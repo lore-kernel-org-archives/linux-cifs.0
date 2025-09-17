@@ -1,714 +1,185 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757EC3233E1;
-	Wed, 17 Sep 2025 12:39:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F7732129F
+	for <linux-cifs@vger.kernel.org>; Wed, 17 Sep 2025 15:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758112760; cv=none; b=hBEf2UxbzvKsckoLrsrU4yaa0T0ZZf3eC4zAMTdqfAcNa4UdNnD7J+2qXD5NJlCxDUuTZm1KRi0w5Qs0NHi0uqVrniYhFqGAj283WaODEB3oa8hEyNWBdVmOSXUQnoT36Yd3dla3lgdrT/dT/Ub6pIaePfnT94luVOL16LVo86w=
+	t=1758123852; cv=none; b=SaXM4npSn/b2QwnVvP2OvNzPIfKRnP5my2t31KcgiuPJ4JUgQ8iC7dczT/bcgf7nXSvzZACiu2X1S9w2VvSxk4psGgf/XmutWFxcx0dBmsb3bmEfGMct7TnE9KRDNqnN5PBtb4xIZNxTMnWA/amupcEDRv1pQch/XZIZNcX5Hag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758112760; c=relaxed/simple;
-	bh=8rBjhyMgdD5ybr48v8YOy7kLOPToBlm8G/LiWF5um7k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dsZTIUrV+oWrdBMdDoyIzLLI6uF7oE9LJT+hAUbSXZAlEi9kG1XIkgJX2uhh+a8yBJSRuXWryNp0rKdlkDHVj6BGXSdrObyEFLb8SqBm5FzrGSHqzk8glNtbQuldqTD3juE7FtgS5nDg1bxMhvVrmTbKQ6sR+p3E/yWiucC0b7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=woUpNUyJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758123852; c=relaxed/simple;
+	bh=PJmoD/E8O8uxpsqeSypLtYbo8FmTldXE1zVyfEVlzFI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aLC+KJjynCk0lHYnguqxRjdVu5STZjC6vdOCv/MkhwhPTlgYcVWxUpLex9rWZRapA+DFiLTz65ZK3V9RsV2eSf1ZKMMECydWn1N687RXc5tFruDkulBgoqZX6OSi24iWcf53b5HgxmRYTPsaxMSgzLZnydwz9PjlFdwYdEHfbPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tn2ywudo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=48nzq6rb; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tn2ywudo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=48nzq6rb; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="woUpNUyJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90856C4CEF0;
-	Wed, 17 Sep 2025 12:39:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1758112759;
-	bh=8rBjhyMgdD5ybr48v8YOy7kLOPToBlm8G/LiWF5um7k=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=woUpNUyJszXg5q31y4+sKordwGStA+ew2MsF48fv5WGaVDPbZCE/JT5rHdQyzfitS
-	 Oing8dOypNogb440qe+ojSs73voBcDknGcpnuflbF3UJ5HiNr/67saMwxDTGPQ301w
-	 ySbiy+8z+b5MU3efxZqSAWec4NGOrNtFjN9UPFF0=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Jean-Baptiste Denis <jbdenis@pasteur.fr>,
-	David Howells <dhowells@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	Frank Sorenson <sorenson@redhat.com>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Benjamin Coddington <bcodding@redhat.com>,
-	Scott Mayhew <smayhew@redhat.com>,
-	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.16 069/189] smb: client: fix data loss due to broken rename(2)
-Date: Wed, 17 Sep 2025 14:32:59 +0200
-Message-ID: <20250917123353.559392928@linuxfoundation.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250917123351.839989757@linuxfoundation.org>
-References: <20250917123351.839989757@linuxfoundation.org>
-User-Agent: quilt/0.68
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tn2ywudo";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="48nzq6rb";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tn2ywudo";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="48nzq6rb"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4A59720A6E;
+	Wed, 17 Sep 2025 15:44:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758123848; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xNisu7KOHochkZfaDmdXl5yHp4zuov5jJ/9YPIvrK64=;
+	b=tn2ywudoySnG6ih5Cln+tw+0k1CTHAuW5oxhFPK5QYOg9fI6mWtoXHYFk38vjvYKWo7ZQV
+	H44OBV4DhysFsb71Lkao0b4/y6CU/D8Co8a933c84Z9eAYXaGunklLz2wxwM7wjjFO9dvT
+	o4vfIWXoNSFD3tjfoaN64qUH8W5u4qo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758123848;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xNisu7KOHochkZfaDmdXl5yHp4zuov5jJ/9YPIvrK64=;
+	b=48nzq6rbddFJL3zalUR6p66xCFbveBaD61wirNT+vNBKg9BMOB8G8LbBSlv45exTSv24KS
+	HdkVd/drL+YOeaDw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758123848; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xNisu7KOHochkZfaDmdXl5yHp4zuov5jJ/9YPIvrK64=;
+	b=tn2ywudoySnG6ih5Cln+tw+0k1CTHAuW5oxhFPK5QYOg9fI6mWtoXHYFk38vjvYKWo7ZQV
+	H44OBV4DhysFsb71Lkao0b4/y6CU/D8Co8a933c84Z9eAYXaGunklLz2wxwM7wjjFO9dvT
+	o4vfIWXoNSFD3tjfoaN64qUH8W5u4qo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758123848;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xNisu7KOHochkZfaDmdXl5yHp4zuov5jJ/9YPIvrK64=;
+	b=48nzq6rbddFJL3zalUR6p66xCFbveBaD61wirNT+vNBKg9BMOB8G8LbBSlv45exTSv24KS
+	HdkVd/drL+YOeaDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CB75B137C3;
+	Wed, 17 Sep 2025 15:44:07 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id sKBZJEfXymjjIwAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Wed, 17 Sep 2025 15:44:07 +0000
+Date: Wed, 17 Sep 2025 12:43:57 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: smfrench@gmail.com, Frank Sorenson <sorenson@redhat.com>, 
+	David Howells <dhowells@redhat.com>, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH] smb: client: fix filename matching of deferred files
+Message-ID: <6crvzn6sgy7ia35jeim3wpvliww3alxkaije6sh55ggyvhitwm@nefxffuhgn3z>
+References: <20250917003701.694520-1-pc@manguebit.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250917003701.694520-1-pc@manguebit.org>
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -3.80
 
-6.16-stable review patch.  If anyone has any objections, please let me know.
+On 09/16, Paulo Alcantara wrote:
+>Fix the following case where the client would end up closing both
+>deferred files (foo.tmp & foo) after unlink(foo) due to strstr() call
+>in cifs_close_deferred_file_under_dentry():
+>
+>  fd1 = openat(AT_FDCWD, "foo", O_WRONLY|O_CREAT|O_TRUNC, 0666);
+>  fd2 = openat(AT_FDCWD, "foo.tmp", O_WRONLY|O_CREAT|O_TRUNC, 0666);
+>  close(fd1);
+>  close(fd2);
+>  unlink("foo");
 
-------------------
+Good catch, but since you're at it, wouldn't it be more elegant to
+replace @path with @dentry and just compare cfile->dentry == dentry?
 
-From: Paulo Alcantara <pc@manguebit.org>
-
-commit c5ea3065586d790ea5193a679b85585173d59866 upstream.
-
-Rename of open files in SMB2+ has been broken for a very long time,
-resulting in data loss as the CIFS client would fail the rename(2)
-call with -ENOENT and then removing the target file.
-
-Fix this by implementing ->rename_pending_delete() for SMB2+, which
-will rename busy files to random filenames (e.g. silly rename) during
-unlink(2) or rename(2), and then marking them to delete-on-close.
-
-Besides, introduce a FIND_WR_NO_PENDING_DELETE flag to prevent open(2)
-from reusing open handles that had been marked as delete pending.
-Handle it in cifs_get_readable_path() as well.
-
-Reported-by: Jean-Baptiste Denis <jbdenis@pasteur.fr>
-Closes: https://marc.info/?i=16aeb380-30d4-4551-9134-4e7d1dc833c0@pasteur.fr
-Reviewed-by: David Howells <dhowells@redhat.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Cc: Frank Sorenson <sorenson@redhat.com>
-Cc: Olga Kornievskaia <okorniev@redhat.com>
-Cc: Benjamin Coddington <bcodding@redhat.com>
-Cc: Scott Mayhew <smayhew@redhat.com>
-Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/smb/client/cifsglob.h  |   13 ++
- fs/smb/client/file.c      |   18 +++-
- fs/smb/client/inode.c     |   86 +++++++++++++++----
- fs/smb/client/smb2glob.h  |    3 
- fs/smb/client/smb2inode.c |  204 ++++++++++++++++++++++++++++++++++++----------
- fs/smb/client/smb2ops.c   |    4 
- fs/smb/client/smb2proto.h |    3 
- fs/smb/client/trace.h     |    9 --
- 8 files changed, 268 insertions(+), 72 deletions(-)
-
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -87,7 +87,7 @@
- #define SMB_INTERFACE_POLL_INTERVAL	600
- 
- /* maximum number of PDUs in one compound */
--#define MAX_COMPOUND 7
-+#define MAX_COMPOUND 10
- 
- /*
-  * Default number of credits to keep available for SMB3.
-@@ -1877,9 +1877,12 @@ static inline bool is_replayable_error(i
- 
- 
- /* cifs_get_writable_file() flags */
--#define FIND_WR_ANY         0
--#define FIND_WR_FSUID_ONLY  1
--#define FIND_WR_WITH_DELETE 2
-+enum cifs_writable_file_flags {
-+	FIND_WR_ANY			= 0U,
-+	FIND_WR_FSUID_ONLY		= (1U << 0),
-+	FIND_WR_WITH_DELETE		= (1U << 1),
-+	FIND_WR_NO_PENDING_DELETE	= (1U << 2),
-+};
- 
- #define   MID_FREE 0
- #define   MID_REQUEST_ALLOCATED 1
-@@ -2339,6 +2342,8 @@ struct smb2_compound_vars {
- 	struct kvec qi_iov;
- 	struct kvec io_iov[SMB2_IOCTL_IOV_SIZE];
- 	struct kvec si_iov[SMB2_SET_INFO_IOV_SIZE];
-+	struct kvec unlink_iov[SMB2_SET_INFO_IOV_SIZE];
-+	struct kvec rename_iov[SMB2_SET_INFO_IOV_SIZE];
- 	struct kvec close_iov;
- 	struct smb2_file_rename_info_hdr rename_info;
- 	struct smb2_file_link_info_hdr link_info;
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -998,7 +998,10 @@ int cifs_open(struct inode *inode, struc
- 
- 	/* Get the cached handle as SMB2 close is deferred */
- 	if (OPEN_FMODE(file->f_flags) & FMODE_WRITE) {
--		rc = cifs_get_writable_path(tcon, full_path, FIND_WR_FSUID_ONLY, &cfile);
-+		rc = cifs_get_writable_path(tcon, full_path,
-+					    FIND_WR_FSUID_ONLY |
-+					    FIND_WR_NO_PENDING_DELETE,
-+					    &cfile);
- 	} else {
- 		rc = cifs_get_readable_path(tcon, full_path, &cfile);
- 	}
-@@ -2530,6 +2533,9 @@ refind_writable:
- 			continue;
- 		if (with_delete && !(open_file->fid.access & DELETE))
- 			continue;
-+		if ((flags & FIND_WR_NO_PENDING_DELETE) &&
-+		    open_file->status_file_deleted)
-+			continue;
- 		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
- 			if (!open_file->invalidHandle) {
- 				/* found a good writable file */
-@@ -2647,6 +2653,16 @@ cifs_get_readable_path(struct cifs_tcon
- 		spin_unlock(&tcon->open_file_lock);
- 		free_dentry_path(page);
- 		*ret_file = find_readable_file(cinode, 0);
-+		if (*ret_file) {
-+			spin_lock(&cinode->open_file_lock);
-+			if ((*ret_file)->status_file_deleted) {
-+				spin_unlock(&cinode->open_file_lock);
-+				cifsFileInfo_put(*ret_file);
-+				*ret_file = NULL;
-+			} else {
-+				spin_unlock(&cinode->open_file_lock);
-+			}
-+		}
- 		return *ret_file ? 0 : -ENOENT;
- 	}
- 
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1931,7 +1931,7 @@ cifs_drop_nlink(struct inode *inode)
-  * but will return the EACCES to the caller. Note that the VFS does not call
-  * unlink on negative dentries currently.
-  */
--int cifs_unlink(struct inode *dir, struct dentry *dentry)
-+static int __cifs_unlink(struct inode *dir, struct dentry *dentry, bool sillyrename)
- {
- 	int rc = 0;
- 	unsigned int xid;
-@@ -2003,7 +2003,11 @@ retry_std_delete:
- 		goto psx_del_no_retry;
- 	}
- 
--	rc = server->ops->unlink(xid, tcon, full_path, cifs_sb, dentry);
-+	if (sillyrename || (server->vals->protocol_id > SMB10_PROT_ID &&
-+			    d_is_positive(dentry) && d_count(dentry) > 2))
-+		rc = -EBUSY;
-+	else
-+		rc = server->ops->unlink(xid, tcon, full_path, cifs_sb, dentry);
- 
- psx_del_no_retry:
- 	if (!rc) {
-@@ -2071,6 +2075,11 @@ unlink_out:
- 	return rc;
- }
- 
-+int cifs_unlink(struct inode *dir, struct dentry *dentry)
-+{
-+	return __cifs_unlink(dir, dentry, false);
-+}
-+
- static int
- cifs_mkdir_qinfo(struct inode *parent, struct dentry *dentry, umode_t mode,
- 		 const char *full_path, struct cifs_sb_info *cifs_sb,
-@@ -2358,14 +2367,16 @@ int cifs_rmdir(struct inode *inode, stru
- 	rc = server->ops->rmdir(xid, tcon, full_path, cifs_sb);
- 	cifs_put_tlink(tlink);
- 
-+	cifsInode = CIFS_I(d_inode(direntry));
-+
- 	if (!rc) {
-+		set_bit(CIFS_INO_DELETE_PENDING, &cifsInode->flags);
- 		spin_lock(&d_inode(direntry)->i_lock);
- 		i_size_write(d_inode(direntry), 0);
- 		clear_nlink(d_inode(direntry));
- 		spin_unlock(&d_inode(direntry)->i_lock);
- 	}
- 
--	cifsInode = CIFS_I(d_inode(direntry));
- 	/* force revalidate to go get info when needed */
- 	cifsInode->time = 0;
- 
-@@ -2458,8 +2469,11 @@ cifs_do_rename(const unsigned int xid, s
- 	}
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
- do_rename_exit:
--	if (rc == 0)
-+	if (rc == 0) {
- 		d_move(from_dentry, to_dentry);
-+		/* Force a new lookup */
-+		d_drop(from_dentry);
-+	}
- 	cifs_put_tlink(tlink);
- 	return rc;
- }
-@@ -2470,6 +2484,7 @@ cifs_rename2(struct mnt_idmap *idmap, st
- 	     struct dentry *target_dentry, unsigned int flags)
- {
- 	const char *from_name, *to_name;
-+	struct TCP_Server_Info *server;
- 	void *page1, *page2;
- 	struct cifs_sb_info *cifs_sb;
- 	struct tcon_link *tlink;
-@@ -2505,6 +2520,7 @@ cifs_rename2(struct mnt_idmap *idmap, st
- 	if (IS_ERR(tlink))
- 		return PTR_ERR(tlink);
- 	tcon = tlink_tcon(tlink);
-+	server = tcon->ses->server;
- 
- 	page1 = alloc_dentry_path();
- 	page2 = alloc_dentry_path();
-@@ -2591,19 +2607,53 @@ cifs_rename2(struct mnt_idmap *idmap, st
- 
- unlink_target:
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
--
--	/* Try unlinking the target dentry if it's not negative */
--	if (d_really_is_positive(target_dentry) && (rc == -EACCES || rc == -EEXIST)) {
--		if (d_is_dir(target_dentry))
--			tmprc = cifs_rmdir(target_dir, target_dentry);
--		else
--			tmprc = cifs_unlink(target_dir, target_dentry);
--		if (tmprc)
--			goto cifs_rename_exit;
--		rc = cifs_do_rename(xid, source_dentry, from_name,
--				    target_dentry, to_name);
--		if (!rc)
--			rehash = false;
-+	if (d_really_is_positive(target_dentry)) {
-+		if (!rc) {
-+			struct inode *inode = d_inode(target_dentry);
-+			/*
-+			 * Samba and ksmbd servers allow renaming a target
-+			 * directory that is open, so make sure to update
-+			 * ->i_nlink and then mark it as delete pending.
-+			 */
-+			if (S_ISDIR(inode->i_mode)) {
-+				drop_cached_dir_by_name(xid, tcon, to_name, cifs_sb);
-+				spin_lock(&inode->i_lock);
-+				i_size_write(inode, 0);
-+				clear_nlink(inode);
-+				spin_unlock(&inode->i_lock);
-+				set_bit(CIFS_INO_DELETE_PENDING, &CIFS_I(inode)->flags);
-+				CIFS_I(inode)->time = 0; /* force reval */
-+				inode_set_ctime_current(inode);
-+				inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
-+			}
-+		} else if (rc == -EACCES || rc == -EEXIST) {
-+			/*
-+			 * Rename failed, possibly due to a busy target.
-+			 * Retry it by unliking the target first.
-+			 */
-+			if (d_is_dir(target_dentry)) {
-+				tmprc = cifs_rmdir(target_dir, target_dentry);
-+			} else {
-+				tmprc = __cifs_unlink(target_dir, target_dentry,
-+						      server->vals->protocol_id > SMB10_PROT_ID);
-+			}
-+			if (tmprc) {
-+				/*
-+				 * Some servers will return STATUS_ACCESS_DENIED
-+				 * or STATUS_DIRECTORY_NOT_EMPTY when failing to
-+				 * rename a non-empty directory.  Make sure to
-+				 * propagate the appropriate error back to
-+				 * userspace.
-+				 */
-+				if (tmprc == -EEXIST || tmprc == -ENOTEMPTY)
-+					rc = tmprc;
-+				goto cifs_rename_exit;
-+			}
-+			rc = cifs_do_rename(xid, source_dentry, from_name,
-+					    target_dentry, to_name);
-+			if (!rc)
-+				rehash = false;
-+		}
- 	}
- 
- 	/* force revalidate to go get info when needed */
-@@ -2629,6 +2679,8 @@ cifs_dentry_needs_reval(struct dentry *d
- 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
- 	struct cached_fid *cfid = NULL;
- 
-+	if (test_bit(CIFS_INO_DELETE_PENDING, &cifs_i->flags))
-+		return false;
- 	if (cifs_i->time == 0)
- 		return true;
- 
---- a/fs/smb/client/smb2glob.h
-+++ b/fs/smb/client/smb2glob.h
-@@ -30,10 +30,9 @@ enum smb2_compound_ops {
- 	SMB2_OP_QUERY_DIR,
- 	SMB2_OP_MKDIR,
- 	SMB2_OP_RENAME,
--	SMB2_OP_DELETE,
- 	SMB2_OP_HARDLINK,
- 	SMB2_OP_SET_EOF,
--	SMB2_OP_RMDIR,
-+	SMB2_OP_UNLINK,
- 	SMB2_OP_POSIX_QUERY_INFO,
- 	SMB2_OP_SET_REPARSE,
- 	SMB2_OP_GET_REPARSE,
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -346,9 +346,6 @@ replay_again:
- 			trace_smb3_posix_query_info_compound_enter(xid, tcon->tid,
- 								   ses->Suid, full_path);
- 			break;
--		case SMB2_OP_DELETE:
--			trace_smb3_delete_enter(xid, tcon->tid, ses->Suid, full_path);
--			break;
- 		case SMB2_OP_MKDIR:
- 			/*
- 			 * Directories are created through parameters in the
-@@ -356,23 +353,40 @@ replay_again:
- 			 */
- 			trace_smb3_mkdir_enter(xid, tcon->tid, ses->Suid, full_path);
- 			break;
--		case SMB2_OP_RMDIR:
--			rqst[num_rqst].rq_iov = &vars->si_iov[0];
-+		case SMB2_OP_UNLINK:
-+			rqst[num_rqst].rq_iov = vars->unlink_iov;
- 			rqst[num_rqst].rq_nvec = 1;
- 
- 			size[0] = 1; /* sizeof __u8 See MS-FSCC section 2.4.11 */
- 			data[0] = &delete_pending[0];
- 
--			rc = SMB2_set_info_init(tcon, server,
--						&rqst[num_rqst], COMPOUND_FID,
--						COMPOUND_FID, current->tgid,
--						FILE_DISPOSITION_INFORMATION,
--						SMB2_O_INFO_FILE, 0, data, size);
--			if (rc)
-+			if (cfile) {
-+				rc = SMB2_set_info_init(tcon, server,
-+							&rqst[num_rqst],
-+							cfile->fid.persistent_fid,
-+							cfile->fid.volatile_fid,
-+							current->tgid,
-+							FILE_DISPOSITION_INFORMATION,
-+							SMB2_O_INFO_FILE, 0,
-+							data, size);
-+			} else {
-+				rc = SMB2_set_info_init(tcon, server,
-+							&rqst[num_rqst],
-+							COMPOUND_FID,
-+							COMPOUND_FID,
-+							current->tgid,
-+							FILE_DISPOSITION_INFORMATION,
-+							SMB2_O_INFO_FILE, 0,
-+							data, size);
-+			}
-+			if (!rc && (!cfile || num_rqst > 1)) {
-+				smb2_set_next_command(tcon, &rqst[num_rqst]);
-+				smb2_set_related(&rqst[num_rqst]);
-+			} else if (rc) {
- 				goto finished;
--			smb2_set_next_command(tcon, &rqst[num_rqst]);
--			smb2_set_related(&rqst[num_rqst++]);
--			trace_smb3_rmdir_enter(xid, tcon->tid, ses->Suid, full_path);
-+			}
-+			num_rqst++;
-+			trace_smb3_unlink_enter(xid, tcon->tid, ses->Suid, full_path);
- 			break;
- 		case SMB2_OP_SET_EOF:
- 			rqst[num_rqst].rq_iov = &vars->si_iov[0];
-@@ -442,7 +456,7 @@ replay_again:
- 							   ses->Suid, full_path);
- 			break;
- 		case SMB2_OP_RENAME:
--			rqst[num_rqst].rq_iov = &vars->si_iov[0];
-+			rqst[num_rqst].rq_iov = vars->rename_iov;
- 			rqst[num_rqst].rq_nvec = 2;
- 
- 			len = in_iov[i].iov_len;
-@@ -732,19 +746,6 @@ finished:
- 				trace_smb3_posix_query_info_compound_done(xid, tcon->tid,
- 									  ses->Suid);
- 			break;
--		case SMB2_OP_DELETE:
--			if (rc)
--				trace_smb3_delete_err(xid, tcon->tid, ses->Suid, rc);
--			else {
--				/*
--				 * If dentry (hence, inode) is NULL, lease break is going to
--				 * take care of degrading leases on handles for deleted files.
--				 */
--				if (inode)
--					cifs_mark_open_handles_for_deleted_file(inode, full_path);
--				trace_smb3_delete_done(xid, tcon->tid, ses->Suid);
--			}
--			break;
- 		case SMB2_OP_MKDIR:
- 			if (rc)
- 				trace_smb3_mkdir_err(xid, tcon->tid, ses->Suid, rc);
-@@ -765,11 +766,11 @@ finished:
- 				trace_smb3_rename_done(xid, tcon->tid, ses->Suid);
- 			SMB2_set_info_free(&rqst[num_rqst++]);
- 			break;
--		case SMB2_OP_RMDIR:
--			if (rc)
--				trace_smb3_rmdir_err(xid, tcon->tid, ses->Suid, rc);
-+		case SMB2_OP_UNLINK:
-+			if (!rc)
-+				trace_smb3_unlink_done(xid, tcon->tid, ses->Suid);
- 			else
--				trace_smb3_rmdir_done(xid, tcon->tid, ses->Suid);
-+				trace_smb3_unlink_err(xid, tcon->tid, ses->Suid, rc);
- 			SMB2_set_info_free(&rqst[num_rqst++]);
- 			break;
- 		case SMB2_OP_SET_EOF:
-@@ -1165,7 +1166,7 @@ smb2_rmdir(const unsigned int xid, struc
- 			     FILE_OPEN, CREATE_NOT_FILE, ACL_NO_MODE);
- 	return smb2_compound_op(xid, tcon, cifs_sb,
- 				name, &oparms, NULL,
--				&(int){SMB2_OP_RMDIR}, 1,
-+				&(int){SMB2_OP_UNLINK}, 1,
- 				NULL, NULL, NULL, NULL);
- }
- 
-@@ -1174,20 +1175,29 @@ smb2_unlink(const unsigned int xid, stru
- 	    struct cifs_sb_info *cifs_sb, struct dentry *dentry)
- {
- 	struct cifs_open_parms oparms;
-+	struct inode *inode = NULL;
-+	int rc;
- 
--	oparms = CIFS_OPARMS(cifs_sb, tcon, name,
--			     DELETE, FILE_OPEN,
--			     CREATE_DELETE_ON_CLOSE | OPEN_REPARSE_POINT,
--			     ACL_NO_MODE);
--	int rc = smb2_compound_op(xid, tcon, cifs_sb, name, &oparms,
--				  NULL, &(int){SMB2_OP_DELETE}, 1,
--				  NULL, NULL, NULL, dentry);
-+	if (dentry)
-+		inode = d_inode(dentry);
-+
-+	oparms = CIFS_OPARMS(cifs_sb, tcon, name, DELETE,
-+			     FILE_OPEN, OPEN_REPARSE_POINT, ACL_NO_MODE);
-+	rc = smb2_compound_op(xid, tcon, cifs_sb, name, &oparms,
-+			      NULL, &(int){SMB2_OP_UNLINK},
-+			      1, NULL, NULL, NULL, dentry);
- 	if (rc == -EINVAL) {
- 		cifs_dbg(FYI, "invalid lease key, resending request without lease");
- 		rc = smb2_compound_op(xid, tcon, cifs_sb, name, &oparms,
--				      NULL, &(int){SMB2_OP_DELETE}, 1,
--				      NULL, NULL, NULL, NULL);
-+				      NULL, &(int){SMB2_OP_UNLINK},
-+				      1, NULL, NULL, NULL, NULL);
- 	}
-+	/*
-+	 * If dentry (hence, inode) is NULL, lease break is going to
-+	 * take care of degrading leases on handles for deleted files.
-+	 */
-+	if (!rc && inode)
-+		cifs_mark_open_handles_for_deleted_file(inode, name);
- 	return rc;
- }
- 
-@@ -1441,3 +1451,113 @@ out:
- 	cifs_free_open_info(&data);
- 	return rc;
- }
-+
-+static inline __le16 *utf16_smb2_path(struct cifs_sb_info *cifs_sb,
-+				      const char *name, size_t namelen)
-+{
-+	int len;
-+
-+	if (*name == '\\' ||
-+	    (cifs_sb_master_tlink(cifs_sb) &&
-+	     cifs_sb_master_tcon(cifs_sb)->posix_extensions && *name == '/'))
-+		name++;
-+	return cifs_strndup_to_utf16(name, namelen, &len,
-+				     cifs_sb->local_nls,
-+				     cifs_remap(cifs_sb));
-+}
-+
-+int smb2_rename_pending_delete(const char *full_path,
-+			       struct dentry *dentry,
-+			       const unsigned int xid)
-+{
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(d_inode(dentry)->i_sb);
-+	struct cifsInodeInfo *cinode = CIFS_I(d_inode(dentry));
-+	__le16 *utf16_path __free(kfree) = NULL;
-+	__u32 co = file_create_options(dentry);
-+	int cmds[] = {
-+		SMB2_OP_SET_INFO,
-+		SMB2_OP_RENAME,
-+		SMB2_OP_UNLINK,
-+	};
-+	const int num_cmds = ARRAY_SIZE(cmds);
-+	char *to_name __free(kfree) = NULL;
-+	__u32 attrs = cinode->cifsAttrs;
-+	struct cifs_open_parms oparms;
-+	static atomic_t sillycounter;
-+	struct cifsFileInfo *cfile;
-+	struct tcon_link *tlink;
-+	struct cifs_tcon *tcon;
-+	struct kvec iov[2];
-+	const char *ppath;
-+	void *page;
-+	size_t len;
-+	int rc;
-+
-+	tlink = cifs_sb_tlink(cifs_sb);
-+	if (IS_ERR(tlink))
-+		return PTR_ERR(tlink);
-+	tcon = tlink_tcon(tlink);
-+
-+	page = alloc_dentry_path();
-+
-+	ppath = build_path_from_dentry(dentry->d_parent, page);
-+	if (IS_ERR(ppath)) {
-+		rc = PTR_ERR(ppath);
-+		goto out;
-+	}
-+
-+	len = strlen(ppath) + strlen("/.__smb1234") + 1;
-+	to_name = kmalloc(len, GFP_KERNEL);
-+	if (!to_name) {
-+		rc = -ENOMEM;
-+		goto out;
-+	}
-+
-+	scnprintf(to_name, len, "%s%c.__smb%04X", ppath, CIFS_DIR_SEP(cifs_sb),
-+		  atomic_inc_return(&sillycounter) & 0xffff);
-+
-+	utf16_path = utf16_smb2_path(cifs_sb, to_name, len);
-+	if (!utf16_path) {
-+		rc = -ENOMEM;
-+		goto out;
-+	}
-+
-+	drop_cached_dir_by_name(xid, tcon, full_path, cifs_sb);
-+	oparms = CIFS_OPARMS(cifs_sb, tcon, full_path,
-+			     DELETE | FILE_WRITE_ATTRIBUTES,
-+			     FILE_OPEN, co, ACL_NO_MODE);
-+
-+	attrs &= ~ATTR_READONLY;
-+	if (!attrs)
-+		attrs = ATTR_NORMAL;
-+	if (d_inode(dentry)->i_nlink <= 1)
-+		attrs |= ATTR_HIDDEN;
-+	iov[0].iov_base = &(FILE_BASIC_INFO) {
-+		.Attributes = cpu_to_le32(attrs),
-+	};
-+	iov[0].iov_len = sizeof(FILE_BASIC_INFO);
-+	iov[1].iov_base = utf16_path;
-+	iov[1].iov_len = sizeof(*utf16_path) * UniStrlen((wchar_t *)utf16_path);
-+
-+	cifs_get_writable_path(tcon, full_path, FIND_WR_WITH_DELETE, &cfile);
-+	rc = smb2_compound_op(xid, tcon, cifs_sb, full_path, &oparms, iov,
-+			      cmds, num_cmds, cfile, NULL, NULL, dentry);
-+	if (rc == -EINVAL) {
-+		cifs_dbg(FYI, "invalid lease key, resending request without lease\n");
-+		cifs_get_writable_path(tcon, full_path,
-+				       FIND_WR_WITH_DELETE, &cfile);
-+		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path, &oparms, iov,
-+				      cmds, num_cmds, cfile, NULL, NULL, NULL);
-+	}
-+	if (!rc) {
-+		set_bit(CIFS_INO_DELETE_PENDING, &cinode->flags);
-+	} else {
-+		cifs_tcon_dbg(FYI, "%s: failed to rename '%s' to '%s': %d\n",
-+			      __func__, full_path, to_name, rc);
-+		rc = -EIO;
-+	}
-+out:
-+	cifs_put_tlink(tlink);
-+	free_dentry_path(page);
-+	return rc;
-+}
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -5399,6 +5399,7 @@ struct smb_version_operations smb20_oper
- 	.llseek = smb3_llseek,
- 	.is_status_io_timeout = smb2_is_status_io_timeout,
- 	.is_network_name_deleted = smb2_is_network_name_deleted,
-+	.rename_pending_delete = smb2_rename_pending_delete,
- };
- #endif /* CIFS_ALLOW_INSECURE_LEGACY */
- 
-@@ -5504,6 +5505,7 @@ struct smb_version_operations smb21_oper
- 	.llseek = smb3_llseek,
- 	.is_status_io_timeout = smb2_is_status_io_timeout,
- 	.is_network_name_deleted = smb2_is_network_name_deleted,
-+	.rename_pending_delete = smb2_rename_pending_delete,
- };
- 
- struct smb_version_operations smb30_operations = {
-@@ -5620,6 +5622,7 @@ struct smb_version_operations smb30_oper
- 	.llseek = smb3_llseek,
- 	.is_status_io_timeout = smb2_is_status_io_timeout,
- 	.is_network_name_deleted = smb2_is_network_name_deleted,
-+	.rename_pending_delete = smb2_rename_pending_delete,
- };
- 
- struct smb_version_operations smb311_operations = {
-@@ -5736,6 +5739,7 @@ struct smb_version_operations smb311_ope
- 	.llseek = smb3_llseek,
- 	.is_status_io_timeout = smb2_is_status_io_timeout,
- 	.is_network_name_deleted = smb2_is_network_name_deleted,
-+	.rename_pending_delete = smb2_rename_pending_delete,
- };
- 
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -320,5 +320,8 @@ int smb2_create_reparse_symlink(const un
- int smb2_make_nfs_node(unsigned int xid, struct inode *inode,
- 		       struct dentry *dentry, struct cifs_tcon *tcon,
- 		       const char *full_path, umode_t mode, dev_t dev);
-+int smb2_rename_pending_delete(const char *full_path,
-+			       struct dentry *dentry,
-+			       const unsigned int xid);
- 
- #endif			/* _SMB2PROTO_H */
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -669,13 +669,12 @@ DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(que
- DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(posix_query_info_compound_enter);
- DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(hardlink_enter);
- DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(rename_enter);
--DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(rmdir_enter);
-+DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(unlink_enter);
- DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(set_eof_enter);
- DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(set_info_compound_enter);
- DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(set_reparse_compound_enter);
- DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(get_reparse_compound_enter);
- DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(query_wsl_ea_compound_enter);
--DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(delete_enter);
- DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(mkdir_enter);
- DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(tdis_enter);
- DEFINE_SMB3_INF_COMPOUND_ENTER_EVENT(mknod_enter);
-@@ -710,13 +709,12 @@ DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(quer
- DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(posix_query_info_compound_done);
- DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(hardlink_done);
- DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(rename_done);
--DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(rmdir_done);
-+DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(unlink_done);
- DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(set_eof_done);
- DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(set_info_compound_done);
- DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(set_reparse_compound_done);
- DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(get_reparse_compound_done);
- DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(query_wsl_ea_compound_done);
--DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(delete_done);
- DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(mkdir_done);
- DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(tdis_done);
- DEFINE_SMB3_INF_COMPOUND_DONE_EVENT(mknod_done);
-@@ -756,14 +754,13 @@ DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(query
- DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(posix_query_info_compound_err);
- DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(hardlink_err);
- DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(rename_err);
--DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(rmdir_err);
-+DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(unlink_err);
- DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(set_eof_err);
- DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(set_info_compound_err);
- DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(set_reparse_compound_err);
- DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(get_reparse_compound_err);
- DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(query_wsl_ea_compound_err);
- DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(mkdir_err);
--DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(delete_err);
- DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(tdis_err);
- DEFINE_SMB3_INF_COMPOUND_ERR_EVENT(mknod_err);
- 
+Would also improve performance by saving calls to
+build_path_from_dentry().
 
 
+Cheers,
+
+Enzo
+
+>Fixes: e3fc065682eb ("cifs: Deferred close performance improvements")
+>Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+>Cc: Frank Sorenson <sorenson@redhat.com>
+>Cc: David Howells <dhowells@redhat.com>
+>Cc: linux-cifs@vger.kernel.org
+>---
+> fs/smb/client/misc.c | 25 ++++++++++++-------------
+> 1 file changed, 12 insertions(+), 13 deletions(-)
+>
+>diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+>index da23cc12a52c..09d5fa3638c9 100644
+>--- a/fs/smb/client/misc.c
+>+++ b/fs/smb/client/misc.c
+>@@ -845,20 +845,19 @@ cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const char *path)
+> 	spin_lock(&tcon->open_file_lock);
+> 	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+> 		full_path = build_path_from_dentry(cfile->dentry, page);
+>-		if (strstr(full_path, path)) {
+>-			if (delayed_work_pending(&cfile->deferred)) {
+>-				if (cancel_delayed_work(&cfile->deferred)) {
+>-					spin_lock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
+>-					cifs_del_deferred_close(cfile);
+>-					spin_unlock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
+>+		if (IS_ERR(full_path) || strcmp(full_path, path))
+>+			continue;
+>+		if (delayed_work_pending(&cfile->deferred) &&
+>+		    cancel_delayed_work(&cfile->deferred)) {
+>+			spin_lock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
+>+			cifs_del_deferred_close(cfile);
+>+			spin_unlock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
+>
+>-					tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
+>-					if (tmp_list == NULL)
+>-						break;
+>-					tmp_list->cfile = cfile;
+>-					list_add_tail(&tmp_list->list, &file_head);
+>-				}
+>-			}
+>+			tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
+>+			if (tmp_list == NULL)
+>+				break;
+>+			tmp_list->cfile = cfile;
+>+			list_add_tail(&tmp_list->list, &file_head);
+> 		}
+> 	}
+> 	spin_unlock(&tcon->open_file_lock);
+>-- 
+>2.51.0
+>
+>
