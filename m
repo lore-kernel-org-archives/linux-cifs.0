@@ -1,318 +1,270 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02442EBBAD
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Sep 2025 12:10:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A9630E0C6;
+	Thu, 18 Sep 2025 15:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758197406; cv=none; b=pKXK1hE66LZhBxJ90CW/+rOBQHdgiJH2jiYCPcsspf5/bTWBnw1cNMgkAsQaIeaIPcV7sTsEiL7YakAJ/w4c8UHnKDbpTRHnW0QDF8YK6drhaqnuXNwH4aEHnDrF/vS6xNTzXIMYf89YzYpEMSD2AQQx64Zck4Yt692X1p8XCDM=
+	t=1758209173; cv=none; b=nZcBuyBt1xLKJWzKw3q3boHz2npdc3Dm0yIqsEpQeiaQND0G+vZPmv439htKn1iU0YR87ZLXKW+Y8LdnrFp9JWmi8BDpT6yrPU+I3sdpg1rnx5UCc9IMrTFHtvwOcS50i9RzKDEA26Kk5A0rzfc2i7kOx1riocFe57G+0kzfg/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758197406; c=relaxed/simple;
-	bh=QSqvJtgl4eopOSUqTRvMkIz8oZWp1TBgC1q8PAQo18k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=apeR4kF7AHVmLpKV4ezRZjlnPrkHlu2o/5EjESOepF0ssx8UFGSq1aF1JhFc3drM/ZDDAEXOFy7+Bv+TMN36T5hzm2ElAGIKZ6UiiCAVl1J8+4pOFE9kJxg3i52AsFfqIpfZTjXfAAqiBggQmYNNUyFGUj53ckv3JPPfgEh0bFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HDu0vEOU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=XWAhpwkg; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HDu0vEOU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=XWAhpwkg; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1758209173; c=relaxed/simple;
+	bh=cVOX0k3Ep5O6QsxMI31eJgKQAsaViJmx6+5+pJJKQH4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PCDSMGxo1//nVviRpiez1ak/yy9tdDwGlkw8rV2p0QyPeZYtQft583mZr/oxNHJ1ciky/LCc4iC0scx4m6Mucml9Ak+C39kEChQUQkEg8S8BUeigwyLfIt9SqiJQi+N7g+g1x61vq0HP4Kw863IeYGIzXlwpshsDSgcm/8qU65g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=3bXl+Z+F; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HDu0vEOU";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="XWAhpwkg";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HDu0vEOU";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="XWAhpwkg"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id A46732119D;
-	Thu, 18 Sep 2025 12:10:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758197400; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CSXiXWIx4LxyK8oDORMkAwUU+C2TOcCaT7/HhuEgrWQ=;
-	b=HDu0vEOUxQIhkAJQdpXaodh02TG8EMSqynuyH8+j6351HIPC45GNSXomq+Krq1o+H10KCT
-	8xL4rRrhPsOALqexAdLY9rnuCbNZ+BPCPVsbL7EE254tee8JnYRI5ilyKFuMmSqhl8GMIz
-	nEH89C7av9uaQiNlC/ldYY0ey4Of+To=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758197400;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CSXiXWIx4LxyK8oDORMkAwUU+C2TOcCaT7/HhuEgrWQ=;
-	b=XWAhpwkg9FoNS1CPNcvdAF6RwRX0p4XHdbbXVfWuwcNJpixUwEYBlB2V8OEEz26mrdWZwf
-	Kd31hoC/iDzK+sAA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758197400; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CSXiXWIx4LxyK8oDORMkAwUU+C2TOcCaT7/HhuEgrWQ=;
-	b=HDu0vEOUxQIhkAJQdpXaodh02TG8EMSqynuyH8+j6351HIPC45GNSXomq+Krq1o+H10KCT
-	8xL4rRrhPsOALqexAdLY9rnuCbNZ+BPCPVsbL7EE254tee8JnYRI5ilyKFuMmSqhl8GMIz
-	nEH89C7av9uaQiNlC/ldYY0ey4Of+To=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758197400;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CSXiXWIx4LxyK8oDORMkAwUU+C2TOcCaT7/HhuEgrWQ=;
-	b=XWAhpwkg9FoNS1CPNcvdAF6RwRX0p4XHdbbXVfWuwcNJpixUwEYBlB2V8OEEz26mrdWZwf
-	Kd31hoC/iDzK+sAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 32B4413A51;
-	Thu, 18 Sep 2025 12:09:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id C6q/Opf2y2iGEgAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Thu, 18 Sep 2025 12:09:59 +0000
-Date: Thu, 18 Sep 2025 09:09:57 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Steve French <smfrench@gmail.com>
-Cc: Paulo Alcantara <pc@manguebit.org>, 
-	Frank Sorenson <sorenson@redhat.com>, David Howells <dhowells@redhat.com>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v2] smb: client: fix filename matching of deferred files
-Message-ID: <jpjp7nokw5gdynw7i64zpg3ns2og5z7blsunpqr5yzyrb3dqq3@nvstycufnglk>
-References: <20250917190322.765293-1-pc@manguebit.org>
- <v4g2cku4itpiqvfiy6aktcey5rjc2jt5kcoknf36hm45p3nxgu@wb5ho6aoy6dc>
- <CAH2r5mu3fyGd11tf983tvYiKB_Yn8FS3tTQL97HzQKybspgUXA@mail.gmail.com>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="3bXl+Z+F"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=ROEeV6/bs53twvM5/USaWrqxnj7hhOA4GFldd0FLYdE=; b=3bXl+Z+FLnQL7aD7MzEwCYa0es
+	r9ShVTHl0CXLnxfolFUduZB+NeZ8AshpVJ6wo6jk8EuaWBVSnruciq9Hc9aaQi+6Fint6EkNVmLrG
+	wbMmjR1XiZ07iWJoXiMwdgUFq54ZX7dihaKjVfzXCihl8px22drVb2Rx7tO3VVLmx6gTdD2t9SCRp
+	R9VG+R/8erbriKfu0d34ov17tgvGLrbCag1Cuqaz+zA+bCbYAVLPjEg30i9IWdC/hYDoyL4dYh1gg
+	pX129PIEJtJANBIq7qrqEr+BNWzt18WPD1f0fC6EkRbFKvu3PNCQgte496KDTcmhGHS4SRifysiz3
+	zUrICPMrFCOhkog/P25VwhEax8ENLTqicDq1YBbzBVhxrPamnAC8AuOGO7Nt0aiVjqOMIR/+iq82A
+	8o3v/mgWMoWMwnHyyX+MIj4pJ3OjuBwaNyLDMlPy4prZsiP0H1Ki7buYSXr3iQwRKl8yDr5022GKp
+	gQ0FGkPO3dClgn5Ta8R4T+ER;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1uzGWH-004mWv-0a;
+	Thu, 18 Sep 2025 15:26:01 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	linux-rdma@vger.kernel.org,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH v2] smb: client: fix sending the iwrap custom IRD/ORD negotiation messages
+Date: Thu, 18 Sep 2025 17:25:00 +0200
+Message-ID: <20250918152459.1244824-2-metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAH2r5mu3fyGd11tf983tvYiKB_Yn8FS3tTQL97HzQKybspgUXA@mail.gmail.com>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_TLS_ALL(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -3.80
+Content-Transfer-Encoding: 8bit
 
-On 09/17, Steve French wrote:
->minor cosmetic change done to the patch (see attached)
->
->from:
->   if (cfile->dentry =3D=3D dentry &&
->to:
->   if ((cfile->dentry =3D=3D dentry) &&
+Do a real negotiation and check the servers initiator_depth and responder_resources.
 
-IMHO those only makes sense if for either correctness or easier
-understanding, e.g.:
+This should use big endian in order to be useful.
+I have captures of windows clients showing this.
 
->  if (x && (y || z))
+The fact that we used little endian up to now
+means that we sent very large numbers and the
+negotiation with the server truncated them to the
+server limits.
 
-or
+Note the reason why this uses u8 for
+initiator_depth and responder_resources is
+that the rdma layer also uses it.
 
->  if ((x & y) && z)
+The inconsitency regarding the initiator_depth
+and responder_resources values being reversed
+for iwarp devices in RDMA_CM_EVENT_ESTABLISHED
+should also be fixed later, but for now we should
+fix it.
 
-Otherwise it only adds pollution and maybe confusion to the code.
-Example of complete unnecessary extra wrapping in file.c and cifsacl.c
-(but there are several others I've seen around):
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Cc: linux-rdma@vger.kernel.org
+Fixes: c7398583340a ("CIFS: SMBD: Implement RDMA memory registration")
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+ fs/smb/client/smbdirect.c | 110 ++++++++++++++++++++++++++++++++++----
+ fs/smb/client/smbdirect.h |   4 +-
+ 2 files changed, 103 insertions(+), 11 deletions(-)
 
->  if ((!open_file->invalidHandle)) {
-
->  if ((!ctsid) || (!cwsid))
-
-
-My 2c only, up to you of course.
-
-
-Cheers,
-
-Enzo
-
->On Wed, Sep 17, 2025 at 2:15=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.de=
-> wrote:
->>
->> On 09/17, Paulo Alcantara wrote:
->> >Fix the following case where the client would end up closing both
->> >deferred files (foo.tmp & foo) after unlink(foo) due to strstr() call
->> >in cifs_close_deferred_file_under_dentry():
->> >
->> >  fd1 =3D openat(AT_FDCWD, "foo", O_WRONLY|O_CREAT|O_TRUNC, 0666);
->> >  fd2 =3D openat(AT_FDCWD, "foo.tmp", O_WRONLY|O_CREAT|O_TRUNC, 0666);
->> >  close(fd1);
->> >  close(fd2);
->> >  unlink("foo");
->> >
->> >Fixes: e3fc065682eb ("cifs: Deferred close performance improvements")
->> >Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
->> >Cc: Enzo Matsumiya <ematsumiya@suse.de>
->> >Cc: Frank Sorenson <sorenson@redhat.com>
->> >Cc: David Howells <dhowells@redhat.com>
->> >Cc: linux-cifs@vger.kernel.org
->> >---
->> > fs/smb/client/cifsproto.h |  4 ++--
->> > fs/smb/client/inode.c     |  6 +++---
->> > fs/smb/client/misc.c      | 36 +++++++++++++++---------------------
->> > 3 files changed, 20 insertions(+), 26 deletions(-)
->> >
->> >diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
->> >index c34c533b2efa..e8fba98690ce 100644
->> >--- a/fs/smb/client/cifsproto.h
->> >+++ b/fs/smb/client/cifsproto.h
->> >@@ -312,8 +312,8 @@ extern void cifs_close_deferred_file(struct cifsIno=
-deInfo *cifs_inode);
->> >
->> > extern void cifs_close_all_deferred_files(struct cifs_tcon *cifs_tcon);
->> >
->> >-extern void cifs_close_deferred_file_under_dentry(struct cifs_tcon *ci=
-fs_tcon,
->> >-                              const char *path);
->> >+void cifs_close_deferred_file_under_dentry(struct cifs_tcon *cifs_tcon,
->> >+                                         struct dentry *dentry);
->> >
->> > extern void cifs_mark_open_handles_for_deleted_file(struct inode *inod=
-e,
->> >                               const char *path);
->> >diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
->> >index 11d442e8b3d6..1703f1285d36 100644
->> >--- a/fs/smb/client/inode.c
->> >+++ b/fs/smb/client/inode.c
->> >@@ -1984,7 +1984,7 @@ static int __cifs_unlink(struct inode *dir, struc=
-t dentry *dentry, bool sillyren
->> >       }
->> >
->> >       netfs_wait_for_outstanding_io(inode);
->> >-      cifs_close_deferred_file_under_dentry(tcon, full_path);
->> >+      cifs_close_deferred_file_under_dentry(tcon, dentry);
->> > #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
->> >       if (cap_unix(tcon->ses) && (CIFS_UNIX_POSIX_PATH_OPS_CAP &
->> >                               le64_to_cpu(tcon->fsUnixInfo.Capability)=
-)) {
->> >@@ -2538,10 +2538,10 @@ cifs_rename2(struct mnt_idmap *idmap, struct in=
-ode *source_dir,
->> >               goto cifs_rename_exit;
->> >       }
->> >
->> >-      cifs_close_deferred_file_under_dentry(tcon, from_name);
->> >+      cifs_close_deferred_file_under_dentry(tcon, source_dentry);
->> >       if (d_inode(target_dentry) !=3D NULL) {
->> >               netfs_wait_for_outstanding_io(d_inode(target_dentry));
->> >-              cifs_close_deferred_file_under_dentry(tcon, to_name);
->> >+              cifs_close_deferred_file_under_dentry(tcon, target_dentr=
-y);
->> >       }
->> >
->> >       rc =3D cifs_do_rename(xid, source_dentry, from_name, target_dent=
-ry,
->> >diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
->> >index da23cc12a52c..350542d57249 100644
->> >--- a/fs/smb/client/misc.c
->> >+++ b/fs/smb/client/misc.c
->> >@@ -832,33 +832,28 @@ cifs_close_all_deferred_files(struct cifs_tcon *t=
-con)
->> >               kfree(tmp_list);
->> >       }
->> > }
->> >-void
->> >-cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const ch=
-ar *path)
->> >+
->> >+void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
->> >+                                         struct dentry *dentry)
->> > {
->> >-      struct cifsFileInfo *cfile;
->> >       struct file_list *tmp_list, *tmp_next_list;
->> >-      void *page;
->> >-      const char *full_path;
->> >+      struct cifsFileInfo *cfile;
->> >       LIST_HEAD(file_head);
->> >
->> >-      page =3D alloc_dentry_path();
->> >       spin_lock(&tcon->open_file_lock);
->> >       list_for_each_entry(cfile, &tcon->openFileList, tlist) {
->> >-              full_path =3D build_path_from_dentry(cfile->dentry, page=
-);
->> >-              if (strstr(full_path, path)) {
->> >-                      if (delayed_work_pending(&cfile->deferred)) {
->> >-                              if (cancel_delayed_work(&cfile->deferred=
-)) {
->> >-                                      spin_lock(&CIFS_I(d_inode(cfile-=
->dentry))->deferred_lock);
->> >-                                      cifs_del_deferred_close(cfile);
->> >-                                      spin_unlock(&CIFS_I(d_inode(cfil=
-e->dentry))->deferred_lock);
->> >+              if (cfile->dentry =3D=3D dentry &&
->> >+                  delayed_work_pending(&cfile->deferred) &&
->> >+                  cancel_delayed_work(&cfile->deferred)) {
->> >+                      spin_lock(&CIFS_I(d_inode(cfile->dentry))->defer=
-red_lock);
->> >+                      cifs_del_deferred_close(cfile);
->> >+                      spin_unlock(&CIFS_I(d_inode(cfile->dentry))->def=
-erred_lock);
->> >
->> >-                                      tmp_list =3D kmalloc(sizeof(stru=
-ct file_list), GFP_ATOMIC);
->> >-                                      if (tmp_list =3D=3D NULL)
->> >-                                              break;
->> >-                                      tmp_list->cfile =3D cfile;
->> >-                                      list_add_tail(&tmp_list->list, &=
-file_head);
->> >-                              }
->> >-                      }
->> >+                      tmp_list =3D kmalloc(sizeof(struct file_list), G=
-FP_ATOMIC);
->> >+                      if (tmp_list =3D=3D NULL)
->> >+                              break;
->> >+                      tmp_list->cfile =3D cfile;
->> >+                      list_add_tail(&tmp_list->list, &file_head);
->> >               }
->> >       }
->> >       spin_unlock(&tcon->open_file_lock);
->> >@@ -868,7 +863,6 @@ cifs_close_deferred_file_under_dentry(struct cifs_t=
-con *tcon, const char *path)
->> >               list_del(&tmp_list->list);
->> >               kfree(tmp_list);
->> >       }
->> >-      free_dentry_path(page);
->> > }
->> >
->> > /*
->>
->> Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
->>
->>
->> Cheers,
->>
->> Enzo
->
->
->
->--=20
->Thanks,
->
->Steve
-
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index a26f677e7adb..30c3ff034816 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -179,6 +179,8 @@ static int smbd_conn_upcall(
+ 	struct smbd_connection *info = id->context;
+ 	struct smbdirect_socket *sc = &info->socket;
+ 	const char *event_name = rdma_event_msg(event->event);
++	u8 peer_initiator_depth;
++	u8 peer_responder_resources;
+ 
+ 	log_rdma_event(INFO, "event=%s status=%d\n",
+ 		event_name, event->status);
+@@ -204,6 +206,85 @@ static int smbd_conn_upcall(
+ 
+ 	case RDMA_CM_EVENT_ESTABLISHED:
+ 		log_rdma_event(INFO, "connected event=%s\n", event_name);
++
++		/*
++		 * Here we work around an inconsistency between
++		 * iWarp and other devices (at least rxe and irdma using RoCEv2)
++		 */
++		if (rdma_protocol_iwarp(id->device, id->port_num)) {
++			/*
++			 * iWarp devices report the peer's values
++			 * with the perspective of the peer here.
++			 * Tested with siw and irdma (in iwarp mode)
++			 * We need to change to our perspective here,
++			 * so we need to switch the values.
++			 */
++			peer_initiator_depth = event->param.conn.responder_resources;
++			peer_responder_resources = event->param.conn.initiator_depth;
++		} else {
++			/*
++			 * Non iWarp devices report the peer's values
++			 * already changed to our perspective here.
++			 * Tested with rxe and irdma (in roce mode).
++			 */
++			peer_initiator_depth = event->param.conn.initiator_depth;
++			peer_responder_resources = event->param.conn.responder_resources;
++		}
++		if (rdma_protocol_iwarp(id->device, id->port_num) &&
++		    event->param.conn.private_data_len == 8) {
++			/*
++			 * Legacy clients with only iWarp MPA v1 support
++			 * need a private blob in order to negotiate
++			 * the IRD/ORD values.
++			 */
++			const __be32 *ird_ord_hdr = event->param.conn.private_data;
++			u32 ird32 = be32_to_cpu(ird_ord_hdr[0]);
++			u32 ord32 = be32_to_cpu(ird_ord_hdr[1]);
++
++			/*
++			 * cifs.ko sends the legacy IRD/ORD negotiation
++			 * event if iWarp MPA v2 was used.
++			 *
++			 * Here we check that the values match and only
++			 * mark the client as legacy if they don't match.
++			 */
++			if ((u32)event->param.conn.initiator_depth != ird32 ||
++			    (u32)event->param.conn.responder_resources != ord32) {
++				/*
++				 * There are broken clients (old cifs.ko)
++				 * using little endian and also
++				 * struct rdma_conn_param only uses u8
++				 * for initiator_depth and responder_resources,
++				 * so we truncate the value to U8_MAX.
++				 *
++				 * smb_direct_accept_client() will then
++				 * do the real negotiation in order to
++				 * select the minimum between client and
++				 * server.
++				 */
++				ird32 = min_t(u32, ird32, U8_MAX);
++				ord32 = min_t(u32, ord32, U8_MAX);
++
++				info->legacy_iwarp = true;
++				peer_initiator_depth = (u8)ird32;
++				peer_responder_resources = (u8)ord32;
++			}
++		}
++
++		/*
++		 * negotiate the value by using the minimum
++		 * between client and server if the client provided
++		 * non 0 values.
++		 */
++		if (peer_initiator_depth != 0)
++			info->initiator_depth =
++					min_t(u8, info->initiator_depth,
++					      peer_initiator_depth);
++		if (peer_responder_resources != 0)
++			info->responder_resources =
++					min_t(u8, info->responder_resources,
++					      peer_responder_resources);
++
+ 		sc->status = SMBDIRECT_SOCKET_CONNECTED;
+ 		wake_up_interruptible(&info->status_wait);
+ 		break;
+@@ -1549,7 +1630,7 @@ static struct smbd_connection *_smbd_get_connection(
+ 	struct ib_qp_init_attr qp_attr;
+ 	struct sockaddr_in *addr_in = (struct sockaddr_in *) dstaddr;
+ 	struct ib_port_immutable port_immutable;
+-	u32 ird_ord_hdr[2];
++	__be32 ird_ord_hdr[2];
+ 
+ 	info = kzalloc(sizeof(struct smbd_connection), GFP_KERNEL);
+ 	if (!info)
+@@ -1557,6 +1638,9 @@ static struct smbd_connection *_smbd_get_connection(
+ 	sc = &info->socket;
+ 	sp = &sc->parameters;
+ 
++	info->initiator_depth = 1;
++	info->responder_resources = SMBD_CM_RESPONDER_RESOURCES;
++
+ 	sc->status = SMBDIRECT_SOCKET_CONNECTING;
+ 	rc = smbd_ia_open(info, dstaddr, port);
+ 	if (rc) {
+@@ -1637,22 +1721,22 @@ static struct smbd_connection *_smbd_get_connection(
+ 	}
+ 	sc->ib.qp = sc->rdma.cm_id->qp;
+ 
+-	memset(&conn_param, 0, sizeof(conn_param));
+-	conn_param.initiator_depth = 0;
+-
+-	conn_param.responder_resources =
+-		min(sc->ib.dev->attrs.max_qp_rd_atom,
+-		    SMBD_CM_RESPONDER_RESOURCES);
+-	info->responder_resources = conn_param.responder_resources;
++	info->responder_resources =
++		min_t(u8, info->responder_resources,
++		      sc->ib.dev->attrs.max_qp_rd_atom);
+ 	log_rdma_mr(INFO, "responder_resources=%d\n",
+ 		info->responder_resources);
+ 
++	memset(&conn_param, 0, sizeof(conn_param));
++	conn_param.initiator_depth = info->initiator_depth;
++	conn_param.responder_resources = info->responder_resources;
++
+ 	/* Need to send IRD/ORD in private data for iWARP */
+ 	sc->ib.dev->ops.get_port_immutable(
+ 		sc->ib.dev, sc->rdma.cm_id->port_num, &port_immutable);
+ 	if (port_immutable.core_cap_flags & RDMA_CORE_PORT_IWARP) {
+-		ird_ord_hdr[0] = info->responder_resources;
+-		ird_ord_hdr[1] = 1;
++		ird_ord_hdr[0] = cpu_to_be32(conn_param.responder_resources);
++		ird_ord_hdr[1] = cpu_to_be32(conn_param.initiator_depth);
+ 		conn_param.private_data = ird_ord_hdr;
+ 		conn_param.private_data_len = sizeof(ird_ord_hdr);
+ 	} else {
+@@ -2119,6 +2203,12 @@ static int allocate_mr_list(struct smbd_connection *info)
+ 	atomic_set(&info->mr_used_count, 0);
+ 	init_waitqueue_head(&info->wait_for_mr_cleanup);
+ 	INIT_WORK(&info->mr_recovery_work, smbd_mr_recovery_work);
++
++	if (info->responder_resources == 0) {
++		log_rdma_mr(ERR, "responder_resources negotiated as 0\n");
++		return -EINVAL;
++	}
++
+ 	/* Allocate more MRs (2x) than hardware responder_resources */
+ 	for (i = 0; i < info->responder_resources * 2; i++) {
+ 		smbdirect_mr = kzalloc(sizeof(*smbdirect_mr), GFP_KERNEL);
+diff --git a/fs/smb/client/smbdirect.h b/fs/smb/client/smbdirect.h
+index e45aa9ddd71d..4ca9b2b2c57f 100644
+--- a/fs/smb/client/smbdirect.h
++++ b/fs/smb/client/smbdirect.h
+@@ -67,7 +67,9 @@ struct smbd_connection {
+ 
+ 	/* Memory registrations */
+ 	/* Maximum number of RDMA read/write outstanding on this connection */
+-	int responder_resources;
++	bool legacy_iwarp;
++	u8 initiator_depth;
++	u8 responder_resources;
+ 	/* Maximum number of pages in a single RDMA write/read on this connection */
+ 	int max_frmr_depth;
+ 	/*
+-- 
+2.43.0
 
