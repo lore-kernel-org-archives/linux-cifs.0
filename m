@@ -1,64 +1,64 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3164531D72E
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Sep 2025 22:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F052631E887
+	for <linux-cifs@vger.kernel.org>; Thu, 18 Sep 2025 22:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758235171; cv=none; b=fST/tUnP51WIve7kaC0qud5I7DcBIXRsmHQtA/OhxPiLbA60NzAv6/KqlfTBpE/LaeT/tl2AOKoc3NplMl8Cc1sXCXD6drAoQR1Ly4lghbcuj/HWraWA+LXRYhdusHIJtCKznC2JkdIPx2mKJlO1EbeYnJHiSebgqWy9oYbzdxQ=
+	t=1758235174; cv=none; b=B5TSso8/AEMvD0Ta+INWxDwVAffyPSvocgCK1QW+BNCKc9ivTDRjP0pM6N0C5daL1naN05ev3D6lDEAQ26dTqCihWYxSi9jUlXHdF5izU/yfjDD2dB0JK+sNDiooewbDS5mWEHwJJ8XYiUmaRDKM3JfEyIVVCgcZLBGpzNriXmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758235171; c=relaxed/simple;
-	bh=GN5N5XOgQeDFCaM57hYCO/L1NwJZmHWz2nTf/Fbsu6o=;
+	s=arc-20240116; t=1758235174; c=relaxed/simple;
+	bh=4IEbIL8Hh9s/ySau6xS2ZP/Awk1ju5g5sP8Jrj/d8fE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kDKakbMpdjDl+HRfgw8y3jhdwmupEGEYiZOJI8fRF826A4B9DHWH6ntTwESPaiQuan30vK2KqF4DBaFLOQk5p5XwBUKDtzoXpAbcGDvl1EDWzRqrLwFK7MQZU40Sledt7rYzeQaee/ssjdoNg1jNyTFIhggvDn3aH6jTuhDE4TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NLu+HW4A; arc=none smtp.client-ip=209.85.222.171
+	 MIME-Version:Content-Type; b=ioWiGYQwxBt42JFWrq2m1tRKkhB5XIdZkW1tUDpJxf74tzrQh2iTtNCnLCa7l7Xh6vLtRcimT1QFefwOdeXwCg19N45rSovkpjTIQ6+GeDSN/6HnqiGe5Aa8yB4vx1zGxjOHM5daejG96zrsQ9WctbFP9ehcJIVIJSU2FgFIRCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XXD1pzWA; arc=none smtp.client-ip=209.85.222.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NLu+HW4A"
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-8287fa098e8so145058685a.1
-        for <linux-cifs@vger.kernel.org>; Thu, 18 Sep 2025 15:39:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XXD1pzWA"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-816ac9f9507so252051885a.1
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Sep 2025 15:39:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758235168; x=1758839968; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758235170; x=1758839970; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+hlOBmPAMn9shnbknH9exd1QO2yhX+f8qJD/12m8eWA=;
-        b=NLu+HW4Az4cVFYA8dePEmfcWe4XR/1deacdie0euNxpXSYyxNjhdfCBrkDCjRV+hMy
-         vjViX+9SAQJr7EycDe+7sWYyFrwQNw2rA5d6G+lRfu5s3D0vg9QbcQE7VgJZFVF+SUaL
-         GhcA0rTEmGSvDVU+9vSvzJaup03Co39xp1B9k92t4CswIVY+vqfoZq9evS3t9UeDY0lU
-         rN8uqa6v0rdcgkppd/MCE77yiSTyC6OXn3Tp4BwPqHVkcf3VSC4O9rBBjFT5XcO3byU5
-         i7pu89GWUqVwb2WHNxsNlz4p3j3KxX+FIttvufIEvzP8nVvnxMOhfC6gIlVg3nLNQphu
-         UDKg==
+        bh=YYw1e4U1PSOcDX6GMCyLzFyvyVg3+bsbhKmkPLzVJ80=;
+        b=XXD1pzWAEqsv+nDbM0hBrC0TwQYPodh0tbElXAZj7F6BN++TAbWuUWNeLHP53YJdRV
+         6g2tM8zwQb8ARvNuaWVAwi77uMCEtFWgJoGyM5ZlYHwMHDTDCi83ehATMiag2iOwj8Gp
+         tWe3Mk43NVSJTP958ruXMjcMjTpd2j3J39e9I+0qpx5ownijGypV9m5ZTySF3z5StwH1
+         PSByC6gQvi1SzPc47pGvFCZCZtYW3zyTmUXM556neIcN2x0OEkK8NIT9VANA6vZV2IAM
+         VTN2O9ER1yGyS2XSqr+mkxohSjF7+jgwD122wY5OulrruHDdoxrJB225kYocTZUFeqgu
+         bo5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758235168; x=1758839968;
+        d=1e100.net; s=20230601; t=1758235170; x=1758839970;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+hlOBmPAMn9shnbknH9exd1QO2yhX+f8qJD/12m8eWA=;
-        b=knzPLcfU4RWK3Ohhz5H2KkenULyKlRnp/6RRAyxr9XEkmybolLk+MrktXcJt2cuLrX
-         3jGuFFGS2240C6XQC6fS7c9sDsR0wXaHdbaw74ivpAOfrg8EmsL6gkkMlA+LKMmdzHau
-         yTNHMgoikva0MJWejUYPMNMvn1Id0v8udvy4i2Uz+v18XKQ1l50uDBRIsQlT5g+elMoo
-         tX75XJiC+atG4QDDM4ZHUSfu0by5o2Pgszqq0NcSwtGcF5MJt36fyskK3pNuJqSARzaH
-         jg2gQSlxpNXOELeJQLsu5EtaTFkJaHVHrxxNi3vszwK+45m01k8dK6CX6+OrBWkL2Lgb
-         y8WA==
-X-Forwarded-Encrypted: i=1; AJvYcCUtOqL3wx0XseULhwKCPdvoRJ9hsMowzml/n+eMJZ5SMmhqzMLv/znRAzf5AHExPGiu509bgQhKgN0M@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD/fNOsn3H9RHZ4pa9XdvxrllNRA1zHmldlQd2OFF8/LnXQOEp
-	IPJuzARBPJDHbu5rYuAWjYsJDZbU6wQnXQQGGN3DjGKr6AZ6MqZYfp2g
-X-Gm-Gg: ASbGnctHpmsLuUan/UrI6fuPTwNLn8S+BOgIgbBMjTxkoOWpWCbvSBMOJUV2dHGzFrX
-	Y2ZkMGnZD2JrwN/WAbuyBb53NYYvPdRMCI70yNdHLTu+ynZ//qR8j9IrADVWNWJ/4dcIQN9aJjB
-	DdLu7C/vqIhBEoWWBm7Z9OFA0KSiGU+qjt55rQw0NEDxgbDlAaYOlTgSrtlU23D5VjDVFMyF11i
-	Xza1mbJXzUIGyuEBB06yH76c6adwi3jGDqcDZdeq9T2egDbJzj5rSmlKkyYCQh4wubyOXsdjX9W
-	C9yVCkDjy5ol5MVuSAbrOigcL0UEM94aKOjF3naXwF/Awv4wsrqIzfLSxkDb9FPKsh8bCAoyrx4
-	J8DJqGqdHj0JDyTbVE2SwgW6H1A6cGcE4hzFg1UmU+Y7cBoOhbR6bTS/qvG2fTSJQvzb6Vfx5qc
-	9+Z7uIBLgA2RaTxiM0
-X-Google-Smtp-Source: AGHT+IHlUz8TsqYsVIbifp+Faoe/5LfBrM8ezHZSN8XA0RQLxGKh/Jw5g1JTGKRD/CS3nkBBXcDMFg==
-X-Received: by 2002:a05:620a:1902:b0:7e8:9f7:da5d with SMTP id af79cd13be357-83ba29b652cmr156614885a.12.1758235167776;
-        Thu, 18 Sep 2025 15:39:27 -0700 (PDT)
+        bh=YYw1e4U1PSOcDX6GMCyLzFyvyVg3+bsbhKmkPLzVJ80=;
+        b=LqWW9C9DYWkndgwAGyyQ1rx/SRiXCixGKUjfSIyBDnLhK0aFT5y5JFE/Kow4rpy30E
+         CmXM5Wy/m6JB+SNpzEGUxsjyQAygKyJyA0lYxlYdhcrbYYhqT8sHWayQnENnt6HXANg6
+         uWYKZPR6CK48h+D3XBDfQ1gSaHM7GJ47HtuaGyS//dMIbTyHa3QI/2J+0+6jbsyRZKDr
+         1+xq/4LuTRx4wua4+iGBs6M2ZcEowXlEybOYRM4IPfHtyQCqhGQWl1oAp8Wqcc7ZAbSo
+         7vzT1tehweH/vys7QBnfcQMpf0LMNYhh+1DS3SL3rrjBDY3bT+gfBlD+5vQ3bdrh2odp
+         rhTA==
+X-Forwarded-Encrypted: i=1; AJvYcCX4Dtg/6FwGN5gBRngMwdysaNXz+52cfkY1Y4fOEUBk3Da0f3L+WZlf0fBL48F5DNdwcdU4GjS6/Fg4@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzm+lqNY2nTvvMBzg8Z/g24r0cqtWx4f5rzLiU2vIT0poXL7LLt
+	V0TxEb87OGXRYg1Mt3m2vsEib0WuSUqhStB6Bu2VTduqIX+ghZhqNai5
+X-Gm-Gg: ASbGncuHEGJf3kvMy2LSwhMjazQGCGDcvC+V1wx8yfIC9+6y0o+vawtm0h2QL5pt0Hy
+	zrzD4w/xrV4+HuJcK6zdvalw+zNe2LY+UKWz/QcTafiIiAueNT2pm8Bx1u9golulVImmb6p+gi9
+	N78vBAGY7P7JzxQ9a7tP9ZatZLKePwDMM3u52+LE3GScop+iGOkxksrqE64RIp7iJ1psm5qICgH
+	gOPglq4oQ8MOEZUApMQtichNKvUprzojkHMFWXBt4A/JH7VvcApgw1jgNH7gy1LDM8HTIbgMbtJ
+	XqLdxTdJtwQkfmuh3Yy53uwh5wH7svkZqWUUtu4gYMeutIF568N8ub4hZBDEIBuDKwfTw4afGMT
+	51VxceZNv2mTTLJK3zPUuONgMFs4s4h82+oyeIa8pNLU6ZK5oSBZmGP6n08Ks79N1jBIoA3XEPA
+	3Jj9CclQ==
+X-Google-Smtp-Source: AGHT+IHW6/UfU9MzrmWHNxUk4Z3hDtuO12gJ8/UjiVU/i8HtiX9FmQ6BFq3tz0jn15zTulYE6tTtmw==
+X-Received: by 2002:a05:620a:4504:b0:7e6:28ba:20f9 with SMTP id af79cd13be357-8363467c777mr589442385a.16.1758235169341;
+        Thu, 18 Sep 2025 15:39:29 -0700 (PDT)
 Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-83630481fc7sm244631185a.43.2025.09.18.15.39.26
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-83630481fc7sm244631185a.43.2025.09.18.15.39.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 15:39:27 -0700 (PDT)
+        Thu, 18 Sep 2025 15:39:28 -0700 (PDT)
 From: Xin Long <lucien.xin@gmail.com>
 To: network dev <netdev@vger.kernel.org>,
 	quic@lists.linux.dev
@@ -94,9 +94,9 @@ Cc: davem@davemloft.net,
 	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
 	Daniel Stenberg <daniel@haxx.se>,
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: [PATCH net-next v3 14/15] quic: add frame encoder and decoder base
-Date: Thu, 18 Sep 2025 18:35:03 -0400
-Message-ID: <a37732e76bbdf172e2ccbcfb0e77ab46938b25df.1758234904.git.lucien.xin@gmail.com>
+Subject: [PATCH net-next v3 15/15] quic: add packet builder and parser base
+Date: Thu, 18 Sep 2025 18:35:04 -0400
+Message-ID: <8deadc67466708d7f67248fc5770a152cf30426f.1758234904.git.lucien.xin@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <cover.1758234904.git.lucien.xin@gmail.com>
 References: <cover.1758234904.git.lucien.xin@gmail.com>
@@ -106,72 +106,90 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This patch introduces 'quic_frame' to represent QUIC frames and
-'quic_frame_ops' to define the associated operations for encoding,
-processing, and acknowledgment.
+This patch introduces 'quic_packet' to handle packing and unpacking of
+QUIC packets on both the transmit (TX) and receive (RX) paths.
 
-This abstraction sets the foundation for flexible and modular frame
-handling. While core operations are defined, actual implementation
-will follow in subsequent patches once packet handling and
-inqueue/outqueue infrastructure are in place.
+On the TX path, it provides functionality for frame packing and packet
+construction. The packet configuration includes setting the path,
+calculating overhead, and verifying routing. Frames are appended to the
+packet before it is created with the queued frames.
 
-The patch introduces hooks for invoking frame-specific logic:
+Once assembled, the packet is encrypted, bundled, and sent out. There
+is also support to flush the packet when no additional frames remain.
+Functions to create application (short) and handshake (long) packets
+are currently placeholders for future implementation.
 
-- quic_frame_create(): Invoke the .create operation of the frame.
+- quic_packet_config(): Set the path, compute overhead, and verify routing.
 
-- quic_frame_process(): Invoke the .process operation of the frame.
+- quic_packet_tail(): Append a frame to the packet for transmission.
 
-- quic_frame_ack(): Invoke the .ack operation of the frame.
+- quic_packet_create(): Create the packet with the queued frames.
 
-To manage frame lifecycles, reference counting is used, supported by
+- quic_packet_xmit(): Encrypt, bundle, and send out the packet.
 
-- quic_frame_get(): Increment the reference count of a frame.
+- quic_packet_flush(): Send the packet if there's nothing left to bundle.
 
-- quic_frame_put(): Decrement the reference count of a frame.
+On the RX side, the patch introduces mechanisms to parse the ALPN from
+client Initial packets to determine the correct listener socket. Received
+packets are then routed and processed accordingly. Similar to the TX path,
+handling for application and handshake packets is not yet implemented.
 
-- quic_frame_alloc(): Allocate a frame and set its data.
+- quic_packet_parse_alpn()`: Parse the ALPN from a client Initial packet,
+  then locate the appropriate listener using the ALPN.
 
-Frames are allocated through quic_frame_alloc(), and a dedicated
-kmem_cache (quic_frame_cachep) is added to optimize memory usage.
+- quic_packet_rcv(): Locate the appropriate socket to handle the packet
+  via quic_packet_process().
 
-For STREAM frames, additional data can be appended using
+- quic_packet_process()`: Process the received packet.
 
-- quic_frame_stream_append(): Append more data to a STREAM frame.
+In addition to packet flow, this patch adds support for ICMP-based MTU
+updates by locating the relevant socket and updating the stored PMTU
+accordingly.
 
-Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
+- quic_packet_rcv_err_pmtu(): Find the socket and update the PMTU via
+  quic_packet_mss_update().
+
 Signed-off-by: Xin Long <lucien.xin@gmail.com>
 ---
-v2:
-  - Clarify the use of offset field with a union type in struct frame.
+v3:
+  - Adjust global connection and listen socket hashtable operations
+    based on the new hashtable type.
+  - Introduce quic_packet_backlog_schedule() to enqueue Initial packets
+    to quic_net.backlog_list and defer their decryption for ALPN demux
+    to quic_packet_backlog_work() on quic_net.work, since
+    quic_crypto_initial_keys_install()/crypto_aead_setkey() must run
+    in process context.
 ---
  net/quic/Makefile   |   2 +-
- net/quic/frame.c    | 558 ++++++++++++++++++++++++++++++++++++++++++++
- net/quic/frame.h    | 195 ++++++++++++++++
- net/quic/protocol.c |   9 +
- net/quic/protocol.h |   1 +
- net/quic/socket.h   |   2 +
- 6 files changed, 766 insertions(+), 1 deletion(-)
- create mode 100644 net/quic/frame.c
- create mode 100644 net/quic/frame.h
+ net/quic/packet.c   | 956 ++++++++++++++++++++++++++++++++++++++++++++
+ net/quic/packet.h   | 130 ++++++
+ net/quic/protocol.c |   6 +
+ net/quic/protocol.h |   4 +
+ net/quic/socket.c   | 114 ++++++
+ net/quic/socket.h   |  12 +
+ 7 files changed, 1223 insertions(+), 1 deletion(-)
+ create mode 100644 net/quic/packet.c
+ create mode 100644 net/quic/packet.h
 
 diff --git a/net/quic/Makefile b/net/quic/Makefile
-index 2ccf01ad9e22..645ee470c95e 100644
+index 645ee470c95e..4a43052eb441 100644
 --- a/net/quic/Makefile
 +++ b/net/quic/Makefile
 @@ -6,4 +6,4 @@
  obj-$(CONFIG_IP_QUIC) += quic.o
  
  quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o \
--	  cong.o pnspace.o crypto.o timer.o
-+	  cong.o pnspace.o crypto.o timer.o frame.o
-diff --git a/net/quic/frame.c b/net/quic/frame.c
+-	  cong.o pnspace.o crypto.o timer.o frame.o
++	  cong.o pnspace.o crypto.o timer.o frame.o packet.o
+diff --git a/net/quic/packet.c b/net/quic/packet.c
 new file mode 100644
-index 000000000000..d1e99c4f4804
+index 000000000000..349a14df88e2
 --- /dev/null
-+++ b/net/quic/frame.c
-@@ -0,0 +1,558 @@
++++ b/net/quic/packet.c
+@@ -0,0 +1,956 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/* QUIC kernel implementation
 + * (C) Copyright Red Hat Corp. 2023
@@ -184,558 +202,956 @@ index 000000000000..d1e99c4f4804
 + *    Xin Long <lucien.xin@gmail.com>
 + */
 +
-+#include <net/proto_memory.h>
-+
 +#include "socket.h"
 +
-+/* ACK Frame {
-+ *  Type (i) = 0x02..0x03,
-+ *  Largest Acknowledged (i),
-+ *  ACK Delay (i),
-+ *  ACK Range Count (i),
-+ *  First ACK Range (i),
-+ *  ACK Range (..) ...,
-+ *  [ECN Counts (..)],
-+ * }
++#define QUIC_HLEN		1
++
++#define QUIC_LONG_HLEN(dcid, scid) \
++	(QUIC_HLEN + QUIC_VERSION_LEN + 1 + (dcid)->len + 1 + (scid)->len)
++
++#define QUIC_VERSION_NUM	2
++
++/* Supported QUIC versions and their compatible versions. Used for Compatible Version
++ * Negotiation in rfc9368#section-2.3.
 + */
-+
-+static struct quic_frame *quic_frame_ack_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_ping_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_padding_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_new_token_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+/* STREAM Frame {
-+ *  Type (i) = 0x08..0x0f,
-+ *  Stream ID (i),
-+ *  [Offset (i)],
-+ *  [Length (i)],
-+ *  Stream Data (..),
-+ * }
-+ */
-+
-+static struct quic_frame *quic_frame_stream_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_handshake_done_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_crypto_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_retire_conn_id_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_new_conn_id_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_path_response_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_path_challenge_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_reset_stream_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_stop_sending_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_max_data_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_max_stream_data_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_max_streams_uni_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_max_streams_bidi_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_connection_close_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_data_blocked_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_stream_data_blocked_create(struct sock *sk,
-+								void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_streams_blocked_uni_create(struct sock *sk,
-+								void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_streams_blocked_bidi_create(struct sock *sk,
-+								 void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static int quic_frame_crypto_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_stream_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_ack_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_new_conn_id_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_retire_conn_id_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_new_token_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_handshake_done_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_padding_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_ping_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_path_challenge_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_reset_stream_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_stop_sending_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_max_data_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_max_stream_data_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_max_streams_uni_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_max_streams_bidi_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_connection_close_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_data_blocked_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_stream_data_blocked_process(struct sock *sk, struct quic_frame *frame,
-+						  u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_streams_blocked_uni_process(struct sock *sk, struct quic_frame *frame,
-+						  u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_streams_blocked_bidi_process(struct sock *sk, struct quic_frame *frame,
-+						   u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_path_response_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static struct quic_frame *quic_frame_invalid_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static struct quic_frame *quic_frame_datagram_create(struct sock *sk, void *data, u8 type)
-+{
-+	return NULL;
-+}
-+
-+static int quic_frame_invalid_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int quic_frame_datagram_process(struct sock *sk, struct quic_frame *frame, u8 type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static void quic_frame_padding_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_ping_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_ack_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_reset_stream_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_stop_sending_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_crypto_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_new_token_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_stream_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_max_data_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_max_stream_data_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_max_streams_bidi_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_max_streams_uni_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_data_blocked_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_stream_data_blocked_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_streams_blocked_bidi_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_streams_blocked_uni_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_new_conn_id_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_retire_conn_id_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_path_challenge_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_path_response_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_connection_close_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_handshake_done_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_invalid_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+static void quic_frame_datagram_ack(struct sock *sk, struct quic_frame *frame)
-+{
-+}
-+
-+#define quic_frame_create_and_process_and_ack(type, eliciting) \
-+	{ \
-+		.frame_create	= quic_frame_##type##_create, \
-+		.frame_process	= quic_frame_##type##_process, \
-+		.frame_ack	= quic_frame_##type##_ack, \
-+		.ack_eliciting	= eliciting \
-+	}
-+
-+static struct quic_frame_ops quic_frame_ops[QUIC_FRAME_MAX + 1] = {
-+	quic_frame_create_and_process_and_ack(padding, 0), /* 0x00 */
-+	quic_frame_create_and_process_and_ack(ping, 1),
-+	quic_frame_create_and_process_and_ack(ack, 0),
-+	quic_frame_create_and_process_and_ack(ack, 0), /* ack_ecn */
-+	quic_frame_create_and_process_and_ack(reset_stream, 1),
-+	quic_frame_create_and_process_and_ack(stop_sending, 1),
-+	quic_frame_create_and_process_and_ack(crypto, 1),
-+	quic_frame_create_and_process_and_ack(new_token, 1),
-+	quic_frame_create_and_process_and_ack(stream, 1),
-+	quic_frame_create_and_process_and_ack(stream, 1),
-+	quic_frame_create_and_process_and_ack(stream, 1),
-+	quic_frame_create_and_process_and_ack(stream, 1),
-+	quic_frame_create_and_process_and_ack(stream, 1),
-+	quic_frame_create_and_process_and_ack(stream, 1),
-+	quic_frame_create_and_process_and_ack(stream, 1),
-+	quic_frame_create_and_process_and_ack(stream, 1),
-+	quic_frame_create_and_process_and_ack(max_data, 1), /* 0x10 */
-+	quic_frame_create_and_process_and_ack(max_stream_data, 1),
-+	quic_frame_create_and_process_and_ack(max_streams_bidi, 1),
-+	quic_frame_create_and_process_and_ack(max_streams_uni, 1),
-+	quic_frame_create_and_process_and_ack(data_blocked, 1),
-+	quic_frame_create_and_process_and_ack(stream_data_blocked, 1),
-+	quic_frame_create_and_process_and_ack(streams_blocked_bidi, 1),
-+	quic_frame_create_and_process_and_ack(streams_blocked_uni, 1),
-+	quic_frame_create_and_process_and_ack(new_conn_id, 1),
-+	quic_frame_create_and_process_and_ack(retire_conn_id, 1),
-+	quic_frame_create_and_process_and_ack(path_challenge, 0),
-+	quic_frame_create_and_process_and_ack(path_response, 0),
-+	quic_frame_create_and_process_and_ack(connection_close, 0),
-+	quic_frame_create_and_process_and_ack(connection_close, 0),
-+	quic_frame_create_and_process_and_ack(handshake_done, 1),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0), /* 0x20 */
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(invalid, 0),
-+	quic_frame_create_and_process_and_ack(datagram, 1), /* 0x30 */
-+	quic_frame_create_and_process_and_ack(datagram, 1),
++static u32 quic_versions[QUIC_VERSION_NUM][4] = {
++	/* Version,	Compatible Versions */
++	{ QUIC_VERSION_V1,	QUIC_VERSION_V2,	QUIC_VERSION_V1,	0 },
++	{ QUIC_VERSION_V2,	QUIC_VERSION_V2,	QUIC_VERSION_V1,	0 },
 +};
 +
-+void quic_frame_ack(struct sock *sk, struct quic_frame *frame)
++/* Get the compatible version list for a given QUIC version. */
++u32 *quic_packet_compatible_versions(u32 version)
 +{
-+	quic_frame_ops[frame->type].frame_ack(sk, frame);
++	u8 i;
 +
-+	list_del_init(&frame->list);
-+	frame->transmitted = 0;
-+	quic_frame_put(frame);
++	for (i = 0; i < QUIC_VERSION_NUM; i++)
++		if (version == quic_versions[i][0])
++			return quic_versions[i];
++	return NULL;
 +}
 +
-+int quic_frame_process(struct sock *sk, struct quic_frame *frame)
++/* Convert version-specific type to internal standard packet type. */
++static u8 quic_packet_version_get_type(u32 version, u8 type)
 +{
-+	u8 type, level = frame->level;
-+	int ret;
++	if (version == QUIC_VERSION_V1)
++		return type;
 +
-+	while (frame->len > 0) {
-+		type = *frame->data++;
-+		frame->len--;
-+
-+		if (type > QUIC_FRAME_MAX) {
-+			pr_debug("%s: unsupported frame, type: %x, level: %d\n",
-+				 __func__, type, level);
-+			return -EPROTONOSUPPORT;
-+		} else if (quic_frame_level_check(level, type)) {
-+			pr_debug("%s: invalid frame, type: %x, level: %d\n",
-+				 __func__, type, level);
-+			return -EINVAL;
-+		}
-+		ret = quic_frame_ops[type].frame_process(sk, frame, type);
-+		if (ret < 0) {
-+			pr_debug("%s: failed, type: %x, level: %d, err: %d\n",
-+				 __func__, type, level, ret);
-+			return ret;
-+		}
-+		pr_debug("%s: done, type: %x, level: %d\n", __func__, type, level);
-+
-+		frame->data += ret;
-+		frame->len -= ret;
++	switch (type) {
++	case QUIC_PACKET_INITIAL_V2:
++		return QUIC_PACKET_INITIAL;
++	case QUIC_PACKET_0RTT_V2:
++		return QUIC_PACKET_0RTT;
++	case QUIC_PACKET_HANDSHAKE_V2:
++		return QUIC_PACKET_HANDSHAKE;
++	case QUIC_PACKET_RETRY_V2:
++		return QUIC_PACKET_RETRY;
++	default:
++		return -1;
 +	}
++	return -1;
++}
++
++/* Parse QUIC version and connection IDs (DCID and SCID) from a Long header packet buffer. */
++static int quic_packet_get_version_and_connid(struct quic_conn_id *dcid, struct quic_conn_id *scid,
++					      u32 *version, u8 **pp, u32 *plen)
++{
++	u64 len, v;
++
++	*pp += QUIC_HLEN;
++	*plen -= QUIC_HLEN;
++
++	if (!quic_get_int(pp, plen, &v, QUIC_VERSION_LEN))
++		return -EINVAL;
++	*version = v;
++
++	if (!quic_get_int(pp, plen, &len, 1) ||
++	    len > *plen || len > QUIC_CONN_ID_MAX_LEN)
++		return -EINVAL;
++	quic_conn_id_update(dcid, *pp, len);
++	*plen -= len;
++	*pp += len;
++
++	if (!quic_get_int(pp, plen, &len, 1) ||
++	    len > *plen || len > QUIC_CONN_ID_MAX_LEN)
++		return -EINVAL;
++	quic_conn_id_update(scid, *pp, len);
++	*plen -= len;
++	*pp += len;
 +	return 0;
 +}
 +
-+struct quic_frame *quic_frame_create(struct sock *sk, u8 type, void *data)
++/* Change the QUIC version for the connection.
++ *
++ * Frees existing initial crypto keys and installs new initial keys compatible with the new
++ * version.
++ */
++static int quic_packet_version_change(struct sock *sk, struct quic_conn_id *dcid, u32 version)
 +{
-+	struct quic_frame *frame;
++	struct quic_crypto *crypto = quic_crypto(sk, QUIC_CRYPTO_INITIAL);
 +
-+	if (type > QUIC_FRAME_MAX)
-+		return NULL;
-+	frame = quic_frame_ops[type].frame_create(sk, data, type);
-+	if (!frame) {
-+		pr_debug("%s: failed, type: %x\n", __func__, type);
-+		return NULL;
-+	}
-+	INIT_LIST_HEAD(&frame->list);
-+	if (!frame->type)
-+		frame->type = type;
-+	frame->ack_eliciting = quic_frame_ops[type].ack_eliciting;
-+	pr_debug("%s: done, type: %x, len: %u\n", __func__, type, frame->len);
-+	return frame;
++	if (quic_crypto_initial_keys_install(crypto, dcid, version, quic_is_serv(sk)))
++		return -1;
++
++	quic_packet(sk)->version = version;
++	return 0;
 +}
 +
-+struct quic_frame *quic_frame_alloc(u32 size, u8 *data, gfp_t gfp)
++/* Select the best compatible QUIC version from offered list.
++ *
++ * Considers the local preferred version, currently chosen version, and versions offered by
++ * the peer. Selects the best compatible version based on client/server role and updates the
++ * connection version accordingly.
++ */
++int quic_packet_select_version(struct sock *sk, u32 *versions, u8 count)
 +{
-+	struct quic_frame *frame;
++	struct quic_packet *packet = quic_packet(sk);
++	struct quic_config *c = quic_config(sk);
++	u8 i, pref_found = 0, ch_found = 0;
++	u32 preferred, chosen, best = 0;
 +
-+	frame = kmem_cache_zalloc(quic_frame_cachep, gfp);
-+	if (!frame)
-+		return NULL;
-+	if (data) {
-+		frame->data = data;
++	preferred = c->version ?: QUIC_VERSION_V1;
++	chosen = packet->version;
++
++	for (i = 0; i < count; i++) {
++		if (!quic_packet_compatible_versions(versions[i]))
++			continue;
++		if (preferred == versions[i])
++			pref_found = 1;
++		if (chosen == versions[i])
++			ch_found = 1;
++		if (best < versions[i]) /* Track highest offered version. */
++			best = versions[i];
++	}
++
++	if (!pref_found && !ch_found && !best)
++		return -1;
++
++	if (quic_is_serv(sk)) { /* Server prefers preferred version if offered, else chosen. */
++		if (pref_found)
++			best = preferred;
++		else if (ch_found)
++			best = chosen;
++	} else { /* Client prefers chosen version, else preferred. */
++		if (ch_found)
++			best = chosen;
++		else if (pref_found)
++			best = preferred;
++	}
++
++	if (packet->version == best)
++		return 0;
++
++	/* Change to selected best version. */
++	return quic_packet_version_change(sk, &quic_paths(sk)->orig_dcid, best);
++}
++
++/* Extracts a QUIC token from a buffer in the Client Initial packet. */
++static int quic_packet_get_token(struct quic_data *token, u8 **pp, u32 *plen)
++{
++	u64 len;
++
++	if (!quic_get_var(pp, plen, &len) || len > *plen)
++		return -EINVAL;
++	quic_data(token, *pp, len);
++	*plen -= len;
++	*pp += len;
++	return 0;
++}
++
++/* Process PMTU reduction event on a QUIC socket. */
++void quic_packet_rcv_err_pmtu(struct sock *sk)
++{
++	struct quic_path_group *paths = quic_paths(sk);
++	struct quic_packet *packet = quic_packet(sk);
++	struct quic_config *c = quic_config(sk);
++	u32 pathmtu, info, taglen;
++	struct dst_entry *dst;
++	bool reset_timer;
++
++	if (!ip_sk_accept_pmtu(sk))
++		return;
++
++	info = clamp(paths->mtu_info, QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX_PMTU);
++	/* If PLPMTUD is not enabled, update MSS using the route and ICMP info. */
++	if (!c->plpmtud_probe_interval) {
++		if (quic_packet_route(sk) < 0)
++			return;
++
++		dst = __sk_dst_get(sk);
++		dst->ops->update_pmtu(dst, sk, NULL, info, true);
++		quic_packet_mss_update(sk, info - packet->hlen);
++		return;
++	}
++	/* PLPMTUD is enabled: adjust to smaller PMTU, subtract headers and AEAD tag.  Also
++	 * notify the QUIC path layer for possible state changes and probing.
++	 */
++	taglen = quic_packet_taglen(packet);
++	info = info - packet->hlen - taglen;
++	pathmtu = quic_path_pl_toobig(paths, info, &reset_timer);
++	if (reset_timer)
++		quic_timer_reset(sk, QUIC_TIMER_PMTU, c->plpmtud_probe_interval);
++	if (pathmtu)
++		quic_packet_mss_update(sk, pathmtu + taglen);
++}
++
++/* Handle ICMP Toobig packet and update QUIC socket path MTU. */
++static int quic_packet_rcv_err(struct sk_buff *skb)
++{
++	union quic_addr daddr, saddr;
++	struct sock *sk = NULL;
++	int ret = 0;
++	u32 info;
++
++	/* All we can do is lookup the matching QUIC socket by addresses. */
++	quic_get_msg_addrs(skb, &saddr, &daddr);
++	sk = quic_sock_lookup(skb, &daddr, &saddr, NULL);
++	if (!sk)
++		return -ENOENT;
++
++	bh_lock_sock(sk);
++	if (quic_is_listen(sk))
++		goto out;
++
++	if (quic_get_mtu_info(skb, &info))
++		goto out;
++
++	ret = 1; /* Success: update socket path MTU info. */
++	quic_paths(sk)->mtu_info = info;
++	if (sock_owned_by_user(sk)) {
++		/* Socket is in use by userspace context.  Defer MTU processing to later via
++		 * tasklet.  Ensure the socket is not dropped before deferral.
++		 */
++		if (!test_and_set_bit(QUIC_MTU_REDUCED_DEFERRED, &sk->sk_tsq_flags))
++			sock_hold(sk);
 +		goto out;
 +	}
-+	frame->data = kmalloc(size, gfp);
-+	if (!frame->data) {
-+		kmem_cache_free(quic_frame_cachep, frame);
-+		return NULL;
-+	}
++	/* Otherwise, process the MTU reduction now. */
++	quic_packet_rcv_err_pmtu(sk);
 +out:
-+	refcount_set(&frame->refcnt, 1);
-+	frame->offset = -1;
-+	frame->len = (u16)size;
-+	frame->size = frame->len;
-+	return frame;
++	bh_unlock_sock(sk);
++	sock_put(sk);
++	return ret;
 +}
 +
-+static void quic_frame_free(struct quic_frame *frame)
-+{
-+	struct quic_frame_frag *frag, *next;
++#define QUIC_PACKET_BACKLOG_MAX		4096
 +
-+	if (!frame->type && frame->skb) { /* RX path frame with skb. */
-+		kfree_skb(frame->skb);
++/* Queue a packet for later processing when sleeping is allowed. */
++static int quic_packet_backlog_schedule(struct net *net, struct sk_buff *skb)
++{
++	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
++	struct quic_net *qn = quic_net(net);
++
++	if (cb->backlog)
++		return 0;
++
++	if (skb_queue_len_lockless(&qn->backlog_list) >= QUIC_PACKET_BACKLOG_MAX) {
++		QUIC_INC_STATS(net, QUIC_MIB_PKT_RCVDROP);
++		kfree_skb(skb);
++		return -1;
++	}
++
++	cb->backlog = 1;
++	skb_queue_tail(&qn->backlog_list, skb);
++	schedule_work(&qn->work);
++	return 1;
++}
++
++#define TLS_MT_CLIENT_HELLO	1
++#define TLS_EXT_alpn		16
++
++/*  TLS Client Hello Msg:
++ *
++ *    uint16 ProtocolVersion;
++ *    opaque Random[32];
++ *    uint8 CipherSuite[2];
++ *
++ *    struct {
++ *        ExtensionType extension_type;
++ *        opaque extension_data<0..2^16-1>;
++ *    } Extension;
++ *
++ *    struct {
++ *        ProtocolVersion legacy_version = 0x0303;
++ *        Random rand;
++ *        opaque legacy_session_id<0..32>;
++ *        CipherSuite cipher_suites<2..2^16-2>;
++ *        opaque legacy_compression_methods<1..2^8-1>;
++ *        Extension extensions<8..2^16-1>;
++ *    } ClientHello;
++ */
++
++#define TLS_CH_RANDOM_LEN	32
++#define TLS_CH_VERSION_LEN	2
++
++/* Extract ALPN data from a TLS ClientHello message.
++ *
++ * Parses the TLS ClientHello handshake message to find the ALPN (Application Layer Protocol
++ * Negotiation) TLS extension. It validates the TLS ClientHello structure, including version,
++ * random, session ID, cipher suites, compression methods, and extensions. Once the ALPN
++ * extension is found, the ALPN protocols list is extracted and stored in @alpn.
++ *
++ * Return: 0 on success or no ALPN found, a negative error code on failed parsing.
++ */
++static int quic_packet_get_alpn(struct quic_data *alpn, u8 *p, u32 len)
++{
++	int err = -EINVAL, found = 0;
++	u64 length, type;
++
++	/* Verify handshake message type (ClientHello) and its length. */
++	if (!quic_get_int(&p, &len, &type, 1) || type != TLS_MT_CLIENT_HELLO)
++		return err;
++	if (!quic_get_int(&p, &len, &length, 3) ||
++	    length < TLS_CH_RANDOM_LEN + TLS_CH_VERSION_LEN)
++		return err;
++	if (len > (u32)length) /* Limit len to handshake message length if larger. */
++		len = length;
++	/* Skip legacy_version (2 bytes) + random (32 bytes). */
++	p += TLS_CH_RANDOM_LEN + TLS_CH_VERSION_LEN;
++	len -= TLS_CH_RANDOM_LEN + TLS_CH_VERSION_LEN;
++	/* legacy_session_id_len must be zero (QUIC requirement). */
++	if (!quic_get_int(&p, &len, &length, 1) || length)
++		return err;
++
++	/* Skip cipher_suites (2 bytes length + variable data). */
++	if (!quic_get_int(&p, &len, &length, 2) || length > (u64)len)
++		return err;
++	len -= length;
++	p += length;
++
++	/* Skip legacy_compression_methods (1 byte length + variable data). */
++	if (!quic_get_int(&p, &len, &length, 1) || length > (u64)len)
++		return err;
++	len -= length;
++	p += length;
++
++	if (!quic_get_int(&p, &len, &length, 2)) /* Read TLS extensions length (2 bytes). */
++		return err;
++	if (len > (u32)length) /* Limit len to extensions length if larger. */
++		len = length;
++	while (len > 4) { /* Iterate over extensions to find ALPN (type TLS_EXT_alpn). */
++		if (!quic_get_int(&p, &len, &type, 2))
++			break;
++		if (!quic_get_int(&p, &len, &length, 2))
++			break;
++		if (len < (u32)length) /* Incomplete TLS extensions. */
++			return 0;
++		if (type == TLS_EXT_alpn) { /* Found ALPN extension. */
++			len = length;
++			found = 1;
++			break;
++		}
++		/* Skip non-ALPN extensions. */
++		p += length;
++		len -= length;
++	}
++	if (!found) { /* no ALPN extension found: set alpn->len = 0 and alpn->data = p. */
++		quic_data(alpn, p, 0);
++		return 0;
++	}
++
++	/* Parse ALPN protocols list length (2 bytes). */
++	if (!quic_get_int(&p, &len, &length, 2) || length > (u64)len)
++		return err;
++	quic_data(alpn, p, length); /* Store ALPN protocols list in alpn->data. */
++	len = length;
++	while (len) { /* Validate ALPN protocols list format. */
++		if (!quic_get_int(&p, &len, &length, 1) || length > (u64)len) {
++			/* Malformed ALPN entry: set alpn->len = 0 and alpn->data = NULL. */
++			quic_data(alpn, NULL, 0);
++			return err;
++		}
++		len -= length;
++		p += length;
++	}
++	pr_debug("%s: alpn_len: %d\n", __func__, alpn->len);
++	return 0;
++}
++
++/* Parse ALPN from a QUIC Initial packet.
++ *
++ * This function processes a QUIC Initial packet to extract the ALPN from the TLS ClientHello
++ * message inside the QUIC CRYPTO frame. It verifies packet type, version compatibility,
++ * decrypts the packet payload, and locates the CRYPTO frame to parse the TLS ClientHello.
++ * Finally, it calls quic_packet_get_alpn() to extract the ALPN extension data.
++ *
++ * Return: 0 on success or no ALPN found, a negative error code on failed parsing.
++ */
++static int quic_packet_parse_alpn(struct sk_buff *skb, struct quic_data *alpn)
++{
++	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
++	struct net *net = sock_net(skb->sk);
++	u8 *p = skb->data, *data, type;
++	struct quic_conn_id dcid, scid;
++	u32 len = skb->len, version;
++	struct quic_crypto *crypto;
++	struct quic_data token;
++	u64 offset, length;
++	int err = -EINVAL;
++
++	if (!sysctl_quic_alpn_demux)
++		return 0;
++	if (quic_packet_get_version_and_connid(&dcid, &scid, &version, &p, &len))
++		return err;
++	if (!quic_packet_compatible_versions(version))
++		return 0;
++	/* Only parse Initial packets. */
++	type = quic_packet_version_get_type(version, quic_hshdr(skb)->type);
++	if (type != QUIC_PACKET_INITIAL)
++		return 0;
++	if (quic_packet_get_token(&token, &p, &len))
++		return err;
++	if (!quic_get_var(&p, &len, &length) || length > (u64)len)
++		return err;
++	if (!cb->backlog) {
++		quic_packet_backlog_schedule(net, skb_get(skb));
++		return err;
++	}
++	cb->length = (u16)length;
++	/* Copy skb data for restoring in case of decrypt failure. */
++	data = kmemdup(skb->data, skb->len, GFP_ATOMIC);
++	if (!data)
++		return -ENOMEM;
++
++	/* Install initial keys for packet decryption to crypto. */
++	crypto = &quic_net(net)->crypto;
++	err = quic_crypto_initial_keys_install(crypto, &dcid, version, 1);
++	if (err)
++		goto out;
++	cb->number_offset = (u16)(p - skb->data);
++	err = quic_crypto_decrypt(crypto, skb);
++	if (err) {
++		QUIC_INC_STATS(net, QUIC_MIB_PKT_DECDROP);
++		/* Restore original data on decrypt failure. */
++		memcpy(skb->data, data, skb->len);
 +		goto out;
 +	}
 +
-+	for (frag = frame->flist; frag; frag = next) {
-+		next = frag->next;
-+		kfree(frag);
-+	}
-+	kfree(frame->data);
++	QUIC_INC_STATS(net, QUIC_MIB_PKT_DECFASTPATHS);
++	cb->resume = 1; /* Mark this packet as already decrypted. */
++
++	/* Find the QUIC CRYPTO frame. */
++	p += cb->number_len;
++	len = cb->length - cb->number_len - QUIC_TAG_LEN;
++	for (; len && !(*p); p++, len--) /* Skip the padding frame. */
++		;
++	if (!len-- || *p++ != QUIC_FRAME_CRYPTO)
++		goto out;
++	if (!quic_get_var(&p, &len, &offset) || offset)
++		goto out;
++	if (!quic_get_var(&p, &len, &length) || length > (u64)len)
++		goto out;
++
++	/* Parse the TLS CLIENT_HELLO message. */
++	err = quic_packet_get_alpn(alpn, p, length);
++
 +out:
-+	kmem_cache_free(quic_frame_cachep, frame);
++	kfree(data);
++	return err;
 +}
 +
-+struct quic_frame *quic_frame_get(struct quic_frame *frame)
++/* Extract the Destination Connection ID (DCID) from a QUIC Long header packet. */
++int quic_packet_get_dcid(struct quic_conn_id *dcid, struct sk_buff *skb)
 +{
-+	refcount_inc(&frame->refcnt);
-+	return frame;
++	u32 plen = skb->len;
++	u8 *p = skb->data;
++	u64 len;
++
++	if (plen < QUIC_HLEN + QUIC_VERSION_LEN)
++		return -EINVAL;
++	plen -= (QUIC_HLEN + QUIC_VERSION_LEN);
++	p += (QUIC_HLEN + QUIC_VERSION_LEN);
++
++	if (!quic_get_int(&p, &plen, &len, 1) ||
++	    len > plen || len > QUIC_CONN_ID_MAX_LEN)
++		return -EINVAL;
++	quic_conn_id_update(dcid, p, len);
++	return 0;
 +}
 +
-+void quic_frame_put(struct quic_frame *frame)
++/* Lookup listening socket for Client Initial packet (in process context). */
++static struct sock *quic_packet_get_listen_sock(struct sk_buff *skb)
 +{
-+	if (refcount_dec_and_test(&frame->refcnt))
-+		quic_frame_free(frame);
++	union quic_addr daddr, saddr;
++	struct quic_data alpns = {};
++	struct sock *sk;
++
++	quic_get_msg_addrs(skb, &daddr, &saddr);
++
++	if (quic_packet_parse_alpn(skb, &alpns))
++		return NULL;
++
++	local_bh_disable();
++	sk = quic_listen_sock_lookup(skb, &daddr, &saddr, &alpns);
++	local_bh_enable();
++
++	return sk;
 +}
 +
-+int quic_frame_stream_append(struct sock *sk, struct quic_frame *frame,
-+			     struct quic_msginfo *info, u8 pack)
++/* Determine the QUIC socket associated with an incoming packet. */
++static struct sock *quic_packet_get_sock(struct sk_buff *skb)
 +{
-+	return -1;
++	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
++	struct net *net = sock_net(skb->sk);
++	struct quic_conn_id dcid, *conn_id;
++	union quic_addr daddr, saddr;
++	struct quic_data alpns = {};
++	struct sock *sk = NULL;
++
++	if (skb->len < QUIC_HLEN)
++		return NULL;
++
++	if (!quic_hdr(skb)->form) { /* Short header path. */
++		if (skb->len < QUIC_HLEN + QUIC_CONN_ID_DEF_LEN)
++			return NULL;
++		/* Fast path: look up QUIC connection by fixed-length DCID
++		 * (Currently, only source CIDs of size QUIC_CONN_ID_DEF_LEN are used).
++		 */
++		conn_id = quic_conn_id_lookup(net, skb->data + QUIC_HLEN,
++					      QUIC_CONN_ID_DEF_LEN);
++		if (conn_id) {
++			cb->seqno = quic_conn_id_number(conn_id);
++			return quic_conn_id_sk(conn_id); /* Return associated socket. */
++		}
++
++		/* Fallback: listener socket lookup
++		 * (May be used to send a stateless reset from a listen socket).
++		 */
++		quic_get_msg_addrs(skb, &daddr, &saddr);
++		sk = quic_listen_sock_lookup(skb, &daddr, &saddr, &alpns);
++		if (sk)
++			return sk;
++		/* Final fallback: address-based connection lookup
++		 * (May be used to receive a stateless reset).
++		 */
++		return quic_sock_lookup(skb, &daddr, &saddr, NULL);
++	}
++
++	/* Long header path. */
++	if (quic_packet_get_dcid(&dcid, skb))
++		return NULL;
++	/* Fast path: look up QUIC connection by parsed DCID. */
++	conn_id = quic_conn_id_lookup(net, dcid.data, dcid.len);
++	if (conn_id) {
++		cb->seqno = quic_conn_id_number(conn_id);
++		return quic_conn_id_sk(conn_id); /* Return associated socket. */
++	}
++
++	/* Fallback: address + DCID lookup
++	 * (May be used for 0-RTT or a follow-up Client Initial packet).
++	 */
++	quic_get_msg_addrs(skb, &daddr, &saddr);
++	sk = quic_sock_lookup(skb, &daddr, &saddr, &dcid);
++	if (sk)
++		return sk;
++	/* Final fallback: listener socket lookup
++	 * (Used for receiving the first Client Initial packet).
++	 */
++	if (quic_packet_parse_alpn(skb, &alpns))
++		return NULL;
++	return quic_listen_sock_lookup(skb, &daddr, &saddr, &alpns);
 +}
-diff --git a/net/quic/frame.h b/net/quic/frame.h
++
++/* Entry point for processing received QUIC packets. */
++int quic_packet_rcv(struct sk_buff *skb, u8 err)
++{
++	struct net *net = sock_net(skb->sk);
++	struct sock *sk;
++
++	if (unlikely(err))
++		return quic_packet_rcv_err(skb);
++
++	skb_pull(skb, skb_transport_offset(skb));
++
++	/* Look up socket from socket or connection IDs hash tables. */
++	sk = quic_packet_get_sock(skb);
++	if (!sk)
++		goto err;
++
++	bh_lock_sock(sk);
++	if (sock_owned_by_user(sk)) {
++		/* Socket is busy (owned by user context): queue to backlog. */
++		if (sk_add_backlog(sk, skb, READ_ONCE(sk->sk_rcvbuf))) {
++			QUIC_INC_STATS(net, QUIC_MIB_PKT_RCVDROP);
++			bh_unlock_sock(sk);
++			sock_put(sk);
++			goto err;
++		}
++		QUIC_SKB_CB(skb)->backlog = 1;
++		QUIC_INC_STATS(net, QUIC_MIB_PKT_RCVBACKLOGS);
++	} else {
++		/* Socket not busy: process immediately. */
++		QUIC_INC_STATS(net, QUIC_MIB_PKT_RCVFASTPATHS);
++		sk->sk_backlog_rcv(sk, skb); /* quic_packet_process(). */
++	}
++	bh_unlock_sock(sk);
++	sock_put(sk);
++	return 0;
++
++err:
++	kfree_skb(skb);
++	return -EINVAL;
++}
++
++static int quic_packet_listen_process(struct sock *sk, struct sk_buff *skb)
++{
++	kfree_skb(skb);
++	return -EOPNOTSUPP;
++}
++
++static int quic_packet_handshake_process(struct sock *sk, struct sk_buff *skb)
++{
++	kfree_skb(skb);
++	return -EOPNOTSUPP;
++}
++
++static int quic_packet_app_process(struct sock *sk, struct sk_buff *skb)
++{
++	kfree_skb(skb);
++	return -EOPNOTSUPP;
++}
++
++int quic_packet_process(struct sock *sk, struct sk_buff *skb)
++{
++	if (quic_is_closed(sk)) {
++		kfree_skb(skb);
++		return 0;
++	}
++
++	if (quic_is_listen(sk))
++		return quic_packet_listen_process(sk, skb);
++
++	if (quic_hdr(skb)->form)
++		return quic_packet_handshake_process(sk, skb);
++
++	return quic_packet_app_process(sk, skb);
++}
++
++/* Work function to process packets in the backlog queue. */
++void quic_packet_backlog_work(struct work_struct *work)
++{
++	struct quic_net *qn = container_of(work, struct quic_net, work);
++	struct sk_buff *skb;
++	struct sock *sk;
++
++	skb = skb_dequeue(&qn->backlog_list);
++	while (skb) {
++		sk = quic_packet_get_listen_sock(skb);
++		if (!sk)
++			continue;
++
++		lock_sock(sk);
++		quic_packet_process(sk, skb);
++		release_sock(sk);
++		sock_put(sk);
++
++		skb = skb_dequeue(&qn->backlog_list);
++	}
++}
++
++/* Make these fixed for easy coding. */
++#define QUIC_PACKET_NUMBER_LEN	4
++#define QUIC_PACKET_LENGTH_LEN	4
++
++static struct sk_buff *quic_packet_handshake_create(struct sock *sk)
++{
++	struct quic_packet *packet = quic_packet(sk);
++	struct quic_frame *frame, *next;
++
++	/* Free all frames for now, and future patches will implement the actual creation logic. */
++	list_for_each_entry_safe(frame, next, &packet->frame_list, list) {
++		list_del(&frame->list);
++		quic_frame_put(frame);
++	}
++	return NULL;
++}
++
++static int quic_packet_number_check(struct sock *sk)
++{
++	return 0;
++}
++
++static struct sk_buff *quic_packet_app_create(struct sock *sk)
++{
++	struct quic_packet *packet = quic_packet(sk);
++	struct quic_frame *frame, *next;
++
++	/* Free all frames for now, and future patches will implement the actual creation logic. */
++	list_for_each_entry_safe(frame, next, &packet->frame_list, list) {
++		list_del(&frame->list);
++		quic_frame_put(frame);
++	}
++	return NULL;
++}
++
++/* Update the MSS and inform congestion control. */
++void quic_packet_mss_update(struct sock *sk, u32 mss)
++{
++	struct quic_packet *packet = quic_packet(sk);
++	struct quic_cong *cong = quic_cong(sk);
++
++	packet->mss[0] = (u16)mss;
++	quic_cong_set_mss(cong, packet->mss[0] - packet->taglen[0]);
++}
++
++/* Perform routing for the QUIC packet on the specified path, update header length and MSS
++ * accordingly, reset path and start PMTU timer.
++ */
++int quic_packet_route(struct sock *sk)
++{
++	struct quic_path_group *paths = quic_paths(sk);
++	struct quic_packet *packet = quic_packet(sk);
++	struct quic_config *c = quic_config(sk);
++	union quic_addr *sa, *da;
++	u32 pmtu;
++	int err;
++
++	da = quic_path_daddr(paths, packet->path);
++	sa = quic_path_saddr(paths, packet->path);
++	err = quic_flow_route(sk, da, sa, &paths->fl);
++	if (err)
++		return err;
++
++	packet->hlen = quic_encap_len(da);
++	pmtu = min_t(u32, dst_mtu(__sk_dst_get(sk)), QUIC_PATH_MAX_PMTU);
++	quic_packet_mss_update(sk, pmtu - packet->hlen);
++
++	quic_path_pl_reset(paths);
++	quic_timer_reset(sk, QUIC_TIMER_PMTU, c->plpmtud_probe_interval);
++	return 0;
++}
++
++/* Configure the QUIC packet header and routing based on encryption level and path. */
++int quic_packet_config(struct sock *sk, u8 level, u8 path)
++{
++	struct quic_conn_id_set *dest = quic_dest(sk), *source = quic_source(sk);
++	struct quic_packet *packet = quic_packet(sk);
++	struct quic_config *c = quic_config(sk);
++	u32 hlen = QUIC_HLEN;
++
++	/* If packet already has data, no need to reconfigure. */
++	if (!quic_packet_empty(packet))
++		return 0;
++
++	packet->ack_eliciting = 0;
++	packet->frame_len = 0;
++	packet->ipfragok = 0;
++	packet->padding = 0;
++	packet->frames = 0;
++	hlen += QUIC_PACKET_NUMBER_LEN; /* Packet number length. */
++	hlen += quic_conn_id_choose(dest, path)->len; /* DCID length. */
++	if (level) {
++		hlen += 1; /* Length byte for DCID. */
++		hlen += 1 + quic_conn_id_active(source)->len; /* Length byte + SCID length. */
++		if (level == QUIC_CRYPTO_INITIAL) /* Include token for Initial packets. */
++			hlen += quic_var_len(quic_token(sk)->len) + quic_token(sk)->len;
++		hlen += QUIC_VERSION_LEN; /* Version length. */
++		hlen += QUIC_PACKET_LENGTH_LEN; /* Packet length field length. */
++		/* Allow fragmentation if PLPMTUD is enabled, as it no longer relies on ICMP
++		 * Toobig messages to discover the path MTU.
++		 */
++		packet->ipfragok = !!c->plpmtud_probe_interval;
++	}
++	packet->level = level;
++	packet->len = (u16)hlen;
++	packet->overhead = (u8)hlen;
++
++	if (packet->path != path) { /* If the path changed, update and reset routing cache. */
++		packet->path = path;
++		__sk_dst_reset(sk);
++	}
++
++	/* Perform routing and MSS update for the configured packet. */
++	if (quic_packet_route(sk) < 0)
++		return -1;
++	return 0;
++}
++
++static void quic_packet_encrypt_done(struct sk_buff *skb, int err)
++{
++	/* Free it for now, future patches will implement the actual deferred transmission logic. */
++	kfree_skb(skb);
++}
++
++/* Coalescing Packets. */
++static int quic_packet_bundle(struct sock *sk, struct sk_buff *skb)
++{
++	struct quic_skb_cb *head_cb, *cb = QUIC_SKB_CB(skb);
++	struct quic_packet *packet = quic_packet(sk);
++	struct sk_buff *p;
++
++	if (!packet->head) { /* First packet to bundle: initialize the head. */
++		packet->head = skb;
++		cb->last = skb;
++		goto out;
++	}
++
++	/* If bundling would exceed MSS, flush the current bundle. */
++	if (packet->head->len + skb->len >= packet->mss[0]) {
++		quic_packet_flush(sk);
++		packet->head = skb;
++		cb->last = skb;
++		goto out;
++	}
++	/* Bundle it and update metadata for the aggregate skb. */
++	p = packet->head;
++	head_cb = QUIC_SKB_CB(p);
++	if (head_cb->last == p)
++		skb_shinfo(p)->frag_list = skb;
++	else
++		head_cb->last->next = skb;
++	p->data_len += skb->len;
++	p->truesize += skb->truesize;
++	p->len += skb->len;
++	head_cb->last = skb;
++	head_cb->ecn |= cb->ecn;  /* Merge ECN flags. */
++
++out:
++	/* rfc9000#section-12.2:
++	 *   Packets with a short header (Section 17.3) do not contain a Length field and so
++	 *   cannot be followed by other packets in the same UDP datagram.
++	 *
++	 * so Return 1 to flush if it is a Short header packet.
++	 */
++	return !cb->level;
++}
++
++/* Transmit a QUIC packet, possibly encrypting and bundling it. */
++int quic_packet_xmit(struct sock *sk, struct sk_buff *skb)
++{
++	struct quic_packet *packet = quic_packet(sk);
++	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
++	struct net *net = sock_net(sk);
++	int err;
++
++	/* Skip encryption if taglen == 0 (e.g., disable_1rtt_encryption). */
++	if (!packet->taglen[quic_hdr(skb)->form])
++		goto xmit;
++
++	cb->crypto_done = quic_packet_encrypt_done;
++	/* Associate skb with sk to ensure sk is valid during async encryption completion. */
++	WARN_ON(!skb_set_owner_sk_safe(skb, sk));
++	err = quic_crypto_encrypt(quic_crypto(sk, packet->level), skb);
++	if (err) {
++		if (err != -EINPROGRESS) {
++			QUIC_INC_STATS(net, QUIC_MIB_PKT_ENCDROP);
++			kfree_skb(skb);
++			return err;
++		}
++		QUIC_INC_STATS(net, QUIC_MIB_PKT_ENCBACKLOGS);
++		return err;
++	}
++	if (!cb->resume) /* Encryption completes synchronously. */
++		QUIC_INC_STATS(net, QUIC_MIB_PKT_ENCFASTPATHS);
++
++xmit:
++	if (quic_packet_bundle(sk, skb))
++		quic_packet_flush(sk);
++	return 0;
++}
++
++/* Create and transmit a new QUIC packet. */
++int quic_packet_create(struct sock *sk)
++{
++	struct quic_packet *packet = quic_packet(sk);
++	struct sk_buff *skb;
++	int err;
++
++	err = quic_packet_number_check(sk);
++	if (err)
++		goto err;
++
++	if (packet->level)
++		skb = quic_packet_handshake_create(sk);
++	else
++		skb = quic_packet_app_create(sk);
++	if (!skb) {
++		err = -ENOMEM;
++		goto err;
++	}
++
++	err = quic_packet_xmit(sk, skb);
++	if (err && err != -EINPROGRESS)
++		goto err;
++
++	/* Return 1 if at least one ACK-eliciting (non-PING) frame was sent. */
++	return !!packet->frames;
++err:
++	pr_debug("%s: err: %d\n", __func__, err);
++	return 0;
++}
++
++/* Flush any coalesced/bundled QUIC packets. */
++void quic_packet_flush(struct sock *sk)
++{
++	struct quic_path_group *paths = quic_paths(sk);
++	struct quic_packet *packet = quic_packet(sk);
++
++	if (packet->head) {
++		quic_lower_xmit(sk, packet->head,
++				quic_path_daddr(paths, packet->path), &paths->fl);
++		packet->head = NULL;
++	}
++}
++
++/* Append a frame to the tail of the current QUIC packet. */
++int quic_packet_tail(struct sock *sk, struct quic_frame *frame)
++{
++	struct quic_packet *packet = quic_packet(sk);
++	u8 taglen;
++
++	/* Reject frame if it doesn't match the packet's encryption level or path, or if
++	 * padding is already in place (no further frames should be added).
++	 */
++	if (frame->level != (packet->level % QUIC_CRYPTO_EARLY) ||
++	    frame->path != packet->path || packet->padding)
++		return 0;
++
++	/* Check if frame would exceed the current datagram MSS (excluding AEAD tag). */
++	taglen = quic_packet_taglen(packet);
++	if (packet->len + frame->len > packet->mss[frame->dgram] - taglen) {
++		/* If some data has already been added to the packet, bail out. */
++		if (packet->len != packet->overhead)
++			return 0;
++		/* Otherwise, allow IP fragmentation for this packet unless it’s a PING probe. */
++		if (!quic_frame_ping(frame->type))
++			packet->ipfragok = 1;
++	}
++	if (frame->padding)
++		packet->padding = frame->padding;
++
++	/* Track frames that require retransmission if lost (i.e., ACK-eliciting and non-PING). */
++	if (frame->ack_eliciting) {
++		packet->ack_eliciting = 1;
++		if (!quic_frame_ping(frame->type)) {
++			packet->frames++;
++			packet->frame_len += frame->len;
++		}
++	}
++
++	list_move_tail(&frame->list, &packet->frame_list);
++	packet->len += frame->len;
++	return frame->len;
++}
++
++void quic_packet_init(struct sock *sk)
++{
++	struct quic_packet *packet = quic_packet(sk);
++
++	INIT_LIST_HEAD(&packet->frame_list);
++	packet->taglen[0] = QUIC_TAG_LEN;
++	packet->taglen[1] = QUIC_TAG_LEN;
++	packet->mss[0] = QUIC_TAG_LEN;
++	packet->mss[1] = QUIC_TAG_LEN;
++
++	packet->version = QUIC_VERSION_V1;
++}
+diff --git a/net/quic/packet.h b/net/quic/packet.h
 new file mode 100644
-index 000000000000..7bcdba1e9bdd
+index 000000000000..b2e2a48b1486
 --- /dev/null
-+++ b/net/quic/frame.h
-@@ -0,0 +1,195 @@
++++ b/net/quic/packet.h
+@@ -0,0 +1,130 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/* QUIC kernel implementation
 + * (C) Copyright Red Hat Corp. 2023
@@ -746,257 +1162,366 @@ index 000000000000..7bcdba1e9bdd
 + *    Xin Long <lucien.xin@gmail.com>
 + */
 +
-+#define QUIC_CLOSE_PHRASE_MAX_LEN	80
++struct quic_packet {
++	struct quic_conn_id dcid;	/* Dest Connection ID from received packet */
++	struct quic_conn_id scid;	/* Source Connection ID from received packet */
++	union quic_addr daddr;		/* Dest address from received packet */
++	union quic_addr saddr;		/* Source address from received packet */
 +
-+#define QUIC_TOKEN_MAX_LEN		120
++	struct list_head frame_list;	/* List of frames to pack into packet for send */
++	struct sk_buff *head;		/* Head skb for packet bundling on send */
++	u16 frame_len;		/* Length of all ack-eliciting frames excluding PING */
++	u8 taglen[2];		/* Tag length for short and long packets */
++	u32 version;		/* QUIC version used/selected during handshake */
++	u8 errframe;		/* Frame type causing packet processing failure */
++	u8 overhead;		/* QUIC header length excluding frames */
++	u16 errcode;		/* Error code on packet processing failure */
++	u16 frames;		/* Number of ack-eliciting frames excluding PING */
++	u16 mss[2];		/* MSS for datagram and non-datagram packets */
++	u16 hlen;		/* UDP + IP header length for sending */
++	u16 len;		/* QUIC packet length excluding taglen for sending */
 +
-+#define QUIC_TICKET_MIN_LEN		64
-+#define QUIC_TICKET_MAX_LEN		4096
-+
-+#define QUIC_FRAME_BUF_SMALL		20
-+#define QUIC_FRAME_BUF_LARGE		100
-+
-+enum {
-+	QUIC_FRAME_PADDING = 0x00,
-+	QUIC_FRAME_PING = 0x01,
-+	QUIC_FRAME_ACK = 0x02,
-+	QUIC_FRAME_ACK_ECN = 0x03,
-+	QUIC_FRAME_RESET_STREAM = 0x04,
-+	QUIC_FRAME_STOP_SENDING = 0x05,
-+	QUIC_FRAME_CRYPTO = 0x06,
-+	QUIC_FRAME_NEW_TOKEN = 0x07,
-+	QUIC_FRAME_STREAM = 0x08,
-+	QUIC_FRAME_MAX_DATA = 0x10,
-+	QUIC_FRAME_MAX_STREAM_DATA = 0x11,
-+	QUIC_FRAME_MAX_STREAMS_BIDI = 0x12,
-+	QUIC_FRAME_MAX_STREAMS_UNI = 0x13,
-+	QUIC_FRAME_DATA_BLOCKED = 0x14,
-+	QUIC_FRAME_STREAM_DATA_BLOCKED = 0x15,
-+	QUIC_FRAME_STREAMS_BLOCKED_BIDI = 0x16,
-+	QUIC_FRAME_STREAMS_BLOCKED_UNI = 0x17,
-+	QUIC_FRAME_NEW_CONNECTION_ID = 0x18,
-+	QUIC_FRAME_RETIRE_CONNECTION_ID = 0x19,
-+	QUIC_FRAME_PATH_CHALLENGE = 0x1a,
-+	QUIC_FRAME_PATH_RESPONSE = 0x1b,
-+	QUIC_FRAME_CONNECTION_CLOSE = 0x1c,
-+	QUIC_FRAME_CONNECTION_CLOSE_APP = 0x1d,
-+	QUIC_FRAME_HANDSHAKE_DONE = 0x1e,
-+	QUIC_FRAME_DATAGRAM = 0x30, /* RFC 9221 */
-+	QUIC_FRAME_DATAGRAM_LEN = 0x31,
-+	QUIC_FRAME_MAX = QUIC_FRAME_DATAGRAM_LEN,
++	u8 ack_eliciting:1;	/* Packet contains ack-eliciting frames to send */
++	u8 ack_requested:1;	/* Packet contains ack-eliciting frames received */
++	u8 ack_immediate:1;	/* Send ACK immediately (skip ack_delay timer) */
++	u8 non_probing:1;	/* Packet has ack-eliciting frames excluding NEW_CONNECTION_ID */
++	u8 has_sack:1;		/* Packet has ACK frames received */
++	u8 ipfragok:1;		/* Allow IP fragmentation */
++	u8 padding:1;		/* Packet has padding frames */
++	u8 path:1;		/* Path identifier used to send this packet */
++	u8 level;		/* Encryption level used */
 +};
 +
-+enum {
-+	QUIC_TRANSPORT_PARAM_ORIGINAL_DESTINATION_CONNECTION_ID = 0x0000,
-+	QUIC_TRANSPORT_PARAM_MAX_IDLE_TIMEOUT = 0x0001,
-+	QUIC_TRANSPORT_PARAM_STATELESS_RESET_TOKEN = 0x0002,
-+	QUIC_TRANSPORT_PARAM_MAX_UDP_PAYLOAD_SIZE = 0x0003,
-+	QUIC_TRANSPORT_PARAM_INITIAL_MAX_DATA = 0x0004,
-+	QUIC_TRANSPORT_PARAM_INITIAL_MAX_STREAM_DATA_BIDI_LOCAL = 0x0005,
-+	QUIC_TRANSPORT_PARAM_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE = 0x0006,
-+	QUIC_TRANSPORT_PARAM_INITIAL_MAX_STREAM_DATA_UNI = 0x0007,
-+	QUIC_TRANSPORT_PARAM_INITIAL_MAX_STREAMS_BIDI = 0x0008,
-+	QUIC_TRANSPORT_PARAM_INITIAL_MAX_STREAMS_UNI = 0x0009,
-+	QUIC_TRANSPORT_PARAM_ACK_DELAY_EXPONENT = 0x000a,
-+	QUIC_TRANSPORT_PARAM_MAX_ACK_DELAY = 0x000b,
-+	QUIC_TRANSPORT_PARAM_DISABLE_ACTIVE_MIGRATION = 0x000c,
-+	QUIC_TRANSPORT_PARAM_PREFERRED_ADDRESS = 0x000d,
-+	QUIC_TRANSPORT_PARAM_ACTIVE_CONNECTION_ID_LIMIT = 0x000e,
-+	QUIC_TRANSPORT_PARAM_INITIAL_SOURCE_CONNECTION_ID = 0x000f,
-+	QUIC_TRANSPORT_PARAM_RETRY_SOURCE_CONNECTION_ID = 0x0010,
-+	QUIC_TRANSPORT_PARAM_MAX_DATAGRAM_FRAME_SIZE = 0x0020,
-+	QUIC_TRANSPORT_PARAM_GREASE_QUIC_BIT = 0x2ab2,
-+	QUIC_TRANSPORT_PARAM_VERSION_INFORMATION = 0x11,
-+	QUIC_TRANSPORT_PARAM_DISABLE_1RTT_ENCRYPTION = 0xbaad,
++struct quic_packet_sent {
++	struct list_head list;	/* Link in sent packet list for ACK tracking */
++	u32 sent_time;		/* Time when packet was sent */
++	u16 frame_len;		/* Combined length of all frames held */
++	u16 frames;		/* Number of frames held */
++
++	s64 number;		/* Packet number */
++	u8  level;		/* Packet number space */
++	u8  ecn:2;		/* ECN bits */
++
++	struct quic_frame *frame_array[];	/* Array of pointers to held frames */
 +};
 +
-+/* Arguments passed to create a STREAM frame */
-+struct quic_msginfo {
-+	struct quic_stream *stream;	/* The QUIC stream associated with this frame */
-+	struct iov_iter *msg;		/* Iterator over message data to send */
-+	u32 flags;			/* Flags controlling stream frame creation */
-+	u8 level;			/* Encryption level for this frame */
-+};
++#define QUIC_PACKET_INITIAL_V1		0
++#define QUIC_PACKET_0RTT_V1		1
++#define QUIC_PACKET_HANDSHAKE_V1	2
++#define QUIC_PACKET_RETRY_V1		3
 +
-+/* Arguments passed to create a PING frame */
-+struct quic_probeinfo {
-+	u16 size;	/* Size of the PING packet */
-+	u8 level;	/* Encryption level for this frame */
-+};
++#define QUIC_PACKET_INITIAL_V2		1
++#define QUIC_PACKET_0RTT_V2		2
++#define QUIC_PACKET_HANDSHAKE_V2	3
++#define QUIC_PACKET_RETRY_V2		0
 +
-+/* Operations for creating, processing, and acknowledging QUIC frames */
-+struct quic_frame_ops {
-+	struct quic_frame *(*frame_create)(struct sock *sk, void *data, u8 type);
-+	int (*frame_process)(struct sock *sk, struct quic_frame *frame, u8 type);
-+	void (*frame_ack)(struct sock *sk, struct quic_frame *frame);
-+	u8 ack_eliciting;
-+};
++#define QUIC_PACKET_INITIAL		QUIC_PACKET_INITIAL_V1
++#define QUIC_PACKET_0RTT		QUIC_PACKET_0RTT_V1
++#define QUIC_PACKET_HANDSHAKE		QUIC_PACKET_HANDSHAKE_V1
++#define QUIC_PACKET_RETRY		QUIC_PACKET_RETRY_V1
 +
-+/* Fragment of data appended to a STREAM frame */
-+struct quic_frame_frag {
-+	struct quic_frame_frag *next;	/* Next fragment in the linked list */
-+	u16 size;			/* Size of this data fragment */
-+	u8 data[];			/* Flexible array member holding fragment data */
-+};
++#define QUIC_VERSION_LEN		4
 +
-+struct quic_frame {
-+	union {
-+		struct quic_frame_frag *flist;	/* For TX: linked list of appended data fragments */
-+		struct sk_buff *skb;		/* For RX: skb containing the raw frame data */
-+	};
-+	struct quic_stream *stream;		/* Stream related to this frame, NULL if none */
-+	struct list_head list;			/* Linked list node for queuing frames */
-+	union {
-+		s64 offset;	/* For RX: stream/crypto data offset or read data offset */
-+		s64 number;	/* For TX: first packet number used */
-+	};
-+	u8  *data;		/* Pointer to the actual frame data buffer */
-+
-+	refcount_t refcnt;
-+	u16 errcode;		/* Error code set during frame processing */
-+	u8  level;		/* Packet number space: Initial, Handshake, or App */
-+	u8  type;		/* Frame type identifier */
-+	u16 bytes;		/* Number of user data bytes */
-+	u16 size;		/* Allocated data buffer size */
-+	u16 len;		/* Total frame length including appended fragments */
-+
-+	u8  ack_eliciting:1;	/* Frame requires acknowledgment */
-+	u8  transmitted:1;	/* Frame is in the transmitted queue */
-+	u8  stream_fin:1;	/* Frame includes FIN flag for stream */
-+	u8  nodelay:1;		/* Frame bypasses Nagle's algorithm for sending */
-+	u8  padding:1;		/* Padding is needed after this frame */
-+	u8  dgram:1;		/* Frame represents a datagram message (RX only) */
-+	u8  event:1;		/* Frame represents an event (RX only) */
-+	u8  path:1;		/* Path index used to send this frame */
-+};
-+
-+static inline bool quic_frame_new_conn_id(u8 type)
++static inline u8 quic_packet_taglen(struct quic_packet *packet)
 +{
-+	return type == QUIC_FRAME_NEW_CONNECTION_ID;
++	return packet->taglen[!!packet->level];
 +}
 +
-+static inline bool quic_frame_dgram(u8 type)
++static inline void quic_packet_set_taglen(struct quic_packet *packet, u8 taglen)
 +{
-+	return type == QUIC_FRAME_DATAGRAM || type == QUIC_FRAME_DATAGRAM_LEN;
++	packet->taglen[0] = taglen;
 +}
 +
-+static inline bool quic_frame_stream(u8 type)
++static inline u32 quic_packet_mss(struct quic_packet *packet)
 +{
-+	return type >= QUIC_FRAME_STREAM && type < QUIC_FRAME_MAX_DATA;
++	return packet->mss[0] - packet->taglen[!!packet->level];
 +}
 +
-+static inline bool quic_frame_sack(u8 type)
++static inline u32 quic_packet_max_payload(struct quic_packet *packet)
 +{
-+	return type == QUIC_FRAME_ACK || type == QUIC_FRAME_ACK_ECN;
++	return packet->mss[0] - packet->overhead - packet->taglen[!!packet->level];
 +}
 +
-+static inline bool quic_frame_ping(u8 type)
++static inline u32 quic_packet_max_payload_dgram(struct quic_packet *packet)
 +{
-+	return type == QUIC_FRAME_PING;
++	return packet->mss[1] - packet->overhead - packet->taglen[!!packet->level];
 +}
 +
-+/* Check if a given frame type is valid for the specified encryption level,
-+ * based on the Frame Types table from rfc9000#section-12.4.
-+ *
-+ * Returns 0 if valid, 1 otherwise.
-+ */
-+static inline int quic_frame_level_check(u8 level, u8 type)
++static inline int quic_packet_empty(struct quic_packet *packet)
 +{
-+	if (level == QUIC_CRYPTO_APP)
-+		return 0;
-+
-+	if (level == QUIC_CRYPTO_EARLY) {
-+		if (type == QUIC_FRAME_ACK || type == QUIC_FRAME_ACK_ECN ||
-+		    type == QUIC_FRAME_CRYPTO || type == QUIC_FRAME_HANDSHAKE_DONE ||
-+		    type == QUIC_FRAME_NEW_TOKEN || type == QUIC_FRAME_PATH_RESPONSE ||
-+		    type == QUIC_FRAME_RETIRE_CONNECTION_ID)
-+			return 1;
-+		return 0;
-+	}
-+
-+	if (type != QUIC_FRAME_ACK && type != QUIC_FRAME_ACK_ECN &&
-+	    type != QUIC_FRAME_PADDING && type != QUIC_FRAME_PING &&
-+	    type != QUIC_FRAME_CRYPTO && type != QUIC_FRAME_CONNECTION_CLOSE)
-+		return 1;
-+	return 0;
++	return list_empty(&packet->frame_list);
 +}
 +
-+int quic_frame_stream_append(struct sock *sk, struct quic_frame *frame,
-+			     struct quic_msginfo *info, u8 pack);
++static inline void quic_packet_reset(struct quic_packet *packet)
++{
++	packet->level = 0;
++	packet->errcode = 0;
++	packet->errframe = 0;
++	packet->has_sack = 0;
++	packet->non_probing = 0;
++	packet->ack_requested = 0;
++	packet->ack_immediate = 0;
++}
 +
-+struct quic_frame *quic_frame_alloc(u32 size, u8 *data, gfp_t gfp);
-+struct quic_frame *quic_frame_get(struct quic_frame *frame);
-+void quic_frame_put(struct quic_frame *frame);
++int quic_packet_tail(struct sock *sk, struct quic_frame *frame);
++int quic_packet_process(struct sock *sk, struct sk_buff *skb);
++int quic_packet_config(struct sock *sk, u8 level, u8 path);
 +
-+struct quic_frame *quic_frame_create(struct sock *sk, u8 type, void *data);
-+int quic_frame_process(struct sock *sk, struct quic_frame *frame);
-+void quic_frame_ack(struct sock *sk, struct quic_frame *frame);
++int quic_packet_xmit(struct sock *sk, struct sk_buff *skb);
++int quic_packet_create(struct sock *sk);
++int quic_packet_route(struct sock *sk);
++
++void quic_packet_mss_update(struct sock *sk, u32 mss);
++void quic_packet_flush(struct sock *sk);
++void quic_packet_init(struct sock *sk);
++
++int quic_packet_get_dcid(struct quic_conn_id *dcid, struct sk_buff *skb);
++int quic_packet_select_version(struct sock *sk, u32 *versions, u8 count);
++u32 *quic_packet_compatible_versions(u32 version);
++
++void quic_packet_backlog_work(struct work_struct *work);
++void quic_packet_rcv_err_pmtu(struct sock *sk);
++int quic_packet_rcv(struct sk_buff *skb, u8 err);
 diff --git a/net/quic/protocol.c b/net/quic/protocol.c
-index c12ef11c7947..fb2c2d9cd80a 100644
+index fb2c2d9cd80a..75b6f6974f47 100644
 --- a/net/quic/protocol.c
 +++ b/net/quic/protocol.c
-@@ -20,6 +20,7 @@
+@@ -275,6 +275,9 @@ static int __net_init quic_net_init(struct net *net)
+ 		return err;
+ 	}
  
- static unsigned int quic_net_id __read_mostly;
++	INIT_WORK(&qn->work, quic_packet_backlog_work);
++	skb_queue_head_init(&qn->backlog_list);
++
+ #ifdef CONFIG_PROC_FS
+ 	err = quic_net_proc_init(net);
+ 	if (err) {
+@@ -293,6 +296,8 @@ static void __net_exit quic_net_exit(struct net *net)
+ #ifdef CONFIG_PROC_FS
+ 	quic_net_proc_exit(net);
+ #endif
++	skb_queue_purge(&qn->backlog_list);
++	cancel_work_sync(&qn->work);
+ 	quic_crypto_free(&qn->crypto);
+ 	free_percpu(qn->stat);
+ 	qn->stat = NULL;
+@@ -342,6 +347,7 @@ static __init int quic_init(void)
+ 	sysctl_quic_wmem[1] = 16 * 1024;
+ 	sysctl_quic_wmem[2] = max(64 * 1024, max_share);
  
-+struct kmem_cache *quic_frame_cachep __read_mostly;
- struct percpu_counter quic_sockets_allocated;
- 
- long sysctl_quic_mem[3];
-@@ -343,6 +344,11 @@ static __init int quic_init(void)
- 
++	quic_path_init(quic_packet_rcv);
  	quic_crypto_init();
  
-+	quic_frame_cachep = kmem_cache_create("quic_frame", sizeof(struct quic_frame),
-+					      0, SLAB_HWCACHE_ALIGN, NULL);
-+	if (!quic_frame_cachep)
-+		goto err;
-+
- 	err = percpu_counter_init(&quic_sockets_allocated, 0, GFP_KERNEL);
- 	if (err)
- 		goto err_percpu_counter;
-@@ -371,6 +377,8 @@ static __init int quic_init(void)
- err_hash:
- 	percpu_counter_destroy(&quic_sockets_allocated);
- err_percpu_counter:
-+	kmem_cache_destroy(quic_frame_cachep);
-+err:
- 	return err;
- }
- 
-@@ -383,6 +391,7 @@ static __exit void quic_exit(void)
- 	unregister_pernet_subsys(&quic_net_ops);
- 	quic_hash_tables_destroy();
- 	percpu_counter_destroy(&quic_sockets_allocated);
-+	kmem_cache_destroy(quic_frame_cachep);
- 	pr_info("quic: exit\n");
- }
- 
+ 	quic_frame_cachep = kmem_cache_create("quic_frame", sizeof(struct quic_frame),
 diff --git a/net/quic/protocol.h b/net/quic/protocol.h
-index 9f86176205c4..91b28554dccf 100644
+index 91b28554dccf..402fd310b606 100644
 --- a/net/quic/protocol.h
 +++ b/net/quic/protocol.h
-@@ -8,6 +8,7 @@
-  *    Xin Long <lucien.xin@gmail.com>
-  */
+@@ -50,6 +50,10 @@ struct quic_net {
+ 	struct proc_dir_entry *proc_net;	/* procfs entry for dumping QUIC socket stats */
+ #endif
+ 	struct quic_crypto crypto;	/* Context for decrypting Initial packets for ALPN */
++
++	/* Queue of packets deferred for processing in process context */
++	struct sk_buff_head backlog_list;
++	struct work_struct work;	/* Work scheduled to drain and process backlog_list */
+ };
  
-+extern struct kmem_cache *quic_frame_cachep __read_mostly;
- extern struct percpu_counter quic_sockets_allocated;
+ struct quic_net *quic_net(struct net *net);
+diff --git a/net/quic/socket.c b/net/quic/socket.c
+index 497ad30c51d3..fc23d201d0aa 100644
+--- a/net/quic/socket.c
++++ b/net/quic/socket.c
+@@ -24,6 +24,113 @@ static void quic_enter_memory_pressure(struct sock *sk)
+ 	WRITE_ONCE(quic_memory_pressure, 1);
+ }
  
- extern long sysctl_quic_mem[3];
++/* Lookup a connected QUIC socket based on address and dest connection ID.
++ *
++ * This function searches the established (non-listening) QUIC socket table for a socket that
++ * matches the source and dest addresses and, optionally, the dest connection ID (DCID). The
++ * value returned by quic_path_orig_dcid() might be the original dest connection ID from the
++ * ClientHello or the Source Connection ID from a Retry packet before.
++ *
++ * The DCID is provided from a handshake packet when searching by source connection ID fails,
++ * such as when the peer has not yet received server's response and updated the DCID.
++ *
++ * Return: A pointer to the matching connected socket, or NULL if no match is found.
++ */
++struct sock *quic_sock_lookup(struct sk_buff *skb, union quic_addr *sa, union quic_addr *da,
++			      struct quic_conn_id *dcid)
++{
++	struct net *net = sock_net(skb->sk);
++	struct quic_path_group *paths;
++	struct quic_shash_head *head;
++	struct sock *sk;
++
++	head = quic_sock_head(net, sa, da);
++	read_lock(&head->lock);
++	sk_for_each(sk, &head->head) {
++		if (net != sock_net(sk))
++			continue;
++		paths = quic_paths(sk);
++		if (quic_cmp_sk_addr(sk, quic_path_saddr(paths, 0), sa) &&
++		    quic_cmp_sk_addr(sk, quic_path_daddr(paths, 0), da) &&
++		    quic_path_usock(paths, 0) == skb->sk &&
++		    (!dcid || !quic_conn_id_cmp(quic_path_orig_dcid(paths), dcid))) {
++			sock_hold(sk);
++			break;
++		}
++	}
++	read_unlock(&head->lock);
++
++	return sk;
++}
++
++/* Find the listening QUIC socket for an incoming packet.
++ *
++ * This function searches the QUIC socket table for a listening socket that matches the dest
++ * address and port, and the ALPN(s) if presented in the ClientHello.  If multiple listening
++ * sockets are bound to the same address, port, and ALPN(s) (e.g., via SO_REUSEPORT), this
++ * function selects a socket from the reuseport group.
++ *
++ * Return: A pointer to the matching listening socket, or NULL if no match is found.
++ */
++struct sock *quic_listen_sock_lookup(struct sk_buff *skb, union quic_addr *sa, union quic_addr *da,
++				     struct quic_data *alpns)
++{
++	struct net *net = sock_net(skb->sk);
++	struct sock *sk = NULL, *tmp;
++	struct quic_shash_head *head;
++	struct quic_data alpn;
++	union quic_addr *a;
++	u64 length;
++	u32 len;
++	u8 *p;
++
++	head = quic_listen_sock_head(net, ntohs(sa->v4.sin_port));
++	read_lock(&head->lock);
++
++	if (!alpns->len) { /* No ALPN entries present or failed to parse the ALPNs. */
++		sk_for_each(tmp, &head->head) {
++			/* If alpns->data != NULL, TLS parsing succeeded but no ALPN was found.
++			 * In this case, only match sockets that have no ALPN set.
++			 */
++			a = quic_path_saddr(quic_paths(tmp), 0);
++			if (net == sock_net(tmp) && quic_cmp_sk_addr(tmp, a, sa) &&
++			    quic_path_usock(quic_paths(tmp), 0) == skb->sk &&
++			    (!alpns->data || !quic_alpn(tmp)->len)) {
++				sk = tmp;
++				if (!quic_is_any_addr(a)) /* Prefer specific address match. */
++					break;
++			}
++		}
++		goto unlock;
++	}
++
++	/* ALPN present: loop through each ALPN entry. */
++	for (p = alpns->data, len = alpns->len; len; len -= length, p += length) {
++		quic_get_int(&p, &len, &length, 1);
++		quic_data(&alpn, p, length);
++		sk_for_each(tmp, &head->head) {
++			a = quic_path_saddr(quic_paths(tmp), 0);
++			if (net == sock_net(tmp) && quic_cmp_sk_addr(tmp, a, sa) &&
++			    quic_path_usock(quic_paths(tmp), 0) == skb->sk &&
++			    quic_data_has(quic_alpn(tmp), &alpn)) {
++				sk = tmp;
++				if (!quic_is_any_addr(a))
++					break;
++			}
++		}
++		if (sk)
++			break;
++	}
++unlock:
++	if (sk && sk->sk_reuseport)
++		sk = reuseport_select_sock(sk, quic_shash(net, da), skb, 1);
++	if (sk)
++		sock_hold(sk);
++
++	read_unlock(&head->lock);
++	return sk;
++}
++
+ static void quic_write_space(struct sock *sk)
+ {
+ 	struct socket_wq *wq;
+@@ -48,6 +155,7 @@ static int quic_init_sock(struct sock *sk)
+ 	quic_cong_init(quic_cong(sk));
+ 
+ 	quic_timer_init(sk);
++	quic_packet_init(sk);
+ 
+ 	if (quic_stream_init(quic_streams(sk)))
+ 		return -ENOMEM;
+@@ -217,6 +325,10 @@ static void quic_release_cb(struct sock *sk)
+ 		nflags = flags & ~QUIC_DEFERRED_ALL;
+ 	} while (!try_cmpxchg(&sk->sk_tsq_flags, &flags, nflags));
+ 
++	if (flags & QUIC_F_MTU_REDUCED_DEFERRED) {
++		quic_packet_rcv_err_pmtu(sk);
++		__sock_put(sk);
++	}
+ 	if (flags & QUIC_F_LOSS_DEFERRED) {
+ 		quic_timer_loss_handler(sk);
+ 		__sock_put(sk);
+@@ -266,6 +378,7 @@ struct proto quic_prot = {
+ 	.accept		=  quic_accept,
+ 	.hash		=  quic_hash,
+ 	.unhash		=  quic_unhash,
++	.backlog_rcv	=  quic_packet_process,
+ 	.release_cb	=  quic_release_cb,
+ 	.no_autobind	=  true,
+ 	.obj_size	=  sizeof(struct quic_sock),
+@@ -296,6 +409,7 @@ struct proto quicv6_prot = {
+ 	.accept		=  quic_accept,
+ 	.hash		=  quic_hash,
+ 	.unhash		=  quic_unhash,
++	.backlog_rcv	=  quic_packet_process,
+ 	.release_cb	=  quic_release_cb,
+ 	.no_autobind	=  true,
+ 	.obj_size	= sizeof(struct quic6_sock),
 diff --git a/net/quic/socket.h b/net/quic/socket.h
-index b3cf31e005ce..75cb90177a01 100644
+index 75cb90177a01..99cc460158a0 100644
 --- a/net/quic/socket.h
 +++ b/net/quic/socket.h
-@@ -20,6 +20,8 @@
+@@ -20,6 +20,7 @@
  #include "path.h"
  #include "cong.h"
  
-+#include "frame.h"
-+
- #include "protocol.h"
- #include "timer.h"
++#include "packet.h"
+ #include "frame.h"
  
+ #include "protocol.h"
+@@ -77,6 +78,7 @@ struct quic_sock {
+ 	struct quic_pnspace		space[QUIC_PNSPACE_MAX];
+ 	struct quic_crypto		crypto[QUIC_CRYPTO_MAX];
+ 
++	struct quic_packet		packet;
+ 	struct quic_timer		timers[QUIC_TIMER_MAX];
+ };
+ 
+@@ -155,6 +157,11 @@ static inline struct quic_crypto *quic_crypto(const struct sock *sk, u8 level)
+ 	return &quic_sk(sk)->crypto[level];
+ }
+ 
++static inline struct quic_packet *quic_packet(const struct sock *sk)
++{
++	return &quic_sk(sk)->packet;
++}
++
+ static inline void *quic_timer(const struct sock *sk, u8 type)
+ {
+ 	return (void *)&quic_sk(sk)->timers[type];
+@@ -200,3 +207,8 @@ static inline void quic_set_state(struct sock *sk, int state)
+ 	inet_sk_set_state(sk, state);
+ 	sk->sk_state_change(sk);
+ }
++
++struct sock *quic_listen_sock_lookup(struct sk_buff *skb, union quic_addr *sa, union quic_addr *da,
++				     struct quic_data *alpns);
++struct sock *quic_sock_lookup(struct sk_buff *skb, union quic_addr *sa, union quic_addr *da,
++			      struct quic_conn_id *dcid);
 -- 
 2.47.1
 
