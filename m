@@ -1,63 +1,133 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B662582;
-	Thu, 18 Sep 2025 03:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EFD29E0F7;
+	Thu, 18 Sep 2025 07:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758166698; cv=none; b=Y+F1WQsj7YGG3xIBMrrM4QuopbMCf3PXqQHkDUYOTvx6fbChAIBUK1d7GCqBHCbr8yI10ARuFgTkho0mwqUsn2NCDN8uhZBzu55aiI0duEqiTPrt1QwWfQ5CsibGY5kOilV9L3MKE3xLk6V2oYcuH72cKB62K5/o8nebHYawxNo=
+	t=1758180883; cv=none; b=qNXgKDI5COfnyn0fvVg5kP/8uD8LG8MHUNgIlH67w9PPkQT6HNd0H0rp0e/A3hRJlQNkM/Xwsw+v2xQZm7+2d8GPlIXTH03GQauF3pBAtMNQcSxIZWH0vz2fpRBk74rwDHvqdYJ7PGofc528Zzm2agk16aa5umaa5PI3C8kn198=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758166698; c=relaxed/simple;
-	bh=9zlp7HPPoTfiEyUqnJ1aM49b7XicO+GZ1rBQUGKxoGc=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=M9RgjVp8YriEhI2tVORSpH7hLi/puMVpKCIA52Tp7EanClaOBy7PErFdWz1okigwBqindETJtUkaB8An1Gs6r20WbffEHt2yv6H7ILgCKTQ0TMRZXkcZNWB8wjl9DJXQ8eqfhBiaeL7JXDseHVEjV+pmEC37O7tw+y/Rgbw9zP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ez6AdStu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758180883; c=relaxed/simple;
+	bh=iFyl1v+R5r8mqqXN1vgFO7dGvg1TVlgShJSyPTUstxk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cOs5HC6hycxFZPtahydUr91DwdltvTHqtjPUmK7J+IN+2wnYytjVPhm0nhpR7klJgiS9j+ITTrzVouzokVTtolqb/xcYGMh4Q4RWJj+SRY4WkT8kGX0MPVkf/YjDe+vLUfrs5pRBB82vhKvwQHTatPnJun4TVu/HGlYXNxWCy1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=phtoj2Cx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ez6AdStu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9EEEC4CEE7;
-	Thu, 18 Sep 2025 03:38:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="phtoj2Cx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0550FC4CEE7;
+	Thu, 18 Sep 2025 07:34:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758166697;
-	bh=9zlp7HPPoTfiEyUqnJ1aM49b7XicO+GZ1rBQUGKxoGc=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=Ez6AdStu5nBpZwd7W4163cNGnuEZsTLewXuLmoocC1znZsRpgk9sz+w20iAJM++ok
-	 1lByfAbQfw3pfjpGSdeL7SgExx9Bas6vZJn0p2LbXwwVEs+mlYgCMwi+vH1AEZTjq/
-	 rM8QGF0lXS9wGGA5pkrBKZgGSZ1ja+mKz3wBjih5Qjw917VWmHz2DEr9a64/0bXI6R
-	 fVj+moWqiPDZdy/T75CS0E3UpEAF6qwlNr93CeKE0QB5kdqb8nwX8SmTvkdSgDX/w7
-	 j2hWcEaf2bLB74SD+HYj8ePikiAW1/KBN7fzMKBiRlYp2fHw67f7gid5ZOCtCTtzuP
-	 eEQyG/ehhjGTQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7166B39D0C28;
-	Thu, 18 Sep 2025 03:38:19 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mveqnRsJ4Fi8pQjTY2WrtDbys1f3JPR+OR=w-eskUoiyw@mail.gmail.com>
-References: <CAH2r5mveqnRsJ4Fi8pQjTY2WrtDbys1f3JPR+OR=w-eskUoiyw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mveqnRsJ4Fi8pQjTY2WrtDbys1f3JPR+OR=w-eskUoiyw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.17-rc6-ksmbd-fixes
-X-PR-Tracked-Commit-Id: e1868ba37fd27c6a68e31565402b154beaa65df0
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 592a93fea16bd86a605a1b4ce9aed16e22d124d2
-Message-Id: <175816669794.2244756.15215190037383884573.pr-tracker-bot@kernel.org>
-Date: Thu, 18 Sep 2025 03:38:17 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Namjae Jeon <linkinjeon@kernel.org>, "Stefan (metze) Metzmacher" <metze@samba.org>, CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+	s=k20201202; t=1758180882;
+	bh=iFyl1v+R5r8mqqXN1vgFO7dGvg1TVlgShJSyPTUstxk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=phtoj2CxJPgt5vlwgTN7FnjIQJ+OT78j87ABMY8vPHEow8JDNeDYUmGsE0e8555rC
+	 /o9X3zw9P6cjDhVh0+KUdQ3X2U9KuoOAuAtfs5l86ewubTk0Vo8eLvBU6KbfjC1L/z
+	 gFYxCE7voIAu9TqJ9/blXGUWYCjbXVVuwMD657mnWPpdX+ff9VGS5Lg0m1tp1gDTNr
+	 0k+WKo1DKSQVtZdnWaVeM6THYvacQUQUACPn/NNwGRAQas4dKY6/WMYtnQGRa7fs2M
+	 m2SFtGKk8uCE+nsvOGBF8TL5TGEhJGjP+CcIw70cDPD1gQ3yyFntHhlOpeEiXp424l
+	 wqOuckTojiYEg==
+Message-ID: <eb729729-c7cf-4a15-ab97-27ec21c0891a@kernel.org>
+Date: Thu, 18 Sep 2025 09:34:39 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/9] simplify vboxsf_dir_atomic_open()
+To: Al Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org
+Cc: v9fs@lists.linux.dev, miklos@szeredi.hu, agruenba@redhat.com,
+ linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org
+References: <20250917232416.GG39973@ZenIV>
+ <20250917232736.2556586-1-viro@zeniv.linux.org.uk>
+ <20250917232736.2556586-5-viro@zeniv.linux.org.uk>
+From: Hans de Goede <hansg@kernel.org>
+Content-Language: en-US, nl
+In-Reply-To: <20250917232736.2556586-5-viro@zeniv.linux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Wed, 17 Sep 2025 19:24:31 -0500:
+Hi,
 
-> git://git.samba.org/ksmbd.git tags/6.17-rc6-ksmbd-fixes
+On 18-Sep-25 1:27 AM, Al Viro wrote:
+> similar to 9p et.al.
+> 
+> Reviewed-by: NeilBrown <neil@brown.name>
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/592a93fea16bd86a605a1b4ce9aed16e22d124d2
+Thanks, patch looks good to me:
 
-Thank you!
+Reviewed-by: Hans de Goede <hansg@kernel.org>
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Regards,
+
+Hans
+
+
+
+> ---
+>  fs/vboxsf/dir.c | 25 +++++++++----------------
+>  1 file changed, 9 insertions(+), 16 deletions(-)
+> 
+> diff --git a/fs/vboxsf/dir.c b/fs/vboxsf/dir.c
+> index 770e29ec3557..42bedc4ec7af 100644
+> --- a/fs/vboxsf/dir.c
+> +++ b/fs/vboxsf/dir.c
+> @@ -315,46 +315,39 @@ static int vboxsf_dir_atomic_open(struct inode *parent, struct dentry *dentry,
+>  {
+>  	struct vboxsf_sbi *sbi = VBOXSF_SBI(parent->i_sb);
+>  	struct vboxsf_handle *sf_handle;
+> -	struct dentry *res = NULL;
+>  	u64 handle;
+>  	int err;
+>  
+>  	if (d_in_lookup(dentry)) {
+> -		res = vboxsf_dir_lookup(parent, dentry, 0);
+> -		if (IS_ERR(res))
+> -			return PTR_ERR(res);
+> -
+> -		if (res)
+> -			dentry = res;
+> +		struct dentry *res = vboxsf_dir_lookup(parent, dentry, 0);
+> +		if (res || d_really_is_positive(dentry))
+> +			return finish_no_open(file, res);
+>  	}
+>  
+>  	/* Only creates */
+> -	if (!(flags & O_CREAT) || d_really_is_positive(dentry))
+> -		return finish_no_open(file, res);
+> +	if (!(flags & O_CREAT))
+> +		return finish_no_open(file, NULL);
+>  
+>  	err = vboxsf_dir_create(parent, dentry, mode, false, flags & O_EXCL, &handle);
+>  	if (err)
+> -		goto out;
+> +		return err;
+>  
+>  	sf_handle = vboxsf_create_sf_handle(d_inode(dentry), handle, SHFL_CF_ACCESS_READWRITE);
+>  	if (IS_ERR(sf_handle)) {
+>  		vboxsf_close(sbi->root, handle);
+> -		err = PTR_ERR(sf_handle);
+> -		goto out;
+> +		return PTR_ERR(sf_handle);
+>  	}
+>  
+>  	err = finish_open(file, dentry, generic_file_open);
+>  	if (err) {
+>  		/* This also closes the handle passed to vboxsf_create_sf_handle() */
+>  		vboxsf_release_sf_handle(d_inode(dentry), sf_handle);
+> -		goto out;
+> +		return err;
+>  	}
+>  
+>  	file->private_data = sf_handle;
+>  	file->f_mode |= FMODE_CREATED;
+> -out:
+> -	dput(res);
+> -	return err;
+> +	return 0;
+>  }
+>  
+>  static int vboxsf_dir_unlink(struct inode *parent, struct dentry *dentry)
+
