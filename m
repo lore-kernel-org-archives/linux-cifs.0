@@ -1,287 +1,318 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4523274FCB
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Sep 2025 09:44:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02442EBBAD
+	for <linux-cifs@vger.kernel.org>; Thu, 18 Sep 2025 12:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758188668; cv=none; b=C/5ZjTWQmxt9xainc/C49gDFpjffDv4W6pR/XULZoHdHyeGTdaDV9J2jySQyTo+11zYuxi2MMtblOId0XHGfDs11YX/Q66Mf2cD7L3hwrImrGlXcND4KR6XVVGeuvPvtlTriewQ9CJse4NPRJEeEgSLskqYAlRe7NurTuXuJPoM=
+	t=1758197406; cv=none; b=pKXK1hE66LZhBxJ90CW/+rOBQHdgiJH2jiYCPcsspf5/bTWBnw1cNMgkAsQaIeaIPcV7sTsEiL7YakAJ/w4c8UHnKDbpTRHnW0QDF8YK6drhaqnuXNwH4aEHnDrF/vS6xNTzXIMYf89YzYpEMSD2AQQx64Zck4Yt692X1p8XCDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758188668; c=relaxed/simple;
-	bh=ecUwECiMZmq4a3VXQ4C20VmqMr9uJNcHAdn9TCOIneA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=RDy+xgxWID95ZxHPBoIW5EWehWI3+/1o3pIe9IiPTKYA8gDO4SSJu8LtiKU8JLbCcdjhRv1CexPNI8mYVq4CPwAr6uB6bQRGk5cCaXDtH0Wq73h7vhIje9B7/HIu3pj/s5YwmWto/1bAQj1qlIwVrxBbdmKLpdXYTWfFWRM90Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RP//8TPl; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1758197406; c=relaxed/simple;
+	bh=QSqvJtgl4eopOSUqTRvMkIz8oZWp1TBgC1q8PAQo18k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=apeR4kF7AHVmLpKV4ezRZjlnPrkHlu2o/5EjESOepF0ssx8UFGSq1aF1JhFc3drM/ZDDAEXOFy7+Bv+TMN36T5hzm2ElAGIKZ6UiiCAVl1J8+4pOFE9kJxg3i52AsFfqIpfZTjXfAAqiBggQmYNNUyFGUj53ckv3JPPfgEh0bFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HDu0vEOU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=XWAhpwkg; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HDu0vEOU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=XWAhpwkg; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RP//8TPl"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-45f29d2357aso4906615e9.2
-        for <linux-cifs@vger.kernel.org>; Thu, 18 Sep 2025 02:44:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1758188665; x=1758793465; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=52c6blvzODeo4kMzcwEtFvfzLTQJyYISjrM2lLbdddk=;
-        b=RP//8TPl/4tiMxCho6B0NlsLgEtivrhTehQm5Z8ULRrau/phX4HqdNvXmx2afgxCTC
-         bE9oRMmv3iI6q+xfji0KOZc5H0vhzlllP1t2V6xYnJubqXKr481r3hzm1BySpShqqmI1
-         oDU/zrsW29j4LT6Z3JCzzha0FmADS2zhbPP9WLWkdyzvfTTnjMolvkK9Niq/1HOqIQnH
-         IF5lzBepYQOXy9Ctir8+/LnBaEytcV871ZdiD95E/0VHjFYDvzxPfghOu4L3m6SYW5mT
-         LLQ7ppDtCabLC47vSLv5IOp/KcF+jmnmeQ2WsYS1pAUsk6ahH70S9b/ewiALf+godc97
-         wPxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758188665; x=1758793465;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=52c6blvzODeo4kMzcwEtFvfzLTQJyYISjrM2lLbdddk=;
-        b=NWpWhourcJjEquCq+2CfaZcIuV8nYlddA4UIn3/K4zKqjH8DHQzPPtosXlfb67kFSo
-         xnq+xvRFB4j0S9zf9Zo/tbaSGXwJlUfVvIoiwleJSoeL0cwtvQm8ZFSMj/97wdiAs0n/
-         QK1MvshOnGH577k0IhUDM33yin31uNsVOXc+pEvOi6NuOqT1uWXZ+l+x7GLZhdY5v3D6
-         4mClobaa85UFI/JISoQ+yaFWyBoeQjTMSPN63OfBezrfJuMtZo/dpXtxYhlA4J0yjjNM
-         2j3VoxeCEFzOV1F0ZgDYKnjrx5EvsoLug3SMBCKpkYo1C6eNUFUu1hENK6r6dbJ+H2Dy
-         KYsQ==
-X-Gm-Message-State: AOJu0YzPbvbHTjIMhXhqHmQ+eml1mXy4+HjiEhFaML0Ttuwh5LFC9iBy
-	yHoel6KyEZInkUupvflhJziab6/YPRB6qmuPXAC/QTDWZje6ndw+lDo+0ar9jt42awI=
-X-Gm-Gg: ASbGncuxsLsjCBi9tj+InzQ2kQQuIdjFYxchorofouTASQPjmFNnjlnwgFMlAb0zTqK
-	U/BH4LajpQDjadsNlnYJhM/z2kXvrnXLeeb/82WMDpVXvixEL2LjWT8A/wcKyQUO8fVMywVfJzG
-	g+PYLkqTYKmjruHfataBSP6FCE9ZGt6by/bS6/7quVUghdFxvmuQyMJFRXcg41nWvynrY7IVPeu
-	zxVEeVcVC8r2UhY+Y7tiPLzxW+TKfhbgLki8fsPnUnvxpcyPRHA9Y3gqLOVAjIDGeLlm/0qWYSr
-	PYiiH5aCNZscloiZsku4Omu58vO3sK6RNipu7Ju8XRShMn5aHydkHQD4eTatH4jWigZ0+K1j1wP
-	hMxq4oyG6ecAUlvZyOfStD68ducbvbxnZenWFtbB80WtiWg==
-X-Google-Smtp-Source: AGHT+IG9t0EBUDD5Qb2WxYtzRuDvJcv51bsr/PwbsV/aFkUmK7pE5swr2Hi9yTVBIx9INcWCWUxf/A==
-X-Received: by 2002:a05:6000:430e:b0:3ee:13ab:cd35 with SMTP id ffacd0b85a97d-3ee13abd14bmr659771f8f.1.1758188664867;
-        Thu, 18 Sep 2025 02:44:24 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-464f4f9f4e4sm36445845e9.13.2025.09.18.02.44.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 02:44:24 -0700 (PDT)
-Date: Thu, 18 Sep 2025 12:44:20 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: linux-cifs@vger.kernel.org
-Subject: [bug report] smb: client: batch SRV_COPYCHUNK entries to cut
- roundtrips
-Message-ID: <aMvUdFU-ciu7Rgc6@stanley.mountain>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HDu0vEOU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="XWAhpwkg";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HDu0vEOU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="XWAhpwkg"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id A46732119D;
+	Thu, 18 Sep 2025 12:10:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758197400; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CSXiXWIx4LxyK8oDORMkAwUU+C2TOcCaT7/HhuEgrWQ=;
+	b=HDu0vEOUxQIhkAJQdpXaodh02TG8EMSqynuyH8+j6351HIPC45GNSXomq+Krq1o+H10KCT
+	8xL4rRrhPsOALqexAdLY9rnuCbNZ+BPCPVsbL7EE254tee8JnYRI5ilyKFuMmSqhl8GMIz
+	nEH89C7av9uaQiNlC/ldYY0ey4Of+To=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758197400;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CSXiXWIx4LxyK8oDORMkAwUU+C2TOcCaT7/HhuEgrWQ=;
+	b=XWAhpwkg9FoNS1CPNcvdAF6RwRX0p4XHdbbXVfWuwcNJpixUwEYBlB2V8OEEz26mrdWZwf
+	Kd31hoC/iDzK+sAA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758197400; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CSXiXWIx4LxyK8oDORMkAwUU+C2TOcCaT7/HhuEgrWQ=;
+	b=HDu0vEOUxQIhkAJQdpXaodh02TG8EMSqynuyH8+j6351HIPC45GNSXomq+Krq1o+H10KCT
+	8xL4rRrhPsOALqexAdLY9rnuCbNZ+BPCPVsbL7EE254tee8JnYRI5ilyKFuMmSqhl8GMIz
+	nEH89C7av9uaQiNlC/ldYY0ey4Of+To=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758197400;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CSXiXWIx4LxyK8oDORMkAwUU+C2TOcCaT7/HhuEgrWQ=;
+	b=XWAhpwkg9FoNS1CPNcvdAF6RwRX0p4XHdbbXVfWuwcNJpixUwEYBlB2V8OEEz26mrdWZwf
+	Kd31hoC/iDzK+sAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 32B4413A51;
+	Thu, 18 Sep 2025 12:09:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id C6q/Opf2y2iGEgAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Thu, 18 Sep 2025 12:09:59 +0000
+Date: Thu, 18 Sep 2025 09:09:57 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Steve French <smfrench@gmail.com>
+Cc: Paulo Alcantara <pc@manguebit.org>, 
+	Frank Sorenson <sorenson@redhat.com>, David Howells <dhowells@redhat.com>, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH v2] smb: client: fix filename matching of deferred files
+Message-ID: <jpjp7nokw5gdynw7i64zpg3ns2og5z7blsunpqr5yzyrb3dqq3@nvstycufnglk>
+References: <20250917190322.765293-1-pc@manguebit.org>
+ <v4g2cku4itpiqvfiy6aktcey5rjc2jt5kcoknf36hm45p3nxgu@wb5ho6aoy6dc>
+ <CAH2r5mu3fyGd11tf983tvYiKB_Yn8FS3tTQL97HzQKybspgUXA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAH2r5mu3fyGd11tf983tvYiKB_Yn8FS3tTQL97HzQKybspgUXA@mail.gmail.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_ALL(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -3.80
 
-Hello Henrique Carvalho,
+On 09/17, Steve French wrote:
+>minor cosmetic change done to the patch (see attached)
+>
+>from:
+>   if (cfile->dentry =3D=3D dentry &&
+>to:
+>   if ((cfile->dentry =3D=3D dentry) &&
 
-Commit 4e3acdf94c89 ("smb: client: batch SRV_COPYCHUNK entries to cut
-roundtrips") from Sep 16, 2025 (linux-next), leads to the following
-Smatch static checker warning:
+IMHO those only makes sense if for either correctness or easier
+understanding, e.g.:
 
-	fs/smb/client/smb2ops.c:1937 smb2_copychunk_range()
-	error: uninitialized symbol 'ret_data_len'.
+>  if (x && (y || z))
 
-fs/smb/client/smb2ops.c
-    1844 static ssize_t
-    1845 smb2_copychunk_range(const unsigned int xid,
-    1846                      struct cifsFileInfo *src_file,
-    1847                      struct cifsFileInfo *dst_file,
-    1848                      u64 src_off,
-    1849                      u64 len,
-    1850                      u64 dst_off)
-    1851 {
-    1852         int rc = 0;
-    1853         unsigned int ret_data_len;
-    1854         struct copychunk_ioctl *cc_req = NULL;
-    1855         struct copychunk_ioctl_rsp *cc_rsp = NULL;
-    1856         struct cifs_tcon *tcon;
-    1857         struct copychunk *chunk;
-    1858         u32 chunks, chunk_count, chunk_bytes;
-    1859         u32 copy_bytes, copy_bytes_left;
-    1860         u32 chunks_written, bytes_written;
-    1861         u64 total_bytes_left = len;
-    1862         u64 src_off_prev, dst_off_prev;
-    1863         u32 retries = 0;
-    1864 
-    1865         tcon = tlink_tcon(dst_file->tlink);
-    1866 
-    1867         trace_smb3_copychunk_enter(xid, src_file->fid.volatile_fid,
-    1868                                    dst_file->fid.volatile_fid, tcon->tid,
-    1869                                    tcon->ses->Suid, src_off, dst_off, len);
-    1870 
-    1871 retry:
-    1872         chunk_count = calc_chunk_count(tcon, total_bytes_left);
-    1873         if (!chunk_count) {
-    1874                 rc = -EOPNOTSUPP;
-    1875                 goto cchunk_out;
-    1876         }
-    1877 
-    1878         cc_req = kzalloc(struct_size(cc_req, Chunks, chunk_count), GFP_KERNEL);
-    1879         if (!cc_req) {
-    1880                 rc = -ENOMEM;
-    1881                 goto cchunk_out;
-    1882         }
-    1883 
-    1884         /* Request a key from the server to identify the source of the copy */
-    1885         rc = SMB2_request_res_key(xid,
-    1886                                   tlink_tcon(src_file->tlink),
-    1887                                   src_file->fid.persistent_fid,
-    1888                                   src_file->fid.volatile_fid,
-    1889                                   cc_req);
-    1890 
-    1891         /* Note: request_res_key sets res_key null only if rc != 0 */
-    1892         if (rc)
-    1893                 goto cchunk_out;
-    1894 
-    1895         while (total_bytes_left > 0) {
-    1896 
-    1897                 /* Store previous offsets to allow rewind */
-    1898                 src_off_prev = src_off;
-    1899                 dst_off_prev = dst_off;
-    1900 
-    1901                 trace_smb3_copychunk_iter(xid, src_file->fid.volatile_fid,
-    1902                                           dst_file->fid.volatile_fid, tcon->tid,
-    1903                                           tcon->ses->Suid, src_off, dst_off, len);
-    1904 
-    1905                 chunks = 0;
-    1906                 copy_bytes = 0;
-    1907                 copy_bytes_left = umin(total_bytes_left, tcon->max_bytes_copy);
-    1908                 while (copy_bytes_left > 0 && chunks < chunk_count) {
-    1909                         chunk = &cc_req->Chunks[chunks++];
-    1910 
-    1911                         chunk->SourceOffset = cpu_to_le64(src_off);
-    1912                         chunk->TargetOffset = cpu_to_le64(dst_off);
-    1913 
-    1914                         chunk_bytes = umin(copy_bytes_left, tcon->max_bytes_chunk);
-    1915 
-    1916                         chunk->Length = cpu_to_le32(chunk_bytes);
-    1917                         chunk->Reserved = 0;
-    1918 
-    1919                         src_off += chunk_bytes;
-    1920                         dst_off += chunk_bytes;
-    1921 
-    1922                         copy_bytes_left -= chunk_bytes;
-    1923                         copy_bytes += chunk_bytes;
-    1924                 }
-    1925 
-    1926                 cc_req->ChunkCount = cpu_to_le32(chunks);
-    1927                 /* Buffer is zeroed, no need to set pcchunk->Reserved = 0 */
-    1928 
-    1929                 /* Request server copy to target from src identified by key */
-    1930                 kfree(cc_rsp);
-    1931                 cc_rsp = NULL;
-    1932                 rc = SMB2_ioctl(xid, tcon, dst_file->fid.persistent_fid,
-    1933                         dst_file->fid.volatile_fid, FSCTL_SRV_COPYCHUNK_WRITE,
-    1934                         (char *)cc_req, struct_size(cc_req, Chunks, chunks),
-    1935                         CIFSMaxBufSize, (char **)&cc_rsp, &ret_data_len);
-    1936 
---> 1937                 if (ret_data_len != sizeof(struct copychunk_ioctl_rsp)) {
-                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Using unintialized variables doesn't work because runtime checkers like
-UBSan will complain as well as static checkers.
+or
 
-But the other issue is that this code treats -EINVAL as having a special
-meaning.  -EINVAL is the most common error code.  All the places which
-treat -EINVAL as having a special meaning end up buggy in the end.  Mostly
-they start out buggy, but even the ones which aren't buggy from the start
-end up buggy over time.
+>  if ((x & y) && z)
 
-    1938                         cifs_tcon_dbg(VFS, "Copychunk invalid response: response size does not match expected size\n");
-    1939                         rc = -EIO;
-    1940                         goto cchunk_out;
-    1941                 }
-    1942 
-    1943                 if (rc == 0) {
-    1944                         bytes_written = le32_to_cpu(cc_rsp->TotalBytesWritten);
-    1945                         if (bytes_written == 0) {
-    1946                                 cifs_tcon_dbg(VFS, "Copychunk invalid response: no bytes copied\n");
-    1947                                 rc = -EIO;
-    1948                                 goto cchunk_out;
-    1949                         }
-    1950                         /* Check if server claimed to write more than we asked */
-    1951                         if (bytes_written > copy_bytes) {
-    1952                                 cifs_tcon_dbg(VFS, "Copychunk invalid response: unexpected value for TotalBytesWritten\n");
-    1953                                 rc = -EIO;
-    1954                                 goto cchunk_out;
-    1955                         }
-    1956 
-    1957                         chunks_written = le32_to_cpu(cc_rsp->ChunksWritten);
-    1958                         if (chunks_written > chunks) {
-    1959                                 cifs_tcon_dbg(VFS, "Copychunk invalid response: Invalid num chunks written\n");
-    1960                                 rc = -EIO;
-    1961                                 goto cchunk_out;
-    1962                         }
-    1963 
-    1964                         /* Partial write: rewind */
-    1965                         if (bytes_written < copy_bytes) {
-    1966                                 u32 delta = copy_bytes - bytes_written;
-    1967 
-    1968                                 src_off -= delta;
-    1969                                 dst_off -= delta;
-    1970                         }
-    1971 
-    1972                         total_bytes_left -= bytes_written;
-    1973 
-    1974                 } else if (rc == -EINVAL) {
-    1975                         /*
-    1976                          * Check if server is not asking us to reduce size.
-    1977                          *
-    1978                          * Note: As per MS-SMB2 2.2.32.1, the values returned
-    1979                          * in cc_rsp are not strictly lower than what existed
-    1980                          * before.
-    1981                          *
-    1982                          */
-    1983                         if (le32_to_cpu(cc_rsp->ChunksWritten) < tcon->max_chunks) {
-    1984                                 cifs_tcon_dbg(VFS, "Copychunk MaxChunks updated: %u -> %u\n",
-    1985                                               tcon->max_chunks,
-    1986                                               le32_to_cpu(cc_rsp->ChunksWritten));
-    1987                                 tcon->max_chunks = le32_to_cpu(cc_rsp->ChunksWritten);
-    1988                         }
-    1989                         if (le32_to_cpu(cc_rsp->ChunkBytesWritten) < tcon->max_bytes_chunk) {
-    1990                                 cifs_tcon_dbg(VFS, "Copychunk MaxBytesChunk updated: %u -> %u\n",
-    1991                                               tcon->max_bytes_chunk,
-    1992                                               le32_to_cpu(cc_rsp->ChunkBytesWritten));
-    1993                                 tcon->max_bytes_chunk = le32_to_cpu(cc_rsp->ChunkBytesWritten);
-    1994                         }
-    1995                         if (le32_to_cpu(cc_rsp->TotalBytesWritten) < tcon->max_bytes_copy) {
-    1996                                 cifs_tcon_dbg(VFS, "Copychunk MaxBytesCopy updated: %u -> %u\n",
-    1997                                               tcon->max_bytes_copy,
-    1998                                               le32_to_cpu(cc_rsp->TotalBytesWritten));
-    1999                                 tcon->max_bytes_copy = le32_to_cpu(cc_rsp->TotalBytesWritten);
-    2000                         }
-    2001 
-    2002                         trace_smb3_copychunk_err(xid, src_file->fid.volatile_fid,
-    2003                                                  dst_file->fid.volatile_fid, tcon->tid,
-    2004                                                  tcon->ses->Suid, src_off, dst_off, len, rc);
-    2005 
-    2006                         /* Rewind */
-    2007                         if (retries++ < 2) {
-    2008                                 src_off = src_off_prev;
-    2009                                 dst_off = dst_off_prev;
-    2010                                 kfree(cc_req);
-    2011                                 cc_req = NULL;
-    2012                                 goto retry;
-    2013                         } else
-    2014                                 goto cchunk_out;
-    2015                 } else { /* Unexpected */
-    2016                         trace_smb3_copychunk_err(xid, src_file->fid.volatile_fid,
-    2017                                                  dst_file->fid.volatile_fid, tcon->tid,
-    2018                                                  tcon->ses->Suid, src_off, dst_off, len, rc);
-    2019                         goto cchunk_out;
-    2020                 }
-    2021         }
-    2022 
-    2023         trace_smb3_copychunk_done(xid, src_file->fid.volatile_fid,
-    2024                                   dst_file->fid.volatile_fid, tcon->tid,
-    2025                                   tcon->ses->Suid, src_off, dst_off, len);
-    2026 
-    2027 cchunk_out:
-    2028         kfree(cc_req);
-    2029         kfree(cc_rsp);
-    2030         if (rc)
-    2031                 return rc;
-    2032         else
-    2033                 return len;
-    2034 }
+Otherwise it only adds pollution and maybe confusion to the code.
+Example of complete unnecessary extra wrapping in file.c and cifsacl.c
+(but there are several others I've seen around):
 
-regards,
-dan carpenter
+>  if ((!open_file->invalidHandle)) {
+
+>  if ((!ctsid) || (!cwsid))
+
+
+My 2c only, up to you of course.
+
+
+Cheers,
+
+Enzo
+
+>On Wed, Sep 17, 2025 at 2:15=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.de=
+> wrote:
+>>
+>> On 09/17, Paulo Alcantara wrote:
+>> >Fix the following case where the client would end up closing both
+>> >deferred files (foo.tmp & foo) after unlink(foo) due to strstr() call
+>> >in cifs_close_deferred_file_under_dentry():
+>> >
+>> >  fd1 =3D openat(AT_FDCWD, "foo", O_WRONLY|O_CREAT|O_TRUNC, 0666);
+>> >  fd2 =3D openat(AT_FDCWD, "foo.tmp", O_WRONLY|O_CREAT|O_TRUNC, 0666);
+>> >  close(fd1);
+>> >  close(fd2);
+>> >  unlink("foo");
+>> >
+>> >Fixes: e3fc065682eb ("cifs: Deferred close performance improvements")
+>> >Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+>> >Cc: Enzo Matsumiya <ematsumiya@suse.de>
+>> >Cc: Frank Sorenson <sorenson@redhat.com>
+>> >Cc: David Howells <dhowells@redhat.com>
+>> >Cc: linux-cifs@vger.kernel.org
+>> >---
+>> > fs/smb/client/cifsproto.h |  4 ++--
+>> > fs/smb/client/inode.c     |  6 +++---
+>> > fs/smb/client/misc.c      | 36 +++++++++++++++---------------------
+>> > 3 files changed, 20 insertions(+), 26 deletions(-)
+>> >
+>> >diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+>> >index c34c533b2efa..e8fba98690ce 100644
+>> >--- a/fs/smb/client/cifsproto.h
+>> >+++ b/fs/smb/client/cifsproto.h
+>> >@@ -312,8 +312,8 @@ extern void cifs_close_deferred_file(struct cifsIno=
+deInfo *cifs_inode);
+>> >
+>> > extern void cifs_close_all_deferred_files(struct cifs_tcon *cifs_tcon);
+>> >
+>> >-extern void cifs_close_deferred_file_under_dentry(struct cifs_tcon *ci=
+fs_tcon,
+>> >-                              const char *path);
+>> >+void cifs_close_deferred_file_under_dentry(struct cifs_tcon *cifs_tcon,
+>> >+                                         struct dentry *dentry);
+>> >
+>> > extern void cifs_mark_open_handles_for_deleted_file(struct inode *inod=
+e,
+>> >                               const char *path);
+>> >diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+>> >index 11d442e8b3d6..1703f1285d36 100644
+>> >--- a/fs/smb/client/inode.c
+>> >+++ b/fs/smb/client/inode.c
+>> >@@ -1984,7 +1984,7 @@ static int __cifs_unlink(struct inode *dir, struc=
+t dentry *dentry, bool sillyren
+>> >       }
+>> >
+>> >       netfs_wait_for_outstanding_io(inode);
+>> >-      cifs_close_deferred_file_under_dentry(tcon, full_path);
+>> >+      cifs_close_deferred_file_under_dentry(tcon, dentry);
+>> > #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+>> >       if (cap_unix(tcon->ses) && (CIFS_UNIX_POSIX_PATH_OPS_CAP &
+>> >                               le64_to_cpu(tcon->fsUnixInfo.Capability)=
+)) {
+>> >@@ -2538,10 +2538,10 @@ cifs_rename2(struct mnt_idmap *idmap, struct in=
+ode *source_dir,
+>> >               goto cifs_rename_exit;
+>> >       }
+>> >
+>> >-      cifs_close_deferred_file_under_dentry(tcon, from_name);
+>> >+      cifs_close_deferred_file_under_dentry(tcon, source_dentry);
+>> >       if (d_inode(target_dentry) !=3D NULL) {
+>> >               netfs_wait_for_outstanding_io(d_inode(target_dentry));
+>> >-              cifs_close_deferred_file_under_dentry(tcon, to_name);
+>> >+              cifs_close_deferred_file_under_dentry(tcon, target_dentr=
+y);
+>> >       }
+>> >
+>> >       rc =3D cifs_do_rename(xid, source_dentry, from_name, target_dent=
+ry,
+>> >diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+>> >index da23cc12a52c..350542d57249 100644
+>> >--- a/fs/smb/client/misc.c
+>> >+++ b/fs/smb/client/misc.c
+>> >@@ -832,33 +832,28 @@ cifs_close_all_deferred_files(struct cifs_tcon *t=
+con)
+>> >               kfree(tmp_list);
+>> >       }
+>> > }
+>> >-void
+>> >-cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const ch=
+ar *path)
+>> >+
+>> >+void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
+>> >+                                         struct dentry *dentry)
+>> > {
+>> >-      struct cifsFileInfo *cfile;
+>> >       struct file_list *tmp_list, *tmp_next_list;
+>> >-      void *page;
+>> >-      const char *full_path;
+>> >+      struct cifsFileInfo *cfile;
+>> >       LIST_HEAD(file_head);
+>> >
+>> >-      page =3D alloc_dentry_path();
+>> >       spin_lock(&tcon->open_file_lock);
+>> >       list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+>> >-              full_path =3D build_path_from_dentry(cfile->dentry, page=
+);
+>> >-              if (strstr(full_path, path)) {
+>> >-                      if (delayed_work_pending(&cfile->deferred)) {
+>> >-                              if (cancel_delayed_work(&cfile->deferred=
+)) {
+>> >-                                      spin_lock(&CIFS_I(d_inode(cfile-=
+>dentry))->deferred_lock);
+>> >-                                      cifs_del_deferred_close(cfile);
+>> >-                                      spin_unlock(&CIFS_I(d_inode(cfil=
+e->dentry))->deferred_lock);
+>> >+              if (cfile->dentry =3D=3D dentry &&
+>> >+                  delayed_work_pending(&cfile->deferred) &&
+>> >+                  cancel_delayed_work(&cfile->deferred)) {
+>> >+                      spin_lock(&CIFS_I(d_inode(cfile->dentry))->defer=
+red_lock);
+>> >+                      cifs_del_deferred_close(cfile);
+>> >+                      spin_unlock(&CIFS_I(d_inode(cfile->dentry))->def=
+erred_lock);
+>> >
+>> >-                                      tmp_list =3D kmalloc(sizeof(stru=
+ct file_list), GFP_ATOMIC);
+>> >-                                      if (tmp_list =3D=3D NULL)
+>> >-                                              break;
+>> >-                                      tmp_list->cfile =3D cfile;
+>> >-                                      list_add_tail(&tmp_list->list, &=
+file_head);
+>> >-                              }
+>> >-                      }
+>> >+                      tmp_list =3D kmalloc(sizeof(struct file_list), G=
+FP_ATOMIC);
+>> >+                      if (tmp_list =3D=3D NULL)
+>> >+                              break;
+>> >+                      tmp_list->cfile =3D cfile;
+>> >+                      list_add_tail(&tmp_list->list, &file_head);
+>> >               }
+>> >       }
+>> >       spin_unlock(&tcon->open_file_lock);
+>> >@@ -868,7 +863,6 @@ cifs_close_deferred_file_under_dentry(struct cifs_t=
+con *tcon, const char *path)
+>> >               list_del(&tmp_list->list);
+>> >               kfree(tmp_list);
+>> >       }
+>> >-      free_dentry_path(page);
+>> > }
+>> >
+>> > /*
+>>
+>> Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
+>>
+>>
+>> Cheers,
+>>
+>> Enzo
+>
+>
+>
+>--=20
+>Thanks,
+>
+>Steve
+
+
