@@ -1,220 +1,265 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664F63164D0
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Sep 2025 17:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D20217F3D
+	for <linux-cifs@vger.kernel.org>; Fri, 19 Sep 2025 18:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758302006; cv=none; b=MwkNyJWQFKXN8g1U3Qt+u2z+Fcr0pW0ecF6hOW8QHL7YsNB3758Nupt4x+vDb88G2syo1Utak2GbZdYwimiX6tkDTEYFztDsZ/4DS2OxcojJ81RJJjiTiVH5N3sei3fhjpGbrF6fYNREMlRc0DnxtDI+JEGaLdgiF9YBK1iyQYM=
+	t=1758308097; cv=none; b=uIUHKSQeYKWFCsnrbMTV/B9VwBkgbusI6by02UrwygY3RUHDBe8YOs0AR//9tU4sovEtYP2f67F+AV/qyReoyoOFmx7JkOtv4P5/5iZzqn2Un69e4ktTktmK9809mcQMpdIBmRhh8SDDjHeHe1IlSRi11aeXMqPQLkQScQXepGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758302006; c=relaxed/simple;
-	bh=gWVCCpKZewzsAh114XPPmRuxL64vxI6yDfizIYn1X64=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Smk2cv0q57jmu/ah5ZO44w1Oo5Ix89dmOPNqTbsDBFu9eGfteOmhmDMSJwQM033A7809s+Yj3uMntcQfyPdOUsevs7bcNuhptpVYCl/iKLWrWheUKXD+LmfXuix8WEIR8l9QS/Fg5jQHaNfUP5dLnsVPWeP5xUdjsutdhnXYNkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=diXtf/7G; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1758308097; c=relaxed/simple;
+	bh=VG+x0o8oCCV6xzGU4Q2Xb4tNsW6G8GsEMMQYnbY4gP8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QMZDPMscffL9d2PGItULbUZzDBgx+hpZ+b31C8eUx46dAS5X8uDQOXRsrE+5wy9XCtj2s5fVzswMn/4VtvENn2sxSVx0QjsRrFchGR/hNddnhkF/F2eHL3G2XQP+GnLPP5QkUWwx1OnMD1Qued5+96bpeMhJc9fiSD0rt9KAb7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fkro3dHm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=CMnnvXXT; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fkro3dHm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=CMnnvXXT; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="diXtf/7G"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=rkwWluhbPRub8ELRpDy4tqs/YqY8w0UQi88+k7YRPl4=; b=diXtf/7G5p0BGbWrHTic7+6FAo
-	bZsLpmwaKHW0rXhPPEYhCRehNHnthWjPHRQQeClIlAyQFAVbRZMXXiFwAsk+uN8Rwy3KGLKp6FfQl
-	9gDWeiqHL+MCaC7zOfWKwb/wdVYkcn7mgdiLvK+jUz/8M5gqayf6FvXlMN7N4AvxqVBejX8XN3FxC
-	d4gzFmCQaD0KP+PgR//VItyJgbQVwoqPQ24XhbZRNwQg/4urqm7zbsMWkC/4xF+4SNrX4y0yuYVGj
-	5BZbvbVZpbOiDhp2tsdxTtb1Gb7EQCFnrOtUQWPyvbHfI1U+03GaaFy/45gy0MVkXhvVE2uxOV3yv
-	V7L6lYZQ==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1uzefb-00000001jmG-3ctX;
-	Fri, 19 Sep 2025 14:13:15 -0300
-From: Paulo Alcantara <pc@manguebit.org>
-To: smfrench@gmail.com
-Cc: "Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	Frank Sorenson <sorenson@redhat.com>,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH] smb: client: handle unlink(2) of files open by different clients
-Date: Fri, 19 Sep 2025 14:13:15 -0300
-Message-ID: <20250919171315.1137337-1-pc@manguebit.org>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fkro3dHm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="CMnnvXXT";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fkro3dHm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="CMnnvXXT"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 36B3A22407;
+	Fri, 19 Sep 2025 18:54:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758308093; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nLiJBEshFxQzrl+9qpwViaLe/SrQpJQQgbpaVnjoQYI=;
+	b=fkro3dHmUKF1cy85uXWmJa72XZO0GtcIEdKvVpFzJseUH5+NIofjej5l8Qoxy429rxYTdE
+	cKunWg/MFE7ApkleUYG78ZZrDr15j8BPWddgooMcdMuZkkePOcIzmB0OkJrUBomZxwQKBg
+	YEDLdUCDWCtlCjspqqLaJ8BiLWkvc7U=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758308093;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nLiJBEshFxQzrl+9qpwViaLe/SrQpJQQgbpaVnjoQYI=;
+	b=CMnnvXXTuPVAbs0O9Gtg46ixJLpyYHSFgaYYFnF1U+N1mTssoj4JSb0haxmYWd416V7Li5
+	sfS7ZxvX3T8XGeDg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758308093; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nLiJBEshFxQzrl+9qpwViaLe/SrQpJQQgbpaVnjoQYI=;
+	b=fkro3dHmUKF1cy85uXWmJa72XZO0GtcIEdKvVpFzJseUH5+NIofjej5l8Qoxy429rxYTdE
+	cKunWg/MFE7ApkleUYG78ZZrDr15j8BPWddgooMcdMuZkkePOcIzmB0OkJrUBomZxwQKBg
+	YEDLdUCDWCtlCjspqqLaJ8BiLWkvc7U=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758308093;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nLiJBEshFxQzrl+9qpwViaLe/SrQpJQQgbpaVnjoQYI=;
+	b=CMnnvXXTuPVAbs0O9Gtg46ixJLpyYHSFgaYYFnF1U+N1mTssoj4JSb0haxmYWd416V7Li5
+	sfS7ZxvX3T8XGeDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B9B4E13A78;
+	Fri, 19 Sep 2025 18:54:52 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id cQZAIPymzWgAfAAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Fri, 19 Sep 2025 18:54:52 +0000
+Date: Fri, 19 Sep 2025 15:54:46 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH 3/6] smb: client: short-circuit negative lookups when
+ parent dir is fully cached
+Message-ID: <grz6l27jndyzc4mztngv2wslloimamsvu6jztchbijsmzitybr@nl6xeyjqh3wp>
+References: <20250919152441.228774-1-henrique.carvalho@suse.com>
+ <20250919152441.228774-3-henrique.carvalho@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250919152441.228774-3-henrique.carvalho@suse.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email]
+X-Spam-Flag: NO
+X-Spam-Score: -3.80
 
-In order to identify whether a certain file is open by a different
-client, start the unlink process by sending a compound request of
-CREATE(DELETE_ON_CLOSE) + CLOSE with only FILE_SHARE_DELETE bit set in
-smb2_create_req::ShareAccess.  If the file is currently open, then the
-server will fail the request with STATUS_SHARING_VIOLATION, in which
-case we'll map it to -EBUSY, so __cifs_unlink() will fall back to
-silly-rename the file.
+On 09/19, Henrique Carvalho wrote:
+>When the parent directory has a valid and complete cached enumeration we
+>can assume that negative dentries are not present in the directory, thus
+>we can return without issuing a request.
+>
+>This reduces traffic for common ENOENT when the directory entries are
+>cached.
+>
+>Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+>---
+> fs/smb/client/dir.c | 48 ++++++++++++++++++++++++++++++++++++++++++++-
+> 1 file changed, 47 insertions(+), 1 deletion(-)
+>
+>diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
+>index 56c59b67ecc2..d382fc76974f 100644
+>--- a/fs/smb/client/dir.c
+>+++ b/fs/smb/client/dir.c
+>@@ -683,6 +683,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+> 	const char *full_path;
+> 	void *page;
+> 	int retry_count = 0;
+>+	struct cached_fid *cfid = NULL;
+>
+> 	xid = get_xid();
+>
+>@@ -722,6 +723,29 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+> 		cifs_dbg(FYI, "non-NULL inode in lookup\n");
+> 	} else {
+> 		cifs_dbg(FYI, "NULL inode in lookup\n");
 
-This fixes the following case where open(O_CREAT) fails with
--ENOENT (STATUS_DELETE_PENDING) due to file still open by a different
-client.
+(unrelated to the patch)
+Can a dentry ever get here being positive?  AFAICS it can't, but I might
+have missed some obscure code path.
 
-* Before patch
+>+
+>+		/*
+>+		 * We can only rely on negative dentries having the same
+>+		 * spelling as the cached dirent if case insensitivity is
+>+		 * forced on mount.
+>+		 *
+>+		 * XXX: if servers correctly announce Case Sensitivity Search
+>+		 * on GetInfo of FileFSAttributeInformation, then we can take
+>+		 * correct action even if case insensitive is not forced on
+>+		 * mount.
+>+		 *
+>+		 */
 
-$ mount.cifs //srv/share /mnt/1 -o ...,nosharesock
-$ mount.cifs //srv/share /mnt/2 -o ...,nosharesock
-$ cd /mnt/1
-$ touch foo
-$ exec 3<>foo
-$ cd /mnt/2
-$ rm foo
-$ touch foo
-touch: cannot touch 'foo': No such file or directory
-$ exec 3>&-
+If you're going into the case-sensitiveness hole, several other things
+can be fixed re: cached dirs (and other areas, as we know lol):
 
-* After patch
+   # mount ... /mnt # not using nocase
+   # cd /mnt
+   # mkdir abc
+   # ls
+   # ls abc
+   # ls ABC
+   # ls ABc
+   # cat /proc/fs/cifs/open_dirs
+   # Version:1
+   # Format:
+   # <tree id> <sess id> <persistent fid> <path>
+   Num entries: 4
+   0x5 0x1d800a8000021 0x760051e015     \ABc       valid file info, valid dirents
+   0x5 0x1d800a8000021 0x760051e012     \ABC       valid file info, valid dirents
+   0x5 0x1d800a8000021 0x760051e00f     \abc       valid file info, valid dirents
+   0x5 0x1d800a8000021 0x760051e00c        valid file info, valid dirents
 
-$ mount.cifs //srv/share /mnt/1 -o ...,nosharesock
-$ mount.cifs //srv/share /mnt/2 -o ...,nosharesock
-$ cd /mnt/1
-$ touch foo
-$ exec 3<>foo
-$ cd /mnt/2
-$ rm foo
-$ touch foo
-$ exec 3>&-
+So, as I understand, for the 'nocase' cases, it might be worth building
+the path string and comparing with strcasecmp().
 
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Reviewed-by: David Howells <dhowells@redhat.com>
-Cc: Frank Sorenson <sorenson@redhat.com>
-Cc: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
----
- fs/smb/client/smb2inode.c | 99 ++++++++++++++++++++++++++++++++++-----
- 1 file changed, 88 insertions(+), 11 deletions(-)
+Other than that, this seems to work fine though.
 
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index 7cadc8ca4f55..e32a3f338793 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -1175,23 +1175,92 @@ int
- smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
- 	    struct cifs_sb_info *cifs_sb, struct dentry *dentry)
- {
-+	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
-+	__le16 *utf16_path __free(kfree) = NULL;
-+	int retries = 0, cur_sleep = 1;
-+	struct TCP_Server_Info *server;
- 	struct cifs_open_parms oparms;
-+	struct smb2_create_req *creq;
- 	struct inode *inode = NULL;
-+	struct smb_rqst rqst[2];
-+	struct kvec rsp_iov[2];
-+	struct kvec close_iov;
-+	int resp_buftype[2];
-+	struct cifs_fid fid;
-+	int flags = 0;
-+	__u8 oplock;
- 	int rc;
- 
--	if (dentry)
-+	utf16_path = cifs_convert_path_to_utf16(name, cifs_sb);
-+	if (!utf16_path)
-+		return -ENOMEM;
-+
-+	if (smb3_encryption_required(tcon))
-+		flags |= CIFS_TRANSFORM_REQ;
-+again:
-+	oplock = SMB2_OPLOCK_LEVEL_NONE;
-+	server = cifs_pick_channel(tcon->ses);
-+
-+	memset(rqst, 0, sizeof(rqst));
-+	memset(resp_buftype, 0, sizeof(resp_buftype));
-+	memset(rsp_iov, 0, sizeof(rsp_iov));
-+
-+	rqst[0].rq_iov = open_iov;
-+	rqst[0].rq_nvec = ARRAY_SIZE(open_iov);
-+
-+	oparms = CIFS_OPARMS(cifs_sb, tcon, name, DELETE | FILE_READ_ATTRIBUTES,
-+			     FILE_OPEN, CREATE_DELETE_ON_CLOSE |
-+			     OPEN_REPARSE_POINT, ACL_NO_MODE);
-+	oparms.fid = &fid;
-+
-+	if (dentry) {
- 		inode = d_inode(dentry);
-+		if (CIFS_I(inode)->lease_granted && server->ops->get_lease_key) {
-+			oplock = SMB2_OPLOCK_LEVEL_LEASE;
-+			server->ops->get_lease_key(inode, &fid);
-+		}
-+	}
- 
--	oparms = CIFS_OPARMS(cifs_sb, tcon, name, DELETE,
--			     FILE_OPEN, OPEN_REPARSE_POINT, ACL_NO_MODE);
--	rc = smb2_compound_op(xid, tcon, cifs_sb, name, &oparms,
--			      NULL, &(int){SMB2_OP_UNLINK},
--			      1, NULL, NULL, NULL, dentry);
--	if (rc == -EINVAL) {
--		cifs_dbg(FYI, "invalid lease key, resending request without lease");
--		rc = smb2_compound_op(xid, tcon, cifs_sb, name, &oparms,
--				      NULL, &(int){SMB2_OP_UNLINK},
--				      1, NULL, NULL, NULL, NULL);
-+	rc = SMB2_open_init(tcon, server,
-+			    &rqst[0], &oplock, &oparms, utf16_path);
-+	if (rc)
-+		goto err_free;
-+	smb2_set_next_command(tcon, &rqst[0]);
-+	creq = rqst[0].rq_iov[0].iov_base;
-+	creq->ShareAccess = FILE_SHARE_DELETE_LE;
-+
-+	rqst[1].rq_iov = &close_iov;
-+	rqst[1].rq_nvec = 1;
-+
-+	rc = SMB2_close_init(tcon, server, &rqst[1],
-+			     COMPOUND_FID, COMPOUND_FID, false);
-+	smb2_set_related(&rqst[1]);
-+	if (rc)
-+		goto err_free;
-+
-+	if (retries) {
-+		for (int i = 0; i < ARRAY_SIZE(rqst);  i++)
-+			smb2_set_replay(server, &rqst[i]);
-+	}
-+
-+	rc = compound_send_recv(xid, tcon->ses, server, flags,
-+				ARRAY_SIZE(rqst), rqst,
-+				resp_buftype, rsp_iov);
-+	SMB2_open_free(&rqst[0]);
-+	SMB2_close_free(&rqst[1]);
-+	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
-+	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
-+
-+	if (is_replayable_error(rc) &&
-+	    smb2_should_replay(tcon, &retries, &cur_sleep))
-+		goto again;
-+
-+	/* Retry compound request without lease */
-+	if (rc == -EINVAL && dentry) {
-+		dentry = NULL;
-+		retries = 0;
-+		cur_sleep = 1;
-+		goto again;
- 	}
- 	/*
- 	 * If dentry (hence, inode) is NULL, lease break is going to
-@@ -1199,6 +1268,14 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
- 	 */
- 	if (!rc && inode)
- 		cifs_mark_open_handles_for_deleted_file(inode, name);
-+
-+	return rc;
-+
-+err_free:
-+	SMB2_open_free(&rqst[0]);
-+	SMB2_close_free(&rqst[1]);
-+	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
-+	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
- 	return rc;
- }
- 
--- 
-2.51.0
+(also, extra line at the end of the comment)
 
+>+		if (pTcon->nocase && !open_cached_dir_by_dentry(pTcon, direntry->d_parent, &cfid)) {
+>+			/*
+>+			 * dentry is negative and parent is fully cached:
+>+			 * we can assume file does not exist
+>+			 */
+>+			if (cfid->dirents.is_valid) {
+>+				close_cached_dir(cfid);
+>+				goto out;
+>+			}
+>+			close_cached_dir(cfid);
+>+		}
+> 	}
+> 	cifs_dbg(FYI, "Full path: %s inode = 0x%p\n",
+> 		 full_path, d_inode(direntry));
+>@@ -755,6 +779,8 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+> 		}
+> 		newInode = ERR_PTR(rc);
+> 	}
+>+
+>+out:
+> 	free_dentry_path(page);
+> 	cifs_put_tlink(tlink);
+> 	free_xid(xid);
+>@@ -765,7 +791,11 @@ static int
+> cifs_d_revalidate(struct inode *dir, const struct qstr *name,
+> 		  struct dentry *direntry, unsigned int flags)
+> {
+>-	struct inode *inode;
+>+	struct inode *inode = NULL;
+>+	struct cifs_sb_info *cifs_sb;
+>+	struct cifs_tcon *tcon;
+>+	struct cached_fid *cfid;
+>+
+
+extra line
+
+> 	int rc;
+>
+> 	if (flags & LOOKUP_RCU)
+>@@ -812,6 +842,22 @@ cifs_d_revalidate(struct inode *dir, const struct qstr *name,
+>
+> 			return 1;
+> 		}
+>+	} else {
+>+		inode = d_inode(direntry->d_parent);
+
+arg @dir == d_inode(direntry->d_parent))
+
+>+		cifs_sb = CIFS_SB(inode->i_sb);
+>+		tcon = cifs_sb_master_tcon(cifs_sb);
+
+Positive dentries are the common case, so maybe move tcon and cifs_sb
+declarations to this scope?
+
+>+
+>+		if (!open_cached_dir_by_dentry(tcon, direntry->d_parent, &cfid)) {
+>+			/*
+>+			 * dentry is negative and parent is fully cached:
+>+			 * we can assume file does not exist
+>+			 */
+>+			if (cfid->dirents.is_valid) {
+>+				close_cached_dir(cfid);
+>+				return 1;
+>+			}
+>+			close_cached_dir(cfid);
+>+		}
+> 	}
+>
+> 	/*
+>-- 
+>2.50.1
+
+
+Cheers,
+
+Enzo
