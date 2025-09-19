@@ -1,161 +1,220 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC0A34BA2A
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Sep 2025 16:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664F63164D0
+	for <linux-cifs@vger.kernel.org>; Fri, 19 Sep 2025 17:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758298547; cv=none; b=rv5HrywoblUPDGlM6WO3WweCDvg5azTfe2pz1hbRzatnem6+7/3F/vWK50SVD7qAeaFPdgIMKBWvr/J3IszDtyJtdlaa6MOLSiRGJgNSaPmjT8JJZKkNr2L+aCzNs3mxh4rsXB4472ZJYKW7Ku54tdkyjV+Bd7s9DO2NvF4hfuo=
+	t=1758302006; cv=none; b=MwkNyJWQFKXN8g1U3Qt+u2z+Fcr0pW0ecF6hOW8QHL7YsNB3758Nupt4x+vDb88G2syo1Utak2GbZdYwimiX6tkDTEYFztDsZ/4DS2OxcojJ81RJJjiTiVH5N3sei3fhjpGbrF6fYNREMlRc0DnxtDI+JEGaLdgiF9YBK1iyQYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758298547; c=relaxed/simple;
-	bh=Ek9mRw3TkUKknlRlOa+LGjlTOliwzQHtd9lAHStO4qo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jcWlpca9fcPZPVS7N3Vlmg250B0cuALDSUq7kPETyOk8gJ1OLOGE4nszwoedc4GgIbenLFqlGHRlCx3St63WEroRClbAGPW4GRqYXmtn4uve7sMfx4tcfVey12k2BiHOpNJkWn6xQoacuv0ZbHfs3CaHIpz/qcZ6MWirhzquvJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FK+NLAlE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=K+rB12FZ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FK+NLAlE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=K+rB12FZ; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1758302006; c=relaxed/simple;
+	bh=gWVCCpKZewzsAh114XPPmRuxL64vxI6yDfizIYn1X64=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Smk2cv0q57jmu/ah5ZO44w1Oo5Ix89dmOPNqTbsDBFu9eGfteOmhmDMSJwQM033A7809s+Yj3uMntcQfyPdOUsevs7bcNuhptpVYCl/iKLWrWheUKXD+LmfXuix8WEIR8l9QS/Fg5jQHaNfUP5dLnsVPWeP5xUdjsutdhnXYNkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=diXtf/7G; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FK+NLAlE";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="K+rB12FZ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FK+NLAlE";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="K+rB12FZ"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 980BC1F7E3;
-	Fri, 19 Sep 2025 16:15:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758298543; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xjWrFyE6Vs/GxEouqGVmhTkxaoDKb/3kpQadOYw7xTM=;
-	b=FK+NLAlE9G85IyueEV4W3Dojw/M+Qtk1WwGpREBi8F+HZIH+0bGxQpEHdvy3ozGEvojVam
-	YmixowKIASWm4uJDLlIt9M1xzpdgneSW+PxWDIfvH8IljxlF+cs7tPdp7LezCYVVZSY9L7
-	9GkP3u8hCILJ5pMZHkSUzHbKHftG5BE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758298543;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xjWrFyE6Vs/GxEouqGVmhTkxaoDKb/3kpQadOYw7xTM=;
-	b=K+rB12FZRkCxso/ndd7iASyOSx9lv83ItVsjuRLyOj/5Xxlaaf9Zf6Fx3fhGm3TUREi7Xt
-	KpnFuxRZ6pFlHrDg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758298543; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xjWrFyE6Vs/GxEouqGVmhTkxaoDKb/3kpQadOYw7xTM=;
-	b=FK+NLAlE9G85IyueEV4W3Dojw/M+Qtk1WwGpREBi8F+HZIH+0bGxQpEHdvy3ozGEvojVam
-	YmixowKIASWm4uJDLlIt9M1xzpdgneSW+PxWDIfvH8IljxlF+cs7tPdp7LezCYVVZSY9L7
-	9GkP3u8hCILJ5pMZHkSUzHbKHftG5BE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758298543;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xjWrFyE6Vs/GxEouqGVmhTkxaoDKb/3kpQadOYw7xTM=;
-	b=K+rB12FZRkCxso/ndd7iASyOSx9lv83ItVsjuRLyOj/5Xxlaaf9Zf6Fx3fhGm3TUREi7Xt
-	KpnFuxRZ6pFlHrDg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 24BBF13A39;
-	Fri, 19 Sep 2025 16:15:42 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id OAwgN66BzWg3TgAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Fri, 19 Sep 2025 16:15:42 +0000
-Date: Fri, 19 Sep 2025 13:15:32 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 2/6] smb: client: short-circuit in
- open_cached_dir_by_dentry() if !dentry
-Message-ID: <ymccofyxeol5vvdm5rbxg37qmegfwrifnhmxfk25h474frgo55@dxpmgtsqucdc>
-References: <20250919152441.228774-1-henrique.carvalho@suse.com>
- <20250919152441.228774-2-henrique.carvalho@suse.com>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="diXtf/7G"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=rkwWluhbPRub8ELRpDy4tqs/YqY8w0UQi88+k7YRPl4=; b=diXtf/7G5p0BGbWrHTic7+6FAo
+	bZsLpmwaKHW0rXhPPEYhCRehNHnthWjPHRQQeClIlAyQFAVbRZMXXiFwAsk+uN8Rwy3KGLKp6FfQl
+	9gDWeiqHL+MCaC7zOfWKwb/wdVYkcn7mgdiLvK+jUz/8M5gqayf6FvXlMN7N4AvxqVBejX8XN3FxC
+	d4gzFmCQaD0KP+PgR//VItyJgbQVwoqPQ24XhbZRNwQg/4urqm7zbsMWkC/4xF+4SNrX4y0yuYVGj
+	5BZbvbVZpbOiDhp2tsdxTtb1Gb7EQCFnrOtUQWPyvbHfI1U+03GaaFy/45gy0MVkXhvVE2uxOV3yv
+	V7L6lYZQ==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
+	id 1uzefb-00000001jmG-3ctX;
+	Fri, 19 Sep 2025 14:13:15 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: smfrench@gmail.com
+Cc: "Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	David Howells <dhowells@redhat.com>,
+	Frank Sorenson <sorenson@redhat.com>,
+	linux-cifs@vger.kernel.org
+Subject: [PATCH] smb: client: handle unlink(2) of files open by different clients
+Date: Fri, 19 Sep 2025 14:13:15 -0300
+Message-ID: <20250919171315.1137337-1-pc@manguebit.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250919152441.228774-2-henrique.carvalho@suse.com>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.991];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCPT_COUNT_THREE(0.00)[3];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
-	SUBJECT_HAS_EXCLAIM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo,suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Score: -3.80
+Content-Transfer-Encoding: 8bit
 
-On 09/19, Henrique Carvalho wrote:
->When dentry is NULL,
+In order to identify whether a certain file is open by a different
+client, start the unlink process by sending a compound request of
+CREATE(DELETE_ON_CLOSE) + CLOSE with only FILE_SHARE_DELETE bit set in
+smb2_create_req::ShareAccess.  If the file is currently open, then the
+server will fail the request with STATUS_SHARING_VIOLATION, in which
+case we'll map it to -EBUSY, so __cifs_unlink() will fall back to
+silly-rename the file.
 
-I know this is good practice, but... Is a NULL dentry ever passed
-down to open_cached_dir_by_dentry()?
+This fixes the following case where open(O_CREAT) fails with
+-ENOENT (STATUS_DELETE_PENDING) due to file still open by a different
+client.
 
-All callers I checked (even with your series applied), seems to
-guarantee a non-NULL dentry at this point.
+* Before patch
 
-Either way,
-Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
+$ mount.cifs //srv/share /mnt/1 -o ...,nosharesock
+$ mount.cifs //srv/share /mnt/2 -o ...,nosharesock
+$ cd /mnt/1
+$ touch foo
+$ exec 3<>foo
+$ cd /mnt/2
+$ rm foo
+$ touch foo
+touch: cannot touch 'foo': No such file or directory
+$ exec 3>&-
 
-> the current code acquires the spinlock and traverses
->the entire list, but the condition (dentry && cfid->dentry == dentry)
->ensures no match will ever be found.
->
->Return -ENOENT early in this case, avoiding unnecessary lock acquisition
->and list traversal.
->
->Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
->---
-> fs/smb/client/cached_dir.c | 5 ++++-
-> 1 file changed, 4 insertions(+), 1 deletion(-)
->
->diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
->index 63dc9add4f13..df6cabd0966d 100644
->--- a/fs/smb/client/cached_dir.c
->+++ b/fs/smb/client/cached_dir.c
->@@ -416,9 +416,12 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
-> 	if (cfids == NULL)
-> 		return -EOPNOTSUPP;
->
->+	if (!dentry)
->+		return -ENOENT;
->+
-> 	spin_lock(&cfids->cfid_list_lock);
-> 	list_for_each_entry(cfid, &cfids->entries, entry) {
->-		if (dentry && cfid->dentry == dentry) {
->+		if (cfid->dentry == dentry) {
-> 			if (!is_valid_cached_dir(cfid))
-> 				break;
-> 			cifs_dbg(FYI, "found a cached file handle by dentry\n");
->-- 
->2.50.1
->
+* After patch
+
+$ mount.cifs //srv/share /mnt/1 -o ...,nosharesock
+$ mount.cifs //srv/share /mnt/2 -o ...,nosharesock
+$ cd /mnt/1
+$ touch foo
+$ exec 3<>foo
+$ cd /mnt/2
+$ rm foo
+$ touch foo
+$ exec 3>&-
+
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Reviewed-by: David Howells <dhowells@redhat.com>
+Cc: Frank Sorenson <sorenson@redhat.com>
+Cc: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org
+---
+ fs/smb/client/smb2inode.c | 99 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 88 insertions(+), 11 deletions(-)
+
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index 7cadc8ca4f55..e32a3f338793 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -1175,23 +1175,92 @@ int
+ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 	    struct cifs_sb_info *cifs_sb, struct dentry *dentry)
+ {
++	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
++	__le16 *utf16_path __free(kfree) = NULL;
++	int retries = 0, cur_sleep = 1;
++	struct TCP_Server_Info *server;
+ 	struct cifs_open_parms oparms;
++	struct smb2_create_req *creq;
+ 	struct inode *inode = NULL;
++	struct smb_rqst rqst[2];
++	struct kvec rsp_iov[2];
++	struct kvec close_iov;
++	int resp_buftype[2];
++	struct cifs_fid fid;
++	int flags = 0;
++	__u8 oplock;
+ 	int rc;
+ 
+-	if (dentry)
++	utf16_path = cifs_convert_path_to_utf16(name, cifs_sb);
++	if (!utf16_path)
++		return -ENOMEM;
++
++	if (smb3_encryption_required(tcon))
++		flags |= CIFS_TRANSFORM_REQ;
++again:
++	oplock = SMB2_OPLOCK_LEVEL_NONE;
++	server = cifs_pick_channel(tcon->ses);
++
++	memset(rqst, 0, sizeof(rqst));
++	memset(resp_buftype, 0, sizeof(resp_buftype));
++	memset(rsp_iov, 0, sizeof(rsp_iov));
++
++	rqst[0].rq_iov = open_iov;
++	rqst[0].rq_nvec = ARRAY_SIZE(open_iov);
++
++	oparms = CIFS_OPARMS(cifs_sb, tcon, name, DELETE | FILE_READ_ATTRIBUTES,
++			     FILE_OPEN, CREATE_DELETE_ON_CLOSE |
++			     OPEN_REPARSE_POINT, ACL_NO_MODE);
++	oparms.fid = &fid;
++
++	if (dentry) {
+ 		inode = d_inode(dentry);
++		if (CIFS_I(inode)->lease_granted && server->ops->get_lease_key) {
++			oplock = SMB2_OPLOCK_LEVEL_LEASE;
++			server->ops->get_lease_key(inode, &fid);
++		}
++	}
+ 
+-	oparms = CIFS_OPARMS(cifs_sb, tcon, name, DELETE,
+-			     FILE_OPEN, OPEN_REPARSE_POINT, ACL_NO_MODE);
+-	rc = smb2_compound_op(xid, tcon, cifs_sb, name, &oparms,
+-			      NULL, &(int){SMB2_OP_UNLINK},
+-			      1, NULL, NULL, NULL, dentry);
+-	if (rc == -EINVAL) {
+-		cifs_dbg(FYI, "invalid lease key, resending request without lease");
+-		rc = smb2_compound_op(xid, tcon, cifs_sb, name, &oparms,
+-				      NULL, &(int){SMB2_OP_UNLINK},
+-				      1, NULL, NULL, NULL, NULL);
++	rc = SMB2_open_init(tcon, server,
++			    &rqst[0], &oplock, &oparms, utf16_path);
++	if (rc)
++		goto err_free;
++	smb2_set_next_command(tcon, &rqst[0]);
++	creq = rqst[0].rq_iov[0].iov_base;
++	creq->ShareAccess = FILE_SHARE_DELETE_LE;
++
++	rqst[1].rq_iov = &close_iov;
++	rqst[1].rq_nvec = 1;
++
++	rc = SMB2_close_init(tcon, server, &rqst[1],
++			     COMPOUND_FID, COMPOUND_FID, false);
++	smb2_set_related(&rqst[1]);
++	if (rc)
++		goto err_free;
++
++	if (retries) {
++		for (int i = 0; i < ARRAY_SIZE(rqst);  i++)
++			smb2_set_replay(server, &rqst[i]);
++	}
++
++	rc = compound_send_recv(xid, tcon->ses, server, flags,
++				ARRAY_SIZE(rqst), rqst,
++				resp_buftype, rsp_iov);
++	SMB2_open_free(&rqst[0]);
++	SMB2_close_free(&rqst[1]);
++	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
++	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
++
++	if (is_replayable_error(rc) &&
++	    smb2_should_replay(tcon, &retries, &cur_sleep))
++		goto again;
++
++	/* Retry compound request without lease */
++	if (rc == -EINVAL && dentry) {
++		dentry = NULL;
++		retries = 0;
++		cur_sleep = 1;
++		goto again;
+ 	}
+ 	/*
+ 	 * If dentry (hence, inode) is NULL, lease break is going to
+@@ -1199,6 +1268,14 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 	 */
+ 	if (!rc && inode)
+ 		cifs_mark_open_handles_for_deleted_file(inode, name);
++
++	return rc;
++
++err_free:
++	SMB2_open_free(&rqst[0]);
++	SMB2_close_free(&rqst[1]);
++	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
++	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
+ 	return rc;
+ }
+ 
+-- 
+2.51.0
+
