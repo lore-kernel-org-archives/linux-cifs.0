@@ -1,163 +1,179 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E36430F541
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Sep 2025 14:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D01E314B9F
+	for <linux-cifs@vger.kernel.org>; Fri, 19 Sep 2025 15:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758292934; cv=none; b=DG5mQUXsX9n2x0CVz4FocMOLoqAMtMr71vpJ2IbpYydsO6qhdyJ2nK/vL4HZSWmnCV9O2iehjnoZpUItQOKKzcj/XT91mZs9x3/uwwBgNnR5V2SVcMGcRgNvo2kz9a1LFLWWfHBYzHcDqoVe6+pVn5Tjm7vxwf8WaS9O95cYGWw=
+	t=1758295627; cv=none; b=s3/wTZ7lsSzePYdIkuB+2wcU04da2CyLa4eDwCHnx/wXsWvicKtNgZxGs2XLHmwieBmBaIrhKIfzeCBHOsoPtd1TrXKhTJIm2JNtvAz1gJEvPb2swUdXbwlaQLJHe7Oaor/XEZNCidLPb9Q2XtG/N2g8Z/IRjkLTwcnUSKl++WQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758292934; c=relaxed/simple;
-	bh=HZlHpTpdK3mBVkCcSAL9bV9vZzv/zqfoBlqlG5Frizc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gU43flXWpivA/7jzDrGREgYTOWJUfUTmTq/eJnr89AqvRxA9u5DYy9r22rby/JNR5gF1DsrCxpH1gBThEuukAP25mayXrraQKwgj53JEsoI5TRxtclPjm175Hvgfb/VVhv5Pev4nrcCWd0m7f0rmejisHAvUGUCckzf3Ld6H1Zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PD9xCNea; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758295627; c=relaxed/simple;
+	bh=hd4J6K/aOC7x/x1Bb9CUr+zBK6BUG/c1mmflO6rZ+cY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AL84/1/6h9mflLa7kO9pq/tXK2bvczSq/pN/Q+9XZgFlDWbAJmkuJt6Vekltd2/Yd230ezvLx767RiSecIAGSBiW/LlnVzT8hTjQwXfg3soJeF5oDkTLI+7/2XxqUMoq9UT2kH1YhdsmzzhitMi9WTyXv6zmu0CiwCYajkA2Luo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=P/UCirDJ; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PD9xCNea"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-32326e2f0b3so1895757a91.2
-        for <linux-cifs@vger.kernel.org>; Fri, 19 Sep 2025 07:42:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="P/UCirDJ"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3ecde0be34eso1759386f8f.1
+        for <linux-cifs@vger.kernel.org>; Fri, 19 Sep 2025 08:27:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758292932; x=1758897732; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HZlHpTpdK3mBVkCcSAL9bV9vZzv/zqfoBlqlG5Frizc=;
-        b=PD9xCNeaVUUeDQrcnuf00PCvNREtBKCP9IGxxAAnHkhHUjJ0PW6ttEA+36mxM41RPE
-         8vYa+2rAh9YvFkkbLClTEh8nzQgOnDrrRwL6i+nWrxMgFy32osvPZ5yv+UhGr0TSlWbL
-         /5smMhSTyS6AOwQeevDETegO47hjs/2MulsZX7QBi5YfHqV8raQ+BVfrqTDhYwXDvFWZ
-         m49yzY/KQsrt+lZCI1EwBWnSSv2PUmBEFaQRIz3OD78DD3oSy8k8Nvs7PBUo3JhdlbRk
-         S//OMvH5e5mCJ1ytn9TKJRkzDgXdChUzq9Sc5i4hKbVZtMYOM+LlCPk7wjHKSAXIPkRm
-         lhow==
+        d=suse.com; s=google; t=1758295623; x=1758900423; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3YDT0SFyvGXs6foqo1DWsdqNH+X49sfPbDQQoide3fI=;
+        b=P/UCirDJiNVdSmRfpsxDS2+gq2RGbpnhxoUvsZyOvcMg1/wb9q3EvZQx7WOyJmkdnE
+         9SOQVRANgq7AMiXDm4kE9lDc/l6ApLvj6s8IJHMstziDhST9Y6KNoRKENgqzRrjnxiv/
+         myDD3veuL+e/O8Ia4RQevt/rS+7C3YFDk5CKvkiXS7SUXxko7gaZXeMEPgrUuAq7KHJ8
+         8wQlTh+D9jH46Gz/uXdY/+krGsepM/oTjVnHUjFhbgDp8h0NY9SI0VcBB5y6UDhxWb1I
+         Y3H7dSw1ezFKNa9R9uDOt4NfEsECTzqjfb6O0bZB0+4KODmwdYYkghmycSw1ywluHg6Q
+         H3pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758292932; x=1758897732;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HZlHpTpdK3mBVkCcSAL9bV9vZzv/zqfoBlqlG5Frizc=;
-        b=P5/7zuTZVsbEUtk5GhwalUt8Uc53hn/EUEbwVGaj/uDwUQcJfSOC6+hRJgV2gOIGoD
-         Y+27ABSCXywOO6nrt3YS8eK8Tt8K0XfGbvqA6XTyzGzl2sDQFCTLvj4jAo7+Yh+TyZPt
-         ZQEIZWCiNhnGomWMdv8LGVzUOohqwtsWSp17a/OWndD399uh5jo8FIECEyROyiC7uGpc
-         a2qC4V1P/sQ6k0UeLimZ4dNIarOBhbeLfKlVUHtBV2ODOfQIbdXNXNpyMFuKJwo1UnU0
-         6u36Ul25WrDBpFU74eBVx/kKt7vT6SOsIvlUeUENYRhzz7/tNjLr08ZWsG2VncIkjw0h
-         cvqw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdb9otStRYdpBUIgsODxu5KnNyJgWi/g82OorUmd8ZCsQC2WeUA5cxlhPn/zksdloLY9ftvI6DDQmk@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw52m+z6HpXQu4GiwjbSDEfRWjUB69Kol1aR72+JgSDOpbhYqgC
-	8U/54XDPY9kE29oxIYsR9bgJVRYYwcclbKqQ2dvSGlPdQECPyocslXjxNaFfVibrp5ofbt7peNO
-	JtufmzqCV82NZz7eKCAwhPLLDzVgUQYI=
-X-Gm-Gg: ASbGncuttye+oNIkSlogKnxpmFIh61wMoFSyMqIPkM2802LrbsrjOSS/dUeByk17PyW
-	F2Y28wHx/dpKpaZjo7eRVos/tRBW1BWmyRvzMvapbShFe3ABnAi3nThKpu+QExDgAVRIs4+6Jxw
-	tXYSokakc3O+JJhHpTkT2kn1mgaEB/IiPABx2bEsyvYcjjiDqiG53mINTsyvtOLC101s4/KCwJy
-	AUF0qw=
-X-Google-Smtp-Source: AGHT+IGo9OakPjgwrSXJF/qJMVUBdi/e7cF1r+aV53PwjCNFN9R0QdCmHkVhEX7Lqj+jz4p4vZqIYSn6l+tyCyIEnog=
-X-Received: by 2002:a17:90b:1a8c:b0:32b:d8bf:c785 with SMTP id
- 98e67ed59e1d1-3309834a0c4mr5086454a91.20.1758292931548; Fri, 19 Sep 2025
- 07:42:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758295623; x=1758900423;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3YDT0SFyvGXs6foqo1DWsdqNH+X49sfPbDQQoide3fI=;
+        b=BZ7BWJGpGM+YDwYYnQZuWyiNZh3vQN0GKGRGhJS7MpHqyUsIegV+Ux2hZ4RfEAjjvT
+         oaKRz5iDoiITHEhzij6NZ4DE5wzLMNufbzH0x3kHFeoVdnrv7IMzyAgEbh70JRyyfZKc
+         m48Op72ut2FLT5biSD2NiVGmwWReSBY2UAR7iiu29o5N+2rDzFkG/YRjPvU3B9HWxJlf
+         MOMALpi3jKMQvZlEH5W7VOqlWyGFLIsqhfUHMALJ6XWSW/+gskdZFl6s4H3v4E9t83Er
+         Ol5EyxoOj174vUZOScQWN/E0Us9MSzrfE/vORa2FUiZ7M4wRS69NRQL+z9275KV03gPb
+         HxEg==
+X-Forwarded-Encrypted: i=1; AJvYcCWiaTQU4o3z8BhbJmbfVhJNK6Qpo0l6NbQlJRaJu+m86blU6j5ScAIACM/keThA1ypZKy5fz1T66xC0@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+TW16QoV6lRrEipuJrufb6H9e3CpRoMehzm9EytZMh+ZtjcPv
+	xZcIG7ERBCTPAvh/47Orp5BBTu+0T/ElDXPuMyaa+umrFDT8HZI2NogrzC7RhTKdLi7ngVDF5lC
+	c5ANi
+X-Gm-Gg: ASbGncvP6jfZzRnF1C3k+PtmQyf6ahXlZ1IhB8xXjlqL8BzWSpNKovbGOdtLr76Qe7p
+	B1/vYByuPQnpzd2xzmQvl7zvp4G/hrf4UyqhbSjJmT4Y8u6GIaT1GN+bpBLVN3luz9Cs+13PX6w
+	sw8janVl3qebYf7pTFUnCvDghe22gaguYoG4Uo+n3eUcFvWoswd5nJSCyiBAg42DDlj22WNJ4H5
+	dAAV7VQnkJtI/55hFbGkfitOOq7YwmF2ORpNu6G1hOHzedeYCij+PtHiJvMPikfLqaDN4VsyiVO
+	vRLvQt4WelneetuBJ+BKER9siLaJ74opD8O6T8u1+EJNkcxNMaM7sHbbLEd3LI8G+xCZPqS5Kr4
+	5aam6QetLE7IJ
+X-Google-Smtp-Source: AGHT+IHbAGmANSsHn2fdx8F3gQm2w4a8yZG/XaoG4F8IjUDx/h422vRTEBUtdC5SkPtdv+yEqR6qbA==
+X-Received: by 2002:a05:6000:24c4:b0:3e8:e7a6:e5b5 with SMTP id ffacd0b85a97d-3edd43bbb3bmr7149663f8f.11.1758295623398;
+        Fri, 19 Sep 2025 08:27:03 -0700 (PDT)
+Received: from precision ([2804:14c:658f:8614::1cfe])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32ecc735627sm5129683a91.1.2025.09.19.08.27.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Sep 2025 08:27:02 -0700 (PDT)
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: smfrench@gmail.com
+Cc: ematsumiya@suse.de,
+	linux-cifs@vger.kernel.org,
+	Henrique Carvalho <henrique.carvalho@suse.com>
+Subject: [PATCH 1/6] smb: client: ensure open_cached_dir_by_dentry() only returns valid cfid
+Date: Fri, 19 Sep 2025 12:24:35 -0300
+Message-ID: <20250919152441.228774-1-henrique.carvalho@suse.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1758234904.git.lucien.xin@gmail.com> <c64e0dde-ce6a-4528-ad11-bfe3a90c2623@suse.de>
-In-Reply-To: <c64e0dde-ce6a-4528-ad11-bfe3a90c2623@suse.de>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 19 Sep 2025 10:41:58 -0400
-X-Gm-Features: AS18NWCO3T47VA_L1EGQq0v2eLMYVU-h3utg8wzRNRsnOhBYSQghROeeV9IDBfk
-Message-ID: <CADvbK_d1fuyoG_F8jXNSyuicFqDxmbwSp06mkE1GvgTFkYRm5A@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 00/15] net: introduce QUIC infrastructure and
- core subcomponents
-To: Hannes Reinecke <hare@suse.de>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, 
-	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, 
-	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
-	Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
-	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 
-T24gRnJpLCBTZXAgMTksIDIwMjUgYXQgMjo0NOKAr0FNIEhhbm5lcyBSZWluZWNrZSA8aGFyZUBz
-dXNlLmRlPiB3cm90ZToNCj4NCj4gT24gOS8xOS8yNSAwMDozNCwgWGluIExvbmcgd3JvdGU6DQo+
-ID4gSW50cm9kdWN0aW9uDQo+ID4gPT09PT09PT09PT09DQo+ID4NCj4gPiBUaGUgUVVJQyBwcm90
-b2NvbCwgZGVmaW5lZCBpbiBSRkMgOTAwMCwgaXMgYSBzZWN1cmUsIG11bHRpcGxleGVkIHRyYW5z
-cG9ydA0KPiA+IGJ1aWx0IG9uIHRvcCBvZiBVRFAuIEl0IGVuYWJsZXMgbG93LWxhdGVuY3kgY29u
-bmVjdGlvbiBlc3RhYmxpc2htZW50LA0KPiA+IHN0cmVhbS1iYXNlZCBjb21tdW5pY2F0aW9uIHdp
-dGggZmxvdyBjb250cm9sLCBhbmQgc3VwcG9ydHMgY29ubmVjdGlvbg0KPiA+IG1pZ3JhdGlvbiBh
-Y3Jvc3MgbmV0d29yayBwYXRocywgd2hpbGUgZW5zdXJpbmcgY29uZmlkZW50aWFsaXR5LCBpbnRl
-Z3JpdHksDQo+ID4gYW5kIGF2YWlsYWJpbGl0eS4NCj4gPg0KPiBbIC4uIF0+DQo+ID4gLSBQZXJm
-b3JtYW5jZSBUZXN0aW5nDQo+ID4NCj4gPiAgICBQZXJmb3JtYW5jZSB3YXMgYmVuY2htYXJrZWQg
-dXNpbmcgaXBlcmYgWzhdIG92ZXIgYSAxMDBHIE5JQyB3aXRoDQo+ID4gICAgdXNpbmcgdmFyaW91
-cyBNVFVzIGFuZCBwYWNrZXQgc2l6ZXM6DQo+ID4NCj4gPiAgICAtIFFVSUMgdnMuIGtUTFM6DQo+
-ID4NCj4gPiAgICAgIFVOSVQgICAgICAgIHNpemU6MTAyNCAgICAgIHNpemU6NDA5NiAgICAgIHNp
-emU6MTYzODQgICAgIHNpemU6NjU1MzYNCj4gPiAgICAgIEdiaXRzL3NlYyAgIFFVSUMgfCBrVExT
-ICAgIFFVSUMgfCBrVExTICAgIFFVSUMgfCBrVExTICAgIFFVSUMgfCBrVExTDQo+ID4gICAgICDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIANCj4gPiAgICAgIG10dToxNTAwICAgIDIu
-MjcgfCAzLjI2ICAgIDMuMDIgfCA2Ljk3ICAgIDMuMzYgfCA5Ljc0ICAgIDMuNDggfCAxMC44DQo+
-ID4gICAgICDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIANCj4gPiAgICAgIG10dTo5
-MDAwICAgIDMuNjYgfCAzLjcyICAgIDUuODcgfCA4LjkyICAgIDcuMDMgfCAxMS4yICAgIDguMDQg
-fCAxMS40DQo+ID4NCj4gPiAgICAtIFFVSUMoZGlzYWJsZV8xcnR0X2VuY3J5cHRpb24pIHZzLiBU
-Q1A6DQo+ID4NCj4gPiAgICAgIFVOSVQgICAgICAgIHNpemU6MTAyNCAgICAgIHNpemU6NDA5NiAg
-ICAgIHNpemU6MTYzODQgICAgIHNpemU6NjU1MzYNCj4gPiAgICAgIEdiaXRzL3NlYyAgIFFVSUMg
-fCBUQ1AgICAgIFFVSUMgfCBUQ1AgICAgIFFVSUMgfCBUQ1AgICAgIFFVSUMgfCBUQ1ANCj4gPiAg
-ICAgIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgA0KPiA+ICAgICAgbXR1OjE1MDAg
-ICAgMy4wOSB8IDQuNTkgICAgNC40NiB8IDE0LjIgICAgNS4wNyB8IDIxLjMgICAgNS4xOCB8IDIz
-LjkNCj4gPiAgICAgIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgA0KPiA+ICAgICAg
-bXR1OjkwMDAgICAgNC42MCB8IDQuNjUgICAgOC40MSB8IDE0LjAgICAgMTEuMyB8IDI4LjkgICAg
-MTMuNSB8IDM5LjINCj4gPg0KPiA+DQo+IEkgaGF2ZSBiZWVuIGZvbGxvd2luZyB0aGUgUVVJQyBp
-bXBsZW1lbnRhdGlvbiBwcm9ncmVzcyBmb3IgcXVpdGUgc29tZQ0KPiB3aGlsZSwgYW5kIGFsd2F5
-cyBmb3VuZCB0aGUgcGVyZm9ybWFuY2UgaW1wYWN0IHJhdGhlciBmcnVzdHJhdGluZy4NCj4gQXQg
-dGhlIG9uc2V0IGl0IGxvb2tzIGFzIGlmIHlvdSB3b3VsZCBzdWZmZXIgaGVhdmlseSBmcm9tIHRo
-ZSBhZGRpdGlvbmFsDQo+IGNvbXBsZXhpdHkgdGhlIFFVSUMgcHJvdG9jb2wgaW1wb3NlcyB1cCB5
-b3UuDQo+IEJ1dCB0aGF0IHdvdWxkIG1ha2UgdGhlIHVzZSBvZiBRVUlDIHJhdGhlciBwb2ludGxl
-c3MgZm9yIG1vc3QgdXNlLWNhc2VzLg0KPiBTbyBvbmUgd29uZGVycyBpZiB0aGlzIGlzIG5vdCBy
-YXRoZXIgYSBwcm9ibGVtIG9mIGFuIHVuc3VpdGFibGUgdGVzdA0KRm9yIGZhc3QgbmV0d29ya3Ms
-IGxpa2UgdGhlIG9uZXMgSSB1c2VkIGluIG15IGlwZXJmIHRlc3RzLCBpdOKAmXMgZXhwZWN0ZWQN
-CnRoYXQgUVVJQyBkb2VzIG5vdCBvdXRwZXJmb3JtIFRDUCtUTFMgYXQgdGhlIHRpbWUsIFRoZSBt
-YWluIHJlYXNvbiBpcyB0aGF0DQpUQ1AgaGFzIGRlY2FkZXMgb2Yga2VybmVsLWxldmVsIG9wdGlt
-aXphdGlvbnMsIGluY2x1ZGluZyBmZWF0dXJlcyBsaWtlDQpHU08vR1JPIGFuZCBldmVuIGhhcmR3
-YXJlIG9mZmxvYWQgc3VwcG9ydCwgd2hpY2ggSSBkb24ndCB0aGluayBRVUlDIGNhbg0KY2F0Y2gg
-dXAgZHVlIHRvIGl0cyBjb21wbGV4aXR5Lg0KDQpUaGF0IHNhaWQsIFFVSUMgc2hvd3MgYWR2YW50
-YWdlcyBpbiBvdGhlciBzY2VuYXJpb3Mgd2ViIGJyb3dzaW5nIG9yDQpzaW1pbGFyIHdvcmtsb2Fk
-cy4gUVVJQyBjYW4gb3V0cGVyZm9ybSBUQ1ArVExTIGJlY2F1c2Ugb2Y6DQoNCi0gRmFzdGVyIGNv
-bm5lY3Rpb24gc2V0dXA6IFFVSUMgY29tYmluZXMgdGhlIHRyYW5zcG9ydCBhbmQgVExTIGhhbmRz
-aGFrZXMsDQogIGF2b2lkaW5nIHRoZSBleHRyYSByb3VuZCB0cmlwcyBvZiBUQ1DigJlzIHRocmVl
-LXdheSBoYW5kc2hha2UgcGx1cyBUTFMNCiAgbmVnb3RpYXRpb24uDQoNCi0gTm8gaGVhZC1vZi1s
-aW5lIGJsb2NraW5nIGFjcm9zcyBzdHJlYW1zOiBRVUlDIG11bHRpcGxleGVzIG11bHRpcGxlDQog
-IHN0cmVhbXMgb3ZlciBhIHNpbmdsZSBjb25uZWN0aW9uLCBzbyBhIHNpbmdsZSBsb3N0IHBhY2tl
-dCBkb2VzbuKAmXQgc3RhbGwNCiAgdW5yZWxhdGVkIHN0cmVhbXMsIHVubGlrZSBUQ1AuDQoNCj4g
-Y2FzZS4gRnJvbSBteSB1bmRlcnN0YW5kaW5nIFFVSUMgaXMgZ2VhcmVkIHVwIGZvciBoYW5kbGlu
-ZyBhDQo+IG11bHRpLXN0cmVhbSBjb25uZWN0aW9uIHdvcmtsb2FkLCBzbyBvbmUgc2hvdWxkIHVz
-ZSBhbiBhZGVxdWF0ZSB0ZXN0IHRvDQo+IHNpbXVsYXRlIGEgbXVsdGktc3RyZWFtIGNvbm5lY3Rp
-b24uIERpZCB5b3UgdXNlIHRoZSAnLVAnIG9wdGlvbiBmb3INCj4gaXBlcmYgd2hlbiBydW5uaW5n
-IHRoZSB0ZXN0cz8NCj4NCj4gQW5kIGl0IG1pZ2h0IGFsc28gYmUgYW4gaWRlYSB0byBhZGQgUVVJ
-QyBzdXBwb3J0IHRvIGlwZXJmIGl0c2VsZiwNCj4gZXNwZWNpYWxseSB0cmFuc2Zvcm1pbmcgdGhl
-ICctUCcgb3B0aW9uIG9udG8gUVVJQyBzdHJlYW1zIGxvb2tzDQo+IHByb21pc2luZy4NCj4NClll
-cywgd2UgY291bGQgYWRkIFFVSUMgdG8gaXBlcmYsIGJ1dCB0aGVuIHRlc3Rpbmcgd291bGQgbmVl
-ZCB0byBpbmNsdWRlDQpwYWNrZXQgbG9zcyBhbmQgZW5zdXJlIHRoZSBDUFUgaXNu4oCZdCB0aGUg
-Ym90dGxlbmVjaywgd2hpY2ggbW92ZXMgYXdheQ0KZnJvbSBhIGZhc3QtbmV0d29yayBlbnZpcm9u
-bWVudC4NCg0KVGhhbmtzIEhhbm5lcyBmb3IgeW91ciBjb21tZW50LiBJ4oCZZCBiZSBnbGFkIHRv
-IGhlYXIgYW55IGZ1cnRoZXIgaWRlYXMgb24NClFVSUMgcGVyZm9ybWFuY2UgdGVzdGluZy4gU28g
-ZmFyLCBJIGhhdmVu4oCZdCBzZWVuIGEgY29tbW9uIG1ldGhvZCBvciB0b29sDQphZG9wdGVkIGZv
-ciBpdCBmcm9tIHRoZSBjb21tdW5pdHkuDQo=
+open_cached_dir_by_dentry() was exposing an invalid cached directory to
+callers. The validity check outside the function was exclusively based
+on cfid->time.
+
+Add validity check before returning success and introduce
+is_valid_cached_dir() helper for consistent checks across the code.
+
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+---
+ fs/smb/client/cached_dir.c | 9 +++++----
+ fs/smb/client/cached_dir.h | 6 ++++++
+ fs/smb/client/dir.c        | 2 +-
+ fs/smb/client/inode.c      | 2 +-
+ 4 files changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index b69daeb1301b..63dc9add4f13 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -36,9 +36,8 @@ static struct cached_fid *find_or_create_cached_dir(struct cached_fids *cfids,
+ 			 * fully cached or it may be in the process of
+ 			 * being deleted due to a lease break.
+ 			 */
+-			if (!cfid->time || !cfid->has_lease) {
++			if (!is_valid_cached_dir(cfid))
+ 				return NULL;
+-			}
+ 			kref_get(&cfid->refcount);
+ 			return cfid;
+ 		}
+@@ -194,7 +193,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 	 * Otherwise, it is either a new entry or laundromat worker removed it
+ 	 * from @cfids->entries.  Caller will put last reference if the latter.
+ 	 */
+-	if (cfid->has_lease && cfid->time) {
++	if (is_valid_cached_dir(cfid)) {
+ 		cfid->last_access_time = jiffies;
+ 		spin_unlock(&cfids->cfid_list_lock);
+ 		*ret_cfid = cfid;
+@@ -233,7 +232,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 			list_for_each_entry(parent_cfid, &cfids->entries, entry) {
+ 				if (parent_cfid->dentry == dentry->d_parent) {
+ 					cifs_dbg(FYI, "found a parent cached file handle\n");
+-					if (parent_cfid->has_lease && parent_cfid->time) {
++					if (is_valid_cached_dir(parent_cfid)) {
+ 						lease_flags
+ 							|= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
+ 						memcpy(pfid->parent_lease_key,
+@@ -420,6 +419,8 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
+ 	spin_lock(&cfids->cfid_list_lock);
+ 	list_for_each_entry(cfid, &cfids->entries, entry) {
+ 		if (dentry && cfid->dentry == dentry) {
++			if (!is_valid_cached_dir(cfid))
++				break;
+ 			cifs_dbg(FYI, "found a cached file handle by dentry\n");
+ 			kref_get(&cfid->refcount);
+ 			*ret_cfid = cfid;
+diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
+index 46b5a2fdf15b..aa12382b4249 100644
+--- a/fs/smb/client/cached_dir.h
++++ b/fs/smb/client/cached_dir.h
+@@ -64,6 +64,12 @@ struct cached_fids {
+ 	struct delayed_work laundromat_work;
+ };
+ 
++static inline bool
++is_valid_cached_dir(struct cached_fid *cfid)
++{
++	return cfid->time && cfid->has_lease;
++}
++
+ extern struct cached_fids *init_cached_dirs(void);
+ extern void free_cached_dirs(struct cached_fids *cfids);
+ extern int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
+index 5223edf6d11a..56c59b67ecc2 100644
+--- a/fs/smb/client/dir.c
++++ b/fs/smb/client/dir.c
+@@ -322,7 +322,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
+ 		list_for_each_entry(parent_cfid, &tcon->cfids->entries, entry) {
+ 			if (parent_cfid->dentry == direntry->d_parent) {
+ 				cifs_dbg(FYI, "found a parent cached file handle\n");
+-				if (parent_cfid->has_lease && parent_cfid->time) {
++				if (is_valid_cached_dir(parent_cfid)) {
+ 					lease_flags
+ 						|= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
+ 					memcpy(fid->parent_lease_key,
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index fe453a4b3dc8..9c8b8bd20edd 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -2639,7 +2639,7 @@ cifs_dentry_needs_reval(struct dentry *dentry)
+ 		return true;
+ 
+ 	if (!open_cached_dir_by_dentry(tcon, dentry->d_parent, &cfid)) {
+-		if (cfid->time && cifs_i->time > cfid->time) {
++		if (cifs_i->time > cfid->time) {
+ 			close_cached_dir(cfid);
+ 			return false;
+ 		}
+-- 
+2.50.1
+
