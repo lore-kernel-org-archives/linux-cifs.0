@@ -1,87 +1,80 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD397082D
-	for <linux-cifs@vger.kernel.org>; Sat, 20 Sep 2025 01:58:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26F0433A6;
+	Sat, 20 Sep 2025 13:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758333485; cv=none; b=l5d/D+k8w1nGpfUihU3PSUFK0UqNx5os79mLP4iyfAXAYOBY1RO6Zkl9o/lwoFIstnV/Z3J1M0lPKgscV/zfGuYmgdaAuhlK8Bi8Er3adDGMVelhCKHUSalb8Foy0rVz6fvNnsqyUdS02v49/f1khnJlA7bRmAozbWW5ilJUS+0=
+	t=1758375196; cv=none; b=jmO73qWDqY+oCEhZgmpk/3mYcfIxcptMTanMbfQaNsOvPKb0RLqOv0KadqvFAbv4RUhrU21kYHeFP73r98N06Siw3eTuO94AfrjWPtEdGqfiirPIdw5j1EPVDqCGKaCVFxUJU+i98wLCWb7vBLhTdxVEUam7mNzDJfOsfvfWsEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758333485; c=relaxed/simple;
-	bh=WrSkMvVgkQNzMvCxVUTSK+7vdP4vvRibyvRZZt1fXbg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=rOzvB3GQxfmdwGkPeWgrs450S6IPY+peMSdJNmQG6zcX33+a8FVUChTSOnR5QIamXtYyZHXr0DUFp/tptCwQwVPgMaP91iyYMUz+R9KIv42eO7gzt4VXzYIEKxtekArOiSD0xYugtGhPQB7zB1Dl+7+MY1EUk9ouqv6AFFoXftw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cyfL/ovd; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758375196; c=relaxed/simple;
+	bh=VRSb89zkXHwlp7QOlg9btXbEdqeq5g9VOvPVphfveiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pr5x35JWqvdjOs5PNHfieXHF/xZS6SgFwuTjwn4+lc0AvxyS2hVfU/fS1E48fi+BHtn6hNk73LzcQGG/sdT/J+cu5Kg59UqecQClJD0L1bsMHhLWRnMg7iaqjw2McNOv6LtcMrypqh+TyePplS3wjMATcu++uPWPJ9CxlS79rjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TvYxEQz0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cyfL/ovd"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-78f30dac856so31987136d6.2
-        for <linux-cifs@vger.kernel.org>; Fri, 19 Sep 2025 18:58:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758333483; x=1758938283; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+IeYdDwGM3XWQ3ytBnc48jBI8s0G65WWqY2pGYrExtE=;
-        b=cyfL/ovdZRQ5mD1Kx4/iz2ip2cH7riEThMjOola5MOrlKEKiWoOsVRWqMMJ10b+/pY
-         aSJxd1XHtJlZmtuLoXoEuaTePZn+Zv5OFNs8DsZmFqmfvXvnJXaT/F7xJHGUAGOq0EpM
-         1JoHl4hTcVwVBXVHSpyxQzhLMrAcA5oKp4oUx5SMsjIZBTxc08dkmNqdzTky2OHviqQh
-         RniTYE8tJwBZBHA4tsc/aODOG6ikkhF0keFUUaBV3m3iiFCwVnSzbxdNQIBiYjF6091U
-         Mj0lX0sAex4RTdKe0aXu2Dsa1N4oRuvf4ePiz1diIENfzH5zLeRAIYCpti8j1wKfaICh
-         m6ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758333483; x=1758938283;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+IeYdDwGM3XWQ3ytBnc48jBI8s0G65WWqY2pGYrExtE=;
-        b=X8an0HcflHLS1B5yiUHsP7YqSOlbC8zer45aJx3+biXC0xSIAnfnx6L5FoP4CPuYrw
-         /j3vg3c7jXz+VEbbAJJVhk8uyQT/A5gbrbxCqV2QmERqoSjC0LTlebnSyEqR+6iPQ/Hd
-         kVqdImajfUchG1ylETBiJ6fAQMJZOcQgmUsytlfx2/jtzi/0VROM0IIz61w5vXnXqFRw
-         2nBOACvYpiEh8AXmJvX12ta7LrbtR8cES7hBDAt8iNVm8ISYbMCHQOoLjeomdEzC8y70
-         MKG85feyOlKvzrbWGogu1o3K3TjOXtK2+XM3KdVhje3KCU29ttTfD6ZVy4HW9x74iMxE
-         8Jnw==
-X-Forwarded-Encrypted: i=1; AJvYcCXfIZWKSX2f72lvnjP4yK+AcGOwwM8OLtfbiNRmIxuvTRjd0phmYrHPzGg7rWzAObZ3+JPDSvgLZVXp@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGAwM8a/GDqJJenht4srCyv56x8xKziehyAoCg0rpK3olddYv4
-	ZWiyuHs+kn8+9M7GntWGfJ4rskrUcs7biGidgOFX5fL05Mc/t/TS/cRtz/YSUeibXDyNuwmpvBp
-	rEtDkYWfqAiRl13Fp4h4puga9txVcDQ4=
-X-Gm-Gg: ASbGncsvhrZvrgZMaBVDD2VmP9vphwxV/+87TK8Da7e1rIAwsAjH7u44siu/dLlXoKK
-	efCAN12Bs59xRDKnyyia6Sw/D1vxEzCs6VhB0o+Xte7HQrdDICpAvulcMXh3Wdhax3LfaPoH1mX
-	eIVWS48I3y5LbMqdRl7qW8ezW2iGQCgtDnbSO9og6t314GIgHn/9fb0O/77WmjHnbokaq9Kd55Q
-	kb6QJip09odfsDygKVdvdWJOAzn6fahi2yX7gRBN/rJyRvV4gxpvq3OCiwK19FJ4VlntccaIgIj
-	Hx2Al2yuPqqeZYRSDcHko59fdMMLb0FdPL2oytO9SraV95xKOyC29owLbWOFRN21Y1AnQkHbwk+
-	qYX0vemo07H4IC4enONFDCg==
-X-Google-Smtp-Source: AGHT+IE5ZXnEkJZJ2o6wIvV1X6khaeULVfo9GNm67tS5a9PM/7HklawdEsggzdlDdW2B9ZR6odz39aZpsVAAwG/QFnU=
-X-Received: by 2002:a05:6214:c2d:b0:793:9d56:3f8b with SMTP id
- 6a1803df08f44-79912980f98mr58763566d6.17.1758333483062; Fri, 19 Sep 2025
- 18:58:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TvYxEQz0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FDF0C4CEEB;
+	Sat, 20 Sep 2025 13:33:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758375196;
+	bh=VRSb89zkXHwlp7QOlg9btXbEdqeq5g9VOvPVphfveiQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TvYxEQz0FjeXNg90HTWMiWPzayBECz49BXqSd2oSdxVHhzHpyKsmcXPOPaCy8imim
+	 VS/DIbt//YbuNZiCFfsWp0OeAwKR+bQP3H/9sbsrXgTQ+vikWJ3Rqx2ICnM/21YUE0
+	 BhQmyyfpm4MD2JDl9InHPUw+VbB5V0KQCdnE+61A/DLufG0SaHJdy9BIMCT1SeFYJf
+	 T6tVPqY9EOCDYT8KLN0YyzXpezU94+2kvr0LqWC8ATesgPI9LVxi4lYIZ9uvkVcAN/
+	 wbe8XyUfBo3K4Bysh9OkoTdkhjsFvMoM5yX6RZ6cvFjIucEv0v9RUUMFdN8n68ZkvN
+	 kDCjLloFgTqkQ==
+Received: by pali.im (Postfix)
+	id 918017C5; Sat, 20 Sep 2025 15:33:12 +0200 (CEST)
+Date: Sat, 20 Sep 2025 15:33:12 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+	ronnie sahlberg <ronniesahlberg@gmail.com>,
+	Ralph =?utf-8?B?QsO2aG1l?= <slow@samba.org>,
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/35] cifs: Fix SMB rmdir() and unlink() against Windows
+ SMB servers
+Message-ID: <20250920133312.myidua5tqzxzs5z2@pali>
+References: <20250831123602.14037-1-pali@kernel.org>
+ <dfa557ed-eb34-4eaf-9e17-7cae221e74fd@samba.org>
+ <20250901170253.mv63jewqkdo5yqj7@pali>
+ <6660f6bd-ea74-4b25-b7dd-280833b5568c@samba.org>
+ <20250902163053.zzgd5ee4qguciajj@pali>
+ <20250907110506.czjh3td4qf5ieb4m@pali>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 19 Sep 2025 20:57:49 -0500
-X-Gm-Features: AS18NWB_aXPFSagMdzo-_5qY1311xAjemTBwOjJ-6PdPqVhA6yImxtDNUQ5y2jw
-Message-ID: <CAH2r5mtPs4=gUB02r12MN29kwK57+qJ_ugAsN6=83_vhA5aDCA@mail.gmail.com>
-Subject: smbdirect/RDMA patches for 6.18
-To: "Stefan (metze) Metzmacher" <metze@samba.org>
-Cc: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, CIFS <linux-cifs@vger.kernel.org>, 
-	Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250907110506.czjh3td4qf5ieb4m@pali>
+User-Agent: NeoMutt/20180716
 
-I have rebased the very large set of RDMA/smbdirect patches from Metze
-on current mainline from today (and the patches in ksmbd-for-next and
-for-next).
+On Sunday 07 September 2025 13:05:06 Pali Rohár wrote:
+> On Tuesday 02 September 2025 18:30:53 Pali Rohár wrote:
+> > On Tuesday 02 September 2025 17:17:14 Stefan Metzmacher wrote:
+> > > Do you have network captures showing the old and new behavior
+> > > that's often easier to understand than looking at patches alone.
+> > > 
+> > > metze
+> > 
+> > I do not have them right now, but I can run test scenario and capture
+> > them, this is not problem. Test case is pretty straightforward.
+> 
+> In attachments are network traces of both the old and new behaviors.
+> In the old behavior is visible that after calling "rm object", the
+> object is still in the followup "ls" output and calling "mkdir object"
+> is failing, also "stat object" is failing.
+> In the new behavior is visible that "rm object" is using exclusive
+> removal, which fails, and then fallback to rename+deletepending which
+> success. After that in the followup "ls" output the object entry is not
+> there, there is only renamed ".smb<num>", and "mkdir object" pass and
+> creates new directory "object".
 
-https://git.samba.org/?p=sfrench/cifs-2.6.git;a=shortlog;h=refs/heads/for-next-next;pg=1
-
-Testing and review would be very welcome.   There was a lot of
-discussion and testing of these at the SMB3 test event at the annual
-Storage Developer Conference this week (and they look VERY promising),
-but it is a very large set, so more reviews and testing will be
-helpful.
-
--- 
-Thanks,
-
-Steve
+Hello, is it enough or do you need some more data?
