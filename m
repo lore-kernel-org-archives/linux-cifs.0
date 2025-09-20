@@ -1,63 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BFA2D47ED;
-	Fri, 19 Sep 2025 23:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD397082D
+	for <linux-cifs@vger.kernel.org>; Sat, 20 Sep 2025 01:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758323665; cv=none; b=bNz6rpPzQwVmuhilG4l1vPU2xi5Rdvjy2uWAJqs8NHcwEQTRDGh6Jxst5H8pyiyEhxlqLTYLZQ+dlB4T2bGlAblNqOA7g7QcMfCkjRzPgJiTIUrbCuiIPAarptVwPuZOrm1K8zsr+6du8Q5pNahzj3WIzIlZx9kXfkLyxk8vLS8=
+	t=1758333485; cv=none; b=l5d/D+k8w1nGpfUihU3PSUFK0UqNx5os79mLP4iyfAXAYOBY1RO6Zkl9o/lwoFIstnV/Z3J1M0lPKgscV/zfGuYmgdaAuhlK8Bi8Er3adDGMVelhCKHUSalb8Foy0rVz6fvNnsqyUdS02v49/f1khnJlA7bRmAozbWW5ilJUS+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758323665; c=relaxed/simple;
-	bh=XlZdOV/35hjfqDqb+dBQcYYNLPsjtj/xCCdAgVqcKNM=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Q8DoGAiKavzh+qsoPNQR2/b74THorlU5Mtlk/+ny0AqmwQBe0RvneIiXC6dH1FFijNsrnGkbkZA/J7X0NXKYF7xgnU58MxwZXAAvVbU/YFkhyoXfNv6tmyPMACPdiuwXl+n1v5/QoKcAbvY6zlt9n1f8BbHPcEFxKzKuEDsxFj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cYOq3dxR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758333485; c=relaxed/simple;
+	bh=WrSkMvVgkQNzMvCxVUTSK+7vdP4vvRibyvRZZt1fXbg=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=rOzvB3GQxfmdwGkPeWgrs450S6IPY+peMSdJNmQG6zcX33+a8FVUChTSOnR5QIamXtYyZHXr0DUFp/tptCwQwVPgMaP91iyYMUz+R9KIv42eO7gzt4VXzYIEKxtekArOiSD0xYugtGhPQB7zB1Dl+7+MY1EUk9ouqv6AFFoXftw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cyfL/ovd; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cYOq3dxR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A450C4CEF0;
-	Fri, 19 Sep 2025 23:14:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758323665;
-	bh=XlZdOV/35hjfqDqb+dBQcYYNLPsjtj/xCCdAgVqcKNM=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=cYOq3dxRXBnJ1ocftWYz5AVerUdf/w2mA+/nL/Z5fOiwH8b/ACKdCEaf9xLF+sxgJ
-	 C552vdbvyElwH0LreIu58NOuNp85tVkIR7DMNScYV8xBVyf3J9NR+1qu37mAea9EFx
-	 PMh72fTHZpU5tzmIG6MDjgAKornjC3Glp0XMEr/DKtRh9Ip36ZZQp66vpQv+XWZh7f
-	 LciSh4ekKdb/HzLEg5/zxdZp642V1lZdDA4R5aj3nqNzLeFPnguwhzfffthUn3+5Lm
-	 /T4s3aasCbo+OarGZmeaPU/R9ReK6Ls5w7IlGMt4rlrHIhOEKciLaq4XLuhm9yOecr
-	 USGcihLB9aVxw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE1D39D0C20;
-	Fri, 19 Sep 2025 23:14:25 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5ms1vdZHKz4guZFpR0fMfZFE36eBwdH+fapaW-i1tOTSaw@mail.gmail.com>
-References: <CAH2r5ms1vdZHKz4guZFpR0fMfZFE36eBwdH+fapaW-i1tOTSaw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5ms1vdZHKz4guZFpR0fMfZFE36eBwdH+fapaW-i1tOTSaw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.17-rc6-smb3-client-fixes
-X-PR-Tracked-Commit-Id: daac51c7032036a0ca5f1aa419ad1b0471d1c6e0
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: cd89d487374c49f18a8c4af312ecc74d997f3b07
-Message-Id: <175832366464.3732828.8309327723878148075.pr-tracker-bot@kernel.org>
-Date: Fri, 19 Sep 2025 23:14:24 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cyfL/ovd"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-78f30dac856so31987136d6.2
+        for <linux-cifs@vger.kernel.org>; Fri, 19 Sep 2025 18:58:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758333483; x=1758938283; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+IeYdDwGM3XWQ3ytBnc48jBI8s0G65WWqY2pGYrExtE=;
+        b=cyfL/ovdZRQ5mD1Kx4/iz2ip2cH7riEThMjOola5MOrlKEKiWoOsVRWqMMJ10b+/pY
+         aSJxd1XHtJlZmtuLoXoEuaTePZn+Zv5OFNs8DsZmFqmfvXvnJXaT/F7xJHGUAGOq0EpM
+         1JoHl4hTcVwVBXVHSpyxQzhLMrAcA5oKp4oUx5SMsjIZBTxc08dkmNqdzTky2OHviqQh
+         RniTYE8tJwBZBHA4tsc/aODOG6ikkhF0keFUUaBV3m3iiFCwVnSzbxdNQIBiYjF6091U
+         Mj0lX0sAex4RTdKe0aXu2Dsa1N4oRuvf4ePiz1diIENfzH5zLeRAIYCpti8j1wKfaICh
+         m6ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758333483; x=1758938283;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+IeYdDwGM3XWQ3ytBnc48jBI8s0G65WWqY2pGYrExtE=;
+        b=X8an0HcflHLS1B5yiUHsP7YqSOlbC8zer45aJx3+biXC0xSIAnfnx6L5FoP4CPuYrw
+         /j3vg3c7jXz+VEbbAJJVhk8uyQT/A5gbrbxCqV2QmERqoSjC0LTlebnSyEqR+6iPQ/Hd
+         kVqdImajfUchG1ylETBiJ6fAQMJZOcQgmUsytlfx2/jtzi/0VROM0IIz61w5vXnXqFRw
+         2nBOACvYpiEh8AXmJvX12ta7LrbtR8cES7hBDAt8iNVm8ISYbMCHQOoLjeomdEzC8y70
+         MKG85feyOlKvzrbWGogu1o3K3TjOXtK2+XM3KdVhje3KCU29ttTfD6ZVy4HW9x74iMxE
+         8Jnw==
+X-Forwarded-Encrypted: i=1; AJvYcCXfIZWKSX2f72lvnjP4yK+AcGOwwM8OLtfbiNRmIxuvTRjd0phmYrHPzGg7rWzAObZ3+JPDSvgLZVXp@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGAwM8a/GDqJJenht4srCyv56x8xKziehyAoCg0rpK3olddYv4
+	ZWiyuHs+kn8+9M7GntWGfJ4rskrUcs7biGidgOFX5fL05Mc/t/TS/cRtz/YSUeibXDyNuwmpvBp
+	rEtDkYWfqAiRl13Fp4h4puga9txVcDQ4=
+X-Gm-Gg: ASbGncsvhrZvrgZMaBVDD2VmP9vphwxV/+87TK8Da7e1rIAwsAjH7u44siu/dLlXoKK
+	efCAN12Bs59xRDKnyyia6Sw/D1vxEzCs6VhB0o+Xte7HQrdDICpAvulcMXh3Wdhax3LfaPoH1mX
+	eIVWS48I3y5LbMqdRl7qW8ezW2iGQCgtDnbSO9og6t314GIgHn/9fb0O/77WmjHnbokaq9Kd55Q
+	kb6QJip09odfsDygKVdvdWJOAzn6fahi2yX7gRBN/rJyRvV4gxpvq3OCiwK19FJ4VlntccaIgIj
+	Hx2Al2yuPqqeZYRSDcHko59fdMMLb0FdPL2oytO9SraV95xKOyC29owLbWOFRN21Y1AnQkHbwk+
+	qYX0vemo07H4IC4enONFDCg==
+X-Google-Smtp-Source: AGHT+IE5ZXnEkJZJ2o6wIvV1X6khaeULVfo9GNm67tS5a9PM/7HklawdEsggzdlDdW2B9ZR6odz39aZpsVAAwG/QFnU=
+X-Received: by 2002:a05:6214:c2d:b0:793:9d56:3f8b with SMTP id
+ 6a1803df08f44-79912980f98mr58763566d6.17.1758333483062; Fri, 19 Sep 2025
+ 18:58:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 19 Sep 2025 20:57:49 -0500
+X-Gm-Features: AS18NWB_aXPFSagMdzo-_5qY1311xAjemTBwOjJ-6PdPqVhA6yImxtDNUQ5y2jw
+Message-ID: <CAH2r5mtPs4=gUB02r12MN29kwK57+qJ_ugAsN6=83_vhA5aDCA@mail.gmail.com>
+Subject: smbdirect/RDMA patches for 6.18
+To: "Stefan (metze) Metzmacher" <metze@samba.org>
+Cc: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, CIFS <linux-cifs@vger.kernel.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-The pull request you sent on Fri, 19 Sep 2025 15:22:35 -0500:
+I have rebased the very large set of RDMA/smbdirect patches from Metze
+on current mainline from today (and the patches in ksmbd-for-next and
+for-next).
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.17-rc6-smb3-client-fixes
+https://git.samba.org/?p=sfrench/cifs-2.6.git;a=shortlog;h=refs/heads/for-next-next;pg=1
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/cd89d487374c49f18a8c4af312ecc74d997f3b07
-
-Thank you!
+Testing and review would be very welcome.   There was a lot of
+discussion and testing of these at the SMB3 test event at the annual
+Storage Developer Conference this week (and they look VERY promising),
+but it is a very large set, so more reviews and testing will be
+helpful.
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+
+Steve
