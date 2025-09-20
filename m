@@ -1,61 +1,61 @@
 Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39576192598
-	for <linux-cifs@vger.kernel.org>; Sat, 20 Sep 2025 17:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D465301483
+	for <linux-cifs@vger.kernel.org>; Sat, 20 Sep 2025 17:26:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758388459; cv=none; b=sf4zpbUs7OFxR1DPrQ2WUM9N0AwCy7o0FXWuL+8ASaH5VjtdUXboTr/ElmbjXuGWCgD37B0N8S4l3DiUUEpBG9MVaR6qed7y4ajJLv9lEvQZqhhppNCPFjWMRD5Pmqwh53rU/KJFb2R7ubX6TP3BqO6QawRULDMpgj0ywrQ1T5Q=
+	t=1758389217; cv=none; b=FDIe53j/GTrndvBebdCEHW6BeG4a627LkpZRMsON8z5KGSttL6aGAZTZTeoo5BsYGS1lnu9ydAq8y3PU08ap6+agafckPkj4AJtvV4iinvvqS7vivH2DN2pZzTAqiCeNuNBPMN8mX2Fcr9aVwSUmzfYJV/0bC48qIn40Et302e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758388459; c=relaxed/simple;
-	bh=/jwLSd5VKKcyTzw1VRj/JQVGUf9SxgTPyNHQnt5EwcE=;
+	s=arc-20240116; t=1758389217; c=relaxed/simple;
+	bh=3adxvJs0qVcgPPD06SkMcewHodlqT6s33+654bxADu4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eRUwfVmTroidBglxMkzo7PCltGZhtb34gL97D7kLTOsSnGmWCFUqxpyUl9uBxyuoG1tcG/uO9eKMSaLGhDSZIK+I/xOr6ocdJ5vR0xtOWWaTDJ3hTNGuU8OyI+92gtIfGQYv69fm4CZBSC+LfGI9XGBMw81hNop+5dIAMzo/N94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R3BZJJPG; arc=none smtp.client-ip=209.85.219.43
+	 To:Cc:Content-Type; b=jlwHcPMEVfBBS8P4s5i1JDeTG9M+rtabnao3eh0/hwv/oaJAczpNdf4fJHiJ4/1+BVsu7psrxZrzM8A9pkWZviIXcp13F+29irnhdWhPnDr534icp/VqMiqCTP5obzty1VrqOllLaPti8T6feGgoeirYeWYg3xL8un5e3DErTWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eqd3wRUO; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R3BZJJPG"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-7960d69f14bso15676886d6.2
-        for <linux-cifs@vger.kernel.org>; Sat, 20 Sep 2025 10:14:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eqd3wRUO"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-7900f7f4ba9so26388946d6.0
+        for <linux-cifs@vger.kernel.org>; Sat, 20 Sep 2025 10:26:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758388455; x=1758993255; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758389214; x=1758994014; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GL7HgTnZoOBvYPNKx43B/15vqjMviRpE5ew90OYFEFY=;
-        b=R3BZJJPGyjPl7iAUTCezxNmSCRmwoGN9SPInLuvTFUd6RWFK8tNfq+4qEtBrDYQgOQ
-         k0r2P7k2b3QwrAv4Ze4jxu9kqVlhLaE4v5lh7/hqLe30nNkCNUt5Q3l/Y/m2mwZ91Kla
-         6UCwEk+TxRckQySSFNHFKSSffHDb2udSx6+hdYEztH/Ap4APL9SSZ1tD6SxQpsCez0TY
-         ORgssVcDRRCrssMgHmcZri1byYEhEC/hDK0numYxmOCGjuv42xFdMYw9UK2LhZwJW4/1
-         nn47v6OrDNqAp8wvw5V9x4IrWOdBBvzu0JOfJLW1TgYVUCgPxxdnHraVEuQBKR3ywJvO
-         2ojA==
+        bh=6paYclhXyeZwz/sSU7beJl+BgRVTSOJzpS7hqwmJ600=;
+        b=eqd3wRUOKjnpYlI5sHuciJkr+uwktsz1qYrSA2Qtatn9oOy7i0ALuqaSmASAJ37Ac8
+         zvxGKnlYnPUNWAuJNiBStpcadSPa+vwmFIqSxpEzQSbNeKnS8d8R9wRZsENK1LBgiFue
+         wBGeQbU7e1XRxLpM/Db7ZLT+NLY9iE++DlODL9uTTBYpQ8NKu9Yzhmm665YkCGYqxWUx
+         9cbmhSf0IAL9VvlPK/i826ogrI3th775iuDxP27CbR0C2Y9QcYBstiiIHwo/ta2KnHly
+         WdCvzUciJidMsqTPGKjICccBkP+3OAA+I6PiEAScWEeAuGMocRSC8tv1X2Eib+4WRNZe
+         TaVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758388455; x=1758993255;
+        d=1e100.net; s=20230601; t=1758389214; x=1758994014;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GL7HgTnZoOBvYPNKx43B/15vqjMviRpE5ew90OYFEFY=;
-        b=XKIkqDEwrZe+IhhJXNeF2iQMzieX10/TihtJ2O9xCjTQ/4r36PzycnO01TyGzwbmFJ
-         O8LMKS67OfTxKjn8jxjicbrcTTzx8HobhYVJnx/UxAT8heUa5gVULceSOFC1KCIxEJCo
-         ixEjOVPyuCG4/dFRFcsOlytlRcT83SJxz568uj+Aiu0Nf1UAou2MxcMWQtfLXQCgFd3C
-         8oPM9Bq2R7TT0h2zyWzDXzo60v8VwuhjGF0yYipFn8k07EDrfsy/z3JAHLtmAPR0z81B
-         +73lERmFreuPSYXaFRBHsL78l5E0+ara7VF3WJjgs0vAjt78nmbOF1eeJ16MwO9xmWSy
-         M1mg==
-X-Forwarded-Encrypted: i=1; AJvYcCXJrrX4YIp/jcOKRLBInNTUq4wa0VbhXcvA0S+xMZSk4dDWmxZGo7liyx86Q4NGwHC8kpL0ong6fegt@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIjkOLX0TxOLa718+e8ecoEG6ij/E9FWJ3XUUvM098mm6T6DNW
-	5zoCVSfr/VZrHZ9RDlALNAGFEkeyAJq1zv1o0K2G445HGdnhSNzYxv9EVBaiKEiiv8bzkDkut0c
-	lMv4+VhDvYPKMLfeGvReq3Dl2OJzE5vw2UA==
-X-Gm-Gg: ASbGncvVxG+IrmhgC2Iw2olYSW4KqAgZVt5MqvoAZYQKiv19dn/7K/QqefAA9DCRYPs
-	2+aleIXeNWtijUpuGz4SXkh8T/xi4BmEWJw1x4kklFbKirh6g4j/WGeX57EsuRYNuTB7BAe0vEr
-	dF8Ced7wBghV4oMaVkzu9cTEZ32S/ElGu9P063x/FDC83oyT37VyUk11Eek+XQ02nznO60C2uRv
-	P0tyElvXE5Di1QCaQQeILyWkOWG7A8rJH9CMuXP8v/BOnZhaouN0t1pjtTx76njy/RVSvlJoR0h
-	l38WNSK7w1Y8Mao0wvIkRpnLxZQi/yXoUaTmR5IDRH3bbrrcrZNdzM71/A2LxWyFO4OU2anqqS2
-	LhqcFm06dn1tJ8qjgDm6d
-X-Google-Smtp-Source: AGHT+IGWDp2LC+F7PzetzGw9w34aHhZgXaWrpI1fd89LE5rl8GVZ4udLChxzMdNiKgt9qd47TsVYg7PhRRfuYniapUU=
-X-Received: by 2002:ad4:5cc5:0:b0:78d:63c4:9d5c with SMTP id
- 6a1803df08f44-79911fe77fbmr87402576d6.5.1758388454877; Sat, 20 Sep 2025
- 10:14:14 -0700 (PDT)
+        bh=6paYclhXyeZwz/sSU7beJl+BgRVTSOJzpS7hqwmJ600=;
+        b=R2KGLE9Z0r28K5SC4NfOSYaTSZ13dUPwJ1N6EPLUlhHGOz9ujdDT6s9mgovkgwgY8N
+         3plIRn2i2lGJMRpUeCkIaFGGPXpnh9IqHV0JcFmpF2qVEooFexYVvOBZCvZaQzt/vyGe
+         i3robL5o2sG9jXJJ05hBzJ1XfxtHDxKNKOrOe4QiuIo/RcFmU5d0AoPoxozwsI7Pujnj
+         ObWIfmgqmvoJfGoKXinfqohA1t6zmP1+EalbicWhlEO3sGiSj/VL4gVdsNaqaWZLUSvh
+         R7Qv5PxrIOh/o9Z4H78DHgMdzbpmVd7wSHBTJIbZY/iSqNwXEWOO3wXHzZzH4f8ZHoTL
+         k9tg==
+X-Forwarded-Encrypted: i=1; AJvYcCWvf0lDMlkN+O70jb80MltPKsr8Vd6EpMsxv/otA9VaskqJ+4KmneHFGLkDFyI5hAUBRNitzG4SZJIg@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx56QQGyUKCMNvJnntCX567WhxOBvbAXC68y4USE6cLPE0tMWlJ
+	fhFClqhhW5i4ZVpJjOheaIO+XK+S3hJwosySNeJxbbP0iA91VApj+6e+sYVka87+9f/vUWY9HH4
+	QCabE+f8/hU5F98aQP32Inwra3+gy/FM=
+X-Gm-Gg: ASbGncsq5AsNR5nnf8mCwlnriAI/ZXLdJU4Glpgw8+1HHy9JvHr49aCItD1IH/VbPYh
+	Lsjo51MiFLiV4TD5pHBFIFUg6Bs0/sJA7/ro6MHsMejeEMoDv/jlr8jCugFs1S71UlYmHAZHUIH
+	nNJrWCdiXErhRPSUgriRfS1Mn6imQUZck/q9th6XoIbp8tda0nbGRHYfdrJ6T5rqoSEjngdhpQq
+	ZotmXWHvsdV8uUl9qxo0Ws5wlaCPpDvce+zcqCN7zhR8Dv2j/VxcWyskxQdNeyZ7uf6/2es0msd
+	8R9MsPvPjEUSePfbijeV8mKzZaJAfbHQ2pk6hD1grBhoBuW4K8FsSDJ7ytFKtIa+BBIe+rBwV71
+	lPHnVsyiqLxZd7BYFAwXH
+X-Google-Smtp-Source: AGHT+IEqHNqLonyZNlJeX+bM903DwjTNtSMOEozdz6cuMeNWKWmi2rOQ9p9SLt+4zpug+/lMZNqYRZ2cd5gRmjaQCU0=
+X-Received: by 2002:a05:6214:21cb:b0:782:18f3:366f with SMTP id
+ 6a1803df08f44-79919dae89cmr84424826d6.38.1758389214102; Sat, 20 Sep 2025
+ 10:26:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -65,9 +65,9 @@ MIME-Version: 1.0
 References: <20250831123602.14037-1-pali@kernel.org> <20250831123602.14037-9-pali@kernel.org>
 In-Reply-To: <20250831123602.14037-9-pali@kernel.org>
 From: Steve French <smfrench@gmail.com>
-Date: Sat, 20 Sep 2025 12:14:00 -0500
-X-Gm-Features: AS18NWDisDSfuK7IEKjZK5rhCKiVjGiYDTGqpwBrdwNDdXG-5dyBaj6jjlWf08I
-Message-ID: <CAH2r5muRF1=H=acG2d0jVayW2fp0_V-5-0=Mx+8+VDRD-2oK4A@mail.gmail.com>
+Date: Sat, 20 Sep 2025 12:26:40 -0500
+X-Gm-Features: AS18NWD6a7R-Jh_7dbMrr6OaHrMzD-i32UGSSr7OqsN6XlPGXriSRBCKXSYRKsg
+Message-ID: <CAH2r5muVP5NuZFfsCWDYhCKATDyeaD2cpXgC3=zNh+3T_zO1Mg@mail.gmail.com>
 Subject: Re: [PATCH 08/35] cifs: Improve SMB2+ stat() to work also for paths
  in DELETE_PENDING state
 To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
@@ -77,11 +77,7 @@ Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-This looks confusing, like it is wrong for Linux apps - when Linux
-queries a file that is deleted (but still open by some other process)
-it should get the equivalent of file not found or at least an error -
-you aren't supposed to allow path based calls on a file which has a
-pending delete or that would break Linux apps.
+This patch doesn't apply to current mainline - can you update it?
 
 On Sun, Aug 31, 2025 at 7:36=E2=80=AFAM Pali Roh=C3=A1r <pali@kernel.org> w=
 rote:
