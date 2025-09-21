@@ -1,152 +1,122 @@
-Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEC424A066;
-	Sun, 21 Sep 2025 10:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E249B1F09A5
+	for <linux-cifs@vger.kernel.org>; Sun, 21 Sep 2025 21:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758450150; cv=none; b=jht46VBY4r6rwJpxnaWGCEjGw7P/YhXLmP+6hg66p6vTTYwqlPfY+eJPD4cXTB3OyWZgdcxuWMUsy8yFIpGqbKPgIv9ECv4UND2vRj+100VGFL1qvn8MC763u6TApXZUUpYN9K29876zM5b9VfYJWOd3ofn4w/4NMg23e6mzPAw=
+	t=1758491134; cv=none; b=j/JsYLII6L8F8z2ItrGl9wHGCFA/6NEhInLpuUL0pWwV39qHmH3xJMzUbWfa0Lr2cr69yMj247MozaKjQ/QPrTmznRoowv3jfsVQDKHyEmMJhV7f8XvI+ZkTYRcn+vewCjaDvJxSxa/cU2yuekmGe74Lgj/L1Oiqy10he06Bl+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758450150; c=relaxed/simple;
-	bh=EuaMo6D/BJKLE6f/Qu2pbLWx6rfoIYSR/NXFNH+/L3U=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=iXigrRaS+OmOAx4XRexOSOGeoV3HJ923aeR5q43WRG+tlXjHO06b41ZinYjIP92FV1ZLFMl27FMPL4F/nnYuTlW7BeDJUFGab3ioxu/bEl7AHtoCTwgL9MLVmENGDx1PVVEIgSM+PM6sfPGCNW7hMvNyvGjDFFfbWY270DZuj50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=suPlKyrD; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GeQRDIo/; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1758491134; c=relaxed/simple;
+	bh=9vI2FOTD0S/7GTz0gSqR/mUrukue87w04FAcxKg4DMc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qZwZ04WI+ab7ps5mLwNttzx5af0FO92t24ymZAqzA5HE+NIuwaGmtixRDJ7bMOezx0y5c+uLBPn5UMamRnLrbSr0BMfw+bg8jPJzBFnj6sb8RAvBBDTgRo1MsAeMnji3aolkamf5FXZBfhrDrDMJdHIEDDZvneur3ubhmh6C3RM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=ebYcaTkH; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="suPlKyrD";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GeQRDIo/"
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 562C314000FC;
-	Sun, 21 Sep 2025 06:22:27 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Sun, 21 Sep 2025 06:22:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm1; t=
-	1758450147; x=1758536547; bh=z4dTzHicOmu0ud13rOeQ61ccyjqJXmSHMtb
-	dd650m2s=; b=suPlKyrDIIb3+IwNlbntYUFM9a0CpPFkrFNA265367EGvWcyL6g
-	Ai3GxZx0x+4ArraDgo85aSSM6UQ4zzFGVA5VIEciOlSm3NNSWX25P5Y03QWE28I3
-	CLe6f2VtSTdh4JJKb+G/1iqdVfzX0vAmv0rw3WzjY6AV5y90Gk3IeMMfARA36sOH
-	HpJc25LV040BNWMua/br1P4ozNIqmfIxCFvLkngByr/O5d1WPsGJ3KRF4kkGQuB9
-	S9eEzNsKbEG3NxPAg9XaP00LN2cp8jxFXUVLY3emc7MIrrwwoRA8u81v7iQcDmwB
-	y1i85q2UsOjLlxCKTdi3KzV5btBgy0j8lkw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1758450147; x=
-	1758536547; bh=z4dTzHicOmu0ud13rOeQ61ccyjqJXmSHMtbdd650m2s=; b=G
-	eQRDIo/bVDytypOm19Nj87vmudllOQ9j3VlOHWvohikkIUe1MVoAnRfTnb6vhZG5
-	p/cfn+Y69hQFq+LVxWZ+cDO0PRm78tF1WIHNftcRqY4jWKzNPYz/PYCASiN4T7dQ
-	Ff0byzGrYNOTxv9a00wLEgh7Gxodwbti8lnoGpLU6lf/v6i1l7z0vb1Vww21tC7U
-	K5yuRQ00OCVFDsDfZsOmzfTDSHTacSs4GGwG3NyiQgJvWadUrnUBAu+OrOJ+aYl6
-	6m6TGOIv9j/d9/dL6Ak7LlYiyTg58SG9j90U7kwqG7mGOfPxJlTcpdXt+6/6EDcN
-	eM/eiPVRXLdSFxgbW1jzg==
-X-ME-Sender: <xms:4tHPaNn-6gqhyy2fn228rdPkVbYp_Ug6kGDDGg2DHA_UQqBKha9eUw>
-    <xme:4tHPaOnAXRg9ewbcwMnOihWBSq0CcdpuYvlOUopk6I_0inPF1phzlafTbq6JWqCIc
-    p6hDERGz-ekLA>
-X-ME-Received: <xmr:4tHPaBvIC1wTbzMyk6Z6_pupiyb2-fdrDwS3wmltW5QQior3XvDjrxQFy5SPe20vXimLdad3qAUTV9KiHeJdEVBVTaKfgGCxDkhwN4vsSbQB>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdehgeejvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpegtgfgghffvvefujghffffkrhesthhqredttddtjeenucfhrhhomheppfgvihhluehr
-    ohifnhcuoehnvghilhgssehofihnmhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpe
-    ffveejleejheeujeegheelleeuveduheejkeegveeuffetvefhfeevtdeuuefgjeenucff
-    ohhmrghinhepghhithhhuhgsrdgtohhmpdhkvghrnhgvlhdrohhrghenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnvghilhgssehofihnmhgr
-    ihhlrdhnvghtpdhnsggprhgtphhtthhopedujedpmhhouggvpehsmhhtphhouhhtpdhrtg
-    hpthhtohepvhhirhhoseiivghnihhvrdhlihhnuhigrdhorhhgrdhukhdprhgtphhtthho
-    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuh
-    igqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
-    uhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
-    hinhhugidqughotgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
-    uhigqdgtihhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuh
-    igqdgstggrtghhvghfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegs
-    phhfsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhgrtghksehsuhhsvg
-    drtgii
-X-ME-Proxy: <xmx:4tHPaIJcxLI3mylMD65vcVWusoP2ANC-YLZj18LljgYs_YDW3iCO8g>
-    <xmx:4tHPaGgZA-AHazPVIA52TncFHJ17tXzJ_qghKTM5oUTHW75gg4Kr9g>
-    <xmx:4tHPaEv6cEE7Fyvgf5R_3YeXxs9nKDVZb4dA2WqlhHve4Jshif9Q_w>
-    <xmx:4tHPaIiKeeX1mmr-u8fMPJqBpiX9lJy-gb8Y3tvRhBYBzbFC7qYN4A>
-    <xmx:49HPaJOA2ecx8oezZruDJjk7UiOe6Ag1tYRGEkvQOih3emkbW4M3hGxH>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 21 Sep 2025 06:22:22 -0400 (EDT)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="ebYcaTkH"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=rz1x2p+kZcks6PcfkDJEI4VuC2ZiaeIdhVgUw0SbpIs=; b=ebYcaTkHtIGJxit7ELdsPFMTMD
+	E/EfFXmfZBNAIDwkcCIuawdqz+l6KtWhw4cYT+b7D6QWH+wCGY5rY3vcwpUlOpRWWlzhsZHz4WstE
+	RM6SJrzGeCFUniyEK/hEQobmwxM2GUmFlmcuXLx11Vu6cnKTIqkptp5Py6HMgyFLzQYFs+lDE8C+X
+	boGjmtIQTC9hCuquBOS26ijA0tiN9o4D/lp5Xn5RACRx5aNoJhUCkrLVJRTZGkGyCaFM6Jc4WuJgZ
+	jxf6Eyarv4ZQqYKlXjXUtKcO5Z3NNdnpDhyKUsl2CJ4RKFkh1I/j34js9M77LZN/6faFxSbyTI2gv
+	swomwpIcBlSuJPjYgHhX7y2MHWQSblBkFAAf5F+VO9/cneCsAFPeU7PmBbbbjTbkBrBG4ZEMU+CiO
+	0cP5tGNUtnBZPhNcnLltpuQoVZzyoKR8tjhDFHDESuN60F1RjZShfUDBtNlzTyF/OVAoVtEwkx99/
+	Z/o9oJEgvtKgzsOI5zeb0S1c;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1v0Rs3-005GM3-0U;
+	Sun, 21 Sep 2025 21:45:23 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH 00/18] smbdirect/client/server: improved error handling and other small improvements
+Date: Sun, 21 Sep 2025 23:44:47 +0200
+Message-ID: <cover.1758489988.git.metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "kernel test robot" <oliver.sang@intel.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
- "Amir Goldstein" <amir73il@gmail.com>, linux-doc@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- linux-bcachefs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jeff Layton" <jlayton@kernel.org>,
- "Jan Kara" <jack@suse.cz>, oliver.sang@intel.com
-Subject:
- Re: [PATCH v3 5/6] VFS: rename kern_path_locked() and related functions.
-In-reply-to: <202509211121.ebd9f4b0-lkp@intel.com>
-References: <20250915021504.2632889-6-neilb@ownmail.net>,
- <202509211121.ebd9f4b0-lkp@intel.com>
-Date: Sun, 21 Sep 2025 20:22:13 +1000
-Message-id: <175845013376.1696783.14389036029721020068@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+Content-Transfer-Encoding: 8bit
 
-On Sun, 21 Sep 2025, kernel test robot wrote:
->=20
-> Hello,
->=20
-> kernel test robot noticed "BUG:unable_to_handle_page_fault_for_address" on:
->=20
-> commit: 747e356babd8bdd569320c29916470345afd3cf7 ("[PATCH v3 5/6] VFS: rena=
-me kern_path_locked() and related functions.")
-> url: https://github.com/intel-lab-lkp/linux/commits/NeilBrown/VFS-ovl-add-l=
-ookup_one_positive_killable/20250915-101929
-> base: https://git.kernel.org/cgit/linux/kernel/git/vfs/vfs.git vfs.all
-> patch link: https://lore.kernel.org/all/20250915021504.2632889-6-neilb@ownm=
-ail.net/
-> patch subject: [PATCH v3 5/6] VFS: rename kern_path_locked() and related fu=
-nctions.
+Hi,
 
-This incremental fix should be sufficient.
+here are some patches basically on top of the other
+smbdirect patches, which let us use common structures, see:
+https://lore.kernel.org/linux-cifs/cover.1756139607.git.metze@samba.org/
 
-Thanks,
-NeilBrown
+They improve the error handling in all kind of situations,
+we now consistently reset SMBDIRECT_SOCKET_CONNECTED on
+the first error and wake up all waiters to notice
+the state change.
 
+We also disable all work consistently on error.
 
-diff --git a/fs/namei.c b/fs/namei.c
-index 5ceb971632fe..92973a7a8091 100644
---- a/fs/namei.c
-+++ b/fs/namei.c
-@@ -2772,7 +2772,7 @@ static struct dentry *__start_removing_path(int dfd, st=
-ruct filename *name,
- 	if (unlikely(type !=3D LAST_NORM))
- 		return ERR_PTR(-EINVAL);
- 	/* don't fail immediately if it's r/o, at least try to report other errors =
-*/
--	error =3D mnt_want_write(path->mnt);
-+	error =3D mnt_want_write(parent_path.mnt);
- 	inode_lock_nested(parent_path.dentry->d_inode, I_MUTEX_PARENT);
- 	d =3D lookup_one_qstr_excl(&last, parent_path.dentry, 0);
- 	if (IS_ERR(d))
-@@ -2789,7 +2789,7 @@ static struct dentry *__start_removing_path(int dfd, st=
-ruct filename *name,
- unlock:
- 	inode_unlock(parent_path.dentry->d_inode);
- 	if (!error)
--		mnt_drop_write(path->mnt);
-+		mnt_drop_write(parent_path.mnt);
- 	return d;
- }
-=20
+We consistently use spin_lock_irq{save,restore}() now.
+
+There are also some improvements in order to make
+further refactoring easier:
+ - E.g. move ib_alloc_pd() and ib_dma_map_single() on the client.
+ - On the server use ib_alloc_cq_any()
+ - let smb_direct_flush_send_list() invalidate a remote key in
+   the first message
+
+Some of these are already in Steve's for-next-next branch.
+I'll soon provide a branch that can replace for-next-next,
+as some of these patches should be moved before some existing
+patches, while dropping some of the patches from for-next-next.
+So that we only have patches for 6.18 included, the rest will
+be deferred to 6.19.
+
+Stefan Metzmacher (18):
+  smb: smbdirect/client: introduce SMBDIRECT_SOCKET_ERROR
+  smb: smbdirect: let smbdirect_socket_init() initialize all
+    [delayed_]work_structs as disabled
+  smb: smbdirect: introduce smbdirect_socket.first_error
+  smb: client: let smbd_disconnect_rdma_connection() set
+    SMBDIRECT_SOCKET_ERROR...
+  smb: client: fill in smbdirect_socket.first_error on error
+  smb: client: let smbd_disconnect_rdma_connection() disable all work
+    but disconnect_work
+  smb: client: let smbd_{destroy,disconnect_rdma_{work,connection}}()
+    wake up all wait queues
+  smb: client: make consitent use of spin_lock_irq{save,restore}() in
+    smbdirect.c
+  smb: client: allocate smbdirect workqueue at the beginning of
+    _smbd_get_connection()
+  smb: client: defer calling ib_alloc_pd() after we are connected
+  smb: client: let smbd_post_send_iter() call ib_dma_map_single() for
+    the header first
+  smb: server: let smb_direct_disconnect_rdma_connection() set
+    SMBDIRECT_SOCKET_ERROR...
+  smb: server: fill in smbdirect_socket.first_error on error
+  smb: server: let smb_direct_disconnect_rdma_connection() disable all
+    work but disconnect_work
+  smb: server: let
+    {free_transport,smb_direct_disconnect_rdma_{work,connection}}() wake
+    up all wait queues
+  smb: server: make consitent use of spin_lock_irq{save,restore}() in
+    transport_rdma.c
+  smb: server: make use of ib_alloc_cq_any() instead of ib_alloc_cq()
+  smb: server: let smb_direct_flush_send_list() invalidate a remote key
+    first
+
+ fs/smb/client/smbdirect.c                  | 224 +++++++++++++++------
+ fs/smb/common/smbdirect/smbdirect_socket.h |  24 +++
+ fs/smb/server/transport_rdma.c             | 157 ++++++++++++---
+ 3 files changed, 309 insertions(+), 96 deletions(-)
+
+-- 
+2.43.0
+
