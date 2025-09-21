@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152FC49620
-	for <linux-cifs@vger.kernel.org>; Sun, 21 Sep 2025 21:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4541F09A5
+	for <linux-cifs@vger.kernel.org>; Sun, 21 Sep 2025 21:46:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758491202; cv=none; b=fs4Bioi5+H1LuZKuKmJxQXlH+FUYJk9QEmnpvHSWIdt27EqitedRrCEaaraTb1symRuFofSmrDDBAFmmeMffpx5rz98Gdi7bvzXf5P4ddgry7202Wh9/LBIMwcD5rja2qsnveczSdMztOTlKtZqx0MbXJPcym2Q7MD8yltFpLdI=
+	t=1758491209; cv=none; b=onWuENCTwLXKJjeWaG6STkkxNj2sDDDLudWWM+7ujPNbo66cIkXAvCLbR7LniFK/gYSm3ruyzPYS45JEAH2aBllalOudvoZknnjg+RKYd1qCsMGldIyEKf3BxK0QyhpPMFXqaHFDOLqQGCewuCFg2yc/oDYO8NczOEdcjznXO24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758491202; c=relaxed/simple;
-	bh=aZsGPigOxM7mg6WUpY2lAivBF/fM344ZqbpIMqh1Yog=;
+	s=arc-20240116; t=1758491209; c=relaxed/simple;
+	bh=26L7SQING/IT3XvBAdZNPi86RyL9LUOZBIbNeBWgJUQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AnnzLy2sWe2yyrCHLaucTRgmyQt/ZuBqKtBdeLRJ70DFwBZwMlyIRMVuAE+cRCmxgotDjCY5mcpaGq1lYj64Tqz5uMsq3DuDRwa753IVGNtvrhucI3QcHzStLuufTFIpDyUttvbZt1qim3JMNtzTYF/5cdU+J+AQdmgzoz+khbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=wy9KfWiz; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=pqlWgYsszPr110IIDlwicA9DPymAi2GDudcsxI0qV/Ls4fNVrh88Zd3afJMHI3REroFFHQrgIateNzRXoeo9UiWLbouboM0O/aBKoVC22Yo7mJB1YT2b93CW/7s96+0y0q0NuMKZ5Yx0OvilsfOsCC8YC+ssFsyyse+h571kI08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=yp/vTsbd; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="wy9KfWiz"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="yp/vTsbd"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=QAgou3ftDUWmD4kZL5Jx3dhyC0z8+wfb9pgA7mCZHWs=; b=wy9KfWizES3S7+2U/xZzbTON4p
-	HKQDp9XdFURvFJsewXPhOYEMRPrcw64M1IxYfqwUXZgZzbl35J4hCUZoqZKzwNHln0IqK/AWWkp2X
-	9dqMa+NccS/vK0xlSjt8+PU8JCYjSEcWg91D3REYWdBciwrg+O7/Y/aMOZ1OhsGIfUZl8sz9Yyb8O
-	tNPL5/XlzetX/G4uuMb0dv5oMwMLjEKmQUk0Jg+e3JipQksrrOHtkI0h/GLmQ0ulDsXxtW9bonT84
-	pcVKjjfxwhTj0pR9n9M427lezZMJw4J2eYGV9l+3bkrLlnDCf+Z7m+7own04SN93UjFZuamHWhMVE
-	HAVoe3LaW4nHFx5MXoRkYRaCtEvlBReXR+etayWa5L7+hBOgnoiXU/EmrzbainUCyPLJwGlxODe0t
-	FgMagYO1IdQyCr5y+Px8dcH/2MJK6VhLz/G5qeFe84qZKKcHEb5QZgBF/mPGVvPMJUw62fkrW+Bt8
-	Wo+H2/Rr/sKVmSco5/0CWtG2;
+	bh=FKCaanVH/HKvXnWdBLFPgsTvOJnaQFL3U6ZUGyyEI1c=; b=yp/vTsbdKDeGg4q4tZVSrQlVnw
+	wB3B4wEGXnqxmWeyJOWVqPhEtCCwgWU75Uk6Apo+7LFs5gevw9+NW54lG/gTADGFlscIoNPIcE6YY
+	UfgCLSD2CT8wrODWHL/cfhuvaVkRu5jpHk5DMG3qIaXg12svbdM/3g+YtNqXJ+v9ASfbCHWpNCHRi
+	xP3N/HMq+/Aoog7YV1RwR/BsASvd2JzU/2Qlxo6XZafguYAwtj+nA1f/z7x75En77BTvyfbbYBLOU
+	GjPO3omNml9/Y8fx1jOlUgdtBTrGMJ7Qbl/WjoW2SpkhP+ivJ3FOjymaBz2DgN94xEY4PZnnd/xVY
+	eLWjTVvZWX/2g3c8pHeXcg7Sl7AP9wkgx7IByas/ABEERySbjC4KjLdRFXEcokfQGmW7oGLPJjp2U
+	BDsvuxoLTdQgXGVXI65MD/VC3I7nItgi9rV43wuJLKxdCoE12gPGQehcaIQuekpCvSFwVI1RatxFt
+	bvinik/gQjFsacc4SVX0bmoJ;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1v0RtD-005GWZ-1e;
-	Sun, 21 Sep 2025 21:46:35 +0000
+	id 1v0RtL-005GXJ-0y;
+	Sun, 21 Sep 2025 21:46:44 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -40,9 +40,9 @@ Cc: metze@samba.org,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 09/18] smb: client: allocate smbdirect workqueue at the beginning of _smbd_get_connection()
-Date: Sun, 21 Sep 2025 23:44:56 +0200
-Message-ID: <05f221d13c02e1b6a9aa5a116f9d704ae9f74591.1758489989.git.metze@samba.org>
+Subject: [PATCH 10/18] smb: client: defer calling ib_alloc_pd() after we are connected
+Date: Sun, 21 Sep 2025 23:44:57 +0200
+Message-ID: <cc7324dd64bc7267a21b2dec956448f32d10d315.1758489989.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1758489988.git.metze@samba.org>
 References: <cover.1758489988.git.metze@samba.org>
@@ -54,7 +54,9 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This will simplify further changes when moving to common code.
+The protection domain is not needed until we're connected.
+
+This makes further changes easier to follow...
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -65,104 +67,54 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/smbdirect.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+ fs/smb/client/smbdirect.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 5bc316248058..e6012523e422 100644
+index e6012523e422..d5e2b3009294 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -1703,10 +1703,9 @@ int smbd_reconnect(struct TCP_Server_Info *server)
- 	return -ENOENT;
- }
+@@ -926,13 +926,6 @@ static int smbd_ia_open(
+ 	if (sc->ib.dev->attrs.kernel_cap_flags & IBK_SG_GAPS_REG)
+ 		sc->mr_io.type = IB_MR_TYPE_SG_GAPS;
  
--static void destroy_caches_and_workqueue(struct smbdirect_socket *sc)
-+static void destroy_caches(struct smbdirect_socket *sc)
- {
- 	destroy_receive_buffers(sc);
--	destroy_workqueue(sc->workqueue);
- 	mempool_destroy(sc->recv_io.mem.pool);
- 	kmem_cache_destroy(sc->recv_io.mem.cache);
- 	mempool_destroy(sc->send_io.mem.pool);
-@@ -1714,7 +1713,7 @@ static void destroy_caches_and_workqueue(struct smbdirect_socket *sc)
- }
- 
- #define MAX_NAME_LEN	80
--static int allocate_caches_and_workqueue(struct smbdirect_socket *sc)
-+static int allocate_caches(struct smbdirect_socket *sc)
- {
- 	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	char name[MAX_NAME_LEN];
-@@ -1760,21 +1759,14 @@ static int allocate_caches_and_workqueue(struct smbdirect_socket *sc)
- 	if (!sc->recv_io.mem.pool)
- 		goto out3;
- 
--	scnprintf(name, MAX_NAME_LEN, "smbd_%p", sc);
--	sc->workqueue = create_workqueue(name);
--	if (!sc->workqueue)
--		goto out4;
+-	sc->ib.pd = ib_alloc_pd(sc->ib.dev, 0);
+-	if (IS_ERR(sc->ib.pd)) {
+-		rc = PTR_ERR(sc->ib.pd);
+-		log_rdma_event(ERR, "ib_alloc_pd() returned %d\n", rc);
+-		goto out2;
+-	}
 -
- 	rc = allocate_receive_buffers(sc, sp->recv_credit_max);
- 	if (rc) {
- 		log_rdma_event(ERR, "failed to allocate receive buffers\n");
--		goto out5;
-+		goto out4;
- 	}
- 
  	return 0;
  
--out5:
--	destroy_workqueue(sc->workqueue);
- out4:
- 	mempool_destroy(sc->recv_io.mem.pool);
- out3:
-@@ -1799,12 +1791,19 @@ static struct smbd_connection *_smbd_get_connection(
- 	struct sockaddr_in *addr_in = (struct sockaddr_in *) dstaddr;
- 	struct ib_port_immutable port_immutable;
- 	__be32 ird_ord_hdr[2];
-+	char wq_name[80];
-+	struct workqueue_struct *workqueue;
+ out2:
+@@ -1858,6 +1851,14 @@ static struct smbd_connection *_smbd_get_connection(
+ 		goto config_failed;
+ 	}
  
- 	info = kzalloc(sizeof(struct smbd_connection), GFP_KERNEL);
- 	if (!info)
- 		return NULL;
- 	sc = &info->socket;
-+	scnprintf(wq_name, ARRAY_SIZE(wq_name), "smbd_%p", sc);
-+	workqueue = create_workqueue(wq_name);
-+	if (!workqueue)
-+		goto create_wq_failed;
- 	smbdirect_socket_init(sc);
-+	sc->workqueue = workqueue;
- 	sp = &sc->parameters;
++	sc->ib.pd = ib_alloc_pd(sc->ib.dev, 0);
++	if (IS_ERR(sc->ib.pd)) {
++		rc = PTR_ERR(sc->ib.pd);
++		sc->ib.pd = NULL;
++		log_rdma_event(ERR, "ib_alloc_pd() returned %d\n", rc);
++		goto alloc_pd_failed;
++	}
++
+ 	sc->ib.send_cq =
+ 		ib_alloc_cq_any(sc->ib.dev, sc,
+ 				sp->send_credit_target, IB_POLL_SOFTIRQ);
+@@ -2002,8 +2003,10 @@ static struct smbd_connection *_smbd_get_connection(
+ 	if (sc->ib.recv_cq)
+ 		ib_free_cq(sc->ib.recv_cq);
  
- 	INIT_WORK(&sc->disconnect_work, smbd_disconnect_rdma_work);
-@@ -1946,7 +1945,7 @@ static struct smbd_connection *_smbd_get_connection(
- 
- 	log_rdma_event(INFO, "rdma_connect connected\n");
- 
--	rc = allocate_caches_and_workqueue(sc);
-+	rc = allocate_caches(sc);
- 	if (rc) {
- 		log_rdma_event(ERR, "cache allocation failed\n");
- 		goto allocate_cache_failed;
-@@ -1986,7 +1985,7 @@ static struct smbd_connection *_smbd_get_connection(
- 
- negotiation_failed:
- 	disable_delayed_work_sync(&sc->idle.timer_work);
--	destroy_caches_and_workqueue(sc);
-+	destroy_caches(sc);
- 	sc->status = SMBDIRECT_SOCKET_NEGOTIATE_FAILED;
- 	rdma_disconnect(sc->rdma.cm_id);
- 	wait_event(sc->status_wait,
-@@ -2008,6 +2007,8 @@ static struct smbd_connection *_smbd_get_connection(
+-config_failed:
+ 	ib_dealloc_pd(sc->ib.pd);
++
++alloc_pd_failed:
++config_failed:
  	rdma_destroy_id(sc->rdma.cm_id);
  
  create_id_failed:
-+	destroy_workqueue(sc->workqueue);
-+create_wq_failed:
- 	kfree(info);
- 	return NULL;
- }
 -- 
 2.43.0
 
