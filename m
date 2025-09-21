@@ -1,408 +1,321 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120432F5B;
-	Sat, 20 Sep 2025 18:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758391720; cv=none; b=rMqKWAmCHeIUNWqPeIoxV4tF/jJ6iZcVWG+n2rGJHHSMKt7urvyMiy1/x1reu3XShDM2dGjQjv3pzLsgs/F7+wrjOoQlqQnBXdVvrtczKyJ02KKAQ8KaQEvaq7D8GYCS/ZInPLHoj5/5SJHF90rx9G89Vdxd7mFip/iZw55qVU0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758391720; c=relaxed/simple;
-	bh=WkeIjJo1LIUAC3tBoV3rkpO8cTac/3jJSEgqxa6muJQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mgcE4X/F/vIcufjgSjCsAuV0u5c2iNiuv3hnIVL7jVGQQ7EB0y5+Ex/gW7Sy6p12AsuAM9c2sYW+UHIUhp4XbgHVHBRh64amdxYkk1/oxCddLpjurMb6pobkm15RiccHDmrRHSZ0TzqSV3EkeyYI54iJNuGv+XhwSy2+rPEK94c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J9pBrSFf; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2322619D8AC;
+	Sun, 21 Sep 2025 09:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758447851; cv=fail; b=RYoTtlqtEWofs8vq0/zt5mn3c8hfs+TCYuh1dPFs144ZJjqROgXaUhc7KeSmlMt3SnkkMcLiEcmf1BAAMrRKnCot6nY9u897Unry0fuNhfnnIYLwMqGS7EfZ1ojOh0HqMFJ8JvpcrUVOZn1a+xaz8+rWaEMTlAsg0hEV/myyzYM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758447851; c=relaxed/simple;
+	bh=8mvySflC4iFeuPtAzClM5bs6BKXknI7NQadiyFUaCZg=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=F3nwxnWd3GUGyNZHrfQuqAcR/1UbGkuIemfw8hAGAYURbG9FXbOb0S+JydDC4l7L1TPIDam4bKYFr564IL9z5gYtaCy717d8XJ8lv46tP/e49km6VcKl2CYo67zsBusMlNvjZJQkbCY5sWuknbD+9wgzcQFZnwDGM5hUqOmfXVw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cpwoLQhf; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J9pBrSFf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46232C4CEEB;
-	Sat, 20 Sep 2025 18:08:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758391719;
-	bh=WkeIjJo1LIUAC3tBoV3rkpO8cTac/3jJSEgqxa6muJQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=J9pBrSFfY4O4mG1XHcGBSfeX3kKixhVu1vUU0c63jcyIZhsoNbObshcKu6wP5AQJk
-	 Fk+zHgUr0ltqBbjQ2CczBZCMOONQNcl5YI1kVdCo88Z09x0ARqnIlyejugeyslBC5l
-	 alwSBVCWc50snte60vxKZxxyBh/Kt/igSZW28JUco5IF4SFgBzgYivjVoKpSmndIzq
-	 csWcTIPN8byQwXNtereEri0jTKhNOAnirVOMqBJs+HBQHi5EzLsARBOm6dl7D+lEZf
-	 GGF9SIIJCilQ5Qi3CQzhVksWWrZP5PniBHZN5wURSmQGHOHxh/f/p0gCicUoa90DwC
-	 wQsOMxl+Aql6Q==
-Received: by pali.im (Postfix)
-	id D51105DA; Sat, 20 Sep 2025 20:08:35 +0200 (CEST)
-Date: Sat, 20 Sep 2025 20:08:35 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Steve French <smfrench@gmail.com>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
-	ronnie sahlberg <ronniesahlberg@gmail.com>,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/35] cifs: Improve SMB2+ stat() to work also for paths
- in DELETE_PENDING state
-Message-ID: <20250920180835.5awqcyf6hzfdvjlq@pali>
-References: <20250831123602.14037-1-pali@kernel.org>
- <20250831123602.14037-9-pali@kernel.org>
- <CAH2r5muRF1=H=acG2d0jVayW2fp0_V-5-0=Mx+8+VDRD-2oK4A@mail.gmail.com>
- <20250920173630.rjajntsu2sy72fys@pali>
- <CAH2r5muDLtJ1hFPmmuRydyh64ovU5Lg5z1WUhCrAo9iCEG33KQ@mail.gmail.com>
- <CAH2r5ms_ufxY-J+8rQ3X5zToe6aQv9B1ZorRuk86CAfW_VBzQw@mail.gmail.com>
- <20250920175108.6t45aw5d2dekplor@pali>
- <CAH2r5mvX9rgen9JsesaT+CdBUJcbqcBesjc9jELT3pUNRKQc7g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cpwoLQhf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758447849; x=1789983849;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   mime-version;
+  bh=8mvySflC4iFeuPtAzClM5bs6BKXknI7NQadiyFUaCZg=;
+  b=cpwoLQhfVZd9neEMaHYLwcsvU3PoMqGL77FvIq1PtOlK+xh+mVUtBMab
+   sRLqIq/7yJSyaeEy5SuzlEhI4MEcU9IJyYvVcDnuY1/j8ALUzsPiTyLJd
+   HF0Sx9drhxVcxtRAbYTfhwbWH0xrS8X5RJJecNRYbIDpZEkCLm7Dem0Eu
+   ReK38bUTH0tprfYOx+m5wYvcSIwEfIjCKoWkEc/iI32Nd9Njg25YMNGWg
+   rO8OE8zR3uYlVTH239OEhEm733QNWrmbywKpk5yEuHD9ZnkFIE6nDPzfd
+   YcM+2wGQBFogfImxcJW7GWvZm4YVOXFDbl/Odj+3sIyledx+bq4Fn/p71
+   g==;
+X-CSE-ConnectionGUID: s7WWvv2lTBSzWXcGDVZEvQ==
+X-CSE-MsgGUID: LBUcfw4YQHChd5zb7WzBaQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11559"; a="60431797"
+X-IronPort-AV: E=Sophos;i="6.18,283,1751266800"; 
+   d="scan'208";a="60431797"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2025 02:44:08 -0700
+X-CSE-ConnectionGUID: /3oVBGxQRzGbDvYuqx/t/w==
+X-CSE-MsgGUID: B6zIl6ycR225EJDjD0Sozg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,283,1751266800"; 
+   d="scan'208";a="180248166"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2025 02:44:07 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Sun, 21 Sep 2025 02:44:06 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Sun, 21 Sep 2025 02:44:06 -0700
+Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.13) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Sun, 21 Sep 2025 02:44:06 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fvHfgOTKiIzuOb1PMlgRyfjaBXfM/EVEiAKcXzcIUFp8+MqPHUWfFmuVcL+Xyio1uXieneJZA2VoMVqkhD6V3fCeNdRikXEzp4etfPsYUpjAchAVn694i63bAm9i90AoK7qAZnEO0v6BzsU4EB9kZLYqrPxrtMmToTt+cXYslQC9shOPm1JNxl6D7EMSxXlyEORLNm14dNzFcEsBtyTTumuG2pUrn//F+bgafEPQqHXSACMmpcUJZSgJ1DRCtN2cUFMzcjLt8r2S4m6LzdOfoOIW2g2i0a9EiatNb4jij1lcs+XyS9kSiX189Kqe3/F+LfhRYNm+yF3ESsjMl/0fqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5mRZVCNPO4rbEaIpVrG1W3ZPsbQsGMmq6Pgo7CdGF50=;
+ b=L2KFVCkjNhbgb4O1dMRkGfQDR3TD1XA2XMgu9LeoEBlIpz23yyDJuEwBF5ZhmEtjQQhDWbeEIm/lNeQRANh9lfQLKvx3EFcqYh89Cx571G4wN5C2+BIqHK5azJr/sJf/Sc2pidMk5uZjwGde+aduRvoVsEK8sbCwW5qR07Ovv+qy+v+UcvAoFJJ3K4my1BieaypgLnp+aOWmUzVPUCsPButsEh9QydhsAlwVdOB16Z8owe8/PBCGvUiXcoHNisK6Xdq8ZCticN+Eu5sozuzLuOnvLAZI8KjST4LbWvObSnTHI8sfAk5Y/BkXYe9vpbaYQq1AxOYq/aH5FpBs6VbrOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
+ by SJ1PR11MB6107.namprd11.prod.outlook.com (2603:10b6:a03:48a::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Sun, 21 Sep
+ 2025 09:43:58 +0000
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c]) by LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c%5]) with mapi id 15.20.9137.018; Sun, 21 Sep 2025
+ 09:43:58 +0000
+Date: Sun, 21 Sep 2025 17:43:46 +0800
+From: kernel test robot <oliver.sang@intel.com>
+To: NeilBrown <neilb@ownmail.net>
+CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, Amir Goldstein
+	<amir73il@gmail.com>, <linux-doc@vger.kernel.org>,
+	<linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
+	<linux-bcachefs@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<ocfs2-devel@lists.linux.dev>, <linux-cifs@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <netdev@vger.kernel.org>, Alexander Viro
+	<viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, "Jeff
+ Layton" <jlayton@kernel.org>, Jan Kara <jack@suse.cz>,
+	<oliver.sang@intel.com>
+Subject: Re: [PATCH v3 5/6] VFS: rename kern_path_locked() and related
+ functions.
+Message-ID: <202509211121.ebd9f4b0-lkp@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250915021504.2632889-6-neilb@ownmail.net>
+X-ClientProxiedBy: TPYP295CA0022.TWNP295.PROD.OUTLOOK.COM
+ (2603:1096:7d0:a::18) To LV3PR11MB8603.namprd11.prod.outlook.com
+ (2603:10b6:408:1b6::9)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5mvX9rgen9JsesaT+CdBUJcbqcBesjc9jELT3pUNRKQc7g@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3PR11MB8603:EE_|SJ1PR11MB6107:EE_
+X-MS-Office365-Filtering-Correlation-Id: ab64e836-ba46-4990-bae2-08ddf8f36340
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?j87uuGhxwJK9wXF+TSVpzfEST90GYB9Q821zu07WU/Obrjzwqdnm7bjqkJQw?=
+ =?us-ascii?Q?jIMoGnbUPgYx95P5hKTewQMMR8odUCIQ21v/za0fIs8lOKLK1gMkhCsKIf6c?=
+ =?us-ascii?Q?NFRKYDv/vTsSPeYMVq9WVxxUKIHWHV0m/gCF4UZsIkXkItBwqBUJbjbh2GNH?=
+ =?us-ascii?Q?m0o9AuBG+btkT+Z8cR1LeUG9306TklLARoHQuAWmhBVgAY9TACKLbCu7e80P?=
+ =?us-ascii?Q?J7VX3DGrYuDG/ZKspDiSgX1Fh17CvjIqc2ohekrTPKclL/6sBDMQjxscKkPZ?=
+ =?us-ascii?Q?RW24VGCH4USrkZAEf6dlsxDKHYVMGiGMmDPimTAtySzKpV8DC6hpvC9xT0Cx?=
+ =?us-ascii?Q?FBnh/OCdLtdvtvRTynkPUV8/HcRlZ6cUvpWr5Uw2+VuuUc6cOweisVzFvkUF?=
+ =?us-ascii?Q?NNJ1U2jwINGxpCbner6Dd8QtR6r1Wav9ACbbkFNn1w/repabC54ejLR5wfVs?=
+ =?us-ascii?Q?+3syYBLEQDqN3YTuuvtOs7MA0F7h5NT5pwZmlWcKgWWQIbmJPjgpFpCIHyaM?=
+ =?us-ascii?Q?WRGBYLpOHqsXs0yzkK2X5kgJXG/QGweWk5sVIDKJ8Vqc6TIPK2PqzpKQiEt4?=
+ =?us-ascii?Q?lgx4NUYvpe2L6kCmkdCN9TT21848lQCHRfPlmZ4gTH/VLJZc6RxBgg7RlVch?=
+ =?us-ascii?Q?R02FHuOi4epYxTPeGWhQmFC4A0azJbi6JI50NSJBf25se+h4MsROlsiaQ3tD?=
+ =?us-ascii?Q?XG8Qv1SavisgLYo7ceiTtUOlxN6k5rSJ1GuHAojKF8wQcPG+RD5G52O3X7xa?=
+ =?us-ascii?Q?Vf6mp4f6+QkmzXPeDdlJ55GYyxjog03OzzP+aFKSiH6X3Uu2e6Lnyv41z3ji?=
+ =?us-ascii?Q?jAb9AIVhsHnag7F47XWiXVEdHok7XwmH7wc5q9+eLSqr7EOHs1aJj+Yqibqm?=
+ =?us-ascii?Q?49Rk3Ep8p3A5UcMyLkbz3okCZ3UmAlGTau/PYTYRUwzDN2giBNWTy2yh0cn0?=
+ =?us-ascii?Q?RKz6FIIMCW7bWr0WrCDGo6alJymPNiPcKE738D4XwQVsxWYTe4w5OuDVEK+N?=
+ =?us-ascii?Q?XHb0y99rhEckNIT4xzAB9zaavzN+dSB7SCi5qhBfvg9jvjLD2IoHblG4DabX?=
+ =?us-ascii?Q?mwpXBWs38fnVil7VKwLLeHb4+57MgtcNks0BCY9GnbG1JVELbUdL0Di/RsHl?=
+ =?us-ascii?Q?IoYWUnw4dWmzIgUYVaI/zUrgaS1c0ux71y2ezlcmTOWuBDi7OHiJ4u4f7e+r?=
+ =?us-ascii?Q?EYbhkd7x2UowIkPr+e2be17mL954Y1Oi7or6vVqBK0lPZ28bJLFlNYNmP96k?=
+ =?us-ascii?Q?7nnS1ZHi4htxMRgnd/qKwp9HdShbsjflhpSUB9rWixBtZWlXmVqgrKOFUGIr?=
+ =?us-ascii?Q?mYTwykHgmSH8F2pqGHqwks7kNJHILnHa6F51CYgYJ324LnZNSiwycr2MvI4g?=
+ =?us-ascii?Q?YrRPbAZIQlKfvVvmmiuNxdIynZob?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8603.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZfydYbg3H8gz/zMJ1aDd6WTU9MdPi/a5P5QOPIULZRiUYbk6lVpQqyROqWKR?=
+ =?us-ascii?Q?cfVQoeje2RPKNL+0rGzRiqawu/gVKOE4/9XGP/fed7vavxSOoXvujELnnpym?=
+ =?us-ascii?Q?8PyUvyZ7z7of6ZP4gAeh/ye0uflF2Li2QZOSHZtzSPFaVNbkdZ5XB1dP7564?=
+ =?us-ascii?Q?5pViNUphprfB6eXKtQ+e0xp4lNQ2WzbOu4j1jpIKQ2Sths7GDR+RPZ04ixeG?=
+ =?us-ascii?Q?DLesgFi0yOV/XaUKfDR5vchnmrotfJGo5lY3AyWKHMRijJmmyqCJwcA6gZJb?=
+ =?us-ascii?Q?wXauO4zX6EqpRFs76YRhbOnLEnTpZqTP/YG7fMOZIifWDgZpkkqBaWXlq3DC?=
+ =?us-ascii?Q?yNlU5gWLhV2PQWMar4BnHQ0t3vBBPHoWLOfntBfJqaRUrvX3gCKa8t2uxKn5?=
+ =?us-ascii?Q?CLPTEU1QELsDp8fOS1j5WtBkjxej6w6pmZ6UMotc+qc9AeqAUQ29lmtwT/JQ?=
+ =?us-ascii?Q?y4Bg0HlClVv5oyxjxnsJLRFuccXMkM18QKkz60aWG6C0tqmYi4iSiIpRV1oh?=
+ =?us-ascii?Q?FISnP22B19FyUA8lrj3eLvwiml01g3OWFhTlv1m3aPxiAaYRJUinXJFhy1YK?=
+ =?us-ascii?Q?lTXTXKKBO8lX829uZVhIchQfSMaRike0vsF2czxa3SC7O37wAMfTBXgvHcvu?=
+ =?us-ascii?Q?GNNcuK3V2CBAmYre+xwgTk3precri86FrNV5oHjS9NJQPzWsqmhm/EvyRYMH?=
+ =?us-ascii?Q?08Jjel8QzRKqb9alWHLfA8eivBNq+tKDF6cJwUvseb5IN8yBaqku2zNKMeND?=
+ =?us-ascii?Q?0L5OmKVlGhOflBNRN5Wnw6RpzVSfcRqHR1e0JKRFVTCEmHRf4kxlrEHQ1tkC?=
+ =?us-ascii?Q?tdwgfXXjSy2zSXu75JXj/Qcr/8HJ8SeORRAtcm6zipAz4ONSfsAAgAkyuiu8?=
+ =?us-ascii?Q?usAFRaojkHPMBGfzIWMPtflGKI6qYQOlt3S+Jw3/tKM/RE46atTbUVj3rQCG?=
+ =?us-ascii?Q?RWvTzYDACVpSqW+RwHxTGnRbkUDTowvfu5fa80nqHzfGzN7NhhGE8dVJxBlX?=
+ =?us-ascii?Q?1ictL3yL+V6XvtTUWIKNFXPkytiynNQOQrd1X8IHLPhPsjhVizpyVybJ/cpQ?=
+ =?us-ascii?Q?hGwaLoGgn2iUm8dwgn1TawnAFVfSrRuEf0ZPp0urDv2rTKW9RcUdchUiYi6f?=
+ =?us-ascii?Q?ckNBh0+X9iObkd7E+arnlrImndIOGuIv+ieWQz/jgllc+Zv9QKaoHNODJL0R?=
+ =?us-ascii?Q?P9LAhHZCupBxPsZQBikUY+aUJXJtDTj+PEXXwXLvCDIddRj7amo1e7QHPR6B?=
+ =?us-ascii?Q?j3o9VoVvIsOo3oVGwCdqGmq1p06aYSHw7TD76lLJMvBH/8R5aUaWVPbTxD+x?=
+ =?us-ascii?Q?pHAN//oWmpKT22Y7bmXkCWWXFNH8pDczuY896VSQcGAbL6OiyAyrhP2hj7th?=
+ =?us-ascii?Q?ErCd8noN50A8XgMERVKd3unC+mHNq9m3x385W5Z1STI11TFWbH7dNe1Swlof?=
+ =?us-ascii?Q?l9muDQGs/QmT6j6xq3Q9HwqSxrv48B3NgWf8WcCFEJDFnhIQDOr5UDQH67G8?=
+ =?us-ascii?Q?6Xh9eMtrYE40NZISJ14ko84mI6s2SnUrawwy9/eh71ebtu9DvKfFLsfIty/U?=
+ =?us-ascii?Q?7mQADjyUwGydaxm6n2zH+2/GMTY99AWqCjCi8LiMXEwKtb0V1YHuv3PRMDcj?=
+ =?us-ascii?Q?sA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab64e836-ba46-4990-bae2-08ddf8f36340
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8603.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2025 09:43:58.4864
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: auoV7AcMdK4NAm74Zn3SGryEW8EPJe7IYFS6dgGuKvmCjCl8TMntqPEaWf8QiguU1PqC9g8Ww+BsVnIdF8M09w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6107
+X-OriginatorOrg: intel.com
 
-See email "[PATCH 00/35]". I already wrote there 5 different simple test
-scenarios which shows what is wrong and how the scenarios are fixed and
-changed after this patch series. Direct email link to archive:
-https://lore.kernel.org/linux-cifs/20250831123602.14037-1-pali@kernel.org/
-Also in followup email I sent pcaps which Stefan Metzmacher asked from me.
-In case there is missing in those scenarios, please let me know, I could
-try to extend or provide more information. I do not have xfstests, I'm
-not very familiar with it.
 
-On Saturday 20 September 2025 12:56:07 Steve French wrote:
-> > "We can use tricks like marking file as hidden and silly rename to make
-> them less visible" --> This is exactly what is the whole patch series is
-> doing.
-> 
-> It wasn't at all clear looking at the 35 patches ... which fix
-> rename/delete cases for current (smb3.1.1) mounts on current mainline.
-> Would be helpful if a few simple test examples to show examples of
-> where current mainline fails to Windows or Samba or ksmbd or Azure
-> etc.   Even better is if you could show which xfstests that it fixes
-> that break with current mainline
-> 
-> On Sat, Sep 20, 2025 at 12:51 PM Pali Rohár <pali@kernel.org> wrote:
-> >
-> > "We can use tricks like marking file as hidden and silly rename to make
-> > them less visible" --> This is exactly what is the whole patch series is
-> > doing.
-> >
-> > On Saturday 20 September 2025 12:40:14 Steve French wrote:
-> > > We can use tricks like marking file as hidden and silly rename to make
-> > > them less visible - but focus on the closest we can get to expected
-> > > Linux behavior
-> > >
-> > > On Sat, Sep 20, 2025 at 12:39 PM Steve French <smfrench@gmail.com> wrote:
-> > > >
-> > > > As long as we don't break any Linux apps - we need to return file not
-> > > > found or equivalent when a file is in delete pending in every path
-> > > > that we can (if we have some places that incorrectly show the file,
-> > > > the better solution is to hide it there, not to break more Linux apps
-> > > > by showing a file which has been deleted/silly-renamed
-> > > >
-> > > > On Sat, Sep 20, 2025 at 12:36 PM Pali Rohár <pali@kernel.org> wrote:
-> > > > >
-> > > > > The point is that the directory entry is not deleted yet. It is present
-> > > > > in the readdir() output. For Linux apps the file not found should be
-> > > > > returned when the directory entry disappear (from readdir()). I wrote
-> > > > > few test scenarios in cover letter of the patch series, which covers
-> > > > > this.
-> > > > >
-> > > > > On Saturday 20 September 2025 12:14:00 Steve French wrote:
-> > > > > > This looks confusing, like it is wrong for Linux apps - when Linux
-> > > > > > queries a file that is deleted (but still open by some other process)
-> > > > > > it should get the equivalent of file not found or at least an error -
-> > > > > > you aren't supposed to allow path based calls on a file which has a
-> > > > > > pending delete or that would break Linux apps.
-> > > > > >
-> > > > > > On Sun, Aug 31, 2025 at 7:36 AM Pali Rohár <pali@kernel.org> wrote:
-> > > > > > >
-> > > > > > > Paths in DELETE_PENDING state cannot be opened at all. So standard way of
-> > > > > > > querying path attributes for this case is not possible.
-> > > > > > >
-> > > > > > > There is an alternative way how to query limited information about file
-> > > > > > > over SMB2+ dialects without opening file itself. It is by opening the
-> > > > > > > parent directory, querying specific child with filled search filter and
-> > > > > > > asking for attributes for that child.
-> > > > > > >
-> > > > > > > Implement this fallback when standard case in smb2_query_path_info fails
-> > > > > > > with STATUS_DELETE_PENDING error and stat was asked for path which is not
-> > > > > > > top level one (because top level does not have parent directory at all).
-> > > > > > >
-> > > > > > > Depends on "cifs: Change translation of STATUS_DELETE_PENDING to -EBUSY".
-> > > > > > >
-> > > > > > > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > > > > > > ---
-> > > > > > >  fs/smb/client/cifsglob.h  |   1 +
-> > > > > > >  fs/smb/client/smb2glob.h  |   1 +
-> > > > > > >  fs/smb/client/smb2inode.c | 177 +++++++++++++++++++++++++++++++++++++-
-> > > > > > >  3 files changed, 176 insertions(+), 3 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> > > > > > > index e6830ab3a546..0ecf4988664e 100644
-> > > > > > > --- a/fs/smb/client/cifsglob.h
-> > > > > > > +++ b/fs/smb/client/cifsglob.h
-> > > > > > > @@ -2337,6 +2337,7 @@ struct smb2_compound_vars {
-> > > > > > >         struct smb_rqst rqst[MAX_COMPOUND];
-> > > > > > >         struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
-> > > > > > >         struct kvec qi_iov;
-> > > > > > > +       struct kvec qd_iov[SMB2_QUERY_DIRECTORY_IOV_SIZE];
-> > > > > > >         struct kvec io_iov[SMB2_IOCTL_IOV_SIZE];
-> > > > > > >         struct kvec si_iov[SMB2_SET_INFO_IOV_SIZE];
-> > > > > > >         struct kvec close_iov;
-> > > > > > > diff --git a/fs/smb/client/smb2glob.h b/fs/smb/client/smb2glob.h
-> > > > > > > index 224495322a05..1cb219605e75 100644
-> > > > > > > --- a/fs/smb/client/smb2glob.h
-> > > > > > > +++ b/fs/smb/client/smb2glob.h
-> > > > > > > @@ -39,6 +39,7 @@ enum smb2_compound_ops {
-> > > > > > >         SMB2_OP_GET_REPARSE,
-> > > > > > >         SMB2_OP_QUERY_WSL_EA,
-> > > > > > >         SMB2_OP_OPEN_QUERY,
-> > > > > > > +       SMB2_OP_QUERY_DIRECTORY,
-> > > > > > >  };
-> > > > > > >
-> > > > > > >  /* Used when constructing chained read requests. */
-> > > > > > > diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-> > > > > > > index 2a0316c514e4..460e75614ef1 100644
-> > > > > > > --- a/fs/smb/client/smb2inode.c
-> > > > > > > +++ b/fs/smb/client/smb2inode.c
-> > > > > > > @@ -176,6 +176,9 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
-> > > > > > >                             struct kvec *out_iov, int *out_buftype, struct dentry *dentry)
-> > > > > > >  {
-> > > > > > >
-> > > > > > > +       bool has_cifs_mount_server_inum = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM;
-> > > > > > > +       struct smb2_query_directory_req *qd_rqst = NULL;
-> > > > > > > +       struct smb2_query_directory_rsp *qd_rsp = NULL;
-> > > > > > >         struct smb2_create_rsp *create_rsp = NULL;
-> > > > > > >         struct smb2_query_info_rsp *qi_rsp = NULL;
-> > > > > > >         struct smb2_compound_vars *vars = NULL;
-> > > > > > > @@ -344,6 +347,41 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
-> > > > > > >                         trace_smb3_posix_query_info_compound_enter(xid, tcon->tid,
-> > > > > > >                                                                    ses->Suid, full_path);
-> > > > > > >                         break;
-> > > > > > > +               case SMB2_OP_QUERY_DIRECTORY:
-> > > > > > > +                       rqst[num_rqst].rq_iov = &vars->qd_iov[0];
-> > > > > > > +                       rqst[num_rqst].rq_nvec = SMB2_QUERY_DIRECTORY_IOV_SIZE;
-> > > > > > > +
-> > > > > > > +                       rc = SMB2_query_directory_init(xid,
-> > > > > > > +                                                      tcon,
-> > > > > > > +                                                      server,
-> > > > > > > +                                                      &rqst[num_rqst],
-> > > > > > > +                                                      cfile ?
-> > > > > > > +                                                       cfile->fid.persistent_fid : COMPOUND_FID,
-> > > > > > > +                                                      cfile ?
-> > > > > > > +                                                       cfile->fid.volatile_fid : COMPOUND_FID,
-> > > > > > > +                                                      0,
-> > > > > > > +                                                      has_cifs_mount_server_inum ?
-> > > > > > > +                                                       SMB_FIND_FILE_ID_FULL_DIR_INFO :
-> > > > > > > +                                                       SMB_FIND_FILE_FULL_DIRECTORY_INFO);
-> > > > > > > +                       if (!rc) {
-> > > > > > > +                               /*
-> > > > > > > +                                * Change the default search wildcard pattern '*'
-> > > > > > > +                                * to the requested file name stored in in_iov[i]
-> > > > > > > +                                * and request for only one single entry.
-> > > > > > > +                                */
-> > > > > > > +                               qd_rqst = rqst[num_rqst].rq_iov[0].iov_base;
-> > > > > > > +                               qd_rqst->Flags |= SMB2_RETURN_SINGLE_ENTRY;
-> > > > > > > +                               qd_rqst->FileNameLength = cpu_to_le16(in_iov[i].iov_len);
-> > > > > > > +                               rqst[num_rqst].rq_iov[1] = in_iov[i];
-> > > > > > > +                       }
-> > > > > > > +                       if (!rc && (!cfile || num_rqst > 1)) {
-> > > > > > > +                               smb2_set_next_command(tcon, &rqst[num_rqst]);
-> > > > > > > +                               smb2_set_related(&rqst[num_rqst]);
-> > > > > > > +                       } else if (rc) {
-> > > > > > > +                               goto finished;
-> > > > > > > +                       }
-> > > > > > > +                       num_rqst++;
-> > > > > > > +                       break;
-> > > > > > >                 case SMB2_OP_DELETE:
-> > > > > > >                         trace_smb3_delete_enter(xid, tcon->tid, ses->Suid, full_path);
-> > > > > > >                         break;
-> > > > > > > @@ -730,6 +768,64 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
-> > > > > > >                                 trace_smb3_posix_query_info_compound_done(xid, tcon->tid,
-> > > > > > >                                                                           ses->Suid);
-> > > > > > >                         break;
-> > > > > > > +               case SMB2_OP_QUERY_DIRECTORY:
-> > > > > > > +                       if (rc == 0) {
-> > > > > > > +                               qd_rsp = (struct smb2_query_directory_rsp *)
-> > > > > > > +                                       rsp_iov[i + 1].iov_base;
-> > > > > > > +                               rc = smb2_validate_iov(le16_to_cpu(qd_rsp->OutputBufferOffset),
-> > > > > > > +                                                      le32_to_cpu(qd_rsp->OutputBufferLength),
-> > > > > > > +                                                      &rsp_iov[i + 1],
-> > > > > > > +                                                      has_cifs_mount_server_inum ?
-> > > > > > > +                                                       sizeof(SEARCH_ID_FULL_DIR_INFO) :
-> > > > > > > +                                                       sizeof(FILE_FULL_DIRECTORY_INFO));
-> > > > > > > +                       }
-> > > > > > > +                       if (rc == 0) {
-> > > > > > > +                               /*
-> > > > > > > +                                * Both SEARCH_ID_FULL_DIR_INFO and FILE_FULL_DIRECTORY_INFO
-> > > > > > > +                                * have same member offsets except the UniqueId and FileName.
-> > > > > > > +                                */
-> > > > > > > +                               SEARCH_ID_FULL_DIR_INFO *si =
-> > > > > > > +                                       (SEARCH_ID_FULL_DIR_INFO *)qd_rsp->Buffer;
-> > > > > > > +
-> > > > > > > +                               idata = in_iov[i + 1].iov_base;
-> > > > > > > +                               idata->fi.CreationTime = si->CreationTime;
-> > > > > > > +                               idata->fi.LastAccessTime = si->LastAccessTime;
-> > > > > > > +                               idata->fi.LastWriteTime = si->LastWriteTime;
-> > > > > > > +                               idata->fi.ChangeTime = si->ChangeTime;
-> > > > > > > +                               idata->fi.Attributes = si->ExtFileAttributes;
-> > > > > > > +                               idata->fi.AllocationSize = si->AllocationSize;
-> > > > > > > +                               idata->fi.EndOfFile = si->EndOfFile;
-> > > > > > > +                               idata->fi.EASize = si->EaSize;
-> > > > > > > +                               idata->fi.Directory =
-> > > > > > > +                                       !!(le32_to_cpu(si->ExtFileAttributes) & ATTR_DIRECTORY);
-> > > > > > > +                               /*
-> > > > > > > +                                * UniqueId is present only in struct SEARCH_ID_FULL_DIR_INFO.
-> > > > > > > +                                * It is not present in struct FILE_FULL_DIRECTORY_INFO.
-> > > > > > > +                                * struct SEARCH_ID_FULL_DIR_INFO was requested only when
-> > > > > > > +                                * CIFS_MOUNT_SERVER_INUM is set.
-> > > > > > > +                                */
-> > > > > > > +                               if (has_cifs_mount_server_inum)
-> > > > > > > +                                       idata->fi.IndexNumber = si->UniqueId;
-> > > > > > > +                               /*
-> > > > > > > +                                * Do not change idata->fi.NumberOfLinks to correctly
-> > > > > > > +                                * trigger the CIFS_FATTR_UNKNOWN_NLINK flag.
-> > > > > > > +                                */
-> > > > > > > +                               /*
-> > > > > > > +                                * Do not change idata->fi.DeletePending as we do not know if
-> > > > > > > +                                * the entry is in the delete pending state. SMB2 QUERY_DIRECTORY
-> > > > > > > +                                * at any level does not provide this information.
-> > > > > > > +                                */
-> > > > > > > +                       }
-> > > > > > > +                       SMB2_query_directory_free(&rqst[num_rqst++]);
-> > > > > > > +                       if (rc)
-> > > > > > > +                               trace_smb3_query_dir_err(xid,
-> > > > > > > +                                       cfile ? cfile->fid.persistent_fid : COMPOUND_FID,
-> > > > > > > +                                       tcon->tid, ses->Suid, 0, 0, rc);
-> > > > > > > +                       else
-> > > > > > > +                               trace_smb3_query_dir_done(xid,
-> > > > > > > +                                       cfile ? cfile->fid.persistent_fid : COMPOUND_FID,
-> > > > > > > +                                       tcon->tid, ses->Suid, 0, 0);
-> > > > > > > +                       break;
-> > > > > > >                 case SMB2_OP_DELETE:
-> > > > > > >                         if (rc)
-> > > > > > >                                 trace_smb3_delete_err(xid, tcon->tid, ses->Suid, rc);
-> > > > > > > @@ -1090,9 +1186,9 @@ int smb2_query_path_info(const unsigned int xid,
-> > > > > > >                 break;
-> > > > > > >         case -EREMOTE:
-> > > > > > >                 break;
-> > > > > > > -       default:
-> > > > > > > -               if (hdr->Status != STATUS_OBJECT_NAME_INVALID)
-> > > > > > > -                       break;
-> > > > > > > +       }
-> > > > > > > +
-> > > > > > > +       if (hdr->Status == STATUS_OBJECT_NAME_INVALID) {
-> > > > > > >                 rc2 = cifs_inval_name_dfs_link_error(xid, tcon, cifs_sb,
-> > > > > > >                                                      full_path, &islink);
-> > > > > > >                 if (rc2) {
-> > > > > > > @@ -1101,6 +1197,81 @@ int smb2_query_path_info(const unsigned int xid,
-> > > > > > >                 }
-> > > > > > >                 if (islink)
-> > > > > > >                         rc = -EREMOTE;
-> > > > > > > +       } else if (hdr->Status == STATUS_DELETE_PENDING && full_path[0]) {
-> > > > > > > +               /*
-> > > > > > > +                * If SMB2 OPEN/CREATE fails with STATUS_DELETE_PENDING error,
-> > > > > > > +                * it means that the path is in delete pending state and it is
-> > > > > > > +                * not possible to open it until some other client clears delete
-> > > > > > > +                * pending state or all other clients close all opened handles
-> > > > > > > +                * to that path.
-> > > > > > > +                *
-> > > > > > > +                * There is an alternative way how to query limited information
-> > > > > > > +                * about path which is in delete pending state still suitable
-> > > > > > > +                * for the stat() syscall. It is by opening the parent directory,
-> > > > > > > +                * querying specific child with filled search filer and asking
-> > > > > > > +                * for attributes for that child.
-> > > > > > > +                */
-> > > > > > > +
-> > > > > > > +               char *parent_path;
-> > > > > > > +               const char *basename;
-> > > > > > > +               __le16 *basename_utf16;
-> > > > > > > +               int basename_utf16_len;
-> > > > > > > +               struct cifsFileInfo *parent_cfile;
-> > > > > > > +
-> > > > > > > +               basename = strrchr(full_path, CIFS_DIR_SEP(cifs_sb));
-> > > > > > > +               if (basename) {
-> > > > > > > +                       parent_path = kstrndup(full_path, basename - full_path, GFP_KERNEL);
-> > > > > > > +                       basename++;
-> > > > > > > +               } else {
-> > > > > > > +                       parent_path = kstrdup("", GFP_KERNEL);
-> > > > > > > +                       basename = full_path;
-> > > > > > > +               }
-> > > > > > > +
-> > > > > > > +               if (!parent_path) {
-> > > > > > > +                       rc = -ENOMEM;
-> > > > > > > +                       goto out;
-> > > > > > > +               }
-> > > > > > > +
-> > > > > > > +               basename_utf16 = cifs_convert_path_to_utf16(basename, cifs_sb);
-> > > > > > > +               if (!basename_utf16) {
-> > > > > > > +                       kfree(parent_path);
-> > > > > > > +                       rc = -ENOMEM;
-> > > > > > > +                       goto out;
-> > > > > > > +               }
-> > > > > > > +
-> > > > > > > +               basename_utf16_len = 2 * UniStrnlen((wchar_t *)basename_utf16, PATH_MAX);
-> > > > > > > +
-> > > > > > > +retry_query_directory:
-> > > > > > > +               num_cmds = 1;
-> > > > > > > +               cmds[0] = SMB2_OP_QUERY_DIRECTORY;
-> > > > > > > +               in_iov[0].iov_base = basename_utf16;
-> > > > > > > +               in_iov[0].iov_len = basename_utf16_len;
-> > > > > > > +               in_iov[1].iov_base = data;
-> > > > > > > +               in_iov[1].iov_len = sizeof(*data);
-> > > > > > > +               oparms = CIFS_OPARMS(cifs_sb, tcon, parent_path, FILE_READ_DATA,
-> > > > > > > +                                    FILE_OPEN, CREATE_NOT_FILE, ACL_NO_MODE);
-> > > > > > > +               cifs_get_readable_path(tcon, parent_path, &parent_cfile);
-> > > > > > > +               free_rsp_iov(out_iov, out_buftype, ARRAY_SIZE(out_iov));
-> > > > > > > +               rc = smb2_compound_op(xid, tcon, cifs_sb, parent_path,
-> > > > > > > +                                     &oparms, in_iov, cmds, num_cmds,
-> > > > > > > +                                     parent_cfile, out_iov, out_buftype, NULL);
-> > > > > > > +               if (rc == -EOPNOTSUPP && (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
-> > > > > > > +                       /*
-> > > > > > > +                        * If querying of server inode numbers is not supported
-> > > > > > > +                        * but is enabled, then disable it and try again.
-> > > > > > > +                        */
-> > > > > > > +                       cifs_autodisable_serverino(cifs_sb);
-> > > > > > > +                       goto retry_query_directory;
-> > > > > > > +               }
-> > > > > > > +
-> > > > > > > +               kfree(parent_path);
-> > > > > > > +               kfree(basename_utf16);
-> > > > > > > +
-> > > > > > > +               hdr = out_iov[0].iov_base;
-> > > > > > > +               if (!hdr || out_buftype[0] == CIFS_NO_BUFFER)
-> > > > > > > +                       goto out;
-> > > > > > > +
-> > > > > > > +               data->fi.DeletePending = 1; /* This is code path for STATUS_DELETE_PENDING. */
-> > > > > > >         }
-> > > > > > >
-> > > > > > >  out:
-> > > > > > > --
-> > > > > > > 2.20.1
-> > > > > > >
-> > > > > > >
-> > > > > >
-> > > > > >
-> > > > > > --
-> > > > > > Thanks,
-> > > > > >
-> > > > > > Steve
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > Thanks,
-> > > >
-> > > > Steve
-> > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
-> 
-> 
-> 
-> -- 
-> Thanks,
-> 
-> Steve
+
+Hello,
+
+kernel test robot noticed "BUG:unable_to_handle_page_fault_for_address" on:
+
+commit: 747e356babd8bdd569320c29916470345afd3cf7 ("[PATCH v3 5/6] VFS: rename kern_path_locked() and related functions.")
+url: https://github.com/intel-lab-lkp/linux/commits/NeilBrown/VFS-ovl-add-lookup_one_positive_killable/20250915-101929
+base: https://git.kernel.org/cgit/linux/kernel/git/vfs/vfs.git vfs.all
+patch link: https://lore.kernel.org/all/20250915021504.2632889-6-neilb@ownmail.net/
+patch subject: [PATCH v3 5/6] VFS: rename kern_path_locked() and related functions.
+
+in testcase: boot
+
+config: i386-randconfig-2006-20250825
+compiler: gcc-14
+test machine: qemu-system-i386 -enable-kvm -cpu SandyBridge -smp 2 -m 4G
+
+(please refer to attached dmesg/kmsg for entire log/backtrace)
+
+
++---------------------------------------------+------------+------------+
+|                                             | 1c87fa0646 | 747e356bab |
++---------------------------------------------+------------+------------+
+| boot_successes                              | 24         | 0          |
+| boot_failures                               | 0          | 24         |
+| BUG:unable_to_handle_page_fault_for_address | 0          | 24         |
+| Oops:Oops:#[##]                             | 0          | 24         |
+| EIP:mnt_want_write                          | 0          | 24         |
+| Kernel_panic-not_syncing:Fatal_exception    | 0          | 24         |
++---------------------------------------------+------------+------------+
+
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <oliver.sang@intel.com>
+| Closes: https://lore.kernel.org/oe-lkp/202509211121.ebd9f4b0-lkp@intel.com
+
+
+[   12.277015][   T18] BUG: unable to handle page fault for address: fefeff02
+[   12.278063][   T18] #PF: supervisor read access in kernel mode
+[   12.278982][   T18] #PF: error_code(0x0000) - not-present page
+[   12.279886][   T18] *pde = 00000000
+[   12.280491][   T18] Oops: Oops: 0000 [#1]
+[   12.281158][   T18] CPU: 0 UID: 0 PID: 18 Comm: kdevtmpfs Not tainted 6.17.0-rc3-00100-g747e356babd8 #1 PREEMPT(full)  97a7d9f1f9975edf00ea02f43ed800cec17522a0
+[   12.283292][   T18] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[ 12.283887][ T18] EIP: mnt_want_write (include/linux/fs.h:1908 include/linux/fs.h:2044 fs/namespace.c:566) 
+[ 12.283887][ T18] Code: 74 26 00 55 83 e8 30 89 e5 e8 b0 ff ff ff 5d c3 2e 8d b4 26 00 00 00 00 8d b6 00 00 00 00 3e 8d 74 26 00 55 89 e5 56 53 89 c3 <8b> 40 04 05 d8 01 00 00 e8 67 f5 ff ff 89 d8 e8 90 e6 ff ff 89 c6
+All code
+========
+   0:	74 26                	je     0x28
+   2:	00 55 83             	add    %dl,-0x7d(%rbp)
+   5:	e8 30 89 e5 e8       	call   0xffffffffe8e5893a
+   a:	b0 ff                	mov    $0xff,%al
+   c:	ff                   	(bad)
+   d:	ff 5d c3             	lcall  *-0x3d(%rbp)
+  10:	2e 8d b4 26 00 00 00 	cs lea 0x0(%rsi,%riz,1),%esi
+  17:	00 
+  18:	8d b6 00 00 00 00    	lea    0x0(%rsi),%esi
+  1e:	3e 8d 74 26 00       	ds lea 0x0(%rsi,%riz,1),%esi
+  23:	55                   	push   %rbp
+  24:	89 e5                	mov    %esp,%ebp
+  26:	56                   	push   %rsi
+  27:	53                   	push   %rbx
+  28:	89 c3                	mov    %eax,%ebx
+  2a:*	8b 40 04             	mov    0x4(%rax),%eax		<-- trapping instruction
+  2d:	05 d8 01 00 00       	add    $0x1d8,%eax
+  32:	e8 67 f5 ff ff       	call   0xfffffffffffff59e
+  37:	89 d8                	mov    %ebx,%eax
+  39:	e8 90 e6 ff ff       	call   0xffffffffffffe6ce
+  3e:	89 c6                	mov    %eax,%esi
+
+Code starting with the faulting instruction
+===========================================
+   0:	8b 40 04             	mov    0x4(%rax),%eax
+   3:	05 d8 01 00 00       	add    $0x1d8,%eax
+   8:	e8 67 f5 ff ff       	call   0xfffffffffffff574
+   d:	89 d8                	mov    %ebx,%eax
+   f:	e8 90 e6 ff ff       	call   0xffffffffffffe6a4
+  14:	89 c6                	mov    %eax,%esi
+[   12.283887][   T18] EAX: fefefefe EBX: fefefefe ECX: c5923640 EDX: c58b9e28
+[   12.283887][   T18] ESI: c58b9f0c EDI: c54024e0 EBP: c58b9ea4 ESP: c58b9e9c
+[   12.283887][   T18] DS: 007b ES: 007b FS: 0000 GS: 0000 SS: 0068 EFLAGS: 00010246
+[   12.283887][   T18] CR0: 80050033 CR2: fefeff02 CR3: 04780000 CR4: 000406d0
+[   12.283887][   T18] Call Trace:
+[ 12.283887][ T18] __start_removing_path (include/linux/fs.h:1024 fs/namei.c:2784) 
+[ 12.283887][ T18] start_removing_path (fs/namei.c:2842) 
+[ 12.283887][ T18] devtmpfs_work_loop (drivers/base/devtmpfs.c:326 drivers/base/devtmpfs.c:387 drivers/base/devtmpfs.c:400) 
+[ 12.283887][ T18] devtmpfsd (drivers/base/devtmpfs.c:444) 
+[ 12.283887][ T18] kthread (kernel/kthread.c:465) 
+[ 12.283887][ T18] ? vclkdev_alloc (drivers/base/devtmpfs.c:436) 
+[ 12.283887][ T18] ? kthread_is_per_cpu (kernel/kthread.c:412) 
+[ 12.283887][ T18] ret_from_fork (arch/x86/kernel/process.c:154) 
+[ 12.283887][ T18] ? kthread_is_per_cpu (kernel/kthread.c:412) 
+[ 12.283887][ T18] ret_from_fork_asm (arch/x86/entry/entry_32.S:737) 
+[ 12.283887][ T18] entry_INT80_32 (arch/x86/entry/entry_32.S:945) 
+[   12.283887][   T18] Modules linked in:
+[   12.283887][   T18] CR2: 00000000fefeff02
+[   12.283887][   T18] ---[ end trace 0000000000000000 ]---
+[ 12.283887][ T18] EIP: mnt_want_write (include/linux/fs.h:1908 include/linux/fs.h:2044 fs/namespace.c:566) 
+[ 12.283887][ T18] Code: 74 26 00 55 83 e8 30 89 e5 e8 b0 ff ff ff 5d c3 2e 8d b4 26 00 00 00 00 8d b6 00 00 00 00 3e 8d 74 26 00 55 89 e5 56 53 89 c3 <8b> 40 04 05 d8 01 00 00 e8 67 f5 ff ff 89 d8 e8 90 e6 ff ff 89 c6
+All code
+========
+   0:	74 26                	je     0x28
+   2:	00 55 83             	add    %dl,-0x7d(%rbp)
+   5:	e8 30 89 e5 e8       	call   0xffffffffe8e5893a
+   a:	b0 ff                	mov    $0xff,%al
+   c:	ff                   	(bad)
+   d:	ff 5d c3             	lcall  *-0x3d(%rbp)
+  10:	2e 8d b4 26 00 00 00 	cs lea 0x0(%rsi,%riz,1),%esi
+  17:	00 
+  18:	8d b6 00 00 00 00    	lea    0x0(%rsi),%esi
+  1e:	3e 8d 74 26 00       	ds lea 0x0(%rsi,%riz,1),%esi
+  23:	55                   	push   %rbp
+  24:	89 e5                	mov    %esp,%ebp
+  26:	56                   	push   %rsi
+  27:	53                   	push   %rbx
+  28:	89 c3                	mov    %eax,%ebx
+  2a:*	8b 40 04             	mov    0x4(%rax),%eax		<-- trapping instruction
+  2d:	05 d8 01 00 00       	add    $0x1d8,%eax
+  32:	e8 67 f5 ff ff       	call   0xfffffffffffff59e
+  37:	89 d8                	mov    %ebx,%eax
+  39:	e8 90 e6 ff ff       	call   0xffffffffffffe6ce
+  3e:	89 c6                	mov    %eax,%esi
+
+Code starting with the faulting instruction
+===========================================
+   0:	8b 40 04             	mov    0x4(%rax),%eax
+   3:	05 d8 01 00 00       	add    $0x1d8,%eax
+   8:	e8 67 f5 ff ff       	call   0xfffffffffffff574
+   d:	89 d8                	mov    %ebx,%eax
+   f:	e8 90 e6 ff ff       	call   0xffffffffffffe6a4
+  14:	89 c6                	mov    %eax,%esi
+
+
+The kernel config and materials to reproduce are available at:
+https://download.01.org/0day-ci/archive/20250921/202509211121.ebd9f4b0-lkp@intel.com
+
+
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
