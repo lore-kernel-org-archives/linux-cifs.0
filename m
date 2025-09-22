@@ -1,193 +1,171 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11021105.outbound.protection.outlook.com [40.107.208.105])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB252E9743
-	for <linux-cifs@vger.kernel.org>; Mon, 22 Sep 2025 17:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758561494; cv=none; b=oeMmhUr/Idxu4/7P+UOU3ZHMfbaTuREwnwpZ/ST2zz4+ZJuRzJGC0QzClKkb/R+Coxhsmnoq7IJjv10DF6SN29XRenK5eVR//0B8tU2QCqJ+AQy4e9NU4AFcXEZ9vwbY2GbQspZglK/NnNZ7urf6hbXNGnLj5OB8J6Bue6rm6Tg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758561494; c=relaxed/simple;
-	bh=h23jT0lD1N06Ba7ngBAjZL3uKVwx/wGpZmwj/K5oFVU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZLEFSFMgfxG1jV8khCut06weCfxsmYwpjlhsnHVbABCtPDX9C0mrGyFBw/gpJVsJgldsfgoCEUkTRdE3E22LO8dRCUcCBNtIh7iV4BtSXc+G8Bewps2g1ibRZHYo31L1F80mELpbiB13FJh+zqQrH3mfMZ7FxeZ2dhnKk6vnzy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VfAULzj0; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VfAULzj0"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3f2ae6fadb4so2670397f8f.1
-        for <linux-cifs@vger.kernel.org>; Mon, 22 Sep 2025 10:18:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1758561490; x=1759166290; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y5wud1lSV0wbWVfXsBYPf/NNYAcPsEVVEIqquff6paA=;
-        b=VfAULzj0ECsYAQFEdLZEMJK4wlpDA7ZVSGGGwfBvJOeCOWWWpiFw3aFyZ6fEoJttmO
-         Q926gxlmjWqoUSj3ftUSriBdu5xXUISeNH6hPTalHf4RYeAVNd3STVG+rkC4gDv6s/K/
-         vq4A6S0Ji3uZ3Fa1zaPtl3m6v5ZTIE2PsGqBQdX8x4/gloFftklo6enUiaEVp29SZIIA
-         lxHgJ995SiAgqCW+PV9MyLwypeqGpRdMuSh79VJZVMiyk3WGhY7yTIlM2nXswKL57iMw
-         y18WI2ykUlNVEVwGX47XASCtPobvSYDHUtnEKkWajwKjreeIEI6C+4odFGOmITqkApkf
-         pdOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758561490; x=1759166290;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y5wud1lSV0wbWVfXsBYPf/NNYAcPsEVVEIqquff6paA=;
-        b=wG8ob0XV47+06kDcthKKsIvZhKjpgxRg4hMANZEX4ga2va4Aoh+x7E32tJ1A0RkCFv
-         l6RxBaVfAOvORAP9vGn4KLJ1cfN4kU9+mKCAi/g7mkA47v7SnMYxMhU6969qiJhox1jt
-         ABD0tIdShj73tRXr1sCHFKqcnUb2vJPk8q1vp922HohJo8bmxKllPa5CjumoY3SKUBxC
-         434v6i0nAySk3fAKB9LAAcUMaAMWnUMPgwETzLHyQG/dhS5Ogl/IMmZYIRzCEuoq3cnh
-         Ixwi9DcP3KPxxmuyziEySj8MZT0txlrPL+YYru9uAIFwooaB6Cscc8xeq1ICH475AX6P
-         2kVg==
-X-Forwarded-Encrypted: i=1; AJvYcCVkAk0y+SsD2/B1AdhBY3Earj3Aisyz68zi/zl8zC+IdIE7bTClQ71Yu1A15GajXs7rC0Z/vh3Quotr@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVNVSlkGD2ZNT2RI12d5ksYRO4C1R799y5anWOd3EciUQqCb1z
-	p6bwV43NyHHGqeMpqPr5aP/HSn/ajhVjIQYx1y4+tD2yeufILqFJddTIDCia1It6rnA=
-X-Gm-Gg: ASbGncusBLAX98+XvlEq4BKZ2K1XlWiskkylql2pVPBy7GaATXj3tWsuCpF/ZNKo9Ml
-	q7c29g0BAULCHLQfGykMmuy58i44CDrSVZ7pb6FJ3f26tH7+ksQQF6H1NBVaaNzyMCyNiQZUPgy
-	ajcX+nTQE7yvAmlJEU+p5wHUN5Z60m8kW+HbXZlCD+bqf7jWJR2fjawWDK/zTh38Z58vJFFGedf
-	U3yR7SVTHmkGPRdK48vMB1ix9WkZrYGiFwfdTHW0kyr5y6w32fP+pqJLsviMn2ORk9/Ue6GgeYS
-	t47woR8+YyuudqQ2CJIJP87vU0Pbt1mIIemacDd06YU9AaQKMGp9HTtZFVfJ7SzJ2vckhyknyGE
-	QlE+xWN9/wQV8D1UgwmahJ2cA+IVeYgSAw4iLpCVbcIpiJbcXU5XsbFWQ9JCk1vCxQLtFSl2kwy
-	PC8MxcbQ==
-X-Google-Smtp-Source: AGHT+IHO/UO2nNy8R+3qajssdW17mzOXAbqfr27EmoY4nf8f1wtEGz+MCivYp3KbUmmU18a/YxXG1w==
-X-Received: by 2002:a5d:5f95:0:b0:3ea:71c4:8e1b with SMTP id ffacd0b85a97d-3ee86d6cf37mr10443452f8f.63.1758561490119;
-        Mon, 22 Sep 2025 10:18:10 -0700 (PDT)
-Received: from ?IPV6:2804:18:10d:538:67e6:b01b:caa9:3531? ([2804:18:10d:538:67e6:b01b:caa9:3531])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77dbc8e7cc4sm11725498b3a.29.2025.09.22.10.18.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Sep 2025 10:18:08 -0700 (PDT)
-Message-ID: <75a60a40-a6fe-40f5-9d6a-aa9ff8cbfa3c@suse.com>
-Date: Mon, 22 Sep 2025 14:15:57 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CEA15853B
+	for <linux-cifs@vger.kernel.org>; Mon, 22 Sep 2025 18:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.105
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758565134; cv=fail; b=QReApmSaK3JYMn76c2kkyYDYnSJhz4A94EFtpHoSYVCkZD5YWL95XpGwZN9YaA4KVwbcFN6lv6vAo0ImcAzXMo8x9/BKbsFdbObSwJmXymHcK+Sw5dJDm6zPLNF9saPQq/dPOD/QeZuXQkd8CEPwVY9fAEaUZ8xAioodnaMSZks=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758565134; c=relaxed/simple;
+	bh=BTgWYsav8Ma/9fpCtPZcmMTKWgyZILt6UkgArPxFWuI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=pFNaCtv+6JCkxaR+dwekZ9qf7jb0gPpijSe9hubdJ8ns/DldUm9a8fgtk/i07HW0NLdq1cfl8x2NFYcIXvrnzOuWRkQJc+ek5Hbily0jXqfG/OUtUKGuZ1A9MASU7Msua24EgeSjrOPcaa1945KWtEDLtc5wH0VSYSMcv5IxVzU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com; spf=pass smtp.mailfrom=talpey.com; arc=fail smtp.client-ip=40.107.208.105
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rD60JRxV21Pwk0KAH20GXNYFAsLXjdfphM5LPCQPcGjDSVt7EumGd+yyqV4BhXPJ4jdHbLffL0nNpzjFTdDlSzjYiz88SnxHV+MzS52f8NYkskz59I+0ttz+xTiEeaXN4dVxZ+K5cm3aJdyAPzoJmScsLtBuXdY1S1uwZF2QFrNkOyfkoODf/WUuwd37a3lhq/bOJ7q76CgLKZnI6nJz1+8yjjoyGfOe2wVLvWGbKjee1ufvl9DaPlx5BlC4bVja77ifGQ98+3e1kjpFf9tE5ynBjteGvUyRVAIbvdnvydv75ZP6q74N1kOUJgRQMUtrR9IiqumJIr2lZs7tCP35AA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=h0HRWUCGOtTsdDP3D+8BmvXugLZVTUEm4LWfbtDRnwM=;
+ b=Juy/l4w5lcoiAYsr9VNfinoiT61eMezhhDrDhpkawhIxM6MBhXGJsygs0vFwW0FqwJJWltRkqQY1EyPcSrx09ehJRS45I4UODH2ieyV+syUZOhr0tY5Kp2T4mnSI7DoI5w7UanVt0f70d+UoN9gv9N3CTWaTyIvwK+Qv2RP7YFXdqXRlhNVc+3Y/5Iv8o2Wf7pWS3c0BkCatFsFCuqCGxmN9/BAx0iOcO+VPDCR6cTSvKF2rnhhFapH7g/IODwh/vFyceHJt0q1vdbsE/4Kz6BE880zehQFvCDyZ0YiZt4SzHhmAqSh9f4P3tCQrRtA2kt/HGNr/Eg62DXTDC67O0Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from DM6PR01MB6105.prod.exchangelabs.com (2603:10b6:5:1cc::20) by
+ SJ0PR01MB7313.prod.exchangelabs.com (2603:10b6:a03:3f3::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9115.23; Mon, 22 Sep 2025 18:18:50 +0000
+Received: from DM6PR01MB6105.prod.exchangelabs.com
+ ([fe80::4784:5106:9c3a:e608]) by DM6PR01MB6105.prod.exchangelabs.com
+ ([fe80::4784:5106:9c3a:e608%4]) with mapi id 15.20.9137.018; Mon, 22 Sep 2025
+ 18:18:50 +0000
+Message-ID: <5987d33c-f3dc-47a4-8ac9-befd689c0650@talpey.com>
+Date: Mon, 22 Sep 2025 14:18:47 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: smbdirect/RDMA patches for 6.18
+To: Steve French <smfrench@gmail.com>,
+ "Stefan (metze) Metzmacher" <metze@samba.org>
+Cc: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>,
+ CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>
+References: <CAH2r5mtPs4=gUB02r12MN29kwK57+qJ_ugAsN6=83_vhA5aDCA@mail.gmail.com>
+From: Tom Talpey <tom@talpey.com>
+Content-Language: en-US
+In-Reply-To: <CAH2r5mtPs4=gUB02r12MN29kwK57+qJ_ugAsN6=83_vhA5aDCA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL0PR0102CA0044.prod.exchangelabs.com
+ (2603:10b6:208:25::21) To DM6PR01MB6105.prod.exchangelabs.com
+ (2603:10b6:5:1cc::20)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] cifs: client: force multichannel=off when
- max_channels=1
-To: Steve French <smfrench@gmail.com>, Enzo Matsumiya <ematsumiya@suse.de>
-Cc: rajasimandalos@gmail.com, linux-cifs@vger.kernel.org, sfrench@samba.org,
- pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- tom@talpey.com, bharathsm@microsoft.com, linux-kernel@vger.kernel.org,
- Rajasi Mandal <rajasimandal@microsoft.com>
-References: <20250922082417.816331-1-rajasimandalos@gmail.com>
- <da3e2b5a-a5da-4526-9884-8789990ebf95@suse.com>
- <qmf3xwqq4hqj4issgci2g76eghytaqxihnrp236ithh2istkkf@n4s54vp3hblr>
- <CAH2r5mu9xUQz5e1Mf-dBCNh2_y2jnxPYMhmuHr1bVqKC6atd8w@mail.gmail.com>
-Content-Language: en-US
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-In-Reply-To: <CAH2r5mu9xUQz5e1Mf-dBCNh2_y2jnxPYMhmuHr1bVqKC6atd8w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR01MB6105:EE_|SJ0PR01MB7313:EE_
+X-MS-Office365-Filtering-Correlation-Id: 20267a4a-b16c-4da8-6e1b-08ddfa047a72
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bmh4dmZCUkRISkNJWit2eDRXZ3U0RERIV3dWZVdhVnVQcmVwWHRZbnRRVmN1?=
+ =?utf-8?B?eTZwSWhZaVhHSjE2ODQzd01IbVgyVVlYWnIweWVUL3crNjBEK1dHalU2SlRX?=
+ =?utf-8?B?NCtyN2tkbCszMU5RcWVlUTZDcHpyQ3ZLNjJmMktON0hvZnhRaFYxRTNmMHow?=
+ =?utf-8?B?aEVGOUlUNkpHWVhxd3MzUGNNSnJ3RU1KQm40UGlPMjhSeTFjNzJ5MkRQZ1J0?=
+ =?utf-8?B?VGROVlQ2ZVYrU2wyaHRyMFd3VG1WazRoNXVteVhNdm5qd3lGY0Erd2VHaWRr?=
+ =?utf-8?B?YTd5K095OHVMSW5BYzJrUkxFT2dabUQ0b1cvUkJna2Y2OW5BQzJkdUlZRUNq?=
+ =?utf-8?B?bitVZEJ0cXpSNDNCK1drMHFNUytHWTJ3d0I2NXFwamRBM0IyTXJVQkljU3Fm?=
+ =?utf-8?B?WHJWVWNaK3Q5UFBuNW0reW9Ram1wK2F0aVgyRjRRUkQxNER1blAySy9uNTNJ?=
+ =?utf-8?B?NXh3NlYxbW9SZGNhdU8wdlQrZmlYL0txM0J4VkcxOXpUUGhuUXNMSkVNMnQ5?=
+ =?utf-8?B?S0VxK1NHU3owamhJaFpuR0RxYTdCMHVKUkZmQUt5UlIrcXprTmlOelRQZ0ZB?=
+ =?utf-8?B?Si8xRGRkTUNYelpQNUJYN0Z1YU9WWEE2dVIzYXliazBRN2tORWRXSjRsdnFQ?=
+ =?utf-8?B?N2RjSjFhWUhXR1hFYlhKczZma0JCbjVOdWRVSmdjOVdVVFJBZUdiWjZWVC95?=
+ =?utf-8?B?Q1JEYno1UTFzZ25GWTRJSG56cWhaK203OEdjK1FWUm0rVEtMY0ZGeVRVZ2tQ?=
+ =?utf-8?B?Z3M2a0g1SzRGSGlPZjM1MGd4Q3JFWWxRenNvaHBYQWhja0xmUVN3TFVvOFZ6?=
+ =?utf-8?B?TkZKckRtTDZKUTFMdW9yUXh5aTJURFhrbUhPRW1vcXB0MmhibVdwUmtPSGRm?=
+ =?utf-8?B?M1BsZnZvZXZDMk1zN0lhQTBCMzR1dyt5SzBmd1JrU3U0ZVMrU2RvR2NNaFhm?=
+ =?utf-8?B?Q2o4UTQvVkdERnRRQ2dqWjdaajdZNk0vanJGVzFPdlIvRHpyS2dNNFk1WURz?=
+ =?utf-8?B?ZWw3cG5jd2NleElYeUloeThBWUhxdjBnUXgxQ2ZYcDNzY3FtUnBhcWl5dDVX?=
+ =?utf-8?B?OG1SMWl2dVIvc3BZOURUdmU1VjY2eUVsR2RVd1lSei9wVFh3SUJ2dGtMTjQ0?=
+ =?utf-8?B?Z25RbFNsdW1QcnJDc3VrTEI1ZVM2V05nK3laSFhFeFl6R3d1bXJ2emJ0M2kw?=
+ =?utf-8?B?eVFjQzcrekRUWm1LVWpUd3Z5Y29lWkpYc1kzNlRRNDk2WUF2QTR1elpRT3hV?=
+ =?utf-8?B?M05BU1pBYjJVbnFLd1JVWHVTOXRKeXVVbUNheHB1S0pWeGd5a2hQZUFPanMr?=
+ =?utf-8?B?Wk9RUTN3MHpNWWJ0TUtZM1RaelNYcm9VQlRoR0VkZ1JYVnRacDczNHpDTitY?=
+ =?utf-8?B?UmpOU3UyM0F4Q0hKblF4cG1HQmZPTm1Fem5jZWh0bkJVa3lxclUwWnZFRng3?=
+ =?utf-8?B?VVRvQVA0WkFRMXRZYXJhdW44US9DYzVraFdmUEVXWjhWU1plTkRsMlBVNWQ5?=
+ =?utf-8?B?aGZkMVdXUnlsaDdwdlpxdWdwTTk2SzFpWXYySkNQTi9GRHNJTVVsbnJ1aWlS?=
+ =?utf-8?B?SkRhMmFaS1VuUDcyRktjTSsrR2E4NHpHKzFoaWtQa1pNam41MitwVEhMdURG?=
+ =?utf-8?B?eHN2cUtQckVoejRFZHoydW8xZXpwYzE3WHE0YlE0WmdJa2IrRG5OUFRDRjEy?=
+ =?utf-8?B?T3RQUzRjZVlkV0lZSnhjQmlaNWFXQW9lcGRaM3RJdFhYMWlQMzA4VVo0ZWMx?=
+ =?utf-8?B?bEFBMjQ5MTRNL1k4U3Q5NVhsS2NUZVQzN01KVjhYOXZYU1FSMzBnRE5idHBn?=
+ =?utf-8?Q?FisdjO0MgSj3NnKTqSSDEPzb0jQHpaIAYlc2s=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR01MB6105.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MndkMmhPbDJOR3pHSE9BRHEzU1dlVkJZY0FDVGRBNGJRZGFBcTEwdFU5Vzkx?=
+ =?utf-8?B?cG5wWnRLZzV6TnNyZTVJR0hQdTF0WmdQbTZRZmoxd1dMZzB3UEZSQXRxUmRj?=
+ =?utf-8?B?WGNySlhKSXEyNnlBWXZQaGhkSXFIV2ZyeEQwOXVnYk9oWmxBMHZWTXVpTE9O?=
+ =?utf-8?B?SHRTeHliTzBYMDh3ZUs2L29DbEdna1VJVzZ1K3llbUo0eXRaNGxCOUlqQjZ0?=
+ =?utf-8?B?cjR3N0RZemROb3pxejhWSnREWEM5NTR1SnZiSGJZaXRrNlhBNnI3a2prdU9q?=
+ =?utf-8?B?RkJaMENsNXQwbytvdjd6WGIyb0svbHFDcGJ3RTRORHEyd1NBdGgyOU9aYUFS?=
+ =?utf-8?B?Z2hERTZZZG8ySFhWTUdUdTlSWEpkZTE5YUVVSzRLUE9yNHZscG9VT09qamZn?=
+ =?utf-8?B?Q0Q0SmRia3BmTTZvb1FWbEZSTnA2V0FMSm9kRjhldmhZR3BqeWFLY0FiaTMy?=
+ =?utf-8?B?QS9qMjk3SWtCb3BDZVErL1RvSDlZWXI2cWRhOG9nR0JRaE84NXRMbU9TNHVy?=
+ =?utf-8?B?TkJuSUkrc0Q4cHA3Q0l1VzhlWm1IYnlkdGVrMGV5ZjNDR25uc0d4YVNRMW84?=
+ =?utf-8?B?aXV0aEhERCtLYXBUajJSSnEvT0Z4NDZwQlZIN3hIQ1FzenZpWXpvUGNJck1m?=
+ =?utf-8?B?VmZUeGpYa0FvMUVvOUYrc2dsTnExa21ZY043UVIrRXIybGpIL1B3dHc2VlBB?=
+ =?utf-8?B?a0Fjd1JkckhFOXNHc2pHclJsam9LVHhhWHNuVXRkdTZqczRMM0JNK2Flc3FH?=
+ =?utf-8?B?OVZNMUdqeXd6UjlKNWZnVmVOM05JSEwyU1RvUmxmUk05WkRHZDlpV0w0YWR2?=
+ =?utf-8?B?REMrQnhSYzBKN1A4Qm15YXlCbFgyS3VxajNYK0t5bXdNOGJwWkZ2enhHZjdT?=
+ =?utf-8?B?SGNFaUUySEJhNENsWm1SYWpUVnNKUTM1dUtaa0NwZTZFSllXMjNYeDZCanRR?=
+ =?utf-8?B?Z2NMUzlXMzBjYVcvUzNUb1hsZDRGN25ZZitBWTBnMEdqTjZKd1B2VXpFTWln?=
+ =?utf-8?B?ZkpPbFRwekd2a0Y2VFdhekxFTmwzVXBOemJjc0t0T3hDdVpnZWViS091VTh5?=
+ =?utf-8?B?U1M0UDA4QnJ1QThuZ0hvWitzTU9wd0RNWVl1WDBFSzNTL2xPdk1ZZHUwZ0x5?=
+ =?utf-8?B?aHVtR0pOUk9mVXg4SUxKZFFjRVd3eGs2VzNMcUdjVGRHays3S01jTkgxYTFQ?=
+ =?utf-8?B?djE0SGk5Q092OEZ3dUp6SjAyaTZaUzNaUDZCaEkwTnpyUVpaUVhWRGtnaEpW?=
+ =?utf-8?B?YTU5L2lZS0g2UlY5S1QrRnJURm5GdUZzems1RmdnSFhobXl5TWFrQzJLaXdY?=
+ =?utf-8?B?ME8yTlBqTFhYRGxyMkc2a3ZNZ0JmV3IvWVBPTElqR1BCOCtlMkpaaGoxMjRD?=
+ =?utf-8?B?N0lBb3U1SGZtVStEZW80RjdPanM5VTF0bXRsbTZRVEpyS0o4Uys1aDZJUmFF?=
+ =?utf-8?B?Zzc4ajZYK0psNXI2emFBZWpBcHN2ZmpXTWZHQ0trcmhib204SklZdzJ3RlVq?=
+ =?utf-8?B?Y0RwRjBnZjdTcithYTVDYUN5TFZvM1h3VjlzdFdxU1E4QUhNMjN1REhGTkds?=
+ =?utf-8?B?bExPUVp4SGh3R3BYQlNrbTNjOU9GMkJxQW5jNzJ0ZnVQNTFMaWMybXpON0x0?=
+ =?utf-8?B?VkRyYW43SXdpRnAxQ1NDMWIwd0VxaGJ2MG9ha28rblgwTzdBVXdUNDR1Y2JQ?=
+ =?utf-8?B?SVZYTGkyeWl5R1ZJTDgrYitOL1MwRTVJc0U2blNrYnZCdGg4V05ENUJxYVlK?=
+ =?utf-8?B?cHF0cDZMUWFkcklZSkFjd24xeExDZG1Ed05XU0EzYVR1WU5wRk04bU5PWjNY?=
+ =?utf-8?B?dmFwLzJzbmJHWXRPNDJrVkN1ZlROazM5Wk82Zmx5U0E2aGNObE5OTU1PeXM1?=
+ =?utf-8?B?VUJRM1VMdWEyMDAvMEdoVGpsSkR1V3lZSzN3YVBCcDRrS3lTL0xXNmRmNFln?=
+ =?utf-8?B?TExEZUxGTDF6RFFGQzlrT29HZE55ZmJxK29MSmJFTzMzcEZEU0thZllsZFNB?=
+ =?utf-8?B?SUROdE1VYzh4YUZnM0RMZXByMSt0NkVBV1Z0VHRXU1FGRXg3eExLTGw2b3Rr?=
+ =?utf-8?B?YnNHdGdIdTZ4Z0VFaU5FdXBZdThXcHplVDBIdVRnSEM5bU5HYWJWNkRVeWVt?=
+ =?utf-8?Q?8vIq1oxtqJr5v/ZD1DbmiRNU9?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 20267a4a-b16c-4da8-6e1b-08ddfa047a72
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR01MB6105.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2025 18:18:50.2326
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fluEdi20syINPADRSAOF65wFsQdHQXtWbtQ4oPzcN/eti3YJvoB0KcWNp/pJhuFu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR01MB7313
 
-
-
-On 9/22/25 1:14 PM, Steve French wrote:
-> . >Do we even need ->multichannel flag at all?
+On 9/19/2025 9:57 PM, Steve French wrote:
+> I have rebased the very large set of RDMA/smbdirect patches from Metze
+> on current mainline from today (and the patches in ksmbd-for-next and
+> for-next).
 > 
-> Yes - especially in the future.   The goal is for the user to have
-> three options:
-> 1) (preferred) "multichannel" (max channels will be dynamically
-> selected and can change) the client gets to choose how many channels
-> to connect to based on what it sees in the output of the most recent
-> query interfaces call (it can change on the fly as server dynamically
-> adds and removes channels or networks become temporarily unreachable)
+> https://git.samba.org/?p=sfrench/cifs-2.6.git;a=shortlog;h=refs/heads/for-next-next;pg=1
+> 
+> Testing and review would be very welcome.   There was a lot of
+> discussion and testing of these at the SMB3 test event at the annual
+> Storage Developer Conference this week (and they look VERY promising),
+> but it is a very large set, so more reviews and testing will be
+> helpful.
 
-I'm guessing this would be required while we are transitioning from
-setting channels dynamically to having multichannel on by default, as
-you commented below. Because once we have it on by default, I don't
-think there is a point in having the flag.
+FYI the server-side ones were tested on my machines at last week's
+IOLab and they checked out well so far. They passed the relevant
+WinProtocol tests as well. I need to verify some details so this
+is not yet a Tested-by from me however.
 
-> 2) "max_channels="   This is for the case where user wants to choose
-> the number of channels rather than have the client automatically
-> (hopefully soon in the future) choose it for you
-> 3) if server has mchan bugs, allow client to mount with no
-> multichannel (or equivalent max_channels=1)
-> 
-> But ... "remount" also has to work for the three above (and currently
-> doesn't) and this is what I am hoping the recent patches can fix (?)
-> but haven't tested them enough yet
-> 
+I also plan to review in more detail. Thanks for merging, it makes
+this easier.
 
-Yes, I agree the patches are important, I am also testing them here.
-
-> On Mon, Sep 22, 2025 at 9:59 AM Enzo Matsumiya <ematsumiya@suse.de> wrote:
->> I'd actually like to propose going even further and having the whole
->> module behaving as if multichannel was always on, even with
->> max_channels=1
-> 
-> Obviously the goal (would love patches for this) is to turn
-> multichannel on by default, have the client select the appropriate
-> number of channels by default etc. but we have to let the user
-> override it (as described above)
-> 
->>
->> On 09/22, Henrique Carvalho wrote:
->>> Hi Rajasi,
->>>
->>> On 9/22/25 5:24 AM, rajasimandalos@gmail.com wrote:
->>>> From: Rajasi Mandal <rajasimandal@microsoft.com>
->>>>
->>>> Previously, specifying both multichannel and max_channels=1 as mount
->>>> options would leave multichannel enabled, even though it is not
->>>> meaningful when only one channel is allowed. This led to confusion and
->>>> inconsistent behavior, as the client would advertise multichannel
->>>> capability but never establish secondary channels.
->>>>
->>>> Fix this by forcing multichannel to false whenever max_channels=1,
->>>> ensuring the mount configuration is consistent and matches user intent.
->>>> This prevents the client from advertising or attempting multichannel
->>>> support when it is not possible.
->>>>
->>>> Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
->>>> ---
->>>>  fs/smb/client/fs_context.c | 7 +++++++
->>>>  1 file changed, 7 insertions(+)
->>>>
->>>> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
->>>> index 072383899e81..43552b44f613 100644
->>>> --- a/fs/smb/client/fs_context.c
->>>> +++ b/fs/smb/client/fs_context.c
->>>> @@ -1820,6 +1820,13 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
->>>>              goto cifs_parse_mount_err;
->>>>      }
->>>>
->>>> +    /*
->>>> +     * Multichannel is not meaningful if max_channels is 1.
->>>> +     * Force multichannel to false to ensure consistent configuration.
->>>> +     */
->>>> +    if (ctx->multichannel && ctx->max_channels == 1)
->>>> +            ctx->multichannel = false;
->>>> +
->>>>      return 0;
->>>>
->>>>   cifs_parse_mount_err:
->>>
->>> Do we even need ->multichannel flag at all? Maybe we could replace
->>> ->multichannel for a function that checks for max_channels > 1?
->>
->> I agree with Henrique.
->>
->> I'd actually like to propose going even further and having the whole
->> module behaving as if multichannel was always on, even with
->> max_channels=1 -- the only difference being the need to run the
->> query_interfaces worker.
->>
->> This is probably work for another patch/series though.
->>
->>
->> Cheers,
->>
->> Enzo
->>
-> 
-> 
-
--- 
-Henrique
-SUSE Labs
+Tom.
