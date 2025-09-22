@@ -1,128 +1,185 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13D127F736
-	for <linux-cifs@vger.kernel.org>; Mon, 22 Sep 2025 14:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FEEC2820D7
+	for <linux-cifs@vger.kernel.org>; Mon, 22 Sep 2025 14:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758552216; cv=none; b=EpVr505ZdPc9p2AvJHYEpiUNPV/0XmwcREg2jDWOWZHnt8QFXIfHnKFuMCOkPQjmJoS/x0Y/HIyORXctFEMQK/9yax2X+J/z7EHgvHAJm2+Fyt3K/svrbhKadh2hV/XBGDTSUohsE4sDvXcpnS4lCAE1HJzwdh1aTgQ3w6ShWRk=
+	t=1758553184; cv=none; b=t0WsIFIB2qUN2Ua+AKt8Gt7JRL/3/Fd8UdH12t/PC+V6X7b3DzNrfYMs1RQgOeU1WZ+bCEm8Qf0nE4nc++gwwqUhuOIqrNTRTIF9LPPnN+Otvw6/kH1CA4Uavi2mXnYB8EER5UX9zDijZMW6lBcZPIYmhcA03lPeS6ghU4AakTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758552216; c=relaxed/simple;
-	bh=+nr7BwNeXXEabqJuUJ4Znex193FXbxHrLOOQ7ddOBBY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kXs5ME0KyxNuA0dVLCPkAQnBn+6cPYuC+bGZNZDAW+OFC9Oj19UfDlw6Q2lGVy7E2gahjaPZFcBw1mTlXKX97qVWES+0VNh9Ojnks0gibQP1pMw5WgtXzRnApC5712sfE2Ipfzfv5DKKpeMGGbqUoEFGVQB5OK5b2V3DddG665U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=GP+ttq9V; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1758553184; c=relaxed/simple;
+	bh=AR4pkQB5ZMS03TGgf3rPdwsxz5cOrdA4kxpYZBvDgu8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IOhwnVxs9156QVN+CYXHpimFEe41Wj9LERVUXMOOoIQGTC4bHtyqiRxiCP1GWIRhS0hT/pofMuPxXwiQi8X/Y3bVOkGlNo7nK/zV4qhdiCFUUWcGHvZ5fvpEf8PVkp9XHiK+jAUTokPWvMDG/9lctqU996F4fboaliy3ZIO/x50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=k1+H2M+Z; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=iirexlPL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=k1+H2M+Z; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=iirexlPL; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="GP+ttq9V"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45dd513f4ecso33072265e9.3
-        for <linux-cifs@vger.kernel.org>; Mon, 22 Sep 2025 07:43:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1758552213; x=1759157013; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=69/QOJ2Y48NhDwYXM0mdWy8yyNCu9BEWxX9HIURiSOo=;
-        b=GP+ttq9VqPVJvoDSCapWXV30/uNKjKCyJx0uasIJMbGyeZaf6q3bAFdlN0kTPooyhu
-         mJhutkcAA4knAXlS0kJGSBwLj6lqR6NNOJ4JfD5EEtsBdnN0C2bu0sBdh7YsCdK/OKiX
-         ZlTgf3Iy9AC99rvgAjDjPXBa/CqgyuDtk+cpFWiPrmOt7lTI5yDLZi4jPlj9IaUWleJv
-         MiTkYBwpdn3waE9ziddc+9yEcr1eTyAQKwd1mfiBtYCu1Db+fueWXsxVxXX+hcjcTYBC
-         4toA+cRmfiKJvRon0sqMyEyrkiIRmCld6232PDVjaezxxCi5UuZKVjl7uV5kxAuPW/PF
-         nykg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758552213; x=1759157013;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=69/QOJ2Y48NhDwYXM0mdWy8yyNCu9BEWxX9HIURiSOo=;
-        b=urhMNP80jtDn8zftiKbh2+DrhLEfsF9dmn3ZsfMp93+BE3nh0vgiZDesIp5h/FM44O
-         1UjcDyL6yVEVxFYRUf7f4ZLgDSZt0QXgcW0G5noFMhAryQwAfHn1PYmWZenzJhkNVlqZ
-         4QpeaC2GDiLHNau4B5bt/lKwE711LiNCqA1dQCps+6nwlyo8ZOK/50uCbVxsaUN7DOHE
-         VhGFhQPs/HoVDLa+KIcHGGimzjRjAbsNYVEgSyIBEK8SAFTBCv/me/2fUY3M/jSr7w3G
-         7T7UAAP6ygqAxcwkznmzCfULKj5+HNeH8qYbvG+mWinFXr+IA3J4VzkCT7/cwavCeJxS
-         d1KA==
-X-Forwarded-Encrypted: i=1; AJvYcCWDQi8KDV596pULjzXZuNaaMmoeKF1sbAClm2Y+ls9WyDu+CtJHBZblcAMCeS2yFAJoV7HZz3T9pvuQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YwU4fEt3fnDSG8vBOdbULVFTMiUqO8KeuoshNLkiH7yJ3j7lY4u
-	uRdnekggej5ZRZ5EG7r3TQRMQiVS02YRQM24cJ+5dg6OejWclrhvY/Ygax3Gpkk2kik=
-X-Gm-Gg: ASbGncsHP3qBy6Y9ANbYCv1wOQ/Vs5Uqx5MPLkXuinvR9dRx1SuJ0JA/MJL5yuFcgSg
-	9gvC65FlqjOINmCjFSRJ81N8dCQ802NYxkxIvMzrz1td6Wa+R5EYVCet0HQV7pGWBKq9lZ0bVSH
-	KvVnCetTzVTADgHHQHc5duWWa/2zG2e+GneqaEoVTEU/X5KiqGMzL0K5y0MFcS1s9pR0fzJ/pGm
-	WP2pmlbaCnD0JI9mRZcn8Liw9B6X95cKV+vDoBjABHAtp74L4inpfbE8KkF5b4d1up4Ek8K+ars
-	yk1oZSaO61flCXi8LSA6iHZUABhnrxL84ax0waeU4qWd/ql3cTwtidK87ETddS3N60tMuuT5efa
-	0jF3y5LFwWACNBb7f6ytNstjMdUuA5VDVLaHGZKNPqV5HVz0qtbHNMGloqKko2yKaBf839YQ=
-X-Google-Smtp-Source: AGHT+IExXUNKRCMA4QKU/OEH4DlhUgNPwHI+yErgzi3NlV2OxxP1jX78IKGVbB7ztYO+b2kgWihAhw==
-X-Received: by 2002:a5d:5846:0:b0:3eb:c276:a359 with SMTP id ffacd0b85a97d-3ee7c552a1emr9200707f8f.9.1758552212963;
-        Mon, 22 Sep 2025 07:43:32 -0700 (PDT)
-Received: from ?IPV6:2804:18:10d:538:67e6:b01b:caa9:3531? ([2804:18:10d:538:67e6:b01b:caa9:3531])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77cfbb7c3bbsm12958965b3a.7.2025.09.22.07.43.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Sep 2025 07:43:32 -0700 (PDT)
-Message-ID: <da3e2b5a-a5da-4526-9884-8789990ebf95@suse.com>
-Date: Mon, 22 Sep 2025 11:41:22 -0300
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="k1+H2M+Z";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="iirexlPL";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="k1+H2M+Z";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="iirexlPL"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 689C42273A;
+	Mon, 22 Sep 2025 14:59:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758553180; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PoiKPHtcWcnHD1XvSkOL4QmCp9+zlGaimvOVSIUNhVU=;
+	b=k1+H2M+ZPD0rJWTWHOpW1YIGUiWRtgDmxgT2JgAolgdoAOp57tY1BcPGnoR0jlT9mgRRqt
+	EDBI1z8Im5RlxO+mjMNj+XfhD55jtBQzQL31I6Cf6cCmaCXS6CEavzX3baYory4PQsQ9VI
+	TmpFRS1ZMLFNsGlmX4obwryI7Izn8CE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758553180;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PoiKPHtcWcnHD1XvSkOL4QmCp9+zlGaimvOVSIUNhVU=;
+	b=iirexlPL0YMFkuzXAWB4sQHH8Yl3E8jV9/u7yYal0Cr99dAEvkYurQcfkGTr8j3bGvIFZb
+	2fcmplSBosWwDWBg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=k1+H2M+Z;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=iirexlPL
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758553180; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PoiKPHtcWcnHD1XvSkOL4QmCp9+zlGaimvOVSIUNhVU=;
+	b=k1+H2M+ZPD0rJWTWHOpW1YIGUiWRtgDmxgT2JgAolgdoAOp57tY1BcPGnoR0jlT9mgRRqt
+	EDBI1z8Im5RlxO+mjMNj+XfhD55jtBQzQL31I6Cf6cCmaCXS6CEavzX3baYory4PQsQ9VI
+	TmpFRS1ZMLFNsGlmX4obwryI7Izn8CE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758553180;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PoiKPHtcWcnHD1XvSkOL4QmCp9+zlGaimvOVSIUNhVU=;
+	b=iirexlPL0YMFkuzXAWB4sQHH8Yl3E8jV9/u7yYal0Cr99dAEvkYurQcfkGTr8j3bGvIFZb
+	2fcmplSBosWwDWBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EA5E51388C;
+	Mon, 22 Sep 2025 14:59:39 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id +yMDLFtk0WjiGgAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 22 Sep 2025 14:59:39 +0000
+Date: Mon, 22 Sep 2025 11:59:37 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: rajasimandalos@gmail.com, linux-cifs@vger.kernel.org, 
+	sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	linux-kernel@vger.kernel.org, Rajasi Mandal <rajasimandal@microsoft.com>
+Subject: Re: [PATCH 1/2] cifs: client: force multichannel=off when
+ max_channels=1
+Message-ID: <qmf3xwqq4hqj4issgci2g76eghytaqxihnrp236ithh2istkkf@n4s54vp3hblr>
+References: <20250922082417.816331-1-rajasimandalos@gmail.com>
+ <da3e2b5a-a5da-4526-9884-8789990ebf95@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] cifs: client: force multichannel=off when
- max_channels=1
-To: rajasimandalos@gmail.com, linux-cifs@vger.kernel.org
-Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- linux-kernel@vger.kernel.org, Rajasi Mandal <rajasimandal@microsoft.com>
-References: <20250922082417.816331-1-rajasimandalos@gmail.com>
-Content-Language: en-US
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-In-Reply-To: <20250922082417.816331-1-rajasimandalos@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <da3e2b5a-a5da-4526-9884-8789990ebf95@suse.com>
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 689C42273A
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,samba.org,manguebit.org,microsoft.com,talpey.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim]
+X-Spam-Score: -4.01
 
-Hi Rajasi,
+On 09/22, Henrique Carvalho wrote:
+>Hi Rajasi,
+>
+>On 9/22/25 5:24 AM, rajasimandalos@gmail.com wrote:
+>> From: Rajasi Mandal <rajasimandal@microsoft.com>
+>>
+>> Previously, specifying both multichannel and max_channels=1 as mount
+>> options would leave multichannel enabled, even though it is not
+>> meaningful when only one channel is allowed. This led to confusion and
+>> inconsistent behavior, as the client would advertise multichannel
+>> capability but never establish secondary channels.
+>>
+>> Fix this by forcing multichannel to false whenever max_channels=1,
+>> ensuring the mount configuration is consistent and matches user intent.
+>> This prevents the client from advertising or attempting multichannel
+>> support when it is not possible.
+>>
+>> Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
+>> ---
+>>  fs/smb/client/fs_context.c | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+>> index 072383899e81..43552b44f613 100644
+>> --- a/fs/smb/client/fs_context.c
+>> +++ b/fs/smb/client/fs_context.c
+>> @@ -1820,6 +1820,13 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+>>  		goto cifs_parse_mount_err;
+>>  	}
+>>
+>> +	/*
+>> +	 * Multichannel is not meaningful if max_channels is 1.
+>> +	 * Force multichannel to false to ensure consistent configuration.
+>> +	 */
+>> +	if (ctx->multichannel && ctx->max_channels == 1)
+>> +		ctx->multichannel = false;
+>> +
+>>  	return 0;
+>>
+>>   cifs_parse_mount_err:
+>
+>Do we even need ->multichannel flag at all? Maybe we could replace
+>->multichannel for a function that checks for max_channels > 1?
 
-On 9/22/25 5:24 AM, rajasimandalos@gmail.com wrote:
-> From: Rajasi Mandal <rajasimandal@microsoft.com>
-> 
-> Previously, specifying both multichannel and max_channels=1 as mount
-> options would leave multichannel enabled, even though it is not
-> meaningful when only one channel is allowed. This led to confusion and
-> inconsistent behavior, as the client would advertise multichannel
-> capability but never establish secondary channels.
-> 
-> Fix this by forcing multichannel to false whenever max_channels=1,
-> ensuring the mount configuration is consistent and matches user intent.
-> This prevents the client from advertising or attempting multichannel
-> support when it is not possible.
-> 
-> Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
-> ---
->  fs/smb/client/fs_context.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index 072383899e81..43552b44f613 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -1820,6 +1820,13 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
->  		goto cifs_parse_mount_err;
->  	}
->  
-> +	/*
-> +	 * Multichannel is not meaningful if max_channels is 1.
-> +	 * Force multichannel to false to ensure consistent configuration.
-> +	 */
-> +	if (ctx->multichannel && ctx->max_channels == 1)
-> +		ctx->multichannel = false;
-> +
->  	return 0;
->  
->   cifs_parse_mount_err:
+I agree with Henrique.
 
-Do we even need ->multichannel flag at all? Maybe we could replace
-->multichannel for a function that checks for max_channels > 1?
+I'd actually like to propose going even further and having the whole
+module behaving as if multichannel was always on, even with
+max_channels=1 -- the only difference being the need to run the
+query_interfaces worker.
 
--- 
-Henrique
-SUSE Labs
+This is probably work for another patch/series though.
+
+
+Cheers,
+
+Enzo
