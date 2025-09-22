@@ -1,42 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1CD2F39C6;
-	Mon, 22 Sep 2025 19:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E592F0C52;
+	Mon, 22 Sep 2025 19:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758570025; cv=none; b=ZV8iYD0RwpcnX128VytYfTg75V7DT8WuJCIFQu39OMYLRrDYwwfFgSyjwenmuwy+aEcC7kU6DC4DgQgxR6e5wX9KHN3pNblOyh8WragdYBwvzI1nCW4v/9wI1etwIfKI7ktPPuMgsBEhVCikBfgKdyYrH0aSXTzTggtAJ3BMA6w=
+	t=1758570027; cv=none; b=nOeAtvwbY/yvhGKfi2mqG+jN9OYkHMtE+oZwPzoVqZGTCzhWu7Q5LqZU8su0tYXh9imcEqhwbAdQJzO3iYG7+kXXvphihUPNrgEhZIVUUMvl/U8KlQWPvzubw0DNq4oGRSB0XGOvia4t4/5BHy2XtkPPjS0JJBPxcAdTtrhJ7LU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758570025; c=relaxed/simple;
-	bh=RFLqZI+3OZAO5rgZ/FEryvPF1k7+XnDfob8p/dywnpk=;
+	s=arc-20240116; t=1758570027; c=relaxed/simple;
+	bh=ANFUOxyKeTKQiJ7hKOVummYz1agVnanljXCIX36ml0c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mD64waBk+9bXmyQDHzYbcX/6+3UOgAQEJKVqnmvRqgifJBdMp1H5RGjvTOO2oYS2anadCZQQ5x2wvwIoj26UN+OGQK1vKEWPaB6quVlkJkHllm92afB1glKQPs3qcN+4AvOMwmEP0WLdpoyQSEnKiBzUiVzIej2/wBdRPxdr8EA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=QoTARtS8; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=JNrlMki4AtcrxBolsyUj2r7uBxpykQmmMerHc7vFvdKg4s/Fnpdik76d0by/mXMTEVbT7IPweFo9JD8mD8onmyLDF2E2aKb61/wEDMlYhjia7/Y/yW77UawWU2N+L0ckXmKjXJ1bkLBjzfmXgjKpXu1Vy0EXGvB1D0hGuKzk08A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=i5vckWpT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="QoTARtS8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE2F4C4CEF0;
-	Mon, 22 Sep 2025 19:40:24 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="i5vckWpT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AADBC4CEF5;
+	Mon, 22 Sep 2025 19:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1758570025;
-	bh=RFLqZI+3OZAO5rgZ/FEryvPF1k7+XnDfob8p/dywnpk=;
+	s=korg; t=1758570027;
+	bh=ANFUOxyKeTKQiJ7hKOVummYz1agVnanljXCIX36ml0c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QoTARtS8tiWnAUEGWmnX++3eWRIkckibBtlO0tXqMhcoRIL/HQ+pxkkhE7PuPCR8X
-	 JrVDwm4DwJxaR/gsjzUfAYf/yxh/pMMDmZ1pEJEEzDxw5BCldFTT7zKvLUNhNIAu+H
-	 1FUv11lepFglAexEo+fkL84P8ibDTmmQ07eveV7w=
+	b=i5vckWpTOKzbkaDdiU8v0tdgtNO17O0wacoCgsXZ35V5nCbK2ozMpkemoY2hqUk6H
+	 AKRENri1szCINBfAddJ4iQFuzmsVxJNNLt6f2jM5pkvM4CviK5CA+vX9xowJzEtE6o
+	 4vD7uR0IGoAfJoNpjb1NWP+wZQ994e/HNEUU0T7o=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>,
-	Frank Sorenson <sorenson@redhat.com>,
-	David Howells <dhowells@redhat.com>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 080/105] smb: client: fix filename matching of deferred files
-Date: Mon, 22 Sep 2025 21:30:03 +0200
-Message-ID: <20250922192410.992745435@linuxfoundation.org>
+Subject: [PATCH 6.12 081/105] smb: client: let smbd_destroy() call disable_work_sync(&info->post_send_credits_work)
+Date: Mon, 22 Sep 2025 21:30:04 +0200
+Message-ID: <20250922192411.019798849@linuxfoundation.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250922192408.913556629@linuxfoundation.org>
 References: <20250922192408.913556629@linuxfoundation.org>
@@ -55,137 +57,72 @@ Content-Transfer-Encoding: 8bit
 
 ------------------
 
-From: Paulo Alcantara <pc@manguebit.org>
+From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit 93ed9a2951308db374cba4562533dde97bac70d3 ]
+[ Upstream commit d9dcbbcf9145b68aa85c40947311a6907277e097 ]
 
-Fix the following case where the client would end up closing both
-deferred files (foo.tmp & foo) after unlink(foo) due to strstr() call
-in cifs_close_deferred_file_under_dentry():
+In smbd_destroy() we may destroy the memory so we better
+wait until post_send_credits_work is no longer pending
+and will never be started again.
 
-  fd1 = openat(AT_FDCWD, "foo", O_WRONLY|O_CREAT|O_TRUNC, 0666);
-  fd2 = openat(AT_FDCWD, "foo.tmp", O_WRONLY|O_CREAT|O_TRUNC, 0666);
-  close(fd1);
-  close(fd2);
-  unlink("foo");
+I actually just hit the case using rxe:
 
-Fixes: e3fc065682eb ("cifs: Deferred close performance improvements")
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: Frank Sorenson <sorenson@redhat.com>
-Cc: David Howells <dhowells@redhat.com>
+WARNING: CPU: 0 PID: 138 at drivers/infiniband/sw/rxe/rxe_verbs.c:1032 rxe_post_recv+0x1ee/0x480 [rdma_rxe]
+...
+[ 5305.686979] [    T138]  smbd_post_recv+0x445/0xc10 [cifs]
+[ 5305.687135] [    T138]  ? srso_alias_return_thunk+0x5/0xfbef5
+[ 5305.687149] [    T138]  ? __kasan_check_write+0x14/0x30
+[ 5305.687185] [    T138]  ? __pfx_smbd_post_recv+0x10/0x10 [cifs]
+[ 5305.687329] [    T138]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[ 5305.687356] [    T138]  ? srso_alias_return_thunk+0x5/0xfbef5
+[ 5305.687368] [    T138]  ? srso_alias_return_thunk+0x5/0xfbef5
+[ 5305.687378] [    T138]  ? _raw_spin_unlock_irqrestore+0x11/0x60
+[ 5305.687389] [    T138]  ? srso_alias_return_thunk+0x5/0xfbef5
+[ 5305.687399] [    T138]  ? get_receive_buffer+0x168/0x210 [cifs]
+[ 5305.687555] [    T138]  smbd_post_send_credits+0x382/0x4b0 [cifs]
+[ 5305.687701] [    T138]  ? __pfx_smbd_post_send_credits+0x10/0x10 [cifs]
+[ 5305.687855] [    T138]  ? __pfx___schedule+0x10/0x10
+[ 5305.687865] [    T138]  ? __pfx__raw_spin_lock_irq+0x10/0x10
+[ 5305.687875] [    T138]  ? queue_delayed_work_on+0x8e/0xa0
+[ 5305.687889] [    T138]  process_one_work+0x629/0xf80
+[ 5305.687908] [    T138]  ? srso_alias_return_thunk+0x5/0xfbef5
+[ 5305.687917] [    T138]  ? __kasan_check_write+0x14/0x30
+[ 5305.687933] [    T138]  worker_thread+0x87f/0x1570
+...
+
+It means rxe_post_recv was called after rdma_destroy_qp().
+This happened because put_receive_buffer() was triggered
+by ib_drain_qp() and called:
+queue_work(info->workqueue, &info->post_send_credits_work);
+
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/cifsproto.h |  4 ++--
- fs/smb/client/inode.c     |  6 +++---
- fs/smb/client/misc.c      | 38 ++++++++++++++++----------------------
- 3 files changed, 21 insertions(+), 27 deletions(-)
+ fs/smb/client/smbdirect.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index fee7bc9848a36..b59647291363b 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -298,8 +298,8 @@ extern void cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode);
- 
- extern void cifs_close_all_deferred_files(struct cifs_tcon *cifs_tcon);
- 
--extern void cifs_close_deferred_file_under_dentry(struct cifs_tcon *cifs_tcon,
--				const char *path);
-+void cifs_close_deferred_file_under_dentry(struct cifs_tcon *cifs_tcon,
-+					   struct dentry *dentry);
- 
- extern void cifs_mark_open_handles_for_deleted_file(struct inode *inode,
- 				const char *path);
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index c0df2c1841243..e06d02b68c538 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1958,7 +1958,7 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index b9bb531717a65..6284252aa4882 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -1308,6 +1308,9 @@ void smbd_destroy(struct TCP_Server_Info *server)
+ 			sc->status == SMBDIRECT_SOCKET_DISCONNECTED);
  	}
  
- 	netfs_wait_for_outstanding_io(inode);
--	cifs_close_deferred_file_under_dentry(tcon, full_path);
-+	cifs_close_deferred_file_under_dentry(tcon, dentry);
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- 	if (cap_unix(tcon->ses) && (CIFS_UNIX_POSIX_PATH_OPS_CAP &
- 				le64_to_cpu(tcon->fsUnixInfo.Capability))) {
-@@ -2489,10 +2489,10 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
- 		goto cifs_rename_exit;
- 	}
- 
--	cifs_close_deferred_file_under_dentry(tcon, from_name);
-+	cifs_close_deferred_file_under_dentry(tcon, source_dentry);
- 	if (d_inode(target_dentry) != NULL) {
- 		netfs_wait_for_outstanding_io(d_inode(target_dentry));
--		cifs_close_deferred_file_under_dentry(tcon, to_name);
-+		cifs_close_deferred_file_under_dentry(tcon, target_dentry);
- 	}
- 
- 	rc = cifs_do_rename(xid, source_dentry, from_name, target_dentry,
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index 57b6b191293ee..499f791df7799 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -829,33 +829,28 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
- 		kfree(tmp_list);
- 	}
- }
--void
--cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const char *path)
++	log_rdma_event(INFO, "cancelling post_send_credits_work\n");
++	disable_work_sync(&info->post_send_credits_work);
 +
-+void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
-+					   struct dentry *dentry)
- {
--	struct cifsFileInfo *cfile;
- 	struct file_list *tmp_list, *tmp_next_list;
--	void *page;
--	const char *full_path;
-+	struct cifsFileInfo *cfile;
- 	LIST_HEAD(file_head);
- 
--	page = alloc_dentry_path();
- 	spin_lock(&tcon->open_file_lock);
- 	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
--		full_path = build_path_from_dentry(cfile->dentry, page);
--		if (strstr(full_path, path)) {
--			if (delayed_work_pending(&cfile->deferred)) {
--				if (cancel_delayed_work(&cfile->deferred)) {
--					spin_lock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
--					cifs_del_deferred_close(cfile);
--					spin_unlock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
--
--					tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
--					if (tmp_list == NULL)
--						break;
--					tmp_list->cfile = cfile;
--					list_add_tail(&tmp_list->list, &file_head);
--				}
--			}
-+		if ((cfile->dentry == dentry) &&
-+		    delayed_work_pending(&cfile->deferred) &&
-+		    cancel_delayed_work(&cfile->deferred)) {
-+			spin_lock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
-+			cifs_del_deferred_close(cfile);
-+			spin_unlock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
-+
-+			tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
-+			if (tmp_list == NULL)
-+				break;
-+			tmp_list->cfile = cfile;
-+			list_add_tail(&tmp_list->list, &file_head);
- 		}
- 	}
- 	spin_unlock(&tcon->open_file_lock);
-@@ -865,7 +860,6 @@ cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const char *path)
- 		list_del(&tmp_list->list);
- 		kfree(tmp_list);
- 	}
--	free_dentry_path(page);
- }
- 
- /*
+ 	log_rdma_event(INFO, "destroying qp\n");
+ 	ib_drain_qp(sc->ib.qp);
+ 	rdma_destroy_qp(sc->rdma.cm_id);
 -- 
 2.51.0
 
