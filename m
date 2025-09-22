@@ -1,41 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C5A1547CC;
-	Mon, 22 Sep 2025 19:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747BE1547CC;
+	Mon, 22 Sep 2025 19:46:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758570405; cv=none; b=MiMkz8QaF+zP5JGNj3XlX2tOqQjLZZNRhdLlEfNOod5TpGvc0ppB8opVZPwYPbuIQy5M4Vq71GPXz/A/jdMup64yCoo6tbjVy23v7ImnP98MgKKYwuSngxXi3uTox6SE4hQMGKAFYy5hLQEBv6yJe6/oNe3W7aTAg8OfB6D8aw4=
+	t=1758570407; cv=none; b=dizrLFZRPs6+9Xq7RV0iXcugwgcAlOs/noqoIj2R10q3wC/v2kacMjESnIZTqNhdK5oLxD7p/yrNK6CWOWlbf7+GBDcYn8VsUrSQLCYoFj+AAbKuBHdc0/rrioPSXSKJuBWbvt8kPr0T6rfKM8XN21TlgOOApw46ifeZriklIek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758570405; c=relaxed/simple;
-	bh=X+sk1trCUHMuCbxMjOOrXga4TMtY/Di6R+460yKeuuA=;
+	s=arc-20240116; t=1758570407; c=relaxed/simple;
+	bh=XGxslejsWoPrlbZ2bhtQgpfkLWpHAsrsvJlgJBqLvaM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gaPlPDTy+gsPlB5nv9Wb8KS2eDZyRN1ebqPw0nbp511ckT5be86O5B1JA46AOg4vxrYrh5t12tpzRRGwe9eSStt1LG1f47PliM/ohQBFfoipMxebIDhuLtEeEBkX1xK9u6f7Zcc9eXZ90hjUW+/19S3YwaibvBV50oUn2pr23Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=RONlRKiq; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=pWy+R/xskxDupDkvMKxFUhS6RgvHbTx7Lx2sD3sStrakk4Hl0LKLu58Fs91sp8W5FWliwm1EakoJGuzQ4M5ngfJxaXZRC72xk1qh67TyDR8gD3337wKe/JmKYcDc+1huxyUj2Cv3d6qBUN07zUTLjuF02TqrLilZqGBccOh+Y+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YLboT4ie; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="RONlRKiq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8967CC4CEF0;
-	Mon, 22 Sep 2025 19:46:44 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YLboT4ie"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E5DAC4CEF0;
+	Mon, 22 Sep 2025 19:46:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1758570404;
-	bh=X+sk1trCUHMuCbxMjOOrXga4TMtY/Di6R+460yKeuuA=;
+	s=korg; t=1758570407;
+	bh=XGxslejsWoPrlbZ2bhtQgpfkLWpHAsrsvJlgJBqLvaM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RONlRKiqIP5CYUso2oTmbaqUbouWK5c5ukZZxlzTnlvYIoILZAwwhgVbF513UmGsa
-	 URXowt4iylF/8JYbBY41hLU/wTRYoqnM0kKJ33QbUsOkoqMyojJFhu1MvJahzhN8lc
-	 8FsJAg5TsJHgDkYZQJ7R49L+n4IKbj7UL5DM58kI=
+	b=YLboT4ie7IXAXifrZIfMH/3LH1B74bY1QAEx/CYzy5+nYnggDdoYi8Z8mc9tq8P7v
+	 5vd+nb2s/mzkffC41Kjv9/ggWzSlWlK2BpyProoUQQBZP8jdJgZOcESFPJJKCnJQxy
+	 sczkZvIllgCIZpcMiWTUk6e1NekluUSkClhEqacU=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	Frank Sorenson <sorenson@redhat.com>,
-	David Howells <dhowells@redhat.com>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.16 136/149] smb: client: fix file open check in __cifs_unlink()
-Date: Mon, 22 Sep 2025 21:30:36 +0200
-Message-ID: <20250922192416.296757898@linuxfoundation.org>
+Subject: [PATCH 6.16 137/149] smb: client: fix smbdirect_recv_io leak in smbd_negotiate() error path
+Date: Mon, 22 Sep 2025 21:30:37 +0200
+Message-ID: <20250922192416.320514082@linuxfoundation.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250922192412.885919229@linuxfoundation.org>
 References: <20250922192412.885919229@linuxfoundation.org>
@@ -54,52 +57,43 @@ Content-Transfer-Encoding: 8bit
 
 ------------------
 
-From: Paulo Alcantara <pc@manguebit.org>
+From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit 251090e2c2c1be60607d1c521af2c993f04d4f61 ]
+[ Upstream commit daac51c7032036a0ca5f1aa419ad1b0471d1c6e0 ]
 
-Fix the file open check to decide whether or not silly-rename the file
-in SMB2+.
+During tests of another unrelated patch I was able to trigger this
+error: Objects remaining on __kmem_cache_shutdown()
 
-Fixes: c5ea3065586d ("smb: client: fix data loss due to broken rename(2)")
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Cc: Frank Sorenson <sorenson@redhat.com>
-Reviewed-by: David Howells <dhowells@redhat.com>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/inode.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ fs/smb/client/smbdirect.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 1703f1285d36d..0f0d2dae6283a 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -2003,8 +2003,21 @@ static int __cifs_unlink(struct inode *dir, struct dentry *dentry, bool sillyren
- 		goto psx_del_no_retry;
- 	}
- 
--	if (sillyrename || (server->vals->protocol_id > SMB10_PROT_ID &&
--			    d_is_positive(dentry) && d_count(dentry) > 2))
-+	/* For SMB2+, if the file is open, we always perform a silly rename.
-+	 *
-+	 * We check for d_count() right after calling
-+	 * cifs_close_deferred_file_under_dentry() to make sure that the
-+	 * dentry's refcount gets dropped in case the file had any deferred
-+	 * close.
-+	 */
-+	if (!sillyrename && server->vals->protocol_id > SMB10_PROT_ID) {
-+		spin_lock(&dentry->d_lock);
-+		if (d_count(dentry) > 1)
-+			sillyrename = true;
-+		spin_unlock(&dentry->d_lock);
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 8b920410cd2fe..6dd2a1c66df3d 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -1101,8 +1101,10 @@ static int smbd_negotiate(struct smbd_connection *info)
+ 	log_rdma_event(INFO, "smbd_post_recv rc=%d iov.addr=0x%llx iov.length=%u iov.lkey=0x%x\n",
+ 		       rc, response->sge.addr,
+ 		       response->sge.length, response->sge.lkey);
+-	if (rc)
++	if (rc) {
++		put_receive_buffer(info, response);
+ 		return rc;
 +	}
-+
-+	if (sillyrename)
- 		rc = -EBUSY;
- 	else
- 		rc = server->ops->unlink(xid, tcon, full_path, cifs_sb, dentry);
+ 
+ 	init_completion(&info->negotiate_completion);
+ 	info->negotiate_done = false;
 -- 
 2.51.0
 
