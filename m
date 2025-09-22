@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC8318C2C;
-	Mon, 22 Sep 2025 19:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8064825A34F;
+	Mon, 22 Sep 2025 19:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758570425; cv=none; b=hgxK13D539PPnxJs19noz/7mlvlRmsZa6/9/0RorYSjxOcqX4m2lslUQLZUGyw0MeI6QZS3lvsVXcLIsOohNJVgPGOKw7lFbwawcy4qY3qyXMVfZck8ZeXX7t5lNjNDbuXhcKygaNbY4BcjdcT2l2OUKx1crFU+oqUT30vV8vLw=
+	t=1758570427; cv=none; b=XU2H/bET31hYInxmaD2NeV759VwoS3aAbiqaxlmnsSTzweJM2nipZ7G5PjhF24ab9BQQTkKjKKz+WCUp8XBpi+U06GHjZxb+qv8VlHGSKoGMCcubRSfoytryHo6wbmx8pu1nNzq+QYKmHMcr/jkHM2BI1t8SnjbOPkhFPCC/mkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758570425; c=relaxed/simple;
-	bh=pITBMN7RJZ17FL5BWi6ZOodplkBIZSuUeDX6ThOHkRs=;
+	s=arc-20240116; t=1758570427; c=relaxed/simple;
+	bh=SHtso6K0zRVL/GUgJGChR/gSJuWzFtjbG+1hdG1c2fc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fAQt2Kty+ovfhZ1A+0x1N8l9fCBYczxE9AbWhsvxZTuU8wMXsJo/75hBDNqubAYYRm5wKGEQKTQRK1QBzqxCDGAm0vZpoTSegcBodUJQ68UrJzOPnF2rlH2z6jevttjPKcv8D7VIv01U1bWuwSSnvEl77XyYj9YtAPhL+d9l6vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YjGq4Jg1; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=mZh/WS3Gf27F4byMT6P3gsl6vTvFjvr5Tz6f7m/Fbz9v3nHQpBxvmntB2Iz6ndVsGvmw+FYCPdlliLL2o0NIEccbU/AjIJoxV5DJHSf9ihiZOTrH05ySkNgti7H+PuwMJXM3qWKj8/4cfHP/x/tCxlhBkNjc9Wo+frc0X1bHE/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=lN599GFw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YjGq4Jg1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87BAAC4CEF0;
-	Mon, 22 Sep 2025 19:47:04 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="lN599GFw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14C04C4CEF0;
+	Mon, 22 Sep 2025 19:47:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1758570424;
-	bh=pITBMN7RJZ17FL5BWi6ZOodplkBIZSuUeDX6ThOHkRs=;
+	s=korg; t=1758570427;
+	bh=SHtso6K0zRVL/GUgJGChR/gSJuWzFtjbG+1hdG1c2fc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YjGq4Jg1sL1Dr72S6dPyaOxRRoveighUBHRPmO71tq/Kzh0to5z8a9nbvTGLq7NhR
-	 qQ38zOwRCN6EAAyXMHiFgGPuMj7j19BH1Vc/O6qpWPnYICMFCHYosVmMxz27XNF2el
-	 uMCsrDo8NJAjbjcOx0dsul91sOGdNOpIAGpXbA94=
+	b=lN599GFwfDXHQLpPPN3BoJ6zVW40aoZIJlu0P1mNZr+BAp7YeiSOFulIu866do6Np
+	 6ZizqIwsYV4mcT2Rn3RzpMDjPVKfMGb0oSyJNYGBLGJMuEBK87zECsBJpLIb7I5XHL
+	 /9lJFjsnbU6aFsqDc2eHNFY+rIGzLSfsOzSX/VPM=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -36,9 +36,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.16 132/149] smb: client: use disable[_delayed]_work_sync in smbdirect.c
-Date: Mon, 22 Sep 2025 21:30:32 +0200
-Message-ID: <20250922192416.200797542@linuxfoundation.org>
+Subject: [PATCH 6.16 133/149] smb: client: let smbd_destroy() call disable_work_sync(&info->post_send_credits_work)
+Date: Mon, 22 Sep 2025 21:30:33 +0200
+Message-ID: <20250922192416.223784333@linuxfoundation.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250922192412.885919229@linuxfoundation.org>
 References: <20250922192412.885919229@linuxfoundation.org>
@@ -59,12 +59,41 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit bac28f604c7699727b2fecf14c3a54668bbe458e ]
+[ Upstream commit d9dcbbcf9145b68aa85c40947311a6907277e097 ]
 
-This makes it safer during the disconnect and avoids
-requeueing.
+In smbd_destroy() we may destroy the memory so we better
+wait until post_send_credits_work is no longer pending
+and will never be started again.
 
-It's ok to call disable[delayed_]work[_sync]() more than once.
+I actually just hit the case using rxe:
+
+WARNING: CPU: 0 PID: 138 at drivers/infiniband/sw/rxe/rxe_verbs.c:1032 rxe_post_recv+0x1ee/0x480 [rdma_rxe]
+...
+[ 5305.686979] [    T138]  smbd_post_recv+0x445/0xc10 [cifs]
+[ 5305.687135] [    T138]  ? srso_alias_return_thunk+0x5/0xfbef5
+[ 5305.687149] [    T138]  ? __kasan_check_write+0x14/0x30
+[ 5305.687185] [    T138]  ? __pfx_smbd_post_recv+0x10/0x10 [cifs]
+[ 5305.687329] [    T138]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[ 5305.687356] [    T138]  ? srso_alias_return_thunk+0x5/0xfbef5
+[ 5305.687368] [    T138]  ? srso_alias_return_thunk+0x5/0xfbef5
+[ 5305.687378] [    T138]  ? _raw_spin_unlock_irqrestore+0x11/0x60
+[ 5305.687389] [    T138]  ? srso_alias_return_thunk+0x5/0xfbef5
+[ 5305.687399] [    T138]  ? get_receive_buffer+0x168/0x210 [cifs]
+[ 5305.687555] [    T138]  smbd_post_send_credits+0x382/0x4b0 [cifs]
+[ 5305.687701] [    T138]  ? __pfx_smbd_post_send_credits+0x10/0x10 [cifs]
+[ 5305.687855] [    T138]  ? __pfx___schedule+0x10/0x10
+[ 5305.687865] [    T138]  ? __pfx__raw_spin_lock_irq+0x10/0x10
+[ 5305.687875] [    T138]  ? queue_delayed_work_on+0x8e/0xa0
+[ 5305.687889] [    T138]  process_one_work+0x629/0xf80
+[ 5305.687908] [    T138]  ? srso_alias_return_thunk+0x5/0xfbef5
+[ 5305.687917] [    T138]  ? __kasan_check_write+0x14/0x30
+[ 5305.687933] [    T138]  worker_thread+0x87f/0x1570
+...
+
+It means rxe_post_recv was called after rdma_destroy_qp().
+This happened because put_receive_buffer() was triggered
+by ib_drain_qp() and called:
+queue_work(info->workqueue, &info->post_send_credits_work);
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -72,47 +101,28 @@ Cc: Long Li <longli@microsoft.com>
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
-Fixes: 050b8c374019 ("smbd: Make upper layer decide when to destroy the transport")
 Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
-Fixes: c7398583340a ("CIFS: SMBD: Implement RDMA memory registration")
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/smbdirect.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ fs/smb/client/smbdirect.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 65175ac3d8418..8c6e766078e14 100644
+index 8c6e766078e14..8b920410cd2fe 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -1341,7 +1341,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
- 	sc->ib.qp = NULL;
+@@ -1335,6 +1335,9 @@ void smbd_destroy(struct TCP_Server_Info *server)
+ 			sc->status == SMBDIRECT_SOCKET_DISCONNECTED);
+ 	}
  
- 	log_rdma_event(INFO, "cancelling idle timer\n");
--	cancel_delayed_work_sync(&info->idle_timer_work);
-+	disable_delayed_work_sync(&info->idle_timer_work);
- 
- 	/* It's not possible for upper layer to get to reassembly */
- 	log_rdma_event(INFO, "drain the reassembly queue\n");
-@@ -1713,7 +1713,7 @@ static struct smbd_connection *_smbd_get_connection(
- 	return NULL;
- 
- negotiation_failed:
--	cancel_delayed_work_sync(&info->idle_timer_work);
-+	disable_delayed_work_sync(&info->idle_timer_work);
- 	destroy_caches_and_workqueue(info);
- 	sc->status = SMBDIRECT_SOCKET_NEGOTIATE_FAILED;
- 	rdma_disconnect(sc->rdma.cm_id);
-@@ -2072,7 +2072,7 @@ static void destroy_mr_list(struct smbd_connection *info)
- 	struct smbdirect_socket *sc = &info->socket;
- 	struct smbd_mr *mr, *tmp;
- 
--	cancel_work_sync(&info->mr_recovery_work);
-+	disable_work_sync(&info->mr_recovery_work);
- 	list_for_each_entry_safe(mr, tmp, &info->mr_list, list) {
- 		if (mr->state == MR_INVALIDATED)
- 			ib_dma_unmap_sg(sc->ib.dev, mr->sgt.sgl,
++	log_rdma_event(INFO, "cancelling post_send_credits_work\n");
++	disable_work_sync(&info->post_send_credits_work);
++
+ 	log_rdma_event(INFO, "destroying qp\n");
+ 	ib_drain_qp(sc->ib.qp);
+ 	rdma_destroy_qp(sc->rdma.cm_id);
 -- 
 2.51.0
 
