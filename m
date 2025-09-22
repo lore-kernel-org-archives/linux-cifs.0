@@ -1,47 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89588C8E6;
-	Mon, 22 Sep 2025 19:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EBF1FDA89;
+	Mon, 22 Sep 2025 19:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758569601; cv=none; b=HxSVkEFzDz/1gh00rhEHCAkjKN08q7f26j5+eC4qLS4f0lZplgogpq1uEn920iOm/H53dekoTapKFrbOqVVC1yeROhOfIiBw3d15Ce0CJvR6i7DM4SjZRh4/LeDRB1h93EhoBzqrejP6WR77x6veN/IoTJBZJK9EBjV72lcH2OI=
+	t=1758569681; cv=none; b=ZIWb2IY63wDebG2EOqNLJQGOeiUl/rVVEGFelZ79FREgdWeuR3wWWtTC1fT+8l2jTnmx0aKG0muzCf+hDcATS4Zk6t4I7Bal2uelojURdp0J4X6fzH/ySQ23St5qtFZ92A/JDuhPiRbkyktsBBuXF8G73kJq6LLxP/SYbrtICgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758569601; c=relaxed/simple;
-	bh=BLVtAvvOI9l9nyKOakCo6O3gEHUseulk5jE5cAtPVRM=;
+	s=arc-20240116; t=1758569681; c=relaxed/simple;
+	bh=dcjT9okpzy3BmcRq28rgo4MjdnV7GQkdXUYS/0z49dA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f6w0DjA2Pp6haAYwRg6OwY8aBDhGlmlTEV2ecZHEPiCbiqpB6tct57h7C5nUGcb+SDzvcStpbh8XoEup8BL4DJeZ8zbwMAojnaZ3A1eEP0h0YT6yXc7i/RcGyzoeG0f4XWHXpqod2Xf6PXOh62GQXYrzS5CHYQsN9oXqediI8JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=KpwEf1nm; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=VZYqAgZwiz22T0bECSU104V3JSgUixZhFFFiq9u6Qq+YTMXzigt56lJdap6sJz+LwS52KTM8c0BB3Ycdg1U8eCbk6o9cbSHCbIm3k87wjhPbWOIK4QljvNV2QO1ngj03V95N3BZB0xqaFtcFa/TOdLWG9ENbT+mav3gI65V8jb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=c4j67MVm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="KpwEf1nm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21B05C4CEF0;
-	Mon, 22 Sep 2025 19:33:20 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="c4j67MVm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B87F5C4CEF0;
+	Mon, 22 Sep 2025 19:34:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1758569601;
-	bh=BLVtAvvOI9l9nyKOakCo6O3gEHUseulk5jE5cAtPVRM=;
+	s=korg; t=1758569681;
+	bh=dcjT9okpzy3BmcRq28rgo4MjdnV7GQkdXUYS/0z49dA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KpwEf1nmHDK1pb2FJk40NxIBkHjODdb/4xfInxJtSLpEsi7j3QkfPdpfbuxzTXC4P
-	 KzU7LtkTES4gA7w7tzaQTCdTWyd7BnKFXSFO+al1pcpGnM1UPKZ7Hv5BEZyWClzQb8
-	 Rog6aqIsSnYhwOGSJebxi1pizcN694Jwy1DUyIqo=
+	b=c4j67MVm4OKT/dsl/Fk/VN0sP8VZPzDhq8tY3a1Cd0S0fizfJ1KN/TI3j3ASahDOT
+	 sTA9ye1Xylgu4fTdjcq3ZvTbHRgGuRKgsX21r1lYlVm+CTCd1aMZolk61S//uYc1kr
+	 3HrXAGbErr2yxPvZF8XYwWh4S+OfHh/0rUeeQgao=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
 	Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Stefan Metzmacher <metze@samba.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.1 45/61] smb: client: fix smbdirect_recv_io leak in smbd_negotiate() error path
-Date: Mon, 22 Sep 2025 21:29:38 +0200
-Message-ID: <20250922192404.830838087@linuxfoundation.org>
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH 6.6 27/70] ksmbd: smbdirect: verify remaining_data_length respects max_fragmented_recv_size
+Date: Mon, 22 Sep 2025 21:29:27 +0200
+Message-ID: <20250922192405.307453170@linuxfoundation.org>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250922192403.524848428@linuxfoundation.org>
-References: <20250922192403.524848428@linuxfoundation.org>
+In-Reply-To: <20250922192404.455120315@linuxfoundation.org>
+References: <20250922192404.455120315@linuxfoundation.org>
 User-Agent: quilt/0.68
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -53,49 +51,63 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.1-stable review patch.  If anyone has any objections, please let me know.
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
 From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit daac51c7032036a0ca5f1aa419ad1b0471d1c6e0 ]
+commit e1868ba37fd27c6a68e31565402b154beaa65df0 upstream.
 
-During tests of another unrelated patch I was able to trigger this
-error: Objects remaining on __kmem_cache_shutdown()
+This is inspired by the check for data_offset + data_length.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
-Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
+Cc: stable@vger.kernel.org
+Fixes: 2ea086e35c3d ("ksmbd: add buffer validation for smb direct")
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/client/smbdirect.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ fs/smb/server/transport_rdma.c |   11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index d47eae133a202..b648bb30401d5 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -1084,8 +1084,10 @@ static int smbd_negotiate(struct smbd_connection *info)
- 	log_rdma_event(INFO, "smbd_post_recv rc=%d iov.addr=0x%llx iov.length=%u iov.lkey=0x%x\n",
- 		       rc, response->sge.addr,
- 		       response->sge.length, response->sge.lkey);
--	if (rc)
-+	if (rc) {
-+		put_receive_buffer(info, response);
- 		return rc;
-+	}
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -553,7 +553,7 @@ static void recv_done(struct ib_cq *cq,
+ 	case SMB_DIRECT_MSG_DATA_TRANSFER: {
+ 		struct smb_direct_data_transfer *data_transfer =
+ 			(struct smb_direct_data_transfer *)recvmsg->packet;
+-		unsigned int data_offset, data_length;
++		u32 remaining_data_length, data_offset, data_length;
+ 		int avail_recvmsg_count, receive_credits;
  
- 	init_completion(&info->negotiate_completion);
- 	info->negotiate_done = false;
--- 
-2.51.0
-
+ 		if (wc->byte_len <
+@@ -563,6 +563,7 @@ static void recv_done(struct ib_cq *cq,
+ 			return;
+ 		}
+ 
++		remaining_data_length = le32_to_cpu(data_transfer->remaining_data_length);
+ 		data_length = le32_to_cpu(data_transfer->data_length);
+ 		data_offset = le32_to_cpu(data_transfer->data_offset);
+ 		if (wc->byte_len < data_offset ||
+@@ -570,6 +571,14 @@ static void recv_done(struct ib_cq *cq,
+ 			put_recvmsg(t, recvmsg);
+ 			smb_direct_disconnect_rdma_connection(t);
+ 			return;
++		}
++		if (remaining_data_length > t->max_fragmented_recv_size ||
++		    data_length > t->max_fragmented_recv_size ||
++		    (u64)remaining_data_length + (u64)data_length >
++		    (u64)t->max_fragmented_recv_size) {
++			put_recvmsg(t, recvmsg);
++			smb_direct_disconnect_rdma_connection(t);
++			return;
+ 		}
+ 
+ 		if (data_length) {
 
 
