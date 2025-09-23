@@ -1,111 +1,108 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CBBD1DE2A0
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Sep 2025 08:18:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA8622ACEB;
+	Tue, 23 Sep 2025 09:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758615498; cv=none; b=RSlI7PM2V3BJG4xV7b3hBIgsRev4YRnvIUKZLpX2gMVuRqU7WLZElVvFK4+c+fDlDnDSTzU7KsdjJkotgsr3TKw0tn6dd7NCZwBbdTb5oBFLRgoWNDnPsFm+U+cmsb6AyDow0MkUpG3+YxIOm1n1F/MtuVFqHa9DdHV1ePPPAu8=
+	t=1758618409; cv=none; b=Sw3W81bdg+H/vGyk8bf0aBav5flpQ7ThHCwP9bOyGFAhr7fGUhFuRYaMHKJFoLKFxUrr0/8lcKz5R7JQcLDYYODMnCqHRev4cSDKWSMATArFoEx/4c/NX/4woA23SBJdcfAqbBwaZYgAXeOu66HuvboZBisPCq/sbHFhQJMqBxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758615498; c=relaxed/simple;
-	bh=z0Kwgtiq66it4UMXF0pNQ3Se0nVNIVZkH+W1aJZyaAU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lgCxQxlDmurOy9in8+74eoNVG+uUlPE3zWBcH0W4GAjzOsH49vzrATz2KPmb5hSgJ7PMM9cH8VbFQtHKySo3NnA9L4GXVLUbjOWP84vxiT0FQg1oi3nG95derF+y0klMUngWJjis2LZP1uvFlHEfnn4wjtOoNHo/l4xkL+PZyHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BDnca5Tk; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758618409; c=relaxed/simple;
+	bh=ZDzclZSQdzF1oEaN1C3ZiYcW4WfselUNILKqPuhL7q8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BRIv9H0nGBPayFO7DfoQ3224XO713OCPJXQJPHHZsDaUZ/bRPOqz4rYTDAfinynz10js6pBeTu36/UZyBuMvuK66OFNYdbyyZms9gLNYlwI1j1hxK1I2IN/7qkLdx7I4qyO3WSZfrPj1iYnzYVS+u6guKNRVvNfZRABTjsdUqrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PaNNYWLH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BDnca5Tk"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3322e6360bbso2501118a91.0
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Sep 2025 01:18:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758615496; x=1759220296; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YUkaPyyL6AFfnJMjIpQqWCA2oE1zoPDVeRYEUkwFkPw=;
-        b=BDnca5TkuDKDHsuYMg0PkAFjAoABIy53a2VL47Ws2dRoxPlB3FEQnkF24mJquCFOga
-         5cxzD6inaRbwi9lBT5fCemPAyKpXjvKXk7SWHti1oSLQUXhw6gqU9BaFXKpAhmEoc9mL
-         kQBISqtNB+ZnT2Q2D/x+WdHLg4g+6sk45TiumIDcy1Biz+M7VQVJ50L5duyJ9M1F8xGE
-         o2vw/q3C926v/eIQO/3Q3Ha4My517LkCl/pRe2Dc6+adtARJxahbU9gD34zrnkf50agt
-         HmaZgbo79295d84HhjHcz9hFQRMi/yuZKfTe3jtTEOdBBrO/NaOf+fYrhZAfiV8yhBqj
-         1LpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758615496; x=1759220296;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YUkaPyyL6AFfnJMjIpQqWCA2oE1zoPDVeRYEUkwFkPw=;
-        b=sae0Jrt6DWmDLbp3e8aXbNeAuBnf0c1o9gGwHNG6Xbdv/YrrnZTio2k2/PGFzn3nZm
-         bkrctPV/M9ZFx9+Sn3HwbmZYkBNYKqWqmB8of75OVRu1ddG8QdzLqEqQp/JSviMLM7+j
-         ibnfhGSAVCb7KZRQI6eBZZdqKoTJs9I+k3CGO+aqwmO/ZeIMpXPjZF4XkynCxpjTixxF
-         aB2aY2qOHWn6Ox/LbtDUVcfShAwDIoq7cNeJ0rjailbBo33fFQoz3VytBMLGAY0s2Iq8
-         G69rr/InrV1ntyPOe64jBZqM/xQlFY8Kfh12HUdWxayvvZVNfG4oZZlrwc/tpb5GUFwj
-         /I5A==
-X-Gm-Message-State: AOJu0YxuUy+8/PLD6BudsPRixkLz08eseMQECFievW06zvt2wWJoE/A1
-	Mg47arXbiWDf1oXUdKUwQMTaVgJG349WM9P+4r6a1KFJDQFyrdmd4QvN
-X-Gm-Gg: ASbGncvE6S8a02Bk1oO56cczotELygI897iqCM/0Mvv1asMleR786QVVd6V4H92RmHm
-	5KGYe4MtwIcofjgA2i6UFpOjL7m6hR0LZElI5mj0fMAJ0vwt60KDrvTlkTEYn65/3fumjUQcfC3
-	zD3W9vcl9ZWmfTWhUc/JLVdpuSvMY1snFBjY0edf3d6Goh38Ge79F7aQ9PHzfMy50DPMeNBC3++
-	XuJYGcafAKjvMK8yUJdLp+6CS/5pDdxLirTmK2rGsCLD1ROis5VDcyyyDMoiZEWyETdO1rH+KDL
-	733mFJ4bpGjdjNQUM4LyiX7iZq4O+f9CpghfxLfqCfSkHk1VBXOsffsiuKLymiqVdKd1U2PZuL6
-	Pt6iYodaiSM9JXiE7bDi7nHyuiHE=
-X-Google-Smtp-Source: AGHT+IHnv2PpiWhjp44rVS3D6dWwp8LFZeraFg84N/MTZ+hM3oMgyC+K8cNvHd4Kp+eTcsGcgpYfSQ==
-X-Received: by 2002:a17:90b:3ec6:b0:327:b2a1:2964 with SMTP id 98e67ed59e1d1-332a953388amr2531198a91.15.1758615496385;
-        Tue, 23 Sep 2025 01:18:16 -0700 (PDT)
-Received: from ubuntu.. ([110.9.142.4])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77f335995cbsm5955477b3a.63.2025.09.23.01.18.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 01:18:16 -0700 (PDT)
-From: Sang-Heon Jeon <ekffu200098@gmail.com>
-To: sfrench@samba.org,
-	pc@manguebit.org
-Cc: linux-cifs@vger.kernel.org,
-	Sang-Heon Jeon <ekffu200098@gmail.com>
-Subject: [PATCH] smb: client: fix wrong index reference in smb2_compound_op()
-Date: Tue, 23 Sep 2025 17:16:45 +0900
-Message-ID: <20250923081645.269534-1-ekffu200098@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PaNNYWLH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D502C4CEF5;
+	Tue, 23 Sep 2025 09:06:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758618409;
+	bh=ZDzclZSQdzF1oEaN1C3ZiYcW4WfselUNILKqPuhL7q8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PaNNYWLHy4fDFnFg0POymQxjyKJRllvvW2PUUnr0Jp8qv3XJcg61GIMhs0/KUaYCi
+	 lX/Wm0QAu11qh8ACDIi6gny9gGL3pMdWMmwslyzGrPd9Yv+CqqAPBioASdIaJFAHz5
+	 nWochXiHzX7gDhPOTrw3KFTulztGvv4VFW3L4V+yHV6oSRn7wFV54X6ukuc3WU74Gw
+	 l+qoCxx9MlWVSKvZQspuPwwpo6a2fQ4HKGPxOBeq/VS/xyIltNYrFtJ3cKWD+aA4yw
+	 5vqH75FRH5jDyhzcPK5yrdIwqpyRlKbWvslpXBVzVoR6vrHFwJO0dwI1zJYKozBxpq
+	 VJ+7xEh6SPO4g==
+Date: Tue, 23 Sep 2025 10:06:41 +0100
+From: Simon Horman <horms@kernel.org>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev,
+	davem@davemloft.net, kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Moritz Buhl <mbuhl@openbsd.org>,
+	Tyler Fanelli <tfanelli@redhat.com>,
+	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Benjamin Coddington <bcodding@redhat.com>,
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+	Alexander Aring <aahringo@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	John Ericson <mail@johnericson.me>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Daniel Stenberg <daniel@haxx.se>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH net-next v3 03/15] quic: provide common utilities and
+ data structures
+Message-ID: <20250923090641.GE836419@horms.kernel.org>
+References: <cover.1758234904.git.lucien.xin@gmail.com>
+ <a7fb75136c7c2e51b7081d3bff421e01b435288f.1758234904.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a7fb75136c7c2e51b7081d3bff421e01b435288f.1758234904.git.lucien.xin@gmail.com>
 
-In smb2_compound_op(), the loop that processes each command's response
-uses wrong indices when accessing response bufferes.
+On Thu, Sep 18, 2025 at 06:34:52PM -0400, Xin Long wrote:
 
-This incorrect indexing leads to improper handling of command results.
-Also, if incorrectly computed index is greather than or equal to
-MAX_COMPOUND, it can cause out-of-bounds accesses.
+> index f79f43f0c17f..b54532916aa2 100644
+> --- a/net/quic/protocol.c
+> +++ b/net/quic/protocol.c
+> @@ -336,6 +336,9 @@ static __init int quic_init(void)
+>  	if (err)
+>  		goto err_percpu_counter;
+>  
+> +	if (quic_hash_tables_init())
 
-Fixes: 3681c74d342d ("smb: client: handle lack of EA support in smb2_query_path_info()") # 6.14
-Signed-off-by: Sang-Heon Jeon <ekffu200098@gmail.com>
----
-I was unable to reproduce this issue in my environment, but the code
-flow clearly looks like typo error. I have not added stable cc-ing yet,
-leaving it to the reviewers' judgment, but IMHO i think it should be needed.
+Hi Xin,
 
-I would be happy to help with testing if anyone can provide reproduction
-steps or additional help on triggering this code path. Always thanks for
-your consideration.
----
- fs/smb/client/smb2inode.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If we reach here then the function will return err, which is 0.
+So it seems that err should be set to a negative error value instead.
+Perhaps the return value of quic_hash_tables_init.
 
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index e32a3f338793..0985db9f86e5 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -687,7 +687,7 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 	}
- 
- 	for (i = 0; i < num_cmds; i++) {
--		char *buf = rsp_iov[i + i].iov_base;
-+		char *buf = rsp_iov[i + 1].iov_base;
- 
- 		if (buf && resp_buftype[i + 1] != CIFS_NO_BUFFER)
- 			rc = server->ops->map_error(buf, false);
--- 
-2.43.0
+Flagged by Smatch.
 
+
+> +		goto err_hash;
+> +
+>  	err = register_pernet_subsys(&quic_net_ops);
+>  	if (err)
+>  		goto err_def_ops;
+> @@ -353,6 +356,8 @@ static __init int quic_init(void)
+>  err_protosw:
+>  	unregister_pernet_subsys(&quic_net_ops);
+>  err_def_ops:
+> +	quic_hash_tables_destroy();
+> +err_hash:
+>  	percpu_counter_destroy(&quic_sockets_allocated);
+>  err_percpu_counter:
+>  	return err;
+
+...
