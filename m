@@ -1,404 +1,202 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF44279DC9
-	for <linux-cifs@vger.kernel.org>; Mon, 22 Sep 2025 21:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8CD156C6A
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Sep 2025 00:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758575646; cv=none; b=KnEGXiQLti2tsOsNKiPdiyFF1wnLxlXTdArRQ/efWC9Uitb4Iwx7lG04uLOklSA4/OYd1pspLIQ3/RstpauEWpgXgXH1YSXwtNoItSRTqklER6REF+1iQB3srUG8X9uVFAPfUYzvoxzqxBd/JYNOgSl+6SftF9S7qyuagcMR7hQ=
+	t=1758588633; cv=none; b=rwfvZLZq7m5Afzf8e2sNKJklhrMnIyFc3SRbZsPL6EosXO6ODv3N5DcdiQ4tRoAjGD1pXO8EgUmlVyVfwB+TzG6jqjz0Iv41hL1nyifNs3vezz3fy62VWJtgthaU1Hvi58siHkjcgj1cvAN5oKyabI/iHifQKoVbL+dmNHCnxsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758575646; c=relaxed/simple;
-	bh=NVqNZVGuWMPfCSYxEdjsIejlbkdUqztfaNiXA+Sie0Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o6e2l+ulEwX0d4P1DhUd8DZhP5adnEz97ojH4nF5PLsH5TwGRB1avGZydDpw091TLDOVa3+tZ1vMIyKXcABzubS/KKgQfmW7K8TRSVBqRS3m7PL5EAIhFMzB0b6igKTiwHO53xgQVxhVAxATudUwHkdjo/Q7MRo+LdJubVB7FR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=am0Lsjzw; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1758588633; c=relaxed/simple;
+	bh=0IRaypG6kjraVDLxKm5HNx5q36OMIE1CYCoovQyDeDw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=tyfe8kMEkt0SBxlWKvQbJ7UVX6yAEcvziyFV2iyvi58GRaZXujc/VzpUWJnoUz5iE4v7VniCiBtr04Azd+mXSm7QF3OqiAtptncvTg1Nrq8Px70rByWM00ixdv2WK68t4FF45x1IBsoi3JqVcUTrZuxSwk+keZZjCV6GixPqlfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W8ZFZKLr; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="am0Lsjzw"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3ece0e4c5faso5614579f8f.1
-        for <linux-cifs@vger.kernel.org>; Mon, 22 Sep 2025 14:14:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W8ZFZKLr"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-78f15d5846dso56611856d6.0
+        for <linux-cifs@vger.kernel.org>; Mon, 22 Sep 2025 17:50:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1758575640; x=1759180440; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AQnUC3UTWERRUD1tnLSmBeOd/aMW4l6+vTyxgJ9B0ZY=;
-        b=am0LsjzwKy6vma582juk5KcifsyncQDpHuw/vJgVh7SjqamohCaspyDKtU53e+DEVJ
-         0Lm0yMub+Q7mbkJVtQL98+s/KstXLBGJUH2rnZp05EcBkAzRcGaStH5UXft+nGjP/fvV
-         YPhqQ36SfWdL7PHu1vYLi18+bDAwIIUElZYCTnD+dSsVSPCkPZXpTzG78tMxjGDmaeWP
-         zk56yIM39o4IOHZDTwXo3l7J/BkIh3PSWTxzCSd7aQehC7feLJShTRx9+fVggR2vCdUA
-         CSZqoiiTMbxyKVnFaNl7jRwXxbNei1DqqEdpacxUUEQD8xd34lgIp7H7RAZUMbKQqtiN
-         bLVg==
+        d=gmail.com; s=20230601; t=1758588630; x=1759193430; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jdP2OtWkp2lQ2fPom/2BpewZKCAl8tKABI3zwpUm4pU=;
+        b=W8ZFZKLrTd1VyaHSGksCM9WgHMyClz6r8zH4AfKmXnzdTXFU3cccjTGlbu6ZJ/9psV
+         G9POHc/qokyK7Xof49MD7+Wb3z3DdLqZajarOY7aqOdSmvyt+PkKTN5JY+j7kkFk6ZNV
+         6JwiTOgTdxC8zOoOIzUq2j17Q9905c3qAchA+Qaq6UTbk+M7sxR4G/O5U7s/HF5x+Kft
+         OWkgCDuoftPcmcHOJxYP3K7z6Bz3GSpHwUyQToy649E+7iZWJz0vQRpdPtFSjU1jL0hg
+         oYfo+X1bWDM+pvL4Wf2b9KxP+Lj5ceusBWkyWY03l2sXO5+ZS9XanadUJmqnjpdbyVsJ
+         iwBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758575640; x=1759180440;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AQnUC3UTWERRUD1tnLSmBeOd/aMW4l6+vTyxgJ9B0ZY=;
-        b=NzYtRY1E76S+9Szm/WTSaeAbINRNem4wk3fwnNVahuaXl7nVMNj+5urZoRjqSNd9Vg
-         FKMgqf2VI5IBOdriHcSfTchxTWcmZRqlwPs7Kz3BFXDU84SqZ5GNiECfe+SNjpUQEaM7
-         ekzZHD7d8iyYyf4cyy9zA2FKAT0WIQaMbaCJNy6bAonZyzCw5hcjCKGA+M37LolOyvad
-         saKkiD+SI4kay9lTIfv+ZcQ+oVktnirIuoyq8uQfFCf7/GYf3ei8dqzWSAILidtUyR4c
-         /vlScN9g5plsRolzOessayk6SaeCpsRVae5jAg2Sp7+0ckRQvjwDt2mWC7HKOT91735r
-         dkeg==
-X-Forwarded-Encrypted: i=1; AJvYcCW8HhJqP1ifyunRrXAyPYqVVJlJ3evPt6d03dhYVko6bGVFkf21ah8h4R9MV69WYAFeE4oZdYZAAglx@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZeKNYxSyLxlWqMrPZadu3P/MgIxSeW8jEolZDmA5fhRFITPqK
-	fZkOWYKV0kBa+PTZfy0ulQUYpLr9LdsdYQkTDUCOogAlYsDARlstppCPia5TDRyvh+gis0mTor2
-	moeGJ
-X-Gm-Gg: ASbGncsGCAHbSGsz16x+5C1LXTBx54i3yjvOfPcK2nwnOrKPejDLjVZFOwagf1LkE8e
-	mmmw1Pv1mY7tWbS8t/foeHQO4/hbwY8TC1Ko5cPPhvaWq+G6EOjZ6FzrAaLiK+B4ruYfTEyCOoQ
-	60U6Pw9e8ezSGhwEv3QVIoITGAk/Wlc/99+BnegQYhEE+Tw+upIySbBO7DNqc/EcwUpqmU/eLEi
-	zshlfhm6TAocaMFV2VombSRGudbnF9qApdk3Yrxh0/eqbkS9XvNa2t7ANhXoinb9QZlx88QCvQA
-	kWPmoTjhIxJsIecyTC7PWEkkncvBxTP5YA9L06nOHXWd8deG3BWoJPWaQo0pK6S+hRQjUPoF5r3
-	R0eKmkbgFJiNwJeX2HWHYEE1xGp51vZeA+JMBel5J1XlnrObc48054kTNifnbvjPy5kVnZ0tvvj
-	WkwNwy5g==
-X-Google-Smtp-Source: AGHT+IEx15QVBVxvTAM0FZsC5CNe1S0I6wlrxJKzWygPiCQ3qj8lhe+IqEzD9Xhgm9A1hjvD5VDRUw==
-X-Received: by 2002:a5d:5d03:0:b0:3ee:23a7:5df0 with SMTP id ffacd0b85a97d-405ccdc1a03mr96756f8f.54.1758575640475;
-        Mon, 22 Sep 2025 14:14:00 -0700 (PDT)
-Received: from ?IPV6:2804:18:898:c51e:84f3:b734:4d02:e7d? ([2804:18:898:c51e:84f3:b734:4d02:e7d])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-332a96fc922sm98666a91.4.2025.09.22.14.13.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Sep 2025 14:13:59 -0700 (PDT)
-Message-ID: <d09c8506-6326-45e6-8687-8e0b002eff62@suse.com>
-Date: Mon, 22 Sep 2025 18:11:49 -0300
+        d=1e100.net; s=20230601; t=1758588630; x=1759193430;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jdP2OtWkp2lQ2fPom/2BpewZKCAl8tKABI3zwpUm4pU=;
+        b=uqUAxw4KeSTijmhvrAf+RSzbc+fWHCun7wwS+FNkwSAorBanJaUQig6Op/+T4kCfjJ
+         xQeb9/oUnSuHTlaGzDMPK0pX8eHLr7kvhWg2MebIehhfZ3sIhvkORU8u3weI0TpKP2iC
+         aP8RZvCgVEVBMow8tXtepXCDasN13HneNHr+4XEcn2AwayN+skDcQ3QhBIN2etUFeovq
+         8ihkbZMz83KSpKgOzJpnZVDCiujzT6uZ0W0ZDPbI1+gFXtZcfkAGeraSb1nHGi2k6jfl
+         e7K18hojjN/LE4z/f6Ek6VT7I+ccj9ZGtx8hmyK7pzTe/xUYYKzubUT32PoU6N/mwSUr
+         nApA==
+X-Gm-Message-State: AOJu0YzSwvL8bLKrmbtvSAfrBfV6dk2FRyXFnd01HCM5qI6z9kUxYotx
+	ithwTWd5wZV4ltQKNAl6u5g1Iw2YkwBA6Q8acwJTDD3FbonrPMaOKG/ucAPZwllvVwhOo4DyNce
+	cwb2JC7n1KtavtChQL0QIhheSpvrwKlj95Eeg
+X-Gm-Gg: ASbGncun3g+Nglcru4dI/UHb1QfuMI+Z3WhFd2Yz9mdSEOJ1EHCAP+ye/2EWyVtivpu
+	EI8Aaf7iDTOzptGWvZKff0IEbX3OI15Bd2CJzpfcr6KIAHbZJwilsGXSEwGrmKJnQyYE9XhxkuD
+	+6pgZjbSSEqBqjcLr6xEe6kPbOZGUIOwvL76oABQNgzcZh39WNu2aS2UdvYfjWrnssQYDfYY399
+	ssUIw+WLY3pgMkYrVivCPnv3JRhK2mNCyGyPWTJQdpBQKYLRawsfAhogQOApzHOZ0yWr8t+47Vj
+	0fe/oSdx8WptszyUPYTSIOf0iL9U+i1Egx7EwugTW3rMWDgmLvk9N/JjLhOHCda5DyDFbwfedDh
+	Hsqq8B0kuzVnJXN8xPYmIJw==
+X-Google-Smtp-Source: AGHT+IHUhd58aMP0rgc02uM59oNIs9oeApj903Qn0h+Tpl83B0OpLvDs+zbCTyfmUkPC8c6oQnaXOtDvZUtLDkiCieM=
+X-Received: by 2002:a05:6214:250c:b0:77b:69ec:79aa with SMTP id
+ 6a1803df08f44-7e6ff32e21dmr11932436d6.11.1758588629573; Mon, 22 Sep 2025
+ 17:50:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] cifs: client: allow changing multichannel mount
- options on remount
-To: rajasimandalos@gmail.com, Rajasi Mandal <rajasimandal@microsoft.com>
-Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org
-References: <20250922082417.816331-1-rajasimandalos@gmail.com>
- <20250922082417.816331-2-rajasimandalos@gmail.com>
-Content-Language: en-US
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-In-Reply-To: <20250922082417.816331-2-rajasimandalos@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 22 Sep 2025 19:50:17 -0500
+X-Gm-Features: AS18NWDjzuUu7Y-wr1tyaVfxk_fjEyWwC4XaQaCKjyZbe4wscwZzMF4ZpV__7sg
+Message-ID: <CAH2r5muDbZTXitjyMP3LWnAHvZwdLKk5OigR8_fH849jz2ukQg@mail.gmail.com>
+Subject: Fix for xfstest generic/637 (dir lease not updating for newly created
+ file on same client)
+To: CIFS <linux-cifs@vger.kernel.org>, 
+	Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: Bharath S M <bharathsm@microsoft.com>
+Content-Type: multipart/mixed; boundary="000000000000928b7d063f6d520a"
 
-Hi Rajasi,
+--000000000000928b7d063f6d520a
+Content-Type: text/plain; charset="UTF-8"
 
-On 9/22/25 5:24 AM, rajasimandalos@gmail.com wrote:
-> From: Rajasi Mandal <rajasimandal@microsoft.com>
-> 
-> Previously, the client did not properly update the session's channel
-> state when multichannel or max_channels mount options were changed
-> during remount. This led to inconsistent behavior and prevented
-> enabling or disabling multichannel support without a full
-> unmount/remount.
-> 
-> Enable dynamic reconfiguration of multichannel and max_channels
-> options during remount by introducing smb3_sync_ses_chan_max() to
-> safely update the session's chan_max field, and smb3_sync_ses_channels()
-> to synchronize the session's channels with the new configuration.
-> Replace cifs_disable_secondary_channels() with
-> cifs_decrease_secondary_channels(), which now takes a from_reconfigure
-> argument for more flexible channel cleanup. Update the remount logic
-> to detect changes in multichannel or max_channels and trigger the
-> appropriate session/channel updates.
-> 
-> With this change, users can safely change multichannel and
-> max_channels options on remount, and the client will correctly adjust
-> the session's channel state to match the new configuration.
-> 
-> Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
-> ---
->  fs/smb/client/cifsproto.h  |  2 +-
->  fs/smb/client/fs_context.c | 29 ++++++++++++++++++
->  fs/smb/client/fs_context.h |  2 +-
->  fs/smb/client/sess.c       | 35 +++++++++++++++-------
->  fs/smb/client/smb2pdu.c    | 60 ++++++++++++++++++++++++++++++--------
->  fs/smb/client/smb2pdu.h    |  2 ++
->  6 files changed, 105 insertions(+), 25 deletions(-)
-> 
-> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> index e8fba98690ce..ec3118457b26 100644
-> --- a/fs/smb/client/cifsproto.h
-> +++ b/fs/smb/client/cifsproto.h
-> @@ -667,7 +667,7 @@ bool
->  cifs_chan_is_iface_active(struct cifs_ses *ses,
->  			  struct TCP_Server_Info *server);
->  void
-> -cifs_disable_secondary_channels(struct cifs_ses *ses);
-> +cifs_decrease_secondary_channels(struct cifs_ses *ses, bool from_reconfigure);
->  void
->  cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server);
->  int
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index 43552b44f613..96e80c70f25d 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -1015,6 +1015,22 @@ int smb3_sync_session_ctx_passwords(struct cifs_sb_info *cifs_sb, struct cifs_se
->  	return 0;
->  }
->  
-> +/**
-> + * smb3_sync_ses_chan_max - Synchronize the session's maximum channel count
-> + * @ses: pointer to the old CIFS session structure
-> + * @max_channels: new maximum number of channels to allow
-> + *
-> + * Updates the session's chan_max field to the new value, protecting the update
-> + * with the session's channel lock. This should be called whenever the maximum
-> + * allowed channels for a session changes (e.g., after a remount or reconfigure).
-> + */
-> +void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channels)
-> +{
-> +	spin_lock(&ses->chan_lock);
-> +	ses->chan_max = max_channels;
-> +	spin_unlock(&ses->chan_lock);
-> +}
-> +
+Am testing this potential fix for the dir lease caching issue now.
+See attached fix.  Additional testing and review would be very
+helpful.
 
-The other writer of chan_max is when creating a session. Is this lock
-really avoiding a race here?
+   smb client: fix dir lease bug with newly created file in cached dir
 
->  static int smb3_reconfigure(struct fs_context *fc)
->  {
->  	struct smb3_fs_context *ctx = smb3_fc2context(fc);
-> @@ -1097,6 +1113,18 @@ static int smb3_reconfigure(struct fs_context *fc)
->  		ses->password2 = new_password2;
->  	}
->  
-> +	/*
-> +	 * If multichannel or max_channels has changed, update the session's channels accordingly.
-> +	 * This may add or remove channels to match the new configuration.
-> +	 */
-> +	if ((ctx->multichannel != cifs_sb->ctx->multichannel) ||
-> +		(ctx->max_channels != cifs_sb->ctx->max_channels)) {
-> +		//Synchronize ses->chan_max with the new mount context
-> +		smb3_sync_ses_chan_max(ses, ctx->max_channels);
-> +		//Now update the session's channels to match the new configuration
-> +		rc = smb3_sync_ses_channels(cifs_sb);
-> +	}
-> +
->  	mutex_unlock(&ses->session_mutex);
->  
->  	STEAL_STRING(cifs_sb, ctx, domainname);
-> @@ -1110,6 +1138,7 @@ static int smb3_reconfigure(struct fs_context *fc)
->  	smb3_cleanup_fs_context_contents(cifs_sb->ctx);
->  	rc = smb3_fs_context_dup(cifs_sb->ctx, ctx);
->  	smb3_update_mnt_flags(cifs_sb);
-> +
->  #ifdef CONFIG_CIFS_DFS_UPCALL
->  	if (!rc)
->  		rc = dfs_cache_remount_fs(cifs_sb);
-> diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-> index b0fec6b9a23b..a75185858285 100644
-> --- a/fs/smb/client/fs_context.h
-> +++ b/fs/smb/client/fs_context.h
-> @@ -371,7 +371,7 @@ static inline struct smb3_fs_context *smb3_fc2context(const struct fs_context *f
->  extern int smb3_fs_context_dup(struct smb3_fs_context *new_ctx, struct smb3_fs_context *ctx);
->  extern int smb3_sync_session_ctx_passwords(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses);
->  extern void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb);
-> -
-> +extern void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channels);
->  /*
->   * max deferred close timeout (jiffies) - 2^30
->   */
-> diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-> index 0a8c2fcc9ded..42b5481c884a 100644
-> --- a/fs/smb/client/sess.c
-> +++ b/fs/smb/client/sess.c
-> @@ -264,13 +264,16 @@ int cifs_try_adding_channels(struct cifs_ses *ses)
->  	return new_chan_count - old_chan_count;
->  }
->  
-> -/*
-> - * called when multichannel is disabled by the server.
-> - * this always gets called from smb2_reconnect
-> - * and cannot get called in parallel threads.
-> +/**
-> + * cifs_decrease_secondary_channels - Reduce the number of active secondary channels
-> + * @ses: pointer to the CIFS session structure
-> + * @from_reconfigure: if true, only reduce to chan_max; if false, reduce to a single channel
-> + *
-> + * This function disables and cleans up extra secondary channels for a CIFS session.
-> + * If called during reconfiguration, it reduces the channel count to the new maximum (chan_max).
-> + * Otherwise, it disables all but the primary channel.
->   */
-> -void
-> -cifs_disable_secondary_channels(struct cifs_ses *ses)
-> +void cifs_decrease_secondary_channels(struct cifs_ses *ses, bool from_reconfigure)
->  {
+    Test generic/637 spotted a problem with create of a new file in a
+    cached directory (by the same client) could cause cases where the
+    new file does not show up properly in ls on that client until the
+    lease times out.
 
-Maybe you could get rid of from_reconfigure parameter if you just set
-chan_max to 1 before calling cifs_decrease_secondary_channels when this
-function is not called from smb3_reconfigure. What do you think?
+    Fixes: 037e1bae588e ("smb: client: use ParentLeaseKey in cifs_do_create")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Bharath SM <bharathsm@microsoft.com>
 
->  	int i, chan_count;
->  	struct TCP_Server_Info *server;
-> @@ -281,12 +284,13 @@ cifs_disable_secondary_channels(struct cifs_ses *ses)
->  	if (chan_count == 1)
->  		goto done;
->  
-> -	ses->chan_count = 1;
-> -
-> -	/* for all secondary channels reset the need reconnect bit */
-> -	ses->chans_need_reconnect &= 1;
-> +	// Update the chan_count to the new maximum
-> +	if (from_reconfigure)
-> +		ses->chan_count = ses->chan_max;
-> +	else
-> +		ses->chan_count = 1;
->  
-> -	for (i = 1; i < chan_count; i++) {
-> +	for (i = ses->chan_max ; i < chan_count; i++) {
->  		iface = ses->chans[i].iface;
->  		server = ses->chans[i].server;
->  
-> @@ -318,6 +322,15 @@ cifs_disable_secondary_channels(struct cifs_ses *ses)
->  		spin_lock(&ses->chan_lock);
->  	}
->  
-> +	/* For extra secondary channels, reset the need reconnect bit */
-> +	if (ses->chan_count == 1) {
-> +		cifs_server_dbg(VFS, "server does not support multichannel anymore. Disable all other channels\n");
-> +		ses->chans_need_reconnect &= 1;
-> +	} else {
-> +		cifs_server_dbg(VFS, "Disable extra secondary channels\n");
-> +		ses->chans_need_reconnect &= ((1UL << ses->chan_max) - 1);
-> +	}
-> +
->  done:
->  	spin_unlock(&ses->chan_lock);
->  }
-> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index c3b9d3f6210f..bf9a8dc0e8fc 100644
-> --- a/fs/smb/client/smb2pdu.c
-> +++ b/fs/smb/client/smb2pdu.c
-> @@ -168,7 +168,7 @@ smb2_hdr_assemble(struct smb2_hdr *shdr, __le16 smb2_cmd,
->  static int
->  cifs_chan_skip_or_disable(struct cifs_ses *ses,
->  			  struct TCP_Server_Info *server,
-> -			  bool from_reconnect)
-> +			  bool from_reconnect, bool from_reconfigure)
->  {
->  	struct TCP_Server_Info *pserver;
->  	unsigned int chan_index;
-> @@ -206,10 +206,49 @@ cifs_chan_skip_or_disable(struct cifs_ses *ses,
->  		return -EHOSTDOWN;
->  	}
->  
-> -	cifs_server_dbg(VFS,
-> -		"server does not support multichannel anymore. Disable all other channels\n");
-> -	cifs_disable_secondary_channels(ses);
-> +	cifs_decrease_secondary_channels(ses, from_reconfigure);
->  
-> +	return 0;
-> +}
-> +
-> +/**
-> + * smb3_sync_ses_channels - Synchronize session channels
-> + * with new configuration (cifs_sb_info version)
-> + * @cifs_sb: pointer to the CIFS superblock info structure
-> + * Returns 0 on success or -EINVAL if scaling is already in progress.
-> + */
-> +int smb3_sync_ses_channels(struct cifs_sb_info *cifs_sb)
-> +{
-> +	struct cifs_ses *ses = cifs_sb_master_tcon(cifs_sb)->ses;
-> +	struct smb3_fs_context *ctx = cifs_sb->ctx;
-> +	bool from_reconnect = false;
-> +
-> +	/* Prevent concurrent scaling operations */
-> +	spin_lock(&ses->ses_lock);
-> +	if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
-> +		spin_unlock(&ses->ses_lock);
-> +		return -EINVAL;
-> +	}
-> +	ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
-> +	spin_unlock(&ses->ses_lock);
-> +
-> +	/*
-> +	 * If the old max_channels is less than the new chan_max,
-> +	 * try to add channels to reach the new maximum.
-> +	 * Otherwise, disable or skip extra channels to match the new configuration.
-> +	 */
-> +	if (ctx->max_channels < ses->chan_max) {
-> +		mutex_unlock(&ses->session_mutex);
-> +		cifs_try_adding_channels(ses);
-> +		mutex_lock(&ses->session_mutex);
-> +	} else {
-
-Maybe you can avoid entering any cifs_chan_skip_or_disable if
-ctx->max_channels == ses->chan_max. There is a cost of holding locks
-inside of it.
-
-> +		cifs_chan_skip_or_disable(ses, ses->server, from_reconnect, true);
-> +	}
-> +
-> +	/* Clear scaling flag after operation */
-> +	spin_lock(&ses->ses_lock);
-> +	ses->flags &= ~CIFS_SES_FLAG_SCALE_CHANNELS;
-> +	spin_unlock(&ses->ses_lock);
->  
->  	return 0;
->  }
-> @@ -356,7 +395,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
->  	if (ses->chan_count > 1 &&
->  	    !(server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
->  		rc = cifs_chan_skip_or_disable(ses, server,
-> -					       from_reconnect);
-> +					       from_reconnect, false);
->  		if (rc) {
->  			mutex_unlock(&ses->session_mutex);
->  			goto out;
-> @@ -439,7 +478,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
->  			 */
->  
->  			rc = cifs_chan_skip_or_disable(ses, server,
-> -						       from_reconnect);
-> +						       from_reconnect, false);
->  			goto skip_add_channels;
->  		} else if (rc)
->  			cifs_dbg(FYI, "%s: failed to query server interfaces: %d\n",
-> @@ -1105,8 +1144,7 @@ SMB2_negotiate(const unsigned int xid,
->  		req->SecurityMode = 0;
->  
->  	req->Capabilities = cpu_to_le32(server->vals->req_capabilities);
-> -	if (ses->chan_max > 1)
-> -		req->Capabilities |= cpu_to_le32(SMB2_GLOBAL_CAP_MULTI_CHANNEL);
-> +	req->Capabilities |= cpu_to_le32(SMB2_GLOBAL_CAP_MULTI_CHANNEL);
->  
->  	/* ClientGUID must be zero for SMB2.02 dialect */
->  	if (server->vals->protocol_id == SMB20_PROT_ID)
-> @@ -1310,10 +1348,8 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->  	if (!pneg_inbuf)
->  		return -ENOMEM;
->  
-> -	pneg_inbuf->Capabilities =
-> -			cpu_to_le32(server->vals->req_capabilities);
-> -	if (tcon->ses->chan_max > 1)
-> -		pneg_inbuf->Capabilities |= cpu_to_le32(SMB2_GLOBAL_CAP_MULTI_CHANNEL);
-> +	pneg_inbuf->Capabilities = cpu_to_le32(server->vals->req_capabilities);
-> +	pneg_inbuf->Capabilities |= cpu_to_le32(SMB2_GLOBAL_CAP_MULTI_CHANNEL);
->  
->  	memcpy(pneg_inbuf->Guid, server->client_guid,
->  					SMB2_CLIENT_GUID_SIZE);
-> diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
-> index 3c09a58dfd07..d3f63a4ef426 100644
-> --- a/fs/smb/client/smb2pdu.h
-> +++ b/fs/smb/client/smb2pdu.h
-> @@ -420,6 +420,8 @@ struct smb2_create_ea_ctx {
->  	struct smb2_file_full_ea_info ea;
->  } __packed;
->  
-> +int smb3_sync_ses_channels(struct cifs_sb_info *cifs_sb);
-> +
->  #define SMB2_WSL_XATTR_UID		"$LXUID"
->  #define SMB2_WSL_XATTR_GID		"$LXGID"
->  #define SMB2_WSL_XATTR_MODE		"$LXMOD"
-
-I also agree with Enzo that we could have an update_channels that
-centralizes the logic of rescaling channels, but that could also come in
-another patch as Steve suggested.
 
 -- 
-Henrique
-SUSE Labs
+Thanks,
+
+Steve
+
+--000000000000928b7d063f6d520a
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb-client-add-new-tracepoint-to-trace-lease-break-n.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb-client-add-new-tracepoint-to-trace-lease-break-n.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mfvu8ost0>
+X-Attachment-Id: f_mfvu8ost0
+
+RnJvbSAxODkzOTZlZjEyYzcwNDJmOTQ1ODIyYjNkZDdjMDI1OGNlMjY3YzEyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBCaGFyYXRoIFNNIDxiaGFyYXRoc21AbWljcm9zb2Z0LmNvbT4K
+RGF0ZTogVHVlLCAyIFNlcCAyMDI1IDIwOjEwOjI1ICswNTMwClN1YmplY3Q6IFtQQVRDSCAxLzJd
+IHNtYjogY2xpZW50OiBhZGQgbmV3IHRyYWNlcG9pbnQgdG8gdHJhY2UgbGVhc2UgYnJlYWsKIG5v
+dGlmaWNhdGlvbgoKQWRkIHNtYjNfbGVhc2VfYnJlYWtfZW50ZXIgdG8gdHJhY2UgbGVhc2UgYnJl
+YWsgbm90aWZpY2F0aW9ucywKcmVjb3JkaW5nIGxlYXNlIHN0YXRlLCBmbGFncywgZXBvY2gsIGFu
+ZCBsZWFzZSBrZXkuIEFsaWduCnNtYjNfbGVhc2Vfbm90X2ZvdW5kIHRvIHVzZSB0aGUgc2FtZSBw
+YXlsb2FkIGFuZCBwcmludCBmb3JtYXQuCgpTaWduZWQtb2ZmLWJ5OiBCaGFyYXRoIFNNIDxiaGFy
+YXRoc21AbWljcm9zb2Z0LmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5j
+aEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYi9jbGllbnQvc21iMm1pc2MuYyB8IDE5ICsrKysr
+KysrKysrLS0tLQogZnMvc21iL2NsaWVudC9zbWIycGR1LmMgIHwgIDQgKystLQogZnMvc21iL2Ns
+aWVudC90cmFjZS5oICAgIHwgNTIgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+Ky0tLQogMyBmaWxlcyBjaGFuZ2VkLCA2NiBpbnNlcnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQoK
+ZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvc21iMm1pc2MuYyBiL2ZzL3NtYi9jbGllbnQvc21i
+Mm1pc2MuYwppbmRleCBjZGRmMjczYzE0YWUuLjg5ZDkzM2I0YThiYyAxMDA2NDQKLS0tIGEvZnMv
+c21iL2NsaWVudC9zbWIybWlzYy5jCisrKyBiL2ZzL3NtYi9jbGllbnQvc21iMm1pc2MuYwpAQCAt
+NjE0LDYgKzYxNCwxNSBAQCBzbWIyX2lzX3ZhbGlkX2xlYXNlX2JyZWFrKGNoYXIgKmJ1ZmZlciwg
+c3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKQogCXN0cnVjdCBjaWZzX3Rjb24gKnRjb247
+CiAJc3RydWN0IGNpZnNfcGVuZGluZ19vcGVuICpvcGVuOwogCisJLyogVHJhY2UgcmVjZWlwdCBv
+ZiBsZWFzZSBicmVhayByZXF1ZXN0IGZyb20gc2VydmVyICovCisJdHJhY2Vfc21iM19sZWFzZV9i
+cmVha19lbnRlcihsZTMyX3RvX2NwdShyc3AtPkN1cnJlbnRMZWFzZVN0YXRlKSwKKwkJbGUzMl90
+b19jcHUocnNwLT5GbGFncyksCisJCWxlMTZfdG9fY3B1KHJzcC0+RXBvY2gpLAorCQlsZTMyX3Rv
+X2NwdShyc3AtPmhkci5JZC5TeW5jSWQuVHJlZUlkKSwKKwkJbGU2NF90b19jcHUocnNwLT5oZHIu
+U2Vzc2lvbklkKSwKKwkJKigodTY0ICopcnNwLT5MZWFzZUtleSksCisJCSooKHU2NCAqKSZyc3At
+PkxlYXNlS2V5WzhdKSk7CisKIAljaWZzX2RiZyhGWUksICJDaGVja2luZyBmb3IgbGVhc2UgYnJl
+YWtcbiIpOwogCiAJLyogSWYgc2VydmVyIGlzIGEgY2hhbm5lbCwgc2VsZWN0IHRoZSBwcmltYXJ5
+IGNoYW5uZWwgKi8KQEAgLTY2MCwxMCArNjY5LDEyIEBAIHNtYjJfaXNfdmFsaWRfbGVhc2VfYnJl
+YWsoY2hhciAqYnVmZmVyLCBzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIpCiAJc3Bpbl91
+bmxvY2soJmNpZnNfdGNwX3Nlc19sb2NrKTsKIAljaWZzX2RiZyhGWUksICJDYW4gbm90IHByb2Nl
+c3MgbGVhc2UgYnJlYWsgLSBubyBsZWFzZSBtYXRjaGVkXG4iKTsKIAl0cmFjZV9zbWIzX2xlYXNl
+X25vdF9mb3VuZChsZTMyX3RvX2NwdShyc3AtPkN1cnJlbnRMZWFzZVN0YXRlKSwKLQkJCQkgICBs
+ZTMyX3RvX2NwdShyc3AtPmhkci5JZC5TeW5jSWQuVHJlZUlkKSwKLQkJCQkgICBsZTY0X3RvX2Nw
+dShyc3AtPmhkci5TZXNzaW9uSWQpLAotCQkJCSAgICooKHU2NCAqKXJzcC0+TGVhc2VLZXkpLAot
+CQkJCSAgICooKHU2NCAqKSZyc3AtPkxlYXNlS2V5WzhdKSk7CisJCQkJCSAgIGxlMzJfdG9fY3B1
+KHJzcC0+RmxhZ3MpLAorCQkJCQkgICBsZTE2X3RvX2NwdShyc3AtPkVwb2NoKSwKKwkJCQkJICAg
+bGUzMl90b19jcHUocnNwLT5oZHIuSWQuU3luY0lkLlRyZWVJZCksCisJCQkJCSAgIGxlNjRfdG9f
+Y3B1KHJzcC0+aGRyLlNlc3Npb25JZCksCisJCQkJCSAgICooKHU2NCAqKXJzcC0+TGVhc2VLZXkp
+LAorCQkJCQkgICAqKCh1NjQgKikmcnNwLT5MZWFzZUtleVs4XSkpOwogCiAJcmV0dXJuIGZhbHNl
+OwogfQpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9zbWIycGR1LmMgYi9mcy9zbWIvY2xpZW50
+L3NtYjJwZHUuYwppbmRleCAyZGY5M2E3NWUzYjguLmMzYjlkM2Y2MjEwZiAxMDA2NDQKLS0tIGEv
+ZnMvc21iL2NsaWVudC9zbWIycGR1LmMKKysrIGIvZnMvc21iL2NsaWVudC9zbWIycGR1LmMKQEAg
+LTYxOTIsMTEgKzYxOTIsMTEgQEAgU01CMl9sZWFzZV9icmVhayhjb25zdCB1bnNpZ25lZCBpbnQg
+eGlkLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAogCXBsZWFzZV9rZXlfaGlnaCA9IChfX3U2NCAq
+KShsZWFzZV9rZXkrOCk7CiAJaWYgKHJjKSB7CiAJCWNpZnNfc3RhdHNfZmFpbF9pbmModGNvbiwg
+U01CMl9PUExPQ0tfQlJFQUtfSEUpOwotCQl0cmFjZV9zbWIzX2xlYXNlX2VycihsZTMyX3RvX2Nw
+dShsZWFzZV9zdGF0ZSksIHRjb24tPnRpZCwKKwkJdHJhY2Vfc21iM19sZWFzZV9hY2tfZXJyKGxl
+MzJfdG9fY3B1KGxlYXNlX3N0YXRlKSwgdGNvbi0+dGlkLAogCQkJc2VzLT5TdWlkLCAqcGxlYXNl
+X2tleV9sb3csICpwbGVhc2Vfa2V5X2hpZ2gsIHJjKTsKIAkJY2lmc19kYmcoRllJLCAiU2VuZCBl
+cnJvciBpbiBMZWFzZSBCcmVhayA9ICVkXG4iLCByYyk7CiAJfSBlbHNlCi0JCXRyYWNlX3NtYjNf
+bGVhc2VfZG9uZShsZTMyX3RvX2NwdShsZWFzZV9zdGF0ZSksIHRjb24tPnRpZCwKKwkJdHJhY2Vf
+c21iM19sZWFzZV9hY2tfZG9uZShsZTMyX3RvX2NwdShsZWFzZV9zdGF0ZSksIHRjb24tPnRpZCwK
+IAkJCXNlcy0+U3VpZCwgKnBsZWFzZV9rZXlfbG93LCAqcGxlYXNlX2tleV9oaWdoKTsKIAogCXJl
+dHVybiByYzsKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvdHJhY2UuaCBiL2ZzL3NtYi9jbGll
+bnQvdHJhY2UuaAppbmRleCA5M2U1YjJiYjlmMjguLmZlMGUwNzViYzYzYyAxMDA2NDQKLS0tIGEv
+ZnMvc21iL2NsaWVudC90cmFjZS5oCisrKyBiL2ZzL3NtYi9jbGllbnQvdHJhY2UuaApAQCAtMTE3
+MSw4ICsxMTcxLDU0IEBAIERFRklORV9FVkVOVChzbWIzX2xlYXNlX2RvbmVfY2xhc3MsIHNtYjNf
+IyNuYW1lLCAgXAogCQlfX3U2NAlsZWFzZV9rZXlfaGlnaCksCVwKIAlUUF9BUkdTKGxlYXNlX3N0
+YXRlLCB0aWQsIHNlc2lkLCBsZWFzZV9rZXlfbG93LCBsZWFzZV9rZXlfaGlnaCkpCiAKLURFRklO
+RV9TTUIzX0xFQVNFX0RPTkVfRVZFTlQobGVhc2VfZG9uZSk7Ci1ERUZJTkVfU01CM19MRUFTRV9E
+T05FX0VWRU5UKGxlYXNlX25vdF9mb3VuZCk7CitERUZJTkVfU01CM19MRUFTRV9ET05FX0VWRU5U
+KGxlYXNlX2Fja19kb25lKTsKKy8qIFRyYWNlcG9pbnQgd2hlbiBhIGxlYXNlIGJyZWFrIHJlcXVl
+c3QgaXMgcmVjZWl2ZWQvZW50ZXJlZCAoaW5jbHVkZXMgZXBvY2ggYW5kIGZsYWdzKSAqLworREVD
+TEFSRV9FVkVOVF9DTEFTUyhzbWIzX2xlYXNlX2VudGVyX2NsYXNzLAorCVRQX1BST1RPKF9fdTMy
+IGxlYXNlX3N0YXRlLAorCQlfX3UzMiBmbGFncywKKwkJX191MTYgZXBvY2gsCisJCV9fdTMyIHRp
+ZCwKKwkJX191NjQgc2VzaWQsCisJCV9fdTY0IGxlYXNlX2tleV9sb3csCisJCV9fdTY0IGxlYXNl
+X2tleV9oaWdoKSwKKwlUUF9BUkdTKGxlYXNlX3N0YXRlLCBmbGFncywgZXBvY2gsIHRpZCwgc2Vz
+aWQsIGxlYXNlX2tleV9sb3csIGxlYXNlX2tleV9oaWdoKSwKKwlUUF9TVFJVQ1RfX2VudHJ5KAor
+CQlfX2ZpZWxkKF9fdTMyLCBsZWFzZV9zdGF0ZSkKKwkJX19maWVsZChfX3UzMiwgZmxhZ3MpCisJ
+CV9fZmllbGQoX191MTYsIGVwb2NoKQorCQlfX2ZpZWxkKF9fdTMyLCB0aWQpCisJCV9fZmllbGQo
+X191NjQsIHNlc2lkKQorCQlfX2ZpZWxkKF9fdTY0LCBsZWFzZV9rZXlfbG93KQorCQlfX2ZpZWxk
+KF9fdTY0LCBsZWFzZV9rZXlfaGlnaCkKKwkpLAorCVRQX2Zhc3RfYXNzaWduKAorCQlfX2VudHJ5
+LT5sZWFzZV9zdGF0ZSA9IGxlYXNlX3N0YXRlOworCQlfX2VudHJ5LT5mbGFncyA9IGZsYWdzOwor
+CQlfX2VudHJ5LT5lcG9jaCA9IGVwb2NoOworCQlfX2VudHJ5LT50aWQgPSB0aWQ7CisJCV9fZW50
+cnktPnNlc2lkID0gc2VzaWQ7CisJCV9fZW50cnktPmxlYXNlX2tleV9sb3cgPSBsZWFzZV9rZXlf
+bG93OworCQlfX2VudHJ5LT5sZWFzZV9rZXlfaGlnaCA9IGxlYXNlX2tleV9oaWdoOworCSksCisJ
+VFBfcHJpbnRrKCJzaWQ9MHglbGx4IHRpZD0weCV4IGxlYXNlX2tleT0weCVsbHglbGx4IGxlYXNl
+X3N0YXRlPTB4JXggZmxhZ3M9MHgleCBlcG9jaD0ldSIsCisJCV9fZW50cnktPnNlc2lkLCBfX2Vu
+dHJ5LT50aWQsIF9fZW50cnktPmxlYXNlX2tleV9oaWdoLAorCQlfX2VudHJ5LT5sZWFzZV9rZXlf
+bG93LCBfX2VudHJ5LT5sZWFzZV9zdGF0ZSwgX19lbnRyeS0+ZmxhZ3MsIF9fZW50cnktPmVwb2No
+KQorKQorCisjZGVmaW5lIERFRklORV9TTUIzX0xFQVNFX0VOVEVSX0VWRU5UKG5hbWUpICAgICAg
+ICBcCitERUZJTkVfRVZFTlQoc21iM19sZWFzZV9lbnRlcl9jbGFzcywgc21iM18jI25hbWUsICBc
+CisJVFBfUFJPVE8oX191MzIgbGVhc2Vfc3RhdGUsICAgICAgICAgICAgXAorCQlfX3UzMiBmbGFn
+cywgICAgICAgICAgICAgICBcCisJCV9fdTE2IGVwb2NoLCAgICAgICAgICAgICAgIFwKKwkJX191
+MzIgdGlkLCAgICAgICAgICAgICAgICAgXAorCQlfX3U2NCBzZXNpZCwgICAgICAgICAgICAgICBc
+CisJCV9fdTY0IGxlYXNlX2tleV9sb3csICAgICAgIFwKKwkJX191NjQgbGVhc2Vfa2V5X2hpZ2gp
+LCAgICAgXAorCVRQX0FSR1MobGVhc2Vfc3RhdGUsIGZsYWdzLCBlcG9jaCwgdGlkLCBzZXNpZCwg
+bGVhc2Vfa2V5X2xvdywgbGVhc2Vfa2V5X2hpZ2gpKQorCitERUZJTkVfU01CM19MRUFTRV9FTlRF
+Ul9FVkVOVChsZWFzZV9icmVha19lbnRlcik7CisvKiBMZWFzZSBub3QgZm91bmQ6IHJldXNlIGxl
+YXNlX2VudGVyIHBheWxvYWQgKGluY2x1ZGVzIGVwb2NoIGFuZCBmbGFncykgKi8KK0RFRklORV9T
+TUIzX0xFQVNFX0VOVEVSX0VWRU5UKGxlYXNlX25vdF9mb3VuZCk7CiAKIERFQ0xBUkVfRVZFTlRf
+Q0xBU1Moc21iM19sZWFzZV9lcnJfY2xhc3MsCiAJVFBfUFJPVE8oX191MzIJbGVhc2Vfc3RhdGUs
+CkBAIC0xMjEzLDcgKzEyNTksNyBAQCBERUZJTkVfRVZFTlQoc21iM19sZWFzZV9lcnJfY2xhc3Ms
+IHNtYjNfIyNuYW1lLCAgXAogCQlpbnQJcmMpLAkJCVwKIAlUUF9BUkdTKGxlYXNlX3N0YXRlLCB0
+aWQsIHNlc2lkLCBsZWFzZV9rZXlfbG93LCBsZWFzZV9rZXlfaGlnaCwgcmMpKQogCi1ERUZJTkVf
+U01CM19MRUFTRV9FUlJfRVZFTlQobGVhc2VfZXJyKTsKK0RFRklORV9TTUIzX0xFQVNFX0VSUl9F
+VkVOVChsZWFzZV9hY2tfZXJyKTsKIAogREVDTEFSRV9FVkVOVF9DTEFTUyhzbWIzX2Nvbm5lY3Rf
+Y2xhc3MsCiAJVFBfUFJPVE8oY2hhciAqaG9zdG5hbWUsCi0tIAoyLjQ4LjEKCg==
+--000000000000928b7d063f6d520a--
