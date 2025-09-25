@@ -1,217 +1,172 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FADC23ABA1
-	for <linux-cifs@vger.kernel.org>; Thu, 25 Sep 2025 15:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C9030171E
+	for <linux-cifs@vger.kernel.org>; Thu, 25 Sep 2025 15:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758815416; cv=none; b=Im9eXZQMXc/nBXRWKcDiTAL0BAGNDPe4DqCdsgwawTg5/7d34ecEGEBimDqutoANpWPR2Ulh/XyxJEdTttMaKz+X2FZWTXNgHPeBETW4aUZo6fPUbkIuujltJOYE7YGtouLLc5zloZnNyUPRs0dVnWTod1+5V4ubiUYr3z21v+Y=
+	t=1758815417; cv=none; b=N9NVYhPIKT7rGeDSNEcOsPBzYhXZ5DOMjOreIFqfzyElkd4Mv/rc2/xpaKi2KVuKdtpVLk7hG+bzwcTsoAN8pDHNYLgkf/tSNjHijbK8i5YGqSagxim30NjbA69gE/FW/5lt6IosiZchcunS8ophcgiXdKc+qR61MWk0gW+qelo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758815416; c=relaxed/simple;
-	bh=m6QpFkawOmNhd7oWD+5jM7932immcIjNUJPNoGbbhJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DdinlalJ115LygmSdcFm0A1VTbVI6WAAu6qee2WeaPjySaAkKUSElbLpmFMA/dHSEh5WzkNteGXr3CH+kle7AedDw2kRCfK1sGbyJtbxda8oKeKnTZPOYjleuwtLhsvyNLsSFgPdEiFq8LZuI2KgE0QDAJn7zGtDa+ImhDCBdXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=cpgEc8qK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=IkI9+abl; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=cpgEc8qK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=IkI9+abl; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1758815417; c=relaxed/simple;
+	bh=6U561RsZS+7ehXxxbAaXaCZdLb/rf1WSXkRONpEB64k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AxOHghL3NiOcY95L93tG6uQ08dUwrD4R5+ua7kBRLJL4KvUEIs8TiAsLQjZp/bH28et4D+Cqw3Xm9Rb/BjL2mp/R58AXU+PAOp4U9w/F7jn6hY+F4bIUuJErfJAnLCc6XPUshxz5EWYJTkftni3cTBHBoCKtSXa8LLwO3HisFgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f/lxhIT5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="cpgEc8qK";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="IkI9+abl";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="cpgEc8qK";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="IkI9+abl"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id A007F6C201;
-	Thu, 25 Sep 2025 15:50:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758815411; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f/lxhIT5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758815414;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=npyjLIAhWT4lA3Ad1zBxTWNYe7yHm1djiA0bY7sYY5w=;
-	b=cpgEc8qKjm4aPAoxXDmt6+/5y5ekg+AORLSL8Xp9cK0Pasex+iS5bWwE2iolNf4lbBz7Wy
-	Q8f95/u4Inv2doM1sA69HerhXnG7T2k48vJuIHZodQvT82TfWkugTfOFFAlgZ5l/H0BwUx
-	dbv5OD/2rTfaPuzfLRPwbBOUL1M9V9I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758815411;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=npyjLIAhWT4lA3Ad1zBxTWNYe7yHm1djiA0bY7sYY5w=;
-	b=IkI9+ablHR65/GBROEZLxndPdM5+1dZOUgcGiyb07mj/bP+pwkQC9/aHFbN54Kl8zfujot
-	G1I/49D7EmRNhRBA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758815411; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=npyjLIAhWT4lA3Ad1zBxTWNYe7yHm1djiA0bY7sYY5w=;
-	b=cpgEc8qKjm4aPAoxXDmt6+/5y5ekg+AORLSL8Xp9cK0Pasex+iS5bWwE2iolNf4lbBz7Wy
-	Q8f95/u4Inv2doM1sA69HerhXnG7T2k48vJuIHZodQvT82TfWkugTfOFFAlgZ5l/H0BwUx
-	dbv5OD/2rTfaPuzfLRPwbBOUL1M9V9I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758815411;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=npyjLIAhWT4lA3Ad1zBxTWNYe7yHm1djiA0bY7sYY5w=;
-	b=IkI9+ablHR65/GBROEZLxndPdM5+1dZOUgcGiyb07mj/bP+pwkQC9/aHFbN54Kl8zfujot
-	G1I/49D7EmRNhRBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8C3A413869;
-	Thu, 25 Sep 2025 15:50:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id U1njIbNk1WgwWwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 25 Sep 2025 15:50:11 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 1D429A0AA0; Thu, 25 Sep 2025 17:50:07 +0200 (CEST)
+	bh=lPOIdtGuD9l53wCDZgvs8CoLuOUrw0SyvwaoNtPWj00=;
+	b=f/lxhIT5Pu9HHugrqnOg/sGfGsJlZF6xuEwo/F7FNWkZ3VQDTUOVRn+iFvtqBWAhasXQJp
+	3NDeJn2Zf1YKRyhw9lT1dAm2j6PhXul1ODKN9JAWlele3e+ZkATclWKykZeArh77c2D94R
+	dRd+xIEyjR4qpaw55mCuZmbsld9OkoY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-187-pM4gC_bnMYGxR90kjzS9RQ-1; Thu, 25 Sep 2025 11:50:11 -0400
+X-MC-Unique: pM4gC_bnMYGxR90kjzS9RQ-1
+X-Mimecast-MFC-AGG-ID: pM4gC_bnMYGxR90kjzS9RQ_1758815410
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46b303f6c9cso9023255e9.2
+        for <linux-cifs@vger.kernel.org>; Thu, 25 Sep 2025 08:50:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758815410; x=1759420210;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lPOIdtGuD9l53wCDZgvs8CoLuOUrw0SyvwaoNtPWj00=;
+        b=Fy9OYP60Lb0+HxiKcqjxZIfZvaV1Sr0K8m6Qid+ZsU1tmjejkUsXcBRAuqG65HC1Pp
+         d/hBZg3hvM41yQM+Pu7rN92ChUJGURUxUUiG2q5MDdogehq77VnStAIzlIM85FFNB7dz
+         xbCIWgWU4gMv7fcFQumhP1IsP4xk3UBjTeV87D33qum7Qf4uhEW9nqo++xfih7N0+fV/
+         eCHFwZ7hshq+v4YHibcOkDuhj4vXRR3U3ly2NFOV+oEbywTt4sGgfPcxDIhooAczvoQq
+         FFiEGLaNXcAZWYBtHs52rlYrelV9IqgR07pbM/JnMHccfokiZKPGDnjmOQ9A/zsIkQwn
+         pZ0A==
+X-Forwarded-Encrypted: i=1; AJvYcCUBBjxJFxImTLPGO4yPEcCX8fYdCkB6GYQvSmE8W1MJLltTEfCb0a/lG+VjNfClAEUaduyESx/2fXSW@vger.kernel.org
+X-Gm-Message-State: AOJu0YybJos+ff99AKxh6VmZsPJNTdpaAAkFCrLceMPPALwICYoAMFah
+	Sm+ijhJoDVFg5vHS52J58/WXoKTo+rfDVxmzelE8ha30JrnlbEgTZGGaXrfa0+4vfoe81bAnID2
+	zCrMdDVW6zetO2v4/h6ZfHyZYqEga5cInRwqn03SQ0bW7m73zLQiJWcACIcrqbl8=
+X-Gm-Gg: ASbGncuOm2MEs33dvyT6XxesIs/bOUBDkWF8EpGvpPjv+McxX64+TqAXUrt9jmwfiUb
+	i405M6cjaU8/+4IdlCZ9MyRXANBmrKCk/rjUEl99a6wMpThvg5w8QD+ljHkz5aDE7vLGBrzJaAH
+	+C/IB97OaqhuCK8qImjibwTjnFyNRbrFJxnyoYUc4BgNH49ro37kA8gBKI90Gnfdo/LIIJ+Kyf5
+	W8rHY64XV0vi1LY5W5k4INqwieiQ4txxXUU6G+qqlAmaKvVsWPn/Ym1CmfmfTcvkJ5xruWJrIKp
+	/EXbxuKXK/ZChth5nn9tB9je21Kz1fOT1mW9KhG3lOA54/yrxdjZlXl2wOsXBkLj4OIza1LPDGh
+	7H0N9TE6RuT0o
+X-Received: by 2002:a05:600c:1ca5:b0:46e:2637:d182 with SMTP id 5b1f17b1804b1-46e32a08feamr49009105e9.28.1758815410209;
+        Thu, 25 Sep 2025 08:50:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFifX77hGxL2O4FYAU+ptB+L8YPLKwsnLSuT5OPi4ABcaTgR4jE6/4IbKEl3gD+G+IQTmbShw==
+X-Received: by 2002:a05:600c:1ca5:b0:46e:2637:d182 with SMTP id 5b1f17b1804b1-46e32a08feamr49008725e9.28.1758815409731;
+        Thu, 25 Sep 2025 08:50:09 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33bf6ecbsm42448815e9.22.2025.09.25.08.50.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Sep 2025 08:50:09 -0700 (PDT)
+Message-ID: <2152c576-68ce-4bc4-9658-bb1e8ccce423@redhat.com>
 Date: Thu, 25 Sep 2025 17:50:07 +0200
-From: Jan Kara <jack@suse.cz>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Chuck Lever <chuck.lever@oracle.com>, 
-	Alexander Aring <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
-	Dai Ngo <Dai.Ngo@oracle.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Amir Goldstein <amir73il@gmail.com>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Paulo Alcantara <pc@manguebit.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, 
-	Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Carlos Maiolino <cem@kernel.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Rick Macklem <rick.macklem@gmail.com>, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, linux-doc@vger.kernel.org, 
-	netfs@lists.linux.dev, ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 22/38] vfs: add fsnotify_modify_mark_mask()
-Message-ID: <mr6lfsrdp77g7ndnhignxby6fniku2fb3u5yykvwng67sneo7o@d6dozubh4t4c>
-References: <20250924-dir-deleg-v3-0-9f3af8bc5c40@kernel.org>
- <20250924-dir-deleg-v3-22-9f3af8bc5c40@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250924-dir-deleg-v3-22-9f3af8bc5c40@kernel.org>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,oracle.com,gmail.com,samba.org,microsoft.com,talpey.com,brown.name,redhat.com,lwn.net,szeredi.hu,manguebit.org,linuxfoundation.org,tyhicks.com,chromium.org,goodmis.org,efficios.com,vger.kernel.org,lists.samba.org,lists.linux.dev];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RL63fqwwx8ot6gmekemcs76f9d)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email]
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 03/15] quic: provide common utilities and data
+ structures
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev,
+ davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+ Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+ kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>,
+ Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1758234904.git.lucien.xin@gmail.com>
+ <a7fb75136c7c2e51b7081d3bff421e01b435288f.1758234904.git.lucien.xin@gmail.com>
+ <871ed254-c3d8-49aa-9aac-eeb72e82f55d@redhat.com>
+ <CADvbK_e20TrcgprXmnZzvoEO6yzoo4Zx7B0qFS0kQPT8Sf63LQ@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CADvbK_e20TrcgprXmnZzvoEO6yzoo4Zx7B0qFS0kQPT8Sf63LQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed 24-09-25 14:06:08, Jeff Layton wrote:
-> nfsd needs to be able to modify the mask on an existing mark when new
-> directory delegations are set or unset. Add an exported function that
-> allows the caller to set and clear bits in the mark->mask, and does
-> the recalculation if something changed.
+On 9/23/25 6:06 PM, Xin Long wrote:
+> On Tue, Sep 23, 2025 at 7:21 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>> On 9/19/25 12:34 AM, Xin Long wrote:
+>>> +static int quic_uhash_table_init(struct quic_uhash_table *ht, u32 max_size, int order)
+>>> +{
+>>> +     int i, max_order, size;
+>>> +
+>>> +     /* Same sizing logic as in quic_shash_table_init(). */
+>>> +     max_order = get_order(max_size * sizeof(struct quic_uhash_head));
+>>> +     order = min(order, max_order);
+>>> +     do {
+>>> +             ht->hash = (struct quic_uhash_head *)
+>>> +                     __get_free_pages(GFP_KERNEL | __GFP_NOWARN, order);
+>>> +     } while (!ht->hash && --order > 0);
+>>
+>> You can avoid a little complexity, and see more consistent behaviour,
+>> using plain vmalloc() or alloc_large_system_hash() with no fallback.
+>>
+> I wanted to use alloc_large_system_hash(), but the memory allocated
+> by it is usually NOT meant to be freed at runtime. I don't see a free_
+> function to do it either.
 > 
-> Suggested-by: Jan Kara <jack@suse.cz>
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> If QUIC works as a kernel module, what should I do with this memory
+> in module_exit()?
 
-Looks good. Feel free to add:
+Right, I did not think about such case. I suggest using a plain
+vmalloc() without the loop than.
 
-Acked-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  fs/notify/mark.c                 | 29 +++++++++++++++++++++++++++++
->  include/linux/fsnotify_backend.h |  1 +
->  2 files changed, 30 insertions(+)
+>>> +/* rfc9000#section-a.3: DecodePacketNumber()
+>>> + *
+>>> + * Reconstructs the full packet number from a truncated one.
+>>> + */
+>>> +s64 quic_get_num(s64 max_pkt_num, s64 pkt_num, u32 n)
+>>> +{
+>>> +     s64 expected = max_pkt_num + 1;
+>>> +     s64 win = BIT_ULL(n * 8);
+>>> +     s64 hwin = win / 2;
+>>> +     s64 mask = win - 1;
+>>> +     s64 cand;
+>>> +
+>>> +     cand = (expected & ~mask) | pkt_num;
+>>> +     if (cand <= expected - hwin && cand < (1ULL << 62) - win)
+>>> +             return cand + win;
+>>> +     if (cand > expected + hwin && cand >= win)
+>>> +             return cand - win;
+>>> +     return cand;
+>>
+>> The above is a bit obscure to me; replacing magic nubers (62) with macro
+>> could help. Some more comments also would do.
+>>
+> The code is exactly from the commented doc:
+> /* rfc9000#section-a.3: DecodePacketNumber()
 > 
-> diff --git a/fs/notify/mark.c b/fs/notify/mark.c
-> index 798340db69d761dd05c1b361c251818dee89b9cf..5ed42b24df7f6aa3812a7069b4c37f0c6b3414fa 100644
-> --- a/fs/notify/mark.c
-> +++ b/fs/notify/mark.c
-> @@ -309,6 +309,35 @@ void fsnotify_recalc_mask(struct fsnotify_mark_connector *conn)
->  		fsnotify_conn_set_children_dentry_flags(conn);
->  }
->  
-> +/**
-> + * fsnotify_modify_mark_mask - set and/or clear flags in a mark's mask
-> + * @mark: mark to be modified
-> + * @set: bits to be set in mask
-> + * @clear: bits to be cleared in mask
-> + *
-> + * Modify a fsnotify_mark mask as directed, and update its associated conn.
-> + * The caller is expected to hold a reference to the mark.
-> + */
-> +void fsnotify_modify_mark_mask(struct fsnotify_mark *mark, u32 set, u32 clear)
-> +{
-> +	bool recalc = false;
-> +	u32 mask;
-> +
-> +	WARN_ON_ONCE(clear & set);
-> +
-> +	spin_lock(&mark->lock);
-> +	mask = mark->mask;
-> +	mark->mask |= set;
-> +	mark->mask &= ~clear;
-> +	if (mark->mask != mask)
-> +		recalc = true;
-> +	spin_unlock(&mark->lock);
-> +
-> +	if (recalc)
-> +		fsnotify_recalc_mask(mark->connector);
-> +}
-> +EXPORT_SYMBOL_GPL(fsnotify_modify_mark_mask);
-> +
->  /* Free all connectors queued for freeing once SRCU period ends */
->  static void fsnotify_connector_destroy_workfn(struct work_struct *work)
->  {
-> diff --git a/include/linux/fsnotify_backend.h b/include/linux/fsnotify_backend.h
-> index d4034ddaf3926bf98d8801997e50ba7ddf776292..8d50e6aad3c62c67a9bf73a8d9aab78565668c5f 100644
-> --- a/include/linux/fsnotify_backend.h
-> +++ b/include/linux/fsnotify_backend.h
-> @@ -912,6 +912,7 @@ extern void fsnotify_get_mark(struct fsnotify_mark *mark);
->  extern void fsnotify_put_mark(struct fsnotify_mark *mark);
->  extern void fsnotify_finish_user_wait(struct fsnotify_iter_info *iter_info);
->  extern bool fsnotify_prepare_user_wait(struct fsnotify_iter_info *iter_info);
-> +extern void fsnotify_modify_mark_mask(struct fsnotify_mark *mark, u32 set, u32 clear);
->  
->  static inline void fsnotify_init_event(struct fsnotify_event *event)
->  {
+> See:
+> https://datatracker.ietf.org/doc/html/rfc9000#section-a.3
 > 
-> -- 
-> 2.51.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> I will bring some comments from there.
+
+You can quote or make a synopsis of the RFC where it makes sense. In any
+case, please try to reduce magic numbers usage.
+
+Thanks,
+
+Paolo
+
