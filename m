@@ -1,172 +1,94 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0143DDC3
-	for <linux-cifs@vger.kernel.org>; Thu, 25 Sep 2025 03:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B023120CCCA;
+	Thu, 25 Sep 2025 11:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758771338; cv=none; b=i37e0xnlUAhM84kD+H64NhMDkoEhCSzPkBYI9rF5fMJh5iq7fwxehpoBen+9Co7IQBBcHKhiRsUwfl7DjM4zr4/Cq4dRmXkcLDdYK5zQyTnXWf7yR/X3XyIIWrPUizFlF+OWUQeONh6laPu23kKCXICVoubs8EM1+LBUbJfl1p8=
+	t=1758799299; cv=none; b=G1b+fOt9TODECh6xarAO6KmjPWLumdaDd3h/SPmvg7wI5L9pJQINGno6HuXNMio23QCG8rdgZqQ8gMEst+anlGK3As0qhS/bBYYKfy1WFTzSQdJsammDpZNyEls7ytOHeYGAe4EhrdXC1fI2CamkQYFCR4wSHyiSUY2uSz4cFdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758771338; c=relaxed/simple;
-	bh=P3B79nJYgC+rmXgtNMai8Yko47dZLILc4ZGiyUzb17A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jDAIgJQ4tPx4E4AQQm/ftSd3tatZpvTVMYWZCrBC97lG+yfNXc5326UnYWtKURDAghyq3K8tQiW/yyWFmleIoQXOei1f/VMErLncLO4iZvVM4rtg1NY3BqCaHFCSbJP7QojlGMDnSr1OB/XHMGmu/KNNP/V5Nwerm8kXxY0sfDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HW2tPRpx; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758799299; c=relaxed/simple;
+	bh=mTM2GrOWeD3F8GLCbqe4PJoUAnPGY934dGBynBWKNOg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A24MTTKl0+BYulESGMTfgWKhw/j04tp8+TKYuyA+RxWdsc5k1AkX4teerWiMSn1qN9DcwDf7qmtL/C1F9E/yEJyc3swxgqdB9vW7Nq13CAhqpOAyo+aviuVKvTtqzyci5mWMP4993Osh0v9QvS16QdKst3nr4fySO5AZYdrPFU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=IPyRk8/J; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HW2tPRpx"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-70ba7aa131fso4806796d6.2
-        for <linux-cifs@vger.kernel.org>; Wed, 24 Sep 2025 20:35:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758771335; x=1759376135; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bIK7aUYfmSEbOwNlXiG3VqvRSfHmRXXXHr1UU8T6Rgk=;
-        b=HW2tPRpx196Z/MoR7LK/PYo0T1MXWsSBwM1WFMp/LvkK8FI6asseiq2QSU1Xxt4hM6
-         ZiTrhVMa0S0C3gUHErFxeDZ1a/CoColrveHFLqxM/+vFuQvNAS6ZBkUL5Xrh+2uRQmBC
-         Poc0bjO0IidbrSSnMFOppoFAEkGR3TBGJ5JSG7TpECcSeb/PgDT5Zf26op5moHu+ht5o
-         sZbWPwn/Nwi1RzZWVD8PNWW0QIdLHMmHMTrAuiuFBtizrOIePKxfBPqpX/IZD7cUIVEa
-         ZhP699w6nFicAoLgxNEG1JEqT5BCbgruAsdENFHgvAzAmC6rcZ3zwFKeJhuxHfJcacEX
-         cMQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758771335; x=1759376135;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bIK7aUYfmSEbOwNlXiG3VqvRSfHmRXXXHr1UU8T6Rgk=;
-        b=HZHnQOsum+eisoFg4pDuWJ2twuYtolC9eynnLSNrxX1qg+Z1U5Pph7NDTGV4tkZJ2E
-         lOd/Tcyi0RJ2NjX3iWK+A5klWEHyXBeleQ3nJYgYL+fl38JU8tMIwpzschTW/79E/Il3
-         dIZKSJQ9+EXUkjfYle3yekD4Kif8vvcHX8vMc6FjtJyqdB02QywFhaWpy33+VMEi+0Vw
-         Pem/dEhXKUI5gWdoU1eC7GYRO5fvIH1LKS4I6YAI8zIwH06Kp+393JigIGjyPn4vJ/J5
-         ZJVC/hZq70ml1eiRn7bGhK04fF4C6Uq9f6iQ28zPzvEH8lb+gmkS7Wnfe4zg/nCj/Kp6
-         X4Pw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5OYsd4ztYUjCCJL0150L42t6/NJ66e44n2kBTAhuGyUFn1QTGF5DQN/1eJbbTZ/F+vWRqQOuIVCRs@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzs74N1MbE1Q0/dWtM4wlpPv/IRkgDZprlvML67w9KYUsPDyqT5
-	Xo/52XwmV1JipGKLV9SrjiZG4qxzKbLlfN4wE4TkKOzOVfCXOzqOhvMnXfN3RSQaVTHfhz9Bu18
-	OWGzTjlQJbe8rgrUk1NvmCFs0qTJCzXE=
-X-Gm-Gg: ASbGncu4wBzJOShEb3PjvhyLt7wdUYaYLHsNaqQW4GvqfFer6HVHAqAvxF2r96JBIUe
-	uVO7aOAHup431NrQb/hnEuH55XlboEd3FxFzWyGIvkRY2fwwauBxJzoVvJIitpCFtxFu6DEEoRb
-	5r0imUaIl4NHeg3nEQTim1pXiXQ+2m67QXdzgYSaM61F36Yx/F9BJBbibOmvDYmL0Y4Wir0Q0RV
-	Vn1snNMSgpHsQKWH/Y8nhE9A5tkYRwJIi22o+h7yxI0nmrAcEL+6pJ/ocFeHSTG2SRI+fQjeB3A
-	IzC52FnCzuEXk10kj+N2nVsDzS/M32l2vyNYR72aEUJQQwD5es16Gwr8T9yUObAAFp3GoySleE1
-	DAjBCI+iIpu8VRQ9Pqku9
-X-Google-Smtp-Source: AGHT+IEZH9SVd9zNx7E67aDdhvo1VrGsYKoyoHRwQsrcWXJN0UfaGH315HI8D1XGrV+kBCTwmo3R27/OfYmsZ1b5NzY=
-X-Received: by 2002:a05:6214:2685:b0:787:907:d26a with SMTP id
- 6a1803df08f44-7fc33707691mr30923466d6.29.1758771335479; Wed, 24 Sep 2025
- 20:35:35 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="IPyRk8/J"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=iHPtz3ycelQ6n18OHQYvVxPNY66NuZcxk79Q3PUoVEg=; b=IPyRk8/Jf2cKSXtpKEMC6Shk+z
+	iB20cNjrhOkx2jlDDItpvyGyoXjbcPdZUiFlMRmkfhTqgTuv4GvhErtG77pyV1tB76br4wo1vQUMZ
+	hSVXLE2SlOW0qzCD3bGnIZnnFZjg0DKotZqKH7pZqqTYNjQsS084TeB4exAhxeOWZA3PbqJmPwEFl
+	nCQzTj9OJDVDGXSNkmwIDKz1tXRQ1nURCi/A8g1t1jgjWoOfS41K0LCYpHVOt4PjscyAe3OzxtJve
+	cKqmZsNxQx+NxkSMCocWIQtnEr59Q6N3imBDK7H6jpQi58MZr3iCL7duUOZxOn8EE5GxNt+6FfSOz
+	dXrI4TjQmKrALCts7+0zSRgJYVH817YPrgqei0LEm9z8KEqt2tQrLpggfAwxEyXvGyJXLAg5CsUtS
+	ek5k7FOdFCY5OGlQ+RpM+y4glKhsSjCoKoEhLbHPPa+p/XUqYCu0DpfFGN2C1osiCsQ+tOuANR+db
+	lA+oUT4lMfxvR+AxB0FNXnMr;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1v1k2Q-005wG1-0I;
+	Thu, 25 Sep 2025 11:21:26 +0000
+Message-ID: <cf4e9b44-e373-4f1c-afcd-51f97da65145@samba.org>
+Date: Thu, 25 Sep 2025 13:21:22 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250923191417.237112-1-henrique.carvalho@suse.com>
-In-Reply-To: <20250923191417.237112-1-henrique.carvalho@suse.com>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 24 Sep 2025 22:35:23 -0500
-X-Gm-Features: AS18NWDsftARsDtzivWKVHqtDfJ3cUMPj0Ue2G85HsbH0amnZXjeIfCBcw4PztQ
-Message-ID: <CAH2r5mv5LjdD4OkC4SGkywTA4bMu0X7eQJqu4UhJVNNrzL+O4A@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: add tcon information to smb2_reconnect()
- debug messages
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	ematsumiya@suse.de, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Does ib_dereg_mr require an additional IB_WR_LOCAL_INV?
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+References: <656eacb1-a39f-4b59-99db-5522d102468a@samba.org>
+ <20250924151002.GK2547959@ziepe.ca>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <20250924151002.GK2547959@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-merged (the revised patch sent later by Hernrique) to cifs-2.6.git for-next
+Am 24.09.25 um 17:10 schrieb Jason Gunthorpe:
+> On Tue, Sep 23, 2025 at 11:09:48PM +0200, Stefan Metzmacher wrote:
+>> Hi,
+>>
+>> I'm trying to understand (and hopefully simplify) the code in fs/smb/client/smbdirect.c,
+>> related to 'struct ib_mr' cleanup on disconnect.
+>>
+>> Assume we have the following sequence of calls:
+>>
+>> ...
+>> ib_alloc_mr()
+>> ib_dma_map_sg()
+>> ib_map_mr_sg()
+>> ib_post_send(IB_WR_REG_MR)
+>>
+>> On cleanup we currently us something like this:
+>>
+>> ib_drain_qp()
+>> init_completion()
+>> ib_post_send(IB_WR_LOCAL_INV)
+>> wait_for_completion()...
+>> ib_dereg_mr()
+>> ib_drain_qp() // again
+>> rdma_destroy_qp();
+>> ib_destroy_cq(revc_cq)
+>> ib_destroy_cq(send_cq)
+>> ib_dealloc_pd()
+>> rdma_destroy_id()
+>>
+>> Now I'm wondering if the following is really required:
+>> init_completion()
+>> ib_post_send(IB_WR_LOCAL_INV)
+>> wait_for_completion()...
+> 
+> I would say IB_WR_LOCAL_INV is redundent with the ib_dereg_mr(). There
+> is no need to invalidate something that will be de-registered in a few
+> moments.
 
-Good catch - looks useful for debugging in future
+Thanks!
 
-On Tue, Sep 23, 2025 at 2:17=E2=80=AFPM Henrique Carvalho
-<henrique.carvalho@suse.com> wrote:
->
-> smb2_reconnect() debug messages lack tcon context, making it hard to
-> identify which tcon is reconnecting in multi-share environments.
->
-> Change cifs_dbg() to cifs_tcon_dbg() to include tcon information.
->
-> Closes: https://bugzilla.suse.com/show_bug.cgi?id=3D1234066
-> Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
-> ---
->  fs/smb/client/smb2pdu.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
->
-> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index c3b9d3f6210f..9e3b2cb7b5cd 100644
-> --- a/fs/smb/client/smb2pdu.c
-> +++ b/fs/smb/client/smb2pdu.c
-> @@ -240,8 +240,8 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon =
-*tcon,
->                  */
->                 if (smb2_command !=3D SMB2_TREE_DISCONNECT) {
->                         spin_unlock(&tcon->tc_lock);
-> -                       cifs_dbg(FYI, "can not send cmd %d while umountin=
-g\n",
-> -                                smb2_command);
-> +                       cifs_tcon_dbg(FYI, "can not send cmd %d while umo=
-unting\n",
-> +                                     smb2_command);
->                         return -ENODEV;
->                 }
->         }
-> @@ -296,9 +296,9 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon =
-*tcon,
->                 return 0;
->         }
->         spin_unlock(&ses->chan_lock);
-> -       cifs_dbg(FYI, "sess reconnect mask: 0x%lx, tcon reconnect: %d",
-> -                tcon->ses->chans_need_reconnect,
-> -                tcon->need_reconnect);
-> +       cifs_tcon_dbg(FYI, "sess reconnect mask: 0x%lx, tcon reconnect: %=
-d\n",
-> +                     tcon->ses->chans_need_reconnect,
-> +                     tcon->need_reconnect);
->
->         mutex_lock(&ses->session_mutex);
->         /*
-> @@ -392,11 +392,11 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tco=
-n *tcon,
->
->         rc =3D cifs_tree_connect(0, tcon);
->
-> -       cifs_dbg(FYI, "reconnect tcon rc =3D %d\n", rc);
-> +       cifs_tcon_dbg(FYI, "reconnect tcon rc =3D %d\n", rc);
->         if (rc) {
->                 /* If sess reconnected but tcon didn't, something strange=
- ... */
->                 mutex_unlock(&ses->session_mutex);
-> -               cifs_dbg(VFS, "reconnect tcon failed rc =3D %d\n", rc);
-> +               cifs_tcon_dbg(VFS, "reconnect tcon failed rc =3D %d\n", r=
-c);
->                 goto out;
->         }
->
-> @@ -442,8 +442,8 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon =
-*tcon,
->                                                        from_reconnect);
->                         goto skip_add_channels;
->                 } else if (rc)
-> -                       cifs_dbg(FYI, "%s: failed to query server interfa=
-ces: %d\n",
-> -                                __func__, rc);
-> +                       cifs_tcon_dbg(FYI, "%s: failed to query server in=
-terfaces: %d\n",
-> +                                     __func__, rc);
->
->                 if (ses->chan_max > ses->chan_count &&
->                     ses->iface_count &&
-> --
-> 2.50.1
->
->
-
-
---=20
-Thanks,
-
-Steve
