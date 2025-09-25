@@ -1,172 +1,245 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C9030171E
-	for <linux-cifs@vger.kernel.org>; Thu, 25 Sep 2025 15:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77CF2FD1B8
+	for <linux-cifs@vger.kernel.org>; Thu, 25 Sep 2025 15:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758815417; cv=none; b=N9NVYhPIKT7rGeDSNEcOsPBzYhXZ5DOMjOreIFqfzyElkd4Mv/rc2/xpaKi2KVuKdtpVLk7hG+bzwcTsoAN8pDHNYLgkf/tSNjHijbK8i5YGqSagxim30NjbA69gE/FW/5lt6IosiZchcunS8ophcgiXdKc+qR61MWk0gW+qelo=
+	t=1758815464; cv=none; b=BE1HCbTavsByOByJ4Y1mmLPOv8z5aWQPlnt3+CQTginWXpXfikr46PmGO9qmyBtAfgbEIaUJVG/W8euNfkaIYTX50FUDqUcbktcTkGzvgS39yTUGPb/BpJS20569R822jZpPU6ATWIGoob/FRmwrFrx1rydCAGdxjZo4zQKVVyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758815417; c=relaxed/simple;
-	bh=6U561RsZS+7ehXxxbAaXaCZdLb/rf1WSXkRONpEB64k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AxOHghL3NiOcY95L93tG6uQ08dUwrD4R5+ua7kBRLJL4KvUEIs8TiAsLQjZp/bH28et4D+Cqw3Xm9Rb/BjL2mp/R58AXU+PAOp4U9w/F7jn6hY+F4bIUuJErfJAnLCc6XPUshxz5EWYJTkftni3cTBHBoCKtSXa8LLwO3HisFgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f/lxhIT5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1758815464; c=relaxed/simple;
+	bh=bqup4E+Z4LYVlj/a9cb1gPbIL51orOjXv5Sja43sUbc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EdSSMC0Snsam8W2iW17RFMc31g7D86GwSAkvFce45C/93jyeWlrrtZ2ycmpSE1Q2+6JMQik1c4nkqTG1N3FBL39TIUTGFHTotWZdh8xery4TXw3GT/Zty5Tixj8kHBeXJwhJeUlcHS7vZQukAALa9wwfUaI5N0i8xn0qAFzUH3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iY7XgZl3; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f/lxhIT5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758815414;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lPOIdtGuD9l53wCDZgvs8CoLuOUrw0SyvwaoNtPWj00=;
-	b=f/lxhIT5Pu9HHugrqnOg/sGfGsJlZF6xuEwo/F7FNWkZ3VQDTUOVRn+iFvtqBWAhasXQJp
-	3NDeJn2Zf1YKRyhw9lT1dAm2j6PhXul1ODKN9JAWlele3e+ZkATclWKykZeArh77c2D94R
-	dRd+xIEyjR4qpaw55mCuZmbsld9OkoY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-187-pM4gC_bnMYGxR90kjzS9RQ-1; Thu, 25 Sep 2025 11:50:11 -0400
-X-MC-Unique: pM4gC_bnMYGxR90kjzS9RQ-1
-X-Mimecast-MFC-AGG-ID: pM4gC_bnMYGxR90kjzS9RQ_1758815410
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46b303f6c9cso9023255e9.2
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Sep 2025 08:50:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iY7XgZl3"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-62fa0653cd1so1803297a12.0
+        for <linux-cifs@vger.kernel.org>; Thu, 25 Sep 2025 08:51:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758815460; x=1759420260; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8pkBkCfzzGdkuWc/HhosQmhWOM0aTTicipXFn1WFKUs=;
+        b=iY7XgZl3CUVbARqjTBzgBZlbHnruBEfqbcILUqCkFf03LMoXHc1VqKP4IZ1j2/t0fi
+         FIKoJ8kqortoCrvZvWc3WlqzvO5dOfsgRUygx40+5XbwygOkecx4O+SquB52zRpbWfuo
+         RfEdlBQQDkPogGkeg+F7JlAf/jdMmVCLOpGW1QujNbSQuH0uduOnbuIsOSmoNSSy/koL
+         63g7jg7eV1RRLL/RkCMrqetIRffD144AAmKTznZVL4gh3fnO0d2Ya3Qgq2Zz025DfXtc
+         eGnJQ1SiKAZJtdArrsxcrFLRIM15gKql3d3dT+idetJ++b9cklFnN3x0qb7MX8MMizbY
+         Q26A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758815410; x=1759420210;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lPOIdtGuD9l53wCDZgvs8CoLuOUrw0SyvwaoNtPWj00=;
-        b=Fy9OYP60Lb0+HxiKcqjxZIfZvaV1Sr0K8m6Qid+ZsU1tmjejkUsXcBRAuqG65HC1Pp
-         d/hBZg3hvM41yQM+Pu7rN92ChUJGURUxUUiG2q5MDdogehq77VnStAIzlIM85FFNB7dz
-         xbCIWgWU4gMv7fcFQumhP1IsP4xk3UBjTeV87D33qum7Qf4uhEW9nqo++xfih7N0+fV/
-         eCHFwZ7hshq+v4YHibcOkDuhj4vXRR3U3ly2NFOV+oEbywTt4sGgfPcxDIhooAczvoQq
-         FFiEGLaNXcAZWYBtHs52rlYrelV9IqgR07pbM/JnMHccfokiZKPGDnjmOQ9A/zsIkQwn
-         pZ0A==
-X-Forwarded-Encrypted: i=1; AJvYcCUBBjxJFxImTLPGO4yPEcCX8fYdCkB6GYQvSmE8W1MJLltTEfCb0a/lG+VjNfClAEUaduyESx/2fXSW@vger.kernel.org
-X-Gm-Message-State: AOJu0YybJos+ff99AKxh6VmZsPJNTdpaAAkFCrLceMPPALwICYoAMFah
-	Sm+ijhJoDVFg5vHS52J58/WXoKTo+rfDVxmzelE8ha30JrnlbEgTZGGaXrfa0+4vfoe81bAnID2
-	zCrMdDVW6zetO2v4/h6ZfHyZYqEga5cInRwqn03SQ0bW7m73zLQiJWcACIcrqbl8=
-X-Gm-Gg: ASbGncuOm2MEs33dvyT6XxesIs/bOUBDkWF8EpGvpPjv+McxX64+TqAXUrt9jmwfiUb
-	i405M6cjaU8/+4IdlCZ9MyRXANBmrKCk/rjUEl99a6wMpThvg5w8QD+ljHkz5aDE7vLGBrzJaAH
-	+C/IB97OaqhuCK8qImjibwTjnFyNRbrFJxnyoYUc4BgNH49ro37kA8gBKI90Gnfdo/LIIJ+Kyf5
-	W8rHY64XV0vi1LY5W5k4INqwieiQ4txxXUU6G+qqlAmaKvVsWPn/Ym1CmfmfTcvkJ5xruWJrIKp
-	/EXbxuKXK/ZChth5nn9tB9je21Kz1fOT1mW9KhG3lOA54/yrxdjZlXl2wOsXBkLj4OIza1LPDGh
-	7H0N9TE6RuT0o
-X-Received: by 2002:a05:600c:1ca5:b0:46e:2637:d182 with SMTP id 5b1f17b1804b1-46e32a08feamr49009105e9.28.1758815410209;
-        Thu, 25 Sep 2025 08:50:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFifX77hGxL2O4FYAU+ptB+L8YPLKwsnLSuT5OPi4ABcaTgR4jE6/4IbKEl3gD+G+IQTmbShw==
-X-Received: by 2002:a05:600c:1ca5:b0:46e:2637:d182 with SMTP id 5b1f17b1804b1-46e32a08feamr49008725e9.28.1758815409731;
-        Thu, 25 Sep 2025 08:50:09 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33bf6ecbsm42448815e9.22.2025.09.25.08.50.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Sep 2025 08:50:09 -0700 (PDT)
-Message-ID: <2152c576-68ce-4bc4-9658-bb1e8ccce423@redhat.com>
-Date: Thu, 25 Sep 2025 17:50:07 +0200
+        d=1e100.net; s=20230601; t=1758815460; x=1759420260;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8pkBkCfzzGdkuWc/HhosQmhWOM0aTTicipXFn1WFKUs=;
+        b=cYTps8hxetvhkxhOY5w1JJGWe8S5aZrNQ2po65bXrG/g0yYuLC8uGCGNPIJ3ibwflx
+         X+3YHG0lbKq4K6zUAx6DBBmNeLPadTwmbGbhZ1SA9NOFmw2sDp+lNzSzElf+e6WDgABG
+         DGbQsagmXLq/k0do6qVfohzQShLe7Wq5kKv1ByI5tgeqTByxogmWMu/t9bJY0oA1qY+f
+         RDIZ2pbT3Osa5iQh79lcAUeQo8SuRekD45La5PwFNAXqyxgPdH+AZPtAFXy5A3zsEDvU
+         82W3WjqC5UwEsZzAqAH8aGMEWj21Y1AuuGbBhoAYVfp7hhlYy1pnQqrAqHYz47aZwG+j
+         PcEw==
+X-Forwarded-Encrypted: i=1; AJvYcCWFYVMZtlsb5dSE9UwPoTZY9YN+5jF9wYHIQ7CQ96TA6GZNBaEPhm6ihvzD6OOJW8H1pLmGjxdOF8ob@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4VPIiWHX9abHL2wyi5h2loYtyMdNMtMgAOl0Na8AD41g5AGTu
+	oeQZEsPpAdtbplq2k0f6G+r0dxXZ9kF96M5ILhyF41hMw1V39Z/GiSYn9uo3NSQz743vklEjzjv
+	5IHBuhAUzzZzySzyR/Zo8Cm+7p7gXugBjFQkX
+X-Gm-Gg: ASbGncv1nBAjTNvwW5gwVby/A+JTwK55/p+PgyQ3YAC1bm7KzuX+Mo0SpYFSbnN6Sbf
+	SRtwziBpfNgAHClt9aealPIT1akcddT725SWu3r5lGVCTYI5gqvmVFdM3N1LU2o9wb6xm6f4lVQ
+	TpkaOQ6VN1jCA1jtI0hteQHOABqCUCeZYNHV9A2lc/G8V7GpLLoq/2844hE0VPx2sbge5fBaI8k
+	Vo3BprqX0RUL2ajdwK6nXgTIMYxUiC5Whl6q1qzvg==
+X-Google-Smtp-Source: AGHT+IEPELCD3OHR2BGTubqUw5ydVo0EBqdmNaM5DUUzIA4oXmm6t1IFpxRmnv1QnAOHXgoMgCOHn19rV0i1+BCN878=
+X-Received: by 2002:a05:6402:5189:b0:628:6fc1:a3f with SMTP id
+ 4fb4d7f45d1cf-6349fa7e3c0mr3078578a12.17.1758815459987; Thu, 25 Sep 2025
+ 08:50:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 03/15] quic: provide common utilities and data
- structures
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev,
- davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
- Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
- Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
- kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
- Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>,
- Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1758234904.git.lucien.xin@gmail.com>
- <a7fb75136c7c2e51b7081d3bff421e01b435288f.1758234904.git.lucien.xin@gmail.com>
- <871ed254-c3d8-49aa-9aac-eeb72e82f55d@redhat.com>
- <CADvbK_e20TrcgprXmnZzvoEO6yzoo4Zx7B0qFS0kQPT8Sf63LQ@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CADvbK_e20TrcgprXmnZzvoEO6yzoo4Zx7B0qFS0kQPT8Sf63LQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250925151140.57548-1-cel@kernel.org>
+In-Reply-To: <20250925151140.57548-1-cel@kernel.org>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Thu, 25 Sep 2025 17:50:48 +0200
+X-Gm-Features: AS18NWDi1hkVUuMtcyKFJEsHH4fQmmUb6QosD-2WEc6arB-jdISZEtt1CuTxQwI
+Message-ID: <CAOQ4uxj-d87B+L+WgbFgmBQqdrYzrPStyfOKtVfcQ19bOEV6CQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] fs: Plumb case sensitivity bits into statx
+To: Chuck Lever <cel@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Volker Lendecke <Volker.Lendecke@sernet.de>, Gabriel Krisman Bertazi <krisman@kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/23/25 6:06 PM, Xin Long wrote:
-> On Tue, Sep 23, 2025 at 7:21 AM Paolo Abeni <pabeni@redhat.com> wrote:
->> On 9/19/25 12:34 AM, Xin Long wrote:
->>> +static int quic_uhash_table_init(struct quic_uhash_table *ht, u32 max_size, int order)
->>> +{
->>> +     int i, max_order, size;
->>> +
->>> +     /* Same sizing logic as in quic_shash_table_init(). */
->>> +     max_order = get_order(max_size * sizeof(struct quic_uhash_head));
->>> +     order = min(order, max_order);
->>> +     do {
->>> +             ht->hash = (struct quic_uhash_head *)
->>> +                     __get_free_pages(GFP_KERNEL | __GFP_NOWARN, order);
->>> +     } while (!ht->hash && --order > 0);
->>
->> You can avoid a little complexity, and see more consistent behaviour,
->> using plain vmalloc() or alloc_large_system_hash() with no fallback.
->>
-> I wanted to use alloc_large_system_hash(), but the memory allocated
-> by it is usually NOT meant to be freed at runtime. I don't see a free_
-> function to do it either.
-> 
-> If QUIC works as a kernel module, what should I do with this memory
-> in module_exit()?
+On Thu, Sep 25, 2025 at 5:21=E2=80=AFPM Chuck Lever <cel@kernel.org> wrote:
+>
+> From: Chuck Lever <chuck.lever@oracle.com>
+>
+> Both the NFSv3 and NFSv4 protocols enable NFS clients to query NFS
+> servers about the case sensitivity and case preservation behaviors
+> of shared file systems. Today, the Linux NFSD implementation
+> unconditionally returns "the export is case sensitive and case
+> preserving".
+>
+> However, a few Linux in-tree file system types appear to have some
+> ability to handle case-folded filenames. Some of our users would
+> like to exploit that functionality from their non-POSIX NFS clients.
+>
+> Enable upper layers such as NFSD to retrieve case sensitivity
+> information from file systems by adding a statx API for this
+> purpose. Introduce a sample producer and a sample consumer for this
+> information.
+>
+> If this mechanism seems sensible, a future patch might add a similar
+> field to the user-space-visible statx structure. User-space file
+> servers already use a variety of APIs to acquire this information.
+>
+> Suggested-by: Jeff Layton <jlayton@kernel.org>
+> Cc: Volker Lendecke <Volker.Lendecke@sernet.de>
+> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+> ---
+>  fs/fat/file.c             |  5 +++++
+>  fs/nfsd/nfs3proc.c        | 35 +++++++++++++++++++++++++++--------
+>  include/linux/stat.h      |  1 +
+>  include/uapi/linux/stat.h | 15 +++++++++++++++
+>  4 files changed, 48 insertions(+), 8 deletions(-)
+>
+> I'm certain this RFC patch has a number of problems, but it should
+> serve as a discussion point.
+>
+>
+> diff --git a/fs/fat/file.c b/fs/fat/file.c
+> index 4fc49a614fb8..8572e36d8f27 100644
+> --- a/fs/fat/file.c
+> +++ b/fs/fat/file.c
+> @@ -413,6 +413,11 @@ int fat_getattr(struct mnt_idmap *idmap, const struc=
+t path *path,
+>                 stat->result_mask |=3D STATX_BTIME;
+>                 stat->btime =3D MSDOS_I(inode)->i_crtime;
+>         }
+> +       if (request_mask & STATX_CASE_INFO) {
+> +               stat->result_mask |=3D STATX_CASE_INFO;
+> +               /* STATX_CASE_PRESERVING is cleared */
+> +               stat->case_info =3D statx_case_ascii;
+> +       }
+>
+>         return 0;
+>  }
+> diff --git a/fs/nfsd/nfs3proc.c b/fs/nfsd/nfs3proc.c
+> index b6d03e1ef5f7..b319d1c4385c 100644
+> --- a/fs/nfsd/nfs3proc.c
+> +++ b/fs/nfsd/nfs3proc.c
+> @@ -697,6 +697,31 @@ nfsd3_proc_fsinfo(struct svc_rqst *rqstp)
+>         return rpc_success;
+>  }
+>
+> +static __be32
+> +nfsd3_proc_case(struct svc_fh *fhp, struct nfsd3_pathconfres *resp)
+> +{
+> +       struct path p =3D {
+> +               .mnt            =3D fhp->fh_export->ex_path.mnt,
+> +               .dentry         =3D fhp->fh_dentry,
+> +       };
+> +       u32 request_mask =3D STATX_CASE_INFO;
+> +       struct kstat stat;
+> +       __be32 nfserr;
+> +
+> +       nfserr =3D nfserrno(vfs_getattr(&p, &stat, request_mask,
+> +                                     AT_STATX_SYNC_AS_STAT));
+> +       if (nfserr !=3D nfs_ok)
+> +               return nfserr;
+> +       if (!(stat.result_mask & STATX_CASE_INFO))
+> +               return nfs_ok;
+> +
+> +       resp->p_case_insensitive =3D
+> +               stat.case_info & STATX_CASE_FOLDING_TYPE ? 0 : 1;
+> +       resp->p_case_preserving =3D
+> +               stat.case_info & STATX_CASE_PRESERVING ? 1 : 0;
+> +       return nfs_ok;
+> +}
+> +
+>  /*
+>   * Get pathconf info for the specified file
+>   */
+> @@ -722,17 +747,11 @@ nfsd3_proc_pathconf(struct svc_rqst *rqstp)
+>         if (resp->status =3D=3D nfs_ok) {
+>                 struct super_block *sb =3D argp->fh.fh_dentry->d_sb;
+>
+> -               /* Note that we don't care for remote fs's here */
+> -               switch (sb->s_magic) {
+> -               case EXT2_SUPER_MAGIC:
+> +               if (sb->s_magic =3D=3D EXT2_SUPER_MAGIC) {
+>                         resp->p_link_max =3D EXT2_LINK_MAX;
+>                         resp->p_name_max =3D EXT2_NAME_LEN;
+> -                       break;
+> -               case MSDOS_SUPER_MAGIC:
+> -                       resp->p_case_insensitive =3D 1;
+> -                       resp->p_case_preserving  =3D 0;
+> -                       break;
+>                 }
+> +               resp->status =3D nfsd3_proc_case(&argp->fh, resp);
+>         }
+>
+>         fh_put(&argp->fh);
+> diff --git a/include/linux/stat.h b/include/linux/stat.h
+> index e3d00e7bb26d..abb47cbb233a 100644
+> --- a/include/linux/stat.h
+> +++ b/include/linux/stat.h
+> @@ -59,6 +59,7 @@ struct kstat {
+>         u32             atomic_write_unit_max;
+>         u32             atomic_write_unit_max_opt;
+>         u32             atomic_write_segments_max;
+> +       u32             case_info;
+>  };
+>
+>  /* These definitions are internal to the kernel for now. Mainly used by =
+nfsd. */
+> diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
+> index 1686861aae20..e929b30d64b6 100644
+> --- a/include/uapi/linux/stat.h
+> +++ b/include/uapi/linux/stat.h
+> @@ -219,6 +219,7 @@ struct statx {
+>  #define STATX_SUBVOL           0x00008000U     /* Want/got stx_subvol */
+>  #define STATX_WRITE_ATOMIC     0x00010000U     /* Want/got atomic_write_=
+* fields */
+>  #define STATX_DIO_READ_ALIGN   0x00020000U     /* Want/got dio read alig=
+nment info */
+> +#define STATX_CASE_INFO                0x00040000U     /* Want/got case =
+folding info */
+>
+>  #define STATX__RESERVED                0x80000000U     /* Reserved for f=
+uture struct statx expansion */
+>
+> @@ -257,4 +258,18 @@ struct statx {
+>  #define STATX_ATTR_WRITE_ATOMIC                0x00400000 /* File suppor=
+ts atomic write operations */
+>
+>
+> +/*
+> + * File system support for case folding is available via a bitmap.
+> + */
+> +#define STATX_CASE_PRESERVING          0x80000000 /* File name case is p=
+reserved */
+> +
+> +/* Values stored in the low-order byte of .case_info */
+> +enum {
+> +       statx_case_sensitive =3D 0,
+> +       statx_case_ascii,
+> +       statx_case_utf8,
+> +       statx_case_utf16,
+> +};
+> +#define STATX_CASE_FOLDING_TYPE                0x000000ff
+> +
+>  #endif /* _UAPI_LINUX_STAT_H */
+> --
+> 2.51.0
+>
 
-Right, I did not think about such case. I suggest using a plain
-vmalloc() without the loop than.
-
->>> +/* rfc9000#section-a.3: DecodePacketNumber()
->>> + *
->>> + * Reconstructs the full packet number from a truncated one.
->>> + */
->>> +s64 quic_get_num(s64 max_pkt_num, s64 pkt_num, u32 n)
->>> +{
->>> +     s64 expected = max_pkt_num + 1;
->>> +     s64 win = BIT_ULL(n * 8);
->>> +     s64 hwin = win / 2;
->>> +     s64 mask = win - 1;
->>> +     s64 cand;
->>> +
->>> +     cand = (expected & ~mask) | pkt_num;
->>> +     if (cand <= expected - hwin && cand < (1ULL << 62) - win)
->>> +             return cand + win;
->>> +     if (cand > expected + hwin && cand >= win)
->>> +             return cand - win;
->>> +     return cand;
->>
->> The above is a bit obscure to me; replacing magic nubers (62) with macro
->> could help. Some more comments also would do.
->>
-> The code is exactly from the commented doc:
-> /* rfc9000#section-a.3: DecodePacketNumber()
-> 
-> See:
-> https://datatracker.ietf.org/doc/html/rfc9000#section-a.3
-> 
-> I will bring some comments from there.
-
-You can quote or make a synopsis of the RFC where it makes sense. In any
-case, please try to reduce magic numbers usage.
+CC unicode maintainer and SMB list.
 
 Thanks,
-
-Paolo
-
+Amir.
