@@ -1,94 +1,81 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B023120CCCA;
-	Thu, 25 Sep 2025 11:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C764F2FF669;
+	Thu, 25 Sep 2025 12:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758799299; cv=none; b=G1b+fOt9TODECh6xarAO6KmjPWLumdaDd3h/SPmvg7wI5L9pJQINGno6HuXNMio23QCG8rdgZqQ8gMEst+anlGK3As0qhS/bBYYKfy1WFTzSQdJsammDpZNyEls7ytOHeYGAe4EhrdXC1fI2CamkQYFCR4wSHyiSUY2uSz4cFdo=
+	t=1758802449; cv=none; b=bYeWsWEKmiDv5Gm6MCPX1UUf/pennl32JcW1YVeuaN9VOe9a2QQOPwos5+oDSGTZoYtjW3DrAcmOjfWm1dkU2cPF76GzwD568Y1Iynt5aXPbbb2zAApP1ncSjXEdlNp6Z9alz4oy25pOM3p97wOie3g0fXY2iBFnvHMQNp+I26c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758799299; c=relaxed/simple;
-	bh=mTM2GrOWeD3F8GLCbqe4PJoUAnPGY934dGBynBWKNOg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A24MTTKl0+BYulESGMTfgWKhw/j04tp8+TKYuyA+RxWdsc5k1AkX4teerWiMSn1qN9DcwDf7qmtL/C1F9E/yEJyc3swxgqdB9vW7Nq13CAhqpOAyo+aviuVKvTtqzyci5mWMP4993Osh0v9QvS16QdKst3nr4fySO5AZYdrPFU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=IPyRk8/J; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1758802449; c=relaxed/simple;
+	bh=h6H6ZhBZe1gKHmrNubWc5sUylhRVOXzZrHkkLa0lGmY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oTl1frbLHWkf1JdWoJKfqdrVdy6CHIDCjqf4mEQNO6d04VmKT+a2XKlRhOTln8D/P6AvrfbPlVCYmBZ1tn4Ze3G+aGaXVb/9n6THIwRy4Z/ffvBNGLkZy0BbthGBEyfKhw477SunRZXAnE/QL7gmKKY7hatHg9K281x5px0DqAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=knIl4HKq; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="IPyRk8/J"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=iHPtz3ycelQ6n18OHQYvVxPNY66NuZcxk79Q3PUoVEg=; b=IPyRk8/Jf2cKSXtpKEMC6Shk+z
-	iB20cNjrhOkx2jlDDItpvyGyoXjbcPdZUiFlMRmkfhTqgTuv4GvhErtG77pyV1tB76br4wo1vQUMZ
-	hSVXLE2SlOW0qzCD3bGnIZnnFZjg0DKotZqKH7pZqqTYNjQsS084TeB4exAhxeOWZA3PbqJmPwEFl
-	nCQzTj9OJDVDGXSNkmwIDKz1tXRQ1nURCi/A8g1t1jgjWoOfS41K0LCYpHVOt4PjscyAe3OzxtJve
-	cKqmZsNxQx+NxkSMCocWIQtnEr59Q6N3imBDK7H6jpQi58MZr3iCL7duUOZxOn8EE5GxNt+6FfSOz
-	dXrI4TjQmKrALCts7+0zSRgJYVH817YPrgqei0LEm9z8KEqt2tQrLpggfAwxEyXvGyJXLAg5CsUtS
-	ek5k7FOdFCY5OGlQ+RpM+y4glKhsSjCoKoEhLbHPPa+p/XUqYCu0DpfFGN2C1osiCsQ+tOuANR+db
-	lA+oUT4lMfxvR+AxB0FNXnMr;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1v1k2Q-005wG1-0I;
-	Thu, 25 Sep 2025 11:21:26 +0000
-Message-ID: <cf4e9b44-e373-4f1c-afcd-51f97da65145@samba.org>
-Date: Thu, 25 Sep 2025 13:21:22 +0200
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="knIl4HKq"
+Received: from localhost.localdomain (unknown [178.69.159.70])
+	by mail.ispras.ru (Postfix) with ESMTPSA id B7AC840A327F;
+	Thu, 25 Sep 2025 12:13:57 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru B7AC840A327F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1758802438;
+	bh=2EVHtjacVStoLork7wasnNmEVZ79Lr/9XpsbjrB7eNs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=knIl4HKqaY0s6G0NSAM2HxjkVhzFpA/5HTSdLKOvFZsClpI2sxMITnXQHsTQbWzcx
+	 ztXQB99p2WXyKSHHSa6P8m0QpPiknIGoXo0r2NbH6jjiTO5rqNMH41mxikeN0XTGds
+	 X2O21CPWLMR07Tj4cfXfbxh0cg8Oj7bsHNcli4PA=
+From: Matvey Kovalev <matvey.kovalev@ispras.ru>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Matvey Kovalev <matvey.kovalev@ispras.ru>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: [PATCH] fix error code overwriting in smb2_get_info_filesystem()
+Date: Thu, 25 Sep 2025 15:12:34 +0300
+Message-ID: <20250925121255.1407-1-matvey.kovalev@ispras.ru>
+X-Mailer: git-send-email 2.43.0.windows.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Does ib_dereg_mr require an additional IB_WR_LOCAL_INV?
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-References: <656eacb1-a39f-4b59-99db-5522d102468a@samba.org>
- <20250924151002.GK2547959@ziepe.ca>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20250924151002.GK2547959@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Am 24.09.25 um 17:10 schrieb Jason Gunthorpe:
-> On Tue, Sep 23, 2025 at 11:09:48PM +0200, Stefan Metzmacher wrote:
->> Hi,
->>
->> I'm trying to understand (and hopefully simplify) the code in fs/smb/client/smbdirect.c,
->> related to 'struct ib_mr' cleanup on disconnect.
->>
->> Assume we have the following sequence of calls:
->>
->> ...
->> ib_alloc_mr()
->> ib_dma_map_sg()
->> ib_map_mr_sg()
->> ib_post_send(IB_WR_REG_MR)
->>
->> On cleanup we currently us something like this:
->>
->> ib_drain_qp()
->> init_completion()
->> ib_post_send(IB_WR_LOCAL_INV)
->> wait_for_completion()...
->> ib_dereg_mr()
->> ib_drain_qp() // again
->> rdma_destroy_qp();
->> ib_destroy_cq(revc_cq)
->> ib_destroy_cq(send_cq)
->> ib_dealloc_pd()
->> rdma_destroy_id()
->>
->> Now I'm wondering if the following is really required:
->> init_completion()
->> ib_post_send(IB_WR_LOCAL_INV)
->> wait_for_completion()...
-> 
-> I would say IB_WR_LOCAL_INV is redundent with the ib_dereg_mr(). There
-> is no need to invalidate something that will be de-registered in a few
-> moments.
+If client doesn't negotiate with SMB3.1.1 POSIX Extensions, 
+then proper error code won't be returned due to overwriting.
 
-Thanks!
+Return error immediately.
+
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Fixes: e2f34481b24db ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Signed-off-by: Matvey Kovalev <matvey.kovalev@ispras.ru>
+---
+ fs/smb/server/smb2pdu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index a565fc36cee6d..a1db006ab6e92 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -5628,7 +5628,8 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
+ 
+ 		if (!work->tcon->posix_extensions) {
+ 			pr_err("client doesn't negotiate with SMB3.1.1 POSIX Extensions\n");
+-			rc = -EOPNOTSUPP;
++			path_put(&path);
++			return -EOPNOTSUPP;
+ 		} else {
+ 			info = (struct filesystem_posix_info *)(rsp->Buffer);
+ 			info->OptimalTransferSize = cpu_to_le32(stfs.f_bsize);
+-- 
+2.43.0.windows.1
 
