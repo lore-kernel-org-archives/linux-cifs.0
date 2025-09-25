@@ -1,341 +1,375 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4002E2EF1
-	for <linux-cifs@vger.kernel.org>; Thu, 25 Sep 2025 15:53:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47FE2E5439
+	for <linux-cifs@vger.kernel.org>; Thu, 25 Sep 2025 15:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758815608; cv=none; b=IuCBJb/pXq9kAtLc/tl6SlkFNub32IjyL+hTwY9zVsPWojqOt7INSvCEuoMBih5okgTkt5pJ0PeV8xXKrFZL4mXCDhQ8lweuSflwguZ2iO5jdSDkKStrpxBKw9kQmm7klP6I1h7HLoPu5gz9hunKD5gHiAvOSx80FcyrKFM1lPE=
+	t=1758815932; cv=none; b=kjLYZngybH2YbNunlkd1ZiyLhdRKH0KS6hBj8DR+goszzwMieUYS4zfftENTG0iZY7VHBIIsNTBS3Emd5+tNf7NQBaimQBj30pvbM1RwE7Na9exb4LiUHJZYiOMr4SPREFYEJV0Gm+lHn0cV+jC4oqQ0aJs6vkncJQZqLlVPJug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758815608; c=relaxed/simple;
-	bh=uhrnl9/zry7673UysahyzBHHm2J/Poy7duc6OEBGMA8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PkL4RIHMXpF1nixr3exAixOWzbVpRzrRVuU4VZAxLGjmEj0afXXlOjNgcJpDwBunjy22747fErwB6S0QuXmL+/FMXZCfuNk71Z9Vh1fSOI6gJgdAiNUiF4LATg6RuX2rtlZcjaqUS+aLNQcoAXOeSa+Sh3Ma9WYoRyHilFJmA5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cHRV2qJl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1758815932; c=relaxed/simple;
+	bh=GXtEq3rF3FmY4v5f5e72IKPEQI8ujYWLQv6nCmj0v5U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=am3kj11jujAZdxqBeS9zept7m+1FGBYD0srdCbOCg59mmUefzxxDZZcdhdxhySLSNX8i2wZW9ZG0XYD4231ohxq2aIDUtPznY5xEJSMMtUKim0P1LJnVqJv7G5KFMCiJskJYLBZUfCE9vXwnStO0UxuCIsRYaTM1/VCmXyrQDNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=XFlomXez; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=dq5o9ACW; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=XFlomXez; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=dq5o9ACW; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cHRV2qJl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758815605;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="XFlomXez";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="dq5o9ACW";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="XFlomXez";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="dq5o9ACW"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0DB223EBB1;
+	Thu, 25 Sep 2025 15:58:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1758815928; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/OrJvNgCuQzdfzmUeCSm/G5uSYVaKQkZM113wfPJo/0=;
-	b=cHRV2qJlqJQXSPYZ6I+SPNeOk4km5AoFiik6Wgf76IIm8Qt2sGqroQVFws5+RgQR5SRgKC
-	k4a3MNizHdbNFjefXK/xx+EDS23K0y2t3QsetOguq43VwXBVceRewJSijnavgUagas/Zvf
-	nVXiXVY3fUHbkmV4qGkR4/YQCEl9i28=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-320-w8_drwEoMCageEZ7WMnazA-1; Thu, 25 Sep 2025 11:53:24 -0400
-X-MC-Unique: w8_drwEoMCageEZ7WMnazA-1
-X-Mimecast-MFC-AGG-ID: w8_drwEoMCageEZ7WMnazA_1758815603
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-46e1e147cc0so8648895e9.2
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Sep 2025 08:53:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758815603; x=1759420403;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/OrJvNgCuQzdfzmUeCSm/G5uSYVaKQkZM113wfPJo/0=;
-        b=rpSnHP0Bh0R94Y7EqHXnA5a58I3qRqN18tZDd0pp0u3gOR1V5n/Du018zKKSZClcQs
-         6BAa15PHtncEEvLAq93Le+C2cA19IlhR3WYwv4h8+CRvWZrpJ3RPdvNydGm7Dd6uPCLS
-         WdlCgnGp7sp6KZYC7viQeT95KtYGmKnc/TF2csJSVy1LaDl/yRze1w1km+ZtuuSO9fVZ
-         9zC7tstLOLkBQoBfgUAJdw8+owf3PI/ukCNtwtj/RYBG+WtpR/uOlL+y1km/JDTXHKkl
-         v9kZsQgEqnGw4kQLeG+Bb2xm4bE14pMPLdc2foyWA+8IvPbLhc1ZhNcdoLb2Ts7Uwoln
-         5jiw==
-X-Forwarded-Encrypted: i=1; AJvYcCXeIWyQeIA1qQc6K++mkzKKSW3XuS8Xj+tssOg6gzLQIiRJH9HNL1AQWmER4vICpfPhlA5VDvMr18M2@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgyDLkxibwF3dDcYI1T0UBaApRuWC2im86AbAm+NnHp/kPUYik
-	sgJEP2U7Dblce7l+jCmq2LefyCgofn4pR460GBc7Yiil78uv/7eoJu1pDZBT3Lw7EBKusCTQIgb
-	Co3vSMttNKY0E3lXi18S2ihIdgZLI+rn6NM/amTIG0YEaxIX5sE51Q29BMdOiWq4=
-X-Gm-Gg: ASbGncuA79b5iWgQl0k7xRY7sw3J/W+ipRjQGM7f8QXuinhjFsJxmG0wrvrqTWaU4DB
-	UZMNOWd9h/lAiP7CEqObO4uU++L0KhcD4NknClBsdK9kaqWvopnoMsMu1XwI4nC7CBff4damnJY
-	OKoj5eHMg1xB0zwnTkNBFviuiaCyBQJYbVPdLeZ/R1fu23jptahf8YAnsI7tBUzpQvz0K8fP2n0
-	6AvbIF50vbmDwaAfaWhhxuu9NlSyvbSlCCFlXLX8A6r+SlhlQehmIrNQx3HtPQgukId6mv1/jjQ
-	jRH1ONYO36COViNO9bGValDRxShti02mt77iYcQmqRT9wYu9g+Qn9bOilq8fANJGFBxUFEXVYWq
-	WK0oztRR+PmR2
-X-Received: by 2002:a05:600c:4fca:b0:46d:45e:350a with SMTP id 5b1f17b1804b1-46e329fb93bmr51962345e9.17.1758815602255;
-        Thu, 25 Sep 2025 08:53:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGd/YGP++P29xvYlWaHsbhyiic8rLVGyrhoHU5/VBmu8xkfMajHVZFOJ8S86WjXkLBx18y+pw==
-X-Received: by 2002:a05:600c:4fca:b0:46d:45e:350a with SMTP id 5b1f17b1804b1-46e329fb93bmr51961875e9.17.1758815601737;
-        Thu, 25 Sep 2025 08:53:21 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e2ab48c28sm81521455e9.18.2025.09.25.08.53.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Sep 2025 08:53:21 -0700 (PDT)
-Message-ID: <ada89946-b0c2-4679-9918-1c89cf2be0c6@redhat.com>
-Date: Thu, 25 Sep 2025 17:53:18 +0200
+	bh=H7kAeq27Btf68kumqbIJpRiiXBnvJcpACUD2OM/hNzM=;
+	b=XFlomXezvgCdYhPrZPrF6PTKy2r5oyB9lm5OG2R1NC2/O/HDpat/tt8llvIWWmXnZDWLHh
+	QSHhVHkDtm7QZd4B0tIlYKpLlUl3BBSK60rstqPvp2zYy/Q0Ube4nA1G5NyRXYoNPxDLAu
+	9j8f2SoYu1i24wEoCRAF090xX0BD27A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1758815928;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H7kAeq27Btf68kumqbIJpRiiXBnvJcpACUD2OM/hNzM=;
+	b=dq5o9ACWLdxEeLy2B9gkrTzC7PkwZxZBzZBd3y3nzp2LtCipbNc5H2zLUSHA++af77Vdr4
+	vx/Z9iIKBUXNH/CA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1758815928; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H7kAeq27Btf68kumqbIJpRiiXBnvJcpACUD2OM/hNzM=;
+	b=XFlomXezvgCdYhPrZPrF6PTKy2r5oyB9lm5OG2R1NC2/O/HDpat/tt8llvIWWmXnZDWLHh
+	QSHhVHkDtm7QZd4B0tIlYKpLlUl3BBSK60rstqPvp2zYy/Q0Ube4nA1G5NyRXYoNPxDLAu
+	9j8f2SoYu1i24wEoCRAF090xX0BD27A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1758815928;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H7kAeq27Btf68kumqbIJpRiiXBnvJcpACUD2OM/hNzM=;
+	b=dq5o9ACWLdxEeLy2B9gkrTzC7PkwZxZBzZBd3y3nzp2LtCipbNc5H2zLUSHA++af77Vdr4
+	vx/Z9iIKBUXNH/CA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EC1F313869;
+	Thu, 25 Sep 2025 15:58:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 86CiObdm1Wi6XQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 25 Sep 2025 15:58:47 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 8D564A0AA0; Thu, 25 Sep 2025 17:58:47 +0200 (CEST)
+Date: Thu, 25 Sep 2025 17:58:47 +0200
+From: Jan Kara <jack@suse.cz>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Chuck Lever <chuck.lever@oracle.com>, 
+	Alexander Aring <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
+	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
+	NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Amir Goldstein <amir73il@gmail.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+	Paulo Alcantara <pc@manguebit.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, 
+	Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Carlos Maiolino <cem@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Rick Macklem <rick.macklem@gmail.com>, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, linux-doc@vger.kernel.org, 
+	netfs@lists.linux.dev, ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 04/38] vfs: allow mkdir to wait for delegation break
+ on parent
+Message-ID: <t5keaycmuzytufkjufw54hpt6sf4mfjsvehc67zqxwoexuofhg@5jmeznwtcup4>
+References: <20250924-dir-deleg-v3-0-9f3af8bc5c40@kernel.org>
+ <20250924-dir-deleg-v3-4-9f3af8bc5c40@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 02/15] net: build socket infrastructure for
- QUIC protocol
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev,
- davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
- Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
- Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
- kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
- Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>,
- Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1758234904.git.lucien.xin@gmail.com>
- <b55a2141a1d5aa31cd57be3d22bb8a5f8d40b7e2.1758234904.git.lucien.xin@gmail.com>
- <7fa38c12-eece-45ae-87b2-da1445c62134@redhat.com>
- <CADvbK_dxOHmDycm1D3-Ga4YSP7E2S91SQD1bdL+u2s-f+=Bkxg@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CADvbK_dxOHmDycm1D3-Ga4YSP7E2S91SQD1bdL+u2s-f+=Bkxg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250924-dir-deleg-v3-4-9f3af8bc5c40@kernel.org>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[44];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,oracle.com,gmail.com,samba.org,microsoft.com,talpey.com,brown.name,redhat.com,lwn.net,szeredi.hu,manguebit.org,linuxfoundation.org,tyhicks.com,chromium.org,goodmis.org,efficios.com,vger.kernel.org,lists.samba.org,lists.linux.dev];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RL63fqwwx8ot6gmekemcs76f9d)];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.com:email]
+X-Spam-Flag: NO
+X-Spam-Score: -2.30
 
-On 9/23/25 5:47 PM, Xin Long wrote:
-> On Tue, Sep 23, 2025 at 7:07 AM Paolo Abeni <pabeni@redhat.com> wrote:
->>
->> On 9/19/25 12:34 AM, Xin Long wrote:
->>> This patch lays the groundwork for QUIC socket support in the kernel.
->>> It defines the core structures and protocol hooks needed to create
->>> QUIC sockets, without implementing any protocol behavior at this stage.
->>>
->>> Basic integration is included to allow building the module via
->>> CONFIG_IP_QUIC=m.
->>>
->>> This provides the scaffolding necessary for adding actual QUIC socket
->>> behavior in follow-up patches.
->>>
->>> Signed-off-by: Pengtao He <hepengtao@xiaomi.com>
->>> Signed-off-by: Xin Long <lucien.xin@gmail.com>
->>> ---
->>> v3:
->>>   - Kconfig: add 'default n' for IP_QUIC (reported by Paolo).
->>>   - quic_disconnect(): return -EOPNOTSUPP (suggested by Paolo).
->>>   - quic_init/destroy_sock(): drop local_bh_disable/enable() calls (noted
->>>     by Paolo).
->>>   - sysctl: add alpn_demux option to en/disable ALPN-based demux.
->>>   - SNMP: remove SNMP_MIB_SENTINEL, switch to
->>>     snmp_get_cpu_field_batch_cnt() to align with latest net-next changes.
->>> ---
->>>  net/Kconfig         |   1 +
->>>  net/Makefile        |   1 +
->>>  net/quic/Kconfig    |  36 +++++
->>>  net/quic/Makefile   |   8 +
->>>  net/quic/protocol.c | 379 ++++++++++++++++++++++++++++++++++++++++++++
->>>  net/quic/protocol.h |  56 +++++++
->>>  net/quic/socket.c   | 207 ++++++++++++++++++++++++
->>>  net/quic/socket.h   |  79 +++++++++
->>>  8 files changed, 767 insertions(+)
->>>  create mode 100644 net/quic/Kconfig
->>>  create mode 100644 net/quic/Makefile
->>>  create mode 100644 net/quic/protocol.c
->>>  create mode 100644 net/quic/protocol.h
->>>  create mode 100644 net/quic/socket.c
->>>  create mode 100644 net/quic/socket.h
->>>
->>> diff --git a/net/Kconfig b/net/Kconfig
->>> index d5865cf19799..1205f5b7cf59 100644
->>> --- a/net/Kconfig
->>> +++ b/net/Kconfig
->>> @@ -249,6 +249,7 @@ source "net/bridge/netfilter/Kconfig"
->>>
->>>  endif # if NETFILTER
->>>
->>> +source "net/quic/Kconfig"
->>>  source "net/sctp/Kconfig"
->>>  source "net/rds/Kconfig"
->>>  source "net/tipc/Kconfig"
->>> diff --git a/net/Makefile b/net/Makefile
->>> index aac960c41db6..7c6de28e9aa5 100644
->>> --- a/net/Makefile
->>> +++ b/net/Makefile
->>> @@ -42,6 +42,7 @@ obj-$(CONFIG_PHONET)                += phonet/
->>>  ifneq ($(CONFIG_VLAN_8021Q),)
->>>  obj-y                                += 8021q/
->>>  endif
->>> +obj-$(CONFIG_IP_QUIC)                += quic/
->>>  obj-$(CONFIG_IP_SCTP)                += sctp/
->>>  obj-$(CONFIG_RDS)            += rds/
->>>  obj-$(CONFIG_WIRELESS)               += wireless/
->>> diff --git a/net/quic/Kconfig b/net/quic/Kconfig
->>> new file mode 100644
->>> index 000000000000..1f10a452b3a1
->>> --- /dev/null
->>> +++ b/net/quic/Kconfig
->>> @@ -0,0 +1,36 @@
->>> +# SPDX-License-Identifier: GPL-2.0-or-later
->>> +#
->>> +# QUIC configuration
->>> +#
->>> +
->>> +menuconfig IP_QUIC
->>> +     tristate "QUIC: A UDP-Based Multiplexed and Secure Transport (Experimental)"
->>> +     depends on INET
->>> +     depends on IPV6
->>> +     select CRYPTO
->>> +     select CRYPTO_HMAC
->>> +     select CRYPTO_HKDF
->>> +     select CRYPTO_AES
->>> +     select CRYPTO_GCM
->>> +     select CRYPTO_CCM
->>> +     select CRYPTO_CHACHA20POLY1305
->>> +     select NET_UDP_TUNNEL
->>> +     default n
->>> +     help
->>> +       QUIC: A UDP-Based Multiplexed and Secure Transport
->>> +
->>> +       From rfc9000 <https://www.rfc-editor.org/rfc/rfc9000.html>.
->>> +
->>> +       QUIC provides applications with flow-controlled streams for structured
->>> +       communication, low-latency connection establishment, and network path
->>> +       migration.  QUIC includes security measures that ensure
->>> +       confidentiality, integrity, and availability in a range of deployment
->>> +       circumstances.  Accompanying documents describe the integration of
->>> +       TLS for key negotiation, loss detection, and an exemplary congestion
->>> +       control algorithm.
->>> +
->>> +       To compile this protocol support as a module, choose M here: the
->>> +       module will be called quic. Debug messages are handled by the
->>> +       kernel's dynamic debugging framework.
->>> +
->>> +       If in doubt, say N.
->>> diff --git a/net/quic/Makefile b/net/quic/Makefile
->>> new file mode 100644
->>> index 000000000000..020e4dd133d8
->>> --- /dev/null
->>> +++ b/net/quic/Makefile
->>> @@ -0,0 +1,8 @@
->>> +# SPDX-License-Identifier: GPL-2.0-or-later
->>> +#
->>> +# Makefile for QUIC support code.
->>> +#
->>> +
->>> +obj-$(CONFIG_IP_QUIC) += quic.o
->>> +
->>> +quic-y := protocol.o socket.o
->>> diff --git a/net/quic/protocol.c b/net/quic/protocol.c
->>> new file mode 100644
->>> index 000000000000..f79f43f0c17f
->>> --- /dev/null
->>> +++ b/net/quic/protocol.c
->>> @@ -0,0 +1,379 @@
->>> +// SPDX-License-Identifier: GPL-2.0-or-later
->>> +/* QUIC kernel implementation
->>> + * (C) Copyright Red Hat Corp. 2023
->>> + *
->>> + * This file is part of the QUIC kernel implementation
->>> + *
->>> + * Initialization/cleanup for QUIC protocol support.
->>> + *
->>> + * Written or modified by:
->>> + *    Xin Long <lucien.xin@gmail.com>
->>> + */
->>> +
->>> +#include <net/inet_common.h>
->>> +#include <linux/proc_fs.h>
->>> +#include <net/protocol.h>
->>> +#include <net/rps.h>
->>> +#include <net/tls.h>
->>> +
->>> +#include "socket.h"
->>> +
->>> +static unsigned int quic_net_id __read_mostly;
->>> +
->>> +struct percpu_counter quic_sockets_allocated;
->>> +
->>> +long sysctl_quic_mem[3];
->>> +int sysctl_quic_rmem[3];
->>> +int sysctl_quic_wmem[3];
->>> +int sysctl_quic_alpn_demux;
->>> +
->>> +static int quic_inet_connect(struct socket *sock, struct sockaddr *addr, int addr_len, int flags)
->>> +{
->>> +     struct sock *sk = sock->sk;
->>> +     const struct proto *prot;
->>> +
->>> +     if (addr_len < (int)sizeof(addr->sa_family))
->>> +             return -EINVAL;
->>> +
->>> +     prot = READ_ONCE(sk->sk_prot);
->>
->> Is the above _ONCE() annotation for ADDRFORM's sake? If so it should not
->> be needed (only UDP and TCP sockets are affected).
-> I will delete it.
+On Wed 24-09-25 14:05:50, Jeff Layton wrote:
+> In order to add directory delegation support, we need to break
+> delegations on the parent whenever there is going to be a change in the
+> directory.
 > 
->>
->>> diff --git a/net/quic/socket.h b/net/quic/socket.h
->>> new file mode 100644
->>> index 000000000000..ded8eb2e6a9c
->>> --- /dev/null
->>> +++ b/net/quic/socket.h
->>> @@ -0,0 +1,79 @@
->>> +/* SPDX-License-Identifier: GPL-2.0-or-later */
->>> +/* QUIC kernel implementation
->>> + * (C) Copyright Red Hat Corp. 2023
->>> + *
->>> + * This file is part of the QUIC kernel implementation
->>> + *
->>> + * Written or modified by:
->>> + *    Xin Long <lucien.xin@gmail.com>
->>> + */
->>> +
->>> +#include <net/udp_tunnel.h>
->>> +
->>> +#include "protocol.h"
->>> +
->>> +extern struct proto quic_prot;
->>> +extern struct proto quicv6_prot;
->>> +
->>> +enum quic_state {
->>> +     QUIC_SS_CLOSED          = TCP_CLOSE,
->>> +     QUIC_SS_LISTENING       = TCP_LISTEN,
->>> +     QUIC_SS_ESTABLISHING    = TCP_SYN_RECV,
->>> +     QUIC_SS_ESTABLISHED     = TCP_ESTABLISHED,
->>> +};
->>
->> Any special reason to define protocol-specific states? I guess you could
->> re-use the TCP ones, as other protocols already do.
->>
-> I know TIPC and SCTP define the states like this:
+> Rename the existing vfs_mkdir to __vfs_mkdir, make it static and add a
+> new delegated_inode parameter. Add a new exported vfs_mkdir wrapper
+> around it that passes a NULL pointer for delegated_inode.
 > 
-> enum {
->         TIPC_LISTEN = TCP_LISTEN,
->         TIPC_ESTABLISHED = TCP_ESTABLISHED,
->         TIPC_OPEN = TCP_CLOSE,
->         TIPC_DISCONNECTING = TCP_CLOSE_WAIT,
->         TIPC_CONNECTING = TCP_SYN_SENT,
-> };
-> 
-> and
-> 
-> enum sctp_sock_state {
->         SCTP_SS_CLOSED         = TCP_CLOSE,
->         SCTP_SS_LISTENING      = TCP_LISTEN,
->         SCTP_SS_ESTABLISHING   = TCP_SYN_SENT,
->         SCTP_SS_ESTABLISHED    = TCP_ESTABLISHED,
->         SCTP_SS_CLOSING        = TCP_CLOSE_WAIT,
-> };
-> 
-> It should be fine to keep as is, or you have more and better
-> examples from other protocols.
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
 
-IMHO the cost/benfit ratio to re-define the socket state value is in not
-enough to justify the additional LoC. I guess it's subjective, but the
-patch series is big and anything shrinking it is IMHO a good thing.
+The changelog looks stale (__vfs_mkdir() doesn't exist anymore) but
+otherwise the patch looks good. Feel free to add:
 
-/P
+Reviewed-by: Jan Kara <jack@suse.cz>
 
+								Honza
+
+> ---
+>  drivers/base/devtmpfs.c  |  2 +-
+>  fs/cachefiles/namei.c    |  2 +-
+>  fs/ecryptfs/inode.c      |  2 +-
+>  fs/init.c                |  2 +-
+>  fs/namei.c               | 24 ++++++++++++++++++------
+>  fs/nfsd/nfs4recover.c    |  2 +-
+>  fs/nfsd/vfs.c            |  2 +-
+>  fs/overlayfs/overlayfs.h |  2 +-
+>  fs/smb/server/vfs.c      |  2 +-
+>  fs/xfs/scrub/orphanage.c |  2 +-
+>  include/linux/fs.h       |  2 +-
+>  11 files changed, 28 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/base/devtmpfs.c b/drivers/base/devtmpfs.c
+> index 31bfb3194b4c29a1d6a002449045bf4e4141911d..a57da600ce7523e9e2755b78f75342bf4fa56ef6 100644
+> --- a/drivers/base/devtmpfs.c
+> +++ b/drivers/base/devtmpfs.c
+> @@ -180,7 +180,7 @@ static int dev_mkdir(const char *name, umode_t mode)
+>  	if (IS_ERR(dentry))
+>  		return PTR_ERR(dentry);
+>  
+> -	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(path.dentry), dentry, mode);
+> +	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(path.dentry), dentry, mode, NULL);
+>  	if (!IS_ERR(dentry))
+>  		/* mark as kernel-created inode */
+>  		d_inode(dentry)->i_private = &thread;
+> diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
+> index 91dfd02318772fa63050ecf40fa5625ab48ad589..b3dac91efec622261186fbba8e704ae9e782bea0 100644
+> --- a/fs/cachefiles/namei.c
+> +++ b/fs/cachefiles/namei.c
+> @@ -130,7 +130,7 @@ struct dentry *cachefiles_get_directory(struct cachefiles_cache *cache,
+>  			goto mkdir_error;
+>  		ret = cachefiles_inject_write_error();
+>  		if (ret == 0)
+> -			subdir = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), subdir, 0700);
+> +			subdir = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), subdir, 0700, NULL);
+>  		else
+>  			subdir = ERR_PTR(ret);
+>  		if (IS_ERR(subdir)) {
+> diff --git a/fs/ecryptfs/inode.c b/fs/ecryptfs/inode.c
+> index 72fbe1316ab8831bb4228d573278f32fe52b6b25..00f54c125b102856c33ffff24627475f40dcbc7b 100644
+> --- a/fs/ecryptfs/inode.c
+> +++ b/fs/ecryptfs/inode.c
+> @@ -517,7 +517,7 @@ static struct dentry *ecryptfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
+>  		goto out;
+>  
+>  	lower_dentry = vfs_mkdir(&nop_mnt_idmap, lower_dir,
+> -				 lower_dentry, mode);
+> +				 lower_dentry, mode, NULL);
+>  	rc = PTR_ERR(lower_dentry);
+>  	if (IS_ERR(lower_dentry))
+>  		goto out;
+> diff --git a/fs/init.c b/fs/init.c
+> index eef5124885e372ac020d2923692116c5e884b3cf..dd5240ce8ad41f02367a54ddf1b6ac0aa28e9721 100644
+> --- a/fs/init.c
+> +++ b/fs/init.c
+> @@ -232,7 +232,7 @@ int __init init_mkdir(const char *pathname, umode_t mode)
+>  	error = security_path_mkdir(&path, dentry, mode);
+>  	if (!error) {
+>  		dentry = vfs_mkdir(mnt_idmap(path.mnt), path.dentry->d_inode,
+> -				  dentry, mode);
+> +				  dentry, mode, NULL);
+>  		if (IS_ERR(dentry))
+>  			error = PTR_ERR(dentry);
+>  	}
+> diff --git a/fs/namei.c b/fs/namei.c
+> index cd517eb232317d326e6d2fc5a60cb4c7569a137d..c939a58f16f9c4edded424475aff52f2c423d301 100644
+> --- a/fs/namei.c
+> +++ b/fs/namei.c
+> @@ -4320,10 +4320,11 @@ SYSCALL_DEFINE3(mknod, const char __user *, filename, umode_t, mode, unsigned, d
+>  
+>  /**
+>   * vfs_mkdir - create directory returning correct dentry if possible
+> - * @idmap:	idmap of the mount the inode was found from
+> - * @dir:	inode of the parent directory
+> - * @dentry:	dentry of the child directory
+> - * @mode:	mode of the child directory
+> + * @idmap:		idmap of the mount the inode was found from
+> + * @dir:		inode of the parent directory
+> + * @dentry:		dentry of the child directory
+> + * @mode:		mode of the child directory
+> + * @delegated_inode:	returns victim inode, if the inode is delegated.
+>   *
+>   * Create a directory.
+>   *
+> @@ -4340,7 +4341,8 @@ SYSCALL_DEFINE3(mknod, const char __user *, filename, umode_t, mode, unsigned, d
+>   * In case of an error the dentry is dput() and an ERR_PTR() is returned.
+>   */
+>  struct dentry *vfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
+> -			 struct dentry *dentry, umode_t mode)
+> +			 struct dentry *dentry, umode_t mode,
+> +			 struct inode **delegated_inode)
+>  {
+>  	int error;
+>  	unsigned max_links = dir->i_sb->s_max_links;
+> @@ -4363,6 +4365,10 @@ struct dentry *vfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
+>  	if (max_links && dir->i_nlink >= max_links)
+>  		goto err;
+>  
+> +	error = try_break_deleg(dir, delegated_inode);
+> +	if (error)
+> +		goto err;
+> +
+>  	de = dir->i_op->mkdir(idmap, dir, dentry, mode);
+>  	error = PTR_ERR(de);
+>  	if (IS_ERR(de))
+> @@ -4386,6 +4392,7 @@ int do_mkdirat(int dfd, struct filename *name, umode_t mode)
+>  	struct path path;
+>  	int error;
+>  	unsigned int lookup_flags = LOOKUP_DIRECTORY;
+> +	struct inode *delegated_inode = NULL;
+>  
+>  retry:
+>  	dentry = filename_create(dfd, name, &path, lookup_flags);
+> @@ -4397,11 +4404,16 @@ int do_mkdirat(int dfd, struct filename *name, umode_t mode)
+>  			mode_strip_umask(path.dentry->d_inode, mode));
+>  	if (!error) {
+>  		dentry = vfs_mkdir(mnt_idmap(path.mnt), path.dentry->d_inode,
+> -				  dentry, mode);
+> +				   dentry, mode, &delegated_inode);
+>  		if (IS_ERR(dentry))
+>  			error = PTR_ERR(dentry);
+>  	}
+>  	done_path_create(&path, dentry);
+> +	if (delegated_inode) {
+> +		error = break_deleg_wait(&delegated_inode);
+> +		if (!error)
+> +			goto retry;
+> +	}
+>  	if (retry_estale(error, lookup_flags)) {
+>  		lookup_flags |= LOOKUP_REVAL;
+>  		goto retry;
+> diff --git a/fs/nfsd/nfs4recover.c b/fs/nfsd/nfs4recover.c
+> index b1005abcb9035b2cf743200808a251b00af7e3f4..423dd102b51198ea7c447be2b9a0a5020c950dba 100644
+> --- a/fs/nfsd/nfs4recover.c
+> +++ b/fs/nfsd/nfs4recover.c
+> @@ -202,7 +202,7 @@ nfsd4_create_clid_dir(struct nfs4_client *clp)
+>  		 * as well be forgiving and just succeed silently.
+>  		 */
+>  		goto out_put;
+> -	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), dentry, S_IRWXU);
+> +	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), dentry, 0700, NULL);
+>  	if (IS_ERR(dentry))
+>  		status = PTR_ERR(dentry);
+>  out_put:
+> diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
+> index 2026431500ecbc0cf5fb5d4af1a7632c611ce4f4..6f1275fdc8ac831aa0ea8da588f751eddff88df1 100644
+> --- a/fs/nfsd/vfs.c
+> +++ b/fs/nfsd/vfs.c
+> @@ -1560,7 +1560,7 @@ nfsd_create_locked(struct svc_rqst *rqstp, struct svc_fh *fhp,
+>  			nfsd_check_ignore_resizing(iap);
+>  		break;
+>  	case S_IFDIR:
+> -		dchild = vfs_mkdir(&nop_mnt_idmap, dirp, dchild, iap->ia_mode);
+> +		dchild = vfs_mkdir(&nop_mnt_idmap, dirp, dchild, iap->ia_mode, NULL);
+>  		if (IS_ERR(dchild)) {
+>  			host_err = PTR_ERR(dchild);
+>  		} else if (d_is_negative(dchild)) {
+> diff --git a/fs/overlayfs/overlayfs.h b/fs/overlayfs/overlayfs.h
+> index bb0d7ded8e763a4a7a6fc506d966ed2f3bdb4f06..4a3a22f422c37d45e49a762cd3c9957aa2c6a485 100644
+> --- a/fs/overlayfs/overlayfs.h
+> +++ b/fs/overlayfs/overlayfs.h
+> @@ -248,7 +248,7 @@ static inline struct dentry *ovl_do_mkdir(struct ovl_fs *ofs,
+>  {
+>  	struct dentry *ret;
+>  
+> -	ret = vfs_mkdir(ovl_upper_mnt_idmap(ofs), dir, dentry, mode);
+> +	ret = vfs_mkdir(ovl_upper_mnt_idmap(ofs), dir, dentry, mode, NULL);
+>  	pr_debug("mkdir(%pd2, 0%o) = %i\n", dentry, mode, PTR_ERR_OR_ZERO(ret));
+>  	return ret;
+>  }
+> diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+> index 04539037108c93e285f4e9d6aa61f93a507ae5da..b0fb73b277876a56797f5cc8a5aa53f156bb7a26 100644
+> --- a/fs/smb/server/vfs.c
+> +++ b/fs/smb/server/vfs.c
+> @@ -229,7 +229,7 @@ int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char *name, umode_t mode)
+>  	idmap = mnt_idmap(path.mnt);
+>  	mode |= S_IFDIR;
+>  	d = dentry;
+> -	dentry = vfs_mkdir(idmap, d_inode(path.dentry), dentry, mode);
+> +	dentry = vfs_mkdir(idmap, d_inode(path.dentry), dentry, mode, NULL);
+>  	if (IS_ERR(dentry))
+>  		err = PTR_ERR(dentry);
+>  	else if (d_is_negative(dentry))
+> diff --git a/fs/xfs/scrub/orphanage.c b/fs/xfs/scrub/orphanage.c
+> index 9c12cb8442311ca26b169e4d1567939ae44a5be0..91c9d07b97f306f57aebb9b69ba564b0c2cb8c17 100644
+> --- a/fs/xfs/scrub/orphanage.c
+> +++ b/fs/xfs/scrub/orphanage.c
+> @@ -167,7 +167,7 @@ xrep_orphanage_create(
+>  	 */
+>  	if (d_really_is_negative(orphanage_dentry)) {
+>  		orphanage_dentry = vfs_mkdir(&nop_mnt_idmap, root_inode,
+> -					     orphanage_dentry, 0750);
+> +					     orphanage_dentry, 0750, NULL);
+>  		error = PTR_ERR(orphanage_dentry);
+>  		if (IS_ERR(orphanage_dentry))
+>  			goto out_unlock_root;
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 74f2bfc519263c6411a8e3427e1bd6680a1121db..24a091509f12ce65a2c8343d438fccf423d3062b 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -1997,7 +1997,7 @@ bool inode_owner_or_capable(struct mnt_idmap *idmap,
+>  int vfs_create(struct mnt_idmap *, struct inode *,
+>  	       struct dentry *, umode_t, bool);
+>  struct dentry *vfs_mkdir(struct mnt_idmap *, struct inode *,
+> -			 struct dentry *, umode_t);
+> +			 struct dentry *, umode_t, struct inode **);
+>  int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
+>                umode_t, dev_t);
+>  int vfs_symlink(struct mnt_idmap *, struct inode *,
+> 
+> -- 
+> 2.51.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
