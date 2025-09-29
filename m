@@ -1,78 +1,79 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63E52F9C2D
-	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 13:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE45F307AD3
+	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 13:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759152576; cv=none; b=r9P4gxvCqJkuRpiF+1VK9qX3jl1VOvdpZ8qJ0Acqc4ItgjsF+cz0Ua0zYHUuCVdQFAeQN5eeUpltADMGtrk3DWKRQD21BQ6o1sjFOUtMyqMhW01nwvVRB7o9hbtOiCdeFd44/CfTKJMFVecGe7PENRlvgrCMh62/IGHvpGUXGUk=
+	t=1759152578; cv=none; b=iGDef8lNg6oxbsdWTJnsr/rWEflXg9dP2tb1Gu710T+HmSlWllZ09ObX7Lv8S8gWRHoRmR/ma40r/LnqoPZwJYmXbGHcgsz6y1w2qxBLfRt+CLeaRcmOk6/5ETeKs+tX4+X6HHZ8YAukSWiwcUTlupQ1YFBOqJmv6ILzyF+nL0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759152576; c=relaxed/simple;
-	bh=iqGheamg0HKgbeOw0PG60Hxquhcny0GxDqXSRHeQfMA=;
+	s=arc-20240116; t=1759152578; c=relaxed/simple;
+	bh=8CJZnbXfpp+R4BXFAFAnNWqRg37vc6Vsgaz4IBde09M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WoqQI3uqhTq4vcWGdlt/L7pOwz1l5jhEz35IklEZNFXgIP1FHjmjgjmER93NEMo8koUsOPEM/Qf2lQCHARNLGwOQ0apyyzNIOY2HmvHuCeGOAnFJf4IQUm9Ir5nei4aklNxbxcbNA+QL9WEkZ3U07oHoomZ6JQPsZgYCcIxiMlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fbGQWRoY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JEcuMYCV; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fbGQWRoY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JEcuMYCV; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=jHOsM9eDnps+iwgHewZn28yqXkLKkeAUSluhvhUQ5z54VN4mGDtxI6rxfN8cHC46T3P6hlehmwC2bFTFP0ND8iyrkyqLkes0NMwzl0PLugoTI8BTN5/EEI9XduXjLuH3QgK4bq8mrFItkNHmBYw8x8UVeZk5FedbmZIPLxV2T14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BZC+QyXo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j/cDc0/9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BZC+QyXo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j/cDc0/9; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fbGQWRoY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JEcuMYCV";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fbGQWRoY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JEcuMYCV"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BZC+QyXo";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j/cDc0/9";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BZC+QyXo";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j/cDc0/9"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 65DD5327E2;
-	Mon, 29 Sep 2025 13:29:27 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 7B60E35650;
+	Mon, 29 Sep 2025 13:29:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759152567; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759152574; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0rzpLq9lGVVuxiw4ooXlsUzL4C+ELKuvaMpQu60aLJ8=;
-	b=fbGQWRoYU0WnMY7sA2wKm0sKlGNTzJhqRIRtbpLM3WuPIRMrJwroH+GcbSAjrCimI1BgYA
-	KrlvAWU4m/cxIUpvat9FWKTz5yCmTpznqUl4Z1EJuveiUOkqYe9yA95LZRDAg/MpUlq82F
-	qgAKVPxNvd27hgusBBl4kO+Fjp4GRk4=
+	bh=5h9TXhddC8EmeENdE/olCY8jTjKpLidzAvrFRhfrRwM=;
+	b=BZC+QyXotABPG697mSQlR379mvL8ApkSrxdbaacnA0eJk1FFC5WojPoj2wblKk/rOxymvX
+	LV+4+unjfbg+IVEMGWlUCUzviFdy/hUqwOm68ujBppMCcqcQxKkTjnCV8fdtWFILsKxry0
+	HIO2o+YFknhJLyp5ZVgl5T2zCTmeVSo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759152567;
+	s=susede2_ed25519; t=1759152574;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0rzpLq9lGVVuxiw4ooXlsUzL4C+ELKuvaMpQu60aLJ8=;
-	b=JEcuMYCVYOt3RhGlcoWx5NB5THHg8qVWEks9j2gpGmoogrzGvN86DDP+DljQ8yQIJD+TvD
-	0E0rU/+WSrvrIfBw==
-Authentication-Results: smtp-out2.suse.de;
-	none
+	bh=5h9TXhddC8EmeENdE/olCY8jTjKpLidzAvrFRhfrRwM=;
+	b=j/cDc0/9zEPKYrciiyonkF6aeq6oYV+rfkwz3BAN3Q3K8/YZK+ssmm955ilc5kuUHEl6NT
+	5I5NjXenadNGB7Dw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=BZC+QyXo;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="j/cDc0/9"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759152567; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759152574; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0rzpLq9lGVVuxiw4ooXlsUzL4C+ELKuvaMpQu60aLJ8=;
-	b=fbGQWRoYU0WnMY7sA2wKm0sKlGNTzJhqRIRtbpLM3WuPIRMrJwroH+GcbSAjrCimI1BgYA
-	KrlvAWU4m/cxIUpvat9FWKTz5yCmTpznqUl4Z1EJuveiUOkqYe9yA95LZRDAg/MpUlq82F
-	qgAKVPxNvd27hgusBBl4kO+Fjp4GRk4=
+	bh=5h9TXhddC8EmeENdE/olCY8jTjKpLidzAvrFRhfrRwM=;
+	b=BZC+QyXotABPG697mSQlR379mvL8ApkSrxdbaacnA0eJk1FFC5WojPoj2wblKk/rOxymvX
+	LV+4+unjfbg+IVEMGWlUCUzviFdy/hUqwOm68ujBppMCcqcQxKkTjnCV8fdtWFILsKxry0
+	HIO2o+YFknhJLyp5ZVgl5T2zCTmeVSo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759152567;
+	s=susede2_ed25519; t=1759152574;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0rzpLq9lGVVuxiw4ooXlsUzL4C+ELKuvaMpQu60aLJ8=;
-	b=JEcuMYCVYOt3RhGlcoWx5NB5THHg8qVWEks9j2gpGmoogrzGvN86DDP+DljQ8yQIJD+TvD
-	0E0rU/+WSrvrIfBw==
+	bh=5h9TXhddC8EmeENdE/olCY8jTjKpLidzAvrFRhfrRwM=;
+	b=j/cDc0/9zEPKYrciiyonkF6aeq6oYV+rfkwz3BAN3Q3K8/YZK+ssmm955ilc5kuUHEl6NT
+	5I5NjXenadNGB7Dw==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E84DC13782;
-	Mon, 29 Sep 2025 13:29:26 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 08F7013782;
+	Mon, 29 Sep 2025 13:29:33 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id WnFpK7aJ2mgDHAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 29 Sep 2025 13:29:26 +0000
+	id oWaCML2J2mgIHAAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 29 Sep 2025 13:29:33 +0000
 From: Enzo Matsumiya <ematsumiya@suse.de>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -82,9 +83,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
 	henrique.carvalho@suse.com
-Subject: [PATCH 15/20] smb: client: remove cached_dirent->fattr
-Date: Mon, 29 Sep 2025 10:28:00 -0300
-Message-ID: <20250929132805.220558-16-ematsumiya@suse.de>
+Subject: [PATCH 16/20] smb: client: add is_dir argument to query_path_info
+Date: Mon, 29 Sep 2025 10:28:01 -0300
+Message-ID: <20250929132805.220558-17-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250929132805.220558-1-ematsumiya@suse.de>
 References: <20250929132805.220558-1-ematsumiya@suse.de>
@@ -95,92 +96,213 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.80 / 50.00];
+X-Spamd-Result: default: False [-3.01 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
 	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
 	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	ARC_NA(0.00)[];
+	MX_GOOD(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	TO_DN_NONE(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email];
-	R_RATELIMIT(0.00)[to_ip_from(RLfjfk8uratp77wzttmx99usr3)];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
+	DKIM_TRACE(0.00)[suse.de:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
 	FREEMAIL_ENVRCPT(0.00)[gmail.com]
 X-Spam-Flag: NO
 X-Spam-Level: 
-X-Spam-Score: -2.80
+X-Rspamd-Queue-Id: 7B60E35650
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -3.01
 
-Replace with ->unique_id and ->dtype -- the only fields used from
-cifs_fattr.
+When we have an inode on upper levels, pass is_dir down to
+smb2_query_path_info() so we can lookup for a cached dir there.
+
+Since we now have a possible recursive lookup in open_cached_dir() e.g.:
+
+cifs_readdir
+  open_cached_dir
+    lookup_noperm_positive_unlocked
+    ...
+      cifs_d_revalidate
+      ...
+        smb2_query_path_info
+	  find_cached_dir
+
+the cfid must be added to the entries list only after dentry lookup, so
+we don't hang on an infinite recursion while waiting for itself to open.
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- fs/smb/client/cached_dir.h | 6 ++++--
- fs/smb/client/readdir.c    | 9 ++++-----
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ fs/smb/client/cached_dir.c | 12 ++++++++----
+ fs/smb/client/cifsglob.h   |  2 +-
+ fs/smb/client/inode.c      |  9 +++++++--
+ fs/smb/client/smb1ops.c    |  4 ++--
+ fs/smb/client/smb2inode.c  | 12 ++++++++----
+ fs/smb/client/smb2proto.h  |  2 +-
+ 6 files changed, 27 insertions(+), 14 deletions(-)
 
-diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index c45151446049..d5ad10a35ed7 100644
---- a/fs/smb/client/cached_dir.h
-+++ b/fs/smb/client/cached_dir.h
-@@ -8,13 +8,15 @@
- #ifndef _CACHED_DIR_H
- #define _CACHED_DIR_H
- 
--
- struct cached_dirent {
- 	struct list_head entry;
- 	char *name;
- 	int namelen;
- 	loff_t pos;
--	struct cifs_fattr fattr;
-+
-+	/* filled from cifs_fattr */
-+	u64 unique_id;
-+	unsigned int dtype;
- };
- 
- struct cached_dirents {
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index 903919345df1..4b6e2632e8ed 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -850,9 +850,7 @@ static bool emit_cached_dirents(struct cached_dirents *cde,
- 		 * initial scan.
- 		 */
- 		ctx->pos = dirent->pos;
--		rc = dir_emit(ctx, dirent->name, dirent->namelen,
--			      dirent->fattr.cf_uniqueid,
--			      dirent->fattr.cf_dtype);
-+		rc = dir_emit(ctx, dirent->name, dirent->namelen, dirent->unique_id, dirent->dtype);
- 		if (!rc)
- 			return rc;
- 		ctx->pos++;
-@@ -901,9 +899,10 @@ static void add_cached_dirent(struct cached_dirents *cde, struct dir_context *ct
- 		cde->is_failed = 1;
- 		return;
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index ad455c067cba..c9e3e71e3f1f 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -277,12 +277,9 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
  	}
--	de->pos = ctx->pos;
  
--	memcpy(&de->fattr, fattr, sizeof(struct cifs_fattr));
-+	de->pos = ctx->pos;
-+	de->unique_id = fattr->cf_uniqueid;
-+	de->dtype = fattr->cf_dtype;
+ 	cfid->cfids = cfids;
+-	cfids->num_entries++;
+-	list_add(&cfid->entry, &cfids->entries);
++	cfid->tcon = tcon;
+ 	spin_unlock(&cfids->cfid_list_lock);
  
- 	list_add_tail(&de->entry, &cde->entries);
- }
+-	pfid = &cfid->fid;
+-
+ 	/*
+ 	 * Skip any prefix paths in @path as lookup_noperm_positive_unlocked() ends up
+ 	 * calling ->lookup() which already adds those through
+@@ -310,6 +307,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
+ 	cfid->tcon = tcon;
+ 	dentry = NULL;
+ 
++	spin_lock(&cfids->cfid_list_lock);
++	cfids->num_entries++;
++	list_add(&cfid->entry, &cfids->entries);
++	spin_unlock(&cfids->cfid_list_lock);
++
++	pfid = &cfid->fid;
++
+ 	/*
+ 	 * We do not hold the lock for the open because in case
+ 	 * SMB2_open needs to reconnect.
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 9a86efddc3c4..08c8131c8018 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -401,7 +401,7 @@ struct smb_version_operations {
+ 			       struct cifs_tcon *tcon,
+ 			       struct cifs_sb_info *cifs_sb,
+ 			       const char *full_path,
+-			       struct cifs_open_info_data *data);
++			       struct cifs_open_info_data *data, bool is_dir);
+ 	/* query file data from the server */
+ 	int (*query_file_info)(const unsigned int xid, struct cifs_tcon *tcon,
+ 			       struct cifsFileInfo *cfile, struct cifs_open_info_data *data);
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index f2eff1138ed0..35c5557d5ea1 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -1283,8 +1283,13 @@ static int cifs_get_fattr(struct cifs_open_info_data *data,
+ 	 */
+ 
+ 	if (!data) {
++		bool is_dir = false;
++
++		if (inode && *inode)
++			is_dir = S_ISDIR((*inode)->i_mode);
++
+ 		rc = server->ops->query_path_info(xid, tcon, cifs_sb,
+-						  full_path, &tmp_data);
++						  full_path, &tmp_data, is_dir);
+ 		data = &tmp_data;
+ 	}
+ 
+@@ -1470,7 +1475,7 @@ static int smb311_posix_get_fattr(struct cifs_open_info_data *data,
+ 	 */
+ 	if (!data) {
+ 		rc = server->ops->query_path_info(xid, tcon, cifs_sb,
+-						  full_path, &tmp_data);
++						  full_path, &tmp_data, false);
+ 		data = &tmp_data;
+ 	}
+ 
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+index a02d41d1ce4a..d964bc9c2823 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -543,7 +543,7 @@ static int cifs_query_path_info(const unsigned int xid,
+ 				struct cifs_tcon *tcon,
+ 				struct cifs_sb_info *cifs_sb,
+ 				const char *full_path,
+-				struct cifs_open_info_data *data)
++				struct cifs_open_info_data *data, bool is_dir)
+ {
+ 	int rc = -EOPNOTSUPP;
+ 	FILE_ALL_INFO fi = {};
+@@ -934,7 +934,7 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ 	if (!(tcon->ses->capabilities & CAP_NT_SMBS) &&
+ 	    (!buf->CreationTime || !buf->LastAccessTime ||
+ 	     !buf->LastWriteTime || !buf->ChangeTime)) {
+-		rc = cifs_query_path_info(xid, tcon, cifs_sb, full_path, &query_data);
++		rc = cifs_query_path_info(xid, tcon, cifs_sb, full_path, &query_data, false);
+ 		if (rc) {
+ 			if (open_file) {
+ 				cifsFileInfo_put(open_file);
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index 6d643b8b9547..280aa033b06a 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -940,10 +940,9 @@ int smb2_query_path_info(const unsigned int xid,
+ 			 struct cifs_tcon *tcon,
+ 			 struct cifs_sb_info *cifs_sb,
+ 			 const char *full_path,
+-			 struct cifs_open_info_data *data)
++			 struct cifs_open_info_data *data, bool is_dir)
+ {
+ 	struct kvec in_iov[3], out_iov[5] = {};
+-	struct cached_fid *cfid = NULL;
+ 	struct cifs_open_parms oparms;
+ 	struct cifsFileInfo *cfile;
+ 	__u32 create_options = 0;
+@@ -964,12 +963,17 @@ int smb2_query_path_info(const unsigned int xid,
+ 	 * is fast enough (always using the compounded version).
+ 	 */
+ 	if (!tcon->posix_extensions) {
++		struct cached_fid *cfid = NULL;
++
+ 		rc = -ENOENT;
+ 		if (!*full_path)
+ 			rc = open_cached_dir(xid, tcon, full_path, cifs_sb, &cfid);
++		else if (is_dir)
++			cfid = find_cached_dir(tcon->cfids, full_path, CFID_LOOKUP_PATH);
++
++		if (cfid) {
++			rc = 0;
+ 
+-		/* If it is a root and its handle is cached then use it */
+-		if (!rc) {
+ 			if (cfid->file_all_info) {
+ 				memcpy(&data->fi, cfid->file_all_info, sizeof(data->fi));
+ 			} else {
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index ac6db1f18b5b..3e3faa7cf633 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -72,7 +72,7 @@ int smb2_query_path_info(const unsigned int xid,
+ 			 struct cifs_tcon *tcon,
+ 			 struct cifs_sb_info *cifs_sb,
+ 			 const char *full_path,
+-			 struct cifs_open_info_data *data);
++			 struct cifs_open_info_data *data, bool is_dir);
+ extern int smb2_set_path_size(const unsigned int xid, struct cifs_tcon *tcon,
+ 			      const char *full_path, __u64 size,
+ 			      struct cifs_sb_info *cifs_sb, bool set_alloc,
 -- 
 2.49.0
 
