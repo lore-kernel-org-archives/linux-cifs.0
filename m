@@ -1,375 +1,343 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEEA22F9C2D
-	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 13:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B742AD31
+	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 14:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759152596; cv=none; b=ii8aglmpPq8CtnRZU0YBRo8TiK5YpaytQ883lC+1bOAB+pk9Qtk8YGBYe14ytIqeZj8j4NKt7dAL9WY6EqoOmLArakGsEDPvFik0PEi87tX0QI1RQE5jTGFtdbAzOrk8GCiy32uMXlu+i5oS0jnJwjI1yn+CLm6kmdxggEmZaEA=
+	t=1759154601; cv=none; b=EYvITF6weve/6sjnCdugRCMwCQiH12qFDT4UcxptGUi6pR0b/Qnw+aD9S5lIZc0cvWg2rAVXhiYlzay18M2gXwzeEISWULhRm4p8hYVkCWOuwe5ib99+Epofy8HL5+v6kwsjF7i3yaxjYzCXS7v/q5D6WguYbx/jRrdTMm3QOnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759152596; c=relaxed/simple;
-	bh=gO0fF98q1c4D2edJT3B9tGDYLcKtQkF5Dwj2woQbXRU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J62HBXS94fgYeHOj5Y+HiT439EC2SFvIsAeWaA+vDeHrSG5zEzZVN9rgLP5kKjWjwWBJFKxdb1C6Sj1BvXzhwmSbxNL6v9gvfVHRH5PufR7/yDlN5Noi/M+VLsla+ViDAi6f829csmZvdrK7vvGeXnYWaTLIqIxmgwxQiog504Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HrBvdhyk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WYRIypSD; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HrBvdhyk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WYRIypSD; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1759154601; c=relaxed/simple;
+	bh=nkESez0Y5Iuz65gdRHrjg3zrM4jjK/dKO0uTwJy0xxQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=nNp2tu7AGj3UeE4cFquNgDwRN9EZi15NaWGE6nvHEpUS1aVZLmcDbJBsJ1K2GsGW0G+xb7wWdrSdC5cIZib89xfnbpDRu7W9bo4zPeqi82Tbo6mhV5GlGoKc7AajvohjYRVSMIxXCWXfLugrK9eP0xujKQU4+pyGuw+vdzdB1GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XUsS8Enm; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HrBvdhyk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WYRIypSD";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HrBvdhyk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WYRIypSD"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E264E327E5;
-	Mon, 29 Sep 2025 13:29:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759152590; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xxbsqyVzqoCKeW3KgcxStZhvQFvaZ4v/BNEVjwH9e/8=;
-	b=HrBvdhykGjqUImloEInKvyrcqNU5zeGNrju90IHX6m0wriYuAhXDi8YtjB+tjJZL6QLO96
-	qwWF31dZLwuV8aO8T3Pq140YrHyo8f7jylgbQL5bdlTBEdE/oCMK5gviW7gHjOhDGcTfR8
-	XXuPFJwfmsAZYVSWqwBjAzB3cL4fcE0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759152590;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xxbsqyVzqoCKeW3KgcxStZhvQFvaZ4v/BNEVjwH9e/8=;
-	b=WYRIypSDOnaG5GQ0kIZBGdr1c1IsZ/eMiEOkL+A9RCzb35L/LGk0/faUtRPg00IV7hjaIk
-	IPuHUR7NmhkevACA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759152590; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xxbsqyVzqoCKeW3KgcxStZhvQFvaZ4v/BNEVjwH9e/8=;
-	b=HrBvdhykGjqUImloEInKvyrcqNU5zeGNrju90IHX6m0wriYuAhXDi8YtjB+tjJZL6QLO96
-	qwWF31dZLwuV8aO8T3Pq140YrHyo8f7jylgbQL5bdlTBEdE/oCMK5gviW7gHjOhDGcTfR8
-	XXuPFJwfmsAZYVSWqwBjAzB3cL4fcE0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759152590;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xxbsqyVzqoCKeW3KgcxStZhvQFvaZ4v/BNEVjwH9e/8=;
-	b=WYRIypSDOnaG5GQ0kIZBGdr1c1IsZ/eMiEOkL+A9RCzb35L/LGk0/faUtRPg00IV7hjaIk
-	IPuHUR7NmhkevACA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6F98513782;
-	Mon, 29 Sep 2025 13:29:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5S/0Dc6J2mgwHAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 29 Sep 2025 13:29:50 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	henrique.carvalho@suse.com
-Subject: [PATCH 20/20] smb: client: cleanup open_cached_dir()
-Date: Mon, 29 Sep 2025 10:28:05 -0300
-Message-ID: <20250929132805.220558-21-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250929132805.220558-1-ematsumiya@suse.de>
-References: <20250929132805.220558-1-ematsumiya@suse.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XUsS8Enm"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4da894db6e9so42156631cf.0
+        for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 07:03:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759154597; x=1759759397; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gvCV0E38kKLcIlUod4X3VegCwhroPma+mna7d+ExGI8=;
+        b=XUsS8EnmvEs3mnQjDel2C/cvlBgh0B8ZrTCyjIKD45SklgNn/hj5YDvxB/NcV68gaV
+         h6kRC1MPjty/HEAUcgXEvdZE9nSXSaIeFZmJGBdBzT19kH7XdkadzDMkcdHk2mH5nVdp
+         UKxxgqSxs7x2yfwWuR3vux0BQfwJGiL1EhiBazfPjSI4Oyf1NNKt8fPNNrJ/l3el4vJe
+         EnVvBTc/EgdxvNLLCUEj6chta++7vwUoxz7PARCkqFnYJB/kNZayWnEtBNqOzAXz4TC+
+         dEBa/gAoONYCmRAEhdG/PSffhrgUV3f3tU4oPPsRPiMJTexCEskHbAZavX7/V0Co6S6g
+         02CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759154597; x=1759759397;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gvCV0E38kKLcIlUod4X3VegCwhroPma+mna7d+ExGI8=;
+        b=LNV5Cjpxr8Y3mbkBk/yIp6NvQxwF4lfHdHVDALq3JjNoGRkEGG13Zl7mVyCMoUR/74
+         RjHcEy3nwLFj0j8V3Ezh9gRcvtULAw/zgB1NYjVsLZV4EWS0ixD1jP5hMKR+yKH1I3oY
+         GnXGLjZXib8WM2M0wyBhY5oPcuIqITucHJeYNrv4qtW7sSfcMoUW3/lN3Goh0XmewspQ
+         +XROSKPQPBQFAI5UOnr0ALPWBFxMGKqsak2AfxqlsSCEIryb81eTfdhNBUixCf+WCcED
+         BLc784K/IGJmn/f4HN1fuK3S+vtApxLHUTihahjhgG3LvH39I2ctgxRdbvxmrLzVnLvB
+         31nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXzydJbZst8YUYNBzSiA6rRT2JkFNRBjMos+dPEtSbCq/J8OOObNRj/le5OJeh3e/r7F/R2CfNeUe1m@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6UtiNFyZBj9qtJrwc0di250QgD74AkZNjnL/qjj8Tbybza7Yy
+	wl0/JqvOii/WDeFlsenTyv9pzsv63H5QsBASQ8Lz4bebb6apyQraIL4pEJdWMlQcCX2ulPImp2d
+	PngoaCItqmxF8LYJ/+ZZdhcIE0jSFRcw=
+X-Gm-Gg: ASbGncsX+BjVFmpueWEu409cQEKNM3kLm5O52lAxBm9S3LL36M1qN8PtcFj1wp3IyYe
+	sBhwukZ2UMCXCbo4tQhLy31wzGmtQBIGSO8GRrrgtiFZ6AE9w3TWzsfuJJUqKVER9d2YcZhU/nM
+	hAjaGNGEiOCTb8Fcq8zm2C3L16tfpDxOs8wAQPHE9PrWsxwvOc/ioDAB+L7qONUEO9f9UUskt8f
+	dQtr4vR2KO50KMa63O2aZxaggl/GNRwd1fw7nXKguRKxtpa57T8G3z+6cBYm0VO29Bnj6Z5iZBw
+	uGtsi7v1PV/AlQN+qucx35L/qehuce3GhAmHnxmF1j8C0gv1McC/Pl2Q2NeGdSdu
+X-Google-Smtp-Source: AGHT+IHcBVwUFJza9JurNQShbGtxj1fXwGfGqch5D9Dhka+la7JRmwXDdcox/NcXnWKsqJMSy2xFXHjTHwFRhl0OMdg=
+X-Received: by 2002:ad4:5745:0:b0:809:aa63:1c34 with SMTP id
+ 6a1803df08f44-809aa631f52mr230470906d6.32.1759154596458; Mon, 29 Sep 2025
+ 07:03:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	ARC_NA(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	R_RATELIMIT(0.00)[to_ip_from(RLfjfk8uratp77wzttmx99usr3)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -2.80
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 29 Sep 2025 09:03:05 -0500
+X-Gm-Features: AS18NWB4G_YY0MPY_eh4Ragl8VOOliK4bmVqSFTTuMqSFnWLAhs_HTJG5aF5OTQ
+Message-ID: <CAH2r5muAWS2AtzLOL_zWeWP+Xp03puRKMjs58vrT88FJXU_j+Q@mail.gmail.com>
+Subject: [GIT PULL] smb3 client and server restructuring of smbdirect handling
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "Stefan (metze) Metzmacher" <metze@samba.org>, Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>, 
+	CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-A bit of refactoring, and merge path_no_prefix() into path_to_dentry().
+Please pull the following changes since commit
+e5f0a698b34ed76002dc5cff3804a61c80233a7a:
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/smb/client/cached_dir.c | 133 ++++++++++++++++---------------------
- 1 file changed, 56 insertions(+), 77 deletions(-)
+  Linux 6.17 (2025-09-28 14:39:22 -0700)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 6d9a06ede476..45be551aad5d 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -166,13 +166,33 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
- 	return NULL;
- }
- 
--static struct dentry *
--path_to_dentry(struct cifs_sb_info *cifs_sb, const char *path)
-+/*
-+ * Skip any prefix paths in @path as lookup_noperm_positive_unlocked() ends up calling ->lookup()
-+ * which already adds those through build_path_from_dentry().
-+ *
-+ * Also, this should be called before sending a network request as we might reconnect and
-+ * potentially end up having a different prefix path (e.g. after DFS failover).
-+ *
-+ * Callers must dput() returned dentry if !IS_ERR().
-+ */
-+static struct dentry *path_to_dentry(struct cifs_sb_info *cifs_sb, const char *path)
- {
- 	struct dentry *dentry;
- 	const char *s, *p;
- 	char sep;
- 
-+	if (!*path)
-+		return dget(cifs_sb->root);
-+
-+	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_USE_PREFIX_PATH) && cifs_sb->prepath) {
-+		size_t len = strlen(cifs_sb->prepath) + 1;
-+
-+		if (unlikely(len > strlen(path)))
-+			return ERR_PTR(-EINVAL);
-+
-+		path += len;
-+	}
-+
- 	sep = CIFS_DIR_SEP(cifs_sb);
- 	dentry = dget(cifs_sb->root);
- 	s = path;
-@@ -197,29 +217,12 @@ path_to_dentry(struct cifs_sb_info *cifs_sb, const char *path)
- 		while (*s && *s != sep)
- 			s++;
- 
--		child = lookup_noperm_positive_unlocked(&QSTR_LEN(p, s - p),
--							dentry);
-+		child = lookup_noperm_positive_unlocked(&QSTR_LEN(p, s - p), dentry);
- 		dput(dentry);
- 		dentry = child;
- 	} while (!IS_ERR(dentry));
--	return dentry;
--}
--
--static const char *path_no_prefix(struct cifs_sb_info *cifs_sb,
--				  const char *path)
--{
--	size_t len = 0;
--
--	if (!*path)
--		return path;
- 
--	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_USE_PREFIX_PATH) &&
--	    cifs_sb->prepath) {
--		len = strlen(cifs_sb->prepath) + 1;
--		if (unlikely(len > strlen(path)))
--			return ERR_PTR(-EINVAL);
--	}
--	return path + len;
-+	return dentry;
- }
- 
- /*
-@@ -255,31 +258,29 @@ struct cached_fid *find_cached_dir(struct cached_fids *cfids, const void *key, i
- int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 		    struct cifs_sb_info *cifs_sb, struct cached_fid **ret_cfid)
- {
--	struct cifs_ses *ses;
-+	int rc, flags = 0, retries = 0, cur_sleep = 1;
-+	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
-+	struct smb2_query_info_rsp *qi_rsp = NULL;
- 	struct TCP_Server_Info *server;
- 	struct cifs_open_parms oparms;
--	struct smb2_create_rsp *o_rsp = NULL;
--	struct smb2_query_info_rsp *qi_rsp = NULL;
- 	struct smb2_file_all_info info;
--	int resp_buftype[2];
-+	struct smb2_create_rsp *o_rsp = NULL;
-+	struct cached_fid __rcu *cfid;
-+	struct cached_fids *cfids;
- 	struct smb_rqst rqst[2];
- 	struct kvec rsp_iov[2];
--	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
-+	struct cifs_fid *pfid;
-+	struct dentry *dentry;
- 	struct kvec qi_iov[1];
--	int rc, flags = 0;
-+	struct cifs_ses *ses;
-+	int resp_buftype[2];
- 	__le16 *utf16_path = NULL;
- 	u8 oplock = SMB2_OPLOCK_LEVEL_II;
--	struct cifs_fid *pfid;
--	struct dentry *dentry;
--	struct cached_fid __rcu *cfid;
--	struct cached_fids *cfids;
--	const char *npath;
--	int retries = 0, cur_sleep = 1;
- 
--	if (cifs_sb->root == NULL)
-+	if (!cifs_sb->root)
- 		return -ENOENT;
- 
--	if (tcon == NULL)
-+	if (!tcon)
- 		return -EOPNOTSUPP;
- 
- 	ses = tcon->ses;
-@@ -307,10 +308,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 		return 0;
- 	}
- 
--	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
--	if (!utf16_path)
--		return -ENOMEM;
--
- 	read_seqlock_excl(&cfids->entries_seqlock);
- 	if (cfids->num_entries >= tcon->max_cached_dirs) {
- 		read_sequnlock_excl(&cfids->entries_seqlock);
-@@ -330,30 +327,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	cfid->tcon = tcon;
- 	pfid = &cfid->fid;
- 
--	/*
--	 * Skip any prefix paths in @path as lookup_noperm_positive_unlocked() ends up
--	 * calling ->lookup() which already adds those through
--	 * build_path_from_dentry().  Also, do it earlier as we might reconnect
--	 * below when trying to send compounded request and then potentially
--	 * having a different prefix path (e.g. after DFS failover).
--	 */
--	npath = path_no_prefix(cifs_sb, path);
--	if (IS_ERR(npath)) {
--		rc = PTR_ERR(npath);
-+	dentry = path_to_dentry(cifs_sb, path);
-+	if (IS_ERR(dentry)) {
-+		rc = PTR_ERR(dentry);
-+		dentry = NULL;
- 		goto out;
- 	}
- 
--	if (!npath[0]) {
--		dentry = dget(cifs_sb->root);
--	} else {
--		dentry = path_to_dentry(cifs_sb, npath);
--		if (IS_ERR(dentry)) {
--			dentry = NULL;
--			rc = -ENOENT;
--			goto out;
--		}
--	}
--
- 	write_seqlock(&cfids->entries_seqlock);
- 	cfids->num_entries++;
- 	list_add_rcu(&cfid->entry, &cfids->entries);
-@@ -386,21 +366,26 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	oparms.fid = pfid;
- 	oparms.replay = !!retries;
- 
-+	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
-+	if (!utf16_path) {
-+		rc = -ENOMEM;
-+		goto oshr_free;
-+	}
-+
- 	rc = SMB2_open_init(tcon, server, &rqst[0], &oplock, &oparms, utf16_path);
-+	kfree(utf16_path);
-+
- 	if (rc)
- 		goto oshr_free;
--	smb2_set_next_command(tcon, &rqst[0]);
- 
-+	smb2_set_next_command(tcon, &rqst[0]);
- 	memset(&qi_iov, 0, sizeof(qi_iov));
- 	rqst[1].rq_iov = qi_iov;
- 	rqst[1].rq_nvec = 1;
- 
--	rc = SMB2_query_info_init(tcon, server,
--				  &rqst[1], COMPOUND_FID,
--				  COMPOUND_FID, FILE_ALL_INFORMATION,
--				  SMB2_O_INFO_FILE, 0,
--				  sizeof(struct smb2_file_all_info) +
--				  PATH_MAX * 2, 0, NULL);
-+	rc = SMB2_query_info_init(tcon, server, &rqst[1], COMPOUND_FID, COMPOUND_FID,
-+				  FILE_ALL_INFORMATION, SMB2_O_INFO_FILE, 0,
-+				  sizeof(struct smb2_file_all_info) + PATH_MAX * 2, 0, NULL);
- 	if (rc)
- 		goto oshr_free;
- 
-@@ -411,14 +396,11 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 		smb2_set_replay(server, &rqst[1]);
- 	}
- 
--	rc = compound_send_recv(xid, ses, server,
--				flags, 2, rqst,
--				resp_buftype, rsp_iov);
-+	rc = compound_send_recv(xid, ses, server, flags, 2, rqst, resp_buftype, rsp_iov);
- 	if (rc) {
- 		if (rc == -EREMCHG) {
- 			tcon->need_reconnect = true;
--			pr_warn_once("server share %s deleted\n",
--				     tcon->tree_name);
-+			pr_warn_once("server share %s deleted\n", tcon->tree_name);
- 		}
- 		goto oshr_free;
- 	}
-@@ -430,7 +412,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	oparms.fid->mid = le64_to_cpu(o_rsp->hdr.MessageId);
- #endif /* CIFS_DEBUG2 */
- 
--
- 	if (o_rsp->OplockLevel != SMB2_OPLOCK_LEVEL_LEASE) {
- 		rc = -EINVAL;
- 		goto oshr_free;
-@@ -449,9 +430,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	if (le32_to_cpu(qi_rsp->OutputBufferLength) < sizeof(struct smb2_file_all_info))
- 		goto oshr_free;
- 
--	if (!smb2_validate_and_copy_iov(le16_to_cpu(qi_rsp->OutputBufferOffset),
--					sizeof(struct smb2_file_all_info), &rsp_iov[1],
--					sizeof(struct smb2_file_all_info), (char *)&info)) {
-+	if (!smb2_validate_and_copy_iov(le16_to_cpu(qi_rsp->OutputBufferOffset), sizeof(info),
-+					&rsp_iov[1], sizeof(info), (char *)&info)) {
- 		cfid->file_all_info = kmemdup(&info, sizeof(info), GFP_ATOMIC);
- 		if (!cfid->file_all_info) {
- 			rc = -ENOMEM;
-@@ -486,7 +466,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 		*ret_cfid = cfid;
- 		atomic_inc(&tcon->num_remote_opens);
- 	}
--	kfree(utf16_path);
- 
- 	if (is_replayable_error(rc) &&
- 	    smb2_should_replay(tcon, &retries, &cur_sleep))
+are available in the Git repository at:
+
+  git://git.samba.org/ksmbd.git tags/v6.18-rc-part1-smb3-common
+
+for you to fetch changes up to 1b53426334c3c942db47e0959a2527a4f815af50:
+
+  smb: server: let smb_direct_flush_send_list() invalidate a remote
+key first (2025-09-28 18:29:54 -0500)
+
+----------------------------------------------------------------
+Large set of small restructuring smbdirect related patches for cifs.ko
+and ksmbd.ko.
+This is the next step  in order to use common structures for smbdirect
+handling across both modules. And also includes improved handling of
+broken connections, as well as fixed negotiation as rdma resources.
+Moving to common functions is planned for 6.19, as well as also
+providing smbdirect via sockets to userspace (e.g. for samba to also
+be able to use smbdirect for userspace server and userspace client
+tools).  This was heavily reviewed and tested at the recent SMB3.1.1
+test event at SDC.
+----------------------------------------------------------------
+Stefan Metzmacher (159):
+      smb: smbdirect: introduce smbdirect_socket_status_string()
+      smb: smbdirect: introduce smbdirect_socket.status_wait
+      smb: smbdirect: introduce smbdirect_socket_init()
+      smb: smbdirect: introduce smbdirect_socket.disconnect_work
+      smb: smbdirect: introduce
+smbdirect_socket.send_io.pending.{count,{dec,zero}_wait_queue}
+      smb: smbdirect: introduce
+smbdirect_socket.send_io.credits.{count,wait_queue}
+      smb: smbdirect: introduce struct smbdirect_send_batch
+      smb: smbdirect: introduce smbdirect_socket.rw_io.credits
+      smb: smbdirect: introduce struct smbdirect_rw_io
+      smb: smbdirect: introduce smbdirect_socket.recv_io.{posted,credits}
+      smb: smbdirect: introduce
+smbdirect_socket_parameters.{resolve_{addr,route},rdma_connect,negotiate}_timeout_msec
+      smb: smbdirect: introduce
+smbdirect_socket_parameters.{initiator_depth,responder_resources}
+      smb: smbdirect: introduce smbdirect_socket.rdma.legacy_iwarp
+      smb: smbdirect: introduce
+smbdirect_socket.idle.{keepalive,immediate_work,timer_work}
+      smb: smbdirect: introduce smbdirect_socket.statistics
+      smb: smbdirect: introduce smbdirect_socket.workqueue
+      smb: smbdirect: introduce struct smbdirect_mr_io
+      smb: smbdirect: introduce smbdirect_socket_parameters.max_frmr_depth
+      smb: smbdirect: introduce smbdirect_socket.mr_io.*
+      smb: smbdirect: let smbdirect_socket_init() initialize all
+[delayed_]work_structs as disabled
+      smb: client: fix sending the iwrap custom IRD/ORD negotiation messages
+      smb: client/smbdirect: replace SMBDIRECT_SOCKET_CONNECTING with
+more detailed states
+      smb: client/smbdirect: introduce SMBDIRECT_SOCKET_ERROR
+      smb: smbdirect: introduce smbdirect_socket.first_error
+      smb: client: adjust smbdirect related output of
+cifs_debug_data_proc_show()
+      smb: client: use status_wait and
+SMBDIRECT_SOCKET_NEGOTIATE_RUNNING for completion
+      smb: client: use status_wait and
+SMBDIRECT_SOCKET_RESOLVE_{ADDR,ROUTE}_RUNNING for completion
+      smb: client: make use of smbdirect_socket.status_wait
+      smb: client: make only use of wake_up[_all]() in smbdirect.c
+      smb: client: make use of smbdirect_socket_init()
+      smb: client: make use of smbdirect_socket.disconnect_work
+      smb: client: make use of
+smbdirect_socket.send_io.pending.{count,{dec,zero}_wait_queue}
+      smb: client: make use of
+smbdirect_socket.send_io.credits.{count,wait_queue}
+      smb: client: make sure smbd_disconnect_rdma_work() doesn't run
+after smbd_destroy() took over
+      smb: client: queue post_recv_credits_work also if the peer
+raises the credit target
+      smb: client: make use of ib_wc_status_msg() and skip
+IB_WC_WR_FLUSH_ERR logging
+      smb: client: remove info->wait_receive_queues handling in smbd_destroy()
+      smb: client: limit the range of info->receive_credit_target
+      smb: client: count the number of posted recv_io messages in
+order to calculated credits
+      smb: client: make use of smbdirect_socket.recv_io.{posted,credits}
+      smb: client: remove useless smbd_connection.send_immediate
+      smb: client: fill smbdirect_socket_parameters at the beginning
+and use the values from there
+      smb: client: make use of
+smbdirect_socket_parameters.{resolve_{addr,route},rdma_connect,negotiate}_timeout_msec
+      smb: client: make use of
+smbdirect_socket_parameters.{initiator_depth,responder_resources}
+      smb: client: make use of smbdirect_socket.rdma.legacy_iwarp
+      smb: client: send empty packets via send_immediate_work
+      smb: client: fix smbdirect keep alive handling to match the documentation
+      smb: client: make use of
+smbdirect_socket.idle.{keepalive,immediate_work,timer_work}
+      smb: client: remove unused smbd_connection->protocol
+      smb: client: remove unused smbd_connection.count_reassembly_queue
+      smb: client: make use of smbdirect_socket.statistics
+      smb: client: move rdma_readwrite_threshold from smbd_connection
+to TCP_Server_Info
+      smb: client: make use of smbdirect_socket.workqueue
+      smb: client: add and use smbd_get_parameters()
+      smb: client: make use of struct smbdirect_mr_io
+      smb: client: make use of smbdirect_socket_parameters.max_frmr_depth
+      smb: client: make use of smbdirect_socket.mr_io
+      smb: client: pass struct smbdirect_socket to {get,put}_receive_buffer()
+      smb: client: pass struct smbdirect_socket to
+{allocate,destroy}_receive_buffers()
+      smb: client: pass struct smbdirect_socket to
+{allocate,destroy}_caches_and_workqueue()
+      smb: client: pass struct smbdirect_socket to
+{enqueue,_get_first}_reassembly()
+      smb: client: pass struct smbdirect_socket to {allocate,destroy}_mr_list()
+      smb: client: pass struct smbdirect_socket to
+smbd_disconnect_rdma_connection()
+      smb: client: pass struct smbdirect_socket to smbd_post_recv()
+      smb: client: pass struct smbdirect_socket to
+manage_credits_prior_sending()
+      smb: client: pass struct smbdirect_socket to smbd_post_send()
+      smb: client: pass struct smbdirect_socket to
+manage_keep_alive_before_sending()
+      smb: client: pass struct smbdirect_socket to smbd_post_send_iter()
+      smb: client: pass struct smbdirect_socket to smbd_post_send_empty()
+      smb: client: pass struct smbdirect_socket to smbd_post_send_full_iter()
+      smb: client: pass struct smbdirect_socket to smbd_conn_upcall()
+      smb: client: pass struct smbdirect_socket to smbd_qp_async_error_upcall()
+      smb: client: pass struct smbdirect_socket to smbd_create_id()
+      smb: client: pass struct smbdirect_socket to smbd_ia_open()
+      smb: client: pass struct smbdirect_socket to
+smbd_post_send_negotiate_req()
+      smb: client: pass struct smbdirect_socket to smbd_negotiate()
+      smb: client: pass struct smbdirect_socket to get_mr()
+      smb: client: remove unused struct smbdirect_socket argument of
+smbd_iter_to_mr()
+      smb: client: let smbd_disconnect_rdma_connection() set
+SMBDIRECT_SOCKET_ERROR...
+      smb: client: fill in smbdirect_socket.first_error on error
+      smb: client: let smbd_disconnect_rdma_connection() disable all
+work but disconnect_work
+      smb: client: let
+smbd_{destroy,disconnect_rdma_{work,connection}}() wake up all wait
+queues
+      smb: client: make consitent use of spin_lock_irq{save,restore}()
+in smbdirect.c
+      smb: client: allocate smbdirect workqueue at the beginning of
+_smbd_get_connection()
+      smb: client: defer calling ib_alloc_pd() after we are connected
+      smb: client: let smbd_post_send_iter() call ib_dma_map_single()
+for the header first
+      smb: server: fix IRD/ORD negotiation with the client
+      smb: server: make use of common smbdirect_pdu.h
+      smb: server: make use of common smbdirect.h
+      smb: server: make use of common smbdirect_socket
+      smb: server: make use of common smbdirect_socket_parameters
+      smb: server: make use of smbdirect_socket->recv_io.expected
+      smb: server: make use of struct smbdirect_recv_io
+      smb: server: make use of smbdirect_socket.recv_io.free.{list,lock}
+      smb: server: make use of smbdirect_socket.recv_io.reassembly.*
+      smb: server: make use of SMBDIRECT_RECV_IO_MAX_SGE
+      smb: server: make use of struct smbdirect_send_io
+      smb: server: make use of smbdirect_socket.{send,recv}_io.mem.{cache,pool}
+      smb: server: make only use of wake_up[_all]() in transport_rdma.c
+      smb: server: add a pr_info() when the server starts running
+      smb: server: queue post_recv_credits_work in put_recvmsg() and
+avoid count_avail_recvmsg
+      smb: server: make use of smbdirect_socket.status_wait
+      smb: server: only turn into SMBDIRECT_SOCKET_CONNECTED when
+negotiation is done
+      smb: server: move smb_direct_disconnect_rdma_work() into free_transport()
+      smb: server: don't wait for info->send_pending == 0 on error
+      smb: server: make use of smbdirect_socket_init()
+      smb: server: make use of smbdirect_socket.disconnect_work
+      smb: server: make use of
+smbdirect_socket.send_io.pending.{count,zero_wait_queue}
+      smb: server: make use of
+smbdirect_socket.send_io.credits.{count,wait_queue}
+      smb: server: make use of struct smbdirect_send_batch
+      smb: server: make use smbdirect_socket.rw_io.credits
+      smb: server: make use of struct smbdirect_rw_io
+      smb: server: take the recv_credit_target from the negotiate req
+and always limit the range
+      smb: server: manage recv credits by counting posted recv_io and
+granted credits
+      smb: server: make use of smbdirect_socket.recv_io.{posted,credits}
+      smb: server: replace smb_trans_direct_transfort() with SMBD_TRANS()
+      smb: server: remove useless casts from KSMBD_TRANS/SMBD_TRANS
+      smb: server: pass ksmbd_transport to get_smbd_max_read_write_size()
+      smb: server: fill smbdirect_socket_parameters at the beginning
+and use the values from there
+      smb: server: make use of
+smbdirect_socket_parameters.negotiate_timeout_msec and change to 5s
+      smb: server: make use of
+smbdirect_socket_parameters.{initiator_depth,responder_resources}
+      smb: server: make use of smbdirect_socket.rdma.legacy_iwarp
+      smb: server: make use of smbdirect_socket.idle.immediate_work
+      smb: server: implement correct keepalive and timeout handling
+for smbdirect
+      smb: server: make use of smbdirect_socket.workqueue
+      smb: server: pass struct smbdirect_socket to {get_free,put}_recvmsg()
+      smb: server: pass struct smbdirect_socket to
+smb_direct_{create,destroy}_pools()
+      smb: server: pass struct smbdirect_socket to smb_direct_get_max_fr_pages()
+      smb: server: pass struct smbdirect_socket to smb_direct_init_params()
+      smb: server: pass struct smbdirect_socket to
+smb_direct_disconnect_rdma_connection()
+      smb: server: pass struct smbdirect_socket to smb_direct_cm_handler()
+      smb: server: pass struct smbdirect_socket to smb_direct_qpair_handler()
+      smb: server: pass struct smbdirect_socket to smb_direct_create_qpair()
+      smb: server: pass struct smbdirect_socket to smb_direct_post_recv()
+      smb: server: pass struct smbdirect_socket to smb_direct_accept_client()
+      smb: server: pass struct smbdirect_socket to
+smb_direct_prepare_negotiation()
+      smb: server: pass struct smbdirect_socket to smb_direct_connect()
+      smb: server: pass struct smbdirect_socket to
+smb_direct_{alloc,free}_sendmsg()
+      smb: server: remove unused struct struct smb_direct_transport
+argument from smb_direct_send_ctx_init()
+      smb: server: pass struct smbdirect_socket to smb_direct_post_send()
+      smb: server: pass struct smbdirect_socket to smb_direct_flush_send_list()
+      smb: server: pass struct smbdirect_socket to wait_for_credits()
+      smb: server: pass struct smbdirect_socket to wait_for_send_credits()
+      smb: server: pass struct smbdirect_socket to wait_for_rw_credits()
+      smb: server: pass struct smbdirect_socket to calc_rw_credits()
+      smb: server: pass struct smbdirect_socket to
+manage_credits_prior_sending()
+      smb: server: pass struct smbdirect_socket to
+manage_keep_alive_before_sending()
+      smb: server: pass struct smbdirect_socket to smb_direct_create_header()
+      smb: server: pass struct smbdirect_socket to post_sendmsg()
+      smb: server: pass struct smbdirect_socket to smb_direct_post_send_data()
+      smb: server: pass struct smbdirect_socket to
+{enqueue,get_first}_reassembly()
+      smb: server: pass struct smbdirect_socket to
+smb_direct_send_negotiate_response()
+      smb: server: let smb_direct_disconnect_rdma_connection() set
+SMBDIRECT_SOCKET_ERROR...
+      smb: server: fill in smbdirect_socket.first_error on error
+      smb: server: let smb_direct_disconnect_rdma_connection() disable
+all work but disconnect_work
+      smb: server: let
+{free_transport,smb_direct_disconnect_rdma_{work,connection}}() wake
+up all wait queues
+      smb: server: make consitent use of spin_lock_irq{save,restore}()
+in transport_rdma.c
+      smb: server: make use of ib_alloc_cq_any() instead of ib_alloc_cq()
+      smb: server: let smb_direct_flush_send_list() invalidate a
+remote key first
+
+ fs/smb/client/cifs_debug.c                 |   81 +-
+ fs/smb/client/cifsglob.h                   |    9 +-
+ fs/smb/client/file.c                       |   16 +-
+ fs/smb/client/smb2ops.c                    |    8 +-
+ fs/smb/client/smb2pdu.c                    |    2 +-
+ fs/smb/client/smbdirect.c                  | 1199 +++++++++++++--------
+ fs/smb/client/smbdirect.h                  |  102 +-
+ fs/smb/common/smbdirect/smbdirect.h        |    7 +
+ fs/smb/common/smbdirect/smbdirect_socket.h |  319 +++++-
+ fs/smb/server/connection.c                 |    4 +-
+ fs/smb/server/connection.h                 |   10 +-
+ fs/smb/server/server.c                     |    1 +
+ fs/smb/server/smb2pdu.c                    |   23 +-
+ fs/smb/server/smb2pdu.h                    |    6 -
+ fs/smb/server/transport_rdma.c             | 1615 ++++++++++++++++------------
+ fs/smb/server/transport_rdma.h             |   45 +-
+ 16 files changed, 2061 insertions(+), 1386 deletions(-)
+
+
+
 -- 
-2.49.0
+Thanks,
 
+Steve
