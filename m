@@ -1,79 +1,79 @@
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE45F307AD3
-	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 13:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9E23074B7
+	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 13:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759152578; cv=none; b=iGDef8lNg6oxbsdWTJnsr/rWEflXg9dP2tb1Gu710T+HmSlWllZ09ObX7Lv8S8gWRHoRmR/ma40r/LnqoPZwJYmXbGHcgsz6y1w2qxBLfRt+CLeaRcmOk6/5ETeKs+tX4+X6HHZ8YAukSWiwcUTlupQ1YFBOqJmv6ILzyF+nL0g=
+	t=1759152584; cv=none; b=BiArcoy6+Li1wZeuYNxv6OaJhwBLHxBVTsn0jN0ye4vsQwG+hAGW2PnvZHU87ZtuJ4zr4adxhOxNTg5CNlYmdHzn22hX8BD17yDyOwWNd0UeVX2vdKSeFf3vZpNpGvQUG4dIojjGPveSkmweDehf/K49TPw5fyymcc4mRn03XUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759152578; c=relaxed/simple;
-	bh=8CJZnbXfpp+R4BXFAFAnNWqRg37vc6Vsgaz4IBde09M=;
+	s=arc-20240116; t=1759152584; c=relaxed/simple;
+	bh=4Gavgn5QITpZDuLzkvXczKBFopEDHFmF7AXtzIXXx64=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jHOsM9eDnps+iwgHewZn28yqXkLKkeAUSluhvhUQ5z54VN4mGDtxI6rxfN8cHC46T3P6hlehmwC2bFTFP0ND8iyrkyqLkes0NMwzl0PLugoTI8BTN5/EEI9XduXjLuH3QgK4bq8mrFItkNHmBYw8x8UVeZk5FedbmZIPLxV2T14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BZC+QyXo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j/cDc0/9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BZC+QyXo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j/cDc0/9; arc=none smtp.client-ip=195.135.223.130
+	 MIME-Version; b=Yd75UG+9pGuH+c+DslOhHpXgSEEwUPpxTWukUBVC0vwW1d/cKq/R1WfbBmiOyWBppXVxB7uDkP1m2jfzPLddTms6DBFMciZEDa62kqS62OyrJ5zobZXVD8QnDVMsPc6OS9VfjEKdJWiCudgk7JpmosKoNxYeAlnbelxDbOlIwIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hcVaWG3q; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DQNrD7eD; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hcVaWG3q; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DQNrD7eD; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BZC+QyXo";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j/cDc0/9";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BZC+QyXo";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j/cDc0/9"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hcVaWG3q";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DQNrD7eD";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hcVaWG3q";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DQNrD7eD"
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 7B60E35650;
-	Mon, 29 Sep 2025 13:29:34 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 985AA2DABA;
+	Mon, 29 Sep 2025 13:29:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759152574; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759152577; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5h9TXhddC8EmeENdE/olCY8jTjKpLidzAvrFRhfrRwM=;
-	b=BZC+QyXotABPG697mSQlR379mvL8ApkSrxdbaacnA0eJk1FFC5WojPoj2wblKk/rOxymvX
-	LV+4+unjfbg+IVEMGWlUCUzviFdy/hUqwOm68ujBppMCcqcQxKkTjnCV8fdtWFILsKxry0
-	HIO2o+YFknhJLyp5ZVgl5T2zCTmeVSo=
+	bh=D63ufxKtwColbSjfI9FJPUXeR810ZVVq/zp1+H8wTd0=;
+	b=hcVaWG3qemrWAvDHdmZ5L3y2h/3wKgoJRJuDKutCey/4aP3MnaKQ9UdMPkRwBLFsM/ey8w
+	giaQPewSnXJxcaZVBdK/QkaomHgPxot3qG1/nT6l+o2de7EEwlyedBrJe6MD4Bdfg5ZzcG
+	fD77k+tTqz5OTi5O52V+6jQVIy/t6EQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759152574;
+	s=susede2_ed25519; t=1759152577;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5h9TXhddC8EmeENdE/olCY8jTjKpLidzAvrFRhfrRwM=;
-	b=j/cDc0/9zEPKYrciiyonkF6aeq6oYV+rfkwz3BAN3Q3K8/YZK+ssmm955ilc5kuUHEl6NT
-	5I5NjXenadNGB7Dw==
+	bh=D63ufxKtwColbSjfI9FJPUXeR810ZVVq/zp1+H8wTd0=;
+	b=DQNrD7eDq5/C0ex7oKB9RxN01YSppQKKF9OFlW6H2E2jW5/KuOHgcaBY01RBVAbrYvFSY0
+	UrfKMjrvDf6y/ZCg==
 Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=BZC+QyXo;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="j/cDc0/9"
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=hcVaWG3q;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=DQNrD7eD
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759152574; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759152577; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5h9TXhddC8EmeENdE/olCY8jTjKpLidzAvrFRhfrRwM=;
-	b=BZC+QyXotABPG697mSQlR379mvL8ApkSrxdbaacnA0eJk1FFC5WojPoj2wblKk/rOxymvX
-	LV+4+unjfbg+IVEMGWlUCUzviFdy/hUqwOm68ujBppMCcqcQxKkTjnCV8fdtWFILsKxry0
-	HIO2o+YFknhJLyp5ZVgl5T2zCTmeVSo=
+	bh=D63ufxKtwColbSjfI9FJPUXeR810ZVVq/zp1+H8wTd0=;
+	b=hcVaWG3qemrWAvDHdmZ5L3y2h/3wKgoJRJuDKutCey/4aP3MnaKQ9UdMPkRwBLFsM/ey8w
+	giaQPewSnXJxcaZVBdK/QkaomHgPxot3qG1/nT6l+o2de7EEwlyedBrJe6MD4Bdfg5ZzcG
+	fD77k+tTqz5OTi5O52V+6jQVIy/t6EQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759152574;
+	s=susede2_ed25519; t=1759152577;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5h9TXhddC8EmeENdE/olCY8jTjKpLidzAvrFRhfrRwM=;
-	b=j/cDc0/9zEPKYrciiyonkF6aeq6oYV+rfkwz3BAN3Q3K8/YZK+ssmm955ilc5kuUHEl6NT
-	5I5NjXenadNGB7Dw==
+	bh=D63ufxKtwColbSjfI9FJPUXeR810ZVVq/zp1+H8wTd0=;
+	b=DQNrD7eDq5/C0ex7oKB9RxN01YSppQKKF9OFlW6H2E2jW5/KuOHgcaBY01RBVAbrYvFSY0
+	UrfKMjrvDf6y/ZCg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 08F7013782;
-	Mon, 29 Sep 2025 13:29:33 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2590713782;
+	Mon, 29 Sep 2025 13:29:36 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id oWaCML2J2mgIHAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 29 Sep 2025 13:29:33 +0000
+	id RLh5N8CJ2mgbHAAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 29 Sep 2025 13:29:36 +0000
 From: Enzo Matsumiya <ematsumiya@suse.de>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -83,9 +83,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
 	henrique.carvalho@suse.com
-Subject: [PATCH 16/20] smb: client: add is_dir argument to query_path_info
-Date: Mon, 29 Sep 2025 10:28:01 -0300
-Message-ID: <20250929132805.220558-17-ematsumiya@suse.de>
+Subject: [PATCH 17/20] smb: client: use cached dir on queryfs/smb2_compound_op
+Date: Mon, 29 Sep 2025 10:28:02 -0300
+Message-ID: <20250929132805.220558-18-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250929132805.220558-1-ematsumiya@suse.de>
 References: <20250929132805.220558-1-ematsumiya@suse.de>
@@ -98,27 +98,28 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-3.01 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
 	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	DKIM_TRACE(0.00)[suse.de:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_HAS_DN(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	R_RATELIMIT(0.00)[to_ip_from(RL73jpmmudngk8cygugnauyh74)];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_DN_NONE(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
 	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
@@ -127,182 +128,188 @@ X-Spamd-Result: default: False [-3.01 / 50.00];
 	FREEMAIL_ENVRCPT(0.00)[gmail.com]
 X-Spam-Flag: NO
 X-Spam-Level: 
-X-Rspamd-Queue-Id: 7B60E35650
+X-Rspamd-Queue-Id: 985AA2DABA
 X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
 X-Rspamd-Action: no action
 X-Spam-Score: -3.01
 
-When we have an inode on upper levels, pass is_dir down to
-smb2_query_path_info() so we can lookup for a cached dir there.
+A dentry is passed to cifs_statfs(), so pass down d_is_dir() to
+smb2_queryfs() so we can cache/reuse this dir.
 
-Since we now have a possible recursive lookup in open_cached_dir() e.g.:
-
-cifs_readdir
-  open_cached_dir
-    lookup_noperm_positive_unlocked
-    ...
-      cifs_d_revalidate
-      ...
-        smb2_query_path_info
-	  find_cached_dir
-
-the cfid must be added to the entries list only after dentry lookup, so
-we don't hang on an infinite recursion while waiting for itself to open.
+Other:
+- make smb2_compound_op a static function, as it's not used anywhere
+  else
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- fs/smb/client/cached_dir.c | 12 ++++++++----
- fs/smb/client/cifsglob.h   |  2 +-
- fs/smb/client/inode.c      |  9 +++++++--
- fs/smb/client/smb1ops.c    |  4 ++--
- fs/smb/client/smb2inode.c  | 12 ++++++++----
- fs/smb/client/smb2proto.h  |  2 +-
- 6 files changed, 27 insertions(+), 14 deletions(-)
+ fs/smb/client/cifsfs.c    |  2 +-
+ fs/smb/client/cifsglob.h  |  2 +-
+ fs/smb/client/smb1ops.c   |  2 +-
+ fs/smb/client/smb2ops.c   | 32 +++++++++++++++++---------------
+ fs/smb/client/smb2proto.h |  6 ------
+ 5 files changed, 20 insertions(+), 24 deletions(-)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index ad455c067cba..c9e3e71e3f1f 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -277,12 +277,9 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	}
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index e1848276bab4..a2ecc5649860 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -339,7 +339,7 @@ cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
+ 	buf->f_ffree = 0;	/* unlimited */
  
- 	cfid->cfids = cfids;
--	cfids->num_entries++;
--	list_add(&cfid->entry, &cfids->entries);
-+	cfid->tcon = tcon;
- 	spin_unlock(&cfids->cfid_list_lock);
+ 	if (server->ops->queryfs)
+-		rc = server->ops->queryfs(xid, tcon, full_path, cifs_sb, buf);
++		rc = server->ops->queryfs(xid, tcon, full_path, cifs_sb, buf, d_is_dir(dentry));
  
--	pfid = &cfid->fid;
--
- 	/*
- 	 * Skip any prefix paths in @path as lookup_noperm_positive_unlocked() ends up
- 	 * calling ->lookup() which already adds those through
-@@ -310,6 +307,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	cfid->tcon = tcon;
- 	dentry = NULL;
- 
-+	spin_lock(&cfids->cfid_list_lock);
-+	cfids->num_entries++;
-+	list_add(&cfid->entry, &cfids->entries);
-+	spin_unlock(&cfids->cfid_list_lock);
-+
-+	pfid = &cfid->fid;
-+
- 	/*
- 	 * We do not hold the lock for the open because in case
- 	 * SMB2_open needs to reconnect.
+ statfs_out:
+ 	free_dentry_path(page);
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 9a86efddc3c4..08c8131c8018 100644
+index 08c8131c8018..dddac55abd6f 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -401,7 +401,7 @@ struct smb_version_operations {
- 			       struct cifs_tcon *tcon,
- 			       struct cifs_sb_info *cifs_sb,
- 			       const char *full_path,
--			       struct cifs_open_info_data *data);
-+			       struct cifs_open_info_data *data, bool is_dir);
- 	/* query file data from the server */
- 	int (*query_file_info)(const unsigned int xid, struct cifs_tcon *tcon,
- 			       struct cifsFileInfo *cfile, struct cifs_open_info_data *data);
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index f2eff1138ed0..35c5557d5ea1 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1283,8 +1283,13 @@ static int cifs_get_fattr(struct cifs_open_info_data *data,
- 	 */
- 
- 	if (!data) {
-+		bool is_dir = false;
-+
-+		if (inode && *inode)
-+			is_dir = S_ISDIR((*inode)->i_mode);
-+
- 		rc = server->ops->query_path_info(xid, tcon, cifs_sb,
--						  full_path, &tmp_data);
-+						  full_path, &tmp_data, is_dir);
- 		data = &tmp_data;
- 	}
- 
-@@ -1470,7 +1475,7 @@ static int smb311_posix_get_fattr(struct cifs_open_info_data *data,
- 	 */
- 	if (!data) {
- 		rc = server->ops->query_path_info(xid, tcon, cifs_sb,
--						  full_path, &tmp_data);
-+						  full_path, &tmp_data, false);
- 		data = &tmp_data;
- 	}
- 
+@@ -519,7 +519,7 @@ struct smb_version_operations {
+ 			__u16 net_fid, struct cifsInodeInfo *cifs_inode);
+ 	/* query remote filesystem */
+ 	int (*queryfs)(const unsigned int, struct cifs_tcon *,
+-		       const char *, struct cifs_sb_info *, struct kstatfs *);
++		       const char *, struct cifs_sb_info *, struct kstatfs *, bool);
+ 	/* send mandatory brlock to the server */
+ 	int (*mand_lock)(const unsigned int, struct cifsFileInfo *, __u64,
+ 			 __u64, __u32, int, int, bool);
 diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index a02d41d1ce4a..d964bc9c2823 100644
+index d964bc9c2823..9fa1ff9ea70d 100644
 --- a/fs/smb/client/smb1ops.c
 +++ b/fs/smb/client/smb1ops.c
-@@ -543,7 +543,7 @@ static int cifs_query_path_info(const unsigned int xid,
- 				struct cifs_tcon *tcon,
- 				struct cifs_sb_info *cifs_sb,
- 				const char *full_path,
--				struct cifs_open_info_data *data)
-+				struct cifs_open_info_data *data, bool is_dir)
+@@ -1105,7 +1105,7 @@ cifs_oplock_response(struct cifs_tcon *tcon, __u64 persistent_fid,
+ 
+ static int
+ cifs_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+-	     const char *path, struct cifs_sb_info *cifs_sb, struct kstatfs *buf)
++	     const char *path, struct cifs_sb_info *cifs_sb, struct kstatfs *buf, bool is_dir)
  {
  	int rc = -EOPNOTSUPP;
- 	FILE_ALL_INFO fi = {};
-@@ -934,7 +934,7 @@ smb_set_file_info(struct inode *inode, const char *full_path,
- 	if (!(tcon->ses->capabilities & CAP_NT_SMBS) &&
- 	    (!buf->CreationTime || !buf->LastAccessTime ||
- 	     !buf->LastWriteTime || !buf->ChangeTime)) {
--		rc = cifs_query_path_info(xid, tcon, cifs_sb, full_path, &query_data);
-+		rc = cifs_query_path_info(xid, tcon, cifs_sb, full_path, &query_data, false);
- 		if (rc) {
- 			if (open_file) {
- 				cifsFileInfo_put(open_file);
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index 6d643b8b9547..280aa033b06a 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -940,10 +940,9 @@ int smb2_query_path_info(const unsigned int xid,
- 			 struct cifs_tcon *tcon,
- 			 struct cifs_sb_info *cifs_sb,
- 			 const char *full_path,
--			 struct cifs_open_info_data *data)
-+			 struct cifs_open_info_data *data, bool is_dir)
- {
- 	struct kvec in_iov[3], out_iov[5] = {};
--	struct cached_fid *cfid = NULL;
- 	struct cifs_open_parms oparms;
- 	struct cifsFileInfo *cfile;
- 	__u32 create_options = 0;
-@@ -964,12 +963,17 @@ int smb2_query_path_info(const unsigned int xid,
- 	 * is fast enough (always using the compounded version).
- 	 */
- 	if (!tcon->posix_extensions) {
-+		struct cached_fid *cfid = NULL;
-+
- 		rc = -ENOENT;
- 		if (!*full_path)
- 			rc = open_cached_dir(xid, tcon, full_path, cifs_sb, &cfid);
-+		else if (is_dir)
-+			cfid = find_cached_dir(tcon->cfids, full_path, CFID_LOOKUP_PATH);
-+
-+		if (cfid) {
-+			rc = 0;
  
--		/* If it is a root and its handle is cached then use it */
--		if (!rc) {
- 			if (cfid->file_all_info) {
- 				memcpy(&data->fi, cfid->file_all_info, sizeof(data->fi));
- 			} else {
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 8842315d2526..f691271463b5 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -1110,6 +1110,11 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+ 	return (ssize_t)rc;
+ }
+ 
++static int smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
++				    const char *path, u32 desired_access, u32 class, u32 type,
++				    u32 output_len, struct kvec *rsp, int *buftype,
++				    struct cifs_sb_info *cifs_sb, bool is_dir);
++
+ static ssize_t
+ smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+ 	       const unsigned char *path, const unsigned char *ea_name,
+@@ -1129,7 +1134,7 @@ smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+ 				      CIFSMaxBufSize -
+ 				      MAX_SMB2_CREATE_RESPONSE_SIZE -
+ 				      MAX_SMB2_CLOSE_RESPONSE_SIZE,
+-				      &rsp_iov, &buftype, cifs_sb);
++				      &rsp_iov, &buftype, cifs_sb, false);
+ 	if (rc) {
+ 		/*
+ 		 * If ea_name is NULL (listxattr) and there are no EAs,
+@@ -1231,7 +1236,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+ 				      CIFSMaxBufSize -
+ 				      MAX_SMB2_CREATE_RESPONSE_SIZE -
+ 				      MAX_SMB2_CLOSE_RESPONSE_SIZE,
+-				      &rsp_iov[1], &resp_buftype[1], cifs_sb);
++				      &rsp_iov[1], &resp_buftype[1], cifs_sb, false);
+ 			if (rc == 0) {
+ 				rsp = (struct smb2_query_info_rsp *)rsp_iov[1].iov_base;
+ 				used_len = le32_to_cpu(rsp->OutputBufferLength);
+@@ -2694,12 +2699,10 @@ bool smb2_should_replay(struct cifs_tcon *tcon,
+  * Passes the query info response back to the caller on success.
+  * Caller need to free this with free_rsp_buf().
+  */
+-int
+-smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+-			 const char *path, u32 desired_access,
+-			 u32 class, u32 type, u32 output_len,
+-			 struct kvec *rsp, int *buftype,
+-			 struct cifs_sb_info *cifs_sb)
++static int smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
++				    const char *path, u32 desired_access, u32 class, u32 type,
++				    u32 output_len, struct kvec *rsp, int *buftype,
++				    struct cifs_sb_info *cifs_sb, bool is_dir)
+ {
+ 	struct smb2_compound_vars *vars;
+ 	struct cifs_ses *ses = tcon->ses;
+@@ -2741,9 +2744,9 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rsp_iov = vars->rsp_iov;
+ 
+ 	/*
+-	 * We can only call this for things we know are directories.
++	 * We can only open + cache paths we know are directories.
+ 	 */
+-	if (!strcmp(path, ""))
++	if (is_dir)
+ 		/* cfid null if open dir failed */
+ 		open_cached_dir(xid, tcon, path, cifs_sb, &cfid);
+ 
+@@ -2852,7 +2855,7 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ static int
+ smb2_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+-	     const char *path, struct cifs_sb_info *cifs_sb, struct kstatfs *buf)
++	     const char *path, struct cifs_sb_info *cifs_sb, struct kstatfs *buf, bool is_dir)
+ {
+ 	struct smb2_query_info_rsp *rsp;
+ 	struct smb2_fs_full_size_info *info = NULL;
+@@ -2860,13 +2863,12 @@ smb2_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+ 	int buftype = CIFS_NO_BUFFER;
+ 	int rc;
+ 
+-
+ 	rc = smb2_query_info_compound(xid, tcon, path,
+ 				      FILE_READ_ATTRIBUTES,
+ 				      FS_FULL_SIZE_INFORMATION,
+ 				      SMB2_O_INFO_FILESYSTEM,
+ 				      sizeof(struct smb2_fs_full_size_info),
+-				      &rsp_iov, &buftype, cifs_sb);
++				      &rsp_iov, &buftype, cifs_sb, is_dir);
+ 	if (rc)
+ 		goto qfs_exit;
+ 
+@@ -2889,7 +2891,7 @@ smb2_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ static int
+ smb311_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+-	       const char *path, struct cifs_sb_info *cifs_sb, struct kstatfs *buf)
++	       const char *path, struct cifs_sb_info *cifs_sb, struct kstatfs *buf, bool is_dir)
+ {
+ 	int rc;
+ 	__le16 *utf16_path = NULL;
+@@ -2898,7 +2900,7 @@ smb311_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_fid fid;
+ 
+ 	if (!tcon->posix_extensions)
+-		return smb2_queryfs(xid, tcon, path, cifs_sb, buf);
++		return smb2_queryfs(xid, tcon, path, cifs_sb, buf, is_dir);
+ 
+ 	oparms = (struct cifs_open_parms) {
+ 		.tcon = tcon,
 diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index ac6db1f18b5b..3e3faa7cf633 100644
+index 3e3faa7cf633..99326810a159 100644
 --- a/fs/smb/client/smb2proto.h
 +++ b/fs/smb/client/smb2proto.h
-@@ -72,7 +72,7 @@ int smb2_query_path_info(const unsigned int xid,
- 			 struct cifs_tcon *tcon,
- 			 struct cifs_sb_info *cifs_sb,
- 			 const char *full_path,
--			 struct cifs_open_info_data *data);
-+			 struct cifs_open_info_data *data, bool is_dir);
- extern int smb2_set_path_size(const unsigned int xid, struct cifs_tcon *tcon,
- 			      const char *full_path, __u64 size,
- 			      struct cifs_sb_info *cifs_sb, bool set_alloc,
+@@ -299,12 +299,6 @@ extern int smb311_crypto_shash_allocate(struct TCP_Server_Info *server);
+ extern int smb311_update_preauth_hash(struct cifs_ses *ses,
+ 				      struct TCP_Server_Info *server,
+ 				      struct kvec *iov, int nvec);
+-extern int smb2_query_info_compound(const unsigned int xid,
+-				    struct cifs_tcon *tcon,
+-				    const char *path, u32 desired_access,
+-				    u32 class, u32 type, u32 output_len,
+-				    struct kvec *rsp, int *buftype,
+-				    struct cifs_sb_info *cifs_sb);
+ /* query path info from the server using SMB311 POSIX extensions*/
+ int smb311_posix_query_path_info(const unsigned int xid,
+ 				 struct cifs_tcon *tcon,
 -- 
 2.49.0
 
