@@ -1,78 +1,79 @@
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA151F95C
-	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 13:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32A82FE599
+	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 13:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759152558; cv=none; b=iGZ5qQHWvhfPxBm6Ms9ZSw2NbOdX4sTTc6W6Bh9KxMg0Ls0oVZO8NBZdV/eyF1YhnX3HIdg5RXyE8OPOzG/K3bx3WN6RdHvuR7v6/obkn3YD3LbT5pAhqJCbrSyAooLYnHPderfPR8QUds3IutgHZjtY4QYcH2DqrMTWfk2pZgk=
+	t=1759152564; cv=none; b=qDmDvflN28pqE84Aew31aP4C3mo5piH8PFho4GPC2KL9CSj6ItUtDCZTPLVCWKRtyPt4ELmfrCKOz01um+ZcAdzENWgxnLMB8UWqrCwRRsJwWHL4NPbEDuBk3U3H+VVr3Z2KKkpCedcdHpQLVP79dLlx8tHmJ2LqekNtQC6EHKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759152558; c=relaxed/simple;
-	bh=dPOcAXxS8b034KnM7BqMzKsiwyq+aFY2Sf8pdHBrn18=;
+	s=arc-20240116; t=1759152564; c=relaxed/simple;
+	bh=BpH/U1ChYJYFFScCBcEORa/QER7MXDoAumZv8ZEL4H0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VcraZBAE/D281aLGgGSoV47mzi1VVsAgMFYw4ELgk+H4vCOyWf63Xo4KpWiVENhxjMJe9hGCl+9WFDMZ0T5ht84GysDCMZzUkxw8FOxs4GcnQRY0M6iyBLtbpCxi66HxXaAsvsK6Bl/cpZaiifOvLKR6Xe5IFQHHdnl/+leLkgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vU2b0lj0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LDeFWTwP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vU2b0lj0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LDeFWTwP; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=ffSPNNDM+5dDpMTH9hI7BSZKyH4H/iusIGqfucdZ7MiejRKoMemy5jPhQrMdd5xuBBxnGMHhIkNyOtfTbI1xs0ctWfU4aqOiJDB4wcucq+UAC5n/wfprBGI+RAWKkKwYDH8YbU1MTddczhYtomtFQzk1n9QRZ9YjftAojGN6f2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QUteWMQQ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YB0Kwyd/; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Eu5YrH5y; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Lp6RyrUA; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vU2b0lj0";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LDeFWTwP";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vU2b0lj0";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LDeFWTwP"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QUteWMQQ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YB0Kwyd/";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Eu5YrH5y";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Lp6RyrUA"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id C973320FE5;
-	Mon, 29 Sep 2025 13:29:11 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id F16663E87F;
+	Mon, 29 Sep 2025 13:29:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759152551; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759152555; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IE7da0SZmT1nYrHxN/buoJs+W2XgXyGbewqcG7mTBq4=;
-	b=vU2b0lj03jPBuVw/sPBLo4pqWioBGVMEJDr7c8m9ksJNRL7i6VJchXDYi3JJyJF7UxajeX
-	KHMJKs31vu7pYrcFAfs75qz8k/+J2brO96TaPWg/hBXKwLpiRTRkfIMMsYPke7eVS0zAPY
-	IkvTTzgztDxW3JlCl3jxYGwvsdXoNw8=
+	bh=aex7BIXaPalc7NFaHsSCorJMaoHBbsuicg+Bbvs2uuo=;
+	b=QUteWMQQwbhY8AvHz5s2AS28h8V+CRRDdDVMS8zKww64k9Gcp3sP2El3I/hxCkRkofGzNr
+	wJUfaYbJk9TnIP/qMhGAmDX49pddpGvaIHoSk5ytpOdCgy0xbRxQojRKunc3aeMQU+/JF4
+	DxU4diV4IBePl6RiN+BmHZ4uxdz0dy8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759152551;
+	s=susede2_ed25519; t=1759152555;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IE7da0SZmT1nYrHxN/buoJs+W2XgXyGbewqcG7mTBq4=;
-	b=LDeFWTwPxXIT08PqRXY3yOjHU98FkjFzbDpQAJrojSCMOYrRgqaNKFIKUREMEYHudze7bf
-	0CoAUFfCx71a17Ag==
+	bh=aex7BIXaPalc7NFaHsSCorJMaoHBbsuicg+Bbvs2uuo=;
+	b=YB0Kwyd/NoEUQfOzZubz+TgCHU89cnP6U3LCcqhn0/ZEHFxaW47YdQCEnuR+Z821IiTZrW
+	xZ+G7/mG8M/iS7Cw==
 Authentication-Results: smtp-out2.suse.de;
-	none
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Eu5YrH5y;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Lp6RyrUA
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759152551; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759152554; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IE7da0SZmT1nYrHxN/buoJs+W2XgXyGbewqcG7mTBq4=;
-	b=vU2b0lj03jPBuVw/sPBLo4pqWioBGVMEJDr7c8m9ksJNRL7i6VJchXDYi3JJyJF7UxajeX
-	KHMJKs31vu7pYrcFAfs75qz8k/+J2brO96TaPWg/hBXKwLpiRTRkfIMMsYPke7eVS0zAPY
-	IkvTTzgztDxW3JlCl3jxYGwvsdXoNw8=
+	bh=aex7BIXaPalc7NFaHsSCorJMaoHBbsuicg+Bbvs2uuo=;
+	b=Eu5YrH5yHXvjnqGep2J5csENLjaFrNUPmbhy3yFvmeDXigkBVdQ8l1BjOp1v8Y8LYYw+Bc
+	HQX+/JhruZaKAG5X60CF9JglDeohxUuozMeyPymntFVGgnjHMnTwcVmq/z11i3rl0DvHRf
+	Wv+zq6lwkfWVjtWJBsUpA0t6O465bEU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759152551;
+	s=susede2_ed25519; t=1759152554;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IE7da0SZmT1nYrHxN/buoJs+W2XgXyGbewqcG7mTBq4=;
-	b=LDeFWTwPxXIT08PqRXY3yOjHU98FkjFzbDpQAJrojSCMOYrRgqaNKFIKUREMEYHudze7bf
-	0CoAUFfCx71a17Ag==
+	bh=aex7BIXaPalc7NFaHsSCorJMaoHBbsuicg+Bbvs2uuo=;
+	b=Lp6RyrUA5C5wS9zfWwKsrBZv7+HfB9FF9nFc5bGTRv0cjCrBV0Zys6uIaRZgsUjPOD4hrS
+	M0d9pZ7OInQltUCQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 575E413782;
-	Mon, 29 Sep 2025 13:29:11 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 715AD13782;
+	Mon, 29 Sep 2025 13:29:14 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id If0aCKeJ2mjuGwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 29 Sep 2025 13:29:11 +0000
+	id FCBYDqqJ2mjyGwAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 29 Sep 2025 13:29:14 +0000
 From: Enzo Matsumiya <ematsumiya@suse.de>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -82,9 +83,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
 	henrique.carvalho@suse.com
-Subject: [PATCH 10/20] smb: client: refactor dropping cached dirs
-Date: Mon, 29 Sep 2025 10:27:55 -0300
-Message-ID: <20250929132805.220558-11-ematsumiya@suse.de>
+Subject: [PATCH 11/20] smb: client: simplify cached_fid state checking
+Date: Mon, 29 Sep 2025 10:27:56 -0300
+Message-ID: <20250929132805.220558-12-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250929132805.220558-1-ematsumiya@suse.de>
 References: <20250929132805.220558-1-ematsumiya@suse.de>
@@ -95,232 +96,354 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.80 / 50.00];
+X-Spamd-Result: default: False [-3.01 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	MID_CONTAINS_FROM(1.00)[];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
 	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	ARC_NA(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	R_RATELIMIT(0.00)[to_ip_from(RLfjfk8uratp77wzttmx99usr3)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	MX_GOOD(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
+	DKIM_TRACE(0.00)[suse.de:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_DN_NONE(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
 	FREEMAIL_ENVRCPT(0.00)[gmail.com]
 X-Spam-Flag: NO
 X-Spam-Level: 
-X-Spam-Score: -2.80
+X-Rspamd-Queue-Id: F16663E87F
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -3.01
 
-- s/drop_cached_dir_by_name/drop_cached_dir/
-  make it a generic find + invalidate function to replace
-  drop_cached_dir_by_name() and cached_dir_lease_break()
+cached_fid validity (usable by callers) is already based on ->time != 0,
+having other flags/booleans to check the same thing can be confusing and
+make things unnecessarily complex.
 
-We now funnel any cleanup to laundromat, so we can make the release
-callback free only dirents, path, and cfid itself.
+This patch removes cached_fid booleans ->has_lease, ->is_open,
+->file_all_info_is_valid.
+
+Replace their semantics with already existing, simpler checks:
+
+- ->is_open is replaced by checking if persistent_fid != 0
+- ->has_lease is currently used as a "is valid" check, but we already
+  validate it based on ->time anyway, so drop it
+- ->file_all_info becomes a pointer and its presence becomes its
+  validity
+
+This patch also concretly defines the "is opening" semantic; it's
+based on ->time == 0, which is used as "creation time", so the only
+time it's 0 is between allocation and valid (opened/cached) or invalid,
+and it also never transitions back to 0 again.
+(->last_access_time follows the same, but it's already used for
+expiration checks)
+
+Other:
+- add CFID_INVALID_TIME (value 1); this allows us to differentiate
+  between opening (0), valid (jiffies), or invalid (1)
+- rename time/last_access_time to ctime/atime to follow other common
+  usage of such fields
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- fs/smb/client/cached_dir.c | 78 +++++++++++---------------------------
- fs/smb/client/cached_dir.h |  3 +-
- fs/smb/client/inode.c      |  2 +-
- fs/smb/client/smb2inode.c  |  7 ++--
- fs/smb/client/smb2misc.c   |  2 +-
- 5 files changed, 29 insertions(+), 63 deletions(-)
+ fs/smb/client/cached_dir.c | 72 +++++++++++++++++++-------------------
+ fs/smb/client/cached_dir.h | 14 +++-----
+ fs/smb/client/cifs_debug.c |  2 +-
+ fs/smb/client/smb2inode.c  | 17 +++++----
+ 4 files changed, 52 insertions(+), 53 deletions(-)
 
 diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 37a9bff26da7..84ea2653cdb9 100644
+index 84ea2653cdb9..ff71f2c06b72 100644
 --- a/fs/smb/client/cached_dir.c
 +++ b/fs/smb/client/cached_dir.c
-@@ -476,22 +476,6 @@ static void smb2_close_cached_fid(struct kref *ref)
- 	struct cached_fid *cfid = container_of(ref, struct cached_fid, refcount);
- 	struct cached_dirent *de, *q;
+@@ -12,6 +12,9 @@
+ #include "smb2proto.h"
+ #include "cached_dir.h"
  
--	/*
--	 * There's no way a valid cfid can reach here.
--	 *
--	 * This is because we hould our own ref, and whenever we put it, we invalidate the cfid.
--	 *
--	 * So even if an external caller puts the last ref, cfid will already have been invalidated
--	 * by then by one of the invalidations that can happen concurrently, e.g. lease break,
--	 * invalidate_all_cached_dirs().
--	 *
--	 * So this check is mostly for precaution, but since we can still take the correct action
--	 * (just list_del()) if it's the case, do so.
--	 */
--	if (WARN_ON(cfid_is_valid(cfid)))
--		/* remaining invalidation done by drop_cfid() below */
--		list_del(&cfid->entry);
--
- 	drop_cfid(cfid);
- 
- 	/* Delete all cached dirent names */
-@@ -506,23 +490,36 @@ static void smb2_close_cached_fid(struct kref *ref)
- 	kfree(cfid);
- }
- 
--void drop_cached_dir_by_name(struct cached_fids *cfids, const char *name)
-+bool drop_cached_dir(struct cached_fids *cfids, const void *key, int mode)
- {
- 	struct cached_fid *cfid;
- 
--	if (!cfids)
--		return;
-+	if (!cfids || !key)
-+		return false;
- 
--	cfid = find_cached_dir(cfids, name, CFID_LOOKUP_PATH);
--	if (!cfid) {
--		cifs_dbg(FYI, "no cached dir found for rmdir(%s)\n", name);
--		return;
--	}
-+	/*
-+	 * Raw lookup here as we _must_ find any matching cfid, no matter its state.
-+	 * Also, we might be racing with the SMB2 open in open_cached_dir(), so no need to wait
-+	 * for it to finish.
-+	 */
-+	cfid = find_cfid(cfids, key, mode, false);
-+	if (!cfid)
-+		return false;
- 
--	drop_cfid(cfid);
-+	if (mode != CFID_LOOKUP_LEASEKEY) {
-+		drop_cfid(cfid);
-+	} else {
-+		/* we're locked in smb2_is_valid_lease_break(), so can't dput/close here */
-+		spin_lock(&cfids->cfid_list_lock);
-+		invalidate_cfid(cfid);
-+		spin_unlock(&cfids->cfid_list_lock);
-+	}
- 
- 	/* put lookup ref */
- 	kref_put(&cfid->refcount, smb2_close_cached_fid);
-+	mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
++/* since jiffies can never be 1 here, use it as an invalid value to add meaning for our purposes */
++#define CFID_INVALID_TIME 1
 +
-+	return true;
+ static struct cached_fid *init_cached_dir(const char *path);
+ static void smb2_close_cached_fid(struct kref *ref);
+ 
+@@ -24,29 +27,30 @@ static inline void invalidate_cfid(struct cached_fid *cfid)
+ 		cfid->cfids->num_entries--;
+ 
+ 	/* do not change other fields here! */
+-	cfid->time = 0;
+-	cfid->last_access_time = 1;
++	cfid->ctime = CFID_INVALID_TIME;
++	cfid->atime = CFID_INVALID_TIME;
  }
  
- void close_cached_dir(struct cached_fid *cfid)
-@@ -589,37 +586,6 @@ void invalidate_all_cached_dirs(struct cached_fids *cfids)
- 	flush_delayed_work(&cfids->laundromat_work);
- }
+ static inline void drop_cfid(struct cached_fid *cfid)
+ {
+ 	struct dentry *dentry = NULL;
++	u64 pfid = 0, vfid = 0;
  
--bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
--{
--	struct cached_fids *cfids = tcon->cfids;
--	struct cached_fid *cfid;
+ 	spin_lock(&cfid->cfids->cfid_list_lock);
+ 	invalidate_cfid(cfid);
+ 
+ 	spin_lock(&cfid->fid_lock);
+ 	swap(cfid->dentry, dentry);
++	swap(cfid->fid.persistent_fid, pfid);
++	swap(cfid->fid.volatile_fid, vfid);
+ 	spin_unlock(&cfid->fid_lock);
+ 	spin_unlock(&cfid->cfids->cfid_list_lock);
+ 
+ 	dput(dentry);
+ 
+-	if (cfid->is_open) {
+-		int rc;
 -
--	if (cfids == NULL)
--		return false;
--
--	/*
--	 * Raw lookup here as we _must_ find our lease, no matter cfid state.
--	 * Also, this lease break might be coming from the SMB2 open in open_cached_dir(), so no
--	 * need to wait for it to finish.
--	 */
--	cfid = find_cfid(cfids, lease_key, CFID_LOOKUP_LEASEKEY, false);
--	if (cfid) {
--		/* found a lease, invalidate cfid and schedule immediate cleanup on laundromat */
--		spin_lock(&cfids->cfid_list_lock);
--		invalidate_cfid(cfid);
--		cfid->has_lease = false;
--		spin_unlock(&cfids->cfid_list_lock);
--
--		/* put lookup ref */
--		kref_put(&cfid->refcount, smb2_close_cached_fid);
--		mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
--
--		return true;
--	}
--
--	return false;
--}
--
- static struct cached_fid *init_cached_dir(const char *path)
- {
- 	struct cached_fid *cfid;
-diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index afb9af227219..bed5ba68b07f 100644
---- a/fs/smb/client/cached_dir.h
-+++ b/fs/smb/client/cached_dir.h
-@@ -82,8 +82,7 @@ extern struct cached_fid *find_cached_dir(struct cached_fids *cfids, const void
- extern int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 			   struct cifs_sb_info *cifs_sb, struct cached_fid **cfid);
- extern void close_cached_dir(struct cached_fid *cfid);
--extern void drop_cached_dir_by_name(struct cached_fids *cfids, const char *name);
-+extern bool drop_cached_dir(struct cached_fids *cfids, const void *key, int mode);
- extern void close_all_cached_dirs(struct cifs_sb_info *cifs_sb);
- extern void invalidate_all_cached_dirs(struct cached_fids *cfids);
--extern bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16]);
- #endif			/* _CACHED_DIR_H */
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index df236c844611..f2eff1138ed0 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -2615,7 +2615,7 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
- 			 * ->i_nlink and then mark it as delete pending.
- 			 */
- 			if (S_ISDIR(inode->i_mode)) {
--				drop_cached_dir_by_name(tcon->cfids, to_name);
-+				drop_cached_dir(tcon->cfids, to_name, CFID_LOOKUP_PATH);
- 				spin_lock(&inode->i_lock);
- 				i_size_write(inode, 0);
- 				clear_nlink(inode);
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index c76fe1dec390..62d6adf50ad1 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -1160,7 +1160,7 @@ smb2_rmdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
- {
+-		cfid->is_open = false;
+-		rc = SMB2_close(0, cfid->tcon, cfid->fid.persistent_fid, cfid->fid.volatile_fid);
++	if (pfid) {
++		/* cfid->tcon is never set to NULL, so no need to check/swap it */
++		int rc = SMB2_close(0, cfid->tcon, pfid, vfid);
+ 
+ 		/* SMB2_close should handle -EBUSY or -EAGAIN */
+ 		if (rc)
+@@ -56,7 +60,7 @@ static inline void drop_cfid(struct cached_fid *cfid)
+ 
+ /*
+  * Find a cached dir based on @key and @mode (raw lookup).
+- * The only validation done here is if cfid is not going down (last_access_time != 1).
++ * The only validation done here is if cfid is going down (->ctime == CFID_INVALID_TIME).
+  *
+  * If @wait_open is true, keep retrying until cfid transitions from 'opening' to valid/invalid.
+  *
+@@ -78,7 +82,7 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
+ 	spin_lock(&cfids->cfid_list_lock);
+ 	list_for_each_entry(cfid, &cfids->entries, entry) {
+ 		/* don't even bother checking if it's going away */
+-		if (cfid->last_access_time == 1)
++		if (cfid->ctime == CFID_INVALID_TIME)
+ 			continue;
+ 
+ 		if (mode == CFID_LOOKUP_PATH)
+@@ -103,7 +107,7 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
+ 
+ 	if (wait_open && found) {
+ 		/* cfid is being opened in open_cached_dir(), retry lookup */
+-		if (found->has_lease && !found->time && !found->last_access_time)
++		if (!found->ctime)
+ 			goto retry_find;
+ 
+ 		/* we didn't get a ref above, so get one now */
+@@ -185,7 +189,7 @@ struct cached_fid *find_cached_dir(struct cached_fids *cfids, const void *key, i
+ 	cfid = find_cfid(cfids, key, mode, true);
+ 	if (cfid) {
+ 		if (cfid_is_valid(cfid)) {
+-			cfid->last_access_time = jiffies;
++			cfid->atime = jiffies;
+ 		} else {
+ 			kref_put(&cfid->refcount, smb2_close_cached_fid);
+ 			cfid = NULL;
+@@ -207,6 +211,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
  	struct cifs_open_parms oparms;
+ 	struct smb2_create_rsp *o_rsp = NULL;
+ 	struct smb2_query_info_rsp *qi_rsp = NULL;
++	struct smb2_file_all_info info;
+ 	int resp_buftype[2];
+ 	struct smb_rqst rqst[2];
+ 	struct kvec rsp_iov[2];
+@@ -241,6 +246,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
+ 	dentry = NULL;
+ 	cfid = NULL;
+ 	*ret_cfid = NULL;
++	memset(&info, 0, sizeof(info));
+ 	server = cifs_pick_channel(ses);
  
--	drop_cached_dir_by_name(tcon->cfids, name);
-+	drop_cached_dir(tcon->cfids, name, CFID_LOOKUP_PATH);
- 	oparms = CIFS_OPARMS(cifs_sb, tcon, name, DELETE,
- 			     FILE_OPEN, CREATE_NOT_FILE, ACL_NO_MODE);
- 	return smb2_compound_op(xid, tcon, cifs_sb,
-@@ -1238,7 +1238,7 @@ int smb2_rename_path(const unsigned int xid,
- 	struct cifsFileInfo *cfile;
- 	__u32 co = file_create_options(source_dentry);
+ 	if (!server->ops->new_lease_key)
+@@ -250,7 +256,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
+ 	if (!utf16_path)
+ 		return -ENOMEM;
  
--	drop_cached_dir_by_name(tcon->cfids, from_name);
-+	drop_cached_dir(tcon->cfids, from_name, CFID_LOOKUP_PATH);
- 	cifs_get_writable_path(tcon, from_name, FIND_WR_WITH_DELETE, &cfile);
+-	/* find_cached_dir() already checks has_lease and time, so no need to check here */
++	/* find_cached_dir() already validates cfid if found, so no need to check here again */
+ 	cfid = find_cached_dir(cfids, path, CFID_LOOKUP_PATH);
+ 	if (cfid) {
+ 		rc = 0;
+@@ -393,7 +399,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
+ 		}
+ 		goto oshr_free;
+ 	}
+-	cfid->is_open = true;
  
- 	int rc = smb2_set_path_attr(xid, tcon, from_name, to_name, cifs_sb,
-@@ -1520,7 +1520,8 @@ int smb2_rename_pending_delete(const char *full_path,
- 		goto out;
+ 	spin_lock(&cfids->cfid_list_lock);
+ 
+@@ -430,19 +435,21 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
+ 		spin_unlock(&cfids->cfid_list_lock);
+ 		goto oshr_free;
+ 	}
+-	if (!smb2_validate_and_copy_iov(
+-				le16_to_cpu(qi_rsp->OutputBufferOffset),
+-				sizeof(struct smb2_file_all_info),
+-				&rsp_iov[1], sizeof(struct smb2_file_all_info),
+-				(char *)&cfid->file_all_info))
+-		cfid->file_all_info_is_valid = true;
+-
+-	cfid->time = jiffies;
+-	cfid->last_access_time = jiffies;
++	if (!smb2_validate_and_copy_iov(le16_to_cpu(qi_rsp->OutputBufferOffset),
++					sizeof(struct smb2_file_all_info), &rsp_iov[1],
++					sizeof(struct smb2_file_all_info), (char *)&info)) {
++		cfid->file_all_info = kmemdup(&info, sizeof(info), GFP_ATOMIC);
++		if (!cfid->file_all_info) {
++			rc = -ENOMEM;
++			goto out;
++		}
++	}
++
++	cfid->ctime = jiffies;
++	cfid->atime = jiffies;
+ 	spin_unlock(&cfids->cfid_list_lock);
+ 	/* At this point the directory handle is fully cached */
+ 	rc = 0;
+-
+ oshr_free:
+ 	SMB2_open_free(&rqst[0]);
+ 	SMB2_query_info_free(&rqst[1]);
+@@ -485,6 +492,8 @@ static void smb2_close_cached_fid(struct kref *ref)
+ 		kfree(de);
  	}
  
--	drop_cached_dir_by_name(tcon->cfids, full_path);
-+	drop_cached_dir(tcon->cfids, full_path, CFID_LOOKUP_PATH);
-+
- 	oparms = CIFS_OPARMS(cifs_sb, tcon, full_path,
- 			     DELETE | FILE_WRITE_ATTRIBUTES,
- 			     FILE_OPEN, co, ACL_NO_MODE);
-diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-index 89d933b4a8bc..71d987f76a12 100644
---- a/fs/smb/client/smb2misc.c
-+++ b/fs/smb/client/smb2misc.c
-@@ -660,7 +660,7 @@ smb2_is_valid_lease_break(char *buffer, struct TCP_Server_Info *server)
- 			}
- 			spin_unlock(&tcon->open_file_lock);
++	kfree(cfid->file_all_info);
++	cfid->file_all_info = NULL;
+ 	kfree(cfid->path);
+ 	cfid->path = NULL;
+ 	kfree(cfid);
+@@ -538,9 +547,10 @@ static void invalidate_all_cfids(struct cached_fids *cfids, bool closed)
+ 	spin_lock(&cfids->cfid_list_lock);
+ 	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
+ 		invalidate_cfid(cfid);
+-		cfid->has_lease = false;
+-		if (closed)
+-			cfid->is_open = false;
++		if (closed) {
++			cfid->fid.persistent_fid = 0;
++			cfid->fid.volatile_fid = 0;
++		}
+ 	}
+ 	spin_unlock(&cfids->cfid_list_lock);
  
--			if (cached_dir_lease_break(tcon, rsp->LeaseKey)) {
-+			if (drop_cached_dir(tcon->cfids, rsp->LeaseKey, CFID_LOOKUP_LEASEKEY)) {
- 				spin_unlock(&cifs_tcp_ses_lock);
- 				return true;
+@@ -611,16 +621,6 @@ static struct cached_fid *init_cached_dir(const char *path)
+ 	/* this is caller/lease ref */
+ 	kref_get(&cfid->refcount);
+ 
+-	/*
+-	 * Set @cfid->has_lease to true during construction so that the lease
+-	 * reference can be put in cached_dir_lease_break() due to a potential
+-	 * lease break right after the request is sent or while @cfid is still
+-	 * being cached, or if a reconnection is triggered during construction.
+-	 * Concurrent processes won't be to use it yet due to @cfid->time being
+-	 * zero.
+-	 */
+-	cfid->has_lease = true;
+-
+ 	return cfid;
+ }
+ 
+diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
+index bed5ba68b07f..c45151446049 100644
+--- a/fs/smb/client/cached_dir.h
++++ b/fs/smb/client/cached_dir.h
+@@ -33,17 +33,14 @@ struct cached_fid {
+ 	struct list_head entry;
+ 	struct cached_fids *cfids;
+ 	const char *path;
+-	bool has_lease:1;
+-	bool is_open:1;
+-	bool file_all_info_is_valid:1;
+-	unsigned long time; /* jiffies of when lease was taken */
+-	unsigned long last_access_time; /* jiffies of when last accessed */
++	unsigned long ctime; /* (jiffies) creation time, when cfid was created (cached) */
++	unsigned long atime; /* (jiffies) access time, when it was last used */
+ 	struct kref refcount;
+ 	struct cifs_fid fid;
+ 	spinlock_t fid_lock;
+ 	struct cifs_tcon *tcon;
+ 	struct dentry *dentry;
+-	struct smb2_file_all_info file_all_info;
++	struct smb2_file_all_info *file_all_info;
+ 	struct cached_dirents dirents;
+ };
+ 
+@@ -68,13 +65,12 @@ enum {
+ 
+ static inline bool cfid_expired(const struct cached_fid *cfid)
+ {
+-	return (cfid->last_access_time &&
+-		time_is_before_jiffies(cfid->last_access_time + HZ * dir_cache_timeout));
++	return (cfid->atime && time_is_before_jiffies(cfid->atime + HZ * dir_cache_timeout));
+ }
+ 
+ static inline bool cfid_is_valid(const struct cached_fid *cfid)
+ {
+-	return (cfid->has_lease && cfid->time && !cfid_expired(cfid));
++	return (cfid->fid.persistent_fid && cfid->ctime && !cfid_expired(cfid));
+ }
+ 
+ extern struct cached_fids *init_cached_dirs(void);
+diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+index 2337cf795db3..bb27b9c97724 100644
+--- a/fs/smb/client/cifs_debug.c
++++ b/fs/smb/client/cifs_debug.c
+@@ -314,7 +314,7 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
+ 						ses->Suid,
+ 						cfid->fid.persistent_fid,
+ 						cfid->path);
+-					if (cfid->file_all_info_is_valid)
++					if (cfid->file_all_info)
+ 						seq_printf(m, "\tvalid file info");
+ 					if (cfid->dirents.is_valid)
+ 						seq_printf(m, ", valid dirents");
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index 62d6adf50ad1..8ccdd1a3ba2c 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -970,14 +970,17 @@ int smb2_query_path_info(const unsigned int xid,
+ 
+ 		/* If it is a root and its handle is cached then use it */
+ 		if (!rc) {
+-			if (cfid->file_all_info_is_valid) {
+-				memcpy(&data->fi, &cfid->file_all_info,
+-				       sizeof(data->fi));
++			if (cfid->file_all_info) {
++				memcpy(&data->fi, cfid->file_all_info, sizeof(data->fi));
+ 			} else {
+-				rc = SMB2_query_info(xid, tcon,
+-						     cfid->fid.persistent_fid,
+-						     cfid->fid.volatile_fid,
+-						     &data->fi);
++				rc = SMB2_query_info(xid, tcon, cfid->fid.persistent_fid,
++						     cfid->fid.volatile_fid, &data->fi);
++				if (!rc) {
++					cfid->file_all_info = kmemdup(&data->fi, sizeof(data->fi),
++								      GFP_KERNEL);
++					if (!cfid->file_all_info)
++						rc = -ENOMEM;
++				}
  			}
+ 			close_cached_dir(cfid);
+ 			return rc;
 -- 
 2.49.0
 
