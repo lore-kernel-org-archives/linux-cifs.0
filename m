@@ -1,78 +1,79 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204D221B918
-	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 13:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DD121B918
+	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 13:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759152536; cv=none; b=Xej/U+zaRpPYdUO6Zjq3MLPbdpvfiZXXlvTFTZXdl8+DXR3sebHEXIrNDuqaz0ipZUFRdJnCQd7GBGHxQ7s2ko7jfq2bwPhNZ/drw425vlj7oc0s26Lalp7d2NPJMnQg22NMNiCMBAqHFyY17uR1BkeSw4LY3kz6J6Kv/JLGzyM=
+	t=1759152539; cv=none; b=bBw3AehHTVnSIF5rWHuxqBIDlfhQwbDjB98Ry2aqNsW4QB998Jlfv3ZZV56Lt1opRUE3eLHjarMQUpO43RM6ubESGXh8OevnQtNCJvi9xDYaoU7CJVux/RFBM5i1TIgz+vuFITdy2JFgLSYprAZIvoCahTCg0Ooew1f7IxLUpSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759152536; c=relaxed/simple;
-	bh=vCABaG8ARYSrKmKrCfZX+MpUulyc0yUnQER2HrPEIT4=;
+	s=arc-20240116; t=1759152539; c=relaxed/simple;
+	bh=3kUSllVwYW1tO4yiDkw9BI0W4roYJPYYZ9FE9lDZmRU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pgUH3VNaKIu5GJ5xpYapX0QoNHwDbipFE75xqSrk+PdVnI0MhxeqyYaT4SnMJy5rj8tEIZLYPj+YosOYPjHKlI0uPg8POuRPi8Euwk8UYPqS4I5MO7xXxm9o2z1sqOv5IkC8QXTFvXru1S2WChIUIQ3gVxYtuOwWz3Ax+d0ymog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bVjnmWjK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ND7HGKKm; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bVjnmWjK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ND7HGKKm; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=hag2kOTTIMDN9XB2Kg0p4sOpK7M8qs/bAqHTcMbGdpoSGNa7mOETecVNkbfjaRV2j+xvSpNXamXYPIwdEYJqbJBunOVugc8pI/a+JnSvfZ3GlZ9o6wjW14zQjXmxAcuSSsT3aeq4EFTUYcPAE+jSlbGQ8cRVpATwcQsbrWwgQp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0sG1c3R2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WGNZgK9O; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0sG1c3R2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WGNZgK9O; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bVjnmWjK";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ND7HGKKm";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bVjnmWjK";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ND7HGKKm"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0sG1c3R2";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WGNZgK9O";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0sG1c3R2";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WGNZgK9O"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 24A75327DB;
-	Mon, 29 Sep 2025 13:28:52 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 5F2FD2C552;
+	Mon, 29 Sep 2025 13:28:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759152532; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759152535; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1Dj5GXGIAMhzIz6ISMP5LT8XcQU2IgCnv4gpOvhOgOU=;
-	b=bVjnmWjKvHjyohPsB0ax69fBIpFWKGXkhuCV/FKAtmNHEos5TMNthyMDJIW/HKQa1VB948
-	pkythZK5aIKAHzncjx2GjQk8nEHx+x2Ouanjo2+dAinRrMFC6S1gmvruih6e2DVVEpQ7qf
-	Y5lhf1oZI/C3GYJ2g6DwJpx4ZjFeUOQ=
+	bh=ju/tg+mp8WtOGFMDvlYlBNVZw0vsQj+gfq80eLINAjU=;
+	b=0sG1c3R2kEY555RYcoBJgzyT94WrvCAyQk8OJHvRTidGzMSYCgtc+FqqNU93hHdFE5cF8A
+	c08P+/AEw+e1LuFXMbn+50sgtcGrrQoyHhuXs3BmthS/3MvZcD8VZO+atyYLFq6NO1CzfG
+	7jRitQziMbtn/enAR6WU1bwfO76vCN8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759152532;
+	s=susede2_ed25519; t=1759152535;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1Dj5GXGIAMhzIz6ISMP5LT8XcQU2IgCnv4gpOvhOgOU=;
-	b=ND7HGKKmvAGJJNmvXy+4j/RpdiLaRkg0qhczGv185jVs5BsihgejTrbR5bE6pwFnLS8RNb
-	KVMug3oyXbnrSDCw==
-Authentication-Results: smtp-out2.suse.de;
-	none
+	bh=ju/tg+mp8WtOGFMDvlYlBNVZw0vsQj+gfq80eLINAjU=;
+	b=WGNZgK9O3RuRCqwTqXaO23g8uPK8wq7OVwzjkEDtVDMdTnFkqz+Ro8JNc9nTDsYdZ0/V1I
+	yfnyUMyHxvl5HQAw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=0sG1c3R2;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=WGNZgK9O
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759152532; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759152535; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1Dj5GXGIAMhzIz6ISMP5LT8XcQU2IgCnv4gpOvhOgOU=;
-	b=bVjnmWjKvHjyohPsB0ax69fBIpFWKGXkhuCV/FKAtmNHEos5TMNthyMDJIW/HKQa1VB948
-	pkythZK5aIKAHzncjx2GjQk8nEHx+x2Ouanjo2+dAinRrMFC6S1gmvruih6e2DVVEpQ7qf
-	Y5lhf1oZI/C3GYJ2g6DwJpx4ZjFeUOQ=
+	bh=ju/tg+mp8WtOGFMDvlYlBNVZw0vsQj+gfq80eLINAjU=;
+	b=0sG1c3R2kEY555RYcoBJgzyT94WrvCAyQk8OJHvRTidGzMSYCgtc+FqqNU93hHdFE5cF8A
+	c08P+/AEw+e1LuFXMbn+50sgtcGrrQoyHhuXs3BmthS/3MvZcD8VZO+atyYLFq6NO1CzfG
+	7jRitQziMbtn/enAR6WU1bwfO76vCN8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759152532;
+	s=susede2_ed25519; t=1759152535;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1Dj5GXGIAMhzIz6ISMP5LT8XcQU2IgCnv4gpOvhOgOU=;
-	b=ND7HGKKmvAGJJNmvXy+4j/RpdiLaRkg0qhczGv185jVs5BsihgejTrbR5bE6pwFnLS8RNb
-	KVMug3oyXbnrSDCw==
+	bh=ju/tg+mp8WtOGFMDvlYlBNVZw0vsQj+gfq80eLINAjU=;
+	b=WGNZgK9O3RuRCqwTqXaO23g8uPK8wq7OVwzjkEDtVDMdTnFkqz+Ro8JNc9nTDsYdZ0/V1I
+	yfnyUMyHxvl5HQAw==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A5D7513782;
-	Mon, 29 Sep 2025 13:28:51 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DD3F613782;
+	Mon, 29 Sep 2025 13:28:54 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id PSIgG5OJ2mjHGwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 29 Sep 2025 13:28:51 +0000
+	id m4NzKJaJ2mjUGwAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 29 Sep 2025 13:28:54 +0000
 From: Enzo Matsumiya <ematsumiya@suse.de>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -82,9 +83,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
 	henrique.carvalho@suse.com
-Subject: [PATCH 05/20] smb: client: remove cached_fid->on_list
-Date: Mon, 29 Sep 2025 10:27:50 -0300
-Message-ID: <20250929132805.220558-6-ematsumiya@suse.de>
+Subject: [PATCH 06/20] smb: client: merge {close,invalidate}_all_cached_dirs()
+Date: Mon, 29 Sep 2025 10:27:51 -0300
+Message-ID: <20250929132805.220558-7-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250929132805.220558-1-ematsumiya@suse.de>
 References: <20250929132805.220558-1-ematsumiya@suse.de>
@@ -96,296 +97,294 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Level: 
-X-Spamd-Result: default: False [-2.80 / 50.00];
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 5F2FD2C552
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
 	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
 	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
 	ARC_NA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid];
-	MIME_TRACE(0.00)[0:+];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_NONE(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
+X-Spam-Score: -3.01
 
-That field is currently used to indicate when a cfid should be removed
-from the entries list.
+close_all_cached_dirs(), invalidate_all_cached_dirs() and
+free_cached_dirs() have become too similar now, merge their
+functionality in a single static invalidate_all_cfids() function.
 
-Since we now keep cfids on the list until they're going down, we can
-remove the field and use the other existing fields for the same effect.
+This also allows removing free_cached_dirs() altogether as it only
+requires cancelling the work afterwards (done directly in
+tconInfoFree()).
 
 Other changes:
-- cfids->num_entries follows semantics of list_*() ops
-- add cfid_expired() and cfid_is_valid() helpers
-- check cfid_is_valid() even on success when leaving open_cached_dir()
+- remove struct cached_dir_dentry
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- fs/smb/client/cached_dir.c | 77 ++++++++++++++------------------------
- fs/smb/client/cached_dir.h | 12 +++++-
- fs/smb/client/dir.c        | 15 ++++----
- 3 files changed, 47 insertions(+), 57 deletions(-)
+ fs/smb/client/cached_dir.c | 114 ++++++++-----------------------------
+ fs/smb/client/cached_dir.h |   4 +-
+ fs/smb/client/file.c       |   2 +-
+ fs/smb/client/misc.c       |   9 ++-
+ fs/smb/client/smb2pdu.c    |   2 +-
+ 5 files changed, 35 insertions(+), 96 deletions(-)
 
 diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 2fea7f6c5678..9b4045a57f12 100644
+index 9b4045a57f12..36a1e1436502 100644
 --- a/fs/smb/client/cached_dir.c
 +++ b/fs/smb/client/cached_dir.c
-@@ -15,7 +15,6 @@
- static struct cached_fid *init_cached_dir(const char *path);
+@@ -16,11 +16,6 @@ static struct cached_fid *init_cached_dir(const char *path);
  static void free_cached_dir(struct cached_fid *cfid);
  static void smb2_close_cached_fid(struct kref *ref);
--static void cfids_laundromat_worker(struct work_struct *work);
  
- struct cached_dir_dentry {
- 	struct list_head entry;
-@@ -27,11 +26,10 @@ static inline void invalidate_cfid(struct cached_fid *cfid)
+-struct cached_dir_dentry {
+-	struct list_head entry;
+-	struct dentry *dentry;
+-};
+-
+ static inline void invalidate_cfid(struct cached_fid *cfid)
+ {
  	/* callers must hold the list lock and do any list operations (del/move) themselves */
- 	lockdep_assert_held(&cfid->cfids->cfid_list_lock);
- 
--	if (cfid->on_list)
-+	if (cfid_is_valid(cfid))
- 		cfid->cfids->num_entries--;
- 
- 	/* do not change other fields here! */
--	cfid->on_list = false;
- 	cfid->time = 0;
- 	cfid->last_access_time = 1;
+@@ -503,6 +498,27 @@ void close_cached_dir(struct cached_fid *cfid)
+ 	kref_put(&cfid->refcount, smb2_close_cached_fid);
  }
-@@ -76,9 +74,9 @@ static struct cached_fid *find_or_create_cached_dir(struct cached_fids *cfids,
- 			 * fully cached or it may be in the process of
- 			 * being deleted due to a lease break.
- 			 */
--			if (!cfid->time || !cfid->has_lease) {
-+			if (!cfid_is_valid(cfid))
- 				return NULL;
--			}
-+
- 			kref_get(&cfid->refcount);
- 			return cfid;
- 		}
-@@ -96,7 +94,6 @@ static struct cached_fid *find_or_create_cached_dir(struct cached_fids *cfids,
- 	cfid->cfids = cfids;
- 	cfids->num_entries++;
- 	list_add(&cfid->entry, &cfids->entries);
--	cfid->on_list = true;
- 	kref_get(&cfid->refcount);
- 	/*
- 	 * Set @cfid->has_lease to true during construction so that the lease
-@@ -263,6 +260,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	} else {
- 		dentry = path_to_dentry(cifs_sb, npath);
- 		if (IS_ERR(dentry)) {
-+			dentry = NULL;
- 			rc = -ENOENT;
- 			goto out;
- 		}
-@@ -272,14 +270,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 			spin_lock(&cfids->cfid_list_lock);
- 			list_for_each_entry(parent_cfid, &cfids->entries, entry) {
- 				if (parent_cfid->dentry == dentry->d_parent) {
-+					if (!cfid_is_valid(parent_cfid))
-+						break;
-+
- 					cifs_dbg(FYI, "found a parent cached file handle\n");
--					if (parent_cfid->has_lease && parent_cfid->time) {
--						lease_flags
--							|= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
--						memcpy(pfid->parent_lease_key,
--						       parent_cfid->fid.lease_key,
--						       SMB2_LEASE_KEY_SIZE);
--					}
-+					lease_flags |= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
-+					memcpy(pfid->parent_lease_key, parent_cfid->fid.lease_key,
-+					       SMB2_LEASE_KEY_SIZE);
- 					break;
- 				}
- 			}
-@@ -288,6 +285,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	}
- 	cfid->dentry = dentry;
- 	cfid->tcon = tcon;
-+	dentry = NULL;
  
- 	/*
- 	 * We do not hold the lock for the open because in case
-@@ -415,24 +413,12 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
- 	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
- out:
--	if (rc) {
++static void invalidate_all_cfids(struct cached_fids *cfids, bool closed)
++{
++	struct cached_fid *cfid, *q;
++
++	if (!cfids)
++		return;
++
++	/* mark all the cfids as closed and invalidate them for laundromat cleanup */
++	spin_lock(&cfids->cfid_list_lock);
++	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
++		invalidate_cfid(cfid);
++		cfid->has_lease = false;
++		if (closed)
++			cfid->is_open = false;
++	}
++	spin_unlock(&cfids->cfid_list_lock);
++
++	/* run laundromat unconditionally now as there might have been previously queued work */
++	mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
++}
++
+ /*
+  * Called from cifs_kill_sb when we unmount a share
+  */
+@@ -510,12 +526,8 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
+ {
+ 	struct rb_root *root = &cifs_sb->tlink_tree;
+ 	struct rb_node *node;
+-	struct cached_fid *cfid;
+ 	struct cifs_tcon *tcon;
+ 	struct tcon_link *tlink;
+-	struct cached_fids *cfids;
+-	struct cached_dir_dentry *tmp_list, *q;
+-	LIST_HEAD(entry);
+ 
+ 	spin_lock(&cifs_sb->tlink_tree_lock);
+ 	for (node = rb_first(root); node; node = rb_next(node)) {
+@@ -523,46 +535,11 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
+ 		tcon = tlink_tcon(tlink);
+ 		if (IS_ERR(tcon))
+ 			continue;
+-		cfids = tcon->cfids;
+-		if (cfids == NULL)
+-			continue;
 -		spin_lock(&cfids->cfid_list_lock);
--		if (cfid->on_list) {
--			list_del(&cfid->entry);
--			cfid->on_list = false;
--			cfids->num_entries--;
--		}
--		if (cfid->has_lease) {
--			/*
--			 * We are guaranteed to have two references at this
--			 * point. One for the caller and one for a potential
--			 * lease. Release one here, and the second below.
--			 */
--			cfid->has_lease = false;
--			kref_put(&cfid->refcount, smb2_close_cached_fid);
+-		list_for_each_entry(cfid, &cfids->entries, entry) {
+-			invalidate_cfid(cfid);
+-
+-			tmp_list = kmalloc(sizeof(*tmp_list), GFP_ATOMIC);
+-			if (tmp_list == NULL) {
+-				/*
+-				 * If the malloc() fails, we won't drop all
+-				 * dentries, and unmounting is likely to trigger
+-				 * a 'Dentry still in use' error.
+-				 */
+-				cifs_tcon_dbg(VFS, "Out of memory while dropping dentries\n");
+-				spin_unlock(&cfids->cfid_list_lock);
+-				spin_unlock(&cifs_sb->tlink_tree_lock);
+-				goto done;
+-			}
+-			spin_lock(&cfid->fid_lock);
+-			tmp_list->dentry = cfid->dentry;
+-			cfid->dentry = NULL;
+-			spin_unlock(&cfid->fid_lock);
+ 
+-			list_add_tail(&tmp_list->entry, &entry);
 -		}
 -		spin_unlock(&cfids->cfid_list_lock);
-+	/* cfid invalidated in the mean time, drop it below */
-+	if (!rc && !cfid_is_valid(cfid))
-+		rc = -ENOENT;
+-
+-		/* run laundromat now as it might not have been queued */
+-		mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
++		invalidate_all_cfids(tcon->cfids, false);
+ 	}
+ 	spin_unlock(&cifs_sb->tlink_tree_lock);
  
-+	if (rc) {
-+		drop_cfid(cfid);
- 		kref_put(&cfid->refcount, smb2_close_cached_fid);
- 	} else {
- 		*ret_cfid = cfid;
-@@ -459,7 +445,7 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
- 
- 	spin_lock(&cfids->cfid_list_lock);
- 	list_for_each_entry(cfid, &cfids->entries, entry) {
--		if (dentry && cfid->dentry == dentry) {
-+		if (cfid_is_valid(cfid) && cfid->dentry == dentry) {
- 			cifs_dbg(FYI, "found a cached file handle by dentry\n");
- 			kref_get(&cfid->refcount);
- 			*ret_cfid = cfid;
-@@ -477,23 +463,20 @@ smb2_close_cached_fid(struct kref *ref)
- 	struct cached_fid *cfid = container_of(ref, struct cached_fid, refcount);
- 
- 	/*
--	 * There's no way a cfid can reach here with ->on_list == true.
-+	 * There's no way a valid cfid can reach here.
- 	 *
--	 * This is because we hould our own ref, and whenever we put it, we invalidate the cfid
--	 * (which sets ->on_list to false).
-+	 * This is because we hould our own ref, and whenever we put it, we invalidate the cfid.
- 	 *
--	 * So even if an external caller puts the last ref, ->on_list will already have been set to
--	 * false by then by one of the invalidations that can happen concurrently, e.g. lease break,
-+	 * So even if an external caller puts the last ref, cfid will already have been invalidated
-+	 * by then by one of the invalidations that can happen concurrently, e.g. lease break,
- 	 * invalidate_all_cached_dirs().
- 	 *
--	 * So this check is mostly for precaution, but since we can still take the correct actions
--	 * if it's the case, do so.
-+	 * So this check is mostly for precaution, but since we can still take the correct action
-+	 * (just list_del()) if it's the case, do so.
- 	 */
--	if (WARN_ON(cfid->on_list)) {
-+	if (WARN_ON(cfid_is_valid(cfid)))
-+		/* remaining invalidation done by drop_cfid() below */
- 		list_del(&cfid->entry);
--		cfid->on_list = false;
--		cfid->cfids->num_entries--;
+-done:
+-	list_for_each_entry_safe(tmp_list, q, &entry, entry) {
+-		list_del(&tmp_list->entry);
+-		dput(tmp_list->dentry);
+-		kfree(tmp_list);
 -	}
- 
- 	drop_cfid(cfid);
- 	free_cached_dir(cfid);
-@@ -591,14 +574,14 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
- void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
+-
+ 	/* Flush any pending work that will drop dentries */
+ 	flush_workqueue(cfid_put_wq);
+ }
+@@ -571,24 +548,12 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
+  * Invalidate all cached dirs when a TCON has been reset
+  * due to a session loss.
+  */
+-void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
++void invalidate_all_cached_dirs(struct cached_fids *cfids)
  {
- 	struct cached_fids *cfids = tcon->cfids;
--	struct cached_fid *cfid, *q;
-+	struct cached_fid *cfid;
- 
+-	struct cached_fids *cfids = tcon->cfids;
+-	struct cached_fid *cfid;
+-
  	if (!cfids)
  		return;
  
- 	/* mark all the cfids as closed and invalidate them for laundromat cleanup */
- 	spin_lock(&cfids->cfid_list_lock);
--	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
-+	list_for_each_entry(cfid, &cfids->entries, entry) {
- 		invalidate_cfid(cfid);
- 		cfid->is_open = false;
- 	}
-@@ -693,8 +676,7 @@ static void cfids_laundromat_worker(struct work_struct *work)
+-	/* mark all the cfids as closed and invalidate them for laundromat cleanup */
+-	spin_lock(&cfids->cfid_list_lock);
+-	list_for_each_entry(cfid, &cfids->entries, entry) {
+-		invalidate_cfid(cfid);
+-		cfid->is_open = false;
+-	}
+-	spin_unlock(&cfids->cfid_list_lock);
+-
+-	/* run laundromat unconditionally now as there might have been previously queued work */
+-	mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
++	invalidate_all_cfids(cfids, true);
+ 	flush_delayed_work(&cfids->laundromat_work);
+ }
  
- 	spin_lock(&cfids->cfid_list_lock);
- 	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
--		if (cfid->last_access_time &&
--		    time_after(jiffies, cfid->last_access_time + HZ * dir_cache_timeout)) {
-+		if (cfid_expired(cfid)) {
- 			invalidate_cfid(cfid);
- 			list_move(&cfid->entry, &entry);
- 		}
-@@ -712,8 +694,7 @@ static void cfids_laundromat_worker(struct work_struct *work)
- 		 * concurrent ref-holders, they'll drop it later (cfid is already invalid at this
- 		 * point, so can't be found anymore).
- 		 *
--		 * No risk for a double list_del() here because cfid->on_list is always false at
--		 * this point.
-+		 * No risk for a double list_del() here because cfid is only on this list now.
- 		 */
- 		drop_cfid(cfid);
- 		kref_put(&cfid->refcount, smb2_close_cached_fid);
+@@ -719,34 +684,3 @@ struct cached_fids *init_cached_dirs(void)
+ 
+ 	return cfids;
+ }
+-
+-/*
+- * Called from tconInfoFree when we are tearing down the tcon.
+- * There are no active users or open files/directories at this point.
+- */
+-void free_cached_dirs(struct cached_fids *cfids)
+-{
+-	struct cached_fid *cfid, *q;
+-	LIST_HEAD(entry);
+-
+-	if (cfids == NULL)
+-		return;
+-
+-	cancel_delayed_work_sync(&cfids->laundromat_work);
+-
+-	spin_lock(&cfids->cfid_list_lock);
+-	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
+-		invalidate_cfid(cfid);
+-		cfid->is_open = false;
+-		list_move(&cfid->entry, &entry);
+-	}
+-	spin_unlock(&cfids->cfid_list_lock);
+-
+-	list_for_each_entry_safe(cfid, q, &entry, entry) {
+-		list_del(&cfid->entry);
+-		drop_cfid(cfid);
+-		free_cached_dir(cfid);
+-	}
+-
+-	kfree(cfids);
+-}
 diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index e549f019b923..92e95c56fd1c 100644
+index 92e95c56fd1c..47c0404ba84a 100644
 --- a/fs/smb/client/cached_dir.h
 +++ b/fs/smb/client/cached_dir.h
-@@ -35,7 +35,6 @@ struct cached_fid {
- 	const char *path;
- 	bool has_lease:1;
- 	bool is_open:1;
--	bool on_list:1;
- 	bool file_all_info_is_valid:1;
- 	unsigned long time; /* jiffies of when lease was taken */
- 	unsigned long last_access_time; /* jiffies of when last accessed */
-@@ -60,6 +59,17 @@ struct cached_fids {
- 	struct delayed_work laundromat_work;
- };
+@@ -71,7 +71,6 @@ static inline bool cfid_is_valid(const struct cached_fid *cfid)
+ }
  
-+static inline bool cfid_expired(const struct cached_fid *cfid)
-+{
-+	return (cfid->last_access_time &&
-+		time_is_before_jiffies(cfid->last_access_time + HZ * dir_cache_timeout));
-+}
-+
-+static inline bool cfid_is_valid(const struct cached_fid *cfid)
-+{
-+	return (cfid->has_lease && cfid->time && !cfid_expired(cfid));
-+}
-+
  extern struct cached_fids *init_cached_dirs(void);
- extern void free_cached_dirs(struct cached_fids *cfids);
+-extern void free_cached_dirs(struct cached_fids *cfids);
  extern int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
-diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-index 5223edf6d11a..e5372c2c799d 100644
---- a/fs/smb/client/dir.c
-+++ b/fs/smb/client/dir.c
-@@ -321,15 +321,14 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
- 		spin_lock(&tcon->cfids->cfid_list_lock);
- 		list_for_each_entry(parent_cfid, &tcon->cfids->entries, entry) {
- 			if (parent_cfid->dentry == direntry->d_parent) {
-+				if (!cfid_is_valid(parent_cfid))
-+					break;
+ 			   const char *path,
+ 			   struct cifs_sb_info *cifs_sb,
+@@ -85,7 +84,6 @@ extern void drop_cached_dir_by_name(const unsigned int xid,
+ 				    const char *name,
+ 				    struct cifs_sb_info *cifs_sb);
+ extern void close_all_cached_dirs(struct cifs_sb_info *cifs_sb);
+-extern void invalidate_all_cached_dirs(struct cifs_tcon *tcon);
++extern void invalidate_all_cached_dirs(struct cached_fids *cfids);
+ extern bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16]);
+-
+ #endif			/* _CACHED_DIR_H */
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index cb907e18cc35..5c195ffa3ead 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -386,7 +386,7 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
+ 	}
+ 	spin_unlock(&tcon->open_file_lock);
+ 
+-	invalidate_all_cached_dirs(tcon);
++	invalidate_all_cached_dirs(tcon->cfids);
+ 	spin_lock(&tcon->tc_lock);
+ 	if (tcon->status == TID_IN_FILES_INVALIDATE)
+ 		tcon->status = TID_NEED_TCON;
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index da23cc12a52c..8d70333a6a3d 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -169,7 +169,14 @@ tconInfoFree(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
+ 		return;
+ 	}
+ 	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count, trace);
+-	free_cached_dirs(tcon->cfids);
 +
- 				cifs_dbg(FYI, "found a parent cached file handle\n");
--				if (parent_cfid->has_lease && parent_cfid->time) {
--					lease_flags
--						|= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
--					memcpy(fid->parent_lease_key,
--					       parent_cfid->fid.lease_key,
--					       SMB2_LEASE_KEY_SIZE);
--					parent_cfid->dirents.is_valid = false;
--				}
-+				lease_flags |= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
-+				memcpy(fid->parent_lease_key, parent_cfid->fid.lease_key,
-+				       SMB2_LEASE_KEY_SIZE);
-+				parent_cfid->dirents.is_valid = false;
- 				break;
- 			}
- 		}
++	if (tcon->cfids) {
++		invalidate_all_cached_dirs(tcon->cfids);
++		cancel_delayed_work_sync(&tcon->cfids->laundromat_work);
++		kfree(tcon->cfids);
++		tcon->cfids = NULL;
++	}
++
+ 	atomic_dec(&tconInfoAllocCount);
+ 	kfree(tcon->nativeFileSystem);
+ 	kfree_sensitive(tcon->password);
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index c3b9d3f6210f..07ba61583114 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -2197,7 +2197,7 @@ SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
+ 	}
+ 	spin_unlock(&ses->chan_lock);
+ 
+-	invalidate_all_cached_dirs(tcon);
++	invalidate_all_cached_dirs(tcon->cfids);
+ 
+ 	rc = smb2_plain_req_init(SMB2_TREE_DISCONNECT, tcon, server,
+ 				 (void **) &req,
 -- 
 2.49.0
 
