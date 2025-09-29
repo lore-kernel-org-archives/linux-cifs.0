@@ -1,341 +1,963 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEAB3019CD
-	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 14:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA3DCA52
+	for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 16:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759157066; cv=none; b=QCa+9reLYflaUaCek6rQybwavwisgvXMwzrC7PEVX+68UyOAo09fexRVFJbHFLvJbAeSAnTUY8ChqLCRb6D//MSZcQMlQf4rPb9RrjpXkSn738Zi01OoA/58T5nNsp9Sy+IzyLQOk3uYa9B/880lSCcEF5vTkYJ58vXFfr85Zcs=
+	t=1759164722; cv=none; b=f5+QGX5at7yItWeGIDwInOH7QzOHEmGUUMLG4D+OpQt8BqdLLZNQXf2KkEN4LQmtOd/0WsLQwZ08KdFLl3meu/+5bffTrXv8oeHLVHg7EklxPxaL0XljMpa62N7HgaXt8xmw7lCCpnrjS+IqpGXInhFd9kP4KzUoHuF45FS4cig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759157066; c=relaxed/simple;
-	bh=wnYm1RaICD/HsMtH0XRQ2j9XYtopaZXcaO7cvHYkqkA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hOW8cIV8o4ruU9KZpFPxNEyHs1prnZ4Xt6xh1D9B1c/1/v4OdW9aYpZ+l/g/bQeXkKgsdGh30PELAh/jG6NNHVitnYXnkTEChNGSHva/Fl06QifMEtwBYJ/+08bAaDcAVLsLkfdJazcBWabM99AnLnho7jHHIP3dW79T1LxvqeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nWSeSmT7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=HFSQEsWJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nWSeSmT7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=HFSQEsWJ; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1759164722; c=relaxed/simple;
+	bh=GE5S0iUw96f5XBiDFmonxFu1i0m63AW2j8MTE5f1KYw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oYJGYlkBdU3jiSTipnqDnBiSU1jRBsPb4BmzTgK908M7uwXKfiji+isVdkRGFWjg4tQrPtbYU/dcVJ2Gelx4JeSLEwXEg9Ksaq47BDvg/GncfLVteCjOcXlQxhTz7jp4rtquRTghvLfto+MK8vzN0mmNXQN1lghC0SY7RI1jNUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jg8UcI9c; arc=none smtp.client-ip=209.85.160.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nWSeSmT7";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="HFSQEsWJ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nWSeSmT7";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="HFSQEsWJ"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 9353B2059F;
-	Mon, 29 Sep 2025 14:44:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759157060; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tJMOQu11Tfubqunb4EUNA+ShGbeYtjyejSlu2dFdT1w=;
-	b=nWSeSmT7bWiGu9qei4ZWzS0r4KaM5X4SBGtbkI6rb5MsnP56ou0t9KzREtBoW6ycvKyi9M
-	/E6X9DIVpjw8TcYF8ItnlG1HSN4IAIB3HDRNSU1JIBBFNdckIsTeIYF57sQupWMYB2pII5
-	iuFXWEzzvH8AarckteMLPnAjw1E6/Ag=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759157060;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tJMOQu11Tfubqunb4EUNA+ShGbeYtjyejSlu2dFdT1w=;
-	b=HFSQEsWJMAJUGgME4BjDsB3ODlUUYdMEHD+hIGmtqHEwbdwwIeQsHzqXAC46iw1RV6lZ0j
-	4iuu/JWm6hZpePCg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759157060; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tJMOQu11Tfubqunb4EUNA+ShGbeYtjyejSlu2dFdT1w=;
-	b=nWSeSmT7bWiGu9qei4ZWzS0r4KaM5X4SBGtbkI6rb5MsnP56ou0t9KzREtBoW6ycvKyi9M
-	/E6X9DIVpjw8TcYF8ItnlG1HSN4IAIB3HDRNSU1JIBBFNdckIsTeIYF57sQupWMYB2pII5
-	iuFXWEzzvH8AarckteMLPnAjw1E6/Ag=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759157060;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tJMOQu11Tfubqunb4EUNA+ShGbeYtjyejSlu2dFdT1w=;
-	b=HFSQEsWJMAJUGgME4BjDsB3ODlUUYdMEHD+hIGmtqHEwbdwwIeQsHzqXAC46iw1RV6lZ0j
-	4iuu/JWm6hZpePCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1E84E13A21;
-	Mon, 29 Sep 2025 14:44:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id DXPXNUOb2mgmNgAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 29 Sep 2025 14:44:19 +0000
-Date: Mon, 29 Sep 2025 11:44:17 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	henrique.carvalho@suse.com
-Subject: Re: [PATCH 00/20] smb: client: cached dir fixes and improvements
-Message-ID: <lh2xlppdsuytbidpbl4tnua3wy5islx3iqbosy65hud4jo65l3@ysnku7wwx32v>
-References: <20250929132805.220558-1-ematsumiya@suse.de>
- <CAH2r5mtAVB-Bvpf941+zN+DGoYHkX74sESVTVYb7oNVy4Gqfpg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jg8UcI9c"
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-373b7e07182so2373737fac.0
+        for <linux-cifs@vger.kernel.org>; Mon, 29 Sep 2025 09:52:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759164719; x=1759769519; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VRf3ws2hsFMXxF1ZBYoromJxcyiu402w5qbDH5EW7D4=;
+        b=Jg8UcI9cOegJdqlS5kW7JlJg0m0s3AD0sj1zxJ+L61dDMs1UFFlIFjSNpYsVvVdpZF
+         QOl6IY8GxHPm7HbUanR4MkR7KgvDeGCgPfOW+a1YO/Etmo/SKJxvlVJ5yslFVx4YvD6G
+         0jlG3tCbusVSgzCX/O0CfTacbs4vmOOOhQjMymL/DLLAirpeCrWGgZrKU59GJR5HjN8O
+         HMjhAcz84ku1ZRLvJom1DRr7wEBYTp5uFtG6zJKByYIpqNvxnd2+lG/jDBiYNZTUtn4P
+         4CSYOLeGlH/PKK07K7pC/93Mj0AgErFgXooN4jaAPOe4afhsCV/R4EDlorJd01X91r4q
+         qtQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759164719; x=1759769519;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VRf3ws2hsFMXxF1ZBYoromJxcyiu402w5qbDH5EW7D4=;
+        b=agDH/9gllg46i27f75eAN+tpJ7vTETybnWCShY3K/5IfbFTTBzVqeSnKeIcqGkelYz
+         XOTp/7nRl/MCK43vguwehqf61u98pWilV7QXzN+CwbMS3nuAEx+XoNoVY894gY+bh4B/
+         /4deFC618tpnjDjuYSGdZdcDThRTQOnicM6uGJddcr4tUne73AQbUikTHF+3Sz9Q66JO
+         XYxku41NMLph+r4twS7pwfwEC7b0CFcWfOBkcor+ZNw6pbL5tYqds3V0pDcBq2Zkz1HW
+         9LhCaWTHhvq1P6Bh2B3QnUvjLN32QvddRUfQmFeM83uHFix4MJCOlL7bKSwCJKyFgOEw
+         +c4g==
+X-Forwarded-Encrypted: i=1; AJvYcCV679qH3KnMyvhPvkkVAK0sORIOt6r/OApvD1tMiEDFP+2p5iZ+kSkFa5i9tuzgf+hLGNeC5E47m+VZ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzvuz3lVvHCDZr/m/vq1cgA/6AmWInwlm1tJ1lB/lcIUMIRU3GN
+	eq9275BjLp0R+dAAtf4fITHTBtVoM8m3twdJ/6MyNV2LIUg6o5e6AL5hllqLJOIIgj415JPWYyf
+	+7dFUriMotvCsNSS00bHDm5MC8g+q3T4=
+X-Gm-Gg: ASbGnctw0nAxv3ZvZK6tmI1vzPCZEUwNt6y8AjADzc4AbKCNmFZp3Hpz4Gq01Y55YeH
+	F0M0A+pNE7l0w1bQUe57s7MhJqcn+x0aWPyj3u72k1p4pOIDRRtaJd8IjSJRNXCY4N8aeWSqdqp
+	SOPBqTgCmwNKcNJgBSg2c/7FHOYHMg5a2HfCD6Yr6todGUvyzWAtg2eubPq5wm6IM9cWW8JCymx
+	kAFGRX2QC1ORsc=
+X-Google-Smtp-Source: AGHT+IGXl48UWbtqT5y5u9G0/XP9tlOBY/mvAte3nZBmXzXXjk48wbmOdw23qotJ1zdHnX3K8hDzRZPomcR2r8fOkvM=
+X-Received: by 2002:a05:6870:2196:b0:30c:2b4:e332 with SMTP id
+ 586e51a60fabf-35ebee23f95mr8622121fac.2.1759164718823; Mon, 29 Sep 2025
+ 09:51:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+References: <20250916133437.713064-1-ekffu200098@gmail.com>
+ <20250916133437.713064-3-ekffu200098@gmail.com> <CABFDxMFtZKSr5KbqcGQzJWYwT5URUYeuEHJ1a_jDUQPO-OKVGg@mail.gmail.com>
+ <CAOQ4uxgEL=gOpSaSAV_+U=a3W5U5_Uq2Sk4agQhUpL4jHMMQ9w@mail.gmail.com>
+In-Reply-To: <CAOQ4uxgEL=gOpSaSAV_+U=a3W5U5_Uq2Sk4agQhUpL4jHMMQ9w@mail.gmail.com>
+From: Sang-Heon Jeon <ekffu200098@gmail.com>
+Date: Tue, 30 Sep 2025 01:51:47 +0900
+X-Gm-Features: AS18NWA5I_gmSW2eDLRwrg6HsaGAIXnKZtQvA0clEBRUirFsbva_ECh2RjJD6ao
+Message-ID: <CABFDxMG8uLaedhFuWHLAqW75a=TFfVEHkm08uwy76B7w9xbr=w@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/2] smb: client: add directory change tracking via
+ SMB2 Change Notify
+To: Amir Goldstein <amir73il@gmail.com>
+Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	linux-cifs@vger.kernel.org, linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
+	Jan Kara <jack@suse.cz>, Stef Bon <stefbon@gmail.com>, 
+	Ioannis Angelakopoulos <iangelak@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAH2r5mtAVB-Bvpf941+zN+DGoYHkX74sESVTVYb7oNVy4Gqfpg@mail.gmail.com>
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,manguebit.com,gmail.com,microsoft.com,talpey.com,suse.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -3.80
 
-On 09/29, Steve French wrote:
->Looks promising (although wish could be done in smaller stages, easier
->to test and review).
-
-The patch I sent you privately a while ago contained most of these in a
-single patch, and it would be definitely not fun to review.
-
-Also, I keep seeing reviews saying to "split patch into smaller bits for
-easier review", so which one is it?
-
->Do you have any reproducers for the problems it fixes?
-
-Since the issues covered are mostly caused by races, it's hard to come
-up with a reproducer, let alone a reliable one.
-
-I do however can say that we have customer bugs with the following
-backtraces, that inspired all these changes.
-
-Deadlock in open_cached_dir() when smb2_reconnect() is triggered:
-
-> Kernel panic - not syncing: softlockup: hung tasks
-> ...
-> RIP: 0010:native_queued_spin_lock_slowpath+0x2d/0x2c0
-> ...
->  _raw_spin_lock+0x25/0x30
->  smb2_close_cached_fid+0x17/0xc0
->  open_cached_dir+0x8ff/0xb60
->  ? smb2_query_info_compound+0x332/0x5c0
->  smb2_query_info_compound+0x332/0x5c0
->  ? step_into+0x10d/0x690
->  ? path_lookupat+0x98/0x140
->  ? filename_lookup+0x115/0x1c0
->  smb2_queryfs+0x6a/0xf0
->  cifs_statfs+0x9f/0x2b0
->  statfs_by_dentry+0x67/0x90
->  vfs_statfs+0x16/0xd0
->  user_statfs+0x54/0xa0
->  __do_sys_statfs+0x20/0x50
->  do_syscall_64+0x5b/0x80
-
-
-Refcount underflow (UAF) in smb2_query_info_compound():
-
-> refcount_t: underflow; use-after-free.
-> WARNING: CPU: 1 PID: 11224 at ../lib/refcount.c:28 refcount_warn_saturate=
-+0x9c/0x110
-> ...
-> RIP: 0010:refcount_warn_saturate+0x9c/0x110
-> ...
-> Call Trace:
->  <TASK>
->  smb2_query_info_compound+0x29c/0x5c0
->  ? step_into+0x10d/0x690
->  ? __legitimize_path+0x28/0x60
->  smb2_queryfs+0x6a/0xf0
->  smb311_queryfs+0x12d/0x140
->  ? kmem_cache_alloc+0x18a/0x340
->  ? getname_flags+0x46/0x1e0
->  cifs_statfs+0x9f/0x2b0
->  statfs_by_dentry+0x67/0x90
->  vfs_statfs+0x16/0xd0
->  user_statfs+0x54/0xa0
->  __do_sys_statfs+0x20/0x50
->  do_syscall_64+0x58/0x80
-
-While developing the patches, I used xfstests generic/241 (dbench 4
-clients) which makes heavy usage of cached dirs.
-
-If you printk cfid fields at the end of open_cached_dir() when
-rc =3D=3D 0, you should see that it sometimes has been invalidated, and a
-now-closed fid is returned to the caller.
-
-If you mix in random interruptions (ctrl-c or network drops) you should
-end up with similar backtraces as above.
-
->I have been
->worried about tests like generic/011 and generic/013 that fail about
->10-20% of the time (probably due to deferred close issues/races) - and
->hoping that we can get more consistent tests ot repro deferred close
->issues so we don't see them in the future.
-
-Yes, that problem also shows up in generic/241 -- even though running
-dbench standalone is fine, the xfstest unit does a final cleanup of the
-test dir and leads to ENOTEMPTY in the end.
-
-I spent the last 1-2 months debugging this, trying to find a way to fix
-it in this very series, but failed.
-
-
-FWIW, improvement-wise, the pcap for that test, with the series
-applied, shows ~5% less opens and ~14% less lease breaks.
-
-Cheers,
-
-Enzo
-
->On Mon, Sep 29, 2025 at 8:28=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de=
-> wrote:
->>
->> Hi,
->>
->> This patch series aims to refactor cached dir related code in order to
->> improve performance, improve code maintenance/readability, and of course
->> fix several, existing and potential, bugs.
->>
->> Please note that the below only makes sense to the whole series applied.
->>
->> Semantic fixes:
->> - cfid->has_lease vs cfid->is_open: when opening a cached dir, we get a =
-fid
->>   (is_open) and a lease (has_lease), however, has_lease is used differen=
-tly
->>   throughout the code, meaning, most of the time, that the cfid is 'usab=
-le'
->>   (fix in patch 11)
->> - refcounting also follows has_lease, up to a point, when we need to
->>   'steal' the reference, then we might have a cfid with 2 refs but
->>   has_lease =3D=3D false (fix in patches 1-5)
->> - cfid lookup: currently done with open_cached_dir() with @lookup_only a=
-rg,
->>   but that is not visibly good-looking and also highly inflexible (becau=
-se
->>   it only works for paths (char *).
->>
->>
->> Technical fixes:
->> - due to the many "Dentry still in use" bugs, cleaning up a cfid has bec=
-ome
->>   too complex -- there are 3 workers to do that asynchronously, and the
->>   release callback itself.  Complexity aside, this still has bugs because
->>   open_cached_dir() design doesn't account for any concurrent invalidati=
-on,
->>   leading sometimes to double opens/closes, sometimes straight UAF/deadl=
-ock
->>   bugs (examples upon request).
->>   (fix in patches 1-11)
->> - locking: the list lock is not used consistently; sometimes protecting =
-only
->>   the list, sometimes protecting only a cfid, sometimes both.
->>   cfid->fid_lock only protects ->dentry, nothing else.  This leads to
->>   inconsistent data being read when a concurrent invalidation occurs, e.=
-g.
->>   cached_dir_lease_break() (sets ->time =3D 0) vs cifs_dentry_needs_reva=
-l()
->>   (reads ->time unlocked)
->>   * also, open_cached_dir() always assume it has >1 refs, but such
->>     assumption is proven wrong when SMB2_open_init() triggers
->>     smb2_reconnect(), and kref_put() is ran locked in the rc !=3D 0 case,
->>     leading to a deadlock because the extra ref has been dropped async
->>   (both fixed in patch 19 and others)
->>
->> Improvements:
->> Having all above fixes and changes allows a cleaner code with a simpler
->> design:
->> - code readability is improved (cf. whole series)
->> - usage of cached dirs in places that weren't making use of it (cf. patc=
-hes
->>   12-18)
->> - patch 19 (locking) not only fixes the synchronization problems, but RC=
-U +
->>   seqcounting allows faster lookups (read-mostly) while also allowing
->>   consistent reads and stability for callers (prevents UAF)
->> - because a directory is always a parent, bake-in support for when openi=
-ng
->>   a path, ParentLeaseKey can be set for any target child (cf. patch 12)
->>
->>
->> Cheers,
->>
->> Enzo Matsumiya (20):
->>   smb: client: remove cfids_invalidation_worker
->>   smb: client: remove cached_dir_offload_close/close_work
->>   smb: client: remove cached_dir_put_work/put_work
->>   smb: client: remove cached_fids->dying list
->>   smb: client: remove cached_fid->on_list
->>   smb: client: merge {close,invalidate}_all_cached_dirs()
->>   smb: client: merge free_cached_dir in release callback
->>   smb: client: split find_or_create_cached_dir()
->>   smb: client: enhance cached dir lookups
->>   smb: client: refactor dropping cached dirs
->>   smb: client: simplify cached_fid state checking
->>   smb: client: prevent lease breaks of cached parents when opening
->>     children
->>   smb: client: actually use cached dirs on readdir
->>   smb: client: wait for concurrent caching of dirents in cifs_readdir()
->>   smb: client: remove cached_dirent->fattr
->>   smb: client: add is_dir argument to query_path_info
->>   smb: client: use cached dir on queryfs/smb2_compound_op
->>   smb: client: fix dentry revalidation of cached root
->>   smb: client: rework cached dirs synchronization
->>   smb: client: cleanup open_cached_dir()
->>
->>  fs/smb/client/cached_dir.c | 946 ++++++++++++++++---------------------
->>  fs/smb/client/cached_dir.h |  74 +--
->>  fs/smb/client/cifs_debug.c |   7 +-
->>  fs/smb/client/cifsfs.c     |   2 +-
->>  fs/smb/client/cifsglob.h   |   5 +-
->>  fs/smb/client/dir.c        |  27 +-
->>  fs/smb/client/file.c       |   2 +-
->>  fs/smb/client/inode.c      |  38 +-
->>  fs/smb/client/misc.c       |   9 +-
->>  fs/smb/client/readdir.c    | 146 +++---
->>  fs/smb/client/smb1ops.c    |   6 +-
->>  fs/smb/client/smb2inode.c  |  48 +-
->>  fs/smb/client/smb2misc.c   |   2 +-
->>  fs/smb/client/smb2ops.c    |  49 +-
->>  fs/smb/client/smb2pdu.c    |  99 +++-
->>  fs/smb/client/smb2proto.h  |  10 +-
->>  16 files changed, 733 insertions(+), 737 deletions(-)
->>
->> --
->> 2.49.0
->>
+On Sat, Sep 27, 2025 at 5:39=E2=80=AFPM Amir Goldstein <amir73il@gmail.com>=
+ wrote:
 >
+> On Sat, Sep 27, 2025 at 3:03=E2=80=AFAM Sang-Heon Jeon <ekffu200098@gmail=
+.com> wrote:
+> >
+> > On Tue, Sep 16, 2025 at 10:35=E2=80=AFPM Sang-Heon Jeon <ekffu200098@gm=
+ail.com> wrote:
+> > >
+> > > Implement directory change tracking using SMB2 Change Notify protocol
+> > > to enable real-time monitoring of remote directories. Applications us=
+ing
+> > > inotify now receive immediate notifications when files are created,
+> > > deleted, or renamed on SMB2+ shares.
+> > >
+> > > This implementation begins by detecting tracking opportunities during
+> > > regular SMB operations. In the current version, the readdir() serves =
+as
+> > > the detection point - when directory contents are accessed on SMB2+
+> > > servers, we check the inode's fsnotify_mask for active inotify watche=
+s.
+> > > If watches exist and directory is not already being tracked, we obtai=
+n a
+> > > new FiieId and send a SMB2_CHANGE_NOTIFY request that waits for chang=
+es.
+> > >
+> > > Based on the server's response status, we convert CHANGE_NOTIFY respo=
+nse
+> > > to fsnotify events and deliver to application on success, mark for
+> > > future reconnection on network errors, or discard the response and
+> > > marked entries for broken. If tracking can continue, we resend
+> > > SMB2_CHANGE_NOTIFY for continuous monitoring.
+> > >
+> > > Entries marked for reconnection are restored during SMB2 reconnection=
+.
+> > > In the current version, smb2_reconnect() serves as restoration point =
+-
+> > > when connection is reestablished, we obtain new FileIds and request
+> > > Change Notify requests for these entries.
+> > >
+> > > Entries marked for unmount during unmount. In the current version,
+> > > cifs_umount() serves as unmount marking point. Entries marked for cle=
+an
+> > > are remove as soon as possible by the worker. Workers also run
+> > > periodically; currently every 30s; to check and remove untracking
+> > > directories.
+> > >
+> > > This feature is controlled by CONFIG_CIFS_DIR_CHANGE_TRACKING with
+> > > experimental.
+> > >
+> > > Signed-off-by: Sang-Heon Jeon <ekffu200098@gmail.com>
+> > > ---
+> > >  fs/smb/client/Kconfig   |  17 ++
+> > >  fs/smb/client/Makefile  |   2 +
+> > >  fs/smb/client/connect.c |   6 +
+> > >  fs/smb/client/notify.c  | 535 ++++++++++++++++++++++++++++++++++++++=
+++
+> > >  fs/smb/client/notify.h  |  19 ++
+> > >  fs/smb/client/readdir.c |   9 +
+> > >  fs/smb/client/smb2pdu.c |   6 +
+> > >  7 files changed, 594 insertions(+)
+> > >  create mode 100644 fs/smb/client/notify.c
+> > >  create mode 100644 fs/smb/client/notify.h
+> > >
+> > > diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
+> > > index a4c02199fef4..0e3911936e0c 100644
+> > > --- a/fs/smb/client/Kconfig
+> > > +++ b/fs/smb/client/Kconfig
+> > > @@ -218,4 +218,21 @@ config CIFS_COMPRESSION
+> > >           Say Y here if you want SMB traffic to be compressed.
+> > >           If unsure, say N.
+> > >
+> > > ++config CIFS_DIR_CHANGE_TRACKING
+> >
+> > I also found a typo here and I'll fix them.
+> >
+> > > +       bool "Directory change tracking (Experimental)"
+> > > +       depends on CIFS && FSNOTIFY=3Dy
+> > > +       default n
+> > > +       help
+> > > +          Enables automatic tracking of directory changes for SMB2 o=
+r later
+> > > +          using the SMB2 Change Notify protocol. File managers and a=
+pplications
+> > > +          monitoring directories via inotify will receive real-time =
+updates
+> > > +          when files are created, deleted, or renamed on the server.
+> > > +
+> > > +          This feature maintains persistent connections to track cha=
+nges.
+> > > +          Each monitored directory consumes server resources and may=
+ increase
+> > > +          network traffic.
+> > > +
+> > > +          Say Y here if you want real-time directory monitoring.
+> > > +          If unsure, say N.
+> > > +
+> > >  endif
+> > > diff --git a/fs/smb/client/Makefile b/fs/smb/client/Makefile
+> > > index 4c97b31a25c2..85253bc1b4b0 100644
+> > > --- a/fs/smb/client/Makefile
+> > > +++ b/fs/smb/client/Makefile
+> > > @@ -35,3 +35,5 @@ cifs-$(CONFIG_CIFS_ROOT) +=3D cifsroot.o
+> > >  cifs-$(CONFIG_CIFS_ALLOW_INSECURE_LEGACY) +=3D smb1ops.o cifssmb.o c=
+ifstransport.o
+> > >
+> > >  cifs-$(CONFIG_CIFS_COMPRESSION) +=3D compress.o compress/lz77.o
+> > > +
+> > > +cifs-$(CONFIG_CIFS_DIR_CHANGE_TRACKING) +=3D notify.o
+> > > diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+> > > index dd12f3eb61dc..eebf729df16a 100644
+> > > --- a/fs/smb/client/connect.c
+> > > +++ b/fs/smb/client/connect.c
+> > > @@ -51,6 +51,9 @@
+> > >  #endif
+> > >  #include "fs_context.h"
+> > >  #include "cifs_swn.h"
+> > > +#ifdef CONFIG_CIFS_DIR_CHANGE_TRACKING
+> > > +#include "notify.h"
+> > > +#endif
+> > >
+> > >  /* FIXME: should these be tunable? */
+> > >  #define TLINK_ERROR_EXPIRE     (1 * HZ)
+> > > @@ -4154,6 +4157,9 @@ cifs_umount(struct cifs_sb_info *cifs_sb)
+> > >         cancel_delayed_work_sync(&cifs_sb->prune_tlinks);
+> > >
+> > >         if (cifs_sb->master_tlink) {
+> > > +#ifdef CONFIG_CIFS_DIR_CHANGE_TRACKING
+> > > +               stop_track_sb_dir_changes(cifs_sb);
+> > > +#endif
+> > >                 tcon =3D cifs_sb->master_tlink->tl_tcon;
+> > >                 if (tcon) {
+> > >                         spin_lock(&tcon->sb_list_lock);
+> > > diff --git a/fs/smb/client/notify.c b/fs/smb/client/notify.c
+> > > new file mode 100644
+> > > index 000000000000..e38345965744
+> > > --- /dev/null
+> > > +++ b/fs/smb/client/notify.c
+> > > @@ -0,0 +1,535 @@
+> > > +// SPDX-License-Identifier: GPL-2.0
+> > > +/*
+> > > + * Directory change notification tracking for SMB
+> > > + *
+> > > + * Copyright (c) 2025, Sang-Heon Jeon <ekffu200098@gmail.com>
+> > > + *
+> > > + * References:
+> > > + * MS-SMB2 "2.2.35 SMB2 CHANGE_NOTIFY Request"
+> > > + * MS-SMB2 "2.2.36 SMB2 CHANGE_NOTIFY Response"
+> > > + * MS-SMB2 "2.7.1 FILE_NOTIFY_INFORMATION"
+> > > + * MS-SMB2 "3.3.5.19 Receiving and SMB2 CHANGE_NOTIFY Request"
+> > > + * MS-FSCC "2.6 File Attributes"
+> > > + */
+> > > +
+> > > +#include <linux/list.h>
+> > > +#include <linux/slab.h>
+> > > +#include <linux/fsnotify.h>
+> > > +#include "notify.h"
+> > > +#include "cifsproto.h"
+> > > +#include "smb2proto.h"
+> > > +#include "cached_dir.h"
+> > > +#include "cifs_debug.h"
+> > > +#include "cifspdu.h"
+> > > +#include "cifs_unicode.h"
+> > > +#include "../common/smb2pdu.h"
+> > > +#include "../common/smb2status.h"
+> > > +
+> > > +#define CLEANUP_INTERVAL (30 * HZ)
+> > > +#define CLEANUP_IMMEDIATE 0
+> > > +
+> > > +enum notify_state {
+> > > +       NOTIFY_STATE_RECONNECT =3D BIT(0),
+> > > +       NOTIFY_STATE_UMOUNT =3D BIT(1),
+> > > +       NOTIFY_STATE_NOMASK =3D BIT(2),
+> > > +       NOTIFY_STATE_BROKEN_REQ =3D BIT(3),
+> > > +       NOTIFY_STATE_BROKEN_RSP =3D BIT(4),
+> > > +};
+> > > +
+> > > +struct notify_info {
+> > > +       struct inode *inode;
+> > > +       const char *path;
+> > > +       __le16 *utf16_path;
+> > > +       struct cifs_fid cifs_fid;
+> > > +       atomic_t state;
+> > > +       struct list_head list;
+> > > +};
+> > > +
+> > > +static int request_change_notify(struct notify_info *info);
+> > > +static void notify_cleanup_worker(struct work_struct *work);
+> > > +
+> > > +static LIST_HEAD(notify_list);
+> > > +static DEFINE_SPINLOCK(notify_list_lock);
+> > > +static DECLARE_DELAYED_WORK(notify_cleanup_work, notify_cleanup_work=
+er);
+> > > +
+> > > +static bool is_resumeable(struct notify_info *info)
+> > > +{
+> > > +       return atomic_read(&info->state) =3D=3D NOTIFY_STATE_RECONNEC=
+T;
+> > > +}
+> > > +
+> > > +static bool is_active(struct notify_info *info)
+> > > +{
+> > > +       return atomic_read(&info->state) =3D=3D 0;
+> > > +}
+> > > +
+> > > +static void set_state(struct notify_info *info, int state)
+> > > +{
+> > > +       atomic_or(state, &info->state);
+> > > +       if (!is_resumeable(info))
+> > > +               mod_delayed_work(cifsiod_wq, &notify_cleanup_work,
+> > > +                       CLEANUP_IMMEDIATE);
+> > > +}
+> > > +
+> > > +static void clear_state(struct notify_info *info, int state)
+> > > +{
+> > > +       atomic_and(~state, &info->state);
+> > > +}
+> > > +
+> > > +static int fsnotify_send(__u32 mask,
+> > > +                        struct inode *parent,
+> > > +                        struct file_notify_information *fni,
+> > > +                        u32 cookie)
+> > > +{
+> > > +       char *name =3D cifs_strndup_from_utf16(fni->FileName,
+> > > +                               le32_to_cpu(fni->FileNameLength), tru=
+e,
+> > > +                               CIFS_SB(parent->i_sb)->local_nls);
+> > > +       struct qstr qstr;
+> > > +       int rc =3D 0;
+> > > +
+> > > +       if (!name)
+> > > +               return -ENOMEM;
+> > > +
+> > > +       qstr.name =3D (const unsigned char *)name;
+> > > +       qstr.len =3D strlen(name);
+> > > +
+> > > +       rc =3D fsnotify_name(mask, NULL, FSNOTIFY_EVENT_NONE, parent,
+> > > +                       &qstr, cookie);
+> > > +       cifs_dbg(FYI, "fsnotify mask=3D%u, name=3D%s, cookie=3D%u, w/=
+return=3D%d",
+> > > +               mask, name, cookie, rc);
+> > > +       kfree(name);
+> > > +       return rc;
+> > > +}
+> > > +
+> > > +static bool is_fsnotify_masked(struct inode *inode)
+> > > +{
+> > > +       if (!inode)
+> > > +               return false;
+> > > +
+> > > +       /* Minimal validation of file explore inotify */
+> > > +       return inode->i_fsnotify_mask &
+> > > +               (FS_CREATE | FS_DELETE | FS_MOVED_FROM | FS_MOVED_TO)=
+;
+> > > +}
+> > > +
+> > > +static void handle_file_notify_information(struct notify_info *info,
+> > > +                                          char *buf,
+> > > +                                          unsigned int buf_len)
+> > > +{
+> > > +       struct file_notify_information *fni;
+> > > +       unsigned int next_entry_offset;
+> > > +       u32 cookie;
+> > > +       bool has_cookie =3D false;
+> > > +
+> > > +       do {
+> > > +               fni =3D (struct file_notify_information *)buf;
+> > > +               next_entry_offset =3D le32_to_cpu(fni->NextEntryOffse=
+t);
+> > > +               if (next_entry_offset > buf_len) {
+> > > +                       cifs_dbg(FYI, "invalid fni->NextEntryOffset=
+=3D%u",
+> > > +                               next_entry_offset);
+> > > +                       break;
+> > > +               }
+> > > +
+> > > +               switch (le32_to_cpu(fni->Action)) {
+> > > +               case FILE_ACTION_ADDED:
+> > > +                       fsnotify_send(FS_CREATE, info->inode, fni, 0)=
+;
+> > > +                       break;
+> > > +               case FILE_ACTION_REMOVED:
+> > > +                       fsnotify_send(FS_DELETE, info->inode, fni, 0)=
+;
+> > > +                       break;
+> > > +               case FILE_ACTION_RENAMED_OLD_NAME:
+> > > +                       if (!has_cookie)
+> > > +                               cookie =3D fsnotify_get_cookie();
+> > > +                       has_cookie =3D !has_cookie;
+> > > +                       fsnotify_send(FS_MOVED_FROM, info->inode, fni=
+, cookie);
+> > > +                       break;
+> > > +               case FILE_ACTION_RENAMED_NEW_NAME:
+> > > +                       if (!has_cookie)
+> > > +                               cookie =3D fsnotify_get_cookie();
+> > > +                       has_cookie =3D !has_cookie;
+> > > +                       fsnotify_send(FS_MOVED_TO, info->inode, fni, =
+cookie);
+> > > +                       break;
+> > > +               default:
+> > > +                       /* Does not occur, so no need to handle */
+> > > +                       break;
+> > > +               }
+> > > +
+> > > +               buf +=3D next_entry_offset;
+> > > +               buf_len -=3D next_entry_offset;
+> > > +       } while (buf_len > 0 && next_entry_offset > 0);
+> > > +}
+> > > +
+> > > +static void handle_smb2_change_notify_rsp(struct notify_info *info,
+> > > +                                         struct mid_q_entry *mid)
+> > > +{
+> > > +       struct smb2_change_notify_rsp *rsp =3D mid->resp_buf;
+> > > +       struct kvec rsp_iov;
+> > > +       unsigned int buf_offset, buf_len;
+> > > +       int rc;
+> > > +
+> > > +       switch (rsp->hdr.Status) {
+> > > +       case STATUS_SUCCESS:
+> > > +               break;
+> > > +       case STATUS_NOTIFY_ENUM_DIR:
+> > > +               goto proceed;
+> > > +       case STATUS_USER_SESSION_DELETED:
+> > > +       case STATUS_NETWORK_NAME_DELETED:
+> > > +       case STATUS_NETWORK_SESSION_EXPIRED:
+> > > +               set_state(info, NOTIFY_STATE_RECONNECT);
+> > > +               return;
+> > > +       default:
+> > > +               set_state(info, NOTIFY_STATE_BROKEN_RSP);
+> > > +               return;
+> > > +       }
+> > > +
+> > > +       rsp_iov.iov_base =3D mid->resp_buf;
+> > > +       rsp_iov.iov_len =3D mid->resp_buf_size;
+> > > +       buf_offset =3D le16_to_cpu(rsp->OutputBufferOffset);
+> > > +       buf_len =3D le32_to_cpu(rsp->OutputBufferLength);
+> > > +
+> > > +       rc =3D smb2_validate_iov(buf_offset, buf_len, &rsp_iov,
+> > > +                               sizeof(struct file_notify_information=
+));
+> > > +       if (rc) {
+> > > +               cifs_dbg(FYI, "stay tracking, w/smb2_validate_iov=3D%=
+d", rc);
+> > > +               goto proceed;
+> > > +       }
+> > > +
+> > > +       handle_file_notify_information(info,
+> > > +               (char *)rsp + buf_offset, buf_len);
+> > > +proceed:
+> > > +       request_change_notify(info);
+> > > +       return;
+> > > +}
+> > > +
+> > > +static void change_notify_callback(struct mid_q_entry *mid)
+> > > +{
+> > > +       struct notify_info *info =3D mid->callback_data;
+> > > +
+> > > +       if (!is_active(info))
+> > > +               return;
+> > > +
+> > > +       if (!is_fsnotify_masked(info->inode)) {
+> > > +               set_state(info, NOTIFY_STATE_NOMASK);
+> > > +               return;
+> > > +       }
+> > > +
+> > > +       if (!mid->resp_buf) {
+> > > +               if (mid->mid_state !=3D MID_RETRY_NEEDED) {
+> > > +                       cifs_dbg(FYI, "stop tracking, w/mid_state=3D%=
+d",
+> > > +                               mid->mid_state);
+> > > +                       set_state(info, NOTIFY_STATE_BROKEN_RSP);
+> > > +                       return;
+> > > +               }
+> > > +
+> > > +               set_state(info, NOTIFY_STATE_RECONNECT);
+> > > +               return;
+> > > +       }
+> > > +
+> > > +       handle_smb2_change_notify_rsp(info, mid);
+> > > +}
+> > > +
+> > > +static int request_change_notify(struct notify_info *info)
+> > > +{
+> > > +       struct cifs_sb_info *cifs_sb =3D CIFS_SB(info->inode->i_sb);
+> > > +       struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
+> > > +       struct smb_rqst rqst;
+> > > +       struct kvec iov[1];
+> > > +       unsigned int xid;
+> > > +       int rc;
+> > > +
+> > > +       if (!tcon) {
+> > > +               cifs_dbg(FYI, "missing tcon while request change noti=
+fy");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +
+> > > +       memset(&rqst, 0, sizeof(struct smb_rqst));
+> > > +       memset(&iov, 0, sizeof(iov));
+> > > +       rqst.rq_iov =3D iov;
+> > > +       rqst.rq_nvec =3D 1;
+> > > +
+> > > +       xid =3D get_xid();
+> > > +       rc =3D SMB2_notify_init(xid, &rqst, tcon, tcon->ses->server,
+> > > +               info->cifs_fid.persistent_fid, info->cifs_fid.volatil=
+e_fid,
+> > > +               FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR=
+_NAME,
+> > > +               false);
+> > > +       free_xid(xid);
+> > > +       if (rc) {
+> > > +               set_state(info, NOTIFY_STATE_BROKEN_REQ);
+> > > +               return rc;
+> > > +       }
+> > > +
+> > > +       rc =3D cifs_call_async(tcon->ses->server, &rqst, NULL,
+> > > +               change_notify_callback, NULL, info, 0, NULL);
+> > > +       cifs_small_buf_release(rqst.rq_iov[0].iov_base);
+> > > +
+> > > +       if (rc)
+> > > +               set_state(info, NOTIFY_STATE_BROKEN_REQ);
+> > > +       return rc;
+> > > +}
+> > > +
+> > > +
+> > > +static void free_notify_info(struct notify_info *info)
+> > > +{
+> > > +       kfree(info->utf16_path);
+> > > +       kfree(info->path);
+> > > +       kfree(info);
+> > > +}
+> > > +
+> > > +static void cleanup_pending_mid(struct notify_info *info,
+> > > +                               struct cifs_tcon *tcon)
+> > > +{
+> > > +       LIST_HEAD(dispose_list);
+> > > +       struct TCP_Server_Info *server;
+> > > +       struct mid_q_entry *mid, *nmid;
+> > > +
+> > > +       if (!tcon->ses || !tcon->ses->server)
+> > > +               return;
+> > > +
+> > > +       server =3D tcon->ses->server;
+> > > +
+> > > +       spin_lock(&server->mid_queue_lock);
+> > > +       list_for_each_entry_safe(mid, nmid, &server->pending_mid_q, q=
+head) {
+> > > +               if (mid->callback_data =3D=3D info) {
+> > > +                       mid->deleted_from_q =3D true;
+> > > +                       list_move(&mid->qhead, &dispose_list);
+> > > +               }
+> > > +       }
+> > > +       spin_unlock(&server->mid_queue_lock);
+> > > +
+> > > +       list_for_each_entry_safe(mid, nmid, &dispose_list, qhead) {
+> > > +               list_del_init(&mid->qhead);
+> > > +               release_mid(mid);
+> > > +       }
+> > > +}
+> > > +
+> > > +static void close_fid(struct notify_info *info)
+> > > +{
+> > > +       struct cifs_tcon *tcon;
+> > > +
+> > > +       unsigned int xid;
+> > > +       int rc;
+> > > +
+> > > +       if (!info->cifs_fid.persistent_fid && !info->cifs_fid.volatil=
+e_fid)
+> > > +               return;
+> > > +
+> > > +       tcon =3D cifs_sb_master_tcon(CIFS_SB(info->inode->i_sb));
+> > > +       if (!tcon) {
+> > > +               cifs_dbg(FYI, "missing master tcon while close");
+> > > +               return;
+> > > +       }
+> > > +
+> > > +       xid =3D get_xid();
+> > > +       rc =3D SMB2_close(xid, tcon, info->cifs_fid.persistent_fid,
+> > > +               info->cifs_fid.volatile_fid);
+> > > +       if (rc) {
+> > > +               cifs_dbg(FYI, "cleanup pending mid, w/SMB2_close=3D%d=
+", rc);
+> > > +               cleanup_pending_mid(info, tcon);
+> > > +       }
+> > > +       free_xid(xid);
+> > > +}
+> > > +
+> > > +static int setup_fid(struct notify_info *info)
+> > > +{
+> > > +       struct cifs_sb_info *cifs_sb =3D CIFS_SB(info->inode->i_sb);
+> > > +       struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
+> > > +       struct cifs_open_parms oparms;
+> > > +       __u8 oplock =3D 0;
+> > > +       unsigned int xid;
+> > > +       int rc =3D 0;
+> > > +
+> > > +       if (!tcon) {
+> > > +               cifs_dbg(FYI, "missing master tcon while open");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +
+> > > +       xid =3D get_xid();
+> > > +       oparms =3D (struct cifs_open_parms) {
+> > > +               .tcon =3D tcon,
+> > > +               .path =3D info->path,
+> > > +               .desired_access =3D GENERIC_READ,
+> > > +               .disposition =3D FILE_OPEN,
+> > > +               .create_options =3D cifs_create_options(cifs_sb, 0),
+> > > +               .fid =3D &info->cifs_fid,
+> > > +               .cifs_sb =3D cifs_sb,
+> > > +               .reconnect =3D false,
+> > > +       };
+> > > +       rc =3D SMB2_open(xid, &oparms, info->utf16_path, &oplock,
+> > > +                       NULL, NULL, NULL, NULL);
+> > > +       free_xid(xid);
+> > > +       return rc;
+> > > +}
+> > > +
+> > > +static bool is_already_tracking(struct inode *dir_inode)
+> > > +{
+> > > +       struct notify_info *entry, *nentry;
+> > > +
+> > > +       spin_lock(&notify_list_lock);
+> > > +       list_for_each_entry_safe(entry, nentry, &notify_list, list) {
+> > > +               if (is_active(entry)) {
+> > > +                       if (entry->inode =3D=3D dir_inode) {
+> > > +                               spin_unlock(&notify_list_lock);
+> > > +                               return true;
+> > > +                       }
+> > > +
+> > > +                       /* Extra check since we must keep iterating *=
+/
+> > > +                       if (!is_fsnotify_masked(entry->inode))
+> > > +                               set_state(entry, NOTIFY_STATE_NOMASK)=
+;
+> > > +               }
+> > > +       }
+> > > +       spin_unlock(&notify_list_lock);
+> > > +
+> > > +       return false;
+> > > +}
+> > > +
+> > > +static bool is_tracking_supported(struct cifs_sb_info *cifs_sb)
+> > > +{
+> > > +       struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
+> > > +
+> > > +       if (!tcon->ses || !tcon->ses->server)
+> > > +               return false;
+> > > +       return tcon->ses->server->dialect >=3D SMB20_PROT_ID;
+> > > +}
+> > > +
+> > > +int start_track_dir_changes(const char *path,
+> > > +                           struct inode *dir_inode,
+> > > +                           struct cifs_sb_info *cifs_sb)
+> > > +{
+> > > +       struct notify_info *info;
+> > > +       int rc;
+> > > +
+> > > +       if (!is_tracking_supported(cifs_sb))
+> > > +               return -EINVAL;
+> > > +
+> > > +       if (!is_fsnotify_masked(dir_inode))
+> > > +               return -EINVAL;
+> > > +
+> > > +       if (is_already_tracking(dir_inode))
+> > > +               return 1;
+> > > +
+> > > +       info =3D kzalloc(sizeof(*info), GFP_KERNEL);
+> > > +       if (!info)
+> > > +               return -ENOMEM;
+> > > +
+> > > +       info->path =3D kstrdup(path, GFP_KERNEL);
+> > > +       if (!info->path) {
+> > > +               free_notify_info(info);
+> > > +               return -ENOMEM;
+> > > +       }
+> > > +       info->utf16_path =3D cifs_convert_path_to_utf16(path, cifs_sb=
+);
+> > > +       if (!info->utf16_path) {
+> > > +               free_notify_info(info);
+> > > +               return -ENOMEM;
+> > > +       }
+> > > +       info->inode =3D dir_inode;
+> > > +
+> > > +       rc =3D setup_fid(info);
+> > > +       if (rc) {
+> > > +               free_notify_info(info);
+> > > +               return rc;
+> > > +       }
+> > > +       rc =3D request_change_notify(info);
+> > > +       if (rc) {
+> > > +               close_fid(info);
+> > > +               free_notify_info(info);
+> > > +               return rc;
+> > > +       }
+> > > +
+> > > +       spin_lock(&notify_list_lock);
+> > > +       list_add(&info->list, &notify_list);
+> > > +       spin_unlock(&notify_list_lock);
+> > > +       return rc;
+> > > +}
+> > > +
+> > > +void stop_track_sb_dir_changes(struct cifs_sb_info *cifs_sb)
+> > > +{
+> > > +       struct notify_info *entry, *nentry;
+> > > +
+> > > +       if (!list_empty(&notify_list)) {
+> > > +               spin_lock(&notify_list_lock);
+> > > +               list_for_each_entry_safe(entry, nentry, &notify_list,=
+ list) {
+> > > +                       if (cifs_sb =3D=3D CIFS_SB(entry->inode->i_sb=
+)) {
+> > > +                               set_state(entry, NOTIFY_STATE_UMOUNT)=
+;
+> > > +                               continue;
+> > > +                       }
+> > > +
+> > > +                       /* Extra check since we must keep iterating *=
+/
+> > > +                       if (!is_fsnotify_masked(entry->inode))
+> > > +                               set_state(entry, NOTIFY_STATE_NOMASK)=
+;
+> > > +               }
+> > > +               spin_unlock(&notify_list_lock);
+> > > +       }
+> > > +}
+> > > +
+> > > +void resume_track_dir_changes(void)
+> > > +{
+> > > +       LIST_HEAD(resume_list);
+> > > +       struct notify_info *entry, *nentry;
+> > > +       struct cifs_tcon *tcon;
+> > > +
+> > > +       if (list_empty(&notify_list))
+> > > +               return;
+> > > +
+> > > +       spin_lock(&notify_list_lock);
+> > > +       list_for_each_entry_safe(entry, nentry, &notify_list, list) {
+> > > +               if (!is_fsnotify_masked(entry->inode)) {
+> > > +                       set_state(entry, NOTIFY_STATE_NOMASK);
+> > > +                       continue;
+> > > +               }
+> > > +
+> > > +               if (is_resumeable(entry)) {
+> > > +                       tcon =3D cifs_sb_master_tcon(CIFS_SB(entry->i=
+node->i_sb));
+> > > +                       spin_lock(&tcon->tc_lock);
+> > > +                       if (tcon->status =3D=3D TID_GOOD) {
+> > > +                               spin_unlock(&tcon->tc_lock);
+> > > +                               list_move(&entry->list, &resume_list)=
+;
+> > > +                               continue;
+> > > +                       }
+> > > +                       spin_unlock(&tcon->tc_lock);
+> > > +               }
+> > > +       }
+> > > +       spin_unlock(&notify_list_lock);
+> > > +
+> > > +       list_for_each_entry_safe(entry, nentry, &resume_list, list) {
+> > > +               if (setup_fid(entry)) {
+> > > +                       list_del(&entry->list);
+> > > +                       free_notify_info(entry);
+> > > +                       continue;
+> > > +               }
+> > > +
+> > > +               if (request_change_notify(entry)) {
+> > > +                       list_del(&entry->list);
+> > > +                       close_fid(entry);
+> > > +                       free_notify_info(entry);
+> > > +                       continue;
+> > > +               }
+> > > +
+> > > +               clear_state(entry, NOTIFY_STATE_RECONNECT);
+> > > +       }
+> > > +
+> > > +       if (!list_empty(&resume_list)) {
+> > > +               spin_lock(&notify_list_lock);
+> > > +               list_splice(&resume_list, &notify_list);
+> > > +               spin_unlock(&notify_list_lock);
+> > > +       }
+> > > +}
+> > > +
+> > > +static void notify_cleanup_worker(struct work_struct *work)
+> > > +{
+> > > +       LIST_HEAD(cleanup_list);
+> > > +       struct notify_info *entry, *nentry;
+> > > +
+> > > +       if (list_empty(&notify_list))
+> > > +               return;
+> > > +
+> > > +       spin_lock(&notify_list_lock);
+> > > +       list_for_each_entry_safe(entry, nentry, &notify_list, list) {
+> > > +               if (!is_resumeable(entry) && !is_active(entry))
+> > > +                       list_move(&entry->list, &cleanup_list);
+> > > +       }
+> > > +       spin_unlock(&notify_list_lock);
+> > > +
+> > > +       list_for_each_entry_safe(entry, nentry, &cleanup_list, list) =
+{
+> > > +               list_del(&entry->list);
+> > > +               close_fid(entry);
+> > > +               free_notify_info(entry);
+> > > +       }
+> > > +       mod_delayed_work(cifsiod_wq, &notify_cleanup_work, CLEANUP_IN=
+TERVAL);
+> > > +}
+> > > diff --git a/fs/smb/client/notify.h b/fs/smb/client/notify.h
+> > > new file mode 100644
+> > > index 000000000000..088efba4dce9
+> > > --- /dev/null
+> > > +++ b/fs/smb/client/notify.h
+> > > @@ -0,0 +1,19 @@
+> > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > +/*
+> > > + * Directory change notification tracking for SMB
+> > > + *
+> > > + * Copyright (c) 2025, Sang-Heon Jeon <ekffu200098@gmail.com>
+> > > + */
+> > > +
+> > > +#ifndef _SMB_NOTIFY_H
+> > > +#define _SMB_NOTIFY_H
+> > > +
+> > > +#include "cifsglob.h"
+> > > +
+> > > +int start_track_dir_changes(const char *path,
+> > > +                           struct inode *dir_inode,
+> > > +                           struct cifs_sb_info *cifs_sb);
+> > > +void stop_track_sb_dir_changes(struct cifs_sb_info *cifs_sb);
+> > > +void resume_track_dir_changes(void);
+> > > +
+> > > +#endif /* _SMB_NOTIFY_H */
+> > > diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
+> > > index 4e5460206397..455e5be37116 100644
+> > > --- a/fs/smb/client/readdir.c
+> > > +++ b/fs/smb/client/readdir.c
+> > > @@ -24,6 +24,9 @@
+> > >  #include "fs_context.h"
+> > >  #include "cached_dir.h"
+> > >  #include "reparse.h"
+> > > +#ifdef CONFIG_CIFS_DIR_CHANGE_TRACKING
+> > > +#include "notify.h"
+> > > +#endif
+> > >
+> > >  /*
+> > >   * To be safe - for UCS to UTF-8 with strings loaded with the rare l=
+ong
+> > > @@ -1070,6 +1073,9 @@ int cifs_readdir(struct file *file, struct dir_=
+context *ctx)
+> > >         if (rc)
+> > >                 goto cache_not_found;
+> > >
+> > > +#ifdef CONFIG_CIFS_DIR_CHANGE_TRACKING
+> > > +       start_track_dir_changes(full_path, d_inode(file_dentry(file))=
+, cifs_sb);
+> > > +#endif
+> > >         mutex_lock(&cfid->dirents.de_mutex);
+> > >         /*
+> > >          * If this was reading from the start of the directory
+> > > @@ -1151,6 +1157,9 @@ int cifs_readdir(struct file *file, struct dir_=
+context *ctx)
+> > >                 cifs_dbg(FYI, "Could not find entry\n");
+> > >                 goto rddir2_exit;
+> > >         }
+> > > +#ifdef CONFIG_CIFS_DIR_CHANGE_TRACKING
+> > > +       start_track_dir_changes(full_path, d_inode(file_dentry(file))=
+, cifs_sb);
+> > > +#endif
+> > >         cifs_dbg(FYI, "loop through %d times filling dir for net buf =
+%p\n",
+> > >                  num_to_fill, cifsFile->srch_inf.ntwrk_buf_start);
+> > >         max_len =3D tcon->ses->server->ops->calc_smb_size(
+> > > diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> > > index 4e922cb32110..58a1ddc39ee6 100644
+> > > --- a/fs/smb/client/smb2pdu.c
+> > > +++ b/fs/smb/client/smb2pdu.c
+> > > @@ -45,6 +45,9 @@
+> > >  #include "cached_dir.h"
+> > >  #include "compress.h"
+> > >  #include "fs_context.h"
+> > > +#ifdef CONFIG_CIFS_DIR_CHANGE_TRACKING
+> > > +#include "notify.h"
+> > > +#endif
+> > >
+> > >  /*
+> > >   *  The following table defines the expected "StructureSize" of SMB2=
+ requests
+> > > @@ -466,6 +469,9 @@ smb2_reconnect(__le16 smb2_command, struct cifs_t=
+con *tcon,
+> > >                 mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
+> > >
+> > >         atomic_inc(&tconInfoReconnectCount);
+> > > +#ifdef CONFIG_CIFS_DIR_CHANGE_TRACKING
+> > > +       resume_track_dir_changes();
+> > > +#endif
+> > >  out:
+> > >         /*
+> > >          * Check if handle based operation so we know whether we can =
+continue
+> > > --
+> > > 2.43.0
+> > >
+> >
+> > To Reviewers.
+> >
+> > This is a gentle reminder on review requests.
+> >
+> > I would be very grateful for your feedback and am more than willing to
+> > revise or improve any parts as needed. And also, let me know if I
+> > missed anything or made mistakes.
 >
->--=20
->Thanks,
+> Hi Sang,
+
+Hello, Amir
+
+> First feedback (value):
+> -----------------------------
+> This looks very useful. this feature has been requested and
+> attempted several times in the past (see links below), so if you are
+> willing to incorporate feedback, I hope you will reach further than those
+> past attempts and I will certainly do my best to help you with that.
+
+Thanks for your kind comment. I'm really glad to hear that.
+
+> Second feedback (reviewers):
+> ----------------------------------------
+> I was very surprised that your patch doesn't touch any vfs code
+> (more on that on design feedback), but this is not an SMB-contained
+> change at all.
+
+I agree with your last comment. I think it might not be easy;
+honestly, I may know less than
+Ioannis or Vivek; but I'm fully committed to giving it a try, no
+matter the challenge.
+
+> Your patch touches the guts of the fsnotify subsystem (in a wrong way).
+> For the next posting please consult the MAINTAINERS entry
+> of the fsnotify subsystem for reviewers and list to CC (now added).
+
+I see. I'll keep it in my mind.
+
+> Third feedback (design):
+> --------------------------------
+> The design choice of polling i_fsnotify_mask on readdir()
+> is quite odd and it is not clear to me why it makes sense.
+> Previous discussions suggested to have a filesystem method
+> to update when applications setup a watch on a directory [1].
+> Another prior feedback was that the API should allow a clear
+> distinction between the REMOTE notifications and the LOCAL
+> notifications [2][3].
+
+Current design choice is a workaround for setting an appropriate add
+watch point (as well as remove). I don't want to stick to the RFC
+design. Also, The point that I considered important is similar to
+Ioannis' one: compatible with existing applications.
+
+> IMO it would be better to finalize the design before working on the
+> code, but that's up to you.
+
+I agree, although it's quite hard to create a perfect blueprint, but
+it might be better to draw to some extent.
+
+Based on my current understanding, I think we need to do the following thin=
+gs.
+- design more compatible and general fsnotify API for all network fs;
+should process LOCAL and REMOTE both smoothly.
+- expand inotify (if needed, fanotify both) flow with new fsnotify API
+- replace SMB2 change_notify start/end point to new API
+
+Let me know if I missed or misunderstood something. And also please
+give me some time to read attached threads more deeply and clean up my
+thoughts and questions.
+
+> Good luck,
+> Amir.
 >
->Steve
+> [1] https://lore.kernel.org/linux-fsdevel/20211025204634.2517-4-iangelak@=
+redhat.com/
+> [2] https://sourceforge.net/p/fuse/mailman/message/58719889/
+> [3] https://lore.kernel.org/linux-fsdevel/YhpY%2FzZe3UA2u3fj@redhat.com/
+
+Best Regards,
+Sang-Heon Jeon
