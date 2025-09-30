@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39049205E3B;
-	Tue, 30 Sep 2025 15:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052A3306B0C;
+	Tue, 30 Sep 2025 15:27:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759245718; cv=none; b=nEerdgL9TwJUDFD5gUeq64LpBLKlCGe3vcHz3ON86JxV8GoqlkQFCLhxP304Yk7SqFoDgNSP+HkFGoY67ielyGBM/F9aDYP2hf2awa55JP9F4NPK2iNBzRjl9ZZiBkCouoHAP0CYTx5GCGuakAG9yaZEjcTdtiGulbwgAdvjfE8=
+	t=1759246059; cv=none; b=psEm9ZBNHUDeY4rJg2HPZVX7n1kpVJwhhsNkdAu2Xb9a6au6TYI/HKkwr5j1dsa72R5hVa7fu0hiQ59odFfqf1bPggKh6QPT/1K5cevGAjITQaxMcPPjXA9BTbcCnH5rI4fwNlwt9fAMmfMgGdzvX6RJ1ko8TKM7x4F0w/XYFcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759245718; c=relaxed/simple;
-	bh=e3LhdmCnmHKP+Qd/lhEJFrbMenFHkYyiuFr1/W6EDc0=;
+	s=arc-20240116; t=1759246059; c=relaxed/simple;
+	bh=BSk4Kj7pKCJ+Lsf4bYAxMNhsMeCYf6iDGbRDWUlnm/Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C4u8CM0Wq1H0wy2X2IRZLbkzU0huFgugQsA2uF0K6rSN4P41OV0Sf1z+FbRuwGfa6uGKygYPLbPco0Bd580j+/rmfEH98yWrZ7H8C/j7r3MZ4vmnX2UPHPJq8R1DAdORIVrGVtWJkpftpj1lDkKBE0uJGuNOBqnL/JS4ozfq8f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=cn+jIIoj; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=t4XNtl99fGchemHCppnxr4cC1Ilj2lGWKfliui1lbvGSxn0UyIyZtpHrH9BuBJZlok2txaV0/vtc1XC0jKZn+TjTvnH4jyBNS3Gm+s6mJtRNxPpsEH5qAB43vpVix2Z0xc7Sc0M+ie3DehpeXI6C2JioM8uHXl1gOuBs6HBEg9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=A5I6/R40; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="cn+jIIoj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B370BC116C6;
-	Tue, 30 Sep 2025 15:21:57 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="A5I6/R40"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69244C4CEF0;
+	Tue, 30 Sep 2025 15:27:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1759245718;
-	bh=e3LhdmCnmHKP+Qd/lhEJFrbMenFHkYyiuFr1/W6EDc0=;
+	s=korg; t=1759246058;
+	bh=BSk4Kj7pKCJ+Lsf4bYAxMNhsMeCYf6iDGbRDWUlnm/Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cn+jIIojtt85uiZU6fo0yWIILivnS+cSgi75P/qK/JJTZYVbqRCaehpsnqyaLDDLM
-	 NNCw44vqFGZWsebNkVZUvHdOXFwi5jx+DEBrj4368BDMnfF7nTLaahElTE34Ilmnmy
-	 oL4wEBFvrplHYsFvKq0Ch8GFBKDUk+37JD7SRp5A=
+	b=A5I6/R403HU3dpo9Pa+ZzaDC4zJxedvTFYXV2kQoeHQqvepPYLQsnicPZxNcEy0in
+	 awzD61E8NpWYtWwidFgzjEXhvOyggdP34pKGN0rWJe51viKenhU1NfPwIWMJNq/x1v
+	 CDvxV/8VbewC+M80j81R5VmoUMEvr86i6sXkHx+o=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -35,12 +35,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6 30/91] smb: server: dont use delayed_work for post_recv_credits_work
-Date: Tue, 30 Sep 2025 16:47:29 +0200
-Message-ID: <20250930143822.399146501@linuxfoundation.org>
+Subject: [PATCH 6.12 32/89] smb: server: dont use delayed_work for post_recv_credits_work
+Date: Tue, 30 Sep 2025 16:47:46 +0200
+Message-ID: <20250930143823.242736576@linuxfoundation.org>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250930143821.118938523@linuxfoundation.org>
-References: <20250930143821.118938523@linuxfoundation.org>
+In-Reply-To: <20250930143821.852512002@linuxfoundation.org>
+References: <20250930143821.852512002@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.6-stable review patch.  If anyone has any objections, please let me know.
+6.12-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -81,7 +81,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 10 deletions(-)
 
 diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 3720304d67929..504e2a1cf33b8 100644
+index 2fc689f99997e..8f5a393828065 100644
 --- a/fs/smb/server/transport_rdma.c
 +++ b/fs/smb/server/transport_rdma.c
 @@ -147,7 +147,7 @@ struct smb_direct_transport {
