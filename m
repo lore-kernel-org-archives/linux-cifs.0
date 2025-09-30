@@ -1,98 +1,158 @@
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E51A2628D;
-	Tue, 30 Sep 2025 14:16:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E211173;
+	Tue, 30 Sep 2025 15:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759241823; cv=none; b=ODJPHI3d3rsCcS2/AcISK9tlSE0uIt9t9AHAYD/NhuYGN3SHG/NwA8yIEaMLD64qvoxsAQKUbmAA/x3KOq5iv/1K00HOv92R8AKOtb1/HeJbFtteCOHY0wZsgcvB72fknXTsVr8P2IjN8DNfleJkGB/Q5yu2ZqMCIc+Yd56eJ+U=
+	t=1759244564; cv=none; b=DEFxI3TjI1Y/XgMjmxQnAXlQdZzaT2l4hkMAWqGXV4+zdZlZ/T5jGbl8StUCsVyt6y6+5HnZuaY6TLqThOLY5cAtdEEU+w1pXDJS0YAmqmqVrG/GItSMH6AO2gYxKaUmiuLUB7O83vU+7aK7Wr6WhSCs6Kfpbwta9GhHEAutSM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759241823; c=relaxed/simple;
-	bh=6d/4bFwswWm48/ncRnHTzPTOPZm44oBy0/a6SmLuzzg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ipPaECAUX4M2wu8UrtIWMui25l+qZkj2eglgUdI8TFin4p6Zi0tbmRZR1xgyvMQA5cyhq2RLwJthSh1/8+2cPRepOJcS0F0MWCrQekxbf6IwxPgU+qtDO16yFRCMehntzn9B5JhYGWeeabTc3taldDX2gze4+haiFx0A7Pa9MdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id AF61D5AE95;
-	Tue, 30 Sep 2025 16:08:39 +0200 (CEST)
-Message-ID: <46c59609-032d-4148-8c19-bf7106c4fa34@proxmox.com>
-Date: Tue, 30 Sep 2025 16:08:38 +0200
+	s=arc-20240116; t=1759244564; c=relaxed/simple;
+	bh=Psp66gXZ2UxLI09zjbhwWleQ2Cg6RflYdzb6E92R2Yw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=iPo44kEYGQjf2O+nahDFbCzGBURQfB/d/nYMprGpQhyRH/fte2uRU9CjB4Ax41vJoMMnzcktjaMZe9m9SbaNvm5zvK44PafNUwQXWv35CQ7MrE042ONIfViD9z5ftDklXtS6fpuxsXUuShaEWlNgXGmZ4tu+i91WuJ4mKxICcL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=kVOM15uP; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="kVOM15uP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72F58C4CEF0;
+	Tue, 30 Sep 2025 15:02:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1759244563;
+	bh=Psp66gXZ2UxLI09zjbhwWleQ2Cg6RflYdzb6E92R2Yw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=kVOM15uPToK6n8VZ14oVv8HQe48enHtRDAmwA/YSESXfiGcioUvI6GHlsdAqkxA+G
+	 l4IILiCu2la9k10pMEoahx2izuv1EMHZyn1yW8fKeqh7EsbOcN/gFNUWE7ruSd5Coq
+	 rR7oen+DCDxysKl8njwItpd7eiH4Rkd0eU7EtG9Q=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Stefan Metzmacher <metze@samba.org>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.16 045/143] smb: server: dont use delayed_work for post_recv_credits_work
+Date: Tue, 30 Sep 2025 16:46:09 +0200
+Message-ID: <20250930143833.032362723@linuxfoundation.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20250930143831.236060637@linuxfoundation.org>
+References: <20250930143831.236060637@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] smb: client: transport: avoid reconnects triggered by
- pending task work
-From: Fiona Ebner <f.ebner@proxmox.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-cifs@vger.kernel.org, bharathsm@microsoft.com, tom@talpey.com,
- sprasad@microsoft.com, ronniesahlberg@gmail.com, pc@manguebit.org,
- sfrench@samba.org
-References: <20250915151950.1017597-1-f.ebner@proxmox.com>
-Content-Language: en-US
-In-Reply-To: <20250915151950.1017597-1-f.ebner@proxmox.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Bm-Milter-Handled: 55990f41-d878-4baa-be0a-ee34c49e34d2
-X-Bm-Transport-Timestamp: 1759241298137
+Content-Transfer-Encoding: 8bit
 
-Ping
+6.16-stable review patch.  If anyone has any objections, please let me know.
 
-Am 15.09.25 um 5:19 PM schrieb Fiona Ebner:
-> When io_uring is used in the same task as CIFS, there might be
-> unnecessary reconnects, causing issues in user-space applications
-> like QEMU with a log like:
-> 
->> CIFS: VFS: \\10.10.100.81 Error -512 sending data on socket to server
-> 
-> Certain io_uring completions might be added to task_work with
-> notify_method being TWA_SIGNAL and thus TIF_NOTIFY_SIGNAL is set for
-> the task.
-> 
-> In __smb_send_rqst(), signals are masked before calling
-> smb_send_kvec(), but the masking does not apply to TIF_NOTIFY_SIGNAL.
-> 
-> If sk_stream_wait_memory() is reached via sock_sendmsg() while
-> TIF_NOTIFY_SIGNAL is set, signal_pending(current) will evaluate to
-> true there, and -EINTR will be propagated all the way from
-> sk_stream_wait_memory() to sock_sendmsg() in smb_send_kvec().
-> Afterwards, __smb_send_rqst() will see that not everything was written
-> and reconnect.
-> 
-> 
-> A reproducer exposing the issue using QEMU:
-> #!/bin/bash
-> target=$1
-> dd if=/dev/urandom of=/tmp/disk.raw bs=1M count=100
-> qemu-img create -f raw $target 100M
-> ./qemu-system-x86_64 --qmp stdio \
-> --blockdev raw,node-name=node0,file.driver=file,file.filename=/tmp/disk.raw,file.aio=io_uring \
-> --blockdev raw,node-name=node1,file.driver=file,file.filename=$target,file.aio=native,file.cache.direct=on \
-> <<EOF
-> {"execute": "qmp_capabilities"}
-> {"execute": "blockdev-mirror", "arguments": { "job-id": "mirror0", "device": "node0", "target": "node1", "sync": "full" } }
-> EOF
-> 
-> Another reproducer is having a QEMU virtual machine with one disk
-> using io_uring and one disk on CIFS and doing IO to both disks at the
-> same time.
-> 
-> I also got a reproducer based on liburing's examples/io_uring-cp.c
-> which I can send along if you are interested in it.
-> 
-> 
-> Fiona Ebner (2):
->   smb: client: transport: avoid reconnects triggered by pending task
->     work
->   smb: client: transport: minor indentation style fix
-> 
->  fs/smb/client/transport.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
-> 
+------------------
+
+From: Stefan Metzmacher <metze@samba.org>
+
+[ Upstream commit 1cde0a74a7a8951b3097417847a458e557be0b5b ]
+
+If we are using a hardcoded delay of 0 there's no point in
+using delayed_work it only adds confusion.
+
+The client also uses a normal work_struct and now
+it is easier to move it to the common smbdirect_socket.
+
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/server/transport_rdma.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index 6550bd9f002c2..10a6b4ed1a037 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -148,7 +148,7 @@ struct smb_direct_transport {
+ 	wait_queue_head_t	wait_send_pending;
+ 	atomic_t		send_pending;
+ 
+-	struct delayed_work	post_recv_credits_work;
++	struct work_struct	post_recv_credits_work;
+ 	struct work_struct	send_immediate_work;
+ 	struct work_struct	disconnect_work;
+ 
+@@ -367,8 +367,8 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
+ 
+ 	spin_lock_init(&t->lock_new_recv_credits);
+ 
+-	INIT_DELAYED_WORK(&t->post_recv_credits_work,
+-			  smb_direct_post_recv_credits);
++	INIT_WORK(&t->post_recv_credits_work,
++		  smb_direct_post_recv_credits);
+ 	INIT_WORK(&t->send_immediate_work, smb_direct_send_immediate_work);
+ 	INIT_WORK(&t->disconnect_work, smb_direct_disconnect_rdma_work);
+ 
+@@ -400,7 +400,7 @@ static void free_transport(struct smb_direct_transport *t)
+ 		   atomic_read(&t->send_pending) == 0);
+ 
+ 	cancel_work_sync(&t->disconnect_work);
+-	cancel_delayed_work_sync(&t->post_recv_credits_work);
++	cancel_work_sync(&t->post_recv_credits_work);
+ 	cancel_work_sync(&t->send_immediate_work);
+ 
+ 	if (t->qp) {
+@@ -615,8 +615,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 			wake_up_interruptible(&t->wait_send_credits);
+ 
+ 		if (is_receive_credit_post_required(receive_credits, avail_recvmsg_count))
+-			mod_delayed_work(smb_direct_wq,
+-					 &t->post_recv_credits_work, 0);
++			queue_work(smb_direct_wq, &t->post_recv_credits_work);
+ 
+ 		if (data_length) {
+ 			enqueue_reassembly(t, recvmsg, (int)data_length);
+@@ -773,8 +772,7 @@ static int smb_direct_read(struct ksmbd_transport *t, char *buf,
+ 		st->count_avail_recvmsg += queue_removed;
+ 		if (is_receive_credit_post_required(st->recv_credits, st->count_avail_recvmsg)) {
+ 			spin_unlock(&st->receive_credit_lock);
+-			mod_delayed_work(smb_direct_wq,
+-					 &st->post_recv_credits_work, 0);
++			queue_work(smb_direct_wq, &st->post_recv_credits_work);
+ 		} else {
+ 			spin_unlock(&st->receive_credit_lock);
+ 		}
+@@ -801,7 +799,7 @@ static int smb_direct_read(struct ksmbd_transport *t, char *buf,
+ static void smb_direct_post_recv_credits(struct work_struct *work)
+ {
+ 	struct smb_direct_transport *t = container_of(work,
+-		struct smb_direct_transport, post_recv_credits_work.work);
++		struct smb_direct_transport, post_recv_credits_work);
+ 	struct smb_direct_recvmsg *recvmsg;
+ 	int receive_credits, credits = 0;
+ 	int ret;
+@@ -1734,7 +1732,7 @@ static int smb_direct_prepare_negotiation(struct smb_direct_transport *t)
+ 		goto out_err;
+ 	}
+ 
+-	smb_direct_post_recv_credits(&t->post_recv_credits_work.work);
++	smb_direct_post_recv_credits(&t->post_recv_credits_work);
+ 	return 0;
+ out_err:
+ 	put_recvmsg(t, recvmsg);
+-- 
+2.51.0
+
 
 
