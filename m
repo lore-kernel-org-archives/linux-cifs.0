@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FA81EE02F;
-	Tue, 30 Sep 2025 15:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ADB42F39C0;
+	Tue, 30 Sep 2025 15:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759244567; cv=none; b=H61vYjOwWh6mLglNYoRZsFxAdQ/5QFjr1HVYOM6eII/Vv5LSc+CI2jkHfWGpM7SFSIRlxs0hYan2dnKwv4QWyP3rWbf5Fice95Po89aaXg2ahDJa3sbfKOcMO95D5BqWZLZRwvQQvGoviZEVL9ossoDt3FrTzhsSEec4v8u57l0=
+	t=1759245463; cv=none; b=nQ7/qoXqtKymcOvXQrS/MPLPc5xLlbt2Kfz8lJ81aSuFgdgjpivjLzQBJ55fJqpPB13lneVCPLZW+AE49wSopfGB8wfsc9pfLKCbIZCn5g6TpGZpMIjosup4yUqzBrIWisasICFfeSfqMmfdwGK1raV1q7EhAvME5v9z/xFXyNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759244567; c=relaxed/simple;
-	bh=I3W7/Df49uVwZz6Z7ZncJ5VHdMHgyXW8xHTN0A9RPdk=;
+	s=arc-20240116; t=1759245463; c=relaxed/simple;
+	bh=/d5Y5g5ReAwxQ2HvzNc1OYtuNjzvcrE21mUkD8wkELA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CsyulwT1PvWdZdnnt+GDwjOmI0mHzvNj9j7DH0YSm+xBNDX+wG42D/t/0RxuLr9vp42DoxCh9mICTsOqRuMeNNe22nFKDklo0SxBtG+mmTZagbDbCAHfyvLg28QUi9/K6o9WIuQmAfx7D3kCpBX/cpkv6NdSjUlVfEk4UrsFJCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=l+a48hW7; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=BR3UrfcmOgJaPpDVlIde1rheWlE3X/AHdZP9XQpeIgVEhG5H8/Sg6d8HJt3K0LZ86BTwKtliq5+VIFMHXnShgck4YLtUlK2YDJHEdAarrWoRGwFeFlTEuXVgEVjMVmD8SwwOBvreISifvv4WfiC0J5pP+8r8E8oNo4Rs1+qb26s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=xBSr7F0U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="l+a48hW7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D16A9C4CEF0;
-	Tue, 30 Sep 2025 15:02:46 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="xBSr7F0U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C353C4CEF0;
+	Tue, 30 Sep 2025 15:17:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1759244567;
-	bh=I3W7/Df49uVwZz6Z7ZncJ5VHdMHgyXW8xHTN0A9RPdk=;
+	s=korg; t=1759245462;
+	bh=/d5Y5g5ReAwxQ2HvzNc1OYtuNjzvcrE21mUkD8wkELA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=l+a48hW7HBokoW/BjowyohutJwQhhtimbamhxotyJu7V+b2W21h+9brzbsSAvL+zG
-	 DM4rbGFeT5OoDpOQ3aXIhsP03okMH4QmzPQwFQhzp+fqs9S9WhDP0rjdsR+Or/rcHL
-	 7qb9S7SyawtPnjnj1rt3XluXW2CAFJ4go5C7HQGs=
+	b=xBSr7F0UX7QFlqXlSfEqhQui8s0pWc97csEvuUxZeR1F369cTHlmwcq3cdnDUlCfp
+	 rbwWJ4nrNg2oW73WU0hGk7iM7iSAtJbbzkOCE9xWB+4yw6gEcZsqgK7JU9qMFwHfyh
+	 8yqX47waR3HtkAX7ZhO/18aumZd4obDsBojga8fI=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -35,12 +35,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.16 046/143] smb: server: use disable_work_sync in transport_rdma.c
-Date: Tue, 30 Sep 2025 16:46:10 +0200
-Message-ID: <20250930143833.071844499@linuxfoundation.org>
+Subject: [PATCH 6.1 25/73] smb: server: dont use delayed_work for post_recv_credits_work
+Date: Tue, 30 Sep 2025 16:47:29 +0200
+Message-ID: <20250930143821.620863819@linuxfoundation.org>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250930143831.236060637@linuxfoundation.org>
-References: <20250930143831.236060637@linuxfoundation.org>
+In-Reply-To: <20250930143820.537407601@linuxfoundation.org>
+References: <20250930143820.537407601@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -52,18 +52,19 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.16-stable review patch.  If anyone has any objections, please let me know.
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
 From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit f7f89250175e0a82e99ed66da7012e869c36497d ]
+[ Upstream commit 1cde0a74a7a8951b3097417847a458e557be0b5b ]
 
-This makes it safer during the disconnect and avoids
-requeueing.
+If we are using a hardcoded delay of 0 there's no point in
+using delayed_work it only adds confusion.
 
-It's ok to call disable_work[_sync]() more than once.
+The client also uses a normal work_struct and now
+it is easier to move it to the common smbdirect_socket.
 
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
@@ -76,26 +77,80 @@ Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/server/transport_rdma.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ fs/smb/server/transport_rdma.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
 diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 10a6b4ed1a037..74dfb6496095d 100644
+index 323b8a401a8c0..84b5b2f5df998 100644
 --- a/fs/smb/server/transport_rdma.c
 +++ b/fs/smb/server/transport_rdma.c
-@@ -399,9 +399,9 @@ static void free_transport(struct smb_direct_transport *t)
- 	wait_event(t->wait_send_pending,
+@@ -147,7 +147,7 @@ struct smb_direct_transport {
+ 	wait_queue_head_t	wait_send_pending;
+ 	atomic_t		send_pending;
+ 
+-	struct delayed_work	post_recv_credits_work;
++	struct work_struct	post_recv_credits_work;
+ 	struct work_struct	send_immediate_work;
+ 	struct work_struct	disconnect_work;
+ 
+@@ -365,8 +365,8 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
+ 
+ 	spin_lock_init(&t->lock_new_recv_credits);
+ 
+-	INIT_DELAYED_WORK(&t->post_recv_credits_work,
+-			  smb_direct_post_recv_credits);
++	INIT_WORK(&t->post_recv_credits_work,
++		  smb_direct_post_recv_credits);
+ 	INIT_WORK(&t->send_immediate_work, smb_direct_send_immediate_work);
+ 	INIT_WORK(&t->disconnect_work, smb_direct_disconnect_rdma_work);
+ 
+@@ -393,7 +393,7 @@ static void free_transport(struct smb_direct_transport *t)
  		   atomic_read(&t->send_pending) == 0);
  
--	cancel_work_sync(&t->disconnect_work);
--	cancel_work_sync(&t->post_recv_credits_work);
--	cancel_work_sync(&t->send_immediate_work);
-+	disable_work_sync(&t->disconnect_work);
-+	disable_work_sync(&t->post_recv_credits_work);
-+	disable_work_sync(&t->send_immediate_work);
+ 	cancel_work_sync(&t->disconnect_work);
+-	cancel_delayed_work_sync(&t->post_recv_credits_work);
++	cancel_work_sync(&t->post_recv_credits_work);
+ 	cancel_work_sync(&t->send_immediate_work);
  
  	if (t->qp) {
- 		ib_drain_qp(t->qp);
+@@ -609,8 +609,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 			wake_up_interruptible(&t->wait_send_credits);
+ 
+ 		if (is_receive_credit_post_required(receive_credits, avail_recvmsg_count))
+-			mod_delayed_work(smb_direct_wq,
+-					 &t->post_recv_credits_work, 0);
++			queue_work(smb_direct_wq, &t->post_recv_credits_work);
+ 
+ 		if (data_length) {
+ 			enqueue_reassembly(t, recvmsg, (int)data_length);
+@@ -767,8 +766,7 @@ static int smb_direct_read(struct ksmbd_transport *t, char *buf,
+ 		st->count_avail_recvmsg += queue_removed;
+ 		if (is_receive_credit_post_required(st->recv_credits, st->count_avail_recvmsg)) {
+ 			spin_unlock(&st->receive_credit_lock);
+-			mod_delayed_work(smb_direct_wq,
+-					 &st->post_recv_credits_work, 0);
++			queue_work(smb_direct_wq, &st->post_recv_credits_work);
+ 		} else {
+ 			spin_unlock(&st->receive_credit_lock);
+ 		}
+@@ -795,7 +793,7 @@ static int smb_direct_read(struct ksmbd_transport *t, char *buf,
+ static void smb_direct_post_recv_credits(struct work_struct *work)
+ {
+ 	struct smb_direct_transport *t = container_of(work,
+-		struct smb_direct_transport, post_recv_credits_work.work);
++		struct smb_direct_transport, post_recv_credits_work);
+ 	struct smb_direct_recvmsg *recvmsg;
+ 	int receive_credits, credits = 0;
+ 	int ret;
+@@ -1676,7 +1674,7 @@ static int smb_direct_prepare_negotiation(struct smb_direct_transport *t)
+ 		goto out_err;
+ 	}
+ 
+-	smb_direct_post_recv_credits(&t->post_recv_credits_work.work);
++	smb_direct_post_recv_credits(&t->post_recv_credits_work);
+ 	return 0;
+ out_err:
+ 	put_recvmsg(t, recvmsg);
 -- 
 2.51.0
 
