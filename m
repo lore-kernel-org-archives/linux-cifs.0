@@ -1,69 +1,69 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC25419E81F
-	for <linux-cifs@vger.kernel.org>; Wed,  1 Oct 2025 18:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F71019E81F
+	for <linux-cifs@vger.kernel.org>; Wed,  1 Oct 2025 18:23:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759342970; cv=none; b=sXt2wy11TNqJuI/DIcECvTjEoaw5dtKeKKg0UeuzysCyrXe0OD76jgIHppuMTv1eH8zESGJwHGLv4JpiUJHgOlLvTvMZTeTI0O4LSbYPiPIMcNOSKo3GZxz5BbxBcoWMRxL3M+PszLNmW8Y5yqyXtRvm5hcEIWiZlP/TXU0mcGw=
+	t=1759342994; cv=none; b=hxXlG5/6baNNdSKGmbGk75joBVmAPOXwEJwLDjh70C6W4PWgikYRCLT6le7G2yjuRTY458ZZD8oKK/+D4IAn7FIpUEIDY1rO0V9C/JfK432vidTI8uEutoLFNWB6B8qpU5VhxnGFIVZYKkd5u4yicm4GE1xZNtUcwOCbmH4Ysr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759342970; c=relaxed/simple;
-	bh=1HG+xuO1AFvt3swxiHOpgpcIiW08Wojer/sXgIXfsTA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OAsE8pibgcc7/X6Y4JgVd1KOc47Z4+fBRGdMAHk3beMwMxDYss0whhvOGkllL7HhxQdaqt/eMKHV69zumlUInURAqLog2V57L90HuAATmSj1VnKGnif4jQnpwBL7ehNdJy5XiU3DienIsSbxjVYByYrLnaaEG0Agp7irvdWUNyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ljJG3BfZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=KzilTdK9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XPwhXAo3; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=xZqmfPMX; arc=none smtp.client-ip=195.135.223.130
+	s=arc-20240116; t=1759342994; c=relaxed/simple;
+	bh=6MNmBUjfIZ1Cz+p29KLqHMbJhxOjhg1ablBeGxGpPHE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dd4jRN8zXC06cJp/FEdIbN/N6Qu7BqttmI/PYFxp/+7Fg0t5IXnRDjSBzYwyqZQi52cQeVc3NIQOLZBDO72SiDdRwDnIFnkRBa6kU4Vy03hyFFaBYoB1nHFe+rFcmtCdCmrFPC3AjgOZGDQ63IJ5kErZ/E5mbBOEcp0L/ecDRrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XRBmTk6O; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jymOHxDs; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XRBmTk6O; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jymOHxDs; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ljJG3BfZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="KzilTdK9";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XPwhXAo3";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="xZqmfPMX"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XRBmTk6O";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jymOHxDs";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XRBmTk6O";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jymOHxDs"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E732233718;
-	Wed,  1 Oct 2025 18:22:45 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 7996C1F457;
+	Wed,  1 Oct 2025 18:23:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759342966; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759342989; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=wDGAg4Ixy5gQMv6arT5teKUq7X669aSOFZzxFqt58Xc=;
-	b=ljJG3BfZgXYKtRTu3yfGYkj6+OlKfhCAuWbjd3pUD1PbJ9/F60HimFOrYMiFlAOOo2kmF8
-	ryUz1xlWsSg8IDJ19ZFYnct2QCOmGc8dc4TZSW+B8vj6XAWIjbrKhRrtnAqBD2flqZqCn0
-	TvXFv5klDN02n7CI4ZpQbBsTjvhzYeQ=
+	bh=tB0bUISVHuK8swYDKjR4IpHNzhXa2noup2yfBlPDYsQ=;
+	b=XRBmTk6OW3Oh0Q//vW1q39Kt6IJ0u7aHmSuOBEsHyYbZ88Hz1X6WSaB73lI/RAIBxKFQT4
+	rKdu6tMvu+1RdHWCqltE+96HcHOT5qXloihb8ywqDUo7YJ5OwqabVwFZNb8P+VIcLdrsTl
+	zsANjfZv8pYshd1WMd1dT2wHkk1kipU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759342966;
+	s=susede2_ed25519; t=1759342989;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=wDGAg4Ixy5gQMv6arT5teKUq7X669aSOFZzxFqt58Xc=;
-	b=KzilTdK9PkLjLkk/rJ37zuA1MZU2NbeegFnqTnIOsxwU3+i81ziZfukQD92XWUwSotRAcJ
-	UGypPyVtqouKYxDA==
-Authentication-Results: smtp-out1.suse.de;
+	bh=tB0bUISVHuK8swYDKjR4IpHNzhXa2noup2yfBlPDYsQ=;
+	b=jymOHxDsi2pX4Ke1xcgqm6XnYN/hZ4EtTyL8y3n3i8C+4+vzwbQ7JCXpjJzLAtuqHDxTYR
+	cYrvclZxquJRaUAQ==
+Authentication-Results: smtp-out2.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759342965; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759342989; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=wDGAg4Ixy5gQMv6arT5teKUq7X669aSOFZzxFqt58Xc=;
-	b=XPwhXAo3IbTIs52/dNyhhCvKJvzjV4RuwLLk9JGvbAtrkDZK5A7CU9GF3ArYJYDMStDoMB
-	NBBcGUxzB3zM2yIUx7YrE7X6ZpPuIR2rD/yZ/bPGHXTKlZGzkJCIu6ZG8eCdokENOHmap1
-	TBX5sO9JPdQZEdblW3vqeLtoozw+ogc=
+	bh=tB0bUISVHuK8swYDKjR4IpHNzhXa2noup2yfBlPDYsQ=;
+	b=XRBmTk6OW3Oh0Q//vW1q39Kt6IJ0u7aHmSuOBEsHyYbZ88Hz1X6WSaB73lI/RAIBxKFQT4
+	rKdu6tMvu+1RdHWCqltE+96HcHOT5qXloihb8ywqDUo7YJ5OwqabVwFZNb8P+VIcLdrsTl
+	zsANjfZv8pYshd1WMd1dT2wHkk1kipU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759342965;
+	s=susede2_ed25519; t=1759342989;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=wDGAg4Ixy5gQMv6arT5teKUq7X669aSOFZzxFqt58Xc=;
-	b=xZqmfPMX9oBUH3LrFxk3fUWh6Uj0++D1WYENgcFaYLnQuEFuiSGiaNVpyZ27AiFiM1FPPr
-	PWhQ3XApbs52tCAw==
+	bh=tB0bUISVHuK8swYDKjR4IpHNzhXa2noup2yfBlPDYsQ=;
+	b=jymOHxDsi2pX4Ke1xcgqm6XnYN/hZ4EtTyL8y3n3i8C+4+vzwbQ7JCXpjJzLAtuqHDxTYR
+	cYrvclZxquJRaUAQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 71AAB13A42;
-	Wed,  1 Oct 2025 18:22:45 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 03DB713A42;
+	Wed,  1 Oct 2025 18:23:08 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id oyZCDnVx3WhqbAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Wed, 01 Oct 2025 18:22:45 +0000
+	id DwEFL4xx3WiPbAAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Wed, 01 Oct 2025 18:23:08 +0000
 From: Enzo Matsumiya <ematsumiya@suse.de>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -73,9 +73,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
 	henrique.carvalho@suse.com
-Subject: [PATCH v2 12/20] smb: client: prevent lease breaks of cached parents when opening children
-Date: Wed,  1 Oct 2025 15:21:11 -0300
-Message-ID: <20251001182111.731114-1-ematsumiya@suse.de>
+Subject: [PATCH v2 19/20] smb: client: rework cached dirs synchronization
+Date: Wed,  1 Oct 2025 15:22:59 -0300
+Message-ID: <20251001182259.731184-1-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -84,468 +84,636 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
 X-Spamd-Result: default: False [-2.80 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
 	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
 	R_MISSING_CHARSET(0.50)[];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	ARC_NA(0.00)[];
 	TO_DN_NONE(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FROM_EQ_ENVFROM(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
+	RCVD_TLS_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid];
 	RCVD_COUNT_TWO(0.00)[2];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FREEMAIL_ENVRCPT(0.00)[gmail.com]
 X-Spam-Flag: NO
-X-Spam-Level: 
 X-Spam-Score: -2.80
 
-In SMB2_open_init() lookup for a cached parent of target path and set
-ParentLeaseKey in lease context if found.
+This patch adds usage of RCU and seqlocks for cached dir (list and
+entries).
 
-Introduce invalidate_cached_dirents() to allow revalidation of cached
-dirents but still keep the cached directory.
+Traversing the list under RCU allows faster lookups (no locks) and also
+guarantees that entries being read are not gone (i.e. prevents UAF).
 
-Testing with e.g. xfstests generic/637 (small simple test) shows a
-performance gain of ~17% less create/open ops, and ~83% less lease
-breaks:
+seqlocks provides atomicity/consistency when reading entries, allowing
+callers to re-check cfid in case of write-side invalidation.
 
-Before patch
-Create/open:
-  # tshark -Y 'smb2.create.disposition == 1' -r unpatched.pcap
-  169
-
-Lease breaks:
-  # tshark -Y 'smb2.cmd == 18' -r unpatched.pcap
-  12
------------------
-After patch:
-Create/open:
-  # tshark -Y 'smb2.create.disposition == 1' -r patched.pcap
-  144
-
-Lease breaks:
-  # tshark -Y 'smb2.cmd == 18' -r patched.pcap
-  2
+Combined with refcounting, this new approach provides safety for
+callers and flexibility for future enhancements.
 
 Other:
-- set oparms->cifs_sb in open_cached_dir() as we need it in
-  check_cached_parent(); use CIFS_OPARMS() too
-- introduce CFID_LOOKUP_PARENT lookup mode (for string paths only)
-- add cached_fids->dirsep to save dir separator, used by parent lookups
+- now that we can inform lookups of cfid changes, set cfid->dentry
+  earlier in open_cached_dir() to allow by-dentry lookups to find
+  this cfid
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
 v2:
-- added invalidate_cached_dirents()
-- fixed conditions to add ParentLeaseKey
-- fixed wrong function name in commit message
-- added performance comparison without and with patch to commit message
+- small rework on find_cfid() to use ERR_PTR instead of an int
+- dropped unnecessrary read of the list on laundromat since it's only
+  called when cleanups are needed (now does a stright write-locked check)
 
 
- fs/smb/client/cached_dir.c | 106 ++++++++++++++++++++++++-------------
- fs/smb/client/cached_dir.h |   5 ++
- fs/smb/client/dir.c        |  23 +-------
- fs/smb/client/smb2inode.c  |  10 +++-
- fs/smb/client/smb2pdu.c    |  63 +++++++++++++++++-----
- 5 files changed, 133 insertions(+), 74 deletions(-)
+ fs/smb/client/cached_dir.c | 236 +++++++++++++++++++++++--------------
+ fs/smb/client/cached_dir.h |  19 ++-
+ fs/smb/client/cifs_debug.c |   5 +-
+ 3 files changed, 167 insertions(+), 93 deletions(-)
 
 diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index ff71f2c06b72..b48c36500e77 100644
+index 361f9529ea8a..edfbb05c2264 100644
 --- a/fs/smb/client/cached_dir.c
 +++ b/fs/smb/client/cached_dir.c
-@@ -71,11 +71,29 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
- 				    bool wait_open)
+@@ -16,12 +16,12 @@
+ #define CFID_INVALID_TIME 1
+ 
+ static struct cached_fid *init_cached_dir(const char *path);
+-static void smb2_close_cached_fid(struct kref *ref);
++static void cfid_release_ref(struct kref *ref);
+ 
+ static inline void invalidate_cfid(struct cached_fid *cfid)
+ {
+ 	/* callers must hold the list lock and do any list operations (del/move) themselves */
+-	lockdep_assert_held(&cfid->cfids->cfid_list_lock);
++	lockdep_assert_held(&cfid->cfids->entries_seqlock.lock);
+ 
+ 	if (cfid_is_valid(cfid))
+ 		cfid->cfids->num_entries--;
+@@ -31,20 +31,19 @@ static inline void invalidate_cfid(struct cached_fid *cfid)
+ 	cfid->atime = CFID_INVALID_TIME;
+ }
+ 
+-static inline void drop_cfid(struct cached_fid *cfid)
++static inline void __drop_cfid(struct cached_fid *cfid)
+ {
+ 	struct dentry *dentry = NULL;
+ 	u64 pfid = 0, vfid = 0;
+ 
+-	spin_lock(&cfid->cfids->cfid_list_lock);
++	write_seqlock(&cfid->cfids->entries_seqlock);
++	write_seqlock(&cfid->seqlock);
+ 	invalidate_cfid(cfid);
+-
+-	spin_lock(&cfid->fid_lock);
+ 	swap(cfid->dentry, dentry);
+ 	swap(cfid->fid.persistent_fid, pfid);
+ 	swap(cfid->fid.volatile_fid, vfid);
+-	spin_unlock(&cfid->fid_lock);
+-	spin_unlock(&cfid->cfids->cfid_list_lock);
++	write_sequnlock(&cfid->seqlock);
++	write_sequnlock(&cfid->cfids->entries_seqlock);
+ 
+ 	dput(dentry);
+ 
+@@ -58,11 +57,18 @@ static inline void drop_cfid(struct cached_fid *cfid)
+ 	}
+ }
+ 
++static inline void drop_cfid(struct cached_fid *cfid)
++{
++	__drop_cfid(cfid);
++	kref_put(&cfid->refcount, cfid_release_ref);
++}
++
+ /*
+  * Find a cached dir based on @key and @mode (raw lookup).
+  * The only validation done here is if cfid is going down (->ctime == CFID_INVALID_TIME).
+  *
+  * If @wait_open is true, keep retrying until cfid transitions from 'opening' to valid/invalid.
++ * Will also keep retrying on list seqcount invalidations.
+  *
+  * Callers must handle any other validation as needed.
+  * Returned cfid, if found, has a ref taken, regardless of state.
+@@ -72,7 +78,7 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
  {
  	struct cached_fid *cfid, *found;
-+	const char *parent_path = NULL;
- 	bool match;
+ 	const char *parent_path = NULL;
+-	bool match;
++	unsigned int lseq = 0;
  
  	if (!cfids || !key)
  		return NULL;
- 
-+	if (mode == CFID_LOOKUP_PARENT) {
-+		const char *path = key;
-+
-+		if (!*path)
-+			return NULL;
-+
-+		parent_path = strrchr(path, cfids->dirsep);
-+		if (!parent_path)
-+			return NULL;
-+
-+		parent_path = kstrndup(path, parent_path - path, GFP_KERNEL);
-+		if (WARN_ON_ONCE(!parent_path))
-+			return NULL;
-+
-+		key = parent_path;
-+		mode = CFID_LOOKUP_PATH;
-+	}
+@@ -97,8 +103,16 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
  retry_find:
  	found = NULL;
  
-@@ -114,6 +132,8 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
- 		kref_get(&found->refcount);
+-	spin_lock(&cfids->cfid_list_lock);
+-	list_for_each_entry(cfid, &cfids->entries, entry) {
++	rcu_read_lock();
++	lseq = read_seqbegin(&cfids->entries_seqlock);
++	list_for_each_entry_rcu(cfid, &cfids->entries, entry) {
++		bool match = false;
++
++		if (need_seqretry(&cfids->entries_seqlock, lseq)) {
++			found = ERR_PTR(-ECHILD);
++			break;
++		}
++
+ 		/* don't even bother checking if it's going away */
+ 		if (cfid->ctime == CFID_INVALID_TIME)
+ 			continue;
+@@ -115,23 +129,59 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
+ 		if (!match)
+ 			continue;
+ 
+-		/* only get a ref here if not waiting for open */
+-		if (!wait_open)
+-			kref_get(&cfid->refcount);
++		if (wait_open && !cfid->ctime) {
++			unsigned int cseq = read_seqbegin(&cfid->seqlock);
++
++			if (!cfid->ctime)
++				found = ERR_PTR(-ECHILD);
++			else if (!cfid_is_valid(cfid))
++				found = ERR_PTR(-EINVAL);
++
++			if (read_seqretry(&cfid->seqlock, cseq) && !found)
++				found = ERR_PTR(-ECHILD);
++
++			if (found)
++				break;
++		}
++
++		kref_get(&cfid->refcount);
+ 		found = cfid;
+ 		break;
+ 	}
+-	spin_unlock(&cfids->cfid_list_lock);
+ 
+-	if (wait_open && found) {
+-		/* cfid is being opened in open_cached_dir(), retry lookup */
+-		if (!found->ctime)
+-			goto retry_find;
++	if (read_seqretry(&cfids->entries_seqlock, lseq)) {
++		if (wait_open) {
++			if (!found) {
++				found = ERR_PTR(-ECHILD);
++
++				/*
++				 * Not found but caller requested wait for open.
++				 * The list seqcount invalidation might have been our open, retry
++				 * only once more (in case it wasn't).
++				 */
++				wait_open = false;
++			}
++		}
++
++		if (found && !IS_ERR(found)) {
++			/* can't put ref under RCU lock, do it below */
++			cfid = found;
++			found = ERR_PTR(-EUCLEAN);
++		}
++	}
++	rcu_read_unlock();
+ 
+-		/* we didn't get a ref above, so get one now */
+-		kref_get(&found->refcount);
++	if (PTR_ERR(found) == -EUCLEAN) {
++		kref_put(&cfid->refcount, cfid_release_ref);
++		found = ERR_PTR(-ECHILD);
  	}
  
-+	kfree(parent_path);
++	if (PTR_ERR(found) == -ECHILD)
++		goto retry_find;
 +
- 	return found;
- }
++	if (IS_ERR(found))
++		found = NULL;
++
+ 	kfree(parent_path);
  
-@@ -226,7 +246,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
+ 	return found;
+@@ -211,7 +261,7 @@ struct cached_fid *find_cached_dir(struct cached_fids *cfids, const void *key, i
+ 		if (cfid_is_valid(cfid)) {
+ 			cfid->atime = jiffies;
+ 		} else {
+-			kref_put(&cfid->refcount, smb2_close_cached_fid);
++			kref_put(&cfid->refcount, cfid_release_ref);
+ 			cfid = NULL;
+ 		}
+ 	}
+@@ -242,7 +292,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
+ 	u8 oplock = SMB2_OPLOCK_LEVEL_II;
+ 	struct cifs_fid *pfid;
+ 	struct dentry *dentry;
+-	struct cached_fid *cfid;
++	struct cached_fid __rcu *cfid;
  	struct cached_fids *cfids;
  	const char *npath;
  	int retries = 0, cur_sleep = 1;
--	__le32 lease_flags = 0;
+@@ -273,34 +323,35 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
+ 	if (!server->ops->new_lease_key)
+ 		return -EIO;
  
- 	if (cifs_sb->root == NULL)
- 		return -ENOENT;
-@@ -236,9 +255,11 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 
- 	ses = tcon->ses;
- 	cfids = tcon->cfids;
+-	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
+-	if (!utf16_path)
+-		return -ENOMEM;
 -
- 	if (!cfids)
- 		return -EOPNOTSUPP;
+ 	/* find_cached_dir() already validates cfid if found, so no need to check here again */
+ 	cfid = find_cached_dir(cfids, path, CFID_LOOKUP_PATH);
+ 	if (cfid) {
+-		rc = 0;
+-		goto out;
++		*ret_cfid = cfid;
++		return 0;
+ 	}
+ 
+-	spin_lock(&cfids->cfid_list_lock);
++	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
++	if (!utf16_path)
++		return -ENOMEM;
 +
-+	if (!cfids->dirsep)
-+		cfids->dirsep = CIFS_DIR_SEP(cifs_sb);
- replay_again:
- 	/* reinitialize for possible replay */
- 	flags = 0;
-@@ -306,24 +327,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 			rc = -ENOENT;
++	read_seqlock_excl(&cfids->entries_seqlock);
+ 	if (cfids->num_entries >= tcon->max_cached_dirs) {
+-		spin_unlock(&cfids->cfid_list_lock);
++		read_sequnlock_excl(&cfids->entries_seqlock);
+ 		rc = -ENOENT;
+ 		goto out;
+ 	}
++	read_sequnlock_excl(&cfids->entries_seqlock);
+ 
++	/* no ned to lock cfid or entries yet */
+ 	cfid = init_cached_dir(path);
+ 	if (!cfid) {
+-		spin_unlock(&cfids->cfid_list_lock);
+ 		rc = -ENOMEM;
+ 		goto out;
+ 	}
+ 
+ 	cfid->cfids = cfids;
+ 	cfid->tcon = tcon;
+-	spin_unlock(&cfids->cfid_list_lock);
++	pfid = &cfid->fid;
+ 
+ 	/*
+ 	 * Skip any prefix paths in @path as lookup_noperm_positive_unlocked() ends up
+@@ -325,16 +376,16 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
  			goto out;
  		}
--		if (dentry->d_parent && server->dialect >= SMB30_PROT_ID) {
--			struct cached_fid *parent_cfid;
--
--			spin_lock(&cfids->cfid_list_lock);
--			list_for_each_entry(parent_cfid, &cfids->entries, entry) {
--				if (parent_cfid->dentry == dentry->d_parent) {
--					if (!cfid_is_valid(parent_cfid))
--						break;
--
--					cifs_dbg(FYI, "found a parent cached file handle\n");
--					lease_flags |= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
--					memcpy(pfid->parent_lease_key, parent_cfid->fid.lease_key,
--					       SMB2_LEASE_KEY_SIZE);
--					break;
--				}
--			}
--			spin_unlock(&cfids->cfid_list_lock);
--		}
  	}
- 	cfid->dentry = dentry;
- 	cfid->tcon = tcon;
-@@ -350,20 +353,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	rqst[0].rq_iov = open_iov;
- 	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
- 
--	oparms = (struct cifs_open_parms) {
--		.tcon = tcon,
--		.path = path,
--		.create_options = cifs_create_options(cifs_sb, CREATE_NOT_FILE),
--		.desired_access =  FILE_READ_DATA | FILE_READ_ATTRIBUTES |
--				   FILE_READ_EA,
--		.disposition = FILE_OPEN,
--		.fid = pfid,
--		.lease_flags = lease_flags,
--		.replay = !!(retries),
--	};
--
--	rc = SMB2_open_init(tcon, server,
--			    &rqst[0], &oplock, &oparms, utf16_path);
-+	oparms = CIFS_OPARMS(cifs_sb, tcon, path,
-+			     FILE_READ_DATA | FILE_READ_ATTRIBUTES | FILE_READ_EA, FILE_OPEN,
-+			     cifs_create_options(cifs_sb, CREATE_NOT_FILE), 0);
-+	oparms.fid = pfid;
-+	oparms.replay = !!retries;
 +
-+	rc = SMB2_open_init(tcon, server, &rqst[0], &oplock, &oparms, utf16_path);
- 	if (rc)
++	write_seqlock(&cfids->entries_seqlock);
++	write_seqlock(&cfid->seqlock);
+ 	cfid->dentry = dentry;
+-	cfid->tcon = tcon;
+ 	dentry = NULL;
++	write_sequnlock(&cfid->seqlock);
+ 
+-	spin_lock(&cfids->cfid_list_lock);
+ 	cfids->num_entries++;
+-	list_add(&cfid->entry, &cfids->entries);
+-	spin_unlock(&cfids->cfid_list_lock);
+-
+-	pfid = &cfid->fid;
++	list_add_rcu(&cfid->entry, &cfids->entries);
++	write_sequnlock(&cfids->entries_seqlock);
+ 
+ 	/*
+ 	 * We do not hold the lock for the open because in case
+@@ -400,8 +451,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
  		goto oshr_free;
- 	smb2_set_next_command(tcon, &rqst[0]);
-@@ -478,20 +474,34 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	return rc;
- }
+ 	}
  
--static void smb2_close_cached_fid(struct kref *ref)
-+static void __invalidate_cached_dirents(struct cached_fid *cfid)
- {
--	struct cached_fid *cfid = container_of(ref, struct cached_fid, refcount);
- 	struct cached_dirent *de, *q;
+-	spin_lock(&cfids->cfid_list_lock);
+-
+ 	o_rsp = (struct smb2_create_rsp *)rsp_iov[0].iov_base;
+ 	oparms.fid->persistent_fid = o_rsp->PersistentFileId;
+ 	oparms.fid->volatile_fid = o_rsp->VolatileFileId;
+@@ -411,30 +460,23 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
  
--	drop_cfid(cfid);
-+	if (!cfid)
-+		return;
  
--	/* Delete all cached dirent names */
-+	mutex_lock(&cfid->dirents.de_mutex);
+ 	if (o_rsp->OplockLevel != SMB2_OPLOCK_LEVEL_LEASE) {
+-		spin_unlock(&cfids->cfid_list_lock);
+ 		rc = -EINVAL;
+ 		goto oshr_free;
+ 	}
+ 
+-	rc = smb2_parse_contexts(server, rsp_iov,
+-				 &oparms.fid->epoch,
+-				 oparms.fid->lease_key,
++	rc = smb2_parse_contexts(server, rsp_iov, &oparms.fid->epoch, oparms.fid->lease_key,
+ 				 &oplock, NULL, NULL);
+-	if (rc) {
+-		spin_unlock(&cfids->cfid_list_lock);
++	if (rc)
+ 		goto oshr_free;
+-	}
+ 
+ 	rc = -EINVAL;
+-	if (!(oplock & SMB2_LEASE_READ_CACHING_HE)) {
+-		spin_unlock(&cfids->cfid_list_lock);
++	if (!(oplock & SMB2_LEASE_READ_CACHING_HE))
+ 		goto oshr_free;
+-	}
++
+ 	qi_rsp = (struct smb2_query_info_rsp *)rsp_iov[1].iov_base;
+-	if (le32_to_cpu(qi_rsp->OutputBufferLength) < sizeof(struct smb2_file_all_info)) {
+-		spin_unlock(&cfids->cfid_list_lock);
++	if (le32_to_cpu(qi_rsp->OutputBufferLength) < sizeof(struct smb2_file_all_info))
+ 		goto oshr_free;
+-	}
++
+ 	if (!smb2_validate_and_copy_iov(le16_to_cpu(qi_rsp->OutputBufferOffset),
+ 					sizeof(struct smb2_file_all_info), &rsp_iov[1],
+ 					sizeof(struct smb2_file_all_info), (char *)&info)) {
+@@ -445,10 +487,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
+ 		}
+ 	}
+ 
+-	cfid->ctime = jiffies;
+-	cfid->atime = jiffies;
+-	spin_unlock(&cfids->cfid_list_lock);
+-	/* At this point the directory handle is fully cached */
+ 	rc = 0;
+ oshr_free:
+ 	SMB2_open_free(&rqst[0]);
+@@ -456,16 +494,22 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
+ 	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
+ 	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
+ out:
+-	/* cfid invalidated in the mean time, drop it below */
+-	if (!rc && !cfid_is_valid(cfid))
++	/* cfid only becomes fully valid below, so can't use cfid_is_valid() here */
++	if (!rc && cfid->ctime == CFID_INVALID_TIME)
+ 		rc = -ENOENT;
+ 
+ 	if (rc) {
+-		if (cfid) {
++		dput(dentry);
++
++		if (cfid)
+ 			drop_cfid(cfid);
+-			kref_put(&cfid->refcount, smb2_close_cached_fid);
+-		}
+ 	} else {
++		/* seqlocked-write will inform concurrent lookups of opening -> open transition */
++		write_seqlock(&cfid->seqlock);
++		cfid->ctime = jiffies;
++		cfid->atime = jiffies;
++		write_sequnlock(&cfid->seqlock);
++
+ 		*ret_cfid = cfid;
+ 		atomic_inc(&tcon->num_remote_opens);
+ 	}
+@@ -485,7 +529,6 @@ static void __invalidate_cached_dirents(struct cached_fid *cfid)
+ 	if (!cfid)
+ 		return;
+ 
+-	mutex_lock(&cfid->dirents.de_mutex);
  	list_for_each_entry_safe(de, q, &cfid->dirents.entries, entry) {
  		list_del(&de->entry);
  		kfree(de->name);
- 		kfree(de);
- 	}
+@@ -496,15 +539,13 @@ static void __invalidate_cached_dirents(struct cached_fid *cfid)
+ 	cfid->dirents.is_failed = false;
+ 	cfid->dirents.file = NULL;
+ 	cfid->dirents.pos = 0;
+-	mutex_unlock(&cfid->dirents.de_mutex);
+ }
  
-+	cfid->dirents.is_valid = false;
-+	cfid->dirents.is_failed = false;
-+	cfid->dirents.file = NULL;
-+	cfid->dirents.pos = 0;
-+	mutex_unlock(&cfid->dirents.de_mutex);
-+}
-+
-+static void smb2_close_cached_fid(struct kref *ref)
+-static void smb2_close_cached_fid(struct kref *ref)
++static void cfid_rcu_free(struct rcu_head *rcu)
+ {
+-	struct cached_fid *cfid = container_of(ref, struct cached_fid, refcount);
++	struct cached_fid *cfid = container_of(rcu, struct cached_fid, rcu);
+ 
+ 	__invalidate_cached_dirents(cfid);
+-	drop_cfid(cfid);
+ 
+ 	kfree(cfid->file_all_info);
+ 	cfid->file_all_info = NULL;
+@@ -513,6 +554,14 @@ static void smb2_close_cached_fid(struct kref *ref)
+ 	kfree(cfid);
+ }
+ 
++static void cfid_release_ref(struct kref *ref)
 +{
 +	struct cached_fid *cfid = container_of(ref, struct cached_fid, refcount);
 +
-+	__invalidate_cached_dirents(cfid);
-+	drop_cfid(cfid);
-+
- 	kfree(cfid->file_all_info);
- 	cfid->file_all_info = NULL;
- 	kfree(cfid->path);
-@@ -531,6 +541,26 @@ bool drop_cached_dir(struct cached_fids *cfids, const void *key, int mode)
- 	return true;
- }
- 
-+/*
-+ * Invalidate cached dirents from @key's parent, regardless if @key itself is a cached dir.
-+ *
-+ * Lease breaks don't necessarily require this, and would require finding the child to begin with,
-+ * so skip such cases.
-+ */
-+void invalidate_cached_dirents(struct cached_fids *cfids, const void *key, int mode)
-+{
-+	struct cached_fid *cfid = NULL;
-+
-+	if (mode == CFID_LOOKUP_LEASEKEY)
-+		return;
-+
-+	cfid = find_cfid(cfids, key, mode, false);
-+	if (cfid) {
-+		__invalidate_cached_dirents(cfid);
-+		kref_put(&cfid->refcount, smb2_close_cached_fid);
-+	}
++	__drop_cfid(cfid);
++	call_rcu_hurry(&cfid->rcu, cfid_rcu_free);
 +}
 +
+ bool drop_cached_dir(struct cached_fids *cfids, const void *key, int mode)
+ {
+ 	struct cached_fid *cfid;
+@@ -533,13 +582,16 @@ bool drop_cached_dir(struct cached_fids *cfids, const void *key, int mode)
+ 		drop_cfid(cfid);
+ 	} else {
+ 		/* we're locked in smb2_is_valid_lease_break(), so can't dput/close here */
+-		spin_lock(&cfids->cfid_list_lock);
++		write_seqlock(&cfids->entries_seqlock);
++		write_seqlock(&cfid->seqlock);
+ 		invalidate_cfid(cfid);
+-		spin_unlock(&cfids->cfid_list_lock);
++		write_sequnlock(&cfid->seqlock);
++		write_sequnlock(&cfids->entries_seqlock);
++
++		/* put lookup ref */
++		kref_put(&cfid->refcount, cfid_release_ref);
+ 	}
+ 
+-	/* put lookup ref */
+-	kref_put(&cfid->refcount, smb2_close_cached_fid);
+ 	mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
+ 
+ 	return true;
+@@ -560,33 +612,39 @@ void invalidate_cached_dirents(struct cached_fids *cfids, const void *key, int m
+ 
+ 	cfid = find_cfid(cfids, key, mode, false);
+ 	if (cfid) {
+-		__invalidate_cached_dirents(cfid);
+-		kref_put(&cfid->refcount, smb2_close_cached_fid);
++		if (cfid_is_valid(cfid)) {
++			mutex_lock(&cfid->dirents.de_mutex);
++			__invalidate_cached_dirents(cfid);
++			mutex_unlock(&cfid->dirents.de_mutex);
++		}
++		kref_put(&cfid->refcount, cfid_release_ref);
+ 	}
+ }
+ 
  void close_cached_dir(struct cached_fid *cfid)
  {
- 	kref_put(&cfid->refcount, smb2_close_cached_fid);
+-	kref_put(&cfid->refcount, smb2_close_cached_fid);
++	kref_put(&cfid->refcount, cfid_release_ref);
+ }
+ 
+ static void invalidate_all_cfids(struct cached_fids *cfids, bool closed)
+ {
+-	struct cached_fid *cfid, *q;
++	struct cached_fid *cfid;
+ 
+ 	if (!cfids)
+ 		return;
+ 
+ 	/* mark all the cfids as closed and invalidate them for laundromat cleanup */
+-	spin_lock(&cfids->cfid_list_lock);
+-	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
++	write_seqlock(&cfids->entries_seqlock);
++	list_for_each_entry(cfid, &cfids->entries, entry) {
++		write_seqlock(&cfid->seqlock);
+ 		invalidate_cfid(cfid);
+ 		if (closed) {
+ 			cfid->fid.persistent_fid = 0;
+ 			cfid->fid.volatile_fid = 0;
+ 		}
++		write_sequnlock(&cfid->seqlock);
+ 	}
+-	spin_unlock(&cfids->cfid_list_lock);
++	write_sequnlock(&cfids->entries_seqlock);
+ 
+ 	/* run laundromat unconditionally now as there might have been previously queued work */
+ 	mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
+@@ -647,7 +705,7 @@ static struct cached_fid *init_cached_dir(const char *path)
+ 	INIT_LIST_HEAD(&cfid->entry);
+ 	INIT_LIST_HEAD(&cfid->dirents.entries);
+ 	mutex_init(&cfid->dirents.de_mutex);
+-	spin_lock_init(&cfid->fid_lock);
++	seqlock_init(&cfid->seqlock);
+ 
+ 	/* this is our ref */
+ 	kref_init(&cfid->refcount);
+@@ -663,20 +721,26 @@ static struct cached_fid *init_cached_dir(const char *path)
+ 
+ static void cfids_laundromat_worker(struct work_struct *work)
+ {
+-	struct cached_fids *cfids;
+ 	struct cached_fid *cfid, *q;
++	struct cached_fids *cfids;
+ 	LIST_HEAD(entry);
+ 
+ 	cfids = container_of(work, struct cached_fids, laundromat_work.work);
+ 
+-	spin_lock(&cfids->cfid_list_lock);
++	synchronize_rcu();
++
++	write_seqlock(&cfids->entries_seqlock);
+ 	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
++		write_seqlock(&cfid->seqlock);
+ 		if (cfid_expired(cfid)) {
+ 			invalidate_cfid(cfid);
+-			list_move(&cfid->entry, &entry);
++			/* can't use list_move() here because of possible RCU readers */
++			list_del_rcu(&cfid->entry);
++			list_add(&cfid->entry, &entry);
+ 		}
++		write_sequnlock(&cfid->seqlock);
+ 	}
+-	spin_unlock(&cfids->cfid_list_lock);
++	write_sequnlock(&cfids->entries_seqlock);
+ 
+ 	list_for_each_entry_safe(cfid, q, &entry, entry) {
+ 		list_del(&cfid->entry);
+@@ -692,7 +756,6 @@ static void cfids_laundromat_worker(struct work_struct *work)
+ 		 * No risk for a double list_del() here because cfid is only on this list now.
+ 		 */
+ 		drop_cfid(cfid);
+-		kref_put(&cfid->refcount, smb2_close_cached_fid);
+ 	}
+ 
+ 	queue_delayed_work(cfid_put_wq, &cfids->laundromat_work, dir_cache_timeout * HZ);
+@@ -705,7 +768,8 @@ struct cached_fids *init_cached_dirs(void)
+ 	cfids = kzalloc(sizeof(*cfids), GFP_KERNEL);
+ 	if (!cfids)
+ 		return NULL;
+-	spin_lock_init(&cfids->cfid_list_lock);
++
++	seqlock_init(&cfids->entries_seqlock);
+ 	INIT_LIST_HEAD(&cfids->entries);
+ 
+ 	INIT_DELAYED_WORK(&cfids->laundromat_work, cfids_laundromat_worker);
 diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index c45151446049..343963a589e6 100644
+index 8bd04a0423ad..0c3762a092b2 100644
 --- a/fs/smb/client/cached_dir.h
 +++ b/fs/smb/client/cached_dir.h
-@@ -54,11 +54,15 @@ struct cached_fids {
+@@ -8,6 +8,8 @@
+ #ifndef _CACHED_DIR_H
+ #define _CACHED_DIR_H
+ 
++#include <linux/seqlock.h>
++
+ struct cached_dirent {
+ 	struct list_head entry;
+ 	char *name;
+@@ -33,13 +35,19 @@ struct cached_dirents {
+ 
+ struct cached_fid {
+ 	struct list_head entry;
++	struct rcu_head rcu;
++	/*
++	 * ->seqlock must be used:
++	 * - write-locked when updating
++	 * - rcu_read_lock() + seqcounted on reads
++	 */
++	seqlock_t seqlock;
+ 	struct cached_fids *cfids;
+ 	const char *path;
+ 	unsigned long ctime; /* (jiffies) creation time, when cfid was created (cached) */
+ 	unsigned long atime; /* (jiffies) access time, when it was last used */
+ 	struct kref refcount;
+ 	struct cifs_fid fid;
+-	spinlock_t fid_lock;
+ 	struct cifs_tcon *tcon;
+ 	struct dentry *dentry;
+ 	struct smb2_file_all_info *file_all_info;
+@@ -48,11 +56,12 @@ struct cached_fid {
+ 
+ /* default MAX_CACHED_FIDS is 16 */
+ struct cached_fids {
+-	/* Must be held when:
+-	 * - accessing the cfids->entries list
+-	 * - accessing cfids->num_entries
++	/*
++	 * ->entries_seqlock must be used when accessing ->entries or ->num_entries:
++	 * - write-locked when updating
++	 * - rcu_read_lock() + seqcounted on reads
+ 	 */
+-	spinlock_t cfid_list_lock;
++	seqlock_t entries_seqlock;
  	int num_entries;
  	struct list_head entries;
  	struct delayed_work laundromat_work;
+diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+index bb27b9c97724..72e63db75403 100644
+--- a/fs/smb/client/cifs_debug.c
++++ b/fs/smb/client/cifs_debug.c
+@@ -306,7 +306,8 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
+ 				cfids = tcon->cfids;
+ 				if (!cfids)
+ 					continue;
+-				spin_lock(&cfids->cfid_list_lock); /* check lock ordering */
 +
-+	/* convenience for parent lookups */
-+	int dirsep;
- };
- 
- /* Lookup modes for find_cached_dir() */
- enum {
- 	CFID_LOOKUP_PATH,
-+	CFID_LOOKUP_PARENT,
- 	CFID_LOOKUP_DENTRY,
- 	CFID_LOOKUP_LEASEKEY,
- };
-@@ -79,6 +83,7 @@ extern int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char
- 			   struct cifs_sb_info *cifs_sb, struct cached_fid **cfid);
- extern void close_cached_dir(struct cached_fid *cfid);
- extern bool drop_cached_dir(struct cached_fids *cfids, const void *key, int mode);
-+extern void invalidate_cached_dirents(struct cached_fids *cfids, const void *key, int mode);
- extern void close_all_cached_dirs(struct cifs_sb_info *cifs_sb);
- extern void invalidate_all_cached_dirs(struct cached_fids *cfids);
- #endif			/* _CACHED_DIR_H */
-diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-index e5372c2c799d..03aa54edba3e 100644
---- a/fs/smb/client/dir.c
-+++ b/fs/smb/client/dir.c
-@@ -190,9 +190,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
- 	int disposition;
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct cifs_open_parms oparms;
--	struct cached_fid *parent_cfid = NULL;
- 	int rdwr_for_fscache = 0;
--	__le32 lease_flags = 0;
- 
- 	*oplock = 0;
- 	if (tcon->ses->server->oplocks)
-@@ -314,26 +312,8 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
- 	if (!tcon->unix_ext && (mode & S_IWUGO) == 0)
- 		create_options |= CREATE_OPTION_READONLY;
- 
--
- retry_open:
--	if (tcon->cfids && direntry->d_parent && server->dialect >= SMB30_PROT_ID) {
--		parent_cfid = NULL;
--		spin_lock(&tcon->cfids->cfid_list_lock);
--		list_for_each_entry(parent_cfid, &tcon->cfids->entries, entry) {
--			if (parent_cfid->dentry == direntry->d_parent) {
--				if (!cfid_is_valid(parent_cfid))
--					break;
--
--				cifs_dbg(FYI, "found a parent cached file handle\n");
--				lease_flags |= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
--				memcpy(fid->parent_lease_key, parent_cfid->fid.lease_key,
--				       SMB2_LEASE_KEY_SIZE);
--				parent_cfid->dirents.is_valid = false;
--				break;
--			}
--		}
--		spin_unlock(&tcon->cfids->cfid_list_lock);
--	}
-+	invalidate_cached_dirents(tcon->cfids, direntry->d_parent, CFID_LOOKUP_DENTRY);
- 
- 	oparms = (struct cifs_open_parms) {
- 		.tcon = tcon,
-@@ -343,7 +323,6 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
- 		.disposition = disposition,
- 		.path = full_path,
- 		.fid = fid,
--		.lease_flags = lease_flags,
- 		.mode = mode,
- 	};
- 	rc = server->ops->open(xid, &oparms, oplock, buf);
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index 8ccdd1a3ba2c..53bc1250391f 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -1120,6 +1120,8 @@ smb2_mkdir(const unsigned int xid, struct inode *parent_inode, umode_t mode,
- {
- 	struct cifs_open_parms oparms;
- 
-+	invalidate_cached_dirents(tcon->cfids, name, CFID_LOOKUP_PARENT);
-+
- 	oparms = CIFS_OPARMS(cifs_sb, tcon, name, FILE_WRITE_ATTRIBUTES,
- 			     FILE_CREATE, CREATE_NOT_FILE, mode);
- 	return smb2_compound_op(xid, tcon, cifs_sb,
-@@ -1141,6 +1143,8 @@ smb2_mkdir_setinfo(struct inode *inode, const char *name,
- 	u32 dosattrs;
- 	int tmprc;
- 
-+	invalidate_cached_dirents(tcon->cfids, name, CFID_LOOKUP_PARENT);
-+
- 	in_iov.iov_base = &data;
- 	in_iov.iov_len = sizeof(data);
- 	cifs_i = CIFS_I(inode);
-@@ -1180,8 +1184,12 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
- 	struct inode *inode = NULL;
- 	int rc;
- 
--	if (dentry)
-+	if (dentry) {
- 		inode = d_inode(dentry);
-+		invalidate_cached_dirents(tcon->cfids, dentry->d_parent, CFID_LOOKUP_DENTRY);
-+	} else {
-+		invalidate_cached_dirents(tcon->cfids, name, CFID_LOOKUP_PARENT);
-+	}
- 
- 	oparms = CIFS_OPARMS(cifs_sb, tcon, name, DELETE,
- 			     FILE_OPEN, OPEN_REPARSE_POINT, ACL_NO_MODE);
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 07ba61583114..f85a2e2555a2 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -2419,7 +2419,8 @@ add_lease_context(struct TCP_Server_Info *server,
- 	if (iov[num].iov_base == NULL)
- 		return -ENOMEM;
- 	iov[num].iov_len = server->vals->create_lease_size;
--	req->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_LEASE;
-+	/* keep the requested oplock level in case of just setting ParentLeaseKey */
-+	req->RequestedOplockLevel = *oplock;
- 	*num_iovec = num + 1;
- 	return 0;
- }
-@@ -3001,6 +3002,34 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
- 	return rc;
- }
- 
-+/*
-+ * When opening a path, set ParentLeaseKey in @oparms if its parent is cached.
-+ * We only have RH caching for dirs, so skip this on mkdir, unlink, rmdir.
-+ *
-+ * Ref: MS-SMB2 3.3.5.9 and MS-FSA 2.1.5.1
-+ *
-+ * Return: 0 if ParentLeaseKey was set in @oparms, -errno otherwise.
-+ */
-+static int check_cached_parent(struct cached_fids *cfids, struct cifs_open_parms *oparms)
-+{
-+	struct cached_fid *cfid;
-+
-+	if (!cfids || !oparms || !oparms->cifs_sb || !*oparms->path)
-+		return -EINVAL;
-+
-+	cfid = find_cached_dir(cfids, oparms->path, CFID_LOOKUP_PARENT);
-+	if (!cfid)
-+		return -ENOENT;
-+
-+	cifs_dbg(FYI, "%s: found cached parent for path: %s\n", __func__, oparms->path);
-+
-+	memcpy(oparms->fid->parent_lease_key, cfid->fid.lease_key, SMB2_LEASE_KEY_SIZE);
-+	oparms->lease_flags |= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
-+	close_cached_dir(cfid);
-+
-+	return 0;
-+}
-+
- int
- SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 	       struct smb_rqst *rqst, __u8 *oplock,
-@@ -3077,20 +3106,28 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 	iov[1].iov_len = uni_path_len;
- 	iov[1].iov_base = path;
- 
--	if ((!server->oplocks) || (tcon->no_lease))
-+	if (!server->oplocks || tcon->no_lease)
- 		*oplock = SMB2_OPLOCK_LEVEL_NONE;
- 
--	if (!(server->capabilities & SMB2_GLOBAL_CAP_LEASING) ||
--	    *oplock == SMB2_OPLOCK_LEVEL_NONE)
--		req->RequestedOplockLevel = *oplock;
--	else if (!(server->capabilities & SMB2_GLOBAL_CAP_DIRECTORY_LEASING) &&
--		  (oparms->create_options & CREATE_NOT_FILE))
--		req->RequestedOplockLevel = *oplock; /* no srv lease support */
--	else {
--		rc = add_lease_context(server, req, iov, &n_iov,
--				       oparms->fid->lease_key, oplock,
--				       oparms->fid->parent_lease_key,
--				       oparms->lease_flags);
-+	req->RequestedOplockLevel = *oplock;
-+
-+	/*
-+	 * MS-SMB2 "Product Behavior" says Windows only checks/sets ParentLeaseKey when a lease is
-+	 * requested for the child/target.
-+	 * Practically speaking, adding the lease context with ParentLeaseKey set, even with oplock
-+	 * none, works fine.
-+	 * As a precaution, however, only set it for oplocks != none.
-+	 */
-+	if ((server->capabilities & SMB2_GLOBAL_CAP_LEASING) &&
-+	    *oplock != SMB2_OPLOCK_LEVEL_NONE) {
-+		rc = -EOPNOTSUPP;
-+		if (server->capabilities & SMB2_GLOBAL_CAP_DIRECTORY_LEASING)
-+			rc = check_cached_parent(tcon->cfids, oparms);
-+
-+		if (!rc || *oplock != SMB2_OPLOCK_LEVEL_NONE)
-+			rc = add_lease_context(server, req, iov, &n_iov, oparms->fid->lease_key,
-+					       oplock, oparms->fid->parent_lease_key,
-+					       oparms->lease_flags);
- 		if (rc)
- 			return rc;
++				read_seqlock_excl(&cfids->entries_seqlock);
+ 				seq_printf(m, "Num entries: %d\n", cfids->num_entries);
+ 				list_for_each_entry(cfid, &cfids->entries, entry) {
+ 					seq_printf(m, "0x%x 0x%llx 0x%llx     %s",
+@@ -320,7 +321,7 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
+ 						seq_printf(m, ", valid dirents");
+ 					seq_printf(m, "\n");
+ 				}
+-				spin_unlock(&cfids->cfid_list_lock);
++				read_sequnlock_excl(&cfids->entries_seqlock);
+ 			}
+ 		}
  	}
 -- 
 2.49.0
