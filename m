@@ -1,720 +1,201 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F71019E81F
-	for <linux-cifs@vger.kernel.org>; Wed,  1 Oct 2025 18:23:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9F31D90DD;
+	Wed,  1 Oct 2025 19:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759342994; cv=none; b=hxXlG5/6baNNdSKGmbGk75joBVmAPOXwEJwLDjh70C6W4PWgikYRCLT6le7G2yjuRTY458ZZD8oKK/+D4IAn7FIpUEIDY1rO0V9C/JfK432vidTI8uEutoLFNWB6B8qpU5VhxnGFIVZYKkd5u4yicm4GE1xZNtUcwOCbmH4Ysr0=
+	t=1759346738; cv=none; b=bIUJ+vz+uul4LMw0dywCyvhIyAjBEc+fxeWKy/zLsLk4oicuO6OIg+oKfveJa9Dj+3yv9ndI4bcmqQO10Il+Ba898Tw+JybuFpyFZYfg+yHn6n6ekdRkI/nvIRXcwH9Dau4fqXgD85bK3HxWmDRiX1sa0dQLH4G15n1o2qwq4WY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759342994; c=relaxed/simple;
-	bh=6MNmBUjfIZ1Cz+p29KLqHMbJhxOjhg1ablBeGxGpPHE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dd4jRN8zXC06cJp/FEdIbN/N6Qu7BqttmI/PYFxp/+7Fg0t5IXnRDjSBzYwyqZQi52cQeVc3NIQOLZBDO72SiDdRwDnIFnkRBa6kU4Vy03hyFFaBYoB1nHFe+rFcmtCdCmrFPC3AjgOZGDQ63IJ5kErZ/E5mbBOEcp0L/ecDRrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XRBmTk6O; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jymOHxDs; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XRBmTk6O; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jymOHxDs; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1759346738; c=relaxed/simple;
+	bh=E7cTOOalQ1Hgy8lDpdpI+zGR+MuYVo6NmJ1DkBcBmnk=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=nlG+RaIUmxnqEHu9D3+9UOOPoQn0V7bdUZV4RwwuZvkSCb2BArS7WNSDNXpqpWjKfGupLms90Ivy6yVmem4FwD24NhVjyETD/mbcNfpyOipw/9JiZu3QNos2LkH/Fnyy4dtWlyPH34AcJPW7G1ZKcUSRvhtllYJtgbqckRlA9gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=BFbXjmx3; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XRBmTk6O";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jymOHxDs";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XRBmTk6O";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jymOHxDs"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 7996C1F457;
-	Wed,  1 Oct 2025 18:23:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759342989; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=tB0bUISVHuK8swYDKjR4IpHNzhXa2noup2yfBlPDYsQ=;
-	b=XRBmTk6OW3Oh0Q//vW1q39Kt6IJ0u7aHmSuOBEsHyYbZ88Hz1X6WSaB73lI/RAIBxKFQT4
-	rKdu6tMvu+1RdHWCqltE+96HcHOT5qXloihb8ywqDUo7YJ5OwqabVwFZNb8P+VIcLdrsTl
-	zsANjfZv8pYshd1WMd1dT2wHkk1kipU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759342989;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=tB0bUISVHuK8swYDKjR4IpHNzhXa2noup2yfBlPDYsQ=;
-	b=jymOHxDsi2pX4Ke1xcgqm6XnYN/hZ4EtTyL8y3n3i8C+4+vzwbQ7JCXpjJzLAtuqHDxTYR
-	cYrvclZxquJRaUAQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759342989; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=tB0bUISVHuK8swYDKjR4IpHNzhXa2noup2yfBlPDYsQ=;
-	b=XRBmTk6OW3Oh0Q//vW1q39Kt6IJ0u7aHmSuOBEsHyYbZ88Hz1X6WSaB73lI/RAIBxKFQT4
-	rKdu6tMvu+1RdHWCqltE+96HcHOT5qXloihb8ywqDUo7YJ5OwqabVwFZNb8P+VIcLdrsTl
-	zsANjfZv8pYshd1WMd1dT2wHkk1kipU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759342989;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=tB0bUISVHuK8swYDKjR4IpHNzhXa2noup2yfBlPDYsQ=;
-	b=jymOHxDsi2pX4Ke1xcgqm6XnYN/hZ4EtTyL8y3n3i8C+4+vzwbQ7JCXpjJzLAtuqHDxTYR
-	cYrvclZxquJRaUAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 03DB713A42;
-	Wed,  1 Oct 2025 18:23:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id DwEFL4xx3WiPbAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Wed, 01 Oct 2025 18:23:08 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	henrique.carvalho@suse.com
-Subject: [PATCH v2 19/20] smb: client: rework cached dirs synchronization
-Date: Wed,  1 Oct 2025 15:22:59 -0300
-Message-ID: <20251001182259.731184-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="BFbXjmx3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1759346716; x=1759951516; i=markus.elfring@web.de;
+	bh=L6RoqV/E5xic5YvrRScLm9fOIIwxmYczXxQqYHqd28k=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
+	 Subject:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=BFbXjmx3qq90uBZ1rH2MmUanW3kdtSBZI8C/+Vn2k7B2AgbUtDTcFD52TAPVnong
+	 dyyUglp65xadP9oxxSu75C2Gx+7O1At5k/eDJtR5qIk6QIkTZg1LHn8ohmKakMTGi
+	 8NV3WMtwmmZIEZ80+a4UXokPSvK8xgDx47nISbSaZt+UKOes31IUCf/QsAtcsAD2e
+	 uyvQxQ+DnGstwG0W28CcqkD8j3Jc8gf+B1Age8YWvueyamuWiYy+7J7QatYYIhZcU
+	 KYImD9ES8P7tMqfEnC+NHOnW1bAq6w/QCtE/PcN8lmgEy6WZj4EJqnTaJKK1ng0lV
+	 9iZdbGQ5QH6yXwj3Bw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.174]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MIya8-1ukryA3Cby-00XFW2; Wed, 01
+ Oct 2025 21:25:16 +0200
+Message-ID: <7f956b3b-853b-4150-b2e0-ccd430adf9ac@web.de>
+Date: Wed, 1 Oct 2025 21:25:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_DN_NONE(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	RCVD_TLS_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+User-Agent: Mozilla Thunderbird
+To: linux-cifs@vger.kernel.org, Hyunchul Lee <hyc.lee@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>
+Content-Language: en-GB, de-DE
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
+ Stefan Metzmacher <metze@samba.org>
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] smb: server: Use common error handling code in
+ smb_direct_rdma_xmit()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:aQQsLX+Zz2WGBpgQ2OjdkzkoxweEph4qNgycVEu5Z4dmOX96Q6H
+ k/UalmGDGE6UzFJhqEf8qCXJ7VIauM4bYSwfEdAhx5PxHU/zR75USTDC2SA6GeMmL4kXwsp
+ WYrO2P/ht+DKJP3yvQ8xvuYLlvG/DNlJQa05ShhPfzNGIBW9amNobXgGGkTbCVV6C8bv78R
+ lr6Wc9RqJj3D2qU/ObaLg==
 X-Spam-Flag: NO
-X-Spam-Score: -2.80
+UI-OutboundReport: notjunk:1;M01:P0:tQ7U+SI3I+k=;8QVdrK815MWxGr7mo9E+OkIxS8A
+ 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
 
-This patch adds usage of RCU and seqlocks for cached dir (list and
-entries).
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Wed, 1 Oct 2025 21:09:00 +0200
 
-Traversing the list under RCU allows faster lookups (no locks) and also
-guarantees that entries being read are not gone (i.e. prevents UAF).
+Add two jump targets so that a bit of exception handling can be better
+reused at the end of this function implementation.
 
-seqlocks provides atomicity/consistency when reading entries, allowing
-callers to re-check cfid in case of write-side invalidation.
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ fs/smb/server/transport_rdma.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-Combined with refcounting, this new approach provides safety for
-callers and flexibility for future enhancements.
-
-Other:
-- now that we can inform lookups of cfid changes, set cfid->dentry
-  earlier in open_cached_dir() to allow by-dentry lookups to find
-  this cfid
-
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
-v2:
-- small rework on find_cfid() to use ERR_PTR instead of an int
-- dropped unnecessrary read of the list on laundromat since it's only
-  called when cleanups are needed (now does a stright write-locked check)
-
-
- fs/smb/client/cached_dir.c | 236 +++++++++++++++++++++++--------------
- fs/smb/client/cached_dir.h |  19 ++-
- fs/smb/client/cifs_debug.c |   5 +-
- 3 files changed, 167 insertions(+), 93 deletions(-)
-
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 361f9529ea8a..edfbb05c2264 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -16,12 +16,12 @@
- #define CFID_INVALID_TIME 1
- 
- static struct cached_fid *init_cached_dir(const char *path);
--static void smb2_close_cached_fid(struct kref *ref);
-+static void cfid_release_ref(struct kref *ref);
- 
- static inline void invalidate_cfid(struct cached_fid *cfid)
- {
- 	/* callers must hold the list lock and do any list operations (del/move) themselves */
--	lockdep_assert_held(&cfid->cfids->cfid_list_lock);
-+	lockdep_assert_held(&cfid->cfids->entries_seqlock.lock);
- 
- 	if (cfid_is_valid(cfid))
- 		cfid->cfids->num_entries--;
-@@ -31,20 +31,19 @@ static inline void invalidate_cfid(struct cached_fid *cfid)
- 	cfid->atime = CFID_INVALID_TIME;
- }
- 
--static inline void drop_cfid(struct cached_fid *cfid)
-+static inline void __drop_cfid(struct cached_fid *cfid)
- {
- 	struct dentry *dentry = NULL;
- 	u64 pfid = 0, vfid = 0;
- 
--	spin_lock(&cfid->cfids->cfid_list_lock);
-+	write_seqlock(&cfid->cfids->entries_seqlock);
-+	write_seqlock(&cfid->seqlock);
- 	invalidate_cfid(cfid);
--
--	spin_lock(&cfid->fid_lock);
- 	swap(cfid->dentry, dentry);
- 	swap(cfid->fid.persistent_fid, pfid);
- 	swap(cfid->fid.volatile_fid, vfid);
--	spin_unlock(&cfid->fid_lock);
--	spin_unlock(&cfid->cfids->cfid_list_lock);
-+	write_sequnlock(&cfid->seqlock);
-+	write_sequnlock(&cfid->cfids->entries_seqlock);
- 
- 	dput(dentry);
- 
-@@ -58,11 +57,18 @@ static inline void drop_cfid(struct cached_fid *cfid)
- 	}
- }
- 
-+static inline void drop_cfid(struct cached_fid *cfid)
-+{
-+	__drop_cfid(cfid);
-+	kref_put(&cfid->refcount, cfid_release_ref);
-+}
-+
- /*
-  * Find a cached dir based on @key and @mode (raw lookup).
-  * The only validation done here is if cfid is going down (->ctime == CFID_INVALID_TIME).
-  *
-  * If @wait_open is true, keep retrying until cfid transitions from 'opening' to valid/invalid.
-+ * Will also keep retrying on list seqcount invalidations.
-  *
-  * Callers must handle any other validation as needed.
-  * Returned cfid, if found, has a ref taken, regardless of state.
-@@ -72,7 +78,7 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
- {
- 	struct cached_fid *cfid, *found;
- 	const char *parent_path = NULL;
--	bool match;
-+	unsigned int lseq = 0;
- 
- 	if (!cfids || !key)
- 		return NULL;
-@@ -97,8 +103,16 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
- retry_find:
- 	found = NULL;
- 
--	spin_lock(&cfids->cfid_list_lock);
--	list_for_each_entry(cfid, &cfids->entries, entry) {
-+	rcu_read_lock();
-+	lseq = read_seqbegin(&cfids->entries_seqlock);
-+	list_for_each_entry_rcu(cfid, &cfids->entries, entry) {
-+		bool match = false;
-+
-+		if (need_seqretry(&cfids->entries_seqlock, lseq)) {
-+			found = ERR_PTR(-ECHILD);
-+			break;
-+		}
-+
- 		/* don't even bother checking if it's going away */
- 		if (cfid->ctime == CFID_INVALID_TIME)
- 			continue;
-@@ -115,23 +129,59 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
- 		if (!match)
- 			continue;
- 
--		/* only get a ref here if not waiting for open */
--		if (!wait_open)
--			kref_get(&cfid->refcount);
-+		if (wait_open && !cfid->ctime) {
-+			unsigned int cseq = read_seqbegin(&cfid->seqlock);
-+
-+			if (!cfid->ctime)
-+				found = ERR_PTR(-ECHILD);
-+			else if (!cfid_is_valid(cfid))
-+				found = ERR_PTR(-EINVAL);
-+
-+			if (read_seqretry(&cfid->seqlock, cseq) && !found)
-+				found = ERR_PTR(-ECHILD);
-+
-+			if (found)
-+				break;
-+		}
-+
-+		kref_get(&cfid->refcount);
- 		found = cfid;
- 		break;
- 	}
--	spin_unlock(&cfids->cfid_list_lock);
- 
--	if (wait_open && found) {
--		/* cfid is being opened in open_cached_dir(), retry lookup */
--		if (!found->ctime)
--			goto retry_find;
-+	if (read_seqretry(&cfids->entries_seqlock, lseq)) {
-+		if (wait_open) {
-+			if (!found) {
-+				found = ERR_PTR(-ECHILD);
-+
-+				/*
-+				 * Not found but caller requested wait for open.
-+				 * The list seqcount invalidation might have been our open, retry
-+				 * only once more (in case it wasn't).
-+				 */
-+				wait_open = false;
-+			}
-+		}
-+
-+		if (found && !IS_ERR(found)) {
-+			/* can't put ref under RCU lock, do it below */
-+			cfid = found;
-+			found = ERR_PTR(-EUCLEAN);
-+		}
-+	}
-+	rcu_read_unlock();
- 
--		/* we didn't get a ref above, so get one now */
--		kref_get(&found->refcount);
-+	if (PTR_ERR(found) == -EUCLEAN) {
-+		kref_put(&cfid->refcount, cfid_release_ref);
-+		found = ERR_PTR(-ECHILD);
- 	}
- 
-+	if (PTR_ERR(found) == -ECHILD)
-+		goto retry_find;
-+
-+	if (IS_ERR(found))
-+		found = NULL;
-+
- 	kfree(parent_path);
- 
- 	return found;
-@@ -211,7 +261,7 @@ struct cached_fid *find_cached_dir(struct cached_fids *cfids, const void *key, i
- 		if (cfid_is_valid(cfid)) {
- 			cfid->atime = jiffies;
- 		} else {
--			kref_put(&cfid->refcount, smb2_close_cached_fid);
-+			kref_put(&cfid->refcount, cfid_release_ref);
- 			cfid = NULL;
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma=
+.c
+index b3077766d6ec..a201c5871a77 100644
+=2D-- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -1574,18 +1574,14 @@ static int smb_direct_rdma_xmit(struct smb_direct_=
+transport *t,
+ 					     get_buf_page_count(desc_buf, desc_buf_len),
+ 					     msg->sg_list, SG_CHUNK_SIZE);
+ 		if (ret) {
+-			kfree(msg);
+ 			ret =3D -ENOMEM;
+-			goto out;
++			goto free_msg;
  		}
- 	}
-@@ -242,7 +292,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	u8 oplock = SMB2_OPLOCK_LEVEL_II;
- 	struct cifs_fid *pfid;
- 	struct dentry *dentry;
--	struct cached_fid *cfid;
-+	struct cached_fid __rcu *cfid;
- 	struct cached_fids *cfids;
- 	const char *npath;
- 	int retries = 0, cur_sleep = 1;
-@@ -273,34 +323,35 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	if (!server->ops->new_lease_key)
- 		return -EIO;
- 
--	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
--	if (!utf16_path)
--		return -ENOMEM;
--
- 	/* find_cached_dir() already validates cfid if found, so no need to check here again */
- 	cfid = find_cached_dir(cfids, path, CFID_LOOKUP_PATH);
- 	if (cfid) {
--		rc = 0;
--		goto out;
-+		*ret_cfid = cfid;
-+		return 0;
- 	}
- 
--	spin_lock(&cfids->cfid_list_lock);
-+	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
-+	if (!utf16_path)
-+		return -ENOMEM;
-+
-+	read_seqlock_excl(&cfids->entries_seqlock);
- 	if (cfids->num_entries >= tcon->max_cached_dirs) {
--		spin_unlock(&cfids->cfid_list_lock);
-+		read_sequnlock_excl(&cfids->entries_seqlock);
- 		rc = -ENOENT;
- 		goto out;
- 	}
-+	read_sequnlock_excl(&cfids->entries_seqlock);
- 
-+	/* no ned to lock cfid or entries yet */
- 	cfid = init_cached_dir(path);
- 	if (!cfid) {
--		spin_unlock(&cfids->cfid_list_lock);
- 		rc = -ENOMEM;
- 		goto out;
- 	}
- 
- 	cfid->cfids = cfids;
- 	cfid->tcon = tcon;
--	spin_unlock(&cfids->cfid_list_lock);
-+	pfid = &cfid->fid;
- 
- 	/*
- 	 * Skip any prefix paths in @path as lookup_noperm_positive_unlocked() ends up
-@@ -325,16 +376,16 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 			goto out;
- 		}
- 	}
-+
-+	write_seqlock(&cfids->entries_seqlock);
-+	write_seqlock(&cfid->seqlock);
- 	cfid->dentry = dentry;
--	cfid->tcon = tcon;
- 	dentry = NULL;
-+	write_sequnlock(&cfid->seqlock);
- 
--	spin_lock(&cfids->cfid_list_lock);
- 	cfids->num_entries++;
--	list_add(&cfid->entry, &cfids->entries);
--	spin_unlock(&cfids->cfid_list_lock);
--
--	pfid = &cfid->fid;
-+	list_add_rcu(&cfid->entry, &cfids->entries);
-+	write_sequnlock(&cfids->entries_seqlock);
- 
- 	/*
- 	 * We do not hold the lock for the open because in case
-@@ -400,8 +451,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 		goto oshr_free;
- 	}
- 
--	spin_lock(&cfids->cfid_list_lock);
--
- 	o_rsp = (struct smb2_create_rsp *)rsp_iov[0].iov_base;
- 	oparms.fid->persistent_fid = o_rsp->PersistentFileId;
- 	oparms.fid->volatile_fid = o_rsp->VolatileFileId;
-@@ -411,30 +460,23 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 
- 
- 	if (o_rsp->OplockLevel != SMB2_OPLOCK_LEVEL_LEASE) {
--		spin_unlock(&cfids->cfid_list_lock);
- 		rc = -EINVAL;
- 		goto oshr_free;
- 	}
- 
--	rc = smb2_parse_contexts(server, rsp_iov,
--				 &oparms.fid->epoch,
--				 oparms.fid->lease_key,
-+	rc = smb2_parse_contexts(server, rsp_iov, &oparms.fid->epoch, oparms.fid->lease_key,
- 				 &oplock, NULL, NULL);
--	if (rc) {
--		spin_unlock(&cfids->cfid_list_lock);
-+	if (rc)
- 		goto oshr_free;
--	}
- 
- 	rc = -EINVAL;
--	if (!(oplock & SMB2_LEASE_READ_CACHING_HE)) {
--		spin_unlock(&cfids->cfid_list_lock);
-+	if (!(oplock & SMB2_LEASE_READ_CACHING_HE))
- 		goto oshr_free;
--	}
-+
- 	qi_rsp = (struct smb2_query_info_rsp *)rsp_iov[1].iov_base;
--	if (le32_to_cpu(qi_rsp->OutputBufferLength) < sizeof(struct smb2_file_all_info)) {
--		spin_unlock(&cfids->cfid_list_lock);
-+	if (le32_to_cpu(qi_rsp->OutputBufferLength) < sizeof(struct smb2_file_all_info))
- 		goto oshr_free;
--	}
-+
- 	if (!smb2_validate_and_copy_iov(le16_to_cpu(qi_rsp->OutputBufferOffset),
- 					sizeof(struct smb2_file_all_info), &rsp_iov[1],
- 					sizeof(struct smb2_file_all_info), (char *)&info)) {
-@@ -445,10 +487,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 		}
- 	}
- 
--	cfid->ctime = jiffies;
--	cfid->atime = jiffies;
--	spin_unlock(&cfids->cfid_list_lock);
--	/* At this point the directory handle is fully cached */
- 	rc = 0;
- oshr_free:
- 	SMB2_open_free(&rqst[0]);
-@@ -456,16 +494,22 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
- 	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
- out:
--	/* cfid invalidated in the mean time, drop it below */
--	if (!rc && !cfid_is_valid(cfid))
-+	/* cfid only becomes fully valid below, so can't use cfid_is_valid() here */
-+	if (!rc && cfid->ctime == CFID_INVALID_TIME)
- 		rc = -ENOENT;
- 
- 	if (rc) {
--		if (cfid) {
-+		dput(dentry);
-+
-+		if (cfid)
- 			drop_cfid(cfid);
--			kref_put(&cfid->refcount, smb2_close_cached_fid);
+=20
+ 		ret =3D get_sg_list(desc_buf, desc_buf_len,
+ 				  msg->sgt.sgl, msg->sgt.orig_nents);
+-		if (ret < 0) {
+-			sg_free_table_chained(&msg->sgt, SG_CHUNK_SIZE);
+-			kfree(msg);
+-			goto out;
 -		}
- 	} else {
-+		/* seqlocked-write will inform concurrent lookups of opening -> open transition */
-+		write_seqlock(&cfid->seqlock);
-+		cfid->ctime = jiffies;
-+		cfid->atime = jiffies;
-+		write_sequnlock(&cfid->seqlock);
-+
- 		*ret_cfid = cfid;
- 		atomic_inc(&tcon->num_remote_opens);
- 	}
-@@ -485,7 +529,6 @@ static void __invalidate_cached_dirents(struct cached_fid *cfid)
- 	if (!cfid)
- 		return;
- 
--	mutex_lock(&cfid->dirents.de_mutex);
- 	list_for_each_entry_safe(de, q, &cfid->dirents.entries, entry) {
- 		list_del(&de->entry);
- 		kfree(de->name);
-@@ -496,15 +539,13 @@ static void __invalidate_cached_dirents(struct cached_fid *cfid)
- 	cfid->dirents.is_failed = false;
- 	cfid->dirents.file = NULL;
- 	cfid->dirents.pos = 0;
--	mutex_unlock(&cfid->dirents.de_mutex);
- }
- 
--static void smb2_close_cached_fid(struct kref *ref)
-+static void cfid_rcu_free(struct rcu_head *rcu)
- {
--	struct cached_fid *cfid = container_of(ref, struct cached_fid, refcount);
-+	struct cached_fid *cfid = container_of(rcu, struct cached_fid, rcu);
- 
- 	__invalidate_cached_dirents(cfid);
--	drop_cfid(cfid);
- 
- 	kfree(cfid->file_all_info);
- 	cfid->file_all_info = NULL;
-@@ -513,6 +554,14 @@ static void smb2_close_cached_fid(struct kref *ref)
- 	kfree(cfid);
- }
- 
-+static void cfid_release_ref(struct kref *ref)
-+{
-+	struct cached_fid *cfid = container_of(ref, struct cached_fid, refcount);
-+
-+	__drop_cfid(cfid);
-+	call_rcu_hurry(&cfid->rcu, cfid_rcu_free);
-+}
-+
- bool drop_cached_dir(struct cached_fids *cfids, const void *key, int mode)
- {
- 	struct cached_fid *cfid;
-@@ -533,13 +582,16 @@ bool drop_cached_dir(struct cached_fids *cfids, const void *key, int mode)
- 		drop_cfid(cfid);
- 	} else {
- 		/* we're locked in smb2_is_valid_lease_break(), so can't dput/close here */
--		spin_lock(&cfids->cfid_list_lock);
-+		write_seqlock(&cfids->entries_seqlock);
-+		write_seqlock(&cfid->seqlock);
- 		invalidate_cfid(cfid);
--		spin_unlock(&cfids->cfid_list_lock);
-+		write_sequnlock(&cfid->seqlock);
-+		write_sequnlock(&cfids->entries_seqlock);
-+
-+		/* put lookup ref */
-+		kref_put(&cfid->refcount, cfid_release_ref);
- 	}
- 
--	/* put lookup ref */
--	kref_put(&cfid->refcount, smb2_close_cached_fid);
- 	mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
- 
- 	return true;
-@@ -560,33 +612,39 @@ void invalidate_cached_dirents(struct cached_fids *cfids, const void *key, int m
- 
- 	cfid = find_cfid(cfids, key, mode, false);
- 	if (cfid) {
--		__invalidate_cached_dirents(cfid);
--		kref_put(&cfid->refcount, smb2_close_cached_fid);
-+		if (cfid_is_valid(cfid)) {
-+			mutex_lock(&cfid->dirents.de_mutex);
-+			__invalidate_cached_dirents(cfid);
-+			mutex_unlock(&cfid->dirents.de_mutex);
-+		}
-+		kref_put(&cfid->refcount, cfid_release_ref);
- 	}
- }
- 
- void close_cached_dir(struct cached_fid *cfid)
- {
--	kref_put(&cfid->refcount, smb2_close_cached_fid);
-+	kref_put(&cfid->refcount, cfid_release_ref);
- }
- 
- static void invalidate_all_cfids(struct cached_fids *cfids, bool closed)
- {
--	struct cached_fid *cfid, *q;
-+	struct cached_fid *cfid;
- 
- 	if (!cfids)
- 		return;
- 
- 	/* mark all the cfids as closed and invalidate them for laundromat cleanup */
--	spin_lock(&cfids->cfid_list_lock);
--	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
-+	write_seqlock(&cfids->entries_seqlock);
-+	list_for_each_entry(cfid, &cfids->entries, entry) {
-+		write_seqlock(&cfid->seqlock);
- 		invalidate_cfid(cfid);
- 		if (closed) {
- 			cfid->fid.persistent_fid = 0;
- 			cfid->fid.volatile_fid = 0;
++		if (ret < 0)
++			goto free_table;
+=20
+ 		ret =3D rdma_rw_ctx_init(&msg->rdma_ctx, sc->ib.qp, sc->ib.qp->port,
+ 				       msg->sgt.sgl,
+@@ -1596,9 +1592,7 @@ static int smb_direct_rdma_xmit(struct smb_direct_tr=
+ansport *t,
+ 				       is_read ? DMA_FROM_DEVICE : DMA_TO_DEVICE);
+ 		if (ret < 0) {
+ 			pr_err("failed to init rdma_rw_ctx: %d\n", ret);
+-			sg_free_table_chained(&msg->sgt, SG_CHUNK_SIZE);
+-			kfree(msg);
+-			goto out;
++			goto free_table;
  		}
-+		write_sequnlock(&cfid->seqlock);
- 	}
--	spin_unlock(&cfids->cfid_list_lock);
-+	write_sequnlock(&cfids->entries_seqlock);
- 
- 	/* run laundromat unconditionally now as there might have been previously queued work */
- 	mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
-@@ -647,7 +705,7 @@ static struct cached_fid *init_cached_dir(const char *path)
- 	INIT_LIST_HEAD(&cfid->entry);
- 	INIT_LIST_HEAD(&cfid->dirents.entries);
- 	mutex_init(&cfid->dirents.de_mutex);
--	spin_lock_init(&cfid->fid_lock);
-+	seqlock_init(&cfid->seqlock);
- 
- 	/* this is our ref */
- 	kref_init(&cfid->refcount);
-@@ -663,20 +721,26 @@ static struct cached_fid *init_cached_dir(const char *path)
- 
- static void cfids_laundromat_worker(struct work_struct *work)
- {
--	struct cached_fids *cfids;
- 	struct cached_fid *cfid, *q;
-+	struct cached_fids *cfids;
- 	LIST_HEAD(entry);
- 
- 	cfids = container_of(work, struct cached_fids, laundromat_work.work);
- 
--	spin_lock(&cfids->cfid_list_lock);
-+	synchronize_rcu();
+=20
+ 		list_add_tail(&msg->list, &msg_list);
+@@ -1630,6 +1624,12 @@ static int smb_direct_rdma_xmit(struct smb_direct_t=
+ransport *t,
+ 	atomic_add(credits_needed, &sc->rw_io.credits.count);
+ 	wake_up(&sc->rw_io.credits.wait_queue);
+ 	return ret;
 +
-+	write_seqlock(&cfids->entries_seqlock);
- 	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
-+		write_seqlock(&cfid->seqlock);
- 		if (cfid_expired(cfid)) {
- 			invalidate_cfid(cfid);
--			list_move(&cfid->entry, &entry);
-+			/* can't use list_move() here because of possible RCU readers */
-+			list_del_rcu(&cfid->entry);
-+			list_add(&cfid->entry, &entry);
- 		}
-+		write_sequnlock(&cfid->seqlock);
- 	}
--	spin_unlock(&cfids->cfid_list_lock);
-+	write_sequnlock(&cfids->entries_seqlock);
- 
- 	list_for_each_entry_safe(cfid, q, &entry, entry) {
- 		list_del(&cfid->entry);
-@@ -692,7 +756,6 @@ static void cfids_laundromat_worker(struct work_struct *work)
- 		 * No risk for a double list_del() here because cfid is only on this list now.
- 		 */
- 		drop_cfid(cfid);
--		kref_put(&cfid->refcount, smb2_close_cached_fid);
- 	}
- 
- 	queue_delayed_work(cfid_put_wq, &cfids->laundromat_work, dir_cache_timeout * HZ);
-@@ -705,7 +768,8 @@ struct cached_fids *init_cached_dirs(void)
- 	cfids = kzalloc(sizeof(*cfids), GFP_KERNEL);
- 	if (!cfids)
- 		return NULL;
--	spin_lock_init(&cfids->cfid_list_lock);
-+
-+	seqlock_init(&cfids->entries_seqlock);
- 	INIT_LIST_HEAD(&cfids->entries);
- 
- 	INIT_DELAYED_WORK(&cfids->laundromat_work, cfids_laundromat_worker);
-diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index 8bd04a0423ad..0c3762a092b2 100644
---- a/fs/smb/client/cached_dir.h
-+++ b/fs/smb/client/cached_dir.h
-@@ -8,6 +8,8 @@
- #ifndef _CACHED_DIR_H
- #define _CACHED_DIR_H
- 
-+#include <linux/seqlock.h>
-+
- struct cached_dirent {
- 	struct list_head entry;
- 	char *name;
-@@ -33,13 +35,19 @@ struct cached_dirents {
- 
- struct cached_fid {
- 	struct list_head entry;
-+	struct rcu_head rcu;
-+	/*
-+	 * ->seqlock must be used:
-+	 * - write-locked when updating
-+	 * - rcu_read_lock() + seqcounted on reads
-+	 */
-+	seqlock_t seqlock;
- 	struct cached_fids *cfids;
- 	const char *path;
- 	unsigned long ctime; /* (jiffies) creation time, when cfid was created (cached) */
- 	unsigned long atime; /* (jiffies) access time, when it was last used */
- 	struct kref refcount;
- 	struct cifs_fid fid;
--	spinlock_t fid_lock;
- 	struct cifs_tcon *tcon;
- 	struct dentry *dentry;
- 	struct smb2_file_all_info *file_all_info;
-@@ -48,11 +56,12 @@ struct cached_fid {
- 
- /* default MAX_CACHED_FIDS is 16 */
- struct cached_fids {
--	/* Must be held when:
--	 * - accessing the cfids->entries list
--	 * - accessing cfids->num_entries
-+	/*
-+	 * ->entries_seqlock must be used when accessing ->entries or ->num_entries:
-+	 * - write-locked when updating
-+	 * - rcu_read_lock() + seqcounted on reads
- 	 */
--	spinlock_t cfid_list_lock;
-+	seqlock_t entries_seqlock;
- 	int num_entries;
- 	struct list_head entries;
- 	struct delayed_work laundromat_work;
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index bb27b9c97724..72e63db75403 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -306,7 +306,8 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
- 				cfids = tcon->cfids;
- 				if (!cfids)
- 					continue;
--				spin_lock(&cfids->cfid_list_lock); /* check lock ordering */
-+
-+				read_seqlock_excl(&cfids->entries_seqlock);
- 				seq_printf(m, "Num entries: %d\n", cfids->num_entries);
- 				list_for_each_entry(cfid, &cfids->entries, entry) {
- 					seq_printf(m, "0x%x 0x%llx 0x%llx     %s",
-@@ -320,7 +321,7 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
- 						seq_printf(m, ", valid dirents");
- 					seq_printf(m, "\n");
- 				}
--				spin_unlock(&cfids->cfid_list_lock);
-+				read_sequnlock_excl(&cfids->entries_seqlock);
- 			}
- 		}
- 	}
--- 
-2.49.0
++free_table:
++	sg_free_table_chained(&msg->sgt, SG_CHUNK_SIZE);
++free_msg:
++	kfree(msg);
++	goto out;
+ }
+=20
+ static int smb_direct_rdma_write(struct ksmbd_transport *t,
+=2D-=20
+2.51.0
 
