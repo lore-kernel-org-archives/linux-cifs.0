@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48F39478;
-	Thu,  2 Oct 2025 15:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43689223707;
+	Thu,  2 Oct 2025 15:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759419066; cv=none; b=Rt0VujNga2ulViu3Va09buCrFc9TBUNIAFPPLZz4y0lO1eIUT6RjyRckw1xUfBEOGLk32pGapUv+cptrrkYLYM8LN/OK5pC6jlmTtu8a8yEpYQOIYTiispC1LV45Dqxwe45BO/afo1NiZCrGIP9ceNnMbzdnUnDmN7GMbzrotpM=
+	t=1759419073; cv=none; b=u1XwiL39noZxUlC3zkySHS9PmOV+TrEnUE6xCFxocwTTQdccMQjd0E0j57fDGV2tCsT2i/lHHXLNelnrML7KUoks7C1wZGTM6x5gmmiUGQNEZslX4IDLMmxs8xSlwtF3cN1CltF1vZfxX1pin6vC3KYq4IHJ79AQ4elc/jTgKyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759419066; c=relaxed/simple;
-	bh=yAwudebwORFowbq4nAr02Ar/6fOt5VjqBk71MiEGQiw=;
+	s=arc-20240116; t=1759419073; c=relaxed/simple;
+	bh=ok5UrTPNfUpkv8Pp3vVk0V9rBi2yJ/XfJgKCcyiE5d0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TdFvLdT2wkRpKkHBAj/ljrUDrRaJcDbpiQY9JNLI9vUpLahCNySRPLbYLD2JtqzKVQZguL0vSaG4AaIMOWcfRj5epR2A9rtt9jhY81fkaxH++3bH3qtStPqjSM6D2UNgI51o2zZ2ECLmthWjiVnq5mNrBiDWlbkfJGI9X/jDUuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLL6/Z64; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Xct06n47QvLj6Y2aJZSBgQN8XNksr60/IxbXflN2yyno+TdYIVOPlAGWVyEzYs2xbU5SjybOZTkmvnj1TJHwfRhILqzNckH1v00ZcaqXm7UFenrLT75POWEZIwCq8D1vSJ+PC8Mu6w/Rd0ombdJkEUZfq8j55NQ0+cn+2MrQIjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9uW0vMx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLL6/Z64"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70214C4CEF9;
-	Thu,  2 Oct 2025 15:31:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9uW0vMx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4B90C4CEF4;
+	Thu,  2 Oct 2025 15:31:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759419066;
-	bh=yAwudebwORFowbq4nAr02Ar/6fOt5VjqBk71MiEGQiw=;
+	s=k20201202; t=1759419073;
+	bh=ok5UrTPNfUpkv8Pp3vVk0V9rBi2yJ/XfJgKCcyiE5d0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lLL6/Z64IJo7TbgAqtlJ00qKIOwiYuGqT2YcJn7yqoerkFaKbQFPmdfGIqejgzMGU
-	 U0pZC9s3bMocna3OtMKNmDtC2id6rJdMFrW4H9a7i/DIRN+m4LBRX2tp451VgwCnIQ
-	 4H6iTxDHKXXpXBUcNIOOyKcWNDNXdlQHBgkkgh6nNCBcRq21uNSxlQDoIMVaHzDOBb
-	 puZP4zO6AYKAmN/mftroT94u7GmltauewCKnk2XbMal5PWkegJHQhaLZHfHyjjqVG8
-	 tOn2zzkkeV5qyg4ee/Bu8RHhjT4D8s4Hc2X64NZM0u4+VURCGe2ZHziL6R/V7+6Rxf
-	 o4dL+8iY3A0Hw==
+	b=b9uW0vMxs1qdkQCajNeyHtMgDdkhRH13rOoKLllAme1wK5ZJEno/WLXzV/Wjw5FQW
+	 +kzgralKjL4BtGhsspoyiE17DI/UcyeR1GTg3dRsVEp6623m4o748Qu1Ty8Qi6fMm/
+	 lVEAOqagb6EnwgUgc6kj1M2CdH8cbjROfsNj1vdTEqZoIFUQoafSELAReCqIgzsM5x
+	 Elw+QH3N3lMJClYp4TH6DFx+pXLCB9nL9hZWKONXJNyD4t7xZEqB7MnHPnGKzJDGgi
+	 Lnv/WCRyhKunP8AD3loWDbBB5mQ2VerlBNgvURnehiLpb1753k9ZLWHQOlmbQDs3VY
+	 s2W32Kim2wBtA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -38,9 +38,9 @@ Cc: Stefan Metzmacher <metze@samba.org>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 6.17] smb: client: limit the range of info->receive_credit_target
-Date: Thu,  2 Oct 2025 11:30:16 -0400
-Message-ID: <20251002153025.2209281-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-6.16] smb: client: queue post_recv_credits_work also if the peer raises the credit target
+Date: Thu,  2 Oct 2025 11:30:20 -0400
+Message-ID: <20251002153025.2209281-33-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251002153025.2209281-1-sashal@kernel.org>
 References: <20251002153025.2209281-1-sashal@kernel.org>
@@ -58,9 +58,13 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit 9219f8cac296769324bbe8a28c289586114244c4 ]
+[ Upstream commit 02548c477a90481c1fd0d6e7c84b4504ec2fcc12 ]
 
-This simplifies further changes...
+This is already handled in the server, but currently it done
+in a very complex way there. So we do it much simpler.
+
+Note that put_receive_buffer() will take care of it
+in case data_length is 0.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -75,170 +79,143 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-## Backport Determination: **YES**
+Based on my comprehensive analysis, here is my assessment:
 
-Based on my comprehensive analysis of this commit and the surrounding
-SMBDirect subsystem, this commit **should be backported** to stable
-kernel trees.
+## **YES**
 
-### Detailed Analysis
+This commit should be backported to stable kernel trees.
 
-#### **1. Nature of the Fix**
+### **Detailed Analysis:**
 
-This commit addresses a **resource exhaustion vulnerability** in the
-SMBDirect client code. The vulnerability occurs because
-`receive_credit_target` is set directly from untrusted network data
-without bounds checking:
+#### **Nature of the Change:**
+This is a **bug fix** for the SMB Direct (RDMA) credit management system
+in the Linux SMB client. The issue addresses incorrect handling of
+receive credit targets when the peer server dynamically raises the
+credit requirement while sending data.
 
-**Vulnerable code locations (fs/smb/client/smbdirect.c):**
-- Line 350: `info->receive_credit_target =
-  le16_to_cpu(packet->credits_requested);`
-- Line 522: `info->receive_credit_target =
-  le16_to_cpu(data_transfer->credits_requested);`
+#### **The Bug Explained:**
 
-#### **2. Security Impact**
+**Code Flow Analysis (fs/smb/client/smbdirect.c:520-554):**
 
-**Exploit Scenario:**
-A malicious SMB server can send a `credits_requested` value of up to
-65535 (max u16 value). This unbounded value is then used in the credit
-posting loop (lines 413-430):
+The `recv_done()` function handles incoming SMB Direct data transfers.
+The critical flow is:
 
-```c
-if (info->receive_credit_target > atomic_read(&info->receive_credits)) {
-    while (true) {
-        response = get_receive_buffer(info);
-        if (!response)
-            break;
-        rc = smbd_post_recv(info, response);
-        ...
-    }
-}
-```
+1. **Line 520:** Decrements `receive_credits` when data is received
+2. **Line 521-522:** Updates `receive_credit_target` from peer's
+   `credits_requested` field
+3. **Line 550-554:** If `data_length > 0`, calls `enqueue_reassembly()`
+   and returns
+4. **Line 554:** If `data_length == 0`, calls `put_receive_buffer()`
+   which queues `post_send_credits_work` (line 1242)
 
-**Consequences:**
-- **Memory exhaustion**: Attempting to allocate 65535 receive buffers
-  could exhaust kernel memory
-- **Hardware limit violations**: RDMA hardware has limits (max_cqe,
-  max_qp_wr) that could be exceeded, causing failures
-- **Denial of service**: System instability or connection failures
-- **Type mismatch**: Using `int` instead of `u16` for a protocol field
-  can cause subtle bugs
+**The Problem:** When the peer raises `receive_credit_target` while
+sending data (`data_length > 0`), the old code takes the first branch
+and never calls `put_receive_buffer()`, so `post_send_credits_work` is
+never queued. This means new receive buffers are not posted to meet the
+increased credit target.
 
-#### **3. The Fix**
+**The Fix:** Before enqueueing data (lines 551-553 in the new code), it
+checks if the credit target increased. If so, it explicitly queues
+`post_send_credits_work` to post additional receive buffers.
 
-The commit implements three protections:
+#### **Impact Analysis:**
 
-1. **Upper bound check**: `min_t(u16, info->receive_credit_target,
-   sp->recv_credit_max)`
-   - Limits to `recv_credit_max` (default 255, validated against
-     hardware limits at line 1578-1584)
+**What `smbd_post_send_credits()` does (lines 413-430):**
+Posts new receive buffers until `receive_credits` reaches
+`receive_credit_target`. Without this work being queued:
 
-2. **Lower bound check**: `max_t(u16, info->receive_credit_target, 1)`
-   - Prevents zero or negative values that could break protocol logic
+1. **Protocol Violation:** SMB Direct protocol ([MS-SMBD] 3.1.1.1)
+   requires clients to maintain receive buffers matching the peer's
+   credit requirements
+2. **Performance Degradation:** Server cannot send data at optimal rate
+   if client doesn't provide enough receive credits
+3. **Potential Stalls:** In extreme cases, both sides could wait for
+   credits, causing connection hangs
 
-3. **Type correction**: Changes `int receive_credit_target` to `u16
-   receive_credit_target`
-   - Matches the wire protocol specification (le16)
-   - Prevents sign-related bugs
+**Server Implementation Comparison
+(fs/smb/server/transport_rdma.c:617-618):**
+The ksmbd server already handles this correctly using
+`is_receive_credit_post_required()` before the `if (data_length)` check.
+The commit message confirms: *"This is already handled in the server,
+but currently it done in a very complex way there. So we do it much
+simpler."*
 
-#### **4. Part of Comprehensive Security Hardening**
+#### **Backport Suitability Indicators:**
 
-This commit is one of **160+ commits** by Stefan Metzmacher (Samba team)
-hardening the SMBDirect code. Related security fixes include:
+✅ **Already backported:** Sasha Levin (stable maintainer) already
+backported this (commit 2cc5b4e388bea)
 
-- `f57e53ea25236`: "let recv_done verify data_offset, data_length and
-  remaining_data_length" (with `Fixes: f198186aa9bb` tag)
-- Multiple memory leak fixes in error paths
-- Improved synchronization and error handling
+✅ **Expert author:** Stefan Metzmacher (166 commits in smbdirect.c,
+Samba core developer)
 
-The commit message mentions this is part of a larger effort: "This
-simplifies further changes..."
+✅ **Maintainer ack:** Acked-by Namjae Jeon (ksmbd maintainer)
 
-#### **5. Backport Suitability**
+✅ **Small and focused:** Only 5 lines added (1 variable declaration, 1
+check, 1 queue_work call)
 
-✅ **Fixes important bug**: Resource exhaustion vulnerability
-✅ **Small and contained**: Only 9 lines changed across 2 files
-✅ **No architectural changes**: Simple bounds checking addition
-✅ **Minimal regression risk**: Defensive check that only restricts
-invalid values
-✅ **No dependencies**: Standalone fix, doesn't require other commits
-✅ **Subsystem isolation**: Confined to SMBDirect client code
-✅ **Already being backported**: Found evidence in linux tree with
-"Signed-off-by: Sasha Levin <sashal@kernel.org>"
+✅ **No regressions:** No subsequent fixes or reverts found in commit
+history after 2025-08-11
 
-#### **6. Risk Assessment**
+✅ **Minimal risk:** Change is confined to credit management logic with
+clear purpose
 
-**Low Risk:**
-- The changes only add validation to untrusted input
-- Well-behaved servers will not be affected (they shouldn't request more
-  than the negotiated maximum anyway)
-- The bounds are based on validated local configuration and hardware
-  capabilities
-- Type change from `int` to `u16` is safe (values are always from
-  `le16_to_cpu()`)
+✅ **Long-standing code:** SMB Direct has existed since ~2017-2018, this
+bug likely affected all versions
 
-**No identified follow-up fixes or reverts** in the git history.
+#### **Risk Assessment:**
 
-### Conclusion
+**Low risk of regression:**
+- The new code path only triggers when `receive_credit_target >
+  old_recv_credit_target` AND `data_length > 0`
+- `post_send_credits_work` is already called in other code paths
+  (put_receive_buffer), so it's well-tested
+- The work function (smbd_post_send_credits) has safety checks and won't
+  over-allocate
 
-This is a **security hardening fix** that prevents resource exhaustion
-attacks from malicious SMB servers. It follows stable kernel rules
-perfectly: it's an important bugfix with minimal risk and no
-architectural changes. The fix is part of a comprehensive security
-review of the SMBDirect subsystem by experienced Samba developers.
+**High value:**
+- Fixes protocol compliance issue
+- Improves SMB over RDMA performance and reliability
+- Aligns client behavior with server implementation
 
-**Recommendation: Backport to all applicable stable trees supporting
-SMBDirect (Linux 4.11+)**
+#### **Conclusion:**
 
- fs/smb/client/smbdirect.c | 7 ++++++-
- fs/smb/client/smbdirect.h | 2 +-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+This is a clear-cut backport candidate: important bug fix, minimal risk,
+small change size, expert authorship, already validated by stable tree
+maintainer, and no dependencies or follow-up fixes needed.
+
+ fs/smb/client/smbdirect.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index c9375dc11f634..3fc5d2cebea5d 100644
+index e0fce5033004c..c9375dc11f634 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -348,6 +348,7 @@ static bool process_negotiation_response(
- 		return false;
- 	}
- 	info->receive_credit_target = le16_to_cpu(packet->credits_requested);
-+	info->receive_credit_target = min_t(u16, info->receive_credit_target, sp->recv_credit_max);
- 
- 	if (packet->credits_granted == 0) {
- 		log_rdma_event(ERR, "error: credits_granted==0\n");
-@@ -456,7 +457,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+@@ -456,6 +456,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
  	struct smbdirect_socket_parameters *sp = &sc->parameters;
  	struct smbd_connection *info =
  		container_of(sc, struct smbd_connection, socket);
--	int old_recv_credit_target;
-+	u16 old_recv_credit_target;
++	int old_recv_credit_target;
  	u32 data_offset = 0;
  	u32 data_length = 0;
  	u32 remaining_data_length = 0;
-@@ -522,6 +523,10 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 		old_recv_credit_target = info->receive_credit_target;
+@@ -518,6 +519,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 		}
+ 
+ 		atomic_dec(&info->receive_credits);
++		old_recv_credit_target = info->receive_credit_target;
  		info->receive_credit_target =
  			le16_to_cpu(data_transfer->credits_requested);
-+		info->receive_credit_target =
-+			min_t(u16, info->receive_credit_target, sp->recv_credit_max);
-+		info->receive_credit_target =
-+			max_t(u16, info->receive_credit_target, 1);
  		if (le16_to_cpu(data_transfer->credits_granted)) {
- 			atomic_add(le16_to_cpu(data_transfer->credits_granted),
- 				&info->send_credits);
-diff --git a/fs/smb/client/smbdirect.h b/fs/smb/client/smbdirect.h
-index e45aa9ddd71da..d0f734afd4fb1 100644
---- a/fs/smb/client/smbdirect.h
-+++ b/fs/smb/client/smbdirect.h
-@@ -63,7 +63,7 @@ struct smbd_connection {
- 	int protocol;
- 	atomic_t send_credits;
- 	atomic_t receive_credits;
--	int receive_credit_target;
-+	u16 receive_credit_target;
- 
- 	/* Memory registrations */
- 	/* Maximum number of RDMA read/write outstanding on this connection */
+@@ -548,6 +550,9 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 		 * reassembly queue and wake up the reading thread
+ 		 */
+ 		if (data_length) {
++			if (info->receive_credit_target > old_recv_credit_target)
++				queue_work(info->workqueue, &info->post_send_credits_work);
++
+ 			enqueue_reassembly(info, response, data_length);
+ 			wake_up_interruptible(&sc->recv_io.reassembly.wait_queue);
+ 		} else
 -- 
 2.51.0
 
