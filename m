@@ -1,219 +1,152 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A6412CD88
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Oct 2025 03:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BDA1411DE
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Oct 2025 03:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759374644; cv=none; b=VTc/OopkaS018Rtaz7bSNswwkfeI8AqImuOlVgRgyCsLR7j99vp/2khEJ03BCzDeTQm6mn5b1ed8Rc25zDaj9nq3Q0mriLV+gsPQqemKg4EHas8zdF1qkpiWh8cswI58GAc6jt2r0exXq8wS7kjCbpTIhoBLjtcf2Eh3cB7HRXI=
+	t=1759375194; cv=none; b=FN/uas22egC51jgemDuzT9LFOL2cCIw4pxus0PjJqYX7F6j/9cOm5lzvI7oyV50tqXoj4JxFi/DFEs2CMZvQl13ZSxvxWSFC8PyEMhPnuhzO7RAsc84CWsGTLVLhrXkFjmIihlTQE+fI9/O58a+FwHPga9zr+Y6joTwdgy+Xpp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759374644; c=relaxed/simple;
-	bh=naEP5xX9TO/gvb3iIPnc1TNUkK4EGVLcKmnj14pAq8w=;
+	s=arc-20240116; t=1759375194; c=relaxed/simple;
+	bh=c2Wmjzq0mnVNk307dy7OY3lHMzfLGJE60heLsNXKXpI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MTmYBGhHcSwptsPG94HTS0ZR7numcK5uR9KuBY9UCApWhNuz7MiD2nPOeuoLxS2d5AOc9hjXjsqK8kYcUrsKm3RqWOA4TQm9kOhFTeCidg0CvPZz9PvLA4HJQsZr9Ps/xwOMaUOLFfj4IhV1xrlrMMlJDkaa33RubcTL3oiasXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RFu33pto; arc=none smtp.client-ip=209.85.160.174
+	 To:Cc:Content-Type; b=jDaxZp8+QrAqnJJD6WXThsie6V1iGZDEJl3lMf4QJthMbHDBR0FmMhW3BIwMexfR+1UFtFrS58tsVd8PfVCKZCCQcuhfHqvfXggkcheHEgCZ4FQcdEeLS2lnz9PxtVz0AGucGn0tGLmPgpgp8S6rkT5W4Yw41VeePyhXUDlHIHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RC2t2gyh; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RFu33pto"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4de584653cfso9402871cf.0
-        for <linux-cifs@vger.kernel.org>; Wed, 01 Oct 2025 20:10:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RC2t2gyh"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-87499a3cd37so4961606d6.3
+        for <linux-cifs@vger.kernel.org>; Wed, 01 Oct 2025 20:19:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759374641; x=1759979441; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1759375190; x=1759979990; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NB4DkTvy4ic7040AJNZyVCiOCeeskAYwM8GSZW9U2fw=;
-        b=RFu33ptou5bRMZv7QFdFxvZK39fLA96SjcNfOLZGjZ1Y6o1Jm/GvKexarN1H3F6d5E
-         Nv6Bf5wr3XUj4XabnT/LHsE5T9L2EsHie33djR6GmWJTGAVpIv8S8aouzFL7aUKMOmf9
-         7a8zRzg9CXJEqxYNIvapqAHk2ngaHVfLtG0liODXGPkexczf1t+8obJtPYFzdst4KJAU
-         vaqyoe9BVY/e65G/bWvQBsbRvkuTzn2+vE9nPw74RI82wWTXOqLeN8KdKB6/7cmAWViy
-         ItCzdIqhOsmgrQOgasSiMSiCFIYPJqQSZhItlWVfuR6+WUJyALrvpFaTnJSgFNPKfbRp
-         eqNg==
+        bh=OglOXsuEiF7i6+vYy+41fucRP7/Kh76ZuAKRSo8eIQw=;
+        b=RC2t2gyhjNJ5o3zuLEZLPIsfaJGUyX+nBn6qpI0Bf7SweaCeVjjHk0LoeosQ9NCkue
+         DwaYEOLQuizlWEuC5/SE7JgyEAIwRKDvtf/WMS4P9o72if+EaMfpSTj3qO0/MyjVzxUL
+         wg9eFydk4yMuZL6f9UESgR13HcsWOcFQiCv95E6DTaP1vp7BkJR/pqZIaaMJjm/5WEH1
+         Mn9weTTTYHeobQZt3wQNSvHd2iKhOGDyE2Dym8i1b31Kx5lFh1ammGapoMsu71hNMQWe
+         atRUHbL6Lc01mLkoH5GyymQFAEf9SYL964SuMKriglOyNb99z6r/C0Gd+4PD+C3NarIu
+         brAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759374641; x=1759979441;
+        d=1e100.net; s=20230601; t=1759375190; x=1759979990;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NB4DkTvy4ic7040AJNZyVCiOCeeskAYwM8GSZW9U2fw=;
-        b=FFTzlre96fqel1lNCx9xrI3CnGwGwbO5fzQCDav28gYU+GUVPRBy2r1ND/2OXrUio2
-         GOB5QGeq8gf0BfYMNXiYzq5hfPmZevmy3Rzy0S0aeKV3uaNxAkMfF29t5NXH5eAKvh1P
-         czFUfzTU6Jozi59bbdw35n2esMlyGOj6RZ3rX/kvwVlKeop/3qmykFP0tJ8p6PJVhBP9
-         zD2aw1MqfFIHWzQ54NM7Lt5rqvyHsT5blxTtVd06hFbKd/sA8LeL4uazZT6L/ysQLaC6
-         aaGhpLt8v5cXqCfNYRg05yrZxh29vwK+j6cSOTaIcS5Tcjk0l1C+oQtScAkNLjuiqnTL
-         ziwA==
-X-Forwarded-Encrypted: i=1; AJvYcCW1oKvRvV0z9syra3hVd2auSj3maLg4LzhBaQYarPfF6nseUsivJeaqqWP4ivu4J1OpLF1ITPFchPjF@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZx37o1Fktc8cHjjeqvF/Vh4FTslxlY+SgPTTbmFwyZD6QKGxl
-	TnFFmLj19vJWCrL/c74tkwC2saJrkMbCAFPjPkkvLkgeu7TyoW4AcjBhGMngqTsY4+x1IFok2eL
-	Nlx156Mh3AAXK1+SRDwZbLT2EkmVS9FIcT9V+
-X-Gm-Gg: ASbGncsWUxEfzI7vI2Rbc1bXUYXJtU7K4sna3Kst4zAkiGK5kKfq/jHj6I5rPuXnJ3A
-	1XpqId0opw3pDMwBCEqI7B1bpjA1lzd1F3XpDLutatHt5vhW64HcnMr4SE8UBPJ0farzsP9lFDM
-	VF3VXGzNf2OGRloyeOt0Z3PB0apsj9n6pNT/lsm3szNwAzpzLrsLmxvCe258z5bKRW4qzf2rzh6
-	PjqfERFa8GfsbDHGRZVAcx9kDnZP+54gLzshm1Hic8//tB74D3zHZ205VusCvvMIu9zyt7pKCsu
-	cq7eyJKOEcg+SBdQMiqS/MBF5w0Oa5U4khuQUpZeRfsfEnxJxW5SJybqoSYcQWVSzOA8Cz54hQr
-	XKwgKxHHi4g==
-X-Google-Smtp-Source: AGHT+IHa609pDoaUoxAUZtMq2YewXC36i0IvPDKSVaNbgXkMgAIHvOC+0jqZTEgqTqHICMnCTBgoYiwMthezHz4BeZk=
-X-Received: by 2002:a05:622a:407:b0:4b5:e220:e1bd with SMTP id
- d75a77b69052e-4e41d8a218amr91799971cf.51.1759374641237; Wed, 01 Oct 2025
- 20:10:41 -0700 (PDT)
+        bh=OglOXsuEiF7i6+vYy+41fucRP7/Kh76ZuAKRSo8eIQw=;
+        b=EqhPO53YR9w1R0hrtxKuOws9c9of6J/GrQhte6OfDzj2NbcliFxYvaBdVdKe2pd5hw
+         puvt8ksjAiyCv/MOoy/vEiQbstoUmzSQFTdS69vqJs7IqTB+nOVFpraG8JFZxcNwm2Je
+         7XCTe7jclB0/wnGYujSeWxgg1mbv3Q+vxWoFr3fmWl8TWDwXZclHawQ2lMweblbQwk+Z
+         rH0nrt16d9bih7BYHmHVbMRvxEFKjgwh/kxSRI/hpn+Lg5kJEmue7Shi1As90NH1cjiM
+         TAW8GvXk9pHDkaolv05QvjDWIVXJOnWVz1cyi2GwoZPH3Iz7kFz1jYasH/yTv36BJMqJ
+         suEw==
+X-Forwarded-Encrypted: i=1; AJvYcCX7dcUIdVRmzcTkAcyhyqRmNRISLEqFqG2IuqIs/tyxk+lkD1MGf6Zqv1nJb3qwJKdUEduiCNy2iz43@vger.kernel.org
+X-Gm-Message-State: AOJu0YyljDz0cgQuEXcduik3S111x3U8UCLalDavUxH8yOTNCSPS3s2g
+	ljrl+aOu1uMm8C92CHIs1wTCIqZ5Y1cy0UAnTlM7+5WewLm1Wk45I7hzxZ/ONKg66ZTO34mtvda
+	dc+kt+CBLC3Gy839G4PjObpi9A2lewGI=
+X-Gm-Gg: ASbGncv8UAOjy5sD0cwRMRhrH1fxbnE2aVmFBqrWvfZV1u/nUZ7p+kZJkE2tEnpBnPP
+	zpy4eHQGN6rCcFbVGKXfhRRVz1+u+KdByu6zdbgDLMpBJEGETZRUpoB5WKCxdjCxIiKlCB2uHHB
+	O2VfusWA6LOFyzH9HWTK2/Mn3TJOCmfk+XNcmBLiLjxgx9juqoLwyxRLUCdV/7EK17tgregRlE9
+	L5gRjpwOKVWCY5MlrJmHMQPZX9iEJ9BSn1kMmUM2uHqw8WJE0R+tg5+gZp2/E/AzhWap+yAz8ml
+	nwCl8QLTFZCPRS9UJnvTd+5UOvE7P2f6HIkva8oqWuvmA3D1u6BDLPTYN482JJb5q2oIaU1ewHF
+	476CauPUQcg==
+X-Google-Smtp-Source: AGHT+IH57Fk72s9H3LGBTK+2pXoFM5w1cHiCSNe9fpORipn06qi265yhxApLm6Bna2MZLP55cAugDROOr1PS64rQS9A=
+X-Received: by 2002:a05:6214:528f:b0:78f:493d:15c6 with SMTP id
+ 6a1803df08f44-8739be1dec0mr69139036d6.3.1759375190477; Wed, 01 Oct 2025
+ 20:19:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250919152441.228774-1-henrique.carvalho@suse.com> <u6r7m2pum2gusoazpzerzxu2attq5a4blighytwnkqnujayr7m@rzr6i6triw63>
-In-Reply-To: <u6r7m2pum2gusoazpzerzxu2attq5a4blighytwnkqnujayr7m@rzr6i6triw63>
+References: <20250915151950.1017597-1-f.ebner@proxmox.com> <20250915151950.1017597-2-f.ebner@proxmox.com>
+In-Reply-To: <20250915151950.1017597-2-f.ebner@proxmox.com>
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 1 Oct 2025 22:10:30 -0500
-X-Gm-Features: AS18NWC7RSHhJcoGzg8tYFLk_6duFHC6jP6sUUEz1bQwGYxKLDmBRJfLs7i1bU4
-Message-ID: <CAH2r5ms_m0OLzw0XUyusqi1CdSN8_x-TdWRNLpC=qJ+9o5bVjw@mail.gmail.com>
-Subject: Re: [PATCH 1/6] smb: client: ensure open_cached_dir_by_dentry() only
- returns valid cfid
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: Henrique Carvalho <henrique.carvalho@suse.com>, linux-cifs@vger.kernel.org
+Date: Wed, 1 Oct 2025 22:19:39 -0500
+X-Gm-Features: AS18NWDPGaX3z3mO1YUySJ5IK4Ie9SMZF7A_a6-KW3yYqMPpeYqFnxmRZrWKqrs
+Message-ID: <CAH2r5mu_6WYwBioQ-6iS8Z+oVYBJA0nmhkkGQoqroWXjdrBVCA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] smb: client: transport: avoid reconnects triggered by
+ pending task work
+To: Fiona Ebner <f.ebner@proxmox.com>
+Cc: linux-kernel@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-cifs@vger.kernel.org, bharathsm@microsoft.com, tom@talpey.com, 
+	sprasad@microsoft.com, ronniesahlberg@gmail.com, pc@manguebit.org, 
+	David Howells <dhowells@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Enzo,
-Added your RB to the 3 patches in Henrique's series that you had indicated.
+I have tentatively merged these two into cifs-2.6.git for-next pending
+testing, but additional review/testing would be helpful.
 
 
-Also have reordered patches in cifs-2.6.git for-next to put higher
-priority/reviewed ones lower down,
-and have temporarily pulled out Bharath's patch
-("0004-smb-client-cap-smb-directory-cache-memory-via-module.patch")
-pending more updates/review etc.
-
-On Fri, Sep 19, 2025 at 10:55=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de=
-> wrote:
+On Mon, Sep 15, 2025 at 10:23=E2=80=AFAM Fiona Ebner <f.ebner@proxmox.com> =
+wrote:
 >
-> On 09/19, Henrique Carvalho wrote:
-> >open_cached_dir_by_dentry() was exposing an invalid cached directory to
-> >callers. The validity check outside the function was exclusively based
-> >on cfid->time.
-> >
-> >Add validity check before returning success and introduce
-> >is_valid_cached_dir() helper for consistent checks across the code.
-> >
-> >Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
-> >---
-> > fs/smb/client/cached_dir.c | 9 +++++----
-> > fs/smb/client/cached_dir.h | 6 ++++++
-> > fs/smb/client/dir.c        | 2 +-
-> > fs/smb/client/inode.c      | 2 +-
-> > 4 files changed, 13 insertions(+), 6 deletions(-)
-> >
-> >diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-> >index b69daeb1301b..63dc9add4f13 100644
-> >--- a/fs/smb/client/cached_dir.c
-> >+++ b/fs/smb/client/cached_dir.c
-> >@@ -36,9 +36,8 @@ static struct cached_fid *find_or_create_cached_dir(st=
-ruct cached_fids *cfids,
-> >                        * fully cached or it may be in the process of
-> >                        * being deleted due to a lease break.
-> >                        */
-> >-                      if (!cfid->time || !cfid->has_lease) {
-> >+                      if (!is_valid_cached_dir(cfid))
-> >                               return NULL;
-> >-                      }
-> >                       kref_get(&cfid->refcount);
-> >                       return cfid;
-> >               }
-> >@@ -194,7 +193,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tc=
-on *tcon,
-> >        * Otherwise, it is either a new entry or laundromat worker remov=
-ed it
-> >        * from @cfids->entries.  Caller will put last reference if the l=
-atter.
-> >        */
-> >-      if (cfid->has_lease && cfid->time) {
-> >+      if (is_valid_cached_dir(cfid)) {
-> >               cfid->last_access_time =3D jiffies;
-> >               spin_unlock(&cfids->cfid_list_lock);
-> >               *ret_cfid =3D cfid;
-> >@@ -233,7 +232,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tc=
-on *tcon,
-> >                       list_for_each_entry(parent_cfid, &cfids->entries,=
- entry) {
-> >                               if (parent_cfid->dentry =3D=3D dentry->d_=
-parent) {
-> >                                       cifs_dbg(FYI, "found a parent cac=
-hed file handle\n");
-> >-                                      if (parent_cfid->has_lease && par=
-ent_cfid->time) {
-> >+                                      if (is_valid_cached_dir(parent_cf=
-id)) {
-> >                                               lease_flags
-> >                                                       |=3D SMB2_LEASE_F=
-LAG_PARENT_LEASE_KEY_SET_LE;
-> >                                               memcpy(pfid->parent_lease=
-_key,
-> >@@ -420,6 +419,8 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon=
-,
-> >       spin_lock(&cfids->cfid_list_lock);
-> >       list_for_each_entry(cfid, &cfids->entries, entry) {
-> >               if (dentry && cfid->dentry =3D=3D dentry) {
-> >+                      if (!is_valid_cached_dir(cfid))
-> >+                              break;
-> >                       cifs_dbg(FYI, "found a cached file handle by dent=
-ry\n");
-> >                       kref_get(&cfid->refcount);
-> >                       *ret_cfid =3D cfid;
-> >diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-> >index 46b5a2fdf15b..aa12382b4249 100644
-> >--- a/fs/smb/client/cached_dir.h
-> >+++ b/fs/smb/client/cached_dir.h
-> >@@ -64,6 +64,12 @@ struct cached_fids {
-> >       struct delayed_work laundromat_work;
-> > };
-> >
-> >+static inline bool
-> >+is_valid_cached_dir(struct cached_fid *cfid)
-> >+{
-> >+      return cfid->time && cfid->has_lease;
-> >+}
-> >+
-> > extern struct cached_fids *init_cached_dirs(void);
-> > extern void free_cached_dirs(struct cached_fids *cfids);
-> > extern int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
-> >diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-> >index 5223edf6d11a..56c59b67ecc2 100644
-> >--- a/fs/smb/client/dir.c
-> >+++ b/fs/smb/client/dir.c
-> >@@ -322,7 +322,7 @@ static int cifs_do_create(struct inode *inode, struc=
-t dentry *direntry, unsigned
-> >               list_for_each_entry(parent_cfid, &tcon->cfids->entries, e=
-ntry) {
-> >                       if (parent_cfid->dentry =3D=3D direntry->d_parent=
-) {
-> >                               cifs_dbg(FYI, "found a parent cached file=
- handle\n");
-> >-                              if (parent_cfid->has_lease && parent_cfid=
-->time) {
-> >+                              if (is_valid_cached_dir(parent_cfid)) {
-> >                                       lease_flags
-> >                                               |=3D SMB2_LEASE_FLAG_PARE=
-NT_LEASE_KEY_SET_LE;
-> >                                       memcpy(fid->parent_lease_key,
-> >diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-> >index fe453a4b3dc8..9c8b8bd20edd 100644
-> >--- a/fs/smb/client/inode.c
-> >+++ b/fs/smb/client/inode.c
-> >@@ -2639,7 +2639,7 @@ cifs_dentry_needs_reval(struct dentry *dentry)
-> >               return true;
-> >
-> >       if (!open_cached_dir_by_dentry(tcon, dentry->d_parent, &cfid)) {
-> >-              if (cfid->time && cifs_i->time > cfid->time) {
-> >+              if (cifs_i->time > cfid->time) {
-> >                       close_cached_dir(cfid);
-> >                       return false;
-> >               }
-> >--
-> >2.50.1
+> When io_uring is used in the same task as CIFS, there might be
+> unnecessary reconnects, causing issues in user-space applications
+> like QEMU with a log like:
 >
-> Reviwed-by: Enzo Matsumiya <ematsumiya@suse.de>
-
+> > CIFS: VFS: \\10.10.100.81 Error -512 sending data on socket to server
+>
+> Certain io_uring completions might be added to task_work with
+> notify_method being TWA_SIGNAL and thus TIF_NOTIFY_SIGNAL is set for
+> the task.
+>
+> In __smb_send_rqst(), signals are masked before calling
+> smb_send_kvec(), but the masking does not apply to TIF_NOTIFY_SIGNAL.
+>
+> If sk_stream_wait_memory() is reached via sock_sendmsg() while
+> TIF_NOTIFY_SIGNAL is set, signal_pending(current) will evaluate to
+> true there, and -EINTR will be propagated all the way from
+> sk_stream_wait_memory() to sock_sendmsg() in smb_send_kvec().
+> Afterwards, __smb_send_rqst() will see that not everything was written
+> and reconnect.
+>
+> Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
+> ---
+>  fs/smb/client/transport.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+> index a61ba7f3fb86..940e90107134 100644
+> --- a/fs/smb/client/transport.c
+> +++ b/fs/smb/client/transport.c
+> @@ -22,6 +22,7 @@
+>  #include <linux/mempool.h>
+>  #include <linux/sched/signal.h>
+>  #include <linux/task_io_accounting_ops.h>
+> +#include <linux/task_work.h>
+>  #include "cifspdu.h"
+>  #include "cifsglob.h"
+>  #include "cifsproto.h"
+> @@ -173,9 +174,16 @@ smb_send_kvec(struct TCP_Server_Info *server, struct=
+ msghdr *smb_msg,
+>                  * send a packet.  In most cases if we fail to send
+>                  * after the retries we will kill the socket and
+>                  * reconnect which may clear the network problem.
+> +                *
+> +                * Even if regular signals are masked, EINTR might be
+> +                * propagated from sk_stream_wait_memory() to here when
+> +                * TIF_NOTIFY_SIGNAL is used for task work. For example,
+> +                * certain io_uring completions will use that. Treat
+> +                * having EINTR with pending task work the same as EAGAIN
+> +                * to avoid unnecessary reconnects.
+>                  */
+>                 rc =3D sock_sendmsg(ssocket, smb_msg);
+> -               if (rc =3D=3D -EAGAIN) {
+> +               if (rc =3D=3D -EAGAIN || unlikely(rc =3D=3D -EINTR && tas=
+k_work_pending(current))) {
+>                         retries++;
+>                         if (retries >=3D 14 ||
+>                             (!server->noblocksnd && (retries > 2))) {
+> --
+> 2.47.2
+>
+>
+>
 
 
 --=20
