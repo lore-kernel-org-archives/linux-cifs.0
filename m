@@ -1,221 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43689223707;
-	Thu,  2 Oct 2025 15:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5D442A99
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Oct 2025 17:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759419073; cv=none; b=u1XwiL39noZxUlC3zkySHS9PmOV+TrEnUE6xCFxocwTTQdccMQjd0E0j57fDGV2tCsT2i/lHHXLNelnrML7KUoks7C1wZGTM6x5gmmiUGQNEZslX4IDLMmxs8xSlwtF3cN1CltF1vZfxX1pin6vC3KYq4IHJ79AQ4elc/jTgKyg=
+	t=1759425644; cv=none; b=tHjgTrH2Av1/270khxdDY1sT5wqRn37az4b1k493XDybwwW6YbscB/S6tK6/xK40TuFW/dv2xAaMQybnZtiWoodLRNJWRqoPEfUbUgBq/2hfykXBPatnSXaX2dpKRSmysKa55pZButCXmtpr+p58xpFf5FnCUMWoka3sUIZL04s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759419073; c=relaxed/simple;
-	bh=ok5UrTPNfUpkv8Pp3vVk0V9rBi2yJ/XfJgKCcyiE5d0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xct06n47QvLj6Y2aJZSBgQN8XNksr60/IxbXflN2yyno+TdYIVOPlAGWVyEzYs2xbU5SjybOZTkmvnj1TJHwfRhILqzNckH1v00ZcaqXm7UFenrLT75POWEZIwCq8D1vSJ+PC8Mu6w/Rd0ombdJkEUZfq8j55NQ0+cn+2MrQIjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9uW0vMx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759425644; c=relaxed/simple;
+	bh=dk1NQw2VERkubWjw6V1HZnO05TMxyayltyTZKNX/AzM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=pAKNvjXMwQAXnJzxB+NvINJ8zkUiXElZngPYJtmtLy6idACJxOt9Ekf7ogADr0oBJAZBeiUaDVsILT3fqdsIetFOtQ/yYp5DbiDPowiSTNat9stSem9HemUrzoBxVu1UWJnATpuo/k6giGpa4N52V8/LF3VIqwisTFWVeK+vWHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SDd0KsRZ; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9uW0vMx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4B90C4CEF4;
-	Thu,  2 Oct 2025 15:31:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759419073;
-	bh=ok5UrTPNfUpkv8Pp3vVk0V9rBi2yJ/XfJgKCcyiE5d0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=b9uW0vMxs1qdkQCajNeyHtMgDdkhRH13rOoKLllAme1wK5ZJEno/WLXzV/Wjw5FQW
-	 +kzgralKjL4BtGhsspoyiE17DI/UcyeR1GTg3dRsVEp6623m4o748Qu1Ty8Qi6fMm/
-	 lVEAOqagb6EnwgUgc6kj1M2CdH8cbjROfsNj1vdTEqZoIFUQoafSELAReCqIgzsM5x
-	 Elw+QH3N3lMJClYp4TH6DFx+pXLCB9nL9hZWKONXJNyD4t7xZEqB7MnHPnGKzJDGgi
-	 Lnv/WCRyhKunP8AD3loWDbBB5mQ2VerlBNgvURnehiLpb1753k9ZLWHQOlmbQDs3VY
-	 s2W32Kim2wBtA==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Stefan Metzmacher <metze@samba.org>,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 6.17-6.16] smb: client: queue post_recv_credits_work also if the peer raises the credit target
-Date: Thu,  2 Oct 2025 11:30:20 -0400
-Message-ID: <20251002153025.2209281-33-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251002153025.2209281-1-sashal@kernel.org>
-References: <20251002153025.2209281-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SDd0KsRZ"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-78f75b0a058so13559596d6.0
+        for <linux-cifs@vger.kernel.org>; Thu, 02 Oct 2025 10:20:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759425641; x=1760030441; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SAtu6/ctQVIzK5vPxGcQc/s7kZti3z+hmRQu3O4UCtY=;
+        b=SDd0KsRZoZR19Le3LD7ViwLmE3XXbpJz1XgB21Ik0R8sSqMXl1ktKhOTFSp4F1/dzk
+         ZSBOZve0k0xjS7YC1GD0fAAZUD4DJq1wILwbzyHHwUuYTLmfCCIAZX8WAMtaYlozcSnR
+         zwciR8/hecUtLNllbc2iCT/UQkWT2Y3tRjWVq6JBhfMkDmbBUBxjYZRcYmvdcTHbzag9
+         1uAf+szf0dpOQ6fRJoFRymPq2a/02+gl15PhuiVPBIUCliUqPSoo75e10zjHNQgLadlI
+         9avXNaHT1gPNXiyOeGMUkiTo/+9Kc0QwFLQlz+3ASwJX1kRqujdCzhRmw/P+Hg36fMZb
+         1V2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759425641; x=1760030441;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SAtu6/ctQVIzK5vPxGcQc/s7kZti3z+hmRQu3O4UCtY=;
+        b=ko4ybcq8ih83T20lCP1m6jujCIbqcQu4xkIMlh2FQ46GIujpV2caO7tQW51ABJ0qxS
+         //epeGR5nu6Zl9mqlLWU1u1punoXJOga5M/qk2Hbft7cvNqqgY2HfjMT2JXDbOIbYTVp
+         1GJ4d57MdwKuOF24PGhVmTEj2MzFMk/FQcQD/udeQ3elIDgocMuTujd9aP4GhibrkuS+
+         Ep5aq90qRVxuEIfkKzdz94NUFARBuyto+zAe/xgrz43iy8jLBKjH4CH2x5CKAXrpGj0y
+         3wIpw68T7UByBnFo59GC2FWX7ZO2eVa8YhTg+1RPcZszfeRAdsKgOjeJFnUcLqiV9XXb
+         iyCw==
+X-Forwarded-Encrypted: i=1; AJvYcCWd1wQK/+XcZNDhjxk4mUrDJGTneDqqkX6G+j31A9nW942jWDEaU//6B+BKuv3ofyXLLJzVcB4AbA4t@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTZ4B22yydGeLgW+z0mJdcyxzFh+cq0Sp98raBDZQDD3ncIOu2
+	xE1KH0kL1JzKytU6vJVqKv8OgFWcitkHlXiDQJ+qPyumpryusSDLkNjD6L6OqHbIS3v0l2saLH3
+	aD0qjsP+KA13AJ9P/+hcLWs6J8WZiFI0=
+X-Gm-Gg: ASbGncvSbijUYvL6XHmCJ0ZvCe8fGNFwJSrZmwOx26peKZih8o4QK8IUlPPceqWmuHl
+	4UM9DAD1ZpwCNTGHNZ52LpBs98YG+hnffkpa/ydDtpBYEdkeyp1s0lDrRw25DriZK/PrTis5evT
+	bXG0EBskUoWj+WJll5qfPKwuK4vdbpPzNBqSepCMM1WhdSQLMThcqJMXgyhf7MEwHn3CQ4S9UbN
+	28PBCXlpaw7CVtcQqyOpYFp2eE/ucuqZVZvdNb7LFt3AiBF69ptu1pmLFpZrbL1ftZ2ubMS1eCo
+	fw8hshUihL1l/IXpu8qCLackzmJKs1yTEuxvnM/RCCt+TQHbss6o9s/JOs8yjRCOSv8ljFNsZFQ
+	lCGPE7NpP3w==
+X-Google-Smtp-Source: AGHT+IGUWZdm9D8d2hudPZnCFmi7yXKHA1CZ7wWJsKITJ/TXMFKIEesjighOYb/MimXVQCCocKK7yApm2jAOKPOJVLY=
+X-Received: by 2002:a05:6214:248a:b0:786:d65c:1c3e with SMTP id
+ 6a1803df08f44-879dc7c5521mr1370446d6.30.1759425640960; Thu, 02 Oct 2025
+ 10:20:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.17
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 2 Oct 2025 12:20:28 -0500
+X-Gm-Features: AS18NWB6qxj8HQdJyEZA2jhJoBIVUzGipHmStWEneP1xhBuJnOXCHOyGk4pTsjY
+Message-ID: <CAH2r5mv8=AvJBTE7cxz=BQsjrR8ZOVS_ZkvVSrLzJqrLiomX8g@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Stefan Metzmacher <metze@samba.org>
+Please pull the following changes since commit
+a9401710a5f5681abd2a6f21f9e76bc9f2e81891:
 
-[ Upstream commit 02548c477a90481c1fd0d6e7c84b4504ec2fcc12 ]
+  Merge tag 'v6.18-rc-part1-smb3-common' of git://git.samba.org/ksmbd
+(2025-09-29 14:57:08 -0700)
 
-This is already handled in the server, but currently it done
-in a very complex way there. So we do it much simpler.
+are available in the Git repository at:
 
-Note that put_receive_buffer() will take care of it
-in case data_length is 0.
+  git://git.samba.org/ksmbd.git tags/v6.18rc1-part1-ksmbd-server-fixes
 
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
+for you to fetch changes up to e28c5bc45640bc851e8f7f0b8d5431fdaa420c8e:
 
-LLM Generated explanations, may be completely bogus:
+  ksmbd: increase session and share hash table bits (2025-09-30 21:37:55 -0500)
 
-Based on my comprehensive analysis, here is my assessment:
+----------------------------------------------------------------
+Nine ksmbd server fixes
+- Fix potential UAFs and corruptions in rpc open and close
+- Fix copy_file_range when ranges overlap
+- Improve session, share, connection lookup performance
+- Fix potential hash collisions in share and session lists
+- Debugging improvement - making per-connection threads easier to identify
+- Improve socket creation
+- Fix return code mapping for posix query fs info
+- Two patches add support for limiting the maximum number of
+connections per IP address, extending the existing connection limiting
+mechanism to enforce per-IP connection limits alongside the global
+connection limit
+----------------------------------------------------------------
+Matvey Kovalev (1):
+      ksmbd: fix error code overwriting in smb2_get_info_filesystem()
 
-## **YES**
+Namjae Jeon (7):
+      ksmbd: make ksmbd thread names distinct by client IP
+      ksmbd: use sock_create_kern interface to create kernel socket
+      ksmbd: copy overlapped range within the same file
+      ksmbd: add max ip connections parameter
+      ksmbd: add an error print when maximum IP connections limit is reached
+      ksmbd: replace connection list with hash table
+      ksmbd: increase session and share hash table bits
 
-This commit should be backported to stable kernel trees.
+Yunseong Kim (1):
+      ksmbd: Fix race condition in RPC handle list access
 
-### **Detailed Analysis:**
+ fs/smb/server/connection.c        | 23 +++++----
+ fs/smb/server/connection.h        |  6 ++-
+ fs/smb/server/ksmbd_netlink.h     |  5 +-
+ fs/smb/server/mgmt/share_config.c |  2 +-
+ fs/smb/server/mgmt/user_session.c | 28 +++++++----
+ fs/smb/server/server.h            |  1 +
+ fs/smb/server/smb2pdu.c           |  7 +--
+ fs/smb/server/transport_ipc.c     |  3 ++
+ fs/smb/server/transport_rdma.c    |  5 ++
+ fs/smb/server/transport_tcp.c     | 98 ++++++++++++++++++++++-----------------
+ fs/smb/server/vfs.c               | 16 ++++++-
+ 11 files changed, 119 insertions(+), 75 deletions(-)
 
-#### **Nature of the Change:**
-This is a **bug fix** for the SMB Direct (RDMA) credit management system
-in the Linux SMB client. The issue addresses incorrect handling of
-receive credit targets when the peer server dynamically raises the
-credit requirement while sending data.
-
-#### **The Bug Explained:**
-
-**Code Flow Analysis (fs/smb/client/smbdirect.c:520-554):**
-
-The `recv_done()` function handles incoming SMB Direct data transfers.
-The critical flow is:
-
-1. **Line 520:** Decrements `receive_credits` when data is received
-2. **Line 521-522:** Updates `receive_credit_target` from peer's
-   `credits_requested` field
-3. **Line 550-554:** If `data_length > 0`, calls `enqueue_reassembly()`
-   and returns
-4. **Line 554:** If `data_length == 0`, calls `put_receive_buffer()`
-   which queues `post_send_credits_work` (line 1242)
-
-**The Problem:** When the peer raises `receive_credit_target` while
-sending data (`data_length > 0`), the old code takes the first branch
-and never calls `put_receive_buffer()`, so `post_send_credits_work` is
-never queued. This means new receive buffers are not posted to meet the
-increased credit target.
-
-**The Fix:** Before enqueueing data (lines 551-553 in the new code), it
-checks if the credit target increased. If so, it explicitly queues
-`post_send_credits_work` to post additional receive buffers.
-
-#### **Impact Analysis:**
-
-**What `smbd_post_send_credits()` does (lines 413-430):**
-Posts new receive buffers until `receive_credits` reaches
-`receive_credit_target`. Without this work being queued:
-
-1. **Protocol Violation:** SMB Direct protocol ([MS-SMBD] 3.1.1.1)
-   requires clients to maintain receive buffers matching the peer's
-   credit requirements
-2. **Performance Degradation:** Server cannot send data at optimal rate
-   if client doesn't provide enough receive credits
-3. **Potential Stalls:** In extreme cases, both sides could wait for
-   credits, causing connection hangs
-
-**Server Implementation Comparison
-(fs/smb/server/transport_rdma.c:617-618):**
-The ksmbd server already handles this correctly using
-`is_receive_credit_post_required()` before the `if (data_length)` check.
-The commit message confirms: *"This is already handled in the server,
-but currently it done in a very complex way there. So we do it much
-simpler."*
-
-#### **Backport Suitability Indicators:**
-
-✅ **Already backported:** Sasha Levin (stable maintainer) already
-backported this (commit 2cc5b4e388bea)
-
-✅ **Expert author:** Stefan Metzmacher (166 commits in smbdirect.c,
-Samba core developer)
-
-✅ **Maintainer ack:** Acked-by Namjae Jeon (ksmbd maintainer)
-
-✅ **Small and focused:** Only 5 lines added (1 variable declaration, 1
-check, 1 queue_work call)
-
-✅ **No regressions:** No subsequent fixes or reverts found in commit
-history after 2025-08-11
-
-✅ **Minimal risk:** Change is confined to credit management logic with
-clear purpose
-
-✅ **Long-standing code:** SMB Direct has existed since ~2017-2018, this
-bug likely affected all versions
-
-#### **Risk Assessment:**
-
-**Low risk of regression:**
-- The new code path only triggers when `receive_credit_target >
-  old_recv_credit_target` AND `data_length > 0`
-- `post_send_credits_work` is already called in other code paths
-  (put_receive_buffer), so it's well-tested
-- The work function (smbd_post_send_credits) has safety checks and won't
-  over-allocate
-
-**High value:**
-- Fixes protocol compliance issue
-- Improves SMB over RDMA performance and reliability
-- Aligns client behavior with server implementation
-
-#### **Conclusion:**
-
-This is a clear-cut backport candidate: important bug fix, minimal risk,
-small change size, expert authorship, already validated by stable tree
-maintainer, and no dependencies or follow-up fixes needed.
-
- fs/smb/client/smbdirect.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index e0fce5033004c..c9375dc11f634 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -456,6 +456,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct smbd_connection *info =
- 		container_of(sc, struct smbd_connection, socket);
-+	int old_recv_credit_target;
- 	u32 data_offset = 0;
- 	u32 data_length = 0;
- 	u32 remaining_data_length = 0;
-@@ -518,6 +519,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 		}
- 
- 		atomic_dec(&info->receive_credits);
-+		old_recv_credit_target = info->receive_credit_target;
- 		info->receive_credit_target =
- 			le16_to_cpu(data_transfer->credits_requested);
- 		if (le16_to_cpu(data_transfer->credits_granted)) {
-@@ -548,6 +550,9 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 		 * reassembly queue and wake up the reading thread
- 		 */
- 		if (data_length) {
-+			if (info->receive_credit_target > old_recv_credit_target)
-+				queue_work(info->workqueue, &info->post_send_credits_work);
-+
- 			enqueue_reassembly(info, response, data_length);
- 			wake_up_interruptible(&sc->recv_io.reassembly.wait_queue);
- 		} else
 -- 
-2.51.0
+Thanks,
 
+Steve
