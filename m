@@ -1,46 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CED4A4D8CE;
-	Thu,  2 Oct 2025 15:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0291F19A;
+	Thu,  2 Oct 2025 15:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759419035; cv=none; b=Wyz9NVEGn9PQK92FZd2f7Szy6OMJ9mlOYoLO5BFDgtsk+BJCneF/0KUV4cbju7PZyn9qLaZXnPVPEeRq5SJOoobsXw+KU5yiybVMzbAxbsKH2iRl5glPF82KcPGuOTvVAdAX2WUHZMhM1u0WzgLh/Or//TZmvLDiK4xZsFWmzlA=
+	t=1759419040; cv=none; b=I8AM9K4Tql5BTOyliLtagKkGWnCmDSS98gt7ceEXEiYc832aVt5V9KwtqP+wJdqmRnkP+7iSnHeXLzOuwpTe/TiQRJqV38Vz0A1Px008am9cWB1xf4Ze1XpHM4tJp7hV1IY8rskLhccpkf6aoSndTJZUalLHBr8frZNM5i6wcfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759419035; c=relaxed/simple;
-	bh=wUknlYPzcIAtcubuB1mkhuqr2wJsmkhIeg9CBWmrvPE=;
+	s=arc-20240116; t=1759419040; c=relaxed/simple;
+	bh=4vSFaHksPoveorcIzumc87wmcMLbePGI8eiqDs2/E+0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eSNFVomH4KHufMexgoOjeES8WNCDwgx/Z+pxHAGKhQpdEAGdm+NRWQe58qjvwznK7QgIWP/JECWAk4AdFLOo9wEsilm6xvode/hZ1wZVgA+xa3fjKfeVH/YVCJpaVP2ATsUryWzesWotMYD57VT3cDaZIK4DOWANUeODLb3M0co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rLRJ+6AI; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=AzIdhXEkSqVFsgNsYyVg1yXr4C0DNsH8J56a4xtOSQ83sEW1A+IBCrh/OGBf5HYVIhlT2WxA8C2jegrUuNsEYv+wgPFB9Ms6unEXzf2+ZdBMq/K6y0Bf0LiFTJHDU1p/WUq0X4n7Y4P6DZ7kTHaFZLaoS9uQm+KHxrRoa/0oe2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BKXFCQl1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rLRJ+6AI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25D01C4CEF9;
-	Thu,  2 Oct 2025 15:30:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BKXFCQl1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EEB7C4CEF4;
+	Thu,  2 Oct 2025 15:30:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759419035;
-	bh=wUknlYPzcIAtcubuB1mkhuqr2wJsmkhIeg9CBWmrvPE=;
+	s=k20201202; t=1759419039;
+	bh=4vSFaHksPoveorcIzumc87wmcMLbePGI8eiqDs2/E+0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rLRJ+6AI+yFZtYBbidf5XV4D835qNaj2oRfbcyz5VN8h1NkVUzB/Ntv6z11zZ27df
-	 jxuVqzviZMnyl/vsEI4EilqaqtF+V4i7QSbTxpTSellRUENldCoKR//p+ElC9YOPYF
-	 1ZzvYic6icI40qBVxSCUrqUU71MGf3pR1c9H4wU4I6/Q3BF3SA5U5ItBcz/lF/wa7K
-	 BNP4tZAmYQGpCU6zeItBkvAsX8dmU3d0Vcu9e9psDUuVfHB/p8PCGr2BxNoNsafjJH
-	 772udg+z/Shd49IZYP77omHuIQQfCR0dXMgk5Bu2gtQuWRciDq0+bO+KX2h8h3Tf4S
-	 1GRydygZ+kAYQ==
+	b=BKXFCQl1AHPXptzW/QFnbOfWk9uumjdAwACKr3P4MBVvezukTT/GpWcVtEfePiCLp
+	 A5GcspoQ1dWIf421VqTQ6c251Fjelova+mlY1YB29fefxYOG+4N++KGDzy9eBLa0Vj
+	 U+/z7kDzoEzTjbxGadRb5hpaZBGmoHhuohamreCw0WNc/Nq2V5rj0nLsabhF93+P3X
+	 BowcKVVjKvDvRN47Ei4lDCRWnXjuwVXkNQJIQkz621QWAScV6gXOqrcweKQjkEY9x+
+	 YndwJmAy6VmOh39YxcReqFGJM82/niHD6f3RUVPyXpp/OMs3hqoOxJhb5sBvOzPSQM
+	 +GNGBFkKAIzyw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
 Cc: Stefan Metzmacher <metze@samba.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
-	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 6.17] smb: client: make use of ib_wc_status_msg() and skip IB_WC_WR_FLUSH_ERR logging
-Date: Thu,  2 Oct 2025 11:29:54 -0400
-Message-ID: <20251002153025.2209281-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-6.1] smb: server: let smb_direct_flush_send_list() invalidate a remote key first
+Date: Thu,  2 Oct 2025 11:29:57 -0400
+Message-ID: <20251002153025.2209281-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251002153025.2209281-1-sashal@kernel.org>
 References: <20251002153025.2209281-1-sashal@kernel.org>
@@ -58,17 +57,16 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit a8e970358b31a5abba8b5737a67ba7b8d26f4258 ]
+[ Upstream commit 1b53426334c3c942db47e0959a2527a4f815af50 ]
 
-There's no need to get log message for every IB_WC_WR_FLUSH_ERR
-completion, but any other error should be logged at level ERR.
+If we want to invalidate a remote key we should do that as soon as
+possible, so do it in the first send work request.
 
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
@@ -76,193 +74,187 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-Based on my exhaustive analysis, here is my recommendation:
+## **BACKPORT RECOMMENDATION: YES**
 
-## **Backport Status: YES**
+## **Detailed Analysis**
 
-### Extensive Analysis:
+### **1. Nature of the Change**
 
-#### **What This Commit Does:**
+This commit fixes a **timing bug** in RDMA remote key invalidation
+within the SMB server's (ksmbd) transport layer.
 
-This commit makes two logging improvements to the SMB Direct (RDMA)
-code:
+**Code Flow Analysis:**
 
-1. **Human-readable error messages**: Changes from numeric status codes
-   (`wc->status=%d`) to descriptive strings using
-   `ib_wc_status_msg(wc->status)` (e.g., "WR flushed" instead of "6")
+The function `smb_direct_flush_send_list()` is called in two contexts:
+- **Line 987**: Called with `is_last=false` from
+  `wait_for_send_credits()` when credits run low during data
+  transmission
+- **Line 1341**: Called with `is_last=true` at the end of
+  `smb_direct_writev()` to finalize the send operation
 
-2. **Reduces log spam**: Adds conditional checks (`if (wc->status !=
-   IB_WC_WR_FLUSH_ERR)`) to skip logging for `IB_WC_WR_FLUSH_ERR`
-   errors, which are benign and occur frequently during normal RDMA
-   operations
-
-3. **Better error visibility**: In `recv_done()` (line 607-608), changes
-   the log level from INFO to ERR for real errors
-
-#### **Deep Technical Context:**
-
-**`IB_WC_WR_FLUSH_ERR` Background:**
-- This is a standard InfiniBand/RDMA work completion status indicating
-  that work requests were flushed from the queue
-- Occurs during normal operations: QP (Queue Pair) error state
-  transitions, connection teardown, and error recovery
-- **NOT an actionable error** - it's expected behavior that doesn't
-  require logging
-- Other kernel RDMA drivers follow this pattern:
-  `drivers/infiniband/core/mad.c:2366` has `if (wc->status ==
-  IB_WC_WR_FLUSH_ERR)` with special handling and no error logging
-
-**SMB Client Logging History:**
-- Multiple commits address log spam in SMB client: d7cb986425ce2 "stop
-  flooding dmesg in smb2_calc_signature()", 6bbed0b3ad8b2 "fix noisy
-  when tree connecting"
-- This commit follows the same pattern - reducing noise while preserving
-  important error information
-
-#### **Backport Suitability Analysis:**
-
-**✅ STRONG POSITIVE FACTORS:**
-
-1. **Very small and safe**: Only 20 lines changed (12 insertions, 8
-   deletions) in a single file
-2. **Logging-only changes**: No functional code paths altered - only
-   what gets logged and how
-3. **Zero dependencies**: Both `ib_wc_status_msg()` (introduced v4.2,
-   2015) and `IB_WC_WR_FLUSH_ERR` exist in v6.17
-4. **Code compatibility**: The v6.17 send_done():275 and recv_done():450
-   functions match the pre-patch state exactly
-5. **Trusted author**: Stefan Metzmacher is a Samba core developer with
-   extensive SMB/CIFS expertise
-6. **Maintainer approval**: Acked-by Namjae Jeon, Signed-off-by Steve
-   French (CIFS maintainer)
-7. **Real user benefit**: Reduces log spam that obscures real errors,
-   improves observability for system administrators
-8. **Industry best practice**: Aligns with how other RDMA drivers in the
-   kernel handle IB_WC_WR_FLUSH_ERR
-9. **Minimal testing burden**: Can be verified simply by observing logs
-   during RDMA operations
-
-**⚠️ CONSIDERATIONS:**
-
-1. No explicit `Cc: stable@` tag (though this is common for QOL
-   improvements)
-2. Not a critical bugfix - it's a usability/observability enhancement
-3. Doesn't fix crashes, data corruption, or security issues
-
-#### **Regression Risk Assessment:**
-
-**Risk Level: VERY LOW**
-
-- Changes only affect logging statements
-- No changes to control flow, data structures, or RDMA operations
-- If something did go wrong (highly unlikely), worst case is missing log
-  messages
-- The logic is straightforward: `if (status != FLUSH_ERR) log_error()`
-
-#### **Specific Code Changes Analyzed:**
-
-**send_done() fs/smb/client/smbdirect.c:415-429:**
+**Old Behavior (BUGGY):**
 ```c
-- log_rdma_send(INFO, "...wc->status=%d", wc->status);
-+ log_rdma_send(INFO, "...wc->status=%s", ib_wc_status_msg(wc->status));
+if (is_last && send_ctx->need_invalidate_rkey) {
+    last->wr.opcode = IB_WR_SEND_WITH_INV;
+    last->wr.ex.invalidate_rkey = send_ctx->remote_key;
+}
+```
+- Remote key invalidation ONLY occurred when BOTH `is_last=true` AND
+  `need_invalidate_rkey=true`
+- After successful flush (lines 944-946), the send context was
+  reinitialized WITH THE SAME VALUES, preserving
+  `need_invalidate_rkey=true`
+- This meant intermediate flushes (with `is_last=false`) would NOT
+  invalidate the key
+- The remote key remained valid across multiple work requests until the
+  final flush
 
-- log_rdma_send(ERR, "wc->status=%d wc->opcode=%d\n", wc->status,
-  wc->opcode);
-+ if (wc->status != IB_WC_WR_FLUSH_ERR)
-+     log_rdma_send(ERR, "wc->status=%s wc->opcode=%d\n",
-+                   ib_wc_status_msg(wc->status), wc->opcode);
+**New Behavior (FIXED):**
+```c
+if (send_ctx->need_invalidate_rkey) {
+    first->wr.opcode = IB_WR_SEND_WITH_INV;
+    first->wr.ex.invalidate_rkey = send_ctx->remote_key;
+    send_ctx->need_invalidate_rkey = false;  // Clear immediately
+    send_ctx->remote_key = 0;
+}
+```
+- Remote key invalidation occurs on the FIRST flush where
+  `need_invalidate_rkey=true`, regardless of `is_last`
+- Uses the FIRST work request instead of the LAST
+- Immediately clears the flags to prevent duplicate invalidation
+- The key is invalidated as soon as possible
+
+### **2. Why This Is a Bug**
+
+**RDMA Remote Key Context:**
+In RDMA/SMB Direct, remote keys grant the remote side access to local
+memory regions. The `IB_WR_SEND_WITH_INV` operation combines sending
+data with invalidating a remote key, which is critical for:
+- **Security**: Preventing unauthorized memory access after data
+  transfer completes
+- **Resource management**: Freeing up RDMA resources promptly
+- **Protocol correctness**: SMB Direct spec requires timely invalidation
+
+**The Problem Scenario:**
+1. `smb_direct_writev()` is called with `need_invalidate=true` for a
+   large transfer
+2. During the while loop (line 1243), `wait_for_send_credits()` triggers
+   an intermediate flush with `is_last=false`
+3. **Bug**: Remote key is NOT invalidated despite
+   `need_invalidate_rkey=true`
+4. Work requests are posted with the remote key still valid
+5. More data is sent, eventually reaching the final flush with
+   `is_last=true`
+6. **Bug**: Only NOW is the remote key finally invalidated
+
+**Impact:** The remote key remains valid longer than necessary,
+potentially allowing the client to access memory that should already be
+inaccessible. This violates the principle of least privilege and could
+cause resource leaks or protocol violations.
+
+### **3. Historical Context**
+
+A related fix was made in 2022 (commit 2fd5dcb1c8ef):
+```
+"ksmbd: smbd: fix missing client's memory region invalidation"
+"if errors occur while processing a SMB2 READ/WRITE request,
+ksmbd sends a response with IB_WR_SEND. So a client could
+use memory regions already in use."
 ```
 
-**recv_done() fs/smb/client/smbdirect.c:597-608:**
-```c
-- log_rdma_recv(INFO, "...wc status=%d...", wc->status, ...);
-+ log_rdma_recv(INFO, "...wc status=%s...",
-ib_wc_status_msg(wc->status), ...);
+This shows that improper remote key invalidation is a known correctness
+and security issue in ksmbd's RDMA implementation. The current commit
+addresses a different aspect of the same problem - timing rather than
+omission.
 
-- log_rdma_recv(INFO, "wc->status=%d opcode=%d\n", wc->status,
-  wc->opcode);
-+ if (wc->status != IB_WC_WR_FLUSH_ERR)
-+     log_rdma_recv(ERR, "wc->status=%s opcode=%d\n",
-+                   ib_wc_status_msg(wc->status), wc->opcode);
-```
+### **4. Commit Metadata**
 
-Note the important change: ERROR level logging for recv_done (was INFO,
-now ERR) - this ensures real errors are more visible.
+- **Author**: Stefan Metzmacher (Samba team, prolific contributor to SMB
+  server code)
+- **Date**: September 8, 2025 (authored), September 28, 2025 (committed)
+- **Acked-by**: Namjae Jeon (ksmbd maintainer)
+- **Signed-off-by**: Steve French (SMB/CIFS maintainer)
+- **File changed**: fs/smb/server/transport_rdma.c (+7, -4 lines)
 
-#### **Why This Should Be Backported:**
+### **5. Risk Assessment**
 
-1. **Improves user experience**: System administrators using SMB Direct
-   over RDMA will see cleaner logs with readable error messages
-2. **Reduces support burden**: Less noise in logs means real errors are
-   easier to identify
-3. **Safe change**: Extremely low risk of introducing regressions
-4. **Already backported elsewhere**: Evidence shows this commit
-   (624cc9eac4e69) was already backported to another stable tree
-5. **Aligns with stable tree philosophy**: Small, safe improvements that
-   benefit users without risk
+**Low Risk:**
+- **Scope**: Change is confined to a single function
+  (`smb_direct_flush_send_list()`)
+- **Size**: Very small (11 line diff)
+- **Logic**: Simple and clear - moves invalidation from last to first WR
+  and removes `is_last` dependency
+- **Testing**: Acked by maintainer, part of active development by Samba
+  team
 
-#### **Conclusion:**
+**Benefits:**
+- Fixes correctness bug in RDMA key invalidation timing
+- Improves security by invalidating keys promptly
+- Aligns with SMB Direct protocol best practices
+- Prevents potential resource leaks
 
-While not a critical fix, this commit provides tangible benefits
-(reduced log spam, better error messages) with virtually zero risk. It
-improves the operational experience for anyone using SMB Direct with
-RDMA, which is important for high-performance SMB deployments. The
-change is small, safe, and comes from trusted maintainers.
+### **6. Backport Suitability Analysis**
 
-**Recommendation: YES - suitable for backporting to stable trees, though
-not urgent priority.**
+**✓ Fixes a bug affecting users**: Yes - users of ksmbd with RDMA/SMB
+Direct
+**✓ Small and contained**: Yes - 11 lines, single function
+**✓ No architectural changes**: Yes - only changes when/how invalidation
+happens
+**✓ Minimal regression risk**: Yes - logic is straightforward
+**✓ Clear correctness improvement**: Yes - invalidates keys ASAP as
+intended
+**✓ Maintainer approved**: Yes - Acked by Namjae Jeon
 
- fs/smb/client/smbdirect.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+### **7. Subsystem Assessment**
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 3fc5d2cebea5d..723f79f38364d 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -281,8 +281,8 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 	struct smbd_connection *info =
- 		container_of(sc, struct smbd_connection, socket);
+- **Subsystem**: SMB server (ksmbd) RDMA transport
+- **Criticality**: Medium - affects RDMA deployments, which are less
+  common than TCP but important for high-performance scenarios
+- **User impact**: Users with ksmbd RDMA configurations could experience
+  protocol violations or delayed key invalidation
+
+---
+
+## **Conclusion**
+
+**YES**, this commit should be backported to stable kernel trees.
+
+This is a clear **bug fix** that corrects the timing of RDMA remote key
+invalidation in the SMB server's RDMA transport code (lines 918-956 in
+transport_rdma.c). The old code delayed invalidation until the final
+flush with `is_last=true`, but the new code correctly invalidates on the
+first flush, ensuring keys are invalidated "as soon as possible" as
+stated in the commit message. This is both a correctness fix (protocol
+behavior) and a security improvement (reduces window of key validity).
+The change is small, well-contained, and has minimal regression risk.
+
+ fs/smb/server/transport_rdma.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index 74dfb6496095d..b539e0421ca00 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -932,12 +932,15 @@ static int smb_direct_flush_send_list(struct smb_direct_transport *t,
+ 			       struct smb_direct_sendmsg,
+ 			       list);
  
--	log_rdma_send(INFO, "smbdirect_send_io 0x%p completed wc->status=%d\n",
--		request, wc->status);
-+	log_rdma_send(INFO, "smbdirect_send_io 0x%p completed wc->status=%s\n",
-+		request, ib_wc_status_msg(wc->status));
++	if (send_ctx->need_invalidate_rkey) {
++		first->wr.opcode = IB_WR_SEND_WITH_INV;
++		first->wr.ex.invalidate_rkey = send_ctx->remote_key;
++		send_ctx->need_invalidate_rkey = false;
++		send_ctx->remote_key = 0;
++	}
++
+ 	last->wr.send_flags = IB_SEND_SIGNALED;
+ 	last->wr.wr_cqe = &last->cqe;
+-	if (is_last && send_ctx->need_invalidate_rkey) {
+-		last->wr.opcode = IB_WR_SEND_WITH_INV;
+-		last->wr.ex.invalidate_rkey = send_ctx->remote_key;
+-	}
  
- 	for (i = 0; i < request->num_sge; i++)
- 		ib_dma_unmap_single(sc->ib.dev,
-@@ -291,8 +291,9 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 			DMA_TO_DEVICE);
- 
- 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
--		log_rdma_send(ERR, "wc->status=%d wc->opcode=%d\n",
--			wc->status, wc->opcode);
-+		if (wc->status != IB_WC_WR_FLUSH_ERR)
-+			log_rdma_send(ERR, "wc->status=%s wc->opcode=%d\n",
-+				ib_wc_status_msg(wc->status), wc->opcode);
- 		mempool_free(request, sc->send_io.mem.pool);
- 		smbd_disconnect_rdma_connection(info);
- 		return;
-@@ -462,13 +463,16 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 	u32 data_length = 0;
- 	u32 remaining_data_length = 0;
- 
--	log_rdma_recv(INFO, "response=0x%p type=%d wc status=%d wc opcode %d byte_len=%d pkey_index=%u\n",
--		      response, sc->recv_io.expected, wc->status, wc->opcode,
-+	log_rdma_recv(INFO,
-+		      "response=0x%p type=%d wc status=%s wc opcode %d byte_len=%d pkey_index=%u\n",
-+		      response, sc->recv_io.expected,
-+		      ib_wc_status_msg(wc->status), wc->opcode,
- 		      wc->byte_len, wc->pkey_index);
- 
- 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_RECV) {
--		log_rdma_recv(INFO, "wc->status=%d opcode=%d\n",
--			wc->status, wc->opcode);
-+		if (wc->status != IB_WC_WR_FLUSH_ERR)
-+			log_rdma_recv(ERR, "wc->status=%s opcode=%d\n",
-+				ib_wc_status_msg(wc->status), wc->opcode);
- 		goto error;
- 	}
- 
+ 	ret = smb_direct_post_send(t, &first->wr);
+ 	if (!ret) {
 -- 
 2.51.0
 
