@@ -1,131 +1,106 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5D442A99
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Oct 2025 17:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F02C1E51EF;
+	Fri,  3 Oct 2025 15:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759425644; cv=none; b=tHjgTrH2Av1/270khxdDY1sT5wqRn37az4b1k493XDybwwW6YbscB/S6tK6/xK40TuFW/dv2xAaMQybnZtiWoodLRNJWRqoPEfUbUgBq/2hfykXBPatnSXaX2dpKRSmysKa55pZButCXmtpr+p58xpFf5FnCUMWoka3sUIZL04s=
+	t=1759505660; cv=none; b=d+UzotIQf6axZdJf1wjucKNlX+Zy9v7UKTsl6mFIPiwGeUie9l2vz+FUw3IpdvOCLdtRKD1/HRhgpyGHqHfZNaW4uHBm812SEb9if9fXWwB3K/lI4fxfAe4cOMQzNQL9DZHyuHsshh8hGx3IDpA3gErzT+5uI1ZDmzi00N4jJp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759425644; c=relaxed/simple;
-	bh=dk1NQw2VERkubWjw6V1HZnO05TMxyayltyTZKNX/AzM=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=pAKNvjXMwQAXnJzxB+NvINJ8zkUiXElZngPYJtmtLy6idACJxOt9Ekf7ogADr0oBJAZBeiUaDVsILT3fqdsIetFOtQ/yYp5DbiDPowiSTNat9stSem9HemUrzoBxVu1UWJnATpuo/k6giGpa4N52V8/LF3VIqwisTFWVeK+vWHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SDd0KsRZ; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1759505660; c=relaxed/simple;
+	bh=34Oe3kkIvVXPNFYZj3oBbSWA8hLsUlehHfqT+ggMRUw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WgFqRFdHhyoMi6OcXahKgfb2pHCIWUOF0IeqBCVtB4Dq8yOsbokzELljECrt7lOXtk2N+PK5xEil2VYPLgn6k0J6CtFpnIcvTjTYayPAawV01CEjXlh1pzZOSYnQckeErH5BpJkm5SSc6B5j0ozv/UymYqgOUXsiIoKJHknb04Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CXsl4Bk0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SDd0KsRZ"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-78f75b0a058so13559596d6.0
-        for <linux-cifs@vger.kernel.org>; Thu, 02 Oct 2025 10:20:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759425641; x=1760030441; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SAtu6/ctQVIzK5vPxGcQc/s7kZti3z+hmRQu3O4UCtY=;
-        b=SDd0KsRZoZR19Le3LD7ViwLmE3XXbpJz1XgB21Ik0R8sSqMXl1ktKhOTFSp4F1/dzk
-         ZSBOZve0k0xjS7YC1GD0fAAZUD4DJq1wILwbzyHHwUuYTLmfCCIAZX8WAMtaYlozcSnR
-         zwciR8/hecUtLNllbc2iCT/UQkWT2Y3tRjWVq6JBhfMkDmbBUBxjYZRcYmvdcTHbzag9
-         1uAf+szf0dpOQ6fRJoFRymPq2a/02+gl15PhuiVPBIUCliUqPSoo75e10zjHNQgLadlI
-         9avXNaHT1gPNXiyOeGMUkiTo/+9Kc0QwFLQlz+3ASwJX1kRqujdCzhRmw/P+Hg36fMZb
-         1V2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759425641; x=1760030441;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SAtu6/ctQVIzK5vPxGcQc/s7kZti3z+hmRQu3O4UCtY=;
-        b=ko4ybcq8ih83T20lCP1m6jujCIbqcQu4xkIMlh2FQ46GIujpV2caO7tQW51ABJ0qxS
-         //epeGR5nu6Zl9mqlLWU1u1punoXJOga5M/qk2Hbft7cvNqqgY2HfjMT2JXDbOIbYTVp
-         1GJ4d57MdwKuOF24PGhVmTEj2MzFMk/FQcQD/udeQ3elIDgocMuTujd9aP4GhibrkuS+
-         Ep5aq90qRVxuEIfkKzdz94NUFARBuyto+zAe/xgrz43iy8jLBKjH4CH2x5CKAXrpGj0y
-         3wIpw68T7UByBnFo59GC2FWX7ZO2eVa8YhTg+1RPcZszfeRAdsKgOjeJFnUcLqiV9XXb
-         iyCw==
-X-Forwarded-Encrypted: i=1; AJvYcCWd1wQK/+XcZNDhjxk4mUrDJGTneDqqkX6G+j31A9nW942jWDEaU//6B+BKuv3ofyXLLJzVcB4AbA4t@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTZ4B22yydGeLgW+z0mJdcyxzFh+cq0Sp98raBDZQDD3ncIOu2
-	xE1KH0kL1JzKytU6vJVqKv8OgFWcitkHlXiDQJ+qPyumpryusSDLkNjD6L6OqHbIS3v0l2saLH3
-	aD0qjsP+KA13AJ9P/+hcLWs6J8WZiFI0=
-X-Gm-Gg: ASbGncvSbijUYvL6XHmCJ0ZvCe8fGNFwJSrZmwOx26peKZih8o4QK8IUlPPceqWmuHl
-	4UM9DAD1ZpwCNTGHNZ52LpBs98YG+hnffkpa/ydDtpBYEdkeyp1s0lDrRw25DriZK/PrTis5evT
-	bXG0EBskUoWj+WJll5qfPKwuK4vdbpPzNBqSepCMM1WhdSQLMThcqJMXgyhf7MEwHn3CQ4S9UbN
-	28PBCXlpaw7CVtcQqyOpYFp2eE/ucuqZVZvdNb7LFt3AiBF69ptu1pmLFpZrbL1ftZ2ubMS1eCo
-	fw8hshUihL1l/IXpu8qCLackzmJKs1yTEuxvnM/RCCt+TQHbss6o9s/JOs8yjRCOSv8ljFNsZFQ
-	lCGPE7NpP3w==
-X-Google-Smtp-Source: AGHT+IGUWZdm9D8d2hudPZnCFmi7yXKHA1CZ7wWJsKITJ/TXMFKIEesjighOYb/MimXVQCCocKK7yApm2jAOKPOJVLY=
-X-Received: by 2002:a05:6214:248a:b0:786:d65c:1c3e with SMTP id
- 6a1803df08f44-879dc7c5521mr1370446d6.30.1759425640960; Thu, 02 Oct 2025
- 10:20:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CXsl4Bk0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02DB1C4CEF5;
+	Fri,  3 Oct 2025 15:34:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759505658;
+	bh=34Oe3kkIvVXPNFYZj3oBbSWA8hLsUlehHfqT+ggMRUw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CXsl4Bk0Fj5qEAD2O2MjUbvQHXgWqGzEFtWsfGMIYi1mj605pyHK3cTOms8hI5RY1
+	 dt3P9gmnNyikqJBKZmUeS//EB3SWgSD7F2VEjCqEdmOfwV5Q2e7VWFJroi0KaVJsn9
+	 G60G0dkZeKQCpo2QoSwFMZBq0UusGXZJYOxk+ny6kSFndooGsw2P3uZFbFmfS96HtJ
+	 XDk9A3NUBgx4ptXkKubhAONaWd7rIDDTRgml1T2QCLn6Sci7pNqKsIrG4pgrqmQI9f
+	 bWQ1OGbA54b+cyww9eSzImJEviiX33/AexQY6iVxuiunMF/e9HPhtuEQX9ANPa6C6p
+	 G1mw6PC+6rOxA==
+Message-ID: <28ffeb31-beec-4c7a-ad41-696d0fd54afe@kernel.org>
+Date: Fri, 3 Oct 2025 11:34:17 -0400
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 2 Oct 2025 12:20:28 -0500
-X-Gm-Features: AS18NWB6qxj8HQdJyEZA2jhJoBIVUzGipHmStWEneP1xhBuJnOXCHOyGk4pTsjY
-Message-ID: <CAH2r5mv8=AvJBTE7cxz=BQsjrR8ZOVS_ZkvVSrLzJqrLiomX8g@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] fs: Plumb case sensitivity bits into statx
+To: Gabriel Krisman Bertazi <gabriel@krisman.be>,
+ Amir Goldstein <amir73il@gmail.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+ Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Volker Lendecke <Volker.Lendecke@sernet.de>,
+ CIFS <linux-cifs@vger.kernel.org>
+References: <20250925151140.57548-1-cel@kernel.org>
+ <CAOQ4uxj-d87B+L+WgbFgmBQqdrYzrPStyfOKtVfcQ19bOEV6CQ@mail.gmail.com>
+ <87tt0gqa8f.fsf@mailhost.krisman.be>
+Content-Language: en-US
+From: Chuck Lever <cel@kernel.org>
+Organization: kernel.org
+In-Reply-To: <87tt0gqa8f.fsf@mailhost.krisman.be>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Please pull the following changes since commit
-a9401710a5f5681abd2a6f21f9e76bc9f2e81891:
+On 10/3/25 11:24 AM, Gabriel Krisman Bertazi wrote:
+> Amir Goldstein <amir73il@gmail.com> writes:
+> 
+>> On Thu, Sep 25, 2025 at 5:21 PM Chuck Lever <cel@kernel.org> wrote:
 
-  Merge tag 'v6.18-rc-part1-smb3-common' of git://git.samba.org/ksmbd
-(2025-09-29 14:57:08 -0700)
+>>> diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
+>>> index 1686861aae20..e929b30d64b6 100644
+>>> --- a/include/uapi/linux/stat.h
+>>> +++ b/include/uapi/linux/stat.h
+>>> @@ -219,6 +219,7 @@ struct statx {
+>>>  #define STATX_SUBVOL           0x00008000U     /* Want/got stx_subvol */
+>>>  #define STATX_WRITE_ATOMIC     0x00010000U     /* Want/got atomic_write_* fields */
+>>>  #define STATX_DIO_READ_ALIGN   0x00020000U     /* Want/got dio read alignment info */
+>>> +#define STATX_CASE_INFO                0x00040000U     /* Want/got case folding info */
+>>>
+>>>  #define STATX__RESERVED                0x80000000U     /* Reserved for future struct statx expansion */
+>>>
+>>> @@ -257,4 +258,18 @@ struct statx {
+>>>  #define STATX_ATTR_WRITE_ATOMIC                0x00400000 /* File supports atomic write operations */
+>>>
+>>>
+>>> +/*
+>>> + * File system support for case folding is available via a bitmap.
+>>> + */
+>>> +#define STATX_CASE_PRESERVING          0x80000000 /* File name case is preserved */
+>>> +
+>>> +/* Values stored in the low-order byte of .case_info */
+>>> +enum {
+>>> +       statx_case_sensitive = 0,
+>>> +       statx_case_ascii,
+>>> +       statx_case_utf8,
+>>> +       statx_case_utf16,
+>>> +};
+>>> +#define STATX_CASE_FOLDING_TYPE                0x000000ff
+> 
+> Does the protocol care about unicode version?  For userspace, it would
+> be very relevant to expose it, as well as other details such as
+> decomposition type.
 
-are available in the Git repository at:
+For the purposes of indicating case sensitivity and preservation, the
+NFS protocol does not currently care about unicode version.
 
-  git://git.samba.org/ksmbd.git tags/v6.18rc1-part1-ksmbd-server-fixes
+But this is a very flexible proposal right now. Please recommend what
+you'd like to see here. I hope I've given enough leeway that a unicode
+version could be provided for other API consumers.
 
-for you to fetch changes up to e28c5bc45640bc851e8f7f0b8d5431fdaa420c8e:
-
-  ksmbd: increase session and share hash table bits (2025-09-30 21:37:55 -0500)
-
-----------------------------------------------------------------
-Nine ksmbd server fixes
-- Fix potential UAFs and corruptions in rpc open and close
-- Fix copy_file_range when ranges overlap
-- Improve session, share, connection lookup performance
-- Fix potential hash collisions in share and session lists
-- Debugging improvement - making per-connection threads easier to identify
-- Improve socket creation
-- Fix return code mapping for posix query fs info
-- Two patches add support for limiting the maximum number of
-connections per IP address, extending the existing connection limiting
-mechanism to enforce per-IP connection limits alongside the global
-connection limit
-----------------------------------------------------------------
-Matvey Kovalev (1):
-      ksmbd: fix error code overwriting in smb2_get_info_filesystem()
-
-Namjae Jeon (7):
-      ksmbd: make ksmbd thread names distinct by client IP
-      ksmbd: use sock_create_kern interface to create kernel socket
-      ksmbd: copy overlapped range within the same file
-      ksmbd: add max ip connections parameter
-      ksmbd: add an error print when maximum IP connections limit is reached
-      ksmbd: replace connection list with hash table
-      ksmbd: increase session and share hash table bits
-
-Yunseong Kim (1):
-      ksmbd: Fix race condition in RPC handle list access
-
- fs/smb/server/connection.c        | 23 +++++----
- fs/smb/server/connection.h        |  6 ++-
- fs/smb/server/ksmbd_netlink.h     |  5 +-
- fs/smb/server/mgmt/share_config.c |  2 +-
- fs/smb/server/mgmt/user_session.c | 28 +++++++----
- fs/smb/server/server.h            |  1 +
- fs/smb/server/smb2pdu.c           |  7 +--
- fs/smb/server/transport_ipc.c     |  3 ++
- fs/smb/server/transport_rdma.c    |  5 ++
- fs/smb/server/transport_tcp.c     | 98 ++++++++++++++++++++++-----------------
- fs/smb/server/vfs.c               | 16 ++++++-
- 11 files changed, 119 insertions(+), 75 deletions(-)
+(As I mentioned to Jeff, there is no user space statx component in the
+current proposal, but it should get one if it is agreed that's useful to
+include).
 
 -- 
-Thanks,
-
-Steve
+Chuck Lever
