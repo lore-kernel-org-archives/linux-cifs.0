@@ -1,88 +1,63 @@
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9D135898;
-	Fri,  3 Oct 2025 21:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0B827B357;
+	Fri,  3 Oct 2025 21:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759526137; cv=none; b=ObCf0R+i6d9Pba4CF0EPHuCYk/oboyuiRCIFyYMO2BCN+nkp8rH7/C7Pe1UD1r5zLHT8jBvlPQ8ynH/SA5Gh+o0YBTNfEgH7nkjNDkM8per+1baYKnRmYC2KpjOlh1k4A8qhIVwi+Gwz8TwA2jShW9N2RO9o2GZp5kafR+51HzI=
+	t=1759527127; cv=none; b=kZqEmwL7D01Y16jfzQrRfbU+t/ufbAXmuogvX5ZbXttG59xQ1X//ovI+uT5GtCU7OlYeWvDwi4GwZsh2ZtIFcxeHHEZF+k+3mGlVxxjIFG+guQxFo2PBB0bS/TWn4Y2aJ/fxWyP73YCfNPpr2GkgIKUbadQWzIEkpdNx5I924wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759526137; c=relaxed/simple;
-	bh=79Fu2ZNjQ/N/Ec4B1PG7nkujis1ZaUQxH7GYIH/vnoc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=CAj6O0I+ZQSSf5eBg+N/UdK8LRXUuegF5f5geWvvL3Ptoifozsjq3AmTxlRABTlLk8DB6nfQiQYlf0M4QXNeeZKiJWe0ZbQJPgFgGIOvRflrbFdnUs+YkDX2M+cN100W/Mht5dm18uzjfGxXw15SoJ2IEeFGzDJRKXHoVZ5iDCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=krisman.be; spf=pass smtp.mailfrom=krisman.be; dkim=pass (2048-bit key) header.d=krisman.be header.i=@krisman.be header.b=Td/mgmm1; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=krisman.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=krisman.be
+	s=arc-20240116; t=1759527127; c=relaxed/simple;
+	bh=pdaPjIhkMcapZtju3PGAan1vdhIZh/4z4FNAwXHX9cc=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=TKhuqO2pj2kCI8vLZHbp3uRPpL7RfcL/UoM6KOh/2byQ4kfcvNgLL8cA9v6eWmShXn806yfRBjp6w4T6LWYpB22yDl67MQTjpDVnQe5nGCxER4MUlUMJDyXFwKkESCTkwCTPyBhumXzyBfXLA4srn2uF9KGj4KELUbmTFvcoL/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uU+7aNIk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=krisman.be header.i=@krisman.be header.b="Td/mgmm1"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F06104429F;
-	Fri,  3 Oct 2025 21:15:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=krisman.be; s=gm1;
-	t=1759526127;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UZ29I7lnXw0PLwXLW62+ndq9iv4f7LygyyrcnVx9szo=;
-	b=Td/mgmm1HYdAvbnYuvTe9GwmLbPuMIjKlRP/8W6B7uKtCceYtS7vjWpUd2ouGhYJgBb/EN
-	LIr0IheYGvIJ5Q3nTqXtrR3faZuTOzeyFAWyms1Qe1X5uwFlptqNG8dspWDCqylC3DUp2M
-	eCRlmDCWWn6VTdR+7vdVUDhYWfHL4ymYdPNU7dvdfD/vO9fTGG9sPeoPoR53xRSYiEXFWV
-	479Tb7cuoFfiAxceIcuauZwE9S9MHOJNIZW7HDUQTk6y5zHJ10Ob2XXx7b4pu9uYRv5GRB
-	znY+jYfhb0LIhOOn+st9TR9B1jg7WnVyN2PHyT/A/Q9AwSqeEDdYXuxnc68gpQ==
-From: Gabriel Krisman Bertazi <gabriel@krisman.be>
-To: Chuck Lever <cel@kernel.org>
-Cc: Amir Goldstein <amir73il@gmail.com>,  linux-fsdevel@vger.kernel.org,
-  linux-nfs@vger.kernel.org,  Chuck Lever <chuck.lever@oracle.com>,  Jeff
- Layton <jlayton@kernel.org>,  Volker Lendecke <Volker.Lendecke@sernet.de>,
-  CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [RFC PATCH] fs: Plumb case sensitivity bits into statx
-In-Reply-To: <4a31ae5c-ddb2-40ae-ae8d-747479da69e3@kernel.org> (Chuck Lever's
-	message of "Fri, 3 Oct 2025 17:05:09 -0400")
-References: <20250925151140.57548-1-cel@kernel.org>
-	<CAOQ4uxj-d87B+L+WgbFgmBQqdrYzrPStyfOKtVfcQ19bOEV6CQ@mail.gmail.com>
-	<87tt0gqa8f.fsf@mailhost.krisman.be>
-	<28ffeb31-beec-4c7a-ad41-696d0fd54afe@kernel.org>
-	<87plb3ra1z.fsf@mailhost.krisman.be>
-	<4a31ae5c-ddb2-40ae-ae8d-747479da69e3@kernel.org>
-Date: Fri, 03 Oct 2025 17:15:24 -0400
-Message-ID: <87ldlrr8k3.fsf@mailhost.krisman.be>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uU+7aNIk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABB30C4CEFA;
+	Fri,  3 Oct 2025 21:32:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759527127;
+	bh=pdaPjIhkMcapZtju3PGAan1vdhIZh/4z4FNAwXHX9cc=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=uU+7aNIk8wXuM3s8Fdho+M9elUMHFTXbpjtGuFrpyLeWZWr2kxw4luB2okXx07yMX
+	 lzHvs1go6aHoe9MbgpavGbpZNkhqVngAtWOWhz1RN+1JB3JHHpi/ar8XO7bPwqMrbv
+	 t4rTxv8IJ2/WRN5Oj43gxlfoHTlYRkQiC86RxwCbnW8z7TjMWWMEUNt3kPfhYvvpiH
+	 QjAHQ3yn7GKvJ00b4a3yNOuiOlm+ORJxaJmQanq6g3cpIcGY63qoxXrOM6nLZ3bh70
+	 emifUHqiP7/OthsURYUFHveZtB9H8yDu98fwMVlMi8KDd1fhy3Cwel8fzU7nojBw0r
+	 x6Hw66sNDYOLA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3687939D0CA0;
+	Fri,  3 Oct 2025 21:32:00 +0000 (UTC)
+Subject: Re: [GIT PULL] ksmbd server fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mv8=AvJBTE7cxz=BQsjrR8ZOVS_ZkvVSrLzJqrLiomX8g@mail.gmail.com>
+References: <CAH2r5mv8=AvJBTE7cxz=BQsjrR8ZOVS_ZkvVSrLzJqrLiomX8g@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mv8=AvJBTE7cxz=BQsjrR8ZOVS_ZkvVSrLzJqrLiomX8g@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v6.18rc1-part1-ksmbd-server-fixes
+X-PR-Tracked-Commit-Id: e28c5bc45640bc851e8f7f0b8d5431fdaa420c8e
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: b3fee71e6673393d04476fbe0f4f03f97765e32d
+Message-Id: <175952711910.82231.10268816409030486314.pr-tracker-bot@kernel.org>
+Date: Fri, 03 Oct 2025 21:31:59 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-GND-Sasl: gabriel@krisman.be
 
-Chuck Lever <cel@kernel.org> writes:
+The pull request you sent on Thu, 2 Oct 2025 12:20:28 -0500:
 
-> On 10/3/25 4:43 PM, Gabriel Krisman Bertazi wrote:
->> Chuck Lever <cel@kernel.org> writes:
->> 
->>> On 10/3/25 11:24 AM, Gabriel Krisman Bertazi wrote:
->
->>>> Does the protocol care about unicode version?  For userspace, it would
->>>> be very relevant to expose it, as well as other details such as
->>>> decomposition type.
->>>
->>> For the purposes of indicating case sensitivity and preservation, the
->>> NFS protocol does not currently care about unicode version.
->>>
->>> But this is a very flexible proposal right now. Please recommend what
->>> you'd like to see here. I hope I've given enough leeway that a unicode
->>> version could be provided for other API consumers.
->> 
->> But also, encoding version information is filesystem-wide, so it would
->> fit statfs.
->
-> ext4 appears to have the ability to set the case folding behavior
-> on each directory, that's why I started with statx.
+> git://git.samba.org/ksmbd.git tags/v6.18rc1-part1-ksmbd-server-fixes
 
-Yes. casefold is set per directory, but the unicode version and
-casefolding semantics used by those casefolded directories are defined
-for the entire filesystem.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/b3fee71e6673393d04476fbe0f4f03f97765e32d
+
+Thank you!
 
 -- 
-Gabriel Krisman Bertazi
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
