@@ -1,262 +1,287 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2532D8DA9
-	for <linux-cifs@vger.kernel.org>; Fri,  3 Oct 2025 17:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33282C21C7
+	for <linux-cifs@vger.kernel.org>; Fri,  3 Oct 2025 17:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759511973; cv=none; b=ekd999n6SV8KPTHpBvrkczIibppM/I9DOuLztdJlTVnPtgUuCRisLYDULymgGuUKeeMbZUjJsx2CNWu8ppCIm4HBB2q4oXEFpZd+9LbY5Swjtd7PN0EJyOcAeTEbL/LhYfkwqGoY/adlQNvTSB5EjVLXmUR3YhTUTfz585w47Rs=
+	t=1759512059; cv=none; b=JT08i0rtCa5knkjVRRArS9pNvu4N/VnqzEIL3thdIcR0JYJMGGYqiHZq3COvNbkPc2yn7nIT2dAZVOYzQK6N+cw8/WmoVcONpcGf85ISU4KwOXSb51F+1Lb0ZSxFfZp+NTxIQSdT5pK8EL4LZD+zjWz3s7cuHRqMhCTnYyzumDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759511973; c=relaxed/simple;
-	bh=d+hNHPCdcctqhqMwwfSI7ZqHOsINPXlQJG9fVF5g2zU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QChYn2U6T8OS2l8rSlhVUlqJk52fh5CGHETNvnz0XGkE+yvbJUOdL1HQXENk3vIpH1hLWNI8s812GeXNdx4LSNLjJcpcc9TKgfYiYcckdBm13c2oSFrCjzbo7eJiZv+3zpmi13dwz2dvWONC2BAAk5DEXmpRvsZJ+RxeZtGReiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PKrsYLYd; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1759512059; c=relaxed/simple;
+	bh=C9CpBLzw1pO3vtP9TOCHCa6fzRdReKRfq65D5kQW2jE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=VmjpfJy16qpcA0IbipGt5eB6Mn7EGXXbkzQyrIUCbmso/m8nnuXfW+Y7qndMhLXYJCkHjrEulaZus5fNFtOZTtittCZvHk6KCvlv3Jz0Cv9F3cgh73n3K1Y6OSckRxgfVO9bpaFmSwCQgsk56TumQCnekUJfC1lSa8FiyNi6HWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tXb/WJ1U; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKrsYLYd"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-78e4056623fso21548446d6.2
-        for <linux-cifs@vger.kernel.org>; Fri, 03 Oct 2025 10:19:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tXb/WJ1U"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-46e504975dbso15741695e9.1
+        for <linux-cifs@vger.kernel.org>; Fri, 03 Oct 2025 10:20:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759511969; x=1760116769; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bQeO7BRufyPD4hH+AuC8eieZK6LtCH///3sKMgHWdcs=;
-        b=PKrsYLYd9YvkY0uaPodUcAjWc7wd/cRHC61t0Ne7dRTX3JeOJo+LXU0lI2Y5ETKvmT
-         vdb4mxi11ZtLYsF8HsFLyK+Q+QZlzBXhQ9MzCEFlcOOJgpR/v2S1Gm+SJvv5GrL4F9BG
-         pCDCb0CpTH8q2BCtavM9iAzCpUdnhIfqFxBNsf0clt5MwPho7qOgHOILXUvM6o/+m2TX
-         e/XtcPxzMy+lFxJfSxPxH5SuwBzKhd1zqEG3eZIkCbgsjFb9+hCeptzW7EfgTbLCWbu2
-         GBsY6iTJbAhEEiYpf68j8vvfw2ZFBPMvkSTmsbqThhbuu6crAhABko93J/XAGlC3Mzxk
-         RCiw==
+        d=linaro.org; s=google; t=1759512055; x=1760116855; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=K1jUhJGkvuXEQLZn2ZvNWi0i88zQ8eeDqvcxRlddFH8=;
+        b=tXb/WJ1UPhgyM6TXeF4M3vm1aXevCHCOi7E2pPgqq6l6r4j9vInIZZ65iwIX/jVDCt
+         uWHs3Esi8t2fUVTK0igT7WtE7uQrOitg3t4yNYBImOQZFgT/cRAgHf9Mch8/RsXZj8Bt
+         Big74EtKvqGIH1lB2Q3LCyfTAvXPgGz9ZGHPO6HyJlQ6oCu2uzT5drlA0NFuzUl4tHSu
+         jgVRx5sGvlo4CjHW78QhzR2/n6P6tgSvph+eHG4w914p9Pt+PqrZrufz/t/JvPBjWUVS
+         IQglgIhfbvbRP8kbAFlPx5C7K8Ue7h1t72EE0A85GJgQJEvD+NL1HWKhRCBC7csys34O
+         uD6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759511969; x=1760116769;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bQeO7BRufyPD4hH+AuC8eieZK6LtCH///3sKMgHWdcs=;
-        b=qUIjfSPxx8EEOpm7vfepbgd7xwfxnLRhwdPYtpKpoqbP2sWVtr9FT1aEOH+6KJVuL5
-         ael3DqVqJqvRpMMTE1tK8KdnQyrPkh249LAFNxssgWpkyen12RuJMnlh6+JVWycmuaFG
-         +okWS7Sn2h+IqVfPK4b5CU/RoNZ5752E7rlkY3jMyafyf105EFBkBcSJ4GBNP0WBNai1
-         ObfMeJPWPWrVU5P9SbYPFOM/bAWJi4k2DfVXLJV155cZ47B7yXhRujljpCW83jQuEoHb
-         PZiMY7OFZ105Oz6mI83hobSFfWFptnOD5FW7Y1oWeBgw4C10xqHfSEAr1CymyxmpSkwx
-         I3cw==
-X-Forwarded-Encrypted: i=1; AJvYcCWFuw/75NzSk3ZdOG89XgzHzJ1/HJBwXsBvALBxIKI2iQymDcoxtHGn4dhHTp0dE2S7lxp7ATYdHM6A@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxlQlOh2AxqWuf+MNitaleJ9VKalthqk1N6ihfa3WIJZ1jqQ5R
-	f9Yw/u0gRs27zdoddt6P9YI1q+c5/f6rq2g498IuICRL+icr7ud9wL1VHxVcEun+spt/qYVncpy
-	Q6ra+6y+1BH7GEGBPJTJfrlTyjcMEZYg=
-X-Gm-Gg: ASbGncsiKQW8ABcPxG6EN6mmBnbdWKGVUM1hZYrDZlKlOzBf1FijK/jut3GDnK1czSH
-	dm/WhGyvJWFLCVjkjMmp3iiKT+rMpAraUHl1MxQE1+fNDtUbH1duU/0XAO0t1kRWHouoU5Cawh0
-	WKgGyCykY3pH6m4JTOhmWYoqqvDXDhEgFxs9yYzA5vtrNLza0TPtYwCyBPm3AHc49hbi3bJgRSm
-	FIng5x6/wsvdXT+t3RqBEzDzBTZupWbQ19ATtuzpMYlalFbyyHHXm1WnxI9r03/bDHoh6GZn8DQ
-	jG9PSxkBsnMtJPh4BhHvQSIFIEhKhpgIIZinIMlpw6K93TDLcpdS0fOOKFaZsm7xk7WKlvN2giD
-	1ebYzZ3c/bz2E8pP9FOM8
-X-Google-Smtp-Source: AGHT+IHJtS/x6vYENYT9s4+gKrjo3t25fmXx0XacnE1QxzxT02WiwpVugpLzABXgwGJPhAYyxaXY2dTT9sFt+ymrUuw=
-X-Received: by 2002:a05:6214:f2d:b0:78e:c8a6:e891 with SMTP id
- 6a1803df08f44-879dc7c2424mr39720346d6.24.1759511969364; Fri, 03 Oct 2025
- 10:19:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759512055; x=1760116855;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K1jUhJGkvuXEQLZn2ZvNWi0i88zQ8eeDqvcxRlddFH8=;
+        b=qYZcZM3lVctrrKvZOCnnYOeUDLIZUu2ePCNcjvMqXP7OnrXoIsNWuH7sK3jh9JMYRc
+         s+YXsa+9k6FzZVC84MuotxRP/FpqVAemMHodtgdQ80Wrs/sbZdtTOaishKp89bLlqyUE
+         REbq7iD4Mcv+J16w8RgGRiYZ/PR9jRelPBEmn29nkvzkpyZBUztlLdRWW3EIIQO1UZvu
+         vZ1n4EwOFZTuOVXhJ/YT21Nfx/G9pd40COoCHkvXa/pGwQUI/XyNu/DZMiczT0VD9WOr
+         qmZpmySdfsV2nXZxVw7tVxkreM8F9nb4atz7vtz7tNwRYQB6at/k5K29dRER9M06ahhX
+         K9NA==
+X-Forwarded-Encrypted: i=1; AJvYcCULRw4PPLQ0Q0oHejucNNyneTiie9hS/9o5z/w3RZtiAEb9yqR2BZG4AwJ1As3zUVAza01Zhxl6G2nm@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvMchWd49bCYZKgWAv/2cv8bfBrP91Alfho5M1wKkjoWaSHrzM
+	qQRYx8s6apMw50RxqcPa71xN70OqLhSlJ3xE6ZXNMQd0my6xErWQHqDRqMbbXoKlhEI=
+X-Gm-Gg: ASbGnctuFnVw8KlikWQaEjW4t9TpYs6aGKqFfa5UoLHXTfBZqTOngEUyTJJk5GKE/t6
+	WSgRWSckBvCsG1rFHHZY48thq82NBbhdBJAEfTqBsomLzG8plWZOhB6YEjLHe7w9kBRASpuBHOO
+	Et0dT6M9KRzhevVpWBnrvl0kg19fSD7BArQ5SQmJqaNI7wRl3GiQ0qNXeySSY9AnlHlXiK5Arbh
+	lXVWZIBcHehqoggU4wgD5/d/Av7TTXE+uIRkTOs+2UmgG32hTVL9sYZNzg342sVZQHdmZ1ZBLvA
+	tsPCMgivAe62cY54M73DHwB8mDnLTr0Zh2hFxI1zk/7V2Ix7n1lJ3M1OpQiXVT3Xu+VivZV2QIK
+	uLbMTZ0Upo5sXintnXUBDFolCE7irXCm+EX9zzyj3AJ7YXl3mty++OpCfjP24HWqpCV0=
+X-Google-Smtp-Source: AGHT+IE9qXd8T2vmx1DiEYO/pYDUzvVktkgheDcwQex8b4BwN0UphaLhZk2mruoWTzAaN8uZMCOdzA==
+X-Received: by 2002:a05:6000:2086:b0:3ee:15c6:9a55 with SMTP id ffacd0b85a97d-425671c0c88mr2523518f8f.34.1759512054900;
+        Fri, 03 Oct 2025 10:20:54 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-4255d8e980dsm9487329f8f.36.2025.10.03.10.20.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Oct 2025 10:20:54 -0700 (PDT)
+Date: Fri, 3 Oct 2025 20:20:50 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Enzo Matsumiya <ematsumiya@suse.de>,
+	linux-cifs@vger.kernel.org
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, smfrench@gmail.com,
+	pc@manguebit.com, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+	tom@talpey.com, bharathsm@microsoft.com, henrique.carvalho@suse.com
+Subject: Re: [PATCH 16/20] smb: client: add is_dir argument to query_path_info
+Message-ID: <202510032329.NN83GCga-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250925151140.57548-1-cel@kernel.org> <CAOQ4uxj-d87B+L+WgbFgmBQqdrYzrPStyfOKtVfcQ19bOEV6CQ@mail.gmail.com>
- <87tt0gqa8f.fsf@mailhost.krisman.be>
-In-Reply-To: <87tt0gqa8f.fsf@mailhost.krisman.be>
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 3 Oct 2025 12:19:17 -0500
-X-Gm-Features: AS18NWAoWePf6tujqsrp1caBJcHKR4HE6V90mW4cx36rU4If80AaEbpRTvIDhcU
-Message-ID: <CAH2r5mtjkgHSvWDALb6anDrw=skmg_iqZNXCgGv9vEPbci-0XA@mail.gmail.com>
-Subject: Re: [RFC PATCH] fs: Plumb case sensitivity bits into statx
-To: Gabriel Krisman Bertazi <gabriel@krisman.be>
-Cc: Amir Goldstein <amir73il@gmail.com>, Chuck Lever <cel@kernel.org>, linux-fsdevel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>, 
-	Jeff Layton <jlayton@kernel.org>, Volker Lendecke <Volker.Lendecke@sernet.de>, 
-	CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250929132805.220558-17-ematsumiya@suse.de>
 
-On Fri, Oct 3, 2025 at 10:52=E2=80=AFAM Gabriel Krisman Bertazi
-<gabriel@krisman.be> wrote:
->
-> Amir Goldstein <amir73il@gmail.com> writes:
->
-> > On Thu, Sep 25, 2025 at 5:21=E2=80=AFPM Chuck Lever <cel@kernel.org> wr=
-ote:
-> >>
-> >> From: Chuck Lever <chuck.lever@oracle.com>
-> >>
-> >> Both the NFSv3 and NFSv4 protocols enable NFS clients to query NFS
-> >> servers about the case sensitivity and case preservation behaviors
-> >> of shared file systems. Today, the Linux NFSD implementation
-> >> unconditionally returns "the export is case sensitive and case
-> >> preserving".
-> >>
-> >> However, a few Linux in-tree file system types appear to have some
-> >> ability to handle case-folded filenames. Some of our users would
-> >> like to exploit that functionality from their non-POSIX NFS clients.
-> >>
-> >> Enable upper layers such as NFSD to retrieve case sensitivity
-> >> information from file systems by adding a statx API for this
-> >> purpose. Introduce a sample producer and a sample consumer for this
-> >> information.
-> >>
-> >> If this mechanism seems sensible, a future patch might add a similar
-> >> field to the user-space-visible statx structure. User-space file
-> >> servers already use a variety of APIs to acquire this information.
-> >>
-> >> Suggested-by: Jeff Layton <jlayton@kernel.org>
-> >> Cc: Volker Lendecke <Volker.Lendecke@sernet.de>
-> >> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> >> ---
-> >>  fs/fat/file.c             |  5 +++++
-> >>  fs/nfsd/nfs3proc.c        | 35 +++++++++++++++++++++++++++--------
-> >>  include/linux/stat.h      |  1 +
-> >>  include/uapi/linux/stat.h | 15 +++++++++++++++
-> >>  4 files changed, 48 insertions(+), 8 deletions(-)
-> >>
-> >> I'm certain this RFC patch has a number of problems, but it should
-> >> serve as a discussion point.
-> >>
-> >>
-> >> diff --git a/fs/fat/file.c b/fs/fat/file.c
-> >> index 4fc49a614fb8..8572e36d8f27 100644
-> >> --- a/fs/fat/file.c
-> >> +++ b/fs/fat/file.c
-> >> @@ -413,6 +413,11 @@ int fat_getattr(struct mnt_idmap *idmap, const st=
-ruct path *path,
-> >>                 stat->result_mask |=3D STATX_BTIME;
-> >>                 stat->btime =3D MSDOS_I(inode)->i_crtime;
-> >>         }
-> >> +       if (request_mask & STATX_CASE_INFO) {
-> >> +               stat->result_mask |=3D STATX_CASE_INFO;
-> >> +               /* STATX_CASE_PRESERVING is cleared */
-> >> +               stat->case_info =3D statx_case_ascii;
-> >> +       }
-> >>
-> >>         return 0;
-> >>  }
-> >> diff --git a/fs/nfsd/nfs3proc.c b/fs/nfsd/nfs3proc.c
-> >> index b6d03e1ef5f7..b319d1c4385c 100644
-> >> --- a/fs/nfsd/nfs3proc.c
-> >> +++ b/fs/nfsd/nfs3proc.c
-> >> @@ -697,6 +697,31 @@ nfsd3_proc_fsinfo(struct svc_rqst *rqstp)
-> >>         return rpc_success;
-> >>  }
-> >>
-> >> +static __be32
-> >> +nfsd3_proc_case(struct svc_fh *fhp, struct nfsd3_pathconfres *resp)
-> >> +{
-> >> +       struct path p =3D {
-> >> +               .mnt            =3D fhp->fh_export->ex_path.mnt,
-> >> +               .dentry         =3D fhp->fh_dentry,
-> >> +       };
-> >> +       u32 request_mask =3D STATX_CASE_INFO;
-> >> +       struct kstat stat;
-> >> +       __be32 nfserr;
-> >> +
-> >> +       nfserr =3D nfserrno(vfs_getattr(&p, &stat, request_mask,
-> >> +                                     AT_STATX_SYNC_AS_STAT));
-> >> +       if (nfserr !=3D nfs_ok)
-> >> +               return nfserr;
-> >> +       if (!(stat.result_mask & STATX_CASE_INFO))
-> >> +               return nfs_ok;
-> >> +
-> >> +       resp->p_case_insensitive =3D
-> >> +               stat.case_info & STATX_CASE_FOLDING_TYPE ? 0 : 1;
-> >> +       resp->p_case_preserving =3D
-> >> +               stat.case_info & STATX_CASE_PRESERVING ? 1 : 0;
-> >> +       return nfs_ok;
-> >> +}
-> >> +
-> >>  /*
-> >>   * Get pathconf info for the specified file
-> >>   */
-> >> @@ -722,17 +747,11 @@ nfsd3_proc_pathconf(struct svc_rqst *rqstp)
-> >>         if (resp->status =3D=3D nfs_ok) {
-> >>                 struct super_block *sb =3D argp->fh.fh_dentry->d_sb;
-> >>
-> >> -               /* Note that we don't care for remote fs's here */
-> >> -               switch (sb->s_magic) {
-> >> -               case EXT2_SUPER_MAGIC:
-> >> +               if (sb->s_magic =3D=3D EXT2_SUPER_MAGIC) {
-> >>                         resp->p_link_max =3D EXT2_LINK_MAX;
-> >>                         resp->p_name_max =3D EXT2_NAME_LEN;
-> >> -                       break;
-> >> -               case MSDOS_SUPER_MAGIC:
-> >> -                       resp->p_case_insensitive =3D 1;
-> >> -                       resp->p_case_preserving  =3D 0;
-> >> -                       break;
-> >>                 }
-> >> +               resp->status =3D nfsd3_proc_case(&argp->fh, resp);
-> >>         }
-> >>
-> >>         fh_put(&argp->fh);
-> >> diff --git a/include/linux/stat.h b/include/linux/stat.h
-> >> index e3d00e7bb26d..abb47cbb233a 100644
-> >> --- a/include/linux/stat.h
-> >> +++ b/include/linux/stat.h
-> >> @@ -59,6 +59,7 @@ struct kstat {
-> >>         u32             atomic_write_unit_max;
-> >>         u32             atomic_write_unit_max_opt;
-> >>         u32             atomic_write_segments_max;
-> >> +       u32             case_info;
-> >>  };
-> >>
-> >>  /* These definitions are internal to the kernel for now. Mainly used =
-by nfsd. */
-> >> diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
-> >> index 1686861aae20..e929b30d64b6 100644
-> >> --- a/include/uapi/linux/stat.h
-> >> +++ b/include/uapi/linux/stat.h
-> >> @@ -219,6 +219,7 @@ struct statx {
-> >>  #define STATX_SUBVOL           0x00008000U     /* Want/got stx_subvol=
- */
-> >>  #define STATX_WRITE_ATOMIC     0x00010000U     /* Want/got atomic_wri=
-te_* fields */
-> >>  #define STATX_DIO_READ_ALIGN   0x00020000U     /* Want/got dio read a=
-lignment info */
-> >> +#define STATX_CASE_INFO                0x00040000U     /* Want/got ca=
-se folding info */
-> >>
-> >>  #define STATX__RESERVED                0x80000000U     /* Reserved fo=
-r future struct statx expansion */
-> >>
-> >> @@ -257,4 +258,18 @@ struct statx {
-> >>  #define STATX_ATTR_WRITE_ATOMIC                0x00400000 /* File sup=
-ports atomic write operations */
-> >>
-> >>
-> >> +/*
-> >> + * File system support for case folding is available via a bitmap.
-> >> + */
-> >> +#define STATX_CASE_PRESERVING          0x80000000 /* File name case i=
-s preserved */
-> >> +
-> >> +/* Values stored in the low-order byte of .case_info */
-> >> +enum {
-> >> +       statx_case_sensitive =3D 0,
-> >> +       statx_case_ascii,
-> >> +       statx_case_utf8,
-> >> +       statx_case_utf16,
-> >> +};
-> >> +#define STATX_CASE_FOLDING_TYPE                0x000000ff
->
-> Does the protocol care about unicode version?  For userspace, it would
-> be very relevant to expose it, as well as other details such as
-> decomposition type.
+Hi Enzo,
 
+kernel test robot noticed the following build warnings:
 
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-The (SMB2/SMB3/SMB3.1.1) protocol specification documentation refers
-to https://www.unicode.org/versions/Unicode5.0.0/ and states
-"Unless otherwise specified, all textual strings MUST be in Unicode
-version 5.0 format, as specified in [UNICODE], using the 16-bit
-Unicode Transformation Format (UTF-16) form of the encoding."
+url:    https://github.com/intel-lab-lkp/linux/commits/Enzo-Matsumiya/smb-client-remove-cfids_invalidation_worker/20250929-213155
+base:   v6.17
+patch link:    https://lore.kernel.org/r/20250929132805.220558-17-ematsumiya%40suse.de
+patch subject: [PATCH 16/20] smb: client: add is_dir argument to query_path_info
+config: i386-randconfig-141-20251003 (https://download.01.org/0day-ci/archive/20251003/202510032329.NN83GCga-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
 
---=20
-Thanks,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202510032329.NN83GCga-lkp@intel.com/
 
-Steve
+New smatch warnings:
+fs/smb/client/inode.c:1313 cifs_get_fattr() error: we previously assumed 'inode' could be null (see line 1288)
+
+vim +/inode +1313 fs/smb/client/inode.c
+
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1259  static int cifs_get_fattr(struct cifs_open_info_data *data,
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1260  			  struct super_block *sb, int xid,
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1261  			  const struct cifs_fid *fid,
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1262  			  struct cifs_fattr *fattr,
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1263  			  struct inode **inode,
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1264  			  const char *full_path)
+^1da177e4c3f41 fs/cifs/inode.c       Linus Torvalds                    2005-04-16  1265  {
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1266  	struct cifs_open_info_data tmp_data = {};
+1208ef1f76540b fs/cifs/inode.c       Pavel Shilovsky                   2012-05-27  1267  	struct cifs_tcon *tcon;
+1208ef1f76540b fs/cifs/inode.c       Pavel Shilovsky                   2012-05-27  1268  	struct TCP_Server_Info *server;
+7ffec372458d16 fs/cifs/inode.c       Jeff Layton                       2010-09-29  1269  	struct tcon_link *tlink;
+^1da177e4c3f41 fs/cifs/inode.c       Linus Torvalds                    2005-04-16  1270  	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1271  	void *smb1_backup_rsp_buf = NULL;
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1272  	int rc = 0;
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1273  	int tmprc = 0;
+^1da177e4c3f41 fs/cifs/inode.c       Linus Torvalds                    2005-04-16  1274  
+7ffec372458d16 fs/cifs/inode.c       Jeff Layton                       2010-09-29  1275  	tlink = cifs_sb_tlink(cifs_sb);
+7ffec372458d16 fs/cifs/inode.c       Jeff Layton                       2010-09-29  1276  	if (IS_ERR(tlink))
+7ffec372458d16 fs/cifs/inode.c       Jeff Layton                       2010-09-29  1277  		return PTR_ERR(tlink);
+1208ef1f76540b fs/cifs/inode.c       Pavel Shilovsky                   2012-05-27  1278  	tcon = tlink_tcon(tlink);
+1208ef1f76540b fs/cifs/inode.c       Pavel Shilovsky                   2012-05-27  1279  	server = tcon->ses->server;
+7ffec372458d16 fs/cifs/inode.c       Jeff Layton                       2010-09-29  1280  
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1281  	/*
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1282  	 * 1. Fetch file metadata if not provided (data)
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1283  	 */
+^1da177e4c3f41 fs/cifs/inode.c       Linus Torvalds                    2005-04-16  1284  
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1285  	if (!data) {
+65e58ef1dafb0c fs/smb/client/inode.c Enzo Matsumiya                    2025-09-29  1286  		bool is_dir = false;
+65e58ef1dafb0c fs/smb/client/inode.c Enzo Matsumiya                    2025-09-29  1287  
+65e58ef1dafb0c fs/smb/client/inode.c Enzo Matsumiya                    2025-09-29 @1288  		if (inode && *inode)
+
+The check implies that "inode" can be NULL.  Pretty sure this
+check can be removed unless something changed out of tree.
+
+65e58ef1dafb0c fs/smb/client/inode.c Enzo Matsumiya                    2025-09-29  1289  			is_dir = S_ISDIR((*inode)->i_mode);
+65e58ef1dafb0c fs/smb/client/inode.c Enzo Matsumiya                    2025-09-29  1290  
+8b4e285d8ce3c6 fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1291  		rc = server->ops->query_path_info(xid, tcon, cifs_sb,
+65e58ef1dafb0c fs/smb/client/inode.c Enzo Matsumiya                    2025-09-29  1292  						  full_path, &tmp_data, is_dir);
+76894f3e2f7117 fs/cifs/inode.c       Paulo Alcantara                   2022-10-03  1293  		data = &tmp_data;
+^1da177e4c3f41 fs/cifs/inode.c       Linus Torvalds                    2005-04-16  1294  	}
+0b8f18e358384a fs/cifs/inode.c       Jeff Layton                       2009-07-09  1295  
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1296  	/*
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1297  	 * 2. Convert it to internal cifs metadata (fattr)
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1298  	 */
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1299  
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1300  	switch (rc) {
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1301  	case 0:
+2e4564b31b645f fs/cifs/inode.c       Steve French                      2020-10-22  1302  		/*
+2e4564b31b645f fs/cifs/inode.c       Steve French                      2020-10-22  1303  		 * If the file is a reparse point, it is more complicated
+2e4564b31b645f fs/cifs/inode.c       Steve French                      2020-10-22  1304  		 * since we have to check if its reparse tag matches a known
+2e4564b31b645f fs/cifs/inode.c       Steve French                      2020-10-22  1305  		 * special file type e.g. symlink or fifo or char etc.
+2e4564b31b645f fs/cifs/inode.c       Steve French                      2020-10-22  1306  		 */
+5f71ebc4129449 fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1307  		if (cifs_open_data_reparse(data)) {
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1308  			rc = reparse_info_to_fattr(data, sb, xid, tcon,
+858e74876c5cbf fs/smb/client/inode.c Paulo Alcantara                   2024-01-19  1309  						   full_path, fattr);
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1310  		} else {
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1311  			cifs_open_info_to_fattr(fattr, data, sb);
+76894f3e2f7117 fs/cifs/inode.c       Paulo Alcantara                   2022-10-03  1312  		}
+ec4535b2a1d709 fs/smb/client/inode.c Paulo Alcantara                   2024-04-08 @1313  		if (!rc && *inode &&
+                                                                                                                   ^^^^^^
+
+The rest of the function assumes inode is a valid pointer.
+
+regards,
+dan carpenter
+
+ec4535b2a1d709 fs/smb/client/inode.c Paulo Alcantara                   2024-04-08  1314  		    (fattr->cf_flags & CIFS_FATTR_DELETE_PENDING))
+fc20c523211a38 fs/smb/client/inode.c Meetakshi Setiya                  2024-03-14  1315  			cifs_mark_open_handles_for_deleted_file(*inode, full_path);
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1316  		break;
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1317  	case -EREMOTE:
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1318  		/* DFS link, no metadata available on this server */
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1319  		cifs_create_junction_fattr(fattr, sb);
+b9a3260f25ab5d fs/cifs/inode.c       Steve French                      2008-05-20  1320  		rc = 0;
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1321  		break;
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1322  	case -EACCES:
+fb157ed226d225 fs/cifs/inode.c       Steve French                      2022-08-01  1323  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+1e77a8c204c9d1 fs/cifs/inode.c       Steve French                      2018-10-19  1324  		/*
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1325  		 * perm errors, try again with backup flags if possible
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1326  		 *
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1327  		 * For SMB2 and later the backup intent flag
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1328  		 * is already sent if needed on open and there
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1329  		 * is no path based FindFirst operation to use
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1330  		 * to retry with
+1e77a8c204c9d1 fs/cifs/inode.c       Steve French                      2018-10-19  1331  		 */
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1332  		if (backup_cred(cifs_sb) && is_smb1_server(server)) {
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1333  			/* for easier reading */
+76894f3e2f7117 fs/cifs/inode.c       Paulo Alcantara                   2022-10-03  1334  			FILE_ALL_INFO *fi;
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1335  			FILE_DIRECTORY_INFO *fdi;
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1336  			SEARCH_ID_FULL_DIR_INFO *si;
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1337  
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1338  			rc = cifs_backup_query_path_info(xid, tcon, sb,
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1339  							 full_path,
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1340  							 &smb1_backup_rsp_buf,
+76894f3e2f7117 fs/cifs/inode.c       Paulo Alcantara                   2022-10-03  1341  							 &fi);
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1342  			if (rc)
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1343  				goto out;
+1e77a8c204c9d1 fs/cifs/inode.c       Steve French                      2018-10-19  1344  
+76894f3e2f7117 fs/cifs/inode.c       Paulo Alcantara                   2022-10-03  1345  			move_cifs_info_to_smb2(&data->fi, fi);
+76894f3e2f7117 fs/cifs/inode.c       Paulo Alcantara                   2022-10-03  1346  			fdi = (FILE_DIRECTORY_INFO *)fi;
+76894f3e2f7117 fs/cifs/inode.c       Paulo Alcantara                   2022-10-03  1347  			si = (SEARCH_ID_FULL_DIR_INFO *)fi;
+c052e2b423f3ea fs/cifs/inode.c       Shirish Pargaonkar                2012-09-28  1348  
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1349  			cifs_dir_info_to_fattr(fattr, fdi, cifs_sb);
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1350  			fattr->cf_uniqueid = le64_to_cpu(si->UniqueId);
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1351  			/* uniqueid set, skip get inum step */
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1352  			goto handle_mnt_opt;
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1353  		} else {
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1354  			/* nothing we can do, bail out */
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1355  			goto out;
+c052e2b423f3ea fs/cifs/inode.c       Shirish Pargaonkar                2012-09-28  1356  		}
+fb157ed226d225 fs/cifs/inode.c       Steve French                      2022-08-01  1357  #else
+fb157ed226d225 fs/cifs/inode.c       Steve French                      2022-08-01  1358  		goto out;
+fb157ed226d225 fs/cifs/inode.c       Steve French                      2022-08-01  1359  #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1360  		break;
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1361  	default:
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1362  		cifs_dbg(FYI, "%s: unhandled err rc %d\n", __func__, rc);
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1363  		goto out;
+132ac7b77cc95a fs/cifs/inode.c       Jeff Layton                       2009-02-10  1364  	}
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1365  
+a108471b5730b5 fs/cifs/inode.c       Ross Lagerwall                    2015-12-02  1366  	/*
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1367  	 * 3. Get or update inode number (fattr->cf_uniqueid)
+a108471b5730b5 fs/cifs/inode.c       Ross Lagerwall                    2015-12-02  1368  	 */
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1369  
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1370  	cifs_set_fattr_ino(xid, tcon, sb, inode, full_path, data, fattr);
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1371  
+7ea884c77e5c97 fs/cifs/inode.c       Steve French                      2018-03-31  1372  	/*
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1373  	 * 4. Tweak fattr based on mount options
+7ea884c77e5c97 fs/cifs/inode.c       Steve French                      2018-03-31  1374  	 */
+fb157ed226d225 fs/cifs/inode.c       Steve French                      2022-08-01  1375  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1376  handle_mnt_opt:
+fb157ed226d225 fs/cifs/inode.c       Steve French                      2022-08-01  1377  #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+0b8f18e358384a fs/cifs/inode.c       Jeff Layton                       2009-07-09  1378  	/* query for SFU type info if supported and needed */
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1379  	if ((fattr->cf_cifsattrs & ATTR_SYSTEM) &&
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1380  	    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL)) {
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1381  		tmprc = cifs_sfu_type(fattr, full_path, cifs_sb, xid);
+0b8f18e358384a fs/cifs/inode.c       Jeff Layton                       2009-07-09  1382  		if (tmprc)
+f96637be081141 fs/cifs/inode.c       Joe Perches                       2013-05-04  1383  			cifs_dbg(FYI, "cifs_sfu_type failed: %d\n", tmprc);
+^1da177e4c3f41 fs/cifs/inode.c       Linus Torvalds                    2005-04-16  1384  	}
+^1da177e4c3f41 fs/cifs/inode.c       Linus Torvalds                    2005-04-16  1385  
+953f868138dbf4 fs/cifs/inode.c       Steve French                      2007-10-31  1386  	/* fill in 0777 bits from ACL */
+e2f8fbfb8d09c0 fs/cifs/inode.c       Steve French                      2019-07-19  1387  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MODE_FROM_SID) {
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1388  		rc = cifs_acl_to_fattr(cifs_sb, fattr, *inode,
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1389  				       true, full_path, fid);
+01ec372cef1e5a fs/cifs/inode.c       Ronnie Sahlberg                   2020-09-03  1390  		if (rc == -EREMOTE)
+01ec372cef1e5a fs/cifs/inode.c       Ronnie Sahlberg                   2020-09-03  1391  			rc = 0;
+e2f8fbfb8d09c0 fs/cifs/inode.c       Steve French                      2019-07-19  1392  		if (rc) {
+e2f8fbfb8d09c0 fs/cifs/inode.c       Steve French                      2019-07-19  1393  			cifs_dbg(FYI, "%s: Get mode from SID failed. rc=%d\n",
+e2f8fbfb8d09c0 fs/cifs/inode.c       Steve French                      2019-07-19  1394  				 __func__, rc);
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1395  			goto out;
+e2f8fbfb8d09c0 fs/cifs/inode.c       Steve French                      2019-07-19  1396  		}
+e2f8fbfb8d09c0 fs/cifs/inode.c       Steve French                      2019-07-19  1397  	} else if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) {
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1398  		rc = cifs_acl_to_fattr(cifs_sb, fattr, *inode,
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1399  				       false, full_path, fid);
+01ec372cef1e5a fs/cifs/inode.c       Ronnie Sahlberg                   2020-09-03  1400  		if (rc == -EREMOTE)
+01ec372cef1e5a fs/cifs/inode.c       Ronnie Sahlberg                   2020-09-03  1401  			rc = 0;
+68464b88cc0a73 fs/cifs/inode.c       Dan Carpenter via samba-technical 2019-11-26  1402  		if (rc) {
+f96637be081141 fs/cifs/inode.c       Joe Perches                       2013-05-04  1403  			cifs_dbg(FYI, "%s: Getting ACL failed with error: %d\n",
+78415d2d306bfe fs/cifs/inode.c       Shirish Pargaonkar                2010-11-27  1404  				 __func__, rc);
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1405  			goto out;
+78415d2d306bfe fs/cifs/inode.c       Shirish Pargaonkar                2010-11-27  1406  		}
+2f3017e7cc7515 fs/smb/client/inode.c Steve French                      2024-09-21  1407  	} else if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL)
+0b8f18e358384a fs/cifs/inode.c       Jeff Layton                       2009-07-09  1408  		/* fill in remaining high mode bits e.g. SUID, VTX */
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1409  		cifs_sfu_mode(fattr, full_path, cifs_sb, xid);
+2f3017e7cc7515 fs/smb/client/inode.c Steve French                      2024-09-21  1410  	else if (!(tcon->posix_extensions))
+2f3017e7cc7515 fs/smb/client/inode.c Steve French                      2024-09-21  1411  		/* clear write bits if ATTR_READONLY is set */
+2f3017e7cc7515 fs/smb/client/inode.c Steve French                      2024-09-21  1412  		if (fattr->cf_cifsattrs & ATTR_READONLY)
+2f3017e7cc7515 fs/smb/client/inode.c Steve French                      2024-09-21  1413  			fattr->cf_mode &= ~(S_IWUGO);
+2f3017e7cc7515 fs/smb/client/inode.c Steve French                      2024-09-21  1414  
+b9a3260f25ab5d fs/cifs/inode.c       Steve French                      2008-05-20  1415  
+1b12b9c15b4371 fs/cifs/inode.c       Stefan Metzmacher                 2010-08-05  1416  	/* check for Minshall+French symlinks */
+1b12b9c15b4371 fs/cifs/inode.c       Stefan Metzmacher                 2010-08-05  1417  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1418  		tmprc = check_mf_symlink(xid, tcon, cifs_sb, fattr, full_path);
+cb084b1a9be347 fs/cifs/inode.c       Sachin Prabhu                     2013-11-25  1419  		cifs_dbg(FYI, "check_mf_symlink: %d\n", tmprc);
+1b12b9c15b4371 fs/cifs/inode.c       Stefan Metzmacher                 2010-08-05  1420  	}
+1b12b9c15b4371 fs/cifs/inode.c       Stefan Metzmacher                 2010-08-05  1421  
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1422  out:
+b8f7442bc46e48 fs/cifs/inode.c       Aurelien Aptel                    2019-11-18  1423  	cifs_buf_release(smb1_backup_rsp_buf);
+7ffec372458d16 fs/cifs/inode.c       Jeff Layton                       2010-09-29  1424  	cifs_put_tlink(tlink);
+76894f3e2f7117 fs/cifs/inode.c       Paulo Alcantara                   2022-10-03  1425  	cifs_free_open_info(&tmp_data);
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1426  	return rc;
+a18280e7fdea1f fs/smb/client/inode.c Paulo Alcantara                   2023-08-17  1427  }
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
