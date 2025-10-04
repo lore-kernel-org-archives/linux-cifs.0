@@ -1,39 +1,41 @@
-Received: from mout.web.de (mout.web.de [212.227.15.4])
+Received: from mout.web.de (mout.web.de [212.227.15.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C665E1A83F9;
-	Sat,  4 Oct 2025 11:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11A51E4AE;
+	Sat,  4 Oct 2025 12:36:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759577852; cv=none; b=ftnlU4tmtIPlB0F3HZS++SjTkUPsxx16c172SkX5GiQ27IjueJlyeV7zBqvfkOQf3MMhCr8MzZiXxthwY47nDzmyQxCXJ0lP1biUiZSc6UeVVBwrDoNYvwPw8s26OEfASdRVqqXg4clD0AjGZ7dLDqVo8K0ZdstOcZXET2FIvHs=
+	t=1759581397; cv=none; b=h2XqbNKjoYcQCio7oi0YgKfq072YCkNeJ9lXnR0Nqjnff51zlM1pQ9/xw4doowbEptmnzjxUiccwqnPqPv6Cmo9ocAGUhFc8J7cV/TQ/faovL3CEwqRLaV98e6/k9tXcrdyu3mHCB3A5GjCCdbv+/cnF53Jgcg+s2V5qxJxFK54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759577852; c=relaxed/simple;
-	bh=ZMwJ94JZSndxN2070LKEhVYMAa3Woj6Sfn6AMz7xuSc=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=o2q60hACdynQURc+1ia9gadBhSErrf20Q92jH3gVfRx2DjxEZpYUzH1o2656U8MzE22kvXXLEk8b4Fs6L54VTmSRViNjN0vgNgEX/6GYe9QENsKwlvqKQsO+py46fGRRSy+KaIsoM7kl+UTvJAQ4Vq21jBY1btlbfAjr8IZ2DUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=JBmXJMwI; arc=none smtp.client-ip=212.227.15.4
+	s=arc-20240116; t=1759581397; c=relaxed/simple;
+	bh=iTB4n+4WSo2KztEncuEhlk63fZWcTuPe+3XGUcHS93I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vt+PfB74hvo3OJmT9KQnCZTXOQkWd39np5iczbCiSJSwQLKXPcAI5pUq9bhp/csN3GMoA7EXjJFDjpPBIhpeEsvuHH8jXnt2Uvh++0c5Th81IkPsFEyujIbBMxphtr2B+w9atWxoFhKmrw0bldi4lJs68SBirunEYj3rIdbcKT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=ByytSIdP; arc=none smtp.client-ip=212.227.15.3
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="JBmXJMwI"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="ByytSIdP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1759577825; x=1760182625; i=markus.elfring@web.de;
-	bh=HKk/p/TS5yX8/Fbq0swMeIhFh6TV1S5qYhu0g+U1Mpc=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
-	 Subject:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=JBmXJMwINu99OTPvhAVjSQKRasRj1qXvWWXSdMZw790J4GyKFC7JIJBozVqUTxYK
-	 AZc0xG24a+Krfy943IsUgNxasufUIwOwJNPM+9dlxMsbkqhq18Q8RNoG/X2RFbg8L
-	 4yrIpyM/D5yg9OcvZc0SPaNHH6YS74OFuQnR+JfGfWLPOPE8QgjpoH+Cxn9NDPxgy
-	 bOVfpKJap4OvWFm+ThzqW1Ogp5OEX/cV9GIOzcAHQL0IDXeOnjMUDtoThCuy1goYG
-	 f3yvZmnBWTzfbMN4psoA/Ph8gb0BYI8qDSPqxB0P/0Q/T8Kubqd/x0AO1HJSBpi0g
-	 n1kN/wS5Carrxdt52w==
+	s=s29768273; t=1759581384; x=1760186184; i=markus.elfring@web.de;
+	bh=H7VX/qy8aGy+IOmkPg1MPbv2e+jG1HKFKTaSPBgmwR8=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=ByytSIdPKSCpW0Nu2LYhb/V9wtUeMkA7mwNzKXPghuV0Xn5eiYITFt+zOFJe1GPy
+	 5AKsvI81GiH3Fn39DiKKaOML5fZZYDso9of6XrOJIz66FGD4RTrvKvK8Pgh2tFnwO
+	 gMivULQUkHcbPCHMhU5XXw0ny6rbyOvu1DVxR7tMoblqEQhjbio8B7yr/mHJY+4R4
+	 AVaXtk7muqrk2eVIGUvCxgLH8zmaVvQIXr+0OOdkrNraI8KLi8FP8/tjpX73P1uLx
+	 jCBYGNTdx1rricOla1zpXgaUDMH1dv4PbfsmsGC/u0E+obl6u+b/wdEk6E5VN3r9z
+	 Lu5RSZ3To1ceHMlGCQ==
 X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
 Received: from [192.168.178.29] ([94.31.69.173]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MnG2C-1uOHI51smq-00iUvZ; Sat, 04
- Oct 2025 13:37:05 +0200
-Message-ID: <1abbfe84-e3f1-4163-9789-6ec49a3ce821@web.de>
-Date: Sat, 4 Oct 2025 13:36:54 +0200
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1M7ux4-1v9xRy1dMg-006R1M; Sat, 04
+ Oct 2025 14:36:24 +0200
+Message-ID: <9e1d6597-156c-4ecc-b188-75089e175dc0@web.de>
+Date: Sat, 4 Oct 2025 14:36:23 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -41,156 +43,129 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Content-Language: en-GB, de-DE
-To: linux-cifs@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>,
- Sergey Senozhatsky <senozhatsky@chromium.org>,
- Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>
+Subject: Re: ksmbd: Use common error handling code in ksmbd_vfs_path_lookup()
+To: NeilBrown <neil@brown.name>, linux-cifs@vger.kernel.org
 Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
- Neil Brown <neil@brown.name>, Stefan Metzmacher <metze@samba.org>
+ Namjae Jeon <linkinjeon@kernel.org>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Stefan Metzmacher <metze@samba.org>, Steve French <smfrench@gmail.com>,
+ Tom Talpey <tom@talpey.com>
+References: <6d759211-79e7-4d86-b22e-2ae46d209622@web.de>
+ <175953064635.1793333.2429881029964457140@noble.neil.brown.name>
+ <2d533e64-8543-402d-9295-5fd2f314f35d@web.de>
+ <175957657719.1793333.15585390544259019306@noble.neil.brown.name>
+Content-Language: en-GB, de-DE
 From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] ksmbd: Use scope-based resource management in
- ksmbd_validate_name_reconnect()
+In-Reply-To: <175957657719.1793333.15585390544259019306@noble.neil.brown.name>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:30zlWL/vsYH/8dKaHWL52jHbcZAoIA9hLosEgNIdMvBeSL7X3KC
- ++Ek5EuIzWXabCyhkIoN2j5HU+4ImJJUqiMYT93klvm+BjDrbEP01R/Sxi+w7jAT9JbytXj
- aGtELHQgWzg2v2CiWdyBz1QbxmJW7sk8d3NBbg+xYwd9elS7wEdSWkJNajiLpIJnETiaveE
- bX2sGfoyxmfbZRbr58DAA==
+X-Provags-ID: V03:K1:UezFS5eW1Qctl6pwdezkhPJ8yAX0hHjr86+KNfHMsG+uW0hKtLI
+ QSKtFySO4WttyTCP87y5Nc1I7cZL3CmM9UszPP9ontaF1Jr7ejcWEWdssegvNA3qXu65Ho1
+ B01Xx2i85y75oZPPt86spZAu/jSc1Z5i+FEwtNm0NngqkFYhBIvRZZWPhot0TAEr5v8XDV2
+ fk2DRFQRhaV2tarM2asAg==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:EqOcctrBT5A=;IFzq6NNB+F05BvoWnAPH+jAhrBJ
- 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
- 0kxCWnwJEon1/MFX4=
+UI-OutboundReport: notjunk:1;M01:P0:LVZhaHJlMSk=;aUIfWbCp1IVLqdhNzWU0jl/ttSI
+ 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
+ bygHQ==
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sat, 4 Oct 2025 13:27:12 +0200
+>>> This is based on the pattern in kern_path_parent() and
+>>> __start_removing_path().
 
-Scope-based resource management became supported for some
-programming interfaces by contributions of Peter Zijlstra on 2023-05-26.
-See also the commit 54da6a0924311c7cf5015533991e44fb8eb12773 ("locking:
-Introduce __cleanup() based infrastructure").
+You influenced the software evolution also according to the availability
+of a function like kern_path_locked_negative().
+https://elixir.bootlin.com/linux/v6.17/source/fs/namei.c#L2770-L2792
 
-* Thus use the attribute =E2=80=9C__free(kfree)=E2=80=9D.
+See also the following commits:
+* 76a53de6f7ff0641570364234fb4489f4d4fc8e9 ("VFS/audit: introduce kern_pat=
+h_parent()
+  for audit") from 2025-09-23
 
-* Reduce the scope for the local variable =E2=80=9Cab_pathname=E2=80=9D.
+* a681b7c17dd21d5aa0da391ceb27a2007ba970a4 ("fs: ensure that *path_locked*=
+() helpers
+  leave passed path pristine") from 2025-04-16
 
-* Omit two kfree() calls accordingly.
 
-* Return status codes directly without using an intermediate variable.
+>> Do you propose that affected software components may benefit more from
+>> the application of scope-based resource management?
+>> https://elixir.bootlin.com/linux/v6.17/source/include/linux/path.h#L22-=
+L28
+>=20
+> Exactly.  It doesn't suit every case, but if you are going to make
+> changes to the exit paths of a function, I think it is worth
+> considering if scope-based code will work well for the particular
+> function.
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- fs/smb/server/vfs_cache.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+Is there a need to clarify possibilities for the usage of the macro =E2=80=
+=9C__free_path_put=E2=80=9D further?
 
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index dfed6fce8904..af8a16879b88 100644
-=2D-- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -933,27 +933,22 @@ void ksmbd_free_global_file_table(void)
- int ksmbd_validate_name_reconnect(struct ksmbd_share_config *share,
- 				  struct ksmbd_file *fp, char *name)
- {
--	char *pathname, *ab_pathname;
--	int ret =3D 0;
-+	char *pathname __free(kfree) =3D kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
-=20
--	pathname =3D kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
- 	if (!pathname)
- 		return -EACCES;
-=20
--	ab_pathname =3D d_path(&fp->filp->f_path, pathname, PATH_MAX);
--	if (IS_ERR(ab_pathname)) {
--		kfree(pathname);
-+	char *ab_pathname =3D d_path(&fp->filp->f_path, pathname, PATH_MAX);
-+
-+	if (IS_ERR(ab_pathname))
- 		return -EACCES;
--	}
-=20
- 	if (name && strcmp(&ab_pathname[share->path_sz + 1], name)) {
- 		ksmbd_debug(SMB, "invalid name reconnect %s\n", name);
--		ret =3D -EINVAL;
-+		return -EINVAL;
- 	}
-=20
--	kfree(pathname);
--
--	return ret;
-+	return 0;
- }
-=20
- int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *f=
-p)
-=2D-=20
-2.51.0
-
+Regards,
+Markus
