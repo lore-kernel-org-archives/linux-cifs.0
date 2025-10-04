@@ -1,61 +1,61 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E9A278158
-	for <linux-cifs@vger.kernel.org>; Sat,  4 Oct 2025 02:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB21122DFB5
+	for <linux-cifs@vger.kernel.org>; Sat,  4 Oct 2025 02:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759543303; cv=none; b=iYxirFuZMcmi/ysSOWpKXqJeHr2/TXdvkyuDIvKRA6dTFt9IEb8fONIsVtPpcanB0H4rx8cPJM4KAPwrkIQfAqnCLx37ubqvAVsKo77PTRP5lAPMUmqNcf3crxQ63iGaSjy9L0IIDo5JJJoTUDyC1VT4EslAjdm4ZeGcLlemsMc=
+	t=1759544104; cv=none; b=TnVBwisw+31pyHg/bV4JiQIa1/vP7ThhJO9vzsmpxZUg899FShjpPSrjrzKsCjzhfN+86osa1Fhl/NpXWkUYvEzQnZwmfkLqpqblPtzRzw8MqNA6098znCj43/UR/EdQykl3U4IRTG9EOwE97EQu4pROt0sTZZFGEMT10K8SLmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759543303; c=relaxed/simple;
-	bh=1SKOI7X78xpeEhrwiWh2N4EVI6yvaPGtFIZJNScoLCw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Sq6buA7CHfR2OFbxLnNIu1aZkuWmljftOeXTNkLRO42KoMqTFQv/jJivTHZC0HHm6ijWmq+qUXUhpGURJKzdheUldEGE3MTRWuAsd2Lblb0E/jpOrErej6PLIZnH9EK4+Z6aC8VabhA3zVYLH+nLphHqhY8l7FCNAAEMPkXcGaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=StfQPbhx; arc=none smtp.client-ip=209.85.221.41
+	s=arc-20240116; t=1759544104; c=relaxed/simple;
+	bh=T0H3iI2Ev65WGFXmvIj0z6oJjKRSN7i7dBfAw/8/a3E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aQmo4vaIz7HeyLOKCpN82t/R+hOSuFF8LuYIvPQbiZK99BOuQEu3P7igSW10Pm228KXZKsNmtT69vl8hR2810TVg2V4Cd4wiD2BHrPBT8MtmQrrf9x5EWiKtE8OcSdYkkZes58KFMmOxQgRcFsfVdSq9g1VMZ8qXNMQsBQeI+U8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=GkchAn9O; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="StfQPbhx"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3b9edf4cf6cso2137329f8f.3
-        for <linux-cifs@vger.kernel.org>; Fri, 03 Oct 2025 19:01:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="GkchAn9O"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-421b93ee372so1353486f8f.2
+        for <linux-cifs@vger.kernel.org>; Fri, 03 Oct 2025 19:15:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1759543298; x=1760148098; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1759544099; x=1760148899; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gAiVtHNJ21lSyZYNVNH+Pv691CGz/8IbCkMQ6GRAYPU=;
-        b=StfQPbhxExD50hLeVGBDtRsZGrArYYEz2A8wEtoxcE2X6SV1ZlgCWdnzNEW2HjGcGS
-         XxD+ythdWLGl2+Kr+gFWEHXqJGqxO4V435H9AgYJu4qii0Z4Emt8n37WBKyc7i6bS+zO
-         lIgtEstQ5uMUadkfQNRoVXzuwy6LYa6YKNMoehzrGj7/RBxQhGaiGXWM/U2d245ITFWN
-         TcGb+UubnSVk/v7bVLywChC77mzoG0Tfe5jj5mLXF1Mo0qOV5rR2IUazx5JyLsBMrGxw
-         K35jCeh3jbqwvyZQrukTKkKBxHpf2RI/VH1qbEKeNdKosW5dS8Frh5YaLZ8DGAAwD9QO
-         9hZg==
+        bh=BOU+uBmrLUiSqdO3SLzf1cDNaG0CZP9TTZtQDC3kNeU=;
+        b=GkchAn9Odjia0cKubh1joH3HdidUOA2GgYVg1ljhrOQCkYJ+KcCG7Hcq3tkoXJ0iZC
+         WDduyqsU5xzC4fYP7VJQhKCFqvNpQ46cjTaBqquGIcauZ4q5iYUUH/IOlM3a3fFLMJ9g
+         Lpf54dDPCAGEqbcyZ8dYqmG7p59NCiwiZpfDK/hd/KnqQUNTqwIRfbTcS5+7x9KSmUyE
+         bfGqZKA9+w+GDbpbSW9rVTdG9BLXCppFQ5FnB5ascGsapzvgt0FZvUnQCliQ/jYzAPta
+         wFAYK3DOZKGPC8JgEYfXSoV2HoCTz8SzzA0XhtiOTF7JWVQC+D1Y+rhondo3Gyq/HX8r
+         4Zkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759543298; x=1760148098;
+        d=1e100.net; s=20230601; t=1759544099; x=1760148899;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gAiVtHNJ21lSyZYNVNH+Pv691CGz/8IbCkMQ6GRAYPU=;
-        b=wAezKjA2NZcWCdX/DBdjvYNZjL/TS6lkpNOdlQvMmcddHDQJVMgkyOJp/xMh5TJPfd
-         Shj0o8KzYcDX9uAYL8IobHYe02eXh9ELoJX0NTEMB8F4wCql6KtdLRWEwtXmcIlsoIn4
-         yX2LqVFC3ga0vafVbOtrJEVFrzTo+TqbrbbUrTwUHVglZmrXpyKNNJHFtrEgeiPFbFfE
-         e/VYpeDv3qH5BJOcrloaWRUDJsUFBaxXcGFgpNkig5nlKzu6wQZKM7D5NC8MFIkKP/lr
-         SgkWYOSF+H9DoHew6CW1lyXRhNAZqbOzpOrxDCpLc+uAwWMV826bimFiWlCW2uZBt3PD
-         0vTw==
-X-Forwarded-Encrypted: i=1; AJvYcCVAVExB1PEtre7dzIoXWInYVmbIE6gGFknqC9NjmxdBdUGPyKq70Bj+a0474ZahMTW/YP9v/IvzzR8s@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxp6icmWthHnKKtpuKYVVL7z1jkqqoShXYjf9fXlnLfl2EuAkQC
-	UDSsjCL5JNPB5dZfdhYFeqT9cPFH84Asv3qWHm5FnzmIyUy/CxIfUcILQXSCOqhj5tY=
-X-Gm-Gg: ASbGncsZotWFwJHRb8h4wnxu168rGKEpJk7PplgCxCfoorNhN2kbzsY/LZ1lPBxqwCZ
-	nsnpytcXIzeJDcMWhYRZx84ph7WnzSPv4yKt7pkGF73XdMYCPGt1+/KVI3uaBoNyFzQjsbo+q/O
-	U/i9KVQLpiVErRm0B5hhKZCZYFLVwbx/cZRoVbv8Oi7JKA8uQmFXMVAUY0vkfoVD562ITvEc0JA
-	/7SYaPlNBVL3Gtm1vLAoZ0tkb+Y3q+BTVliEjaK36yq441R1HDhaDgJ66mg6SyRZv7SZYn7wk8n
-	ZPaKsNGNKuX/X+qCmt8DC0n2eGE8XCNS4LlRSVo6j+u9lJruLnzBfSkveL9Hnd7AO1ivvDTBORx
-	8bSwu9Le7zMXvnDU6piUup1Tj/GZSsSJhfBeCsgOD1wiD8WoGzUKm5ctLvCDIbL0=
-X-Google-Smtp-Source: AGHT+IGZJceZistdew9/svcH4C1LozyV4uJhV1MiQzPITHlSEvWvrx+M4bGmv51Y6fLg5L66tVj5Rg==
-X-Received: by 2002:a05:6000:24c6:b0:425:58d0:486d with SMTP id ffacd0b85a97d-425671c110bmr2964317f8f.48.1759543298548;
-        Fri, 03 Oct 2025 19:01:38 -0700 (PDT)
+        bh=BOU+uBmrLUiSqdO3SLzf1cDNaG0CZP9TTZtQDC3kNeU=;
+        b=hhKyeW1XK1GrxtsEY7jyu2kiy7VOdZ9Y/hJSdEEWdn3JxIAoa0O+h1Vps6vgwM3snl
+         m0vxcacFOwkEsnjN91NJpr7phf0YV3/2UUj5t+nGfW1nOHqjz8V7S7I7KPnbnTkIJSf/
+         is5RnrPqceRYwPVMHZwfY2IS8W9DWxTjty9R7fovJJFvcaU/nj7pdeBzwbQihXFpG6Yl
+         upBtGoIAocpqWaW/roNCuP7PoO1F2UbIZhzo4afbXERly6rnrEO81PL/V5GejYwJjuQm
+         hZ4YctQZT8ytr/ixlJ/DVjozPlfCKY2bGSr7BpBfEvPwdLh/86rdtlt9zvjumEfn9Fi7
+         ttyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVuruak/PQsV1d8wzrTIol0rlc3sCzlBKLhmfbDHQCoitVv4b+ki5irj96CFRNHBKH+9Jh0Sp9bBHDo@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywe7xjnbnbHk4oPppMI7Y1uzfD8v7nqE3Fi1yNnYkejQJnm1A6U
+	3BYiTKd7/RhQppIztD0UZiBI5OYfYZkO57WTPcfQuQvIbJp5iI7EK9Lhv7QLSfZGoEo=
+X-Gm-Gg: ASbGncv6ERdrcDMHm0RkGfEnZAdNSQwJVXXuX9L176y0N2xkgo1AtL4K3Mdn8/RvVSO
+	3kcERWJOUeyTDHvccztUKn8mgXJJtipVmu1/ivvlU5Op8BRWMu3nBLOTL5F+f6Pml9w9mS1gwme
+	nfUiMWkBubFAEOVMXWqZ97U6LK/MQIIQXBUYjp2O2wZhdIiUtLq4jUd8MAxIuBsszbSe6CzvEsW
+	Q3BYF/odqYip15QFKUacT1QmsiFFrunnDxTbXaAhP4RRfqbkJ56ST3iTRjQN6OLa8yY1fRKrsGb
+	wbnfDYeCWDmux9x+Xv2ISP3EjNzhowOCj5cr/A43taWzuWp4DrN8vBQDi5dF7Gq4kpzrvf3OehM
+	+3L1DsBgnIAHR4wwv5Fnd1mIkBLtCWr7AjWr4OI7UJIIZJY5iZF/G
+X-Google-Smtp-Source: AGHT+IH/BujYi+UaiXNp2YgtdftuG+uM/sy381rE2UPNyszkwK0HdsYUPe6hZeLj1EuSKTGKFFqr+Q==
+X-Received: by 2002:a5d:5d0b:0:b0:3fe:4fa2:8cdc with SMTP id ffacd0b85a97d-425671c3b54mr3006105f8f.60.1759544098889;
+        Fri, 03 Oct 2025 19:14:58 -0700 (PDT)
 Received: from precision ([2804:7f0:bc01:751:618a:117f:a8e:defe])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-78b01f9cd56sm6184236b3a.2.2025.10.03.19.01.35
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-28e8d1108b8sm63455745ad.26.2025.10.03.19.14.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Oct 2025 19:01:37 -0700 (PDT)
+        Fri, 03 Oct 2025 19:14:58 -0700 (PDT)
 From: Henrique Carvalho <henrique.carvalho@suse.com>
 To: sfrench@samba.org
 Cc: pc@manguebit.org,
@@ -66,9 +66,9 @@ Cc: pc@manguebit.org,
 	ematsumiya@suse.de,
 	linux-cifs@vger.kernel.org,
 	Henrique Carvalho <henrique.carvalho@suse.com>
-Subject: [PATCH v3] smb: client: batch SRV_COPYCHUNK entries to cut roundtrips
-Date: Fri,  3 Oct 2025 22:59:05 -0300
-Message-ID: <20251004015905.198696-1-henrique.carvalho@suse.com>
+Subject: [PATCH v4] smb: client: batch SRV_COPYCHUNK entries to cut round trips
+Date: Fri,  3 Oct 2025 23:11:43 -0300
+Message-ID: <20251004021143.230223-1-henrique.carvalho@suse.com>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -85,13 +85,16 @@ Implement variable Chunks[] array in struct copychunk_ioctl and fill it
 with struct copychunk (MS-SMB2 2.2.31.1.1), bounded by server-advertised
 limits.
 
-This reduces the number of IOCTLs requests for large copies.
+This reduces the number of IOCTL requests for large copies.
 
 While we are at it, rename a couple variables to follow the terminology
 used in the specification.
 
 Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 ---
+V3 -> V4:
+- fix min_t truncation to u32 issue in calc_chunk_count
+
 V2 -> V3:
 - guard against potential "Invented loads" in calc_chunk_count
   (see https://lwn.net/Articles/793253/#Invented%20Loads -- please
@@ -112,8 +115,15 @@ V1 -> V2:
  fs/smb/client/trace.h   |   2 +-
  3 files changed, 207 insertions(+), 117 deletions(-)
 
+
+
+ fs/smb/client/smb2ops.c | 306 +++++++++++++++++++++++++---------------
+ fs/smb/client/smb2pdu.h |  16 ++-
+ fs/smb/client/trace.h   |   2 +-
+ 3 files changed, 207 insertions(+), 117 deletions(-)
+
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 058050f744c0..d1d6028ad748 100644
+index 058050f744c0..80114292e2c9 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
 @@ -1803,140 +1803,226 @@ smb2_ioctl_query_info(const unsigned int xid,
@@ -146,7 +156,7 @@ index 058050f744c0..d1d6028ad748 100644
 +	/* chunks allowed per cc request */
 +	allowed = DIV_ROUND_UP(max_bytes_copy, max_bytes_chunk);
 +
-+	return min_t(u32, need, umin(max_chunks, allowed));
++	return (u32)umin(need, umin(max_chunks, allowed));
 +}
 +
 +/**
