@@ -1,386 +1,172 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D660B1F0994
-	for <linux-cifs@vger.kernel.org>; Tue,  7 Oct 2025 17:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBB145C0B;
+	Tue,  7 Oct 2025 18:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759859096; cv=none; b=fQr9J6KLUgrnjolznk7r/LDzygvRs5bTqmcvTpbb02jk/4U5AK8gQEInlelym3pEUht0QnSEBPrNc7CYRgJejS8OJe+uxdoL5sZ1Kkcy7r13ceRj9Zjt0+jaKrBDPZt0op2BsyHIUfBIxXe/lmWpRYX2vHh/w2AkZGh4goRB2jQ=
+	t=1759860626; cv=none; b=ewHBPyOIye1ohmzxw2CKGYMdUbSjeIFFgV+dYmSulB71pG4chR9mzOamJzm50tezf7zqdh3+6eaV5FeefwIQBiwKwnmVMIZNc2/SCn1jDAUvfQyeMIKKuMb6VwbAgYFr7cDc2bkbeMeaBf/8LznNPfBAIMkrQkuGbJvL2pDGtuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759859096; c=relaxed/simple;
-	bh=qHQAHnOK0eo7UFK4ICgLfU6JPmc3NH15Eumal4GlHck=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=USekCt0yxiuX3pmvd3jzjh78b3sRu44x3x8VJ7OdJPApVvnRanZAUfQo0c6HyEP8ZkRBQJAvEjFofBeQqJHlhmG0vgn6qqKx2cj1XeWhD/xfkFfWviGimBtEx+lC9TA3+kDwN51dgFZTbFgKpTb9jyFlfkLMQAqc+AxkovIIDaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JcUpzu4k; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=OOui5Mab; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JcUpzu4k; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=OOui5Mab; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1759860626; c=relaxed/simple;
+	bh=PU1UcClLwbar1Zk/rbgFgXIjPB2mQdwsCi6FEpoHdV8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=cbsK/CJZoWP/NqChexFnalmGi/i2vcqr/mEIdFMivwY5I3LSShJzwuW1scB3lBPfu2IbvxQ1EJf0APx2qnlJDONHy6QBvmfMCj8X8L7PBHujkQy6Vh6imap7KSvH3WNWdhvFowouNaP9HBUGH8+kpEC6Bcr6aEUc/aHMMD49phY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=etPuZK4R; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JcUpzu4k";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="OOui5Mab";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JcUpzu4k";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="OOui5Mab"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 8E29220AD0;
-	Tue,  7 Oct 2025 17:44:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759859063; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TdKGpm2Az0xziL+0brfEHqjHURDiqfa+uWfrIQaEOz4=;
-	b=JcUpzu4ktt2HLrCxm2pfjibOVsA+/RSItPU1Qybcb0OVA7rVaABWEdr/zfJFkUfpgR0VtH
-	2OmGJRQl2tyDloCswSofYNMJkIYHVDRF73FZVPRvc7D1gjSya027wJA7DHRYjAbpzKrN+9
-	JuQJAIBQnHvsef3YgbfQO+hUM6MHWXQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759859063;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TdKGpm2Az0xziL+0brfEHqjHURDiqfa+uWfrIQaEOz4=;
-	b=OOui5MabJ2eSOw0PDaxcPBKeZjdM8BObL84MaoMtaAM3AmMXjOr4PN302kuAv6E72YZeTV
-	CdjYUCdve2m7vOAA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=JcUpzu4k;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=OOui5Mab
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759859063; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TdKGpm2Az0xziL+0brfEHqjHURDiqfa+uWfrIQaEOz4=;
-	b=JcUpzu4ktt2HLrCxm2pfjibOVsA+/RSItPU1Qybcb0OVA7rVaABWEdr/zfJFkUfpgR0VtH
-	2OmGJRQl2tyDloCswSofYNMJkIYHVDRF73FZVPRvc7D1gjSya027wJA7DHRYjAbpzKrN+9
-	JuQJAIBQnHvsef3YgbfQO+hUM6MHWXQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759859063;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TdKGpm2Az0xziL+0brfEHqjHURDiqfa+uWfrIQaEOz4=;
-	b=OOui5MabJ2eSOw0PDaxcPBKeZjdM8BObL84MaoMtaAM3AmMXjOr4PN302kuAv6E72YZeTV
-	CdjYUCdve2m7vOAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 19E8213693;
-	Tue,  7 Oct 2025 17:44:22 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id glOLNHZR5WhIeAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Tue, 07 Oct 2025 17:44:22 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	henrique.carvalho@suse.com
-Subject: [PATCH v2 20/20] smb: client: cleanup open_cached_dir()
-Date: Tue,  7 Oct 2025 14:43:04 -0300
-Message-ID: <20251007174304.1755251-21-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251007174304.1755251-1-ematsumiya@suse.de>
-References: <20251007174304.1755251-1-ematsumiya@suse.de>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="etPuZK4R"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1759860612; x=1760465412; i=markus.elfring@web.de;
+	bh=SZob4jle2xeFF73UScJ33u2dZTmyY6LJz873tKKHCX4=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
+	 Subject:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=etPuZK4Rsm6+AEA7+ifqGuNi0cinBqQTvoQTsbv+O7zUoOcfa84tyczo+jmCYM41
+	 Kt/1uAHhMEPTGPgPcyfAbPBsnb5IuQON9QsOwEHBDLmLQKCD1uOadkEKeoJc8W2tP
+	 ItbntD9BxR59AHm9AoVv9waQvSSwvXimMgkO0gJyTk5Q+BD7P9jPGDGU07gcLQoiE
+	 jE+7Bx6TLuk3VK1Q1F9+AZpW3ZZGZ+Rc6OaOgKPyPfaKI/OPfBLxciGcGzxp/TiNi
+	 fJ97/+m+gRbiuFDofDyzIzDwJ6uV43FF4boK8U96WqcL+QXbjemyWD9wGIOX/itIf
+	 2XiFUVHGUKBLWCcPaw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.202]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MJFhX-1ur0XI2kRP-00KNLq; Tue, 07
+ Oct 2025 20:10:11 +0200
+Message-ID: <94f70136-c57c-4c4c-9e5d-5044e7e01b67@web.de>
+Date: Tue, 7 Oct 2025 20:10:10 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
+User-Agent: Mozilla Thunderbird
+Content-Language: en-GB, de-DE
+To: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ Bharath SM <bharathsm@microsoft.com>, Paulo Alcantara <pc@manguebit.org>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Steve French <sfrench@samba.org>,
+ Tom Talpey <tom@talpey.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] smb: client: Use common code in cifs_acl_to_fattr()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:s1D/5YgA3K4NY7KAYljGwc71olT/uwj2exOW68vK95JtC5jbRV8
+ IfJIRvTnu7788jvO8iexmVDcaArhGKgWMzwQbWajj0/HSSsNqTCPggoOWrHH36SzbyXiXyE
+ Nyab+MpAJOXncrZk94FIgMQNqJli7469hySQR+NBBMsdFqIqsFBs0q820fkNtYYfE9P99dh
+ 4U++Gft4VnY8buuT14PXw==
 X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 8E29220AD0
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	R_RATELIMIT(0.00)[to_ip_from(RL73jpmmudngk8cygugnauyh74)];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_DN_NONE(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Spam-Score: -3.01
+UI-OutboundReport: notjunk:1;M01:P0:3kFh9P619KU=;VBxxE5BpJV872eo7AX+5sQqm1MH
+ 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
+ TurKhzJP2YuPqAo7bCk1/24MAM=
 
-A bit of refactoring, and merge path_no_prefix() into path_to_dentry().
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Tue, 7 Oct 2025 20:00:18 +0200
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/smb/client/cached_dir.c | 133 ++++++++++++++++---------------------
- 1 file changed, 56 insertions(+), 77 deletions(-)
+Use an additional label so that a bit of common code can be better reused
+at the end of this function implementation.
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index defdde4f7ff1..43f9acb176e4 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -188,13 +188,33 @@ static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key,
- 	return found;
- }
- 
--static struct dentry *
--path_to_dentry(struct cifs_sb_info *cifs_sb, const char *path)
-+/*
-+ * Skip any prefix paths in @path as lookup_noperm_positive_unlocked() ends up calling ->lookup()
-+ * which already adds those through build_path_from_dentry().
-+ *
-+ * Also, this should be called before sending a network request as we might reconnect and
-+ * potentially end up having a different prefix path (e.g. after DFS failover).
-+ *
-+ * Callers must dput() returned dentry if !IS_ERR().
-+ */
-+static struct dentry *path_to_dentry(struct cifs_sb_info *cifs_sb, const char *path)
- {
- 	struct dentry *dentry;
- 	const char *s, *p;
- 	char sep;
- 
-+	if (!*path)
-+		return dget(cifs_sb->root);
-+
-+	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_USE_PREFIX_PATH) && cifs_sb->prepath) {
-+		size_t len = strlen(cifs_sb->prepath) + 1;
-+
-+		if (unlikely(len > strlen(path)))
-+			return ERR_PTR(-EINVAL);
-+
-+		path += len;
-+	}
-+
- 	sep = CIFS_DIR_SEP(cifs_sb);
- 	dentry = dget(cifs_sb->root);
- 	s = path;
-@@ -219,29 +239,12 @@ path_to_dentry(struct cifs_sb_info *cifs_sb, const char *path)
- 		while (*s && *s != sep)
- 			s++;
- 
--		child = lookup_noperm_positive_unlocked(&QSTR_LEN(p, s - p),
--							dentry);
-+		child = lookup_noperm_positive_unlocked(&QSTR_LEN(p, s - p), dentry);
- 		dput(dentry);
- 		dentry = child;
- 	} while (!IS_ERR(dentry));
--	return dentry;
--}
--
--static const char *path_no_prefix(struct cifs_sb_info *cifs_sb,
--				  const char *path)
--{
--	size_t len = 0;
--
--	if (!*path)
--		return path;
- 
--	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_USE_PREFIX_PATH) &&
--	    cifs_sb->prepath) {
--		len = strlen(cifs_sb->prepath) + 1;
--		if (unlikely(len > strlen(path)))
--			return ERR_PTR(-EINVAL);
--	}
--	return path + len;
-+	return dentry;
- }
- 
- /*
-@@ -277,31 +280,29 @@ struct cached_fid *find_cached_dir(struct cached_fids *cfids, const void *key, i
- int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 		    struct cifs_sb_info *cifs_sb, struct cached_fid **ret_cfid)
- {
--	struct cifs_ses *ses;
-+	int rc, flags = 0, retries = 0, cur_sleep = 1;
-+	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
-+	struct smb2_query_info_rsp *qi_rsp = NULL;
- 	struct TCP_Server_Info *server;
- 	struct cifs_open_parms oparms;
--	struct smb2_create_rsp *o_rsp = NULL;
--	struct smb2_query_info_rsp *qi_rsp = NULL;
- 	struct smb2_file_all_info info;
--	int resp_buftype[2];
-+	struct smb2_create_rsp *o_rsp = NULL;
-+	struct cached_fids *cfids;
-+	struct cached_fid *cfid;
- 	struct smb_rqst rqst[2];
- 	struct kvec rsp_iov[2];
--	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
-+	struct cifs_fid *pfid;
-+	struct dentry *dentry;
- 	struct kvec qi_iov[1];
--	int rc, flags = 0;
-+	struct cifs_ses *ses;
-+	int resp_buftype[2];
- 	__le16 *utf16_path = NULL;
- 	u8 oplock = SMB2_OPLOCK_LEVEL_II;
--	struct cifs_fid *pfid;
--	struct dentry *dentry;
--	struct cached_fid *cfid;
--	struct cached_fids *cfids;
--	const char *npath;
--	int retries = 0, cur_sleep = 1;
- 
--	if (cifs_sb->root == NULL)
-+	if (!cifs_sb->root)
- 		return -ENOENT;
- 
--	if (tcon == NULL)
-+	if (!tcon)
- 		return -EOPNOTSUPP;
- 
- 	ses = tcon->ses;
-@@ -331,10 +332,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 		return 0;
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ fs/smb/client/cifsacl.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
+index 63b3b1290bed..ca89f22a72c4 100644
+=2D-- a/fs/smb/client/cifsacl.c
++++ b/fs/smb/client/cifsacl.c
+@@ -1579,8 +1579,8 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, stru=
+ct cifs_fattr *fattr,
+ 	else if (ops->get_acl)
+ 		pntsd =3D ops->get_acl(cifs_sb, inode, path, &acllen, info);
+ 	else {
+-		cifs_put_tlink(tlink);
+-		return -EOPNOTSUPP;
++		rc =3D -EOPNOTSUPP;
++		goto put_tlink;
  	}
- 
--	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
--	if (!utf16_path)
--		return -ENOMEM;
+ 	/* if we can retrieve the ACL, now parse Access Control Entries, ACEs */
+ 	if (IS_ERR(pntsd)) {
+@@ -1596,7 +1596,7 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, stru=
+ct cifs_fattr *fattr,
+ 		if (rc)
+ 			cifs_dbg(VFS, "parse sec desc failed rc =3D %d\n", rc);
+ 	}
 -
- 	read_seqlock_excl(&cfids->entries_seqlock);
- 	if (cfids->num_entries >= tcon->max_cached_dirs) {
- 		read_sequnlock_excl(&cfids->entries_seqlock);
-@@ -354,30 +351,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	cfid->tcon = tcon;
- 	pfid = &cfid->fid;
- 
--	/*
--	 * Skip any prefix paths in @path as lookup_noperm_positive_unlocked() ends up
--	 * calling ->lookup() which already adds those through
--	 * build_path_from_dentry().  Also, do it earlier as we might reconnect
--	 * below when trying to send compounded request and then potentially
--	 * having a different prefix path (e.g. after DFS failover).
--	 */
--	npath = path_no_prefix(cifs_sb, path);
--	if (IS_ERR(npath)) {
--		rc = PTR_ERR(npath);
-+	dentry = path_to_dentry(cifs_sb, path);
-+	if (IS_ERR(dentry)) {
-+		rc = PTR_ERR(dentry);
-+		dentry = NULL;
- 		goto out;
- 	}
- 
--	if (!npath[0]) {
--		dentry = dget(cifs_sb->root);
--	} else {
--		dentry = path_to_dentry(cifs_sb, npath);
--		if (IS_ERR(dentry)) {
--			dentry = NULL;
--			rc = -ENOENT;
--			goto out;
--		}
--	}
--
- 	write_seqlock(&cfids->entries_seqlock);
- 	write_seqlock(&cfid->seqlock);
- 	cfid->dentry = dentry;
-@@ -415,21 +395,26 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	oparms.fid = pfid;
- 	oparms.replay = !!retries;
- 
-+	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
-+	if (!utf16_path) {
-+		rc = -ENOMEM;
-+		goto oshr_free;
-+	}
-+
- 	rc = SMB2_open_init(tcon, server, &rqst[0], &oplock, &oparms, utf16_path);
-+	kfree(utf16_path);
-+
- 	if (rc)
- 		goto oshr_free;
--	smb2_set_next_command(tcon, &rqst[0]);
- 
-+	smb2_set_next_command(tcon, &rqst[0]);
- 	memset(&qi_iov, 0, sizeof(qi_iov));
- 	rqst[1].rq_iov = qi_iov;
- 	rqst[1].rq_nvec = 1;
- 
--	rc = SMB2_query_info_init(tcon, server,
--				  &rqst[1], COMPOUND_FID,
--				  COMPOUND_FID, FILE_ALL_INFORMATION,
--				  SMB2_O_INFO_FILE, 0,
--				  sizeof(struct smb2_file_all_info) +
--				  PATH_MAX * 2, 0, NULL);
-+	rc = SMB2_query_info_init(tcon, server, &rqst[1], COMPOUND_FID, COMPOUND_FID,
-+				  FILE_ALL_INFORMATION, SMB2_O_INFO_FILE, 0,
-+				  sizeof(struct smb2_file_all_info) + PATH_MAX * 2, 0, NULL);
- 	if (rc)
- 		goto oshr_free;
- 
-@@ -440,14 +425,11 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 		smb2_set_replay(server, &rqst[1]);
- 	}
- 
--	rc = compound_send_recv(xid, ses, server,
--				flags, 2, rqst,
--				resp_buftype, rsp_iov);
-+	rc = compound_send_recv(xid, ses, server, flags, 2, rqst, resp_buftype, rsp_iov);
- 	if (rc) {
- 		if (rc == -EREMCHG) {
- 			tcon->need_reconnect = true;
--			pr_warn_once("server share %s deleted\n",
--				     tcon->tree_name);
-+			pr_warn_once("server share %s deleted\n", tcon->tree_name);
- 		}
- 		goto oshr_free;
- 	}
-@@ -459,7 +441,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	oparms.fid->mid = le64_to_cpu(o_rsp->hdr.MessageId);
- #endif /* CIFS_DEBUG2 */
- 
--
- 	if (o_rsp->OplockLevel != SMB2_OPLOCK_LEVEL_LEASE) {
- 		rc = -EINVAL;
- 		goto oshr_free;
-@@ -478,9 +459,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 	if (le32_to_cpu(qi_rsp->OutputBufferLength) < sizeof(struct smb2_file_all_info))
- 		goto oshr_free;
- 
--	if (!smb2_validate_and_copy_iov(le16_to_cpu(qi_rsp->OutputBufferOffset),
--					sizeof(struct smb2_file_all_info), &rsp_iov[1],
--					sizeof(struct smb2_file_all_info), (char *)&info)) {
-+	if (!smb2_validate_and_copy_iov(le16_to_cpu(qi_rsp->OutputBufferOffset), sizeof(info),
-+					&rsp_iov[1], sizeof(info), (char *)&info)) {
- 		cfid->file_all_info = kmemdup(&info, sizeof(info), GFP_ATOMIC);
- 		if (!cfid->file_all_info) {
- 			rc = -ENOMEM;
-@@ -514,7 +494,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- 		*ret_cfid = cfid;
- 		atomic_inc(&tcon->num_remote_opens);
- 	}
--	kfree(utf16_path);
- 
- 	if (is_replayable_error(rc) &&
- 	    smb2_should_replay(tcon, &retries, &cur_sleep))
--- 
++put_tlink:
+ 	cifs_put_tlink(tlink);
+=20
+ 	return rc;
+=2D-=20
 2.51.0
 
