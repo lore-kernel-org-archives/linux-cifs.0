@@ -1,79 +1,78 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757B32E0B64
-	for <linux-cifs@vger.kernel.org>; Tue,  7 Oct 2025 17:44:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DFA1F0994
+	for <linux-cifs@vger.kernel.org>; Tue,  7 Oct 2025 17:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759859049; cv=none; b=FCoVN1XwcXU99PIcjYMUcvy9JszL6QkvPc+GLviMt2R60R35Njhd7NvJT+bGLR+NkOeq/D/B/oIl4KuRD5LKQ+h+v+fJsdN3nP6ts2gyJMhy49wZ3rHR2zvfU6rgOXLZ7Ycu1Bh7yIxg6n5Yq5RgiypDMKAJjuy7DWhJNRUehyc=
+	t=1759859051; cv=none; b=GDTU49Dv4SIyMgSU7TCCzDrHWkzcbtX8DfvqVwLPDWelCphFvgpMDcGe767JRN4TdG3t4LVzYvKjddiwDvT3l0VsGcZCLdloNz0rDZVlsZRnveeFVQrrHmizzWCFHKff7wYkyOkVReEFdR6PfblPYxRBaeJC9qsYiRM4VUzMeCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759859049; c=relaxed/simple;
-	bh=LZdePpZftaXs9IOz33KdnB1rm2FSnGCRa/mQWJOsg0o=;
+	s=arc-20240116; t=1759859051; c=relaxed/simple;
+	bh=+c5LzmCGeKT/5JZSul4+qTU24easIuyHbCGcx25bn4E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I7WRi4SdNKPrick54s13wn9bdV6c8xV8zWNMgr0hMo7DsVwpOmMoiidFRcJHksmKmVIPjrpmct+MsNeZ1oSicO2FhR4H3H/di4CTOaMvC3Kyupbp8f7vTNTqj+m1d45pYliMZShyp00SbQI7Um5wZS04ZFMhgDHoJeJUfIJSGOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=On17kzT/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YNEBuNsf; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=On17kzT/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YNEBuNsf; arc=none smtp.client-ip=195.135.223.130
+	 MIME-Version; b=RXvCdkThZmDzwSnAevPm1lCfM2jIgb/iVxVNypKUZbCcXrZa0O7D+FCNF7yYWYrf0p/hK0myfkas3g+Ej/6XLJE4NpfB6YRvKlOZu0CfmiM9mmMqai0MeU2CQho+Pd4yd6kkFKbys29+cYutb5i8fb4F7m+sa2tHsRmEJFbcIq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=SKqoyLoa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=KEgMr6FW; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=SKqoyLoa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=KEgMr6FW; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="On17kzT/";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YNEBuNsf";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="On17kzT/";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YNEBuNsf"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="SKqoyLoa";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="KEgMr6FW";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="SKqoyLoa";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="KEgMr6FW"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 13F4D34214;
-	Tue,  7 Oct 2025 17:43:45 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 8C39420AAD;
+	Tue,  7 Oct 2025 17:43:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759859025; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759859037; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=44vRzUTbIjM2Ow8AWZ750yGa2pc4I3QkqrZztYQ7xSU=;
-	b=On17kzT/rX3883S2wHcEUtlUAEJQPcvOjnELZADI3mk5J1CfoScUCToRWKWLvYMElS0b3z
-	aisWR2T/49B2+qJXcymtGNXJUAZOv8FmmqreTmtuusfvpLZo9G+IsgoXSWtemW8uS0gUgA
-	Q8mZUnNO8iVG9Ci+IUuOVtNTI4EvYn4=
+	bh=EfuJM3M2pAWnAWiyeaM3eKtYhLzEXmd6LVOy9am+7TE=;
+	b=SKqoyLoaK0D8l9RotrLkuuJwdnU3sU9oenufUzizm7k4pviqvcQ9qHF7kJ8fJRe72RVGaS
+	SxPXV+L9tYCjlfXdr21eDLNG8euyUq46P2LS7vBolLSUL2DTpYoYNMedjt3NNNL18RjC2E
+	pzHzAoK9d+VeJJrE8sBiaSYf/QUaOTc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759859025;
+	s=susede2_ed25519; t=1759859037;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=44vRzUTbIjM2Ow8AWZ750yGa2pc4I3QkqrZztYQ7xSU=;
-	b=YNEBuNsfzgT2tjz6ybeJg5RHNTom/Mrk2GhqXTbOZAXjd/zGpWJ2K1oI6mTNKKDsURfUUY
-	ENuAk20f7F9e9+Ag==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="On17kzT/";
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=YNEBuNsf
+	bh=EfuJM3M2pAWnAWiyeaM3eKtYhLzEXmd6LVOy9am+7TE=;
+	b=KEgMr6FWdySSZuiaLIC4t9asXl+qSe6c6JeXmCLVDLHx9I+K9yQy5CTO8dqax+ZRrAKORT
+	h4qFtc6gAXEH/ADw==
+Authentication-Results: smtp-out2.suse.de;
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759859025; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1759859037; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=44vRzUTbIjM2Ow8AWZ750yGa2pc4I3QkqrZztYQ7xSU=;
-	b=On17kzT/rX3883S2wHcEUtlUAEJQPcvOjnELZADI3mk5J1CfoScUCToRWKWLvYMElS0b3z
-	aisWR2T/49B2+qJXcymtGNXJUAZOv8FmmqreTmtuusfvpLZo9G+IsgoXSWtemW8uS0gUgA
-	Q8mZUnNO8iVG9Ci+IUuOVtNTI4EvYn4=
+	bh=EfuJM3M2pAWnAWiyeaM3eKtYhLzEXmd6LVOy9am+7TE=;
+	b=SKqoyLoaK0D8l9RotrLkuuJwdnU3sU9oenufUzizm7k4pviqvcQ9qHF7kJ8fJRe72RVGaS
+	SxPXV+L9tYCjlfXdr21eDLNG8euyUq46P2LS7vBolLSUL2DTpYoYNMedjt3NNNL18RjC2E
+	pzHzAoK9d+VeJJrE8sBiaSYf/QUaOTc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759859025;
+	s=susede2_ed25519; t=1759859037;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=44vRzUTbIjM2Ow8AWZ750yGa2pc4I3QkqrZztYQ7xSU=;
-	b=YNEBuNsfzgT2tjz6ybeJg5RHNTom/Mrk2GhqXTbOZAXjd/zGpWJ2K1oI6mTNKKDsURfUUY
-	ENuAk20f7F9e9+Ag==
+	bh=EfuJM3M2pAWnAWiyeaM3eKtYhLzEXmd6LVOy9am+7TE=;
+	b=KEgMr6FWdySSZuiaLIC4t9asXl+qSe6c6JeXmCLVDLHx9I+K9yQy5CTO8dqax+ZRrAKORT
+	h4qFtc6gAXEH/ADw==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 948F813693;
-	Tue,  7 Oct 2025 17:43:44 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 19D4313693;
+	Tue,  7 Oct 2025 17:43:56 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id sU/fFlBR5WgOeAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Tue, 07 Oct 2025 17:43:44 +0000
+	id 6a/TNFxR5WgjeAAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Tue, 07 Oct 2025 17:43:56 +0000
 From: Enzo Matsumiya <ematsumiya@suse.de>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -83,9 +82,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
 	henrique.carvalho@suse.com
-Subject: [PATCH v2 09/20] smb: client: enhance cached dir lookups
-Date: Tue,  7 Oct 2025 14:42:53 -0300
-Message-ID: <20251007174304.1755251-10-ematsumiya@suse.de>
+Subject: [PATCH v2 13/20] smb: client: actually use cached dirs on readdir
+Date: Tue,  7 Oct 2025 14:42:57 -0300
+Message-ID: <20251007174304.1755251-14-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251007174304.1755251-1-ematsumiya@suse.de>
 References: <20251007174304.1755251-1-ematsumiya@suse.de>
@@ -96,587 +95,333 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-3.01 / 50.00];
+X-Spamd-Result: default: False [-2.80 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	MID_CONTAINS_FROM(1.00)[];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_NONE(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	ARC_NA(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	DKIM_TRACE(0.00)[suse.de:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
 	RCVD_COUNT_TWO(0.00)[2];
-	TO_DN_NONE(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
+	R_RATELIMIT(0.00)[to_ip_from(RLfjfk8uratp77wzttmx99usr3)];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email];
 	RCVD_TLS_ALL(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
 	FREEMAIL_ENVRCPT(0.00)[gmail.com]
 X-Spam-Flag: NO
 X-Spam-Level: 
-X-Rspamd-Queue-Id: 13F4D34214
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -3.01
+X-Spam-Score: -2.80
 
-Enable cfid lookups to be matched with the 3 modes (path, dentry,
-and lease key) currently used in a single function.
+Currently, even when we have a valid cached dir, cifs_readdir will not
+make use of it for the Find request, and will reopen a separate handle
+in query_dir_first.
 
-Caller exposed function (find_cached_dir()) checks if cfid is
-mid-creation in open_cached_dir() and retries the lookup, avoiding
-opening the same path again.
+Fix this by setting cifsFile->fid to cfid->fid and resetting search info
+parameters.  Also add cifs_search_info->reset_scan to indicate
+SMB2_query_directory_init to include the SMB2_RESTART_SCANS flag.
 
-Changes:
-- expose find_cached_dir()
-- add CFID_LOOKUP_* modes
-- remove @lookup_only arg from open_cached_dir(), replace, in calllers,
-  with find_cached_dir() where it was true
-- remove open_cached_dir_by_dentry(), replace with find_cached_dir()
-- use find_cached_dir() in cached_dir_lease_break()
+With this, we use query_dir_next directly instead of query_dir_first.
+
+This patch also keeps the cfid reference all through cifs_readdir().
+To prevent bogus/invalid usage of it, check if cfid is still valid after
+each possible network call (i.e. where possible reconnects may have
+happened).
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- fs/smb/client/cached_dir.c | 201 +++++++++++++++++++++----------------
- fs/smb/client/cached_dir.h |  17 ++--
- fs/smb/client/dir.c        |  39 ++++---
- fs/smb/client/inode.c      |  13 +--
- fs/smb/client/readdir.c    |   4 +-
- fs/smb/client/smb2inode.c  |  10 +-
- fs/smb/client/smb2ops.c    |  10 +-
- 7 files changed, 168 insertions(+), 126 deletions(-)
+ fs/smb/client/cifsglob.h  |  1 +
+ fs/smb/client/readdir.c   | 77 +++++++++++++++++++++++----------------
+ fs/smb/client/smb2ops.c   |  2 +-
+ fs/smb/client/smb2pdu.c   | 11 +++---
+ fs/smb/client/smb2proto.h |  2 +-
+ 5 files changed, 55 insertions(+), 38 deletions(-)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 067dfa7de4fc..100d608828f2 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -52,27 +52,63 @@ static inline void drop_cfid(struct cached_fid *cfid)
- 	}
- }
- 
--static struct cached_fid *find_cached_dir(struct cached_fids *cfids, const char *path)
-+/*
-+ * Find a cached dir based on @key and @mode (raw lookup).
-+ * The only validation done here is if cfid is not going down (last_access_time != 1).
-+ *
-+ * If @wait_open is true, keep retrying until cfid transitions from 'opening' to valid/invalid.
-+ *
-+ * Callers must handle any other validation as needed.
-+ * Returned cfid, if found, has a ref taken, regardless of state.
-+ */
-+static struct cached_fid *find_cfid(struct cached_fids *cfids, const void *key, int mode,
-+				    bool wait_open)
- {
--	struct cached_fid *cfid;
-+	struct cached_fid *cfid, *found;
-+	bool match;
-+
-+	if (!cfids || !key)
-+		return NULL;
-+
-+retry_find:
-+	found = NULL;
- 
-+	spin_lock(&cfids->cfid_list_lock);
- 	list_for_each_entry(cfid, &cfids->entries, entry) {
--		if (!strcmp(cfid->path, path)) {
--			/*
--			 * If it doesn't have a lease it is either not yet
--			 * fully cached or it may be in the process of
--			 * being deleted due to a lease break.
--			 */
--			if (!is_valid_cached_dir(cfid))
--				return NULL;
-+		/* don't even bother checking if it's going away */
-+		if (cfid->last_access_time == 1)
-+			continue;
- 
--			cfid->last_access_time = jiffies;
-+		if (mode == CFID_LOOKUP_PATH)
-+			match = !strcmp(cfid->path, (char *)key);
-+
-+		if (mode == CFID_LOOKUP_DENTRY)
-+			match = (cfid->dentry == key);
-+
-+		if (mode == CFID_LOOKUP_LEASEKEY)
-+			match = !memcmp(cfid->fid.lease_key, (u8 *)key, SMB2_LEASE_KEY_SIZE);
-+
-+		if (!match)
-+			continue;
-+
-+		/* only get a ref here if not waiting for open */
-+		if (!wait_open)
- 			kref_get(&cfid->refcount);
--			return cfid;
--		}
-+		found = cfid;
-+		break;
- 	}
-+	spin_unlock(&cfids->cfid_list_lock);
- 
--	return NULL;
-+	if (wait_open && found) {
-+		/* cfid is being opened in open_cached_dir(), retry lookup */
-+		if (found->has_lease && !found->time && !found->last_access_time)
-+			goto retry_find;
-+
-+		/* we didn't get a ref above, so get one now */
-+		kref_get(&found->refcount);
-+	}
-+
-+	return found;
- }
- 
- static struct dentry *
-@@ -131,14 +167,38 @@ static const char *path_no_prefix(struct cifs_sb_info *cifs_sb,
- 	return path + len;
- }
- 
-+/*
-+ * Find a cached dir based on @key and @mode (caller exposed).
-+ * This function will retry lookup if cfid found is in opening state.
-+ *
-+ * Returns valid cfid (with updated last_access_time) or NULL.
-+ */
-+struct cached_fid *find_cached_dir(struct cached_fids *cfids, const void *key, int mode)
-+{
-+	struct cached_fid *cfid;
-+
-+	if (!cfids || !key)
-+		return NULL;
-+
-+	cfid = find_cfid(cfids, key, mode, true);
-+	if (cfid) {
-+		if (is_valid_cached_dir(cfid)) {
-+			cfid->last_access_time = jiffies;
-+		} else {
-+			kref_put(&cfid->refcount, smb2_close_cached_fid);
-+			cfid = NULL;
-+		}
-+	}
-+
-+	return cfid;
-+}
-+
- /*
-  * Open the and cache a directory handle.
-  * If error then *cfid is not initialized.
-  */
--int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
--		    const char *path,
--		    struct cifs_sb_info *cifs_sb,
--		    bool lookup_only, struct cached_fid **ret_cfid)
-+int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
-+		    struct cifs_sb_info *cifs_sb, struct cached_fid **ret_cfid)
- {
- 	struct cifs_ses *ses;
- 	struct TCP_Server_Info *server;
-@@ -154,7 +214,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	__le16 *utf16_path = NULL;
- 	u8 oplock = SMB2_OPLOCK_LEVEL_II;
- 	struct cifs_fid *pfid;
--	struct dentry *dentry = NULL;
-+	struct dentry *dentry;
- 	struct cached_fid *cfid;
- 	struct cached_fids *cfids;
- 	const char *npath;
-@@ -176,6 +236,9 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	/* reinitialize for possible replay */
- 	flags = 0;
- 	oplock = SMB2_OPLOCK_LEVEL_II;
-+	dentry = NULL;
-+	cfid = NULL;
-+	*ret_cfid = NULL;
- 	server = cifs_pick_channel(ses);
- 
- 	if (!server->ops->new_lease_key)
-@@ -185,27 +248,25 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	if (!utf16_path)
- 		return -ENOMEM;
- 
--	spin_lock(&cfids->cfid_list_lock);
--	if (cfids->num_entries >= tcon->max_cached_dirs) {
--		spin_unlock(&cfids->cfid_list_lock);
--		kfree(utf16_path);
--		return -ENOENT;
-+	/* find_cached_dir() already checks if cfid is valid, so no need to check here */
-+	cfid = find_cached_dir(cfids, path, CFID_LOOKUP_PATH);
-+	if (cfid) {
-+		rc = 0;
-+		goto out;
- 	}
- 
--	/* find_cached_dir() already checks if cfid is valid, so no need to check here */
--	cfid = find_cached_dir(cfids, path);
--	if (cfid || lookup_only) {
--		*ret_cfid = cfid;
-+	spin_lock(&cfids->cfid_list_lock);
-+	if (cfids->num_entries >= tcon->max_cached_dirs) {
- 		spin_unlock(&cfids->cfid_list_lock);
--		kfree(utf16_path);
--		return cfid ? 0 : -ENOENT;
-+		rc = -ENOENT;
-+		goto out;
- 	}
- 
- 	cfid = init_cached_dir(path);
- 	if (!cfid) {
- 		spin_unlock(&cfids->cfid_list_lock);
--		kfree(utf16_path);
--		return -ENOMEM;
-+		rc = -ENOMEM;
-+		goto out;
- 	}
- 
- 	cfid->cfids = cfids;
-@@ -392,8 +453,10 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 		rc = -ENOENT;
- 
- 	if (rc) {
--		drop_cfid(cfid);
--		kref_put(&cfid->refcount, smb2_close_cached_fid);
-+		if (cfid) {
-+			drop_cfid(cfid);
-+			kref_put(&cfid->refcount, smb2_close_cached_fid);
-+		}
- 	} else {
- 		*ret_cfid = cfid;
- 		atomic_inc(&tcon->num_remote_opens);
-@@ -407,34 +470,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
--int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
--			      struct dentry *dentry,
--			      struct cached_fid **ret_cfid)
--{
--	struct cached_fid *cfid;
--	struct cached_fids *cfids = tcon->cfids;
--
--	if (cfids == NULL)
--		return -EOPNOTSUPP;
--
--	if (!dentry)
--		return -ENOENT;
--
--	spin_lock(&cfids->cfid_list_lock);
--	list_for_each_entry(cfid, &cfids->entries, entry) {
--		if (is_valid_cached_dir(cfid) && cfid->dentry == dentry) {
--			cifs_dbg(FYI, "found a cached file handle by dentry\n");
--			kref_get(&cfid->refcount);
--			*ret_cfid = cfid;
--			cfid->last_access_time = jiffies;
--			spin_unlock(&cfids->cfid_list_lock);
--			return 0;
--		}
--	}
--	spin_unlock(&cfids->cfid_list_lock);
--	return -ENOENT;
--}
--
- static void
- smb2_close_cached_fid(struct kref *ref)
- {
-@@ -478,7 +513,7 @@ void drop_cached_dir_by_name(struct cached_fids *cfids, const char *name)
- 	if (!cfids)
- 		return;
- 
--	cfid = find_cached_dir(cfids, name);
-+	cfid = find_cached_dir(cfids, name, CFID_LOOKUP_PATH);
- 	if (!cfid) {
- 		cifs_dbg(FYI, "no cached dir found for rmdir(%s)\n", name);
- 		return;
-@@ -558,35 +593,31 @@ bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
- {
- 	struct cached_fids *cfids = tcon->cfids;
- 	struct cached_fid *cfid;
--	bool found = false;
- 
- 	if (cfids == NULL)
- 		return false;
- 
--	spin_lock(&cfids->cfid_list_lock);
--	list_for_each_entry(cfid, &cfids->entries, entry) {
--		if (cfid->has_lease &&
--		    !memcmp(lease_key,
--			    cfid->fid.lease_key,
--			    SMB2_LEASE_KEY_SIZE)) {
--			/*
--			 * We found a lease, invalidate cfid and schedule immediate cleanup on
--			 * laundromat.
--			 * No need to take a ref here, as we still hold our initial one.
--			 */
--			invalidate_cfid(cfid);
--			cfid->has_lease = false;
--			found = true;
--			break;
--		}
--	}
--	spin_unlock(&cfids->cfid_list_lock);
-+	/*
-+	 * Raw lookup here as we _must_ find our lease, no matter cfid state.
-+	 * Also, this lease break might be coming from the SMB2 open in open_cached_dir(), so no
-+	 * need to wait for it to finish.
-+	 */
-+	cfid = find_cfid(cfids, lease_key, CFID_LOOKUP_LEASEKEY, false);
-+	if (cfid) {
-+		/* found a lease, invalidate cfid and schedule immediate cleanup on laundromat */
-+		spin_lock(&cfids->cfid_list_lock);
-+		invalidate_cfid(cfid);
-+		cfid->has_lease = false;
-+		spin_unlock(&cfids->cfid_list_lock);
- 
--	/* avoid unnecessary scheduling */
--	if (found)
-+		/* put lookup ref */
-+		kref_put(&cfid->refcount, smb2_close_cached_fid);
- 		mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
- 
--	return found;
-+		return true;
-+	}
-+
-+	return false;
- }
- 
- static struct cached_fid *init_cached_dir(const char *path)
-diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index 8018f7a947b5..8d9733b8fbb6 100644
---- a/fs/smb/client/cached_dir.h
-+++ b/fs/smb/client/cached_dir.h
-@@ -64,6 +64,13 @@ struct cached_fids {
- 	atomic64_t total_dirents_bytes;
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 3ac254e123dc..6d6dca23d83a 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1441,6 +1441,7 @@ struct cifs_search_info {
+ 	bool emptyDir:1;
+ 	bool unicode:1;
+ 	bool smallBuf:1; /* so we know which buf_release function to call */
++	bool restart_scan;
  };
  
-+/* Lookup modes for find_cached_dir() */
-+enum {
-+	CFID_LOOKUP_PATH,
-+	CFID_LOOKUP_DENTRY,
-+	CFID_LOOKUP_LEASEKEY,
-+};
-+
- static inline bool cfid_expired(const struct cached_fid *cfid)
- {
- 	return (cfid->last_access_time &&
-@@ -78,13 +85,9 @@ static inline bool is_valid_cached_dir(struct cached_fid *cfid)
- /* Module-wide directory cache accounting (defined in cifsfs.c) */
- extern atomic64_t cifs_dircache_bytes_used; /* bytes across all mounts */
- extern struct cached_fids *init_cached_dirs(void);
--extern int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
--			   const char *path,
--			   struct cifs_sb_info *cifs_sb,
--			   bool lookup_only, struct cached_fid **cfid);
--extern int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
--				     struct dentry *dentry,
--				     struct cached_fid **cfid);
-+extern struct cached_fid *find_cached_dir(struct cached_fids *cfids, const void *key, int mode);
-+extern int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
-+			   struct cifs_sb_info *cifs_sb, struct cached_fid **cfid);
- extern void close_cached_dir(struct cached_fid *cfid);
- extern void drop_cached_dir_by_name(struct cached_fids *cfids, const char *name);
- extern void close_all_cached_dirs(struct cifs_sb_info *cifs_sb);
-diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-index 31a0926774a8..5466f4968a84 100644
---- a/fs/smb/client/dir.c
-+++ b/fs/smb/client/dir.c
-@@ -677,7 +677,6 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
- 	const char *full_path;
- 	void *page;
- 	int retry_count = 0;
--	struct cached_fid *cfid = NULL;
- 
- 	xid = get_xid();
- 
-@@ -728,16 +727,24 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
- 		 * correct action even if case insensitive is not forced on
- 		 * mount.
- 		 */
--		if (pTcon->nocase && !open_cached_dir_by_dentry(pTcon, direntry->d_parent, &cfid)) {
-+		if (pTcon->nocase) {
-+			struct cached_fid *cfid = find_cached_dir(pTcon->cfids, direntry->d_parent,
-+								  CFID_LOOKUP_DENTRY);
-+
- 			/*
--			 * dentry is negative and parent is fully cached:
--			 * we can assume file does not exist
-+			 * dentry is negative and parent is fully cached, we can assume file does
-+			 * not exist
-+			 *
-+			 * reuse rc here
- 			 */
--			if (cfid->dirents.is_valid) {
-+			rc = 0;
-+			if (cfid) {
-+				rc = cfid->dirents.is_valid;
- 				close_cached_dir(cfid);
--				goto out;
- 			}
--			close_cached_dir(cfid);
-+
-+			if (rc)
-+				goto out;
- 		}
- 	}
- 	cifs_dbg(FYI, "Full path: %s inode = 0x%p\n",
-@@ -785,7 +792,6 @@ cifs_d_revalidate(struct inode *dir, const struct qstr *name,
- 		  struct dentry *direntry, unsigned int flags)
- {
- 	struct inode *inode = NULL;
--	struct cached_fid *cfid;
- 	int rc;
- 
- 	if (flags & LOOKUP_RCU)
-@@ -835,17 +841,20 @@ cifs_d_revalidate(struct inode *dir, const struct qstr *name,
- 	} else {
- 		struct cifs_sb_info *cifs_sb = CIFS_SB(dir->i_sb);
- 		struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-+		struct cached_fid *cfid = find_cached_dir(tcon->cfids, direntry->d_parent,
-+							  CFID_LOOKUP_DENTRY);
- 
--		if (!open_cached_dir_by_dentry(tcon, direntry->d_parent, &cfid)) {
-+		if (cfid) {
- 			/*
--			 * dentry is negative and parent is fully cached:
--			 * we can assume file does not exist
-+			 * dentry is negative and parent is fully cached, we can assume file does
-+			 * not exist
-+			 *
-+			 * reuse rc here
- 			 */
--			if (cfid->dirents.is_valid) {
--				close_cached_dir(cfid);
--				return 1;
--			}
-+			rc = cfid->dirents.is_valid;
- 			close_cached_dir(cfid);
-+			if (rc)
-+				return 1;
- 		}
- 	}
- 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index c99829f9ec06..34a31617c298 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -2690,7 +2690,7 @@ cifs_dentry_needs_reval(struct dentry *dentry)
- 	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
--	struct cached_fid *cfid = NULL;
-+	struct cached_fid *cfid;
- 
- 	if (test_bit(CIFS_INO_DELETE_PENDING, &cifs_i->flags))
- 		return false;
-@@ -2703,13 +2703,14 @@ cifs_dentry_needs_reval(struct dentry *dentry)
- 	if (!lookupCacheEnabled)
- 		return true;
- 
--	if (!open_cached_dir_by_dentry(tcon, dentry->d_parent, &cfid)) {
--		if (cifs_i->time > cfid->time) {
--			close_cached_dir(cfid);
--			return false;
--		}
-+	cfid = find_cached_dir(tcon->cfids, dentry->d_parent, CFID_LOOKUP_DENTRY);
-+	if (cfid) {
-+		bool valid = time_after(cifs_i->time, cfid->time);
-+
- 		close_cached_dir(cfid);
-+		return !valid;
- 	}
-+
- 	/*
- 	 * depending on inode type, check if attribute caching disabled for
- 	 * files or directories
+ #define ACL_NO_MODE	((umode_t)(-1))
 diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index f0ce26622a14..c9c32e4868eb 100644
+index c9c32e4868eb..9470723a4579 100644
 --- a/fs/smb/client/readdir.c
 +++ b/fs/smb/client/readdir.c
-@@ -1079,7 +1079,7 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
- 		tcon = tlink_tcon(cifsFile->tlink);
+@@ -344,7 +344,7 @@ cifs_std_info_to_fattr(struct cifs_fattr *fattr, FIND_FILE_STANDARD_INFO *info,
+ 
+ static int
+ _initiate_cifs_search(const unsigned int xid, struct file *file,
+-		     const char *full_path)
++		     const char *full_path, struct cached_fid *cfid)
+ {
+ 	__u16 search_flags;
+ 	int rc = 0;
+@@ -374,7 +374,6 @@ _initiate_cifs_search(const unsigned int xid, struct file *file,
  	}
  
--	rc = open_cached_dir(xid, tcon, full_path, cifs_sb, false, &cfid);
-+	rc = open_cached_dir(xid, tcon, full_path, cifs_sb, &cfid);
- 	cifs_put_tlink(tlink);
- 	if (rc)
- 		goto cache_not_found;
-@@ -1150,7 +1150,7 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
+ 	server = tcon->ses->server;
+-
+ 	if (!server->ops->query_dir_first) {
+ 		rc = -ENOSYS;
+ 		goto error_exit;
+@@ -382,6 +381,13 @@ _initiate_cifs_search(const unsigned int xid, struct file *file,
+ 
+ 	cifsFile->invalidHandle = true;
+ 	cifsFile->srch_inf.endOfSearch = false;
++	if (cfid) {
++		cifsFile->srch_inf.restart_scan = true;
++		cifsFile->srch_inf.entries_in_buffer = 0;
++		cifsFile->srch_inf.index_of_last_entry = 2;
++		cifsFile->fid.persistent_fid = cfid->fid.persistent_fid;
++		cifsFile->fid.volatile_fid = cfid->fid.volatile_fid;
++	}
+ 
+ 	cifs_dbg(FYI, "Full path: %s start at: %lld\n", full_path, file->f_pos);
+ 
+@@ -406,12 +412,16 @@ _initiate_cifs_search(const unsigned int xid, struct file *file,
+ 	if (backup_cred(cifs_sb))
+ 		search_flags |= CIFS_SEARCH_BACKUP_SEARCH;
+ 
+-	rc = server->ops->query_dir_first(xid, tcon, full_path, cifs_sb,
+-					  &cifsFile->fid, search_flags,
+-					  &cifsFile->srch_inf);
+-
++	if (cfid)
++		rc = server->ops->query_dir_next(xid, tcon, &cifsFile->fid, 0, &cifsFile->srch_inf);
++	else
++		rc = server->ops->query_dir_first(xid, tcon, full_path, cifs_sb, &cifsFile->fid,
++						  search_flags, &cifsFile->srch_inf);
+ 	if (rc == 0) {
+-		cifsFile->invalidHandle = false;
++		if (cfid)
++			cifsFile->srch_inf.restart_scan = false;
++		else
++			cifsFile->invalidHandle = false;
+ 	} else if ((rc == -EOPNOTSUPP) &&
+ 		   (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
+ 		cifs_autodisable_serverino(cifs_sb);
+@@ -424,12 +434,12 @@ _initiate_cifs_search(const unsigned int xid, struct file *file,
+ 
+ static int
+ initiate_cifs_search(const unsigned int xid, struct file *file,
+-		     const char *full_path)
++		     const char *full_path, struct cached_fid *cfid)
+ {
+ 	int rc, retry_count = 0;
+ 
+ 	do {
+-		rc = _initiate_cifs_search(xid, file, full_path);
++		rc = _initiate_cifs_search(xid, file, full_path, cfid);
+ 		/*
+ 		 * If we don't have enough credits to start reading the
+ 		 * directory just try again after short wait.
+@@ -683,7 +693,7 @@ static int cifs_save_resume_key(const char *current_entry,
+ static int
+ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
+ 		struct file *file, const char *full_path,
+-		char **current_entry, int *num_to_ret)
++		char **current_entry, int *num_to_ret, struct cached_fid *cfid)
+ {
+ 	__u16 search_flags;
+ 	int rc = 0;
+@@ -739,7 +749,7 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
+ 			cfile->srch_inf.srch_entries_start = NULL;
+ 			cfile->srch_inf.last_entry = NULL;
+ 		}
+-		rc = initiate_cifs_search(xid, file, full_path);
++		rc = initiate_cifs_search(xid, file, full_path, cfid);
+ 		if (rc) {
+ 			cifs_dbg(FYI, "error %d reinitiating a search on rewind\n",
+ 				 rc);
+@@ -1042,7 +1052,6 @@ static int cifs_filldir(char *find_entry, struct file *file,
+ 			      &fattr, cfid, file);
+ }
+ 
+-
+ int cifs_readdir(struct file *file, struct dir_context *ctx)
+ {
+ 	int rc = 0;
+@@ -1050,7 +1059,7 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
+ 	int i;
+ 	struct tcon_link *tlink = NULL;
+ 	struct cifs_tcon *tcon;
+-	struct cifsFileInfo *cifsFile;
++	struct cifsFileInfo *cifsFile = NULL;
+ 	char *current_entry;
+ 	int num_to_fill = 0;
+ 	char *tmp_buf = NULL;
+@@ -1071,8 +1080,10 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
+ 
+ 	if (file->private_data == NULL) {
+ 		tlink = cifs_sb_tlink(cifs_sb);
+-		if (IS_ERR(tlink))
+-			goto cache_not_found;
++		if (IS_ERR(tlink)) {
++			rc = PTR_ERR(tlink);
++			goto rddir2_exit;
++		}
+ 		tcon = tlink_tcon(tlink);
+ 	} else {
+ 		cifsFile = file->private_data;
+@@ -1109,23 +1120,22 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
+ 	}
+ 	mutex_unlock(&cfid->dirents.de_mutex);
+ 
+-	/* Drop the cache while calling initiate_cifs_search and
+-	 * find_cifs_entry in case there will be reconnects during
+-	 * query_directory.
+-	 */
+-	close_cached_dir(cfid);
+-	cfid = NULL;
+-
+- cache_not_found:
++	/* keep our cfid ref, but check if still valid after network calls */
++cache_not_found:
+ 	/*
+ 	 * Ensure FindFirst doesn't fail before doing filldir() for '.' and
+ 	 * '..'. Otherwise we won't be able to notify VFS in case of failure.
+ 	 */
+ 	if (file->private_data == NULL) {
+-		rc = initiate_cifs_search(xid, file, full_path);
++		rc = initiate_cifs_search(xid, file, full_path, cfid);
+ 		cifs_dbg(FYI, "initiate cifs search rc %d\n", rc);
+ 		if (rc)
+ 			goto rddir2_exit;
++
++		if (tcon->status != TID_GOOD || (cfid && !is_valid_cached_dir(cfid))) {
++			rc = -ENOENT;
++			goto rddir2_exit;
++		}
+ 	}
+ 
+ 	if (!dir_emit_dots(file, ctx))
+@@ -1142,15 +1152,17 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
+ 			rc = 0;
+ 			goto rddir2_exit;
+ 		}
+-	} /* else {
+-		cifsFile->invalidHandle = true;
+-		tcon->ses->server->close(xid, tcon, &cifsFile->fid);
+-	} */
++	}
+ 
  	tcon = tlink_tcon(cifsFile->tlink);
  	rc = find_cifs_entry(xid, tcon, ctx->pos, file, full_path,
- 			     &current_entry, &num_to_fill);
--	open_cached_dir(xid, tcon, full_path, cifs_sb, false, &cfid);
-+	open_cached_dir(xid, tcon, full_path, cifs_sb, &cfid);
+-			     &current_entry, &num_to_fill);
+-	open_cached_dir(xid, tcon, full_path, cifs_sb, &cfid);
++			     &current_entry, &num_to_fill, cfid);
++
++	if (tcon->status != TID_GOOD || (cfid && !is_valid_cached_dir(cfid))) {
++		rc = -ENOENT;
++		goto rddir2_exit;
++	}
++
  	if (rc) {
  		cifs_dbg(FYI, "fce error %d\n", rc);
  		goto rddir2_exit;
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index e69e9a3b5511..33962c72e2fc 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -964,12 +964,10 @@ int smb2_query_path_info(const unsigned int xid,
- 	 * is fast enough (always using the compounded version).
- 	 */
- 	if (!tcon->posix_extensions) {
--		if (*full_path) {
--			rc = -ENOENT;
--		} else {
--			rc = open_cached_dir(xid, tcon, full_path,
--					     cifs_sb, false, &cfid);
--		}
-+		rc = -ENOENT;
-+		if (!*full_path)
-+			rc = open_cached_dir(xid, tcon, full_path, cifs_sb, &cfid);
-+
- 		/* If it is a root and its handle is cached then use it */
- 		if (!rc) {
- 			if (cfid->file_all_info_is_valid) {
+@@ -1218,8 +1230,11 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
+ 	kfree(tmp_buf);
+ 
+ rddir2_exit:
+-	if (cfid)
++	if (cfid) {
++		if (cifsFile)
++			cifsFile->invalidHandle = true;
+ 		close_cached_dir(cfid);
++	}
+ 	free_dentry_path(page);
+ 	free_xid(xid);
+ 	return rc;
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 058050f744c0..26eba23c113d 100644
+index 26eba23c113d..cc2c1f9b76f2 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -882,7 +882,7 @@ smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon,
- 		.fid = &fid,
- 	};
+@@ -2397,7 +2397,7 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rc = SMB2_query_directory_init(xid, tcon, server,
+ 				       &rqst[1],
+ 				       COMPOUND_FID, COMPOUND_FID,
+-				       0, srch_inf->info_level);
++				       0, srch_inf);
+ 	if (rc)
+ 		goto qdf_free;
  
--	rc = open_cached_dir(xid, tcon, "", cifs_sb, false, &cfid);
-+	rc = open_cached_dir(xid, tcon, "", cifs_sb, &cfid);
- 	if (rc == 0)
- 		memcpy(&fid, &cfid->fid, sizeof(struct cifs_fid));
- 	else
-@@ -952,8 +952,8 @@ smb2_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
- 	bool islink;
- 	int rc, rc2;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 366dcb996f59..1b13333394e2 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -5395,7 +5395,7 @@ int SMB2_query_directory_init(const unsigned int xid,
+ 			      struct TCP_Server_Info *server,
+ 			      struct smb_rqst *rqst,
+ 			      u64 persistent_fid, u64 volatile_fid,
+-			      int index, int info_level)
++			      int index, struct cifs_search_info *search)
+ {
+ 	struct smb2_query_directory_req *req;
+ 	unsigned char *bufptr;
+@@ -5412,7 +5412,7 @@ int SMB2_query_directory_init(const unsigned int xid,
+ 	if (rc)
+ 		return rc;
  
--	rc = open_cached_dir(xid, tcon, full_path, cifs_sb, true, &cfid);
--	if (!rc) {
-+	cfid = find_cached_dir(tcon->cfids, full_path, CFID_LOOKUP_PATH);
-+	if (cfid) {
- 		close_cached_dir(cfid);
- 		return 0;
+-	switch (info_level) {
++	switch (search->info_level) {
+ 	case SMB_FIND_FILE_DIRECTORY_INFO:
+ 		req->FileInformationClass = FILE_DIRECTORY_INFORMATION;
+ 		break;
+@@ -5426,14 +5426,15 @@ int SMB2_query_directory_init(const unsigned int xid,
+ 		req->FileInformationClass = FILE_FULL_DIRECTORY_INFORMATION;
+ 		break;
+ 	default:
+-		cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
+-			info_level);
++		cifs_tcon_dbg(VFS, "info level %u isn't supported\n", search->info_level);
+ 		return -EINVAL;
  	}
-@@ -2744,8 +2744,8 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
- 	 * We can only call this for things we know are directories.
- 	 */
- 	if (!strcmp(path, ""))
--		open_cached_dir(xid, tcon, path, cifs_sb, false,
--				&cfid); /* cfid null if open dir failed */
-+		/* cfid null if open dir failed */
-+		open_cached_dir(xid, tcon, path, cifs_sb, &cfid);
  
- 	rqst[0].rq_iov = vars->open_iov;
- 	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
+ 	req->FileIndex = cpu_to_le32(index);
+ 	req->PersistentFileId = persistent_fid;
+ 	req->VolatileFileId = volatile_fid;
++	if (search->restart_scan)
++		req->Flags |= SMB2_RESTART_SCANS;
+ 
+ 	len = 0x2;
+ 	bufptr = req->Buffer;
+@@ -5580,7 +5581,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rc = SMB2_query_directory_init(xid, tcon, server,
+ 				       &rqst, persistent_fid,
+ 				       volatile_fid, index,
+-				       srch_inf->info_level);
++				       srch_inf);
+ 	if (rc)
+ 		goto qdir_exit;
+ 
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index b3f1398c9f79..ac6db1f18b5b 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -231,7 +231,7 @@ extern int SMB2_query_directory_init(unsigned int xid, struct cifs_tcon *tcon,
+ 				     struct TCP_Server_Info *server,
+ 				     struct smb_rqst *rqst,
+ 				     u64 persistent_fid, u64 volatile_fid,
+-				     int index, int info_level);
++				     int index, struct cifs_search_info *search);
+ extern void SMB2_query_directory_free(struct smb_rqst *rqst);
+ extern int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
+ 			u64 persistent_fid, u64 volatile_fid, u32 pid,
 -- 
 2.51.0
 
