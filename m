@@ -1,39 +1,39 @@
 Received: from mout.web.de (mout.web.de [212.227.15.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05C91DE887;
-	Tue,  7 Oct 2025 13:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B6F1F3BA4;
+	Tue,  7 Oct 2025 14:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759845418; cv=none; b=iBmc60WO4MtDUrJIJ2tt/eRKm2KmrIQBNR7TKbpqOQWtNLnrqBQkKR8dL78PkyMgffpC/Pmvlou4rcxC2GKqpvkTs3hNpUQiBbiNwAdqvQzfIhnIKCpxsf0XBDf7wySvHp7cMJN00O/GAulGmBfF8EX7sRalAF07xIRkCandOso=
+	t=1759848379; cv=none; b=UidOoWwPVlZjE9RQ2D3/R1Zjds3F7g3ycKZSfwxeLP8+idlK6ubH0t/8w3h8KP78/M1QBbCpN/Mj1SbMqgWmDSyGaxzp6izr/uvOezAqLf43sK5vEFcadKFm1AVqaloXshZX/eedLCPFR+2UBDhOWlKBM/bQmNVkz0iTZj6FaEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759845418; c=relaxed/simple;
-	bh=Wi3J1XtMuR1O7fegeKFuRvokDhXazfrVyJxG+JlRfmM=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=HFPtgq7bm/NLYLsJLDNISHpHnBwBbBBoUSaUiCihDQHsXoraSb6jURUT8aTsHiXowgrUrYFVgZex6EFp/0oUVS4Q6KtmGSm66FpG4+ICvAQQ6/YGZj5o0DuRnHeeRlX0ylNE7IIFF8GxrwMHsiOUA3BMBV9VRjD13tV3IxvuCa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=KVN5NlVc; arc=none smtp.client-ip=212.227.15.3
+	s=arc-20240116; t=1759848379; c=relaxed/simple;
+	bh=qpNjxwNibw5NzkF2mH3vS3U8RFw1xUqdMXdg6vsThxc=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=W5b/ZcsgxD6ZPSL6Yw5pFgZhVRRqDdhEpcPxxJfhVF/Mag6o6DGe4XWSQMt3zBxTX//NVtHfP3OIsvl+FCBiKASr1PTco265TvG2LP0n5qLEQJLJzI0yPIckCXZemZ+hhYxYXeaWxXaMG6Z2J139PGqRYF6G1uQ7FmXcOgI9tdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=sTUY4Hli; arc=none smtp.client-ip=212.227.15.3
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="KVN5NlVc"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="sTUY4Hli"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1759845410; x=1760450210; i=markus.elfring@web.de;
-	bh=v8DsEMB2FRksA0dGd/S0prFoIKyv/nPEMSOWWwWY7TY=;
+	s=s29768273; t=1759848360; x=1760453160; i=markus.elfring@web.de;
+	bh=QJEoOh3XKzsWVxo2yAKGwvITj7AmDQGSnoLkfhq1hJk=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
 	 Subject:Content-Type:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=KVN5NlVcFGREoYOeCWpccaGuOKypEAxB27ruF6ZRED6Z/Petsh59l1K+E+d52eJA
-	 GI2D6UnCv6OfUKoe6XVTvKsnHHUPX6HkYBeiFOPaoAuuhNi7nfQJV9IWvLbI6sfi/
-	 axu0CBDn4yML/INmx2dGf25Yudqcnldk9XlTeWlTNGvpQMSbc85bRn9AzpvviujFK
-	 jyjd5MJManXf5DfqSORoyfBUQerTBCu7SgxctVq4U3qUHS/RHM4BdNDmvalRBS/0b
-	 ZHPnGMPQcjAyqa9Lwo9X51c6l1WB6wdrY214YQG0yo3oRKwJPtJxo2vrZODfYUkEx
-	 sODOUQaUhNgpWiKvWg==
+	b=sTUY4HliqwthlI9k941J/icPh57B1FS1/1yzL3qkdjKzjYTgXmW98TXC/Uw2BvAo
+	 kb4GQyOshr5z63jPIMcdZJEjvtKnvkxNhiBqqybiD11d+SOvIiqDSEGgD5eXNODo2
+	 5YhIM3S/xowq30oNFwRDPiX05Uni9ush9aeqELR6/Y/5f5PIYCu6XT5gdJYPPwKB/
+	 i1icxlAKr6n5RYL35Fgq0h6MijvBypJg+pF8oDf+oIQ5jLkkLKsgSBrVr/FYm7FFH
+	 60gv5IiR5DgCIX7RsHO/E5czYiUjGw0Q5AcEDhTjtUQOKToUNuRgtYzXdwH5oXXOx
+	 73GxKPjK7Qh+VtLxSw==
 X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.69.202]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mq1CA-1uTEYK2ck6-00oXRY; Tue, 07
- Oct 2025 15:50:42 +0200
-Message-ID: <bdb24f04-98a5-43ce-bef2-dcda4edd8618@web.de>
-Date: Tue, 7 Oct 2025 15:50:33 +0200
+Received: from [192.168.178.29] ([94.31.69.202]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MDMv4-1uwkkY0UuU-00Aqeu; Tue, 07
+ Oct 2025 16:46:00 +0200
+Message-ID: <6de9dea4-205b-4fb6-a785-498ce31636e3@web.de>
+Date: Tue, 7 Oct 2025 16:45:58 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -43,207 +43,137 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Content-Language: en-GB, de-DE
 To: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- Al Viro <viro@zeniv.linux.org.uk>, Bharath SM <bharathsm@microsoft.com>,
- Paul Aurich <paul@darkrain42.org>, Paulo Alcantara <pc@manguebit.org>,
+ Bharath SM <bharathsm@microsoft.com>, Paulo Alcantara <pc@manguebit.org>,
  Ronnie Sahlberg <ronniesahlberg@gmail.com>,
  Shyam Prasad N <sprasad@microsoft.com>, Steve French <sfrench@samba.org>,
  Tom Talpey <tom@talpey.com>
 Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] smb: client: Use more common code in open_cached_dir()
+Subject: [PATCH] smb: client: Return a status code only as a constant in
+ cifs_spnego_key_instantiate()
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:EyYwPU6y05QU3P5iAEG3I+uti+YbHyLrDqDOGdMWLf47BTvEjOm
- 01lk2tdUfKyhqYv8D7OZAbz5qekZkTThbkT9clV0trCIx3CVWs85VKL5W0ZiYIqe/oxog73
- Funucz8PKdvlIwGYC79raXiacS1fF/HLkhPNUSBDl0DS4jI1t2iIPzoiBfZdZvr3l59J2q9
- aZXuH4jWmbSbLJz56tK+g==
+X-Provags-ID: V03:K1:h7Rd8JrZwxJVGWDRQ5I8n0mqB6RSdzCrLILEHqC9V/WcQ0JVg+B
+ huygjfVRaH/skFK5OT/V7oigFPMKnVSGIUJVhH2z/mhVRO7DzzGPVjxfCO38xQ3PyGh4xdC
+ qmQB42NbBy9izV0oddJRv9htV55KeAdVj/qr4E1t7Iqvlxuf2z7dmXoujAfVTHUny0KNhZQ
+ NCbZldWSaUHUZQp15U9PQ==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:w5bSxpeHRYE=;7cb81zwooO3cx42869it7l56NBs
- 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
+UI-OutboundReport: notjunk:1;M01:P0:g4VFSaTGvHY=;WNrPFoH6Olew0XrgoJGjFozZI/l
+ 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
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Tue, 7 Oct 2025 15:34:56 +0200
+Date: Tue, 7 Oct 2025 16:32:25 +0200
 
-Use two additional labels so that another bit of common code can be better
-reused at the end of this function implementation.
+* Return a status code without storing it in an intermediate variable.
+
+* Delete the local variable =E2=80=9Cret=E2=80=9D and the label =E2=80=9Ce=
+rror=E2=80=9D
+  which became unnecessary with this refactoring.
 
 Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 =2D--
- fs/smb/client/cached_dir.c | 42 ++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 22 deletions(-)
+ fs/smb/client/cifs_spnego.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index b36f9f9340f0..d3ab0467b0d9 100644
-=2D-- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -184,9 +184,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon=
- *tcon,
- 	spin_lock(&cfids->cfid_list_lock);
- 	cfid =3D find_or_create_cached_dir(cfids, path, lookup_only, tcon->max_c=
-ached_dirs);
- 	if (cfid =3D=3D NULL) {
--		spin_unlock(&cfids->cfid_list_lock);
--		kfree(utf16_path);
--		return -ENOENT;
-+		rc =3D -ENOENT;
-+		goto free_unlock_list;
- 	}
- 	/*
- 	 * Return cached fid if it is valid (has a lease and has a time).
-@@ -195,10 +194,9 @@ int open_cached_dir(unsigned int xid, struct cifs_tco=
-n *tcon,
- 	 */
- 	if (is_valid_cached_dir(cfid)) {
- 		cfid->last_access_time =3D jiffies;
--		spin_unlock(&cfids->cfid_list_lock);
- 		*ret_cfid =3D cfid;
--		kfree(utf16_path);
--		return 0;
-+		rc =3D 0;
-+		goto free_unlock_list;
- 	}
- 	spin_unlock(&cfids->cfid_list_lock);
+diff --git a/fs/smb/client/cifs_spnego.c b/fs/smb/client/cifs_spnego.c
+index 43b86fa4d695..9891f55bac1e 100644
+=2D-- a/fs/smb/client/cifs_spnego.c
++++ b/fs/smb/client/cifs_spnego.c
+@@ -24,20 +24,14 @@ static const struct cred *spnego_cred;
+ static int
+ cifs_spnego_key_instantiate(struct key *key, struct key_preparsed_payload=
+ *prep)
+ {
+-	char *payload;
+-	int ret;
++	char *payload =3D kmemdup(prep->data, prep->datalen, GFP_KERNEL);
 =20
-@@ -331,30 +329,25 @@ int open_cached_dir(unsigned int xid, struct cifs_tc=
-on *tcon,
+-	ret =3D -ENOMEM;
+-	payload =3D kmemdup(prep->data, prep->datalen, GFP_KERNEL);
+ 	if (!payload)
+-		goto error;
++		return -ENOMEM;
 =20
-=20
- 	if (o_rsp->OplockLevel !=3D SMB2_OPLOCK_LEVEL_LEASE) {
--		spin_unlock(&cfids->cfid_list_lock);
- 		rc =3D -EINVAL;
--		goto oshr_free;
-+		goto unlock_list;
- 	}
-=20
- 	rc =3D smb2_parse_contexts(server, rsp_iov,
- 				 &oparms.fid->epoch,
- 				 oparms.fid->lease_key,
- 				 &oplock, NULL, NULL);
--	if (rc) {
--		spin_unlock(&cfids->cfid_list_lock);
--		goto oshr_free;
--	}
-+	if (rc)
-+		goto unlock_list;
-=20
- 	rc =3D -EINVAL;
--	if (!(oplock & SMB2_LEASE_READ_CACHING_HE)) {
--		spin_unlock(&cfids->cfid_list_lock);
--		goto oshr_free;
--	}
-+	if (!(oplock & SMB2_LEASE_READ_CACHING_HE))
-+		goto unlock_list;
-+
- 	qi_rsp =3D (struct smb2_query_info_rsp *)rsp_iov[1].iov_base;
--	if (le32_to_cpu(qi_rsp->OutputBufferLength) < sizeof(struct smb2_file_al=
-l_info)) {
--		spin_unlock(&cfids->cfid_list_lock);
--		goto oshr_free;
--	}
-+	if (le32_to_cpu(qi_rsp->OutputBufferLength) < sizeof(struct smb2_file_al=
-l_info))
-+		goto unlock_list;
-+
- 	if (!smb2_validate_and_copy_iov(
- 				le16_to_cpu(qi_rsp->OutputBufferOffset),
- 				sizeof(struct smb2_file_all_info),
-@@ -364,10 +357,10 @@ int open_cached_dir(unsigned int xid, struct cifs_tc=
-on *tcon,
-=20
- 	cfid->time =3D jiffies;
- 	cfid->last_access_time =3D jiffies;
--	spin_unlock(&cfids->cfid_list_lock);
- 	/* At this point the directory handle is fully cached */
- 	rc =3D 0;
+ 	/* attach the data */
+ 	key->payload.data[0] =3D payload;
+-	ret =3D 0;
 -
-+unlock_list:
-+	spin_unlock(&cfids->cfid_list_lock);
- oshr_free:
- 	SMB2_open_free(&rqst[0]);
- 	SMB2_query_info_free(&rqst[1]);
-@@ -404,6 +397,11 @@ int open_cached_dir(unsigned int xid, struct cifs_tco=
-n *tcon,
- 		goto replay_again;
-=20
- 	return rc;
-+
-+free_unlock_list:
-+	spin_unlock(&cfids->cfid_list_lock);
-+	kfree(utf16_path);
-+	return rc;
+-error:
+-	return ret;
++	return 0;
  }
 =20
- int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
+ static void
 =2D-=20
 2.51.0
 
