@@ -1,505 +1,198 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11022113.outbound.protection.outlook.com [52.101.43.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E059A253355
-	for <linux-cifs@vger.kernel.org>; Mon,  6 Oct 2025 19:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759777740; cv=none; b=P/ayEiPyAI26LnMJaXxOl2vPGE+7ciuYR1F184WbUUnRyvZI6XYBLoKeMTJ+eN4FzYSlO29V+3YgR5qLXaorBAyLJIzrChU6DXW8DiybcF8eGvvn9kAnev/YOOhnOXht5TLoyqbjvMGnKGvQcTlqmYPyNBoisGZJXC6Vg7jaMog=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759777740; c=relaxed/simple;
-	bh=FhIQ2BPtycKmamafwtMuB1uvpiwGeHc1nvYJbNixTJE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t/TeD8QORUOYpgH82E2HDZkLO7HimIGajSzP7UeUr2t5kA5szJNWJwjdAlZZcnw439jngTGxXFPVSYt6Wv8qVYs2hLA+oW9O0P73NHiFdxBguxqxW5o9SxkduOZc+jNtxpRWE5eaTxuYZjJe+UaqqmOW0wgv28ACy1+YOk3FFp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=9alnFmn2; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="9alnFmn2"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=8hFdvqpNxGITrrYn7bCCOjkrRMREwuOJifUGySPGMHM=; b=9alnFmn2BrctcYZ2HX1anmpAmg
-	8Nd3TO0cviRv/jNM60vW44EzQy/0CF85aTFdIHrulANJmDGfJlMfRCQCUUMbF8kxIV+0xGRExsHzS
-	I+35XPh3anWD2gNzIROEnwHirVSiboNgth6X6CeGhgf8Xv5scEo+bsLyF5iJcvFyP0GaXXhnsz3Wj
-	FhgaSZJ+cy9mGT76ljwaagxejVDBZ57CvZq81pyns12DOw8raRsrT93IYiLPsBMeqdGCo6eXo+N4V
-	z9yNY2hQ4QPjMTZOvlUdkSG4jlZBSDmYrmujIZlNdPp60d/5rYGh4WT6KQWZVm1XVyhAbgJx5BalT
-	1OscLYug==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1v5qZp-00000000qka-3DWw;
-	Mon, 06 Oct 2025 16:08:54 -0300
-From: Paulo Alcantara <pc@manguebit.org>
-To: smfrench@gmail.com
-Cc: Frank Sorenson <sorenson@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH v2 1/3] smb: client: fix missing timestamp updates with O_TRUNC
-Date: Mon,  6 Oct 2025 16:08:52 -0300
-Message-ID: <20251006190854.103483-1-pc@manguebit.org>
-X-Mailer: git-send-email 2.51.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47BD34BA3A;
+	Tue,  7 Oct 2025 00:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.113
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759796741; cv=fail; b=GUDKPNqOZlD05Q3sIGjjatAdk82wJRro12qY2OufwmH6hbsqFTbWAN/TJO53x6p0CcIk5cKtRh7l7dvv2Pra2RbIwxgpjSQkveVlxev0xCmNG9tZBE4GI07MhxE9F+6q7ODENm0iBtAjNgEAC4VNexFN99fQoCFYJCLFdWAWp10=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759796741; c=relaxed/simple;
+	bh=QC9Y2M8qsaJjEDrSDjCp3RMGAT5khbmnkEPc80hpxUI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=B5fBQsu6vvbnCSfeDc7eNQvO/jEfwyBNYQhMmvqmpqhmceu/c3Cr1cm0J3s4sSZDn61Z9zf6HC9m4jOFHkHmq048+RNXyyQ+NmlTkvlJ4jQSdUJr3zEPHzQBjs2iZd3xN91mu2ECzfSj/HVcB3wprZGrZZd5BO1vmgOpAGg6WcY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com; spf=pass smtp.mailfrom=talpey.com; arc=fail smtp.client-ip=52.101.43.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EtpeicxwuLROacodTS0OIjg0DGwfGqMw3Amhh4YTbDwEQ/OzwsdpBQeQpceTsn7sz9VWN34W9SEbc4+/zg2HpeTKe3xlfedL9VfOd7wFMpJZ3gmFrTbYidFu/GKCzW7QvIa7K7pmNxdkqw5mbPOSXdd1x3fVyqU3iFAMKrNFXQZcW8mlqWUbjjM8QZiKXzYGRApPpix27yrVlX//bkdZXuHZQaCKhWb7idYOAvykab789oCw6PMo3okV7UufMR6guSFryVtICxcwssWJZmawpUOGwgIqelQbzoP8uNjkIHx2Kca4ygXpp32oYvWxHZJmjRpVGpz4qiYxFLjxzwHsEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r690kwhAmbp8H773i+lWqflbhoNzheWFPfSa/76icoI=;
+ b=soiDy/EHOleH+R7IjWmRriaCAQz85CUqKox54aYyA4y0RJLDAsiDWKx/JQvO5nVPHoTQSh8ZE4CPazuMZ3jT0fn4ZMFPM1icKgiKUuAN609xgnGa1zFZmwlHg8VT2ImleCpW2tsswJmVrRVlvxz9Kl1ybMwNFcoOIkVSlMDMCYU69n5ppQJU8PjNDDFLweaiK7F9hlLkKxU27VLR67uRt2rNDKJy8tFo9XDRZMJKMUWlMLOs3nuEPUrpMTT7WQYyMorr+39NIzHbMi9CH79ehkjLcQlwG5CUmeDEf59QzZAYlnxhZGqLHHm4mJ1+UnAIYyWZ/mLO7dUMM2C+oxGNXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from CY3PR01MB9193.prod.exchangelabs.com (2603:10b6:930:109::5) by
+ CO6PR01MB7516.prod.exchangelabs.com (2603:10b6:303:147::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9182.20; Tue, 7 Oct 2025 00:25:36 +0000
+Received: from CY3PR01MB9193.prod.exchangelabs.com
+ ([fe80::5818:cc62:988f:8908]) by CY3PR01MB9193.prod.exchangelabs.com
+ ([fe80::5818:cc62:988f:8908%4]) with mapi id 15.20.9182.017; Tue, 7 Oct 2025
+ 00:25:36 +0000
+Message-ID: <3886ed32-f67c-40ab-99d9-4445655a887a@talpey.com>
+Date: Mon, 6 Oct 2025 20:25:34 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] cifs: Fix copy_to_iter return value check
+To: Fushuai Wang <wangfushuai@baidu.com>, sfrench@samba.org,
+ pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+ bharathsm@microsoft.com
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ linux-kernel@vger.kernel.org
+References: <20251005141925.35461-1-wangfushuai@baidu.com>
+From: Tom Talpey <tom@talpey.com>
+Content-Language: en-US
+In-Reply-To: <20251005141925.35461-1-wangfushuai@baidu.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL1PR13CA0018.namprd13.prod.outlook.com
+ (2603:10b6:208:256::23) To CY3PR01MB9193.prod.exchangelabs.com
+ (2603:10b6:930:109::5)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY3PR01MB9193:EE_|CO6PR01MB7516:EE_
+X-MS-Office365-Filtering-Correlation-Id: 16bbb1db-4eec-4321-dd01-08de053808db
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Rm01N2phZWxvRVhObER4anBGeFh5djBaRE9GUytJNEpuZ1FaVDlpZG1hbTc4?=
+ =?utf-8?B?SVBqOWc3blBoR092eWFGbitmNnJGUTVkN05wUm5zeXJFOTlISzZmZm50MEJo?=
+ =?utf-8?B?bWVKayt3bkRIRTZXZzJoT1krSmZBVEs4N09jRGhxbmYxamVZN1N3RUt1cmJ0?=
+ =?utf-8?B?S0ZnVDdTNVdmOHZ0R2NhQkRlM1ljeGRteCt0b24yenBwdEFYYkUxMU91RjIz?=
+ =?utf-8?B?aEhUQWd0Qnpib21lWUhiT3NEVG1KdEwvTHdLNGNZVi9kTWg4Z25MWVA5UE15?=
+ =?utf-8?B?ems0QjBHMHg5cGx3eFNxbUdQNnhhelN1WCs3WklXOFRLSGthaFZHUnFXVXlr?=
+ =?utf-8?B?d2VDbEhEZVFsc2U3eGxWOVdaaEIzbEg3bU5rWmg2U2NMbi9TK21GZDBNbmFV?=
+ =?utf-8?B?MW83dG0rY05XcHB6YzhkdVA0QWplMmxhMnJvK0F6OVcyaEpYZXAxb3F0MFFG?=
+ =?utf-8?B?Qy9wU0hpUHpsUTAvMFRsTDROQnRiNXRkWHdQa2dmK3hXN2QrVCtzTTNHYmlH?=
+ =?utf-8?B?bDBHaHg3QjUzQlloZXM1K2FabGQ3RTU0UGZrZ3Y3SlBidTlUbVFZc1NDR3NS?=
+ =?utf-8?B?bmhOY25heHpaK3VCKzdQc1JxWUZIRmhTcmhmM09lelNZWWNDaUhMdGxjMXM1?=
+ =?utf-8?B?MVp1b3hjQ2p2UGdJZkUvZVVxVWRPQ3ZOODEzdDkrNzJRak9LclpuWS9yZ3Jp?=
+ =?utf-8?B?Q2V5YzFGRGtyR0Q5anJVSzlwS0NHRitkSFBZellHZzcyV00yTXlkN3ovbm5S?=
+ =?utf-8?B?NGNINFVsVCtScTlFRG5acTNPMXNxdmJtWUJ1S2pJaGR6TWhsZ1RiR2xXbmI1?=
+ =?utf-8?B?U2dIQmZma3k2d2R3OTFLbE1udG5yWXNiQkxldWd6WHRtblhiaDdqaEpmeGY1?=
+ =?utf-8?B?UnZvNjVSVmx1YlFMOE02ODVxb2tmbVBwcFo4ekNQZXRyNzgxbzVHb2o0Tnpq?=
+ =?utf-8?B?R1pHUHZaYmxZY1NjTDBmREx4bERCZEszSTJydVViRmM4My9CVVJkM2N0ejRz?=
+ =?utf-8?B?WmJmdkRTcjlkNWZXOHVBcUtKNkNaZ21RZUdObzUyczAzRmV5RTJHdGJGOVo5?=
+ =?utf-8?B?TU0vbG5oWFNLS3NLWUdnT1ZFdnlKbWhyTU1BRjNTRDRsMXo2WGtPSEZwZlY1?=
+ =?utf-8?B?dk5vdFJ1T2MxK0tmRzZJWXdMNCswQUY5OHBkUUhIZWNMdDM3aUQxK3FtaG9i?=
+ =?utf-8?B?MDZ1Zml1cWVaYVFHMmd1WkNsdzJTeW1zZlVhaktRSHFjODAzK0RtYWxQcjY0?=
+ =?utf-8?B?TlF0Uk9CUGJ2RWlWRmoyMjZzT0tBSFYyRmkrdTdoMWRuSHhGUzVFM0x0TVc1?=
+ =?utf-8?B?WVhRMWFSQ0VaVEY0aVg3YktTY1hiY1FWbVE5S0swVkVJamxCcnZVUFhWT2Vy?=
+ =?utf-8?B?RUJqN2xVei9adXBxWTJobnhJbi8zZmYvdWc1M0hFK2p3aVVpRUFsb0Z4Y2NS?=
+ =?utf-8?B?VURTSDBReFJvQ2RFSkhVc2p5UjU2MUFodGpTQnBvS1ZDUWNlWW9xaHlVYTZp?=
+ =?utf-8?B?NXMzbFg0ZnNFT1ltME55QktmWS9zSWRSN1FTYU0wckx0QzVESCtlM3llU216?=
+ =?utf-8?B?RFZuc0xsOG9hbkdrSUhYZzBxZ1d4TGMxemFoRHpWUGE1c3RLaGkvLytaRG54?=
+ =?utf-8?B?VnNKelFSZ2R1ZG82cWJhWk9VV2ZCT1h6M1dsVkV2eTdMdW5HK3hnSDgxa2Ur?=
+ =?utf-8?B?NUdPUlVGM1Y1TWp5UVMrV0VadWpsMUFmV1dITVkyOWMreGR2b0IwYmlRV3RY?=
+ =?utf-8?B?Mmd1THhjUVF3elM5U0xObHl6QUE0L1NHZEZSYy9lQ2d1TjF1VHhUbHhGdGhF?=
+ =?utf-8?B?enZCMkJDeURWeXJPMUs3Q1JUOXc5TXpsRE1vMXFQeW5ncDFLb1NtQWRyMWQ5?=
+ =?utf-8?B?YXFBaUZXY0RLZTYzNXNNU2lRRjZRKy9GeWdYOUhtcEltSlZNMkRmL2w5S3pI?=
+ =?utf-8?Q?aQapJj9lNn3CH0CIbhku/P08Qqrz3gHB?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY3PR01MB9193.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ejMyY3haYVkxSDJYTHNGSUlOY1BwMjJGVHBVVnBQcTRBdkEyazNPdXNndXBn?=
+ =?utf-8?B?NHcvQ1FqWHlZK3dNS3Y1Q1htK3BMS2MxNkh5N3pDOWNwNFkrY2ovcVA2Z0tt?=
+ =?utf-8?B?dlA4RFVycFNQU2dheXZRVVp4RFJNSlFOY2Y1NjZHTjQ3WmFXZWRBOFh5dHho?=
+ =?utf-8?B?WkExRzFjZnRaQ2NDVEhvUDRvTUtkaUlGUmRqcXZoY0M3cE8ybXhBUU1ocHN5?=
+ =?utf-8?B?TS9SLzIwckUrOEdtMDFQVUJvZDdnZFFnK3RvQktUNUdEaXh3SDVTRE9DT2lJ?=
+ =?utf-8?B?eDR6Nnl1MjRyOWZzZlRKdmpkV2hkclZFN1p3T2Fmc2lOeU5wTHVSaUg4Q3hI?=
+ =?utf-8?B?Wmc5TWZITTBtOXNQVlJnUkVpVFhIT3hBaEV6dmg5eS95Qm1DWmo1YmtyOVBs?=
+ =?utf-8?B?am9PalZtTkNqNzI0eHRHY0xrV1RVc0Q1eXZwTUFrN1EwRXR1ZTdEUVM0MzVT?=
+ =?utf-8?B?djl4OHJZdXRjeGJ4a1h3UWhUeDNNM2o1eHlsZUJwU1F2N3NzMVBBcTFpbW5m?=
+ =?utf-8?B?M1l5MThSUGlybjhZS1h3WUxvcWgzWXYyYWNZWkg1MW5ReFBUTzRjZEV5S2dD?=
+ =?utf-8?B?dW0xbENCL3FwaU9TUEdxb01tSGV1WVZ6azBpVHdQOG1KMHBBNE1SVWlGMEh5?=
+ =?utf-8?B?eUZJVWlkcStLdGYvU0xMQitEeUhLTURaSFRoR3JVcHlQWmtDUTFJYUFLckw0?=
+ =?utf-8?B?ZWhpc0hEQTFVTFhnajVUdjFNT3oySjVZaWZIc3NZMTltUGxRekJFQW5ZZ2F0?=
+ =?utf-8?B?V1NGTlNFUFpOMTdhc2x4aW5nRkFWTDI3MG5CdTBjbURUQ3JDa2drZTNwUU55?=
+ =?utf-8?B?TXZ2bUdmS1RIWTdHRGpvQmVsUDAwa3Z5ejUrNHVlZDNHNDRCRTJURS9uZTNY?=
+ =?utf-8?B?SHRYWm1yTTJvRU1WVGNJOFFZTVgvckZiaEJoZjQvb0QxeWpOb0MvWCtKcXhi?=
+ =?utf-8?B?cXQ3L2JhWGR3QnBBWkhNSU05Vkd3czBRR0xGUTBvM2FkdEVyaDJiTUpva29E?=
+ =?utf-8?B?aVFaQjV6Uy9sek9ROVhMVENkR29wUjhGWHc3Y05xOTFsQnd0SUdtOTJ6cTh0?=
+ =?utf-8?B?cmhsdWlZUUdWVksyYUdxU0JTVjF5YytrRW1IM3B4SkNKVWU4cW9OTmdRdjJH?=
+ =?utf-8?B?aDlTUWJRNm9KdjBxVTNkTHltQUFLLzRnVmNhQ2tCdWZzdEJsejdxQm1pV2tB?=
+ =?utf-8?B?NnVNTmFYdEpwdGVST2g4YS9pdlVtc2lGT0JCQmdGZDkxZlBNSllQcklCZjdT?=
+ =?utf-8?B?OWR0Nncyc2RkTjJRcjFycFp1anNuR1YvaFJsZkRsckZObkNYeFNlalZwN2Zt?=
+ =?utf-8?B?ajVubURxL014VENqdHBsNnJzY1VncVpPZTRQNDg5b1lRb1p5WmtPbHpsU0V5?=
+ =?utf-8?B?YmN4bWU4QWMzSU1QMkdneXhwSDQvK0xSY25OVHI4ZjBPTWtmU2kvekxObFNk?=
+ =?utf-8?B?eHlTMDRFSFE2bWt1eUFFRVNTRUhSWFZPd0FPdnNISmVnblQ3MmVlUWpRRlBT?=
+ =?utf-8?B?bm9XUEN5NWVkSzFMWHBRbmNtSGkyeHphYzdwMEt4NUJyaXV5RTlwMlZXZmk0?=
+ =?utf-8?B?ZFo0WXdmQUlYd25JOEhBRjVzbWZUMEwvVEVLWVFBMVptTEdaQkR1ZThPVVpk?=
+ =?utf-8?B?SEFsY05yOVBnRDFoL0locTFsNjRUUUloN3UyTjJVUzc3a3JuV3NVSmhYQ293?=
+ =?utf-8?B?WG0xYmszbjQ4OVBJcHJ1MnAxUGdmY0NXdnZvWDlVOWs4NWgrQThSSTN4dHJJ?=
+ =?utf-8?B?Q3VmZmdJcmxabDJrblFiRzFLaWs5TldXREdFNEVwT0VjTWJMR3U5WnpGYzFQ?=
+ =?utf-8?B?a0xyTTRFd05SVDlZd0hjdGhzL08yLzF1TmNoRms0ak1QZi9xWW9MNWpBL0dW?=
+ =?utf-8?B?RUhhVXNsQm1VQ1ZORlQ2VGQ5aWsyS2RiME5tdjM0b096S2pGUS9TU0NFNXl2?=
+ =?utf-8?B?NlErckJYUnJIV1puakNWcTRuK3ZsN1Raa1lmMXhLSjRFZnpPTTJZMkZCeHdw?=
+ =?utf-8?B?TmJRaGhVSHhldkY5ZUNEZFBOUk1kQStJS0wxck9YRkFKM1pWamZsMEJqUHIw?=
+ =?utf-8?B?MW9lVG40THZCNkl4V0hURmF5cVY4YUgycWE4LzArME9iNmsxZTRRb1A5TGJx?=
+ =?utf-8?Q?udFM6fND3D3zNGmslweadLHGC?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 16bbb1db-4eec-4321-dd01-08de053808db
+X-MS-Exchange-CrossTenant-AuthSource: CY3PR01MB9193.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2025 00:25:35.9862
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vE9rzcWdn/cZ76qPoEQukOQoNA28ItwB5Gr+FqUVhLEWHH8w3Kfx0BzbplLiwznn
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR01MB7516
 
-Don't call ->set_file_info() on open handle to prevent the server from
-stopping [cm]time updates automatically as per MS-FSA 2.1.4.17.
+On 10/5/2025 10:19 AM, Fushuai Wang wrote:
+> The return value of copy_to_iter() function will never be negative,
+> it is the number of bytes copied, or zero if nothing was copied.
+> Update the check to treat !length as an error, and return -1 in
+> that case.
+> 
+> Fixes: d08089f649a0 ("cifs: Change the I/O paths to use an iterator rather than a page list")
+> Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
+> ---
+>   fs/smb/client/smb2ops.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+> index 058050f744c0..577ac2e11e77 100644
+> --- a/fs/smb/client/smb2ops.c
+> +++ b/fs/smb/client/smb2ops.c
+> @@ -4764,8 +4764,8 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+>   		/* read response payload is in buf */
+>   		WARN_ONCE(buffer, "read data can be either in buf or in buffer");
+>   		length = copy_to_iter(buf + data_offset, data_len, &rdata->subreq.io_iter);
+> -		if (length < 0)
+> -			return length;
+> +		if (!length)
+> +			return -1;
+>   		rdata->got_bytes = data_len;
 
-Fix this by checking for ATTR_OPEN bit earlier in cifs_setattr() to
-prevent ->set_file_info() from being called when opening a file with
-O_TRUNC.  Do the truncation in ->open() instead.
+I think this has exposed several issues, and one's still there.
 
-This also saves two roundtrips when opening a file with O_TRUNC and
-there are currently no open handles to be reused.
+1) copy_to_iter() returns a size_t, which is the fundamental reason
+this can never be negative. The code is assigning the size_t to
+an integer ("length"), which is why static checkers never found it.
+You should correct this.
 
-Before patch:
+2) If the "length" is positive, it's completely ignored and the
+previously-computed "data_len" is substituted. This pre-existing
+mistake could easily cause a too-large read data count to be
+returned, incorrectly.
 
-$ mount.cifs //srv/share /mnt -o ...
-$ cd /mnt
-$ exec 3>foo; stat -c 'old: %z %y' foo; sleep 2; echo test >&3; exec 3>&-; sleep 2; stat -c 'new: %z %y' foo
-old: 2025-10-03 13:26:23.151030500 -0300 2025-10-03 13:26:23.151030500 -0300
-new: 2025-10-03 13:26:23.151030500 -0300 2025-10-03 13:26:23.151030500 -0300
+3) I detest using integers as booleans. Please spell out a test
+against zero. But I guess I wouldn't nak for that alone.
 
-After patch:
+Tom.
 
-$ mount.cifs //srv/share /mnt -o ...
-$ cd /mnt
-$ exec 3>foo; stat -c 'old: %z %y' foo; sleep 2; echo test >&3; exec 3>&-; sleep 2; stat -c 'new: %z %y' foo
-$ exec 3>foo; stat -c 'old: %z %y' foo; sleep 2; echo test >&3; exec 3>&-; sleep 2; stat -c 'new: %z %y' foo
-old: 2025-10-03 13:28:13.911933800 -0300 2025-10-03 13:28:13.911933800 -0300
-new: 2025-10-03 13:28:26.647492700 -0300 2025-10-03 13:28:26.647492700 -0300
-
-Reported-by: Frank Sorenson <sorenson@redhat.com>
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
----
- fs/smb/client/cifsglob.h |   5 ++
- fs/smb/client/file.c     |  94 +++++++++++++++++-------
- fs/smb/client/inode.c    | 152 ++++++++++++++++++++++-----------------
- 3 files changed, 159 insertions(+), 92 deletions(-)
-
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 3ac254e123dc..8f6f567d7474 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1566,6 +1566,11 @@ struct cifsFileInfo *cifsFileInfo_get(struct cifsFileInfo *cifs_file);
- void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_hdlr,
- 		       bool offload);
- void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
-+int cifs_file_flush(const unsigned int xid, struct inode *inode,
-+		    struct cifsFileInfo *cfile);
-+int cifs_file_set_size(const unsigned int xid, struct dentry *dentry,
-+		       const char *full_path, struct cifsFileInfo *open_file,
-+		       loff_t size);
- 
- #define CIFS_CACHE_READ_FLG	1
- #define CIFS_CACHE_HANDLE_FLG	2
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index a5ed742afa00..ecbb63e66521 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -952,6 +952,66 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file,
- 	}
- }
- 
-+int cifs_file_flush(const unsigned int xid, struct inode *inode,
-+		    struct cifsFileInfo *cfile)
-+{
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-+	struct cifs_tcon *tcon;
-+	int rc;
-+
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC)
-+		return 0;
-+
-+	if (cfile && (OPEN_FMODE(cfile->f_flags) & FMODE_WRITE)) {
-+		tcon = tlink_tcon(cfile->tlink);
-+		return tcon->ses->server->ops->flush(xid, tcon,
-+						     &cfile->fid);
-+	}
-+	rc = cifs_get_writable_file(CIFS_I(inode), FIND_WR_ANY, &cfile);
-+	if (!rc) {
-+		tcon = tlink_tcon(cfile->tlink);
-+		rc = tcon->ses->server->ops->flush(xid, tcon, &cfile->fid);
-+		cifsFileInfo_put(cfile);
-+	} else if (rc == -EBADF) {
-+		rc = 0;
-+	}
-+	return rc;
-+}
-+
-+static int cifs_do_truncate(const unsigned int xid, struct dentry *dentry)
-+{
-+	struct cifsInodeInfo *cinode = CIFS_I(d_inode(dentry));
-+	struct inode *inode = d_inode(dentry);
-+	struct cifsFileInfo *cfile = NULL;
-+	struct TCP_Server_Info *server;
-+	struct cifs_tcon *tcon;
-+	int rc;
-+
-+	rc = filemap_write_and_wait(inode->i_mapping);
-+	if (is_interrupt_error(rc))
-+		return -ERESTARTSYS;
-+	mapping_set_error(inode->i_mapping, rc);
-+
-+	cfile = find_writable_file(cinode, FIND_WR_FSUID_ONLY);
-+	rc = cifs_file_flush(xid, inode, cfile);
-+	if (!rc) {
-+		if (cfile) {
-+			tcon = tlink_tcon(cfile->tlink);
-+			server = tcon->ses->server;
-+			rc = server->ops->set_file_size(xid, tcon,
-+							cfile, 0, false);
-+		}
-+		if (!rc) {
-+			netfs_resize_file(&cinode->netfs, 0, true);
-+			cifs_setsize(inode, 0);
-+			inode->i_blocks = 0;
-+		}
-+	}
-+	if (cfile)
-+		cifsFileInfo_put(cfile);
-+	return rc;
-+}
-+
- int cifs_open(struct inode *inode, struct file *file)
- 
- {
-@@ -1004,6 +1064,12 @@ int cifs_open(struct inode *inode, struct file *file)
- 			file->f_op = &cifs_file_direct_ops;
- 	}
- 
-+	if (file->f_flags & O_TRUNC) {
-+		rc = cifs_do_truncate(xid, file_dentry(file));
-+		if (rc)
-+			goto out;
-+	}
-+
- 	/* Get the cached handle as SMB2 close is deferred */
- 	if (OPEN_FMODE(file->f_flags) & FMODE_WRITE) {
- 		rc = cifs_get_writable_path(tcon, full_path,
-@@ -2685,13 +2751,10 @@ cifs_get_readable_path(struct cifs_tcon *tcon, const char *name,
- int cifs_strict_fsync(struct file *file, loff_t start, loff_t end,
- 		      int datasync)
- {
--	unsigned int xid;
--	int rc = 0;
--	struct cifs_tcon *tcon;
--	struct TCP_Server_Info *server;
- 	struct cifsFileInfo *smbfile = file->private_data;
- 	struct inode *inode = file_inode(file);
--	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-+	unsigned int xid;
-+	int rc = 0;
- 
- 	rc = file_write_and_wait_range(file, start, end);
- 	if (rc) {
-@@ -2712,26 +2775,7 @@ int cifs_strict_fsync(struct file *file, loff_t start, loff_t end,
- 		}
- 	}
- 
--	tcon = tlink_tcon(smbfile->tlink);
--	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC)) {
--		server = tcon->ses->server;
--		if (server->ops->flush == NULL) {
--			rc = -ENOSYS;
--			goto strict_fsync_exit;
--		}
--
--		if ((OPEN_FMODE(smbfile->f_flags) & FMODE_WRITE) == 0) {
--			smbfile = find_writable_file(CIFS_I(inode), FIND_WR_ANY);
--			if (smbfile) {
--				rc = server->ops->flush(xid, tcon, &smbfile->fid);
--				cifsFileInfo_put(smbfile);
--			} else
--				cifs_dbg(FYI, "ignore fsync for file not open for write\n");
--		} else
--			rc = server->ops->flush(xid, tcon, &smbfile->fid);
--	}
--
--strict_fsync_exit:
-+	rc = cifs_file_flush(xid, inode, smbfile);
- 	free_xid(xid);
- 	return rc;
- }
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 8bb544be401e..ce88bef4e44c 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -3007,28 +3007,24 @@ int cifs_fiemap(struct inode *inode, struct fiemap_extent_info *fei, u64 start,
- 
- void cifs_setsize(struct inode *inode, loff_t offset)
- {
--	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
--
- 	spin_lock(&inode->i_lock);
- 	i_size_write(inode, offset);
- 	spin_unlock(&inode->i_lock);
--
--	/* Cached inode must be refreshed on truncate */
--	cifs_i->time = 0;
-+	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
- 	truncate_pagecache(inode, offset);
- }
- 
--static int
--cifs_set_file_size(struct inode *inode, struct iattr *attrs,
--		   unsigned int xid, const char *full_path, struct dentry *dentry)
-+int cifs_file_set_size(const unsigned int xid, struct dentry *dentry,
-+		       const char *full_path, struct cifsFileInfo *open_file,
-+		       loff_t size)
- {
--	int rc;
--	struct cifsFileInfo *open_file;
--	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
-+	struct inode *inode = d_inode(dentry);
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-+	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
- 	struct tcon_link *tlink = NULL;
- 	struct cifs_tcon *tcon = NULL;
- 	struct TCP_Server_Info *server;
-+	int rc = -EINVAL;
- 
- 	/*
- 	 * To avoid spurious oplock breaks from server, in the case of
-@@ -3039,19 +3035,25 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
- 	 * writebehind data than the SMB timeout for the SetPathInfo
- 	 * request would allow
- 	 */
--	open_file = find_writable_file(cifsInode, FIND_WR_FSUID_ONLY);
--	if (open_file) {
-+	if (open_file && (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE)) {
- 		tcon = tlink_tcon(open_file->tlink);
- 		server = tcon->ses->server;
--		if (server->ops->set_file_size)
--			rc = server->ops->set_file_size(xid, tcon, open_file,
--							attrs->ia_size, false);
--		else
--			rc = -ENOSYS;
--		cifsFileInfo_put(open_file);
--		cifs_dbg(FYI, "SetFSize for attrs rc = %d\n", rc);
--	} else
--		rc = -EINVAL;
-+		rc = server->ops->set_file_size(xid, tcon,
-+						open_file,
-+						size, false);
-+		cifs_dbg(FYI, "%s: set_file_size: rc = %d\n", __func__, rc);
-+	} else {
-+		open_file = find_writable_file(cifsInode, FIND_WR_FSUID_ONLY);
-+		if (open_file) {
-+			tcon = tlink_tcon(open_file->tlink);
-+			server = tcon->ses->server;
-+			rc = server->ops->set_file_size(xid, tcon,
-+							open_file,
-+							size, false);
-+			cifs_dbg(FYI, "%s: set_file_size: rc = %d\n", __func__, rc);
-+			cifsFileInfo_put(open_file);
-+		}
-+	}
- 
- 	if (!rc)
- 		goto set_size_out;
-@@ -3069,20 +3071,15 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
- 	 * valid, writeable file handle for it was found or because there was
- 	 * an error setting it by handle.
- 	 */
--	if (server->ops->set_path_size)
--		rc = server->ops->set_path_size(xid, tcon, full_path,
--						attrs->ia_size, cifs_sb, false, dentry);
--	else
--		rc = -ENOSYS;
--	cifs_dbg(FYI, "SetEOF by path (setattrs) rc = %d\n", rc);
--
--	if (tlink)
--		cifs_put_tlink(tlink);
-+	rc = server->ops->set_path_size(xid, tcon, full_path, size,
-+					cifs_sb, false, dentry);
-+	cifs_dbg(FYI, "%s: SetEOF by path (setattrs) rc = %d\n", __func__, rc);
-+	cifs_put_tlink(tlink);
- 
- set_size_out:
- 	if (rc == 0) {
--		netfs_resize_file(&cifsInode->netfs, attrs->ia_size, true);
--		cifs_setsize(inode, attrs->ia_size);
-+		netfs_resize_file(&cifsInode->netfs, size, true);
-+		cifs_setsize(inode, size);
- 		/*
- 		 * i_blocks is not related to (i_size / i_blksize), but instead
- 		 * 512 byte (2**9) size is required for calculating num blocks.
-@@ -3090,15 +3087,7 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
- 		 * this is best estimate we have for blocks allocated for a file
- 		 * Number of blocks must be rounded up so size 1 is not 0 blocks
- 		 */
--		inode->i_blocks = (512 - 1 + attrs->ia_size) >> 9;
--
--		/*
--		 * The man page of truncate says if the size changed,
--		 * then the st_ctime and st_mtime fields for the file
--		 * are updated.
--		 */
--		attrs->ia_ctime = attrs->ia_mtime = current_time(inode);
--		attrs->ia_valid |= ATTR_CTIME | ATTR_MTIME;
-+		inode->i_blocks = (512 - 1 + size) >> 9;
- 	}
- 
- 	return rc;
-@@ -3118,7 +3107,7 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
- 	struct tcon_link *tlink;
- 	struct cifs_tcon *pTcon;
- 	struct cifs_unix_set_info_args *args = NULL;
--	struct cifsFileInfo *open_file;
-+	struct cifsFileInfo *open_file = NULL;
- 
- 	cifs_dbg(FYI, "setattr_unix on file %pd attrs->ia_valid=0x%x\n",
- 		 direntry, attrs->ia_valid);
-@@ -3132,6 +3121,9 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
- 	if (rc < 0)
- 		goto out;
- 
-+	if (attrs->ia_valid & ATTR_FILE)
-+		open_file = attrs->ia_file->private_data;
-+
- 	full_path = build_path_from_dentry(direntry, page);
- 	if (IS_ERR(full_path)) {
- 		rc = PTR_ERR(full_path);
-@@ -3159,9 +3151,17 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
- 	rc = 0;
- 
- 	if (attrs->ia_valid & ATTR_SIZE) {
--		rc = cifs_set_file_size(inode, attrs, xid, full_path, direntry);
-+		rc = cifs_file_set_size(xid, direntry, full_path,
-+					open_file, attrs->ia_size);
- 		if (rc != 0)
- 			goto out;
-+		/*
-+		 * The man page of truncate says if the size changed,
-+		 * then the st_ctime and st_mtime fields for the file
-+		 * are updated.
-+		 */
-+		attrs->ia_ctime = attrs->ia_mtime = current_time(inode);
-+		attrs->ia_valid |= ATTR_CTIME | ATTR_MTIME;
- 	}
- 
- 	/* skip mode change if it's just for clearing setuid/setgid */
-@@ -3206,14 +3206,24 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
- 		args->ctime = NO_CHANGE_64;
- 
- 	args->device = 0;
--	open_file = find_writable_file(cifsInode, FIND_WR_FSUID_ONLY);
--	if (open_file) {
--		u16 nfid = open_file->fid.netfid;
--		u32 npid = open_file->pid;
-+	rc = -EINVAL;
-+	if (open_file && (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE)) {
- 		pTcon = tlink_tcon(open_file->tlink);
--		rc = CIFSSMBUnixSetFileInfo(xid, pTcon, args, nfid, npid);
--		cifsFileInfo_put(open_file);
-+		rc = CIFSSMBUnixSetFileInfo(xid, pTcon, args,
-+					    open_file->fid.netfid,
-+					    open_file->pid);
- 	} else {
-+		open_file = find_writable_file(cifsInode, FIND_WR_FSUID_ONLY);
-+		if (open_file) {
-+			pTcon = tlink_tcon(open_file->tlink);
-+			rc = CIFSSMBUnixSetFileInfo(xid, pTcon, args,
-+						    open_file->fid.netfid,
-+						    open_file->pid);
-+			cifsFileInfo_put(open_file);
-+		}
-+	}
-+
-+	if (rc) {
- 		tlink = cifs_sb_tlink(cifs_sb);
- 		if (IS_ERR(tlink)) {
- 			rc = PTR_ERR(tlink);
-@@ -3221,8 +3231,8 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
- 		}
- 		pTcon = tlink_tcon(tlink);
- 		rc = CIFSSMBUnixSetPathInfo(xid, pTcon, full_path, args,
--				    cifs_sb->local_nls,
--				    cifs_remap(cifs_sb));
-+					    cifs_sb->local_nls,
-+					    cifs_remap(cifs_sb));
- 		cifs_put_tlink(tlink);
- 	}
- 
-@@ -3264,8 +3274,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
- 	struct inode *inode = d_inode(direntry);
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
--	struct cifsFileInfo *wfile;
--	struct cifs_tcon *tcon;
-+	struct cifsFileInfo *cfile = NULL;
- 	const char *full_path;
- 	void *page = alloc_dentry_path();
- 	int rc = -EACCES;
-@@ -3285,6 +3294,9 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
- 	if (rc < 0)
- 		goto cifs_setattr_exit;
- 
-+	if (attrs->ia_valid & ATTR_FILE)
-+		cfile = attrs->ia_file->private_data;
-+
- 	full_path = build_path_from_dentry(direntry, page);
- 	if (IS_ERR(full_path)) {
- 		rc = PTR_ERR(full_path);
-@@ -3311,25 +3323,24 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
- 
- 	rc = 0;
- 
--	if ((attrs->ia_valid & ATTR_MTIME) &&
--	    !(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC)) {
--		rc = cifs_get_writable_file(cifsInode, FIND_WR_ANY, &wfile);
--		if (!rc) {
--			tcon = tlink_tcon(wfile->tlink);
--			rc = tcon->ses->server->ops->flush(xid, tcon, &wfile->fid);
--			cifsFileInfo_put(wfile);
--			if (rc)
--				goto cifs_setattr_exit;
--		} else if (rc != -EBADF)
-+	if (attrs->ia_valid & ATTR_MTIME) {
-+		rc = cifs_file_flush(xid, inode, cfile);
-+		if (rc)
- 			goto cifs_setattr_exit;
--		else
--			rc = 0;
- 	}
- 
- 	if (attrs->ia_valid & ATTR_SIZE) {
--		rc = cifs_set_file_size(inode, attrs, xid, full_path, direntry);
-+		rc = cifs_file_set_size(xid, direntry, full_path,
-+					cfile, attrs->ia_size);
- 		if (rc != 0)
- 			goto cifs_setattr_exit;
-+		/*
-+		 * The man page of truncate says if the size changed,
-+		 * then the st_ctime and st_mtime fields for the file
-+		 * are updated.
-+		 */
-+		attrs->ia_ctime = attrs->ia_mtime = current_time(inode);
-+		attrs->ia_valid |= ATTR_CTIME | ATTR_MTIME;
- 	}
- 
- 	if (attrs->ia_valid & ATTR_UID)
-@@ -3459,6 +3470,13 @@ cifs_setattr(struct mnt_idmap *idmap, struct dentry *direntry,
- 
- 	if (unlikely(cifs_forced_shutdown(cifs_sb)))
- 		return -EIO;
-+	/*
-+	 * Avoid setting [cm]time with O_TRUNC to prevent the server from
-+	 * disabling automatic timestamp updates as specified in
-+	 * MS-FSA 2.1.4.17.
-+	 */
-+	if (attrs->ia_valid & ATTR_OPEN)
-+		return 0;
- 
- 	do {
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
--- 
-2.51.0
+>   	} else {
+>   		/* read response payload cannot be in both buf and pages */
 
