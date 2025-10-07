@@ -1,43 +1,43 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A24220E31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A19F2CCC0
 	for <linux-cifs@vger.kernel.org>; Tue,  7 Oct 2025 19:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759865017; cv=none; b=BlyeJQ0GMG1KSX/q6lTcmPj1Lk9pfmHG+X2+E/SiRN1sOkP7WXuRk+f/eYiRA5fLf6iY2JXiEau1QuxEQC/ebBBcJupW0eGZQ8xmwCHHNfggBbbGapDplzCmpG3T+rJZ0VV/31lz5cDgfDq3d6eO7r8RGUaT09dfsv//hoYWGyM=
+	t=1759865017; cv=none; b=pF15WyrpWc8Al/ufg6B5Tqr2i8wUcPLL8UkoTU2CQzjKRDdoLc/AtepKDo8VN3arM9NIM3b692U7zGCcetw4MtArhtBmOn+Ig8iSXl0z3qIO3FHOUOdcHV9p9Ly79sP7N97xjVk9pLCRjNyzoYWWc1Ao7UW72/WQDqseDUgl1N0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1759865017; c=relaxed/simple;
-	bh=2QLXb7bNkeWm+V5WTvED4MLjtFTGX16zSXWvrP65CQY=;
+	bh=OATEN0HbmPXY1ygU7EbWPSPvplXNQDNROPuIFe7j3UE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DNgm4rAzgtcX884T5nmQVWYpdfrvHW6sfYa9vlW4GY/6k+S0JcO5fubej3qNWR5gdxhchwHgXWEgWZ9scwGDP14ylf9Ojrwx4Lw43SgpXvBW//USgosPU9AXz0s7UgFO+mUIVzp37ZpzA6Ah9JmIdElFbOJPpcnuiuVjFYUlNy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=O5Prn/oK; arc=none smtp.client-ip=143.255.12.172
+	 MIME-Version; b=WCdJjr0Pq0j9L9p3Ju7H4Mfnlli7H+7lFxAh1AKK/yyLnhlwGKXoQ1CXJncPf1SJncYNJokKntMcRc4dB1UOJedKHek4eddgpKigTt5cU7QLlVIb03UYf1r8D2MCcenR+LUDUIqME/vbV7Jv8OCgv9yAsW8ILWtzRRH924nclJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=cYLvG2xy; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="O5Prn/oK"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="cYLvG2xy"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=psdhGCxRBHsCfXUTdXo1uDDLOpsm6N69q3vYyP2p0io=; b=O5Prn/oKTZ79ODiT7Ue2QylNs4
-	oFWYSastFNiHvxlpGjQ4DV9BUYUhUbdvZAl3zhqHDqRj/8krULW/JuYvh9HpjSTaLrVgklZhTFxyV
-	4giy0Rzr8vg3EU85tCupAI2Wo/k63+HuDVLEuvRobrEtP7OVcayV70B9yIFCSjN1Kbkfzgq9jBrpY
-	RKiWIEaCjOMpXSxdb/CU27ZiAZaYwG6UiGnOlKARdA+fSi9+aGyJk0ocuDY9RpUVXlI1lDV4L0r9Q
-	LKPSusAn2Cdg4/EFKpqWQEVbjh7hGKL9vvWAnQn/9roKkgpBFoNtBrLHr2eGfjfwyVr2JIViL4RHB
-	7IQeeX0g==;
+	bh=a9wSQfwdxHebOZy6nqWvwCngBBA32s552TTHGI3rERw=; b=cYLvG2xy2o4L/03K7QxYjBWsai
+	msq91Zpr48u/FICyeeVbnaKez+LVAK9XE7eYG+v2/T8k0bBK+Bxz5UF1Ep9UFiCVqBDjkxiO4D8J6
+	wicWF3agIZulhY+T9Sq+y405WrDPRei7XgesdQTti9xlYmmYH7uE411YA4XrftPnHDv67rt2NsgYE
+	S+lMRPyLmFL+yKG1cLapjjhLzLfE4dnPoH0jZB0u0py25VT238u9u99ocL9E8BauDEdARFew9fqRT
+	D++zVsEhC9Bjn8dsJOwp1IS8HbR5tBoJ0tldkjQTjRR3N3kRYbwBObz2soNp9sKVBRVXH1SRqBP/G
+	UUmZ/3qA==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1v6DHR-00000000twi-2ZYa;
+	id 1v6DHR-00000000twd-1vA7;
 	Tue, 07 Oct 2025 16:23:26 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: smfrench@gmail.com
 Cc: "Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
 	Frank Sorenson <sorenson@redhat.com>,
+	David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH v3 4/4] smb: client: fix race with fallocate(2) and AIO+DIO
-Date: Tue,  7 Oct 2025 16:23:25 -0300
-Message-ID: <20251007192326.234467-4-pc@manguebit.org>
+Subject: [PATCH v3 3/4] smb: client: fix missing timestamp updates after utime(2)
+Date: Tue,  7 Oct 2025 16:23:24 -0300
+Message-ID: <20251007192326.234467-3-pc@manguebit.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251007192326.234467-1-pc@manguebit.org>
 References: <20251007192326.234467-1-pc@manguebit.org>
@@ -49,179 +49,103 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-AIO+DIO may extend the file size, hence we need to make sure ->i_size
-is stable across the entire fallocate(2) operation, otherwise it would
-become a truncate and then inode size reduced back down when it
-finishes.
+Don't reuse open handle when changing timestamps to prevent the server
+from disabling automatic timestamp updates as per MS-FSA 2.1.4.17.
 
-Fix this by calling netfs_wait_for_outstanding_io() right after
-acquiring ->i_rwsem exclusively in cifs_fallocate() and then guarantee
-a stable ->i_size across fallocate(2).
+---8<---
+import os
+import time
 
-Also call netfs_wait_for_outstanding_io() after truncating pagecache
-to avoid any potential races with writeback.
+filename = '/mnt/foo'
 
+def print_stat(prefix):
+    st = os.stat(filename)
+    print(prefix, ': ', time.ctime(st.st_atime), time.ctime(st.st_ctime))
+
+fd = os.open(filename, os.O_CREAT|os.O_TRUNC|os.O_WRONLY, 0o644)
+print_stat('old')
+os.utime(fd, None)
+time.sleep(2)
+os.write(fd, b'foo')
+os.close(fd)
+time.sleep(2)
+print_stat('new')
+---8<---
+
+Before patch:
+
+$ mount.cifs //srv/share /mnt -o ...
+$ python3 run.py
+old :  Fri Oct  3 14:01:21 2025 Fri Oct  3 14:01:21 2025
+new :  Fri Oct  3 14:01:21 2025 Fri Oct  3 14:01:21 2025
+
+After patch:
+
+$ mount.cifs //srv/share /mnt -o ...
+$ python3 run.py
+old :  Fri Oct  3 17:03:34 2025 Fri Oct  3 17:03:34 2025
+new :  Fri Oct  3 17:03:36 2025 Fri Oct  3 17:03:36 2025
+
+Fixes: b6f2a0f89d7e ("cifs: for compound requests, use open handle if possible")
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Reviewed-by: David Howells <dhowells@redhat.com>
 Cc: Frank Sorenson <sorenson@redhat.com>
+Cc: David Howells <dhowells@redhat.com>
 Cc: linux-cifs@vger.kernel.org
 ---
- fs/smb/client/cifsfs.c  | 22 +++++++++++++++++++---
- fs/smb/client/inode.c   |  1 +
- fs/smb/client/smb2ops.c | 18 ++++++------------
- 3 files changed, 26 insertions(+), 15 deletions(-)
+ fs/smb/client/smb2inode.c | 32 +++++++++++++++++---------------
+ 1 file changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 1775c2b7528f..05b1fa76e8cc 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -392,11 +392,27 @@ static long cifs_fallocate(struct file *file, int mode, loff_t off, loff_t len)
- 	struct cifs_sb_info *cifs_sb = CIFS_FILE_SB(file);
- 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
- 	struct TCP_Server_Info *server = tcon->ses->server;
-+	struct inode *inode = file_inode(file);
-+	int rc;
- 
--	if (server->ops->fallocate)
--		return server->ops->fallocate(file, tcon, mode, off, len);
-+	if (!server->ops->fallocate)
-+		return -EOPNOTSUPP;
- 
--	return -EOPNOTSUPP;
-+	rc = inode_lock_killable(inode);
-+	if (rc)
-+		return rc;
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index 0985db9f86e5..e441fa2e7689 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -1382,31 +1382,33 @@ int
+ smb2_set_file_info(struct inode *inode, const char *full_path,
+ 		   FILE_BASIC_INFO *buf, const unsigned int xid)
+ {
+-	struct cifs_open_parms oparms;
+-	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+-	struct tcon_link *tlink;
+-	struct cifs_tcon *tcon;
+-	struct cifsFileInfo *cfile;
+ 	struct kvec in_iov = { .iov_base = buf, .iov_len = sizeof(*buf), };
+-	int rc;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++	struct cifsFileInfo *cfile = NULL;
++	struct cifs_open_parms oparms;
++	struct tcon_link *tlink;
++	struct cifs_tcon *tcon;
++	int rc = 0;
 +
-+	netfs_wait_for_outstanding_io(inode);
-+
-+	rc = file_modified(file);
-+	if (rc)
-+		goto out_unlock;
-+
-+	rc = server->ops->fallocate(file, tcon, mode, off, len);
-+
-+out_unlock:
-+	inode_unlock(inode);
-+	return rc;
- }
++	tlink = cifs_sb_tlink(cifs_sb);
++	if (IS_ERR(tlink))
++		return PTR_ERR(tlink);
++	tcon = tlink_tcon(tlink);
  
- static int cifs_permission(struct mnt_idmap *idmap,
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index fbfd5b556815..239dd84a336f 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -3012,6 +3012,7 @@ void cifs_setsize(struct inode *inode, loff_t offset)
- 	spin_unlock(&inode->i_lock);
- 	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
- 	truncate_pagecache(inode, offset);
-+	netfs_wait_for_outstanding_io(inode);
- }
+ 	if ((buf->CreationTime == 0) && (buf->LastAccessTime == 0) &&
+-	    (buf->LastWriteTime == 0) && (buf->ChangeTime == 0) &&
+-	    (buf->Attributes == 0))
+-		return 0; /* would be a no op, no sense sending this */
++	    (buf->LastWriteTime == 0) && (buf->ChangeTime == 0)) {
++		if (buf->Attributes == 0)
++			goto out; /* would be a no op, no sense sending this */
++		cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
++	}
  
- int cifs_file_set_size(const unsigned int xid, struct dentry *dentry,
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 80114292e2c9..6226dc787860 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -3367,7 +3367,6 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	trace_smb3_zero_enter(xid, cfile->fid.persistent_fid, tcon->tid,
- 			      ses->Suid, offset, len);
- 
--	inode_lock(inode);
- 	filemap_invalidate_lock(inode->i_mapping);
- 
- 	i_size = i_size_read(inode);
-@@ -3385,6 +3384,7 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	 * first, otherwise the data may be inconsistent with the server.
- 	 */
- 	truncate_pagecache_range(inode, offset, offset + len - 1);
-+	netfs_wait_for_outstanding_io(inode);
- 
- 	/* if file not oplocked can't be sure whether asking to extend size */
- 	rc = -EOPNOTSUPP;
-@@ -3413,7 +3413,6 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 
-  zero_range_exit:
- 	filemap_invalidate_unlock(inode->i_mapping);
--	inode_unlock(inode);
- 	free_xid(xid);
- 	if (rc)
- 		trace_smb3_zero_err(xid, cfile->fid.persistent_fid, tcon->tid,
-@@ -3437,7 +3436,6 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
- 
- 	xid = get_xid();
- 
--	inode_lock(inode);
- 	/* Need to make file sparse, if not already, before freeing range. */
- 	/* Consider adding equivalent for compressed since it could also work */
- 	if (!smb2_set_sparse(xid, tcon, cfile, inode, set_sparse)) {
-@@ -3451,6 +3449,7 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
- 	 * caches first, otherwise the data may be inconsistent with the server.
- 	 */
- 	truncate_pagecache_range(inode, offset, offset + len - 1);
-+	netfs_wait_for_outstanding_io(inode);
- 
- 	cifs_dbg(FYI, "Offset %lld len %lld\n", offset, len);
- 
-@@ -3485,7 +3484,6 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
- unlock:
- 	filemap_invalidate_unlock(inode->i_mapping);
- out:
--	inode_unlock(inode);
- 	free_xid(xid);
- 	return rc;
- }
-@@ -3749,8 +3747,6 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
- 
- 	xid = get_xid();
- 
--	inode_lock(inode);
+-	tlink = cifs_sb_tlink(cifs_sb);
+-	if (IS_ERR(tlink))
+-		return PTR_ERR(tlink);
+-	tcon = tlink_tcon(tlink);
 -
- 	old_eof = i_size_read(inode);
- 	if ((off >= old_eof) ||
- 	    off + len >= old_eof) {
-@@ -3765,6 +3761,7 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
- 
- 	truncate_pagecache_range(inode, off, old_eof);
- 	ictx->zero_point = old_eof;
-+	netfs_wait_for_outstanding_io(inode);
- 
- 	rc = smb2_copychunk_range(xid, cfile, cfile, off + len,
- 				  old_eof - off - len, off);
-@@ -3785,8 +3782,7 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
- 	fscache_resize_cookie(cifs_inode_cookie(inode), new_eof);
- out_2:
- 	filemap_invalidate_unlock(inode->i_mapping);
-- out:
--	inode_unlock(inode);
+-	cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
+ 	oparms = CIFS_OPARMS(cifs_sb, tcon, full_path, FILE_WRITE_ATTRIBUTES,
+ 			     FILE_OPEN, 0, ACL_NO_MODE);
+ 	rc = smb2_compound_op(xid, tcon, cifs_sb,
+ 			      full_path, &oparms, &in_iov,
+ 			      &(int){SMB2_OP_SET_INFO}, 1,
+ 			      cfile, NULL, NULL, NULL);
 +out:
- 	free_xid(xid);
- 	return rc;
- }
-@@ -3803,8 +3799,6 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
- 
- 	xid = get_xid();
- 
--	inode_lock(inode);
--
- 	old_eof = i_size_read(inode);
- 	if (off >= old_eof) {
- 		rc = -EINVAL;
-@@ -3819,6 +3813,7 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
- 	if (rc < 0)
- 		goto out_2;
- 	truncate_pagecache_range(inode, off, old_eof);
-+	netfs_wait_for_outstanding_io(inode);
- 
- 	rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
- 			  cfile->fid.volatile_fid, cfile->pid, new_eof);
-@@ -3841,8 +3836,7 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
- 	rc = 0;
- out_2:
- 	filemap_invalidate_unlock(inode->i_mapping);
-- out:
--	inode_unlock(inode);
-+out:
- 	free_xid(xid);
+ 	cifs_put_tlink(tlink);
  	return rc;
  }
 -- 
