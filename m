@@ -1,156 +1,120 @@
-Received: from mout.web.de (mout.web.de [217.72.192.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0835A1F9F70;
-	Wed,  8 Oct 2025 21:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C0EDF6C
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Oct 2025 00:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759957230; cv=none; b=IusmwSw/McZ1J2eyZAMYeYljwDpcGGW7VFT2D/zU/7I8mBSZ75sA6ZfEDUSHt1KJIrUQiWimtjp0ZoT74Q44WmnjijcZ/necdmKB5+F6IAq+dj9c5PSipSWswKySHlFcABeuhICpCxqhVSlANwgeYVgUMztwi49JVc3HVZWcP/s=
+	t=1759968759; cv=none; b=pf24YFGcx7E3pUrUD7zXvR6bjhAbpl1bz90TbH23rjlh+mrEXhL6OnQBH52aPgqjOXbY4ac0VflC7CVJV9UizS1H33mNW+38U9SrKiMkWL4wooXk7kTOrHhm83a7LkbneV1kKL7YcOtNAl2Jb0dMWeLqU3bUK6IOARGJModfuXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759957230; c=relaxed/simple;
-	bh=e87bG8v1WTGxac/uoC3grZQJr0znPQJvQ8t4+oDeR/s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=snAAmwS4+i4p1T/5u8qIHksUleYpuEXqmUZqxJdNQsTOoTYXFnTQZyALywp8dv8Ku61cuXzUiQTXmijR42krypPYIew5bxv0t3HlucxOtfKRo6c5nbDPxwI1auMY4PALNspE/V+N0g1COI9Xuosuq9QgCQYhDhV5UGSsOMdnLp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=f+Imn/Rv; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1759968759; c=relaxed/simple;
+	bh=Z0JF/h8mBUCqcPAR13Gn4OPXCm3qaHZYWJB6uhLvJtA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rqSCf7vidsg7ULFIfbaAG+c6tlG6O5/yzVRYAJwQ+ke7TGZ4VufScdR4k9ATiJtDXkUJvEMOWy6w13TtlmkPL58XPxGci+L2OUfNq53r+zQyZunD8UYNf9nqaOeR7YOAqyutSIeUmfbElU8mG2O74NcpRl1xx0c5u0Ck2YWWp+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DLDVNUOk; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="f+Imn/Rv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1759957214; x=1760562014; i=markus.elfring@web.de;
-	bh=e87bG8v1WTGxac/uoC3grZQJr0znPQJvQ8t4+oDeR/s=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=f+Imn/Rv8YQq2xk4Cr8A6zTloWNdrlLRNiwStshmxfo6h1Wq0ji4meoC3UQrvlDF
-	 rtAvlm/dDZfd98++7uNyvZtagd4RDJpWOPkUWZ0wVpiyjgm0qjJ/TaHpQcX1slTxy
-	 NKzbqslHlJtd9SRQ04CqUMDG4fWZhxZu/5dHWLZ8N0p4Af/NUmlYJ0ORLh991nbc6
-	 Ki44gq0YRle+hyx2KFpUtMmQFN6plkJJIizHDMpbWxZanq5y0TnjssU2FHmnzdlBL
-	 mwtcAfSOswHqQNhitdwAROK9b52mKGCvyf8mRnWzuUOIbvivZxawrWiRy+fDGJBZT
-	 owXDUSGdrLfTWxgwLQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.92.249]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MnX5T-1uNgD50Y4b-00Zf5R; Wed, 08
- Oct 2025 23:00:14 +0200
-Message-ID: <99546145-8c6a-4e26-a787-b5c9bb0b8613@web.de>
-Date: Wed, 8 Oct 2025 23:00:12 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DLDVNUOk"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4e06163d9e9so3146191cf.3
+        for <linux-cifs@vger.kernel.org>; Wed, 08 Oct 2025 17:12:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759968756; x=1760573556; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iLOs0m+C5vy8eU1JuQcMkicCaJKpraCdPB1zIalrqqQ=;
+        b=DLDVNUOkky4k1sok6w7IfZN1sYj1GMmOaLvooxszPDdZn8YxmOwoNqgnOjAiH4AQ+2
+         0Gg0nnLNt90ImTl0WeO7iuuVQnxwXl3pAnbusMS9TxlfPhILRqRqLBFGhCjxLiJ11mou
+         9gWxK/JMEcxZK2qysIR8oB5yB/CRC0QfPkzvRD+X4pyUEJR4b0SIEctQRUME+mVZ2Ocz
+         /hReImJNenpbKGAlmv5KOvkWsARcHHS+AFkIw+tiZoppOcFoieVtFTzHwB83Tq2Z2vib
+         PCuG8RpKWOjfwl5mJho2MlY/9XMfRFAPMI8TX56OQQgfg8S5hdKQwWIiMZRTdUiQjLBa
+         48Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759968756; x=1760573556;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iLOs0m+C5vy8eU1JuQcMkicCaJKpraCdPB1zIalrqqQ=;
+        b=i6CZzWX6980GMeEaNTDHPcePKqq0v43GQjq46iJJUpnOkY+GTnZsNkNoSbJwhrDUTz
+         7+5LauBh8XAPknq92ZDOUiRr2IF4euefjG3mFKIW34I0zN7pq31ucih103m52aA2Jjy9
+         rNvxwg/KP788zrVkpmuFPTIa7YY7/0+a8vZT+TzVlAQIY0rxYpMYf4M01ddAbzY6H0t1
+         s6z3m4CBxA7dDRToMzj0WHidcL9JCFwD5UnYn+x69Mhf6F5Jheb+ryQFNISyJs/SMnNh
+         bi7MtvZBDXXfLjxb6lgfRbChx8dCPDvd1meqJyldrcG0UTATLmxurPJN6jSvgsIoRY4C
+         uPhQ==
+X-Gm-Message-State: AOJu0YwELJjAd7TMzAEajVJPyr2WcIsdoXWFndKGQZOKapA9KgqgTCcM
+	bLUR8TfW1cd+3sjHBm85Lft2j4ngJSiq+m5rq8/t7+ywBYmIzZL2A35UF4sRCGKUMtQAlbGdI8v
+	4+AVnjINLrvZqPVpF/efaEF/kjI6OzGg=
+X-Gm-Gg: ASbGncvVDDZHaof7Oz3FcAGWZPVwx6jg2lLxIHJYyF1+quvQYzEz2t0m7EdnV+JZDOx
+	pktldZLPvmK0ZNlvP99rY1SVAAGvLuBgelVoDsvZjD8SYtw2Io56SZxn8me8lXnHFcRxMoway7F
+	Vj1l3f4KH7w06rTH5lFlZmxqxWSiyU3DnVsYSXjY3tkTvod+qqjzKgvMcxK8T3/9zDAypMqWENK
+	GzKvrq3F3SZ3aZuK+h/w0gvVB7RwqkKZUgaz3DxHA4zN5AKxAYTLLIXGDMAGKThv+S5TDKa1u4p
+	Ku/RBs946ybO0VBSIb3MSpAdiEZQvAmXNyWF4OqPaV1LkQEjtril2DQwOok1oCx7AaUEzxo+p0e
+	tQopFxlBHo2ShWdmOtr5qOXkayRf4fjOD0pzWFY/uB2gmQQ==
+X-Google-Smtp-Source: AGHT+IGTMJxEUzyjJOaL0+NNwHEI9UfsX87q17OQxRmhejzUvwBxmkwB9k17auDXhJE1cMaLG7jkj1CnKy1ELrzjvrA=
+X-Received: by 2002:a05:622a:6a42:b0:4e6:ee71:ee96 with SMTP id
+ d75a77b69052e-4e6ee71f26cmr35134331cf.25.1759968756008; Wed, 08 Oct 2025
+ 17:12:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] smb: client: Move an error code assignment in
- smb3_init_transform_rq()
-To: Steve French <smfrench@gmail.com>,
- Henrique Carvalho <henrique.carvalho@suse.com>, linux-cifs@vger.kernel.org,
- samba-technical <samba-technical@lists.samba.org>,
- Bharath SM <bharathsm@microsoft.com>, Paulo Alcantara <pc@manguebit.org>,
- Pavel Shilovsky <pshilov@microsoft.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Steve French <sfrench@samba.org>,
- Tom Talpey <tom@talpey.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
- kernel-janitors <kernel-janitors@vger.kernel.org>
-References: <02627021-da2f-41f8-9ea7-fd2da96e0503@web.de>
- <5bd37df6-1743-4b9c-a83a-a811e221489b@suse.com>
- <CAH2r5msZjL_krwN-nd1Ly3skxAHK9srJehPJ_vYXPLRFXpJ_yw@mail.gmail.com>
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <CAH2r5msZjL_krwN-nd1Ly3skxAHK9srJehPJ_vYXPLRFXpJ_yw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+References: <5b95806a-e72e-4d05-9db8-104be645e6e5@web.de>
+In-Reply-To: <5b95806a-e72e-4d05-9db8-104be645e6e5@web.de>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 8 Oct 2025 19:12:24 -0500
+X-Gm-Features: AS18NWBDO6yK69iSBzCC-3F6icpJXqhtpmdffwn6wWQE7dyQKytMaHCk49ryAxs
+Message-ID: <CAH2r5mtrT7m71i2928akVarmQ0FTKzaEOu2q4781U8a-_w__ZA@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: Simplify a return statement in get_smb2_acl_by_path()
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Bharath SM <bharathsm@microsoft.com>, Paulo Alcantara <pc@manguebit.org>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Steve French <sfrench@samba.org>, Tom Talpey <tom@talpey.com>, LKML <linux-kernel@vger.kernel.org>, 
+	kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:wesrHUFO7r9xF7dBDhSH6eNe1qWVlWEHS55pVwO8vpIlgLhaWa5
- ifQADtK0lKhrni0DiJFtCUVtmLNQJ8k39BMaqKMMNXyDFa7U5/aIPrTA8OJJGzLJWwPBMaL
- QKEyvBBMIrrvydwew+LNHbvmzVMLENm4CycRzZGGqevvUBc0pMXQLPWHM00axvViu0Nodo0
- R0PKPEVeQhciXn6yyejHQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:ysYbaSs7CKM=;w4vDVf+I30nAnB2sh50cVxev/6L
- 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
 
-> Also when a patch doesn't shrink code, but even grows it by one line, an=
-d doesn't make it much clearer, it is probably not worth changing (it comp=
-licates future backports of real fixes in the future eg). Let's limit thes=
-e to those that shrink code and make code clearer (or ideally fix potentia=
-l bugs)
+merged into cifs-2.6.git for-next
 
-Do you insist to keep an extra initialisation for the local variable =E2=
-=80=9Crc=E2=80=9D
-despite of the implementation detail that the value =E2=80=9C-ENOMEM=E2=80=
-=9D is needed
-only for a single if branch here?
+On Wed, Oct 8, 2025 at 3:02=E2=80=AFPM Markus Elfring <Markus.Elfring@web.d=
+e> wrote:
+>
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Wed, 8 Oct 2025 21:56:34 +0200
+>
+> Return an error pointer without referencing another local variable
+> in an if branch of this function implementation.
+>
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> ---
+>  fs/smb/client/smb2ops.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+> index 7c3e96260fd4..bb5eda032aa4 100644
+> --- a/fs/smb/client/smb2ops.c
+> +++ b/fs/smb/client/smb2ops.c
+> @@ -3216,9 +3216,8 @@ get_smb2_acl_by_path(struct cifs_sb_info *cifs_sb,
+>
+>         utf16_path =3D cifs_convert_path_to_utf16(path, cifs_sb);
+>         if (!utf16_path) {
+> -               rc =3D -ENOMEM;
+>                 free_xid(xid);
+> -               return ERR_PTR(rc);
+> +               return ERR_PTR(-ENOMEM);
+>         }
+>
+>         oparms =3D (struct cifs_open_parms) {
+> --
+> 2.51.0
+>
+>
 
-Regards,
-Markus
+
+--=20
+Thanks,
+
+Steve
