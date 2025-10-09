@@ -1,160 +1,306 @@
-Received: from mout.web.de (mout.web.de [212.227.15.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f98.google.com (mail-qv1-f98.google.com [209.85.219.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B9920330;
-	Thu,  9 Oct 2025 05:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAF91FFC48
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Oct 2025 06:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759987111; cv=none; b=nV9fNZ0O1PLU1ZSralYtdClJaE7eA+b/QwEpImap6JcYVKtdmvXG7hlBdNwOLYBHPu/XTWlYc6Wif6O1kOngZOsn7YHaFCUsxLbl7se1hOQiWEUg+kwo/+7Uj+kn9zUU18KdrjuiyBq/KzHQTKAV1+zqflHt2BsNsLXmP7CTurE=
+	t=1759991114; cv=none; b=eb2V0mWfUasV9WDk1BqOkQQtNDhIHaTIO5XOdRCcSu1SuuV9Wz4aCu1jlNVWcjc0mtT72RTTKUbqHI2LSQh3Ewb274eiusUJbZmMa8BCEmRP6Xw4BjcmqJeFDMzyXdWrHiPHNnSNr88uwKRvbqpcQCOiydcIU5Qn41U9q2YZgps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759987111; c=relaxed/simple;
-	bh=kYqCIQV33Ty9A5jvaxvSullPFtVpWx4KRxQoFomNZLM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a7Fit9y1pToDPy+FZjE7q2pFIF5nllLC3HS4qX3qOgaKbseNzGHuyYtnHRiFQkY9M0SiAYSBQjNZ0J+Mm2lLqCNPr2bOWx3NcEcNBi5nZlDcWmN+4UXZPMmz7pGgxte4sNabrha1EpAZtyG2BkzFBP0RiMKvcnWQ+9aQhcVVlRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Xdh9KDyd; arc=none smtp.client-ip=212.227.15.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1759991114; c=relaxed/simple;
+	bh=+J+9CQSJvXmIuePph7LZKBSTQUJaQDgSX95H7QjCjvA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pdttX/MkWgbD6YLbhKK7lcXiIQqw1yOrlr5c9jlWZJODqoo4+ySZLR7IYDOf+GNv31kLAlnHRiGorcIQAgAddola9XmSI9giqOch7bwUIPcm+Zz7xVXFBumu3rlNoDKnxnBA1KhTxSd3dDRWxDcXkDto8oCxrjlM1OGcDi8uLRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=B09IWro2; arc=none smtp.client-ip=209.85.219.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Xdh9KDyd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1759987073; x=1760591873; i=markus.elfring@web.de;
-	bh=kYqCIQV33Ty9A5jvaxvSullPFtVpWx4KRxQoFomNZLM=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=Xdh9KDydFS4lBw1B1g0L51K61rDahpE9CtTBZKGTrvIqpDdklZeYwwNVxFmMbX08
-	 sGPJ80BV7oE//H3+78PrP9b7DxAzvdwO9olR6UbwghsxOz1RLBN40BEjh/NAqXyN2
-	 expMPqYS7YwQpBVQSmp540lXOfLFwd3bQ5Fq/PA5aYkbFf/5bpbqQ72IpD7tNOU+P
-	 ugSLMp+iGk5JbR9UtsQM9L4GVBsxF+c/megPDNy075az0Q52UcUKOt4Ix2FJC06SD
-	 zxr3n6S3FVEhQLHblKPp/MsAX+qDa7wQs1Ag1ZVK8YfEcO5Mx2B13O8rwHGDG0ijT
-	 Y4Od0n+PAVm1T7uFvw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.92.255]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MgRQJ-1ucMVK0z6t-00hfX6; Thu, 09
- Oct 2025 07:17:53 +0200
-Message-ID: <bc8f02de-0cd5-475d-bb19-e44e202f7a58@web.de>
-Date: Thu, 9 Oct 2025 07:17:40 +0200
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="B09IWro2"
+Received: by mail-qv1-f98.google.com with SMTP id 6a1803df08f44-78f58f4230cso5087686d6.1
+        for <linux-cifs@vger.kernel.org>; Wed, 08 Oct 2025 23:25:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759991111; x=1760595911;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bS+vJs2offx96KKff6hwDdiXDpHtb7AICfG+1qxivmI=;
+        b=gNZwTezvHhquYYVA0lBtCx5Dpwpo0flCxcmtNEHUOxUjtNbSU31xG9Ow9QbRkrKONz
+         T2rlEDQjeHk5TBeXmoMVYf3YrEKGsR1mBKJqBGAGWVqjCJbmrkxPTjNPICOTHLdKE3a0
+         HJnnHX4325tQdDbT9P9bv2km43DmfC8e5Atz/TG9EcSefTSYWYSSrRlteZf+e1308PfP
+         pBGXwdmHzA3yIb3BEMoWjlQvseShrvGjIqJiXZ4GfdGWhplDyuCGFdWtAyi/zeN8N1Zx
+         7+zb5kYoCxpCDOLyHxE49XsuGP6zVOEkQN5ecIiSNF716SjVsZ4F3EIaFElJ472/B4J6
+         MjyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW4Zc6ay+PxHvX8/Fgec+x3VHSl8TQZJhaJsxAGFG+RYuN+VK2GJB9n1Xfym3BRssylkA/MmE4Lllv3@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTBWglXDtnZDnpfBXue9fVQLGUVLf50E9r13mMnX3otBu8l7sP
+	HuLXFrDm5OEy1inFA0uXJ4ECJmoZrkDnZz5GINQemv0hKmYUDUfC+n9/7RYX7GrRUhnwC5SJL5k
+	OZz9L2RA4GW7q7YIs6cHbrYWWvOu8hDPIHY2Zg3eT6yt+y0jvTBR0nFBGUCw5gc59RpIhU7nKzN
+	6kXYuTKHNWQBStYA+5+qKewWXqpdk3c1PivuLuRmsaIovGZYlClvDwfPPR9ECdIJhh+ETTgyF21
+	dyaDWZ6Bk5nqEYPN5vb0ho=
+X-Gm-Gg: ASbGncvoygJ+cAY/vH8bfSHXbOk6d8wGgHtli9oDhQECOUgd4Ki4q+EHOdmjkgfv0ev
+	+yBfP2hjV5+mVvef1FiayIxaCR6oxFKQqPzzveMHMNpsqz2WUsH687Gz6PViKBDWFGq4GX+6pVX
+	f7fmdR7GMmwmX2tCVvShDCrgvT/s95cJgUUeoFGq1JH1q94BLwNMov5lSUx6yIzBBIACK9svABU
+	95zY8YRJh9/CbbmRPuW9V+Momc/+NkgJQTEzH6xu4szBmQ9UXR9SWq3ZOFK4779G5yRvS19Afl1
+	uf0vNuEfMRlvDM3emmTtBMx8CzDuDW9hmsIJTBdCxz4BRO68Cs7RhjAQsIBJX3E1Vv/hcY7k0KP
+	OEvXEF4cuu7F4nt7XyXfvek9fSR6eOLiu4CSFDm/sXpqmA8rhBH9Ndvu5iPPtQVw+BfOTxZJEms
+	R0S2mCrjbed4Q=
+X-Google-Smtp-Source: AGHT+IFoM7NVGnEEJayQrm7QosJ7F2GW4LPqVq8cG3qxTB7TbtmbXSnv+EiSn2HrLlIZmaHdB0fD/fTwISC4
+X-Received: by 2002:a05:6214:76d:b0:81c:6455:ec77 with SMTP id 6a1803df08f44-87b2efb9b08mr75244796d6.40.1759991111535;
+        Wed, 08 Oct 2025 23:25:11 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-878be04c74asm18067566d6.28.2025.10.08.23.25.11
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 08 Oct 2025 23:25:11 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-828bd08624aso219102985a.1
+        for <linux-cifs@vger.kernel.org>; Wed, 08 Oct 2025 23:25:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1759991110; x=1760595910; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bS+vJs2offx96KKff6hwDdiXDpHtb7AICfG+1qxivmI=;
+        b=B09IWro2M/rBm7Kwi5qYHfrmWk+uPl145ZU15FFVpV5lZorusB8IZ3i56ogn/o70Z7
+         vMU7bP+fK5cZzWNkSk89OrnVIdXHioA5S6wHIFwTDQR11/OCPxXR6htXoQDZcFHm+qeG
+         WVS/K+lyvI2RHdIA109z4saWl2YezCf8mTFlM=
+X-Forwarded-Encrypted: i=1; AJvYcCWab16f2ryTmuhWlySCl8sPvAJWSJK+AhYBs6hpY3E8rYNhXxhhdzMHZu7WBhF/Pz0kk4OJBjFI240q@vger.kernel.org
+X-Received: by 2002:a05:620a:4016:b0:862:75e0:76e8 with SMTP id af79cd13be357-883535590bdmr909461185a.42.1759991110351;
+        Wed, 08 Oct 2025 23:25:10 -0700 (PDT)
+X-Received: by 2002:a05:620a:4016:b0:862:75e0:76e8 with SMTP id af79cd13be357-883535590bdmr909458885a.42.1759991109866;
+        Wed, 08 Oct 2025 23:25:09 -0700 (PDT)
+Received: from shivania.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-884a274d0fcsm136973085a.55.2025.10.08.23.25.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Oct 2025 23:25:08 -0700 (PDT)
+From: Shivani Agarwal <shivani.agarwal@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: bcm-kernel-feedback-list@broadcom.com,
+	linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	tapas.kundu@broadcom.com,
+	sfrench@samba.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Paul Aurich <paul@darkrain42.org>,
+	Steve French <stfrench@microsoft.com>,
+	Cliff Liu <donghua.liu@windriver.com>,
+	He Zhe <Zhe.He@windriver.com>,
+	Shivani Agarwal <shivani.agarwal@broadcom.com>
+Subject: [PATCH v6.1] smb: prevent use-after-free due to open_cached_dir error paths
+Date: Wed,  8 Oct 2025 23:08:46 -0700
+Message-Id: <20251009060846.351250-1-shivani.agarwal@broadcom.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: smb: client: Simplify a return statement in
- get_smb2_acl_by_path()
-To: Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org,
- samba-technical <samba-technical@lists.samba.org>,
- Bharath SM <bharathsm@microsoft.com>, Paulo Alcantara <pc@manguebit.org>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>
-Cc: Steve French <sfrench@samba.org>, LKML <linux-kernel@vger.kernel.org>,
- kernel-janitors@vger.kernel.org
-References: <5b95806a-e72e-4d05-9db8-104be645e6e5@web.de>
- <CAH2r5mtpoLscs9sodXcRMO3-dqMDBSTR+ncExdqy4dQR=4uE8A@mail.gmail.com>
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <CAH2r5mtpoLscs9sodXcRMO3-dqMDBSTR+ncExdqy4dQR=4uE8A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:aK6u5vY3rfsU/U3U6mny2nsDgSwSi98VQpQWc40Km2mADSr2n8A
- V2IetDSFNiAsFxmU4yw16p48+bdwpLkV1ZTFWsD2uO3CF5fovg3vAUzKHpx3CAUONoWvorD
- 7n8xZAxM6ylWZeVICTMstyyXWpS2sO44kEq3gteInwqMm4DBLqPHKUWt2p5cVDFgbHut/Bx
- WC6Z2dsweXpwvaTRjXtwQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:hUW4gf7FZ+s=;yyoLG+GLsIVyA067XSKuoec055/
- Opcg1LnhByl+eyFGtFdgvSp5+V6vKavUAz5JtqMSGqiKivYnM0CD36jFrcZuuhjVKAYQZ9Wn8
- 2PABaVKbu2u5LEwcaiES+Z9VqrDWgnNmfhgt1Iu501n5e0e9lJZ+vlASbe3VctUXBD2kh8J4x
- LuKOzQ8oyV0NocHB/q1v1bJ+TQwSDb/iyPDpKGM2qd6K+Ii4ME/wHcr8vifdY7fE/b1TpEfSs
- ZPcsINIa1MMJA+UJynOG+p0FvKmCKrURmyIgdFyiv/LyvuauiD8/6dUIoekprVlVCggcVFsYd
- hEy7ItcMEVqjxRA60DmiUwtSsPufLUvzxiW5WfOC/e2YW6yeyOTNMM+ma/LMHDhF6kLir8TGa
- J8M6G6MvedE99keqzgA8BuNtLMo1Ljk8zaOK+IBstBZVzSn3YhFk6mvi/YPOHfZdfMGXc5ssq
- 1+BG49h7sGB5W2icpGvOHb7geDwVfl4tckV8xBwy/z6MxvarwSzlpb57r6bmdB5aXXiB2uewC
- TpyKHGQdos+s1o9fOHSzhZ+NBfMV7EwaaS18FQaPDEp7el0rszFlGNRsSUMXEem3EQhz4NkIH
- lJPuqjMhXj1Ty4wRuoEluO4+FQ5WCx+yqnc13ZLJgiyP9/uNJPkMNnIFG8D+VsdKrsmCEEQGD
- +BsehMjs/HcgL0/q4EINsO1DPbndre6TpF87FVct95RiPdr6J/Itvnh0QnRGctnCf8g9S1Pc+
- NoIrWuQzJrXQZNrDX5TQDd6ETH1nUP40jMA7XaM9tKHrMZa42U8Vn8MSBfbkeLNefEss5Ac2z
- hdtoYFIOJrlc/m5cxmk7yIRGglKogVuowcdQ8ETCxamLV3ZGqo1kGZEtoKzEdp32iQVE694pb
- zPHDsL9g23gdyRXPanCGXriQcbk5JignO38dGudFe4OhRN6R36xuP6XZiq77B9JcZ1lyXMIBI
- 1GcbHgq3X1acgh0j76kBGWkSMkgj6Nl3JQFVzjAOhO2IaefMmMrQGrRvl9SrZAhWWVc8h4Ka+
- LqtEIQ8OSa1/4SXHgsM+jOcZfU2wsSyp2aOy43JX6PMfjuWvgD6CIfMsUS3RepvklOjZGSDlA
- mMIXYpsjy6b2wMTy+K63WDmlo9ssswtSIhc43IHLFohV9O86Q1sVy2CbVylsz1gE7iamBGgcq
- l2+9vNrUU+Br00L1u0BxTHk8eu4T+6J4h0fWo5fFbm30WNOczFzgm6Vqf3fKJa8n8MBarN9xn
- cQ+c6QhLTX+3KSv077llVNVa1aPnmDg3kHRY7T0ZsrSjXM/d0p7FVqQxhaoqdeowJxY50yhzY
- ZcnpsDm3xzwuRabRFLDYXQAVGQ7EAMCz97fpmbZUm7znwt5RHbAoTbM6HvRHBV4NUZJgyO1Tt
- 1eU2em6nDoWtlX66x7MmhDLXlZR89HlpikQ1lV74twofp5UckLHOEn9w9KeKqpJtRY3wU07zH
- nEBERORx+n5V2PSf23rouDr9aQLQvnFhwjGv2Bgly75xapUA2BjOem0GD8nGLGEUbHQuLC406
- +UwbVr1F2Wkokx7fo/Ruz3UF+dgw2qW/U59TTr2LTpK4KMH4F/xVNHkf4kopJZbIZRyXLEksz
- D4rc4GHKY5ySOrrSkDNJOqzDxwCOzxNx2hlIW0JS8m1xpw3LFna0VFf50DKdAOH0OLSfEFMnI
- 7HtcQWnVeH/n810xwiyCbLaA2THwCj2rDOsYwQCNeWeuLQb9X46DLcCFLNIWTleqChz8QgYqt
- MxKniFWrtBnniI/dRkdz+2zBcSt4REoFL4aAVYB/4YqNfwxJiT19ew6gfwyec8/VvVaaDoIBR
- 4BvZFifmXW3A3gfcbO9hbIFMf7DjH80hHyamW/Wt1rMYOM3+FbISJW9VuxW0eXsVikLdLU87l
- USaoA98VVIK3gGwn/WbJ36nLnNQif6Ejlmp4lyopy3jLMJvhv+G32kr5G00VKtRW3s4kXXG7i
- CbBO6CiczFPI4Vp9cZhgjR8+28tqEkYjaXB6Z42d2mYy1bX8VLLuONdC6sguB025fIdiYrwZ+
- AFZRdXrs2TgnmOVJcPCXn8BZYJ8ZbksSSLTIJv5TpVTt3WwUB0jX6BxmvB02FfuKoy8uYuyOg
- 4Z+dLJvyBFlVT389THVsVuFu/sDvO48Uf8LdJPa5wyQ5BjX5ybB3Megw15osE2tKVMFB2sIUJ
- gWv9m/PASC4psv+qHV5e9DRKHyesU9NB/Q03A8tlSO53/s80sgaLYwelpZorbcQzdMvxFDzPl
- hc4n7R1p2rTkOezpzaSfIVyXuWEVdyAIvw9Y3J0Ptb+mC6sL06d1hRV9YHEFz8FIGHLacKz1h
- n4NvRwKieUjd4yAIRR8G2Y+CQdmXQRM48lNr0ngqm7GlQ+pRXDm9KV0ol106GONfsTJXtwHzX
- TEZ1jOR+d1y8Vw7aDzND8qnd5jmYTirppugcKY/M+ye0+zRelJp6S2/hNLVqDbGG6dPzueZ6q
- Y0Z9FTrTGXUZ+V3CXndhPucWbN3cyt33XLCYMLEWC/9oITe6EjSxLmSF+0JRkcCksDzMO3gkS
- otONWYm82rg4pA3In8mNUgHArqiJT7V/+JmDuEYIkwCJAFEyH5UY8bLcKZqBEDCFy7pEcUEmd
- 5jCZ2GUY56lvpprxhwf9yQ5Zgys8h5YWoFPjzWYUTHGnUoz1fScrzT0djQ1WKEKqJMr0rJttz
- A7YJK6XqKK50BtghSxps/gS0uBlphulVfKbGjglwR+E23t8iDWy8v2uP4NNsE5OSAorRYOSTn
- 4kX2jHHhgB7UXBWBVSCCO2NiZnVDcxHSfowewRHrbtgNkDl2W5zAGVzeIewtRTEtRL3XS4wEq
- T+85/gKRVmEX1y5Y9PHvlGn6sN0TJIk8re1OjvVenHAftdqHoCHmMcmOX9uASAJSAQW/FXJFv
- upGGExuqGEowsYtMVtdQu+7MS6ChIOU3suoSaXId9DaQakDl+toRyhftJV57RGyj941LGwn4O
- gnnNT4g+GE9xe9BVVWsJ3BGddSrdKBuR3V2n8ucx9z6tGb/lom1B3ocvYu7oJKTvQozGqhimy
- uRhi0c62gSdbZWLm7l2S0SAEYLKi2GnZQg2VAhnGwcU+Q68CCjqbf7BHM2M+AWFebbY8vc9d8
- /t2zasFsfJyGcf9N7LoivFkJj+RYR/MSJzEhX9AB+Ss+UfujfrSOeb4a1TS0ihhk2yB5eHaQ6
- dk9yA+hzHyIBu2DsmALkjVMPWpc47yjrBeY65IoywCNi1HCUEgNUcXMGGJSBr6ksiouOSTiR1
- x0zKCTXLEWInniUS2gKeUvI7MUVYOSUkhIv+cu7GnTZ7j5d6O6CATNMNHOtGjiK1MwXz1vm7P
- D1sQpFHgkuUMQagsT4FEXz6qYTmBMmXAwwVxaiN7/1m1Kv5d5oWstKnWKONEay/uhYiDbbuUW
- VZt1lGc28ruj+tUTHK9xft07rX8Yr2s0ZJBGJkQsKOxg9bOHD0CNSnk6x0afOxMe9CSBjpEJd
- PhuoywkzFwHlWojJb6zxsXKDwLDGNwCiB2/1yjJt4ckxzn9mi+HV3HlTf1pLc5/Wn3DJ/vWhZ
- 34UsXcZI2m7uFd1YKnvR3j5oip1rAq1y7NwhX7PwtXvCFPvv8C3vDVkDijPHhwBByhbkMBLyO
- xBRNfL4l9vVWKANCsy89GnmPqqC1X/JVJ0gXGQ8HmAPKcqda2eVabXP65nD4v4sTwkZbVIbI+
- kLRNwv6dW/IKugjxpYSvmHRux7WOdY5Z1a9LEpGpMnoSw7T2QezBlN7TLMUIddfUCCobTt0M/
- 9q3/nAuvIX2iS+MOH1VpXWQ0KYhEfbYY1JCDWDZmb0tZeZtlx6dXI2aRgvw68c+wERYH2jxya
- s/Cz+nOmEsdCsjuyJtyiIniixqm6Ma11RIKIxNbP1AW4xfeqyMhO2sZw5lw1w50h/D7rU4GsQ
- 4WuSJ95e/mYynTyCuU+SchC3RMJOoIEbjyBHXhOa34zaZkP8tPhZsHI5qZMKvK21+JXG5HNwe
- 9jzDGBfbfR6G1WioZpOQiXhygko84JcN1JYeWkwzNT+a2wU9fRu24BUPGV7u811E00DrOflf7
- RfACO/j58NVWpNg1wJWKedEXR1hj2z5k46iVXfoPEH2/BxAhICWTYzL6DZXOftFSGLhcvJvj5
- 4bl+Y1sOB938C64xnhY2yxFdkWG8EuNm3Bm5A/yx1r5PFshtuID19hcCS+gaioBnNWnQrgYtC
- RWhUKmbfmmmpNQuy+MJ+abQQ0K91Jjo2GNDa9xDfZmmXaCoXHB9baXaOra+kuOZKrdcysTVTv
- cZsNW+P4qJKCS0tQBjz1El732HWvcA2BTsprKqfbq2uLBBawUg6W6YFm8LhMAGzl5YWP0xtJC
- sx78lC9W+xlRmyh0NVhKrUX4+alJhHrjX+bH0e40DVtsauiJKJLjdYAf57EUOT9CoGfAW29bP
- b+jpbkniYo/Er/Il48iPAUbmDmcKkADBMNerhDiNE/6tt53d5f5s8KcGGJlpOCQNl1gkVdZL0
- FjuM2wJYf6Ub/HpKKycwtNFB5u+MWYBYo2JnNzIE5AYY5lL64BwDZEvIMrqmYDWF/SCI/NZ5j
- MAzfWMaiwQjGG1fS6Y2GDM29mlKLehBMfNJRRQ2gNJOHXMc53fK/7R1CfzTaFnpquazo5e1jK
- LpxyzI/YYA/N0GbG5Ep+1130+H+WNLshdWgGIMGC6aALn6bYb/9v32Szggu6HjqyLsEc7ma83
- g8Bat2XfA16GASsE5w/3PbEIKfUBGLUd458e6c1tyxiMZHv+8Ib2UC0dVQ4e42hGilfgVIxKY
- /FObYmZu9K6QG8rQmRjopBZx8XrqNIKUnlKe+RM5pLop1KgpQ+qK1ww/r0BvIC19An6AQstew
- g443O5VbT5y+125tVWm4eplfh/PU3qGmmXSx50pwAraasjFznjSBPXmccjFJDu729r9MwYO06
- IlaAs+iK/RXE0m827D3JRcqGtj5pBJI3gFhlSCZZQeoko1D3j5OPrJYttaplrKv4g6Ic9iKNx
- svYDu5SnRdBcFvmuK0jEmEtwgvIxsoAb33kdied0W+YXx+Xs/b7TSsB0
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-> This is an example of one that is probably slightly worth it,
+From: Paul Aurich <paul@darkrain42.org>
 
-Thanks for such a positive indication.
+commit a9685b409a03b73d2980bbfa53eb47555802d0a9 upstream.
 
+If open_cached_dir() encounters an error parsing the lease from the
+server, the error handling may race with receiving a lease break,
+resulting in open_cached_dir() freeing the cfid while the queued work is
+pending.
 
-> it shrinks one line of code, and also doesn't have risk,
+Update open_cached_dir() to drop refs rather than directly freeing the
+cfid.
 
-Similar source code refinements might become also interesting and helpful.
+Have cached_dir_lease_break(), cfids_laundromat_worker(), and
+invalidate_all_cached_dirs() clear has_lease immediately while still
+holding cfids->cfid_list_lock, and then use this to also simplify the
+reference counting in cfids_laundromat_worker() and
+invalidate_all_cached_dirs().
 
+Fixes this KASAN splat (which manually injects an error and lease break
+in open_cached_dir()):
 
-> but at least three of the others today don't shrink and sometimes grow lines of code (and don't fix anything )
+==================================================================
+BUG: KASAN: slab-use-after-free in smb2_cached_lease_break+0x27/0xb0
+Read of size 8 at addr ffff88811cc24c10 by task kworker/3:1/65
 
-Further update candidates can be found and eventually transformed also with the help
-of the semantic patch language (Coccinelle software).
+CPU: 3 UID: 0 PID: 65 Comm: kworker/3:1 Not tainted 6.12.0-rc6-g255cf264e6e5-dirty #87
+Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
+Workqueue: cifsiod smb2_cached_lease_break
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x77/0xb0
+ print_report+0xce/0x660
+ kasan_report+0xd3/0x110
+ smb2_cached_lease_break+0x27/0xb0
+ process_one_work+0x50a/0xc50
+ worker_thread+0x2ba/0x530
+ kthread+0x17c/0x1c0
+ ret_from_fork+0x34/0x60
+ ret_from_fork_asm+0x1a/0x30
+ </TASK>
 
+Allocated by task 2464:
+ kasan_save_stack+0x33/0x60
+ kasan_save_track+0x14/0x30
+ __kasan_kmalloc+0xaa/0xb0
+ open_cached_dir+0xa7d/0x1fb0
+ smb2_query_path_info+0x43c/0x6e0
+ cifs_get_fattr+0x346/0xf10
+ cifs_get_inode_info+0x157/0x210
+ cifs_revalidate_dentry_attr+0x2d1/0x460
+ cifs_getattr+0x173/0x470
+ vfs_statx_path+0x10f/0x160
+ vfs_statx+0xe9/0x150
+ vfs_fstatat+0x5e/0xc0
+ __do_sys_newfstatat+0x91/0xf0
+ do_syscall_64+0x95/0x1a0
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-> so are unlikely to be worth it since they slightly increase risk of adding difficulty to stable backports of future fixes
+Freed by task 2464:
+ kasan_save_stack+0x33/0x60
+ kasan_save_track+0x14/0x30
+ kasan_save_free_info+0x3b/0x60
+ __kasan_slab_free+0x51/0x70
+ kfree+0x174/0x520
+ open_cached_dir+0x97f/0x1fb0
+ smb2_query_path_info+0x43c/0x6e0
+ cifs_get_fattr+0x346/0xf10
+ cifs_get_inode_info+0x157/0x210
+ cifs_revalidate_dentry_attr+0x2d1/0x460
+ cifs_getattr+0x173/0x470
+ vfs_statx_path+0x10f/0x160
+ vfs_statx+0xe9/0x150
+ vfs_fstatat+0x5e/0xc0
+ __do_sys_newfstatat+0x91/0xf0
+ do_syscall_64+0x95/0x1a0
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-I hope that such change resistance can be reconsidered.
+Last potentially related work creation:
+ kasan_save_stack+0x33/0x60
+ __kasan_record_aux_stack+0xad/0xc0
+ insert_work+0x32/0x100
+ __queue_work+0x5c9/0x870
+ queue_work_on+0x82/0x90
+ open_cached_dir+0x1369/0x1fb0
+ smb2_query_path_info+0x43c/0x6e0
+ cifs_get_fattr+0x346/0xf10
+ cifs_get_inode_info+0x157/0x210
+ cifs_revalidate_dentry_attr+0x2d1/0x460
+ cifs_getattr+0x173/0x470
+ vfs_statx_path+0x10f/0x160
+ vfs_statx+0xe9/0x150
+ vfs_fstatat+0x5e/0xc0
+ __do_sys_newfstatat+0x91/0xf0
+ do_syscall_64+0x95/0x1a0
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Regards,
-Markus
+The buggy address belongs to the object at ffff88811cc24c00
+ which belongs to the cache kmalloc-1k of size 1024
+The buggy address is located 16 bytes inside of
+ freed 1024-byte region [ffff88811cc24c00, ffff88811cc25000)
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Paul Aurich <paul@darkrain42.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+[ Do not apply the change for cfids_laundromat_worker() since there is no
+  this function and related feature on 6.1.y. Update open_cached_dir()
+  according to method of upstream patch. ]
+Signed-off-by: Cliff Liu <donghua.liu@windriver.com>
+Signed-off-by: He Zhe <Zhe.He@windriver.com>
+[Shivani: Modified to apply on 6.1.y]
+Signed-off-by: Shivani Agarwal <shivani.agarwal@broadcom.com>
+---
+ fs/smb/client/cached_dir.c | 39 ++++++++++++++++----------------------
+ 1 file changed, 16 insertions(+), 23 deletions(-)
+
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 3d028b6a2..23a57a0c8 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -320,17 +320,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 		/*
+ 		 * We are guaranteed to have two references at this point.
+ 		 * One for the caller and one for a potential lease.
+-		 * Release the Lease-ref so that the directory will be closed
+-		 * when the caller closes the cached handle.
++		 * Release one here, and the second below.
+ 		 */
+ 		kref_put(&cfid->refcount, smb2_close_cached_fid);
+ 	}
+ 	if (rc) {
+-		if (cfid->is_open)
+-			SMB2_close(0, cfid->tcon, cfid->fid.persistent_fid,
+-				   cfid->fid.volatile_fid);
+-		free_cached_dir(cfid);
+-		cfid = NULL;
++		cfid->has_lease = false;
++		kref_put(&cfid->refcount, smb2_close_cached_fid);
+ 	}
+ 
+ 	if (rc == 0) {
+@@ -462,25 +458,24 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
+ 		cfids->num_entries--;
+ 		cfid->is_open = false;
+ 		cfid->on_list = false;
+-		/* To prevent race with smb2_cached_lease_break() */
+-		kref_get(&cfid->refcount);
++		if (cfid->has_lease) {
++			/*
++			 * The lease was never cancelled from the server,
++			 * so steal that reference.
++			 */
++			cfid->has_lease = false;
++		} else
++			kref_get(&cfid->refcount);
+ 	}
+ 	spin_unlock(&cfids->cfid_list_lock);
+ 
+ 	list_for_each_entry_safe(cfid, q, &entry, entry) {
+ 		list_del(&cfid->entry);
+ 		cancel_work_sync(&cfid->lease_break);
+-		if (cfid->has_lease) {
+-			/*
+-			 * We lease was never cancelled from the server so we
+-			 * need to drop the reference.
+-			 */
+-			spin_lock(&cfids->cfid_list_lock);
+-			cfid->has_lease = false;
+-			spin_unlock(&cfids->cfid_list_lock);
+-			kref_put(&cfid->refcount, smb2_close_cached_fid);
+-		}
+-		/* Drop the extra reference opened above*/
++		/*
++		 * Drop the ref-count from above, either the lease-ref (if there
++		 * was one) or the extra one acquired.
++		 */
+ 		kref_put(&cfid->refcount, smb2_close_cached_fid);
+ 	}
+ }
+@@ -491,9 +486,6 @@ smb2_cached_lease_break(struct work_struct *work)
+ 	struct cached_fid *cfid = container_of(work,
+ 				struct cached_fid, lease_break);
+ 
+-	spin_lock(&cfid->cfids->cfid_list_lock);
+-	cfid->has_lease = false;
+-	spin_unlock(&cfid->cfids->cfid_list_lock);
+ 	kref_put(&cfid->refcount, smb2_close_cached_fid);
+ }
+ 
+@@ -511,6 +503,7 @@ int cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
+ 		    !memcmp(lease_key,
+ 			    cfid->fid.lease_key,
+ 			    SMB2_LEASE_KEY_SIZE)) {
++			cfid->has_lease = false;
+ 			cfid->time = 0;
+ 			/*
+ 			 * We found a lease remove it from the list
+-- 
+2.40.4
+
