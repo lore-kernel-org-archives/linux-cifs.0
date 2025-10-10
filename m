@@ -1,123 +1,307 @@
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from o-chul.darkrain42.org (o-chul.darkrain42.org [74.207.241.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106E428151E
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Oct 2025 23:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0343D246BD5;
+	Fri, 10 Oct 2025 03:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.207.241.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760051636; cv=none; b=cQGF1si8xW/0CV8tROOtZxWK1+BwGJBeeuQk9G4TpCQOnBS5iqV4oHd+HOSmmPN2kRMP5NBaW6PDenUY+73mSvkk6YXCAEXctPcl0mLeFuCZfCzXw7uaEBZH4mab36LUoK6SBho6DRt5JJvOB/mc1e7xTchulehjYB/VKY3Yjhc=
+	t=1760065647; cv=none; b=OYiZGmKPmV9WnW4PY5cc5cub8aJyFXuCzEfO3gnFQJRBGHrEM7RQz7Edu6VuOHXSqcu5gNWbGUu/TrKCJ8TEOUs7vbYOwllVW9dXPaN3eHfFjDcj+PD+mG5AiqhujrgdbpMPo2rC+uFOzCPbkWjcRSJRY9s/xRMz6aGFNr5gr50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760051636; c=relaxed/simple;
-	bh=icD5g3JrakgqAzLdZNgzn4FXNUhgYYqnMP5I70/mOwc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xv9eZJNMLD0w8GAWqYB6e+Ai8D3kpdCTKESltkiMdB+49Ya+6l17IwvpCy2WwZkCwxnlYAOxvWMk6ozPBwh5SunWEgsannzstfM7QQgLGnA3ee6CNPsdUgFRRPPT/QXlURgcN5bqpN4rb0ulHAb/ZF4NaZ0Ht7j/h7YN41x8xPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UMDtp2rI; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760065647; c=relaxed/simple;
+	bh=X94e31DK5GglJvnSzcTtcjLzBOuyWyYnOB9QCXb6N6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KlU5gI8tkITz7KhCP0g+4zduCUxBtGAlpHhlQch/p+8xgPRB+qvfdoFdU9qhEwV8afoMfLtY+DkYrBfnUtXQAgT+V7rQwIZ3qrERBrrnxIMzryU+4PGguS4XiOPZ4ChS14EbIoOIeRBtsMPm5pEyIHmc4Jce46narDMIhcFoUQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org; spf=pass smtp.mailfrom=darkrain42.org; dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=BsRc6WQr; dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=LInobg+F; arc=none smtp.client-ip=74.207.241.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=darkrain42.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UMDtp2rI"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8738c6fdbe8so19662676d6.1
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Oct 2025 16:13:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760051634; x=1760656434; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EoBfUDQUyoBNh4GKZoH0GFg+k3/ZMM7A65pnmU46O/w=;
-        b=UMDtp2rIbzSCFqqexny+zJeM80q/xPAUw0PcuzMpBidzRtQzJWWRDL+ruFOprumG7R
-         3ek3XbVRthH3BTUk/hG2BF1U0qZ2Jt3jncohf5rh7h5sowxu9p93dJ4F25+QoOXnK1XU
-         0yxgmIpPxMTROU4d0wyJwzrkBDhF8aSQh5sM6rH/8XcVTZVD5BjBr93x4xcB4AQdRO1i
-         zttjPc5VMNkrTqEWRlCEZx3P5a3PlF5TKsAEhgxNq2e/qbcJXMaVZBoW44GWPtldvGb6
-         wJRvbwpDoGstg5vRH5epZOOuaB0iN4GOg/XWzJaHcM38Kjv/8uk8cD1v7IQPXSsAtDX/
-         npXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760051634; x=1760656434;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EoBfUDQUyoBNh4GKZoH0GFg+k3/ZMM7A65pnmU46O/w=;
-        b=K9L7f3B0xXVtOqR8gwAQHNdtmcGOnfOQYVpVicQ1xgvsN2H4kEjgDiAljdOexbnGT6
-         5dX2k3SvoHbDnPFdBHFAKZ55KLj8xiBgzVm3gCzA/RelNwCoa5qdCAa+HuQftoeEdy3Y
-         dsDs85ydo65asXKzT3cTxBxRDr7Wr3g0O4sZgGO21pR5iNF9Njfmtl2ubJr3CSm70MLL
-         kYkZMzXAzpK/B0YJeta3wsJkFvz+eD/MZLBU99MvbldYT2dq3FLtAW0XwFNWgvJgYlQD
-         gf9gDPvNCo94n9NU+/ro1XfcEka28aE6REtpuyLSR1tvQ2m8xDNjgqy9kfgLjoVsslNk
-         xoXQ==
-X-Gm-Message-State: AOJu0YxVSeUqQnXalzo8WHHFNE3bED+pg207y4jk0lvZn8H0sS1x6aFY
-	q49H7bDfKvbULTlXedLLdt1fWhyLNB62dxu4fVXBjljxRAE6XTDCRRIucq9vdeL4FXeyeiEnd4A
-	UOMyfecMnWd3ls8jAx68sfFOGwJiUqGQ=
-X-Gm-Gg: ASbGncvjoSEYDBiILykrBZlQLyGAcj6p8JtokPoFOJuaPAYQYUbGWBGj/YCsfI4bZnC
-	yYiStbYjKqfCA7GGVuZ0LtzqnGUoVEI8if0BEqBPieEER3gn1l9g1hiriPIbHqdFyjmmRYu6Kum
-	Xs8P0iHhDjEocsImdTjQ6yRyDAmNZUBEu7BpDsFkCp8EVV4LWH4lqhMY5b/1p0mtiCEL3JSRHmg
-	/YyVJ7F0s3hOcy34KMpPuNltb1sBnTAFiUlwhnuB15Num3+SSRSfI2tsOdj8NljSxxMVsh+ZFHa
-	/iD6SYeP+O+5FskcBjfr7BLJbzgT8LuO6FCV3x3laB6oJnU0svmv9Gqb530aVFFUxsD4Bf+kb2q
-	2iWQmTrglG2ZM2Jnfqxi3oiNUM0K+yE5hxSX78uIFpIUBaw==
-X-Google-Smtp-Source: AGHT+IEnZybB/pQoR8mg9We79EFOiBBpDNgcNw2U1+RtMh7JiFiYQpflxHEIHvLvGjG3GkqOQfeQC3ZgJpNo++61zSM=
-X-Received: by 2002:a05:6214:f0b:b0:765:1642:2ca0 with SMTP id
- 6a1803df08f44-87b3a7a16f7mr108786206d6.8.1760051633631; Thu, 09 Oct 2025
- 16:13:53 -0700 (PDT)
+	dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="BsRc6WQr";
+	dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="LInobg+F"
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+ d=darkrain42.org; i=@darkrain42.org; q=dns/txt; s=ed25519-2022-03;
+ t=1760065234; h=date : from : to : cc : subject : message-id :
+ references : mime-version : content-type : in-reply-to : from;
+ bh=2MlfTdL7VOS2ZqeiFcTckOlK9rkkqh8RGEd6yNe/N04=;
+ b=BsRc6WQr3jBH15GHysImyx3624H6H+lsTazWaCN0fPrkvgdvqQBeDUuH8QX1+/DRkLL6i
+ HYu9HHSqszwuztZAA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=darkrain42.org;
+ i=@darkrain42.org; q=dns/txt; s=rsa-2022-03; t=1760065234; h=date :
+ from : to : cc : subject : message-id : references : mime-version :
+ content-type : in-reply-to : from;
+ bh=2MlfTdL7VOS2ZqeiFcTckOlK9rkkqh8RGEd6yNe/N04=;
+ b=LInobg+FMJd4iN8XTvCSuFiuD8J/ufM+cnh5YNyEP2tgca5CnLXfOpyqFpk1QpXFeWAQ/
+ BWpdjyjCNgDlVeLUgV95Z5zFzMdw5+sAMrO4wqHLxCL0VvqLISiJ6Kf106qvhSVGddsHu1R
+ 5fUJU9WDKwr/fxKKP7pBH7YDMJRFvi3OiDNj+MjET6qdj7FeATkJyBdyGkxGtmp8jmP34+a
+ 7CkuyV/oNaO+YQYwlNs19VJ3E1RUA2v8qFmrj4k1QXqaGjzA1OxIuHtS8yIuY+Ljzn+pW+o
+ jW9WgUy8UiVUIrKoh7BC/5aAX00BUqaIrY/cs/fuky35sGaRSV95+8uR0siQ==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256
+	 client-signature ED25519)
+	(Client CN "otters", Issuer "otters" (not verified))
+	by o-chul.darkrain42.org (Postfix) with ESMTPS id 782B18222;
+	Thu,  9 Oct 2025 20:00:34 -0700 (PDT)
+Received: by vaarsuvius.home.arpa (Postfix, from userid 1000)
+	id 631F38C179E; Thu, 09 Oct 2025 20:00:33 -0700 (PDT)
+Date: Thu, 9 Oct 2025 20:00:33 -0700
+From: Paul Aurich <paul@darkrain42.org>
+To: Shivani Agarwal <shivani.agarwal@broadcom.com>
+Cc: stable@vger.kernel.org, gregkh@linuxfoundation.org,
+	bcm-kernel-feedback-list@broadcom.com, linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
+	tapas.kundu@broadcom.com, sfrench@samba.org, pc@manguebit.org,
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+	bharathsm@microsoft.com, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Steve French <stfrench@microsoft.com>,
+	Cliff Liu <donghua.liu@windriver.com>,
+	He Zhe <Zhe.He@windriver.com>
+Subject: Re: [PATCH v6.1] smb: prevent use-after-free due to open_cached_dir
+ error paths
+Message-ID: <aOh20TkmJDG5Bomt@vaarsuvius.home.arpa>
+Mail-Followup-To: Shivani Agarwal <shivani.agarwal@broadcom.com>,
+	stable@vger.kernel.org, gregkh@linuxfoundation.org,
+	bcm-kernel-feedback-list@broadcom.com, linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
+	tapas.kundu@broadcom.com, sfrench@samba.org, pc@manguebit.org,
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+	bharathsm@microsoft.com, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Steve French <stfrench@microsoft.com>,
+	Cliff Liu <donghua.liu@windriver.com>,
+	He Zhe <Zhe.He@windriver.com>
+References: <20251009060846.351250-1-shivani.agarwal@broadcom.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5muZ8KPXD8-KN+PsAfrhJzJXtR7EdVhtSbS+M5TCvyPEfA@mail.gmail.com>
- <CAH2r5mvsQ6raxt9dMp6YLpjxstr3kiZftmk1ay7QZ3k0PKM6gQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mvsQ6raxt9dMp6YLpjxstr3kiZftmk1ay7QZ3k0PKM6gQ@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 9 Oct 2025 18:13:42 -0500
-X-Gm-Features: AS18NWD81tW4TuPQuihR3kU0YaZMJZOOYmVmMTN2oMJTRixSau8SUMzy7027sBU
-Message-ID: <CAH2r5ms3EZ-R5QmOYzJb-1jF9Mnc3rL5eKeD2k=tDpLz+o0NAA@mail.gmail.com>
-Subject: Re: directory lease patch series
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: CIFS <linux-cifs@vger.kernel.org>, Bharath S M <bharathsm@microsoft.com>, 
-	Henrique Carvalho <henrique.carvalho@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20251009060846.351250-1-shivani.agarwal@broadcom.com>
 
-Interestingly the overall test run only took 2x longer, so many of the
-tests were not affected, but at least 20+ tests were much slower
+Thanks for proposing this!  I think this backport has the problem I was 
+concerned with when Cliff Liu proposed a backport in March [1].
 
-On Thu, Oct 9, 2025 at 3:45=E2=80=AFPM Steve French <smfrench@gmail.com> wr=
-ote:
+The handling of the 'has_lease' field in this patch depends on work done by 
+two other patches, and those should be backported before this one:
+
+- 5c86919455c1 ("smb: client: fix use-after-free in 
+    smb2_query_info_compound()")
+- 7afb86733685 ("smb: Don't leak cfid when reconnect races with 
+    open_cached_dir")
+
+I have (somewhere...) a backport of all three of these patches three patches 
+to linux-6.1.y, but it was a while ago and I never found the time to _test_ 
+the backports.
+
+[1] https://lore.kernel.org/linux-cifs/Z9uGCaxYJgs1gvwM@vaarsuvius.home.arpa/
+
+On 2025-10-08 23:08:46 -0700, Shivani Agarwal wrote:
+>From: Paul Aurich <paul@darkrain42.org>
 >
-> Note that this run is comparing Enzo's patches on mainline from a few day=
-s ago, so is missing a few patches in for next (like Paulo's) that might he=
-lp perf if included?!
+>commit a9685b409a03b73d2980bbfa53eb47555802d0a9 upstream.
 >
-> Thanks,
+>If open_cached_dir() encounters an error parsing the lease from the
+>server, the error handling may race with receiving a lease break,
+>resulting in open_cached_dir() freeing the cfid while the queued work is
+>pending.
 >
-> Steve
+>Update open_cached_dir() to drop refs rather than directly freeing the
+>cfid.
 >
-> On Thu, Oct 9, 2025, 1:52=E2=80=AFPM Steve French <smfrench@gmail.com> wr=
-ote:
->>
->> Enzo,
->> Was running tests with your 20 patch directory lease series (with
->> mainline from a few days ago) and noticed a HUGE slowdown in
->> generic/165 (run to Samba) it went from taking 41 seconds, to taking
->> over 31 minutes (and thus timing out).  I also noticed that more than
->> 1/3 of the tests were also running much slower - e.g. test cifs/105
->> went from 4 seconds to 39 seconds (but only from Samba, didn't have
->> this problem to older Windows), generic/014 to Azure was about 50%
->> slower, generic/109 (to Windows) went from 15-->25 seconds,
->> generic/129 to Azure was about 40% slower, generic/138 and 139 and 140
->> (all three to Samba) slowed down as well going from 5 seconds to about
->> 40 seconds when run with the patches, generic/142 (to Samba) went from
->> 5 seconds to 4:46, generic/143 (to Samba) went from 26 seconds to
->> 5:06, generic/144 (to Samba) went from 5 seconds to 41 seconds.
->> Similarly tests generic/145, 147, 148, 149, 150, 151, 153, 155 (to
->> Samba) were about 20x slower run with Enzo's patches
->>
->> Do you notice this perf degradation?
->> --
->> Thanks,
->>
->> Steve
+>Have cached_dir_lease_break(), cfids_laundromat_worker(), and
+>invalidate_all_cached_dirs() clear has_lease immediately while still
+>holding cfids->cfid_list_lock, and then use this to also simplify the
+>reference counting in cfids_laundromat_worker() and
+>invalidate_all_cached_dirs().
+>
+>Fixes this KASAN splat (which manually injects an error and lease break
+>in open_cached_dir()):
+>
+>==================================================================
+>BUG: KASAN: slab-use-after-free in smb2_cached_lease_break+0x27/0xb0
+>Read of size 8 at addr ffff88811cc24c10 by task kworker/3:1/65
+>
+>CPU: 3 UID: 0 PID: 65 Comm: kworker/3:1 Not tainted 6.12.0-rc6-g255cf264e6e5-dirty #87
+>Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
+>Workqueue: cifsiod smb2_cached_lease_break
+>Call Trace:
+> <TASK>
+> dump_stack_lvl+0x77/0xb0
+> print_report+0xce/0x660
+> kasan_report+0xd3/0x110
+> smb2_cached_lease_break+0x27/0xb0
+> process_one_work+0x50a/0xc50
+> worker_thread+0x2ba/0x530
+> kthread+0x17c/0x1c0
+> ret_from_fork+0x34/0x60
+> ret_from_fork_asm+0x1a/0x30
+> </TASK>
+>
+>Allocated by task 2464:
+> kasan_save_stack+0x33/0x60
+> kasan_save_track+0x14/0x30
+> __kasan_kmalloc+0xaa/0xb0
+> open_cached_dir+0xa7d/0x1fb0
+> smb2_query_path_info+0x43c/0x6e0
+> cifs_get_fattr+0x346/0xf10
+> cifs_get_inode_info+0x157/0x210
+> cifs_revalidate_dentry_attr+0x2d1/0x460
+> cifs_getattr+0x173/0x470
+> vfs_statx_path+0x10f/0x160
+> vfs_statx+0xe9/0x150
+> vfs_fstatat+0x5e/0xc0
+> __do_sys_newfstatat+0x91/0xf0
+> do_syscall_64+0x95/0x1a0
+> entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+>Freed by task 2464:
+> kasan_save_stack+0x33/0x60
+> kasan_save_track+0x14/0x30
+> kasan_save_free_info+0x3b/0x60
+> __kasan_slab_free+0x51/0x70
+> kfree+0x174/0x520
+> open_cached_dir+0x97f/0x1fb0
+> smb2_query_path_info+0x43c/0x6e0
+> cifs_get_fattr+0x346/0xf10
+> cifs_get_inode_info+0x157/0x210
+> cifs_revalidate_dentry_attr+0x2d1/0x460
+> cifs_getattr+0x173/0x470
+> vfs_statx_path+0x10f/0x160
+> vfs_statx+0xe9/0x150
+> vfs_fstatat+0x5e/0xc0
+> __do_sys_newfstatat+0x91/0xf0
+> do_syscall_64+0x95/0x1a0
+> entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+>Last potentially related work creation:
+> kasan_save_stack+0x33/0x60
+> __kasan_record_aux_stack+0xad/0xc0
+> insert_work+0x32/0x100
+> __queue_work+0x5c9/0x870
+> queue_work_on+0x82/0x90
+> open_cached_dir+0x1369/0x1fb0
+> smb2_query_path_info+0x43c/0x6e0
+> cifs_get_fattr+0x346/0xf10
+> cifs_get_inode_info+0x157/0x210
+> cifs_revalidate_dentry_attr+0x2d1/0x460
+> cifs_getattr+0x173/0x470
+> vfs_statx_path+0x10f/0x160
+> vfs_statx+0xe9/0x150
+> vfs_fstatat+0x5e/0xc0
+> __do_sys_newfstatat+0x91/0xf0
+> do_syscall_64+0x95/0x1a0
+> entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+>The buggy address belongs to the object at ffff88811cc24c00
+> which belongs to the cache kmalloc-1k of size 1024
+>The buggy address is located 16 bytes inside of
+> freed 1024-byte region [ffff88811cc24c00, ffff88811cc25000)
+>
+>Cc: stable@vger.kernel.org
+>Signed-off-by: Paul Aurich <paul@darkrain42.org>
+>Signed-off-by: Steve French <stfrench@microsoft.com>
+>[ Do not apply the change for cfids_laundromat_worker() since there is no
+>  this function and related feature on 6.1.y. Update open_cached_dir()
+>  according to method of upstream patch. ]
+>Signed-off-by: Cliff Liu <donghua.liu@windriver.com>
+>Signed-off-by: He Zhe <Zhe.He@windriver.com>
+>[Shivani: Modified to apply on 6.1.y]
+>Signed-off-by: Shivani Agarwal <shivani.agarwal@broadcom.com>
+>---
+> fs/smb/client/cached_dir.c | 39 ++++++++++++++++----------------------
+> 1 file changed, 16 insertions(+), 23 deletions(-)
+>
+>diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+>index 3d028b6a2..23a57a0c8 100644
+>--- a/fs/smb/client/cached_dir.c
+>+++ b/fs/smb/client/cached_dir.c
+>@@ -320,17 +320,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+> 		/*
+> 		 * We are guaranteed to have two references at this point.
+> 		 * One for the caller and one for a potential lease.
+>-		 * Release the Lease-ref so that the directory will be closed
+>-		 * when the caller closes the cached handle.
+>+		 * Release one here, and the second below.
+> 		 */
+> 		kref_put(&cfid->refcount, smb2_close_cached_fid);
+> 	}
+> 	if (rc) {
+>-		if (cfid->is_open)
+>-			SMB2_close(0, cfid->tcon, cfid->fid.persistent_fid,
+>-				   cfid->fid.volatile_fid);
+>-		free_cached_dir(cfid);
+>-		cfid = NULL;
+>+		cfid->has_lease = false;
 
+cfid->has_lease needs to be cleared while holding cfids->cfid_list_lock.  (See 
+my feedback to the stable backport in March)
 
+>+		kref_put(&cfid->refcount, smb2_close_cached_fid);
+> 	}
+>
+> 	if (rc == 0) {
+>@@ -462,25 +458,24 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
+> 		cfids->num_entries--;
+> 		cfid->is_open = false;
+> 		cfid->on_list = false;
+>-		/* To prevent race with smb2_cached_lease_break() */
+>-		kref_get(&cfid->refcount);
+>+		if (cfid->has_lease) {
+>+			/*
+>+			 * The lease was never cancelled from the server,
+>+			 * so steal that reference.
+>+			 */
+>+			cfid->has_lease = false;
+>+		} else
+>+			kref_get(&cfid->refcount);
+> 	}
+> 	spin_unlock(&cfids->cfid_list_lock);
+>
+> 	list_for_each_entry_safe(cfid, q, &entry, entry) {
+> 		list_del(&cfid->entry);
+> 		cancel_work_sync(&cfid->lease_break);
+>-		if (cfid->has_lease) {
+>-			/*
+>-			 * We lease was never cancelled from the server so we
+>-			 * need to drop the reference.
+>-			 */
+>-			spin_lock(&cfids->cfid_list_lock);
+>-			cfid->has_lease = false;
+>-			spin_unlock(&cfids->cfid_list_lock);
+>-			kref_put(&cfid->refcount, smb2_close_cached_fid);
+>-		}
+>-		/* Drop the extra reference opened above*/
+>+		/*
+>+		 * Drop the ref-count from above, either the lease-ref (if there
+>+		 * was one) or the extra one acquired.
+>+		 */
+> 		kref_put(&cfid->refcount, smb2_close_cached_fid);
+> 	}
+> }
+>@@ -491,9 +486,6 @@ smb2_cached_lease_break(struct work_struct *work)
+> 	struct cached_fid *cfid = container_of(work,
+> 				struct cached_fid, lease_break);
+>
+>-	spin_lock(&cfid->cfids->cfid_list_lock);
+>-	cfid->has_lease = false;
+>-	spin_unlock(&cfid->cfids->cfid_list_lock);
+> 	kref_put(&cfid->refcount, smb2_close_cached_fid);
+> }
+>
+>@@ -511,6 +503,7 @@ int cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
+> 		    !memcmp(lease_key,
+> 			    cfid->fid.lease_key,
+> 			    SMB2_LEASE_KEY_SIZE)) {
+>+			cfid->has_lease = false;
+> 			cfid->time = 0;
+> 			/*
+> 			 * We found a lease remove it from the list
+>-- 
+>2.40.4
+>
 
---=20
-Thanks,
+~Paul
 
-Steve
