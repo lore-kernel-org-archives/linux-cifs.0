@@ -1,77 +1,77 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABF91386C9
-	for <linux-cifs@vger.kernel.org>; Sat, 11 Oct 2025 20:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85CB22655B
+	for <linux-cifs@vger.kernel.org>; Sat, 11 Oct 2025 20:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760212867; cv=none; b=oG3NUi+YRs6NvSKVxoAhX3r3GX4Jzs0TKsO35jbhbP/83mFGgmoaw6FmbTh9Z/VZPKK4QL1rJ4p9dlRa2VKApXdzyMr2YGopxmahS+7UQUZ6kFoxJs3TMaGSCM/g5Pp6dFhFLJ4emEsN+TxOojsX5ifgm7hqdcVoSE2MZY1rxXs=
+	t=1760212973; cv=none; b=M0Oyi8wrLDAryB6RvqwOml9lAON7B/Ptx2C2QaOt0my/kIPHgiSJnr4nO5dToRNH9deyac8xk4iUJrOvoTM9XL+56g9fgN40fU0vRIYmIYifcgrwWZH2s7JE29QkCf3JXv1ooNvlmc4x+v5iD135xqAJYR5qwBS6bvvuTi+P7hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760212867; c=relaxed/simple;
-	bh=1Ps4bs+k5Q12zq1sC/XXxaSLC6nK6BiT6V7wRXyLi8M=;
+	s=arc-20240116; t=1760212973; c=relaxed/simple;
+	bh=uKELvK+Pabr7Cacwb8UIBERYWif8VOC/Fn/heHRHgdo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T5FmV2tRjG5FAGNFv57BJjZVizUaAfAegqyRxdJF5dCtjjcZ4BLNq2da0/VRt1UxZJN6f/evbAxkFaOAGU71u2TIIOKiQfmov27OlYwXg0TeF+9t5jDhk6RlBf9L7Gujlj19sIrd74/pdGHp5vA9u9Wc0GCVrNQkH8UTAoUa48E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WmbcgNwt; arc=none smtp.client-ip=209.85.219.53
+	 To:Cc:Content-Type; b=m6+ud+4yLAYFoA5gZfm3rHHvhPKCXgLLz9PcnHUNUxMmDrWkTH93TgI1DSK3WS0OoRfx0F+fjUw93viQTBZDKtakpv7N5AFwPC2/yQ8SNU2Y2waHSOJeaebs/05iQF3UASGnm2uGTIofcFN4I/UJyCZDmXWGkzvpYkcUypTqLE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yw7pWgLa; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WmbcgNwt"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-7970e8d1cfeso51235556d6.1
-        for <linux-cifs@vger.kernel.org>; Sat, 11 Oct 2025 13:01:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yw7pWgLa"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-87a0801ba1aso477003085a.2
+        for <linux-cifs@vger.kernel.org>; Sat, 11 Oct 2025 13:02:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760212864; x=1760817664; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760212970; x=1760817770; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hfL+PrpKvMN9jJeKubgjHEY0rwUSNs6+/9bmODOXmYo=;
-        b=WmbcgNwt6p9W2WjOcsJkJwTnWA2KdH2NLaAbIUz8xqe3km/hseaEOgf3w5tQcnvVIe
-         HpnUYWRUqj5kCvn9L8alRy/CzqKxUSxUDFELTISHi9Mm1OGtMQFL4qbRjUEIPfhLAI9o
-         VdbVz1owvZ38v3+E6Cg3OF7c19JjfSZjgmPFdKJmRNVGnWMYqaRo/ZkSRnK5JjP3JPL9
-         svta4AMS1IBa18cayA3v5FZdA050J5VZZWvGiyfbuI86gq52zJK3FTYfbG3ZPzk4LiAl
-         qO6Y8Z85oEePTmf9Y3GGbybo4cwYrdoQGch+qgiUzEvuaunvo2Im6vYRG54ud32YUNn6
-         GtRQ==
+        bh=xkr5Es7W1sfU77GvysO3I+d49t0a9ilRQJudJAibtUM=;
+        b=Yw7pWgLaQoD10kVLOmX/9Hr2IE20ZUZMQINXnfAqf5653lRq2V/QNH2DGzWXiwbq2z
+         1D9CmNHRS4gLUc+L8MMIsQy5uVN+eTob1v9MzQlj9IGc4DQCkrOy3Oz3WiWGCKGDZxjV
+         qqPloWwMeWiH1Bhy5BI/n9kh9HUJ7aOvVPf5WMcgcCmR60MDp1jZ1MkfswXv0vWxSMyl
+         RLxTN4zTqlnlIe/WBSgLHJR9xOh+H4iswlDnS0gV44stp7Auvs9hvad4Sp/55dbbrME4
+         vX6FqlNv4wClzVt99z9CJE2JAIC/MY+ao2B7P8qIWa7oGCFPTZXuWuJagfXOPPoFXTkR
+         2nbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760212864; x=1760817664;
+        d=1e100.net; s=20230601; t=1760212970; x=1760817770;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hfL+PrpKvMN9jJeKubgjHEY0rwUSNs6+/9bmODOXmYo=;
-        b=xQt4SuCDcGHoIsfI0WYcambplhe3J8hD80oc9rhlHM3D8rcBdKuHSg0rV6XeLUoMkg
-         /o5em1XUdbK9OQeQtklxxgWRNoGqEyIDbD4BPlNS3+RrrHNuxtHXG981jCANfR2t1T3H
-         bmpNWokra3Xqw66Tb+dFcaXCknnneiMA62fqiLYO1viwlPnOai9wWewVlp/+X7HQZVf1
-         gQ8ry8aqRenvzsHP18d+iUwhoSZdzwdYhL6DPGI0FcVk1hetPfwCbpHSqOFQt2Qb2sdv
-         7wOCQL8VagnC3iCEWaehUXk9DGhjPzcIkQLg3DzUrZEUpkTvPvx5PeA7DOfMcDEYaKzb
-         4YyQ==
-X-Gm-Message-State: AOJu0YySa2WNp/NoDd86KB/jJI2EDkA/nu/qGGvpfXDLC3DtGe0cdqiG
-	ndutHeencW2YHZ7sMMy8ppFlgr603MI6D0m6q6EctZ0Ue2j/tdjCmeTsr5noEq1lrJFiJ8ACFN1
-	V64yCXhiLKzy75ggES4KG3/KIeUoFQOU=
-X-Gm-Gg: ASbGncsxx75r9hJlW5g4gjvAC7h2ffL823TzxRWkjJ6DrOYIN+elwip9CjOsPHC9mAV
-	o6sQKsaTXqyQUbZo6GeaMrqJXr6funNEpSbQcvPa/0aVFnFKyYnSoGPI8gy9Gk6caeOh85KcG3S
-	UezMO3xiQ59xinVVjYGY77fgtiNhAMuFmc2GF09tIFpXrlntTvN6ZtQLhX3ehyxHnl+sDBdQ3RY
-	VD5h1NOkOrU3TGXzqnHaesa9sPNcju4o2JZ6gHj9e2Zr0wDBU4nzZxysss0lZSH2fTgVusPCASw
-	uFUpOTnJG5FSb1knauhnv/LnQNkS34lqZWhVGvvuIbsK2ls8F27QI5N4Glq+7FO2RBBaC0KIhLZ
-	MCWT7e/dEiJxw5hRZTnRYcxBv/boNC+gAWne8jGSR
-X-Google-Smtp-Source: AGHT+IGPQgsa9k2a1Up8+w6cXCZMeV+WWQ7neAnv2u8rNwSSNXa4/xhGZLri+COAL8htLz8tCf0DrbfdaqC7StUYs9Q=
-X-Received: by 2002:a05:6214:f23:b0:809:c3a1:27c8 with SMTP id
- 6a1803df08f44-87b2efc2d9amr249718956d6.38.1760212864032; Sat, 11 Oct 2025
- 13:01:04 -0700 (PDT)
+        bh=xkr5Es7W1sfU77GvysO3I+d49t0a9ilRQJudJAibtUM=;
+        b=nb55HK4eIjD02ET2CkF8ombylwsZWmjZCz0lPaDcaMqG8m6DhS5CHQcVZAWzMM2MTA
+         iow9Y22Y7lagxyMr3V7Yj8UZR2KqXr1AI0vTPJY+3WkQr6I+AaF4aKBLgHso487dQvNX
+         ed0eRQjs7vOqCv8H9FqCYdfziJr1JY90I4onPeeqwTx4ABm0POir6lLfNtG2S6P6tCpQ
+         95ttXzIwVAO6wiDRvlRX+f/FjPHl+9Xn7hl35XHwyFL+MSqIBbs7+NZMsuDZW/6A1FIq
+         HEsj8YNyNQRs4WDz+Hzp8b1149FtIPsMCJorgLCG6vCxGruEebwrd8IVDI9/MkYdARKM
+         xwjw==
+X-Gm-Message-State: AOJu0YzC0A/o3DeHm7cOwTfdwrDQnUfvbjYnS6UzxOKB/gyZ4UYeSttE
+	lO4tSg73Knl5io2ak1j0Yv5fHOxUm13AR5Vbdxh/lNEs5FMYz4tQJLCxFwU/AHcYaYOtv2eZPRt
+	q8sVBWjq4FmonD/BWIf0WmJRPH3Diw+4=
+X-Gm-Gg: ASbGncuIY2hBHDCi0sIkZRUna4EMSqO5LTRsocULg4VCIbIz5bimrhKP4Gnn69pVzPy
+	pZc5ePAHA/WWnN8A3yhI408tYskwCbYyRH6zIAcA6FDybrD+Tg/PkA4BkLfCn5KZTfptmvgdAUM
+	vIQD/wqmIDhUN3lsvV/GZgtXQy6RWZgnSzyNhWNw4JOvOajxmKOlRhadZZBIa+4lc0wEMO/I9Kb
+	qGvXWBwjGdhZ5xQSDPKvo4t7TyyNRxhr6OATeC0LPOh5ruBTRe4mCjOg+YHMMjq4TqAOhf+ue6S
+	88w5ccnsN2GWdorNhsqqT0mpnlK5HmIcmphr42muEor5+9AN1ur8utQ9lcieajtamWU79Ne80Wh
+	zT+Gx0yI0YU01CeeHeI+HwdW8CfC8Pr6EIVOMe+2TX+r8RwzAznM=
+X-Google-Smtp-Source: AGHT+IG9ZCiwfq5KyR/1TeCl3i0cP2OQ4leD6REdC5/3Qk1b9iGVKiA0Gxr/3psvpoZZ40crdSe1lNPJ/iiBnZaSH1U=
+X-Received: by 2002:ac8:7e96:0:b0:4e0:a9d6:d554 with SMTP id
+ d75a77b69052e-4e6ead5427emr236273121cf.38.1760212970368; Sat, 11 Oct 2025
+ 13:02:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f61abf77-4f12-4dc8-8b42-4bfe19aef174@web.de>
-In-Reply-To: <f61abf77-4f12-4dc8-8b42-4bfe19aef174@web.de>
+References: <10e2a3a5-e109-44b5-ba3c-3e8c40d76361@web.de>
+In-Reply-To: <10e2a3a5-e109-44b5-ba3c-3e8c40d76361@web.de>
 From: Steve French <smfrench@gmail.com>
-Date: Sat, 11 Oct 2025 15:00:52 -0500
-X-Gm-Features: AS18NWCM0YwVW2bZ6DwJJ1L4nOwS-cEpGPRUjdlffaDFbiwcZQD4uBoAC9uA7ws
-Message-ID: <CAH2r5mt7LOFRahepvnPyLb_f6-SsWXRkWZ=B+TB3bB-dLmZUcA@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: Return a status code only as a constant in sid_to_id()
+Date: Sat, 11 Oct 2025 15:02:38 -0500
+X-Gm-Features: AS18NWDvFK4gyGSPs9eyGmSKOV3bV8TQqhZdaEEWV_hSRnuKNvbTBU9D0yth8t4
+Message-ID: <CAH2r5muxz0q6E+8NQiAxDRgWRfbwjsRN9fnoQXjyV_u9WXFh-w@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: Omit one redundant variable assignment in cifs_xattr_set()
 To: Markus Elfring <Markus.Elfring@web.de>
 Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	Bharath SM <bharathsm@microsoft.com>, Paulo Alcantara <pc@manguebit.org>, 
-	Qiujun Huang <hqjagain@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Bharath SM <bharathsm@microsoft.com>, Boris Protopopov <bprotopopov@hotmail.com>, 
+	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
 	Shyam Prasad N <sprasad@microsoft.com>, Steve French <sfrench@samba.org>, Tom Talpey <tom@talpey.com>, 
 	LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -79,50 +79,35 @@ Content-Transfer-Encoding: quoted-printable
 
 merged into cifs-2.6.git for-next
 
-On Fri, Oct 10, 2025 at 2:24=E2=80=AFPM Markus Elfring <Markus.Elfring@web.=
+On Fri, Oct 10, 2025 at 7:56=E2=80=AFAM Markus Elfring <Markus.Elfring@web.=
 de> wrote:
 >
 > From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Fri, 10 Oct 2025 21:04:16 +0200
+> Date: Fri, 10 Oct 2025 14:48:13 +0200
 >
-> Return a status code without storing it in an intermediate variable.
->
-> This issue was detected by using the Coccinelle software.
+> The local variable =E2=80=9Crc=E2=80=9D is assigned a value in an if bran=
+ch without
+> using it before it is reassigned there.
+> Thus delete this assignment statement.
 >
 > Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 > ---
->  fs/smb/client/cifsacl.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+>  fs/smb/client/xattr.c | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-> index 63b3b1290bed..ce2ebc213a1d 100644
-> --- a/fs/smb/client/cifsacl.c
-> +++ b/fs/smb/client/cifsacl.c
-> @@ -339,7 +339,6 @@ int
->  sid_to_id(struct cifs_sb_info *cifs_sb, struct smb_sid *psid,
->                 struct cifs_fattr *fattr, uint sidtype)
->  {
-> -       int rc =3D 0;
->         struct key *sidkey;
->         char *sidstr;
->         const struct cred *saved_cred;
-> @@ -446,12 +445,12 @@ sid_to_id(struct cifs_sb_info *cifs_sb, struct smb_=
-sid *psid,
->          * fails then we just fall back to using the ctx->linux_uid/linux=
-_gid.
->          */
->  got_valid_id:
-> -       rc =3D 0;
->         if (sidtype =3D=3D SIDOWNER)
->                 fattr->cf_uid =3D fuid;
->         else
->                 fattr->cf_gid =3D fgid;
-> -       return rc;
-> +
-> +       return 0;
->  }
+> diff --git a/fs/smb/client/xattr.c b/fs/smb/client/xattr.c
+> index b88fa04f5792..029910d56c22 100644
+> --- a/fs/smb/client/xattr.c
+> +++ b/fs/smb/client/xattr.c
+> @@ -178,7 +178,6 @@ static int cifs_xattr_set(const struct xattr_handler =
+*handler,
+>                         memcpy(pacl, value, size);
+>                         if (pTcon->ses->server->ops->set_acl) {
+>                                 int aclflags =3D 0;
+> -                               rc =3D 0;
 >
->  int
+>                                 switch (handler->flags) {
+>                                 case XATTR_CIFS_NTSD_FULL:
 > --
 > 2.51.0
 >
