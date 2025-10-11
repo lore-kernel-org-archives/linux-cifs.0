@@ -1,145 +1,135 @@
-Received: from mout.web.de (mout.web.de [212.227.15.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137831548C
-	for <linux-cifs@vger.kernel.org>; Sat, 11 Oct 2025 14:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABF91386C9
+	for <linux-cifs@vger.kernel.org>; Sat, 11 Oct 2025 20:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760191523; cv=none; b=r36N4hv1QCxLNKjhJ68vHozJZm/Fkd6SZ/wifdtCdiRcnlE+Z4KPQ5hIaI8mDoFNqUZZQzOeWGf3+O9UbDAFPl53feWsHi5a+sp3qCsJ4RAtThI1d9le+BE96++qXVxpaqboHdkGrJHoIj/vvFK2tLSJYuyUIELxWCSQjgmtRVs=
+	t=1760212867; cv=none; b=oG3NUi+YRs6NvSKVxoAhX3r3GX4Jzs0TKsO35jbhbP/83mFGgmoaw6FmbTh9Z/VZPKK4QL1rJ4p9dlRa2VKApXdzyMr2YGopxmahS+7UQUZ6kFoxJs3TMaGSCM/g5Pp6dFhFLJ4emEsN+TxOojsX5ifgm7hqdcVoSE2MZY1rxXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760191523; c=relaxed/simple;
-	bh=cCLRCsl+ubv+ujPGZt3kbB1IYCZIObalg2ThqCaBNpE=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=fGNIUQtDqHM6z/aHzFPxkZq68EGgc0GJisI3lYLfdXKy/2WyNNecYgfoM6I9UHKNDYP0/BxcCUIR3F3G39sOm4Vp9iE2IPo+RCIfg210LDaZYlxZ44imrOZlVSPgD/BUzNLWAQ2LWvbU3A3fnDicawdLptXkTUCxqhItZ0CkfvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=NrtRjims; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1760212867; c=relaxed/simple;
+	bh=1Ps4bs+k5Q12zq1sC/XXxaSLC6nK6BiT6V7wRXyLi8M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T5FmV2tRjG5FAGNFv57BJjZVizUaAfAegqyRxdJF5dCtjjcZ4BLNq2da0/VRt1UxZJN6f/evbAxkFaOAGU71u2TIIOKiQfmov27OlYwXg0TeF+9t5jDhk6RlBf9L7Gujlj19sIrd74/pdGHp5vA9u9Wc0GCVrNQkH8UTAoUa48E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WmbcgNwt; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="NrtRjims"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1760191519; x=1760796319; i=markus.elfring@web.de;
-	bh=eGMiRWSm2YNTRobMRHY/QrAuxojGhIcf/jx36myw29w=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
-	 Subject:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=NrtRjims3bAKT4N4loj7HMES91mSkm52O0Vwr2JmcFDnKZjYW2svEzHKtKVvLZXs
-	 H62qGhHG2/4LpKZOlNiq9L/aLW1XJiLDghTPXq3nkCP1yHZUsWPPqpeBolUD2LaYl
-	 fX6+QgRlyCvnrSrAjazBTcF6go5txwQ35NgVY+ziAftenm0R1UzI8cI1zG9CDuLXc
-	 5hzrPkfPcoUDiim0+YsFtuVkfpn1xs7YmASnUmPSWfFjHjleZ17Tt7qkFqmBjwpWA
-	 W385SC3GQV1HmqW4vfwAOUB72StkA3lLVKBcaBAU2u3rfiLxh75LokQZ54AegZtDA
-	 YYlYFCaFGbG3JnV9VA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.69.253]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N30dV-1u7Cde00zd-0136I0; Sat, 11
- Oct 2025 16:05:19 +0200
-Message-ID: <06e01da1-cdc0-4be3-b74d-fe12da890c1a@web.de>
-Date: Sat, 11 Oct 2025 16:05:18 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WmbcgNwt"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-7970e8d1cfeso51235556d6.1
+        for <linux-cifs@vger.kernel.org>; Sat, 11 Oct 2025 13:01:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760212864; x=1760817664; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hfL+PrpKvMN9jJeKubgjHEY0rwUSNs6+/9bmODOXmYo=;
+        b=WmbcgNwt6p9W2WjOcsJkJwTnWA2KdH2NLaAbIUz8xqe3km/hseaEOgf3w5tQcnvVIe
+         HpnUYWRUqj5kCvn9L8alRy/CzqKxUSxUDFELTISHi9Mm1OGtMQFL4qbRjUEIPfhLAI9o
+         VdbVz1owvZ38v3+E6Cg3OF7c19JjfSZjgmPFdKJmRNVGnWMYqaRo/ZkSRnK5JjP3JPL9
+         svta4AMS1IBa18cayA3v5FZdA050J5VZZWvGiyfbuI86gq52zJK3FTYfbG3ZPzk4LiAl
+         qO6Y8Z85oEePTmf9Y3GGbybo4cwYrdoQGch+qgiUzEvuaunvo2Im6vYRG54ud32YUNn6
+         GtRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760212864; x=1760817664;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hfL+PrpKvMN9jJeKubgjHEY0rwUSNs6+/9bmODOXmYo=;
+        b=xQt4SuCDcGHoIsfI0WYcambplhe3J8hD80oc9rhlHM3D8rcBdKuHSg0rV6XeLUoMkg
+         /o5em1XUdbK9OQeQtklxxgWRNoGqEyIDbD4BPlNS3+RrrHNuxtHXG981jCANfR2t1T3H
+         bmpNWokra3Xqw66Tb+dFcaXCknnneiMA62fqiLYO1viwlPnOai9wWewVlp/+X7HQZVf1
+         gQ8ry8aqRenvzsHP18d+iUwhoSZdzwdYhL6DPGI0FcVk1hetPfwCbpHSqOFQt2Qb2sdv
+         7wOCQL8VagnC3iCEWaehUXk9DGhjPzcIkQLg3DzUrZEUpkTvPvx5PeA7DOfMcDEYaKzb
+         4YyQ==
+X-Gm-Message-State: AOJu0YySa2WNp/NoDd86KB/jJI2EDkA/nu/qGGvpfXDLC3DtGe0cdqiG
+	ndutHeencW2YHZ7sMMy8ppFlgr603MI6D0m6q6EctZ0Ue2j/tdjCmeTsr5noEq1lrJFiJ8ACFN1
+	V64yCXhiLKzy75ggES4KG3/KIeUoFQOU=
+X-Gm-Gg: ASbGncsxx75r9hJlW5g4gjvAC7h2ffL823TzxRWkjJ6DrOYIN+elwip9CjOsPHC9mAV
+	o6sQKsaTXqyQUbZo6GeaMrqJXr6funNEpSbQcvPa/0aVFnFKyYnSoGPI8gy9Gk6caeOh85KcG3S
+	UezMO3xiQ59xinVVjYGY77fgtiNhAMuFmc2GF09tIFpXrlntTvN6ZtQLhX3ehyxHnl+sDBdQ3RY
+	VD5h1NOkOrU3TGXzqnHaesa9sPNcju4o2JZ6gHj9e2Zr0wDBU4nzZxysss0lZSH2fTgVusPCASw
+	uFUpOTnJG5FSb1knauhnv/LnQNkS34lqZWhVGvvuIbsK2ls8F27QI5N4Glq+7FO2RBBaC0KIhLZ
+	MCWT7e/dEiJxw5hRZTnRYcxBv/boNC+gAWne8jGSR
+X-Google-Smtp-Source: AGHT+IGPQgsa9k2a1Up8+w6cXCZMeV+WWQ7neAnv2u8rNwSSNXa4/xhGZLri+COAL8htLz8tCf0DrbfdaqC7StUYs9Q=
+X-Received: by 2002:a05:6214:f23:b0:809:c3a1:27c8 with SMTP id
+ 6a1803df08f44-87b2efc2d9amr249718956d6.38.1760212864032; Sat, 11 Oct 2025
+ 13:01:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: linux-cifs@vger.kernel.org
-Content-Language: en-GB, de-DE
-Cc: samba-technical@lists.samba.org
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [bug report] Avoiding reserved identifier violations
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:qnWuS9+q8h2wRg2uPN5HVZsUKUco3U9rMQu+/vwyxOuYJ0tuGai
- r18Wn92LWmSKFo0sS2v9TikAVmAJwasj+GYyLCx04PO/H0a7/SfRIvDynMu5kq0b4HAxzHY
- 4CqSso+cieDJNbHraURxHIekE9DdXFzcoeXQNdwWvKfP+zV/qYiABWqiIzqilD/j0fHlqcC
- uyxvM+3ZmO+Y+dSJUStMw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:76zvo62jgtQ=;dOO78x1HHTa3orh4nFgzz3dX2Ns
- 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
- nziXw==
+References: <f61abf77-4f12-4dc8-8b42-4bfe19aef174@web.de>
+In-Reply-To: <f61abf77-4f12-4dc8-8b42-4bfe19aef174@web.de>
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 11 Oct 2025 15:00:52 -0500
+X-Gm-Features: AS18NWCM0YwVW2bZ6DwJJ1L4nOwS-cEpGPRUjdlffaDFbiwcZQD4uBoAC9uA7ws
+Message-ID: <CAH2r5mt7LOFRahepvnPyLb_f6-SsWXRkWZ=B+TB3bB-dLmZUcA@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: Return a status code only as a constant in sid_to_id()
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Bharath SM <bharathsm@microsoft.com>, Paulo Alcantara <pc@manguebit.org>, 
+	Qiujun Huang <hqjagain@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Steve French <sfrench@samba.org>, Tom Talpey <tom@talpey.com>, 
+	LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+merged into cifs-2.6.git for-next
 
-I would like to point out once more that identifiers like the following
-do eventually not fit to the expected naming convention of the C++ language standard.
-
-* _CIFSKEY_H
-  https://git.samba.org/?p=cifs-utils.git;a=blob;f=cifskey.h;h=00694456e7f8a574d50c998501fa441b4230b0bf;hb=1561527e4b6192f6d47b85ea670637f771f5d52c#l20
-
-* _LIBUTIL_H
-  https://git.samba.org/?p=cifs-utils.git;a=blob;f=util.h;h=2864130f9246a87bd2f5118636a727f5dcecc01d;hb=e18d42adddbea9178d93b6051132f9cdee4cc9e0#l25
+On Fri, Oct 10, 2025 at 2:24=E2=80=AFPM Markus Elfring <Markus.Elfring@web.=
+de> wrote:
+>
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Fri, 10 Oct 2025 21:04:16 +0200
+>
+> Return a status code without storing it in an intermediate variable.
+>
+> This issue was detected by using the Coccinelle software.
+>
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> ---
+>  fs/smb/client/cifsacl.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
+> index 63b3b1290bed..ce2ebc213a1d 100644
+> --- a/fs/smb/client/cifsacl.c
+> +++ b/fs/smb/client/cifsacl.c
+> @@ -339,7 +339,6 @@ int
+>  sid_to_id(struct cifs_sb_info *cifs_sb, struct smb_sid *psid,
+>                 struct cifs_fattr *fattr, uint sidtype)
+>  {
+> -       int rc =3D 0;
+>         struct key *sidkey;
+>         char *sidstr;
+>         const struct cred *saved_cred;
+> @@ -446,12 +445,12 @@ sid_to_id(struct cifs_sb_info *cifs_sb, struct smb_=
+sid *psid,
+>          * fails then we just fall back to using the ctx->linux_uid/linux=
+_gid.
+>          */
+>  got_valid_id:
+> -       rc =3D 0;
+>         if (sidtype =3D=3D SIDOWNER)
+>                 fattr->cf_uid =3D fuid;
+>         else
+>                 fattr->cf_gid =3D fgid;
+> -       return rc;
+> +
+> +       return 0;
+>  }
+>
+>  int
+> --
+> 2.51.0
+>
+>
 
 
-Would you like to adjust your selection for unique names?
-https://wiki.sei.cmu.edu/confluence/display/c/DCL37-C.+Do+not+declare+or+define+a+reserved+identifier#DCL37C.Donotdeclareordefineareservedidentifier-NoncompliantCodeExample%28IncludeGuard%29
+--=20
+Thanks,
 
-Regards,
-Markus
+Steve
