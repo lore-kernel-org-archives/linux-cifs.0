@@ -1,27 +1,27 @@
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A4329AAF8;
-	Sun, 12 Oct 2025 15:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43AA7296BD0;
+	Sun, 12 Oct 2025 15:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760281911; cv=none; b=gH5xwM6JnmlS4B1DevxAkFL4jmQNSSgqBLTKaZo6RDJqSnyiq5SYJzvEtXWTMoJf9eCOdiiYZtbJjW6OyBhVHTut+6dO1DNeIDk+GEj4+WsgE3KzR3dvkZ7gOW8AFBe7SSN2SCA8yWngwFHXO7PZwYt4cwxj1LPMk477fZEWGro=
+	t=1760281922; cv=none; b=J92n7NpyajdtYLSkMJKnPsY1jIVA1mjrczVfK8BprQ+yezkK8bJKj/ycRKgn0VCRx41p9fOyJt6EPqNhJedX3UD4pwB+0sbUme0ViuTzv5HtXckG8npStNcoAL06k3Y0/SsHpdsx6cd9lA18MBAjl8u44F4f9IRvZlJVfZ5XbIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760281911; c=relaxed/simple;
-	bh=kV6Tt6gzqKXi9CitHgRtyQsuEujD+nsj1u8QElwcN2E=;
+	s=arc-20240116; t=1760281922; c=relaxed/simple;
+	bh=h8rXpMFfHIROBKkRmkoCt2Bb21FexDTnSrRb1R1hAAI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RvAaS+9dWWbCp25B7f43l7oU3p0V13QsREe51SuxfCTA8JePp7jfvivsjpO/SYU4IZb5M9B3Hb8hIJIwUiUFuAt0h9JIQhGqDphCAZLK0AC5Bs558UfoPI2OKIcdeLiVcTBErv3K/mEnA929j2yn5EThhRvlQjVqlQBvGJzjrRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=15.184.224.54
+	 MIME-Version; b=TNtGPDPTbGKZhQVQIaD+8zDF03KT+wQ32M+WOSesGVYMPPqTKz1SbFEfLldS7Col3p/6coYlu3Oa2ZN0p5AyA7GM5Tm7AKFCrrG4TYcUTQuuuWvKM+EafF8IpW3YUoVHJTA5XrbyOBVuA+f2o/xk41KJuYJkYltVhsu5p0/48cE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=18.132.163.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: zesmtpgz9t1760281818t30d02601
-X-QQ-Originating-IP: 4T3y8AdGX3KtkBO90drlOfE9sq7siHnM75Fkw+PEMIQ=
+X-QQ-mid: zesmtpgz9t1760281822t2ae7ab6a
+X-QQ-Originating-IP: 2vPsGU0OwO1yRDGYjebapCcIRuF/AAbGjXFKqLDo6WM=
 Received: from localhost.localdomain ( [116.128.244.171])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 12 Oct 2025 23:10:17 +0800 (CST)
+	id ; Sun, 12 Oct 2025 23:10:21 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 831036991751228392
+X-BIZMAIL-ID: 2608946645097381380
 From: chenxiaosong@chenxiaosong.com
 To: stfrench@microsoft.com,
 	metze@samba.org,
@@ -39,9 +39,9 @@ To: stfrench@microsoft.com,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 06/22] smb: move SMB1_PROTO_NUMBER to common/cifsglob.h
-Date: Sun, 12 Oct 2025 23:08:59 +0800
-Message-ID: <2AC3F0FD2E1F3D39+20251012150915.2992220-7-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 08/22] smb: move smb_sockaddr_in and smb_sockaddr_in6 to common/smb2pdu.h
+Date: Sun, 12 Oct 2025 23:09:01 +0800
+Message-ID: <BDC099D2EB3E3711+20251012150915.2992220-9-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251012150915.2992220-1-chenxiaosong@chenxiaosong.com>
 References: <20251012150915.2992220-1-chenxiaosong@chenxiaosong.com>
@@ -54,77 +54,176 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: OH2bKVRJtexU4ZSOOzomo7gSs+T1nEFtYZMOuO4lbFrOUNKxc8qUuhpj
-	8ZeXP0AT736JHPcHnfgGUoThC+P5UWBrpmO39LMv4qXdHCpJ3lx35BzNE2e26LWOFwW8zhz
-	X9/5U7NQomw45J1RLbeSH7fWnuuE63GOvNDuFsK3q938UiLTpv/Dw95IsAfJYMniDQJH1Ny
-	muE98PE+KWMOu9ImkpUaF01QWwL26x9Ug+HSORjofruXmEM6pmABWL44+84FqQ+1llTVrt1
-	gZWltEPb4KaiRnTs0RFJuOV1eFBQOM/N2tuQ0pDkIU14R1mAAU9OY69FT/GHexcD8H4sA2k
-	cE95BCAISfP1XVIGMnyv8bl7N674zHg1bElB9PWR7gzp0xI4zLRq9otDdm6gpgsQ3g1XH9u
-	YGIqMJMa9D3eZMTT6nlobu9xhehHzV23tMtfQ8HnUS5l+LesgmJi8GuEsdwcXnLQZa5oIJh
-	Da5dr8S1BNsaAe0IFgEyENufzAWoq3G5gnqQSefjjnqcgxk6IyyO0J/EuVSV0Mreg4sjp8h
-	DKJZph2kbT1TuoXjwMNFFliC1OKp/561K0AQMBMs7P6so+cJiP0qNJ3QJRu3ye819tWtT9Y
-	7RZo78v9+hlBfRSmOQKrCggByqaOHg+jIZ134eg+MIYgLhEXpZ4tl7o7cp3+lfMUciu4H0s
-	8f5uYABl8+/bxmgx7XazEvnrcd3DIrQ1dx96GrbHxF0n4QKa7GfDvVVa4ZM6C0CrGl+CCFu
-	DvxumviEk8ykc8W53ghDzS+BikngW1gp1BQNGkIErbaSAKX/NuQxjJ6XuYXlTfX8pHpRYNf
-	aMHvREEklEFJQpzD1nN5su7vkWtD1IkKctAPD5VzqZBYIXDOIxLqxUdeniCWifeU7t2fKp8
-	MKFW5t2Io1FERUjVgk0DZbjpz3VDFBXvUeEsqUwuEPB9vFhK5c85bgiK0+HvcMdNwmkUC+X
-	MqkJBLR//f4yXv8vX0tX5cQMzBnLFVnk1ezKAgn3+HzMWZFjIGjVWaz3FVPmQy8np3IA=
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-XMAILINFO: Mw3/skGyA4U5uiJ3cdt52BmWd7SPoXebHY6eva8vqZGPZXtoj63iQOMl
+	a1bdsFBnyGoPX6looNaWFDaULxst9V63IXk88sEizK6ZlpgNZg1OrQLdzHH0MkXNimuEUlh
+	lUGrql1KVUdfXsBMYEmOjwHvBMkOGC6doTvqbjZnOsmaI/kEC1+z7MBmLDlehrWMRNgpn3O
+	S6A+6Ifyk3+9Qeq6bB3ujkqBu8xbp3kAX/nQhyT4xVsJJ51HgDkHNMei+aKCFXxq9RhiN0l
+	m+W1foKSYgCsyWUnaMfsO30VxDsbFPvuXHopnYbKTzLSmj9tuE7Tte61WR6gnr+A9Qxm5e4
+	J12A0zCzVKrm49Dv6eQCJDXXQD+aZHB1QVUhH2LymIC/NWSmS+eRB4pHnVgva38fyDADbWr
+	gsh9JLVLVwYsgbuaLk2PqUPcmFaxY9sHSH/k/xJM9n1xKwlAvhgSKxn+WyhTkpK02y0E3BF
+	Nttpb6c55Spg0k+sKKD8dKoAcTfH5QkZVcPlUak/pY0phhWibBuy+eOSLMueD8fRltp0L6S
+	0QGzeT8nWTwrlGCQWCB+HroWPA36FCVreGy9yOuY8Ud1hr7rLj55K65qy5IO4q3J8i5VfQY
+	ySYyHfrnbbGxpJUPRMyaWrxODvhWOd395sOCfMJ0yZZF2ZvigMUQt5VMvpq1hhKR97bJ8SW
+	9/GArEoOH/9lNGichWpjEtFgdKFsLipoPkgFdP6jLQ4Zkx3wXwLdpidsexif0fmQ3v2GL24
+	aYnXnYVOwwY8YWFXO3SngfXdX+vj4e4bKydjtvMv7Mvz1oXld2/oADOheH8RHgfCSuQYk+D
+	EcZykgcb91qR1PEGyHQJon26Johjmgzl9OFhRONnvZoxTATo8cWJzPi9Xm/GFi4rzP1zjah
+	MljI4t3n5QsjitavkzGFS5zGj92p4smupozasuKYtOULWHBoi+CxUIFqoL4Gz2iR2bt7ps9
+	lwEG3FiGO8mwdwyzSmipoxD6yESVutUQnsYodVDMfjH9tB1+nh1iExrpOEawYk0bryG447x
+	K5WY6aCIu5P1DSpLWsCL13vCZwTT2V12JDUcC0ww==
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
 X-QQ-RECHKSPAM: 0
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-Replace the constant of client with SMB1_PROTO_NUMBER, then move the
-macro definition from server/smb_common.h to common/cifsglob.h, maybe
-the server will use this macro definition in the future.
+Rename 4 places:
+
+  - iface_info_ipv4 -> smb_sockaddr_in
+  - iface_info_ipv6 -> smb_sockaddr_in6
+  - IPv4address -> IPv4Address
+  - IPv6address -> IPv6Address
+
+Then move duplicate definitions to common header file.
 
 Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 ---
- fs/smb/client/misc.c       | 2 +-
- fs/smb/common/cifsglob.h   | 2 ++
- fs/smb/server/smb_common.h | 1 -
- 3 files changed, 3 insertions(+), 2 deletions(-)
+ fs/smb/client/smb2ops.c |  8 ++++----
+ fs/smb/client/smb2pdu.h | 13 -------------
+ fs/smb/common/smb2pdu.h | 15 +++++++++++++++
+ fs/smb/server/smb2pdu.c |  4 ++--
+ fs/smb/server/smb2pdu.h | 13 -------------
+ 5 files changed, 21 insertions(+), 32 deletions(-)
 
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index dda6dece802a..15be9d8738ab 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -318,7 +318,7 @@ static int
- check_smb_hdr(struct smb_hdr *smb)
- {
- 	/* does it have the right SMB "signature" ? */
--	if (*(__le32 *) smb->Protocol != cpu_to_le32(0x424d53ff)) {
-+	if (*(__le32 *) smb->Protocol != cpu_to_le32(SMB1_PROTO_NUMBER)) {
- 		cifs_dbg(VFS, "Bad protocol string signature header 0x%x\n",
- 			 *(unsigned int *)smb->Protocol);
- 		return 1;
-diff --git a/fs/smb/common/cifsglob.h b/fs/smb/common/cifsglob.h
-index 371160fec1cd..5928d35c7f30 100644
---- a/fs/smb/common/cifsglob.h
-+++ b/fs/smb/common/cifsglob.h
-@@ -9,6 +9,8 @@
- #ifndef _COMMON_CIFS_GLOB_H
- #define _COMMON_CIFS_GLOB_H
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 7c392cf5940b..e90ca77d2ac7 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -624,8 +624,8 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
+ 	struct network_interface_info_ioctl_rsp *p;
+ 	struct sockaddr_in *addr4;
+ 	struct sockaddr_in6 *addr6;
+-	struct iface_info_ipv4 *p4;
+-	struct iface_info_ipv6 *p6;
++	struct smb_sockaddr_in *p4;
++	struct smb_sockaddr_in6 *p6;
+ 	struct cifs_server_iface *info = NULL, *iface = NULL, *niface = NULL;
+ 	struct cifs_server_iface tmp_iface;
+ 	ssize_t bytes_left;
+@@ -685,7 +685,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
+ 		 */
+ 		case INTERNETWORK:
+ 			addr4 = (struct sockaddr_in *)&tmp_iface.sockaddr;
+-			p4 = (struct iface_info_ipv4 *)p->Buffer;
++			p4 = (struct smb_sockaddr_in *)p->Buffer;
+ 			addr4->sin_family = AF_INET;
+ 			memcpy(&addr4->sin_addr, &p4->IPv4Address, 4);
  
-+#define SMB1_PROTO_NUMBER		cpu_to_le32(0x424d53ff)
+@@ -697,7 +697,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
+ 			break;
+ 		case INTERNETWORKV6:
+ 			addr6 =	(struct sockaddr_in6 *)&tmp_iface.sockaddr;
+-			p6 = (struct iface_info_ipv6 *)p->Buffer;
++			p6 = (struct smb_sockaddr_in6 *)p->Buffer;
+ 			addr6->sin6_family = AF_INET6;
+ 			memcpy(&addr6->sin6_addr, &p6->IPv6Address, 16);
+ 
+diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
+index c013560bcfa1..0be63c00f848 100644
+--- a/fs/smb/client/smb2pdu.h
++++ b/fs/smb/client/smb2pdu.h
+@@ -261,19 +261,6 @@ struct network_resiliency_req {
+ } __packed;
+ /* There is no buffer for the response ie no struct network_resiliency_rsp */
+ 
+-struct iface_info_ipv4 {
+-	__be16 Port;
+-	__be32 IPv4Address;
+-	__be64 Reserved;
+-} __packed;
+-
+-struct iface_info_ipv6 {
+-	__be16 Port;
+-	__be32 FlowInfo;
+-	__u8   IPv6Address[16];
+-	__be32 ScopeId;
+-} __packed;
+-
+ #define NO_FILE_ID 0xFFFFFFFFFFFFFFFFULL /* general ioctls to srv not to file */
+ 
+ struct compress_ioctl {
+diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+index 25e8ece283c4..b01114108d23 100644
+--- a/fs/smb/common/smb2pdu.h
++++ b/fs/smb/common/smb2pdu.h
+@@ -1428,6 +1428,21 @@ struct network_interface_info_ioctl_rsp {
+ 	};
+ } __packed;
+ 
++/* See MS-SMB2 2.2.32.5.1.1 */
++struct smb_sockaddr_in {
++	__be16 Port;
++	__be32 IPv4Address;
++	__u8   Reserved[8];
++} __packed;
 +
- struct smb_version_values {
- 	char		*version_string;
- 	__u16		protocol_id;
-diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
-index 9c0db206624b..6d427dbed5fd 100644
---- a/fs/smb/server/smb_common.h
-+++ b/fs/smb/server/smb_common.h
-@@ -151,7 +151,6 @@
- 		FILE_EXECUTE | FILE_DELETE_CHILD | \
- 		FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES)
++/* See MS-SMB2 2.2.32.5.1.2 */
++struct smb_sockaddr_in6 {
++	__be16 Port;
++	__be32 FlowInfo;
++	__u8   IPv6Address[16];
++	__be32 ScopeId;
++} __packed;
++
+ /* this goes in the ioctl buffer when doing FSCTL_SET_ZERO_DATA */
+ struct file_zero_data_information {
+ 	__le64	FileOffset;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 169fbec03cfd..dd6f1375a833 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -7903,7 +7903,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+ 			idev = __in_dev_get_rtnl(netdev);
+ 			if (!idev)
+ 				continue;
+-			sockaddr_storage->addr4.IPv4address =
++			sockaddr_storage->addr4.IPv4Address =
+ 						idev_ipv4_address(idev);
+ 			nbytes += sizeof(struct network_interface_info_ioctl_rsp);
+ 			ipv4_set = true;
+@@ -7911,7 +7911,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+ 		} else {
+ 			struct inet6_dev *idev6;
+ 			struct inet6_ifaddr *ifa;
+-			__u8 *ipv6_addr = sockaddr_storage->addr6.IPv6address;
++			__u8 *ipv6_addr = sockaddr_storage->addr6.IPv6Address;
  
--#define SMB1_PROTO_NUMBER		cpu_to_le32(0x424d53ff)
- #define SMB_COM_NEGOTIATE		0x72
- #define SMB1_CLIENT_GUID_SIZE		(16)
+ 			sockaddr_storage->Family = INTERNETWORKV6;
+ 			sockaddr_storage->addr6.Port = 0;
+diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
+index fe92bfeb415a..5a76b706ccd9 100644
+--- a/fs/smb/server/smb2pdu.h
++++ b/fs/smb/server/smb2pdu.h
+@@ -136,19 +136,6 @@ struct create_posix_rsp {
  
+ #define SMB2_0_IOCTL_IS_FSCTL 0x00000001
+ 
+-struct smb_sockaddr_in {
+-	__be16 Port;
+-	__be32 IPv4address;
+-	__u8 Reserved[8];
+-} __packed;
+-
+-struct smb_sockaddr_in6 {
+-	__be16 Port;
+-	__be32 FlowInfo;
+-	__u8 IPv6address[16];
+-	__be32 ScopeId;
+-} __packed;
+-
+ struct sockaddr_storage_rsp {
+ 	__le16 Family;
+ 	union {
 -- 
 2.43.0
 
