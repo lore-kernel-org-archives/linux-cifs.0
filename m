@@ -1,26 +1,27 @@
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A141720FAA4;
-	Sun, 12 Oct 2025 16:18:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BB92ECD15;
+	Sun, 12 Oct 2025 16:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760285935; cv=none; b=N2kx0YODlfZb0oqrjGtvw6w3zMBXv2G1tzwLN8PEH1AewZtCg5BJzW+SC9y5fSghlkW0iNPgI+XwqiXSh2Zb5NHhOIxGbm7qkIwCCDTwrRPgndE/L6pwrrr52Guec54uMjhg2YrjUnaEatAjfhLZxoV8Ztrf5/Cc/m0rR1B2tRs=
+	t=1760285941; cv=none; b=M6wGewa1wLKA7oFODuW0j9Y+DiN794sYhtudqL4Dtj0EkHwPgfFFRxCBs2F3tciCxzEbWHeuxgalEHvHtWsP79SkHG1TPrPx+BVe9IP2Vj0Ou+L6fthgWjU33lycDNn2p/hn5Q7RD4Sz8AjkLfC0FM/evRE3mnHTW/yInG61Ym4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760285935; c=relaxed/simple;
-	bh=bhr+qTVya/+V9+BCjxfG4OVqLhjJpgZpWmo1XscXVvI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d3FeczARspyWwL1mhErm4DCOIx90XS2BVgCW1qo7K7Pu7MhfBY3lOoDGiDn3DGt4Vcnfs4gh5fIfBvtwLlYiNe0jf/VJ5jLtJD446lf8tzU3AmITQuL1ueMv410tCHhUPE2IhsvsmtZXL/43vCv948CjuMGOAP/kpA88hZ9UB+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.243.244.52
+	s=arc-20240116; t=1760285941; c=relaxed/simple;
+	bh=+Y1i4ZX5YAVz0aE+JKDU1tjQg9Po8/DgENzqiLN/5r0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=C+3ODj/kbKKqwXeqVMIUbVYlJezoIZG9Aot0Fa4oSaWrQPXh8x0uDkL7i39fuAK4E+yj4syGrTJuUX3NITNFzk++EGYLdBg1kqRCeW3OUxi+xtfvx7r+sv/xpVzHoYV/lC6BQI+/8yGwc0eTULUOEuCbUmkV9nW6ZF4g+Xj87QA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.254.200.128
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: esmtpgz15t1760285892ta72686ff
-X-QQ-Originating-IP: GgNdDl3AGe27E/H08SS1YB4BCbf6F9J4D0iDbewHgOQ=
+X-QQ-mid: esmtpgz15t1760285894tdd4e7eec
+X-QQ-Originating-IP: IR5Fu0QYzlgEnuwjCn8U1ToBqQMMKRJTpkrlVI0xims=
 Received: from localhost.localdomain ( [116.128.244.171])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 13 Oct 2025 00:18:10 +0800 (CST)
+	id ; Mon, 13 Oct 2025 00:18:13 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 7517991960377754638
+X-BIZMAIL-ID: 8599701500783114678
 From: chenxiaosong@chenxiaosong.com
 To: stfrench@microsoft.com,
 	metze@samba.org,
@@ -38,10 +39,12 @@ To: stfrench@microsoft.com,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2 00/22] smb: fix some bugs, move duplicate definitions to common header file
-Date: Mon, 13 Oct 2025 00:17:27 +0800
-Message-ID: <40F04A8E2145E761+20251012161749.2994033-1-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH v2 01/22] smb/server: fix possible memory leak in smb2_read()
+Date: Mon, 13 Oct 2025 00:17:28 +0800
+Message-ID: <47508024F79AE36C+20251012161749.2994033-2-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251012161749.2994033-1-chenxiaosong@chenxiaosong.com>
+References: <20251012161749.2994033-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,92 +54,49 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpgz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: NSEFX6u+4l+KjVaGc4WUFGVI+QWLboSo2NxHhuN0Q+kkpmZBi9QS1FCM
-	yRU8nxlWWEPgLqbobg7MKBtBCsHjM3e8hHZmetfqCzzAFnpmJtCGXmrQ/O+2R5eByfdhWND
-	LUsvyMTXELyP9gkIO9LJyEcJNvGbcpL86lx4Ji8OhypALAB9IQE7oThWMaJ7S5bopIixhFw
-	P8APpdHC5zkhw4S8SdIMcPNDjwddc0aMijmMuuAWPlIHoHcAYLmxn4x1KEHcl21m6nhrzyh
-	obdPUCJDTMW11ajH6MtumOcBUW1YeWtS4Wr2pQ1obsteAS29xTTjtmajjIe7s0IRdrTffSH
-	IKbK9WDxzro+ROPxxa/d5ov2/kS0gb1iaDrw6PW43b70PSlDoSA9CTGgVMv0g2RvYVMd6Co
-	J8BeEZNWusHbK78flmZcUYqqknLnK09xzSajhpOKIlfQYW61tuxEK5RUt/kf7j3JQJqJetq
-	Tl1Il8E+R5TjN7TUG2EctI1LOXLWVg7BJfwObr5HQj1cjQS0GDZqYIdp0mPAsWTEwSmJ+B9
-	4Mbq42wTZeeDFle5tEndTeLp5nWXv96udUT3vy+SYv/0HblcV0PfZABXDvJFhlNwM4QcX6c
-	cVcttKM1irl2aoBeO49BvxE3uMTkpa9EqoiMwdct49rt16bi8NA4DDu6RwFSIcdZAJtCgZo
-	2qfdBk8LZqRfhtKrGoJRzbftdwfcBJGHgs/kzucrhRMnRF6I9iIJ8sudCb705S1CZs/ERu3
-	hRoax1upiMJKpNUA2bBKiM3LXgGuEdRmbufySMTrrQsH4Fvo8ClVbbyOqI3e3CWGtSfIoTI
-	EQE0o+HmTKByoTijb+Jz8Y1yhEt/DjKmKqn3+S+EkHtuniru98vq5HRZZxRm1CFGoMng5rg
-	d/f0AQuWVzAEl9bogMn0dp4AkFkuGbeOt4jfESgATi9kfTnXwO6+pB1VvHrKTTELbRwGsaj
-	x4ZwgA1YWsLSOjGAdteJ0ZfzIBDtn0Ram1R2M8prKHoHdHw1hsOY8m5Nu
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
+X-QQ-XMAILINFO: Ngwq0BL9nhqbFGFP9UQ2N/VgIHp/4j6dtQhP9AgVrJIGCbmPQVe5ij7L
+	HXnB5LKWcxK2oFQ8xUXHrQfx4ju4eXR2LyHlUpBffkLbCUO/QBGBtA5iBW/xhydF0yGIEKg
+	tTfpOxk+a9CbrgpBacu+Lp8ga7KCu0YVqRT8Z7XR7INoDCophOvhk+/pbwGrgVnOheSgweo
+	DH/Hpuk06bF5KYz0PixWBJZEfWOFwqMBa3osGqgV6js2G5iUdv/G6wkiOF6V9q+x1OWGZ/A
+	XK9VbI9lNP387D49d5aD/0qT7lv32Odr0fSUN30JBLdnOpgHM3rSOZJUc1p9RRDhcq8v5SP
+	+vcZsgu+TSJCc5A9vHONProXuMMs5P9r0AnKitDTyF7P0WJRbLh9vLhmpb0x6FIrVWR+XqO
+	fOiVGnPic63IVXR4MAivxokKKJX0J1AFlyRm7SJdL5FboaodX2yNj3uH6wj9JBe80jp9p5b
+	CxfEzqUZTJD4nSnJvJjg7bkpl0Y8QkuZ5LCtAd3CN3wncXLt7qq7UVVQNp01P6nnR9Fo7ih
+	UB16+3QTnlyySmuB4xUXk3TBFQt0tb3Z7Z8bVzeEFVVDX0MZF29a6VGlwGii/VESirMQGpX
+	Ihwgj4S8l6Ex6Bh0VpxdfWkMuZ7dsHLLNvp3y52iaqthEMP8n9DjPNNoDqsRsWvpKMp+8h4
+	EKKWSA1/D9Yjtv2P9JL9NnBQUfb2n8s8O3Sn6+rPP39eDaRPVtm97RA7tvmsGux7BTe5Vxp
+	Vofwop8tS8C8+UUoCmS/meLE5r8ByluqvZtX+CrGaYyOlaG9kPNQRrE74AkwpoJDswPNwRn
+	iUQwjQG9uoT51pAJ2qmNEkVsmKVE37tqLVtv4CSOwI/PUW9+HRQswSC/JWfyiBqNwwqAiHZ
+	bT/a9J40WAKs37zvL2k71IdPnbYjbHNGlCKdanGy1rSHEyljQuF+/5NfnI9zo1a7l0tCzgD
+	bmFcnf5gzGN1twYF3uSS3JxCdrCfuvF1FM+AQBzvsKth/urblP0v6iOTgEnTFc8QrP0idU/
+	tloPhRnek4N3T/l5t+xmkB/Ak0wc+XLVjZ4UQnQQ==
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
 X-QQ-RECHKSPAM: 0
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-Fix some bugs of smb server.
+Memory leak occurs when ksmbd_vfs_read() fails.
+Fix this by adding the missing kvfree().
 
-In order to maintain the code more easily, move some duplicate definitions
-to common header file.
+Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
+---
+ fs/smb/server/smb2pdu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Add some MS documentation references for macro and struct definitions.
-
-v1->v2:
-  - update patch #06 according to Christophe JAILLET's suggestions: https://lore.kernel.org/all/d03c64d2-46c0-42d8-8f88-28669e921c95@wanadoo.fr/
-
-v1:
-  - cover-letter: https://lore.kernel.org/all/76A15C078023E21F+20251012150915.2992220-1-chenxiaosong@chenxiaosong.com/
-  - patches: https://lore.kernel.org/all/029014EF18C9D322+20251012150915.2992220-2-chenxiaosong@chenxiaosong.com/
-  - RESEND cover-letter: https://lore.kernel.org/all/37DF3D711BAD3621+20251012152247.2992573-1-chenxiaosong@chenxiaosong.com/
-  - RESEND: patches: https://lore.kernel.org/all/9836A3F274B62345+20251012152247.2992573-2-chenxiaosong@chenxiaosong.com/
-
-ChenXiaoSong (12):
-  smb: move smb2_file_network_open_info to common/smb2pdu.h
-  smb: move some duplicate definitions to common/cifspdu.h
-  smb: move file access permission bits definitions to common/cifspdu.h
-  smb: move SMB frame definitions to common/cifspdu.h
-  smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/cifspdu.h
-  smb: move FILE_SYSTEM_DEVICE_INFO to common/cifspdu.h
-  smb: move FILE_SYSTEM_INFO to common/cifspdu.h
-  smb: move FILE_DIRECTORY_INFO to common/cifspdu.h
-  smb: move FILE_FULL_DIRECTORY_INFO to common/cifspdu.h
-  smb: move FILE_BOTH_DIRECTORY_INFO to common/cifspdu.h
-  smb: move SEARCH_ID_FULL_DIR_INFO to common/cifspdu.h
-  smb: move FILE_SYSTEM_POSIX_INFO to common/cifspdu.h
-
-ZhangGuoDong (10):
-  smb/server: fix possible memory leak in smb2_read()
-  smb/server: fix possible refcount leak in smb2_sess_setup()
-  smb: move some duplicate definitions to common/cifsglob.h
-  smb: move smb_version_values to common/cifsglob.h
-  smb: move get_rfc1002_len() to common/cifsglob.h
-  smb: move SMB1_PROTO_NUMBER to common/cifsglob.h
-  smb: move some duplicate definitions to common/smb2pdu.h
-  smb: move smb_sockaddr_in and smb_sockaddr_in6 to common/smb2pdu.h
-  smb: move copychunk definitions to common/smb2pdu.h
-  smb: move resume_key_ioctl_rsp to common/smb2pdu.h
-
- fs/smb/client/cifsacl.c       |   4 +-
- fs/smb/client/cifsglob.h      |  47 +---
- fs/smb/client/cifspdu.h       | 436 +-------------------------------
- fs/smb/client/cifssmb.c       |  10 +-
- fs/smb/client/cifstransport.c |   8 +-
- fs/smb/client/connect.c       |   2 +-
- fs/smb/client/misc.c          |   2 +-
- fs/smb/client/smb2ops.c       |  18 +-
- fs/smb/client/smb2pdu.h       |  80 +-----
- fs/smb/common/cifsglob.h      |  68 +++++
- fs/smb/common/cifspdu.h       | 464 ++++++++++++++++++++++++++++++++++
- fs/smb/common/smb2pdu.h       |  98 ++++++-
- fs/smb/server/smb2misc.c      |   2 +-
- fs/smb/server/smb2ops.c       |  32 +--
- fs/smb/server/smb2pdu.c       | 114 +++++----
- fs/smb/server/smb2pdu.h       |  67 -----
- fs/smb/server/smb_common.c    |  10 +-
- fs/smb/server/smb_common.h    | 304 +---------------------
- fs/smb/server/smbacl.c        |   2 +-
- fs/smb/server/vfs.c           |   2 +-
- 20 files changed, 735 insertions(+), 1035 deletions(-)
- create mode 100644 fs/smb/common/cifsglob.h
- create mode 100644 fs/smb/common/cifspdu.h
-
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index ab1d45fcebde..e81e615f322a 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -6824,6 +6824,7 @@ int smb2_read(struct ksmbd_work *work)
+ 
+ 	nbytes = ksmbd_vfs_read(work, fp, length, &offset, aux_payload_buf);
+ 	if (nbytes < 0) {
++		kvfree(aux_payload_buf);
+ 		err = nbytes;
+ 		goto out;
+ 	}
 -- 
 2.43.0
 
