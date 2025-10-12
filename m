@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D55E1EB9FA;
-	Sun, 12 Oct 2025 01:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEC320126A;
+	Sun, 12 Oct 2025 01:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760234387; cv=none; b=KK6+pUVAA2vJq0NXOti55U0TjOqTjFwcfd6e+Om7yL5TkIYD693X60Ky4WwUIDHx0ietWzxqtzZcbW9oQ9V3uOEdTW06nk36cvkyruq75pJDO5uBDTh1+vhNT/kGi6GcwJwEPSpuN9KZwCde2yEWBjHA+XjAZo/HaouvQc/lzSc=
+	t=1760234388; cv=none; b=YdH283ce9059970rJ+vu3n7/ZoWneLZSbztYyrPbbxOAM+5ooW8Llsrn3l3v9K8eQSUTXn0diPAyVTHR4GMezdKf2tWDePJJVciB5fkE7kOo476sdzkbWQ0KV08BgjGRBiS9tlWRBCL3LUnHRfQBP14XhchuE8Rlj6157ul9VmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760234387; c=relaxed/simple;
-	bh=BeoMBztbvcFX7rlY3UlLBL/j/SrAexLozHMH/LcR0Eg=;
+	s=arc-20240116; t=1760234388; c=relaxed/simple;
+	bh=68uQaOv1+uvhvQouwuek8F2wnHh0nnIbcccW1KgVb2g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ALhK9kmQe4ljWHsVWS9XcBUHMQBmTPgT22vu1SOfh9vVZQkRWlO4aYvb9g5b8uy/w1IYOVvy0nDz6mplqTXah3xTb8QysPVWd/vNx26XifrjJYwCKE2Hg8Ibl3Jto7FDaIPPEE6+88n/vGiKSUuViKuMmduWVPqESZ8VZP7pgK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N/HdaC4u; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=A7fjjZQGLXVMgjMTgqV4p3dG4fvr00020CYAkQy7VFudzRN/+AShVo/TW5qIIPCYR8/lYuNSEZ+Eu377VZtWwCgQijTzUG7GSG1fKegKusVDNTHM4WL/ot4tHmZEI2fB/8gkhUdGV0wmjVQflhpRjQE9cNDOR5vr1jrVzsgaJag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FbM0R5dj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N/HdaC4u"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C09C2C116B1;
-	Sun, 12 Oct 2025 01:59:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FbM0R5dj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A54DC116C6;
+	Sun, 12 Oct 2025 01:59:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760234387;
-	bh=BeoMBztbvcFX7rlY3UlLBL/j/SrAexLozHMH/LcR0Eg=;
+	s=k20201202; t=1760234388;
+	bh=68uQaOv1+uvhvQouwuek8F2wnHh0nnIbcccW1KgVb2g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=N/HdaC4uMmXHTdT/xwfRNxGkdiy2jHuLg1LULk7maMj+wD1Z5ajherw1whr2B5e18
-	 ZE+xAYUnyUfn6uDMobTxz4MaOzJVUjvq0tm/9nchPlMhCJkRgA6rKXJzEkvoXj6USO
-	 A1JBSfHmEK5us02Vzoqn7AThV8pcLrFXFYwruECHyMEvToRMlRpFbG5kqQnVJDMCDm
-	 SLYUPP6XBI+1OIfE/n/mSR2B/VruZihrDgH41uxu+YyCgGsizvkI+68CsBbgp2RNaO
-	 OCt/W8gd8dL/k0/Ge/a4/r0Yd/wgT/mVUVZGStJPPy9Dxh2fILgyUih69GNaZM2BEm
-	 4nCO/ylPjB6qw==
+	b=FbM0R5djZTm0S99UUljKvf6qqa7s0wQ5i/slLm0bWAmG0y3kNMwAcz73FapbTXCl2
+	 B7YixY/GU6hExfPP5ZSRcPhzyQBhpDFKjL+Bh2xh1KjPM0rXXpQpgVO9+T76lo2CiL
+	 P6wVjwB5DQTyIY9octvl/B7bcuMsw51YhvE/EbiO5zSB4V2TGZe+pI28TkDHLjeEVw
+	 S+Yzja43QlhGQaLudM8BupaX1fQV7cMF1Q1a3vAzVNCwONO0LubdRGf4A/yRfjWLKE
+	 GjjRzqlokfgS+4nZ9P9pc6RShNo4L6IoXDvjhYr1P0QOB/dVHqGssFaDqYMGrS/IbA
+	 SiodS1DlZ084Q==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-cifs@vger.kernel.org,
 	Steve French <sfrench@samba.org>
@@ -38,9 +38,9 @@ Cc: samba-technical@lists.samba.org,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 5/8] smb: client: Use MD5 library for SMB1 signature calculation
-Date: Sat, 11 Oct 2025 18:57:35 -0700
-Message-ID: <20251012015738.244315-6-ebiggers@kernel.org>
+Subject: [PATCH 8/8] smb: client: Consolidate cmac(aes) shash allocation
+Date: Sat, 11 Oct 2025 18:57:38 -0700
+Message-ID: <20251012015738.244315-9-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251012015738.244315-1-ebiggers@kernel.org>
 References: <20251012015738.244315-1-ebiggers@kernel.org>
@@ -52,121 +52,77 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert cifs_calc_signature() to use the MD5 library instead of a "md5"
-crypto_shash.  This is simpler and faster.  With the library there's no
-need to allocate memory, no need to handle errors, and the MD5 code is
-accessed directly without inefficient indirect calls and other
-unnecessary API overhead.
-
-To preserve the existing behavior of MD5 signature support being
-disabled when the kernel is booted with "fips=1", make
-cifs_calc_signature() check fips_enabled itself.  Previously it relied
-on the error from cifs_alloc_hash("md5", &server->secmech.md5).
+Now that smb3_crypto_shash_allocate() and smb311_crypto_shash_allocate()
+are identical and only allocate "cmac(aes)", delete the latter and
+replace the call to it with the former.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- fs/smb/client/cifsencrypt.c | 34 +++++++++++++++++-----------------
- fs/smb/client/cifsproto.h   |  1 +
- 2 files changed, 18 insertions(+), 17 deletions(-)
+ fs/smb/client/sess.c          |  2 +-
+ fs/smb/client/smb2proto.h     |  2 +-
+ fs/smb/client/smb2transport.c | 10 +---------
+ 3 files changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
-index 9522088a1cfb7..80215ba7a5744 100644
---- a/fs/smb/client/cifsencrypt.c
-+++ b/fs/smb/client/cifsencrypt.c
-@@ -22,24 +22,33 @@
- #include <linux/highmem.h>
- #include <linux/fips.h>
- #include <linux/iov_iter.h>
- #include <crypto/aead.h>
- #include <crypto/arc4.h>
-+#include <crypto/md5.h>
- #include <crypto/sha2.h>
- 
- static int cifs_sig_update(struct cifs_calc_sig_ctx *ctx,
- 			   const u8 *data, size_t len)
- {
-+	if (ctx->md5) {
-+		md5_update(ctx->md5, data, len);
-+		return 0;
-+	}
- 	if (ctx->hmac) {
- 		hmac_sha256_update(ctx->hmac, data, len);
- 		return 0;
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index 0a8c2fcc9dedf..ef3b498b0a02a 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -582,11 +582,11 @@ cifs_ses_add_channel(struct cifs_ses *ses,
+ 	/*
+ 	 * We need to allocate the server crypto now as we will need
+ 	 * to sign packets before we generate the channel signing key
+ 	 * (we sign with the session key)
+ 	 */
+-	rc = smb311_crypto_shash_allocate(chan->server);
++	rc = smb3_crypto_shash_allocate(chan->server);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: crypto alloc failed\n", __func__);
+ 		mutex_unlock(&ses->session_mutex);
+ 		goto out;
  	}
- 	return crypto_shash_update(ctx->shash, data, len);
- }
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index e7cda885c39f0..6eb86d134abcc 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -293,11 +293,11 @@ extern int smb2_validate_and_copy_iov(unsigned int offset,
+ 				      struct kvec *iov,
+ 				      unsigned int minbufsize, char *data);
+ extern void smb2_copy_fs_info_to_kstatfs(
+ 	 struct smb2_fs_full_size_info *pfs_inf,
+ 	 struct kstatfs *kst);
+-extern int smb311_crypto_shash_allocate(struct TCP_Server_Info *server);
++extern int smb3_crypto_shash_allocate(struct TCP_Server_Info *server);
+ extern void smb311_update_preauth_hash(struct cifs_ses *ses,
+ 				       struct TCP_Server_Info *server,
+ 				       struct kvec *iov, int nvec);
+ extern int smb2_query_info_compound(const unsigned int xid,
+ 				    struct cifs_tcon *tcon,
+diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+index cd689bc27bfdc..ad6068e17a2a9 100644
+--- a/fs/smb/client/smb2transport.c
++++ b/fs/smb/client/smb2transport.c
+@@ -25,20 +25,12 @@
+ #include "smb2proto.h"
+ #include "cifs_debug.h"
+ #include "../common/smb2status.h"
+ #include "smb2glob.h"
  
- static int cifs_sig_final(struct cifs_calc_sig_ctx *ctx, u8 *out)
- {
-+	if (ctx->md5) {
-+		md5_final(ctx->md5, out);
-+		return 0;
-+	}
- 	if (ctx->hmac) {
- 		hmac_sha256_final(ctx->hmac, out);
- 		return 0;
- 	}
- 	return crypto_shash_final(ctx->shash, out);
-@@ -128,35 +137,26 @@ int __cifs_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
-  * should be called with the server->srv_mutex held.
-  */
- static int cifs_calc_signature(struct smb_rqst *rqst,
- 			struct TCP_Server_Info *server, char *signature)
- {
--	int rc;
-+	struct md5_ctx ctx;
- 
- 	if (!rqst->rq_iov || !signature || !server)
- 		return -EINVAL;
+-static int
+-smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
+-{
+-	struct cifs_secmech *p = &server->secmech;
 -
--	rc = cifs_alloc_hash("md5", &server->secmech.md5);
--	if (rc)
--		return -1;
+-	return cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
+-}
 -
--	rc = crypto_shash_init(server->secmech.md5);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not init md5\n", __func__);
--		return rc;
-+	if (fips_enabled) {
-+		cifs_dbg(VFS,
-+			 "MD5 signature support is disabled due to FIPS\n");
-+		return -EOPNOTSUPP;
- 	}
+ int
+-smb311_crypto_shash_allocate(struct TCP_Server_Info *server)
++smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
+ {
+ 	struct cifs_secmech *p = &server->secmech;
  
--	rc = crypto_shash_update(server->secmech.md5,
--		server->session_key.response, server->session_key.len);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
--		return rc;
--	}
-+	md5_init(&ctx);
-+	md5_update(&ctx, server->session_key.response, server->session_key.len);
- 
- 	return __cifs_calc_signature(
- 		rqst, server, signature,
--		&(struct cifs_calc_sig_ctx){ .shash = server->secmech.md5 });
-+		&(struct cifs_calc_sig_ctx){ .md5 = &ctx });
+ 	return cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
  }
- 
- /* must be called with server->srv_mutex held */
- int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
- 		   __u32 *pexpected_response_sequence_number)
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 3bb74eea0e4ff..4976be2c47c14 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -631,10 +631,11 @@ int cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- int cifs_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- 			   struct cifs_sb_info *cifs_sb,
- 			   const unsigned char *path, char *pbuf,
- 			   unsigned int *pbytes_written);
- struct cifs_calc_sig_ctx {
-+	struct md5_ctx *md5;
- 	struct hmac_sha256_ctx *hmac;
- 	struct shash_desc *shash;
- };
- int __cifs_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
- 			  char *signature, struct cifs_calc_sig_ctx *ctx);
 -- 
 2.51.0
 
