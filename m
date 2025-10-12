@@ -1,27 +1,27 @@
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDDBA2D6E43;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C3E2D7395;
 	Sun, 12 Oct 2025 15:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760282050; cv=none; b=sAwiN0q/LNJSMtqM9UMn+oobfi3YenIIJDCLZFKm284V7BmtWJhm06nVz1KXAxZ7L7FIdQ51LvUBwKMoYoUsHg2PDWIbw+Qy2HLiWgJx4Qe0gKMk163X8+RaFWnTle7zx1g/BXXDA1vfpDo2vv4yk5wLq0/FPbQqsyeUBuAN+qA=
+	t=1760282055; cv=none; b=uGP+a7X8Wqyh7os6tQkfcLPXRfSj+1Bc1Ht3TiulejCzDXHiDunPG49rIkPrv12cvoJtI4/yklAhKaTwJbIk7fD9ogM4dZ1JYVV8UJPhWp3rJkCCXKlp1IQJH4pVbT90HjG6zHDvP4EsQYhTzo8fndPoxvsVyOmwanawnLrZWSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760282050; c=relaxed/simple;
-	bh=qKW1ea93q6vZqFG50LDILT19TfQEPrMuEhgjiQtZhBM=;
+	s=arc-20240116; t=1760282055; c=relaxed/simple;
+	bh=F6Sq6Ie75/UTc0yIY1uQJ2UUmS8cT5UNdaUtmeFRic8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rtGdE2cDJMSVUbF/2oYtoUxe0iCuljygFcGHZ6svYke0MxbgrKxq8nlVAvWvfuy4hbGzanSO03009/qzNrmP9scqGreoq2zLnvmrOty/ty2HduqN1EaI5onEQqGvGZ2GyqW1XXjeie8Y2/e2HVAeJXyA1hw/AuYPyRw9ABhEgOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.206.16.166
+	 MIME-Version; b=dRO69xDXJhNbUECfce4Vtxn8+Vh5dMSneTMlKKRCaEuDpahpj/VOcMcAWW7zyM7B/zfL6/VTVeBFjBTiEXXd31Ye84MdiDmkD/WPzGe3A01576fYaj8TJrEDVStSsGMBdQqCUd5PhREwhA+a3EW2xskJNCwaL8JpOZ0LjTI81W0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.207.19.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: zesmtpgz9t1760281836t9387fffc
-X-QQ-Originating-IP: 2T95c9L4H61HzEWJQT2O9lrbGD03QEdtDkk0qUFq86g=
+X-QQ-mid: zesmtpgz9t1760281845t332b7d2f
+X-QQ-Originating-IP: EQ8+eazKRppuB9E6Azt2sSlJ9bqLQmL3XZ8W8m05150=
 Received: from localhost.localdomain ( [116.128.244.171])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 12 Oct 2025 23:10:35 +0800 (CST)
+	id ; Sun, 12 Oct 2025 23:10:44 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 15633041953525125974
+X-BIZMAIL-ID: 11428189015172842347
 From: chenxiaosong@chenxiaosong.com
 To: stfrench@microsoft.com,
 	metze@samba.org,
@@ -39,9 +39,9 @@ To: stfrench@microsoft.com,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 14/22] smb: move SMB frame definitions to common/cifspdu.h
-Date: Sun, 12 Oct 2025 23:09:07 +0800
-Message-ID: <ECF836BA0695D4DB+20251012150915.2992220-15-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 18/22] smb: move FILE_DIRECTORY_INFO to common/cifspdu.h
+Date: Sun, 12 Oct 2025 23:09:11 +0800
+Message-ID: <30F7355E94F655A9+20251012150915.2992220-19-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251012150915.2992220-1-chenxiaosong@chenxiaosong.com>
 References: <20251012150915.2992220-1-chenxiaosong@chenxiaosong.com>
@@ -54,267 +54,184 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: Mprg6+9faFwuJnDj/Js60OlzARkvDGtLSwHpFog/FzAe0Madod28Afnl
-	1PT4m7nRFa+UVuLtqAnSmDRqo2whEWcRM6gpxEfo288TIQVwyAMewP6c0ixZHblJutRKPHN
-	14P3sIbVKbRhE1siP3M0Rf4NPscBTyBce/UqzY9d94lNK5NbiQh4YxACMsq9EsRcQVuvcFV
-	6JnWLTcJuYHFWDihRKvRZ+W0b/3j4/BdvogJklCXzivpDMZ2WwT1y1Hm18dDBUIL2N6iQrt
-	pC2TxB0s3GoGU/9pnjVIxHPI06YHzOoL3D3/Wc8yQTlIDV+wPeDBjbkIMzr35woIyvzdv8f
-	FgRaJ9Oj4Zeh0Ydc0gDceWlGIbVP3/cWmEWbL+bbI83SKrjSg09U4852T1evsegwvqaOzOS
-	lV97R3HOcbu8YSdSQZxZvaO1CzUfIXqrdEX7zNqVdExiavyTnr8XjXlPRABskJwkg+Iois0
-	2KyfQ3G8ugur+IBwHA3lgr+VdjprRiYAmTe5KfgaiDJOCc1JiPy2e76XU8V54SoxUjWLHyg
-	Rq8he4e9cfeQPBYgMsW2+Ti9EyfjpwLnJYIi6rjor0ETKhJgU1ncqBDRwUQ672gyOqPhAZz
-	ohp+gZ4o4Ei5fvfow8X19SQrXyLR2WhsLvoIIFVU/4B8vaU4oHB1YURqifI74DewqE3hvyN
-	S66A+9DPa3xsv0hyrPio939Yf5KsaXgeZN73ofiY/vYydFNKyLdI2forj6NhW61TSwIHe0B
-	ceQt06Fi1WKNQY5HHk8DG3sqlVcL13+fZleyekM2b6DuS9chi25K2n9dqiLhGs4hyX77uqB
-	MvKMBUHL2hZJUKNqLj44An49CidLMfEhqeHNEmxYpx1kjnhYX9GdYlSKT1H8s53ic4qVoZS
-	CUYhHMaoFk/rY2A51YdkBOc4RfbjsoTniVaIiaH5hLgOyEsfeuvpbYjHybq7s7ptsv/7Vdu
-	pHM0hpgdBvaki/hnZnf3cHYc6DBOKfDcbHRd37TVhLAyUSU5EyvUBD384wVWRUKi8m1ZRQ0
-	XDqcgpNRny5EtViqDFFnj5yv6kIuxQ+CzggXfR7+HBKiwL2ujT
+X-QQ-XMAILINFO: M+znYroNOpVIQMivM2tSgMxm+zKsnkTmszkiVi/w9nWFOPIW+dLGku67
+	k0KF/MjxPY3k5X14zd7apv/sjfWlT3QbSuIftX4FCgofN/8up/uEli9vSFEM/CYjpQO0bMM
+	D7L0PI6HNwWUS9EkzixUILh5GvkurGVfAGw5lyLZPV0LFtuPNByygFhedIx7blYf+AXKQ73
+	Q6WFZ9kEl4u9C1ubk87LIBQfe3btwX+q3pj26VRrCPy8FkYHccCCdVBfMNxK5ka0eBSXalS
+	aSakJ059Op77Ls8bVopTqgYLbRylLdJDO3jdrrZcwBxntgOWOpvd2kXmfMd80YF47YUvTT4
+	Bqf/MeusoiYfBoMjXS4C5+TpS8A8aaAbAofh1AxpQf5FFZbkOYOr0WCoToxAxGjFNyYFAA9
+	l1iIoxOG32XSOKn++XFSD4/IwIyhzCD1Fcn2o1V+KUUqUsvLBlh9qoeaBaA9gtgiXqXEgyY
+	A0DJmQD5iUXn9J/Pzd/EatjpSCSmWDIxPbjHPaSzTHZLd4JlQcWufDRMkzcoHNwHDVm5C2c
+	SWa1L52Qbngg8/GKSmJ7gs24NbXcz9OaRqVJw+1kgowOiveDSfyhsh6MqoEdaF6DbXVoOuO
+	kjrEPaEnopyh7Jzn7TbAIdrE4kPR1EDxFdaERWg5lUO/oitqemdDqwBn3DOMQyZhsJ8+Mu1
+	bo4nate0jFOW0xiAbcAt2JlXi3RrI5wgz/IpS1oArFpD/XBHUoom6yBswCdvIWEg3BLnofy
+	vppA3SRTlSgEgedsGX2TRmV93C9OkkClhb1EgpKKwW1q7g5j0VAvtc5JiDbDc0FjHi6Xo09
+	GMvzWsO+pAtC3QujO8gLiJbxVRHOOf6BRy9SzMrjtAip0nkg03ZKcp8M/0FvpB09H9m0iRS
+	5eBn3YQkXuRwJl1lhjnYBxq97QSyBJ2cloZV3ccml9iytd+JbC5U8XLoNDEsonL02+xTMAX
+	Kw+P8vv4vqGYuPOq9PzONpeJaYnTkyOaC5mv6+ZxxORtd17QgHPd74czxYyX+tnF47fB1q+
+	64Uzrt53rL7zbK3qCl+iwc6v834wo5/8+BcopHkA==
 X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
 X-QQ-RECHKSPAM: 0
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-The client and server have different struct negotiate_rsp, perhaps in the
-future we can change them to be the same.
+Rename "struct file_directory_info" to "FILE_DIRECTORY_INFO",
+then move duplicate definitions to common header file.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifspdu.h    | 58 ----------------------------------
- fs/smb/client/cifssmb.c    |  4 +--
- fs/smb/common/cifspdu.h    | 65 ++++++++++++++++++++++++++++++++++++++
- fs/smb/server/smb_common.c | 10 +++---
- fs/smb/server/smb_common.h | 14 --------
- 5 files changed, 72 insertions(+), 79 deletions(-)
+ fs/smb/client/cifspdu.h    | 14 --------------
+ fs/smb/common/cifspdu.h    | 15 +++++++++++++++
+ fs/smb/server/smb2pdu.c    | 16 ++++++++--------
+ fs/smb/server/smb_common.h | 14 --------------
+ fs/smb/server/vfs.c        |  2 +-
+ 5 files changed, 24 insertions(+), 37 deletions(-)
 
 diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index a0883b1fda16..07eb821654e1 100644
+index 889be409146c..8031e24234a9 100644
 --- a/fs/smb/client/cifspdu.h
 +++ b/fs/smb/client/cifspdu.h
-@@ -266,64 +266,6 @@ put_bcc(__u16 count, struct smb_hdr *hdr)
-  */
- #define MAX_PATHCONF 256
+@@ -2150,20 +2150,6 @@ typedef struct {
+ 	};
+ } __attribute__((packed)) FILE_UNIX_INFO; /* level 0x202 */
  
--/*
-- *  SMB frame definitions  (following must be packed structs)
-- *  See the SNIA CIFS Specification for details.
-- *
-- *  The Naming convention is the lower case version of the
-- *  smb command code name for the struct and this is typedef to the
-- *  uppercase version of the same name with the prefix SMB_ removed
-- *  for brevity.  Although typedefs are not commonly used for
-- *  structure definitions in the Linux kernel, their use in the
-- *  CIFS standards document, which this code is based on, may
-- *  make this one of the cases where typedefs for structures make
-- *  sense to improve readability for readers of the standards doc.
-- *  Typedefs can always be removed later if they are too distracting
-- *  and they are only used for the CIFSs PDUs themselves, not
-- *  internal cifs vfs structures
-- *
-- */
+-typedef struct {
+-	__le32 NextEntryOffset;
+-	__u32 FileIndex;
+-	__le64 CreationTime;
+-	__le64 LastAccessTime;
+-	__le64 LastWriteTime;
+-	__le64 ChangeTime;
+-	__le64 EndOfFile;
+-	__le64 AllocationSize;
+-	__le32 ExtFileAttributes;
+-	__le32 FileNameLength;
+-	char FileName[];
+-} __attribute__((packed)) FILE_DIRECTORY_INFO;   /* level 0x101 FF resp data */
 -
--typedef struct negotiate_req {
--	struct smb_hdr hdr;	/* wct = 0 */
--	__le16 ByteCount;
--	unsigned char DialectsArray[];
--} __attribute__((packed)) NEGOTIATE_REQ;
--
--#define MIN_TZ_ADJ (15 * 60) /* minimum grid for timezones in seconds */
--
--#define READ_RAW_ENABLE 1
--#define WRITE_RAW_ENABLE 2
--#define RAW_ENABLE (READ_RAW_ENABLE | WRITE_RAW_ENABLE)
--#define SMB1_CLIENT_GUID_SIZE (16)
--typedef struct negotiate_rsp {
--	struct smb_hdr hdr;	/* wct = 17 */
--	__le16 DialectIndex; /* 0xFFFF = no dialect acceptable */
--	__u8 SecurityMode;
--	__le16 MaxMpxCount;
--	__le16 MaxNumberVcs;
--	__le32 MaxBufferSize;
--	__le32 MaxRawSize;
--	__le32 SessionKey;
--	__le32 Capabilities;	/* see below */
--	__le32 SystemTimeLow;
--	__le32 SystemTimeHigh;
--	__le16 ServerTimeZone;
--	__u8 EncryptionKeyLength;
--	__u16 ByteCount;
--	union {
--		/* cap extended security off */
--		DECLARE_FLEX_ARRAY(unsigned char, EncryptionKey);
--		/* followed by Domain name - if extended security is off */
--		/* followed by 16 bytes of server GUID */
--		/* then security blob if cap_extended_security negotiated */
--		struct {
--			unsigned char GUID[SMB1_CLIENT_GUID_SIZE];
--			unsigned char SecurityBlob[];
--		} __attribute__((packed)) extended_response;
--	} __attribute__((packed)) u;
--} __attribute__((packed)) NEGOTIATE_RSP;
--
- /* SecurityMode bits */
- #define SECMODE_USER          0x01	/* off indicates share level security */
- #define SECMODE_PW_ENCRYPT    0x02
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 9a346d67e298..e37a00c9251c 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -361,7 +361,7 @@ static int validate_t2(struct smb_t2_rsp *pSMB)
- }
- 
- static int
--decode_ext_sec_blob(struct cifs_ses *ses, NEGOTIATE_RSP *pSMBr)
-+decode_ext_sec_blob(struct cifs_ses *ses, CLIENT_NEGOTIATE_RSP *pSMBr)
- {
- 	int	rc = 0;
- 	u16	count;
-@@ -420,7 +420,7 @@ CIFSSMBNegotiate(const unsigned int xid,
- 		 struct TCP_Server_Info *server)
- {
- 	NEGOTIATE_REQ *pSMB;
--	NEGOTIATE_RSP *pSMBr;
-+	CLIENT_NEGOTIATE_RSP *pSMBr;
- 	int rc = 0;
- 	int bytes_returned;
- 	int i;
+ typedef struct {
+ 	__le32 NextEntryOffset;
+ 	__u32 FileIndex;
 diff --git a/fs/smb/common/cifspdu.h b/fs/smb/common/cifspdu.h
-index 59e5425cdc8d..1109c20f7bf8 100644
+index 548d621ec233..82d57ba275ee 100644
 --- a/fs/smb/common/cifspdu.h
 +++ b/fs/smb/common/cifspdu.h
-@@ -256,6 +256,71 @@ struct smb_hdr {
- 	__u8 WordCount;
- } __attribute__((packed));
+@@ -370,4 +370,19 @@ typedef struct {
+ 	__le16 FileSystemName[]; /* do not have to save this - get subset? */
+ } __attribute__((packed)) FILE_SYSTEM_ATTRIBUTE_INFO;
  
-+/*
-+ *  SMB frame definitions  (following must be packed structs)
-+ *  See the SNIA CIFS Specification for details.
-+ *
-+ *  The Naming convention is the lower case version of the
-+ *  smb command code name for the struct and this is typedef to the
-+ *  uppercase version of the same name with the prefix SMB_ removed
-+ *  for brevity.  Although typedefs are not commonly used for
-+ *  structure definitions in the Linux kernel, their use in the
-+ *  CIFS standards document, which this code is based on, may
-+ *  make this one of the cases where typedefs for structures make
-+ *  sense to improve readability for readers of the standards doc.
-+ *  Typedefs can always be removed later if they are too distracting
-+ *  and they are only used for the CIFSs PDUs themselves, not
-+ *  internal cifs vfs structures
-+ *
-+ */
++/* See MS-CIFS 2.2.8.1.4 */
++typedef struct {
++	__le32 NextEntryOffset;
++	__u32 FileIndex;
++	__le64 CreationTime;
++	__le64 LastAccessTime;
++	__le64 LastWriteTime;
++	__le64 ChangeTime;
++	__le64 EndOfFile;
++	__le64 AllocationSize;
++	__le32 ExtFileAttributes;
++	__le32 FileNameLength;
++	char FileName[];
++} __attribute__((packed)) FILE_DIRECTORY_INFO;   /* level 0x101 FF resp data */
 +
-+typedef struct negotiate_req {
-+	struct smb_hdr hdr;	/* wct = 0 */
-+	__le16 ByteCount;
-+	unsigned char DialectsArray[];
-+} __attribute__((packed)) NEGOTIATE_REQ;
-+
-+#define MIN_TZ_ADJ (15 * 60) /* minimum grid for timezones in seconds */
-+
-+#define READ_RAW_ENABLE 1
-+#define WRITE_RAW_ENABLE 2
-+#define RAW_ENABLE (READ_RAW_ENABLE | WRITE_RAW_ENABLE)
-+#define SMB1_CLIENT_GUID_SIZE (16)
-+
-+typedef struct client_negotiate_rsp {
-+	struct smb_hdr hdr;	/* wct = 17 */
-+	__le16 DialectIndex; /* 0xFFFF = no dialect acceptable */
-+	__u8 SecurityMode;
-+	__le16 MaxMpxCount;
-+	__le16 MaxNumberVcs;
-+	__le32 MaxBufferSize;
-+	__le32 MaxRawSize;
-+	__le32 SessionKey;
-+	__le32 Capabilities;	/* see below */
-+	__le32 SystemTimeLow;
-+	__le32 SystemTimeHigh;
-+	__le16 ServerTimeZone;
-+	__u8 EncryptionKeyLength;
-+	__u16 ByteCount;
-+	union {
-+		/* cap extended security off */
-+		DECLARE_FLEX_ARRAY(unsigned char, EncryptionKey);
-+		/* followed by Domain name - if extended security is off */
-+		/* followed by 16 bytes of server GUID */
-+		/* then security blob if cap_extended_security negotiated */
-+		struct {
-+			unsigned char GUID[SMB1_CLIENT_GUID_SIZE];
-+			unsigned char SecurityBlob[];
-+		} __attribute__((packed)) extended_response;
-+	} __attribute__((packed)) u;
-+} __attribute__((packed)) CLIENT_NEGOTIATE_RSP;
-+
-+typedef struct server_negotiate_rsp {
-+	struct smb_hdr hdr;     /* wct = 17 */
-+	__le16 DialectIndex; /* 0xFFFF = no dialect acceptable */
-+	__le16 ByteCount;
-+} __attribute__((packed)) SERVER_NEGOTIATE_RSP;
-+
- /* List of FileSystemAttributes - see 2.5.1 of MS-FSCC */
- #define FILE_SUPPORTS_SPARSE_VDL	0x10000000 /* faster nonsparse extend */
- #define FILE_SUPPORTS_BLOCK_REFCOUNTING	0x08000000 /* allow ioctl dup extents */
-diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-index b23203a1c286..e1e89bc1c43f 100644
---- a/fs/smb/server/smb_common.c
-+++ b/fs/smb/server/smb_common.c
-@@ -280,13 +280,13 @@ static int ksmbd_negotiate_smb_dialect(void *buf)
+ #endif /* _COMMON_CIFSPDU_H */
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 2ad46a11e7ef..679318afdce3 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -3800,7 +3800,7 @@ static int readdir_info_level_struct_sz(int info_level)
+ 	case FILE_BOTH_DIRECTORY_INFORMATION:
+ 		return sizeof(struct file_both_directory_info);
+ 	case FILE_DIRECTORY_INFORMATION:
+-		return sizeof(struct file_directory_info);
++		return sizeof(FILE_DIRECTORY_INFO);
+ 	case FILE_NAMES_INFORMATION:
+ 		return sizeof(struct file_names_info);
+ 	case FILEID_FULL_DIRECTORY_INFORMATION:
+@@ -3839,9 +3839,9 @@ static int dentry_name(struct ksmbd_dir_info *d_info, int info_level)
+ 	}
+ 	case FILE_DIRECTORY_INFORMATION:
+ 	{
+-		struct file_directory_info *fdinfo;
++		FILE_DIRECTORY_INFO *fdinfo;
  
- 	proto = *(__le32 *)((struct smb_hdr *)buf)->Protocol;
- 	if (proto == SMB1_PROTO_NUMBER) {
--		struct smb_negotiate_req *req;
-+		struct negotiate_req *req;
+-		fdinfo = (struct file_directory_info *)d_info->rptr;
++		fdinfo = (FILE_DIRECTORY_INFO *)d_info->rptr;
+ 		d_info->rptr += le32_to_cpu(fdinfo->NextEntryOffset);
+ 		d_info->name = fdinfo->FileName;
+ 		d_info->name_len = le32_to_cpu(fdinfo->FileNameLength);
+@@ -3978,9 +3978,9 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
+ 	}
+ 	case FILE_DIRECTORY_INFORMATION:
+ 	{
+-		struct file_directory_info *fdinfo;
++		FILE_DIRECTORY_INFO *fdinfo;
  
--		req = (struct smb_negotiate_req *)buf;
-+		req = (struct negotiate_req *)buf;
- 		if (le16_to_cpu(req->ByteCount) < 2)
+-		fdinfo = (struct file_directory_info *)kstat;
++		fdinfo = (FILE_DIRECTORY_INFO *)kstat;
+ 		fdinfo->FileNameLength = cpu_to_le32(conv_len);
+ 		if (d_info->hide_dot_file && d_info->name[0] == '.')
+ 			fdinfo->ExtFileAttributes |= FILE_ATTRIBUTE_HIDDEN_LE;
+@@ -4228,9 +4228,9 @@ static int reserve_populate_dentry(struct ksmbd_dir_info *d_info,
+ 	}
+ 	case FILE_DIRECTORY_INFORMATION:
+ 	{
+-		struct file_directory_info *fdinfo;
++		FILE_DIRECTORY_INFO *fdinfo;
+ 
+-		fdinfo = (struct file_directory_info *)d_info->wptr;
++		fdinfo = (FILE_DIRECTORY_INFO *)d_info->wptr;
+ 		memcpy(fdinfo->FileName, d_info->name, d_info->name_len);
+ 		fdinfo->FileName[d_info->name_len] = 0x00;
+ 		fdinfo->FileNameLength = cpu_to_le32(d_info->name_len);
+@@ -4514,7 +4514,7 @@ int smb2_query_dir(struct ksmbd_work *work)
  			goto err_out;
- 
--		if (offsetof(struct smb_negotiate_req, DialectsArray) - 4 +
-+		if (offsetof(struct negotiate_req, DialectsArray) - 4 +
- 			le16_to_cpu(req->ByteCount) > smb_buf_length) {
- 			goto err_out;
- 		}
-@@ -572,12 +572,12 @@ static int __smb2_negotiate(struct ksmbd_conn *conn)
- 
- static int smb_handle_negotiate(struct ksmbd_work *work)
- {
--	struct smb_negotiate_rsp *neg_rsp = work->response_buf;
-+	struct server_negotiate_rsp *neg_rsp = work->response_buf;
- 
- 	ksmbd_debug(SMB, "Unsupported SMB1 protocol\n");
- 
- 	if (ksmbd_iov_pin_rsp(work, (void *)neg_rsp + 4,
--			      sizeof(struct smb_negotiate_rsp) - 4))
-+			      sizeof(struct server_negotiate_rsp) - 4))
- 		return -ENOMEM;
- 
- 	neg_rsp->hdr.Status.CifsError = STATUS_SUCCESS;
+ 	} else {
+ no_buf_len:
+-		((struct file_directory_info *)
++		((FILE_DIRECTORY_INFO *)
+ 		((char *)rsp->Buffer + d_info.last_entry_offset))
+ 		->NextEntryOffset = 0;
+ 		if (d_info.data_count >= d_info.last_entry_off_align)
 diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
-index 90015cd8fe4e..a5dd656c36f1 100644
+index d6351b0ee62a..ea1c64f84ff1 100644
 --- a/fs/smb/server/smb_common.h
 +++ b/fs/smb/server/smb_common.h
-@@ -56,20 +56,6 @@
- 		FILE_EXECUTE | FILE_DELETE_CHILD | \
- 		FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES)
+@@ -80,20 +80,6 @@ struct object_id_info {
+ 	struct fs_extended_info extended_info;
+ } __packed;
  
--#define SMB1_CLIENT_GUID_SIZE		(16)
+-struct file_directory_info {
+-	__le32 NextEntryOffset;
+-	__u32 FileIndex;
+-	__le64 CreationTime;
+-	__le64 LastAccessTime;
+-	__le64 LastWriteTime;
+-	__le64 ChangeTime;
+-	__le64 EndOfFile;
+-	__le64 AllocationSize;
+-	__le32 ExtFileAttributes;
+-	__le32 FileNameLength;
+-	char FileName[];
+-} __packed;   /* level 0x101 FF resp data */
 -
--struct smb_negotiate_req {
--	struct smb_hdr hdr;     /* wct = 0 */
--	__le16 ByteCount;
--	unsigned char DialectsArray[];
--} __packed;
--
--struct smb_negotiate_rsp {
--	struct smb_hdr hdr;     /* wct = 17 */
--	__le16 DialectIndex; /* 0xFFFF = no dialect acceptable */
--	__le16 ByteCount;
--} __packed;
--
- struct filesystem_attribute_info {
- 	__le32 Attributes;
- 	__le32 MaxPathNameComponentLength;
+ struct file_names_info {
+ 	__le32 NextEntryOffset;
+ 	__u32 FileIndex;
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 891ed2dc2b73..a8660487e4ae 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -1654,7 +1654,7 @@ int ksmbd_vfs_get_dos_attrib_xattr(struct mnt_idmap *idmap,
+  */
+ void *ksmbd_vfs_init_kstat(char **p, struct ksmbd_kstat *ksmbd_kstat)
+ {
+-	struct file_directory_info *info = (struct file_directory_info *)(*p);
++	FILE_DIRECTORY_INFO *info = (FILE_DIRECTORY_INFO *)(*p);
+ 	struct kstat *kstat = ksmbd_kstat->kstat;
+ 	u64 time;
+ 
 -- 
 2.43.0
 
