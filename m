@@ -1,27 +1,27 @@
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB37A2D739B;
-	Sun, 12 Oct 2025 15:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC55B2D7814;
+	Sun, 12 Oct 2025 15:15:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760282055; cv=none; b=sIaRCbcfKsf3Y9q5TDOHfxfgp6hLc9+952Nn67qbYMg5Dcc8Tf/pr3ROmHOi7q54htleCskuc//luxMbvnZL+zdlM9MHGn/XDiZRgun9tileddrTdp2LZxkqD9KhuB+JZnTxFVuR252Af9L+EJ8Uy6mkJysbMZhV5qUf6+1Wmr8=
+	t=1760282146; cv=none; b=HjWYQj2xYmRpYFbom2gY5nmXFGa4oHCmEUqOHTku0HWCI0yL0y0kq6YNAqx+aFP4V9yHigeNo19ippU+MHCwkkK+q2lauOub6d+Ho2r707vwlcanCzPm7JmxLDpg4Msc4NGlAd7pUp10xDO7H6b1bsSBTRAFhCmx9zZmr00SOTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760282055; c=relaxed/simple;
-	bh=9fhG8rUC2Y67xiXJfY2hEFKpnkRKB2gNIMJ6ia+D7cM=;
+	s=arc-20240116; t=1760282146; c=relaxed/simple;
+	bh=Xf8YDORNtEKfBSYe5NMLOToggAz3uvjWZVx2WzEpT+Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EvjkcVMg2o54KQwi9ksxNS39MzgSvAvf+bCAag5kj8/86x7bJJO4cL93nc8rUAabned7O6ebt+p2GqOCor46ZGx6J2xo1VWyblTN0Rjxu0vD04k2gvakIETfgSjztFGvqTHXKbX55tiLdsvZJKVDhdpupg0TVpJ2o5YfnVNr9o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=52.59.177.22
+	 MIME-Version; b=iFZBLlwWnBKdFcDna4GWKy0Q2uITu4TieuU7zz55rl4S8F+lAAi3/tsux44e9aKMM8X+8H5Jy35HrlYmcC1tu1cSoqMtQJC6VGa+WUX8aRMcFFnMxqMqbcs16Pa1G2bbl8O0bUPtwed4b5ROl0l3wX0m8JdYGn/3liZ9vpFI5ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.204.34.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: zesmtpgz9t1760281847t3bcad29a
-X-QQ-Originating-IP: 7fdZq8rvWj067Vat6YuiZlCdCTNLKewesOZqESftJgs=
+X-QQ-mid: zesmtpgz9t1760281854t649e598b
+X-QQ-Originating-IP: t2iYRrmfbAzIz6LLFoW8zbJCqK90/3jYCzsloHhDGI0=
 Received: from localhost.localdomain ( [116.128.244.171])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 12 Oct 2025 23:10:46 +0800 (CST)
+	id ; Sun, 12 Oct 2025 23:10:53 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 15875391227853962137
+X-BIZMAIL-ID: 14456546733879225036
 From: chenxiaosong@chenxiaosong.com
 To: stfrench@microsoft.com,
 	metze@samba.org,
@@ -39,9 +39,9 @@ To: stfrench@microsoft.com,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 19/22] smb: move FILE_FULL_DIRECTORY_INFO to common/cifspdu.h
-Date: Sun, 12 Oct 2025 23:09:12 +0800
-Message-ID: <F1114E31F698FF94+20251012150915.2992220-20-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 22/22] smb: move FILE_SYSTEM_POSIX_INFO to common/cifspdu.h
+Date: Sun, 12 Oct 2025 23:09:15 +0800
+Message-ID: <BAD128CECF6CEF50+20251012150915.2992220-23-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251012150915.2992220-1-chenxiaosong@chenxiaosong.com>
 References: <20251012150915.2992220-1-chenxiaosong@chenxiaosong.com>
@@ -54,164 +54,160 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: NbxtxvLq7lKKhKLAEMpmztwJEPZtCa2lIqR5x+/Hcatadt8c4NXzPEro
-	n8nD/TJ5w+f3nRy0uQchUPjANI8IS7PIDYE6FU55ne2hjnNyUsI54NG0kHslOeJF9lqR/23
-	uRs/cEYT5oWx2/jdmRiXipU8Kk7R9LXT7HM0owa+a591v2RSOkJlxyrp49dUMAQGFdUvqLx
-	38JmxvcMdvL4cZm+ikxBgSogI/En+BqrTFbo8fEfPBBQ6ksDgRPykuAI7JHQ0zdyqcx7t3n
-	yPZaYP6Av5588pq0lrJZgnBy479Nn8zlNgnpldmlPuIJ9foxzKQ9YFI53CUkqOcCFgsochv
-	+aom7XW0AYmKdqfKzASvI8tgbk1k42bN122i1webwlvzh/e2LbKt8RjBfYovwm0RKZreFEA
-	JWG3Efe3JRgjk9vmRwHcavNpZiZUelJouJmWSMT+E4F6bgXwARupU0YhDH9XMxIDA9lOCvh
-	68FWQCBKL3eFkuip4TP+JU8Q5F2OV5ZU4P9VW56Cr4wxwuDUtC4+mFsvq+ARATyvesxAHjf
-	+e8wna6PNX1h7rWZgr3i6nVtm213W4np20422jyIigQxVBxc+wAUGZzGH4kPEi2IUltNeUW
-	HbJUcjIvOicuty/6VnHqMUXVu3AI1EhLy8luGzokAlymKa1w1rZq5IewvyzwFtcu5nfShzM
-	HKJS6FS0bHKZ8d7ZmIBQoTY1p1ifRD8qy1Fajngd8GJ7TXn30V8Bf+4BhH8/b/Dq7nOyTEa
-	Q7U13NAVjWiZPXWypjjZgwmN9dTcOzRYXYO/JV5AmqIQaBzqqMmPZ4WEnr0gxuufnBUJt27
-	9aOtxP81/poe6mGxq1iRJuzciTs/i4h9XnwVNv/8Adm5tNm0c6LTNB/hvZsJj6nt6MjyTlt
-	ZXR5KLQfrFa5p6krjFb95s/CoPjSRfmGsMaOKtXFiEVmzCSpKO22qE9n2rRpxbZ/grZEGv+
-	26s4Xs7M/wq6v8rm7s61OPQig3PU11hHags57aQuM0IVP7JeDcSQ47+dhMvNVjlbBk/V/aW
-	4MAJpSyojFirQFc4rZouGjeFCG0Y2l4jx+/xUKtzpCJ5zb+dtsF3GNsqwTHHI=
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-XMAILINFO: MjgrMiwCCJklvnP89b1VoWtIgI+JAZqJlW4zCrRRAR8LGAGfay7GDltd
+	Xq9fK0oLUbN20cmcxuIgTF5tSTgJRH9jqztEIpDr6ZNwvCntmAqDm35aBefspJl50+sGuJN
+	RG8kKEY4dVz9XMkAv3ALytvPhKkl3vMhUJWxoJ4FrvLhmkfjbAFIWu72Gd5zE8S2sO7zAqI
+	jyGOcdhw/gDeHhUAJUSQIo1saWm/wk+eYINxPRj73jFKE9nas0v0+peRHVkD2bXeLvBvV9K
+	dRYa1k9EOS9KWBvsBXDJ98aFfMJ8SSajAxPy18T4TGERReOqUH4B3SbI/5dgmG4YrxAk5Vc
+	x1cm5cMmEZwMP8yBpeGWAW/IYOJwT4Zu9Hd67sk590VXZED+OlRqurzwrO6YvT+gtDitJAt
+	tWasMydW48hlKl0ad6cASO10MIW7++AFdmqe7GM0K7CygDwTcYTbuLcmEN8k1rVgYN3sgAW
+	4pZ7doRRwyXX62+LCG3XhSqh6aZpll1CpDK36Ebcmv0njUaSU63D5NI6/Au4kIYjZ1XPoR5
+	EG3+c5e0rCR/pyjsPlPyIqdFC/SdqXWztAR5kDu4DvTwN+ULPhWs9LdzCmO4IXwrLW3748e
+	SBjmuXiiMP+gSOUBVF/2uHqtbpREKmKABGFnYWzYNdeqpXXI5VKDE0nZ8Fh17/cRfYQFenh
+	y3C9HLznzUie1zi8Rx6fmeeCGYk7n1Y+lwwyKmKehvUAJwNylq9KHtZfa+V/J+iL91FiU2e
+	x02x25uXsQ6sWSA7YrSmdm+ZXwzVFfPaZumn4vq6P3Krn0rlW5FX9S2lisRL78mhYAY+LJ+
+	eo6LTk+xalaJ8UX7Dw17uUsZNQYOSEfC8/ZU67TtGJFXoMkaEPL0s7K3GeePzk41TbdJEgp
+	MkT1ZrlhLKMMdmbT541EaR5xNmFu6/aamT43Y5L12K8j1SZhjhDVm9IrEenRbsySx7zo7c1
+	/wqJu/wG2exjmKyq921afzeX+LR9OxlwIcT8pRtb0vLpl4f+H/lffhS46ZpB843OEuRCvGW
+	ZP6CeJPHT0vYFwrwRGsnQrRmfnHd4WXM6hitWEEw==
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
 X-QQ-RECHKSPAM: 0
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Rename "struct file_full_directory_info" to "FILE_FULL_DIRECTORY_INFO",
+Rename "struct filesystem_posix_info" to "FILE_SYSTEM_POSIX_INFO",
 then move duplicate definitions to common header file.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifspdu.h    | 15 ---------------
- fs/smb/common/cifspdu.h    | 16 ++++++++++++++++
- fs/smb/server/smb2pdu.c    | 14 +++++++-------
- fs/smb/server/smb_common.h | 15 ---------------
- 4 files changed, 23 insertions(+), 37 deletions(-)
+ fs/smb/client/cifspdu.h    | 22 ----------------------
+ fs/smb/common/cifspdu.h    | 23 +++++++++++++++++++++++
+ fs/smb/server/smb2pdu.c    |  4 ++--
+ fs/smb/server/smb_common.h | 23 -----------------------
+ 4 files changed, 25 insertions(+), 47 deletions(-)
 
 diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index 8031e24234a9..f89abcb88dee 100644
+index 68e3af176add..ab23a233153a 100644
 --- a/fs/smb/client/cifspdu.h
 +++ b/fs/smb/client/cifspdu.h
-@@ -2150,21 +2150,6 @@ typedef struct {
- 	};
- } __attribute__((packed)) FILE_UNIX_INFO; /* level 0x202 */
+@@ -1866,28 +1866,6 @@ typedef struct {
+ 
+ #define CIFS_POSIX_EXTENSIONS           0x00000010 /* support for new QFSInfo */
  
 -typedef struct {
--	__le32 NextEntryOffset;
--	__u32 FileIndex;
--	__le64 CreationTime;
--	__le64 LastAccessTime;
--	__le64 LastWriteTime;
--	__le64 ChangeTime;
--	__le64 EndOfFile;
--	__le64 AllocationSize;
--	__le32 ExtFileAttributes;
--	__le32 FileNameLength;
--	__le32 EaSize; /* length of the xattrs */
--	char FileName[];
--} __attribute__((packed)) FILE_FULL_DIRECTORY_INFO; /* level 0x102 rsp data */
+-	/* For undefined recommended transfer size return -1 in that field */
+-	__le32 OptimalTransferSize;  /* bsize on some os, iosize on other os */
+-	__le32 BlockSize;
+-    /* The next three fields are in terms of the block size.
+-	(above). If block size is unknown, 4096 would be a
+-	reasonable block size for a server to report.
+-	Note that returning the blocks/blocksavail removes need
+-	to make a second call (to QFSInfo level 0x103 to get this info.
+-	UserBlockAvail is typically less than or equal to BlocksAvail,
+-	if no distinction is made return the same value in each */
+-	__le64 TotalBlocks;
+-	__le64 BlocksAvail;       /* bfree */
+-	__le64 UserBlocksAvail;   /* bavail */
+-    /* For undefined Node fields or FSID return -1 */
+-	__le64 TotalFileNodes;
+-	__le64 FreeFileNodes;
+-	__le64 FileSysIdentifier;   /* fsid */
+-	/* NB Namelen comes from FILE_SYSTEM_ATTRIBUTE_INFO call */
+-	/* NB flags can come from FILE_SYSTEM_DEVICE_INFO call   */
+-} __attribute__((packed)) FILE_SYSTEM_POSIX_INFO;
 -
- typedef struct {
- 	__le32 NextEntryOffset;
- 	__u32 FileIndex;
+ /* DeviceType Flags */
+ #define FILE_DEVICE_CD_ROM              0x00000002
+ #define FILE_DEVICE_CD_ROM_FILE_SYSTEM  0x00000003
 diff --git a/fs/smb/common/cifspdu.h b/fs/smb/common/cifspdu.h
-index 82d57ba275ee..d7c9f17ed220 100644
+index b4ca0c36cf84..853e03f395be 100644
 --- a/fs/smb/common/cifspdu.h
 +++ b/fs/smb/common/cifspdu.h
-@@ -385,4 +385,20 @@ typedef struct {
- 	char FileName[];
- } __attribute__((packed)) FILE_DIRECTORY_INFO;   /* level 0x101 FF resp data */
+@@ -329,6 +329,29 @@ typedef struct {
+ 	__le32 BytesPerSector;
+ } __attribute__((packed)) FILE_SYSTEM_INFO;	/* size info, level 0x103 */
  
-+/* See MS-CIFS 2.2.8.1.5 */
 +typedef struct {
-+	__le32 NextEntryOffset;
-+	__u32 FileIndex;
-+	__le64 CreationTime;
-+	__le64 LastAccessTime;
-+	__le64 LastWriteTime;
-+	__le64 ChangeTime;
-+	__le64 EndOfFile;
-+	__le64 AllocationSize;
-+	__le32 ExtFileAttributes;
-+	__le32 FileNameLength;
-+	__le32 EaSize; /* length of the xattrs */
-+	char FileName[];
-+} __attribute__((packed)) FILE_FULL_DIRECTORY_INFO; /* level 0x102 rsp data */
++	/* For undefined recommended transfer size return -1 in that field */
++	__le32 OptimalTransferSize;  /* bsize on some os, iosize on other os */
++	__le32 BlockSize;
++	/* The next three fields are in terms of the block size.
++	 * (above). If block size is unknown, 4096 would be a
++	 * reasonable block size for a server to report.
++	 * Note that returning the blocks/blocksavail removes need
++	 * to make a second call (to QFSInfo level 0x103 to get this info.
++	 * UserBlockAvail is typically less than or equal to BlocksAvail,
++	 * if no distinction is made return the same value in each
++	 */
++	__le64 TotalBlocks;
++	__le64 BlocksAvail;       /* bfree */
++	__le64 UserBlocksAvail;   /* bavail */
++	/* For undefined Node fields or FSID return -1 */
++	__le64 TotalFileNodes;
++	__le64 FreeFileNodes;
++	__le64 FileSysIdentifier;   /* fsid */
++	/* NB Namelen comes from FILE_SYSTEM_ATTRIBUTE_INFO call */
++	/* NB flags can come from FILE_SYSTEM_DEVICE_INFO call   */
++} __attribute__((packed)) FILE_SYSTEM_POSIX_INFO;
 +
- #endif /* _COMMON_CIFSPDU_H */
+ /* See MS-CIFS 2.2.8.2.5 */
+ typedef struct {
+ 	__le32 DeviceType;
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 679318afdce3..6121060d84ae 100644
+index 065e0daaa91b..d49cd1ad1d70 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -3796,7 +3796,7 @@ static int readdir_info_level_struct_sz(int info_level)
- {
- 	switch (info_level) {
- 	case FILE_FULL_DIRECTORY_INFORMATION:
--		return sizeof(struct file_full_directory_info);
-+		return sizeof(FILE_FULL_DIRECTORY_INFO);
- 	case FILE_BOTH_DIRECTORY_INFORMATION:
- 		return sizeof(struct file_both_directory_info);
- 	case FILE_DIRECTORY_INFORMATION:
-@@ -3819,9 +3819,9 @@ static int dentry_name(struct ksmbd_dir_info *d_info, int info_level)
- 	switch (info_level) {
- 	case FILE_FULL_DIRECTORY_INFORMATION:
+@@ -5626,14 +5626,14 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
+ 	}
+ 	case FS_POSIX_INFORMATION:
  	{
--		struct file_full_directory_info *ffdinfo;
-+		FILE_FULL_DIRECTORY_INFO *ffdinfo;
+-		struct filesystem_posix_info *info;
++		FILE_SYSTEM_POSIX_INFO *info;
  
--		ffdinfo = (struct file_full_directory_info *)d_info->rptr;
-+		ffdinfo = (FILE_FULL_DIRECTORY_INFO *)d_info->rptr;
- 		d_info->rptr += le32_to_cpu(ffdinfo->NextEntryOffset);
- 		d_info->name = ffdinfo->FileName;
- 		d_info->name_len = le32_to_cpu(ffdinfo->FileNameLength);
-@@ -3944,9 +3944,9 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
- 	switch (info_level) {
- 	case FILE_FULL_DIRECTORY_INFORMATION:
- 	{
--		struct file_full_directory_info *ffdinfo;
-+		FILE_FULL_DIRECTORY_INFO *ffdinfo;
- 
--		ffdinfo = (struct file_full_directory_info *)kstat;
-+		ffdinfo = (FILE_FULL_DIRECTORY_INFO *)kstat;
- 		ffdinfo->FileNameLength = cpu_to_le32(conv_len);
- 		ffdinfo->EaSize =
- 			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
-@@ -4206,9 +4206,9 @@ static int reserve_populate_dentry(struct ksmbd_dir_info *d_info,
- 	switch (info_level) {
- 	case FILE_FULL_DIRECTORY_INFORMATION:
- 	{
--		struct file_full_directory_info *ffdinfo;
-+		FILE_FULL_DIRECTORY_INFO *ffdinfo;
- 
--		ffdinfo = (struct file_full_directory_info *)d_info->wptr;
-+		ffdinfo = (FILE_FULL_DIRECTORY_INFO *)d_info->wptr;
- 		memcpy(ffdinfo->FileName, d_info->name, d_info->name_len);
- 		ffdinfo->FileName[d_info->name_len] = 0x00;
- 		ffdinfo->FileNameLength = cpu_to_le32(d_info->name_len);
+ 		if (!work->tcon->posix_extensions) {
+ 			pr_err("client doesn't negotiate with SMB3.1.1 POSIX Extensions\n");
+ 			path_put(&path);
+ 			return -EOPNOTSUPP;
+ 		} else {
+-			info = (struct filesystem_posix_info *)(rsp->Buffer);
++			info = (FILE_SYSTEM_POSIX_INFO *)(rsp->Buffer);
+ 			info->OptimalTransferSize = cpu_to_le32(stfs.f_bsize);
+ 			info->BlockSize = cpu_to_le32(stfs.f_bsize);
+ 			info->TotalBlocks = cpu_to_le64(stfs.f_blocks);
 diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
-index ea1c64f84ff1..e325c2e89aa5 100644
+index 4f48dbf9c13b..d349b3443219 100644
 --- a/fs/smb/server/smb_common.h
 +++ b/fs/smb/server/smb_common.h
-@@ -87,21 +87,6 @@ struct file_names_info {
+@@ -107,29 +107,6 @@ struct file_id_both_directory_info {
  	char FileName[];
- } __packed;   /* level 0xc FF resp data */
+ } __packed;
  
--struct file_full_directory_info {
--	__le32 NextEntryOffset;
--	__u32 FileIndex;
--	__le64 CreationTime;
--	__le64 LastAccessTime;
--	__le64 LastWriteTime;
--	__le64 ChangeTime;
--	__le64 EndOfFile;
--	__le64 AllocationSize;
--	__le32 ExtFileAttributes;
--	__le32 FileNameLength;
--	__le32 EaSize;
--	char FileName[];
--} __packed; /* level 0x102 FF resp */
+-struct filesystem_posix_info {
+-	/* For undefined recommended transfer size return -1 in that field */
+-	__le32 OptimalTransferSize;  /* bsize on some os, iosize on other os */
+-	__le32 BlockSize;
+-	/* The next three fields are in terms of the block size.
+-	 * (above). If block size is unknown, 4096 would be a
+-	 * reasonable block size for a server to report.
+-	 * Note that returning the blocks/blocksavail removes need
+-	 * to make a second call (to QFSInfo level 0x103 to get this info.
+-	 * UserBlockAvail is typically less than or equal to BlocksAvail,
+-	 * if no distinction is made return the same value in each
+-	 */
+-	__le64 TotalBlocks;
+-	__le64 BlocksAvail;       /* bfree */
+-	__le64 UserBlocksAvail;   /* bavail */
+-	/* For undefined Node fields or FSID return -1 */
+-	__le64 TotalFileNodes;
+-	__le64 FreeFileNodes;
+-	__le64 FileSysIdentifier;   /* fsid */
+-	/* NB Namelen comes from FILE_SYSTEM_ATTRIBUTE_INFO call */
+-	/* NB flags can come from FILE_SYSTEM_DEVICE_INFO call   */
+-} __packed;
 -
- struct file_both_directory_info {
- 	__le32 NextEntryOffset;
- 	__u32 FileIndex;
+ struct smb_version_ops {
+ 	u16 (*get_cmd_val)(struct ksmbd_work *swork);
+ 	int (*init_rsp_hdr)(struct ksmbd_work *swork);
 -- 
 2.43.0
 
