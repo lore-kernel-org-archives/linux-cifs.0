@@ -1,27 +1,27 @@
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+Received: from bg4.exmail.qq.com (bg4.exmail.qq.com [43.155.65.254])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5462EBB9A;
-	Sun, 12 Oct 2025 15:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4461C2EDD6D;
+	Sun, 12 Oct 2025 15:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.155.65.254
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760282656; cv=none; b=i1uUhb7b8Vu/KSeANu20pGyrcO4s40QrroFCW/B21GlG74JmRcVvZzM9LFARt/WCdrBUZavtqmIB5cNnL86QCgUP0tvGMqnqlpb8pkNEwz02Yzw6dXJT1mDxLWgKMC6yesMglP6VY9ZzQaa+cF3mSmAgyKKTCpR4I4Ng4DZhfVQ=
+	t=1760282673; cv=none; b=V2e6fib0RRjmsB4emFk2Cy6nZBAdviQ+I6nnqhO+Z5TysKbjG2UV+r2Za+v9xqoL2pPapotfP8aZU9t7AucZAbPiFOMaPkxdYYrWPIp1FcVHeTwf/0f29WcCxkvnAkbtOY6AN6LFS+4oXk3kZWuEtgCS7terG7q/0FDcoqHDOFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760282656; c=relaxed/simple;
-	bh=5IMVy24+l6yn6QhpNLwcgEJtk2PtES/mK4kXXRSryxc=;
+	s=arc-20240116; t=1760282673; c=relaxed/simple;
+	bh=fUKthNy2wlDGAqzuUnZdkSIU7ZaaNp3xh67aJrzdFvQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n815vfTWhhiG/4BSgRYKZX5/o9P8U4v0Z0KAyBtGUKKTM2Ddte+VE6JsQWtijJkeakeRPxZpOKcB0EqrWeJUSl8hRKTpj/1QmEkkhPzk3S1ydgVirhz5TWx/l7REsYPcgLkQ0aDR/qnHe+H6ZzaLwCPlz3p+dMs4pFnKop7akHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=15.184.224.54
+	 MIME-Version; b=Yx3WLlYZUZQ4XSqXAFdOgoXnwjTsf/zPNTarRfmHcBV23/uOa/T/c3dvmizgdVmvLCSIQD4CYy88OD4Avbi7TyCv4azfHsTxrDYWDq7nKJ9kIJLA4FUIj1czbrrUHVWpt6w90qrhmHLJuRMthW8EHszMmPNmPJvbBWdFL4Tq0GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=43.155.65.254
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: zesmtpgz3t1760282597t6d2e04f9
-X-QQ-Originating-IP: /6nZrIqZTTL9/noKQDA3h9hikjc1eWO5ztcDzmIheqE=
+X-QQ-mid: zesmtpgz3t1760282607t0748f230
+X-QQ-Originating-IP: kD22IJkaGa+JVEBzM1Ey9RJPVR/aPuHzRaegwAwVlrE=
 Received: from localhost.localdomain ( [116.128.244.171])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 12 Oct 2025 23:23:16 +0800 (CST)
+	id ; Sun, 12 Oct 2025 23:23:25 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 463370740963289350
+X-BIZMAIL-ID: 8893172405107320436
 From: chenxiaosong@chenxiaosong.com
 To: stfrench@microsoft.com,
 	metze@samba.org,
@@ -39,9 +39,9 @@ To: stfrench@microsoft.com,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH RESEND 05/22] smb: move get_rfc1002_len() to common/cifsglob.h
-Date: Sun, 12 Oct 2025 23:22:30 +0800
-Message-ID: <A15A011B492599D1+20251012152247.2992573-6-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH RESEND 10/22] smb: move resume_key_ioctl_rsp to common/smb2pdu.h
+Date: Sun, 12 Oct 2025 23:22:35 +0800
+Message-ID: <070E98BAA8DB648C+20251012152247.2992573-11-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251012152247.2992573-1-chenxiaosong@chenxiaosong.com>
 References: <20251012152247.2992573-1-chenxiaosong@chenxiaosong.com>
@@ -54,174 +54,140 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MAu4Ycv3XufafByMU3k5EG89I2X8BQEcOBGhdpXwGAmlkp+N+RT9Mur+
-	+/fEPYIG89MIBsLnlsMauXKEKjh8fdc+g0dQiOp9i8UOcvxgQqo8d+6Ck2GtNbRpS7XbuTC
-	/crqzduXwf/kWozJb7X1GUF3xh6/HGCJeEwkstlyihzIgeRaCKb5eXPUzhSAjNqbcfA36En
-	eUKLo9XYzOfNjzujBeDvpFzr+Vs76sQ8l7MUeOmRZPAMEepyaLC5IV063FGAIhHDlC0nGej
-	XG9m0PHN1lMuVLvGg6nV9lzsXjy67+FnRR8B8tEUlcjgG1Mv0ODdCRarOMmT9Tg+sRrri+K
-	apfSuTVV36LynutrFlsQA+V0rDSfIwK9utZlUoWIQSNbLkKKYz8JSS8ru5UY9tTu50+aDyN
-	KBDST4wGa2UEVvd+GySvnTCLg1da60AHLB0tZ3G+xuqcNDS3O+Qg37Qp2fDwBJ3CCrdiHey
-	OO1P/XoEbkc+ZaR7CX6fZnQk9DriL/Ja856oSXKlnTbr9zmoooIFq8gArKZ7mYHqMWrxGdb
-	d66WBAK6VD8THfu96U83DGs3fYiSnpQKVXldyOJu6dnh5XTXN6QIUYKWUKk7fegdAzPGkoh
-	12OOBVUCR4OleOKEWNiUB+1P76zOtiJlCIgNrIhGi4u2R06TlKk5iK8KVJhQ62wwF+cw9A6
-	y+SVb0pNtq5vVAG3s099qQCuy8NXLgy4D3l9BKOZMyUseXLl/ig+SfqNcIWHJTkc+dlZM3V
-	nxk25v3Tf+aQMOMszfb/nKsBy3iqZW0FIEdCnrU8XiSK+A8RNw7vtoRCi9i1v86NVQRIYcU
-	mVs72wVLNfGuQasp+ju6Sh+mcPL530Niijp+5HOheY71VZ8uweu3zR6rfo2GYiix33eOgGJ
-	pdfeFBN7miiFcHlkUwXrYpj72gI6mxkJASn/tqzHGlnb5LrqU1QpkkJlRPUpLfB6t43BupD
-	sP78vV9XUHTSxU+SIDxCi4fyVDRXS6P4UmmaYmaW96UpbdC2VS67+cv7pjcHwWHqMwFPXwJ
-	lxpTD//8uf5VulLh7SPI5Pp8k2IBr5J/Aoehu7bGvXVvk/aeprAHviA+GmAsLmka7s1Ik+R
-	sgUoDiegUiDGlzgygLD0MY=
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
+X-QQ-XMAILINFO: OZGW2/3qAmIfqJpqkUSBquOFHEjvlP/oo2HUPGsnVpGrw7s+Vvq1rYHo
+	6bgFTMl8kd4o1W0KlgNVZndtpC5ztQHXFRcZcAMCEFgvYbjs7F5F7WPVW5Em/mXuTyU5C+5
+	w3rmsD122CFAX48s3PbgnSe0tjk7z8Y2ca4zi5dllj/ArDNPPPJMvDGZ34kKDDUGxIGKGNE
+	Cve1FUD3P2FRpYqGxDz4r1VMxVRpL2euFxMs95JRiJQ9Z0gAt62xQ0443MNMcApFWsWCl0z
+	Q7W8gb7uJWePr+dkStxKM0JrMj9noGcCU3m4935pn1imNu55gu2GeJzQTdbAmMLErYR1Yq1
+	YNA8eUllAxUDlr9wAzSBdgGBFgxCdw5QTuKzcsBCUcakIlHdmgn/gMz6RJfX59O3AMSZRVe
+	vufGRVk0V6qoNU5apkSVyMAmIFSaOB7xAEJhJ+/hrmZAAy7v7uvPzlDORwxusyjZQyDMX3x
+	cJPx2jLCW3SiEEoHWaVpoEBbJZt/7sgqJJU8XdA2MtzP8ShbPdPxayHUJMIl41x/UdQLLoR
+	5ecE8/91JFmqX80GHGynoxyfYurO3HOkD29JIwpQ2IArhQzKf2N7lQJsHcljQl/eI8VCH2p
+	cf3zhvpEHrPWjnVkZo4sQeaBRtvjXV1uHuxm/4BXrD3xmTGemgktJ6GzGmwk1yFV128mYGr
+	e1lIguKC/V4JaxJI76bGOOvE8UMlF0Bzq98w5ZV4//A3cM79QyMTVnrv25skD3+GygOxjNk
+	JwSNZbUjEbRp5F1WE6SWHqzW7bBdeieIYM1sRM+K5A3OVwXmIRHPVjTa5q0AJi8uUtzprYd
+	6/jWdzleZ9Cb2lFQq7HPnR6i2lhctiva7KreES7TnOZCrp1WGN+5lvwoe7BHyj+IKqaKkem
+	X17kTvYnUxY6W5eIwvM9B8IFbiyJJiOBMBA7+/tD+dXcvfWDcp2iCl4IGa8vKQJu5YK3GoZ
+	pjicsjizx/bGdlhGmxgUVqVJYDn8XskBavlFfTa1jODkcJgmNA9CE7IFXKlGiIiS3EScfxc
+	ftB4cFZjzj285lqmD5yIj/7NZC6ap9nDwoO5RBA9Goa757ZPcTWnMyA5qpZYfJ4qtDoPaz4
+	8HV26SEb8m3tIicgLgWOUZu4yw7hGVe1g==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-SPAM: true
+X-QQ-RECHKSPAM: 3
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-Rename get_rfc1002_length() to get_rfc1002_len(), then move duplicate
+Rename 2 places:
+
+  - resume_key_req -> resume_key_ioctl_rsp
+  - server: ResumeKey -> ResumeKeyU64
+
+Merge the struct members of the server and the client, then move duplicate
 definitions to common header file.
 
 Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 ---
- fs/smb/client/cifsglob.h      | 6 ------
- fs/smb/client/cifssmb.c       | 6 +++---
- fs/smb/client/cifstransport.c | 8 ++++----
- fs/smb/client/connect.c       | 2 +-
- fs/smb/common/cifsglob.h      | 5 +++++
- fs/smb/server/smb_common.h    | 5 -----
- 6 files changed, 13 insertions(+), 19 deletions(-)
+ fs/smb/client/smb2ops.c |  4 ++--
+ fs/smb/client/smb2pdu.h |  6 ------
+ fs/smb/common/smb2pdu.h | 10 ++++++++++
+ fs/smb/server/smb2pdu.c |  4 ++--
+ fs/smb/server/smb2pdu.h |  6 ------
+ 5 files changed, 14 insertions(+), 16 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 88a428e3903a..81f77eb9a01e 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -675,12 +675,6 @@ struct cifs_mnt_data {
- 	int flags;
- };
- 
--static inline unsigned int
--get_rfc1002_length(void *buf)
--{
--	return be32_to_cpu(*((__be32 *)buf)) & 0xffffff;
--}
--
- struct TCP_Server_Info {
- 	struct list_head tcp_ses_list;
- 	struct list_head smb_ses_list;
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 2881efcbe09a..9a346d67e298 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -614,7 +614,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
- 
- 	iov[0].iov_len = 4;
- 	iov[0].iov_base = smb;
--	iov[1].iov_len = get_rfc1002_length(smb);
-+	iov[1].iov_len = get_rfc1002_len(smb);
- 	iov[1].iov_base = (char *)smb + 4;
- 
- 	rc = cifs_call_async(server, &rqst, NULL, cifs_echo_callback, NULL,
-@@ -1435,7 +1435,7 @@ cifs_async_readv(struct cifs_io_subrequest *rdata)
- 	rdata->iov[0].iov_base = smb;
- 	rdata->iov[0].iov_len = 4;
- 	rdata->iov[1].iov_base = (char *)smb + 4;
--	rdata->iov[1].iov_len = get_rfc1002_length(smb);
-+	rdata->iov[1].iov_len = get_rfc1002_len(smb);
- 
- 	rc = cifs_call_async(tcon->ses->server, &rqst, cifs_readv_receive,
- 			     cifs_readv_callback, NULL, rdata, 0, NULL);
-@@ -1800,7 +1800,7 @@ cifs_async_writev(struct cifs_io_subrequest *wdata)
- 	/* 4 for RFC1001 length + 1 for BCC */
- 	iov[0].iov_len = 4;
- 	iov[0].iov_base = smb;
--	iov[1].iov_len = get_rfc1002_length(smb) + 1;
-+	iov[1].iov_len = get_rfc1002_len(smb) + 1;
- 	iov[1].iov_base = (char *)smb + 4;
- 
- 	rqst.rq_iov = iov;
-diff --git a/fs/smb/client/cifstransport.c b/fs/smb/client/cifstransport.c
-index e98b95eff8c9..4c4f5befb6d3 100644
---- a/fs/smb/client/cifstransport.c
-+++ b/fs/smb/client/cifstransport.c
-@@ -165,7 +165,7 @@ SendReceiveNoRsp(const unsigned int xid, struct cifs_ses *ses,
- 	int resp_buf_type;
- 
- 	iov[0].iov_base = in_buf;
--	iov[0].iov_len = get_rfc1002_length(in_buf) + 4;
-+	iov[0].iov_len = get_rfc1002_len(in_buf) + 4;
- 	flags |= CIFS_NO_RSP_BUF;
- 	rc = SendReceive2(xid, ses, iov, 1, &resp_buf_type, flags, &rsp_iov);
- 	cifs_dbg(NOISY, "SendRcvNoRsp flags %d rc %d\n", flags, rc);
-@@ -177,7 +177,7 @@ int
- cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 		   bool log_error)
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index ea9709d81851..8da5fe4efa2d 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -1528,7 +1528,7 @@ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
  {
--	unsigned int len = get_rfc1002_length(mid->resp_buf) + 4;
-+	unsigned int len = get_rfc1002_len(mid->resp_buf) + 4;
+ 	int rc;
+ 	unsigned int ret_data_len;
+-	struct resume_key_req *res_key;
++	struct resume_key_ioctl_rsp *res_key;
  
- 	dump_smb(mid->resp_buf, min_t(u32, 92, len));
- 
-@@ -370,7 +370,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 		goto out;
+ 	rc = SMB2_ioctl(xid, tcon, persistent_fid, volatile_fid,
+ 			FSCTL_SRV_REQUEST_RESUME_KEY, NULL, 0 /* no input */,
+@@ -1541,7 +1541,7 @@ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
+ 		cifs_tcon_dbg(VFS, "refcpy ioctl error %d getting resume key\n", rc);
+ 		goto req_res_key_exit;
  	}
+-	if (ret_data_len < sizeof(struct resume_key_req)) {
++	if (ret_data_len < sizeof(struct resume_key_ioctl_rsp)) {
+ 		cifs_tcon_dbg(VFS, "Invalid refcopy resume key length\n");
+ 		rc = -EINVAL;
+ 		goto req_res_key_exit;
+diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
+index 9b5880e60a4e..77dceca20240 100644
+--- a/fs/smb/client/smb2pdu.h
++++ b/fs/smb/client/smb2pdu.h
+@@ -191,12 +191,6 @@ struct crt_sd_ctxt {
+ 	struct smb3_sd sd;
+ } __packed;
  
--	*pbytes_returned = get_rfc1002_length(midQ->resp_buf);
-+	*pbytes_returned = get_rfc1002_len(midQ->resp_buf);
- 	memcpy(out_buf, midQ->resp_buf, *pbytes_returned + 4);
- 	rc = cifs_check_receive(midQ, server, 0);
- out:
-@@ -554,7 +554,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 		goto out;
- 	}
+-struct resume_key_req {
+-	char ResumeKey[COPY_CHUNK_RES_KEY_SIZE];
+-	__le32	ContextLength;	/* MBZ */
+-	char	Context[];	/* ignored, Windows sets to 4 bytes of zero */
+-} __packed;
+-
+ /* See MS-FSCC 2.3.29 and 2.3.30 */
+ struct get_retrieval_pointer_count_req {
+ 	__le64 StartingVcn; /* virtual cluster number (signed) */
+diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+index 857e6a577e84..15932ee05c98 100644
+--- a/fs/smb/common/smb2pdu.h
++++ b/fs/smb/common/smb2pdu.h
+@@ -1421,6 +1421,16 @@ struct copychunk_ioctl_rsp {
+ 	__le32 TotalBytesWritten;
+ } __packed;
  
--	*pbytes_returned = get_rfc1002_length(midQ->resp_buf);
-+	*pbytes_returned = get_rfc1002_len(midQ->resp_buf);
- 	memcpy(out_buf, midQ->resp_buf, *pbytes_returned + 4);
- 	rc = cifs_check_receive(midQ, server, 0);
- out:
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index dd12f3eb61dc..22f37ae7a66a 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -1299,7 +1299,7 @@ cifs_demultiplex_thread(void *p)
- 		 * The right amount was read from socket - 4 bytes,
- 		 * so we can now interpret the length field.
- 		 */
--		pdu_length = get_rfc1002_length(buf);
-+		pdu_length = get_rfc1002_len(buf);
- 
- 		cifs_dbg(FYI, "RFC1002 header 0x%x\n", pdu_length);
- 		if (!is_smb_response(server, buf[0]))
-diff --git a/fs/smb/common/cifsglob.h b/fs/smb/common/cifsglob.h
-index eda5e666a761..371160fec1cd 100644
---- a/fs/smb/common/cifsglob.h
-+++ b/fs/smb/common/cifsglob.h
-@@ -40,6 +40,11 @@ struct smb_version_values {
- 	size_t		create_posix_size;
- };
- 
-+static inline unsigned int get_rfc1002_len(void *buf)
-+{
-+	return be32_to_cpu(*((__be32 *)buf)) & 0xffffff;
-+}
++/* See MS-SMB2 2.2.32.3 */
++struct resume_key_ioctl_rsp {
++	union {
++		char ResumeKey[COPY_CHUNK_RES_KEY_SIZE];
++		__u64 ResumeKeyU64[3];
++	};
++	__le32	ContextLength;	/* MBZ */
++	char	Context[];	/* ignored, Windows sets to 4 bytes of zero */
++} __packed;
 +
- static inline void inc_rfc1001_len(void *buf, int count)
- {
- 	be32_add_cpu((__be32 *)buf, count);
-diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
-index dac783b46545..9c0db206624b 100644
---- a/fs/smb/server/smb_common.h
-+++ b/fs/smb/server/smb_common.h
-@@ -423,9 +423,4 @@ unsigned int ksmbd_server_side_copy_max_chunk_size(void);
- unsigned int ksmbd_server_side_copy_max_total_size(void);
- bool is_asterisk(char *p);
- __le32 smb_map_generic_desired_access(__le32 daccess);
+ struct smb2_ioctl_rsp {
+ 	struct smb2_hdr hdr;
+ 	__le16 StructureSize; /* Must be 49 */
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 846cca45195b..200bce13b467 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -8115,8 +8115,8 @@ static int fsctl_request_resume_key(struct ksmbd_work *work,
+ 		return -ENOENT;
+ 
+ 	memset(key_rsp, 0, sizeof(*key_rsp));
+-	key_rsp->ResumeKey[0] = req->VolatileFileId;
+-	key_rsp->ResumeKey[1] = req->PersistentFileId;
++	key_rsp->ResumeKeyU64[0] = req->VolatileFileId;
++	key_rsp->ResumeKeyU64[1] = req->PersistentFileId;
+ 	ksmbd_fd_put(work, fp);
+ 
+ 	return 0;
+diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
+index eecd1f1f5505..3d000c5d964b 100644
+--- a/fs/smb/server/smb2pdu.h
++++ b/fs/smb/server/smb2pdu.h
+@@ -151,12 +151,6 @@ struct file_object_buf_type1_ioctl_rsp {
+ 	__u8 DomainId[16];
+ } __packed;
+ 
+-struct resume_key_ioctl_rsp {
+-	__u64 ResumeKey[3];
+-	__le32 ContextLength;
+-	__u8 Context[4]; /* ignored, Windows sets to 4 bytes of zero */
+-} __packed;
 -
--static inline unsigned int get_rfc1002_len(void *buf)
--{
--	return be32_to_cpu(*((__be32 *)buf)) & 0xffffff;
--}
- #endif /* __SMB_COMMON_H__ */
+ struct file_sparse {
+ 	__u8	SetSparse;
+ } __packed;
 -- 
 2.43.0
 
