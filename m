@@ -1,27 +1,27 @@
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B4C299ABF;
-	Sun, 12 Oct 2025 15:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A4329AAF8;
+	Sun, 12 Oct 2025 15:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760281909; cv=none; b=P1YpNOK5SOiQxAfkYQGFOrY86MieVPt3QZ4GUWXxQ9k4DXZXyyXt44zfqz1ucsO737QihY2QClhF+X6AmgOjjqVQqmQlJea6G+7ziyQ48W/Yw3Z0/8DdRxGlqQO5zRhPzq6bXXYbHVUA3UF6RMYYFtxd+3RNADOdf5aq+SZKfIk=
+	t=1760281911; cv=none; b=gH5xwM6JnmlS4B1DevxAkFL4jmQNSSgqBLTKaZo6RDJqSnyiq5SYJzvEtXWTMoJf9eCOdiiYZtbJjW6OyBhVHTut+6dO1DNeIDk+GEj4+WsgE3KzR3dvkZ7gOW8AFBe7SSN2SCA8yWngwFHXO7PZwYt4cwxj1LPMk477fZEWGro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760281909; c=relaxed/simple;
-	bh=oeqLPDpudEfH9dps5z2KcrSJw2zXBQjtIeVUQecIez4=;
+	s=arc-20240116; t=1760281911; c=relaxed/simple;
+	bh=kV6Tt6gzqKXi9CitHgRtyQsuEujD+nsj1u8QElwcN2E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KEd06/7+gFVfyS4Q+D58U662F7XDr4AjImYv7QWTDuF7ffnCUy9KhXmycnzrYS4i5rIN5RQcd0fgw965xJyGaV5I4gny6kHD4paUHXhDE3ScEJqkmd6pUoYtsfA5PBMjd8LxG4PP/t3mnsTCf8dULEAfk37D7a3MEvLCbI098Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=18.194.254.142
+	 MIME-Version; b=RvAaS+9dWWbCp25B7f43l7oU3p0V13QsREe51SuxfCTA8JePp7jfvivsjpO/SYU4IZb5M9B3Hb8hIJIwUiUFuAt0h9JIQhGqDphCAZLK0AC5Bs558UfoPI2OKIcdeLiVcTBErv3K/mEnA929j2yn5EThhRvlQjVqlQBvGJzjrRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=15.184.224.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: zesmtpgz9t1760281820t10462655
-X-QQ-Originating-IP: cmk8TKbEnD2TCk1lFhen2O0cvf62JfW2gQkyjmBquSg=
+X-QQ-mid: zesmtpgz9t1760281818t30d02601
+X-QQ-Originating-IP: 4T3y8AdGX3KtkBO90drlOfE9sq7siHnM75Fkw+PEMIQ=
 Received: from localhost.localdomain ( [116.128.244.171])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 12 Oct 2025 23:10:19 +0800 (CST)
+	id ; Sun, 12 Oct 2025 23:10:17 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 5668552034267711716
+X-BIZMAIL-ID: 831036991751228392
 From: chenxiaosong@chenxiaosong.com
 To: stfrench@microsoft.com,
 	metze@samba.org,
@@ -39,9 +39,9 @@ To: stfrench@microsoft.com,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 07/22] smb: move some duplicate definitions to common/smb2pdu.h
-Date: Sun, 12 Oct 2025 23:09:00 +0800
-Message-ID: <0FA210977C80E4EA+20251012150915.2992220-8-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 06/22] smb: move SMB1_PROTO_NUMBER to common/cifsglob.h
+Date: Sun, 12 Oct 2025 23:08:59 +0800
+Message-ID: <2AC3F0FD2E1F3D39+20251012150915.2992220-7-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251012150915.2992220-1-chenxiaosong@chenxiaosong.com>
 References: <20251012150915.2992220-1-chenxiaosong@chenxiaosong.com>
@@ -54,213 +54,77 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: NOIkHYnr7VzdjnffZwmCFcyni1EJXkEBMFQHN7XQR66kFwfCybbnsxXn
-	Iqu1n7gs/JtB2tVJO1OCRJgOZqgmCCm+fDadAd/giEOkSBqtc4cdN+/GP30U8VnaJnPF7dw
-	heD3FrC88I6J23DtT7LF2zxoBzwNyjR3d0l5htXF3bOJq3qO5/HqI4NZhg4PZ5D8LSkt12Y
-	IPdgH83Sn3r2n/CoeZk/Jni0uUwGgg9+ySpdvJd7rtvHPxQWoNsH65ZhbvYQnQxu2S8ePQB
-	k0Oe7Q68T2DT7oj8JH6uWXKp6Zbe+ahwxO19W58p7Tx4YDN3Juu/I3Dx/zA8vdi8+TFsPgX
-	cCFm8m5ytPJzojVUJczWCGF827DlEWC6+ovHkUGXqMJ4CIZJKKGVqudZAk3Fmrl/C1rbMQi
-	lSqZ135BrvjV3hVdArcM4x4RlAvSTDETAmdlKziuOXoSPWkIuEAOY+GS0yu+3ZChW5GJCII
-	HJYPnqYeX6jkzDtGmgJtw/lB7nYau1HtwjlaoZU7OFDYejudbMzbmRgu09xVMdKQzXI80y7
-	6cr/iyzHkQgc0nUT5XY8wEartknIHFLL1x51NPfQOmkETo9yP5ORS1QzOoxBlBqFWmukrvF
-	bPnX3KSPGpTldrSVM8e3uoZ8xm3xgbLVAkrmpqW8Kg23hyGXMbK7CFmRWDKjbhU3VMYtUaJ
-	W7Nzspp2KXzfxvzNYijbtTeaMYzvgRE45CBwuH0d/BzYsXMU7WkhUhQZFe3EyUrYJVvkIyG
-	OyhzkAseL/gztRI8DyXJCEuIkSROCUxHrWuPIlXXqxytRpQe1Ip/moyURepYckxFaw5AfLh
-	z4qG7mXMHC3N7zMYXjc99lIjS2rSBXiwC3Ngt5H+l6NudIDkb3bfly4T3cU3EZ/C6JAmxd0
-	rhWyxkPp7gKVCHtNu8OTo/ABae5k2AFZYJSogibIwP5dVTw4XcDLR11gsaqnJ6iMlL3g+gk
-	K9NCPLwZH869y0fim4Vo/1KKo+O2rQIRbkczq2E84enbLSQ0mx7hFGyhY82yDfXm60rU=
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-XMAILINFO: OH2bKVRJtexU4ZSOOzomo7gSs+T1nEFtYZMOuO4lbFrOUNKxc8qUuhpj
+	8ZeXP0AT736JHPcHnfgGUoThC+P5UWBrpmO39LMv4qXdHCpJ3lx35BzNE2e26LWOFwW8zhz
+	X9/5U7NQomw45J1RLbeSH7fWnuuE63GOvNDuFsK3q938UiLTpv/Dw95IsAfJYMniDQJH1Ny
+	muE98PE+KWMOu9ImkpUaF01QWwL26x9Ug+HSORjofruXmEM6pmABWL44+84FqQ+1llTVrt1
+	gZWltEPb4KaiRnTs0RFJuOV1eFBQOM/N2tuQ0pDkIU14R1mAAU9OY69FT/GHexcD8H4sA2k
+	cE95BCAISfP1XVIGMnyv8bl7N674zHg1bElB9PWR7gzp0xI4zLRq9otDdm6gpgsQ3g1XH9u
+	YGIqMJMa9D3eZMTT6nlobu9xhehHzV23tMtfQ8HnUS5l+LesgmJi8GuEsdwcXnLQZa5oIJh
+	Da5dr8S1BNsaAe0IFgEyENufzAWoq3G5gnqQSefjjnqcgxk6IyyO0J/EuVSV0Mreg4sjp8h
+	DKJZph2kbT1TuoXjwMNFFliC1OKp/561K0AQMBMs7P6so+cJiP0qNJ3QJRu3ye819tWtT9Y
+	7RZo78v9+hlBfRSmOQKrCggByqaOHg+jIZ134eg+MIYgLhEXpZ4tl7o7cp3+lfMUciu4H0s
+	8f5uYABl8+/bxmgx7XazEvnrcd3DIrQ1dx96GrbHxF0n4QKa7GfDvVVa4ZM6C0CrGl+CCFu
+	DvxumviEk8ykc8W53ghDzS+BikngW1gp1BQNGkIErbaSAKX/NuQxjJ6XuYXlTfX8pHpRYNf
+	aMHvREEklEFJQpzD1nN5su7vkWtD1IkKctAPD5VzqZBYIXDOIxLqxUdeniCWifeU7t2fKp8
+	MKFW5t2Io1FERUjVgk0DZbjpz3VDFBXvUeEsqUwuEPB9vFhK5c85bgiK0+HvcMdNwmkUC+X
+	MqkJBLR//f4yXv8vX0tX5cQMzBnLFVnk1ezKAgn3+HzMWZFjIGjVWaz3FVPmQy8np3IA=
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
 X-QQ-RECHKSPAM: 0
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-In order to maintain the code more easily, move duplicate definitions to
-new common header file.
+Replace the constant of client with SMB1_PROTO_NUMBER, then move the
+macro definition from server/smb_common.h to common/cifsglob.h, maybe
+the server will use this macro definition in the future.
 
 Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 ---
- fs/smb/client/smb2pdu.h | 24 +++---------------------
- fs/smb/common/smb2pdu.h | 24 ++++++++++++++++++++++++
- fs/smb/server/smb2pdu.c |  8 ++++----
- fs/smb/server/smb2pdu.h | 17 -----------------
- 4 files changed, 31 insertions(+), 42 deletions(-)
+ fs/smb/client/misc.c       | 2 +-
+ fs/smb/common/cifsglob.h   | 2 ++
+ fs/smb/server/smb_common.h | 1 -
+ 3 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
-index 101024f8f725..c013560bcfa1 100644
---- a/fs/smb/client/smb2pdu.h
-+++ b/fs/smb/client/smb2pdu.h
-@@ -135,11 +135,9 @@ struct share_redirect_error_context_rsp {
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index dda6dece802a..15be9d8738ab 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -318,7 +318,7 @@ static int
+ check_smb_hdr(struct smb_hdr *smb)
+ {
+ 	/* does it have the right SMB "signature" ? */
+-	if (*(__le32 *) smb->Protocol != cpu_to_le32(0x424d53ff)) {
++	if (*(__le32 *) smb->Protocol != cpu_to_le32(SMB1_PROTO_NUMBER)) {
+ 		cifs_dbg(VFS, "Bad protocol string signature header 0x%x\n",
+ 			 *(unsigned int *)smb->Protocol);
+ 		return 1;
+diff --git a/fs/smb/common/cifsglob.h b/fs/smb/common/cifsglob.h
+index 371160fec1cd..5928d35c7f30 100644
+--- a/fs/smb/common/cifsglob.h
++++ b/fs/smb/common/cifsglob.h
+@@ -9,6 +9,8 @@
+ #ifndef _COMMON_CIFS_GLOB_H
+ #define _COMMON_CIFS_GLOB_H
  
- 
- /* See MS-SMB2 2.2.13.2.11 */
--/* Flags */
--#define SMB2_DHANDLE_FLAG_PERSISTENT	0x00000002
- struct durable_context_v2 {
- 	__le32 Timeout;
--	__le32 Flags;
-+	__le32 Flags; /* see SMB2_DHANDLE_FLAG_PERSISTENT */
- 	__u64 Reserved;
- 	__u8 CreateGuid[16];
- } __packed;
-@@ -157,13 +155,13 @@ struct durable_reconnect_context_v2 {
- 		__u64 VolatileFileId;
- 	} Fid;
- 	__u8 CreateGuid[16];
--	__le32 Flags; /* see above DHANDLE_FLAG_PERSISTENT */
-+	__le32 Flags; /* see SMB2_DHANDLE_FLAG_PERSISTENT */
- } __packed;
- 
- /* See MS-SMB2 2.2.14.2.12 */
- struct durable_reconnect_context_v2_rsp {
- 	__le32 Timeout;
--	__le32 Flags; /* see above DHANDLE_FLAG_PERSISTENT */
-+	__le32 Flags; /* see SMB2_DHANDLE_FLAG_PERSISTENT */
- } __packed;
- 
- struct create_durable_handle_reconnect_v2 {
-@@ -263,22 +261,6 @@ struct network_resiliency_req {
- } __packed;
- /* There is no buffer for the response ie no struct network_resiliency_rsp */
- 
--#define RSS_CAPABLE	cpu_to_le32(0x00000001)
--#define RDMA_CAPABLE	cpu_to_le32(0x00000002)
--
--#define INTERNETWORK	cpu_to_le16(0x0002)
--#define INTERNETWORKV6	cpu_to_le16(0x0017)
--
--struct network_interface_info_ioctl_rsp {
--	__le32 Next; /* next interface. zero if this is last one */
--	__le32 IfIndex;
--	__le32 Capability; /* RSS or RDMA Capable */
--	__le32 Reserved;
--	__le64 LinkSpeed;
--	__le16 Family;
--	__u8 Buffer[126];
--} __packed;
--
- struct iface_info_ipv4 {
- 	__be16 Port;
- 	__be32 IPv4Address;
-diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index f79a5165a7cc..25e8ece283c4 100644
---- a/fs/smb/common/smb2pdu.h
-+++ b/fs/smb/common/smb2pdu.h
-@@ -1290,6 +1290,10 @@ struct create_mxac_req {
- 	__le64 Timestamp;
- } __packed;
- 
-+/* See MS-SMB2 2.2.13.2.11 and MS-SMB2 2.2.13.2.12 and MS-SMB2 2.2.14.2.12 */
-+/* Flags */
-+#define SMB2_DHANDLE_FLAG_PERSISTENT	0x00000002
++#define SMB1_PROTO_NUMBER		cpu_to_le32(0x424d53ff)
 +
- /* See MS-SMB2 2.2.14.2.5 */
- struct create_mxac_rsp {
- 	struct create_context_hdr ccontext;
-@@ -1404,6 +1408,26 @@ struct smb2_ioctl_rsp {
- 	__u8   Buffer[];
- } __packed;
+ struct smb_version_values {
+ 	char		*version_string;
+ 	__u16		protocol_id;
+diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
+index 9c0db206624b..6d427dbed5fd 100644
+--- a/fs/smb/server/smb_common.h
++++ b/fs/smb/server/smb_common.h
+@@ -151,7 +151,6 @@
+ 		FILE_EXECUTE | FILE_DELETE_CHILD | \
+ 		FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES)
  
-+/* See MS-SMB2 2.2.32.5 and MS-SMB2 2.2.32.5.1 */
-+#define RSS_CAPABLE	cpu_to_le32(0x00000001)
-+#define RDMA_CAPABLE	cpu_to_le32(0x00000002)
-+#define INTERNETWORK	cpu_to_le16(0x0002)
-+#define INTERNETWORKV6	cpu_to_le16(0x0017)
-+struct network_interface_info_ioctl_rsp {
-+	__le32 Next; /* next interface. zero if this is last one */
-+	__le32 IfIndex;
-+	__le32 Capability; /* RSS or RDMA Capable */
-+	__le32 Reserved;
-+	__le64 LinkSpeed;
-+	union {
-+		char	SockAddr_Storage[128];
-+		struct {
-+			__le16 Family;
-+			__u8 Buffer[126];
-+		};
-+	};
-+} __packed;
-+
- /* this goes in the ioctl buffer when doing FSCTL_SET_ZERO_DATA */
- struct file_zero_data_information {
- 	__le64	FileOffset;
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 8a615e8c600f..169fbec03cfd 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -7869,9 +7869,9 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+-#define SMB1_PROTO_NUMBER		cpu_to_le32(0x424d53ff)
+ #define SMB_COM_NEGOTIATE		0x72
+ #define SMB1_CLIENT_GUID_SIZE		(16)
  
- 		nii_rsp->Capability = 0;
- 		if (netdev->real_num_tx_queues > 1)
--			nii_rsp->Capability |= cpu_to_le32(RSS_CAPABLE);
-+			nii_rsp->Capability |= RSS_CAPABLE;
- 		if (ksmbd_rdma_capable_netdev(netdev))
--			nii_rsp->Capability |= cpu_to_le32(RDMA_CAPABLE);
-+			nii_rsp->Capability |= RDMA_CAPABLE;
- 
- 		nii_rsp->Next = cpu_to_le32(152);
- 		nii_rsp->Reserved = 0;
-@@ -7897,7 +7897,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 		if (!ipv4_set) {
- 			struct in_device *idev;
- 
--			sockaddr_storage->Family = cpu_to_le16(INTERNETWORK);
-+			sockaddr_storage->Family = INTERNETWORK;
- 			sockaddr_storage->addr4.Port = 0;
- 
- 			idev = __in_dev_get_rtnl(netdev);
-@@ -7913,7 +7913,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 			struct inet6_ifaddr *ifa;
- 			__u8 *ipv6_addr = sockaddr_storage->addr6.IPv6address;
- 
--			sockaddr_storage->Family = cpu_to_le16(INTERNETWORKV6);
-+			sockaddr_storage->Family = INTERNETWORKV6;
- 			sockaddr_storage->addr6.Port = 0;
- 			sockaddr_storage->addr6.FlowInfo = 0;
- 
-diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
-index 5163d5241b90..fe92bfeb415a 100644
---- a/fs/smb/server/smb2pdu.h
-+++ b/fs/smb/server/smb2pdu.h
-@@ -116,8 +116,6 @@ struct create_durable_rsp {
- } __packed;
- 
- /* See MS-SMB2 2.2.13.2.11 */
--/* Flags */
--#define SMB2_DHANDLE_FLAG_PERSISTENT	0x00000002
- struct create_durable_v2_rsp {
- 	struct create_context_hdr ccontext;
- 	__u8   Name[8];
-@@ -151,9 +149,6 @@ struct smb_sockaddr_in6 {
- 	__be32 ScopeId;
- } __packed;
- 
--#define INTERNETWORK	0x0002
--#define INTERNETWORKV6	0x0017
--
- struct sockaddr_storage_rsp {
- 	__le16 Family;
- 	union {
-@@ -162,18 +157,6 @@ struct sockaddr_storage_rsp {
- 	};
- } __packed;
- 
--#define RSS_CAPABLE	0x00000001
--#define RDMA_CAPABLE	0x00000002
--
--struct network_interface_info_ioctl_rsp {
--	__le32 Next; /* next interface. zero if this is last one */
--	__le32 IfIndex;
--	__le32 Capability; /* RSS or RDMA Capable */
--	__le32 Reserved;
--	__le64 LinkSpeed;
--	char	SockAddr_Storage[128];
--} __packed;
--
- struct file_object_buf_type1_ioctl_rsp {
- 	__u8 ObjectId[16];
- 	__u8 BirthVolumeId[16];
 -- 
 2.43.0
 
