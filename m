@@ -1,27 +1,27 @@
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43AA7296BD0;
-	Sun, 12 Oct 2025 15:11:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C5C25783C;
+	Sun, 12 Oct 2025 15:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760281922; cv=none; b=J92n7NpyajdtYLSkMJKnPsY1jIVA1mjrczVfK8BprQ+yezkK8bJKj/ycRKgn0VCRx41p9fOyJt6EPqNhJedX3UD4pwB+0sbUme0ViuTzv5HtXckG8npStNcoAL06k3Y0/SsHpdsx6cd9lA18MBAjl8u44F4f9IRvZlJVfZ5XbIM=
+	t=1760281924; cv=none; b=lt9880Dsmd2hGZxdwA8WAnQ1M+TvXBYOk+RFVEx7tTAjkb3kZ5IhY8Xsj1aV2VBu/r9z42WJsd3chVDYo7KlezxTtvPTMChIZuvtPIgL+Fq3npuzwHgF27dzqXOrp+zOVDsPMMa+A9ljTRTdSuSIvG8a5CYuXobO7csc4KHZeBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760281922; c=relaxed/simple;
-	bh=h8rXpMFfHIROBKkRmkoCt2Bb21FexDTnSrRb1R1hAAI=;
+	s=arc-20240116; t=1760281924; c=relaxed/simple;
+	bh=oteY2DB6t8StVBkclNm0ZCXNfCcJGBmqqtuWOd8wqCE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TNtGPDPTbGKZhQVQIaD+8zDF03KT+wQ32M+WOSesGVYMPPqTKz1SbFEfLldS7Col3p/6coYlu3Oa2ZN0p5AyA7GM5Tm7AKFCrrG4TYcUTQuuuWvKM+EafF8IpW3YUoVHJTA5XrbyOBVuA+f2o/xk41KJuYJkYltVhsu5p0/48cE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=18.132.163.193
+	 MIME-Version; b=InImAbq95htKS0hWfVqjZTkVptODCMCy6whOxPFUAiLo5yn5S5lqOamhY/v6qzn44AFRvxHp2C2QJWESPFvX1SD3gtqkiKtGEA8Y7MhbxjufD99EaFJ6cI3x8BNAqnGbn+4AS1ONMPyJB/jQ4dBW0hwcL2P+vxWDGOERJ5ieGw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.254.200.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: zesmtpgz9t1760281822t2ae7ab6a
-X-QQ-Originating-IP: 2vPsGU0OwO1yRDGYjebapCcIRuF/AAbGjXFKqLDo6WM=
+X-QQ-mid: zesmtpgz9t1760281825t635632e9
+X-QQ-Originating-IP: 6HLTX+dRc9CYL1tk1F4OdQ5zclB6J+QcMRbQrl4qaqw=
 Received: from localhost.localdomain ( [116.128.244.171])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 12 Oct 2025 23:10:21 +0800 (CST)
+	id ; Sun, 12 Oct 2025 23:10:23 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 2608946645097381380
+X-BIZMAIL-ID: 11190244469557168826
 From: chenxiaosong@chenxiaosong.com
 To: stfrench@microsoft.com,
 	metze@samba.org,
@@ -39,9 +39,9 @@ To: stfrench@microsoft.com,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 08/22] smb: move smb_sockaddr_in and smb_sockaddr_in6 to common/smb2pdu.h
-Date: Sun, 12 Oct 2025 23:09:01 +0800
-Message-ID: <BDC099D2EB3E3711+20251012150915.2992220-9-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 09/22] smb: move copychunk definitions to common/smb2pdu.h
+Date: Sun, 12 Oct 2025 23:09:02 +0800
+Message-ID: <41D148FBA128451D+20251012150915.2992220-10-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251012150915.2992220-1-chenxiaosong@chenxiaosong.com>
 References: <20251012150915.2992220-1-chenxiaosong@chenxiaosong.com>
@@ -54,176 +54,223 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: Mw3/skGyA4U5uiJ3cdt52BmWd7SPoXebHY6eva8vqZGPZXtoj63iQOMl
-	a1bdsFBnyGoPX6looNaWFDaULxst9V63IXk88sEizK6ZlpgNZg1OrQLdzHH0MkXNimuEUlh
-	lUGrql1KVUdfXsBMYEmOjwHvBMkOGC6doTvqbjZnOsmaI/kEC1+z7MBmLDlehrWMRNgpn3O
-	S6A+6Ifyk3+9Qeq6bB3ujkqBu8xbp3kAX/nQhyT4xVsJJ51HgDkHNMei+aKCFXxq9RhiN0l
-	m+W1foKSYgCsyWUnaMfsO30VxDsbFPvuXHopnYbKTzLSmj9tuE7Tte61WR6gnr+A9Qxm5e4
-	J12A0zCzVKrm49Dv6eQCJDXXQD+aZHB1QVUhH2LymIC/NWSmS+eRB4pHnVgva38fyDADbWr
-	gsh9JLVLVwYsgbuaLk2PqUPcmFaxY9sHSH/k/xJM9n1xKwlAvhgSKxn+WyhTkpK02y0E3BF
-	Nttpb6c55Spg0k+sKKD8dKoAcTfH5QkZVcPlUak/pY0phhWibBuy+eOSLMueD8fRltp0L6S
-	0QGzeT8nWTwrlGCQWCB+HroWPA36FCVreGy9yOuY8Ud1hr7rLj55K65qy5IO4q3J8i5VfQY
-	ySYyHfrnbbGxpJUPRMyaWrxODvhWOd395sOCfMJ0yZZF2ZvigMUQt5VMvpq1hhKR97bJ8SW
-	9/GArEoOH/9lNGichWpjEtFgdKFsLipoPkgFdP6jLQ4Zkx3wXwLdpidsexif0fmQ3v2GL24
-	aYnXnYVOwwY8YWFXO3SngfXdX+vj4e4bKydjtvMv7Mvz1oXld2/oADOheH8RHgfCSuQYk+D
-	EcZykgcb91qR1PEGyHQJon26Johjmgzl9OFhRONnvZoxTATo8cWJzPi9Xm/GFi4rzP1zjah
-	MljI4t3n5QsjitavkzGFS5zGj92p4smupozasuKYtOULWHBoi+CxUIFqoL4Gz2iR2bt7ps9
-	lwEG3FiGO8mwdwyzSmipoxD6yESVutUQnsYodVDMfjH9tB1+nh1iExrpOEawYk0bryG447x
-	K5WY6aCIu5P1DSpLWsCL13vCZwTT2V12JDUcC0ww==
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-XMAILINFO: NLq8blVtEno84RSzHtBJub+JPGsk1j1x6rDhlsZTz38MKhqWJsER+Vvs
+	CLDnwpWX9+NLUus1H4CyH/yznSjHnUafuyYtDKtN2L2eJjp6/Spc5O7rQQS8KtVFnMTqWY/
+	+hspwUFkhSav23qhVQH2e08vnyv6Hei/iAU+oiSg+ah+sRFMPrbrhBpWZYwuWLcnSM0opZb
+	7ImPPEWiFSIRtXsyXJhkWB/cGmyzhrg9G2+lGWI5DKwyvmk4Iuz9Q9Xx10nAw1B4fBmFEI2
+	9khiUSoj3HFTXhdzXcwBdgtxIm8Anr+E8+OeqeYVN3k/Mfor56hwHCqpD2OKQ4Z1kEN69ZC
+	U6rT57Y/wAanqt+ZcxBx7pXjG/07D6ioxMuMdSc3j2jdy3OCp3tv+GyHcJpPog3FrGJ/xhk
+	5wCftkL/vkusjQyXXULrp4l8qMH4BPusCnQuyhsdIkmhN8lq0ItGfaUYdVIxumudh3oSrAL
+	Jwhl974koz2GOVnU6zGdViddW3XlHNrBqdnaZmCpShXhOEGyIt8LxMxtbktnXSIkvadXOb5
+	q/GjwP8jJRz+st0V60If/KmQttpazBKGPkvj/6DGYSfDIgH4RKM7sAB/YpNap6fhWjwinMp
+	i9qhBor5ASTA3mlDg3yQsBWUQ5SCXrTW+aXUn+9z1y05O9c+olSJr0L9NM7bFAXNR1KEhnS
+	nDqrskylEzFyHNYRiWS8Z+plNKjdfpnkjgBuhzvSC3nMnoDQrY8TWwZiUgt0XwRMJQ9Ew3h
+	evdSpI1iNc3rahq4qXr4nJFKbknViJEv3QzvlmzXYi/78B3/b9Hz6PLAa/MZUhj4Z5RCWVJ
+	ZwM7Ny46B47ianFz8Pcqa0pXQ9GrZvwuSmxBJaWQIr4EKBFA+8yMcKLYdZcq+E5A+m9Wz56
+	S55dIORLd14ZbnlqkNOWsBr5pIJc0bua93F52ihicloEQoxnxPuV1HZon5VqlNCvjAlbmfM
+	/rhGjUZRVzC5Y+0LffooESgAbFSdiK3OYGbL2OvwTlfuMfjyAHgqI7NM+vdGz8YeEtRH778
+	D+IOth+9WWBgrvhWbsNxPLjLOmBic=
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
 X-QQ-RECHKSPAM: 0
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-Rename 4 places:
+Rename 3 places:
 
-  - iface_info_ipv4 -> smb_sockaddr_in
-  - iface_info_ipv6 -> smb_sockaddr_in6
-  - IPv4address -> IPv4Address
-  - IPv6address -> IPv6Address
+  - copychunk_ioctl -> copychunk_ioctl_req
+  - copychunk -> srv_copychunk
+  - server: ResumeKey -> SourceKeyU64
 
-Then move duplicate definitions to common header file.
+Merge the struct members of the server and the client, then move duplicate
+definitions to common header file.
 
 Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 ---
- fs/smb/client/smb2ops.c |  8 ++++----
- fs/smb/client/smb2pdu.h | 13 -------------
- fs/smb/common/smb2pdu.h | 15 +++++++++++++++
+ fs/smb/client/cifspdu.h |  8 --------
+ fs/smb/client/smb2ops.c |  6 +++---
+ fs/smb/client/smb2pdu.h | 24 ------------------------
+ fs/smb/common/smb2pdu.h | 29 +++++++++++++++++++++++++++++
  fs/smb/server/smb2pdu.c |  4 ++--
- fs/smb/server/smb2pdu.h | 13 -------------
- 5 files changed, 21 insertions(+), 32 deletions(-)
+ fs/smb/server/smb2pdu.h | 20 --------------------
+ 6 files changed, 34 insertions(+), 57 deletions(-)
 
+diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
+index d9cf7db0ac35..c86a329e5822 100644
+--- a/fs/smb/client/cifspdu.h
++++ b/fs/smb/client/cifspdu.h
+@@ -1323,14 +1323,6 @@ typedef struct smb_com_ntransact_rsp {
+ 	/* parms and data follow */
+ } __attribute__((packed)) NTRANSACT_RSP;
+ 
+-/* See MS-SMB 2.2.7.2.1.1 */
+-struct srv_copychunk {
+-	__le64 SourceOffset;
+-	__le64 DestinationOffset;
+-	__le32 CopyLength;
+-	__u32  Reserved;
+-} __packed;
+-
+ typedef struct smb_com_transaction_ioctl_req {
+ 	struct smb_hdr hdr;	/* wct = 23 */
+ 	__u8 MaxSetupCount;
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 7c392cf5940b..e90ca77d2ac7 100644
+index e90ca77d2ac7..ea9709d81851 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -624,8 +624,8 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 	struct network_interface_info_ioctl_rsp *p;
- 	struct sockaddr_in *addr4;
- 	struct sockaddr_in6 *addr6;
--	struct iface_info_ipv4 *p4;
--	struct iface_info_ipv6 *p6;
-+	struct smb_sockaddr_in *p4;
-+	struct smb_sockaddr_in6 *p6;
- 	struct cifs_server_iface *info = NULL, *iface = NULL, *niface = NULL;
- 	struct cifs_server_iface tmp_iface;
- 	ssize_t bytes_left;
-@@ -685,7 +685,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 		 */
- 		case INTERNETWORK:
- 			addr4 = (struct sockaddr_in *)&tmp_iface.sockaddr;
--			p4 = (struct iface_info_ipv4 *)p->Buffer;
-+			p4 = (struct smb_sockaddr_in *)p->Buffer;
- 			addr4->sin_family = AF_INET;
- 			memcpy(&addr4->sin_addr, &p4->IPv4Address, 4);
- 
-@@ -697,7 +697,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 			break;
- 		case INTERNETWORKV6:
- 			addr6 =	(struct sockaddr_in6 *)&tmp_iface.sockaddr;
--			p6 = (struct iface_info_ipv6 *)p->Buffer;
-+			p6 = (struct smb_sockaddr_in6 *)p->Buffer;
- 			addr6->sin6_family = AF_INET6;
- 			memcpy(&addr6->sin6_addr, &p6->IPv6Address, 16);
- 
+@@ -1524,7 +1524,7 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
+ static int
+ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     u64 persistent_fid, u64 volatile_fid,
+-		     struct copychunk_ioctl *pcchunk)
++		     struct copychunk_ioctl_req *pcchunk)
+ {
+ 	int rc;
+ 	unsigned int ret_data_len;
+@@ -1857,10 +1857,10 @@ smb2_copychunk_range(const unsigned int xid,
+ {
+ 	int rc = 0;
+ 	unsigned int ret_data_len = 0;
+-	struct copychunk_ioctl *cc_req = NULL;
++	struct copychunk_ioctl_req *cc_req = NULL;
+ 	struct copychunk_ioctl_rsp *cc_rsp = NULL;
+ 	struct cifs_tcon *tcon;
+-	struct copychunk *chunk;
++	struct srv_copychunk *chunk;
+ 	u32 chunks, chunk_count, chunk_bytes;
+ 	u32 copy_bytes, copy_bytes_left;
+ 	u32 chunks_written, bytes_written;
 diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
-index c013560bcfa1..0be63c00f848 100644
+index 0be63c00f848..9b5880e60a4e 100644
 --- a/fs/smb/client/smb2pdu.h
 +++ b/fs/smb/client/smb2pdu.h
-@@ -261,19 +261,6 @@ struct network_resiliency_req {
+@@ -191,36 +191,12 @@ struct crt_sd_ctxt {
+ 	struct smb3_sd sd;
  } __packed;
- /* There is no buffer for the response ie no struct network_resiliency_rsp */
  
--struct iface_info_ipv4 {
--	__be16 Port;
--	__be32 IPv4Address;
--	__be64 Reserved;
+-
+-#define COPY_CHUNK_RES_KEY_SIZE	24
+ struct resume_key_req {
+ 	char ResumeKey[COPY_CHUNK_RES_KEY_SIZE];
+ 	__le32	ContextLength;	/* MBZ */
+ 	char	Context[];	/* ignored, Windows sets to 4 bytes of zero */
+ } __packed;
+ 
+-
+-struct copychunk {
+-	__le64 SourceOffset;
+-	__le64 TargetOffset;
+-	__le32 Length;
+-	__le32 Reserved;
 -} __packed;
 -
--struct iface_info_ipv6 {
--	__be16 Port;
--	__be32 FlowInfo;
--	__u8   IPv6Address[16];
--	__be32 ScopeId;
+-/* this goes in the ioctl buffer when doing a copychunk request */
+-struct copychunk_ioctl {
+-	char SourceKey[COPY_CHUNK_RES_KEY_SIZE];
+-	__le32 ChunkCount;
+-	__le32 Reserved;
+-	struct copychunk Chunks[];
 -} __packed;
 -
- #define NO_FILE_ID 0xFFFFFFFFFFFFFFFFULL /* general ioctls to srv not to file */
- 
- struct compress_ioctl {
+-struct copychunk_ioctl_rsp {
+-	__le32 ChunksWritten;
+-	__le32 ChunkBytesWritten;
+-	__le32 TotalBytesWritten;
+-} __packed;
+-
+ /* See MS-FSCC 2.3.29 and 2.3.30 */
+ struct get_retrieval_pointer_count_req {
+ 	__le64 StartingVcn; /* virtual cluster number (signed) */
 diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index 25e8ece283c4..b01114108d23 100644
+index b01114108d23..857e6a577e84 100644
 --- a/fs/smb/common/smb2pdu.h
 +++ b/fs/smb/common/smb2pdu.h
-@@ -1428,6 +1428,21 @@ struct network_interface_info_ioctl_rsp {
- 	};
+@@ -1392,6 +1392,35 @@ struct smb2_ioctl_req {
+ 	__u8   Buffer[];
  } __packed;
  
-+/* See MS-SMB2 2.2.32.5.1.1 */
-+struct smb_sockaddr_in {
-+	__be16 Port;
-+	__be32 IPv4Address;
-+	__u8   Reserved[8];
++/* See MS-SMB2 2.2.31.1.1 */
++struct srv_copychunk {
++	__le64 SourceOffset;
++	__le64 TargetOffset;
++	__le32 Length;
++	__le32 Reserved;
 +} __packed;
 +
-+/* See MS-SMB2 2.2.32.5.1.2 */
-+struct smb_sockaddr_in6 {
-+	__be16 Port;
-+	__be32 FlowInfo;
-+	__u8   IPv6Address[16];
-+	__be32 ScopeId;
++#define COPY_CHUNK_RES_KEY_SIZE	24
++
++/* See MS-SMB2 2.2.31.1 */
++/* this goes in the ioctl buffer when doing a copychunk request */
++struct copychunk_ioctl_req {
++	union {
++		char SourceKey[COPY_CHUNK_RES_KEY_SIZE];
++		__le64 SourceKeyU64[3];
++	};
++	__le32 ChunkCount;
++	__le32 Reserved;
++	struct srv_copychunk Chunks[] __counted_by_le(ChunkCount);
 +} __packed;
 +
- /* this goes in the ioctl buffer when doing FSCTL_SET_ZERO_DATA */
- struct file_zero_data_information {
- 	__le64	FileOffset;
++/* See MS-SMB2 2.2.32.1 */
++struct copychunk_ioctl_rsp {
++	__le32 ChunksWritten;
++	__le32 ChunkBytesWritten;
++	__le32 TotalBytesWritten;
++} __packed;
++
+ struct smb2_ioctl_rsp {
+ 	struct smb2_hdr hdr;
+ 	__le16 StructureSize; /* Must be 49 */
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 169fbec03cfd..dd6f1375a833 100644
+index dd6f1375a833..846cca45195b 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -7903,7 +7903,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 			idev = __in_dev_get_rtnl(netdev);
- 			if (!idev)
- 				continue;
--			sockaddr_storage->addr4.IPv4address =
-+			sockaddr_storage->addr4.IPv4Address =
- 						idev_ipv4_address(idev);
- 			nbytes += sizeof(struct network_interface_info_ioctl_rsp);
- 			ipv4_set = true;
-@@ -7911,7 +7911,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 		} else {
- 			struct inet6_dev *idev6;
- 			struct inet6_ifaddr *ifa;
--			__u8 *ipv6_addr = sockaddr_storage->addr6.IPv6address;
-+			__u8 *ipv6_addr = sockaddr_storage->addr6.IPv6Address;
+@@ -7757,11 +7757,11 @@ static int fsctl_copychunk(struct ksmbd_work *work,
+ 	}
  
- 			sockaddr_storage->Family = INTERNETWORKV6;
- 			sockaddr_storage->addr6.Port = 0;
+ 	src_fp = ksmbd_lookup_foreign_fd(work,
+-					 le64_to_cpu(ci_req->ResumeKey[0]));
++					 le64_to_cpu(ci_req->SourceKeyU64[0]));
+ 	dst_fp = ksmbd_lookup_fd_slow(work, volatile_id, persistent_id);
+ 	ret = -EINVAL;
+ 	if (!src_fp ||
+-	    src_fp->persistent_id != le64_to_cpu(ci_req->ResumeKey[1])) {
++	    src_fp->persistent_id != le64_to_cpu(ci_req->SourceKeyU64[1])) {
+ 		rsp->hdr.Status = STATUS_OBJECT_NAME_NOT_FOUND;
+ 		goto out;
+ 	}
 diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
-index fe92bfeb415a..5a76b706ccd9 100644
+index 5a76b706ccd9..eecd1f1f5505 100644
 --- a/fs/smb/server/smb2pdu.h
 +++ b/fs/smb/server/smb2pdu.h
-@@ -136,19 +136,6 @@ struct create_posix_rsp {
+@@ -157,26 +157,6 @@ struct resume_key_ioctl_rsp {
+ 	__u8 Context[4]; /* ignored, Windows sets to 4 bytes of zero */
+ } __packed;
  
- #define SMB2_0_IOCTL_IS_FSCTL 0x00000001
- 
--struct smb_sockaddr_in {
--	__be16 Port;
--	__be32 IPv4address;
--	__u8 Reserved[8];
+-struct srv_copychunk {
+-	__le64 SourceOffset;
+-	__le64 TargetOffset;
+-	__le32 Length;
+-	__le32 Reserved;
 -} __packed;
 -
--struct smb_sockaddr_in6 {
--	__be16 Port;
--	__be32 FlowInfo;
--	__u8 IPv6address[16];
--	__be32 ScopeId;
+-struct copychunk_ioctl_req {
+-	__le64 ResumeKey[3];
+-	__le32 ChunkCount;
+-	__le32 Reserved;
+-	struct srv_copychunk Chunks[] __counted_by_le(ChunkCount);
 -} __packed;
 -
- struct sockaddr_storage_rsp {
- 	__le16 Family;
- 	union {
+-struct copychunk_ioctl_rsp {
+-	__le32 ChunksWritten;
+-	__le32 ChunkBytesWritten;
+-	__le32 TotalBytesWritten;
+-} __packed;
+-
+ struct file_sparse {
+ 	__u8	SetSparse;
+ } __packed;
 -- 
 2.43.0
 
