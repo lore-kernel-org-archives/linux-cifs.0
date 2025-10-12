@@ -1,41 +1,29 @@
-Received: from smtp.smtpout.orange.fr (smtp-82.smtpout.orange.fr [80.12.242.82])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD7319CCFC;
-	Sun, 12 Oct 2025 20:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.82
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC1F4C85;
+	Sun, 12 Oct 2025 22:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760301410; cv=none; b=tIrBcNqg039dnUGPH0wZrbAVeU5VRQev/ce7xThMGjHYJAqAZzxmYUl1laqjCD9dC5+/cMeVRmpiMaPt13iug3tX2CwrCj1unkicztGR6RHFh/7nSo4FQxdR+bZqwZ1hJ+pO/VqwdFFy1l1dVgUuNQSS63OmLSaMqqByS7P/UwY=
+	t=1760309951; cv=none; b=TeEbK5UckIgqYDnOPfUgoJT4M5umTl2lBD1vsgRc1iJEJAkKI0Rp39p2JpFqHsE5ug0YgFh33wpiKpQZVquWi9xCdKxwc9HXD78C+nY8p77qKjs0JTSknmGEf6Cf2Kf9jYS4yizSi/xYCHo2pXa/ndzyhEmi9OLg18basT0fV4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760301410; c=relaxed/simple;
-	bh=3VEMiJN+f8AXiW5vvqX1vWzwUHbrPRFw5t07fiqVhWw=;
+	s=arc-20240116; t=1760309951; c=relaxed/simple;
+	bh=O9/xMq/WsWwt6BhdaZP+0IQk2PmNkJ/e+71vzrgkOOI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BTd6pMxaQXbBevz+3ZvgdvTCiXnK6SSsxSwK5s2R1eKJm8vyjcd71zugsqO1gEdJENc64Igiql+A1jFSt0V9sFxpt02vTdqxdk0w9IVQoJ7LQBhWNfESpi4VUaUFBdu13XBjJXqVEzovvmZLB9PqYhnuvsZDOg1KDGDrAAwQRFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=rIecwSds; arc=none smtp.client-ip=80.12.242.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="rIecwSds"
-Received: from [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
- ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
-	by smtp.orange.fr with ESMTPA
-	id 82nvv5XdMA5xR82nwvnlT0; Sun, 12 Oct 2025 22:36:38 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1760301398;
-	bh=4D8Uhhp5TYXB9cD1KefCal6Y2TqrBc7OXDaDGeAMLII=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=rIecwSds61SpEeCCHleqGVkotONOD999cdZtSdKuQ42mAXwsAFYBRPCdCtPjfF1XM
-	 PqEUA/9iY4x7OVmt8URR9i6/g3oAKngj+2BvgOzzBq1uhRzL45dTsOqhlE2B/eOAwq
-	 QTySE8jLOPkhzWHJBc/WiRX3W6MGQ0/JhiUE41KXTe4dnsaQgoQGP5qY/0WnfWA2Hd
-	 6TvGmbf743sdDzSreLnDwliDvx3BEHvHpcMjWgB7gvj8PS90NXzA6MG0X+TdapemAh
-	 Io1G4e0ftSCYpaFF5XVHeIuyvNVZ30oI8Tts8QU5GhOxyEVF6IEn9g4tRHi0pmikIN
-	 g0mIfpAr1Kanw==
-X-ME-Helo: [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Sun, 12 Oct 2025 22:36:38 +0200
-X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
-Message-ID: <bd7b1078-4e58-4403-97e3-ac3a4765c51a@wanadoo.fr>
-Date: Sun, 12 Oct 2025 22:36:30 +0200
+	 In-Reply-To:Content-Type; b=Vq26vVTZ+pWb87vqkdiBCtU+aFlbiCL8nDfGhpxlVlOtNVbY1pwJgSN39rkrb+jgYEqVsmWj7WVvZr7JwTg0R6FpGVdOcXao6tLIJANfthCCDfr4tjGtBW2XtET4TKQ/a4PRdwUZiVoamPerXCw42qLqDeyxBKSWMCqrD9mvKYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+X-QQ-mid: zesmtpgz3t1760309901tf1369bb2
+X-QQ-Originating-IP: MvtMcZy8FSuveoXRjmYKGRWu3Gd3/PHMHPUpYLPI0AU=
+Received: from [192.168.3.223] ( [116.128.244.171])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 13 Oct 2025 06:58:20 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 15561149925438105871
+Message-ID: <56E522C05F8E6468+9e555719-8b1e-47a6-8d60-b6a7e89fd91b@chenxiaosong.com>
+Date: Mon, 13 Oct 2025 06:58:20 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -44,86 +32,62 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2 06/22] smb: move SMB1_PROTO_NUMBER to common/cifsglob.h
-To: chenxiaosong@chenxiaosong.com, stfrench@microsoft.com, metze@samba.org,
- pali@kernel.org, linkinjeon@kernel.org, smfrench@gmail.com,
- sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
- pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- bharathsm@microsoft.com, zhangguodong@kylinos.cn
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ stfrench@microsoft.com, metze@samba.org, pali@kernel.org,
+ linkinjeon@kernel.org, smfrench@gmail.com, sfrench@samba.org,
+ senozhatsky@chromium.org, tom@talpey.com, pc@manguebit.org,
+ ronniesahlberg@gmail.com, sprasad@microsoft.com, bharathsm@microsoft.com,
+ zhangguodong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
  ChenXiaoSong <chenxiaosong@kylinos.cn>
 References: <20251012161749.2994033-1-chenxiaosong@chenxiaosong.com>
  <66942D4891D3E571+20251012161749.2994033-7-chenxiaosong@chenxiaosong.com>
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Content-Language: en-US, fr-FR
-In-Reply-To: <66942D4891D3E571+20251012161749.2994033-7-chenxiaosong@chenxiaosong.com>
+ <bd7b1078-4e58-4403-97e3-ac3a4765c51a@wanadoo.fr>
+Content-Language: en-US
+From: chenxiaosong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <bd7b1078-4e58-4403-97e3-ac3a4765c51a@wanadoo.fr>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: M6HsUa4FHJpkREuH6gKmoKadHC2GeyeFVXQD1ZZH1o0+wu4TWXSYuyeu
+	ShYRK44jqH5ITPzFw+F1jfvbMLgCf4HV8eE9IOEO8YC5BbdodOqn/pugq2C6zBujiWoEZ1R
+	Me5eXtGs/SYwceMKT1GHenumWgq4W0LxRnOEPNyoXEfK4ZNptRjvmvejtrkayM6Ad5mQDEy
+	FyNHNFS2u88okb6w1lJ4VAKtfQJKp4vdQv/1itBh/ZwuCuRbuJP1RexlSGNa7xrKU4wvdFi
+	WDJYNw3GsCr7S3fT1ejoVohnz33MQFpWq3lHggFjXAye1kraDBSC+T7WUBjcntyet7NgYm8
+	fSFkN5+HLgap79ahWQ2s6w2aQtIH3tXXdgPQ4ADZmmtU4B6AYOChV+8byErfPsE8I+UBigI
+	4QuBk1WdH9+Mmdo2NqYgK1z/dubhgLtc4hZEe3cSpoPlEmxtPUMWcWB1o+7XjROvzqqM/lT
+	4rnlAc8NVkpRaeI/wmJaEuW8hegQ/01InAZsWzpF4Z6GwVM8F313H5QEyxQ/tNtjIaQcgiC
+	AEOhQHLIfv/in+Q828wE0W65IVdhobR3AarRvrkgAy3z1CYFe/69mFF5pj6qQcMjg1fF1Tt
+	UyxOV0L/1TeN+rABwz+Yb7l11NZ7riAUxWscAXvKjjJa7xduRV3WV3YQPNeJJVZTOIxuJcD
+	U4NapQa9K7mF++tj6XKQZZnraBp6lF1sDyyj6SLxPylHVlMVn+FfqZZNCqRaGBFNfPsfL3k
+	LfE+ARi7nMmDKVcJFzd7DS2vE+R76y6nsLlezcY+/8qOGJaYXTrKVdsxc2FIYtQDitChdhP
+	VuR01US3fzHtYmzZ0xj0ucbMYOWBaFnykbn/e4PdzIUDBznwBJgDDG7X0NevXv2z0vlmIRl
+	RVgYmQhDVFGxZQN5nT5NatRmun/UpNN4gaEMT9GT3B1nuLmHp4asTbcXGZw7MuSRcSS3/+1
+	i7qthzjUszR31kEF/jOEp9rWJXIs0UIB8ThlZ5tu+KNGd8RRTua7By3GebhoWDRP51zZFq0
+	zR7jU5dIh5mX7z9en4fnDEhYxL54SqObWlViYcSLZMwjPQLJaAPpWTNojhkCbazHrO7TUAD
+	g==
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+X-QQ-RECHKSPAM: 0
 
-Le 12/10/2025 à 18:17, chenxiaosong@chenxiaosong.com a écrit :
-> From: ZhangGuoDong <zhangguodong@kylinos.cn>
+Hi Christophe,
+
+Thank you for taking the time to review and comment. Apologies — it was 
+my oversight not to list you in the "To:" of v2, and I should have used 
+"Suggested-by:" rather than "Reviewed-by:".
+
+On 2025/10/13 04:36, Christophe JAILLET wrote:
 > 
-> Replace the constant of client with SMB1_PROTO_NUMBER, then move the
-> macro definition from server/smb_common.h to common/cifsglob.h.
+> Hi,
 > 
-> Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
-> Reviewed-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-
-Hi,
-
-even if I reviewed and commented on this patch, I never gave an explicit 
-R-b.
-
-And as I'm cited in this v2, being in To: or Cc: of this updated version 
-would have been appreciated.
-
-No hard-feeling.
-
-CJ
-
-> ---
->   fs/smb/client/misc.c       | 2 +-
->   fs/smb/common/cifsglob.h   | 2 ++
->   fs/smb/server/smb_common.h | 1 -
->   3 files changed, 3 insertions(+), 2 deletions(-)
+> even if I reviewed and commented on this patch, I never gave an explicit 
+> R-b.
 > 
-> diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-> index dda6dece802a..68607b7a68ca 100644
-> --- a/fs/smb/client/misc.c
-> +++ b/fs/smb/client/misc.c
-> @@ -318,7 +318,7 @@ static int
->   check_smb_hdr(struct smb_hdr *smb)
->   {
->   	/* does it have the right SMB "signature" ? */
-> -	if (*(__le32 *) smb->Protocol != cpu_to_le32(0x424d53ff)) {
-> +	if (*(__le32 *) smb->Protocol != SMB1_PROTO_NUMBER) {
->   		cifs_dbg(VFS, "Bad protocol string signature header 0x%x\n",
->   			 *(unsigned int *)smb->Protocol);
->   		return 1;
-> diff --git a/fs/smb/common/cifsglob.h b/fs/smb/common/cifsglob.h
-> index 371160fec1cd..5928d35c7f30 100644
-> --- a/fs/smb/common/cifsglob.h
-> +++ b/fs/smb/common/cifsglob.h
-> @@ -9,6 +9,8 @@
->   #ifndef _COMMON_CIFS_GLOB_H
->   #define _COMMON_CIFS_GLOB_H
->   
-> +#define SMB1_PROTO_NUMBER		cpu_to_le32(0x424d53ff)
-> +
->   struct smb_version_values {
->   	char		*version_string;
->   	__u16		protocol_id;
-> diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
-> index 9c0db206624b..6d427dbed5fd 100644
-> --- a/fs/smb/server/smb_common.h
-> +++ b/fs/smb/server/smb_common.h
-> @@ -151,7 +151,6 @@
->   		FILE_EXECUTE | FILE_DELETE_CHILD | \
->   		FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES)
->   
-> -#define SMB1_PROTO_NUMBER		cpu_to_le32(0x424d53ff)
->   #define SMB_COM_NEGOTIATE		0x72
->   #define SMB1_CLIENT_GUID_SIZE		(16)
->   
+> And as I'm cited in this v2, being in To: or Cc: of this updated version 
+> would have been appreciated.
+> 
+> No hard-feeling.
+> 
+> CJ
+> 
 
