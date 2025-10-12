@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB4920F08E;
-	Sun, 12 Oct 2025 01:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF0E2153D2;
+	Sun, 12 Oct 2025 01:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760234389; cv=none; b=c/6uqXoYjRSrJG+YfCH65Ca64fUNwuUXFDbuuq8zLamTFjGAmAk1sKkxWxzY4E52hs67nc465umMH7Y9HwPHHc39PowzkWmm57CHVOlT9aisOhG9m3HK2GBsYtiyYrKwDoUZ99KomH6Jp3ZDaWWG1Nr0L8dO8xJEd2nG70y2l5Y=
+	t=1760234389; cv=none; b=deETar3eQD5kzUN6zrWKJ8S42uj79BJpAbcYFeh/H+blQoaYmNHYp+b4Fa+BQTmv+NZqHkxxXyUSG109P6aJc/edJiKc7lK0SfJvd5fE5Bsmx4QQzWPb6HAARq2Jk8eRTlveXR2EUBrRpmQaIjYknjXyE7LnsnI/Mkuuzc3E4yM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1760234389; c=relaxed/simple;
-	bh=J6mbhHXU0seemf1o87nmEu43wEPi9saI0VMIAbjq9mw=;
+	bh=HHm6pOVf3sXBU3OQBSM5qr/7AHVRHIgZ/gieJ/a5ZQ4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jUxe/0FGGv+hyrkkIDspnhxHS8g/JijqrP2Rvjm/PPpyZgEG1RX63mNvJemGY1/veJuQJsc/ShwCJHaH3KIadaSOZVx07d3Eta+cy3Lj4yCtP22ARfywiBZnT84OC0GiYl5gqsg+ghRUlkieO1bfhmHgeDUBY7JR+h1k9karD4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kIImpOmL; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=W8HaENpLJevaonIFa01OMYCABY44TE9mCri0daA+sFCdlm+WBkXM93yvKL3gk0YViTw7bRvopyTBRfwIUYHePHsHfyS9c0nIdNaXfvlITi4/XcHpvsTUAQSLrOdUL/px0MyW2r0zEXQ5hoIcgu+h4uSJOd4KSaMxH7/V+XrGOuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqhjxUsc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kIImpOmL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41E24C4AF09;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqhjxUsc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B89E8C4AF0B;
 	Sun, 12 Oct 2025 01:59:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760234387;
-	bh=J6mbhHXU0seemf1o87nmEu43wEPi9saI0VMIAbjq9mw=;
+	s=k20201202; t=1760234388;
+	bh=HHm6pOVf3sXBU3OQBSM5qr/7AHVRHIgZ/gieJ/a5ZQ4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kIImpOmLVSuiSsv4S+rFxYlKi8EwLJnegWbA/vPc0+eTLH26dyMnyCiPsMnHya2Py
-	 2+CoT/Dx8oYwvHdtGF04wPpg1xdbAfk4KCXkllb+EBfLjesFlRogsROtHfUXzhgNS+
-	 2GulfyiVFUTPS8+xlwj0TJLTPhVPTTOHg62r4937ukloDVrWpK6nUuGi1d4WoSofVf
-	 P3+4s2TjmSEIPwy2YrMkMOcUgFrMe5YvN9a+QrivOMMgChn+lJB0QRyTpx+fudFd2t
-	 f1C3WgDM2jbkWQcIZubIwOJrYbaY2hT/13L+1HlNzizATC+Y5tOhdPb7SeBbkYpoCh
-	 cyH4H+e1u9+fA==
+	b=aqhjxUsc4ywtaQlokdKDqKbCRA5CyYQm1lk/0pTxq/nIpBi+mwzgy3Y6jNeXHi+3y
+	 R05NLQYxEcZL34GbgR9WR4jmvXWDuCn1TCmsovkVweYiSfchAVj2eJN6ZeyTHJ6+xr
+	 Nixkr9LHao9w/RLuZjErdz3jExn6wTh0LeusFucQezfCgk5Z5L+QVmzuOzx/dYjuT+
+	 +jVCW3bqMSy2WgTIFG5T9CEfp/lnihyjgsrw9xW1E9QQ4rIwfgdQjjhzUQ5Fq8dM2S
+	 Xbh843sXNlUHPkVrxOUWFAHJdWlD1E72vRvRTKIUFvYhCaP018ICZUtayILJy+W/52
+	 8MA9HG46EHj6w==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-cifs@vger.kernel.org,
 	Steve French <sfrench@samba.org>
@@ -38,9 +38,9 @@ Cc: samba-technical@lists.samba.org,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 6/8] smb: client: Use HMAC-MD5 library for NTLMv2
-Date: Sat, 11 Oct 2025 18:57:36 -0700
-Message-ID: <20251012015738.244315-7-ebiggers@kernel.org>
+Subject: [PATCH 7/8] smb: client: Remove obsolete crypto_shash allocations
+Date: Sat, 11 Oct 2025 18:57:37 -0700
+Message-ID: <20251012015738.244315-8-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251012015738.244315-1-ebiggers@kernel.org>
 References: <20251012015738.244315-1-ebiggers@kernel.org>
@@ -52,249 +52,159 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For the HMAC-MD5 computations in NTLMv2, use the HMAC-MD5 library
-instead of a "hmac(md5)" crypto_shash.  This is simpler and faster.
-With the library there's no need to allocate memory, no need to handle
-errors, and the HMAC-MD5 code is accessed directly without inefficient
-indirect calls and other unnecessary API overhead.
-
-To preserve the existing behavior of NTLMv2 support being disabled when
-the kernel is booted with "fips=1", make setup_ntlmv2_rsp() check
-fips_enabled itself.  Previously it relied on the error from
-cifs_alloc_hash("hmac(md5)", &hmacmd5).
+Now that the SMB client accesses MD5, HMAC-MD5, HMAC-SHA256, and SHA-512
+only via the library API and not via crypto_shash, allocating
+crypto_shash objects for these algorithms is no longer necessary.
+Remove all these allocations, their corresponding kconfig selections,
+and their corresponding module soft dependencies.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- fs/smb/client/cifsencrypt.c | 114 +++++++-----------------------------
- 1 file changed, 22 insertions(+), 92 deletions(-)
+ fs/smb/client/Kconfig         |  4 ----
+ fs/smb/client/cifsencrypt.c   |  3 ---
+ fs/smb/client/cifsfs.c        |  4 ----
+ fs/smb/client/cifsglob.h      |  3 ---
+ fs/smb/client/smb2transport.c | 35 ++---------------------------------
+ 5 files changed, 2 insertions(+), 47 deletions(-)
 
+diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
+index f5a980bdfc939..17bd368574e94 100644
+--- a/fs/smb/client/Kconfig
++++ b/fs/smb/client/Kconfig
+@@ -3,15 +3,11 @@ config CIFS
+ 	tristate "SMB3 and CIFS support (advanced network filesystem)"
+ 	depends on INET
+ 	select NLS
+ 	select NLS_UCS2_UTILS
+ 	select CRYPTO
+-	select CRYPTO_MD5
+-	select CRYPTO_SHA256
+-	select CRYPTO_SHA512
+ 	select CRYPTO_CMAC
+-	select CRYPTO_HMAC
+ 	select CRYPTO_AEAD2
+ 	select CRYPTO_CCM
+ 	select CRYPTO_GCM
+ 	select CRYPTO_ECB
+ 	select CRYPTO_AES
 diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
-index 80215ba7a5744..bbcf3b05c19ab 100644
+index bbcf3b05c19ab..801824825ecf2 100644
 --- a/fs/smb/client/cifsencrypt.c
 +++ b/fs/smb/client/cifsencrypt.c
-@@ -423,33 +423,23 @@ static __le64 find_timestamp(struct cifs_ses *ses)
- 	ktime_get_real_ts64(&ts);
- 	return cpu_to_le64(cifs_UnixTimeToNT(ts));
- }
+@@ -691,13 +691,10 @@ calc_seckey(struct cifs_ses *ses)
  
- static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
--			    const struct nls_table *nls_cp, struct shash_desc *hmacmd5)
-+			    const struct nls_table *nls_cp)
+ void
+ cifs_crypto_secmech_release(struct TCP_Server_Info *server)
  {
--	int rc = 0;
- 	int len;
- 	char nt_hash[CIFS_NTHASH_SIZE];
-+	struct hmac_md5_ctx hmac_ctx;
- 	__le16 *user;
- 	wchar_t *domain;
- 	wchar_t *server;
+ 	cifs_free_hash(&server->secmech.aes_cmac);
+-	cifs_free_hash(&server->secmech.hmacsha256);
+-	cifs_free_hash(&server->secmech.md5);
+-	cifs_free_hash(&server->secmech.sha512);
  
- 	/* calculate md4 hash of password */
- 	E_md4hash(ses->password, nt_hash, nls_cp);
- 
--	rc = crypto_shash_setkey(hmacmd5->tfm, nt_hash, CIFS_NTHASH_SIZE);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not set NT hash as a key, rc=%d\n", __func__, rc);
--		return rc;
--	}
--
--	rc = crypto_shash_init(hmacmd5);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not init HMAC-MD5, rc=%d\n", __func__, rc);
--		return rc;
--	}
-+	hmac_md5_init_usingrawkey(&hmac_ctx, nt_hash, CIFS_NTHASH_SIZE);
- 
- 	/* convert ses->user_name to unicode */
- 	len = ses->user_name ? strlen(ses->user_name) : 0;
- 	user = kmalloc(2 + (len * 2), GFP_KERNEL);
- 	if (user == NULL)
-@@ -460,16 +450,12 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
- 		UniStrupr(user);
- 	} else {
- 		*(u16 *)user = 0;
+ 	if (server->secmech.enc) {
+ 		crypto_free_aead(server->secmech.enc);
+ 		server->secmech.enc = NULL;
  	}
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 05b1fa76e8ccf..4f959f1e08d23 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -2137,17 +2137,13 @@ MODULE_LICENSE("GPL");	/* combination of LGPL + GPL source behaves as GPL */
+ MODULE_DESCRIPTION
+ 	("VFS to access SMB3 servers e.g. Samba, Macs, Azure and Windows (and "
+ 	"also older servers complying with the SNIA CIFS Specification)");
+ MODULE_VERSION(CIFS_VERSION);
+ MODULE_SOFTDEP("ecb");
+-MODULE_SOFTDEP("hmac");
+-MODULE_SOFTDEP("md5");
+ MODULE_SOFTDEP("nls");
+ MODULE_SOFTDEP("aes");
+ MODULE_SOFTDEP("cmac");
+-MODULE_SOFTDEP("sha256");
+-MODULE_SOFTDEP("sha512");
+ MODULE_SOFTDEP("aead2");
+ MODULE_SOFTDEP("ccm");
+ MODULE_SOFTDEP("gcm");
+ module_init(init_cifs)
+ module_exit(exit_cifs)
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 8f6f567d7474f..8932aa612db4a 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -219,13 +219,10 @@ struct session_key {
+ 	char *response;
+ };
  
--	rc = crypto_shash_update(hmacmd5, (char *)user, 2 * len);
-+	hmac_md5_update(&hmac_ctx, (const u8 *)user, 2 * len);
- 	kfree(user);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not update with user, rc=%d\n", __func__, rc);
--		return rc;
--	}
+ /* crypto hashing related structure/fields, not specific to a sec mech */
+ struct cifs_secmech {
+-	struct shash_desc *md5; /* md5 hash function, for CIFS/SMB1 signatures */
+-	struct shash_desc *hmacsha256; /* hmac-sha256 hash function, for SMB2 signatures */
+-	struct shash_desc *sha512; /* sha512 hash function, for SMB3.1.1 preauth hash */
+ 	struct shash_desc *aes_cmac; /* block-cipher based MAC function, for SMB3 signatures */
  
- 	/* convert ses->domainName to unicode and uppercase */
- 	if (ses->domainName) {
- 		len = strlen(ses->domainName);
+ 	struct crypto_aead *enc; /* smb3 encryption AEAD TFM (AES-CCM and AES-GCM) */
+ 	struct crypto_aead *dec; /* smb3 decryption AEAD TFM (AES-CCM and AES-GCM) */
+ };
+diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+index 89258accc2203..cd689bc27bfdc 100644
+--- a/fs/smb/client/smb2transport.c
++++ b/fs/smb/client/smb2transport.c
+@@ -29,53 +29,22 @@
  
-@@ -477,81 +463,48 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
- 		if (domain == NULL)
- 			return -ENOMEM;
- 
- 		len = cifs_strtoUTF16((__le16 *)domain, ses->domainName, len,
- 				      nls_cp);
--		rc = crypto_shash_update(hmacmd5, (char *)domain, 2 * len);
-+		hmac_md5_update(&hmac_ctx, (const u8 *)domain, 2 * len);
- 		kfree(domain);
--		if (rc) {
--			cifs_dbg(VFS, "%s: Could not update with domain, rc=%d\n", __func__, rc);
--			return rc;
--		}
- 	} else {
- 		/* We use ses->ip_addr if no domain name available */
- 		len = strlen(ses->ip_addr);
- 
- 		server = kmalloc(2 + (len * 2), GFP_KERNEL);
- 		if (server == NULL)
- 			return -ENOMEM;
- 
- 		len = cifs_strtoUTF16((__le16 *)server, ses->ip_addr, len, nls_cp);
--		rc = crypto_shash_update(hmacmd5, (char *)server, 2 * len);
-+		hmac_md5_update(&hmac_ctx, (const u8 *)server, 2 * len);
- 		kfree(server);
--		if (rc) {
--			cifs_dbg(VFS, "%s: Could not update with server, rc=%d\n", __func__, rc);
--			return rc;
--		}
- 	}
- 
--	rc = crypto_shash_final(hmacmd5, ntlmv2_hash);
--	if (rc)
--		cifs_dbg(VFS, "%s: Could not generate MD5 hash, rc=%d\n", __func__, rc);
--
--	return rc;
-+	hmac_md5_final(&hmac_ctx, ntlmv2_hash);
-+	return 0;
- }
- 
--static int
--CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash, struct shash_desc *hmacmd5)
-+static void CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash)
+ static int
+ smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
  {
+ 	struct cifs_secmech *p = &server->secmech;
 -	int rc;
- 	struct ntlmv2_resp *ntlmv2 = (struct ntlmv2_resp *)
- 	    (ses->auth_key.response + CIFS_SESS_KEY_SIZE);
- 	unsigned int hash_len;
- 
- 	/* The MD5 hash starts at challenge_key.key */
- 	hash_len = ses->auth_key.len - (CIFS_SESS_KEY_SIZE +
- 		offsetof(struct ntlmv2_resp, challenge.key[0]));
- 
--	rc = crypto_shash_setkey(hmacmd5->tfm, ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not set NTLMv2 hash as a key, rc=%d\n", __func__, rc);
--		return rc;
--	}
 -
--	rc = crypto_shash_init(hmacmd5);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not init HMAC-MD5, rc=%d\n", __func__, rc);
--		return rc;
--	}
--
- 	if (ses->server->negflavor == CIFS_NEGFLAVOR_EXTENDED)
- 		memcpy(ntlmv2->challenge.key, ses->ntlmssp->cryptkey, CIFS_SERVER_CHALLENGE_SIZE);
- 	else
- 		memcpy(ntlmv2->challenge.key, ses->server->cryptkey, CIFS_SERVER_CHALLENGE_SIZE);
- 
--	rc = crypto_shash_update(hmacmd5, ntlmv2->challenge.key, hash_len);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not update with response, rc=%d\n", __func__, rc);
--		return rc;
--	}
--
--	/* Note that the MD5 digest over writes anon.challenge_key.key */
--	rc = crypto_shash_final(hmacmd5, ntlmv2->ntlmv2_hash);
+-	rc = cifs_alloc_hash("hmac(sha256)", &p->hmacsha256);
 -	if (rc)
--		cifs_dbg(VFS, "%s: Could not generate MD5 hash, rc=%d\n", __func__, rc);
+-		goto err;
 -
--	return rc;
-+	/* Note that the HMAC-MD5 value overwrites ntlmv2->challenge.key */
-+	hmac_md5_usingrawkey(ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE,
-+			     ntlmv2->challenge.key, hash_len,
-+			     ntlmv2->ntlmv2_hash);
- }
+-	rc = cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
+-	if (rc)
+-		goto err;
  
- /*
-  * Set up NTLMv2 response blob with SPN (cifs/<hostname>) appended to the
-  * existing list of AV pairs.
-@@ -604,11 +557,10 @@ static int set_auth_key_response(struct cifs_ses *ses)
+-	return 0;
+-err:
+-	cifs_free_hash(&p->hmacsha256);
+-	return rc;
++	return cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
  }
  
  int
- setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ smb311_crypto_shash_allocate(struct TCP_Server_Info *server)
  {
--	struct shash_desc *hmacmd5 = NULL;
- 	unsigned char *tiblob = NULL; /* target info blob */
- 	struct ntlmv2_resp *ntlmv2;
- 	char ntlmv2_hash[16];
- 	__le64 rsp_timestamp;
- 	__u64 cc;
-@@ -675,55 +627,33 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- 	ntlmv2->reserved = 0;
- 	ntlmv2->time = rsp_timestamp;
- 	ntlmv2->client_chal = cc;
- 	ntlmv2->reserved2 = 0;
+ 	struct cifs_secmech *p = &server->secmech;
+-	int rc = 0;
  
--	rc = cifs_alloc_hash("hmac(md5)", &hmacmd5);
--	if (rc) {
--		cifs_dbg(VFS, "Could not allocate HMAC-MD5, rc=%d\n", rc);
-+	if (fips_enabled) {
-+		cifs_dbg(VFS, "NTLMv2 support is disabled due to FIPS\n");
-+		rc = -EOPNOTSUPP;
- 		goto unlock;
- 	}
- 
- 	/* calculate ntlmv2_hash */
--	rc = calc_ntlmv2_hash(ses, ntlmv2_hash, nls_cp, hmacmd5);
-+	rc = calc_ntlmv2_hash(ses, ntlmv2_hash, nls_cp);
- 	if (rc) {
- 		cifs_dbg(VFS, "Could not get NTLMv2 hash, rc=%d\n", rc);
- 		goto unlock;
- 	}
- 
- 	/* calculate first part of the client response (CR1) */
--	rc = CalcNTLMv2_response(ses, ntlmv2_hash, hmacmd5);
--	if (rc) {
--		cifs_dbg(VFS, "Could not calculate CR1, rc=%d\n", rc);
--		goto unlock;
--	}
-+	CalcNTLMv2_response(ses, ntlmv2_hash);
- 
- 	/* now calculate the session key for NTLMv2 */
--	rc = crypto_shash_setkey(hmacmd5->tfm, ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not set NTLMv2 hash as a key, rc=%d\n", __func__, rc);
--		goto unlock;
--	}
--
--	rc = crypto_shash_init(hmacmd5);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not init HMAC-MD5, rc=%d\n", __func__, rc);
--		goto unlock;
--	}
--
--	rc = crypto_shash_update(hmacmd5, ntlmv2->ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not update with response, rc=%d\n", __func__, rc);
--		goto unlock;
--	}
--
--	rc = crypto_shash_final(hmacmd5, ses->auth_key.response);
+-	rc = cifs_alloc_hash("hmac(sha256)", &p->hmacsha256);
 -	if (rc)
--		cifs_dbg(VFS, "%s: Could not generate MD5 hash, rc=%d\n", __func__, rc);
-+	hmac_md5_usingrawkey(ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE,
-+			     ntlmv2->ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE,
-+			     ses->auth_key.response);
-+	rc = 0;
- unlock:
- 	cifs_server_unlock(ses->server);
--	cifs_free_hash(&hmacmd5);
- setup_ntlmv2_rsp_ret:
- 	kfree_sensitive(tiblob);
- 
- 	return rc;
+-		return rc;
+-
+-	rc = cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
+-	if (rc)
+-		goto err;
+-
+-	rc = cifs_alloc_hash("sha512", &p->sha512);
+-	if (rc)
+-		goto err;
+-
+-	return 0;
+-
+-err:
+-	cifs_free_hash(&p->aes_cmac);
+-	cifs_free_hash(&p->hmacsha256);
+-	return rc;
++	return cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
  }
+ 
+-
+ static
+ int smb3_get_sign_key(__u64 ses_id, struct TCP_Server_Info *server, u8 *key)
+ {
+ 	struct cifs_chan *chan;
+ 	struct TCP_Server_Info *pserver;
 -- 
 2.51.0
 
