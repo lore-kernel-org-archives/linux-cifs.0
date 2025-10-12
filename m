@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9E81E0DFE;
-	Sun, 12 Oct 2025 01:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D55E1EB9FA;
+	Sun, 12 Oct 2025 01:59:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760234386; cv=none; b=ZXTNC9rzzv9yA2aihBrcPYHoPR1DVtnwtL7CpDg4OohDWAC/LsW9K1wYFDSo5W8BOvVSHLzCosbH1zm0UMsrf4ydPFc+x3c1oNqgAU4SWPgO9Dz8vNPjCIOrrBGht5/B4w7hv/TSEY2w3ixkcn+6zR1T6l2DyIZkXUBKwbMdSaY=
+	t=1760234387; cv=none; b=KK6+pUVAA2vJq0NXOti55U0TjOqTjFwcfd6e+Om7yL5TkIYD693X60Ky4WwUIDHx0ietWzxqtzZcbW9oQ9V3uOEdTW06nk36cvkyruq75pJDO5uBDTh1+vhNT/kGi6GcwJwEPSpuN9KZwCde2yEWBjHA+XjAZo/HaouvQc/lzSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760234386; c=relaxed/simple;
-	bh=JhHxre8sN4Y1ugTTLTf0Yhjkw9zjfabtQaNOSXJn+OU=;
+	s=arc-20240116; t=1760234387; c=relaxed/simple;
+	bh=BeoMBztbvcFX7rlY3UlLBL/j/SrAexLozHMH/LcR0Eg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LJfx5kYoDJ793c6IWdsQxqk2ZM0natXQWefZestdKuzeXbRvVuYOFvpzNuy4/h9XKxEC8k5idvWCF2I0h6qKjwDo6xaMkfCQQ8k1B6Oj/ghavo0TeFF/fbqq7MEMCFPnr7A/fGjGWVXEIpSk2hcJFVE2pIqOzZcuy4xj1w3XgeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sa30SE0+; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ALhK9kmQe4ljWHsVWS9XcBUHMQBmTPgT22vu1SOfh9vVZQkRWlO4aYvb9g5b8uy/w1IYOVvy0nDz6mplqTXah3xTb8QysPVWd/vNx26XifrjJYwCKE2Hg8Ibl3Jto7FDaIPPEE6+88n/vGiKSUuViKuMmduWVPqESZ8VZP7pgK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N/HdaC4u; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sa30SE0+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B95FC4CEF9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N/HdaC4u"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C09C2C116B1;
 	Sun, 12 Oct 2025 01:59:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760234386;
-	bh=JhHxre8sN4Y1ugTTLTf0Yhjkw9zjfabtQaNOSXJn+OU=;
+	s=k20201202; t=1760234387;
+	bh=BeoMBztbvcFX7rlY3UlLBL/j/SrAexLozHMH/LcR0Eg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sa30SE0+EqxZyaE63NhzySKXds81BVuFMAZIUhwiffgHWzABbBQG9NAjqIu+fSede
-	 Lj6Yg9xae/goWaRuySxh19XVDzLc2RvVXi1PlRkEEMcxkamzBipF/MaRwEAOZjpn1J
-	 eUHBmHbENwi3UefeoAd82vZsHef4xD8JxgFac9lCFnanOmSv1jn2GRD7qFOvS0ILOy
-	 n2bHdgtImzZJvS23Skuhze89+6SkEmkyGaAAaiCiCnn7V6tAj+feLqAUQVDxCCW2Aa
-	 H/Ib5LxeJy4VzXQOgdCsSKfGPaAdT3+XrQ2sC1Ju+xVULfUu0dXwDGaQyEjpG7bm+5
-	 e7izBmIHvV+HA==
+	b=N/HdaC4uMmXHTdT/xwfRNxGkdiy2jHuLg1LULk7maMj+wD1Z5ajherw1whr2B5e18
+	 ZE+xAYUnyUfn6uDMobTxz4MaOzJVUjvq0tm/9nchPlMhCJkRgA6rKXJzEkvoXj6USO
+	 A1JBSfHmEK5us02Vzoqn7AThV8pcLrFXFYwruECHyMEvToRMlRpFbG5kqQnVJDMCDm
+	 SLYUPP6XBI+1OIfE/n/mSR2B/VruZihrDgH41uxu+YyCgGsizvkI+68CsBbgp2RNaO
+	 OCt/W8gd8dL/k0/Ge/a4/r0Yd/wgT/mVUVZGStJPPy9Dxh2fILgyUih69GNaZM2BEm
+	 4nCO/ylPjB6qw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-cifs@vger.kernel.org,
 	Steve French <sfrench@samba.org>
@@ -38,9 +38,9 @@ Cc: samba-technical@lists.samba.org,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 4/8] smb: client: Use MD5 library for M-F symlink hashing
-Date: Sat, 11 Oct 2025 18:57:34 -0700
-Message-ID: <20251012015738.244315-5-ebiggers@kernel.org>
+Subject: [PATCH 5/8] smb: client: Use MD5 library for SMB1 signature calculation
+Date: Sat, 11 Oct 2025 18:57:35 -0700
+Message-ID: <20251012015738.244315-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251012015738.244315-1-ebiggers@kernel.org>
 References: <20251012015738.244315-1-ebiggers@kernel.org>
@@ -52,128 +52,121 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert parse_mf_symlink() and format_mf_symlink() to use the MD5
-library instead of a "md5" crypto_shash.  This is simpler and faster.
-With the library there's no need to allocate memory, no need to handle
-errors, and the MD5 code is accessed directly without inefficient
-indirect calls and other unnecessary API overhead.
+Convert cifs_calc_signature() to use the MD5 library instead of a "md5"
+crypto_shash.  This is simpler and faster.  With the library there's no
+need to allocate memory, no need to handle errors, and the MD5 code is
+accessed directly without inefficient indirect calls and other
+unnecessary API overhead.
 
-This also fixes an issue where these functions did not work on kernels
-booted in FIPS mode.  The use of MD5 here is for data integrity rather
-than a security purpose, so it can use a non-FIPS-approved algorithm.
+To preserve the existing behavior of MD5 signature support being
+disabled when the kernel is booted with "fips=1", make
+cifs_calc_signature() check fips_enabled itself.  Previously it relied
+on the error from cifs_alloc_hash("md5", &server->secmech.md5).
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- fs/smb/client/Kconfig |  1 +
- fs/smb/client/link.c  | 31 +++----------------------------
- 2 files changed, 4 insertions(+), 28 deletions(-)
+ fs/smb/client/cifsencrypt.c | 34 +++++++++++++++++-----------------
+ fs/smb/client/cifsproto.h   |  1 +
+ 2 files changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
-index f0c1ff8544f67..f5a980bdfc939 100644
---- a/fs/smb/client/Kconfig
-+++ b/fs/smb/client/Kconfig
-@@ -14,10 +14,11 @@ config CIFS
- 	select CRYPTO_CCM
- 	select CRYPTO_GCM
- 	select CRYPTO_ECB
- 	select CRYPTO_AES
- 	select CRYPTO_LIB_ARC4
-+	select CRYPTO_LIB_MD5
- 	select CRYPTO_LIB_SHA256
- 	select CRYPTO_LIB_SHA512
- 	select KEYS
- 	select DNS_RESOLVER
- 	select ASN1
-diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
-index fe80e711cd756..70f3c0c67eebd 100644
---- a/fs/smb/client/link.c
-+++ b/fs/smb/client/link.c
-@@ -3,10 +3,11 @@
-  *
-  *   Copyright (C) International Business Machines  Corp., 2002,2008
-  *   Author(s): Steve French (sfrench@us.ibm.com)
-  *
-  */
+diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
+index 9522088a1cfb7..80215ba7a5744 100644
+--- a/fs/smb/client/cifsencrypt.c
++++ b/fs/smb/client/cifsencrypt.c
+@@ -22,24 +22,33 @@
+ #include <linux/highmem.h>
+ #include <linux/fips.h>
+ #include <linux/iov_iter.h>
+ #include <crypto/aead.h>
+ #include <crypto/arc4.h>
 +#include <crypto/md5.h>
- #include <linux/fs.h>
- #include <linux/stat.h>
- #include <linux/slab.h>
- #include <linux/namei.h>
- #include "cifsfs.h"
-@@ -34,27 +35,10 @@
+ #include <crypto/sha2.h>
  
- #define CIFS_MF_SYMLINK_LEN_FORMAT "XSym\n%04u\n"
- #define CIFS_MF_SYMLINK_MD5_FORMAT "%16phN\n"
- #define CIFS_MF_SYMLINK_MD5_ARGS(md5_hash) md5_hash
- 
--static int
--symlink_hash(unsigned int link_len, const char *link_str, u8 *md5_hash)
--{
--	int rc;
--	struct shash_desc *md5 = NULL;
--
--	rc = cifs_alloc_hash("md5", &md5);
--	if (rc)
--		return rc;
--
--	rc = crypto_shash_digest(md5, link_str, link_len, md5_hash);
--	if (rc)
--		cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
--	cifs_free_hash(&md5);
--	return rc;
--}
--
- static int
- parse_mf_symlink(const u8 *buf, unsigned int buf_len, unsigned int *_link_len,
- 		 char **_link_str)
+ static int cifs_sig_update(struct cifs_calc_sig_ctx *ctx,
+ 			   const u8 *data, size_t len)
  {
- 	int rc;
-@@ -75,15 +59,11 @@ parse_mf_symlink(const u8 *buf, unsigned int buf_len, unsigned int *_link_len,
- 		return -EINVAL;
- 
- 	if (link_len > CIFS_MF_SYMLINK_LINK_MAXLEN)
- 		return -EINVAL;
- 
--	rc = symlink_hash(link_len, link_str, md5_hash);
--	if (rc) {
--		cifs_dbg(FYI, "%s: MD5 hash failure: %d\n", __func__, rc);
--		return rc;
--	}
-+	md5(link_str, link_len, md5_hash);
- 
- 	scnprintf(md5_str2, sizeof(md5_str2),
- 		  CIFS_MF_SYMLINK_MD5_FORMAT,
- 		  CIFS_MF_SYMLINK_MD5_ARGS(md5_hash));
- 
-@@ -101,11 +81,10 @@ parse_mf_symlink(const u8 *buf, unsigned int buf_len, unsigned int *_link_len,
++	if (ctx->md5) {
++		md5_update(ctx->md5, data, len);
++		return 0;
++	}
+ 	if (ctx->hmac) {
+ 		hmac_sha256_update(ctx->hmac, data, len);
+ 		return 0;
+ 	}
+ 	return crypto_shash_update(ctx->shash, data, len);
  }
  
- static int
- format_mf_symlink(u8 *buf, unsigned int buf_len, const char *link_str)
+ static int cifs_sig_final(struct cifs_calc_sig_ctx *ctx, u8 *out)
+ {
++	if (ctx->md5) {
++		md5_final(ctx->md5, out);
++		return 0;
++	}
+ 	if (ctx->hmac) {
+ 		hmac_sha256_final(ctx->hmac, out);
+ 		return 0;
+ 	}
+ 	return crypto_shash_final(ctx->shash, out);
+@@ -128,35 +137,26 @@ int __cifs_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+  * should be called with the server->srv_mutex held.
+  */
+ static int cifs_calc_signature(struct smb_rqst *rqst,
+ 			struct TCP_Server_Info *server, char *signature)
  {
 -	int rc;
- 	unsigned int link_len;
- 	unsigned int ofs;
- 	u8 md5_hash[16];
++	struct md5_ctx ctx;
  
- 	if (buf_len != CIFS_MF_SYMLINK_FILE_SIZE)
-@@ -114,15 +93,11 @@ format_mf_symlink(u8 *buf, unsigned int buf_len, const char *link_str)
- 	link_len = strlen(link_str);
- 
- 	if (link_len > CIFS_MF_SYMLINK_LINK_MAXLEN)
- 		return -ENAMETOOLONG;
- 
--	rc = symlink_hash(link_len, link_str, md5_hash);
+ 	if (!rqst->rq_iov || !signature || !server)
+ 		return -EINVAL;
+-
+-	rc = cifs_alloc_hash("md5", &server->secmech.md5);
+-	if (rc)
+-		return -1;
+-
+-	rc = crypto_shash_init(server->secmech.md5);
 -	if (rc) {
--		cifs_dbg(FYI, "%s: MD5 hash failure: %d\n", __func__, rc);
+-		cifs_dbg(VFS, "%s: Could not init md5\n", __func__);
+-		return rc;
++	if (fips_enabled) {
++		cifs_dbg(VFS,
++			 "MD5 signature support is disabled due to FIPS\n");
++		return -EOPNOTSUPP;
+ 	}
+ 
+-	rc = crypto_shash_update(server->secmech.md5,
+-		server->session_key.response, server->session_key.len);
+-	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
 -		return rc;
 -	}
-+	md5(link_str, link_len, md5_hash);
++	md5_init(&ctx);
++	md5_update(&ctx, server->session_key.response, server->session_key.len);
  
- 	scnprintf(buf, buf_len,
- 		  CIFS_MF_SYMLINK_LEN_FORMAT CIFS_MF_SYMLINK_MD5_FORMAT,
- 		  link_len,
- 		  CIFS_MF_SYMLINK_MD5_ARGS(md5_hash));
+ 	return __cifs_calc_signature(
+ 		rqst, server, signature,
+-		&(struct cifs_calc_sig_ctx){ .shash = server->secmech.md5 });
++		&(struct cifs_calc_sig_ctx){ .md5 = &ctx });
+ }
+ 
+ /* must be called with server->srv_mutex held */
+ int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ 		   __u32 *pexpected_response_sequence_number)
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 3bb74eea0e4ff..4976be2c47c14 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -631,10 +631,11 @@ int cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ int cifs_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 			   struct cifs_sb_info *cifs_sb,
+ 			   const unsigned char *path, char *pbuf,
+ 			   unsigned int *pbytes_written);
+ struct cifs_calc_sig_ctx {
++	struct md5_ctx *md5;
+ 	struct hmac_sha256_ctx *hmac;
+ 	struct shash_desc *shash;
+ };
+ int __cifs_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ 			  char *signature, struct cifs_calc_sig_ctx *ctx);
 -- 
 2.51.0
 
