@@ -1,27 +1,27 @@
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456292ECEBB;
-	Sun, 12 Oct 2025 16:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795CC2ECD05;
+	Sun, 12 Oct 2025 16:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760286048; cv=none; b=oUMELi0ioQ/pU3aSWCmywjkkdXVeIxTbWMjEiLm/XJFvKnfKRca6QEreb+CKVpIwBbmbDhjanFQYCA+ZxQjGBFTn4PG1bUzTXApmqI8OK963ucFngwWm4tMnYXbqtvpY2xcByiPkHE38p3M0vGX7zVIStfORpm+ERNxsSzVES1g=
+	t=1760286048; cv=none; b=jPFkEwlcBovYgARqfqSCKoPaeKLBg4e6GFjwHHcNewGoTawV6ILZ6Pb+y/3g3K0iN5/BrskDPlcYuZJ8EbfBMVagwKQ/CYRAe/uJIqbY+6Kd2lvPuIadWAzYMqK9IAXATiGfedmn2dFpUjNiSlRuC3s940B+RVtHwYz4CtvULOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1760286048; c=relaxed/simple;
-	bh=0jipzrpcnVOgT74CwCWD0FKFQxM2RdUoPYok6jhANYc=;
+	bh=4Ay36zznrd+WMNPrQQPEHfc0KoAAcKYIuJn8+wlxfOA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HWUOLcjdil99zJSZ3c/HbVkYI4wNRYlO9Jt2aQfqDRpWJOa5wQqUVHVL6gv5eUDaGH7PGl5/PQlU3PZl4mtb6GUGHTKgT4zet4CJrm8ZXsXf/ksiwSK43812Qwmwodoc01HsokTzsfh+Rts7lG6FpvH5wtQUmCo4uThlbr2iTEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.204.34.130
+	 MIME-Version; b=f7Id8sJuEu8KhZ8+5j1eHHO1EJmIXNX74IJ5DTB9qtyPXsVye2paK3yaxbvVAQCG26YIqz7S/FzoS3iJ5+Zc0OFxDKuTRNcQJxfs0xTEcIbviWLrQkO3k4lTID5oTXSJt2MvoQ/g4Gj7PBCF5n7t5CAu24mmbJjdiv9fDUGCcIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.207.22.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: esmtpgz15t1760285921t31108ae1
-X-QQ-Originating-IP: /joD++aPpOUE1sdnsIT1MkzbK+3JtYBf542pSq0M4Rw=
+X-QQ-mid: esmtpgz15t1760285925t29840cf3
+X-QQ-Originating-IP: NKFaBcoD/K1c9anJnQW9k70N2J2NscFG9Y1a/wL/CxQ=
 Received: from localhost.localdomain ( [116.128.244.171])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 13 Oct 2025 00:18:39 +0800 (CST)
+	id ; Mon, 13 Oct 2025 00:18:44 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 9083543551103487012
+X-BIZMAIL-ID: 9191251187041815914
 From: chenxiaosong@chenxiaosong.com
 To: stfrench@microsoft.com,
 	metze@samba.org,
@@ -39,9 +39,9 @@ To: stfrench@microsoft.com,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2 13/22] smb: move file access permission bits definitions to common/cifspdu.h
-Date: Mon, 13 Oct 2025 00:17:40 +0800
-Message-ID: <B4EA08F518242A2F+20251012161749.2994033-14-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH v2 15/22] smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/cifspdu.h
+Date: Mon, 13 Oct 2025 00:17:42 +0800
+Message-ID: <EE3FC07AAF8ADDF9+20251012161749.2994033-16-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251012161749.2994033-1-chenxiaosong@chenxiaosong.com>
 References: <20251012161749.2994033-1-chenxiaosong@chenxiaosong.com>
@@ -54,414 +54,118 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpgz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MSOp5WiNUVk6U0NPFkETIDrxNEsayJT3buHUFSvbkJId/+hJmq88RSD4
-	qqUImy9TBMf1Onn1WA4PupN1/yRfYRcaQ/QbeAlWSqas3S50Ah74fUEz+soluCXcEg24gWI
-	bOpR31HgiXucYMOROgzQsU/zlPMFRwfgjGYweCx8U1G64hC2+Nnf1FxoVlYm/K6K6Vi5ea2
-	a87vWjFvmOP7Or1exUpJbvszGoBGoLkEz3fdcxtevrUlpCbxOat//ryCKMNMU9Y7O8P4I2A
-	TqYQkrHBttbiKREFhh6lAgNoo4VXudxfEzGAB77B8fH9bB1u0js6eZvLmiGcGEkDfSN1JZJ
-	ucZox1u9XraoM4bLhlwQb4DO7OcLNNRXyDD4o98xgTZLQNSNetxH9WuGb8bPYD3XAS1SA91
-	AQmpGZkTFjOo0WqxPSnWUzuaYfVyCh3oXrF8yPdzAGjGCsFhI78ghbAjLbwZqlEWsPoQWIM
-	+zH8c84SEn63vY9j434M57hRlHpXdZ5V4ZKQ544uIO9LC2eGnnzySn3ymw8n9Alg7IEE4ah
-	dKpbBohLJOfq3QB+n21AMzUx2/769C3mObjpU3p5VSiQjdLjOY3V3FZ1WCYp3AqUpUumbbd
-	JfHkwxbRUN/mH5qRjIn+amCFS+Yux59tzW6/BahpjlfhEMkBrTXq20gb1Z5bE6eAg6nF9pT
-	s8z+gpBwn1256lDtLpW8V4QNvFzibD8wYBsMyGHxDVeFwI5FakD9J3g9xRMJ9h0FyFVw71I
-	DbH1VraZcUHFNuTh03TC7nNUbH9N2kFzubH9dUdreX6cJFADG4H7unO7Hd2dtwDFXpdk+wJ
-	6aMU+UZ1tbD5dyZkjHeLVRzdXdY3cEccLZme0ehOmBkuk4z6I1d3w/Z5k46mbSbE/JxqHW/
-	y8c3A6WRGlgcrx+QIGXEc+9JGnrGuS16KNr7NwLXLmfn9fzGAq4BBZ8cs1VV78X1DExLH8I
-	4ZLNCZs3NawGEIdXk5PBBoqACslNPVPpHE7ZKCwts4+JMrP/elI1yZB1jkWRVVF5Ar1OMEu
-	BMmxjpvCvjs8GeiGHL6OzOFWC6VygImoWknmBYfb2WB5rfrIcZlLFE8ThVM6xQeNh02KgEM
-	VIW8+WLtdx/
+X-QQ-XMAILINFO: MoZqUia8aYdxbbpKak/ejKTz9keoY9GcaKI+lvlOND1Q+xY4czaTwMNw
+	Ym3DwLdNAYUeVRbEb+O7cqBbE+Brark6A25e2gUoYEXnKDTPjnSRvwJtWTJh0lFL8KSU6RT
+	A2UJZ3wUTM3kjSW2heS+15XH+Z9OxtxJ07AhDp6JOs8LgrgMbAuVb8UQz/hs0N+QMyrzdGW
+	erdcOCWDi3aFg1gaT2BlxtcajPdMCabycKaLn00C1XMntcH6420K4/EssNYsj43A8IijWyD
+	lV8/syxovZuq/tTZp0x8gCDiinxASxRto4Hu0K/Az+b19zmI0a9bb7It2Cjcm/5kWW9LVd3
+	Swh7seVMPf35fKZIEUP1yn5/cDMqfoBI2nVMdiYZ7mb+FLRUN/Y31wH7AeYliF+C7WrVp/m
+	LrMqKXxIGIH1QhJMByTG0k1s+QdGGl7et9lmmK9liyREwg1/II1XybNKBBMDiJdTuLD+7Pd
+	vmIojQBztwIVZRmzswTgA/W4BB/Qtpv9XnhKdKzv6GYn1pDHQVVhTmnCpa2K7SMfV/EFMvR
+	UMAlwzQp3PwXZPRF3hMRcWO1rCW1c0gIccvkYCeb65QachQq1PitcEgGeeY6/NJfMAZHaKm
+	vMwb1cYKWeOnaLIQWOxOcyeZtOSSp1JlPY9QGtJrVSUsCbVy0aji4Tqsu+nh1yQ9XlClrbP
+	feClbeC3B1hf0wK+z2IB3mTAOiz+7NrhyB6yE0rwwLJMvZzczJMuxpefCZYjUeDAhIYuxYF
+	d3nFqS5F63Ppo0DxJ8gMlWeQGC+M5O9PGS/Ob4MTue77NvM/ucHkrHQ+XggOz04X5quUhgW
+	+FPoTWMRCg++vWSkcpDexpxx2A+lG77iM04kokOX7sLKLnFFw/tFsgUAu2pmz2+nhIdzWWs
+	iouy1ifNOPHtQ6nOLyNoQSnqB2zEW4RzOIpa/PGnCzevOHpSlKqSxFXXpCV4aGyLrRgO1fq
+	6en42HI5edbsIBkrp5deHe1sHBw8XxqbDGMnqQ5s5wjQXfAYAmlhF50sxl+QGdIZroVDTNl
+	Lr38ZJEsTb9m6TWouqlnK0W86LauLctvonGpnsX9MizWeDAKr/4ejJDoptXoRcxZ2Mdfvqp
+	A2xTipdtImi
 X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
 X-QQ-RECHKSPAM: 0
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-There are only 2 different definitions between the client and server:
-
-  - SET_FILE_READ_RIGHTS
-  - SET_FILE_WRITE_RIGHTS
-
-Perhaps in the future we can change them to be the same.
+Rename "struct filesystem_attribute_info" to "FILE_SYSTEM_ATTRIBUTE_INFO",
+then move duplicate definitions to common header file.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifsacl.c    |   4 +-
- fs/smb/client/cifspdu.h    | 112 ---------------------------------
- fs/smb/common/cifspdu.h    | 123 ++++++++++++++++++++++++++++++++++++-
- fs/smb/common/smb2pdu.h    |   6 --
- fs/smb/server/smb_common.h |  55 -----------------
- fs/smb/server/smbacl.c     |   2 +-
- 6 files changed, 125 insertions(+), 177 deletions(-)
+ fs/smb/client/cifspdu.h    | 7 -------
+ fs/smb/common/cifspdu.h    | 8 ++++++++
+ fs/smb/server/smb2pdu.c    | 6 +++---
+ fs/smb/server/smb_common.h | 7 -------
+ 4 files changed, 11 insertions(+), 17 deletions(-)
 
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index 63b3b1290bed..ef12ae0fddb3 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -655,9 +655,9 @@ static void mode_to_access_flags(umode_t mode, umode_t bits_to_use,
- 	   is this but we have cleared all the bits sans RWX for
- 	   either user or group or other as per bits_to_use */
- 	if (mode & S_IRUGO)
--		*pace_flags |= SET_FILE_READ_RIGHTS;
-+		*pace_flags |= CLIENT_SET_FILE_READ_RIGHTS;
- 	if (mode & S_IWUGO)
--		*pace_flags |= SET_FILE_WRITE_RIGHTS;
-+		*pace_flags |= CLIENT_SET_FILE_WRITE_RIGHTS;
- 	if (mode & S_IXUGO)
- 		*pace_flags |= SET_FILE_EXEC_RIGHTS;
- 
 diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index 9f42b0469d1a..a0883b1fda16 100644
+index 07eb821654e1..a6f7e168961e 100644
 --- a/fs/smb/client/cifspdu.h
 +++ b/fs/smb/client/cifspdu.h
-@@ -116,118 +116,6 @@
- #define SMBOPEN_OTRUNC        0x0002
- #define SMBOPEN_OAPPEND       0x0001
+@@ -1937,13 +1937,6 @@ typedef struct {
+ /* minimum includes first three fields, and empty FS Name */
+ #define MIN_FS_ATTR_INFO_SIZE 12
  
--/*
-- * These are the file access permission bits defined in CIFS for the
-- * NTCreateAndX as well as the level 0x107
-- * TRANS2_QUERY_PATH_INFORMATION API.  The level 0x107, SMB_QUERY_FILE_ALL_INFO
-- * responds with the AccessFlags.
-- * The AccessFlags specifies the access permissions a caller has to the
-- * file and can have any suitable combination of the following values:
-- */
+-typedef struct {
+-	__le32 Attributes;
+-	__le32 MaxPathNameComponentLength;
+-	__le32 FileSystemNameLen;
+-	char FileSystemName[52]; /* do not have to save this - get subset? */
+-} __attribute__((packed)) FILE_SYSTEM_ATTRIBUTE_INFO;
 -
--#define FILE_READ_DATA        0x00000001  /* Data can be read from the file   */
--					  /* or directory child entries can   */
--					  /* be listed together with the      */
--					  /* associated child attributes      */
--					  /* (so the FILE_READ_ATTRIBUTES on  */
--					  /* the child entry is not needed)   */
--#define FILE_WRITE_DATA       0x00000002  /* Data can be written to the file  */
--					  /* or new file can be created in    */
--					  /* the directory                    */
--#define FILE_APPEND_DATA      0x00000004  /* Data can be appended to the file */
--					  /* (for non-local files over SMB it */
--					  /* is same as FILE_WRITE_DATA)      */
--					  /* or new subdirectory can be       */
--					  /* created in the directory         */
--#define FILE_READ_EA          0x00000008  /* Extended attributes associated   */
--					  /* with the file can be read        */
--#define FILE_WRITE_EA         0x00000010  /* Extended attributes associated   */
--					  /* with the file can be written     */
--#define FILE_EXECUTE          0x00000020  /*Data can be read into memory from */
--					  /* the file using system paging I/O */
--					  /* for executing the file / script  */
--					  /* or right to traverse directory   */
--					  /* (but by default all users have   */
--					  /* directory bypass traverse        */
--					  /* privilege and do not need this   */
--					  /* permission on directories at all)*/
--#define FILE_DELETE_CHILD     0x00000040  /* Child entry can be deleted from  */
--					  /* the directory (so the DELETE on  */
--					  /* the child entry is not needed)   */
--#define FILE_READ_ATTRIBUTES  0x00000080  /* Attributes associated with the   */
--					  /* file or directory can be read    */
--#define FILE_WRITE_ATTRIBUTES 0x00000100  /* Attributes associated with the   */
--					  /* file or directory can be written */
--#define DELETE                0x00010000  /* The file or dir can be deleted   */
--#define READ_CONTROL          0x00020000  /* The discretionary access control */
--					  /* list and ownership associated    */
--					  /* with the file or dir can be read */
--#define WRITE_DAC             0x00040000  /* The discretionary access control */
--					  /* list associated with the file or */
--					  /* directory can be written         */
--#define WRITE_OWNER           0x00080000  /* Ownership information associated */
--					  /* with the file/dir can be written */
--#define SYNCHRONIZE           0x00100000  /* The file handle can waited on to */
--					  /* synchronize with the completion  */
--					  /* of an input/output request       */
--#define SYSTEM_SECURITY       0x01000000  /* The system access control list   */
--					  /* associated with the file or      */
--					  /* directory can be read or written */
--					  /* (cannot be in DACL, can in SACL) */
--#define MAXIMUM_ALLOWED       0x02000000  /* Maximal subset of GENERIC_ALL    */
--					  /* permissions which can be granted */
--					  /* (cannot be in DACL nor SACL)     */
--#define GENERIC_ALL           0x10000000  /* Same as: GENERIC_EXECUTE |       */
--					  /*          GENERIC_WRITE |         */
--					  /*          GENERIC_READ |          */
--					  /*          FILE_DELETE_CHILD |     */
--					  /*          DELETE |                */
--					  /*          WRITE_DAC |             */
--					  /*          WRITE_OWNER             */
--					  /* So GENERIC_ALL contains all bits */
--					  /* mentioned above except these two */
--					  /* SYSTEM_SECURITY  MAXIMUM_ALLOWED */
--#define GENERIC_EXECUTE       0x20000000  /* Same as: FILE_EXECUTE |          */
--					  /*          FILE_READ_ATTRIBUTES |  */
--					  /*          READ_CONTROL |          */
--					  /*          SYNCHRONIZE             */
--#define GENERIC_WRITE         0x40000000  /* Same as: FILE_WRITE_DATA |       */
--					  /*          FILE_APPEND_DATA |      */
--					  /*          FILE_WRITE_EA |         */
--					  /*          FILE_WRITE_ATTRIBUTES | */
--					  /*          READ_CONTROL |          */
--					  /*          SYNCHRONIZE             */
--#define GENERIC_READ          0x80000000  /* Same as: FILE_READ_DATA |        */
--					  /*          FILE_READ_EA |          */
--					  /*          FILE_READ_ATTRIBUTES |  */
--					  /*          READ_CONTROL |          */
--					  /*          SYNCHRONIZE             */
--
--#define FILE_READ_RIGHTS (FILE_READ_DATA | FILE_READ_EA | FILE_READ_ATTRIBUTES)
--#define FILE_WRITE_RIGHTS (FILE_WRITE_DATA | FILE_APPEND_DATA \
--				| FILE_WRITE_EA | FILE_WRITE_ATTRIBUTES)
--#define FILE_EXEC_RIGHTS (FILE_EXECUTE)
--
--#define SET_FILE_READ_RIGHTS (FILE_READ_DATA | FILE_READ_EA | FILE_WRITE_EA \
--				| FILE_READ_ATTRIBUTES \
--				| FILE_WRITE_ATTRIBUTES \
--				| DELETE | READ_CONTROL | WRITE_DAC \
--				| WRITE_OWNER | SYNCHRONIZE)
--#define SET_FILE_WRITE_RIGHTS (FILE_WRITE_DATA | FILE_APPEND_DATA \
--				| FILE_READ_EA | FILE_WRITE_EA \
--				| FILE_READ_ATTRIBUTES \
--				| FILE_WRITE_ATTRIBUTES \
--				| DELETE | READ_CONTROL | WRITE_DAC \
--				| WRITE_OWNER | SYNCHRONIZE)
--#define SET_FILE_EXEC_RIGHTS (FILE_READ_EA | FILE_WRITE_EA | FILE_EXECUTE \
--				| FILE_READ_ATTRIBUTES \
--				| FILE_WRITE_ATTRIBUTES \
--				| DELETE | READ_CONTROL | WRITE_DAC \
--				| WRITE_OWNER | SYNCHRONIZE)
--
--#define SET_MINIMUM_RIGHTS (FILE_READ_EA | FILE_READ_ATTRIBUTES \
--				| READ_CONTROL | SYNCHRONIZE)
--
- /*
-  * Invalid readdir handle
-  */
+ /******************************************************************************/
+ /* QueryFileInfo/QueryPathinfo (also for SetPath/SetFile) data buffer formats */
+ /******************************************************************************/
 diff --git a/fs/smb/common/cifspdu.h b/fs/smb/common/cifspdu.h
-index ca16741b5947..59e5425cdc8d 100644
+index 1109c20f7bf8..560900617be7 100644
 --- a/fs/smb/common/cifspdu.h
 +++ b/fs/smb/common/cifspdu.h
-@@ -77,7 +77,128 @@
- #define SMBFLG2_UNICODE cpu_to_le16(0x8000)
+@@ -348,4 +348,12 @@ typedef struct server_negotiate_rsp {
+ #define FILE_CASE_PRESERVED_NAMES	0x00000002
+ #define FILE_CASE_SENSITIVE_SEARCH	0x00000001
  
- /*
-- * File Attribute flags
-+ * These are the file access permission bits defined in CIFS for the
-+ * NTCreateAndX as well as the level 0x107
-+ * TRANS2_QUERY_PATH_INFORMATION API.  The level 0x107, SMB_QUERY_FILE_ALL_INFO
-+ * responds with the AccessFlags.
-+ * The AccessFlags specifies the access permissions a caller has to the
-+ * file and can have any suitable combination of the following values:
-+ */
++/* See FS-FSCC 2.5.1 */
++typedef struct {
++	__le32 Attributes;
++	__le32 MaxPathNameComponentLength;
++	__le32 FileSystemNameLen;
++	__le16 FileSystemName[]; /* do not have to save this - get subset? */
++} __attribute__((packed)) FILE_SYSTEM_ATTRIBUTE_INFO;
 +
-+#define FILE_READ_DATA        0x00000001  /* Data can be read from the file   */
-+					  /* or directory child entries can   */
-+					  /* be listed together with the      */
-+					  /* associated child attributes      */
-+					  /* (so the FILE_READ_ATTRIBUTES on  */
-+					  /* the child entry is not needed)   */
-+#define FILE_WRITE_DATA       0x00000002  /* Data can be written to the file  */
-+					  /* or new file can be created in    */
-+					  /* the directory                    */
-+#define FILE_APPEND_DATA      0x00000004  /* Data can be appended to the file */
-+					  /* (for non-local files over SMB it */
-+					  /* is same as FILE_WRITE_DATA)      */
-+					  /* or new subdirectory can be       */
-+					  /* created in the directory         */
-+#define FILE_READ_EA          0x00000008  /* Extended attributes associated   */
-+					  /* with the file can be read        */
-+#define FILE_WRITE_EA         0x00000010  /* Extended attributes associated   */
-+					  /* with the file can be written     */
-+#define FILE_EXECUTE          0x00000020  /*Data can be read into memory from */
-+					  /* the file using system paging I/O */
-+					  /* for executing the file / script  */
-+					  /* or right to traverse directory   */
-+					  /* (but by default all users have   */
-+					  /* directory bypass traverse        */
-+					  /* privilege and do not need this   */
-+					  /* permission on directories at all)*/
-+#define FILE_DELETE_CHILD     0x00000040  /* Child entry can be deleted from  */
-+					  /* the directory (so the DELETE on  */
-+					  /* the child entry is not needed)   */
-+#define FILE_READ_ATTRIBUTES  0x00000080  /* Attributes associated with the   */
-+					  /* file or directory can be read    */
-+#define FILE_WRITE_ATTRIBUTES 0x00000100  /* Attributes associated with the   */
-+					  /* file or directory can be written */
-+#define DELETE                0x00010000  /* The file or dir can be deleted   */
-+#define READ_CONTROL          0x00020000  /* The discretionary access control */
-+					  /* list and ownership associated    */
-+					  /* with the file or dir can be read */
-+#define WRITE_DAC             0x00040000  /* The discretionary access control */
-+					  /* list associated with the file or */
-+					  /* directory can be written         */
-+#define WRITE_OWNER           0x00080000  /* Ownership information associated */
-+					  /* with the file/dir can be written */
-+#define SYNCHRONIZE           0x00100000  /* The file handle can waited on to */
-+					  /* synchronize with the completion  */
-+					  /* of an input/output request       */
-+#define SYSTEM_SECURITY       0x01000000  /* The system access control list   */
-+					  /* associated with the file or      */
-+					  /* directory can be read or written */
-+					  /* (cannot be in DACL, can in SACL) */
-+#define MAXIMUM_ALLOWED       0x02000000  /* Maximal subset of GENERIC_ALL    */
-+					  /* permissions which can be granted */
-+					  /* (cannot be in DACL nor SACL)     */
-+#define GENERIC_ALL           0x10000000  /* Same as: GENERIC_EXECUTE |       */
-+					  /*          GENERIC_WRITE |         */
-+					  /*          GENERIC_READ |          */
-+					  /*          FILE_DELETE_CHILD |     */
-+					  /*          DELETE |                */
-+					  /*          WRITE_DAC |             */
-+					  /*          WRITE_OWNER             */
-+					  /* So GENERIC_ALL contains all bits */
-+					  /* mentioned above except these two */
-+					  /* SYSTEM_SECURITY  MAXIMUM_ALLOWED */
-+#define GENERIC_EXECUTE       0x20000000  /* Same as: FILE_EXECUTE |          */
-+					  /*          FILE_READ_ATTRIBUTES |  */
-+					  /*          READ_CONTROL |          */
-+					  /*          SYNCHRONIZE             */
-+#define GENERIC_WRITE         0x40000000  /* Same as: FILE_WRITE_DATA |       */
-+					  /*          FILE_APPEND_DATA |      */
-+					  /*          FILE_WRITE_EA |         */
-+					  /*          FILE_WRITE_ATTRIBUTES | */
-+					  /*          READ_CONTROL |          */
-+					  /*          SYNCHRONIZE             */
-+#define GENERIC_READ          0x80000000  /* Same as: FILE_READ_DATA |        */
-+					  /*          FILE_READ_EA |          */
-+					  /*          FILE_READ_ATTRIBUTES |  */
-+					  /*          READ_CONTROL |          */
-+					  /*          SYNCHRONIZE             */
-+
-+#define FILE_READ_RIGHTS (FILE_READ_DATA | FILE_READ_EA | FILE_READ_ATTRIBUTES)
-+#define FILE_WRITE_RIGHTS (FILE_WRITE_DATA | FILE_APPEND_DATA \
-+				| FILE_WRITE_EA | FILE_WRITE_ATTRIBUTES)
-+#define FILE_EXEC_RIGHTS (FILE_EXECUTE)
-+
-+#define CLIENT_SET_FILE_READ_RIGHTS (FILE_READ_DATA | FILE_READ_EA | FILE_WRITE_EA \
-+				| FILE_READ_ATTRIBUTES \
-+				| FILE_WRITE_ATTRIBUTES \
-+				| DELETE | READ_CONTROL | WRITE_DAC \
-+				| WRITE_OWNER | SYNCHRONIZE)
-+#define SERVER_SET_FILE_READ_RIGHTS (FILE_READ_DATA | FILE_READ_EA \
-+				| FILE_READ_ATTRIBUTES \
-+				| DELETE | READ_CONTROL | WRITE_DAC \
-+				| WRITE_OWNER | SYNCHRONIZE)
-+#define CLIENT_SET_FILE_WRITE_RIGHTS (FILE_WRITE_DATA | FILE_APPEND_DATA \
-+				| FILE_READ_EA | FILE_WRITE_EA \
-+				| FILE_READ_ATTRIBUTES \
-+				| FILE_WRITE_ATTRIBUTES \
-+				| DELETE | READ_CONTROL | WRITE_DAC \
-+				| WRITE_OWNER | SYNCHRONIZE)
-+#define SERVER_SET_FILE_WRITE_RIGHTS (FILE_WRITE_DATA | FILE_APPEND_DATA \
-+				| FILE_WRITE_EA \
-+				| FILE_DELETE_CHILD \
-+				| FILE_WRITE_ATTRIBUTES \
-+				| DELETE | READ_CONTROL | WRITE_DAC \
-+				| WRITE_OWNER | SYNCHRONIZE)
-+#define SET_FILE_EXEC_RIGHTS (FILE_READ_EA | FILE_WRITE_EA | FILE_EXECUTE \
-+				| FILE_READ_ATTRIBUTES \
-+				| FILE_WRITE_ATTRIBUTES \
-+				| DELETE | READ_CONTROL | WRITE_DAC \
-+				| WRITE_OWNER | SYNCHRONIZE)
-+#define SET_MINIMUM_RIGHTS (FILE_READ_EA | FILE_READ_ATTRIBUTES \
-+				| READ_CONTROL | SYNCHRONIZE)
-+
-+/*
-+ * File Attribute flags - see MS-SMB 2.2.1.4.1
-  */
- #define ATTR_READONLY  0x0001
- #define ATTR_HIDDEN    0x0002
-diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index f5c8c72b8959..40689c11e97a 100644
---- a/fs/smb/common/smb2pdu.h
-+++ b/fs/smb/common/smb2pdu.h
-@@ -1149,12 +1149,6 @@ struct smb2_server_client_notification {
- #define FILE_OVERWRITE_IF_LE		cpu_to_le32(0x00000005)
- #define FILE_CREATE_MASK_LE             cpu_to_le32(0x00000007)
+ #endif /* _COMMON_CIFSPDU_H */
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index a46d4ddade9e..a05b04799c0d 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -5485,10 +5485,10 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
+ 	}
+ 	case FS_ATTRIBUTE_INFORMATION:
+ 	{
+-		struct filesystem_attribute_info *info;
++		FILE_SYSTEM_ATTRIBUTE_INFO *info;
+ 		size_t sz;
  
--#define FILE_READ_RIGHTS (FILE_READ_DATA | FILE_READ_EA \
--			| FILE_READ_ATTRIBUTES)
--#define FILE_WRITE_RIGHTS (FILE_WRITE_DATA | FILE_APPEND_DATA \
--			| FILE_WRITE_EA | FILE_WRITE_ATTRIBUTES)
--#define FILE_EXEC_RIGHTS (FILE_EXECUTE)
--
- /* CreateOptions Flags */
- #define FILE_DIRECTORY_FILE_LE		cpu_to_le32(0x00000001)
- /* same as #define CREATE_NOT_FILE_LE	cpu_to_le32(0x00000001) */
+-		info = (struct filesystem_attribute_info *)rsp->Buffer;
++		info = (FILE_SYSTEM_ATTRIBUTE_INFO *)rsp->Buffer;
+ 		info->Attributes = cpu_to_le32(FILE_SUPPORTS_OBJECT_IDS |
+ 					       FILE_PERSISTENT_ACLS |
+ 					       FILE_UNICODE_ON_DISK |
+@@ -5507,7 +5507,7 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
+ 					"NTFS", PATH_MAX, conn->local_nls, 0);
+ 		len = len * 2;
+ 		info->FileSystemNameLen = cpu_to_le32(len);
+-		sz = sizeof(struct filesystem_attribute_info) + len;
++		sz = sizeof(FILE_SYSTEM_ATTRIBUTE_INFO) + len;
+ 		rsp->OutputBufferLength = cpu_to_le32(sz);
+ 		break;
+ 	}
 diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
-index a326809f7765..90015cd8fe4e 100644
+index a5dd656c36f1..016ec93e6df4 100644
 --- a/fs/smb/server/smb_common.h
 +++ b/fs/smb/server/smb_common.h
-@@ -37,61 +37,6 @@
- #define F_CREATED	2
- #define F_OVERWRITTEN	3
+@@ -56,13 +56,6 @@
+ 		FILE_EXECUTE | FILE_DELETE_CHILD | \
+ 		FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES)
  
--#define FILE_READ_DATA        0x00000001  /* Data can be read from the file   */
--#define FILE_WRITE_DATA       0x00000002  /* Data can be written to the file  */
--#define FILE_APPEND_DATA      0x00000004  /* Data can be appended to the file */
--#define FILE_READ_EA          0x00000008  /* Extended attributes associated   */
--/* with the file can be read        */
--#define FILE_WRITE_EA         0x00000010  /* Extended attributes associated   */
--/* with the file can be written     */
--#define FILE_EXECUTE          0x00000020  /*Data can be read into memory from */
--/* the file using system paging I/O */
--#define FILE_DELETE_CHILD     0x00000040
--#define FILE_READ_ATTRIBUTES  0x00000080  /* Attributes associated with the   */
--/* file can be read                 */
--#define FILE_WRITE_ATTRIBUTES 0x00000100  /* Attributes associated with the   */
--/* file can be written              */
--#define DELETE                0x00010000  /* The file can be deleted          */
--#define READ_CONTROL          0x00020000  /* The access control list and      */
--/* ownership associated with the    */
--/* file can be read                 */
--#define WRITE_DAC             0x00040000  /* The access control list and      */
--/* ownership associated with the    */
--/* file can be written.             */
--#define WRITE_OWNER           0x00080000  /* Ownership information associated */
--/* with the file can be written     */
--#define SYNCHRONIZE           0x00100000  /* The file handle can waited on to */
--/* synchronize with the completion  */
--/* of an input/output request       */
--#define GENERIC_ALL           0x10000000
--#define GENERIC_EXECUTE       0x20000000
--#define GENERIC_WRITE         0x40000000
--#define GENERIC_READ          0x80000000
--/* In summary - Relevant file       */
--/* access flags from CIFS are       */
--/* file_read_data, file_write_data  */
--/* file_execute, file_read_attributes*/
--/* write_dac, and delete.           */
+-struct filesystem_attribute_info {
+-	__le32 Attributes;
+-	__le32 MaxPathNameComponentLength;
+-	__le32 FileSystemNameLen;
+-	__le16 FileSystemName[]; /* do not have to save this - get subset? */
+-} __packed;
 -
--#define SET_FILE_READ_RIGHTS (FILE_READ_DATA | FILE_READ_EA \
--		| FILE_READ_ATTRIBUTES \
--		| DELETE | READ_CONTROL | WRITE_DAC \
--		| WRITE_OWNER | SYNCHRONIZE)
--#define SET_FILE_WRITE_RIGHTS (FILE_WRITE_DATA | FILE_APPEND_DATA \
--		| FILE_WRITE_EA \
--		| FILE_DELETE_CHILD \
--		| FILE_WRITE_ATTRIBUTES \
--		| DELETE | READ_CONTROL | WRITE_DAC \
--		| WRITE_OWNER | SYNCHRONIZE)
--#define SET_FILE_EXEC_RIGHTS (FILE_READ_EA | FILE_WRITE_EA | FILE_EXECUTE \
--		| FILE_READ_ATTRIBUTES \
--		| FILE_WRITE_ATTRIBUTES \
--		| DELETE | READ_CONTROL | WRITE_DAC \
--		| WRITE_OWNER | SYNCHRONIZE)
--
--#define SET_MINIMUM_RIGHTS (FILE_READ_EA | FILE_READ_ATTRIBUTES \
--		| READ_CONTROL | SYNCHRONIZE)
--
- /* generic flags for file open */
- #define GENERIC_READ_FLAGS	(READ_CONTROL | FILE_READ_DATA | \
- 		FILE_READ_ATTRIBUTES | \
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index 5aa7a66334d9..b70ba50f1f10 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -180,7 +180,7 @@ static void mode_to_access_flags(umode_t mode, umode_t bits_to_use,
- 	 * either user or group or other as per bits_to_use
- 	 */
- 	if (mode & 0444)
--		*pace_flags |= SET_FILE_READ_RIGHTS;
-+		*pace_flags |= SERVER_SET_FILE_READ_RIGHTS;
- 	if (mode & 0222)
- 		*pace_flags |= FILE_WRITE_RIGHTS;
- 	if (mode & 0111)
+ struct filesystem_device_info {
+ 	__le32 DeviceType;
+ 	__le32 DeviceCharacteristics;
 -- 
 2.43.0
 
