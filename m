@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AEBB1D5CD4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020B51DC198;
 	Sun, 12 Oct 2025 01:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760234385; cv=none; b=rkg/cw7MEdnDzc1HMyH0CiAJcL9hPdEjXK0E+H9JIHyTr5A+Qnqjl7cj/C5wyEeX5W93jailX75pmgZPBW+SLMlNYtWKP5j/7ilpWqOZZmbHpkzoJp+TApmLpb/KsAMVO9G7uheUptiVbwdp3MM402HxQvB0aPf8ObeXTS0hZbI=
+	t=1760234386; cv=none; b=Q1jtoL9HIBolQ3IB0N2JEIKXSuRDikoFdRXRq5CmpQI9iRVIJvqJ0vHjBBGkn0Vq3u4OqvYzpuRHUM6USZphvTngz/gnvz3jy0787LYeGTtng3w45RaOBuyqMRgS0HNN8+NYZ0PX9ahl/huQagHX6HvuRAL9f4dCtLca+KE2WSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760234385; c=relaxed/simple;
-	bh=gce5OUBuQc+Smg+z6s1ygjYENWqF7SJkJMMmMZMOOlE=;
+	s=arc-20240116; t=1760234386; c=relaxed/simple;
+	bh=CFwwvsQDJoXU8kuloHYUxNSwdl7+OvrAbXEAKBrRTe8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F8cNSLpLhuPdDBorZXI3F6QFuvi5uqVp54r6KNcuWBYCg8OZyeNl9Y24tEN5fXRuQGD2lc0JngLoCR7cDKl75LoXUXozRUK5dzYnsGlBjsObY6s7LOwnKcPtDKtC/DvB61ohXPDABxiJL7aGZF7loJg3KGLoeeYgaVFqguxj+b8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOFa2Bgf; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=oCojj8RytR7aVz5B7VwfcbsGNbrsMssAaOw88wZkA5YRG5Uf+XCgUvk9csq3X4FedRRO9us4jcOhv/JB5fBPNkRPXygcg3CSFgH900VMLeZ1mkFcfTs2/Uy0TclHzgfuyP/6rcvnJtk8fRyen7ft++/Ve3HQnIj3uugAeutpRQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jmS8iJ5w; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOFa2Bgf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2841C116B1;
-	Sun, 12 Oct 2025 01:59:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jmS8iJ5w"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5404AC4CEF9;
+	Sun, 12 Oct 2025 01:59:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1760234385;
-	bh=gce5OUBuQc+Smg+z6s1ygjYENWqF7SJkJMMmMZMOOlE=;
+	bh=CFwwvsQDJoXU8kuloHYUxNSwdl7+OvrAbXEAKBrRTe8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fOFa2BgfmrnYt+k/zVIQi5A9Wk/A4ED+EuqcaUmW4vXpAVYR8NzprTQBkGMKK5FXB
-	 R6I8IQoKlWRD0gZSEOFcml9VksATsuEGH/VnUWOhljv8HDNUXQRAXGosI9iMjwOmXp
-	 G05ABTRcYlnmzRyBVuDx7rJgyfUFaNM7xnfiLXxunkzkNnhzMhmdn2DOBT8YO4/rPX
-	 WH5lsxHRKZQEVGA+8ri7GrjU5XjkapQrlQkqWMMiOao7OjL0zLCtmJB/m6htFt06gS
-	 S/VkCNm2eIWHMNIuoX2smph16xRf/WhjuBe+LLBqqJ3wXsmQEMsK7017I3TLqSkODm
-	 A7F1AA4qzGxig==
+	b=jmS8iJ5wZo2v/APcs9jWMtqsxbTgtSEjmDdCu3oDUiknoCMzKkmOgdUHCWJrTbS4b
+	 Hzdb53bi94VrmBLcx4CTAuh9o7ywWsWBwefpoism2V1G2DirNqoov69rz9yPowI1do
+	 MpiGiKdO27bAp2jPhYah4+CFjj7HOmkZ77JJXyM7uz2Q5Tou6/TZ/wJ0i2X2xDG2AQ
+	 j55ePl7Sokh6zCyzTEz+JU83ofSsWCNBIr1YgJSk7+VKi2+5ZddUDp9QzHjgwlpCTe
+	 E/zotRg8dClJx0KKFWz5Kv/yfR3JgYJfwCoYCkSrkO3pEqXVecMen/zRkCR3iQoj8K
+	 lX2n9F70kELcw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-cifs@vger.kernel.org,
 	Steve French <sfrench@samba.org>
@@ -38,9 +38,9 @@ Cc: samba-technical@lists.samba.org,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 1/8] smb: client: Use SHA-512 library for SMB3.1.1 preauth hash
-Date: Sat, 11 Oct 2025 18:57:31 -0700
-Message-ID: <20251012015738.244315-2-ebiggers@kernel.org>
+Subject: [PATCH 2/8] smb: client: Use HMAC-SHA256 library for key generation
+Date: Sat, 11 Oct 2025 18:57:32 -0700
+Message-ID: <20251012015738.244315-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251012015738.244315-1-ebiggers@kernel.org>
 References: <20251012015738.244315-1-ebiggers@kernel.org>
@@ -52,30 +52,25 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert smb311_update_preauth_hash() to use the SHA-512 library instead
-of a "sha512" crypto_shash.  This is simpler and faster.  With the
+Convert generate_key() to use the HMAC-SHA256 library instead of a
+"hmac(sha256)" crypto_shash.  This is simpler and faster.  With the
 library there's no need to allocate memory, no need to handle errors,
-and the SHA-512 code is accessed directly without inefficient indirect
-calls and other unnecessary API overhead.
+and the HMAC-SHA256 code is accessed directly without inefficient
+indirect calls and other unnecessary API overhead.
 
-Remove the call to smb311_crypto_shash_allocate() from
-smb311_update_preauth_hash(), since it appears to have been needed only
-to allocate the "sha512" crypto_shash.  (It also had the side effect of
-allocating the "cmac(aes)" crypto_shash, but that's also done in
-generate_key() which is where the AES-CMAC key is initialized.)
+Also remove the unnecessary 'hashptr' variable.
 
-For now the "sha512" crypto_shash is still being allocated elsewhere.
-It will be removed in a later commit.
+For now smb3_crypto_shash_allocate() still allocates a "hmac(sha256)"
+crypto_shash.  It will be removed in a later commit.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- fs/smb/client/Kconfig     |  1 +
- fs/smb/client/smb2misc.c  | 53 +++++++++------------------------------
- fs/smb/client/smb2proto.h |  6 ++---
- 3 files changed, 16 insertions(+), 44 deletions(-)
+ fs/smb/client/Kconfig         |  1 +
+ fs/smb/client/smb2transport.c | 68 ++++++++---------------------------
+ 2 files changed, 15 insertions(+), 54 deletions(-)
 
 diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
-index a4c02199fef48..4ac79ff5649bf 100644
+index 4ac79ff5649bf..f0c1ff8544f67 100644
 --- a/fs/smb/client/Kconfig
 +++ b/fs/smb/client/Kconfig
 @@ -14,10 +14,11 @@ config CIFS
@@ -84,133 +79,122 @@ index a4c02199fef48..4ac79ff5649bf 100644
  	select CRYPTO_ECB
  	select CRYPTO_AES
  	select CRYPTO_LIB_ARC4
-+	select CRYPTO_LIB_SHA512
++	select CRYPTO_LIB_SHA256
+ 	select CRYPTO_LIB_SHA512
  	select KEYS
  	select DNS_RESOLVER
  	select ASN1
  	select OID_REGISTRY
- 	select NETFS_SUPPORT
-diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-index 89d933b4a8bc2..96bfe4c63ccf9 100644
---- a/fs/smb/client/smb2misc.c
-+++ b/fs/smb/client/smb2misc.c
-@@ -5,10 +5,11 @@
-  *                 Etersoft, 2012
-  *   Author(s): Steve French (sfrench@us.ibm.com)
-  *              Pavel Shilovsky (pshilovsky@samba.org) 2012
-  *
-  */
+diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+index 33f33013b3927..bde96eace8c94 100644
+--- a/fs/smb/client/smb2transport.c
++++ b/fs/smb/client/smb2transport.c
+@@ -17,10 +17,11 @@
+ #include <linux/uaccess.h>
+ #include <asm/processor.h>
+ #include <linux/mempool.h>
+ #include <linux/highmem.h>
+ #include <crypto/aead.h>
 +#include <crypto/sha2.h>
- #include <linux/ctype.h>
  #include "cifsglob.h"
  #include "cifsproto.h"
  #include "smb2proto.h"
  #include "cifs_debug.h"
-@@ -886,17 +887,17 @@ smb2_handle_cancelled_mid(struct mid_q_entry *mid, struct TCP_Server_Info *serve
-  * @ses:	server session structure
-  * @server:	pointer to server info
-  * @iov:	array containing the SMB request we will send to the server
-  * @nvec:	number of array entries for the iov
-  */
--int
-+void
- smb311_update_preauth_hash(struct cifs_ses *ses, struct TCP_Server_Info *server,
- 			   struct kvec *iov, int nvec)
- {
--	int i, rc;
-+	int i;
- 	struct smb2_hdr *hdr;
--	struct shash_desc *sha512 = NULL;
-+	struct sha512_ctx sha_ctx;
+ #include "../common/smb2status.h"
+@@ -334,80 +335,39 @@ static int generate_key(struct cifs_ses *ses, struct kvec label,
+ 	__u8 i[4] = {0, 0, 0, 1};
+ 	__u8 L128[4] = {0, 0, 0, 128};
+ 	__u8 L256[4] = {0, 0, 1, 0};
+ 	int rc = 0;
+ 	unsigned char prfhash[SMB2_HMACSHA256_SIZE];
+-	unsigned char *hashptr = prfhash;
+ 	struct TCP_Server_Info *server = ses->server;
++	struct hmac_sha256_ctx hmac_ctx;
  
- 	hdr = (struct smb2_hdr *)iov[0].iov_base;
- 	/* neg prot are always taken */
- 	if (hdr->Command == SMB2_NEGOTIATE)
- 		goto ok;
-@@ -905,54 +906,24 @@ smb311_update_preauth_hash(struct cifs_ses *ses, struct TCP_Server_Info *server,
- 	 * If we process a command which wasn't a negprot it means the
- 	 * neg prot was already done, so the server dialect was set
- 	 * and we can test it. Preauth requires 3.1.1 for now.
- 	 */
- 	if (server->dialect != SMB311_PROT_ID)
--		return 0;
-+		return;
+ 	memset(prfhash, 0x0, SMB2_HMACSHA256_SIZE);
+ 	memset(key, 0x0, key_size);
  
- 	if (hdr->Command != SMB2_SESSION_SETUP)
--		return 0;
-+		return;
- 
- 	/* skip last sess setup response */
- 	if ((hdr->Flags & SMB2_FLAGS_SERVER_TO_REDIR)
- 	    && (hdr->Status == NT_STATUS_OK
- 		|| (hdr->Status !=
- 		    cpu_to_le32(NT_STATUS_MORE_PROCESSING_REQUIRED))))
--		return 0;
-+		return;
- 
- ok:
--	rc = smb311_crypto_shash_allocate(server);
--	if (rc)
--		return rc;
+ 	rc = smb3_crypto_shash_allocate(server);
+ 	if (rc) {
+ 		cifs_server_dbg(VFS, "%s: crypto alloc failed\n", __func__);
+-		goto smb3signkey_ret;
+-	}
 -
--	sha512 = server->secmech.sha512;
--	rc = crypto_shash_init(sha512);
+-	rc = crypto_shash_setkey(server->secmech.hmacsha256->tfm,
+-		ses->auth_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
 -	if (rc) {
--		cifs_dbg(VFS, "%s: Could not init sha512 shash\n", __func__);
--		return rc;
+-		cifs_server_dbg(VFS, "%s: Could not set with session key\n", __func__);
+-		goto smb3signkey_ret;
 -	}
 -
--	rc = crypto_shash_update(sha512, ses->preauth_sha_hash,
--				 SMB2_PREAUTH_HASH_SIZE);
+-	rc = crypto_shash_init(server->secmech.hmacsha256);
 -	if (rc) {
--		cifs_dbg(VFS, "%s: Could not update sha512 shash\n", __func__);
--		return rc;
+-		cifs_server_dbg(VFS, "%s: Could not init sign hmac\n", __func__);
+-		goto smb3signkey_ret;
 -	}
 -
--	for (i = 0; i < nvec; i++) {
--		rc = crypto_shash_update(sha512, iov[i].iov_base, iov[i].iov_len);
--		if (rc) {
--			cifs_dbg(VFS, "%s: Could not update sha512 shash\n",
--				 __func__);
--			return rc;
--		}
--	}
--
--	rc = crypto_shash_final(sha512, ses->preauth_sha_hash);
+-	rc = crypto_shash_update(server->secmech.hmacsha256, i, 4);
 -	if (rc) {
--		cifs_dbg(VFS, "%s: Could not finalize sha512 shash\n",
--			 __func__);
--		return rc;
+-		cifs_server_dbg(VFS, "%s: Could not update with n\n", __func__);
+-		goto smb3signkey_ret;
 -	}
 -
--	return 0;
-+	sha512_init(&sha_ctx);
-+	sha512_update(&sha_ctx, ses->preauth_sha_hash, SMB2_PREAUTH_HASH_SIZE);
-+	for (i = 0; i < nvec; i++)
-+		sha512_update(&sha_ctx, iov[i].iov_base, iov[i].iov_len);
-+	sha512_final(&sha_ctx, ses->preauth_sha_hash);
+-	rc = crypto_shash_update(server->secmech.hmacsha256, label.iov_base, label.iov_len);
+-	if (rc) {
+-		cifs_server_dbg(VFS, "%s: Could not update with label\n", __func__);
+-		goto smb3signkey_ret;
+-	}
+-
+-	rc = crypto_shash_update(server->secmech.hmacsha256, &zero, 1);
+-	if (rc) {
+-		cifs_server_dbg(VFS, "%s: Could not update with zero\n", __func__);
+-		goto smb3signkey_ret;
++		return rc;
+ 	}
+ 
+-	rc = crypto_shash_update(server->secmech.hmacsha256, context.iov_base, context.iov_len);
+-	if (rc) {
+-		cifs_server_dbg(VFS, "%s: Could not update with context\n", __func__);
+-		goto smb3signkey_ret;
+-	}
++	hmac_sha256_init_usingrawkey(&hmac_ctx, ses->auth_key.response,
++				     SMB2_NTLMV2_SESSKEY_SIZE);
++	hmac_sha256_update(&hmac_ctx, i, 4);
++	hmac_sha256_update(&hmac_ctx, label.iov_base, label.iov_len);
++	hmac_sha256_update(&hmac_ctx, &zero, 1);
++	hmac_sha256_update(&hmac_ctx, context.iov_base, context.iov_len);
+ 
+ 	if ((server->cipher_type == SMB2_ENCRYPTION_AES256_CCM) ||
+ 		(server->cipher_type == SMB2_ENCRYPTION_AES256_GCM)) {
+-		rc = crypto_shash_update(server->secmech.hmacsha256, L256, 4);
++		hmac_sha256_update(&hmac_ctx, L256, 4);
+ 	} else {
+-		rc = crypto_shash_update(server->secmech.hmacsha256, L128, 4);
+-	}
+-	if (rc) {
+-		cifs_server_dbg(VFS, "%s: Could not update with L\n", __func__);
+-		goto smb3signkey_ret;
++		hmac_sha256_update(&hmac_ctx, L128, 4);
+ 	}
++	hmac_sha256_final(&hmac_ctx, prfhash);
+ 
+-	rc = crypto_shash_final(server->secmech.hmacsha256, hashptr);
+-	if (rc) {
+-		cifs_server_dbg(VFS, "%s: Could not generate sha256 hash\n", __func__);
+-		goto smb3signkey_ret;
+-	}
+-
+-	memcpy(key, hashptr, key_size);
+-
+-smb3signkey_ret:
+-	return rc;
++	memcpy(key, prfhash, key_size);
++	return 0;
  }
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index b3f1398c9f790..e7cda885c39f0 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -294,13 +294,13 @@ extern int smb2_validate_and_copy_iov(unsigned int offset,
- 				      unsigned int minbufsize, char *data);
- extern void smb2_copy_fs_info_to_kstatfs(
- 	 struct smb2_fs_full_size_info *pfs_inf,
- 	 struct kstatfs *kst);
- extern int smb311_crypto_shash_allocate(struct TCP_Server_Info *server);
--extern int smb311_update_preauth_hash(struct cifs_ses *ses,
--				      struct TCP_Server_Info *server,
--				      struct kvec *iov, int nvec);
-+extern void smb311_update_preauth_hash(struct cifs_ses *ses,
-+				       struct TCP_Server_Info *server,
-+				       struct kvec *iov, int nvec);
- extern int smb2_query_info_compound(const unsigned int xid,
- 				    struct cifs_tcon *tcon,
- 				    const char *path, u32 desired_access,
- 				    u32 class, u32 type, u32 output_len,
- 				    struct kvec *rsp, int *buftype,
+ 
+ struct derivation {
+ 	struct kvec label;
+ 	struct kvec context;
 -- 
 2.51.0
 
