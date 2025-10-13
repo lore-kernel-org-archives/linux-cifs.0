@@ -1,93 +1,138 @@
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC1F4C85;
-	Sun, 12 Oct 2025 22:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1598E14A8B
+	for <linux-cifs@vger.kernel.org>; Mon, 13 Oct 2025 03:05:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760309951; cv=none; b=TeEbK5UckIgqYDnOPfUgoJT4M5umTl2lBD1vsgRc1iJEJAkKI0Rp39p2JpFqHsE5ug0YgFh33wpiKpQZVquWi9xCdKxwc9HXD78C+nY8p77qKjs0JTSknmGEf6Cf2Kf9jYS4yizSi/xYCHo2pXa/ndzyhEmi9OLg18basT0fV4k=
+	t=1760324725; cv=none; b=GRJVTI0fcL09GlD1KEMcIUDJ/k6KUR0qoVXaYOKUeEISVVm8IhJbRYKcWjP4vXf0rBap9o1bThjcIEuXTASKGkKqqoJZMjBLci0FZBRz2ryjGE8reE8V/T9FSf+AvQ2mgLdtxwtDbBN7opCBd27KL+NrQQhz3a/rnEGTwk5AtIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760309951; c=relaxed/simple;
-	bh=O9/xMq/WsWwt6BhdaZP+0IQk2PmNkJ/e+71vzrgkOOI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vq26vVTZ+pWb87vqkdiBCtU+aFlbiCL8nDfGhpxlVlOtNVbY1pwJgSN39rkrb+jgYEqVsmWj7WVvZr7JwTg0R6FpGVdOcXao6tLIJANfthCCDfr4tjGtBW2XtET4TKQ/a4PRdwUZiVoamPerXCw42qLqDeyxBKSWMCqrD9mvKYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: zesmtpgz3t1760309901tf1369bb2
-X-QQ-Originating-IP: MvtMcZy8FSuveoXRjmYKGRWu3Gd3/PHMHPUpYLPI0AU=
-Received: from [192.168.3.223] ( [116.128.244.171])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 13 Oct 2025 06:58:20 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 15561149925438105871
-Message-ID: <56E522C05F8E6468+9e555719-8b1e-47a6-8d60-b6a7e89fd91b@chenxiaosong.com>
-Date: Mon, 13 Oct 2025 06:58:20 +0800
+	s=arc-20240116; t=1760324725; c=relaxed/simple;
+	bh=LB823DSu0I/dpeUVPCiKCr1mPvlI7JQrBF2t23MNi0A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m0OMoyKddUm46LeCjK0ubD0Q+mbCRF/mHGhnLT/yshyVi1mi+6ToKyGMFWp7HFzF/yRv0ntQjNwoj11y5HOPb22uZOLeO2FYLiDmJYmbtgdKdAacaF1SSoglGVpiP+jHG7JmHWtwKpjJmHPIHL9M/rlMvZuPRYShgBOhRydGsl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nEw8rgCl; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nEw8rgCl"
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-78f15d5846dso61339286d6.0
+        for <linux-cifs@vger.kernel.org>; Sun, 12 Oct 2025 20:05:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760324723; x=1760929523; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qHAqGhh/ixHW+v9mccbsdYXuyyKdgiAAP3DIPnvHpvs=;
+        b=nEw8rgClFZk6KBL1V3CJyUb3ImJGtm5RGawS+EJAPSYD531zrvSoKN1G2V9CkswBkW
+         MP2Czyf1pAt5V4p6YwpgvOwIA+5cT0p3dAXTfrRgM0ruJtS9TTMec+vqFERuGSHdZQuu
+         a88ZPU1M9zlcU0yz3zA2TtTeHLxT2gqbp2wqP+mAJviI9osQB4Qv13UDI9rgVlM8h+HP
+         xvch/fItQtMV44fzpxO5RWiwX35caUfrGysh5KWEGC6aedT/JO3wUk6NpfiEBw2v3c8z
+         TIVgf1u7lFXIur9SmXh4QhNRveJA9byA6hwpEZ/wzuwNYrDhOQ18BCXpuLHknlDz5sPk
+         +UJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760324723; x=1760929523;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qHAqGhh/ixHW+v9mccbsdYXuyyKdgiAAP3DIPnvHpvs=;
+        b=mgwf+l2jg7zXOsKs3vAL03jJ0h/bSL25tARBr3UaIHkvku/Qo6RdYZ16t4GBciJlS/
+         XDFMHA2cJhPk2WoVgs8gwf+fcByj+OYbFBmmjP6paF70VaZYjXPgxhuMpdp1ybZDYy5M
+         8tGdj28db/M1EiND1dUK1aWnVDGy4C7qigL4OkoeMx4XA4Bl28c81I8LiuP1wMLg6MPY
+         uDLBZvrOArRzPuWKmLZz1lT3X0XHKcFR6m7aj73obJRAx5i5LMMqUndQeyPknlPZLueh
+         RO1o63zkM1I+mN0i0sMi37FpEISo34T/WzEjXsAAYw/dIYrgFaplAoK4R6kQDbDZkLNn
+         oMEQ==
+X-Gm-Message-State: AOJu0YxCj3HEyXrlu0e1c2c4BgESw7f4Ipo2tbvKwQJ2Igu2RZhZT0ck
+	C/nddnj2pMGJyqo5LqXteRQRk2VpGLgVdDiK/NLAcwJmHxejYT4WUJqXzZhPzPFq36sbLRHoVkj
+	0BROpyKdFLIxuo293s9g33Uiz6ntGlVM=
+X-Gm-Gg: ASbGncvN2xT1I0dGK1gzc8YPzZj18BJgHDjzO6Y2zl6LPZpwgDHv/2QSuFyMIw7V67G
+	lN7w+QntYpffYHxKIjvO60LoAgeUuXLSHIPNvSSa3I0YDCCtppactB7mK1QYbtNoucQua7EKOEs
+	o4Ut6T+ziHF483q31/zhqbQrVjGng1Lz7pg367iLx0emtGSIGr2NnDZYo+pZQIImxlRWlx6qfi/
+	KGJ0PrVmaD8Or7Y018Jw9O3AEiAdwNUgrxaPbG55ojhOJh9KOyAgu9DA0g8Ug8q9xwMcT2vSPBp
+	KkRYtDwA4RzaTkfEd4hjBpC//2DcueO5ybrBa6eN4qL2SZgGCcpGU40FF6Hu9pIYsQbWiAOoAQT
+	UXOEPol0thuCZZVtPR3ZilqLUQ4epv+zKnbWn2tAP
+X-Google-Smtp-Source: AGHT+IGDwTSeSw8sMShsBfmLNXRL+l5FjSlGRN765Q6/KfQ0u9Esino45KVYsQZMHmm3/nGdQnVEF8SEli+vXx+F6YM=
+X-Received: by 2002:ad4:5c8b:0:b0:782:f478:8ef6 with SMTP id
+ 6a1803df08f44-87b2ef3fd05mr271912316d6.53.1760324722984; Sun, 12 Oct 2025
+ 20:05:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 06/22] smb: move SMB1_PROTO_NUMBER to common/cifsglob.h
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- stfrench@microsoft.com, metze@samba.org, pali@kernel.org,
- linkinjeon@kernel.org, smfrench@gmail.com, sfrench@samba.org,
- senozhatsky@chromium.org, tom@talpey.com, pc@manguebit.org,
- ronniesahlberg@gmail.com, sprasad@microsoft.com, bharathsm@microsoft.com,
- zhangguodong@kylinos.cn
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20251012161749.2994033-1-chenxiaosong@chenxiaosong.com>
- <66942D4891D3E571+20251012161749.2994033-7-chenxiaosong@chenxiaosong.com>
- <bd7b1078-4e58-4403-97e3-ac3a4765c51a@wanadoo.fr>
-Content-Language: en-US
-From: chenxiaosong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <bd7b1078-4e58-4403-97e3-ac3a4765c51a@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: M6HsUa4FHJpkREuH6gKmoKadHC2GeyeFVXQD1ZZH1o0+wu4TWXSYuyeu
-	ShYRK44jqH5ITPzFw+F1jfvbMLgCf4HV8eE9IOEO8YC5BbdodOqn/pugq2C6zBujiWoEZ1R
-	Me5eXtGs/SYwceMKT1GHenumWgq4W0LxRnOEPNyoXEfK4ZNptRjvmvejtrkayM6Ad5mQDEy
-	FyNHNFS2u88okb6w1lJ4VAKtfQJKp4vdQv/1itBh/ZwuCuRbuJP1RexlSGNa7xrKU4wvdFi
-	WDJYNw3GsCr7S3fT1ejoVohnz33MQFpWq3lHggFjXAye1kraDBSC+T7WUBjcntyet7NgYm8
-	fSFkN5+HLgap79ahWQ2s6w2aQtIH3tXXdgPQ4ADZmmtU4B6AYOChV+8byErfPsE8I+UBigI
-	4QuBk1WdH9+Mmdo2NqYgK1z/dubhgLtc4hZEe3cSpoPlEmxtPUMWcWB1o+7XjROvzqqM/lT
-	4rnlAc8NVkpRaeI/wmJaEuW8hegQ/01InAZsWzpF4Z6GwVM8F313H5QEyxQ/tNtjIaQcgiC
-	AEOhQHLIfv/in+Q828wE0W65IVdhobR3AarRvrkgAy3z1CYFe/69mFF5pj6qQcMjg1fF1Tt
-	UyxOV0L/1TeN+rABwz+Yb7l11NZ7riAUxWscAXvKjjJa7xduRV3WV3YQPNeJJVZTOIxuJcD
-	U4NapQa9K7mF++tj6XKQZZnraBp6lF1sDyyj6SLxPylHVlMVn+FfqZZNCqRaGBFNfPsfL3k
-	LfE+ARi7nMmDKVcJFzd7DS2vE+R76y6nsLlezcY+/8qOGJaYXTrKVdsxc2FIYtQDitChdhP
-	VuR01US3fzHtYmzZ0xj0ucbMYOWBaFnykbn/e4PdzIUDBznwBJgDDG7X0NevXv2z0vlmIRl
-	RVgYmQhDVFGxZQN5nT5NatRmun/UpNN4gaEMT9GT3B1nuLmHp4asTbcXGZw7MuSRcSS3/+1
-	i7qthzjUszR31kEF/jOEp9rWJXIs0UIB8ThlZ5tu+KNGd8RRTua7By3GebhoWDRP51zZFq0
-	zR7jU5dIh5mX7z9en4fnDEhYxL54SqObWlViYcSLZMwjPQLJaAPpWTNojhkCbazHrO7TUAD
-	g==
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-X-QQ-RECHKSPAM: 0
+References: <cover.1760295528.git.metze@samba.org>
+In-Reply-To: <cover.1760295528.git.metze@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 12 Oct 2025 22:05:11 -0500
+X-Gm-Features: AS18NWBXSKZ22IKuewh1gVJmA-cWkMqgUW3PAEIT_pZFb0XSxNvkXaBGJYNOaDg
+Message-ID: <CAH2r5mt=6mwgy=d6kmB--V0f8GbxWooBH4pD56bDUouMOaDXrQ@mail.gmail.com>
+Subject: Re: [PATCH 00/10] improve smbdirect_mr_io lifetime
+To: Stefan Metzmacher <metze@samba.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>, 
+	Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Christophe,
+merged into cifs-2.6.git for-next pending more testing
 
-Thank you for taking the time to review and comment. Apologies — it was 
-my oversight not to list you in the "To:" of v2, and I should have used 
-"Suggested-by:" rather than "Reviewed-by:".
-
-On 2025/10/13 04:36, Christophe JAILLET wrote:
-> 
+On Sun, Oct 12, 2025 at 2:10=E2=80=AFPM Stefan Metzmacher <metze@samba.org>=
+ wrote:
+>
 > Hi,
-> 
-> even if I reviewed and commented on this patch, I never gave an explicit 
-> R-b.
-> 
-> And as I'm cited in this v2, being in To: or Cc: of this updated version 
-> would have been appreciated.
-> 
-> No hard-feeling.
-> 
-> CJ
-> 
+>
+> these patches improve and simplify our handling of
+> smbdirect_mr_io structures and their lifetime.
+>
+> smbd_register_mr() returns a pointer to struct smbdirect_mr_io
+> and smbd_deregister_mr() gives the pointer back.
+>
+> But currently the memory itself is managed by the connection
+> (struct smbdirect_socket) and smbd_destroy() has a strange
+> wait loop in order to wait for smbd_deregister_mr() being
+> called. It means code in smbd_destroy() is aware of
+> the server mutex in the generic smb client handling above
+> the transport layer.
+>
+> These patches do some cleanups and fixes before changing
+> the logic to use a kref and a mutex in order to allow
+> smbd_deregister_mr() being called after smbd_destroy()
+> as the memory of smbdirect_mr_io will stay in memory
+> but will be detached from the connection.
+>
+> This makes the code independent of cifs_server_[un]lock()
+> and will allow us to move more smbdirect code into common
+> functions (shared between client and server).
+>
+> I think these should go into 6.18.
+>
+> Stefan Metzmacher (10):
+>   smb: smbdirect: introduce smbdirect_mr_io.{kref,mutex} and
+>     SMBDIRECT_MR_DISABLED
+>   smb: client: change smbd_deregister_mr() to return void
+>   smb: client: let destroy_mr_list() call list_del(&mr->list)
+>   smb: client: let destroy_mr_list() remove locked from the list
+>   smb: client: improve logic in allocate_mr_list()
+>   smb: client: improve logic in smbd_register_mr()
+>   smb: client: improve logic in smbd_deregister_mr()
+>   smb: client: call ib_dma_unmap_sg if mr->sgt.nents is not 0
+>   smb: client: let destroy_mr_list() call ib_dereg_mr() before
+>     ib_dma_unmap_sg()
+>   smb: client: let destroy_mr_list() keep smbdirect_mr_io memory if
+>     registered
+>
+>  fs/smb/client/smbdirect.c                  | 312 ++++++++++++++-------
+>  fs/smb/client/smbdirect.h                  |   2 +-
+>  fs/smb/common/smbdirect/smbdirect_socket.h |  11 +-
+>  3 files changed, 224 insertions(+), 101 deletions(-)
+>
+> --
+> 2.43.0
+>
 
+
+--=20
+Thanks,
+
+Steve
