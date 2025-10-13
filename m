@@ -1,248 +1,163 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F16E30EF89;
-	Mon, 13 Oct 2025 15:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380CF30DEA4;
+	Mon, 13 Oct 2025 15:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760368817; cv=none; b=l9LneuE6W7C/kV7Wc9vYtfJajT15MwPVQfWc3z0SZjScSV+Ao6j7zxWtNscLtvkG7pBnzLIKaTFt801zGLtHOmyUtCghfh3dsprgToxneM9UYvaSHMY518WR7KG1UqV6MaIlxNR0pg+4cOXiKvXUw/5PE8d6ZdHklO8AVCIq0Lc=
+	t=1760369191; cv=none; b=p95bW+MzApwIsdspm5L2uCzvVPo2fwzE0tmLP6u1ihwl+njfk5b75C3Jza3a8CrWPZI0TKv8UooiQe6/iDMPFqh/HuyMYAeJwrzDm6MIb6JWPEI09UIJZpHiS4+gxHplNBs/7sEI/ttBclP+jF69pIWK42kUs21JvbevK5UgTGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760368817; c=relaxed/simple;
-	bh=5D7wV/7h+x8oEfOvP7j4kvDbVdexIozBgutQXx/iaCA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rsd0CIUPKv2q9jgiSbMQ+Gtl0OGXxCNHVK9gwdUaKiIQZpPR0vEe/LSDA/WPymQJJQctN32IlUT76hkb0wd6VLXVfgjEepmI41RUSL9XfmacRIz2sONnvQc5V5lrNrEHfEEqIjG1m0c9oytvaoYxzs+LGIZmjUa4o3e9Rm0PVdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=sUPIT+7d; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760369191; c=relaxed/simple;
+	bh=qzmsCLHvn1CkR8Is3amMxqjd9S3jL+Su3MM1yXwJK78=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GQmVHuiacZ3y0U46TNfMThLhJcxDpObeAXZn3Ok9KGDxRZOqqZJXY0XsnDJLNWTZ55DFB2WIlZQHuY3A3h09/TieO+imavMf4CmfSPXxbf+GLzfkK0ooBjfSeXvTJWi8gz6Lb+AyLq4u9YrtkMt/Wgq9MomZbbDZl6x/LgTB84c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QiXKKGQ7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="sUPIT+7d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9156C116B1;
-	Mon, 13 Oct 2025 15:20:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1760368817;
-	bh=5D7wV/7h+x8oEfOvP7j4kvDbVdexIozBgutQXx/iaCA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sUPIT+7d9VTuszgx34Z0a4Oqa+jcwtTCUdnHitGo/Jd/LCKwoPhsVx50D+cJXjfz6
-	 R594FWqhUUb+x/ado0lAVWHERekjN/ghol7oKa2YzxI2PrqxlBbq2zWOpkg9l9sf2s
-	 wSgxud2lZbXP8hgmD6q4v73pif/vNrydn9kU8RUI=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-rdma@vger.kernel.org,
-	Stefan Metzmacher <metze@samba.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.17 030/563] smb: server: fix IRD/ORD negotiation with the client
-Date: Mon, 13 Oct 2025 16:38:11 +0200
-Message-ID: <20251013144412.380771383@linuxfoundation.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251013144411.274874080@linuxfoundation.org>
-References: <20251013144411.274874080@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QiXKKGQ7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA24EC4CEE7;
+	Mon, 13 Oct 2025 15:26:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760369190;
+	bh=qzmsCLHvn1CkR8Is3amMxqjd9S3jL+Su3MM1yXwJK78=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=QiXKKGQ7b0mt3ydyGwtJiiW6eJ8DGV/i8ZZQhxArZWBtRDEngK49QSNoDisJez2pG
+	 pC9GXsrZBQHwFHZdZEvFcFPSseVuH1l4Qy5olxWrpi5/GVLPsaQnd7pxkHMpS0ItGq
+	 bvc9Avu87Vk6L1Inb2Q/+gNv65mY67MBZBOG5cUSXLvacxeDYp2enHeGINuHtdScuK
+	 F4CAyjA8Idu5z5xKnNvSSKIQHu0nHnhgLXKR0Dd7NfEles20HmDKiIDZeUXPC33qxf
+	 qDT8jdk70ob8XWp6UOqDEqJ4qP5ExfAn7U91RZ8gkSg9JZ98uhjOPOyB/O0X8AiwRK
+	 Afa23H3GqOHGA==
+Message-ID: <acc332bcc7ad4b6f4d901bf783a5017dd6eca1b5.camel@kernel.org>
+Subject: Re: [PATCH 00/13] vfs: recall-only directory delegations for knfsd
+From: Jeff Layton <jlayton@kernel.org>
+To: Chuck Lever <chuck.lever@oracle.com>, Miklos Szeredi
+ <miklos@szeredi.hu>,  Alexander Viro <viro@zeniv.linux.org.uk>, Christian
+ Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,  Alexander Aring
+ <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, Anna
+ Schumaker <anna@kernel.org>,  Steve French <sfrench@samba.org>, Paulo
+ Alcantara <pc@manguebit.org>, Ronnie Sahlberg	 <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey	 <tom@talpey.com>,
+ Bharath SM <bharathsm@microsoft.com>, Greg Kroah-Hartman	
+ <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Danilo Krummrich	 <dakr@kernel.org>, David Howells <dhowells@redhat.com>,
+ Tyler Hicks	 <code@tyhicks.com>, NeilBrown <neil@brown.name>, Olga
+ Kornievskaia	 <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Amir
+ Goldstein	 <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, Steve
+ French	 <smfrench@gmail.com>, Sergey Senozhatsky
+ <senozhatsky@chromium.org>, Carlos Maiolino <cem@kernel.org>, Kuniyuki
+ Iwashima <kuniyu@google.com>, "David S. Miller"	 <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski	 <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, netfs@lists.linux.dev,
+ ecryptfs@vger.kernel.org, 	linux-unionfs@vger.kernel.org,
+ linux-xfs@vger.kernel.org, netdev@vger.kernel.org
+Date: Mon, 13 Oct 2025 11:26:26 -0400
+In-Reply-To: <846db8bf-6e5a-4a2c-90fa-3d4ffaf4c1de@oracle.com>
+References: <20251013-dir-deleg-ro-v1-0-406780a70e5e@kernel.org>
+	 <846db8bf-6e5a-4a2c-90fa-3d4ffaf4c1de@oracle.com>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-6.17-stable review patch.  If anyone has any objections, please let me know.
+On Mon, 2025-10-13 at 10:52 -0400, Chuck Lever wrote:
+> On 10/13/25 10:47 AM, Jeff Layton wrote:
+> > It would be great if we could get into linux-next soon so that it can b=
+e
+> > merged for v6.19. Christian, could you pick up the vfs/filelock patches=
+,
+> > and Chuck pick up the nfsd patches?
+>=20
+> Question about merge strategy:
+>=20
+> Seems like I would have to base nfsd-testing (and nfsd-next) on
+> Christian's tree, once the VFS changes are applied, for one or two of
+> the NFSD patches to work. Yes?
+>=20
 
-------------------
+Correct. I think the usual way we've done this in the past is to have
+Christian create a branch with just the vfs layer patches that you and
+he can both pull into your -next branches.
 
-From: Stefan Metzmacher <metze@samba.org>
-
-[ Upstream commit fad988a2158d743da7971884b93482a73735b25e ]
-
-Already do real negotiation in smb_direct_handle_connect_request()
-where we see the requested initiator_depth and responder_resources
-from the client.
-
-We should detect legacy iwarp clients using MPA v1
-with the custom IRD/ORD negotiation.
-
-We need to send the custom IRD/ORD in big endian,
-but we need to try to let clients with broken requests
-using little endian (older cifs.ko) to work.
-
-Note the reason why this uses u8 for
-initiator_depth and responder_resources is
-that the rdma layer also uses it.
-
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Cc: linux-rdma@vger.kernel.org
-Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/server/transport_rdma.c | 99 +++++++++++++++++++++++++++++-----
- 1 file changed, 85 insertions(+), 14 deletions(-)
-
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 74dfb6496095d..e1f659d3b4cf5 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -153,6 +153,10 @@ struct smb_direct_transport {
- 	struct work_struct	disconnect_work;
- 
- 	bool			negotiation_requested;
-+
-+	bool			legacy_iwarp;
-+	u8			initiator_depth;
-+	u8			responder_resources;
- };
- 
- #define KSMBD_TRANS(t) ((struct ksmbd_transport *)&((t)->transport))
-@@ -347,6 +351,9 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
- 	t->cm_id = cm_id;
- 	cm_id->context = t;
- 
-+	t->initiator_depth = SMB_DIRECT_CM_INITIATOR_DEPTH;
-+	t->responder_resources = 1;
-+
- 	t->status = SMB_DIRECT_CS_NEW;
- 	init_waitqueue_head(&t->wait_status);
- 
-@@ -1676,21 +1683,21 @@ static int smb_direct_send_negotiate_response(struct smb_direct_transport *t,
- static int smb_direct_accept_client(struct smb_direct_transport *t)
- {
- 	struct rdma_conn_param conn_param;
--	struct ib_port_immutable port_immutable;
--	u32 ird_ord_hdr[2];
-+	__be32 ird_ord_hdr[2];
- 	int ret;
- 
-+	/*
-+	 * smb_direct_handle_connect_request()
-+	 * already negotiated t->initiator_depth
-+	 * and t->responder_resources
-+	 */
- 	memset(&conn_param, 0, sizeof(conn_param));
--	conn_param.initiator_depth = min_t(u8, t->cm_id->device->attrs.max_qp_rd_atom,
--					   SMB_DIRECT_CM_INITIATOR_DEPTH);
--	conn_param.responder_resources = 0;
--
--	t->cm_id->device->ops.get_port_immutable(t->cm_id->device,
--						 t->cm_id->port_num,
--						 &port_immutable);
--	if (port_immutable.core_cap_flags & RDMA_CORE_PORT_IWARP) {
--		ird_ord_hdr[0] = conn_param.responder_resources;
--		ird_ord_hdr[1] = 1;
-+	conn_param.initiator_depth = t->initiator_depth;
-+	conn_param.responder_resources = t->responder_resources;
-+
-+	if (t->legacy_iwarp) {
-+		ird_ord_hdr[0] = cpu_to_be32(conn_param.responder_resources);
-+		ird_ord_hdr[1] = cpu_to_be32(conn_param.initiator_depth);
- 		conn_param.private_data = ird_ord_hdr;
- 		conn_param.private_data_len = sizeof(ird_ord_hdr);
- 	} else {
-@@ -2081,10 +2088,13 @@ static bool rdma_frwr_is_supported(struct ib_device_attr *attrs)
- 	return true;
- }
- 
--static int smb_direct_handle_connect_request(struct rdma_cm_id *new_cm_id)
-+static int smb_direct_handle_connect_request(struct rdma_cm_id *new_cm_id,
-+					     struct rdma_cm_event *event)
- {
- 	struct smb_direct_transport *t;
- 	struct task_struct *handler;
-+	u8 peer_initiator_depth;
-+	u8 peer_responder_resources;
- 	int ret;
- 
- 	if (!rdma_frwr_is_supported(&new_cm_id->device->attrs)) {
-@@ -2098,6 +2108,67 @@ static int smb_direct_handle_connect_request(struct rdma_cm_id *new_cm_id)
- 	if (!t)
- 		return -ENOMEM;
- 
-+	peer_initiator_depth = event->param.conn.initiator_depth;
-+	peer_responder_resources = event->param.conn.responder_resources;
-+	if (rdma_protocol_iwarp(new_cm_id->device, new_cm_id->port_num) &&
-+	    event->param.conn.private_data_len == 8) {
-+		/*
-+		 * Legacy clients with only iWarp MPA v1 support
-+		 * need a private blob in order to negotiate
-+		 * the IRD/ORD values.
-+		 */
-+		const __be32 *ird_ord_hdr = event->param.conn.private_data;
-+		u32 ird32 = be32_to_cpu(ird_ord_hdr[0]);
-+		u32 ord32 = be32_to_cpu(ird_ord_hdr[1]);
-+
-+		/*
-+		 * cifs.ko sends the legacy IRD/ORD negotiation
-+		 * event if iWarp MPA v2 was used.
-+		 *
-+		 * Here we check that the values match and only
-+		 * mark the client as legacy if they don't match.
-+		 */
-+		if ((u32)event->param.conn.initiator_depth != ird32 ||
-+		    (u32)event->param.conn.responder_resources != ord32) {
-+			/*
-+			 * There are broken clients (old cifs.ko)
-+			 * using little endian and also
-+			 * struct rdma_conn_param only uses u8
-+			 * for initiator_depth and responder_resources,
-+			 * so we truncate the value to U8_MAX.
-+			 *
-+			 * smb_direct_accept_client() will then
-+			 * do the real negotiation in order to
-+			 * select the minimum between client and
-+			 * server.
-+			 */
-+			ird32 = min_t(u32, ird32, U8_MAX);
-+			ord32 = min_t(u32, ord32, U8_MAX);
-+
-+			t->legacy_iwarp = true;
-+			peer_initiator_depth = (u8)ird32;
-+			peer_responder_resources = (u8)ord32;
-+		}
-+	}
-+
-+	/*
-+	 * First set what the we as server are able to support
-+	 */
-+	t->initiator_depth = min_t(u8, t->initiator_depth,
-+				   new_cm_id->device->attrs.max_qp_rd_atom);
-+
-+	/*
-+	 * negotiate the value by using the minimum
-+	 * between client and server if the client provided
-+	 * non 0 values.
-+	 */
-+	if (peer_initiator_depth != 0)
-+		t->initiator_depth = min_t(u8, t->initiator_depth,
-+					   peer_initiator_depth);
-+	if (peer_responder_resources != 0)
-+		t->responder_resources = min_t(u8, t->responder_resources,
-+					       peer_responder_resources);
-+
- 	ret = smb_direct_connect(t);
- 	if (ret)
- 		goto out_err;
-@@ -2122,7 +2193,7 @@ static int smb_direct_listen_handler(struct rdma_cm_id *cm_id,
- {
- 	switch (event->event) {
- 	case RDMA_CM_EVENT_CONNECT_REQUEST: {
--		int ret = smb_direct_handle_connect_request(cm_id);
-+		int ret = smb_direct_handle_connect_request(cm_id, event);
- 
- 		if (ret) {
- 			pr_err("Can't create transport: %d\n", ret);
--- 
-2.51.0
-
-
-
+--=20
+Jeff Layton <jlayton@kernel.org>
