@@ -1,127 +1,248 @@
-Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C89F2BF009
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Oct 2025 14:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4281EB9FA;
+	Mon, 13 Oct 2025 14:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760367048; cv=none; b=cdVIOnt9c7fkyqT3iuixqOZvMoczOKMgOh2y/ILOJ7HPmVBFxE851NQL1ekU7jhrpvk3ZYQuGjiek2lYvQ7MHUddUZanJFix3mkmhdYjx7pD4zIkyQKbPGqJOzutYYqDFFEYnW3yobzOAB4GmGbnFTeTpAzIlnREDJfEcWyeB8w=
+	t=1760367064; cv=none; b=pE6x29KL+92nlXJ0Uy6V0o0T+KdJrjU2JNQPRiJ0Vm159/dND8dLo5Tv2XS7s9r98rHfoAbg0wSTx7LafuFEBTla24qcRWoaEo6uZtP/4sr2esvhKPVvk4OXDsMnrT/qwJ1pw2wfwQQg+qhQ+heq5jW6+q03U+K8VtN03bU+o0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760367048; c=relaxed/simple;
-	bh=tv420yr54IGx5wad+qpuj37I9o6HirgVE9boHJQ+dWU=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=tldOvPRswEwDVV8vGKVADASMeONyGmqPzn/D0x5uU1TeGYJOJpht9K414ssJQrbfO8ohmzDLOM/Ck9XaFp0BdY3yvslPLVcwgiKFhiDyRdM8Lf1He/CHDw3cqgXgEPv/mvMjtYcu395qoc12avT89AzvDvlSehThoLaO5B4AXyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=KvMr5ajp; arc=none smtp.client-ip=192.134.164.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
+	s=arc-20240116; t=1760367064; c=relaxed/simple;
+	bh=V+EA/HAYN4xAQmv1tLAZQoGTMRNG5Dw7RZ7cdv7LCAw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=P+op4GlTrgJzHpbOp6EISfNXqqMZm+GBWoj8omjWpWG4dXHroeLTHTddw71RKMiqnb664kEcWYnnt8yNMgOIBLd4OekLmIyv16ddlpzl9DusuqCZwbFWogYsfrYHLwxdm3S8rHFhkxbt8QRNlaJOtmjK0vtsN14U3tcbseXcSLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Zezx/nrb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="KvMr5ajp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=/KSGh+mz1eb7Y8G+KxS/eYv2a9owUNpbOQ1PhTDWdKA=;
-  b=KvMr5ajps0lMsstnqNnIiV+mwheM9xCWDqk5MTbSdWAjLflwwttT9ifT
-   geVBv4YzcNIIq69TC4UdDPCjrpEtt94QKzg20KVtn8KzC5viWgxYzS4JQ
-   bXdHZKo0IfTclTGXSMx0QDwCuU5h9p0XdxBu0tN6s46vjVkH3SFKJusEs
-   o=;
-X-CSE-ConnectionGUID: snjf87YOR5q4s1+MPM3jyQ==
-X-CSE-MsgGUID: dUvK5BosRYOuCeyUGjvDyg==
-Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.19,225,1754949600"; 
-   d="scan'208";a="128049442"
-Received: from bb116-15-226-202.singnet.com.sg (HELO hadrien) ([116.15.226.202])
-  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2025 16:49:33 +0200
-Date: Mon, 13 Oct 2025 22:49:28 +0800 (+08)
-From: Julia Lawall <julia.lawall@inria.fr>
-To: Markus Elfring <Markus.Elfring@web.de>
-cc: cocci@inria.fr, linux-cifs@vger.kernel.org
-Subject: =?UTF-8?Q?Re=3A_=5Bcocci=5D_Improving_source_code_parsing_for?=
- =?UTF-8?Q?_=E2=80=9Cfs=2Fsmb=2Fclient=2Fdir=2Ec=E2=80=9D=3F?=
-In-Reply-To: <8480276b-ee1e-454e-954f-b25890c79add@web.de>
-Message-ID: <dcfb5c63-ce1a-f487-df23-cadef6c45a32@inria.fr>
-References: <335b0fe9-313f-4e3d-a01d-1954f3c46489@web.de> <805f36f6-ea15-cbc9-f510-45856eb6f6d7@inria.fr> <8480276b-ee1e-454e-954f-b25890c79add@web.de>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Zezx/nrb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D696AC4CEE7;
+	Mon, 13 Oct 2025 14:51:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1760367064;
+	bh=V+EA/HAYN4xAQmv1tLAZQoGTMRNG5Dw7RZ7cdv7LCAw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Zezx/nrbo6xTPhoAliQwjBgbLOyLsLRPTkR1YzSML3d3g/O8ke7rv1gScPCwgbYv4
+	 MsvAvv0YyGb55tzaV3nemzUD2XSt9EELiIHONr1UUXgdQQJ7iGRFk4Xib8uW6U/3Ya
+	 2EAIsuDqoJwIk2C4ZO7Q1MY7Sw3RSrrfPOGIiaNU=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-rdma@vger.kernel.org,
+	Stefan Metzmacher <metze@samba.org>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.1 052/196] smb: server: fix IRD/ORD negotiation with the client
+Date: Mon, 13 Oct 2025 16:43:45 +0200
+Message-ID: <20251013144316.467260856@linuxfoundation.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251013144314.549284796@linuxfoundation.org>
+References: <20251013144314.549284796@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323329-107936897-1760366974=:3281"
+Content-Transfer-Encoding: 8bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
---8323329-107936897-1760366974=:3281
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+------------------
+
+From: Stefan Metzmacher <metze@samba.org>
+
+[ Upstream commit fad988a2158d743da7971884b93482a73735b25e ]
+
+Already do real negotiation in smb_direct_handle_connect_request()
+where we see the requested initiator_depth and responder_resources
+from the client.
+
+We should detect legacy iwarp clients using MPA v1
+with the custom IRD/ORD negotiation.
+
+We need to send the custom IRD/ORD in big endian,
+but we need to try to let clients with broken requests
+using little endian (older cifs.ko) to work.
+
+Note the reason why this uses u8 for
+initiator_depth and responder_resources is
+that the rdma layer also uses it.
+
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Cc: linux-rdma@vger.kernel.org
+Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/server/transport_rdma.c | 99 +++++++++++++++++++++++++++++-----
+ 1 file changed, 85 insertions(+), 14 deletions(-)
+
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index 84b5b2f5df998..af1c41f922bb3 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -152,6 +152,10 @@ struct smb_direct_transport {
+ 	struct work_struct	disconnect_work;
+ 
+ 	bool			negotiation_requested;
++
++	bool			legacy_iwarp;
++	u8			initiator_depth;
++	u8			responder_resources;
+ };
+ 
+ #define KSMBD_TRANS(t) ((struct ksmbd_transport *)&((t)->transport))
+@@ -345,6 +349,9 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
+ 	t->cm_id = cm_id;
+ 	cm_id->context = t;
+ 
++	t->initiator_depth = SMB_DIRECT_CM_INITIATOR_DEPTH;
++	t->responder_resources = 1;
++
+ 	t->status = SMB_DIRECT_CS_NEW;
+ 	init_waitqueue_head(&t->wait_status);
+ 
+@@ -1618,21 +1625,21 @@ static int smb_direct_send_negotiate_response(struct smb_direct_transport *t,
+ static int smb_direct_accept_client(struct smb_direct_transport *t)
+ {
+ 	struct rdma_conn_param conn_param;
+-	struct ib_port_immutable port_immutable;
+-	u32 ird_ord_hdr[2];
++	__be32 ird_ord_hdr[2];
+ 	int ret;
+ 
++	/*
++	 * smb_direct_handle_connect_request()
++	 * already negotiated t->initiator_depth
++	 * and t->responder_resources
++	 */
+ 	memset(&conn_param, 0, sizeof(conn_param));
+-	conn_param.initiator_depth = min_t(u8, t->cm_id->device->attrs.max_qp_rd_atom,
+-					   SMB_DIRECT_CM_INITIATOR_DEPTH);
+-	conn_param.responder_resources = 0;
+-
+-	t->cm_id->device->ops.get_port_immutable(t->cm_id->device,
+-						 t->cm_id->port_num,
+-						 &port_immutable);
+-	if (port_immutable.core_cap_flags & RDMA_CORE_PORT_IWARP) {
+-		ird_ord_hdr[0] = conn_param.responder_resources;
+-		ird_ord_hdr[1] = 1;
++	conn_param.initiator_depth = t->initiator_depth;
++	conn_param.responder_resources = t->responder_resources;
++
++	if (t->legacy_iwarp) {
++		ird_ord_hdr[0] = cpu_to_be32(conn_param.responder_resources);
++		ird_ord_hdr[1] = cpu_to_be32(conn_param.initiator_depth);
+ 		conn_param.private_data = ird_ord_hdr;
+ 		conn_param.private_data_len = sizeof(ird_ord_hdr);
+ 	} else {
+@@ -2018,10 +2025,13 @@ static bool rdma_frwr_is_supported(struct ib_device_attr *attrs)
+ 	return true;
+ }
+ 
+-static int smb_direct_handle_connect_request(struct rdma_cm_id *new_cm_id)
++static int smb_direct_handle_connect_request(struct rdma_cm_id *new_cm_id,
++					     struct rdma_cm_event *event)
+ {
+ 	struct smb_direct_transport *t;
+ 	struct task_struct *handler;
++	u8 peer_initiator_depth;
++	u8 peer_responder_resources;
+ 	int ret;
+ 
+ 	if (!rdma_frwr_is_supported(&new_cm_id->device->attrs)) {
+@@ -2035,6 +2045,67 @@ static int smb_direct_handle_connect_request(struct rdma_cm_id *new_cm_id)
+ 	if (!t)
+ 		return -ENOMEM;
+ 
++	peer_initiator_depth = event->param.conn.initiator_depth;
++	peer_responder_resources = event->param.conn.responder_resources;
++	if (rdma_protocol_iwarp(new_cm_id->device, new_cm_id->port_num) &&
++	    event->param.conn.private_data_len == 8) {
++		/*
++		 * Legacy clients with only iWarp MPA v1 support
++		 * need a private blob in order to negotiate
++		 * the IRD/ORD values.
++		 */
++		const __be32 *ird_ord_hdr = event->param.conn.private_data;
++		u32 ird32 = be32_to_cpu(ird_ord_hdr[0]);
++		u32 ord32 = be32_to_cpu(ird_ord_hdr[1]);
++
++		/*
++		 * cifs.ko sends the legacy IRD/ORD negotiation
++		 * event if iWarp MPA v2 was used.
++		 *
++		 * Here we check that the values match and only
++		 * mark the client as legacy if they don't match.
++		 */
++		if ((u32)event->param.conn.initiator_depth != ird32 ||
++		    (u32)event->param.conn.responder_resources != ord32) {
++			/*
++			 * There are broken clients (old cifs.ko)
++			 * using little endian and also
++			 * struct rdma_conn_param only uses u8
++			 * for initiator_depth and responder_resources,
++			 * so we truncate the value to U8_MAX.
++			 *
++			 * smb_direct_accept_client() will then
++			 * do the real negotiation in order to
++			 * select the minimum between client and
++			 * server.
++			 */
++			ird32 = min_t(u32, ird32, U8_MAX);
++			ord32 = min_t(u32, ord32, U8_MAX);
++
++			t->legacy_iwarp = true;
++			peer_initiator_depth = (u8)ird32;
++			peer_responder_resources = (u8)ord32;
++		}
++	}
++
++	/*
++	 * First set what the we as server are able to support
++	 */
++	t->initiator_depth = min_t(u8, t->initiator_depth,
++				   new_cm_id->device->attrs.max_qp_rd_atom);
++
++	/*
++	 * negotiate the value by using the minimum
++	 * between client and server if the client provided
++	 * non 0 values.
++	 */
++	if (peer_initiator_depth != 0)
++		t->initiator_depth = min_t(u8, t->initiator_depth,
++					   peer_initiator_depth);
++	if (peer_responder_resources != 0)
++		t->responder_resources = min_t(u8, t->responder_resources,
++					       peer_responder_resources);
++
+ 	ret = smb_direct_connect(t);
+ 	if (ret)
+ 		goto out_err;
+@@ -2059,7 +2130,7 @@ static int smb_direct_listen_handler(struct rdma_cm_id *cm_id,
+ {
+ 	switch (event->event) {
+ 	case RDMA_CM_EVENT_CONNECT_REQUEST: {
+-		int ret = smb_direct_handle_connect_request(cm_id);
++		int ret = smb_direct_handle_connect_request(cm_id, event);
+ 
+ 		if (ret) {
+ 			pr_err("Can't create transport: %d\n", ret);
+-- 
+2.51.0
 
 
 
-On Mon, 13 Oct 2025, Markus Elfring wrote:
-
-> > If you want the problem to be solved, please make some effort to narrow it
-> > down to a smaller number of lines. …
->
-> How do you think about to improve data processing for another source file example
-> like the following?
->
->
-> static int my_test_condition(void)
-> {
-> #ifdef MY_CONFIG_LEGACY_OPTION
->  if (0)
->     {
->         my_log("working?");
->     }
->  else
->     {
->         /* Test comment */
->     }
-> my_info:
->  if (0)
->     my_log("reminder!");
->  else
->     {
-> #else
->     {
-> #endif
->      my_log("special part");
->     }
->  return 0;
-> }
-
-Thank you for the more understanable example.  I think it should ignore
-the code under the #else since parsing is not successful when that is
-taken into account.  I will try to look into it at some point.
-
-julia
-
->
->
-> Questionable test result (according to the software combination “Coccinelle 1.3.0”):
-> Markus_Elfring@Sonne:…/Projekte/Coccinelle/Probe> /usr/bin/spatch --parse-c test-ifdef-legacy3.c
-> …
-> PB: not found closing brace in fuzzy parsing
-> ERROR-RECOV: found sync '}' at line 23
-> …
-> parse error
->  = File "test-ifdef-legacy3.c", line 24, column 0, charpos = 282
->   around = '',
->   whole content =
-> badcount: 22
-> bad: static int my_test_condition(void)
-> …
-> bad:  return 0;
-> BAD:!!!!! }
-> …
-> nb good = 0,  nb passed = 3 =========> 12.00% passed
-> nb good = 0,  nb bad = 22 =========> 12.00% good or passed
->
->
-> Will similar test cases trigger more desirable improvements?
->
-> Regards,
-> Markus
->
---8323329-107936897-1760366974=:3281--
