@@ -1,246 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7BE30F52D;
-	Mon, 13 Oct 2025 14:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C89F2BF009
+	for <linux-cifs@vger.kernel.org>; Mon, 13 Oct 2025 14:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760366941; cv=none; b=uRRuPft2ifHXsGPyvecRwv+XhKELGV0EW3X5WbAyWoQ2n9LQKGNpTBIpLsUxvAQfc/iOs7TvFvRICr0F0O6xyJp9P9dpVh99EJEZ/zCS66ra1XaqJ4ifi4qEX5cnFO4gkDimnrtdrS/BqAIHKXGXeNF/ApW9mdw7JYpkzQvvyP4=
+	t=1760367048; cv=none; b=cdVIOnt9c7fkyqT3iuixqOZvMoczOKMgOh2y/ILOJ7HPmVBFxE851NQL1ekU7jhrpvk3ZYQuGjiek2lYvQ7MHUddUZanJFix3mkmhdYjx7pD4zIkyQKbPGqJOzutYYqDFFEYnW3yobzOAB4GmGbnFTeTpAzIlnREDJfEcWyeB8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760366941; c=relaxed/simple;
-	bh=aa2nwa5AUZDKL13xRk8VHTGhhxsB/IoN/NqofQpDKAc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WQnpyPu59FtCwUlJ0VHjBJfeeUD50/1CGnzVt57sppTJtdjki3tUk1BprlBNCp6IjRRjeS4VljCqufLMC/1tpB8dz8hql+qDXgzdMgY1+hH9ugbACkJ8EPUp07Vd0n6L3lu0+P5HloGkwlBDmIV+C5lZsvE05CYpQng9bycOh2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ADlt6a8U; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760367048; c=relaxed/simple;
+	bh=tv420yr54IGx5wad+qpuj37I9o6HirgVE9boHJQ+dWU=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=tldOvPRswEwDVV8vGKVADASMeONyGmqPzn/D0x5uU1TeGYJOJpht9K414ssJQrbfO8ohmzDLOM/Ck9XaFp0BdY3yvslPLVcwgiKFhiDyRdM8Lf1He/CHDw3cqgXgEPv/mvMjtYcu395qoc12avT89AzvDvlSehThoLaO5B4AXyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=KvMr5ajp; arc=none smtp.client-ip=192.134.164.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ADlt6a8U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CC74C116D0;
-	Mon, 13 Oct 2025 14:48:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760366940;
-	bh=aa2nwa5AUZDKL13xRk8VHTGhhxsB/IoN/NqofQpDKAc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ADlt6a8UOqbXngXAy2sAICDjbTu8dQMBsS6xbt6qOQb2gm/owZ4yYhQ5aTYVHkS8K
-	 PJb9QzkLF+wFcUY87kwm5HUAA3uOoENEJYmOj/O1tmK3qB0t7l3fh861lgjqOFKzx3
-	 lMFFpsTlgp0IwfaoLxJIaVr4Tt1iMgqfDbsbePdRnbvSuJDpWm9zvMZICvlLx599ve
-	 nRdTNQgViHLtKmVQ1xwRbpO2cvYPJ89QEE8ejkiSQ9Wwrb1rz3L8OArIUzq7nPxH1A
-	 3RhzYr1BuPJ4xihBlbaYq4JV8WU38FvdnS8NZMhqZQdxPYT9dBKNPpdmXQEYauC3dW
-	 A7ehVmMPCAe0Q==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Mon, 13 Oct 2025 10:48:11 -0400
-Subject: [PATCH 13/13] nfsd: wire up GET_DIR_DELEGATION handling
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="KvMr5ajp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=inria.fr; s=dc;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=/KSGh+mz1eb7Y8G+KxS/eYv2a9owUNpbOQ1PhTDWdKA=;
+  b=KvMr5ajps0lMsstnqNnIiV+mwheM9xCWDqk5MTbSdWAjLflwwttT9ifT
+   geVBv4YzcNIIq69TC4UdDPCjrpEtt94QKzg20KVtn8KzC5viWgxYzS4JQ
+   bXdHZKo0IfTclTGXSMx0QDwCuU5h9p0XdxBu0tN6s46vjVkH3SFKJusEs
+   o=;
+X-CSE-ConnectionGUID: snjf87YOR5q4s1+MPM3jyQ==
+X-CSE-MsgGUID: dUvK5BosRYOuCeyUGjvDyg==
+Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.19,225,1754949600"; 
+   d="scan'208";a="128049442"
+Received: from bb116-15-226-202.singnet.com.sg (HELO hadrien) ([116.15.226.202])
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2025 16:49:33 +0200
+Date: Mon, 13 Oct 2025 22:49:28 +0800 (+08)
+From: Julia Lawall <julia.lawall@inria.fr>
+To: Markus Elfring <Markus.Elfring@web.de>
+cc: cocci@inria.fr, linux-cifs@vger.kernel.org
+Subject: =?UTF-8?Q?Re=3A_=5Bcocci=5D_Improving_source_code_parsing_for?=
+ =?UTF-8?Q?_=E2=80=9Cfs=2Fsmb=2Fclient=2Fdir=2Ec=E2=80=9D=3F?=
+In-Reply-To: <8480276b-ee1e-454e-954f-b25890c79add@web.de>
+Message-ID: <dcfb5c63-ce1a-f487-df23-cadef6c45a32@inria.fr>
+References: <335b0fe9-313f-4e3d-a01d-1954f3c46489@web.de> <805f36f6-ea15-cbc9-f510-45856eb6f6d7@inria.fr> <8480276b-ee1e-454e-954f-b25890c79add@web.de>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251013-dir-deleg-ro-v1-13-406780a70e5e@kernel.org>
-References: <20251013-dir-deleg-ro-v1-0-406780a70e5e@kernel.org>
-In-Reply-To: <20251013-dir-deleg-ro-v1-0-406780a70e5e@kernel.org>
-To: Miklos Szeredi <miklos@szeredi.hu>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
- Chuck Lever <chuck.lever@oracle.com>, 
- Alexander Aring <alex.aring@gmail.com>, 
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
- Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
- Bharath SM <bharathsm@microsoft.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
- David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, 
- NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
- Dai Ngo <Dai.Ngo@oracle.com>, Amir Goldstein <amir73il@gmail.com>, 
- Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
- Sergey Senozhatsky <senozhatsky@chromium.org>, 
- Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
- samba-technical@lists.samba.org, netfs@lists.linux.dev, 
- ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
- linux-xfs@vger.kernel.org, netdev@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4963; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=aa2nwa5AUZDKL13xRk8VHTGhhxsB/IoN/NqofQpDKAc=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBo7REsqKBgKC2+m7edWhTDSNSDZurmHp2v1qS5S
- pJaGuMrNpCJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaO0RLAAKCRAADmhBGVaC
- FWPJD/4h1UbKOkyHMkLf6qmTTkk42pMF1Jty9w9cZJcboE+925ZuYTGJJ4kyKPq4k3F9k9ZM1Uz
- xEQi80nS/XkkYixKDgVT+vBsr79wWDdetT5WTVyyMMJwjA2WguRuo3rTMkEaj+DCHOd4Ooh+wkL
- e20JG9gzFWWXdOM7Ib94E6jPFUZOle2AF3BWPI+J8jhUmWUbRrZbMmlxUyopmSaTtvSr1wx2Lf0
- SGlyWrvDqqLB90yE6M4LZrK0DIB1+TVB00odavoPm4bczI1AGUFoz1cCnW4/yoiT8kD0gYbdbsl
- c9p7eTZlL1YpQg6Bl1p8yuWsf/UPmIF/JW3sfZ1+R98HiutJkeglXhyRo061Nj+mcAlDKVZKaOT
- MCK9KBPVir+CPUvXZCf05Vkp4kpCm6Oz0KP3FSjStCBrR+L/moCPWsOmPj0kOyzaUFs+uMyQUmn
- ZcYjxu9rD6Fgap7z0XgMjtSzP+icwfkGJpWEyoIvf63htUP/68SesXIG1ShZIB2ayOukkFGX7nW
- oO4UJIp3m4oWMNXgjk2i3JC3Or6/KWn3cTkxWBsxZgvjr5Vk9WKxMAjg22AG3ODBmlJ2oTVe+s4
- Vhgd4994ReIp18pdn31CddfPRERgE5HkIJP6hBsqZ20SAZhMjRzNlxkgZr0YZu0cGnizZfzgjOw
- GI4L9WSBZOGm9qw==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Type: multipart/mixed; boundary="8323329-107936897-1760366974=:3281"
 
-Add a new routine for acquiring a read delegation on a directory. Since
-the same CB_RECALL/DELEGRETURN infrastrure is used for regular and
-directory delegations, we can just use a normal nfs4_delegation to
-represent it.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- fs/nfsd/nfs4proc.c  | 21 +++++++++++++-
- fs/nfsd/nfs4state.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/nfsd/state.h     |  5 ++++
- 3 files changed, 107 insertions(+), 1 deletion(-)
+--8323329-107936897-1760366974=:3281
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-diff --git a/fs/nfsd/nfs4proc.c b/fs/nfsd/nfs4proc.c
-index 7f7e6bb23a90d9a1cafd154c0f09e236df75b083..527f8dc52159803770964700170473509ec328ed 100644
---- a/fs/nfsd/nfs4proc.c
-+++ b/fs/nfsd/nfs4proc.c
-@@ -2342,6 +2342,13 @@ nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
- 			 union nfsd4_op_u *u)
- {
- 	struct nfsd4_get_dir_delegation *gdd = &u->get_dir_delegation;
-+	struct nfs4_delegation *dd;
-+	struct nfsd_file *nf;
-+	__be32 status;
-+
-+	status = nfsd_file_acquire_dir(rqstp, &cstate->current_fh, &nf);
-+	if (status != nfs_ok)
-+		return status;
- 
- 	/*
- 	 * RFC 8881, section 18.39.3 says:
-@@ -2355,7 +2362,19 @@ nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
- 	 * return NFS4_OK with a non-fatal status of GDD4_UNAVAIL in this
- 	 * situation.
- 	 */
--	gdd->gddrnf_status = GDD4_UNAVAIL;
-+	dd = nfsd_get_dir_deleg(cstate, gdd, nf);
-+	if (IS_ERR(dd)) {
-+		int err = PTR_ERR(dd);
-+
-+		if (err != -EAGAIN)
-+			return nfserrno(err);
-+		gdd->gddrnf_status = GDD4_UNAVAIL;
-+		return nfs_ok;
-+	}
-+
-+	gdd->gddrnf_status = GDD4_OK;
-+	memcpy(&gdd->gddr_stateid, &dd->dl_stid.sc_stateid, sizeof(gdd->gddr_stateid));
-+	nfs4_put_stid(&dd->dl_stid);
- 	return nfs_ok;
- }
- 
-diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-index 011e336dfd996daa82b706c3536628971369fb10..770acbee9e8dc69b6f19635638408ae4f0498b5d 100644
---- a/fs/nfsd/nfs4state.c
-+++ b/fs/nfsd/nfs4state.c
-@@ -9386,3 +9386,85 @@ nfsd4_deleg_getattr_conflict(struct svc_rqst *rqstp, struct dentry *dentry,
- 	nfs4_put_stid(&dp->dl_stid);
- 	return status;
- }
-+
-+/**
-+ * nfsd_get_dir_deleg - attempt to get a directory delegation
-+ * @cstate: compound state
-+ * @gdd: GET_DIR_DELEGATION arg/resp structure
-+ * @nf: nfsd_file opened on the directory
-+ *
-+ * Given a GET_DIR_DELEGATION request @gdd, attempt to acquire a delegation
-+ * on the directory to which @nf refers. Note that this does not set up any
-+ * sort of async notifications for the delegation.
-+ */
-+struct nfs4_delegation *
-+nfsd_get_dir_deleg(struct nfsd4_compound_state *cstate,
-+		   struct nfsd4_get_dir_delegation *gdd,
-+		   struct nfsd_file *nf)
-+{
-+	struct nfs4_client *clp = cstate->clp;
-+	struct nfs4_delegation *dp;
-+	struct file_lease *fl;
-+	struct nfs4_file *fp;
-+	int status = 0;
-+
-+	fp = nfsd4_alloc_file();
-+	if (!fp)
-+		return ERR_PTR(-ENOMEM);
-+
-+	nfsd4_file_init(&cstate->current_fh, fp);
-+	fp->fi_deleg_file = nf;
-+	fp->fi_delegees = 1;
-+
-+	/* if this client already has one, return that it's unavailable */
-+	spin_lock(&state_lock);
-+	spin_lock(&fp->fi_lock);
-+	if (nfs4_delegation_exists(clp, fp))
-+		status = -EAGAIN;
-+	spin_unlock(&fp->fi_lock);
-+	spin_unlock(&state_lock);
-+
-+	if (status)
-+		goto out_delegees;
-+
-+	/* Try to set up the lease */
-+	status = -ENOMEM;
-+	dp = alloc_init_deleg(clp, fp, NULL, NFS4_OPEN_DELEGATE_READ);
-+	if (!dp)
-+		goto out_delegees;
-+
-+	fl = nfs4_alloc_init_lease(dp);
-+	if (!fl)
-+		goto out_put_stid;
-+
-+	status = kernel_setlease(nf->nf_file,
-+				 fl->c.flc_type, &fl, NULL);
-+	if (fl)
-+		locks_free_lease(fl);
-+	if (status)
-+		goto out_put_stid;
-+
-+	/*
-+	 * Now, try to hash it. This can fail if we race another nfsd task
-+	 * trying to set a delegation on the same file. If that happens,
-+	 * then just say UNAVAIL.
-+	 */
-+	spin_lock(&state_lock);
-+	spin_lock(&clp->cl_lock);
-+	spin_lock(&fp->fi_lock);
-+	status = hash_delegation_locked(dp, fp);
-+	spin_unlock(&fp->fi_lock);
-+	spin_unlock(&clp->cl_lock);
-+	spin_unlock(&state_lock);
-+
-+	if (!status)
-+		return dp;
-+
-+	/* Something failed. Drop the lease and clean up the stid */
-+	kernel_setlease(fp->fi_deleg_file->nf_file, F_UNLCK, NULL, (void **)&dp);
-+out_put_stid:
-+	nfs4_put_stid(&dp->dl_stid);
-+out_delegees:
-+	put_deleg_file(fp);
-+	return ERR_PTR(status);
-+}
-diff --git a/fs/nfsd/state.h b/fs/nfsd/state.h
-index 1e736f4024263ffa9c93bcc9ec48f44566a8cc77..b052c1effdc5356487c610db9728df8ecfe851d4 100644
---- a/fs/nfsd/state.h
-+++ b/fs/nfsd/state.h
-@@ -867,4 +867,9 @@ static inline bool try_to_expire_client(struct nfs4_client *clp)
- 
- extern __be32 nfsd4_deleg_getattr_conflict(struct svc_rqst *rqstp,
- 		struct dentry *dentry, struct nfs4_delegation **pdp);
-+
-+struct nfsd4_get_dir_delegation;
-+struct nfs4_delegation *nfsd_get_dir_deleg(struct nfsd4_compound_state *cstate,
-+						struct nfsd4_get_dir_delegation *gdd,
-+						struct nfsd_file *nf);
- #endif   /* NFSD4_STATE_H */
 
--- 
-2.51.0
 
+On Mon, 13 Oct 2025, Markus Elfring wrote:
+
+> > If you want the problem to be solved, please make some effort to narrow it
+> > down to a smaller number of lines. …
+>
+> How do you think about to improve data processing for another source file example
+> like the following?
+>
+>
+> static int my_test_condition(void)
+> {
+> #ifdef MY_CONFIG_LEGACY_OPTION
+>  if (0)
+>     {
+>         my_log("working?");
+>     }
+>  else
+>     {
+>         /* Test comment */
+>     }
+> my_info:
+>  if (0)
+>     my_log("reminder!");
+>  else
+>     {
+> #else
+>     {
+> #endif
+>      my_log("special part");
+>     }
+>  return 0;
+> }
+
+Thank you for the more understanable example.  I think it should ignore
+the code under the #else since parsing is not successful when that is
+taken into account.  I will try to look into it at some point.
+
+julia
+
+>
+>
+> Questionable test result (according to the software combination “Coccinelle 1.3.0”):
+> Markus_Elfring@Sonne:…/Projekte/Coccinelle/Probe> /usr/bin/spatch --parse-c test-ifdef-legacy3.c
+> …
+> PB: not found closing brace in fuzzy parsing
+> ERROR-RECOV: found sync '}' at line 23
+> …
+> parse error
+>  = File "test-ifdef-legacy3.c", line 24, column 0, charpos = 282
+>   around = '',
+>   whole content =
+> badcount: 22
+> bad: static int my_test_condition(void)
+> …
+> bad:  return 0;
+> BAD:!!!!! }
+> …
+> nb good = 0,  nb passed = 3 =========> 12.00% passed
+> nb good = 0,  nb bad = 22 =========> 12.00% good or passed
+>
+>
+> Will similar test cases trigger more desirable improvements?
+>
+> Regards,
+> Markus
+>
+--8323329-107936897-1760366974=:3281--
