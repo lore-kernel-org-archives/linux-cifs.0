@@ -1,195 +1,188 @@
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EDA26FA56
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Oct 2025 14:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D48308F25
+	for <linux-cifs@vger.kernel.org>; Mon, 13 Oct 2025 14:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760366112; cv=none; b=AqZQ7g4qVB+9aZWRKVW7eMuOenChBYYzh/W8rU59G4jpKK4/rCYM7as8mtRP2qc4kUxFRrLY5XQeBBEY4uxVkm0fcxoWHgOLnZ3tEZGRauhw8QPOTm3ax288fu156mUWITGYSlsNMLGi9jEhDxGyJgVNoua7Es5nnLrFNX+Zbxw=
+	t=1760366686; cv=none; b=nJBi5zJWDsax+T/mLFCBOezvj4HA7HBubs1ZXZb/JAlqot6AZUcUkdhZIHKk2cO4AkAUdclSEPGcyxZuCEx8p4DaC4eIg0p9XZ5V6kV/ZDG+SZkV4GcIumapEhlTfXAZ4lpnEWyfo4B+szOkSUpqzeaQNayrCcI1bzpEgUZNxDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760366112; c=relaxed/simple;
-	bh=H5CD4aUulW3AJe9/EH+Y94y+kOIsJt58GEFRbfEOYtU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fjtZ0hNnsj3lk6sRqP74Nub4PKx3ZsEQkyOHSdFk4NEz6d27W2Y9pw6H4uhAFL3kAxA2DqoB6NKRcjoI/oQCVHB6alFBtsRyWvZamnI5NVlnUdUo2JDOxElpL77vbzYas2np+2Wid7yUZDzRCCr7/zBlhGZ7S45R5Re2Cal95UA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=s6VOMfYw; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1760366686; c=relaxed/simple;
+	bh=ywXpP59Lk88yCseXP50OE5LNKsf9iCO/d2MVzhXqhDI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pQl8K4q1iBZS3ExgKKFyzhbeTrrOvaIin1Z3DpONFQi4XMTp5INcP7Hw+gE6ju98FeP0X8XYqSnPDsxP/8nOZzE+xyvpRbfQWyk5VlyRSBSLFp+aQfBB/4GmG3MEiR21eNhTsRR1yxZCctHcflCcWvfUYr9aMXIBYir7Dm8KK74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VK+1EE4j; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=H+Z+hlMP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hkN0EgMX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FHAP454y; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="s6VOMfYw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1760366108; x=1760970908; i=markus.elfring@web.de;
-	bh=t4YbVn7UuEQrxVmXBS9q88pwfFK3vA2fr6yZ+C+zAUc=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=s6VOMfYwB7n9llZddKuqQfwE9rtPLHg5hAdMs5C72WjwTQ0k+H6fFTOY7MsP6Njd
-	 5agp6S8/eRlikemMyzxxRTJ67OKwfwL4Xw12t2K6SVdn2V8LqO8Evz//2kYqmAXXH
-	 UoqdsY6p+L80ZK0YJD7l1/HUSFiHRiRJBTFGe4F0te9q6+drc8XeXfU4wD/eSCRIB
-	 8VMX4BKTv+MwjUnBXvIY0iQX5TND7kETDPxsijx0D863eRPrhvty2/mBEWlXwhuFL
-	 6IG+kUJaC6nqoIgvq8weaoPdCe/p9D7Jm/jWn8QlHL+kj/xqqzfkd9Xt0Bb6EGt3n
-	 jDp9QWDXcUQSCKRsBQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.69.186]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MhFlm-1ueDkM11hi-00jYFG; Mon, 13
- Oct 2025 16:35:08 +0200
-Message-ID: <8480276b-ee1e-454e-954f-b25890c79add@web.de>
-Date: Mon, 13 Oct 2025 16:35:07 +0200
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VK+1EE4j";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="H+Z+hlMP";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hkN0EgMX";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="FHAP454y"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 9512521905;
+	Mon, 13 Oct 2025 14:44:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1760366681; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K+B3cRhWFJTukv1G4BnYWSSIGt6ZCh6nUUGxVgo8uAQ=;
+	b=VK+1EE4j3M6zBqUyqwsfJPZ7wNYbNuR1eUYpArR9NC5nxT0JEYhfCqG3l/1UbRM8XVeAgD
+	OP0ejKQsBj5T8f9bIQnjWVkcKyFcX8n6r7VgwfemCk5Xer8TbVvXtU1PO6ufXcSm+jf7I7
+	0qcZxo/SElX6uWKsTJCbr/DdMo7uR+0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1760366681;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K+B3cRhWFJTukv1G4BnYWSSIGt6ZCh6nUUGxVgo8uAQ=;
+	b=H+Z+hlMPXqFqLSc2kVG/rLS0qhGuA8ExX3p3hiaPm4lBldtXUsA9IZ5fg0XElV5gpVt8mp
+	TA9WceHuz9oKuUCw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=hkN0EgMX;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=FHAP454y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1760366680; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K+B3cRhWFJTukv1G4BnYWSSIGt6ZCh6nUUGxVgo8uAQ=;
+	b=hkN0EgMXB8IgYv43vMMrxEPUrwlVUpg7/bsuVp035BGXrnqO2UTWc9/uGV0Y/B2ihoI0TF
+	UfiYAbs6vrdVLfBdsWUUqMvC/1w863h6ipglsyft76uCD275x9BlmpoHMSXnVNQB7Hb8/j
+	JNqGyyE8fu1nTh7W6JPQvPTs7IfIHT4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1760366680;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K+B3cRhWFJTukv1G4BnYWSSIGt6ZCh6nUUGxVgo8uAQ=;
+	b=FHAP454y4M6+ghCQIv03zw8w029neiqKz5sutpVNxnz92au7q04wTGUqqbMW0bPmU9qH0Q
+	yaMIuKKvyDU9IXAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1852A13874;
+	Mon, 13 Oct 2025 14:44:39 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id jQVKNFcQ7Wh4KQAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 13 Oct 2025 14:44:39 +0000
+Date: Mon, 13 Oct 2025 11:44:37 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>, 
+	samba-technical@lists.samba.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>
+Subject: Re: [PATCH 0/8] smb: client: More crypto library conversions
+Message-ID: <ihoaj3ymhuesevdb7k2kg2a2axdkishrrrjr2teigelhkxmt4s@do2n6pkdmaas>
+References: <20251012015738.244315-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?Q?Re=3A_=5Bcocci=5D_Improving_source_code_parsing_for_?=
- =?UTF-8?B?4oCcZnMvc21iL2NsaWVudC9kaXIuY+KAnT8=?=
-To: Julia Lawall <julia.lawall@inria.fr>, cocci@inria.fr
-Cc: linux-cifs@vger.kernel.org
-References: <335b0fe9-313f-4e3d-a01d-1954f3c46489@web.de>
- <805f36f6-ea15-cbc9-f510-45856eb6f6d7@inria.fr>
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <805f36f6-ea15-cbc9-f510-45856eb6f6d7@inria.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:vReqd/9oMpsaaHqbrIJ5+J63+bR4BFcmR3USpowEQsPYC6v9bDN
- Rmzxbho0E5vcFAYrxez8OR7BECScE0Sk7W4gv2Po8ze2Yd73+OWkeXtmc1Jz9d2j8W5eCOu
- Stm7lklN5U+fNfGjlN0sk55/l2d1jTTIs139J7cEu3qls5zrjTo85zp3t4I7ni6/qsZonXP
- 2YCQXzEYUtIYeVchl3rQA==
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20251012015738.244315-1-ebiggers@kernel.org>
+X-Spam-Level: 
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:DGcuGOkEwGo=;UgVyhxqlbPJ7WetXq8z4ajCUc3X
- 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
- aoXDA==
+X-Rspamd-Queue-Id: 9512521905
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,samba.org,lists.samba.org,manguebit.org,gmail.com,microsoft.com,talpey.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -4.01
 
-> If you want the problem to be solved, please make some effort to narrow =
-it
-> down to a smaller number of lines. =E2=80=A6
+Hi Eric,
 
-How do you think about to improve data processing for another source file =
-example
-like the following?
+On 10/11, Eric Biggers wrote:
+>This series converts fs/smb/client/ to access SHA-512, HMAC-SHA256, MD5,
+>and HMAC-MD5 using the library APIs instead of crypto_shash.
+>
+>This simplifies the code significantly.  It also slightly improves
+>performance, as it eliminates unnecessary overhead.
+>
+>Tested with Samba with all SMB versions, with mfsymlinks in the mount
+>options, 'server min protocol = NT1' and 'server signing = required' in
+>smb.conf, and doing a simple file data and symlink verification test.
+>That seems to cover all the modified code paths.
+>
+>However, with SMB 1.0 I get "CIFS: VFS: SMB signature verification
+>returned error = -13", regardless of whether this series is applied or
+>not.  Presumably, testing that case requires some other setting I
+>couldn't find.
+>
+>Regardless, these are straightforward conversions and all the actual
+>crypto is exactly the same as before, as far as I can tell.
 
+I think the overall series looks good and do a great cleanup.
 
-static int my_test_condition(void)
-{
-#ifdef MY_CONFIG_LEGACY_OPTION
- if (0)
-    {
-        my_log("working?");
-    }
- else
-    {
-        /* Test comment */
-    }
-my_info:
- if (0)
-    my_log("reminder!");
- else
-    {
-#else
-    {
-#endif
-     my_log("special part");
-    }
- return 0;
-}
+Just a minor nit about fips_enabled: since it's now being handled
+explicitly (rather than an error on cifs_alloc_hash() currently), I
+think it makes sense to move the check to mount code path when
+'sectype == NTLMv2' (I don't particularly care about SMB1, but
+something similar can be done for 'smb1 && sign' cases I guess).
+
+>Eric Biggers (8):
+>  smb: client: Use SHA-512 library for SMB3.1.1 preauth hash
+>  smb: client: Use HMAC-SHA256 library for key generation
+>  smb: client: Use HMAC-SHA256 library for SMB2 signature calculation
+>  smb: client: Use MD5 library for M-F symlink hashing
+>  smb: client: Use MD5 library for SMB1 signature calculation
+>  smb: client: Use HMAC-MD5 library for NTLMv2
+>  smb: client: Remove obsolete crypto_shash allocations
+>  smb: client: Consolidate cmac(aes) shash allocation
+>
+> fs/smb/client/Kconfig         |   7 +-
+> fs/smb/client/cifsencrypt.c   | 201 +++++++++++++---------------------
+> fs/smb/client/cifsfs.c        |   4 -
+> fs/smb/client/cifsglob.h      |   3 -
+> fs/smb/client/cifsproto.h     |  10 +-
+> fs/smb/client/link.c          |  31 +-----
+> fs/smb/client/sess.c          |   2 +-
+> fs/smb/client/smb2misc.c      |  53 ++-------
+> fs/smb/client/smb2proto.h     |   8 +-
+> fs/smb/client/smb2transport.c | 164 +++++----------------------
+> 10 files changed, 131 insertions(+), 352 deletions(-)
+>
+>
+>base-commit: 67029a49db6c1f21106a1b5fcdd0ea234a6e0711
+>-- 
+>2.51.0
 
 
-Questionable test result (according to the software combination =E2=80=9CC=
-occinelle 1.3.0=E2=80=9D):
-Markus_Elfring@Sonne:=E2=80=A6/Projekte/Coccinelle/Probe> /usr/bin/spatch =
-=2D-parse-c test-ifdef-legacy3.c
-=E2=80=A6
-PB: not found closing brace in fuzzy parsing
-ERROR-RECOV: found sync '}' at line 23
-=E2=80=A6
-parse error=20
- =3D File "test-ifdef-legacy3.c", line 24, column 0, charpos =3D 282
-  around =3D '',
-  whole content =3D=20
-badcount: 22
-bad: static int my_test_condition(void)
-=E2=80=A6
-bad:  return 0;
-BAD:!!!!! }
-=E2=80=A6
-nb good =3D 0,  nb passed =3D 3 =3D=3D=3D=3D=3D=3D=3D=3D=3D> 12.00% passed
-nb good =3D 0,  nb bad =3D 22 =3D=3D=3D=3D=3D=3D=3D=3D=3D> 12.00% good or =
-passed
+Cheers,
 
-
-Will similar test cases trigger more desirable improvements?
-
-Regards,
-Markus
+Enzo
