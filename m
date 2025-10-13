@@ -1,188 +1,178 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D48308F25
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Oct 2025 14:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29E6211290;
+	Mon, 13 Oct 2025 14:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760366686; cv=none; b=nJBi5zJWDsax+T/mLFCBOezvj4HA7HBubs1ZXZb/JAlqot6AZUcUkdhZIHKk2cO4AkAUdclSEPGcyxZuCEx8p4DaC4eIg0p9XZ5V6kV/ZDG+SZkV4GcIumapEhlTfXAZ4lpnEWyfo4B+szOkSUpqzeaQNayrCcI1bzpEgUZNxDs=
+	t=1760366896; cv=none; b=CSU2HVB91Qyp1U5UQpOtSLlURnIC7NTjTRSQ3YhttUEnOK/dZ5qp1uV78lRyDfmhkvhfD8uWd0pDfS+CvPrKeuWj+kNxpIDU44fk/qHNmxUfgCvWYZUSIlkew2o6ATK8u79yFZeS6t3ckC6BnKdJigwHNbCYsFZXtYZtHgglWCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760366686; c=relaxed/simple;
-	bh=ywXpP59Lk88yCseXP50OE5LNKsf9iCO/d2MVzhXqhDI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pQl8K4q1iBZS3ExgKKFyzhbeTrrOvaIin1Z3DpONFQi4XMTp5INcP7Hw+gE6ju98FeP0X8XYqSnPDsxP/8nOZzE+xyvpRbfQWyk5VlyRSBSLFp+aQfBB/4GmG3MEiR21eNhTsRR1yxZCctHcflCcWvfUYr9aMXIBYir7Dm8KK74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VK+1EE4j; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=H+Z+hlMP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hkN0EgMX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FHAP454y; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1760366896; c=relaxed/simple;
+	bh=jWgRdOclHfQbfaaf9W2P4KkHZdNwhBqzpIGWPibgK3c=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hae2wJ7NDRafYQh8LIA0b8jwu8oAFbGvk6fzN7MHeaBBcZ6mWA0a1h0kqfODEjc4eXWKKAaB9xHYrAAgbxbRxzCKJrKN2Xubd5fiWDKHF1i6xN9nUMYPP1m+yQfgX3FiYfssj/PTO5K/zIhI6pyxfYbh7KNQABhg3o8+/mmG9xM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lKGV3p7A; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VK+1EE4j";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="H+Z+hlMP";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hkN0EgMX";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="FHAP454y"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 9512521905;
-	Mon, 13 Oct 2025 14:44:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760366681; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K+B3cRhWFJTukv1G4BnYWSSIGt6ZCh6nUUGxVgo8uAQ=;
-	b=VK+1EE4j3M6zBqUyqwsfJPZ7wNYbNuR1eUYpArR9NC5nxT0JEYhfCqG3l/1UbRM8XVeAgD
-	OP0ejKQsBj5T8f9bIQnjWVkcKyFcX8n6r7VgwfemCk5Xer8TbVvXtU1PO6ufXcSm+jf7I7
-	0qcZxo/SElX6uWKsTJCbr/DdMo7uR+0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760366681;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K+B3cRhWFJTukv1G4BnYWSSIGt6ZCh6nUUGxVgo8uAQ=;
-	b=H+Z+hlMPXqFqLSc2kVG/rLS0qhGuA8ExX3p3hiaPm4lBldtXUsA9IZ5fg0XElV5gpVt8mp
-	TA9WceHuz9oKuUCw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=hkN0EgMX;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=FHAP454y
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760366680; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K+B3cRhWFJTukv1G4BnYWSSIGt6ZCh6nUUGxVgo8uAQ=;
-	b=hkN0EgMXB8IgYv43vMMrxEPUrwlVUpg7/bsuVp035BGXrnqO2UTWc9/uGV0Y/B2ihoI0TF
-	UfiYAbs6vrdVLfBdsWUUqMvC/1w863h6ipglsyft76uCD275x9BlmpoHMSXnVNQB7Hb8/j
-	JNqGyyE8fu1nTh7W6JPQvPTs7IfIHT4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760366680;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K+B3cRhWFJTukv1G4BnYWSSIGt6ZCh6nUUGxVgo8uAQ=;
-	b=FHAP454y4M6+ghCQIv03zw8w029neiqKz5sutpVNxnz92au7q04wTGUqqbMW0bPmU9qH0Q
-	yaMIuKKvyDU9IXAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1852A13874;
-	Mon, 13 Oct 2025 14:44:39 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id jQVKNFcQ7Wh4KQAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 13 Oct 2025 14:44:39 +0000
-Date: Mon, 13 Oct 2025 11:44:37 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>, 
-	samba-technical@lists.samba.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
-	Bharath SM <bharathsm@microsoft.com>
-Subject: Re: [PATCH 0/8] smb: client: More crypto library conversions
-Message-ID: <ihoaj3ymhuesevdb7k2kg2a2axdkishrrrjr2teigelhkxmt4s@do2n6pkdmaas>
-References: <20251012015738.244315-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lKGV3p7A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB088C4CEE7;
+	Mon, 13 Oct 2025 14:48:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760366896;
+	bh=jWgRdOclHfQbfaaf9W2P4KkHZdNwhBqzpIGWPibgK3c=;
+	h=From:Subject:Date:To:Cc:From;
+	b=lKGV3p7AwvrM7OJT7hOATJJT/UQN+kJq3n5xXj6pTbNb/aPqxIKhMOTBAMtYBveMU
+	 TgVOAT3NRJ2aqglav+lGus1drXMm5aA7AevvrCajbMeOZRo73m8fEM85t6G9zOnC47
+	 bkXLvwRG4lqnGBYomaZtBBEvED6bhbRwQKQzmgMFrnyZCIApHKZO4f7D6WeL8G25Rg
+	 c78aaDpyifmo5QKKLtVuHnMGcM83XQC/oy/41mkt0StfUpPOcU04WD37SJs+QTiVDz
+	 BHIRDvjN4HiU4B7Taa7rtLbx8UC+3WZc2Bx3pqHcQkG8pBWPz6ckrC0p8kFu8F2RJB
+	 G42YDsjvFASow==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH 00/13] vfs: recall-only directory delegations for knfsd
+Date: Mon, 13 Oct 2025 10:47:58 -0400
+Message-Id: <20251013-dir-deleg-ro-v1-0-406780a70e5e@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20251012015738.244315-1-ebiggers@kernel.org>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 9512521905
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,samba.org,lists.samba.org,manguebit.org,gmail.com,microsoft.com,talpey.com];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -4.01
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAB4R7WgC/x3MMQqAMAxA0atIZgNNi6BeRRzUpjUgVVIQoXh3i
+ +Mb/i+QWYUzjE0B5VuynKmC2ga2fUmRUXw1WGM7MuTQi6LngyPqid4EpqG3brUENbmUgzz/bpr
+ f9wMsflGqXgAAAA==
+X-Change-ID: 20251013-dir-deleg-ro-d0fe19823b21
+To: Miklos Szeredi <miklos@szeredi.hu>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+ Chuck Lever <chuck.lever@oracle.com>, 
+ Alexander Aring <alex.aring@gmail.com>, 
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+ Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+ Bharath SM <bharathsm@microsoft.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+ David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, 
+ NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
+ Dai Ngo <Dai.Ngo@oracle.com>, Amir Goldstein <amir73il@gmail.com>, 
+ Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, 
+ Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+ samba-technical@lists.samba.org, netfs@lists.linux.dev, 
+ ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
+ linux-xfs@vger.kernel.org, netdev@vger.kernel.org, 
+ Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4011; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=jWgRdOclHfQbfaaf9W2P4KkHZdNwhBqzpIGWPibgK3c=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBo7REpbSXN3G6FhVhF7XoUUMttobFKJ1BVSzBKY
+ aCDKYuY4e2JAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaO0RKQAKCRAADmhBGVaC
+ FdWwEADB1fG+r8Su4S75zX1urKLYXefEdzK/4m7dqrLwtnMwVrkRljoJZTmFyjRp1sLur6cTdfm
+ BefXgRYtzswymnNoi9hw19fh/D0zWJ5o/nJetdEaseeMqb9pwOuflLudHalhJIQ+G3evmWazi1F
+ ZJJzDF9WiQchXF9Ezx56oZQTJpcxdXIdtE9VRLz//IFzRwAGlHttrOpnW8iKq7jaouBEwFQ7pLj
+ l5aF/xUAMxIKotGm0r1pOf6BFMLZd6n3e1NZJTPllLvT1bvpa/w9EW1ABO4SgzvFmPTl5Yj7OVi
+ eXYM2I9HeykVe3h9cW0z0jRIkSuJGZC5Cmvvlpg6PFHQXBJqbHuIKQb4wMMCxoebTZJVBanLuIc
+ SkSncW7lEH8Z56zqAJHNFSN7ApLT6xo8Cljcbk2ZpciKJcoWjXjCFIat62ASVUwAhpT2V1rIMZl
+ DvINrGLx1hl1stODptoSPvW8f+P4UbeRI5UAYRDYsV38WJPYwrCJlFbdXnY8SaxH+YSslvABTVh
+ xG1M9pPAgwZDe+2SN3/krfrgncKX9UujZrJBaIkuJS8YFJMG6+R4LcajTSrQvdyOSj+7+TTB+vx
+ a1jxuVEnA/cOqUmxrGC5B64PWdoG+UQEmYMFp2gg38R7C0Yls2PcT9yGsdlWTcUXohOHPoWsR8L
+ IIbHtLPojiFcNXg==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-Hi Eric,
+At the fall NFS Bakeathon last week, the NFS client and server
+maintainers had a discussion about how to merge support for directory
+delegations. We decided to start with just merging support for simple,
+recallable-only directory delegation support, for a number of reasons:
 
-On 10/11, Eric Biggers wrote:
->This series converts fs/smb/client/ to access SHA-512, HMAC-SHA256, MD5,
->and HMAC-MD5 using the library APIs instead of crypto_shash.
->
->This simplifies the code significantly.  It also slightly improves
->performance, as it eliminates unnecessary overhead.
->
->Tested with Samba with all SMB versions, with mfsymlinks in the mount
->options, 'server min protocol = NT1' and 'server signing = required' in
->smb.conf, and doing a simple file data and symlink verification test.
->That seems to cover all the modified code paths.
->
->However, with SMB 1.0 I get "CIFS: VFS: SMB signature verification
->returned error = -13", regardless of whether this series is applied or
->not.  Presumably, testing that case requires some other setting I
->couldn't find.
->
->Regardless, these are straightforward conversions and all the actual
->crypto is exactly the same as before, as far as I can tell.
+1/ RFC8881 has some gaps in coverage that we are hoping to have
+addressed in RFC8881bis. In particular, it's written such that CB_NOTIFY
+callbacks require directory position information. That will be hard to
+do properly under Linux, so we're planning to extend the spec to allow
+that information to be omitted.
 
-I think the overall series looks good and do a great cleanup.
+2/ client-side support for CB_NOTIFY still lags a bit. The client side
+is tricky, as it involves heuristics about when to request a delegation.
 
-Just a minor nit about fips_enabled: since it's now being handled
-explicitly (rather than an error on cifs_alloc_hash() currently), I
-think it makes sense to move the check to mount code path when
-'sectype == NTLMv2' (I don't particularly care about SMB1, but
-something similar can be done for 'smb1 && sign' cases I guess).
+3/ we have some early indication that simple, recallable-only
+delegations can help performance in some cases. Anna mentioned seeing a
+multi-minute speedup in xfstests runs with them enabled. This needs more
+investigation, but it's promising and seems like enough justification to
+merge support.
 
->Eric Biggers (8):
->  smb: client: Use SHA-512 library for SMB3.1.1 preauth hash
->  smb: client: Use HMAC-SHA256 library for key generation
->  smb: client: Use HMAC-SHA256 library for SMB2 signature calculation
->  smb: client: Use MD5 library for M-F symlink hashing
->  smb: client: Use MD5 library for SMB1 signature calculation
->  smb: client: Use HMAC-MD5 library for NTLMv2
->  smb: client: Remove obsolete crypto_shash allocations
->  smb: client: Consolidate cmac(aes) shash allocation
->
-> fs/smb/client/Kconfig         |   7 +-
-> fs/smb/client/cifsencrypt.c   | 201 +++++++++++++---------------------
-> fs/smb/client/cifsfs.c        |   4 -
-> fs/smb/client/cifsglob.h      |   3 -
-> fs/smb/client/cifsproto.h     |  10 +-
-> fs/smb/client/link.c          |  31 +-----
-> fs/smb/client/sess.c          |   2 +-
-> fs/smb/client/smb2misc.c      |  53 ++-------
-> fs/smb/client/smb2proto.h     |   8 +-
-> fs/smb/client/smb2transport.c | 164 +++++----------------------
-> 10 files changed, 131 insertions(+), 352 deletions(-)
->
->
->base-commit: 67029a49db6c1f21106a1b5fcdd0ea234a6e0711
->-- 
->2.51.0
+This patchset is quite similar to the set I initially posted back in
+early 2024 [1]. We've merged some GET_DIR_DELEGATION handling patches
+since then, but the VFS layer support is basically the same.
 
+One thing that I want to make clear is that with this patchset, userspace
+can request a read lease on a directory that will be recalled on
+conflicting accesses. I saw no reason to prevent this, and I think it may
+be something useful for applications like Samba.
 
-Cheers,
+As always, users can disable leases altogether via the fs.leases-enable
+sysctl if this is an issue, but I wanted to point this out in case
+anyone sees footguns here.
 
-Enzo
+It would be great if we could get into linux-next soon so that it can be
+merged for v6.19. Christian, could you pick up the vfs/filelock patches,
+and Chuck pick up the nfsd patches?
+
+Thanks!
+
+[1]: https://lore.kernel.org/all/20240315-dir-deleg-v1-0-a1d6209a3654@kernel.org/
+
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Jeff Layton (13):
+      filelock: push the S_ISREG check down to ->setlease handlers
+      filelock: add a lm_may_setlease lease_manager callback
+      vfs: add try_break_deleg calls for parents to vfs_{link,rename,unlink}
+      vfs: allow mkdir to wait for delegation break on parent
+      vfs: allow rmdir to wait for delegation break on parent
+      vfs: break parent dir delegations in open(..., O_CREAT) codepath
+      vfs: make vfs_create break delegations on parent directory
+      vfs: make vfs_mknod break delegations on parent directory
+      filelock: lift the ban on directory leases in generic_setlease
+      nfsd: allow filecache to hold S_IFDIR files
+      nfsd: allow DELEGRETURN on directories
+      nfsd: check for delegation conflicts vs. the same client
+      nfsd: wire up GET_DIR_DELEGATION handling
+
+ drivers/base/devtmpfs.c  |   6 +-
+ fs/cachefiles/namei.c    |   2 +-
+ fs/ecryptfs/inode.c      |   6 +-
+ fs/fuse/dir.c            |   1 +
+ fs/init.c                |   4 +-
+ fs/locks.c               |  17 ++++-
+ fs/namei.c               | 163 ++++++++++++++++++++++++++++++++++-------------
+ fs/nfs/nfs4file.c        |   2 +
+ fs/nfsd/filecache.c      |  50 +++++++++++----
+ fs/nfsd/filecache.h      |   2 +
+ fs/nfsd/nfs4proc.c       |  21 +++++-
+ fs/nfsd/nfs4recover.c    |   6 +-
+ fs/nfsd/nfs4state.c      | 114 ++++++++++++++++++++++++++++++++-
+ fs/nfsd/state.h          |   5 ++
+ fs/nfsd/vfs.c            |  11 ++--
+ fs/nfsd/vfs.h            |   2 +-
+ fs/overlayfs/overlayfs.h |   6 +-
+ fs/smb/client/cifsfs.c   |   3 +
+ fs/smb/server/vfs.c      |   6 +-
+ fs/xfs/scrub/orphanage.c |   2 +-
+ include/linux/filelock.h |  14 ++++
+ include/linux/fs.h       |   9 +--
+ net/unix/af_unix.c       |   2 +-
+ 23 files changed, 363 insertions(+), 91 deletions(-)
+---
+base-commit: 2c40814eb5ae104d3f898fd8b705ecad114105b5
+change-id: 20251013-dir-deleg-ro-d0fe19823b21
+
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
+
