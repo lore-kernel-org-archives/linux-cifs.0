@@ -1,32 +1,32 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06EDB30DEBE
-	for <linux-cifs@vger.kernel.org>; Tue, 14 Oct 2025 07:20:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BA430E0E7
+	for <linux-cifs@vger.kernel.org>; Tue, 14 Oct 2025 07:21:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760426461; cv=none; b=IW9nEKsMKjG8Qbw0QeMDeAptiVt8LYsK23WxCVGuaz/Ooc7kVLLBF8TG/mI7d1wAN4hGxcQQbZGWMCo7biK/yj8hzFrXyW9DE+DR+m0a8WWv6p0uPGBDFu9RwicyCyNv/rAxF+c0c6rYN31JYR/sql4G9tPZHZSbfOD+PiXmLb4=
+	t=1760426468; cv=none; b=hNwZeFuHZeacvVQ8kECGvtzGtKHdpSk5evrBwotqHjJGeLcA4R6tJgsif429RPmwOhyDYALBh1T44cYAdEgIB2DCAw+EqH/9kN8PSZB4Z87jI9DM3zFeLYBoRW8KS/i4qztmpsWe6ahl06dDdOSQJbO45nw079Az55hg19HwTcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760426461; c=relaxed/simple;
-	bh=+Y1i4ZX5YAVz0aE+JKDU1tjQg9Po8/DgENzqiLN/5r0=;
+	s=arc-20240116; t=1760426468; c=relaxed/simple;
+	bh=LzJ+/nuwdxTRfBvOPshybE9q6IX8QoFZJsWv+HEV83w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YSaX0kE/y/IbCTInM5UYcrTX6LH1PYYsGu7zUqyvavJgt2B4iSy1L3RcjY/J6KjhbisMmga0VaM7iVbhRz6PLIBo1BhOIWhMhrw2r2MtKEr2/29P78VMgj+out+c4RJbuwO6K1m15bO4iRFz6597txbFs/nYmiLjt9avcK87654=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZPpfb8R6; arc=none smtp.client-ip=91.218.175.172
+	 MIME-Version; b=lD5EW9K7mkKdoagDp5WRv20AgO/QFkspEuzQAA7WvvpK10lqxKhW4H8CtFvPzQL94XRtB5dEbo/4a3YoghpoMTSWLbxfa8yYBHuGrWIO5ezCVYvqsYhlwzMb2fqOJc6hp6bMIOKcU7ojbd36D9uMDLh9HAilPcGdhKFDa31oqiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WohUWAP9; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZPpfb8R6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WohUWAP9"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760426457;
+	t=1760426462;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lSRewhMs0xcK2C1fYqR5qEmLPIT+QjryLkw7YlI2BEM=;
-	b=ZPpfb8R67M7XWE7N3VCMDSoriLLB7AGUPHYdpOQx2wr/1NoJS5ct4YiwwgUwlTeXqMc9uq
-	PPztDI077jhltjsdHGe8qleP6YMrfWt6qo3vfmY6HHhXdLCxeN+VY6QN+BZC9PEb5oewD0
-	4yfXbOlAmeS2F+ee3rGTcA6gMzIZkq8=
+	bh=daVXf+TWClFPvubEl10Mc6JK/uKVd72ihrUlJrAgzb0=;
+	b=WohUWAP94aX486UmD4qSI6CFo3JT7NcnKH3FhIF1ldnu+hMwUhqy4i+Xa/RjIH667NCE1W
+	QEizzT5F0xvZL5XF3zNgZsstUI03nWd6NZ4YpbxhfNSj8Ylb91+RreYADEfdgKAptaEIL2
+	qRuXuxW1fqUYbj7fsuM7tdVjrMo6mUM=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: stfrench@microsoft.com,
 	metze@samba.org,
@@ -45,9 +45,9 @@ To: stfrench@microsoft.com,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v3 01/22] smb/server: fix possible memory leak in smb2_read()
-Date: Tue, 14 Oct 2025 15:18:56 +0800
-Message-ID: <20251014071917.3004573-2-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH v3 02/22] smb/server: fix possible refcount leak in smb2_sess_setup()
+Date: Tue, 14 Oct 2025 15:18:57 +0800
+Message-ID: <20251014071917.3004573-3-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251014071917.3004573-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251014071917.3004573-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -61,8 +61,8 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-Memory leak occurs when ksmbd_vfs_read() fails.
-Fix this by adding the missing kvfree().
+Reference count of ksmbd_session will leak when session need reconnect.
+Fix this by adding the missing ksmbd_user_session_put().
 
 Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
@@ -72,17 +72,17 @@ Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
  1 file changed, 1 insertion(+)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index ab1d45fcebde..e81e615f322a 100644
+index e81e615f322a..b731d9b09408 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -6824,6 +6824,7 @@ int smb2_read(struct ksmbd_work *work)
+@@ -1806,6 +1806,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
  
- 	nbytes = ksmbd_vfs_read(work, fp, length, &offset, aux_payload_buf);
- 	if (nbytes < 0) {
-+		kvfree(aux_payload_buf);
- 		err = nbytes;
- 		goto out;
- 	}
+ 		if (ksmbd_conn_need_reconnect(conn)) {
+ 			rc = -EFAULT;
++			ksmbd_user_session_put(sess);
+ 			sess = NULL;
+ 			goto out_err;
+ 		}
 -- 
 2.43.0
 
