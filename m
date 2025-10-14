@@ -1,140 +1,201 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from flow-b8-smtp.messagingengine.com (flow-b8-smtp.messagingengine.com [202.12.124.143])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777FF3074AA;
-	Tue, 14 Oct 2025 03:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861CE13DBA0;
+	Tue, 14 Oct 2025 05:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.143
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760413444; cv=none; b=VZ6QgcbzhWwIykeEX08CreoytY7BpN39CEjvTNKXEA/XQjJ1nVOtQOp1I5xsOveJzejvrtGwlWpH3OSJ01hUuhuOebiFnMfYa0NRcWcagNF0KVYozMf2dlVU4un4IqY5V9UMZwved77885IuaSnZU0EOHe74OHwluvtBOBF6FWg=
+	t=1760420101; cv=none; b=uql13z7X+xXzIiYlu646JIWcKnkDlDOPyAwu7tkm/ZejwmE9ud1esGWpdc4WQn2no8qD+KVV0l8uzWcEz54CwjplhpNwv48qO6Qz+rcJc3MIQzNp24InsM0RNhoXdXruwDuTPPnDhRCmnpDGSmtbMqIl0zKvlzRcnqymn8dMqG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760413444; c=relaxed/simple;
-	bh=0K0PAhJTgGRJZpANDPQ3DTTkASQZRCvWyFV/+A4yDLM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AVKe4t6SPKc4ufsSdF6K0kGz/K6cWCYRRS/ELY3YwFq3Gz+VPHngWi66CCDd1Iuz4gI3f/aiI1Ul8AXwSr7KPMPBotd8CYg+SYHdSqeJNaSO4SH/mnCKYA2SeLqfX9kEbLs4Mz1WTzfe+siy4QWVXoG5kl5v36vHsRvoe1JqDiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BPwgeD1H; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760420101; c=relaxed/simple;
+	bh=X5WPVB8Em/gBcebUeg/HDVgnFFFK8ttMHgLzywHakA4=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=qFzThTzxYIDivtZcTbW1KntBvvXOrmNP++4/WVC5ujNMN+If8IJX2toWZGghvVHLKDCUdLe8eomN8kVm5wIgftB+BRKN8vhpTVLYxKatvcqdXmOwBQq1dsBEngmYIFAj65iwarrhHA6gm44yyy1p5lhtkBVvTOQpL/cA6RcFnAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=EMHXmtH6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ih+RDekg; arc=none smtp.client-ip=202.12.124.143
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BPwgeD1H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 949FAC4CEE7;
-	Tue, 14 Oct 2025 03:44:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760413442;
-	bh=0K0PAhJTgGRJZpANDPQ3DTTkASQZRCvWyFV/+A4yDLM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BPwgeD1HDTROX5aKEg63a5DmGmvi8K8xQ6+LHv8i47138uiJ72iRYzHcb1llwA1ci
-	 S+7X7yHjCDreI4TmR+2OA5+oNFctlf5hwbtwbvtyVoeFlwLl4Kc6VpkyE8Yzv7/xnr
-	 lZSpS9RflDO8GTop/gE9vl7Io46WppN620iax0TpfX4t+47I72lhqTncqEqlfs2LMA
-	 Ho9qNJoM4VdhFDyCZcqJimBis/CXILd/1LcgVWuIipp/vaSrgmrG2SlIegiMZV3A5m
-	 yqY6NgghKggo2gvibFzvSffGr8Ein9MvANdWlRg+FGhpOYGztvjYS1souVmQLlOt9I
-	 rWBMtaG5RmqXQ==
-Date: Mon, 13 Oct 2025 20:42:30 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
-Cc: samba-technical@lists.samba.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>
-Subject: Re: [PATCH 0/8] smb: client: More crypto library conversions
-Message-ID: <20251014034230.GC2763@sol>
-References: <20251012015738.244315-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="EMHXmtH6";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ih+RDekg"
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailflow.stl.internal (Postfix) with ESMTP id 9C94F1300216;
+	Tue, 14 Oct 2025 01:34:57 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Tue, 14 Oct 2025 01:34:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
+	1760420097; x=1760427297; bh=sKvX0cwi5L2mQqOKfWbZAQQCGUflq024x5h
+	ZczDrYtI=; b=EMHXmtH6b1fssNuWNAbg39nPBc2L6iLo9Ov6TFV9qllyxag3kQl
+	VvtR8X+4Za9g2Vw/Na+uS9UetgsfpRkZL1jz1/auc6Oy9Fq/N3API8bZzlIeqS+8
+	OjId+x1I54l5gE4nOruTpTX/eIn+DMjXL5K+xkpQQMMBYqKYZbAoJbxHVEnJCxyO
+	GuwVNtYCGxxVYsar+VUXpQgttiAqGWRjkt15aK64LQqfqxqxFr0g6wXKB/Ibf2XG
+	/cxaxnXKKVd6RVbRRMfLB3f2m4fsB0FeJxFOUSfB6WZiuqXvwmbis9V2yhheF05K
+	VmxNfUjA1k1l+mLURd+ZuZFqVsb6BMYN94A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760420097; x=
+	1760427297; bh=sKvX0cwi5L2mQqOKfWbZAQQCGUflq024x5hZczDrYtI=; b=i
+	h+RDekgtuViqOuIRe5nRpsoy76Bx+bzGVh5cBTj8/X62C0XR7TEIA2xbt2Ubxpid
+	ZHq1+y+7InziK5qe1r9LHucLnuKtgHqiO+FJDRNHoj+tR9Q3PyID4LVM/3M3ybRX
+	tIH70Tx5Za71PjvLbkA/yeToEismdKYiPPzND/ygwI7geT796CZq/6emzH7eNm4V
+	Kce1Eyi/Y3RiDRX6XMGOfP6tmK6MicTRdw6J7gWuQcQoU6VJmgQ73wKrjDyZY++8
+	u8xiIYup5XPh8TtZB2Jq/GVp2aBKUBf6LKfVQd6UoWatyJpdJXN19DN+foHp9Ekz
+	zoZtogTA7a4Db2it5V2NQ==
+X-ME-Sender: <xms:_-DtaGDSStk9-hdw2H6ZL83waWfdVJ9YX5PyZE66IpkrirSbEhiR2w>
+    <xme:_-DtaPgz524KR1bIMerhs2C7YXAmbZW4Lsj3EsWSvpJwVeGY-BzhhonTtr5xmV6Ss
+    GpABGkyA-RB0RJhi2Lq8cCoQS1KXsJC00AQOjfMWlRhV5yMIA>
+X-ME-Received: <xmr:_-DtaB2IaBnzbz1hHV5senq7g_aSWzgh3eK-gJYcQFcoiXy_Aqk709eaLtyG4VXyvm7TKsTwnzEKdhghfx2bsou0ue1yREccsDhltZNVqC4X>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduudeljeduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
+    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epleejtdefgeeukeeiteduveehudevfeffvedutefgteduhfegvdfgtdeigeeuudejnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
+    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepgeefpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
+    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
+    oheplhhinhhugidqgihfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    hlihhnuhigqdhunhhiohhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
+    oheplhhinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    hlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pehlihhnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
+    htoheplhhinhhugidqtghifhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
+    ohepvggtrhihphhtfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:_-DtaBIY-oFTdHKRTw3D8L3q4PTHVD4zpV8goGnqHXyVH0nbHG8b-g>
+    <xmx:_-DtaE2CVchSpis3kE9Qdx37fJ6LzhXT6BNt0IM3jeZVpKMoYnyecg>
+    <xmx:_-DtaL64I2eH2ZO8gGbqN6_6BowsHFpdQspB-a4TT9QeVF7PfU6YCw>
+    <xmx:_-DtaBHiAd6eRDoVhivjdRfsp-KtS_QT_guqr2aFH_bbkXfblrXRRA>
+    <xmx:AeHtaDciWRkXrzOWRd6sH4KgBlnrwJkD0ZAWHMp6JhGiQZ8mFgAE876O>
+Feedback-ID: iab3e480c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 14 Oct 2025 01:34:44 -0400 (EDT)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251012015738.244315-1-ebiggers@kernel.org>
+From: NeilBrown <neilb@ownmail.net>
+To: "Jeff Layton" <jlayton@kernel.org>
+Cc: "Miklos Szeredi" <miklos@szeredi.hu>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
+ "Chuck Lever" <chuck.lever@oracle.com>,
+ "Alexander Aring" <alex.aring@gmail.com>,
+ "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>, "Steve French" <sfrench@samba.org>,
+ "Paulo Alcantara" <pc@manguebit.org>,
+ "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
+ "Shyam Prasad N" <sprasad@microsoft.com>, "Tom Talpey" <tom@talpey.com>,
+ "Bharath SM" <bharathsm@microsoft.com>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ "Danilo Krummrich" <dakr@kernel.org>,
+ "David Howells" <dhowells@redhat.com>, "Tyler Hicks" <code@tyhicks.com>,
+ "Olga Kornievskaia" <okorniev@redhat.com>,
+ "Dai Ngo" <Dai.Ngo@oracle.com>, "Amir Goldstein" <amir73il@gmail.com>,
+ "Namjae Jeon" <linkinjeon@kernel.org>,
+ "Steve French" <smfrench@gmail.com>,
+ "Sergey Senozhatsky" <senozhatsky@chromium.org>,
+ "Carlos Maiolino" <cem@kernel.org>,
+ "Kuniyuki Iwashima" <kuniyu@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, netfs@lists.linux.dev,
+ ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+ linux-xfs@vger.kernel.org, netdev@vger.kernel.org,
+ "Jeff Layton" <jlayton@kernel.org>
+Subject:
+ Re: [PATCH 02/13] filelock: add a lm_may_setlease lease_manager callback
+In-reply-to: <20251013-dir-deleg-ro-v1-2-406780a70e5e@kernel.org>
+References: <20251013-dir-deleg-ro-v1-0-406780a70e5e@kernel.org>,
+ <20251013-dir-deleg-ro-v1-2-406780a70e5e@kernel.org>
+Date: Tue, 14 Oct 2025 16:34:43 +1100
+Message-id: <176042008301.1793333.506325387242251221@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-On Sat, Oct 11, 2025 at 06:57:30PM -0700, Eric Biggers wrote:
-> This series converts fs/smb/client/ to access SHA-512, HMAC-SHA256, MD5,
-> and HMAC-MD5 using the library APIs instead of crypto_shash.
-> 
-> This simplifies the code significantly.  It also slightly improves
-> performance, as it eliminates unnecessary overhead.
-> 
-> Tested with Samba with all SMB versions, with mfsymlinks in the mount
-> options, 'server min protocol = NT1' and 'server signing = required' in
-> smb.conf, and doing a simple file data and symlink verification test.
-> That seems to cover all the modified code paths.
-> 
-> However, with SMB 1.0 I get "CIFS: VFS: SMB signature verification
-> returned error = -13", regardless of whether this series is applied or
-> not.  Presumably, testing that case requires some other setting I
-> couldn't find.
-> 
-> Regardless, these are straightforward conversions and all the actual
-> crypto is exactly the same as before, as far as I can tell.
-> 
-> Eric Biggers (8):
->   smb: client: Use SHA-512 library for SMB3.1.1 preauth hash
->   smb: client: Use HMAC-SHA256 library for key generation
->   smb: client: Use HMAC-SHA256 library for SMB2 signature calculation
->   smb: client: Use MD5 library for M-F symlink hashing
->   smb: client: Use MD5 library for SMB1 signature calculation
->   smb: client: Use HMAC-MD5 library for NTLMv2
->   smb: client: Remove obsolete crypto_shash allocations
->   smb: client: Consolidate cmac(aes) shash allocation
+On Tue, 14 Oct 2025, Jeff Layton wrote:
+> The NFSv4.1 protocol adds support for directory delegations, but it
+> specifies that if you already have a delegation and try to request a new
+> one on the same filehandle, the server must reply that the delegation is
+> unavailable.
+>=20
+> Add a new lease manager callback to allow the lease manager (nfsd in
+> this case) to impose this extra check when performing a setlease.
+>=20
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+>  fs/locks.c               |  5 +++++
+>  include/linux/filelock.h | 14 ++++++++++++++
+>  2 files changed, 19 insertions(+)
+>=20
+> diff --git a/fs/locks.c b/fs/locks.c
+> index 0b16921fb52e602ea2e0c3de39d9d772af98ba7d..9e366b13674538dbf482ffdeee9=
+2fc717733ee20 100644
+> --- a/fs/locks.c
+> +++ b/fs/locks.c
+> @@ -1826,6 +1826,11 @@ generic_add_lease(struct file *filp, int arg, struct=
+ file_lease **flp, void **pr
+>  			continue;
+>  		}
+> =20
+> +		/* Allow the lease manager to veto the setlease */
+> +		if (lease->fl_lmops->lm_may_setlease &&
+> +		    !lease->fl_lmops->lm_may_setlease(lease, fl))
+> +			goto out;
+> +
 
-As requested off-list, here are some (micro)benchmark results for this
-series.  The CPU was AMD Ryzen 9 9950X.  The server was Samba running on
-localhost.  Message signing was enabled.  A valid username and password
-were given in the mount options.  The "Improvement" column is the
-percent change in throughput (reciprocal cycles):
+I don't see any locking around this.  What if the condition which
+triggers a veto happens after this check, and before the lm_change
+below?
+Should lm_change implement the veto?  Return -EAGAIN?
 
-           Microbenchmark               Before      After   Improvement
-           ==============               ======      =====   ===========
+NeilBrown
 
-    1. Total cycles spent in             44548      20081      122%
-    smb311_update_preauth_hash()
-    during SMB 3.1.1 mount
-    (4 calls total)
 
-    2. setup_ntlmv2_rsp() cycles         31777      22231       43%
+>  		/*
+>  		 * No exclusive leases if someone else has a lease on
+>  		 * this file:
+> diff --git a/include/linux/filelock.h b/include/linux/filelock.h
+> index c2ce8ba05d068b451ecf8f513b7e532819a29944..70079beddf61aa32ef01f1114cf=
+0cb3ffaf2131a 100644
+> --- a/include/linux/filelock.h
+> +++ b/include/linux/filelock.h
+> @@ -49,6 +49,20 @@ struct lease_manager_operations {
+>  	int (*lm_change)(struct file_lease *, int, struct list_head *);
+>  	void (*lm_setup)(struct file_lease *, void **);
+>  	bool (*lm_breaker_owns_lease)(struct file_lease *);
+> +
+> +	/**
+> +	 * lm_may_setlease - extra conditions for setlease
+> +	 * @new: new file_lease being set
+> +	 * @old: old (extant) file_lease
+> +	 *
+> +	 * This allows the lease manager to add extra conditions when
+> +	 * setting a lease, based on the presence of an existing lease.
+> +	 *
+> +	 * Return values:
+> +	 *   %false: @new and @old conflict
+> +	 *   %true: No conflict detected
+> +	 */
+> +	bool (*lm_may_setlease)(struct file_lease *new, struct file_lease *old);
+>  };
+> =20
+>  struct lock_manager {
+>=20
+> --=20
+> 2.51.0
+>=20
+>=20
 
-    3. Total cycles spent in             17802      22876      -22%
-    generate_key()
-    during SMB 3.1.1 mount
-    (3 calls total)
-
-    4. Total cycles spent in            205110      87204      135%
-    smb2_calc_signature()
-    during SMB 2.0 mount
-    (26 calls & 3316 bytes total)
-
-    5. Total cycles spent in          22689767   21043125        8%
-    smb2_calc_signature()
-    reading 10MB file using SMB 2.0
-    (316 calls & 10031077 bytes total)
-
-    6. Total cycles spent in             56803      37840       50%
-    cifs_calc_signature()
-    during SMB 1.0 mount
-    (18 calls & 1551 bytes total)
-
-    7. Total cycles spent in          52669066   51974573        1%
-    cifs_calc_signature()
-    reading 10MB file using SMB 1.0
-    (336 calls & 10021426 bytes total)
-
-    8. parse_mf_symlink() cycles          7654       4902       56%
-
-Note: case 3 regressed because the "cmac(aes)" allocation moved from
-smb311_update_preauth_hash (case 1) to generate_key (case 3).  Excluding
-that allocation, generate_key got faster.  Likewise, the sum of cases 1,
-2, and 3 (which all occurred at mount time) got faster.
-
-There was a greater speedup in signature calculation than I expected.
-It's probably because many SMB messages are short (especially the ones
-exchanged at mount time), and also because the old code allocated new
-crypto_shash objects more frequently than I had thought.  The SMB 2.0
-code allocated a new "hmac(sha256)" crypto_shash for every other message
-signed.  That overhead is all gone after switching to the library.
-
-TLDR: all SMB crypto calculations (SHA-512, HMAC-SHA256, MD5, HMAC-MD5)
-affected by this series are faster now.  The library APIs fix the
-unnecessary overhead that the traditional crypto API has.  Of course,
-it's also a lot easier to use as well.
-
-- Eric
