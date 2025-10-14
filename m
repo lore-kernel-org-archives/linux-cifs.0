@@ -1,267 +1,140 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2D530C605;
-	Mon, 13 Oct 2025 20:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777FF3074AA;
+	Tue, 14 Oct 2025 03:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760387607; cv=none; b=M8DIpmkcnQbsZY+Lmh56WsFWhh8L9uv78AWQ0VllGNr5yVcCPNtHgksBbvTyHKZwqg94J+CvTK9m7HPM181VyOqkf7BES/NFlh1oyA61ON3UlGLnd1fuCntpStm1ogLTv+9qqbxQfwN3XMWXxyzupH9+1Xg5rXNMIlufCQfzHpg=
+	t=1760413444; cv=none; b=VZ6QgcbzhWwIykeEX08CreoytY7BpN39CEjvTNKXEA/XQjJ1nVOtQOp1I5xsOveJzejvrtGwlWpH3OSJ01hUuhuOebiFnMfYa0NRcWcagNF0KVYozMf2dlVU4un4IqY5V9UMZwved77885IuaSnZU0EOHe74OHwluvtBOBF6FWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760387607; c=relaxed/simple;
-	bh=7AKYyDo9YRgfWjkjqDCsr+AI5gn+xU6nxrB2mhKrsmQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BVNEPc/9yBqVYwfKA4hJSvvJUM1eGUFvx7hw1cV+5ispTEe/pY7WBT2FJYWszLs2oXRjo/sFhxDioZvwx3uS9SUW/rF35Eq4pKW9hm9EhJxv0t4NnraOlsGDhiDSGDoIEZ5M0+xVWhjOy0GjvGEwY2Qu63Ki/UUBTrRT2FufxX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DKswOP3J; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760413444; c=relaxed/simple;
+	bh=0K0PAhJTgGRJZpANDPQ3DTTkASQZRCvWyFV/+A4yDLM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AVKe4t6SPKc4ufsSdF6K0kGz/K6cWCYRRS/ELY3YwFq3Gz+VPHngWi66CCDd1Iuz4gI3f/aiI1Ul8AXwSr7KPMPBotd8CYg+SYHdSqeJNaSO4SH/mnCKYA2SeLqfX9kEbLs4Mz1WTzfe+siy4QWVXoG5kl5v36vHsRvoe1JqDiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BPwgeD1H; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DKswOP3J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9EE8C4CEE7;
-	Mon, 13 Oct 2025 20:33:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BPwgeD1H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 949FAC4CEE7;
+	Tue, 14 Oct 2025 03:44:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760387607;
-	bh=7AKYyDo9YRgfWjkjqDCsr+AI5gn+xU6nxrB2mhKrsmQ=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=DKswOP3J8KzmwjB6+tH1MMhzGvvpE8+q92VjjxZkb96+E516W8xA7OrNtnBwwy//5
-	 18zobh8/DhxMT753geoFpyUsyo3ycP8SEih6FhDAl0RzJUC0Cu9MWKgZdqdtrZ9Axe
-	 1E/3myAM34j3ZUXGc6gXHEzyO8qaWJyW4s898JKqPHTWIjp8MJIvu/HBUsBfVSVosz
-	 9yBkJKfmmtYADA3aLJtWhpPirpuyKsdnPYOukwMPW5qYoLRjFNh0z1nLc24MkyHbof
-	 x13XGa/d4ccZvJMw0onY3D1PGn8vLUTRbT7Thv95JiYizOWN+yV0nYCXy1qoR1DX7g
-	 UdEAn6CZUpLBQ==
-Message-ID: <4c582926e3996a6582e29fd4e51e926fb9d2c537.camel@kernel.org>
-Subject: Re: [PATCH 07/13] vfs: make vfs_create break delegations on parent
- directory
-From: Jeff Layton <jlayton@kernel.org>
-To: Miklos Szeredi <miklos@szeredi.hu>, Alexander Viro
- <viro@zeniv.linux.org.uk>,  Christian Brauner	 <brauner@kernel.org>, Jan
- Kara <jack@suse.cz>, Chuck Lever	 <chuck.lever@oracle.com>, Alexander Aring
- <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, Anna
- Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>,  Paulo
- Alcantara	 <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N	 <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Bharath SM	 <bharathsm@microsoft.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>,  "Rafael J. Wysocki"	 <rafael@kernel.org>,
- Danilo Krummrich <dakr@kernel.org>, David Howells	 <dhowells@redhat.com>,
- Tyler Hicks <code@tyhicks.com>, NeilBrown <neil@brown.name>,  Olga
- Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Amir
- Goldstein <amir73il@gmail.com>, Namjae Jeon	 <linkinjeon@kernel.org>, Steve
- French <smfrench@gmail.com>, Sergey Senozhatsky	
- <senozhatsky@chromium.org>, Carlos Maiolino <cem@kernel.org>, Kuniyuki
- Iwashima	 <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet	 <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni	 <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, netfs@lists.linux.dev,
- ecryptfs@vger.kernel.org, 	linux-unionfs@vger.kernel.org,
- linux-xfs@vger.kernel.org, netdev@vger.kernel.org
-Date: Mon, 13 Oct 2025 16:33:22 -0400
-In-Reply-To: <20251013-dir-deleg-ro-v1-7-406780a70e5e@kernel.org>
-References: <20251013-dir-deleg-ro-v1-0-406780a70e5e@kernel.org>
-	 <20251013-dir-deleg-ro-v1-7-406780a70e5e@kernel.org>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	s=k20201202; t=1760413442;
+	bh=0K0PAhJTgGRJZpANDPQ3DTTkASQZRCvWyFV/+A4yDLM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BPwgeD1HDTROX5aKEg63a5DmGmvi8K8xQ6+LHv8i47138uiJ72iRYzHcb1llwA1ci
+	 S+7X7yHjCDreI4TmR+2OA5+oNFctlf5hwbtwbvtyVoeFlwLl4Kc6VpkyE8Yzv7/xnr
+	 lZSpS9RflDO8GTop/gE9vl7Io46WppN620iax0TpfX4t+47I72lhqTncqEqlfs2LMA
+	 Ho9qNJoM4VdhFDyCZcqJimBis/CXILd/1LcgVWuIipp/vaSrgmrG2SlIegiMZV3A5m
+	 yqY6NgghKggo2gvibFzvSffGr8Ein9MvANdWlRg+FGhpOYGztvjYS1souVmQLlOt9I
+	 rWBMtaG5RmqXQ==
+Date: Mon, 13 Oct 2025 20:42:30 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
+Cc: samba-technical@lists.samba.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>
+Subject: Re: [PATCH 0/8] smb: client: More crypto library conversions
+Message-ID: <20251014034230.GC2763@sol>
+References: <20251012015738.244315-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251012015738.244315-1-ebiggers@kernel.org>
 
-On Mon, 2025-10-13 at 10:48 -0400, Jeff Layton wrote:
-> In order to add directory delegation support, we need to break
-> delegations on the parent whenever there is going to be a change in the
-> directory.
->=20
-> Rename vfs_create as __vfs_create, make it static, and add a new
-> delegated_inode parameter. Fix do_mknodat to call __vfs_create and wait
-> for a delegation break if there is one. Add a new exported vfs_create
-> wrapper that passes in NULL for delegated_inode.
->=20
+On Sat, Oct 11, 2025 at 06:57:30PM -0700, Eric Biggers wrote:
+> This series converts fs/smb/client/ to access SHA-512, HMAC-SHA256, MD5,
+> and HMAC-MD5 using the library APIs instead of crypto_shash.
+> 
+> This simplifies the code significantly.  It also slightly improves
+> performance, as it eliminates unnecessary overhead.
+> 
+> Tested with Samba with all SMB versions, with mfsymlinks in the mount
+> options, 'server min protocol = NT1' and 'server signing = required' in
+> smb.conf, and doing a simple file data and symlink verification test.
+> That seems to cover all the modified code paths.
+> 
+> However, with SMB 1.0 I get "CIFS: VFS: SMB signature verification
+> returned error = -13", regardless of whether this series is applied or
+> not.  Presumably, testing that case requires some other setting I
+> couldn't find.
+> 
+> Regardless, these are straightforward conversions and all the actual
+> crypto is exactly the same as before, as far as I can tell.
+> 
+> Eric Biggers (8):
+>   smb: client: Use SHA-512 library for SMB3.1.1 preauth hash
+>   smb: client: Use HMAC-SHA256 library for key generation
+>   smb: client: Use HMAC-SHA256 library for SMB2 signature calculation
+>   smb: client: Use MD5 library for M-F symlink hashing
+>   smb: client: Use MD5 library for SMB1 signature calculation
+>   smb: client: Use HMAC-MD5 library for NTLMv2
+>   smb: client: Remove obsolete crypto_shash allocations
+>   smb: client: Consolidate cmac(aes) shash allocation
 
-My apologies. I meant to change this to just add the extra parameter to
-vfs_create() without all of the wrapper nonsense. I'll plan to re-post
-at least once more, but I'll wait a bit in case there are other changes
-needed.
+As requested off-list, here are some (micro)benchmark results for this
+series.  The CPU was AMD Ryzen 9 9950X.  The server was Samba running on
+localhost.  Message signing was enabled.  A valid username and password
+were given in the mount options.  The "Improvement" column is the
+percent change in throughput (reciprocal cycles):
 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  fs/namei.c | 55 ++++++++++++++++++++++++++++++++++++-------------------
->  1 file changed, 36 insertions(+), 19 deletions(-)
->=20
-> diff --git a/fs/namei.c b/fs/namei.c
-> index 786f42bd184b5dbf6d754fa1fb6c94c0f75429f2..1427c53e13978e70adefdc572=
-b71247536985430 100644
-> --- a/fs/namei.c
-> +++ b/fs/namei.c
-> @@ -3458,6 +3458,32 @@ static inline umode_t vfs_prepare_mode(struct mnt_=
-idmap *idmap,
->  	return mode;
->  }
-> =20
-> +static int __vfs_create(struct mnt_idmap *idmap, struct inode *dir,
-> +			struct dentry *dentry, umode_t mode, bool want_excl,
-> +			struct inode **delegated_inode)
-> +{
-> +	int error;
-> +
-> +	error =3D may_create(idmap, dir, dentry);
-> +	if (error)
-> +		return error;
-> +
-> +	if (!dir->i_op->create)
-> +		return -EACCES;	/* shouldn't it be ENOSYS? */
-> +
-> +	mode =3D vfs_prepare_mode(idmap, dir, mode, S_IALLUGO, S_IFREG);
-> +	error =3D security_inode_create(dir, dentry, mode);
-> +	if (error)
-> +		return error;
-> +	error =3D try_break_deleg(dir, delegated_inode);
-> +	if (error)
-> +		return error;
-> +	error =3D dir->i_op->create(idmap, dir, dentry, mode, want_excl);
-> +	if (!error)
-> +		fsnotify_create(dir, dentry);
-> +	return error;
-> +}
-> +
->  /**
->   * vfs_create - create new file
->   * @idmap:	idmap of the mount the inode was found from
-> @@ -3477,23 +3503,7 @@ static inline umode_t vfs_prepare_mode(struct mnt_=
-idmap *idmap,
->  int vfs_create(struct mnt_idmap *idmap, struct inode *dir,
->  	       struct dentry *dentry, umode_t mode, bool want_excl)
->  {
-> -	int error;
-> -
-> -	error =3D may_create(idmap, dir, dentry);
-> -	if (error)
-> -		return error;
-> -
-> -	if (!dir->i_op->create)
-> -		return -EACCES;	/* shouldn't it be ENOSYS? */
-> -
-> -	mode =3D vfs_prepare_mode(idmap, dir, mode, S_IALLUGO, S_IFREG);
-> -	error =3D security_inode_create(dir, dentry, mode);
-> -	if (error)
-> -		return error;
-> -	error =3D dir->i_op->create(idmap, dir, dentry, mode, want_excl);
-> -	if (!error)
-> -		fsnotify_create(dir, dentry);
-> -	return error;
-> +	return __vfs_create(idmap, dir, dentry, mode, want_excl, NULL);
->  }
->  EXPORT_SYMBOL(vfs_create);
-> =20
-> @@ -4365,6 +4375,7 @@ static int do_mknodat(int dfd, struct filename *nam=
-e, umode_t mode,
->  	struct path path;
->  	int error;
->  	unsigned int lookup_flags =3D 0;
-> +	struct inode *delegated_inode =3D NULL;
-> =20
->  	error =3D may_mknod(mode);
->  	if (error)
-> @@ -4383,8 +4394,9 @@ static int do_mknodat(int dfd, struct filename *nam=
-e, umode_t mode,
->  	idmap =3D mnt_idmap(path.mnt);
->  	switch (mode & S_IFMT) {
->  		case 0: case S_IFREG:
-> -			error =3D vfs_create(idmap, path.dentry->d_inode,
-> -					   dentry, mode, true);
-> +			error =3D __vfs_create(idmap, path.dentry->d_inode,
-> +					     dentry, mode, true,
-> +					     &delegated_inode);
->  			if (!error)
->  				security_path_post_mknod(idmap, dentry);
->  			break;
-> @@ -4399,6 +4411,11 @@ static int do_mknodat(int dfd, struct filename *na=
-me, umode_t mode,
->  	}
->  out2:
->  	end_creating_path(&path, dentry);
-> +	if (delegated_inode) {
-> +		error =3D break_deleg_wait(&delegated_inode);
-> +		if (!error)
-> +			goto retry;
-> +	}
->  	if (retry_estale(error, lookup_flags)) {
->  		lookup_flags |=3D LOOKUP_REVAL;
->  		goto retry;
+           Microbenchmark               Before      After   Improvement
+           ==============               ======      =====   ===========
 
---=20
-Jeff Layton <jlayton@kernel.org>
+    1. Total cycles spent in             44548      20081      122%
+    smb311_update_preauth_hash()
+    during SMB 3.1.1 mount
+    (4 calls total)
+
+    2. setup_ntlmv2_rsp() cycles         31777      22231       43%
+
+    3. Total cycles spent in             17802      22876      -22%
+    generate_key()
+    during SMB 3.1.1 mount
+    (3 calls total)
+
+    4. Total cycles spent in            205110      87204      135%
+    smb2_calc_signature()
+    during SMB 2.0 mount
+    (26 calls & 3316 bytes total)
+
+    5. Total cycles spent in          22689767   21043125        8%
+    smb2_calc_signature()
+    reading 10MB file using SMB 2.0
+    (316 calls & 10031077 bytes total)
+
+    6. Total cycles spent in             56803      37840       50%
+    cifs_calc_signature()
+    during SMB 1.0 mount
+    (18 calls & 1551 bytes total)
+
+    7. Total cycles spent in          52669066   51974573        1%
+    cifs_calc_signature()
+    reading 10MB file using SMB 1.0
+    (336 calls & 10021426 bytes total)
+
+    8. parse_mf_symlink() cycles          7654       4902       56%
+
+Note: case 3 regressed because the "cmac(aes)" allocation moved from
+smb311_update_preauth_hash (case 1) to generate_key (case 3).  Excluding
+that allocation, generate_key got faster.  Likewise, the sum of cases 1,
+2, and 3 (which all occurred at mount time) got faster.
+
+There was a greater speedup in signature calculation than I expected.
+It's probably because many SMB messages are short (especially the ones
+exchanged at mount time), and also because the old code allocated new
+crypto_shash objects more frequently than I had thought.  The SMB 2.0
+code allocated a new "hmac(sha256)" crypto_shash for every other message
+signed.  That overhead is all gone after switching to the library.
+
+TLDR: all SMB crypto calculations (SHA-512, HMAC-SHA256, MD5, HMAC-MD5)
+affected by this series are faster now.  The library APIs fix the
+unnecessary overhead that the traditional crypto API has.  Of course,
+it's also a lot easier to use as well.
+
+- Eric
