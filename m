@@ -1,123 +1,78 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7362517AA
-	for <linux-cifs@vger.kernel.org>; Wed, 15 Oct 2025 18:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25524A21
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Oct 2025 01:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760551853; cv=none; b=mdDM9SYwEwTKn+vKUY2Q9CQBeyxU4CA/FjWHuzyjSlvotMGIfhZUtjEXyu4e+n56gfbMA/7SSrGdOTwyJRdZV3PsvzWfiGuPd4vyjiEIsZelZylfveHMh0Tj87APTj8XV9nkvpUZ8I+Nyt7aSBFRReVufZng8t1jcA+4REZhGNw=
+	t=1760578784; cv=none; b=R4LcKiBJ3NIWLPio1QGsaYjDyhZYa4NHxoh/BjLTEGA+KvOMGi4hEg9KP6L3jO6ByvCfx4foX9HsGezNCT2JDo3RXfsib+YgTHPDsZGreDMx62TxRqbY67bMIfsciZtqzY9l1m+nF7ASEFQy4QEIbVFYNf9V9kQqPk42KrW1H3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760551853; c=relaxed/simple;
-	bh=A1Yp6U35cANnY8G27X9QHKs7ZC1uiK/VGWHHtWeVu8E=;
+	s=arc-20240116; t=1760578784; c=relaxed/simple;
+	bh=NhXpNt5UXUXiz5jBvZva67jJz20jfIcaD8d1CiGWqnE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EctuNJ9P2+NDIsMWtwEwyY3P2FWrtTxW/luSm7CaAXKavoaQ4mbmsLRtVlUnwhcRzDy7e139tOptuk4cUBmGVK3fxyCDYImMHHOltTIgBBXdZOUR8UMbOho+JN4XsUoecYuwwOdEBfisE5ghcAHYv/uwJ3CGIGLxkOhoRN90bW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A6iYrQ72; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=m1cV5/zC2aISJ+LUuo+z+AswH6rznqP12+mRgFDfvxtvEKy75GTLNLW3qd9KkJdcHU9UzTTBctJURO8x41DskNNrs9PGfaXHFSBGA54VlwZX6OI7+ma6FQZVqWUrPwo3qmFMakxRKoMZJihqcw0G+8KzQzbVgvoSsUlzWiwYbug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ehR4mtxZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6iYrQ72"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-796fe71deecso80048106d6.1
-        for <linux-cifs@vger.kernel.org>; Wed, 15 Oct 2025 11:10:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760551850; x=1761156650; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nqA7k4UVVoz1WmvKpqEl1VWC0k/EIByv+fhLJjtIG9s=;
-        b=A6iYrQ72i70wKcH+lwKdRv0LQ53a3isLZ679z7DbNBds4diWJX4Zpkh5ySfsfOLhMY
-         lNT2EJBpGU2OGNi0mW4xqbmIv8NqfYwRVokPd1MF0b5RayS2rgo+jZEYoS8DzT62rZQs
-         lwj38Iu1WNRlNUUYRzorQdphahmLEOPXXBiNcMj17PBpvlBHMk1se4q/WaZbrfVEq6li
-         R/Vfg571qRjD3e+aQlMJgyTfRREOHmvcUimk6QZShneN59a8J88SkYTIgKNEurDPhaP1
-         DzS+ySXUycFjNafnHGDbQU/BWWzV+/Jo8LKbxnvvFO/oAXCkVhBtm8QMpAmqWM7SgEIP
-         h3zQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760551851; x=1761156651;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nqA7k4UVVoz1WmvKpqEl1VWC0k/EIByv+fhLJjtIG9s=;
-        b=LyOwdN80fIPQy7IGzL3u3coHJQadRPhFPJyu2i+/buwZrCrF3fkfktO8stnFtz5PI7
-         tokNQIo3lz/NwqnnhAs7x8laLcqvBLlQewHLBeWUz3Fd9aakUpmsOO0AL/Em92Y1hjj8
-         zfzDkNEVZlpeSydHfpcMLfc9aIUU8JFGlBGq4+yDCjl9LWofmWNmZebr8LxfZRzflYOi
-         AjoJkM/do+Is4x44s3VA53i/jQBa5pBvyvjYmGus5EuwWzAxiRnsUeQIpaaRCPhREAeb
-         9MeJRbj+KqJGRQgH0jQAaoRtBkXUz6ShoYH8eCa6utCs+8N7yNPypNCNMecfVKYzlFQj
-         UlQg==
-X-Forwarded-Encrypted: i=1; AJvYcCWcmSowIFEBBihHXVMnCXVnnDGaOoRme+WY++fOTbAwxAekC+Fx0pBLxGW0TH5itTIPHYD5Cid/lA8y@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIFG3ICZEuGgBDP+JtU3qdTv3zpCqzb1K/kR2qBeUuNp+tgnZt
-	Z3JXlkEvhh2VCUlmhB/QiAY7u3/SVT29D1//hDzSVSLngYQ+NDafkvnNKV0lny+Asgp2pYuYFds
-	DTV+WUEGx37e0uhmc8OGlFHcKFQbsLxU=
-X-Gm-Gg: ASbGncsxckpG+JHYFMVW1gj5aIZAPajkOWH4O0c8ijK2CfMrdZPf4pG4m+uNwf416RE
-	tjAqwdAwPZE7itAoLpHRQh5ZlVmwqoBhg/T7ZPbuNsRLwA8K2le2bPqHzziuCowOShCOOjtQWaH
-	P+6B/yXmPBxMyvhACwGcq2BwiOb1nsZDZwGzjPo/Etw9K9UbpwdTXONokFBIVGpWdyqRckjlwml
-	rPJaV3shauDtEkblx0xDWyMKH2uKPgr3uXcJEcsUComR0TZ1XxvJUXMwMcWzVR3R4LXHidjqe+W
-	DOJr5QIdKe/4D6TjaK/OfdvVnJLK3jGa57kspA4pZ/GEPcqVrS+hM1A4EWi3fA5gzDI5f6rD90N
-	rdXhWTXpDilCmgLvlVhWHoiXo8Mkaw0RVIY52hfVV
-X-Google-Smtp-Source: AGHT+IHninkPESQS8dHVL1fQL53uOsfSc1mur/cEdxDh3bmiIBfWuhMXmHWs7FOB1Mg5kel/vGkCWetRJzQIDq/GUh0=
-X-Received: by 2002:ad4:5945:0:b0:78e:c8a6:e891 with SMTP id
- 6a1803df08f44-87b2103f5c0mr366857086d6.24.1760551850329; Wed, 15 Oct 2025
- 11:10:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ehR4mtxZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 323B6C4AF09
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Oct 2025 01:39:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760578783;
+	bh=NhXpNt5UXUXiz5jBvZva67jJz20jfIcaD8d1CiGWqnE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=ehR4mtxZpG1HtChuZG0ohdH4pnl84kRn0mCw9JtZq/csxlFhXIJFvHzsN/kXkjjWI
+	 PxWERL6D8BLhYCmnN+W7ve2qwHm8eDHy6liyFH8kbGLTfJruUO57GPdm/I3sxwgNZf
+	 7sdpZkWd8xQ4tc8m4PKclyO5iJ57Kya8xDY2EG76iNkeQlsgnhWV/pKZwCMs1wfgpg
+	 z6Neh7XgsjmjnVt7WXB0AzOIcwVrD2DbYT6Zxf6zxozuhmHpqovuOJ2nqeNYQsLx0u
+	 2j27TErBU3/vybHGhQ6rbQaj+95pT4q5+Uel6lA804gs2cgQEjgaN+MLzeQ7HdYt67
+	 ZHT6fKaOLhvyQ==
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b5e19810703so23621066b.2
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Oct 2025 18:39:43 -0700 (PDT)
+X-Gm-Message-State: AOJu0YwNDZSe2cJcr4o/iZxqo6dA2fa9dvGCqth48ACQcQ5XN0wIh8EN
+	pJtAIVGJQsTAAYDNWkQAr+eNCK0kXB0XGlSFrhmIURqROAgiSkVvc+mLx5sehk6gIndGxasZ4Co
+	h4F814Xg8LQzLlPcmcQcg7IIVMpuGrYs=
+X-Google-Smtp-Source: AGHT+IFkuj2gn7j4EKFSb8mXxfaPao6rWf4LSgGhFV/1DY7kYAtV9Z2dgD6/f3T5VanUmKryMjD3HNMvXh6rn8NDpWk=
+X-Received: by 2002:a17:907:80a:b0:b48:6b19:e65c with SMTP id
+ a640c23a62f3a-b50aba9d735mr3027700166b.42.1760578781745; Wed, 15 Oct 2025
+ 18:39:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aOzRF9JB9VkBKapw@osx.local> <6599bf31-1099-426d-a8e5-902c3d98e032@web.de>
- <aO/DLq/OtAjvkgcY@chcpu18> <6eeec2b6-ef28-4280-a854-cc22d2df55ed@web.de>
-In-Reply-To: <6eeec2b6-ef28-4280-a854-cc22d2df55ed@web.de>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 15 Oct 2025 13:10:38 -0500
-X-Gm-Features: AS18NWBfaSIxv2RDHlnpAQo8uwRpyrQ2N8ndjpwz_0K_rEufX1VnmPESyUOVHfY
-Message-ID: <CAH2r5mvg2Ask8SXOQArDLnKOjHHSPKGwuHkYp9NuuzEqYcZNEQ@mail.gmail.com>
-Subject: Re: [PATCH] smb: Fix refcount leak for cifs_sb_tlink
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Shuhao Fu <sfual@cse.ust.hk>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, Bharath SM <bharathsm@microsoft.com>, 
-	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Steve French <sfrench@samba.org>, Tom Talpey <tom@talpey.com>, 
-	LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+References: <20251015150527.1109622-1-metze@samba.org>
+In-Reply-To: <20251015150527.1109622-1-metze@samba.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 16 Oct 2025 10:39:29 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-qN17m=CCnyUksiZZD0F7221kFh9xpV0FhRk8hSQiNgQ@mail.gmail.com>
+X-Gm-Features: AS18NWCrRIOBjY9SmWEj0Dw7rfBTOpn4PjO_y6WdvXCqZgpA9Y4_1st5Jo8ZUec
+Message-ID: <CAKYAXd-qN17m=CCnyUksiZZD0F7221kFh9xpV0FhRk8hSQiNgQ@mail.gmail.com>
+Subject: Re: [PATCH] smb: server: let free_transport() wait for SMBDIRECT_SOCKET_DISCONNECTED
+To: Stefan Metzmacher <metze@samba.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-I agree that "callsites" is incorrect, it should be "calls" e.g. but
-the others are very minor and I think the existing wording is fine for
-the others
-
-On Wed, Oct 15, 2025 at 11:25=E2=80=AFAM Markus Elfring <Markus.Elfring@web=
-.de> wrote:
+On Thu, Oct 16, 2025 at 12:05=E2=80=AFAM Stefan Metzmacher <metze@samba.org=
+> wrote:
 >
-> > Fix three refcount inconsistency issues related to `cifs_sb_tlink`.
+> We should wait for the rdma_cm to become SMBDIRECT_SOCKET_DISCONNECTED!
 >
-> I suggest to omit this introduction.
+> At least on the client side (with similar code)
+> wait_event_interruptible() often returns with -ERESTARTSYS instead of
+> waiting for SMBDIRECT_SOCKET_DISCONNECTED.
+> We should use wait_event() here too, which makes the code be identical
+> in client and server, which will help when moving to common functions.
 >
->
-> > Comments for `cifs_sb_tlink` state that `cifs_put_tlink()` needs to be
->
->                              ()?
->
->
-> > called after successful calls to `cifs_sb_tlink`. Three callsites fail
->
->                                                           call sites?
->
->
-> > to update refcount accordingly, leading to possible resource leaks.
->
-> * Do we prefer the term =E2=80=9Creference count=E2=80=9D?
->
-> * Is the word =E2=80=9Cpossible=E2=80=9D really relevant here?
->   (Would you find corresponding case distinctions more helpful?)
->
-> * How do you think about to increase the application of scope-based resou=
-rce management?
->
->
-> Regards,
-> Markus
-
-
-
---=20
-Thanks,
-
-Steve
+> Fixes: b31606097de8 ("smb: server: move smb_direct_disconnect_rdma_work()=
+ into free_transport()")
+> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: Steve French <smfrench@gmail.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: linux-cifs@vger.kernel.org
+> Cc: samba-technical@lists.samba.org
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Applied it to #ksmbd-for-next-next.
+Thanks!
