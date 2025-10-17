@@ -1,45 +1,46 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CB62D7394
-	for <linux-cifs@vger.kernel.org>; Fri, 17 Oct 2025 08:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FD92D6E71
+	for <linux-cifs@vger.kernel.org>; Fri, 17 Oct 2025 09:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760690875; cv=none; b=W7vLYjLAB7ooP2gZ+EeDYqyFORqGSjPcIyWIVVUfqAtL9ad11jfb/tcWTtf4rYtnm0+3IVcZhxWODQkRRTITgwEyZlACqqIJ4TD5K1zU4vjtgd0s8NhCl6xW8nNOAuJw9dOns6u2kg7E/B0wo/gIfpO5F1m7gBF5eZ+5iodnJXY=
+	t=1760694927; cv=none; b=n9h9BqsG5xYW2QM+txpY6cK+jPg1bLrW8Tux6ZHf0c1te5+F9eOLyvqPuIrGh7DbVg3MrJX6n0MS6FBSXGlawIrVkIRVHzdoFKvjbTGY2GTkmBk65ZPNLYCWy5pQxRQ9jCg61NDpQfiUzPFfhpITmzWziXpgdcyc0L+lElRKrPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760690875; c=relaxed/simple;
-	bh=Smwkl3d6C9d5R43QKpDslC7vUv+Zi3b+/WBFLL5/d4A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q5oLJiX0NVLOEf7QRuBaXioEZuC4RmRUL3uPAwNQCGIys4RLgXDSaUUq79B+2q8Kbo8Um9+agcz/obV02YuGz5AIehnsPXbz7ZqndGtdjXn7kqR04YPNzoLp8QMsVP9AGUiQrNwAqDcWi9E3YJ3niT9zBYrnxFs+Lc+qONuBcFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=koLMRnxk; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1760694927; c=relaxed/simple;
+	bh=7FO44JT2Qm+OqXyTOezndnsREp7zjft0V5TOPtEO2Q0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BFI5pyj+Mpyqi2Hnm7qY/PPix3XS32VXG/9PvTGwqMu90EOcUcCkwOvTBeGqh+uZo2VxbEpPceqVqem+KuWo6Sl1BmcaPW/XAWwcDwpqXSrJIYPRS/HtCBS1FpG344Le3N8LCgavSimY5MKIOBKiscreYCIm8T6yWsMshX0ABQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=dgc2wzZk; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="koLMRnxk"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760690871;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eQckkc68Kr1WClPbN+XkVmK2MPKAUeYvLWYVQK2kNuU=;
-	b=koLMRnxkrMt6jAOBgk/S4xdtIwWvyLCBjslANTg11vVCTqT9sDApGmnDDltqD7JexGfDhU
-	sNKVKjlaLyfJGLILWBqy5pNU4QrcwH5Zu6393y1cgdiVjoIoeLC5MhZ4j7VgOFeXxacnke
-	2u8NtiiKFNK5Y/MruFlNmJmFUtifwL8=
-From: chenxiaosong.chenxiaosong@linux.dev
-To: sfrench@samba.org,
-	smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	linkinjeon@samba.org
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 6/6] smb/server: update some misguided comment of smb2_0_server_cmds proc
-Date: Fri, 17 Oct 2025 16:46:10 +0800
-Message-ID: <20251017084610.3085644-7-chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251017084610.3085644-1-chenxiaosong.chenxiaosong@linux.dev>
-References: <20251017084610.3085644-1-chenxiaosong.chenxiaosong@linux.dev>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="dgc2wzZk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=5AWviQ4GrXO7mRCVMAFeRXYi/zv1elrrXNg4LPr23rU=; b=dgc2wzZkSXmMM8V5gFnOxpxGMz
+	I3ifo4mmYr0Qv4U0Oe2wAI41vpb9dIOVSECHXqbcH6d0sOqqI0tjpFlbuSOGZe1/hFW5APAVa5QWw
+	+Y2LLlFiQlSzHEjepfQbEzSN8rxjkOa3P2TawPWnDTKmyeMkxJZ2tho/0HTCXJQ4rEWlsPzVlsqaB
+	ZcqVdB/9h1HYYslPzqkkoD+M0G2sp0EL13T0h2OTaTDlhr7WWMxcDlr/6daoyls+akFDAQRQPVmxA
+	fdr4qz91caLIZOWYyS09Mr+r+tn1KTg2WEdETvv3v558D2c/Copt4HQZY+KZeJ82h/I8R+5FRNphm
+	fUfMpmYBArE/CvklpNTqc6fwPR+MtLk2LDWRNgT+30jGBIWulC3EOYf9Tn8wEOPff06eogtr5UIyr
+	brGvsrLquEdEAan432R97wIopObF+RT9gSZ9SjJfYx/a04ehaX5WkGvd1QhfKtjXjc6KfiO37rwnY
+	aAfMFs+c55+YHxu94ArjtxCt;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1v9hBB-009irG-1E;
+	Fri, 17 Oct 2025 09:55:21 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>
+Subject: [PATCH v5] smb: server: allocate enough space for RW WRs and ib_drain_qp()
+Date: Fri, 17 Oct 2025 11:55:02 +0200
+Message-ID: <20251017095502.1532414-1-metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -47,57 +48,412 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Make use of rdma_rw_mr_factor() to calculate the number of rw
+credits and the number of pages per RDMA RW operation.
 
-These functions return error code rather than always returning 0.
+We get the same numbers for iWarp connections, tested
+with siw.ko and irdma.ko (in iWarp mode).
 
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+siw:
+
+CIFS: max_qp_rd_atom=128, max_fast_reg_page_list_len = 256
+CIFS: max_sgl_rd=0, max_sge_rd=1
+CIFS: responder_resources=32 max_frmr_depth=256 mr_io.type=0
+CIFS: max_send_wr 384, device reporting max_cqe 3276800 max_qp_wr 32768
+ksmbd: max_fast_reg_page_list_len = 256, max_sgl_rd=0, max_sge_rd=1
+ksmbd: device reporting max_cqe 3276800 max_qp_wr 32768
+ksmbd: Old sc->rw_io.credits: max = 9, num_pages = 256
+ksmbd: New sc->rw_io.credits: max = 9, num_pages = 256, maxpages=2048
+ksmbd: Info: rdma_send_wr 27 + max_send_wr 256 = 283
+
+irdma (in iWarp mode):
+
+CIFS: max_qp_rd_atom=127, max_fast_reg_page_list_len = 262144
+CIFS: max_sgl_rd=0, max_sge_rd=13
+CIFS: responder_resources=32 max_frmr_depth=2048 mr_io.type=0
+CIFS: max_send_wr 384, device reporting max_cqe 1048574 max_qp_wr 4063
+ksmbd: max_fast_reg_page_list_len = 262144, max_sgl_rd=0, max_sge_rd=13
+ksmbd: device reporting max_cqe 1048574 max_qp_wr 4063
+ksmbd: Old sc->rw_io.credits: max = 9, num_pages = 256
+ksmbd: New sc->rw_io.credits: max = 9, num_pages = 256, maxpages=2048
+ksmbd: rdma_send_wr 27 + max_send_wr 256 = 283
+
+This means that we get the different correct numbers for ROCE,
+tested with rdma_rxe.ko and irdma.ko (in RoCEv2 mode).
+
+rxe:
+
+CIFS: max_qp_rd_atom=128, max_fast_reg_page_list_len = 512
+CIFS: max_sgl_rd=0, max_sge_rd=32
+CIFS: responder_resources=32 max_frmr_depth=512 mr_io.type=0
+CIFS: max_send_wr 384, device reporting max_cqe 32767 max_qp_wr 1048576
+ksmbd: max_fast_reg_page_list_len = 512, max_sgl_rd=0, max_sge_rd=32
+ksmbd: device reporting max_cqe 32767 max_qp_wr 1048576
+ksmbd: Old sc->rw_io.credits: max = 9, num_pages = 256
+ksmbd: New sc->rw_io.credits: max = 65, num_pages = 32, maxpages=2048
+ksmbd: rdma_send_wr 65 + max_send_wr 256 = 321
+
+irdma (in RoCEv2 mode):
+
+CIFS: max_qp_rd_atom=127, max_fast_reg_page_list_len = 262144,
+CIFS: max_sgl_rd=0, max_sge_rd=13
+CIFS: responder_resources=32 max_frmr_depth=2048 mr_io.type=0
+CIFS: max_send_wr 384, device reporting max_cqe 1048574 max_qp_wr 4063
+ksmbd: max_fast_reg_page_list_len = 262144, max_sgl_rd=0, max_sge_rd=13
+ksmbd: device reporting max_cqe 1048574 max_qp_wr 4063
+ksmbd: Old sc->rw_io.credits: max = 9, num_pages = 256,
+ksmbd: New sc->rw_io.credits: max = 159, num_pages = 13, maxpages=2048
+ksmbd: rdma_send_wr 159 + max_send_wr 256 = 415
+
+And rely on rdma_rw_init_qp() to setup ib_mr_pool_init() for
+RW MRs. ib_mr_pool_destroy() will be called by rdma_rw_cleanup_mrs().
+
+It seems the code was implemented before the rdma_rw_* layer
+was fully established in the kernel.
+
+While there also add additional space for ib_drain_qp().
+
+This should make sure ib_post_send() will never fail
+because the submission queue is full.
+
+Fixes: ddbdc861e37c ("ksmbd: smbd: introduce read/write credits for RDMA read/write")
+Fixes: 4c564f03e23b ("smb: server: make use of common smbdirect_socket")
+Fixes: 177368b99243 ("smb: server: make use of common smbdirect_socket_parameters")
+Fixes: 95475d8886bd ("smb: server: make use smbdirect_socket.rw_io.credits")
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/server/smb2pdu.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ fs/smb/server/transport_rdma.c | 233 ++++++++++++++++++++-------------
+ 1 file changed, 142 insertions(+), 91 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 0fb517838325..9ddfc2dbe07c 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -2168,7 +2168,7 @@ static int smb2_create_open_flags(bool file_present, __le32 access,
-  * smb2_tree_disconnect() - handler for smb tree connect request
-  * @work:	smb work containing request buffer
-  *
-- * Return:      0
-+ * Return:      0 on success, otherwise error
-  */
- int smb2_tree_disconnect(struct ksmbd_work *work)
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index 94851ff25a02..90cf5ab36103 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -470,7 +470,6 @@ static void free_transport(struct smb_direct_transport *t)
+ 
+ 	if (sc->ib.qp) {
+ 		ib_drain_qp(sc->ib.qp);
+-		ib_mr_pool_destroy(sc->ib.qp, &sc->ib.qp->rdma_mrs);
+ 		sc->ib.qp = NULL;
+ 		rdma_destroy_qp(sc->rdma.cm_id);
+ 	}
+@@ -1870,20 +1869,11 @@ static int smb_direct_prepare_negotiation(struct smbdirect_socket *sc)
+ 	return ret;
+ }
+ 
+-static unsigned int smb_direct_get_max_fr_pages(struct smbdirect_socket *sc)
+-{
+-	return min_t(unsigned int,
+-		     sc->ib.dev->attrs.max_fast_reg_page_list_len,
+-		     256);
+-}
+-
+-static int smb_direct_init_params(struct smbdirect_socket *sc,
+-				  struct ib_qp_cap *cap)
++static int smb_direct_init_params(struct smbdirect_socket *sc)
  {
-@@ -2232,7 +2232,7 @@ int smb2_tree_disconnect(struct ksmbd_work *work)
-  * smb2_session_logoff() - handler for session log off request
-  * @work:	smb work containing request buffer
-  *
-- * Return:      0
-+ * Return:      0 on success, otherwise error
-  */
- int smb2_session_logoff(struct ksmbd_work *work)
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+-	struct ib_device *device = sc->ib.dev;
+-	int max_send_sges, max_rw_wrs, max_send_wrs;
+-	unsigned int max_sge_per_wr, wrs_per_credit;
++	int max_send_sges;
++	unsigned int maxpages;
+ 
+ 	/* need 3 more sge. because a SMB_DIRECT header, SMB2 header,
+ 	 * SMB2 response could be mapped.
+@@ -1894,67 +1884,18 @@ static int smb_direct_init_params(struct smbdirect_socket *sc,
+ 		return -EINVAL;
+ 	}
+ 
+-	/* Calculate the number of work requests for RDMA R/W.
+-	 * The maximum number of pages which can be registered
+-	 * with one Memory region can be transferred with one
+-	 * R/W credit. And at least 4 work requests for each credit
+-	 * are needed for MR registration, RDMA R/W, local & remote
+-	 * MR invalidation.
+-	 */
+-	sc->rw_io.credits.num_pages = smb_direct_get_max_fr_pages(sc);
+-	sc->rw_io.credits.max = DIV_ROUND_UP(sp->max_read_write_size,
+-					 (sc->rw_io.credits.num_pages - 1) *
+-					 PAGE_SIZE);
+-
+-	max_sge_per_wr = min_t(unsigned int, device->attrs.max_send_sge,
+-			       device->attrs.max_sge_rd);
+-	max_sge_per_wr = max_t(unsigned int, max_sge_per_wr,
+-			       max_send_sges);
+-	wrs_per_credit = max_t(unsigned int, 4,
+-			       DIV_ROUND_UP(sc->rw_io.credits.num_pages,
+-					    max_sge_per_wr) + 1);
+-	max_rw_wrs = sc->rw_io.credits.max * wrs_per_credit;
+-
+-	max_send_wrs = sp->send_credit_target + max_rw_wrs;
+-	if (max_send_wrs > device->attrs.max_cqe ||
+-	    max_send_wrs > device->attrs.max_qp_wr) {
+-		pr_err("consider lowering send_credit_target = %d\n",
+-		       sp->send_credit_target);
+-		pr_err("Possible CQE overrun, device reporting max_cqe %d max_qp_wr %d\n",
+-		       device->attrs.max_cqe, device->attrs.max_qp_wr);
+-		return -EINVAL;
+-	}
+-
+-	if (sp->recv_credit_max > device->attrs.max_cqe ||
+-	    sp->recv_credit_max > device->attrs.max_qp_wr) {
+-		pr_err("consider lowering receive_credit_max = %d\n",
+-		       sp->recv_credit_max);
+-		pr_err("Possible CQE overrun, device reporting max_cpe %d max_qp_wr %d\n",
+-		       device->attrs.max_cqe, device->attrs.max_qp_wr);
+-		return -EINVAL;
+-	}
+-
+-	if (device->attrs.max_send_sge < SMBDIRECT_SEND_IO_MAX_SGE) {
+-		pr_err("warning: device max_send_sge = %d too small\n",
+-		       device->attrs.max_send_sge);
+-		return -EINVAL;
+-	}
+-	if (device->attrs.max_recv_sge < SMBDIRECT_RECV_IO_MAX_SGE) {
+-		pr_err("warning: device max_recv_sge = %d too small\n",
+-		       device->attrs.max_recv_sge);
+-		return -EINVAL;
+-	}
++	maxpages = DIV_ROUND_UP(sp->max_read_write_size, PAGE_SIZE);
++	sc->rw_io.credits.max = rdma_rw_mr_factor(sc->ib.dev,
++						  sc->rdma.cm_id->port_num,
++						  maxpages);
++	sc->rw_io.credits.num_pages = DIV_ROUND_UP(maxpages, sc->rw_io.credits.max);
++	/* add one extra in order to handle unaligned pages */
++	sc->rw_io.credits.max += 1;
+ 
+ 	sc->recv_io.credits.target = 1;
+ 
+ 	atomic_set(&sc->rw_io.credits.count, sc->rw_io.credits.max);
+ 
+-	cap->max_send_wr = max_send_wrs;
+-	cap->max_recv_wr = sp->recv_credit_max;
+-	cap->max_send_sge = SMBDIRECT_SEND_IO_MAX_SGE;
+-	cap->max_recv_sge = SMBDIRECT_RECV_IO_MAX_SGE;
+-	cap->max_inline_data = 0;
+-	cap->max_rdma_ctxs = sc->rw_io.credits.max;
+ 	return 0;
+ }
+ 
+@@ -2028,13 +1969,129 @@ static int smb_direct_create_pools(struct smbdirect_socket *sc)
+ 	return -ENOMEM;
+ }
+ 
+-static int smb_direct_create_qpair(struct smbdirect_socket *sc,
+-				   struct ib_qp_cap *cap)
++static u32 smb_direct_rdma_rw_send_wrs(struct ib_device *dev, const struct ib_qp_init_attr *attr)
++{
++	/*
++	 * This could be split out of rdma_rw_init_qp()
++	 * and be a helper function next to rdma_rw_mr_factor()
++	 *
++	 * We can't check unlikely(rdma_rw_force_mr) here,
++	 * but that is most likely 0 anyway.
++	 */
++	u32 factor;
++
++	WARN_ON_ONCE(attr->port_num == 0);
++
++	/*
++	 * Each context needs at least one RDMA READ or WRITE WR.
++	 *
++	 * For some hardware we might need more, eventually we should ask the
++	 * HCA driver for a multiplier here.
++	 */
++	factor = 1;
++
++	/*
++	 * If the device needs MRs to perform RDMA READ or WRITE operations,
++	 * we'll need two additional MRs for the registrations and the
++	 * invalidation.
++	 */
++	if (rdma_protocol_iwarp(dev, attr->port_num) || dev->attrs.max_sgl_rd)
++		factor += 2;	/* inv + reg */
++
++	return factor * attr->cap.max_rdma_ctxs;
++}
++
++static int smb_direct_create_qpair(struct smbdirect_socket *sc)
  {
-@@ -5844,7 +5844,7 @@ static noinline int smb2_close_pipe(struct ksmbd_work *work)
-  * smb2_close() - handler for smb2 close file command
-  * @work:	smb work containing close request buffer
-  *
-- * Return:	0
-+ * Return:	0 on success, otherwise error
-  */
- int smb2_close(struct ksmbd_work *work)
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 	int ret;
++	struct ib_qp_cap qp_cap;
+ 	struct ib_qp_init_attr qp_attr;
+-	int pages_per_rw;
++	u32 max_send_wr;
++	u32 rdma_send_wr;
++
++	/*
++	 * Note that {rdma,ib}_create_qp() will call
++	 * rdma_rw_init_qp() if cap->max_rdma_ctxs is not 0.
++	 * It will adjust cap->max_send_wr to the required
++	 * number of additional WRs for the RDMA RW operations.
++	 * It will cap cap->max_send_wr to the device limit.
++	 *
++	 * +1 for ib_drain_qp
++	 */
++	qp_cap.max_send_wr = sp->send_credit_target + 1;
++	qp_cap.max_recv_wr = sp->recv_credit_max + 1;
++	qp_cap.max_send_sge = SMBDIRECT_SEND_IO_MAX_SGE;
++	qp_cap.max_recv_sge = SMBDIRECT_RECV_IO_MAX_SGE;
++	qp_cap.max_inline_data = 0;
++	qp_cap.max_rdma_ctxs = sc->rw_io.credits.max;
++
++	/*
++	 * Find out the number of max_send_wr
++	 * after rdma_rw_init_qp() adjusted it.
++	 *
++	 * We only do it on a temporary variable,
++	 * as rdma_create_qp() will trigger
++	 * rdma_rw_init_qp() again.
++	 */
++	memset(&qp_attr, 0, sizeof(qp_attr));
++	qp_attr.cap = qp_cap;
++	qp_attr.port_num = sc->rdma.cm_id->port_num;
++	rdma_send_wr = smb_direct_rdma_rw_send_wrs(sc->ib.dev, &qp_attr);
++	max_send_wr = qp_cap.max_send_wr + rdma_send_wr;
++
++	if (qp_cap.max_send_wr > sc->ib.dev->attrs.max_cqe ||
++	    qp_cap.max_send_wr > sc->ib.dev->attrs.max_qp_wr) {
++		pr_err("Possible CQE overrun: max_send_wr %d\n",
++		       qp_cap.max_send_wr);
++		pr_err("device %.*s reporting max_cqe %d max_qp_wr %d\n",
++		       IB_DEVICE_NAME_MAX,
++		       sc->ib.dev->name,
++		       sc->ib.dev->attrs.max_cqe,
++		       sc->ib.dev->attrs.max_qp_wr);
++		pr_err("consider lowering send_credit_target = %d\n",
++		       sp->send_credit_target);
++		return -EINVAL;
++	}
++
++	if (qp_cap.max_rdma_ctxs &&
++	    (max_send_wr >= sc->ib.dev->attrs.max_cqe ||
++	     max_send_wr >= sc->ib.dev->attrs.max_qp_wr)) {
++		pr_err("Possible CQE overrun: rdma_send_wr %d + max_send_wr %d = %d\n",
++		       rdma_send_wr, qp_cap.max_send_wr, max_send_wr);
++		pr_err("device %.*s reporting max_cqe %d max_qp_wr %d\n",
++		       IB_DEVICE_NAME_MAX,
++		       sc->ib.dev->name,
++		       sc->ib.dev->attrs.max_cqe,
++		       sc->ib.dev->attrs.max_qp_wr);
++		pr_err("consider lowering send_credit_target = %d, max_rdma_ctxs = %d\n",
++		       sp->send_credit_target, qp_cap.max_rdma_ctxs);
++		return -EINVAL;
++	}
++
++	if (qp_cap.max_recv_wr > sc->ib.dev->attrs.max_cqe ||
++	    qp_cap.max_recv_wr > sc->ib.dev->attrs.max_qp_wr) {
++		pr_err("Possible CQE overrun: max_recv_wr %d\n",
++		       qp_cap.max_recv_wr);
++		pr_err("device %.*s reporting max_cqe %d max_qp_wr %d\n",
++		       IB_DEVICE_NAME_MAX,
++		       sc->ib.dev->name,
++		       sc->ib.dev->attrs.max_cqe,
++		       sc->ib.dev->attrs.max_qp_wr);
++		pr_err("consider lowering receive_credit_max = %d\n",
++		       sp->recv_credit_max);
++		return -EINVAL;
++	}
++
++	if (qp_cap.max_send_sge > sc->ib.dev->attrs.max_send_sge ||
++	    qp_cap.max_recv_sge > sc->ib.dev->attrs.max_recv_sge) {
++		pr_err("device %.*s max_send_sge/max_recv_sge = %d/%d too small\n",
++		       IB_DEVICE_NAME_MAX,
++		       sc->ib.dev->name,
++		       sc->ib.dev->attrs.max_send_sge,
++		       sc->ib.dev->attrs.max_recv_sge);
++		return -EINVAL;
++	}
+ 
+ 	sc->ib.pd = ib_alloc_pd(sc->ib.dev, 0);
+ 	if (IS_ERR(sc->ib.pd)) {
+@@ -2045,8 +2102,7 @@ static int smb_direct_create_qpair(struct smbdirect_socket *sc,
+ 	}
+ 
+ 	sc->ib.send_cq = ib_alloc_cq_any(sc->ib.dev, sc,
+-					 sp->send_credit_target +
+-					 cap->max_rdma_ctxs,
++					 max_send_wr,
+ 					 IB_POLL_WORKQUEUE);
+ 	if (IS_ERR(sc->ib.send_cq)) {
+ 		pr_err("Can't create RDMA send CQ\n");
+@@ -2056,7 +2112,7 @@ static int smb_direct_create_qpair(struct smbdirect_socket *sc,
+ 	}
+ 
+ 	sc->ib.recv_cq = ib_alloc_cq_any(sc->ib.dev, sc,
+-					 sp->recv_credit_max,
++					 qp_cap.max_recv_wr,
+ 					 IB_POLL_WORKQUEUE);
+ 	if (IS_ERR(sc->ib.recv_cq)) {
+ 		pr_err("Can't create RDMA recv CQ\n");
+@@ -2065,10 +2121,18 @@ static int smb_direct_create_qpair(struct smbdirect_socket *sc,
+ 		goto err;
+ 	}
+ 
++	/*
++	 * We reset completely here!
++	 * As the above use was just temporary
++	 * to calc max_send_wr and rdma_send_wr.
++	 *
++	 * rdma_create_qp() will trigger rdma_rw_init_qp()
++	 * again if max_rdma_ctxs is not 0.
++	 */
+ 	memset(&qp_attr, 0, sizeof(qp_attr));
+ 	qp_attr.event_handler = smb_direct_qpair_handler;
+ 	qp_attr.qp_context = sc;
+-	qp_attr.cap = *cap;
++	qp_attr.cap = qp_cap;
+ 	qp_attr.sq_sig_type = IB_SIGNAL_REQ_WR;
+ 	qp_attr.qp_type = IB_QPT_RC;
+ 	qp_attr.send_cq = sc->ib.send_cq;
+@@ -2084,18 +2148,6 @@ static int smb_direct_create_qpair(struct smbdirect_socket *sc,
+ 	sc->ib.qp = sc->rdma.cm_id->qp;
+ 	sc->rdma.cm_id->event_handler = smb_direct_cm_handler;
+ 
+-	pages_per_rw = DIV_ROUND_UP(sp->max_read_write_size, PAGE_SIZE) + 1;
+-	if (pages_per_rw > sc->ib.dev->attrs.max_sgl_rd) {
+-		ret = ib_mr_pool_init(sc->ib.qp, &sc->ib.qp->rdma_mrs,
+-				      sc->rw_io.credits.max, IB_MR_TYPE_MEM_REG,
+-				      sc->rw_io.credits.num_pages, 0);
+-		if (ret) {
+-			pr_err("failed to init mr pool count %zu pages %zu\n",
+-			       sc->rw_io.credits.max, sc->rw_io.credits.num_pages);
+-			goto err;
+-		}
+-	}
+-
+ 	return 0;
+ err:
+ 	if (sc->ib.qp) {
+@@ -2182,10 +2234,9 @@ static int smb_direct_prepare(struct ksmbd_transport *t)
+ 
+ static int smb_direct_connect(struct smbdirect_socket *sc)
  {
-@@ -5969,7 +5969,7 @@ int smb2_close(struct ksmbd_work *work)
-  * smb2_echo() - handler for smb2 echo(ping) command
-  * @work:	smb work containing echo request buffer
-  *
-- * Return:	0
-+ * Return:	0 on success, otherwise error
-  */
- int smb2_echo(struct ksmbd_work *work)
- {
+-	struct ib_qp_cap qp_cap;
+ 	int ret;
+ 
+-	ret = smb_direct_init_params(sc, &qp_cap);
++	ret = smb_direct_init_params(sc);
+ 	if (ret) {
+ 		pr_err("Can't configure RDMA parameters\n");
+ 		return ret;
+@@ -2197,7 +2248,7 @@ static int smb_direct_connect(struct smbdirect_socket *sc)
+ 		return ret;
+ 	}
+ 
+-	ret = smb_direct_create_qpair(sc, &qp_cap);
++	ret = smb_direct_create_qpair(sc);
+ 	if (ret) {
+ 		pr_err("Can't accept RDMA client: %d\n", ret);
+ 		return ret;
 -- 
 2.43.0
 
