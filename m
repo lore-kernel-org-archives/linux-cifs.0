@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F6C1D5CE0;
-	Fri, 17 Oct 2025 15:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE142330B30;
+	Fri, 17 Oct 2025 15:34:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760714244; cv=none; b=QgqkwiP2A9sFNxVj+TtGFp+B17790rp3SCLAtA80ZUyTpJEIrbXONGr/iBeUYX87e7WqsVI0SXJRiy0K289DAnxfl2U+6ehFq5oakYovUt5SmMEzvjco4FtlSyhtrvgVOVKdborR5kORCY/uj9M9Bm8h5nFE5UYdwUojWqAAn0s=
+	t=1760715298; cv=none; b=laG7MBC84HRL6F6S9XJWIk5RXEZSDWZgE+2LXzWiasd60q2uhYfo21v3GAINp4Oc8hGikAG4ZoVm+u6BlWS5jXqYp8Ci6GIQYJoG/I3LvJUi8tf6Zo0S5blNCxaIMyY4OQEoz0nQofoFDHJSsbxiyaD2imFY9CIkh/NFq9chGyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760714244; c=relaxed/simple;
-	bh=9wacYYWiBL/E7YaJ1TKlKkcnGqg1RremJa4VaO/vWsU=;
+	s=arc-20240116; t=1760715298; c=relaxed/simple;
+	bh=tVOrh7QmWggo/YjM1kuPjz1xilQxS6y9g5M6O+HoT9s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o9FosUGfvjUdn/nmZyIu7Jm+qBzEgrn8Qf8h1RopBNUAu0yA0+JrwvX+oX+/6TXUGf6X0puS+sx/AH2U9c8SwlZaaFiT1TEhYn1TvUkyOE6iurOE82Ksur/DccvbVgj/Z+XcWia4ScCz1H8+QTRefiREJr+FQePROx55m/jy60w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=uFJ/M/6w; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=PAUEO+3TCH0aJs/J/P2ZRCotHX5O47iwEhtwCtF3LzgtxFSQ+rdQTn9drya1KNZzgSR8/eryL6bI6GiWYn8W2zxfi62BW+Jb1/LPu074MHv3J+5srP4Iu2OIfL3qLGKrFaQNvW1vFw6tcLL0cbEwyQtyUzdNlZDCOooURJkLOJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=NuJgo86+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="uFJ/M/6w"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F8B4C4CEE7;
-	Fri, 17 Oct 2025 15:17:23 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="NuJgo86+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EDDBC4CEE7;
+	Fri, 17 Oct 2025 15:34:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1760714244;
-	bh=9wacYYWiBL/E7YaJ1TKlKkcnGqg1RremJa4VaO/vWsU=;
+	s=korg; t=1760715298;
+	bh=tVOrh7QmWggo/YjM1kuPjz1xilQxS6y9g5M6O+HoT9s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uFJ/M/6wJK0CMxpaELY3nW2JOIFQzgkb0sqrZGwag9UVFsigKOJtymxQPM78bCKW9
-	 nvZk8wryUfs95o79VB7BpSgCiuTt+lE+ueAgklRm04uCjm1q9UQWHhem7ND41v+sm0
-	 UoXck+e+IzZ1qGWyDmaqoNmak2WAXPoLUuSqw/Os=
+	b=NuJgo86+jejT7y2rmnN41i21KDfGjBAb/td7AoCF9c/gaeT0fxgZVTZuQAdWxWxFl
+	 W+7aavpMw+jczm5j3RVDfLQcZjbUtAViedu7gvxn6TCRO4LC7watYrBsEY4wMvI0tj
+	 H7mJ7oc7UHQsNp/63czFZ4me8iVOHsRi/ZMQNHS8=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -33,12 +33,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-cifs@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 078/277] smb: client: fix missing timestamp updates after utime(2)
-Date: Fri, 17 Oct 2025 16:51:25 +0200
-Message-ID: <20251017145149.985444186@linuxfoundation.org>
+Subject: [PATCH 6.17 124/371] smb: client: fix missing timestamp updates after utime(2)
+Date: Fri, 17 Oct 2025 16:51:39 +0200
+Message-ID: <20251017145206.420700415@linuxfoundation.org>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251017145147.138822285@linuxfoundation.org>
-References: <20251017145147.138822285@linuxfoundation.org>
+In-Reply-To: <20251017145201.780251198@linuxfoundation.org>
+References: <20251017145201.780251198@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -50,7 +50,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+6.17-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -107,10 +107,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 12 insertions(+), 10 deletions(-)
 
 diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index 104a563dc317f..cb049bc70e0cb 100644
+index 0985db9f86e51..e441fa2e76897 100644
 --- a/fs/smb/client/smb2inode.c
 +++ b/fs/smb/client/smb2inode.c
-@@ -1220,31 +1220,33 @@ int
+@@ -1382,31 +1382,33 @@ int
  smb2_set_file_info(struct inode *inode, const char *full_path,
  		   FILE_BASIC_INFO *buf, const unsigned int xid)
  {
