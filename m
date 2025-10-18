@@ -1,183 +1,96 @@
-Received: from flow-a4-smtp.messagingengine.com (flow-a4-smtp.messagingengine.com [103.168.172.139])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266682629F;
-	Fri, 17 Oct 2025 23:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883A8189906
+	for <linux-cifs@vger.kernel.org>; Sat, 18 Oct 2025 01:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760744682; cv=none; b=iGza4fGallriRrHqko60yzsIsNB6VFmM8Kp8wnXaY4OOWm+/pDvOUtXIYJUn2ebCRto8QwGgGry2aRudE7YizfCf8qkDZNffUbSvon1wuwYTThdtCAekq/ipyO36Ka1/2U+Cz+N8N3u0GwBM/D1WvjsZH0QD0YtwdPJ7tn0wjfo=
+	t=1760750065; cv=none; b=hnet330BATGPdki1Lg5n0Bd3kVao18hNfTqSoxS1lFjiFNl27oMW7NmpM6Ji0dOadLhpJ+lhJfusavGECR03Q3KZKJAofBTPO0OjjtHdEMKXfH29FI6kCInBDfTUPfZTiUY2d/H+jHil4b3uFI7feI0E0/0sm2XW/IMUiRLaeNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760744682; c=relaxed/simple;
-	bh=u0MZX99m7tsyAu2FbX/wO754TpewlSzO9tI9LAlI5Rg=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=AP9KAcbwU2ctK6Wy9HWLAHi+2SUARKLnJpmNeK3yov0z+NMRVzniD2RCfMOxYkN3r+0VMlpDC2AnE6JaS/6dwWO/QyClXdlodX3Mt/M8suBEWiuFdLVucP4NdqXhkFDWYQyNlvsiqAzK/TyzMpUVA//eonIxnOo9M3k+ZBn7kkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=PpCfbnCi; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=JID8YgBs; arc=none smtp.client-ip=103.168.172.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1760750065; c=relaxed/simple;
+	bh=6v9JrvQsPFybALvBmLT/GeyJQdxeUhOnHL8fO9QP2Ng=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E0N0yrL6Y0AEr64kopGGsMrbLCDAeib6sCZvPcRUcr8HSVYXUUZkP6IPB1Bn9xG8mpfTrEeoveVrKBcnKYL0HisuXB4s+v6jekSd34B1jE764N7BuDj1sqLjZLEfe0wfnfEdc3SwfDt+aomGSAirxSQuFOg52rm8kVrFTLPuF+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OuXKvYYX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="PpCfbnCi";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="JID8YgBs"
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailflow.phl.internal (Postfix) with ESMTP id 3FD3F1380634;
-	Fri, 17 Oct 2025 19:44:38 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-09.internal (MEProxy); Fri, 17 Oct 2025 19:44:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
-	1760744678; x=1760751878; bh=fsRJNHgf5wp6dMPZl2BHgqJB2Mn3uMg+ds8
-	+N/kIR6M=; b=PpCfbnCi5m2pJlypffNagOwQ1jiOv1FqH42riPH7kB2SKsP0X2V
-	JviiDDVWBhLadufIpgRZA4P+tAAmkEsTeo2iw5bey8/quk1S/nIzAKWSl//Jtsp4
-	R3E1xHCnM5I7fPHqvY6xxYUEXnWFdcGsqnFOg0iZbW7nYad4O3m6AecmLEfa4wgm
-	053figuFB9afPvzZisE9w9ZWy5lbX+Uk1XdACK4r2jD7lufSEfaQejMOYY7HCag4
-	/kmwTf4NmJrnK3e2GrZQ4jz/u3/0aqPDdnu7qobIRo8P0z1Ge9t+sDHMSPF8/wrE
-	2qptYIed9mahk/9p0SuwjIvpgwq2Shl/jVA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760744678; x=
-	1760751878; bh=fsRJNHgf5wp6dMPZl2BHgqJB2Mn3uMg+ds8+N/kIR6M=; b=J
-	ID8YgBsC0Zlq97uy28rnGxEniUfQ+yFOuU+ciiPl7K8wlO2e0nT3BEBmW2cl49h2
-	NVHwoyX8FgY6wxmkjhwXjEbepDeRRrrd/2KynnCpsuVJkb6n05xksyt2Xf3l0rDJ
-	zd5ryMoClAGFXxjnEvTtfNMFw6fJnOnGXBgXoIGUBsBczWbW0b5xo3c/PSoixbVd
-	Vflnp8GoiiBmQ1lmJSzWS0ndraz6I0xBTcvVrs5JN+3Mp24jmfR4zysroUEK2JjJ
-	/0j5o9flRWFIhIiCNmd2yAgkAA2DrIMqqLqIZfQi/VnGrg/hZ/EHEC5BgmjW66pn
-	JnLifN/o/tGIonbXG5hCQ==
-X-ME-Sender: <xms:5NTyaOorzpQDJMLlg9LI8TKz0YXzq0nDnVMeovAsKg6SBFO3UN3wUg>
-    <xme:5NTyaLpPfn_QQB80N2_qjcaF0vOjVu5Y_NBqzmwm73Inj29zE7g-_wUZlXG-Kyviw
-    _A2Y_hxNHVlcFb2oV9AQCjzAaIPG8LxGekke4oYziF4OhuaMIc>
-X-ME-Received: <xmr:5NTyaLelh78ONagQhOl9SGV7AW4KVMmR6XnSnOyV0_u5_PpC99rpXmUMadzBckTIuya7bDQbfLWn8qJiAezszE_hu4hrpmd1QqEZX-8_2U1g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddufedtheefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epvdeuteelkeejkeevteetvedtkeegleduieeftdeftefgtddtleejgfelgfevffeinecu
-    ffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurf
-    grrhgrmhepmhgrihhlfhhrohhmpehnvghilhgssehofihnmhgrihhlrdhnvghtpdhnsggp
-    rhgtphhtthhopeegfedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepvhhirhhose
-    iivghnihhvrdhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehnvghtuggvvhesvhhg
-    vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdigfhhssehvghgvrh
-    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidquhhnihhonhhfshesvhhg
-    vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhnfhhssehvghgvrh
-    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgv
-    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqfhhsuggvvhgvlhesvh
-    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgtihhfshesvhhg
-    vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvtghrhihpthhfshesvhhgvghrrd
-    hkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:5NTyaKQOygeT-WDC4EpGdB9UxeBX1x1b0QQARdMw78hJaUuGw16Bpg>
-    <xmx:5NTyaHeqAIRulsREZCjlE_C8s0Is771XsTmonG6WXx4qb74PiaFT_w>
-    <xmx:5NTyaKCO0YfW6-IqqtOcltxObTrHKpPry1oAkKr1FbLeSlCFfCsvXg>
-    <xmx:5NTyaEv_hh5zLWLwI9GLd5aEfHsL025i_s7LtxBypvsPVX3tUGd22A>
-    <xmx:5tTyaCiEjulIfLatm6Wk-Qg3CpixYcKoLl74c5ZXFD26oqjV2H5JH3BJ>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 17 Oct 2025 19:44:25 -0400 (EDT)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OuXKvYYX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C169C4AF09
+	for <linux-cifs@vger.kernel.org>; Sat, 18 Oct 2025 01:14:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760750065;
+	bh=6v9JrvQsPFybALvBmLT/GeyJQdxeUhOnHL8fO9QP2Ng=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=OuXKvYYXs81sgOQ1JRCBGQjFKR0A54pFpkAB1RwmvLSTm3IDPG99Zc89CxMDHFhgz
+	 2Zm+YPWlmd+u8IwBxjcThaLDbnbQ2PPTsFZyVhH5Gx6kfWEr+9YwmW6AFV7iWnqu2b
+	 aBQvOm/b4b+MtoVXxIJ39umhy4dM+DEbinypTncaOnM0rIStocG/rrw81Th3my/RIo
+	 phbZfN7wI2cRxccCqbHs9dhflcb2rV4cxXn+bIv6Raq8VTwQr2thKNsl21d1xl61Bf
+	 GDsc1F1IJCj6Wp2BGkov01AfN8FjOXc0e/ngfsKj/I6vB+ZQR1F4WE4VSdKJOU9MB1
+	 k/XeGb0UBjtlw==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b3e9d633b78so589654666b.1
+        for <linux-cifs@vger.kernel.org>; Fri, 17 Oct 2025 18:14:24 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXp5jDdampfxeF1TM0OtxEJ57qcdVJFKsBEVt7ysZ75h8uNBct7j9oyLd/MDc+P4pQez+ycTdAgfT4H@vger.kernel.org
+X-Gm-Message-State: AOJu0YyH/lLBBaJWZ+ZMFlvfOYSPqJ9k0EzlkdjWljElbdYO86N/hvms
+	xemXVbe3hC0bV9ZFJE/i5rS1kOtB3NxV4xyXFEIXMeMbH14nqZ5dGdEFvohsYcYCQmzJ75TvesH
+	k9R/p3IHnQwHMVbVmMSltqTv8NQgVE+I=
+X-Google-Smtp-Source: AGHT+IFNOoNKIqJZb/Wu3oG0d9wHBg5D7b2gLVqnTee9g4CiKNIvsw8JPiYTTffBUU5Me+rI/MgYFGzhp8lZK2XCI0I=
+X-Received: by 2002:a17:907:a78a:b0:b3e:fc83:fa83 with SMTP id
+ a640c23a62f3a-b6054cdd5e0mr1076191066b.26.1760750063629; Fri, 17 Oct 2025
+ 18:14:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Jeff Layton" <jlayton@kernel.org>
-Cc: "Miklos Szeredi" <miklos@szeredi.hu>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
- "Chuck Lever" <chuck.lever@oracle.com>,
- "Alexander Aring" <alex.aring@gmail.com>,
- "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "Steve French" <sfrench@samba.org>,
- "Paulo Alcantara" <pc@manguebit.org>,
- "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
- "Shyam Prasad N" <sprasad@microsoft.com>, "Tom Talpey" <tom@talpey.com>,
- "Bharath SM" <bharathsm@microsoft.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- "Danilo Krummrich" <dakr@kernel.org>,
- "David Howells" <dhowells@redhat.com>, "Tyler Hicks" <code@tyhicks.com>,
- "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Amir Goldstein" <amir73il@gmail.com>,
- "Namjae Jeon" <linkinjeon@kernel.org>,
- "Steve French" <smfrench@gmail.com>,
- "Sergey Senozhatsky" <senozhatsky@chromium.org>,
- "Carlos Maiolino" <cem@kernel.org>,
- "Kuniyuki Iwashima" <kuniyu@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, netfs@lists.linux.dev,
- ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
- linux-xfs@vger.kernel.org, netdev@vger.kernel.org,
- "Jeff Layton" <jlayton@kernel.org>
-Subject: Re: [PATCH v2 00/11] vfs: recall-only directory delegations for knfsd
-In-reply-to: <20251017-dir-deleg-ro-v2-0-8c8f6dd23c8b@kernel.org>
-References: <20251017-dir-deleg-ro-v2-0-8c8f6dd23c8b@kernel.org>
-Date: Sat, 18 Oct 2025 10:44:23 +1100
-Message-id: <176074466364.1793333.7771684363912648120@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+References: <20251017104613.3094031-1-chenxiaosong.chenxiaosong@linux.dev> <287b5c2b-3cb2-4115-a16a-bd1ff85f5071@linux.dev>
+In-Reply-To: <287b5c2b-3cb2-4115-a16a-bd1ff85f5071@linux.dev>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 18 Oct 2025 10:14:11 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_zBVZKM8ZqJwg5HcdfW-3Ln6LrCehaVNYm6CJ6LFc7VQ@mail.gmail.com>
+X-Gm-Features: AS18NWDLrGWQ_9gBH-uDHoHrpf-nfX0D1-zewFfpRYE_YLecaIUeOwNEO2zSpmU
+Message-ID: <CAKYAXd_zBVZKM8ZqJwg5HcdfW-3Ln6LrCehaVNYm6CJ6LFc7VQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] smb/server: fix return values of
+ smb2_0_server_cmds proc
+To: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
+Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 17 Oct 2025, Jeff Layton wrote:
-> A smaller variation of the v1 patchset that I posted earlier this week.
-> Neil's review inspired me to get rid of the lm_may_setlease operation
-> and to do the conflict resolution internally inside of nfsd. That means
-> a smaller VFS-layer change, and an overall reduction in code.
->=20
-> This patchset adds support for directory delegations to nfsd. This
-> version only supports recallable delegations. There is no CB_NOTIFY
-> support yet. I have patches for those, but we've decided to add that
-> support in a later kernel once we get some experience with this part.
-> Anna is working on the client-side pieces.
->=20
-> It would be great if we could get into linux-next soon so that it can be
-> merged for v6.19. Christian, could you pick up the vfs/filelock patches,
-> and Chuck pick up the nfsd patches?
->=20
-> Thanks!
-> Jeff
->=20
-> [1]: https://lore.kernel.org/all/20240315-dir-deleg-v1-0-a1d6209a3654@kerne=
-l.org/
->=20
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
-> Changes in v2:
-> - handle lease conflict resolution inside of nfsd
-> - drop the lm_may_setlease lock_manager operation
-> - just add extra argument to vfs_create() instead of creating wrapper
-> - don't allocate fsnotify_mark for open directories
-> - Link to v1: https://lore.kernel.org/r/20251013-dir-deleg-ro-v1-0-406780a7=
-0e5e@kernel.org
->=20
-> ---
-> Jeff Layton (11):
->       filelock: push the S_ISREG check down to ->setlease handlers
->       vfs: add try_break_deleg calls for parents to vfs_{link,rename,unlink}
->       vfs: allow mkdir to wait for delegation break on parent
->       vfs: allow rmdir to wait for delegation break on parent
->       vfs: break parent dir delegations in open(..., O_CREAT) codepath
->       vfs: make vfs_create break delegations on parent directory
->       vfs: make vfs_mknod break delegations on parent directory
->       filelock: lift the ban on directory leases in generic_setlease
->       nfsd: allow filecache to hold S_IFDIR files
->       nfsd: allow DELEGRETURN on directories
->       nfsd: wire up GET_DIR_DELEGATION handling
-
-vfs_symlink() is missing from the updated APIs.  Surely that needs to be
-able to wait for a delegation to break.
-
-vfs_mkobj() maybe does too, but I could easily turn a blind eye to that.
-
-I haven't looked properly at the last patch but all the other could have
- Reviewed-by: NeilBrown <neil@brown.name>
-
-once the vfs_symlink() omission is fixed.
-
-NeilBrown
+On Fri, Oct 17, 2025 at 11:56=E2=80=AFPM ChenXiaoSong
+<chenxiaosong.chenxiaosong@linux.dev> wrote:
+>
+> Hi Namjae,
+>
+> v1 has typos, and I've already sent this v2.
+I have applied v2 patch-set.
+Please check the ksmbd-for-next-next branch and let me know if you
+find any issues.
+Thanks.
+>
+> Thanks.
+>
+> On 10/17/25 6:46 PM, chenxiaosong.chenxiaosong@linux.dev wrote:
+> > From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> >
+> > These functions should return error code when an error occurs,
+> > then __process_request() will print the error messages.
+> >
+> > v1->v2: Update patch #01 #02 due to typos.
+> >
+> > v1: https://lore.kernel.org/all/20251017084610.3085644-1-chenxiaosong.c=
+henxiaosong@linux.dev/
+> >
+> > ChenXiaoSong (6):
+> >    smb/server: fix return value of smb2_read()
+> >    smb/server: fix return value of smb2_notify()
+> >    smb/server: fix return value of smb2_query_dir()
+> >    smb/server: fix return value of smb2_ioctl()
+> >    smb/server: fix return value of smb2_oplock_break()
+> >    smb/server: update some misguided comment of smb2_0_server_cmds proc
+> >
+> >   fs/smb/server/smb2pdu.c | 30 +++++++++++++++++-------------
+> >   1 file changed, 17 insertions(+), 13 deletions(-)
+> >
+>
