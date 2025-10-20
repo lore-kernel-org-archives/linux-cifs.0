@@ -1,143 +1,123 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FBD148850
-	for <linux-cifs@vger.kernel.org>; Mon, 20 Oct 2025 14:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08322609D0
+	for <linux-cifs@vger.kernel.org>; Mon, 20 Oct 2025 16:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760971520; cv=none; b=dwudGBOnpmV6Zrfo15J0wzySHv7i2Ph62+w9QRGIbZ5bDR2jvwzmVYvgGN3t+jib3F4+mfz0YfzCdEyznENbUrUAud4y8D+pBFLJc0jRk+UpRBNEJb85DNIXzoSSG/Zx12Zhig7YwQ+cQgvno/iRTJjssOxgcpEHWJKay/xh55g=
+	t=1760979537; cv=none; b=OyRdJMDnnXfqJBS8ZIwtewVioEmZoV5jV2Eh5KRpquxBNoNUDMjPIk4VKGf8mo2AFdvpRPp3NuTT/f2rn1j80esBZ7aMFmAbuwGMoHswq746sHbNhOi/6IBGE2GficuZZGXInF9BC5i7OfIHpnWoLTlVkg595/Dg9DvwlC0OXkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760971520; c=relaxed/simple;
-	bh=uPjzAGd0a9HS8zV6Omrr6pLQmcHggE369SJlHnb/hDA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jZy6BpWTLgXkApRILXHtVPWAasGwAiuQzl3XP3eWBD7dgMJngUvYb2iXlQc8qNH4Ps/G9y0X652zMSmOiy1/VD84KAJW03nt4LDoyqccxuIg7KqOSKqj6zk8I5Hl5CGmX+KXppqZW4pUbQJXWN2RlEJnoN91aZdPKTEjmXGx/vA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hIN+hw5U; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PGvErf38; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wf3MIGlK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=aF7gSwkG; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1760979537; c=relaxed/simple;
+	bh=4bQ5dGdI37+mKtm3nyfRFem5GeQNndtwmqJv6QZC4X0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V9PWi9uz+qmx+qbNhecAfStfFHh08FT0GcxjSV+vH3ciZhU+h7ugzkVNwQw0wkngnp7i/6v+i404LWfH+Efd6zA7wcW1lP3NJcAH2N5VubYnQYPc5C1fr+Z1Jgz6K7OzbO2NQUWFE3UwtLnqW4M3E9fM56eT7e/UwspgCKhoe18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MeKcGWor; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hIN+hw5U";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PGvErf38";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wf3MIGlK";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="aF7gSwkG"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id DFB631F385;
-	Mon, 20 Oct 2025 14:45:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760971513; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uPjzAGd0a9HS8zV6Omrr6pLQmcHggE369SJlHnb/hDA=;
-	b=hIN+hw5U5J5eSZdRlWSpYcNfQd8ddptSmB/0qQVjR/hEoUiE9kqfu9i1r1XDgqy0tQ/Eoz
-	3zhQYuhc0YB++e7QbTv9ioiKP9ZCgzSGHEjX6aB9Z0BxIhzTs4RKPLl5mZe4rWJsfJQIWO
-	q2qUiL3daXrPhgCFoM73MRDGAsVYPvE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760971513;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uPjzAGd0a9HS8zV6Omrr6pLQmcHggE369SJlHnb/hDA=;
-	b=PGvErf38E2RSTnxvHl6TT9SwqvOat+XfjLgSB04MRNQaOT5OZ+fu6miMUHoEoRQKbw2fkC
-	u88duyjOjRifzsDQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=wf3MIGlK;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=aF7gSwkG
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760971508; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uPjzAGd0a9HS8zV6Omrr6pLQmcHggE369SJlHnb/hDA=;
-	b=wf3MIGlK9UG/Pc4kKtSJaTOw3KcUU+U9EVGP0IvsRfqF4EZW7MbZbqxCraJ+49Yd8t8wnR
-	k9HbNJUEOOtqgUcwB5/pWcOdZqMMYSvwGbGYSJDtLObqwhJjwzJ9AJZwnAWBv1Dy1Pneqh
-	kJHxBSPTN+K1kmab+9Rvh3tolXuRQv4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760971508;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uPjzAGd0a9HS8zV6Omrr6pLQmcHggE369SJlHnb/hDA=;
-	b=aF7gSwkGn+4J5+pd5CnDwLiqjF6uEK7XL5SkUYHDWAAm9QEb6kqD46q4YmKau1/VaHUjdS
-	PprJ7VUTkKb3VsAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6D8F213A8E;
-	Mon, 20 Oct 2025 14:45:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5ZK4DfRK9mghMwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 20 Oct 2025 14:45:08 +0000
-Date: Mon, 20 Oct 2025 11:45:02 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: David Howells <dhowells@redhat.com>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Fix TCP_Server_Info::credits to be signed
-Message-ID: <p6vfujqnba3rxuifaouccuuhonhyupsu554cdnlx45fvboggku@5h7gaicp4opp>
-References: <vmbhu5djhw2fovzwpa6dptuthwocmjc5oh6vsi4aolodstmqix@4jv64tzfe3qp>
- <1006942.1760950016@warthog.procyon.org.uk>
- <1158747.1760969306@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MeKcGWor"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-78f75b0a058so61410206d6.0
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Oct 2025 09:58:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760979535; x=1761584335; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WgsdylpKUJQfQkBSHP7xg/RD79zsocybv4Uh09OP8R0=;
+        b=MeKcGWoro02/4Eg8K9LVgB9EI6XZMMdkvBezzHR9H/bq9oKo86d4lpqZvjhBJ4YivJ
+         NxtjUsp/enHfGZ84xtDNbbxfwcKknwJn5Io2fXOOnH0rQEegINY/LgyoufTcPT/0xokX
+         0GG2Xwx4aHoFNuKl4RjCSkjLMjxLPsafu7+uuLzGA2Mnqq5V1gODvnaZm7eAg4CSn92h
+         d1V6kLk1YSbTQ3dGYsWAyGgkfgscH+9/izwj+XbtiwbeCp93/VZj0FOQVlqfghWzBp8/
+         Brv5Mq9fdgx7dRk67pWdFRh4Z64J1UTKhYhxNP1DBy7iRKGWRItJQnbawzA5fE6IZw/e
+         A3LA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760979535; x=1761584335;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WgsdylpKUJQfQkBSHP7xg/RD79zsocybv4Uh09OP8R0=;
+        b=pwOJD/pu3Z8CFP+3xXR0xqBidMXfBRA4wiMxlaLFn85Eo81sLp5PTOG9v8sNCPZmXO
+         nDCXN+mfb/SrYqzW8gdY5ppvrYplo6e/Xu30HB1Tw/XSP9uUeVgJKdtRb+VFTVlomuJT
+         AiyjxkA8GbTznVoGxxlOeILpA6L+bXBHpY67GAqktkrrx0WMBs83mA/wvS8fyazm5WDW
+         7N06XTDjXPtBXtbrRyHtEsML6f7ObNKjfwJMUtv0Jrv5EgeVAI7ry9dJkvl+nyxB3hTg
+         Rf8m2daDABN859VuKjOnnIG58u3TtkooZgzGE0ccC992DzonsEJScx/kuTGxtvAxtIzS
+         kb1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWhCJ14DHUZ9vldmb1N7XgpJhefqz3PaBowVq9MxBdq8IIBvIkT2EdngRbLkIcVAk3sVZwF1gx5vklQ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1bPAyrlnde4YulONmskQYmWMIqyRjoEP5+ek/fxRi6Lj/C2Yo
+	+5VbcG0oRi77mYDKsDjiQVD5yj3AJes9KcG6d+xBEeFdo1YA3nG+RdcnvtCY+QgO7Fl2WA7oXuK
+	E5zINdSBMehEb7AxVyDvagoz45o+IJ/8=
+X-Gm-Gg: ASbGncubLMPOcX7th3swIhhEvLAtC7OeWOsH2O6m7rZiUyBshuitiDPjr7/x4xk1PVs
+	l/jCTzdg3TuDuYlj+/jaU2dZGEEnzhTSKjeM7srkCv7QchfaLGxsE9REzYKm61r1O8xEZTLb5Om
+	LEdOS/c+fhI/O+uWu2bzIrtpGcZR3oVOjdMMy+Y4qjFmJXQ9hVWiof2mL1qJTJRPWA5HAVmpES5
+	iFIywHJMdSuk52CPO/OciDoyDpd9aglIdIZaI2FEuN8/7bV5IAaErtaC1EoSLO0kmu98N4znOGz
+	xc5f6eC/LutGyYKNH5FTnBDBFJ44/AsKMZjSTs5+vK3/JIEXd1K1wNPDClN6ss9NtyltKjcjX81
+	pqbpcv8C0IOA5b9CfOVTpjAaIbad5bmUTLs2A3JpESNPGrbZ4irEYk3VDNqbFLcDOvG581sZtsl
+	mN1ID6mbtqp7Oe33v8jhZb
+X-Google-Smtp-Source: AGHT+IHbXFlV0wP4FY/uwKW9bu6aO+4kvfoixtYtWRosnhokGbPU8PEqiSlE80WY+IOyu6/479D4KFoQCxyPQIW+q5g=
+X-Received: by 2002:a05:6214:1c09:b0:87c:dffa:3291 with SMTP id
+ 6a1803df08f44-87cdffa3562mr107155826d6.43.1760979534432; Mon, 20 Oct 2025
+ 09:58:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+References: <1006942.1760950016@warthog.procyon.org.uk> <vmbhu5djhw2fovzwpa6dptuthwocmjc5oh6vsi4aolodstmqix@4jv64tzfe3qp>
+ <1158747.1760969306@warthog.procyon.org.uk>
 In-Reply-To: <1158747.1760969306@warthog.procyon.org.uk>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: DFB631F385
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Score: -4.01
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 20 Oct 2025 11:58:42 -0500
+X-Gm-Features: AS18NWCQzB81UKEefQM5CmQBxxIlIJnyDPWcumyA1Qwmkt85JWSyfbkHNlFn7yQ
+Message-ID: <CAH2r5mvOwmdcP_5kjC+ENgtooi06AuPvwBXrMnZrfy7_poAoFQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Fix TCP_Server_Info::credits to be signed
+To: David Howells <dhowells@redhat.com>
+Cc: Enzo Matsumiya <ematsumiya@suse.de>, Steve French <sfrench@samba.org>, 
+	Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Pavel Shilovsky <piastryyy@gmail.com>, ronnie sahlberg <ronniesahlberg@gmail.com>, 
+	Bharath S M <bharathsm@microsoft.com>, Shyam Prasad <nspmangalore@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/20, David Howells wrote:
->Enzo Matsumiya <ematsumiya@suse.de> wrote:
+On Mon, Oct 20, 2025 at 9:08=E2=80=AFAM David Howells <dhowells@redhat.com>=
+ wrote:
 >
->> Both semantically and technically, credits shouldn't go negative.
->> Shouldn't those other fields/functions become unsigned instead?
+> Enzo Matsumiya <ematsumiya@suse.de> wrote:
 >
->That's really a question for Steve, but it makes it easier to handle
->underflow
+> > Both semantically and technically, credits shouldn't go negative.
+> > Shouldn't those other fields/functions become unsigned instead?
+>
+> That's really a question for Steve, but it makes it easier to handle
+> underflow, and I'm guessing that the maximum credits isn't likely to exce=
+ed
+> 2G.
+>
+> David
 
-But if there's an overflow somewhere the math should be checked instead
-(I never seen it happen though).
+Interesting question - I do like the idea of keeping signed if it
+makes it easier to check
+for underflows but IIRC that hasn't been a problem in a long time (adding P=
+avel
+and Ronnie in case they remember) but more important than the signed
+vs. unsigned
+in my opinion is at least keeping the field consistent.
 
-> and I'm guessing that the maximum credits isn't likely to exceed
->2G.
+I have seen a few stress related xfstests that often generate
+reconnects, so we may want
+to run with the tracepoint enabled
+(smb3_reconnect_with_invalid_credits) to see if that
+is actually happening (the underflow of credits)
 
-Yes, it's capped at 60-65k (depends on the function...)
-So yes, an unsigned short would be fine.
+I also was thinking that we should doublecheck that lease break acks
+will never run out credits
+(since that can deadlock servers for more than 30 seconds as they wait
+for timeouts), even if
+"lease break storms" are rare.   Maybe we should allow e.g. lease
+break acks to borrow echo
+credits e.g. as minor improvement?
 
+--=20
+Thanks,
 
-Cheers,
-
-Enzo
+Steve
