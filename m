@@ -1,150 +1,227 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F423FFD
-	for <linux-cifs@vger.kernel.org>; Mon, 20 Oct 2025 01:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAEA418FDDB
+	for <linux-cifs@vger.kernel.org>; Mon, 20 Oct 2025 04:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760923120; cv=none; b=fhlUbnZp51YP2jIS6MYXnNpRgGhaCN6uiA5oAyHq5ztb2aoxvp5k2p2BU7m0XdFduUK594VZn5Omft0UqpvsqcQ6kpOCslRGnhzRmPQdI/DEHcFFRr+ui+insTN2pgbZ71x/jce0jFI8VUDX97hDfT+SmQBF9zX3hTZaDrGhXwk=
+	t=1760935158; cv=none; b=P2P76lj5IDIMP0kb7vG7XSaBd985eP5f6aTV/M2s9CD+Ad7H9T3ARirh9wqAiZrMbGE9wadQqXLOww+wnf/yTfwbDWdGeS+Y2KT250MZygmud8ww+1sogE4va9AOl3/+4DfDyq5GQvX3wvd+EPCNsxjfsnciI6pJDzCV2T+xjPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760923120; c=relaxed/simple;
-	bh=XV6atz4EwtITnFq29ESZy9zjh32cqDrsW6hrdVttNmc=;
+	s=arc-20240116; t=1760935158; c=relaxed/simple;
+	bh=0lEuHphZEJBnAn7ReiIvbjfn1Hb0S/RVFc4qor7YKp0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F/6wkUQpygBOYd+T7//UfGqf8qxG8yiQ5E493de61+4tYI4V2EO6Y9aqE8eYhwJJnwNzRS04+/Oj/KjJj6x4N9hI9RKT5tpUPM+AfPwKU/WiMnqkn2Wb1lKXkhA+xD1w8y7AkC6qVvHay8N1ENEzKzlMnb3bDAr6sSC5uUAJA5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dDz8E82M; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=GC/p20U75f87Z+iz2BeyHcbo3cO+OwpS0KkYPQxv6BQcPKaBy99ZeYyc64gMNAQq76FqrrxuHwHJU+noamyFRlDcR1SxQqIQh3Ya5y5lAqp/sDyQ7YALg5+q4T3oy/JKFYpV3i6KPQV4OUdaNOIkH/Wk+wwgUkknfdioW6WH4yI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=faYkP5NZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dDz8E82M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1778DC116B1
-	for <linux-cifs@vger.kernel.org>; Mon, 20 Oct 2025 01:18:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="faYkP5NZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3623CC4CEFB
+	for <linux-cifs@vger.kernel.org>; Mon, 20 Oct 2025 04:39:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760923120;
-	bh=XV6atz4EwtITnFq29ESZy9zjh32cqDrsW6hrdVttNmc=;
+	s=k20201202; t=1760935158;
+	bh=0lEuHphZEJBnAn7ReiIvbjfn1Hb0S/RVFc4qor7YKp0=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=dDz8E82M5ZdAN8+UqRAH3ly6pJBHGavuRXFqq4aa9zq9MKR/3y3gQA5JgRBLrVxGo
-	 Fg/rlFMtAqoFRSVBn/kiTFsaW+tM0S1t0sruko054oTgxLXpiIm76G0osRodk3STEc
-	 Y3MiwuMmQrtY8J2nDE8nXFUUiZDLgHt+6C+/txMDMTiwEJqIvZaPXojth5BKO5pU8I
-	 BtoyTy5lbHTVgYZs1GjJl6C9R4JXccC7AcsgSSt604vGGhNZHjYgCjSULfHcnTmKYS
-	 v0DaZ053eUkWmdyzwkhU0KRNAwAprPFZCFWTCh61ajO4Q8ORTP4imBSk1Ez/IfzR8H
-	 UBAGqlGVkiG2g==
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-63c4f1e7243so2258687a12.3
-        for <linux-cifs@vger.kernel.org>; Sun, 19 Oct 2025 18:18:40 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxqSMvbqZZowhE19f2zXvj68dKjvKtaJL7D5KcZ9eOgyYsdSZTG
-	/0zEP4ErU+0EE6iEfhawJSzIQViEO0/io3Ig0Y7fJWTSEx7B8nMeYhU+4O/yhqsWGfNkZrMXnFP
-	RzNlMTDWq6PepTZiD2+8mx9+tjVer5qk=
-X-Google-Smtp-Source: AGHT+IE14oQqrNgjb6tAHMizeorwjtvCCmzGmbogDqECZTljTXIGFRJ1Vg7eiiyckQ1JZFTfxoObbt9lzLUSfn4r4tg=
-X-Received: by 2002:a05:6402:40c5:b0:63c:1e95:dd4c with SMTP id
- 4fb4d7f45d1cf-63c1f6cea34mr11370754a12.27.1760923118682; Sun, 19 Oct 2025
- 18:18:38 -0700 (PDT)
+	b=faYkP5NZE16YZIaz6nqK6z7ynSXCjhcD1uOyAeEPWJ4sP5bJpqucJS6RQlOGOkXKR
+	 mfHHL1Yf0hu+lO+sx+PQxbuFXJg+zensK2iWp0N+QiEN3bIy906y9h1qutHBGQP8qh
+	 ZPUkkNk/pEOb/i04Xnh+KeIqH+oZk7e7jtBjdzt1yhn0hakKWt9ZWrvSpz+YysU2N6
+	 qCpWsUpZwAWu9TOquIfHaJiohC2DD4q7j2oWuAXnx/2bqQ5l/XLYMV/Fyip4mkjaLv
+	 xb7MELuNZdBgvlOk07bHGiuB9bYXljRnaMj72qR18bAJAcanYpPEXKR8Vo+3cpJQo0
+	 wU7oD0UnnQFAA==
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b403bb7843eso714602666b.3
+        for <linux-cifs@vger.kernel.org>; Sun, 19 Oct 2025 21:39:18 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUsVVYuNbdLBxx+VTf3zloj5W6NUTGN4hPxlAKnoWiLzoYica/yGc6SP/2oxOa8uWCN0TsI22N4FwwO@vger.kernel.org
+X-Gm-Message-State: AOJu0YytBT3WxYkD99O+McvWsQg8veKcDyi1Vo0ZCfitntqq8kE9ZqGP
+	RvSPaRQllN78tTtpnIQ/2bi0C8TsLqoXEqs7hgONfFKNIiYOOuGSiWqDxlT9R+M4xXtxmF2wTzR
+	i+9/AfkuwdfAdVK31vRGC9ID4aQm81RM=
+X-Google-Smtp-Source: AGHT+IFePAXF7U5/SChhNT0TWqp8e7MJxybLoyo+yfz+CrPCbQrNHNTphVAVhfTnBX18iJLK2g8Xmt/Vyr7nk4DfoIw=
+X-Received: by 2002:a17:907:fd15:b0:b47:de64:df34 with SMTP id
+ a640c23a62f3a-b6474241266mr1497341966b.51.1760935156739; Sun, 19 Oct 2025
+ 21:39:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251017095502.1532414-1-metze@samba.org>
-In-Reply-To: <20251017095502.1532414-1-metze@samba.org>
+References: <20251014071917.3004573-1-chenxiaosong.chenxiaosong@linux.dev> <20251014071917.3004573-4-chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <20251014071917.3004573-4-chenxiaosong.chenxiaosong@linux.dev>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 20 Oct 2025 10:18:25 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-v+LX4jED3taHgB=TkiBckipiHfcOysifgbJBCG3QEVg@mail.gmail.com>
-X-Gm-Features: AS18NWDHzk0KiQsmnXt-b4jlkcbxi1i1B2tWYfFtpWdHWaVziSa5ajLJ9kz9S4U
-Message-ID: <CAKYAXd-v+LX4jED3taHgB=TkiBckipiHfcOysifgbJBCG3QEVg@mail.gmail.com>
-Subject: Re: [PATCH v5] smb: server: allocate enough space for RW WRs and ib_drain_qp()
-To: Stefan Metzmacher <metze@samba.org>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>
+Date: Mon, 20 Oct 2025 13:39:04 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9hFbYvLtX7TRL0dmVTQj_hvAaY=uKhmUtCUVNhJuGMzg@mail.gmail.com>
+X-Gm-Features: AS18NWDC2DN-ewOyxqqf19p2skDpuXOuak1yYFKOalzKxymLebLbhSfRaQbhXJY
+Message-ID: <CAKYAXd9hFbYvLtX7TRL0dmVTQj_hvAaY=uKhmUtCUVNhJuGMzg@mail.gmail.com>
+Subject: Re: [PATCH v3 03/22] smb: move some duplicate definitions to common/cifsglob.h
+To: chenxiaosong.chenxiaosong@linux.dev
+Cc: stfrench@microsoft.com, metze@samba.org, pali@kernel.org, 
+	smfrench@gmail.com, sfrench@samba.org, senozhatsky@chromium.org, 
+	tom@talpey.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, bharathsm@microsoft.com, christophe.jaillet@wanadoo.fr, 
+	zhangguodong@kylinos.cn, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 17, 2025 at 6:55=E2=80=AFPM Stefan Metzmacher <metze@samba.org>=
- wrote:
+On Tue, Oct 14, 2025 at 4:21=E2=80=AFPM <chenxiaosong.chenxiaosong@linux.de=
+v> wrote:
 >
-> Make use of rdma_rw_mr_factor() to calculate the number of rw
-> credits and the number of pages per RDMA RW operation.
+> From: ZhangGuoDong <zhangguodong@kylinos.cn>
 >
-> We get the same numbers for iWarp connections, tested
-> with siw.ko and irdma.ko (in iWarp mode).
+> In order to maintain the code more easily, move duplicate definitions to
+> new common header file.
 >
-> siw:
+> Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
+> ---
+>  fs/smb/client/cifsglob.h   | 19 +------------------
+>  fs/smb/common/cifsglob.h   | 30 ++++++++++++++++++++++++++++++
+>  fs/smb/server/smb_common.h | 14 +-------------
+>  3 files changed, 32 insertions(+), 31 deletions(-)
+>  create mode 100644 fs/smb/common/cifsglob.h
 >
-> CIFS: max_qp_rd_atom=3D128, max_fast_reg_page_list_len =3D 256
-> CIFS: max_sgl_rd=3D0, max_sge_rd=3D1
-> CIFS: responder_resources=3D32 max_frmr_depth=3D256 mr_io.type=3D0
-> CIFS: max_send_wr 384, device reporting max_cqe 3276800 max_qp_wr 32768
-> ksmbd: max_fast_reg_page_list_len =3D 256, max_sgl_rd=3D0, max_sge_rd=3D1
-> ksmbd: device reporting max_cqe 3276800 max_qp_wr 32768
-> ksmbd: Old sc->rw_io.credits: max =3D 9, num_pages =3D 256
-> ksmbd: New sc->rw_io.credits: max =3D 9, num_pages =3D 256, maxpages=3D20=
-48
-> ksmbd: Info: rdma_send_wr 27 + max_send_wr 256 =3D 283
+> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+> index 8f6f567d7474..c5034cf9ac9e 100644
+> --- a/fs/smb/client/cifsglob.h
+> +++ b/fs/smb/client/cifsglob.h
+> @@ -24,6 +24,7 @@
+>  #include "cifsacl.h"
+>  #include <crypto/internal/hash.h>
+>  #include <uapi/linux/cifs/cifs_mount.h>
+> +#include "../common/cifsglob.h"
+cifs is a legacy name. How about renaming it smbglob.h?
+>  #include "../common/smb2pdu.h"
+>  #include "smb2pdu.h"
+>  #include <linux/filelock.h>
+> @@ -702,12 +703,6 @@ get_rfc1002_length(void *buf)
+>         return be32_to_cpu(*((__be32 *)buf)) & 0xffffff;
+>  }
 >
-> irdma (in iWarp mode):
+> -static inline void
+> -inc_rfc1001_len(void *buf, int count)
+> -{
+> -       be32_add_cpu((__be32 *)buf, count);
+> -}
+> -
+>  struct TCP_Server_Info {
+>         struct list_head tcp_ses_list;
+>         struct list_head smb_ses_list;
+> @@ -1021,8 +1016,6 @@ compare_mid(__u16 mid, const struct smb_hdr *smb)
+>  #define CIFS_MAX_RFC1002_WSIZE ((1<<17) - 1 - sizeof(WRITE_REQ) + 4)
+>  #define CIFS_MAX_RFC1002_RSIZE ((1<<17) - 1 - sizeof(READ_RSP) + 4)
 >
-> CIFS: max_qp_rd_atom=3D127, max_fast_reg_page_list_len =3D 262144
-> CIFS: max_sgl_rd=3D0, max_sge_rd=3D13
-> CIFS: responder_resources=3D32 max_frmr_depth=3D2048 mr_io.type=3D0
-> CIFS: max_send_wr 384, device reporting max_cqe 1048574 max_qp_wr 4063
-> ksmbd: max_fast_reg_page_list_len =3D 262144, max_sgl_rd=3D0, max_sge_rd=
-=3D13
-> ksmbd: device reporting max_cqe 1048574 max_qp_wr 4063
-> ksmbd: Old sc->rw_io.credits: max =3D 9, num_pages =3D 256
-> ksmbd: New sc->rw_io.credits: max =3D 9, num_pages =3D 256, maxpages=3D20=
-48
-> ksmbd: rdma_send_wr 27 + max_send_wr 256 =3D 283
+> -#define CIFS_DEFAULT_IOSIZE (1024 * 1024)
+> -
+>  /*
+>   * Windows only supports a max of 60kb reads and 65535 byte writes. Defa=
+ult to
+>   * those values when posix extensions aren't in force. In actuality here=
+, we
+> @@ -2148,30 +2141,20 @@ extern mempool_t cifs_io_request_pool;
+>  extern mempool_t cifs_io_subrequest_pool;
 >
-> This means that we get the different correct numbers for ROCE,
-> tested with rdma_rxe.ko and irdma.ko (in RoCEv2 mode).
+>  /* Operations for different SMB versions */
+> -#define SMB1_VERSION_STRING    "1.0"
+> -#define SMB20_VERSION_STRING    "2.0"
+>  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+>  extern struct smb_version_operations smb1_operations;
+>  extern struct smb_version_values smb1_values;
+>  extern struct smb_version_operations smb20_operations;
+>  extern struct smb_version_values smb20_values;
+>  #endif /* CIFS_ALLOW_INSECURE_LEGACY */
+> -#define SMB21_VERSION_STRING   "2.1"
+>  extern struct smb_version_operations smb21_operations;
+>  extern struct smb_version_values smb21_values;
+> -#define SMBDEFAULT_VERSION_STRING "default"
+>  extern struct smb_version_values smbdefault_values;
+> -#define SMB3ANY_VERSION_STRING "3"
+>  extern struct smb_version_values smb3any_values;
+> -#define SMB30_VERSION_STRING   "3.0"
+>  extern struct smb_version_operations smb30_operations;
+>  extern struct smb_version_values smb30_values;
+> -#define SMB302_VERSION_STRING  "3.02"
+> -#define ALT_SMB302_VERSION_STRING "3.0.2"
+>  /*extern struct smb_version_operations smb302_operations;*/ /* not neede=
+d yet */
+>  extern struct smb_version_values smb302_values;
+> -#define SMB311_VERSION_STRING  "3.1.1"
+> -#define ALT_SMB311_VERSION_STRING "3.11"
+>  extern struct smb_version_operations smb311_operations;
+>  extern struct smb_version_values smb311_values;
 >
-> rxe:
+> diff --git a/fs/smb/common/cifsglob.h b/fs/smb/common/cifsglob.h
+> new file mode 100644
+> index 000000000000..00fd215e3eb5
+> --- /dev/null
+> +++ b/fs/smb/common/cifsglob.h
+> @@ -0,0 +1,30 @@
+> +/* SPDX-License-Identifier: LGPL-2.1 */
+> +/*
+> + *
+> + *   Copyright (C) International Business Machines  Corp., 2002,2008
+> + *   Author(s): Steve French (sfrench@us.ibm.com)
+> + *              Jeremy Allison (jra@samba.org)
+> + *
+> + */
+> +#ifndef _COMMON_CIFS_GLOB_H
+> +#define _COMMON_CIFS_GLOB_H
+> +
+> +static inline void inc_rfc1001_len(void *buf, int count)
+> +{
+> +       be32_add_cpu((__be32 *)buf, count);
+> +}
+> +
+> +#define SMB1_VERSION_STRING    "1.0"
+> +#define SMB20_VERSION_STRING    "2.0"
+> +#define SMB21_VERSION_STRING   "2.1"
+> +#define SMBDEFAULT_VERSION_STRING "default"
+> +#define SMB3ANY_VERSION_STRING "3"
+> +#define SMB30_VERSION_STRING   "3.0"
+> +#define SMB302_VERSION_STRING  "3.02"
+> +#define ALT_SMB302_VERSION_STRING "3.0.2"
+> +#define SMB311_VERSION_STRING  "3.1.1"
+> +#define ALT_SMB311_VERSION_STRING "3.11"
+> +
+> +#define CIFS_DEFAULT_IOSIZE (1024 * 1024)
+> +
+> +#endif /* _COMMON_CIFS_GLOB_H */
+> diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
+> index d742ba754348..863716207a0d 100644
+> --- a/fs/smb/server/smb_common.h
+> +++ b/fs/smb/server/smb_common.h
+> @@ -10,6 +10,7 @@
 >
-> CIFS: max_qp_rd_atom=3D128, max_fast_reg_page_list_len =3D 512
-> CIFS: max_sgl_rd=3D0, max_sge_rd=3D32
-> CIFS: responder_resources=3D32 max_frmr_depth=3D512 mr_io.type=3D0
-> CIFS: max_send_wr 384, device reporting max_cqe 32767 max_qp_wr 1048576
-> ksmbd: max_fast_reg_page_list_len =3D 512, max_sgl_rd=3D0, max_sge_rd=3D3=
-2
-> ksmbd: device reporting max_cqe 32767 max_qp_wr 1048576
-> ksmbd: Old sc->rw_io.credits: max =3D 9, num_pages =3D 256
-> ksmbd: New sc->rw_io.credits: max =3D 65, num_pages =3D 32, maxpages=3D20=
-48
-> ksmbd: rdma_send_wr 65 + max_send_wr 256 =3D 321
+>  #include "glob.h"
+>  #include "nterr.h"
+> +#include "../common/cifsglob.h"
+>  #include "../common/smb2pdu.h"
+>  #include "smb2pdu.h"
 >
-> irdma (in RoCEv2 mode):
+> @@ -26,16 +27,8 @@
+>  #define SMB311_PROT            6
+>  #define BAD_PROT               0xFFFF
 >
-> CIFS: max_qp_rd_atom=3D127, max_fast_reg_page_list_len =3D 262144,
-> CIFS: max_sgl_rd=3D0, max_sge_rd=3D13
-> CIFS: responder_resources=3D32 max_frmr_depth=3D2048 mr_io.type=3D0
-> CIFS: max_send_wr 384, device reporting max_cqe 1048574 max_qp_wr 4063
-> ksmbd: max_fast_reg_page_list_len =3D 262144, max_sgl_rd=3D0, max_sge_rd=
-=3D13
-> ksmbd: device reporting max_cqe 1048574 max_qp_wr 4063
-> ksmbd: Old sc->rw_io.credits: max =3D 9, num_pages =3D 256,
-> ksmbd: New sc->rw_io.credits: max =3D 159, num_pages =3D 13, maxpages=3D2=
-048
-> ksmbd: rdma_send_wr 159 + max_send_wr 256 =3D 415
+> -#define SMB1_VERSION_STRING    "1.0"
+> -#define SMB20_VERSION_STRING   "2.0"
+> -#define SMB21_VERSION_STRING   "2.1"
+> -#define SMB30_VERSION_STRING   "3.0"
+> -#define SMB302_VERSION_STRING  "3.02"
+> -#define SMB311_VERSION_STRING  "3.1.1"
+> -
+>  #define SMB_ECHO_INTERVAL      (60 * HZ)
 >
-> And rely on rdma_rw_init_qp() to setup ib_mr_pool_init() for
-> RW MRs. ib_mr_pool_destroy() will be called by rdma_rw_cleanup_mrs().
+> -#define CIFS_DEFAULT_IOSIZE    (64 * 1024)
+>  #define MAX_CIFS_SMALL_BUFFER_SIZE 448 /* big enough for most */
 >
-> It seems the code was implemented before the rdma_rw_* layer
-> was fully established in the kernel.
+>  #define MAX_STREAM_PROT_LEN    0x00FFFFFF
+> @@ -464,9 +457,4 @@ static inline unsigned int get_rfc1002_len(void *buf)
+>  {
+>         return be32_to_cpu(*((__be32 *)buf)) & 0xffffff;
+>  }
+> -
+> -static inline void inc_rfc1001_len(void *buf, int count)
+> -{
+> -       be32_add_cpu((__be32 *)buf, count);
+> -}
+>  #endif /* __SMB_COMMON_H__ */
+> --
+> 2.43.0
 >
-> While there also add additional space for ib_drain_qp().
->
-> This should make sure ib_post_send() will never fail
-> because the submission queue is full.
->
-> Fixes: ddbdc861e37c ("ksmbd: smbd: introduce read/write credits for RDMA =
-read/write")
-> Fixes: 4c564f03e23b ("smb: server: make use of common smbdirect_socket")
-> Fixes: 177368b99243 ("smb: server: make use of common smbdirect_socket_pa=
-rameters")
-> Fixes: 95475d8886bd ("smb: server: make use smbdirect_socket.rw_io.credit=
-s")
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: Steve French <smfrench@gmail.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: samba-technical@lists.samba.org
-> Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Applied it to #ksmbd-for-next-next.
-Thanks!
