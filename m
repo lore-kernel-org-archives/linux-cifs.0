@@ -1,284 +1,155 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4187C2F8BCB
-	for <linux-cifs@vger.kernel.org>; Mon, 20 Oct 2025 13:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B7AC2FB
+	for <linux-cifs@vger.kernel.org>; Mon, 20 Oct 2025 14:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760967537; cv=none; b=Xxd0+s493iVztp37DrNl01Jpv8rGua8uS1ysfhSfujXP9SDyExw3i/MY3xBPAf3SuGdwdpcwKGADOLeXVFJ/gfFRp0XLTXzYoU5AsKhTIYRh0M/AiE40OaINJX4zG7DpscP0cIjgMkJthK2QFHIcsyG6exJfB7w4KUowaxyFeCc=
+	t=1760969250; cv=none; b=evi7VxGoPY+dy7R9T0vU05WUE6RYZgNukXAswL3ScPBneoFDJPCd+2yyR5FvJYjbC4L2pdSsOWsHfoVSBSrwGuCKwYAZ40CFkcCXDyX51xC9kvQspkCGbZJ6sd6NKkuHoDl8ptvLByDbXffwlYTo4i0CHQWGxNpHJn+GgXG6xYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760967537; c=relaxed/simple;
-	bh=9wQ2bND1mPIM6ed87fe7TH8lrL7VZNaGcj1Do/D1NgI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f6mDMwmqmpTEUHFB7BIIbaa4vANpooa/JC7QHgP3QfsNCTyiv+hLLJ9bpgFt/6BrXyR4z7d4EK9wx6KvzzktiaYURZev8dVuI8/5LCPhw91QOlKPtB9LQaOmEvh65mkd8wEWWve08oNYvRM/ChnEb4n/1qhgpsRz9LoIAMgg58A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=S3mOaGB0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rsFaY7CX; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dWa3K2mp; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=B++jNjrE; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1760969250; c=relaxed/simple;
+	bh=EmGjWevRpaEIJ6nK1aoiYoKkjVzOTDs+zWEL0leU8Zo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IQVyHVntw3YAYKSL6d9DxF9LZIhvec5/uuuacDitDlXQxIkrNZ4PAkJkLK9TfZzZGTNUhPZlxlSJDFdnlZFy71uWKyKBsD2vtn0qa7K6S1rXkeLbLDpl2eVoMSwMqqvsvXd2qM9j1KT1tsqgssqFsaiayTaXbdb7lX0URJq5QAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=jbIm4Hj0; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="S3mOaGB0";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rsFaY7CX";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dWa3K2mp";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="B++jNjrE"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 51AC62117C;
-	Mon, 20 Oct 2025 13:38:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760967529; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N/UVD2xs0kDh9chtUCmfxdpnmbvjWHUT1V9m6yQzLO4=;
-	b=S3mOaGB0jNO4C0J0XRF5qVzVHjCFjIiI/nmm1BCQ8d1G6cIi6MbrKAQ/VIyFC/4OzD3Wb9
-	poIpHkReq6Um2MFhHM1H8B6cZgv42u3l2GMME3XeZFbOw8/XyAOTxwCKdbW7pU/zcWZAnj
-	CehRbGGlnbg8Jwi5It3ZWvH6WAIi2HQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760967529;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N/UVD2xs0kDh9chtUCmfxdpnmbvjWHUT1V9m6yQzLO4=;
-	b=rsFaY7CXoyArNv+KymKvCp4BHUDuzfre1A0Rp8tQFoJj7bCcgyzZgEGITwzTsXYmfCIXdK
-	BT2r8zkZb5LuLBAQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=dWa3K2mp;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=B++jNjrE
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1760967525; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N/UVD2xs0kDh9chtUCmfxdpnmbvjWHUT1V9m6yQzLO4=;
-	b=dWa3K2mpxO3qeBG/SxmVBHg79iHpPabFnHMOR7wY+R7pACNeu/3qtTcFzRDlcK9WH3XvBN
-	UCKBGvxV4JKmThVwu09IWaAtONgMgov5izDR3LuiEjjGqQCa4Kh/Z8BKfQoWG5mKDqMvmM
-	JQs+ougGIcbc3v/mm34YTRQ7s4JMg0k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1760967525;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N/UVD2xs0kDh9chtUCmfxdpnmbvjWHUT1V9m6yQzLO4=;
-	b=B++jNjrEq2csaT1voFzTlIL4Ch5NzKgfvgbXR1w+x1DKsVwBnsAr6KD2T42r+hcUPSGhzf
-	COQ+LOhmrQNYm6CA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D377D13AAC;
-	Mon, 20 Oct 2025 13:38:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 9j5RJmQ79mhFcgAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 20 Oct 2025 13:38:44 +0000
-Date: Mon, 20 Oct 2025 10:38:42 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: David Howells <dhowells@redhat.com>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Call the calc_signature functions directly
-Message-ID: <jf5k4w47cw3jhc3nfmhwtaqtqxrqd5ufg4agpagacbxejyuhb7@udi3ed54kf3m>
-References: <1090391.1760961375@warthog.procyon.org.uk>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="jbIm4Hj0"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=CKbs8F46hzWpAcLY1h695ycsojLGA5bkvcNuSHQPy5M=; b=jbIm4Hj0Hmjys4qMAGE61aUhF4
+	UYZlDDBIHirVdTVooTs84pMo2Chy3bA2iCme/E+brSpPQ3EK40B/qkQBxEKjNykWD0i/1tYrKw/OV
+	O4EgreN1c1gmTKEZ786umMGr48v0KKa/EXVygNqeQUqrxIddCDYyhuZIQafyT08HVXR31Ef8CZJJz
+	iYy9DXW8BH16v5Lg1D8TEwxjMrl63as7c9SQns9RO8fxkWhr5lWDzcw31uob49AXuuoL5FMRaDjkG
+	gn+Ncq3umFKe5xrhvOQr8yQ1Zti970MOxeF6fyhC8nTjxNnK8TXueuivKvI3auZUr1QDWZesHyzaM
+	3qndarIRZ5fTpD7D/lRrNZZGDEQcpXX4hkpUz0xZnFqJ1N4YXPPciXBJF6QPdb9LdgglQizCp4Mrg
+	lOshACNeTLV48h7nv4SZ3EM4exKkJgR8xLVo+T3nejtzimxEWHftMCLH7wIICOF3roz5XQpsPL+XB
+	G71iDZ//DnmZyUlABpzZBin8;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vAqXf-00AATL-0I;
+	Mon, 20 Oct 2025 14:07:19 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>
+Subject: [PATCH] smb: server: call smb_direct_post_recv_credits() when the negotiation is done
+Date: Mon, 20 Oct 2025 16:07:13 +0200
+Message-ID: <20251020140713.155001-1-metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <1090391.1760961375@warthog.procyon.org.uk>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 51AC62117C
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[samba.org:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:email];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Score: -4.01
+Content-Transfer-Encoding: 8bit
 
-Hi David,
+We now activate sc->recv_io.posted.refill_work and sc->idle.immediate_work
+only after a successful negotiation, before sending the negotiation
+response.
 
-On 10/20, David Howells wrote:
->As the SMB1 and SMB2/3 calc_signature functions are called from separate
->sign and verify paths, just call them directly rather than using a function
->pointer.  The SMB3 calc_signature then jumps to the SMB2 variant if
->necessary.
->
->Signed-off-by: David Howells <dhowells@redhat.com>
->cc: Steve French <sfrench@samba.org>
->cc: Paulo Alcantara <pc@manguebit.org>
->cc: linux-cifs@vger.kernel.org
->cc: linux-fsdevel@vger.kernel.org
->---
-> fs/smb/client/cifsglob.h      |    2 --
-> fs/smb/client/smb2ops.c       |    4 ----
-> fs/smb/client/smb2proto.h     |    6 ------
-> fs/smb/client/smb2transport.c |   18 +++++++++---------
-> 4 files changed, 9 insertions(+), 21 deletions(-)
->
->diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
->index b91397dbb6aa..7297f0f01cb3 100644
->--- a/fs/smb/client/cifsglob.h
->+++ b/fs/smb/client/cifsglob.h
->@@ -536,8 +536,6 @@ struct smb_version_operations {
-> 	void (*new_lease_key)(struct cifs_fid *);
-> 	int (*generate_signingkey)(struct cifs_ses *ses,
-> 				   struct TCP_Server_Info *server);
->-	int (*calc_signature)(struct smb_rqst *, struct TCP_Server_Info *,
->-				bool allocate_crypto);
-> 	int (*set_integrity)(const unsigned int, struct cifs_tcon *tcon,
-> 			     struct cifsFileInfo *src_file);
-> 	int (*enum_snapshots)(const unsigned int xid, struct cifs_tcon *tcon,
->diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
->index 7c392cf5940b..66eee3440df6 100644
->--- a/fs/smb/client/smb2ops.c
->+++ b/fs/smb/client/smb2ops.c
->@@ -5446,7 +5446,6 @@ struct smb_version_operations smb20_operations = {
-> 	.get_lease_key = smb2_get_lease_key,
-> 	.set_lease_key = smb2_set_lease_key,
-> 	.new_lease_key = smb2_new_lease_key,
->-	.calc_signature = smb2_calc_signature,
-> 	.is_read_op = smb2_is_read_op,
-> 	.set_oplock_level = smb2_set_oplock_level,
-> 	.create_lease_buf = smb2_create_lease_buf,
->@@ -5550,7 +5549,6 @@ struct smb_version_operations smb21_operations = {
-> 	.get_lease_key = smb2_get_lease_key,
-> 	.set_lease_key = smb2_set_lease_key,
-> 	.new_lease_key = smb2_new_lease_key,
->-	.calc_signature = smb2_calc_signature,
-> 	.is_read_op = smb21_is_read_op,
-> 	.set_oplock_level = smb21_set_oplock_level,
-> 	.create_lease_buf = smb2_create_lease_buf,
->@@ -5660,7 +5658,6 @@ struct smb_version_operations smb30_operations = {
-> 	.set_lease_key = smb2_set_lease_key,
-> 	.new_lease_key = smb2_new_lease_key,
-> 	.generate_signingkey = generate_smb30signingkey,
->-	.calc_signature = smb3_calc_signature,
-> 	.set_integrity  = smb3_set_integrity,
-> 	.is_read_op = smb21_is_read_op,
-> 	.set_oplock_level = smb3_set_oplock_level,
->@@ -5777,7 +5774,6 @@ struct smb_version_operations smb311_operations = {
-> 	.set_lease_key = smb2_set_lease_key,
-> 	.new_lease_key = smb2_new_lease_key,
-> 	.generate_signingkey = generate_smb311signingkey,
->-	.calc_signature = smb3_calc_signature,
-> 	.set_integrity  = smb3_set_integrity,
-> 	.is_read_op = smb21_is_read_op,
-> 	.set_oplock_level = smb3_set_oplock_level,
->diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
->index b3f1398c9f79..7e98fbe7bf33 100644
->--- a/fs/smb/client/smb2proto.h
->+++ b/fs/smb/client/smb2proto.h
->@@ -39,12 +39,6 @@ extern struct mid_q_entry *smb2_setup_async_request(
-> 			struct TCP_Server_Info *server, struct smb_rqst *rqst);
-> extern struct cifs_tcon *smb2_find_smb_tcon(struct TCP_Server_Info *server,
-> 						__u64 ses_id, __u32  tid);
->-extern int smb2_calc_signature(struct smb_rqst *rqst,
->-				struct TCP_Server_Info *server,
->-				bool allocate_crypto);
->-extern int smb3_calc_signature(struct smb_rqst *rqst,
->-				struct TCP_Server_Info *server,
->-				bool allocate_crypto);
-> extern void smb2_echo_request(struct work_struct *work);
-> extern __le32 smb2_get_lease_state(struct cifsInodeInfo *cinode);
-> extern bool smb2_is_valid_oplock_break(char *buffer,
->diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
->index 33f33013b392..916c131d763d 100644
->--- a/fs/smb/client/smb2transport.c
->+++ b/fs/smb/client/smb2transport.c
->@@ -247,9 +247,9 @@ smb2_find_smb_tcon(struct TCP_Server_Info *server, __u64 ses_id, __u32  tid)
-> 	return tcon;
-> }
->
->-int
->+static int
-> smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
->-			bool allocate_crypto)
->+		    bool allocate_crypto)
-> {
-> 	int rc;
-> 	unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
->@@ -576,9 +576,9 @@ generate_smb311signingkey(struct cifs_ses *ses,
-> 	return generate_smb3signingkey(ses, server, &triplet);
-> }
->
->-int
->+static int
-> smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
->-			bool allocate_crypto)
->+		    bool allocate_crypto)
-> {
-> 	int rc;
-> 	unsigned char smb3_signature[SMB2_CMACAES_SIZE];
->@@ -589,6 +589,9 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
-> 	struct smb_rqst drqst;
-> 	u8 key[SMB3_SIGN_KEY_SIZE];
->
->+	if ((server->vals->protocol_id & 0xf00) == 0x200)
+It means the queue_work(sc->workqueue, &sc->recv_io.posted.refill_work)
+in put_recvmsg() of the negotiate request, is a no-op now.
 
-Please use:
+It also means our explicit smb_direct_post_recv_credits() will
+have queue_work(sc->workqueue, &sc->idle.immediate_work) as no-op.
 
-   if (server->vals->protocol_id <= SMB21_PROT_ID)
+This should make sure we don't have races and post any immediate
+data_transfer message that tries to grant credits to the peer,
+before we send the negotiation response, as that will grant
+the initial credits to the peer.
 
-Other than that
+Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
+Fixes: 1cde0a74a7a8 ("smb: server: don't use delayed_work for post_recv_credits_work")
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+---
+ fs/smb/server/transport_rdma.c | 36 ++++++++++++++++++++++++++--------
+ 1 file changed, 28 insertions(+), 8 deletions(-)
 
-Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index 90cf5ab36103..1b597f9f85e3 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -417,9 +417,6 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
+ 
+ 	sc->ib.dev = sc->rdma.cm_id->device;
+ 
+-	INIT_WORK(&sc->recv_io.posted.refill_work,
+-		  smb_direct_post_recv_credits);
+-	INIT_WORK(&sc->idle.immediate_work, smb_direct_send_immediate_work);
+ 	INIT_DELAYED_WORK(&sc->idle.timer_work, smb_direct_idle_connection_timer);
+ 
+ 	conn = ksmbd_conn_alloc();
+@@ -1862,7 +1859,6 @@ static int smb_direct_prepare_negotiation(struct smbdirect_socket *sc)
+ 		goto out_err;
+ 	}
+ 
+-	smb_direct_post_recv_credits(&sc->recv_io.posted.refill_work);
+ 	return 0;
+ out_err:
+ 	put_recvmsg(sc, recvmsg);
+@@ -2205,8 +2201,8 @@ static int smb_direct_prepare(struct ksmbd_transport *t)
+ 		return -ECONNABORTED;
+ 
+ 	ret = smb_direct_check_recvmsg(recvmsg);
+-	if (ret == -ECONNABORTED)
+-		goto out;
++	if (ret)
++		goto put;
+ 
+ 	req = (struct smbdirect_negotiate_req *)recvmsg->packet;
+ 	sp->max_recv_size = min_t(int, sp->max_recv_size,
+@@ -2221,14 +2217,38 @@ static int smb_direct_prepare(struct ksmbd_transport *t)
+ 	sc->recv_io.credits.target = min_t(u16, sc->recv_io.credits.target, sp->recv_credit_max);
+ 	sc->recv_io.credits.target = max_t(u16, sc->recv_io.credits.target, 1);
+ 
+-	ret = smb_direct_send_negotiate_response(sc, ret);
+-out:
++put:
+ 	spin_lock_irqsave(&sc->recv_io.reassembly.lock, flags);
+ 	sc->recv_io.reassembly.queue_length--;
+ 	list_del(&recvmsg->list);
+ 	spin_unlock_irqrestore(&sc->recv_io.reassembly.lock, flags);
+ 	put_recvmsg(sc, recvmsg);
+ 
++	if (ret == -ECONNABORTED)
++		return ret;
++
++	if (ret)
++		goto respond;
++
++	/*
++	 * We negotiated with success, so we need to refill the recv queue.
++	 * We do that with sc->idle.immediate_work still being disabled
++	 * via smbdirect_socket_init(), so that queue_work(sc->workqueue,
++	 * &sc->idle.immediate_work) in smb_direct_post_recv_credits()
++	 * is a no-op.
++	 *
++	 * The message that grants the credits to the client is
++	 * the negotiate response.
++	 */
++	INIT_WORK(&sc->recv_io.posted.refill_work, smb_direct_post_recv_credits);
++	smb_direct_post_recv_credits(&sc->recv_io.posted.refill_work);
++	if (unlikely(sc->first_error))
++		return sc->first_error;
++	INIT_WORK(&sc->idle.immediate_work, smb_direct_send_immediate_work);
++
++respond:
++	ret = smb_direct_send_negotiate_response(sc, ret);
++
+ 	return ret;
+ }
+ 
+-- 
+2.43.0
 
->+		return smb2_calc_signature(rqst, server, allocate_crypto);
->+
-> 	rc = smb3_get_sign_key(le64_to_cpu(shdr->SessionId), server, key);
-> 	if (unlikely(rc)) {
-> 		cifs_server_dbg(FYI, "%s: Could not get signing key\n", __func__);
->@@ -657,7 +660,6 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
-> static int
-> smb2_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server)
-> {
->-	int rc = 0;
-> 	struct smb2_hdr *shdr;
-> 	struct smb2_sess_setup_req *ssr;
-> 	bool is_binding;
->@@ -684,9 +686,7 @@ smb2_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server)
-> 		return 0;
-> 	}
->
->-	rc = server->ops->calc_signature(rqst, server, false);
->-
->-	return rc;
->+	return smb3_calc_signature(rqst, server, false);
-> }
->
-> int
->@@ -722,7 +722,7 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
->
-> 	memset(shdr->Signature, 0, SMB2_SIGNATURE_SIZE);
->
->-	rc = server->ops->calc_signature(rqst, server, true);
->+	rc = smb3_calc_signature(rqst, server, true);
->
-> 	if (rc)
-> 		return rc;
->
->
