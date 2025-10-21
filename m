@@ -1,172 +1,106 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48B72676F4
-	for <linux-cifs@vger.kernel.org>; Tue, 21 Oct 2025 06:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4990F223707
+	for <linux-cifs@vger.kernel.org>; Tue, 21 Oct 2025 06:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761028605; cv=none; b=TN0Y1Qc7eHmKeu9nvVAZDJUtb9RgRtRkL3iiuKGLvmRRvp5saeMlho9g1nayEZpbNqBd1auBw8Xtr2djKtfQBVeRpxv4Y0DQiB8w9bHjtRXTmobFAvDxOUzDp+qWJkiZ8tAR5/RfUnttfzFItCpSmMm51dYdg2/O5Qwiys9n19w=
+	t=1761029530; cv=none; b=Qd4ypHE+7CWSA++50L+aORA4IQxsWvywoA1DEyEMKWOXuDv6F+zMyy+c8uwfoUYMsgkszsNPDOg44uYmWSghelSynL06lqe6/zbkEhAlUjb8wmI1lI70qzjvf1GoNjKYJsKqAhhHqu/J0WQv68r9Gc8uqupDT8Ay4S4xkuBF67k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761028605; c=relaxed/simple;
-	bh=09ammgPTGOYPV4N0HtDlqzFG5Kp4YxoPIsUdniunFtc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I8B+yRe5m42AYqcW9AJJMfevKw1Hy4yUgZ4TT3x+B8DR0qpclSCBzU4f8SaTIPGI7O36zLee+0NeHLoAt282DmpLJn63qBLsfigDBPHMEjL3ok2SrHUb9TgbOGqXYNQQ2l/+DcQfFIUE83/nerIdYKAzDLdRnIGT+x468Xf8ccQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IZD9xYHe; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1761029530; c=relaxed/simple;
+	bh=sn2oVwNS+TozRSZUOIzYvrxL5Ano16/PHHOHPc8rOcA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DalHl7/JAq5kk8fxf3dUhjwqQFpDX8LhA35mT3djn+ZsAthr3wtzVGAJnPyIDuWtOfWWew/5ycvYDOPYFKsbnAX5h6pubWn7PNrMeaYxrEHbHTKfczXrFE8URcrPl5jBqFzafzBzgAYTv4GscNZ/N1M76tdWLw0VTOVTvSoHoYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bnej4HOw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IZD9xYHe"
-Message-ID: <1c1d15a0-4030-4929-bda4-4006696bd96b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761028599;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/JehDfC8TDuzdoor+Tx1iNgu123iWqGj+gYZMDk+5vI=;
-	b=IZD9xYHefLrqwkrqIFyLWlLPUbEWBQg2DPatM1iIvovpCoDKXfkmT9uWCBDyiY7OzJGwae
-	5itExXZ7HlbnLEBHO1SuR69mzKxP6KXm7G+lLW8Lwup0ul186xQ0FkJroBRqfid+5GE+x6
-	IfkB+RJlI7h5bQBt8FULvD2ESeQktuA=
-Date: Tue, 21 Oct 2025 14:36:22 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bnej4HOw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4DA7C4CEF1
+	for <linux-cifs@vger.kernel.org>; Tue, 21 Oct 2025 06:52:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761029529;
+	bh=sn2oVwNS+TozRSZUOIzYvrxL5Ano16/PHHOHPc8rOcA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=bnej4HOwelhXTLL32Ygz2bYk2/QYpTl7sDs/x2ZvgN+erBRSwsN/juVJvVPUMTF8a
+	 Cuod+l+YB+NYl4jh+RLbb0vw2glEY+bPB3sGSizFUX4M2lSDCYciXQ0SjmBnYKocbE
+	 +U2aaTX7n3EGOvvyzsOsThip+PCQiT0/wA2rZOJJejaVeS9CC7ZKgbPjGLMnQ3Iaga
+	 5kYkX39h0jcYTpGZkeKFavJ5s5oWFT4NYqHytv6ytl2Llz+fB4IoXFi8U5n8lsdfIe
+	 wZs6ET1LtF4P97YmDWVlwAA4LRzF9RInBPYAfFy4FUWsjZJsGpVhF7p5e23GIlruGt
+	 5mFSxz2zfIHiQ==
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-63c523864caso6611115a12.1
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Oct 2025 23:52:09 -0700 (PDT)
+X-Gm-Message-State: AOJu0YyWdeaux19JHu78SxF6GpvjK98Tq+M04iSnsagEpxz5Fp0NTsBC
+	jkd5E+waIlxQeTpSZaH3HhGPwiGn0FBVFlv8PTBAeHISuZlqXDodgjR+fykIRGyq13wte7L4Mn1
+	yyejj2X9zrZyXaGcQMQ3NaL463IWI8io=
+X-Google-Smtp-Source: AGHT+IFZNDKNWJa48C/FXExjke0/+yALeZkgGB9ynQVEz6IqFXNklSnl/HfM6TIrj1PZHpT8Uxy7FEc57DZ1+JBCd2o=
+X-Received: by 2002:a05:6402:5252:b0:63a:294:b034 with SMTP id
+ 4fb4d7f45d1cf-63c1f634868mr15205207a12.13.1761029528359; Mon, 20 Oct 2025
+ 23:52:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 15/22] smb: move FILE_SYSTEM_ATTRIBUTE_INFO to
- common/cifspdu.h
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: stfrench@microsoft.com, metze@samba.org, pali@kernel.org,
- smfrench@gmail.com, sfrench@samba.org, senozhatsky@chromium.org,
- tom@talpey.com, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, bharathsm@microsoft.com,
- christophe.jaillet@wanadoo.fr, linux-cifs@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251014071917.3004573-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251014072856.3004683-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251014072856.3004683-5-chenxiaosong.chenxiaosong@linux.dev>
- <CAKYAXd_xwKGST7PXu9ha5wdBF_M-qoe2g52Dp9Y3-0r+aYXa-w@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <CAKYAXd_xwKGST7PXu9ha5wdBF_M-qoe2g52Dp9Y3-0r+aYXa-w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <cover.1760984605.git.metze@samba.org>
+In-Reply-To: <cover.1760984605.git.metze@samba.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 21 Oct 2025 15:51:56 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8KQzA+0HoEFpfHj4rNRjkbhkUQn0P2dOgmr_bx_64XLg@mail.gmail.com>
+X-Gm-Features: AS18NWAgxtJNHqWVefs6e3Lo8TZ4yADtDXKQ6fcO_ZG8HqiIEATt5ATIWq5VxXY
+Message-ID: <CAKYAXd8KQzA+0HoEFpfHj4rNRjkbhkUQn0P2dOgmr_bx_64XLg@mail.gmail.com>
+Subject: Re: [PATCH 0/5] smb: smbdirect: introduce local send credits
+To: Stefan Metzmacher <metze@samba.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for your suggestions. I’ll send v4 soon.
-
--- 
-Thanks,
-ChenXiaoSong.
-
-On 10/20/25 1:35 PM, Namjae Jeon wrote:
-> On Tue, Oct 14, 2025 at 4:30 PM <chenxiaosong.chenxiaosong@linux.dev> wrote:
->>
->> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->>
->> Rename "struct filesystem_attribute_info" to "FILE_SYSTEM_ATTRIBUTE_INFO",
->> then move duplicate definitions to common header file.
->>
->> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> Please check the warnings from checkpatch.pl.
-> 
-> WARNING: do not add new typedefs
-> #109: FILE: fs/smb/common/cifspdu.h:352:
-> +typedef struct {
-> 
-> WARNING: Prefer __packed over __attribute__((packed))
-> #114: FILE: fs/smb/common/cifspdu.h:357:
-> +} __attribute__((packed)) FILE_SYSTEM_ATTRIBUTE_INFO;
-> 
->> ---
->>   fs/smb/client/cifspdu.h    | 7 -------
->>   fs/smb/common/cifspdu.h    | 8 ++++++++
->>   fs/smb/server/smb2pdu.c    | 6 +++---
->>   fs/smb/server/smb_common.h | 7 -------
->>   4 files changed, 11 insertions(+), 17 deletions(-)
->>
->> diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
->> index 07eb821654e1..a6f7e168961e 100644
->> --- a/fs/smb/client/cifspdu.h
->> +++ b/fs/smb/client/cifspdu.h
->> @@ -1937,13 +1937,6 @@ typedef struct {
->>   /* minimum includes first three fields, and empty FS Name */
->>   #define MIN_FS_ATTR_INFO_SIZE 12
->>
->> -typedef struct {
->> -       __le32 Attributes;
->> -       __le32 MaxPathNameComponentLength;
->> -       __le32 FileSystemNameLen;
->> -       char FileSystemName[52]; /* do not have to save this - get subset? */
->> -} __attribute__((packed)) FILE_SYSTEM_ATTRIBUTE_INFO;
->> -
->>   /******************************************************************************/
->>   /* QueryFileInfo/QueryPathinfo (also for SetPath/SetFile) data buffer formats */
->>   /******************************************************************************/
->> diff --git a/fs/smb/common/cifspdu.h b/fs/smb/common/cifspdu.h
->> index 1109c20f7bf8..560900617be7 100644
->> --- a/fs/smb/common/cifspdu.h
->> +++ b/fs/smb/common/cifspdu.h
->> @@ -348,4 +348,12 @@ typedef struct server_negotiate_rsp {
->>   #define FILE_CASE_PRESERVED_NAMES      0x00000002
->>   #define FILE_CASE_SENSITIVE_SEARCH     0x00000001
->>
->> +/* See FS-FSCC 2.5.1 */
->> +typedef struct {
->> +       __le32 Attributes;
->> +       __le32 MaxPathNameComponentLength;
->> +       __le32 FileSystemNameLen;
->> +       __le16 FileSystemName[]; /* do not have to save this - get subset? */
->> +} __attribute__((packed)) FILE_SYSTEM_ATTRIBUTE_INFO;
->> +
->>   #endif /* _COMMON_CIFSPDU_H */
->> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
->> index a46d4ddade9e..a05b04799c0d 100644
->> --- a/fs/smb/server/smb2pdu.c
->> +++ b/fs/smb/server/smb2pdu.c
->> @@ -5485,10 +5485,10 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
->>          }
->>          case FS_ATTRIBUTE_INFORMATION:
->>          {
->> -               struct filesystem_attribute_info *info;
->> +               FILE_SYSTEM_ATTRIBUTE_INFO *info;
->>                  size_t sz;
->>
->> -               info = (struct filesystem_attribute_info *)rsp->Buffer;
->> +               info = (FILE_SYSTEM_ATTRIBUTE_INFO *)rsp->Buffer;
->>                  info->Attributes = cpu_to_le32(FILE_SUPPORTS_OBJECT_IDS |
->>                                                 FILE_PERSISTENT_ACLS |
->>                                                 FILE_UNICODE_ON_DISK |
->> @@ -5507,7 +5507,7 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
->>                                          "NTFS", PATH_MAX, conn->local_nls, 0);
->>                  len = len * 2;
->>                  info->FileSystemNameLen = cpu_to_le32(len);
->> -               sz = sizeof(struct filesystem_attribute_info) + len;
->> +               sz = sizeof(FILE_SYSTEM_ATTRIBUTE_INFO) + len;
->>                  rsp->OutputBufferLength = cpu_to_le32(sz);
->>                  break;
->>          }
->> diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
->> index a5dd656c36f1..016ec93e6df4 100644
->> --- a/fs/smb/server/smb_common.h
->> +++ b/fs/smb/server/smb_common.h
->> @@ -56,13 +56,6 @@
->>                  FILE_EXECUTE | FILE_DELETE_CHILD | \
->>                  FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES)
->>
->> -struct filesystem_attribute_info {
->> -       __le32 Attributes;
->> -       __le32 MaxPathNameComponentLength;
->> -       __le32 FileSystemNameLen;
->> -       __le16 FileSystemName[]; /* do not have to save this - get subset? */
->> -} __packed;
->> -
->>   struct filesystem_device_info {
->>          __le32 DeviceType;
->>          __le32 DeviceCharacteristics;
->> --
->> 2.43.0
->>
-
+On Tue, Oct 21, 2025 at 3:36=E2=80=AFAM Stefan Metzmacher <metze@samba.org>=
+ wrote:
+>
+> Hi,
+>
+> our client already has some logic to prevent overflows of
+> the local submission queue for ib_post_send(), if the peer
+> granted more credits than we asked for.
+>
+> But it's not as easy as it could be.
+>
+> I guess that won't happen against Windows, but our git
+> history indicates this could happen.
+>
+> Now we have a loop of local credits based on our send_credit_target.
+> With that we always try to get a local credit first and then
+> get a remote credit. When we got both we are able to
+> mark the request as pending in order to keep the
+> existing logic based on the pending count working.
+> Removing or changing that is a task for another day,
+> when all code if in common between client and server.
+>
+> For the server this is a real bug fix, as such a logic was missing
+> before.
+>
+> For the client it's not strictly required for 6.18, but
+> I think we should keep things consistent, as it will reduce
+> churn on my 6.19 patchset, which already has about 100 patches
+> and brings things into common code. And more is comming there...
+>
+> Stefan Metzmacher (5):
+>   smb: smbdirect: introduce smbdirect_socket.send_io.lcredits.*
+>   smb: server: smb_direct_disconnect_rdma_connection() already wakes all
+>     waiters on error
+>   smb: server: simplify sibling_list handling in
+>     smb_direct_flush_send_list/send_done
+>   smb: server: make use of smbdirect_socket.send_io.lcredits.*
+>   smb: client: make use of smbdirect_socket.send_io.lcredits.*
+Applied them to #ksmbd-for-next-next.
+Thanks!
+>
+>  fs/smb/client/smbdirect.c                  |  67 ++++++++-----
+>  fs/smb/common/smbdirect/smbdirect_socket.h |  13 ++-
+>  fs/smb/server/transport_rdma.c             | 106 +++++++++++++++------
+>  3 files changed, 129 insertions(+), 57 deletions(-)
+>
+> --
+> 2.43.0
+>
+>
