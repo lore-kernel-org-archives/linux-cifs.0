@@ -1,118 +1,176 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A3D340A4D
-	for <linux-cifs@vger.kernel.org>; Tue, 21 Oct 2025 14:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BE42F2910;
+	Tue, 21 Oct 2025 15:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761058507; cv=none; b=tQKE7xLyf71ZXTLfN3UzEVFZWhRf7gjeE+zgR6qyZdnTu4y1RTWxDtTex51ym1HclPkiNLPBEPZ94898BgVno+ESNlkzNk6eACdGf4kTbz7wVUpwZrcB9I4708s+FMyLJp6ZG1pWr7KzxseMe1SQWn/oNqumWoA16jk91L/YvGU=
+	t=1761060362; cv=none; b=rNWNYDSUiDGMHL/fS4r58cbwhqaKjLz6JW3YQvid8l08MBaf3EqoulbxcE3rvF7fbaqzBYPMVONVWma/uJIQnLGECv9lPNegkjk9gagVCwITBYozq7EKIOlZj+qe2jJl7KZzcwU8DdMm3uB6n3kNGyvg1J5cFKnzRUTCtWyXO7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761058507; c=relaxed/simple;
-	bh=DfZMU0R0dRnRuQiWcl7q8VsHGYmCXQ9jXTVQm1yN/2o=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OkE0D4UEQYJpRn85Rfu+wdJFxGOegEUxg1BVoiLBZSBnvhXk4At8K4nAM6u7WMfSL0IHZvX/cr4cEEMl6EHyNSsMqsMaF1aqeqrJ/0hzQv8jvVWpGSZWYgr2x4YObdgkNC9/93v5mYUbMSIsrJDT6g77P8X0CIwfXVJBaXV0ChE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U3lOkytZ; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761060362; c=relaxed/simple;
+	bh=Q87QCWTMqM/Fch2ObvjDPBq/NiDII/xJMjnOVOUNThI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=eTFiXmgpo43ofEgJUo6KunDHVUbKaXEkXVkMyC8hTw/OnTvSUN/tP+ZcDMt1RH8YgKalOYU+9kiJPZU4I9nnyjZkz+eHUqlTmKdlwRfHLB4IOFJzXmp8Wwgybe8sKmSWbjc4PATxHPz+FynyhaUcRZKqZYqPsT0E2gyGfI+yfDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqd79Qve; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U3lOkytZ"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-79cf7fd45afso569926b3a.0
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Oct 2025 07:55:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761058504; x=1761663304; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i8VP2I0PGCA2sfJ++TfsZS3uJgWd3RCZmM7e0QrTU2A=;
-        b=U3lOkytZnhJ3xunlZBIjvy3C2PSJcTAcZ6oS+atQJgKbX2eTCVitmX6MdpKdCbGatW
-         MYa0EHzhU397hRnxYGmo6mkR478J+ald6CE7/bTss8OnzqI/aV3CQ+sK+esjUzZMZrNy
-         cqlKDtHAnohEVGD5h+p8aerW2mruuUEjg8t4GlRrH6Wa2Za53Rd5LiJIs5RW/o+GgKlW
-         jXOL9JyEUBilSfUxRs/a8PVCOBkHm+uJ4fzJXXwntc3xLhz5NwmzxEC/8So0k4UVtrRM
-         OX56UckZtTDrj+Ye8K4XVMtKQtpYpJd9Nk2t2N9f0s7I/qAV+m1iuMqKPdYtPS1HmEIq
-         s2Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761058504; x=1761663304;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i8VP2I0PGCA2sfJ++TfsZS3uJgWd3RCZmM7e0QrTU2A=;
-        b=aWLKQtCUUMQfNgtpsVQZ0yN/uDh5WA8dUa9e2vzfhBAsjbYLBEjG8xXxHcF8sO3MmX
-         da3UpeGyE51t2InGQxbPH/JDIEwxko3VASjx3XWZ6cHIlNxc3FHBwwvhIpJe6gUbEKo1
-         D5dcb6fK2PbXOGd09MLvp14JNT5oQM1/xkJbBVFipCN8MtR7NPapCmGbuz9TpDF1XSap
-         gncOxGytlUdBijIAKFEC0w8aIa7YJUgv2IsPBfBbFSFocjnrCkL4duDGL5tUjs+NTZWu
-         fx1zBFx5ZJ5FUWYWUZBar1D7/tHcw3qmYUGniWI4jwRzI3G0zzUHQcXh5Dz540YaGXAK
-         1Ggg==
-X-Forwarded-Encrypted: i=1; AJvYcCVROv2H6TQVW7r+FnxAEusOZvsfVZhy3e65GWGO2mvPU5JZ8T3fR1OymPfWxsc10mnvaBkWJA3Nuq80@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlA46m9JjONpuBB9E6xElBxjf5Xdti2UVno3a78F/Me5t8YDfL
-	ZuYzIEerhRWVUYM+R9r4ytbuHS5G3As94dOktEoaULgkS8MwXPUKRqQ3
-X-Gm-Gg: ASbGncvTYW698/2UVryHphNsTAG3HykaMFyQgI6QqlhpkbMGFcobKJm649YLKCPSKjn
-	XTNJhtvKzcWbsvrqRKxqQfDnDVNsY4zoNOBjb2L4fVeSbStnR2FhIzrLxyMNLT6O7X3lL7sOpsc
-	jvjpVykufRvZ1ET799hXIzgreoyU9L3dj42O8oyAPhTiahTtbFYbxJoyqYwXtkuzD1wmT08bw/H
-	f7IeVE7zQ79tYaPJJTyas4chy+vd25Es8i2rQ8Fk/N4QI5ShcxNNpjXD/HrcwFzJRoslTprQFq7
-	D07GoYpVULrpnCsBGchsgwgUlxFIokAC6kg4wEgIfCDadYH8uFpRPj55XTF1yjIvM/RZ8nZk400
-	cEKl1SNvJUvJgsrFvw20+BTU7nGWAz8bpWG6+hwL/ID7U0jLblctOuGmG/YV2tVWY0KbaSTx5md
-	8PoALxtWuz1PLceG0z6EecUhAj3U3ACg9Jwv7Exo1cmmQVATV5UnRH9JLTdmH1oG24ZOVphZ4x
-X-Google-Smtp-Source: AGHT+IFGdbtj0ivIPfYSgKjRnJx+JRIuBP/TzlLHzhX/tcb7pAq49jg9nE07bVQ8DwbDuxENZ1F91w==
-X-Received: by 2002:a05:6a00:1408:b0:781:229b:cf82 with SMTP id d2e1a72fcca58-7a2572d4b3amr2639509b3a.3.1761058503854;
-        Tue, 21 Oct 2025 07:55:03 -0700 (PDT)
-Received: from poi.localdomain (KD118158218050.ppp-bb.dion.ne.jp. [118.158.218.50])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a22ff1581dsm11484614b3a.12.2025.10.21.07.55.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 07:55:03 -0700 (PDT)
-From: Qianchang Zhao <pioooooooooip@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	gregkh@linuxfoundation.org,
-	Qianchang Zhao <pioooooooooip@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: transport_ipc: validate payload size before reading handle
-Date: Tue, 21 Oct 2025 23:54:49 +0900
-Message-Id: <20251021145449.473932-1-pioooooooooip@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <2025102125-petted-gristle-43a0@gregkh>
-References: <2025102125-petted-gristle-43a0@gregkh>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqd79Qve"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE8D2C4CEF5;
+	Tue, 21 Oct 2025 15:25:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761060362;
+	bh=Q87QCWTMqM/Fch2ObvjDPBq/NiDII/xJMjnOVOUNThI=;
+	h=From:Subject:Date:To:Cc:From;
+	b=aqd79QvexMw3yN1Z6OIdtZ68aEqbM9S90kkYaFvknnnoeeYhQYX7ZvHxUDNuQBDUv
+	 jINyyGLgoo4lPhCvpAaIaPbZt4e2iFK673pNXgEl52qrZWWnDA7iwsiHsY7J0VY1Q1
+	 n2+wx5nkHBwXRDkAHaowNh2pUHZuzq3pjCl9ypkRUQWBR6nqjKPz7/GBh/iDo9nOz7
+	 +Vnjit/h95K5z09gRLQdBpBXO4WjzpnVgBKLgtRtNqetd88WonQXgV0vj7Y2UhMgiv
+	 cEdjeZptTpwzyXuCUN4TEid646aVjwF+cMl49RQH6Sx9gZxO+YNJlKE9mejpgPMVYo
+	 B3QxunChlynTQ==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH v3 00/13] vfs: recall-only directory delegations for knfsd
+Date: Tue, 21 Oct 2025 11:25:35 -0400
+Message-Id: <20251021-dir-deleg-ro-v3-0-a08b1cde9f4c@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAO+l92gC/3XMQQ6CMBCF4auQrq2ZtgLVlfcwLqAdYCKhZmoaD
+ eHuFlZq4vK95PtnEZEJozgVs2BMFClMeZhdIdzQTD1K8nkLDbpUoIz0xNLjiL3kID10qI5Wm1Y
+ rkcmdsaPnlrtc8x4oPgK/tnpS6/snlJQEeYCqttDUgCWeb8gTjvvAvVhLSX/q+kfrrK2zXeW9N
+ s62X3pZljfWoL2A5wAAAA==
+X-Change-ID: 20251013-dir-deleg-ro-d0fe19823b21
+To: Miklos Szeredi <miklos@szeredi.hu>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+ Chuck Lever <chuck.lever@oracle.com>, 
+ Alexander Aring <alex.aring@gmail.com>, 
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+ Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+ Bharath SM <bharathsm@microsoft.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+ David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, 
+ NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
+ Dai Ngo <Dai.Ngo@oracle.com>, Amir Goldstein <amir73il@gmail.com>, 
+ Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, 
+ Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+ samba-technical@lists.samba.org, netfs@lists.linux.dev, 
+ ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
+ linux-xfs@vger.kernel.org, netdev@vger.kernel.org, 
+ Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3682; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=Q87QCWTMqM/Fch2ObvjDPBq/NiDII/xJMjnOVOUNThI=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBo96X8nMA6JHSE4mFHDRit04fMBMvd7Th3QybeV
+ CKDwZihXoCJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaPel/AAKCRAADmhBGVaC
+ FZKuD/9wyxvXLHuHQyIlhr6OCk+4aZduJGNL6vaxDdsNuZ7ewALoDKjX+Ty4+7PaFJlu7fbNqGM
+ XAs4xRkkVvigjqXIb+TVsi44clXUmjoXDNeuW4RmmW8v3Ss65/vKIGGEGbnFH5EvA70sCZkDQoN
+ vNgjjssxELH9zQZRCrgGaYHGcpiXl00KB9LRkJN9a/u03PzZVjQi2chbKkAB41EI+rPk8ehVUio
+ 1XEODXlHlY9u9Xtp+SoIASZ9TYkMF+rd9d7JkHdTk47ui7slW5S7Ga7l/VQ6yunARPKpNqngkhz
+ mdX0/rf1Ria7H0sac8AwONw0owkWRyS809NjnAWB9yLLq5NxV2LzrkFq4X1kjdglJSsEvuRSjHd
+ 9utlHZGZE3xInDapqfqyj4mMWOwx0Omzxp7xpVB1yUL6tvPQEJlf0/FJvPdtSJ4sUUYlP11FKPI
+ Zx8nX97umOGWgtIEOp2N9hHTGm3I8+KiOWV1Lxn5V4ZX4IwTmYf5BNsUjR4kEtsBLtPwz6W/KyW
+ n3e0/HghTWzTkNmqBM5F5Kkql6MZQZ8RjDROWWzZuYnkLTgrYYz3bjGR4MMWeE+MAnCgIomRE8z
+ qRIdC8hA10RfRYZ8c1SAnpYLTwPM16ij/Jgp9PwWPq4QaerUM6pwEH6T8tLVfrJnr1ykqB7mAu+
+ QWKKCCCZ8Jofm6A==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-handle_response() dereferences the payload as a 4-byte handle without
-verifying that the declared payload size is at least 4 bytes. A malformed
-or truncated message from ksmbd.mountd can lead to a 4-byte read past the
-declared payload size. Validate the size before dereferencing.
+Behold, another version of directory delegations. This version contains
+support for recall-only delegations. Support for CB_NOTIFY will be
+forthcoming (once the client-side patches have caught up).
 
-This is a minimal fix to guard the initial handle read.
+This main differences in this version are bugfixes, but the last patch
+adds a more formal API for userland to request a delegation. That
+support is optional. We can drop it and the rest of the series should be
+fine.
 
-Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
-Cc: stable@vger.kernel.org
-Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
-Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+My main interest in making delegations available to userland is to allow
+testing this support without nfsd. I have an xfstest ready to submit for
+this if that support looks acceptable. If it is, then I'll also plan to
+submit an update for fcntl(2).
+
+Christian, Chuck mentioned he was fine with you merging the nfsd bits
+too, if you're willing to take the whole pile.
+
+Thanks!
+Jeff
+
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- fs/smb/server/transport_ipc.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Changes in v3:
+- Fix potential nfsd_file refcount leaks on GET_DIR_DELEGATION error
+- Add missing parent dir deleg break in vfs_symlink()
+- Add F_SETDELEG/F_GETDELEG support to fcntl()
+- Link to v2: https://lore.kernel.org/r/20251017-dir-deleg-ro-v2-0-8c8f6dd23c8b@kernel.org
 
-diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
-index 46f87fd1ce1c..2028de4d3ddf 100644
---- a/fs/smb/server/transport_ipc.c
-+++ b/fs/smb/server/transport_ipc.c
-@@ -263,6 +263,10 @@ static void ipc_msg_handle_free(int handle)
- 
- static int handle_response(int type, void *payload, size_t sz)
- {
-+	/* Prevent 4-byte read beyond declared payload size */
-+	if (sz < sizeof(unsigned int))
-+		return -EINVAL;
-+
- 	unsigned int handle = *(unsigned int *)payload;
- 	struct ipc_msg_table_entry *entry;
- 	int ret = 0;
+Changes in v2:
+- handle lease conflict resolution inside of nfsd
+- drop the lm_may_setlease lock_manager operation
+- just add extra argument to vfs_create() instead of creating wrapper
+- don't allocate fsnotify_mark for open directories
+- Link to v1: https://lore.kernel.org/r/20251013-dir-deleg-ro-v1-0-406780a70e5e@kernel.org
+
+---
+Jeff Layton (13):
+      filelock: push the S_ISREG check down to ->setlease handlers
+      vfs: add try_break_deleg calls for parents to vfs_{link,rename,unlink}
+      vfs: allow mkdir to wait for delegation break on parent
+      vfs: allow rmdir to wait for delegation break on parent
+      vfs: break parent dir delegations in open(..., O_CREAT) codepath
+      vfs: make vfs_create break delegations on parent directory
+      vfs: make vfs_mknod break delegations on parent directory
+      vfs: make vfs_symlink break delegations on parent dir
+      filelock: lift the ban on directory leases in generic_setlease
+      nfsd: allow filecache to hold S_IFDIR files
+      nfsd: allow DELEGRETURN on directories
+      nfsd: wire up GET_DIR_DELEGATION handling
+      vfs: expose delegation support to userland
+
+ drivers/base/devtmpfs.c    |   6 +-
+ fs/cachefiles/namei.c      |   2 +-
+ fs/ecryptfs/inode.c        |  10 +--
+ fs/fcntl.c                 |   9 +++
+ fs/fuse/dir.c              |   1 +
+ fs/init.c                  |   6 +-
+ fs/locks.c                 |  68 +++++++++++++++-----
+ fs/namei.c                 | 150 +++++++++++++++++++++++++++++++++++----------
+ fs/nfs/nfs4file.c          |   2 +
+ fs/nfsd/filecache.c        |  57 ++++++++++++-----
+ fs/nfsd/filecache.h        |   2 +
+ fs/nfsd/nfs3proc.c         |   2 +-
+ fs/nfsd/nfs4proc.c         |  22 ++++++-
+ fs/nfsd/nfs4recover.c      |   6 +-
+ fs/nfsd/nfs4state.c        | 103 ++++++++++++++++++++++++++++++-
+ fs/nfsd/state.h            |   5 ++
+ fs/nfsd/vfs.c              |  16 ++---
+ fs/nfsd/vfs.h              |   2 +-
+ fs/open.c                  |   2 +-
+ fs/overlayfs/overlayfs.h   |  10 +--
+ fs/smb/client/cifsfs.c     |   3 +
+ fs/smb/server/vfs.c        |   8 +--
+ fs/xfs/scrub/orphanage.c   |   2 +-
+ include/linux/filelock.h   |  12 ++++
+ include/linux/fs.h         |  13 ++--
+ include/uapi/linux/fcntl.h |  10 +++
+ net/unix/af_unix.c         |   2 +-
+ 27 files changed, 425 insertions(+), 106 deletions(-)
+---
+base-commit: d2ced3cadfab04c7e915adf0a73c53fcf1642719
+change-id: 20251013-dir-deleg-ro-d0fe19823b21
+
+Best regards,
 -- 
-2.34.1
+Jeff Layton <jlayton@kernel.org>
 
