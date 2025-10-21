@@ -1,157 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC0C3370F5
-	for <linux-cifs@vger.kernel.org>; Tue, 21 Oct 2025 13:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A3D340A4D
+	for <linux-cifs@vger.kernel.org>; Tue, 21 Oct 2025 14:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761052845; cv=none; b=FrHzmqN7Yf9Kcc3b0NGwLcQPpgqI2FcMYePetI5WzcQD8V98ScLlAX/PS4uYrw9LyS00dLizPjju3rBcB5fEXmEl0XTlTt/se10ZeijhFCR97bmEKGGdTX3Y7ujhkF0SmEVdIOxtUIOI3XEUhHdv5GcEs9NF70OwZJsSVj0P5Cc=
+	t=1761058507; cv=none; b=tQKE7xLyf71ZXTLfN3UzEVFZWhRf7gjeE+zgR6qyZdnTu4y1RTWxDtTex51ym1HclPkiNLPBEPZ94898BgVno+ESNlkzNk6eACdGf4kTbz7wVUpwZrcB9I4708s+FMyLJp6ZG1pWr7KzxseMe1SQWn/oNqumWoA16jk91L/YvGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761052845; c=relaxed/simple;
-	bh=pUM3WkjxlvllZMSA21avgB5tS8ZLspUBiO6Y0NL2uMw=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=sqn4B/QRa7yvG6dj0JTAfixTlFyfoMxWZYgCCALEIPfCMKE1R/43SXQwKDGLtQBIpsHB/Pppp85F09f0+YPTT0hn1vaWW6gsYAsOJ+1UW4rOXhrDaWZ/rtncRApOUlYAj/OnNcIiPtAQhXGtq8uYyays4XD24Yk3qKjpzyBiB0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XGck72En; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1761058507; c=relaxed/simple;
+	bh=DfZMU0R0dRnRuQiWcl7q8VsHGYmCXQ9jXTVQm1yN/2o=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=OkE0D4UEQYJpRn85Rfu+wdJFxGOegEUxg1BVoiLBZSBnvhXk4At8K4nAM6u7WMfSL0IHZvX/cr4cEEMl6EHyNSsMqsMaF1aqeqrJ/0hzQv8jvVWpGSZWYgr2x4YObdgkNC9/93v5mYUbMSIsrJDT6g77P8X0CIwfXVJBaXV0ChE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U3lOkytZ; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XGck72En"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761052842;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LDMAXz3Joj1Fr7gZbdHzGwjvuqW31ZCsGZDGsi8cR5E=;
-	b=XGck72EnRHYCUOqbRWn/kmAjM2fJhYjyXrV5yEgGYMCYinBiIQZxDszu+RXV1snH/n2+3s
-	QmJUQAnAESku0u964tJOhFIt+dKmnIz5TScuJUKHYa9gILvbUG4r/oT7dOD49+YxZAHXY0
-	GKA0kHeDzFW1H7Q98NEAm8HItkQpNnc=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-550-VgoTW2vuM22D-D82mMOdLA-1; Tue,
- 21 Oct 2025 09:20:38 -0400
-X-MC-Unique: VgoTW2vuM22D-D82mMOdLA-1
-X-Mimecast-MFC-AGG-ID: VgoTW2vuM22D-D82mMOdLA_1761052836
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 47727195608A;
-	Tue, 21 Oct 2025 13:20:28 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.57])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D872C1956056;
-	Tue, 21 Oct 2025 13:20:22 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20251021-agieren-spruch-65c107748c09@brauner>
-References: <20251021-agieren-spruch-65c107748c09@brauner> <20251014133551.82642-1-dhowells@redhat.com> <20251014133551.82642-2-dhowells@redhat.com>
-To: Christian Brauner <brauner@kernel.org>
-Cc: dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-    Christian Brauner <christian@brauner.io>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Jeffrey Altman <jaltman@auristor.com>,
-    Steve French <sfrench@samba.org>, linux-afs@lists.infradead.org,
-    openafs-devel@openafs.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org,
-    Etienne Champetier <champetier.etienne@gmail.com>,
-    Chet Ramey <chet.ramey@case.edu>,
-    Cheyenne Wills <cwills@sinenomine.net>,
-    Mimi Zohar <zohar@linux.ibm.com>, linux-integrity@vger.kernel.org
-Subject: Re: [PATCH 1/2] vfs: Allow filesystems with foreign owner IDs to override UID checks
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U3lOkytZ"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-79cf7fd45afso569926b3a.0
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Oct 2025 07:55:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761058504; x=1761663304; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i8VP2I0PGCA2sfJ++TfsZS3uJgWd3RCZmM7e0QrTU2A=;
+        b=U3lOkytZnhJ3xunlZBIjvy3C2PSJcTAcZ6oS+atQJgKbX2eTCVitmX6MdpKdCbGatW
+         MYa0EHzhU397hRnxYGmo6mkR478J+ald6CE7/bTss8OnzqI/aV3CQ+sK+esjUzZMZrNy
+         cqlKDtHAnohEVGD5h+p8aerW2mruuUEjg8t4GlRrH6Wa2Za53Rd5LiJIs5RW/o+GgKlW
+         jXOL9JyEUBilSfUxRs/a8PVCOBkHm+uJ4fzJXXwntc3xLhz5NwmzxEC/8So0k4UVtrRM
+         OX56UckZtTDrj+Ye8K4XVMtKQtpYpJd9Nk2t2N9f0s7I/qAV+m1iuMqKPdYtPS1HmEIq
+         s2Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761058504; x=1761663304;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i8VP2I0PGCA2sfJ++TfsZS3uJgWd3RCZmM7e0QrTU2A=;
+        b=aWLKQtCUUMQfNgtpsVQZ0yN/uDh5WA8dUa9e2vzfhBAsjbYLBEjG8xXxHcF8sO3MmX
+         da3UpeGyE51t2InGQxbPH/JDIEwxko3VASjx3XWZ6cHIlNxc3FHBwwvhIpJe6gUbEKo1
+         D5dcb6fK2PbXOGd09MLvp14JNT5oQM1/xkJbBVFipCN8MtR7NPapCmGbuz9TpDF1XSap
+         gncOxGytlUdBijIAKFEC0w8aIa7YJUgv2IsPBfBbFSFocjnrCkL4duDGL5tUjs+NTZWu
+         fx1zBFx5ZJ5FUWYWUZBar1D7/tHcw3qmYUGniWI4jwRzI3G0zzUHQcXh5Dz540YaGXAK
+         1Ggg==
+X-Forwarded-Encrypted: i=1; AJvYcCVROv2H6TQVW7r+FnxAEusOZvsfVZhy3e65GWGO2mvPU5JZ8T3fR1OymPfWxsc10mnvaBkWJA3Nuq80@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlA46m9JjONpuBB9E6xElBxjf5Xdti2UVno3a78F/Me5t8YDfL
+	ZuYzIEerhRWVUYM+R9r4ytbuHS5G3As94dOktEoaULgkS8MwXPUKRqQ3
+X-Gm-Gg: ASbGncvTYW698/2UVryHphNsTAG3HykaMFyQgI6QqlhpkbMGFcobKJm649YLKCPSKjn
+	XTNJhtvKzcWbsvrqRKxqQfDnDVNsY4zoNOBjb2L4fVeSbStnR2FhIzrLxyMNLT6O7X3lL7sOpsc
+	jvjpVykufRvZ1ET799hXIzgreoyU9L3dj42O8oyAPhTiahTtbFYbxJoyqYwXtkuzD1wmT08bw/H
+	f7IeVE7zQ79tYaPJJTyas4chy+vd25Es8i2rQ8Fk/N4QI5ShcxNNpjXD/HrcwFzJRoslTprQFq7
+	D07GoYpVULrpnCsBGchsgwgUlxFIokAC6kg4wEgIfCDadYH8uFpRPj55XTF1yjIvM/RZ8nZk400
+	cEKl1SNvJUvJgsrFvw20+BTU7nGWAz8bpWG6+hwL/ID7U0jLblctOuGmG/YV2tVWY0KbaSTx5md
+	8PoALxtWuz1PLceG0z6EecUhAj3U3ACg9Jwv7Exo1cmmQVATV5UnRH9JLTdmH1oG24ZOVphZ4x
+X-Google-Smtp-Source: AGHT+IFGdbtj0ivIPfYSgKjRnJx+JRIuBP/TzlLHzhX/tcb7pAq49jg9nE07bVQ8DwbDuxENZ1F91w==
+X-Received: by 2002:a05:6a00:1408:b0:781:229b:cf82 with SMTP id d2e1a72fcca58-7a2572d4b3amr2639509b3a.3.1761058503854;
+        Tue, 21 Oct 2025 07:55:03 -0700 (PDT)
+Received: from poi.localdomain (KD118158218050.ppp-bb.dion.ne.jp. [118.158.218.50])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a22ff1581dsm11484614b3a.12.2025.10.21.07.55.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 07:55:03 -0700 (PDT)
+From: Qianchang Zhao <pioooooooooip@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	Qianchang Zhao <pioooooooooip@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: transport_ipc: validate payload size before reading handle
+Date: Tue, 21 Oct 2025 23:54:49 +0900
+Message-Id: <20251021145449.473932-1-pioooooooooip@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <2025102125-petted-gristle-43a0@gregkh>
+References: <2025102125-petted-gristle-43a0@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1523596.1761052821.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Oct 2025 14:20:21 +0100
-Message-ID: <1523597.1761052821@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Transfer-Encoding: 8bit
 
-Christian Brauner <brauner@kernel.org> wrote:
+handle_response() dereferences the payload as a 4-byte handle without
+verifying that the declared payload size is at least 4 bytes. A malformed
+or truncated message from ksmbd.mountd can lead to a 4-byte read past the
+declared payload size. Validate the size before dereferencing.
 
-> > +	if (unlikely(inode->i_op->have_same_owner)) {
-> =
+This is a minimal fix to guard the initial handle read.
 
-> Same, as above: similar to IOP_FASTPERM this should use a flag to avoid =
-pointer derefs.
+Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
+Cc: stable@vger.kernel.org
+Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+---
+ fs/smb/server/transport_ipc.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Can we do these IOP_* flags better?  Surely we can determine at the point =
-the
-inode has its ->i_op assigned that these things are provided?  This optimi=
-ses
-the case where they don't exist at the expense of the case where they do (=
-we
-still have to check the pointer every time).
-
-> > +	if (unlikely(inode->i_op->have_same_owner)) {
-> =
-
-> Same, as above: similar to IOP_FASTPERM this should use a flag to avoid =
-pointer derefs.
-> =
-
-> Really, we should very properly bias this towards the common case where
-> the filesystem will not have a custom ownership comparison callback at a=
-ll.
-
-Hence the unlikely().
-
-> > +		struct dentry *parent;
-> > +		struct inode *dir;
-> > +		int ret;
-> > +
-> > +		if (inode !=3D nd->inode) {
-> > +			dir =3D nd->inode;
-> > +			ret =3D inode->i_op->have_same_owner(idmap, inode, dir);
-> > +		} else if (nd->flags & LOOKUP_RCU) {
-> > +			parent =3D READ_ONCE(nd->path.dentry);
-> > +			dir =3D READ_ONCE(parent->d_inode);
-> > +			if (!dir)
-> > +				return -ECHILD;
-> > +			ret =3D inode->i_op->have_same_owner(idmap, inode, dir);
-> > +		} else {
-> > +			parent =3D dget_parent(nd->path.dentry);
-> > +			dir =3D parent->d_inode;
-> > +			ret =3D inode->i_op->have_same_owner(idmap, inode, dir);
-> > +			dput(parent);
-> > +		}
-> > +		return ret;
-> > +	}
-> =
-
-> This about as ugly as it can get and costly...
-
-I can break this out into a helper, but it should make no difference to th=
-e
-actual code generated.
-
-> > +	ret =3D vfs_inode_and_dir_have_same_owner(idmap, inode, nd);
-> > +	if (ret <=3D 0)
-> > +		return ret;
-> =
-
-> Ok, so while that doesn't exactly surface the error it's still weird.
-> Please make that consistent. Either have those two new helper functions
-> return negative error codes and zero on success or have it be a proper
-> boolean instead so there's no possible confusion. This is just begging
-> for someone to do if (ret) return ret and bubble up that positive return
-> value.
-
-The problem is that you have three available returns: Yes they do, no they
-don't and some arbitrary error was encountered.  The first two are not err=
-or
-cases, and potentially any error you pick to represent, say, "no" could al=
-so
-be returned by the underlying filesystem.
-
-David
+diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
+index 46f87fd1ce1c..2028de4d3ddf 100644
+--- a/fs/smb/server/transport_ipc.c
++++ b/fs/smb/server/transport_ipc.c
+@@ -263,6 +263,10 @@ static void ipc_msg_handle_free(int handle)
+ 
+ static int handle_response(int type, void *payload, size_t sz)
+ {
++	/* Prevent 4-byte read beyond declared payload size */
++	if (sz < sizeof(unsigned int))
++		return -EINVAL;
++
+ 	unsigned int handle = *(unsigned int *)payload;
+ 	struct ipc_msg_table_entry *entry;
+ 	int ret = 0;
+-- 
+2.34.1
 
