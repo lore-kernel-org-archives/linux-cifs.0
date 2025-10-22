@@ -1,212 +1,118 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F1930EF9D
-	for <linux-cifs@vger.kernel.org>; Wed, 22 Oct 2025 09:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE1F35BDC9
+	for <linux-cifs@vger.kernel.org>; Wed, 22 Oct 2025 14:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761123819; cv=none; b=NfKSwOyV7P9wNeGq7puWnZGiqMwed6yQOLMge0hT82qptQtD/wIGuKmBYpJ8SQUFl+qYFRadHqG8Sv0J1ar+ErNAAEjip3LTbaket5M+4QBn8qNV6v1fOBJE56QYsmjPBYQ2WUSaddWrCcDbzvIZknUh3KBx0fnD7yM8om1mLbY=
+	t=1761144844; cv=none; b=W8tj9jL/irGuzIcokVM5aYDgMPW8Cgm67WrsqUGYiiBtNcPmCfWjUNQ5PXxi3cBa9mCk4AvpbytHs+waNcQWrHF0sHIDCrLTYjPnm6ZoxQc2oXsu7+UhO+V3AsoQYvk72oWDHc5e8tt9j5Br7voFYKGeTGtvRvOTySnVymcHQNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761123819; c=relaxed/simple;
-	bh=BbjKdKJOIN11/N/Av8tRJFdvvl/rcEy0y/T/ykyBLDs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E7L+arLzDNXWikOl47OMKfWPI6CYlVH45upOiqXdTVgP1mkfPIU1HUlja+A+DHylamxGV4C4/s/gR5d5OMMFExG9DtE+Fs1TaaNvz05e8YcdqpIjg8jW8/iCJjyEJHcS8zuGpeSWfC0MpSsm1OFtnziBVDMcY7NCPEda4fPh97o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=G9J5KCh6; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=14G+ZRO8; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=cw4Kd4WO; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Q0/1LwQh; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1761144844; c=relaxed/simple;
+	bh=bks8qIi7M2BOZI3y7iG2qNo8QYzUXZ0cz4QMvS9FeDg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DBX8fSPi/Spmlauw32ve1DYue0RkXUZvuF6gsyL8hX4CJp06RYHP03RyRtBmfAGhBIr1q6sZfcAlPUMOrPXVJPISXAb1jPlRGLoAcepwZSzkPMItjTEObVWgakQNMTncDN/GbQBt7fR4nC1heetxk8CxvlKqma6heHBb7Wi9FSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AL/8yhpO; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="G9J5KCh6";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="14G+ZRO8";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="cw4Kd4WO";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Q0/1LwQh"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E6A691F788;
-	Wed, 22 Oct 2025 09:03:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1761123812; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zWrRoINCj3OqAfg5PTgsjqvXeRUN3tNurbDF1UsQ+SU=;
-	b=G9J5KCh6W+1WPd/qBI48zIgYJLRNiHsHnfkiRiTP0Xzyyzdb1KHb8GuQVeUVLuJl/a8YVn
-	XNPsdB1Jx8K9KlwbDI2YFXtHvg8ZaxNxPfv17V5TwZu2vztFabLuSstPusCcqDnwgOi+8S
-	PB8Nd5XOFFeoYmMoNO6xMj8qKJiMLrA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1761123812;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zWrRoINCj3OqAfg5PTgsjqvXeRUN3tNurbDF1UsQ+SU=;
-	b=14G+ZRO8KRuFHfqfYaKfca3Mg4mTGnDXIsGqDkPmz4hI/RMvdcY4XYQ1xk1lfbQytLf/uk
-	WbYvieYu0JpZciBg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=cw4Kd4WO;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b="Q0/1LwQh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1761123808; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zWrRoINCj3OqAfg5PTgsjqvXeRUN3tNurbDF1UsQ+SU=;
-	b=cw4Kd4WOzTalNHRC5kCf/r86pEI4ruZ6cuuR60Cib43IhlIP4H7IfPypaa8eJQIZ8mkj7s
-	pCoATgsHVMVqio6AfMa02cN26SSVNk33Ez6Vdo6DGluRbOzllUTn07g2yyZI/8u2q6Pq+5
-	vcb55DncI+TB00+jX03tL2ElOHnubaE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1761123808;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zWrRoINCj3OqAfg5PTgsjqvXeRUN3tNurbDF1UsQ+SU=;
-	b=Q0/1LwQhf1vXYMN24ZHHUpKVytdg28nYw9hc6n1N6ay6PKGXvIm/kT09I7fQl0fNvl4n4k
-	OmJeQTUwvheKYoDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DA47013A29;
-	Wed, 22 Oct 2025 09:03:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id XmdINd+d+GisbAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Wed, 22 Oct 2025 09:03:27 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 43473A0990; Wed, 22 Oct 2025 11:03:19 +0200 (CEST)
-Date: Wed, 22 Oct 2025 11:03:19 +0200
-From: Jan Kara <jack@suse.cz>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Miklos Szeredi <miklos@szeredi.hu>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Chuck Lever <chuck.lever@oracle.com>, Alexander Aring <alex.aring@gmail.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, David Howells <dhowells@redhat.com>, 
-	Tyler Hicks <code@tyhicks.com>, NeilBrown <neil@brown.name>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
-	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v3 09/13] filelock: lift the ban on directory leases in
- generic_setlease
-Message-ID: <g7r2bffekbosexqbatj5mb7ljc5rn5rw3dwfehipsxdb6hewyp@heriwuhgh3zo>
-References: <20251021-dir-deleg-ro-v3-0-a08b1cde9f4c@kernel.org>
- <20251021-dir-deleg-ro-v3-9-a08b1cde9f4c@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AL/8yhpO"
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b6d364dd71cso12813066b.1
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Oct 2025 07:54:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761144840; x=1761749640; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bks8qIi7M2BOZI3y7iG2qNo8QYzUXZ0cz4QMvS9FeDg=;
+        b=AL/8yhpOqQkpiE/+WJdMEYRlOKeqUqHddQ5y9TgWJ4mfVmJzEBxtfWI5erMBihdD2J
+         XKH83fUX0x9DgFIwQ/jErQ8lKqPk/Izt8tkNpZmmKTMSqgpDCFQYDmnECOOnebnW6ZEw
+         lL+0H28uPPY64BJaSpC3f7OycjeVYQ2cdbaUnJCnwy+28EXMg+Szcj3Q0LaATsekWysg
+         JszZBSnJ3xWexLcrVIKDc1vQDMbmgVRqQZyi9zswePHLkRUeEkZoDPxuT1BOkrI+0vPI
+         dAagkhoAf26tOkX23HDkW4jPq5TCuep+sC7zM5qWmao2+p7vzVHsgHUe8UpE2mAqn4NG
+         Ddpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761144840; x=1761749640;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bks8qIi7M2BOZI3y7iG2qNo8QYzUXZ0cz4QMvS9FeDg=;
+        b=PGd0hsstQVGskMeuk0pZCj4fl6UTha3Xrq0528iBXJK9rVLQLX8tYBEP8BARcQpJ/d
+         iss7ixlWve6a5riDXS+pfg2M+35blP4tONP6tHoXwbDOFQQa17v1W3P50md8JwS9rdp1
+         4b9W6e4+LpoZIeOQgazUrsEEtvTk2jQW1tIeiyschTr+mwx883mUbOPK7K19vcQ2u9oC
+         HYmFWZ2tM+PMRx1FJCVc3uZKzDGpaz0HMvWGB0JYHJBOaGmZMoqYhm4svWKlA+dLwa7h
+         P+L+hAROAebZIWZ6WKG4J6X0oAf4OGSfNaEZmqfWBhLR7YVkqO2wEfngE74nekIVlMgM
+         +Vaw==
+X-Forwarded-Encrypted: i=1; AJvYcCXUPNsHcbbWSHmy7t5zTtEfIISyd+y9tenZI/Tcs/cJtG59D08bhWyXxMQO6cnRFqgAf8z0PP8zVSvM@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBDsAADCadk1d6r9g8gaWY7BRsp+OCbhpsXqUcsvcqTmiqxr4U
+	N8eVe0Jud0oK4yT3SUkjp63SwEGqYy1gIJ8/l6QIdBRpEZK7qTbQg9N81/7PRDyCG7yu5DWeX/g
+	31w9eBlo5LnfT8OQRT5dAWXiCv4umO6Q=
+X-Gm-Gg: ASbGncuRYowcNqjlFE7yUwOSW4Z6XBSIdZPWvPfwEOT5ulJJjRuZ4hrpU3DyJ1knpwg
+	4qhDxgKtHFHMj5jbkCbz+hbqOJ4htNSn0TSBPFDoMp+QyUH1MAY78cgsDjDFmIlVfKFPza/9R5w
+	1UDj/94i7o8ua5DLKt2RDmY1lZbM3TGmXGTz7/w9MnW8ixHwa95eUPDuKhLK3MrKx1RicLLvDel
+	hHO328+07jrt2RM2hwMI7DmM3+mAXQ07zPPPPI0mIqFYLfIDWzOhulx3paIUw==
+X-Google-Smtp-Source: AGHT+IG7h7TaFxHTuDY8AWEs3DohBAFF5ntTu6CWIe9+nZpuje6ygTxavGcJ/i05b9VtLfcssN/cg/UG6AHp/Ayc0iQ=
+X-Received: by 2002:a17:907:d90:b0:b6c:55b5:27a2 with SMTP id
+ a640c23a62f3a-b6c76fa331cmr460806666b.6.1761144839990; Wed, 22 Oct 2025
+ 07:53:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251021-dir-deleg-ro-v3-9-a08b1cde9f4c@kernel.org>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: E6A691F788
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	ARC_NA(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[szeredi.hu,zeniv.linux.org.uk,kernel.org,suse.cz,oracle.com,gmail.com,samba.org,manguebit.org,microsoft.com,talpey.com,linuxfoundation.org,redhat.com,tyhicks.com,brown.name,chromium.org,google.com,davemloft.net,vger.kernel.org,lists.samba.org,lists.linux.dev];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	R_RATELIMIT(0.00)[to_ip_from(RLpnapcpkwxdkc5mopt1ezhhna)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[brown.name:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.cz:dkim,suse.cz:email,suse.com:email]
-X-Spam-Score: -2.51
+References: <2025102125-petted-gristle-43a0@gregkh> <20251021145449.473932-1-pioooooooooip@gmail.com>
+ <CAKYAXd-JFuBptqzEbgggUhaF2bEfWMRXCSK9N_spiBxvi1v0Wg@mail.gmail.com>
+In-Reply-To: <CAKYAXd-JFuBptqzEbgggUhaF2bEfWMRXCSK9N_spiBxvi1v0Wg@mail.gmail.com>
+From: =?UTF-8?B?44GP44GV44GC44GV?= <pioooooooooip@gmail.com>
+Date: Wed, 22 Oct 2025 23:53:49 +0900
+X-Gm-Features: AS18NWC4GzKd1xEuugd--eot2ZHrwZpDIUjy0AlgxBnilTm3xbX4azrPGMl_XLI
+Message-ID: <CAFgAp7ixLZLXGSN6tOmtNj0f4b-z3pnMrQg4Avnb6tOvj3h3KQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: transport_ipc: validate payload size before
+ reading handle
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	gregkh@linuxfoundation.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue 21-10-25 11:25:44, Jeff Layton wrote:
-> With the addition of the try_break_lease calls in directory changing
-> operations, allow generic_setlease to hand them out. Write leases on
-> directories are never allowed however, so continue to reject them.
-> 
-> For now, there is no API for requesting delegations from userland, so
-> ensure that userland is prevented from acquiring a lease on a directory.
-> 
-> Reviewed-by: NeilBrown <neil@brown.name>
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+Hi Namjae, Steve,
 
-Looks good. Feel free to add:
+Thanks for updating the patch. I=E2=80=99ve reviewed the changes and they l=
+ook
+good to me.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Minor impact note: this patch prevents a 4-byte out-of-bounds read in
+ksmbd's handle_response() when the declared Generic Netlink payload
+size is < 4.
+If a remote client can influence ksmbd.mountd to emit a truncated
+payload, this could be remotely triggerable (info-leak/DoS potential).
+If you consider this security-impacting, I=E2=80=99m happy to request a CVE
+via the kernel.org CNA.
 
-								Honza
+Thanks!!
+Qianchang Zhao
 
-> ---
->  fs/locks.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/locks.c b/fs/locks.c
-> index 0b16921fb52e602ea2e0c3de39d9d772af98ba7d..b47552106769ec5a189babfe12518e34aa59c759 100644
-> --- a/fs/locks.c
-> +++ b/fs/locks.c
-> @@ -1929,14 +1929,19 @@ static int generic_delete_lease(struct file *filp, void *owner)
->  int generic_setlease(struct file *filp, int arg, struct file_lease **flp,
->  			void **priv)
->  {
-> -	if (!S_ISREG(file_inode(filp)->i_mode))
-> +	struct inode *inode = file_inode(filp);
-> +
-> +	if (!S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode))
->  		return -EINVAL;
->  
->  	switch (arg) {
->  	case F_UNLCK:
->  		return generic_delete_lease(filp, *priv);
-> -	case F_RDLCK:
->  	case F_WRLCK:
-> +		if (S_ISDIR(inode->i_mode))
-> +			return -EINVAL;
-> +		fallthrough;
-> +	case F_RDLCK:
->  		if (!(*flp)->fl_lmops->lm_break) {
->  			WARN_ON_ONCE(1);
->  			return -ENOLCK;
-> @@ -2065,6 +2070,9 @@ static int do_fcntl_add_lease(unsigned int fd, struct file *filp, int arg)
->   */
->  int fcntl_setlease(unsigned int fd, struct file *filp, int arg)
->  {
-> +	if (S_ISDIR(file_inode(filp)->i_mode))
-> +		return -EINVAL;
-> +
->  	if (arg == F_UNLCK)
->  		return vfs_setlease(filp, F_UNLCK, NULL, (void **)&filp);
->  	return do_fcntl_add_lease(fd, filp, arg);
-> 
-> -- 
-> 2.51.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+
+On Wed, Oct 22, 2025 at 3:39=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.org>=
+ wrote:
+>
+> On Tue, Oct 21, 2025 at 11:55=E2=80=AFPM Qianchang Zhao <pioooooooooip@gm=
+ail.com> wrote:
+> >
+> > handle_response() dereferences the payload as a 4-byte handle without
+> > verifying that the declared payload size is at least 4 bytes. A malform=
+ed
+> > or truncated message from ksmbd.mountd can lead to a 4-byte read past t=
+he
+> > declared payload size. Validate the size before dereferencing.
+> >
+> > This is a minimal fix to guard the initial handle read.
+> >
+> > Fixes: 0626e6641f6b ("cifsd: add server handler for central processing =
+and tranport layers")
+> > Cc: stable@vger.kernel.org
+> > Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+> > Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+> I have directly updated your patch. Can you check the attached patch ?
+> Thanks!
