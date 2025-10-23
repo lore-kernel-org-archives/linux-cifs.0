@@ -1,170 +1,121 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA461CD2C
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Oct 2025 00:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E332C11FD
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Oct 2025 07:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761177667; cv=none; b=Ls+y9DBDxPrOHTNWZdD268nOlmkm2ELEycWbC4qcOtH1MIO4w6UEVbUtCXTvkqvZQrAuyp5TZXQRED8mYrUAy9dkOBWJIxc1Kli/TQ/2MGIr3xUOZkl3pNBQg3rJJUiezOSWXrXaIi1TldhYcQ3MQ5kZWNQ7U33qxKKx4GUaDrI=
+	t=1761204097; cv=none; b=T5aAMAxmcgPT0RKV/C62RBHwE4X+95VgzCctOFCAJaaikV1B9L3dhda3Q9bJbwKJ3eV6MAKs+Skc8CK7DI/pba8xpHxAzBcsT8Cihj28XMmlLdyK4b7jdgXOpAZgKZ5f68d/nveby0z6RFbgG7Aiu4fngYilj8yDPORAUsRMoZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761177667; c=relaxed/simple;
-	bh=viUrZiXtuCdJdjTSbRkRaTQ8uiewrNUBtXc6bTCzvwI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YYwCG3yUOoWjJt/bQsR3rjuMtUPtsCTWj4+Dr7ZKbJlDZSko8/YgzhH/7+NiuDcsZFus+Od0JWutNkvJv+SPAD75HzpTOHUNhMUWP9toXrSEFJjSMhHEe1QqHRRXLbPfT8JIJCzU3q/+IpRRFHenTVL6ENJUp8gy5y06HZNZISM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=KZd4aU9C; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1761204097; c=relaxed/simple;
+	bh=/g94T3C3FpvXuoLJ50EST30PL4M1AgzqRzsFNFlQ8HI=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=UL3F5V3Jv2DXtVFmNpF9V1e34Lc1khSVdN0YFiRIxnQznlXbvae2XRXXYqia4y75ZkF0w3whGleSTk9IVd2vXzK6gKY6oDR/hh1DdD9OdMXkac7lnF7wkLp46NlxV6PBYBicv0CQwRHZz38ARao1YYCvsuv6laCe+HNAtAX0cqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YgDyha/p; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="KZd4aU9C"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=D7qJzGAceYFItXNlelcqgE5jtHtS289KdPv+1x2XXz0=; b=KZd4aU9CuM2Cr+twuzShqxzmt3
-	pxEkYqbfhKzcB37UQupyMcSM0Odw12O23x181GoZ3zJgf0uspHry3cDoiRDI3evSJmgP/l3c2Qvll
-	6DsXrBFR/XfMOq5PYHNEHlmAmy6nQe1wasaw89ZWCR4JY0aYA1uEyt6I3F9vU/soNYrLCeJc4iuJb
-	xafCRnwYJvSggvSioOdQ2G2jbduuf+NYPWtjwW5RUtliHKRT7WvmDKHlwY6kcb92bjvASJRcWrN6i
-	UemvZzMqL0rAmjAXZgcYuFapl3F1SYEjoAAV5yy2tdLL18kiTf4C4JZfoJXNlzKDCwHmyDv9zWpXU
-	hbYuk9vA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1vBiUD-00000000Cm7-2zWd;
-	Wed, 22 Oct 2025 20:43:21 -0300
-From: Paulo Alcantara <pc@manguebit.org>
-To: smfrench@gmail.com
-Cc: Anoop C S <anoopcs@samba.org>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	Xiaoli Feng <xifeng@redhat.com>,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH] smb: client: fix cifs_close_deferred_file_under_dentry()
-Date: Wed, 22 Oct 2025 20:43:21 -0300
-Message-ID: <20251022234321.279422-1-pc@manguebit.org>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YgDyha/p"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761204094;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lDzebCCMPQTZ7xDuMBPuzYzGqdMATmQDJmQkqVWUYuc=;
+	b=YgDyha/pXDLeYg9Y2wVUTxqb+dddMNfiHLQhlp45xxY6KaDaAn8JPmuJ0gnoK9xGHIBqmh
+	uY44rZyexcZuqHa8bA3aMwH9poSoq2cUq1xFc3CYLH5/CtdOWARf/Ka/druTKc+igVIavf
+	0w/Lw0fYIdSw5HPtZ4gsd+ni/zsDaxg=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-445-eq852SuiPCur_SwGV9o8kg-1; Thu,
+ 23 Oct 2025 03:21:27 -0400
+X-MC-Unique: eq852SuiPCur_SwGV9o8kg-1
+X-Mimecast-MFC-AGG-ID: eq852SuiPCur_SwGV9o8kg_1761204086
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3C0A318001E2;
+	Thu, 23 Oct 2025 07:21:26 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.57])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9671030002D7;
+	Thu, 23 Oct 2025 07:21:24 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20251022234321.279422-1-pc@manguebit.org>
+References: <20251022234321.279422-1-pc@manguebit.org>
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: dhowells@redhat.com, smfrench@gmail.com,
+    Anoop C S <anoopcs@samba.org>, Xiaoli Feng <xifeng@redhat.com>,
+    linux-cifs@vger.kernel.org
+Subject: Re: [PATCH] smb: client: fix cifs_close_deferred_file_under_dentry()
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1837801.1761204083.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Oct 2025 08:21:23 +0100
+Message-ID: <1837802.1761204083@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-The dentry passed in cifs_close_deferred_file_under_dentry() could
-have been unhashed from its parents hash list and then looked up
-again, so matching @cfile->dentry with @dentry would no longer work.
-This would then fail to close the deferred file prior to renaming or
-unlinking it.
+Paulo Alcantara <pc@manguebit.org> wrote:
 
-Fix this by matching filenames instead of dentry pointers.
+> The dentry passed in cifs_close_deferred_file_under_dentry() could
+> have been unhashed from its parents hash list and then looked up
+> again, so matching @cfile->dentry with @dentry would no longer work.
+> This would then fail to close the deferred file prior to renaming or
+> unlinking it.
+> =
 
-This problem can be reproduced with LTP rename14 testcase:
+> Fix this by matching filenames instead of dentry pointers.
+> =
 
-  rename14 0 TINFO : Using /mnt/1/ltp-a5w7It6Osi/LTP_renffzJE1 as
-  tmpdir (unknown filesystem)
-  rename14    1  TPASS  :  Test Passed
-  rename14 0 TWARN : tst_tmpdir.c:347: tst_rmdir:
-  rmobj(/mnt/1/ltp-a5w7It6Osi/LTP_renffzJE1) failed:
-  unlink(/mnt/1/ltp-a5w7It6Osi/LTP_renffzJE1/.__smb0021) failed;
-  errno=2: ENOENT
-  <<<execution_status>>>
-  initiation_status="ok"
-  duration=5 termination_type=exited termination_id=4 corefile=no
-  cutime=0 cstime=587
-  <<<test_end>>>
-  INFO: ltp-pan reported some tests FAIL
-  LTP Version: 20250930-14-g9bb94efa3
-         ###############################################################
-              Done executing testcases.
-              LTP Version:  20250930-14-g9bb94efa3
-         ###############################################################
-  -------------------------------------------
-  INFO: runltp script is deprecated, try kirk
-  https://github.com/linux-test-project/kirk
-  -------------------------------------------
-  rm: cannot remove '/mnt/1/ltp-a5w7It6Osi/LTP_renffzJE1': Directory not empty
+> This problem can be reproduced with LTP rename14 testcase:
+> =
 
-Reported-by: Anoop C S <anoopcs@samba.org>
-Fixes: 93ed9a295130 ("smb: client: fix filename matching of deferred files")
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: Xiaoli Feng <xifeng@redhat.com>
-Cc: linux-cifs@vger.kernel.org
----
- fs/smb/client/cifsproto.h | 2 +-
- fs/smb/client/inode.c     | 6 +++---
- fs/smb/client/misc.c      | 8 ++++++--
- 3 files changed, 10 insertions(+), 6 deletions(-)
+>   rename14 0 TINFO : Using /mnt/1/ltp-a5w7It6Osi/LTP_renffzJE1 as
+>   tmpdir (unknown filesystem)
+>   rename14    1  TPASS  :  Test Passed
+>   rename14 0 TWARN : tst_tmpdir.c:347: tst_rmdir:
+>   rmobj(/mnt/1/ltp-a5w7It6Osi/LTP_renffzJE1) failed:
+>   unlink(/mnt/1/ltp-a5w7It6Osi/LTP_renffzJE1/.__smb0021) failed;
+>   errno=3D2: ENOENT
+>   <<<execution_status>>>
+>   initiation_status=3D"ok"
+>   duration=3D5 termination_type=3Dexited termination_id=3D4 corefile=3Dn=
+o
+>   cutime=3D0 cstime=3D587
+>   <<<test_end>>>
+>   INFO: ltp-pan reported some tests FAIL
+>   LTP Version: 20250930-14-g9bb94efa3
+>          ###############################################################
+>               Done executing testcases.
+>               LTP Version:  20250930-14-g9bb94efa3
+>          ###############################################################
+>   -------------------------------------------
+>   INFO: runltp script is deprecated, try kirk
+>   https://github.com/linux-test-project/kirk
+>   -------------------------------------------
+>   rm: cannot remove '/mnt/1/ltp-a5w7It6Osi/LTP_renffzJE1': Directory not=
+ empty
+> =
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index fb1813cbe0eb..65abbb5041b8 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -314,7 +314,7 @@ extern void cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode);
- extern void cifs_close_all_deferred_files(struct cifs_tcon *cifs_tcon);
- 
- void cifs_close_deferred_file_under_dentry(struct cifs_tcon *cifs_tcon,
--					   struct dentry *dentry);
-+					   const char *full_path);
- 
- extern void cifs_mark_open_handles_for_deleted_file(struct inode *inode,
- 				const char *path);
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 098a79b7a959..1a4369abba32 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1984,7 +1984,7 @@ static int __cifs_unlink(struct inode *dir, struct dentry *dentry, bool sillyren
- 	}
- 
- 	netfs_wait_for_outstanding_io(inode);
--	cifs_close_deferred_file_under_dentry(tcon, dentry);
-+	cifs_close_deferred_file_under_dentry(tcon, full_path);
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- 	if (cap_unix(tcon->ses) && (CIFS_UNIX_POSIX_PATH_OPS_CAP &
- 				le64_to_cpu(tcon->fsUnixInfo.Capability))) {
-@@ -2553,10 +2553,10 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
- 		goto cifs_rename_exit;
- 	}
- 
--	cifs_close_deferred_file_under_dentry(tcon, source_dentry);
-+	cifs_close_deferred_file_under_dentry(tcon, from_name);
- 	if (d_inode(target_dentry) != NULL) {
- 		netfs_wait_for_outstanding_io(d_inode(target_dentry));
--		cifs_close_deferred_file_under_dentry(tcon, target_dentry);
-+		cifs_close_deferred_file_under_dentry(tcon, to_name);
- 	}
- 
- 	rc = cifs_do_rename(xid, source_dentry, from_name, target_dentry,
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index 340c44dc7b5b..0b1b25c6e0cc 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -834,15 +834,18 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
- }
- 
- void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
--					   struct dentry *dentry)
-+					   const char *full_path)
- {
- 	struct file_list *tmp_list, *tmp_next_list;
-+	void *page = alloc_dentry_path();
- 	struct cifsFileInfo *cfile;
- 	LIST_HEAD(file_head);
- 
- 	spin_lock(&tcon->open_file_lock);
- 	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
--		if ((cfile->dentry == dentry) &&
-+		const char *path = build_path_from_dentry(cfile->dentry, page);
-+
-+		if (!IS_ERR(path) && !strcmp(full_path, path) &&
- 		    delayed_work_pending(&cfile->deferred) &&
- 		    cancel_delayed_work(&cfile->deferred)) {
- 			spin_lock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
-@@ -863,6 +866,7 @@ void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
- 		list_del(&tmp_list->list);
- 		kfree(tmp_list);
- 	}
-+	free_dentry_path(page);
- }
- 
- /*
--- 
-2.51.0
+> Reported-by: Anoop C S <anoopcs@samba.org>
+> Fixes: 93ed9a295130 ("smb: client: fix filename matching of deferred fil=
+es")
+> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: Xiaoli Feng <xifeng@redhat.com>
+> Cc: linux-cifs@vger.kernel.org
+
+Reviewed-by: David Howells <dhowells@redhat.com>
 
