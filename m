@@ -1,270 +1,91 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D64B28DC4
-	for <linux-cifs@vger.kernel.org>; Fri, 24 Oct 2025 02:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919E327453
+	for <linux-cifs@vger.kernel.org>; Fri, 24 Oct 2025 05:08:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761274162; cv=none; b=p6bluZ/wVIiSxF2zgXrU2fxL9wJxLReaJFk+D3pbba+WURZEHOUAWEiOaZOdFYcMebA/DkvzQWxwsEjtONwwAFC0mDN+w+hsGKc2bv+X4cpxtqHCY+rNRAdY/0CLWnHEBjKc65OyjUdiOjqLwX2cQx1p11oJxRxXEHjpV+nugMI=
+	t=1761282486; cv=none; b=VSyBCgr9Z8QaUja2Fjpw3Jm4VnXgTa8JeZ5YAIBVD+eA03rIGVD6wkl/mvJTECUfJYrqK74TofWkDOutmG7uPu3aC58IBss6uOTUVDd+G3Krsh5Gz+RqRNtuGnBB8dNgzNJyMAHTtgPQKyaC/xKZE5HQh9rTnZ6XacuQptlgQno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761274162; c=relaxed/simple;
-	bh=jTYRvZbzsnG/Yqv5KUYcMiOMMdLlylr5eAFu0u0iM6Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BmC/C+CLZLAFo51qhR8sGYRHk6JAiwBUCgRf7IeoryRlspqPNSy/hVoXs9T1f5ApYCx981KICGpwBU7ezNhMc1w6910g26Z4wfGIlYu4SIUmoDlXkUk9q78GQN8nynMDj0PC46Q188a4eowprxhpbAgj8I9xOvU54vZ2Yhvd2Xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=c9YVMJfK; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1761282486; c=relaxed/simple;
+	bh=eIJk14yf0ixEQNG5/MPY9A2l/FLeyJqXyUAOMoIZ1u0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VBBIhuirBtVk9pNWoS6Vsqxkfeirfgfa0ah+C6vqnfuZUhOJY9TPbieg8dTmj7G9/Tqc1N3zuUK4yBgRJ/Gcxu6C9jsIHCoS5WVyczyaP326oxfhfN3IN6AMDxOcIIxnG35yVl7InBrbE1R9I59ZQrH1nLzJcg35QXRS+y++13c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=zMCKRlOd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="c9YVMJfK"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=N98CpJ2Wm42Gq1P+oPrWQ8khHyFKV1BfJDQmJAGHppM=; b=c9YVMJfK6wb1m5Uw8TMOdOE4q5
-	8QuB0lSq1wWxhMl5SMcgXY7GWF6k8iOaSX2yMMIa1iUXdj9AE2xYpkp7T9VRy2mBACAk9XGTIaZcC
-	URmYaJ2J6X8SUFsCjniU0pZpmRPH8mvUNLheIDNHZoxu0m9Or8++69NvXWDlCUB2p33ArxnQuhYEp
-	Ch6f6y3c5ooNBd1yOQ2Nj3MLrW661bYja1zVSUSwo7ExQ/w9n9eyvxacliX75dPxV+9Su6gNRcBNX
-	VQ9IIlo9JhBwgdZN0rIGClgCj1h98qmmg5YLBHUGNDLxbxbojyUAvCH78OgOxcbxfFxtgZdFTCsmP
-	qDs714gw==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1vC7rZ-00000000H6T-1tYD;
-	Thu, 23 Oct 2025 23:49:09 -0300
-From: Paulo Alcantara <pc@manguebit.org>
-To: smfrench@gmail.com
-Cc: Jay Shin <jaeshin@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH] smb: client: handle lack of IPC in dfs_cache_refresh()
-Date: Thu, 23 Oct 2025 23:49:09 -0300
-Message-ID: <20251024024909.474285-1-pc@manguebit.org>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="zMCKRlOd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CA0FC4CEF1;
+	Fri, 24 Oct 2025 05:08:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1761282485;
+	bh=eIJk14yf0ixEQNG5/MPY9A2l/FLeyJqXyUAOMoIZ1u0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=zMCKRlOdduUb7bSyy/j4YhvcQ4DQtqVKh53lcdld+zaKy5pAQb5bO8atfC/BxJJU6
+	 +i2biU6io3Ru/btoZ+laZWfttmHGq+VFmYay3HFc7812xfDwZ5I/b7sjCWx1CbQx8u
+	 78o9HGgOkH25ZmfNyCZa5dSTyjzYki/gHtTHfs0k=
+Date: Fri, 24 Oct 2025 07:08:01 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+	Rosen Penev <rosenp@gmail.com>
+Subject: Re: [PATCH v2] RFC: ksmbd: Create module_kobject if builtin
+Message-ID: <2025102441-calculate-accustom-2023@gregkh>
+References: <20251024-ksmbd-sysfs-module-v2-1-acba8159dbe5@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251024-ksmbd-sysfs-module-v2-1-acba8159dbe5@linaro.org>
 
-In very rare cases, DFS mounts could end up with SMB sessions without
-any IPC connections.  These mounts are only possible when having
-unexpired cached DFS referrals, hence not requiring any IPC
-connections during the mount process.
+On Fri, Oct 24, 2025 at 12:49:44AM +0200, Linus Walleij wrote:
+> Adding a call to lookup_or_create_module_kobject() to ksmbd
+> makes /sys/modules/ksmbd appear even when ksmbd is compiled
+> into the kernel.
 
-Try to establish those missing IPC connections when refreshing DFS
-referrals.  If the server is still rejecting it, then simply ignore
-and leave expired cached DFS referral for any potential DFS failovers.
+Ick, no, please do not.  Otherwise you will see this pop up in all
+drivers/modules for the same "reason".
 
-Reported-by: Jay Shin <jaeshin@redhat.com>
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
----
- fs/smb/client/cifsproto.h |  2 ++
- fs/smb/client/connect.c   | 35 +++++++++++++---------------
- fs/smb/client/dfs_cache.c | 49 ++++++++++++++++++++++++++++++++-------
- 3 files changed, 59 insertions(+), 27 deletions(-)
+> This is nice when you boot a custom kernel on OpenWrt because
+> the startup script does things such as:
+> 
+> [ ! -e /sys/module/ksmbd ] && modprobe ksmbd 2> /dev/null
+> if [ ! -e /sys/module/ksmbd ]; then
+>     logger -p daemon.error -t 'ksmbd' "modprobe of ksmbd "
+>     "module failed, can\'t start ksmbd!"
+>      exit 1
+> fi
+> 
+> which makes the script not work with a compiled-in ksmbd.
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index fb1813cbe0eb..3528c365a452 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -616,6 +616,8 @@ extern int E_md4hash(const unsigned char *passwd, unsigned char *p16,
- extern struct TCP_Server_Info *
- cifs_find_tcp_session(struct smb3_fs_context *ctx);
- 
-+struct cifs_tcon *cifs_setup_ipc(struct cifs_ses *ses, bool seal);
-+
- void __cifs_put_smb_ses(struct cifs_ses *ses);
- 
- extern struct cifs_ses *
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 22f37ae7a66a..22699d75a0b3 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -2021,33 +2021,26 @@ static int match_session(struct cifs_ses *ses,
-  * A new IPC connection is made and stored in the session
-  * tcon_ipc. The IPC tcon has the same lifetime as the session.
-  */
--static int
--cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
-+struct cifs_tcon *cifs_setup_ipc(struct cifs_ses *ses, bool seal)
- {
- 	int rc = 0, xid;
- 	struct cifs_tcon *tcon;
- 	char unc[SERVER_NAME_LENGTH + sizeof("//x/IPC$")] = {0};
--	bool seal = false;
- 	struct TCP_Server_Info *server = ses->server;
- 
- 	/*
- 	 * If the mount request that resulted in the creation of the
- 	 * session requires encryption, force IPC to be encrypted too.
- 	 */
--	if (ctx->seal) {
--		if (server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION)
--			seal = true;
--		else {
--			cifs_server_dbg(VFS,
--				 "IPC: server doesn't support encryption\n");
--			return -EOPNOTSUPP;
--		}
-+	if (seal && !(server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION)) {
-+		cifs_server_dbg(VFS, "IPC: server doesn't support encryption\n");
-+		return ERR_PTR(-EOPNOTSUPP);
- 	}
- 
- 	/* no need to setup directory caching on IPC share, so pass in false */
- 	tcon = tcon_info_alloc(false, netfs_trace_tcon_ref_new_ipc);
- 	if (tcon == NULL)
--		return -ENOMEM;
-+		return ERR_PTR(-ENOMEM);
- 
- 	spin_lock(&server->srv_lock);
- 	scnprintf(unc, sizeof(unc), "\\\\%s\\IPC$", server->hostname);
-@@ -2057,13 +2050,13 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 	tcon->ses = ses;
- 	tcon->ipc = true;
- 	tcon->seal = seal;
--	rc = server->ops->tree_connect(xid, ses, unc, tcon, ctx->local_nls);
-+	rc = server->ops->tree_connect(xid, ses, unc, tcon, ses->local_nls);
- 	free_xid(xid);
- 
- 	if (rc) {
--		cifs_server_dbg(VFS, "failed to connect to IPC (rc=%d)\n", rc);
-+		cifs_server_dbg(VFS | ONCE, "failed to connect to IPC (rc=%d)\n", rc);
- 		tconInfoFree(tcon, netfs_trace_tcon_ref_free_ipc_fail);
--		goto out;
-+		return ERR_PTR(rc);
- 	}
- 
- 	cifs_dbg(FYI, "IPC tcon rc=%d ipc tid=0x%x\n", rc, tcon->tid);
-@@ -2071,9 +2064,7 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 	spin_lock(&tcon->tc_lock);
- 	tcon->status = TID_GOOD;
- 	spin_unlock(&tcon->tc_lock);
--	ses->tcon_ipc = tcon;
--out:
--	return rc;
-+	return tcon;
- }
- 
- static struct cifs_ses *
-@@ -2347,6 +2338,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
- {
- 	struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&server->dstaddr;
- 	struct sockaddr_in *addr = (struct sockaddr_in *)&server->dstaddr;
-+	struct cifs_tcon *ipc;
- 	struct cifs_ses *ses;
- 	unsigned int xid;
- 	int retries = 0;
-@@ -2525,7 +2517,12 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
- 	list_add(&ses->smb_ses_list, &server->smb_ses_list);
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
--	cifs_setup_ipc(ses, ctx);
-+	ipc = cifs_setup_ipc(ses, ctx->seal);
-+	spin_lock(&cifs_tcp_ses_lock);
-+	spin_lock(&ses->ses_lock);
-+	ses->tcon_ipc = !IS_ERR(ipc) ? ipc : NULL;
-+	spin_unlock(&ses->ses_lock);
-+	spin_unlock(&cifs_tcp_ses_lock);
- 
- 	free_xid(xid);
- 
-diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
-index 4dada26d56b5..7ed073a6af85 100644
---- a/fs/smb/client/dfs_cache.c
-+++ b/fs/smb/client/dfs_cache.c
-@@ -1120,24 +1120,57 @@ static bool target_share_equal(struct cifs_tcon *tcon, const char *s1)
- 	return match;
- }
- 
--static bool is_ses_good(struct cifs_ses *ses)
-+static bool is_ses_good(struct cifs_tcon *tcon, struct cifs_ses *ses)
- {
- 	struct TCP_Server_Info *server = ses->server;
--	struct cifs_tcon *tcon = ses->tcon_ipc;
-+	struct cifs_tcon *ipc = NULL;
- 	bool ret;
- 
-+	spin_lock(&cifs_tcp_ses_lock);
- 	spin_lock(&ses->ses_lock);
- 	spin_lock(&ses->chan_lock);
-+
- 	ret = !cifs_chan_needs_reconnect(ses, server) &&
--		ses->ses_status == SES_GOOD &&
--		!tcon->need_reconnect;
-+		ses->ses_status == SES_GOOD;
-+
- 	spin_unlock(&ses->chan_lock);
-+
-+	if (!ret)
-+		goto out;
-+
-+	if (likely(ses->tcon_ipc)) {
-+		if (ses->tcon_ipc->need_reconnect) {
-+			ret = false;
-+			goto out;
-+		}
-+	} else {
-+		spin_unlock(&ses->ses_lock);
-+		spin_unlock(&cifs_tcp_ses_lock);
-+
-+		ipc = cifs_setup_ipc(ses, tcon->seal);
-+
-+		spin_lock(&cifs_tcp_ses_lock);
-+		spin_lock(&ses->ses_lock);
-+		if (!IS_ERR(ipc)) {
-+			if (!ses->tcon_ipc) {
-+				ses->tcon_ipc = ipc;
-+				ipc = NULL;
-+			}
-+		} else {
-+			ret = false;
-+			ipc = NULL;
-+		}
-+	}
-+
-+out:
- 	spin_unlock(&ses->ses_lock);
-+	spin_unlock(&cifs_tcp_ses_lock);
-+	tconInfoFree(ipc, netfs_trace_tcon_ref_free_ipc);
- 	return ret;
- }
- 
- /* Refresh dfs referral of @ses */
--static void refresh_ses_referral(struct cifs_ses *ses)
-+static void refresh_ses_referral(struct cifs_tcon *tcon, struct cifs_ses *ses)
- {
- 	struct cache_entry *ce;
- 	unsigned int xid;
-@@ -1153,7 +1186,7 @@ static void refresh_ses_referral(struct cifs_ses *ses)
- 	}
- 
- 	ses = CIFS_DFS_ROOT_SES(ses);
--	if (!is_ses_good(ses)) {
-+	if (!is_ses_good(tcon, ses)) {
- 		cifs_dbg(FYI, "%s: skip cache refresh due to disconnected ipc\n",
- 			 __func__);
- 		goto out;
-@@ -1241,7 +1274,7 @@ static void refresh_tcon_referral(struct cifs_tcon *tcon, bool force_refresh)
- 	up_read(&htable_rw_lock);
- 
- 	ses = CIFS_DFS_ROOT_SES(ses);
--	if (!is_ses_good(ses)) {
-+	if (!is_ses_good(tcon, ses)) {
- 		cifs_dbg(FYI, "%s: skip cache refresh due to disconnected ipc\n",
- 			 __func__);
- 		goto out;
-@@ -1309,7 +1342,7 @@ void dfs_cache_refresh(struct work_struct *work)
- 	tcon = container_of(work, struct cifs_tcon, dfs_cache_work.work);
- 
- 	list_for_each_entry(ses, &tcon->dfs_ses_list, dlist)
--		refresh_ses_referral(ses);
-+		refresh_ses_referral(tcon, ses);
- 	refresh_tcon_referral(tcon, false);
- 
- 	queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
--- 
-2.51.0
+Please fix the start up script to not do this.  Don't work around broken
+userspace by changing the kernel.
 
+> Since I actually turn off modules and compile all my modules
+> into the kernel, I can't change the script to just check
+> cat /lib/modules/$(uname -r)/modules.builtin | grep ksmbd
+> either: no /lib/modules directory.
+
+Then do something else to determine if ksmbd is in the running kernel,
+don't rely on a modules sysfs file like that.
+
+> An option would be to change the script to proceed and
+> just assume the module is compiled in but it feels wrong.
+
+Agreed, surely there is some other way to "know" if that kernel feature
+is present or not, right?  Mount a filesystem?  Something else?
+
+> If this approach is acceptable I am happy to generalize this
+> to something that any module that wants a /sys/modules/foo
+> file can use to get just that.
+
+No, please do not do that.  Just fix userspace.
+
+thanks,
+
+greg k-h
