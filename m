@@ -1,137 +1,156 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262CA2EA723
-	for <linux-cifs@vger.kernel.org>; Fri, 24 Oct 2025 08:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16ABA306B37
+	for <linux-cifs@vger.kernel.org>; Fri, 24 Oct 2025 09:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761293923; cv=none; b=AoNZM/BYFC6IKGV79EZeVaMBvsuQDgPoKt1Om9ZOK5GvN+j6v62tL7noDiQzU5m5N2K258bNuUEJJuFEPiSq4H6ohB4R9FfbWv3MIywcGrpLAT5hDg6Rc2Hg+7CuDMT3deAvYo3yKk9YvcSK9a9FNxaGDG6lY45oZj2btnY0xms=
+	t=1761297246; cv=none; b=f9f4sb+YjL/fZsbi/TtxwOpqbvjpdhCzqYgscNo/t5CtuFSMVNW3uLA1qzSZck1J6MXQCqLdrwYC78LUhE9eU695NAIwhaMoPh3UGPJxfXAaGy43+ydl1FttfjRQbUdsJDidNzCVRPBDp8dc4TOp9jpXHqMX6icWnp4WVBC4HbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761293923; c=relaxed/simple;
-	bh=F/AsaJWaXnRf4Ffi4FjdhMqFIbkputpBFXP+Dz5QhNQ=;
+	s=arc-20240116; t=1761297246; c=relaxed/simple;
+	bh=YkWz/eLA9P5wnFmu3ZMMaRznLdfeB1qZAHP+lceLBSc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Uay0dFVU8iplEr2xtmHwUJ2EeenlIWUEUXz5lKGVrOeO/vlmYKNPua6+0eIz76pr8dIvpRH3PCCtsG9WLXLitJ8UHanhjyNBlqTk4+KV9X9d5xyGHTa9noT/pQQN7/MYosseB2r3E/wLrCD46WNcJnpRwLpAqPDPMHrh1/TP+u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MXcLzuAv; arc=none smtp.client-ip=209.85.208.50
+	 To:Cc:Content-Type; b=MS/eAoGbJPvNlmsD7ItfRrWhtTjT2tzTNDXq4J+RL1ZENbsrURcsNWF7S5pP5pD48lUkt2vlnB68+7WWA2FxjgtLAZBEt190wtWGQK07r20pD6Ps1ddOWrCwjMsH8NQ3HdLb0oIna1r3WfmOFOx3E0MKXNHqv/cw7qB4ViMO8Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=moBCDjVb; arc=none smtp.client-ip=74.125.224.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MXcLzuAv"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-63c3c7d3d53so2722137a12.2
-        for <linux-cifs@vger.kernel.org>; Fri, 24 Oct 2025 01:18:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="moBCDjVb"
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-63e3568f90dso1895033d50.0
+        for <linux-cifs@vger.kernel.org>; Fri, 24 Oct 2025 02:14:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761293920; x=1761898720; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761297243; x=1761902043; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QxtIHZNmwawyIJXtxXoptc40yR+RhBOnr00kmoWAGLg=;
-        b=MXcLzuAvG3Bo481KRtE5dmDBuYRpbrc02Q8epcRI7uk1YJpgHs1BEVrUUkAIR7glfo
-         eQv8iBtCDNKYuB2Yjjs+Uyr09NDQHPW4uJe1LUBRSUKjGxSc6TJ/J20STgu1gemUSzlJ
-         EgVD2OmB++olvT41u0a7cWCqMYzB36U0+4Jgn9Lwqx6Rwozk9smzTsBAzmBwuJmTHkSF
-         oLRnrUY50hE593Co+C8+IWk28Zk/Vc/HmpT9wVmQryWtoChF3tL1HhGOswC0AS2Ei5Sj
-         Dt8en/LrE7Y0cIXYGmaWg0Ih5mbPaqVe5Diy4UsmMNgTVtGzNLIzhqmO9cIPh+r2ineb
-         bBHg==
+        bh=ww5IStytbWWzh3axxpP6syzswHBpM+tPPGSPp/lLbiw=;
+        b=moBCDjVbigDSdhuT+0fLM02gZFo1pnv83AV+6OQoyCyySIn+BWgULHh68oWzHHvryA
+         pqwc1lGi59WH7tULW7HxxPS0cnaKIVNrv8EI8yGWHWtyzT6cxqcVR/uNR6pSRr0SXAoJ
+         IwyJkKHPoE321yAJgj8YPvmPKBXZy35t3KakYoQ/xbJiFrzkXUvBBhSkYkxndBP+85qR
+         3epjS6O/byY7fPGwBdJKl7ZP3p382oR7W3ziCUwZmkKjis+yBi8+weV5H0lfiaDRjauy
+         6Y60NwjLwcCgVGhq2N7AP1VzkbUgKWjR/fqSfR04BQjUOu5V6UkN+Zj5uENdL05oyG8J
+         4ifA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761293920; x=1761898720;
+        d=1e100.net; s=20230601; t=1761297243; x=1761902043;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QxtIHZNmwawyIJXtxXoptc40yR+RhBOnr00kmoWAGLg=;
-        b=CjOiyVp/5WTRjWEYjSRg0nBm8g0+RfIMIcfXzVYZLpPVNBcyBg22WWt0eaHdfJkGJE
-         8SN55HrCtXO2ZP2CB90Rm0buI/+yORXisw/5hJGLu65G994Kb45tGSUb59HLntpBYu0/
-         AzFY9wpR6cyRKyUbFeJ7V5FfMeQWf90kiIEnmQ4oKB5DIqzhGBlv99Oa1hPnLfVOASxT
-         /k0voNP2n4RtlNV8pa/KhlLPFCz1CcswVK3WSUQkfL2D2bReOKa/LlsG6Ki7a+MfnH26
-         gs8V3EjDfNB5tHSOiqULX+SjAGcmNSMcuGtMzjsNsCxB3QqorsRFOQzLzEmLbmpMvGOk
-         l18Q==
-X-Gm-Message-State: AOJu0YweKTTuDJNBC6sMS+KAZBw+LlhI5vrHTf4Bn6HAWnk9eCkhsyPR
-	GXU7WaVHsvnWq4IkfAAc6d4AAoY7jjaJuizxQ0HC2axovRiueRXJ76/kerB6+tLORH46LHNZu5v
-	UNsGney5vcFR90HakbK/vZyX5ni6JzvbhBmcV
-X-Gm-Gg: ASbGnct01BPn8ktOJuzsBKzVlyYAcofhQI6QgdJVgl46Ri7cGSSm9G6fXQl6LU4tQyK
-	VDCzguR00AHVjEqijv41QI8hmp+gnEtoZRtcAw5mhxF6mZ+kdWcwk+FB6s6p99eUxGQMwwMn5yn
-	tSi4OHhKPXc6wSsZ2/57oBQmcSx1oN8q2DCChhSOIXGo03zuwTFZ7zYZKxHOcCVkf8NSZLlp6LS
-	Lcs3Ks74WFkDP+2qb9Gk0uIeT4ZGFDku2Cdrhe2lSXhpwEGxAMr+maNKqrcaLb03FDlsHLhbDT+
-	kcH2
-X-Google-Smtp-Source: AGHT+IEI9X6feGw2fa6YAfgN2jkYCV1nMnALxX2XoIVEifm4oXRk3d5oTwvSNW4e2MhT8hCSd3YlhWn9QczGNWS/N4I=
-X-Received: by 2002:a05:6402:26cc:b0:63b:f76f:c87e with SMTP id
- 4fb4d7f45d1cf-63e6000390cmr1367605a12.1.1761293920075; Fri, 24 Oct 2025
- 01:18:40 -0700 (PDT)
+        bh=ww5IStytbWWzh3axxpP6syzswHBpM+tPPGSPp/lLbiw=;
+        b=aekN5KVmzeeCzUrIz02kQhFJhxHW1mKLE8cD14x091+V2joz5GFgR5u1MOxMtHq0VL
+         u4N5jpMMkWUeFROATdcDuLR1EyVx7StWGZnsUUfb+jtxRxU1GPG5LE1NiXQ2WpPDbhIq
+         rdP6jP2FrMXFVe1iuuwWQBQPoUcnGTelXwZr+3v4h8kodUPOWfoYRl16b4i7/EMzVMZ1
+         Gj1xSIij1vsdAcn5fGnJoI0Ebhqu7728J7JKKB1xD62rUmbNldhUG8KaiUMj7lf5Wik/
+         Y2YYdWqF+ceqso848lwCMjfmJrq/agldecgiHIUugm2YieZAHGSB1lzgCEc8fhoNn+UF
+         p5eA==
+X-Forwarded-Encrypted: i=1; AJvYcCWO0pYmRGWXh2q9yq7+fkueSF8XDwu2b3kw5+hqhyrJa7OxF8aGaHFUCaq/uKUoOEnjfDU4x8TtMVcC@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQ+uzRmJ4g7NlUVTLgKb0R1eCEgpKG/+7YJxmxNhZnjXHfWD4R
+	XtSfOnMmmH/qvUWFHMy4fYLmtK+b8YO9F1GvIVnR/LY0kQpCVBjLs5eAPJu8DiffcoMJn2qhte2
+	TqZoEyzrQMlSF7vjWvwmzSl+OuThDhAw=
+X-Gm-Gg: ASbGnctCBk0Ir8JZVj2AA3i8JdziG07CFBtHCGnbTaW/uslBisjBUc6o/VEeOglTrra
+	NNzOQO6b+gWAZvn0FoHiIHG08hIrLrdk1obO7ICiivRXuVGyKrYJHtO1gtt9uq0CD4dUZDXTqRw
+	9J4c2yIjWpmIQfRkasbgtP/uhGBkL3lBI8n4CHXjLQwafvScaJqzditia5xxKqCZqFguiygj1TO
+	zGg83gbvVeoK89xempzY6DYkXDITsGjaLjS47S1lULmpYx9Jc4vcdTi2vokVZO3Uht/Mj8=
+X-Google-Smtp-Source: AGHT+IFSrdDKkSVcWsLqx7Pf7bHPRADDQgKRKHZHzQTFze2p72Runu1bsKnPmSgK3N/ff0Y7uzayMI/FM3pHq2ngItA=
+X-Received: by 2002:a53:b3c9:0:b0:63e:3323:1ac1 with SMTP id
+ 956f58d0204a3-63f378c4e3dmr3077378d50.48.1761297242836; Fri, 24 Oct 2025
+ 02:14:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAEAsNvQmV=xFsU-4jn9zC2DYoAUjXTS3qcsGNe7XUZEEXg1cLg@mail.gmail.com>
-In-Reply-To: <CAEAsNvQmV=xFsU-4jn9zC2DYoAUjXTS3qcsGNe7XUZEEXg1cLg@mail.gmail.com>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Fri, 24 Oct 2025 13:48:27 +0530
-X-Gm-Features: AS18NWB1I3iJ0S7VZ8z-pHDVInxR5zM3xXdsJz2yaeC9XYBstvt3Xy1HDtitkrE
-Message-ID: <CANT5p=qktRuzfwwAceyQWYx0k47udy7C4uQc8FASwRWfSYL_ng@mail.gmail.com>
-Subject: Re: mount.cifs fails to negotiate AES-256-GCM but works when enforced
- via sysfs or modprobe options
-To: Thomas Spear <speeddymon@gmail.com>
-Cc: linux-cifs@vger.kernel.org
+References: <CAH2r5muGJTYxfNN9kcnBtX0JaJDeGa6SLiiuMg+zQVkNRjP1Yw@mail.gmail.com>
+ <aztzqdkslkjs6jjtrxlir65hujpl4euikgaxwq67ulfeoqnitb@wnalncavigju>
+In-Reply-To: <aztzqdkslkjs6jjtrxlir65hujpl4euikgaxwq67ulfeoqnitb@wnalncavigju>
+From: Bharath SM <bharathsm.hsk@gmail.com>
+Date: Fri, 24 Oct 2025 02:13:51 -0700
+X-Gm-Features: AS18NWB2MXPo156pqpEs0lh9QOhT8Mum2Brxph3YCLmu4Qmzg4GSu1JUNesDTu0
+Message-ID: <CAGypqWxmEENEGAukMATvfCgWN_pvfqTw4aS1hFjEJptmPRBCEw@mail.gmail.com>
+Subject: Re: [SMB CLIENT][PATCHES] directory lease debugging and configuration
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>, 
+	Bharath S M <bharathsm@microsoft.com>, samba-technical <samba-technical@lists.samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 21, 2025 at 2:22=E2=80=AFAM Thomas Spear <speeddymon@gmail.com>=
+Thanks for your comments. Apologies for getting back late on this.
+
+On Tue, Sep 30, 2025 at 6:11=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de>=
  wrote:
 >
-> First time emailing here, I hope I'm writing to the correct place.
+> Hi Steve, Bharath,
 >
-> I have an Azure Storage account that has been configured with an Azure
-> Files share to allow only AES-256-GCM channel encryption with NTLMv2
-> authentication via SMB, and I have a linux client which is running
-> Ubuntu 24.04 and has the Ubuntu version of cifs-utils 7.0 installed,
-> however after looking at the release notes for the later upstream
-> releases I don't think this is specific to this version and rather it
-> is an issue in the upstream.
+> Sending my review based on the commit messages and the patches applied
+> manually on my local tree.
 >
-> When I try to mount an Azure Files share over SMB, I get a mount error
-> 13. However, if I do either of the following, I'm able to successfully
-> mount.
->
-> 1. Enable AES-128-GCM on the storage account
-> 2. Keep AES-128-GCM disabled on the storage account, but enforce
-> AES-256-GCM on the client side by running 'echo 1 >
-> /sys/module/cifs/parameters/require_gcm_256' after loading the cifs
-> module with modprobe.
->
-> I can see after running modprobe that the parameter "enable_gcm_256"
-> is set to Y (the default value) and the parameter "require_gcm_256" is
-> set to N (also the default value)  so I believe the mount command
-> should theoretically negotiate with the server, but it seems that no
-> matter what I try, unless I require 256 bits on the client side by
-> overwriting the "require_gcm_256" parameter, it will never mount
-> successfully when the server only allows 256 bits.
->
-> It seems like mount.cifs should look at the "enable_gcm_256" parameter
-> and if it's "Y" try to use 256 bits at first, falling back to 128 bits
-> if the server doesn't support it or throwing an error if the
-> "require_gcm_256" parameter is set to the default "N" value, but I
-> must admit I don't know if there's some reason that can't be done.
->
-> Is this something that could be looked at and possibly improved? I'm
-> unfortunately not a developer, but just a user interested in making
-> better documentation so if this cannot be improved, I'll go ahead and
-> get something written up and share it with downstream teams like Azure
-> Files CSI driver -- on that note, I'll appreciate any clarification on
-> why setting this specific parameter is required if this can't be
-> improved.
->
-> Thank you,
->
-> Thomas Spear
->
+> Please try sending the patches with git-send-email next time, as it's
+> much easier to apply and review.  Thanks!
+Ack.
 
-Hi Thomas,
+>
+> On 09/29, Steve French via samba-technical wrote:
+> >4 patches from Bharath to improve directory lease handling (see
+> >attached).  Lightly updated and rebased on current mainline, and
+> >merged into cifs-2.6.git for-next.  Feedback/review/comments welcome
+> >
+> >commit a50843f864205ea4576638cb32321313d9c06e54
+> >Author: Bharath SM <bharathsm@microsoft.com>
+> >Date:   Tue Sep 2 14:18:21 2025 +0530
+> >
+> >    smb: client: cap smb directory cache memory via module parameter
+> >
+> >    The CIFS directory entry cache could grow without a global
+> >    bound across mounts. Add a module-wide cap to limit memory
+> >    used by cached dirents and avoid unbounded growth.
+> >
+> >    Introduce a new module parameter, dir_cache_max_memory_kb
+> >    (KB units; 0 =3D unlimited). When unset and directory caching
+>
+> "0 =3D unlimited" should be "0 =3D ~10% of RAM"
 
-This is documented by Azure Files here:
-https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/stora=
-ge/fail-to-mount-azure-file-share#minimumencryption
+If the user wants behavior like today, then can explicitly write '0'
+to make it unlimited.
+Otherwise by default 10%of RAM.
 
-I suggest you open a support case with Microsoft about this if this is
-limiting your use case.
+>
+> >    is enabled (dir_cache_timeout !=3D 0), default the cap to ~10%
+> >    of system RAM during module init. The parameter is exposed
+> >    under: /sys/module/cifs/parameters/dir_cache_max_memory_kb.
+> >
+> >    Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> >    Signed-off-by: Steve French <stfrench@microsoft.com>
+>
+> I think this should be a sysfs module parameter, as it assumes users
+> knows how much memory they'll need beforehand:
 
---=20
-Regards,
-Shyam
+Ack. We can keep it in procfs.
+
+> - one can't say how many entries are in the shares, or how many shares
+>    will be mounted
+> - if they do, they need to calculate (nentries * (sizeof(struct
+>    cached_dirents) + namelen (of each entry) + 1)), + round up(1024),
+>    then finally divide by 1024, meaning they'll fallback to using the
+>    default value
+>
+> On the default value, I think 10% of RAM is too much for cifs cached
+> entries.
+
+Today, we don't have a limit on memory for cached entries. I took 10%
+percent RAM
+as default value to start with and we can tune it later based on need.
+Please let me know if you have suggestions about limits.
+
+
+>
+> The max memory value should be module-wide, yes, but equally divided for
+> each tcon, because I might have an initial not-so-important share that
+> ends up filling the whole cache, then a more important/accessed one that
+> will not have the chance to cache entries.
+
+Ack. We can have more granular control later. But since we have dir
+cache timeout of 30 seconds
+unless it's reused again it is not a problem today. IMO memory will be
+utilised by the mount which is
+performing heavy metadata operations and that would actually need the
+most caching.
