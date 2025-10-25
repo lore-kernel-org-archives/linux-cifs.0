@@ -1,98 +1,112 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A8F27EFE9
-	for <linux-cifs@vger.kernel.org>; Fri, 24 Oct 2025 23:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E0020CCE4
+	for <linux-cifs@vger.kernel.org>; Sat, 25 Oct 2025 01:11:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761349884; cv=none; b=LnKkxRJ2ZCipK2vVG+o2pxa6MyD9elOKMvsip6JL8qD2jM4derXHjKdDHXqUaIvq8u00Y6pNH78++e9HClnPo55a2qpJfoh9BTJnSKhAzZQ5I/iVntFUjbX04W80EyzAxFFooU05U/b1Tx2pHR3TNEKBuq6CW9M1FSrYP1leq7E=
+	t=1761354671; cv=none; b=qC3vUeSMUEEnC30KkFoNWSSg9ndUx2r3eexXcTzOzExxWPB7oZgZe/byu4bsJcq9QeX/+ApM1f23IdqWB0VRWxkyjbio7Ly05CdSA3bZ0r6yPFjaJo3bA13rYuApR5gfkkdfgIfXZDQNiNYEe9Jt+Uh5wQGWFvGFelbb6GS1zY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761349884; c=relaxed/simple;
-	bh=kg/sFbQ5ZF67NU7RVAArHvgGi0lNHjwpD8KFw0mm0RU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OQbdIWYjCGyanVaYbiL4negwWTh5edepNLzwTsbnY0TqdH/nDGoI21lPB6FLAVsOxDMARPvGg3Tg2Qq9xo3EFI9LeP7xkiRmGeNFIXgULPq1ULsSHrNwWXw61RcOx5/ZwHCZzSw4zue1VUp+77fDlUP2uIQse7q0j9dJNJQtrfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lOMn2P9i; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1761354671; c=relaxed/simple;
+	bh=vkFLnchn18y3PGU0HuO7wDzePkXF+DMlKXXu3yVYCSI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=QJFRoOFYHynwKOZLaq+LNRfL2bdGCTqPce/4iMnnXy7CGt+EU1ZQd39EFCaSt0Q5tQJ50KpZZBdLx6uLj4IxhEju5n90ITxEn0SPM4hPjnN4i0pZi80l+s84AepSInVkY/hET01GYP1+0597VraLTs0i1FyJMnh1ULYk6MbhmMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XvvzzYLG; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lOMn2P9i"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761349883; x=1792885883;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kg/sFbQ5ZF67NU7RVAArHvgGi0lNHjwpD8KFw0mm0RU=;
-  b=lOMn2P9iF2hG6R83rVfDZDVo5hC33aOU+k5APag9tYgPWpJxM1xiq9l1
-   6Ye9E0pFAxUxlt791m0hDWU36h2QlSoTihq02o4OVUfvBL97/Zd0LCIew
-   q6BR+ROWgT17NHzYJw+u8EoBOL6hHgTOpqyLie6fO6iJxECP/Deql2RbU
-   kzO+9LJ1AkKnjkySgNW1KaubPnbyhDqJgRuuUCP/Aqd3YoSHLMfywXd0Z
-   WIBi/Y8wIXTMqzIm2POCcI0fGUFK1JOV+w8Cd08eVkpFgM9pgVQse0qnc
-   hllP+yQXrmgQFkG04p5p29Pyu+6Sb3MtedGWHf0lsoB0H2xn5mEoNRiPo
-   A==;
-X-CSE-ConnectionGUID: TTe/HJGjSHmtsbXrR46BjA==
-X-CSE-MsgGUID: YXJzOJWJTySPZn8YvCqahA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63424861"
-X-IronPort-AV: E=Sophos;i="6.19,253,1754982000"; 
-   d="scan'208";a="63424861"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2025 16:51:22 -0700
-X-CSE-ConnectionGUID: IpdDWz9vQoak8a9Ju28AVg==
-X-CSE-MsgGUID: pAzEXL66Q82wPrDoVjD/Zg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,253,1754982000"; 
-   d="scan'208";a="185310520"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by fmviesa010.fm.intel.com with ESMTP; 24 Oct 2025 16:51:20 -0700
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vCRZ0-000Eyn-0R;
-	Fri, 24 Oct 2025 23:51:18 +0000
-Date: Sat, 25 Oct 2025 07:50:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Paulo Alcantara <pc@manguebit.org>, smfrench@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev, Jay Shin <jaeshin@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] smb: client: handle lack of IPC in dfs_cache_refresh()
-Message-ID: <202510250702.8oAy2KCd-lkp@intel.com>
-References: <20251024024909.474285-1-pc@manguebit.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XvvzzYLG"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-79a7d439efbso21749736d6.0
+        for <linux-cifs@vger.kernel.org>; Fri, 24 Oct 2025 18:11:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761354668; x=1761959468; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pXXynZiVA7ILhETj4SRlC+eTmkqrxVS2pruELk/St0s=;
+        b=XvvzzYLGggzo7N7xoLshem6CY5pxDAGyc+sWuMysZ3Z5IhEuzUnL0dCcZqlZyzdtix
+         e5Po7GbTujP3+7gJp8VFb+Y1UaUU4JWu8cbJpQfoOqseb8XvMG2AeTs6yaBbqJp1Crfh
+         CcUNXrzgb2zRIGFdSfZjUvqM9J1M6DSl0IFbHyV6Os42JBP81eUXGG3muiHpSUyaz1qr
+         pjmj+iLRhg6v5ErjeBpY8b9Urdh8rt+avY2GQbBTsqASN+SgB6q4YI9ippm3BxQyqc01
+         UIhnv69dQ9h5lQuMQEs6HKeEMFLGgIy74IoshUM9fS7WHNX4lm2aetTGxKsgDB5tyfob
+         h3/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761354668; x=1761959468;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pXXynZiVA7ILhETj4SRlC+eTmkqrxVS2pruELk/St0s=;
+        b=mMcTqCbR52cHcUQJcoQ2nvYT+Q6cXYjR0a0lj65pqsH8slKrtlRRhafmEqmdKQAQE+
+         nzHui06TA9DKZSMOycQT6e7DDCpFl/6JuYRqSHfL5ih7MGmpqMgyQYfCcahKe68VQFDS
+         YqxfBJn2jl17umrK7b5C6hCgtLOoFxBGXFbyeVKKvVIFPggJl53UKP2pC35kJmOwNR6L
+         zfNKewwd2nim/46KhHxbi59qeV6vnIbcrlXto45rqXEH1b8zTTzKQapg9UBffHOeNR98
+         Jutfv16P26I2fTIl+GHav6VoWED4PQGaj1n5mCakfRqDCAq36Y83vtva5kfwrYpaUTnd
+         bPZw==
+X-Forwarded-Encrypted: i=1; AJvYcCU8MMjXcv/v57w0Zqu0zD98iJ9RbkCRrc6IehTgNldG7VbMM+JfVGThe6bBKIJ443k1b6Ii+pntolYj@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywg/H9d+2vmDRF+J6RvemSa75+r3mL6U1uUD24auVG0CGZE++UZ
+	2U0vXIzLPFAFY+A463um1zqcwdobhRJrWOUF7LKEa3rX666XWfH0lEQksUgQ5a4tDdJNYLrpMCt
+	x8sEwtHRzn5KwJdu46bnRTrP/SVbKM4U=
+X-Gm-Gg: ASbGnctr2tHLHk2vCSw0xECRwEWhj0Ae+9gJWFDkzIRqlrmmFoXWn9R4HKunMAQL669
+	vaJUm2jz6r2jtGEehH1dmwqfmjYt5BW64SNj3h8YwyD8GXkPT8G2ohjzPXYwfmQl8fgW+MEgY+O
+	7wa5z0c6TxXIqvdPfUYo3IbUsYmoupdBG/rEcCfzMgjjWOWDeBrdO1fpV15Kh8puJOPa7KCHhGB
+	M7NqITVw4wcWZ4K21LrL00C/Tie8L06x+3uCPA8wg/n+rQoA/hwYjJQpZ1Jy1EZJqVFxc7H5iO7
+	W6DXshRx5Fkg1z5DfRRa7Vf7inm4XB6F9A5nTD1Jy4ESeReB3aAe4kDJGwFZaNahY+wml867MFd
+	DZFPkhDbLHhin+9zX69MjJn63Lm1TxZgFN6sjhJxQCfBr8rdIXsjwafQVq6UWHaoHDNIJO6nlds
+	1wT2OBOSfCWA==
+X-Google-Smtp-Source: AGHT+IGLC1riZEI7Reuuli+Gtx1S04wkLThtwoO6dLMPrCiDVZkSRZIZ/K4miOs8BpZc7XQeGiqvbgyG8/WTrQJ0SBI=
+X-Received: by 2002:ad4:5ca3:0:b0:87d:f3a9:26c7 with SMTP id
+ 6a1803df08f44-87f9eda1c30mr108192226d6.17.1761354668558; Fri, 24 Oct 2025
+ 18:11:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251024024909.474285-1-pc@manguebit.org>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 24 Oct 2025 20:10:57 -0500
+X-Gm-Features: AWmQ_bnObCO69NTARUO5wmRbMghuLsHgMFyJ2N1PvDKSWdSvX_SolGwmjveF0jU
+Message-ID: <CAH2r5muFRm0X_uYTFySHj-T7YZQhXZWVa4WzKny_YmEzXOhCBw@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Paulo,
+Please pull the following changes since commit
+211ddde0823f1442e4ad052a2f30f050145ccada:
 
-kernel test robot noticed the following build warnings:
+  Linux 6.18-rc2 (2025-10-19 15:19:16 -1000)
 
-[auto build test WARNING on cifs/for-next]
-[also build test WARNING on linus/master v6.18-rc2 next-20251024]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+are available in the Git repository at:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Paulo-Alcantara/smb-client-handle-lack-of-IPC-in-dfs_cache_refresh/20251024-104948
-base:   git://git.samba.org/sfrench/cifs-2.6.git for-next
-patch link:    https://lore.kernel.org/r/20251024024909.474285-1-pc%40manguebit.org
-patch subject: [PATCH] smb: client: handle lack of IPC in dfs_cache_refresh()
-config: i386-randconfig-001-20251025 (https://download.01.org/0day-ci/archive/20251025/202510250702.8oAy2KCd-lkp@intel.com/config)
-compiler: gcc-13 (Debian 13.3.0-16) 13.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251025/202510250702.8oAy2KCd-lkp@intel.com/reproduce)
+  git://git.samba.org/ksmbd.git tags/v6.18-rc2-smb-server-fixes
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510250702.8oAy2KCd-lkp@intel.com/
+for you to fetch changes up to dd6940f5c7dbee7ae70708f4c8967c3c8cb1d965:
 
-All warnings (new ones prefixed by >>):
+  smb: server: let free_transport() wait for
+SMBDIRECT_SOCKET_DISCONNECTED (2025-10-23 20:58:51 -0500)
 
->> Warning: fs/smb/client/connect.c:2024 function parameter 'seal' not described in 'cifs_setup_ipc'
+----------------------------------------------------------------
+Seven ksmbd server smbdirect (RDMA) fixes in order avoid potential
+submission queue overflows
+- free transport teardown fix
+- six credit related fixes (five server related, one client related)
+----------------------------------------------------------------
+Stefan Metzmacher (7):
+      smb: server: allocate enough space for RW WRs and ib_drain_qp()
+      smb: smbdirect: introduce smbdirect_socket.send_io.lcredits.*
+      smb: server: smb_direct_disconnect_rdma_connection() already
+wakes all waiters on error
+      smb: server: simplify sibling_list handling in
+smb_direct_flush_send_list/send_done
+      smb: server: make use of smbdirect_socket.send_io.lcredits.*
+      smb: client: make use of smbdirect_socket.send_io.lcredits.*
+      smb: server: let free_transport() wait for SMBDIRECT_SOCKET_DISCONNECTED
+
+ fs/smb/client/smbdirect.c                  |  67 +++--
+ fs/smb/common/smbdirect/smbdirect_socket.h |  13 +-
+ fs/smb/server/transport_rdma.c             | 344 +++++++++++++++---------
+ 3 files changed, 273 insertions(+), 151 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+
+Steve
