@@ -1,42 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81618304BDD;
-	Sat, 25 Oct 2025 16:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC22306490;
+	Sat, 25 Oct 2025 16:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761408796; cv=none; b=pA3VtbD+Nkf8EsCwKFam2XUoyMrTHFzuFVmhoUdAbuvoN9dwFeZPkh6Kwv/uGJmmWsKer8FGvICOYBvju2zhkZhTUbxzY171SkbbTcoXXn3zLZveAcUU62LVaLhdBn5EoEU8fDITlusDPKhrpkEyF4uitO9JnE2L5MAFKJX7cHs=
+	t=1761409641; cv=none; b=JgKl9VLnwdAF5xgslHjVAydw+BTknua7r13UvuLA7wXSirBVDXf0gyuPZMNL+XNKmG3XccxUvXaTuInmozjW+Rlu15MqIgqN4xjMy/Xih2jC8qoqvwcapxobmeswSG305bgKF6AmbPO+knnse0DmUhVV9GedSeKehZGRJWV0AMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761408796; c=relaxed/simple;
-	bh=10OYArm44jdBF2hV8i8tYIoiUjvjLsrQPQkWq8YYgyU=;
+	s=arc-20240116; t=1761409641; c=relaxed/simple;
+	bh=qIMw9ZuxqOW9de6zo3ajgmujFKYvixLItCVGd2KiffY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DoRhs/Gv8nAM1g94o0SwRrOg8+KIR7T8vharbR4VyRtSSD7oKfdrEXpD7x6RDyWzWq0YDtqfKrIG4q3zwstazoonJRdzgALRLGdh3tZ6OEp0J8ksL9Gq+w1YuuYSa367x9AW/EmYvjdQvei1yLwvSAcpZoHw2IwNBHZOcisZ33Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=io39PaVq; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=c4POXgYgDtcKAqjx6Ier+wI+jZpbArdKMt57hghSH0oVqZg1iXjvfA0nFESew/bF2bX0nzRGTlVSQ6Zn/EApBQtA5usdZc/zc2EKI6wMfU5TF43Tgx9ZXetgRywBpZNlI0wns7/H08cKiwtsaSNxx697nHcHfXvi5itooSzLahA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jTLpcCTS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="io39PaVq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91AE7C4CEFB;
-	Sat, 25 Oct 2025 16:13:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jTLpcCTS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E0DFC4CEF5;
+	Sat, 25 Oct 2025 16:27:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761408796;
-	bh=10OYArm44jdBF2hV8i8tYIoiUjvjLsrQPQkWq8YYgyU=;
+	s=k20201202; t=1761409641;
+	bh=qIMw9ZuxqOW9de6zo3ajgmujFKYvixLItCVGd2KiffY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=io39PaVq8MvAcCLJAUv3DIDw83ly0gbEmqFcDFn7YGTmnAfZ614DgqOjDTpIe0kaN
-	 O/ce4meTCGZdHKAnZz1WXjJiF7EErxOWQkkHamcyuf+PzFgvj06+9NhumgPQ+WxjB1
-	 GvlRJymxT7UULeYOLh0SeB9hVrQwRe+Svo0h89HOMgcAcack5bxvCKN0dbglfxRbPz
-	 jiMLQHtQaD99yzMJvgVbz0VGnlChxMPWKXSPzpg0IUqK1ac5LEL8G4bVAGY6hETWVC
-	 3B2yw3FpJQIK3OvYv4a/xMVFP2eTXi8zm7xiYpLl5RkutZ9LInqGuhcGS4t9H6Ejki
-	 AytCVXkEJdkBg==
+	b=jTLpcCTSsUHVgOkkrbYONgGAfWlb2zcUYhqgLVb6n1Ve55w3VjpF0P9NFt8unVnCz
+	 DxqVCDExM8SOv/wRQQfeqDW7fW7dRvk8fF4au8hD93aCTPtLtVhLJrvOxH63R0t4yN
+	 5/Gbyw5aG3mUiNq/ffyJAQRKk775rtBxOHLg0IE2uiPs32/ir3KMIdaOLKIhcLP3ET
+	 RYoaO3SC3eTN8zCNMsl+NybY79sAVbTPDsbuZ0ZZB4x0s4hnsSxtTQDRPKtpoG1UYT
+	 vX30RVjFkPqK8Z9QKR6QhtYPiNAzUnPdq/uGl8aGUBQ0UM4lfUTpUeGo/0t3uj/imc
+	 F2GC0UPoSmBlg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
+Cc: Fiona Ebner <f.ebner@proxmox.com>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
-	smfrench@gmail.com,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-6.1] ksmbd: use sock_create_kern interface to create kernel socket
-Date: Sat, 25 Oct 2025 11:55:06 -0400
-Message-ID: <20251025160905.3857885-75-sashal@kernel.org>
+	sfrench@samba.org,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 6.17-6.1] smb: client: transport: avoid reconnects triggered by pending task work
+Date: Sat, 25 Oct 2025 12:00:33 -0400
+Message-ID: <20251025160905.3857885-402-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -49,71 +50,109 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.17.5
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Namjae Jeon <linkinjeon@kernel.org>
+From: Fiona Ebner <f.ebner@proxmox.com>
 
-[ Upstream commit 3677ca67b9791481af16d86e47c3c7d1f2442f95 ]
+[ Upstream commit 00be6f26a2a7c671f1402d74c4d3c30a5844660a ]
 
-we should use sock_create_kern() if the socket resides in kernel space.
+When io_uring is used in the same task as CIFS, there might be
+unnecessary reconnects, causing issues in user-space applications
+like QEMU with a log like:
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> CIFS: VFS: \\10.10.100.81 Error -512 sending data on socket to server
+
+Certain io_uring completions might be added to task_work with
+notify_method being TWA_SIGNAL and thus TIF_NOTIFY_SIGNAL is set for
+the task.
+
+In __smb_send_rqst(), signals are masked before calling
+smb_send_kvec(), but the masking does not apply to TIF_NOTIFY_SIGNAL.
+
+If sk_stream_wait_memory() is reached via sock_sendmsg() while
+TIF_NOTIFY_SIGNAL is set, signal_pending(current) will evaluate to
+true there, and -EINTR will be propagated all the way from
+sk_stream_wait_memory() to sock_sendmsg() in smb_send_kvec().
+Afterwards, __smb_send_rqst() will see that not everything was written
+and reconnect.
+
+Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-YES – ksmbd now creates its listening sockets with `sock_create_kern()`,
-so the socket is marked as a kernel socket and bypasses LSM policy
-checks that would otherwise block the listener.
-- `fs/smb/server/transport_tcp.c:474-505` replaces both IPv6 and IPv4
-  calls to `sock_create()` with
-  `sock_create_kern(current->nsproxy->net_ns, …)`, ensuring
-  `__sock_create()` runs with `kern=1` (`net/socket.c:1661-1682`).
-- When `kern` stays 0 (old code) LSMs such as SELinux and AppArmor
-  enforce their policy hooks, which often deny kernel threads from
-  opening INET stream sockets (`security/selinux/hooks.c:4797-4839`,
-  `security/apparmor/lsm.c:1261-1301`). That failure bubbles back to
-  `create_socket()` and leaves the ksmbd interface unconfigured
-  (`fs/smb/server/transport_tcp.c:474-519`), so the server never starts
-  listening.
-- The change aligns ksmbd with other kernel networking users (e.g., the
-  SMB client already calls `sock_create_kern()` in
-  `fs/smb/client/connect.c:3366-3374`) and introduces no behavioral or
-  API risk beyond correctly flagging the socket as kernel-owned.
+YES
+- **Bug addressed:** When `sk_stream_wait_memory()` sees
+  `signal_pending(current)` it returns `-EINTR`
+  (net/core/stream.c:141-185). In CIFS, `__smb_send_rqst()` masks
+  regular signals but not `TIF_NOTIFY_SIGNAL`, so that `-EINTR` flows
+  back, hits the reconnect path (`rc = -ERESTARTSYS` plus
+  `cifs_signal_cifsd_for_reconnect()`) and forces unnecessary
+  disconnects with errors like `-512`
+  (fs/smb/client/transport.c:350-379).
+- **Why it happens in practice:** io_uring queues task_work with
+  `notify_method = TWA_SIGNAL` (io_uring/io_uring.c:3844-3847), which
+  sets `TIF_NOTIFY_SIGNAL` and trips `signal_pending()` even though the
+  task only has task_work pending. CIFS previously treated this
+  indistinguishably from a real signal, so combining io_uring with SMB
+  writes caused spurious reconnects observed by users (commit message
+  symptom).
+- **Fix mechanics:** The patch adds `<linux/task_work.h>`
+  (fs/smb/client/transport.c:25) and treats `-EINTR` as a transient
+  condition only when `task_work_pending(current)` reports queued task
+  work (fs/smb/client/transport.c:186-195). This keeps the existing
+  retry/backoff logic but prevents the reconnect machinery from running
+  on synthetic task-work signals. The comment at
+  fs/smb/client/transport.c:178-183 documents the scenario.
+- **Safety:** Fatal or user-requested interrupts still break out because
+  `fatal_signal_pending(current)` is checked up front
+  (fs/smb/client/transport.c:268-272) and the new clause only fires when
+  both `rc == -EINTR` and task work is pending. If the condition
+  persists, the existing retry limit still returns `-EAGAIN`, so there
+  is no risk of livelock. `task_work_pending()` has been part of the API
+  since v5.18 (include/linux/task_work.h:24-27), so the helper is
+  available on active stable lines, and no other subsystems are touched.
+- **Backport outlook:** The change is tiny, self-contained, and directly
+  fixes a user-visible regression without altering protocol semantics.
+  It should be safe to backport as-is; running the usual CIFS
+  regression/balance-of-tree network write tests would be the natural
+  follow-up.
 
-Given that this fixes a real service outage on systems with enforcing
-LSM policies, is tightly scoped, and carries minimal regression risk, it
-is a strong candidate for stable backporting. Suggested verification:
-bring up ksmbd under SELinux/AppArmor enforcing and confirm the listener
-binds successfully.
+ fs/smb/client/transport.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
- fs/smb/server/transport_tcp.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index 1009cb324fd51..43401d09c9db4 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -473,12 +473,13 @@ static int create_socket(struct interface *iface)
- 	struct socket *ksmbd_socket;
- 	bool ipv4 = false;
- 
--	ret = sock_create(PF_INET6, SOCK_STREAM, IPPROTO_TCP, &ksmbd_socket);
-+	ret = sock_create_kern(current->nsproxy->net_ns, PF_INET6, SOCK_STREAM,
-+			IPPROTO_TCP, &ksmbd_socket);
- 	if (ret) {
- 		if (ret != -EAFNOSUPPORT)
- 			pr_err("Can't create socket for ipv6, fallback to ipv4: %d\n", ret);
--		ret = sock_create(PF_INET, SOCK_STREAM, IPPROTO_TCP,
--				  &ksmbd_socket);
-+		ret = sock_create_kern(current->nsproxy->net_ns, PF_INET,
-+				SOCK_STREAM, IPPROTO_TCP, &ksmbd_socket);
- 		if (ret) {
- 			pr_err("Can't create socket for ipv4: %d\n", ret);
- 			goto out_clear;
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index a61ba7f3fb86b..940e901071343 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -22,6 +22,7 @@
+ #include <linux/mempool.h>
+ #include <linux/sched/signal.h>
+ #include <linux/task_io_accounting_ops.h>
++#include <linux/task_work.h>
+ #include "cifspdu.h"
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+@@ -173,9 +174,16 @@ smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
+ 		 * send a packet.  In most cases if we fail to send
+ 		 * after the retries we will kill the socket and
+ 		 * reconnect which may clear the network problem.
++		 *
++		 * Even if regular signals are masked, EINTR might be
++		 * propagated from sk_stream_wait_memory() to here when
++		 * TIF_NOTIFY_SIGNAL is used for task work. For example,
++		 * certain io_uring completions will use that. Treat
++		 * having EINTR with pending task work the same as EAGAIN
++		 * to avoid unnecessary reconnects.
+ 		 */
+ 		rc = sock_sendmsg(ssocket, smb_msg);
+-		if (rc == -EAGAIN) {
++		if (rc == -EAGAIN || unlikely(rc == -EINTR && task_work_pending(current))) {
+ 			retries++;
+ 			if (retries >= 14 ||
+ 			    (!server->noblocksnd && (retries > 2))) {
 -- 
 2.51.0
 
