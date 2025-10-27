@@ -1,43 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997FE2222AA;
-	Mon, 27 Oct 2025 19:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCC91E47CA;
+	Mon, 27 Oct 2025 19:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761592573; cv=none; b=K+Sj2PcOBUw0W4+dAMByuGTTpXkkTVTic/kZBFEIuiDMcYnBjlyr8KCNcg+0tLJK9ACk6Aar1u5p/ZauCcpjHVZR7Fl2YudAEfPsOK0v1IeyeaBOROnEaMZXeeR8SdQlTYxBhpaXgwdv54POMv09CUjER4I+x1ewQOb1xI/IjfY=
+	t=1761592635; cv=none; b=dWNJtLrrM8DmLTqNkWs7e0DhiLFHJIZBOkrtIqRtfCpIsVj0bGAVJXUf1IdfGswLvXKtkT2XN0bVEAYZ8K9yR0JMeIT5HzAjLiWjCkylsa9zVbGmMdquO3xbWdsvwaxCKFhgXXYtBtj47GPGPL4OLwAwGQAbb8BMwiBA68h9+to=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761592573; c=relaxed/simple;
-	bh=8w7I5chpfB9usadMEUljhkSFIxzfWOdFs8faqhFiPEk=;
+	s=arc-20240116; t=1761592635; c=relaxed/simple;
+	bh=r/WmfOTTxlpVgWdFWx/zX6NEQbTGT1pnZERW8ZnE1wI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tYbMsm2lVbR9lWPUMEQ3XI+POmVu+U6i618D/AjSyq0Wcq5dDxV2pHSALsgbyzXOmA+dcb6O7millOotbC3YQFRp84edJhlaaOexPnjuyFHb0bLH3/lHt9hWL6lTb/RHtpRxaj61L6BT1/zLb9pKfsjAmw3rI+d48WPhLcD66Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=iBMi4v5n; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=CLDzVDuZbNRHYjR4zGu1OpaKpczhUa8iHxEYPdlz2be4kNpL79bp/bc49ph/fkcyQEaEsvPyXlsngxvkhRbGhEWXMdDmvLhjoNHclulKawW7h6zcrbeA80DMvBuFXX70vPPeCYNFJP4Z4TXaLNVv2DJSS3M2mwQKMGZfQMls6eI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=WMrKRj7p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="iBMi4v5n"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BACE4C4CEF1;
-	Mon, 27 Oct 2025 19:16:12 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="WMrKRj7p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8BA1C113D0;
+	Mon, 27 Oct 2025 19:17:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1761592573;
-	bh=8w7I5chpfB9usadMEUljhkSFIxzfWOdFs8faqhFiPEk=;
+	s=korg; t=1761592635;
+	bh=r/WmfOTTxlpVgWdFWx/zX6NEQbTGT1pnZERW8ZnE1wI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iBMi4v5nUPk0JurYRBneHu5ljmxSLbq9kopNVZVXyEwYYQ7eyX8mmrIt7JR/bSO8f
-	 AAQ4bZ9WKzXunBG8sumuu4q9gJG+AMRMLr1/FxdSDZ3LR6au6XVYzWCtfnsy9GaM5u
-	 FDN2+kUXdAovzNxy3dquBGm5VatfOqxeiID4YC94=
+	b=WMrKRj7ppo8YGnCek54lLWyx52bhchTe5LC+GWWu/sPSQMwx/pVtXzoLsKYvwnFPh
+	 nmcH4ibbuqzPI7LGrim+0NcLGewLCcYG8ljZRtq8YuRuXl/wlVnRfoqOT5nrPkzuYi
+	 Tfn3Rc8uDBHGfwStbgiAn26Y+wWtgO+lyj69GQa4=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
+	David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Stefan Metzmacher <metze@samba.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6 15/84] smb: server: let smb_direct_flush_send_list() invalidate a remote key first
-Date: Mon, 27 Oct 2025 19:36:04 +0100
-Message-ID: <20251027183439.224015819@linuxfoundation.org>
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	Pavel Shilovskiy <pshilovskiy@microsoft.com>,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH 6.6 39/84] cifs: Fix TCP_Server_Info::credits to be signed
+Date: Mon, 27 Oct 2025 19:36:28 +0100
+Message-ID: <20251027183439.860574899@linuxfoundation.org>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251027183438.817309828@linuxfoundation.org>
 References: <20251027183438.817309828@linuxfoundation.org>
@@ -56,51 +53,37 @@ Content-Transfer-Encoding: 8bit
 
 ------------------
 
-From: Stefan Metzmacher <metze@samba.org>
+From: David Howells <dhowells@redhat.com>
 
-[ Upstream commit 1b53426334c3c942db47e0959a2527a4f815af50 ]
+commit 5b2ff4873aeab972f919d5aea11c51393322bf58 upstream.
 
-If we want to invalidate a remote key we should do that as soon as
-possible, so do it in the first send work request.
+Fix TCP_Server_Info::credits to be signed, just as echo_credits and
+oplock_credits are.  This also fixes what ought to get at least a
+compilation warning if not an outright error in *get_credits_field() as a
+pointer to the unsigned server->credits field is passed back as a pointer
+to a signed int.
 
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: linux-cifs@vger.kernel.org
+Cc: stable@vger.kernel.org
+Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Acked-by: Pavel Shilovskiy <pshilovskiy@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/server/transport_rdma.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ fs/smb/client/cifsglob.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 31c1ac256e1be..91e85a1a154fd 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -938,12 +938,15 @@ static int smb_direct_flush_send_list(struct smb_direct_transport *t,
- 			       struct smb_direct_sendmsg,
- 			       list);
- 
-+	if (send_ctx->need_invalidate_rkey) {
-+		first->wr.opcode = IB_WR_SEND_WITH_INV;
-+		first->wr.ex.invalidate_rkey = send_ctx->remote_key;
-+		send_ctx->need_invalidate_rkey = false;
-+		send_ctx->remote_key = 0;
-+	}
-+
- 	last->wr.send_flags = IB_SEND_SIGNALED;
- 	last->wr.wr_cqe = &last->cqe;
--	if (is_last && send_ctx->need_invalidate_rkey) {
--		last->wr.opcode = IB_WR_SEND_WITH_INV;
--		last->wr.ex.invalidate_rkey = send_ctx->remote_key;
--	}
- 
- 	ret = smb_direct_post_send(t, &first->wr);
- 	if (!ret) {
--- 
-2.51.0
-
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -703,7 +703,7 @@ struct TCP_Server_Info {
+ 	bool nosharesock;
+ 	bool tcp_nodelay;
+ 	bool terminate;
+-	unsigned int credits;  /* send no more requests at once */
++	int credits;  /* send no more requests at once */
+ 	unsigned int max_credits; /* can override large 32000 default at mnt */
+ 	unsigned int in_flight;  /* number of requests on the wire to server */
+ 	unsigned int max_in_flight; /* max number of requests that were on wire */
 
 
