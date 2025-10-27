@@ -1,32 +1,32 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B226F2DFA5A
-	for <linux-cifs@vger.kernel.org>; Mon, 27 Oct 2025 07:23:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA552DC32E
+	for <linux-cifs@vger.kernel.org>; Mon, 27 Oct 2025 07:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761549839; cv=none; b=k9Wbi51exogsnMpUQdQY1eTWAHYw1KN86WRZHCqKRgirFbmoQh6wt8PKisj7e5Jz7OAtLlwKcgKG3kuVPBeXMvpn5Ts82l2zIce/goq1DUyFqQtsY/Tcqx4nLIaT5CAzsycnyhz2f33tjIUbGeVckeKtX6Pp6H1FvrXOMhfhzaE=
+	t=1761549843; cv=none; b=NaGGCBwxdzy7RYvsbWjFEQJZAondcoDHVODdE4SR74URE9r8vV8E+WIxj4uSuhoyVNxbWngEhjsfvKCuvbQ0g6Wl1YnGY8I4ShBpko1BnXNBVyJ4DkE5bhRfrhPKch/+DCoOaTw+WArRpUx9wrA1QMfndcNQgFXI8aW7wS6NXwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761549839; c=relaxed/simple;
-	bh=lm/tK9pKP3kfe8IUsXAzbUd55nvSXO7lhA6B/h/81Jg=;
+	s=arc-20240116; t=1761549843; c=relaxed/simple;
+	bh=1wP+8RqUhm5f9trzFZDZKEGkSzwUgvOQuGC/J+j2ZT4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PHLfFUAxa9Cb6TAK4DLeZRNXmg4ARYOHMJ+5DGhSNI2BWif1LfmoEa1tZViE5e0aTkiIxFyDr4AtisXarg2mhyryT67X8uKHJ9ZUXcUmgZJmPji97xllCptMVdIjL/OZgvA7fGYnT+yl5D76yhLtj+PzENgL7d1IJX3jKtf2fdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X7JQrhBK; arc=none smtp.client-ip=95.215.58.186
+	 MIME-Version; b=DpyX3O/WG8GxjOfH6ikR36PpAhfE+mqjnLwvsUj9GUGdSrGnrTmbTXuLtT+9iaKfVw6lf6EYmIViorEH+nO+dhXIWzRB5mv9jdOX5CX5UQVdPHtDftVmP23jIq8DCP4jR+lUUvgT/dDoEOSMgerdqgikcirYoHWlpP4O0wCvZF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F6haeWJk; arc=none smtp.client-ip=95.215.58.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X7JQrhBK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F6haeWJk"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761549836;
+	t=1761549839;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fNMx+mS9oi/4/9XGraq2gniUdtLbevqPEBur+tTV9Xs=;
-	b=X7JQrhBKfPPaSVRb+mr72nCWVHWrP7i13jxHw+pEF5KvB5yXvzCLYNScy5itD+bmtLoNMH
-	Vvf0fQAXBoSy8j0Pu0yWVhlSdoNS0rxGNbAgNMxZ3fuBcUc0UdOrepH2VE9ojno4saUv1t
-	N7QdBg2v2266IashQSDMvqIxRXS5Ggo=
+	bh=nAg7H6k3Ss/PPdDpVyO/MSrA/oYwNacKlenw9To0wfA=;
+	b=F6haeWJkxjscoYdsqUHf5NTZ5sXmh3r1Pq/Uap4STTA5nBhNWy/w/mrV0pol5r8DjvqcyJ
+	VAd/ILenbMDAHYc0pzUDEGLzon4YaGpa0ThJf5gjEEs0QWNOAjCGshVfLoRAy0+46PFubO
+	h8syXAJh7iO+MoRUqL3HaTOfmT6fnmo=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: sfrench@samba.org,
 	smfrench@gmail.com,
@@ -37,9 +37,9 @@ Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ZhangGuoDong <zhangguodong@kylinos.cn>,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v4 21/24] smb: move smb_sockaddr_in and smb_sockaddr_in6 to common/smb2pdu.h
-Date: Mon, 27 Oct 2025 15:22:03 +0800
-Message-ID: <20251027072206.3468578-7-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH v4 22/24] smb: move copychunk definitions to common/smb2pdu.h
+Date: Mon, 27 Oct 2025 15:22:04 +0800
+Message-ID: <20251027072206.3468578-8-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251027071316.3468472-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251027071316.3468472-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -53,155 +53,202 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-Rename 4 places:
+Rename 3 places:
 
-  - iface_info_ipv4 -> smb_sockaddr_in
-  - iface_info_ipv6 -> smb_sockaddr_in6
-  - IPv4address -> IPv4Address
-  - IPv6address -> IPv6Address
+  - copychunk_ioctl -> copychunk_ioctl_req
+  - copychunk -> srv_copychunk
+  - server: ResumeKey -> SourceKeyU64
 
-Then move duplicate definitions to common header file.
+Merge the struct members of the server and the client, then move duplicate
+definitions to common header file.
 
 Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 ---
- fs/smb/client/smb2ops.c |  8 ++++----
- fs/smb/client/smb2pdu.h | 13 -------------
- fs/smb/common/smb2pdu.h | 15 +++++++++++++++
+ fs/smb/client/cifspdu.h |  8 --------
+ fs/smb/client/smb2ops.c |  6 +++---
+ fs/smb/client/smb2pdu.h | 24 ------------------------
+ fs/smb/common/smb2pdu.h | 29 +++++++++++++++++++++++++++++
  fs/smb/server/smb2pdu.c |  4 ++--
- fs/smb/server/smb2pdu.h | 13 -------------
- 5 files changed, 21 insertions(+), 32 deletions(-)
+ fs/smb/server/smb2pdu.h | 20 --------------------
+ 6 files changed, 34 insertions(+), 57 deletions(-)
 
+diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
+index 55aaae6dbc86..157dbc344540 100644
+--- a/fs/smb/client/cifspdu.h
++++ b/fs/smb/client/cifspdu.h
+@@ -1030,14 +1030,6 @@ typedef struct smb_com_ntransact_rsp {
+ 	/* parms and data follow */
+ } __attribute__((packed)) NTRANSACT_RSP;
+ 
+-/* See MS-SMB 2.2.7.2.1.1 */
+-struct srv_copychunk {
+-	__le64 SourceOffset;
+-	__le64 DestinationOffset;
+-	__le32 CopyLength;
+-	__u32  Reserved;
+-} __packed;
+-
+ typedef struct smb_com_transaction_ioctl_req {
+ 	struct smb_hdr hdr;	/* wct = 23 */
+ 	__u8 MaxSetupCount;
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 0f9130ef2e7d..1b9995ebb895 100644
+index 1b9995ebb895..a2319eef2801 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -624,8 +624,8 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 	struct network_interface_info_ioctl_rsp *p;
- 	struct sockaddr_in *addr4;
- 	struct sockaddr_in6 *addr6;
--	struct iface_info_ipv4 *p4;
--	struct iface_info_ipv6 *p6;
-+	struct smb_sockaddr_in *p4;
-+	struct smb_sockaddr_in6 *p6;
- 	struct cifs_server_iface *info = NULL, *iface = NULL, *niface = NULL;
- 	struct cifs_server_iface tmp_iface;
- 	ssize_t bytes_left;
-@@ -685,7 +685,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 		 */
- 		case INTERNETWORK:
- 			addr4 = (struct sockaddr_in *)&tmp_iface.sockaddr;
--			p4 = (struct iface_info_ipv4 *)p->Buffer;
-+			p4 = (struct smb_sockaddr_in *)p->Buffer;
- 			addr4->sin_family = AF_INET;
- 			memcpy(&addr4->sin_addr, &p4->IPv4Address, 4);
- 
-@@ -697,7 +697,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 			break;
- 		case INTERNETWORKV6:
- 			addr6 =	(struct sockaddr_in6 *)&tmp_iface.sockaddr;
--			p6 = (struct iface_info_ipv6 *)p->Buffer;
-+			p6 = (struct smb_sockaddr_in6 *)p->Buffer;
- 			addr6->sin6_family = AF_INET6;
- 			memcpy(&addr6->sin6_addr, &p6->IPv6Address, 16);
- 
+@@ -1524,7 +1524,7 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
+ static int
+ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     u64 persistent_fid, u64 volatile_fid,
+-		     struct copychunk_ioctl *pcchunk)
++		     struct copychunk_ioctl_req *pcchunk)
+ {
+ 	int rc;
+ 	unsigned int ret_data_len;
+@@ -1857,10 +1857,10 @@ smb2_copychunk_range(const unsigned int xid,
+ {
+ 	int rc = 0;
+ 	unsigned int ret_data_len = 0;
+-	struct copychunk_ioctl *cc_req = NULL;
++	struct copychunk_ioctl_req *cc_req = NULL;
+ 	struct copychunk_ioctl_rsp *cc_rsp = NULL;
+ 	struct cifs_tcon *tcon;
+-	struct copychunk *chunk;
++	struct srv_copychunk *chunk;
+ 	u32 chunks, chunk_count, chunk_bytes;
+ 	u32 copy_bytes, copy_bytes_left;
+ 	u32 chunks_written, bytes_written;
 diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
-index 6def502f68b7..a0f73b183c0e 100644
+index a0f73b183c0e..f8aa4bcc5eac 100644
 --- a/fs/smb/client/smb2pdu.h
 +++ b/fs/smb/client/smb2pdu.h
-@@ -244,19 +244,6 @@ struct network_interface_info_ioctl_rsp {
- 	__u8 Buffer[126];
+@@ -158,36 +158,12 @@ struct crt_sd_ctxt {
+ 	struct smb3_sd sd;
  } __packed;
  
--struct iface_info_ipv4 {
--	__be16 Port;
--	__be32 IPv4Address;
--	__be64 Reserved;
--} __packed;
 -
--struct iface_info_ipv6 {
--	__be16 Port;
--	__be32 FlowInfo;
--	__u8   IPv6Address[16];
--	__be32 ScopeId;
--} __packed;
--
- #define NO_FILE_ID 0xFFFFFFFFFFFFFFFFULL /* general ioctls to srv not to file */
+-#define COPY_CHUNK_RES_KEY_SIZE	24
+ struct resume_key_req {
+ 	char ResumeKey[COPY_CHUNK_RES_KEY_SIZE];
+ 	__le32	ContextLength;	/* MBZ */
+ 	char	Context[];	/* ignored, Windows sets to 4 bytes of zero */
+ } __packed;
  
- struct compress_ioctl {
+-
+-struct copychunk {
+-	__le64 SourceOffset;
+-	__le64 TargetOffset;
+-	__le32 Length;
+-	__le32 Reserved;
+-} __packed;
+-
+-/* this goes in the ioctl buffer when doing a copychunk request */
+-struct copychunk_ioctl {
+-	char SourceKey[COPY_CHUNK_RES_KEY_SIZE];
+-	__le32 ChunkCount;
+-	__le32 Reserved;
+-	struct copychunk Chunks[];
+-} __packed;
+-
+-struct copychunk_ioctl_rsp {
+-	__le32 ChunksWritten;
+-	__le32 ChunkBytesWritten;
+-	__le32 TotalBytesWritten;
+-} __packed;
+-
+ /* See MS-FSCC 2.3.29 and 2.3.30 */
+ struct get_retrieval_pointer_count_req {
+ 	__le64 StartingVcn; /* virtual cluster number (signed) */
 diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index 704096c251b7..2b56a17bccdb 100644
+index 2b56a17bccdb..319890c6d46b 100644
 --- a/fs/smb/common/smb2pdu.h
 +++ b/fs/smb/common/smb2pdu.h
-@@ -1440,6 +1440,21 @@ struct smb2_ioctl_rsp {
+@@ -1424,6 +1424,35 @@ struct smb2_ioctl_req {
  	__u8   Buffer[];
  } __packed;
  
-+/* See MS-SMB2 2.2.32.5.1.1 */
-+struct smb_sockaddr_in {
-+	__be16 Port;
-+	__be32 IPv4Address;
-+	__u8   Reserved[8];
++/* See MS-SMB2 2.2.31.1.1 */
++struct srv_copychunk {
++	__le64 SourceOffset;
++	__le64 TargetOffset;
++	__le32 Length;
++	__le32 Reserved;
 +} __packed;
 +
-+/* See MS-SMB2 2.2.32.5.1.2 */
-+struct smb_sockaddr_in6 {
-+	__be16 Port;
-+	__be32 FlowInfo;
-+	__u8   IPv6Address[16];
-+	__be32 ScopeId;
++#define COPY_CHUNK_RES_KEY_SIZE	24
++
++/* See MS-SMB2 2.2.31.1 */
++/* this goes in the ioctl buffer when doing a copychunk request */
++struct copychunk_ioctl_req {
++	union {
++		char SourceKey[COPY_CHUNK_RES_KEY_SIZE];
++		__le64 SourceKeyU64[3];
++	};
++	__le32 ChunkCount;
++	__le32 Reserved;
++	struct srv_copychunk Chunks[] __counted_by_le(ChunkCount);
 +} __packed;
 +
- /* this goes in the ioctl buffer when doing FSCTL_SET_ZERO_DATA */
- struct file_zero_data_information {
- 	__le64	FileOffset;
++/* See MS-SMB2 2.2.32.1 */
++struct copychunk_ioctl_rsp {
++	__le32 ChunksWritten;
++	__le32 ChunkBytesWritten;
++	__le32 TotalBytesWritten;
++} __packed;
++
+ struct smb2_ioctl_rsp {
+ 	struct smb2_hdr hdr;
+ 	__le16 StructureSize; /* Must be 49 */
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 06da751063b5..c1ea4b747625 100644
+index c1ea4b747625..44e2cef70f27 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -7910,7 +7910,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 			idev = __in_dev_get_rtnl(netdev);
- 			if (!idev)
- 				continue;
--			sockaddr_storage->addr4.IPv4address =
-+			sockaddr_storage->addr4.IPv4Address =
- 						idev_ipv4_address(idev);
- 			nbytes += sizeof(struct network_interface_info_ioctl_rsp);
- 			ipv4_set = true;
-@@ -7918,7 +7918,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 		} else {
- 			struct inet6_dev *idev6;
- 			struct inet6_ifaddr *ifa;
--			__u8 *ipv6_addr = sockaddr_storage->addr6.IPv6address;
-+			__u8 *ipv6_addr = sockaddr_storage->addr6.IPv6Address;
+@@ -7764,11 +7764,11 @@ static int fsctl_copychunk(struct ksmbd_work *work,
+ 	}
  
- 			sockaddr_storage->Family = cpu_to_le16(INTERNETWORKV6);
- 			sockaddr_storage->addr6.Port = 0;
+ 	src_fp = ksmbd_lookup_foreign_fd(work,
+-					 le64_to_cpu(ci_req->ResumeKey[0]));
++					 le64_to_cpu(ci_req->SourceKeyU64[0]));
+ 	dst_fp = ksmbd_lookup_fd_slow(work, volatile_id, persistent_id);
+ 	ret = -EINVAL;
+ 	if (!src_fp ||
+-	    src_fp->persistent_id != le64_to_cpu(ci_req->ResumeKey[1])) {
++	    src_fp->persistent_id != le64_to_cpu(ci_req->SourceKeyU64[1])) {
+ 		rsp->hdr.Status = STATUS_OBJECT_NAME_NOT_FOUND;
+ 		goto out;
+ 	}
 diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
-index 25c20b26315b..fb4df2860481 100644
+index fb4df2860481..ab4359f384b3 100644
 --- a/fs/smb/server/smb2pdu.h
 +++ b/fs/smb/server/smb2pdu.h
-@@ -100,19 +100,6 @@ struct create_posix_rsp {
+@@ -136,26 +136,6 @@ struct resume_key_ioctl_rsp {
+ 	__u8 Context[4]; /* ignored, Windows sets to 4 bytes of zero */
+ } __packed;
  
- #define SMB2_0_IOCTL_IS_FSCTL 0x00000001
- 
--struct smb_sockaddr_in {
--	__be16 Port;
--	__be32 IPv4address;
--	__u8 Reserved[8];
+-struct srv_copychunk {
+-	__le64 SourceOffset;
+-	__le64 TargetOffset;
+-	__le32 Length;
+-	__le32 Reserved;
 -} __packed;
 -
--struct smb_sockaddr_in6 {
--	__be16 Port;
--	__be32 FlowInfo;
--	__u8 IPv6address[16];
--	__be32 ScopeId;
+-struct copychunk_ioctl_req {
+-	__le64 ResumeKey[3];
+-	__le32 ChunkCount;
+-	__le32 Reserved;
+-	struct srv_copychunk Chunks[] __counted_by_le(ChunkCount);
 -} __packed;
 -
- #define INTERNETWORK	0x0002
- #define INTERNETWORKV6	0x0017
- 
+-struct copychunk_ioctl_rsp {
+-	__le32 ChunksWritten;
+-	__le32 ChunkBytesWritten;
+-	__le32 TotalBytesWritten;
+-} __packed;
+-
+ struct file_sparse {
+ 	__u8	SetSparse;
+ } __packed;
 -- 
 2.43.0
 
