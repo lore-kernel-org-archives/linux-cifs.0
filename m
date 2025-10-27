@@ -1,32 +1,32 @@
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E508F2E2DFC
-	for <linux-cifs@vger.kernel.org>; Mon, 27 Oct 2025 07:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0CCD2DCBE0
+	for <linux-cifs@vger.kernel.org>; Mon, 27 Oct 2025 07:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761549356; cv=none; b=QS/XBvf+UOv1MrFu/KO/Pah+L2HdGUu265OwBVyeFRZ5R0l/kMP6nN9H6qY1KDGxqYdmvGAgOpnRtrR/Z8MlaBvuWErkqBdhNdpRVrRhzLVfAR9uy6iy8E+JegIGSP13gofnBRXBRNg7cF9pbxAe05+slC1Bcj97+ojOtDXCOSU=
+	t=1761549825; cv=none; b=qY9C72o6LDPxU28hGVkHzJIAxGkQQl0gPTI+4RkuCMBjniCMG8mSXpMR5DmcRX2u4qeSBYX3jsrCYkAdKLRXRJGbSQQNNzFtW7n1zxuKMlC7rN2AKa0IGRBQnL2+ihHhlaAL3DbOvU4W0E3ui9fqad0BxY4o8+0MBmaAK3COEFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761549356; c=relaxed/simple;
-	bh=wunBsqhsP068NiMoELqQshZ2wU0PGypzj8sZSqysckI=;
+	s=arc-20240116; t=1761549825; c=relaxed/simple;
+	bh=Zf6J3Hs4f2PorXqJZOx/hFVWj6S8Oc8vZdNa5KsWoCg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZzsdvYO029PHHVaGp2RPRPDvBt+Ks3A0oPQYTUk54J47LEVZhaSTBPiLpOcpBoZwUCKzPaoG5BcZT4maRex8+1WNb4hxISZkc9xzbm9SGZh6dWA7CIfbm2j5qreKCRZdx/CDE4bj2tQlT+TeraDjQWjjZqNutYqH1pD+QiyXzak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=loz9ZqSu; arc=none smtp.client-ip=95.215.58.183
+	 MIME-Version; b=gSR6rJnEREnVPYdxnT3t/Qy+tziQT3ACAslKRfLhQP91wtlVZN1jkaB/5JLqSvUWMDx723owQO4L4vglGVFfeis5wlsXRDAaZkciOXpo020NndI545PeP8uYF1lBFPwk5wrAfwzwG3cr2DXBEQwz8TyiD8YHhL4DVbMXpY5vErA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Lc8F/9Oo; arc=none smtp.client-ip=95.215.58.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="loz9ZqSu"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Lc8F/9Oo"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761549352;
+	t=1761549822;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=z/npw3UtVzzHKnhWtUxEh+GVZ5zLFBAoolGZR5y2DWw=;
-	b=loz9ZqSu9aQa6azazaDz56X0xJQFykTZsgk6bOh47LE53uDB1j1gZ1Xd2Rj4rsYiXjiJVW
-	N0uZT+96MIv236wpBNZjFAfciYFF9y7zIXmaFXTvOuf4PuPJfH+zBN3zSBfYklNmWsViOB
-	Pp6B3QYhcRfxiW/3KMqPCpWSy6JSxQQ=
+	bh=XY3enVx+NvA5c1N34me4+c6U2C2vkgiExeqfsy34gg4=;
+	b=Lc8F/9Ooob/pZbJrTuEuibSyurS41EDeihqkYR0pdMPs4fj/TmNJvXzzxBgw0tcDXvBj7c
+	opG7oq/Fl0I1vUfwAalgTX6iRq6YKVphGKFfxp+866J1IUBjqQDtsoKIQ0OWo+FPoSjP4o
+	BcOxpvpCgkjKA1HSirMfTcefqlVf/5Q=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: sfrench@samba.org,
 	smfrench@gmail.com,
@@ -36,9 +36,9 @@ To: sfrench@samba.org,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v4 14/24] smb: move SEARCH_ID_FULL_DIR_INFO to common/smb1pdu.h
-Date: Mon, 27 Oct 2025 15:13:06 +0800
-Message-ID: <20251027071316.3468472-15-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH v4 16/24] smb: move create_durable_req_v2 to common/smb2pdu.h
+Date: Mon, 27 Oct 2025 15:21:58 +0800
+Message-ID: <20251027072206.3468578-2-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251027071316.3468472-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251027071316.3468472-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -52,151 +52,160 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Rename "struct file_id_full_dir_info" to "SEARCH_ID_FULL_DIR_INFO",
-then move duplicate definitions to common header file.
+Replace some fields in "struct create_durable_req_v2" with "struct
+durable_context_v2", rename 2 places:
+
+  - durable_context_v2 -> durable_context_v2_req
+  - create_durable_v2 -> create_durable_req_v2
+
+Then move duplicate definitions to common header file.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifspdu.h    | 17 -----------------
- fs/smb/common/smb1pdu.h    | 18 ++++++++++++++++++
- fs/smb/server/smb2pdu.c    | 14 +++++++-------
- fs/smb/server/smb_common.h | 17 -----------------
- 4 files changed, 25 insertions(+), 41 deletions(-)
+ fs/smb/client/smb2pdu.c | 14 +++++++-------
+ fs/smb/client/smb2pdu.h | 12 ------------
+ fs/smb/common/smb2pdu.h | 14 ++++++++++++++
+ fs/smb/server/smb2pdu.c |  8 ++++----
+ fs/smb/server/smb2pdu.h |  9 ---------
+ 5 files changed, 25 insertions(+), 32 deletions(-)
 
-diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index 8aac0e04f9fd..d106c6850807 100644
---- a/fs/smb/client/cifspdu.h
-+++ b/fs/smb/client/cifspdu.h
-@@ -2159,23 +2159,6 @@ typedef struct {
- 	};
- } __attribute__((packed)) FILE_UNIX_INFO; /* level 0x202 */
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index b0739a2661bf..c1f67864c84b 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -2424,21 +2424,21 @@ add_lease_context(struct TCP_Server_Info *server,
+ 	return 0;
+ }
  
--typedef struct {
--	__le32 NextEntryOffset;
--	__u32 FileIndex;
--	__le64 CreationTime;
--	__le64 LastAccessTime;
--	__le64 LastWriteTime;
--	__le64 ChangeTime;
--	__le64 EndOfFile;
--	__le64 AllocationSize;
--	__le32 ExtFileAttributes;
--	__le32 FileNameLength;
--	__le32 EaSize; /* EA size */
--	__le32 Reserved;
--	__le64 UniqueId; /* inode num - le since Samba puts ino in low 32 bit*/
--	char FileName[];
--} __attribute__((packed)) SEARCH_ID_FULL_DIR_INFO; /* level 0x105 FF rsp data */
+-static struct create_durable_v2 *
++static struct create_durable_req_v2 *
+ create_durable_v2_buf(struct cifs_open_parms *oparms)
+ {
+ 	struct cifs_fid *pfid = oparms->fid;
+-	struct create_durable_v2 *buf;
++	struct create_durable_req_v2 *buf;
+ 
+-	buf = kzalloc(sizeof(struct create_durable_v2), GFP_KERNEL);
++	buf = kzalloc(sizeof(struct create_durable_req_v2), GFP_KERNEL);
+ 	if (!buf)
+ 		return NULL;
+ 
+ 	buf->ccontext.DataOffset = cpu_to_le16(offsetof
+-					(struct create_durable_v2, dcontext));
+-	buf->ccontext.DataLength = cpu_to_le32(sizeof(struct durable_context_v2));
++					(struct create_durable_req_v2, dcontext));
++	buf->ccontext.DataLength = cpu_to_le32(sizeof(struct durable_context_v2_req));
+ 	buf->ccontext.NameOffset = cpu_to_le16(offsetof
+-				(struct create_durable_v2, Name));
++				(struct create_durable_req_v2, Name));
+ 	buf->ccontext.NameLength = cpu_to_le16(4);
+ 
+ 	/*
+@@ -2508,7 +2508,7 @@ add_durable_v2_context(struct kvec *iov, unsigned int *num_iovec,
+ 	iov[num].iov_base = create_durable_v2_buf(oparms);
+ 	if (iov[num].iov_base == NULL)
+ 		return -ENOMEM;
+-	iov[num].iov_len = sizeof(struct create_durable_v2);
++	iov[num].iov_len = sizeof(struct create_durable_req_v2);
+ 	*num_iovec = num + 1;
+ 	return 0;
+ }
+diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
+index 101024f8f725..94d184733f33 100644
+--- a/fs/smb/client/smb2pdu.h
++++ b/fs/smb/client/smb2pdu.h
+@@ -137,18 +137,6 @@ struct share_redirect_error_context_rsp {
+ /* See MS-SMB2 2.2.13.2.11 */
+ /* Flags */
+ #define SMB2_DHANDLE_FLAG_PERSISTENT	0x00000002
+-struct durable_context_v2 {
+-	__le32 Timeout;
+-	__le32 Flags;
+-	__u64 Reserved;
+-	__u8 CreateGuid[16];
+-} __packed;
 -
- typedef struct {
- 	__u32  ResumeKey;
- 	__le16 CreationDate; /* SMB Date */
-diff --git a/fs/smb/common/smb1pdu.h b/fs/smb/common/smb1pdu.h
-index 0bc1e2373210..82331a8f70e8 100644
---- a/fs/smb/common/smb1pdu.h
-+++ b/fs/smb/common/smb1pdu.h
-@@ -399,6 +399,24 @@ typedef struct {
- 	char FileName[];
- } __packed FILE_FULL_DIRECTORY_INFO; /* level 0x102 rsp data */
+-struct create_durable_v2 {
+-	struct create_context_hdr ccontext;
+-	__u8   Name[8];
+-	struct durable_context_v2 dcontext;
+-} __packed;
  
-+/* See MS-SMB 2.2.8.1.2 */
-+typedef struct {
-+	__le32 NextEntryOffset;
-+	__u32 FileIndex;
-+	__le64 CreationTime;
-+	__le64 LastAccessTime;
-+	__le64 LastWriteTime;
-+	__le64 ChangeTime;
-+	__le64 EndOfFile;
-+	__le64 AllocationSize;
-+	__le32 ExtFileAttributes;
-+	__le32 FileNameLength;
-+	__le32 EaSize; /* EA size */
-+	__le32 Reserved;
-+	__le64 UniqueId; /* inode num - le since Samba puts ino in low 32 bit*/
-+	char FileName[];
-+} __packed SEARCH_ID_FULL_DIR_INFO; /* level 0x105 FF rsp data */
-+
- /* See MS-CIFS 2.2.8.1.7 */
- typedef struct {
- 	__le32 NextEntryOffset;
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index b6daac1cd080..47fab72a3588 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3804,7 +3804,7 @@ static int readdir_info_level_struct_sz(int info_level)
- 	case FILE_NAMES_INFORMATION:
- 		return sizeof(struct file_names_info);
- 	case FILEID_FULL_DIRECTORY_INFORMATION:
--		return sizeof(struct file_id_full_dir_info);
-+		return sizeof(SEARCH_ID_FULL_DIR_INFO);
- 	case FILEID_BOTH_DIRECTORY_INFORMATION:
- 		return sizeof(struct file_id_both_directory_info);
- 	case SMB_FIND_FILE_POSIX_INFO:
-@@ -3859,9 +3859,9 @@ static int dentry_name(struct ksmbd_dir_info *d_info, int info_level)
- 	}
- 	case FILEID_FULL_DIRECTORY_INFORMATION:
- 	{
--		struct file_id_full_dir_info *dinfo;
-+		SEARCH_ID_FULL_DIR_INFO *dinfo;
- 
--		dinfo = (struct file_id_full_dir_info *)d_info->rptr;
-+		dinfo = (SEARCH_ID_FULL_DIR_INFO *)d_info->rptr;
- 		d_info->rptr += le32_to_cpu(dinfo->NextEntryOffset);
- 		d_info->name = dinfo->FileName;
- 		d_info->name_len = le32_to_cpu(dinfo->FileNameLength);
-@@ -4000,9 +4000,9 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
- 	}
- 	case FILEID_FULL_DIRECTORY_INFORMATION:
- 	{
--		struct file_id_full_dir_info *dinfo;
-+		SEARCH_ID_FULL_DIR_INFO *dinfo;
- 
--		dinfo = (struct file_id_full_dir_info *)kstat;
-+		dinfo = (SEARCH_ID_FULL_DIR_INFO *)kstat;
- 		dinfo->FileNameLength = cpu_to_le32(conv_len);
- 		dinfo->EaSize =
- 			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
-@@ -4250,9 +4250,9 @@ static int reserve_populate_dentry(struct ksmbd_dir_info *d_info,
- 	}
- 	case FILEID_FULL_DIRECTORY_INFORMATION:
- 	{
--		struct file_id_full_dir_info *dinfo;
-+		SEARCH_ID_FULL_DIR_INFO *dinfo;
- 
--		dinfo = (struct file_id_full_dir_info *)d_info->wptr;
-+		dinfo = (SEARCH_ID_FULL_DIR_INFO *)d_info->wptr;
- 		memcpy(dinfo->FileName, d_info->name, d_info->name_len);
- 		dinfo->FileName[d_info->name_len] = 0x00;
- 		dinfo->FileNameLength = cpu_to_le32(d_info->name_len);
-diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
-index 649b45695449..6141ca8f7e1c 100644
---- a/fs/smb/server/smb_common.h
-+++ b/fs/smb/server/smb_common.h
-@@ -108,23 +108,6 @@ struct file_id_both_directory_info {
- 	char FileName[];
+ /* See MS-SMB2 2.2.13.2.12 */
+ struct durable_reconnect_context_v2 {
+diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+index f2fbd651ab8f..6a5c8eef357d 100644
+--- a/fs/smb/common/smb2pdu.h
++++ b/fs/smb/common/smb2pdu.h
+@@ -1284,6 +1284,20 @@ struct create_mxac_req {
+ 	__le64 Timestamp;
  } __packed;
  
--struct file_id_full_dir_info {
--	__le32 NextEntryOffset;
--	__u32 FileIndex;
--	__le64 CreationTime;
--	__le64 LastAccessTime;
--	__le64 LastWriteTime;
--	__le64 ChangeTime;
--	__le64 EndOfFile;
--	__le64 AllocationSize;
--	__le32 ExtFileAttributes;
--	__le32 FileNameLength;
--	__le32 EaSize; /* EA size */
--	__le32 Reserved;
--	__le64 UniqueId; /* inode num - le since Samba puts ino in low 32 bit*/
--	char FileName[];
--} __packed; /* level 0x105 FF rsp data */
++/* See MS-SMB2 2.2.13.2.11 */
++struct durable_context_v2_req {
++	__le32 Timeout;
++	__le32 Flags; /* see SMB2_DHANDLE_FLAG_PERSISTENT */
++	__u64 Reserved;
++	__u8 CreateGuid[16];
++} __packed;
++
++struct create_durable_req_v2 {
++	struct create_context_hdr ccontext;
++	__u8   Name[8];
++	struct durable_context_v2_req dcontext;
++} __packed;
++
+ /* See MS-SMB2 2.2.14.2.5 */
+ struct create_mxac_rsp {
+ 	struct create_context_hdr ccontext;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index dc0f0ed4ccb6..92bd086ca715 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -2816,7 +2816,7 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
+ 			durable_v2_blob =
+ 				(struct create_durable_req_v2 *)context;
+ 			ksmbd_debug(SMB, "Request for durable v2 open\n");
+-			dh_info->fp = ksmbd_lookup_fd_cguid(durable_v2_blob->CreateGuid);
++			dh_info->fp = ksmbd_lookup_fd_cguid(durable_v2_blob->dcontext.CreateGuid);
+ 			if (dh_info->fp) {
+ 				if (!memcmp(conn->ClientGUID, dh_info->fp->client_guid,
+ 					    SMB2_CLIENT_GUID_SIZE)) {
+@@ -2834,11 +2834,11 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
+ 			if ((lc && (lc->req_state & SMB2_LEASE_HANDLE_CACHING_LE)) ||
+ 			    req_op_level == SMB2_OPLOCK_LEVEL_BATCH) {
+ 				dh_info->CreateGuid =
+-					durable_v2_blob->CreateGuid;
++					durable_v2_blob->dcontext.CreateGuid;
+ 				dh_info->persistent =
+-					le32_to_cpu(durable_v2_blob->Flags);
++					le32_to_cpu(durable_v2_blob->dcontext.Flags);
+ 				dh_info->timeout =
+-					le32_to_cpu(durable_v2_blob->Timeout);
++					le32_to_cpu(durable_v2_blob->dcontext.Timeout);
+ 				dh_info->type = dh_idx;
+ 			}
+ 			break;
+diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
+index 5163d5241b90..e9df94e4749c 100644
+--- a/fs/smb/server/smb2pdu.h
++++ b/fs/smb/server/smb2pdu.h
+@@ -66,15 +66,6 @@ struct preauth_integrity_info {
+ /* Apple Defined Contexts */
+ #define SMB2_CREATE_AAPL		"AAPL"
+ 
+-struct create_durable_req_v2 {
+-	struct create_context_hdr ccontext;
+-	__u8   Name[8];
+-	__le32 Timeout;
+-	__le32 Flags;
+-	__u8 Reserved[8];
+-	__u8 CreateGuid[16];
+-} __packed;
 -
- struct filesystem_posix_info {
- 	/* For undefined recommended transfer size return -1 in that field */
- 	__le32 OptimalTransferSize;  /* bsize on some os, iosize on other os */
+ #define DURABLE_HANDLE_MAX_TIMEOUT	300000
+ 
+ struct create_durable_reconn_req {
 -- 
 2.43.0
 
