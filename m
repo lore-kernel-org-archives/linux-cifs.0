@@ -1,55 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F482777FC
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Oct 2025 03:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EBA272E5A
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Oct 2025 03:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761622973; cv=none; b=g8ndURa9AmvIrqD61810maX6vDR8r+RuGZtThTZYC764fnTnohjvMgakE5gDvsIAtX0WhoMwRsP+xsCoVOCeRGFjyLmPbKZXv2CYqeH+w4oTYNPpmYa+O664fQGWE9+E0fccJ16wNeOvInmQGHNrE6kNDteXlkPUohtqbUpcp+M=
+	t=1761623419; cv=none; b=UxDwcMAPBCqdy3qxI0k3IQVNQqteE2RP7pNv7YCjSP5/grjh892K69AziLnu4MXvFDTgq19Ql7oDa7sFQitM0kj5FZjQpqfR2ow3xbL0QAb3QbHMdsHWeTjfhIggV7TkKjznPKdlbQYVsm18yG06ouEC9Yug9g8hpzsHzonp8ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761622973; c=relaxed/simple;
-	bh=EZxjcoS5qdrAwcRhEUNyB2nv+HkIt/HSRelXLGyxR/c=;
+	s=arc-20240116; t=1761623419; c=relaxed/simple;
+	bh=GX5+3aqXD2nsCgd5kp0igvha5Nm5hmSUAzCGmsD6XZE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c7WZpdy5TmnAgZo2fFdwaJ8lPmIEuNDZDWyv+SZWbJRwc7U+ETYO8wkg2KmT+TU64HHTfMsl8WXiqa6/8CB6/p9GE+yFt3Y46XBWboF12oW4DyFuqPC5CJiy2PMI0Ewo8s5E0W59x5JghR8YmB7yfoE6hm5otpONvLQHyZ6WBXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ctmRBT4U; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=JLUkDvd2bTG+4eNcFPovQ+4mZGeZ/lfR5sLisLtTncc+ConnR8nWGnJ4XjXw/p/yKlScWpW0SVBJfwN31RDUs/7JpnPKuWlAGe5qIBfrL+Gvh969vcM2HmWQzl6yQTFNR3peHLVrsNq8J0hH5MMPDaWCZuIBmBLs3uJFymzxMY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qlzKQ8Uz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ctmRBT4U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA2FBC4CEF1
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Oct 2025 03:42:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qlzKQ8Uz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55B8CC16AAE
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Oct 2025 03:50:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761622972;
-	bh=EZxjcoS5qdrAwcRhEUNyB2nv+HkIt/HSRelXLGyxR/c=;
+	s=k20201202; t=1761623419;
+	bh=GX5+3aqXD2nsCgd5kp0igvha5Nm5hmSUAzCGmsD6XZE=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ctmRBT4URZ6Cpzu5/Uhz0fQY+6zbTkeNv0+Hn3Hnh95eFwL1b2gfJGHGP65u2X3yq
-	 2FQQwgSak9K9/MA4VzL3bGwoT2vnoSZUqAHFWBSF088S2r3Lmh9I6DlqcC3P9UzL1z
-	 zyFHBsh87wtQK3RHG7Dm7qOp+wYSQRZqBXWpwWTa3IrA6fySTP/5y9tKoAGi6d1BmI
-	 kQx2Kr+dFuZU90q23IWSq8bK04bQAP4T+Aam6xZC6Vj+YF2gDZ+pUGHg7r/BWPocVB
-	 QZc18bVq7e2aeXyNY9XJZFHsXDW59VAYr05FYQ0VpkRdV9oar2jd17fh1s/4hGRJwT
-	 5Of+3ZMOfTRow==
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-63e0abe71a1so10459394a12.1
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Oct 2025 20:42:52 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU5NDyicKOWfjRCaE3x4qvYPSx7MZt5OdiyJ3eOb6WD3ei7zT5xU7moHOBc8qwRKodDQEKGGOPZDMeQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWTVSQNZ7VNOh9/SQV7mrQYUVfTuOvjBCTY0WdfB1pL6tyartt
-	iRC9gk5SL+Ydqjm/9zdC27pZFT8vTnSzApccEGzh2Wh5tKqPtNtYr8peoC1kAU0hI3Fs34j06Fe
-	W8270wn+Y/pHunar/KhBxhC+qDLLFg+s=
-X-Google-Smtp-Source: AGHT+IE0Lwz1JCRI0jHDYh0j09hHq/x9gpT0MXwMZfzZOvhhSbGEAsEW7sSrOe5WEAS9zt2ERS+jZl1qvzny5tkooLw=
-X-Received: by 2002:a05:6402:1ecd:b0:639:6bc8:c7bd with SMTP id
- 4fb4d7f45d1cf-63ed8372b59mr1779428a12.15.1761622971503; Mon, 27 Oct 2025
- 20:42:51 -0700 (PDT)
+	b=qlzKQ8UzaJ48peMQ3Pmq6UZseTDzXG/WwpxCW90jnUo4JSkmsj6RYit6TBh/lOFNR
+	 PHiXAlp6c7j14bEMqxIaGDJcaA+d9fCnbEEH9y2mqryQD/+dceFI1FhmcTj4cz2zu/
+	 WfXQYcd9TnjMvW6z3WV9trfF14tjuUMlkcqQQBme9zdx9OxLfgMZmGyoFxkOMVy0ln
+	 QEbAsCYt/PxUSb4xc/ReI0b//pzxeT5xcX++uq+B9wqE9Xmr7c3d2ydnlyDIMVX7/w
+	 9vxHCSvdqLbkowRfvAx//FfNqJyJCHWgMsfpoNCR/7ZN8Xrc5oD7oZFxLQdZ4/SSeI
+	 +pzJhnDfJAY2g==
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b6d53684cfdso1219739366b.0
+        for <linux-cifs@vger.kernel.org>; Mon, 27 Oct 2025 20:50:19 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCX35DAC1XZZQNVomIj/A/RKKyC4hpEeDWOz9YGQts3nJTf2lMG0jmOiWD2Y1Ac/2EtQBSMaaLfEJFSg@vger.kernel.org
+X-Gm-Message-State: AOJu0YziADomQmA2VZfO35UqatOz74e5AErZjNb1zCMJQxMyEAtwm7Yk
+	vTEMEPgH7i8D8O8xlEyeZsHJbRzSDkthVVVRcuENf+11WkGaMD5dMxN0tm6/ZKelS9HzsfjLYmW
+	0PchCnjQk6/2GewI24QlvXfDqune/rnA=
+X-Google-Smtp-Source: AGHT+IGWi61RE4SipPq0yD++Mc3cWCsrDBtPxuFho7I8zqknsGiDawaPV+gUrIP/8HXhDpM7pXr3B2NTq9c2OlOoP8s=
+X-Received: by 2002:a17:907:968b:b0:b6d:552f:e400 with SMTP id
+ a640c23a62f3a-b6dba4440a0mr226678666b.3.1761623417854; Mon, 27 Oct 2025
+ 20:50:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251027071316.3468472-1-chenxiaosong.chenxiaosong@linux.dev> <20251027071316.3468472-6-chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251027071316.3468472-6-chenxiaosong.chenxiaosong@linux.dev>
+References: <20251027071316.3468472-1-chenxiaosong.chenxiaosong@linux.dev> <20251027071316.3468472-15-chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <20251027071316.3468472-15-chenxiaosong.chenxiaosong@linux.dev>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 28 Oct 2025 12:42:39 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_u5+p5hjvQey+TM8w4+P7aN7zSfwDbrUKRtbwx4vtyDw@mail.gmail.com>
-X-Gm-Features: AWmQ_bk529JyA7cBhMnSJ-zScZU08IV0EpoThk9A1m56Np09T_41LA9OSe8XU2M
-Message-ID: <CAKYAXd_u5+p5hjvQey+TM8w4+P7aN7zSfwDbrUKRtbwx4vtyDw@mail.gmail.com>
-Subject: Re: [PATCH v4 05/24] smb: move some duplicate definitions to common/smb1pdu.h
+Date: Tue, 28 Oct 2025 12:50:06 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-X62FhZ7+ggb6geq7LGWyWiipmF2x2K0A4LeE3EDpYXA@mail.gmail.com>
+X-Gm-Features: AWmQ_bm57GE-BQzhbij7lUjhJmls7N8XtTmJe50Jk0XjT8imjsS57LoirQkB9Vs
+Message-ID: <CAKYAXd-X62FhZ7+ggb6geq7LGWyWiipmF2x2K0A4LeE3EDpYXA@mail.gmail.com>
+Subject: Re: [PATCH v4 14/24] smb: move SEARCH_ID_FULL_DIR_INFO to common/smb1pdu.h
 To: chenxiaosong.chenxiaosong@linux.dev
 Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org, 
 	christophe.jaillet@wanadoo.fr, linux-cifs@vger.kernel.org, 
@@ -62,11 +62,72 @@ v> wrote:
 >
 > From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 >
-> In order to maintain the code more easily, move duplicate definitions to
-> new common header file.
+> Rename "struct file_id_full_dir_info" to "SEARCH_ID_FULL_DIR_INFO",
+> then move duplicate definitions to common header file.
 >
 > Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
-ksmbd does not use all smb1 pdus. Instead of moving all smb1 definitions,
-move the ones ksmbd uses to smb1pdu.h.
+> ---
+>  fs/smb/client/cifspdu.h    | 17 -----------------
+>  fs/smb/common/smb1pdu.h    | 18 ++++++++++++++++++
+>  fs/smb/server/smb2pdu.c    | 14 +++++++-------
+>  fs/smb/server/smb_common.h | 17 -----------------
+>  4 files changed, 25 insertions(+), 41 deletions(-)
+>
+> diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
+> index 8aac0e04f9fd..d106c6850807 100644
+> --- a/fs/smb/client/cifspdu.h
+> +++ b/fs/smb/client/cifspdu.h
+> @@ -2159,23 +2159,6 @@ typedef struct {
+>         };
+>  } __attribute__((packed)) FILE_UNIX_INFO; /* level 0x202 */
+>
+> -typedef struct {
+> -       __le32 NextEntryOffset;
+> -       __u32 FileIndex;
+> -       __le64 CreationTime;
+> -       __le64 LastAccessTime;
+> -       __le64 LastWriteTime;
+> -       __le64 ChangeTime;
+> -       __le64 EndOfFile;
+> -       __le64 AllocationSize;
+> -       __le32 ExtFileAttributes;
+> -       __le32 FileNameLength;
+> -       __le32 EaSize; /* EA size */
+> -       __le32 Reserved;
+> -       __le64 UniqueId; /* inode num - le since Samba puts ino in low 32=
+ bit*/
+> -       char FileName[];
+> -} __attribute__((packed)) SEARCH_ID_FULL_DIR_INFO; /* level 0x105 FF rsp=
+ data */
+> -
+>  typedef struct {
+>         __u32  ResumeKey;
+>         __le16 CreationDate; /* SMB Date */
+> diff --git a/fs/smb/common/smb1pdu.h b/fs/smb/common/smb1pdu.h
+> index 0bc1e2373210..82331a8f70e8 100644
+> --- a/fs/smb/common/smb1pdu.h
+> +++ b/fs/smb/common/smb1pdu.h
+> @@ -399,6 +399,24 @@ typedef struct {
+>         char FileName[];
+>  } __packed FILE_FULL_DIRECTORY_INFO; /* level 0x102 rsp data */
+>
+> +/* See MS-SMB 2.2.8.1.2 */
+> +typedef struct {
+> +       __le32 NextEntryOffset;
+> +       __u32 FileIndex;
+> +       __le64 CreationTime;
+> +       __le64 LastAccessTime;
+> +       __le64 LastWriteTime;
+> +       __le64 ChangeTime;
+> +       __le64 EndOfFile;
+> +       __le64 AllocationSize;
+> +       __le32 ExtFileAttributes;
+> +       __le32 FileNameLength;
+> +       __le32 EaSize; /* EA size */
+> +       __le32 Reserved;
+> +       __le64 UniqueId; /* inode num - le since Samba puts ino in low 32=
+ bit*/
+> +       char FileName[];
+> +} __packed SEARCH_ID_FULL_DIR_INFO; /* level 0x105 FF rsp data */
+Please check if this class name is defined in the fscc specification.
 Thanks.
