@@ -1,93 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482592989BF
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Oct 2025 04:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C2B2236E9
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Oct 2025 04:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761624179; cv=none; b=ee4ZlvR2xNq6vvvb/gl6ZvQVhsCrq/74dFarSm+StRuAHfAziHl3HyIZCa90mVcLZbIX+lSCT/ERvxoGoaVo4ZgUJI4mzLEYUW4mlEm357MaxM1dFfZb022aRhDrcdJnZSj37QJAVDUmB215uyrOgc0xf9Q9A3zT86kPuadgags=
+	t=1761624313; cv=none; b=TI/s8bShvtu6OvfdZe7OWgWxm5OFRLrlc0tQIuwUiNfHGPd8RFPDLU4yC5epk0AbSCNI3vg2qzvh9KKEnf/vD2tG6in2A6J9iuqPij8e3DgV38ihtIyD1ACzWmAEcir8eEqCTxeS+Xu9nbUzdyqQ0QkwuqkvF7VVKswXZVlEk7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761624179; c=relaxed/simple;
-	bh=tQ76DelEERQRex/jtJZfPH2Uwy7MZJd5BE1h4O3y61o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YyEzW3E15Jlap8xNLNPDX0oGedsfJ+eVsVtHL2owAExqJLEPzTmluxcEpvRUeFAk9SHO3qoaSg0oCIBzCNlNOGuu94H7aSs35e0Ir1pl3Mr38d1a5rVp+XOauakZGCkRqdug0gO2pgdBHchEgyUg8HEtH8RdmXh+z1Si1fWuO2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQZcFttU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761624313; c=relaxed/simple;
+	bh=Nfsq+JtkBw9KVVTd9umdC+x300tX0xxu2EiJF7U4ess=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Tnkn4iUe5cYO0l95Wh5b/kvVauLB3gp8NtBwAin/3/hywxDzyX8dhvw4YeKk5oJemg0VSVjiDEqdZ04puIewgbEcuBURXYEJlLRtvHIWWA7ifHxNFaus/F9uR3hQ3xbbHQvx1Y9env4VdcSirIPukNEHWZ7lglCO+Pwq+3+pZ8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bAPvYg4G; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQZcFttU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1495C4CEE7
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Oct 2025 04:02:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761624178;
-	bh=tQ76DelEERQRex/jtJZfPH2Uwy7MZJd5BE1h4O3y61o=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=AQZcFttUAejCsBupzSJxXGQwIiKwwVZiJy7/3JYhRuyc6iJnRbNUt4Cr1G3n3FkQt
-	 U+dSY6I00YwT1wjJA4LjPvKSO5H10uN5kAIBvMu6vNcdZaRGiUrWOXLvd3UwBTWcU9
-	 zqI34c+Yfkp1/7w8GEIOHG4DKi8v0amTuXLqYMHt2ztYvtNL2yzyrTj7gEHZzntN48
-	 Wiv2h2MiIysSCYtEbNVmIYKH1XVec67pnLk6NC5yr0vGtnHJ6xM/VftmcMMGn6AubP
-	 rsNt9UHwtd2RfMXjY25Lz/UyE57019QBtqU/CA0Sbcpa5MxTYO9cBQ2AKsZON9D+da
-	 prSGmeG+d1I8A==
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-63c09141cabso8120775a12.0
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Oct 2025 21:02:58 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCW1ch+eqnlmWDDSgKscYykSNlJLK/9x8Urwestifng4xIVXmkvVBQLx6ptVqrwDSiWf7ShY8A2JMBkK@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiPfEA4la81ALch61AfbCF9xBQvQFetu+ztFtXAO2+r1dQ9OW4
-	8yDGgeYr8skNVN/ldMc3+Zh9SwycH/FjDl8oyqqSe25XwDw8glnMBKuF3p0sUSJ/43JLh8kvl5R
-	dDJC0HvzRO0mXGFBxToRF4K2US9EbWvI=
-X-Google-Smtp-Source: AGHT+IHXAMLyGd3ViihkM7YWAwqC60GP3yExiGkJKKlISyVAqClcK8DRhTQvl1yvQUUGcMgAouco7qij1IZFRq6GO4Q=
-X-Received: by 2002:a05:6402:280a:b0:634:c377:e188 with SMTP id
- 4fb4d7f45d1cf-63ed7f0f51cmr2040695a12.6.1761624177528; Mon, 27 Oct 2025
- 21:02:57 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bAPvYg4G"
+Message-ID: <6679610e-0e8f-43bb-a994-b9949e636b8c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761624309;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6p99fq4+aDu3NTN4hgnbdTua/gnvTFt7Efn6aq9U9xs=;
+	b=bAPvYg4GM8fKkx3FypH717P+5CrENSFEGrtWgvzwgxJQ9wtzrBzzD1V1+HKwu8QZ4+e3Jx
+	aKxwFguUc/Ld0+3hhEhqIH1VSOoYe/RjISA+znjK4Rt4Tr/0P5kJeSsEDtVypqjCxvBYfa
+	iJWnCxrLd8iq/I7YhczzFzcolGTJZxI=
+Date: Tue, 28 Oct 2025 12:04:19 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH v4 13/24] smb: move FILE_BOTH_DIRECTORY_INFO to
+ common/smb1pdu.h
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org,
+ christophe.jaillet@wanadoo.fr, linux-cifs@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
 References: <20251027071316.3468472-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251027071316.3468472-6-chenxiaosong.chenxiaosong@linux.dev>
- <CAKYAXd_u5+p5hjvQey+TM8w4+P7aN7zSfwDbrUKRtbwx4vtyDw@mail.gmail.com> <75086bc6-9747-4a10-b4ee-ebf9ffdf25ec@linux.dev>
-In-Reply-To: <75086bc6-9747-4a10-b4ee-ebf9ffdf25ec@linux.dev>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 28 Oct 2025 13:02:45 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8zuJsy5FZxsEQtPCm1OqJ6Usr-6CPkVgoRPYnX3NiQ9g@mail.gmail.com>
-X-Gm-Features: AWmQ_bkIhrtor2FjpadxESdE_tFAx0KuAPo1GLwDErGKEJHKMeO6tthrhAVNJOk
-Message-ID: <CAKYAXd8zuJsy5FZxsEQtPCm1OqJ6Usr-6CPkVgoRPYnX3NiQ9g@mail.gmail.com>
-Subject: Re: [PATCH v4 05/24] smb: move some duplicate definitions to common/smb1pdu.h
-To: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org, 
-	christophe.jaillet@wanadoo.fr, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ <20251027071316.3468472-14-chenxiaosong.chenxiaosong@linux.dev>
+ <CAKYAXd-Jh2ucT5E8p5=jbU5NSrsejGUn2-DJb8-mzrERQcSGBQ@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <CAKYAXd-Jh2ucT5E8p5=jbU5NSrsejGUn2-DJb8-mzrERQcSGBQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 28, 2025 at 12:58=E2=80=AFPM ChenXiaoSong
-<chenxiaosong.chenxiaosong@linux.dev> wrote:
->
-> Would it be harder to maintain if only part of the definitions are moved?
->
-> Moving the related definitions together would make maintenance easier,
-> that's just my personal opinion.
-Please check Steve's reply on another mail thread.
-If you think it looks weird, don't move them.
+OK, I’ll try to create a new common/fscc.h.
 
->
-> On 10/28/25 11:42 AM, Namjae Jeon wrote:
-> > On Mon, Oct 27, 2025 at 4:15=E2=80=AFPM <chenxiaosong.chenxiaosong@linu=
-x.dev> wrote:
-> >>
-> >> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> >>
-> >> In order to maintain the code more easily, move duplicate definitions =
-to
-> >> new common header file.
-> >>
-> >> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> >> Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
-> > ksmbd does not use all smb1 pdus. Instead of moving all smb1 definition=
-s,
-> > move the ones ksmbd uses to smb1pdu.h.
-> > Thanks.
->
-> --
-> Thanks,
-> ChenXiaoSong.
->
+On 10/28/25 11:39 AM, Namjae Jeon wrote:
+> On Mon, Oct 27, 2025 at 4:15 PM <chenxiaosong.chenxiaosong@linux.dev> wrote:
+>>
+>> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>>
+>> Rename "struct file_both_directory_info" to "FILE_BOTH_DIRECTORY_INFO",
+>> then move duplicate definitions to common header file.
+>>
+>> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> file information classes are defined in ms-fscc specification.
+> So we can move them to fscc.h. Please check other your patches also.
+
+-- 
+Thanks,
+ChenXiaoSong.
+
