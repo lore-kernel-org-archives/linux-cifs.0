@@ -1,103 +1,108 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC1734A3AA
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Oct 2025 17:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B692E2FFDD4
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Oct 2025 23:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761673449; cv=none; b=QfinNCtY+ffSvnNyTBfyF7jODKaDjRNqLQmkLz3yih7JUhLHPUBovkkPKY/yii6OmRk01kcixxKCR5W8aN1iIGqhe8TQcXUWVAmfXKSBRqQ1c7vNRGcVi8yBvpcrYbqnH2ZtH/2WfQbLMiYlA6cE+ZludHyYFBQ2qNGQnpe4yiE=
+	t=1761695444; cv=none; b=WfkiVrlL85MtS272AH3sUNHbXU/HOG/g1q87iQ1tbNz6o/gEekwA83TiU0DHoVegS8+3CTdFRDZMdDrs+MAFgIUgHTP+XC4QZRW70mjO4KEJdDm7XMS2Sm6BLIZZrQbH7xv2Z1zL/MeqSze93HgjoT40bssSg6iEU8c3qYNyHbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761673449; c=relaxed/simple;
-	bh=hxGejzQTOSr5ZviRcRY0xxFw831uESh1M0jNrjgt26o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M7+xkBynVy7VwoNKAeOHQujHxrA8nK2pT1DlBEn61/spIuEOtuLGHNyz6kqpkEloH7tpyyRdEjg541IKGeXAvSpaLYz087zUFV/P/UoNBbbxJpmJLKypW9ayGck9H+dIalycPsbb/oLdLkBhsXCeWH4/XUBVFfrmG4kH0jYwAGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=jd5Dwqt+; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1761695444; c=relaxed/simple;
+	bh=vWlIS3Y/oVX7SW5js/ioA1mtAuSAo2zoDhgZ1h9PcRE=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=i2rDZtvYw0EC09Dl7LRvpaHkKtfnmKg+IatFcCxiLS/clxXL/p7UAWY29Wgbtj2LT81slhPHxtkLQdf7ck3q1IR+so0ojettSWfyOla47KBsJsrkAc9AUcnE5ZC9KOmeRibGyoeAtwdAAyTRJ6ewgew8YasVN2lC7z9cvhDRxe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dRY+4Rf4; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="jd5Dwqt+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=vaSEz0xi2rODa315BDn6GyJ2sDUw6WlXsoYvDMbS+l0=; b=jd5Dwqt+79YRShV11YjOvv0vZm
-	VOAvhboWRUuYtHGFpY53x71bRO8NYtDipDvqKmcezUDSeO4QGsw74ychx/eeImwYV8KzxCm3bVJNY
-	N7Pz5wD2sxhlLayBcC9yr/3fPFy06YO6PR3oqnaTYkhnsMwUg5J09pVHLDskP+SVVl+FBqSigc8Lx
-	NhGlbtAhtTzT+XjonHiO/jQUwCl8BAqEPkH1dfJvMv60xmpi/LCuU3uXjJ0BpxB04NeDs61alkReK
-	VJplcojfu1Ci3yDuzfLQmH2ZroNo8X/2gCEKHznC30FkGjZPpWU7qrb4M5K3YzT3ixCTad933Q61I
-	CIl+NSDp07EpZgcngOpCFT5G5asWM9L8g27Itnk4iYjtmcnwlMN12xyY1LLnzkYDzIFXl6lxGbLwB
-	7eoSrFakq1/6VY53RGs5oirQPrux5sM1Tg4lPUFJbcIQTalZGe2sqWGvwA0yyNYg+iJJCnqbfJmLR
-	xm87K0Ntbh9HfRm+aE/UiruL;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vDnji-00BSvP-0L;
-	Tue, 28 Oct 2025 17:43:58 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: metze@samba.org,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] smb: client: call smbd_destroy() in the same splace as kernel_sock_shutdown()/sock_release()
-Date: Tue, 28 Oct 2025 18:43:46 +0100
-Message-ID: <20251028174347.1800568-1-metze@samba.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dRY+4Rf4"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-592f7e50da2so511934e87.0
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Oct 2025 16:50:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761695441; x=1762300241; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BcCjrRgOWUo5URvOluVp+lygBcH0R5GiU5s65O64e98=;
+        b=dRY+4Rf4UEUxc7iRNg70WCEfkd12JgKkIlZu6ZNMNvCsLkRyeOZdpvBeyeZyt1rmnH
+         3pUy/5I9J4qXPq3dvDF5jUK1E5eMdcLwSUhgYqtwlXqCn1g4n1DxPPV/Ce4xK+V8pbbg
+         xyxsTihHykN5lC1yD7Xmrpo03rbLdjP8ep4F01daNAh1TlHIK2xI9QVvusttahGgDDIW
+         rhqs7t878lu+3xXsvjDaGzKO3Ah2UgJHTtIi/aIoKmlf/PyW8hrj4sQUQRXtijFE0EKP
+         pjwUD7UTFUSg1IuxNdnNg6lGryPvhKjXxFLG1Oq8kIhgK1NSN3fyPKwvk4lz69xvHtRq
+         d9NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761695441; x=1762300241;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BcCjrRgOWUo5URvOluVp+lygBcH0R5GiU5s65O64e98=;
+        b=JIVbj72iO8GZkWrbsLp7RX9pZGMXAwU6KkYsXPYqLGqBquAFLz3dprlr9TrdoZ1LKP
+         QrUCbF8JrNtfNRvG/mR3PPa1qEps2USysSSYCc0aCElJ6dhdH43Cnfwd3DMP7dWlhAHB
+         z8lzJK4PW2HZ5xDYSo4dGTvSBXXMft/6CLnUFB7spH4dU3NOL+VoF5Npo3o2nsjXZyZd
+         Brx5n/7OWKZAFnljDFn4Bei6UwaaCKz9gy/aHYv6bGlJylcS86zij5gQ8S6seyvRHbYx
+         xku1wSSlr43Cjyp2ySp8c9KacwLz1q87oaplbQbse0uVjNq367i0DzIjms0AuQLnpkQL
+         hUdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVfuP4JxFdgkkiKdyaHl0aO1hfvQSF/arWwHzCXUDL7/wthnIZJW6V/eYRV6kBcWvdanyiTMEQP20ki@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTlxpC7liT/eqP2AgUP0Gv8tCFhlLzMh2RVo4japNr1w/UEj+2
+	ZnWA0QSCmwdMkq3EMJ5eVLr2tUJjXiu/gbh/LlUdH3+2jxq1fTknCwkz831MDzrKAavjQ7BP60w
+	LLQcDCsilV9pv8u/A6PT9JK13gsR+6UOOroTbKZI=
+X-Gm-Gg: ASbGncvopBdXi4jVQ9uIsubt15n9DUdYjC1rLnJkC/KmuQsEP23XOMZSyqu93Etsfyu
+	EoarijqezUBrb9LIvf3X1CpBe0EPusNdASbR1k6248DVybdTfyvuPq3gVz5z1wm87Ermg2R9oEw
+	v/18Ze7Ack3PG4gGikXa0oIiUqW5m3YlAthV6eKGDAE8L5nN4/HphNHirH1Ne/aqJ9GB6rkuwFl
+	SMonTTZI1fGIxrhE+v6jW8QU6Lblwm2jc4i/Zx6/QfvKkPFWrQkymVbSz/qFfIrrQuV1xZ4+Xev
+	JvbuhespJMXiIpSbGq3e7JVhUjjxuQv1sm/l4nS7LIY6qcMw4oN+6NByqVW4bEo6T+2RXU1m6+B
+	EOD8qYKFzVjZ1uHMe8A/gctSdPFJFLORIYuBxvhqNhg==
+X-Google-Smtp-Source: AGHT+IEDzoOaSGsGdbeO3X6wLVyV4eHafi+2jrHwh/fj2DuhlHGmtB/8y2IAX/KeBgZufayT6+WEuejDRJEX5cA1JkQ=
+X-Received: by 2002:a05:6512:4012:b0:585:1a9b:8b9a with SMTP id
+ 2adb3069b0e04-5930edc3631mr1517466e87.9.1761695440522; Tue, 28 Oct 2025
+ 16:50:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 28 Oct 2025 18:50:25 -0500
+X-Gm-Features: AWmQ_bldv1tX4lgQDkpyYvPXZCLltojj1sUsdHeJ-3n6birSyiXJ4DFqxsfAYEw
+Message-ID: <CAH2r5mu7ZOL06JftZt4forRyQy77+OYZQ0gWYn5Cs9Rvk62vjQ@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-With commit b0432201a11b ("smb: client: let destroy_mr_list() keep
-smbdirect_mr_io memory if registered") the changes from commit
-214bab448476 ("cifs: Call MID callback before destroying transport") and
-commit 1d2a4f57cebd ("cifs:smbd When reconnecting to server, call
-smbd_destroy() after all MIDs have been called") are no longer needed.
+Please pull the following changes since commit
+dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa:
 
-And it's better to use the same logic flow, so that
-the chance of smbdirect related problems is smaller.
+  Linux 6.18-rc3 (2025-10-26 15:59:49 -0700)
 
-Fixes: 214bab448476 ("cifs: Call MID callback before destroying transport")
-Fixes: 1d2a4f57cebd ("cifs:smbd When reconnecting to server, call smbd_destroy() after all MIDs have been called")
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
----
- fs/smb/client/connect.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+are available in the Git repository at:
 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index dd12f3eb61dc..61b693ed7126 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -310,6 +310,8 @@ cifs_abort_connection(struct TCP_Server_Info *server)
- 			 server->ssocket->flags);
- 		sock_release(server->ssocket);
- 		server->ssocket = NULL;
-+	} else if (cifs_rdma_enabled(server)) {
-+		smbd_destroy(server);
- 	}
- 	server->sequence_number = 0;
- 	server->session_estab = false;
-@@ -338,12 +340,6 @@ cifs_abort_connection(struct TCP_Server_Info *server)
- 		mid_execute_callback(mid);
- 		release_mid(mid);
- 	}
--
--	if (cifs_rdma_enabled(server)) {
--		cifs_server_lock(server);
--		smbd_destroy(server);
--		cifs_server_unlock(server);
--	}
- }
- 
- static bool cifs_tcp_ses_needs_reconnect(struct TCP_Server_Info *server, int num_targets)
+  git://git.samba.org/ksmbd.git tags/v6.18-rc3-smb-server-fixes
+
+for you to fetch changes up to f574069c5c55ebe642f899a01c8f127d845fd562:
+
+  smb: server: let smb_direct_cm_handler() call ib_drain_qp() after
+smb_direct_disconnect_rdma_work() (2025-10-26 20:47:32 -0500)
+
+----------------------------------------------------------------
+Three ksmbd server fixes
+- Improve check for malformed payload
+- Fix free transport smbdirect potential race
+- Fix potential race in credit allocation during smbdirect negotiation
+----------------------------------------------------------------
+Qianchang Zhao (1):
+      ksmbd: transport_ipc: validate payload size before reading handle
+
+Stefan Metzmacher (2):
+      smb: server: call smb_direct_post_recv_credits() when the
+negotiation is done
+      smb: server: let smb_direct_cm_handler() call ib_drain_qp()
+after smb_direct_disconnect_rdma_work()
+
+ fs/smb/server/transport_ipc.c  |  8 ++++++-
+ fs/smb/server/transport_rdma.c | 47 ++++++++++++++++++++++++++++++++----------
+ 2 files changed, 43 insertions(+), 12 deletions(-)
+
 -- 
-2.43.0
+Thanks,
 
+Steve
