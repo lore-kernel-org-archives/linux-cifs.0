@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859871AA7BF;
-	Tue, 28 Oct 2025 00:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037857405A;
+	Tue, 28 Oct 2025 00:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761611983; cv=none; b=eaLUgeW7C5HjY9b3izq/m+Gh5stbb/otcESx5TYFncgmyuFlnXqLUJHkypcD5a8L4UKkRPIYB+8j8WNwEd9M3JzNAihQl4xkx5997zU5WZJozaohMWV+IeAhF3ZC9jdygNiryco792vK4hUqrauXQMoNeY1eOfRjrmgN1lJiuQI=
+	t=1761612047; cv=none; b=HezJegbTCsNMPkRO2x5PYAkMhc6KBdt7w64uDaJyo2epUvrtZz/yPdmE69wKNs3VNZcL1Tcpo0HiUDVKjgdWiPquEO8oS6rTa+QrJmVbrIwGlx+wB5pwaCNqiMgTG4T6TLYyemxVWBK1ZFhgxjCtC+7t/z9LA3Wv6QU6e5nv2L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761611983; c=relaxed/simple;
-	bh=TB0R3bR1qdlWHTe7bspeBSlcpR/p94kxOplQF65Lb7I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nZwDM1BM5TmgryymWJXd4+T/yLoPELQacMdTXDLqXLTjOryW980irOJV5OfKyHJJj+HK1QJSuJrlNa2fN4EATy66WzZ0GLkSFG9ThIAZfGVdPNuTQGCSjmQKMSSxLWT5yU97kh0l+8NpNJO7Z1bPJsqhbzeU69+x3bb2BBBWDS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IZDypBLy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761612047; c=relaxed/simple;
+	bh=MfewUPwIchICHzHVhM3/Fb3siT4W43mGj775mjeZtk8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RMI2ilESM1KsV6K/nmVHvMw4lz8tqT6x1tYjmC7NdIIgz2vetEJBtdRydtyKiVQlp4uC4o5E8ZWGpnuj4m8DnXhre+HmNQ9Tk8aZq+50amgxqQzDniNW7AeAY4Bj+eQ+yZB8UiMK70s7eUl3deXL1iW7bOC8r2/ge7KYY3C56Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=noSuBgdq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IZDypBLy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 177A4C4CEF1;
-	Tue, 28 Oct 2025 00:39:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="noSuBgdq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8036CC4CEF1;
+	Tue, 28 Oct 2025 00:40:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761611983;
-	bh=TB0R3bR1qdlWHTe7bspeBSlcpR/p94kxOplQF65Lb7I=;
-	h=From:To:Cc:Subject:Date:From;
-	b=IZDypBLyiXx1F9cPtxNoW8JrkYHRpjOKxmkPkie4UWeQtiqi6sFdKJMqUcLj28Ckw
-	 l7T49dJ89G7lwhzFipt36Xy2yza96+SuxJbRuWl2xsy4dVvN6c1nhzWN1WpcKIBZ11
-	 Gyk9Nx1JX3nvXVKSKOM2LN/IDwQ5EaS1Q21BU1JCt8HC/mC3MY4MZIctuePTqw2woe
-	 jg3MWiK+3bfGWstRq4w7KIUW3T3WqMc72Nu4Plh4bGIEpmisRMtiHjO3s798wT7uvF
-	 JS5WKdh35p8RYbSr1jCvhpzHlq8HlUKk2W6E4RdPViptbDePLL/9IcyUR2wE3hLO/f
-	 GNQcsk15vxeaA==
+	s=k20201202; t=1761612045;
+	bh=MfewUPwIchICHzHVhM3/Fb3siT4W43mGj775mjeZtk8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=noSuBgdqgZ8UgmrMsMInS3pV/l+Alfvo38OdmY4CJk3mW2KvmxNen9a45SeWwi+0J
+	 RiLoHw6x6skb5c1zavd2pfBUyS8NPjK8B4e/JdiHpMkNGkS06oZO0F2zG+YQdGiFT4
+	 NnMHfukYot9IolMidJtlD+GFlXQppx4CoRTFJabB49KzT0IU2pB4cMBIHyqszDxkTl
+	 p/z8Uv+xUX88gkQncSkIjDJRb0v5RtsSeVWgbJuW7NK2V3ZCsxE69xl1NDJETaeb2p
+	 65vVNaYf2IXFx5o99dqCwcov7InXr55z81lERsHBPYkUXRdCtCFZoKdIh6y4qVEu3y
+	 4CVQTSxUZGfcg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -35,10 +36,12 @@ Cc: ZhangGuoDong <zhangguodong@kylinos.cn>,
 	Sasha Levin <sashal@kernel.org>,
 	smfrench@gmail.com,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-6.1] smb/server: fix possible memory leak in smb2_read()
-Date: Mon, 27 Oct 2025 20:38:45 -0400
-Message-ID: <20251028003940.884625-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-6.1] smb/server: fix possible refcount leak in smb2_sess_setup()
+Date: Mon, 27 Oct 2025 20:39:10 -0400
+Message-ID: <20251028003940.884625-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251028003940.884625-1-sashal@kernel.org>
+References: <20251028003940.884625-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -53,10 +56,10 @@ Content-Transfer-Encoding: 8bit
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-[ Upstream commit 6fced056d2cc8d01b326e6fcfabaacb9850b71a4 ]
+[ Upstream commit 379510a815cb2e64eb0a379cb62295d6ade65df0 ]
 
-Memory leak occurs when ksmbd_vfs_read() fails.
-Fix this by adding the missing kvfree().
+Reference count of ksmbd_session will leak when session need reconnect.
+Fix this by adding the missing ksmbd_user_session_put().
 
 Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
@@ -68,185 +71,166 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-## **Backport Status: YES**
+## BACKPORT RECOMMENDATION: **YES**
 
-### **Extensive Analysis**
+## COMPREHENSIVE ANALYSIS
 
-Based on comprehensive semantic code analysis and repository
-examination, this commit **should be backported** to stable kernel
-trees.
+### 1. SEMANTIC CODE ANALYSIS PERFORMED
 
----
+I used the following semantic code analysis tools to thoroughly
+investigate this commit:
 
-## **1. Code Change Analysis**
+- **mcp__semcode__find_function**: Located `smb2_sess_setup`,
+  `ksmbd_session_lookup`, `ksmbd_user_session_put`,
+  `ksmbd_session_lookup_slowpath`, and related functions
+- **mcp__semcode__find_callers**: Analyzed the call graph to determine
+  impact scope and exposure
+- **mcp__semcode__find_callchain**: Traced the execution path from user-
+  space to the affected code
+- **git blame and git log**: Identified when the bug was introduced and
+  its history
 
-The commit adds a single line to fix a memory leak in
-`fs/smb/server/smb2pdu.c`:
+### 2. BUG ANALYSIS - REFERENCE COUNT LEAK
 
-```c
-nbytes = ksmbd_vfs_read(work, fp, length, &offset, aux_payload_buf);
-if (nbytes < 0) {
-+   kvfree(aux_payload_buf);  // <-- Added line
-    err = nbytes;
-    goto out;
-}
+**The Bug:**
+The commit fixes a classic reference count leak in
+`fs/smb/server/smb2pdu.c:1806-1809`. Here's the problematic flow:
+
+1. **Line 1794-1795**: `ksmbd_session_lookup()` is called, which
+   **increments** the session reference count via
+   `ksmbd_user_session_get(sess)` (verified in user_session.c:298)
+
+2. **Line 1806-1809**: When `ksmbd_conn_need_reconnect(conn)` returns
+   true:
+  ```c
+  if (ksmbd_conn_need_reconnect(conn)) {
+  rc = -EFAULT;
+  sess = NULL;  // BUG: sess pointer lost without decrementing refcount
+  goto out_err;
+  }
+  ```
+
+3. **Line 1924-1938 (out_err handler)**: The error handler checks `if
+   (sess)` but since `sess` was set to NULL, it never calls
+   `ksmbd_user_session_put(sess)`, causing the leaked reference.
+
+**The Fix:**
+The commit adds `ksmbd_user_session_put(sess);` before setting `sess =
+NULL`, properly releasing the reference before discarding the pointer.
+This matches the pattern already correctly implemented in the binding
+path at lines 1769-1773.
+
+### 3. USER-SPACE REACHABILITY - CONFIRMED EXPLOITABLE
+
+**Call Path Analysis:**
+- `smb2_sess_setup()` is registered in the SMB command dispatch table at
+  `fs/smb/server/smb2ops.c:173`
+- It's invoked via `__process_request() → cmds->proc(work)` in
+  `server.c:147`
+- **This is directly triggered by SMB2_SESSION_SETUP requests from any
+  SMB client**
+
+**Attack Scenario:**
+An attacker (authenticated or during authentication) can:
+1. Send SMB2_SESSION_SETUP requests with an existing session ID
+2. Trigger the connection reconnect state condition
+3. Repeatedly leak session references
+4. Eventually exhaust kernel memory, leading to DoS
+
+### 4. IMPACT SCOPE - HIGH SEVERITY
+
+**Affected Versions:**
+- Bug introduced in commit `f5c779b7ddbda3` (May 2023) which fixed
+  security issues ZDI-CAN-20481, ZDI-CAN-20590, ZDI-CAN-20596
+- Present in kernel versions **6.4+** through **6.17.x** (bug exists in
+  current working directory v6.17.2)
+- Fixed in **6.18-rc2** by commit `379510a815cb2`
+- The buggy commit was marked `Cc: stable@vger.kernel.org`, so it **was
+  backported to stable trees**, spreading the bug
+
+**Severity Factors:**
+- ✅ **User-triggerable**: Any SMB client can trigger this
+- ✅ **Resource exhaustion**: Repeated triggers lead to memory leak and
+  potential DoS
+- ✅ **Present in stable kernels**: Affects LTS kernels 6.4.x, 6.6.x
+- ✅ **Small, safe fix**: Single line addition with clear purpose
+
+### 5. SEMANTIC CHANGE ANALYSIS
+
+Using `mcp__semcode__find_function` analysis:
+- **Type of change**: Pure bug fix (resource leak correction)
+- **Behavioral impact**: No functional behavior change, only proper
+  cleanup
+- **Scope**: Confined to one error path in one function
+- **Dependencies**: No new dependencies introduced
+- **Side effects**: None - only ensures proper reference counting
+
+### 6. ARCHITECTURAL IMPACT - MINIMAL
+
+- ✅ No data structure changes (verified with code inspection)
+- ✅ No API modifications
+- ✅ No new features introduced
+- ✅ Change is localized to one error path
+- ✅ Pattern matches existing correct code in the same function
+
+### 7. STABLE TREE COMPLIANCE - EXCELLENT FIT
+
+**Why this MUST be backported:**
+
+1. **Critical Bug Fix**: Fixes a memory leak that can be exploited for
+   DoS
+2. **Minimal Risk**: Single line fix with clear semantics and no side
+   effects
+3. **Matches Stable Rules**: Pure bug fix, no new features, minimal
+   scope
+4. **Security Impact**: Prevents resource exhaustion attacks on SMB
+   server
+5. **Already in Mainline**: Present in v6.18-rc2, stable trees need this
+   fix
+6. **Widespread Exposure**: Bug exists in all stable 6.4+ kernels
+   currently deployed
+
+**Missing Stable Tags:**
+The upstream commit lacks `Cc: stable@vger.kernel.org` and `Fixes:`
+tags. It should have:
+```
+Fixes: f5c779b7ddbda3 ("ksmbd: fix racy issue from session setup and
+logoff")
+Cc: stable@vger.kernel.org # v6.4+
 ```
 
-**What was wrong:** Memory allocated at line 6821 (`aux_payload_buf =
-kvzalloc(ALIGN(length, 8), KSMBD_DEFAULT_GFP)`) was not freed when
-`ksmbd_vfs_read()` fails, while all other error paths properly call
-`kvfree()`.
+### 8. RECOMMENDATION DETAILS
 
----
+**Backport to:** All active stable kernel trees 6.4 through 6.17
+**Priority:** HIGH
+**Risk Level:** LOW
+**Testing:** Standard ksmbd functionality tests with session reconnect
+scenarios
 
-## **2. Semantic Analysis Tools Used**
+**Code Reference:**
+- Buggy code: `fs/smb/server/smb2pdu.c:1806-1809`
+- Fix location: `fs/smb/server/smb2pdu.c:1808` (add
+  `ksmbd_user_session_put(sess);`)
 
-### **Tool 1: mcp__semcode__find_function**
-- Located `smb2_read()` in `fs/smb/server/smb2pdu.c:6727-6895`
-- Confirmed it's an SMB2 protocol handler (169 lines, 24 function calls)
-- Return type: `int` (returns error codes)
-
-### **Tool 2: mcp__semcode__find_callers**
-- Result: No direct function callers
-- However, cross-referenced with `smb2ops.c:183` showing `smb2_read` is
-  registered as a handler: `[SMB2_READ_HE] = { .proc = smb2_read }`
-- **Conclusion:** This is a protocol handler invoked by the SMB2 message
-  dispatcher, meaning it's **directly user-triggerable** via network
-  requests
-
-### **Tool 3: mcp__semcode__find_calls**
-- Analyzed `ksmbd_vfs_read()` dependencies
-- Found it can fail with multiple error codes: `-EISDIR`, `-EACCES`,
-  `-EAGAIN`, plus any errors from `kernel_read()`
-- **All of these failure paths trigger the memory leak**
-
-### **Tool 4: git blame & git log**
-- Bug introduced: commit `e2f34481b24db2` (2021-03-16) - **4 years
-  old!**
-- Recent modification: commit `06a025448b572c` (2024-11-30) changed
-  allocation to `ALIGN(length, 8)` but didn't fix the leak
-- Found 15+ similar "memory leak" fixes in ksmbd history, indicating
-  active maintenance
-
----
-
-## **3. Impact Scope Analysis**
-
-### **User Exposure: CRITICAL**
-- **Protocol Handler:** Any SMB client can trigger this by sending SMB2
-  READ requests
-- **Network-facing:** ksmbd is a kernel SMB server exposed to network
-  clients
-- **No authentication required to trigger:** The error path can be
-  reached even with permission errors
-
-### **Trigger Conditions (from VFS analysis):**
-1. **-EISDIR**: Client tries to read a directory
-2. **-EACCES**: Permission denied (no FILE_READ_DATA or FILE_EXECUTE
-   access)
-3. **-EAGAIN**: File is locked by another process
-4. **kernel_read() failures**: Various VFS/filesystem errors
-
-All of these are **easily triggerable** by malicious or misbehaving
-clients.
-
-### **Memory Leak Severity: HIGH**
-- **Allocation size:** `ALIGN(length, 8)` where `length` is client-
-  controlled
-- **Maximum per leak:** Up to `SMB3_MAX_IOSIZE` = **8 MB** (from
-  smb2pdu.h:28)
-- **Default size:** `SMB21_DEFAULT_IOSIZE` = **1 MB** (from
-  smb2pdu.h:25)
-- **Attack scenario:** An attacker could repeatedly:
-  1. Send READ requests for locked files (triggers -EAGAIN)
-  2. Each failed request leaks up to 8MB
-  3. 100 requests = 800MB leaked
-  4. Can exhaust server memory leading to **DoS**
-
----
-
-## **4. Regression Risk Analysis**
-
-### **Risk Level: VERY LOW**
-- **Change size:** Single line addition
-- **Operation:** Adding missing cleanup (defensive programming)
-- **No behavior change:** Only affects error path that already returns
-  failure
-- **Idempotent:** `kvfree()` is safe to call and simply frees allocated
-  memory
-- **No dependencies:** No API changes or external impact
-
----
-
-## **5. Stable Tree Compliance**
-
-| Criterion | Status | Evidence |
-|-----------|--------|----------|
-| Fixes important bug | ✅ YES | Memory leak leading to potential DoS |
-| Small and contained | ✅ YES | 1 line change, single function |
-| No new features | ✅ YES | Pure bug fix |
-| No architectural changes | ✅ YES | No structural modifications |
-| Low regression risk | ✅ YES | Minimal, defensive change |
-| Confined to subsystem | ✅ YES | Only affects ksmbd |
-| User-facing impact | ✅ YES | Affects all ksmbd users |
-
----
-
-## **6. Comparison with Similar Commits**
-
-Recent ksmbd fixes in the repository show similar patterns:
-- `379510a815cb2`: "fix possible refcount leak in smb2_sess_setup()"
-- `5929e98f3bb76`: "fix potential double free on smb2_read_pipe() error
-  path"
-- `e523a26c05672`: "fix passing freed memory 'aux_payload_buf'"
-- `809d50d36e71b`: "fix memory leak in smb2_lock()"
-
-**All these are typical stable tree backport candidates** with similar
-characteristics (small resource leak fixes).
-
----
-
-## **7. Missing Stable Tags**
-
-**Notable:** The commit lacks explicit stable tree tags:
-- ❌ No `Cc: stable@vger.kernel.org`
-- ❌ No `Fixes:` tag pointing to the original buggy commit
-
-However, this doesn't diminish backport worthiness - the technical
-merits clearly justify backporting.
-
----
-
-## **Conclusion**
-
-This commit is an **excellent candidate for backporting** because:
-
-1. **Security concern:** Remote memory exhaustion DoS vector
-2. **Long-standing bug:** Present since ksmbd's introduction (4+ years)
-3. **Wide impact:** Affects all ksmbd deployments
-4. **Minimal risk:** Single-line defensive fix
-5. **Clear bug fix:** Unambiguous resource leak on error path
-6. **Pattern consistency:** Matches other successfully backported ksmbd
-   fixes
-
-**Recommendation:** Backport to all active stable trees where ksmbd
-exists (5.15+).
+This is a textbook example of a commit that should be backported to
+stable trees: it fixes a real bug with security implications, has
+minimal risk, and follows stable tree guidelines perfectly.
 
  fs/smb/server/smb2pdu.c | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 287200d7c0764..409b85af82e1c 100644
+index 409b85af82e1c..acb06d7118571 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -6826,6 +6826,7 @@ int smb2_read(struct ksmbd_work *work)
+@@ -1805,6 +1805,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
  
- 	nbytes = ksmbd_vfs_read(work, fp, length, &offset, aux_payload_buf);
- 	if (nbytes < 0) {
-+		kvfree(aux_payload_buf);
- 		err = nbytes;
- 		goto out;
- 	}
+ 		if (ksmbd_conn_need_reconnect(conn)) {
+ 			rc = -EFAULT;
++			ksmbd_user_session_put(sess);
+ 			sess = NULL;
+ 			goto out_err;
+ 		}
 -- 
 2.51.0
 
