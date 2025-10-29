@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECF12868BA
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BFC2877D0
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761744343; cv=none; b=i9C1pvr6tiEaFcMGEHLc9yk7wVny/ZlomMEp5lwSozc28QhDFgFK58aaaZnSWE1G16PriQYZmhjBj7I2Iu8rSIFrfXC8YZTf+1G2fHIQ7HDIUJcAqVFuwKVvnSMff/CfQfsmNjZc2/1BGlQ5h6k4Nu9OuTWJmPTD3fBrA1q3TSQ=
+	t=1761744349; cv=none; b=fQ66xni1S9TtWgpN57QunJgc3UZRYtRkr9or/9r5lFIWhmr6hKIdJYWl6B/4+WFCVfVvFi3onQcHEuNw+fTxLNTjExROJVBIxXrY1jtpuFZQBjTDf2xHCmJJ48TUv6hccWQpMbvh1PXZCBbJZJ3h0BoVWe1MPPMw6TgSM1uVdpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761744343; c=relaxed/simple;
-	bh=VvNDtyNxLzqx0917lrVDE/wRGjSRYrP5cc92T2QdMws=;
+	s=arc-20240116; t=1761744349; c=relaxed/simple;
+	bh=vBUahATFbNLXoEA33yRNGJJXrSuIIug7pZkQBpK6UsY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nkAT2jktdpt9xI9HkfMhJIwUgp3TZWbs27MDlhnkPXYI8VK2Vlxaswy6h6A3C+60MsjJyDfwL+4ngxEe9BIjis9NUGRZDd52e++UQPq5ibRWzflOeYsRJV4ZeMTQdWpkRG1KmbWen5jWsKdEoA71xBTnnNo0jnT6YlEpKJtIivI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=GbWT1i4P; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=nRCsnDCMzxYz3KZfSRRxYnQpUQCjrQghkAWuZlr5v6pZnTWSxPHIhQ5/eQzr9AihGGdnuBNgx7ZG/0ho7r9tUNUWCIFEt7XMIBpXGvckqsgdIJ4svzdWRW7oXvtmc796K9MElF/eMazAmwLtoraBhSvGQJG4Der/1JlD2wLjBOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=VdclBOyi; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="GbWT1i4P"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="VdclBOyi"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=g3EeffCMRSgikqS+OWfN6NyVTeJFf2HI0U5pHA0vc4I=; b=GbWT1i4PGwM4p0CH7Gwj1Ox585
-	5EYMPAJAPSuF/ajGud0FyN8YIofO9fy/iFy15vEZnOzILBlADOef/6Ya/bOCxNOwKbOtt8PoL5wxK
-	uvAooyUMt/qeJvVzlSL85MNZCTEq+eFWC5LpH5ilSE95u+DSq0wLnbhFNK4uW3a52KhDwu2VfWFcQ
-	YluOOHb1Lh8sUeFEl1IKSelK/Lp0rwHXiThZbliSxVnQW9cMJCzoiQfggBdY/zCaV5v/72+lGa5Wi
-	7lQYx0PmhCLlHbk2UgFPZSAUBYgqmwLgoMJrxvNvCe4fM9dmt3+NcVSqnCKzEQN01D1ghuMJvbUyS
-	lGzya9YXEzomvp802AvH96Eb1AZ51kMyI9tQVAYShzZuKofshAAA6pW17KuQoK2+uM2b5PdUPWYi5
-	TH5ygLV9UL4hKsuXnKAbag7rcNLC+zVs0mpUDarCFndnw6i1yjW1fKQJnhZxZdwEd+eHlQmM3hRI9
-	woy0Dw6/4turfEclPko2KEeb;
+	bh=28D6orzukcizWytuTeSTWaYI28PiLw7fuK4rETH6Y+Q=; b=VdclBOyi5j3bQLRh4Hx3kLDIDr
+	LqjAQ8ukfnGOwCKgvIQnsmzOGWY+cZdQlyFE6XV0r98CzzWJRLmUU+Dgw9VzsL6h7L/BHOrEp7v6+
+	Qx1WMhaove+JRRc1sG4oN2mXUIFqoCLM9MWGSCITvFIogVuj5DpfNItgvpD27bpav06X9uBP399xB
+	UMksaWFsgINJNf5kg9uTxmiZkZfB7tXATSdpuRrD8DCjbG+b1oBJKugVD5mb3GYBwD7xFi5HxABie
+	9jxRdNvJZu8b4COPuMf4lm1AHBD2tuSRcjx6PVSCGewl+xG7FXsBOCJuYBgRCmiBrvQCSMTvFch55
+	PP3RaoHORzPgRg17t9E3VsI9wr05zvOEBN5p3cZjQ0XZn4TJz1OL43M1DDoYcmHry59c3oJgvLHEh
+	yHMiUKJQqhA3FtlXoNTLi3eXlhGhstdw7pNya73OgOB96FU2ihdnohuqA2wKxivLxxPvnyD+eQWV4
+	tThHH/ZzX6uF/wV/GDb9lTky;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vE6BD-00BbeC-0e;
-	Wed, 29 Oct 2025 13:25:35 +0000
+	id 1vE6BJ-00Bbeg-1O;
+	Wed, 29 Oct 2025 13:25:42 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -39,9 +39,9 @@ Cc: metze@samba.org,
 	Tom Talpey <tom@talpey.com>,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v2 031/127] smb: smbdirect: introduce smbdirect_mr.c with client mr code
-Date: Wed, 29 Oct 2025 14:20:09 +0100
-Message-ID: <29ca70c42fc7950839809395af3eafd7cc2caef7.1761742839.git.metze@samba.org>
+Subject: [PATCH v2 032/127] smb: smbdirect: introduce smbdirect_rw.c with server rw code
+Date: Wed, 29 Oct 2025 14:20:10 +0100
+Message-ID: <da8140b0f70e63b3c1306d778250d747032f264c.1761742839.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1761742839.git.metze@samba.org>
 References: <cover.1761742839.git.metze@samba.org>
@@ -54,18 +54,18 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 This is basically contains the following functions copied from
-the client: destroy_mr_list, allocate_mr_list, register_mr_done,
-smbd_mr_recovery_work, get_mr, smbd_iter_to_mr, smbd_register_mr
-and smbd_deregister_mr.
+the server: wait_for_rw_credits, calc_rw_credits, get_sg_list,
+smb_direct_free_rdma_rw_msg, read_write_done, read_done,
+write_done, smb_direct_rdma_xmit.
 
 They got new names, some indentation/formatting changes,
 some variable names are changed too.
 
 They also only use struct smbdirect_socket instead of
-struct smbd_connection.
+struct smb_direct_transport.
 
 But the logic is still the same. They will be used
-by the client soon.
+by the server soon.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -76,569 +76,306 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
  .../common/smbdirect/smbdirect_all_c_files.c  |   1 +
- fs/smb/common/smbdirect/smbdirect_mr.c        | 544 ++++++++++++++++++
- 2 files changed, 545 insertions(+)
- create mode 100644 fs/smb/common/smbdirect/smbdirect_mr.c
+ fs/smb/common/smbdirect/smbdirect_rw.c        | 253 ++++++++++++++++++
+ fs/smb/common/smbdirect/smbdirect_socket.h    |   9 +
+ 3 files changed, 263 insertions(+)
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_rw.c
 
 diff --git a/fs/smb/common/smbdirect/smbdirect_all_c_files.c b/fs/smb/common/smbdirect/smbdirect_all_c_files.c
-index ba92f0813932..15022ca39815 100644
+index 15022ca39815..3423330465ae 100644
 --- a/fs/smb/common/smbdirect/smbdirect_all_c_files.c
 +++ b/fs/smb/common/smbdirect/smbdirect_all_c_files.c
-@@ -16,3 +16,4 @@
- #error SMBDIRECT_USE_INLINE_C_FILES define needed
+@@ -17,3 +17,4 @@
  #endif
  #include "smbdirect_connection.c"
-+#include "smbdirect_mr.c"
-diff --git a/fs/smb/common/smbdirect/smbdirect_mr.c b/fs/smb/common/smbdirect/smbdirect_mr.c
+ #include "smbdirect_mr.c"
++#include "smbdirect_rw.c"
+diff --git a/fs/smb/common/smbdirect/smbdirect_rw.c b/fs/smb/common/smbdirect/smbdirect_rw.c
 new file mode 100644
-index 000000000000..5fd6a853e656
+index 000000000000..2f6a1e34e665
 --- /dev/null
-+++ b/fs/smb/common/smbdirect/smbdirect_mr.c
-@@ -0,0 +1,544 @@
++++ b/fs/smb/common/smbdirect/smbdirect_rw.c
+@@ -0,0 +1,253 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + *   Copyright (C) 2017, Microsoft Corporation.
++ *   Copyright (C) 2018, LG Electronics.
 + *   Copyright (c) 2025, Stefan Metzmacher
 + */
 +
 +#include "smbdirect_internal.h"
 +
-+static void smbdirect_connection_destroy_mr_list(struct smbdirect_socket *sc);
-+static void smbdirect_connection_mr_io_recovery_work(struct work_struct *work);
-+
-+/*
-+ * Allocate MRs used for RDMA read/write
-+ * The number of MRs will not exceed hardware capability in responder_resources
-+ * All MRs are kept in mr_list. The MR can be recovered after it's used
-+ * Recovery is done in smbd_mr_recovery_work. The content of list entry changes
-+ * as MRs are used and recovered for I/O, but the list links will not change
-+ */
-+__maybe_unused /* this is temporary while this file is included in orders */
-+static int smbdirect_connection_create_mr_list(struct smbdirect_socket *sc)
++static int smbdirect_connection_wait_for_rw_credits(struct smbdirect_socket *sc,
++						    int credits)
 +{
-+	struct smbdirect_socket_parameters *sp = &sc->parameters;
-+	struct smbdirect_mr_io *mr;
-+	int ret;
-+	u32 i;
++	return smbdirect_connection_wait_for_credits(sc,
++						     &sc->rw_io.credits.wait_queue,
++						     &sc->rw_io.credits.count,
++						     credits);
++}
 +
-+	if (sp->responder_resources == 0) {
-+		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+			"responder_resources negotiated as 0\n");
++static int smbdirect_connection_calc_rw_credits(struct smbdirect_socket *sc,
++						const void *buf,
++						size_t len)
++{
++	return DIV_ROUND_UP(smbdirect_get_buf_page_count(buf, len),
++			    sc->rw_io.credits.num_pages);
++}
++
++static int smbdirect_connection_rdma_get_sg_list(void *buf,
++						 size_t size,
++						 struct scatterlist *sg_list,
++						 size_t nentries)
++{
++	bool high = is_vmalloc_addr(buf);
++	struct page *page;
++	size_t offset, len;
++	int i = 0;
++
++	if (size == 0 || nentries < smbdirect_get_buf_page_count(buf, size))
 +		return -EINVAL;
++
++	offset = offset_in_page(buf);
++	buf -= offset;
++	while (size > 0) {
++		len = min_t(size_t, PAGE_SIZE - offset, size);
++		if (high)
++			page = vmalloc_to_page(buf);
++		else
++			page = kmap_to_page(buf);
++
++		if (!sg_list)
++			return -EINVAL;
++		sg_set_page(sg_list, page, len, offset);
++		sg_list = sg_next(sg_list);
++
++		buf += PAGE_SIZE;
++		size -= len;
++		offset = 0;
++		i++;
 +	}
 +
-+	/* Allocate more MRs (2x) than hardware responder_resources */
-+	for (i = 0; i < sp->responder_resources * 2; i++) {
-+		mr = kzalloc(sizeof(*mr), GFP_KERNEL);
-+		if (!mr) {
-+			ret = -ENOMEM;
-+			goto kzalloc_mr_failed;
-+		}
++	return i;
++}
 +
-+		kref_init(&mr->kref);
-+		mutex_init(&mr->mutex);
++static void smbdirect_connection_rw_io_free(struct smbdirect_rw_io *msg,
++					    enum dma_data_direction dir)
++{
++	struct smbdirect_socket *sc = msg->socket;
 +
-+		mr->mr = ib_alloc_mr(sc->ib.pd,
-+				     sc->mr_io.type,
-+				     sp->max_frmr_depth);
-+		if (IS_ERR(mr->mr)) {
-+			ret = PTR_ERR(mr->mr);
-+			smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+				"ib_alloc_mr failed ret=%d (%s) type=0x%x max_frmr_depth=%u\n",
-+				ret, errname(ret), sc->mr_io.type, sp->max_frmr_depth);
-+			goto ib_alloc_mr_failed;
-+		}
-+		mr->sgt.sgl = kcalloc(sp->max_frmr_depth,
-+				      sizeof(struct scatterlist),
-+				      GFP_KERNEL);
-+		if (!mr->sgt.sgl) {
-+			ret = -ENOMEM;
-+			smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+				"failed to allocate sgl, max_frmr_depth=%u\n",
-+				sp->max_frmr_depth);
-+			goto kcalloc_sgl_failed;
-+		}
-+		mr->state = SMBDIRECT_MR_READY;
-+		mr->socket = sc;
++	rdma_rw_ctx_destroy(&msg->rdma_ctx,
++			    sc->ib.qp,
++			    sc->ib.qp->port,
++			    msg->sgt.sgl,
++			    msg->sgt.nents,
++			    dir);
++	sg_free_table_chained(&msg->sgt, SG_CHUNK_SIZE);
++	kfree(msg);
++}
 +
-+		list_add_tail(&mr->list, &sc->mr_io.all.list);
-+		atomic_inc(&sc->mr_io.ready.count);
++static void smbdirect_connection_rdma_rw_done(struct ib_cq *cq, struct ib_wc *wc,
++					      enum dma_data_direction dir)
++{
++	struct smbdirect_rw_io *msg =
++		container_of(wc->wr_cqe, struct smbdirect_rw_io, cqe);
++	struct smbdirect_socket *sc = msg->socket;
++
++	if (wc->status != IB_WC_SUCCESS) {
++		msg->error = -EIO;
++		pr_err("read/write error. opcode = %d, status = %s(%d)\n",
++		       wc->opcode, ib_wc_status_msg(wc->status), wc->status);
++		if (wc->status != IB_WC_WR_FLUSH_ERR)
++			smbdirect_connection_schedule_disconnect(sc, msg->error);
 +	}
 +
-+	INIT_WORK(&sc->mr_io.recovery_work, smbdirect_connection_mr_io_recovery_work);
-+
-+	return 0;
-+
-+kcalloc_sgl_failed:
-+	ib_dereg_mr(mr->mr);
-+ib_alloc_mr_failed:
-+	mutex_destroy(&mr->mutex);
-+	kfree(mr);
-+kzalloc_mr_failed:
-+	smbdirect_connection_destroy_mr_list(sc);
-+	return ret;
++	complete(msg->completion);
 +}
 +
-+static void smbdirect_mr_io_disable_locked(struct smbdirect_mr_io *mr)
++static void smbdirect_connection_rdma_read_done(struct ib_cq *cq, struct ib_wc *wc)
 +{
-+	struct smbdirect_socket *sc = mr->socket;
-+
-+	lockdep_assert_held(&mr->mutex);
-+
-+	if (mr->state == SMBDIRECT_MR_DISABLED)
-+		return;
-+
-+	if (mr->mr)
-+		ib_dereg_mr(mr->mr);
-+	if (mr->sgt.nents)
-+		ib_dma_unmap_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->dir);
-+	kfree(mr->sgt.sgl);
-+
-+	mr->mr = NULL;
-+	mr->sgt.sgl = NULL;
-+	mr->sgt.nents = 0;
-+
-+	mr->state = SMBDIRECT_MR_DISABLED;
++	smbdirect_connection_rdma_rw_done(cq, wc, DMA_FROM_DEVICE);
 +}
 +
-+static void smbdirect_mr_io_free_locked(struct kref *kref)
++static void smbdirect_connection_rdma_write_done(struct ib_cq *cq, struct ib_wc *wc)
 +{
-+	struct smbdirect_mr_io *mr =
-+		container_of(kref, struct smbdirect_mr_io, kref);
-+
-+	lockdep_assert_held(&mr->mutex);
-+
-+	/*
-+	 * smbdirect_mr_io_disable_locked() should already be called!
-+	 */
-+	if (WARN_ON_ONCE(mr->state != SMBDIRECT_MR_DISABLED))
-+		smbdirect_mr_io_disable_locked(mr);
-+
-+	mutex_unlock(&mr->mutex);
-+	mutex_destroy(&mr->mutex);
-+	kfree(mr);
++	smbdirect_connection_rdma_rw_done(cq, wc, DMA_TO_DEVICE);
 +}
 +
-+static void smbdirect_connection_destroy_mr_list(struct smbdirect_socket *sc)
++__maybe_unused /* this is temporary while this file is included in orders */
++static int smbdirect_connection_rdma_xmit(struct smbdirect_socket *sc,
++					  void *buf, size_t buf_len,
++					  struct smbdirect_buffer_descriptor_v1 *desc,
++					  size_t desc_len,
++					  bool is_read)
 +{
-+	struct smbdirect_mr_io *mr, *tmp;
-+	LIST_HEAD(all_list);
-+	unsigned long flags;
-+
-+	disable_work_sync(&sc->mr_io.recovery_work);
-+
-+	spin_lock_irqsave(&sc->mr_io.all.lock, flags);
-+	list_splice_tail_init(&sc->mr_io.all.list, &all_list);
-+	spin_unlock_irqrestore(&sc->mr_io.all.lock, flags);
-+
-+	list_for_each_entry_safe(mr, tmp, &all_list, list) {
-+		mutex_lock(&mr->mutex);
-+
-+		smbdirect_mr_io_disable_locked(mr);
-+		list_del(&mr->list);
-+		mr->socket = NULL;
-+
-+		/*
-+		 * No kref_put_mutex() as it's already locked.
-+		 *
-+		 * If smbdirect_mr_io_free_locked() is called
-+		 * and the mutex is unlocked and mr is gone,
-+		 * in that case kref_put() returned 1.
-+		 *
-+		 * If kref_put() returned 0 we know that
-+		 * smbdirect_mr_io_free_locked() didn't
-+		 * run. Not by us nor by anyone else, as we
-+		 * still hold the mutex, so we need to unlock.
-+		 *
-+		 * If the mr is still registered it will
-+		 * be dangling (detached from the connection
-+		 * waiting for smbd_deregister_mr() to be
-+		 * called in order to free the memory.
-+		 */
-+		if (!kref_put(&mr->kref, smbdirect_mr_io_free_locked))
-+			mutex_unlock(&mr->mutex);
-+	}
-+}
-+
-+/*
-+ * Get a MR from mr_list. This function waits until there is at least one MR
-+ * available in the list. It may access the list while the
-+ * smbdirect_connection_mr_io_recovery_work is recovering the MR list. This
-+ * doesn't need a lock as they never modify the same places. However, there may
-+ * be several CPUs issuing I/O trying to get MR at the same time, mr_list_lock
-+ * is used to protect this situation.
-+ */
-+static struct smbdirect_mr_io *
-+smbdirect_connection_get_mr_io(struct smbdirect_socket *sc)
-+{
-+	struct smbdirect_mr_io *mr;
-+	unsigned long flags;
++	struct smbdirect_socket_parameters *sp = &sc->parameters;
++	enum dma_data_direction direction = is_read ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
++	struct smbdirect_rw_io *msg, *next_msg;
++	size_t i;
 +	int ret;
++	DECLARE_COMPLETION_ONSTACK(completion);
++	struct ib_send_wr *first_wr;
++	LIST_HEAD(msg_list);
++	u8 *desc_buf;
++	int credits_needed;
++	size_t desc_buf_len, desc_num = 0;
 +
-+again:
-+	ret = wait_event_interruptible(sc->mr_io.ready.wait_queue,
-+				       atomic_read(&sc->mr_io.ready.count) ||
-+				       sc->status != SMBDIRECT_SOCKET_CONNECTED);
++	if (sc->status != SMBDIRECT_SOCKET_CONNECTED)
++		return -ENOTCONN;
++
++	if (buf_len > sp->max_read_write_size)
++		return -EINVAL;
++
++	/* calculate needed credits */
++	credits_needed = 0;
++	desc_buf = buf;
++	for (i = 0; i < desc_len / sizeof(*desc); i++) {
++		if (!buf_len)
++			break;
++
++		desc_buf_len = le32_to_cpu(desc[i].length);
++		if (!desc_buf_len)
++			return -EINVAL;
++
++		if (desc_buf_len > buf_len) {
++			desc_buf_len = buf_len;
++			desc[i].length = cpu_to_le32(desc_buf_len);
++			buf_len = 0;
++		}
++
++		credits_needed += smbdirect_connection_calc_rw_credits(sc,
++								       desc_buf,
++								       desc_buf_len);
++		desc_buf += desc_buf_len;
++		buf_len -= desc_buf_len;
++		desc_num++;
++	}
++
++	smbdirect_log_rdma_rw(sc, SMBDIRECT_LOG_INFO,
++		"RDMA %s, len %zu, needed credits %d\n",
++		str_read_write(is_read), buf_len, credits_needed);
++
++	ret = smbdirect_connection_wait_for_rw_credits(sc, credits_needed);
++	if (ret < 0)
++		return ret;
++
++	/* build rdma_rw_ctx for each descriptor */
++	desc_buf = buf;
++	for (i = 0; i < desc_num; i++) {
++		size_t page_count;
++
++		msg = kzalloc(struct_size(msg, sg_list, SG_CHUNK_SIZE),
++			      sc->rw_io.mem.gfp_mask);
++		if (!msg) {
++			ret = -ENOMEM;
++			goto out;
++		}
++
++		desc_buf_len = le32_to_cpu(desc[i].length);
++		page_count = smbdirect_get_buf_page_count(desc_buf, desc_buf_len);
++
++		msg->socket = sc;
++		msg->cqe.done = is_read ?
++			smbdirect_connection_rdma_read_done :
++			smbdirect_connection_rdma_write_done;
++		msg->completion = &completion;
++
++		msg->sgt.sgl = &msg->sg_list[0];
++		ret = sg_alloc_table_chained(&msg->sgt,
++					     page_count,
++					     msg->sg_list,
++					     SG_CHUNK_SIZE);
++		if (ret) {
++			ret = -ENOMEM;
++			goto free_msg;
++		}
++
++		ret = smbdirect_connection_rdma_get_sg_list(desc_buf,
++							    desc_buf_len,
++							    msg->sgt.sgl,
++							    msg->sgt.orig_nents);
++		if (ret < 0)
++			goto free_table;
++
++		ret = rdma_rw_ctx_init(&msg->rdma_ctx,
++				       sc->ib.qp,
++				       sc->ib.qp->port,
++				       msg->sgt.sgl,
++				       page_count,
++				       0,
++				       le64_to_cpu(desc[i].offset),
++				       le32_to_cpu(desc[i].token),
++				       direction);
++		if (ret < 0) {
++			pr_err("failed to init rdma_rw_ctx: %d\n", ret);
++			goto free_table;
++		}
++
++		list_add_tail(&msg->list, &msg_list);
++		desc_buf += desc_buf_len;
++	}
++
++	/* concatenate work requests of rdma_rw_ctxs */
++	first_wr = NULL;
++	list_for_each_entry_reverse(msg, &msg_list, list) {
++		first_wr = rdma_rw_ctx_wrs(&msg->rdma_ctx,
++					   sc->ib.qp,
++					   sc->ib.qp->port,
++					   &msg->cqe,
++					   first_wr);
++	}
++
++	ret = ib_post_send(sc->ib.qp, first_wr, NULL);
 +	if (ret) {
-+		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+			"wait_event_interruptible ret=%d (%s)\n",
-+			ret, errname(ret));
-+		return NULL;
++		pr_err("failed to post send wr for RDMA R/W: %d\n", ret);
++		goto out;
 +	}
 +
-+	if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
-+		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+			"sc->status=%s sc->first_error=%1pe\n",
-+			smbdirect_socket_status_string(sc->status),
-+			SMBDIRECT_DEBUG_ERR_PTR(sc->first_error));
-+		return NULL;
++	msg = list_last_entry(&msg_list, struct smbdirect_rw_io, list);
++	wait_for_completion(&completion);
++	ret = msg->error;
++out:
++	list_for_each_entry_safe(msg, next_msg, &msg_list, list) {
++		list_del(&msg->list);
++		smbdirect_connection_rw_io_free(msg, direction);
 +	}
-+
-+	spin_lock_irqsave(&sc->mr_io.all.lock, flags);
-+	list_for_each_entry(mr, &sc->mr_io.all.list, list) {
-+		if (mr->state == SMBDIRECT_MR_READY) {
-+			mr->state = SMBDIRECT_MR_REGISTERED;
-+			kref_get(&mr->kref);
-+			spin_unlock_irqrestore(&sc->mr_io.all.lock, flags);
-+			atomic_dec(&sc->mr_io.ready.count);
-+			atomic_inc(&sc->mr_io.used.count);
-+			return mr;
-+		}
-+	}
-+
-+	spin_unlock_irqrestore(&sc->mr_io.all.lock, flags);
-+	/*
-+	 * It is possible that we could fail to get MR because other processes may
-+	 * try to acquire a MR at the same time. If this is the case, retry it.
-+	 */
-+	goto again;
-+}
-+
-+static void smbdirect_connection_mr_io_register_done(struct ib_cq *cq, struct ib_wc *wc)
-+{
-+	struct smbdirect_mr_io *mr =
-+		container_of(wc->wr_cqe, struct smbdirect_mr_io, cqe);
-+	struct smbdirect_socket *sc = mr->socket;
-+
-+	if (wc->status != IB_WC_SUCCESS) {
-+		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+			"wc->status=%s opcode=%d\n",
-+			ib_wc_status_msg(wc->status), wc->opcode);
-+		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
-+	}
-+}
-+
-+static void smbdirect_connection_mr_io_local_inv_done(struct ib_cq *cq, struct ib_wc *wc)
-+{
-+	struct smbdirect_mr_io *mr =
-+		container_of(wc->wr_cqe, struct smbdirect_mr_io, cqe);
-+	struct smbdirect_socket *sc = mr->socket;
-+
-+	mr->state = SMBDIRECT_MR_INVALIDATED;
-+	if (wc->status != IB_WC_SUCCESS) {
-+		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+			"invalidate failed status=%s\n",
-+			ib_wc_status_msg(wc->status));
-+		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
-+	}
-+	complete(&mr->invalidate_done);
-+}
-+
-+/*
-+ * The work queue function that recovers MRs
-+ * We need to call ib_dereg_mr() and ib_alloc_mr() before this MR can be used
-+ * again. Both calls are slow, so finish them in a workqueue. This will not
-+ * block I/O path.
-+ * There is one workqueue that recovers MRs, there is no need to lock as the
-+ * I/O requests calling smbd_register_mr will never update the links in the
-+ * mr_list.
-+ */
-+static void smbdirect_connection_mr_io_recovery_work(struct work_struct *work)
-+{
-+	struct smbdirect_socket *sc =
-+		container_of(work, struct smbdirect_socket, mr_io.recovery_work);
-+	struct smbdirect_socket_parameters *sp = &sc->parameters;
-+	struct smbdirect_mr_io *mr;
-+	int ret;
-+
-+	list_for_each_entry(mr, &sc->mr_io.all.list, list) {
-+		if (mr->state != SMBDIRECT_MR_ERROR)
-+			/* This MR is being used, don't recover it */
-+			continue;
-+
-+		/* recover this MR entry */
-+		ret = ib_dereg_mr(mr->mr);
-+		if (ret) {
-+			smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+				"ib_dereg_mr failed ret=%u (%s)\n",
-+				ret, errname(ret));
-+			smbdirect_connection_schedule_disconnect(sc, ret);
-+			continue;
-+		}
-+
-+		mr->mr = ib_alloc_mr(sc->ib.pd,
-+				     sc->mr_io.type,
-+				     sp->max_frmr_depth);
-+		if (IS_ERR(mr->mr)) {
-+			ret = PTR_ERR(mr->mr);
-+			smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+				"ib_alloc_mr failed ret=%d (%s) type=0x%x depth=%u\n",
-+				ret, errname(ret), sc->mr_io.type, sp->max_frmr_depth);
-+			smbdirect_connection_schedule_disconnect(sc, ret);
-+			continue;
-+		}
-+
-+		mr->state = SMBDIRECT_MR_READY;
-+
-+		/* smbdirect_mr->state is updated by this function
-+		 * and is read and updated by I/O issuing CPUs trying
-+		 * to get a MR, the call to atomic_inc_return
-+		 * implicates a memory barrier and guarantees this
-+		 * value is updated before waking up any calls to
-+		 * get_mr() from the I/O issuing CPUs
-+		 */
-+		if (atomic_inc_return(&sc->mr_io.ready.count) == 1)
-+			wake_up(&sc->mr_io.ready.wait_queue);
-+	}
-+}
-+
-+/*
-+ * Transcribe the pages from an iterator into an MR scatterlist.
-+ */
-+static int smbdirect_iter_to_sgt(struct iov_iter *iter,
-+				 struct sg_table *sgt,
-+				 unsigned int max_sg)
-+{
-+	int ret;
-+
-+	memset(sgt->sgl, 0, max_sg * sizeof(struct scatterlist));
-+
-+	ret = extract_iter_to_sg(iter, iov_iter_count(iter), sgt, max_sg, 0);
-+	WARN_ON(ret < 0);
-+	if (sgt->nents > 0)
-+		sg_mark_end(&sgt->sgl[sgt->nents - 1]);
-+
++	atomic_add(credits_needed, &sc->rw_io.credits.count);
++	wake_up(&sc->rw_io.credits.wait_queue);
 +	return ret;
++
++free_table:
++	sg_free_table_chained(&msg->sgt, SG_CHUNK_SIZE);
++free_msg:
++	kfree(msg);
++	goto out;
 +}
-+
-+/*
-+ * Register memory for RDMA read/write
-+ * iter: the buffer to register memory with
-+ * writing: true if this is a RDMA write (SMB read), false for RDMA read
-+ * need_invalidate: true if this MR needs to be locally invalidated after I/O
-+ * return value: the MR registered, NULL if failed.
-+ */
-+__maybe_unused /* this is temporary while this file is included in orders */
-+static struct smbdirect_mr_io *
-+smbdirect_connection_register_mr_io(struct smbdirect_socket *sc,
-+				    struct iov_iter *iter,
-+				    bool writing,
-+				    bool need_invalidate)
-+{
-+	struct smbdirect_socket_parameters *sp = &sc->parameters;
-+	struct smbdirect_mr_io *mr;
-+	int ret, num_pages;
-+	struct ib_reg_wr *reg_wr;
-+
-+	num_pages = iov_iter_npages(iter, sp->max_frmr_depth + 1);
-+	if (num_pages > sp->max_frmr_depth) {
-+		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+			"num_pages=%d max_frmr_depth=%d\n",
-+			num_pages, sp->max_frmr_depth);
-+		WARN_ON_ONCE(1);
-+		return NULL;
-+	}
-+
-+	mr = smbdirect_connection_get_mr_io(sc);
-+	if (!mr) {
-+		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+			"smbdirect_connection_get_mr_io returning NULL\n");
-+		return NULL;
-+	}
-+
-+	mutex_lock(&mr->mutex);
-+
-+	mr->dir = writing ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
-+	mr->need_invalidate = need_invalidate;
-+	mr->sgt.nents = 0;
-+	mr->sgt.orig_nents = 0;
-+
-+	smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_INFO,
-+		"num_pages=%u count=%zu depth=%u\n",
-+		num_pages, iov_iter_count(iter), sp->max_frmr_depth);
-+	smbdirect_iter_to_sgt(iter, &mr->sgt, sp->max_frmr_depth);
-+
-+	ret = ib_dma_map_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->dir);
-+	if (!ret) {
-+		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+			"ib_dma_map_sg num_pages=%u dir=%x ret=%d (%s)\n",
-+			num_pages, mr->dir, ret, errname(ret));
-+		goto dma_map_error;
-+	}
-+
-+	ret = ib_map_mr_sg(mr->mr, mr->sgt.sgl, mr->sgt.nents, NULL, PAGE_SIZE);
-+	if (ret != mr->sgt.nents) {
-+		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+			"ib_map_mr_sg failed ret = %d nents = %u\n",
-+			ret, mr->sgt.nents);
-+		goto map_mr_error;
-+	}
-+
-+	ib_update_fast_reg_key(mr->mr, ib_inc_rkey(mr->mr->rkey));
-+	reg_wr = &mr->wr;
-+	reg_wr->wr.opcode = IB_WR_REG_MR;
-+	mr->cqe.done = smbdirect_connection_mr_io_register_done;
-+	reg_wr->wr.wr_cqe = &mr->cqe;
-+	reg_wr->wr.num_sge = 0;
-+	reg_wr->wr.send_flags = IB_SEND_SIGNALED;
-+	reg_wr->mr = mr->mr;
-+	reg_wr->key = mr->mr->rkey;
-+	reg_wr->access = writing ?
-+			IB_ACCESS_REMOTE_WRITE | IB_ACCESS_LOCAL_WRITE :
-+			IB_ACCESS_REMOTE_READ;
-+
-+	/*
-+	 * There is no need for waiting for complemtion on ib_post_send
-+	 * on IB_WR_REG_MR. Hardware enforces a barrier and order of execution
-+	 * on the next ib_post_send when we actually send I/O to remote peer
-+	 */
-+	ret = ib_post_send(sc->ib.qp, &reg_wr->wr, NULL);
-+	if (!ret) {
+diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
+index 983e08c8d2ee..14c5d8503fca 100644
+--- a/fs/smb/common/smbdirect/smbdirect_socket.h
++++ b/fs/smb/common/smbdirect/smbdirect_socket.h
+@@ -306,6 +306,14 @@ struct smbdirect_socket {
+ 	 * The state for RDMA read/write requests on the server
+ 	 */
+ 	struct {
 +		/*
-+		 * smbdirect_connection_get_mr_io() gave us a reference
-+		 * via kref_get(&mr->kref), we keep that and let
-+		 * the caller use smbdirect_connection_deregister_mr_io()
-+		 * to remove it again.
++		 * Memory hints for
++		 * smbdirect_rw_io structs
 +		 */
-+		mutex_unlock(&mr->mutex);
-+		return mr;
-+	}
++		struct {
++			gfp_t gfp_mask;
++		} mem;
 +
-+	smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+		"ib_post_send failed ret=%d (%s) reg_wr->key=0x%x\n",
-+		ret, errname(ret), reg_wr->key);
-+
-+	/* If all failed, attempt to recover this MR by setting it SMBDIRECT_MR_ERROR*/
-+map_mr_error:
-+	ib_dma_unmap_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->dir);
-+
-+dma_map_error:
-+	mr->sgt.nents = 0;
-+	mr->state = SMBDIRECT_MR_ERROR;
-+	if (atomic_dec_and_test(&sc->mr_io.used.count))
-+		wake_up(&sc->mr_io.cleanup.wait_queue);
-+
-+	smbdirect_connection_schedule_disconnect(sc, ret);
-+
-+	/*
-+	 * smbdirect_connection_get_mr_io() gave us a reference
-+	 * via kref_get(&mr->kref), we need to remove it again
-+	 * on error.
-+	 *
-+	 * No kref_put_mutex() as it's already locked.
-+	 *
-+	 * If smbdirect_mr_io_free_locked() is called
-+	 * and the mutex is unlocked and mr is gone,
-+	 * in that case kref_put() returned 1.
-+	 *
-+	 * If kref_put() returned 0 we know that
-+	 * smbdirect_mr_io_free_locked() didn't
-+	 * run. Not by us nor by anyone else, as we
-+	 * still hold the mutex, so we need to unlock.
-+	 */
-+	if (!kref_put(&mr->kref, smbdirect_mr_io_free_locked))
-+		mutex_unlock(&mr->mutex);
-+	return NULL;
-+}
-+/*
-+ * Deregister a MR after I/O is done
-+ * This function may wait if remote invalidation is not used
-+ * and we have to locally invalidate the buffer to prevent data is being
-+ * modified by remote peer after upper layer consumes it
-+ */
-+__maybe_unused /* this is temporary while this file is included in orders */
-+static void smbdirect_connection_deregister_mr_io(struct smbdirect_mr_io *mr)
-+{
-+	struct smbdirect_socket *sc = mr->socket;
-+	int ret = 0;
-+
-+	mutex_lock(&mr->mutex);
-+	if (mr->state == SMBDIRECT_MR_DISABLED)
-+		goto put_kref;
-+
-+	if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
-+		smbdirect_mr_io_disable_locked(mr);
-+		goto put_kref;
-+	}
-+
-+	if (mr->need_invalidate) {
-+		struct ib_send_wr *wr = &mr->inv_wr;
-+
-+		/* Need to finish local invalidation before returning */
-+		wr->opcode = IB_WR_LOCAL_INV;
-+		mr->cqe.done = smbdirect_connection_mr_io_local_inv_done;
-+		wr->wr_cqe = &mr->cqe;
-+		wr->num_sge = 0;
-+		wr->ex.invalidate_rkey = mr->mr->rkey;
-+		wr->send_flags = IB_SEND_SIGNALED;
-+
-+		init_completion(&mr->invalidate_done);
-+		ret = ib_post_send(sc->ib.qp, wr, NULL);
-+		if (ret) {
-+			smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
-+				"ib_post_send failed ret=%d (%s)\n",
-+				ret, errname(ret));
-+			smbdirect_mr_io_disable_locked(mr);
-+			smbdirect_connection_schedule_disconnect(sc, ret);
-+			goto done;
-+		}
-+		wait_for_completion(&mr->invalidate_done);
-+		mr->need_invalidate = false;
-+	} else
-+		/*
-+		 * For remote invalidation, just set it to SMBDIRECT_MR_INVALIDATED
-+		 * and defer to mr_recovery_work to recover the MR for next use
-+		 */
-+		mr->state = SMBDIRECT_MR_INVALIDATED;
-+
-+	if (mr->sgt.nents) {
-+		ib_dma_unmap_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->dir);
-+		mr->sgt.nents = 0;
-+	}
-+
-+	if (mr->state == SMBDIRECT_MR_INVALIDATED) {
-+		mr->state = SMBDIRECT_MR_READY;
-+		if (atomic_inc_return(&sc->mr_io.ready.count) == 1)
-+			wake_up(&sc->mr_io.ready.wait_queue);
-+	} else
-+		/*
-+		 * Schedule the work to do MR recovery for future I/Os MR
-+		 * recovery is slow and don't want it to block current I/O
-+		 */
-+		queue_work(sc->workqueue, &sc->mr_io.recovery_work);
-+
-+done:
-+	if (atomic_dec_and_test(&sc->mr_io.used.count))
-+		wake_up(&sc->mr_io.cleanup.wait_queue);
-+
-+put_kref:
-+	/*
-+	 * No kref_put_mutex() as it's already locked.
-+	 *
-+	 * If smbdirect_mr_io_free_locked() is called
-+	 * and the mutex is unlocked and mr is gone,
-+	 * in that case kref_put() returned 1.
-+	 *
-+	 * If kref_put() returned 0 we know that
-+	 * smbdirect_mr_io_free_locked() didn't
-+	 * run. Not by us nor by anyone else, as we
-+	 * still hold the mutex, so we need to unlock
-+	 * and keep the mr in SMBDIRECT_MR_READY or
-+	 * SMBDIRECT_MR_ERROR state.
-+	 */
-+	if (!kref_put(&mr->kref, smbdirect_mr_io_free_locked))
-+		mutex_unlock(&mr->mutex);
-+}
+ 		/*
+ 		 * The credit state for the send side
+ 		 */
+@@ -511,6 +519,7 @@ static __always_inline void smbdirect_socket_init(struct smbdirect_socket *sc)
+ 	spin_lock_init(&sc->recv_io.reassembly.lock);
+ 	init_waitqueue_head(&sc->recv_io.reassembly.wait_queue);
+ 
++	sc->rw_io.mem.gfp_mask = GFP_KERNEL;
+ 	atomic_set(&sc->rw_io.credits.count, 0);
+ 	init_waitqueue_head(&sc->rw_io.credits.wait_queue);
+ 
 -- 
 2.43.0
 
