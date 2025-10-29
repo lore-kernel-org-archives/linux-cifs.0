@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9EE285C8D
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:25:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E68284B25
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761744328; cv=none; b=Ze9BNp4/NwG4N4+/UOYVITkmWewLv8EX4pXuHBA+AQNH2nCsmOzxbiTSLoQocEfOp2IhdQ/c6SE+UXNjf/uUN7/TQzG/ZMcTXvDY2KgVsRyXsYvHXNHLE3Pz49Ut0GIVFUTZsRLkUwMxxXaulJE5X/Nph4O2NuQkc7x5htYWqK4=
+	t=1761744337; cv=none; b=B7As2qFhf3FxogZ8/G1Paaq8WqvVDifk+NJRigmsfL3RTAVIicKvKtWgz96auXQV+hOlXeQZ1OoeEoMWsy5ytucj4u5j2n4EXGqkfiaggMNVhNHM/2g1IFPc+UgTef6JxdYE/SeH8burIgS5AVIaNts22xOEZHYpWKBknvjhfuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761744328; c=relaxed/simple;
-	bh=ENtoRXgRLog0F5PCMLoc7ReK67BP9vzvEAdQiSjQxpw=;
+	s=arc-20240116; t=1761744337; c=relaxed/simple;
+	bh=fREmyy9HzaP7l/oo/GCmRZFVyT3B8t+xLZEFMciX8Hw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lmd/mn5mUvkkSxDeIdUa81Sk0jLWIKtLBVvXpYeIO7Lc2ET18us4AGiTSXZ9zAju26e36xLQuj7O0jKmDm2uzjbkV0PBJ75OhPulPJeMttripgQGZ6F4d/Fl17saOpBEE982P1ZxQ8OzEZPyrFuHgPuc7rtKoavVh1KIY7hucfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=vAkOY99o; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=sXUEho06pH2baFSxTqkSI7tbFl+NaIgOr07MMIIrsDUNa77NnKXVtptegouf0hGtZAj6cerGrwGhMAz/NpX2F4TcEh5g2x4evPs9YKtt3G6Z5ieuZsdWUTkpAADX9u5Uh3jRsN1POm0b6cTRqKPZ71l779XoYr1gRluRBlcZoBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=fYjjSlbg; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="vAkOY99o"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="fYjjSlbg"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=n7oSuR4/Qsa3P52qQ0Ryhuz6phjJhE/hO9NAAagfr4Q=; b=vAkOY99otPX09PVSggM++NZCl1
-	HmcAhKmP0c2ktuHo02Dqc1kYdF1IKkDMkwK/16eFwHSOLef4Yfr+WbM8WhsDhXMr1ANfL3IAqV+Rt
-	EfqF3IEc2gfLsfmM5sDHWcOXHrjja0CEZRMAdkDucEwDtWZE3T7Pul7AHjzweP/U2qMBYjN/71pUO
-	FLnP2tqEYWfZcQZPN2RRaFzOPxQ/LTLv5135aajUQsKaw+/ETQ4nqXBhIchISWucmZNxINC6qFSca
-	n8Vsx5TLgBB2uxPJeMch7d8yuZHQH/67j4Vorq5eiBXQkNcDhtHYBX0bfFv4lWi8CsxJgCCpbRF77
-	WDMDjpurjXRGMlNEJTDpKJsai1P/jGI5Je4RmZ4szbz/r1WKcTHiBcjrNLT/ncACKgqZu2FH3iyJi
-	WrcJanLhdYeUS0vqsgs9r6+v5TWlP7E/yoLMvMBQwwIlT53tb1ebeUZ7fRJXUrQIQHmQF8rmhWoJ/
-	mwXprZ/zpnand7xBQyJ1zV2n;
+	bh=GOi0ORirNZxGAhcvh5mMlbPeJ4YM4Ek0oe7GsgT7n68=; b=fYjjSlbghyTdIrIB4/frm2CuoH
+	WvqTMPgvWPjR1mHj+SsWbRZtgw9X8U8dH/YPTZMV/owh0d5tD+OsNZq6a0rowI0Cnlus0BYUheai/
+	DOydN6BkjwSXgvAtL0PfjnJ0M0quTIMH+zOuGP32e5V7A2iw9+VxjGXhi6BAnTj2FrFwGMV+fIwt9
+	V9FqKEfD8/ljjQRS6bQkB/6FRzCoa99mhG0xVccv/ulVqpexVAa+7JblJDMeJOy/YATFer5Q8uPV7
+	sirnXGk/hLgBMIjDwi3pzqT1bm/STDSOCFh7OIuSUZqFP84Brscnftns+pjVZTMGiIzmkha7WAq6w
+	3J99eVLb1+cUcNDQSKkq/5FiK+DwyZUDhvRF+lrSnx9bIYDyTTIghCFSRVrKCeVVsuoXmDzIqvE6s
+	iVjpq71fgcaoC3A6PYoNkQAVCd38kCFxJAJ4QSFSF5sR/0e0P+7AbPnNOzqAbrYLZWniH5h6K0Wx0
+	FlRlFBSN3UJ1K5meeshm72Tu;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vE6Az-00BbdD-1B;
-	Wed, 29 Oct 2025 13:25:21 +0000
+	id 1vE6B6-00Bbdj-26;
+	Wed, 29 Oct 2025 13:25:28 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -39,9 +39,9 @@ Cc: metze@samba.org,
 	Tom Talpey <tom@talpey.com>,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v2 029/127] smb: smbdirect: introduce smbdirect_get_buf_page_count()
-Date: Wed, 29 Oct 2025 14:20:07 +0100
-Message-ID: <4051ce8759eb0b014e0db5e3b409251bee87a895.1761742839.git.metze@samba.org>
+Subject: [PATCH v2 030/127] smb: smbdirect: introduce smbdirect_connection_wait_for_credits()
+Date: Wed, 29 Oct 2025 14:20:08 +0100
+Message-ID: <b67ab02598dbea9f0b19227e4937631d4096d276.1761742839.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1761742839.git.metze@samba.org>
 References: <cover.1761742839.git.metze@samba.org>
@@ -53,11 +53,11 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is a copy of get_buf_page_count() in the server
-and will replace it soon.
+This is a copy of wait_for_credits() in the server, which
+will be replaced by this soon.
 
-The only difference is that we now use size_t instead
-of int.
+This will allow us to share more common code between client
+and server soon.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -67,24 +67,47 @@ Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/common/smbdirect/smbdirect_socket.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ .../common/smbdirect/smbdirect_connection.c   | 27 +++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
-index 5856ce287afa..983e08c8d2ee 100644
---- a/fs/smb/common/smbdirect/smbdirect_socket.h
-+++ b/fs/smb/common/smbdirect/smbdirect_socket.h
-@@ -640,4 +640,10 @@ struct smbdirect_rw_io {
- 	struct scatterlist sg_list[];
- };
+diff --git a/fs/smb/common/smbdirect/smbdirect_connection.c b/fs/smb/common/smbdirect/smbdirect_connection.c
+index c1281807ff8c..1b84e0789d77 100644
+--- a/fs/smb/common/smbdirect/smbdirect_connection.c
++++ b/fs/smb/common/smbdirect/smbdirect_connection.c
+@@ -796,6 +796,33 @@ static void smbdirect_connection_idle_timer_work(struct work_struct *work)
+ 	queue_work(sc->workqueue, &sc->idle.immediate_work);
+ }
  
-+static inline size_t smbdirect_get_buf_page_count(const void *buf, size_t size)
++__maybe_unused /* this is temporary while this file is included in orders */
++static int smbdirect_connection_wait_for_credits(struct smbdirect_socket *sc,
++						 wait_queue_head_t *waitq,
++						 atomic_t *total_credits,
++						 int needed)
 +{
-+	return DIV_ROUND_UP((uintptr_t)buf + size, PAGE_SIZE) -
-+		(uintptr_t)buf / PAGE_SIZE;
++	int ret;
++
++	if (WARN_ON_ONCE(needed < 0))
++		return -EINVAL;
++
++	do {
++		if (atomic_sub_return(needed, total_credits) >= 0)
++			return 0;
++
++		atomic_add(needed, total_credits);
++		ret = wait_event_interruptible(*waitq,
++					       atomic_read(total_credits) >= needed ||
++					       sc->status != SMBDIRECT_SOCKET_CONNECTED);
++
++		if (sc->status != SMBDIRECT_SOCKET_CONNECTED)
++			return -ENOTCONN;
++		else if (ret < 0)
++			return ret;
++	} while (true);
 +}
 +
- #endif /* __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_SOCKET_H__ */
+ __maybe_unused /* this is temporary while this file is included in orders */
+ static void smbdirect_connection_send_io_done(struct ib_cq *cq, struct ib_wc *wc)
+ {
 -- 
 2.43.0
 
