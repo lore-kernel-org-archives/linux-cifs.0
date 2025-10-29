@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6456C37A3AA
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E9D224B15
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761744433; cv=none; b=FLalkj2dtGW0BrbZR/9XuYxsIAljHX2E75/urjhIX+ffUdza5Z+ZUXRNaOgaa+efJfuVCixueSQf18ZR/OaTdfVb6b3x3AvcELMYLd0SzYcFSShnJ9DT1zr18Ui2f+6OlGHckmheQr2AvX4Ibk4S4XEqMpwBNf3ric3AOuy9nYw=
+	t=1761744438; cv=none; b=a5u7i6HdW+sGHMAHRvc1gawKxKwwl82uK6ip2mWabhOWtNmIxyGVEZPAFWHtP47iUSWjyJLlW6AiJafFJEXn8Wglgf/tlD3/i0rYMlV9EabNtk2zxF1EpO3H3z/E4Sr6SFC9n5HzIFW0alk3h7zzztsz9L3FGnxBfc5X7KbnTtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761744433; c=relaxed/simple;
-	bh=BTjGrykZs7IzT2RCTp6lwgIz6IH0ZFL+oc90IHgdJ7I=;
+	s=arc-20240116; t=1761744438; c=relaxed/simple;
+	bh=HPOONTvFsqKBpVUXna/EUOQo821DpK+M1b1f8a/ewe8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BYOpwiuL6krk1DbiB4b7QSoeozqtEPurJtlwKqdDj4x/ozImb75wSmcMKIlKR3IIroDLqQgV1xXi4DpRjocVF9ov6OUtzlWl1F+N/ZTYuDgpr4WDDJzJjHZ0snWCGV6f1kyOeRlJ26B34J4/1fmJrvKAUnZgCNuoT4IRa0h+bws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=uzLCT5KO; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=NekkPvQ2gLBTd0WT8V0UVf+bli2w8bcdHmMyeQ/yTG3nib53eOeQZhFiX0ANGj37Z/PeF8iHrU301c/jwLU6V3jT2yVDD1ADS72q+GnZZt9F/pPsEu2qejwbHKBs6SB7UUsqKekfmN2WtOmIeJN60UTUMnVxuNelDmtzZv1tVxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=zQt6vIUT; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="uzLCT5KO"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="zQt6vIUT"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=5SnSj2eQcuRm+P36UsJW55o8k1/pIVpEPVCSUniMkoE=; b=uzLCT5KOlSxl8xex2LIczxlqoh
-	qSNTvQG39dPwguPVEyu+8IqnpIzCaFfTI3QKjbifvmUrrurItOcwzAv1OhEQiKIDvIwhVNlHq/PSS
-	86z9ffC0MrjlsMlYu7mlU4OeVZuOiCsgpp5TZL1UiNdCEdatfNCIurFIYPiI9Rkv1Jbx6oKZBQh4z
-	foFjCi9X8Q+d0hfO1oSqeJRlf9hul3YOggMGCtYN51oLBqSkNAie+fwCuqByxN574tgp1vrvAM+5q
-	W1P9Sj1UixcyFbIuUWOh3MD5vOSIXtg6EgbQCGpyPYkVccUQDPKD/Wo59cGG7Npynws40cjbHnexS
-	mX2J9+xRGmxNzSEscZ/fNkafbfKA/HxPTzERBvpf69hOG1akbRJoILJtTUpQ409Jzmzate3aaQhDN
-	LqA8ugITrkBn2iyE4/8EaJzpBOhFFB+ZY9NRPP38AhrOb9n92hpdp6AxtrtIWbhjIShuRPs8hMOID
-	miLlHg622Gr6H8inNFUJA2Fs;
+	bh=es2jaFA4hWzXp2s1/zltWKFmmsKGJNoXYMYWFZDIWds=; b=zQt6vIUT04zFuqAkTbCGqCFXi+
+	LHZCkIqCdHvSAg47FGonUwkOa/npBj6//MEQhtHPlbXdaXCQJIOt8nQUeyJDLKKSsnYgkDW/2J7I9
+	TKeGPmpJjslAaG4L1lM8w76Eljn64YYAVe3oWzjLXXSW05esstP5vU8SVZEJH9LouZ99WPoEYSAt/
+	Q5ay6ELCoEtIClrEuIqASt8sb+UdxQfnINzQFits2q5H9c5gKmJNDIy76/IAsuauUup2ZGm8FwkUX
+	D8mZWdTgLOAfhICHU4AfsTqv67Esj7ppRDI+om9kC9ynB/UBi6zKe2w7SQrZdIkmpvru4TvOZi7IP
+	S6rF17Nta1f/JSWvjqJkQDNMCLkhbdakksjfsAftq2PVU898CLAcmHyZQRkwGVTteViyl/r5Dd+8w
+	Rijc9RE45bERtihpY4rKQlYFbMnrew+orT/KGLWJNkwS8A6CO4/l8Nk7ILPwe06W/bgXqrRQgAqyU
+	XntFoJWbmQjPJleza417T13G;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vE6Ci-00BbtV-1X;
-	Wed, 29 Oct 2025 13:27:08 +0000
+	id 1vE6Co-00BbuZ-0P;
+	Wed, 29 Oct 2025 13:27:14 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -39,9 +39,9 @@ Cc: metze@samba.org,
 	Tom Talpey <tom@talpey.com>,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v2 047/127] smb: smbdirect: introduce smbdirect_connection_is_connected()
-Date: Wed, 29 Oct 2025 14:20:25 +0100
-Message-ID: <28f7953cda95a9162ec7ae7ac146959f77e103d4.1761742839.git.metze@samba.org>
+Subject: [PATCH v2 048/127] smb: smbdirect: introduce smbdirect_socket_shutdown()
+Date: Wed, 29 Oct 2025 14:20:26 +0100
+Message-ID: <84a38bb78cf7f7ca48d54242b1d06f5f181010cb.1761742839.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1761742839.git.metze@samba.org>
 References: <cover.1761742839.git.metze@samba.org>
@@ -53,8 +53,11 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is a simple way to check is the connection is still ok
-without the need to know internals of struct smbdirect_socket.
+This can be used by client and server to trigger a
+disconnect of the connection, the idea of to be
+similar to kernel_sock_shutdown(), but for smbdirect
+there's no point in shutting down only one direct
+so there's no 'how' argument.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -64,28 +67,26 @@ Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/common/smbdirect/smbdirect_connection.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ fs/smb/common/smbdirect/smbdirect_connection.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/fs/smb/common/smbdirect/smbdirect_connection.c b/fs/smb/common/smbdirect/smbdirect_connection.c
-index 858b071ba1bb..1487efbe7620 100644
+index 1487efbe7620..5670e442e129 100644
 --- a/fs/smb/common/smbdirect/smbdirect_connection.c
 +++ b/fs/smb/common/smbdirect/smbdirect_connection.c
-@@ -900,6 +900,14 @@ static void smbdirect_connection_disconnect_work(struct work_struct *work)
- 	smbdirect_connection_wake_up_all(sc);
+@@ -1100,6 +1100,12 @@ static void smbdirect_connection_destroy_sync(struct smbdirect_socket *sc)
+ 		SMBDIRECT_DEBUG_ERR_PTR(sc->first_error));
  }
  
 +__maybe_unused /* this is temporary while this file is included in orders */
-+static bool smbdirect_connection_is_connected(struct smbdirect_socket *sc)
++static void smbdirect_socket_shutdown(struct smbdirect_socket *sc)
 +{
-+	if (unlikely(!sc || sc->first_error || sc->status != SMBDIRECT_SOCKET_CONNECTED))
-+		return false;
-+	return true;
++	smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
 +}
 +
- __maybe_unused /* this is temporary while this file is included in orders */
- static int smbdirect_connection_wait_for_connected(struct smbdirect_socket *sc)
+ static void smbdirect_connection_idle_timer_work(struct work_struct *work)
  {
+ 	struct smbdirect_socket *sc =
 -- 
 2.43.0
 
