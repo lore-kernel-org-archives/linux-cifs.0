@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1553123EA9C
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E58E238C08
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761744273; cv=none; b=IdotgNL6eTT0Xhu9mL8DRWLLiGziOJBdgZdJmyeCkNjpvsBGKI3mc/clLMUDqdRRasrxaOlnOsurmn6Ces1KTLQKdE75DhTzIpKpsZV9FP1CmbiAF6rsriqoPhBFEU+0NIO28Xm3rzD26J8+9GOGqhaPr3YLKjVU2GTZGln1Rek=
+	t=1761744281; cv=none; b=gBQwmWCZJZ1jCR8f9smbpYrS61CheLNWA1RBQ16UVROCGNZ3cwX15qXCFecQcsrftKbNe2vvcC1jEWEVXCHNPTwk/QfXMbeG8SbCSrebsYqHj/upVYlsufSb7Ecw07Nf+mp1wG+FvTqB0Swy2STHRoiXBUvnkr3H9BwnUrkd7u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761744273; c=relaxed/simple;
-	bh=5NXPiLkftIuNQurxkpX9T9q10PB/Fex9oiI3rE0Y81w=;
+	s=arc-20240116; t=1761744281; c=relaxed/simple;
+	bh=Jx4iMTsZez/X3oV3cY6aLv8lQ2IFnfzws4xeO8OzcHY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LsORigZh3nFGNBo+mxpdoGVK5n4LFv4mawieRFG5kIAKGl1A2YgnVdtp4EOf50DjFMZRSJpLHXLxlgmt3gzMTHEqrGidYQn1ciKzR32Yk/ualf1fNO+mukAofxA9MfBrOskIbKPGztlIFb9WRP2PpocW6LhtnNf6AXUwe7ikSIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=F9CDmvM1; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=RJMWodhZo/4mKGX6C76Zs3WkHudHIkpI7w3RdeOi8s2J0n1BIaeBr5N7OODJVYgBoGk3KFkegHHAYJCnFkqR9xs2gZWAUhD0ZTKVJCHxqysHB6ihv/xArDdwcbgvtlCH6kIOgCJdGKoNr0o4feiviPffZ2sLrSRGrZsOBwbHIb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=wUyOnGsE; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="F9CDmvM1"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="wUyOnGsE"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=W25Lc2rBDqaolDVFFyXbWKKD1MzRZBLvvcJSdADQXBk=; b=F9CDmvM1wqunuPRljm0wy5OvkO
-	DSFVIeWe2GysAe32Vq/m76x+ihRwHhBYjTwrSiU8JzV5bOYoOs4rCiCjDDksr4fo0Z1YGQBGwd80C
-	fPBEUGZtPHHrAZ6OnnFIgTTSZOdAyrsAKJi4we9eslmJ45POYM9Lxi6byXivb3GZfYabwavTJo5id
-	hWkQJaRyWHShRC/m8GBnpUyzhgG8I8SlRH95z/fnIz00Y/WobTwgqIGWY/ThQ0raqLPgD0gU3k5j6
-	lRpqvos00b+MtF5N5s+U/msS9aEAjMLyYB8HRepfVKhnhO72N73kf8GOqxjz2XySM+HzdqOcyjNYS
-	ZLY5/HeqiQVj9HmOQUb03hoXlN8/9kP6SVqrK+MTqAB01F11qqBbt5dh7ad2FIlGs+46+wtXz0nDO
-	SPIPabt1rOZg7VzlR5xeEm8wJhkTYAWtgfvSdWEZTagNrA11JBQ5HiMzCQ1G/Opl48sS5efuQW296
-	lOEzgcyDKLnacXKrS513w1Lr;
+	bh=iLhQ1rVS4zBVrUO4h6jXSyy7sC7Q7umdC7HGDw2OaBc=; b=wUyOnGsES+QZqq5YqyXQo3H/lV
+	rQ4ipXnDXCICi8ILjuS6wDoY7en/xWSvfnoaKP7cj6lWLfkA7W2Iz18hw6eLxl+Nl9SI84+F79ku3
+	E0c1YFHsth9JxQLyi49yPndICMnCSAd06xf3j6K8w4RJI8eisLVYmkXUh2wNwon2yCO45+Tz83hs7
+	XQdpTooVT0HJ09eikzWkCox786Qqi+SE6FfDKDQLwqo1fgRi7PHY2UAzA6T4+XY52C5MNnKPTE/sA
+	UZBjFoBpUWo8MOkZjMgwrOF/hbN90uUHLUaVjpn+7bWZ88vSjv8QYxCMsWzzSobYOma+Kh6qlQezM
+	QaXiZ8ygLlzatKAQvTzeRRn4EGMtSlAIG37nGpOscjxUzeCZBq40sSsGqVPTcQFKzhe2uiMQOB9Cz
+	imDRdjF5/hifsLpwohA/J8Ez9AUfkS4+pXx1YN4Mji+HnwB9Zwuf3g3Eti0HUualfQ/pwFDKB7Nhi
+	PlOIz8agQSPQzrniv8bRH6mR;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vE6A9-00BbVL-26;
-	Wed, 29 Oct 2025 13:24:29 +0000
+	id 1vE6AF-00BbWN-0i;
+	Wed, 29 Oct 2025 13:24:36 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -40,9 +40,9 @@ Cc: metze@samba.org,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v2 020/127] smb: smbdirect: introduce smbdirect_connection_send_io_done()
-Date: Wed, 29 Oct 2025 14:19:58 +0100
-Message-ID: <2506202c043d04c50fa500207b5bb57952e577ef.1761742839.git.metze@samba.org>
+Subject: [PATCH v2 021/127] smb: smbdirect: introduce smbdirect_connection_{create,destroy}_mem_pools()
+Date: Wed, 29 Oct 2025 14:19:59 +0100
+Message-ID: <48774548952e318fe7c920425702a6f1ae8e8558.1761742839.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1761742839.git.metze@samba.org>
 References: <cover.1761742839.git.metze@samba.org>
@@ -54,8 +54,31 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is a combination of send_done() of client and server.
-It will replace both...
+This is based on smb_direct_{create,destroy}_pools() in the server.
+
+But it doesn't use smbdirect_connection_get_recv_io() on cleanup,
+instead it uses list_for_each_entry_safe()...
+
+It also keep some logic to allow userspace access to
+smbdirect_recv_io payload, which is needed for the client
+code. But it exposes the whole payload including the
+smbdirect_data_transfer header as documentation says
+data_offset = 0 and data_length != 0 would be valid,
+while the existing client code requires data_offset >= 24.
+
+This should replace the related server functions and also
+be used on the client.
+
+It also abstracts recv_io.mem.gfp_mask in order to
+allow server to keep using __GFP_RETRY_MAYFAIL.
+
+It also uses struct kmem_cache_args consistently
+as that's the currently preferred version of
+kmem_cache_create(). And it makes use of the
+mempool_create_slab_pool() helper.
+
+And it uses list_add_tail() just to let me feel
+better when looking at the code...
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -66,60 +89,127 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- .../common/smbdirect/smbdirect_connection.c   | 43 +++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ .../common/smbdirect/smbdirect_connection.c   | 107 ++++++++++++++++++
+ 1 file changed, 107 insertions(+)
 
 diff --git a/fs/smb/common/smbdirect/smbdirect_connection.c b/fs/smb/common/smbdirect/smbdirect_connection.c
-index e5e8432f88e6..05a68991587c 100644
+index 05a68991587c..dedc47916e0e 100644
 --- a/fs/smb/common/smbdirect/smbdirect_connection.c
 +++ b/fs/smb/common/smbdirect/smbdirect_connection.c
-@@ -375,3 +375,46 @@ static void smbdirect_connection_idle_timer_work(struct work_struct *work)
- 		"schedule send of empty idle message\n");
- 	queue_work(sc->workqueue, &sc->idle.immediate_work);
+@@ -88,6 +88,113 @@ static void smbdirect_connection_wake_up_all(struct smbdirect_socket *sc)
+ 	wake_up_all(&sc->mr_io.cleanup.wait_queue);
  }
+ 
++static void smbdirect_connection_destroy_mem_pools(struct smbdirect_socket *sc);
 +
 +__maybe_unused /* this is temporary while this file is included in orders */
-+static void smbdirect_connection_send_io_done(struct ib_cq *cq, struct ib_wc *wc)
++static int smbdirect_connection_create_mem_pools(struct smbdirect_socket *sc)
 +{
-+	struct smbdirect_send_io *msg =
-+		container_of(wc->wr_cqe, struct smbdirect_send_io, cqe);
-+	struct smbdirect_socket *sc = msg->socket;
-+	struct smbdirect_send_io *sibling, *next;
-+	int lcredits = 0;
-+
-+	smbdirect_log_rdma_send(sc, SMBDIRECT_LOG_INFO,
-+		"smbdirect_send_io completed. status='%s (%d)', opcode=%d\n",
-+		ib_wc_status_msg(wc->status), wc->status, wc->opcode);
++	struct smbdirect_socket_parameters *sp = &sc->parameters;
++	char name[80];
++	size_t i;
 +
 +	/*
-+	 * Free possible siblings and then the main send_io
++	 * We use sizeof(struct smbdirect_negotiate_resp) for the
++	 * payload size as it is larger as
++	 * sizeof(struct smbdirect_data_transfer).
++	 *
++	 * This will fit client and server usage for now.
 +	 */
-+	list_for_each_entry_safe(sibling, next, &msg->sibling_list, sibling_list) {
-+		list_del_init(&sibling->sibling_list);
-+		smbdirect_connection_free_send_io(sibling);
-+		lcredits += 1;
++	snprintf(name, sizeof(name), "smbdirect_send_io_cache_%p", sc);
++	struct kmem_cache_args send_io_args = {
++		.align		= __alignof__(struct smbdirect_send_io),
++	};
++	sc->send_io.mem.cache = kmem_cache_create(name,
++						  sizeof(struct smbdirect_send_io) +
++						  sizeof(struct smbdirect_negotiate_resp),
++						  &send_io_args,
++						  SLAB_HWCACHE_ALIGN);
++	if (!sc->send_io.mem.cache)
++		goto err;
++
++	sc->send_io.mem.pool = mempool_create_slab_pool(sp->send_credit_target,
++							sc->send_io.mem.cache);
++	if (!sc->send_io.mem.pool)
++		goto err;
++
++	/*
++	 * A payload size of sp->max_recv_size should fit
++	 * any message.
++	 *
++	 * For smbdirect_data_transfer messages the whole
++	 * buffer might be exposed to userspace
++	 * (currently on the client side...)
++	 * The documentation says data_offset = 0 would be
++	 * strange but valid.
++	 */
++	snprintf(name, sizeof(name), "smbdirect_recv_io_cache_%p", sc);
++	struct kmem_cache_args recv_io_args = {
++		.align		= __alignof__(struct smbdirect_recv_io),
++		.useroffset	= sizeof(struct smbdirect_recv_io),
++		.usersize	= sp->max_recv_size,
++	};
++	sc->recv_io.mem.cache = kmem_cache_create(name,
++						  sizeof(struct smbdirect_recv_io) +
++						  sp->max_recv_size,
++						  &recv_io_args,
++						  SLAB_HWCACHE_ALIGN);
++	if (!sc->recv_io.mem.cache)
++		goto err;
++
++	sc->recv_io.mem.pool = mempool_create_slab_pool(sp->recv_credit_max,
++							sc->recv_io.mem.cache);
++	if (!sc->recv_io.mem.pool)
++		goto err;
++
++	for (i = 0; i < sp->recv_credit_max; i++) {
++		struct smbdirect_recv_io *recv_io;
++
++		recv_io = mempool_alloc(sc->recv_io.mem.pool,
++					sc->recv_io.mem.gfp_mask);
++		if (!recv_io)
++			goto err;
++		recv_io->socket = sc;
++		recv_io->sge.length = 0;
++		list_add_tail(&recv_io->list, &sc->recv_io.free.list);
 +	}
-+	/* Note this frees wc->wr_cqe, but not wc */
-+	smbdirect_connection_free_send_io(msg);
-+	lcredits += 1;
 +
-+	if (unlikely(wc->status != IB_WC_SUCCESS || WARN_ON_ONCE(wc->opcode != IB_WC_SEND))) {
-+		if (wc->status != IB_WC_WR_FLUSH_ERR)
-+			smbdirect_log_rdma_send(sc, SMBDIRECT_LOG_ERR,
-+				"wc->status=%s (%d) wc->opcode=%d\n",
-+				ib_wc_status_msg(wc->status), wc->status, wc->opcode);
-+		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
-+		return;
-+	}
-+
-+	atomic_add(lcredits, &sc->send_io.lcredits.count);
-+	wake_up(&sc->send_io.lcredits.wait_queue);
-+
-+	if (atomic_dec_and_test(&sc->send_io.pending.count))
-+		wake_up(&sc->send_io.pending.zero_wait_queue);
-+
-+	wake_up(&sc->send_io.pending.dec_wait_queue);
++	return 0;
++err:
++	smbdirect_connection_destroy_mem_pools(sc);
++	return -ENOMEM;
 +}
++
++static void smbdirect_connection_destroy_mem_pools(struct smbdirect_socket *sc)
++{
++	struct smbdirect_recv_io *recv_io, *next_io;
++
++	list_for_each_entry_safe(recv_io, next_io, &sc->recv_io.free.list, list) {
++		list_del(&recv_io->list);
++		mempool_free(recv_io, sc->recv_io.mem.pool);
++	}
++
++	/*
++	 * Note mempool_destroy() and kmem_cache_destroy()
++	 * work fine with a NULL pointer
++	 */
++
++	mempool_destroy(sc->recv_io.mem.pool);
++	sc->recv_io.mem.pool = NULL;
++
++	kmem_cache_destroy(sc->recv_io.mem.cache);
++	sc->recv_io.mem.cache = NULL;
++
++	mempool_destroy(sc->send_io.mem.pool);
++	sc->send_io.mem.pool = NULL;
++
++	kmem_cache_destroy(sc->send_io.mem.cache);
++	sc->send_io.mem.cache = NULL;
++}
++
+ __maybe_unused /* this is temporary while this file is included in orders */
+ static struct smbdirect_send_io *smbdirect_connection_alloc_send_io(struct smbdirect_socket *sc)
+ {
 -- 
 2.43.0
 
