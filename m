@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0109F2459DC
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56C824DD17
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761744537; cv=none; b=izHXiSLzE9gCRx32kOBJkmTaSz9fd59RobCKeK4Wdx1akWIGHEsqXLsRgUHjvs6IjNPQnfcGPuk70c/jpYoSGmnUSp5w8DBdqURfsl9+AsAxwzNo21AytQST77W6yLCM/XYTRG/1b93hOFyDgt/mCw4n52mAEgkmuCCWa3IpUU4=
+	t=1761744544; cv=none; b=pPmhk5QnbBOpnd83o2pmiYJPukDhzCZc7CA/PQR26g4dPw9sw4uUhO6cBY0himAl+sDHHeG4/8yTZpF8TLewvtnUcao+rlnASiCG1+Gt/Xea0LXIODONcSXQqBJcUasmnLrYtMcA2hATEP0jwvmKzqoznhwC5yCtmWNdG2WIa2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761744537; c=relaxed/simple;
-	bh=MjaMGd2RtUF/uoc4DSKDaGEzuvXU1SPBkf8V5dJbx0Q=;
+	s=arc-20240116; t=1761744544; c=relaxed/simple;
+	bh=7+D7pcvIUa5Gu4vRCIlaZZ4fjYko8GSdKm4VsZHke2k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Uz+BvUNkyRCqfAkkCGzIPZbuVcH1p2Qp2F+L4g/+7frZl6rrwdepG2sqm1mj3jD2JMQYUWSPLHv/nNN3IxwF7wGZM1oR6qM9u2cUFgNIsewvjibYNzb3C/l3K5SQlJMedOjfFjuLbAqCrt5GMLHGg1C5l3eei509GnVeCZ9wp3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=C3OBaRGb; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=kwK6Hp4HqnIcNkVF4cWOi8vuIL0JaoZQQCYfQqegEOwbf3uWpzq5k1KapX37MyKS5aLEps3r34gWL6+vLbPeyt2JOejQN2Koy4ebXCuCRSS2fEMPvzo0JRDmNESSBb0enEtBMAaRQ+9JMhEpd1n8T7KCIJGCljCwrRjVYvqXaB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=ifo0Z/ly; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="C3OBaRGb"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="ifo0Z/ly"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=n/KAblsQXDaf4rGjCuOL+re5yQhMQXgXAj4jCSyK7Dw=; b=C3OBaRGbKEZ38hsaVieALNuZc4
-	J5c+21q5RmgA2GjQ9woK2RoYPdCJKKSbbVoR2T1N8Im0WVMyR7ThOcwDLuOf+sflbU/o2F0DZXJRK
-	HZ787GEhcwPvHPwzNOI8TpXFZzmrV+XB7AFjJDwR9AtwV85NLJThIMNKpsykfXBJoInjCj0ITHut6
-	qt7nfdpPqOy/A0+9DnsUlfYdclR6FSyy0uKAilRzyC+HTp/o5q1KMeqdMcD1GbTSFAYCwg5Vqe9LC
-	f1VLF13JYmK/GmJRFfG/RY643UwBtLSw/+lxDkXPQ4jqgEN1XEvZXHjiPuhezxi/5hpXQzv2QxYpO
-	Micye5+ooP+xs9ljkSiNYxaTPuq6Ui+t/NOSWwEY0eaLPfNAIgPVvxhWGdGnAmmjGvumQVd/9mznU
-	1q5Y5hrPcjMyXtMZ/CVzBGKJN1bLsqSorPvQcK/fpsPau51Tq8Sw5Bnx4yqXkljlK7PvupK7C2TDZ
-	JcTr5dRzmHrvfNqh/Ar0Dx+v;
+	bh=7ubsP+SWHfRC2bI9lCg3c2d7FSEDuWknQuvsHJZhbFw=; b=ifo0Z/lyfZ5cYUSR+bhvzRW5Mt
+	TIFTdzfTLP+mDTXF8Qb4k6JrfIfaYXgszHLg3/ufDKwnjDLAf3gNry1si9crQfdYSNkoAuKEDwjEj
+	tG6vUHSNluBdMdITwncluY5n0n5Ngf6OVkmbBoKrb9KwqYUydzOfrNeDUOzTCSbf/dLQ9ihCeD0sA
+	t+Obw16a04tPIjwVfHgRIRU6Lr9n/Ae8f3LzMvYsvKN0R9YezJy6gePAmHvkcpRIA7wnEQB9pyTGI
+	FhBmHS7ZkTcwY900Ho/0EdsACv1RnJ/Ed4eSpWlLJEsQuAZmhPo5trzb+/C/GoGAjXDOiO3c8dQNE
+	BzHlkSjbqGiqe/mIu8UpYjFLOatGEo4iy8lbYSjAiytBos3GXIsMKgNxeM4YkuB8a9909K7Hszves
+	cpl6UXp2YWly9XLZZeAG0Xy0VyJu4+xLr6i+iPqH5V+16lSLcWW7tuUxxLI+1DC8O61NVFXjjbkH/
+	iA12d1Wl1Qp94CXpM2M5wv9L;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vE6EO-00BcAS-1G;
-	Wed, 29 Oct 2025 13:28:52 +0000
+	id 1vE6EU-00BcB5-0H;
+	Wed, 29 Oct 2025 13:28:58 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -40,9 +40,9 @@ Cc: metze@samba.org,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v2 065/127] smb: client: make use of smbdirect_frwr_is_supported()
-Date: Wed, 29 Oct 2025 14:20:43 +0100
-Message-ID: <74930afdb9ca1f722e7c92273af8aaabb2bcdf53.1761742839.git.metze@samba.org>
+Subject: [PATCH v2 066/127] smb: client: make use of smbdirect_connection_{alloc,free}_send_io()
+Date: Wed, 29 Oct 2025 14:20:44 +0100
+Message-ID: <d9892df7ea6e7f2ebcbb2ab92863ca087d510a77.1761742839.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1761742839.git.metze@samba.org>
 References: <cover.1761742839.git.metze@samba.org>
@@ -54,7 +54,18 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This an exact copy of frwr_is_supported().
+This simplifies the code and allows us to share more code in common
+with the server.
+
+The only difference is that we use ib_dma_unmap_page() for all sges,
+this simplifies the logic and doesn't matter as
+ib_dma_unmap_single() and ib_dma_unmap_page() both operate
+on dma_addr_t and dma_unmap_single_attrs() is just an
+alias for dma_unmap_page_attrs().
+
+We already had such an inconsistency before
+as we called ib_dma_unmap_single(), while we mapped
+using ib_dma_map_page() in smb_set_sge().
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -65,43 +76,128 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/smbdirect.c | 16 +---------------
- 1 file changed, 1 insertion(+), 15 deletions(-)
+ fs/smb/client/smbdirect.c | 42 ++++++++++++---------------------------
+ 1 file changed, 13 insertions(+), 29 deletions(-)
 
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index e61f41fd020b..ab8ce4c46bd6 100644
+index ab8ce4c46bd6..1eed0686a34d 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -783,20 +783,6 @@ static struct rdma_cm_id *smbd_create_id(
- 	return ERR_PTR(rc);
+@@ -390,7 +390,6 @@ static inline void *smbdirect_recv_io_payload(struct smbdirect_recv_io *response
+ /* Called when a RDMA send is done */
+ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
+ {
+-	int i;
+ 	struct smbdirect_send_io *request =
+ 		container_of(wc->wr_cqe, struct smbdirect_send_io, cqe);
+ 	struct smbdirect_socket *sc = request->socket;
+@@ -399,12 +398,8 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
+ 	log_rdma_send(INFO, "smbdirect_send_io 0x%p completed wc->status=%s\n",
+ 		request, ib_wc_status_msg(wc->status));
+ 
+-	for (i = 0; i < request->num_sge; i++)
+-		ib_dma_unmap_single(sc->ib.dev,
+-			request->sge[i].addr,
+-			request->sge[i].length,
+-			DMA_TO_DEVICE);
+-	mempool_free(request, sc->send_io.mem.pool);
++	/* Note this frees wc->wr_cqe, but not wc */
++	smbdirect_connection_free_send_io(request);
+ 	lcredits += 1;
+ 
+ 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
+@@ -835,15 +830,13 @@ static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
+ {
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 	struct ib_send_wr send_wr;
+-	int rc = -ENOMEM;
++	int rc;
+ 	struct smbdirect_send_io *request;
+ 	struct smbdirect_negotiate_req *packet;
+ 
+-	request = mempool_alloc(sc->send_io.mem.pool, GFP_KERNEL);
+-	if (!request)
+-		return rc;
+-
+-	request->socket = sc;
++	request = smbdirect_connection_alloc_send_io(sc);
++	if (IS_ERR(request))
++		return PTR_ERR(request);
+ 
+ 	packet = smbdirect_send_io_payload(request);
+ 	packet->min_version = cpu_to_le16(SMBDIRECT_V1);
+@@ -855,7 +848,6 @@ static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
+ 	packet->max_fragmented_size =
+ 		cpu_to_le32(sp->max_fragmented_recv_size);
+ 
+-	request->num_sge = 1;
+ 	request->sge[0].addr = ib_dma_map_single(
+ 				sc->ib.dev, (void *)packet,
+ 				sizeof(*packet), DMA_TO_DEVICE);
+@@ -866,6 +858,7 @@ static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
+ 
+ 	request->sge[0].length = sizeof(*packet);
+ 	request->sge[0].lkey = sc->ib.pd->local_dma_lkey;
++	request->num_sge = 1;
+ 
+ 	ib_dma_sync_single_for_device(
+ 		sc->ib.dev, request->sge[0].addr,
+@@ -892,13 +885,11 @@ static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
+ 	/* if we reach here, post send failed */
+ 	log_rdma_send(ERR, "ib_post_send failed rc=%d\n", rc);
+ 	atomic_dec(&sc->send_io.pending.count);
+-	ib_dma_unmap_single(sc->ib.dev, request->sge[0].addr,
+-		request->sge[0].length, DMA_TO_DEVICE);
+ 
+ 	smbdirect_connection_schedule_disconnect(sc, rc);
+ 
+ dma_mapping_failed:
+-	mempool_free(request, sc->send_io.mem.pool);
++	smbdirect_connection_free_send_io(request);
+ 	return rc;
  }
  
--/*
-- * Test if FRWR (Fast Registration Work Requests) is supported on the device
-- * This implementation requires FRWR on RDMA read/write
-- * return value: true if it is supported
-- */
--static bool frwr_is_supported(struct ib_device_attr *attrs)
--{
--	if (!(attrs->device_cap_flags & IB_DEVICE_MEM_MGT_EXTENSIONS))
--		return false;
--	if (attrs->max_fast_reg_page_list_len == 0)
--		return false;
--	return true;
--}
--
- static int smbd_ia_open(
- 		struct smbdirect_socket *sc,
- 		struct sockaddr *dstaddr, int port)
-@@ -814,7 +800,7 @@ static int smbd_ia_open(
+@@ -996,7 +987,7 @@ static int smbd_post_send_iter(struct smbdirect_socket *sc,
+ 			       int *_remaining_data_length)
+ {
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+-	int i, rc;
++	int rc;
+ 	int header_length;
+ 	int data_length;
+ 	struct smbdirect_send_io *request;
+@@ -1039,13 +1030,12 @@ static int smbd_post_send_iter(struct smbdirect_socket *sc,
+ 		goto wait_credit;
  	}
- 	sc->ib.dev = sc->rdma.cm_id->device;
  
--	if (!frwr_is_supported(&sc->ib.dev->attrs)) {
-+	if (!smbdirect_frwr_is_supported(&sc->ib.dev->attrs)) {
- 		log_rdma_event(ERR, "Fast Registration Work Requests (FRWR) is not supported\n");
- 		log_rdma_event(ERR, "Device capability flags = %llx max_fast_reg_page_list_len = %u\n",
- 			       sc->ib.dev->attrs.device_cap_flags,
+-	request = mempool_alloc(sc->send_io.mem.pool, GFP_KERNEL);
+-	if (!request) {
+-		rc = -ENOMEM;
++	request = smbdirect_connection_alloc_send_io(sc);
++	if (IS_ERR(request)) {
++		rc = PTR_ERR(request);
+ 		goto err_alloc;
+ 	}
+ 
+-	request->socket = sc;
+ 	memset(request->sge, 0, sizeof(request->sge));
+ 
+ 	/* Map the packet to DMA */
+@@ -1135,13 +1125,7 @@ static int smbd_post_send_iter(struct smbdirect_socket *sc,
+ 	wake_up(&sc->send_io.pending.dec_wait_queue);
+ 
+ err_dma:
+-	for (i = 0; i < request->num_sge; i++)
+-		if (request->sge[i].addr)
+-			ib_dma_unmap_single(sc->ib.dev,
+-					    request->sge[i].addr,
+-					    request->sge[i].length,
+-					    DMA_TO_DEVICE);
+-	mempool_free(request, sc->send_io.mem.pool);
++	smbdirect_connection_free_send_io(request);
+ 
+ 	/* roll back the granted receive credits */
+ 	atomic_sub(new_credits, &sc->recv_io.credits.count);
 -- 
 2.43.0
 
