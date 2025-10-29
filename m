@@ -1,299 +1,397 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D9329ACFD;
-	Wed, 29 Oct 2025 13:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B68E34888D
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761743067; cv=none; b=nn1jA5KY+rsEyVaSwgqOfytNUXF9pz7wOdDMUVvfBhGXcEFqEM31eevHRg/LfHAk5p/YHRMT/SnssndUZq61GlxLVwcjcKReXEESmYFxXmbghFXwjVNEYz+Ij+cocs0w8NWkHf5dyZxNulfGK7U7zZusHibC6R78nHha+9U3EdU=
+	t=1761744157; cv=none; b=MfF1xLk5aQUi/LMoQPkJ3J5ujM+LnC52KnirnO0mitJZ8QKXGEQtpqcXRrTEmGrf1PXHVXpd7TcMcZdh5N3/rPfOXIZZhUAMZjDoA6wdhLweMwVsGaANmAMxeH70hntN6DyqX+k9EhyBFSyVoPgn9fgCy/z+yfcjtUkrN3JswoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761743067; c=relaxed/simple;
-	bh=fE8QG9lwew0oeKgQNAFBdRSfba6pmQFQ0pQ1K4aw6h8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PyRHKcmW9MKnvC8Uc8SXzjNmO8JoVxBH095Wo6YRT/vqMASmftIwWwZpUin6T07Mz3d+ta6RhWrTiO6vPAJP8WxwUeq0zSJm42rxRPjXj7t3DU1eIjw80mszZknxqJTP6mpYW9XCFPHiI9MAdxHdkwWxVC+2Uc+pUztjeRZEZQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nMnKmgbU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761744157; c=relaxed/simple;
+	bh=Yf1S6VGd356OzS0ij64mXGpYQLTrNXVEUyy9B5A7vOg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pIb086uELsXCiKSNMDSW593AlS6BMjL//a+OCaf6GoLq1pP1GzKS9d0V4mZvcXhzxiyfJYL+KDuDqyUGYnmvz0KSrqFw3RPBIcH3VKCcDECn74cEYz6jX7kIu/rjJUHzVsdN3MRuvwRayuCXSEXZKLjvir7v7fgeCGUyTNv+2E8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=0NgBFagy; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nMnKmgbU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1BBAC4CEF7;
-	Wed, 29 Oct 2025 13:04:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761743066;
-	bh=fE8QG9lwew0oeKgQNAFBdRSfba6pmQFQ0pQ1K4aw6h8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nMnKmgbUkMNGtKk2BRBuHSCL2+AIuPvigBhRlrMg0BGXz2TsoBd8SL1+DEB5fZ4/Z
-	 ZJXQpx9O/3z47O4apzXbIZ0ZnIPyZ2nNZqV6tfYMJ669PkqdRyLWEObxaIoGzUz24r
-	 zjJhRL/jHBdXucZndgexGA0+ikPcr4EBYuI5FX4uUDurP5qojmd8jmqEG4ByLakzHq
-	 9rRg60BRMPrsdKSrgzkFejWk+aU/5X3vmtVHCp9n1LEuBnirTWGzoyh8xYduBkdgFw
-	 ZH270/i2hB+BCZOJOVXV7ic4idjSDYGTtxC+sK9Ij3e1BZj3Gzxcip1Ggp6mNfFDY6
-	 +5GtD6AOdSGeg==
-Date: Wed, 29 Oct 2025 14:04:15 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Miklos Szeredi <miklos@szeredi.hu>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Chuck Lever <chuck.lever@oracle.com>, 
-	Alexander Aring <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, 
-	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
-	Bharath SM <bharathsm@microsoft.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, NeilBrown <neil@brown.name>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
-	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v3 03/13] vfs: allow mkdir to wait for delegation break
- on parent
-Message-ID: <20251029-zeltlager-auspuff-0e3070d1a9c3@brauner>
-References: <20251021-dir-deleg-ro-v3-0-a08b1cde9f4c@kernel.org>
- <20251021-dir-deleg-ro-v3-3-a08b1cde9f4c@kernel.org>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="0NgBFagy"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=gFx1WV+b+1pjrdhef/BZYh7gYM0Xr2U53PWZ8i+Ahc4=; b=0NgBFagyneMH0MuAgOtW0YdM6M
+	c/tmuawsbAWnuo6+r8voXBVc0NG2NJHKI/OJllXgPTMQSVjmSlTsPOKokoiGLVPp0l2yv4NDEPbSJ
+	MjTQ+CFH74t1ScTvAHeqTByUnwCsY2KnVS5QDUHI9StZbD1zH3GtayYWhLXIzJ4mVts/YY4VdoUTX
+	+8l6Tcyq0BqdE5tU6cI+5bp9zUp9pceOEEz4Zbdnwj4sldvzMFGiATMWxGIs4f+Bbo40m41loFKjA
+	wF7RmzN7pLrTjlrm5xYGDGpAVmRNTScZqFAUBrkvWGlb2d9DtJ9JksbpDnBpoaSlXVi1/Ui016jH7
+	G/4+BSp4415J0rDRKthsuH7CV+fafzS2fJz+5agW/uiXT3meOjn+v3hegWtCM1oLqFYlC+bWmnump
+	LfzJc52GK3M4RLTznUExi74HIg8x/MXSsaQgsgTeFqPQK2Mr2LLMJuHLhI7gjVpxRGewTL4TJXGDo
+	gIO3bDYCOW6nborFwyoY5TKd;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vE68F-00BbEB-2T;
+	Wed, 29 Oct 2025 13:22:31 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	David Howells <dhowells@redhat.com>
+Subject: [PATCH v2 000/127] smb: smbdirect/client/server: moving to common functions and smbdirect.ko
+Date: Wed, 29 Oct 2025 14:19:38 +0100
+Message-ID: <cover.1761742839.git.metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251021-dir-deleg-ro-v3-3-a08b1cde9f4c@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 21, 2025 at 11:25:38AM -0400, Jeff Layton wrote:
-> In order to add directory delegation support, we need to break
-> delegations on the parent whenever there is going to be a change in the
-> directory.
-> 
-> Add a new delegated_inode parameter to vfs_mkdir. All of the existing
-> callers set that to NULL for now, except for do_mkdirat which will
-> properly block until the lease is gone.
-> 
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> Reviewed-by: NeilBrown <neil@brown.name>
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  drivers/base/devtmpfs.c  |  2 +-
->  fs/cachefiles/namei.c    |  2 +-
->  fs/ecryptfs/inode.c      |  2 +-
->  fs/init.c                |  2 +-
->  fs/namei.c               | 24 ++++++++++++++++++------
->  fs/nfsd/nfs4recover.c    |  2 +-
->  fs/nfsd/vfs.c            |  2 +-
->  fs/overlayfs/overlayfs.h |  2 +-
->  fs/smb/server/vfs.c      |  2 +-
->  fs/xfs/scrub/orphanage.c |  2 +-
->  include/linux/fs.h       |  2 +-
->  11 files changed, 28 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/base/devtmpfs.c b/drivers/base/devtmpfs.c
-> index 9d4e46ad8352257a6a65d85526ebdbf9bf2d4b19..0e79621cb0f79870003b867ca384199171ded4e0 100644
-> --- a/drivers/base/devtmpfs.c
-> +++ b/drivers/base/devtmpfs.c
-> @@ -180,7 +180,7 @@ static int dev_mkdir(const char *name, umode_t mode)
->  	if (IS_ERR(dentry))
->  		return PTR_ERR(dentry);
->  
-> -	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(path.dentry), dentry, mode);
-> +	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(path.dentry), dentry, mode, NULL);
->  	if (!IS_ERR(dentry))
->  		/* mark as kernel-created inode */
->  		d_inode(dentry)->i_private = &thread;
-> diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
-> index d1edb2ac38376c4f9d2a18026450bb3c774f7824..50c0f9c76d1fd4c05db90d7d0d1bad574523ead0 100644
-> --- a/fs/cachefiles/namei.c
-> +++ b/fs/cachefiles/namei.c
-> @@ -130,7 +130,7 @@ struct dentry *cachefiles_get_directory(struct cachefiles_cache *cache,
->  			goto mkdir_error;
->  		ret = cachefiles_inject_write_error();
->  		if (ret == 0)
-> -			subdir = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), subdir, 0700);
-> +			subdir = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), subdir, 0700, NULL);
->  		else
->  			subdir = ERR_PTR(ret);
->  		if (IS_ERR(subdir)) {
-> diff --git a/fs/ecryptfs/inode.c b/fs/ecryptfs/inode.c
-> index ed1394da8d6bd7065f2a074378331f13fcda17f9..35830b3144f8f71374a78b3e7463b864f4fc216e 100644
-> --- a/fs/ecryptfs/inode.c
-> +++ b/fs/ecryptfs/inode.c
-> @@ -508,7 +508,7 @@ static struct dentry *ecryptfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
->  		goto out;
->  
->  	lower_dentry = vfs_mkdir(&nop_mnt_idmap, lower_dir,
-> -				 lower_dentry, mode);
-> +				 lower_dentry, mode, NULL);
->  	rc = PTR_ERR(lower_dentry);
->  	if (IS_ERR(lower_dentry))
->  		goto out;
-> diff --git a/fs/init.c b/fs/init.c
-> index 07f592ccdba868509d0f3aaf9936d8d890fdbec5..895f8a09a71acfd03e11164e3b441a7d4e2de146 100644
-> --- a/fs/init.c
-> +++ b/fs/init.c
-> @@ -233,7 +233,7 @@ int __init init_mkdir(const char *pathname, umode_t mode)
->  	error = security_path_mkdir(&path, dentry, mode);
->  	if (!error) {
->  		dentry = vfs_mkdir(mnt_idmap(path.mnt), path.dentry->d_inode,
-> -				  dentry, mode);
-> +				  dentry, mode, NULL);
->  		if (IS_ERR(dentry))
->  			error = PTR_ERR(dentry);
->  	}
-> diff --git a/fs/namei.c b/fs/namei.c
-> index 6e61e0215b34134b1690f864e2719e3f82cf71a8..86cf6eca1f485361c6732974e4103cf5ea721539 100644
-> --- a/fs/namei.c
-> +++ b/fs/namei.c
-> @@ -4407,10 +4407,11 @@ SYSCALL_DEFINE3(mknod, const char __user *, filename, umode_t, mode, unsigned, d
->  
->  /**
->   * vfs_mkdir - create directory returning correct dentry if possible
-> - * @idmap:	idmap of the mount the inode was found from
-> - * @dir:	inode of the parent directory
-> - * @dentry:	dentry of the child directory
-> - * @mode:	mode of the child directory
-> + * @idmap:		idmap of the mount the inode was found from
-> + * @dir:		inode of the parent directory
-> + * @dentry:		dentry of the child directory
-> + * @mode:		mode of the child directory
-> + * @delegated_inode:	returns parent inode, if the inode is delegated.
+Hi,
 
-I wonder if it would be feasible and potentially elegant if delegated
-inodes were returned as separate type like struct delegated_inode
-similar to the vfsuid_t just a struct wrapper around the inode itself.
-The advantage is that it's not possible to accidently abuse this thing
-as we're passing that stuff around to try_break_deleg() and so on.
+this is the move use common functions in an smbdirect.ko.
 
->   *
->   * Create a directory.
->   *
-> @@ -4427,7 +4428,8 @@ SYSCALL_DEFINE3(mknod, const char __user *, filename, umode_t, mode, unsigned, d
->   * In case of an error the dentry is dput() and an ERR_PTR() is returned.
->   */
->  struct dentry *vfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
-> -			 struct dentry *dentry, umode_t mode)
-> +			 struct dentry *dentry, umode_t mode,
-> +			 struct inode **delegated_inode)
->  {
->  	int error;
->  	unsigned max_links = dir->i_sb->s_max_links;
-> @@ -4450,6 +4452,10 @@ struct dentry *vfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
->  	if (max_links && dir->i_nlink >= max_links)
->  		goto err;
->  
-> +	error = try_break_deleg(dir, delegated_inode);
-> +	if (error)
-> +		goto err;
-> +
->  	de = dir->i_op->mkdir(idmap, dir, dentry, mode);
->  	error = PTR_ERR(de);
->  	if (IS_ERR(de))
-> @@ -4473,6 +4479,7 @@ int do_mkdirat(int dfd, struct filename *name, umode_t mode)
->  	struct path path;
->  	int error;
->  	unsigned int lookup_flags = LOOKUP_DIRECTORY;
-> +	struct inode *delegated_inode = NULL;
->  
->  retry:
->  	dentry = filename_create(dfd, name, &path, lookup_flags);
-> @@ -4484,11 +4491,16 @@ int do_mkdirat(int dfd, struct filename *name, umode_t mode)
->  			mode_strip_umask(path.dentry->d_inode, mode));
->  	if (!error) {
->  		dentry = vfs_mkdir(mnt_idmap(path.mnt), path.dentry->d_inode,
-> -				  dentry, mode);
-> +				   dentry, mode, &delegated_inode);
->  		if (IS_ERR(dentry))
->  			error = PTR_ERR(dentry);
->  	}
->  	end_creating_path(&path, dentry);
-> +	if (delegated_inode) {
-> +		error = break_deleg_wait(&delegated_inode);
-> +		if (!error)
-> +			goto retry;
-> +	}
->  	if (retry_estale(error, lookup_flags)) {
->  		lookup_flags |= LOOKUP_REVAL;
->  		goto retry;
-> diff --git a/fs/nfsd/nfs4recover.c b/fs/nfsd/nfs4recover.c
-> index b1005abcb9035b2cf743200808a251b00af7e3f4..423dd102b51198ea7c447be2b9a0a5020c950dba 100644
-> --- a/fs/nfsd/nfs4recover.c
-> +++ b/fs/nfsd/nfs4recover.c
-> @@ -202,7 +202,7 @@ nfsd4_create_clid_dir(struct nfs4_client *clp)
->  		 * as well be forgiving and just succeed silently.
->  		 */
->  		goto out_put;
-> -	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), dentry, S_IRWXU);
-> +	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), dentry, 0700, NULL);
->  	if (IS_ERR(dentry))
->  		status = PTR_ERR(dentry);
->  out_put:
-> diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
-> index 8b2dc7a88aab015d1e39da0dd4e6daf7e276aabe..5f24af289d509bea54a324b8851fa06de6050353 100644
-> --- a/fs/nfsd/vfs.c
-> +++ b/fs/nfsd/vfs.c
-> @@ -1645,7 +1645,7 @@ nfsd_create_locked(struct svc_rqst *rqstp, struct svc_fh *fhp,
->  			nfsd_check_ignore_resizing(iap);
->  		break;
->  	case S_IFDIR:
-> -		dchild = vfs_mkdir(&nop_mnt_idmap, dirp, dchild, iap->ia_mode);
-> +		dchild = vfs_mkdir(&nop_mnt_idmap, dirp, dchild, iap->ia_mode, NULL);
->  		if (IS_ERR(dchild)) {
->  			host_err = PTR_ERR(dchild);
->  		} else if (d_is_negative(dchild)) {
-> diff --git a/fs/overlayfs/overlayfs.h b/fs/overlayfs/overlayfs.h
-> index c8fd5951fc5ece1ae6b3e2a0801ca15f9faf7d72..0f65f9a5d54d4786b39e4f4f30f416d5b9016e70 100644
-> --- a/fs/overlayfs/overlayfs.h
-> +++ b/fs/overlayfs/overlayfs.h
-> @@ -248,7 +248,7 @@ static inline struct dentry *ovl_do_mkdir(struct ovl_fs *ofs,
->  {
->  	struct dentry *ret;
->  
-> -	ret = vfs_mkdir(ovl_upper_mnt_idmap(ofs), dir, dentry, mode);
-> +	ret = vfs_mkdir(ovl_upper_mnt_idmap(ofs), dir, dentry, mode, NULL);
->  	pr_debug("mkdir(%pd2, 0%o) = %i\n", dentry, mode, PTR_ERR_OR_ZERO(ret));
->  	return ret;
->  }
-> diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-> index 891ed2dc2b7351a5cb14a2241d71095ffdd03f08..3d2190f26623b23ea79c63410905a3c3ad684048 100644
-> --- a/fs/smb/server/vfs.c
-> +++ b/fs/smb/server/vfs.c
-> @@ -230,7 +230,7 @@ int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char *name, umode_t mode)
->  	idmap = mnt_idmap(path.mnt);
->  	mode |= S_IFDIR;
->  	d = dentry;
-> -	dentry = vfs_mkdir(idmap, d_inode(path.dentry), dentry, mode);
-> +	dentry = vfs_mkdir(idmap, d_inode(path.dentry), dentry, mode, NULL);
->  	if (IS_ERR(dentry))
->  		err = PTR_ERR(dentry);
->  	else if (d_is_negative(dentry))
-> diff --git a/fs/xfs/scrub/orphanage.c b/fs/xfs/scrub/orphanage.c
-> index 9c12cb8442311ca26b169e4d1567939ae44a5be0..91c9d07b97f306f57aebb9b69ba564b0c2cb8c17 100644
-> --- a/fs/xfs/scrub/orphanage.c
-> +++ b/fs/xfs/scrub/orphanage.c
-> @@ -167,7 +167,7 @@ xrep_orphanage_create(
->  	 */
->  	if (d_really_is_negative(orphanage_dentry)) {
->  		orphanage_dentry = vfs_mkdir(&nop_mnt_idmap, root_inode,
-> -					     orphanage_dentry, 0750);
-> +					     orphanage_dentry, 0750, NULL);
->  		error = PTR_ERR(orphanage_dentry);
->  		if (IS_ERR(orphanage_dentry))
->  			goto out_unlock_root;
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index c895146c1444be36e0a779df55622cc38c9419ff..1040df3792794cd353b86558b41618294e25b8a6 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -2113,7 +2113,7 @@ bool inode_owner_or_capable(struct mnt_idmap *idmap,
->  int vfs_create(struct mnt_idmap *, struct inode *,
->  	       struct dentry *, umode_t, bool);
->  struct dentry *vfs_mkdir(struct mnt_idmap *, struct inode *,
-> -			 struct dentry *, umode_t);
-> +			 struct dentry *, umode_t, struct inode **);
->  int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
->                umode_t, dev_t);
->  int vfs_symlink(struct mnt_idmap *, struct inode *,
-> 
-> -- 
-> 2.51.0
-> 
+It can also be found in my for-6.19/fs-smb-20251029-v2 branch,
+at commit ca69115a279fbe0455c1b48d283072520e257d45:
+git fetch https://git.samba.org/metze/linux/wip.git for-6.19/fs-smb-20251029-v2
+https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/for-6.19/fs-smb-20251029-v2
+
+It is based on origin/master and smfrench-smb3-kernel/ksmbd-for-next
+at commit e53642b87a4f4b03a8d7e5f8507fc3cd0c595ea6
+
+Plus the patches from
+https://lore.kernel.org/linux-cifs/20251027065102.12104-1-linkinjeon@kernel.org/
+ksmbd: detect RDMA capable lower devices when bridge and vlan netdev is used
+ksmbd: detect RDMA capable netdevs include IPoIB
+
+and
+
+https://lore.kernel.org/linux-cifs/20251028174347.1800568-1-metze@samba.org/
+smb: client: call smbd_destroy() in the same splace as
+kernel_sock_shutdown()/sock_release()
+
+The end goal is still to go via the socket layer in order
+to provide smbdirect support to userspace, so that Samba
+can use if as client and server. But that will be done on
+top of this patchset.
+
+The patchset starts with the introduction of
+a logging infrastructure that allows us to have
+common code, but still do logging with cifs.ko
+and ksmbd.ko specific functions.
+
+Then it introduces smbdirect_all_c_files.c, which
+is only temporary. It is included in the client and
+server and will itself include more files with
+common functions in the following patches.
+This makes it possible to do the transition in
+small steps. At the end this will be removed again,
+while removing the file itself will be done in a later
+patchset.
+
+Then we have a series of patches introducing
+common functions, most of them are copies
+of the existing functions, just with a new name
+and some reformatting. But the core logic is
+mostly unchanged.
+
+Then we have new functions related to async
+connect and accept handling.
+
+Followed by preparing some functions as public
+and some as private, so that we have the
+Kbuild logic for smbdirect.ko, which is
+still disabled at that point.
+
+Then we have small steps in the client in order
+to make use of the new functions. At the end
+is only uses smbdirect.ko and its exported functions.
+
+Then we have small steps in the server in order
+to make use of the new functions. At the end
+is only uses smbdirect.ko and its exported functions.
+
+Every patch compiles on its own and passes
+  grep -v 'Fixes: 0626e6641f6b ' | \
+    scripts/checkpatch.pl --quiet --codespell \
+      --ignore=FILE_PATH_CHANGES,EXPORT_SYMBOL,COMPLEX_MACRO
+
+I've tested these tests at the end of the
+patchset with siw and rxe:
+
+cifs/001
+generic/001
+generic/002
+generic/005
+generic/006
+generic/007
+generic/008
+generic/011
+generic/024
+generic/028
+generic/029
+generic/030
+generic/033
+generic/036
+generic/069
+generic/071
+generic/080
+generic/084
+generic/086
+generic/095
+generic/098
+generic/103
+generic/124
+generic/130
+generic/132
+generic/135
+generic/141
+generic/198
+generic/207
+generic/210
+generic/212
+generic/214
+generic/215
+generic/221
+generic/228
+generic/236
+generic/246
+generic/248
+generic/249
+generic/257
+generic/258
+generic/308
+generic/309
+generic/313
+generic/315
+generic/339
+generic/340
+generic/344
+generic/345
+generic/346
+generic/354
+generic/360
+generic/390
+generic/391
+generic/393
+generic/394
+generic/406
+generic/412
+
+Can we get this into for-next-next?
+
+David, if you rebase on this, you should be able to use
+smbdirect_connection_send_iter() directly in smbd_send() and
+remove the iov_iter_advance(iter, 4); before calling smbd_send().
+smb_extract_bvecq_to_rdma() should be added as
+smbdirect_map_sges_from_bvecq() into smbdirect_map_sges_from_iter().
+
+From there I'll work on the changes to introduce IPPROTO_SMBDIRECT.
+
+Stefan Metzmacher (127):
+  smb: smbdirect: let smbdirect.h include #include <linux/types.h>
+  smb: smbdirect: introduce SMBDIRECT_DEBUG_ERR_PTR() helper
+  smb: smbdirect: introduce smbdirect_socket.logging infrastructure
+  smb: smbdirect: introduce smbdirect_all_c_files.c
+  smb: smbdirect: introduce smbdirect_internal.h
+  smb: client: include smbdirect_all_c_files.c
+  smb: server: include smbdirect_all_c_files.c
+  smb: smbdirect: introduce smbdirect_connection.c with the first helper
+    function
+  smb: smbdirect: introduce smbdirect_socket_set_logging()
+  smb: smbdirect: introduce smbd_disconnect_wake_up_all()
+  smb: smbdirect: introduce smbdirect_connection_disconnect_work()
+  smb: smbdirect: introduce smbdirect_connection_schedule_disconnect()
+  smb: smbdirect: introduce smbdirect_connection_{get,put}_recv_io()
+  smb: smbdirect: introduce
+    smbdirect_connection_reassembly_{append,first}_recv_io()
+  smb: smbdirect: introduce smbdirect_connection_idle_timer_work()
+  smb: smbdirect: set SMBDIRECT_KEEPALIVE_NONE before
+    disable_delayed_work(&sc->idle.timer_work);
+  smb: smbdirect: introduce smbdirect_frwr_is_supported()
+  smb: smbdirect: introduce smbdirect_socket.{send,recv}_io.mem.gfp_mask
+  smb: smbdirect: introduce smbdirect_connection_{alloc,free}_send_io()
+  smb: smbdirect: introduce smbdirect_connection_send_io_done()
+  smb: smbdirect: introduce
+    smbdirect_connection_{create,destroy}_mem_pools()
+  smb: smbdirect: introduce smbdirect_map_sges_from_iter() and helper
+    functions
+  smb: smbdirect: introduce smbdirect_connection_qp_event_handler()
+  smb: smbdirect: introduce
+    smbdirect_connection_negotiate_rdma_resources()
+  smb: smbdirect: introduce smbdirect_connection_{create,destroy}_qp()
+  smb: smbdirect: introduce smbdirect_connection_post_recv_io()
+  smb: smbdirect: introduce smbdirect_connection_recv_io_refill_work()
+  smb: smbdirect: split out smbdirect_connection_recv_io_refill()
+  smb: smbdirect: introduce smbdirect_get_buf_page_count()
+  smb: smbdirect: introduce smbdirect_connection_wait_for_credits()
+  smb: smbdirect: introduce smbdirect_mr.c with client mr code
+  smb: smbdirect: introduce smbdirect_rw.c with server rw code
+  smb: smbdirect: define SMBDIRECT_MIN_{RECEIVE,FRAGMENTED}_SIZE
+  smb: smbdirect: define SMBDIRECT_RDMA_CM_[RNR_]RETRY
+  smb: smbdirect: introduce smbdirect_connection_recv_io_done()
+  smb: smbdirect: introduce smbdirect_connection_destroy[_sync]()
+  smb: smbdirect: introduce
+    smbdirect_connection_rdma_{established,event_handler}()
+  smb: smbdirect: introduce smbdirect_connection_recvmsg()
+  smb: smbdirect: introduce smbdirect_connection_grant_recv_credits()
+  smb: smbdirect: introduce smbdirect_connection_request_keep_alive()
+  smb: smbdirect: introduce smbdirect_connection_send_iter() and related
+    functions
+  smb: smbdirect: introduce smbdirect_connection_send_immediate_work()
+  smb: smbdirect: introduce smbdirect_connection_negotiation_done()
+  smb: smbdirect: introduce smbdirect_mr_io_fill_buffer_descriptor()
+  smb: smbdirect: introduce
+    smbdirect_connection_legacy_debug_proc_show()
+  smb: smbdirect: introduce smbdirect_connection_wait_for_connected()
+  smb: smbdirect: introduce smbdirect_connection_is_connected()
+  smb: smbdirect: introduce smbdirect_socket_shutdown()
+  smb: smbdirect: introduce smbdirect_socket_init_{new,accepting}() and
+    helpers
+  smb: smbdirect: introduce smbdirect_connect[_sync]()
+  smb: smbdirect: introduce smbdirect_accept_connect_request()
+  smb: smbdirect: introduce smbdirect_socket_create_{kern,accepting}()
+    and smbdirect_socket_release()
+  smb: smbdirect: let smbdirect_internal.h define pr_fmt without
+    SMBDIRECT_USE_INLINE_C_FILES
+  smb: smbdirect: introduce smbdirect_public.h with prototypes
+  smb: smbdirect: introduce smbdirect_private.h with prototypes
+  smb: smbdirect: introduce the basic smbdirect.ko
+  smb: client: make use of smbdirect_socket_prepare_create()
+  smb: client: make use of smbdirect_socket_set_logging()
+  smb: client: make use of smbdirect_connection_wake_up_all()
+  smb: client: make use of smbdirect_connection_disconnect_work()
+  smb: client: make use of smbdirect_connection_schedule_disconnect()
+  smb: client: make use of smbdirect_connection_{get,put}_recv_io()
+  smb: client: make use of
+    smbdirect_connection_reassembly_{append,first}_recv_io()
+  smb: client: make use of smbdirect_connection_idle_timer_work()
+  smb: client: make use of smbdirect_frwr_is_supported()
+  smb: client: make use of smbdirect_connection_{alloc,free}_send_io()
+  smb: client: make use of smbdirect_connection_send_io_done()
+  smb: client: make use of
+    smbdirect_connection_{create,destroy}_mem_pools()
+  smb: client: make use of smbdirect_map_sges_from_iter()
+  smb: client: make use of smbdirect_connection_qp_event_handler()
+  smb: client: make use of
+    smbdirect_connection_negotiate_rdma_resources()
+  smb: client: make use of smbdirect_connection_{create,destroy}_qp()
+  smb: client: initialize recv_io->cqe.done = recv_done just once
+  smb: client: make use of smbdirect_connection_post_recv_io()
+  smb: client: make use of smbdirect_connection_recv_io_refill_work()
+  smb: client: make use of functions from smbdirect_mr.c
+  smb: client: make use of smbdirect_connection_destroy_sync()
+  smb: client: make use of smbdirect_connection_recvmsg()
+  smb: client: let smbd_post_send() make use of request->wr
+  smb: client: make use of smbdirect_connection_grant_recv_credits()
+  smb: client: make use of smbdirect_connection_request_keep_alive()
+  smb: client: change smbd_post_send_empty() to void return
+  smb: client: let smbd_post_send_iter() get remaining_length and return
+    data_length
+  smb: client: let smbd_post_send_full_iter() get remaining_length and
+    return data_length
+  smb: client: make use of
+    smbdirect_connection_send_{single_iter,immediate_work}()
+  smb: client: introduce and use smbd_mr_fill_buffer_descriptor()
+  smb: client: introduce and use smbd_debug_proc_show()
+  smb: client: make use of smbdirect_socket_init_new() and
+    smbdirect_connect_sync()
+  smb: client: make use of
+    smbdirect_socket_create_kern()/smbdirect_socket_release()
+  smb: client: only use public smbdirect functions
+  smb: client: make use of smbdirect.ko
+  smb: server: make use of smbdirect_socket_prepare_create()
+  smb: server: make use of smbdirect_socket_set_logging()
+  smb: server: make use of smbdirect_connection_wake_up_all()
+  smb: server: make use of smbdirect_connection_disconnect_work()
+  smb: server: make use of smbdirect_connection_schedule_disconnect()
+  smb: server: make use of smbdirect_connection_{get,put}_recv_io()
+  smb: server: make use of
+    smbdirect_connection_reassembly_{append,first}_recv_io()
+  smb: server: make use of smbdirect_connection_idle_timer_work()
+  smb: server: make use of smbdirect_frwr_is_supported()
+  smb: server: make use of smbdirect_connection_{alloc,free}_send_io()
+  smb: server: make use of smbdirect_connection_send_io_done()
+  smb: server: make use of
+    smbdirect_connection_{create,destroy}_mem_pools()
+  smb: server: make use of smbdirect_map_sges_from_iter()
+  smb: server: make use of smbdirect_connection_qp_event_handler()
+  smb: server: make use of
+    smbdirect_connection_negotiate_rdma_resources()
+  smb: server: make use of smbdirect_connection_{create,destroy}_qp()
+  smb: server: initialize recv_io->cqe.done = recv_done just once
+  smb: server: make use of smbdirect_connection_post_recv_io()
+  smb: server: make use of smbdirect_connection_recv_io_refill[_work]()
+  smb: server: make use of smbdirect_get_buf_page_count()
+  smb: server: make use of smbdirect_connection_wait_for_credits()
+  smb: server: make use of functions from smbdirect_rw.c
+  smb: server: make use of smbdirect_connection_destroy_sync()
+  smb: server: make use of smbdirect_connection_recvmsg()
+  smb: server: make use of smbdirect_connection_grant_recv_credits()
+  smb: server: make use of smbdirect_connection_request_keep_alive()
+  smb: server: move iov_iter_kvec() out of smb_direct_post_send_data()
+  smb: server: inline smb_direct_create_header() into
+    smb_direct_post_send_data()
+  smb: server: let smbdirect_map_sges_from_iter() truncate the message
+    boundary
+  smb: server: split out smb_direct_send_iter() out of
+    smb_direct_writev()
+  smb: server: let smb_direct_post_send_data() return data_length
+  smb: server: make use of smbdirect_connection_send_iter() and related
+    functions
+  smb: server: make use of
+    smbdirect_{socket_init_accepting,connection_wait_for_connected}()
+  smb: server: make use of
+    smbdirect_socket_create_accepting()/smbdirect_socket_release()
+  smb: server: only use public smbdirect functions
+  smb: server: make use of smbdirect.ko
+
+ fs/smb/Kconfig                                |    2 +
+ fs/smb/client/Kconfig                         |    3 +-
+ fs/smb/client/cifs_debug.c                    |   67 +-
+ fs/smb/client/smb2pdu.c                       |    9 +-
+ fs/smb/client/smbdirect.c                     | 2813 +----------------
+ fs/smb/client/smbdirect.h                     |   20 +-
+ fs/smb/common/Makefile                        |    1 +
+ fs/smb/common/smbdirect/Kconfig               |    9 +
+ fs/smb/common/smbdirect/Makefile              |   15 +
+ fs/smb/common/smbdirect/smbdirect.h           |    2 +
+ fs/smb/common/smbdirect/smbdirect_accept.c    |  596 ++++
+ .../common/smbdirect/smbdirect_all_c_files.c  |   23 +
+ fs/smb/common/smbdirect/smbdirect_connect.c   |  797 +++++
+ .../common/smbdirect/smbdirect_connection.c   | 2631 +++++++++++++++
+ fs/smb/common/smbdirect/smbdirect_debug.c     |   89 +
+ fs/smb/common/smbdirect/smbdirect_internal.h  |   20 +
+ fs/smb/common/smbdirect/smbdirect_main.c      |   24 +
+ fs/smb/common/smbdirect/smbdirect_mr.c        |  565 ++++
+ fs/smb/common/smbdirect/smbdirect_pdu.h       |    4 +
+ fs/smb/common/smbdirect/smbdirect_private.h   |   92 +
+ fs/smb/common/smbdirect/smbdirect_public.h    |  154 +
+ fs/smb/common/smbdirect/smbdirect_rw.c        |  254 ++
+ fs/smb/common/smbdirect/smbdirect_socket.h    |  206 +-
+ fs/smb/server/Kconfig                         |    4 +-
+ fs/smb/server/smb2pdu.c                       |    1 -
+ fs/smb/server/transport_rdma.c                | 2399 +-------------
+ fs/smb/server/transport_rdma.h                |    2 +
+ 27 files changed, 5823 insertions(+), 4979 deletions(-)
+ create mode 100644 fs/smb/common/smbdirect/Kconfig
+ create mode 100644 fs/smb/common/smbdirect/Makefile
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_accept.c
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_all_c_files.c
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_connect.c
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_connection.c
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_debug.c
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_internal.h
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_main.c
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_mr.c
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_private.h
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_public.h
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_rw.c
+
+-- 
+2.43.0
+
