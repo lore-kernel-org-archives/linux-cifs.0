@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F50037A3A2
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE281DE8AD
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Oct 2025 13:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761744778; cv=none; b=a7Q/EhDfaxD0T75ty/oVKd8rneAhj+9vvBvvKXNV0tF+i2deT6Q18EYaMNwk7yMXzehc0mxbd/4HDS9v6AOUKKFkBA5xLE9O8d0PJneTn6l4QR4mJkntrVihIW+iMcqXxaNWROqoptgrdcyl/h7eQgxbSWENKO5xZtOhvOvkY4s=
+	t=1761744786; cv=none; b=ECaN0cHE/D2W79eUL9FYG66y2w4inZu7kNv6mWH9TdzX8lhjbBStJ0ULJ/F+e3aJYIkKopgleH1MbSNU45ZqTSNb40jZEPF6tEBYFgDhwbFy2UiZsTcSYZmx1MLN35m657SfOFln/KkJCLKUGE/Rsdige4a/leTckLi7CU2ULDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761744778; c=relaxed/simple;
-	bh=XDNZcYPXtJ03g5OxJdSM52Npqhdkte6XaZ38LbASLuA=;
+	s=arc-20240116; t=1761744786; c=relaxed/simple;
+	bh=U9Ti/OSP3QQGRHUxu2Dli8Lbc1otdYdGInSWDEsvXjU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Sjh022kMxDquiRrobOGOxOfC9ynxksx8C8mNHtxTI1zzhfvn2qBy4iFzAQltbbnpUu3fjigloZD/vBCw2Yeek7PqDmbmCtRJfA+y+9rocj0tnZdkGNkfYhsHV0Kb+M1I6U329sr07Q6v0ZtL4WkjJ7U/CNs4HSa0X7luT1rK79M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=hjqUeFnC; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=oaungJ19CRc1eaDouIqFTTDZWqmZp+G49dXY3a1G882iaeIRZk2FxWM2BPwvPuI19TCCbHsADg6IH8NHgdRWgu5mblhZ/hXG98p+Hbf+7PtWUmo52YY+q9JeQxUGJivLLe1of26879rUzqxbViB/qNzJawovBuyJwgFl6/WKGxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=VhoeLfFr; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="hjqUeFnC"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="VhoeLfFr"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=cyE40zN8p+hnxqMWBmHhn8DwD3WxBsCMiG4WMRAX4CQ=; b=hjqUeFnCOnIYm6kOpC/ThaPsRa
-	+kSRmx6rRjkS4NZAwdk9QFhwct8QrWLXhv3AW5+uuYTzZhygaipyS/OTYClB5hUyxd3yhUBK7XEUG
-	tHAUgeXM+esZmL2QNesJAS42Dz6jZdOcbTmAhhnZ95jyJ+Sbirzx8vd2Up53SVDkfSeywb5nEkr97
-	Gu9hnJFeeLFpsaiR1aocT8qlQFvRWJ1lYLd5ohD2BTli7DluNbpM0NQ6q52Js+z2U0INuz35lkM+A
-	jWQ024poDexV4i0skfrI+msft9dyHB/c9D3xn3rMa4NAK7NjSMcoXRdl40Li0RsebQs7hODZ9Rafr
-	vr3f3SpGtu7FCyzspMJaZpff1LwObElg6Adf1KhWG/LL/U7wvuzhCja0zU+jf7BzwBX3Kz0OwKygq
-	PcE7AffTs+dgQMD7natnGu0PMyc5j/ZmjvvyYKAVNIJ0kPxLIhNX8BoHcEq2b03udirQJRwCk0Z7m
-	wYWK0qShQpQYlMw0dcJ4tSSf;
+	bh=QwQXgNapX9ca/6/adGL3E0qWvfYpdKxJw8a1c/f5+xA=; b=VhoeLfFrhEr+cfx82GifbnVRSh
+	uRJ41EnWpjxVPL3r9eLPvjtqYbkYMoUDqDQrNBO9HFi8AoVAU2L0pIAf2B0WEUsM/ECAn/hLqWrrC
+	1ep5rQoHf+fuDbtBIqzaYUBwBwITv3vY6JP3EmZkD6AKBL6D8e3JJ5++/X1+/2FtjrUvCCw5yWf1q
+	UBGznN9xgr7sTdMLv8XxLFRMU3PYtnRz0nwSoMD+UvSfFw0dfx2Gml25L+ZpWAOvIna/FWRcb7ksJ
+	NgXcIkoZeQ1SRJP9qCmTX2GvaSCWLfkdxkdrbtX7hV3Rk1IH2+sh43+8biyIQ221KxFTQDTjrQ1xX
+	B6o10SXIFQT5XTil23OGXg5128yJbW82x4xhAOl+d/Oi2gluxcxn6Nr+aW1DBeC9CgXLZFKo3HxZ/
+	Rg7f+RRFvcpQhlwkqByE0f/s4M5Y7sUpUDcus4Vnpy2lZcWBk3xg3icQaLCFM449EvjwHoCVr8A2Q
+	YOO7FHPB9zt7OU1utvoTN+KW;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vE6IH-00BcpJ-2G;
-	Wed, 29 Oct 2025 13:32:53 +0000
+	id 1vE6IN-00Bcqb-1O;
+	Wed, 29 Oct 2025 13:32:59 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -39,9 +39,9 @@ Cc: metze@samba.org,
 	Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v2 103/127] smb: server: make use of smbdirect_connection_{create,destroy}_mem_pools()
-Date: Wed, 29 Oct 2025 14:21:21 +0100
-Message-ID: <b9cf44de30ca9348998c61a540dbfdf6363080f2.1761742839.git.metze@samba.org>
+Subject: [PATCH v2 104/127] smb: server: make use of smbdirect_map_sges_from_iter()
+Date: Wed, 29 Oct 2025 14:21:22 +0100
+Message-ID: <11d1c5a951ffbb6bf27f8c2d1acc8ee199c91c02.1761742839.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1761742839.git.metze@samba.org>
 References: <cover.1761742839.git.metze@samba.org>
@@ -53,19 +53,8 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This were based on smb_direct_{create,destroy}_pools() in the server.
-
-The main logical differences are the following:
-
-We now don't use smbdirect_connection_get_recv_io() on cleanup,
-instead it uses list_for_each_entry_safe()...
-
-We don't generate warnings if smbdirect_recv_io payload
-is copied into userspace buffers. This doesn't happen
-in the server anyway.
-
-And it uses list_add_tail() just to let me feel
-better when looking at the code...
+It will make it easier to move stuff into common code when
+both client and server use smbdirect_map_sges_from_iter().
 
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
@@ -75,124 +64,97 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/server/transport_rdma.c | 76 ++--------------------------------
- 1 file changed, 3 insertions(+), 73 deletions(-)
+ fs/smb/server/transport_rdma.c | 58 +++++++++++-----------------------
+ 1 file changed, 19 insertions(+), 39 deletions(-)
 
 diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index aff7ac3054bc..3c36c4c0580d 100644
+index 3c36c4c0580d..4e2de2664e31 100644
 --- a/fs/smb/server/transport_rdma.c
 +++ b/fs/smb/server/transport_rdma.c
-@@ -202,7 +202,6 @@ static inline int get_buf_page_count(void *buf, int size)
- 		(uintptr_t)buf / PAGE_SIZE;
+@@ -1005,18 +1005,6 @@ static int get_sg_list(void *buf, int size, struct scatterlist *sg_list, int nen
+ 	return i;
  }
  
--static void smb_direct_destroy_pools(struct smbdirect_socket *sc);
- static void smb_direct_post_recv_credits(struct work_struct *work);
- static int smb_direct_post_send_data(struct smbdirect_socket *sc,
- 				     struct smbdirect_send_batch *send_ctx,
-@@ -259,6 +258,7 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
- 				     smb_direct_logging_needed,
- 				     smb_direct_logging_vaprintf);
- 	sc->send_io.mem.gfp_mask = KSMBD_DEFAULT_GFP;
-+	sc->recv_io.mem.gfp_mask = KSMBD_DEFAULT_GFP;
- 	/*
- 	 * from here we operate on the copy.
- 	 */
-@@ -351,7 +351,7 @@ static void free_transport(struct smb_direct_transport *t)
- 		rdma_destroy_id(sc->rdma.cm_id);
- 	}
- 
--	smb_direct_destroy_pools(sc);
-+	smbdirect_connection_destroy_mem_pools(sc);
- 	ksmbd_conn_free(KSMBD_TRANS(t)->conn);
- }
- 
-@@ -1716,76 +1716,6 @@ static int smb_direct_init_params(struct smbdirect_socket *sc)
- 	return 0;
- }
- 
--static void smb_direct_destroy_pools(struct smbdirect_socket *sc)
+-static int get_mapped_sg_list(struct ib_device *device, void *buf, int size,
+-			      struct scatterlist *sg_list, int nentries,
+-			      enum dma_data_direction dir)
 -{
--	struct smbdirect_recv_io *recvmsg;
+-	int npages;
 -
--	while ((recvmsg = smbdirect_connection_get_recv_io(sc)))
--		mempool_free(recvmsg, sc->recv_io.mem.pool);
--
--	mempool_destroy(sc->recv_io.mem.pool);
--	sc->recv_io.mem.pool = NULL;
--
--	kmem_cache_destroy(sc->recv_io.mem.cache);
--	sc->recv_io.mem.cache = NULL;
--
--	mempool_destroy(sc->send_io.mem.pool);
--	sc->send_io.mem.pool = NULL;
--
--	kmem_cache_destroy(sc->send_io.mem.cache);
--	sc->send_io.mem.cache = NULL;
+-	npages = get_sg_list(buf, size, sg_list, nentries);
+-	if (npages < 0)
+-		return -EINVAL;
+-	return ib_dma_map_sg(device, sg_list, npages, dir);
 -}
 -
--static int smb_direct_create_pools(struct smbdirect_socket *sc)
--{
--	struct smbdirect_socket_parameters *sp = &sc->parameters;
--	char name[80];
--	int i;
--	struct smbdirect_recv_io *recvmsg;
--
--	snprintf(name, sizeof(name), "smbdirect_send_io_pool_%p", sc);
--	sc->send_io.mem.cache = kmem_cache_create(name,
--					     sizeof(struct smbdirect_send_io) +
--					      sizeof(struct smbdirect_negotiate_resp),
--					     0, SLAB_HWCACHE_ALIGN, NULL);
--	if (!sc->send_io.mem.cache)
--		return -ENOMEM;
--
--	sc->send_io.mem.pool = mempool_create(sp->send_credit_target,
--					    mempool_alloc_slab, mempool_free_slab,
--					    sc->send_io.mem.cache);
--	if (!sc->send_io.mem.pool)
--		goto err;
--
--	snprintf(name, sizeof(name), "smbdirect_recv_io_pool_%p", sc);
--	sc->recv_io.mem.cache = kmem_cache_create(name,
--					     sizeof(struct smbdirect_recv_io) +
--					     sp->max_recv_size,
--					     0, SLAB_HWCACHE_ALIGN, NULL);
--	if (!sc->recv_io.mem.cache)
--		goto err;
--
--	sc->recv_io.mem.pool =
--		mempool_create(sp->recv_credit_max, mempool_alloc_slab,
--			       mempool_free_slab, sc->recv_io.mem.cache);
--	if (!sc->recv_io.mem.pool)
--		goto err;
--
--	for (i = 0; i < sp->recv_credit_max; i++) {
--		recvmsg = mempool_alloc(sc->recv_io.mem.pool, KSMBD_DEFAULT_GFP);
--		if (!recvmsg)
--			goto err;
--		recvmsg->socket = sc;
--		recvmsg->sge.length = 0;
--		list_add(&recvmsg->list, &sc->recv_io.free.list);
--	}
--
--	return 0;
--err:
--	smb_direct_destroy_pools(sc);
--	return -ENOMEM;
--}
--
- static u32 smb_direct_rdma_rw_send_wrs(struct ib_device *dev, const struct ib_qp_init_attr *attr)
+ static int post_sendmsg(struct smbdirect_socket *sc,
+ 			struct smbdirect_send_batch *send_ctx,
+ 			struct smbdirect_send_io *msg)
+@@ -1060,10 +1048,9 @@ static int smb_direct_post_send_data(struct smbdirect_socket *sc,
+ 				     struct kvec *iov, int niov,
+ 				     int remaining_data_length)
  {
- 	/*
-@@ -2083,7 +2013,7 @@ static int smb_direct_connect(struct smbdirect_socket *sc)
- 		return ret;
+-	int i, j, ret;
++	int i, ret;
+ 	struct smbdirect_send_io *msg;
+ 	int data_length;
+-	struct scatterlist sg[SMBDIRECT_SEND_IO_MAX_SGE - 1];
+ 
+ 	ret = wait_for_send_lcredit(sc, send_ctx);
+ 	if (ret)
+@@ -1082,34 +1069,27 @@ static int smb_direct_post_send_data(struct smbdirect_socket *sc,
+ 	if (ret)
+ 		goto header_failed;
+ 
+-	for (i = 0; i < niov; i++) {
+-		struct ib_sge *sge;
+-		int sg_cnt;
+-
+-		sg_init_table(sg, SMBDIRECT_SEND_IO_MAX_SGE - 1);
+-		sg_cnt = get_mapped_sg_list(sc->ib.dev,
+-					    iov[i].iov_base, iov[i].iov_len,
+-					    sg, SMBDIRECT_SEND_IO_MAX_SGE - 1,
+-					    DMA_TO_DEVICE);
+-		if (sg_cnt <= 0) {
+-			pr_err("failed to map buffer\n");
+-			ret = -ENOMEM;
++	if (data_length) {
++		struct smbdirect_map_sges extract = {
++			.num_sge	= msg->num_sge,
++			.max_sge	= ARRAY_SIZE(msg->sge),
++			.sge		= msg->sge,
++			.device		= sc->ib.dev,
++			.local_dma_lkey	= sc->ib.pd->local_dma_lkey,
++			.direction	= DMA_TO_DEVICE,
++		};
++		struct iov_iter iter;
++
++		iov_iter_kvec(&iter, ITER_SOURCE, iov, niov, data_length);
++
++		ret = smbdirect_map_sges_from_iter(&iter, data_length, &extract);
++		if (ret < 0)
+ 			goto err;
+-		} else if (sg_cnt + msg->num_sge > SMBDIRECT_SEND_IO_MAX_SGE) {
+-			pr_err("buffer not fitted into sges\n");
+-			ret = -E2BIG;
+-			ib_dma_unmap_sg(sc->ib.dev, sg, sg_cnt,
+-					DMA_TO_DEVICE);
++		if (WARN_ON_ONCE(ret != data_length)) {
++			ret = -EIO;
+ 			goto err;
+ 		}
+-
+-		for (j = 0; j < sg_cnt; j++) {
+-			sge = &msg->sge[msg->num_sge];
+-			sge->addr = sg_dma_address(&sg[j]);
+-			sge->length = sg_dma_len(&sg[j]);
+-			sge->lkey  = sc->ib.pd->local_dma_lkey;
+-			msg->num_sge++;
+-		}
++		msg->num_sge = extract.num_sge;
  	}
  
--	ret = smb_direct_create_pools(sc);
-+	ret = smbdirect_connection_create_mem_pools(sc);
- 	if (ret) {
- 		pr_err("Can't init RDMA pool: %d\n", ret);
- 		return ret;
+ 	ret = post_sendmsg(sc, send_ctx, msg);
 -- 
 2.43.0
 
