@@ -1,98 +1,82 @@
-Received: from forwardcorp1b.mail.yandex.net (forwardcorp1b.mail.yandex.net [178.154.239.136])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC65B2C029A;
-	Thu, 30 Oct 2025 07:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B179334363
+	for <linux-cifs@vger.kernel.org>; Thu, 30 Oct 2025 08:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761810245; cv=none; b=je8MsLI3k9LSgVLGcev4QaXvzoucBbA7ZA0GFurF4ATI5HTtCo7CHLcfTqSgSzm/dntZBxOFcy+eCGIKBqIloFmCECz+wvrTn/DHIu0sV2dj6Wp9CFiWdZS0hibVJJ9/zoSBExcdVTXQ2mbQxOWXol/2jxsVXUjV4P+i6LeZpJM=
+	t=1761811913; cv=none; b=NXY48ZpbVmVn6zXf+QR22MsTOoMZrnkpOnPHRefQv/KqlzCourkducDmPiqXGBemPv6uRS68UijCKQWHh82WRg8Hx+9Ob3ugmkiuu5XTWQE7AggMvWw4CvdURm/xxFX+aUsOODZDObGvbgpoqjIm2VuKJFH/YcNoDVQJNmPmhfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761810245; c=relaxed/simple;
-	bh=kxq9qjSwI/euAspvdW8LIPsGMx60Il7SC5u0QaAHm58=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SQ8LtZsaqgBEvU5tHUF+99ntF34P3XPUWxZmWT7sO+aO1xBML9UyvOWvvtXpzws3H5PdF1PKObh+g2dHppE9OlghPJz6WLHBAjkbTsmlUQwdaqCEmIg2oY/eGGwMdU/I8x9ftcVFsq36fk7CD/Gl0n7urg9WGJIzuX0HId0hhrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=fH4ppwqn; arc=none smtp.client-ip=178.154.239.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
+	s=arc-20240116; t=1761811913; c=relaxed/simple;
+	bh=vCcTYuH6mTu6qyvg70BghXWQVnQ8I0gdNc3/3b60Ajw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lKv9NJ2ERZa3EAq5isW9SaTihschfn+7eveOE8qBqGUbUnubTH9E0gPYeNgPUD0/4Ytv45K/XqH6yxbl6JPnFEsS5pBLwI87dSicF/wcOUBBApb+aBrKoykzAhVnSkZOgHwA3RXC7TvoMKs5wCEVRbv5iw/TPFHuze9dL0TjMnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b4iTK/Fm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="fH4ppwqn"
-Received: from mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net (mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net [IPv6:2a02:6b8:c10:49f:0:640:b99a:0])
-	by forwardcorp1b.mail.yandex.net (Yandex) with ESMTPS id 3CC2180830;
-	Thu, 30 Oct 2025 10:43:49 +0300 (MSK)
-Received: from i111667286.ld.yandex.ru (unknown [2a02:6bf:8080:56d::1:12])
-	by mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id hhZcSK0Ft4Y0-qTvyUiRu;
-	Thu, 30 Oct 2025 10:43:48 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; t=1761810228;
-	bh=EP6EuytiS7tC0fn/EYZWxe2O/pwA7Pr5SZWQ3bpebgc=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=fH4ppwqn+sm8nIGFWXHE0wAMxA4jlaWZCPAj5E9S0QctZ9YeXzQvErt5Q/UDqiFwc
-	 3rXBRGHXS1TpNv7UeXUSHvxATE+ZcvuHwxtJxslJ/GV0v2dShnsRw5+WNsQQTu8jJp
-	 +yPmK+YynL2bXcgcheFkAv8sndn2Jc/R7APNXYgQ=
-Authentication-Results: mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-From: Andrey Troshin <drtrosh@yandex-team.ru>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Andrey Troshin <drtrosh@yandex-team.ru>,
-	Steve French <sfrench@samba.org>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH 5.10] smb: client: fix smbdirect_recv_io leak in smbd_negotiate() error path
-Date: Thu, 30 Oct 2025 10:43:42 +0300
-Message-ID: <20251030074342.1360-1-drtrosh@yandex-team.ru>
-X-Mailer: git-send-email 2.51.0.windows.2
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b4iTK/Fm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B314C16AAE
+	for <linux-cifs@vger.kernel.org>; Thu, 30 Oct 2025 08:11:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761811913;
+	bh=vCcTYuH6mTu6qyvg70BghXWQVnQ8I0gdNc3/3b60Ajw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=b4iTK/FmXmNI6qUZedlTwzN5uSyHwBXWniVl8o7fCmHXlHzGzlso/P/nfsGTdExpP
+	 M21qPYWOTnF0oOR12CpycfC1yosNRFGW0/4VpPOeyhsXJQLXitdRMUBFugwU5n0el3
+	 cFr6846EQWLhfz3rkB4PGzVtGbjdCI+TFCcuDy5xaLKg1G2Si28sGruIskjPv9d5Bt
+	 ZjZoHm2HIeGeDQbghisjN8hNvwJfswpv3bXg5OovTbO2CN7eMXGA5zsEG0+1shUWut
+	 C3dMfb+Ubd53l/JGFANxD7fX2fSpmrPRzfeQHAx5WO6xNVoe/q/mwVJcCqVok/xbVL
+	 VVXp08t6X/PmA==
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b70406feed3so209939266b.3
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Oct 2025 01:11:53 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWdXHzSmoJGqjhWBYCNgJzun4yjF4Oy9u2cIxEg65XqFxr1FIXrhaOlZfhnmCQcmw549DvZUTy+SbpN@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXbHhWJmCVgRaaN4axCvA2N2Wck1vuKINvC4rVxR1U1sr6aiv0
+	7LzWiIoGOjVvWa6QnDIJE0gTQkEzdRe76hmgp91UuflxanX9VOCRY0axyY0YlvAcER5D6pmJujS
+	mBcQ0Mx1liJYc3QMVN/TDObsIo71Fndg=
+X-Google-Smtp-Source: AGHT+IF5P/qdVOfbIIV+SEJSLe/A1R1mpnSYlz9hP4HAxa+hEO5mYBlCRES28Qi95wHLRZ3k7iN612R/4zMk5bAAmFs=
+X-Received: by 2002:a17:907:940a:b0:b6d:692e:9a84 with SMTP id
+ a640c23a62f3a-b7053e2c694mr214741166b.38.1761811911789; Thu, 30 Oct 2025
+ 01:11:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251030064736.24061-1-dqfext@gmail.com>
+In-Reply-To: <20251030064736.24061-1-dqfext@gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 30 Oct 2025 17:11:39 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9nkQFgXPpKpOY+O_B5HRLeyiZKO5a4X5MdfjYoO_O+Aw@mail.gmail.com>
+X-Gm-Features: AWmQ_bl_8SFNU2Ia4p8afvCEYgPx8n2HX4p9nIHde5wt-h4qbFdQlg8ez7H-da0
+Message-ID: <CAKYAXd9nkQFgXPpKpOY+O_B5HRLeyiZKO5a4X5MdfjYoO_O+Aw@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: server: avoid busy polling in accept loop
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Stefan Metzmacher <metze@samba.org>
-
-[ Upstream commit daac51c7032036a0ca5f1aa419ad1b0471d1c6e0 ]
-
-During tests of another unrelated patch I was able to trigger this
-error: Objects remaining on __kmem_cache_shutdown()
-
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[Andrey Troshin: backport fix from fs/cifs/smbdirect.c to fs/smb/client/smbdirect.c]
-Signed-off-by: Andrey Troshin <drtrosh@yandex-team.ru>
----
-Backport fix for CVE-2025-39929
-Link: https://nvd.nist.gov/vuln/detail/CVE-2025-39929
----
- fs/cifs/smbdirect.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index ae332f3771f6..e273f3b9efcb 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -1083,8 +1083,10 @@ static int smbd_negotiate(struct smbd_connection *info)
- 	log_rdma_event(INFO, "smbd_post_recv rc=%d iov.addr=%llx iov.length=%x iov.lkey=%x\n",
- 		       rc, response->sge.addr,
- 		       response->sge.length, response->sge.lkey);
--	if (rc)
-+	if (rc) {
-+		put_receive_buffer(info, response);
- 		return rc;
-+	}
- 
- 	init_completion(&info->negotiate_completion);
- 	info->negotiate_done = false;
--- 
-2.34.1
-
+On Thu, Oct 30, 2025 at 3:47=E2=80=AFPM Qingfang Deng <dqfext@gmail.com> wr=
+ote:
+>
+> The ksmbd listener thread was using busy waiting on a listening socket by
+> calling kernel_accept() with SOCK_NONBLOCK and retrying every 100ms on
+> -EAGAIN. Since this thread is dedicated to accepting new connections,
+> there is no need for non-blocking mode.
+>
+> Switch to a blocking accept() call instead, allowing the thread to sleep
+> until a new connection arrives. This avoids unnecessary wakeups and CPU
+> usage.
+>
+> Also remove:
+>   - TCP_NODELAY, which has no effect on a listening socket.
+>   - sk_rcvtimeo and sk_sndtimeo assignments, which only caused accept()
+>     to return -EAGAIN prematurely.
+>
+> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing an=
+d tranport layers")
+> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+Applied it to #ksmbd-for-next-next.
+Thanks!
