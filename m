@@ -1,71 +1,75 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5B9148830
-	for <linux-cifs@vger.kernel.org>; Thu, 30 Oct 2025 17:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2BD330D42
+	for <linux-cifs@vger.kernel.org>; Thu, 30 Oct 2025 17:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761843689; cv=none; b=kvtXiCGgA4NeY8kExQk3gPCfWD5vqiCFq7jeiww/gNYBjy2GAB1ww8xE1g20EJ/VkZdMNOsCPSkHlZYmN/z8fcDmMbqdqFcHm/FUK1RwUHoVWglM8TVhq1cb9WJ52bCdvwPbXt8fiKBw+EZ6c7U0mOtOXM+Y9Wgvve7pSzQrygQ=
+	t=1761843712; cv=none; b=atkjx83BUiaeXIo1oQaxf2tBVcHtuQzaxTrOawAzSDDL/sx93W+gKwgaTcTS2IER4FHvA3gFcmmuOzlAfpiQpIfB1Mii3t8uN9QRsZ/QDa0Vrmx+xBv/+fFJSCLLjdYugjZRiTnvW/C96jQWIAtsuX5jfj+VuE0XJnIAxUF4C9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761843689; c=relaxed/simple;
-	bh=x2O7K4uhp2pZr4VXdJXl0ZixtSvvbc4MrdtQw2EsCKw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MrWnwnSOSUsi2bRSLZGS2qLe8xfU2nz5gqyjCuYi10sQ7HTGfgtp9GxvL0xlO90uLEQ3ibTVXF11gbHlX5TPZ+Q+RhDDVTOW7Pmpu09xoltwCRxTbegoUOwjOYa9/AMNY7LKti5BRKBYMwlhp2fguGIH+NSQLljKN0rU6RgZEHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sf80oiUp; arc=none smtp.client-ip=209.85.215.171
+	s=arc-20240116; t=1761843712; c=relaxed/simple;
+	bh=HTxmNRT7OTKZykSqcxZiLZjBzKT+I6sfkHZfgxJjeIE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZkU7vuXD+E2GTDAEKcqc0U9Eqf7hT8PO6VkJQHuRE3RB1xpgrf8RoVI42rRuUAbqLm8bp1YIN7qyS7+CCzv5f1cDWB0CyQ8JawYopvRy3jjn7codIxbpvp7kbkNoWd2rb93GY3E+cvO3PVpNv6NK3zQcVGDYWq4ArESNRvEFeoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hYEkTca8; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sf80oiUp"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b6cfffbb1e3so1027729a12.3
-        for <linux-cifs@vger.kernel.org>; Thu, 30 Oct 2025 10:01:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hYEkTca8"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-34029a194bcso1531351a91.0
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Oct 2025 10:01:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761843683; x=1762448483; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YIJepu/J/kJQh3IWQ6vqOFf63Y+N6hvUdgleeQZ1GBc=;
-        b=Sf80oiUpXLdCtIM0yL7RZbIORsbkwajyaBw3GJSFaybyNVgVyTH6laXry1TRUWYmCf
-         EfNe4p2fchw0qeyOL0zSfmYuU4XRBSllgUcTpsHiOoO6Ajupu+0WPSO3vE9grsknCu76
-         5wleiK2MbAqRFpPb7ZpcUxt8WeMq1yWC4ZrglOxciSE1vqBOhZfDRAcv3b/xKLCiJ4w+
-         o0iE87Z8T6k5651PeDXmVAjsfhpVFmrPIjKpcWN8iMtpGlQTuuXmrvO+AKBW0mWtsk2V
-         urvx9FymlSvt4yoTcbNBfF509sc179qpNUgKbYRanCkjg6rO4tA2CwRCOKOnDz9psBPw
-         VHog==
+        d=gmail.com; s=20230601; t=1761843690; x=1762448490; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vtKIBQvYxGkMhdq8eW3gVNThACtdyAfJe/7FuQf9bXg=;
+        b=hYEkTca8E9AZ6Rzb+DPn28ExuDSbTucNUsGkLIAcXt/ut6V/RkfoivJfRezhoiS+Mu
+         ZS6UNkwbrMjMNiPg9IC5A6Qnut7ihRwl20zU7cNAubgjhBCv1bDpOo10y1pqAs0qQDVb
+         CRdwZ/CDWC0yy3pj+fT1w5KmfRufhOv/9nq1+WHNCRv5GWSZcIiu9DB/au4PB3zgIYxh
+         pjr+AfflQn6JYPp45nGAD6sayyGarKY7VWVY0G7YnuePSGGTIhLZ9WVg1GADcp31MKIv
+         4eRB/38pZgb/Ygh/vOoOhoDAhY2D9pQXhZXbOJEjFza7MItr9gJWQ5YdlvpoLIebJZcB
+         XDqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761843683; x=1762448483;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YIJepu/J/kJQh3IWQ6vqOFf63Y+N6hvUdgleeQZ1GBc=;
-        b=kBx8VIx7O34yYalJ4kT3ZQmJ6/xsLVGPj2PtxIeyp1Cpoo/7xpua8Ow028pi6lpwZG
-         4EFtkyQmOi6SG/8ombyyxP9llsZ8dF+eJJ+DYcYMby2ZpKtbFemJ9JVI8G8kiXIOy3gC
-         Rn+4bNccztmCTiGxTryAxBE1YcPTh6NbUf0FYia3K7R4Axy33+/5tnt0RcRe2Y1cHEbK
-         yrT+/BHupI8upD+C2//7X0UI68A0A79ke3HiX6znp6XkYL8OgUWgz4SmFUXM0+LB+dKS
-         iJxzOuJ2gkUCH6vCgJrWF9Mj7eIfp6SR1OGYSxIN3AYyd+ueHLL7LS4vZcWUtQoswBtI
-         qVRA==
-X-Gm-Message-State: AOJu0YxsT+1Ul2xrmFiVDseO9ex8CWK9uYZoyqsjW2YKNFMoUj+LEuk3
-	OEtNTmwcsWjSXvpsxw84zJ1A4W52jwC6sg5yNjpz4VKvU28for403Gwz/5xdfqro
-X-Gm-Gg: ASbGnct7lO3sCBsZZIg4uHaqYNjY7QI4W6odRoII9dR/fsXGm/zsV7YmN+Z06bi5621
-	orFQNC1EkO/+M5TlMuSiCdo3mxGny+Q2RXSsy24PQ0B178or3CEu6OOvBnyywPTpWXrGB3QQVrr
-	fxj/a78DL2slvReigxON6CRqv7BiCVtnzu7zTbVVRSab1XjSoKV0IAoIa4nmDitjz3YTxkKW/IN
-	oBeWBzMUtxTPxHHE5fHCmfyLLeuh4IDZFwUHR+Q84dVq3nGJRsvAprTdzLYhXxBHkbYatXENMTC
-	24LVs6CSO8HR0p74jOjgBm3bkewydSNRSdjA5wWRWjjzjn8bY3skC98Il0v0NkQwcqROi4Ipq+7
-	EipTQFL9g/Zv89bdmgUuG74pQ/TLe8agwdxFxXqd9oDnef3eahh0TtjP9dPaSQJOXf1X1YIKK6Z
-	hHlKrhXg4WUczvqQW5WMMpkDP6pleT2oirRDkFHA==
-X-Google-Smtp-Source: AGHT+IGLVHjRl8mOnxxjViKKVvquFHR0KPFTYFOdUrz2UdRoQsw3AUx0acPVVOTh1OvWGSyMC5lBtQ==
-X-Received: by 2002:a17:903:2a8d:b0:269:4759:904b with SMTP id d9443c01a7336-2951a4df00cmr5393785ad.58.1761843683263;
-        Thu, 30 Oct 2025 10:01:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761843690; x=1762448490;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vtKIBQvYxGkMhdq8eW3gVNThACtdyAfJe/7FuQf9bXg=;
+        b=pqEFy4/L8zX5khN8cr/+iB3pv2bqgs4OTVa1Anynhz/o3iP3Bj8uRwxNfVyfjqNS4f
+         V6mRlNkgPOcgkagdXz1PdL5imR2N7AlPFhZ8C1/VkSsHfI4+JZzx5H5Go/2ATs5xEPfN
+         et5aOxxfEEH6QijkcyLPnUDb6dhEAGk/IkFAGs8b9GHLpHoxd2+EKWCcorFZrJQFgFGS
+         24Wo4UxyzFmGSrw+cuPkGvNh3QqL3tbiz3Yb6EbZ2qwT/Vofo0E97jUBXW7RbcS3XG/Q
+         7GxLsifrJjK+nQWn6mQeB0JCygdFTF239Ac+RZ1Uy3PtXfCChw1+gVHvWRU7U/rfFt5/
+         fTMg==
+X-Gm-Message-State: AOJu0YwISuZ8DkiC0nRsPPQKK/Jn8+3laMiWIgndYqRJS0F7AWLj5HaO
+	aesu5um5xnnHEESIRjYO5Oeq9+9l7LnAPxlqPuDCY3l6qkI8gAyhD1jXbuiYQIIZ
+X-Gm-Gg: ASbGncsv99Aaer9P3FYa/Z/SdUGCsQNTl7febQI51olhv06u1QBbX8X2Vs1bC4fj0pz
+	uNLDmPQoC+h3ZKljyj2P4sEusutiVrpd8h7Yf9+AdeXhrumRBYb6lH63Acuh88l1LhHrwlYPbqR
+	039UGDjdGdd2EjZvOksgzkvKY9+l2+7CctxhQaTzBghAIYySdlhDnkSGNxkclzFkPPE6deSjdhH
+	LOGGc0huXY5cZknGEk3sIkftRvYdfKDiPQXENrXm1J0cB/vBWw7tje8z98uwxMXgVRMJblYELeE
+	bnZDsKTzUme3iCc7pg6zSYSIlhORKoLReW4Ue7K5SqLLd4Ll8HpQI6S4oTjJ2ZKpzs4WaTTKlty
+	JVE1wgErzUcU1Z117zP4EFE7elOiLv2Xy8k5OXel6tsD+ysO8ZKopp3AtEzxBuXrVaDb6Mk09f9
+	OBH9Wt5snmp9LG8r20c+O62LXrPas=
+X-Google-Smtp-Source: AGHT+IFW99ggwqFO5TtPqqHBT+HcRYnp0Yxz6WDnW+xYWYJrcaYGU/9paLm//rxeF/grZb4G8/cE3Q==
+X-Received: by 2002:a17:902:d2c8:b0:275:7ee4:83bc with SMTP id d9443c01a7336-2951a36c306mr5384315ad.2.1761843689340;
+        Thu, 30 Oct 2025 10:01:29 -0700 (PDT)
 Received: from bharathsm-Virtual-Machine.. ([131.107.160.85])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-29498e41697sm191788485ad.98.2025.10.30.10.01.22
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-29498e41697sm191788485ad.98.2025.10.30.10.01.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 10:01:22 -0700 (PDT)
+        Thu, 30 Oct 2025 10:01:29 -0700 (PDT)
 From: Bharath SM <bharathsm.hsk@gmail.com>
 X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
 To: linux-cifs@vger.kernel.org,
 	sprasad@microsoft.com,
 	smfrench@gmail.com
 Cc: Bharath SM <bharathsm@microsoft.com>
-Subject: [PATCH 1/3] smb: client: show smb lease key in open_files output
-Date: Thu, 30 Oct 2025 22:31:14 +0530
-Message-ID: <20251030170116.31239-1-bharathsm@microsoft.com>
+Subject: [PATCH 2/3] smb: client: show smb lease key in open_dirs output
+Date: Thu, 30 Oct 2025 22:31:15 +0530
+Message-ID: <20251030170116.31239-2-bharathsm@microsoft.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20251030170116.31239-1-bharathsm@microsoft.com>
+References: <20251030170116.31239-1-bharathsm@microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -74,51 +78,46 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the SMB lease key in /proc/fs/cifs/open_files for
-debugging purposes.
+Show cached directory smb lease key in /proc/fs/cifs/open_dirs
+for debugging purposes.
 
 Signed-off-by: Bharath SM <bharathsm@microsoft.com>
 ---
- fs/smb/client/cifs_debug.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ fs/smb/client/cifs_debug.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index 1fb71d2d31b5..1383caa5a034 100644
+index 1383caa5a034..7fdcaf9feb16 100644
 --- a/fs/smb/client/cifs_debug.c
 +++ b/fs/smb/client/cifs_debug.c
-@@ -249,9 +249,9 @@ static int cifs_debug_files_proc_show(struct seq_file *m, void *v)
+@@ -324,7 +324,7 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
+ 
+ 	seq_puts(m, "# Version:1\n");
  	seq_puts(m, "# Format:\n");
- 	seq_puts(m, "# <tree id> <ses id> <persistent fid> <flags> <count> <pid> <uid>");
- #ifdef CONFIG_CIFS_DEBUG2
--	seq_puts(m, " <filename> <lease> <mid>\n");
-+	seq_puts(m, " <filename> <lease> <lease-key> <mid>\n");
- #else
--	seq_puts(m, " <filename> <lease>\n");
-+	seq_puts(m, " <filename> <lease> <lease-key>\n");
- #endif /* CIFS_DEBUG2 */
+-	seq_puts(m, "# <tree id> <sess id> <persistent fid> <path>\n");
++	seq_puts(m, "# <tree id> <sess id> <persistent fid> <lease-key> <path>\n");
+ 
  	spin_lock(&cifs_tcp_ses_lock);
- 	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
-@@ -274,6 +274,7 @@ static int cifs_debug_files_proc_show(struct seq_file *m, void *v)
- 
- 					/* Append lease/oplock caching state as RHW letters */
- 					inode = d_inode(cfile->dentry);
-+					cinode = NULL;
- 					n = 0;
- 					if (inode) {
- 						cinode = CIFS_I(inode);
-@@ -291,6 +292,12 @@ static int cifs_debug_files_proc_show(struct seq_file *m, void *v)
- 					else
- 						seq_puts(m, "NONE");
- 
-+					seq_puts(m, " ");
-+					if (cinode && cinode->lease_granted)
-+						seq_printf(m, "%pUl", cinode->lease_key);
+ 	list_for_each(stmp, &cifs_tcp_ses_list) {
+@@ -343,11 +343,15 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
+ 						(unsigned long)atomic_long_read(&cfids->total_dirents_entries),
+ 						(unsigned long long)atomic64_read(&cfids->total_dirents_bytes));
+ 				list_for_each_entry(cfid, &cfids->entries, entry) {
+-					seq_printf(m, "0x%x 0x%llx 0x%llx     %s",
++					seq_printf(m, "0x%x 0x%llx 0x%llx ",
+ 						tcon->tid,
+ 						ses->Suid,
+-						cfid->fid.persistent_fid,
+-						cfid->path);
++						cfid->fid.persistent_fid);
++					if (cfid->has_lease)
++						seq_printf(m, "%pUl ", cfid->fid.lease_key);
 +					else
-+						seq_puts(m, "-");
-+
- #ifdef CONFIG_CIFS_DEBUG2
- 					seq_printf(m, " %llu", cfile->fid.mid);
- #endif /* CONFIG_CIFS_DEBUG2 */
++						seq_puts(m, "- ");
++					seq_printf(m, "%s", cfid->path);
+ 					if (cfid->file_all_info_is_valid)
+ 						seq_printf(m, "\tvalid file info");
+ 					if (cfid->dirents.is_valid)
 -- 
 2.48.1
 
