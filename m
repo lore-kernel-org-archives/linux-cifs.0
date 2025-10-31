@@ -1,33 +1,33 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30C520C463
-	for <linux-cifs@vger.kernel.org>; Fri, 31 Oct 2025 02:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB582E6CDC
+	for <linux-cifs@vger.kernel.org>; Fri, 31 Oct 2025 02:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761877512; cv=none; b=pDOJqkY7SYRw25UYg4E6RUZ7yucB/m7loFgJ339sSmug69AhY2nScmc8ANPKUMZ1keSjMjRSZat4VWVvYv0vu4umx3PwJIbIY8R5HE0XCnY330evzM9Ia0gGZTqauZSQ5IYr3ETP6E93obBCpsoEwkc5ebr2LB7XTjl53rwgUK4=
+	t=1761877928; cv=none; b=TsW2XfGJHiU3Ys+OAaCiCTpWdAaWJUGGqNlsmYGJDQ+klMw+P+6XawGQHsz2pXsPzM6K3p9p0I1YfqXPxfumCnrUv4dqBtSBR6gYkeSo1KGg2mME4DXU4PKdMp5bu+pE0MP/Jo1TwFZmtj8s6ZHUrU9G+DFAbF2MzdCML6xEkEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761877512; c=relaxed/simple;
-	bh=a0/Aw9rdJRh6TCw+ET1ntS2tFV2UR6oax8kPz5yEtOU=;
+	s=arc-20240116; t=1761877928; c=relaxed/simple;
+	bh=dQyxJ1d91572THsFTNh3JwQBfOdXBE8nxpCAVZ8Hy84=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qDCRF02xiUKcGTgvFBklnW2YLxoP1ks7MtQSv5DkSM0y153kQy2WBvA9RLNFpV8/kDTy8orNTvdcxuuZywU8lrw9fqd4ijjVH+F5Gw+PKBVxWWZFxerE5GslFBJDMsVacxZrj0088ELUjYUnErqxT+Vi8WKgqv2ZWFCda7vMqBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ODaJ2JG9; arc=none smtp.client-ip=91.218.175.182
+	 In-Reply-To:Content-Type; b=CX/8Hnwj6gSsgeVfEJuUe53hoHGrTWeAj5ckQgTF1ucXGve6RE/vTmWJ8yKk7plgvu2RaNXuPpAZKDvn2KT+Wi33Pp0b0lMhbobqCGN4LwI41xQrxJTHuSBJGZzE+MMljQ3FUaQzCE8nQOUzo3cmmdw/bQyummVKGMcnEiGsZvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AZCR+5QV; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ODaJ2JG9"
-Message-ID: <3f706533-6dac-4aff-b71b-65dfc9c0a45f@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AZCR+5QV"
+Message-ID: <d1835c8a-f354-498f-a8c3-f43d7bb62548@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761877497;
+	t=1761877918;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9zXpaf1PUl+ks+7sZWUmsZnpMNh1FxPUUYlNyCCH1AY=;
-	b=ODaJ2JG9/pcH7xJnRc/fb8LZUtMg79iLyQ4vIW8DPiTOAW17Ei7eBT9rLg5xTH0YAblp6b
-	Fl5rIbLihEqpt9BUXftwnCvAsM4IX/mK7nm49nJhFWfaI3ktN4hfRRHGoZ9LGl0a8PeIM9
-	scN71ObN38ZzZ5yUDkrXOXE+gu7Fgx4=
-Date: Fri, 31 Oct 2025 10:24:06 +0800
+	bh=ZReHVNJ6NA73HQEk8o4tY+Q+SuvKfISP0Quo375SkgY=;
+	b=AZCR+5QVtdA1uEk82UZAlFWEBpeZaevkicPkVBjsSuLvCGWvXTRLoOpqtSnhftpdTwFrm2
+	chvqN7wmDGnf8ci9bIODkTPKgAzYAeA8VfNO4F4oLxaPdtb4SjCKrkQ4fmHHGOeVaPNYqE
+	dy9DEzTiaI2pAChplDUNFXmg0lqs8ck=
+Date: Fri, 31 Oct 2025 10:31:04 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -54,7 +54,8 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Got it, thank you for your answer.
+This GitLab repository seems to be more up to date than the one on 
+samba.org: https://git.samba.org/?p=slow/smb3_posix_spec.git;a=shortlog
 
 Thanks,
 ChenXiaoSong.
