@@ -1,626 +1,334 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AF734D3B5
-	for <linux-cifs@vger.kernel.org>; Fri, 31 Oct 2025 09:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F712C21DF;
+	Fri, 31 Oct 2025 12:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761904687; cv=none; b=DnxOh5ApRYtyu62LJR7nnJaBY8GKg0nh1fX+YLk0NZPF2UXMQZlWpwXSJYwsEcv8OOMwCaqdBVt9OyjIu79U4yaMpZGBi5jYHkWEMvri7kMd56C2VTIE3PpeHSZOucSlBg2kWWtCtTxpTefQTD00Q/SjO4OV5pJYnw3isP+Ebn8=
+	t=1761913425; cv=none; b=R1fZS7/qOGdKXXBYxw4csSDXmsuRxT9mMBzYlAnosrfrE34UfMc4xhtpYD4cYRKv3CIvqHus2oy4U2qdbDPtexLIgSmmqef+hVFMhEshU2N4wc68h/u4XAmZKK/8/I5dPQq6ipz5LTJ9cOuE9tcxfx5rySEYIZgcrNvmZdwtWkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761904687; c=relaxed/simple;
-	bh=ahpYBMDeR0zUKyyvqD8IyQ0ii/8RhYPpw2dhtAgAz3s=;
-	h=Message-ID:Date:MIME-Version:Subject:References:To:Cc:From:
-	 In-Reply-To:Content-Type; b=U5lmVt7MoM5ql8U/QAcG3erHLsQkagej55FnLBsq/+ieQpFCBu3U2cFVnVlWKno2KAr2iL6H1It8DhiF8X4pehPhrrJdtEN31RTclkAcZGFj6S+5/QZUtUiMlvVlAfH5L017Ai0e83cN176yZcB2lZXq2N2SWzRr98AkSsCHGcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pNO8s93I; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1761913425; c=relaxed/simple;
+	bh=teAVH4fG3LreoMxTD8/5S+pv4bUIKIPakzAxChdahXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PcZ3tYyyJ9I/mtpM2nXVASDXwfeNUoiToalZRG62uOM5b5avb3XhtaA/IFuJS0tJIh9oypr97cxZjzQ94nlrDEBGzwL0FBRS30HMqqY/pGSlfEfyFUjjO/rW3q4waUSao9PlK3cF5u4GmI6etwYLu4fiZvFX0HSCSNsWPII/g84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HFM7mXUe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pNO8s93I"
-Message-ID: <0ce02ac2-48a8-4a2d-a572-280b1399e768@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761904680;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5RQGLq1edhk0RLep8pwvVeBMCGtirA3xZY7AOpx8X0c=;
-	b=pNO8s93I2gbw/aijHusISNBcjQLZ5OABiXyt0QSoYak0YSrUneyl6sYNUyMQKugQ9UyQ8V
-	V19mZN5/5fh3v1h2s5QJKVzQ8MZ2ZqTiS4IKMyZfUvcRgGQwlWx/emUvywkCNr6F6cajVi
-	SBeNpCNIACAbVmtNjmcoA2PlUNqc/Gw=
-Date: Fri, 31 Oct 2025 17:57:08 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HFM7mXUe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 555E8C4CEE7;
+	Fri, 31 Oct 2025 12:23:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761913424;
+	bh=teAVH4fG3LreoMxTD8/5S+pv4bUIKIPakzAxChdahXI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HFM7mXUel+Kg91fRCmNz2uzMM3LiMooa3p/kalel14loykQ7inJ7k7oBfBMwMhdwk
+	 OthiTCzv+9rAug31/oaq0wrzAvIpBz018xh3iPD7CrxW7CJa6+RR4iLwUfP62UPoro
+	 Gj1t1XNlIp5eqAfrPc/XM5inFN2Z2RyO6YlK5LiskH2PHFsyc/wsz9Jm1mi0okIZi3
+	 KuV/+dbpKIFHzPOKRgTQqQsZPpB4+BXSPOMmD2PNhaqHjdxCY/cEHPWdT6nBMw6P27
+	 jRpZCQ614sSLTW20WhMwd9IwyB4VQQt3fVYyjZCDi5IajLJjSqoT6UZ6H3/MAEVIxA
+	 0mcI+8emRhmuw==
+Date: Fri, 31 Oct 2025 13:23:33 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Miklos Szeredi <miklos@szeredi.hu>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Chuck Lever <chuck.lever@oracle.com>, 
+	Alexander Aring <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
+	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, 
+	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, NeilBrown <neil@brown.name>, 
+	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, netfs@lists.linux.dev, 
+	ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 03/13] vfs: allow mkdir to wait for delegation break
+ on parent
+Message-ID: <20251031-bildung-erdig-b18b71db0520@brauner>
+References: <20251021-dir-deleg-ro-v3-0-a08b1cde9f4c@kernel.org>
+ <20251021-dir-deleg-ro-v3-3-a08b1cde9f4c@kernel.org>
+ <20251029-zeltlager-auspuff-0e3070d1a9c3@brauner>
+ <77e357c346ac9dce543fea9c22168f4a53dded5d.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Fwd: [PATCH v4 05/24] smb: move some duplicate definitions to
- common/smb1pdu.h
-Content-Language: en-US
-References: <c2895654-82a8-4548-80af-b3f3d9936dd3@kylinos.cn>
-To: sfrench@samba.org, smfrench@gmail.com, linkinjeon@kernel.org,
- linkinjeon@samba.org, christophe.jaillet@wanadoo.fr,
- =?UTF-8?Q?Ralph_B=C3=B6hme?= <slow@samba.org>
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <c2895654-82a8-4548-80af-b3f3d9936dd3@kylinos.cn>
-X-Forwarded-Message-Id: <c2895654-82a8-4548-80af-b3f3d9936dd3@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <77e357c346ac9dce543fea9c22168f4a53dded5d.camel@kernel.org>
 
-Use @linux.dev email to forward, to avoid the possibility of the email 
-not being received.
-
-
--------- Forwarded Message --------
-Subject: Re: [PATCH v4 05/24] smb: move some duplicate definitions to 
-common/smb1pdu.h
-Date: Fri, 31 Oct 2025 17:50:17 +0800
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
-To: chenxiaosong.chenxiaosong@linux.dev, sfrench@samba.org, 
-smfrench@gmail.com, linkinjeon@kernel.org, linkinjeon@samba.org, 
-christophe.jaillet@wanadoo.fr, Ralph Böhme <slow@samba.org>
-CC: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-
-Greetings,
-
-I couldn't find the definition of ATTR_VOLUME and ATTR_DEVICE in any of 
-the following documents:
-
-   - MS-FSCC: 
-https://learn.microsoft.com/pdf?url=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Fopenspecs%2Fwindows_protocols%2Fms-fscc%2Ftoc.json
-   - MS-CIFS: 
-https://learn.microsoft.com/pdf?url=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Fopenspecs%2Fwindows_protocols%2Fms-cifs%2Ftoc.json
-   - MS-SMB: 
-https://learn.microsoft.com/pdf?url=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Fopenspecs%2Fwindows_protocols%2Fms-smb%2Ftoc.json
-   - MS-SMB2: 
-https://learn.microsoft.com/pdf?url=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Fopenspecs%2Fwindows_protocols%2Fms-smb2%2Ftoc.json
-   - smb3-posix-spec: https://gitlab.com/samba-team/smb3-posix-spec
-
-Are these two macro definitions (ATTR_VOLUME and ATTR_DEVICE) defined in 
-other documents?
-
-PS: The following are the document locations I found for the File 
-Attribute flags:
-
-/*
-  * File Attribute flags
-  */
-#define ATTR_READONLY   0x0001  /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_HIDDEN     0x0002  /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_SYSTEM     0x0004  /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_VOLUME     0x0008	/* ? */
-#define ATTR_DIRECTORY  0x0010  /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_ARCHIVE    0x0020  /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_DEVICE     0x0040	/* ? */
-#define ATTR_NORMAL     0x0080  /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_TEMPORARY  0x0100  /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_SPARSE     0x0200  /* See MS-SMB 2.2.1.2.1 */
-#define ATTR_REPARSE    0x0400  /* See MS-SMB 2.2.1.2.1 */
-#define ATTR_COMPRESSED 0x0800  /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_OFFLINE    0x1000  /* See MS-SMB 2.2.1.2.1
-                                    ie file not immediately available -
-                                    on offline storage */
-#define ATTR_NOT_CONTENT_INDEXED 0x2000         /* See MS-SMB 2.2.1.2.1 */
-#define ATTR_ENCRYPTED          0x4000          /* See MS-SMB 2.2.1.2.1 */
-#define ATTR_POSIX_SEMANTICS    0x01000000      /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_BACKUP_SEMANTICS   0x02000000      /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_DELETE_ON_CLOSE    0x04000000      /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_SEQUENTIAL_SCAN    0x08000000      /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_RANDOM_ACCESS      0x10000000      /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_NO_BUFFERING       0x20000000      /* See MS-CIFS 2.2.1.2.3 */
-#define ATTR_WRITE_THROUGH      0x80000000      /* See MS-CIFS 2.2.1.2.3 */
-
-Thanks,
-ChenXiaoSong.
-
-On 10/27/25 15:12, chenxiaosong.chenxiaosong@linux.dev wrote:
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+On Wed, Oct 29, 2025 at 09:37:22AM -0400, Jeff Layton wrote:
+> On Wed, 2025-10-29 at 14:04 +0100, Christian Brauner wrote:
+> > On Tue, Oct 21, 2025 at 11:25:38AM -0400, Jeff Layton wrote:
+> > > In order to add directory delegation support, we need to break
+> > > delegations on the parent whenever there is going to be a change in the
+> > > directory.
+> > > 
+> > > Add a new delegated_inode parameter to vfs_mkdir. All of the existing
+> > > callers set that to NULL for now, except for do_mkdirat which will
+> > > properly block until the lease is gone.
+> > > 
+> > > Reviewed-by: Jan Kara <jack@suse.cz>
+> > > Reviewed-by: NeilBrown <neil@brown.name>
+> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > > ---
+> > >  drivers/base/devtmpfs.c  |  2 +-
+> > >  fs/cachefiles/namei.c    |  2 +-
+> > >  fs/ecryptfs/inode.c      |  2 +-
+> > >  fs/init.c                |  2 +-
+> > >  fs/namei.c               | 24 ++++++++++++++++++------
+> > >  fs/nfsd/nfs4recover.c    |  2 +-
+> > >  fs/nfsd/vfs.c            |  2 +-
+> > >  fs/overlayfs/overlayfs.h |  2 +-
+> > >  fs/smb/server/vfs.c      |  2 +-
+> > >  fs/xfs/scrub/orphanage.c |  2 +-
+> > >  include/linux/fs.h       |  2 +-
+> > >  11 files changed, 28 insertions(+), 16 deletions(-)
+> > > 
+> > > diff --git a/drivers/base/devtmpfs.c b/drivers/base/devtmpfs.c
+> > > index 9d4e46ad8352257a6a65d85526ebdbf9bf2d4b19..0e79621cb0f79870003b867ca384199171ded4e0 100644
+> > > --- a/drivers/base/devtmpfs.c
+> > > +++ b/drivers/base/devtmpfs.c
+> > > @@ -180,7 +180,7 @@ static int dev_mkdir(const char *name, umode_t mode)
+> > >  	if (IS_ERR(dentry))
+> > >  		return PTR_ERR(dentry);
+> > >  
+> > > -	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(path.dentry), dentry, mode);
+> > > +	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(path.dentry), dentry, mode, NULL);
+> > >  	if (!IS_ERR(dentry))
+> > >  		/* mark as kernel-created inode */
+> > >  		d_inode(dentry)->i_private = &thread;
+> > > diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
+> > > index d1edb2ac38376c4f9d2a18026450bb3c774f7824..50c0f9c76d1fd4c05db90d7d0d1bad574523ead0 100644
+> > > --- a/fs/cachefiles/namei.c
+> > > +++ b/fs/cachefiles/namei.c
+> > > @@ -130,7 +130,7 @@ struct dentry *cachefiles_get_directory(struct cachefiles_cache *cache,
+> > >  			goto mkdir_error;
+> > >  		ret = cachefiles_inject_write_error();
+> > >  		if (ret == 0)
+> > > -			subdir = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), subdir, 0700);
+> > > +			subdir = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), subdir, 0700, NULL);
+> > >  		else
+> > >  			subdir = ERR_PTR(ret);
+> > >  		if (IS_ERR(subdir)) {
+> > > diff --git a/fs/ecryptfs/inode.c b/fs/ecryptfs/inode.c
+> > > index ed1394da8d6bd7065f2a074378331f13fcda17f9..35830b3144f8f71374a78b3e7463b864f4fc216e 100644
+> > > --- a/fs/ecryptfs/inode.c
+> > > +++ b/fs/ecryptfs/inode.c
+> > > @@ -508,7 +508,7 @@ static struct dentry *ecryptfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
+> > >  		goto out;
+> > >  
+> > >  	lower_dentry = vfs_mkdir(&nop_mnt_idmap, lower_dir,
+> > > -				 lower_dentry, mode);
+> > > +				 lower_dentry, mode, NULL);
+> > >  	rc = PTR_ERR(lower_dentry);
+> > >  	if (IS_ERR(lower_dentry))
+> > >  		goto out;
+> > > diff --git a/fs/init.c b/fs/init.c
+> > > index 07f592ccdba868509d0f3aaf9936d8d890fdbec5..895f8a09a71acfd03e11164e3b441a7d4e2de146 100644
+> > > --- a/fs/init.c
+> > > +++ b/fs/init.c
+> > > @@ -233,7 +233,7 @@ int __init init_mkdir(const char *pathname, umode_t mode)
+> > >  	error = security_path_mkdir(&path, dentry, mode);
+> > >  	if (!error) {
+> > >  		dentry = vfs_mkdir(mnt_idmap(path.mnt), path.dentry->d_inode,
+> > > -				  dentry, mode);
+> > > +				  dentry, mode, NULL);
+> > >  		if (IS_ERR(dentry))
+> > >  			error = PTR_ERR(dentry);
+> > >  	}
+> > > diff --git a/fs/namei.c b/fs/namei.c
+> > > index 6e61e0215b34134b1690f864e2719e3f82cf71a8..86cf6eca1f485361c6732974e4103cf5ea721539 100644
+> > > --- a/fs/namei.c
+> > > +++ b/fs/namei.c
+> > > @@ -4407,10 +4407,11 @@ SYSCALL_DEFINE3(mknod, const char __user *, filename, umode_t, mode, unsigned, d
+> > >  
+> > >  /**
+> > >   * vfs_mkdir - create directory returning correct dentry if possible
+> > > - * @idmap:	idmap of the mount the inode was found from
+> > > - * @dir:	inode of the parent directory
+> > > - * @dentry:	dentry of the child directory
+> > > - * @mode:	mode of the child directory
+> > > + * @idmap:		idmap of the mount the inode was found from
+> > > + * @dir:		inode of the parent directory
+> > > + * @dentry:		dentry of the child directory
+> > > + * @mode:		mode of the child directory
+> > > + * @delegated_inode:	returns parent inode, if the inode is delegated.
+> > 
+> > I wonder if it would be feasible and potentially elegant if delegated
+> > inodes were returned as separate type like struct delegated_inode
+> > similar to the vfsuid_t just a struct wrapper around the inode itself.
+> > The advantage is that it's not possible to accidently abuse this thing
+> > as we're passing that stuff around to try_break_deleg() and so on.
+> > 
 > 
-> In order to maintain the code more easily, move duplicate definitions to
-> new common header file.
+> I have a patch that does exactly that:
 > 
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
-> ---
->   fs/smb/client/cifspdu.h    | 152 +---------------------------------
->   fs/smb/common/smb1pdu.h    | 163 +++++++++++++++++++++++++++++++++++++
->   fs/smb/server/smb_common.h |  79 +-----------------
->   3 files changed, 165 insertions(+), 229 deletions(-)
->   create mode 100644 fs/smb/common/smb1pdu.h
-> 
-> diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-> index d9cf7db0ac35..86167875574c 100644
-> --- a/fs/smb/client/cifspdu.h
-> +++ b/fs/smb/client/cifspdu.h
-> @@ -12,44 +12,12 @@
->   #include <net/sock.h>
->   #include <linux/unaligned.h>
->   #include "../common/smbfsctl.h"
-> +#include "../common/smb1pdu.h"
->   
->   #define CIFS_PROT   0
->   #define POSIX_PROT  (CIFS_PROT+1)
->   #define BAD_PROT 0xFFFF
->   
-> -/* SMB command codes:
-> - * Note some commands have minimal (wct=0,bcc=0), or uninteresting, responses
-> - * (ie which include no useful data other than the SMB error code itself).
-> - * This can allow us to avoid response buffer allocations and copy in some cases
-> - */
-> -#define SMB_COM_CREATE_DIRECTORY      0x00 /* trivial response */
-> -#define SMB_COM_DELETE_DIRECTORY      0x01 /* trivial response */
-> -#define SMB_COM_CLOSE                 0x04 /* triv req/rsp, timestamp ignored */
-> -#define SMB_COM_FLUSH                 0x05 /* triv req/rsp */
-> -#define SMB_COM_DELETE                0x06 /* trivial response */
-> -#define SMB_COM_RENAME                0x07 /* trivial response */
-> -#define SMB_COM_QUERY_INFORMATION     0x08 /* aka getattr */
-> -#define SMB_COM_SETATTR               0x09 /* trivial response */
-> -#define SMB_COM_LOCKING_ANDX          0x24 /* trivial response */
-> -#define SMB_COM_COPY                  0x29 /* trivial rsp, fail filename ignrd*/
-> -#define SMB_COM_ECHO                  0x2B /* echo request */
-> -#define SMB_COM_OPEN_ANDX             0x2D /* Legacy open for old servers */
-> -#define SMB_COM_READ_ANDX             0x2E
-> -#define SMB_COM_WRITE_ANDX            0x2F
-> -#define SMB_COM_TRANSACTION2          0x32
-> -#define SMB_COM_TRANSACTION2_SECONDARY 0x33
-> -#define SMB_COM_FIND_CLOSE2           0x34 /* trivial response */
-> -#define SMB_COM_TREE_DISCONNECT       0x71 /* trivial response */
-> -#define SMB_COM_NEGOTIATE             0x72
-> -#define SMB_COM_SESSION_SETUP_ANDX    0x73
-> -#define SMB_COM_LOGOFF_ANDX           0x74 /* trivial response */
-> -#define SMB_COM_TREE_CONNECT_ANDX     0x75
-> -#define SMB_COM_NT_TRANSACT           0xA0
-> -#define SMB_COM_NT_TRANSACT_SECONDARY 0xA1
-> -#define SMB_COM_NT_CREATE_ANDX        0xA2
-> -#define SMB_COM_NT_CANCEL             0xA4 /* no response */
-> -#define SMB_COM_NT_RENAME             0xA5 /* trivial response */
-> -
->   /* Transact2 subcommand codes */
->   #define TRANS2_OPEN                   0x00
->   #define TRANS2_FIND_FIRST             0x01
-> @@ -86,7 +54,6 @@
->   #define NT_TRANSACT_GET_USER_QUOTA    0x07
->   #define NT_TRANSACT_SET_USER_QUOTA    0x08
->   
-> -#define MAX_CIFS_SMALL_BUFFER_SIZE 448 /* big enough for most */
->   /* future chained NTCreateXReadX bigger, but for time being NTCreateX biggest */
->   /* among the requests (NTCreateX response is bigger with wct of 34) */
->   #define MAX_CIFS_HDR_SIZE 0x58 /* 4 len + 32 hdr + (2*24 wct) + 2 bct + 2 pad */
-> @@ -150,36 +117,6 @@
->   #define SMBOPEN_OTRUNC        0x0002
->   #define SMBOPEN_OAPPEND       0x0001
->   
-> -/*
-> - * SMB flag definitions
-> - */
-> -#define SMBFLG_EXTD_LOCK 0x01	/* server supports lock-read write-unlock smb */
-> -#define SMBFLG_RCV_POSTED 0x02	/* obsolete */
-> -#define SMBFLG_RSVD 0x04
-> -#define SMBFLG_CASELESS 0x08	/* all pathnames treated as caseless (off
-> -				implies case sensitive file handling request) */
-> -#define SMBFLG_CANONICAL_PATH_FORMAT 0x10	/* obsolete */
-> -#define SMBFLG_OLD_OPLOCK 0x20	/* obsolete */
-> -#define SMBFLG_OLD_OPLOCK_NOTIFY 0x40	/* obsolete */
-> -#define SMBFLG_RESPONSE 0x80	/* this PDU is a response from server */
-> -
-> -/*
-> - * SMB flag2 definitions
-> - */
-> -#define SMBFLG2_KNOWS_LONG_NAMES cpu_to_le16(1)	/* can send long (non-8.3)
-> -						   path names in response */
-> -#define SMBFLG2_KNOWS_EAS cpu_to_le16(2)
-> -#define SMBFLG2_SECURITY_SIGNATURE cpu_to_le16(4)
-> -#define SMBFLG2_COMPRESSED (8)
-> -#define SMBFLG2_SECURITY_SIGNATURE_REQUIRED (0x10)
-> -#define SMBFLG2_IS_LONG_NAME cpu_to_le16(0x40)
-> -#define SMBFLG2_REPARSE_PATH (0x400)
-> -#define SMBFLG2_EXT_SEC cpu_to_le16(0x800)
-> -#define SMBFLG2_DFS cpu_to_le16(0x1000)
-> -#define SMBFLG2_PAGING_IO cpu_to_le16(0x2000)
-> -#define SMBFLG2_ERR_STATUS cpu_to_le16(0x4000)
-> -#define SMBFLG2_UNICODE cpu_to_le16(0x8000)
-> -
->   /*
->    * These are the file access permission bits defined in CIFS for the
->    * NTCreateAndX as well as the level 0x107
-> @@ -292,7 +229,6 @@
->   #define SET_MINIMUM_RIGHTS (FILE_READ_EA | FILE_READ_ATTRIBUTES \
->   				| READ_CONTROL | SYNCHRONIZE)
->   
-> -
->   /*
->    * Invalid readdir handle
->    */
-> @@ -322,33 +258,6 @@
->   #define CIFS_ALIAS_TYPE_FILE 0x0001
->   #define CIFS_SHARE_TYPE_FILE 0x0000
->   
-> -/*
-> - * File Attribute flags
-> - */
-> -#define ATTR_READONLY  0x0001
-> -#define ATTR_HIDDEN    0x0002
-> -#define ATTR_SYSTEM    0x0004
-> -#define ATTR_VOLUME    0x0008
-> -#define ATTR_DIRECTORY 0x0010
-> -#define ATTR_ARCHIVE   0x0020
-> -#define ATTR_DEVICE    0x0040
-> -#define ATTR_NORMAL    0x0080
-> -#define ATTR_TEMPORARY 0x0100
-> -#define ATTR_SPARSE    0x0200
-> -#define ATTR_REPARSE   0x0400
-> -#define ATTR_COMPRESSED 0x0800
-> -#define ATTR_OFFLINE    0x1000	/* ie file not immediately available -
-> -					on offline storage */
-> -#define ATTR_NOT_CONTENT_INDEXED 0x2000
-> -#define ATTR_ENCRYPTED  0x4000
-> -#define ATTR_POSIX_SEMANTICS 0x01000000
-> -#define ATTR_BACKUP_SEMANTICS 0x02000000
-> -#define ATTR_DELETE_ON_CLOSE 0x04000000
-> -#define ATTR_SEQUENTIAL_SCAN 0x08000000
-> -#define ATTR_RANDOM_ACCESS   0x10000000
-> -#define ATTR_NO_BUFFERING    0x20000000
-> -#define ATTR_WRITE_THROUGH   0x80000000
-> -
->   /* ShareAccess flags */
->   #define FILE_NO_SHARE     0x00000000
->   #define FILE_SHARE_READ   0x00000001
-> @@ -417,38 +326,6 @@
->   #define GETU16(var)  (*((__u16 *)var))	/* BB check for endian issues */
->   #define GETU32(var)  (*((__u32 *)var))	/* BB check for endian issues */
->   
-> -struct smb_hdr {
-> -	__be32 smb_buf_length;	/* BB length is only two (rarely three) bytes,
-> -		with one or two byte "type" preceding it that will be
-> -		zero - we could mask the type byte off */
-> -	__u8 Protocol[4];
-> -	__u8 Command;
-> -	union {
-> -		struct {
-> -			__u8 ErrorClass;
-> -			__u8 Reserved;
-> -			__le16 Error;
-> -		} __attribute__((packed)) DosError;
-> -		__le32 CifsError;
-> -	} __attribute__((packed)) Status;
-> -	__u8 Flags;
-> -	__le16 Flags2;		/* note: le */
-> -	__le16 PidHigh;
-> -	union {
-> -		struct {
-> -			__le32 SequenceNumber;  /* le */
-> -			__u32 Reserved; /* zero */
-> -		} __attribute__((packed)) Sequence;
-> -		__u8 SecuritySignature[8];	/* le */
-> -	} __attribute__((packed)) Signature;
-> -	__u8 pad[2];
-> -	__u16 Tid;
-> -	__le16 Pid;
-> -	__u16 Uid;
-> -	__le16 Mid;
-> -	__u8 WordCount;
-> -} __attribute__((packed));
-> -
->   /* given a pointer to an smb_hdr, retrieve a void pointer to the ByteCount */
->   static inline void *
->   BCC(struct smb_hdr *smb)
-> @@ -2239,33 +2116,6 @@ typedef struct {
->   /* minimum includes first three fields, and empty FS Name */
->   #define MIN_FS_ATTR_INFO_SIZE 12
->   
-> -
-> -/* List of FileSystemAttributes - see 2.5.1 of MS-FSCC */
-> -#define FILE_SUPPORTS_SPARSE_VDL	0x10000000 /* faster nonsparse extend */
-> -#define FILE_SUPPORTS_BLOCK_REFCOUNTING	0x08000000 /* allow ioctl dup extents */
-> -#define FILE_SUPPORT_INTEGRITY_STREAMS	0x04000000
-> -#define FILE_SUPPORTS_USN_JOURNAL	0x02000000
-> -#define FILE_SUPPORTS_OPEN_BY_FILE_ID	0x01000000
-> -#define FILE_SUPPORTS_EXTENDED_ATTRIBUTES 0x00800000
-> -#define FILE_SUPPORTS_HARD_LINKS	0x00400000
-> -#define FILE_SUPPORTS_TRANSACTIONS	0x00200000
-> -#define FILE_SEQUENTIAL_WRITE_ONCE	0x00100000
-> -#define FILE_READ_ONLY_VOLUME		0x00080000
-> -#define FILE_NAMED_STREAMS		0x00040000
-> -#define FILE_SUPPORTS_ENCRYPTION	0x00020000
-> -#define FILE_SUPPORTS_OBJECT_IDS	0x00010000
-> -#define FILE_VOLUME_IS_COMPRESSED	0x00008000
-> -#define FILE_SUPPORTS_POSIX_UNLINK_RENAME 0x00000400
-> -#define FILE_RETURNS_CLEANUP_RESULT_INFO  0x00000200
-> -#define FILE_SUPPORTS_REMOTE_STORAGE	0x00000100
-> -#define FILE_SUPPORTS_REPARSE_POINTS	0x00000080
-> -#define FILE_SUPPORTS_SPARSE_FILES	0x00000040
-> -#define FILE_VOLUME_QUOTAS		0x00000020
-> -#define FILE_FILE_COMPRESSION		0x00000010
-> -#define FILE_PERSISTENT_ACLS		0x00000008
-> -#define FILE_UNICODE_ON_DISK		0x00000004
-> -#define FILE_CASE_PRESERVED_NAMES	0x00000002
-> -#define FILE_CASE_SENSITIVE_SEARCH	0x00000001
->   typedef struct {
->   	__le32 Attributes;
->   	__le32 MaxPathNameComponentLength;
-> diff --git a/fs/smb/common/smb1pdu.h b/fs/smb/common/smb1pdu.h
-> new file mode 100644
-> index 000000000000..f14d3d9aac22
-> --- /dev/null
-> +++ b/fs/smb/common/smb1pdu.h
-> @@ -0,0 +1,163 @@
-> +/* SPDX-License-Identifier: LGPL-2.1 */
-> +/*
-> + *
-> + *   Copyright (c) International Business Machines  Corp., 2002,2009
-> + *   Author(s): Steve French (sfrench@us.ibm.com)
-> + *
-> + */
-> +
-> +#ifndef _COMMON_SMB1_PDU_H
-> +#define _COMMON_SMB1_PDU_H
-> +
-> +/* SMB command codes:
-> + * Note some commands have minimal (wct=0,bcc=0), or uninteresting, responses
-> + * (ie which include no useful data other than the SMB error code itself).
-> + * This can allow us to avoid response buffer allocations and copy in some cases
-> + */
-> +#define SMB_COM_CREATE_DIRECTORY      0x00 /* trivial response */
-> +#define SMB_COM_DELETE_DIRECTORY      0x01 /* trivial response */
-> +#define SMB_COM_CLOSE                 0x04 /* triv req/rsp, timestamp ignored */
-> +#define SMB_COM_FLUSH                 0x05 /* triv req/rsp */
-> +#define SMB_COM_DELETE                0x06 /* trivial response */
-> +#define SMB_COM_RENAME                0x07 /* trivial response */
-> +#define SMB_COM_QUERY_INFORMATION     0x08 /* aka getattr */
-> +#define SMB_COM_SETATTR               0x09 /* trivial response */
-> +#define SMB_COM_LOCKING_ANDX          0x24 /* trivial response */
-> +#define SMB_COM_COPY                  0x29 /* trivial rsp, fail filename ignrd*/
-> +#define SMB_COM_ECHO                  0x2B /* echo request */
-> +#define SMB_COM_OPEN_ANDX             0x2D /* Legacy open for old servers */
-> +#define SMB_COM_READ_ANDX             0x2E
-> +#define SMB_COM_WRITE_ANDX            0x2F
-> +#define SMB_COM_TRANSACTION2          0x32
-> +#define SMB_COM_TRANSACTION2_SECONDARY 0x33
-> +#define SMB_COM_FIND_CLOSE2           0x34 /* trivial response */
-> +#define SMB_COM_TREE_DISCONNECT       0x71 /* trivial response */
-> +#define SMB_COM_NEGOTIATE             0x72
-> +#define SMB_COM_SESSION_SETUP_ANDX    0x73
-> +#define SMB_COM_LOGOFF_ANDX           0x74 /* trivial response */
-> +#define SMB_COM_TREE_CONNECT_ANDX     0x75
-> +#define SMB_COM_NT_TRANSACT           0xA0
-> +#define SMB_COM_NT_TRANSACT_SECONDARY 0xA1
-> +#define SMB_COM_NT_CREATE_ANDX        0xA2
-> +#define SMB_COM_NT_CANCEL             0xA4 /* no response */
-> +#define SMB_COM_NT_RENAME             0xA5 /* trivial response */
-> +
-> +#define MAX_CIFS_SMALL_BUFFER_SIZE 448 /* big enough for most */
-> +
-> +/*
-> + * SMB flag definitions
-> + */
-> +#define SMBFLG_EXTD_LOCK 0x01	/* server supports lock-read write-unlock smb */
-> +#define SMBFLG_RCV_POSTED 0x02	/* obsolete */
-> +#define SMBFLG_RSVD 0x04
-> +#define SMBFLG_CASELESS 0x08	/* all pathnames treated as caseless (off
-> +				implies case sensitive file handling request) */
-> +#define SMBFLG_CANONICAL_PATH_FORMAT 0x10	/* obsolete */
-> +#define SMBFLG_OLD_OPLOCK 0x20	/* obsolete */
-> +#define SMBFLG_OLD_OPLOCK_NOTIFY 0x40	/* obsolete */
-> +#define SMBFLG_RESPONSE 0x80	/* this PDU is a response from server */
-> +
-> +/*
-> + * SMB flag2 definitions
-> + */
-> +#define SMBFLG2_KNOWS_LONG_NAMES cpu_to_le16(1)	/* can send long (non-8.3)
-> +						   path names in response */
-> +#define SMBFLG2_KNOWS_EAS cpu_to_le16(2)
-> +#define SMBFLG2_SECURITY_SIGNATURE cpu_to_le16(4)
-> +#define SMBFLG2_COMPRESSED (8)
-> +#define SMBFLG2_SECURITY_SIGNATURE_REQUIRED (0x10)
-> +#define SMBFLG2_IS_LONG_NAME cpu_to_le16(0x40)
-> +#define SMBFLG2_REPARSE_PATH (0x400)
-> +#define SMBFLG2_EXT_SEC cpu_to_le16(0x800)
-> +#define SMBFLG2_DFS cpu_to_le16(0x1000)
-> +#define SMBFLG2_PAGING_IO cpu_to_le16(0x2000)
-> +#define SMBFLG2_ERR_STATUS cpu_to_le16(0x4000)
-> +#define SMBFLG2_UNICODE cpu_to_le16(0x8000)
-> +
-> +/*
-> + * File Attribute flags
-> + */
-> +#define ATTR_READONLY  0x0001
-> +#define ATTR_HIDDEN    0x0002
-> +#define ATTR_SYSTEM    0x0004
-> +#define ATTR_VOLUME    0x0008
-> +#define ATTR_DIRECTORY 0x0010
-> +#define ATTR_ARCHIVE   0x0020
-> +#define ATTR_DEVICE    0x0040
-> +#define ATTR_NORMAL    0x0080
-> +#define ATTR_TEMPORARY 0x0100
-> +#define ATTR_SPARSE    0x0200
-> +#define ATTR_REPARSE   0x0400
-> +#define ATTR_COMPRESSED 0x0800
-> +#define ATTR_OFFLINE    0x1000	/* ie file not immediately available -
-> +					on offline storage */
-> +#define ATTR_NOT_CONTENT_INDEXED 0x2000
-> +#define ATTR_ENCRYPTED  0x4000
-> +#define ATTR_POSIX_SEMANTICS 0x01000000
-> +#define ATTR_BACKUP_SEMANTICS 0x02000000
-> +#define ATTR_DELETE_ON_CLOSE 0x04000000
-> +#define ATTR_SEQUENTIAL_SCAN 0x08000000
-> +#define ATTR_RANDOM_ACCESS   0x10000000
-> +#define ATTR_NO_BUFFERING    0x20000000
-> +#define ATTR_WRITE_THROUGH   0x80000000
-> +
-> +struct smb_hdr {
-> +	__be32 smb_buf_length;	/* BB length is only two (rarely three) bytes,
-> +		with one or two byte "type" preceding it that will be
-> +		zero - we could mask the type byte off */
-> +	__u8 Protocol[4];
-> +	__u8 Command;
-> +	union {
-> +		struct {
-> +			__u8 ErrorClass;
-> +			__u8 Reserved;
-> +			__le16 Error;
-> +		} __packed DosError;
-> +		__le32 CifsError;
-> +	} __packed Status;
-> +	__u8 Flags;
-> +	__le16 Flags2;		/* note: le */
-> +	__le16 PidHigh;
-> +	union {
-> +		struct {
-> +			__le32 SequenceNumber;  /* le */
-> +			__u32 Reserved; /* zero */
-> +		} __packed Sequence;
-> +		__u8 SecuritySignature[8];	/* le */
-> +	} __packed Signature;
-> +	__u8 pad[2];
-> +	__u16 Tid;
-> +	__le16 Pid;
-> +	__u16 Uid;
-> +	__le16 Mid;
-> +	__u8 WordCount;
-> +} __packed;
-> +
-> +/* List of FileSystemAttributes - see 2.5.1 of MS-FSCC */
-> +#define FILE_SUPPORTS_SPARSE_VDL	0x10000000 /* faster nonsparse extend */
-> +#define FILE_SUPPORTS_BLOCK_REFCOUNTING	0x08000000 /* allow ioctl dup extents */
-> +#define FILE_SUPPORT_INTEGRITY_STREAMS	0x04000000
-> +#define FILE_SUPPORTS_USN_JOURNAL	0x02000000
-> +#define FILE_SUPPORTS_OPEN_BY_FILE_ID	0x01000000
-> +#define FILE_SUPPORTS_EXTENDED_ATTRIBUTES 0x00800000
-> +#define FILE_SUPPORTS_HARD_LINKS	0x00400000
-> +#define FILE_SUPPORTS_TRANSACTIONS	0x00200000
-> +#define FILE_SEQUENTIAL_WRITE_ONCE	0x00100000
-> +#define FILE_READ_ONLY_VOLUME		0x00080000
-> +#define FILE_NAMED_STREAMS		0x00040000
-> +#define FILE_SUPPORTS_ENCRYPTION	0x00020000
-> +#define FILE_SUPPORTS_OBJECT_IDS	0x00010000
-> +#define FILE_VOLUME_IS_COMPRESSED	0x00008000
-> +#define FILE_SUPPORTS_POSIX_UNLINK_RENAME 0x00000400
-> +#define FILE_RETURNS_CLEANUP_RESULT_INFO  0x00000200
-> +#define FILE_SUPPORTS_REMOTE_STORAGE	0x00000100
-> +#define FILE_SUPPORTS_REPARSE_POINTS	0x00000080
-> +#define FILE_SUPPORTS_SPARSE_FILES	0x00000040
-> +#define FILE_VOLUME_QUOTAS		0x00000020
-> +#define FILE_FILE_COMPRESSION		0x00000010
-> +#define FILE_PERSISTENT_ACLS		0x00000008
-> +#define FILE_UNICODE_ON_DISK		0x00000004
-> +#define FILE_CASE_PRESERVED_NAMES	0x00000002
-> +#define FILE_CASE_SENSITIVE_SEARCH	0x00000001
-> +
-> +#endif /* _COMMON_SMB1_PDU_H */
-> diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
-> index c3258a3231e4..810fad0303d7 100644
-> --- a/fs/smb/server/smb_common.h
-> +++ b/fs/smb/server/smb_common.h
-> @@ -11,6 +11,7 @@
->   #include "glob.h"
->   #include "nterr.h"
->   #include "../common/smbglob.h"
-> +#include "../common/smb1pdu.h"
->   #include "../common/smb2pdu.h"
->   #include "smb2pdu.h"
->   
-> @@ -29,8 +30,6 @@
->   
->   #define SMB_ECHO_INTERVAL	(60 * HZ)
->   
-> -#define MAX_CIFS_SMALL_BUFFER_SIZE 448 /* big enough for most */
-> -
->   #define MAX_STREAM_PROT_LEN	0x00FFFFFF
->   
->   /* Responses when opening a file. */
-> @@ -39,44 +38,6 @@
->   #define F_CREATED	2
->   #define F_OVERWRITTEN	3
->   
-> -/*
-> - * File Attribute flags
-> - */
-> -#define ATTR_POSIX_SEMANTICS		0x01000000
-> -#define ATTR_BACKUP_SEMANTICS		0x02000000
-> -#define ATTR_DELETE_ON_CLOSE		0x04000000
-> -#define ATTR_SEQUENTIAL_SCAN		0x08000000
-> -#define ATTR_RANDOM_ACCESS		0x10000000
-> -#define ATTR_NO_BUFFERING		0x20000000
-> -#define ATTR_WRITE_THROUGH		0x80000000
-> -
-> -/* List of FileSystemAttributes - see 2.5.1 of MS-FSCC */
-> -#define FILE_SUPPORTS_SPARSE_VDL	0x10000000 /* faster nonsparse extend */
-> -#define FILE_SUPPORTS_BLOCK_REFCOUNTING	0x08000000 /* allow ioctl dup extents */
-> -#define FILE_SUPPORT_INTEGRITY_STREAMS	0x04000000
-> -#define FILE_SUPPORTS_USN_JOURNAL	0x02000000
-> -#define FILE_SUPPORTS_OPEN_BY_FILE_ID	0x01000000
-> -#define FILE_SUPPORTS_EXTENDED_ATTRIBUTES 0x00800000
-> -#define FILE_SUPPORTS_HARD_LINKS	0x00400000
-> -#define FILE_SUPPORTS_TRANSACTIONS	0x00200000
-> -#define FILE_SEQUENTIAL_WRITE_ONCE	0x00100000
-> -#define FILE_READ_ONLY_VOLUME		0x00080000
-> -#define FILE_NAMED_STREAMS		0x00040000
-> -#define FILE_SUPPORTS_ENCRYPTION	0x00020000
-> -#define FILE_SUPPORTS_OBJECT_IDS	0x00010000
-> -#define FILE_VOLUME_IS_COMPRESSED	0x00008000
-> -#define FILE_SUPPORTS_POSIX_UNLINK_RENAME 0x00000400
-> -#define FILE_RETURNS_CLEANUP_RESULT_INFO  0x00000200
-> -#define FILE_SUPPORTS_REMOTE_STORAGE	0x00000100
-> -#define FILE_SUPPORTS_REPARSE_POINTS	0x00000080
-> -#define FILE_SUPPORTS_SPARSE_FILES	0x00000040
-> -#define FILE_VOLUME_QUOTAS		0x00000020
-> -#define FILE_FILE_COMPRESSION		0x00000010
-> -#define FILE_PERSISTENT_ACLS		0x00000008
-> -#define FILE_UNICODE_ON_DISK		0x00000004
-> -#define FILE_CASE_PRESERVED_NAMES	0x00000002
-> -#define FILE_CASE_SENSITIVE_SEARCH	0x00000001
-> -
->   #define FILE_READ_DATA        0x00000001  /* Data can be read from the file   */
->   #define FILE_WRITE_DATA       0x00000002  /* Data can be written to the file  */
->   #define FILE_APPEND_DATA      0x00000004  /* Data can be appended to the file */
-> @@ -151,46 +112,8 @@
->   		FILE_EXECUTE | FILE_DELETE_CHILD | \
->   		FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES)
->   
-> -#define SMB_COM_NEGOTIATE		0x72
->   #define SMB1_CLIENT_GUID_SIZE		(16)
->   
-> -#define SMBFLG_RESPONSE 0x80	/* this PDU is a response from server */
-> -
-> -#define SMBFLG2_IS_LONG_NAME	cpu_to_le16(0x40)
-> -#define SMBFLG2_EXT_SEC		cpu_to_le16(0x800)
-> -#define SMBFLG2_ERR_STATUS	cpu_to_le16(0x4000)
-> -#define SMBFLG2_UNICODE		cpu_to_le16(0x8000)
-> -
-> -struct smb_hdr {
-> -	__be32 smb_buf_length;
-> -	__u8 Protocol[4];
-> -	__u8 Command;
-> -	union {
-> -		struct {
-> -			__u8 ErrorClass;
-> -			__u8 Reserved;
-> -			__le16 Error;
-> -		} __packed DosError;
-> -		__le32 CifsError;
-> -	} __packed Status;
-> -	__u8 Flags;
-> -	__le16 Flags2;          /* note: le */
-> -	__le16 PidHigh;
-> -	union {
-> -		struct {
-> -			__le32 SequenceNumber;  /* le */
-> -			__u32 Reserved; /* zero */
-> -		} __packed Sequence;
-> -		__u8 SecuritySignature[8];      /* le */
-> -	} __packed Signature;
-> -	__u8 pad[2];
-> -	__le16 Tid;
-> -	__le16 Pid;
-> -	__le16 Uid;
-> -	__le16 Mid;
-> -	__u8 WordCount;
-> -} __packed;
-> -
->   struct smb_negotiate_req {
->   	struct smb_hdr hdr;     /* wct = 0 */
->   	__le16 ByteCount;
+> https://lore.kernel.org/linux-nfs/20250924-dir-deleg-v3-15-9f3af8bc5c40@kernel.org/
 
+I love it!
+
+> 
+> I didn't submit it here since it wasn't strictly required for this
+> patchset. If we get around to implementing CB_NOTIFY support however,
+> it will be since we'll need to pass back other information than just
+> the inode.
+> 
+> I could move that into this series if you prefer. If we do that though,
+> then it might also be cleaner to take the previous patch in the series
+> that cleans up __break_lease() arguments:
+> 
+> https://lore.kernel.org/linux-nfs/20250924-dir-deleg-v3-14-9f3af8bc5c40@kernel.org/
+
+If you have a wholesome story to tell then by all means tell it all.
+Don't GRRM us with half a tale.  IOW, it's fine to have a large patch
+series. If it's well split-up then it's great. Al or I apparently can't
+get a series out the door that's under 20 patches so you get the same
+leeway. :)
+
+> 
+> Let me know what you'd prefer.
+> 
+> > >   *
+> > >   * Create a directory.
+> > >   *
+> > > @@ -4427,7 +4428,8 @@ SYSCALL_DEFINE3(mknod, const char __user *, filename, umode_t, mode, unsigned, d
+> > >   * In case of an error the dentry is dput() and an ERR_PTR() is returned.
+> > >   */
+> > >  struct dentry *vfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
+> > > -			 struct dentry *dentry, umode_t mode)
+> > > +			 struct dentry *dentry, umode_t mode,
+> > > +			 struct inode **delegated_inode)
+> > >  {
+> > >  	int error;
+> > >  	unsigned max_links = dir->i_sb->s_max_links;
+> > > @@ -4450,6 +4452,10 @@ struct dentry *vfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
+> > >  	if (max_links && dir->i_nlink >= max_links)
+> > >  		goto err;
+> > >  
+> > > +	error = try_break_deleg(dir, delegated_inode);
+> > > +	if (error)
+> > > +		goto err;
+> > > +
+> > >  	de = dir->i_op->mkdir(idmap, dir, dentry, mode);
+> > >  	error = PTR_ERR(de);
+> > >  	if (IS_ERR(de))
+> > > @@ -4473,6 +4479,7 @@ int do_mkdirat(int dfd, struct filename *name, umode_t mode)
+> > >  	struct path path;
+> > >  	int error;
+> > >  	unsigned int lookup_flags = LOOKUP_DIRECTORY;
+> > > +	struct inode *delegated_inode = NULL;
+> > >  
+> > >  retry:
+> > >  	dentry = filename_create(dfd, name, &path, lookup_flags);
+> > > @@ -4484,11 +4491,16 @@ int do_mkdirat(int dfd, struct filename *name, umode_t mode)
+> > >  			mode_strip_umask(path.dentry->d_inode, mode));
+> > >  	if (!error) {
+> > >  		dentry = vfs_mkdir(mnt_idmap(path.mnt), path.dentry->d_inode,
+> > > -				  dentry, mode);
+> > > +				   dentry, mode, &delegated_inode);
+> > >  		if (IS_ERR(dentry))
+> > >  			error = PTR_ERR(dentry);
+> > >  	}
+> > >  	end_creating_path(&path, dentry);
+> > > +	if (delegated_inode) {
+> > > +		error = break_deleg_wait(&delegated_inode);
+> > > +		if (!error)
+> > > +			goto retry;
+> > > +	}
+> > >  	if (retry_estale(error, lookup_flags)) {
+> > >  		lookup_flags |= LOOKUP_REVAL;
+> > >  		goto retry;
+> > > diff --git a/fs/nfsd/nfs4recover.c b/fs/nfsd/nfs4recover.c
+> > > index b1005abcb9035b2cf743200808a251b00af7e3f4..423dd102b51198ea7c447be2b9a0a5020c950dba 100644
+> > > --- a/fs/nfsd/nfs4recover.c
+> > > +++ b/fs/nfsd/nfs4recover.c
+> > > @@ -202,7 +202,7 @@ nfsd4_create_clid_dir(struct nfs4_client *clp)
+> > >  		 * as well be forgiving and just succeed silently.
+> > >  		 */
+> > >  		goto out_put;
+> > > -	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), dentry, S_IRWXU);
+> > > +	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), dentry, 0700, NULL);
+> > >  	if (IS_ERR(dentry))
+> > >  		status = PTR_ERR(dentry);
+> > >  out_put:
+> > > diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
+> > > index 8b2dc7a88aab015d1e39da0dd4e6daf7e276aabe..5f24af289d509bea54a324b8851fa06de6050353 100644
+> > > --- a/fs/nfsd/vfs.c
+> > > +++ b/fs/nfsd/vfs.c
+> > > @@ -1645,7 +1645,7 @@ nfsd_create_locked(struct svc_rqst *rqstp, struct svc_fh *fhp,
+> > >  			nfsd_check_ignore_resizing(iap);
+> > >  		break;
+> > >  	case S_IFDIR:
+> > > -		dchild = vfs_mkdir(&nop_mnt_idmap, dirp, dchild, iap->ia_mode);
+> > > +		dchild = vfs_mkdir(&nop_mnt_idmap, dirp, dchild, iap->ia_mode, NULL);
+> > >  		if (IS_ERR(dchild)) {
+> > >  			host_err = PTR_ERR(dchild);
+> > >  		} else if (d_is_negative(dchild)) {
+> > > diff --git a/fs/overlayfs/overlayfs.h b/fs/overlayfs/overlayfs.h
+> > > index c8fd5951fc5ece1ae6b3e2a0801ca15f9faf7d72..0f65f9a5d54d4786b39e4f4f30f416d5b9016e70 100644
+> > > --- a/fs/overlayfs/overlayfs.h
+> > > +++ b/fs/overlayfs/overlayfs.h
+> > > @@ -248,7 +248,7 @@ static inline struct dentry *ovl_do_mkdir(struct ovl_fs *ofs,
+> > >  {
+> > >  	struct dentry *ret;
+> > >  
+> > > -	ret = vfs_mkdir(ovl_upper_mnt_idmap(ofs), dir, dentry, mode);
+> > > +	ret = vfs_mkdir(ovl_upper_mnt_idmap(ofs), dir, dentry, mode, NULL);
+> > >  	pr_debug("mkdir(%pd2, 0%o) = %i\n", dentry, mode, PTR_ERR_OR_ZERO(ret));
+> > >  	return ret;
+> > >  }
+> > > diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+> > > index 891ed2dc2b7351a5cb14a2241d71095ffdd03f08..3d2190f26623b23ea79c63410905a3c3ad684048 100644
+> > > --- a/fs/smb/server/vfs.c
+> > > +++ b/fs/smb/server/vfs.c
+> > > @@ -230,7 +230,7 @@ int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char *name, umode_t mode)
+> > >  	idmap = mnt_idmap(path.mnt);
+> > >  	mode |= S_IFDIR;
+> > >  	d = dentry;
+> > > -	dentry = vfs_mkdir(idmap, d_inode(path.dentry), dentry, mode);
+> > > +	dentry = vfs_mkdir(idmap, d_inode(path.dentry), dentry, mode, NULL);
+> > >  	if (IS_ERR(dentry))
+> > >  		err = PTR_ERR(dentry);
+> > >  	else if (d_is_negative(dentry))
+> > > diff --git a/fs/xfs/scrub/orphanage.c b/fs/xfs/scrub/orphanage.c
+> > > index 9c12cb8442311ca26b169e4d1567939ae44a5be0..91c9d07b97f306f57aebb9b69ba564b0c2cb8c17 100644
+> > > --- a/fs/xfs/scrub/orphanage.c
+> > > +++ b/fs/xfs/scrub/orphanage.c
+> > > @@ -167,7 +167,7 @@ xrep_orphanage_create(
+> > >  	 */
+> > >  	if (d_really_is_negative(orphanage_dentry)) {
+> > >  		orphanage_dentry = vfs_mkdir(&nop_mnt_idmap, root_inode,
+> > > -					     orphanage_dentry, 0750);
+> > > +					     orphanage_dentry, 0750, NULL);
+> > >  		error = PTR_ERR(orphanage_dentry);
+> > >  		if (IS_ERR(orphanage_dentry))
+> > >  			goto out_unlock_root;
+> > > diff --git a/include/linux/fs.h b/include/linux/fs.h
+> > > index c895146c1444be36e0a779df55622cc38c9419ff..1040df3792794cd353b86558b41618294e25b8a6 100644
+> > > --- a/include/linux/fs.h
+> > > +++ b/include/linux/fs.h
+> > > @@ -2113,7 +2113,7 @@ bool inode_owner_or_capable(struct mnt_idmap *idmap,
+> > >  int vfs_create(struct mnt_idmap *, struct inode *,
+> > >  	       struct dentry *, umode_t, bool);
+> > >  struct dentry *vfs_mkdir(struct mnt_idmap *, struct inode *,
+> > > -			 struct dentry *, umode_t);
+> > > +			 struct dentry *, umode_t, struct inode **);
+> > >  int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
+> > >                umode_t, dev_t);
+> > >  int vfs_symlink(struct mnt_idmap *, struct inode *,
+> > > 
+> > > -- 
+> > > 2.51.0
+> > > 
+> 
+> -- 
+> Jeff Layton <jlayton@kernel.org>
