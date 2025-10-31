@@ -1,60 +1,68 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC6D2EC55C;
-	Fri, 31 Oct 2025 09:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AF734D3B5
+	for <linux-cifs@vger.kernel.org>; Fri, 31 Oct 2025 09:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761904233; cv=none; b=u4ZDHpacIyRgra8UW8abbSYMV44CVtA+7Q1lNGrNZnmecboEqb6s8rmj8q4CMSVdsgtT5rG7+XSno/+85pgZIz14PTbof0cyIUnEJ76qenTp+D43vasLuCUiQyMN5bsK5ae24kqcEoezvadCdpSH7CvBSh8ybY/A3pWkYndpkIo=
+	t=1761904687; cv=none; b=DnxOh5ApRYtyu62LJR7nnJaBY8GKg0nh1fX+YLk0NZPF2UXMQZlWpwXSJYwsEcv8OOMwCaqdBVt9OyjIu79U4yaMpZGBi5jYHkWEMvri7kMd56C2VTIE3PpeHSZOucSlBg2kWWtCtTxpTefQTD00Q/SjO4OV5pJYnw3isP+Ebn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761904233; c=relaxed/simple;
-	bh=AAQzpALIEI1byftEsiLhQiQHITLlo7WCtAEx+og5c90=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MMFtTJqzkTyWRI9eawNNGbjBXVbyVt0hoU06uYhsYAebKGxFFqDGVFtKk7BaJOkMtA5M0iKjOh7vQJwU1HanhgTQeSO+piwsnbweQeHqMrdrPHfPSjfPWJKsct/Ypk2dfLPiMIynWYuuFlgGNFh8bB1cLZ1DLMOzUM2OwKW09JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 0334b378b63f11f0a38c85956e01ac42-20251031
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:fd5c9343-223a-4aa9-8dd0-8b82aa9f7579,IP:0,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:0
-X-CID-META: VersionHash:a9d874c,CLOUDID:08725b749243088ea88a5cfc84936d74,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102,TC:nil,Content:0|15|50,E
-	DM:-3,IP:nil,URL:99|80|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI
-	:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 0334b378b63f11f0a38c85956e01ac42-20251031
-X-User: chenxiaosong@kylinos.cn
-Received: from [10.42.20.206] [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <chenxiaosong@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
-	with ESMTP id 388334684; Fri, 31 Oct 2025 17:50:20 +0800
-Message-ID: <c2895654-82a8-4548-80af-b3f3d9936dd3@kylinos.cn>
-Date: Fri, 31 Oct 2025 17:50:17 +0800
+	s=arc-20240116; t=1761904687; c=relaxed/simple;
+	bh=ahpYBMDeR0zUKyyvqD8IyQ0ii/8RhYPpw2dhtAgAz3s=;
+	h=Message-ID:Date:MIME-Version:Subject:References:To:Cc:From:
+	 In-Reply-To:Content-Type; b=U5lmVt7MoM5ql8U/QAcG3erHLsQkagej55FnLBsq/+ieQpFCBu3U2cFVnVlWKno2KAr2iL6H1It8DhiF8X4pehPhrrJdtEN31RTclkAcZGFj6S+5/QZUtUiMlvVlAfH5L017Ai0e83cN176yZcB2lZXq2N2SWzRr98AkSsCHGcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pNO8s93I; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pNO8s93I"
+Message-ID: <0ce02ac2-48a8-4a2d-a572-280b1399e768@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761904680;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5RQGLq1edhk0RLep8pwvVeBMCGtirA3xZY7AOpx8X0c=;
+	b=pNO8s93I2gbw/aijHusISNBcjQLZ5OABiXyt0QSoYak0YSrUneyl6sYNUyMQKugQ9UyQ8V
+	V19mZN5/5fh3v1h2s5QJKVzQ8MZ2ZqTiS4IKMyZfUvcRgGQwlWx/emUvywkCNr6F6cajVi
+	SBeNpCNIACAbVmtNjmcoA2PlUNqc/Gw=
+Date: Fri, 31 Oct 2025 17:57:08 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 05/24] smb: move some duplicate definitions to
+Subject: Fwd: [PATCH v4 05/24] smb: move some duplicate definitions to
  common/smb1pdu.h
-To: chenxiaosong.chenxiaosong@linux.dev, sfrench@samba.org,
- smfrench@gmail.com, linkinjeon@kernel.org, linkinjeon@samba.org,
- christophe.jaillet@wanadoo.fr, =?UTF-8?Q?Ralph_B=C3=B6hme?= <slow@samba.org>
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251027071316.3468472-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251027071316.3468472-6-chenxiaosong.chenxiaosong@linux.dev>
 Content-Language: en-US
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
-In-Reply-To: <20251027071316.3468472-6-chenxiaosong.chenxiaosong@linux.dev>
+References: <c2895654-82a8-4548-80af-b3f3d9936dd3@kylinos.cn>
+To: sfrench@samba.org, smfrench@gmail.com, linkinjeon@kernel.org,
+ linkinjeon@samba.org, christophe.jaillet@wanadoo.fr,
+ =?UTF-8?Q?Ralph_B=C3=B6hme?= <slow@samba.org>
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <c2895654-82a8-4548-80af-b3f3d9936dd3@kylinos.cn>
+X-Forwarded-Message-Id: <c2895654-82a8-4548-80af-b3f3d9936dd3@kylinos.cn>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+
+Use @linux.dev email to forward, to avoid the possibility of the email 
+not being received.
+
+
+-------- Forwarded Message --------
+Subject: Re: [PATCH v4 05/24] smb: move some duplicate definitions to 
+common/smb1pdu.h
+Date: Fri, 31 Oct 2025 17:50:17 +0800
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+To: chenxiaosong.chenxiaosong@linux.dev, sfrench@samba.org, 
+smfrench@gmail.com, linkinjeon@kernel.org, linkinjeon@samba.org, 
+christophe.jaillet@wanadoo.fr, Ralph Böhme <slow@samba.org>
+CC: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Greetings,
 
