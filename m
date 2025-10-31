@@ -1,60 +1,59 @@
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5F9223311
-	for <linux-cifs@vger.kernel.org>; Fri, 31 Oct 2025 03:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D13280A56
+	for <linux-cifs@vger.kernel.org>; Fri, 31 Oct 2025 03:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761880728; cv=none; b=JRJqbFZulUDSGWnhz2ndAPcRbcaSJqzN5BfosyizcitWn9Z3NikTtOOq6uwQaAj7cJbGXWMt54oeq71XOEkRWRDYdtO+yY8gHyO9E5U/x3iLSsAv5N684o8NNfT6jqWAbbkV0p1IZ5ZslH5YV+6V5PCRhi2PJx5DRXLSe1FPzi0=
+	t=1761880805; cv=none; b=sW+nJ+WeusVTipqR8oLxqLJmvJIuZolZfyX4zk6NBa5e6bBSSYDWluQJEGIin441BQ8mXp1NY8oM5y/13GgRi9GblIpifa9FyKq0LrSg9eDUNynor3nDLVHNiN3AKwL3XCsnERgunbZH3ZsbVQP5oHDW+YgDqvIZhTglaHPgsLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761880728; c=relaxed/simple;
-	bh=H8ADnCT7+XtmnLo/t/7jpWENWaN9J4LAu5C59CyV8f8=;
+	s=arc-20240116; t=1761880805; c=relaxed/simple;
+	bh=3HhVbz+oiX23cNqSPXcAtTtA3p7J7LV43TxhWjxngIQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=alAcSUOLSdweOY287uI2fDF6h5MsQbjazWCUmCes8zd4O8jj0mslfT+xGL4B+XmBulXsCKPcoZDuQEATNTnEc2wZWnblJrlQwoegRGJVi+7Cw/UIWv78aXDtHMWtUW0V1Y+B9vCDUOXXMLyN+XyInZs6zOiEmSyvuhnerFDR8Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hv74qovj; arc=none smtp.client-ip=209.85.218.50
+	 To:Cc:Content-Type; b=gnKYa819sds8Tfx+ZFHI7KYhRBwqsxpoBGYCgil6oZNVZbn0ezqtS8MX0GnHdYHzwOmpeTf2zreASEun9rvV2cLDk7A2AjvHmcId0wQIq66UCE44J8vE9otN2xbrTDNayOaheve95VMXROLO0rQN6RSsk1R/VVChTmYjPk5ydTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wd6QFjYn; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hv74qovj"
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b6d70df0851so364842066b.1
-        for <linux-cifs@vger.kernel.org>; Thu, 30 Oct 2025 20:18:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wd6QFjYn"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-640741cdda7so1271157a12.2
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Oct 2025 20:20:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761880724; x=1762485524; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761880802; x=1762485602; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=m56MSCi9GS2DAUmAGO0m1PhXXJaDS1IMIajpI5QUjCY=;
-        b=Hv74qovjUcPjRFSCpuImxbbFdSADhw2ZdSSnyQvDnK5IhQgP37K37XGbQSQVcqeF7w
-         gfIxPAJSW4GtttTZ06Gcey5CEIxMirJDslZREzXs6NxVS91KfWrXnIMxXWaXFpWdBgl6
-         OpnueKjtpHsxZDB2k1TziSEZ+e0CRgg4hGVWM4Ql/1zn/WfzaY/AgrTWZ37rOhUcsdOz
-         ioqQ0h8Ug3NyumaI6fvFVf7vng7VaKB3Xjm+WtcF/70Fli4iYtqCuh/BGOByGs1HX56a
-         nN9mFdulF7z9rMZ/lfWfhh+wUm5IVd32guBLsmzoGoe4Pa7wemSGZL2496OPkgmWRwVe
-         l9UA==
+        bh=6hdlfh4APZvyYNBzW9B962sErA2WCFAnDLAh5iqxCGE=;
+        b=Wd6QFjYnQ9W+K75y+zK/dY4T2rspo6n1ECfUhqfpmtlv28OtNQKHbbrYyKFeTbYjsR
+         eheGGwlop2QxKTV1hOJDiIV4XblLu9g6relGBpZmRS9TqqWTTtnPN60980HUtuMCg0dp
+         hGAakOf+170k8fftpPAzL5p2BwfRZcFmsYrAuztJ5f3OoHezcm57AFpZyaz0ik5XowGD
+         D3U8dqof5myGLoucr+Qtk20Dt5vxM4mPVw2b/KZKid/kQQzP9zUIGcVm+Vy7GQ8JuIfN
+         S5xPD7mSzaEQIxEXFYs8g60O5gSSEYVFN3Ga1KbmF2DluZ+JTDd62WsAkqkI520ZZo7n
+         kKOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761880724; x=1762485524;
+        d=1e100.net; s=20230601; t=1761880802; x=1762485602;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=m56MSCi9GS2DAUmAGO0m1PhXXJaDS1IMIajpI5QUjCY=;
-        b=jbxsomkBALg+otOVgadJQb7jJtc3zY/DtBhvr6u60WSJ1OhfnBpUUzC8ECdko8qrfe
-         x+1Y4UQIUE0RKgLb5bpEQf1LwA9MxcSiVyIJ4ULuB4NiO9iK2/hhuvG6WgCtR7MKneuC
-         DINh+8ICvd8UQwJUyBoWTN+sQ2Wd3meNqkpfyfPW4Mx3GMRw6jdZpDAoVph9Sn5TWsZF
-         8YZMsAmdc3ArTgPuC6H3q2hz1ExQrsCtwQj/1SmcT0F2aaM7Mnv8Kd64nDUlBaoZZZm7
-         V5pJj3VcNbHRwFwxFjwF3NgTrH+m4GENuLoNH9RoAeGC42eLYcI6yWTidkqP1LEghNCK
-         dLOw==
-X-Forwarded-Encrypted: i=1; AJvYcCWCWICA/0O3YONQ3X0b9n/lDttyfr8Ane5WECNv9kaZlRQ0drMy9Xc6tObk3e/Uv4jQCURd1CK0phol@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVebl7c7v1a+wh4j3u6y3KTVDuBZ0JbTdSr7EditzfKpe0uBqs
-	H7uMpzmNo7jgLjeV+/MtBRyT04xS6aVCYd5YuOSLOU9CcWGv8ckuCGzREiqol8ubJFwr0eoLQ47
-	DuPjy8Cbk4jAoaMH4R/v8DXq30ly52Pc=
-X-Gm-Gg: ASbGncvxd2g8kPx2GD3jhKYfhPZxKg8p/YAOcovNc7h7Vf8E6B2b3EmG8cMSK6D6DDT
-	x2rA9xH5EYIJv1r3/w7fE7A8vQufXPzSls5z3MaGvAq0J/wKXisKf2Ya9RNIyYrpjeO4W/V8fb3
-	B78Gz+iwKjBZNBKFDVlnyAaD2z+1vuDK3fh7ESWX+eu9qb+tCMjrrbVFF30jSM6TxGPS8TEih2E
-	yCJK4AzBhV9FCYa8Us7ZrdeE8oFfzJ9x+924iCr1m02Saq/CGltzagyDK/E+Jj6t7Kfi7E7k6Gf
-	T0AB
-X-Google-Smtp-Source: AGHT+IFf4/f4waiiynFlzSFaW3MAv42hx+VykCHoNAFRcd7Uim8FFULynsfdXEzGAZSppucIkdK483TZcymapU9M4pI=
-X-Received: by 2002:a17:907:1c09:b0:b70:67a6:ce9c with SMTP id
- a640c23a62f3a-b707089f865mr178665066b.62.1761880724264; Thu, 30 Oct 2025
- 20:18:44 -0700 (PDT)
+        bh=6hdlfh4APZvyYNBzW9B962sErA2WCFAnDLAh5iqxCGE=;
+        b=sBOkAc3nLD9CPwXg9fFhaRsK7COEvQUBjVJ9077vMToUtyXjtxE3e7mLAhuFKlI8ot
+         LKTaacRP/1BGwp7BXWACY2r2HzgQV/9fsgFLwZWpzg5v32IyXJHAta8cErrKyrIXoR2X
+         R9xR2LkxdVWeQ8mQvpxaeSGIge8IaxG5U5nwigyndmZDNn6r06rwFKeFQXtKooXT2k5Z
+         Kq04z2+drKwlzfHCxU3KyZqoJkp1EcA/MC0IBJeYXma6MgZERVKd+VIKR1TZUS/0bkXH
+         xI40yqlj7mRg9selWvKlZaLwECGDnK2Y5OeNU6Hh//3Bf1AvEktx0JF4mYBVD+4iEY+T
+         5uwg==
+X-Forwarded-Encrypted: i=1; AJvYcCXwEaX5slRyBT36lh3fjRNkx9KCg46S9RXG0/Wa3fMY1B9G7NfPvKrxaoO+NA+pG3tb8g3pek7ygwXo@vger.kernel.org
+X-Gm-Message-State: AOJu0YxE5nkGMBRR5DZjj8TTKjpID57ph0JycbEwKw9x4f0khUBiIPpX
+	OHHL1ICfuDfhA1ArtpMRBFxVnbsDpPu7BldCqQSU8GgVBE/HIBju7JaU37cthCpgTCWEYJdwQNc
+	9owo3LsEYPIqYU4AJQqfQITCVvQjWrfk=
+X-Gm-Gg: ASbGnctvvmzNo7TF7rEbpceY8iGLK59+eAVto9rv1RIg6K2y9QtM5YpBm65IC62dxdj
+	sEIWXj/3ZdFEXvQjb5co09Lkw3cPpezgrlRpLoTM2RJI0k2PJKkB6jKRQewLke5T0H+74axTTP5
+	7bG57apJ19egQ0JX68AsqONtLXH50D/Kjz4z+w4+TcUyeKn19ua8G4IPME19B6JSG87R1u0Mmh8
+	YykZWsAd07agqqRg3lWbrWLvJCLsd/PsVERUCqzrizPVdDxAYvSuwekgBM=
+X-Google-Smtp-Source: AGHT+IHRq0Y4FPtYm+Wq2az0RAL1jAfKfa12KLvOtgIMEIe3B0ddlN11aIOCOqF970xmRnO3oZgnZ9G5EsN1LziiIto=
+X-Received: by 2002:a05:6402:27d1:b0:63c:4f2:2131 with SMTP id
+ 4fb4d7f45d1cf-640770161a3mr1454654a12.22.1761880801868; Thu, 30 Oct 2025
+ 20:20:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -63,55 +62,44 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20251030170116.31239-1-bharathsm@microsoft.com>
  <20251030170116.31239-3-bharathsm@microsoft.com> <b3ced9ba1cc2a3d8e451c2e9d7ed460c@manguebit.org>
- <iqf7l4ymr4pebuxkuxdklftctcctvfhilivf6zvtxqgwf5cics@ztoabwasr4md>
-In-Reply-To: <iqf7l4ymr4pebuxkuxdklftctcctvfhilivf6zvtxqgwf5cics@ztoabwasr4md>
+In-Reply-To: <b3ced9ba1cc2a3d8e451c2e9d7ed460c@manguebit.org>
 From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Fri, 31 Oct 2025 08:48:33 +0530
-X-Gm-Features: AWmQ_bmoOmuHGdp8BFePG1f8ILtaAl4pQ-EmLWApsID7NTuu1MqUhgm4cVQMp5E
-Message-ID: <CANT5p=pnXLDyZMVoKdUqTzPB7dxj2kd1g+2FfzD8LS4+8LyODg@mail.gmail.com>
+Date: Fri, 31 Oct 2025 08:49:50 +0530
+X-Gm-Features: AWmQ_bnK5M9LEhBS2Bwp_KrtQ8PAQnwg2dKdcCIITIS1cKjn7FN9k9gsJSTqCZE
+Message-ID: <CANT5p=pbEAKBm3K26AxtZV9+UwXvfrrk-fYs7LsSD3nHdZptNw@mail.gmail.com>
 Subject: Re: [PATCH 3/3] smb: client: show directory lease state in /proc/fs/cifs/open_dirs
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: Paulo Alcantara <pc@manguebit.org>, Bharath SM <bharathsm.hsk@gmail.com>, 
-	linux-cifs@vger.kernel.org, sprasad@microsoft.com, smfrench@gmail.com, 
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: Bharath SM <bharathsm.hsk@gmail.com>, linux-cifs@vger.kernel.org, 
+	sprasad@microsoft.com, smfrench@gmail.com, 
 	Bharath SM <bharathsm@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Enzo,
-
-On Fri, Oct 31, 2025 at 3:42=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de>=
- wrote:
+On Fri, Oct 31, 2025 at 3:28=E2=80=AFAM Paulo Alcantara <pc@manguebit.org> =
+wrote:
 >
-> On 10/30, Paulo Alcantara wrote:
-> >Bharath SM <bharathsm.hsk@gmail.com> writes:
-> >
-> >> Expose the SMB directory lease bits in the cached-dir proc
-> >> output for debugging purposes.
-> >>
-> >> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
-> >> ---
-> >>  fs/smb/client/cached_dir.c |  7 +++++++
-> >>  fs/smb/client/cached_dir.h |  1 +
-> >>  fs/smb/client/cifs_debug.c | 23 +++++++++++++++++++----
-> >>  3 files changed, 27 insertions(+), 4 deletions(-)
-> >
-> >Are you increasing cached_fid structure just for debugging purposes?
-> >That makes no sense.
-> >
-> >cached_fid structure has a dentry pointer, so what about accessing lease
-> >flags as below
-> >
-> >        u8 lease_state =3D CIFS_I(d_inode(cfid->dentry))->oplock;
+> Bharath SM <bharathsm.hsk@gmail.com> writes:
 >
-> Also, I don't think we can even get anything different than RH caching
-> for dirs.
-I don't think we can make an assumption about what all servers return.
-I don't mind dumping this extra info about the lease state.
+> > Expose the SMB directory lease bits in the cached-dir proc
+> > output for debugging purposes.
+> >
+> > Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> > ---
+> >  fs/smb/client/cached_dir.c |  7 +++++++
+> >  fs/smb/client/cached_dir.h |  1 +
+> >  fs/smb/client/cifs_debug.c | 23 +++++++++++++++++++----
+> >  3 files changed, 27 insertions(+), 4 deletions(-)
 >
-> Even on RH -> R lease breaks (IIRC this can happen), we don't handle it
-> and cfid is gone anyway.
+> Are you increasing cached_fid structure just for debugging purposes?
+> That makes no sense.
 >
-
+> cached_fid structure has a dentry pointer, so what about accessing lease
+> flags as below
+>
+>         u8 lease_state =3D CIFS_I(d_inode(cfid->dentry))->oplock;
+>
+I agree with Paulo here. We should avoid duplicating data if it's
+already available elsewhere.
 
 --=20
 Regards,
