@@ -1,149 +1,102 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0DE2652A4
-	for <linux-cifs@vger.kernel.org>; Fri, 31 Oct 2025 17:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA2C32ED50
+	for <linux-cifs@vger.kernel.org>; Fri, 31 Oct 2025 23:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761931987; cv=none; b=VIc+OuP8mIRyldcuTiMsbbirC0L3Hb4AfEeTGXzU73sbql0uj3uKqW/kB/qfeqn9z3SOV+8h+/JtJHXnBUddHi4s37SxhbKzvYbVSvMYJUjaKGfIiI/6VlVEMGawM1CPH5nEu1tu06vTPFTTiccRHW508pJmRwwE1dWBZaink+4=
+	t=1761954654; cv=none; b=QpLitvVlFj8odKy/MnT5hiRz/mnABM6+6mfSHD3GgQmaTzA6SDKZdujMevhjv6mRUt6wLX1aqToKHocp2XOuldMvz1SJ+3+5CuzHGCzHolphxj7rhTaPm62y0QjioLjQ6JnZVXGFPx85nLuRIXGuNfDZrP/DB4b9vhn82WWWBV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761931987; c=relaxed/simple;
-	bh=7sCevWjkyjL3d+vFNxL1lN9dML6nd3bnDu+c33kO9jI=;
+	s=arc-20240116; t=1761954654; c=relaxed/simple;
+	bh=vpvm7wOdtrB3Ns8GW+amqnU7ULxpYLWKGAm34Amb4T0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rqDQbIp4gWZBfJiczQfcTiE9xWWHPCkzwlnXkodkeFNkWOMQV3Exb7qGQaZypqtgOLXIpGMVfEyL1zFtQZYvV1JzVig7CB5ZUitAUn+IGprzYTD/c5fBJ9DzETbbNA7788iwQ5kBvei8ZsISt0Xjh7IRO1uPFKdt52hnPttRxQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MqSyc2PO; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=ND4at8BS6H2kq+8idVsY5gFl8n3v8/iq5PVnKn2rkt8q6/J3WuyI0aF8gS/0iyl5OVJ951E0Y9iEa6o2CZOR2KUJvW0u9RQ37s/36gUZ/3wg8hh1jke8/1JbcOS74HNDX9xn/TlNK7WiFForDfBlP6LZamd046jntUXspdAwH5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nCdsl7UJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqSyc2PO"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-88021e1abc4so19728926d6.2
-        for <linux-cifs@vger.kernel.org>; Fri, 31 Oct 2025 10:33:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761931983; x=1762536783; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ibj1wv0KJmrPfux8dZzfE+rsy2vdBV17eWfAlpZNk+o=;
-        b=MqSyc2POelGyHxUBRoWudRxJZcfJiqgkqbdkQTdfgzZE95+YWUXcS2j6LN+wxJzHrD
-         S+A7/QIXID68Kb2sEDiLauLKtc0iqIkWgbqdCPJbrvTgtHWDpjbKtxXuvSpCwMRSNMSX
-         u+sUkxEbBgV4Hj8XwdnmTH1TqslS7hOT2pUYd9teCtwTjDV1JgajASrUr6rlZAIzS0mT
-         nZmngQKhvfAjpE7vCijjybpyJt6JMJZcP7u0I209vSnMLPRzd8s6sw3RuSOMmtHrE0K8
-         J1jtr+JNUAWWArTLh5Mx+DWrjyKnEb7yDg4lGYQBuZ+HLqGQCu3DEnm+oGLtzFMBAS5t
-         R9oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761931983; x=1762536783;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ibj1wv0KJmrPfux8dZzfE+rsy2vdBV17eWfAlpZNk+o=;
-        b=VsSXh22sUiEfRpSKoaDWwQilTsMt9B2VrMxDiUhKeQY6Qhmqdyq5rsCbNLDWBqMJG8
-         LKtXLZG6dSPcsFcSeQzgohKVvS3GkMVekJ9P3bVfakfxZ+Fe5Zm+a2GucD3WhR4+B0yC
-         LKuef6VYvShfLmhrUuRTfUkCLnyDeUhcSqYR9CfukzWo46FYUZ+DAAl0CkXkL5QvqbZR
-         fdMeBQUl1s3h9ClmIv+kIWaenb6kABr/EpQxVvkIR4G3OUCSZIibHnn0gJqOgHoYOp1I
-         srcO9n5pMoRfNavwQTn1CxcC2t74ECLM+Wev1u648y1mUoQJ/Wa31lGYfSW5pZaeFckC
-         bW7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUgjvo9Ogzq7w4ikQDVi5mu4bmXhfalkuqPpW7Z/FfmcbAIlStLrkyANBuEA0rhJlRhkCRwQz+cwya0@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywy/R+21kEvtVc5bb0IpY8Fjq4m/FW3+86GTr8eko9Ckw1IvtVe
-	ycMpgpUS2619IZhfthzXaLaz50BtmKgygiZgQOcgkR23GhA7OmWI9bnA7+1Qc7nJJO5rXgDUnqA
-	Ay3Cs+y91fIVgtg7u9NCijiBQvROHQ51Fmfhn
-X-Gm-Gg: ASbGnctvUSYR5BGmdGhrT/ClGopBcyOcDXiKkBSCFJc5vMCUSNbprGfuKeHcauPk2FP
-	QpLbkkJq1qcOK8dV9NStt771t3UuzWeHwykcmUW1IUyYiSDdyAJ9GrZptn2Jxvl7WHUCRgZ5zED
-	gXqDqYf56R/+LkOF550qMnI8Q+S9fja9fQsKeFYkgPGnxgQ5EylC3oD0Hp/YCYYkfN1JxC7uTdA
-	/9KSu3/LXawjEJePvp5Wwt7WqafjU42u8EHr70ugWjQUAFDTaF2ogW1FvmLCIFB9wpRNCTUeuug
-	0vuC1OHk4K0faPAQJYzJFAyz/bXaziMYw3h/HZaxXF3XeDykUSh5+fz9LaGd2vLnY+3hlK4K1Mw
-	5oh2V/Pyf+Yk2LGuYHH7+/RMHY3yG2/4rZFCidXxmdGoIMfOKIREo+6dXXIUdY27hCMGxhKvIFR
-	w=
-X-Google-Smtp-Source: AGHT+IEFaeQpOBUZ6qeAuDaef87etVuRUyKDAKEMcWbNk01VtIfZMB4VK7zptzTLlanV5zfB7swl3G4E9bFWjH6Z/hE=
-X-Received: by 2002:a05:6214:f02:b0:880:2368:2e70 with SMTP id
- 6a1803df08f44-8802f43e997mr59400166d6.39.1761931983251; Fri, 31 Oct 2025
- 10:33:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nCdsl7UJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6105C19423
+	for <linux-cifs@vger.kernel.org>; Fri, 31 Oct 2025 23:50:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761954653;
+	bh=vpvm7wOdtrB3Ns8GW+amqnU7ULxpYLWKGAm34Amb4T0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=nCdsl7UJpLskZO67zKjdkVugtZEur3BWgNp9mub2G4iiB83QHMcNN72wFva6dX4SI
+	 YjSIZquKKAMWlcNum97jMhrIaADzvD/rfVNn2i9UixTspTn4VsRFsHYEOAnzKfBgQI
+	 tTlPWWjZBQ18qIIBWw4m6G39sKfIl+J3AKtJEx2/8rKyYmthb/aqtqRINWMc7qt052
+	 1UMeENKUvRqavAd0Y+RGMgtvAXFvSK/CuS6eggNH8jZddwhTQ3BNjtf38iJAmX0Q7N
+	 84zYNXZo1mxUXvCj3bU1BeAFyKCOeIGrKX9K9EPAaaU/6c5b0VB9hgjaYEHsyBNi2J
+	 7yJymZj2tziUA==
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-63c3d7e2217so5022111a12.3
+        for <linux-cifs@vger.kernel.org>; Fri, 31 Oct 2025 16:50:53 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWQSi9tlH4gof5BEJfFqvuqcNNQ9BmOTCbThGsRFsWnO/xhaWe2ZZpu7UNIJ0Wgc1iKaFSbcFEq5Rec@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoVbJOj0CILkgOoW77iWd7IA3EpQ27XRnyZwZhRM0Qp6bPt1WV
+	Eo+cXVLX7BX0G5bpO29s7gfncrJVV33j1Q+WKEniUSK71nDV25qa2CJ5J3T0ByjQcDOCc2a/tKR
+	At/X+KxRl00C0lhFpL7okrR1xwq11YCY=
+X-Google-Smtp-Source: AGHT+IFYOngRr162Y43f2hE7ormKcaP4Mblz6ZPfEkfVpLgAUzvuR4AnuPYlcQQNTLsH0+ZVIi9NNkQ11nuI7J5go9w=
+X-Received: by 2002:a05:6402:1e88:b0:63c:1170:656a with SMTP id
+ 4fb4d7f45d1cf-64077041b61mr3590736a12.37.1761954652229; Fri, 31 Oct 2025
+ 16:50:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251030170116.31239-1-bharathsm@microsoft.com>
- <20251030170116.31239-3-bharathsm@microsoft.com> <b3ced9ba1cc2a3d8e451c2e9d7ed460c@manguebit.org>
- <iqf7l4ymr4pebuxkuxdklftctcctvfhilivf6zvtxqgwf5cics@ztoabwasr4md>
- <CANT5p=pnXLDyZMVoKdUqTzPB7dxj2kd1g+2FfzD8LS4+8LyODg@mail.gmail.com> <6juyv7x4jacgyxpfgtmcegyzso2mblw43t2x6pc4g5fnsfyody@ji2zhgqnrgvq>
-In-Reply-To: <6juyv7x4jacgyxpfgtmcegyzso2mblw43t2x6pc4g5fnsfyody@ji2zhgqnrgvq>
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 31 Oct 2025 12:32:51 -0500
-X-Gm-Features: AWmQ_bkJeqr4K5pX8QJ5dM2pwmm15f0beLbjFu0BC2ORO9nZqGNjhlkExz2SpWk
-Message-ID: <CAH2r5mtZ5D=CJSVbfri0tdBXZSwj+FJ5sUHhFWWZ9BxmzZqNVQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] smb: client: show directory lease state in /proc/fs/cifs/open_dirs
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: Shyam Prasad N <nspmangalore@gmail.com>, Paulo Alcantara <pc@manguebit.org>, 
-	Bharath SM <bharathsm.hsk@gmail.com>, linux-cifs@vger.kernel.org, sprasad@microsoft.com, 
-	Bharath SM <bharathsm@microsoft.com>
+References: <20251030064736.24061-1-dqfext@gmail.com> <CAKYAXd9nkQFgXPpKpOY+O_B5HRLeyiZKO5a4X5MdfjYoO_O+Aw@mail.gmail.com>
+ <CALW65jZQzTMv1HMB3R9cSACebVagtUsMM9iiL8zkTGmethfcPg@mail.gmail.com>
+ <2025103116-grinning-component-3aea@gregkh> <CALW65jZgu2=BfSEvi5A8vG_vBKrg=XLs68UoE3F3GBOOpeJtpg@mail.gmail.com>
+In-Reply-To: <CALW65jZgu2=BfSEvi5A8vG_vBKrg=XLs68UoE3F3GBOOpeJtpg@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 1 Nov 2025 08:50:40 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8gbpoQXCsEuaKsoZpsw2ZR5GkT4scLoBSLCkScH6Xvow@mail.gmail.com>
+X-Gm-Features: AWmQ_bn2HoAc3qCopFzNNtsX8TZzJNQBiOPs9s_azg1kgzYotbe35jPoxbA5UI0
+Message-ID: <CAKYAXd8gbpoQXCsEuaKsoZpsw2ZR5GkT4scLoBSLCkScH6Xvow@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: server: avoid busy polling in accept loop
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steve French <smfrench@gmail.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Sasha Levin <sashal@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-dropped that patch from for-next (kept the other two small debug ones,
-although those are low priority)
-
-On Fri, Oct 31, 2025 at 7:55=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de>=
- wrote:
+On Fri, Oct 31, 2025 at 4:49=E2=80=AFPM Qingfang Deng <dqfext@gmail.com> wr=
+ote:
 >
-> On 10/31, Shyam Prasad N wrote:
-> >Hi Enzo,
+> On Fri, Oct 31, 2025 at 3:44=E2=80=AFPM Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
 > >
-> >On Fri, Oct 31, 2025 at 3:42=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.=
-de> wrote:
-> >>
-> >> On 10/30, Paulo Alcantara wrote:
-> >> >Bharath SM <bharathsm.hsk@gmail.com> writes:
-> >> >
-> >> >> Expose the SMB directory lease bits in the cached-dir proc
-> >> >> output for debugging purposes.
-> >> >>
-> >> >> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
-> >> >> ---
-> >> >>  fs/smb/client/cached_dir.c |  7 +++++++
-> >> >>  fs/smb/client/cached_dir.h |  1 +
-> >> >>  fs/smb/client/cifs_debug.c | 23 +++++++++++++++++++----
-> >> >>  3 files changed, 27 insertions(+), 4 deletions(-)
-> >> >
-> >> >Are you increasing cached_fid structure just for debugging purposes?
-> >> >That makes no sense.
-> >> >
-> >> >cached_fid structure has a dentry pointer, so what about accessing le=
-ase
-> >> >flags as below
-> >> >
-> >> >        u8 lease_state =3D CIFS_I(d_inode(cfid->dentry))->oplock;
-> >>
-> >> Also, I don't think we can even get anything different than RH caching
-> >> for dirs.
-> >I don't think we can make an assumption about what all servers return.
-> >I don't mind dumping this extra info about the lease state.
+> > On Fri, Oct 31, 2025 at 03:32:06PM +0800, Qingfang Deng wrote:
+> > > Hi Namjae,
+> > >
+> > > On Thu, Oct 30, 2025 at 4:11=E2=80=AFPM Namjae Jeon <linkinjeon@kerne=
+l.org> wrote:
+> > > > > Fixes: 0626e6641f6b ("cifsd: add server handler for central proce=
+ssing and tranport layers")
+> > > > > Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+> > > > Applied it to #ksmbd-for-next-next.
+> > > > Thanks!
+> > >
+> > > I just found that this depends on another commit which is not in
+> > > kernel versions earlier than v6.1:
+> > > a7c01fa93aeb ("signal: break out of wait loops on kthread_stop()")
+> > >
+> > > With the current Fixes tag, this commit will be backported to v5.15
+> > > automatically. But without said commit, kthread_stop() cannot wake up
+> > > a blocking kernel_accept().
+> > > Should I change the Fixes tag, or inform linux-stable not to backport
+> > > this patch to v5.15?
+> >
+> > Email stable@vger.kernel.org when it lands in Linus's tree to not
+> > backport it that far.
 >
-> It's not an assumption, it's a fact -- if a server returns anything
-> different than RH for a dir lease, the server is broken and we shouldn't
-> even trust/cache it.
->
-> >> Even on RH -> R lease breaks (IIRC this can happen), we don't handle i=
-t
-> >> and cfid is gone anyway.
->
-> My point is a dir is either cached (RH, cfid->has_lease =3D=3D true) or w=
-e
-> don't (lease break with 0 or R-cache only, cfid->has_lease =3D=3D false).
->
-> So unless we're changing/handling the behaviour for RH -> R downgrades
-> (which I really think we shouldn't), creating such level of granularity
-> makes no sense and will only cause confusion (imagine seeing W-caching
-> for a dir).
->
->
-> Cheers,
->
-> Enzo
+> Noted. Thanks!
+I think it would be better to use the stable tag + kernel version tag
+instead of the fixes tag.
 
+Cc: stable@vger.kernel.org # v6.1+
 
-
---=20
-Thanks,
-
-Steve
+Also, I don't think this patch necessarily needs to be merged into the
+stable kernels.
+Thanks.
