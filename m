@@ -1,112 +1,134 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976401397
-	for <linux-cifs@vger.kernel.org>; Sun,  2 Nov 2025 03:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C886B1DEFE7
+	for <linux-cifs@vger.kernel.org>; Sun,  2 Nov 2025 07:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762052469; cv=none; b=OcY7zhjPjKtwnWBYjEfUc6dMp5wHB/v4KJTzTi0lI2BXnEfc0q8U82c+rcThuJnSvqSYjVTaqSbTAOXL3fn5l6ut4DNhpTTFMx0KppCIO+PrwK4kpK2ChaOev+kOnIUsZmIVsxiicIoiEvTV7hzkksrVAZ34KVlc7tuZJvOzmA4=
+	t=1762068740; cv=none; b=S/NEeW9yZCDgRK1ucyS8M86zU9RlkRh/BF2GmJxsm/uGTkIqUfFrJqVGG9XDEEcDA5eea2+oUx75G92Uy0YuQGTIyOOERJbDlB0moO6xg5A9Ka7zFSuAd+zLX41NYNOsP/znUHwgmksWyi9U022Bb4lXkOO8Wt0+A8Bc7zxJKEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762052469; c=relaxed/simple;
-	bh=IQPlxWK2SiCYHp3ozQZ0AHeaXF3prwFijLEBBh82vT0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=RfzggxIAyFN597gbEO8BI8kLiq/L+NSDpi0n/XC8wqLFnItPdnjzTsm3VYkY+i/Qy0eUsW383bJg4Au/+mZxxfMuZ2bs2hvGdLjvIwDHxd2syTdplAuWVBqyJj0FFMbhwgdIR/4bG6rlp+W5mty4jo9I2TO0Jl24hf/fJRkZ9fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 27988c6cb79811f0a38c85956e01ac42-20251102
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:14a2a488-7914-4b8b-a08d-53dd174efb49,IP:10,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:1,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:11
-X-CID-INFO: VERSION:1.3.6,REQID:14a2a488-7914-4b8b-a08d-53dd174efb49,IP:10,URL
-	:0,TC:0,Content:0,EDM:0,RT:0,SF:1,FILE:0,BULK:0,RULE:Release_Ham,ACTION:re
-	lease,TS:11
-X-CID-META: VersionHash:a9d874c,CLOUDID:fe36ae48f8e0976b8a2f7cc453af3b6f,BulkI
-	D:251101080553FTFBUHBO,BulkQuantity:3,Recheck:0,SF:19|38|64|66|72|78|80|81
-	|82|83|102|841,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:1,File:nil,RT:nil,B
-	ulk:40,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
-	0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FSD,TF_CID_SPAM_ULS
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 27988c6cb79811f0a38c85956e01ac42-20251102
-X-User: chenxiaosong@kylinos.cn
-Received: from [192.168.0.101] [(220.202.230.216)] by mailgw.kylinos.cn
-	(envelope-from <chenxiaosong@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
-	with ESMTP id 1064133614; Sun, 02 Nov 2025 11:00:57 +0800
-Message-ID: <72b98be3-c8aa-46ec-aa08-7687b9ee0209@kylinos.cn>
-Date: Sun, 2 Nov 2025 11:00:54 +0800
+	s=arc-20240116; t=1762068740; c=relaxed/simple;
+	bh=xWSv1it25Xy4tFCIged1MnqeORJzvNk9fJ9H6RwZpbo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UlfGRWVntFiPlmso7ZLfP7j0YUGk7U29KzVVRb+KznUi0PHkboMeRmoe9yB3gKHtU0txtkMGY+YvIHDbtwSUT+2BVbyaVvE1wKQMdNeTXS/d7JDkityVjBr/pA8bX06C7uZflzujSzcEsYK36OqJ9FIKa5SYxukXnYe2HS9s8u0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RoAShPJc; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RoAShPJc"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762068735;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Bbe2mlfUV4MuMFB3diayfmXCwmdcycYZm+yEgSQApfU=;
+	b=RoAShPJcpeQ0Fg0vQ+nWFCPhI7zwFJ/lDFojaGFafXztPsxQc6CSD+xEORNuM2xdNSUIHT
+	T/Rri0CaZY5G4SzRrzKzuW3SHnGSTagxAr8SOhdb20cdCHgOxJuLqhY+YkLQOjG0Z2c+Nc
+	KNmZAgwgGk9X/LUQ9urOGC7BXyVqSQg=
+From: chenxiaosong.chenxiaosong@linux.dev
+To: sfrench@samba.org,
+	smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	linkinjeon@samba.org,
+	christophe.jaillet@wanadoo.fr
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH v5 00/14] smb: move duplicate definitions to common header file
+Date: Sun,  2 Nov 2025 15:30:45 +0800
+Message-ID: <20251102073059.3681026-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/6] smb/server: fix return value of smb2_notify()
-To: Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
- CIFS <linux-cifs@vger.kernel.org>
-References: <20251017084610.3085644-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251017084610.3085644-3-chenxiaosong.chenxiaosong@linux.dev>
- <CAKYAXd-DxRTEu65-YKwXw8jA478jmgQAtOUNR66Tjb+czxp=xw@mail.gmail.com>
- <63eb1d4e-b606-4776-a0cd-d41c6bdc60be@linux.dev>
- <CAKYAXd9GGAX+RX+s5_jLUPMnjenWvJw3S3aO2CJW8BqLWqNdnQ@mail.gmail.com>
- <CAH2r5mttHJfMTEc7xS56va-WDohXQ3DfuYKq0OFWgFiGEQHoGQ@mail.gmail.com>
-Content-Language: en-US
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
-In-Reply-To: <CAH2r5mttHJfMTEc7xS56va-WDohXQ3DfuYKq0OFWgFiGEQHoGQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-I will also try to work on improvements for the client. This will be 
-very interesting and very useful.
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Good news: next year I will be able to fully focus on SMB development.
+The following patches from v3 have already been merged into the mainline:
 
-Thanks,
-ChenXiaoSong.
+  - 6fced056d2cc smb/server: fix possible memory leak in smb2_read()
+  - 379510a815cb smb/server: fix possible refcount leak in smb2_sess_setup()
+  - d877470b5991 smb: move some duplicate definitions to common/cifsglob.h
 
-On 11/2/25 10:52 AM, Steve French wrote:
-> I am also very interested in the work to improve the VFS to allow
-> filesystems, especially cifs.ko (client) to support change notify
-> (without having to use the ioctl or smb client specific tool, smbinfo
-> etc).  It will be very useful
-> 
-> On Fri, Oct 31, 2025 at 7:10 PM Namjae Jeon <linkinjeon@kernel.org> wrote:
->>
->> On Sat, Nov 1, 2025 at 9:05 AM ChenXiaoSong
->> <chenxiaosong.chenxiaosong@linux.dev> wrote:
->>>
->>> Hi Namjae,
->> Hi ChenXiaoSong,
->>>
->>> I’m referring to the userspace samba code and trying to implement this
->>> feature.
->> Sounds great!
->> There are requests from users to implement it :
->> https://github.com/namjaejeon/ksmbd/issues/495#issuecomment-3473472265
->> Thanks!
->>>
->>> Thanks,
->>> ChenXiaoSong.
->>>
->>> On 11/1/25 7:56 AM, Namjae Jeon wrote:
->>>> On Fri, Oct 17, 2025 at 5:47 PM <chenxiaosong.chenxiaosong@linux.dev> wrote:
->>>>>
->>>>> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->>>>>
->>>>> smb2_notify() should return error code when an error occurs,
->>>>> __process_request() will print the error messages.
->>>>>
->>>>> I may implement the SMB2 CHANGE_NOTIFY response (see MS-SMB2 2.2.36)
->>>>> in the future.
->>>> Do you have any plans to implement SMB2 CHANGE_NOTIFY?
->>>> Thanks.
->>>
-> 
-> 
-> 
+The following patches from v4 have been applied to [the ksmbd-for-next-next branch](https://git.samba.org/?p=ksmbd.git;a=shortlog;h=refs/heads/ksmbd-for-next-next):
+
+  - smb: move resume_key_ioctl_rsp to common/smb2pdu.h
+  - smb: move copychunk definitions to common/smb2pdu.h
+  - smb: move smb_sockaddr_in and smb_sockaddr_in6 to common/smb2pdu.h
+  - smb: move SMB1_PROTO_NUMBER to common/smbglob.h
+  - smb: move get_rfc1002_len() to common/smbglob.h
+  - smb: move smb_version_values to common/smbglob.h
+  - smb: rename common/cifsglob.h to common/smbglob.h
+
+In order to maintain the code more easily, move some duplicate definitions
+to common header file.
+
+Add some MS documentation references for macro and struct definitions.
+
+I will test these code changes with smbtorure and xfstests as soon as possible.
+
+By cleaning the common definitions for client and server, I've become more
+familiar with the MS documentation, which I believe will be very useful for
+developing SMB features soon. 
+
+v4->v5:
+  - The following modifications were made according to Namjae's and Steve's suggestions.
+  - Create patch #01 #02 #08.
+  - Patch #07: move struct smb_hdr to common/smb2pdu.h, do not move SET_FILE_READ_RIGHTS and SET_FILE_WRITE_RIGHTS.
+  - Patch #09 ~ #12: move definitions to common/fscc.h
+  - Patch #10: include all changes that only rename structures in this patch.
+  - Patch #11 #12: some cleanups.
+
+v4: https://lore.kernel.org/all/20251027071316.3468472-1-chenxiaosong.chenxiaosong@linux.dev/
+
+ChenXiaoSong (13):
+  smb/client: fix CAP_BULK_TRANSFER value
+  smb: move MAX_CIFS_SMALL_BUFFER_SIZE to common/smbglob.h
+  smb: move create_durable_req_v2 to common/smb2pdu.h
+  smb: move create_durable_handle_reconnect_v2 to common/smb2pdu.h
+  smb: move create_durable_rsp_v2 to common/smb2pdu.h
+  smb/server: remove create_durable_reconn_req
+  smb: move SMB_NEGOTIATE_REQ to common/smb2pdu.h
+  smb: move list of FileSystemAttributes to common/fscc.h
+  smb: move some duplicate struct definitions to common/fscc.h
+  smb: move FILE_SYSTEM_SIZE_INFO to common/fscc.h
+  smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/fscc.h
+  smb: do some cleanups
+  smb: fix some warnings reported by scripts/checkpatch.pl
+
+ZhangGuoDong (1):
+  smb: move some duplicate definitions to common/smb2pdu.h
+
+ fs/smb/client/cifsglob.h   |   1 +
+ fs/smb/client/cifspdu.h    | 593 +++++++++++--------------------------
+ fs/smb/client/cifssmb.c    |  12 +-
+ fs/smb/client/connect.c    |   4 +-
+ fs/smb/client/inode.c      |   4 +-
+ fs/smb/client/ntlmssp.h    |   8 +-
+ fs/smb/client/readdir.c    |  12 +-
+ fs/smb/client/reparse.h    |   8 +-
+ fs/smb/client/rfc1002pdu.h |   8 +-
+ fs/smb/client/smb1ops.c    |   2 +-
+ fs/smb/client/smb2inode.c  |   2 +-
+ fs/smb/client/smb2pdu.c    |  16 +-
+ fs/smb/client/smb2pdu.h    |  69 -----
+ fs/smb/common/fscc.h       | 179 +++++++++++
+ fs/smb/common/smb2pdu.h    | 221 +++++++++++++-
+ fs/smb/common/smbacl.h     |   8 +-
+ fs/smb/common/smbglob.h    |   4 +
+ fs/smb/server/oplock.c     |   8 +-
+ fs/smb/server/smb2ops.c    |   6 +-
+ fs/smb/server/smb2pdu.c    | 116 ++++----
+ fs/smb/server/smb2pdu.h    |  68 -----
+ fs/smb/server/smb_common.h | 237 +--------------
+ fs/smb/server/vfs.c        |   2 +-
+ 23 files changed, 682 insertions(+), 906 deletions(-)
+ create mode 100644 fs/smb/common/fscc.h
+
+-- 
+2.43.0
 
