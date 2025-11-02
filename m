@@ -1,32 +1,32 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5662821883F
-	for <linux-cifs@vger.kernel.org>; Sun,  2 Nov 2025 07:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F88253F11
+	for <linux-cifs@vger.kernel.org>; Sun,  2 Nov 2025 07:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762068743; cv=none; b=MYKZ3UHJSj+j9Rmy6ZLYWIWNHuRUoBUu6MW/O3XTotZNT5JnNPBJlemgmBKQYoEG7WEM56sFU5bcu2NxIrs1qQPXYC+2Hjn85kmyhs1O+GCNlg6VUjqbgHdDCYIfUMS7d6CYUMq06jbLcqTryIX43xTnXnlLwc4wKVDGaxiTAtk=
+	t=1762068746; cv=none; b=u9JRiD7E6bPap/+WU0BUwykatV31xnYBDiWu/AoHO60cofFBRmVJB/wS+er6uICsY+nBFVm17Txv5t8EdCJd3YdVdMHHnRliSlZEHVmwKqzieOnSCstysbTlIJkVwGOsW0iPIcGwzcfnDsjeZcwaIx8zmvEnQR4gxTTctnpIEUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762068743; c=relaxed/simple;
-	bh=lv0j/YcQFKnUdk2DHk6VDntmzv28QzwppahtJd7spvY=;
+	s=arc-20240116; t=1762068746; c=relaxed/simple;
+	bh=Zx31GQhTf+NGlFQDldb/w2jBqmYAff62m6LXTgOKi08=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B1JdToBEvJPFn8IadvQuAIbPo2WQts6/Y6RFr2mrcyBbQY8rpRIMjZpVekWi7FmI88iS1ZZA7CyoS+4Zp8blenzQ4f4L960CWAesv8d0vc+2+s05DeKkTN2XyGBeeDsBtt0NR/qShMhtIC/Zbk87M4HRr2QZW2iRJaKHqIbxFCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vSCcAmoF; arc=none smtp.client-ip=91.218.175.179
+	 MIME-Version; b=QRNVfcTIXLOR7kMPoelNr4RkWbr1nllCz2rtzCC5Cx1I8WJLhntKT4B3G+Kqdi/jQZZ12ziCoMPFAJ8Si/KNFEhjwuVHkSjyzBhVGaB5DrtC4BM9XRpsthZOyde3tK6aUXLSixD/K9H1GAzbgioaSMe5vts4iR1u4rIj6gnrdQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=djjU7PTm; arc=none smtp.client-ip=91.218.175.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vSCcAmoF"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="djjU7PTm"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762068738;
+	t=1762068740;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fRMYMmekqqB7pIlz/+ak7bgcPvJClWJupmxwrOImkfI=;
-	b=vSCcAmoF1xy82lMvssN4AVU0mW/KDxleHuk8icuFO3M2ij8CWnKbkdGpUxgIUnCu8hBBi0
-	jjTvQMRWsUGKmNvu1oGcVO+rNojoRKOl+Iu5Mz7rYocr3BzQ1/V2CqLa9a7WerzJiAWxpb
-	QLAe9LoGU/nHC7Y8fvHPFILTCONCTE0=
+	bh=x1PKr7dfmn1x3wo4NC3mmqZ1Avb8U3jlg6h/I/4TzkM=;
+	b=djjU7PTmllE2QhB+q9rW6Y4yI57PWxZuZgJQxN+j2voKRnHPXwwFTWDLQn0/l9PlFohu3Q
+	y7fZEajeOrOPxm6/8uRcJfR1GpVEaXNenvs3r1NHoXv+PyLq5zfd12kdIhzld8xa636cLN
+	oDAix8J7tc9WojgaB0k5fSV8cd0yJ68=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: sfrench@samba.org,
 	smfrench@gmail.com,
@@ -36,9 +36,9 @@ To: sfrench@samba.org,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v5 01/14] smb/client: fix CAP_BULK_TRANSFER value
-Date: Sun,  2 Nov 2025 15:30:46 +0800
-Message-ID: <20251102073059.3681026-2-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH v5 02/14] smb: move MAX_CIFS_SMALL_BUFFER_SIZE to common/smbglob.h
+Date: Sun,  2 Nov 2025 15:30:47 +0800
+Message-ID: <20251102073059.3681026-3-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251102073059.3681026-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251102073059.3681026-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -52,42 +52,66 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-See MS-CIFS 2.2.4.52.2.
+In order to maintain the code more easily, move duplicate definitions to
+common header file.
 
-Keep it consistent with the value in the documentation.
+By the way, add the copyright and author information for Namjae to
+common/smbglob.h.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifspdu.h | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ fs/smb/client/cifspdu.h    | 1 -
+ fs/smb/common/smbglob.h    | 4 ++++
+ fs/smb/server/smb_common.h | 2 --
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index c86a329e5822..aba9caee8302 100644
+index aba9caee8302..2fb1eb2fff41 100644
 --- a/fs/smb/client/cifspdu.h
 +++ b/fs/smb/client/cifspdu.h
-@@ -711,7 +711,12 @@ struct ntlmv2_resp {
+@@ -86,7 +86,6 @@
+ #define NT_TRANSACT_GET_USER_QUOTA    0x07
+ #define NT_TRANSACT_SET_USER_QUOTA    0x08
  
- #define CIFS_NETWORK_OPSYS "CIFS VFS Client for Linux"
+-#define MAX_CIFS_SMALL_BUFFER_SIZE 448 /* big enough for most */
+ /* future chained NTCreateXReadX bigger, but for time being NTCreateX biggest */
+ /* among the requests (NTCreateX response is bigger with wct of 34) */
+ #define MAX_CIFS_HDR_SIZE 0x58 /* 4 len + 32 hdr + (2*24 wct) + 2 bct + 2 pad */
+diff --git a/fs/smb/common/smbglob.h b/fs/smb/common/smbglob.h
+index fa3d30dc6022..7853b5771128 100644
+--- a/fs/smb/common/smbglob.h
++++ b/fs/smb/common/smbglob.h
+@@ -2,8 +2,10 @@
+ /*
+  *
+  *   Copyright (C) International Business Machines  Corp., 2002,2008
++ *                 2018 Samsung Electronics Co., Ltd.
+  *   Author(s): Steve French (sfrench@us.ibm.com)
+  *              Jeremy Allison (jra@samba.org)
++ *              Namjae Jeon (linkinjeon@kernel.org)
+  *
+  */
+ #ifndef _COMMON_SMB_GLOB_H
+@@ -65,4 +67,6 @@ static inline void inc_rfc1001_len(void *buf, int count)
  
--/* Capabilities bits (for NTLM SessSetup request) */
+ #define CIFS_DEFAULT_IOSIZE (1024 * 1024)
+ 
++#define MAX_CIFS_SMALL_BUFFER_SIZE 448 /* big enough for most */
 +
-+/*
-+ * Capabilities bits (for NTLM SessSetup request)
-+ * See MS-CIFS 2.2.4.52.2
-+ *     MS-SMB 2.2.4.5.2.1
-+ */
- #define CAP_UNICODE            0x00000004
- #define CAP_LARGE_FILES        0x00000008
- #define CAP_NT_SMBS            0x00000010
-@@ -719,7 +724,7 @@ struct ntlmv2_resp {
- #define CAP_LEVEL_II_OPLOCKS   0x00000080
- #define CAP_NT_FIND            0x00000200	/* reserved should be zero
- 				(because NT_SMBs implies the same thing?) */
--#define CAP_BULK_TRANSFER      0x20000000
-+#define CAP_BULK_TRANSFER      0x00000400
- #define CAP_EXTENDED_SECURITY  0x80000000
+ #endif	/* _COMMON_SMB_GLOB_H */
+diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
+index c3258a3231e4..a2c7ab994fb1 100644
+--- a/fs/smb/server/smb_common.h
++++ b/fs/smb/server/smb_common.h
+@@ -29,8 +29,6 @@
  
- /* Action bits */
+ #define SMB_ECHO_INTERVAL	(60 * HZ)
+ 
+-#define MAX_CIFS_SMALL_BUFFER_SIZE 448 /* big enough for most */
+-
+ #define MAX_STREAM_PROT_LEN	0x00FFFFFF
+ 
+ /* Responses when opening a file. */
 -- 
 2.43.0
 
