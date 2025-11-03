@@ -1,167 +1,179 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511F031B130;
-	Mon,  3 Nov 2025 18:03:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F916214204
+	for <linux-cifs@vger.kernel.org>; Mon,  3 Nov 2025 22:57:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762192988; cv=none; b=PuNDgkiyoLADpbz+axey8/7GikUUH9GgiHTbAyj43yJgMUydIpR7NPqqGYTIlTPokSFYkDj5x2E3mpi1RwWbxaDt4q6vb5mf0ZtTd75F4d0/AUCYx45aw3xyMIzJ82enTQvPgiWP3iszHKD4l6RTy5nBZhzPjlnrjn2OTbK4b2w=
+	t=1762210677; cv=none; b=gu1AHrpO9AVeYrLP/MnwxiuiGAjiA6yr3JRsFzOCff6oVvMuWT4yzuTREmwT6I5+OQzVrkRC+/TW4TVtl4zWiKrFuC6IeELAVTabaUan0JdY5oO3BVmdqwA4TI9pBQbLsvfq5ad2GksTst+5+MHXDbgafpDWEzaHojsxzukdVFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762192988; c=relaxed/simple;
-	bh=XZg6tEDLa16EMaR5NtjP4niGslvahlCrI31g+m9bbfM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=er9OBpWnDdYx2e472QTAcZRl5NnMl4LUM2LiL5bpubipTn/y1L1Wcf9wdJOektXMfmspykgF85mI6MPANF3FBtppYIFhwsURI+6S6GN35NiChc1PoeEm8AGgfzS7OfNXn03g0db607BkK5cE58TW0ki21N9ksBWPvBuqCZ2NBzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PwRXhMqU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762210677; c=relaxed/simple;
+	bh=aXKHUZg6WiIxqWjF49OQA+hCEb5+P+5lJuhNpJEt9/s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Nxb67yqWcqgToaBEHl3dH6N1ScTrxXtWwUWSCeOwSIFHXaQrSQuoZNmlsV7y861VUY9utuQRdSUzul1lo3zrqY39+9K5Nl32jPvak3cKypg7WXY7WW15rHHlLCscx1GR1D2M8fCjP5gOJM/d38ib5fe/4SW5+ITIkUXZvkxEnlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=BXG30uZT; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PwRXhMqU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7F9EC116D0;
-	Mon,  3 Nov 2025 18:03:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762192985;
-	bh=XZg6tEDLa16EMaR5NtjP4niGslvahlCrI31g+m9bbfM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PwRXhMqUrveCPLxX23Tqn0XFYZBQP/bFlWVIrvCYZoDW1vUnDgk9ig4QWYtQjMf5W
-	 HL/j/GtVipBeK3opVX8sflhDAN7mthu+4iZdhncBesO9aBF1F9lmgUvw1wObvDpVCO
-	 BpL39onooH6nXba/ddDpVYNlp4BvSafN/UBzO1c7v9cWSckYIiqPttI9/3GC3KAw9t
-	 LjMP1kuttGc/lhsnbNLe45GS3/8+n6s5c4rU0VLE9C2QH2SmNT4f9E4V1X4g8rLPyh
-	 yYmgb4wARVVX7DYdWaFnE9RB3hbgHJRlv/QxkI51ttGnzw3Q9gQiFiRa4yX/1se5O3
-	 fd1vAoxfF4uTA==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Steve French <stfrench@microsoft.com>,
-	Thomas Spear <speeddymon@gmail.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="BXG30uZT"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3ee64bc6b90so3873170f8f.0
+        for <linux-cifs@vger.kernel.org>; Mon, 03 Nov 2025 14:57:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1762210674; x=1762815474; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=woaq09gBMKAgzKkT28bSEWfquvq2rcTRJnnMzH9zQEM=;
+        b=BXG30uZTfjA6FIEijtAs7S8y6K94Gm36zjsl/sX3hcf1u7oKHh/Hi33D6BFUegLNSz
+         7UYMRP5Y6/rEKjRkm9WHmx4gGp9RyDSaqeojPdCpsNDdS0uawfwohJp1ZkvfPFYq2wcw
+         goDn9QeWz6Fp98F8CD0TV8SA5c++1Ir3EBeybOoOc+Q534xcsdoP9Tas6CnT/4w+Cv3I
+         RTcRYf21Zl4KhnKA7sxV2wywFOFhaYWRJhbkuHmxQMDuGG7M8ZuMwSh8shHZ3fesoVKB
+         5swbhBtTX0c1UNn4ZPksi/E+mj04Pi5F+vlzn0yY62IFRm4NUrp8qkFCYQ2VhMCkVhyS
+         v8+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762210674; x=1762815474;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=woaq09gBMKAgzKkT28bSEWfquvq2rcTRJnnMzH9zQEM=;
+        b=EiOzwZoAs27Gzc+A0HECgikvXQmcaP3EKdtMWYnkPo75ZgWJb0ROrVqBbe+jCI0EV3
+         LY82hC8T5N52C2L200VU0M/In6yjfERYSKHQk5Lgo38mYQNd3ros4bIorWRGXJNT1Tfv
+         ySvjarOVID8nnNguPV0v4u2rAnEx7MFaPz5MfhAcWSs1IEUINUyt9/VadeIvLehumgE5
+         vJUqqOKUeJAyiISvJc/dO/RzZZsMFR5/7gLSqa2CSi0m7wjfYAvJvHMTo/UvHKw3Sk1u
+         M82yZT+OGFxhdmJOIjWAch0Gn8oFjDXHs9IAF59WBiD89Bm/duBfxQrI4pPZcW1uqOvF
+         3Raw==
+X-Forwarded-Encrypted: i=1; AJvYcCXRKPNygC2azSAhu5oN+uDvYwdsj4XqCLEY48vsxtR/PsGDLjqqxQEJweZVTDKURAsp40sVRw/7NxaA@vger.kernel.org
+X-Gm-Message-State: AOJu0YwG5g51jUcPEH+O8SgoxHZk+BwT8Gz5RUB7EDcKp5CACZ8RFASO
+	GGrQ0LptjKrOBnaMrz0ioH852eHWvHMONvTiYUvhoopk69AU7sFqt9wVoUZIQq55Ds4=
+X-Gm-Gg: ASbGncvUhCkEQ79Q/xEscP3OQcvACScsuW7aMmE47Xtj19jpiMmQvPC6tUOncvM8PTF
+	OQJ2uGdJEgNGats5j/vZ8DLL0ts9b8UNzEeeUJOAjaJqsGO9Z7NXxQ2eXe2RGMvtvN0yyxhjNHx
+	crwrFHtxh6DC329fFM/ACD5FnpEbXgpSUNXEcmRwW1tITzt4LbAxug6U4JJFt9rBv7xTjYU+mDK
+	IUaZqiV+00EaYLetFclBK8vOD4RqrEgULJ/8rwIbiIZWsrifqzcE8LBeUg1XLbcXyUJ+MPMAd5L
+	ceiVYJtcsIbYSWWEaCK+SLo1+8ptVMShsg4z/GWvp62jb5Huu56x+6GeWwEj9+GOktTAttxBeO7
+	mqlE4qMekHyDhEFFaLELrEqL4O4VCbStfpR9fJU7pGUsRPpguE+NtU5BWid1HN7edBu3vGzHY+B
+	afGjXS
+X-Google-Smtp-Source: AGHT+IFwFhVXiPd4hy146h4DqON39yrCDlSswV40KFoenniqHV80RvlLPb5vJhYG91hmgzHv7UecmQ==
+X-Received: by 2002:a05:6000:4b14:b0:429:c4bb:fbd1 with SMTP id ffacd0b85a97d-429c4bbfe42mr9301290f8f.18.1762210673595;
+        Mon, 03 Nov 2025 14:57:53 -0800 (PST)
+Received: from precision ([152.234.106.4])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba1f1831141sm251142a12.4.2025.11.03.14.57.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Nov 2025 14:57:53 -0800 (PST)
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: sfrench@samba.org
+Cc: pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	ematsumiya@suse.de,
+	jaeshin@redhat.com,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.17-6.1] cifs: fix typo in enable_gcm_256 module parameter
-Date: Mon,  3 Nov 2025 13:02:22 -0500
-Message-ID: <20251103180246.4097432-9-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251103180246.4097432-1-sashal@kernel.org>
-References: <20251103180246.4097432-1-sashal@kernel.org>
+	Henrique Carvalho <henrique.carvalho@suse.com>
+Subject: [PATCH v4] smb: client: fix potential UAF in smb2_close_cached_fid()
+Date: Mon,  3 Nov 2025 19:52:55 -0300
+Message-ID: <20251103225255.908859-1-henrique.carvalho@suse.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.17.7
 Content-Transfer-Encoding: 8bit
 
-From: Steve French <stfrench@microsoft.com>
+find_or_create_cached_dir() could grab a new reference after kref_put()
+had seen the refcount drop to zero but before cfid_list_lock is acquired
+in smb2_close_cached_fid(), leading to use-after-free.
 
-[ Upstream commit f765fdfcd8b5bce92c6aa1a517ff549529ddf590 ]
+Switch to kref_put_lock() so cfid_release() is called with
+cfid_list_lock held, closing that gap.
 
-Fix typo in description of enable_gcm_256 module parameter
-
-Suggested-by: Thomas Spear <speeddymon@gmail.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Fixes: ebe98f1447bb ("cifs: enable caching of directories for which a lease is held")
+Cc: stable@vger.kernel.org
+Reported-by: Jay Shin <jaeshin@redhat.com>
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 ---
+V3 -> V4: rebase, added Reviewed-by and Reported-by, add
+lockdep_assert_held in smb2_close_cached_fid, change commit subject (was
+"smb: client: fix race in smb2_close_cached_fid()") to clearly state the
+bug class (UAF)
+V2 -> V3: rebase, remove unneeded comments, modify commit subject
+V1 -> V2: kept the original function names and added __releases annotation
+to silence sparse warning
+---
+ fs/smb/client/cached_dir.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-LLM Generated explanations, may be completely bogus:
-
-Based on my comprehensive analysis using semantic code analysis tools
-and git history examination, here is my determination:
-
-## **Backport Status: YES**
-
-### Analysis Summary
-
-**1. Semantic Code Analysis Findings:**
-
-Using `mcp__semcode__grep_functions` and `mcp__semcode__find_function`,
-I identified that `enable_gcm_256` is used in the `build_encrypt_ctxt`
-function (fs/smb/client/smb2pdu.c:643), which controls SMB encryption
-cipher negotiation. Using `mcp__semcode__find_callers`, I found this
-function is called by `assemble_neg_contexts`, which is part of the SMB2
-protocol negotiation path.
-
-**2. Historical Context (Critical Finding):**
-
-Through git history analysis, I discovered this is actually the **second
-fix** for this documentation bug:
-
-- **April 2021** (commit fee742b50289): Changed `enable_gcm_256` default
-  from `false` to `true`, but **forgot to update documentation** (left
-  as "Default: n/N/0")
-
-- **June 2024** (commit 8bf0287528da1): **Partial fix** - changed
-  documentation from "n/N/0" to "y/Y/0"
-  - This commit was **explicitly tagged with `Cc:
-    stable@vger.kernel.org`**
-  - Included `Fixes: fee742b50289` tag
-  - **Was successfully backported to multiple stable trees**
-
-- **October 2025** (commit f765fdfcd8b5b - the commit being analyzed):
-  **Completes the fix** - changes "y/Y/0" to "y/Y/1"
-  - Fixes the remaining typo left by the partial June 2024 fix
-  - Already appears to be in backporting pipeline (commit 66b5c330b9223)
-
-**3. Why This Should Be Backported:**
-
-1. **Precedent**: The June 2024 partial fix was deemed important enough
-   for stable backporting by maintainers, even though it was "just
-   documentation"
-
-2. **Incomplete Fix in Stable Trees**: Stable trees that received the
-   June 2024 backport currently have **contradictory documentation**
-   stating "Default: y/Y/0" where "y/Y" suggests true but "0" suggests
-   false
-
-3. **Security Context**: This affects user understanding of encryption
-   settings for CIFS/SMB mounts. The variable controls whether 256-bit
-   GCM encryption is offered during protocol negotiation
-   (fs/smb/client/smb2pdu.c:643-648)
-
-4. **User Impact**: Users running `modinfo cifs` on stable kernels with
-   the partial fix see confusing/incorrect information about security-
-   related defaults
-
-5. **Zero Risk**: Single character change in a MODULE_PARM_DESC string -
-   cannot cause regressions
-
-6. **Completes Backported Work**: This is a continuation of fix
-   8bf0287528da1 that was already backported to stable
-
-**4. Code Impact Analysis:**
-
-- **Files Changed**: 1 (fs/smb/client/cifsfs.c)
-- **Lines Changed**: 1 (documentation string only)
-- **Functional Changes**: None (pure documentation)
-- **Actual Code Default**: `bool enable_gcm_256 = true;` (line 68) -
-  unchanged since April 2021
-
-### Recommendation
-
-**YES - This commit should be backported** because it completes a
-documentation fix that was already deemed worthy of stable backporting.
-Stable trees currently have misleading documentation ("y/Y/0") that
-contradicts itself, and this trivial, zero-risk change corrects user-
-visible information about security-related module parameters. The
-precedent for backporting documentation fixes for this specific
-parameter was already established in June 2024.
-
- fs/smb/client/cifsfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index e1848276bab41..984545cfe30b7 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -133,7 +133,7 @@ module_param(enable_oplocks, bool, 0644);
- MODULE_PARM_DESC(enable_oplocks, "Enable or disable oplocks. Default: y/Y/1");
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index b8ac7b7faf61..018055fd2cdb 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -388,11 +388,11 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 			 * lease. Release one here, and the second below.
+ 			 */
+ 			cfid->has_lease = false;
+-			kref_put(&cfid->refcount, smb2_close_cached_fid);
++			close_cached_dir(cfid);
+ 		}
+ 		spin_unlock(&cfids->cfid_list_lock);
  
- module_param(enable_gcm_256, bool, 0644);
--MODULE_PARM_DESC(enable_gcm_256, "Enable requesting strongest (256 bit) GCM encryption. Default: y/Y/0");
-+MODULE_PARM_DESC(enable_gcm_256, "Enable requesting strongest (256 bit) GCM encryption. Default: y/Y/1");
+-		kref_put(&cfid->refcount, smb2_close_cached_fid);
++		close_cached_dir(cfid);
+ 	} else {
+ 		*ret_cfid = cfid;
+ 		atomic_inc(&tcon->num_remote_opens);
+@@ -438,12 +438,14 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
  
- module_param(require_gcm_256, bool, 0644);
- MODULE_PARM_DESC(require_gcm_256, "Require strongest (256 bit) GCM encryption. Default: n/N/0");
+ static void
+ smb2_close_cached_fid(struct kref *ref)
++__releases(&cfid->cfids->cfid_list_lock)
+ {
+ 	struct cached_fid *cfid = container_of(ref, struct cached_fid,
+ 					       refcount);
+ 	int rc;
+ 
+-	spin_lock(&cfid->cfids->cfid_list_lock);
++	lockdep_assert_held(&cfid->cfids->cfid_list_lock);
++
+ 	if (cfid->on_list) {
+ 		list_del(&cfid->entry);
+ 		cfid->on_list = false;
+@@ -478,7 +480,7 @@ void drop_cached_dir_by_name(const unsigned int xid, struct cifs_tcon *tcon,
+ 	spin_lock(&cfid->cfids->cfid_list_lock);
+ 	if (cfid->has_lease) {
+ 		cfid->has_lease = false;
+-		kref_put(&cfid->refcount, smb2_close_cached_fid);
++		close_cached_dir(cfid);
+ 	}
+ 	spin_unlock(&cfid->cfids->cfid_list_lock);
+ 	close_cached_dir(cfid);
+@@ -487,7 +489,7 @@ void drop_cached_dir_by_name(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ void close_cached_dir(struct cached_fid *cfid)
+ {
+-	kref_put(&cfid->refcount, smb2_close_cached_fid);
++	kref_put_lock(&cfid->refcount, smb2_close_cached_fid, &cfid->cfids->cfid_list_lock);
+ }
+ 
+ /*
+@@ -596,7 +598,7 @@ cached_dir_offload_close(struct work_struct *work)
+ 
+ 	WARN_ON(cfid->on_list);
+ 
+-	kref_put(&cfid->refcount, smb2_close_cached_fid);
++	close_cached_dir(cfid);
+ 	cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_cached_close);
+ }
+ 
+@@ -762,7 +764,7 @@ static void cfids_laundromat_worker(struct work_struct *work)
+ 			 * Drop the ref-count from above, either the lease-ref (if there
+ 			 * was one) or the extra one acquired.
+ 			 */
+-			kref_put(&cfid->refcount, smb2_close_cached_fid);
++			close_cached_dir(cfid);
+ 	}
+ 	queue_delayed_work(cfid_put_wq, &cfids->laundromat_work,
+ 			   dir_cache_timeout * HZ);
 -- 
-2.51.0
+2.50.1
 
