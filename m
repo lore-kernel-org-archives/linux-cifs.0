@@ -1,85 +1,38 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF152D8370
-	for <linux-cifs@vger.kernel.org>; Tue,  4 Nov 2025 11:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0D829BDBC
+	for <linux-cifs@vger.kernel.org>; Tue,  4 Nov 2025 11:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762254355; cv=none; b=pk8/wR0hXsCRlOt43xoZHtXsiDneW2qrekbiRlswzP8dnataFbZQe/rTJ4vej4Gtj0A2PYNbyfLITHCYgd6MDxepIOZO2zMZ9ZC75ZK7PjHZvZE1UfSn4a5qEhyBOpjB4XBQ/I2Ju8TidSIjV3VK5YQFZGryqg8nolpoveG+PqE=
+	t=1762255014; cv=none; b=EOj8I2emGi5TtUq2y7qeGshA/Nt2IqJ6eOhHuL2Moybba6diUMUbKLQgbivBJbVFq+69z06o8deOsubXpPN0Ap06yOEXw/5r5pLWQv59QUnq1d5T/kPPgtP0G2NDq65ZZ7TOdLOgpIDwwzooBdShLGajIZ4k9SpRyHkkXiBeQG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762254355; c=relaxed/simple;
-	bh=6rkuhGsUq+FMshFBuGH4UBuujI5+HFmkSrNJPWLxEDs=;
+	s=arc-20240116; t=1762255014; c=relaxed/simple;
+	bh=IDGK6rVj6fS2WAahhdnkJwfKFLBRsY0QlYIpi0N4Khw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EkkYNdIEO7xmqB0JwX88Lv+jculyntCEG3f/uLOgOXd4kiSsyRhQ3oQVwtHfAP3G5i1JIIwm2n5coMWmFgOqPXp8njnNJiFZgcb4Q/uNopTXPwcFbgi9fMAI4H51OTyGKABMsIbvvjIW3JXod061nFthsx56iolTSAfWe8MfciI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=apwJZ6PC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DtAox43Y; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 In-Reply-To:Content-Type; b=ZrV0c+Gfwh6J3ocjjEuB9Vsti2EvUrWA+D52xt8K+jSXLplPYYP7sBfYfmm6gQRXAHRewHt299tKYsABl9a7o0iignVZqs7/ILzpOetNuiB6lwQ2i/brpXW4h/kyjRsbyxwDIsDJ26nTx41M+qBm5W1i1nAT/pLkz2pU8vZa9lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=YX/t7H43; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="apwJZ6PC";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DtAox43Y"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762254352;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OxmghJIcjc3tJC2DIG8MaqzZFBLXh5fxewma9fsdqXU=;
-	b=apwJZ6PC1qBS75zy3RvwIHRoL63GixP1t9G6QHjYgUksW8kssbSxmSa+5/Ao5v/VQ59gjT
-	x9wg7t2X3+t5j5lgWklzLATHrJJWR3L41ucOZ6b7NFBn60+MwjHtui8U+VHDSaLyxMk238
-	ZM8kYlNayewsTIr+c9FJw+UC3UZIri8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-135-Hj55hd9tPyKmjgoLLkiSlA-1; Tue, 04 Nov 2025 06:05:51 -0500
-X-MC-Unique: Hj55hd9tPyKmjgoLLkiSlA-1
-X-Mimecast-MFC-AGG-ID: Hj55hd9tPyKmjgoLLkiSlA_1762254350
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-429c9024a1dso1293251f8f.2
-        for <linux-cifs@vger.kernel.org>; Tue, 04 Nov 2025 03:05:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762254350; x=1762859150; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OxmghJIcjc3tJC2DIG8MaqzZFBLXh5fxewma9fsdqXU=;
-        b=DtAox43Y5w70OHUi0G3BPXvZ2ZaEsdARx4De11HsJzrj0ZQSyFCG/kOfcy3oBEpAU4
-         L9LWUTUB5autDnsNvuvG/WsKWv4zpI+g4W19tp/9eHeOzidn4wGKiok+GxN9IRYH3WwV
-         IEpwRb2Zsa/xs0xxFfVyF/9BiwnNKLmH/RD+gO2qKWCpkfHyQGd3Uf/rHREySkg7QOMe
-         fBlLXaZg8VYQ1tv0SGJvIa13m/RTPnjiNkPclYK6USGkbRxVfVDb5eSyXmNuAhqOo1jn
-         5POK+OhAtOT3sEEwO1RZGoo3e0qpFQHaAvEZjGHfiY2aeclZfjNqnkAZ0x01XN7SjFAe
-         xrTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762254350; x=1762859150;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OxmghJIcjc3tJC2DIG8MaqzZFBLXh5fxewma9fsdqXU=;
-        b=X+fkP0ywKwJDNFZnXDChLRRszagKpMU4UddmmFZbdvnpV0LRW/DOMpC8p+SnX3SkhY
-         wGg7T5KOYmOEAUfdJQA6+PoXqFs9lC9XnhJNei/XJnr3yx+bxF8hDrEETcFvWjfY2gol
-         k0dYKNXhQZNcTLRarXGEklQsz/lipSMXubI+0KRQD0migHX8zdIwVrlg64362iTuo+96
-         7t5eAXjbJs6aRmmJXYsWi0lt2cf1WkilL5HyZw/v9D9GH6rLTKwN+WUq756IPPvdPtif
-         sI+3zYYCSUNeF+okS2j5wer40vqIDv35Ks8xukumRbCSWPkI+Wcmvmb2tX/08YfWYlDF
-         68Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCW6IK8hhn442xxsvzafjWZAqYWLdwz4zWyUUHBDhe/YE1u/J3ELXkAbi8BxDFv3d41UGb8xvZYTybbT@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNW8HiXPcVFQIMCIJhPxYMpJAbWuPveXQ/8s2RIL9GNqP38GGq
-	dzrpMjuZautVmd3pzk8+A1wwOzfQ57ZEs1hrC2JcUKRQwczpct2dJqGSxuFTMrvxXw75Emvg1Ej
-	VHeQX7r+GrySUEhpesfb45NEJ05wl1zTR0o/aNVzoF4g1PFaJ2SYm7vc4yaCOFF8=
-X-Gm-Gg: ASbGncuort/s//FPAfV4J89wzc5uNQCDBrKF/8veZ1O5ce4+PcoYQx9WXpS/OMo8kSo
-	sGXfMSAy+I+n+FUDBMckhmx/3rNfoY0E7zEU+pJ3F2+xD2eI3QQjBFDLPj0KmFNsQf8m8s7Qn8s
-	J1yn99zMY9JbkvfxAdjDBgtYg9s6/Ror2gvS5zkSQ7E4774zQtLavi8R96mKugaN/rhVMMSUfyV
-	WIaKSGm+6UBIjRGwKWW8kygvr41X7/0Kq7Gdy7WbaEhH2TuIxqffZZL3LkIja7VfNhDfmQyL1AV
-	tDlOfvAVnHoYS9KNkFzX5LUg/M7+MJL7hFZ7VvaNH2QJEb6Qyv8qPanLlSsdJzr12xWYX2K3hsi
-	3PQRwVs5Wu8WgMrGTMKt8GVqKVOHxl1HG9dnk5np/KboU
-X-Received: by 2002:a5d:584b:0:b0:429:dc4a:4094 with SMTP id ffacd0b85a97d-429dc4a41c5mr2036062f8f.30.1762254349826;
-        Tue, 04 Nov 2025 03:05:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFRTcLyJarL+HzJIicet1BC+SA9mI8/liFB8LEEp4cpSbdxEDl917ajaG6JsdKZcXmSqC73zQ==
-X-Received: by 2002:a5d:584b:0:b0:429:dc4a:4094 with SMTP id ffacd0b85a97d-429dc4a41c5mr2036004f8f.30.1762254349252;
-        Tue, 04 Nov 2025 03:05:49 -0800 (PST)
-Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc1f5af7sm4174267f8f.28.2025.11.04.03.05.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Nov 2025 03:05:48 -0800 (PST)
-Message-ID: <ad38f56b-5c53-408e-abcc-4b061c2097a3@redhat.com>
-Date: Tue, 4 Nov 2025 12:05:46 +0100
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="YX/t7H43"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=qU1tnJ0/MPcxw9b1Y6p1pDscT9rIC7FnI932WdChdbU=; b=YX/t7H43ffN3EBN0KXWtDFKjFU
+	+akjcEsE+8/X4TFnLRTx4Nf3ssZuHSkbClOB0hN20YjnuqjwFgIv07PGn0GpyVsTuL2nazYJBEIWN
+	5HL8iE89WRnEro4jq8jT6rWlSGAKF7zUJLM4ARLBpyDHFf8ZlER98scf/gSJAxYi+eTRIFRQp1FhF
+	6750elrJB+BczL3NazF7VoOsirE6l70EowS0HhsPf1oj5NPo2iueddP5+hfy0s2L7eukyplO7dQWW
+	4e5jhfX5dzYfU0BkpAAvBT5hF9KBXXI0eP2F86aAre8vEbDBAXtoEoPJlzg5cwtfVFEIIuXwtJyMq
+	bM2OxsT2AQrURX+IsaLx5crNk/Z3HWGYQ8FL3FvvpaAillfffr3xXRJGKZpc1mhG6oqTgVn3bbnH+
+	TU3vnOdr8AlgEVEUTia+nUmNIJtWA1QZlU2TBHgXbMqAxy3XbmquSNLWpNvfBuJnG0wyAKupNp9EU
+	t4nVRtOyeB2Jt4lTg7imhD3z;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vGEbV-00CW5C-30;
+	Tue, 04 Nov 2025 10:49:34 +0000
+Message-ID: <8f1cd9a8-d292-4129-abed-9e6082ee397b@samba.org>
+Date: Tue, 4 Nov 2025 11:49:33 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -87,211 +40,874 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 06/15] quic: add stream management
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
- quic@lists.linux.dev
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
- linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
- Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Benjamin Coddington <bcodding@redhat.com>, Steve Dickson
- <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1761748557.git.lucien.xin@gmail.com>
- <6b527b669fe05f9743e37d9f584f7cd492a7649b.1761748557.git.lucien.xin@gmail.com>
+Subject: Re: [PATCH v2 000/127] smb: smbdirect/client/server: moving to common
+ functions and smbdirect.ko
+To: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+Cc: Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
+ Long Li <longli@microsoft.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ David Howells <dhowells@redhat.com>
+References: <cover.1761742839.git.metze@samba.org>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <6b527b669fe05f9743e37d9f584f7cd492a7649b.1761748557.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <cover.1761742839.git.metze@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/29/25 3:35 PM, Xin Long wrote:
-+/* Create and register new streams for sending. */
-> +static struct quic_stream *quic_stream_send_create(struct quic_stream_table *streams,
-> +						   s64 max_stream_id, u8 is_serv)
-> +{
-> +	struct quic_stream *stream = NULL;
-> +	s64 stream_id;
-> +
-> +	stream_id = streams->send.next_bidi_stream_id;
-> +	if (quic_stream_id_uni(max_stream_id))
-> +		stream_id = streams->send.next_uni_stream_id;
-> +
-> +	/* rfc9000#section-2.1: A stream ID that is used out of order results in all streams
-> +	 * of that type with lower-numbered stream IDs also being opened.
-> +	 */
-> +	while (stream_id <= max_stream_id) {
-> +		stream = kzalloc(sizeof(*stream), GFP_KERNEL_ACCOUNT);
-> +		if (!stream)
-> +			return NULL;
-> +
-> +		stream->id = stream_id;
-> +		if (quic_stream_id_uni(stream_id)) {
-> +			stream->send.max_bytes = streams->send.max_stream_data_uni;
-> +
-> +			if (streams->send.next_uni_stream_id < stream_id + QUIC_STREAM_ID_STEP)
-> +				streams->send.next_uni_stream_id = stream_id + QUIC_STREAM_ID_STEP;
+Hi,
 
-It's unclear to me the goal the above 2 statements. Dealing with id
-wrap-arounds? If 'streams->send.next_uni_stream_id < stream_id +
-QUIC_STREAM_ID_STEP' is not true the next quic_stream_send_create() will
-reuse the same stream_id.
+I already used these debugging features:
 
-I moving the above in a separate helper with some comments would help.
+CONFIG_KASAN_SHADOW_OFFSET=0xdffffc0000000000
+CONFIG_HAVE_ARCH_KASAN=y
+CONFIG_HAVE_ARCH_KASAN_VMALLOC=y
+CONFIG_CC_HAS_KASAN_GENERIC=y
+CONFIG_KASAN=y
+CONFIG_CC_HAS_KASAN_MEMINTRINSIC_PREFIX=y
+CONFIG_KASAN_GENERIC=y
+CONFIG_KASAN_INLINE=y
+CONFIG_KASAN_STACK=y
+CONFIG_KASAN_VMALLOC=y
+CONFIG_KASAN_EXTRA_INFO=y
 
+But now I turned on a lot more debugging features:
 
-> +			streams->send.streams_uni++;
-> +
-> +			quic_stream_add(streams, stream);
-> +			stream_id += QUIC_STREAM_ID_STEP;
-> +			continue;
-> +		}
-> +
-> +		if (streams->send.next_bidi_stream_id < stream_id + QUIC_STREAM_ID_STEP)
-> +			streams->send.next_bidi_stream_id = stream_id + QUIC_STREAM_ID_STEP;
-> +		streams->send.streams_bidi++;
-> +
-> +		if (quic_stream_id_local(stream_id, is_serv)) {
-> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_remote;
-> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_local;
-> +		} else {
-> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_local;
-> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_remote;
-> +		}
-> +		stream->recv.window = stream->recv.max_bytes;
-> +
-> +		quic_stream_add(streams, stream);
-> +		stream_id += QUIC_STREAM_ID_STEP;
-> +	}
-> +	return stream;
-> +}
-> +
-> +/* Create and register new streams for receiving. */
-> +static struct quic_stream *quic_stream_recv_create(struct quic_stream_table *streams,
-> +						   s64 max_stream_id, u8 is_serv)
-> +{
-> +	struct quic_stream *stream = NULL;
-> +	s64 stream_id;
-> +
-> +	stream_id = streams->recv.next_bidi_stream_id;
-> +	if (quic_stream_id_uni(max_stream_id))
-> +		stream_id = streams->recv.next_uni_stream_id;
-> +
-> +	/* rfc9000#section-2.1: A stream ID that is used out of order results in all streams
-> +	 * of that type with lower-numbered stream IDs also being opened.
-> +	 */
-> +	while (stream_id <= max_stream_id) {
-> +		stream = kzalloc(sizeof(*stream), GFP_ATOMIC | __GFP_ACCOUNT);
-> +		if (!stream)
-> +			return NULL;
-> +
-> +		stream->id = stream_id;
-> +		if (quic_stream_id_uni(stream_id)) {
-> +			stream->recv.window = streams->recv.max_stream_data_uni;
-> +			stream->recv.max_bytes = stream->recv.window;
-> +
-> +			if (streams->recv.next_uni_stream_id < stream_id + QUIC_STREAM_ID_STEP)
-> +				streams->recv.next_uni_stream_id = stream_id + QUIC_STREAM_ID_STEP;
-> +			streams->recv.streams_uni++;
-> +
-> +			quic_stream_add(streams, stream);
-> +			stream_id += QUIC_STREAM_ID_STEP;
-> +			continue;
-> +		}
-> +
-> +		if (streams->recv.next_bidi_stream_id < stream_id + QUIC_STREAM_ID_STEP)
-> +			streams->recv.next_bidi_stream_id = stream_id + QUIC_STREAM_ID_STEP;
-> +		streams->recv.streams_bidi++;
-> +
-> +		if (quic_stream_id_local(stream_id, is_serv)) {
-> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_remote;
-> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_local;
-> +		} else {
-> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_local;
-> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_remote;
-> +		}
-> +		stream->recv.window = stream->recv.max_bytes;
-> +
-> +		quic_stream_add(streams, stream);
-> +		stream_id += QUIC_STREAM_ID_STEP;
-> +	}
-> +	return stream;
-> +}
+CONFIG_PRINTK_CALLER=y
+CONFIG_STACKTRACE_BUILD_ID=y
+CONFIG_DEBUG_INFO_COMPRESSED_ZSTD=y
+CONFIG_DEBUG_SECTION_MISMATCH=y
+CONFIG_MAGIC_SYSRQ_DEFAULT_ENABLE=0xffffffff
+CONFIG_PAGE_EXTENSION=y
+CONFIG_PAGE_OWNER=y
+CONFIG_PAGE_TABLE_CHECK=y
+CONFIG_DEBUG_PAGE_REF=y
+CONFIG_PTDUMP_DEBUGFS=y
+CONFIG_DEBUG_KMEMLEAK=y
+CONFIG_DEBUG_KMEMLEAK_MEM_POOL_SIZE=16000
+CONFIG_DEBUG_KMEMLEAK_DEFAULT_OFF=y
+CONFIG_DEBUG_OBJECTS=y
+CONFIG_DEBUG_OBJECTS_FREE=y
+CONFIG_DEBUG_OBJECTS_TIMERS=y
+CONFIG_DEBUG_OBJECTS_WORK=y
+CONFIG_DEBUG_OBJECTS_RCU_HEAD=y
+CONFIG_DEBUG_OBJECTS_PERCPU_COUNTER=y
+CONFIG_DEBUG_OBJECTS_ENABLE_DEFAULT=0
+CONFIG_WQ_WATCHDOG=y
+CONFIG_PROVE_LOCKING=y
+CONFIG_PROVE_RAW_LOCK_NESTING=y
+CONFIG_LOCK_STAT=y
+CONFIG_DEBUG_RT_MUTEXES=y
+CONFIG_DEBUG_SPINLOCK=y
+CONFIG_DEBUG_MUTEXES=y
+CONFIG_DEBUG_WW_MUTEX_SLOWPATH=y
+CONFIG_DEBUG_RWSEMS=y
+CONFIG_DEBUG_LOCK_ALLOC=y
+CONFIG_LOCKDEP=y
+CONFIG_LOCKDEP_BITS=15
+CONFIG_LOCKDEP_CHAINS_BITS=16
+CONFIG_LOCKDEP_STACK_TRACE_BITS=19
+CONFIG_LOCKDEP_STACK_TRACE_HASH_BITS=14
+CONFIG_LOCKDEP_CIRCULAR_QUEUE_BITS=12
+CONFIG_DEBUG_ATOMIC_SLEEP=y
+CONFIG_TRACE_IRQFLAGS=y
+CONFIG_TRACE_IRQFLAGS_NMI=y
+CONFIG_DEBUG_IRQFLAGS=y
+CONFIG_PROVE_RCU=y
+CONFIG_RCU_TRACE=y
+CONFIG_RING_BUFFER_ALLOW_SWAP=y
+CONFIG_PREEMPTIRQ_TRACEPOINTS=y
+CONFIG_TRACE_PREEMPT_TOGGLE=y
+CONFIG_IRQSOFF_TRACER=y
+CONFIG_PREEMPT_TRACER=y
+CONFIG_TRACER_SNAPSHOT_PER_CPU_SWAP=y
 
-The above 2 functions has a lot of code in common. I think you could
-deduplicate it by:
-- defining a named type for quic_stream_table.{send,recv}
-- define a generic quic_stream_create() helper using an additonal
-argument for the relevant table.{send,recv}
-- replace the above 2 functions with a single invocation to such helper.
+And that luckily revealed some cases where
+I called functions which might sleep in a
+ib_post_recv completion function that
+is called in a softirq as the client uses
+IB_POLL_SOFTIRQ.
 
-It looks like there are more de-dup opportunity below.
+I means that I needed to deferr some of the
+smbdirect_connect_negotiate_recv_done and
+smbdirect_accept_negotiate_recv_done logic
+to the workqueue.
 
-> +
-> +/* Check if a send or receive stream ID is already closed. */
-> +static bool quic_stream_id_closed(struct quic_stream_table *streams, s64 stream_id, bool send)
-> +{
-> +	if (quic_stream_id_uni(stream_id)) {
-> +		if (send)
-> +			return stream_id < streams->send.next_uni_stream_id;
-> +		return stream_id < streams->recv.next_uni_stream_id;
-> +	}
-> +	if (send)
-> +		return stream_id < streams->send.next_bidi_stream_id;
-> +	return stream_id < streams->recv.next_bidi_stream_id;
-> +}
-> +
-> +/* Check if a stream ID would exceed local (recv) or peer (send) limits. */
-> +bool quic_stream_id_exceeds(struct quic_stream_table *streams, s64 stream_id, bool send)
-> +{
-> +	u64 nstreams;
-> +
-> +	if (!send) {
-> +		if (quic_stream_id_uni(stream_id))
-> +			return stream_id > streams->recv.max_uni_stream_id;
-> +		return stream_id > streams->recv.max_bidi_stream_id;
-> +	}
-> +
-> +	if (quic_stream_id_uni(stream_id)) {
-> +		if (stream_id > streams->send.max_uni_stream_id)
-> +			return true;
-> +		stream_id -= streams->send.next_uni_stream_id;
-> +		nstreams = quic_stream_id_to_streams(stream_id);
-> +		return nstreams + streams->send.streams_uni > streams->send.max_streams_uni;
-> +	}
-> +
-> +	if (stream_id > streams->send.max_bidi_stream_id)
-> +		return true;
-> +	stream_id -= streams->send.next_bidi_stream_id;
-> +	nstreams = quic_stream_id_to_streams(stream_id);
-> +	return nstreams + streams->send.streams_bidi > streams->send.max_streams_bidi;
-> +}
-> +
-> +/* Get or create a send stream by ID. */
-> +struct quic_stream *quic_stream_send_get(struct quic_stream_table *streams, s64 stream_id,
-> +					 u32 flags, bool is_serv)
-> +{
-> +	struct quic_stream *stream;
-> +
-> +	if (!quic_stream_id_valid(stream_id, is_serv, true))
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	stream = quic_stream_find(streams, stream_id);
-> +	if (stream) {
+And I added some includes to smbdirect_socket.h,
+as some sparc cross compile bot was complaining
+about a failing build.
 
-You should add some comments and possibly lockdep annotation/static
-check about the expected locking for the whole stream lifecycle.
+I also did a few minor changes like using
+sc->ib.dev consistently.
 
-/P
+As well as setting sc->first_error as early as possible.
+
+I took the current ksmbd-for-next-next at
+commit 2bd117c715790585d69a06bd5f795520fc67ce86
+and rebased it on v6.18-rc4 and then removed my patches
+and added the modified once on top.
+
+The result can be found in my for-6.19/fs-smb-20251104-v3 branch,
+at commit a73e9e7470238121b87b2128da2ed1fff9fd6d4b:
+git fetch https://git.samba.org/metze/linux/wip.git for-6.19/fs-smb-20251104-v3
+https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/for-6.19/fs-smb-20251104-v3
+
+The whole diff between the old and new patchset
+follows below:
+
+The new branch should replace ksmbd-for-next-next...
+
+Thanks!
+metze
+
+  fs/smb/common/smbdirect/smbdirect_accept.c     | 154 +++++++++++++++-------
+  fs/smb/common/smbdirect/smbdirect_connect.c    | 171 +++++++++++++++++--------
+  fs/smb/common/smbdirect/smbdirect_connection.c |  91 +++++++++++--
+  fs/smb/common/smbdirect/smbdirect_socket.h     |  15 +++
+  4 files changed, 316 insertions(+), 115 deletions(-)
+
+diff --git a/fs/smb/common/smbdirect/smbdirect_accept.c b/fs/smb/common/smbdirect/smbdirect_accept.c
+index 0ed3f43a7397..3455e7327663 100644
+--- a/fs/smb/common/smbdirect/smbdirect_accept.c
++++ b/fs/smb/common/smbdirect/smbdirect_accept.c
+@@ -192,25 +192,14 @@ static int smbdirect_accept_init_params(struct smbdirect_socket *sc)
+  	return 0;
+  }
+
++static void smbdirect_accept_negotiate_recv_work(struct work_struct *work);
++
+  static void smbdirect_accept_negotiate_recv_done(struct ib_cq *cq, struct ib_wc *wc)
+  {
+  	struct smbdirect_recv_io *recv_io =
+  		container_of(wc->wr_cqe, struct smbdirect_recv_io, cqe);
+  	struct smbdirect_socket *sc = recv_io->socket;
+-	struct smbdirect_socket_parameters *sp = &sc->parameters;
+-	struct smbdirect_negotiate_req *nreq;
+-	u16 min_version;
+-	u16 max_version;
+-	u16 credits_requested;
+-	u32 preferred_send_size;
+-	u32 max_receive_size;
+-	u32 max_fragmented_size;
+-	struct smbdirect_send_io *send_io = NULL;
+-	struct smbdirect_negotiate_resp *nrep;
+-	struct ib_send_wr send_wr;
+-	u32 ntstatus;
+-	int posted;
+-	int ret;
++	const struct smbdirect_socket_parameters *sp = &sc->parameters;
+
+  	if (unlikely(wc->status != IB_WC_SUCCESS || WARN_ON_ONCE(wc->opcode != IB_WC_RECV))) {
+  		if (wc->status != IB_WC_WR_FLUSH_ERR)
+@@ -235,18 +224,98 @@ static void smbdirect_accept_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  	mod_delayed_work(sc->workqueue, &sc->idle.timer_work,
+  			 msecs_to_jiffies(sp->keepalive_interval_msec));
+
+-	ib_dma_sync_single_for_cpu(wc->qp->device,
++	ib_dma_sync_single_for_cpu(sc->ib.dev,
+  				   recv_io->sge.addr,
+  				   recv_io->sge.length,
+  				   DMA_FROM_DEVICE);
+
+-	if (wc->byte_len < sizeof(*nreq)) {
++	if (wc->byte_len < sizeof(struct smbdirect_negotiate_req)) {
+  		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+  			"wc->byte_len=%u < %zu\n",
+-			wc->byte_len, sizeof(*nreq));
++			wc->byte_len, sizeof(struct smbdirect_negotiate_req));
+  		goto error;
+  	}
+
++	/*
++	 * We continue via the workqueue as we may have
++	 * complex work that might sleep.
++	 *
++	 * The work should already/still be disabled,
++	 * but smbdirect_connection_put_recv_io() disables
++	 * it again.
++	 *
++	 * Note that smbdirect_connection_put_recv_io()
++	 * only moved recv_io into the free list, but
++	 * we didn't call smbdirect_connection_recv_io_refill()
++	 * yet, so it won't be reused, but the cleanup code
++	 * on disconnect is able to find it, disables
++	 * recv_io->complex_work again.
++	 */
++	smbdirect_connection_put_recv_io(recv_io);
++	INIT_WORK(&recv_io->complex_work, smbdirect_accept_negotiate_recv_work);
++	queue_work(sc->workqueue, &recv_io->complex_work);
++	return;
++
++error:
++	/*
++	 * recv_io.posted.refill_work is still disabled,
++	 * so smbdirect_connection_put_recv_io() won't
++	 * start it.
++	 */
++	smbdirect_connection_put_recv_io(recv_io);
++	smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++}
++
++static void smbdirect_accept_negotiate_recv_work(struct work_struct *work)
++{
++	struct smbdirect_recv_io *recv_io =
++		container_of(work, struct smbdirect_recv_io, complex_work);
++	struct smbdirect_socket *sc = recv_io->socket;
++	struct smbdirect_socket_parameters *sp = &sc->parameters;
++	struct smbdirect_negotiate_req *nreq;
++	u16 min_version;
++	u16 max_version;
++	u16 credits_requested;
++	u32 preferred_send_size;
++	u32 max_receive_size;
++	u32 max_fragmented_size;
++	struct smbdirect_send_io *send_io = NULL;
++	struct smbdirect_negotiate_resp *nrep;
++	struct ib_send_wr send_wr;
++	u32 ntstatus;
++	int posted;
++	int ret;
++
++	/*
++	 * make sure we won't start again...
++	 */
++	disable_work(work);
++
++	/*
++	 * Note recv_io is already part of the free list,
++	 * as smbdirect_connect_negotiate_recv_done() called
++	 * smbdirect_connection_put_recv_io(), but
++	 * it won't be reused before we call
++	 * smbdirect_connection_recv_io_refill() below.
++	 */
++
++	if (unlikely(sc->first_error))
++		return;
++
++	if (sc->status != SMBDIRECT_SOCKET_NEGOTIATE_RUNNING) {
++		/*
++		 * Something went wrong...
++		 */
++		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
++			"status=%s first_error=%1pe local: %pISpsfc remote: %pISpsfc\n",
++			smbdirect_socket_status_string(sc->status),
++			SMBDIRECT_DEBUG_ERR_PTR(sc->first_error),
++			&sc->rdma.cm_id->route.addr.src_addr,
++			&sc->rdma.cm_id->route.addr.dst_addr);
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
++	}
++
+  	nreq = (struct smbdirect_negotiate_req *)recv_io->packet;
+  	min_version = le16_to_cpu(nreq->min_version);
+  	max_version = le16_to_cpu(nreq->max_version);
+@@ -281,7 +350,8 @@ static void smbdirect_accept_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  	if (credits_requested == 0) {
+  		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+  			"invalid: credits_requested == 0\n");
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
+  	}
+
+  	if (max_receive_size < SMBDIRECT_MIN_RECEIVE_SIZE) {
+@@ -289,7 +359,8 @@ static void smbdirect_accept_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  			"invalid: max_receive_size=%u < %u\n",
+  			max_receive_size,
+  			SMBDIRECT_MIN_RECEIVE_SIZE);
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
+  	}
+
+  	if (max_fragmented_size < SMBDIRECT_MIN_FRAGMENTED_SIZE) {
+@@ -297,7 +368,8 @@ static void smbdirect_accept_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  			"invalid: max_fragmented_size=%u < %u\n",
+  			max_fragmented_size,
+  			SMBDIRECT_MIN_FRAGMENTED_SIZE);
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
+  	}
+
+  	/*
+@@ -327,12 +399,6 @@ static void smbdirect_accept_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  	 */
+  	sp->max_fragmented_send_size = max_fragmented_size;
+
+-	/*
+-	 * Give recv_io back to the recv_io.free.list,
+-	 * so that the refill can also post it.
+-	 */
+-	smbdirect_connection_put_recv_io(recv_io);
+-
+  	/*
+  	 * Prepare for receiving data_transfer messages
+  	 */
+@@ -350,7 +416,8 @@ static void smbdirect_accept_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+  			"smbdirect_connection_recv_io_refill() failed %1pe\n",
+  			SMBDIRECT_DEBUG_ERR_PTR(posted));
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
+  	}
+
+  	/*
+@@ -365,11 +432,11 @@ static void smbdirect_accept_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  	send_io = smbdirect_connection_alloc_send_io(sc);
+  	if (IS_ERR(send_io)) {
+  		ret = PTR_ERR(send_io);
+-		send_io = NULL;
+  		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+  			"smbdirect_connection_alloc_send_io() failed %1pe\n",
+  			SMBDIRECT_DEBUG_ERR_PTR(ret));
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, ret);
++		return;
+  	}
+  	send_io->cqe.done = smbdirect_accept_negotiate_send_done;
+
+@@ -430,7 +497,9 @@ static void smbdirect_accept_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+  			"ib_dma_mapping_error() failed %1pe\n",
+  			SMBDIRECT_DEBUG_ERR_PTR(ret));
+-		goto error;
++		smbdirect_connection_free_send_io(send_io);
++		smbdirect_connection_schedule_disconnect(sc, ret);
++		return;
+  	}
+
+  	send_io->sge[0].length = sizeof(*nrep);
+@@ -455,30 +524,19 @@ static void smbdirect_accept_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  		smbdirect_log_rdma_send(sc, SMBDIRECT_LOG_ERR,
+  			"smbdirect_connection_post_send_wr() failed %1pe\n",
+  			SMBDIRECT_DEBUG_ERR_PTR(ret));
+-		goto error;
++		/*
++		 * Note smbdirect_connection_free_send_io()
++		 * does ib_dma_unmap_page()
++		 */
++		smbdirect_connection_free_send_io(send_io);
++		smbdirect_connection_schedule_disconnect(sc, ret);
++		return;
+  	}
+
+  	/*
+  	 * smbdirect_accept_negotiate_send_done
+  	 * will do all remaining work...
+  	 */
+-	return;
+-
+-error:
+-	/*
+-	 * recv_io.posted.refill_work is still disabled,
+-	 * so smbdirect_connection_put_recv_io() won't
+-	 * start it.
+-	 */
+-	if (recv_io)
+-		smbdirect_connection_put_recv_io(recv_io);
+-	/*
+-	 * Note smbdirect_connection_free_send_io()
+-	 * does ib_dma_unmap_page()
+-	 */
+-	if (send_io)
+-		smbdirect_connection_free_send_io(send_io);
+-	smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
+  }
+
+  static void smbdirect_accept_negotiate_send_done(struct ib_cq *cq, struct ib_wc *wc)
+diff --git a/fs/smb/common/smbdirect/smbdirect_connect.c b/fs/smb/common/smbdirect/smbdirect_connect.c
+index eb8e903c9fce..b9544a6ef59b 100644
+--- a/fs/smb/common/smbdirect/smbdirect_connect.c
++++ b/fs/smb/common/smbdirect/smbdirect_connect.c
+@@ -536,23 +536,14 @@ static void smbdirect_connect_negotiate_send_done(struct ib_cq *cq, struct ib_wc
+  	}
+  }
+
++static void smbdirect_connect_negotiate_recv_work(struct work_struct *work);
++
+  static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc *wc)
+  {
+  	struct smbdirect_recv_io *recv_io =
+  		container_of(wc->wr_cqe, struct smbdirect_recv_io, cqe);
+  	struct smbdirect_socket *sc = recv_io->socket;
+-	struct smbdirect_socket_parameters *sp = &sc->parameters;
+-	struct smbdirect_negotiate_resp *nrep;
+-	u16 negotiated_version;
+-	u16 credits_requested;
+-	u16 credits_granted;
+-	u32 status;
+-	u32 max_readwrite_size;
+-	u32 preferred_send_size;
+-	u32 max_receive_size;
+-	u32 max_fragmented_size;
+-	int posted;
+-	int ret;
++	const struct smbdirect_socket_parameters *sp = &sc->parameters;
+
+  	if (unlikely(wc->status != IB_WC_SUCCESS || WARN_ON_ONCE(wc->opcode != IB_WC_RECV))) {
+  		if (wc->status != IB_WC_WR_FLUSH_ERR)
+@@ -574,18 +565,96 @@ static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  	mod_delayed_work(sc->workqueue, &sc->idle.timer_work,
+  			 msecs_to_jiffies(sp->keepalive_interval_msec));
+
+-	ib_dma_sync_single_for_cpu(wc->qp->device,
++	ib_dma_sync_single_for_cpu(sc->ib.dev,
+  				   recv_io->sge.addr,
+  				   recv_io->sge.length,
+  				   DMA_FROM_DEVICE);
+
+-	if (wc->byte_len < sizeof(*nrep)) {
++	if (wc->byte_len < sizeof(struct smbdirect_negotiate_resp)) {
+  		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+  			"wc->byte_len=%u < %zu\n",
+-			wc->byte_len, sizeof(*nrep));
++			wc->byte_len, sizeof(struct smbdirect_negotiate_resp));
+  		goto error;
+  	}
+
++	/*
++	 * We continue via the workqueue as we may have
++	 * complex work that might sleep.
++	 *
++	 * The work should already/still be disabled,
++	 * but smbdirect_connection_put_recv_io() disables
++	 * it again.
++	 *
++	 * Note that smbdirect_connection_put_recv_io()
++	 * only moved recv_io into the free list, but
++	 * we didn't call smbdirect_connection_recv_io_refill()
++	 * yet, so it won't be reused, but the cleanup code
++	 * on disconnect is able to find it, disables
++	 * recv_io->complex_work again.
++	 */
++	smbdirect_connection_put_recv_io(recv_io);
++	INIT_WORK(&recv_io->complex_work, smbdirect_connect_negotiate_recv_work);
++	queue_work(sc->workqueue, &recv_io->complex_work);
++	return;
++
++error:
++	/*
++	 * recv_io.posted.refill_work is still disabled,
++	 * so smbdirect_connection_put_recv_io() won't
++	 * start it.
++	 */
++	smbdirect_connection_put_recv_io(recv_io);
++	smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++}
++
++static void smbdirect_connect_negotiate_recv_work(struct work_struct *work)
++{
++	struct smbdirect_recv_io *recv_io =
++		container_of(work, struct smbdirect_recv_io, complex_work);
++	struct smbdirect_socket *sc = recv_io->socket;
++	struct smbdirect_socket_parameters *sp = &sc->parameters;
++	struct smbdirect_negotiate_resp *nrep;
++	u16 negotiated_version;
++	u16 credits_requested;
++	u16 credits_granted;
++	u32 status;
++	u32 max_readwrite_size;
++	u32 preferred_send_size;
++	u32 max_receive_size;
++	u32 max_fragmented_size;
++	int posted;
++	int ret;
++
++	/*
++	 * make sure we won't start again...
++	 */
++	disable_work(work);
++
++	/*
++	 * Note recv_io is already part of the free list,
++	 * as smbdirect_connect_negotiate_recv_done() called
++	 * smbdirect_connection_put_recv_io(), but
++	 * it won't be reused before we call
++	 * smbdirect_connection_recv_io_refill() below.
++	 */
++
++	if (unlikely(sc->first_error))
++		return;
++
++	if (sc->status != SMBDIRECT_SOCKET_NEGOTIATE_RUNNING) {
++		/*
++		 * Something went wrong...
++		 */
++		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
++			"status=%s first_error=%1pe local: %pISpsfc remote: %pISpsfc\n",
++			smbdirect_socket_status_string(sc->status),
++			SMBDIRECT_DEBUG_ERR_PTR(sc->first_error),
++			&sc->rdma.cm_id->route.addr.src_addr,
++			&sc->rdma.cm_id->route.addr.dst_addr);
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
++	}
++
+  	nrep = (struct smbdirect_negotiate_resp *)recv_io->packet;
+  	negotiated_version = le16_to_cpu(nrep->negotiated_version);
+  	credits_requested = le16_to_cpu(nrep->credits_requested);
+@@ -623,7 +692,16 @@ static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+  			"invalid: negotiated_version=0x%x\n",
+  			negotiated_version);
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNREFUSED);
++		return;
++	}
++
++	if (status != 0) {
++		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
++			"invalid: status=0x%x != 0x0\n",
++			status);
++		smbdirect_connection_schedule_disconnect(sc, -ECONNREFUSED);
++		return;
+  	}
+
+  	if (max_receive_size < SMBDIRECT_MIN_RECEIVE_SIZE) {
+@@ -631,7 +709,8 @@ static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  			"invalid: max_receive_size=%u < %u\n",
+  			max_receive_size,
+  			SMBDIRECT_MIN_RECEIVE_SIZE);
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
+  	}
+
+  	if (max_fragmented_size < SMBDIRECT_MIN_FRAGMENTED_SIZE) {
+@@ -639,19 +718,22 @@ static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  			"invalid: max_fragmented_size=%u < %u\n",
+  			max_fragmented_size,
+  			SMBDIRECT_MIN_FRAGMENTED_SIZE);
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
+  	}
+
+  	if (credits_granted == 0) {
+  		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+  			"invalid: credits_granted == 0\n");
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
+  	}
+
+  	if (credits_requested == 0) {
+  		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+  			"invalid: credits_requested == 0\n");
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
+  	}
+
+  	if (preferred_send_size > sp->max_recv_size) {
+@@ -659,14 +741,8 @@ static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  			"invalid: preferred_send_size=%u < max_recv_size=%u\n",
+  			preferred_send_size,
+  			sp->max_recv_size);
+-		goto error;
+-	}
+-
+-	if (status != 0) {
+-		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+-			"invalid: status=0x%x != 0x0\n",
+-			status);
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
+  	}
+
+  	/*
+@@ -701,7 +777,8 @@ static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  			"invalid: max_readwrite_size=%u < PAGE_SIZE(%lu)\n",
+  			max_readwrite_size,
+  			PAGE_SIZE);
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
+  	}
+  	sp->max_frmr_depth = sp->max_read_write_size / PAGE_SIZE;
+
+@@ -716,11 +793,14 @@ static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  	 */
+  	sp->max_fragmented_send_size = max_fragmented_size;
+
+-	/*
+-	 * Give recv_io back to the recv_io.free.list,
+-	 * so that the refill can also post it.
+-	 */
+-	smbdirect_connection_put_recv_io(recv_io);
++	ret = smbdirect_connection_create_mr_list(sc);
++	if (ret) {
++		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
++			"smbdirect_connection_create_mr_list() failed %1pe\n",
++			SMBDIRECT_DEBUG_ERR_PTR(ret));
++		smbdirect_connection_schedule_disconnect(sc, ret);
++		return;
++	}
+
+  	/*
+  	 * Prepare for receiving data_transfer messages
+@@ -731,14 +811,6 @@ static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  		recv_io->cqe.done = smbdirect_connection_recv_io_done;
+  	recv_io = NULL;
+
+-	ret = smbdirect_connection_create_mr_list(sc);
+-	if (ret) {
+-		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
+-			"smbdirect_connection_create_mr_list() failed %1pe\n",
+-			SMBDIRECT_DEBUG_ERR_PTR(ret));
+-		goto error;
+-	}
+-
+  	/*
+  	 * We should at least post 1 smbdirect_recv_io!
+  	 */
+@@ -747,7 +819,8 @@ static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+  			"smbdirect_connection_recv_io_refill() failed %1pe\n",
+  			SMBDIRECT_DEBUG_ERR_PTR(ret));
+-		goto error;
++		smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
++		return;
+  	}
+
+  	/*
+@@ -756,18 +829,6 @@ static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc
+  	 * the waiter.
+  	 */
+  	smbdirect_connection_negotiation_done(sc);
+-
+-	return;
+-
+-error:
+-	/*
+-	 * recv_io.posted.refill_work is still disabled,
+-	 * so smbdirect_connection_put_recv_io() won't
+-	 * start it.
+-	 */
+-	if (recv_io)
+-		smbdirect_connection_put_recv_io(recv_io);
+-	smbdirect_connection_schedule_disconnect(sc, -ECONNABORTED);
+  }
+
+  __SMBDIRECT_PUBLIC__
+diff --git a/fs/smb/common/smbdirect/smbdirect_connection.c b/fs/smb/common/smbdirect/smbdirect_connection.c
+index ae9626888b5c..cc22e8b2f4d3 100644
+--- a/fs/smb/common/smbdirect/smbdirect_connection.c
++++ b/fs/smb/common/smbdirect/smbdirect_connection.c
+@@ -742,6 +742,8 @@ int smbdirect_connection_create_mem_pools(struct smbdirect_socket *sc)
+  			goto err;
+  		recv_io->socket = sc;
+  		recv_io->sge.length = 0;
++		INIT_WORK(&recv_io->complex_work, __smbdirect_socket_disabled_work);
++		disable_work_sync(&recv_io->complex_work);
+  		list_add_tail(&recv_io->list, &sc->recv_io.free.list);
+  	}
+
+@@ -757,6 +759,10 @@ void smbdirect_connection_destroy_mem_pools(struct smbdirect_socket *sc)
+  	struct smbdirect_recv_io *recv_io, *next_io;
+
+  	list_for_each_entry_safe(recv_io, next_io, &sc->recv_io.free.list, list) {
++		/*
++		 * The work should already be disabled
++		 */
++		disable_work_sync(&recv_io->complex_work);
+  		list_del(&recv_io->list);
+  		mempool_free(recv_io, sc->recv_io.mem.pool);
+  	}
+@@ -833,9 +839,10 @@ struct smbdirect_recv_io *smbdirect_connection_get_recv_io(struct smbdirect_sock
+  	unsigned long flags;
+
+  	spin_lock_irqsave(&sc->recv_io.free.lock, flags);
+-	msg = list_first_entry_or_null(&sc->recv_io.free.list,
+-				       struct smbdirect_recv_io,
+-				       list);
++	if (likely(!sc->first_error))
++		msg = list_first_entry_or_null(&sc->recv_io.free.list,
++					       struct smbdirect_recv_io,
++					       list);
+  	if (likely(msg)) {
+  		list_del(&msg->list);
+  		sc->statistics.get_receive_buffer++;
+@@ -851,6 +858,11 @@ void smbdirect_connection_put_recv_io(struct smbdirect_recv_io *msg)
+  	struct smbdirect_socket *sc = msg->socket;
+  	unsigned long flags;
+
++	/*
++	 * Should already be disabled anyway.
++	 */
++	disable_work(&msg->complex_work);
++
+  	if (likely(msg->sge.length != 0)) {
+  		ib_dma_unmap_single(sc->ib.dev,
+  				    msg->sge.addr,
+@@ -874,6 +886,11 @@ static void smbdirect_connection_reassembly_append_recv_io(struct smbdirect_sock
+  {
+  	unsigned long flags;
+
++	/*
++	 * The work should already/still be disabled
++	 */
++	disable_work(&msg->complex_work);
++
+  	spin_lock_irqsave(&sc->recv_io.reassembly.lock, flags);
+  	list_add_tail(&msg->list, &sc->recv_io.reassembly.list);
+  	sc->recv_io.reassembly.queue_length++;
+@@ -968,6 +985,14 @@ __SMBDIRECT_PRIVATE__
+  void smbdirect_connection_schedule_disconnect(struct smbdirect_socket *sc,
+  					      int error)
+  {
++	struct smbdirect_recv_io *recv_io, *recv_tmp;
++	unsigned long flags;
++
++	if (sc->first_error == 0)
++		sc->first_error = error;
++	if (sc->first_error == 0)
++		sc->first_error = -ECONNABORTED;
++
+  	/*
+  	 * make sure other work (than disconnect_work)
+  	 * is not queued again but here we don't block and avoid
+@@ -979,10 +1004,19 @@ void smbdirect_connection_schedule_disconnect(struct smbdirect_socket *sc,
+  	sc->idle.keepalive = SMBDIRECT_KEEPALIVE_NONE;
+  	disable_delayed_work(&sc->idle.timer_work);
+
+-	if (sc->first_error == 0)
+-		sc->first_error = error;
+-	if (sc->first_error == 0)
+-		sc->first_error = -ECONNABORTED;
++	/*
++	 * If any complex work was scheduled we
++	 * should disable it (only happens during
++	 * negotiation)...
++	 *
++	 * Note that sc->first_error is set before,
++	 * so any future smbdirect_connection_get_recv_io()
++	 * will see it and return NULL.
++	 */
++	spin_lock_irqsave(&sc->recv_io.free.lock, flags);
++	list_for_each_entry_safe(recv_io, recv_tmp, &sc->recv_io.free.list, list)
++		disable_work(&recv_io->complex_work);
++	spin_unlock_irqrestore(&sc->recv_io.free.lock, flags);
+
+  	switch (sc->status) {
+  	case SMBDIRECT_SOCKET_RESOLVE_ADDR_FAILED:
+@@ -1037,12 +1071,17 @@ static void smbdirect_connection_disconnect_work(struct work_struct *work)
+  {
+  	struct smbdirect_socket *sc =
+  		container_of(work, struct smbdirect_socket, disconnect_work);
++	struct smbdirect_recv_io *recv_io, *recv_tmp;
++	unsigned long flags;
+
+  	/*
+  	 * This should not never be called in an interrupt!
+  	 */
+  	WARN_ON_ONCE(in_interrupt());
+
++	if (sc->first_error == 0)
++		sc->first_error = -ECONNABORTED;
++
+  	/*
+  	 * make sure this and other work is not queued again
+  	 * but here we don't block and avoid
+@@ -1055,8 +1094,19 @@ static void smbdirect_connection_disconnect_work(struct work_struct *work)
+  	sc->idle.keepalive = SMBDIRECT_KEEPALIVE_NONE;
+  	disable_delayed_work(&sc->idle.timer_work);
+
+-	if (sc->first_error == 0)
+-		sc->first_error = -ECONNABORTED;
++	/*
++	 * If any complex work was scheduled we
++	 * should disable it (only happens during
++	 * negotiation)...
++	 *
++	 * Note that sc->first_error is set before,
++	 * so any future smbdirect_connection_get_recv_io()
++	 * will see it and return NULL.
++	 */
++	spin_lock_irqsave(&sc->recv_io.free.lock, flags);
++	list_for_each_entry_safe(recv_io, recv_tmp, &sc->recv_io.free.list, list)
++		disable_work(&recv_io->complex_work);
++	spin_unlock_irqrestore(&sc->recv_io.free.lock, flags);
+
+  	switch (sc->status) {
+  	case SMBDIRECT_SOCKET_NEGOTIATE_NEEDED:
+@@ -1216,6 +1266,24 @@ static void smbdirect_connection_destroy(struct smbdirect_socket *sc)
+  	disable_work_sync(&sc->idle.immediate_work);
+  	disable_delayed_work_sync(&sc->idle.timer_work);
+
++	/*
++	 * If any complex work was scheduled we
++	 * should disable it (only happens during
++	 * negotiation)...
++	 *
++	 * Note was already set in sc->first_error in
++	 * smbdirect_connection_schedule_disconnect() or
++	 * smbdirect_connection_disconnect_work(), both
++	 * before time before:
++	 * spin_lock_irqsave(&sc->recv_io.free.lock, flags),
++	 * so any future smbdirect_connection_get_recv_io()
++	 * will see it and return NULL. And we don't
++	 * need to get the lock here again, while
++	 * trying disable_work_sync().
++	 */
++	list_for_each_entry_safe(recv_io, recv_tmp, &sc->recv_io.free.list, list)
++		disable_work_sync(&recv_io->complex_work);
++
+  	if (sc->rdma.cm_id)
+  		rdma_lock_handler(sc->rdma.cm_id);
+
+@@ -1231,9 +1299,8 @@ static void smbdirect_connection_destroy(struct smbdirect_socket *sc)
+  	spin_lock_irqsave(&sc->recv_io.reassembly.lock, flags);
+  	list_splice_tail_init(&sc->recv_io.reassembly.list, &all_list);
+  	spin_unlock_irqrestore(&sc->recv_io.reassembly.lock, flags);
+-	list_for_each_entry_safe(recv_io, recv_tmp, &all_list, list) {
++	list_for_each_entry_safe(recv_io, recv_tmp, &all_list, list)
+  		smbdirect_connection_put_recv_io(recv_io);
+-	}
+  	sc->recv_io.reassembly.data_length = 0;
+
+  	smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_INFO,
+@@ -2002,7 +2069,7 @@ void smbdirect_connection_recv_io_done(struct ib_cq *cq, struct ib_wc *wc)
+  	mod_delayed_work(sc->workqueue, &sc->idle.timer_work,
+  			 msecs_to_jiffies(sp->keepalive_interval_msec));
+
+-	ib_dma_sync_single_for_cpu(wc->qp->device,
++	ib_dma_sync_single_for_cpu(sc->ib.dev,
+  				   recv_io->sge.addr,
+  				   recv_io->sge.length,
+  				   DMA_FROM_DEVICE);
+diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
+index 65f25fc4b4a7..ef151ff1c02a 100644
+--- a/fs/smb/common/smbdirect/smbdirect_socket.h
++++ b/fs/smb/common/smbdirect/smbdirect_socket.h
+@@ -6,6 +6,13 @@
+  #ifndef __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_SOCKET_H__
+  #define __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_SOCKET_H__
+
++#include <linux/wait.h>
++#include <linux/workqueue.h>
++#include <linux/kref.h>
++#include <linux/mempool.h>
++#include <linux/spinlock.h>
++#include <linux/mutex.h>
++#include <linux/completion.h>
+  #include <rdma/rw.h>
+
+  enum smbdirect_socket_status {
+@@ -617,6 +624,14 @@ struct smbdirect_recv_io {
+  #define SMBDIRECT_RECV_IO_MAX_SGE 1
+  	struct ib_sge sge;
+
++	/*
++	 * We may need to handle complex
++	 * work that might sleep and are
++	 * not allowed to run in an interrupt
++	 * context.
++	 */
++	struct work_struct complex_work;
++
+  	/* Link to free or reassembly list */
+  	struct list_head list;
+
 
