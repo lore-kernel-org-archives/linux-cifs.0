@@ -1,217 +1,156 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF5534678B;
-	Tue,  4 Nov 2025 18:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2DA1465B4
+	for <linux-cifs@vger.kernel.org>; Tue,  4 Nov 2025 18:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762279832; cv=none; b=KpxKIuvx2wGNpJRb2IGyQ5hfMqc9LMgggQ484YgGSVQGa2kcN3459VaH36x5054U8E+uPmcG1Bj069i9qpM6V1bbcz1sUB145jE+FL3grx3PN8UISHvFITpLC9KTtvDQSsHk2/rTZm7p2mC2zt5kf5acxDNgKQMoAVfj07/bmG0=
+	t=1762281388; cv=none; b=W7ZtXbhEdwYMIj56T6dbkkyD7/XU5nO4I+XYtxVVxnR+GMp1kvq6tzSj5AbCLMuVZAM0YRHFnH3uSpmb6zb7s5mz1GQuH77mhkDsr4qsju3dCtcvOEwLuzXQiXorXUqZLDkyjtPUm49WAeNfKFeiTMvrKMS8joMaaMbUp0MnSxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762279832; c=relaxed/simple;
-	bh=gG/b1YvIBThJQ7VI9xW8NHzcypqR4QPnbQ5E7Xh785k=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rMNyLMoBprxQpTRY7v6waY/gZSNy6ElkyEHKHlWk5SVAkXRujQJdW7NVeizhwFJy9SC6rA2eEbJI5Wzm3LsWm5JLqIbCva4BxPxwZOA6zfEkgjH5ZDXBwSMbUhcawoTa50m+poLi48ohTssOas6oYVIGgc4tZ77OTbXqM7BHpK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H6PhL26+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762281388; c=relaxed/simple;
+	bh=AuWLO47Op0A6cXiQCT3lnMl7si4MV471QvuioS+vdqU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TicCrdlaw3pn+GA9K2XExziQg9bpfiIPpd6M6Rmsonx6a0nDT+89rN+DE1rRrR0LphMP2PKALy2AykYNHNSmKejFfZzPAUxodTHnffWaFatDM1jcZSFUH1fYjF7HuAu1dOhIGwRV7vzn+Yp1NajIuomRrd/SEgDEBAjkIg5jz/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=HBIDbtxO; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H6PhL26+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4436AC2BCB5;
-	Tue,  4 Nov 2025 18:10:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762279831;
-	bh=gG/b1YvIBThJQ7VI9xW8NHzcypqR4QPnbQ5E7Xh785k=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=H6PhL26+p4Oy/kcc8Fr2t7iOOrX6ggeCdNEpYVTeEdXIPS7NFFMiqK7WrLNCK3CHR
-	 mN83rJbptK9amtOIWpJ6kT9pTB7YYZvPpAq7RrIkAu0xxyhrhkqDiWsNxn59nufze6
-	 SW4qptBqgx772H/WAtWEUsfQPpfYr5DbDZx/FMj4Tn6Jd/zlUD/ysvyURDsVlvTSna
-	 ZHOmjWLlWouCXXERu3TDK9jdgVMrYy1W/SjQBQaarf1q1GHH5HMDsHnyzsmvfHqp+I
-	 SHbpSMZYdDI7qvsuE4ASweHBPAk7R7AJOLoAQO/agiDKUheBomX0vps2m238bGqcz2
-	 NknfS/UjMiTFQ==
-Message-ID: <68c1c557d9499e63ffca00c8880ca6b63d9c1304.camel@kernel.org>
-Subject: Re: [PATCH v4 10/17] vfs: make vfs_create break delegations on
- parent directory
-From: Jeff Layton <jlayton@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Miklos Szeredi <miklos@szeredi.hu>, Alexander Viro
- <viro@zeniv.linux.org.uk>,  Christian Brauner	 <brauner@kernel.org>, Jan
- Kara <jack@suse.cz>, Chuck Lever	 <chuck.lever@oracle.com>, Alexander Aring
- <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, Anna
- Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>,  Paulo
- Alcantara	 <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N	 <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Bharath SM	 <bharathsm@microsoft.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>,  "Rafael J. Wysocki"	 <rafael@kernel.org>,
- Danilo Krummrich <dakr@kernel.org>, David Howells	 <dhowells@redhat.com>,
- Tyler Hicks <code@tyhicks.com>, NeilBrown <neil@brown.name>,  Olga
- Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Amir
- Goldstein <amir73il@gmail.com>, Namjae Jeon	 <linkinjeon@kernel.org>, Steve
- French <smfrench@gmail.com>, Sergey Senozhatsky	
- <senozhatsky@chromium.org>, Carlos Maiolino <cem@kernel.org>, Kuniyuki
- Iwashima	 <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet	 <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni	 <pabeni@redhat.com>, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	netfs@lists.linux.dev, ecryptfs@vger.kernel.org,
- linux-unionfs@vger.kernel.org, 	linux-xfs@vger.kernel.org,
- netdev@vger.kernel.org
-Date: Tue, 04 Nov 2025 13:10:26 -0500
-In-Reply-To: <aQo5_P5XCsSZhw7N@horms.kernel.org>
-References: <20251103-dir-deleg-ro-v4-0-961b67adee89@kernel.org>
-	 <20251103-dir-deleg-ro-v4-10-961b67adee89@kernel.org>
-	 <aQo5_P5XCsSZhw7N@horms.kernel.org>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="HBIDbtxO"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4775638d819so5348835e9.1
+        for <linux-cifs@vger.kernel.org>; Tue, 04 Nov 2025 10:36:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1762281385; x=1762886185; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S+qOQwxfN64qmYsF01vjK7YlVT/sIFKRQ4EeU3BDs4o=;
+        b=HBIDbtxOjeulc/p1M3/WFPuBqjchvgQInrCIfAsgoj5z1ohWS82RZakjTs+ALxzi3o
+         JLmFrGy8gKL11o83DdyhVRu4eGhlkH0VKUSWNTREa06MHDpDfjLn0W9Tda6ggZMghoVm
+         19HOhz14KjtvN89IvD+Uj5nMZEzRECPBQ3dQ6RTOc0SkWuoxWWIMYdejQRNyorsNfUqL
+         yN1qVSdWevyLqgZQ+o47o+oe+ljQ6Kal2UJBaVJrbwxyc8+RXKtcIzLociyaVjLkD8RJ
+         pKgthmlQVlnbja+wGI8woQoI9eO5rro2kPeLeQTexcVr93n2IngoT5j9mb0Z1Kfdor/e
+         XO4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762281385; x=1762886185;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S+qOQwxfN64qmYsF01vjK7YlVT/sIFKRQ4EeU3BDs4o=;
+        b=alt0xPoML4R1vur0cIdGWN7UziAiq6ATrKCAW1XEmM+14CX9lvYpnEcoh1jpiEGqDB
+         TTBHOMVl3poDPI4ggXtj1T69VMm6FB/xCuvweZsoAyjZx44CXM7AK76xlx0PPF1vfQ+9
+         6PgBCfpA7i0Oz4D5ftF0Sc1gEskBmyelsnABDV7A7bm1rmtp5VVQnzO40TYSKAGu6Sxl
+         BHzTL5SjOxz1n77Tp6b+tcCx9LOtL2v0wI1ZmPDgh/xISrFzKrTeLcagfkLovWYiGIId
+         p4XTwwkIydoaWtVAw3PsVRK8YQFRiP4nP34jwRf9OmDmNQzwMKbWWasojHvuLW5MhZUo
+         nzTg==
+X-Forwarded-Encrypted: i=1; AJvYcCW3nbb7fepKlThIS4pdFdg/cUPeg2+lOG4PgkQCVkmWtA8Sn2IujBQ7EnsP0rcLL2k0nEIdRZWAiid8@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+z9pINujs+0NDJwdYwVNSTpUGpiO/3UodDrTerrLkVQu81hL8
+	7NYMpKwaThz5xz11uBx+AfHhw1eBpfELlAOqUPryF951z67FkCAuqevwzX7+pO8mWYI=
+X-Gm-Gg: ASbGncsMDC/MesBHN93jCcu/pQKLfPuDccFiFf4Uf7g7pXUwHxjNp/455SoM67eJwFh
+	XP8nUa6xzcu+AXblF1S8NnULuH34Mq5lYLVHdX96j2WgTw4veZzidyiCZduMk3ex2rTb/WL2LTY
+	Vk8EBWFQdkmBCNyrbpM0bLukeOVE/7rop80rH4UVDeTWubHfB/SSEhe/BmO+jm97KP+BOz8JISA
+	JSwYrGdnVzFtY7tfQ7TdDpRVlXQDuvn9uunCduXfhfwONHq9BO4btNGz4nbcZmyids+CT3MDCEI
+	lSASCqmhp0o+Zj+jCia6lTvSWvPNUjkFfP3YredYHtqO0I2Mtrjj+pJVrzpdpXV16JezZ0tz4dQ
+	rLZLndx6nzNK42Ck6az6RJjuh9xxQPLjToQghyH7teppPMpUq4/Bly2rZZN81YP/ZN14dHgcnIT
+	deSoXHOpfqj8iw3jQfgCqu5c0=
+X-Google-Smtp-Source: AGHT+IEnR2psnzPx+1g8M1v8iuPpltBNgHmLBznqDt6V+MFNoJ7oCyKOUDMVl+6Ny1hv8tF/qNLwHw==
+X-Received: by 2002:a05:600c:1d07:b0:471:803:6a26 with SMTP id 5b1f17b1804b1-4775ce265d1mr2708915e9.37.1762281384874;
+        Tue, 04 Nov 2025 10:36:24 -0800 (PST)
+Received: from [192.168.15.14] ([152.234.106.4])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7acd392040csm3651030b3a.19.2025.11.04.10.36.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Nov 2025 10:36:24 -0800 (PST)
+Message-ID: <33de0eaf-474b-4e88-a445-2f12387bc36c@suse.com>
+Date: Tue, 4 Nov 2025 15:34:12 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] smb: client: fix refcount leak in smb2_set_path_attr
+To: Shuhao Fu <sfual@cse.ust.hk>
+Cc: Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Paulo Alcantara <pc@manguebit.org>,
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
+ Bharath SM <bharathsm@microsoft.com>
+References: <aQoYCxKqMHwH4sOK@osx.local>
+ <CAH2r5mu7s4p88RhUbCm5mqUvEVM60OOTTJOZ+rz09nFfc+t3mQ@mail.gmail.com>
+ <648b7b14-d285-449a-a1b3-4cd062a55b02@suse.com> <aQowQ7gCdDruGVro@chcpu18>
+Content-Language: en-US
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+In-Reply-To: <aQowQ7gCdDruGVro@chcpu18>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, 2025-11-04 at 17:38 +0000, Simon Horman wrote:
-> On Mon, Nov 03, 2025 at 07:52:38AM -0500, Jeff Layton wrote:
-> > In order to add directory delegation support, we need to break
-> > delegations on the parent whenever there is going to be a change in the
-> > directory.
-> >=20
-> > Add a delegated_inode parameter to struct createdata. Most callers just
-> > leave that as a NULL pointer, but do_mknodat() is changed to wait for a
-> > delegation break if there is one.
-> >=20
-> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > ---
-> >  fs/namei.c         | 26 +++++++++++++++++---------
-> >  include/linux/fs.h |  2 +-
-> >  2 files changed, 18 insertions(+), 10 deletions(-)
-> >=20
-> > diff --git a/fs/namei.c b/fs/namei.c
->=20
-> ...
->=20
-> > @@ -4359,6 +4362,8 @@ static int may_mknod(umode_t mode)
-> >  static int do_mknodat(int dfd, struct filename *name, umode_t mode,
-> >  		unsigned int dev)
-> >  {
-> > +	struct delegated_inode delegated_inode =3D { };
-> > +	struct createdata cargs =3D { };
-> >  	struct mnt_idmap *idmap;
-> >  	struct dentry *dentry;
-> >  	struct path path;
-> > @@ -4383,18 +4388,16 @@ static int do_mknodat(int dfd, struct filename =
-*name, umode_t mode,
-> >  	switch (mode & S_IFMT) {
-> >  		case 0:
-> >  		case S_IFREG:
-> > -		{
-> > -			struct createdata args =3D { .idmap =3D idmap,
-> > -						   .dir =3D path.dentry->d_inode,
-> > -						   .dentry =3D dentry,
-> > -						   .mode =3D mode,
-> > -						   .excl =3D true };
-> > -
-> > -			error =3D vfs_create(&args);
-> > +			cargs.idmap =3D idmap,
-> > +			cargs.dir =3D path.dentry->d_inode,
-> > +			cargs.dentry =3D dentry,
-> > +			cargs.delegated_inode =3D &delegated_inode;
-> > +			cargs.mode =3D mode,
-> > +			cargs.excl =3D true,
->=20
-> Hi Jeff,
->=20
-> I don't think it makes any difference to the generated code.
-> But I think it would be more intuitive to use ';' rather than ','
-> at the end of the lines immediately above.
->=20
 
-Definitely. Will fix.
 
-> > +			error =3D vfs_create(&cargs);
-> >  			if (!error)
-> >  				security_path_post_mknod(idmap, dentry);
-> >  			break;
-> > -		}
-> >  		case S_IFCHR: case S_IFBLK:
-> >  			error =3D vfs_mknod(idmap, path.dentry->d_inode,
-> >  					  dentry, mode, new_decode_dev(dev));
->=20
-> ...
+On 11/4/25 1:56 PM, Shuhao Fu wrote:
+> On Tue, Nov 04, 2025 at 01:23:33PM -0300, Henrique Carvalho wrote:
+>>
+>>
+>> On 11/4/25 1:12 PM, Steve French via samba-technical wrote:
+>>> There are multiple callers - are there callers that don't call
+>>> "set_writeable_path()" ?    And so could cause the reverse refcount
+>>> issue?
+>>
+>> Yes... Even if it does not cause an issue today, that fix looks like it
+>> belongs inside smb2_rename_path?
+> 
+> I placed decrement in `smb2_set_path_attr` since it seems like a wrapper
+> of `smb2_compound_op`. I figured that this wrapper should handle the
+> failure cases the same way as `smb2_compound_op`.
 
-Thanks!
---=20
-Jeff Layton <jlayton@kernel.org>
+Makes sense.
+
+Acked-by: Henrique Carvalho <henrique.carvalho@suse.com>
+
+> 
+> Thanks,
+> Shuhao
+>>
+>>>
+>>> On Tue, Nov 4, 2025 at 9:21 AM Shuhao Fu <sfual@cse.ust.hk> wrote:
+>>>>
+>>>> Fix refcount leak in `smb2_set_path_attr` when path conversion fails.
+>>>>
+>>>> Function `cifs_get_writable_path` returns `cfile` with its reference
+>>>> counter `cfile->count` increased on success. Function `smb2_compound_op`
+>>>> would decrease the reference counter for `cfile`, as stated in its
+>>>> comment. By calling `smb2_rename_path`, the reference counter of `cfile`
+>>>> would leak if `cifs_convert_path_to_utf16` fails in `smb2_set_path_attr`.
+>>>>
+>>>> Fixes: 8de9e86c67ba ("cifs: create a helper to find a writeable handle by path name")
+>>>> Signed-off-by: Shuhao Fu <sfual@cse.ust.hk>
+>>>> ---
+>>>>  fs/smb/client/smb2inode.c | 2 ++
+>>>>  1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+>>>> index 09e3fc81d..69cb81fa0 100644
+>>>> --- a/fs/smb/client/smb2inode.c
+>>>> +++ b/fs/smb/client/smb2inode.c
+>>>> @@ -1294,6 +1294,8 @@ static int smb2_set_path_attr(const unsigned int xid, struct cifs_tcon *tcon,
+>>>>         smb2_to_name = cifs_convert_path_to_utf16(to_name, cifs_sb);
+>>>>         if (smb2_to_name == NULL) {
+>>>>                 rc = -ENOMEM;
+>>>> +               if (cfile)
+>>>> +                       cifsFileInfo_put(cfile);
+>>>>                 goto smb2_rename_path;
+>>>>         }
+>>>>         in_iov.iov_base = smb2_to_name;
+>>>> --
+>>>> 2.39.5 (Apple Git-154)
+>>>>
+>>>>
+>>>
+>>>
+>>
+>> -- 
+>> Henrique
+>> SUSE Labs
+
+-- 
+Henrique
+SUSE Labs
