@@ -1,85 +1,85 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E498686329
-	for <linux-cifs@vger.kernel.org>; Tue,  4 Nov 2025 12:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14672ECEAC
+	for <linux-cifs@vger.kernel.org>; Tue,  4 Nov 2025 12:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762259609; cv=none; b=o4qSYk5Bq3E2ocAr5qiX2ATD3+vdVEtW4LXqrGI5dcnMnGTbtJaJG+aIdnWHh+U2tayhVvtwZ4WFTc0TtWBU7ROrMBoqmykM/pUQDXOw10yOX7vJG+7hvfWNXSAo9aNZBjlH9gDXVP1+MjZjW5qg3n0gaXg82al84GoM+9M+Yuo=
+	t=1762260464; cv=none; b=OiftSKuDhW1NUEGw5qOyDO9F9ikFBK7ccMeceeeND8vbmAIhDhttw05yD0I3Fj35am/ryMok8TKQnxcxl2yRCgw0DDbLhWahUnsf1q4X1PazGSnERviJRAiY4I3MUKlP76PPkbJFd2Zphk0A+ZyN08vTbEhrn/yfkoSwqs64zOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762259609; c=relaxed/simple;
-	bh=rvu6O0E/7DDQAPj95W4jLS6+wxWIiNJJleMFtELomlU=;
+	s=arc-20240116; t=1762260464; c=relaxed/simple;
+	bh=g4MzobWCgMAbdFKqXdws3q6G9OR+n0+6vpq9/2gGiYo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aaaGKBbBj0BdJbxJ9LxjcX/fKCx6/JJ7TITVV4lxAIL7MA75cYJccMEfG0wkv2L1qYV1GxqoKo7yqkzx2dfCjaJ6MUD/wGeilxsJQj1Dd46ZealBqXKRZVPzKB2zYLaVabBeUEbP1m96ZbqE2Ag4E9ubiE3LL0ueKJ4Vf96JJj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OXuDU95H; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y8VxjrhB; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=a2KJMqDzIXfKk+cE9gB4mdUWId8nVKzeCN6h84ZXFYmd5PCIScewMFyYFFxwe3DpkpcAsbbHQeA8A7QZSzbcaft2o99+GLvxjtXOawgD5VM0XdUzlJNAeKs8Cox2YfdQCFV5CgrDc5tn6rgzsT6yiDH31iojbtZXpmhsdbtQrGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mp8b3IW6; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VKba1yXw; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OXuDU95H";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y8VxjrhB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mp8b3IW6";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VKba1yXw"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762259606;
+	s=mimecast20190719; t=1762260461;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0+n3IR+AGm5h5aAEd+ooyhPcJs+3zBjyrD/S6ttEIHg=;
-	b=OXuDU95Hk3J0WPFLcGJs2ychYOtloAw9/IOt40heLkF5gidwyIlZXJT5ehHbrZx32LC373
-	fnvuUEoiRp8Fyri0pMZJZnIEdcozPPiDmcq2krmFn87LJAjrb9y3SA+9FHpqO5PpHcr2bu
-	/EBxqVwJbwrdiXV3o8dZttwkiaCmRtA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=BWnifgGT0AcayVvuS2yfUcRlYF71GXMXDqlq2lq5xps=;
+	b=Mp8b3IW68dk5F3iMH1X0sj/+wDHG+j01bA5G4NrkktUKG6qQn2NZwGAN/xcZwMXKmSBI8j
+	N1Sidb9iXWwDnE3qSiZHBEK+Ire4EDoxSahfoweDBYPb4EupaL2O8RD5UHDB91GzywXur2
+	uipVLuvRLEEHWgAN008PEj/C1FjuhfE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-ocjfzrglMeGvrxYtP7YRIg-1; Tue, 04 Nov 2025 07:33:24 -0500
-X-MC-Unique: ocjfzrglMeGvrxYtP7YRIg-1
-X-Mimecast-MFC-AGG-ID: ocjfzrglMeGvrxYtP7YRIg_1762259604
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4721b4f3afbso21481055e9.0
-        for <linux-cifs@vger.kernel.org>; Tue, 04 Nov 2025 04:33:24 -0800 (PST)
+ us-mta-640-VJew1EEoNsmGM5ADdomRBA-1; Tue, 04 Nov 2025 07:47:40 -0500
+X-MC-Unique: VJew1EEoNsmGM5ADdomRBA-1
+X-Mimecast-MFC-AGG-ID: VJew1EEoNsmGM5ADdomRBA_1762260459
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-429cceeeb96so1223893f8f.1
+        for <linux-cifs@vger.kernel.org>; Tue, 04 Nov 2025 04:47:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762259604; x=1762864404; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1762260459; x=1762865259; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0+n3IR+AGm5h5aAEd+ooyhPcJs+3zBjyrD/S6ttEIHg=;
-        b=Y8VxjrhBIi81w5mWliTL1aJFYNOnIeKVI3j3x3QjeVPI0Q2UQs75iITc9WnujdoQq5
-         Vc+sSlyMA8aBrEBXgkRInWxb0RXHuEtFWRDyVeeqO/tZJn9Yjx2moWYxCGzHtwFQHyDp
-         SvFioVZYyLNCt0nj7mrPpYtbi8GaU6MPqOJth4QBcD/nkNPIrsEWBFj2Jh3dxseaq8g1
-         AfpUdTJQXCvm98dKaaKZVijxSxZzjrYDdZdK6Z+Oy+mRlKLT9lLc22hvkE96MKZqjVUG
-         MjKnNb5VymksBELwW/YJl7JBv1az5hjPnJfvGPWWdGoZODC1JsGzlGhb5BQBIoZluwSd
-         2/Vg==
+        bh=BWnifgGT0AcayVvuS2yfUcRlYF71GXMXDqlq2lq5xps=;
+        b=VKba1yXwSlT1JSdoiZtO6T6xLfIlZxUkWQszQHB/6WwvFY4GG23P2xr6znm/fkx9MT
+         szW9fqwrHt29xJLGFCMLXkkd2YN1fl8MRjJcSs8A29qVmLxoFtdwPOoFF3VNGr6xT+Vm
+         ffFBnyJTJfSJqqoPqaLVZ6TDOypmdnWu90RHOxvYkShy+9Zc95b4nhxVW+5/RCWebyNw
+         QccLTN0DGfhRods6hukqQ0dfJ0IwDsE/u8hvg4KP5AVHHQWkZMNLia7hJ0/p+fBgDJE+
+         1jUuJNdhfduVfimFsucqmTnqe3WHa72MUk+LvA32mtpHezOmc08rUnEgvJ8QVQWWw93u
+         7/Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762259604; x=1762864404;
+        d=1e100.net; s=20230601; t=1762260459; x=1762865259;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0+n3IR+AGm5h5aAEd+ooyhPcJs+3zBjyrD/S6ttEIHg=;
-        b=LXNXq2wchjxQIeEs3kOXCYweZ3KmdCtsN/wlyfaZekDjDqb26K59OQbu/bthfn/ZMx
-         kkBQ1BetGbHseplH0DOBw2IXqNi8f8puZ4cUy1StyiHp8Gbm58XTvpQhkhNlBEHkB5Ds
-         d282twF2RGEhtkQQLvZMmw14+cfcCdpxd46RccNpV0af2GLHNeNCJkhf5/e4Gz7RqM+G
-         toXRElFUlbzQulNlFXXZZeKeW5sLEFLV2xLDgaA6iqy+52owSfDMMspA3Qj3PaExIPLx
-         Vctcdu+fcl1zNy8ux7wr40d5/Q0CQ+DHYAsm+jwNUlfEin6SC+d12+2iSJ0ocIvoUaNr
-         vBXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVnYFY354D3lbTTL9kRIBHc3Vt+SbramYguET+OCd6FtcEmPNC/qXNxlt/LUk07WR0wSrSW5rW5LLfw@vger.kernel.org
-X-Gm-Message-State: AOJu0YyW0NV/cmL4dnv1FWe9DvT7l9CSXrfucuRJAgSLz/V7c2zcaljA
-	qF7l2xO3JSxc9/7iJqMluwUx1sC2ZlHymDoFEN5j/Xav3vubCj32VJ5rvPBtRsHupxR8XCO1xoM
-	t5GROCMjRgWP6UhAhJQtC0Y7B+KO3ShBb+QQhn3q0GdEhSFgv/CPkfhI/uEPcAuM=
-X-Gm-Gg: ASbGncvQbxh3fcox1AXYBYDlvs0FXzcSNqZi8ttl4eaBoWnJJXkzfs1bG6U8O0aieL1
-	foxesrAqUoFYUdVqgg6z3xLauYZmtQsLCzPYAGIuv7LigFd+7yNu+vZTPZjLMKpbG+eHMTrp6FL
-	xUQ1VkLt5A/8wnoOeM9oExxNbvSzSA7kaQ6ZRuyW6XisX+DRTbSjHF54h+FbbP8Q+bJtPdQvmjm
-	rtro7cV758GjjXn+RuwE/flOUoyQV5Q6DSR09KqUlwfb9UZua/2CLs0huyowZrQeHTVCp7/YEDt
-	IhaUC3PsAMzeANTzgSZldj3e66JGlXVi6uh3LxqgGluLmg87AQKke78vfj6NxNvtf9RNI0lyKSz
-	VXcHKFN5TOaiX0h9of8elksW04g14mP1S9AGvc3aMSIQn
-X-Received: by 2002:a05:600c:a086:b0:477:5582:dee3 with SMTP id 5b1f17b1804b1-4775582e17dmr21786615e9.23.1762259603577;
-        Tue, 04 Nov 2025 04:33:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEW7XZAfAI36z3n3gua+YP3lVHEkUX5rYhKEKRSMwAwl/px8xmvwUV2n/8i+Vg7lzMYGCOnZA==
-X-Received: by 2002:a05:600c:a086:b0:477:5582:dee3 with SMTP id 5b1f17b1804b1-4775582e17dmr21786255e9.23.1762259603207;
-        Tue, 04 Nov 2025 04:33:23 -0800 (PST)
+        bh=BWnifgGT0AcayVvuS2yfUcRlYF71GXMXDqlq2lq5xps=;
+        b=h2tTQ6Xn0vg8rNMkUqXjljeGtWJoo2+ugeMLHzUOG8USs1eG3JKHpBI/nuWGBQ4CFW
+         jlQcQti4hIfrYYeiBHrkSFKkG84UnmkD+QjgCo5swUHKYkgHdKsCek4SLf+g0ybZMhra
+         Pzv336DT/r0hn8zCf9yur2C6jlP+AqvPGGDgADRAEPHN6UPM1xReuiJhuPT/742kEa9D
+         V9I9+4OY8DOK2EG0uqf38cf05c753WdC4FqrRkpFtk+N0UH6jttRwCAW6ZyoA4XOwx29
+         tTcuf/M0Uy0BsyBBir55tXLZ9OcpgOYAGKfrewoap4f18oIAv7J2iS3h00v5CBspMH7K
+         hK9w==
+X-Forwarded-Encrypted: i=1; AJvYcCU40dBR7YWAYSgi7PoHNOoOdN/OxKsNfh0t3vj6mpHS+t5jHs94B+jLR7aza91vWPJ4clYyRxmu6TyJ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1dY10MaBLzDFZ85DBs9BYLn6HxotZrZ/NieNRFOQievSMiWyT
+	ybQVuuJxmP60DxjiDY7fv0Wm/qFp9D9XmJVoByvacQz0OG5BfeVHxO22qI+g6ytC7VWz8Owhz45
+	vT3ew9hkOmXf1+YHXhnjCBG3MoW9OsYQEt2zQyDTEtLvwQP5srAb8y2xSGqXj+V8=
+X-Gm-Gg: ASbGncvPdW148d/abnV3zaQ59HK994dmsTfsXu8usAZE41quetRcO+A0mX0Uik7DxbD
+	3L2BmYk5Rlickfp/Em5qKiHCDeHBCUSrwm56XV27T7rssiLln/JTXi05QD0Rnd++KCBeVMmsJZ0
+	yDtCX8ni7HND0zkpfTng5yK+GRY263vokIJitYd2yA1KBcSk0+oNffy+uQXvymnYoiNZCAFCAvz
+	0SKvqaaoX2Nogw16JAbNf9n7+EMh+v1jbMReUDgW8QeTXKbj6FyPan22oump50PRgL/wqtOZyZg
+	6h27aW4zfdUjgb/vng3IxYq7mpQHWxwkgTk+uOdz83jlHaM9A2rmVMaEoX2Jt28Uj4U2e+ayjdx
+	mkjdiv8e7ASKw6WoOG5asyhpXyEaeiahpkoC2khtBCiNR
+X-Received: by 2002:a05:6000:4b0f:b0:429:c965:afa with SMTP id ffacd0b85a97d-429c9650c2emr9026854f8f.36.1762260459278;
+        Tue, 04 Nov 2025 04:47:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGiJ1SiVaPavd71LCb0yruPCRV4eS0waiUfxW8OCw2NKcYZLnottK8w5LOXobrD0/V4oRg99w==
+X-Received: by 2002:a05:6000:4b0f:b0:429:c965:afa with SMTP id ffacd0b85a97d-429c9650c2emr9026809f8f.36.1762260458840;
+        Tue, 04 Nov 2025 04:47:38 -0800 (PST)
 Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477558e695esm17324625e9.2.2025.11.04.04.33.20
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dbf53e86sm4620311f8f.0.2025.11.04.04.47.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Nov 2025 04:33:22 -0800 (PST)
-Message-ID: <3618948d-8372-4f8d-9a0e-97a059bbf6eb@redhat.com>
-Date: Tue, 4 Nov 2025 13:33:20 +0100
+        Tue, 04 Nov 2025 04:47:38 -0800 (PST)
+Message-ID: <989d3df8-52cf-41db-bb4c-44950a34ce89@redhat.com>
+Date: Tue, 4 Nov 2025 13:47:35 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -87,7 +87,8 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 13/15] quic: add timer management
+Subject: Re: [PATCH net-next v4 14/15] quic: add frame encoder and decoder
+ base
 To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
  quic@lists.linux.dev
 Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
@@ -109,26 +110,25 @@ Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
  Daniel Stenberg <daniel@haxx.se>,
  Andy Gospodarek <andrew.gospodarek@broadcom.com>
 References: <cover.1761748557.git.lucien.xin@gmail.com>
- <cc874b85134ba00f8d1d334e93633fbfa04b5a9a.1761748557.git.lucien.xin@gmail.com>
+ <56e8d1efe9c7d5db33b0c425bc4c1276a251923d.1761748557.git.lucien.xin@gmail.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <cc874b85134ba00f8d1d334e93633fbfa04b5a9a.1761748557.git.lucien.xin@gmail.com>
+In-Reply-To: <56e8d1efe9c7d5db33b0c425bc4c1276a251923d.1761748557.git.lucien.xin@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 10/29/25 3:35 PM, Xin Long wrote:
-> +void quic_timer_stop(struct sock *sk, u8 type)
+> +static void quic_frame_free(struct quic_frame *frame)
 > +{
-> +	if (type == QUIC_TIMER_PACE) {
-> +		if (hrtimer_try_to_cancel(quic_timer(sk, type)) == 1)
-> +			sock_put(sk);
-> +		return;
-> +	}
-> +	if (timer_delete(quic_timer(sk, type)))
+> +	struct quic_frame_frag *frag, *next;
+> +
+> +	if (!frame->type && frame->skb) { /* RX path frame with skb. */
 
-timer_shutdown()
+Are RX path frame with !skb expected/possible? such frames will be
+'misinterpreted' as TX ones, specifically will do `kfree(frame->data)`
+which in turn could be a bad thing.
 
-Other than that:
+Possibly add a WARN on such scenario?
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+/P
 
