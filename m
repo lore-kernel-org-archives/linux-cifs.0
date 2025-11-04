@@ -1,135 +1,127 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A100314B60
-	for <linux-cifs@vger.kernel.org>; Tue,  4 Nov 2025 09:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A70B2D481C
+	for <linux-cifs@vger.kernel.org>; Tue,  4 Nov 2025 10:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762250109; cv=none; b=L6siYZOmJI7DF7ANlEbKWsJd+odnA3ioQ8NGaokdWM+ux2TVjrxI5bHJ7D0jnUSy/5RZH92V1o/KTMgP1I2uikemIRGYALkrKxZ2BSeVKKE8Q7N/iD7R/OwL77HBTSWJpjMHwE1Lv/yz2H1OeOgtBG7GAkUe1ROfYWQkqKdh9y0=
+	t=1762250623; cv=none; b=unWiFXXfEuJHRo1n3bbqL4EkPnsU3HiStP4p0liBCsCqVQG6JYrg5Uwb9f5tEeSRpVui3eSY203mVRAtOzjrVd4bAAQp2bmhAGuNVgsHRXO0krZpZ+AglFrJdwJBlxJpsHSH3uF3KKtr5PzcSdSMVxNHr49bVZyM6/LjQVeRTaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762250109; c=relaxed/simple;
-	bh=QfSQ5cpqVePGEDeF20Ht8A/SzrjwwOLDakiJXtv47U0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dij49+He0QowV5qti8Of03rdKR0oMcJjQ/IvmiMS3HWfRJ2e1STT/NQDZ/iORT44RNUaHjCTwP61Ba0lECkomkLB82IvJ8sExDQVOMFwZwxjMppK8EsEOTiH+65bZKBC/GCV7qmGsrd8j0G90FlWISYzJC6PGHf5jnCKm+TL2Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IQcTEQX8; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pbc3IeyS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1762250623; c=relaxed/simple;
+	bh=yCNhQ4a0Nk0Atx6Dr4wxtJ0ZtyqyLGT9ZWpCeh0ba7s=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=DSeZSrRp/hpVcnEmepShxrGJi5rsmVhpFouKU0IPTTjW/T5kkiSNbh3gnofiKbakY01pdNABETqPZ4iLc1O4ym/VCPirwtAfz3X1EN9/FhYWE9X+W7udMdoyO76Q95ifP1w46fzQ+4wpmrs6gL8W9x6lioSrJNc4LdJnpoHFM2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mQ53Ntyq; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IQcTEQX8";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pbc3IeyS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762250107;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VP7vTJNouoan64MmsnztfHu0gZfK42bIBxJmyPWNcv8=;
-	b=IQcTEQX8PW7A2EKkkLPTeicvAX6AybTRM/I63+gtKb1r0BknExu5V0NDKBDFFKj/XVwDzm
-	69tlH6mI7FQQRAeQt2LjomSn2O7GJ9W0sjRuhkXQ6wAjoplEHT7W1VtxzE330RnUkOMtl5
-	GLPCQ/FP9t+SIvhCEcmbRDYcaktJRIU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-398-4-eddJtROPCSwxOu6-1_eA-1; Tue, 04 Nov 2025 04:55:05 -0500
-X-MC-Unique: 4-eddJtROPCSwxOu6-1_eA-1
-X-Mimecast-MFC-AGG-ID: 4-eddJtROPCSwxOu6-1_eA_1762250104
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47106a388cfso41627595e9.0
-        for <linux-cifs@vger.kernel.org>; Tue, 04 Nov 2025 01:55:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mQ53Ntyq"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-26808b24a00so8083645ad.1
+        for <linux-cifs@vger.kernel.org>; Tue, 04 Nov 2025 02:03:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762250104; x=1762854904; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VP7vTJNouoan64MmsnztfHu0gZfK42bIBxJmyPWNcv8=;
-        b=pbc3IeySiscSqzEdQYt5Wpr2mSDzBCnlBaqG3f5dO9S+G3YnSb0Vbfgi8zeeAY8voQ
-         9e0eKr96WW69lKxIxCiJwQ9WuBgNQKA/MTGl9Y+VPG4hM6N8gJCkGBQxsmv3c4hxhzZ4
-         6VtWxtZuTk+jIGa6hUZiBjLqIR2wgR6WtCDblrdOYSauekxG62tukqEwDcEEtBbbJ486
-         rhEuT9bkaGiWfZ8SUqsu59vlXaXtveMl4a/k64SI9AXJkeQ7dcwrGd7Oq6KTBzBJAfpd
-         3kNjcuQuGJxrlQ9K6OdR44QtulcVK+Q84HDtNOyhWLi+LnRjneOys4iEbqflwYhcsjp+
-         fv6A==
+        d=gmail.com; s=20230601; t=1762250621; x=1762855421; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VKUczaa/kE48HAcaJ5lE+YSGWpwTs3a+tEo/Ya98+Oc=;
+        b=mQ53Ntyq00EMTSh035RR+uDtW7hqjDsU/ZP5ohgCtXU8iDxkKWRO+rWmFTmRd3dtve
+         /9oHlAvsGwGsM7p2C1MXvAi61D0Uk3dIy6G2YyjJfgSsmY8gX3MXp3jMK7pwNmuNcqBd
+         uHBqxjox4bQW/TlBTz4WEPe6EVfSCehly9TXbbO2OuQquuXC92Ulw1VY/Ubm7A+gTN0S
+         LvH6K+3Z9chVBQ7YtbJ4ir7Yf1if9X0rhTIXdW/PEyCyRlKuRLOCEQpRXQEW0BWzRMAQ
+         uvCO6YkLHlqWaMmAlYMUrhOdL11AIOQ6AHx7XxZhTMVc/xlY5vav4vcw3g9oeQk2eZ0/
+         853A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762250104; x=1762854904;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VP7vTJNouoan64MmsnztfHu0gZfK42bIBxJmyPWNcv8=;
-        b=T5oLYU5N4i+GNGDvGwIXPGYVvukN1pZijDxKVaAO0SEvXuNWKhcQ3ocBApU1B3EtQw
-         9zfeKVRyFwgsSH06/tBlw9VSEBhR1HxuPwOR0Q9buiHF9gZPGu7z1KMbiFdMBYRmoYbi
-         ZZhctSZAHoQctZbc1lm/cppiIbzQiUolvRQHiCh9FGQPzZwzwqGiJlvts6kuGiQmK14X
-         6w/6KHeYx3wOjGgD7i6mcW1pBumd3imRGmItDyAISaUBOW8JIVyzqG6PWCgOx+lwrj0G
-         0MbmGP7NtIYuM9T/Voeg+oaD8TTEJ8FhjtDuAGLIyKxTPkEuBPqChh2mR6tvAAc7HGSY
-         Opyw==
-X-Forwarded-Encrypted: i=1; AJvYcCWQcLOZvSNApcA6EORx6UG9IbW26Pbie6+e6zDFisCkVJdNi9+Z+SAGLwAPZeUsHrPCRlFTq27iusRS@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVW6zmL6zPk7sJGdryDpapXrz6t49+k3J6w6sj/3B+IWFWJ28n
-	axIcUe1F60USofUtqnzYaMWLRKlqStx48rbj/7/gGZjMEo7ptyarNd9fklCHwNSUyL+srdBDhUb
-	B0et8y90scW2JlJDpDRaNnIieB2WWWRPMLFp7a9km/Rj1ro6kdqC9sqy0z96lGLA=
-X-Gm-Gg: ASbGncuVj2WOxiaXVYInPEJIQGZuNjt1Vg3oGM1Ygm6gWhxeq3i9tNvxJS+/SQXurGq
-	gB+mMrCFBPqrjQmcGTAteluLXXjE9HSjvtisrSW/GqARmLDycePSS+ol3EEBu+uldzlG38aQd1E
-	qebWfBRKUNl5L103eFGlpAGZoH/sLz4D6FUF/ifFhqxvXO1AR4zD1kEaSofqwZ8FN4cJfissRNl
-	qQYvJ1+jAkBlqL5iNEi/H1Smp0AA6rt7nEbELrR1qN3W33okA0oMAmQJWAH5e26psVPU3cXbHhE
-	4uDC/NtegXNfz2jHU90QtFBv0/eVFnBXxJQW/CxWn6y3atoZifHy4oy0wiSZt224Sj5EovQKrVw
-	lAdQB2FzbGvZt6ypnGOqMQIIFmPrU5PgLyGce6hFxmHt0
-X-Received: by 2002:a05:600d:8394:b0:475:d944:2053 with SMTP id 5b1f17b1804b1-47730ef502bmr102634485e9.2.1762250104370;
-        Tue, 04 Nov 2025 01:55:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH6j3suXJsdE1W3rADP1TPpeXGC+84lF7jrCGSmoPCopSvWPQsrXeTI2soLtfPTzeuZHI21IQ==
-X-Received: by 2002:a05:600d:8394:b0:475:d944:2053 with SMTP id 5b1f17b1804b1-47730ef502bmr102634195e9.2.1762250103915;
-        Tue, 04 Nov 2025 01:55:03 -0800 (PST)
-Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4775598c2c9sm28545315e9.8.2025.11.04.01.55.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Nov 2025 01:55:03 -0800 (PST)
-Message-ID: <1fcf4639-4c3e-4c07-9d01-0537cadcff42@redhat.com>
-Date: Tue, 4 Nov 2025 10:55:01 +0100
+        d=1e100.net; s=20230601; t=1762250621; x=1762855421;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VKUczaa/kE48HAcaJ5lE+YSGWpwTs3a+tEo/Ya98+Oc=;
+        b=LUaIdUPW9BvnZkIztx6zLAzIrpLQdaq6GMy26knx477xoJd+SktGU6gPo+Op1jxsNP
+         mWN9hzmyNHveexAvtkdKmUVPTAgjgnRAhTN7zBcWHavFibP7g2PDdxyma0pKbNIpye3O
+         nwNNRGFuPNEr7RJbktIgb6PdC1skbpg40+Sw6WpreDI/mQnT1gqKHt0uYvV78q0fqjuz
+         Fl/lYKKyaXhatxL2v8SatJ+xh5cponqHOQOL36XO4p3R9luFT5MwKLDV0/Kb/Ki/H2nT
+         /m0YaSSdcnj1+SjzeqdBe2qMKvjcqfQ7MSHpXpyXbwIVodHVjuUAfH3h0EpxT1sNdKcD
+         pC1w==
+X-Forwarded-Encrypted: i=1; AJvYcCVBHovNvlMzG4DqiJ2XEFjmh+Avv71lLFfATAutwu+0ZPQYEuVXCpmlOD1zQh2qa+u1c5s1cIVSO+Pu@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLmCXVaVZQuXCg3MLhbaEdyKns7VuRIN88a1SdN/5VRzVFMLb4
+	6wQ1zxuiQ83wdGMcl/5E0MNvEDJ0UDsQm8tknOGo1ys3gw/CfYM6ZpA5
+X-Gm-Gg: ASbGncvOs1wBlb15bYMy6NLZmxu705O1vbnvbTpZgbO9NU+S1g8OHzUQMGsOBFvSlH6
+	7lmwWFpfxwAvDx6xfUyzM265pO6t6jhEVhxKDcVgYtOUZBp8vnmG49x7D6x1A5j6MDiBgw5N1vG
+	pPRYzHaBEjjsrR481iDzl5vNTRPBs9E8uD6u7WLlqkXrsX3bESpHp2vj9omW/ANbDt7c4eu66i+
+	pstplER5+6QjQCiN0Qxn/SPAMZYx0kdL8SbdcFSuOh9hVT9UmDqH12s28/kRU+ZnF7k+fZir7es
+	uZNTuka9yT+NWdJYHwDh0dvn612gAzcKz7FrWKy4LafBZZ1SdfU5XyRvAQhZiqW/Z0yslJrNy90
+	pRxSgX4kb/usW5/cs3aIO1fJFdW42Lo680Ppp8hcmbO5MqBFp94RCHVmJIeMgQrk+GWeStmdW7G
+	ZdiBPv1/qqI1z5NhoOu6FqhKNYe7X9S5azdXCG9Meip3zvNkaBuShBJ8eiQlLjwg==
+X-Google-Smtp-Source: AGHT+IERjCdObduOqXZ7oaX8UqF7sHs4pQ6NQtq4FOaNwiNZd5TJwbQT+UFYEFtX/Kv19Ewgasg8YA==
+X-Received: by 2002:a17:902:f393:b0:295:54cd:d2e2 with SMTP id d9443c01a7336-29554cdd55fmr54991885ad.0.1762250620759;
+        Tue, 04 Nov 2025 02:03:40 -0800 (PST)
+Received: from poi.localdomain (KD118158218050.ppp-bb.dion.ne.jp. [118.158.218.50])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601998ef7sm20672565ad.33.2025.11.04.02.03.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Nov 2025 02:03:40 -0800 (PST)
+From: Qianchang Zhao <pioooooooooip@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	Qianchang Zhao <pioooooooooip@gmail.com>,
+	Zhitong Liu <liuzhitong1993@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: fix leak of transform buffer on encrypt_resp() failure
+Date: Tue,  4 Nov 2025 19:03:25 +0900
+Message-Id: <20251104100325.343863-1-pioooooooooip@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <2025110432-maimed-polio-c7b4@gregkh>
+References: <2025110432-maimed-polio-c7b4@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 03/15] quic: provide common utilities and data
- structures
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
- quic@lists.linux.dev
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
- linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
- Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Benjamin Coddington <bcodding@redhat.com>, Steve Dickson
- <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1761748557.git.lucien.xin@gmail.com>
- <66e48fe865ea67beb2a7f5cf084ea86d93592dff.1761748557.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <66e48fe865ea67beb2a7f5cf084ea86d93592dff.1761748557.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/29/25 3:35 PM, Xin Long wrote:
-> This patch provides foundational data structures and utilities used
-> throughout the QUIC stack.
-> 
-> It introduces packet header types, connection ID support, and address
-> handling. Hash tables are added to manage socket lookup and connection
-> ID mapping.
-> 
-> A flexible binary data type is provided, along with helpers for parsing,
-> matching, and memory management. Helpers for encoding and decoding
-> transport parameters and frames are also included.
-> 
-> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+When encrypt_resp() fails at the send path, we only set
+STATUS_DATA_ERROR but leave the transform buffer allocated (work->tr_buf
+in this tree). Repeating this path leaks kernel memory and can lead to
+OOM (DoS) when encryption is required.
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+Reproduced on: Linux v6.18-rc2 (self-built test kernel)
+
+Fix by freeing the transform buffer and forcing plaintext error reply.
+
+Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+---
+ fs/smb/server/server.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+index 7b01c7589..15dd13e76 100644
+--- a/fs/smb/server/server.c
++++ b/fs/smb/server/server.c
+@@ -246,11 +246,11 @@ static void __handle_ksmbd_work(struct ksmbd_work *work,
+ 		rc = conn->ops->encrypt_resp(work);
+ 		if (rc < 0) {
+ 			conn->ops->set_rsp_status(work, STATUS_DATA_ERROR);
+-			 work->encrypted = false;
+-    			 	if (work->tr_buf) {
+-            				kvfree(work->tr_buf);
+-            				work->tr_buf = NULL;
+-       			   	}
++			work->encrypted = false;
++			if (work->tr_buf) {
++				kvfree(work->tr_buf);
++				work->tr_buf = NULL;
++			}
+ 		}
+ 	}
+ 	if (work->sess)
+-- 
+2.34.1
 
