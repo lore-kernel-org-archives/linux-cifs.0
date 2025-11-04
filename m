@@ -1,120 +1,140 @@
-Received: from cse.ust.hk (cssvr7.cse.ust.hk [143.89.41.157])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE1733710D;
-	Tue,  4 Nov 2025 16:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=143.89.41.157
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762275447; cv=pass; b=qVqoLjakDhA6+9yC0HpAjY90rDJQrD5clEyE51paVJrd+0vbsK9dVVwZGQBEvArgyS4ruxSqa8hjVQHendXEbHdT6toGzJLJdCKXGx9GNTy5y3lyMBgyt9/F4JJfJWJ9o4LB2yhaj/eX4sDX8NMY01jx9/8enalZwcwREZ5gQsI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762275447; c=relaxed/simple;
-	bh=YYIMH53HBHk2TPn5jU8Fcn4xNukezoAye4WzOc7qoSE=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE4D3385B5;
+	Tue,  4 Nov 2025 17:38:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762277894; cv=none; b=Zl+kTSFI7qM20+N+zNX4mugulcBGRpWOsdZh3Owr/N52x6bjeYJpUEhAwu2CMUW2lmMqVvpjkJzKAP0L0pE+T+ldDyf1TD3k2pbvolj2gxi/onUpI4fV9l4hQdFXK4McoHJRMAB5LRHzlkaHZ+wu/I/oFXCdrBIt0f+idbgsR2M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762277894; c=relaxed/simple;
+	bh=2YkhSmbyR/ykbq3wvF4/ragaZLbIWVFj3cwVxNUZdOg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IMI7yobxZ7W4accP+soSfGgYh50z9Nz3CUKSPClZiT4uRmDM70vb5dkNZ8VaULGWhrTOph0LBcDx+LE0US5g2RxrHAq739dBDnpsAdUL7D53MsNSH7qNu2G0c/mHGOicykh0lkFGaMJhH8qJf5oHrAMTsmgjGyGjIZ/NK2UFQ3c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.ust.hk; spf=pass smtp.mailfrom=cse.ust.hk; dkim=pass (1024-bit key) header.d=cse.ust.hk header.i=@cse.ust.hk header.b=zYPp8PRd; arc=pass smtp.client-ip=143.89.41.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.ust.hk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.ust.hk
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wznt+7awMAPpVSSsgyQvO4eeS7QYUveMakPLbvcz0MgMTMmTDtOlIuRHwHVYN5S4C/tJBgdfGfNsYyMluf54ikrIbIEPgSjur/4fZvNZGE3Vz7kS1JooMxAJLCnl6pKJ8GYG6noSy8P39mYEjSa0lHgHdBUt2Nv/lixqtffbniw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jD3Bcrqt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cse.ust.hk header.i=@cse.ust.hk header.b="zYPp8PRd"
-Received: from chcpu18 (191host009.mobilenet.cse.ust.hk [143.89.191.9])
-	(authenticated bits=0)
-	by cse.ust.hk (8.18.1/8.12.5) with ESMTPSA id 5A4GueO5331024
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 5 Nov 2025 00:56:41 +0800
-ARC-Seal: i=1; a=rsa-sha256; d=cse.ust.hk; s=arccse; t=1762275402; cv=none;
-	b=U1HuaaCt6Ocr0p+yRso7dGbzhpnPPBdV6o45qeWz/xxaLpfvGo2QRVUn4+2O2tAnzKpngHsYJJ/JltfZqCj2hmZAWBWSaYO08SGnNDcAc9BCZAUA/wm+6lr0KicTIZXy/Lf/WMh6P5ZezkpO2WeEFdrgenhtV8lLGcmFA8f1yig=
-ARC-Message-Signature: i=1; a=rsa-sha256; d=cse.ust.hk; s=arccse;
-	t=1762275402; c=relaxed/relaxed;
-	bh=dF21PmcLWVQ+pvG3FJNdRfJkuHk9+cjzqFLWm9fZJ6U=;
-	h=DKIM-Signature:Date:From:To:Subject:Message-ID:MIME-Version; b=U0JwSIlWtZE27e3lT2cRsekwwQwNvnIzjPIjO2VzFmaxn8nTfAh7fAFNxIN9wFUBxQyIUE9jRGTjJqlTu+DYZtt4yb24NrBVoZHnVLRDyD2rBmbDHHvslCBUtoub5wUzuokjMJI2p+FOIxtQJ7/e1SSniA2RNoGDHLJIVBpXKpI=
-ARC-Authentication-Results: i=1; cse.ust.hk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cse.ust.hk;
-	s=cseusthk; t=1762275402;
-	bh=dF21PmcLWVQ+pvG3FJNdRfJkuHk9+cjzqFLWm9fZJ6U=;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jD3Bcrqt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F483C4CEF7;
+	Tue,  4 Nov 2025 17:38:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762277893;
+	bh=2YkhSmbyR/ykbq3wvF4/ragaZLbIWVFj3cwVxNUZdOg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=zYPp8PRdtH57eRd2TiXY+M8K3eBkh8x76ADf8fuDlWOR+chL6ZGfgT1O52JuXMI7i
-	 N3KGpd1ceNkziudAdnGYLPw8aSVaU0XuCHWJbXBlFzq0o7FRrI+jXVNZLGteWGG4a9
-	 O/kCPgfK0VS45xsSPXrvzC5UuOziR9sxEk1npn/8=
-Date: Tue, 4 Nov 2025 16:56:35 +0000
-From: Shuhao Fu <sfual@cse.ust.hk>
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        Steve French <sfrench@samba.org>, Bharath SM <bharathsm@microsoft.com>
-Subject: Re: [PATCH] smb: client: fix refcount leak in smb2_set_path_attr
-Message-ID: <aQowQ7gCdDruGVro@chcpu18>
-References: <aQoYCxKqMHwH4sOK@osx.local>
- <CAH2r5mu7s4p88RhUbCm5mqUvEVM60OOTTJOZ+rz09nFfc+t3mQ@mail.gmail.com>
- <648b7b14-d285-449a-a1b3-4cd062a55b02@suse.com>
+	b=jD3BcrqtkZePKnxYHwmwZYrukhL924KK+XvIkgGVxtLZF3G8EhI0HztRHNkLk/RrZ
+	 xZ3icwfEYP+6rywLt1s/PR6mPSxnyDflICEeZSxJBxj5TYePRraT3XHf0MFJQuRqkh
+	 JxMr0DKypTdkQDdKbx83cWecgDQt8BKyVL11TM/532eR31nMoxm0uZgdx+t/WXyJK3
+	 0hVRs8djr+qJgAUGI7SgH8Ni7jAFnlCY3oW2W0QPu15rvN90eQU1+Urrluh2iy5DA2
+	 GnkHhgnocol6ztqH+u39zUu0PykXgUXPI7PIcjYad+ztfV9y8rO/x206FGCMBbLPrP
+	 bjd9t8CVd1NFg==
+Date: Tue, 4 Nov 2025 17:38:04 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Miklos Szeredi <miklos@szeredi.hu>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>,
+	NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>, Amir Goldstein <amir73il@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, netfs@lists.linux.dev,
+	ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+	linux-xfs@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 10/17] vfs: make vfs_create break delegations on
+ parent directory
+Message-ID: <aQo5_P5XCsSZhw7N@horms.kernel.org>
+References: <20251103-dir-deleg-ro-v4-0-961b67adee89@kernel.org>
+ <20251103-dir-deleg-ro-v4-10-961b67adee89@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <648b7b14-d285-449a-a1b3-4cd062a55b02@suse.com>
-X-Env-From: sfual
+In-Reply-To: <20251103-dir-deleg-ro-v4-10-961b67adee89@kernel.org>
 
-On Tue, Nov 04, 2025 at 01:23:33PM -0300, Henrique Carvalho wrote:
+On Mon, Nov 03, 2025 at 07:52:38AM -0500, Jeff Layton wrote:
+> In order to add directory delegation support, we need to break
+> delegations on the parent whenever there is going to be a change in the
+> directory.
 > 
+> Add a delegated_inode parameter to struct createdata. Most callers just
+> leave that as a NULL pointer, but do_mknodat() is changed to wait for a
+> delegation break if there is one.
 > 
-> On 11/4/25 1:12 PM, Steve French via samba-technical wrote:
-> > There are multiple callers - are there callers that don't call
-> > "set_writeable_path()" ?    And so could cause the reverse refcount
-> > issue?
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+>  fs/namei.c         | 26 +++++++++++++++++---------
+>  include/linux/fs.h |  2 +-
+>  2 files changed, 18 insertions(+), 10 deletions(-)
 > 
-> Yes... Even if it does not cause an issue today, that fix looks like it
-> belongs inside smb2_rename_path?
+> diff --git a/fs/namei.c b/fs/namei.c
 
-I placed decrement in `smb2_set_path_attr` since it seems like a wrapper
-of `smb2_compound_op`. I figured that this wrapper should handle the
-failure cases the same way as `smb2_compound_op`.
+...
 
-Thanks,
-Shuhao
-> 
-> > 
-> > On Tue, Nov 4, 2025 at 9:21 AM Shuhao Fu <sfual@cse.ust.hk> wrote:
-> >>
-> >> Fix refcount leak in `smb2_set_path_attr` when path conversion fails.
-> >>
-> >> Function `cifs_get_writable_path` returns `cfile` with its reference
-> >> counter `cfile->count` increased on success. Function `smb2_compound_op`
-> >> would decrease the reference counter for `cfile`, as stated in its
-> >> comment. By calling `smb2_rename_path`, the reference counter of `cfile`
-> >> would leak if `cifs_convert_path_to_utf16` fails in `smb2_set_path_attr`.
-> >>
-> >> Fixes: 8de9e86c67ba ("cifs: create a helper to find a writeable handle by path name")
-> >> Signed-off-by: Shuhao Fu <sfual@cse.ust.hk>
-> >> ---
-> >>  fs/smb/client/smb2inode.c | 2 ++
-> >>  1 file changed, 2 insertions(+)
-> >>
-> >> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-> >> index 09e3fc81d..69cb81fa0 100644
-> >> --- a/fs/smb/client/smb2inode.c
-> >> +++ b/fs/smb/client/smb2inode.c
-> >> @@ -1294,6 +1294,8 @@ static int smb2_set_path_attr(const unsigned int xid, struct cifs_tcon *tcon,
-> >>         smb2_to_name = cifs_convert_path_to_utf16(to_name, cifs_sb);
-> >>         if (smb2_to_name == NULL) {
-> >>                 rc = -ENOMEM;
-> >> +               if (cfile)
-> >> +                       cifsFileInfo_put(cfile);
-> >>                 goto smb2_rename_path;
-> >>         }
-> >>         in_iov.iov_base = smb2_to_name;
-> >> --
-> >> 2.39.5 (Apple Git-154)
-> >>
-> >>
-> > 
-> > 
-> 
-> -- 
-> Henrique
-> SUSE Labs
+> @@ -4359,6 +4362,8 @@ static int may_mknod(umode_t mode)
+>  static int do_mknodat(int dfd, struct filename *name, umode_t mode,
+>  		unsigned int dev)
+>  {
+> +	struct delegated_inode delegated_inode = { };
+> +	struct createdata cargs = { };
+>  	struct mnt_idmap *idmap;
+>  	struct dentry *dentry;
+>  	struct path path;
+> @@ -4383,18 +4388,16 @@ static int do_mknodat(int dfd, struct filename *name, umode_t mode,
+>  	switch (mode & S_IFMT) {
+>  		case 0:
+>  		case S_IFREG:
+> -		{
+> -			struct createdata args = { .idmap = idmap,
+> -						   .dir = path.dentry->d_inode,
+> -						   .dentry = dentry,
+> -						   .mode = mode,
+> -						   .excl = true };
+> -
+> -			error = vfs_create(&args);
+> +			cargs.idmap = idmap,
+> +			cargs.dir = path.dentry->d_inode,
+> +			cargs.dentry = dentry,
+> +			cargs.delegated_inode = &delegated_inode;
+> +			cargs.mode = mode,
+> +			cargs.excl = true,
+
+Hi Jeff,
+
+I don't think it makes any difference to the generated code.
+But I think it would be more intuitive to use ';' rather than ','
+at the end of the lines immediately above.
+
+> +			error = vfs_create(&cargs);
+>  			if (!error)
+>  				security_path_post_mknod(idmap, dentry);
+>  			break;
+> -		}
+>  		case S_IFCHR: case S_IFBLK:
+>  			error = vfs_mknod(idmap, path.dentry->d_inode,
+>  					  dentry, mode, new_decode_dev(dev));
+
+...
