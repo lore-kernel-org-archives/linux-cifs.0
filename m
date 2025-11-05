@@ -1,154 +1,109 @@
-Received: from flow-b6-smtp.messagingengine.com (flow-b6-smtp.messagingengine.com [202.12.124.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DF92C236D;
-	Wed,  5 Nov 2025 21:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0999E2EFDA2
+	for <linux-cifs@vger.kernel.org>; Wed,  5 Nov 2025 22:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762378069; cv=none; b=n5YURDpxDuQmUtzARuFI80OXZhMWoF0LYMHA4URtQeX4tcDwOuA9Y9oh2D6lCjhtIA4Oe4RazGr3WvNZrbkC/ACaPF5XlasQU2KZEezr3+9axVq1BtvanY6TEaZU69/7W73eXqJR+86a1Kg0Zsp6g5XadzMx99mD0RAEuyTKOq8=
+	t=1762381214; cv=none; b=kEAfrsFdiQHxUIrX99IIdGr0GkFOXq6t2ePRXVAxblHjrEpdomZSxzSsPzzm5ja4+s9z0BwDrOjQ7MNCVGNLKhTWTYAbMVokNkIpybD9kDhxBobUvprCz7XamqWQQcGJ9IKWzW5vwHALl0TR1eMSCdogbJKh0pynLEgPJyfXtlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762378069; c=relaxed/simple;
-	bh=bsJ/Udr6HIBj2j3DHtF1mJqwIo8FnbCO8DJuuTTp7AY=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=UF1HRXU3T5n1v8Zh88rIW7d38dZB8hJ0jejZ3gc1padRMQTcbYWaCTCOQvwNpktoLk50XzQixqlOHZnq3MBhRx+DAWwhoLZ2Su+MQ2cijeBGpE6cTL5eoxwAfjUs/0fBrV2lG3tiE/UfiY9pm/8ssIPtPuXQ8Th4fvSrMV60s/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=NBHnJwpj; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=3M/rrUhi; arc=none smtp.client-ip=202.12.124.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1762381214; c=relaxed/simple;
+	bh=EYKxP/O/E3xqBmODbiboV3aBEJpx7ZMxu1D3mOtTn3M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n+b5U1aZudSj1rsUNEWAvM7Goh6rZVDtpjH6Ss6E8xnaMuKxBD9tdGDrXOXIbU5+AOLZYuE9/tm+VfIYRQ3zh6vGK5n8mgK94LncXjV4ihw4Bqg7geSt0G/sdZAr4Ob9YgwCyyqYCIX6/4k5+oSRZKV3p6NFSNu7+168JF8qh04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kg26vQ7F; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="NBHnJwpj";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="3M/rrUhi"
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailflow.stl.internal (Postfix) with ESMTP id 0D9511300C27;
-	Wed,  5 Nov 2025 16:27:45 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Wed, 05 Nov 2025 16:27:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm3; t=
-	1762378064; x=1762385264; bh=5CX/6mtoYFxir8X1F5OVPvA/OUy5Hh9/ND3
-	R8DtJqdE=; b=NBHnJwpjzuHIsUT27Y57rWaJK10DtVOwxECp26qAgU5U2ikzYZl
-	M90AeLnEPJscbb16J19gvwy+B4NZoJRivr0Kl/sDL1WtKYsBIOcIU/852lrhgqq/
-	GKpuXfd3fOlM1hSTmng5Eykm2SDZU+rDa1/3QCl4npJjdOdSa4TG9dpLKZzWTZau
-	gQKLJddbfSk7iP2cfocCd6lwvv8WNjntDUxjyvhguNRIoYy5cYz8v7pgB6OdrZID
-	eo/hzOuwTPvx8j13d20hMasG3aiklwbNYaKqed8tm9GulrRukjfYfVMUU+ubDqNE
-	5IFnjPvLo6riN3CKxIUqANOUuK511UeBr+g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762378064; x=
-	1762385264; bh=5CX/6mtoYFxir8X1F5OVPvA/OUy5Hh9/ND3R8DtJqdE=; b=3
-	M/rrUhioH8XUekNhjPbddPDnBn7n7UQz6zEWYhMdJzgaKPUZki5Si9V9oHY1Ogop
-	wXK5pvp5JtloGloRJyhjQ+2g3DFkHJIsPf1kJQ9SRoFA1OYYao78/h5ua/7WVVKr
-	DX+Ajwtsc07FWpwIeyLBbksAID7RZIbG2vTFcoPvGOBOYPZWyaoKettLH2wbO2Id
-	zKDpw89eEUWl/BgYOURwsIfdCSu9Zdtbf8szQKl7cVJ5bzYuDeYhoPqbJZCUYoKO
-	UZQ0HyqjcmXxStXvR2TDlvY0c4w3Pn/LIGuOHcFde9b8MNLY8rM1ER7IKpgSaQz2
-	fo67zQAgkeqNFzV2z+NIw==
-X-ME-Sender: <xms:UMELaTX303FHgII2VhPCDsLqAaz7DXpODKCSAw4DGpYCqOIYMw_8zQ>
-    <xme:UMELaalAv0IbTqHYOiNCaxTQxCHNYl3ObvfykhtHLjOM-xv4HXM4-O5UB5FicXKO4
-    aJ5vH9vBYrGmrMZ_ywg8xmZ6HOs7HRayKsq762rTphtV6QY5VU>
-X-ME-Received: <xmr:UMELaXr1-Ji_La_HqW1BRUEv9gTeMOwPrnbybPjNk5nkzekaJJ_jmOB-OurJPK7b-HcbN7SNbSmn59Pi_qJVyNSOkvZPYWst3NWLBXCl3DJX>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeegleekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurheptgfgggfhvfevufgjfhffkfhrsehtjeertddttdejnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epudetfefhudevhedvfeeufedvffekveekgfdtfefggfekheejgefhteeihffggfelnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
-    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepgeefpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
-    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    oheplhhinhhugidqgihfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hlihhnuhigqdhunhhiohhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    oheplhhinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pehlihhnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
-    htoheplhhinhhugidqtghifhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    ohepvggtrhihphhtfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:UMELaas2dgxfilRLBUrQKjBzvFla9FVJzR7OHV29epBrN0TxHC_Zrg>
-    <xmx:UMELaXL_tyUQYVcmu-B8I71Pa7g3b9MIUvkmgGp58Io5P9qADq2c4w>
-    <xmx:UMELaX8_nhpfJRosFBux8I7DSDNy8EkxssJf6tgxkmBv96HvCzl8zA>
-    <xmx:UMELaT6oKvaTbilSvWrldHDoodd9WTL6TODMPNKGUr-HrQG2M0IzRg>
-    <xmx:UMELacRM2CO16jgdzCpw14XismqrJauCEWxLaqWueHVYB4MJELrVVaIb>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 5 Nov 2025 16:27:33 -0500 (EST)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kg26vQ7F"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b6271ea3a6fso194288a12.0
+        for <linux-cifs@vger.kernel.org>; Wed, 05 Nov 2025 14:20:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762381201; x=1762986001; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ui2U0Ij5vkKFB7H5IIU3rlE4C90Li/F+qZfil4Xomfo=;
+        b=Kg26vQ7Fw8IrfAVf/vxnizhVNu3GwZ9LPJPCBtPPlaOr3DR5yTVp/uxlLX/VY5qdkd
+         +dJ4GPNTw4TRQm2NqdPS72mnPPUI3dmqrguNSDdbojGovgfyuo6bqaM6hvqkSEURAs1g
+         JH79JAMFkcRK4uA3uatwOr46o2eoZMaylGA//0wl0nJiJ7LbBc/92OGjNEuwBEiOL9/4
+         KoSHB5oTRZ3L0/RxiZrL6XQUR1piFw1TcTGOJVqMd2lKO+POhVriLc84tMRqM/I0BGUo
+         rmXjLCvFVXT1rpjt6UhDRnWkMOwEELE3OmGq26oNyarLGUqxzF2OdU1p/Eu84kY32SY1
+         q6dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762381201; x=1762986001;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ui2U0Ij5vkKFB7H5IIU3rlE4C90Li/F+qZfil4Xomfo=;
+        b=X3IF525aRe3vZzFliq62jNBLL5/m5RJ6RwH3yFt+3/riJ5da3NUGZqKms6uYuvxaw4
+         ftU5xo2oy5GYmHwl5GY7M7qI8gud1A1nQoF8MOk8VTBx9UU4lR2qG9o3zw3dXahW5v0m
+         2OYRsWV7CV1cGHPbQm+rs/i4bAc1BzZB7awdM5EE1uYj5LU3f4eYUw4ZKS9MnIg7ZsQ8
+         e7O0GmUlt6zixSFQyBy0U+2e3NlmxSW7r19M9hc2YOf1HoqYHOP4t1C9FUR8eKT60NOq
+         5i62cqZR3NZKEPisxrFJhUTMOAvMgw72fRG0rZs/KZ+4fRb6jKpn2xmct8qhEx/cyhxR
+         yVgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQJuJfA1vUmxSJrwyDJGDiSPK1Qia5iALSQebQszXPb2GrhQS2eSrxFVkx6d41rMNdeNKzJ7l9uAKF@vger.kernel.org
+X-Gm-Message-State: AOJu0YwccylewfBhla8Xg7ijOaOsv4JAhceWjDrQmDmhYa7nyqL3Qriv
+	GgJFjaefckzBboEsePu26Ak+V0YmdFknIL40mlyBIjI6NeK6tHefMmrkJci2yzsvOlhvDRCWtjX
+	rbkAM6gW/Dl0rW4aWQ8QIrPHYgBqFgnQ=
+X-Gm-Gg: ASbGncuV0Ija5ZrgCY5fDYhshTOyreWYen2Y8ASlWoL9cc2TjcpCjtjuv0yne5fmNXf
+	AuaobpDqjg4eVNFQpDa5KDhI3xhnpFAxToGEUfsqqdbZVXFj4nXrb9/tAf/DPzukONUshJck+/H
+	IPBh/c7zoyDURRaFatpxRvm+cNCXNnyM2aGFEORU+sXijPLsaFXJSUJAKX8HwxpmQd6EHEZgqNt
+	wsy3k6dh6impvKVa+ZHpfUx+Xesj+M/rENp3B2FccKcI/Y6B5pGqq6ZLHBG
+X-Google-Smtp-Source: AGHT+IEDvGlUuVEideahYZY+ODYUe4guvkm4F0yQbQ2rOAGZccJElktFd+64A9TEF3O1cn/fjQ78uoSBDOooxDIQsAU=
+X-Received: by 2002:a17:902:db05:b0:295:6850:a389 with SMTP id
+ d9443c01a7336-2962ad2b2c3mr69533935ad.20.1762381201200; Wed, 05 Nov 2025
+ 14:20:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Jeff Layton" <jlayton@kernel.org>
-Cc: "Miklos Szeredi" <miklos@szeredi.hu>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
- "Chuck Lever" <chuck.lever@oracle.com>,
- "Alexander Aring" <alex.aring@gmail.com>,
- "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "Steve French" <sfrench@samba.org>,
- "Paulo Alcantara" <pc@manguebit.org>,
- "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
- "Shyam Prasad N" <sprasad@microsoft.com>, "Tom Talpey" <tom@talpey.com>,
- "Bharath SM" <bharathsm@microsoft.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- "Danilo Krummrich" <dakr@kernel.org>,
- "David Howells" <dhowells@redhat.com>, "Tyler Hicks" <code@tyhicks.com>,
- "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Amir Goldstein" <amir73il@gmail.com>,
- "Namjae Jeon" <linkinjeon@kernel.org>,
- "Steve French" <smfrench@gmail.com>,
- "Sergey Senozhatsky" <senozhatsky@chromium.org>,
- "Carlos Maiolino" <cem@kernel.org>,
- "Kuniyuki Iwashima" <kuniyu@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, netfs@lists.linux.dev,
- ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
- linux-xfs@vger.kernel.org, netdev@vger.kernel.org,
- "Jeff Layton" <jlayton@kernel.org>
-Subject: Re: [PATCH v5 09/17] vfs: clean up argument list for vfs_create()
-In-reply-to: <20251105-dir-deleg-ro-v5-9-7ebc168a88ac@kernel.org>
-References: <20251105-dir-deleg-ro-v5-0-7ebc168a88ac@kernel.org>,
- <20251105-dir-deleg-ro-v5-9-7ebc168a88ac@kernel.org>
-Date: Thu, 06 Nov 2025 08:27:31 +1100
-Message-id: <176237805165.634289.1849067298194355086@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+References: <cover.1761748557.git.lucien.xin@gmail.com> <20251103184145.17b23780@kernel.org>
+In-Reply-To: <20251103184145.17b23780@kernel.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Wed, 5 Nov 2025 17:19:49 -0500
+X-Gm-Features: AWmQ_bk5zH6aZ8eA6Di6ajFu_oTzlSNpD7ldH11olJifIEsUkj_P9OR2FBRf4E0
+Message-ID: <CADvbK_fdph6C5+nnUix2259TQb9-vBVEPOxMpzzpEy5xhR-xTA@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 00/15] net: introduce QUIC infrastructure and
+ core subcomponents
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 06 Nov 2025, Jeff Layton wrote:
-> As Neil points out:
-> 
-> "I would be in favour of dropping the "dir" arg because it is always
-> d_inode(dentry->d_parent) which is stable."
-> 
-> ...and...
-> 
-> "Also *every* caller of vfs_create() passes ".excl = true".  So maybe we
-> don't need that arg at all."
-> 
-> Drop both arguments from vfs_create() and fix up the callers.
-> 
-> Suggested-by: NeilBrown <neilb@ownmail.net>
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+On Mon, Nov 3, 2025 at 9:41=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Wed, 29 Oct 2025 10:35:42 -0400 Xin Long wrote:
+> >  net/Kconfig               |    1 +
+> >  net/Makefile              |    1 +
+>
+> Haven't gotten to reviewing yet myself, hopefully Paolo will find time
+> tomorrow. But you're definitely missing a MAINTAINERS entry...
 
-This I like.
+I was planning to add the MAINTAINERS entry in the second patchset,
+since that patch will introduce Documentation/networking/quic.rst,
+which should be listed in the entry as:
 
-Reviewed-by: NeilBrown <neil@brown.name>
+F:      Documentation/networking/quic.rst
 
-It would be consistent to also remove the 'dir' arg from vfs_mkdir(),
-vfs_mknod(), etc.  I wouldn't do that until we find out what other
-people think of the change.
+I guess it should be fine to add the MAINTAINERS entry now without
+this F: line in the current patchset, and then update it in the second
+patchset once the file exists.
 
-Thanks,
-NeilBrown
-
-
+Thanks.
