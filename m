@@ -1,296 +1,185 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-b6-smtp.messagingengine.com (flow-b6-smtp.messagingengine.com [202.12.124.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEBE6219A79
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Nov 2025 21:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A34F23F424;
+	Wed,  5 Nov 2025 21:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762377509; cv=none; b=aIotojhJ55+dXVsI3zKNu3vfPMFGODzP1dQFuZY7T/JjdFqrSlhFoBNlWKl3iZMhPzVzoNveRwvxtvT0wplLW9espVjgfDPFdDu2ztrQxoPspy+7iWSpYq/vP0I9UAg0OAhnaNPM4j+/zk1X9LYzmMedMkdb8YkgAbZdMoR2sz0=
+	t=1762377849; cv=none; b=i4JciZp882lhO+EIRmak5VUTyfPbdPgWOHnqVKwi4FWsn4BmrrY3n5csFOyxN3y4F/PTyi40oXxqfCoJu1opa0WoeU5FTq5NF1Jzg62sbd+YQH6NK7C51ezim9QzetLr4fux9Ft5Dweed7WDI9ZyPZ2YxwU2O0ock1eFhXdDLLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762377509; c=relaxed/simple;
-	bh=UddrVL3QzuHMvnX6l4E2NBDqO9Xy2GXW1FQCzw9YdYI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P/E/hz79p2WBfs09RhKVy55n0NxszLq9HcBXiXgU3PspiGR4VfR/uRCBEwW+RlZklVW0UW5QVLI+nfgRD/gAPpUJI5qsaqPBBun+s5e7bmDUAdko1iGtrO79DJmzPFkBCD50141XT+p9kfh4YgtlN2phnojHkxUVQUMOyT2NOt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=aqhtiu0j; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1762377849; c=relaxed/simple;
+	bh=u7d9evMnHLg8hJK0Bj/mYGhbV3SaK5dJyb8wyfl1+zg=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=HShAdk2x0EZ/hCfR6hiYIh+DOtgJ/yMqTxtEDwpRYr+c4sQHQZ0WxHnwh1YVCmt2oX/xazquhtSrOnEbpf9jc/MyJf/pPUbsnVrQGSxvgduq9+doZq6Gg8KjwfsgaxOjl5JoqsEmmU7VW1+/5SfQ20tMBzrydN3y2BPbTgye7U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=HmU5hGoP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=qSmEJgx4; arc=none smtp.client-ip=202.12.124.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="aqhtiu0j"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3ecde0be34eso776708f8f.1
-        for <linux-cifs@vger.kernel.org>; Wed, 05 Nov 2025 13:18:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1762377505; x=1762982305; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hxP4QuqNzjfjEvUcLs0JHlG1THCLkaB6nCbEdnOATbE=;
-        b=aqhtiu0jkzDzzhF2OrsZVq91CWMifTWSUIR36+IF8G+SYSQngyp8mVi/Nxzzg3PRzH
-         sfTyPsdI2No8kKDqr/9LDMtkcmTCnrHNaFF+1/2CQ5nj1XgSHUEzMROI31XJoMWG369+
-         u6YiD7aanpQSVzbnLj3adD3pb5NHZD15w1gsqEyPj2/KFGo8smNvulE1dPlmoC/zMIPT
-         ByP9H/V5+24NstUA5NX1+94/aGdVB0mQNfBPAJQhkZ+gg/8eNG4jk4NOND9kEKne5khF
-         Q+f3V5D5UzT/64IGmmqqRbIY2gASfIEbZ2naaysRGdKhZGIU3U9PNSweCOIaqj0+tuQV
-         WG2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762377505; x=1762982305;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hxP4QuqNzjfjEvUcLs0JHlG1THCLkaB6nCbEdnOATbE=;
-        b=iNaw3XlIFPn2Qlca1jO5BfkyIfaGHQpTqZq41qVLAkHdDgKcxd+rPVCTjhb9uYDdUW
-         Z6daCXF8vHw+WQdT3l6iOUHtRdXCP2EGW8MCgQ53+blmunjmY0o4ZiPYSohtvoLNHgf2
-         5e7ih2jBefEGrmzy6qX4UpA09IFdh5jnQT3T9QYBPu8CKrbGjuIwep9odZWIvMg8FG/v
-         CxN3HScMdQCldDKmyaLROs1mFGlStqIEk4eHIaEDS3J/axdQEC5pJJeU1dsoSfjXXS2u
-         ufeB8Z4C+8JiOzfboU6BA40+8b+WAKIj6owsH3C+tWRYMZVtTPd/VnVWkNlBoD3p1Hag
-         d3hA==
-X-Forwarded-Encrypted: i=1; AJvYcCWOj6vloImX3MFuIUd1a50DRTe4blerrUvVBXkZOqKTh3ZyEkve2uRjCRNza3mAPkO8bDDRd6fDsm0f@vger.kernel.org
-X-Gm-Message-State: AOJu0YwM/UqB4uH4A68x0xE5aKOAC0dqDtFTk6xq8OCV0tYpoZdJrCDY
-	rir77Hm1dKAQ8S3Md3bqdOk0ffQFP9wpdYdtvVB7T/GB9wA1ExuTlNFexPNg70sDmG0=
-X-Gm-Gg: ASbGncvND5iiJReSlyTGeUlYtW86MN4RBnODPZuGfyDzbcCC4jMto2DUFG+o+2F78Ld
-	9CP+unOhX05wFqzMEjbPp0vLEgNvvGP91AMBBTln1ZkL/wCURrma0wgZS64IgEwUyc9uRQkbP4Z
-	cieUEcBUHnCWwGcGlEBdFOCAOWkD5n/o9S4l3NAm/5vkmaONMeNWmHXDrh6cmkIRMa4fFdVxKGQ
-	wCHdq0qq/RSTXlvZKmHjLpKZ3p62OGL6DetvqG1Ui2kImfXt5dq5f4lDRaeQvAUb47/pxZPO+7X
-	bxKsqqdLaInWPhvffErjXVHtDAhjuvSGUUpT1WAPkbMqleNTqoHWygomkQIKpyW0cW3S8QAvQYz
-	MDkTCrg2DpVFMsYJ3vRleYRXnmTvuUezIza0mt2BJJiPkLXZ3Os7LRQbZVLaaOkvba2F6fIxkVN
-	H2zkNTE000u1i+
-X-Google-Smtp-Source: AGHT+IGhM1OsjB8ILgBiibtEKGWC0wh5mzOrOKe1tDzOLFjPv/FIEFIT2Ny5f5a9t5rWrIixVIkjBA==
-X-Received: by 2002:a05:6000:288a:b0:429:8fbc:9824 with SMTP id ffacd0b85a97d-429eb12fbf1mr775543f8f.3.1762377505014;
-        Wed, 05 Nov 2025 13:18:25 -0800 (PST)
-Received: from [192.168.15.14] ([152.234.106.4])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba8ffe36ad7sm256566a12.22.2025.11.05.13.18.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Nov 2025 13:18:24 -0800 (PST)
-Message-ID: <5823dbac-9d20-4b00-b723-fe0c9a03341b@suse.com>
-Date: Wed, 5 Nov 2025 18:16:11 -0300
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="HmU5hGoP";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="qSmEJgx4"
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailflow.stl.internal (Postfix) with ESMTP id 1739B1300C2C;
+	Wed,  5 Nov 2025 16:24:03 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Wed, 05 Nov 2025 16:24:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm3; t=
+	1762377842; x=1762385042; bh=EVCZm+k0TFnzyISAYv/ad61W8yGyS+Ggtni
+	ecPh35bI=; b=HmU5hGoPqokqzJCeAqGf4BLGNy0MGNPv7gplJ67n7ajHRRuR5XU
+	QACgC7SBMngKWRr4nVPjJJgBKA3Q8lvkyUIGSJ1J47cOcYiClbPU1pS4MppGb5wh
+	2U2/xgadcENW/jgHJsJTyYYdk+1XjojR7/TQqmLQq3cUPGl27XnIya4CBHC1wN5U
+	B+nehvMy/L9Mb2tEVTuU62Q/a0ARwc5MO2szCGIyxpVtm6vXzecjyFmyuGF+NoPC
+	aDoFRHfQnTUA0wUc9ga83EokX5Vq/Y4zVF59Z0IqpO5AZkbSr//2iHDO/uH6Mdle
+	v+KzAJeRAhAF2PY5f//xFYICp+6h/EtUY0Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762377842; x=
+	1762385042; bh=EVCZm+k0TFnzyISAYv/ad61W8yGyS+GgtniecPh35bI=; b=q
+	SmEJgx4M8dlmgTjoUZkSr8FLucgLUEVlbd9odWDFkQcMJ+PFRsH9Y//0VRWWOa2P
+	Ww7Nr0XlQSokRvZEPNvVMlDa6wHjsBAaK17Tal0oudel/kBoVldVw56udPXn9uh7
+	Mczp91CekHgkQQrSfj7GW2ikHW7rCR3uH+ZZqm5byT0S1cyww1zJkHKJ+SuERDBe
+	UBNUFH0g9LBeW66OTxBJSBU1+z1R+WJlAHRefWLPYecfVMfJsDxhw/7LXOajVkRK
+	EY0gezm21MwMMJYPZofen2+s3eL3i0IyTk0/RNQdye2aRU/x2B6K2Dlf35uwcujj
+	UVMV0x49c00E0JFs7mDIA==
+X-ME-Sender: <xms:asALaQBQoSVaUuTXtcG_GYkEHX7ZGK1IdW3-DpTTeAob7NvcdQnESw>
+    <xme:asALaZvvSYTRURk71wOmt1sLYQpre30qKc9hcTtEoays4h59X1vNTOzcXv4ewIAT7
+    PBP05Cv2IT0eKS3Y5hzt-pSpQXWpNcWFPc3z3tPuShZJnbiAw>
+X-ME-Received: <xmr:asALaV1K1vj_trpV4WX4Ug9tckywabHWFw4izsBwBHNEfUZdhT2LhWV0hKbStCEFmuTyATTpSjnEcu5m6FzT9u-CFv5Y_mYw-vIlsrnNGGDt>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeegleejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
+    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epleejtdefgeeukeeiteduveehudevfeffvedutefgteduhfegvdfgtdeigeeuudejnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
+    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepleegpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
+    hrtghpthhtohepfhhrrghnkhdrlhhisehvihhvohdrtghomhdprhgtphhtthhopehlihhn
+    uhigqdigfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugi
+    dquhhnihhonhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
+    uhigqdhnihhlfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinh
+    hugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhig
+    qdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuh
+    igqdhhrghruggvnhhinhhgsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    lhhinhhugidqfhhsuggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:asALafmPr_ZX1OBseZ_yN5P8ha0kcdOo70DqfQ-d7eox1J3FRhMuTg>
+    <xmx:asALaYv6caGo7YOyqxlwHt-aa7xcS6ubR74B6joQPFkP4nVa857B-Q>
+    <xmx:asALaQazXCEbXKvEWtOde9MGMuFd4iSpENdxHY6Br8A6SQLP9UCqOg>
+    <xmx:asALaUc6XxQI42baNH5r4oVKLbArJeUxiTNL9duhGxUFeugLz9diCA>
+    <xmx:csALaZ2nr3Xo9lu7ZwRVoMnu5vfNzgtS4RKi9tfb5i1b6hqQye68vliH>
+Feedback-ID: iab3e480c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Nov 2025 16:23:32 -0500 (EST)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] smb: client: fix potential UAF in
- smb2_close_cached_fid()
-To: Steve French <smfrench@gmail.com>
-Cc: Paulo Alcantara <pc@manguebit.org>,
- ronnie sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Bharath S M <bharathsm@microsoft.com>, Enzo Matsumiya <ematsumiya@suse.de>,
- Jay Shin <jaeshin@redhat.com>, linux-cifs@vger.kernel.org
-References: <20251103225255.908859-1-henrique.carvalho@suse.com>
- <CAH2r5mtSmg-FwgPzEyPF2CFfP1zuc-Qh5CVuBjbEkA8eTA2Mtg@mail.gmail.com>
- <d8aa9dc3-2a94-484b-addb-2ceb18318c54@suse.com>
- <9d2bfeac-d6d8-4299-87f0-791ff9940971@suse.com>
- <CAH2r5mvkefptGUvjarOmOW=hQA7_ZRFLwOk_jptOSAyzuMUGuw@mail.gmail.com>
-Content-Language: en-US
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-In-Reply-To: <CAH2r5mvkefptGUvjarOmOW=hQA7_ZRFLwOk_jptOSAyzuMUGuw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: NeilBrown <neilb@ownmail.net>
+To: "Jeff Layton" <jlayton@kernel.org>
+Cc: "Eric Van Hensbergen" <ericvh@kernel.org>,
+ "Latchesar Ionkov" <lucho@ionkov.net>,
+ "Dominique Martinet" <asmadeus@codewreck.org>,
+ "Christian Schoenebeck" <linux_oss@crudebyte.com>,
+ "David Sterba" <dsterba@suse.com>, "David Howells" <dhowells@redhat.com>,
+ "Marc Dionne" <marc.dionne@auristor.com>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
+ "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+ "Chris Mason" <clm@fb.com>, "Xiubo Li" <xiubli@redhat.com>,
+ "Ilya Dryomov" <idryomov@gmail.com>, "Jan Harkes" <jaharkes@cs.cmu.edu>,
+ coda@cs.cmu.edu, "Tyler Hicks" <code@tyhicks.com>,
+ "Jeremy Kerr" <jk@ozlabs.org>, "Ard Biesheuvel" <ardb@kernel.org>,
+ "Namjae Jeon" <linkinjeon@kernel.org>,
+ "Sungjong Seo" <sj1557.seo@samsung.com>,
+ "Yuezhang Mo" <yuezhang.mo@sony.com>, "Theodore Ts'o" <tytso@mit.edu>,
+ "Andreas Dilger" <adilger.kernel@dilger.ca>,
+ "Jaegeuk Kim" <jaegeuk@kernel.org>, "Chao Yu" <chao@kernel.org>,
+ "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>,
+ "Miklos Szeredi" <miklos@szeredi.hu>,
+ "Andreas Gruenbacher" <agruenba@redhat.com>,
+ "Viacheslav Dubeyko" <slava@dubeyko.com>,
+ "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
+ "Yangtao Li" <frank.li@vivo.com>, "Richard Weinberger" <richard@nod.at>,
+ "Anton Ivanov" <anton.ivanov@cambridgegreys.com>,
+ "Johannes Berg" <johannes@sipsolutions.net>,
+ "Mikulas Patocka" <mikulas@artax.karlin.mff.cuni.cz>,
+ "Muchun Song" <muchun.song@linux.dev>,
+ "Oscar Salvador" <osalvador@suse.de>,
+ "David Hildenbrand" <david@redhat.com>,
+ "David Woodhouse" <dwmw2@infradead.org>,
+ "Dave Kleikamp" <shaggy@kernel.org>,
+ "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>,
+ "Ryusuke Konishi" <konishi.ryusuke@gmail.com>,
+ "Konstantin Komarov" <almaz.alexandrovich@paragon-software.com>,
+ "Mark Fasheh" <mark@fasheh.com>, "Joel Becker" <jlbec@evilplan.org>,
+ "Joseph Qi" <joseph.qi@linux.alibaba.com>,
+ "Bob Copeland" <me@bobcopeland.com>,
+ "Mike Marshall" <hubcap@omnibond.com>,
+ "Martin Brandenburg" <martin@omnibond.com>,
+ "Amir Goldstein" <amir73il@gmail.com>,
+ "Steve French" <sfrench@samba.org>, "Paulo Alcantara" <pc@manguebit.org>,
+ "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
+ "Shyam Prasad N" <sprasad@microsoft.com>, "Tom Talpey" <tom@talpey.com>,
+ "Bharath SM" <bharathsm@microsoft.com>,
+ "Zhihao Cheng" <chengzhihao1@huawei.com>,
+ "Hans de Goede" <hansg@kernel.org>, "Carlos Maiolino" <cem@kernel.org>,
+ "Hugh Dickins" <hughd@google.com>,
+ "Baolin Wang" <baolin.wang@linux.alibaba.com>,
+ "Andrew Morton" <akpm@linux-foundation.org>,
+ "Kees Cook" <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ linux-kernel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
+ linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+ codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, gfs2@lists.linux.dev,
+ linux-um@lists.infradead.org, linux-mm@kvack.org,
+ linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+ linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
+ ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
+ linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
+ linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-xfs@vger.kernel.org,
+ linux-hardening@vger.kernel.org, "Jeff Layton" <jlayton@kernel.org>
+Subject:
+ Re: [PATCH] vfs: remove the excl argument from the ->create() inode_operation
+In-reply-to: <20251105-create-excl-v1-1-a4cce035cc55@kernel.org>
+References: <20251105-create-excl-v1-1-a4cce035cc55@kernel.org>
+Date: Thu, 06 Nov 2025 08:23:24 +1100
+Message-id: <176237780417.634289.15818324160940255011@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-Hi Steve,
+On Thu, 06 Nov 2025, Jeff Layton wrote:
+> Since ce8644fcadc5 ("lookup_open(): expand the call of vfs_create()"),
+> the "excl" argument to the ->create() inode_operation is always set to
+> true. Remove it, and fix up all of the create implementations.
 
-On 11/5/25 1:20 PM, Steve French wrote:
-> I can run it through again if you semd mean updated patch
-> 
-> Thanks,
-> 
-> Steve
+nonono
 
-I don't think there's anything to update here.
 
-Adding a separate __acquires at call sites would be misleading. Not only
-the call site is correctly annotated -- refcount_dec_and_lock() is
-annotated with __cond_acquires(lock). Sparse reports no warnings, so
-there's no missing annotation to fix.
+> @@ -3802,7 +3802,7 @@ static struct dentry *lookup_open(struct nameidata *n=
+d, struct file *file,
+>  		}
+> =20
+>  		error =3D dir_inode->i_op->create(idmap, dir_inode, dentry,
+> -						mode, open_flag & O_EXCL);
+> +						mode);
 
-Likewise, documenting that callers must hold the lock before calling
-kref_put_lock() would be incorrect -- they must not.
+"open_flag & O_EXCL" is not the same as "true".
 
-No one should call kref_put_lock() directly. Likewise, no one should
-call smb2_close_cached_fid() directly. lockdep_assert_held() is there
-simply to ensure the invariant at runtime and as a hint to other
-developers.
+It is true that "all calls to vfs_create() pass true for 'excl'"
+The same is NOT true for inode_operations.create.
 
-If you think it would help, I can add a short comment in
-smb2_close_cached_fid() noting that the lock is held via
-kref_put_lock().
+NeilBrown
 
-Let me know if you prefer that comment and I'll send a v5.
-
-> 
-> On Wed, Nov 5, 2025, 10:18 AM Henrique Carvalho <henrique.carvalho@suse.com>
-> wrote:
-> 
->>
->>
->> On 11/5/25 10:30 AM, Henrique Carvalho wrote:
->>> Hi Steve,
->>>
->>> On 11/4/25 7:42 PM, Steve French wrote:
->>>> One minor comment that AI had on this was on the change to
->>>> fs/smb/client/cached_dir.c (line 447). See below.
->>>>
->>>>     -spin_lock(&cfid->cfids->cfid_list_lock);
->>>>     +lockdep_assert_held(&cfid->cfids->cfid_list_lock);
->>>>
->>>>
->>>> The lockdep_assert_held validates that the lock is held on entry, but
->>>> the function signature __releases(&cfid->cfids->cfid_list_lock)
->>>> indicates the lock is released inside. Consider adding a corresponding
->>>> __acquires annotation to the call sites that call this function via
->>>> kref_put_lock, or document why callers must hold the lock before
->>>> calling kref_put_lock.
->>>
->>> But we don't actually acquire the lock every time in close_cached_dir.
->>> Only when (a) refcount is 1; and (b) refcount did not increase after we
->>> acquired the lock. So where should __acquires annotation go?
->>>
->>> One option would be adding documentation to smb2_close_cached_fid,
->>> though since it's a release function that shouldn't be called elsewhere,
->>> I'm not sure that adds much value. Do you have thoughts?
->>>
->>
->> I think it's worth adding that kref_put_lock uses refcount_dec_and_lock,
->> which is defined as
->>
->> extern __must_check bool refcount_dec_and_lock(refcount_t *r, spinlock_t
->> *lock) __cond_acquires(lock);
->>
->> __cond_acquires() was introduced in commit 4a557a5d1a614 ("sparse:
->> introduce conditional lock acquire function attribute").
->>
->> So in a sense, if I understand it correctly, the "acquires" is already
->> there to make the sparse __releases annotation work. This should be
->> enough to satisfy the comment the AI raised.
->>
->>>>
->>>> On Mon, Nov 3, 2025 at 5:00 PM Henrique Carvalho
->>>> <henrique.carvalho@suse.com> wrote:
->>>>>
->>>>> find_or_create_cached_dir() could grab a new reference after kref_put()
->>>>> had seen the refcount drop to zero but before cfid_list_lock is
->> acquired
->>>>> in smb2_close_cached_fid(), leading to use-after-free.
->>>>>
->>>>> Switch to kref_put_lock() so cfid_release() is called with
->>>>> cfid_list_lock held, closing that gap.
->>>>>
->>>>> Fixes: ebe98f1447bb ("cifs: enable caching of directories for which a
->> lease is held")
->>>>> Cc: stable@vger.kernel.org
->>>>> Reported-by: Jay Shin <jaeshin@redhat.com>
->>>>> Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
->>>>> Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
->>>>> ---
->>>>> V3 -> V4: rebase, added Reviewed-by and Reported-by, add
->>>>> lockdep_assert_held in smb2_close_cached_fid, change commit subject
->> (was
->>>>> "smb: client: fix race in smb2_close_cached_fid()") to clearly state
->> the
->>>>> bug class (UAF)
->>>>> V2 -> V3: rebase, remove unneeded comments, modify commit subject
->>>>> V1 -> V2: kept the original function names and added __releases
->> annotation
->>>>> to silence sparse warning
->>>>> ---
->>>>>  fs/smb/client/cached_dir.c | 16 +++++++++-------
->>>>>  1 file changed, 9 insertions(+), 7 deletions(-)
->>>>>
->>>>> diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
->>>>> index b8ac7b7faf61..018055fd2cdb 100644
->>>>> --- a/fs/smb/client/cached_dir.c
->>>>> +++ b/fs/smb/client/cached_dir.c
->>>>> @@ -388,11 +388,11 @@ int open_cached_dir(unsigned int xid, struct
->> cifs_tcon *tcon,
->>>>>                          * lease. Release one here, and the second
->> below.
->>>>>                          */
->>>>>                         cfid->has_lease = false;
->>>>> -                       kref_put(&cfid->refcount,
->> smb2_close_cached_fid);
->>>>> +                       close_cached_dir(cfid);
->>>>>                 }
->>>>>                 spin_unlock(&cfids->cfid_list_lock);
->>>>>
->>>>> -               kref_put(&cfid->refcount, smb2_close_cached_fid);
->>>>> +               close_cached_dir(cfid);
->>>>>         } else {
->>>>>                 *ret_cfid = cfid;
->>>>>                 atomic_inc(&tcon->num_remote_opens);
->>>>> @@ -438,12 +438,14 @@ int open_cached_dir_by_dentry(struct cifs_tcon
->> *tcon,
->>>>>
->>>>>  static void
->>>>>  smb2_close_cached_fid(struct kref *ref)
->>>>> +__releases(&cfid->cfids->cfid_list_lock)
->>>>>  {
->>>>>         struct cached_fid *cfid = container_of(ref, struct cached_fid,
->>>>>                                                refcount);
->>>>>         int rc;
->>>>>
->>>>> -       spin_lock(&cfid->cfids->cfid_list_lock);
->>>>> +       lockdep_assert_held(&cfid->cfids->cfid_list_lock);
->>>>> +
->>>>>         if (cfid->on_list) {
->>>>>                 list_del(&cfid->entry);
->>>>>                 cfid->on_list = false;
->>>>> @@ -478,7 +480,7 @@ void drop_cached_dir_by_name(const unsigned int
->> xid, struct cifs_tcon *tcon,
->>>>>         spin_lock(&cfid->cfids->cfid_list_lock);
->>>>>         if (cfid->has_lease) {
->>>>>                 cfid->has_lease = false;
->>>>> -               kref_put(&cfid->refcount, smb2_close_cached_fid);
->>>>> +               close_cached_dir(cfid);
->>>>>         }
->>>>>         spin_unlock(&cfid->cfids->cfid_list_lock);
->>>>>         close_cached_dir(cfid);
->>>>> @@ -487,7 +489,7 @@ void drop_cached_dir_by_name(const unsigned int
->> xid, struct cifs_tcon *tcon,
->>>>>
->>>>>  void close_cached_dir(struct cached_fid *cfid)
->>>>>  {
->>>>> -       kref_put(&cfid->refcount, smb2_close_cached_fid);
->>>>> +       kref_put_lock(&cfid->refcount, smb2_close_cached_fid,
->> &cfid->cfids->cfid_list_lock);
->>>>>  }
->>>>>
->>>>>  /*
->>>>> @@ -596,7 +598,7 @@ cached_dir_offload_close(struct work_struct *work)
->>>>>
->>>>>         WARN_ON(cfid->on_list);
->>>>>
->>>>> -       kref_put(&cfid->refcount, smb2_close_cached_fid);
->>>>> +       close_cached_dir(cfid);
->>>>>         cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_cached_close);
->>>>>  }
->>>>>
->>>>> @@ -762,7 +764,7 @@ static void cfids_laundromat_worker(struct
->> work_struct *work)
->>>>>                          * Drop the ref-count from above, either the
->> lease-ref (if there
->>>>>                          * was one) or the extra one acquired.
->>>>>                          */
->>>>> -                       kref_put(&cfid->refcount,
->> smb2_close_cached_fid);
->>>>> +                       close_cached_dir(cfid);
->>>>>         }
->>>>>         queue_delayed_work(cfid_put_wq, &cfids->laundromat_work,
->>>>>                            dir_cache_timeout * HZ);
->>>>> --
->>>>> 2.50.1
->>>>>
->>>>>
->>>>
->>>>
->>>
->>
->> --
->> Henrique
->> SUSE Labs
->>
-> 
-
--- 
-Henrique
-SUSE Labs
