@@ -1,107 +1,191 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99D4A2561D9
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Nov 2025 05:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16FAC147C9B;
+	Wed,  5 Nov 2025 12:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762319709; cv=none; b=DkYg4lam96h8jbL1U4IJVfRMpQPsm5wrgGDJIOi5pmf9SmyoGDJaAtZ0rQw92hTDufm82zdiQUxPmmA+fXm5feX4+OI1vWozdDo68JrhK9VWPAKIYr2jBt8WnKmMYr+/7WHg82baMHxsAH31HrKrUXj66MFV/pj2JXoZddRevO0=
+	t=1762344950; cv=none; b=eL6M9qbiYBoPt/rQLfyFpY7ENHNgPA/8h3YOcBqlF8gjbzVEllj+a4JgVwhRPHjj24vd8F8ER9vRLkubxBHKUxTuZsgGmvOR7E+DSaxaCXW4g+V+SDd7kgJdiHOrF18jhZDaSdZ3A7fTPletI0o+S16jy/TMTt23AT5xUVmbIks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762319709; c=relaxed/simple;
-	bh=U1gcHYEs9i1aYxKKaiMBpSNsLLBtCBGwKROrVszwRYc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n9jjz0WZ0Pf3Ui+rLXhd5k//6NJunZoqtU1V42sM1oMVTOMqH0yjMqTa49SlBsTXrcYdP0kmj6l/rJHX4WsHCSwmyLYRz4acnWFufO2LOc1KRNwg+7Pnrh21Ck0C8exj3RrYcNiUCv3Yw6ieYZMeQHa7mZH547NCw69hr+dGbPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kkMFxPK6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762344950; c=relaxed/simple;
+	bh=j6nt+b2fOshIZ+T+ki5rUhiMWr57o6/QciYlKMH8SN4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oy9akNY38Nueh7dHg4jggNb3473MZUtvkJfetfei3rQuZKqP1BKdZG61ltZE3PUF2yka2Go9pFlKIaJKe5K3J27ASn5JqhRPq6PPVp2J5ryHxdNfPI9tXiLOdLbVXtzRZGoew/YuZvMC/ROdwEjHV2IOPULvzt9pXmls3hOLV4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NS9wsXtX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kkMFxPK6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E8EFC4CEFB
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Nov 2025 05:15:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NS9wsXtX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE995C4CEF8;
+	Wed,  5 Nov 2025 12:15:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762319709;
-	bh=U1gcHYEs9i1aYxKKaiMBpSNsLLBtCBGwKROrVszwRYc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=kkMFxPK62VIsB9OfmQqvzhME4k+ydiNyvaGbgBGvbqCoGu0UxzgSGliq8e+B7PMxs
-	 D6DedIDFkHSgmDoguZdy8dIZ3OZ4C8eNA0shL5VLrRagW2zjDpr38TIkLrQH4yF26u
-	 43eRILXak4Zwt+3uPbVx9RTaslXSum/fMtmrm+242VV3m56amavNR7NLdZ4HydpNtp
-	 /bzgXTFfe1o9gaHgDy5vG8+wjm5HvINTOtTWQDO9n3jxZydxMX6fMYJud5FeMons7a
-	 hPucUEYzTm83YrPIAyin3Y6Bx25ucjioIGlC7mObKmQTPja1HDcj3v5wWDuBtCG1QP
-	 YgvVor0Fz4CSw==
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-640a503fbe8so3424580a12.1
-        for <linux-cifs@vger.kernel.org>; Tue, 04 Nov 2025 21:15:08 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUs5Y4w/w9+Q/tcTJfEYCQjOW7x5A+2LS3PL83La/mDCcXYzZBtBs4hfsdavBZEN6GYFB5XFNs4AYAA@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqfPkcE9zkXP21KJtuvIOGLoXzqf+9oigDZ9I3dd1nTuzKdOIA
-	uA7ntIDf94acZAIiv115J4QmsGjdka3QLnKzsiZ66/qraU8S9WFXsXzY4dP5a2wi1kJ2NG003qm
-	ljCcoBLzuXSUJyCVJYzadAdRg7swqKN8=
-X-Google-Smtp-Source: AGHT+IFC37S1oyDl/UFRyqOhTM6lpKE7vOb4Rois7WuNYgcmNYNdTXbXGcT2OjA1QYiPpBNetwu+J2hwSLldIctFzqo=
-X-Received: by 2002:a05:6402:5193:b0:640:baed:f675 with SMTP id
- 4fb4d7f45d1cf-64105b77b62mr1432647a12.33.1762319707657; Tue, 04 Nov 2025
- 21:15:07 -0800 (PST)
+	s=k20201202; t=1762344949;
+	bh=j6nt+b2fOshIZ+T+ki5rUhiMWr57o6/QciYlKMH8SN4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NS9wsXtXeg83J4YkDH8mQGdfGeGp3fYVvsVuRb2YFXCr9gg7zr2E8d5qLGHlzD0T9
+	 g0joBJEt/8wJYQwe1mmYw+Q404f9DdrfC55hzAoMVswnD7yGxZG/6kxn5HLFPcQkaD
+	 i0MkivAt2W1JCI7Pcf+hAGPttUlQ/azzKoFM9cyU6lVCro2L0in3QA2i40f7qu51Py
+	 84549oeilWi63mHbfBDkbClenojZhj7uLqIA6Mw933WfrbPuYWHB93sBAQS66SB7ea
+	 KfY8pXUuvVsObS2yZgrAtlj952qoNi+ocfRIDcqtj+fk9DUiRMH7XiYaZmIVV5Zm1k
+	 bqjk/PMisUGEg==
+Date: Wed, 5 Nov 2025 13:15:38 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: NeilBrown <neil@brown.name>, Miklos Szeredi <miklos@szeredi.hu>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Chuck Lever <chuck.lever@oracle.com>, 
+	Alexander Aring <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
+	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, 
+	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, 
+	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, netfs@lists.linux.dev, 
+	ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v4 10/17] vfs: make vfs_create break delegations on
+ parent directory
+Message-ID: <20251105-lamawolle-strom-bcd659e0b66a@brauner>
+References: <20251103-dir-deleg-ro-v4-0-961b67adee89@kernel.org>
+ <20251103-dir-deleg-ro-v4-10-961b67adee89@kernel.org>
+ <176221525113.1793333.253208063990645256@noble.neil.brown.name>
+ <6021e64ed25c3b3e7880f17accb0f7a7b89fac0e.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <2025110432-maimed-polio-c7b4@gregkh> <20251104141214.345175-1-pioooooooooip@gmail.com>
-In-Reply-To: <20251104141214.345175-1-pioooooooooip@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 5 Nov 2025 14:14:55 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_ORc86pHr66OVhCAXWbvPy7Y2DVAH_ubipOXufQGD4dQ@mail.gmail.com>
-X-Gm-Features: AWmQ_bneHOhxu7T1nX-P1IRNUTalF5hYblatzPqzqhor9kRyW5EvYEalAbVSk9A
-Message-ID: <CAKYAXd_ORc86pHr66OVhCAXWbvPy7Y2DVAH_ubipOXufQGD4dQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix leak of transform buffer on encrypt_resp() failure
-To: Qianchang Zhao <pioooooooooip@gmail.com>
-Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	gregkh@linuxfoundation.org, Zhitong Liu <liuzhitong1993@gmail.com>, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6021e64ed25c3b3e7880f17accb0f7a7b89fac0e.camel@kernel.org>
 
-On Tue, Nov 4, 2025 at 11:12=E2=80=AFPM Qianchang Zhao <pioooooooooip@gmail=
-.com> wrote:
->
-> When encrypt_resp() fails at the send path, we only set
-> STATUS_DATA_ERROR but leave the transform buffer allocated (work->tr_buf
-> in this tree). Repeating this path leaks kernel memory and can lead to
-> OOM (DoS) when encryption is required.
->
-> Reproduced on: Linux v6.18-rc2 (self-built test kernel)
->
-> Fix by freeing the transform buffer and forcing plaintext error reply.
->
-> Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
-> Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
-> ---
->  fs/smb/server/server.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-> index 40420544c..15dd13e76 100644
-> --- a/fs/smb/server/server.c
-> +++ b/fs/smb/server/server.c
-> @@ -244,8 +244,14 @@ static void __handle_ksmbd_work(struct ksmbd_work *w=
-ork,
->         if (work->sess && work->sess->enc && work->encrypted &&
->             conn->ops->encrypt_resp) {
->                 rc =3D conn->ops->encrypt_resp(work);
-> -               if (rc < 0)
-> +               if (rc < 0) {
->                         conn->ops->set_rsp_status(work, STATUS_DATA_ERROR=
-);
-> +                       work->encrypted =3D false;
-> +                       if (work->tr_buf) {
-> +                               kvfree(work->tr_buf);
-->tr_buf is freed in ksmbd_free_work_struct(). How can tr_buf not be freed?
-Thanks.
-> +                               work->tr_buf =3D NULL;
-> +                       }
-> +               }
->         }
->         if (work->sess)
->                 ksmbd_user_session_put(work->sess);
-> --
-> 2.34.1
->
+On Mon, Nov 03, 2025 at 07:30:57PM -0500, Jeff Layton wrote:
+> On Tue, 2025-11-04 at 11:14 +1100, NeilBrown wrote:
+> > On Mon, 03 Nov 2025, Jeff Layton wrote:
+> > > In order to add directory delegation support, we need to break
+> > > delegations on the parent whenever there is going to be a change in the
+> > > directory.
+> > > 
+> > > Add a delegated_inode parameter to struct createdata. Most callers just
+> > > leave that as a NULL pointer, but do_mknodat() is changed to wait for a
+> > > delegation break if there is one.
+> > > 
+> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > > ---
+> > >  fs/namei.c         | 26 +++++++++++++++++---------
+> > >  include/linux/fs.h |  2 +-
+> > >  2 files changed, 18 insertions(+), 10 deletions(-)
+> > > 
+> > > diff --git a/fs/namei.c b/fs/namei.c
+> > > index fdf4e78cd041de8c564b7d1d89a46ba2aaf79d53..e8973000a312fb05ebb63a0d9bd83b9a5f8f805d 100644
+> > > --- a/fs/namei.c
+> > > +++ b/fs/namei.c
+> > > @@ -3487,6 +3487,9 @@ int vfs_create(struct createdata *args)
+> > >  
+> > >  	mode = vfs_prepare_mode(idmap, dir, mode, S_IALLUGO, S_IFREG);
+> > >  	error = security_inode_create(dir, dentry, mode);
+> > > +	if (error)
+> > > +		return error;
+> > > +	error = try_break_deleg(dir, args->delegated_inode);
+> > >  	if (error)
+> > >  		return error;
+> > >  	error = dir->i_op->create(idmap, dir, dentry, mode, args->excl);
+> > > @@ -4359,6 +4362,8 @@ static int may_mknod(umode_t mode)
+> > >  static int do_mknodat(int dfd, struct filename *name, umode_t mode,
+> > >  		unsigned int dev)
+> > >  {
+> > > +	struct delegated_inode delegated_inode = { };
+> > > +	struct createdata cargs = { };
+> > 
+> > If we must have 'createdata', can it have a 'struct delegated_inode'
+> > rather than a pointer to it?
+> > 
+> 
+> If we do that, then we'd need some way to signal that the caller
+> doesn't want to wait on the delegation break. Currently that's
+> indicated by setting cargs.delegated_inode to NULL. I suppose we could
+> add a bool for this or something.
+> 
+> I confess that I too am lukewarm on struct createdata. I can live with
+> it, but it's not clearly a win to me either.
+> 
+> Christian, thoughts?
+
+If two stable voices of the community seem to have consensus that this
+isn't worth it then it's obviously fine to not do it.
+
+> 
+> > 
+> > >  	struct mnt_idmap *idmap;
+> > >  	struct dentry *dentry;
+> > >  	struct path path;
+> > > @@ -4383,18 +4388,16 @@ static int do_mknodat(int dfd, struct filename *name, umode_t mode,
+> > >  	switch (mode & S_IFMT) {
+> > >  		case 0:
+> > >  		case S_IFREG:
+> > > -		{
+> > > -			struct createdata args = { .idmap = idmap,
+> > > -						   .dir = path.dentry->d_inode,
+> > > -						   .dentry = dentry,
+> > > -						   .mode = mode,
+> > > -						   .excl = true };
+> > > -
+> > > -			error = vfs_create(&args);
+> > > +			cargs.idmap = idmap,
+> > > +			cargs.dir = path.dentry->d_inode,
+> > > +			cargs.dentry = dentry,
+> > > +			cargs.delegated_inode = &delegated_inode;
+> > > +			cargs.mode = mode,
+> > > +			cargs.excl = true,
+> > > +			error = vfs_create(&cargs);
+> > >  			if (!error)
+> > >  				security_path_post_mknod(idmap, dentry);
+> > >  			break;
+> > > -		}
+> > >  		case S_IFCHR: case S_IFBLK:
+> > >  			error = vfs_mknod(idmap, path.dentry->d_inode,
+> > >  					  dentry, mode, new_decode_dev(dev));
+> > > @@ -4406,6 +4409,11 @@ static int do_mknodat(int dfd, struct filename *name, umode_t mode,
+> > >  	}
+> > >  out2:
+> > >  	end_creating_path(&path, dentry);
+> > > +	if (is_delegated(&delegated_inode)) {
+> > > +		error = break_deleg_wait(&delegated_inode);
+> > > +		if (!error)
+> > > +			goto retry;
+> > > +	}
+> > >  	if (retry_estale(error, lookup_flags)) {
+> > >  		lookup_flags |= LOOKUP_REVAL;
+> > >  		goto retry;
+> > > diff --git a/include/linux/fs.h b/include/linux/fs.h
+> > > index b61873767b37591aecadd147623d7dfc866bef82..cfcb20a7c4ce4b6dcec98b3eccbdb5ec8bab6fa9 100644
+> > > --- a/include/linux/fs.h
+> > > +++ b/include/linux/fs.h
+> > > @@ -2116,12 +2116,12 @@ struct createdata {
+> > >  	struct mnt_idmap *idmap;	// idmap of the mount the inode was found from
+> > >  	struct inode *dir;		// inode of parent directory
+> > >  	struct dentry *dentry;		// dentry of the child file
+> > > +	struct delegated_inode *delegated_inode; // returns parent inode, if delegated
+> > >  	umode_t mode;			// mode of the child file
+> > >  	bool excl;			// whether the file must not yet exist
+> > >  };
+> > >  
+> > >  int vfs_create(struct createdata *);
+> > > -
+> > >  struct dentry *vfs_mkdir(struct mnt_idmap *, struct inode *,
+> > >  			 struct dentry *, umode_t, struct delegated_inode *);
+> > >  int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
+> > > 
+> > > -- 
+> > > 2.51.1
+> > > 
+> > > 
+> 
+> -- 
+> Jeff Layton <jlayton@kernel.org>
