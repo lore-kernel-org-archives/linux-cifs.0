@@ -1,74 +1,74 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1532D3733
-	for <linux-cifs@vger.kernel.org>; Thu,  6 Nov 2025 16:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02C534AAF3
+	for <linux-cifs@vger.kernel.org>; Thu,  6 Nov 2025 17:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762447761; cv=none; b=nUf7j3ilr14OGquPjFLC66WVk5SL7lQzH4Cak4v/BrJ/TFULY/LnInsJWwRYzFrQPAyMEyGcBkWkLw4fstySbhvA5JFCgpDJ56apRka/7E5BaCqFiaXS6e/yyt2ve9lggyDR+Nd9G8X4RAIbq8KPsGrtgrxLKLDpmr7/C/1P5Vw=
+	t=1762449736; cv=none; b=NgMPAYnGFEX89L1/eUwBZ5wEyy9AYgiA8Vf1AtP8VeQ8WwqJk3mko2lyqwDFRCBaMSsspl0xX3Ee0oh5/yJuAm+EP2mvzOZREz9moOsD6+4jncA9HC/y/EkpvLHqZwLki7oL8umIKogjHO83AiobHqWcBNglX/TaHvWCxnZoWXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762447761; c=relaxed/simple;
-	bh=gPC9VPLFYbjfVxBSFkmUOkcw3DGZnlisHf1J732GkLk=;
+	s=arc-20240116; t=1762449736; c=relaxed/simple;
+	bh=NH2hfHppCjrZFVx6eqpdpt03wHQYT9rQOCs3FER3WSU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kGaB9gSqFPzzxftSL65mCk8R6PYhX7PTBQi8OP0ZQMGVEo3u01RcQwsm21wCenx7I1ksEmMaebLcGNqwV+EUeeGn+s4qQ6rWlfyKxqvHUlF2ZJJmY4uj1Ina0lJ9fJdgS3Rw9sCA5J5xLta4eqbX5dVetj3d32rMyyEffoOCxmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pxdy5pNV; arc=none smtp.client-ip=209.85.210.179
+	 To:Cc:Content-Type; b=bSckT8EAk0kxBYAz/8WvO1lkLJA+AYtKY6wwPpZ/6Pxs5aM3DL3s4GFJ54BDs6lUKUtnprR/oA0eh6IoNuZI7SPVJRz5fpZWE/Octp9/b53/dpYhO3sE1y4rsylNkhCxM29f7Rg00GEAh7z15qMdSJA/A+aShM6a5n28w0vMwZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ecr6jJ0W; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pxdy5pNV"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-793021f348fso1035222b3a.1
-        for <linux-cifs@vger.kernel.org>; Thu, 06 Nov 2025 08:49:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ecr6jJ0W"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-339d7c403b6so1446034a91.2
+        for <linux-cifs@vger.kernel.org>; Thu, 06 Nov 2025 09:22:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762447760; x=1763052560; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762449734; x=1763054534; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1qzn6+Sh35pzxbK3z/xOK777J6LI54V1OZ2Oy1H+1YU=;
-        b=Pxdy5pNVYWILmUSusu47+TjwZlsqGFBaR0IidrJzRoMtGDpXyUs+YIxMsMoiseL/bJ
-         hiL6CS6636iL8aIq4ZILae2grig0IdTbCkNWBmQ/bqlfbNjaicKYBmiedN+i+rc4hPcb
-         w6Sy5+OviusZWIDVGhnskDCyioxinh7itjziVJYHNLFEXqc3NUzcuOhYj++5QlMuPEJN
-         FOr43I1zwz8Ps6cEEh8H78mZy4JIcIpOwl/2mTrj3Rca/x8a274j9RWd8MZWkuBIOlY+
-         vGmqRf59G0gwFIpTSAeoWoiar/UXs5PZOvf3rz+duCw75SKGFoIn+wZuxA5CveXSnjl+
-         Y8fg==
+        bh=ROsaoNagz4I7/dBZaDxwLj1TocAA02sCxxRugnpAtAU=;
+        b=Ecr6jJ0W8ehZnjxendHBhQJfsVHKkFWKenIdwRgdz9sZSpKHp3m4xt0oaBey0du3GV
+         o3m0440tVDT6tSEIlss0vsm95n9+DZ/bFOBMU1uQmmdEJ6ud9FXTifvYHplJ2lZfCDix
+         BpxPGuWBKtCbAqZUoLJxHlucKwcl0zZf5naYzWEJ1adFu+NcJz3qUVTuOzZYamAGtbuX
+         ANAdJKUloY/hwG4cwvlmVj53JopAth0/1Zp6/yUSnUlOcZ0D3gknYSVUl1HewPYiMxsl
+         0A9hA/lCe0+6S0sAgVZ+G4PgelRxvADX+Lm0tX939d1gHdwfsWwMXjga3xVO5sHeapi0
+         y9Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762447760; x=1763052560;
+        d=1e100.net; s=20230601; t=1762449734; x=1763054534;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1qzn6+Sh35pzxbK3z/xOK777J6LI54V1OZ2Oy1H+1YU=;
-        b=C966di2zsGvf07enztB76MNkGvIIz+ZuFuQlTteT/WdxSa9MaV/RjIthjITCXp4wB5
-         C55NXKuVaf4uzWklG6jjSw2jQtM24BFeneviB6ShbW63pbWiRrmtU3IZgxbKxRBMh9OK
-         PxbVQs5Wis0iwJBTHicVFaoCt3h768yH/H8PeO2yQmAkNHoXU5A8i3t6sc7OiJErcSjE
-         IZEhg/QOBS8eTZqFq4y7oonyzAgVncUcwOIRHtrgJ5ps8J7DPGEZ9/WKXPdga3bjq+wY
-         FAgsGC5HXu+rtlVNPJqI1vwgGsj48ubC7DSy9DwMZQHnBqcCRCv2t0J2gLLg5i+LY2co
-         +tGA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGvlncTrWKaAsFuBmxP2ieCfnR/ttIItykN8ZcYOB8pdPwE0hzNmzI7C7gnf5YVl8QJ+KHMccNZGk0@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOMGrMIcDCWl8X0w4P0qXo9iR9Qad+TAzKpUx/enculajRVXIV
-	ep81akq/vr6iYgZj9BZhI+fo82oAxTI8cPzz3m12rCvHsJGD174ke17/Eh6ioxrLoNwXuCf7UqN
-	urOLwW6BlmRu1eoFpm+YfJXzDhaEHWnQ=
-X-Gm-Gg: ASbGncvaW3oMfuEt2oHKJP+KVOvbT937OTaR4YtzUj6WLuDohVRcPOgW5JS9iMJZPIA
-	+J3oT3yPtg0mq+hTxohum/uPIKAdRWRsdjBWS5Vo5K4FcOGdxXZB/p28D3VyELlIcL7sLPWPOcd
-	p+AJu4iVY8xCCiKOSvzQqw7nD060xyBNq8tfZyuYDBsPYpQr25DHD2EHFp5BYiEavt1Lzva9rey
-	P/nqo8LNckJzM1Uj4JDGuajBxFsK0WbzhAMUZ8G/ptROK/JT2olyivYSwKK20yri9mZQ52FhMue
-	cAbEJmMhrpGD3lbr+6Pha9OOYBTk7w==
-X-Google-Smtp-Source: AGHT+IF5xt57zcNq+U+HwDSwBlT/1oLe/u7UB3heYQ1Kbhs29xTrM/I6aw5xgiWPTyWZevpEl+UkTdOu25fxJ6wmzM0=
-X-Received: by 2002:a17:902:ef4f:b0:290:dd1f:3d60 with SMTP id
- d9443c01a7336-297c04931c8mr1358545ad.51.1762447759701; Thu, 06 Nov 2025
- 08:49:19 -0800 (PST)
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ROsaoNagz4I7/dBZaDxwLj1TocAA02sCxxRugnpAtAU=;
+        b=jzJl8itav5LtwA7SRUBb4rM/tYNCgpYeMHXi1ucmlregXr8djcqDz/9XeZ7bUNQnY0
+         4/MK3omMRl8j+Mj1hnr1q4rISIUBzz9RvM7pUSBUXrZQrKphDicgt2Gz/LcZBUiiSCYM
+         adXzbrdTm7fMqqPbWyOVK6rDBQ0i9WD2ENBVybG7rJ9fLqmfSdqiokDN2LRKB8ssdB0b
+         DK1b3WefA1kP7lOYsZm/atar5N4o081sZiqp1OiniP29qBsgj96ATpZHBHSUM+buAVLM
+         J7W8zb6crcCEG0Eb3T/+sMk3bNJrJcgUGbqCk0Hw05tPs2x1a8yz8xIPRa/UPR1dKB4G
+         JVVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWun4/SU3GuQl+lGTKKYZq2j4Fv5Oji/cRcr8brvmgW7s5i3mkTBAXrKGL8RpKf7LrX/3V/v1A1kItE@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQF5pZeUvEIyiCrKU5B9HBqXQu612dKOfU7m9ttU68LOye1n5P
+	k/3HZA1C3nRzfmzYctFV0UhJ/wfYIycLInZGWSP7tbgTK+jI07tXhiZQqGOrwrdeDBLBRv5Uzbc
+	EfA3MPJb+4dBbCuqoHNbRXYTrfQAaNw4=
+X-Gm-Gg: ASbGncsVUSYqIDr85m9MeLGq+cY62GbYBvGYosxfBF/obLhQ9zn1w1JJCPB5V8eYMbo
+	nlHiJwa2/+0pUvAXslHOHLbonP3cyw93gY5ZzwIo/RgBE0YfSiW5aW0NGmkMAje1UOuRPss0caG
+	jJBwkIvB1xO8xmLr5YOeZHfXtJuBI5In2RhS7bK/is2Ph9ITNCHV8E7DJZUCMkVt897Mjfnd6Et
+	lxWscGzh5nb2bcyAoClEURFkmSD41PQ838ch8hD4WD/AoT06N+ILQRsbKqtiHgeoIM7/uxJuBXm
+	9ZVaIdLyjycbmq8yDHQ=
+X-Google-Smtp-Source: AGHT+IGhY0NYTXXkTu0P4tB4nC9X5IQVYEkg7KbXM/lxcc2ajgsNtrlqaMsuOSOOG/NPcl8ekPlhnRj1iJwQaZFqVyY=
+X-Received: by 2002:a17:90b:2b44:b0:340:6f9c:b25b with SMTP id
+ 98e67ed59e1d1-341a6c4d3f4mr11082353a91.11.1762449734034; Thu, 06 Nov 2025
+ 09:22:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1761748557.git.lucien.xin@gmail.com> <cc874b85134ba00f8d1d334e93633fbfa04b5a9a.1761748557.git.lucien.xin@gmail.com>
- <3618948d-8372-4f8d-9a0e-97a059bbf6eb@redhat.com>
-In-Reply-To: <3618948d-8372-4f8d-9a0e-97a059bbf6eb@redhat.com>
+References: <cover.1761748557.git.lucien.xin@gmail.com> <56e8d1efe9c7d5db33b0c425bc4c1276a251923d.1761748557.git.lucien.xin@gmail.com>
+ <989d3df8-52cf-41db-bb4c-44950a34ce89@redhat.com>
+In-Reply-To: <989d3df8-52cf-41db-bb4c-44950a34ce89@redhat.com>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 6 Nov 2025 11:49:08 -0500
-X-Gm-Features: AWmQ_bkulaWnvSaWsxVAziWY-nd-sBA09kWceVf7bj-CFTKpUJNHZl6a4fE2Pjg
-Message-ID: <CADvbK_f9o=_L=K+Vo_MbJk3mXFgriUUtGCSVm6GNo6hFHk5Kzw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 13/15] quic: add timer management
+Date: Thu, 6 Nov 2025 12:22:02 -0500
+X-Gm-Features: AWmQ_blXBOK6Lm7J_4Le7zJYv7Rj5XNuyVIMzzqJ7AFvKAnEANk67rWLYRhV00Y
+Message-ID: <CADvbK_eGPuueR7XL80eagkrAeJraKBMiTVrhiFb_wnTD+N7qVw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 14/15] quic: add frame encoder and decoder base
 To: Paolo Abeni <pabeni@redhat.com>
 Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
@@ -87,24 +87,36 @@ Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 4, 2025 at 7:33=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+On Tue, Nov 4, 2025 at 7:47=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
 e:
 >
 > On 10/29/25 3:35 PM, Xin Long wrote:
-> > +void quic_timer_stop(struct sock *sk, u8 type)
+> > +static void quic_frame_free(struct quic_frame *frame)
 > > +{
-> > +     if (type =3D=3D QUIC_TIMER_PACE) {
-> > +             if (hrtimer_try_to_cancel(quic_timer(sk, type)) =3D=3D 1)
-> > +                     sock_put(sk);
-> > +             return;
-> > +     }
-> > +     if (timer_delete(quic_timer(sk, type)))
+> > +     struct quic_frame_frag *frag, *next;
+> > +
+> > +     if (!frame->type && frame->skb) { /* RX path frame with skb. */
 >
-> timer_shutdown()
-Will update. Thanks.
+> Are RX path frame with !skb expected/possible? such frames will be
+> 'misinterpreted' as TX ones, specifically will do `kfree(frame->data)`
+> which in turn could be a bad thing.
+>
+Yes, when generating and delivering an event to userspace, it
+keeps the frame content into frame->data, instead of frame->skb.
 
+There's no need check !frame->type for RX path,  and I will change it to:
+
+        if (frame->skb) { /* For stream/crypto/dgram frames on RX. */
+                kfree_skb(frame->skb);
+                goto out;
+        }
+
+if skb is set, it will go kfree_skb(frame->skb), instead of kfree(frame->da=
+ta).
+Because if frame->skb is set, it only needs to do kfree_skb(frame->skb).
+
+Thanks.
+> Possibly add a WARN on such scenario?
 >
-> Other than that:
->
-> Acked-by: Paolo Abeni <pabeni@redhat.com>
+> /P
 >
