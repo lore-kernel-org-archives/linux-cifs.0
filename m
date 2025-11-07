@@ -1,114 +1,204 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-b3-smtp.messagingengine.com (flow-b3-smtp.messagingengine.com [202.12.124.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883132E7F22
-	for <linux-cifs@vger.kernel.org>; Fri,  7 Nov 2025 22:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4761F4CA9;
+	Fri,  7 Nov 2025 22:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762552989; cv=none; b=PThTn36ZM/EJg1/221r3TrgUngAa+MS3LlViqZRA0bzh0Eho/kq2sKD/0+NRknSkDrpC4gLN9P7d1w1jiGwYvPBBBP2U9XhgkhXoFQQr6hC9bjSk3UAMSHq2h8jj12s7pPbkwLgqzPbWlXLQp0m1B63UyXmMWK7X3cxiEnk8trc=
+	t=1762554621; cv=none; b=B6Gk440rJkqTWqlee7+vvrypHgfpnj+sraRZojUhfzHjMaHt0wpoM9Mklp+QtaVS7Q3EWbrOmeT/Fn7vDqdR8mLx+5A+O1i3VMkTCKGWUmLJNTDDn+Aw2E0j239iakuPtkZroNT0RC8Uxa9adMRYLWQ3y4/pbybK2tQf7culAOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762552989; c=relaxed/simple;
-	bh=fO21NbkdQNfR7Mv9J6O79Io7dXowoIYE+qE+u5UBCEY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EHudrvyMmnEqroChWWpe4zfTpKB4hUATXo4AjduRwQiDAK3vNrFHJOAuDeZzdakUZYm9URFl1gQaDtp2BrBmV+D5Xfxblq11E5HumtFpB1uYKa3PqH1EqZ5i/BRZ82WXdSeAkCbyGhcS17vEqOlYXpVj5PAyvCx4aEn6pEV6fDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=MNOMQLJG; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1762554621; c=relaxed/simple;
+	bh=W+ttskEK9RUptSjJ3i+3bIIqHWPThqYvd6x7/NI5P2o=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=cJ2bQbcpx/OQclvRLgy8SSh8A1UpGV0uBXYTmbRCncsZfvF4XdPaCTyQz94AqYZ6APUsuYK/9TzFf0hA3OE5TxVU/3Lq2I0NuOaWcf93LaURh5aNlavXx0Y50cu3nz5buLEscnxLKvTW4DAx7OkP6AITIWx1GDunho4W88vqUu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=RSl+2Ovm; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UuwaUA5H; arc=none smtp.client-ip=202.12.124.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="MNOMQLJG"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b3e7cc84b82so232221366b.0
-        for <linux-cifs@vger.kernel.org>; Fri, 07 Nov 2025 14:03:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1762552985; x=1763157785; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kI1EkV1pIyQF8PjpBSc6MpnlpbLKwfT0Jjn7Jf+R9rU=;
-        b=MNOMQLJGi3h7DZJ3l4hOoO3F/rYkDXtCTLn09oXtNnJGXQjxaVlJN5QaezyiAH/wo2
-         Adt4XlBKZnG3aizhHNmcb+Enc+FjWQOQhhs5sNquF0TmCFdcD3mmRN23kxjiuAuAPGE1
-         ruBpHRfBWzKG1Sb8nVQ/ynv1nWhRUBcfNgw6U3RsVy+eAeixNjONT3bNYWPZKsQoyyz/
-         UEv+4kMzF+xIYLYYHNNoDA6SGrUK0IbzLF4wohIM9HP5IwOyGWEGf+QO8/d7EuFf04ey
-         cRjlrfb8+2tydnGd70XAaF+dmJexAwEmYE5KkIJ8wVBCbye+uwqr21NicZVCkoyYzAub
-         hLrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762552985; x=1763157785;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kI1EkV1pIyQF8PjpBSc6MpnlpbLKwfT0Jjn7Jf+R9rU=;
-        b=dZfl+QjFwrxJPXnwO7ibBfL7fnDlOtJ6SxsSahGgCbwTDSG2pUQGFNMxYMtbFPqVb6
-         KSndqCVoQab+S1YXPcjrLdjiyavKppp6AYV+L7jf+BD6m6THQEPMZ+q92++hoPTNyQyh
-         MRCrUedQiZQEgSB32EnDF1hOhBNJRtyhrayQmtqFmAuRG8vcfopCkUq4/pA3NttYnTZG
-         eBPgPT7r/1hxHQ3q5S7UHaVo7HC4joqF1SZbhZk1RCrh7CtfY7SZ9NeLhWKScdWLT4Pg
-         SkZDM6NnAt7I365S8D0XTb9+TS8eluExI+aUc3KTAT3lY8tMq0kkB9gl95WcnWollAEI
-         6q7w==
-X-Forwarded-Encrypted: i=1; AJvYcCUFFUp1z2a99eTzrAa/8S5ETD9YFqqqKaCBaAAR7YDJVabfqAY/XWjfFDADJCGsPQOcS3ZZr4Owk3+w@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0o/5kcYZ6SUjQSoPn6Y3WLCxnM/w8st6Fan4DtUq+wDw61KwU
-	Uezw+br248Eqw9+pcdY6JLzD9bE9B+e6oltASi3zgcZxzcTMY4gom2AOWz7yCPFP4022+TZTCZ5
-	JO4i0
-X-Gm-Gg: ASbGncsNCa7aa5nQQ7+L7Uw2ZLd4WR9mD29in2c5OP8yHIjtqzGOFf8fCGY01TCv3Ch
-	hkCSeynSEmuqHbeUoQcgZnC14q3ggxY1FZoSlJ2a3s1e/00AII+nEI4bawfMFrHmC7bvgj7SocL
-	3r3shkVt8JEC84r84WO18BazOXD7ZVTSnQ/y6gHGpCgJ+al6YIKuwNV9g37zyHKFuUX6iKKsANS
-	a4tAwmRjhl7BPzDrBHe/H4lHPOl/Kk4yYT7sPaFHjrC68rAkBaCSE5vJJd3BHkY2K6/unyeL1hA
-	f+ZPlM4A7uXnW0VBRnUE4m9CA6cREwjrbOn/3Bt/PPELUkFcqYprKr/EIZ6Q33eq+mlsrkQRsCT
-	ppGxQTPZlOtFKNxtxJHODM582Z/pHfBNINiIFKHziiG68+5KRyyySHtlfFUV78GGHKO6QLXITJU
-	hwCh1+3IAdr6VF2qk=
-X-Google-Smtp-Source: AGHT+IFTNcu5mPFMtGA/nJW7bssU/3YxBhT76QzSRtBfC54AISwg6wpDctXEJHR5a2LwCZ7XpyRdWA==
-X-Received: by 2002:a17:907:944a:b0:b71:df18:9fc7 with SMTP id a640c23a62f3a-b72e04843dcmr74424766b.29.1762552984749;
-        Fri, 07 Nov 2025 14:03:04 -0800 (PST)
-Received: from precision ([152.234.106.4])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-45002752ca9sm2848505b6e.14.2025.11.07.14.03.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Nov 2025 14:03:04 -0800 (PST)
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: sfrench@samba.org,
-	sprasad@microsoft.com
-Cc: pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	ematsumiya@suse.de,
-	linux-cifs@vger.kernel.org,
-	Henrique Carvalho <henrique.carvalho@suse.com>
-Subject: [PATCH] smb: client: fix cifs_pick_channel when channel needs reconnect
-Date: Fri,  7 Nov 2025 18:59:53 -0300
-Message-ID: <20251107215953.4190096-1-henrique.carvalho@suse.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="RSl+2Ovm";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UuwaUA5H"
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailflow.stl.internal (Postfix) with ESMTP id 793A513004D8;
+	Fri,  7 Nov 2025 17:30:15 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Fri, 07 Nov 2025 17:30:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm3; t=
+	1762554615; x=1762561815; bh=ZwkPbF9nsnt/dQhVAIT39vJvv4cO/9hCxNu
+	UVfACV+4=; b=RSl+2OvmuLLOe4+H9eKpqC9RuowrdRH1jGe8qwVoOfdZ4I27ekS
+	h347QoJGR7MbFLykEaO1W0OFpHRCXityFGk6z/rxp66MZo+KGt12LqqTInEw2CYx
+	3UVsJ0CnGd7WLdxCGmc3/jPkOyINCLxKnxNZklsUc3J3YikUBo2z3iRjiXQtMcY8
+	yq2lYeSEAVc2EWLQj1vGWye7x7mEIpjRksMMLReKQwYai89hN6GT0qLs9w2fXT/S
+	aMCWnv9MVDkZT/W5daTSkcLSwc8NcaRJOdNaOs10bJXlSp1ckOlZsLuPaoex29HZ
+	f8A5rEk01MsQM2q7vJ8gaDY5oWS9+X43upg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762554615; x=
+	1762561815; bh=ZwkPbF9nsnt/dQhVAIT39vJvv4cO/9hCxNuUVfACV+4=; b=U
+	uwaUA5HM3Mo8/6XH0sr3iEvIm8qkyq18WHGz5dmT4o3VuNPYFK0sT5/XwMakgpxt
+	Ddom64XoCKrACYy2h4ZcgV+Tb8PW+9ZOvOvsw3PhcaXohwqssibqLdWfGuvkRTof
+	t0u6Tm24jIfdJQPXMml4ZsBV3LhgKvo8idsWtpOv2NMgA6+6q/kF7vulaDiw1Wu8
+	QXM1pWPcrGZS5Ickwb89bPU2A6H7dDCOZcL68OGNiBqQPLXtlFiE4VEh4FSXHbCH
+	jVfBahE281hNyxR2h1puiT9DkuKNVkHHM+JFBCiTT4EucRcOcOrhAYY2UT2c/Eoo
+	JZasuDe2hIsiAlgrLmPZw==
+X-ME-Sender: <xms:8HIOaWcJ3fvBIlxYhSXg2q9kliHbCJheSrwA-afUtv0OZvqwXLDyaQ>
+    <xme:8HIOaUV0elXG3FvBZLynkKLK1KgrkL5csSh7j4QStWTKC78ohwNtKKCTXTTHgS-gp
+    tx6yHyJkUTuEkTZ5fK6ZZAuUD2GiIcU7CC_2eZ5UrNZYjQDQA>
+X-ME-Received: <xmr:8HIOaZisnAl3bLTOnvZKYyms_eoqV6GZneXYuZmTxpw76w3Ai29fkPeeLdpc1Or3ahBpEelhGgOyPonxIcN_mwWmfK2BHg0p1qv3ZiVRU6Jc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduledtkeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurheptgfgggfhvfevufgjfhffkfhrsehtjeertddttdejnecuhfhrohhmpefpvghilheu
+    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epudetfefhudevhedvfeeufedvffekveekgfdtfefggfekheejgefhteeihffggfelnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
+    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepleejpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
+    hrtghpthhtohepfhhrrghnkhdrlhhisehvihhvohdrtghomhdprhgtphhtthhopehlihhn
+    uhigqdigfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugi
+    dquhhnihhonhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
+    uhigqdhnihhlfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinh
+    hugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhig
+    qdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuh
+    igqdhhrghruggvnhhinhhgsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    lhhinhhugidqfhhsuggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:8HIOaQRYcr2XZwYm0IZqPOguq_RH9vLLuCtHHjKz_7fIxkwW75Seeg>
+    <xmx:8HIOaYxjBK0ZJhgdNXL6-GZM5wqctaqKx4DPCA07b6HaSPRwb68vzg>
+    <xmx:8HIOaa-QnxtUrxuCdvh7t737bdTRYVtIsmaz5JhvP3JtprsULcfyDA>
+    <xmx:8HIOacn1Ltrl3NwobU3IDf3ppIfGvZcjgmhPN9__dNGKj77ZkqtQiQ>
+    <xmx:93IOadG3kN8Y0sl9-bllfvn04bE55YSNPrlPh3KgJLC15UMHH_zqyJDP>
+Feedback-ID: iab3e480c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 7 Nov 2025 17:29:44 -0500 (EST)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: NeilBrown <neilb@ownmail.net>
+To: "Jeff Layton" <jlayton@kernel.org>
+Cc: "Eric Van Hensbergen" <ericvh@kernel.org>,
+ "Latchesar Ionkov" <lucho@ionkov.net>,
+ "Dominique Martinet" <asmadeus@codewreck.org>,
+ "Christian Schoenebeck" <linux_oss@crudebyte.com>,
+ "David Sterba" <dsterba@suse.com>, "David Howells" <dhowells@redhat.com>,
+ "Marc Dionne" <marc.dionne@auristor.com>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
+ "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+ "Chris Mason" <clm@fb.com>, "Xiubo Li" <xiubli@redhat.com>,
+ "Ilya Dryomov" <idryomov@gmail.com>, "Jan Harkes" <jaharkes@cs.cmu.edu>,
+ coda@cs.cmu.edu, "Tyler Hicks" <code@tyhicks.com>,
+ "Jeremy Kerr" <jk@ozlabs.org>, "Ard Biesheuvel" <ardb@kernel.org>,
+ "Namjae Jeon" <linkinjeon@kernel.org>,
+ "Sungjong Seo" <sj1557.seo@samsung.com>,
+ "Yuezhang Mo" <yuezhang.mo@sony.com>, "Theodore Ts'o" <tytso@mit.edu>,
+ "Andreas Dilger" <adilger.kernel@dilger.ca>,
+ "Jaegeuk Kim" <jaegeuk@kernel.org>, "Chao Yu" <chao@kernel.org>,
+ "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>,
+ "Miklos Szeredi" <miklos@szeredi.hu>,
+ "Andreas Gruenbacher" <agruenba@redhat.com>,
+ "Viacheslav Dubeyko" <slava@dubeyko.com>,
+ "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
+ "Yangtao Li" <frank.li@vivo.com>, "Richard Weinberger" <richard@nod.at>,
+ "Anton Ivanov" <anton.ivanov@cambridgegreys.com>,
+ "Johannes Berg" <johannes@sipsolutions.net>,
+ "Mikulas Patocka" <mikulas@artax.karlin.mff.cuni.cz>,
+ "Muchun Song" <muchun.song@linux.dev>,
+ "Oscar Salvador" <osalvador@suse.de>,
+ "David Hildenbrand" <david@redhat.com>,
+ "David Woodhouse" <dwmw2@infradead.org>,
+ "Dave Kleikamp" <shaggy@kernel.org>,
+ "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>,
+ "Ryusuke Konishi" <konishi.ryusuke@gmail.com>,
+ "Konstantin Komarov" <almaz.alexandrovich@paragon-software.com>,
+ "Mark Fasheh" <mark@fasheh.com>, "Joel Becker" <jlbec@evilplan.org>,
+ "Joseph Qi" <joseph.qi@linux.alibaba.com>,
+ "Bob Copeland" <me@bobcopeland.com>,
+ "Mike Marshall" <hubcap@omnibond.com>,
+ "Martin Brandenburg" <martin@omnibond.com>,
+ "Amir Goldstein" <amir73il@gmail.com>,
+ "Steve French" <sfrench@samba.org>, "Paulo Alcantara" <pc@manguebit.org>,
+ "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
+ "Shyam Prasad N" <sprasad@microsoft.com>, "Tom Talpey" <tom@talpey.com>,
+ "Bharath SM" <bharathsm@microsoft.com>,
+ "Zhihao Cheng" <chengzhihao1@huawei.com>,
+ "Hans de Goede" <hansg@kernel.org>, "Carlos Maiolino" <cem@kernel.org>,
+ "Hugh Dickins" <hughd@google.com>,
+ "Baolin Wang" <baolin.wang@linux.alibaba.com>,
+ "Andrew Morton" <akpm@linux-foundation.org>,
+ "Kees Cook" <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ "Jonathan Corbet" <corbet@lwn.net>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ linux-kernel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
+ linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+ codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, gfs2@lists.linux.dev,
+ linux-um@lists.infradead.org, linux-mm@kvack.org,
+ linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+ linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
+ ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
+ linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
+ linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-xfs@vger.kernel.org,
+ linux-hardening@vger.kernel.org, linux-doc@vger.kernel.org,
+ "Jeff Layton" <jlayton@kernel.org>
+Subject: Re: [PATCH v2] vfs: remove the excl argument from the ->create()
+ inode_operation
+In-reply-to: <20251107-create-excl-v2-1-f678165d7f3f@kernel.org>
+References: <20251107-create-excl-v2-1-f678165d7f3f@kernel.org>
+Date: Sat, 08 Nov 2025 09:29:43 +1100
+Message-id: <176255458305.634289.5577159882824096330@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-cifs_pick_channel iterates candidate channels using cur. The
-reconnect-state test mistakenly used a different variable.
+On Sat, 08 Nov 2025, Jeff Layton wrote:
+> With two exceptions, ->create() methods provided by filesystems ignore
+> the "excl" flag.  Those exception are NFS and GFS2 which both also
+> provide ->atomic_open.
+> 
+> Since ce8644fcadc5 ("lookup_open(): expand the call of vfs_create()"),
+> the "excl" argument to the ->create() inode_operation is always set to
+> true in vfs_create(). The ->create() call in lookup_open() sets it
+> according to the O_EXCL open flag, but is never called if the filesystem
+> provides ->atomic_open().
+> 
+> The excl flag is therefore always either ignored or true.  Remove it,
+> and change NFS and GFS2 to act as if it were always true.
+> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+> Note that this is based on top of the dir delegation series [1]. LMK
+> if the Documentation/ updates are too wordy.
 
-This checked the wrong slot and would cause us to skip a healthy channel
-and to dispatch on one that needs reconnect, occasionally failing
-operations when a channel was down.
+Patch is very nice.  I don't think the documentation is too wordy.
+I think it is good that the two changes to the different files say
+essentially the same thing but use different words.  That helps.
 
-Fix by replacing for the correct variable.
+Reviewed-by: NeilBrown <neil@brown.name>
 
-Fixes: fc43a8ac396d ("cifs: cifs_pick_channel should try selecting active channels")
-Cc: stable@vger.kernel.org
-Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
----
- fs/smb/client/transport.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> Full disclosure: I did use Claude code to generate the first
+> approximation of this patch, but I had to fix a number of things that it
+> missed.  I probably could have given it better prompts. In any case, I'm
+> not sure how to properly attribute this (or if I even need to).
 
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 051cd9dbba13..915cedde5d66 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -830,7 +830,7 @@ struct TCP_Server_Info *cifs_pick_channel(struct cifs_ses *ses)
- 		if (!server || server->terminate)
- 			continue;
- 
--		if (CIFS_CHAN_NEEDS_RECONNECT(ses, i))
-+		if (CIFS_CHAN_NEEDS_RECONNECT(ses, cur))
- 			continue;
- 
- 		/*
--- 
-2.50.1
+My understanding is that if you fully understand (and can defend) the
+code change with all its motivations and implications as well as if you
+had written it yourself, then you don't need to attribute whatever fancy
+text editor or IDE (e.g.  Claude) that you used to help produce the
+patch.
 
+Thanks,
+NeilBrown
