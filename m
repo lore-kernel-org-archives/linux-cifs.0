@@ -1,150 +1,120 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2FA829A33E
-	for <linux-cifs@vger.kernel.org>; Fri,  7 Nov 2025 12:54:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564AE23B638;
+	Fri,  7 Nov 2025 14:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762520066; cv=none; b=VL75WRQCPr0VPAKozkvUbk3fVOqEN8toQTUsNib4fDjKGcp87FMdiLOL+iY9OS3o9YjJ/nUlxzkEjXzufz1n4zFRYMTcb6xCenSf62CG7INMJijJevIlqhie8n+PesuIecIitJOAea9HpYRF3ICjVGSqJSw6HjdZqSWOEuAOurU=
+	t=1762524117; cv=none; b=iIzI/oTaWaFUwcWVFgzR7uR7hOSFcO36cXeluCcVOmTquTGL4039XYlMyaM+gIY855YyBn6NcJcyjFhv7/8zGV8Da580Wwr5wxNYNbZoXkW+I1vbBPJ2mXin2Mnajd+O61Cg4NNRHTYYvgSpsjWRz/trA4rHypwtXHBeUdniioU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762520066; c=relaxed/simple;
-	bh=8pu6rm5AfsFpxIVh9Q2XtU3/QB4gOI+ZMX3/Z5GHfW8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gt0BV6ZwYWQfMbRIskk4YS8fq/BdCE8iIeMbvDD5oNmJcODtBcnmhObhLhlo0kT2sdYyj/jUMPDs5QMXoji/o5JtR9i1cSdEQq1WTuSki1vnm2EKfunZEjq+DWNApN9I7HmhDlzD7hnGVtOLjTM8M/VRu7QViPkfpkSbAmA4doY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OWA+2KbA; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762524117; c=relaxed/simple;
+	bh=scUDJhF4SHxD2LeiWfW3HwnUCLV+2kXA/sCsExXtlQk=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=Y2a5ibrGPtO11wtDqRp91LMzYsO8QLjxx1XOd6rDgdV+j5X1xI31ZYOJhfyc4/tV628M4WFgQH4Z6GOiaFnw04/oe8CfsogmDUx+vzQNbw4FPNmkGDlnoJfYzpqIPiMoWhPx1v4K/cTD7habbJN+f0+YemWCkNmBXHrJ+x3693I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=zqgispbW; arc=none smtp.client-ip=162.62.57.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWA+2KbA"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b713c7096f9so103558966b.3
-        for <linux-cifs@vger.kernel.org>; Fri, 07 Nov 2025 04:54:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762520063; x=1763124863; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7zlQTq+936U9oPTpTa05k6OIYh+uEnd/bNRU0qCGB5g=;
-        b=OWA+2KbAGB3PGPOAMtl28XTMPqEAtRu/VOIvPNoGuFzqRlmI2F5ciJaWUE2nOULT0W
-         RgRxsyux5TRDCz10mF2yXLzqCLxhdNUfgAgoHLt6Ep3xKfGp7fbjtHJLcgR5RnbpnTLs
-         5cmz2HvPEboqsESo8zKrJl/iUdw2kWGx9B+xeT/q2VlPT9ugx51xfhtHHl9AynZI+kW/
-         icVNkiepzad1BzpO7pxVjZrhJR9f1IfXhnI1/7Nuou8bFxlaQ5fO+5IPWGW5STUbXW5P
-         vkYeIU0A4FWhu5Aoqn7n8N3rykMxJ/ZKQuYxlz/7SgxIiLkYlZl/qkeif0JYqA/YdrWg
-         ukjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762520063; x=1763124863;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7zlQTq+936U9oPTpTa05k6OIYh+uEnd/bNRU0qCGB5g=;
-        b=KklA1HIg9gQzKTKlGCvyYb6RJBkKRZWAmM3RlsZYAiJptCEmXaXxQXDi/OovRr7WTd
-         brMNCX0ia5292i+ZGM3hmfuEy6qyM853U+IgZYRYwvftT07e0IddK8va5i9bzGrTd/LK
-         ZUlbdJ/JjuLDhPiK8Ev1VsQpTgOAZ2S8c7EdIgMfbZsUCiLW6zx9/CuQnu1DewgtWnKy
-         TWOMiuCfc76fXRKv/PJDvbYrJa8TqGcvXXvN0Fe1Ig7vmczZVc4GDPG2wDlncScm4Rv6
-         sDN+TjkBvthvcUIBdjGtbyPTVA68QswW4cxBONWnqiWMAwPbXLEFF7vwQuNiEbi4Fgi2
-         av0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWVIJjsivgVpCadiPLuJYG3PRYC+3IXQ0uv6XJjeTTqJCFEZbNMv2SGtZU//3JJ5AJ5w6FZf+twc5qR@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYjffygYHqgc+++rWPhyEx/tEkzIqmBHIpiFkRktDzqShlZ6aJ
-	FkaCVlqRwS3zwnTIKyQHq1/Xj3LrtC9bjq6lxyzrlPrjhq+esSjdmcNjwWPaPGDUNztET3fArUx
-	TdaQWOkB0jUXpgktPvhQ/7/5RazhjuM8=
-X-Gm-Gg: ASbGncvZmAnnLkrZEOyI16g8HsCmieJ+x3k4W2lfHxHkHFyEf7JIKrxxCE8aoXI4CYi
-	cCERpTU5StTQWXejNDSLVpAlDyBTKO5pKg7yWRxAA6dGF86IE7zqd4lzJOOLT93lsF/S1O1IPWd
-	cXLruI6mJv8/cQKYhm3kZ8aXly5/Mc9+1n7lgOV7eY41dSYiDokHo+jdNQMpApqzOqPvwhVmHrA
-	wfzrJC3Xih53AehS9anxRc4wms6ckSQkR3uQVFvXkPfdYiScPYI4N7rXsXn+J7FWsh4uQ==
-X-Google-Smtp-Source: AGHT+IEPgtMlUKaht1ovA3aDh36/52WETEiI4LJw/jCM8IfG3n/+XC02Lrmxhj7k3vQqRkHvzGU4fxYnYWytX34ADLw=
-X-Received: by 2002:a17:907:1c08:b0:b40:8deb:9cbe with SMTP id
- a640c23a62f3a-b72c08dc7e9mr312866866b.2.1762520062670; Fri, 07 Nov 2025
- 04:54:22 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="zqgispbW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1762524103; bh=88CqQVoCZpXl6pSXFcKCKbx0xO7QSECEV3gJ41owLVk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=zqgispbW0ScL2ZjE/E5kOHNOfXvA0DDHQHwAXf2rdpJOHZPAlfPiqdSZglw13HChc
+	 ph8TB0ouvnReFHvjuPPWu752e6+zwEQ+a2cMGX9D/64abhBdgyhAltab7U0CCiz2cq
+	 CKZNTZ8tAYtX1qLJK/5na0fPPflzh7KVi5k33nRg=
+Received: from pek-lxu-l1.corp.ad.wrs.com ([111.201.7.117])
+	by newxmesmtplogicsvrszb20-1.qq.com (NewEsmtp) with SMTP
+	id 66A52E7; Fri, 07 Nov 2025 22:01:38 +0800
+X-QQ-mid: xmsmtpt1762524098tieus4ud2
+Message-ID: <tencent_5D8667DBC6ECD2FF464349ADEEFD2EE84C06@qq.com>
+X-QQ-XMAILINFO: OATpkVjS499umwbUbosFTV8W9DlQ4fIB7LhH/l3DvwepTwAyzZSNNU1xNKNPVg
+	 6ZM4X473+wmg/vPAaAHn6Zqux+UuRkfxGegVmtCIMYhx4voCCpZ04LOZAQ93mQswPEr7mZRY3jW4
+	 JXgdo54IKJRy515P5fclUo1nw9CfemOwFtvGdE+yKiOx4fAofA0VEDhom5o75bVztVwtSLSs4y8s
+	 YHzMoH+/zA7khfmXm4EtqJpLz831Ph1DT0sAUY+XQd8Bww/RfuQBm1nPtDwdwBCRXAIiYVBQpIUO
+	 krRyMMG56uUvBEVHg5AwZBny3jSYBilY3WV8IQXUtsgVfrzKVrUQp1QZJ+bQ37/d2idoD5gmyR7j
+	 fhJ7sO96oS3yf/hE/Hp2izo9VPwBRn8Ak4dhhtseid5IZ1ScE4i7OVbycH7yf5yZzXCuJWxczkM1
+	 n4TrLKyoo0cBetKitcGCCeEPH4emY9c/t27TovpWYan+FMKoy7CioDrS3TfhDkHoFpZkkLTmGd0u
+	 Wg8+r25iC4E+BThN5Xap//nhQwkO5RtzCUILw5dtp/LXFjOeHTvxOmsKCDsqy40+QoajawgiRTuN
+	 SY75TayfIcuvfJe5bf+6HYPlP7rgyVddvBKdU933Ay1tjyU/czcWGD/Yq2RV1MovLSUX68VGdDYi
+	 ktcrGZGdPXe8BXmOVSP6XYlE86MwYHwC8HfeGmiI6TJhfrK6BV+TM9pSPb8e2MtOVOaeu9Qccoqb
+	 yzB+7DmEUgA53W8d/4VyoTgxxnbHf0gwy2wCdF/trKOfKrx68b6mdpoCqnvBkor6qGSQGsLhxvNW
+	 pmALaNnN3OucFllBod8wEAglS27fLOws4p2VGh0qaya3CXQvTd3QFtZhbkPm7Tj1sKGnppJRJQf7
+	 GZ+6axeNLbr4hplmP/ntSjVvV5JBarj7AUdEgFeCfHoGL8ovdRIkBIVPC1cvanbq5mevTCrc4Wmb
+	 C7oIilLL+8gmxkWX5EGZxh59AE3UPw/NGqyvtOHZMrPtNr3rTiMz3pduP+nPTqbEnLx7ZTr2U=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+72afd4c236e6bc3f4bac@syzkaller.appspotmail.com
+Cc: bharathsm@microsoft.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	samba-technical@lists.samba.org,
+	sfrench@samba.org,
+	sprasad@microsoft.com,
+	syzkaller-bugs@googlegroups.com,
+	tom@talpey.com
+Subject: [PATCH] cifs: client: fix memory leak in smb3_fs_context_parse_param
+Date: Fri,  7 Nov 2025 22:01:39 +0800
+X-OQ-MSGID: <20251107140138.3897816-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <690da014.a70a0220.22f260.0026.GAE@google.com>
+References: <690da014.a70a0220.22f260.0026.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <YT1PR01MB9451424C6870795133FB7C96B3A72@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
- <36fb31bf2c854cdc930a3415f5551dcd@izw-berlin.de> <CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com>
- <uildcjpqxzc5nckupgdeeifkrqwrau2qxuc2df2uxuyys3i2k2@iz2bmi6yojyu>
- <YT1PR01MB945191C652AEE173CEADBA3EB3A12@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
- <aaloi77h2f5xolhrnegxsxntqp2jopwisunmjfp45idsoockpy@cy5agf2oqjop>
-In-Reply-To: <aaloi77h2f5xolhrnegxsxntqp2jopwisunmjfp45idsoockpy@cy5agf2oqjop>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Fri, 7 Nov 2025 18:24:10 +0530
-X-Gm-Features: AWmQ_blcBd6W2zro5oPc02GV5eATdJZXgSpAMBVDyRdYXQuo6Bl26ek3b4gV9n0
-Message-ID: <CANT5p=r=QgseACdUQySq2MCxycMsG-EvHCx-wwUPWo+xkSRVXg@mail.gmail.com>
-Subject: Re: [[ EXT ]] [BUG REPORT] cifs/smb data corruption when writing,
- x86_64, kernel 6.6.71
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: Mark A Whiting <whitingm@opentext.com>, Steve French <smfrench@gmail.com>, 
-	"Heckmann, Ilja" <heckmann@izw-berlin.de>, 
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
-	"henrique.carvalho@suse.com" <henrique.carvalho@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 27, 2025 at 6:39=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.de>=
- wrote:
->
-> Hi Mark,
->
-> On 03/27, Mark A Whiting wrote:
-> >>This is the fix we used (rebased on top of v6.6.71 tag):
-> >>https://git.exis.tech/linux.git/commit/?h=3Ddata_corruption_v6.x&id=3D8=
-d4c40e084f3d132434d5d3d068175c8db59ce65
-> >
-> >I tried following the link but it gave me a "502 Bad Gateway" error, I a=
-lso tried the link on my personal machine at home in case it was my corpora=
-te network blocking things, same result. I don't know how big the patch is.=
- Any chance you could just drop it in this thread?
->
-> Yes, sorry about that, I'm having problems on that server.
-> Patch is attached.
->
-> >>@Ilja @Mark could you test it with your reproducer please?
-> >>@Steve can you try it with the reproducer mentioned in the commit messa=
-ge please?
-> >>
-> >
-> >I would be happy to try it out.
->
-> Thanks, I'm eager to know the results.
->
->
-> Cheers,
->
-> Enzo
+The user calls fsconfig twice, but when the program exits, free() only
+frees ctx->source for the second fsconfig, not the first.
+Regarding fc->source, there is no code in the fs context related to its
+memory reclamation.
 
-Hi Enzo,
+To fix this memory leak, release the source memory corresponding to ctx
+or fc before each parsing.
 
-I reviewed the patch from my end.
+syzbot reported:
+BUG: memory leak
+unreferenced object 0xffff888128afa360 (size 96):
+  backtrace (crc 79c9c7ba):
+    kstrdup+0x3c/0x80 mm/util.c:84
+    smb3_fs_context_parse_param+0x229b/0x36c0 fs/smb/client/fs_context.c:1444
 
-I think you missed the test for non-dirty folios in your change.
--           if (!folio_test_dirty(folio) ||
--               folio_test_writeback(folio)) {
-+           if (folio_test_writeback(folio)) {
-I think this is why Mark and Bharath saw the WARNING with this patch.
-This happens when there's a clean folio in the extended range. With
-your patch, it will add such a folio to the batch as well.
+BUG: memory leak
+unreferenced object 0xffff888112c7d900 (size 96):
+  backtrace (crc 79c9c7ba):
+    smb3_fs_context_fullpath+0x70/0x1b0 fs/smb/client/fs_context.c:629
+    smb3_fs_context_parse_param+0x2266/0x36c0 fs/smb/client/fs_context.c:1438
 
-I also did not understand the reason for setting stop to false in these cas=
-es:
-+           if (xa_is_value(folio)) {
-+               stop =3D false;
-                break;
-            }
+Reported-by: syzbot+72afd4c236e6bc3f4bac@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=72afd4c236e6bc3f4bac
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ fs/smb/client/fs_context.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-+           if (unlikely(folio !=3D xas_reload(xas) || folio->mapping !=3D
-mapping)) {
-+               stop =3D false;
-+               goto put_next;
-            }
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index e60927b2a7c8..0e1949bcd6ea 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -1435,12 +1435,14 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 			cifs_errorf(fc, "Unknown error parsing devname\n");
+ 			goto cifs_parse_mount_err;
+ 		}
++		kfree(ctx->source);
+ 		ctx->source = smb3_fs_context_fullpath(ctx, '/');
+ 		if (IS_ERR(ctx->source)) {
+ 			ctx->source = NULL;
+ 			cifs_errorf(fc, "OOM when copying UNC string\n");
+ 			goto cifs_parse_mount_err;
+ 		}
++		kfree(fc->source);
+ 		fc->source = kstrdup(ctx->source, GFP_KERNEL);
+ 		if (fc->source == NULL) {
+ 			cifs_errorf(fc, "OOM when copying UNC string\n");
+-- 
+2.43.0
 
-It looks to me like it's a bug if we're hitting either of the above
-conditions. i.e. file mapping should always match and the folio should
-always be a pointer in the file mapping.
-Won't we end up in an infinite loop if ever something causes these to be tr=
-ue?
-
-Rest of the changes look good to me.
-
---=20
-Regards,
-Shyam
