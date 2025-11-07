@@ -1,123 +1,199 @@
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A052192EE;
-	Fri,  7 Nov 2025 22:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB3130103F
+	for <linux-cifs@vger.kernel.org>; Fri,  7 Nov 2025 23:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762554927; cv=none; b=VEMmWm+StNGd9+3I2NLgfIvkLmxKS3F3IuT6lOsChqK49yfSWqrhBm6EeytqgewZGUsWot0DB2Da34oMteEa5Z+jCRg3Gjw0uQ7I4xpZZBxORlA+7OA2Jjz6kTYvpDiNM0AU+cA+KSjUmqND0kKnuNvbOaAi/0fqNrFDhkei2pU=
+	t=1762556853; cv=none; b=jkQ9qQSk3P3gvIPwdrj/xUIHHemH3dzhpF1rqeYoiLpqATFNPE33dHa8rrAQ6rLc2VShRrpUXChbNpVzSypRSjp2xPI6g4wYGepZwvUkJ1tbTjpyoqxDCAKD2LkW7JDzMsy+3v6wnHfUVpmV+uO+8aCZA0zde+sJxJb1nCp/Y40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762554927; c=relaxed/simple;
-	bh=XFl4H7zlaSjNeZC0YFUU21tNjZ/wnYPimecT/uq5tKQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=S1xtH2u4rErEkLWHkV8kpO0zban8Az3Fo5CgS3FzsfqI7gAcBe9jwQcf/kEBHs/+oD0CROQFAF5+/7CmLYxDyVKG0JtNYN6j17lP22Sxuz8necqIIgcp6xrjpwNdZRVyOj2kZL8+zlc08KJQvi+MxucdhheR5s4Z9MjQV2dvD/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=gwskUpuJ; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+	s=arc-20240116; t=1762556853; c=relaxed/simple;
+	bh=qW4W6cA0owJCFwbp6YNpBCC2XHiH39M+fTk7ojXrDCo=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=autk+Tzt30m3ma0/Qe/9kJqw5T1cEJv2acZ6ANgn/9L0HwiAKa72z3GM6SSjWUeUJW09Mtt99+YmWcz+D7zEi8YoWJ1fYZwkLMqrI1SYCM/NlRLz6kinsCh9AGzeM3Alz430uR2uRMQSdsUgr9NwVpLI3ldy+ijcYbR0VIFMDSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YyEJAh37; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="gwskUpuJ"
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 65A4040AED
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1762554918; bh=1SMRxhNRshB8vecJq42CGMcQSf+tMG9pcOEmrtJR/2o=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=gwskUpuJ4a2g0JY5PiFttMjCeJQuS5S9UEPZocWG6S53nMlyt4gNfosYgLoQ6Jwhj
-	 dtsb6S+afpYrUIi0QfyDP5S6e0bDBizWxKwt/uIC0tV/2BUoFA5ZIOjasCC/wOB6C5
-	 IvBnQSvlGwdiy84Vv7DtwNnU0ThlI1+rpNmvLMNs2Mlba7j5UvudGA8dWS/wNWoEhb
-	 QQZECfmiJHj8aTYEDJFrkXseci/C7M7RQmHvvaOKNnK8EDDOg1KshyEqtA+pwvZFub
-	 CJuACGdj/HuNVrTYEYhxm/X8rI6+e/rYpIzGlIZWWTn5T4qJ87Gv51ZI5YPYmAqjvD
-	 ATLFFKQC18bmQ==
-Received: from localhost (unknown [IPv6:2601:280:4600:2da9::1fe])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 65A4040AED;
-	Fri,  7 Nov 2025 22:35:18 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: NeilBrown <neil@brown.name>, Jeff Layton <jlayton@kernel.org>
-Cc: Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov
- <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, Christian
- Schoenebeck <linux_oss@crudebyte.com>, David Sterba <dsterba@suse.com>,
- David Howells <dhowells@redhat.com>, Marc Dionne
- <marc.dionne@auristor.com>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, "Tigran
- A. Aivazian" <aivazian.tigran@gmail.com>, Chris Mason <clm@fb.com>, Xiubo
- Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, Jan Harkes
- <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, Tyler Hicks <code@tyhicks.com>,
- Jeremy Kerr <jk@ozlabs.org>, Ard Biesheuvel <ardb@kernel.org>, Namjae Jeon
- <linkinjeon@kernel.org>, Sungjong Seo <sj1557.seo@samsung.com>, Yuezhang
- Mo <yuezhang.mo@sony.com>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger
- <adilger.kernel@dilger.ca>, Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu
- <chao@kernel.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, Miklos
- Szeredi <miklos@szeredi.hu>, Andreas Gruenbacher <agruenba@redhat.com>,
- Viacheslav Dubeyko <slava@dubeyko.com>, John Paul Adrian Glaubitz
- <glaubitz@physik.fu-berlin.de>, Yangtao Li <frank.li@vivo.com>, Richard
- Weinberger <richard@nod.at>, Anton Ivanov
- <anton.ivanov@cambridgegreys.com>, Johannes Berg
- <johannes@sipsolutions.net>, Mikulas Patocka
- <mikulas@artax.karlin.mff.cuni.cz>, Muchun Song <muchun.song@linux.dev>,
- Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@redhat.com>,
- David Woodhouse <dwmw2@infradead.org>, Dave Kleikamp <shaggy@kernel.org>,
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
- Ryusuke Konishi <konishi.ryusuke@gmail.com>, Konstantin Komarov
- <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>,
- Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>,
- Bob Copeland <me@bobcopeland.com>, Mike Marshall <hubcap@omnibond.com>,
- Martin Brandenburg <martin@omnibond.com>, Amir Goldstein
- <amir73il@gmail.com>, Steve French <sfrench@samba.org>, Paulo Alcantara
- <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam
- Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
- <bharathsm@microsoft.com>, Zhihao Cheng <chengzhihao1@huawei.com>, Hans de
- Goede <hansg@kernel.org>, Carlos Maiolino <cem@kernel.org>, Hugh Dickins
- <hughd@google.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, Andrew
- Morton <akpm@linux-foundation.org>, Kees Cook <kees@kernel.org>, "Gustavo
- A. R. Silva" <gustavoars@kernel.org>, "Matthew Wilcox (Oracle)"
- <willy@infradead.org>, linux-kernel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
- linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
- codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
- linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, gfs2@lists.linux.dev,
- linux-um@lists.infradead.org, linux-mm@kvack.org,
- linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
- linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
- ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
- linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
- linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, linux-xfs@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-doc@vger.kernel.org, Jeff Layton
- <jlayton@kernel.org>
-Subject: LLM disclosure (was: [PATCH v2] vfs: remove the excl argument from
- the ->create() inode_operation)
-In-Reply-To: <176255458305.634289.5577159882824096330@noble.neil.brown.name>
-References: <20251107-create-excl-v2-1-f678165d7f3f@kernel.org>
- <176255458305.634289.5577159882824096330@noble.neil.brown.name>
-Date: Fri, 07 Nov 2025 15:35:17 -0700
-Message-ID: <87ikfl1nfe.fsf@trenco.lwn.net>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YyEJAh37"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-88040cfadbfso7977296d6.0
+        for <linux-cifs@vger.kernel.org>; Fri, 07 Nov 2025 15:07:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762556850; x=1763161650; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0T1xBMVbMQYQHCdHkuRAqGIgurAU4TjTILHapuv9Fxw=;
+        b=YyEJAh37+pOqhVCzIx+NP3lJAvWwO3aiJHD0NShmvsh2SWcGJg5XxbRe8flDucX+6x
+         rKUwl9oFBATWjGrnEKWINxGL4ffO4zVNtMhUkHAmQEKWEMoxdaHalfpEk+sV3zUMkDtt
+         7LpwClqjEVnsoCVd6bdIopSwWo/hgl6sXeEULHbSJ5r0cRCOMdNSl+axwKVbcaBJMvDj
+         ocrGhdnsmye2knWTo0aRBeyrFoprG+/1/PmXTkdobv/O/VFG+VNdXWWP8gtBKgXzBTvT
+         pJh+AvLrJwyrc//marKIjFyWaKDlQDaUObrEAKBUEJYcoTtrubRlCs3iLJqCDUYkQGMF
+         CoSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762556850; x=1763161650;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0T1xBMVbMQYQHCdHkuRAqGIgurAU4TjTILHapuv9Fxw=;
+        b=JHuQMfgTGQ9ATvlySS8EesxYuCf+dciKyhfHZTB6rbVsePhkk1CUFISC7zbaZ7pNv4
+         0MV4w9X04CqxdywZKlAWHkZ2bAIcvlOLptLnVfFmldDEjxlBdYP2BnvmyE4DAuzjYjJc
+         CbuoADBUjL4RPHygNzo8wmOZioU5BWeFnvlA4IJAPR0+/50Tp8RLq1+JXbBbG+hX2+Nb
+         CT6HAvpw2/QQ2LucQiKktJPb6E39LLDca7xui4tJuwFxudzOcoU5kId+GABHTBqvf/uo
+         WuVujaTmtGbwans4CaNy8Mt7hFG1ykB3fz9JQn5ofIe7LUKc7wuIPfaHVE5IzY75HHkI
+         Ja6Q==
+X-Gm-Message-State: AOJu0Yz7mvA0/iXPk8TWdsNKksUeSEPS2Zlbf9gjrF4rn8kB2jqJJQLz
+	Kgn8qbJevLijuA7WwKwrvNevkKx6Mz7JZeXm+Q2krTgh3tAEyvsx0LJRTHd9tHXo80m/wp0EYm9
+	NuLrj+kywsUYH8imPDdTbjBzQYoux7xt6L74WV9U=
+X-Gm-Gg: ASbGncviY4Pj/qI912X8ndTUd3TVla0BArhfL0qRCV828Hb5mbi5k8CKzLNx16quabZ
+	anEo736H3SmK54ubNmJGSVl2KDoXEm4dhEXREwo+OfTBXdWAVeZW9DJLUi1y27Tht7b1pFXUkhF
+	rDNKxe/UHlPz4/+CiJwHquhS5zwm7Vam329g9ry6+XVH6cVeefUbUbA1MR4Nodo0S8opM+9TVYg
+	JQjqfduJDN4VzWjD320U4UydysXoFlrQUpDSuiDC9JEs+hR2Td3R0FMyFPPKvXMM8BXUwGKww0B
+	AXOFxKR2xenxZnMux+55l8bHYwwI4nsb40RfAZnWujvWmxosE8rnztaXnnuO3f1v9B+s8GSZoQb
+	T8ZQzMnZS1vgHGdx39oxKrVcERskSz5CmB+NkcAcbAXGT4vnKlSr5kdD6vMPASryRWQLBhtlv36
+	LgsXkvsw==
+X-Google-Smtp-Source: AGHT+IGOLfAfRsUHcd1Msc0svw2onbQGzlijsVJGAhAfVSOJmcdGW1uSmgz02mAtL1+OtCo2627+NZHzH/oRmdghdTA=
+X-Received: by 2002:a05:6214:212f:b0:880:3eb3:3b0a with SMTP id
+ 6a1803df08f44-8822f4d3dacmr42420846d6.4.1762556850270; Fri, 07 Nov 2025
+ 15:07:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 7 Nov 2025 17:07:19 -0600
+X-Gm-Features: AWmQ_bm04_u2v4ue835sql5fjIpB9wIYHMjxSoH7iDJ9P7JjYK_EwvrJHrKdu_U
+Message-ID: <CAH2r5mtnf1eBTXnDQBiQYKrwEwUzxcxC5Nfv1NbiCdudQMaUZA@mail.gmail.com>
+Subject: New netfs crash in last month or so
+To: CIFS <linux-cifs@vger.kernel.org>
+Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>, David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-NeilBrown <neilb@ownmail.net> writes:
+Have been seeing this netfs crash over the last month or so
+(presumably a recent regression) for example running generix/215.
+Ideas welcome
 
-> On Sat, 08 Nov 2025, Jeff Layton wrote:
+[Fri Nov 7 10:03:14 2025] run fstests generic/215 at 2025-11-07 10:03:15
+==================================================================
+[Fri Nov 7 10:03:15 2025] BUG: KASAN: slab-use-after-free in
+netfs_limit_iter+0x50f/0x770 [netfs]
+[Fri Nov 7 10:03:15 2025] Read of size 1 at addr ff1100011b65d910 by
+task kworker/u36:2/69285
+[Fri Nov 7 10:03:15 2025] CPU: 3 UID: 0 PID: 69285 Comm: kworker/u36:2
+Tainted: G E 6.18.0-rc4 #1 PREEMPT(voluntary)
+[Fri Nov 7 10:03:15 2025] Tainted: [E]=UNSIGNED_MODULE
+[Fri Nov 7 10:03:15 2025] Hardware name: Red Hat KVM, BIOS
+1.16.3-4.el9 04/01/2014
+[Fri Nov 7 10:03:15 2025] Workqueue: events_unbound
+netfs_write_collection_worker [netfs]
+[Fri Nov 7 10:03:15 2025] Call Trace:
+[Fri Nov 7 10:03:15 2025] <TASK>
+[Fri Nov 7 10:03:15 2025] dump_stack_lvl+0x79/0xb0
+[Fri Nov 7 10:03:15 2025] print_report+0xcb/0x610
+[Fri Nov 7 10:03:15 2025] ? __virt_addr_valid+0x19a/0x300
+[Fri Nov 7 10:03:15 2025] ? netfs_limit_iter+0x50f/0x770 [netfs]
+[Fri Nov 7 10:03:15 2025] ? netfs_limit_iter+0x50f/0x770 [netfs]
+[Fri Nov 7 10:03:15 2025] kasan_report+0xca/0x100
+[Fri Nov 7 10:03:15 2025] ? netfs_limit_iter+0x50f/0x770 [netfs]
+[Fri Nov 7 10:03:15 2025] netfs_limit_iter+0x50f/0x770 [netfs]
+[Fri Nov 7 10:03:15 2025] ? __pfx_netfs_limit_iter+0x10/0x10 [netfs]
+[Fri Nov 7 10:03:15 2025] ? cifs_prepare_write+0x28e/0x490 [cifs]
+[Fri Nov 7 10:03:15 2025] netfs_retry_writes+0x94d/0xcf0 [netfs]
+[Fri Nov 7 10:03:15 2025] ? __pfx_netfs_retry_writes+0x10/0x10 [netfs]
+[Fri Nov 7 10:03:15 2025] ? folio_end_writeback+0x9b/0xf0
+[Fri Nov 7 10:03:15 2025] ? netfs_folio_written_back+0x1af/0x3e0 [netfs]
+[Fri Nov 7 10:03:15 2025] netfs_write_collection+0x936/0x1bb0 [netfs]
+[Fri Nov 7 10:03:15 2025] netfs_write_collection_worker+0x13d/0x2b0 [netfs]
+[Fri Nov 7 10:03:15 2025] process_one_work+0x4bf/0xb40
+[Fri Nov 7 10:03:15 2025] ? __pfx_process_one_work+0x10/0x10
+[Fri Nov 7 10:03:15 2025] ? assign_work+0xd6/0x110
+[Fri Nov 7 10:03:15 2025] worker_thread+0x2c9/0x550
+[Fri Nov 7 10:03:15 2025] ? __pfx_worker_thread+0x10/0x10
+[Fri Nov 7 10:03:15 2025] kthread+0x216/0x3e0
+[Fri Nov 7 10:03:15 2025] ? __pfx_kthread+0x10/0x10
+[Fri Nov 7 10:03:15 2025] ? __pfx_kthread+0x10/0x10
+[Fri Nov 7 10:03:15 2025] ? lock_release+0xc4/0x270
+[Fri Nov 7 10:03:15 2025] ? rcu_is_watching+0x20/0x50
+[Fri Nov 7 10:03:15 2025] ? __pfx_kthread+0x10/0x10
+[Fri Nov 7 10:03:15 2025] ret_from_fork+0x2a8/0x350
+[Fri Nov 7 10:03:15 2025] ? __pfx_kthread+0x10/0x10
+[Fri Nov 7 10:03:15 2025] ret_from_fork_asm+0x1a/0x30
+[Fri Nov 7 10:03:15 2025] </TASK>
+[Fri Nov 7 10:03:15 2025] Allocated by task 74971:
+[Fri Nov 7 10:03:15 2025] kasan_save_stack+0x24/0x50
+[Fri Nov 7 10:03:15 2025] kasan_save_track+0x14/0x30
+[Fri Nov 7 10:03:15 2025] __kasan_kmalloc+0x7f/0x90
+[Fri Nov 7 10:03:15 2025] netfs_folioq_alloc+0x56/0x1b0 [netfs]
+[Fri Nov 7 10:03:15 2025] rolling_buffer_init+0x23/0x70 [netfs]
+[Fri Nov 7 10:03:15 2025] netfs_create_write_req+0x85/0x360 [netfs]
+[Fri Nov 7 10:03:15 2025] netfs_writepages+0x110/0x520 [netfs]
+[Fri Nov 7 10:03:15 2025] do_writepages+0x123/0x260
+[Fri Nov 7 10:03:15 2025] filemap_fdatawrite_wbc+0x74/0x90
+[Fri Nov 7 10:03:15 2025] __filemap_fdatawrite_range+0x9a/0xc0
+[Fri Nov 7 10:03:15 2025] filemap_write_and_wait_range+0x56/0xc0
+[Fri Nov 7 10:03:15 2025] cifs_flush+0x10c/0x1f0 [cifs]
+[Fri Nov 7 10:03:15 2025] filp_flush+0x97/0xd0
+[Fri Nov 7 10:03:15 2025] __x64_sys_close+0x4a/0x90
+[Fri Nov 7 10:03:15 2025] do_syscall_64+0x75/0x9c0
+[Fri Nov 7 10:03:15 2025] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[Fri Nov 7 10:03:15 2025] Freed by task 69285:
+[Fri Nov 7 10:03:15 2025] kasan_save_stack+0x24/0x50
+[Fri Nov 7 10:03:15 2025] kasan_save_track+0x14/0x30
+[Fri Nov 7 10:03:15 2025] __kasan_save_free_info+0x3b/0x60
+[Fri Nov 7 10:03:15 2025] __kasan_slab_free+0x43/0x70
+[Fri Nov 7 10:03:15 2025] kfree+0x11a/0x630
+[Fri Nov 7 10:03:15 2025] rolling_buffer_delete_spent+0x80/0xa0 [netfs]
+[Fri Nov 7 10:03:15 2025] netfs_write_collection+0x119c/0x1bb0 [netfs]
+[Fri Nov 7 10:03:15 2025] netfs_write_collection_worker+0x13d/0x2b0 [netfs]
+[Fri Nov 7 10:03:15 2025] process_one_work+0x4bf/0xb40
+[Fri Nov 7 10:03:15 2025] worker_thread+0x2c9/0x550
+[Fri Nov 7 10:03:15 2025] kthread+0x216/0x3e0
+[Fri Nov 7 10:03:15 2025] ret_from_fork+0x2a8/0x350
+[Fri Nov 7 10:03:15 2025] ret_from_fork_asm+0x1a/0x30
+[Fri Nov 7 10:03:15 2025] The buggy address belongs to the object at
+ff1100011b65d800
+which belongs to the cache kmalloc-512 of size 512
+[Fri Nov 7 10:03:15 2025] The buggy address is located 272 bytes inside of
+freed 512-byte region [ff1100011b65d800, ff1100011b65da00)
+[Fri Nov 7 10:03:15 2025] The buggy address belongs to the physical page:
+[Fri Nov 7 10:03:15 2025] page: refcount:0 mapcount:0
+mapping:0000000000000000 index:0x0 pfn:0x11b658
+[Fri Nov 7 10:03:15 2025] head: order:3 mapcount:0 entire_mapcount:0
+nr_pages_mapped:0 pincount:0
+[Fri Nov 7 10:03:15 2025] anon flags:
+0x17ffffc0000040(head|node=0|zone=2|lastcpupid=0x1fffff)
+[Fri Nov 7 10:03:15 2025] page_type: f5(slab)
+[Fri Nov 7 10:03:15 2025] raw: 0017ffffc0000040 ff11000100038c80
+0000000000000000 dead000000000001
+[Fri Nov 7 10:03:15 2025] raw: 0000000000000000 0000000000200020
+00000000f5000000 0000000000000000
+[Fri Nov 7 10:03:15 2025] head: 0017ffffc0000040 ff11000100038c80
+0000000000000000 dead000000000001
+[Fri Nov 7 10:03:15 2025] head: 0000000000000000 0000000000200020
+00000000f5000000 0000000000000000
+[Fri Nov 7 10:03:15 2025] head: 0017ffffc0000003 ffd40000046d9601
+00000000ffffffff 00000000ffffffff
+[Fri Nov 7 10:03:15 2025] head: ffffffffffffffff 0000000000000000
+00000000ffffffff 0000000000000008
+[Fri Nov 7 10:03:15 2025] page dumped because: kasan: bad access detected
+[Fri Nov 7 10:03:15 2025] Memory state around the buggy address:
+[Fri Nov 7 10:03:15 2025] ff1100011b65d800: fa fb fb fb fb fb fb fb fb
+fb fb fb fb fb fb fb
+[Fri Nov 7 10:03:15 2025] ff1100011b65d880: fb fb fb fb fb fb fb fb fb
+fb fb fb fb fb fb fb
+[Fri Nov 7 10:03:15 2025] >ff1100011b65d900: fb fb fb fb fb fb fb fb
+fb fb fb fb fb fb fb fb
+[Fri Nov 7 10:03:15 2025] ^
+[Fri Nov 7 10:03:15 2025] ff1100011b65d980: fb fb fb fb fb fb fb fb fb
+fb fb fb fb fb fb fb
+[Fri Nov 7 10:03:15 2025] ff1100011b65da00: fc fc fc fc fc fc fc fc fc
+fc fc fc fc fc fc fc
+[Fri Nov 7 10:03:15 2025]
+==================================================================
+[Fri Nov 7 10:03:15 2025] Disabling lock debugging due to kernel taint
 
->> Full disclosure: I did use Claude code to generate the first
->> approximation of this patch, but I had to fix a number of things that it
->> missed.  I probably could have given it better prompts. In any case, I'm
->> not sure how to properly attribute this (or if I even need to).
->
-> My understanding is that if you fully understand (and can defend) the
-> code change with all its motivations and implications as well as if you
-> had written it yourself, then you don't need to attribute whatever fancy
-> text editor or IDE (e.g.  Claude) that you used to help produce the
-> patch.
+http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/8/builds/152/steps/78/logs/stdio
 
-The proposed policy for such things is here, under review right now:
+-- 
+Thanks,
 
-  https://lore.kernel.org/all/20251105231514.3167738-1-dave.hansen@linux.intel.com/
-
-jon
+Steve
