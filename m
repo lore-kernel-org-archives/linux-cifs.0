@@ -1,131 +1,114 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98ED3272805
-	for <linux-cifs@vger.kernel.org>; Fri,  7 Nov 2025 16:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883132E7F22
+	for <linux-cifs@vger.kernel.org>; Fri,  7 Nov 2025 22:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762532628; cv=none; b=tN5OhsFk8lwdopHKdEICT+pc4kCJUKsP+0Mr/4akFUH0WZmRT0MwjpPP2gWEYt772NNL8e77HheUXTsh1URReTSDk+XRyMVhD25s0BwlWPrGrHTXSXs5hKU9OQCa3J7jph+tA21S+K60F5aIhL8cB35s/Vtn/0npBAF+yAm1TCE=
+	t=1762552989; cv=none; b=PThTn36ZM/EJg1/221r3TrgUngAa+MS3LlViqZRA0bzh0Eho/kq2sKD/0+NRknSkDrpC4gLN9P7d1w1jiGwYvPBBBP2U9XhgkhXoFQQr6hC9bjSk3UAMSHq2h8jj12s7pPbkwLgqzPbWlXLQp0m1B63UyXmMWK7X3cxiEnk8trc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762532628; c=relaxed/simple;
-	bh=J6EunYEz2tEr0LK2DJ7zlLy+0hgjNQzinAZTpJUBdJo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M2Je02okzNvoH8/IYacCg3n8/EM1zbf0dh1LMo57xpkKLgG6algwHa5Iy5CPLUUV2jlA3xFrEGGKWQziPjGSX+CoR72Rb5jWWxdfsmKP4fb4RVVzVpMmUjIJUQlNsvkS2fiZ8DLARVG1YbpIKRHLM7/fik/K3eJ2VCz81G29fds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GwwSenuZ; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762552989; c=relaxed/simple;
+	bh=fO21NbkdQNfR7Mv9J6O79Io7dXowoIYE+qE+u5UBCEY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EHudrvyMmnEqroChWWpe4zfTpKB4hUATXo4AjduRwQiDAK3vNrFHJOAuDeZzdakUZYm9URFl1gQaDtp2BrBmV+D5Xfxblq11E5HumtFpB1uYKa3PqH1EqZ5i/BRZ82WXdSeAkCbyGhcS17vEqOlYXpVj5PAyvCx4aEn6pEV6fDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=MNOMQLJG; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GwwSenuZ"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8a479c772cfso53924485a.0
-        for <linux-cifs@vger.kernel.org>; Fri, 07 Nov 2025 08:23:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="MNOMQLJG"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b3e7cc84b82so232221366b.0
+        for <linux-cifs@vger.kernel.org>; Fri, 07 Nov 2025 14:03:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762532625; x=1763137425; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XNyT8hdstTN7e/8rEeWhIH9mkCHpXo1HxjWjp/fCq8k=;
-        b=GwwSenuZlKJeuBBddnWTFlC/lc5/m+gsb6A1TZv5frcL+4IC5w73y4an13s9yYKF8/
-         rBAiBxjQWHXb18rk8yFbRW8CyNuDUKHhHf0XJp9g0Qzfi3orTc90tMK0esO+isWO+iEG
-         1PquR568JKGMUQQCeSeO3UIdSoBKDBoWPb1jxcGVWdJtbmfcczl+YCzsncyTiVHueZsM
-         DOasqYxrqIZYlwSq51E0KnkUKSeQACshmCGJH3paB/dIN6DAFet8a01WS8CHVIaAhJ8O
-         6+DaEfvndy2pQ+iM0D0RqluWWnZeMtt9017QxhPeoNZXPrqcT25TYdqUFDXtCSknN2qy
-         8HpA==
+        d=suse.com; s=google; t=1762552985; x=1763157785; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kI1EkV1pIyQF8PjpBSc6MpnlpbLKwfT0Jjn7Jf+R9rU=;
+        b=MNOMQLJGi3h7DZJ3l4hOoO3F/rYkDXtCTLn09oXtNnJGXQjxaVlJN5QaezyiAH/wo2
+         Adt4XlBKZnG3aizhHNmcb+Enc+FjWQOQhhs5sNquF0TmCFdcD3mmRN23kxjiuAuAPGE1
+         ruBpHRfBWzKG1Sb8nVQ/ynv1nWhRUBcfNgw6U3RsVy+eAeixNjONT3bNYWPZKsQoyyz/
+         UEv+4kMzF+xIYLYYHNNoDA6SGrUK0IbzLF4wohIM9HP5IwOyGWEGf+QO8/d7EuFf04ey
+         cRjlrfb8+2tydnGd70XAaF+dmJexAwEmYE5KkIJ8wVBCbye+uwqr21NicZVCkoyYzAub
+         hLrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762532625; x=1763137425;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=XNyT8hdstTN7e/8rEeWhIH9mkCHpXo1HxjWjp/fCq8k=;
-        b=hAmBvnxHAOpe9owOJLyMws+91L75GMia+o9kaCC5jqKjsvF8pWIXuQ+dor3Xi5Im4c
-         /GtWvZf2sb05OVQ+GrLzL69Pjg4TjsAUqTUsmiW6kicZgHuCqWAa/EIC3j1TRYkpFa1d
-         vWxe7ugqimii3BWFkkGStJr91b763R97eh1fe7OFtxIu4WqcFqNg2hkWYwOQAIHWK3cw
-         0JyN2eS7PuIYdIhNzlAH5nXXTUJcLIhDoMObG7vv0gyC4qqXUNgXr0tg5xoXA2mIZkoB
-         PqU6zS+FgckbfqFEwl2ilaqkEJMyeYQvKs80EIz35Qz7aaCqeN1KtM63ctWrXQqwoi6w
-         PRbQ==
-X-Gm-Message-State: AOJu0YzR6d5ojvUmMqeDx+YUrC5MybHyqnRV61tv8qoUlMO5ZYtzfuDA
-	D3aY0OTKqqu67aLvHP1usDD2JswAkOmADsRf2+uytUZ9/7PkVa7qR6NFhLy0s1vWAE6hX9tTDTm
-	ThHr0WmcGP+YCpBCfNhVyWF5CN2D6NYeIVMvmkj8=
-X-Gm-Gg: ASbGnctEM9/VRDH6pcFaEG0T4rZtUERp6eArrUQPuUtNhwZ5AFOIqiXAN9m7B4AfzdR
-	AYCrL5d4xbsaeEwtdsoniQswsTOKm6lDKIsaeN9L4Gmrdd6vQPoHgwvdtrVmdi0n3oTJXU6ydWV
-	ootWV+28Pdi66YJIM+cFaucLsn1jKELSeKxa8G1Eb8M7werNvIJhMLjjJ8Bcke9NMIc2zoandeq
-	5u+HxCF7e0PxqgZ5WwQNFLtm2XhPZVNIdlaT13qO6fMpvAbHVcXgIh37fKztZClb8wNrxVIFziA
-	cZz7LS6vWoY6Q2ZTTviOEfg+yKZja4xGn5fEMbJo9CvtSYuWlAs025Q57EVzNk7GoqyPrZG/29W
-	fwOnJduFXIUO9liDMQns/L8i0jBIW7iuDXnRfFo7BE8s2VXoqOgxZTlcw49jKnvngrTkOQcjDYE
-	8=
-X-Google-Smtp-Source: AGHT+IH2U2Qvnn+ubT9ZQn53f6cMK7J+Xc93yFMfaPMBNNB7P5IuutxIdU6CYVxtEQgdLyfGtq9QQxQmulxRkksMBko=
-X-Received: by 2002:ac8:7fcd:0:b0:4ec:fb8c:5183 with SMTP id
- d75a77b69052e-4ed94a8d4c6mr35326591cf.61.1762532625454; Fri, 07 Nov 2025
- 08:23:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762552985; x=1763157785;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kI1EkV1pIyQF8PjpBSc6MpnlpbLKwfT0Jjn7Jf+R9rU=;
+        b=dZfl+QjFwrxJPXnwO7ibBfL7fnDlOtJ6SxsSahGgCbwTDSG2pUQGFNMxYMtbFPqVb6
+         KSndqCVoQab+S1YXPcjrLdjiyavKppp6AYV+L7jf+BD6m6THQEPMZ+q92++hoPTNyQyh
+         MRCrUedQiZQEgSB32EnDF1hOhBNJRtyhrayQmtqFmAuRG8vcfopCkUq4/pA3NttYnTZG
+         eBPgPT7r/1hxHQ3q5S7UHaVo7HC4joqF1SZbhZk1RCrh7CtfY7SZ9NeLhWKScdWLT4Pg
+         SkZDM6NnAt7I365S8D0XTb9+TS8eluExI+aUc3KTAT3lY8tMq0kkB9gl95WcnWollAEI
+         6q7w==
+X-Forwarded-Encrypted: i=1; AJvYcCUFFUp1z2a99eTzrAa/8S5ETD9YFqqqKaCBaAAR7YDJVabfqAY/XWjfFDADJCGsPQOcS3ZZr4Owk3+w@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0o/5kcYZ6SUjQSoPn6Y3WLCxnM/w8st6Fan4DtUq+wDw61KwU
+	Uezw+br248Eqw9+pcdY6JLzD9bE9B+e6oltASi3zgcZxzcTMY4gom2AOWz7yCPFP4022+TZTCZ5
+	JO4i0
+X-Gm-Gg: ASbGncsNCa7aa5nQQ7+L7Uw2ZLd4WR9mD29in2c5OP8yHIjtqzGOFf8fCGY01TCv3Ch
+	hkCSeynSEmuqHbeUoQcgZnC14q3ggxY1FZoSlJ2a3s1e/00AII+nEI4bawfMFrHmC7bvgj7SocL
+	3r3shkVt8JEC84r84WO18BazOXD7ZVTSnQ/y6gHGpCgJ+al6YIKuwNV9g37zyHKFuUX6iKKsANS
+	a4tAwmRjhl7BPzDrBHe/H4lHPOl/Kk4yYT7sPaFHjrC68rAkBaCSE5vJJd3BHkY2K6/unyeL1hA
+	f+ZPlM4A7uXnW0VBRnUE4m9CA6cREwjrbOn/3Bt/PPELUkFcqYprKr/EIZ6Q33eq+mlsrkQRsCT
+	ppGxQTPZlOtFKNxtxJHODM582Z/pHfBNINiIFKHziiG68+5KRyyySHtlfFUV78GGHKO6QLXITJU
+	hwCh1+3IAdr6VF2qk=
+X-Google-Smtp-Source: AGHT+IFTNcu5mPFMtGA/nJW7bssU/3YxBhT76QzSRtBfC54AISwg6wpDctXEJHR5a2LwCZ7XpyRdWA==
+X-Received: by 2002:a17:907:944a:b0:b71:df18:9fc7 with SMTP id a640c23a62f3a-b72e04843dcmr74424766b.29.1762552984749;
+        Fri, 07 Nov 2025 14:03:04 -0800 (PST)
+Received: from precision ([152.234.106.4])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-45002752ca9sm2848505b6e.14.2025.11.07.14.03.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Nov 2025 14:03:04 -0800 (PST)
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: sfrench@samba.org,
+	sprasad@microsoft.com
+Cc: pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	ematsumiya@suse.de,
+	linux-cifs@vger.kernel.org,
+	Henrique Carvalho <henrique.carvalho@suse.com>
+Subject: [PATCH] smb: client: fix cifs_pick_channel when channel needs reconnect
+Date: Fri,  7 Nov 2025 18:59:53 -0300
+Message-ID: <20251107215953.4190096-1-henrique.carvalho@suse.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5mtLBAwfk7YbgRkCnA4S7uNyiTGs7kDssa697pci=rCYDw@mail.gmail.com>
- <ONR9GWFvdJx39b1jAUTFBGjhqlY1LgZhwHECF_OroUZSCW0dGQHjcNSBDtiLfxdP1-Ly3UufUTo17bw5Kea5LTglBll2vZjWw9V8aGnMKvg=@joshua.hu>
-In-Reply-To: <ONR9GWFvdJx39b1jAUTFBGjhqlY1LgZhwHECF_OroUZSCW0dGQHjcNSBDtiLfxdP1-Ly3UufUTo17bw5Kea5LTglBll2vZjWw9V8aGnMKvg=@joshua.hu>
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 7 Nov 2025 10:23:34 -0600
-X-Gm-Features: AWmQ_bkYKM4SIJOpU5lJW5zVw_Cn56Fl2XFrh8ZX1N09-34a3gQR7iwBi0eGO-Y
-Message-ID: <CAH2r5mvcOwmJjSyewm06uyEfXKsfdEWS9ZYgr3aiD-ia+XF2Qg@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: validate change notify buffer before copy
-To: Joshua Rogers <reszta@joshua.hu>
-Cc: CIFS <linux-cifs@vger.kernel.org>, Joshua Rogers <linux@joshua.hu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Added mention of it in the description (see below).  Let me know if
-that is incorrect.   Interesting that I don't see other kernel patches
-noting that interesting sounding tool (yet)
+cifs_pick_channel iterates candidate channels using cur. The
+reconnect-state test mistakenly used a different variable.
 
-    smb: client: validate change notify buffer before copy
+This checked the wrong slot and would cause us to skip a healthy channel
+and to dispatch on one that needs reconnect, occasionally failing
+operations when a channel was down.
 
-    SMB2_change_notify called smb2_validate_iov() but ignored the return
-    code, then kmemdup()ed using server provided OutputBufferOffset/Length.
+Fix by replacing for the correct variable.
 
-    Check the return of smb2_validate_iov() and bail out on error.
+Fixes: fc43a8ac396d ("cifs: cifs_pick_channel should try selecting active channels")
+Cc: stable@vger.kernel.org
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+---
+ fs/smb/client/transport.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-    Discovered with help from the ZeroPath security tooling.
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index 051cd9dbba13..915cedde5d66 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -830,7 +830,7 @@ struct TCP_Server_Info *cifs_pick_channel(struct cifs_ses *ses)
+ 		if (!server || server->terminate)
+ 			continue;
+ 
+-		if (CIFS_CHAN_NEEDS_RECONNECT(ses, i))
++		if (CIFS_CHAN_NEEDS_RECONNECT(ses, cur))
+ 			continue;
+ 
+ 		/*
+-- 
+2.50.1
 
-    Signed-off-by: Joshua Rogers <linux@joshua.hu>
-    Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-    Cc: stable@vger.kernel.org
-    Fixes: e3e9463414f61 ("smb3: improve SMB3 change notification support")
-    Signed-off-by: Steve French <stfrench@microsoft.com>
-
-On Fri, Nov 7, 2025 at 9:22=E2=80=AFAM Joshua Rogers <reszta@joshua.hu> wro=
-te:
->
-> Is it possible to slightly change the commit msg to include "Found with Z=
-eroPath"? As this bug was, indeed, found with a tool called ZeroPath.
->
-> Thank you.
->
->
-> On Friday, 7 November 2025 at 11:23, Steve French <smfrench@gmail.com> wr=
-ote:
->
-> >
-> >
-> > SMB2_change_notify called smb2_validate_iov() but ignored the return
-> > code, then kmemdup()ed using server provided OutputBufferOffset/Length.
-> >
-> > Check the return of smb2_validate_iov() and bail out on error.
-> >
-> > See attached (lightly updated to fix checkpatch warnings from Joshua's
-> > original patch)
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
-
-
-
---=20
-Thanks,
-
-Steve
