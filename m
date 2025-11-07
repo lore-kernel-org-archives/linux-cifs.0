@@ -1,182 +1,249 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C862F7478
-	for <linux-cifs@vger.kernel.org>; Thu,  6 Nov 2025 20:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C23A33993;
+	Fri,  7 Nov 2025 00:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762460685; cv=none; b=a0Dhn3SD0YFzr0igLO4iNBF9PMkWE7kUpUyOeTJG2uwhJAFov2ru1aYlueGu2NNDzsy3XDqM4uj7xfkd3S4MLrwEvSiab+99buQtv8oZq8CeVm6FkhUvSRAZJ5Hv6hKavx3sXF2oCHwD7sv7D2p732j43t/ZpwC95Q5oYzBnt9c=
+	t=1762473681; cv=none; b=ufJ4zqM+wyIPsjRK193FvrNokGG8H5JotQCaEz+5/ywGO0gzCbAKdeXXS87qBajmt7/nSDGn52hFA2/0C4NSQD5WZQ3FY1D2zwrkGJ2e58HdCXT3JVihuupOidW4o11gd7t94HiSh/ADjaY6BOHWPJtd/MtYyP+Kta8ZdkjZ8ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762460685; c=relaxed/simple;
-	bh=Im9QWWxJXdZqz7HeLFWXZzmI9TfaqMlaB4gqcycUoss=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HyTIYKjDufB2FSMWlNdBU0YDY3AmOUTvQK+zDYKrdnnMoPOCn0g/C4/I2oW6x6/KFYoPrtR/FnD6mYqHARcN2jNw9P4hEaq+fvjCoZQSzF7XIMmDw0aYyFhbs6tJrXKth+F16Ry3fPOMUvJJeC4VFJnSfbq6wI/pI1kKdUh5EdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IKzIS/fF; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762473681; c=relaxed/simple;
+	bh=MufCujU/0LsEsdoh25mDaMBAKJ5uFyL9+gDf2+vBd+0=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=oHYXEcTSYoHyVkX72EIqQp/P5StWGobo798vrgPKFkPEkyNRL5ulqc34y95dBzU5Q70jyjXpa6GEl3JMrRYy72FKDLvfRAtsDuZPNxrlAQyxUhrdj6GtCfXZaxIIc/Z6SGzkmAFCGOCwEtUPUkJZUwttL8x470KeSzTiJxH2JMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=WZYAC5pt; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Psg2gNos; arc=none smtp.client-ip=103.168.172.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IKzIS/fF"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b6329b6e3b0so17922a12.1
-        for <linux-cifs@vger.kernel.org>; Thu, 06 Nov 2025 12:24:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762460683; x=1763065483; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z3gyUgZQhfQPtS7SLCIDf6NbyslQ68pOuETZ2b4hfpg=;
-        b=IKzIS/fFRLupOYMhAxubkYmOMf1iYd0JtSGu6N6tjdphDY2T+lfSFlleOabM79FN56
-         Xc4BiYJcoO2yRft4fhIiiYjYyeO7ZY290lVgGmyJDaSg1qEtZjZaZnKrw0R6J+lFganu
-         InG87B1W4nncZe4GN2aWhII1F7jvu5cokGXaNGDU+U6mVBmr72wWeaxgajY3uA+Qe5dg
-         irGl0Pis5EDMCeH6qatxrr9VPL9MymKX+OfYaq13RJo8IRtXPJNwr9i4mmekwj6E/hYq
-         LOZDBCz90b2Za4RhRuMFtE8A7mVpVKK9stsAJnIqwXImh1dNG81H1gHMpOGD2wR1LQwM
-         QIWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762460683; x=1763065483;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=z3gyUgZQhfQPtS7SLCIDf6NbyslQ68pOuETZ2b4hfpg=;
-        b=sWFp8ZnHbQ/Q7WpSEgztjqoTG2BKScKhvVR0FdMitVa+fEIT6X5NGhGBx73kgYh0gp
-         OkLZBa1+ZeZu9lNyY/N2LOKwrjCcx0F3/51W+OpHhP9DLqslwlLYqckbvzLS3wxdd3UF
-         AUlZSOLUQ3gtPefzIL13hr6uV/wql+ZoxS2fDsTy7t5ArsXtY1DC6YqdT29mWtirXvwi
-         O8MfamGEETfA1JhU1sG7/gF+dCluVxWiy+y1T8hMRQ6keN4/c1pyJSVCiU5t5EAiohAL
-         OoHNmZfxbdly0vP24mDnRIrlKP1Y+uNnjK3DqMXN6KtilY7GXl9NgS/jPmpsmUKJuuc5
-         0wyA==
-X-Forwarded-Encrypted: i=1; AJvYcCWVj94Vh06CUYU/KJ2MgKjEXQkgCJN3aqLEZH3v4UHt0o/kclr9IqfeMe3Z56ZlQNOA9dyVXV3W7A+d@vger.kernel.org
-X-Gm-Message-State: AOJu0YyovHW2aXY5WJaJo/AzeN+3mCpX9qDbwJ5I7o/7x5BmkkD2CKkV
-	4qG4LGckIUVcACi3LjcXHglL7UdJFb52xm4eOKdyliSl+EHOKftrbJxytlCf56hZCWNRvUlbT45
-	KYeul7JC++RhVh7m3lpHO7GgrubISjVXj/T72cN8=
-X-Gm-Gg: ASbGncuS++ZqX7R6r+tqI8RkBGsIzZ6WLZYQPoKPrJxxvno6MCx0vFcy8Ipta53WZJG
-	QRALA5HeS5eKYto7Jm8/wpR9sntPPsVhPS6Ac1zq4VZ/7WaVTbRb4eICxy0b6FdP0Nt033RrBbN
-	L+YUuPyJ6cWJoUXY6OoycMqoGSWrkhWdMVhzKm+At0mbJKKnPugsXFShFkDxz0IC4aK/UuNcPPX
-	l75PTW6W2sFqj5TeDCoBvOJxf/yHz8Zb55uhJHUXc+iWqx66Nfqh57fjGCPAgj8mjXDpzFNojHW
-	wNpjMzJhYXYxRRIaO3ey8OdA2x++VQ==
-X-Google-Smtp-Source: AGHT+IGTWzJU0xlvlovHbYWoDH5XM24Ae1wEThKwWG8ycDKpQ4Pza4FucwMrn4xnT46tQsURsHTnLGHE4XvA3l/bTbM=
-X-Received: by 2002:a17:902:da86:b0:267:912b:2b36 with SMTP id
- d9443c01a7336-297c00de2ecmr9261995ad.23.1762460682652; Thu, 06 Nov 2025
- 12:24:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="WZYAC5pt";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Psg2gNos"
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailflow.phl.internal (Postfix) with ESMTP id 2F76A13801BB;
+	Thu,  6 Nov 2025 19:01:16 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-12.internal (MEProxy); Thu, 06 Nov 2025 19:01:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm3; t=
+	1762473676; x=1762480876; bh=H6fp6wT7I155+JjI5U+YS+I+wpfi8UjlpY4
+	LU8fjdU4=; b=WZYAC5ptT+JI+E3LCYQDPMrHgn2+EeezTwSX9Fj81LnO57sEIW0
+	r5bog5i33AtRsNThYOW5jDpkHJo5LmpOQU7UBC/WI2CsBHqkVpPTyHV/ApxUM1tN
+	z6dVSfEJthkopAMT44s7CyEjRA2sDrA7Y2ef+eMrFuZp33UeziEFvqR18wUswgoZ
+	7iPlUWWsOUPV/ZTTFBfyHToZxwjR9SvGXXZHsmi76QwHLy2cwbWHeeTpiMc4d1Bx
+	XeBUu2V3z1ClTvl5FdR+kiB+ei1mybka1yZ1GjCONTkXDJfd+mNjp5j/C8/VHSTP
+	dThaFVWL2uE50jq2dsohAmGrZdbMqVO7Ang==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762473676; x=
+	1762480876; bh=H6fp6wT7I155+JjI5U+YS+I+wpfi8UjlpY4LU8fjdU4=; b=P
+	sg2gNosOUgNreOPGLlVE9k8r0A93bFTvKl0A1YiFCaR0/yxDdKMWNofRmX2pbv2C
+	pRquqzDxvSlnoOFKUo3q0Ir6NiXbOSxcJH8T5/d9/oXcWZsBYNknHCW+NvYGKU2G
+	Ni1/LdQGu7Us7ontcePjlATrS/pgRVzjGEEX7HanmFiC2g+ePTDJ5SSAtpJBah0H
+	UWRXuHQQCAsLEu8BLIO90FsUNkSBOy8aoz2K3RYVbczfmOyGIUeyWzmqDvAPkDRA
+	jQU6SMudoXVNKkegC9Kaz3mNZdYl5nPuZwKwE6TAABXrWOiDglM1NlGb8+vPxFje
+	mse7RGNm/dK9IXvzGfidw==
+X-ME-Sender: <xms:xDYNaRhNbUJHsahPPmb6piowRnF47nS9W-BDbBUWZMioGCLB0QKE0Q>
+    <xme:xDYNadGCoPUcs45mlm9G-M-v6BypV59NlC8i5D0rXfDdqG1vicJvxUwSAeEgzm-AW
+    mM9E_dg4ffodJEGnHgTyJ5KyY9-2grnnN8X99UhFArcj-pfDw>
+X-ME-Received: <xmr:xDYNaZhYRnJe2Zwy43UTfxOwR_mAMlSeo2ztdDGjHNPtTGiDI9p-9jO_eGsbdcJ0bT11eVgdtj8wsq09LuBid3ldax93JTUA9nFc7WrB4ws3>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeekudeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
+    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epleejtdefgeeukeeiteduveehudevfeffvedutefgteduhfegvdfgtdeigeeuudejnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
+    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepleegpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
+    hrtghpthhtohepfhhrrghnkhdrlhhisehvihhvohdrtghomhdprhgtphhtthhopehlihhn
+    uhigqdigfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugi
+    dquhhnihhonhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
+    uhigqdhnihhlfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinh
+    hugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhig
+    qdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuh
+    igqdhhrghruggvnhhinhhgsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    lhhinhhugidqfhhsuggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:xDYNaRZM3kLhMQrgyC03y_mvDTyKIhHr-UZRyaVoDw1bUdd3TO5KWQ>
+    <xmx:xDYNab6BMLI1rNIb697RuBsl1xbiAOh3-jJjQLerAQCMMocsAIIZ6A>
+    <xmx:xDYNaWzpKwiCJssErWAKaC5Omh24WDMdd_ESMwy-1QKK0c3T8HNikg>
+    <xmx:xDYNadOOkUDnvT6bORX3tFjgvG8jH6RVTiJmdbw7J549hUUGJI3E9w>
+    <xmx:zDYNaZmP4HdGrgNN2fuf1yLCRS5MEi7pUT3ZiXhJ138U_-MYPTZPl43i>
+Feedback-ID: iab3e480c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 6 Nov 2025 19:00:45 -0500 (EST)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1761748557.git.lucien.xin@gmail.com> <32c7730d3b0f6e5323d289d5bdfd01fc22d551b5.1761748557.git.lucien.xin@gmail.com>
- <43ea4062-75a8-4152-bf19-2eca561036bd@redhat.com>
-In-Reply-To: <43ea4062-75a8-4152-bf19-2eca561036bd@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 6 Nov 2025 15:24:30 -0500
-X-Gm-Features: AWmQ_blGjOQ50fcZQT5EtzHNncMYn6qzWEjBf9UHnF498_0zXTgvgxEng025WXQ
-Message-ID: <CADvbK_d8WoKJkU7ACK6nzbv7hzxxkAYZ5--DPzVQHsSZbEJnuw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 09/15] quic: add congestion control
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: NeilBrown <neilb@ownmail.net>
+To: "Jeff Layton" <jlayton@kernel.org>
+Cc: "Eric Van Hensbergen" <ericvh@kernel.org>,
+ "Latchesar Ionkov" <lucho@ionkov.net>,
+ "Dominique Martinet" <asmadeus@codewreck.org>,
+ "Christian Schoenebeck" <linux_oss@crudebyte.com>,
+ "David Sterba" <dsterba@suse.com>, "David Howells" <dhowells@redhat.com>,
+ "Marc Dionne" <marc.dionne@auristor.com>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
+ "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+ "Chris Mason" <clm@fb.com>, "Xiubo Li" <xiubli@redhat.com>,
+ "Ilya Dryomov" <idryomov@gmail.com>, "Jan Harkes" <jaharkes@cs.cmu.edu>,
+ coda@cs.cmu.edu, "Tyler Hicks" <code@tyhicks.com>,
+ "Jeremy Kerr" <jk@ozlabs.org>, "Ard Biesheuvel" <ardb@kernel.org>,
+ "Namjae Jeon" <linkinjeon@kernel.org>,
+ "Sungjong Seo" <sj1557.seo@samsung.com>,
+ "Yuezhang Mo" <yuezhang.mo@sony.com>, "Theodore Ts'o" <tytso@mit.edu>,
+ "Andreas Dilger" <adilger.kernel@dilger.ca>,
+ "Jaegeuk Kim" <jaegeuk@kernel.org>, "Chao Yu" <chao@kernel.org>,
+ "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>,
+ "Miklos Szeredi" <miklos@szeredi.hu>,
+ "Andreas Gruenbacher" <agruenba@redhat.com>,
+ "Viacheslav Dubeyko" <slava@dubeyko.com>,
+ "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
+ "Yangtao Li" <frank.li@vivo.com>, "Richard Weinberger" <richard@nod.at>,
+ "Anton Ivanov" <anton.ivanov@cambridgegreys.com>,
+ "Johannes Berg" <johannes@sipsolutions.net>,
+ "Mikulas Patocka" <mikulas@artax.karlin.mff.cuni.cz>,
+ "Muchun Song" <muchun.song@linux.dev>,
+ "Oscar Salvador" <osalvador@suse.de>,
+ "David Hildenbrand" <david@redhat.com>,
+ "David Woodhouse" <dwmw2@infradead.org>,
+ "Dave Kleikamp" <shaggy@kernel.org>,
+ "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>,
+ "Ryusuke Konishi" <konishi.ryusuke@gmail.com>,
+ "Konstantin Komarov" <almaz.alexandrovich@paragon-software.com>,
+ "Mark Fasheh" <mark@fasheh.com>, "Joel Becker" <jlbec@evilplan.org>,
+ "Joseph Qi" <joseph.qi@linux.alibaba.com>,
+ "Bob Copeland" <me@bobcopeland.com>,
+ "Mike Marshall" <hubcap@omnibond.com>,
+ "Martin Brandenburg" <martin@omnibond.com>,
+ "Amir Goldstein" <amir73il@gmail.com>,
+ "Steve French" <sfrench@samba.org>, "Paulo Alcantara" <pc@manguebit.org>,
+ "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
+ "Shyam Prasad N" <sprasad@microsoft.com>, "Tom Talpey" <tom@talpey.com>,
+ "Bharath SM" <bharathsm@microsoft.com>,
+ "Zhihao Cheng" <chengzhihao1@huawei.com>,
+ "Hans de Goede" <hansg@kernel.org>, "Carlos Maiolino" <cem@kernel.org>,
+ "Hugh Dickins" <hughd@google.com>,
+ "Baolin Wang" <baolin.wang@linux.alibaba.com>,
+ "Andrew Morton" <akpm@linux-foundation.org>,
+ "Kees Cook" <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ linux-kernel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
+ linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+ codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, gfs2@lists.linux.dev,
+ linux-um@lists.infradead.org, linux-mm@kvack.org,
+ linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+ linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
+ ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
+ linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
+ linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-xfs@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+Subject:
+ Re: [PATCH] vfs: remove the excl argument from the ->create() inode_operation
+In-reply-to: <f5927a9bb985b9ad241bc5f9fc32acfd35340222.camel@kernel.org>
+References: <20251105-create-excl-v1-1-a4cce035cc55@kernel.org>,
+ <176237780417.634289.15818324160940255011@noble.neil.brown.name>,
+ <6758176514cdd6e2ceacb3bd0e4d63fb8784b7c6.camel@kernel.org>,
+ <f5927a9bb985b9ad241bc5f9fc32acfd35340222.camel@kernel.org>
+Date: Fri, 07 Nov 2025 11:00:34 +1100
+Message-id: <176247363419.634289.473957828516111884@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-On Tue, Nov 4, 2025 at 7:02=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 10/29/25 3:35 PM, Xin Long wrote:
-> > +/* Compute and update the pacing rate based on congestion window and s=
-moothed RTT. */
-> > +static void quic_cong_pace_update(struct quic_cong *cong, u32 bytes, u=
-32 max_rate)
-> > +{
-> > +     u64 rate;
-> > +
-> > +     /* rate =3D N * congestion_window / smoothed_rtt */
-> > +     rate =3D (u64)cong->window * USEC_PER_SEC * 2;
-> > +     if (likely(cong->smoothed_rtt))
-> > +             rate =3D div64_ul(rate, cong->smoothed_rtt);
-> > +
-> > +     WRITE_ONCE(cong->pacing_rate, min_t(u64, rate, max_rate));
-> > +     pr_debug("%s: update pacing rate: %u, max rate: %u, srtt: %u\n",
-> > +              __func__, cong->pacing_rate, max_rate, cong->smoothed_rt=
-t);
->
-> I think you should skip entirely the pacing_rate update when
-> `smoothed_rtt =3D=3D 0`
->
-will update it.
+On Fri, 07 Nov 2025, Jeff Layton wrote:
+> On Thu, 2025-11-06 at 07:07 -0500, Jeff Layton wrote:
+> > On Thu, 2025-11-06 at 08:23 +1100, NeilBrown wrote:
+> > > On Thu, 06 Nov 2025, Jeff Layton wrote:
+> > > > Since ce8644fcadc5 ("lookup_open(): expand the call of vfs_create()"),
+> > > > the "excl" argument to the ->create() inode_operation is always set to
+> > > > true. Remove it, and fix up all of the create implementations.
+> > >=20
+> > > nonono
+> > >=20
+> > >=20
+> > > > @@ -3802,7 +3802,7 @@ static struct dentry *lookup_open(struct nameid=
+ata *nd, struct file *file,
+> > > >  		}
+> > > > =20
+> > > >  		error =3D dir_inode->i_op->create(idmap, dir_inode, dentry,
+> > > > -						mode, open_flag & O_EXCL);
+> > > > +						mode);
+> > >=20
+> > > "open_flag & O_EXCL" is not the same as "true".
+> > >=20
+> > > It is true that "all calls to vfs_create() pass true for 'excl'"
+> > > The same is NOT true for inode_operations.create.
+> > >=20
+> >=20
+> > I don't think this is a problem, actually:
+> >=20
+> > Almost all of the existing ->create() operations ignore the "excl"
+> > bool. There are only two that I found that do not: NFS and GFS2. Both
+> > of those have an ->atomic_open() operation though, so lookup_open()
+> > will never call ->create() for those filesystems. This means that -
+> > > create() _is_ always called with excl =3D=3D true.
+>=20
+> How about this for a revised changelog, which makes the above clear:
+>=20
+>     vfs: remove the excl argument from the ->create() inode_operation
+>    =20
+>     Since ce8644fcadc5 ("lookup_open(): expand the call of vfs_create()"),
+>     the "excl" argument to the ->create() inode_operation is always set to
+>     true in vfs_create().
+>    =20
+>     There is another call to ->create() in lookup_open() that can set it to
+>     either true or false. All of the ->create() operations in the kernel
+>     ignore the excl argument, except for NFS and GFS2. Both NFS and GFS2
+>     have an ->atomic_open() operation, however so lookup_open() will never
+>     call ->create() on those filesystems.
+>    =20
+>     Remove the "excl" argument from the ->create() operation, and fix up the
+>     filesystems accordingly.
 
-> [...]> +/* rfc9002#section-5: Estimating the Round-Trip Time */
-> > +void quic_cong_rtt_update(struct quic_cong *cong, u32 time, u32 ack_de=
-lay)
-> > +{
-> > +     u32 adjusted_rtt, rttvar_sample;
-> > +
-> > +     /* Ignore RTT sample if ACK delay is suspiciously large. */
-> > +     if (ack_delay > cong->max_ack_delay * 2)
-> > +             return;
-> > +
-> > +     /* rfc9002#section-5.1: latest_rtt =3D ack_time - send_time_of_la=
-rgest_acked */
-> > +     cong->latest_rtt =3D cong->time - time;
-> > +
-> > +     /* rfc9002#section-5.2: Estimating min_rtt */
-> > +     if (!cong->min_rtt_valid) {
-> > +             cong->min_rtt =3D cong->latest_rtt;
-> > +             cong->min_rtt_valid =3D 1;
-> > +     }
-> > +     if (cong->min_rtt > cong->latest_rtt)
-> > +             cong->min_rtt =3D cong->latest_rtt;
-> > +
-> > +     if (!cong->is_rtt_set) {
-> > +             /* rfc9002#section-5.3:
-> > +              *   smoothed_rtt =3D latest_rtt
-> > +              *   rttvar =3D latest_rtt / 2
-> > +              */
-> > +             cong->smoothed_rtt =3D cong->latest_rtt;
-> > +             cong->rttvar =3D cong->smoothed_rtt / 2;
-> > +             quic_cong_pto_update(cong);
-> > +             cong->is_rtt_set =3D 1;
-> > +             return;
-> > +     }
-> > +
-> > +     /* rfc9002#section-5.3:
-> > +      *   adjusted_rtt =3D latest_rtt
-> > +      *   if (latest_rtt >=3D min_rtt + ack_delay):
-> > +      *     adjusted_rtt =3D latest_rtt - ack_delay
-> > +      *   smoothed_rtt =3D 7/8 * smoothed_rtt + 1/8 * adjusted_rtt
-> > +      *   rttvar_sample =3D abs(smoothed_rtt - adjusted_rtt)
-> > +      *   rttvar =3D 3/4 * rttvar + 1/4 * rttvar_sample
-> > +      */
-> > +     adjusted_rtt =3D cong->latest_rtt;
-> > +     if (cong->latest_rtt >=3D cong->min_rtt + ack_delay)
-> > +             adjusted_rtt =3D cong->latest_rtt - ack_delay;
-> > +
-> > +     cong->smoothed_rtt =3D (cong->smoothed_rtt * 7 + adjusted_rtt) / =
-8;
->
-> Out of sheer curiosity, is the compiler smart enough to use a 'srl 3'
-> for the above?
->
-Yes.
+Thanks, that is a substantial improvement.  I see your point now and I
+think this is a really nice cleanup to make - thanks.
 
-266 cong->smoothed_rtt =3D (cong->smoothed_rtt * 7 + adjusted_rtt) / 8;
+I think the commit message could be improved further by leading with the
+detail that is central - that most ->create function ignore 'excl'.
 
-0x593d <+77>:  mov    (%rbx),%ecx         ; ecx =3D cong->smoothed_rtt
-0x593f <+79>:  lea    (%rax,%rcx,8),%edx   ; edx =3D adjusted_rtt + (ecx * =
-8)
-0x5942 <+82>:  sub    %ecx,%edx           ; edx =3D adjusted_rtt +
-(8*ecx) - ecx =3D ecx*7 + adjusted_rtt
-0x5946 <+86>:  shr    $0x3,%edx           ; edx >>=3D 3 =E2=86=92 divide by=
- 8
-0x594d <+93>:  mov    %edx,(%rbx)         ; store result back to
-cong->smoothed_rtt
+ With two exceptions, ->create() methods provided by filesystems ignore
+ the "excl" flag.  Those exception are NFS and GFS2 which both also
+ provide ->atomic_open.
 
-Thanks.
+ excl is always true when ->create is called from vfs_create() (since
+ commit......) so the only time it can be false is when it is called by
+ lookup_open() for filesystems that do not provide ->atomic_open.
+
+ So the excl flag to ->create is either ignored or true.  So we can
+ remove it and change NFS and GFS2 to acts as though it were true.
+
+>=20
+> Maybe we also need some comments or updates to Documentation/ to make
+> it clear that ->create() always implies O_EXCL semantics?
+
+Definitely, something in porting.rst and something in vfs.rst.
+
+I would be worth saying somewhere that if the fs needs to mediate
+non-exclusive creation, it must provide atomic_open().
+
+Thanks,
+NeilBrown
+
+
+> --=20
+> Jeff Layton <jlayton@kernel.org>
+>=20
+
