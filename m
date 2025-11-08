@@ -1,144 +1,162 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D870F1A262A
-	for <linux-cifs@vger.kernel.org>; Sat,  8 Nov 2025 04:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6822C0270;
+	Sat,  8 Nov 2025 06:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762576664; cv=none; b=EjevuQfWl30zaiAEJkYtVNlmZAoUfxnmG/JpZU2kxPNkDG/j8enH0MXn0ongVtkA9pHXNC+tdzHSHDYOJwu7CgaznVrjEgzG9GwAw135lPBSt/JL1ZaFE5hYpEBP/PmCrrPbzBJnYj/S+zFRsbo+exGgLb65P+aXfqY7H8ZcDKI=
+	t=1762582386; cv=none; b=h1pusQwfaQxnPeg6yU3BqrThk4NwPltas9Shxy60ruowit28ttmw02GAZer2DX6aHj4SYN6RT7Ay32QppMdQarTBfFmUP9UohsBwSLIqmHM9IjQdULOolIb7ltCUJ4DciUgXu2FYv8MpFmDC4+9a7EjRsX60UtHHWw2RXcYVY5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762576664; c=relaxed/simple;
-	bh=eLraf8FnW47yTxroFlhzJ1U9czGxv2PN4l/nHj3JSNQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VfEs5ZA0N56KJT9y88NAJz2xm1bae6Shi1Z4uvXDupdnniFgHn4QR8vkqRZg//I+NhqR5YCivsF3/+YM7UBhtiPnnWjIrV5s3XQacDCpLtrEWmJ2X/EuUgx1nFPlqrjW1Wrh8ngp1afycAcchoomZo+VWlCU40eB+Hl31JIkbtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WYfYf0HM; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762582386; c=relaxed/simple;
+	bh=DgH5GUT7j3a/+liLaMLDQ+ppgc87s/ERzvidbBqi8Oc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bkikl/JRoX4zln4YTg/f/wrUrA+yGv5EE4xNA2rco9ct1p3/Ep5t5+ccuLWMtRTY0rjfC0TZpHDgxaxIbymlkTKFPAEjnUy3Pv5GTMV9SHITJvc/mS4ym28yzZzas4icQjD63IrTsk21HMoVa6qVLROFf7rJ/2/TH8os8YoZzn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=B+D3byKt; arc=none smtp.client-ip=62.210.214.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WYfYf0HM"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b472842981fso181749266b.1
-        for <linux-cifs@vger.kernel.org>; Fri, 07 Nov 2025 20:37:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762576661; x=1763181461; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H6KLcC9Dx8BV8ZlTNUqU1ioG2cskDrJt3lJvdWPoSCY=;
-        b=WYfYf0HMt3wnUWQnAlcXqdwz/rSReqPdSQv/i2eAkUhb1MVWQVVVxtRdLooYooEb/U
-         JUiIcW6PFsASE4wu4+PaZ7C9obftP/1moFxsKrvPkUzTgg1aGihFKTXtAFHDGr2chHy4
-         dXTofmet3JJu0wuO6Kmbx9ZYbHNZJlHU6CtRib1liR9fbe1FGPKUyKNCaIXb1C+FuIfg
-         LhuJFmDBivzTeS++b2jgG7FsBDRbj4EY4cv5qZGDY6Y4WpdcfxdXCTLtgpAesQdFUkKN
-         fUs6gq7GlOT6+Ytm2UGrmRpeF3d/Lk2iG+/WWhHv6yERale7l6wDUnWy6pgjEHRLsUNc
-         HiYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762576661; x=1763181461;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=H6KLcC9Dx8BV8ZlTNUqU1ioG2cskDrJt3lJvdWPoSCY=;
-        b=fvJ0h7GlfkeT7Lc/O8qUUazr7x4DYuj4u7vEgqavFE8UUf2WASLunb4T+P0Cetw0c4
-         Z8+XodLzZjT8E17wkGl4SGlXCy+OguCuinegVzw3B82UOyssrpqz2JyNhQXWUtdErYUY
-         EOBT+vkWF2g/loPqULERaJQefGOnpmJpJ8l0hjGgUcW2Qoq1zy2q0S+BSWrJgMdPsjBR
-         DrL4FUb9uhiUOmHUWZ6NtutYQPR748Vb5oBE47go66g8dmEohRnufJ6FKBla3VU2fTXm
-         CN99im1j0j2bnO52a7A0kNN7kneRdobwkvkHRa7Tk9SVZsD3kARCmorXU8nF7/qMcDo3
-         E41Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVU+WHNTa/kPhLSCiNkbZWyZUFG3JxahdL98H0AsmJdj5njo2VIw4CNP3Yae0Rsw1n0AUsn9AMhm91p@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpqPFMmUuVGclHhfwVa/czZgZRIKVRR5a03DSgX4BB28l7lZbL
-	PaJCbaxa+mN80SqftxOJHcZdN69z1X/z0kUh0Yx5vAfGgorJnhtK+IXlyVnHEjPXRKD9lJXqByV
-	jxG1lZNENdUES21gm62DVDqcvyA/GhSWvISeV
-X-Gm-Gg: ASbGncslWvI8OZFT0Xfje7/q1Pn6XOb5acvT7Tf1cDEEcHkPoekZOnVBXgTqOKoCpUN
-	qoZi3YdDwelI5uj/3nhNOVQYyBY8WLJkdFH8WlIvcObANLncj5QQ3CeSqTv9W4NkDnzgWLkQcsi
-	OI/dogmfz5maaL1w/sRnesQAFSAwbQkMVn8Af3FDrfmQ/sfX4JGZ0x8ytOaEyymlZ0X63Qp6r4/
-	AzrpGpV+74/9TJ5Pl4LvQ3MSt3WX1yaFnTnBPV3RW/6qJOKXwscbbrJEaE=
-X-Google-Smtp-Source: AGHT+IFUOYrLUjrCzhLUZre+v6Aa6zfSgpAO4H/Sa1EvhIkcpBMMwXynhux90SF7ym9IAId8uEW/McesBeE+VjgIC5I=
-X-Received: by 2002:a17:906:794b:b0:b72:5734:9fd3 with SMTP id
- a640c23a62f3a-b72e05626b1mr169599366b.32.1762576661108; Fri, 07 Nov 2025
- 20:37:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="B+D3byKt"
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by submarine.notk.org (Postfix) with ESMTPS id A419014C2D3;
+	Sat,  8 Nov 2025 07:12:27 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
+	s=2; t=1762582373;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LTM5LkyL3mfB0IbHJeS1oRharyj4iNDNdaZ7y5irjmg=;
+	b=B+D3byKtJ5aLyRiu2rooP0B2TJlyh9NnWKaBHKY3oGl5WrI9R/ZTOokRqfrmQkRjA4d6PF
+	hVA+2jtaIxDHKJVm19YOlIu00RJFzbMjiJ2IJMY5v8SjTtfCjEZWBxEPfRtzuPasj++KiY
+	8Sahe5eVbfmwmhQeo5uzL3Rp7AKK7Nzr7m3ipU5qmaiTEStLej1x9iBcfVqKnY9WidAi8X
+	rwVB6qqUGBZMEcUSkoPWBbqf240gmgWcLbAb7B4RNHuho0O1rPy72OuweBfiXGGrgaJqO1
+	amO1aDXHVrMyRWIApKs7c+o9NFvUODZZvMkcXugNCGdZ2S65dzPgh2BACKmoHA==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 26a2c8b4;
+	Sat, 8 Nov 2025 06:12:25 +0000 (UTC)
+Date: Sat, 8 Nov 2025 15:12:10 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	David Sterba <dsterba@suse.com>,
+	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+	Chris Mason <clm@fb.com>, Xiubo Li <xiubli@redhat.com>,
+	Ilya Dryomov <idryomov@gmail.com>, Jan Harkes <jaharkes@cs.cmu.edu>,
+	coda@cs.cmu.edu, Tyler Hicks <code@tyhicks.com>,
+	Jeremy Kerr <jk@ozlabs.org>, Ard Biesheuvel <ardb@kernel.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Sungjong Seo <sj1557.seo@samsung.com>,
+	Yuezhang Mo <yuezhang.mo@sony.com>, Theodore Ts'o <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Yangtao Li <frank.li@vivo.com>, Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	David Hildenbrand <david@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Dave Kleikamp <shaggy@kernel.org>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Bob Copeland <me@bobcopeland.com>,
+	Mike Marshall <hubcap@omnibond.com>,
+	Martin Brandenburg <martin@omnibond.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	Hans de Goede <hansg@kernel.org>, Carlos Maiolino <cem@kernel.org>,
+	Hugh Dickins <hughd@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	NeilBrown <neilb@ownmail.net>, linux-kernel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-btrfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu,
+	ecryptfs@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	gfs2@lists.linux.dev, linux-um@lists.infradead.org,
+	linux-mm@kvack.org, linux-mtd@lists.infradead.org,
+	jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org,
+	linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
+	ocfs2-devel@lists.linux.dev,
+	linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
+	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-xfs@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2] vfs: remove the excl argument from the ->create()
+ inode_operation
+Message-ID: <aQ7fOmknHIxcxuha@codewreck.org>
+References: <20251107-create-excl-v2-1-f678165d7f3f@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5mtLBAwfk7YbgRkCnA4S7uNyiTGs7kDssa697pci=rCYDw@mail.gmail.com>
- <ONR9GWFvdJx39b1jAUTFBGjhqlY1LgZhwHECF_OroUZSCW0dGQHjcNSBDtiLfxdP1-Ly3UufUTo17bw5Kea5LTglBll2vZjWw9V8aGnMKvg=@joshua.hu>
- <CAH2r5mvcOwmJjSyewm06uyEfXKsfdEWS9ZYgr3aiD-ia+XF2Qg@mail.gmail.com>
-In-Reply-To: <CAH2r5mvcOwmJjSyewm06uyEfXKsfdEWS9ZYgr3aiD-ia+XF2Qg@mail.gmail.com>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Sat, 8 Nov 2025 10:07:29 +0530
-X-Gm-Features: AWmQ_bnAzeAV8cXMrG46l165Or5ZKqBnl4yPFEx9P82OTC9TG2Ce3WlQKu2uTmY
-Message-ID: <CANT5p=rLO8t6aHPO3qMKXzVOVuN3HPtUo0rGuHh0PFBbcRSfOA@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: validate change notify buffer before copy
-To: Steve French <smfrench@gmail.com>
-Cc: Joshua Rogers <reszta@joshua.hu>, CIFS <linux-cifs@vger.kernel.org>, 
-	Joshua Rogers <linux@joshua.hu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251107-create-excl-v2-1-f678165d7f3f@kernel.org>
 
-On Fri, Nov 7, 2025 at 10:01=E2=80=AFPM Steve French <smfrench@gmail.com> w=
-rote:
->
-> Added mention of it in the description (see below).  Let me know if
-> that is incorrect.   Interesting that I don't see other kernel patches
-> noting that interesting sounding tool (yet)
->
->     smb: client: validate change notify buffer before copy
->
->     SMB2_change_notify called smb2_validate_iov() but ignored the return
->     code, then kmemdup()ed using server provided OutputBufferOffset/Lengt=
-h.
->
->     Check the return of smb2_validate_iov() and bail out on error.
->
->     Discovered with help from the ZeroPath security tooling.
->
->     Signed-off-by: Joshua Rogers <linux@joshua.hu>
->     Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
->     Cc: stable@vger.kernel.org
->     Fixes: e3e9463414f61 ("smb3: improve SMB3 change notification support=
-")
->     Signed-off-by: Steve French <stfrench@microsoft.com>
->
-> On Fri, Nov 7, 2025 at 9:22=E2=80=AFAM Joshua Rogers <reszta@joshua.hu> w=
-rote:
-> >
-> > Is it possible to slightly change the commit msg to include "Found with=
- ZeroPath"? As this bug was, indeed, found with a tool called ZeroPath.
-> >
-> > Thank you.
-> >
-> >
-> > On Friday, 7 November 2025 at 11:23, Steve French <smfrench@gmail.com> =
-wrote:
-> >
-> > >
-> > >
-> > > SMB2_change_notify called smb2_validate_iov() but ignored the return
-> > > code, then kmemdup()ed using server provided OutputBufferOffset/Lengt=
-h.
-> > >
-> > > Check the return of smb2_validate_iov() and bail out on error.
-> > >
-> > > See attached (lightly updated to fix checkpatch warnings from Joshua'=
-s
-> > > original patch)
-> > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
->
-Looks good to me.
+Jeff Layton wrote on Fri, Nov 07, 2025 at 10:05:03AM -0500:
+> With two exceptions, ->create() methods provided by filesystems ignore
+> the "excl" flag.  Those exception are NFS and GFS2 which both also
+> provide ->atomic_open.
+> 
+> Since ce8644fcadc5 ("lookup_open(): expand the call of vfs_create()"),
+> the "excl" argument to the ->create() inode_operation is always set to
+> true in vfs_create(). The ->create() call in lookup_open() sets it
+> according to the O_EXCL open flag, but is never called if the filesystem
+> provides ->atomic_open().
+> 
+> The excl flag is therefore always either ignored or true.  Remove it,
+> and change NFS and GFS2 to act as if it were always true.
+> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
 
---=20
-Regards,
-Shyam
+Good cleanup, just one whitespace nitpick below but:
+Reviewed-by: Dominique Martinet <asmadeus@codewreck.org>
+
+
+> diff --git a/Documentation/filesystems/vfs.rst b/Documentation/filesystems/vfs.rst
+> index 4f13b01e42eb5e2ad9d60cbbce7e47d09ad831e6..7a55e491e0c87a0d18909bd181754d6d68318059 100644
+> --- a/Documentation/filesystems/vfs.rst
+> +++ b/Documentation/filesystems/vfs.rst
+> @@ -505,7 +505,10 @@ otherwise noted.
+>  	if you want to support regular files.  The dentry you get should
+>  	not have an inode (i.e. it should be a negative dentry).  Here
+>  	you will probably call d_instantiate() with the dentry and the
+> -	newly created inode
+> +        newly created inode. This operation should always provide O_EXCL
+
+This and the block below change halfway from tab (old text) to spaces
+(your patch)
+
+Looks like the file has a few space-indented sections though so it won't
+be the first if that goes in as is, the html-rendering doesn't seem to
+care :)
+
+Cheers,
+-- 
+Dominique Martinet | Asmadeus
