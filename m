@@ -1,113 +1,177 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778312253FC
-	for <linux-cifs@vger.kernel.org>; Sat,  8 Nov 2025 15:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92FF5219A7D
+	for <linux-cifs@vger.kernel.org>; Sat,  8 Nov 2025 16:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762617447; cv=none; b=RV11caXs/IkhmUCquoz9EUNWmw9ev+ge+mQ5fTOzyItNYP0OyvAYuv0ym2P+3paShUEGkyMQGhk257GWHjj6U4FpOO3yEu+jW9kVYegam1/7oaRYgqDuP4jNEOKCnrOwtvnkisd+MDsSb09Jh+Pr0oG4ciaUsY2JA20DykIChfc=
+	t=1762617616; cv=none; b=r/OE4rkhvlZEXQxn27/ifg6lfM0GCYa88s8utcu1DcUj2N+FwEELlo+U6Y6P9Pu1MOd4L/fn14NoOMOEPoEYUdDJawoi32T0Uiw8FSyY2keVX03NrRJL6HGDw5EMeRZS6l5asOquShJQ6W/XQ2xF90mOWrMUTBqZj8ERtnWmQTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762617447; c=relaxed/simple;
-	bh=1B6qJxhbK00jLGFc+/1YeYK+A12GIKfCTEsHFV4BWFE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MZSgmLctyo2tR9BbEDmFqhgT+z7KFF+5rEUWa/zDEP/YCA6fTG4o/2so/Sk/doBTvVGzCyHxbTUTiCUDge5edsR25bZNuDarNxucGRO+726iLoUJV0Bn5GfISswSS9yZO9HD9ZoGamVeT2KlwkWBm/Bzfr2iGVQh1wXBnFA2/b4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NPhw8UE+; arc=none smtp.client-ip=209.85.216.52
+	s=arc-20240116; t=1762617616; c=relaxed/simple;
+	bh=bFsXLkOC7htAcCK4FnqqlbRFpr/P4o9KOYs3YriLlAU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bW9YAu9pxFizklbe7dhMcMxCDulIntB9+KrM0iu09g0JlLcE2q30wUgz/KWLBXBol30KLTQwg5UWCHdJ291sWRq9CMxHq1KUyNd5+M5cYU4VCgM+a/Dv5ftC6n70896g9SYhUvKpi9mti6sQ5fgQXllT/pCNIwIFP+JTewG75GM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Is+gnpXv; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NPhw8UE+"
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3436b2dbfb9so63642a91.0
-        for <linux-cifs@vger.kernel.org>; Sat, 08 Nov 2025 07:57:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Is+gnpXv"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b70b40e0321so32114066b.1
+        for <linux-cifs@vger.kernel.org>; Sat, 08 Nov 2025 08:00:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762617446; x=1763222246; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1762617613; x=1763222413; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UF04VjpCgrtM4AACwnQlzOMrdSH/wb0uO//xFFcApf4=;
-        b=NPhw8UE+uGSqouH7donjkwGs8XsLpQPCFsj2zK/upWEoCA2ckn30uTNztMiwWsFhwJ
-         RUi2UQud8H7gjTorRjPKJk3d+uzhHRMvAauypLHQl7EaUI+tUKLZWSgnVfT/uta4R0/+
-         x6Rx/HLFB6O1QQfqF1rjozka19gFNDSTcYp1WO7iGAg0WvjLPRZfFvuGv8bSxHzJBgON
-         qXLHdGuLUb1CTUuCjirhLE1U+JrmKYfEF0WmdHyc3uqrfT1fna+Q7v63lktBZUM7MV1Z
-         ZvrFhOiMY6IwvPKDRPE62N9WzDhQfBVMobAD6rRpo9bgWB+KW0INgiU19HnPEdMhWXvQ
-         uHTw==
+        bh=I5gIjwY0VIkQOLBhqDqw7K5il1qhHJd5j+7PMJ2a3+Q=;
+        b=Is+gnpXvIL2ogHXDKkF/jx3CednBJYPcv22ZtpKCpu0J6ktH08cYqOTIDJlImVwAR7
+         dyadKr9LlZTSsCgGBjtMsgIKKq9aBsGeW8+r5IzXjSAjWBYZ3OVTgo6uYrq9icO6IlOF
+         IVkGhwAyMxV7ikbVVNRnmjC8mDX8vCy/GKp46scZ16Ci2LnVjKSnHNFvDEX9zuMxH2+Z
+         YVkYRdQKFphGrNMbRY2Oy4qk2av87Up9LwptxDxLnmJjZsF8Xe6/aUsnO15QPNvZ1Pkq
+         2lqsTfK94VflzWP5umoJw2LHLCqXN+zFDwGMXILfP1TShNrwOVjV7rzZcievbF7ENZ5V
+         S8/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762617446; x=1763222246;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1762617613; x=1763222413;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=UF04VjpCgrtM4AACwnQlzOMrdSH/wb0uO//xFFcApf4=;
-        b=cqjQDgcFzGwlomt0FEp/wd4We04oL86+xcP4BCndWGrLPazmn5jrFHCQ8iIDESnxhM
-         uJb91CsNpc52A7vbz+KKlnGhgqZSLQ/xJ4Vq85k7Wgjh4WDGxgSBgddZgiTFqZuA5jHh
-         v+ji079bZgrlOQF2BZHOpfx55IHDMKFomJWfcAZZLhiNqYhdbC04Owo1psfXZYOQHA2x
-         a1MmFdc7eMKzkkdOILN+e6zJpsXnEytU+hBY0EJiGK7W/vnkl9aZ9d5bBIt1rtQhcuQt
-         U/NGIEzStRVxM3HtqOq5i9al8HRwmsBNDzwEfbDWnUNchw6/l2Qzi5hV03rnIBbzxDJg
-         xmCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV37nO4Qs3s3eHJnUHrdvmYCNrsVBKYFLAL3A2qC8YvVs6A7YXJxZdcAY1jLps5zoV+UlXN3EHkUwb1@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxulbwf0p4h0Pzw9fUQOjCENlLuCk0ge9/q1vlDcxOTJRrc+Uan
-	VZZYUdALHAvU11tQTyWVC7I9yw81NOm/zEtHX30KNE651+I8goNZ1Nsw
-X-Gm-Gg: ASbGnctt2uACp4BZz4VoKMGeroctCYnWkixDeJdROBNJ1d0xD0jcyLMvhW0hlkpp/48
-	VCx37Mh+OoY0BNejcl26mrX1GzdlgUWVmu10j+4zAOw1OY3vHxAM9z0Ixl8Qn6xNH6Fc/D4+AKI
-	7aewJIGcwj7/Sg88IPOwbtuKE5TGd7s4i1d1jXGhOXGAxRmKv7I5W1ekDNeOftczF3Amws3j/4/
-	0hKQ/k1yZhabddwx6fwV6x3Nb/JBxZS8UcKXZ8b1/dIwH32mrDlZyGG4S2/8JJ4jXixF6PW8Ofp
-	cfeYlgKiQlAjIleUm/32h6IVtOp4YawSgIynum1oG5b8+g5/U/hmR3+qBSzq2eDbJu/hzQPbiSf
-	sxkG33la/Q/EXkTLp56zpOz5rXdQKPI/qkg14CbZYiMGZe5J9w0XFWkHfshHNM/ootSa+TtECx/
-	WxUEIarvoWHk7TF5MN6GjIG3g3o35JxwW1a6/7LS/t9OOn8izC7F8i+akDt4HLDLOzHq+ExvT3
-X-Google-Smtp-Source: AGHT+IH9LyA7/tnKICrBnlW9MvtAHS+5SqO+iVA2GT69gP6cJzXTVGRPCBtL5DJXPhM6hg6KNiVtoA==
-X-Received: by 2002:a05:6a20:4305:b0:2e3:a914:aabe with SMTP id adf61e73a8af0-353a026aa2fmr1974504637.2.1762617445630;
-        Sat, 08 Nov 2025 07:57:25 -0800 (PST)
-Received: from poi.localdomain (KD118158218050.ppp-bb.dion.ne.jp. [118.158.218.50])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba901c39ea7sm8200832a12.29.2025.11.08.07.57.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Nov 2025 07:57:24 -0800 (PST)
-From: Qianchang Zhao <pioooooooooip@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: gregkh@linuxfoundation.org,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	security@kernel.org,
-	Zhitong Liu <liuzhitong1993@gmail.com>,
-	Qianchang Zhao <pioooooooooip@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] ksmbd: vfs: skip lock-range check on equal size to avoid size==0 underflow
-Date: Sun,  9 Nov 2025 00:57:12 +0900
-Message-Id: <20251108155712.384021-1-pioooooooooip@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CAKYAXd-R8NGDzQ-GTM67QbCxwJTCMGNhxKBo1a0sm0XBDqftLw@mail.gmail.com>
-References: <CAKYAXd-R8NGDzQ-GTM67QbCxwJTCMGNhxKBo1a0sm0XBDqftLw@mail.gmail.com>
+        bh=I5gIjwY0VIkQOLBhqDqw7K5il1qhHJd5j+7PMJ2a3+Q=;
+        b=T5oQ8FBoajuAXv0tZUjVjHc/de+BVU7asRlxgsIPO/F12PZUa/C4EQdZ8/tZgiMQ6y
+         fH+f7fjUFDsxcjMbH3Ik05bzysHupvaAp3xOhEs0ckPgJm/rjhqH2IwVdcquJcZE7iQX
+         fXV4xjm4MSYbEhhxgg8A7iPp8/a/XT1DGNledW6NyGtgCmF+/vgvU3Qb4AS+pKQXP6r8
+         enEGynndHVwqO/hy7q1UGmq960cPvpjyHkgK17o5SCBaKGpcApQN5uwLtCWdSXU889zO
+         QGn6FVRLObvEQlM/BFTVJfkl7NN0CTIKhlAdTyJzFV2eMLdZ+KVTpwVvaqYn2bHrMtS7
+         8GOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUK4YN07JRcyFst4zcK35bFn1LGKTm65oftQ+amxwYZBbRSP0Shvhnu3UzqWXpyjqS+pTZ7nNsPlw5r@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy64hdE1GyR8YdAKngvfkTmcoatjQEPqAm7pFdz8ru/rc+ovDGd
+	icnO74chkD5wdYR9e3zWz8PwZotAqFVNieedfUFEFMPjk/C60gV6nJ+7nupml0VeQ67nPWRP8aV
+	F9bSaqw1IoIuduFpb0KPuB+uYnha6Pys=
+X-Gm-Gg: ASbGncst/bqdJPN1i0XsH/Goy5L9GmI8x/GrYxHL3VY8SAg1mUl/CnMqqvUwTB1k+c1
+	pLtWfWY5Imm5k6mmMm8oiAkbK7a2mRI/p/3g91OeviVVJCRshLNvgQymDuZDII7pubkOqvXFfd3
+	ZZlo8PP2SK8Z88x3m9hWCforwc0z06hfXRKbwoNWjkkXlosMLOFM6BNxw686zEfo1ml7CBaQjwC
+	kPuOVKSDFjETkoZ/BxLxgPw4Spw2pbjpi4B4xrV7zRlT10ZlLVuKY/LUI85D9O5vT0VTNiy
+X-Google-Smtp-Source: AGHT+IE36q81ytbzipjRNhSYqb9l6GAh21i2Japqe13b7xIwmws0+g4DATqa0W/viEjZnbKMLzVT0GmZGyYO3yq7+qg=
+X-Received: by 2002:a17:907:d29:b0:b46:6718:3f1f with SMTP id
+ a640c23a62f3a-b72e0572c96mr159995566b.7.1762617612482; Sat, 08 Nov 2025
+ 08:00:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <2025110803-retrace-unnatural-127f@gregkh> <20251108123609.382365-1-pioooooooooip@gmail.com>
+ <CAKYAXd-R8NGDzQ-GTM67QbCxwJTCMGNhxKBo1a0sm0XBDqftLw@mail.gmail.com>
+In-Reply-To: <CAKYAXd-R8NGDzQ-GTM67QbCxwJTCMGNhxKBo1a0sm0XBDqftLw@mail.gmail.com>
+From: =?UTF-8?B?44GP44GV44GC44GV?= <pioooooooooip@gmail.com>
+Date: Sun, 9 Nov 2025 01:00:01 +0900
+X-Gm-Features: AWmQ_blPS5r1nNyxxhsinZ2QngiwVO-KEXZe6F6Hp_3GEfSqaWpGWONKMCdT6F4
+Message-ID: <CAFgAp7hG8k7Qrtor0O_CKb8tH3yNso-m2AjWDmvOtbRE4056JA@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: vfs: fix truncate lock-range check for shrink/grow
+ and avoid size==0 underflow
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Zhitong Liu <liuzhitong1993@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When size equals the current i_size (including 0), the code used to call
-check_lock_range(filp, i_size, size - 1, WRITE), which computes `size - 1`
-and can underflow for size==0. Skip the equal case.
+Thanks for the guidance =E2=80=94 I=E2=80=99ve sent v2 patch.
+Best regards,
+Qianchang
 
-Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
-Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
----
- fs/smb/server/vfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 891ed2dc2..d068b78a3 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -828,7 +828,7 @@ int ksmbd_vfs_truncate(struct ksmbd_work *work,
- 		if (size < inode->i_size) {
- 			err = check_lock_range(filp, size,
- 					       inode->i_size - 1, WRITE);
--		} else {
-+		} else if (size > inode->i_size) {
- 			err = check_lock_range(filp, inode->i_size,
- 					       size - 1, WRITE);
- 		}
--- 
-2.34.1
-
+On Sat, Nov 8, 2025 at 11:46=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.org>=
+ wrote:
+>
+> On Sat, Nov 8, 2025 at 9:36=E2=80=AFPM Qianchang Zhao <pioooooooooip@gmai=
+l.com> wrote:
+> >
+> > ksmbd_vfs_truncate() uses check_lock_range() with arguments that are
+> > incorrect for shrink, and can underflow when size=3D=3D0:
+> >
+> > - For shrink, the code passed [inode->i_size, size-1], which is reverse=
+d.
+> > - When size=3D=3D0, "size-1" underflows to -1, so the range becomes
+> >   [old_size, -1], effectively skipping the intended [0, old_size-1].
+> >
+> > Fix by:
+> > - Rejecting negative size with -EINVAL.
+> > - For shrink (size < old): check [size, old-1].
+> > - For grow   (size > old): check [old, size-1].
+> > - Skip lock check when size =3D=3D old.
+> > - Keep the return value on conflict as -EAGAIN (no noisy pr_err()).
+> >
+> > This avoids the size=3D=3D0 underflow and uses the correct range order,
+> > preserving byte-range lock semantics.
+> >
+> > Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+> > Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+> > ---
+> >  fs/smb/server/vfs.c | 28 +++++++++++++++++++---------
+> >  1 file changed, 19 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+> > index 891ed2dc2..e7843ec9b 100644
+> > --- a/fs/smb/server/vfs.c
+> > +++ b/fs/smb/server/vfs.c
+> > @@ -825,17 +825,27 @@ int ksmbd_vfs_truncate(struct ksmbd_work *work,
+> >         if (!work->tcon->posix_extensions) {
+> >                 struct inode *inode =3D file_inode(filp);
+> >
+> > -               if (size < inode->i_size) {
+> > -                       err =3D check_lock_range(filp, size,
+> > -                                              inode->i_size - 1, WRITE=
+);
+> > -               } else {
+> > -                       err =3D check_lock_range(filp, inode->i_size,
+> > -                                              size - 1, WRITE);
+> > +               loff_t old =3D i_size_read(inode);
+> > +               loff_t start =3D 0, end =3D -1;
+> > +               bool need_check =3D false;
+> > +
+> > +               if (size < 0)
+> > +                       return -EINVAL;
+> There is no case where size variable is negative.
+>
+> > +
+> > +               if (size < old) {
+> > +                       start =3D size;
+> > +                       end   =3D old - 1;
+> > +                       need_check =3D true;
+> > +               } else if (size > old) {
+> > +                       start =3D old;
+> > +                       end   =3D size - 1;
+> > +                       need_check =3D true;
+> >                 }
+> >
+> > -               if (err) {
+> > -                       pr_err("failed due to lock\n");
+> > -                       return -EAGAIN;
+> > +               if (need_check) {
+> > +                       err =3D check_lock_range(filp, start, end, WRIT=
+E);
+> > +                       if (err)
+> > +                               return -EAGAIN;
+> >                 }
+> >         }
+> Can't you just change it like this?
+>
+> diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+> index 891ed2dc2b73..f96f27c60301 100644
+> --- a/fs/smb/server/vfs.c
+> +++ b/fs/smb/server/vfs.c
+> @@ -828,7 +828,7 @@ int ksmbd_vfs_truncate(struct ksmbd_work *work,
+>                 if (size < inode->i_size) {
+>                         err =3D check_lock_range(filp, size,
+>                                                inode->i_size - 1, WRITE);
+> -               } else {
+> +               } else if (size > inode->i_size) {
+>                         err =3D check_lock_range(filp, inode->i_size,
+>                                                size - 1, WRITE);
+>                 }
+>
+> Thanks.
+> > --
+> > 2.34.1
+> >
