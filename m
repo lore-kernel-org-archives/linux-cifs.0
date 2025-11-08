@@ -1,222 +1,134 @@
-Received: from flow-b3-smtp.messagingengine.com (flow-b3-smtp.messagingengine.com [202.12.124.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516F0314B87;
-	Fri,  7 Nov 2025 23:38:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035177D098
+	for <linux-cifs@vger.kernel.org>; Sat,  8 Nov 2025 04:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762558689; cv=none; b=jp+v6gFsE+R1LWElwRtiw4Sy6VCcq3lhp6GcnFkmNVY2diWdsoGY20MSR4kqSZ+BNiU8Tzd3IJqppkrnFDFnylk4M3fWj+UVxv8euh5iyIk+Fo+BC/Ru3Th6a0hsx71k1n6UssAozJZmlnFxWVPcQQNaETHm5jPUuxsia8li8zU=
+	t=1762575066; cv=none; b=S/OtOATL/nyh/qp6a/Uf1xtl0F+rfxQYh3GwgcqFLr7OS4hDfMyD2n8bp+U+CZM9fdLqqhtf+7xR5MORIx/c6zrDxaHoZ8FdizO1xbVHy5qnUPY3f/Qw054YbR8y2N/SHiGPCXQVshLRgaRFNtVtgPUB5RKdKy9ygKJz1Soy89s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762558689; c=relaxed/simple;
-	bh=pHPtbLi2TErUd+MN0LC96eF/g0yHByCgb4Kw0BwbT0o=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=Qw/QpLg6fQNVS79CiLfIbxJ4pIVvX9C5nhF4f0ba9B3HrRrNVD9kfscCrlptpnD1lzvQQ5mkqwGQbgXK2HpMv+uw6ffrySFlQJ53Ym5mAAcFBpJk+yXgAleG7xts7iGtnIbsCpkPUflM0O/ipU3XhAmUyj3ukHdp4Px5nnuk0RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=E4OMnSLC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=av+lzygt; arc=none smtp.client-ip=202.12.124.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1762575066; c=relaxed/simple;
+	bh=GLDAIkw0B/Jgj1pC/JQvdBxiQTL/crtcSc+Xnw91Tkw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f81ItDlRiqxEzp32bw7V800DYuIELM11oGdAOu4zC7gLcR7ojKVg49lw0aSnYqGH0BUTFRCc9RMOluq6tYJEteF67MXvy7nQcl9wdfpjXCBlv5Gb4XnpLnP2xGWsUau/Tc+okWDHjGsSdp8HFA51wEo44azkM2eMxHMeNfaczQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NwhXct9/; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="E4OMnSLC";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="av+lzygt"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailflow.stl.internal (Postfix) with ESMTP id 3696013001EB;
-	Fri,  7 Nov 2025 18:38:03 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Fri, 07 Nov 2025 18:38:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm3; t=
-	1762558683; x=1762565883; bh=ZcRWR0XGRVohQHNqpTmVOGqvgKfDCmeABc6
-	Q5B6kVA0=; b=E4OMnSLCME0PmpfRUhAwNxIceLFq3/FAK5GtwevM7iICUCUuV5x
-	chVCFB6fdmay7+ooFw0uv6Azy1ChdRqJqvR+mkrCRIpg73LnR+/X59PszjPwZ/rz
-	8CPuwHb/xwC5N1QSJvSaLdjI57addGAeTJRkLimMYRo6wgCZPhDhW+hNxZlCxMuJ
-	hAPkIxK9zjio+5tvTHBm3a+bqM8CDMop81FHuSYzFd2NCfNmjV5NgDtUDa2Eyf25
-	3VuDhIEZvIbIrGiHuAnMLfItwaVgsWO7Q33GX+ggP6/jGDAegWeYBoQRn47aNko2
-	PunoNsPduYvN8zewgDdm1dEy75bfZgIQYaQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762558683; x=
-	1762565883; bh=ZcRWR0XGRVohQHNqpTmVOGqvgKfDCmeABc6Q5B6kVA0=; b=a
-	v+lzygtoc1HX4ZadDskwTpZwJtb1oG3peL6O0gr4iO5O5jYd+vaRP7/no7N27oF3
-	EzxSXy6KoH6IHmfzzAjLPr0QATO37tQfExkHIQ/kLMEtcMIpZa9opvRREQRlIldG
-	Q9D0WkBAPuYtKKTvP1JAxo1/Rx7n6G2bitd51++grbdTyzCWIWx3DW0/Nhivcp1A
-	s7ZtqshuHntLjgQgQJ+crHlgWYzKyD5izePEyTID8AqXRiIHiDEt9qwC/wQbmAXC
-	g/7fHF+pLwFi9swg49B8mIz8mdbJ+nyJwVG9AYbNRT/JTg129nrTn8NZkPgHxX+2
-	7BatW30ZGfoIC5BANZTig==
-X-ME-Sender: <xms:04IOaUS1llkqfnpj0hP0k9hck1nUGtgZum40Y0dtCM64yfklBqqJ5g>
-    <xme:04IOaV4vrSP4x6QNhepje5WcwIcNTd1apJim4xvCzIrniX8SAiYXqKNGGHIuD1WKQ
-    33nU51_RKbR52XMFfrIspvHlzrBn079yJ8CWMmi6dxhoUy63Q>
-X-ME-Received: <xmr:04IOaT3MWpLgDLL757W25o-tMfqjGpak2vFwG2uUDPGL2GuLLHFgVWSCwflcxilp3PZXpLTiHfR-SxGJx5w8TjROMf9sHRUcJd4NP_ZWYt62>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduledutddtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegouf
-    hprghmfghrlhculdeftddtmdenucfjughrpegtgfgghffvvefujghffffkrhesthhqredt
-    tddtjeenucfhrhhomheppfgvihhluehrohifnhcuoehnvghilhgssehofihnmhgrihhlrd
-    hnvghtqeenucggtffrrghtthgvrhhnpedvueetleekjeekveetteevtdekgeeludeifedt
-    feetgfdttdeljefglefgveffieenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuuf
-    hprghmfghrlhephhhtthhpshemsddslhhorhgvrdhkvghrnhgvlhdrohhrghdsrghllhds
-    jeeiieeffeeileekvdeltdehuddurdehfedtvdekfeekqdelqdgurghvvgdrhhgrnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsges
-    ohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepleejpdhmohguvgepshhmthhpoh
-    huthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpdhr
-    tghpthhtohepfhhrrghnkhdrlhhisehvihhvohdrtghomhdprhgtphhtthhopehlihhnuh
-    igqdigfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidq
-    uhhnihhonhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuh
-    igqdhnihhlfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhu
-    gidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqd
-    hkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhig
-    qdhhrghruggvnhhinhhgsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
-    hinhhugidqfhhsuggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:04IOaUUP8Agp5i-ePskgdOIZ3qDw3X8wH2n0PkSgIS-qUH6nBwUnqg>
-    <xmx:04IOaTnQGxLDK6TRtOgEGVijEWvd6FvZOuwL0vyqcWwYM4LX-zVZXA>
-    <xmx:04IOaVhEuGeVrKovELx7lzKD-9IxEW9YEYZ2LQZX-iUA996QSWwOgg>
-    <xmx:04IOab5K6Z-7wWhbIK2-S_EvLNyL4_2HwgPfi2l7GSRp7-b2X_0qug>
-    <xmx:24IOabMc8-grgTNo-sBp23kB4IC_01hhvLJuap-Y8_HG_nozNoQTctxM>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 7 Nov 2025 18:37:32 -0500 (EST)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NwhXct9/"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-640aaa89697so2104211a12.3
+        for <linux-cifs@vger.kernel.org>; Fri, 07 Nov 2025 20:11:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762575059; x=1763179859; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P++gdfwUiF7yMcQqAmBtJY8SzbdW8C3xUIGjzW3pdRw=;
+        b=NwhXct9/LxjU4KyHI3RrGiXNktiaA8FHFpDWBLgwVw4LrPKejsrlMUU3UFNz8AIo10
+         YGWl4OQRvnnkn7xuTQqlhPMgznp12/9M1qxle6kYIHFy9b0OJDkSLaEb5GibGijpJ8yF
+         G4SYMMOJ3d1oWQC9xmubCSw7kEmQUPj3BbH4OqdM4q+RWvbmYIk5YtZet1kVnMxFl652
+         iPkYpar5l3s/hCZxhQw8dWrqJetB9viZYLIIcT0CDcJZip8UGiQuUT+1YesJBdG6Ayp2
+         JgqsR+ctmw41VdVQE7EI7tZXk+AakDgDVV1VQ9O6/NDm81PjnvEzWukcdSKVMHRID8lk
+         1HNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762575059; x=1763179859;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=P++gdfwUiF7yMcQqAmBtJY8SzbdW8C3xUIGjzW3pdRw=;
+        b=tmZHqppf47xzREuRZfwc+wo0GUgQub0mnYmasBi1RPrns18uBqW3Q17p0dpeEXLHVE
+         uki4e3h2LKdwaLquIvz9+V7/ldVQJeeliCEyQv2Zx4zygsJ35dz5tsW5+N3+dsQ+EonA
+         MbDfftSyDw/6IrNU/vuQafPoy5zDKHwQOzKkA7efwgZJUQW89o68fuOWmO+sCWQtwOwF
+         +keIY2WVOAw7ZqWawPTTOtcTBnRovWvegOLVdJ723Sb4Z6xhYAcRGsnV3Jw5RxMzWf6a
+         NjBhXT/bgznrhg3NYFW9qTJXGEdt9NdQvups7og3EGG08QVoXyjdQgI/CBhFVsyjs4Yv
+         fsdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+YXRdsQ5SBbXEmJKS9aZhO44b5y+jPPiHg9VD4k8+9b3j2/aRM5doje5W2CTa6NusGeP8MB6oEMGI@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvN5ItECRQgmv+uSWWWylOjbU3ohZtg6s3C2v0bxkDUBlrDBO2
+	Z9TXWyNJVPwPBgyc8MSjLLTjsOvgEdAXq2JdKV4caRX2eT3Q8Z1wSramR7lnSmYXz5JVVlUt1Bq
+	ZllqYvOeDEQC30QBY3ORbhQm4g3CFxsGx12VC
+X-Gm-Gg: ASbGncuhjQvfDfzRxFwo8BZ04YOZOLeWxgiwddg/IxPfVz3d5nzEpqHFVue7zL2xT6W
+	vh1pZvv813wt9BJoT03q0j6nXs6krss6ZtIKL7wHw5ofTfmD0MngxN9bK3Cu4/4N4cuppijUtDl
+	jiwQQ79KlHFSpgNeBY/8NNaxdEuZqHu1OXrvCvkpFz6+iL8HGcO78aFKJwJ1HfqtuF1cGaeULJK
+	p2aVGrKa2OTws+N1cFcxgQg1RkRft5ZH+08d3dKmceal3GpVHKNTFG1QsQ=
+X-Google-Smtp-Source: AGHT+IFQHN513SKWUZDhIZq5fNSOZPmipMMdZRlwUPhW5CQq9Q9hTaVzkxgS5FQwuag/NF+mudr0LdobGydgL8Ih3QM=
+X-Received: by 2002:a17:907:1c19:b0:b70:b7c2:abe9 with SMTP id
+ a640c23a62f3a-b72e052d690mr119296066b.38.1762575059104; Fri, 07 Nov 2025
+ 20:10:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Jeff Layton" <jlayton@kernel.org>
-Cc: "Jonathan Corbet" <corbet@lwn.net>,
- "Eric Van Hensbergen" <ericvh@kernel.org>,
- "Latchesar Ionkov" <lucho@ionkov.net>,
- "Dominique Martinet" <asmadeus@codewreck.org>,
- "Christian Schoenebeck" <linux_oss@crudebyte.com>,
- "David Sterba" <dsterba@suse.com>, "David Howells" <dhowells@redhat.com>,
- "Marc Dionne" <marc.dionne@auristor.com>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
- "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
- "Chris Mason" <clm@fb.com>, "Xiubo Li" <xiubli@redhat.com>,
- "Ilya Dryomov" <idryomov@gmail.com>, "Jan Harkes" <jaharkes@cs.cmu.edu>,
- coda@cs.cmu.edu, "Tyler Hicks" <code@tyhicks.com>,
- "Jeremy Kerr" <jk@ozlabs.org>, "Ard Biesheuvel" <ardb@kernel.org>,
- "Namjae Jeon" <linkinjeon@kernel.org>,
- "Sungjong Seo" <sj1557.seo@samsung.com>,
- "Yuezhang Mo" <yuezhang.mo@sony.com>, "Theodore Ts'o" <tytso@mit.edu>,
- "Andreas Dilger" <adilger.kernel@dilger.ca>,
- "Jaegeuk Kim" <jaegeuk@kernel.org>, "Chao Yu" <chao@kernel.org>,
- "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>,
- "Miklos Szeredi" <miklos@szeredi.hu>,
- "Andreas Gruenbacher" <agruenba@redhat.com>,
- "Viacheslav Dubeyko" <slava@dubeyko.com>,
- "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
- "Yangtao Li" <frank.li@vivo.com>, "Richard Weinberger" <richard@nod.at>,
- "Anton Ivanov" <anton.ivanov@cambridgegreys.com>,
- "Johannes Berg" <johannes@sipsolutions.net>,
- "Mikulas Patocka" <mikulas@artax.karlin.mff.cuni.cz>,
- "Muchun Song" <muchun.song@linux.dev>,
- "Oscar Salvador" <osalvador@suse.de>,
- "David Hildenbrand" <david@redhat.com>,
- "David Woodhouse" <dwmw2@infradead.org>,
- "Dave Kleikamp" <shaggy@kernel.org>,
- "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>,
- "Ryusuke Konishi" <konishi.ryusuke@gmail.com>,
- "Konstantin Komarov" <almaz.alexandrovich@paragon-software.com>,
- "Mark Fasheh" <mark@fasheh.com>, "Joel Becker" <jlbec@evilplan.org>,
- "Joseph Qi" <joseph.qi@linux.alibaba.com>,
- "Bob Copeland" <me@bobcopeland.com>,
- "Mike Marshall" <hubcap@omnibond.com>,
- "Martin Brandenburg" <martin@omnibond.com>,
- "Amir Goldstein" <amir73il@gmail.com>,
- "Steve French" <sfrench@samba.org>, "Paulo Alcantara" <pc@manguebit.org>,
- "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
- "Shyam Prasad N" <sprasad@microsoft.com>, "Tom Talpey" <tom@talpey.com>,
- "Bharath SM" <bharathsm@microsoft.com>,
- "Zhihao Cheng" <chengzhihao1@huawei.com>,
- "Hans de Goede" <hansg@kernel.org>, "Carlos Maiolino" <cem@kernel.org>,
- "Hugh Dickins" <hughd@google.com>,
- "Baolin Wang" <baolin.wang@linux.alibaba.com>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "Kees Cook" <kees@kernel.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- linux-kernel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
- linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
- codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
- linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, gfs2@lists.linux.dev,
- linux-um@lists.infradead.org, linux-mm@kvack.org,
- linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
- linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
- ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
- linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
- linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, linux-xfs@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: LLM disclosure (was: [PATCH v2] vfs: remove the excl argument
- from the ->create() inode_operation)
-In-reply-to: <f5a2c41e4f272fef9f1525e17b494dd4b4bcb529.camel@kernel.org>
-References: <20251107-create-excl-v2-1-f678165d7f3f@kernel.org>,
- <176255458305.634289.5577159882824096330@noble.neil.brown.name>,
- <87ikfl1nfe.fsf@trenco.lwn.net>,
- <f5a2c41e4f272fef9f1525e17b494dd4b4bcb529.camel@kernel.org>
-Date: Sat, 08 Nov 2025 10:37:30 +1100
-Message-id: <176255865045.634289.1814933499430115577@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+References: <20251107215953.4190096-1-henrique.carvalho@suse.com> <CAH2r5mt979CqEHa8wTEV3U+qCVnBqB2N7fCYynQqE2=214Cy7A@mail.gmail.com>
+In-Reply-To: <CAH2r5mt979CqEHa8wTEV3U+qCVnBqB2N7fCYynQqE2=214Cy7A@mail.gmail.com>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Sat, 8 Nov 2025 09:40:47 +0530
+X-Gm-Features: AWmQ_bmm87yZ1JC-6qDmmsE-lzJUB0GuY4i814AOCU0G2J-mHK6ANG2W8Yero38
+Message-ID: <CANT5p=rqcPr86R4Dz3jXaHY8w2M9JxSqUcHMg1fjegNp8Sza+w@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: fix cifs_pick_channel when channel needs reconnect
+To: Steve French <smfrench@gmail.com>
+Cc: Henrique Carvalho <henrique.carvalho@suse.com>, sfrench@samba.org, sprasad@microsoft.com, 
+	pc@manguebit.org, ronniesahlberg@gmail.com, tom@talpey.com, 
+	bharathsm@microsoft.com, ematsumiya@suse.de, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 08 Nov 2025, Jeff Layton wrote:
-> On Fri, 2025-11-07 at 15:35 -0700, Jonathan Corbet wrote:
-> > NeilBrown <neilb@ownmail.net> writes:
-> >=20
-> > > On Sat, 08 Nov 2025, Jeff Layton wrote:
-> >=20
-> > > > Full disclosure: I did use Claude code to generate the first
-> > > > approximation of this patch, but I had to fix a number of things that=
- it
-> > > > missed.  I probably could have given it better prompts. In any case, =
-I'm
-> > > > not sure how to properly attribute this (or if I even need to).
-> > >=20
-> > > My understanding is that if you fully understand (and can defend) the
-> > > code change with all its motivations and implications as well as if you
-> > > had written it yourself, then you don't need to attribute whatever fancy
-> > > text editor or IDE (e.g.  Claude) that you used to help produce the
-> > > patch.
-> >=20
-> > The proposed policy for such things is here, under review right now:
-> >=20
-> >   https://lore.kernel.org/all/20251105231514.3167738-1-dave.hansen@linux.=
-intel.com/
-> >=20
-> > jon
->=20
-> Thanks Jon.
->=20
-> I'm guessing that this would fall under the "menial task"
-> classification, and therefore doesn't need attribution. This seems
-> applicable:
->=20
-> + - Purely mechanical transformations like variable renaming
->=20
-> This is a little different, but it's a similar rote task.
-> --=20
-> Jeff Layton <jlayton@kernel.org>
->=20
+On Sat, Nov 8, 2025 at 4:46=E2=80=AFAM Steve French <smfrench@gmail.com> wr=
+ote:
+>
+> merged into cifs-2.6.git for-next pending additional review and testing
+>
+> On Fri, Nov 7, 2025 at 4:03=E2=80=AFPM Henrique Carvalho
+> <henrique.carvalho@suse.com> wrote:
+> >
+> > cifs_pick_channel iterates candidate channels using cur. The
+> > reconnect-state test mistakenly used a different variable.
+> >
+> > This checked the wrong slot and would cause us to skip a healthy channe=
+l
+> > and to dispatch on one that needs reconnect, occasionally failing
+> > operations when a channel was down.
+> >
+> > Fix by replacing for the correct variable.
+> >
+> > Fixes: fc43a8ac396d ("cifs: cifs_pick_channel should try selecting acti=
+ve channels")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+> > ---
+> >  fs/smb/client/transport.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+> > index 051cd9dbba13..915cedde5d66 100644
+> > --- a/fs/smb/client/transport.c
+> > +++ b/fs/smb/client/transport.c
+> > @@ -830,7 +830,7 @@ struct TCP_Server_Info *cifs_pick_channel(struct ci=
+fs_ses *ses)
+> >                 if (!server || server->terminate)
+> >                         continue;
+> >
+> > -               if (CIFS_CHAN_NEEDS_RECONNECT(ses, i))
+> > +               if (CIFS_CHAN_NEEDS_RECONNECT(ses, cur))
+> >                         continue;
+> >
+> >                 /*
+> > --
+> > 2.50.1
+> >
+> >
+>
+>
+> --
+> Thanks,
+>
+> Steve
+>
 
-The bit I particularly liked was:
+Good spot. I think reordering of patches may have caused this to regress.
+Changes look good to me. Please add my RB and CC stable.
 
-+
-+Even if your tool use is out of scope you should still always consider
-+if it would help reviewing your contribution if the reviewer knows
-+about the tool that you used.
-+
-
-"would it help the reviewer"?  I agree that is a key question.  In your
-case I cannot see how it would help.
-
-Thanks,
-NeilBrown
+--=20
+Regards,
+Shyam
