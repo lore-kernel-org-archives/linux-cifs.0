@@ -1,69 +1,75 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D11199D8
-	for <linux-cifs@vger.kernel.org>; Sat,  8 Nov 2025 18:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1509613C3CD
+	for <linux-cifs@vger.kernel.org>; Sun,  9 Nov 2025 01:32:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762626368; cv=none; b=ZkyqzUSesc20UISu8BMuAp5dLJn2Ssf5yCFOAe9Ida4m7NnE/DbfkwU4vWnp5Kn0VLib1TyYGp4bWUxHCas2+0MXxIu716JyHLWMoGQB4ZJulPY/1Pzv2UOZin2Bdptlywg+oDWu6r1bQduCaTmc9NTsZgn1BXeF4/Qq8M7IkiY=
+	t=1762651971; cv=none; b=rkqkQMuHRqJQPLzIHRmRtauB0qW3g2nqfzZdiylJGodp7EeXU4tDhdZvPVQQU6XBRUAY5sXrcocK/b9LyS9EPm4CAmBaXncL1KhDN/UZTp99bgs4mO+O3XD/2L0Mm/J3uR7UOXoGvOOycj7HVrd1dLLh7MD2q1God4aBDa4tlHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762626368; c=relaxed/simple;
-	bh=3PuqQZnrVolbPPF+5k8cNRZuvPBkP3W5oJbsN/qLIx4=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=QLDEtsCas0JNW6yMCt+nYVArKiZ0Fxx2gUk9tOe3BpHMx/M1fRZ6BQCB0Jeu//uGG4t9/vzYt9uv4w+xSVLXd4MAAhO0kQqXaYCD6OMXKc5MkQHpy1GAXWUU3kbbroeyiFyH4CnK6czB6GSrSu3zdun84jeToz8xyuhyDMcLo78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=jk2/Nx7A; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1762651971; c=relaxed/simple;
+	bh=JLDqV8ezX7r/6cFHYwMMco/iyixfBO8kA6xRqCIgak0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XCG+II62tNLjy7tcKRJyCphlwKJ/QQt0iEyGGm61w0DoH3LJvo89NAeSTTrG0rvdjCyYK889mL72m2XaLjoPTQXSk0OxMcGth6YYZ9/oPpHriZ7GFSugKoWvIfgI+/b+A+JZ85bmU7Tidm5MblFxQT2za4s+MyboKvMSdFsJdO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tseue9iF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="jk2/Nx7A"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=3PuqQZnrVolbPPF+5k8cNRZuvPBkP3W5oJbsN/qLIx4=; b=jk2/Nx7AjKGdHC7Kn6EZnqFOkG
-	KTcGm+DtZInf5iEcRsis441DszjdIBz/H7zssjkvEY0zLzuf8PoZs/1YeMntVTSwJPq/F4tAs8O99
-	sHYw+WIQIQDOQ9aBWKJA9nQozfXRIgmFMsKuW19vgP6zyYh2G7BsAxUnRIe7WixnVnUQlfWLAjYLz
-	Bsvm0IZte/M07tSnYhuSQoRn8ZesC/3qz6iPPt/E/uMey8PnrCL+b016K3qtlZlsQltzOhPRh34U5
-	e3HH0iIxfqaeTWyT06aAi8iskdhny2Q6AAB5RxcjH4e2KtIEtvcFwLKP1hqJbjUwgnzM+Msn6aL9S
-	m9NvSHUA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1vHndJ-000000000V8-0RHU;
-	Sat, 08 Nov 2025 15:25:53 -0300
-Message-ID: <926cdc492899f9626612d5d881c34317@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Henrique Carvalho <henrique.carvalho@suse.com>, Steve French
- <smfrench@gmail.com>
-Cc: ronnie sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
- <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath S M
- <bharathsm@microsoft.com>, Enzo Matsumiya <ematsumiya@suse.de>, Jay Shin
- <jaeshin@redhat.com>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v4] smb: client: fix potential UAF in
- smb2_close_cached_fid()
-In-Reply-To: <7eba7884-3b54-4711-b5b3-5d82e1981acb@suse.com>
-References: <baf7ee5f-aa34-41f3-a00c-8e3b7686d566@suse.com>
- <7eba7884-3b54-4711-b5b3-5d82e1981acb@suse.com>
-Date: Sat, 08 Nov 2025 15:25:52 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tseue9iF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F26C116D0
+	for <linux-cifs@vger.kernel.org>; Sun,  9 Nov 2025 01:32:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762651970;
+	bh=JLDqV8ezX7r/6cFHYwMMco/iyixfBO8kA6xRqCIgak0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Tseue9iF/XsTqddA/n2eiYdGOL9xB5VwvXusYMlOOCeD9l9GjP4zzS8/BPalTFG0e
+	 BAg7zKhf5g5qK7V+bgY8DqfZsJNKsfk8pYmtfGUZszQJFzOMpAkNH8VmC4m6k+W0mg
+	 hhk94oI3NK6bVMyY+oZFMjucSWZzFlmrDS1genhoaMG2ApWDqR4gk0V9SMB3ed5QuS
+	 BYwttlBm7DPZ0f6UhKJ4ecNFwyMOZBK0pHFZm2CbpucecMOMq4jVfW3JllLUSGReOU
+	 LH//cABc57A0GkSNuy98bgT16Uq9a7cu9CCAuDIQk6Omf3PSd8kYUdbzTR6qBIkbtn
+	 /ZhtFoU22JTqg==
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-640f0f82da9so3845034a12.1
+        for <linux-cifs@vger.kernel.org>; Sat, 08 Nov 2025 17:32:50 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWrJd/DrUAH8yVW4ikGsW2tG1EfgV4hvzOCDD5qdTFIF7sMS8RQWnhKrV/22pb+1ARWRw/nX8nRuw3L@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAwprzBzfWqHREZtp2ZujI/T1S1Rmf/Q5mt+Db96jzBx5ezrQb
+	SKvHFXoOSuVdO/KXp18WhnVdv9lgjNPmpfcHxucGzdCLVBGnZCPlQ5iFhuoSRphqh2iGTgd8TNd
+	ZzC5J11c2oN2xjohdWpF04WqSDO+zoEY=
+X-Google-Smtp-Source: AGHT+IFwE0YurAS9EBuOH/BTK/I2Z5iOVtiNvSMR5NXl4i1e/jRjGd1XBWjtYC10l/5GnGiHdMouahIIkUWnSFvo2LU=
+X-Received: by 2002:a17:907:7246:b0:b72:5e29:5084 with SMTP id
+ a640c23a62f3a-b72e02729dfmr390481166b.4.1762651969360; Sat, 08 Nov 2025
+ 17:32:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <CAKYAXd-R8NGDzQ-GTM67QbCxwJTCMGNhxKBo1a0sm0XBDqftLw@mail.gmail.com>
+ <20251108155712.384021-1-pioooooooooip@gmail.com>
+In-Reply-To: <20251108155712.384021-1-pioooooooooip@gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sun, 9 Nov 2025 10:32:37 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-SSBbW+FhC7mHYEh1JLFRVNyNOLiogbj=Nt1eszxf2vw@mail.gmail.com>
+X-Gm-Features: AWmQ_bnHIIwGraT7R8ro6xvCocGSJ1L8DonF5ZezAsU__d-y2HYgoO6DXOrC-NQ
+Message-ID: <CAKYAXd-SSBbW+FhC7mHYEh1JLFRVNyNOLiogbj=Nt1eszxf2vw@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: vfs: skip lock-range check on equal size to
+ avoid size==0 underflow
+To: Qianchang Zhao <pioooooooooip@gmail.com>
+Cc: Steve French <smfrench@gmail.com>, gregkh@linuxfoundation.org, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, security@kernel.org, 
+	Zhitong Liu <liuzhitong1993@gmail.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Henrique Carvalho <henrique.carvalho@suse.com> writes:
-
-> Resending to include linux-cifs@vger.kernel.org.
+On Sun, Nov 9, 2025 at 12:57=E2=80=AFAM Qianchang Zhao <pioooooooooip@gmail=
+.com> wrote:
 >
-> Since there were concerns about a potential deadlock in this path (from Enzo
-> and copilot), I reworked the patch a bit.
+> When size equals the current i_size (including 0), the code used to call
+> check_lock_range(filp, i_size, size - 1, WRITE), which computes `size - 1=
+`
+> and can underflow for size=3D=3D0. Skip the equal case.
 >
-> In theory the existing code is fine as long as the refcount invariant holds,
-> but we've already been proven wrong in this area a few times. So I'd rather
-> make the deadlock impossible and WARN if the invariant is violated
-> instead of
-> relying on it being perfect.
->
-> @Paulo, what do you think about this?
-
-Sounds good.
+> Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+> Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+Applied it to #ksmbd-for-next-next.
+Thanks!
