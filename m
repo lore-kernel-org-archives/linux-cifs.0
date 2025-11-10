@@ -1,85 +1,176 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCEE6205AA1
-	for <linux-cifs@vger.kernel.org>; Mon, 10 Nov 2025 16:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A91952848AF
+	for <linux-cifs@vger.kernel.org>; Mon, 10 Nov 2025 16:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762790430; cv=none; b=Qf9Ze3yctzgWJNlKLNZl+I2+VgD6W2LvBHihUWZpELgyeAPZeD1/80yzmTNIlwWmLD1CnDzbqHO0P85z9pVgcJ9tSckU1cVG4M4UcKaNujCxk6qGVcfIRHxOw41NMMZghEr9seAVCi7zibiLqsvYXXi6GSeL8yNQxy5kb3lXI2Y=
+	t=1762790952; cv=none; b=rGSF3ppq4tWFBj95Cfl1G8GvCVaVWI0tmOGUD+gPukHh3NzkTZ1a14fCcSCf+Gyoyaf3Z8Bl64MY1e5pv8mOs2l4hiWkY+lVGn/dtTghmuYjoh/IcfaiNHTOXAmDJ65/yhrQcsJ/uh67PW3Tj2oXV0voZuk1/6eVjQd6SsCAeng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762790430; c=relaxed/simple;
-	bh=AhbhQ67wwQhQ4c07srXeKmzRK8+FD0WRq0ZbeCnH4oc=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=UeaQhf0x1LTOI/0O7nPfUj42DSVvhoQBuNaAYZQ3EQdY1E4gcjiOEVGJcE3fNj8pAtviabyO9nrCYX390v915PcajaTLsd2u5pbwSL7NBqz9ZrSXS4Y1wMIcpfm+wFZkVhr8y1BsRSEpWe0MBj8sAkoM0SJ5MvU2DwLSnPEwEaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WVTXtYSJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1762790952; c=relaxed/simple;
+	bh=OKZOzwPNbZ0eA/RzD6GT+kbo2DW/QUWT3Vl/4pt9v6g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JiwKgSHQEF73kOO9dmrILHlUsd/bCektTGGEAS7Phte/PdB+OubmFyYW7SlGyCe/NVv+ioZUIrBvEzQwZZllq3+3+HjnrOWbJBkmkNkrgN69QUPeQEb01dqlhlPF6JffhI/DQg+N+gCRFNH9Q8foNlF1vwG/ia84SH+2yLFaN0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cns/P4eR; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WVTXtYSJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762790427;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T8hqKhR4PO1YyDfo47togD7d/nqY6gzVyhXnj63GbVQ=;
-	b=WVTXtYSJy8AiDEgyPEDx/+wD7QXMBOMndw1ZIQZvQDYdztKsmcaRmk6erZ198dnFRG2bY4
-	V/gSv29SLU/yvC4EYxlW3cSuIss5QXas/z3NZUIdfvaBLP4irOyF1Bz5OPeDnUpZ7nEZDg
-	qTyDl6LKQJoMpAwr+OvQw9kXh9tZi58=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-586-TxtdQIawM9irXdSNeM31cQ-1; Mon,
- 10 Nov 2025 11:00:24 -0500
-X-MC-Unique: TxtdQIawM9irXdSNeM31cQ-1
-X-Mimecast-MFC-AGG-ID: TxtdQIawM9irXdSNeM31cQ_1762790422
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1D7A51801235;
-	Mon, 10 Nov 2025 16:00:22 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.87])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7C9B51800576;
-	Mon, 10 Nov 2025 16:00:19 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CAGypqWw0bnE7_=49HSxgExouk4s5PVFQ6gVH50wrE8_=4b5vAg@mail.gmail.com>
-References: <CAGypqWw0bnE7_=49HSxgExouk4s5PVFQ6gVH50wrE8_=4b5vAg@mail.gmail.com> <YT1PR01MB9451424C6870795133FB7C96B3A72@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM> <36fb31bf2c854cdc930a3415f5551dcd@izw-berlin.de> <CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com> <uildcjpqxzc5nckupgdeeifkrqwrau2qxuc2df2uxuyys3i2k2@iz2bmi6yojyu> <YT1PR01MB945191C652AEE173CEADBA3EB3A12@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM> <aaloi77h2f5xolhrnegxsxntqp2jopwisunmjfp45idsoockpy@cy5agf2oqjop> <YT1PR01MB9451A0F623371F50E77CC1C9B3AD2@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
-To: Bharath SM <bharathsm.hsk@gmail.com>
-Cc: dhowells@redhat.com, Mark A Whiting <whitingm@opentext.com>,
-    henrique.carvalho@suse.com, Enzo Matsumiya <ematsumiya@suse.de>,
-    Steve French <smfrench@gmail.com>,
-    Shyam Prasad <nspmangalore@gmail.com>,
-    Paulo Alcantara <pc@manguebit.org>,
-    "Heckmann,
-                         Ilja" <heckmann@izw-berlin.de>,
-    "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Subject: Re: [[ EXT ]] [BUG REPORT] cifs/smb data corruption when writing, x86_64, kernel 6.6.71
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cns/P4eR"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-29558061c68so38734445ad.0
+        for <linux-cifs@vger.kernel.org>; Mon, 10 Nov 2025 08:09:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762790949; x=1763395749; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s031glNNGPLU3pRhUQF/ls9Tz5E2v6rbM7VrNj/wX3k=;
+        b=Cns/P4eRZdvAKqqYulMy3O1Se0Q8vGE+7/KHmQttIzBeZCAOQ3gDDvSz3+XnUlGKlA
+         ppSKeNsijOTb87pYJLJ5k50or0OD1zAuKx/P/eWX4037TVlQqVFL7riJfGpFR9PAw+yw
+         i35r/J2t++VuZnABkylXNQyFo7vmT/bIkC+03kUsYMfoOuA7srfNplO+MWMCLOUdocys
+         kRK/1v7Xiv6BFDNMUQPEYULvJr7NvgOzNoNfsVhFwskwuZScbX19Hu9fVDnvws6rf1/r
+         DA+gIfmMJ73YHlRbfF1hWRILx2jnva0+aojFy/GW3Cs+8rmIhzmtKqGnwi/roZpbzNmm
+         7H8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762790949; x=1763395749;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=s031glNNGPLU3pRhUQF/ls9Tz5E2v6rbM7VrNj/wX3k=;
+        b=ZZAPsi69LJjN1skkJHZarR85HPjd/Xuqi5WjDXJgnB/VU4B7vncIjc1mztHc6zzhIi
+         r9l/fZSNMLlR+6TVnBHLGUfG653rSHMz6OIukzGYu6pr+ZOCGBWk5pxJZh0/0SLOWEjO
+         e798lVR/oZ2oQbBCikRksZA/f7vfezht9S59bUa0ZSfcyzf3/LaIq9xSrqEHs5/JaPUR
+         Q3yzdwuyJuS/+srXI2eGyAs4X94hegofJ1Eg9XVOpiuB0E5t1FLZ9me8ulOzSH8gSUpm
+         ZZT8jk9Che4sEtsRuFSg754OYMQA1FDj+xd/tzNeiyGn1XHkPy36yoPpHzNmKZvUaQgK
+         LuDw==
+X-Forwarded-Encrypted: i=1; AJvYcCWbjR8tWB9LrsnuzZg1/8WPnKzwQ5uZ27O7hKy9/m1BWTYEW49eKluUjUMicuHYBHaGwBzSMfZTu5Db@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWX6sTFUabJyWlwWrbShRDp4U7hTAox5oUvWeLvmeVfQDjuxxw
+	f6/krocv+cW/0TBDwigHcmMXnYfZwwmlULK3bZSq9EFbdXtaOhd7IumAc1skFZNPJv8OQcaIaOU
+	fHVIQDnO3HEkxyVyBjatd50ptJ7vd6JM=
+X-Gm-Gg: ASbGnctOMfTHiYLkANCONjKSRrU8oeDgygDdm0WmXKUi9KOsGT2heqxxfIMPV1At8fu
+	k1XUrBFAP8kja9naEvmUsRKJVhd4k33mhYgYgmbhbPrLWoNIvbEeUydOsgNP7GEn13GmH+0+7Fo
+	UwKlxJQW5MGuvoP8T/BOCX1VxbUxkOLGDQDy6fDk0e4FlJsG7HKX9jKM7INXokUROrHIreMUn5a
+	eDYCrAuCD+fTt5uVI+E+S0HMm/w71J5TFwj6PLuYv+IrFMQGf6FK3L8CU7+NnLGXQJ9R9U=
+X-Google-Smtp-Source: AGHT+IHOYPI89bvNijFudu8ipuYpe33+VB7nbqJZeXEdLg498kOVR3mmjHBZOcylAlfsBqli+DO2uzjCmhEfT9se4Vs=
+X-Received: by 2002:a17:902:fc4f:b0:298:2237:a2eb with SMTP id
+ d9443c01a7336-2982237a409mr51261425ad.16.1762790948766; Mon, 10 Nov 2025
+ 08:09:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <931047.1762790417.1@warthog.procyon.org.uk>
-Date: Mon, 10 Nov 2025 16:00:17 +0000
-Message-ID: <931048.1762790417@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+References: <20251106005333.956321-1-neilb@ownmail.net> <20251106005333.956321-12-neilb@ownmail.net>
+In-Reply-To: <20251106005333.956321-12-neilb@ownmail.net>
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Mon, 10 Nov 2025 11:08:57 -0500
+X-Gm-Features: AWmQ_bnsQdAKOPc2sWsQJTL6A89EPTloA4MsBf1tbsCjlSWDuuet8e3lOwk-mCw
+Message-ID: <CAEjxPJ528Ou4dvRwHo+kXjWreGicda8BOXkQRvq3vMED6JQKOQ@mail.gmail.com>
+Subject: Re: [PATCH v5 11/14] Add start_renaming_two_dentries()
+To: NeilBrown <neil@brown.name>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
+	Amir Goldstein <amir73il@gmail.com>, Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
+	Jeff Layton <jlayton@kernel.org>, Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, 
+	David Howells <dhowells@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, Tyler Hicks <code@tyhicks.com>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Chuck Lever <chuck.lever@oracle.com>, 
+	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+	Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Carlos Maiolino <cem@kernel.org>, 
+	John Johansen <john.johansen@canonical.com>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+	Ondrej Mosnacek <omosnace@redhat.com>, Mateusz Guzik <mjguzik@gmail.com>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Stefan Berger <stefanb@linux.ibm.com>, 
+	"Darrick J. Wong" <djwong@kernel.org>, linux-kernel@vger.kernel.org, netfs@lists.linux.dev, 
+	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	selinux@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Bharath SM <bharathsm.hsk@gmail.com> wrote:
+On Wed, Nov 5, 2025 at 7:56=E2=80=AFPM NeilBrown <neilb@ownmail.net> wrote:
+>
+> From: NeilBrown <neil@brown.name>
+>
+> A few callers want to lock for a rename and already have both dentries.
+> Also debugfs does want to perform a lookup but doesn't want permission
+> checking, so start_renaming_dentry() cannot be used.
+>
+> This patch introduces start_renaming_two_dentries() which is given both
+> dentries.  debugfs performs one lookup itself.  As it will only continue
+> with a negative dentry and as those cannot be renamed or unlinked, it is
+> safe to do the lookup before getting the rename locks.
+>
+> overlayfs uses start_renaming_two_dentries() in three places and  selinux
+> uses it twice in sel_make_policy_nodes().
+>
+> In sel_make_policy_nodes() we now lock for rename twice instead of just
+> once so the combined operation is no longer atomic w.r.t the parent
+> directory locks.  As selinux_state.policy_mutex is held across the whole
+> operation this does open up any interesting races.
+>
+> Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+> Signed-off-by: NeilBrown <neil@brown.name>
+>
+> ---
+> changes since v3:
+>  added missing assignment to rd.mnt_idmap in ovl_cleanup_and_whiteout
+> ---
 
-> observed by comparing expected vs actual outputs.  Easy reproducer:
-> 
-> 	done | dd ibs=4194304 iflag=fullblock count=10240000 of=remotefile
-> 8999946
-> <corrupt lines shows here>
+> diff --git a/security/selinux/selinuxfs.c b/security/selinux/selinuxfs.c
+> index 232e087bce3e..a224ef9bb831 100644
+> --- a/security/selinux/selinuxfs.c
+> +++ b/security/selinux/selinuxfs.c
+> @@ -539,22 +540,30 @@ static int sel_make_policy_nodes(struct selinux_fs_=
+info *fsi,
+>         if (ret)
+>                 goto out;
+>
+> -       lock_rename(tmp_parent, fsi->sb->s_root);
+> +       rd.old_parent =3D tmp_parent;
+> +       rd.new_parent =3D fsi->sb->s_root;
+>
+>         /* booleans */
+> -       d_exchange(tmp_bool_dir, fsi->bool_dir);
+> +       ret =3D start_renaming_two_dentries(&rd, tmp_bool_dir, fsi->bool_=
+dir);
+> +       if (!ret) {
+> +               d_exchange(tmp_bool_dir, fsi->bool_dir);
 
-That reproducer would seem to be invalid shell.  Were there lines preceding
-the "done" that need to be included?
+I would recommend an immediate goto out if ret !=3D 0; we don't want to
+silently fall through and possibly reset ret on the next
+start_renaming_two_dentries() call, thereby ultimately returning 0 to
+the caller and acting as if nothing bad happened.
 
-David
-
+>
+> -       swap(fsi->bool_num, bool_num);
+> -       swap(fsi->bool_pending_names, bool_names);
+> -       swap(fsi->bool_pending_values, bool_values);
+> +               swap(fsi->bool_num, bool_num);
+> +               swap(fsi->bool_pending_names, bool_names);
+> +               swap(fsi->bool_pending_values, bool_values);
+>
+> -       fsi->bool_dir =3D tmp_bool_dir;
+> +               fsi->bool_dir =3D tmp_bool_dir;
+> +               end_renaming(&rd);
+> +       }
+>
+>         /* classes */
+> -       d_exchange(tmp_class_dir, fsi->class_dir);
+> -       fsi->class_dir =3D tmp_class_dir;
+> +       ret =3D start_renaming_two_dentries(&rd, tmp_class_dir, fsi->clas=
+s_dir);
+> +       if (ret =3D=3D 0) {
+> +               d_exchange(tmp_class_dir, fsi->class_dir);
+> +               fsi->class_dir =3D tmp_class_dir;
+>
+> -       unlock_rename(tmp_parent, fsi->sb->s_root);
+> +               end_renaming(&rd);
+> +       }
+>
+>  out:
+>         sel_remove_old_bool_data(bool_num, bool_names, bool_values);
+> --
+> 2.50.0.107.gf914562f5916.dirty
+>
