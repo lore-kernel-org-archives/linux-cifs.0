@@ -1,163 +1,229 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BAB849C
-	for <linux-cifs@vger.kernel.org>; Mon, 10 Nov 2025 04:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2A11B0437
+	for <linux-cifs@vger.kernel.org>; Mon, 10 Nov 2025 05:18:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762749454; cv=none; b=hefW8RgyjTXVmhLXSldR0VCNQV6mHYLSl/y848YwbNhcfnNGABC0prBmMpISLmdOujm/YyA9HsFFwQ/2lEtkj7WceuwFF48cn41fVrQYuA8nFBux7KsJhlRilY4av5XXrbvJKq8nPlvjEaLEfh+vCrEdXiwni6Ipa8PmE0tAIVg=
+	t=1762751896; cv=none; b=kTyQF31JlK4EApBQe2Sw/hHTzEdtwgtfU+Xgcp4DQ5PW2VvtmtEqbnJf18Q6hGKp2YvXEIliKFmW2u6nSeNuZr9uZmQZfhcFkq1krnDBX4EnShTMEn/gJoKnC/JS6Se+GjpTAdTokf8Oq4c/AeIXbrXPXHV0/LUzPP/9FI3xirU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762749454; c=relaxed/simple;
-	bh=XWZmHbd21ylsvjXqeK0wqH5w8NzRBj7Bz0403aRaBIY=;
+	s=arc-20240116; t=1762751896; c=relaxed/simple;
+	bh=++gtEzpGcu6xgR6K6h2d4HU0XkRxkWJd8Bk1p3etrX4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vGIH6RHF9c1MlmSBQ7nKew6M4P0OpvrfksXIYPvlB+IU3ODHWEJlcw9ksj4ZKPlXf8VSniHNlOkT8mVFO9Up6yuscTzUuXeYHTgv8KaD7C2MAj6UjzbQXgcQvh8UD2JpBD5Mf97pl21a2zkOqMoVCKTd2eW0KzWS9pXTqiWuk9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UkKKvq5+; arc=none smtp.client-ip=209.85.218.47
+	 To:Cc:Content-Type; b=SHuL2jarm6bXk3hj1YMF4yzy+ISVlfLI2qXNfHCAbQgQVfZnoLZGifnY54vQG2sxlenpoutqzvq8L/P5FUDHk9Dexjr9xK+UElRayLbL2Qw+Z1UslQ5M43Hvz7Dbqy9HfhkUPWpZuxQMV9pSatc2JyHzv88MMUvaeHDh7xbzrwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DnkKzoa5; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UkKKvq5+"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b727f452fffso436475366b.1
-        for <linux-cifs@vger.kernel.org>; Sun, 09 Nov 2025 20:37:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DnkKzoa5"
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-640b4a52950so3879246a12.1
+        for <linux-cifs@vger.kernel.org>; Sun, 09 Nov 2025 21:18:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762749451; x=1763354251; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762751893; x=1763356693; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OiJloGhPDrr8GLvwcF1TR0t/9mGxlSJaz6CbhgT5pWg=;
-        b=UkKKvq5+hetusejKAtHaewp9AG6FK5YC0n2r4hbYiTr+8TQxHqgkOWFbAdXNSHf961
-         3Q2E2yMZ0iqFLmBHRwRpRzHmvaoB0elSrns/Gr1GpUgUXpiKtPdWKNRaPACJTHLV+fb9
-         23klGc6SSMsZBGABip5HvbpKk7N+PdbsvkxhgOJVMDqZE/up6JYy9tCH5BxJU+yBJ3kL
-         FY8Q/4mPRjoXvZLnj9Uy/olE4Ryb7MSPOVcdSAj82PaFvClmxXgqQjQKUemmK/JTCZjC
-         ekDPRdyQPZuKhXFpNqToNXxc/kgrXbvfEA7eZq872tjltXRItP8+Meomt3LHeaRkk4rx
-         2y2A==
+        bh=++gtEzpGcu6xgR6K6h2d4HU0XkRxkWJd8Bk1p3etrX4=;
+        b=DnkKzoa5orHz/OBVEkrcrHNjom0BKADxK/yRNB3WXhn0UuadGTJL7dqhlUCGs5IKyv
+         VnaE+FsCJ+p3p0y9xjuWElMNFVawmnI2LZUR0djKUoMbzsiMJY/4Won/1ZOf+o/2HAYd
+         LboFyFxGEnd+Ajoe3g/XC5TXU0E7I854I7Xv4N9qUhpcrpeB7hpbwP76QZ9OVhQ84Si8
+         7baD5Zpb32phpJYAimtJwbhG8Q9gQ1oxlVu+skVxKKfmzMYH2BThKnrAKOtds5owL1Ku
+         H0ELX0bdbdus0D7beSqYpSUF5DtcTZhEBURmm6v3u8jdVNbgIjjyU/A075/kds41niLk
+         KKfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762749451; x=1763354251;
+        d=1e100.net; s=20230601; t=1762751893; x=1763356693;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=OiJloGhPDrr8GLvwcF1TR0t/9mGxlSJaz6CbhgT5pWg=;
-        b=CJAfk8i/OR+ev6rTl3604ESAR7D3HPJsGQWPDtLesBfhWPrvyMQH7Qf6fpv7Baz6/h
-         M63MWPKrQO6M9aIqghs5k4mu4pFNIyXp0StPisKOI27/ucUMbps/roYKnLu5oUuCAzxY
-         K6vsOwquDWNkWSP6+4u7hM/HmPg/mm52ufqJllDSNTlJ911wLYeZC7MkcXm5Zg6nFRZI
-         /HPja0X+nqrsfHQjGDJejBKDrkfQ9GUnR71pARD1MZwsgQcWUz5QeawSvh0kSeTHCkPF
-         ResgCflYzsA4YpQwdLSe3efAnueyacedJBhZtMS1kL6Jm4eVKyWuTFbGUlYpyidEwJA9
-         rlkA==
-X-Forwarded-Encrypted: i=1; AJvYcCXxSsx5c/ptmhizmMdtEArwVP7YvI8UJsxnAp0P/lfidcZ2rULgJWyjZnz1Hc1Ofo0Vo9Rlh3hTVTrl@vger.kernel.org
-X-Gm-Message-State: AOJu0YybvmhmD0Zp3BPYq6qJMAwjHh5MhK5FarjmEpDDUIviS0hSv+J9
-	J1mf10C0CLHmLYVNrRLL+IaF5YNASz09SwXaZkMs89oR+yxi/TEyFKqvjY123JqWo0x9YdsTQIZ
-	97vLUJId6a4xQDq3Rgx2yvs5mfR/oW/4=
-X-Gm-Gg: ASbGncvZl1e+IfiDzOOTKumdGhdSHox62dR3YrCFZs0wHAbjeUG55Hd3F8eT8w1ZTgx
-	Ujxovbm+PeL30YcRHKbuPt60mfnueZ2rB2a2R7S6deTIGDckAs7edyx6SNPzRfoSFq7ZIg8WgE9
-	Qmp9MH5/3xDltABtES0iPGYPEStd3gc8jk2GcKiyutC1Qc5YfRGROkMqNTTjiytLz4GcTW72iLb
-	gotcgHu3QavXK+yz/Zz7l7gGqGQTfPhpguDVQnjWkH3uCiSKEwenIWKmGqNcoyjgaoKGA==
-X-Google-Smtp-Source: AGHT+IEH1Ty7xvZKwOEY769RN6XRp++BsCvvaRg+JeEO9TOVgbmPP5K16Ub5UlF3Xj9rIkVFEDr8Sv3UXsK+0wMdeVI=
-X-Received: by 2002:a17:906:fd86:b0:b70:b9b6:9a94 with SMTP id
- a640c23a62f3a-b72dff17c63mr646514766b.23.1762749451023; Sun, 09 Nov 2025
- 20:37:31 -0800 (PST)
+        bh=++gtEzpGcu6xgR6K6h2d4HU0XkRxkWJd8Bk1p3etrX4=;
+        b=I6itEaUCUhIfNhRJfQsdvw4QHsCB26gBSTrf7Vc0utAPQ6aBK1P1Xt6Lj7oBMQPqgB
+         K085r0stVMpxPwkcxgQSsWPyg7HIp4kHsRCoI6NsRvgY+C1/D0P44VJuwOQeGeJPkOu+
+         PQKUn7DU3dgrjwx+SYjAh578PnhJGRPN1H+HG+kmiuES5lesbrAisjnUfVTpc1gVJQSR
+         4vqeRGU45HkabelkuOjTzyBWjknhPBUwfCDF9S+SKbhRuY5su9UGvN6QW7goSkkwK1A8
+         AHrkLu/bYVx3sLcA4FfJpCnr33mlxUsg/3tR1S3vhM4AIJEM1rj97GduHX13lKX/bZsb
+         yMVw==
+X-Gm-Message-State: AOJu0YyU+WJ+EGZ09Cpk6c447V0g7aH67iaDrIUU3fjIUBTEp0rLRkeF
+	N9SwQEg/eDBikc61n7zS7Bt6xROLXJTVaknpQUl7oXNs+I7yHmBtdrk8pfON2gRs9TaeKV3uqa1
+	RSf17kyGamhgWXr1TtFrZpQVmQ5UGkm8z2r0Itmk=
+X-Gm-Gg: ASbGncvKWHUCZzgJjLlqpIsejUIPgrx6xlwqh5Ks8d+ePHpRKM7Apj1pIyRuZqyiXDx
+	Xr7aul0mmfHFXOhpaU/tx1IPijtNrHgfvGm0AelcoAySiAtBypjH//1qu69yJ4qYCvuTiJ9dSwe
+	MyKdCnuEao1DarZQCLaNx4+EBcEnOEL65yJsnVEzXyGcTz1w4aBQX1B0ortkaEWXrA2IurTyTGi
+	1tuGSxABYjnTmXJRYGE8EguONw8ugKDzwGT3Re4pZ6vNalE2quikC5YJLlrwVARhi196+3Dtg1Z
+	neDq
+X-Google-Smtp-Source: AGHT+IHgUoBYSs1Ui5eLQ8OYfjFCd/t/iFFT0en1iYaWbLE78j1USxFDEmAp18V0mTVwTArsi++M2GNg1PkW0I18Apc=
+X-Received: by 2002:a17:907:3f26:b0:b3d:9261:ff1b with SMTP id
+ a640c23a62f3a-b72e029316emr628392266b.5.1762751892536; Sun, 09 Nov 2025
+ 21:18:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <YT1PR01MB9451424C6870795133FB7C96B3A72@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
- <36fb31bf2c854cdc930a3415f5551dcd@izw-berlin.de> <CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com>
- <uildcjpqxzc5nckupgdeeifkrqwrau2qxuc2df2uxuyys3i2k2@iz2bmi6yojyu>
- <YT1PR01MB945191C652AEE173CEADBA3EB3A12@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
- <aaloi77h2f5xolhrnegxsxntqp2jopwisunmjfp45idsoockpy@cy5agf2oqjop> <CANT5p=r=QgseACdUQySq2MCxycMsG-EvHCx-wwUPWo+xkSRVXg@mail.gmail.com>
-In-Reply-To: <CANT5p=r=QgseACdUQySq2MCxycMsG-EvHCx-wwUPWo+xkSRVXg@mail.gmail.com>
+References: <CAH2r5mtnf1eBTXnDQBiQYKrwEwUzxcxC5Nfv1NbiCdudQMaUZA@mail.gmail.com>
+In-Reply-To: <CAH2r5mtnf1eBTXnDQBiQYKrwEwUzxcxC5Nfv1NbiCdudQMaUZA@mail.gmail.com>
 From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Mon, 10 Nov 2025 10:07:19 +0530
-X-Gm-Features: AWmQ_bkOGF1gFLwSwA7TzLwObldE_nxPMnKrzJvI8FrFYr-ts7AmFTifK7E1zTU
-Message-ID: <CANT5p=qMoEMMM_f8Qn8C6hK2pBDLJ6HhqRY80ORrC23CD8i18w@mail.gmail.com>
-Subject: Re: [[ EXT ]] [BUG REPORT] cifs/smb data corruption when writing,
- x86_64, kernel 6.6.71
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: Mark A Whiting <whitingm@opentext.com>, Steve French <smfrench@gmail.com>, 
-	"Heckmann, Ilja" <heckmann@izw-berlin.de>, 
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
-	"henrique.carvalho@suse.com" <henrique.carvalho@suse.com>
+Date: Mon, 10 Nov 2025 10:48:00 +0530
+X-Gm-Features: AWmQ_blFf_ipmknB2PTyHkqoaG_0J7bKY1_oo8xXafjWkaNBZ9Paffyawvw0fJI
+Message-ID: <CANT5p=p2jb2dmgQJw2jen_JcvUw8BJYV1Lq4pfUzuMVDpx=v2A@mail.gmail.com>
+Subject: Re: New netfs crash in last month or so
+To: Steve French <smfrench@gmail.com>, David Howells <dhowells@redhat.com>, 
+	Paulo Alcantara <pc@manguebit.com>, Paulo Alcantara <pc@manguebit.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, 
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 7, 2025 at 6:24=E2=80=AFPM Shyam Prasad N <nspmangalore@gmail.c=
-om> wrote:
+On Sat, Nov 8, 2025 at 4:37=E2=80=AFAM Steve French <smfrench@gmail.com> wr=
+ote:
 >
-> On Thu, Mar 27, 2025 at 6:39=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.d=
-e> wrote:
-> >
-> > Hi Mark,
-> >
-> > On 03/27, Mark A Whiting wrote:
-> > >>This is the fix we used (rebased on top of v6.6.71 tag):
-> > >>https://git.exis.tech/linux.git/commit/?h=3Ddata_corruption_v6.x&id=
-=3D8d4c40e084f3d132434d5d3d068175c8db59ce65
-> > >
-> > >I tried following the link but it gave me a "502 Bad Gateway" error, I=
- also tried the link on my personal machine at home in case it was my corpo=
-rate network blocking things, same result. I don't know how big the patch i=
-s. Any chance you could just drop it in this thread?
-> >
-> > Yes, sorry about that, I'm having problems on that server.
-> > Patch is attached.
-> >
-> > >>@Ilja @Mark could you test it with your reproducer please?
-> > >>@Steve can you try it with the reproducer mentioned in the commit mes=
-sage please?
-> > >>
-> > >
-> > >I would be happy to try it out.
-> >
-> > Thanks, I'm eager to know the results.
-> >
-> >
-> > Cheers,
-> >
-> > Enzo
+> Have been seeing this netfs crash over the last month or so
+> (presumably a recent regression) for example running generix/215.
+> Ideas welcome
 >
-> Hi Enzo,
+> [Fri Nov 7 10:03:14 2025] run fstests generic/215 at 2025-11-07 10:03:15
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [Fri Nov 7 10:03:15 2025] BUG: KASAN: slab-use-after-free in
+> netfs_limit_iter+0x50f/0x770 [netfs]
+> [Fri Nov 7 10:03:15 2025] Read of size 1 at addr ff1100011b65d910 by
+> task kworker/u36:2/69285
+> [Fri Nov 7 10:03:15 2025] CPU: 3 UID: 0 PID: 69285 Comm: kworker/u36:2
+> Tainted: G E 6.18.0-rc4 #1 PREEMPT(voluntary)
+> [Fri Nov 7 10:03:15 2025] Tainted: [E]=3DUNSIGNED_MODULE
+> [Fri Nov 7 10:03:15 2025] Hardware name: Red Hat KVM, BIOS
+> 1.16.3-4.el9 04/01/2014
+> [Fri Nov 7 10:03:15 2025] Workqueue: events_unbound
+> netfs_write_collection_worker [netfs]
+> [Fri Nov 7 10:03:15 2025] Call Trace:
+> [Fri Nov 7 10:03:15 2025] <TASK>
+> [Fri Nov 7 10:03:15 2025] dump_stack_lvl+0x79/0xb0
+> [Fri Nov 7 10:03:15 2025] print_report+0xcb/0x610
+> [Fri Nov 7 10:03:15 2025] ? __virt_addr_valid+0x19a/0x300
+> [Fri Nov 7 10:03:15 2025] ? netfs_limit_iter+0x50f/0x770 [netfs]
+> [Fri Nov 7 10:03:15 2025] ? netfs_limit_iter+0x50f/0x770 [netfs]
+> [Fri Nov 7 10:03:15 2025] kasan_report+0xca/0x100
+> [Fri Nov 7 10:03:15 2025] ? netfs_limit_iter+0x50f/0x770 [netfs]
+> [Fri Nov 7 10:03:15 2025] netfs_limit_iter+0x50f/0x770 [netfs]
+> [Fri Nov 7 10:03:15 2025] ? __pfx_netfs_limit_iter+0x10/0x10 [netfs]
+> [Fri Nov 7 10:03:15 2025] ? cifs_prepare_write+0x28e/0x490 [cifs]
+> [Fri Nov 7 10:03:15 2025] netfs_retry_writes+0x94d/0xcf0 [netfs]
+> [Fri Nov 7 10:03:15 2025] ? __pfx_netfs_retry_writes+0x10/0x10 [netfs]
+> [Fri Nov 7 10:03:15 2025] ? folio_end_writeback+0x9b/0xf0
+> [Fri Nov 7 10:03:15 2025] ? netfs_folio_written_back+0x1af/0x3e0 [netfs]
+> [Fri Nov 7 10:03:15 2025] netfs_write_collection+0x936/0x1bb0 [netfs]
+> [Fri Nov 7 10:03:15 2025] netfs_write_collection_worker+0x13d/0x2b0 [netf=
+s]
+> [Fri Nov 7 10:03:15 2025] process_one_work+0x4bf/0xb40
+> [Fri Nov 7 10:03:15 2025] ? __pfx_process_one_work+0x10/0x10
+> [Fri Nov 7 10:03:15 2025] ? assign_work+0xd6/0x110
+> [Fri Nov 7 10:03:15 2025] worker_thread+0x2c9/0x550
+> [Fri Nov 7 10:03:15 2025] ? __pfx_worker_thread+0x10/0x10
+> [Fri Nov 7 10:03:15 2025] kthread+0x216/0x3e0
+> [Fri Nov 7 10:03:15 2025] ? __pfx_kthread+0x10/0x10
+> [Fri Nov 7 10:03:15 2025] ? __pfx_kthread+0x10/0x10
+> [Fri Nov 7 10:03:15 2025] ? lock_release+0xc4/0x270
+> [Fri Nov 7 10:03:15 2025] ? rcu_is_watching+0x20/0x50
+> [Fri Nov 7 10:03:15 2025] ? __pfx_kthread+0x10/0x10
+> [Fri Nov 7 10:03:15 2025] ret_from_fork+0x2a8/0x350
+> [Fri Nov 7 10:03:15 2025] ? __pfx_kthread+0x10/0x10
+> [Fri Nov 7 10:03:15 2025] ret_from_fork_asm+0x1a/0x30
+> [Fri Nov 7 10:03:15 2025] </TASK>
+> [Fri Nov 7 10:03:15 2025] Allocated by task 74971:
+> [Fri Nov 7 10:03:15 2025] kasan_save_stack+0x24/0x50
+> [Fri Nov 7 10:03:15 2025] kasan_save_track+0x14/0x30
+> [Fri Nov 7 10:03:15 2025] __kasan_kmalloc+0x7f/0x90
+> [Fri Nov 7 10:03:15 2025] netfs_folioq_alloc+0x56/0x1b0 [netfs]
+> [Fri Nov 7 10:03:15 2025] rolling_buffer_init+0x23/0x70 [netfs]
+> [Fri Nov 7 10:03:15 2025] netfs_create_write_req+0x85/0x360 [netfs]
+> [Fri Nov 7 10:03:15 2025] netfs_writepages+0x110/0x520 [netfs]
+> [Fri Nov 7 10:03:15 2025] do_writepages+0x123/0x260
+> [Fri Nov 7 10:03:15 2025] filemap_fdatawrite_wbc+0x74/0x90
+> [Fri Nov 7 10:03:15 2025] __filemap_fdatawrite_range+0x9a/0xc0
+> [Fri Nov 7 10:03:15 2025] filemap_write_and_wait_range+0x56/0xc0
+> [Fri Nov 7 10:03:15 2025] cifs_flush+0x10c/0x1f0 [cifs]
+> [Fri Nov 7 10:03:15 2025] filp_flush+0x97/0xd0
+> [Fri Nov 7 10:03:15 2025] __x64_sys_close+0x4a/0x90
+> [Fri Nov 7 10:03:15 2025] do_syscall_64+0x75/0x9c0
+> [Fri Nov 7 10:03:15 2025] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [Fri Nov 7 10:03:15 2025] Freed by task 69285:
+> [Fri Nov 7 10:03:15 2025] kasan_save_stack+0x24/0x50
+> [Fri Nov 7 10:03:15 2025] kasan_save_track+0x14/0x30
+> [Fri Nov 7 10:03:15 2025] __kasan_save_free_info+0x3b/0x60
+> [Fri Nov 7 10:03:15 2025] __kasan_slab_free+0x43/0x70
+> [Fri Nov 7 10:03:15 2025] kfree+0x11a/0x630
+> [Fri Nov 7 10:03:15 2025] rolling_buffer_delete_spent+0x80/0xa0 [netfs]
+> [Fri Nov 7 10:03:15 2025] netfs_write_collection+0x119c/0x1bb0 [netfs]
+> [Fri Nov 7 10:03:15 2025] netfs_write_collection_worker+0x13d/0x2b0 [netf=
+s]
+> [Fri Nov 7 10:03:15 2025] process_one_work+0x4bf/0xb40
+> [Fri Nov 7 10:03:15 2025] worker_thread+0x2c9/0x550
+> [Fri Nov 7 10:03:15 2025] kthread+0x216/0x3e0
+> [Fri Nov 7 10:03:15 2025] ret_from_fork+0x2a8/0x350
+> [Fri Nov 7 10:03:15 2025] ret_from_fork_asm+0x1a/0x30
+> [Fri Nov 7 10:03:15 2025] The buggy address belongs to the object at
+> ff1100011b65d800
+> which belongs to the cache kmalloc-512 of size 512
+> [Fri Nov 7 10:03:15 2025] The buggy address is located 272 bytes inside o=
+f
+> freed 512-byte region [ff1100011b65d800, ff1100011b65da00)
+> [Fri Nov 7 10:03:15 2025] The buggy address belongs to the physical page:
+> [Fri Nov 7 10:03:15 2025] page: refcount:0 mapcount:0
+> mapping:0000000000000000 index:0x0 pfn:0x11b658
+> [Fri Nov 7 10:03:15 2025] head: order:3 mapcount:0 entire_mapcount:0
+> nr_pages_mapped:0 pincount:0
+> [Fri Nov 7 10:03:15 2025] anon flags:
+> 0x17ffffc0000040(head|node=3D0|zone=3D2|lastcpupid=3D0x1fffff)
+> [Fri Nov 7 10:03:15 2025] page_type: f5(slab)
+> [Fri Nov 7 10:03:15 2025] raw: 0017ffffc0000040 ff11000100038c80
+> 0000000000000000 dead000000000001
+> [Fri Nov 7 10:03:15 2025] raw: 0000000000000000 0000000000200020
+> 00000000f5000000 0000000000000000
+> [Fri Nov 7 10:03:15 2025] head: 0017ffffc0000040 ff11000100038c80
+> 0000000000000000 dead000000000001
+> [Fri Nov 7 10:03:15 2025] head: 0000000000000000 0000000000200020
+> 00000000f5000000 0000000000000000
+> [Fri Nov 7 10:03:15 2025] head: 0017ffffc0000003 ffd40000046d9601
+> 00000000ffffffff 00000000ffffffff
+> [Fri Nov 7 10:03:15 2025] head: ffffffffffffffff 0000000000000000
+> 00000000ffffffff 0000000000000008
+> [Fri Nov 7 10:03:15 2025] page dumped because: kasan: bad access detected
+> [Fri Nov 7 10:03:15 2025] Memory state around the buggy address:
+> [Fri Nov 7 10:03:15 2025] ff1100011b65d800: fa fb fb fb fb fb fb fb fb
+> fb fb fb fb fb fb fb
+> [Fri Nov 7 10:03:15 2025] ff1100011b65d880: fb fb fb fb fb fb fb fb fb
+> fb fb fb fb fb fb fb
+> [Fri Nov 7 10:03:15 2025] >ff1100011b65d900: fb fb fb fb fb fb fb fb
+> fb fb fb fb fb fb fb fb
+> [Fri Nov 7 10:03:15 2025] ^
+> [Fri Nov 7 10:03:15 2025] ff1100011b65d980: fb fb fb fb fb fb fb fb fb
+> fb fb fb fb fb fb fb
+> [Fri Nov 7 10:03:15 2025] ff1100011b65da00: fc fc fc fc fc fc fc fc fc
+> fc fc fc fc fc fc fc
+> [Fri Nov 7 10:03:15 2025]
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [Fri Nov 7 10:03:15 2025] Disabling lock debugging due to kernel taint
 >
-> I reviewed the patch from my end.
->
-> I think you missed the test for non-dirty folios in your change.
-> -           if (!folio_test_dirty(folio) ||
-> -               folio_test_writeback(folio)) {
-> +           if (folio_test_writeback(folio)) {
-> I think this is why Mark and Bharath saw the WARNING with this patch.
-> This happens when there's a clean folio in the extended range. With
-> your patch, it will add such a folio to the batch as well.
->
-> I also did not understand the reason for setting stop to false in these c=
-ases:
-> +           if (xa_is_value(folio)) {
-> +               stop =3D false;
->                 break;
->             }
->
-> +           if (unlikely(folio !=3D xas_reload(xas) || folio->mapping !=
-=3D
-> mapping)) {
-> +               stop =3D false;
-> +               goto put_next;
->             }
->
-> It looks to me like it's a bug if we're hitting either of the above
-> conditions. i.e. file mapping should always match and the folio should
-> always be a pointer in the file mapping.
-> Won't we end up in an infinite loop if ever something causes these to be =
-true?
->
-> Rest of the changes look good to me.
+> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/=
+8/builds/152/steps/78/logs/stdio
 >
 > --
-> Regards,
-> Shyam
+> Thanks,
+>
+> Steve
+>
 
-Hi Enzo, David and Steve,
-
-Can we please review the above and send out a final patch to stable?
-Without this patch, this is a serious data corruption in the affected
-kernels.
+It looks like a missing initialization in the netfs write retry code.
+This initialization of sreq_max_segs seems different from all the
+other places to me:
+https://elixir.bootlin.com/linux/v6.18-rc4/source/fs/netfs/write_retry.c#L1=
+62
+David / Paulo: Is it expected to set a non-zero value to this? If the
+value of this was 0, we wouldn't have called netfs_limit_iter in this
+codepath.
 
 --=20
 Regards,
