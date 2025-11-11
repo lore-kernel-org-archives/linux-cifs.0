@@ -1,189 +1,85 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AD92D780C
-	for <linux-cifs@vger.kernel.org>; Mon, 10 Nov 2025 17:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64D11C6FE1
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 05:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762795854; cv=none; b=H4ldgOhF9uSoxLmRc/XfvY5Th6oTVy+LELeldOd0YHo4mzP5WU1OvRCOvQdaM7zD9WcKA2hEmx1P6SfwESkUfXXcsRoVI8AhRNlEOtnTuTMdi+YvIqwtc5bRSs6a8EY67lkxfj7itDJXC68gIh+tudv7NKcqYzEscNwtaxic7+c=
+	t=1762839999; cv=none; b=iu201r6U3RhvUgktTz9kwaBH49y6KzIvbl+2rXtDGCJ8xcR3/5pAmL9nRk/Da+s6YMzcaHvFAAj5Q4AgRmgW57rE5iQKw6Sx6tLj65ILjk1vtNr8PC5xWrD1RiahKl3zyQEcW8LM6uEHx9uE7WNUijLJO/fqXdtVst6VxH2j54U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762795854; c=relaxed/simple;
-	bh=troxVhxfQBVjFwf8LpZkj4v60KJWpcZ7GG8KqeA3sP8=;
+	s=arc-20240116; t=1762839999; c=relaxed/simple;
+	bh=88MA7FFfqsE2m/H01Z3+We2u+DvOXcJRGWjb+ba/aq0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FnefUfYzXEleAXMXHRoZc6kzVKktBqsGw56sKzlaMwFqhnSxBT47hZeYkSJMa9ViEiljiTBUy+cvcZCoSOGzewQQBnQqFfZpgPj/EAF5Di0pyPEGN3NpDJcyFXLt4rh3gHHrtBZMY0jrjMQcTeRCszjxQGXfVAMZo1EGnD6iRtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AC9XHANc; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=qDZ1X6IXP6ahFPX+1uKUievPWn8lwfnYFSJuDpTV68aWoqurEUItRC105QAJasw0XHLNcx4e60BlniSyS9vbO1bBKtX06q6c00LGYCB0LyT+tj+0mEMgmwLVz6/oIU5u8Je3cyOQX8xCgSP2ofMryAkGTUwzxGYuIMKV78ihc2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZwufzs1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AC9XHANc"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-782e93932ffso2717877b3a.3
-        for <linux-cifs@vger.kernel.org>; Mon, 10 Nov 2025 09:30:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762795851; x=1763400651; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZBupVcckmVz5Ln4jfPWyUolTVnASsByCuaOtA4I7qvo=;
-        b=AC9XHANc7Jv98OiD1RAbXbgghzmw1fEwG+S7ohAbVKTZWl40zZDYQxjQT60E0kzVgF
-         0lDK3EhNyqlXgP46+IyQtHB8hn5TTuyX8hGN7aPnqGaC/cZ/twGlZbKdZ4mHsmjIMj2m
-         9B235fBEy+69JEIZbjZKnmzi0oot5veGPLpqdFnhs6N0L6Z4WRAY3bOc2sWGobkCepm7
-         29F+ut8qbkM9nIyouH+e9sIriR42Kmct4jI6zyyL2LV5cRdCJE9MZ2KaCcj1YONMjG0N
-         BLlTXjRo6B8D1sl2IY0/xH6nDtCVzbGhLx6JTNf/sUskbrDXyIOTzOZLSIPdvJK0aHUy
-         HwUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762795851; x=1763400651;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZBupVcckmVz5Ln4jfPWyUolTVnASsByCuaOtA4I7qvo=;
-        b=dXLe5L5W8tLvnVG6mk9PMvIWFLsPs5rWpFlSiD3EwlhtQGyxee8v8WHbL8+KmMjs8K
-         O9snLpA73EQGM7+XriicCcVfmICqiX2UD+LgYDoiuHTt1q5zsn4iY5Yd8MXIJw3ecJW2
-         /QpwiyeLi5Qb1NMhSgwG3PyCwBO0qC7ybmK7Y236RMU9sbzP7LPXLtj9dfM6XppSvPW1
-         eN55JGfJz+L+dE3q6m784XK1eTdQZAlAyYhBh7GZ92UxQ8up3swRKnZn25diLd81Ybpj
-         xs/VhzmAYEXolTsSa8gwygdnjcwiRkIpGUIlPxuBrCk1ep53jiO86uUlgVg6U8iWTs12
-         vhRw==
-X-Forwarded-Encrypted: i=1; AJvYcCVicEHZE3d7JF6TPSMr5PYqoKzb1G5gdQ0DvKgjPsoOhDHOB88gxLayTNqrhFBcWqnFRe+7JguKhpfO@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywz+BU1z03nnOaPczujG7NPXfgZgSXchzIWMUdWKM6o6RULwZji
-	JSKB9JdvTP2922yN2AqomooYaJG/GsaFnqfNHs/YLrurXmS6g/PopAkNeDdTaC3CnpVMHpg2ZDv
-	pY3bgMbJm+H1qnZroMDtvGNXfg6TsfFg=
-X-Gm-Gg: ASbGncvoHh4ftcc55Zqtx3Qdge5UdkjjG5YuHlTdiDhxtfIOYrN6QT5MwdXzsc+e8r4
-	9j+jAjZlLAu00iiCfCDDhFfr4E3GlYHyQr6lo1wz5zc2TR/mxzeNAH0IRVad99esUVCkL98OjzD
-	p4RKuqQE5HsyVMtB3SbZYfvul0L9cW5ncAt2ywjE8lutv4z3pLCvX4+0VbwnoFcjuwzbGegbUM/
-	sOydEsRCF3tcj+TXA3dvcJjbJNL2SqhdiJv8qlN+W7vn6M1NXLDPHNmKm2f
-X-Google-Smtp-Source: AGHT+IG1vzxlgOlG9RofPIQ8HXS/TzZg0c7M7/gWC0zTYmT64xMp8LfK4tDIRftHYt3f+PSr3BPp3nPvSQoI3SsCuMA=
-X-Received: by 2002:a17:90a:ac0e:b0:343:747e:2cab with SMTP id
- 98e67ed59e1d1-343747e31a5mr6285125a91.8.1762795851107; Mon, 10 Nov 2025
- 09:30:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZwufzs1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CFD9C116B1
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 05:46:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762839999;
+	bh=88MA7FFfqsE2m/H01Z3+We2u+DvOXcJRGWjb+ba/aq0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=FZwufzs1svcGhCfpLuQNqjnWtHM4V8hOrHKApdHZ0xX9tdOlR3jljP+OJufenNL6h
+	 4OvKif3vLyl55Xnlk1LFXAnqWCILvNogQO8XFnESMWqvSFKY06fUHoPlHXMEVdCjQq
+	 qpBmvU/hBFjPuBLhiBRl9n7dkbG0fh6Mo1RvtRVlt5tagaVvgj0huDOcxajCZNvEh+
+	 PsT8XbB61VMrCnaL8DCvrk8nL4mEzQHz6h8dv9CzOuupzH0OWT0+j0SyTEyGWEJgDV
+	 zJeBYtDT1uUVeokS384gnyYNxmMZ87s8iPTaqNQWOptZqHVnun2L+JSKIME9xoq3ML
+	 XepzZOTL1wnxg==
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6419b7b4b80so2468554a12.2
+        for <linux-cifs@vger.kernel.org>; Mon, 10 Nov 2025 21:46:39 -0800 (PST)
+X-Gm-Message-State: AOJu0YybT2guHsAUxRB1EVAyhQNLZaMnN5B2GfG+tE87Wa4fWmDFcu0T
+	bgzRQ2pIpqbNud2SZoHNxabcwKVRqfqA6v301VcoxL5xLfXztj3Y7ZXKTkrwi0UBw2ZhmnJFszk
+	W4FEfOdXqLiNuFKp0BrXWiksV946LTkc=
+X-Google-Smtp-Source: AGHT+IGwEPdaSDYQbTScYkkptse9ATIhZO7TWXe/XoISjgO/uLNwm7phNBo2mRF7mkqD+QDGLEsI3q8e93DG9aSId+w=
+X-Received: by 2002:a17:907:7f0d:b0:b40:cfe9:ed2c with SMTP id
+ a640c23a62f3a-b72e05c9530mr979626366b.64.1762839997984; Mon, 10 Nov 2025
+ 21:46:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251106005333.956321-1-neilb@ownmail.net> <20251106005333.956321-12-neilb@ownmail.net>
- <CAEjxPJ528Ou4dvRwHo+kXjWreGicda8BOXkQRvq3vMED6JQKOQ@mail.gmail.com>
-In-Reply-To: <CAEjxPJ528Ou4dvRwHo+kXjWreGicda8BOXkQRvq3vMED6JQKOQ@mail.gmail.com>
-From: Stephen Smalley <stephen.smalley.work@gmail.com>
-Date: Mon, 10 Nov 2025 12:30:39 -0500
-X-Gm-Features: AWmQ_bndNmWOI1mokvMjGbHl4ympSya5-SIjECF6vpxPVypYlN3NvFXLixarZ1U
-Message-ID: <CAEjxPJ6-BXRntLqNRJxveAbwHmC2EB9YYg7f4hLD9T2g-H3fzw@mail.gmail.com>
-Subject: Re: [PATCH v5 11/14] Add start_renaming_two_dentries()
-To: NeilBrown <neil@brown.name>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	Amir Goldstein <amir73il@gmail.com>, Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	Jeff Layton <jlayton@kernel.org>, Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, 
-	David Howells <dhowells@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, Tyler Hicks <code@tyhicks.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Chuck Lever <chuck.lever@oracle.com>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
-	Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Carlos Maiolino <cem@kernel.org>, 
-	John Johansen <john.johansen@canonical.com>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
-	Ondrej Mosnacek <omosnace@redhat.com>, Mateusz Guzik <mjguzik@gmail.com>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Stefan Berger <stefanb@linux.ibm.com>, 
-	"Darrick J. Wong" <djwong@kernel.org>, linux-kernel@vger.kernel.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org
+References: <20251110152420.2889233-1-metze@samba.org>
+In-Reply-To: <20251110152420.2889233-1-metze@samba.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 11 Nov 2025 14:46:26 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9CMKMfMZGSL05fm9uE0FcdiSHRhMUcqVdxVfFv1mJFHg@mail.gmail.com>
+X-Gm-Features: AWmQ_bnWpKDAr3OvJboQXFJlGFZRaQQTIGqXGsox1QeN4YJHzwrvkRn6R9YCfn8
+Message-ID: <CAKYAXd9CMKMfMZGSL05fm9uE0FcdiSHRhMUcqVdxVfFv1mJFHg@mail.gmail.com>
+Subject: Re: [PATCH] smb: server: let smb_direct_disconnect_rdma_connection()
+ turn CREATED into DISCONNECTED
+To: Stefan Metzmacher <metze@samba.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 10, 2025 at 11:08=E2=80=AFAM Stephen Smalley
-<stephen.smalley.work@gmail.com> wrote:
+On Tue, Nov 11, 2025 at 12:24=E2=80=AFAM Stefan Metzmacher <metze@samba.org=
+> wrote:
 >
-> On Wed, Nov 5, 2025 at 7:56=E2=80=AFPM NeilBrown <neilb@ownmail.net> wrot=
-e:
-> >
-> > From: NeilBrown <neil@brown.name>
-> >
-> > A few callers want to lock for a rename and already have both dentries.
-> > Also debugfs does want to perform a lookup but doesn't want permission
-> > checking, so start_renaming_dentry() cannot be used.
-> >
-> > This patch introduces start_renaming_two_dentries() which is given both
-> > dentries.  debugfs performs one lookup itself.  As it will only continu=
-e
-> > with a negative dentry and as those cannot be renamed or unlinked, it i=
-s
-> > safe to do the lookup before getting the rename locks.
-> >
-> > overlayfs uses start_renaming_two_dentries() in three places and  selin=
-ux
-> > uses it twice in sel_make_policy_nodes().
-> >
-> > In sel_make_policy_nodes() we now lock for rename twice instead of just
-> > once so the combined operation is no longer atomic w.r.t the parent
-> > directory locks.  As selinux_state.policy_mutex is held across the whol=
-e
-> > operation this does open up any interesting races.
-
-Also, I assume you mean "does NOT open up any interesting races" above.
-
-> >
-> > Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-> > Signed-off-by: NeilBrown <neil@brown.name>
-> >
-> > ---
-> > changes since v3:
-> >  added missing assignment to rd.mnt_idmap in ovl_cleanup_and_whiteout
-> > ---
+> When smb_direct_disconnect_rdma_connection() turns SMBDIRECT_SOCKET_CREAT=
+ED
+> into SMBDIRECT_SOCKET_ERROR, we'll have the situation that
+> smb_direct_disconnect_rdma_work() will set SMBDIRECT_SOCKET_DISCONNECTING
+> and call rdma_disconnect(), which likely fails as we never reached
+> the RDMA_CM_EVENT_ESTABLISHED. it means that
+> wait_event(sc->status_wait, sc->status =3D=3D SMBDIRECT_SOCKET_DISCONNECT=
+ED)
+> in free_transport() will hang forever in SMBDIRECT_SOCKET_DISCONNECTING
+> never reaching SMBDIRECT_SOCKET_DISCONNECTED.
 >
-> > diff --git a/security/selinux/selinuxfs.c b/security/selinux/selinuxfs.=
-c
-> > index 232e087bce3e..a224ef9bb831 100644
-> > --- a/security/selinux/selinuxfs.c
-> > +++ b/security/selinux/selinuxfs.c
-> > @@ -539,22 +540,30 @@ static int sel_make_policy_nodes(struct selinux_f=
-s_info *fsi,
-> >         if (ret)
-> >                 goto out;
-> >
-> > -       lock_rename(tmp_parent, fsi->sb->s_root);
-> > +       rd.old_parent =3D tmp_parent;
-> > +       rd.new_parent =3D fsi->sb->s_root;
-> >
-> >         /* booleans */
-> > -       d_exchange(tmp_bool_dir, fsi->bool_dir);
-> > +       ret =3D start_renaming_two_dentries(&rd, tmp_bool_dir, fsi->boo=
-l_dir);
-> > +       if (!ret) {
-> > +               d_exchange(tmp_bool_dir, fsi->bool_dir);
+> So we directly go from SMBDIRECT_SOCKET_CREATED to
+> SMBDIRECT_SOCKET_DISCONNECTED.
 >
-> I would recommend an immediate goto out if ret !=3D 0; we don't want to
-> silently fall through and possibly reset ret on the next
-> start_renaming_two_dentries() call, thereby ultimately returning 0 to
-> the caller and acting as if nothing bad happened.
->
-> >
-> > -       swap(fsi->bool_num, bool_num);
-> > -       swap(fsi->bool_pending_names, bool_names);
-> > -       swap(fsi->bool_pending_values, bool_values);
-> > +               swap(fsi->bool_num, bool_num);
-> > +               swap(fsi->bool_pending_names, bool_names);
-> > +               swap(fsi->bool_pending_values, bool_values);
-> >
-> > -       fsi->bool_dir =3D tmp_bool_dir;
-> > +               fsi->bool_dir =3D tmp_bool_dir;
-> > +               end_renaming(&rd);
-> > +       }
-> >
-> >         /* classes */
-> > -       d_exchange(tmp_class_dir, fsi->class_dir);
-> > -       fsi->class_dir =3D tmp_class_dir;
-> > +       ret =3D start_renaming_two_dentries(&rd, tmp_class_dir, fsi->cl=
-ass_dir);
-> > +       if (ret =3D=3D 0) {
-> > +               d_exchange(tmp_class_dir, fsi->class_dir);
-> > +               fsi->class_dir =3D tmp_class_dir;
-> >
-> > -       unlock_rename(tmp_parent, fsi->sb->s_root);
-> > +               end_renaming(&rd);
-> > +       }
-> >
-> >  out:
-> >         sel_remove_old_bool_data(bool_num, bool_names, bool_values);
-> > --
-> > 2.50.0.107.gf914562f5916.dirty
-> >
+> Fixes: b3fd52a0d85c ("smb: server: let smb_direct_disconnect_rdma_connect=
+ion() set SMBDIRECT_SOCKET_ERROR...")
+> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: Steve French <smfrench@gmail.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: linux-cifs@vger.kernel.org
+> Cc: samba-technical@lists.samba.org
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Applied it to #ksmbd-for-next-next.
+Thanks!
