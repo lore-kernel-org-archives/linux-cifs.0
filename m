@@ -1,232 +1,193 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3887434DB54
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 10:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6A134FF6E
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 10:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762857574; cv=none; b=GPi+4qLojiVE3btjSEvxpum5P+dWKZxKvezRzWVho0RGcxezyy57odF6LBPdwzft82OXjsYgTJBMmLAclac2ZT913o2PSSHg1X6gFPUvYpzfH2BbVDbdly5zFi3hs5xS/YAvl5kGUZBejA8R2/i+gFKQIqP9FB9Uzhil7agx8Pg=
+	t=1762858079; cv=none; b=Z4yZ5yvVU9dZ8nu5sJ3Zo9BGA5hltoRw7rHPUVaCQGweQ8nAjhqwGSHdnXQKy2BLe91VRRoZS2wpxGlvWE4mfEnpYDugHkXoPxh1t8vCpMQAqvYEcEKbCX+qRA5sspgMlox85XSqSaylAwn0addY+9oRxqNXG6YDTuqizCCzsuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762857574; c=relaxed/simple;
-	bh=V1xi4wZp79WYbmsxVdcyCRKtx4O9XmbAwt7bqZyz4M8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dXoS6wfS+sMHIenmQ5fccnVYSztfDnt9JhhTuUPb203GxBOp+eYcnClymnNClLGFzDsq5gEm2Ht40oEC/OTFlu5CXFl8zyUTWe4Ki3zqAaQBJInt03an3hcIOp055SHB5B4Mh2ZYdpeAUP8WGL5MAA8qdJCUSCnCW2AXIAeIcso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=isb6pvka; arc=none smtp.client-ip=209.85.218.54
+	s=arc-20240116; t=1762858079; c=relaxed/simple;
+	bh=WfUCYKomq065xhjullLuTILgOb0RdHyS2EMF53wqVws=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XbkHDGMdMaF2q544J/2fg886aBs6g4buHGN5QpRScCE+zan+AphTUXctY70GgOUREOqT2CBz1oZ+P5/+CQygTQiDmw8FKRrhV9VYFwEs07pDJndm3J6CP/aB2e39Pg3lV/deBkL+Txsc8g8KhiivLJFKpCNDzZXEMDmYK2t2Jk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=InNTWs9p; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="isb6pvka"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b472842981fso523217366b.1
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 02:39:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="InNTWs9p"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7aad4823079so3670560b3a.0
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 02:47:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762857570; x=1763462370; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JjWKcRO+2b+ndJ2XljKkgDsj61sT++Z6j1qUmNjzl/A=;
-        b=isb6pvkaHWu3dkgmjrPcW9O/EacCQRIe/MdP979IjydiccQFSRDTbi/hnRmfShHRRI
-         HMSpTHYebz0A+Jpww0EvlPWOB9m4UIhuWzCBZpxLTemulFrlsi9U3yoQTUBzlXpI7Mmi
-         QmQDbOM0YNhC4KR1E8G1sd7oRI1GQqI/xYZo2Y/G6Ku5toTKm6wPRycPZdrizTDhsvWR
-         P7C0EeCBDc5ohU9OzQ214uCmi08qhMytUtxO0QnG20N6HQLZAM3aUjAqFd8vSCVhaUSG
-         7rBkqVNyj9Dwh+msACx6x4iM7qXyijc15JfKt79927VXYHzUcriGi71BSyWGEosbCbWx
-         agrg==
+        d=gmail.com; s=20230601; t=1762858077; x=1763462877; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KGM7v17X5fBjnUVPBs36cQEsoFHwlXkRLxBvLVWWErg=;
+        b=InNTWs9pHe/+aVO8dwNa+HcMialSUjjTYWzOPDgL3TCnagT87j2UVwGBGYpFzcFqP1
+         CD+7gHWpC0HRT3CYdW2gDRMj+dN8qEYxEsqLtm4oXzFUlKnVAGHdRIvsSnGLupuHqgQD
+         bmQeo1dNsVmDG2DpF61pAEtqSCKSAgyn5LCn1GQvjiKaXNRVhbmANeENrwc0/cQC7/g3
+         fKFgJ0kakyW+Ewwz+G4B1QIACdraTBqwNYtJpm/KzfVvDb5fWBT3r0qIzIStm64Tn2xI
+         WaYbQcU9xJxLlDog6ROOcLPhLZCb5iTJgTELGyzeZ/geWX9zYoQBX1UPnq0RiWhbsHei
+         pGWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762857570; x=1763462370;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JjWKcRO+2b+ndJ2XljKkgDsj61sT++Z6j1qUmNjzl/A=;
-        b=DS1V93HT6pLD0D5hSYsqCcjSk4klu8JQESTJAUUkRaR1queLLxD9TKYXNb1i9VHQqm
-         zotRXnO5rBmlBIAs8Q+WLOQLxFAVUVFvpMThs2LcqqQkgHDkBCwIsurVcG6gWYE+c1K1
-         fl7rtOlKc48hIZEis07/qP4x2oUMIWQER5EdXtzt+JFx2YizkBTy3W/I/mnACokjZPFr
-         2SrhAMQdkPtUPfdV1mccLlf2kBfZO8PP2h+edgZM1TMiEQbLOnvdC60NLBSWCsb53DGK
-         KOqhyckG0g5rwGXLcaPK/ctFDKdd/La5yS/5yeomdfMtGdnTqvRYJMbDbLlQcPrXN+eQ
-         eqUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUTNSR9TGvwoRHa0klk/FmZvKvHJzFTK7hT9/pUV2YtK2+gD9njU8Bsj0Pz6sNybRC4vGqdbjvUrLem@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVTcE8D5ca3FVF0YKG1jLmUJqNjOQNnkQHW8zwkTjDfP3EgNw1
-	oV9T4jia0BY7C1RBIYu/fjfLThjJLQCNB38Cev+JCrkJOX1/IxuvMbwXGouWSCh1e+0WoPdxtiN
-	I2uJ981QvCYf6tm+t7tAztF5zdBZbjtU=
-X-Gm-Gg: ASbGncu7VG0km9B+WdZJFSDvjJQyoClbRh6UX2TCTJa0uu8+2p9jZQcgIQMwPl0NH1q
-	ksqdE66IpHoM/7VfSm4kgfSjbHfw+TVer5nuwxv9Zld2omQIYDG1mqmuduL3ztDK/a0OiVLwATg
-	XmhOPCXo3f4XV0uL37tBQOmzuoIYcv+sVhAaHwxLaVFC7I75EhYXQR3xDdxtrlDOFAo1G6DbUxW
-	Q2og+9YqHIkx42uEO9SC4WXAFVvwznf5G6cIjyzOBk9RORhsquTPRd76hw=
-X-Google-Smtp-Source: AGHT+IEWM/lPCLkXzS7sjuMMmVA9nkDCg2nqlJ6qiMZ+twylPt8tk7cp28fe51bsIQ31I+9LTom69b0ldoEyrmLcMik=
-X-Received: by 2002:a17:907:5c6:b0:b72:6fec:5d0e with SMTP id
- a640c23a62f3a-b72e02ca0e1mr1062204766b.13.1762857570078; Tue, 11 Nov 2025
- 02:39:30 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762858077; x=1763462877;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KGM7v17X5fBjnUVPBs36cQEsoFHwlXkRLxBvLVWWErg=;
+        b=W6n5P4YXSqL4ax7nadaM9cLQd6vZOyff8bRE+H+HKAolnzdIN0Q9b/qMEsmUT7TUvi
+         BY9D7KD+oq+5eV/l76wmSrv2IVVnL6ChN6hi8BqQ1jIVIOoFq5wJb6Lln6IWJpsNsY+c
+         PAGKJbHM8v16cUBVi83Js56oDdrUpptWZ0BzC6qQkXlpWJvRCglKNyKYCIlYFYvi0dNv
+         yztRCc+Jf5S1+INwF8VO1UK1wmzevGjsGmmBavPJgyySEzU7Q5kKkiAB+MNGfeHphuHj
+         p2Y1YMNSNGoD9mRhw2MD1GzVa4JPynVt0yuFo9A0SQH5/G3eK3Pp2nF7r9pi8jbXvPWp
+         eqeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUuys3q0BYsgBcg7IdeByXWDWF3C4rp5mkyFMuBDFZRWSbcqSx+XqHAigsYtkBaHYsg6aUn//VeNXES@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBZ3uoV7lkGpeFxqOI6Cjx+lKLc2HF75n8B9XujaKuH4zGISPr
+	meW5xnavr05kZmvyIRBiVZuTtJALPX0/+xpDoO4buK3u8MryCId8ti0A
+X-Gm-Gg: ASbGncuINA8jU6xRFPVPqLld9Dg7qbkFMWQ/zPIRPy4mSIiamsXz9yxzHxDL4dBQBAs
+	jM8grNugwhoQRvJpE4l3ROyurBNGz5r6SGHQmvkWB9mzZ4TZRfGX+8pCzClCCheTjZXl6InWFPL
+	KollMeI0aD18RW7mWu0QcEZJ3OWr++JFvZde7oTtANbc1OmDZ99k5o83eUAYGgb1IMCZJTTrpea
+	/NGlpO9ikGhkHKKzEcfeClPcU8k8T9rq9A+QCfJOak4p5L6mpE04o2inO6vlRiCbymZKYcgdqUt
+	Lh2U0R75sUUNOqosKCHktxpEfRZIOc7q9NS5BB8EUuTI38uGQkJfZ63JTU5KJP4f7dBboSW7jYv
+	fv1UsjCFhfL1V2Wu0m7gyZHZ30CMA4Diy8xYuIBXTLKV1bF2eWfm+D6Vu6jo2chp5DofcW416yA
+	==
+X-Google-Smtp-Source: AGHT+IEGEeJH5qOCRfzOE45L5zCqZ3JL5eKpNLRtF+FdalHg2ufAcdmgy4UMZm2EL294xytUUaIh9g==
+X-Received: by 2002:a05:6a00:ccc:b0:77f:4c3e:c19d with SMTP id d2e1a72fcca58-7b225c8d22bmr14790664b3a.12.1762858077096;
+        Tue, 11 Nov 2025 02:47:57 -0800 (PST)
+Received: from gmail.com ([2a09:bac1:19c0:20::4:2ee])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0ccd4edc3sm14912911b3a.66.2025.11.11.02.47.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Nov 2025 02:47:56 -0800 (PST)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	Hyunchul Lee <hyc.lee@gmail.com>,
+	Ronnie Sahlberg <lsahlber@redhat.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	Stefan Metzmacher <metze@samba.org>
+Subject: [PATCH v2] ksmbd: server: avoid busy polling in accept loop
+Date: Tue, 11 Nov 2025 18:47:49 +0800
+Message-ID: <20251111104750.25739-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <YT1PR01MB9451424C6870795133FB7C96B3A72@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
- <36fb31bf2c854cdc930a3415f5551dcd@izw-berlin.de> <CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com>
- <uildcjpqxzc5nckupgdeeifkrqwrau2qxuc2df2uxuyys3i2k2@iz2bmi6yojyu>
- <YT1PR01MB945191C652AEE173CEADBA3EB3A12@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
- <aaloi77h2f5xolhrnegxsxntqp2jopwisunmjfp45idsoockpy@cy5agf2oqjop>
- <YT1PR01MB9451A0F623371F50E77CC1C9B3AD2@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
- <CAGypqWw0bnE7_=49HSxgExouk4s5PVFQ6gVH50wrE8_=4b5vAg@mail.gmail.com> <958479.1762852948@warthog.procyon.org.uk>
-In-Reply-To: <958479.1762852948@warthog.procyon.org.uk>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Tue, 11 Nov 2025 16:09:18 +0530
-X-Gm-Features: AWmQ_bkiLijVXeOQbJ5_ryJIcwTEDEN9SxZsZIPLUpK7y6yCSzQQ2FHWw6aVhEk
-Message-ID: <CANT5p=rh7BQBnwNYLxHtFw=YUhAGVnskJ=33i6Eg4porU-X+5A@mail.gmail.com>
-Subject: Re: [[ EXT ]] [BUG REPORT] cifs/smb data corruption when writing,
- x86_64, kernel 6.6.71
-To: David Howells <dhowells@redhat.com>
-Cc: Bharath SM <bharathsm.hsk@gmail.com>, Mark A Whiting <whitingm@opentext.com>, 
-	henrique.carvalho@suse.com, Enzo Matsumiya <ematsumiya@suse.de>, 
-	Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@manguebit.org>, 
-	"Heckmann, Ilja" <heckmann@izw-berlin.de>, 
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 11, 2025 at 2:52=E2=80=AFPM David Howells <dhowells@redhat.com>=
- wrote:
->
-> Okay, the patch isn't good from a quick scan of it.
->
-> > +                     if (folio_test_writeback(folio)) {
-> > +                             /*
-> > +                              * For data-integrity syscalls (fsync(), =
-msync()) we must wait for
-> > +                              * the I/O to complete on the page.
-> > +                              * For other cases (!sync), we can just s=
-kip this page, even if
-> > +                              * it's dirty.
-> > +                              */
-> > +                             if (!sync) {
-> > +                                     stop =3D false;
-> > +                                     goto unlock_next;
-> > +                             } else {
-> > +                                     folio_wait_writeback(folio);
->
-> You can't sleep here.  The RCU read lock is held.  There's no actual need=
- to
-> sleep here anyway - you can just stop and leave the function (well, set
-> stop=3Dtrue and break so that the accumulated batch is processed).
->
-> The way the code is meant to work is that cifs_write_back_from_locked_fol=
-io()
-> locks and waits for the first folio, then calls cifs_extend_writeback() t=
-o add
-> more folios to the writeout - if it doesn't need to wait for them.  You c=
-annot
-> skip any folios as the set has to be contiguous.  If you skip one, you'll
-> corrupt the file.
->
-> Once a set of folios has been dispatched, cifs_writepages_begin() *should=
-*
-> begin with the next folio that hasn't been sent - quite possibly one just
-> rejected by cifs_extend_writeback().  But at this point
-> cifs_write_back_from_locked_folio() will wait for it.
->
-> This should[*] work correctly, even in sync mode, because it should event=
-ually
-> wait for any folio that's already undergoing writeback - though it might =
-be
-> less efficient because if there are competing writebacks, they may end up
-> forcing each other to produce very small writes (there's no
-> writeback-vs-writeback locking apart from the individual folio locks).
->
-> [*] At least as far as the design goes; that's not to say there isn't a b=
-ug in
->     the implementation.
->
-> That said, in sync mode, you might actually want cifs_extend_writeback() =
-to
-> wait - but in that case, you have to drop the RCU read lock before you do=
- the
-> wait and then reset the iteration correctly... and beware that doing that
-> might advance[**] the iterator state.
->
-> [**] It's possible that this is the actual cause of the bug - and that we=
-'re
->      skipping the rejected folio because the xa_state isn't been correctl=
-y
->      rewound.
->
-> David
->
+The ksmbd listener thread was using busy waiting on a listening socket by
+calling kernel_accept() with SOCK_NONBLOCK and retrying every 100ms on
+-EAGAIN. Since this thread is dedicated to accepting new connections,
+there is no need for non-blocking mode.
 
-Hi David,
+Switch to a blocking accept() call instead, allowing the thread to sleep
+until a new connection arrives. This avoids unnecessary wakeups and CPU
+usage. During teardown, call shutdown() on the listening socket so that
+accept() returns -EINVAL and the thread exits cleanly.
 
-Thanks for the detailed review and explanation.
+The socket release mutex is redundant because kthread_stop() blocks until
+the listener thread returns, guaranteeing safe teardown ordering.
 
-Based on your explanation, the continue when folio_try_get fails seems
-out of place. Should that be a break instead?
-https://elixir.bootlin.com/linux/v6.9.12/source/fs/smb/client/file.c#L2758
--------------------------
-if (!folio_try_get(folio)) {
-xas_reset(xas);
-continue;    <<<<<<<<<<<<<<<<
-}
--------------------------
-However, that does not seem to be the cause of the corruption here.
-But can that cause an unnecessary spin loop?
+Also remove sk_rcvtimeo and sk_sndtimeo assignments, which only caused
+accept() to return -EAGAIN prematurely.
 
-Enzo noted in his patch:
--------------------------
-- Pointer arguments are updated before bound checking (actual root cause)
-@_len and @_count are updated with the current folio values before
-actually checking if the current
-values fit in their boundaries, so by the time the function exits, the
-caller (only
-cifs_write_back_from_locked_folio(), that BTW doesn't do any further
-checks) those arguments might
-have crossed bounds and extra data (zeroes) are added as padding.
-Later, with those offsets marked as 'done', the real actual data that
-should've been written into
-those offsets are skipped, making the final file corrupt.
--------------------------
-However, I have a hard time understanding why the zero padding would happen=
-.
+Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+---
+v1 -> v2: https://lore.kernel.org/linux-cifs/20251030064736.24061-1-dqfext@gmail.com
+ Do not remove TCP_NODELAY, as accepted sockets inherits from it.
+ Fix accept() blocking forever on older kernel versions.
+ Remove a redundant mutex
 
-The bound checking does happen after the _count and _len are updated.
-Which would mean that _len can go above max_len and _count can go
-negative.
-https://elixir.bootlin.com/linux/v6.9.12/source/fs/smb/client/file.c#L2793
--------------------------
-index +=3D nr_pages;
-*_count -=3D nr_pages; <<<<<<<<<<<<<< updated first
-*_len +=3D len; <<<<<<<<<<<<<<<< then bound check
-if (max_pages <=3D 0 || *_len >=3D max_len || *_count <=3D 0)  <<<<<<<<<<<<
-bound check
-stop =3D true;
+ fs/smb/server/transport_tcp.c | 28 ++++++----------------------
+ 1 file changed, 6 insertions(+), 22 deletions(-)
 
-if (!folio_batch_add(&batch, folio)) <<<<<<<<<<<<<<<<< folio batch add
-break;
-if (stop)
-break;
-}
--------------------------
-But that would just mean that an extra folio could be added to the
-batch (and marked for writeback), causing the batch to contain more
-len than max_len (which is likely wsize).
-If I follow the code further, adjust_credits can then be called with
-wdata->bytes > wsize, and smb2_adjust_credits can then return
-EOPNOTSUPP, causing us to fail the write:
-https://elixir.bootlin.com/linux/v6.9.12/source/fs/smb/client/smb2ops.c#L29=
-5
--------------------------
-if (credits->value < new_val) {
-trace_smb3_too_many_credits(server->CurrentMid,
-server->conn_id, server->hostname, 0, credits->value - new_val, 0);
-cifs_server_dbg(VFS, "request has less credits (%d) than required (%d)",
-credits->value, new_val);
+diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
+index 6e03e93321b8..79319815b2fc 100644
+--- a/fs/smb/server/transport_tcp.c
++++ b/fs/smb/server/transport_tcp.c
+@@ -22,7 +22,6 @@ struct interface {
+ 	struct socket		*ksmbd_socket;
+ 	struct list_head	entry;
+ 	char			*name;
+-	struct mutex		sock_release_lock;
+ 	int			state;
+ };
+ 
+@@ -236,20 +235,14 @@ static int ksmbd_kthread_fn(void *p)
+ 	unsigned int max_ip_conns;
+ 
+ 	while (!kthread_should_stop()) {
+-		mutex_lock(&iface->sock_release_lock);
+ 		if (!iface->ksmbd_socket) {
+-			mutex_unlock(&iface->sock_release_lock);
+ 			break;
+ 		}
+-		ret = kernel_accept(iface->ksmbd_socket, &client_sk,
+-				    SOCK_NONBLOCK);
+-		mutex_unlock(&iface->sock_release_lock);
+-		if (ret) {
+-			if (ret == -EAGAIN)
+-				/* check for new connections every 100 msecs */
+-				schedule_timeout_interruptible(HZ / 10);
++		ret = kernel_accept(iface->ksmbd_socket, &client_sk, 0);
++		if (ret == -EINVAL)
++			break;
++		if (ret)
+ 			continue;
+-		}
+ 
+ 		if (!server_conf.max_ip_connections)
+ 			goto skip_max_ip_conns_limit;
+@@ -458,10 +451,6 @@ static void tcp_destroy_socket(struct socket *ksmbd_socket)
+ 	if (!ksmbd_socket)
+ 		return;
+ 
+-	/* set zero to timeout */
+-	ksmbd_tcp_rcv_timeout(ksmbd_socket, 0);
+-	ksmbd_tcp_snd_timeout(ksmbd_socket, 0);
+-
+ 	ret = kernel_sock_shutdown(ksmbd_socket, SHUT_RDWR);
+ 	if (ret)
+ 		pr_err("Failed to shutdown socket: %d\n", ret);
+@@ -532,9 +521,6 @@ static int create_socket(struct interface *iface)
+ 		goto out_error;
+ 	}
+ 
+-	ksmbd_socket->sk->sk_rcvtimeo = KSMBD_TCP_RECV_TIMEOUT;
+-	ksmbd_socket->sk->sk_sndtimeo = KSMBD_TCP_SEND_TIMEOUT;
+-
+ 	ret = kernel_listen(ksmbd_socket, KSMBD_SOCKET_BACKLOG);
+ 	if (ret) {
+ 		pr_err("Port listen() error: %d\n", ret);
+@@ -604,12 +590,11 @@ static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
+ 		if (iface && iface->state == IFACE_STATE_CONFIGURED) {
+ 			ksmbd_debug(CONN, "netdev-down event: netdev(%s) is going down\n",
+ 					iface->name);
++			kernel_sock_shutdown(iface->ksmbd_socket, SHUT_RDWR);
+ 			tcp_stop_kthread(iface->ksmbd_kthread);
+ 			iface->ksmbd_kthread = NULL;
+-			mutex_lock(&iface->sock_release_lock);
+-			tcp_destroy_socket(iface->ksmbd_socket);
++			sock_release(iface->ksmbd_socket);
+ 			iface->ksmbd_socket = NULL;
+-			mutex_unlock(&iface->sock_release_lock);
+ 
+ 			iface->state = IFACE_STATE_DOWN;
+ 			break;
+@@ -672,7 +657,6 @@ static struct interface *alloc_iface(char *ifname)
+ 	iface->name = ifname;
+ 	iface->state = IFACE_STATE_DOWN;
+ 	list_add(&iface->entry, &iface_list);
+-	mutex_init(&iface->sock_release_lock);
+ 	return iface;
+ }
+ 
+-- 
+2.43.0
 
-return -EOPNOTSUPP;
-}
--------------------------
-
-However, Enzo's patch *does work* to prevent data corruption as
-verified by Mark and Bharath.
-(There's a WARNING that gets thrown, but that's probably due to a
-required check that Enzo missed in his change)
-What am I missing here?
-
---=20
-Regards,
-Shyam
