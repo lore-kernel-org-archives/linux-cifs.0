@@ -1,155 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA672561AE
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 08:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8332ED15D
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 09:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762850847; cv=none; b=JXt6UfUqOwA6oop5deP+XyY7KbWPfLhqJyU4QLzttDr5xhYFtus3HUbCmtC1vgZeihcGY/2rifpj4TouX35tR2PnmNWNw5Sj6PxFliwCM6H7kMxQyineDapCH8Yjnx8iRrKhJ6C8JaxrPJpT3YagBOKQG2xPKMeNz5jCjdCc9qg=
+	t=1762852972; cv=none; b=pwGBP8xTAWs+6enNgsZugTNrozNYPTuVTZW+GpqpvKh3W9BHsx6sVC45p2gkJUIaxzla0RZa8hJwyBK7UNuT8+LaiBTEsEf3aB4yiJUC0Z5BMZPyQ0nzC1fR8hcI0s6p6uBZ3oAc3WaHq2hl6wAtWvtyqeoARuAjBasNosXiB5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762850847; c=relaxed/simple;
-	bh=2uauu+e7e2Iijj+hzAEHLbjoZXgVM4D+TCNpdSDVIvk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MHriov78QCFIjE1n9dVkiAbxkmjBIiMDpI1rIYBYY9y0dF82GhXNYWQ/jgob//YHTQBp/+nAhhEUwfPEkHBRJxD5Zkt8mzoqK42LTCtalQD89riJiV5xMZq5PSN5D3MHGiLaFsL0vAj1xIdWdSooW7ffKsBiKTai+YkgZekI8RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A5S3yRZh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762852972; c=relaxed/simple;
+	bh=h26Eyqu+NSRgv1KG7Ls+93kR0m0AexzUFJF9O7t78nY=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=CHd692xGpV9v7mi5Z6Pux2bvvcuASZT1np+a98O4lZ5TQjVN+c8qeH1hDIq1jwIQviN4+mH/Rb2WD44S80DoRMIaSCHa3bXN9Y22rpGzvlc95oSkk/XahuTtFXytq9H72vXQk+PC1e0z9+OAYqBrIe0THBwR7CsykGnBxmxvov0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ek3rPYzh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A5S3yRZh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32129C19424
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 08:47:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762850847;
-	bh=2uauu+e7e2Iijj+hzAEHLbjoZXgVM4D+TCNpdSDVIvk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=A5S3yRZhFBu0wHm9MDRF54snByCb7yRvJN+IghIeEnl0az/uWltKMf49/IiHIKUgt
-	 NLfT6LjuzE+8PqUtqaoGCWwy04UDjirQ332jvtfLJPEY2nWaPVwgIy8vzHqDPP8qAH
-	 SomxdZMNB12E/MUtFSg1WY2U46anQJQrxjzc7awkxVE5fqmEj+yWl923bPcNOffa5j
-	 CVc2XkemaPMmX3ATKY5pfn8czep/BHFtssZS4aOBgRZPmscpuiUz8yWAg8qQXA6s+t
-	 OkXE31wJGm0mrQhmvuf1dGuDjcSiGe5aMg8j5V4FKaEZbm11Ey+um00pWfDEHv1BQx
-	 lryPZCA/TTiEg==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-63c489f1e6cso930835a12.1
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 00:47:27 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWQqE+Yk7fiOyqZq0ULakH3+F9ryabSEL4HLuLT7oWNjTFB2YeNEbjPbrUdb6xQD6T4iXNy06+MwdOH@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhQU2IoB3EKT73q9S293rB/ailaycL3lbHTUdvYOQ8RBtdZZjE
-	soXvcbKnF20p/YVxNuX31TJHip4ig+Ln7NqvkT2PKIPRamRpVxrKlopXdA53QuspFeAdy/kShRg
-	VehIX/rSgYSVACueNdealtr5Gv4wn0H4=
-X-Google-Smtp-Source: AGHT+IHkQyqpu8uY/c9UPfomQHwGFx66iPjBHykE3hl/2cQehAkvE3KYP9MR7fZUJQfYxuuZp8VE4LWQAJGNO0qnxpw=
-X-Received: by 2002:a05:6402:208e:20b0:640:cf58:47f9 with SMTP id
- 4fb4d7f45d1cf-642e276c72emr2011860a12.9.1762850845770; Tue, 11 Nov 2025
- 00:47:25 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ek3rPYzh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762852969;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=x53XiDjKeKuDcvknuszrxzrJsq7weROy/z8/H9pN0WM=;
+	b=Ek3rPYzhGbj8pzUXwsMXDlQbK0dPHUzvScDYY3Tq+JyVeCe+80nTKe9FnHZXeKKeroDcwB
+	yV6+i68NiC7JzuUOZqYsFN51FMn5tCeVKTNRUpmqi14Xrudt0x3uGVC4Je3VvB80NNW9Q/
+	W+q/N0qS/qbsgANz9NZZp7EKFp1jJj8=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-92-LPsq1SZwN2-OIX2v-pkPqA-1; Tue,
+ 11 Nov 2025 04:22:46 -0500
+X-MC-Unique: LPsq1SZwN2-OIX2v-pkPqA-1
+X-Mimecast-MFC-AGG-ID: LPsq1SZwN2-OIX2v-pkPqA_1762852964
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 717431954B0A;
+	Tue, 11 Nov 2025 09:22:44 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.87])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C302B180035F;
+	Tue, 11 Nov 2025 09:22:31 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAGypqWw0bnE7_=49HSxgExouk4s5PVFQ6gVH50wrE8_=4b5vAg@mail.gmail.com>
+References: <CAGypqWw0bnE7_=49HSxgExouk4s5PVFQ6gVH50wrE8_=4b5vAg@mail.gmail.com> <YT1PR01MB9451424C6870795133FB7C96B3A72@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM> <36fb31bf2c854cdc930a3415f5551dcd@izw-berlin.de> <CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com> <uildcjpqxzc5nckupgdeeifkrqwrau2qxuc2df2uxuyys3i2k2@iz2bmi6yojyu> <YT1PR01MB945191C652AEE173CEADBA3EB3A12@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM> <aaloi77h2f5xolhrnegxsxntqp2jopwisunmjfp45idsoockpy@cy5agf2oqjop> <YT1PR01MB9451A0F623371F50E77CC1C9B3AD2@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
+To: Bharath SM <bharathsm.hsk@gmail.com>
+Cc: dhowells@redhat.com, Mark A Whiting <whitingm@opentext.com>,
+    henrique.carvalho@suse.com, Enzo Matsumiya <ematsumiya@suse.de>,
+    Steve French <smfrench@gmail.com>,
+    Shyam Prasad <nspmangalore@gmail.com>,
+    Paulo Alcantara <pc@manguebit.org>,
+    "Heckmann,
+                         Ilja" <heckmann@izw-berlin.de>,
+    "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Subject: Re: [[ EXT ]] [BUG REPORT] cifs/smb data corruption when writing, x86_64, kernel 6.6.71
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251030064736.24061-1-dqfext@gmail.com> <2516ed5d-fed2-47a3-b1eb-656d79d242f3@samba.org>
- <10da0cb9-8c92-413d-b8df-049279100458@samba.org> <CALW65jav2wiWzz6q6vdnjL88GJB1eWJtLVzH3M1CkOHbdgSDWw@mail.gmail.com>
-In-Reply-To: <CALW65jav2wiWzz6q6vdnjL88GJB1eWJtLVzH3M1CkOHbdgSDWw@mail.gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 11 Nov 2025 17:47:13 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8pcBaTjVpG9HQuLRqNT8yxpZmKvJypSA=EyfzyWDjAfg@mail.gmail.com>
-X-Gm-Features: AWmQ_bkmXcuPhr7pfdB3NLP7MMVOO0QH8k5h9CXEl-rTvXG_N4UNf9xAwgxokSQ
-Message-ID: <CAKYAXd8pcBaTjVpG9HQuLRqNT8yxpZmKvJypSA=EyfzyWDjAfg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: server: avoid busy polling in accept loop
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Stefan Metzmacher <metze@samba.org>, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <958478.1762852948.1@warthog.procyon.org.uk>
+Date: Tue, 11 Nov 2025 09:22:28 +0000
+Message-ID: <958479.1762852948@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, Nov 11, 2025 at 5:03=E2=80=AFPM Qingfang Deng <dqfext@gmail.com> wr=
-ote:
->
-> Hi Stefan,
->
-> On Tue, Nov 11, 2025 at 3:16=E2=80=AFPM Stefan Metzmacher <metze@samba.or=
-g> wrote:
-> > >> Also remove:
-> > >>    - TCP_NODELAY, which has no effect on a listening socket.
-> > >>    - sk_rcvtimeo and sk_sndtimeo assignments, which only caused acce=
-pt()
-> > >>      to return -EAGAIN prematurely.
-> > >
-> > > Aren't these inherited to the accepted sockets?
-> > > So we need to apply them to the accepted sockets now
-> > > instead of dropping them completely?
->
-> You're right, TCP_NODELAY of a new accepted socket is inherited from
-> the listen socket, so it should not be removed.
->
-> >
-> > Actually the timeouts are added to the client connection,
-> > but not the TCP_NODELAY.
-> >
-> > But looking at it more detailed I'm wondering if this might
-> > introduce a deadlock.
-> >
-> > We have this in the accepting thread:
-> >
-> >          while (!kthread_should_stop()) {
-> >                  mutex_lock(&iface->sock_release_lock);
-> >                  if (!iface->ksmbd_socket) {
-> >                          mutex_unlock(&iface->sock_release_lock);
-> >                          break;
-> >                  }
-> >                  ret =3D kernel_accept(iface->ksmbd_socket, &client_sk,=
- 0);
-> >                  mutex_unlock(&iface->sock_release_lock);
-> >                  if (ret)
-> >                          continue;
-> >
-> >
-> > And in the stopping code this:
-> >
-> >          case NETDEV_DOWN:
-> >                  iface =3D ksmbd_find_netdev_name_iface_list(netdev->na=
-me);
-> >                  if (iface && iface->state =3D=3D IFACE_STATE_CONFIGURE=
-D) {
-> >                          ksmbd_debug(CONN, "netdev-down event: netdev(%=
-s) is going down\n",
-> >                                          iface->name);
-> >                          tcp_stop_kthread(iface->ksmbd_kthread);
-> >                          iface->ksmbd_kthread =3D NULL;
-> >                          mutex_lock(&iface->sock_release_lock);
-> >                          tcp_destroy_socket(iface->ksmbd_socket);
-> >                          iface->ksmbd_socket =3D NULL;
-> >                          mutex_unlock(&iface->sock_release_lock);
-> >
-> >                          iface->state =3D IFACE_STATE_DOWN;
-> >                          break;
-> >                  }
-> >
-> >
-> >
-> > I guess that now kernel_accept() call waits forever holding iface->sock=
-_release_lock
-> > and tcp_stop_kthread(iface->ksmbd_kthread); doesn't have any impact any=
-more
-> > as we may never reach kthread_should_stop() anymore.
-> >
-> > We may want to do a kernel_sock_shutdown(ksmbd_socket, SHUT_RDWR) after
-> > tcp_stop_kthread(iface->ksmbd_kthread); but before mutex_lock(&iface->s=
-ock_release_lock);
-> > so that kernel_accept() hopefully returns directly.
-> > And we only call sock_release(ksmbd_socket); under the iface->sock_rele=
-ase_lock mutex.
->
-> In kernel v6.1 or later, kthread_stop() in tcp_stop_kthread() will
-> send a signal to the ksmbd kthread so accept() will return -EINTR.
-> Before v6.1 it can actually get stuck, as accept() will block forever.
->
-> If you're fixing the issue when this patch was backported to versions
-> before v6.1, this will not work, because kthread_stop() blocks until
-> the target kthread returns, so shutdown() will never get called. The
-> sock_release_lock mutex seems redundant because of that.
-> Instead, shutdown() can be called _before_ kthread_stop() so accept()
-> will return -EINVAL.
->
-> Namjae, should I send a v2 with both issues addressed?
-Yes, please send the v2 patch.
-Thanks.
->
-> -- Qingfang
+Okay, the patch isn't good from a quick scan of it.
+
+> +			if (folio_test_writeback(folio)) {
+> +				/*
+> +				 * For data-integrity syscalls (fsync(), msync()) we must wait for
+> +				 * the I/O to complete on the page.
+> +				 * For other cases (!sync), we can just skip this page, even if
+> +				 * it's dirty.
+> +				 */
+> +				if (!sync) {
+> +					stop = false;
+> +					goto unlock_next;
+> +				} else {
+> +					folio_wait_writeback(folio);
+
+You can't sleep here.  The RCU read lock is held.  There's no actual need to
+sleep here anyway - you can just stop and leave the function (well, set
+stop=true and break so that the accumulated batch is processed).
+
+The way the code is meant to work is that cifs_write_back_from_locked_folio()
+locks and waits for the first folio, then calls cifs_extend_writeback() to add
+more folios to the writeout - if it doesn't need to wait for them.  You cannot
+skip any folios as the set has to be contiguous.  If you skip one, you'll
+corrupt the file.
+
+Once a set of folios has been dispatched, cifs_writepages_begin() *should*
+begin with the next folio that hasn't been sent - quite possibly one just
+rejected by cifs_extend_writeback().  But at this point
+cifs_write_back_from_locked_folio() will wait for it.
+
+This should[*] work correctly, even in sync mode, because it should eventually
+wait for any folio that's already undergoing writeback - though it might be
+less efficient because if there are competing writebacks, they may end up
+forcing each other to produce very small writes (there's no
+writeback-vs-writeback locking apart from the individual folio locks).
+
+[*] At least as far as the design goes; that's not to say there isn't a bug in
+    the implementation.
+
+That said, in sync mode, you might actually want cifs_extend_writeback() to
+wait - but in that case, you have to drop the RCU read lock before you do the
+wait and then reset the iteration correctly... and beware that doing that
+might advance[**] the iterator state.
+
+[**] It's possible that this is the actual cause of the bug - and that we're
+     skipping the rejected folio because the xa_state isn't been correctly
+     rewound.
+
+David
+
