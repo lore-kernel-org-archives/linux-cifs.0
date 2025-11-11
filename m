@@ -1,332 +1,232 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517D734EF03
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 10:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3887434DB54
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 10:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762857462; cv=none; b=pcl5we6wIfTr4CXB/BME66icoL4yGFawwxW2X5tskfFpIQ+/jYD1vNgsSYyh0XdJ2uvODBE0MWGtz01xyAHqb+xEJ0rste0l9xlvud3HCG8R+scEwg7TzunJrgGOwNGYPjFCrb2MWZzZslXsDF0e2dmcnN5RyURJJBSYzQCMLVk=
+	t=1762857574; cv=none; b=GPi+4qLojiVE3btjSEvxpum5P+dWKZxKvezRzWVho0RGcxezyy57odF6LBPdwzft82OXjsYgTJBMmLAclac2ZT913o2PSSHg1X6gFPUvYpzfH2BbVDbdly5zFi3hs5xS/YAvl5kGUZBejA8R2/i+gFKQIqP9FB9Uzhil7agx8Pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762857462; c=relaxed/simple;
-	bh=hyNCHdMdIEMpcB1iHJpcmtHhO0cY+NOEEI3eHb/ZxTw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ljXIu7FvoHVYB37HjCYaOk9g5mVxQr7HVf6JoyOZ+UPp3a3EmcRYctBnRD2laWJyH63TepGZVHb7N3vxxBPLfJgE9Qy4uVIGeFjCfEBZ5+wDmfLE8dGks4rbm2lKkxwx7/nQpOn3Vq4ApK/yrJjoCXc//PkjZqgTURN05lkUL2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ABmQSe0O; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=jkz/qW7s; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=VntBozyr; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=T2bebI6e; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1762857574; c=relaxed/simple;
+	bh=V1xi4wZp79WYbmsxVdcyCRKtx4O9XmbAwt7bqZyz4M8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dXoS6wfS+sMHIenmQ5fccnVYSztfDnt9JhhTuUPb203GxBOp+eYcnClymnNClLGFzDsq5gEm2Ht40oEC/OTFlu5CXFl8zyUTWe4Ki3zqAaQBJInt03an3hcIOp055SHB5B4Mh2ZYdpeAUP8WGL5MAA8qdJCUSCnCW2AXIAeIcso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=isb6pvka; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ABmQSe0O";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="jkz/qW7s";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="VntBozyr";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="T2bebI6e"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E1E551F750;
-	Tue, 11 Nov 2025 10:37:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1762857457; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TEc5BMTgakLjP2lCVtIyTqJLSeq6a+T/g0/3T6sOX5U=;
-	b=ABmQSe0O1DSmwu4YW8RIxEoGNBGD+4SQhQzJNFk7ZIK/wi1vrlGnLIPVriMj95Ui3+p9mx
-	Yd9UGrSajO0qV2Bht3YikO09LuHTEssfjHksnNrnqdIMybRvVPBE2k7viEu7oL10CxU7Wp
-	zZEbIsiQ2mLyhAEHZgq5Jy4hmevTtak=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1762857457;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TEc5BMTgakLjP2lCVtIyTqJLSeq6a+T/g0/3T6sOX5U=;
-	b=jkz/qW7s9eoNvg0Y9NyoTKRl1CvNA7QZbsZl15s/0xIal0ZkL87Xv+ZpSBJWNabgCS/cBA
-	sSwA+bE4gBgZFbCA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=VntBozyr;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=T2bebI6e
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1762857456; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TEc5BMTgakLjP2lCVtIyTqJLSeq6a+T/g0/3T6sOX5U=;
-	b=VntBozyrZOAwKMhMIiNgxjR0KRGEpKVeRCJN7GjFlWWR3GAVTLaBB12PQhXoalsSNvR29T
-	eJAe4uA/CLjC/RkCVPY1m/Z0HuNeRSv2ONIkwfnmCBZ7yfZsVyA36iQF4JOwCbXzwqXCJV
-	4rlGyoMFfgMKp2cuB4/q0PLoHrmRCrY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1762857456;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TEc5BMTgakLjP2lCVtIyTqJLSeq6a+T/g0/3T6sOX5U=;
-	b=T2bebI6e2BNXdytzddpspO6C6YUZ4uUPoYnCUJiePajNoGohIT8FiWbGYBMGrmJPUekWob
-	EW3tQuc1bsO/icAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CF8A1148F0;
-	Tue, 11 Nov 2025 10:37:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id IuCoMvARE2kbNQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 11 Nov 2025 10:37:36 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 8D536A28C8; Tue, 11 Nov 2025 11:37:36 +0100 (CET)
-Date: Tue, 11 Nov 2025 11:37:36 +0100
-From: Jan Kara <jack@suse.cz>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Miklos Szeredi <miklos@szeredi.hu>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Chuck Lever <chuck.lever@oracle.com>, Alexander Aring <alex.aring@gmail.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, David Howells <dhowells@redhat.com>, 
-	Tyler Hicks <code@tyhicks.com>, NeilBrown <neil@brown.name>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
-	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	netdev@vger.kernel.org, NeilBrown <neilb@ownmail.net>
-Subject: Re: [PATCH v5 09/17] vfs: clean up argument list for vfs_create()
-Message-ID: <g3si4zuuhxleat2gkebyhnokq5eiymatgi36ad25datcbvinfs@nsk4fop6sz5f>
-References: <20251105-dir-deleg-ro-v5-0-7ebc168a88ac@kernel.org>
- <20251105-dir-deleg-ro-v5-9-7ebc168a88ac@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="isb6pvka"
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b472842981fso523217366b.1
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 02:39:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762857570; x=1763462370; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JjWKcRO+2b+ndJ2XljKkgDsj61sT++Z6j1qUmNjzl/A=;
+        b=isb6pvkaHWu3dkgmjrPcW9O/EacCQRIe/MdP979IjydiccQFSRDTbi/hnRmfShHRRI
+         HMSpTHYebz0A+Jpww0EvlPWOB9m4UIhuWzCBZpxLTemulFrlsi9U3yoQTUBzlXpI7Mmi
+         QmQDbOM0YNhC4KR1E8G1sd7oRI1GQqI/xYZo2Y/G6Ku5toTKm6wPRycPZdrizTDhsvWR
+         P7C0EeCBDc5ohU9OzQ214uCmi08qhMytUtxO0QnG20N6HQLZAM3aUjAqFd8vSCVhaUSG
+         7rBkqVNyj9Dwh+msACx6x4iM7qXyijc15JfKt79927VXYHzUcriGi71BSyWGEosbCbWx
+         agrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762857570; x=1763462370;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=JjWKcRO+2b+ndJ2XljKkgDsj61sT++Z6j1qUmNjzl/A=;
+        b=DS1V93HT6pLD0D5hSYsqCcjSk4klu8JQESTJAUUkRaR1queLLxD9TKYXNb1i9VHQqm
+         zotRXnO5rBmlBIAs8Q+WLOQLxFAVUVFvpMThs2LcqqQkgHDkBCwIsurVcG6gWYE+c1K1
+         fl7rtOlKc48hIZEis07/qP4x2oUMIWQER5EdXtzt+JFx2YizkBTy3W/I/mnACokjZPFr
+         2SrhAMQdkPtUPfdV1mccLlf2kBfZO8PP2h+edgZM1TMiEQbLOnvdC60NLBSWCsb53DGK
+         KOqhyckG0g5rwGXLcaPK/ctFDKdd/La5yS/5yeomdfMtGdnTqvRYJMbDbLlQcPrXN+eQ
+         eqUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUTNSR9TGvwoRHa0klk/FmZvKvHJzFTK7hT9/pUV2YtK2+gD9njU8Bsj0Pz6sNybRC4vGqdbjvUrLem@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVTcE8D5ca3FVF0YKG1jLmUJqNjOQNnkQHW8zwkTjDfP3EgNw1
+	oV9T4jia0BY7C1RBIYu/fjfLThjJLQCNB38Cev+JCrkJOX1/IxuvMbwXGouWSCh1e+0WoPdxtiN
+	I2uJ981QvCYf6tm+t7tAztF5zdBZbjtU=
+X-Gm-Gg: ASbGncu7VG0km9B+WdZJFSDvjJQyoClbRh6UX2TCTJa0uu8+2p9jZQcgIQMwPl0NH1q
+	ksqdE66IpHoM/7VfSm4kgfSjbHfw+TVer5nuwxv9Zld2omQIYDG1mqmuduL3ztDK/a0OiVLwATg
+	XmhOPCXo3f4XV0uL37tBQOmzuoIYcv+sVhAaHwxLaVFC7I75EhYXQR3xDdxtrlDOFAo1G6DbUxW
+	Q2og+9YqHIkx42uEO9SC4WXAFVvwznf5G6cIjyzOBk9RORhsquTPRd76hw=
+X-Google-Smtp-Source: AGHT+IEWM/lPCLkXzS7sjuMMmVA9nkDCg2nqlJ6qiMZ+twylPt8tk7cp28fe51bsIQ31I+9LTom69b0ldoEyrmLcMik=
+X-Received: by 2002:a17:907:5c6:b0:b72:6fec:5d0e with SMTP id
+ a640c23a62f3a-b72e02ca0e1mr1062204766b.13.1762857570078; Tue, 11 Nov 2025
+ 02:39:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251105-dir-deleg-ro-v5-9-7ebc168a88ac@kernel.org>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: E1E551F750
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[45];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com,ownmail.net];
-	FREEMAIL_CC(0.00)[szeredi.hu,zeniv.linux.org.uk,kernel.org,suse.cz,oracle.com,gmail.com,samba.org,manguebit.org,microsoft.com,talpey.com,linuxfoundation.org,redhat.com,tyhicks.com,brown.name,chromium.org,google.com,davemloft.net,vger.kernel.org,lists.samba.org,lists.linux.dev,ownmail.net];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	TAGGED_RCPT(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLpnapcpkwxdkc5mopt1ezhhna)];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Score: -2.51
+References: <YT1PR01MB9451424C6870795133FB7C96B3A72@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
+ <36fb31bf2c854cdc930a3415f5551dcd@izw-berlin.de> <CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com>
+ <uildcjpqxzc5nckupgdeeifkrqwrau2qxuc2df2uxuyys3i2k2@iz2bmi6yojyu>
+ <YT1PR01MB945191C652AEE173CEADBA3EB3A12@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
+ <aaloi77h2f5xolhrnegxsxntqp2jopwisunmjfp45idsoockpy@cy5agf2oqjop>
+ <YT1PR01MB9451A0F623371F50E77CC1C9B3AD2@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
+ <CAGypqWw0bnE7_=49HSxgExouk4s5PVFQ6gVH50wrE8_=4b5vAg@mail.gmail.com> <958479.1762852948@warthog.procyon.org.uk>
+In-Reply-To: <958479.1762852948@warthog.procyon.org.uk>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Tue, 11 Nov 2025 16:09:18 +0530
+X-Gm-Features: AWmQ_bkiLijVXeOQbJ5_ryJIcwTEDEN9SxZsZIPLUpK7y6yCSzQQ2FHWw6aVhEk
+Message-ID: <CANT5p=rh7BQBnwNYLxHtFw=YUhAGVnskJ=33i6Eg4porU-X+5A@mail.gmail.com>
+Subject: Re: [[ EXT ]] [BUG REPORT] cifs/smb data corruption when writing,
+ x86_64, kernel 6.6.71
+To: David Howells <dhowells@redhat.com>
+Cc: Bharath SM <bharathsm.hsk@gmail.com>, Mark A Whiting <whitingm@opentext.com>, 
+	henrique.carvalho@suse.com, Enzo Matsumiya <ematsumiya@suse.de>, 
+	Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@manguebit.org>, 
+	"Heckmann, Ilja" <heckmann@izw-berlin.de>, 
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed 05-11-25 11:53:55, Jeff Layton wrote:
-> As Neil points out:
-> 
-> "I would be in favour of dropping the "dir" arg because it is always
-> d_inode(dentry->d_parent) which is stable."
-> 
-> ...and...
-> 
-> "Also *every* caller of vfs_create() passes ".excl = true".  So maybe we
-> don't need that arg at all."
-> 
-> Drop both arguments from vfs_create() and fix up the callers.
-> 
-> Suggested-by: NeilBrown <neilb@ownmail.net>
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+On Tue, Nov 11, 2025 at 2:52=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> Okay, the patch isn't good from a quick scan of it.
+>
+> > +                     if (folio_test_writeback(folio)) {
+> > +                             /*
+> > +                              * For data-integrity syscalls (fsync(), =
+msync()) we must wait for
+> > +                              * the I/O to complete on the page.
+> > +                              * For other cases (!sync), we can just s=
+kip this page, even if
+> > +                              * it's dirty.
+> > +                              */
+> > +                             if (!sync) {
+> > +                                     stop =3D false;
+> > +                                     goto unlock_next;
+> > +                             } else {
+> > +                                     folio_wait_writeback(folio);
+>
+> You can't sleep here.  The RCU read lock is held.  There's no actual need=
+ to
+> sleep here anyway - you can just stop and leave the function (well, set
+> stop=3Dtrue and break so that the accumulated batch is processed).
+>
+> The way the code is meant to work is that cifs_write_back_from_locked_fol=
+io()
+> locks and waits for the first folio, then calls cifs_extend_writeback() t=
+o add
+> more folios to the writeout - if it doesn't need to wait for them.  You c=
+annot
+> skip any folios as the set has to be contiguous.  If you skip one, you'll
+> corrupt the file.
+>
+> Once a set of folios has been dispatched, cifs_writepages_begin() *should=
+*
+> begin with the next folio that hasn't been sent - quite possibly one just
+> rejected by cifs_extend_writeback().  But at this point
+> cifs_write_back_from_locked_folio() will wait for it.
+>
+> This should[*] work correctly, even in sync mode, because it should event=
+ually
+> wait for any folio that's already undergoing writeback - though it might =
+be
+> less efficient because if there are competing writebacks, they may end up
+> forcing each other to produce very small writes (there's no
+> writeback-vs-writeback locking apart from the individual folio locks).
+>
+> [*] At least as far as the design goes; that's not to say there isn't a b=
+ug in
+>     the implementation.
+>
+> That said, in sync mode, you might actually want cifs_extend_writeback() =
+to
+> wait - but in that case, you have to drop the RCU read lock before you do=
+ the
+> wait and then reset the iteration correctly... and beware that doing that
+> might advance[**] the iterator state.
+>
+> [**] It's possible that this is the actual cause of the bug - and that we=
+'re
+>      skipping the rejected folio because the xa_state isn't been correctl=
+y
+>      rewound.
+>
+> David
+>
 
-Looks good. Feel free to add:
+Hi David,
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Thanks for the detailed review and explanation.
 
-								Honza
+Based on your explanation, the continue when folio_try_get fails seems
+out of place. Should that be a break instead?
+https://elixir.bootlin.com/linux/v6.9.12/source/fs/smb/client/file.c#L2758
+-------------------------
+if (!folio_try_get(folio)) {
+xas_reset(xas);
+continue;    <<<<<<<<<<<<<<<<
+}
+-------------------------
+However, that does not seem to be the cause of the corruption here.
+But can that cause an unnecessary spin loop?
 
-> ---
->  fs/ecryptfs/inode.c      |  3 +--
->  fs/namei.c               | 11 ++++-------
->  fs/nfsd/nfs3proc.c       |  2 +-
->  fs/nfsd/vfs.c            |  3 +--
->  fs/open.c                |  4 +---
->  fs/overlayfs/overlayfs.h |  2 +-
->  fs/smb/server/vfs.c      |  3 +--
->  include/linux/fs.h       |  3 +--
->  8 files changed, 11 insertions(+), 20 deletions(-)
-> 
-> diff --git a/fs/ecryptfs/inode.c b/fs/ecryptfs/inode.c
-> index 88631291b32535f623a3fbe4ea9b6ed48a306ca0..d109e3763a88150bfe64cd2d5564dc9802ef3386 100644
-> --- a/fs/ecryptfs/inode.c
-> +++ b/fs/ecryptfs/inode.c
-> @@ -188,8 +188,7 @@ ecryptfs_do_create(struct inode *directory_inode,
->  
->  	rc = lock_parent(ecryptfs_dentry, &lower_dentry, &lower_dir);
->  	if (!rc)
-> -		rc = vfs_create(&nop_mnt_idmap, lower_dir,
-> -				lower_dentry, mode, true);
-> +		rc = vfs_create(&nop_mnt_idmap, lower_dentry, mode);
->  	if (rc) {
->  		printk(KERN_ERR "%s: Failure to create dentry in lower fs; "
->  		       "rc = [%d]\n", __func__, rc);
-> diff --git a/fs/namei.c b/fs/namei.c
-> index f439429bdfa271ccc64c937771ef4175597feb53..9586c6aba6eae05a9fc3c103b8501d98767bef53 100644
-> --- a/fs/namei.c
-> +++ b/fs/namei.c
-> @@ -3461,10 +3461,8 @@ static inline umode_t vfs_prepare_mode(struct mnt_idmap *idmap,
->  /**
->   * vfs_create - create new file
->   * @idmap:	idmap of the mount the inode was found from
-> - * @dir:	inode of the parent directory
->   * @dentry:	dentry of the child file
->   * @mode:	mode of the child file
-> - * @want_excl:	whether the file must not yet exist
->   *
->   * Create a new file.
->   *
-> @@ -3474,9 +3472,9 @@ static inline umode_t vfs_prepare_mode(struct mnt_idmap *idmap,
->   * On non-idmapped mounts or if permission checking is to be performed on the
->   * raw inode simply pass @nop_mnt_idmap.
->   */
-> -int vfs_create(struct mnt_idmap *idmap, struct inode *dir,
-> -	       struct dentry *dentry, umode_t mode, bool want_excl)
-> +int vfs_create(struct mnt_idmap *idmap, struct dentry *dentry, umode_t mode)
->  {
-> +	struct inode *dir = d_inode(dentry->d_parent);
->  	int error;
->  
->  	error = may_create(idmap, dir, dentry);
-> @@ -3490,7 +3488,7 @@ int vfs_create(struct mnt_idmap *idmap, struct inode *dir,
->  	error = security_inode_create(dir, dentry, mode);
->  	if (error)
->  		return error;
-> -	error = dir->i_op->create(idmap, dir, dentry, mode, want_excl);
-> +	error = dir->i_op->create(idmap, dir, dentry, mode, true);
->  	if (!error)
->  		fsnotify_create(dir, dentry);
->  	return error;
-> @@ -4383,8 +4381,7 @@ static int do_mknodat(int dfd, struct filename *name, umode_t mode,
->  	idmap = mnt_idmap(path.mnt);
->  	switch (mode & S_IFMT) {
->  		case 0: case S_IFREG:
-> -			error = vfs_create(idmap, path.dentry->d_inode,
-> -					   dentry, mode, true);
-> +			error = vfs_create(idmap, dentry, mode);
->  			if (!error)
->  				security_path_post_mknod(idmap, dentry);
->  			break;
-> diff --git a/fs/nfsd/nfs3proc.c b/fs/nfsd/nfs3proc.c
-> index b6d03e1ef5f7a5e8dd111b0d56c061f1e91abff7..30ea7ffa2affdb9a959b0fd15a630de056d6dc3c 100644
-> --- a/fs/nfsd/nfs3proc.c
-> +++ b/fs/nfsd/nfs3proc.c
-> @@ -344,7 +344,7 @@ nfsd3_create_file(struct svc_rqst *rqstp, struct svc_fh *fhp,
->  	status = fh_fill_pre_attrs(fhp);
->  	if (status != nfs_ok)
->  		goto out;
-> -	host_err = vfs_create(&nop_mnt_idmap, inode, child, iap->ia_mode, true);
-> +	host_err = vfs_create(&nop_mnt_idmap, child, iap->ia_mode);
->  	if (host_err < 0) {
->  		status = nfserrno(host_err);
->  		goto out;
-> diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
-> index c400ea94ff2e837fd59719bf2c4b79ef1d064743..464fd54675f3b16fce9ae5f05ad22e0e6b363eb3 100644
-> --- a/fs/nfsd/vfs.c
-> +++ b/fs/nfsd/vfs.c
-> @@ -1552,8 +1552,7 @@ nfsd_create_locked(struct svc_rqst *rqstp, struct svc_fh *fhp,
->  	err = 0;
->  	switch (type) {
->  	case S_IFREG:
-> -		host_err = vfs_create(&nop_mnt_idmap, dirp, dchild,
-> -				      iap->ia_mode, true);
-> +		host_err = vfs_create(&nop_mnt_idmap, dchild, iap->ia_mode);
->  		if (!host_err)
->  			nfsd_check_ignore_resizing(iap);
->  		break;
-> diff --git a/fs/open.c b/fs/open.c
-> index fdaa6f08f6f4cac5c2fefd3eafa5e430e51f3979..e440f58e3ce81e137aabdf00510d839342a19219 100644
-> --- a/fs/open.c
-> +++ b/fs/open.c
-> @@ -1171,9 +1171,7 @@ struct file *dentry_create(const struct path *path, int flags, umode_t mode,
->  	if (IS_ERR(f))
->  		return f;
->  
-> -	error = vfs_create(mnt_idmap(path->mnt),
-> -			   d_inode(path->dentry->d_parent),
-> -			   path->dentry, mode, true);
-> +	error = vfs_create(mnt_idmap(path->mnt), path->dentry, mode);
->  	if (!error)
->  		error = vfs_open(path, f);
->  
-> diff --git a/fs/overlayfs/overlayfs.h b/fs/overlayfs/overlayfs.h
-> index d215d7349489686b66bb66e939b27046f7d836f6..2bdc434941ebc70f6d4f57cca4f68125112a7bc4 100644
-> --- a/fs/overlayfs/overlayfs.h
-> +++ b/fs/overlayfs/overlayfs.h
-> @@ -235,7 +235,7 @@ static inline int ovl_do_create(struct ovl_fs *ofs,
->  				struct inode *dir, struct dentry *dentry,
->  				umode_t mode)
->  {
-> -	int err = vfs_create(ovl_upper_mnt_idmap(ofs), dir, dentry, mode, true);
-> +	int err = vfs_create(ovl_upper_mnt_idmap(ofs), dentry, mode);
->  
->  	pr_debug("create(%pd2, 0%o) = %i\n", dentry, mode, err);
->  	return err;
-> diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-> index c5f0f3170d586cb2dc4d416b80948c642797fb82..83ece2de4b23bf9209137e7ca414a72439b5cc2e 100644
-> --- a/fs/smb/server/vfs.c
-> +++ b/fs/smb/server/vfs.c
-> @@ -188,8 +188,7 @@ int ksmbd_vfs_create(struct ksmbd_work *work, const char *name, umode_t mode)
->  	}
->  
->  	mode |= S_IFREG;
-> -	err = vfs_create(mnt_idmap(path.mnt), d_inode(path.dentry),
-> -			 dentry, mode, true);
-> +	err = vfs_create(mnt_idmap(path.mnt), dentry, mode);
->  	if (!err) {
->  		ksmbd_vfs_inherit_owner(work, d_inode(path.dentry),
->  					d_inode(dentry));
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 12873214e1c7811735ea5d2dee3d57e2a5604d8f..21876ef1fec90181b9878372c7c7e710773aae9f 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -2111,8 +2111,7 @@ bool inode_owner_or_capable(struct mnt_idmap *idmap,
->  /*
->   * VFS helper functions..
->   */
-> -int vfs_create(struct mnt_idmap *, struct inode *,
-> -	       struct dentry *, umode_t, bool);
-> +int vfs_create(struct mnt_idmap *, struct dentry *, umode_t);
->  struct dentry *vfs_mkdir(struct mnt_idmap *, struct inode *,
->  			 struct dentry *, umode_t, struct delegated_inode *);
->  int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
-> 
-> -- 
-> 2.51.1
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Enzo noted in his patch:
+-------------------------
+- Pointer arguments are updated before bound checking (actual root cause)
+@_len and @_count are updated with the current folio values before
+actually checking if the current
+values fit in their boundaries, so by the time the function exits, the
+caller (only
+cifs_write_back_from_locked_folio(), that BTW doesn't do any further
+checks) those arguments might
+have crossed bounds and extra data (zeroes) are added as padding.
+Later, with those offsets marked as 'done', the real actual data that
+should've been written into
+those offsets are skipped, making the final file corrupt.
+-------------------------
+However, I have a hard time understanding why the zero padding would happen=
+.
+
+The bound checking does happen after the _count and _len are updated.
+Which would mean that _len can go above max_len and _count can go
+negative.
+https://elixir.bootlin.com/linux/v6.9.12/source/fs/smb/client/file.c#L2793
+-------------------------
+index +=3D nr_pages;
+*_count -=3D nr_pages; <<<<<<<<<<<<<< updated first
+*_len +=3D len; <<<<<<<<<<<<<<<< then bound check
+if (max_pages <=3D 0 || *_len >=3D max_len || *_count <=3D 0)  <<<<<<<<<<<<
+bound check
+stop =3D true;
+
+if (!folio_batch_add(&batch, folio)) <<<<<<<<<<<<<<<<< folio batch add
+break;
+if (stop)
+break;
+}
+-------------------------
+But that would just mean that an extra folio could be added to the
+batch (and marked for writeback), causing the batch to contain more
+len than max_len (which is likely wsize).
+If I follow the code further, adjust_credits can then be called with
+wdata->bytes > wsize, and smb2_adjust_credits can then return
+EOPNOTSUPP, causing us to fail the write:
+https://elixir.bootlin.com/linux/v6.9.12/source/fs/smb/client/smb2ops.c#L29=
+5
+-------------------------
+if (credits->value < new_val) {
+trace_smb3_too_many_credits(server->CurrentMid,
+server->conn_id, server->hostname, 0, credits->value - new_val, 0);
+cifs_server_dbg(VFS, "request has less credits (%d) than required (%d)",
+credits->value, new_val);
+
+return -EOPNOTSUPP;
+}
+-------------------------
+
+However, Enzo's patch *does work* to prevent data corruption as
+verified by Mark and Bharath.
+(There's a WARNING that gets thrown, but that's probably due to a
+required check that Enzo missed in his change)
+What am I missing here?
+
+--=20
+Regards,
+Shyam
