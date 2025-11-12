@@ -1,120 +1,151 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BDC36656D
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 16:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E302BE02C;
+	Wed, 12 Nov 2025 09:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762877042; cv=none; b=SbySuSFgnZrQ20OVfbAr2DXDKINmVrGuaga8t2kjr4lAiFGQ+Qo2bf3w38ummXLh4K3AyM+F9K2DmdpDDGsA0Tbn4UXEGmjk2jU59oUiB5nrNCdEIAH7tIt2bFyWhxAhanhhgClVYakMMxN6VUMtO6+RQFlpyZjn2OlsKOytVto=
+	t=1762938072; cv=none; b=IbYqAGKwh0FIc+WIaGoSRnsxDMeIwtQR++IM/bFQeC+SVB1Mv0/o1vOkvMTr6w8O6JHhYn3BODfjMQNl+yI2nd7HCQ68FH7uKHg8IiMZRZ8NDovJaaPXg8lL6liQtdl12lKZBs8kg7+LXAycG7qurliYK88PVmny8iaziEBimqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762877042; c=relaxed/simple;
-	bh=IqSj1pjWkOxz8XdpRQAu1uWC/z8Cx/Uyiq/kF6bkn2Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WFdI1dvdt4fpm7h1laTXE4grPQDAsRfSSpYP0WTGwuft1w9wI8XguV+VBVIX0zm7bWFCGkmnS8RyZuSJ/EAnewFALyfuj2YfDRzAhYHa4YSeR/Gcd6o7bHJbRlI7ja2VWd/MY/nRjQGB91LyRFIKDGFhy8Yp32B7E0jiZD2KQJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XOFdNtAR; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762938072; c=relaxed/simple;
+	bh=NmxT3e9rVD+Vk0gwGiTwEsfo+VbVQUJ9eVtsypMNXuc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kjIRRlg54TReeS1MKEdXqZMJlYz4sTsQ14Evn9NObmG+g9VbSGcYYnj5EgTSrPT7sDHFa8coyGKrkoem+DiMeIT6HR/0UrRv7k/L1mQ9OunOXBG7JqH6rBSM+hkTbxc577N+IxKQRVERNzGp/D/mL7fm7KeRTsxGW8obojUksYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sdP5jmGf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XOFdNtAR"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-88044caaa3eso44244396d6.3
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Nov 2025 08:04:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762877040; x=1763481840; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p22dqnTP+WT7LTzsUQpMYPFrvPg4fKs8whrEeV7I6/k=;
-        b=XOFdNtARQuUZYTaSY1j+/x+r8jPV0QmDjFvPOBeGDp3gwW17Ve9lla8i6FcQPY9Fhf
-         HKFl6qxPd/PH1X/fSTDS96FIxnQQnQ0yF6+DI4hpMskFCKkFywsZRe9J6CBaR78nitxA
-         NnUDgU+nqwq9OAPLWAj5cx/QKl3X9CcxXE7w3M8uFiIyx8HM7gtz+gfJGdS1lyai6Gqj
-         JtCiROn8lo+9wSLn5riA2ey86kDFgI9AfC+PmOGeA/rb1SWuhEFGltLtDiEi11+4PMug
-         JQkwIrYw8l6AoJB4aP7/TCA8OMuxT0M5/9J0DbaTbOgEy3CbKlkv3X2/HySVqT/dXjKB
-         D+hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762877040; x=1763481840;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=p22dqnTP+WT7LTzsUQpMYPFrvPg4fKs8whrEeV7I6/k=;
-        b=h79fGA1kS5r1QEh1yKkLV1xqVTxc5wfAisboyjGP9wFsq5iaAlHSgCWJJxy1M8vKWX
-         /eDtECkrjpoDQwbqhriEQmQxep2M5sUMAeHUoNDHx343aH6Rr5UoNBfwpX+H5DNayCRL
-         lJHlCRzm7+1Aza3Wz2yyBLX1xEM3k0PkJdY8FycM9KXB739kFfdwUq+T7eACukF4xO1n
-         Ji8/IMomQ6i7lAIFDia2IoWGQ9ndYwzgMJOSrdf7fiw2JVorOYJUB7z2xFBZ6cecVWq9
-         uAOElhm3LCNj3DFWJMKHOSzOZ0QmsrxYEbCj0Ln1bDg/yDHxI4VPe2twYG50j3euqZPr
-         kE5g==
-X-Forwarded-Encrypted: i=1; AJvYcCXRYIp23uWfZpDOmWrvftSgBEg4brLlJggMWwcbRGL1Vw8aVH+GMnKOYitzzVakS1+SxXha1K0v4MOI@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXOleR+AHafIx0o5iR3UQe98v0JBrF8Ll0g6NQ+p2st2jq1dnL
-	ILq3vZj1eQ33Oot4T6LKTef4a5hc1R61Ki0NUbhK0kJ4vZyu78Gap6tyVN7+Ni+rnGGyGCdO7F1
-	0nqr/1ErAUehz/Ki/r1/Marm19DgZDkU=
-X-Gm-Gg: ASbGncvz68IEt7Iz8g0Rcus5uHtM+S2YcyXbiDjWelXoruJAYzRi1Td71giCQwlI/+r
-	RrC7dTJQuBchUTNjWVNI7z5rs8WpCehUpKKkfDSUPRHT4O9ievtauF1r+fZwntfJO4a5ERFbNHX
-	aktMpXKDhLNDdfkMesbkZmcYYxovYQeTJoJTpp2U6TH/bwzWZQqOMoCNtMqs/x4TN0I66v0JHtJ
-	/tdV/Dll79F78pbh9MSs6HfI0hYv4N0RsGrEG7fGPm+zGtGiJ7IGZJWiAQBiBCbKNT+A3wZOmKw
-	9BE29z1+EDBV1g6tZMDFTu0hv8nxaUAIxR/hTw9fBygX52veAeXdgQXvZvniP2CWUfBeo/QvaRN
-	92gRLlEbD/wg7c3YoC2ffDwA432lDA6rMGhGW58IWdqa4kApOLb7C+nHkElMK9XRMAq16yxFIAp
-	MLzVQnQnO2o/5LU2gmmq0=
-X-Google-Smtp-Source: AGHT+IGbI2y8BO4zXLUCfMUPsmSUaVvSwPP3A7OqUwFX0uRSKtOhi6kkDFDcw0Vnhb7AgoDQJVNEyWKQqIxY52glLdk=
-X-Received: by 2002:a05:6214:3010:b0:87f:fb2e:9991 with SMTP id
- 6a1803df08f44-882385cfb7dmr212493586d6.6.1762877039610; Tue, 11 Nov 2025
- 08:03:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sdP5jmGf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6871C4CEF5;
+	Wed, 12 Nov 2025 09:01:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762938071;
+	bh=NmxT3e9rVD+Vk0gwGiTwEsfo+VbVQUJ9eVtsypMNXuc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=sdP5jmGfLM+SqEuBX/RsMGAmFa8GSx+5s3qlPF12YVUgFuFMpcff20Xhp8BQtu318
+	 XA2RUpFBp4/3lodTcuJD9YOxWBHcqQMk3h0u5+ME/+CzWeA+bk0+dKlaisCTBqHd6o
+	 T355kOHQKyPmjbq0GoHZQNmcLvQtYngvT4iiH2Yz4Pxoon6WrwLqGla9zLz5WNvIde
+	 cx9FOyjZdSQNY97ifMj9UKI2ssD71LcFv7Xa9qcxmE1cNFEdtAm9HMRRMZLh6u0A5a
+	 AD1vXlXRa/op+Ax2MTk3mKPyO0SMhntbfLDp2az621cBgWCihv3p++dBVMO0VEQrwn
+	 3SDY/PgaVZE9g==
+From: Christian Brauner <brauner@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	netfs@lists.linux.dev,
+	ecryptfs@vger.kernel.org,
+	linux-unionfs@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-api@vger.kernel.org,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Tyler Hicks <code@tyhicks.com>,
+	NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v6 00/17] vfs: recall-only directory delegations for knfsd
+Date: Wed, 12 Nov 2025 10:00:47 +0100
+Message-ID: <20251112-allesamt-ursprung-7581bf774318@brauner>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251111-dir-deleg-ro-v6-0-52f3feebb2f2@kernel.org>
+References: <20251111-dir-deleg-ro-v6-0-52f3feebb2f2@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251111070539.1558765-1-sunyiqixm@gmail.com>
-In-Reply-To: <20251111070539.1558765-1-sunyiqixm@gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 11 Nov 2025 10:03:47 -0600
-X-Gm-Features: AWmQ_bnWa6CPOjA90RODWVbZ9Ca-j58oVz0SxlTOoe6a2Jum9heLBu_4Q52omkc
-Message-ID: <CAH2r5msGsFW0GBrZpt1odmn8yXMbORMCHWTnD2xGOhG6GpWoLA@mail.gmail.com>
-Subject: Re: [PATCH] smb: fix invalid username check in smb3_fs_context_parse_param()
-To: Yiqi Sun <sunyiqixm@gmail.com>
-Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3125; i=brauner@kernel.org; h=from:subject:message-id; bh=NmxT3e9rVD+Vk0gwGiTwEsfo+VbVQUJ9eVtsypMNXuc=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWSK+Jx86vPs+ErnB/wb72nN1on3KMp9zX7dQSQ82GOlr L4T45e1HaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABN5uY/hn/2qqoNLZz+dwN+8 MaJT8c46z87PsQEvsjp28yya0xLDk8bwTylL6cEuZvNOz6YbIjsbtC63ni4K0TY9cPOZxLVsp4t dPAA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-tentatively applied to for-next pending review and testing
+On Tue, 11 Nov 2025 09:12:41 -0500, Jeff Layton wrote:
+> Behold, another version of the directory delegation patchset. This
+> version contains support for recall-only delegations. Support for
+> CB_NOTIFY will be forthcoming (once the client-side patches have caught
+> up).
+> 
+> The main changes here are in response to Jan's comments. I also changed
+> struct delegation use to fixed-with integer types.
+> 
+> [...]
 
-On Tue, Nov 11, 2025 at 1:19=E2=80=AFAM Yiqi Sun <sunyiqixm@gmail.com> wrot=
-e:
->
-> Since the maximum return value of strnlen(..., CIFS_MAX_USERNAME_LEN)
-> is CIFS_MAX_USERNAME_LEN, length check in smb3_fs_context_parse_param()
-> is always FALSE and invalid.
->
-> Fix the comparison in if statement.
->
-> Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
-> ---
->  fs/smb/client/fs_context.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index 59ccc2229ab3..d2cf1f60416a 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -1470,7 +1470,7 @@ static int smb3_fs_context_parse_param(struct fs_co=
-ntext *fc,
->                         break;
->                 }
->
-> -               if (strnlen(param->string, CIFS_MAX_USERNAME_LEN) >
-> +               if (strnlen(param->string, CIFS_MAX_USERNAME_LEN) =3D=3D
->                     CIFS_MAX_USERNAME_LEN) {
->                         pr_warn("username too long\n");
->                         goto cifs_parse_mount_err;
-> --
-> 2.34.1
->
->
+Applied to the vfs-6.19.directory.delegations branch of the vfs/vfs.git tree.
+Patches in the vfs-6.19.directory.delegations branch should appear in linux-next soon.
 
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
---=20
-Thanks,
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
-Steve
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-6.19.directory.delegations
+
+[01/17] filelock: make lease_alloc() take a flags argument
+        https://git.kernel.org/vfs/vfs/c/6fc5f2b19e75
+[02/17] filelock: rework the __break_lease API to use flags
+        https://git.kernel.org/vfs/vfs/c/4be9f3cc582a
+[03/17] filelock: add struct delegated_inode
+        https://git.kernel.org/vfs/vfs/c/6976ed2dd0d5
+[04/17] filelock: push the S_ISREG check down to ->setlease handlers
+        https://git.kernel.org/vfs/vfs/c/e6d28ebc17eb
+[05/17] vfs: add try_break_deleg calls for parents to vfs_{link,rename,unlink}
+        https://git.kernel.org/vfs/vfs/c/b46ebf9a768d
+[06/17] vfs: allow mkdir to wait for delegation break on parent
+        https://git.kernel.org/vfs/vfs/c/e12d203b8c88
+[07/17] vfs: allow rmdir to wait for delegation break on parent
+        https://git.kernel.org/vfs/vfs/c/4fa76319cd0c
+[08/17] vfs: break parent dir delegations in open(..., O_CREAT) codepath
+        https://git.kernel.org/vfs/vfs/c/134796f43a5e
+[09/17] vfs: clean up argument list for vfs_create()
+        https://git.kernel.org/vfs/vfs/c/85bbffcad730
+[10/17] vfs: make vfs_create break delegations on parent directory
+        https://git.kernel.org/vfs/vfs/c/c826229c6a82
+[11/17] vfs: make vfs_mknod break delegations on parent directory
+        https://git.kernel.org/vfs/vfs/c/e8960c1b2ee9
+[12/17] vfs: make vfs_symlink break delegations on parent dir
+        https://git.kernel.org/vfs/vfs/c/92bf53577f01
+[13/17] filelock: lift the ban on directory leases in generic_setlease
+        https://git.kernel.org/vfs/vfs/c/d0eab9fc1047
+[14/17] nfsd: allow filecache to hold S_IFDIR files
+        https://git.kernel.org/vfs/vfs/c/544a0ee152f0
+[15/17] nfsd: allow DELEGRETURN on directories
+        https://git.kernel.org/vfs/vfs/c/80c8afddc8b1
+[16/17] nfsd: wire up GET_DIR_DELEGATION handling
+        https://git.kernel.org/vfs/vfs/c/8b99f6a8c116
+[17/17] vfs: expose delegation support to userland
+        https://git.kernel.org/vfs/vfs/c/1602bad16d7d
