@@ -1,107 +1,109 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C35F1917F0
-	for <linux-cifs@vger.kernel.org>; Thu, 13 Nov 2025 04:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A7E2D73B5
+	for <linux-cifs@vger.kernel.org>; Thu, 13 Nov 2025 09:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763008787; cv=none; b=sUb/DWCX3JbocWNf9Ai1kTwLaiTf07c0pUxhsLIfRU3H+l5S4ESL54qZ3kGX+7YTbrdUqXThmBh53MLi9eWLNZIy7PrvawCIpOCbfz5HV5qRPjAbHNMRJqhQghXpNI4demKwEyLAt2NOkkVUnPaptuIdckMCD8Lt6nkgqfwhL3Y=
+	t=1763026037; cv=none; b=mRo+AVLlUWFgpbaPH8yM1FqgsqPRdlZFk2COPLtR/OSPMttECWFVpAoodeFD6hXktI1CCKa3YnPvVhOhB7bf9n2MiVNClciV7z2u94M61MXmK6grOjRo5capDXZAEqiX2DaEQqWt0y1lTm5cASCFQnwZbCH8BVC5Ocz8jCaV5Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763008787; c=relaxed/simple;
-	bh=8PE/5UQ+uNe5danCCBOkdV9a/gHHtnO41yR+Z+8vF9c=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=dUCg+lLUi7jgwuTLt0+3kf4s2oGmIvR81Ww9qVsW86lCRw9vq9hw1BfWV5jCO0BgSesr6laEkjbcMtbvWoK0zoap5psKZ2xM6wrZ13OImFD6pfYv9E2eX8OlbQ1SIwi4UZbu/vdZP+gg0i0sUrG2Xs/etieahUffXJ1qjWtAlZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TKCKTppC; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763026037; c=relaxed/simple;
+	bh=lFyIlcliweTDArjOud38dDnDHE7GQErnUCwb4MO0ybo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tziIW5MM10cZIb58arHF8R/b1nSst/3YSqRWCnhmYz2if5fnDVSM/zXBRTs8cHsl/sC6LU9pXokfWAHl8xt51qgLe46nlLomk3MyKih4DIt1Bmd4XQlkTLnPvBPk9QepVwcqheA3AHRMW9zYMOissZHTxFneXDyZ85zHlyokz3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ngBDeKim; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TKCKTppC"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4eddceccb89so4409201cf.0
-        for <linux-cifs@vger.kernel.org>; Wed, 12 Nov 2025 20:39:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763008784; x=1763613584; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=nS1Fb6GY+hcNWo43ARgi6gCvS6V1xrWZtXSBcti+qYA=;
-        b=TKCKTppCSwCsllOXmp+xW40ejn0s1bjOGOAAZnNus9cr8MB0XsKTRQGNBvCrsK9nv8
-         XeWiETpruJooaY17aBdA3eHHcKhbXcHYltj9zX4kQ0mV815hN5aIYSDo4lkBdJNzFZk/
-         6HDGcbgJ0SAKQFqB6txgVzacbJpZhUV5VAcdy9h9PUCbcSpsfvrBJSkXwmB0hBUq+RdR
-         c8dBIHqai+HztFx4jXBqyYWjfezTDsU5YjZsvMj6VHAKEzOouJxFwgSdt4v4nAXwwXdZ
-         93woQv6U+aTbeI2jO5Pr5jXUBmSbp0qsY+I5qGydyjqYZ7t4EWUzHEMzie/igE3kuRY3
-         7+YA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763008784; x=1763613584;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nS1Fb6GY+hcNWo43ARgi6gCvS6V1xrWZtXSBcti+qYA=;
-        b=CjFj+1HfjGBcayHLamwCVva7yZahNTWTyg5P2YJCppcdovkzMU6CrY559dM83Tfltr
-         eCrsYzMI+hl9An5FvXj5ZyFNZwUTKcBMChy4j+nFo+XO0+adGsGj9OGDJ7Z9Uo3gaulF
-         7ruEPT7o8FdvJNdz8UJzmZ0Bz6cKw06Bhy1wD8Nnl3fXeYpfmntA6KvQ8Ut9F1VBUmEV
-         NIeVegUA9GfJzOJ5ZamCyrrHSayZL5VEuExyumUbhEV1FXYRR+i9fCctiGhqk6yjL/kk
-         IABFKbtlZR9F8tjOrqg+tqzQ7gYTCsroCZ4q6x9KX5a+aaQZM9IXfyKsf/mASDGxZP/A
-         6FgA==
-X-Forwarded-Encrypted: i=1; AJvYcCU3QSWuVGbjs5BrDz3VvRFZuXYOmMZBr3AhmEJOcm5I2RA+rspB7XLkLtrshH5CvsuwbNu7Q1qhE11A@vger.kernel.org
-X-Gm-Message-State: AOJu0YwscDiCYxSIs9R/z96/bmDtPSShgARPs+r1eLqK0W3F/ZUlbAA4
-	z7AX3TkxO9MZYVWmuOuFSHsPjO4IkIjSs96EpBRU4+4NrPPSEML2Q19xHQME0lCytMZPafSgCNc
-	RUUb9O/wWqEBmPLzwe/49bEVvnHMg+4pN1hXD
-X-Gm-Gg: ASbGnctYLWrY4xIAvX9LgSZBTyP+o2eCYAGtxE7z5c7ZRx+P9QjIVeIJNtzsJchBfEw
-	9eT7ycIm0KfLIXx+x5nm705x+tkzUCgRY8Ne7N4WulxsAO9EMkEgCyHd76VyxV0WIUqlU91pYpH
-	jq91HQD0P2MCVV/EtMOLbu3hh9issZuSWMpp8rntuU7ujgkHcvAQPG2DTCssLUlBbk+xKkbJphq
-	TCgx1HnNYweTZDcXujFfMfK+Eg5oYJ9UTxoWrjOS3ob2O/o72DLuKmKXP/CSsAYd4MgDJmNmOdu
-	EVo9PCzV8pIiv29B5r8E596Ta/7PL46rs9XEXKDHSVVS/y5KaUnzS3K09tiMJ6zmHR1ncDEx85t
-	cm6VrPgqDLWKaNsLKuMO83lZqArLzlamBQNfu5482AKD6s6lm
-X-Google-Smtp-Source: AGHT+IF/HFdvvnrQstUYL2HuKqJQana16mxr6VqWpNpkevQWIOl9K20sZHhgiPfXNxPJU+XnOgrH/DPNQqHwHB8DZKc=
-X-Received: by 2002:ac8:5d50:0:b0:4d0:ac40:fab8 with SMTP id
- d75a77b69052e-4eddbc6aa3dmr79240981cf.7.1763008784515; Wed, 12 Nov 2025
- 20:39:44 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ngBDeKim"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763026031;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=f9Gs7sU3C6pl28t3n8A03C3rIVhAKjaPqrv88ZWeXpE=;
+	b=ngBDeKimW5D2u6XFUVjbX0IOfqnXBVIgx4DbaXBAjtGN3yh9i/RU7gIw1X5pePtksSX+Cb
+	A27R/Kf2marevi9aDe98L9+K9iPRHACcOCXX11Fi2cAP3ghFz9I03TYiOlTCndzF4xn+38
+	oClU9JygROCdn1S5KHQSEACIraBTxVg=
+From: chenxiaosong.chenxiaosong@linux.dev
+To: sfrench@samba.org,
+	smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	linkinjeon@samba.org,
+	christophe.jaillet@wanadoo.fr
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	chenxiaosong@chenxiaosong.com,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH v6 0/2] smb: move duplicate definitions to common header file
+Date: Thu, 13 Nov 2025 17:26:00 +0800
+Message-ID: <20251113092602.24733-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 12 Nov 2025 22:39:33 -0600
-X-Gm-Features: AWmQ_bmA8jjlgRZ1SJQzNksGaq_SRIeKXPDybLTOtBvuiJNrv9YIYy_FUkSQTlE
-Message-ID: <CAH2r5mt03Ds=Fcbn59XO+9Vy6SVpeQ4DvcUzu-gA4-=gw5A2nw@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, 
-	"Stefan (metze) Metzmacher" <metze@samba.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Please pull the following changes since commit
-e9a6fb0bcdd7609be6969112f3fbfcce3b1d4a7c:
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-  Linux 6.18-rc5 (2025-11-09 15:10:19 -0800)
+In order to maintain the code more easily, move some duplicate definitions
+to common header file. Add some MS documentation references for macro and
+struct definitions.
 
-are available in the Git repository at:
+I have tested all patches using xfstests and smbtorture, and no additional
+test failures were observed in the results. The detailed test results can
+be found in https://chenxiaosong.com/en/smb-test/20251113.html
 
-  git://git.samba.org/ksmbd.git tags/v6.18-rc5-smb-server-fixes
+v3: https://lore.kernel.org/all/20251014071917.3004573-1-chenxiaosong.chenxiaosong@linux.dev/
+The following patches from v3 have already been merged into the mainline:
+  - d877470b5991 smb: move some duplicate definitions to common/cifsglob.h
+  - 379510a815cb smb/server: fix possible refcount leak in smb2_sess_setup()
+  - 6fced056d2cc smb/server: fix possible memory leak in smb2_read()
 
-for you to fetch changes up to 55286b1e1bf4ce55f61ad2816d4ff8a7861a8cbb:
+v4: https://lore.kernel.org/all/20251027071316.3468472-1-chenxiaosong.chenxiaosong@linux.dev/
+v5: https://lore.kernel.org/all/20251102073059.3681026-1-chenxiaosong.chenxiaosong@linux.dev/
+The following patches from v4 and v5 have been applied to the ksmbd-for-next-next branch: https://git.samba.org/?p=ksmbd.git;a=shortlog;h=refs/heads/ksmbd-for-next-next
+  - smb: fix some warnings reported by scripts/checkpatch.pl
+  - smb: do some cleanups
+  - smb: move FILE_SYSTEM_SIZE_INFO to common/fscc.h
+  - smb: move some duplicate struct definitions to common/fscc.h
+  - smb: move list of FileSystemAttributes to common/fscc.h
+  - smb: move SMB_NEGOTIATE_REQ to common/smb2pdu.h
+  - smb: move some duplicate definitions to common/smb2pdu.h
+  - smb: move create_durable_rsp_v2 to common/smb2pdu.h
+  - smb: move create_durable_handle_reconnect_v2 to common/smb2pdu.h
+  - smb: move create_durable_req_v2 to common/smb2pdu.h
+  - smb: move MAX_CIFS_SMALL_BUFFER_SIZE to common/smbglob.h
+  - smb/client: fix CAP_BULK_TRANSFER value
+  - smb: move resume_key_ioctl_rsp to common/smb2pdu.h
+  - smb: move copychunk definitions to common/smb2pdu.h
+  - smb: move smb_sockaddr_in and smb_sockaddr_in6 to common/smb2pdu.h
+  - smb: move SMB1_PROTO_NUMBER to common/smbglob.h
+  - smb: move get_rfc1002_len() to common/smbglob.h
+  - smb: move smb_version_values to common/smbglob.h
+  - smb: rename common/cifsglob.h to common/smbglob.h
 
-  smb: server: let smb_direct_disconnect_rdma_connection() turn
-CREATED into DISCONNECTED (2025-11-11 09:50:35 -0600)
+v5->v6:
+  - Patch #0001: use typedef to define both CREATE_DURABLE and CREATE_DURABLE_RECONN_REQ
+    for a single struct.
+  - Patch #0002: make FILE_SYSTEM_ATTRIBUTE_INFO.FileSystemName a flexible array member.
 
-----------------------------------------------------------------
-Three ksmbd server fixes
-- Fix smbdirect (RDMA) disconnect hang bug
-- Fix potential Denial of Service when connection limit exceeded
-- Fix smbdirect (RDMA) connection (potentially accessing freed memory) bug
-----------------------------------------------------------------
-Joshua Rogers (2):
-      smb: server: rdma: avoid unmapping posted recv on accept failure
-      ksmbd: close accepted socket when per-IP limit rejects connection
+ChenXiaoSong (2):
+  smb: move CREATE_DURABLE_RECONN_REQ to common/smb2pdu.h
+  smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/fscc.h
 
-Stefan Metzmacher (1):
-      smb: server: let smb_direct_disconnect_rdma_connection() turn
-CREATED into DISCONNECTED
-
- fs/smb/server/transport_rdma.c | 14 +++++++++++++-
- fs/smb/server/transport_tcp.c  |  5 ++++-
- 2 files changed, 17 insertions(+), 2 deletions(-)
+ fs/smb/client/cifspdu.h    | 10 ----------
+ fs/smb/client/smb2pdu.c    | 25 ++++++++++++-------------
+ fs/smb/common/fscc.h       |  8 ++++++++
+ fs/smb/common/smb2pdu.h    |  4 ++--
+ fs/smb/server/smb2pdu.c    | 12 ++++++------
+ fs/smb/server/smb2pdu.h    | 12 ------------
+ fs/smb/server/smb_common.h |  7 -------
+ 7 files changed, 28 insertions(+), 50 deletions(-)
 
 -- 
-Thanks,
+2.43.0
 
-Steve
