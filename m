@@ -1,126 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9616325A33F
-	for <linux-cifs@vger.kernel.org>; Thu, 13 Nov 2025 01:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFB7296BB7
+	for <linux-cifs@vger.kernel.org>; Thu, 13 Nov 2025 01:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762997039; cv=none; b=kDLu0q1/RsLZRJoJOKGJ015uVYPw7ohIUIlbFXnjMyYp/bz7ww56PQ+tIaBWPjdy5TFSV2tOKsJKMv7bTHSYtnBDNaewuLJDOjl9bXaCAYNEfGDTdgLje21nD4A98INfHHIov6SKkK1ArBGrrAFnvVKSR152iolBRK2S2oFyjqU=
+	t=1762998388; cv=none; b=RGTGO9RknSZIDtP9VptBisu9uixxDKIrHpaGnHUKdxN0bFHtZvcbqx/hQWLg7mLsrtBWtBt06hbeVO6oIRYAqH69N72gXNBNq1UXEeMW9Gz19hfNzz3CjfFoOd+1i2YZ3R8U+blvnQkHAXTljTHuN75hyBiO/3mRN7yfb2+hcqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762997039; c=relaxed/simple;
-	bh=VYVCX7GPtJjuE+GgDCKLrXkBDv0CP9xP5mPuO/bZz5c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T/ADMvyPYDKLXUrf79AxbA7Uug0XX2GooDO/Gj/l0iSEA19fJf6KE4G0WB6MvTdWy7SMS2Qnc1ahOsDS9645KrdDubVNrW32ojeSPlJTG5z2kWGhetxkYb0AuoHUsLZ6JJKK1VFc/IWgBACvXW8zX/NwchSjynQZtJxJ9WuWv2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qimOLV6I; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762998388; c=relaxed/simple;
+	bh=UobmHQ+i1qGEF8C/zTJsB2ABG1daqbuFPHpfOfzkP9M=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=kJn/52T3Qnq++1vmxL7ze9CjAHlfQlxMr/FlYxmeB85f/PgOWtHepnZsWn5GVHn4puqJRp+12f5J8ux/vZQMgUSfIffK7mcyTUt857t2DRL1Y2rToWYnyfkgvwvH29gY75zmZ6V8ciEj+JqScpjgUgvRNS3Hv7/TtMf+GakAPxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=none smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong-com.20230601.gappssmtp.com header.i=@chenxiaosong-com.20230601.gappssmtp.com header.b=AxDy0t6N; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qimOLV6I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DE9BC2BC87
-	for <linux-cifs@vger.kernel.org>; Thu, 13 Nov 2025 01:23:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762997039;
-	bh=VYVCX7GPtJjuE+GgDCKLrXkBDv0CP9xP5mPuO/bZz5c=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=qimOLV6IgiQ/vtwsTcmqONYlgtdYjqXS+SBjenNwf4WsFjd/LA5jQiOQe+a1m5m8s
-	 7J5hwobGj/s3DiKPgmGqZdk6T1/sDQroSsK2XHFkAd+BAly5srHfNX7PfpI9epR54b
-	 KSLCx3rGSitDA+nb73J0vFkaTVlI/B8FuR/5wOXYNoOPT3SASYNPQ9Qy052xTbOvX7
-	 IX4T3I7ur8Tk0pz8TbgMa0fvxS4rW73pK1Y2YpUnmatHa0WuFC55tNB0m2E903B5AU
-	 ByJ4f1EkqctHZ+b11L1GLuSkvG/riHnLtQyjtapfZo3TEbKRcOrwHuw7SRusYFa7KL
-	 elzB1xSvb+BPg==
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-64175dfc338so485892a12.0
-        for <linux-cifs@vger.kernel.org>; Wed, 12 Nov 2025 17:23:59 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVGm1v0nvqHApjrlgj044TZenaeklAVbmt+pWMygR66WsVVGzFGFA8BJxbBCgZ4KqF8Pbs+e8pzRlGH@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTBAP9dkNrbRnYwcLHF1ONSJeMkW7hiEFGZtaV1RxVbXPuwWUU
-	jVHtE0+T0Opypg6kPD25tBs+lKDPwF5OG6IfLSnScGVyHMh7iosvKFSIFuDk88CTj6Y5tsQ1Ix3
-	5da/43kvq2QvHZvDrSh2rCaHx4TbzxxU=
-X-Google-Smtp-Source: AGHT+IGEsa6QU6NH+dn86hp3h/tM2rUVVmZtnqxarHN5u+paEPhFru5BCQNU14p+2Wc/fDSbHzO5VPaAWwvsacyUEuU=
-X-Received: by 2002:a05:6402:26cb:b0:640:c640:98c5 with SMTP id
- 4fb4d7f45d1cf-6431a584ee0mr4668463a12.34.1762997037892; Wed, 12 Nov 2025
- 17:23:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=chenxiaosong-com.20230601.gappssmtp.com header.i=@chenxiaosong-com.20230601.gappssmtp.com header.b="AxDy0t6N"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b994baabfcfso182817a12.3
+        for <linux-cifs@vger.kernel.org>; Wed, 12 Nov 2025 17:46:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chenxiaosong-com.20230601.gappssmtp.com; s=20230601; t=1762998385; x=1763603185; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=d2VhFVfZP0yG3njrNawDEH+d1ecXNNX+BfE+gXR0ZA8=;
+        b=AxDy0t6NOCT1OU/vXnCNZ2OhkWkIz6wC/k/LXQDGHbk+Ge+Y3mr1gcDHCBNijmVkHo
+         Jp6hTvS0SlQ6hqwEhlDWHABjQWO1XbbD8TD3ThdpIrqw2Lh8qSkat2FeIAGS7a4RS7lZ
+         BYwZBagRINnHXhEf1D9IZ7158n+4Xgcf5lji/AUSYfFzldcM6hP3hPLIeRFP+/9AoHzz
+         0ena8OEM905YgF66TKZYemL7TXTdMe9HH1M2WiZ1xezjXgqexaDzj6zMc2yS/Y/Ezc5Y
+         PoDkxtsUJxuoYuDe545O/JVJv5GZ2y4qPCK3oUho9gudTVSug7bF1fLtQUbsXlS6Cdw/
+         CjCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762998385; x=1763603185;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d2VhFVfZP0yG3njrNawDEH+d1ecXNNX+BfE+gXR0ZA8=;
+        b=O49NsV4NXhSbBEGQ/yANfsMfFoFYwfD9xn/E7X2uptRi66IYIuIVzgXgIxqaAV2n0P
+         otv1sj7TkboXYDOE/z/zjN7aaj/DoowjsXkt2HIjxmFgkSfFADjQ4p1ZhZlRiq7sx1cK
+         187Yz5yTtXzjtYRa2QzqOVzHA+vTXnWK7kHGLARBOf+kzm7VmP87BPBkbwCiQv2EbuVQ
+         AXOxLToIOt57FHYxMC9MH0eGVzb/+gJ2xqyjUAW8SD6Gwt6S4paPHBy3f8DJ/yeg7fCS
+         MRUxsuAqhg0rFqIcnjBxezQaMTdpTL6DnnvTf67GEBtdLuliTHvLbHBcDaWTapJ5NaOm
+         WBOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVUPvZFDpWWjUT409vWPqrRrig7vaBLRSzTksM06zthCGF9u6Svy6ZJg4fejqlFGM1Ya1MIDVlzSXqS@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4Dqx/qCqfhb0nYGRDv7tl9Fe1HS7CTG1I+TUaE4MeGV1SvS99
+	VUJ5RCDGrf5JXU5TcznDlfJN/RIupaDIg6+fzh76NFx/tFFeOai5iMwG2Avd2hcCPmuL
+X-Gm-Gg: ASbGncuB3OchHJKc+KDQcuCf2iZEir+9ks7U4A4vgfdwtPsJZw1g59z6n430H1R+mHG
+	Uux1tA8RBcoLVF1VqqZSkHB2wQHt6mxiuH9xynbAXTv5GLJviH0hfHzfng0I3/SmTprTJL3iVhB
+	esYzl+LsMJkqW/RQmCaREoSZiXFQZo3x8D05jccW22oKj6FJbk8N+kMgZYyPwUTR0wW/PApDnjI
+	GVvF4el+3b1/S6RJI63psMwuSPdLaQNVBIIYbHLSaRRtLfpInB7GEyT26Lc40nO0gzziDfCoY8i
+	Tjh7s7FUJVwWVoSuOtCqUlBNbQdXbz+rVAQE2aW51Bw7Cad2ay5YP8C14xN0TYvlBo3c3e7hIjl
+	isM6f/aveWU84cEqzHMCnZ9lFxCHronen1DPrH19judzLbCgLKUJckxXmcO/8xhVsX5v9fWaVJA
+	Xtsh6OZLfoxp3iUyCR0NSx5pAI8+RFUQ==
+X-Google-Smtp-Source: AGHT+IHbymVR8GjScDftVTUuU4zA27Nl0y0MLi1qfG+GLQ7TTdKzfbxLqfu7VKUHAbpg/EzQzWRjMA==
+X-Received: by 2002:a17:903:2ac3:b0:298:33c9:eda1 with SMTP id d9443c01a7336-2984edddbbamr60750745ad.43.1762998384819;
+        Wed, 12 Nov 2025 17:46:24 -0800 (PST)
+Received: from [192.168.3.223] ([116.128.244.171])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c245f8asm5156085ad.37.2025.11.12.17.46.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Nov 2025 17:46:24 -0800 (PST)
+Message-ID: <fd9d8a05-32e8-4f83-8e40-a6497dde1ed5@chenxiaosong.com>
+Date: Thu, 13 Nov 2025 09:46:12 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251102073059.3681026-1-chenxiaosong.chenxiaosong@linux.dev> <20251102073059.3681026-13-chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251102073059.3681026-13-chenxiaosong.chenxiaosong@linux.dev>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 13 Nov 2025 10:23:46 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_n3D=CC9DfVTak3oQa3xqkQ2jyHm9sUKDLd=exJAuXJQ@mail.gmail.com>
-X-Gm-Features: AWmQ_bkqXjNzTD1YuzK5pU54qQgT-nuarTPHum9OF8Gyr-6AHVoR3Ynhe-xkUUE
-Message-ID: <CAKYAXd_n3D=CC9DfVTak3oQa3xqkQ2jyHm9sUKDLd=exJAuXJQ@mail.gmail.com>
-Subject: Re: [PATCH v5 12/14] smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/fscc.h
-To: chenxiaosong.chenxiaosong@linux.dev
-Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org, 
-	christophe.jaillet@wanadoo.fr, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Subject: Re: [PATCH v5 06/14] smb/server: remove create_durable_reconn_req
+To: Namjae Jeon <linkinjeon@kernel.org>, chenxiaosong.chenxiaosong@linux.dev
+Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org,
+ christophe.jaillet@wanadoo.fr, linux-cifs@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251102073059.3681026-1-chenxiaosong.chenxiaosong@linux.dev>
+ <20251102073059.3681026-7-chenxiaosong.chenxiaosong@linux.dev>
+ <CAKYAXd8o3CKcaArMzEifR+oaX2G_g3XuEjFkBtPhyO99pKQO+g@mail.gmail.com>
+Content-Language: en-US
+In-Reply-To: <CAKYAXd8o3CKcaArMzEifR+oaX2G_g3XuEjFkBtPhyO99pKQO+g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, Nov 2, 2025 at 4:32=E2=80=AFPM <chenxiaosong.chenxiaosong@linux.dev=
-> wrote:
->
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->
-> Rename "struct filesystem_attribute_info" to "FILE_SYSTEM_ATTRIBUTE_INFO"=
-,
-> then move them to common header file.
->
-> Calculate the minimum size of FileFsAttributeInformation using offsetof()=
-.
->
-> On the server, replace original "sizeof(struct filesystem_attribute_info)=
-"
-> with "MIN_FS_ATTR_INFO_SIZE".
->
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> ---
->  fs/smb/client/cifspdu.h    | 10 ----------
->  fs/smb/common/fscc.h       | 14 ++++++++++++++
->  fs/smb/server/smb2pdu.c    |  6 +++---
->  fs/smb/server/smb_common.h |  7 -------
->  4 files changed, 17 insertions(+), 20 deletions(-)
->
-> diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-> index a9a853b9011f..2c454e450dfa 100644
-> --- a/fs/smb/client/cifspdu.h
-> +++ b/fs/smb/client/cifspdu.h
-> @@ -2063,16 +2063,6 @@ typedef struct {
->  #define FILE_PORTABLE_DEVICE                   0x00004000
->  #define FILE_DEVICE_ALLOW_APPCONTAINER_TRAVERSAL 0x00020000
->
-> -/* minimum includes first three fields, and empty FS Name */
-> -#define MIN_FS_ATTR_INFO_SIZE 12
-> -
-> -typedef struct {
-> -       __le32 Attributes;
-> -       __le32 MaxPathNameComponentLength;
-> -       __le32 FileSystemNameLen;
-> -       char FileSystemName[52]; /* do not have to save this - get subset=
-? */
-> -} __attribute__((packed)) FILE_SYSTEM_ATTRIBUTE_INFO;
-> -
->  /***********************************************************************=
-*******/
->  /* QueryFileInfo/QueryPathinfo (also for SetPath/SetFile) data buffer fo=
-rmats */
->  /***********************************************************************=
-*******/
-> diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
-> index a0580a772a41..9d3ac9903357 100644
-> --- a/fs/smb/common/fscc.h
-> +++ b/fs/smb/common/fscc.h
-> @@ -94,6 +94,20 @@ struct smb2_file_network_open_info {
->         __le32 Reserved;
->  } __packed; /* level 34 Query also similar returned in close rsp and ope=
-n rsp */
->
-> +/* See FS-FSCC 2.5.1 */
-> +typedef struct {
-> +       __le32 Attributes;
-> +       __le32 MaxPathNameComponentLength;
-> +       __le32 FileSystemNameLen;
-> +       __le16 FileSystemName[52]; /* do not have to save this - get subs=
-et? */
-Is there any reason why we can not use flex-array ?
-Thanks.
+Okay, I'll make the changes.
+
+Once you've applied some of the patches from this version, I'll 
+immediately send the next version.
+
+Thanks,
+ChenXiaoSong.
+
+On 11/13/25 9:19 AM, Namjae Jeon wrote:
+> On Sun, Nov 2, 2025 at 4:32 PM <chenxiaosong.chenxiaosong@linux.dev> wrote:
+>>
+>> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>>
+>> The fields in struct create_durable_reconn_req and struct create_durable
+>> are exactly the same.
+>>
+>> The documentation references are:
+>>
+>>    - SMB2_CREATE_DURABLE_HANDLE_REQUEST   in MS-SMB2 2.2.13.2.3
+>>    - SMB2_CREATE_DURABLE_HANDLE_RECONNECT in MS-SMB2 2.2.13.2.4
+>>    - SMB2_FILEID in MS-SMB2 2.2.14.1
+>>
+>> We can give these two structs a uniform name: create_durable.
+> Please use typedef to define multiple aliases for a single struct.
+> typedef struct {
+>    ...
+> } create_durable, create_durable_reconn_req;
+> 
+> Thanks.
+
