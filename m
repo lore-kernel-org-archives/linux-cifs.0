@@ -1,257 +1,107 @@
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766DB2BE629
-	for <linux-cifs@vger.kernel.org>; Thu, 13 Nov 2025 04:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C35F1917F0
+	for <linux-cifs@vger.kernel.org>; Thu, 13 Nov 2025 04:39:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763007991; cv=none; b=n3YsBf7FNwZdfjo4hR5EA5xp5FVivO2hBPNLJt8qmSL9fiXxDebOqdNDAOmq7yFM9aszHobXf+E1zEX0V+NXdacp781XCTVRmdPoS63zm9cuALpLu/jg/50mKO+6reDbSAj/RGG6vckIjZAvhvJSX/ctuByGJYuPfoyI53hyDuQ=
+	t=1763008787; cv=none; b=sUb/DWCX3JbocWNf9Ai1kTwLaiTf07c0pUxhsLIfRU3H+l5S4ESL54qZ3kGX+7YTbrdUqXThmBh53MLi9eWLNZIy7PrvawCIpOCbfz5HV5qRPjAbHNMRJqhQghXpNI4demKwEyLAt2NOkkVUnPaptuIdckMCD8Lt6nkgqfwhL3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763007991; c=relaxed/simple;
-	bh=h0INBf89Mp9+J6NVNbApuTqiFkExLITyHns+5BnmXKk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=XhAA7DHbNvE7iCak9LBLbioM9op91OauNyRkTSGVX2RBkASeLA/mJScaEaoLwNNSFeIjBGT4fO7bbXNnqjBdOBHdrOG/1c6Mrjdl5sbSQGdAzibuFLJ5AbfDj5IYjfnIBHfQje5mTuqe9C2uUiOUONB8kJ/Xp7yl333m/9+WUDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-433692f7479so18115755ab.3
-        for <linux-cifs@vger.kernel.org>; Wed, 12 Nov 2025 20:26:29 -0800 (PST)
+	s=arc-20240116; t=1763008787; c=relaxed/simple;
+	bh=8PE/5UQ+uNe5danCCBOkdV9a/gHHtnO41yR+Z+8vF9c=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=dUCg+lLUi7jgwuTLt0+3kf4s2oGmIvR81Ww9qVsW86lCRw9vq9hw1BfWV5jCO0BgSesr6laEkjbcMtbvWoK0zoap5psKZ2xM6wrZ13OImFD6pfYv9E2eX8OlbQ1SIwi4UZbu/vdZP+gg0i0sUrG2Xs/etieahUffXJ1qjWtAlZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TKCKTppC; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TKCKTppC"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4eddceccb89so4409201cf.0
+        for <linux-cifs@vger.kernel.org>; Wed, 12 Nov 2025 20:39:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763008784; x=1763613584; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nS1Fb6GY+hcNWo43ARgi6gCvS6V1xrWZtXSBcti+qYA=;
+        b=TKCKTppCSwCsllOXmp+xW40ejn0s1bjOGOAAZnNus9cr8MB0XsKTRQGNBvCrsK9nv8
+         XeWiETpruJooaY17aBdA3eHHcKhbXcHYltj9zX4kQ0mV815hN5aIYSDo4lkBdJNzFZk/
+         6HDGcbgJ0SAKQFqB6txgVzacbJpZhUV5VAcdy9h9PUCbcSpsfvrBJSkXwmB0hBUq+RdR
+         c8dBIHqai+HztFx4jXBqyYWjfezTDsU5YjZsvMj6VHAKEzOouJxFwgSdt4v4nAXwwXdZ
+         93woQv6U+aTbeI2jO5Pr5jXUBmSbp0qsY+I5qGydyjqYZ7t4EWUzHEMzie/igE3kuRY3
+         7+YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763007988; x=1763612788;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ydHVQNe2srJLJGp2D/A0QPLHXTjGyY6A2XrZzcrWi1Q=;
-        b=qzbseFm0YskG8ncM/h2TD2N2WmUME7jrQYPxsNm/09ICE7SRRlMJIlBkXzJ0491lut
-         /Tw0WyRUxzfk6TRDD38h1nr5oHln5xVeXUSkXbYwOPfzca4V3BA3q1rN8uCyFZQnfSxk
-         PH6dGGnY/4har8FYwjC0Luw1bdpdBidPASxV3JxPk2sM3KO3MYGGi/TOUzz03HGQQ670
-         h0JuxIaE5ThD5uWM1ug60aXuJWf7XFbjgx9DiNKUAfvXN9vP0IOyxJM7rbvonYX9dKEh
-         fiNR6sSPQgkRMwwO7o49LfOfiMEP24U6SJIM5io8XH8sybjhSPA8nke7VMQwQOnAjF1l
-         Bh8w==
-X-Forwarded-Encrypted: i=1; AJvYcCXdmZsxmRskiA+dHMgd4c8A2dZn/P98TZzKslql3fvmtQsEeEXMPIsfCHYFox8U6PfJljVcN/b2NdaU@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgXGYONszYrH7wKspuGXUdVphM2fSrVsJcUknRwfJc4ezkXq93
-	7ZiY5CS7JdsyRJgk/Ki0v6Dy+JDT+KBoQgJsxQjZRvfyaNfLlcl6zJVhED1fk0iteiknv/zn3Lp
-	TZBDLzt/vKLIK17/FqD0BtHhSXgTeL+MRzy+H704cdkuEdzVs6v7ccYu7Oj4=
-X-Google-Smtp-Source: AGHT+IHXrfGrzI9sEMMFVaBVE7dJZIIx6+86VFCDEXXhBEvo6fy/89IuSzROtjYJoDB0IT8eOAHfShX8nYEaKj6G82SPNeKbhssH
+        d=1e100.net; s=20230601; t=1763008784; x=1763613584;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nS1Fb6GY+hcNWo43ARgi6gCvS6V1xrWZtXSBcti+qYA=;
+        b=CjFj+1HfjGBcayHLamwCVva7yZahNTWTyg5P2YJCppcdovkzMU6CrY559dM83Tfltr
+         eCrsYzMI+hl9An5FvXj5ZyFNZwUTKcBMChy4j+nFo+XO0+adGsGj9OGDJ7Z9Uo3gaulF
+         7ruEPT7o8FdvJNdz8UJzmZ0Bz6cKw06Bhy1wD8Nnl3fXeYpfmntA6KvQ8Ut9F1VBUmEV
+         NIeVegUA9GfJzOJ5ZamCyrrHSayZL5VEuExyumUbhEV1FXYRR+i9fCctiGhqk6yjL/kk
+         IABFKbtlZR9F8tjOrqg+tqzQ7gYTCsroCZ4q6x9KX5a+aaQZM9IXfyKsf/mASDGxZP/A
+         6FgA==
+X-Forwarded-Encrypted: i=1; AJvYcCU3QSWuVGbjs5BrDz3VvRFZuXYOmMZBr3AhmEJOcm5I2RA+rspB7XLkLtrshH5CvsuwbNu7Q1qhE11A@vger.kernel.org
+X-Gm-Message-State: AOJu0YwscDiCYxSIs9R/z96/bmDtPSShgARPs+r1eLqK0W3F/ZUlbAA4
+	z7AX3TkxO9MZYVWmuOuFSHsPjO4IkIjSs96EpBRU4+4NrPPSEML2Q19xHQME0lCytMZPafSgCNc
+	RUUb9O/wWqEBmPLzwe/49bEVvnHMg+4pN1hXD
+X-Gm-Gg: ASbGnctYLWrY4xIAvX9LgSZBTyP+o2eCYAGtxE7z5c7ZRx+P9QjIVeIJNtzsJchBfEw
+	9eT7ycIm0KfLIXx+x5nm705x+tkzUCgRY8Ne7N4WulxsAO9EMkEgCyHd76VyxV0WIUqlU91pYpH
+	jq91HQD0P2MCVV/EtMOLbu3hh9issZuSWMpp8rntuU7ujgkHcvAQPG2DTCssLUlBbk+xKkbJphq
+	TCgx1HnNYweTZDcXujFfMfK+Eg5oYJ9UTxoWrjOS3ob2O/o72DLuKmKXP/CSsAYd4MgDJmNmOdu
+	EVo9PCzV8pIiv29B5r8E596Ta/7PL46rs9XEXKDHSVVS/y5KaUnzS3K09tiMJ6zmHR1ncDEx85t
+	cm6VrPgqDLWKaNsLKuMO83lZqArLzlamBQNfu5482AKD6s6lm
+X-Google-Smtp-Source: AGHT+IF/HFdvvnrQstUYL2HuKqJQana16mxr6VqWpNpkevQWIOl9K20sZHhgiPfXNxPJU+XnOgrH/DPNQqHwHB8DZKc=
+X-Received: by 2002:ac8:5d50:0:b0:4d0:ac40:fab8 with SMTP id
+ d75a77b69052e-4eddbc6aa3dmr79240981cf.7.1763008784515; Wed, 12 Nov 2025
+ 20:39:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3e04:b0:433:7d37:38ea with SMTP id
- e9e14a558f8ab-43473dae01emr61075365ab.24.1763007988701; Wed, 12 Nov 2025
- 20:26:28 -0800 (PST)
-Date: Wed, 12 Nov 2025 20:26:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69155df4.a70a0220.3124cb.0016.GAE@google.com>
-Subject: [syzbot] [cifs?] memory leak in smb3_fs_context_fullpath
-From: syzbot <syzbot+87be6809ed9bf6d718e3@syzkaller.appspotmail.com>
-To: bharathsm@microsoft.com, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	samba-technical@lists.samba.org, sfrench@samba.org, sprasad@microsoft.com, 
-	syzkaller-bugs@googlegroups.com, tom@talpey.com
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 12 Nov 2025 22:39:33 -0600
+X-Gm-Features: AWmQ_bmA8jjlgRZ1SJQzNksGaq_SRIeKXPDybLTOtBvuiJNrv9YIYy_FUkSQTlE
+Message-ID: <CAH2r5mt03Ds=Fcbn59XO+9Vy6SVpeQ4DvcUzu-gA4-=gw5A2nw@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, 
+	"Stefan (metze) Metzmacher" <metze@samba.org>, CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+Please pull the following changes since commit
+e9a6fb0bcdd7609be6969112f3fbfcce3b1d4a7c:
 
-syzbot found the following issue on:
+  Linux 6.18-rc5 (2025-11-09 15:10:19 -0800)
 
-HEAD commit:    4ea7c1717f3f Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11b75c12580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cb128cd5cb439809
-dashboard link: https://syzkaller.appspot.com/bug?extid=87be6809ed9bf6d718e3
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15350658580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=160d960a580000
+are available in the Git repository at:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1f8cf51c9042/disk-4ea7c171.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/6f227246b5b7/vmlinux-4ea7c171.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f935766a00b3/bzImage-4ea7c171.xz
+  git://git.samba.org/ksmbd.git tags/v6.18-rc5-smb-server-fixes
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+87be6809ed9bf6d718e3@syzkaller.appspotmail.com
+for you to fetch changes up to 55286b1e1bf4ce55f61ad2816d4ff8a7861a8cbb:
 
-2025/11/11 03:33:01 executed programs: 5
-BUG: memory leak
-unreferenced object 0xffff888110616300 (size 192):
-  comm "syz.0.17", pid 6091, jiffies 4294942682
-  hex dump (first 32 bytes):
-    2f 2f f2 2f 06 08 2f df 2f 6f dc ea 95 9a 82 10  //./.././o......
-    97 57 8f 37 98 9b 2f f9 0d 6d 44 94 29 55 db 15  .W.7../..mD.)U..
-  backtrace (crc 93bb458c):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4979 [inline]
-    slab_alloc_node mm/slub.c:5284 [inline]
-    __do_kmalloc_node mm/slub.c:5645 [inline]
-    __kmalloc_noprof+0x3e3/0x6b0 mm/slub.c:5658
-    kmalloc_noprof include/linux/slab.h:961 [inline]
-    smb3_fs_context_fullpath+0x70/0x1b0 fs/smb/client/fs_context.c:629
-    smb3_fs_context_parse_param+0x2266/0x36c0 fs/smb/client/fs_context.c:1438
-    vfs_parse_fs_param+0xf4/0x190 fs/fs_context.c:146
-    vfs_fsconfig_locked fs/fsopen.c:303 [inline]
-    __do_sys_fsconfig+0x7d3/0x900 fs/fsopen.c:473
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  smb: server: let smb_direct_disconnect_rdma_connection() turn
+CREATED into DISCONNECTED (2025-11-11 09:50:35 -0600)
 
-BUG: memory leak
-unreferenced object 0xffff888110616180 (size 192):
-  comm "syz.0.17", pid 6091, jiffies 4294942682
-  hex dump (first 32 bytes):
-    2f 2f f2 2f 06 08 2f df 2f 6f dc ea 95 9a 82 10  //./.././o......
-    97 57 8f 37 98 9b 2f f9 0d 6d 44 94 29 55 db 15  .W.7../..mD.)U..
-  backtrace (crc 93bb458c):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4979 [inline]
-    slab_alloc_node mm/slub.c:5284 [inline]
-    __do_kmalloc_node mm/slub.c:5645 [inline]
-    __kmalloc_node_track_caller_noprof+0x3aa/0x6b0 mm/slub.c:5755
-    __kmemdup_nul mm/util.c:64 [inline]
-    kstrdup+0x3c/0x80 mm/util.c:84
-    smb3_fs_context_parse_param+0x229b/0x36c0 fs/smb/client/fs_context.c:1444
-    vfs_parse_fs_param+0xf4/0x190 fs/fs_context.c:146
-    vfs_fsconfig_locked fs/fsopen.c:303 [inline]
-    __do_sys_fsconfig+0x7d3/0x900 fs/fsopen.c:473
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+----------------------------------------------------------------
+Three ksmbd server fixes
+- Fix smbdirect (RDMA) disconnect hang bug
+- Fix potential Denial of Service when connection limit exceeded
+- Fix smbdirect (RDMA) connection (potentially accessing freed memory) bug
+----------------------------------------------------------------
+Joshua Rogers (2):
+      smb: server: rdma: avoid unmapping posted recv on accept failure
+      ksmbd: close accepted socket when per-IP limit rejects connection
 
-BUG: memory leak
-unreferenced object 0xffff888128172cc0 (size 192):
-  comm "syz.0.18", pid 6093, jiffies 4294942683
-  hex dump (first 32 bytes):
-    2f 2f f2 2f 06 08 2f df 2f 6f dc ea 95 9a 82 10  //./.././o......
-    97 57 8f 37 98 9b 2f f9 0d 6d 44 94 29 55 db 15  .W.7../..mD.)U..
-  backtrace (crc 93bb458c):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4979 [inline]
-    slab_alloc_node mm/slub.c:5284 [inline]
-    __do_kmalloc_node mm/slub.c:5645 [inline]
-    __kmalloc_noprof+0x3e3/0x6b0 mm/slub.c:5658
-    kmalloc_noprof include/linux/slab.h:961 [inline]
-    smb3_fs_context_fullpath+0x70/0x1b0 fs/smb/client/fs_context.c:629
-    smb3_fs_context_parse_param+0x2266/0x36c0 fs/smb/client/fs_context.c:1438
-    vfs_parse_fs_param+0xf4/0x190 fs/fs_context.c:146
-    vfs_fsconfig_locked fs/fsopen.c:303 [inline]
-    __do_sys_fsconfig+0x7d3/0x900 fs/fsopen.c:473
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Stefan Metzmacher (1):
+      smb: server: let smb_direct_disconnect_rdma_connection() turn
+CREATED into DISCONNECTED
 
-BUG: memory leak
-unreferenced object 0xffff888128172180 (size 192):
-  comm "syz.0.18", pid 6093, jiffies 4294942683
-  hex dump (first 32 bytes):
-    2f 2f f2 2f 06 08 2f df 2f 6f dc ea 95 9a 82 10  //./.././o......
-    97 57 8f 37 98 9b 2f f9 0d 6d 44 94 29 55 db 15  .W.7../..mD.)U..
-  backtrace (crc 93bb458c):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4979 [inline]
-    slab_alloc_node mm/slub.c:5284 [inline]
-    __do_kmalloc_node mm/slub.c:5645 [inline]
-    __kmalloc_node_track_caller_noprof+0x3aa/0x6b0 mm/slub.c:5755
-    __kmemdup_nul mm/util.c:64 [inline]
-    kstrdup+0x3c/0x80 mm/util.c:84
-    smb3_fs_context_parse_param+0x229b/0x36c0 fs/smb/client/fs_context.c:1444
-    vfs_parse_fs_param+0xf4/0x190 fs/fs_context.c:146
-    vfs_fsconfig_locked fs/fsopen.c:303 [inline]
-    __do_sys_fsconfig+0x7d3/0x900 fs/fsopen.c:473
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+ fs/smb/server/transport_rdma.c | 14 +++++++++++++-
+ fs/smb/server/transport_tcp.c  |  5 ++++-
+ 2 files changed, 17 insertions(+), 2 deletions(-)
 
-BUG: memory leak
-unreferenced object 0xffff888128172000 (size 192):
-  comm "syz.0.19", pid 6098, jiffies 4294942685
-  hex dump (first 32 bytes):
-    2f 2f f2 2f 06 08 2f df 2f 6f dc ea 95 9a 82 10  //./.././o......
-    97 57 8f 37 98 9b 2f f9 0d 6d 44 94 29 55 db 15  .W.7../..mD.)U..
-  backtrace (crc 93bb458c):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4979 [inline]
-    slab_alloc_node mm/slub.c:5284 [inline]
-    __do_kmalloc_node mm/slub.c:5645 [inline]
-    __kmalloc_noprof+0x3e3/0x6b0 mm/slub.c:5658
-    kmalloc_noprof include/linux/slab.h:961 [inline]
-    smb3_fs_context_fullpath+0x70/0x1b0 fs/smb/client/fs_context.c:629
-    smb3_fs_context_parse_param+0x2266/0x36c0 fs/smb/client/fs_context.c:1438
-    vfs_parse_fs_param+0xf4/0x190 fs/fs_context.c:146
-    vfs_fsconfig_locked fs/fsopen.c:303 [inline]
-    __do_sys_fsconfig+0x7d3/0x900 fs/fsopen.c:473
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+-- 
+Thanks,
 
-BUG: memory leak
-unreferenced object 0xffff8881281723c0 (size 192):
-  comm "syz.0.19", pid 6098, jiffies 4294942685
-  hex dump (first 32 bytes):
-    2f 2f f2 2f 06 08 2f df 2f 6f dc ea 95 9a 82 10  //./.././o......
-    97 57 8f 37 98 9b 2f f9 0d 6d 44 94 29 55 db 15  .W.7../..mD.)U..
-  backtrace (crc 93bb458c):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4979 [inline]
-    slab_alloc_node mm/slub.c:5284 [inline]
-    __do_kmalloc_node mm/slub.c:5645 [inline]
-    __kmalloc_node_track_caller_noprof+0x3aa/0x6b0 mm/slub.c:5755
-    __kmemdup_nul mm/util.c:64 [inline]
-    kstrdup+0x3c/0x80 mm/util.c:84
-    smb3_fs_context_parse_param+0x229b/0x36c0 fs/smb/client/fs_context.c:1444
-    vfs_parse_fs_param+0xf4/0x190 fs/fs_context.c:146
-    vfs_fsconfig_locked fs/fsopen.c:303 [inline]
-    __do_sys_fsconfig+0x7d3/0x900 fs/fsopen.c:473
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-BUG: memory leak
-unreferenced object 0xffff888128172c00 (size 192):
-  comm "syz.0.20", pid 6128, jiffies 4294943222
-  hex dump (first 32 bytes):
-    2f 2f f2 2f 06 08 2f df 2f 6f dc ea 95 9a 82 10  //./.././o......
-    97 57 8f 37 98 9b 2f f9 0d 6d 44 94 29 55 db 15  .W.7../..mD.)U..
-  backtrace (crc 93bb458c):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4979 [inline]
-    slab_alloc_node mm/slub.c:5284 [inline]
-    __do_kmalloc_node mm/slub.c:5645 [inline]
-    __kmalloc_noprof+0x3e3/0x6b0 mm/slub.c:5658
-    kmalloc_noprof include/linux/slab.h:961 [inline]
-    smb3_fs_context_fullpath+0x70/0x1b0 fs/smb/client/fs_context.c:629
-    smb3_fs_context_parse_param+0x2266/0x36c0 fs/smb/client/fs_context.c:1438
-    vfs_parse_fs_param+0xf4/0x190 fs/fs_context.c:146
-    vfs_fsconfig_locked fs/fsopen.c:303 [inline]
-    __do_sys_fsconfig+0x7d3/0x900 fs/fsopen.c:473
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Steve
