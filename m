@@ -1,251 +1,80 @@
-Received: from flow-b5-smtp.messagingengine.com (flow-b5-smtp.messagingengine.com [202.12.124.140])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB0226E6F5;
-	Thu, 13 Nov 2025 00:43:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082C62C181
+	for <linux-cifs@vger.kernel.org>; Thu, 13 Nov 2025 01:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762994591; cv=none; b=PLfsTLnnteJErhHPVi5P5e1R/lpnPl2xzi0XYkJZUfdSvYCaX9+cYdHuX81EtxkYUiGP9gSPcnjEBW3LC4iJy44cfqehnNdLawWmTR6y4o6hNhlKDJRlo+3qYX3c6uW2uev2lTM9MYYN3hciog6bPkgKBCYJAreZt6h0gekBhJY=
+	t=1762996782; cv=none; b=V9uiV9Rn5rs1ig/SlsejHI1rB0rc8OtW+fG4tSI3O1umwEiTPrmi9eRAj6OqTR5QZWlWxUt9xqtiIaxagbO/GEilMQ8CP6tUdlX0fiajuF+wSPz4rp7G0yfN75zsrG5yNPhqiOdTrH6YWRj/xhvyXy9Vd9txqfgrxt2Sm5ihGuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762994591; c=relaxed/simple;
-	bh=OTB0rGLAxSxPYqaVuzKhtxaaom6SXBwXYWGgKixk4og=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iqrqu4o5GvS9NXQzlb4+DphUWW0uPJT9NYfXlDGp5UpZfndo0TDEdyB37mOr58mbgg4beTV3W3HpnJm2h55LtVIpu+OrrIyD9uuw07irQ5CHCcKhYQYlr18UsOKMSl6jL5CfA661X0fFQqtjzDv4uiQwS+/6BMuYo8hfUsaAJhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=LcFeVDZg; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=y5IZtIaQ; arc=none smtp.client-ip=202.12.124.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1762996782; c=relaxed/simple;
+	bh=7FPSBOEc5+aqrhL8867Hnsv8NNqxIjSIlUp41kin0sg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e6bBEp+1mbQgVhhVBWR5TYt9F1P7BP2qwN8Bu/9yq1YGUYKj1sCx/tNko+UseutzROkzE9a0UOcQOYpjSaV33TEEqtpNk0vznBExPhMWHQ5cKJoxMnkxbIi7ILcVn/Eu5fd8Vh2+1fCsRZSAVBJQm8xh8nwZVeDD6e8BwRBhsug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DRgMF60a; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="LcFeVDZg";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="y5IZtIaQ"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailflow.stl.internal (Postfix) with ESMTP id 1C94C1300C9C;
-	Wed, 12 Nov 2025 19:43:08 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Wed, 12 Nov 2025 19:43:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:reply-to:subject:subject:to:to; s=fm3; t=1762994587;
-	 x=1763001787; bh=LH6B8gufGV0TjJ4vlHu8RH1VmAxd1MYT56YsH6sKK6w=; b=
-	LcFeVDZgdj6isygMwW1oIYlc7mst+quWlTaNMT0fsvXfYmp1ZXN1NXM4X95hrrSv
-	DvoZcFS/DH6CH+uKZJBGXii8RSKCe2jAKSdyTbzyLr5rxDVADOhFFguBaHaIZogi
-	Oo84gyVH5AkICsS30Alo8gyP9KHpBLzZCGALCeL/pjklVuqcD4VNCTlpX5EFnFTy
-	8dwEwqys52KZbOFCf//pXRccTxqE/H12Vm9+s30YWKbYHR5Xr5Aar++CxnTNrRq0
-	MHhuhpn8Rdx8Q7lybzi2Wb7ZZFdPSAlEMNeK47V59B8GpH2W7bk59BOEmFxSFlb0
-	0nePM9v/timsp+emzn9D9g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1762994587; x=1763001787; bh=L
-	H6B8gufGV0TjJ4vlHu8RH1VmAxd1MYT56YsH6sKK6w=; b=y5IZtIaQ5rUB7FZc9
-	DZiFRQNoyTxQjRss2CWGi/2vujHuc8nwLRS0bIATFM/3zmLXR1D+WqEgcUa5xBgG
-	NmIj2541lKoAXLaqsR+t2zkfDd8Kl87UiOQCz/YwJSIqsZHFh8c8Mezk7hoitMfJ
-	+lkR8gI45oA9KzMR3Y72nNsZYENu4QGgO7onqdAlQmku+pyNP8tEJR9CF3f8dq20
-	LQjyaoNmewI7tTUsacxY2huMyhJ2JCCpvq+mPm/yIp/Z7sQisLYcFT5bTmeFXEIH
-	SZ3QOLjICK5YWweqXwcazxL2DuID/AwpOp2Y+XiPrSW17gr7GwaaLGVmaWHciqFp
-	OHW7Q==
-X-ME-Sender: <xms:mykVaSUwVqtIzfyjHocH7cPvv5XBpa0X1D_9lZn61xQbxHCxkXGasw>
-    <xme:mykVaTqMEcjDOUNn2Ok2QhFo2ec8KKqTJWiECORYIv3NWqT4aZa1u3vIAgqIt3DuT
-    eL62AF9da2UBumwh6hHqMlr2Apy5LlOPCd8u_VE77TRzFCxGA>
-X-ME-Received: <xmr:mykVaTYWE3CdfkUP4vOCNQ4YFfvW5eEWclj8W-i2XmghbotjkL8ytkpP4S6-hBL6wB21RR8h9qeV8G8-UnifVAI_9CT3ZWU5uS00Yn9GZUFO>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvtdehheegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofgjfhhrggfgsedtkeertdertddtnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epveevkeffudeuvefhieeghffgudektdelkeejiedtjedugfeukedvkeffvdefvddunecu
-    vehluhhsthgvrhfuihiivgepvdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
-    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepgedtpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
-    hrtghpthhtohepshgvlhhinhhugiesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehlihhnuhigqdigfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    eplhhinhhugidquhhnihhonhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehlihhnuhigqdhsvggtuhhrihhthidqmhhoughulhgvsehvghgvrhdrkhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtoheplhhinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehlihhnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqtghifhhssehvghgvrhdrkhgvrhhnvg
-    hlrdhorhhg
-X-ME-Proxy: <xmx:mykVaXCaC6FMRT2xrI4xiuXZMdd4I6puaIt8pgf5zrtW07ZMrxjszw>
-    <xmx:mykVaeH4gTlfc_orQZm7HbzBGUxV9g9PdW-yYmi3BPtyvHuOubhxEg>
-    <xmx:mykVaTwsOiMEB8iYLInJyeTZKhfJ1yAms0HRzV6umBeNshUynQYHXg>
-    <xmx:mykVaTfSC-8N3rruS9d_IutVbX-KqK1QErWxGADESmYPr-whfK0uGA>
-    <xmx:mykVaWuUGHt76D35n5qsHYsTqLG9Zdz2WwzhMWF2V0_uy5i2t_IuohBZ>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 12 Nov 2025 19:42:57 -0500 (EST)
-From: NeilBrown <neilb@ownmail.net>
-To: "Alexander Viro" <viro@zeniv.linux.org.uk>,
-	"Christian Brauner" <brauner@kernel.org>,
-	"Amir Goldstein" <amir73il@gmail.com>
-Cc: "Jan Kara" <jack@suse.cz>,	linux-fsdevel@vger.kernel.org,
-	Jeff Layton <jlayton@kernel.org>,	Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>,	David Howells <dhowells@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,	Tyler Hicks <code@tyhicks.com>,
-	Miklos Szeredi <miklos@szeredi.hu>,	Chuck Lever <chuck.lever@oracle.com>,
-	Olga Kornievskaia <okorniev@redhat.com>,	Dai Ngo <Dai.Ngo@oracle.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,	Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>,	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Ondrej Mosnacek <omosnace@redhat.com>,	Mateusz Guzik <mjguzik@gmail.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	"Darrick J. Wong" <djwong@kernel.org>,	linux-kernel@vger.kernel.org,
-	netfs@lists.linux.dev,	ecryptfs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,	linux-unionfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org,	linux-xfs@vger.kernel.org,
-	linux-security-module@vger.kernel.org,	selinux@vger.kernel.org
-Subject: [PATCH v6 15/15] VFS: introduce end_creating_keep()
-Date: Thu, 13 Nov 2025 11:18:38 +1100
-Message-ID: <20251113002050.676694-16-neilb@ownmail.net>
-X-Mailer: git-send-email 2.50.0.107.gf914562f5916.dirty
-In-Reply-To: <20251113002050.676694-1-neilb@ownmail.net>
-References: <20251113002050.676694-1-neilb@ownmail.net>
-Reply-To: NeilBrown <neil@brown.name>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DRgMF60a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD6FEC19424
+	for <linux-cifs@vger.kernel.org>; Thu, 13 Nov 2025 01:19:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762996781;
+	bh=7FPSBOEc5+aqrhL8867Hnsv8NNqxIjSIlUp41kin0sg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=DRgMF60aFWMIE+glOLy6tGuEEI6CaI1q9H41bugnc35xJ72H79jQfF8aE2FT1AKph
+	 joLJz9FjWSm3Yf4JpCHVvii/XsKRArnQ+I6wdMmDN0CVSFLIZO7O33DIQija7exv/K
+	 uF/cm6FYS/qZtoAT0CMrc0zHaEM9aRO8nTA3PAzTZepHfpNwzIHrzlki4EVxE/qp5h
+	 V6XJk5MQJdgFtrRrQF9RJLqUoBtvtYBjGDD8qGl/hT9ITpkCc8Kv3YJX245lYILLfI
+	 ySKi6ENAz5JtxzZownS0DsW+wXU0gzN4FtJhF7WDl1syIGnhS1h43/lNfKFSLtSBcb
+	 aQQ+cT5dxLqQQ==
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-63c489f1e6cso486546a12.1
+        for <linux-cifs@vger.kernel.org>; Wed, 12 Nov 2025 17:19:41 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWcmqh6Ke1JGUae7uso/uxv5WW5fJGUBjhJdrfsVss/7SDoxv9kqQkPsWhRa9MLen8SpPM8Q4vpWcJ/@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNBIkn/zj6fJWcuXjyS3P7yeBzl0U5CqVKSUR+s94hDOrS3FWG
+	x2P2fBQAQBYEV+sgYLSrAxN7EPqCO4voZJSgIsaaF86hlLneSKj11bofLpJrNmtBgysHHwoEfnf
+	3xEHk9/I1+tyiKbXOoNlrnwafUewrOX0=
+X-Google-Smtp-Source: AGHT+IH3OJZdCnys5PZEXpc+3YruRfI2mIC69GRGRXC8tf1kMdgC6Beey79mvjWhmhmETHR7O1KBhw8Tom7UH9eNUnA=
+X-Received: by 2002:aa7:dcd8:0:b0:62f:9091:ff30 with SMTP id
+ 4fb4d7f45d1cf-64334c73405mr938039a12.3.1762996780194; Wed, 12 Nov 2025
+ 17:19:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251102073059.3681026-1-chenxiaosong.chenxiaosong@linux.dev> <20251102073059.3681026-7-chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <20251102073059.3681026-7-chenxiaosong.chenxiaosong@linux.dev>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 13 Nov 2025 10:19:28 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8o3CKcaArMzEifR+oaX2G_g3XuEjFkBtPhyO99pKQO+g@mail.gmail.com>
+X-Gm-Features: AWmQ_bkew1tHJwUxtyLjNCkvCk2g3GSBubsHa87-IqewxPm-jIAhCjQH120o770
+Message-ID: <CAKYAXd8o3CKcaArMzEifR+oaX2G_g3XuEjFkBtPhyO99pKQO+g@mail.gmail.com>
+Subject: Re: [PATCH v5 06/14] smb/server: remove create_durable_reconn_req
+To: chenxiaosong.chenxiaosong@linux.dev
+Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org, 
+	christophe.jaillet@wanadoo.fr, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: NeilBrown <neil@brown.name>
+On Sun, Nov 2, 2025 at 4:32=E2=80=AFPM <chenxiaosong.chenxiaosong@linux.dev=
+> wrote:
+>
+> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>
+> The fields in struct create_durable_reconn_req and struct create_durable
+> are exactly the same.
+>
+> The documentation references are:
+>
+>   - SMB2_CREATE_DURABLE_HANDLE_REQUEST   in MS-SMB2 2.2.13.2.3
+>   - SMB2_CREATE_DURABLE_HANDLE_RECONNECT in MS-SMB2 2.2.13.2.4
+>   - SMB2_FILEID in MS-SMB2 2.2.14.1
+>
+> We can give these two structs a uniform name: create_durable.
+Please use typedef to define multiple aliases for a single struct.
+typedef struct {
+  ...
+} create_durable, create_durable_reconn_req;
 
-Occasionally the caller of end_creating() wants to keep using the dentry.
-Rather then requiring them to dget() the dentry (when not an error)
-before calling end_creating(), provide end_creating_keep() which does
-this.
-
-cachefiles and overlayfs make use of this.
-
-Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-Signed-off-by: NeilBrown <neil@brown.name>
----
- fs/cachefiles/namei.c |  3 +--
- fs/overlayfs/dir.c    |  8 ++------
- fs/overlayfs/super.c  | 11 +++--------
- include/linux/namei.h | 22 ++++++++++++++++++++++
- 4 files changed, 28 insertions(+), 16 deletions(-)
-
-diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
-index 59327618ac42..ef22ac19545b 100644
---- a/fs/cachefiles/namei.c
-+++ b/fs/cachefiles/namei.c
-@@ -155,8 +155,7 @@ struct dentry *cachefiles_get_directory(struct cachefiles_cache *cache,
- 
- 	/* Tell rmdir() it's not allowed to delete the subdir */
- 	inode_lock(d_inode(subdir));
--	dget(subdir);
--	end_creating(subdir);
-+	end_creating_keep(subdir);
- 
- 	if (!__cachefiles_mark_inode_in_use(NULL, d_inode(subdir))) {
- 		pr_notice("cachefiles: Inode already in use: %pd (B=%lx)\n",
-diff --git a/fs/overlayfs/dir.c b/fs/overlayfs/dir.c
-index 739f974dc258..d21f81a524f6 100644
---- a/fs/overlayfs/dir.c
-+++ b/fs/overlayfs/dir.c
-@@ -251,10 +251,7 @@ struct dentry *ovl_create_temp(struct ovl_fs *ofs, struct dentry *workdir,
- 	if (IS_ERR(ret))
- 		return ret;
- 	ret = ovl_create_real(ofs, workdir, ret, attr);
--	if (!IS_ERR(ret))
--		dget(ret);
--	end_creating(ret);
--	return ret;
-+	return end_creating_keep(ret);
- }
- 
- static int ovl_set_opaque_xerr(struct dentry *dentry, struct dentry *upper,
-@@ -364,8 +361,7 @@ static int ovl_create_upper(struct dentry *dentry, struct inode *inode,
- 	if (IS_ERR(newdentry))
- 		return PTR_ERR(newdentry);
- 
--	dget(newdentry);
--	end_creating(newdentry);
-+	end_creating_keep(newdentry);
- 
- 	if (ovl_type_merge(dentry->d_parent) && d_is_dir(newdentry) &&
- 	    !ovl_allow_offline_changes(ofs)) {
-diff --git a/fs/overlayfs/super.c b/fs/overlayfs/super.c
-index 3acda985c8a3..7b8fc1cab6eb 100644
---- a/fs/overlayfs/super.c
-+++ b/fs/overlayfs/super.c
-@@ -319,8 +319,7 @@ static struct dentry *ovl_workdir_create(struct ovl_fs *ofs,
- 		};
- 
- 		if (work->d_inode) {
--			dget(work);
--			end_creating(work);
-+			end_creating_keep(work);
- 			if (persist)
- 				return work;
- 			err = -EEXIST;
-@@ -336,9 +335,7 @@ static struct dentry *ovl_workdir_create(struct ovl_fs *ofs,
- 		}
- 
- 		work = ovl_do_mkdir(ofs, dir, work, attr.ia_mode);
--		if (!IS_ERR(work))
--			dget(work);
--		end_creating(work);
-+		end_creating_keep(work);
- 		err = PTR_ERR(work);
- 		if (IS_ERR(work))
- 			goto out_err;
-@@ -630,9 +627,7 @@ static struct dentry *ovl_lookup_or_create(struct ovl_fs *ofs,
- 		if (!child->d_inode)
- 			child = ovl_create_real(ofs, parent, child,
- 						OVL_CATTR(mode));
--		if (!IS_ERR(child))
--			dget(child);
--		end_creating(child);
-+		end_creating_keep(child);
- 	}
- 	dput(parent);
- 
-diff --git a/include/linux/namei.h b/include/linux/namei.h
-index b4d95b79b5a8..58600cf234bc 100644
---- a/include/linux/namei.h
-+++ b/include/linux/namei.h
-@@ -126,6 +126,28 @@ static inline void end_creating(struct dentry *child)
- 	end_dirop(child);
- }
- 
-+/* end_creating_keep - finish action started with start_creating() and return result
-+ * @child: dentry returned by start_creating() or vfs_mkdir()
-+ *
-+ * Unlock and return the child. This can be called after
-+ * start_creating() whether that function succeeded or not,
-+ * but it is not needed on failure.
-+ *
-+ * If vfs_mkdir() was called then the value returned from that function
-+ * should be given for @child rather than the original dentry, as vfs_mkdir()
-+ * may have provided a new dentry.
-+ *
-+ * Returns: @child, which may be a dentry or an error.
-+ *
-+ */
-+static inline struct dentry *end_creating_keep(struct dentry *child)
-+{
-+	if (!IS_ERR(child))
-+		dget(child);
-+	end_dirop(child);
-+	return child;
-+}
-+
- /**
-  * end_removing - finish action started with start_removing
-  * @child:  dentry returned by start_removing()
--- 
-2.50.0.107.gf914562f5916.dirty
-
+Thanks.
