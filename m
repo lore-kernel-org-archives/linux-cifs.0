@@ -1,73 +1,79 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C49231065A;
-	Fri, 14 Nov 2025 12:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04274BA3D;
+	Fri, 14 Nov 2025 12:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763121726; cv=none; b=YaUKUA2+iXGE60A1r8SrP3EWDb0eYfvqV06nxbn0vShhOSKtTk3KNuas5Un7EYqs2/106xRbrNojyw9OFH38Joz5ZB4R27CKIA8GPIVfhx2/W0kTiz5hqXRMZTKG9Bc3ECKAohMh+F9KKIpeUB3roAAYrbiyIShaH1lJvDg3GGQ=
+	t=1763123092; cv=none; b=M2u5i/QIENyB9GgQz58g43qoBJYxuGR9Wday9Gv0wvi8f0WZTvQxcITPn7qfGLS77BP7dA421w146Tiv77mPFc3t2R2EWcwL/5M5YtZFNOa5nDjT77fjMZvc2jMjo/WPzgjL6FACfmlgqGKX8rp6wx0ZKMKpWOXO35iuqYBZ1Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763121726; c=relaxed/simple;
-	bh=RcOIrza22pQbeEe4PPAk8KoX4dKtq9BnjNAjCwPPzLo=;
+	s=arc-20240116; t=1763123092; c=relaxed/simple;
+	bh=+mBDMZqOqXyj1nw2FoUq3hfj9Pq1+bVG+kNKFkCOjGM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ihPn1m2ArqwdgTMYWAGlXVCnlJ7UToFQOQiARr96884jZmfiya1iUYroph+qyOYV+G6a9HqDO1Ae8nAi3AR2n7jcSEuO/mHXOH+XmBi81zfIoMl0qSk5hCsL2OZGiYcfb+tldviKI7hiw/ZVUhg5tlZeQYVCi+KQ1HRHzgbvOFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V3Pnieip; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=uncm53JlyQI3sC0uNQ/siFO2d34jb51g2OdTsNckO1Up3EqgIVPiq51Rw7opVrd3tCYaVTwmhhztHrU3GnXRiYbYz/zdXXB3od0WLMH/2xoNY6jnSyTZgN/L9OFbk5Bk8NhCYQZokI84gmzPfKqH+1zM0EaReMHFKhJ91cos8ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L88J3kMN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V3Pnieip"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBEA4C4CEFB;
-	Fri, 14 Nov 2025 12:02:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L88J3kMN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B678C4AF09;
+	Fri, 14 Nov 2025 12:24:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763121726;
-	bh=RcOIrza22pQbeEe4PPAk8KoX4dKtq9BnjNAjCwPPzLo=;
+	s=k20201202; t=1763123091;
+	bh=+mBDMZqOqXyj1nw2FoUq3hfj9Pq1+bVG+kNKFkCOjGM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V3PnieipHYUUHcmnuNUlP7qNnl4dAYVySltj5L82uJj+Zj2PhVTomjJO9l8aXBtKm
-	 WrQSYWwZxnM6Qx6JYPZ72VHI93r76g27SDW+ZC524cHwhEsAJp96v7kcELQkIXmZ5s
-	 UVIxXrLlmoTXZg7IcMKjn+U1kI/WG9Gzc4lYDzOjKteyO8e5ezGr+YGbeDHBhJDdHp
-	 8GlGeXdITJH7bD0Kc1ZGqEOoy7kaSVKzDMbVfiIm7IbY0SZuVKOab3At/b2g6VuXHt
-	 BDTwEk8yi9o7kSPP1fym2dwjy7THo9vl9syjiKb9N10o0hngCr8R3lUzaWJuwrWFP7
-	 PfBb+nOKyOujQ==
-Date: Fri, 14 Nov 2025 12:02:01 +0000
-From: Simon Horman <horms@kernel.org>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>, Hyunchul Lee <hyc.lee@gmail.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Stefan Metzmacher <metze@samba.org>
-Subject: Re: [PATCH v2] ksmbd: server: avoid busy polling in accept loop
-Message-ID: <aRcaOZ79iQwqMTZI@horms.kernel.org>
-References: <20251111104750.25739-1-dqfext@gmail.com>
+	b=L88J3kMNXclmlVXvSCh0nwJz3MI/z//UToTodAyB8+hSlNnkgXmt679fqapIropxt
+	 TUKtETf1WbcWvQE6SEEa+vxb91ma9o4EiZV0RToOZ4Ov5mPY5b43+Ubt0LW1+fDwfU
+	 tLqEQIv5BoWbspBjSFZbeubTeip6wzBqqXljdlL33QtlYekrXKtmNVKynge7yPqMts
+	 +QLPN90oTnvZgsDNursj4MM6EYHj2IB3cRa5vnPrY6LbfG/BgI4m2zsEsMemyRtNPJ
+	 ymiv896FRZ1UahmIF3bSUq4VROCfN8SABYT93BJyBU6UnvuYE29zdU0f92GFitE8Zk
+	 L1O4gixSsAR3g==
+Date: Fri, 14 Nov 2025 13:24:41 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: NeilBrown <neil@brown.name>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Amir Goldstein <amir73il@gmail.com>, Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
+	Jeff Layton <jlayton@kernel.org>, Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, 
+	David Howells <dhowells@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+	Tyler Hicks <code@tyhicks.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+	Chuck Lever <chuck.lever@oracle.com>, Olga Kornievskaia <okorniev@redhat.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Carlos Maiolino <cem@kernel.org>, John Johansen <john.johansen@canonical.com>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Ondrej Mosnacek <omosnace@redhat.com>, Mateusz Guzik <mjguzik@gmail.com>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Stefan Berger <stefanb@linux.ibm.com>, 
+	"Darrick J. Wong" <djwong@kernel.org>, linux-kernel@vger.kernel.org, netfs@lists.linux.dev, 
+	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, linux-xfs@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	selinux@vger.kernel.org
+Subject: Re: [PATCH v6 00/15] Create and use APIs to centralise locking for
+ directory ops
+Message-ID: <20251114-baden-banknoten-96fb107f79d7@brauner>
+References: <20251113002050.676694-1-neilb@ownmail.net>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251111104750.25739-1-dqfext@gmail.com>
+In-Reply-To: <20251113002050.676694-1-neilb@ownmail.net>
 
-On Tue, Nov 11, 2025 at 06:47:49PM +0800, Qingfang Deng wrote:
+On Thu, Nov 13, 2025 at 11:18:23AM +1100, NeilBrown wrote:
+> Following is a new version of this series:
+>  - fixed a bug found by syzbot
+>  - cleanup suggested by Stephen Smalley
+>  - added patch for missing updates in smb/server - thanks Jeff Layton
 
-...
+The codeflow right now is very very gnarly in a lot of places which
+obviously isn't your fault. But start_creating() and end_creating()
+would very naturally lend themselves to be CLASS() guards.
 
-> @@ -458,10 +451,6 @@ static void tcp_destroy_socket(struct socket *ksmbd_socket)
->  	if (!ksmbd_socket)
->  		return;
->  
-> -	/* set zero to timeout */
-> -	ksmbd_tcp_rcv_timeout(ksmbd_socket, 0);
-> -	ksmbd_tcp_snd_timeout(ksmbd_socket, 0);
-> -
-
-Hi Qingfang Deng,
-
-W=1 builds tell me that ksmbd_tcp_rcv_timeout() is now unused:
-I expect it can be removed.
-
->  	ret = kernel_sock_shutdown(ksmbd_socket, SHUT_RDWR);
->  	if (ret)
->  		pr_err("Failed to shutdown socket: %d\n", ret);
-
-...
+Unrelated: I'm very inclined to slap a patch on top that renames
+start_creating()/end_creating() and start_dirop()/end_dirop() to
+vfs_start_creating()/vfs_end_creating() and
+vfs_start_dirop()/vfs_end_dirop(). After all they are VFS level
+maintained helpers and I try to be consistent with the naming in the
+codebase making it very easy to grep.
