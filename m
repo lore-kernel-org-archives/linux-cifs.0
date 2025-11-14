@@ -1,90 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5F5320A32;
-	Fri, 14 Nov 2025 14:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461BB324B36
+	for <linux-cifs@vger.kernel.org>; Fri, 14 Nov 2025 14:43:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763130207; cv=none; b=nqoIpfWvkyAIxroTy4XmG3O8/vasiIsm0ZMZeQKN4/zwXAx0UeEjviToxl1S7tOK9Ol3CTPPEFIH9CEPLQIj58PmUODsdRKIUHJr07Xl/JPb/qW7PXsl19Uxv85y3r9+uFWqEBnC9CZb4FRwXe/mGo7NQOk5iOjXMziECaguPds=
+	t=1763131387; cv=none; b=JrgjX0p3fXB7NkAGoaHLe/maPzDjbmfLAgaWIMrpASBuPHDiVRgvl2j/F4deFOKvuOl2rhNr9UpzHPXn7Sb4Yq8jzXT4VjtaCAoBxE1wnpH/u7DPtaHPq8tQZPHU0ddK/DdELppE3aKO/6Ulwhmkcf5o1M9me9oiGtA9MMbYwj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763130207; c=relaxed/simple;
-	bh=RGpfqZOq5hHnk/yvgrQYwZa/mUCvahEJHKOaVI69qnM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uCOHVauHVt9GdVaRG8OvT8QK4IRFFiihfCF0CPHGaUt+yhClNeDeOdIyKi2h7bpMis+o32BIbz+3LKJIuvviBZDCB1aACy0ZmyAEE+mbQz95oSudRdK49GI561C30XIlThX8nguQtylaCkYdwSiAck3mgJ36OJ/dQJ9bsrlcfco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IeLydU5i; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763131387; c=relaxed/simple;
+	bh=MGT2xl91CZ54abMdskxDife7YJATEBP0WGs8uPKA8g4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HfZ0mVck6sL98NvYJPnILx3/9bnbbUkUSRvzURT9K7j+VvWIqxeqLrGji71V5MKMje1bRxXoD2gtozt4Xjp59BUV0PHaeN7tSmLI3E5FR67H9fG2Uk4O5tI5wnSJMRKPxsP3xbVqMgMDeUnS71H0FlCQr8QqnUnGW6Hu7By+Qew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FUkSfIc7; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IeLydU5i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2171C113D0;
-	Fri, 14 Nov 2025 14:23:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763130207;
-	bh=RGpfqZOq5hHnk/yvgrQYwZa/mUCvahEJHKOaVI69qnM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IeLydU5iP2+4TeKLZKvwnOGTzJo8HZ208jWq0RFqPsO35dRQdxjjoQZqca1Qz7iSy
-	 KaBM6yv6CHsCMRygo8SlJ52fMIXUJO2Y5Tj0Z+QKrh0lT3t7dT+Eagsd3BvuezVaW/
-	 WTuvxzU2W/PQdvUk+v5FXracx4sUG/Kz1XItFYIbhuscYlarKlv1v+IP9t+QqwD8N8
-	 Qyd/+AxbvMcqGKDeQyPVAXLAWGgBRI15tXAMe931FB2U5chFp4krZOLF8WIqzREIZE
-	 8Rt3NGZun/K4089Ji3VC0UK8NHlja2X0JAOkgq5mqSokmThJExrZlJDhpSctxipv7p
-	 d09yqkGYVvCFQ==
-Date: Fri, 14 Nov 2025 15:23:16 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: NeilBrown <neil@brown.name>, Jeff Layton <jlayton@kernel.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Amir Goldstein <amir73il@gmail.com>, Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, 
-	David Howells <dhowells@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
-	Tyler Hicks <code@tyhicks.com>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Chuck Lever <chuck.lever@oracle.com>, Olga Kornievskaia <okorniev@redhat.com>, 
-	Dai Ngo <Dai.Ngo@oracle.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Carlos Maiolino <cem@kernel.org>, John Johansen <john.johansen@canonical.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Ondrej Mosnacek <omosnace@redhat.com>, Mateusz Guzik <mjguzik@gmail.com>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Stefan Berger <stefanb@linux.ibm.com>, 
-	"Darrick J. Wong" <djwong@kernel.org>, linux-kernel@vger.kernel.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, linux-xfs@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org
-Subject: Re: [PATCH v6 00/15] Create and use APIs to centralise locking for
- directory ops
-Message-ID: <20251114-liedgut-eidesstattlich-8c116178202f@brauner>
-References: <20251113002050.676694-1-neilb@ownmail.net>
- <20251114-baden-banknoten-96fb107f79d7@brauner>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FUkSfIc7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763131384;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=C6rPByvLKqtnsLXWaANw7evp6VJ82e2ziRPypwtRY3U=;
+	b=FUkSfIc7apfU1CjCeX3/1RA8VoOXEAK182wVYiWP8Ev2H8RqHO8PCmuZAvoxY9soMM60gl
+	Kh0Ew97CwXuuDV4V1SG58pgOIKryLGBRLcF/UN2rUOmKilPnbyJaXueog3GmaIfrubuoyO
+	m7fjkyXPtu5ptv1z6AP3gBFvrr4c5y0=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-152-VNeAQWpRPfiqLWopg3zU5A-1; Fri,
+ 14 Nov 2025 09:43:01 -0500
+X-MC-Unique: VNeAQWpRPfiqLWopg3zU5A-1
+X-Mimecast-MFC-AGG-ID: VNeAQWpRPfiqLWopg3zU5A_1763131379
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6608118001FE;
+	Fri, 14 Nov 2025 14:42:59 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.87])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D72D3180049F;
+	Fri, 14 Nov 2025 14:42:56 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/9] netfs: Miscellaneous prep patches for rewrite of I/O layer
+Date: Fri, 14 Nov 2025 14:42:42 +0000
+Message-ID: <20251114144253.1853312-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251114-baden-banknoten-96fb107f79d7@brauner>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Fri, Nov 14, 2025 at 01:24:41PM +0100, Christian Brauner wrote:
-> On Thu, Nov 13, 2025 at 11:18:23AM +1100, NeilBrown wrote:
-> > Following is a new version of this series:
-> >  - fixed a bug found by syzbot
-> >  - cleanup suggested by Stephen Smalley
-> >  - added patch for missing updates in smb/server - thanks Jeff Layton
-> 
-> The codeflow right now is very very gnarly in a lot of places which
-> obviously isn't your fault. But start_creating() and end_creating()
-> would very naturally lend themselves to be CLASS() guards.
-> 
-> Unrelated: I'm very inclined to slap a patch on top that renames
-> start_creating()/end_creating() and start_dirop()/end_dirop() to
-> vfs_start_creating()/vfs_end_creating() and
-> vfs_start_dirop()/vfs_end_dirop(). After all they are VFS level
-> maintained helpers and I try to be consistent with the naming in the
-> codebase making it very easy to grep.
+Hi Steve,
 
-@Neil, @Jeff, could you please look at:
-https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git/log/?h=vfs.all
+Could you consider taking these patches extracted from my I/O layer rewrite
+for the upcoming merge window.  The performance change should be neutral,
+but it cleans up the code a bit.
 
-and specifically at the merge conflict resolution I did for:
+ (1) Add the smb3_read_* tracepoints to SMB1 as well as SMB2/3.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git/commit/?h=vfs.all&id=f28c9935f78bffe6fee62f7fb9f6c5af7e30d9b2
+ (2) Rename struct mid_q_entry to smb_message.  In my rewrite, smb_message
+     will get allocated in the marshalling functions in smb2pdu.c and
+     cifssmb.c rather than in transport.c and used to hand parameters down
+     - and so I think it could be better named for that.
 
-and tell me whether it all looks sane?
+ (3) Remove the RFC1002 header from the smb_hdr struct so that it's
+     consistent with SMB2/3.  This allows I/O routines to be simplified and
+     shared.
+
+ (4) Make SMB1's SendReceive() wrap cifs_send_recv() and thus share code
+     with SMB2/3.
+
+ (5) Clean up a bunch of extra kvec[] that were required for RFC1002
+     headers from SMB1's header struct.
+
+ (6) Replace SendReceiveBlockingLock() with SendReceive() plus flags.
+
+ (7) Remove the server pointer from smb_message.  It can be passed down
+     from the caller to all places that need it.
+
+ (8) Use netfs_alloc/free_folioq_buffer() rather than cifs doing its own
+     version.
+
+ (9) Don't need state locking in smb2_get_mid_entry() as we're just doing a
+     single read inside the lock.  READ_ONCE() should suffice instead.
+
+The patches can be found here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-next
+
+Thanks,
+David
+
+David Howells (9):
+  cifs: Add the smb3_read_* tracepoints to SMB1
+  cifs: Rename mid_q_entry to smb_message
+  cifs: Remove the RFC1002 header from smb_hdr
+  cifs: Make smb1's SendReceive() wrap cifs_send_recv()
+  cifs: Clean up some places where an extra kvec[] was required for
+    rfc1002
+  cifs: Replace SendReceiveBlockingLock() with SendReceive() plus flags
+  cifs: Remove the server pointer from smb_message
+  cifs: Use netfs_alloc/free_folioq_buffer()
+  cifs: Don't need state locking in smb2_get_mid_entry()
+
+ fs/smb/client/cifs_debug.c    |  47 +-
+ fs/smb/client/cifs_debug.h    |   2 +-
+ fs/smb/client/cifsencrypt.c   |  72 +--
+ fs/smb/client/cifsfs.c        |  31 +-
+ fs/smb/client/cifsglob.h      |  93 ++--
+ fs/smb/client/cifspdu.h       |   5 +-
+ fs/smb/client/cifsproto.h     |  76 ++--
+ fs/smb/client/cifssmb.c       | 806 +++++++++++++++++++---------------
+ fs/smb/client/cifstransport.c | 432 +++---------------
+ fs/smb/client/connect.c       | 188 ++++----
+ fs/smb/client/misc.c          |  32 +-
+ fs/smb/client/netmisc.c       |  15 +-
+ fs/smb/client/sess.c          |   8 +-
+ fs/smb/client/smb1ops.c       | 113 +++--
+ fs/smb/client/smb2misc.c      |  11 +-
+ fs/smb/client/smb2ops.c       | 206 +++------
+ fs/smb/client/smb2pdu.c       |  48 +-
+ fs/smb/client/smb2proto.h     |  12 +-
+ fs/smb/client/smb2transport.c | 111 +++--
+ fs/smb/client/transport.c     | 281 ++++++------
+ 20 files changed, 1159 insertions(+), 1430 deletions(-)
+
