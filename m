@@ -1,192 +1,78 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86C1328603
-	for <linux-cifs@vger.kernel.org>; Mon, 17 Nov 2025 11:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EB5337108;
+	Mon, 17 Nov 2025 14:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763378996; cv=none; b=izic1Z9Jj6xwW9sjHFDCPTJyIwWXgdDXiEHeNpzGsfTX1cFOAEXA+PGYQFFAcZtv3AW+Om17h+XxAwq+JQcxhx2xt7YGfZ72wBm2U0biFmlYuzKSWWQaOXTPheVtevYn1RiV3u7TJ7bk9R7GnEmPYRGfGme3zpJgKztXC6TbAcE=
+	t=1763391159; cv=none; b=X4A4+H/bNuEAGDyYBHnjDwzii+IqfFSi+kjQfV+BV+EVFse3bpbHLKd8IPZzBL0JmFLqSbV2+dro+JzuxPLxvAN8H2qSVzFunRZhAX9WJAWwK9VU/Nf8En848eLb4vvNr6Q98tjwS6NZ9xu84crwSVbvpRw2sNM0AhvJH0+fMtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763378996; c=relaxed/simple;
-	bh=fpYGUO6n4DY2BJDZ8fwnOaG9MWW3M/g6Yrk/WARPENc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ai2W6NiWXD139Cl06xi0AbREVhyVq0w4ocqlPmW1+r8/VNNj6IARHpA1HD1WOTvmzD3sv+199HyzUJD5oAXKJ/K8RXRCUZ/NNIShaCQ+Ke9vJlzVnVaDiWYC9DmtwxHN4y5iZqay8iq/0aGhVNTBY6bydTP0g+EQSi83iPpFQ2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=THsG7jQy; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1763391159; c=relaxed/simple;
+	bh=d0gJRFe5O5oxyfdofN6O/gPpe8rbSohYEpWcmPKF9fE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cT2G08fkwaVDkfMQ25gUCwT8wyaHKNiof4Agt19NZvbCbGNaAatUhrE9VeRu75tkst+Mh/IhuWXM7VfhpIEtOn/P3GEG8C1F5CzrkBEc67hpFhLL/7pHFu0wGc9z/LJ7KDLN7cXhc019AuEyX39czGaGtxBYsJQ1MxwSbK1f7Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=BgbXCrLZ; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="THsG7jQy"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763378992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a/gJaK5daEK13gn0nSNn1LV4o2mZh0FHjw2t/MUGV7g=;
-	b=THsG7jQy7EVa3xdY0qoMuMf98l1l113ry1o7NjbrwJLQHYQP/eRauCuadqx1Ks/emW2NXH
-	TOGUpgIEGeL6dr8RXNspmyU0YpsJVmqVJTeMW6V00MvzC93FN3pA0m8F7qtKXTsG/Oc2jg
-	eYApIm+W6auU17rOEZl70Q2Vw6Xraqs=
-From: chenxiaosong.chenxiaosong@linux.dev
-To: sfrench@samba.org,
-	smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	linkinjeon@samba.org,
-	christophe.jaillet@wanadoo.fr
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	chenxiaosong@chenxiaosong.com,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v9 1/1] smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/fscc.h
-Date: Mon, 17 Nov 2025 19:28:38 +0800
-Message-ID: <20251117112838.473051-2-chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251117112838.473051-1-chenxiaosong.chenxiaosong@linux.dev>
-References: <20251117112838.473051-1-chenxiaosong.chenxiaosong@linux.dev>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="BgbXCrLZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=IyCngOossDPyBLMWLzMAJqaoi2OoRGy3Rcpb86+lvr8=; b=BgbXCrLZROEZYf/vnpjgp1FFOs
+	7O30kOwROiOrpCKUv3imsp6Pmu1BooWYQu2dGPNe0pEhnCYpD21e1lIPKEgl/fnyEZR0wejDU190X
+	dNc6MsdpdnFzLG3XtVsxah9Y6kM3sjJS3JjsFVWbgk3mXa/MC9YI1QqA1R3t2i/FahzautgQU95nh
+	MRjZycc7INttfqOmpeDA25KeZTSR3djUyWlED11KHCq6T5VuDOFS9dsmOzdu/m5O6B9iBJRhj5oQZ
+	K0AaKumdOVxPhbPMz1RJU1Nj5Fsg8ycbbwhdJHyZNmj6R/XHU4a2FfnIMCPnOKx8QP9R5okO459he
+	P3i/VMmioabpYfSJGDKsvQ7il5oYZpx6k0vd4ebgTxrDCAMIqmVz3D96ceyN1CiUngEX4DYRl9Q7k
+	d9qUpqxMVU4bR0XMXgY5OI7z5BZahka6EzGW6eVS70CBBmeobi5ybprlSFK/j8vtzlMq02Aw5Q2BD
+	cwwWbIJQyWsTh61dUw/hMoeZ;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vL0af-00EOL2-27;
+	Mon, 17 Nov 2025 14:52:25 +0000
+Message-ID: <cc80596c-f08d-465e-a503-bdb42fddbbae@samba.org>
+Date: Mon, 17 Nov 2025 15:52:24 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] ksmbd: server: avoid busy polling in accept loop
+To: Qingfang Deng <dqfext@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Steve French <smfrench@gmail.com>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>,
+ Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>,
+ linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>
+References: <20251117085900.466432-1-dqfext@gmail.com>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <20251117085900.466432-1-dqfext@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Am 17.11.25 um 09:59 schrieb Qingfang Deng:
+> The ksmbd listener thread was using busy waiting on a listening socket by
+> calling kernel_accept() with SOCK_NONBLOCK and retrying every 100ms on
+> -EAGAIN. Since this thread is dedicated to accepting new connections,
+> there is no need for non-blocking mode.
+> 
+> Switch to a blocking accept() call instead, allowing the thread to sleep
+> until a new connection arrives. This avoids unnecessary wakeups and CPU
+> usage. During teardown, call shutdown() on the listening socket so that
+> accept() returns -EINVAL and the thread exits cleanly.
+> 
+> The socket release mutex is redundant because kthread_stop() blocks until
+> the listener thread returns, guaranteeing safe teardown ordering.
+> 
+> Also remove sk_rcvtimeo and sk_sndtimeo assignments, which only caused
+> accept() to return -EAGAIN prematurely.
+> 
+> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
+> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
 
-Modify the following places:
-
-  - struct filesystem_attribute_info -> FILE_SYSTEM_ATTRIBUTE_INFO
-  - Remove MIN_FS_ATTR_INFO_SIZE definition
-  - Introduce MAX_FS_NAME_LEN
-  - max_len of FileFsAttributeInformation -> sizeof(FILE_SYSTEM_ATTRIBUTE_INFO) + MAX_FS_NAME_LEN
-  - min_len of FileFsAttributeInformation -> sizeof(FILE_SYSTEM_ATTRIBUTE_INFO)
-  - SMB2_QFS_attr(): memcpy(..., min_len)
-
-Then move FILE_SYSTEM_ATTRIBUTE_INFO to common header file.
-
-I have tested the relevant code related to FILE_SYSTEM_ATTRIBUTE_INFO (Link[1]).
-
-Link[1]: https://chenxiaosong.com/en/FILE_SYSTEM_ATTRIBUTE_INFO.html
-Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
-Tested-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/client/cifspdu.h    | 10 ----------
- fs/smb/client/smb2pdu.c    |  6 +++---
- fs/smb/common/fscc.h       |  9 +++++++++
- fs/smb/server/smb2pdu.c    |  6 +++---
- fs/smb/server/smb_common.h |  7 -------
- 5 files changed, 15 insertions(+), 23 deletions(-)
-
-diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index d84e10b1477f..49f35cb3cf2e 100644
---- a/fs/smb/client/cifspdu.h
-+++ b/fs/smb/client/cifspdu.h
-@@ -2068,16 +2068,6 @@ typedef struct {
- #define FILE_PORTABLE_DEVICE			0x00004000
- #define FILE_DEVICE_ALLOW_APPCONTAINER_TRAVERSAL 0x00020000
- 
--/* minimum includes first three fields, and empty FS Name */
--#define MIN_FS_ATTR_INFO_SIZE 12
--
--typedef struct {
--	__le32 Attributes;
--	__le32 MaxPathNameComponentLength;
--	__le32 FileSystemNameLen;
--	char FileSystemName[52]; /* do not have to save this - get subset? */
--} __attribute__((packed)) FILE_SYSTEM_ATTRIBUTE_INFO;
--
- /******************************************************************************/
- /* QueryFileInfo/QueryPathinfo (also for SetPath/SetFile) data buffer formats */
- /******************************************************************************/
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 032b4b037f07..ef2c6ac500f7 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -5981,8 +5981,8 @@ SMB2_QFS_attr(const unsigned int xid, struct cifs_tcon *tcon,
- 		max_len = sizeof(FILE_SYSTEM_DEVICE_INFO);
- 		min_len = sizeof(FILE_SYSTEM_DEVICE_INFO);
- 	} else if (level == FS_ATTRIBUTE_INFORMATION) {
--		max_len = sizeof(FILE_SYSTEM_ATTRIBUTE_INFO);
--		min_len = MIN_FS_ATTR_INFO_SIZE;
-+		max_len = sizeof(FILE_SYSTEM_ATTRIBUTE_INFO) + MAX_FS_NAME_LEN;
-+		min_len = sizeof(FILE_SYSTEM_ATTRIBUTE_INFO);
- 	} else if (level == FS_SECTOR_SIZE_INFORMATION) {
- 		max_len = sizeof(struct smb3_fs_ss_info);
- 		min_len = sizeof(struct smb3_fs_ss_info);
-@@ -6028,7 +6028,7 @@ SMB2_QFS_attr(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (level == FS_ATTRIBUTE_INFORMATION)
- 		memcpy(&tcon->fsAttrInfo, offset
- 			+ (char *)rsp, min_t(unsigned int,
--			rsp_len, max_len));
-+			rsp_len, min_len));
- 	else if (level == FS_DEVICE_INFORMATION)
- 		memcpy(&tcon->fsDevInfo, offset
- 			+ (char *)rsp, sizeof(FILE_SYSTEM_DEVICE_INFO));
-diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
-index a0580a772a41..35dbacdbb902 100644
---- a/fs/smb/common/fscc.h
-+++ b/fs/smb/common/fscc.h
-@@ -94,6 +94,15 @@ struct smb2_file_network_open_info {
- 	__le32 Reserved;
- } __packed; /* level 34 Query also similar returned in close rsp and open rsp */
- 
-+/* See MS-FSCC 2.5.1 */
-+#define MAX_FS_NAME_LEN		52
-+typedef struct {
-+	__le32 Attributes;
-+	__le32 MaxPathNameComponentLength;
-+	__le32 FileSystemNameLen;
-+	__le16 FileSystemName[]; /* do not have to save this - get subset? */
-+} __packed FILE_SYSTEM_ATTRIBUTE_INFO;
-+
- /* List of FileSystemAttributes - see MS-FSCC 2.5.1 */
- #define FILE_SUPPORTS_SPARSE_VDL	0x10000000 /* faster nonsparse extend */
- #define FILE_SUPPORTS_BLOCK_REFCOUNTING	0x08000000 /* allow ioctl dup extents */
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index c71f156cc64a..1c8935f61150 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -5492,10 +5492,10 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
- 	}
- 	case FS_ATTRIBUTE_INFORMATION:
- 	{
--		struct filesystem_attribute_info *info;
-+		FILE_SYSTEM_ATTRIBUTE_INFO *info;
- 		size_t sz;
- 
--		info = (struct filesystem_attribute_info *)rsp->Buffer;
-+		info = (FILE_SYSTEM_ATTRIBUTE_INFO *)rsp->Buffer;
- 		info->Attributes = cpu_to_le32(FILE_SUPPORTS_OBJECT_IDS |
- 					       FILE_PERSISTENT_ACLS |
- 					       FILE_UNICODE_ON_DISK |
-@@ -5514,7 +5514,7 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
- 					"NTFS", PATH_MAX, conn->local_nls, 0);
- 		len = len * 2;
- 		info->FileSystemNameLen = cpu_to_le32(len);
--		sz = sizeof(struct filesystem_attribute_info) + len;
-+		sz = sizeof(FILE_SYSTEM_ATTRIBUTE_INFO) + len;
- 		rsp->OutputBufferLength = cpu_to_le32(sz);
- 		break;
- 	}
-diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
-index 4dd573c5f0b2..6c1607b43eb3 100644
---- a/fs/smb/server/smb_common.h
-+++ b/fs/smb/server/smb_common.h
-@@ -90,13 +90,6 @@ struct smb_negotiate_rsp {
- 	__le16 ByteCount;
- } __packed;
- 
--struct filesystem_attribute_info {
--	__le32 Attributes;
--	__le32 MaxPathNameComponentLength;
--	__le32 FileSystemNameLen;
--	__le16 FileSystemName[]; /* do not have to save this - get subset? */
--} __packed;
--
- struct filesystem_vol_info {
- 	__le64 VolumeCreationTime;
- 	__le32 SerialNumber;
--- 
-2.43.0
+Reviewed-by: Stefan Metzmacher <metze@samba.org>
 
