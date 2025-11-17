@@ -1,30 +1,32 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF9C3277AA
-	for <linux-cifs@vger.kernel.org>; Mon, 17 Nov 2025 11:29:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86C1328603
+	for <linux-cifs@vger.kernel.org>; Mon, 17 Nov 2025 11:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763378994; cv=none; b=gjLeU4PTkzAD+D5Y7Hpq7x+FEM2Gq00a7BBJS/FoC0sKe2ad3tk9ZmWlqpiaj1j+QjZEDRKLORDRP7UU9LrHB4JGH53dJwJmVqo3T2whvnsKG1nuYXPATe1vzWgy0uz9A8SaaS/JRuAPXuFKSThTeOLEOyh0PTKFsz2QFT1XHpU=
+	t=1763378996; cv=none; b=izic1Z9Jj6xwW9sjHFDCPTJyIwWXgdDXiEHeNpzGsfTX1cFOAEXA+PGYQFFAcZtv3AW+Om17h+XxAwq+JQcxhx2xt7YGfZ72wBm2U0biFmlYuzKSWWQaOXTPheVtevYn1RiV3u7TJ7bk9R7GnEmPYRGfGme3zpJgKztXC6TbAcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763378994; c=relaxed/simple;
-	bh=ep+lLZIMWxXsAk6NTTFgn7sM6nojwB74fEpz07zSsSU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jMtFqAUl03jRF7MWNM1z4VhX7xZhM1osWxRBOHWeHxSVsTY9AK9irx0zTAojidyoc8yR9IEwdhsH/XsYMO0XHFpPQryuc09fumEc3nc14tewKKoMkk/TMDgVJRzcUUc0aQdmq9c1JqsP0yJShOZAenhMR3nPlXKRGMEjz1XjRdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LDOcD+5d; arc=none smtp.client-ip=95.215.58.171
+	s=arc-20240116; t=1763378996; c=relaxed/simple;
+	bh=fpYGUO6n4DY2BJDZ8fwnOaG9MWW3M/g6Yrk/WARPENc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ai2W6NiWXD139Cl06xi0AbREVhyVq0w4ocqlPmW1+r8/VNNj6IARHpA1HD1WOTvmzD3sv+199HyzUJD5oAXKJ/K8RXRCUZ/NNIShaCQ+Ke9vJlzVnVaDiWYC9DmtwxHN4y5iZqay8iq/0aGhVNTBY6bydTP0g+EQSi83iPpFQ2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=THsG7jQy; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LDOcD+5d"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="THsG7jQy"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763378989;
+	t=1763378992;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gKSB7WZ/Rem1rfCC4nAPSfG72QwB194JYJHtNbWRcF0=;
-	b=LDOcD+5dYppRSB/LwNbCKaO4a8rvy4zkmDI68kqjIxpvlR9yOLlp/lKOKhs848y22v2yx8
-	/ug6Ufa7lYVpX28/vEm/Rpm00LZYLM0Au7LmGnChyJBzPN+z4OnA6tdeYgB/cXeVElywUQ
-	hx5opZQkc47lNV2n/DWEoOEHuWWSeAE=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a/gJaK5daEK13gn0nSNn1LV4o2mZh0FHjw2t/MUGV7g=;
+	b=THsG7jQy7EVa3xdY0qoMuMf98l1l113ry1o7NjbrwJLQHYQP/eRauCuadqx1Ks/emW2NXH
+	TOGUpgIEGeL6dr8RXNspmyU0YpsJVmqVJTeMW6V00MvzC93FN3pA0m8F7qtKXTsG/Oc2jg
+	eYApIm+W6auU17rOEZl70Q2Vw6Xraqs=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: sfrench@samba.org,
 	smfrench@gmail.com,
@@ -35,9 +37,11 @@ Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	chenxiaosong@chenxiaosong.com,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v9 0/1] smb: move duplicate definitions to common header file
-Date: Mon, 17 Nov 2025 19:28:37 +0800
-Message-ID: <20251117112838.473051-1-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH v9 1/1] smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/fscc.h
+Date: Mon, 17 Nov 2025 19:28:38 +0800
+Message-ID: <20251117112838.473051-2-chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <20251117112838.473051-1-chenxiaosong.chenxiaosong@linux.dev>
+References: <20251117112838.473051-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,51 +53,24 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-I have tested the relevant code related to FILE_SYSTEM_ATTRIBUTE_INFO: https://chenxiaosong.com/en/FILE_SYSTEM_ATTRIBUTE_INFO.html
+Modify the following places:
 
-I have tested all patches using xfstests and smbtorture, and no additional
-test failures were observed in the results. The detailed test results can
-be found in https://chenxiaosong.com/en/smb-test-20251117.html
-
-v3: https://lore.kernel.org/all/20251014071917.3004573-1-chenxiaosong.chenxiaosong@linux.dev/
-The following patches from v3 have already been merged into the mainline:
-  - d877470b5991 smb: move some duplicate definitions to common/cifsglob.h
-  - 379510a815cb smb/server: fix possible refcount leak in smb2_sess_setup()
-  - 6fced056d2cc smb/server: fix possible memory leak in smb2_read()
-
-v4: https://lore.kernel.org/all/20251027071316.3468472-1-chenxiaosong.chenxiaosong@linux.dev/
-v5: https://lore.kernel.org/all/20251102073059.3681026-1-chenxiaosong.chenxiaosong@linux.dev/
-v7: https://lore.kernel.org/all/20251113133252.145867-1-chenxiaosong.chenxiaosong@linux.dev/
-The following patches from v4 v5 v7 have been applied to the ksmbd-for-next-next branch: https://git.samba.org/?p=ksmbd.git;a=shortlog;h=refs/heads/ksmbd-for-next-next
-  - smb: move create_durable_reconn to common/smb2pdu.h
-  - smb: fix some warnings reported by scripts/checkpatch.pl
-  - smb: do some cleanups
-  - smb: move FILE_SYSTEM_SIZE_INFO to common/fscc.h
-  - smb: move some duplicate struct definitions to common/fscc.h
-  - smb: move list of FileSystemAttributes to common/fscc.h
-  - smb: move SMB_NEGOTIATE_REQ to common/smb2pdu.h
-  - smb: move some duplicate definitions to common/smb2pdu.h
-  - smb: move create_durable_rsp_v2 to common/smb2pdu.h
-  - smb: move create_durable_handle_reconnect_v2 to common/smb2pdu.h
-  - smb: move create_durable_req_v2 to common/smb2pdu.h
-  - smb: move MAX_CIFS_SMALL_BUFFER_SIZE to common/smbglob.h
-  - smb/client: fix CAP_BULK_TRANSFER value
-  - smb: move resume_key_ioctl_rsp to common/smb2pdu.h
-  - smb: move copychunk definitions to common/smb2pdu.h
-  - smb: move smb_sockaddr_in and smb_sockaddr_in6 to common/smb2pdu.h
-  - smb: move SMB1_PROTO_NUMBER to common/smbglob.h
-  - smb: move get_rfc1002_len() to common/smbglob.h
-  - smb: move smb_version_values to common/smbglob.h
-  - smb: rename common/cifsglob.h to common/smbglob.h
-
-v8: https://lore.kernel.org/all/20251116065213.282598-1-chenxiaosong.chenxiaosong@linux.dev/
-v8->v9:
+  - struct filesystem_attribute_info -> FILE_SYSTEM_ATTRIBUTE_INFO
+  - Remove MIN_FS_ATTR_INFO_SIZE definition
+  - Introduce MAX_FS_NAME_LEN
+  - max_len of FileFsAttributeInformation -> sizeof(FILE_SYSTEM_ATTRIBUTE_INFO) + MAX_FS_NAME_LEN
+  - min_len of FileFsAttributeInformation -> sizeof(FILE_SYSTEM_ATTRIBUTE_INFO)
   - SMB2_QFS_attr(): memcpy(..., min_len)
-  - Fix typo: FS-FSCC -> MS-FSCC
 
-ChenXiaoSong (1):
-  smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/fscc.h
+Then move FILE_SYSTEM_ATTRIBUTE_INFO to common header file.
 
+I have tested the relevant code related to FILE_SYSTEM_ATTRIBUTE_INFO (Link[1]).
+
+Link[1]: https://chenxiaosong.com/en/FILE_SYSTEM_ATTRIBUTE_INFO.html
+Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
+Tested-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
  fs/smb/client/cifspdu.h    | 10 ----------
  fs/smb/client/smb2pdu.c    |  6 +++---
  fs/smb/common/fscc.h       |  9 +++++++++
@@ -101,6 +78,115 @@ ChenXiaoSong (1):
  fs/smb/server/smb_common.h |  7 -------
  5 files changed, 15 insertions(+), 23 deletions(-)
 
+diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
+index d84e10b1477f..49f35cb3cf2e 100644
+--- a/fs/smb/client/cifspdu.h
++++ b/fs/smb/client/cifspdu.h
+@@ -2068,16 +2068,6 @@ typedef struct {
+ #define FILE_PORTABLE_DEVICE			0x00004000
+ #define FILE_DEVICE_ALLOW_APPCONTAINER_TRAVERSAL 0x00020000
+ 
+-/* minimum includes first three fields, and empty FS Name */
+-#define MIN_FS_ATTR_INFO_SIZE 12
+-
+-typedef struct {
+-	__le32 Attributes;
+-	__le32 MaxPathNameComponentLength;
+-	__le32 FileSystemNameLen;
+-	char FileSystemName[52]; /* do not have to save this - get subset? */
+-} __attribute__((packed)) FILE_SYSTEM_ATTRIBUTE_INFO;
+-
+ /******************************************************************************/
+ /* QueryFileInfo/QueryPathinfo (also for SetPath/SetFile) data buffer formats */
+ /******************************************************************************/
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 032b4b037f07..ef2c6ac500f7 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -5981,8 +5981,8 @@ SMB2_QFS_attr(const unsigned int xid, struct cifs_tcon *tcon,
+ 		max_len = sizeof(FILE_SYSTEM_DEVICE_INFO);
+ 		min_len = sizeof(FILE_SYSTEM_DEVICE_INFO);
+ 	} else if (level == FS_ATTRIBUTE_INFORMATION) {
+-		max_len = sizeof(FILE_SYSTEM_ATTRIBUTE_INFO);
+-		min_len = MIN_FS_ATTR_INFO_SIZE;
++		max_len = sizeof(FILE_SYSTEM_ATTRIBUTE_INFO) + MAX_FS_NAME_LEN;
++		min_len = sizeof(FILE_SYSTEM_ATTRIBUTE_INFO);
+ 	} else if (level == FS_SECTOR_SIZE_INFORMATION) {
+ 		max_len = sizeof(struct smb3_fs_ss_info);
+ 		min_len = sizeof(struct smb3_fs_ss_info);
+@@ -6028,7 +6028,7 @@ SMB2_QFS_attr(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if (level == FS_ATTRIBUTE_INFORMATION)
+ 		memcpy(&tcon->fsAttrInfo, offset
+ 			+ (char *)rsp, min_t(unsigned int,
+-			rsp_len, max_len));
++			rsp_len, min_len));
+ 	else if (level == FS_DEVICE_INFORMATION)
+ 		memcpy(&tcon->fsDevInfo, offset
+ 			+ (char *)rsp, sizeof(FILE_SYSTEM_DEVICE_INFO));
+diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
+index a0580a772a41..35dbacdbb902 100644
+--- a/fs/smb/common/fscc.h
++++ b/fs/smb/common/fscc.h
+@@ -94,6 +94,15 @@ struct smb2_file_network_open_info {
+ 	__le32 Reserved;
+ } __packed; /* level 34 Query also similar returned in close rsp and open rsp */
+ 
++/* See MS-FSCC 2.5.1 */
++#define MAX_FS_NAME_LEN		52
++typedef struct {
++	__le32 Attributes;
++	__le32 MaxPathNameComponentLength;
++	__le32 FileSystemNameLen;
++	__le16 FileSystemName[]; /* do not have to save this - get subset? */
++} __packed FILE_SYSTEM_ATTRIBUTE_INFO;
++
+ /* List of FileSystemAttributes - see MS-FSCC 2.5.1 */
+ #define FILE_SUPPORTS_SPARSE_VDL	0x10000000 /* faster nonsparse extend */
+ #define FILE_SUPPORTS_BLOCK_REFCOUNTING	0x08000000 /* allow ioctl dup extents */
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index c71f156cc64a..1c8935f61150 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -5492,10 +5492,10 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
+ 	}
+ 	case FS_ATTRIBUTE_INFORMATION:
+ 	{
+-		struct filesystem_attribute_info *info;
++		FILE_SYSTEM_ATTRIBUTE_INFO *info;
+ 		size_t sz;
+ 
+-		info = (struct filesystem_attribute_info *)rsp->Buffer;
++		info = (FILE_SYSTEM_ATTRIBUTE_INFO *)rsp->Buffer;
+ 		info->Attributes = cpu_to_le32(FILE_SUPPORTS_OBJECT_IDS |
+ 					       FILE_PERSISTENT_ACLS |
+ 					       FILE_UNICODE_ON_DISK |
+@@ -5514,7 +5514,7 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
+ 					"NTFS", PATH_MAX, conn->local_nls, 0);
+ 		len = len * 2;
+ 		info->FileSystemNameLen = cpu_to_le32(len);
+-		sz = sizeof(struct filesystem_attribute_info) + len;
++		sz = sizeof(FILE_SYSTEM_ATTRIBUTE_INFO) + len;
+ 		rsp->OutputBufferLength = cpu_to_le32(sz);
+ 		break;
+ 	}
+diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
+index 4dd573c5f0b2..6c1607b43eb3 100644
+--- a/fs/smb/server/smb_common.h
++++ b/fs/smb/server/smb_common.h
+@@ -90,13 +90,6 @@ struct smb_negotiate_rsp {
+ 	__le16 ByteCount;
+ } __packed;
+ 
+-struct filesystem_attribute_info {
+-	__le32 Attributes;
+-	__le32 MaxPathNameComponentLength;
+-	__le32 FileSystemNameLen;
+-	__le16 FileSystemName[]; /* do not have to save this - get subset? */
+-} __packed;
+-
+ struct filesystem_vol_info {
+ 	__le64 VolumeCreationTime;
+ 	__le32 SerialNumber;
 -- 
 2.43.0
 
