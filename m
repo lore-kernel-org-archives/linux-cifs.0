@@ -1,63 +1,65 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24181C861A
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 02:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC3331327A
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 02:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763432867; cv=none; b=MSWRa0IoOOpnfIl28DQfJWb5umV2NJaihzkJ2NwKN7J9xGRIDzbVQe1sJHEeO7sOpYM+mcUq82GaZ/JpSilvXSlbQiEi6Y479Kf3u555AiCfpOum3MBrMSgo0dwhlYcB3WE7hbbIPLJgqlBb4FU+O3x4G0/1A2uhwUf5QeVwm4E=
+	t=1763432876; cv=none; b=Yx8WwJlYackClLLSAbPT10IQjgsaMflZjsm+eZG4/9TE02edUFIQ2pz92PwVcD3CuVhF+DTw52eAEwYzDw7WfP8Mh9GRCQqyNLdrxJJj2pNZwvEjEoKuU9tIQGlOp4hVGU7nRuEJ24mlVivcalORx0snVHcPQzCIq075AU84j+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763432867; c=relaxed/simple;
-	bh=IuYX8Ybp/bgqXpg4/h9HUgoO1P3LMO1wdokSzXVY8kE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pHIcDyFbQkrENa97h/6Pupc9kSwD5UjRu5qQMrzKSXJuF6lof3BmSV4H5zKjM5QFRddGZCB7xJgsRyi41EFKIkVk6jhks1qNu4j8iDc5duohnJVHgQVg2IWjGdyp+3ghhIHft5wYrWT6sxvuz3c0A05F19rmDvX/1G34zcQGsLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nrPFq5hj; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1763432876; c=relaxed/simple;
+	bh=Pypc31j7e6WzTBARjBckj9L4hLk7f5FPu0IKuFpsR6Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nat+++mjZY65ERIMUfLThki1rbva6aY+14nA6b7Ic5RhqHzRoLv2LiODO25oMErzK+Fj5SzGoy5qf+Sd02fhrhc2cBX3EOevwgRX4AvpiZZG163+RfwmGlZXH6+FrPUaFW1qyfIUbg8T2SWVl0ra+h7qM3ufkXTAGLqdHmpFbYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XEZ0FG4I; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nrPFq5hj"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2981f9ce15cso63320485ad.1
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Nov 2025 18:27:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XEZ0FG4I"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-29555b384acso51023405ad.1
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Nov 2025 18:27:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763432865; x=1764037665; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Bn9qlwUqhBEonhqbp+iyTs1wo7JGYonc9b4L9aHC3g=;
-        b=nrPFq5hjP40XN+UynV+rZ/L6lcgh3yE49MxCpPmguJiFE/nVvyz4WG/1ObupTgnyh/
-         Ae9JfACxQ1fEXcZ8Qbi2udXKygW1L4N5f9jxyCkk4NjPzmsqAFL/qhsPklb/Ob8XFmnx
-         nB/4+dtSYQuTo3+r+hCxRuLEXy9Ooju0lJObFr4zqBz0Ll4DSa8qbM1J1pNYsA05HBCg
-         erlchcqk0GF9HuEP1fi9wxEzw2nwDX0knN7RrFzuAORDPGV4A3MD6s6uoIR+J+C9zo8R
-         r4QbK3bsis26z3JVadiwlLDTrozsr37W9MA8mQvQy7agmu1xwhKfxH93xGHkQIg96DJW
-         Ghnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763432865; x=1764037665;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1763432875; x=1764037675; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6Bn9qlwUqhBEonhqbp+iyTs1wo7JGYonc9b4L9aHC3g=;
-        b=VbIbqCkz0aYN65pjB10mzz9ix+sDck4Xr6XYz23W/+MLP+Jrad8imyflzW2mv2WTT9
-         m32H2bsf0nR40DyK1c4ukMMDQaTLkwNuB2yR/vBaJ7kGVTLW/7Jrfr63Mckl4bNaMEVh
-         H60wmKOW2kzWmOdMRL6VCWGGW6Mr6PtbJFjH2NPcfNR2YDt7YgkgPdSbZh99qf9NAciX
-         WKK6ziS07NuLOBQ/WbyL6M2y2wMEicfVknDkJ1aoyi9U7Wz+znWEilAVgE3KHLPzg1z8
-         XXJVqfTy117wP9ojbKCgCCKUifWtTLO7tVqh2ssrFMahQMK3g1NL8GkRvZCvzsQwa6kf
-         xvHA==
-X-Forwarded-Encrypted: i=1; AJvYcCURiWxF4IewYSwoBv1RYa5i61oMVoQ/KsyyZ92wagk3+lFiX1tmnw5jjO83BS2b1A4wpRNV0eW5fSaD@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoBcd01ZcmqWIusxxU5EtUQgZsFz4MePRw9r3ceitsluWtrp5f
-	ogJI6nzW56aRDnhENsMWvVrDoDLxkfSkQiKDu/YzFaiFyQuB8v4hnJa1
-X-Gm-Gg: ASbGncvNPC4SwWhPNh2iznXMFwmbpiscZ8AE+jwgBRZ91Y5frsbSX+QqwVJ6jPQMtqO
-	AxdQEYkkEFL8qNkIVggMvNkWzP7N5GqX7UqnjI562uWnLnnXSGYKKGxVbWl66QlOSH9bBNVOpXA
-	prhNEFAGx27pEpVWDQ/D6veI+porSCdo8AOhfsWJlokPwP1Nn7aiqDYUGZLpUreflmZQiy2UKVE
-	8oQSl+yxdpk0SGNcyEYd3KseEQnWs+UzjWgpzAzdSFir3sR/kY4qj4zbFes8yWkJnoykN1mte5j
-	E/LZsEfPZJJHAHISOgIBW30lR+Ly7iywXrRilCcwMoenmmi2mRuxNr8h65WiJgENmjZz8EhoDss
-	1pCsLHrqCcyRBiyDXfu7p7+Wwo87kCqFzlPHWFM8/KNId2R+YQIMs0OX0iORUZKDgc6x81JCKGu
-	ayxqFfFPo9puAA3gSRInsLmiLHXpp/tlFHBHr/Ke95sJq0skGFtBV3mfxTy+6bkzp1wxZh+VEnL
-	OtZ4gAqs6pN/QzTdQ==
-X-Google-Smtp-Source: AGHT+IFKECxgl7WkTg/SRwJjv1N7Fi1vzCaBobvQYhBUGpyQwgXtST+Wd/ajvsur73PAvIMJDA7xOw==
-X-Received: by 2002:a17:903:3284:b0:298:2237:a2eb with SMTP id d9443c01a7336-2986a6bf9f5mr120474265ad.16.1763432864922;
-        Mon, 17 Nov 2025 18:27:44 -0800 (PST)
+        bh=eUeRTgtvZX5xIfYESgNI5CfhH9TmmJjF3mJVIzLoI7M=;
+        b=XEZ0FG4I4s+zynMyUVhmidOOzu+lvj2IRjBnjR2Kg6wjxsrMtevPWiPTJL94dDvo98
+         vM9EYBLcfpcF1Xa1mmyrlsbzmwEP0nSvmA4kXDnYcnj0aD7ywo7bsOdMMIGR+VKMpsMP
+         VoRelZX9kPczIRJLJrAFFQWK1MvN243xbN95FCZg8V9hAC+OISqK9CFjNq7aNmKCEBCk
+         p8spcOt6mkn2qZiX070xDPluIcFzDmROTuOtlhGvgLm3Z6UoGqREriiG2SPBaa6SxV37
+         iqUk+PqnH9SkRBxSGjtVU9zhcUsfSrtlnXXWz4UxzJAML9YB8N55bYN5TRbPdTC9mynN
+         u90g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763432875; x=1764037675;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=eUeRTgtvZX5xIfYESgNI5CfhH9TmmJjF3mJVIzLoI7M=;
+        b=Sz97VJATeOhJuwEyVQvzGcp60ZV6awI7SLC7/enHwh34Oj+Rg//oF/q/LgnehtDUJZ
+         5cprIkuXb29EDesod7Mtnyx7m2ElVGTeIvB8b2aFLxnsafrX0NXm/5effcX2RAbEJt6x
+         jDyoQfq1izWKn2lfIlHTGNdpbr6hUaK2Jtfm86VQS6TuINdf9oF8nlLQ6JTD347VXvVg
+         WNgUW/buH6G6E4KwYWXrvGPuO24khv03sPuSRSSkETXJOO98krQhg2gTxnX4r7mOFx1C
+         r/zpL/J6cN5bpmB5dEDyrk/R16CcpPu0YQKyfOaci9QTKIqr43DUXwfxl1XVOqpEWyAg
+         PG3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXW2ZE3WugBiQvE/4FFZ0qxUe3Qgt1PmrVyJLG1tufuBmP32bifg+BHJrJjHWrHdtVdtF6EadA1er3Y@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyo274JpCXl292K+Vd1OoeFMVSbMoFPqfIykWjgxYtmxn64IwGW
+	hjXu7krogb1PSHmYGtaxnq1reu582rnV/cmPTtYWSuRCcpIA4UKZBiTY
+X-Gm-Gg: ASbGncse7L4U+v1zHBN2Wsa4LQo9JJ7rm5165XvsKAoaN1OGhb5CiEltyWToP45U4Fr
+	aWDwzH8cZh3JYWeZu3jdnRyWY9+NK97KyqAMNEFLvqgms/q7KR2hCxFnos6pdSCxr3E6Sphc76M
+	NRXD7XUhL82au3lVSHLBdPUg6KJ1bJOp/NDLt3JWI7VAIXk3scxblcehD4PekygCDMeNnYYTZLf
+	scc6VKwHx/ulKBh+QHOG6TFgTBghK53Abv0tN2ts6cR3B1G6IvLCc9Tl5XBrH/MBlGmpRfysYxN
+	PU0JgDeWlduMXSel+OJ/s2JM4VGjSPH7ZmzN2ZbvuLEtnAKSpjuu4HEEOvSXkSHigoCU1lTiERP
+	t3xZr38dVe+cmONbBD7LrPeHfDQim/DW/RUUZpnohJ5DfpX5MzNUDGiW7KgP2TzcPIYTCB2FdAJ
+	uCgNXuNCsjuXLNrkZtH1FZSlEY92oZRDVKu4uY0bmn39qCN1VOmQCZZybPfpPPzVZPhiHO+wNGv
+	u+wFZg=
+X-Google-Smtp-Source: AGHT+IF4kSAjfwknCVM4USZhMERLBGdwXplWAHKQAlRqecUdLezqzo6LAYFe/hkB2X7tS7mhxTfn9w==
+X-Received: by 2002:a17:902:cf03:b0:298:46a9:df01 with SMTP id d9443c01a7336-2986a6b8911mr202325475ad.3.1763432874583;
+        Mon, 17 Nov 2025 18:27:54 -0800 (PST)
 Received: from linuxbackup1-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([4.247.136.47])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c23849esm153170975ad.5.2025.11.17.18.27.41
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c23849esm153170975ad.5.2025.11.17.18.27.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 18:27:44 -0800 (PST)
+        Mon, 17 Nov 2025 18:27:54 -0800 (PST)
 From: Rajasi Mandal <rajasimandalos@gmail.com>
 To: sfrench@samba.org,
 	linux-cifs@vger.kernel.org
@@ -69,10 +71,12 @@ Cc: pc@manguebit.org,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org,
 	Rajasi Mandal <rajasimandal@microsoft.com>
-Subject: [PATCH] cifs: client: allow changing multichannel mount options on remount
-Date: Tue, 18 Nov 2025 02:26:54 +0000
-Message-ID: <20251118022655.126994-1-rajasimandalos@gmail.com>
+Subject: [PATCH] cifs: client: enforce consistent handling of multichannel and max_channels
+Date: Tue, 18 Nov 2025 02:26:55 +0000
+Message-ID: <20251118022655.126994-2-rajasimandalos@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251118022655.126994-1-rajasimandalos@gmail.com>
+References: <20251118022655.126994-1-rajasimandalos@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -83,327 +87,178 @@ Content-Transfer-Encoding: 8bit
 
 From: Rajasi Mandal <rajasimandal@microsoft.com>
 
-Previously, the client did not update a session's channel state when
-multichannel or max_channels mount options were changed via remount.
-This led to inconsistent behavior and prevented enabling or disabling
-multichannel support without a full unmount/remount cycle.
+Previously, the behavior of the multichannel and max_channels mount
+options was inconsistent and order-dependent. For example, specifying
+"multichannel,max_channels=1" would result in 2 channels, while
+"max_channels=1,multichannel" would result in 1 channel. Additionally,
+conflicting combinations such as "nomultichannel,max_channels=3" or
+"multichannel,max_channels=1" did not produce errors and could lead to
+unexpected channel counts.
 
-Enable dynamic reconfiguration of multichannel and max_channels during
-remount by:
-- Introducing smb3_sync_ses_chan_max(), a centralized function for
-  channel updates which synchronizes the session's channels with the
-  updated configuration.
-- Replacing cifs_disable_secondary_channels() with
-  cifs_decrease_secondary_channels(), which accepts a from_reconfigure
-  flag to support targeted cleanup during reconfiguration.
-- Updating remount logic to detect changes in multichannel or
-  max_channels and trigger appropriate session/channel updates.
+This commit introduces two new fields in smb3_fs_context to explicitly
+track whether multichannel and max_channels were specified during
+mount. The option parsing and validation logic is updated to ensure:
+- The outcome is no longer dependent on the order of options.
+- Conflicting combinations (e.g., "nomultichannel,max_channels=3" or
+  "multichannel,max_channels=1") are detected and result in an error.
+- The number of channels created is consistent with the specified
+  options.
 
-Current limitation:
-- The query_interfaces worker runs even when max_channels=1 so that
-  multichannel can be enabled later via remount without requiring an
-  unmount. This is a temporary approach and may be refined in the
-  future.
-
-Users can safely modify multichannel and max_channels on an existing
-mount. The client will correctly adjust the session's channel state to
-match the new configuration, preserving durability where possible and
-avoiding unnecessary disconnects.
+This improves the reliability and predictability of mount option
+handling for SMB3 multichannel support.
 
 Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
 ---
- fs/smb/client/cifsproto.h  |  4 ++-
- fs/smb/client/connect.c    |  4 ++-
- fs/smb/client/fs_context.c | 50 +++++++++++++++++++++++++++++++++-
- fs/smb/client/sess.c       | 32 +++++++++++++++-------
- fs/smb/client/smb2pdu.c    | 55 ++++++++++++++++++++++++++++----------
- 5 files changed, 119 insertions(+), 26 deletions(-)
+ fs/smb/client/cifsfs.c     |  1 -
+ fs/smb/client/fs_context.c | 65 ++++++++++++++++++++++++++++----------
+ fs/smb/client/fs_context.h |  2 ++
+ 3 files changed, 50 insertions(+), 18 deletions(-)
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 3528c365a452..a1fc9e1918bc 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -649,6 +649,8 @@ int cifs_alloc_hash(const char *name, struct shash_desc **sdesc);
- void cifs_free_hash(struct shash_desc **sdesc);
- 
- int cifs_try_adding_channels(struct cifs_ses *ses);
-+int smb3_update_ses_channels(struct cifs_ses *ses, struct TCP_Server_Info *server,
-+					bool from_reconnect, bool from_reconfigure);
- bool is_ses_using_iface(struct cifs_ses *ses, struct cifs_server_iface *iface);
- void cifs_ses_mark_for_reconnect(struct cifs_ses *ses);
- 
-@@ -674,7 +676,7 @@ bool
- cifs_chan_is_iface_active(struct cifs_ses *ses,
- 			  struct TCP_Server_Info *server);
- void
--cifs_disable_secondary_channels(struct cifs_ses *ses);
-+cifs_decrease_secondary_channels(struct cifs_ses *ses, bool from_reconfigure);
- void
- cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server);
- int
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 55cb4b0cbd48..cebe4a5f54f2 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -3927,7 +3927,9 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
- 	ctx->prepath = NULL;
- 
- out:
--	cifs_try_adding_channels(mnt_ctx.ses);
-+	smb3_update_ses_channels(mnt_ctx.ses, mnt_ctx.server,
-+				  false /* from_reconnect */,
-+				  false /* from_reconfigure */);
- 	rc = mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
- 	if (rc)
- 		goto error;
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 185ac41bd7e9..4d53ec53d8db 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -1016,7 +1016,6 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
+ 	} else {
+ 		cifs_info("Attempting to mount %s\n", old_ctx->source);
+ 	}
+-
+ 	cifs_sb = kzalloc(sizeof(*cifs_sb), GFP_KERNEL);
+ 	if (!cifs_sb)
+ 		return ERR_PTR(-ENOMEM);
 diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 0f894d09157b..751ed6ebd458 100644
+index 46d1eaae62da..1794a31541fe 100644
 --- a/fs/smb/client/fs_context.c
 +++ b/fs/smb/client/fs_context.c
-@@ -717,6 +717,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
- 					    void *data);
- static int smb3_get_tree(struct fs_context *fc);
-+static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channels);
- static int smb3_reconfigure(struct fs_context *fc);
- 
- static const struct fs_context_operations smb3_fs_context_ops = {
-@@ -1013,6 +1014,22 @@ int smb3_sync_session_ctx_passwords(struct cifs_sb_info *cifs_sb, struct cifs_se
+@@ -711,6 +711,47 @@ smb3_parse_devname(const char *devname, struct smb3_fs_context *ctx)
  	return 0;
  }
  
-+/*
-+ * smb3_sync_ses_chan_max - Synchronize the session's maximum channel count
-+ * @ses: pointer to the old CIFS session structure
-+ * @max_channels: new maximum number of channels to allow
-+ *
-+ * Updates the session's chan_max field to the new value, protecting the update
-+ * with the session's channel lock. This should be called whenever the maximum
-+ * allowed channels for a session changes (e.g., after a remount or reconfigure).
-+ */
-+static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channels)
++static int smb3_handle_conflicting_options(struct fs_context *fc)
 +{
-+	spin_lock(&ses->chan_lock);
-+	ses->chan_max = max_channels;
-+	spin_unlock(&ses->chan_lock);
-+}
++	struct smb3_fs_context *ctx = smb3_fc2context(fc);
 +
- static int smb3_reconfigure(struct fs_context *fc)
- {
- 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
-@@ -1095,7 +1112,38 @@ static int smb3_reconfigure(struct fs_context *fc)
- 		ses->password2 = new_password2;
- 	}
- 
--	mutex_unlock(&ses->session_mutex);
-+	/*
-+	 * If multichannel or max_channels has changed, update the session's channels accordingly.
-+	 * This may add or remove channels to match the new configuration.
-+	 */
-+	if ((ctx->multichannel != cifs_sb->ctx->multichannel) ||
-+	    (ctx->max_channels != cifs_sb->ctx->max_channels)) {
-+
-+		/* Synchronize ses->chan_max with the new mount context */
-+		smb3_sync_ses_chan_max(ses, ctx->max_channels);
-+		/* Now update the session's channels to match the new configuration */
-+		/* Prevent concurrent scaling operations */
-+		spin_lock(&ses->ses_lock);
-+		if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
-+			spin_unlock(&ses->ses_lock);
-+			return -EINVAL;
++	if (ctx->multichannel_specified) {
++		if (ctx->multichannel) {
++			if (!ctx->max_channels_specified) {
++				ctx->max_channels = 2;
++			} else if (ctx->max_channels == 1) {
++				cifs_errorf(fc,
++					    "max_channels must be greater than 1 when multichannel is enabled\n");
++				return -EINVAL;
++			}
++		} else {
++			if (!ctx->max_channels_specified) {
++				ctx->max_channels = 1;
++			} else if (ctx->max_channels > 1) {
++				cifs_errorf(fc,
++					    "max_channels must be equal to 1 when multichannel is disabled\n");
++				return -EINVAL;
++			}
 +		}
-+		ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
-+		spin_unlock(&ses->ses_lock);
-+
-+		mutex_unlock(&ses->session_mutex);
-+
-+		rc = smb3_update_ses_channels(ses, ses->server,
-+					       false /* from_reconnect */,
-+					       true /* from_reconfigure */);
-+
-+		/* Clear scaling flag after operation */
-+		spin_lock(&ses->ses_lock);
-+		ses->flags &= ~CIFS_SES_FLAG_SCALE_CHANNELS;
-+		spin_unlock(&ses->ses_lock);
 +	} else {
-+		mutex_unlock(&ses->session_mutex);
-+	}
- 
- 	STEAL_STRING(cifs_sb, ctx, domainname);
- 	STEAL_STRING(cifs_sb, ctx, nodename);
-diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index ef3b498b0a02..cfd83986a84a 100644
---- a/fs/smb/client/sess.c
-+++ b/fs/smb/client/sess.c
-@@ -265,12 +265,16 @@ int cifs_try_adding_channels(struct cifs_ses *ses)
- }
- 
- /*
-- * called when multichannel is disabled by the server.
-- * this always gets called from smb2_reconnect
-- * and cannot get called in parallel threads.
-+ * cifs_decrease_secondary_channels - Reduce the number of active secondary channels
-+ * @ses: pointer to the CIFS session structure
-+ * @from_reconfigure: if true, only reduce to chan_max; if false, reduce to a single channel
-+ *
-+ * This function disables and cleans up extra secondary channels for a CIFS session.
-+ * If called during reconfiguration, it reduces the channel count to the new maximum (chan_max).
-+ * Otherwise, it disables all but the primary channel.
-  */
- void
--cifs_disable_secondary_channels(struct cifs_ses *ses)
-+cifs_decrease_secondary_channels(struct cifs_ses *ses, bool from_reconfigure)
- {
- 	int i, chan_count;
- 	struct TCP_Server_Info *server;
-@@ -281,12 +285,13 @@ cifs_disable_secondary_channels(struct cifs_ses *ses)
- 	if (chan_count == 1)
- 		goto done;
- 
--	ses->chan_count = 1;
--
--	/* for all secondary channels reset the need reconnect bit */
--	ses->chans_need_reconnect &= 1;
-+	/* Update the chan_count to the new maximum */
-+	if (from_reconfigure)
-+		ses->chan_count = ses->chan_max;
-+	else
-+		ses->chan_count = 1;
- 
--	for (i = 1; i < chan_count; i++) {
-+	for (i = ses->chan_max ; i < chan_count; i++) {
- 		iface = ses->chans[i].iface;
- 		server = ses->chans[i].server;
- 
-@@ -318,6 +323,15 @@ cifs_disable_secondary_channels(struct cifs_ses *ses)
- 		spin_lock(&ses->chan_lock);
- 	}
- 
-+	/* For extra secondary channels, reset the need reconnect bit */
-+	if (ses->chan_count == 1) {
-+		cifs_dbg(VFS, "server does not support multichannel anymore. Disable all other channels\n");
-+		ses->chans_need_reconnect &= 1;
-+	} else {
-+		cifs_dbg(VFS, "Disable extra secondary channels\n");
-+		ses->chans_need_reconnect &= ((1UL << ses->chan_max) - 1);
++		if (ctx->max_channels_specified) {
++			if (ctx->max_channels > 1)
++				ctx->multichannel = true;
++			else
++				ctx->multichannel = false;
++		} else {
++			ctx->multichannel = false;
++			ctx->max_channels = 1;
++		}
 +	}
 +
- done:
- 	spin_unlock(&ses->chan_lock);
- }
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 8b4a4573e9c3..d051da46eaab 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -168,7 +168,7 @@ smb2_hdr_assemble(struct smb2_hdr *shdr, __le16 smb2_cmd,
- static int
- cifs_chan_skip_or_disable(struct cifs_ses *ses,
- 			  struct TCP_Server_Info *server,
--			  bool from_reconnect)
-+			  bool from_reconnect, bool from_reconfigure)
- {
- 	struct TCP_Server_Info *pserver;
- 	unsigned int chan_index;
-@@ -206,14 +206,41 @@ cifs_chan_skip_or_disable(struct cifs_ses *ses,
- 		return -EHOSTDOWN;
- 	}
- 
--	cifs_server_dbg(VFS,
--		"server does not support multichannel anymore. Disable all other channels\n");
--	cifs_disable_secondary_channels(ses);
--
-+	cifs_decrease_secondary_channels(ses, from_reconfigure);
- 
- 	return 0;
- }
- 
-+/*
-+ * smb3_update_ses_channels - Synchronize session channels with new configuration
-+ * @ses: pointer to the CIFS session structure
-+ * @server: pointer to the TCP server info structure
-+ * @from_reconnect: indicates if called from reconnect context
-+ * @from_reconfigure: indicates if called from reconfigure context
-+ *
-+ * Returns 0 on success or error code on failure.
-+ *
-+ * Note: Outside of reconfigure, this function is only called from reconnect scenarios
-+ * when the server stops advertising multichannel (MC) capability.
-+ */
-+int smb3_update_ses_channels(struct cifs_ses *ses, struct TCP_Server_Info *server,
-+			bool from_reconnect, bool from_reconfigure)
-+{
-+	int rc = 0;
-+	/*
-+	 * If the current channel count is less than the new chan_max,
-+	 * try to add channels to reach the new maximum.
-+	 * Otherwise, disable or skip extra channels to match the new configuration.
-+	 */
-+	if (ses->chan_count < ses->chan_max)
-+		rc = cifs_try_adding_channels(ses);
-+	else
-+		rc = cifs_chan_skip_or_disable(ses, server, from_reconnect,
-+						from_reconfigure);
++	//resetting default values as remount doesn't initialize fs_context again
++	ctx->multichannel_specified = false;
++	ctx->max_channels_specified = false;
 +
-+	return rc;
++	return 0;
 +}
 +
- static int
- smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	       struct TCP_Server_Info *server, bool from_reconnect)
-@@ -355,8 +382,8 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	 */
- 	if (ses->chan_count > 1 &&
- 	    !(server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
--		rc = cifs_chan_skip_or_disable(ses, server,
--					       from_reconnect);
-+		rc = smb3_update_ses_channels(ses, server,
-+					       from_reconnect, false /* from_reconfigure */);
- 		if (rc) {
- 			mutex_unlock(&ses->session_mutex);
- 			goto out;
-@@ -438,8 +465,9 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 			 * treat this as server not supporting multichannel
- 			 */
+ static void smb3_fs_context_free(struct fs_context *fc);
+ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 				       struct fs_parameter *param);
+@@ -785,6 +826,7 @@ static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
+ 		if (ret < 0)
+ 			break;
+ 	}
++	ret = smb3_handle_conflicting_options(fc);
  
--			rc = cifs_chan_skip_or_disable(ses, server,
--						       from_reconnect);
-+			rc = smb3_update_ses_channels(ses, server,
-+						       from_reconnect,
-+						       false /* from_reconfigure */);
- 			goto skip_add_channels;
- 		} else if (rc)
- 			cifs_tcon_dbg(FYI, "%s: failed to query server interfaces: %d\n",
-@@ -451,7 +479,8 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 			if (ses->chan_count == 1)
- 				cifs_server_dbg(VFS, "supports multichannel now\n");
- 
--			cifs_try_adding_channels(ses);
-+			smb3_update_ses_channels(ses, server, from_reconnect,
-+						  false /* from_reconfigure */);
+ 	return ret;
+ }
+@@ -1296,15 +1338,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		ctx->nodelete = 1;
+ 		break;
+ 	case Opt_multichannel:
+-		if (result.negated) {
++		ctx->multichannel_specified = true;
++		if (result.negated)
+ 			ctx->multichannel = false;
+-			ctx->max_channels = 1;
+-		} else {
++		else
+ 			ctx->multichannel = true;
+-			/* if number of channels not specified, default to 2 */
+-			if (ctx->max_channels < 2)
+-				ctx->max_channels = 2;
+-		}
+ 		break;
+ 	case Opt_uid:
+ 		ctx->linux_uid = result.uid;
+@@ -1440,15 +1478,13 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		ctx->max_credits = result.uint_32;
+ 		break;
+ 	case Opt_max_channels:
++		ctx->max_channels_specified = true;
+ 		if (result.uint_32 < 1 || result.uint_32 > CIFS_MAX_CHANNELS) {
+ 			cifs_errorf(fc, "%s: Invalid max_channels value, needs to be 1-%d\n",
+ 				 __func__, CIFS_MAX_CHANNELS);
+ 			goto cifs_parse_mount_err;
  		}
- 	} else {
- 		mutex_unlock(&ses->session_mutex);
-@@ -1105,8 +1134,7 @@ SMB2_negotiate(const unsigned int xid,
- 		req->SecurityMode = 0;
+ 		ctx->max_channels = result.uint_32;
+-		/* If more than one channel requested ... they want multichan */
+-		if (result.uint_32 > 1)
+-			ctx->multichannel = true;
+ 		break;
+ 	case Opt_max_cached_dirs:
+ 		if (result.uint_32 < 1) {
+@@ -1866,13 +1902,6 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		goto cifs_parse_mount_err;
+ 	}
  
- 	req->Capabilities = cpu_to_le32(server->vals->req_capabilities);
--	if (ses->chan_max > 1)
--		req->Capabilities |= cpu_to_le32(SMB2_GLOBAL_CAP_MULTI_CHANNEL);
-+	req->Capabilities |= cpu_to_le32(SMB2_GLOBAL_CAP_MULTI_CHANNEL);
+-	/*
+-	 * Multichannel is not meaningful if max_channels is 1.
+-	 * Force multichannel to false to ensure consistent configuration.
+-	 */
+-	if (ctx->multichannel && ctx->max_channels == 1)
+-		ctx->multichannel = false;
+-
+ 	return 0;
  
- 	/* ClientGUID must be zero for SMB2.02 dialect */
- 	if (server->vals->protocol_id == SMB20_PROT_ID)
-@@ -1312,8 +1340,7 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+  cifs_parse_mount_err:
+@@ -1955,6 +1984,8 @@ int smb3_init_fs_context(struct fs_context *fc)
  
- 	pneg_inbuf->Capabilities =
- 			cpu_to_le32(server->vals->req_capabilities);
--	if (tcon->ses->chan_max > 1)
--		pneg_inbuf->Capabilities |= cpu_to_le32(SMB2_GLOBAL_CAP_MULTI_CHANNEL);
-+	pneg_inbuf->Capabilities |= cpu_to_le32(SMB2_GLOBAL_CAP_MULTI_CHANNEL);
+ 	/* default to no multichannel (single server connection) */
+ 	ctx->multichannel = false;
++	ctx->multichannel_specified = false;
++	ctx->max_channels_specified = false;
+ 	ctx->max_channels = 1;
  
- 	memcpy(pneg_inbuf->Guid, server->client_guid,
- 					SMB2_CLIENT_GUID_SIZE);
+ 	ctx->backupuid_specified = false; /* no backup intent for a user */
+diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
+index b0fec6b9a23b..7af7cbbe4208 100644
+--- a/fs/smb/client/fs_context.h
++++ b/fs/smb/client/fs_context.h
+@@ -294,6 +294,8 @@ struct smb3_fs_context {
+ 	bool domainauto:1;
+ 	bool rdma:1;
+ 	bool multichannel:1;
++	bool multichannel_specified:1; /* true if user specified multichannel or nomultichannel */
++	bool max_channels_specified:1; /* true if user specified max_channels */
+ 	bool use_client_guid:1;
+ 	/* reuse existing guid for multichannel */
+ 	u8 client_guid[SMB2_CLIENT_GUID_SIZE];
 -- 
 2.43.0
 
