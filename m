@@ -1,71 +1,92 @@
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACEB30C601
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 12:10:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA0B3321B8
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 12:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763467804; cv=none; b=ICgwMzB8Z69CTFEEzup8xkcKlMlD2soEj2hI16oehGHCHl90sFpM9KUdICFFqyB86TwKY5t13o8/E08BEGBVEeNxxfl3vgoNB2pxYAx+bdmG7JLF6ENIYt/85sDhdxYSQyu8BzyU/hwvS6RMBd4CSvSijsohhcbUKqshRmVPvRQ=
+	t=1763468801; cv=none; b=biDi0M27kEE/dlIOkSRyj6W3IEPKseUJ5SoC+9EK3e0+9K4A3GiJ0JTdsCmO6iX4SA3pZDq/oMUluwoT5bLOib6MVUTaB0+ESW5GiRNpifPn2ZL/NPt7DV+45V/oJUexiKyQFEGAWvsnozEcrRWN6V86ybGswpeUwdchuhxnLZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763467804; c=relaxed/simple;
-	bh=byOcPlpdfvk0F7G82i47iQoMRnYJcyJOzxrJGAhJmoc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=qKjf7qLOplDTmfoIHLzD3JK015TqQ5a+plVKAhQSefypGbZeOPZXyheo8a+RLspBXSk5cwGlyP5JKlmUeDNoXk+MbghXUgJBPU6XuiO/rQI+4HztP5BhnA1iBFxIa8cj2QmE0g3LUvjBixWf3WUoGjJpubRZvGw72sjA9I12lAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-945c705df24so643829539f.0
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 04:10:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763467802; x=1764072602;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WLYt9N5wQEgzJ53nVxRgAlq1RG3P9zclJt9kSY9Tg+c=;
-        b=SkFVaNU8wk9RJThzjyVBEYggA/dDzmanvYPpJLaiMf5mfnggJOrZFq1sY5jadY5xXV
-         ftb5ZUiwoOIBRCKPdShBmTkZ8aHfROFzsXI6yTxDHmdM8bRzGeJJDywtlWwEqJ0VGhkb
-         dWM4vgHWw1iUSaYXaR3Fdm36wo9pl+dgsndIKEjoNhh3EitMzpz/xxPKwvo8P3lPasXb
-         vZPO1dj1Cbu6ntTqlA4GWfzSOVG6OFeI9fbaweltjJhkCOE0ENhFsVg/0Y34e9ivPoRo
-         hTEODB1k7QsSfTcpSbhPg2/BHLeJfdmLGhjhwjdxl3blMjGdt7DcCLj/T0Rnip0pgMOD
-         WWLg==
-X-Gm-Message-State: AOJu0YxWPgfHJYU1O4kG2dM4Qq656FXrmqbgd2HTQ+SfD45fbABpOx/i
-	klmytr76+CniTwlN8Hrln/Ra08dvSQYFCvxSLAhRa8ZeQvsylqM03Mu/iR03arSgfg9QmaZu3LP
-	lAC4A4BN3Xi0W8Fh4PiAiEPxLeFEXYwfsPj9NLoI0SSQtC2Y8AvcNf0TgHfc=
-X-Google-Smtp-Source: AGHT+IFb7fBUTN7mHre+rofh8ByeSd9ZzD0uow69Y9Cdo12E0VhEzZTG1Rgv0FbZcjT6dmdolGRC/nWJOaQ438e9U0/MGwMOYstp
+	s=arc-20240116; t=1763468801; c=relaxed/simple;
+	bh=3rX/VqHJTgtzHNXtIEjSPz09uqlbGRqTFLwySHR1ZsY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Moq7jXA+IYJB34u1jN5xov3zyIBXWpPMrR+IP6185zA9mc6dglhCF+8tHlpE1fykvBAS5yHeYsNbwcFO+4BM+O+aF+bdsvNJ29x4MHTUZ09zlH8imiP1bsXsQlbw1gJMHD0ipAWDkn4koLuhaEmWcc2GrvXDvlwn4+FLx92dPYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YbZQeBju; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YbZQeBju"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763468797;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LSY+cUwPd3WWpMvF8AQl/Mq19oCMrQP4VSfGWu/D1ek=;
+	b=YbZQeBjundcW3Qbn+o3x4rzYXdplZ4KyxwjrnIXmLbtP6Y7Ath46rLEyY7aguobrmI1+kn
+	JEuKCqR7UZxTIFOSuaPaS+rTSl2Kxru4ELMN216j9X7+4IEB941+a84btaEyMP1EDcf875
+	Qzn0YrmeWQ2B99lOaBXJGNn6gK5zfqs=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ksmbd: Replace strcpy + strcat with scnprintf in convert_to_nt_pathname
+Date: Tue, 18 Nov 2025 13:25:56 +0100
+Message-ID: <20251118122555.75624-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a63:b0:433:3060:f5b with SMTP id
- e9e14a558f8ab-43592e03999mr31824505ab.12.1763467802111; Tue, 18 Nov 2025
- 04:10:02 -0800 (PST)
-Date: Tue, 18 Nov 2025 04:10:02 -0800
-In-Reply-To: <8819ae8c-93b8-4942-871d-a821359ca625@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <691c621a.a70a0220.3124cb.00c3.GAE@google.com>
-Subject: Re: [syzbot] [cifs?] memory leak in smb3_fs_context_fullpath
-From: syzbot <syzbot+87be6809ed9bf6d718e3@syzkaller.appspotmail.com>
-To: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ssranevjti@gmail.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello,
+strcpy() is deprecated and using strcat() is discouraged; use the safer
+scnprintf() instead.  No functional changes.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Link: https://github.com/KSPP/linux/issues/88
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ fs/smb/server/misc.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-Reported-by: syzbot+87be6809ed9bf6d718e3@syzkaller.appspotmail.com
-Tested-by: syzbot+87be6809ed9bf6d718e3@syzkaller.appspotmail.com
+diff --git a/fs/smb/server/misc.c b/fs/smb/server/misc.c
+index cb2a11ffb23f..86411f947989 100644
+--- a/fs/smb/server/misc.c
++++ b/fs/smb/server/misc.c
+@@ -164,6 +164,7 @@ char *convert_to_nt_pathname(struct ksmbd_share_config *share,
+ {
+ 	char *pathname, *ab_pathname, *nt_pathname;
+ 	int share_path_len = share->path_sz;
++	size_t nt_pathname_len;
+ 
+ 	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+ 	if (!pathname)
+@@ -180,15 +181,15 @@ char *convert_to_nt_pathname(struct ksmbd_share_config *share,
+ 		goto free_pathname;
+ 	}
+ 
+-	nt_pathname = kzalloc(strlen(&ab_pathname[share_path_len]) + 2,
+-			      KSMBD_DEFAULT_GFP);
++	nt_pathname_len = strlen(&ab_pathname[share_path_len]) + 2;
++	nt_pathname = kzalloc(nt_pathname_len, KSMBD_DEFAULT_GFP);
+ 	if (!nt_pathname) {
+ 		nt_pathname = ERR_PTR(-ENOMEM);
+ 		goto free_pathname;
+ 	}
+-	if (ab_pathname[share_path_len] == '\0')
+-		strcpy(nt_pathname, "/");
+-	strcat(nt_pathname, &ab_pathname[share_path_len]);
++	scnprintf(nt_pathname, nt_pathname_len,
++		  ab_pathname[share_path_len] == '\0' ? "/%s" : "%s",
++		  &ab_pathname[share_path_len]);
+ 
+ 	ksmbd_conv_path_to_windows(nt_pathname);
+ 
+-- 
+2.51.1
 
-Tested on:
-
-commit:         e7c375b1 Merge tag 'vfs-6.18-rc7.fixes' of gitolite.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1399f212580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f30cc590c4f6da44
-dashboard link: https://syzkaller.appspot.com/bug?extid=87be6809ed9bf6d718e3
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=1129f212580000
-
-Note: testing is done by a robot and is best-effort only.
