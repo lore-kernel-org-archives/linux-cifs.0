@@ -1,101 +1,72 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08AAC3081D0
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 08:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F0A268C42
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 09:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763456346; cv=none; b=gtGrMKLJBykb0QEa7RF8qmoQH8AX4pw1G1RNIFRharaaf6jWgQRZqyZsSNEaSEa6mt4LxbYDMLdmEnFBAnSWGvKrDJ0jhjmteY0sYE/cA2iDs+kif+j6V5bXIS1PD0GffV14LhlZzuJxjoYcgNoZF3yKe6knwnVNG2RgWHmRWpA=
+	t=1763459945; cv=none; b=AXopFIUMSa/fG3gDOdCLNyIqVOmOuWoLsa7TFXzAhDDZnTJYiRVodlibfrgYeiyVXKSZg8k5NZv5XQVfidR4wISE6eFnZ1Q9mGWLQp3Q2X1Kbk4neq8vS2uGt+SUtLktheX11sY5DUoZ3djbfBKgTkog6VYhp7YK27z+ZW0rXd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763456346; c=relaxed/simple;
-	bh=x/mAy1pSvtCBQglAzNSwziWbAmyz733c9ABBqKUw2PE=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=S44/HAg8m5R4E1SnMG1Zhn880IOTTdIgAtGqqLpvYogcmC6SMR/bY+q881dN9obfehm/vACgd6y1noQ8leY8KwXHXswnmvz9O+3icg5EgtbNlhRy/AwAfweaRX3dlemCRVV0Z3E+PltyICBM3tRcIxzsAPVT0FBVhqTwmzj7aqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OZVQiB7p; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OZVQiB7p"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2984dfae043so49637965ad.0
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 00:59:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763456344; x=1764061144; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language:subject
-         :references:cc:to:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KUmPskdfxU4Pzdy7Qbg/7BrxTe0Dl4lbyRxjql3bTZg=;
-        b=OZVQiB7pmd2G1YgOOVT4FWxMKnFDfMT7SvrFHiAiF5sclB2QJV31LHQtUuEzDmCzez
-         uN7v3XL4CUU4+UHY0o2u0o9cU0+Smb6o/ZRCKZDLxaPAs70SN8LnMgSHIg7DS9vE4DHH
-         Q7YWNO1vuiK3xJrPCdh1uCp/Ek2yxmnp/k1djsW31nkWoAS2/oO23Y31nKB4jasKNtZD
-         Kb9/3aB4B+POxv3YeERhlinuqTbbEq/SgKz9vF3n9uzmt2wZYtsOdm4RwF2p6lMZUJTl
-         Ssg3/YQffCZO9YzISt+emnEsiU7KArVdGJuDHTKSKO6vYOHlkjskiOtIo5EnlBicpdp7
-         Gc0Q==
+	s=arc-20240116; t=1763459945; c=relaxed/simple;
+	bh=eYVK5tHF99gmNVBpMrLKs0ClXmamXMM467i2roKtSIc=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Yq09YY+D6V9m/x8Uw3WeuUw9vQEfmMPzcubYyYsvwV7MCxGohUepYgQTI6/i3U64fwEwC0hCU1lUbkhEgB462nqJsbsCI5ggT31nAloKd9zzfdO0HqDGOSgmFptO5fMf4j2mDbv5IxrKttCUFbqp/ePOWNxRGxprHhE3co18oiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-9486c2da7f6so445782039f.2
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 01:59:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763456344; x=1764061144;
-        h=content-transfer-encoding:in-reply-to:from:content-language:subject
-         :references:cc:to:user-agent:mime-version:date:message-id:x-gm-gg
+        d=1e100.net; s=20230601; t=1763459943; x=1764064743;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KUmPskdfxU4Pzdy7Qbg/7BrxTe0Dl4lbyRxjql3bTZg=;
-        b=lMglkNiXqlTrbgMj8Y+7HKlDvk1LruJVKRDXqBdPMDyOGknr+nfAULsNZXv49fbpzG
-         LB7KkAZx/GB3d+dDm8l8AQEG/9+jCZ3+yiqGm3WIYLDbQNEfGP50qthyQOyUpDoOFczL
-         K9ejDpWU0slAcOn4QF6+Jzb9xA3YjgFaAfvOIao1Kofj0dq8laVk0hjp9SyZsI1vqZhO
-         nrVHcZ7t6Qot5ztDSpqDbT2ug0P/Hiz4kb5emUgucuK1rpby18QdsM+8X1xzmci9JujK
-         vtc/7iMmM+0o6B6rs45hnjVH3REBUmCh9f2obvJjmenBj5z+Wbh3TltNjyFFK8SS+sYw
-         AIvg==
-X-Gm-Message-State: AOJu0YzAK73Q5VQboakz10QgQHucD8eZ0JWyncO6tgnpVio25jTiKi+x
-	SjmHthuPP+hnx0nYqqM6T6Dl9yGruBe3oP72m2yQFEsqBRlc+RCToGRV6F/1dA==
-X-Gm-Gg: ASbGncu3rcnwGLjmI6HB7iopVXf8hCCq3lTBBT3zjC8ZhPazZApj+8Z2InORxIPHTSt
-	NdcjUWsq80JMImQPQVWEJpUBf4ZXyBm5RTvo+ptfa5e2bGlOyGN+vn7lHLErC5fwEZjC0G8JuKU
-	T45o17pwj1NVK/64S9U5yOXhHpVps0n17k0XjUIZUhENW8e6K+nfjMaIae9U/YAlKhGzmHLkC68
-	dzMzgFKWm13x7Szz49l6MkKJ0GW9V8y88DikP90CcV3G0vnZ/kX7neQf536H6gY//sc2+NJC/Qw
-	/wRv5bnPCpVR7XupN7udc2Gu1UKeL1d0ZHCWi16kFNjbBKuaWskcJKMZGf9UfLom3Ih349a6MEl
-	Ca2nBqfMKd6ymp4jFiAVKap4rCVujsUTeXdZ1m4/7BgA0/CHJdlsl6RhwHOwLO7XZZUQt/0T9AB
-	09NAn4NuJjW6B672jYsVTNbK+M745Fu/wlwodR1h9OH5WWT1NZz+PH7iiGEA+ZlA8=
-X-Google-Smtp-Source: AGHT+IHgh6PA6G1apHM+ako1vThMywJAXh+PHpqQQ44eccqRbaXMC9mM8B44cHmHC93roIZ9Q9hyzA==
-X-Received: by 2002:a17:902:e551:b0:295:6427:87e4 with SMTP id d9443c01a7336-2986a750a0emr193171945ad.40.1763456344102;
-        Tue, 18 Nov 2025 00:59:04 -0800 (PST)
-Received: from ?IPV6:2405:201:31:d869:97fc:5352:f5a:57af? ([2405:201:31:d869:97fc:5352:f5a:57af])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c249806sm165613565ad.44.2025.11.18.00.59.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Nov 2025 00:59:03 -0800 (PST)
-Message-ID: <01e16af7-4f76-40eb-89c2-79386850d756@gmail.com>
-Date: Tue, 18 Nov 2025 14:28:59 +0530
+        bh=1F4+39iWa7k+l/mpdoL1DzhX7KHVuD11tR9zgOHCaaQ=;
+        b=j1kGS3Uu/nNm9Tw8iCld5krnfIWmMKNKVGRgq4y0kF/0V+wkkH1g6vVOimucxUUlIb
+         +/6F1ukwzCYEHKSgxkQkRnhRVeG8RosuSHKku+ksBCwfVY80l5BMfdSS9YKmyKsrQEXa
+         Q+B8VAAZAuXMk7vIcnF3BKR6B6MyX5kOMyEAlbXDsKIQwM1gd0TSyIAK5ZA88yM58H2w
+         uhInFsx5ZO6F8CWJFQnDw0uOFrwNmDBIn9b+eYU0jpF3rEzUWkZKpIBUWbjItT8cuBJt
+         y5HzPl/v4E1CHkcWTNZpQM7JcSCQNZiFapAx+U5nD0DNb8QwAx2hyJ8rCLGSjaFyqxgV
+         G2GQ==
+X-Gm-Message-State: AOJu0YzpOq2mWJdfra342W7QDFz3EeoQnD3QroqwIWok/2bd1Q/opTV5
+	MzvJYXWFM83qHGA3UagEYFjZCd/66AJk0D2VT19nZa5q6HiVbvHkpZMXmNVtrGvL6nuGphuq7FU
+	r0+7lnlfAmzd5+z79j+UWVtHSd3EESpZOO8ag0WsVlZqHJ4E+c/HLAuQbOSg=
+X-Google-Smtp-Source: AGHT+IFxmJyfGpkCxNxDKj46b5OXv0hf66FZ5sG8bVy+N0TB/Pp+7i6SvLsOu4Hc82BFBH65R8WV1kArk7debQf/sKeUXsjNrzhM
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: syzbot+87be6809ed9bf6d718e3@syzkaller.appspotmail.com
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com
-References: <69155df4.a70a0220.3124cb.0016.GAE@google.com>
+X-Received: by 2002:a05:6e02:1a26:b0:433:1e9b:61de with SMTP id
+ e9e14a558f8ab-4348c93f13cmr160188085ab.24.1763459943435; Tue, 18 Nov 2025
+ 01:59:03 -0800 (PST)
+Date: Tue, 18 Nov 2025 01:59:03 -0800
+In-Reply-To: <01e16af7-4f76-40eb-89c2-79386850d756@gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <691c4367.a70a0220.3124cb.00ba.GAE@google.com>
 Subject: Re: [syzbot] [cifs?] memory leak in smb3_fs_context_fullpath
-Content-Language: en-US
-From: shaurya <ssranevjti@gmail.com>
-In-Reply-To: <69155df4.a70a0220.3124cb.0016.GAE@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: syzbot <syzbot+87be6809ed9bf6d718e3@syzkaller.appspotmail.com>
+To: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	ssranevjti@gmail.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-#syz test: 
-git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+Hello,
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 0f894d09157b..975f1fa153fd 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1834,6 +1834,12 @@ static int smb3_fs_context_parse_param(struct 
-fs_context *fc,
-      ctx->password = NULL;
-      kfree_sensitive(ctx->password2);
-      ctx->password2 = NULL;
-+    kfree(ctx->source);
-+    ctx->source = NULL;
-+    if (fc) {
-+        kfree(fc->source);
-+        fc->source = NULL;
-+    }
-      return -EINVAL;
-  }
+syzbot tried to test the proposed patch but the build/boot failed:
+
+failed to apply patch:
+checking file fs/smb/client/fs_context.c
+patch: **** unexpected end of file in patch
+
+
+
+Tested on:
+
+commit:         e7c375b1 Merge tag 'vfs-6.18-rc7.fixes' of gitolite.ke..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cb128cd5cb439809
+dashboard link: https://syzkaller.appspot.com/bug?extid=87be6809ed9bf6d718e3
+compiler:       
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=125ef212580000
 
