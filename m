@@ -1,172 +1,199 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44642D77E3
-	for <linux-cifs@vger.kernel.org>; Mon, 17 Nov 2025 23:04:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85728134CF
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 00:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763420680; cv=none; b=ovgjRdJ/D37K8sigs4eTn92f5jNgHj0xtQqHsYN6VyykRh5aK9CDMgCwCtCaHbgK6ZcsEfIzTsijU0oQ6OwgQtPCSN5frxcv5stC9Dhmiflk6OBV4zQTM2iKpu+i00rrZBdkEd0GGH4u0lEiUO4q/N4DWPRL5vWQjog6ga+dPTY=
+	t=1763426317; cv=none; b=T31WdAB/ATqqoMh1saCAJT4jz0zX1NMhoxFXsU/sbQJPtxSMZVUumOJsRNpv7v3Y2vxQR0+xmooEjzwe0bTgr7JmsAnG8SGXRCmrIR4VHweI50S1pdU+HGzBsY3q0cNC3q7iYZtOEsFmwE0ulDYblqLQB2QZt/NuVIA6xpGnzK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763420680; c=relaxed/simple;
-	bh=i7DdhnG71ftd4i2m2G21HgRfKhN3UzNnHz1O3MhLXC4=;
+	s=arc-20240116; t=1763426317; c=relaxed/simple;
+	bh=NolSpxAFx7Iuz5gCYUMQIMohSXdycGVAKp4PbTIGcc4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GhgxNwynN3LSe3ccJC8M+FwAKCPRSFhL6xFzfaRpjwcDH+dBqYw7YYiH48WHZeYM6jWg56a4jwxwaFTrRD7gUj8yqBpr01BrZjvAXEEDkCoHiW2g8uf4DcVNdWNNFknPSUpKYsttIoTkDgjrkPc2+Si861fFF/zXrlxaAdXpTQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=YmjZq2vE; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	 To:Cc:Content-Type; b=TcSnt3v0/s9vnezP3ew5P6grTQbZIBXZucwGwxhX4e5LDRncWeWsYhaDrZ0GK5unhM56Mws4g0+f9waAaooLSTstkqH52U69/jxvJhIgl+faHRJ+nI/a15sKdfhNr8vgzUl7LB4BcOipi862rbcaAntBXEyFnYl+qnuWl6mCQts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CDf+4Nqo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="YmjZq2vE"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-340bb1cb9ddso4124646a91.2
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Nov 2025 15:04:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1763420676; x=1764025476; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=67DqjyCI/JhVTsF1ULoiPuOUOphLY2mp3g5O7RzL6g8=;
-        b=YmjZq2vEP3RrKkuynMuBECfzV/qmuCZcW2k5SrDDwNLrBwCjhC9leZeksspqC9Reg5
-         7m1qs16aYUYUzMy31VgnfaRfQ925KDC/Wf0JDl3vg/7PHxxunMH/Nn6A8qpdHIeOgmKF
-         SSalfOtnM6+aKcPi/R1diKoX6mzhOZoLeEgbC5txiQiK8mFtldLoRKhJhxkJw2YYx59r
-         W0OtXAGkR5gvdztwjWl9g4n1k7D8tVL8dwrwiXVcU0tTMTY3u4bltrQMVL5eUp5spcvr
-         GNGswPZEV3ZLiPG9FXx0fVQEcWAztc4A7KBMY/KmU8D+TNzUS8SypFep3kDas3TIZnAY
-         J+LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763420676; x=1764025476;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=67DqjyCI/JhVTsF1ULoiPuOUOphLY2mp3g5O7RzL6g8=;
-        b=VqDcKHaQaJuXRWJOOfaV72UvNZRLAfJiAVK5UnKs5RROH756c+tjKJOYTaroFZtuB6
-         D7AkWOR+oidTjJ1rFr+COONWmyyhnmc2O9q3VEO2uC/aZZ+huZUoL6wsi8O+VQhJkZwv
-         2/ETFc/BIgP+C2qNxqLFoO2QryxoYLRQ0regiTzug2NKPq780mM5Qe7MdMnhFq9H76PL
-         uj4GAmJxsJOiLG8U3jGpv48xzd4Xa4G638jmrSABxuRp5UFmnHFr93tlturkkKEoj6rd
-         2BFI2oXm90atCdz/XW++8gQ49QESTB66mU11UHRru3isnRQZoQrqL2cOdX38EeMAA63o
-         tHag==
-X-Forwarded-Encrypted: i=1; AJvYcCWcGxqYE2SJc3HIhx5kFIz0WitCn8wBR+FIp80Lw5CYBP5rPvnXO/1zKe8MOzXqmbBeNtHf6ulHDnTA@vger.kernel.org
-X-Gm-Message-State: AOJu0YwccSpcQkCw/AIml2JSw22zzaH6jnZlyahUBZoyKsqtSfE6MU60
-	mt9xxKeNktLGR2ivbSzw/lFXAbM0llqTPlGHKrutxKxq6wsw8Ua1yT0E5Peqkku/Bw/TuzXe3Lk
-	6tKoqpUdZDi5UmP08q+PAjKoc6BLSk6Yy0ESUDJYu
-X-Gm-Gg: ASbGnctyiO+ejlJBmMTf4JbthKnBoEyG8frP+Jnbw7WVlhHrHgc/ul4eUA3Fo+wOsCP
-	ABEEU0lQ8mRZRgipxW0ATReQqg9AXRQUG6+3AFO55t6XLij4uCmRHDk7uDXCFQ28BV8wZPt3AQF
-	fy68AA4cSuXQsywrvnTwoevbDy+HMni36v9vJhKWemRKlNXMgnztYA/tAiAWVL/4X+1QYEkt+NN
-	PKFDT6kY4cxXTP8XB81Bia8KunZl+pQxBDY2CbUnrt4h9yoNOYweZnuXqFUXAu8JqOY5VxRT0fI
-	In40Og==
-X-Google-Smtp-Source: AGHT+IEvNsvH0S9IPXXRMbbmgzHTccG9PPI2nYN0bRiYDZkjLr7eZa3zFcl2Aq+G2oZCl+9tdbOi4J//UzL45yvj1Lw=
-X-Received: by 2002:a17:90b:3a45:b0:341:2141:d809 with SMTP id
- 98e67ed59e1d1-343fa74b235mr16121302a91.26.1763420676475; Mon, 17 Nov 2025
- 15:04:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CDf+4Nqo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6C46C2BCB0
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 00:38:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763426317;
+	bh=NolSpxAFx7Iuz5gCYUMQIMohSXdycGVAKp4PbTIGcc4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=CDf+4NqomrffDvPLiVJsDam/m07z3cULuu/i8K4yWHYMnxLU81yIn9FZX4x63kLnx
+	 j/0iLMRTu8LF4lljwr+m8c+crCF/QO+5DwDFPmzS598tiEiVG3aoN7IaCTcrjTcpbM
+	 ZdYOjYbImioGwCgRYEX6j1R7a+nR4rUgCipVMGLLSbKKQUi7uXzaoTg+th7Iee8Ujt
+	 YXLO5qtDh5XUlhC/c9qNOLGxrdIKOa23YsATilY9KKV6vJv80CyGEWci/maviPC/nG
+	 DhBD2G2aqQsOAuxlQxYoeMnpfCI9JLdE274Kdkc1zpR59FSoCb+gZs8Z9H8xhFzzJ8
+	 D8iky/hbjMogw==
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-644f90587e5so1047701a12.0
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Nov 2025 16:38:36 -0800 (PST)
+X-Gm-Message-State: AOJu0YyMyVaftzhFbIyIOSW3botnh79EivuT7xWIiyyBJ9PyrsQ/m0xk
+	FRK9GBik/+m7HTuF6OSco0hVXNXyIWf/7omV8Q+g+phlxOTlsF49Xp17Q4cnEtRxGT505Q14Ooc
+	iL8NRpvRheNKu72sLFVZhaq6yOhp7Nnw=
+X-Google-Smtp-Source: AGHT+IFhYhdZfg+EyLBQWS9JaaUh5/lknYe6+2nwQ03IgZpJZiVq93TNcBtNcRUVL6juI4D3Oiah1Z78XOeQL2ivnig=
+X-Received: by 2002:a05:6402:4603:b0:640:f974:7629 with SMTP id
+ 4fb4d7f45d1cf-64350e225e0mr13649663a12.15.1763426314754; Mon, 17 Nov 2025
+ 16:38:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251113002050.676694-1-neilb@ownmail.net> <20251113002050.676694-13-neilb@ownmail.net>
-In-Reply-To: <20251113002050.676694-13-neilb@ownmail.net>
-From: Paul Moore <paul@paul-moore.com>
-Date: Mon, 17 Nov 2025 18:04:25 -0500
-X-Gm-Features: AWmQ_blmwKtGFLQfMeJ-bOJqBB1-xlrqHYzasnjIoux8218WIXniQF0qawaCUpA
-Message-ID: <CAHC9VhQERRrabQhMUd3DHRg+TqV6Ztoo0kqwK_tn5u--in-f4Q@mail.gmail.com>
-Subject: Re: [PATCH v6 12/15] Add start_renaming_two_dentries()
-To: NeilBrown <neil@brown.name>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	Amir Goldstein <amir73il@gmail.com>, Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	Jeff Layton <jlayton@kernel.org>, Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, 
-	David Howells <dhowells@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, Tyler Hicks <code@tyhicks.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Chuck Lever <chuck.lever@oracle.com>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
-	Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Carlos Maiolino <cem@kernel.org>, 
-	John Johansen <john.johansen@canonical.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Ondrej Mosnacek <omosnace@redhat.com>, Mateusz Guzik <mjguzik@gmail.com>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Stefan Berger <stefanb@linux.ibm.com>, 
-	"Darrick J. Wong" <djwong@kernel.org>, linux-kernel@vger.kernel.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org
+References: <20251117185041.1689521-1-aadityakansal390@gmail.com>
+In-Reply-To: <20251117185041.1689521-1-aadityakansal390@gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 18 Nov 2025 09:38:22 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8PqH9KUTFwOL0v5k185u17dh8NB+kphjh15DU3BnNLmQ@mail.gmail.com>
+X-Gm-Features: AWmQ_blIYobcgqg5mioS3yoq5jz5HqgaGVkw9YwJGA8YQwOx6YCXzBJZLbyURfQ
+Message-ID: <CAKYAXd8PqH9KUTFwOL0v5k185u17dh8NB+kphjh15DU3BnNLmQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: implement error handling for STATUS_INFO_LENGTH_MISMATCH
+ in smb server
+To: Aaditya Kansal <aadityakansal390@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 12, 2025 at 7:42=E2=80=AFPM NeilBrown <neilb@ownmail.net> wrote=
-:
+On Tue, Nov 18, 2025 at 3:51=E2=80=AFAM Aaditya Kansal
+<aadityakansal390@gmail.com> wrote:
 >
-> From: NeilBrown <neil@brown.name>
+> Add STATUS_INFO_LENGTH_MISMATCH mapping to EMSGSIZE.
+> Currently, STATUS_INFO_LENGTH_MISMATCH has no mapping to any error code,
+> making it difficult to distinguish between invalid parameters and length
+> mismatch.
 >
-> A few callers want to lock for a rename and already have both dentries.
-> Also debugfs does want to perform a lookup but doesn't want permission
-> checking, so start_renaming_dentry() cannot be used.
+> Map STATUS_INFO_LENGTH_MISMATCH to EMSGSIZE while keeping the EINVAL for
+> invalid parameters. Although the buf_len check only checks for buf_size
+> being less than required, there was no error code for lower buf_size.
+> Hence, EMSGSIZE is used.
 >
-> This patch introduces start_renaming_two_dentries() which is given both
-> dentries.  debugfs performs one lookup itself.  As it will only continue
-> with a negative dentry and as those cannot be renamed or unlinked, it is
-> safe to do the lookup before getting the rename locks.
->
-> overlayfs uses start_renaming_two_dentries() in three places and  selinux
-> uses it twice in sel_make_policy_nodes().
->
-> In sel_make_policy_nodes() we now lock for rename twice instead of just
-> once so the combined operation is no longer atomic w.r.t the parent
-> directory locks.  As selinux_state.policy_mutex is held across the whole
-> operation this does not open up any interesting races.
->
-> Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-> Reviewed-by: Jeff Layton <jlayton@kernel.org>
-> Signed-off-by: NeilBrown <neil@brown.name>
->
+> Signed-off-by: Aaditya Kansal <aadityakansal390@gmail.com>
+Applied it to #ksmbd-for-next-next.
+Please add cc linux-cifs mailing list next time.
+Thanks!
 > ---
-> changes since v5:
->  - sel_make_policy_nodes now uses "goto out" on error from start_renaming=
-_two_dentries()
+>  fs/smb/server/smb2pdu.c | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
 >
-> changes since v3:
->  added missing assignment to rd.mnt_idmap in ovl_cleanup_and_whiteout
-> ---
->  fs/debugfs/inode.c           | 48 ++++++++++++--------------
->  fs/namei.c                   | 65 ++++++++++++++++++++++++++++++++++++
->  fs/overlayfs/dir.c           | 43 ++++++++++++++++--------
->  include/linux/namei.h        |  2 ++
->  security/selinux/selinuxfs.c | 15 +++++++--
->  5 files changed, 131 insertions(+), 42 deletions(-)
-
-...
-
-> diff --git a/fs/namei.c b/fs/namei.c
-> index 4b740048df97..7f0384ceb976 100644
-> --- a/fs/namei.c
-> +++ b/fs/namei.c
-> @@ -3877,6 +3877,71 @@ int start_renaming_dentry(struct renamedata *rd, i=
-nt lookup_flags,
->  }
->  EXPORT_SYMBOL(start_renaming_dentry);
+> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+> index f901ae18e68a..d79a08378965 100644
+> --- a/fs/smb/server/smb2pdu.c
+> +++ b/fs/smb/server/smb2pdu.c
+> @@ -6396,7 +6396,6 @@ static int set_file_mode_info(struct ksmbd_file *fp=
+,
+>   * @share:     ksmbd_share_config pointer
+>   *
+>   * Return:     0 on success, otherwise error
+> - * TODO: need to implement an error handling for STATUS_INFO_LENGTH_MISM=
+ATCH
+>   */
+>  static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file=
+ *fp,
+>                               struct smb2_set_info_req *req,
+> @@ -6409,14 +6408,14 @@ static int smb2_set_info_file(struct ksmbd_work *=
+work, struct ksmbd_file *fp,
+>         case FILE_BASIC_INFORMATION:
+>         {
+>                 if (buf_len < sizeof(struct smb2_file_basic_info))
+> -                       return -EINVAL;
+> +                       return -EMSGSIZE;
 >
-> +/**
-> + * start_renaming_two_dentries - Lock to dentries in given parents for r=
-ename
-
-I'm guessing you meant this to read "Lock *two* dentries ...".
-
-Otherwise the SELinux changes look fine to me.
-
-Acked-by: Paul Moore <paul@paul-moore.com> (SELinux)
-
-> + * @rd:           rename data containing parent
-> + * @old_dentry:   dentry of name to move
-> + * @new_dentry:   dentry to move to
-> + *
-> + * Ensure locks are in place for rename and check parentage is still cor=
-rect.
-> + *
-> + * On success the two dentries are stored in @rd.old_dentry and
-> + * @rd.new_dentry and @rd.old_parent and @rd.new_parent are confirmed to
-> + * be the parents of the dentries.
-> + *
-> + * References and the lock can be dropped with end_renaming()
-> + *
-> + * Returns: zero or an error.
-> + */
-
---=20
-paul-moore.com
+>                 return set_file_basic_info(fp, (struct smb2_file_basic_in=
+fo *)buffer, share);
+>         }
+>         case FILE_ALLOCATION_INFORMATION:
+>         {
+>                 if (buf_len < sizeof(struct smb2_file_alloc_info))
+> -                       return -EINVAL;
+> +                       return -EMSGSIZE;
+>
+>                 return set_file_allocation_info(work, fp,
+>                                                 (struct smb2_file_alloc_i=
+nfo *)buffer);
+> @@ -6424,7 +6423,7 @@ static int smb2_set_info_file(struct ksmbd_work *wo=
+rk, struct ksmbd_file *fp,
+>         case FILE_END_OF_FILE_INFORMATION:
+>         {
+>                 if (buf_len < sizeof(struct smb2_file_eof_info))
+> -                       return -EINVAL;
+> +                       return -EMSGSIZE;
+>
+>                 return set_end_of_file_info(work, fp,
+>                                             (struct smb2_file_eof_info *)=
+buffer);
+> @@ -6432,7 +6431,7 @@ static int smb2_set_info_file(struct ksmbd_work *wo=
+rk, struct ksmbd_file *fp,
+>         case FILE_RENAME_INFORMATION:
+>         {
+>                 if (buf_len < sizeof(struct smb2_file_rename_info))
+> -                       return -EINVAL;
+> +                       return -EMSGSIZE;
+>
+>                 return set_rename_info(work, fp,
+>                                        (struct smb2_file_rename_info *)bu=
+ffer,
+> @@ -6441,7 +6440,7 @@ static int smb2_set_info_file(struct ksmbd_work *wo=
+rk, struct ksmbd_file *fp,
+>         case FILE_LINK_INFORMATION:
+>         {
+>                 if (buf_len < sizeof(struct smb2_file_link_info))
+> -                       return -EINVAL;
+> +                       return -EMSGSIZE;
+>
+>                 return smb2_create_link(work, work->tcon->share_conf,
+>                                         (struct smb2_file_link_info *)buf=
+fer,
+> @@ -6451,7 +6450,7 @@ static int smb2_set_info_file(struct ksmbd_work *wo=
+rk, struct ksmbd_file *fp,
+>         case FILE_DISPOSITION_INFORMATION:
+>         {
+>                 if (buf_len < sizeof(struct smb2_file_disposition_info))
+> -                       return -EINVAL;
+> +                       return -EMSGSIZE;
+>
+>                 return set_file_disposition_info(fp,
+>                                                  (struct smb2_file_dispos=
+ition_info *)buffer);
+> @@ -6465,7 +6464,7 @@ static int smb2_set_info_file(struct ksmbd_work *wo=
+rk, struct ksmbd_file *fp,
+>                 }
+>
+>                 if (buf_len < sizeof(struct smb2_ea_info))
+> -                       return -EINVAL;
+> +                       return -EMSGSIZE;
+>
+>                 return smb2_set_ea((struct smb2_ea_info *)buffer,
+>                                    buf_len, &fp->filp->f_path, true);
+> @@ -6473,14 +6472,14 @@ static int smb2_set_info_file(struct ksmbd_work *=
+work, struct ksmbd_file *fp,
+>         case FILE_POSITION_INFORMATION:
+>         {
+>                 if (buf_len < sizeof(struct smb2_file_pos_info))
+> -                       return -EINVAL;
+> +                       return -EMSGSIZE;
+>
+>                 return set_file_position_info(fp, (struct smb2_file_pos_i=
+nfo *)buffer);
+>         }
+>         case FILE_MODE_INFORMATION:
+>         {
+>                 if (buf_len < sizeof(struct smb2_file_mode_info))
+> -                       return -EINVAL;
+> +                       return -EMSGSIZE;
+>
+>                 return set_file_mode_info(fp, (struct smb2_file_mode_info=
+ *)buffer);
+>         }
+> @@ -6587,6 +6586,8 @@ int smb2_set_info(struct ksmbd_work *work)
+>                 rsp->hdr.Status =3D STATUS_ACCESS_DENIED;
+>         else if (rc =3D=3D -EINVAL)
+>                 rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
+> +       else if (rc =3D=3D -EMSGSIZE)
+> +               rsp->hdr.Status =3D STATUS_INFO_LENGTH_MISMATCH;
+>         else if (rc =3D=3D -ESHARE)
+>                 rsp->hdr.Status =3D STATUS_SHARING_VIOLATION;
+>         else if (rc =3D=3D -ENOENT)
+> --
+> 2.51.1
+>
