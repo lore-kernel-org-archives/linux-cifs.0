@@ -1,87 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A8E944F
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 00:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8771E7C19;
+	Tue, 18 Nov 2025 01:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763427403; cv=none; b=S+TfxNUUXPzgO+yMieOErQksQSGPovr4aQ6tsKekfh60U5IL9tR2PQHuGATF8qPiF/QYRDxYsofZRya708YKTfx7NjUbriRiBLX6O6BkezDp/pTekFnio6JLOdv2dUgz4C5n/FuDK8SJV7mdH7yrG9R+XEy5ksHJGhxFnJLSBtg=
+	t=1763429600; cv=none; b=dDf1d/7Roa/Ub9wedWcv0WejwzEuuvWGkmF02e3A2JJ7B8qb0P9gy6dKGH7Oo5LpoXMThEYCj8fq3KUmWOY8NWCkMz58cuKw5o2h2sr3MbXpHdfgEV6zbK2fWnglBn1piBYGokSVAHklkUsM5AkOeeIK2cbK7LrcoSVUMlCTnTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763427403; c=relaxed/simple;
-	bh=EhRvEKA9wsUl3d/ytkctMCvw+xK5SQChI+CyRvPpfOE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fIP7Suo3lnu77WfNNaIPTVIADjFI19VSyEobdZtyQcFb+7hPMUD8e/hKwHYpYv7mdS03J5UB/lHD0vGk9EzpQKCD8Rv9+wy3EDl3Nrje9QQ7ZKW22ZjY+GdgmUJo2ZNyV6f7hALhEuWXZpI/VFbWYlE1g2MP/XgfRlPZCQnDnu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ToAS+SVl; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ToAS+SVl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D898C4AF0F
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 00:56:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763427402;
-	bh=EhRvEKA9wsUl3d/ytkctMCvw+xK5SQChI+CyRvPpfOE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ToAS+SVl/bh8t3QFNc4lLHfs4jMmOZZyPOUuRWGYLbQpKhQTcwzxksKi7tbG1CboH
-	 UyP5xAWsky08IfHysf9S2B87lOe1boYe2Ri5BMvXMYK+TT5g+Z7E0IQitNSWzFJEJh
-	 kMlOttkyrxqW3M46aUDURjZblV38+MWfwDF376TeOgQo6YohPavVxUCEf77HhE78sU
-	 1scoeSHFy/z36XcHddNKtaqq44bKYeCsEeGcH2feEJLCk86UYvTplFizYgNf4fw0pe
-	 s6eU/DbTj4P7FGeiFguoo9tgKq7Bi0EqNHbddClFw3Bn22kUfqiHTzGVVZbMPaA3zU
-	 EBGiTytuH4ulg==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-64320b9bb4bso4314791a12.0
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Nov 2025 16:56:42 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVJjIaiqFjGdp0YQyCPX3lfx2ghyn9az3ldjdLsVnfqGaH4QBEoMMK3u3zQTT663yjNA9APS4GrtOq7@vger.kernel.org
-X-Gm-Message-State: AOJu0Yybs9S/iHxR5QTWFeUTrZFg4fuQQOGN4RLRKsWDwtdV7tPB7z6K
-	YTdN3/NdApNtdEIvSdJk75EvwCx0fo1OrklzfdrzgIEITlvkJgUcNiHQWNd11RcQFe3rTMwg4b3
-	ldu36bf8DOVh23J5hrNJO4kFNoB46o88=
-X-Google-Smtp-Source: AGHT+IGHUTnsFaxroJyYoH8y0OWDzIYvYpd8iOXYto4bLn5lfNO+9pj1p3pcvuUPzlYEJwzqZeih64KTvmDtDbjKVbE=
-X-Received: by 2002:a05:6402:5256:b0:643:11fc:7115 with SMTP id
- 4fb4d7f45d1cf-644fe9b1b6emr1439615a12.11.1763427400612; Mon, 17 Nov 2025
- 16:56:40 -0800 (PST)
+	s=arc-20240116; t=1763429600; c=relaxed/simple;
+	bh=nrD+5LxC6eXKZN39YsA+YUDUtRJnH0Xkjw5N7cZS/nk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FloucbZb7d/raU+pPzNoS9kYTdx53GmquAxMq6W+/TuWyd81Fi+ozA9GMTvH7CJrt/agqG1pmrBh+EUxVdOB/So5gnFBqEzy5ZorUO8uHL9GXKFASa47hVv+jxVKGieYRrpu3PM9AdSYOQFEHL7x9EYPPvBSRaZwVOqY3YLTbsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-01 (Coremail) with SMTP id qwCowABX7czQzBtpCbwbAQ--.20056S2;
+	Tue, 18 Nov 2025 09:33:04 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: linkinjeon@kernel.org,
+	smfrench@gmail.com,
+	senozhatsky@chromium.org,
+	tom@talpey.com
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH] ksmbd: convert comma to semicolon
+Date: Tue, 18 Nov 2025 09:32:29 +0800
+Message-Id: <20251118013229.283900-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251117112838.473051-1-chenxiaosong.chenxiaosong@linux.dev> <20251117112838.473051-2-chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251117112838.473051-2-chenxiaosong.chenxiaosong@linux.dev>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 18 Nov 2025 09:56:28 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-+aNHGp+DuLudxG63-Ay0GQtLDjk5KR_9APvH2i=c0TQ@mail.gmail.com>
-X-Gm-Features: AWmQ_bkB-oeJ2AAPitGC3UmP8ws-bbjtSAezPOXN5P6U9jzeBubcRjPen2oibVg
-Message-ID: <CAKYAXd-+aNHGp+DuLudxG63-Ay0GQtLDjk5KR_9APvH2i=c0TQ@mail.gmail.com>
-Subject: Re: [PATCH v9 1/1] smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/fscc.h
-To: chenxiaosong.chenxiaosong@linux.dev
-Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org, 
-	christophe.jaillet@wanadoo.fr, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, chenxiaosong@chenxiaosong.com, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowABX7czQzBtpCbwbAQ--.20056S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Gr4rCw4kuw4kuw1xGrW3ZFb_yoWfZFcEgr
+	13Xan7Cr1FqFyFgFs8A3yFyr9Yg34F9r18Jry8tanI9w4Ykrn09rs7tw1kJa13urW3Wr13
+	Kr9Igr4SkFy3ujkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbsxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	JF0_Jw1lc2xSY4AK67AK6w4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0x
+	ZFpf9x0JUJOz3UUUUU=
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-On Mon, Nov 17, 2025 at 8:29=E2=80=AFPM <chenxiaosong.chenxiaosong@linux.de=
-v> wrote:
->
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->
-> Modify the following places:
->
->   - struct filesystem_attribute_info -> FILE_SYSTEM_ATTRIBUTE_INFO
->   - Remove MIN_FS_ATTR_INFO_SIZE definition
->   - Introduce MAX_FS_NAME_LEN
->   - max_len of FileFsAttributeInformation -> sizeof(FILE_SYSTEM_ATTRIBUTE=
-_INFO) + MAX_FS_NAME_LEN
->   - min_len of FileFsAttributeInformation -> sizeof(FILE_SYSTEM_ATTRIBUTE=
-_INFO)
->   - SMB2_QFS_attr(): memcpy(..., min_len)
->
-> Then move FILE_SYSTEM_ATTRIBUTE_INFO to common header file.
->
-> I have tested the relevant code related to FILE_SYSTEM_ATTRIBUTE_INFO (Li=
-nk[1]).
->
-> Link[1]: https://chenxiaosong.com/en/FILE_SYSTEM_ATTRIBUTE_INFO.html
-> Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
-> Tested-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+Replace comma between expressions with semicolons.
+
+Using a ',' in place of a ';' can have unintended side effects.
+Although that is not the case here, it is seems best to use ';'
+unless ',' is intended.
+
+Found by inspection.
+No functional change intended.
+Compile tested only.
+
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+---
+ fs/smb/server/vfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 03fd7409be79..d699fa79acb6 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -699,7 +699,7 @@ int ksmbd_vfs_rename(struct ksmbd_work *work, const struct path *old_path,
+ 	rd.old_parent		= NULL;
+ 	rd.new_parent		= new_path.dentry;
+ 	rd.flags		= flags;
+-	rd.delegated_inode	= NULL,
++	rd.delegated_inode	= NULL;
+ 	err = start_renaming_dentry(&rd, lookup_flags, old_child, &new_last);
+ 	if (err)
+ 		goto out_drop_write;
+-- 
+2.25.1
+
