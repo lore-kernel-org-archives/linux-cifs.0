@@ -1,50 +1,50 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4173375C2
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 11:48:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACEB30C601
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 12:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763466487; cv=none; b=X3ePkxKtOcGDQDrAwwQd3IM2UEhZTTjtaVzEgBCiI+bh7thnp0kRNBOhKPpcIX9XdkX8dXnIhpuGsMFmB+S1Jh8jgAWL7PzyAwwnt37/VO54TCTV0+H019/DaQTM2JCb0kIWaou0X3YXDRs6aGLjAOfp9rt1M9iTU6l2lPdizwE=
+	t=1763467804; cv=none; b=ICgwMzB8Z69CTFEEzup8xkcKlMlD2soEj2hI16oehGHCHl90sFpM9KUdICFFqyB86TwKY5t13o8/E08BEGBVEeNxxfl3vgoNB2pxYAx+bdmG7JLF6ENIYt/85sDhdxYSQyu8BzyU/hwvS6RMBd4CSvSijsohhcbUKqshRmVPvRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763466487; c=relaxed/simple;
-	bh=/jokgqhSAFMekCYYiMc0GS/66+rDx4g6ozF0Oi1fw2Q=;
+	s=arc-20240116; t=1763467804; c=relaxed/simple;
+	bh=byOcPlpdfvk0F7G82i47iQoMRnYJcyJOzxrJGAhJmoc=;
 	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=bh+kpoy6pgn1wsOVGu/WeLn7EF+F5Es9TyC3ljvzyy/ZMGjrLafmpaFjwA2BJkhemCUz8iWE1Bt/Y6qfshXJJDcDvGNimOj93rqyBmhgkI7uD+X4c92nvhvHa/gVS7UAtnXZhxHleRA+GkrFtgEr/UU7LTz/o0v89lxnfvWP0ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+	 Content-Type; b=qKjf7qLOplDTmfoIHLzD3JK015TqQ5a+plVKAhQSefypGbZeOPZXyheo8a+RLspBXSk5cwGlyP5JKlmUeDNoXk+MbghXUgJBPU6XuiO/rQI+4HztP5BhnA1iBFxIa8cj2QmE0g3LUvjBixWf3WUoGjJpubRZvGw72sjA9I12lAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-43329b607e0so60602725ab.2
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 03:48:05 -0800 (PST)
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-945c705df24so643829539f.0
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Nov 2025 04:10:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763466485; x=1764071285;
+        d=1e100.net; s=20230601; t=1763467802; x=1764072602;
         h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7eHg1UJdJJTmlR4Sm8mwISV1t3EoazLR6jPZAk6scl4=;
-        b=D5kfJY9kR+eOgGy2R2clSG4YXgtB31Z1QiKpX1FzkenH7U2G096eLHVYV+qhs/1UIs
-         dAaEbsBNBXkGRJLCFgcicYYlZNqfkOjPgFZQFSQV9a0i/mRpm9NZRlx5GfiQz3dOr/Zk
-         +wJ/uIHdQchf7zxvU6/+NuicIJJSdpOZC2lxLkM+JfQDSdn9CVsFlmJsj0pEco+RlbcZ
-         hsMhJTMW2IbImb4T4WXjv7TSP1GMNffLre9MfRUDpcjprI9IiU9NgokecM4bVmCIWwkE
-         73aQ9+ygvht6V5LF/bswHU8SRd83jaxJQIISNIEcRymdDdQNWMspX/VN5vxpvrGh7I87
-         Yj0g==
-X-Gm-Message-State: AOJu0Yx713XA+rTr8FDy5CZmkyGlwYUEK6zZPAE9qiGW55OHCbYwhHQt
-	wtv5q7XAK3THIjDHQjbbDkRTWVR+1bs+CskRiSgfS39tnjOTxdAulLNH3N2bnzy6+kuoG+H3dH8
-	XUVJe8reEHPg0OuVTqpQHTIIKgGnBujubgP5Nl3v/anorz7xwrnDWEcs1reA=
-X-Google-Smtp-Source: AGHT+IFGo+wGmp9kZSzSscOhyaDWwpIfZs/K9X8BNFV8wmigZyCjilJz1y2ile5XdmhqZRjekvN28+Sru6u2kvqzyYTNDAARqZ5e
+        bh=WLYt9N5wQEgzJ53nVxRgAlq1RG3P9zclJt9kSY9Tg+c=;
+        b=SkFVaNU8wk9RJThzjyVBEYggA/dDzmanvYPpJLaiMf5mfnggJOrZFq1sY5jadY5xXV
+         ftb5ZUiwoOIBRCKPdShBmTkZ8aHfROFzsXI6yTxDHmdM8bRzGeJJDywtlWwEqJ0VGhkb
+         dWM4vgHWw1iUSaYXaR3Fdm36wo9pl+dgsndIKEjoNhh3EitMzpz/xxPKwvo8P3lPasXb
+         vZPO1dj1Cbu6ntTqlA4GWfzSOVG6OFeI9fbaweltjJhkCOE0ENhFsVg/0Y34e9ivPoRo
+         hTEODB1k7QsSfTcpSbhPg2/BHLeJfdmLGhjhwjdxl3blMjGdt7DcCLj/T0Rnip0pgMOD
+         WWLg==
+X-Gm-Message-State: AOJu0YxWPgfHJYU1O4kG2dM4Qq656FXrmqbgd2HTQ+SfD45fbABpOx/i
+	klmytr76+CniTwlN8Hrln/Ra08dvSQYFCvxSLAhRa8ZeQvsylqM03Mu/iR03arSgfg9QmaZu3LP
+	lAC4A4BN3Xi0W8Fh4PiAiEPxLeFEXYwfsPj9NLoI0SSQtC2Y8AvcNf0TgHfc=
+X-Google-Smtp-Source: AGHT+IFb7fBUTN7mHre+rofh8ByeSd9ZzD0uow69Y9Cdo12E0VhEzZTG1Rgv0FbZcjT6dmdolGRC/nWJOaQ438e9U0/MGwMOYstp
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3181:b0:433:7c77:be5a with SMTP id
- e9e14a558f8ab-4348c939ad9mr241364585ab.28.1763466485255; Tue, 18 Nov 2025
- 03:48:05 -0800 (PST)
-Date: Tue, 18 Nov 2025 03:48:05 -0800
-In-Reply-To: <8831475d-0eeb-4107-ad87-c9c8736c219c@gmail.com>
+X-Received: by 2002:a05:6e02:1a63:b0:433:3060:f5b with SMTP id
+ e9e14a558f8ab-43592e03999mr31824505ab.12.1763467802111; Tue, 18 Nov 2025
+ 04:10:02 -0800 (PST)
+Date: Tue, 18 Nov 2025 04:10:02 -0800
+In-Reply-To: <8819ae8c-93b8-4942-871d-a821359ca625@gmail.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <691c5cf5.a70a0220.3124cb.00c1.GAE@google.com>
+Message-ID: <691c621a.a70a0220.3124cb.00c3.GAE@google.com>
 Subject: Re: [syzbot] [cifs?] memory leak in smb3_fs_context_fullpath
 From: syzbot <syzbot+87be6809ed9bf6d718e3@syzkaller.appspotmail.com>
 To: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -53,20 +53,19 @@ Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
-syzbot tried to test the proposed patch but the build/boot failed:
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-failed to apply patch:
-checking file fs/smb/client/fs_context.c
-patch: **** unexpected end of file in patch
-
-
+Reported-by: syzbot+87be6809ed9bf6d718e3@syzkaller.appspotmail.com
+Tested-by: syzbot+87be6809ed9bf6d718e3@syzkaller.appspotmail.com
 
 Tested on:
 
 commit:         e7c375b1 Merge tag 'vfs-6.18-rc7.fixes' of gitolite.ke..
 git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cb128cd5cb439809
+console output: https://syzkaller.appspot.com/x/log.txt?x=1399f212580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f30cc590c4f6da44
 dashboard link: https://syzkaller.appspot.com/bug?extid=87be6809ed9bf6d718e3
-compiler:       
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=17661658580000
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=1129f212580000
 
+Note: testing is done by a robot and is best-effort only.
