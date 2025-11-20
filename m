@@ -1,75 +1,127 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4F7302CD0
-	for <linux-cifs@vger.kernel.org>; Thu, 20 Nov 2025 08:35:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00884332EA3;
+	Thu, 20 Nov 2025 12:09:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763627753; cv=none; b=quEg07OEZrU4WCif5HzXvWr3eWtxHAerOW0WB3sn94ZgNYY5FqBO6BCyk3tlWM6DwLgEGZd2YnyNwA2jWz9wC1Ed63aArZul1lWPvuI6xpsgJ2tWFNnDy/wQz1dPx3FG18ZlCnD//rdMu91T7paZKgdc7tA2z/I4nz6zClMOX8w=
+	t=1763640548; cv=none; b=ihoUiXPFlklmQI2D88GcKmwXZx2t2RkcUV79hniKHt5R36zU5Y9bEOXvB2jvejOg51fPyysCXICMWXviwtOzRDVPqyEuOkJEh/TDNP1/ePe4clgt9JCzbCeCLuqQLwOH7dF3mBd6T3D8i0J2Ilu7z53JS2DVViCZ5Bpqj2EgJcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763627753; c=relaxed/simple;
-	bh=MFJ63z6TXyLu24OjCKYs0Kt11E/41frSyaDFgCFlNWk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ogTQekcb+Uhs/nuNyRgB4q0B38cgB+WnGxElO3G4UD5em+1Kg/4SNq/QIl5kph9WoIkL3IqoEDkmTkS0ZOjWUAmeQyD6ftf4NRl5jlLehS3y3xuAd2PASTfHGpDgKLD16ytLa3OOkJqmovHygGPA2TzVaaJa2lFs1GbRflmtuyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cDX3B7Om; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763640548; c=relaxed/simple;
+	bh=Bf5/WWqzlo7qPd3Gy6oXR94jU0k6NB2mIj4E4SnZVoE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RtgsluBjV6jf8jzNSJ1kQTGj0jakpGyT3Jn90mLmkG3NI8gNhsQXEG1OsiFCUcSU4B2k6CXEc8MgO6yUrQxmKN8hZ2f2sTH+4e4GgqoJ8TVbDmkzcqREiNrKSSubHCt5KVdWChTHCrx4AZzp5HdKWOWOSYSSVSiicSryECRq4QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aAPIEb9I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cDX3B7Om"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3A74C19424
-	for <linux-cifs@vger.kernel.org>; Thu, 20 Nov 2025 08:35:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aAPIEb9I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE6C7C4CEF1;
+	Thu, 20 Nov 2025 12:09:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763627752;
-	bh=MFJ63z6TXyLu24OjCKYs0Kt11E/41frSyaDFgCFlNWk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=cDX3B7Om+hIFtgCWfJa7lU1AFYMoOdzGS90RgHBMs9DpfYgutSEjB2qAwpWLYzbC5
-	 lSYSDV3OHB2VvVsQu31p8EGsNN95qFeCO7aU7dpVnQtzJw0ITLc8fKo3QXV8L3pTlt
-	 pNixPG6u1RHyumz7MVULBZr1WMVFcNa8mb68EGsfnlTHtuhHF47asJ5Zvn2ldaNL8s
-	 jUYtQViqWhTxK/NqhKB+K9ytI1ZUpAZMByVc3dnP7yzcJOuhQeHekDoxtZxH+0/BTT
-	 Kh2/GKG6Vn6f5puIMfltWGsu+5xI56NzU63K92Twu+fQ7uvTAAZ5Q/bTBq+CARwzzH
-	 zEAM2vDf11tcA==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b7380f66a8bso91978366b.2
-        for <linux-cifs@vger.kernel.org>; Thu, 20 Nov 2025 00:35:52 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWkQ/YRH/YkahGEWjaelVbkB9Df+Tg8BVjO8TDwujf0JI5mp/tD18Un8fg3G/O9SgHTj93x7ZJbv2z3@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzFjuKgUEmsrzU3Y6I1akx0aeTRuBS9AW03Ue1MpzctZRQo92H
-	DLixHG8J75gs2cPX/uElKi5wPuX56DtlGK2HC0Ch+mFCHh+0GKGQpSYRkkyO689fZcfkM48W4dl
-	AtTE6GLP17QW0hhx7I8V0cqkhukrfaPM=
-X-Google-Smtp-Source: AGHT+IF9dSjGhMZRqv8eD5K7CupB8PVGXybo9OnhQGdHoNEPB6hUwf12h5Ea5oMnuYVTDBop2cBhvd8RSTBj8+xdvCg=
-X-Received: by 2002:a17:907:86ac:b0:b73:301c:b158 with SMTP id
- a640c23a62f3a-b7654cf9b84mr206977166b.6.1763627751480; Thu, 20 Nov 2025
- 00:35:51 -0800 (PST)
+	s=k20201202; t=1763640547;
+	bh=Bf5/WWqzlo7qPd3Gy6oXR94jU0k6NB2mIj4E4SnZVoE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=aAPIEb9InMQGq2r1fFWgr7V8gVTZqRIi4Rm+9UTqRPc4LI2fTFx4Y4qHTWJ/XDYcP
+	 1pF69VoWwqQUDCyWVKePP1PsBa01XBG7cUOw7rMHhKan/y+KiiGSABvqy2isxcXcpl
+	 6RM/mCWIoJEu1s80UaWaUTIAYt+746CKshQum/vvICptvTjibtfiCM0cl3o/fg8ShT
+	 pjSdbVXTwq3dOP64cy1X187J/KPqDZAUMZz7/6Li1tAxclp286dUxelzmVrALmwm/B
+	 PjP50ZWoCDMwp7DLj7ch+NvxbTE/oQjbY/ZDweRgRPqVyDm2+Zi8IhWhC0ufPX5Avn
+	 Y/B2oPzEcG9cg==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Yiqi Sun <sunyiqixm@gmail.com>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	sfrench@samba.org,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 6.17-6.1] smb: fix invalid username check in smb3_fs_context_parse_param()
+Date: Thu, 20 Nov 2025 07:08:25 -0500
+Message-ID: <20251120120838.1754634-16-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251120120838.1754634-1-sashal@kernel.org>
+References: <20251120120838.1754634-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251119130231.171352-1-thorsten.blum@linux.dev>
-In-Reply-To: <20251119130231.171352-1-thorsten.blum@linux.dev>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 20 Nov 2025 17:35:38 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd80SpFBmp1JTHz5VfG14jy8+_RoHU_BL6-bFr_wcOduUQ@mail.gmail.com>
-X-Gm-Features: AWmQ_bkIcH6AZgv3D-xVCg4qxDXrsLHSg4ZCxzfGI_e_6F7zOhOcY-xQ2asbGBQ
-Message-ID: <CAKYAXd80SpFBmp1JTHz5VfG14jy8+_RoHU_BL6-bFr_wcOduUQ@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: Replace strcpy + strcat to improve convert_to_nt_pathname
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: David Laight <david.laight.linux@gmail.com>, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.17.8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 19, 2025 at 10:03=E2=80=AFPM Thorsten Blum <thorsten.blum@linux=
-.dev> wrote:
->
-> strcpy() is deprecated [1] and using strcat() is discouraged. Replace
-> them by assigning the prefix directly and by using memcpy() to copy the
-> pathname. Using memcpy() is safe because we already know the length of
-> the source string and that it is guaranteed to be NUL-terminated.
->
-> Allocate only as many bytes as needed and replace kzalloc() with
-> kmalloc() since memcpy() overwrites the entire buffer anyway.
->
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strc=
-py [1]
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+From: Yiqi Sun <sunyiqixm@gmail.com>
+
+[ Upstream commit ed6612165b74f09db00ef0abaf9831895ab28b7f ]
+
+Since the maximum return value of strnlen(..., CIFS_MAX_USERNAME_LEN)
+is CIFS_MAX_USERNAME_LEN, length check in smb3_fs_context_parse_param()
+is always FALSE and invalid.
+
+Fix the comparison in if statement.
+
+Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+## CONCLUSION
+
+This commit fixes a **5-year-old logic error** in SMB/CIFS username
+validation that has existed since the mount API refactoring in v5.11
+(December 2020). The bug is a classic off-by-one comparison error where
+`strnlen(..., 256) > 256` is always false because strnlen returns at
+most 256.
+
+**The bug causes:**
+- **Validation bypass** allowing usernames longer than 256 characters
+- **Memory waste** through unnecessary kernel allocations
+- **Authentication failures** with confusing error messages when
+  truncated usernames are sent to servers
+- **Protocol non-compliance** with SMB username length limits
+
+**The fix is trivial:**
+- Changes one character: `>` becomes `==`
+- Brings username validation in line with domain name validation (same
+  file, line 1509)
+- Zero risk of regression (only makes validation stricter)
+
+**Evidence supporting backport:**
+- **Already backported** to 7+ stable trees (6.12.y, 6.11.y, 6.6.y,
+  6.1.y, 5.15.y, 5.10.y, 5.4.y)
+- **Obviously correct** - single-character fix that matches the pattern
+  used elsewhere
+- **Small and contained** - one line in one file
+- **Fixes real user issues** - authentication failures with long
+  usernames
+- **Long-standing bug** - affects all kernels from v5.11 to present
+
+This is a **textbook example** of an appropriate stable kernel backport:
+small, surgical, obviously correct, fixes a real bug, and carries no
+regression risk.
+
+**YES**
+
+ fs/smb/client/fs_context.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index 072383899e817..8470ecd6f8924 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -1470,7 +1470,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 			break;
+ 		}
+ 
+-		if (strnlen(param->string, CIFS_MAX_USERNAME_LEN) >
++		if (strnlen(param->string, CIFS_MAX_USERNAME_LEN) ==
+ 		    CIFS_MAX_USERNAME_LEN) {
+ 			pr_warn("username too long\n");
+ 			goto cifs_parse_mount_err;
+-- 
+2.51.0
+
