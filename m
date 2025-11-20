@@ -1,139 +1,146 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE70234E753
-	for <linux-cifs@vger.kernel.org>; Thu, 20 Nov 2025 15:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56A735C188
+	for <linux-cifs@vger.kernel.org>; Thu, 20 Nov 2025 15:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763651095; cv=none; b=gkTMHyHiH0pXUQz56KyNO7LHRAHrp0YeTouoREzr15+1O4EUHeKAG44+8TAOzFq5MdxVXxTrBOv6rfLpUJ6kik2y+DaGJpo6vKgHhR7GXgAZ39sHbqBnOXZbWT/ecJq0uYDjAUFOEKQmlWB2mpnVOevvks38EO7yPVHWGApbiuU=
+	t=1763652345; cv=none; b=DdPIqQnjk0cxz0a6RhWF2tRukX1/efxWypQ1HrrvsZANhQLOtYGQDdVLyaBQI0q4PGmbm/ROJX5nvxy4g6YgBhZWUx7efs1OM/ohn6eo4pEBGx5Ee0LFtjii+8EdOuCITw7aemEsM0/YpMeqrDmlQaycRnXUUAJbhKblz7Vize4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763651095; c=relaxed/simple;
-	bh=NbNdR+vY3IqSyNtreeEa3AHm7XvOE71tHIEOstePnBM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HUO+tYYb8PW/QUyeTasZ039WkJGvTxQ20+ZZYhSWr7s3TRYCfiPEkqpRFrAAQzWXOS3J/4rtHH11EBooLMseug2EKTR6P/GwlzXOFGrOWPaekm2/KJ4HN6SN0FnlOXSvVzwpDkMqk9abRwg1R408+RKNq9EPeMBhWrM9DUDK59I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KfyhHsTJ; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763652345; c=relaxed/simple;
+	bh=wSdVpLJCV33dPU5ELuUNEBkTNMU8h4s4XVJel9nkKwk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SBpXpn8xUbsZcs3h6oR3WNFGsgVTrqXVfj4soXhv85bq5pdl5NyzypE8NVu5DbDkFAgRx82Q+ccS+gk78Uh4dMZpzYJCxh3FFu02fSlmqk/3AwBNs2kd3XwAI0JC2SPMt9ty+Jk5gPmsb9/cwHCrhh2kPGvlave7BSnEGZDt4SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eKMjgtzJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KfyhHsTJ"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-88057f5d041so9077586d6.1
-        for <linux-cifs@vger.kernel.org>; Thu, 20 Nov 2025 07:04:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763651088; x=1764255888; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6kRFpPUlL1GMv8pTQgs/uuj/dHi7IU+YUX5w8tOzD2g=;
-        b=KfyhHsTJVUsWbCh5qfxTzMUixCdBGEJSE1tMXBOGGS7q9mEUAvx6x5tfLTgTMFwzMt
-         iVADJ8PbrUd2QGlOnlwwh5GXt59C8I2VRtju8Nn2onbd/RnDB+BakeGotwT7AguT3C46
-         DhflEQj6DNDLwWwLkT0Ci0kjA1YKyJivy25lxh+Hj6Y0Zj1ZvHmZk1qr6mdbS/Gw+e2+
-         U38C/0gRuJODxyO87X5043/mUh0lw49jJ1MMbgsnaRqhV56Gw6p3q1ilWI3RxQjDoqdA
-         Fw7gaPReXOqUxbcF9qIn7YUtaYbbilYtFoHHXg1hdlhrln9m0z/sgNIQ66HZhv3lTfjN
-         B2BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763651088; x=1764255888;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6kRFpPUlL1GMv8pTQgs/uuj/dHi7IU+YUX5w8tOzD2g=;
-        b=e/SvaXvGvYriTw6ccuhsK6g1rQvbHKaRxLHw0rd01ksBNCT+p4fy/LLS357chOqKPs
-         sGnaPbYAYCtdummerrJA9lk7mNeHEIXbKlkZgMSWaXPiJCj7sfuy1Lmjb2h2jUF6EFHL
-         Ljjqt5Zk4Cbcfpl1eA06RewJ1SO6Qs4fRnIFmnKP1i5xVteLO029YXLFlKZH2B4aAkdd
-         mQMBe6Ir3EziPKUPJeMmSZ6c3qPJuSfSY8RJtdz/wFLPSq/T4xX/O2+VJdR+vjPFmgpZ
-         kFxyI8HOhfnv2B5D1HK8bBrFr9+eWpl8m5C9Fiqvi6fBvdnJ2UtpZgniXmKAaB1xWWFv
-         vfYA==
-X-Forwarded-Encrypted: i=1; AJvYcCVSlPPwmzuHeGb4ygKW2GAuv7cP6qWGHWILcL1ps1yUP/RdjlWcT+bBLrwN7yCBPDQseATa3J+JJ1Gu@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYjAuMNYgoKePaQzsjOHoOx5h1jWrr+fGYsKjlJ+lvC7GbPB+I
-	YPrZNLP4E5FtHhj4QHFIQ5Nl+vu97JPR3MKlw+xNj9sO1DpHPSJ+FJ3+gWkhtx4JeblBhscUFU/
-	Jdsbj18zQK9g6fJhiT+URKAyMMrEs4nQ=
-X-Gm-Gg: ASbGncugP3ERGTcWNiufg4tA7bmMbYJVFcDemyQTr4ACXNO1Ncwi9b5GZTZ4XbLt0Fz
-	LS//Vj4fGMgrH8DIFPGEfb0l53MIbEPjaPrk/cJJbrHN4T4lVSEVbCUXCgtvAlFAht9NzxS5qoN
-	iQtYJOFd828G6G+/wf1nH410JNDOWqacIK/S7YSx7CSwE7HsUglt/XBKXfOmHcUV7LNjkaFL9CY
-	V+MpuBBowLBkXY67MolQae2lz92Q0XkhMpWdzOWS8alVuaIxbKjJSnjt3sA9TvfTQgUmQo6pHVv
-	JJJlpLBGgbc9vdw/V66xan7TgsdUYDoO6u5TWulq6Z/slRCT6i4cvuu/8/RiCE3uzX8gN+XlbNh
-	+03jHBxj9OhGW+UpHDbNHRd/8vMimvR3Mo5Tr2ryzmHhK3YdYo6UbJcpcbg6BzY0gcGUkPSPXjG
-	pGFGrjGH70qQ==
-X-Google-Smtp-Source: AGHT+IFsKkXhYMhdtsra+P/p8EP0e3W7i7D0GhBHrYUlEp2ymhejSmkE+PNaMgkvA7xkNx/rrZIboeX4ZOKJeFtVYLU=
-X-Received: by 2002:a05:6214:4903:b0:880:5279:98e9 with SMTP id
- 6a1803df08f44-8846e131c85mr49130116d6.40.1763651088222; Thu, 20 Nov 2025
- 07:04:48 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eKMjgtzJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763652342;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=PjNrAY4dFYWKw1aaXZDc9ufswCb6NZR4BOSYe0sks6k=;
+	b=eKMjgtzJne6DZOXeYwXrn8PUzizsjrKQiV+BFieoBxn9RhQ5GqTyFgPYx0V9YnB3/xoM4G
+	lyA91r2Fuct720YCUT/mqN4m1JBm/DSQM23G3VsrLEvSGIXmFqCvQ6hxyL5GuDMt0/Tepu
+	CuW6lufQod1U+wyFeG29fCDZE5QkWjo=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-679-dhD_Sij2PfewjznRvvYsfw-1; Thu,
+ 20 Nov 2025 10:25:41 -0500
+X-MC-Unique: dhD_Sij2PfewjznRvvYsfw-1
+X-Mimecast-MFC-AGG-ID: dhD_Sij2PfewjznRvvYsfw_1763652340
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 02B9E19198A3;
+	Thu, 20 Nov 2025 15:25:32 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.5])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4D82930044DB;
+	Thu, 20 Nov 2025 15:25:29 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/9] netfs: Miscellaneous prep patches for rewrite of I/O layer
+Date: Thu, 20 Nov 2025 15:25:13 +0000
+Message-ID: <20251120152524.2711660-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251118022655.126994-1-rajasimandalos@gmail.com>
- <20251118022655.126994-2-rajasimandalos@gmail.com> <7mc3cpg6qojvq7hak6jvkud7xgynmaki554tgn2jic2y52onzm@ugw7wsq43wsp>
-In-Reply-To: <7mc3cpg6qojvq7hak6jvkud7xgynmaki554tgn2jic2y52onzm@ugw7wsq43wsp>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 20 Nov 2025 09:04:37 -0600
-X-Gm-Features: AWmQ_blXfBEk2RwNC6znsiMRxvr5QE5e_9rCamPn7heku5OMDZrkh4jsUebDcd4
-Message-ID: <CAH2r5msVd2Ygtfmp_9L-tuPUMT7pcW1aQxobHuOjtgYEWRgZ6A@mail.gmail.com>
-Subject: Re: [PATCH] cifs: client: enforce consistent handling of multichannel
- and max_channels
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: Rajasi Mandal <rajasimandalos@gmail.com>, Rajasi Mandal <rajasimandal@microsoft.com>, 
-	linux-cifs@vger.kernel.org, sprasad@microsoft.com, pc@manguebit.org, 
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
-	sfrench@samba.org, bharathsm@microsoft.com, tom@talpey.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tue, Nov 18, 2025 at 8:01=E2=80=AFAM Enzo Matsumiya via samba-technical
-<samba-technical@lists.samba.org> wrote:
->
-> On 11/18, Rajasi Mandal wrote:
-> >From: Rajasi Mandal <rajasimandal@microsoft.com>
-> >
-> >Previously, the behavior of the multichannel and max_channels mount
-> >options was inconsistent and order-dependent. For example, specifying
-> >"multichannel,max_channels=3D1" would result in 2 channels, while
-> >"max_channels=3D1,multichannel" would result in 1 channel. Additionally,
-> >conflicting combinations such as "nomultichannel,max_channels=3D3" or
-> >"multichannel,max_channels=3D1" did not produce errors and could lead to
-> >unexpected channel counts.
-> >
-> >This commit introduces two new fields in smb3_fs_context to explicitly
-> >track whether multichannel and max_channels were specified during
-> >mount. The option parsing and validation logic is updated to ensure:
-> >- The outcome is no longer dependent on the order of options.
-> >- Conflicting combinations (e.g., "nomultichannel,max_channels=3D3" or
-> >  "multichannel,max_channels=3D1") are detected and result in an error.
-> >- The number of channels created is consistent with the specified
-> >  options.
-> >
-> >This improves the reliability and predictability of mount option
-> >handling for SMB3 multichannel support.
-> >
-> >Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
-> >Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
->
-> It's conflicting because it's already too complex for something that
-> should've been simple.  This patch introduces a new field + unnecessary
-> logic on top if it all.
->
-> cf. a PoC patch I sent a while ago, we can (ab)use fsparam with same key
-> name, but different key types, so we could only deal with:
->
-> 'nomultichannel', 'multichannel=3D{0,1,off,no}' as multichannel disabled
-> 'multichannel' as ctx->max_channels=3D2 (multichannel enabled, obviously)
-> 'multichannel=3DX' as ctx->max_channels=3DX (ditto)
->
-> Makes 0 sense to have both multichannel and max_channels mount options.
+Hi Steve,
 
-We can't regress customers who use common mount options without
-warning them for multiple releases that parm is going to be removed.
+Could you consider taking these patches extracted from my I/O layer rewrite
+for the upcoming merge window.  The performance change should be neutral,
+but it cleans up the code a bit.
 
-I don't object to changing Opt_max_channels parsing so
-ctx->max_channels in fs_context fgoes rom a # to a combination of
-number and something which can be mapped to on/off (for on client
-picks default on the fly while for off sets channels to 1) and
-removing ctx->multichannel - so if you specify "multichannel" it sets
-ctx->max_channels to something like -1  (or whatever max # is) and if
-you set nomultichannel it sets ctx->max_channels to 1
+ (1) Add the smb3_read_* tracepoints to SMB1 as well as SMB2/3.
 
---=20
+ (2) Use netfs_alloc/free_folioq_buffer() rather than cifs doing its own
+     version.
+
+ (3) Rename struct mid_q_entry to smb_message.  In my rewrite, smb_message
+     will get allocated in the marshalling functions in smb2pdu.c and
+     cifssmb.c rather than in transport.c and used to hand parameters down
+     - and so I think it could be better named for that.
+
+ (4) Remove the RFC1002 header from the smb_hdr struct so that it's
+     consistent with SMB2/3.  This allows I/O routines to be simplified and
+     shared.
+
+ (5) Make SMB1's SendReceive() wrap cifs_send_recv() and thus share code
+     with SMB2/3.
+
+ (6) Clean up a bunch of extra kvec[] that were required for RFC1002
+     headers from SMB1's header struct.
+
+ (7) Replace SendReceiveBlockingLock() with SendReceive() plus flags.
+
+ (8) Remove the server pointer from smb_message.  It can be passed down
+     from the caller to all places that need it.
+
+ (9) Don't need state locking in smb2_get_mid_entry() as we're just doing a
+     single read inside the lock.  READ_ONCE() should suffice instead.
+
+The patches can be found here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-next
+
 Thanks,
+David
 
-Steve
+Changes
+=======
+ver #2)
+ - Rebased on the ksmbd-for-next-next branch.
+ - Moved the patch to use netfs_alloc/free_folioq_buffer() down the stack.
+
+David Howells (9):
+  cifs: Add the smb3_read_* tracepoints to SMB1
+  cifs: Use netfs_alloc/free_folioq_buffer()
+  cifs: Rename mid_q_entry to smb_message
+  cifs: Remove the RFC1002 header from smb_hdr
+  cifs: Make smb1's SendReceive() wrap cifs_send_recv()
+  cifs: Clean up some places where an extra kvec[] was required for
+    rfc1002
+  cifs: Replace SendReceiveBlockingLock() with SendReceive() plus flags
+  cifs: Remove the server pointer from smb_message
+  cifs: Don't need state locking in smb2_get_mid_entry()
+
+ fs/smb/client/cifs_debug.c    |  47 +-
+ fs/smb/client/cifs_debug.h    |   2 +-
+ fs/smb/client/cifsencrypt.c   |  72 +--
+ fs/smb/client/cifsfs.c        |  31 +-
+ fs/smb/client/cifsglob.h      |  92 ++--
+ fs/smb/client/cifspdu.h       |   2 +-
+ fs/smb/client/cifsproto.h     |  76 ++--
+ fs/smb/client/cifssmb.c       | 806 +++++++++++++++++++---------------
+ fs/smb/client/cifstransport.c | 432 +++---------------
+ fs/smb/client/connect.c       | 188 ++++----
+ fs/smb/client/misc.c          |  32 +-
+ fs/smb/client/netmisc.c       |  15 +-
+ fs/smb/client/sess.c          |   8 +-
+ fs/smb/client/smb1ops.c       | 113 +++--
+ fs/smb/client/smb2misc.c      |  11 +-
+ fs/smb/client/smb2ops.c       | 206 +++------
+ fs/smb/client/smb2pdu.c       |  48 +-
+ fs/smb/client/smb2proto.h     |  12 +-
+ fs/smb/client/smb2transport.c | 111 +++--
+ fs/smb/client/transport.c     | 281 ++++++------
+ fs/smb/common/smb2pdu.h       |   3 -
+ fs/smb/common/smbglob.h       |   1 -
+ 22 files changed, 1159 insertions(+), 1430 deletions(-)
+
