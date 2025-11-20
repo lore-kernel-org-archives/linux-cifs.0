@@ -1,127 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00884332EA3;
-	Thu, 20 Nov 2025 12:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE70234E753
+	for <linux-cifs@vger.kernel.org>; Thu, 20 Nov 2025 15:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763640548; cv=none; b=ihoUiXPFlklmQI2D88GcKmwXZx2t2RkcUV79hniKHt5R36zU5Y9bEOXvB2jvejOg51fPyysCXICMWXviwtOzRDVPqyEuOkJEh/TDNP1/ePe4clgt9JCzbCeCLuqQLwOH7dF3mBd6T3D8i0J2Ilu7z53JS2DVViCZ5Bpqj2EgJcc=
+	t=1763651095; cv=none; b=gkTMHyHiH0pXUQz56KyNO7LHRAHrp0YeTouoREzr15+1O4EUHeKAG44+8TAOzFq5MdxVXxTrBOv6rfLpUJ6kik2y+DaGJpo6vKgHhR7GXgAZ39sHbqBnOXZbWT/ecJq0uYDjAUFOEKQmlWB2mpnVOevvks38EO7yPVHWGApbiuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763640548; c=relaxed/simple;
-	bh=Bf5/WWqzlo7qPd3Gy6oXR94jU0k6NB2mIj4E4SnZVoE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RtgsluBjV6jf8jzNSJ1kQTGj0jakpGyT3Jn90mLmkG3NI8gNhsQXEG1OsiFCUcSU4B2k6CXEc8MgO6yUrQxmKN8hZ2f2sTH+4e4GgqoJ8TVbDmkzcqREiNrKSSubHCt5KVdWChTHCrx4AZzp5HdKWOWOSYSSVSiicSryECRq4QI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aAPIEb9I; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763651095; c=relaxed/simple;
+	bh=NbNdR+vY3IqSyNtreeEa3AHm7XvOE71tHIEOstePnBM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HUO+tYYb8PW/QUyeTasZ039WkJGvTxQ20+ZZYhSWr7s3TRYCfiPEkqpRFrAAQzWXOS3J/4rtHH11EBooLMseug2EKTR6P/GwlzXOFGrOWPaekm2/KJ4HN6SN0FnlOXSvVzwpDkMqk9abRwg1R408+RKNq9EPeMBhWrM9DUDK59I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KfyhHsTJ; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aAPIEb9I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE6C7C4CEF1;
-	Thu, 20 Nov 2025 12:09:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763640547;
-	bh=Bf5/WWqzlo7qPd3Gy6oXR94jU0k6NB2mIj4E4SnZVoE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aAPIEb9InMQGq2r1fFWgr7V8gVTZqRIi4Rm+9UTqRPc4LI2fTFx4Y4qHTWJ/XDYcP
-	 1pF69VoWwqQUDCyWVKePP1PsBa01XBG7cUOw7rMHhKan/y+KiiGSABvqy2isxcXcpl
-	 6RM/mCWIoJEu1s80UaWaUTIAYt+746CKshQum/vvICptvTjibtfiCM0cl3o/fg8ShT
-	 pjSdbVXTwq3dOP64cy1X187J/KPqDZAUMZz7/6Li1tAxclp286dUxelzmVrALmwm/B
-	 PjP50ZWoCDMwp7DLj7ch+NvxbTE/oQjbY/ZDweRgRPqVyDm2+Zi8IhWhC0ufPX5Avn
-	 Y/B2oPzEcG9cg==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Yiqi Sun <sunyiqixm@gmail.com>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.17-6.1] smb: fix invalid username check in smb3_fs_context_parse_param()
-Date: Thu, 20 Nov 2025 07:08:25 -0500
-Message-ID: <20251120120838.1754634-16-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251120120838.1754634-1-sashal@kernel.org>
-References: <20251120120838.1754634-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KfyhHsTJ"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-88057f5d041so9077586d6.1
+        for <linux-cifs@vger.kernel.org>; Thu, 20 Nov 2025 07:04:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763651088; x=1764255888; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6kRFpPUlL1GMv8pTQgs/uuj/dHi7IU+YUX5w8tOzD2g=;
+        b=KfyhHsTJVUsWbCh5qfxTzMUixCdBGEJSE1tMXBOGGS7q9mEUAvx6x5tfLTgTMFwzMt
+         iVADJ8PbrUd2QGlOnlwwh5GXt59C8I2VRtju8Nn2onbd/RnDB+BakeGotwT7AguT3C46
+         DhflEQj6DNDLwWwLkT0Ci0kjA1YKyJivy25lxh+Hj6Y0Zj1ZvHmZk1qr6mdbS/Gw+e2+
+         U38C/0gRuJODxyO87X5043/mUh0lw49jJ1MMbgsnaRqhV56Gw6p3q1ilWI3RxQjDoqdA
+         Fw7gaPReXOqUxbcF9qIn7YUtaYbbilYtFoHHXg1hdlhrln9m0z/sgNIQ66HZhv3lTfjN
+         B2BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763651088; x=1764255888;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6kRFpPUlL1GMv8pTQgs/uuj/dHi7IU+YUX5w8tOzD2g=;
+        b=e/SvaXvGvYriTw6ccuhsK6g1rQvbHKaRxLHw0rd01ksBNCT+p4fy/LLS357chOqKPs
+         sGnaPbYAYCtdummerrJA9lk7mNeHEIXbKlkZgMSWaXPiJCj7sfuy1Lmjb2h2jUF6EFHL
+         Ljjqt5Zk4Cbcfpl1eA06RewJ1SO6Qs4fRnIFmnKP1i5xVteLO029YXLFlKZH2B4aAkdd
+         mQMBe6Ir3EziPKUPJeMmSZ6c3qPJuSfSY8RJtdz/wFLPSq/T4xX/O2+VJdR+vjPFmgpZ
+         kFxyI8HOhfnv2B5D1HK8bBrFr9+eWpl8m5C9Fiqvi6fBvdnJ2UtpZgniXmKAaB1xWWFv
+         vfYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVSlPPwmzuHeGb4ygKW2GAuv7cP6qWGHWILcL1ps1yUP/RdjlWcT+bBLrwN7yCBPDQseATa3J+JJ1Gu@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYjAuMNYgoKePaQzsjOHoOx5h1jWrr+fGYsKjlJ+lvC7GbPB+I
+	YPrZNLP4E5FtHhj4QHFIQ5Nl+vu97JPR3MKlw+xNj9sO1DpHPSJ+FJ3+gWkhtx4JeblBhscUFU/
+	Jdsbj18zQK9g6fJhiT+URKAyMMrEs4nQ=
+X-Gm-Gg: ASbGncugP3ERGTcWNiufg4tA7bmMbYJVFcDemyQTr4ACXNO1Ncwi9b5GZTZ4XbLt0Fz
+	LS//Vj4fGMgrH8DIFPGEfb0l53MIbEPjaPrk/cJJbrHN4T4lVSEVbCUXCgtvAlFAht9NzxS5qoN
+	iQtYJOFd828G6G+/wf1nH410JNDOWqacIK/S7YSx7CSwE7HsUglt/XBKXfOmHcUV7LNjkaFL9CY
+	V+MpuBBowLBkXY67MolQae2lz92Q0XkhMpWdzOWS8alVuaIxbKjJSnjt3sA9TvfTQgUmQo6pHVv
+	JJJlpLBGgbc9vdw/V66xan7TgsdUYDoO6u5TWulq6Z/slRCT6i4cvuu/8/RiCE3uzX8gN+XlbNh
+	+03jHBxj9OhGW+UpHDbNHRd/8vMimvR3Mo5Tr2ryzmHhK3YdYo6UbJcpcbg6BzY0gcGUkPSPXjG
+	pGFGrjGH70qQ==
+X-Google-Smtp-Source: AGHT+IFsKkXhYMhdtsra+P/p8EP0e3W7i7D0GhBHrYUlEp2ymhejSmkE+PNaMgkvA7xkNx/rrZIboeX4ZOKJeFtVYLU=
+X-Received: by 2002:a05:6214:4903:b0:880:5279:98e9 with SMTP id
+ 6a1803df08f44-8846e131c85mr49130116d6.40.1763651088222; Thu, 20 Nov 2025
+ 07:04:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.17.8
-Content-Transfer-Encoding: 8bit
+References: <20251118022655.126994-1-rajasimandalos@gmail.com>
+ <20251118022655.126994-2-rajasimandalos@gmail.com> <7mc3cpg6qojvq7hak6jvkud7xgynmaki554tgn2jic2y52onzm@ugw7wsq43wsp>
+In-Reply-To: <7mc3cpg6qojvq7hak6jvkud7xgynmaki554tgn2jic2y52onzm@ugw7wsq43wsp>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 20 Nov 2025 09:04:37 -0600
+X-Gm-Features: AWmQ_blXfBEk2RwNC6znsiMRxvr5QE5e_9rCamPn7heku5OMDZrkh4jsUebDcd4
+Message-ID: <CAH2r5msVd2Ygtfmp_9L-tuPUMT7pcW1aQxobHuOjtgYEWRgZ6A@mail.gmail.com>
+Subject: Re: [PATCH] cifs: client: enforce consistent handling of multichannel
+ and max_channels
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: Rajasi Mandal <rajasimandalos@gmail.com>, Rajasi Mandal <rajasimandal@microsoft.com>, 
+	linux-cifs@vger.kernel.org, sprasad@microsoft.com, pc@manguebit.org, 
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
+	sfrench@samba.org, bharathsm@microsoft.com, tom@talpey.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Yiqi Sun <sunyiqixm@gmail.com>
+On Tue, Nov 18, 2025 at 8:01=E2=80=AFAM Enzo Matsumiya via samba-technical
+<samba-technical@lists.samba.org> wrote:
+>
+> On 11/18, Rajasi Mandal wrote:
+> >From: Rajasi Mandal <rajasimandal@microsoft.com>
+> >
+> >Previously, the behavior of the multichannel and max_channels mount
+> >options was inconsistent and order-dependent. For example, specifying
+> >"multichannel,max_channels=3D1" would result in 2 channels, while
+> >"max_channels=3D1,multichannel" would result in 1 channel. Additionally,
+> >conflicting combinations such as "nomultichannel,max_channels=3D3" or
+> >"multichannel,max_channels=3D1" did not produce errors and could lead to
+> >unexpected channel counts.
+> >
+> >This commit introduces two new fields in smb3_fs_context to explicitly
+> >track whether multichannel and max_channels were specified during
+> >mount. The option parsing and validation logic is updated to ensure:
+> >- The outcome is no longer dependent on the order of options.
+> >- Conflicting combinations (e.g., "nomultichannel,max_channels=3D3" or
+> >  "multichannel,max_channels=3D1") are detected and result in an error.
+> >- The number of channels created is consistent with the specified
+> >  options.
+> >
+> >This improves the reliability and predictability of mount option
+> >handling for SMB3 multichannel support.
+> >
+> >Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+> >Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
+>
+> It's conflicting because it's already too complex for something that
+> should've been simple.  This patch introduces a new field + unnecessary
+> logic on top if it all.
+>
+> cf. a PoC patch I sent a while ago, we can (ab)use fsparam with same key
+> name, but different key types, so we could only deal with:
+>
+> 'nomultichannel', 'multichannel=3D{0,1,off,no}' as multichannel disabled
+> 'multichannel' as ctx->max_channels=3D2 (multichannel enabled, obviously)
+> 'multichannel=3DX' as ctx->max_channels=3DX (ditto)
+>
+> Makes 0 sense to have both multichannel and max_channels mount options.
 
-[ Upstream commit ed6612165b74f09db00ef0abaf9831895ab28b7f ]
+We can't regress customers who use common mount options without
+warning them for multiple releases that parm is going to be removed.
 
-Since the maximum return value of strnlen(..., CIFS_MAX_USERNAME_LEN)
-is CIFS_MAX_USERNAME_LEN, length check in smb3_fs_context_parse_param()
-is always FALSE and invalid.
+I don't object to changing Opt_max_channels parsing so
+ctx->max_channels in fs_context fgoes rom a # to a combination of
+number and something which can be mapped to on/off (for on client
+picks default on the fly while for off sets channels to 1) and
+removing ctx->multichannel - so if you specify "multichannel" it sets
+ctx->max_channels to something like -1  (or whatever max # is) and if
+you set nomultichannel it sets ctx->max_channels to 1
 
-Fix the comparison in if statement.
+--=20
+Thanks,
 
-Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-## CONCLUSION
-
-This commit fixes a **5-year-old logic error** in SMB/CIFS username
-validation that has existed since the mount API refactoring in v5.11
-(December 2020). The bug is a classic off-by-one comparison error where
-`strnlen(..., 256) > 256` is always false because strnlen returns at
-most 256.
-
-**The bug causes:**
-- **Validation bypass** allowing usernames longer than 256 characters
-- **Memory waste** through unnecessary kernel allocations
-- **Authentication failures** with confusing error messages when
-  truncated usernames are sent to servers
-- **Protocol non-compliance** with SMB username length limits
-
-**The fix is trivial:**
-- Changes one character: `>` becomes `==`
-- Brings username validation in line with domain name validation (same
-  file, line 1509)
-- Zero risk of regression (only makes validation stricter)
-
-**Evidence supporting backport:**
-- **Already backported** to 7+ stable trees (6.12.y, 6.11.y, 6.6.y,
-  6.1.y, 5.15.y, 5.10.y, 5.4.y)
-- **Obviously correct** - single-character fix that matches the pattern
-  used elsewhere
-- **Small and contained** - one line in one file
-- **Fixes real user issues** - authentication failures with long
-  usernames
-- **Long-standing bug** - affects all kernels from v5.11 to present
-
-This is a **textbook example** of an appropriate stable kernel backport:
-small, surgical, obviously correct, fixes a real bug, and carries no
-regression risk.
-
-**YES**
-
- fs/smb/client/fs_context.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 072383899e817..8470ecd6f8924 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1470,7 +1470,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 			break;
- 		}
- 
--		if (strnlen(param->string, CIFS_MAX_USERNAME_LEN) >
-+		if (strnlen(param->string, CIFS_MAX_USERNAME_LEN) ==
- 		    CIFS_MAX_USERNAME_LEN) {
- 			pr_warn("username too long\n");
- 			goto cifs_parse_mount_err;
--- 
-2.51.0
-
+Steve
