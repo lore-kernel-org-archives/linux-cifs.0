@@ -1,156 +1,126 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010553A79B6
-	for <linux-cifs@vger.kernel.org>; Thu, 20 Nov 2025 15:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB9C341670;
+	Fri, 21 Nov 2025 10:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763652390; cv=none; b=JdAAQPrDH3vlAVxvEvKTItV+rnlA22iMBub59CgtttzYkVg7SqPbiRTTIj8sRdhEUQlLcp5RgmU08JV7U06cqduxfFUuZWXP0Kc+J8HVqAUfDk43ysTHiRtYw3JEtuRonz4BhzJ/QWI0tvORNHkAjUmNuSSLyHpJVdtLNTlFeHw=
+	t=1763719351; cv=none; b=l7IbAoBJg5P3FGXFbXKzs0V1bOa8AqtBraWhlO+oGiYcfzgoBz25NEjB9ZdhbYzZ5G2OFd9Gdqfm8njm8+2rPHKoUgV2DBYA6cgKhBIGXRkbeF002XbMP7blT7BSazerPg9+1H0evsGreWDd3pWWkRDduKF0DI9ZN7iMiZhHrL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763652390; c=relaxed/simple;
-	bh=9azUYLxcrprXapB2AW29/5U1XZ7wheGbaYw8wddL248=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bDl1SSpChjKWL6fpsAcTX0jhumFpOEMucZfeadCf+EZJr7ZQ1fmoXANOX9mXmEFVxIrinT8RlZWZ6QmNf5+WlCCFO7WLlvhC0w0e3/id/Kb+WP+/PFG7jadWIsad56MWs4rKsB0ro/ye9To/rnoX0Yn4Sk270WWlAKU/Ac75ZWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CxpmQYCC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1763719351; c=relaxed/simple;
+	bh=U/ZTpQ9JRcF37vRAN4m5FXZIcf2Wk6nEC2WfzB3/lO8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GqCODJv/VHoWB3qZHPM+oQnmsYXSDEKK2v8Fw9DOFPAWQhYC0f5w3E5JcYsNLMp5XSk6GkTQxisrScMJ84fvexTPY3In3oGAh16l0IFRnWAGviGppG5jjN4usNoaUlYfZ8tuQgr/PWL00KnNeu2nz8NAIkBUEulzr7Ai+EEvVUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=jiZ1/mcj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CxpmQYCC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763652388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7FUmnWmOFPZ/yS6/aSdvHVfj2x2LVbiiAoaubXk9WOA=;
-	b=CxpmQYCCiakrOuZKz/OLLTGSBglSfKK527312f/utePRst4M0KkKxlmLEvu9BmiFfKTG/6
-	Uv41qpAue+C9S/C39C335mdsT/JWNP4KZFOWnW+ox6Fxz59EZv6v+2q6VtBkCNcQZSYleb
-	UooqjQ6dbNOy+E1nv+v3peCdqlqkDwU=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-49-5u3njFTYPHmFH6hmwEyJVg-1; Thu,
- 20 Nov 2025 10:26:19 -0500
-X-MC-Unique: 5u3njFTYPHmFH6hmwEyJVg-1
-X-Mimecast-MFC-AGG-ID: 5u3njFTYPHmFH6hmwEyJVg_1763652378
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EE0ED1954231;
-	Thu, 20 Nov 2025 15:26:17 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.5])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7BF6430044E0;
-	Thu, 20 Nov 2025 15:26:15 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Steve French <sfrench@samba.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Tom Talpey <tom@talpey.com>
-Subject: [PATCH v2 9/9] cifs: Don't need state locking in smb2_get_mid_entry()
-Date: Thu, 20 Nov 2025 15:25:22 +0000
-Message-ID: <20251120152524.2711660-10-dhowells@redhat.com>
-In-Reply-To: <20251120152524.2711660-1-dhowells@redhat.com>
-References: <20251120152524.2711660-1-dhowells@redhat.com>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="jiZ1/mcj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44AB8C4CEF1;
+	Fri, 21 Nov 2025 10:02:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1763719350;
+	bh=U/ZTpQ9JRcF37vRAN4m5FXZIcf2Wk6nEC2WfzB3/lO8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jiZ1/mcjOX8LlhfWeUc9s7KV1CA1S9ZnMwZr22DD1sLB3qrhniSH7W027RxnpH7Z+
+	 D/DhmmMd7a5EOhC7c0K7UT/3WA3XMikFFIW0piheadh+gECL/ZHmAuNgKe2X4/SXmu
+	 QWYnhIjKp+LOXCeBOoVWFNGY/hAwAeFw1R421jWw=
+Date: Fri, 21 Nov 2025 11:02:28 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Bharath SM <bharathsm.hsk@gmail.com>
+Cc: Henrique Carvalho <henrique.carvalho@suse.com>, stable@vger.kernel.org,
+	Shyam Prasad N <sprasad@microsoft.com>, apais@microsoft.com,
+	Bharath S M <bharathsm@microsoft.com>,
+	David Howells <dhowells@redhat.com>, smfrench@gmail.com,
+	linux-cifs@vger.kernel.org, Laura Kerner <laura.kerner@ichaus.de>
+Subject: Re: [PATCH 6.6.y] smb: client: support kvec iterators in async read
+ path
+Message-ID: <2025112112-icon-bunkmate-bfad@gregkh>
+References: <20250710165040.3525304-1-henrique.carvalho@suse.com>
+ <2944136.1752224518@warthog.procyon.org.uk>
+ <aHE0--yUyFJqK6lb@precision>
+ <CAGypqWyyA6nUfH-bGhQxLYD74O7EcE_6_W15=AB8jvi6yZiV_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <CAGypqWyyA6nUfH-bGhQxLYD74O7EcE_6_W15=AB8jvi6yZiV_Q@mail.gmail.com>
 
-There's no need to get ->srv_lock or ->ses_lock in smb2_get_mid_entry() as
-all that happens of relevance (to the lock) inside the locked sections is
-the reading of one status value in each.
+On Thu, Nov 06, 2025 at 06:02:39AM -0800, Bharath SM wrote:
+> On Fri, Jul 11, 2025 at 9:01 AM Henrique Carvalho
+> <henrique.carvalho@suse.com> wrote:
+> >
+> > On Fri, Jul 11, 2025 at 10:01:58AM +0100, David Howells wrote:
+> > > Henrique Carvalho <henrique.carvalho@suse.com> wrote:
+> > >
+> > > > Add cifs_limit_kvec_subset() and select the appropriate limiter in
+> > > > cifs_send_async_read() to handle kvec iterators in async read path,
+> > > > fixing the EIO bug when running executables in cifs shares mounted
+> > > > with nolease.
+> > > >
+> > > > This patch -- or equivalent patch, does not exist upstream, as the
+> > > > upstream code has suffered considerable API changes. The affected path
+> > > > is currently handled by netfs lib and located under netfs/direct_read.c.
+> > >
+> > > Are you saying that you do see this upstream too?
+> > >
+> >
+> > No, the patch only targets the 6.6.y stable tree. Since version 6.8,
+> > this path has moved into the netfs layer, so the original bug no longer
+> > exists.
+> >
+> > The bug was fixed at least since the commit referred in the commit
+> > message -- 3ee1a1fc3981. In this commit, the call to cifs_user_readv()
+> > is replaced by a call to netfs_unbuffered_read_iter(), inside the
+> > function cifs_strict_readv().
+> >
+> > netfs_unbuffered_read_iter() itself was introduced in commit
+> > 016dc8516aec8, along with other netfs api changes, present in kernel
+> > versions 6.8+.
+> >
+> > Backporting netfs directly would be non-trivial. Instead, I:
+> >
+> > - add cifs_limit_kvec_subset(), modeled on the existing
+> >   cifs_limit_bvec_subset()
+> > - choose between the kvec or bvec limiter function early in
+> >   cifs_write_from_iter().
+> >
+> > The Fixes tag references d08089f649a0c, which implements
+> > cifs_limit_bvec_subset() and uses it inside cifs_write_from_iter().
+> >
+> > > > Reproducer:
+> > > >
+> > > > $ mount.cifs //server/share /mnt -o nolease
+> > > > $ cat - > /mnt/test.sh <<EOL
+> > > > echo hallo
+> > > > EOL
+> > > > $ chmod +x /mnt/test.sh
+> > > > $ /mnt/test.sh
+> > > > bash: /mnt/test.sh: /bin/bash: Defekter Interpreter: Eingabe-/Ausgabefehler
+> > > > $ rm -f /mnt/test.sh
+> > >
+> > > Is this what you are expecting to see when it works or when it fails?
+> > >
+> >
+> > This is the reproducer for the observed bug. In english it reads "Bad
+> > interpreter: Input/Output error".
+> >
+> > FYI: I tried to follow Option 3 of the stable-kernel rules for submission:
+> > <https://www.kernel.org/doc/html/v6.15/process/stable-kernel-rules.html>
+> > Please let me know if you'd prefer a different approach or any further
+> > changes.
+> Thanks Henrique.
+> 
+> Hi Greg,
+> 
+> We are observing the same issue with the 6.6 Kernel, Can you please
+> help include this patch in the 6.6 stable kernel.?
 
-Replace the locking with READ_ONCE() and use a switch instead of a chain of
-if-statements.
+Pleas provide a working backport and we will be glad to imclude it.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Shyam Prasad N <sprasad@microsoft.com>
-cc: Tom Talpey <tom@talpey.com>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/smb/client/smb2transport.c | 48 +++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 28 deletions(-)
+thanks,
 
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index 6d76b0c6d73d..47eab3753c9e 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -684,43 +684,35 @@ static int
- smb2_get_mid_entry(struct cifs_ses *ses, struct TCP_Server_Info *server,
- 		   struct smb2_hdr *shdr, struct smb_message **smb)
- {
--	spin_lock(&server->srv_lock);
--	if (server->tcpStatus == CifsExiting) {
--		spin_unlock(&server->srv_lock);
-+	switch (READ_ONCE(server->tcpStatus)) {
-+	case CifsExiting:
- 		return -ENOENT;
--	}
--
--	if (server->tcpStatus == CifsNeedReconnect) {
--		spin_unlock(&server->srv_lock);
-+	case CifsNeedReconnect:
- 		cifs_dbg(FYI, "tcp session dead - return to caller to retry\n");
- 		return -EAGAIN;
--	}
--
--	if (server->tcpStatus == CifsNeedNegotiate &&
--	   shdr->Command != SMB2_NEGOTIATE) {
--		spin_unlock(&server->srv_lock);
--		return -EAGAIN;
--	}
--	spin_unlock(&server->srv_lock);
--
--	spin_lock(&ses->ses_lock);
--	if (ses->ses_status == SES_NEW) {
--		if ((shdr->Command != SMB2_SESSION_SETUP) &&
--		    (shdr->Command != SMB2_NEGOTIATE)) {
--			spin_unlock(&ses->ses_lock);
-+	case CifsNeedNegotiate:
-+		if (shdr->Command != SMB2_NEGOTIATE)
- 			return -EAGAIN;
--		}
--		/* else ok - we are setting up session */
-+		break;
-+	default:
-+		break;
- 	}
- 
--	if (ses->ses_status == SES_EXITING) {
--		if (shdr->Command != SMB2_LOGOFF) {
--			spin_unlock(&ses->ses_lock);
-+	switch (READ_ONCE(ses->ses_status)) {
-+	case SES_NEW:
-+		if (shdr->Command != SMB2_SESSION_SETUP &&
-+		    shdr->Command != SMB2_NEGOTIATE)
-+			return -EAGAIN;
-+			/* else ok - we are setting up session */
-+		break;
-+	case SES_EXITING:
-+		if (shdr->Command != SMB2_LOGOFF)
- 			return -EAGAIN;
--		}
- 		/* else ok - we are shutting down the session */
-+		break;
-+	default:
-+		break;
- 	}
--	spin_unlock(&ses->ses_lock);
- 
- 	*smb = smb2_mid_entry_alloc(shdr, server);
- 	if (*smb == NULL)
-
+greg k-h
