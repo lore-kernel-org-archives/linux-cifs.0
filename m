@@ -1,89 +1,128 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDD32F7AC5
-	for <linux-cifs@vger.kernel.org>; Fri, 21 Nov 2025 23:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257B936D4E5
+	for <linux-cifs@vger.kernel.org>; Sat, 22 Nov 2025 06:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763768298; cv=none; b=kyEFNW9xM8pS6KNlegMK0/NuZ8KHZ+ZkBanyzT73j//BbAcBmgRf7YzkJqDhX6l8F3BKD7/IwbGT8HvVumW/cn9dpBCDgN9sWwzZw3vbdDK/rQQS5yny4DYZmL6T2F40Zkvj/sOmIgPa+dwq4VDWeX05a3tf6cLsIttsFc5rAgM=
+	t=1763793295; cv=none; b=PVNdN+CCiTbxXKdSZR/0LkJZjGkqb/dyZ+r9/aYnuj4l2z1CQnUVbklkWryM5Jr4UoA81r7GybisUBl7a6Yk4fwLc02M9D1HtuXeKNVwOH+go+RloJG0IiViOA+18ZzsnEytnIxvK8IMLxkCLOhYowQIxSbuN9ADw5TP8Pt0gQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763768298; c=relaxed/simple;
-	bh=858uwxvz3bY2eV1nRnV8NV5lXePfeFw+kvJgLpfRYH4=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=RgCEZvSPQuG5VT9zczZNyYlyXzFSrFztLdD3wJdOzV9v1aKB/BFmCQCbDuugHKH8fNregTUpXe9PskIhNnVL0eBjt5SZNi3ZQvrFb3CA4Lv3p6gktPXmT75Ozmu7FXe5H40iAV6j5WK/Fc45tm2o9da20qH7meTGgNVSGc9XKso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mu2tZ2YG; arc=none smtp.client-ip=209.85.160.173
+	s=arc-20240116; t=1763793295; c=relaxed/simple;
+	bh=02Kz8fPp6mA/IDSshot0dAal4iOKc81y31cnqPmh/oE=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=qs+U2wZcaN8F7lNXCII0OwSGOCZEb/sMTDQ8bP7hrZgJT7F36kqrWjjqB+kymeb1A4aq9LhQp9AoJJwE8UFIYchV/IWGEJEjk7uZVUqgkZEQsu2j6t2tSNoXEo2ic2Q2m1jTKSzC2x1GREfqk9NtMtjT2YjDMXLEgQqTNaP1Seg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XvncpJvL; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mu2tZ2YG"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4eda6a8cc12so26120321cf.0
-        for <linux-cifs@vger.kernel.org>; Fri, 21 Nov 2025 15:38:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XvncpJvL"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4779aa4f928so24011625e9.1
+        for <linux-cifs@vger.kernel.org>; Fri, 21 Nov 2025 22:34:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763768295; x=1764373095; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5yZR9PZ4cQwCsgTuoYLVZkrtiQUKvHtt143Dw7SbRzw=;
-        b=Mu2tZ2YG0TcYWBrGBz0hMPblGq/1wANAMawQRvktTbjF4mYQ9kuFLefFmkQgPAtmvE
-         pJgMoEk6he0BZMWcghHmK/nX7mx2redA5JciRSxbqEingtM7L+EW2TgkeKFEOWOMQX5i
-         G8ZxnT4vMh2fIQ/39arzRZhy1dSxFivsLGI+pynEp6uHBOOYhfZmysL8jQYfm9bXV1nC
-         M4figsti4EYwx+nC5+GPC13Mk1R7JcD9tsWyaP6GZfTT97Q9btA3Cua9rohNGm+xjF+/
-         1B1ZBbAqV3p92QuxPM4vso81BmNiyQivwl/QIke7umbnza5lazCtWz+34C88hTFABic3
-         UHkw==
+        d=gmail.com; s=20230601; t=1763793292; x=1764398092; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cxm2J6NqSLjtvzrVaPhog5W+r8/4yF+H0d8/AKPhJOo=;
+        b=XvncpJvLXpULD3akHD4Z57JwvLdQ5NIxhH7F5812F32IM99Nlv4FWcr30EV6ol0jfB
+         UHSO2z8qRL9H11tec+bFFcCNi9J9xJkz9l0lKwdDXf5kcUfIoIeDsHffwMo11Lscfgpj
+         rQ0NtsTBg1PJ1P2nRx1R1K5ArBIvz9lqD7/nXWpiu5pevQwEARDAAALnpfCPCrxoVSaM
+         kLJNaswTywQSo7kvYKPlAC37g1SWGROBcp/I9Y9yxrrQ9Subc2/sUj3Z0TBDIEHLdKp1
+         ZbCvGvBiZ/TOP7iS4KmcYcf9NTydi0h7fcb3Wa1H1wVR8J+S9iSvwNlwrXxNCZJASuH+
+         pVbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763768295; x=1764373095;
-        h=to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5yZR9PZ4cQwCsgTuoYLVZkrtiQUKvHtt143Dw7SbRzw=;
-        b=t+gClbqnN9wb7ugVC4wCokHV76VEt6BfPrS85NTAGZzVeTzmo2VJOblid7HIiMlQ9W
-         7o1eF44VJ3+jv48PtGcgQUENTnSyA+k9BGW4R+85YcTIIj1AkjjaZepKY1ksBJxENODG
-         x0P0hnc6lm0Pp4Ccpp2UjrUVUSVpOp75Tx7OYSyVw8nMERk+F2WOpkOqhZGU83uAmt2p
-         pXPrk9VOV4LhBRi/8WWEdLrmGFKHBhN1S0cozayJjmL4G5CNLPavmolleYOkE4A+rJ2n
-         h32Dv+sLXiOUqThMCP4zzaR/Im27aWIE9aAe7g89faEis4dP02dInd6VYI5HGiWVvJyY
-         0raA==
-X-Gm-Message-State: AOJu0YwPSGC2/2kH1mCiclOyQAvdIieGEGkJbbr4DqdpKOVjTI9YeuLz
-	QcmQAd73LSmj0qg9nUeAQ14pctzyNDipaFAhC/Du/dhvThftW4vte+ygpOQFFDe9UkKZatMNBSN
-	PoXXjWrsM83zWMS59ieLoPyXU79svus36x/Tm
-X-Gm-Gg: ASbGnct62djFiws3pPCaugTMn52cj/n0amatVVY0vy+W0E6t71HyUdDrcZpLcK9xAgI
-	beEuHTbK0n82dNTnkEJlAm7zAF9KiQd6xygH0zH8yrWGGxzNCLJq3HJRZsbbqAAo7bqvc5FKnRJ
-	MhZMhG9uQ1SUfhzpZsIREuJhD2sU9e6CFcOwU6T/X3zJjchMxCMP8kkn/W6Pfl/EjQrWovng2e5
-	SNEBieyKY3k3yzL9qf3YS8BMVtwGZhOZ7m0V0K6UEF7gGqBTgyp1AmLmPtP9OW79GthlU1rUH2w
-	+0UTFjuLcHnFpN9YT4D8aa62VHValdNZPe2ohE4+gfm/lHF8bxAyRGSfMPu+CR4QVyWTQjkEYoP
-	bnRy0Buqp4AkzJ9HkDk7Qre8e73Tc11MS7RbTf1VsXNRRKjDpIk67VuKFHIY+sAFnkgDaNrTKyh
-	qG++vdb7Etqw==
-X-Google-Smtp-Source: AGHT+IFDIsAYDbXY79i2HogGFE9nTO2FQ0+ZSZhlk5OgkecwtjW9FIDF3of/VCsb4AGwZNmsssiyAKzSd4TmfuTL7o4=
-X-Received: by 2002:ac8:7d86:0:b0:4ee:1d76:7341 with SMTP id
- d75a77b69052e-4ee5877ff3dmr60140011cf.0.1763768294770; Fri, 21 Nov 2025
- 15:38:14 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763793292; x=1764398092;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cxm2J6NqSLjtvzrVaPhog5W+r8/4yF+H0d8/AKPhJOo=;
+        b=PD3xAUGvjxNhZfTww6+DG1jnyll9wV5+XTfzJ2g7FX9GMU/grFzmza4T5Z80fz62E9
+         rGFANjCaG8XcGr8BOcHzI3woJCrA99dyXWwqt4iaZkdtBUP00xy+LIY2SOtzyesh/wv+
+         MzvPQUsLQfPPFrpDa6XgmMFNpiav3d0DZI6wNGk7txteQw8n0TvnHqD+wxMmC9eaNEH7
+         XEceARP6e0O+11pTRgVsdfHoYGe43+xh+ZooiScqd9DFeTAJoAHbqnofVdym1Urqp+/y
+         xUCZvg1cQ09W+lRzD/2KH47kTRfxwbYJVfQeQpCrCDBan49CRjYv3YmKN3NDowngEP86
+         f9EA==
+X-Gm-Message-State: AOJu0YzDWcTUPtJ5gpmh9rs2j5a4RkaDckRrg+MFQ+ucLQ4JrMwxuTps
+	eqywsN4bTsZqvXLCp96HbxZmSQx3E1UJxE4Yx9VQSh0dKc4PcZSQ07Ll8lU0vqT2qstH51bcPEV
+	lEaEmUDuRJLVfj1xV7K8/ElIsz8FI54P4HKYlJbM=
+X-Gm-Gg: ASbGncvrh5KlQceeNVt3HaVNKD+3CL5lj/868LxD0Fh0PNJhrEXWvrZCnuYiWHfOPak
+	OLesfkkmDNG4Z9UzdnJU4zCm4xHY6n9uhLpjdEQXjMxyYuFZ16yxK13oM94vWS5UsV5ZpsNhYVm
+	FjvHSdIYSspshcYy+D48mBG9ub+ge96ZLGdvq1kagWTbxRIxRNkpNOsq8eSrC3LauaVk0bGkXUL
+	Y4AHOmk8BegTUuZqZLbqa+YivE2P4UAeRGHp+hXO8FlQALk9oNOJB5zK4RhTjHKfg00kHUI
+X-Google-Smtp-Source: AGHT+IGpbKVihy8Gf8vekT0fXwsb0dbg7rJqeL324ZUHxV4KHSGgD4uY1ZHNyOmaZDgMjkjQ00CY63coTtq56KQVHT8=
+X-Received: by 2002:a05:600c:3b09:b0:471:131f:85aa with SMTP id
+ 5b1f17b1804b1-477c017dfd2mr43475215e9.13.1763793292023; Fri, 21 Nov 2025
+ 22:34:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 21 Nov 2025 17:38:03 -0600
-X-Gm-Features: AWmQ_bk87nWr6fyL0sErZgefWPCikaLVzZJoSWyRpBO5CaoSgrh8BruwUS_PjE8
-Message-ID: <CAH2r5mstHjwg3=Vz_3cPXKGJphGhZ7G0hep=-sSfP_hE_3fd3Q@mail.gmail.com>
-Subject: Client and Server patches for upcoming Linux kernel (6.19-rc) merge window
-To: CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>
+From: Alexander Yashkin <alex.aspirine@gmail.com>
+Date: Sat, 22 Nov 2025 09:34:39 +0300
+X-Gm-Features: AWmQ_bnkQnrw5fFaJ0YngmJ66fkwM6Pj1i8Ao909iZFZ0KocBFuHK6EcbrpNtH0
+Message-ID: <CADBtHDBL3Z7KdkFbCYyOfjdjCBfDsnc_i1sGHyLewpqk7hPhMg@mail.gmail.com>
+Subject: Inquiry on DFS Connection Aggregation and Future Plans
+To: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-With the merge window for 6.19 Linux kernel likely approaching in ten
-days, now would be a good time to collect all of the pending patches
-and apply to for-next branch (for the client) or ksmbd-for-next (for
-the kernel server).
+Hello Linux CIFS developers and community,
 
-There are likely many patches that I missed either due to getting
-routed to spam or postponed ones.  If you have patches you want us to
-consider for upcoming merge window that are not already in for-next
-e.g. please email e.g. git link to current version or attachments with
-the patches (some e.g. will need to be rebased given the huge amount
-of change to fs/smb  in 6.18 so far).
+I am writing to seek your expert advice regarding the configuration of
+DFS connections and to understand the project's direction concerning
+connection aggregation.
 
-I don't want to accidentally miss good patches due to some patches
-getting ignored due to the very busy 6.18 release
+SETUP DESCRIPTION
 
--- 
-Thanks,
+We have a Windows Server 2022 configured with a DFS Namespace. The
+setup is as follows:
 
-Steve
+DFS Namespace: \\SERVER-FR\Data
+    =E2=94=82
+    =E2=94=9C=E2=94=80=E2=94=80 DFS Link: Shared01
+    =E2=94=82       =E2=94=82
+    =E2=94=82       =E2=94=9C=E2=94=80=E2=94=80 Target 1: \\SERVER-FR\Share=
+d01
+    =E2=94=82       =E2=94=94=E2=94=80=E2=94=80 Target 2: \\SERVER-UK\Share=
+d01
+    =E2=94=82
+    =E2=94=94=E2=94=80=E2=94=80 DFS Link: Shared02
+            =E2=94=82
+            =E2=94=9C=E2=94=80=E2=94=80 Target 1: \\SERVER-FR\Shared02
+            =E2=94=94=E2=94=80=E2=94=80 Target 2: \\SERVER-UK\Shared02
+
+Our Linux client, located in the same geographical zone as SERVER-FR,
+mounts the DFS root \\SERVER-FR\Data. This server (SERVER-FR) acts as
+both the DFS namespace server and hosts the SMB shares for the
+targets.
+
+ISSUE: Lack of Connection Aggregation
+
+We are observing a significant proliferation of TCP/SMB connections to
+the single server (SERVER-FR), which we believe is suboptimal:
+- Mounting the DFS namespace creates 2 connections.
+- Accessing Shared01 creates 3 additional connections.
+- Accessing Shared02 creates another 3 connections.
+
+This results in a total of 8 connections to a single server for this
+minimal setup. In our real-world production environment, with dozens
+of DFS targets and thousands of clients, this behavior leads to an
+overwhelming number of connections, exhausting system resources on the
+SMB server.
+
+QUESTIONS
+
+We would be grateful if you could provide insight on the following:
+- Is there a current method or configuration parameter (e.g., in
+mount.cifs or via sysfs) to encourage connection aggregation?
+Specifically, is it possible to reuse existing SMB connections to the
+same server for accessing different DFS targets, rather than
+establishing new ones for each?
+- Are there any active plans or ongoing development efforts to
+implement more efficient connection aggregation for single-server DFS
+scenarios, similar to the behavior found in other operating systems?
+
+Thank you for your time and for your continued work on the CIFS module.
+
+Best Regards,
+Alexander Yashkin
