@@ -1,474 +1,219 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986782BEFF6;
-	Sun, 23 Nov 2025 10:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8D3EEAB
+	for <linux-cifs@vger.kernel.org>; Sun, 23 Nov 2025 23:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763894303; cv=none; b=omD+mnk5mVfcy6HQt21V2Fr+p3E4tOKXFmyj+RS4e1TUccvoJeEITocZJgcWCNExJAEBbddZDB5ZU4yzAQccU+Pr7BhIytKrWdFK4PNi9ieJSmrlGyWoXpAj/qJaxXIy/2Ilf1o4ZbIn5vq5jWXyoYgU8Jetz3UfE5bo71JV8N4=
+	t=1763941977; cv=none; b=o+EEPIrbepARaBpqLKvGmBfgeG20iASYVVWjLLXAOT63Fz3AM+hD2w9KiTaN8QQMBYZDhDaiIV7O36o1dTdvegwzL/7E+IqcigzsHuQqDQxPuxzTE+UQNBysCqMyQcDTilwGWV/+BtliTTz8uHJTBPWz3JnxPhEXZtNqLFVi9tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763894303; c=relaxed/simple;
-	bh=drF2/MAxuMNgx8DcgY+p0/2w6tUrXJKfHIkkOoY/oME=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=f650VVKuhHIM0tvuGj+UweEDTJR9sx9s/1WOGSuY1m4nSarMH4gj6pxadsQtu3KfWCkIgrb8v13+XVpZ0GOerdFmrDVwtQpTv566YXK7J+xrx+WKXhsUNXZWglE3VLH/y7X6og795Lxu5Sh0FOlsyi8WsWrmqpEVUQwqLN3gJgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dDll95HwvzYQtdx;
-	Sun, 23 Nov 2025 18:37:25 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id 75A5C1A07BD;
-	Sun, 23 Nov 2025 18:38:12 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.50.87.129])
-	by APP2 (Coremail) with SMTP id Syh0CgBHpXsU5CJpsCLzBg--.58186S4;
-	Sun, 23 Nov 2025 18:38:12 +0800 (CST)
-From: Wang Zhaolong <wangzhaolong@huaweicloud.com>
-To: sfrench@samba.org,
-	pc@manguebit.org
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	chengzhihao1@huawei.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH v6] smb: client: Fix mount deadlock by avoiding super block iteration in DFS reconnect
-Date: Sun, 23 Nov 2025 18:28:44 +0800
-Message-Id: <20251123102845.456273-1-wangzhaolong@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1763941977; c=relaxed/simple;
+	bh=G+396j5E3oSYlgXES0uT2w8/XhT7FnSRGJQJf3/XKTA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F7J+IiO9iryAQqRLMnLvPCf6lNwIndCX5Iyglg7ZeJZ/D2GXcCGrPuPfphCQ3PNvJNkThq/rSv4+ZFeaxaEt+DWDNYG5oMi4GVW56rzBYR+Ze73LDOo3VA0wfhM2Wf4a1yEStzlDe1zujBb3DtA2pRzzj6zKTZIfWqv5A/c1NDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UH+tmo/t; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UH+tmo/t"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763941973;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3iwb5YW7lTHp3b6+iKLPVMv6CIYbcmnN5G/p+yPO23I=;
+	b=UH+tmo/tg8PV0A+XhA0d8Qhz2YfKk1r60lfHpxjcxlx4HZsbeUe5oGMz5s7Hu6r8DKDAOF
+	BQwOCjfBLNecHwo6BcKeE7PfK79+4gb9TzY+x2ttRfR8lnqXhzMK2fU+i2KGkP4NWIE95A
+	BwjgAgEvxGoLNLXecuV+FPJKV7CFySE=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-481-CPoFZG8nMTCII-yelFMgEg-1; Sun,
+ 23 Nov 2025 18:52:50 -0500
+X-MC-Unique: CPoFZG8nMTCII-yelFMgEg-1
+X-Mimecast-MFC-AGG-ID: CPoFZG8nMTCII-yelFMgEg_1763941968
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2B0951800447;
+	Sun, 23 Nov 2025 23:52:48 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.14])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B42791955F1B;
+	Sun, 23 Nov 2025 23:52:45 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 00/12] cifs: Miscellaneous prep patches for rewrite of I/O layer
+Date: Sun, 23 Nov 2025 23:52:27 +0000
+Message-ID: <20251123235242.3361706-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgBHpXsU5CJpsCLzBg--.58186S4
-X-Coremail-Antispam: 1UD129KBjvAXoW3ZFWxJFWDWr4xJF4xXFWDJwb_yoW8JF4rWo
-	W3Xayfu348Gr1jqrWqkrn3KFWDWa4DKF47Xa1Y9FsxKF9Yya4rC3yxta17JFW3uwn3tw1Y
-	vrWxt34kCa1xGrZ8n29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
-	AaLaJ3UjIYCTnIWjp_UUUYj7kC6x804xWl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK
-	8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4
-	AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF
-	7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7
-	CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8C
-	rVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6x
-	CaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28I
-	cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
-	IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
-	42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42
-	IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280
-	aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1wiSPUUUUU==
-X-CM-SenderInfo: pzdqw6xkdrz0tqj6x35dzhxuhorxvhhfrp/
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-An AA deadlock occurs when network interruption during mount triggers
-DFS reconnection logic that calls iterate_supers_type().
+Hi Steve,
 
-The detailed call process is as follows:
+Could you take these patches extracted from my I/O layer rewrite for the
+upcoming merge window.  The performance change should be neutral, but it
+cleans up the code a bit.
 
-   mount.cifs
--------------------------
-path_mount
- do_new_mount
-  vfs_get_tree
-   smb3_get_tree
-    cifs_smb3_do_mount
-     sget
-      alloc_super
-       down_write_nested(&s->s_umount, ..);  // Hold lock
-     cifs_root_iget
-      cifs_get_inode_info
-       smb2_query_path_info
-        smb2_compound_op
-         SMB2_open_init
-          smb2_plain_req_init
-           smb2_reconnect           // Trigger reconnection
-            cifs_tree_connect
-             cifs_get_dfs_tcon_super
-              __cifs_get_super
-               iterate_supers_type
-                super_lock_shared
-                 super_lock
-                  __super_lock
-                   down_read(&sb->s_umount); // Deadlock
-  do_new_mount_fc
-   up_write(&sb->s_umount);  // Release lock
+ (1) Do some minor cleanups so that patch 2 can be generated wholly by a
+     script.
 
-During mount phase, if reconnection is triggered, the foreground mount
-process may enter smb2_reconnect prior to the reconnect worker being
-scheduled, leading to a deadlock when subsequent DFS tree connect
-attempts reacquire the s_umount lock.
+ (2) Organise the declarations in the cifs client header files, naming the
+     arguments the same as for the implementations, inserting divider
+     comments, ordering them the same as they're found in the files and
+     dividing them better between general, smb1 and smb2/3 categories.
 
-The root cause is that cifs_get_dfs_tcon_super() uses
-iterate_supers_type() to locate a matching DFS super block, which
-reacquires s_umount while it is already held by the mount code.
+     The organisation is entirely scripted with the script in the second
+     patch's commit message.  The first patch does a bit of preparation to
+     make sure that the second patch's output will build.
 
-Fix this by avoiding global super block iteration in the DFS reconnect
-path and only using the existing CIFS hierarchy:
+     By filling in the argument names, this stops checkpatch moaning about
+     unnamed arguments from search-and-replace changes in later patches.
+     (Note that it doesn't fix func pointer declarations).
 
-  - First, walk tcon->cifs_sb_list under tcon->sb_list_lock and update
-    all attached cifs_sb using cifs_update_super_prepath().  This covers
-    the "master" tcon case.
+     smbdirect is left untouched as requested by Stefan Metzmacher.
 
-  - If that list is empty, fall back to walking all sessions and tcons
-    on the same server that share the same dfs_root_ses and
-    origin_fullpath, and update their cifs_sb lists instead.
+ (3) Add the smb3_read_* tracepoints to SMB1 as well as SMB2/3.
 
-This keeps all DFS prepath updates within the server → ses → tcon →
-cifs_sb structures protected by CIFS locks and removes the dependency
-on iterate_supers_type(), so the reconnect path no longer touches
-s_umount and the deadlock is avoided.
+ (4) Use netfs_alloc/free_folioq_buffer() rather than cifs doing its own
+     version.
 
-As a minor optimization, avoid updating the super block prepath if it
-is already set to the same value.
+ (5) Rename struct mid_q_entry to smb_message.  In my rewrite, smb_message
+     will get allocated in the marshalling functions in smb2pdu.c and
+     cifssmb.c rather than in transport.c and used to hand parameters down
+     - and so I think it could be better named for that.
 
-Fixes: 3ae872de4107 ("smb: client: fix shared DFS root mounts with different prefixes")
-Signed-off-by: Wang Zhaolong <wangzhaolong@huaweicloud.com>
----
+ (6) Remove the RFC1002 header from the smb_hdr struct so that it's
+     consistent with SMB2/3.  This allows I/O routines to be simplified and
+     shared.
 
-V6:
- - Refine update_tcon_super_prepaths() to handle non-master (multiuser) tcons
-   by walking server->smb_ses_list / ses->tcon_list and matching on
-   dfs_root_ses + origin_fullpath, then updating all attached cifs_sb
- - Completely drop cifs_get_dfs_tcon_super() / iterate_supers_type()-based
-   lookup from the DFS reconnect path
- - Add a cheap early-return in cifs_update_super_prepath() when prepath is
-   unchanged.
+ (7) Make SMB1's SendReceive() wrap cifs_send_recv() and thus share code
+     with SMB2/3.
 
-V5:
- - Extract update logic into update_tcon_super_prepaths() function
- - Add error logging for prepath update failures
- - Leverage existing tcon->cifs_sb_list infrastructure instead of iterate_supers_type()
- - Remove now-unused cifs_get_dfs_tcon_super() and related callback code
+ (8) Clean up a bunch of extra kvec[] that were required for RFC1002
+     headers from SMB1's header struct.
 
-V4:
- - Perform a null pointer check on the return value of cifs_get_dfs_tcon_super()
-   to prevent NULL ptr dereference with DFS multiuser mount
+ (9) Replace SendReceiveBlockingLock() with SendReceive() plus flags.
 
-V3:
- - Adjust the trace diagram for the super_lock_shared() section to align with
-   the latest mainline call flow.
+(10) Remove the server pointer from smb_message.  It can be passed down
+     from the caller to all places that need it.
 
-V2:
- - Adjust the trace diagram in the commit message to indicate when the lock
-   is released
+(11) Don't need state locking in smb2_get_mid_entry() as we're just doing a
+     single read inside the lock.  READ_ONCE() should suffice instead.
 
- fs/smb/client/cifsproto.h |  2 -
- fs/smb/client/connect.c   |  2 +-
- fs/smb/client/dfs.c       | 97 ++++++++++++++++++++++++++++++++++-----
- fs/smb/client/misc.c      | 79 ++-----------------------------
- 4 files changed, 89 insertions(+), 91 deletions(-)
+(12) Add a tracepoint to log EIO errors and up to a couple of bits of info
+     for each to make it easier to find out why an EIO error happened when
+     the system is very busy without introducing printk delays.
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 3528c365a452..a28942f53653 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -684,12 +684,10 @@ void extract_unc_hostname(const char *unc, const char **h, size_t *len);
- int copy_path_name(char *dst, const char *src);
- int smb2_parse_query_directory(struct cifs_tcon *tcon, struct kvec *rsp_iov,
- 			       int resp_buftype,
- 			       struct cifs_search_info *srch_inf);
- 
--struct super_block *cifs_get_dfs_tcon_super(struct cifs_tcon *tcon);
--void cifs_put_tcp_super(struct super_block *sb);
- int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix);
- char *extract_hostname(const char *unc);
- char *extract_sharename(const char *unc);
- int parse_reparse_point(struct reparse_data_buffer *buf,
- 			u32 plen, struct cifs_sb_info *cifs_sb,
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 55cb4b0cbd48..f4761d381b44 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -4434,11 +4434,11 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
- 	}
- 
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	if (origin_fullpath) {
- 		spin_lock(&tcon->tc_lock);
--		tcon->origin_fullpath = origin_fullpath;
-+		WRITE_ONCE(tcon->origin_fullpath, origin_fullpath);
- 		spin_unlock(&tcon->tc_lock);
- 		origin_fullpath = NULL;
- 		queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
- 				   dfs_cache_get_ttl() * HZ);
- 	}
-diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
-index f65a8a90ba27..a61144be1142 100644
---- a/fs/smb/client/dfs.c
-+++ b/fs/smb/client/dfs.c
-@@ -227,11 +227,11 @@ static int __dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
- 	if (rc)
- 		goto out;
- 
- 	tcon = mnt_ctx->tcon;
- 	spin_lock(&tcon->tc_lock);
--	tcon->origin_fullpath = origin_fullpath;
-+	WRITE_ONCE(tcon->origin_fullpath, origin_fullpath);
- 	origin_fullpath = NULL;
- 	ref_walk_set_tcon(rw, tcon);
- 	spin_unlock(&tcon->tc_lock);
- 	queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
- 			   dfs_cache_get_ttl() * HZ);
-@@ -331,13 +331,93 @@ static int target_share_matches_server(struct TCP_Server_Info *server, char *sha
- 	}
- 	cifs_server_unlock(server);
- 	return rc;
- }
- 
-+static int update_tcon_super_prepaths(struct cifs_tcon *tcon, const char *prefix)
-+{
-+	struct TCP_Server_Info *server = tcon->ses->server;
-+	struct cifs_ses *ses;
-+	struct cifs_tcon *scan_tcon;
-+	struct cifs_sb_info *cifs_sb;
-+	const char *origin;
-+	int rc = 0;
-+	bool updated = false;
-+
-+	/* Fast path: master tcon */
-+	spin_lock(&tcon->sb_list_lock);
-+	list_for_each_entry(cifs_sb, &tcon->cifs_sb_list, tcon_sb_link) {
-+		updated = true;
-+		rc = cifs_update_super_prepath(cifs_sb, (char *)prefix);
-+		if (rc) {
-+			cifs_dbg(VFS,
-+				 "Failed to update prepath for superblock: %d\n",
-+				 rc);
-+			break;
-+		}
-+	}
-+	spin_unlock(&tcon->sb_list_lock);
-+
-+	if (updated || rc)
-+		return rc;
-+
-+	/* Slow path: non-master tcon */
-+	origin = READ_ONCE(tcon->origin_fullpath);
-+	if (!origin)
-+		return 0;
-+
-+	spin_lock(&cifs_tcp_ses_lock);
-+	spin_lock(&server->srv_lock);
-+	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+		spin_lock(&ses->ses_lock);
-+
-+		if (ses->dfs_root_ses != tcon->ses->dfs_root_ses) {
-+			spin_unlock(&ses->ses_lock);
-+			continue;
-+		}
-+
-+		list_for_each_entry(scan_tcon, &ses->tcon_list, tcon_list) {
-+			const char *scan_origin;
-+
-+			scan_origin = READ_ONCE(scan_tcon->origin_fullpath);
-+			if (!scan_origin)
-+				continue;
-+
-+			if (!dfs_src_pathname_equal(scan_origin, origin))
-+				continue;
-+
-+			spin_lock(&scan_tcon->sb_list_lock);
-+			list_for_each_entry(cifs_sb, &scan_tcon->cifs_sb_list,
-+					    tcon_sb_link) {
-+				rc = cifs_update_super_prepath(cifs_sb,
-+							       (char *)prefix);
-+				if (rc) {
-+					cifs_dbg(VFS,
-+						 "Failed to update prepath for superblock: %d\n",
-+						 rc);
-+					break;
-+				}
-+			}
-+			spin_unlock(&scan_tcon->sb_list_lock);
-+
-+			if (rc) {
-+				spin_unlock(&ses->ses_lock);
-+				goto out_srv_unlock;
-+			}
-+		}
-+
-+		spin_unlock(&ses->ses_lock);
-+	}
-+out_srv_unlock:
-+	spin_unlock(&server->srv_lock);
-+	spin_unlock(&cifs_tcp_ses_lock);
-+
-+	return rc;
-+}
-+
- static int tree_connect_dfs_target(const unsigned int xid,
- 				   struct cifs_tcon *tcon,
--				   struct cifs_sb_info *cifs_sb,
- 				   char *tree, bool islink,
- 				   struct dfs_cache_tgt_list *tl)
- {
- 	const struct smb_version_operations *ops = tcon->ses->server->ops;
- 	struct TCP_Server_Info *server = tcon->ses->server;
-@@ -370,12 +450,12 @@ static int tree_connect_dfs_target(const unsigned int xid,
- 
- 		dfs_cache_noreq_update_tgthint(server->leaf_fullpath + 1, tit);
- 		scnprintf(tree, MAX_TREE_SIZE, "\\%s", share);
- 		rc = ops->tree_connect(xid, tcon->ses, tree,
- 				       tcon, tcon->ses->local_nls);
--		if (islink && !rc && cifs_sb)
--			rc = cifs_update_super_prepath(cifs_sb, prefix);
-+		if (islink && !rc && READ_ONCE(tcon->origin_fullpath))
-+			rc = update_tcon_super_prepaths(tcon, prefix);
- 		break;
- 	}
- 
- 	kfree(share);
- 	kfree(prefix);
-@@ -387,12 +467,10 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon)
- {
- 	int rc;
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	const struct smb_version_operations *ops = server->ops;
- 	DFS_CACHE_TGT_LIST(tl);
--	struct cifs_sb_info *cifs_sb = NULL;
--	struct super_block *sb = NULL;
- 	struct dfs_info3_param ref = {0};
- 	char *tree;
- 
- 	/* only send once per connect */
- 	spin_lock(&tcon->tc_lock);
-@@ -428,29 +506,24 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon)
- 		rc = ops->tree_connect(xid, tcon->ses, tree,
- 				       tcon, tcon->ses->local_nls);
- 		goto out;
- 	}
- 
--	sb = cifs_get_dfs_tcon_super(tcon);
--	if (!IS_ERR(sb))
--		cifs_sb = CIFS_SB(sb);
--
- 	/* Tree connect to last share in @tcon->tree_name if no DFS referral */
- 	if (!server->leaf_fullpath ||
- 	    dfs_cache_noreq_find(server->leaf_fullpath + 1, &ref, &tl)) {
- 		rc = ops->tree_connect(xid, tcon->ses, tcon->tree_name,
- 				       tcon, tcon->ses->local_nls);
- 		goto out;
- 	}
- 
--	rc = tree_connect_dfs_target(xid, tcon, cifs_sb, tree, ref.server_type == DFS_TYPE_LINK,
-+	rc = tree_connect_dfs_target(xid, tcon, tree, ref.server_type == DFS_TYPE_LINK,
- 				     &tl);
- 	free_dfs_info_param(&ref);
- 
- out:
- 	kfree(tree);
--	cifs_put_tcp_super(sb);
- 
- 	if (rc) {
- 		spin_lock(&tcon->tc_lock);
- 		if (tcon->status == TID_IN_TCON)
- 			tcon->status = TID_NEED_TCON;
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index e10123d8cd7d..ee26168d17b9 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -1119,86 +1119,10 @@ int copy_path_name(char *dst, const char *src)
- 	/* we count the trailing nul */
- 	name_len++;
- 	return name_len;
- }
- 
--struct super_cb_data {
--	void *data;
--	struct super_block *sb;
--};
--
--static void tcon_super_cb(struct super_block *sb, void *arg)
--{
--	struct super_cb_data *sd = arg;
--	struct cifs_sb_info *cifs_sb;
--	struct cifs_tcon *t1 = sd->data, *t2;
--
--	if (sd->sb)
--		return;
--
--	cifs_sb = CIFS_SB(sb);
--	t2 = cifs_sb_master_tcon(cifs_sb);
--
--	spin_lock(&t2->tc_lock);
--	if ((t1->ses == t2->ses ||
--	     t1->ses->dfs_root_ses == t2->ses->dfs_root_ses) &&
--	    t1->ses->server == t2->ses->server &&
--	    t2->origin_fullpath &&
--	    dfs_src_pathname_equal(t2->origin_fullpath, t1->origin_fullpath))
--		sd->sb = sb;
--	spin_unlock(&t2->tc_lock);
--}
--
--static struct super_block *__cifs_get_super(void (*f)(struct super_block *, void *),
--					    void *data)
--{
--	struct super_cb_data sd = {
--		.data = data,
--		.sb = NULL,
--	};
--	struct file_system_type **fs_type = (struct file_system_type *[]) {
--		&cifs_fs_type, &smb3_fs_type, NULL,
--	};
--
--	for (; *fs_type; fs_type++) {
--		iterate_supers_type(*fs_type, f, &sd);
--		if (sd.sb) {
--			/*
--			 * Grab an active reference in order to prevent automounts (DFS links)
--			 * of expiring and then freeing up our cifs superblock pointer while
--			 * we're doing failover.
--			 */
--			cifs_sb_active(sd.sb);
--			return sd.sb;
--		}
--	}
--	pr_warn_once("%s: could not find dfs superblock\n", __func__);
--	return ERR_PTR(-EINVAL);
--}
--
--static void __cifs_put_super(struct super_block *sb)
--{
--	if (!IS_ERR_OR_NULL(sb))
--		cifs_sb_deactive(sb);
--}
--
--struct super_block *cifs_get_dfs_tcon_super(struct cifs_tcon *tcon)
--{
--	spin_lock(&tcon->tc_lock);
--	if (!tcon->origin_fullpath) {
--		spin_unlock(&tcon->tc_lock);
--		return ERR_PTR(-ENOENT);
--	}
--	spin_unlock(&tcon->tc_lock);
--	return __cifs_get_super(tcon_super_cb, tcon);
--}
--
--void cifs_put_tcp_super(struct super_block *sb)
--{
--	__cifs_put_super(sb);
--}
--
- #ifdef CONFIG_CIFS_DFS_UPCALL
- int match_target_ip(struct TCP_Server_Info *server,
- 		    const char *host, size_t hostlen,
- 		    bool *result)
- {
-@@ -1223,10 +1147,13 @@ int match_target_ip(struct TCP_Server_Info *server,
- 
- int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix)
- {
- 	int rc;
- 
-+	if (cifs_sb->prepath && prefix && !strcmp(cifs_sb->prepath, prefix))
-+		return 0;
-+
- 	kfree(cifs_sb->prepath);
- 	cifs_sb->prepath = NULL;
- 
- 	if (prefix && *prefix) {
- 		cifs_sb->prepath = cifs_sanitize_prepath(prefix, GFP_ATOMIC);
--- 
-2.39.2
+The patches can be found here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-cleanup
+
+Thanks,
+David
+
+Changes
+=======
+ver #3)
+ - Rebased on the ksmbd-for-next branch.
+ - Add the patches to clean up the function prototypes in the headers.
+   - Don't touch smbdirect.
+   - Put prototypes into netlink.h and cached_dir.h rather than
+     centralising them.
+   - Indent the arguments in the prototypes to the opening bracket + 1.
+ - Cleaned up most other checkpatch complaints.
+ - Added the EIO tracepoint patch to the end.
+
+ver #2)
+ - Rebased on the ksmbd-for-next-next branch.
+ - Moved the patch to use netfs_alloc/free_folioq_buffer() down the stack.
+
+David Howells (12):
+  cifs: Do some preparation prior to organising the function
+    declarations
+  cifs: Clean up declarations
+  cifs: Add the smb3_read_* tracepoints to SMB1
+  cifs: Use netfs_alloc/free_folioq_buffer()
+  cifs: Rename mid_q_entry to smb_message
+  cifs: Remove the RFC1002 header from smb_hdr
+  cifs: Make smb1's SendReceive() wrap cifs_send_recv()
+  cifs: Clean up some places where an extra kvec[] was required for
+    rfc1002
+  cifs: Replace SendReceiveBlockingLock() with SendReceive() plus flags
+  cifs: Remove the server pointer from smb_message
+  cifs: Don't need state locking in smb2_get_mid_entry()
+  cifs: Add a tracepoint to log EIO errors
+
+ fs/smb/client/cached_dir.c    |    2 +-
+ fs/smb/client/cached_dir.h    |   37 +-
+ fs/smb/client/cifs_debug.c    |   51 +-
+ fs/smb/client/cifs_debug.h    |   15 +-
+ fs/smb/client/cifs_spnego.h   |    2 -
+ fs/smb/client/cifs_swn.h      |   15 +-
+ fs/smb/client/cifs_unicode.c  |    1 +
+ fs/smb/client/cifs_unicode.h  |   16 -
+ fs/smb/client/cifsacl.c       |   11 +-
+ fs/smb/client/cifsencrypt.c   |   83 +-
+ fs/smb/client/cifsfs.c        |   36 +-
+ fs/smb/client/cifsfs.h        |   64 --
+ fs/smb/client/cifsglob.h      |  219 ++----
+ fs/smb/client/cifspdu.h       |   13 +-
+ fs/smb/client/cifsproto.h     | 1340 +++++++++++++++++----------------
+ fs/smb/client/cifssmb.c       |  954 +++++++++++++----------
+ fs/smb/client/cifstransport.c |  439 ++---------
+ fs/smb/client/compress.c      |   23 +-
+ fs/smb/client/compress.h      |   20 +-
+ fs/smb/client/connect.c       |  200 ++---
+ fs/smb/client/dfs.h           |    4 -
+ fs/smb/client/dfs_cache.h     |   16 -
+ fs/smb/client/dir.c           |    9 +-
+ fs/smb/client/dns_resolve.h   |    3 -
+ fs/smb/client/file.c          |    7 +-
+ fs/smb/client/fs_context.c    |    2 +-
+ fs/smb/client/fs_context.h    |    9 -
+ fs/smb/client/fscache.h       |   13 +-
+ fs/smb/client/inode.c         |   15 +-
+ fs/smb/client/ioctl.c         |    1 +
+ fs/smb/client/link.c          |   11 +-
+ fs/smb/client/misc.c          |   53 +-
+ fs/smb/client/netlink.h       |    8 +-
+ fs/smb/client/netmisc.c       |   21 +-
+ fs/smb/client/nterr.h         |    2 -
+ fs/smb/client/ntlmssp.h       |   13 -
+ fs/smb/client/readdir.c       |    2 +-
+ fs/smb/client/reparse.c       |   53 +-
+ fs/smb/client/reparse.h       |   11 -
+ fs/smb/client/sess.c          |   17 +-
+ fs/smb/client/smb1ops.c       |  116 ++-
+ fs/smb/client/smb1proto.h     |  227 ++++++
+ fs/smb/client/smb2file.c      |    9 +-
+ fs/smb/client/smb2inode.c     |   12 +-
+ fs/smb/client/smb2maperror.c  |    3 +
+ fs/smb/client/smb2misc.c      |   11 +-
+ fs/smb/client/smb2ops.c       |  249 +++---
+ fs/smb/client/smb2pdu.c       |  228 +++---
+ fs/smb/client/smb2proto.h     |  516 ++++++-------
+ fs/smb/client/smb2transport.c |  113 ++-
+ fs/smb/client/smbdirect.c     |   18 +-
+ fs/smb/client/smbdirect.h     |    1 +
+ fs/smb/client/trace.h         |  153 ++++
+ fs/smb/client/transport.c     |  302 ++++----
+ fs/smb/client/xattr.c         |    2 +-
+ fs/smb/common/smb2pdu.h       |    3 -
+ fs/smb/common/smbglob.h       |    1 -
+ 57 files changed, 2913 insertions(+), 2862 deletions(-)
+ create mode 100644 fs/smb/client/smb1proto.h
 
