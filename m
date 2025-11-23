@@ -1,290 +1,474 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46DEA212574
-	for <linux-cifs@vger.kernel.org>; Sun, 23 Nov 2025 02:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986782BEFF6;
+	Sun, 23 Nov 2025 10:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763866468; cv=none; b=LeC+WwE2JVR1/uJaP79eTIt+UGUb7QZksMbSxPa8z5nk4BKp3xxXSoFRM7n3sJZ3qYSdWJxp6ERnryKdhOSO7KcAUjpSTV2We3bliO0A4qAPGkGazjjgHmMiR8U7Ei1KRvtHyRShfttAZ3JjFdd0PFiRW/KV51LehELNgt2R2P0=
+	t=1763894303; cv=none; b=omD+mnk5mVfcy6HQt21V2Fr+p3E4tOKXFmyj+RS4e1TUccvoJeEITocZJgcWCNExJAEBbddZDB5ZU4yzAQccU+Pr7BhIytKrWdFK4PNi9ieJSmrlGyWoXpAj/qJaxXIy/2Ilf1o4ZbIn5vq5jWXyoYgU8Jetz3UfE5bo71JV8N4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763866468; c=relaxed/simple;
-	bh=VPSEhOnB2RE6eQydB0Smr96MaVFBkvWgt2EDOEnbyuA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mUb5t2zBOioN/LPv7z0+dNJVQC7VipCNj0PhIYUyiSQLUIGQ4uPMzgezkB9QSVVUXIHLV0qwUwqODymDQQX+ciE+CROAfCwcD9ddJUp+eciJPafTChE7D6CF+mkLYCQ+qB8cvN+bfYI1GuWXkaVZgjZWwj42VqGazzU61hdxxwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ru2Kf5ta; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ru2Kf5ta"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-bceaaed0514so261799a12.3
-        for <linux-cifs@vger.kernel.org>; Sat, 22 Nov 2025 18:54:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763866464; x=1764471264; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+rWyDuox+fsgvKye3HBmJxKH4MrEcdZHrSZHWuNczAU=;
-        b=Ru2Kf5taPfYQ76Wzf60aQ1WFd4/4hmtFhaFR4sWgTn+4DLVmceCuRBZZZgx+hFe0lr
-         kFdD3SB2rV2uXwgrTLfn7tVzzjJPrxyPhhh+4cKAPKCK6jIO8OjvBftVf9VkyW+pbIdc
-         9uPxsky22hcfz3TP+CSpP1ztoJB4/P3XNgYFzlnxAijH1RNi1MG/BHim2e5VyBu2ohN7
-         gt6siTEHi7ChlBR1usICkfmmR82o8Sz0ekY281FmFbF/jLx3asoOU8JIvzV/Dd4J6CL1
-         6m8I6+zuO7mm8vKuP+ARnallH5rDm1PiyZ5/gyP6kIsC/PEIj9IaSbJF5ZjhIylCj+K1
-         kI5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763866464; x=1764471264;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+rWyDuox+fsgvKye3HBmJxKH4MrEcdZHrSZHWuNczAU=;
-        b=gcFtkceTHY0nno9MTlTHJ9AXwqweI55BtrIg0fhQH/Dw3Afbb4GlhqH3Vp5TpL0P/y
-         sSGUmyueeypJBSIpbvQloYFVChxFCIYKF8Z5G2Pv1039pFHi/5dxqSPP08Cg7W2NgvA6
-         uYb5iwUH/Y0/Yfm+ho2TlcGwJO9569XrrN//cRfwHi7C5dxTv3/E3YbyhlTEVgMo+hTh
-         VIOWnQHCiPgRCucvVNagjo/CjyIWEoZahQ04UkW6ryXbrlf985UeYJrqhwk03aCvPnds
-         HG86TyN8t26h1nbYqnRAxIXOnxg/j+aySOvJIgH8SEvoBg0lEKq8ooM5fZZ7HCySKmwV
-         R+IQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUVOPRusDn8kdMDbMEuQXf6JsuJ0t9pyqmG0SOp+M3RlQvr/luQxkRq/TZuaL7mCkKe2EfVeP16VIj5@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzOAtJbXuMgPySCa8sRl1i6xDHdQ0j6IoG7syDWMJt3Q7rdDLZ
-	UfeeDvh6qbigK2XvpSaXKLurDyBN0f9Cfo2i+5I6xUzHFg3ctmUYaxAv
-X-Gm-Gg: ASbGnct4CYv0CaCSFcGoVRD7dwVlTCwJnRblVovz9GBp07k0KtVjyMglCfQ8EfrGm88
-	rzotAI8gNZZqH+L7w1uLOi4cGegBGQLOY9Jw/cKGFN99TzsNlvhL/pyukVB8tyqNYBrO6sdoKLx
-	wRToe2dF+NkJSPq9kY1qLMrMliRl/+XldeDXgUxVYngWMnCXH/aFRuR+/s7b7wgJGJB4/9oQ4h6
-	/x1QBLeiCxx+PebZHy44ayQzSnFF6YnbZKMOyuVx8tb3k1liUMo2g6i2XzusimJ2hiA3Tx14KGp
-	xRj/dYCyoaYy0dP3OHDgw9H8xzOBF055hU/JgGCpwakXP3+2Cx2kbbnWs8Qph/1fARPFryuEumz
-	s71fWprUoM679cbMO6NeFYsWHDYtD77f0SvBm9dQtB+X7txeq/IRPABd3VlDRGsYDiGTPhgZVmJ
-	OLvxnc48Q6YTJgt9fkOVDxisnb7W8hoP6927uvSGSIrvTaax5wC7fxdo0Xein79ulq897xV02w
-X-Google-Smtp-Source: AGHT+IEOwgcBpDEpwRs7NjxIYRpA59LU4lAa4Z5co3ra/2xjeKkaDavEtEeAipX/NV+VPLbSZ81R9Q==
-X-Received: by 2002:a17:90b:3e8b:b0:340:e0f3:8212 with SMTP id 98e67ed59e1d1-34736bdad39mr4096260a91.8.1763866464426;
-        Sat, 22 Nov 2025 18:54:24 -0800 (PST)
-Received: from poi.localdomain (KD118158218050.ppp-bb.dion.ne.jp. [118.158.218.50])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-345b03e04e5sm8281266a91.6.2025.11.22.18.54.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Nov 2025 18:54:23 -0800 (PST)
-From: Qianchang Zhao <pioooooooooip@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: gregkh@linuxfoundation.org,
-	linux-cifs@vger.kernel.org,
+	s=arc-20240116; t=1763894303; c=relaxed/simple;
+	bh=drF2/MAxuMNgx8DcgY+p0/2w6tUrXJKfHIkkOoY/oME=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=f650VVKuhHIM0tvuGj+UweEDTJR9sx9s/1WOGSuY1m4nSarMH4gj6pxadsQtu3KfWCkIgrb8v13+XVpZ0GOerdFmrDVwtQpTv566YXK7J+xrx+WKXhsUNXZWglE3VLH/y7X6og795Lxu5Sh0FOlsyi8WsWrmqpEVUQwqLN3gJgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dDll95HwvzYQtdx;
+	Sun, 23 Nov 2025 18:37:25 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id 75A5C1A07BD;
+	Sun, 23 Nov 2025 18:38:12 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.87.129])
+	by APP2 (Coremail) with SMTP id Syh0CgBHpXsU5CJpsCLzBg--.58186S4;
+	Sun, 23 Nov 2025 18:38:12 +0800 (CST)
+From: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+To: sfrench@samba.org,
+	pc@manguebit.org
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org,
-	Zhitong Liu <liuzhitong1993@gmail.com>,
-	Qianchang Zhao <pioooooooooip@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: vfs: fix race on m_flags in vfs_cache
-Date: Sun, 23 Nov 2025 11:54:14 +0900
-Message-Id: <20251123025414.644641-1-pioooooooooip@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CAKYAXd_v9sLxB7a10iwHwci_c38jNJiNNCQprb0Hu9TmaQE7gg@mail.gmail.com>
-References: <CAKYAXd_v9sLxB7a10iwHwci_c38jNJiNNCQprb0Hu9TmaQE7gg@mail.gmail.com>
+	chengzhihao1@huawei.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH v6] smb: client: Fix mount deadlock by avoiding super block iteration in DFS reconnect
+Date: Sun, 23 Nov 2025 18:28:44 +0800
+Message-Id: <20251123102845.456273-1-wangzhaolong@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgBHpXsU5CJpsCLzBg--.58186S4
+X-Coremail-Antispam: 1UD129KBjvAXoW3ZFWxJFWDWr4xJF4xXFWDJwb_yoW8JF4rWo
+	W3Xayfu348Gr1jqrWqkrn3KFWDWa4DKF47Xa1Y9FsxKF9Yya4rC3yxta17JFW3uwn3tw1Y
+	vrWxt34kCa1xGrZ8n29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UjIYCTnIWjp_UUUYj7kC6x804xWl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK
+	8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4
+	AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF
+	7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7
+	CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8C
+	rVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6x
+	CaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28I
+	cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+	IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
+	42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42
+	IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280
+	aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1wiSPUUUUU==
+X-CM-SenderInfo: pzdqw6xkdrz0tqj6x35dzhxuhorxvhhfrp/
 
-ksmbd maintains delete-on-close and pending-delete state in
-ksmbd_inode->m_flags. In vfs_cache.c this field is accessed under
-inconsistent locking: some paths read and modify m_flags under
-ci->m_lock while others do so without taking the lock at all.
+An AA deadlock occurs when network interruption during mount triggers
+DFS reconnection logic that calls iterate_supers_type().
 
-Examples:
+The detailed call process is as follows:
 
- - ksmbd_query_inode_status() and __ksmbd_inode_close() use
-   ci->m_lock when checking or updating m_flags.
- - ksmbd_inode_pending_delete(), ksmbd_set_inode_pending_delete(),
-   ksmbd_clear_inode_pending_delete() and ksmbd_fd_set_delete_on_close()
-   used to read and modify m_flags without ci->m_lock.
+   mount.cifs
+-------------------------
+path_mount
+ do_new_mount
+  vfs_get_tree
+   smb3_get_tree
+    cifs_smb3_do_mount
+     sget
+      alloc_super
+       down_write_nested(&s->s_umount, ..);  // Hold lock
+     cifs_root_iget
+      cifs_get_inode_info
+       smb2_query_path_info
+        smb2_compound_op
+         SMB2_open_init
+          smb2_plain_req_init
+           smb2_reconnect           // Trigger reconnection
+            cifs_tree_connect
+             cifs_get_dfs_tcon_super
+              __cifs_get_super
+               iterate_supers_type
+                super_lock_shared
+                 super_lock
+                  __super_lock
+                   down_read(&sb->s_umount); // Deadlock
+  do_new_mount_fc
+   up_write(&sb->s_umount);  // Release lock
 
-This creates a potential data race on m_flags when multiple threads
-open, close and delete the same file concurrently. In the worst case
-delete-on-close and pending-delete bits can be lost or observed in an
-inconsistent state, leading to confusing delete semantics (files that
-stay on disk after delete-on-close, or files that disappear while still
-in use).
+During mount phase, if reconnection is triggered, the foreground mount
+process may enter smb2_reconnect prior to the reconnect worker being
+scheduled, leading to a deadlock when subsequent DFS tree connect
+attempts reacquire the s_umount lock.
 
-Fix it by:
+The root cause is that cifs_get_dfs_tcon_super() uses
+iterate_supers_type() to locate a matching DFS super block, which
+reacquires s_umount while it is already held by the mount code.
 
- - Making ksmbd_query_inode_status() look at m_flags under ci->m_lock
-   after dropping inode_hash_lock.
- - Adding ci->m_lock protection to all helpers that read or modify
-   m_flags (ksmbd_inode_pending_delete(), ksmbd_set_inode_pending_delete(),
-   ksmbd_clear_inode_pending_delete(), ksmbd_fd_set_delete_on_close()).
- - Keeping the existing ci->m_lock protection in __ksmbd_inode_close(),
-   and moving the actual unlink/xattr removal outside the lock.
+Fix this by avoiding global super block iteration in the DFS reconnect
+path and only using the existing CIFS hierarchy:
 
-This unifies the locking around m_flags and removes the data race while
-preserving the existing delete-on-close behaviour.
+  - First, walk tcon->cifs_sb_list under tcon->sb_list_lock and update
+    all attached cifs_sb using cifs_update_super_prepath().  This covers
+    the "master" tcon case.
 
-Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
-Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+  - If that list is empty, fall back to walking all sessions and tcons
+    on the same server that share the same dfs_root_ses and
+    origin_fullpath, and update their cifs_sb lists instead.
+
+This keeps all DFS prepath updates within the server → ses → tcon →
+cifs_sb structures protected by CIFS locks and removes the dependency
+on iterate_supers_type(), so the reconnect path no longer touches
+s_umount and the deadlock is avoided.
+
+As a minor optimization, avoid updating the super block prepath if it
+is already set to the same value.
+
+Fixes: 3ae872de4107 ("smb: client: fix shared DFS root mounts with different prefixes")
+Signed-off-by: Wang Zhaolong <wangzhaolong@huaweicloud.com>
 ---
- fs/smb/server/vfs_cache.c | 114 +++++++++++++++++++++++++++++---------
- 1 file changed, 87 insertions(+), 27 deletions(-)
 
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index dfed6fce8..b44e0d618 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -112,40 +112,88 @@ int ksmbd_query_inode_status(struct dentry *dentry)
+V6:
+ - Refine update_tcon_super_prepaths() to handle non-master (multiuser) tcons
+   by walking server->smb_ses_list / ses->tcon_list and matching on
+   dfs_root_ses + origin_fullpath, then updating all attached cifs_sb
+ - Completely drop cifs_get_dfs_tcon_super() / iterate_supers_type()-based
+   lookup from the DFS reconnect path
+ - Add a cheap early-return in cifs_update_super_prepath() when prepath is
+   unchanged.
+
+V5:
+ - Extract update logic into update_tcon_super_prepaths() function
+ - Add error logging for prepath update failures
+ - Leverage existing tcon->cifs_sb_list infrastructure instead of iterate_supers_type()
+ - Remove now-unused cifs_get_dfs_tcon_super() and related callback code
+
+V4:
+ - Perform a null pointer check on the return value of cifs_get_dfs_tcon_super()
+   to prevent NULL ptr dereference with DFS multiuser mount
+
+V3:
+ - Adjust the trace diagram for the super_lock_shared() section to align with
+   the latest mainline call flow.
+
+V2:
+ - Adjust the trace diagram in the commit message to indicate when the lock
+   is released
+
+ fs/smb/client/cifsproto.h |  2 -
+ fs/smb/client/connect.c   |  2 +-
+ fs/smb/client/dfs.c       | 97 ++++++++++++++++++++++++++++++++++-----
+ fs/smb/client/misc.c      | 79 ++-----------------------------
+ 4 files changed, 89 insertions(+), 91 deletions(-)
+
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 3528c365a452..a28942f53653 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -684,12 +684,10 @@ void extract_unc_hostname(const char *unc, const char **h, size_t *len);
+ int copy_path_name(char *dst, const char *src);
+ int smb2_parse_query_directory(struct cifs_tcon *tcon, struct kvec *rsp_iov,
+ 			       int resp_buftype,
+ 			       struct cifs_search_info *srch_inf);
  
- 	read_lock(&inode_hash_lock);
- 	ci = __ksmbd_inode_lookup(dentry);
--	if (ci) {
--		ret = KSMBD_INODE_STATUS_OK;
--		if (ci->m_flags & (S_DEL_PENDING | S_DEL_ON_CLS))
--			ret = KSMBD_INODE_STATUS_PENDING_DELETE;
--		atomic_dec(&ci->m_count);
--	}
- 	read_unlock(&inode_hash_lock);
-+	if (!ci)
-+		return ret;
-+	down_read(&ci->m_lock);
-+	if (ci->m_flags & (S_DEL_PENDING | S_DEL_ON_CLS))
-+		ret = KSMBD_INODE_STATUS_PENDING_DELETE;
-+	else
-+		ret = KSMBD_INODE_STATUS_OK;
-+	up_read(&ci->m_lock);
-+
-+	atomic_dec(&ci->m_count);
- 	return ret;
- }
- 
- bool ksmbd_inode_pending_delete(struct ksmbd_file *fp)
- {
--	return (fp->f_ci->m_flags & (S_DEL_PENDING | S_DEL_ON_CLS));
-+	struct ksmbd_inode *ci;
-+	bool ret;
-+
-+	if (!fp)
-+		return false;
-+
-+	ci = fp->f_ci;
-+	if (!ci)
-+		return false;
-+
-+	down_read(&ci->m_lock);
-+	ret = ci->m_flags & (S_DEL_PENDING | S_DEL_ON_CLS);
-+	up_read(&ci->m_lock);
-+
-+	return ret;
- }
- 
- void ksmbd_set_inode_pending_delete(struct ksmbd_file *fp)
- {
--	fp->f_ci->m_flags |= S_DEL_PENDING;
-+	struct ksmbd_inode *ci;
-+
-+	if (!fp)
-+		return;
-+
-+	ci = fp->f_ci;
-+	if (!ci)
-+		return;
-+
-+	down_write(&ci->m_lock);
-+	ci->m_flags |= S_DEL_PENDING;
-+	up_write(&ci->m_lock);
- }
- 
- void ksmbd_clear_inode_pending_delete(struct ksmbd_file *fp)
- {
--	fp->f_ci->m_flags &= ~S_DEL_PENDING;
-+	struct ksmbd_inode *ci;
-+
-+	if (!fp)
-+		return;
-+
-+	ci = fp->f_ci;
-+	if (!ci)
-+		return;
-+
-+	down_write(&ci->m_lock);
-+	ci->m_flags &= ~S_DEL_PENDING;
-+	up_write(&ci->m_lock);
- }
- 
--void ksmbd_fd_set_delete_on_close(struct ksmbd_file *fp,
--				  int file_info)
-+void ksmbd_fd_set_delete_on_close(struct ksmbd_file *fp, int file_info)
- {
--	if (ksmbd_stream_fd(fp)) {
--		fp->f_ci->m_flags |= S_DEL_ON_CLS_STREAM;
-+	struct ksmbd_inode *ci;
-+
-+	if (!fp)
-+		return;
-+
-+	ci = fp->f_ci;
-+	if (!ci)
- 		return;
--	}
- 
--	fp->f_ci->m_flags |= S_DEL_ON_CLS;
-+	down_write(&ci->m_lock);
-+	if (ksmbd_stream_fd(fp))
-+		ci->m_flags |= S_DEL_ON_CLS_STREAM;
-+	else
-+		ci->m_flags |= S_DEL_ON_CLS;
-+	up_write(&ci->m_lock);
- }
- 
- static void ksmbd_inode_hash(struct ksmbd_inode *ci)
-@@ -255,29 +303,41 @@ static void __ksmbd_inode_close(struct ksmbd_file *fp)
- 	struct ksmbd_inode *ci = fp->f_ci;
- 	int err;
- 	struct file *filp;
-+	bool remove_stream_xattr = false;
-+	bool do_unlink = false;
- 
- 	filp = fp->filp;
--	if (ksmbd_stream_fd(fp) && (ci->m_flags & S_DEL_ON_CLS_STREAM)) {
--		ci->m_flags &= ~S_DEL_ON_CLS_STREAM;
--		err = ksmbd_vfs_remove_xattr(file_mnt_idmap(filp),
--					     &filp->f_path,
--					     fp->stream.name,
--					     true);
--		if (err)
--			pr_err("remove xattr failed : %s\n",
--			       fp->stream.name);
-+
-+	if (ksmbd_stream_fd(fp)) {
-+		down_write(&ci->m_lock);
-+		if (ci->m_flags & S_DEL_ON_CLS_STREAM) {
-+			ci->m_flags &= ~S_DEL_ON_CLS_STREAM;
-+			remove_stream_xattr = true;
-+		}
-+		up_write(&ci->m_lock);
-+
-+		if (remove_stream_xattr) {
-+			err = ksmbd_vfs_remove_xattr(file_mnt_idmap(filp),
-+						     &filp->f_path,
-+						     fp->stream.name,
-+						     true);
-+			if (err)
-+				pr_err("remove xattr failed : %s\n",
-+				       fp->stream.name);
-+		}
+-struct super_block *cifs_get_dfs_tcon_super(struct cifs_tcon *tcon);
+-void cifs_put_tcp_super(struct super_block *sb);
+ int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix);
+ char *extract_hostname(const char *unc);
+ char *extract_sharename(const char *unc);
+ int parse_reparse_point(struct reparse_data_buffer *buf,
+ 			u32 plen, struct cifs_sb_info *cifs_sb,
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 55cb4b0cbd48..f4761d381b44 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -4434,11 +4434,11 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
  	}
  
- 	if (atomic_dec_and_test(&ci->m_count)) {
- 		down_write(&ci->m_lock);
- 		if (ci->m_flags & (S_DEL_ON_CLS | S_DEL_PENDING)) {
- 			ci->m_flags &= ~(S_DEL_ON_CLS | S_DEL_PENDING);
--			up_write(&ci->m_lock);
--			ksmbd_vfs_unlink(filp);
--			down_write(&ci->m_lock);
-+			do_unlink = true;
- 		}
- 		up_write(&ci->m_lock);
- 
-+		if (do_unlink)
-+			ksmbd_vfs_unlink(filp);
-+
- 		ksmbd_inode_free(ci);
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ 	if (origin_fullpath) {
+ 		spin_lock(&tcon->tc_lock);
+-		tcon->origin_fullpath = origin_fullpath;
++		WRITE_ONCE(tcon->origin_fullpath, origin_fullpath);
+ 		spin_unlock(&tcon->tc_lock);
+ 		origin_fullpath = NULL;
+ 		queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
+ 				   dfs_cache_get_ttl() * HZ);
  	}
+diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
+index f65a8a90ba27..a61144be1142 100644
+--- a/fs/smb/client/dfs.c
++++ b/fs/smb/client/dfs.c
+@@ -227,11 +227,11 @@ static int __dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
+ 	if (rc)
+ 		goto out;
+ 
+ 	tcon = mnt_ctx->tcon;
+ 	spin_lock(&tcon->tc_lock);
+-	tcon->origin_fullpath = origin_fullpath;
++	WRITE_ONCE(tcon->origin_fullpath, origin_fullpath);
+ 	origin_fullpath = NULL;
+ 	ref_walk_set_tcon(rw, tcon);
+ 	spin_unlock(&tcon->tc_lock);
+ 	queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
+ 			   dfs_cache_get_ttl() * HZ);
+@@ -331,13 +331,93 @@ static int target_share_matches_server(struct TCP_Server_Info *server, char *sha
+ 	}
+ 	cifs_server_unlock(server);
+ 	return rc;
  }
+ 
++static int update_tcon_super_prepaths(struct cifs_tcon *tcon, const char *prefix)
++{
++	struct TCP_Server_Info *server = tcon->ses->server;
++	struct cifs_ses *ses;
++	struct cifs_tcon *scan_tcon;
++	struct cifs_sb_info *cifs_sb;
++	const char *origin;
++	int rc = 0;
++	bool updated = false;
++
++	/* Fast path: master tcon */
++	spin_lock(&tcon->sb_list_lock);
++	list_for_each_entry(cifs_sb, &tcon->cifs_sb_list, tcon_sb_link) {
++		updated = true;
++		rc = cifs_update_super_prepath(cifs_sb, (char *)prefix);
++		if (rc) {
++			cifs_dbg(VFS,
++				 "Failed to update prepath for superblock: %d\n",
++				 rc);
++			break;
++		}
++	}
++	spin_unlock(&tcon->sb_list_lock);
++
++	if (updated || rc)
++		return rc;
++
++	/* Slow path: non-master tcon */
++	origin = READ_ONCE(tcon->origin_fullpath);
++	if (!origin)
++		return 0;
++
++	spin_lock(&cifs_tcp_ses_lock);
++	spin_lock(&server->srv_lock);
++	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
++		spin_lock(&ses->ses_lock);
++
++		if (ses->dfs_root_ses != tcon->ses->dfs_root_ses) {
++			spin_unlock(&ses->ses_lock);
++			continue;
++		}
++
++		list_for_each_entry(scan_tcon, &ses->tcon_list, tcon_list) {
++			const char *scan_origin;
++
++			scan_origin = READ_ONCE(scan_tcon->origin_fullpath);
++			if (!scan_origin)
++				continue;
++
++			if (!dfs_src_pathname_equal(scan_origin, origin))
++				continue;
++
++			spin_lock(&scan_tcon->sb_list_lock);
++			list_for_each_entry(cifs_sb, &scan_tcon->cifs_sb_list,
++					    tcon_sb_link) {
++				rc = cifs_update_super_prepath(cifs_sb,
++							       (char *)prefix);
++				if (rc) {
++					cifs_dbg(VFS,
++						 "Failed to update prepath for superblock: %d\n",
++						 rc);
++					break;
++				}
++			}
++			spin_unlock(&scan_tcon->sb_list_lock);
++
++			if (rc) {
++				spin_unlock(&ses->ses_lock);
++				goto out_srv_unlock;
++			}
++		}
++
++		spin_unlock(&ses->ses_lock);
++	}
++out_srv_unlock:
++	spin_unlock(&server->srv_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
++
++	return rc;
++}
++
+ static int tree_connect_dfs_target(const unsigned int xid,
+ 				   struct cifs_tcon *tcon,
+-				   struct cifs_sb_info *cifs_sb,
+ 				   char *tree, bool islink,
+ 				   struct dfs_cache_tgt_list *tl)
+ {
+ 	const struct smb_version_operations *ops = tcon->ses->server->ops;
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+@@ -370,12 +450,12 @@ static int tree_connect_dfs_target(const unsigned int xid,
+ 
+ 		dfs_cache_noreq_update_tgthint(server->leaf_fullpath + 1, tit);
+ 		scnprintf(tree, MAX_TREE_SIZE, "\\%s", share);
+ 		rc = ops->tree_connect(xid, tcon->ses, tree,
+ 				       tcon, tcon->ses->local_nls);
+-		if (islink && !rc && cifs_sb)
+-			rc = cifs_update_super_prepath(cifs_sb, prefix);
++		if (islink && !rc && READ_ONCE(tcon->origin_fullpath))
++			rc = update_tcon_super_prepaths(tcon, prefix);
+ 		break;
+ 	}
+ 
+ 	kfree(share);
+ 	kfree(prefix);
+@@ -387,12 +467,10 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon)
+ {
+ 	int rc;
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+ 	const struct smb_version_operations *ops = server->ops;
+ 	DFS_CACHE_TGT_LIST(tl);
+-	struct cifs_sb_info *cifs_sb = NULL;
+-	struct super_block *sb = NULL;
+ 	struct dfs_info3_param ref = {0};
+ 	char *tree;
+ 
+ 	/* only send once per connect */
+ 	spin_lock(&tcon->tc_lock);
+@@ -428,29 +506,24 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon)
+ 		rc = ops->tree_connect(xid, tcon->ses, tree,
+ 				       tcon, tcon->ses->local_nls);
+ 		goto out;
+ 	}
+ 
+-	sb = cifs_get_dfs_tcon_super(tcon);
+-	if (!IS_ERR(sb))
+-		cifs_sb = CIFS_SB(sb);
+-
+ 	/* Tree connect to last share in @tcon->tree_name if no DFS referral */
+ 	if (!server->leaf_fullpath ||
+ 	    dfs_cache_noreq_find(server->leaf_fullpath + 1, &ref, &tl)) {
+ 		rc = ops->tree_connect(xid, tcon->ses, tcon->tree_name,
+ 				       tcon, tcon->ses->local_nls);
+ 		goto out;
+ 	}
+ 
+-	rc = tree_connect_dfs_target(xid, tcon, cifs_sb, tree, ref.server_type == DFS_TYPE_LINK,
++	rc = tree_connect_dfs_target(xid, tcon, tree, ref.server_type == DFS_TYPE_LINK,
+ 				     &tl);
+ 	free_dfs_info_param(&ref);
+ 
+ out:
+ 	kfree(tree);
+-	cifs_put_tcp_super(sb);
+ 
+ 	if (rc) {
+ 		spin_lock(&tcon->tc_lock);
+ 		if (tcon->status == TID_IN_TCON)
+ 			tcon->status = TID_NEED_TCON;
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index e10123d8cd7d..ee26168d17b9 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -1119,86 +1119,10 @@ int copy_path_name(char *dst, const char *src)
+ 	/* we count the trailing nul */
+ 	name_len++;
+ 	return name_len;
+ }
+ 
+-struct super_cb_data {
+-	void *data;
+-	struct super_block *sb;
+-};
+-
+-static void tcon_super_cb(struct super_block *sb, void *arg)
+-{
+-	struct super_cb_data *sd = arg;
+-	struct cifs_sb_info *cifs_sb;
+-	struct cifs_tcon *t1 = sd->data, *t2;
+-
+-	if (sd->sb)
+-		return;
+-
+-	cifs_sb = CIFS_SB(sb);
+-	t2 = cifs_sb_master_tcon(cifs_sb);
+-
+-	spin_lock(&t2->tc_lock);
+-	if ((t1->ses == t2->ses ||
+-	     t1->ses->dfs_root_ses == t2->ses->dfs_root_ses) &&
+-	    t1->ses->server == t2->ses->server &&
+-	    t2->origin_fullpath &&
+-	    dfs_src_pathname_equal(t2->origin_fullpath, t1->origin_fullpath))
+-		sd->sb = sb;
+-	spin_unlock(&t2->tc_lock);
+-}
+-
+-static struct super_block *__cifs_get_super(void (*f)(struct super_block *, void *),
+-					    void *data)
+-{
+-	struct super_cb_data sd = {
+-		.data = data,
+-		.sb = NULL,
+-	};
+-	struct file_system_type **fs_type = (struct file_system_type *[]) {
+-		&cifs_fs_type, &smb3_fs_type, NULL,
+-	};
+-
+-	for (; *fs_type; fs_type++) {
+-		iterate_supers_type(*fs_type, f, &sd);
+-		if (sd.sb) {
+-			/*
+-			 * Grab an active reference in order to prevent automounts (DFS links)
+-			 * of expiring and then freeing up our cifs superblock pointer while
+-			 * we're doing failover.
+-			 */
+-			cifs_sb_active(sd.sb);
+-			return sd.sb;
+-		}
+-	}
+-	pr_warn_once("%s: could not find dfs superblock\n", __func__);
+-	return ERR_PTR(-EINVAL);
+-}
+-
+-static void __cifs_put_super(struct super_block *sb)
+-{
+-	if (!IS_ERR_OR_NULL(sb))
+-		cifs_sb_deactive(sb);
+-}
+-
+-struct super_block *cifs_get_dfs_tcon_super(struct cifs_tcon *tcon)
+-{
+-	spin_lock(&tcon->tc_lock);
+-	if (!tcon->origin_fullpath) {
+-		spin_unlock(&tcon->tc_lock);
+-		return ERR_PTR(-ENOENT);
+-	}
+-	spin_unlock(&tcon->tc_lock);
+-	return __cifs_get_super(tcon_super_cb, tcon);
+-}
+-
+-void cifs_put_tcp_super(struct super_block *sb)
+-{
+-	__cifs_put_super(sb);
+-}
+-
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ int match_target_ip(struct TCP_Server_Info *server,
+ 		    const char *host, size_t hostlen,
+ 		    bool *result)
+ {
+@@ -1223,10 +1147,13 @@ int match_target_ip(struct TCP_Server_Info *server,
+ 
+ int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix)
+ {
+ 	int rc;
+ 
++	if (cifs_sb->prepath && prefix && !strcmp(cifs_sb->prepath, prefix))
++		return 0;
++
+ 	kfree(cifs_sb->prepath);
+ 	cifs_sb->prepath = NULL;
+ 
+ 	if (prefix && *prefix) {
+ 		cifs_sb->prepath = cifs_sanitize_prepath(prefix, GFP_ATOMIC);
 -- 
-2.34.1
+2.39.2
 
