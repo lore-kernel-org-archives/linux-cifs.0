@@ -1,500 +1,225 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5942FFDDC
-	for <linux-cifs@vger.kernel.org>; Mon, 24 Nov 2025 11:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104FE3002AD
+	for <linux-cifs@vger.kernel.org>; Mon, 24 Nov 2025 12:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763985015; cv=none; b=sTXV4hlbyaWe4/x4vojEMgQwo0GSgPnp+7PdHcKCyP8I6TLzEks5cPC2PCyIHItUVCtdz2iOAaXYu8riWQ87tW/kQGDNqyCV98hcTgugZH1to0on4UK5sdDW/mKjcXndBd1JBcy5avqQFVoZ9DQDj16oSF70f7IKCFJ2Bw6v2Dk=
+	t=1763988188; cv=none; b=RAJ+bzmC6NJ2f65wZ9stkiJW59O6kYz8fPTFoLotM7LGru/9HlBgqgoDuFc42+eoH4c7DIdh0bWXtgFUWa2U1YAa9twkq2u2N18rbgOFT1yppXvlAjaZMTZBcPqNDd7Powryn4d85ruZjrvGxcSWs8uecIkg7g3PAm1nONyX6Rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763985015; c=relaxed/simple;
-	bh=+/GfsQT/rK0uYHXDue4gjQbqjKBDZbTf7ID7QVR6pTA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Hc4bkxpHNDzZd02wE+2ZmJdPoLCEVSIq2mzWKTnvlz++fpzNqmHq0XVRsOu7Zo6nXLKYruixjj5A3y5MqpXeY38icz7trDZ7gKLqDi0x5NYmr6VYylE5EA1VBjJCbcuRpY7WDbGNPBXwcNfceUbPvRXjBkR0DFfIIDTdY2+lZng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TWwP15nb; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763988188; c=relaxed/simple;
+	bh=GA5bDKGcQ9ouYULzNRYeF0iuQoUfe3Y/1YEdFzZ3mvA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u0e2bK95dx+q5ojRNVpp2H+tgNt4yOQQ6OnMBXhCzIEiV1E0TGpt3cThAt6MSYYGVdSjagDlJOKohk5d6JDXQsdhokJGu9EY/8a29i7QgIPL3vO30kkIK/yAV1E5Ytw3mLje9d1LFbfcsjlT1+gY/+nrYfRA3EOxPc/2UdRJdeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FvfVXXnR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TWwP15nb"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b7370698a8eso541967666b.0
-        for <linux-cifs@vger.kernel.org>; Mon, 24 Nov 2025 03:50:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763985012; x=1764589812; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qTsX74x3miO5NhXwBIi3PNOqqcYDVYQU/9M1KuaEhHU=;
-        b=TWwP15nbcA+vDeDrruDrFLxXRs/Dew4bRfdFyBMHp/B9XJmwlhdDxMeinSxhpmI+EU
-         w7/VwpDqf9XgMkWg1WCSby9imuuGEjVtM3biJjL/zoX9wYawz7v9Sb7xmgf6BSch1RFP
-         xOz6w7gMfbFl4iMSaRHnvHZKXeJBrvLBX1tfoWrvwm+6Oys5iFRyw6J+EJ9pUKKVmLJB
-         q9CPw1yFt1o1KRSdauC6sQChLjJaFF+rHfNy3y1FkPxsL1WzsY//57KTzxNkiXcRYhrp
-         8X0RaZhHakREkTUyfkrr1rbjz9VFvSRVCJIYDGtB18yDb3Fxzayw4O2NdJVND1n98mOs
-         xE6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763985012; x=1764589812;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qTsX74x3miO5NhXwBIi3PNOqqcYDVYQU/9M1KuaEhHU=;
-        b=YxJx57UPLwNAg+Vj3UET5TgqcbV5eFNI5BPnBcQsELEtk6+ynZ7HMI9/8P9yAW8gD3
-         3Qo7hHDp5swF7NxxtT+NKW07q3EmTM7MWx1RuLW02QbPRNHS5wGWZoMlF29OAI2ziTM0
-         gpmI+5aYeoGvpIgqErXq79KxVJHqLUZrw6BnYd+QCWXokWu2ilQzILpOo2tyMoEZNQhb
-         qUUilyKiZaolzv26H0kcqX/f98VEu+kSXqZBd6s9ItjieKb/6fRfSjU3mU1QMkVpGiJE
-         G2sAJPXofo9sblHBhvTr3pg4u9Jn/3ANd+Hq9TQB+Jm2mAY5zAUS0Yoj+FdnTXEmsgx6
-         OVLw==
-X-Forwarded-Encrypted: i=1; AJvYcCXIlC+ngNS/KMaRPXCxUyCMWjJw8WNq+1I5DWBfIv4NH502ILcz8FSuegWHwfElpS+0EZ/B4R6nF5AH@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCJRJqbwzhRO9ePhur3kLUovslOJwMObwGmLklPX8ytd8BMgPt
-	1Wu0oQuOYXT6BRz1rgBGR5T2Z4PQbIDiIfN3cn7q+JVAdBtYytFt2p3/n9o1dbKE1W63W0cmDr5
-	9MKIgRKkD2/3x+koiNF7mwaaO8uH8+anHMd6u
-X-Gm-Gg: ASbGnctUHGKQOWhowuP7fZMyorVDp0CsexlfqNqBeqlE3bkoxHZMcOFwED2PTHWyhr0
-	JM/DWvZIw6E8KtqLLpLYrFuJAW3B7kUUoMlLszrA9ygPUV2wiqiwYTCK3lPUpZf0Writqxa21Cv
-	NN2P0O+N25t5iR9ZbImsSA/zFabMqwDMn8I2y6SqDH00FiBv7P/reMr8VzgNdZmrkoP5LhwVEKI
-	wPbJAlXxoVZz87VQRLyzX/qvKB37ZzAUuCsKhfRIl9+YHp68+oyckojme4zS39er6M25A==
-X-Google-Smtp-Source: AGHT+IFZ4hgOnP+GGzFtxXgwCCUo5PfAR/nWqfGsAUnrg85wi9EqQVdLNnZC+kYcsuEtY2QjopW1tLau3Ug6FTb/Vnw=
-X-Received: by 2002:a17:907:7244:b0:b76:63b8:7394 with SMTP id
- a640c23a62f3a-b767184bc2bmr1299210766b.51.1763985011282; Mon, 24 Nov 2025
- 03:50:11 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FvfVXXnR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763988184;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1iD30+8y8aeycbkW0yQ0TCow658sGNcOCv4O0ud5y6s=;
+	b=FvfVXXnRoY+89eB72HrwAyNE/qVfxjXjWGWd6zoI+Jw6FMkdQCqVnaqmU2IIPRsfnqRwVQ
+	KYzdhOQz0FnXjtQGxr3OQ15pLumApijszi3ecMbEghf1T3EqnkzadNAgmdZUjv24VoOt1w
+	WdClxrw4LXgHa3vOLviWxYJmr0aasl4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-465-TMLAfd1VNoKVXAyGgG-4GQ-1; Mon,
+ 24 Nov 2025 07:42:59 -0500
+X-MC-Unique: TMLAfd1VNoKVXAyGgG-4GQ-1
+X-Mimecast-MFC-AGG-ID: TMLAfd1VNoKVXAyGgG-4GQ_1763988178
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D1E96195608F;
+	Mon, 24 Nov 2025 12:42:57 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.14])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 335FB180047F;
+	Mon, 24 Nov 2025 12:42:54 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v4 00/11] cifs: Miscellaneous prep patches for rewrite of I/O layer
+Date: Mon, 24 Nov 2025 12:42:39 +0000
+Message-ID: <20251124124251.3565566-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251118022655.126994-1-rajasimandalos@gmail.com> <CAFTVevWRXF8TCDQstp7r1uu8eZ21M4m1EPs3zXANPTDj8bh_ZQ@mail.gmail.com>
-In-Reply-To: <CAFTVevWRXF8TCDQstp7r1uu8eZ21M4m1EPs3zXANPTDj8bh_ZQ@mail.gmail.com>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Mon, 24 Nov 2025 17:19:58 +0530
-X-Gm-Features: AWmQ_bnIjQgahXtJjHFnWg5u-M5ugvbyueAQzBGUsEwA0mwLa5NlWynD5jzcwWc
-Message-ID: <CANT5p=ohMvQ+0+YYCQrkSw7sPW24gs60TQzBoiAyfedO8GXgfQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: client: allow changing multichannel mount options
- on remount
-To: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Cc: Rajasi Mandal <rajasimandalos@gmail.com>, sfrench@samba.org, linux-cifs@vger.kernel.org, 
-	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
-	tom@talpey.com, bharathsm@microsoft.com, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org, Rajasi Mandal <rajasimandal@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Thu, Nov 20, 2025 at 11:40=E2=80=AFAM Meetakshi Setiya
-<meetakshisetiyaoss@gmail.com> wrote:
->
-> Hi Rajasi,
->
-> On Tue, Nov 18, 2025 at 7:59=E2=80=AFAM Rajasi Mandal <rajasimandalos@gma=
-il.com> wrote:
-> >
-> > From: Rajasi Mandal <rajasimandal@microsoft.com>
-> >
-> > Previously, the client did not update a session's channel state when
-> > multichannel or max_channels mount options were changed via remount.
-> > This led to inconsistent behavior and prevented enabling or disabling
-> > multichannel support without a full unmount/remount cycle.
-> >
-> > Enable dynamic reconfiguration of multichannel and max_channels during
-> > remount by:
-> > - Introducing smb3_sync_ses_chan_max(), a centralized function for
-> >   channel updates which synchronizes the session's channels with the
-> >   updated configuration.
-> > - Replacing cifs_disable_secondary_channels() with
-> >   cifs_decrease_secondary_channels(), which accepts a from_reconfigure
-> >   flag to support targeted cleanup during reconfiguration.
-> > - Updating remount logic to detect changes in multichannel or
-> >   max_channels and trigger appropriate session/channel updates.
-> >
-> > Current limitation:
-> > - The query_interfaces worker runs even when max_channels=3D1 so that
-> >   multichannel can be enabled later via remount without requiring an
-> >   unmount. This is a temporary approach and may be refined in the
-> >   future.
-> >
-> > Users can safely modify multichannel and max_channels on an existing
-> > mount. The client will correctly adjust the session's channel state to
-> > match the new configuration, preserving durability where possible and
-> > avoiding unnecessary disconnects.
-> >
-> > Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
-> > Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
-> > ---
-> >  fs/smb/client/cifsproto.h  |  4 ++-
-> >  fs/smb/client/connect.c    |  4 ++-
-> >  fs/smb/client/fs_context.c | 50 +++++++++++++++++++++++++++++++++-
-> >  fs/smb/client/sess.c       | 32 +++++++++++++++-------
-> >  fs/smb/client/smb2pdu.c    | 55 ++++++++++++++++++++++++++++----------
-> >  5 files changed, 119 insertions(+), 26 deletions(-)
-> >
-> > diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> > index 3528c365a452..a1fc9e1918bc 100644
-> > --- a/fs/smb/client/cifsproto.h
-> > +++ b/fs/smb/client/cifsproto.h
-> > @@ -649,6 +649,8 @@ int cifs_alloc_hash(const char *name, struct shash_=
-desc **sdesc);
-> >  void cifs_free_hash(struct shash_desc **sdesc);
-> >
-> >  int cifs_try_adding_channels(struct cifs_ses *ses);
-> > +int smb3_update_ses_channels(struct cifs_ses *ses, struct TCP_Server_I=
-nfo *server,
-> > +                                       bool from_reconnect, bool from_=
-reconfigure);
-> >  bool is_ses_using_iface(struct cifs_ses *ses, struct cifs_server_iface=
- *iface);
-> >  void cifs_ses_mark_for_reconnect(struct cifs_ses *ses);
-> >
-> > @@ -674,7 +676,7 @@ bool
-> >  cifs_chan_is_iface_active(struct cifs_ses *ses,
-> >                           struct TCP_Server_Info *server);
-> >  void
-> > -cifs_disable_secondary_channels(struct cifs_ses *ses);
-> > +cifs_decrease_secondary_channels(struct cifs_ses *ses, bool from_recon=
-figure);
-> >  void
-> >  cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *s=
-erver);
-> >  int
-> > diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> > index 55cb4b0cbd48..cebe4a5f54f2 100644
-> > --- a/fs/smb/client/connect.c
-> > +++ b/fs/smb/client/connect.c
-> > @@ -3927,7 +3927,9 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, stru=
-ct smb3_fs_context *ctx)
-> >         ctx->prepath =3D NULL;
-> >
-> >  out:
-> > -       cifs_try_adding_channels(mnt_ctx.ses);
-> > +       smb3_update_ses_channels(mnt_ctx.ses, mnt_ctx.server,
-> > +                                 false /* from_reconnect */,
-> > +                                 false /* from_reconfigure */);
->
-> Shouldn't this be added to the non-dfs cifs_mount() too? I see that
-> even cifs_try_adding_channels() is not present in this function,
-> @Shyam Prasad is this expected?
+Hi Steve,
 
-That's a good catch.
-I think this is a day-0 bug.
-I can see that the original change by Aurelien has the change only in
-DFS cifs_mount:
-commit d70e9fa55884760b6d6c293dbf20d8c52ce11fb7
-Author: Aurelien Aptel <aaptel@suse.com>
-Date:   Fri Sep 20 06:31:10 2019 +0200
+Could you take these patches extracted from my I/O layer rewrite for the
+upcoming merge window.  The performance change should be neutral, but it
+cleans up the code a bit.
 
-    cifs: try opening channels after mounting
+ (1) Use netfs_alloc/free_folioq_buffer() rather than cifs doing its own
+     version.
 
-We should have a follow-up patch to fix this.
+ (2) Do some minor cleanups so that patch 2 can be generated wholly by a
+     script.
 
->
-> >         rc =3D mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
-> >         if (rc)
-> >                 goto error;
-> > diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> > index 0f894d09157b..751ed6ebd458 100644
-> > --- a/fs/smb/client/fs_context.c
-> > +++ b/fs/smb/client/fs_context.c
-> > @@ -717,6 +717,7 @@ static int smb3_fs_context_parse_param(struct fs_co=
-ntext *fc,
-> >  static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
-> >                                             void *data);
-> >  static int smb3_get_tree(struct fs_context *fc);
-> > +static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int =
-max_channels);
-> >  static int smb3_reconfigure(struct fs_context *fc);
-> >
-> >  static const struct fs_context_operations smb3_fs_context_ops =3D {
-> > @@ -1013,6 +1014,22 @@ int smb3_sync_session_ctx_passwords(struct cifs_=
-sb_info *cifs_sb, struct cifs_se
-> >         return 0;
-> >  }
-> >
-> > +/*
-> > + * smb3_sync_ses_chan_max - Synchronize the session's maximum channel =
-count
-> > + * @ses: pointer to the old CIFS session structure
-> > + * @max_channels: new maximum number of channels to allow
-> > + *
-> > + * Updates the session's chan_max field to the new value, protecting t=
-he update
-> > + * with the session's channel lock. This should be called whenever the=
- maximum
-> > + * allowed channels for a session changes (e.g., after a remount or re=
-configure).
-> > + */
-> > +static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int =
-max_channels)
-> > +{
-> > +       spin_lock(&ses->chan_lock);
-> > +       ses->chan_max =3D max_channels;
-> > +       spin_unlock(&ses->chan_lock);
-> > +}
-> > +
-> >  static int smb3_reconfigure(struct fs_context *fc)
-> >  {
-> >         struct smb3_fs_context *ctx =3D smb3_fc2context(fc);
-> > @@ -1095,7 +1112,38 @@ static int smb3_reconfigure(struct fs_context *f=
-c)
-> >                 ses->password2 =3D new_password2;
-> >         }
-> >
-> > -       mutex_unlock(&ses->session_mutex);
-> > +       /*
-> > +        * If multichannel or max_channels has changed, update the sess=
-ion's channels accordingly.
-> > +        * This may add or remove channels to match the new configurati=
-on.
-> > +        */
-> > +       if ((ctx->multichannel !=3D cifs_sb->ctx->multichannel) ||
-> > +           (ctx->max_channels !=3D cifs_sb->ctx->max_channels)) {
-> > +
-> > +               /* Synchronize ses->chan_max with the new mount context=
- */
-> > +               smb3_sync_ses_chan_max(ses, ctx->max_channels);
-> > +               /* Now update the session's channels to match the new c=
-onfiguration */
-> > +               /* Prevent concurrent scaling operations */
-> > +               spin_lock(&ses->ses_lock);
-> > +               if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
-> > +                       spin_unlock(&ses->ses_lock);
-> > +                       return -EINVAL;
-> > +               }
-> > +               ses->flags |=3D CIFS_SES_FLAG_SCALE_CHANNELS;
-> > +               spin_unlock(&ses->ses_lock);
-> > +
-> > +               mutex_unlock(&ses->session_mutex);
-> > +
-> > +               rc =3D smb3_update_ses_channels(ses, ses->server,
-> > +                                              false /* from_reconnect =
-*/,
-> > +                                              true /* from_reconfigure=
- */);
-> > +
-> > +               /* Clear scaling flag after operation */
-> > +               spin_lock(&ses->ses_lock);
-> > +               ses->flags &=3D ~CIFS_SES_FLAG_SCALE_CHANNELS;
-> > +               spin_unlock(&ses->ses_lock);
-> > +       } else {
-> > +               mutex_unlock(&ses->session_mutex);
-> > +       }
-> >
-> >         STEAL_STRING(cifs_sb, ctx, domainname);
-> >         STEAL_STRING(cifs_sb, ctx, nodename);
-> > diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-> > index ef3b498b0a02..cfd83986a84a 100644
-> > --- a/fs/smb/client/sess.c
-> > +++ b/fs/smb/client/sess.c
-> > @@ -265,12 +265,16 @@ int cifs_try_adding_channels(struct cifs_ses *ses=
-)
-> >  }
-> >
-> >  /*
-> > - * called when multichannel is disabled by the server.
-> > - * this always gets called from smb2_reconnect
-> > - * and cannot get called in parallel threads.
-> > + * cifs_decrease_secondary_channels - Reduce the number of active seco=
-ndary channels
-> > + * @ses: pointer to the CIFS session structure
-> > + * @from_reconfigure: if true, only reduce to chan_max; if false, redu=
-ce to a single channel
-> > + *
-> > + * This function disables and cleans up extra secondary channels for a=
- CIFS session.
-> > + * If called during reconfiguration, it reduces the channel count to t=
-he new maximum (chan_max).
-> > + * Otherwise, it disables all but the primary channel.
-> >   */
-> >  void
-> > -cifs_disable_secondary_channels(struct cifs_ses *ses)
-> > +cifs_decrease_secondary_channels(struct cifs_ses *ses, bool from_recon=
-figure)
-> >  {
-> >         int i, chan_count;
-> >         struct TCP_Server_Info *server;
-> > @@ -281,12 +285,13 @@ cifs_disable_secondary_channels(struct cifs_ses *=
-ses)
-> >         if (chan_count =3D=3D 1)
-> >                 goto done;
-> >
-> > -       ses->chan_count =3D 1;
-> > -
-> > -       /* for all secondary channels reset the need reconnect bit */
-> > -       ses->chans_need_reconnect &=3D 1;
-> > +       /* Update the chan_count to the new maximum */
-> > +       if (from_reconfigure)
-> > +               ses->chan_count =3D ses->chan_max;
-> > +       else
-> > +               ses->chan_count =3D 1;
-> >
-> > -       for (i =3D 1; i < chan_count; i++) {
-> > +       for (i =3D ses->chan_max ; i < chan_count; i++) {
-> >                 iface =3D ses->chans[i].iface;
-> >                 server =3D ses->chans[i].server;
-> >
-> > @@ -318,6 +323,15 @@ cifs_disable_secondary_channels(struct cifs_ses *s=
-es)
-> >                 spin_lock(&ses->chan_lock);
-> >         }
-> >
-> > +       /* For extra secondary channels, reset the need reconnect bit *=
-/
-> > +       if (ses->chan_count =3D=3D 1) {
-> > +               cifs_dbg(VFS, "server does not support multichannel any=
-more. Disable all other channels\n");
-> > +               ses->chans_need_reconnect &=3D 1;
-> > +       } else {
-> > +               cifs_dbg(VFS, "Disable extra secondary channels\n");
-> > +               ses->chans_need_reconnect &=3D ((1UL << ses->chan_max) =
-- 1);
-> > +       }
-> > +
-> >  done:
-> >         spin_unlock(&ses->chan_lock);
-> >  }
-> > diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> > index 8b4a4573e9c3..d051da46eaab 100644
-> > --- a/fs/smb/client/smb2pdu.c
-> > +++ b/fs/smb/client/smb2pdu.c
-> > @@ -168,7 +168,7 @@ smb2_hdr_assemble(struct smb2_hdr *shdr, __le16 smb=
-2_cmd,
-> >  static int
-> >  cifs_chan_skip_or_disable(struct cifs_ses *ses,
-> >                           struct TCP_Server_Info *server,
-> > -                         bool from_reconnect)
-> > +                         bool from_reconnect, bool from_reconfigure)
-> >  {
-> >         struct TCP_Server_Info *pserver;
-> >         unsigned int chan_index;
-> > @@ -206,14 +206,41 @@ cifs_chan_skip_or_disable(struct cifs_ses *ses,
-> >                 return -EHOSTDOWN;
-> >         }
-> >
-> > -       cifs_server_dbg(VFS,
-> > -               "server does not support multichannel anymore. Disable =
-all other channels\n");
-> > -       cifs_disable_secondary_channels(ses);
-> > -
-> > +       cifs_decrease_secondary_channels(ses, from_reconfigure);
-> >
-> >         return 0;
-> >  }
-> >
-> > +/*
-> > + * smb3_update_ses_channels - Synchronize session channels with new co=
-nfiguration
-> > + * @ses: pointer to the CIFS session structure
-> > + * @server: pointer to the TCP server info structure
-> > + * @from_reconnect: indicates if called from reconnect context
-> > + * @from_reconfigure: indicates if called from reconfigure context
-> > + *
-> > + * Returns 0 on success or error code on failure.
-> > + *
-> > + * Note: Outside of reconfigure, this function is only called from rec=
-onnect scenarios
-> > + * when the server stops advertising multichannel (MC) capability.
-> > + */
->
-> I see that function is being called during mount too. Did you
-> mean cifs_decrease_secondary_channels()?
->
-> > +int smb3_update_ses_channels(struct cifs_ses *ses, struct TCP_Server_I=
-nfo *server,
-> > +                       bool from_reconnect, bool from_reconfigure)
-> > +{
-> > +       int rc =3D 0;
-> > +       /*
-> > +        * If the current channel count is less than the new chan_max,
-> > +        * try to add channels to reach the new maximum.
-> > +        * Otherwise, disable or skip extra channels to match the new c=
-onfiguration.
-> > +        */
-> > +       if (ses->chan_count < ses->chan_max)
-> > +               rc =3D cifs_try_adding_channels(ses);
-> > +       else
-> > +               rc =3D cifs_chan_skip_or_disable(ses, server, from_reco=
-nnect,
-> > +                                               from_reconfigure);
-> > +
-> > +       return rc;
-> > +}
-> > +
-> >  static int
-> >  smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
-> >                struct TCP_Server_Info *server, bool from_reconnect)
-> > @@ -355,8 +382,8 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tco=
-n *tcon,
-> >          */
-> >         if (ses->chan_count > 1 &&
-> >             !(server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
-> > -               rc =3D cifs_chan_skip_or_disable(ses, server,
-> > -                                              from_reconnect);
-> > +               rc =3D smb3_update_ses_channels(ses, server,
-> > +                                              from_reconnect, false /*=
- from_reconfigure */);
-> >                 if (rc) {
-> >                         mutex_unlock(&ses->session_mutex);
-> >                         goto out;
-> > @@ -438,8 +465,9 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tco=
-n *tcon,
-> >                          * treat this as server not supporting multicha=
-nnel
-> >                          */
-> >
-> > -                       rc =3D cifs_chan_skip_or_disable(ses, server,
-> > -                                                      from_reconnect);
-> > +                       rc =3D smb3_update_ses_channels(ses, server,
-> > +                                                      from_reconnect,
-> > +                                                      false /* from_re=
-configure */);
-> >                         goto skip_add_channels;
-> >                 } else if (rc)
-> >                         cifs_tcon_dbg(FYI, "%s: failed to query server =
-interfaces: %d\n",
-> > @@ -451,7 +479,8 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tco=
-n *tcon,
-> >                         if (ses->chan_count =3D=3D 1)
-> >                                 cifs_server_dbg(VFS, "supports multicha=
-nnel now\n");
-> >
-> > -                       cifs_try_adding_channels(ses);
-> > +                       smb3_update_ses_channels(ses, server, from_reco=
-nnect,
-> > +                                                 false /* from_reconfi=
-gure */);
-> >                 }
-> >         } else {
-> >                 mutex_unlock(&ses->session_mutex);
-> > @@ -1105,8 +1134,7 @@ SMB2_negotiate(const unsigned int xid,
-> >                 req->SecurityMode =3D 0;
-> >
-> >         req->Capabilities =3D cpu_to_le32(server->vals->req_capabilitie=
-s);
-> > -       if (ses->chan_max > 1)
-> > -               req->Capabilities |=3D cpu_to_le32(SMB2_GLOBAL_CAP_MULT=
-I_CHANNEL);
-> > +       req->Capabilities |=3D cpu_to_le32(SMB2_GLOBAL_CAP_MULTI_CHANNE=
-L);
-> >
-> >         /* ClientGUID must be zero for SMB2.02 dialect */
-> >         if (server->vals->protocol_id =3D=3D SMB20_PROT_ID)
-> > @@ -1312,8 +1340,7 @@ int smb3_validate_negotiate(const unsigned int xi=
-d, struct cifs_tcon *tcon)
-> >
-> >         pneg_inbuf->Capabilities =3D
-> >                         cpu_to_le32(server->vals->req_capabilities);
-> > -       if (tcon->ses->chan_max > 1)
-> > -               pneg_inbuf->Capabilities |=3D cpu_to_le32(SMB2_GLOBAL_C=
-AP_MULTI_CHANNEL);
-> > +       pneg_inbuf->Capabilities |=3D cpu_to_le32(SMB2_GLOBAL_CAP_MULTI=
-_CHANNEL);
-> >
-> >         memcpy(pneg_inbuf->Guid, server->client_guid,
-> >                                         SMB2_CLIENT_GUID_SIZE);
-> > --
-> > 2.43.0
-> >
-> >
->
-> Thanks
-> Meetakshi
->
+ (3) Organise the declarations in the cifs client header files, naming the
+     arguments the same as for the implementations, inserting divider
+     comments, ordering them the same as they're found in the files and
+     dividing them better between general, smb1 and smb2/3 categories.
 
+     The organisation is entirely scripted with the script in the second
+     patch's commit message.  The first patch does a bit of preparation to
+     make sure that the second patch's output will build.
 
---=20
-Regards,
-Shyam
+     By filling in the argument names, this stops checkpatch moaning about
+     unnamed arguments from search-and-replace changes in later patches.
+     (Note that it doesn't fix func pointer declarations).
+
+     smbdirect is left untouched as requested by Stefan Metzmacher.
+
+ (4) Rename struct mid_q_entry to smb_message.  In my rewrite, smb_message
+     will get allocated in the marshalling functions in smb2pdu.c and
+     cifssmb.c rather than in transport.c and used to hand parameters down
+     - and so I think it could be better named for that.
+
+ (5) Remove the RFC1002 header from the smb_hdr struct so that it's
+     consistent with SMB2/3.  This allows I/O routines to be simplified and
+     shared.
+
+ (6) Make SMB1's SendReceive() wrap cifs_send_recv() and thus share code
+     with SMB2/3.
+
+ (7) Clean up a bunch of extra kvec[] that were required for RFC1002
+     headers from SMB1's header struct.
+
+ (8) Replace SendReceiveBlockingLock() with SendReceive() plus flags.
+
+ (9) Remove the server pointer from smb_message.  It can be passed down
+     from the caller to all places that need it.
+
+(10) Don't need state locking in smb2_get_mid_entry() as we're just doing a
+     single read inside the lock.  READ_ONCE() should suffice instead.
+
+(11) Add a tracepoint to log EIO errors and up to a couple of bits of info
+     for each to make it easier to find out why an EIO error happened when
+     the system is very busy without introducing printk delays.
+
+The patches can be found here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-cleanup
+
+Thanks,
+David
+
+Changes
+=======
+ver #4)
+ - Rebased on the ksmbd-for-next branch.
+ - The read tracepoint patch got merged, so drop it.
+ - Move the netfs_alloc, etc. patch first.
+ - Fix a couple of prototypes that need to be conditional (may need some post
+   cleanup).
+ - Fixed another couple of headers that needed their own prototype lists.
+ - Fixed #include order in a couple of places.
+
+ver #3)
+ - Rebased on the ksmbd-for-next branch.
+ - Add the patches to clean up the function prototypes in the headers.
+   - Don't touch smbdirect.
+   - Put prototypes into netlink.h and cached_dir.h rather than
+     centralising them.
+   - Indent the arguments in the prototypes to the opening bracket + 1.
+ - Cleaned up most other checkpatch complaints.
+ - Added the EIO tracepoint patch to the end.
+
+ver #2)
+ - Rebased on the ksmbd-for-next-next branch.
+ - Moved the patch to use netfs_alloc/free_folioq_buffer() down the stack.
+
+David Howells (11):
+  cifs: Use netfs_alloc/free_folioq_buffer()
+  cifs: Do some preparation prior to organising the function
+    declarations
+  cifs: Clean up declarations
+  cifs: Rename mid_q_entry to smb_message
+  cifs: Remove the RFC1002 header from smb_hdr
+  cifs: Make smb1's SendReceive() wrap cifs_send_recv()
+  cifs: Clean up some places where an extra kvec[] was required for
+    rfc1002
+  cifs: Replace SendReceiveBlockingLock() with SendReceive() plus flags
+  cifs: Remove the server pointer from smb_message
+  cifs: Don't need state locking in smb2_get_mid_entry()
+  cifs: Add a tracepoint to log EIO errors
+
+ fs/smb/client/cached_dir.c    |    2 +-
+ fs/smb/client/cached_dir.h    |   37 +-
+ fs/smb/client/cifs_debug.c    |   51 +-
+ fs/smb/client/cifs_debug.h    |   15 +-
+ fs/smb/client/cifs_spnego.h   |    2 -
+ fs/smb/client/cifs_swn.h      |   15 +-
+ fs/smb/client/cifs_unicode.c  |    1 +
+ fs/smb/client/cifs_unicode.h  |   16 -
+ fs/smb/client/cifsacl.c       |   11 +-
+ fs/smb/client/cifsencrypt.c   |   83 +--
+ fs/smb/client/cifsfs.c        |   36 +-
+ fs/smb/client/cifsfs.h        |   64 --
+ fs/smb/client/cifsglob.h      |  219 ++----
+ fs/smb/client/cifspdu.h       |   13 +-
+ fs/smb/client/cifsproto.h     | 1318 +++++++++++++++++----------------
+ fs/smb/client/cifssmb.c       |  932 +++++++++++++----------
+ fs/smb/client/cifstransport.c |  439 ++---------
+ fs/smb/client/compress.c      |   23 +-
+ fs/smb/client/compress.h      |   20 +-
+ fs/smb/client/connect.c       |  200 ++---
+ fs/smb/client/dfs.h           |   12 +-
+ fs/smb/client/dfs_cache.h     |    9 +-
+ fs/smb/client/dir.c           |    9 +-
+ fs/smb/client/dns_resolve.h   |    3 -
+ fs/smb/client/file.c          |    7 +-
+ fs/smb/client/fs_context.c    |    2 +-
+ fs/smb/client/fs_context.h    |    9 -
+ fs/smb/client/fscache.h       |   13 +-
+ fs/smb/client/inode.c         |   15 +-
+ fs/smb/client/ioctl.c         |    1 +
+ fs/smb/client/link.c          |   11 +-
+ fs/smb/client/misc.c          |   53 +-
+ fs/smb/client/netlink.h       |    8 +-
+ fs/smb/client/netmisc.c       |   21 +-
+ fs/smb/client/nterr.h         |    2 -
+ fs/smb/client/ntlmssp.h       |   13 -
+ fs/smb/client/readdir.c       |    2 +-
+ fs/smb/client/reparse.c       |   53 +-
+ fs/smb/client/reparse.h       |   11 -
+ fs/smb/client/sess.c          |   17 +-
+ fs/smb/client/smb1ops.c       |  116 ++-
+ fs/smb/client/smb1proto.h     |  227 ++++++
+ fs/smb/client/smb2file.c      |    9 +-
+ fs/smb/client/smb2inode.c     |   13 +-
+ fs/smb/client/smb2maperror.c  |    6 +-
+ fs/smb/client/smb2misc.c      |   11 +-
+ fs/smb/client/smb2ops.c       |  253 +++----
+ fs/smb/client/smb2pdu.c       |  230 +++---
+ fs/smb/client/smb2proto.h     |  516 +++++++------
+ fs/smb/client/smb2transport.c |  113 ++-
+ fs/smb/client/smbdirect.c     |   18 +-
+ fs/smb/client/smbdirect.h     |    1 +
+ fs/smb/client/trace.h         |  153 ++++
+ fs/smb/client/transport.c     |  302 ++++----
+ fs/smb/client/xattr.c         |    2 +-
+ fs/smb/common/smb2pdu.h       |    3 -
+ fs/smb/common/smbglob.h       |    1 -
+ 57 files changed, 2887 insertions(+), 2855 deletions(-)
+ create mode 100644 fs/smb/client/smb1proto.h
+
