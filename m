@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED5832B9AF
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 17:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D68632BF32
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 17:58:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764093525; cv=none; b=Fk01oYZ7TerAd6zw0gyUcZLRyYOceswK6tmc68YZAW/7jcljICAINpgbi+2vx1Ved6+zPlwhjy5bf9ut43GJ6zmU3Sn/O5DaPQythJlCZsawALRJGbzi5nNs68hbyJ7yX4ZkhOjLNIUDwRwYW4hbavahLnwZ6pAub12ermHZT5c=
+	t=1764093530; cv=none; b=uNDBF7N5ILK11AHL3X8rLJGpF1JSqmL0no5e0PbqAXoiUigoSNkdIrIdVozTtKLaSxYPFPIF23gy6f1D7WvJBiTjwob1kzs/S3TiRdvqV5h5PtAq/J/e0dY8+jcBWXCTMYmspciMFOVJFUAqEAC9hWtdjjrik/STwRbAIxplZUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764093525; c=relaxed/simple;
-	bh=czwyDNYzie7DjNKB0MqkSzU23ex1huz0mNmH1cd9XXY=;
+	s=arc-20240116; t=1764093530; c=relaxed/simple;
+	bh=+mY06DdkuYqcPF2+p8G5Y/yjj7sE7wzD92qC4oltiG0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ql2lYG+zM9cp3msTNgbuixpDO4AgrJLglos9Qt9nrsBBO/bDfYdLoFRq5+OJbSi57IPjJki7xD9N7ncQkBVNZv4tgJqDEfieiPJcuEEIyMjyUScYVU3JnO4qkyaJK7N4WdCpXV8cNjcJVi9so3UsZOOTO5tNPZLsSyq4twiYyps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=rl0Fn6UX; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=NuMNpE6auAd540pE3tNvkBPwvn9VTwqzivPxi5i6MZPfHFCmQs/cn9R/As4yeYzt3yhewDa5bc2wk4zklfeYZvcgeIIphsFbX01ruMadNBf3IJqRIfBpr/j8nL9jdiOA5Xm16nGj5VID3M5d2j9A08mufst7/sqIXzHWIYmeSbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=tmb/b9pC; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="rl0Fn6UX"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="tmb/b9pC"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=/hBu2ti3SKIvUnNd5nMLk5GywAqbNJsZRr1OcWEr/7g=; b=rl0Fn6UX+b9VSV2B5Slva1nZU6
-	qS9HaLcJix2wpCWsEciTZbPwKQdjyZjo7rWHxpV3bPo/Tf6SqM/9BE1qgeAQkHPYAMWm95Jmnkixj
-	6EgtnQHnhAEzpopKAIuUidfSM0GJHNszpqA1zLBtDmsgx/LrobsZR3u2D8bWDadvevHlxr5wFAw1l
-	eYOnbC+Byi+k8P5nDvoCVSFLrdzV6tMEjpQ6Zz/gB4rGi0P7SBKnIFGviieA6VG8OihwvyXcjK/f0
-	3aQgYlxXCIBsRYCZfQcjcuPRYzWvvHisxn9yciPXNlw7mSQHGCLvl6dcFmL9jyb+3MbiQ8SChoYyp
-	j74m6nMc7nY3fWeAN62o6oIIz1VT7yYzXgkWQoLlglQntZVoW0Ofqg7XS/ING5Tj33MDGwQ6QdeL7
-	6a4sqKC3TSdWhTItefuCBKvJF3UrD/2Gq1lFrrJK1uf76hjWOjrHqkHNH/TAHkFEJZL5Ew+ecZ+Zg
-	7XvUMHv9ZEsWE1gSwkKJEJsT;
+	bh=/nmrFopcBFu/CiIRR8O6DD/+7yBidxHrwdPAAiVXnuU=; b=tmb/b9pCooSxYzbdHbp0PgJSWs
+	ZYSVw0UdeggjuMH78ZSAxOQO1+d69XvT+BFQHUIyfqXNTjjpbU4RqQSFPmWdiajdnasAS7FBrg84K
+	uKLqm/e2E5BuK5xOQqCJiHQv3bbtcglNUuhFrOfHC22CiZhVNpr412yIU+AiBtNxVXMc0Ns1H2iVG
+	gQkziWAWC2L2KJHLRpQzlzLL5UDsGnd3/ioPNaFAuI542LIrqdMXecctuQLajiZYAFQrYGXo+mNAT
+	0i4g9l1lQIg2j6zYMZm8Trekq8f8POSSK+BE0fSRrmbpsMZH8v8BSPaE1c9+C3kGdlwied+ssjTdp
+	TRmEuDz+r3dDEQsP5GI02LNyMDZwG4ZE9LuUmMlDIREqdbJnOccKIs8u/z5kOxb+JfiEBWntCPc6n
+	0jq9tMjXUaPGRhbeawb4+goB1+dPlq+6FsSdenqzt9Zz127REYKcXda15lZoz8ojnjqxM9JpKDRsP
+	mtbO8L2DbQErHJu5IY6I7xGa;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vNxJH-00Fcn2-1o;
-	Tue, 25 Nov 2025 17:58:40 +0000
+	id 1vNxJN-00Fcnz-2y;
+	Tue, 25 Nov 2025 17:58:46 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -40,9 +40,9 @@ Cc: metze@samba.org,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v4 020/145] smb: smbdirect: introduce smbdirect_frwr_is_supported()
-Date: Tue, 25 Nov 2025 18:54:26 +0100
-Message-ID: <52ba53092030ce29c102e80b089c45d80bd6ee79.1764091285.git.metze@samba.org>
+Subject: [PATCH v4 021/145] smb: smbdirect: introduce smbdirect_socket.{send,recv}_io.mem.gfp_mask
+Date: Tue, 25 Nov 2025 18:54:27 +0100
+Message-ID: <78c571cb638f0e308a06e1c4d8eba55ebbeccf93.1764091285.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1764091285.git.metze@samba.org>
 References: <cover.1764091285.git.metze@samba.org>
@@ -54,8 +54,8 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This will replace frwr_is_supported() on the client and
-rdma_frwr_is_supported() on the server.
+This will allow common code to be split out while still using the
+gfp_mask currently used.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -66,36 +66,55 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/common/smbdirect/smbdirect_socket.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ fs/smb/common/smbdirect/smbdirect_socket.h | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/fs/smb/common/smbdirect/smbdirect_socket.c b/fs/smb/common/smbdirect/smbdirect_socket.c
-index cd7192584820..c064cbcb6b5c 100644
---- a/fs/smb/common/smbdirect/smbdirect_socket.c
-+++ b/fs/smb/common/smbdirect/smbdirect_socket.c
-@@ -6,6 +6,22 @@
+diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
+index f56f2b037a69..5564cf9d999f 100644
+--- a/fs/smb/common/smbdirect/smbdirect_socket.h
++++ b/fs/smb/common/smbdirect/smbdirect_socket.h
+@@ -150,8 +150,9 @@ struct smbdirect_socket {
+ 		 * smbdirect_send_io buffers
+ 		 */
+ 		struct {
+-			struct kmem_cache	*cache;
+-			mempool_t		*pool;
++			struct kmem_cache *cache;
++			mempool_t *pool;
++			gfp_t gfp_mask;
+ 		} mem;
  
- #include "smbdirect_internal.h"
+ 		/*
+@@ -204,8 +205,9 @@ struct smbdirect_socket {
+ 		 * smbdirect_recv_io buffers
+ 		 */
+ 		struct {
+-			struct kmem_cache	*cache;
+-			mempool_t		*pool;
++			struct kmem_cache *cache;
++			mempool_t *pool;
++			gfp_t gfp_mask;
+ 		} mem;
  
-+__maybe_unused /* this is temporary while this file is included in others */
-+static bool smbdirect_frwr_is_supported(const struct ib_device_attr *attrs)
-+{
-+	/*
-+	 * Test if FRWR (Fast Registration Work Requests) is supported on the
-+	 * device This implementation requires FRWR on RDMA read/write return
-+	 * value: true if it is supported
-+	 */
+ 		/*
+@@ -481,6 +483,8 @@ static __always_inline void smbdirect_socket_init(struct smbdirect_socket *sc)
+ 	INIT_DELAYED_WORK(&sc->idle.timer_work, __smbdirect_socket_disabled_work);
+ 	disable_delayed_work_sync(&sc->idle.timer_work);
+ 
++	sc->send_io.mem.gfp_mask = GFP_KERNEL;
 +
-+	if (!(attrs->device_cap_flags & IB_DEVICE_MEM_MGT_EXTENSIONS))
-+		return false;
-+	if (attrs->max_fast_reg_page_list_len == 0)
-+		return false;
-+	return true;
-+}
-+
- static void smbdirect_socket_cleanup_work(struct work_struct *work);
+ 	atomic_set(&sc->send_io.lcredits.count, 0);
+ 	init_waitqueue_head(&sc->send_io.lcredits.wait_queue);
  
- __maybe_unused /* this is temporary while this file is included in others */
+@@ -491,6 +495,8 @@ static __always_inline void smbdirect_socket_init(struct smbdirect_socket *sc)
+ 	init_waitqueue_head(&sc->send_io.pending.dec_wait_queue);
+ 	init_waitqueue_head(&sc->send_io.pending.zero_wait_queue);
+ 
++	sc->recv_io.mem.gfp_mask = GFP_KERNEL;
++
+ 	INIT_LIST_HEAD(&sc->recv_io.free.list);
+ 	spin_lock_init(&sc->recv_io.free.lock);
+ 
 -- 
 2.43.0
 
