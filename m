@@ -1,47 +1,46 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CFE3314DD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD1432FA13
 	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:32:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764095575; cv=none; b=aRG6mIOfAMedF6PefzLVEC/9b2RqTEGFfcy1kMMUvVbEcpY4MN0RePGQLJ0EzrDkvuaKjB/k/7vgBBtiC+zfjXzSOdF0ZVFcLitJLdERpAdzAZDGim2SRHIBm+MY3RXmTauJbHINAvZwcX/Q/IW+0y20HzjIfpYxQchU2t6PWV0=
+	t=1764095575; cv=none; b=EZIYkC7wQY1z824gbo0W5pDfx8J4bLCXpL5Wn6JVmVU9Y5hvMrJ13noyX8HHP0sI9jX4NqBEmfeyzZJw4wDfFSC7kPEJF9gRxHFui5klwKxh6C541SsiLs08LEXtby8kbY+waV69b6EcqsqO1YkElQRFVG4jakF7n2yGTHwGJ1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764095575; c=relaxed/simple;
-	bh=koiTwUmChf1DmaLc6NPfM6JMZMJwv/4mBYXovjS4EX0=;
+	bh=hgSrCWtnjPlFjvRHsOQ2pxWNCfGEF4FLy264UTIpqa8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RLntDogKeQS7L14VxXiJM6xMSLrVhvFCnHqqIzFDs0hBej47f5IFkSDSSkRjQpaw15P1gsTbY+QaXxZtrk/0jJDCNt1DQ4gMrclQPnWjmQWF/iVTxF0yDtPj+/F+BgkNbHQ8XCZUp05EVyP1eJV4II2O9Wadpx0yilVU78JI32o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=NKQfFWVg; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=WWW6ma08YvOjSSN+XsF2TSRH9iyy2fWG2Y4UlhghkAxLKXK3fSYxpkSp9rdLvejrcB76e/cELFl+VAGF3F9qGCWB8wQ5swqGge/SBnh2eruJKbD2K4ZztAkJG/R3FEDQ2gBchW5ISYOeboqF9CszuuPXgrrkZHzwjKiK3muDomE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=p/FORkIh; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="NKQfFWVg"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="p/FORkIh"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=6ZBdmK/hb72nWzfTX+xpVwDxdtCuyybkMHjYK9w6vSg=; b=NKQfFWVg2e26+fuyxgPQOSVPF/
-	EXlf72BFVDDBmJbpjrSfb/Fwiy9Xlo9l8kBOFZMuY2sQA17ghs/lsoRj8lPaU/pd0djQ+22t2kD47
-	GTIPQcTpargtnfbGCxkRoHxT0ECTqYkLT7M4MoG5j1V5VlKTRhbAlNC1FQgPZTl+VyTpTAyPBLJ97
-	0qN55RiDCSCHDX2uy7b2MCGr3UccINWgFfDunuLtZ6Ea/ti8DCUM2Oa45QW6e800ayeOwxIIG+OvN
-	uehxyyTUEPQapUsCv7Q126zZfqAQyFVGiblvvsE3yYdyvAwQzUkJ6XOU6l7FlG0t0Py6sHJzue+Ix
-	12VUy1k+BizZR8i+JDcA6Lr3U5h+x7pE6xfkNXF63xG1JPQlVkgaRisLmaOoflGVteZdFl5A5bbKe
-	JNP9bRah3zoHmawUm9KSJlmdZO8aLIwYwZ56EUueMTlOcIh3vBlDGDpdWEBoxj/SaMkVJmn1J6ABY
-	/3rKDzJmQs5eV6dKpZfoPPMw;
+	bh=HeXhqlYf9fWcFDLT1id1nFuOueeCwtgSskqFUIh4hD8=; b=p/FORkIhC0bXgMgHbSTRcyh6v9
+	djWLv6vQEPpFb8c5ErOH1YVvsiN2usb4sj03wd5SPcz16lTBkKzwsS3trQ8lOtlFbZNkPsPWKovhd
+	KCRvYBZcRI1gBZpbsppFg80jOma7fT/cxBgqyjiJqKJP8ajLf+OXxDRU7EJ28FkR22q02lcXj/BcB
+	PFEhmPUSHVURx90JwS4aZm30aZMAfcC0CH6aM6GZn8KrKmQY6guv5Kxyv4WKKBv3+zHkgWFGGuHfR
+	gwLM4CjqnuWDo97YkSlTaMq5zLmdXwdP2HVwG0Sj5C7UAP6qGNR6boltAHkvmjTzA94/G/jfwbAlV
+	DNXCg46eqpJuIuCy+gSBndrlWOHYYrzmf+5L+mmSqYehxjF/0a5vNVD1wryX7BmIiFTjlv58kTbyy
+	tGXCBCE0LMu4W8NeiU3i8rQzNY8nPrBONywmPIRtUOrEtbEwbynEINvC2Jv2C3Y5JTa9/FYkii0yD
+	OT33UbGZqVjCPwPCwq5GAXxD;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vNxmu-00Ffwd-0y;
-	Tue, 25 Nov 2025 18:29:16 +0000
+	id 1vNxn0-00Ffzo-1S;
+	Tue, 25 Nov 2025 18:29:23 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
 Cc: metze@samba.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v4 138/145] smb: client: no longer use smbdirect_socket_set_custom_workqueue()
-Date: Tue, 25 Nov 2025 18:56:24 +0100
-Message-ID: <cabe70c090b544443f56512146270fa58dcc5578.1764091285.git.metze@samba.org>
+	Tom Talpey <tom@talpey.com>
+Subject: [PATCH v4 139/145] smb: server: no longer use smbdirect_socket_set_custom_workqueue()
+Date: Tue, 25 Nov 2025 18:56:25 +0100
+Message-ID: <2369db3e6594b7f995fbc7178e95a1500afbb355.1764091285.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1764091285.git.metze@samba.org>
 References: <cover.1764091285.git.metze@samba.org>
@@ -56,85 +55,116 @@ Content-Transfer-Encoding: 8bit
 smbdirect.ko has global workqueues now, so we should use these
 default once.
 
+Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/client/smbdirect.c | 12 ------------
- fs/smb/client/smbdirect.h |  1 -
- 2 files changed, 13 deletions(-)
+ fs/smb/server/connection.c     |  1 -
+ fs/smb/server/transport_rdma.c | 27 ---------------------------
+ fs/smb/server/transport_rdma.h |  2 --
+ 3 files changed, 30 deletions(-)
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 0c3a4b6aa03f..4b9ae71c323b 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -196,7 +196,6 @@ void smbd_destroy(struct TCP_Server_Info *server)
- 
- 	smbdirect_socket_release(info->socket);
- 
--	destroy_workqueue(info->workqueue);
- 	kfree(info);
- 	server->smbd_conn = NULL;
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index b6b4f1286b9c..66d6dab66ebe 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -505,6 +505,5 @@ void ksmbd_conn_transport_destroy(void)
+ 	ksmbd_tcp_destroy();
+ 	ksmbd_rdma_stop_listening();
+ 	stop_sessions();
+-	ksmbd_rdma_destroy();
+ 	mutex_unlock(&init_lock);
  }
-@@ -245,7 +244,6 @@ static struct smbd_connection *_smbd_get_connection(
- 	struct smbdirect_socket_parameters init_params = {};
- 	struct smbdirect_socket_parameters *sp;
- 	__be16 *sport;
--	char wq_name[80];
- 	int ret;
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index c261082ff9c7..15559227ad69 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -78,8 +78,6 @@ static struct smb_direct_listener {
+ 	struct rdma_cm_id	*cm_id;
+ } smb_direct_listener;
  
- 	/*
-@@ -270,10 +268,6 @@ static struct smbd_connection *_smbd_get_connection(
- 	info = kzalloc(sizeof(struct smbd_connection), GFP_KERNEL);
- 	if (!info)
- 		return NULL;
--	scnprintf(wq_name, ARRAY_SIZE(wq_name), "smbd_%p", info);
--	info->workqueue = create_workqueue(wq_name);
--	if (!info->workqueue)
--		goto create_wq_failed;
- 	ret = smbdirect_socket_create_kern(net, &sc);
- 	if (ret)
- 		goto socket_init_failed;
-@@ -284,9 +278,6 @@ static struct smbd_connection *_smbd_get_connection(
- 	ret = smbdirect_socket_set_kernel_settings(sc, IB_POLL_SOFTIRQ, GFP_KERNEL);
+-static struct workqueue_struct *smb_direct_wq;
+-
+ struct smb_direct_transport {
+ 	struct ksmbd_transport	transport;
+ 
+@@ -211,9 +209,6 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
+ 	ret = smbdirect_socket_set_kernel_settings(sc, IB_POLL_WORKQUEUE, KSMBD_DEFAULT_GFP);
  	if (ret)
  		goto set_settings_failed;
--	ret = smbdirect_socket_set_custom_workqueue(sc, info->workqueue);
+-	ret = smbdirect_socket_set_custom_workqueue(sc, smb_direct_wq);
 -	if (ret)
 -		goto set_workqueue_failed;
  
- 	if (dstaddr->sa_family == AF_INET6)
- 		sport = &((struct sockaddr_in6 *)dstaddr)->sin6_port;
-@@ -306,13 +297,10 @@ static struct smbd_connection *_smbd_get_connection(
- 	return info;
+ 	conn = ksmbd_conn_alloc();
+ 	if (!conn)
+@@ -231,7 +226,6 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
+ 	return t;
  
- connect_failed:
+ conn_alloc_failed:
 -set_workqueue_failed:
  set_settings_failed:
  set_params_failed:
  	smbdirect_socket_release(sc);
- socket_init_failed:
--	destroy_workqueue(info->workqueue);
--create_wq_failed:
- 	kfree(info);
- 	return NULL;
+@@ -508,21 +502,8 @@ int ksmbd_rdma_init(void)
+ 		return ret;
+ 	}
+ 
+-	/* When a client is running out of send credits, the credits are
+-	 * granted by the server's sending a packet using this queue.
+-	 * This avoids the situation that a clients cannot send packets
+-	 * for lack of credits
+-	 */
+-	smb_direct_wq = alloc_workqueue("ksmbd-smb_direct-wq",
+-					WQ_HIGHPRI | WQ_MEM_RECLAIM | WQ_PERCPU,
+-					0);
+-	if (!smb_direct_wq)
+-		return -ENOMEM;
+-
+ 	ret = smb_direct_listen(smb_direct_port);
+ 	if (ret) {
+-		destroy_workqueue(smb_direct_wq);
+-		smb_direct_wq = NULL;
+ 		pr_err("Can't listen: %d\n", ret);
+ 		return ret;
+ 	}
+@@ -543,14 +524,6 @@ void ksmbd_rdma_stop_listening(void)
+ 	smb_direct_listener.cm_id = NULL;
  }
-diff --git a/fs/smb/client/smbdirect.h b/fs/smb/client/smbdirect.h
-index bd03ae72e9c8..0017d5b2de44 100644
---- a/fs/smb/client/smbdirect.h
-+++ b/fs/smb/client/smbdirect.h
-@@ -25,7 +25,6 @@ extern int smbd_receive_credit_max;
  
- struct smbd_connection {
- 	struct smbdirect_socket *socket;
--	struct workqueue_struct *workqueue;
- };
- 
- /* Create a SMBDirect session */
+-void ksmbd_rdma_destroy(void)
+-{
+-	if (smb_direct_wq) {
+-		destroy_workqueue(smb_direct_wq);
+-		smb_direct_wq = NULL;
+-	}
+-}
+-
+ static bool ksmbd_find_rdma_capable_netdev(struct net_device *netdev)
+ {
+ 	struct smb_direct_device *smb_dev;
+diff --git a/fs/smb/server/transport_rdma.h b/fs/smb/server/transport_rdma.h
+index e16f625caed2..05352dc47f95 100644
+--- a/fs/smb/server/transport_rdma.h
++++ b/fs/smb/server/transport_rdma.h
+@@ -14,14 +14,12 @@
+ #ifdef CONFIG_SMB_SERVER_SMBDIRECT
+ int ksmbd_rdma_init(void);
+ void ksmbd_rdma_stop_listening(void);
+-void ksmbd_rdma_destroy(void);
+ bool ksmbd_rdma_capable_netdev(struct net_device *netdev);
+ void init_smbd_max_io_size(unsigned int sz);
+ unsigned int get_smbd_max_read_write_size(struct ksmbd_transport *kt);
+ #else
+ static inline int ksmbd_rdma_init(void) { return 0; }
+ static inline void ksmbd_rdma_stop_listening(void) { }
+-static inline void ksmbd_rdma_destroy(void) { }
+ static inline bool ksmbd_rdma_capable_netdev(struct net_device *netdev) { return false; }
+ static inline void init_smbd_max_io_size(unsigned int sz) { }
+ static inline unsigned int get_smbd_max_read_write_size(struct ksmbd_transport *kt) { return 0; }
 -- 
 2.43.0
 
