@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B7725CC63
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A728720C48A
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764093661; cv=none; b=bX2W7LlNMOc46V0v14BUjRcGPtah+IJD+IOIc7Dbwy2qfIJvsdfq4FMJGk8grpthaGcRHc+u6e8gewlX6mWkAIieBbi1otRPVHGfD6Xsufk9hI2O4cLvJ9LOxtzzBefkJtYTWurENC63h08uT5sMVpD60qnT2jQSEO2y9wxCVbQ=
+	t=1764093671; cv=none; b=B8uCBQnt9UTBmkSascAaK6leTmjGMyVZzcBpLHB+we9PoKEnkecjRSgPk+plMXztUQqVr36ib8PulQKm5KrCBFYgg1BarUlKlyobUwLOVWywgeGD97hMy4MXC5PlLusC2Z/KhP7nhUTafHGAeM5Mb9iZq7waBZVeJ818TcLuGBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764093661; c=relaxed/simple;
-	bh=gFq1nv5IH5JkuQUX9nimZCwWIVIE4Rb051u099YEcCk=;
+	s=arc-20240116; t=1764093671; c=relaxed/simple;
+	bh=pPif6ej8+aSErewUfEtrTOzgqL8kxK0VrCiUvuzeT8I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EchRul/SPjFtnL1fOVfl+M4N50NVwVkg+cf2vl8D76yrLsstIAc+AnOSB0CsBBPPtSzSeS/W/U5GdiGGFiv+HXwWospuv0AXN8kLv4P/Rcf/WkfvXJj8rc9G/WIza/7WIWe2Lba2mWbhxdTqhelBuHgr4T8rDbkKkjh+tqh5T/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=l9VNwLG6; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=j4ZCjJk8+BlWQceHCBHhI3dUWaGd9NkboX3kRwxgad88wZjCYcAh9nF/JUo7XGd8HQ8K4aBg1s+LyJ2E8ixzhfwAkUUi1GeBP7D04jS+461H2ZF++/EzigCX8PmFAAelcD50sZWuURxgSQkIvYIgcuPActJ/Dc+a0gAgVJNH/Gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=xu8kQoUC; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="l9VNwLG6"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="xu8kQoUC"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=jzupWyNj+MhdfsWHMq6FTS6bwH4NLUQh9F+UlYiUKFQ=; b=l9VNwLG6Sm2SpwOdwGeJV6rSfs
-	ZC9MJbN9dbE/HxckkwL5n+2YYRnZPKN/QJBohXAZShFND2si/REtg9iMD2ej2YjHOKHGq1AECFMbM
-	KAgzpSfA5XwT/1A3jw5R5nSCY5eeceeu5hU/uh6YN/JT602V8+RZYfgyOtnoeO7nPUvPrhiCEPKMu
-	b0JZ9XLNv7oibAawHWu+JvHNd55hGU29ZX0SSkKF5gH2QIS0QnoL5hSj/KIU0p/Y3zhA2aQYDd4gn
-	NBZNeVN6pzYyhMIrssYGYBdQIRFqXndhI6LBulZWwrhB6NA5YYevujQgP23wRRxMRgS3BjNU6VGUr
-	BWHM127u6u10oHRJxyhx6aeh5KPc9SiuaMFywGWTTye0+C3u5hv1uOQ//4PHWkSvklCHYiXaG16KY
-	7yjzKiYd/yHxEjaNLuiRWv+rVr3HG/p1U1J33Xcw99/IOpgs3j1wWNjZi87Q06MVKfUvWx498xsCS
-	N9ESEHgJqnuAbXDFuRhkgIVO;
+	bh=Ot/g2X2p3USxlU4/6ctFi0yjrKOMYk59FL1Ot5hIGbY=; b=xu8kQoUCm+H56q0NMfFfp59Th7
+	M7Mbaw5yY8y5E1OGQvcnMmkfeiLdSjhAMhXDb0bJ2dYvQPxUuAaHLDA4s8jm35NKRrD1yVmtHQ1dG
+	kD6pKSIcX7PJTwt3QoDHuuVe2CgyqYwAD533on4XI1wG0wprxlaV0fkhTXyKlxeDx9snzt41Y2wcQ
+	8euiko+r7z6njQVCfSG+8i5IxCawZHUWHwWfTCOGusdu0m8vVrgCr8okyqp95reMt6JjQyBJwqJN3
+	6NhME6E5pd5MYL52kDApeVBS2homXLWBf04SXF26ukoW4F5Py+W/IG2TzWLDo02aMy3IWvD+kDlOA
+	rO/eiu0mhlebLEgp0xnVJmhVo3TuAgFIe9GKnor9Q2uelvWWIAzFxopO+u3Nc3CyXiq66+ggvq8SH
+	CDkfan0dK7ExvMGx6SCSWO3FjPJiJEWr8y5cB4hww3EpBQnMVQKuJ7c3YhAN+nRSCuNCHMmjRiYD+
+	zR2HxiTJphD8WSegjQu1NBy6;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vNxLR-00Fd76-1S;
-	Tue, 25 Nov 2025 18:00:53 +0000
+	id 1vNxLX-00Fd7s-2w;
+	Tue, 25 Nov 2025 18:01:00 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -40,9 +40,9 @@ Cc: metze@samba.org,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v4 041/145] smb: smbdirect: introduce smbdirect_connection_recvmsg()
-Date: Tue, 25 Nov 2025 18:54:47 +0100
-Message-ID: <f752acca7635f4714c06c547c3f8a0d4767f8b11.1764091285.git.metze@samba.org>
+Subject: [PATCH v4 042/145] smb: smbdirect: introduce smbdirect_connection_grant_recv_credits()
+Date: Tue, 25 Nov 2025 18:54:48 +0100
+Message-ID: <5cd8c3c57d16740da9de79b93b56177fbdc9272e.1764091285.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1764091285.git.metze@samba.org>
 References: <cover.1764091285.git.metze@samba.org>
@@ -54,11 +54,14 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is basically a copy of smbd_recv() in the client.
+This is a copy of manage_credits_prior_sending() in the server.
 
-And it's very similar to smb_direct_read() in the server.
+It is very similar to manage_credits_prior_sending() in the
+client, the only difference is that
+atomic_add(new_credits, &sc->recv_io.credits.count) is done
+in the caller there.
 
-It will replace both in the following commits.
+It will replace both versions in future.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -69,170 +72,39 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- .../common/smbdirect/smbdirect_connection.c   | 151 ++++++++++++++++++
- 1 file changed, 151 insertions(+)
+ .../common/smbdirect/smbdirect_connection.c   | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/fs/smb/common/smbdirect/smbdirect_connection.c b/fs/smb/common/smbdirect/smbdirect_connection.c
-index 5c4303093b15..71d2ee4030a2 100644
+index 71d2ee4030a2..6dce0f0c126a 100644
 --- a/fs/smb/common/smbdirect/smbdirect_connection.c
 +++ b/fs/smb/common/smbdirect/smbdirect_connection.c
-@@ -1062,6 +1062,157 @@ static void smbdirect_connection_recv_io_refill_work(struct work_struct *work)
- 	}
+@@ -704,6 +704,26 @@ static void smbdirect_connection_idle_timer_work(struct work_struct *work)
+ 	queue_work(sc->workqueue, &sc->idle.immediate_work);
  }
  
 +__maybe_unused /* this is temporary while this file is included in others */
-+static int smbdirect_connection_recvmsg(struct smbdirect_socket *sc,
-+					struct msghdr *msg,
-+					unsigned int flags)
++static u16 smbdirect_connection_grant_recv_credits(struct smbdirect_socket *sc)
 +{
-+	struct smbdirect_recv_io *response;
-+	struct smbdirect_data_transfer *data_transfer;
-+	size_t size = iov_iter_count(&msg->msg_iter);
-+	int to_copy, to_read, data_read, offset;
-+	u32 data_length, remaining_data_length, data_offset;
-+	int ret;
++	u16 new_credits;
 +
-+	if (WARN_ON_ONCE(flags))
-+		return -EINVAL; /* no flags support for now */
++	if (atomic_read(&sc->recv_io.credits.count) >= sc->recv_io.credits.target)
++		return 0;
 +
-+	if (WARN_ON_ONCE(iov_iter_rw(&msg->msg_iter) != ITER_DEST))
-+		return -EINVAL; /* It's a bug in upper layer to get there */
++	new_credits = atomic_read(&sc->recv_io.posted.count);
++	if (new_credits == 0)
++		return 0;
 +
-+again:
-+	if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
-+		smbdirect_log_read(sc, SMBDIRECT_LOG_ERR,
-+			"status=%s first_error=%1pe => %s\n",
-+			smbdirect_socket_status_string(sc->status),
-+			SMBDIRECT_DEBUG_ERR_PTR(sc->first_error),
-+			errname(-ENOTCONN));
-+		return -ENOTCONN;
-+	}
++	new_credits -= atomic_read(&sc->recv_io.credits.count);
++	if (new_credits <= 0)
++		return 0;
 +
-+	/*
-+	 * No need to hold the reassembly queue lock all the time as we are
-+	 * the only one reading from the front of the queue. The transport
-+	 * may add more entries to the back of the queue at the same time
-+	 */
-+	smbdirect_log_read(sc, SMBDIRECT_LOG_INFO,
-+		"size=%zd sc->recv_io.reassembly.data_length=%d\n",
-+		size, sc->recv_io.reassembly.data_length);
-+	if (sc->recv_io.reassembly.data_length >= size) {
-+		int queue_length;
-+		int queue_removed = 0;
-+		unsigned long flags;
-+
-+		/*
-+		 * Need to make sure reassembly_data_length is read before
-+		 * reading reassembly_queue_length and calling
-+		 * smbdirect_connection_reassembly_first_recv_io. This call is lock free
-+		 * as we never read at the end of the queue which are being
-+		 * updated in SOFTIRQ as more data is received
-+		 */
-+		virt_rmb();
-+		queue_length = sc->recv_io.reassembly.queue_length;
-+		data_read = 0;
-+		to_read = size;
-+		offset = sc->recv_io.reassembly.first_entry_offset;
-+		while (data_read < size) {
-+			response = smbdirect_connection_reassembly_first_recv_io(sc);
-+			data_transfer = (void *)response->packet;
-+			data_length = le32_to_cpu(data_transfer->data_length);
-+			remaining_data_length =
-+				le32_to_cpu(
-+					data_transfer->remaining_data_length);
-+			data_offset = le32_to_cpu(data_transfer->data_offset);
-+
-+			/*
-+			 * The upper layer expects RFC1002 length at the
-+			 * beginning of the payload. Return it to indicate
-+			 * the total length of the packet. This minimize the
-+			 * change to upper layer packet processing logic. This
-+			 * will be eventually remove when an intermediate
-+			 * transport layer is added
-+			 */
-+			if (response->first_segment && size == 4) {
-+				unsigned int rfc1002_len =
-+					data_length + remaining_data_length;
-+				__be32 rfc1002_hdr = cpu_to_be32(rfc1002_len);
-+
-+				if (copy_to_iter(&rfc1002_hdr, sizeof(rfc1002_hdr),
-+						 &msg->msg_iter) != sizeof(rfc1002_hdr))
-+					return -EFAULT;
-+				data_read = 4;
-+				response->first_segment = false;
-+				smbdirect_log_read(sc, SMBDIRECT_LOG_INFO,
-+					"returning rfc1002 length %d\n",
-+					rfc1002_len);
-+				goto read_rfc1002_done;
-+			}
-+
-+			to_copy = min_t(int, data_length - offset, to_read);
-+			if (copy_to_iter((u8 *)data_transfer + data_offset + offset,
-+					 to_copy, &msg->msg_iter) != to_copy)
-+				return -EFAULT;
-+
-+			/* move on to the next buffer? */
-+			if (to_copy == data_length - offset) {
-+				queue_length--;
-+				/*
-+				 * No need to lock if we are not at the
-+				 * end of the queue
-+				 */
-+				if (queue_length)
-+					list_del(&response->list);
-+				else {
-+					spin_lock_irqsave(
-+						&sc->recv_io.reassembly.lock, flags);
-+					list_del(&response->list);
-+					spin_unlock_irqrestore(
-+						&sc->recv_io.reassembly.lock, flags);
-+				}
-+				queue_removed++;
-+				sc->statistics.dequeue_reassembly_queue++;
-+				smbdirect_connection_put_recv_io(response);
-+				offset = 0;
-+				smbdirect_log_read(sc, SMBDIRECT_LOG_INFO,
-+					"smbdirect_connection_put_recv_io offset=0\n");
-+			} else
-+				offset += to_copy;
-+
-+			to_read -= to_copy;
-+			data_read += to_copy;
-+
-+			smbdirect_log_read(sc, SMBDIRECT_LOG_INFO,
-+				 "memcpy %d bytes len-ofs=%u => todo=%u done=%u ofs=%u\n",
-+				 to_copy, data_length - offset,
-+				 to_read, data_read, offset);
-+		}
-+
-+		spin_lock_irqsave(&sc->recv_io.reassembly.lock, flags);
-+		sc->recv_io.reassembly.data_length -= data_read;
-+		sc->recv_io.reassembly.queue_length -= queue_removed;
-+		spin_unlock_irqrestore(&sc->recv_io.reassembly.lock, flags);
-+
-+		sc->recv_io.reassembly.first_entry_offset = offset;
-+		smbdirect_log_read(sc, SMBDIRECT_LOG_INFO,
-+			 "returning data_read=%d reassembly_length=%d first_ofs=%u\n",
-+			 data_read, sc->recv_io.reassembly.data_length,
-+			 sc->recv_io.reassembly.first_entry_offset);
-+read_rfc1002_done:
-+		return data_read;
-+	}
-+
-+	smbdirect_log_read(sc, SMBDIRECT_LOG_INFO,
-+		"wait_event on more data\n");
-+	ret = wait_event_interruptible(sc->recv_io.reassembly.wait_queue,
-+				       sc->recv_io.reassembly.data_length >= size ||
-+				       sc->status != SMBDIRECT_SOCKET_CONNECTED);
-+	/* Don't return any data if interrupted */
-+	if (ret)
-+		return ret;
-+
-+	goto again;
++	atomic_add(new_credits, &sc->recv_io.credits.count);
++	return new_credits;
 +}
 +
- static bool smbdirect_map_sges_single_page(struct smbdirect_map_sges *state,
- 					   struct page *page, size_t off, size_t len)
+ __maybe_unused /* this is temporary while this file is included in others */
+ static void smbdirect_connection_send_io_done(struct ib_cq *cq, struct ib_wc *wc)
  {
 -- 
 2.43.0
