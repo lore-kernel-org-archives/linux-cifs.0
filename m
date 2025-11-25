@@ -1,114 +1,169 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF312F1FE9
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 23:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A956256C84
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 23:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764115102; cv=none; b=tOYMfU0a391PYyrHcjyX30TAmq1h600MWqLVQ92zHaIsGwcS0JbJeWR7UuVPcA/Ns4D/Z9CAYAA4eSb4ExgcjsZCsitobAMDK3udVUwPp/5j+mhj6NSQoN2LAutgdQ2ii1zOcxyuJqyTouEcvgG2eEhUpeOK6X1oTbSp3TmNiCc=
+	t=1764115164; cv=none; b=gw6u4BDSyo9wVH7FjnSXQbVOgj1agaTT2gyjYXt/zML7VnQnfdWRoRM5OAqdradeYvzYHV4cgWwRajH//6f7+G1ItlYePgA4jlEpPwD3e6N/X+jXXG/WIBlbfvm8mwaoGlgWNoAfLz8elT8p0S02He1TxKj1oe33tvAxWpBDN34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764115102; c=relaxed/simple;
-	bh=0Cp18DFXXEgdm7bt/WRHygN61Nk5btD3pIICkvmHQEc=;
+	s=arc-20240116; t=1764115164; c=relaxed/simple;
+	bh=RovQq1KhcIqyH6tmSHlLo8msvWJrI2AjLdxdreD11qo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hTjwHxubtfBM1FTmf63y/Is7fzKsUefk+NW3Lg9kZ2WCMW/MsGzZcG7iLVwEVOXOfWeIQsLBiHw1dV9hRNE1SqOr+Lc33cIyqGCcUbfNvPyqkzq52mQZY7BnjL7YKE3TQef5S/FB5edg+LtEmQ5PDTTUQG9aI9A8t4xFx/k4G64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X6V2o73u; arc=none smtp.client-ip=209.85.219.52
+	 To:Cc:Content-Type; b=rNG/lbHh6fWCEWRPWdeZQ67xOhRW1N+tfngZqLFel/cpXMURXy/WQx64Xym285dpvRQPnOdd46TXs/h1dTomM66oEKzRt/7VkK554xzoegRsA/e239SQ45Wyf6Zd9+w6WEZupPHAfnkQaDcVTGSorPqEHIDa3BdQW55JqIdiDhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U2tjWbTj; arc=none smtp.client-ip=209.85.219.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X6V2o73u"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-88242fc32c9so71871706d6.1
-        for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 15:58:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2tjWbTj"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-8824ce98111so94717586d6.0
+        for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 15:59:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764115099; x=1764719899; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764115162; x=1764719962; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QXYNc/4laOM0Q97PY3J4KL3e2qPiUiGanCOWZDiW1kQ=;
-        b=X6V2o73u5xyVdUKmUPK1zyo9m/INSv4RyVRNNyBae4g4fdBcLm/VC3TFNd54uDZBYX
-         yYNEDUqpu7HKHQz6iLPAjtLsIWccb2KFtUyAjv4wDev3Inl6UY1YG8yd8P2QPHkXK/Zf
-         GV/GJHsE2nG2zp2k/t9xXDREI0sUu75P898uPGWTdbBswKvN8KIrPDSgUTlUuMRYJ6yq
-         rDbVf1WEkrA6iKJ0IwC64EnOsGTWZgBs0S92U+psghFFkBaLF1/d8Z8heYdhmJ5dwRHa
-         jSgGW1Fwcd36dZBwC8XxqaQWQ0r0XrfGVZmc8kcVfmh+U74SMl6UymN8duJvtF5U3T8j
-         AaUg==
+        bh=LGKAbXSOb/hIN/3EXOfiiEv3A7Hp4O1wFMrKhdxoDso=;
+        b=U2tjWbTjdirFao59AQ0YcM2zFFoeCBck29IcmEaOQqhoTrxKnwsXuPvcKpqutMDISs
+         BFPvOyHzj64i0Yu5VNCiDngCkp0bY1za/Kumaw+iDUeMbKCGaSuHbXo5ogbXGfXfIoSm
+         wAkXsDtep5hgU3lemrLFObJJ69fCFcGMHLIO7+G82tHbHYEt/ltUwj7MYSOLsqjxWOAB
+         MQCiwjHcDr31M5MNe1C97q7vKthybQohEmAYl8XjLDkxH8iXY7BGVc8UTpIqFPwZZuEa
+         JILswsyIDKWGkNOvlAns32fS+W6hrw3VQI5436tyDhmj1MCg2gr1JSzu0NUNJe/h34Zp
+         PqAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764115099; x=1764719899;
+        d=1e100.net; s=20230601; t=1764115162; x=1764719962;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QXYNc/4laOM0Q97PY3J4KL3e2qPiUiGanCOWZDiW1kQ=;
-        b=ftOzGPw8OTcXCh60vCGnMBxJ5A44KurTk2TNBS45SuGVyeZwf97btiLUQvJzN0BlAf
-         2a7/VgH/wHxn6vR/mDE1rKEQa4rZhcBLDD4luLQUcuqDUTkKyb+gAHNkRm+R77RGETnd
-         NWheLa2oClFzBGpPYqZiJJ/MQmgMuOFEZ0nqoKocqUhPzJfvMqLF4psHo8blsK5bSvoP
-         OU8YABrUwfGiWy0ex97c91G6vWu39+NRq8i2O0y9kjnrne9btBtUU3VeAYTASk36I6Tw
-         E4ZMVDpSX2uAhGdTkFTKAh3We1H7F0gOtqaeTDqIWOTB60pjoGc7OezT91K74LN90A0D
-         U2jw==
-X-Forwarded-Encrypted: i=1; AJvYcCX557pJriUt+SgGA6ufXEOXqIQzJKLUgkC1PmA9a8OZPLw2KobFHeSrvi57NI2yVkc8IaHnqzo3Zb+o@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCFVqZSZ8GKrm9z32whbOol8lvFvMoy2xeY10lTBKtjL4T5rtl
-	vIpiXp0Bssfw4NSu1PkfUiAwMdUO1Msgu/xoC7ALTkebbi8qBc5kPuz9Q9oA8492nRiJ9oW/s/N
-	Jf+PUgftRK2H4T6yco9QcK1uWZ2DHR6U=
-X-Gm-Gg: ASbGncs7ePUweDJhSqRn/CROfixK9i3RUh1WlhMZCubKtqBWShDK1hhub26A5DY80aK
-	jDFxM79u7ZQJq+CV/+MLnd+tyD6nhZXTS0Y5IRQ4v4RWFoSEN6IuCHzSgMlauljQnFtqQam4bk2
-	jRbm1HI+1wM6+z5mp9vYi43egXKBXc0R44h13esCGsh/Hz5+NGzULKMVyEj+G5CWZshmfMhGfmg
-	XPPf8TxDQI5dFyAQwDjOI26T49/W9Xfjd1KOtxwaD4Rum4/+SxfbCrYU6m97zt4PABOyzcJQ/bL
-	wevPBg1N9ux6RORuJOJtH+KUlrtORBzOhsMyYKctSWwTj8mCAvtEA5OSSQ+D9cGEm8m1h2MD0Vt
-	k23qkZBgSTb5FwtEZLMhc6sE4wYgTkOxoKprRARnIKAcGHNkEJP/b9IKlId31mQwrQ+2U/2pO5j
-	3wch2gI7b+8Q==
-X-Google-Smtp-Source: AGHT+IEPm4UOPjCmHNwcCFtz5kGdNpGHq9s2u6MTXL8/uO5hPvCs0suCKcEGIdT1obINcZkbVe0yMSQVoKLxYJVvflc=
-X-Received: by 2002:a05:6214:3d8a:b0:880:4c68:f24c with SMTP id
- 6a1803df08f44-8847c4880bbmr251839726d6.11.1764115099470; Tue, 25 Nov 2025
- 15:58:19 -0800 (PST)
+        bh=LGKAbXSOb/hIN/3EXOfiiEv3A7Hp4O1wFMrKhdxoDso=;
+        b=vutSDGei8rUDKKdZWCN3hyNm2KcaCCuhGczZizz+L/hVoupFqpoBuxBP36jHeif7qq
+         CIYgDRedbc0WWNbSCbZzO5nWJngrXlR10JqAnU14X5C3h4pCVqIuA4qw/vHAMy/zj147
+         CMGWgMYyJ6lbXITgR9sbtp7cxJKhs59d5XmxxzENkkjvz8L68O+UAeAjsN+k3oog35CF
+         p5g5gGVBTHHKAuO35AE1EED1IiLWDnfq56My+ivTLnNwvvYZ0dDwtWhj4tPGciIBSmbN
+         AHW3Jf2iYY1ZbpLIQNEmlU7eipicOwAHUmeuu7v2xh0gu73CK3Pd3CAopoiR9tcmNzZR
+         Vb2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUxjkXl5meqbHgdvOM3/VtNE7AWht/jCF/7bj63ptQFvo4Vv5g4cAmioGDMxqbia9nAdLfsR88C21rI@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSUQUsLii52pkUu544ngQy5WfzT6WHmsXJPaN4gNZdWyit6BKW
+	3RezAXA42ms5PkOLuj4n0eJ7JmK2137Ctgmrrw6GhslMJKQMnsC1909IW0yDcQJWyC5DdFIo0s4
+	LAEWOuNj7Wy1A1oHKeTeeHwUsEdk8PLo=
+X-Gm-Gg: ASbGncsdmByRp2VBXuxz6TFKNZJjLvCmxFiRyG1O1X3kPRR1aLy1sUXbuDhE+2iXF/r
+	nCwUxV5vbzqumpsNxa+kHlsn6sAbNiJg4Q8rC1sZgm8Qu2EVc8zofknYmiovE4GuOkn08LkOJh4
+	Crwv3xGEMIU9gXXnyUjVoQpAS+I3Ix+5kZK167DoLg+i5Cm8DXjlWAi4piHU/tKSrZ0eekFBq35
+	l6ER+AueyVKiInttTaTVzTRXEa9gxSzJ0iW5aoJAPBcyNiUzqNFwaXzUbab/7EGKMZWcE7L0lgD
+	GUh1a8DozCA9+aJM0i06VxfYTOLOtHVn5VrMwqMLimi4LBHO+fq5i+3ROaQpAv6Nzi7/A7Qn4af
+	YKa2h1OZepBdFJcZ0/2I3YPsp9ZFjs9XeNEgfTg0PClQeqps3rXAxMmjCdY3au/qhZEabteakqZ
+	3k4QNw0TfO0DT89sY7wKNb
+X-Google-Smtp-Source: AGHT+IGvGBuP3gj1SzITT5yPR2BBx6IbHMF7PVeMxEYas9l4hy811l7wO/nNXAm0PljlOCe8AHwUQ0nz9gaJMntdsT4=
+X-Received: by 2002:a05:6214:508e:b0:880:298b:3a6d with SMTP id
+ 6a1803df08f44-8847c515c4bmr283137986d6.35.1764115162003; Tue, 25 Nov 2025
+ 15:59:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251125205829.1709717-1-pc@manguebit.org>
-In-Reply-To: <20251125205829.1709717-1-pc@manguebit.org>
+References: <20251125195541.1701938-1-pc@manguebit.org>
+In-Reply-To: <20251125195541.1701938-1-pc@manguebit.org>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 25 Nov 2025 17:58:08 -0600
-X-Gm-Features: AWmQ_bkQHdMLP4tnqgA7rEvpNL4rqfRp0ENrACip2zggxfg0JNMXh9zJ-Lef2dE
-Message-ID: <CAH2r5mvb6O6bj0uecpViGC1k_sxXYk9QR6t-OUYFUMc1FnrGow@mail.gmail.com>
-Subject: Re: [PATCH] docs: update echo_interval description
+Date: Tue, 25 Nov 2025 17:59:10 -0600
+X-Gm-Features: AWmQ_bmprbLgOxltibCwh_wV-OG1URFYExJL_Nr4aLpjs1iyFt2y0OVllv-h8HI
+Message-ID: <CAH2r5mutuLO4s6azh8g7D6Xs286mW_NyptEkF_6X3Uy4kY=FBw@mail.gmail.com>
+Subject: Re: [PATCH] cifscreds: fix parsing of commands and parameters
 To: Paulo Alcantara <pc@manguebit.org>
-Cc: piastryyy@gmail.com, Alexandros Panagiotou <apanagio@redhat.com>, linux-cifs@vger.kernel.org
+Cc: piastryyy@gmail.com, Xiaoli Feng <xifeng@redhat.com>, Jay Shin <jaeshin@redhat.com>, 
+	linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Added to cifs-utils for-next
+added to cifs-utils for-next
 
-On Tue, Nov 25, 2025 at 2:58=E2=80=AFPM Paulo Alcantara <pc@manguebit.org> =
+Do you know if this is a regression of cifs-utils and if so what release/wh=
+en?
+
+On Tue, Nov 25, 2025 at 1:55=E2=80=AFPM Paulo Alcantara <pc@manguebit.org> =
 wrote:
 >
-> It is '3 * echo_interval' since upstream commit f2caf901c1b7 ("cifs:
-> Fix a race condition with cifs_echo_request").
+> Fix the parsing of '--username' and '--timeout' options as both
+> require an argument by fixing the value passed in @optstring when
+> calling getopt_long(3).
 >
-> Reported-by: Alexandros Panagiotou <apanagio@redhat.com>
+> Also fix the matching of commands by breaking the loop when an exact
+> match is found.  Otherwise `cifscreds clear ...` would return
+> "Ambiguous command" due to "clearall" command.
+>
+> * Before patch
+>
+> $ ./cifscreds add -u testuser w22-root2.zelda.test
+> error: Could not resolve address for testuser
+> $ ./cifscreds add -u testuser -d ZELDA
+> Password:
+> $ grep 'cifs:[ad]' /proc/keys
+> 198de7a1 I--Q---     1 perm 0d0d0000     0     0 logon     cifs:d:testuse=
+r: 13
+>                                                                   ^^ wron=
+g desc
+> $ ./cifscreds clear -u testuser w22-root2.zelda.test
+> Ambiguous command
+> $ ./cifscreds clear -u testuser -d ZELDA
+> Ambiguous command
+>
+> * After patch
+>
+> $ ./cifscreds add -u testuser w22-root2.zelda.test
+> Password:
+> $ ./cifscreds add -u testuser -d ZELDA
+> Password:
+> $ grep 'cifs:[ad]' /proc/keys
+> 089183a9 I--Q---     1 perm 0d0d0000     0     0 logon     cifs:a:192.168=
+.124.32: 17
+> 0ca5ed80 I--Q---     1 perm 0d0d0000     0     0 logon     cifs:d:ZELDA: =
+17
+> $ ./cifscreds clear -u testuser w22-root2.zelda.test
+> $ ./cifscreds clear -u testuser -d ZELDA
+>
+> Reported-by: Xiaoli Feng <xifeng@redhat.com>
+> Reported-by: Jay Shin <jaeshin@redhat.com>
 > Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 > Cc: Steve French <smfrench@gmail.com>
 > Cc: linux-cifs@vger.kernel.org
 > ---
->  mount.cifs.rst | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  cifscreds.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
-> diff --git a/mount.cifs.rst b/mount.cifs.rst
-> index d4890706a0fe..4b6d47447c0e 100644
-> --- a/mount.cifs.rst
-> +++ b/mount.cifs.rst
-> @@ -483,8 +483,8 @@ echo_interval=3Dn
->    sets the interval at which echo requests are sent to the server on an
->    idling connection. This setting also affects the time required for a
->    connection to an unresponsive server to timeout. Here n is the echo
-> -  interval in seconds. The reconnection happens at twice the value of th=
-e
-> -  echo_interval set for an unresponsive server.
-> +  interval in seconds. The reconnection happens at three times the
-> +  value of the echo_interval set for an unresponsive server.
->    If this option is not given then the default value of 60 seconds is us=
-ed.
->    The minimum tunable value is 1 second and maximum can go up to 600 sec=
-onds.
+> diff --git a/cifscreds.c b/cifscreds.c
+> index 295059f9683d..e8713be23d71 100644
+> --- a/cifscreds.c
+> +++ b/cifscreds.c
+> @@ -71,7 +71,7 @@ static struct command commands[] =3D {
+>  static struct option longopts[] =3D {
+>         {"username", 1, NULL, 'u'},
+>         {"domain", 0, NULL, 'd' },
+> -       {"timeout", 0, NULL, 't' },
+> +       {"timeout", 1, NULL, 't' },
+>         {NULL, 0, NULL, 0}
+>  };
 >
+> @@ -477,7 +477,7 @@ int main(int argc, char **argv)
+>         if (argc =3D=3D 1)
+>                 return usage();
+>
+> -       while((n =3D getopt_long(argc, argv, "dut:", longopts, NULL)) !=
+=3D -1) {
+> +       while((n =3D getopt_long(argc, argv, "du:t:", longopts, NULL)) !=
+=3D -1) {
+>                 switch (n) {
+>                 case 'd':
+>                         arg.keytype =3D (char) n;
+> @@ -507,7 +507,7 @@ int main(int argc, char **argv)
+>                 if (cmd->name[n] =3D=3D 0) {
+>                         /* exact match */
+>                         best =3D cmd;
+> -                       continue;
+> +                       break;
+>                 }
+>
+>                 /* partial match */
 > --
 > 2.51.1
 >
