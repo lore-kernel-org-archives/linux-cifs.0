@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61E915ECD7
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9375320C48A
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764094097; cv=none; b=GYmCLUcGaw4BBI3F5M5V+rlKEpeGkjvBjZOHDhEcF+Z7Tdvprv2GYGB+gPMDnuwhKQDj4V+zI4RAseh8RVZudqrl9R/PPQDGDaGsLtL21XObqigdfD8OCU8gjYldubj+YvoOtV96rIMnq8uoDxGhpw5fdN/vxuHTq48IGbFW4bI=
+	t=1764094146; cv=none; b=VQ48VPiLvh0J/xxGxBXAsjbjEEDTf3muIITuuBW2cfr5PrkmasMNex0H+CyrkfHsDCZ6Esza6FldRgXA5ParesYNmKxuMcRwyiC8H104ZY3RvFvfm62tZqtGvfUOlUr8amHoG4fwpJLn3ZjnnLEntLc0J2d3uanDI62SsdCImg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764094097; c=relaxed/simple;
-	bh=wWFV1+zTqpvwFgM+afAAnsEk+cAX14ceuLIhrFgkucE=;
+	s=arc-20240116; t=1764094146; c=relaxed/simple;
+	bh=A1wzk0p3uG5LTDx+rHZPFInDeq6LsRxrvluctRygiPM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m6MSLySmBLwn0K/nvzgOvMTlg7BeOwACsB9iySSK3wOpGUGpQcQhZuC+WWuyI9tN7sgbvv/lDIwV6NGDhAcHQXXKri7b01VF/jq53kCQ3X7w3PS+QjDS8yEahu0c7qy38X4yCkME44hgB7H/4CsLq2xt7DRTiI9JdGbq+aRKwes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=stXH3Lki; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=hifsC6buMSkt2828EI80mDw74BRpXljixB/Owt2QnU2w+mdgTv5His+fzyXNZQfSVcVUHGDMczhkqOZrJOVPMUHdg91DLoHvRmUF2UvjiyehjloypblO916lLzbcV2iRN2oJrZFmqLNZTwfGWPTlJ/kzxQvHRkP27DFr1EyUvws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=pRfAjVAt; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="stXH3Lki"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="pRfAjVAt"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=pMTdTq7HOGqXyfkiKU+KEqSuKmskUIzm0AJFeVodh94=; b=stXH3LkiKf0TDmQOj0+GuUUIvQ
-	Hy9qbE7bYqLUo1X9A1XSL11ubLGrOzfpQQDMCXr57le/lrqoBu3nsiEk1+aS8msRyQFyiJwSqgf4S
-	6nLMryCOBY+oWHfhun9PF+q45kDBPKQEDbzQNofDxJV58XuSo79G7eAzemVEZT39Tvfyn2V9v/EYv
-	9hQnrdyapNKEa2D6gvYIhUiZLKIkCp5eRwg/+Sh7IgKRaxyjiIbS8GmGdNZUjyYRfOq5NfOhEF7kr
-	snK5iXDbp7sCEBaYKekGrpQSfWL6Q9ERghnwKWAOfXj/e8l4BuafvHkevWc5ZWIjcU+kCTdb0RGSP
-	/iYGPsWURybrF2BYdxeYjxN1oI1CmOMHdQbnfJX8Q5xGRX9vTziQrBgZfY9fG47w1fSnYw9nT8asw
-	gWpBvKic1FViyMrxQEE5XndW9YqmRJjiVEWvxk0EMkjawaZ+yPHxN1JM2dYBxmN8c1j2ogyoPepqv
-	hdNaan1pqbh4xRmCEkhsEaLC;
+	bh=wOnXOIAXm1j8QawORK0SKlEutsnHaqh1y2eOYjmixi4=; b=pRfAjVAtnbxu4budRCylsuv7+C
+	2t0YMdV1PVqzv2C3JSGFDKxkrz1HRD+99QbFaEV1b9BI9IGDdKfoAK9YXk7asIu1dqPq9tKnE0cms
+	ZTTN8Z+ZSrmxa4FaeWEmy9b7RCDnAKImclqLDFeQ7TYcX0rKT4y4+O7FP7ZQvDY4+MDbBMMrxn3pz
+	Iz5q8/+ZOT2/xRszbqWfe4tYuYdGRiPaPpFNiXAi1lsSK3w7vpKDWtDNimnF1FaVQ3PP9BVnzTlqg
+	KYpn1NVAIYkhyk/oefXEXdXoye1dlDZtvtVEpfkxns0DM9bW/HBDv97s3hUjCDoEG5oZBW5iYFf5z
+	mOlmnPJ8Cbn3ECcL2GzVJIc2WBm2bHGkgfaXzcJ2pc8W4QjGOfSNRFLDUCnFqweMMZT50UHoVC7Bc
+	sUsU9GMHJwqOlXyATyvmgz7wJ/aA6HHeBSTiJfYsXU788qMEbPyPd7bVieg7UVCII3VDSkS/dau7V
+	vi0P4r/LmuTHIRfhCjwcDoC7;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vNxOa-00FdfR-16;
-	Tue, 25 Nov 2025 18:04:08 +0000
+	id 1vNxOo-00Fdg2-3C;
+	Tue, 25 Nov 2025 18:04:31 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -40,9 +40,9 @@ Cc: metze@samba.org,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v4 069/145] smb: client: make use of smbdirect_connection_idle_timer_work()
-Date: Tue, 25 Nov 2025 18:55:15 +0100
-Message-ID: <f4601fa50f70f1fb558f488bcc061a7afcdb9824.1764091285.git.metze@samba.org>
+Subject: [PATCH v4 070/145] smb: client: make use of smbdirect_frwr_is_supported()
+Date: Tue, 25 Nov 2025 18:55:16 +0100
+Message-ID: <10a7ab588dbc3e3a63aabd4dbbd094ecd726caff.1764091285.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1764091285.git.metze@samba.org>
 References: <cover.1764091285.git.metze@samba.org>
@@ -54,9 +54,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is basically a copy of idle_connection_timer().
-
-Note smbdirect_socket_prepare_create() already calls INIT_DELAYED_WORK().
+This an exact copy of frwr_is_supported().
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -67,57 +65,43 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/smbdirect.c | 30 ------------------------------
- 1 file changed, 30 deletions(-)
+ fs/smb/client/smbdirect.c | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
 
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 39d94bea2bbe..d2359d6b18ba 100644
+index d2359d6b18ba..11c72871981d 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -1342,35 +1342,6 @@ static void send_immediate_empty_message(struct work_struct *work)
- 	smbd_post_send_empty(sc);
+@@ -784,20 +784,6 @@ static struct rdma_cm_id *smbd_create_id(
+ 	return ERR_PTR(rc);
  }
  
--/* Implement idle connection timer [MS-SMBD] 3.1.6.2 */
--static void idle_connection_timer(struct work_struct *work)
+-/*
+- * Test if FRWR (Fast Registration Work Requests) is supported on the device
+- * This implementation requires FRWR on RDMA read/write
+- * return value: true if it is supported
+- */
+-static bool frwr_is_supported(struct ib_device_attr *attrs)
 -{
--	struct smbdirect_socket *sc =
--		container_of(work, struct smbdirect_socket, idle.timer_work.work);
--	struct smbdirect_socket_parameters *sp = &sc->parameters;
--
--	if (sc->idle.keepalive != SMBDIRECT_KEEPALIVE_NONE) {
--		log_keep_alive(ERR,
--			"error status sc->idle.keepalive=%d\n",
--			sc->idle.keepalive);
--		smbdirect_socket_schedule_cleanup(sc, -ETIMEDOUT);
--		return;
--	}
--
--	if (sc->status != SMBDIRECT_SOCKET_CONNECTED)
--		return;
--
--	/*
--	 * Now use the keepalive timeout (instead of keepalive interval)
--	 * in order to wait for a response
--	 */
--	sc->idle.keepalive = SMBDIRECT_KEEPALIVE_PENDING;
--	mod_delayed_work(sc->workqueue, &sc->idle.timer_work,
--			 msecs_to_jiffies(sp->keepalive_timeout_msec));
--	log_keep_alive(INFO, "schedule send of empty idle message\n");
--	queue_work(sc->workqueue, &sc->idle.immediate_work);
+-	if (!(attrs->device_cap_flags & IB_DEVICE_MEM_MGT_EXTENSIONS))
+-		return false;
+-	if (attrs->max_fast_reg_page_list_len == 0)
+-		return false;
+-	return true;
 -}
 -
- /*
-  * Destroy the transport and related RDMA and memory resources
-  * Need to go through all the pending counters and make sure on one is using
-@@ -1774,7 +1745,6 @@ static struct smbd_connection *_smbd_get_connection(
+ static int smbd_ia_open(
+ 		struct smbdirect_socket *sc,
+ 		struct sockaddr *dstaddr, int port)
+@@ -815,7 +801,7 @@ static int smbd_ia_open(
  	}
+ 	sc->ib.dev = sc->rdma.cm_id->device;
  
- 	INIT_WORK(&sc->idle.immediate_work, send_immediate_empty_message);
--	INIT_DELAYED_WORK(&sc->idle.timer_work, idle_connection_timer);
- 	/*
- 	 * start with the negotiate timeout and SMBDIRECT_KEEPALIVE_PENDING
- 	 * so that the timer will cause a disconnect.
+-	if (!frwr_is_supported(&sc->ib.dev->attrs)) {
++	if (!smbdirect_frwr_is_supported(&sc->ib.dev->attrs)) {
+ 		log_rdma_event(ERR, "Fast Registration Work Requests (FRWR) is not supported\n");
+ 		log_rdma_event(ERR, "Device capability flags = %llx max_fast_reg_page_list_len = %u\n",
+ 			       sc->ib.dev->attrs.device_cap_flags,
 -- 
 2.43.0
 
