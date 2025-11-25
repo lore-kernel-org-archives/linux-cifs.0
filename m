@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADD032C949
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2367232D447
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:05:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764093957; cv=none; b=HuCGwGk4n4wolDCWB69xMcnYC7hE6d7PXcLcRbPPjbkUfks5hB+W6c1INSKuPKoX92vs/fg91gaFKDdvf2Irxw09cK2qAFbxjDw2vOkXCVvr+qJpLLN6vm8l8TUS50flrvpq87807TgCgvTIt4XD0LxifmYqC/4AYocS2lBXVr8=
+	t=1764093961; cv=none; b=pCvzmcqG3Ex4MbydxNW/N+BDV3B02R4qBNTSFMeZ7hHCJ/Cu+hUEwycl60kcW+odi1lYVvgNIxUNRMor7J3YmQiDWgX86vHsM4ZXMXMoDE+/XDHyGEoct0nrn11EWAgwCa2vnZfRah8eNHsBtibMAHEnejwXUJHHtYmTq0xzgkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764093957; c=relaxed/simple;
-	bh=uHHIK9Bm2R2kc9aYk6s6IvsbTGu+Vq5OAF2zo8ZpiLM=;
+	s=arc-20240116; t=1764093961; c=relaxed/simple;
+	bh=uOpuBn40tAba1h1ZOcqK6BICCMaHPZLW5tshqz74uqY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lwbD9XxnFfTgDtvm4pjyWdnPDFsksgLFtA6AwRKuCL0d6q55Bg3jR5Y0XPLUEGTvlAduEEEGcMv6XFaNOPbqZz+yFSr06Gg02HhTOTdVN+kqM7/C4zIbGyy8MAgeUCLy6NA9UIWU8m5xwxcSHCENQ0ZQ92FBl9MhZU+A/1r5PkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=TQOhc5YI; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=teGdc6K6H9BZB063AXr/bmfJBP67k8+U9s+fFp5VUVoWAS2C5lGVqWrA07Q0yhwwGsE1b1LYktphbe79xxkNmTAJqPXI3Q0YdY1kAMC75EOlK+mQjOFOzGUr0u2vJW/Vkr1y2jW4M5JlbCHWxaU1zQHuq2jPUm18UY4r5lo1IYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=JKujkI1F; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="TQOhc5YI"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="JKujkI1F"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=9mtvYtROTKB0ZOuCelpKzHJ4Dp/EO2AKk5RzR5yObYs=; b=TQOhc5YIqANtwsBSh7vi5R9rUc
-	Xa91skU6k/3U74sXn0Sx7ZbK4oZZ7XCVLoJhkuKO6xfehFddHbu0PErvCbfQQlOHqaj4psLj8EjBU
-	72TEPKRyZ14FnfHsfMe4Ep6hBKoLm3SAZuxsd0nMOMrRd8XMq8I8PfEpKPl2kgDDvSyY7oT+4ESsU
-	70TwR5en88kANRtqPwy6UBXk/Zy6h4KSDDj6NmHOfibuXTVAS0g4lfOgKLb0DALhxyWZKs8y3v60E
-	u+ZJj7+XHiyJnJbFFsBofZx3k4bvv4nQTRjI4A2wDADRQAUxZiCkdiqt2Im72Df0R0wA3hw4Vaxuz
-	tQgpS2SfauWu5lJTGDZNuQj8SimyaI2VovFI/pCPj0T55/vAkhyxaRDOOVc0G5ILRgr2MAZPM1B4b
-	+iG8f/0gYKk2T5droZZI/XhKMn3+ik8PpDe0e+oCmvqxW9qE+vYdtVCvpVlvHriylR9ISWE+sw2zs
-	ITL+39dTmjMf9vDXZvg0F/Pf;
+	bh=WTKlRogXAkY0AmY+CxIbr68CLDFidBN0WEKEg1YtkVw=; b=JKujkI1FEZXRFsdEpokFjtzAhK
+	KDZZmg6AVsmGUSobPeQIyZ3ltlZpLIGuYgz6KBTa3/KSPizqU3F381m+CQkrjfxsmOlGY7KRib1H0
+	PYhyNpy0le1IQvlaPTbhXc9anlnLcBpHe3+hSFhwxJWPs+WYEyjmnvDrhaCn8uGXkPW6clp2Gphyj
+	R0hESsJZb+vEXR0ipjP4QzOaiZYRiTdvSWVY6Cx6PpJ5StkabagUBCwTxiyDaJYUr4n17kCE/2giw
+	plI5fIKoVITSkGFi+/eVxhLdE3IuxigxEWEUGKvQwsOzpDr3dGNpPifLmGz4yMz1pqKaObVhmfWEq
+	Cei44zxIqGZb5ojJIpKiZ6biaKMpKE4++FT28wkuNA+Ea+4R7XdjGBNNuzVD0FF93FuvHthM9mp+v
+	MuNLCmMAtUQYlAzxyIYPc0me3dU9bk/Sd37tzdrdBbbbASFY+vPgvnoTJXosi70LoOSFL7XZIV5Jb
+	lBQ8cw7a4cTelN6mpybtPjro;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vNxNF-00FdYj-08;
-	Tue, 25 Nov 2025 18:02:45 +0000
+	id 1vNxNL-00FdZ9-2n;
+	Tue, 25 Nov 2025 18:02:53 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -40,9 +40,9 @@ Cc: metze@samba.org,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v4 058/145] smb: smbdirect: introduce smbdirect_public.h with prototypes
-Date: Tue, 25 Nov 2025 18:55:04 +0100
-Message-ID: <935c14de0622950ee8ebed7ced70666e1bae0edd.1764091285.git.metze@samba.org>
+Subject: [PATCH v4 059/145] smb: smbdirect: provide explicit prototypes for cross .c file functions
+Date: Tue, 25 Nov 2025 18:55:05 +0100
+Message-ID: <3e1ec313c12140105147f088b04e31443157b159.1764091285.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1764091285.git.metze@samba.org>
 References: <cover.1764091285.git.metze@samba.org>
@@ -54,30 +54,12 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-smbdirect_public.h contains functions which will be still be
-eported when we move to an smbdirect.ko.
+These prototypes are used between private .c files,
+when they will be compiled alone into smbdirect.ko.
 
 For now this uses the SMBDIRECT_USE_INLINE_C_FILES code path
 and marks all function as '__maybe_unused static',
 but this will make further changes easier.
-
-Note this generates the following things from checkpatch.pl,
-so I passed --ignore=FILE_PATH_CHANGES,EXPORT_SYMBOL,COMPLEX_MACRO
-
- ERROR: Macros with complex values should be enclosed in parentheses
- #514: FILE: fs/smb/common/smbdirect/smbdirect_public.h:18:
- +#define __SMBDIRECT_PUBLIC__ __maybe_unused static
-
- WARNING: EXPORT_SYMBOL(foo); should immediately follow its function/variable
- #515: FILE: fs/smb/common/smbdirect/smbdirect_public.h:19:
- +#define __SMBDIRECT_EXPORT_SYMBOL__(__sym)
-
- WARNING: EXPORT_SYMBOL(foo); should immediately follow its function/variable
- #518: FILE: fs/smb/common/smbdirect/smbdirect_public.h:22:
- +#define __SMBDIRECT_EXPORT_SYMBOL__(__sym) EXPORT_SYMBOL_FOR_MODULES(__sym, "cifs,ksmbd")
-
-This is exactly what we want here, so we should ignore the
-checkpatch.pl problems.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -88,700 +70,422 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/common/smbdirect/smbdirect_accept.c    |   7 +-
- fs/smb/common/smbdirect/smbdirect_connect.c   |  13 +-
- .../common/smbdirect/smbdirect_connection.c   |  51 +++---
- fs/smb/common/smbdirect/smbdirect_debug.c     |   9 +-
- fs/smb/common/smbdirect/smbdirect_internal.h  |   1 +
- fs/smb/common/smbdirect/smbdirect_mr.c        |  17 +-
- fs/smb/common/smbdirect/smbdirect_public.h    | 154 ++++++++++++++++++
- fs/smb/common/smbdirect/smbdirect_rw.c        |  13 +-
- fs/smb/common/smbdirect/smbdirect_socket.c    |  82 ++++++----
- fs/smb/common/smbdirect/smbdirect_socket.h    |  14 --
- 10 files changed, 263 insertions(+), 98 deletions(-)
- create mode 100644 fs/smb/common/smbdirect/smbdirect_public.h
+ .../common/smbdirect/smbdirect_connection.c   |  67 ++++++------
+ fs/smb/common/smbdirect/smbdirect_internal.h  | 102 ++++++++++++++----
+ fs/smb/common/smbdirect/smbdirect_mr.c        |   7 +-
+ fs/smb/common/smbdirect/smbdirect_socket.c    |  39 +++----
+ 4 files changed, 145 insertions(+), 70 deletions(-)
 
-diff --git a/fs/smb/common/smbdirect/smbdirect_accept.c b/fs/smb/common/smbdirect/smbdirect_accept.c
-index db829e82fde4..f27992cf393b 100644
---- a/fs/smb/common/smbdirect/smbdirect_accept.c
-+++ b/fs/smb/common/smbdirect/smbdirect_accept.c
-@@ -13,9 +13,9 @@ static int smbdirect_accept_init_params(struct smbdirect_socket *sc);
- static void smbdirect_accept_negotiate_recv_done(struct ib_cq *cq, struct ib_wc *wc);
- static void smbdirect_accept_negotiate_send_done(struct ib_cq *cq, struct ib_wc *wc);
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
--					    const struct rdma_conn_param *param)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
-+				     const struct rdma_conn_param *param)
- {
- 	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct smbdirect_recv_io *recv_io;
-@@ -159,6 +159,7 @@ static int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
- init_params_failed:
- 	return ret;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_accept_connect_request);
- 
- static int smbdirect_accept_init_params(struct smbdirect_socket *sc)
- {
-diff --git a/fs/smb/common/smbdirect/smbdirect_connect.c b/fs/smb/common/smbdirect/smbdirect_connect.c
-index 0a3629dcf150..797916dc8481 100644
---- a/fs/smb/common/smbdirect/smbdirect_connect.c
-+++ b/fs/smb/common/smbdirect/smbdirect_connect.c
-@@ -15,9 +15,8 @@ static int smbdirect_connect_negotiate_start(struct smbdirect_socket *sc);
- static void smbdirect_connect_negotiate_send_done(struct ib_cq *cq, struct ib_wc *wc);
- static void smbdirect_connect_negotiate_recv_done(struct ib_cq *cq, struct ib_wc *wc);
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_connect(struct smbdirect_socket *sc,
--			     const struct sockaddr *dst)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connect(struct smbdirect_socket *sc, const struct sockaddr *dst)
- {
- 	const struct sockaddr *src = NULL;
- 	union {
-@@ -61,6 +60,7 @@ static int smbdirect_connect(struct smbdirect_socket *sc,
- 	 */
- 	return 0;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connect);
- 
- static int smbdirect_connect_setup_connection(struct smbdirect_socket *sc)
- {
-@@ -817,9 +817,9 @@ static void smbdirect_connect_negotiate_recv_work(struct work_struct *work)
- 	smbdirect_connection_negotiation_done(sc);
- }
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_connect_sync(struct smbdirect_socket *sc,
--				  const struct sockaddr *dst)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connect_sync(struct smbdirect_socket *sc,
-+			   const struct sockaddr *dst)
- {
- 	int ret;
- 
-@@ -841,3 +841,4 @@ static int smbdirect_connect_sync(struct smbdirect_socket *sc,
- 
- 	return 0;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connect_sync);
 diff --git a/fs/smb/common/smbdirect/smbdirect_connection.c b/fs/smb/common/smbdirect/smbdirect_connection.c
-index c270c9ac1c81..a2ced59171ac 100644
+index a2ced59171ac..c9208bdfded5 100644
 --- a/fs/smb/common/smbdirect/smbdirect_connection.c
 +++ b/fs/smb/common/smbdirect/smbdirect_connection.c
-@@ -719,16 +719,17 @@ static void smbdirect_connection_negotiate_rdma_resources(struct smbdirect_socke
- 						peer_responder_resources);
- }
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static bool smbdirect_connection_is_connected(struct smbdirect_socket *sc)
-+__SMBDIRECT_PUBLIC__
-+bool smbdirect_connection_is_connected(struct smbdirect_socket *sc)
- {
- 	if (unlikely(!sc || sc->first_error || sc->status != SMBDIRECT_SOCKET_CONNECTED))
- 		return false;
- 	return true;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_is_connected);
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_connection_wait_for_connected(struct smbdirect_socket *sc)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_wait_for_connected(struct smbdirect_socket *sc)
- {
- 	const struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	union {
-@@ -794,6 +795,7 @@ static int smbdirect_connection_wait_for_connected(struct smbdirect_socket *sc)
- 
+@@ -143,8 +143,8 @@ static int smbdirect_connection_rdma_event_handler(struct rdma_cm_id *id,
  	return 0;
  }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_wait_for_connected);
  
- static void smbdirect_connection_idle_timer_work(struct work_struct *work)
+-__maybe_unused /* this is temporary while this file is included in others */
+-static void smbdirect_connection_rdma_established(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_rdma_established(struct smbdirect_socket *sc)
  {
-@@ -1027,11 +1029,12 @@ static int smbdirect_connection_post_send_io(struct smbdirect_socket *sc,
- 	return smbdirect_connection_post_send_wr(sc, &msg->wr);
+ 	smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_INFO,
+ 		"rdma established: device: %.*s local: %pISpsfc remote: %pISpsfc\n",
+@@ -157,8 +157,8 @@ static void smbdirect_connection_rdma_established(struct smbdirect_socket *sc)
+ 	sc->rdma.expected_event = RDMA_CM_EVENT_DISCONNECTED;
  }
  
--static int smbdirect_connection_send_single_iter(struct smbdirect_socket *sc,
--						 struct smbdirect_send_batch *batch,
--						 struct iov_iter *iter,
--						 unsigned int flags,
--						 u32 remaining_data_length)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_send_single_iter(struct smbdirect_socket *sc,
-+					  struct smbdirect_send_batch *batch,
-+					  struct iov_iter *iter,
-+					  unsigned int flags,
-+					  u32 remaining_data_length)
+-__maybe_unused /* this is temporary while this file is included in others */
+-static void smbdirect_connection_negotiation_done(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_negotiation_done(struct smbdirect_socket *sc)
+ {
+ 	if (unlikely(sc->first_error))
+ 		return;
+@@ -233,8 +233,8 @@ static u32 smbdirect_rdma_rw_send_wrs(struct ib_device *dev,
+ 	return factor * attr->cap.max_rdma_ctxs;
+ }
+ 
+-__maybe_unused /* this is temporary while this file is included in others */
+-static int smbdirect_connection_create_qp(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_create_qp(struct smbdirect_socket *sc)
  {
  	const struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct smbdirect_send_io *msg;
-@@ -1162,9 +1165,10 @@ static int smbdirect_connection_send_single_iter(struct smbdirect_socket *sc,
- lcredit_failed:
+ 	struct ib_qp_init_attr qp_attr;
+@@ -391,7 +391,8 @@ static int smbdirect_connection_create_qp(struct smbdirect_socket *sc)
  	return ret;
  }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_send_single_iter);
  
--__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_connection_send_wait_zero_pending(struct smbdirect_socket *sc)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_send_wait_zero_pending(struct smbdirect_socket *sc)
+-static void smbdirect_connection_destroy_qp(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_destroy_qp(struct smbdirect_socket *sc)
  {
- 	/*
- 	 * As an optimization, we don't wait for individual I/O to finish
-@@ -1187,13 +1191,14 @@ static int smbdirect_connection_send_wait_zero_pending(struct smbdirect_socket *
- 
- 	return 0;
- }
--
--__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_connection_send_iter(struct smbdirect_socket *sc,
--					  struct iov_iter *iter,
--					  unsigned int flags,
--					  bool need_invalidate,
--					  unsigned int remote_key)
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_send_wait_zero_pending);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_send_iter(struct smbdirect_socket *sc,
-+				   struct iov_iter *iter,
-+				   unsigned int flags,
-+				   bool need_invalidate,
-+				   unsigned int remote_key)
- {
- 	const struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct smbdirect_send_batch batch;
-@@ -1272,6 +1277,7 @@ static int smbdirect_connection_send_iter(struct smbdirect_socket *sc,
- 
- 	return total_count;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_send_iter);
- 
- static void smbdirect_connection_send_io_done(struct ib_cq *cq, struct ib_wc *wc)
- {
-@@ -1650,10 +1656,10 @@ static void smbdirect_connection_recv_io_refill_work(struct work_struct *work)
+ 	if (sc->ib.qp) {
+ 		ib_drain_qp(sc->ib.qp);
+@@ -412,8 +413,8 @@ static void smbdirect_connection_destroy_qp(struct smbdirect_socket *sc)
  	}
  }
  
 -__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_connection_recvmsg(struct smbdirect_socket *sc,
--					struct msghdr *msg,
--					unsigned int flags)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_recvmsg(struct smbdirect_socket *sc,
-+				 struct msghdr *msg,
-+				 unsigned int flags)
+-static int smbdirect_connection_create_mem_pools(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_create_mem_pools(struct smbdirect_socket *sc)
  {
- 	struct smbdirect_recv_io *response;
- 	struct smbdirect_data_transfer *data_transfer;
-@@ -1800,6 +1806,7 @@ static int smbdirect_connection_recvmsg(struct smbdirect_socket *sc,
- 
- 	goto again;
+ 	const struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 	char name[80];
+@@ -492,7 +493,8 @@ static int smbdirect_connection_create_mem_pools(struct smbdirect_socket *sc)
+ 	return -ENOMEM;
  }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_recvmsg);
  
- static bool smbdirect_map_sges_single_page(struct smbdirect_map_sges *state,
- 					   struct page *page, size_t off, size_t len)
-diff --git a/fs/smb/common/smbdirect/smbdirect_debug.c b/fs/smb/common/smbdirect/smbdirect_debug.c
-index 20b87d8aa6d1..eac924164fd4 100644
---- a/fs/smb/common/smbdirect/smbdirect_debug.c
-+++ b/fs/smb/common/smbdirect/smbdirect_debug.c
-@@ -7,10 +7,10 @@
- #include "smbdirect_internal.h"
- #include <linux/seq_file.h>
+-static void smbdirect_connection_destroy_mem_pools(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_destroy_mem_pools(struct smbdirect_socket *sc)
+ {
+ 	struct smbdirect_recv_io *recv_io, *next_io;
+ 
+@@ -523,8 +525,8 @@ static void smbdirect_connection_destroy_mem_pools(struct smbdirect_socket *sc)
+ 	sc->send_io.mem.cache = NULL;
+ }
  
 -__maybe_unused /* this is temporary while this file is included in others */
--static void smbdirect_connection_legacy_debug_proc_show(struct smbdirect_socket *sc,
--							unsigned int rdma_readwrite_threshold,
--							struct seq_file *m)
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_connection_legacy_debug_proc_show(struct smbdirect_socket *sc,
-+						 unsigned int rdma_readwrite_threshold,
-+						 struct seq_file *m)
+-static struct smbdirect_send_io *smbdirect_connection_alloc_send_io(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++struct smbdirect_send_io *smbdirect_connection_alloc_send_io(struct smbdirect_socket *sc)
  {
- 	const struct smbdirect_socket_parameters *sp;
+ 	struct smbdirect_send_io *msg;
  
-@@ -86,3 +86,4 @@ static void smbdirect_connection_legacy_debug_proc_show(struct smbdirect_socket
- 		   atomic_read(&sc->mr_io.ready.count),
- 		   atomic_read(&sc->mr_io.used.count));
+@@ -538,8 +540,8 @@ static struct smbdirect_send_io *smbdirect_connection_alloc_send_io(struct smbdi
+ 	return msg;
  }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_legacy_debug_proc_show);
+ 
+-__maybe_unused /* this is temporary while this file is included in others */
+-static void smbdirect_connection_free_send_io(struct smbdirect_send_io *msg)
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_free_send_io(struct smbdirect_send_io *msg)
+ {
+ 	struct smbdirect_socket *sc = msg->socket;
+ 	size_t i;
+@@ -570,8 +572,8 @@ static void smbdirect_connection_free_send_io(struct smbdirect_send_io *msg)
+ 	mempool_free(msg, sc->send_io.mem.pool);
+ }
+ 
+-__maybe_unused /* this is temporary while this file is included in others */
+-static struct smbdirect_recv_io *smbdirect_connection_get_recv_io(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++struct smbdirect_recv_io *smbdirect_connection_get_recv_io(struct smbdirect_socket *sc)
+ {
+ 	struct smbdirect_recv_io *msg = NULL;
+ 	unsigned long flags;
+@@ -590,8 +592,8 @@ static struct smbdirect_recv_io *smbdirect_connection_get_recv_io(struct smbdire
+ 	return msg;
+ }
+ 
+-__maybe_unused /* this is temporary while this file is included in others */
+-static void smbdirect_connection_put_recv_io(struct smbdirect_recv_io *msg)
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_put_recv_io(struct smbdirect_recv_io *msg)
+ {
+ 	struct smbdirect_socket *sc = msg->socket;
+ 	unsigned long flags;
+@@ -657,11 +659,11 @@ smbdirect_connection_reassembly_first_recv_io(struct smbdirect_socket *sc)
+ 	return msg;
+ }
+ 
+-__maybe_unused /* this is temporary while this file is included in others */
+-static void smbdirect_connection_negotiate_rdma_resources(struct smbdirect_socket *sc,
+-							  u8 peer_initiator_depth,
+-							  u8 peer_responder_resources,
+-							  const struct rdma_conn_param *param)
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_negotiate_rdma_resources(struct smbdirect_socket *sc,
++						   u8 peer_initiator_depth,
++						   u8 peer_responder_resources,
++						   const struct rdma_conn_param *param)
+ {
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 
+@@ -797,7 +799,8 @@ int smbdirect_connection_wait_for_connected(struct smbdirect_socket *sc)
+ }
+ __SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_wait_for_connected);
+ 
+-static void smbdirect_connection_idle_timer_work(struct work_struct *work)
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_idle_timer_work(struct work_struct *work)
+ {
+ 	struct smbdirect_socket *sc =
+ 		container_of(work, struct smbdirect_socket, idle.timer_work.work);
+@@ -867,8 +870,9 @@ static bool smbdirect_connection_request_keep_alive(struct smbdirect_socket *sc)
+ 	return false;
+ }
+ 
+-static int smbdirect_connection_post_send_wr(struct smbdirect_socket *sc,
+-					     struct ib_send_wr *wr)
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_post_send_wr(struct smbdirect_socket *sc,
++				      struct ib_send_wr *wr)
+ {
+ 	int ret;
+ 
+@@ -1342,8 +1346,8 @@ static void smbdirect_connection_send_immediate_work(struct work_struct *work)
+ 	}
+ }
+ 
+-__maybe_unused /* this is temporary while this file is included in others */
+-static int smbdirect_connection_post_recv_io(struct smbdirect_recv_io *msg)
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_post_recv_io(struct smbdirect_recv_io *msg)
+ {
+ 	struct smbdirect_socket *sc = msg->socket;
+ 	const struct smbdirect_socket_parameters *sp = &sc->parameters;
+@@ -1384,8 +1388,8 @@ static int smbdirect_connection_post_recv_io(struct smbdirect_recv_io *msg)
+ 	return ret;
+ }
+ 
+-__maybe_unused /* this is temporary while this file is included in others */
+-static void smbdirect_connection_recv_io_done(struct ib_cq *cq, struct ib_wc *wc)
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_recv_io_done(struct ib_cq *cq, struct ib_wc *wc)
+ {
+ 	struct smbdirect_recv_io *recv_io =
+ 		container_of(wc->wr_cqe, struct smbdirect_recv_io, cqe);
+@@ -1551,7 +1555,8 @@ static void smbdirect_connection_recv_io_done(struct ib_cq *cq, struct ib_wc *wc
+ 	smbdirect_socket_schedule_cleanup(sc, -ECONNABORTED);
+ }
+ 
+-static int smbdirect_connection_recv_io_refill(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_recv_io_refill(struct smbdirect_socket *sc)
+ {
+ 	int missing;
+ 	int posted = 0;
 diff --git a/fs/smb/common/smbdirect/smbdirect_internal.h b/fs/smb/common/smbdirect/smbdirect_internal.h
-index 8ea10f8f8501..b61f2473a28b 100644
+index b61f2473a28b..a2018670749f 100644
 --- a/fs/smb/common/smbdirect/smbdirect_internal.h
 +++ b/fs/smb/common/smbdirect/smbdirect_internal.h
-@@ -13,6 +13,7 @@
- #include <linux/errname.h>
- #include "smbdirect.h"
- #include "smbdirect_pdu.h"
-+#include "smbdirect_public.h"
+@@ -16,13 +16,27 @@
+ #include "smbdirect_public.h"
  #include "smbdirect_socket.h"
  
- static void __smbdirect_socket_schedule_cleanup(struct smbdirect_socket *sc,
-diff --git a/fs/smb/common/smbdirect/smbdirect_mr.c b/fs/smb/common/smbdirect/smbdirect_mr.c
-index 3c2f653f70e8..c7be46c7ffe4 100644
---- a/fs/smb/common/smbdirect/smbdirect_mr.c
-+++ b/fs/smb/common/smbdirect/smbdirect_mr.c
-@@ -330,8 +330,8 @@ static int smbdirect_iter_to_sgt(struct iov_iter *iter,
-  * need_invalidate: true if this MR needs to be locally invalidated after I/O
-  * return value: the MR registered, NULL if failed.
-  */
--__maybe_unused /* this is temporary while this file is included in others */
--static struct smbdirect_mr_io *
-+__SMBDIRECT_PUBLIC__
-+struct smbdirect_mr_io *
- smbdirect_connection_register_mr_io(struct smbdirect_socket *sc,
- 				    struct iov_iter *iter,
- 				    bool writing,
-@@ -452,10 +452,11 @@ smbdirect_connection_register_mr_io(struct smbdirect_socket *sc,
- 		mutex_unlock(&mr->mutex);
- 	return NULL;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_register_mr_io);
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static void smbdirect_mr_io_fill_buffer_descriptor(struct smbdirect_mr_io *mr,
--						   struct smbdirect_buffer_descriptor_v1 *v1)
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_mr_io_fill_buffer_descriptor(struct smbdirect_mr_io *mr,
-+					    struct smbdirect_buffer_descriptor_v1 *v1)
- {
- 	mutex_lock(&mr->mutex);
- 	if (mr->state == SMBDIRECT_MR_REGISTERED) {
-@@ -469,6 +470,7 @@ static void smbdirect_mr_io_fill_buffer_descriptor(struct smbdirect_mr_io *mr,
- 	}
- 	mutex_unlock(&mr->mutex);
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_mr_io_fill_buffer_descriptor);
- 
- /*
-  * Deregister a MR after I/O is done
-@@ -476,8 +478,8 @@ static void smbdirect_mr_io_fill_buffer_descriptor(struct smbdirect_mr_io *mr,
-  * and we have to locally invalidate the buffer to prevent data is being
-  * modified by remote peer after upper layer consumes it
-  */
--__maybe_unused /* this is temporary while this file is included in others */
--static void smbdirect_connection_deregister_mr_io(struct smbdirect_mr_io *mr)
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_connection_deregister_mr_io(struct smbdirect_mr_io *mr)
- {
- 	struct smbdirect_socket *sc = mr->socket;
- 	int ret = 0;
-@@ -559,3 +561,4 @@ static void smbdirect_connection_deregister_mr_io(struct smbdirect_mr_io *mr)
- 	if (!kref_put(&mr->kref, smbdirect_mr_io_free_locked))
- 		mutex_unlock(&mr->mutex);
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_deregister_mr_io);
-diff --git a/fs/smb/common/smbdirect/smbdirect_public.h b/fs/smb/common/smbdirect/smbdirect_public.h
-new file mode 100644
-index 000000000000..a5b15fce840c
---- /dev/null
-+++ b/fs/smb/common/smbdirect/smbdirect_public.h
-@@ -0,0 +1,154 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ *   Copyright (C) 2025, Stefan Metzmacher
-+ */
-+
-+#ifndef __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_PUBLIC_H__
-+#define __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_PUBLIC_H__
-+
-+struct smbdirect_buffer_descriptor_v1;
-+struct smbdirect_socket_parameters;
-+
-+struct smbdirect_socket;
-+struct smbdirect_send_batch;
-+struct smbdirect_mr_io;
-+
+-static void __smbdirect_socket_schedule_cleanup(struct smbdirect_socket *sc,
+-						const char *macro_name,
+-						unsigned int lvl,
+-						const char *func,
+-						unsigned int line,
+-						int error,
+-						enum smbdirect_socket_status *force_status);
 +#ifdef SMBDIRECT_USE_INLINE_C_FILES
 +/* this is temporary while this file is included in others */
-+#define __SMBDIRECT_PUBLIC__ __maybe_unused static
-+#define __SMBDIRECT_EXPORT_SYMBOL__(__sym)
++#define __SMBDIRECT_PRIVATE__ __maybe_unused static
 +#else
-+#define __SMBDIRECT_PUBLIC__
-+#define __SMBDIRECT_EXPORT_SYMBOL__(__sym) EXPORT_SYMBOL_FOR_MODULES(__sym, "cifs,ksmbd")
++#define __SMBDIRECT_PRIVATE__
 +#endif
 +
-+#include <rdma/rw.h>
++__SMBDIRECT_PRIVATE__
++int smbdirect_socket_init_new(struct net *net, struct smbdirect_socket *sc);
 +
-+__SMBDIRECT_PUBLIC__
-+bool smbdirect_frwr_is_supported(const struct ib_device_attr *attrs);
++__SMBDIRECT_PRIVATE__
++int smbdirect_socket_init_accepting(struct rdma_cm_id *id, struct smbdirect_socket *sc);
 +
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_socket_create_kern(struct net *net, struct smbdirect_socket **_sc);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_socket_create_accepting(struct rdma_cm_id *id, struct smbdirect_socket **_sc);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_socket_set_initial_parameters(struct smbdirect_socket *sc,
-+					    const struct smbdirect_socket_parameters *sp);
-+
-+__SMBDIRECT_PUBLIC__
-+const struct smbdirect_socket_parameters *
-+smbdirect_socket_get_current_parameters(struct smbdirect_socket *sc);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_socket_set_kernel_settings(struct smbdirect_socket *sc,
-+					 enum ib_poll_context poll_ctx,
-+					 gfp_t gfp_mask);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_socket_set_custom_workqueue(struct smbdirect_socket *sc,
-+					  struct workqueue_struct *workqueue);
-+
-+#define SMBDIRECT_LOG_ERR		0x0
-+#define SMBDIRECT_LOG_INFO		0x1
-+
-+#define SMBDIRECT_LOG_OUTGOING			0x1
-+#define SMBDIRECT_LOG_INCOMING			0x2
-+#define SMBDIRECT_LOG_READ			0x4
-+#define SMBDIRECT_LOG_WRITE			0x8
-+#define SMBDIRECT_LOG_RDMA_SEND			0x10
-+#define SMBDIRECT_LOG_RDMA_RECV			0x20
-+#define SMBDIRECT_LOG_KEEP_ALIVE		0x40
-+#define SMBDIRECT_LOG_RDMA_EVENT		0x80
-+#define SMBDIRECT_LOG_RDMA_MR			0x100
-+#define SMBDIRECT_LOG_RDMA_RW			0x200
-+#define SMBDIRECT_LOG_NEGOTIATE			0x400
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_socket_set_logging(struct smbdirect_socket *sc,
-+				  void *private_ptr,
-+				  bool (*needed)(struct smbdirect_socket *sc,
-+						 void *private_ptr,
-+						 unsigned int lvl,
-+						 unsigned int cls),
-+				  void (*vaprintf)(struct smbdirect_socket *sc,
-+						   const char *func,
-+						   unsigned int line,
-+						   void *private_ptr,
-+						   unsigned int lvl,
-+						   unsigned int cls,
-+						   struct va_format *vaf));
-+
-+__SMBDIRECT_PUBLIC__
-+bool smbdirect_connection_is_connected(struct smbdirect_socket *sc);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_wait_for_connected(struct smbdirect_socket *sc);
-+
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_socket_shutdown(struct smbdirect_socket *sc);
-+
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_socket_release(struct smbdirect_socket *sc);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_send_single_iter(struct smbdirect_socket *sc,
-+					  struct smbdirect_send_batch *batch,
-+					  struct iov_iter *iter,
-+					  unsigned int flags,
-+					  u32 remaining_data_length);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_send_wait_zero_pending(struct smbdirect_socket *sc);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_send_iter(struct smbdirect_socket *sc,
-+				   struct iov_iter *iter,
-+				   unsigned int flags,
-+				   bool need_invalidate,
-+				   unsigned int remote_key);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_recvmsg(struct smbdirect_socket *sc,
-+				 struct msghdr *msg,
-+				 unsigned int flags);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connect(struct smbdirect_socket *sc,
-+		      const struct sockaddr *dst);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connect_sync(struct smbdirect_socket *sc,
-+			   const struct sockaddr *dst);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
-+				     const struct rdma_conn_param *param);
-+
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_rdma_xmit(struct smbdirect_socket *sc,
-+				   void *buf, size_t buf_len,
-+				   struct smbdirect_buffer_descriptor_v1 *desc,
-+				   size_t desc_len,
-+				   bool is_read);
-+
-+__SMBDIRECT_PUBLIC__
-+struct smbdirect_mr_io *
-+smbdirect_connection_register_mr_io(struct smbdirect_socket *sc,
-+				    struct iov_iter *iter,
-+				    bool writing,
-+				    bool need_invalidate);
-+
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_mr_io_fill_buffer_descriptor(struct smbdirect_mr_io *mr,
-+					    struct smbdirect_buffer_descriptor_v1 *v1);
-+
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_connection_deregister_mr_io(struct smbdirect_mr_io *mr);
-+
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_connection_legacy_debug_proc_show(struct smbdirect_socket *sc,
-+						 unsigned int rdma_readwrite_threshold,
-+						 struct seq_file *m);
-+
-+#endif /* __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_PUBLIC_H__ */
-diff --git a/fs/smb/common/smbdirect/smbdirect_rw.c b/fs/smb/common/smbdirect/smbdirect_rw.c
-index 1ff80c8de491..46d9b1430f35 100644
---- a/fs/smb/common/smbdirect/smbdirect_rw.c
-+++ b/fs/smb/common/smbdirect/smbdirect_rw.c
-@@ -105,12 +105,12 @@ static void smbdirect_connection_rdma_write_done(struct ib_cq *cq, struct ib_wc
- 	smbdirect_connection_rdma_rw_done(cq, wc, DMA_TO_DEVICE);
- }
++__SMBDIRECT_PRIVATE__
++void __smbdirect_socket_schedule_cleanup(struct smbdirect_socket *sc,
++					 const char *macro_name,
++					 unsigned int lvl,
++					 const char *func,
++					 unsigned int line,
++					 int error,
++					 enum smbdirect_socket_status *force_status);
+ #define smbdirect_socket_schedule_cleanup(__sc, __error) \
+ 	__smbdirect_socket_schedule_cleanup(__sc, \
+ 		"smbdirect_socket_schedule_cleanup", SMBDIRECT_LOG_ERR, \
+@@ -38,21 +52,73 @@ static void __smbdirect_socket_schedule_cleanup(struct smbdirect_socket *sc,
+ 		__func__, __LINE__, __error, &__force_status); \
+ } while (0)
  
+-static int smbdirect_socket_wait_for_credits(struct smbdirect_socket *sc,
+-					     enum smbdirect_socket_status expected_status,
+-					     int unexpected_errno,
+-					     wait_queue_head_t *waitq,
+-					     atomic_t *total_credits,
+-					     int needed);
++__SMBDIRECT_PRIVATE__
++void smbdirect_socket_destroy_sync(struct smbdirect_socket *sc);
++
++__SMBDIRECT_PRIVATE__
++int smbdirect_socket_wait_for_credits(struct smbdirect_socket *sc,
++				      enum smbdirect_socket_status expected_status,
++				      int unexpected_errno,
++				      wait_queue_head_t *waitq,
++				      atomic_t *total_credits,
++				      int needed);
++
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_rdma_established(struct smbdirect_socket *sc);
++
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_negotiation_done(struct smbdirect_socket *sc);
++
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_create_qp(struct smbdirect_socket *sc);
++
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_destroy_qp(struct smbdirect_socket *sc);
++
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_create_mem_pools(struct smbdirect_socket *sc);
++
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_destroy_mem_pools(struct smbdirect_socket *sc);
++
++__SMBDIRECT_PRIVATE__
++struct smbdirect_send_io *smbdirect_connection_alloc_send_io(struct smbdirect_socket *sc);
++
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_free_send_io(struct smbdirect_send_io *msg);
++
++__SMBDIRECT_PRIVATE__
++struct smbdirect_recv_io *smbdirect_connection_get_recv_io(struct smbdirect_socket *sc);
++
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_put_recv_io(struct smbdirect_recv_io *msg);
++
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_negotiate_rdma_resources(struct smbdirect_socket *sc,
++						   u8 peer_initiator_depth,
++						   u8 peer_responder_resources,
++						   const struct rdma_conn_param *param);
++
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_idle_timer_work(struct work_struct *work);
++
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_post_send_wr(struct smbdirect_socket *sc,
++				      struct ib_send_wr *wr);
+ 
+-static void smbdirect_connection_destroy_qp(struct smbdirect_socket *sc);
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_post_recv_io(struct smbdirect_recv_io *msg);
+ 
+-static void smbdirect_connection_destroy_mem_pools(struct smbdirect_socket *sc);
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_recv_io_done(struct ib_cq *cq, struct ib_wc *wc);
+ 
+-static void smbdirect_connection_put_recv_io(struct smbdirect_recv_io *msg);
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_recv_io_refill(struct smbdirect_socket *sc);
+ 
+-static void smbdirect_connection_idle_timer_work(struct work_struct *work);
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_create_mr_list(struct smbdirect_socket *sc);
+ 
+-static void smbdirect_connection_destroy_mr_list(struct smbdirect_socket *sc);
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_destroy_mr_list(struct smbdirect_socket *sc);
+ 
+ #endif /* __FS_SMB_COMMON_SMBDIRECT_INTERNAL_H__ */
+diff --git a/fs/smb/common/smbdirect/smbdirect_mr.c b/fs/smb/common/smbdirect/smbdirect_mr.c
+index c7be46c7ffe4..ad95ee841c14 100644
+--- a/fs/smb/common/smbdirect/smbdirect_mr.c
++++ b/fs/smb/common/smbdirect/smbdirect_mr.c
+@@ -15,8 +15,8 @@ static void smbdirect_connection_mr_io_recovery_work(struct work_struct *work);
+  * Recovery is done in smbd_mr_recovery_work. The content of list entry changes
+  * as MRs are used and recovered for I/O, but the list links will not change
+  */
 -__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_connection_rdma_xmit(struct smbdirect_socket *sc,
--					  void *buf, size_t buf_len,
--					  struct smbdirect_buffer_descriptor_v1 *desc,
--					  size_t desc_len,
--					  bool is_read)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_connection_rdma_xmit(struct smbdirect_socket *sc,
-+				   void *buf, size_t buf_len,
-+				   struct smbdirect_buffer_descriptor_v1 *desc,
-+				   size_t desc_len,
-+				   bool is_read)
+-static int smbdirect_connection_create_mr_list(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++int smbdirect_connection_create_mr_list(struct smbdirect_socket *sc)
  {
  	const struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	enum dma_data_direction direction = is_read ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
-@@ -253,3 +253,4 @@ static int smbdirect_connection_rdma_xmit(struct smbdirect_socket *sc,
- 	kfree(msg);
- 	goto out;
+ 	struct smbdirect_mr_io *mr;
+@@ -121,7 +121,8 @@ static void smbdirect_mr_io_free_locked(struct kref *kref)
+ 	kfree(mr);
  }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_rdma_xmit);
+ 
+-static void smbdirect_connection_destroy_mr_list(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++void smbdirect_connection_destroy_mr_list(struct smbdirect_socket *sc)
+ {
+ 	struct smbdirect_mr_io *mr, *tmp;
+ 	LIST_HEAD(all_list);
 diff --git a/fs/smb/common/smbdirect/smbdirect_socket.c b/fs/smb/common/smbdirect/smbdirect_socket.c
-index 12989140c297..e17794999382 100644
+index e17794999382..35252aa12fe4 100644
 --- a/fs/smb/common/smbdirect/smbdirect_socket.c
 +++ b/fs/smb/common/smbdirect/smbdirect_socket.c
-@@ -6,8 +6,8 @@
- 
- #include "smbdirect_internal.h"
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static bool smbdirect_frwr_is_supported(const struct ib_device_attr *attrs)
-+__SMBDIRECT_PUBLIC__
-+bool smbdirect_frwr_is_supported(const struct ib_device_attr *attrs)
- {
- 	/*
- 	 * Test if FRWR (Fast Registration Work Requests) is supported on the
-@@ -21,6 +21,7 @@ static bool smbdirect_frwr_is_supported(const struct ib_device_attr *attrs)
- 		return false;
- 	return true;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_frwr_is_supported);
- 
- static void smbdirect_socket_cleanup_work(struct work_struct *work);
- 
-@@ -82,8 +83,8 @@ static int smbdirect_socket_init_new(struct net *net, struct smbdirect_socket *s
- 	return 0;
+@@ -52,7 +52,8 @@ static int smbdirect_socket_rdma_event_handler(struct rdma_cm_id *id,
+ 	return -ESTALE;
  }
  
--__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_socket_create_kern(struct net *net, struct smbdirect_socket **_sc)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_socket_create_kern(struct net *net, struct smbdirect_socket **_sc)
+-static int smbdirect_socket_init_new(struct net *net, struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++int smbdirect_socket_init_new(struct net *net, struct smbdirect_socket *sc)
  {
- 	struct smbdirect_socket *sc;
+ 	struct rdma_cm_id *id;
  	int ret;
-@@ -107,6 +108,7 @@ static int smbdirect_socket_create_kern(struct net *net, struct smbdirect_socket
- alloc_failed:
- 	return ret;
+@@ -110,7 +111,8 @@ int smbdirect_socket_create_kern(struct net *net, struct smbdirect_socket **_sc)
  }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_create_kern);
+ __SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_create_kern);
  
- static int smbdirect_socket_init_accepting(struct rdma_cm_id *id, struct smbdirect_socket *sc)
+-static int smbdirect_socket_init_accepting(struct rdma_cm_id *id, struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++int smbdirect_socket_init_accepting(struct rdma_cm_id *id, struct smbdirect_socket *sc)
  {
-@@ -123,8 +125,8 @@ static int smbdirect_socket_init_accepting(struct rdma_cm_id *id, struct smbdire
- 	return 0;
+ 	smbdirect_socket_init(sc);
+ 
+@@ -295,13 +297,14 @@ static void smbdirect_socket_wake_up_all(struct smbdirect_socket *sc)
+ 	wake_up_all(&sc->mr_io.cleanup.wait_queue);
+ }
+ 
+-static void __smbdirect_socket_schedule_cleanup(struct smbdirect_socket *sc,
+-						const char *macro_name,
+-						unsigned int lvl,
+-						const char *func,
+-						unsigned int line,
+-						int error,
+-						enum smbdirect_socket_status *force_status)
++__SMBDIRECT_PRIVATE__
++void __smbdirect_socket_schedule_cleanup(struct smbdirect_socket *sc,
++					 const char *macro_name,
++					 unsigned int lvl,
++					 const char *func,
++					 unsigned int line,
++					 int error,
++					 enum smbdirect_socket_status *force_status)
+ {
+ 	struct smbdirect_recv_io *recv_io, *recv_tmp;
+ 	unsigned long flags;
+@@ -593,8 +596,8 @@ static void smbdirect_socket_destroy(struct smbdirect_socket *sc)
+ 		"rdma session destroyed\n");
  }
  
 -__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_socket_create_accepting(struct rdma_cm_id *id, struct smbdirect_socket **_sc)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_socket_create_accepting(struct rdma_cm_id *id, struct smbdirect_socket **_sc)
+-static void smbdirect_socket_destroy_sync(struct smbdirect_socket *sc)
++__SMBDIRECT_PRIVATE__
++void smbdirect_socket_destroy_sync(struct smbdirect_socket *sc)
  {
- 	struct smbdirect_socket *sc;
+ 	smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_INFO,
+ 		"status=%s first_error=%1pe",
+@@ -693,13 +696,13 @@ void smbdirect_socket_release(struct smbdirect_socket *sc)
+ }
+ __SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_release);
+ 
+-__maybe_unused /* this is temporary while this file is included in others */
+-static int smbdirect_socket_wait_for_credits(struct smbdirect_socket *sc,
+-					     enum smbdirect_socket_status expected_status,
+-					     int unexpected_errno,
+-					     wait_queue_head_t *waitq,
+-					     atomic_t *total_credits,
+-					     int needed)
++__SMBDIRECT_PRIVATE__
++int smbdirect_socket_wait_for_credits(struct smbdirect_socket *sc,
++				      enum smbdirect_socket_status expected_status,
++				      int unexpected_errno,
++				      wait_queue_head_t *waitq,
++				      atomic_t *total_credits,
++				      int needed)
+ {
  	int ret;
-@@ -148,10 +150,11 @@ static int smbdirect_socket_create_accepting(struct rdma_cm_id *id, struct smbdi
- alloc_failed:
- 	return ret;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_create_accepting);
  
--__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_socket_set_initial_parameters(struct smbdirect_socket *sc,
--						   const struct smbdirect_socket_parameters *sp)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_socket_set_initial_parameters(struct smbdirect_socket *sc,
-+					    const struct smbdirect_socket_parameters *sp)
- {
- 	/*
- 	 * This is only allowed before connect or accept
-@@ -173,18 +176,20 @@ static int smbdirect_socket_set_initial_parameters(struct smbdirect_socket *sc,
- 
- 	return 0;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_set_initial_parameters);
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static const struct smbdirect_socket_parameters *
-+__SMBDIRECT_PUBLIC__
-+const struct smbdirect_socket_parameters *
- smbdirect_socket_get_current_parameters(struct smbdirect_socket *sc)
- {
- 	return &sc->parameters;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_get_current_parameters);
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_socket_set_kernel_settings(struct smbdirect_socket *sc,
--						enum ib_poll_context poll_ctx,
--						gfp_t gfp_mask)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_socket_set_kernel_settings(struct smbdirect_socket *sc,
-+					 enum ib_poll_context poll_ctx,
-+					 gfp_t gfp_mask)
- {
- 	/*
- 	 * This is only allowed before connect or accept
-@@ -204,10 +209,11 @@ static int smbdirect_socket_set_kernel_settings(struct smbdirect_socket *sc,
- 
- 	return 0;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_set_kernel_settings);
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static int smbdirect_socket_set_custom_workqueue(struct smbdirect_socket *sc,
--						 struct workqueue_struct *workqueue)
-+__SMBDIRECT_PUBLIC__
-+int smbdirect_socket_set_custom_workqueue(struct smbdirect_socket *sc,
-+					  struct workqueue_struct *workqueue)
- {
- 	/*
- 	 * This is only allowed before connect or accept
-@@ -226,6 +232,7 @@ static int smbdirect_socket_set_custom_workqueue(struct smbdirect_socket *sc,
- 
- 	return 0;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_set_custom_workqueue);
- 
- __maybe_unused /* this is temporary while this file is included in others */
- static void smbdirect_socket_prepare_create(struct smbdirect_socket *sc,
-@@ -250,25 +257,26 @@ static void smbdirect_socket_prepare_create(struct smbdirect_socket *sc,
- 	INIT_DELAYED_WORK(&sc->idle.timer_work, smbdirect_connection_idle_timer_work);
- }
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static void smbdirect_socket_set_logging(struct smbdirect_socket *sc,
--					 void *private_ptr,
--					 bool (*needed)(struct smbdirect_socket *sc,
--							void *private_ptr,
--							unsigned int lvl,
--							unsigned int cls),
--					 void (*vaprintf)(struct smbdirect_socket *sc,
--							  const char *func,
--							  unsigned int line,
--							  void *private_ptr,
--							  unsigned int lvl,
--							  unsigned int cls,
--							  struct va_format *vaf))
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_socket_set_logging(struct smbdirect_socket *sc,
-+				  void *private_ptr,
-+				  bool (*needed)(struct smbdirect_socket *sc,
-+						 void *private_ptr,
-+						 unsigned int lvl,
-+						 unsigned int cls),
-+				  void (*vaprintf)(struct smbdirect_socket *sc,
-+						   const char *func,
-+						   unsigned int line,
-+						   void *private_ptr,
-+						   unsigned int lvl,
-+						   unsigned int cls,
-+						   struct va_format *vaf))
- {
- 	sc->logging.private_ptr = private_ptr;
- 	sc->logging.needed = needed;
- 	sc->logging.vaprintf = vaprintf;
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_set_logging);
- 
- static void smbdirect_socket_wake_up_all(struct smbdirect_socket *sc)
- {
-@@ -634,11 +642,12 @@ static void smbdirect_socket_destroy_sync(struct smbdirect_socket *sc)
- 		SMBDIRECT_DEBUG_ERR_PTR(sc->first_error));
- }
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static void smbdirect_socket_shutdown(struct smbdirect_socket *sc)
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_socket_shutdown(struct smbdirect_socket *sc)
- {
- 	smbdirect_socket_schedule_cleanup(sc, -ESHUTDOWN);
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_shutdown);
- 
- static void smbdirect_socket_release_disconnect(struct kref *kref)
- {
-@@ -665,8 +674,8 @@ static void smbdirect_socket_release_destroy(struct kref *kref)
- 	kfree(sc);
- }
- 
--__maybe_unused /* this is temporary while this file is included in others */
--static void smbdirect_socket_release(struct smbdirect_socket *sc)
-+__SMBDIRECT_PUBLIC__
-+void smbdirect_socket_release(struct smbdirect_socket *sc)
- {
- 	/*
- 	 * We expect only 1 disconnect reference
-@@ -682,6 +691,7 @@ static void smbdirect_socket_release(struct smbdirect_socket *sc)
- 	 */
- 	kref_put(&sc->refs.destroy, smbdirect_socket_release_destroy);
- }
-+__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_release);
- 
- __maybe_unused /* this is temporary while this file is included in others */
- static int smbdirect_socket_wait_for_credits(struct smbdirect_socket *sc,
-diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
-index bfa6a8907de4..95c20b8d7ec3 100644
---- a/fs/smb/common/smbdirect/smbdirect_socket.h
-+++ b/fs/smb/common/smbdirect/smbdirect_socket.h
-@@ -386,20 +386,6 @@ struct smbdirect_socket {
- 	} statistics;
- 
- 	struct {
--#define SMBDIRECT_LOG_ERR		0x0
--#define SMBDIRECT_LOG_INFO		0x1
--
--#define SMBDIRECT_LOG_OUTGOING			0x1
--#define SMBDIRECT_LOG_INCOMING			0x2
--#define SMBDIRECT_LOG_READ			0x4
--#define SMBDIRECT_LOG_WRITE			0x8
--#define SMBDIRECT_LOG_RDMA_SEND			0x10
--#define SMBDIRECT_LOG_RDMA_RECV			0x20
--#define SMBDIRECT_LOG_KEEP_ALIVE		0x40
--#define SMBDIRECT_LOG_RDMA_EVENT		0x80
--#define SMBDIRECT_LOG_RDMA_MR			0x100
--#define SMBDIRECT_LOG_RDMA_RW			0x200
--#define SMBDIRECT_LOG_NEGOTIATE			0x400
- 		void *private_ptr;
- 		bool (*needed)(struct smbdirect_socket *sc,
- 			       void *private_ptr,
 -- 
 2.43.0
 
