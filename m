@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA29620C48A
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57A0329C7A
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:01:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764093684; cv=none; b=iKnUiQHZKQaoTcgRKyiZwix9G3SVrTAVKUL3On9JXb5CQA8ih1zlDtbz/JkRyfT/67KzOUpYOd8SBv8WOjO1oPgeTnlmLcOovpT4HVwTkSS6+/0/wv+6dq71fLvLRTpZU3sMXTyFeSAx/mUXDQ7JYvc5TB7s06sg83n+nrl/qhQ=
+	t=1764093687; cv=none; b=H5eMpbCjaLNmPyXfz0JkKtfu6zQ4QGE6yRehPmYnmaItNPsAVQSidAgtHMTnrmhhMXjW0b4GUGaTCv5/s2qoqVZDd2htLPM4/PIIeXLftgzLaxlTk+iJwofb2JwnoBqgh+ttBfxcRGWOkDy7aVwQBh8cOhM5FM1OsEmSNoXI2E8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764093684; c=relaxed/simple;
-	bh=wsGIeuvP4BFp9T+lwthJHBKXEIUVI4yt10atcSgsp6c=;
+	s=arc-20240116; t=1764093687; c=relaxed/simple;
+	bh=0mIP4Mwfk8i/Gl3rIRwxQqsf8CJXbkOL+VSxhV2MFVA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LGInypZR6SO8OC0SV5UDvV3w9GIi+4rs/fXUMUciZ7lvlt3UIa6Ft/2mPjAPNwTewKlWvO4rfkGEqaYMxOcTxG59Stl1cSzDpV7X2lnWxqOpQNfPlmTZ4PJ1FLKX5xlBpEq2ArsKCT0JEz1H/Qe1lpYEATAq/sT5XlKi4jvWETA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=zjcUEAws; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=A0E+LrXh1OJ9nja7t2xG0geGh4g++2ypSWd/5dNf4GE7QUaTVVPUhQK65IC9qwYcM4Jt3g30RPAZGeSuzvVsSjfFCUgcV04PS235TgLn0CsSaMSfNvITinHZNZ5zAHpw5Monj38WnIcdwSpboebRbINOFlV1nhiKKNFLaPn1yPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=OkG5RE+C; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="zjcUEAws"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="OkG5RE+C"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=4qQ0ph+aJ1kJNKLW8TtEQ+u2SVAzHBca1HXiGZS6QXQ=; b=zjcUEAwsAxFUNb0CAySoAQrwiW
-	3lGqPEBzNhMY3lhh6/1m8+vFE1TEC/wCT354sHNhb6Ywo5TBgKmH+12qdtL8FDMxJr8wzLS4tecKJ
-	S6ZZfqZoYt3bF8M+Ce8inxoZ6ymO4FKb+aXO0mALH2Ywf2xmhEZhvMO5OlfxlrpNtkEZ1GdzgMb9p
-	pLre2qVFz1I3dCuWt35ykclykq0scMelO8TThTuOymKrRrIDD4rl5/xK5bWYRB6m3brG2K4EAtDhz
-	092m9aW+9aesasWUHpdJBQ1CHp9dcj5xbd3I8RjhSHeZhdGcz7XsD26+Q2Q9oB/H16jiHJ1eBK0nw
-	Wo7FP2R3IKHJQCeDdgPWwXAgEoJLrkTpUP1h+pLo/ZZjszuRiLrIWud+tkiC0jsoK8/owbi009yQ5
-	AAKG3V7yMOnxM08QGnAFBJdXCdDqqcori49rBE5tx6J6vvJSfYw65IEDs3bb2lIp1Gmd86rU8BX5V
-	6TsEmpAKPVEP0+c8LsXA9FJ+;
+	bh=lKA6ST1MbnQPG1RhcqVft3KRJy1bpH5GZVI+G0mS6g0=; b=OkG5RE+CwzcK4n+D2ZRCYRlxiZ
+	gdWHQcDgZNufNr5olHpS1C3EWNEJvRHfbUKt6kcaDVUPbV+BVhMw0zzRZ1pSjY/xXZaFTQBZmsr3d
+	7iYImayxqfUYXNPtWg944+MehS2UF59yCJOrjb/Uq3Lpvl3LyfjE/Ezf1HDjVW3Zzg89pnxsOrEU2
+	jUOYv6Z7GD72aPLiQCHuhYA52uNuRWwgdZc1wgG7ylhPuA4yRqoFnha++F0EXqKmMvwR9wgMY60jH
+	M1t0MG9QA8sEr5VW5uKAbGnkCgtNvXtt9PG/y7y5s81r6nz/KqPtJ1nTPv7tK5kqAc1b2mnL1/b0Z
+	QInth88sI30Z45mZkcY2uatf7FLo4vE4ftWIXzlMdRGvdefWfUgFhQeOqwU62fiVBiWMNgyaiYTGc
+	z2tLGO4FQPgD9AsNFKf9eOTzTA75eV84Bl60CzeUDpZgA4CHkiy6Qyt2LT4TJUubx/5na6faM7yW8
+	htPMhmhS/jTeRq9b0JI4pZi8;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vNxLm-00FdAH-0R;
-	Tue, 25 Nov 2025 18:01:15 +0000
+	id 1vNxLu-00FdC3-0J;
+	Tue, 25 Nov 2025 18:01:22 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -39,11 +39,10 @@ Cc: metze@samba.org,
 	Tom Talpey <tom@talpey.com>,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
-	David Howells <dhowells@redhat.com>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v4 044/145] smb: smbdirect: introduce smbdirect_connection_send_iter() and related functions
-Date: Tue, 25 Nov 2025 18:54:50 +0100
-Message-ID: <84bfbd2a95bc28dd07c231f2f8a884dbfe406aa4.1764091285.git.metze@samba.org>
+Subject: [PATCH v4 045/145] smb: smbdirect: introduce smbdirect_connection_send_immediate_work()
+Date: Tue, 25 Nov 2025 18:54:51 +0100
+Message-ID: <dbb988f75cc4bff99de7a39313d36ffdd7a4eb4a.1764091285.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1764091285.git.metze@samba.org>
 References: <cover.1764091285.git.metze@samba.org>
@@ -55,466 +54,57 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is basically a copy of the following functions in the server:
+This is a combination of smb_direct_send_immediate_work() in the server
+as well as send_immediate_empty_message() and smbd_post_send_empty() in
+the client.
 
-smb_direct_post_send       => smbdirect_connection_post_send_wr
-smb_direct_send_ctx_init   => smbdirect_connection_send_batch_init
-smb_direct_flush_send_list => smbdirect_connection_send_batch_flush
-wait_for_send_lcredit      => smbdirect_connection_wait_for_send_lcredit
-wait_for_send_credits      => smbdirect_connection_wait_for_send_credits
-post_sendmsg               => smbdirect_connection_post_send_io
-smb_direct_post_send_data  => smbdirect_connection_send_single_iter
-smb_direct_send_iter       => smbdirect_connection_send_iter
-
-They will replace the server functions soon and will also be used in
-the client as smbdirect_connection_send_single_iter() is very similar to
-smbd_post_send_iter().
-
-There's also a smbdirect_connection_send_wait_zero_pending()
-helper that can be used together with
-smbdirect_connection_send_single_iter() in the client
-until it can use smbdirect_connection_send_iter(),
-which can happen with David's refactoring.
+smbdirect_connection_send_immediate_work() replace all of them in
+client and server.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
 Cc: Long Li <longli@microsoft.com>
 Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: David Howells <dhowells@redhat.com>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- .../common/smbdirect/smbdirect_connection.c   | 408 +++++++++++++++++-
- 1 file changed, 407 insertions(+), 1 deletion(-)
+ .../common/smbdirect/smbdirect_connection.c   | 22 +++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
 diff --git a/fs/smb/common/smbdirect/smbdirect_connection.c b/fs/smb/common/smbdirect/smbdirect_connection.c
-index 9901c5d01958..1ba83fdc1e6a 100644
+index 1ba83fdc1e6a..8ee3a1e28f82 100644
 --- a/fs/smb/common/smbdirect/smbdirect_connection.c
 +++ b/fs/smb/common/smbdirect/smbdirect_connection.c
-@@ -743,7 +743,414 @@ static bool smbdirect_connection_request_keep_alive(struct smbdirect_socket *sc)
- 	return false;
+@@ -1193,6 +1193,28 @@ static void smbdirect_connection_send_io_done(struct ib_cq *cq, struct ib_wc *wc
+ 	wake_up(&sc->send_io.pending.dec_wait_queue);
  }
  
-+static int smbdirect_connection_post_send_wr(struct smbdirect_socket *sc,
-+					     struct ib_send_wr *wr)
++__maybe_unused /* this is temporary while this file is included in others */
++static void smbdirect_connection_send_immediate_work(struct work_struct *work)
 +{
++	struct smbdirect_socket *sc =
++		container_of(work, struct smbdirect_socket, idle.immediate_work);
 +	int ret;
 +
-+	if (unlikely(sc->first_error))
-+		return sc->first_error;
++	if (sc->status != SMBDIRECT_SOCKET_CONNECTED)
++		return;
 +
-+	atomic_inc(&sc->send_io.pending.count);
-+	ret = ib_post_send(sc->ib.qp, wr, NULL);
-+	if (ret) {
-+		atomic_dec(&sc->send_io.pending.count);
-+		smbdirect_log_rdma_send(sc, SMBDIRECT_LOG_ERR,
-+			"ib_post_send() failed %1pe\n",
++	smbdirect_log_keep_alive(sc, SMBDIRECT_LOG_INFO,
++		"send an empty message\n");
++	sc->statistics.send_empty++;
++	ret = smbdirect_connection_send_single_iter(sc, NULL, NULL, 0, 0);
++	if (ret < 0) {
++		smbdirect_log_write(sc, SMBDIRECT_LOG_ERR,
++			"smbdirect_connection_send_single_iter ret=%1pe\n",
 +			SMBDIRECT_DEBUG_ERR_PTR(ret));
 +		smbdirect_socket_schedule_cleanup(sc, ret);
 +	}
-+
-+	return ret;
-+}
-+
-+static void smbdirect_connection_send_batch_init(struct smbdirect_send_batch *batch,
-+						 bool need_invalidate_rkey,
-+						 unsigned int remote_key)
-+{
-+	INIT_LIST_HEAD(&batch->msg_list);
-+	batch->wr_cnt = 0;
-+	batch->need_invalidate_rkey = need_invalidate_rkey;
-+	batch->remote_key = remote_key;
-+}
-+
-+static int smbdirect_connection_send_batch_flush(struct smbdirect_socket *sc,
-+						 struct smbdirect_send_batch *batch,
-+						 bool is_last)
-+{
-+	struct smbdirect_send_io *first, *last;
-+	int ret;
-+
-+	if (list_empty(&batch->msg_list))
-+		return 0;
-+
-+	first = list_first_entry(&batch->msg_list,
-+				 struct smbdirect_send_io,
-+				 sibling_list);
-+	last = list_last_entry(&batch->msg_list,
-+			       struct smbdirect_send_io,
-+			       sibling_list);
-+
-+	if (batch->need_invalidate_rkey) {
-+		first->wr.opcode = IB_WR_SEND_WITH_INV;
-+		first->wr.ex.invalidate_rkey = batch->remote_key;
-+		batch->need_invalidate_rkey = false;
-+		batch->remote_key = 0;
-+	}
-+
-+	last->wr.send_flags = IB_SEND_SIGNALED;
-+	last->wr.wr_cqe = &last->cqe;
-+
-+	/*
-+	 * Remove last from send_ctx->msg_list
-+	 * and splice the rest of send_ctx->msg_list
-+	 * to last->sibling_list.
-+	 *
-+	 * send_ctx->msg_list is a valid empty list
-+	 * at the end.
-+	 */
-+	list_del_init(&last->sibling_list);
-+	list_splice_tail_init(&batch->msg_list, &last->sibling_list);
-+	batch->wr_cnt = 0;
-+
-+	ret = smbdirect_connection_post_send_wr(sc, &first->wr);
-+	if (ret) {
-+		struct smbdirect_send_io *sibling, *next;
-+
-+		list_for_each_entry_safe(sibling, next, &last->sibling_list, sibling_list) {
-+			list_del_init(&sibling->sibling_list);
-+			smbdirect_connection_free_send_io(sibling);
-+		}
-+		smbdirect_connection_free_send_io(last);
-+	}
-+
-+	return ret;
-+}
-+
-+
-+static int smbdirect_connection_wait_for_send_lcredit(struct smbdirect_socket *sc,
-+						      struct smbdirect_send_batch *batch)
-+{
-+	if (batch && atomic_read(&sc->send_io.lcredits.count) <= 1) {
-+		int ret;
-+
-+		ret = smbdirect_connection_send_batch_flush(sc, batch, false);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return smbdirect_socket_wait_for_credits(sc,
-+						 SMBDIRECT_SOCKET_CONNECTED,
-+						 -ENOTCONN,
-+						 &sc->send_io.lcredits.wait_queue,
-+						 &sc->send_io.lcredits.count,
-+						 1);
-+}
-+
-+static int smbdirect_connection_wait_for_send_credits(struct smbdirect_socket *sc,
-+						      struct smbdirect_send_batch *batch)
-+{
-+	if (batch && (batch->wr_cnt >= 16 || atomic_read(&sc->send_io.credits.count) <= 1)) {
-+		int ret;
-+
-+		ret = smbdirect_connection_send_batch_flush(sc, batch, false);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return smbdirect_socket_wait_for_credits(sc,
-+						 SMBDIRECT_SOCKET_CONNECTED,
-+						 -ENOTCONN,
-+						 &sc->send_io.credits.wait_queue,
-+						 &sc->send_io.credits.count,
-+						 1);
-+}
-+
-+static void smbdirect_connection_send_io_done(struct ib_cq *cq, struct ib_wc *wc);
-+
-+static int smbdirect_connection_post_send_io(struct smbdirect_socket *sc,
-+					     struct smbdirect_send_batch *batch,
-+					     struct smbdirect_send_io *msg)
-+{
-+	int i;
-+
-+	for (i = 0; i < msg->num_sge; i++)
-+		ib_dma_sync_single_for_device(sc->ib.dev,
-+					      msg->sge[i].addr, msg->sge[i].length,
-+					      DMA_TO_DEVICE);
-+
-+	msg->cqe.done = smbdirect_connection_send_io_done;
-+	msg->wr.wr_cqe = &msg->cqe;
-+	msg->wr.opcode = IB_WR_SEND;
-+	msg->wr.sg_list = &msg->sge[0];
-+	msg->wr.num_sge = msg->num_sge;
-+	msg->wr.next = NULL;
-+
-+	if (batch) {
-+		msg->wr.send_flags = 0;
-+		if (!list_empty(&batch->msg_list)) {
-+			struct smbdirect_send_io *last;
-+
-+			last = list_last_entry(&batch->msg_list,
-+					       struct smbdirect_send_io,
-+					       sibling_list);
-+			last->wr.next = &msg->wr;
-+		}
-+		list_add_tail(&msg->sibling_list, &batch->msg_list);
-+		batch->wr_cnt++;
-+		return 0;
-+	}
-+
-+	msg->wr.send_flags = IB_SEND_SIGNALED;
-+	return smbdirect_connection_post_send_wr(sc, &msg->wr);
-+}
-+
-+static int smbdirect_connection_send_single_iter(struct smbdirect_socket *sc,
-+						 struct smbdirect_send_batch *batch,
-+						 struct iov_iter *iter,
-+						 unsigned int flags,
-+						 u32 remaining_data_length)
-+{
-+	const struct smbdirect_socket_parameters *sp = &sc->parameters;
-+	struct smbdirect_send_io *msg;
-+	struct smbdirect_data_transfer *packet;
-+	size_t header_length;
-+	u16 new_credits = 0;
-+	u32 data_length = 0;
-+	int ret;
-+
-+	if (WARN_ON_ONCE(flags))
-+		return -EINVAL; /* no flags support for now */
-+
-+	if (iter) {
-+		if (WARN_ON_ONCE(iov_iter_rw(iter) != ITER_SOURCE))
-+			return -EINVAL; /* It's a bug in upper layer to get there */
-+
-+		header_length = sizeof(struct smbdirect_data_transfer);
-+		if (WARN_ON_ONCE(remaining_data_length == 0 ||
-+				 iov_iter_count(iter) > remaining_data_length))
-+			return -EINVAL;
-+	} else {
-+		/* If this is a packet without payload, don't send padding */
-+		header_length = offsetof(struct smbdirect_data_transfer, padding);
-+		if (WARN_ON_ONCE(remaining_data_length))
-+			return -EINVAL;
-+	}
-+
-+	if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
-+		smbdirect_log_write(sc, SMBDIRECT_LOG_ERR,
-+			"status=%s first_error=%1pe => %s\n",
-+			smbdirect_socket_status_string(sc->status),
-+			SMBDIRECT_DEBUG_ERR_PTR(sc->first_error),
-+			errname(-ENOTCONN));
-+		return -ENOTCONN;
-+	}
-+
-+	ret = smbdirect_connection_wait_for_send_lcredit(sc, batch);
-+	if (ret)
-+		goto lcredit_failed;
-+
-+	ret = smbdirect_connection_wait_for_send_credits(sc, batch);
-+	if (ret)
-+		goto credit_failed;
-+
-+	msg = smbdirect_connection_alloc_send_io(sc);
-+	if (IS_ERR(msg)) {
-+		ret = PTR_ERR(msg);
-+		goto alloc_failed;
-+	}
-+
-+	/* Map the packet to DMA */
-+	msg->sge[0].addr = ib_dma_map_single(sc->ib.dev,
-+					     msg->packet,
-+					     header_length,
-+					     DMA_TO_DEVICE);
-+	ret = ib_dma_mapping_error(sc->ib.dev, msg->sge[0].addr);
-+	if (ret)
-+		goto err;
-+
-+	msg->sge[0].length = header_length;
-+	msg->sge[0].lkey = sc->ib.pd->local_dma_lkey;
-+	msg->num_sge = 1;
-+
-+	if (iter) {
-+		struct smbdirect_map_sges extract = {
-+			.num_sge	= msg->num_sge,
-+			.max_sge	= ARRAY_SIZE(msg->sge),
-+			.sge		= msg->sge,
-+			.device		= sc->ib.dev,
-+			.local_dma_lkey	= sc->ib.pd->local_dma_lkey,
-+			.direction	= DMA_TO_DEVICE,
-+		};
-+		size_t payload_len = umin(iov_iter_count(iter),
-+					  sp->max_send_size - sizeof(*packet));
-+
-+		ret = smbdirect_map_sges_from_iter(iter, payload_len, &extract);
-+		if (ret < 0)
-+			goto err;
-+		data_length = ret;
-+		remaining_data_length -= data_length;
-+		msg->num_sge = extract.num_sge;
-+	}
-+
-+	/* Fill in the packet header */
-+	packet = (struct smbdirect_data_transfer *)msg->packet;
-+	packet->credits_requested = cpu_to_le16(sp->send_credit_target);
-+	new_credits = smbdirect_connection_grant_recv_credits(sc);
-+	packet->credits_granted = cpu_to_le16(new_credits);
-+
-+	packet->flags = 0;
-+	if (smbdirect_connection_request_keep_alive(sc))
-+		packet->flags |= cpu_to_le16(SMBDIRECT_FLAG_RESPONSE_REQUESTED);
-+
-+	packet->reserved = 0;
-+	if (!data_length)
-+		packet->data_offset = 0;
-+	else
-+		packet->data_offset = cpu_to_le32(24);
-+	packet->data_length = cpu_to_le32(data_length);
-+	packet->remaining_data_length = cpu_to_le32(remaining_data_length);
-+	packet->padding = 0;
-+
-+	smbdirect_log_outgoing(sc, SMBDIRECT_LOG_INFO,
-+		"DataOut: %s=%u, %s=%u, %s=0x%x, %s=%u, %s=%u, %s=%u\n",
-+		"CreditsRequested",
-+		le16_to_cpu(packet->credits_requested),
-+		"CreditsGranted",
-+		le16_to_cpu(packet->credits_granted),
-+		"Flags",
-+		le16_to_cpu(packet->flags),
-+		"RemainingDataLength",
-+		le32_to_cpu(packet->remaining_data_length),
-+		"DataOffset",
-+		le32_to_cpu(packet->data_offset),
-+		"DataLength",
-+		le32_to_cpu(packet->data_length));
-+
-+	ret = smbdirect_connection_post_send_io(sc, batch, msg);
-+	if (ret)
-+		goto err;
-+	return data_length;
-+err:
-+	smbdirect_connection_free_send_io(msg);
-+alloc_failed:
-+	atomic_inc(&sc->send_io.credits.count);
-+credit_failed:
-+	atomic_inc(&sc->send_io.lcredits.count);
-+lcredit_failed:
-+	return ret;
 +}
 +
  __maybe_unused /* this is temporary while this file is included in others */
-+static int smbdirect_connection_send_wait_zero_pending(struct smbdirect_socket *sc)
-+{
-+	/*
-+	 * As an optimization, we don't wait for individual I/O to finish
-+	 * before sending the next one.
-+	 * Send them all and wait for pending send count to get to 0
-+	 * that means all the I/Os have been out and we are good to return
-+	 */
-+
-+	wait_event(sc->send_io.pending.zero_wait_queue,
-+		   atomic_read(&sc->send_io.pending.count) == 0 ||
-+		   sc->status != SMBDIRECT_SOCKET_CONNECTED);
-+	if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
-+		smbdirect_log_write(sc, SMBDIRECT_LOG_ERR,
-+			"status=%s first_error=%1pe => %s\n",
-+			smbdirect_socket_status_string(sc->status),
-+			SMBDIRECT_DEBUG_ERR_PTR(sc->first_error),
-+			errname(-ENOTCONN));
-+		return -ENOTCONN;
-+	}
-+
-+	return 0;
-+}
-+
-+__maybe_unused /* this is temporary while this file is included in others */
-+static int smbdirect_connection_send_iter(struct smbdirect_socket *sc,
-+					  struct iov_iter *iter,
-+					  unsigned int flags,
-+					  bool need_invalidate,
-+					  unsigned int remote_key)
-+{
-+	const struct smbdirect_socket_parameters *sp = &sc->parameters;
-+	struct smbdirect_send_batch batch;
-+	int total_count = iov_iter_count(iter);
-+	int ret;
-+	int error = 0;
-+	__be32 hdr;
-+
-+	if (WARN_ON_ONCE(flags))
-+		return -EINVAL; /* no flags support for now */
-+
-+	if (WARN_ON_ONCE(iov_iter_rw(iter) != ITER_SOURCE))
-+		return -EINVAL; /* It's a bug in upper layer to get there */
-+
-+	if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
-+		smbdirect_log_write(sc, SMBDIRECT_LOG_ERR,
-+			"status=%s first_error=%1pe => %s\n",
-+			smbdirect_socket_status_string(sc->status),
-+			SMBDIRECT_DEBUG_ERR_PTR(sc->first_error),
-+			errname(-ENOTCONN));
-+		return -ENOTCONN;
-+	}
-+
-+	/*
-+	 * For now we expect the iter to have the full
-+	 * message, including a 4 byte length header.
-+	 */
-+	if (iov_iter_count(iter) <= 4)
-+		return -EINVAL;
-+	if (!copy_from_iter_full(&hdr, sizeof(hdr), iter))
-+		return -EFAULT;
-+	if (iov_iter_count(iter) != be32_to_cpu(hdr))
-+		return -EINVAL;
-+
-+	/*
-+	 * The size must fit into the negotiated
-+	 * fragmented send size.
-+	 */
-+	if (iov_iter_count(iter) > sp->max_fragmented_send_size)
-+		return -EMSGSIZE;
-+
-+	smbdirect_log_write(sc, SMBDIRECT_LOG_INFO,
-+		"Sending (RDMA): length=%zu\n",
-+		iov_iter_count(iter));
-+
-+	smbdirect_connection_send_batch_init(&batch, need_invalidate, remote_key);
-+	while (iov_iter_count(iter)) {
-+		ret = smbdirect_connection_send_single_iter(sc,
-+							    &batch,
-+							    iter,
-+							    flags,
-+							    iov_iter_count(iter));
-+		if (unlikely(ret < 0)) {
-+			error = ret;
-+			break;
-+		}
-+	}
-+
-+	ret = smbdirect_connection_send_batch_flush(sc, &batch, true);
-+	if (unlikely(ret && !error))
-+		error = ret;
-+
-+	/*
-+	 * As an optimization, we don't wait for individual I/O to finish
-+	 * before sending the next one.
-+	 * Send them all and wait for pending send count to get to 0
-+	 * that means all the I/Os have been out and we are good to return
-+	 */
-+
-+	ret = smbdirect_connection_send_wait_zero_pending(sc);
-+	if (unlikely(ret && !error))
-+		error = ret;
-+
-+	if (unlikely(error))
-+		return error;
-+
-+	return total_count;
-+}
-+
- static void smbdirect_connection_send_io_done(struct ib_cq *cq, struct ib_wc *wc)
- {
- 	struct smbdirect_send_io *msg =
-@@ -1455,7 +1862,6 @@ static ssize_t smbdirect_map_sges_from_folioq(struct iov_iter *iter,
-  * BVEC-type iterator and the pages pinned, ref'd or otherwise held in some
-  * way.
-  */
--__maybe_unused /* this is temporary while this file is included in others */
- static ssize_t smbdirect_map_sges_from_iter(struct iov_iter *iter, size_t len,
- 					    struct smbdirect_map_sges *state)
+ static int smbdirect_connection_post_recv_io(struct smbdirect_recv_io *msg)
  {
 -- 
 2.43.0
