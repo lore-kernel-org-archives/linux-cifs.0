@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950521E991B
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E4E32937D
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764093707; cv=none; b=lZoeJPavJBUsb4wmW+HmqsTyAKghk9mFWW/clw5gBNvOo5sbCHyJnWd7jMLEERFSTOVcaazgAFF04VK3mCtqih2mqPz54NwYFL8/bfRkcL1+knlPrYnvamiMFC0UiaoI4IfLgHIwPUFt408EJLDADR7qYt1uggJZhA+D9wwgFlY=
+	t=1764093714; cv=none; b=t0rmYED3mHYqqdrB/v6cFedvUhqPPyrdWO6imYBkKJ+qTwd0WkHE6hEM+h9QhzQeYuFTQlV+FfSWGLvqQ02WfpgEH9N3nMKc6jK4Vi2m/7cOsomcSgFJjErQ9Zn0M9GQpsCD8lykoN0oC8TbCVQoLey6ajiQYLgHqNXvYru/FM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764093707; c=relaxed/simple;
-	bh=gunagSxwyhQpg/ar4V2BpzYs3o5HR4yna5jAXc6gpuw=;
+	s=arc-20240116; t=1764093714; c=relaxed/simple;
+	bh=M7xQxnNlnpYu1OcdaJotbQlMANcbeb7XtufQUOuJEi8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EeIOkpchR2hRuPz7N7heXWOJ41Zk0hGyMivUaxV4+/EVRLMJ29LvlhQnNAzt0WiNbKIkOLS7uoBO9EGwkbhnKLlkrbSBkDtpniGEyvTGlIA0biN+NRjSUKm1vkPYwAadGmIjC//mN0vaNv4DaDUgPJKqq9my0ZgR5whVM1oGDFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=MKAKf6A5; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=RZz19Ps5Pam/978W2B08eNV7UFfDcY7ygr5zrG1Bh+fDGHGcX3z3a2l+cgQo5zmeWu9hqYxst3XQ3oHg8nt0ifzLJTAMlWnFhM6BWz7UJWYbJcqx01bSqet61vsdnFweSdoMX5cQy/JtDVi4Yh5KeMl5yGrCrqDxXMYP8SZuwJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=oP24vBs6; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="MKAKf6A5"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="oP24vBs6"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=A3yHeMH8W+n2/0ZF51SjulsInAIehuLDHBydqU419e0=; b=MKAKf6A5bBapsvsFe2ghLcBUcG
-	nU07SEHN0dXQ+fxWu3hqkAe/OYKk6+Uoh+p+vgCRSQPgMTZGmhqEfR972xlthKUx97r3+a2ts1Rr/
-	34w0/kUZ95VU5JToM5DsMYPqK+LNWnPYjGcKeauqSFU3/YDdt1I856QyE5iggYEGAWfJMAiNGqPWB
-	54EOcr4o3p6c7e6kFVeBpCQlrE9aa88P5bLuGTeP2JqTCQqsJqIedMizVuNYM1b6hZnyBgvxDPufT
-	pBPphqUioiQ9xSdKc6qNc8B5ovtv4u0uJFK5hcTSQ3yX5+as3+HanjlsaQQtnYy0H81c4g5EWMW3Q
-	8iakMD5PEWQKIR2ZOEVH426SChSk1Ju5xSMzs46AFMDV93aSCHl/PIGCXt/rlo71/WIcWyhG3VRfr
-	zsdQDAu7YEzfTGdfQ/pmE6HHxAQBG7UY+rPE+KzbTqtg7Yo6IfYWRBQzHn8e00gDYCMmddl1lyIuU
-	DwMAzlM98YkSEfiDeD1IPKhX;
+	bh=llXoHEudPzkUluI3KGa1VSbDxHrIcUI2FUX/ww+qN6U=; b=oP24vBs6XMvU/2uFzFqF5pLkTG
+	Cv5ilo9nPT0QnyixG5TBv2IeywX/HxcmTCxUiEaVeDoUE0zdgScs9hov1QaNSL9AZAiz79xsxl6bO
+	9+ab1vHm6lRI7N773HpheO53MG+11mJsVT0B+m8iSjjaL1981z9WnQjO8QkrdH0W9FZEcgC6FKR5l
+	tSumGDB5Q3jpaXF86f3+FdlZMs74WEFDaRh5gy7oIKZHfyA3fiAUUtL1fln/Hnknj6jjay2IdHHj1
+	n1MHbi7jcgJtY9bJ1vI4rnjpnWZ57o2UkylJ6MTuoyrZ4+iCHYCqmOIyVkv6FBQ+rXfp8dOfLkjRH
+	YlO7+PipYu7fyCEAi1HkOZM6ux8vOYMyM6FkNyMBUhBax7akHQAlBrw1W56w6ilXva4+hwHo2teMX
+	Wrfn4xnVOz4crk8pPFqJjYzGl/7tyDBySfOixylOYcaer0XUnvM2Dra0a+jLurTKfpZghqYcMQIDt
+	pianR8RHONWitkgX6IBcnG5D;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vNxME-00FdGd-16;
-	Tue, 25 Nov 2025 18:01:42 +0000
+	id 1vNxMK-00FdHy-0i;
+	Tue, 25 Nov 2025 18:01:48 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -40,9 +40,9 @@ Cc: metze@samba.org,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v4 048/145] smb: smbdirect: introduce smbdirect_connection_legacy_debug_proc_show()
-Date: Tue, 25 Nov 2025 18:54:54 +0100
-Message-ID: <2240497ba94c9c199ed2ace63d8f18df34c3879f.1764091285.git.metze@samba.org>
+Subject: [PATCH v4 049/145] smb: smbdirect: introduce smbdirect_connection_wait_for_connected()
+Date: Tue, 25 Nov 2025 18:54:55 +0100
+Message-ID: <22017877c4e0af3df7af7bfae7a13659c1035cfa.1764091285.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1764091285.git.metze@samba.org>
 References: <cover.1764091285.git.metze@samba.org>
@@ -54,9 +54,9 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This will be used by the client in order to keep the debug output
-in the current way without the need to access struct smbdirect_socket
-internals.
+This will be used by client and server in order to wait for
+the connect/negotiation to finish in order to get a usable
+connection.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -67,114 +67,88 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- .../common/smbdirect/smbdirect_all_c_files.c  |  1 +
- fs/smb/common/smbdirect/smbdirect_debug.c     | 88 +++++++++++++++++++
- 2 files changed, 89 insertions(+)
- create mode 100644 fs/smb/common/smbdirect/smbdirect_debug.c
+ .../common/smbdirect/smbdirect_connection.c   | 68 +++++++++++++++++++
+ 1 file changed, 68 insertions(+)
 
-diff --git a/fs/smb/common/smbdirect/smbdirect_all_c_files.c b/fs/smb/common/smbdirect/smbdirect_all_c_files.c
-index 963a1fc3b54b..51b2bcda5596 100644
---- a/fs/smb/common/smbdirect/smbdirect_all_c_files.c
-+++ b/fs/smb/common/smbdirect/smbdirect_all_c_files.c
-@@ -19,3 +19,4 @@
- #include "smbdirect_connection.c"
- #include "smbdirect_mr.c"
- #include "smbdirect_rw.c"
-+#include "smbdirect_debug.c"
-diff --git a/fs/smb/common/smbdirect/smbdirect_debug.c b/fs/smb/common/smbdirect/smbdirect_debug.c
-new file mode 100644
-index 000000000000..20b87d8aa6d1
---- /dev/null
-+++ b/fs/smb/common/smbdirect/smbdirect_debug.c
-@@ -0,0 +1,88 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *   Copyright (C) 2017, Microsoft Corporation.
-+ *   Copyright (c) 2025, Stefan Metzmacher
-+ */
-+
-+#include "smbdirect_internal.h"
-+#include <linux/seq_file.h>
-+
+diff --git a/fs/smb/common/smbdirect/smbdirect_connection.c b/fs/smb/common/smbdirect/smbdirect_connection.c
+index 3576737ec199..22d6273649a7 100644
+--- a/fs/smb/common/smbdirect/smbdirect_connection.c
++++ b/fs/smb/common/smbdirect/smbdirect_connection.c
+@@ -719,6 +719,74 @@ static void smbdirect_connection_negotiate_rdma_resources(struct smbdirect_socke
+ 						peer_responder_resources);
+ }
+ 
 +__maybe_unused /* this is temporary while this file is included in others */
-+static void smbdirect_connection_legacy_debug_proc_show(struct smbdirect_socket *sc,
-+							unsigned int rdma_readwrite_threshold,
-+							struct seq_file *m)
++static int smbdirect_connection_wait_for_connected(struct smbdirect_socket *sc)
 +{
-+	const struct smbdirect_socket_parameters *sp;
++	const struct smbdirect_socket_parameters *sp = &sc->parameters;
++	union {
++		struct sockaddr sa;
++		struct sockaddr_storage ss;
++	} src_addr, dst_addr;
++	const struct sockaddr *src = NULL;
++	const struct sockaddr *dst = NULL;
++	char _devname[IB_DEVICE_NAME_MAX] = { 0, };
++	const char *devname = NULL;
++	int ret;
 +
-+	if (!sc)
-+		return;
-+	sp = &sc->parameters;
++	if (sc->rdma.cm_id) {
++		src_addr.ss = sc->rdma.cm_id->route.addr.src_addr;
++		if (src_addr.sa.sa_family != AF_UNSPEC)
++			src = &src_addr.sa;
++		dst_addr.ss = sc->rdma.cm_id->route.addr.dst_addr;
++		if (dst_addr.sa.sa_family != AF_UNSPEC)
++			dst = &dst_addr.sa;
 +
-+	seq_puts(m, "\n");
-+	seq_printf(m, "SMBDirect protocol version: 0x%x ",
-+		   SMBDIRECT_V1);
-+	seq_printf(m, "transport status: %s (%u)",
-+		   smbdirect_socket_status_string(sc->status),
-+		   sc->status);
++		if (sc->ib.dev) {
++			memcpy(_devname, sc->ib.dev->name, IB_DEVICE_NAME_MAX);
++			devname = _devname;
++		}
++	}
 +
-+	seq_puts(m, "\n");
-+	seq_printf(m, "Conn receive_credit_max: %u ",
-+		   sp->recv_credit_max);
-+	seq_printf(m, "send_credit_target: %u max_send_size: %u",
-+		   sp->send_credit_target,
-+		   sp->max_send_size);
++	smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_INFO,
++		"waiting for connection: device: %.*s local: %pISpsfc remote: %pISpsfc\n",
++		IB_DEVICE_NAME_MAX, devname, src, dst);
 +
-+	seq_puts(m, "\n");
-+	seq_printf(m, "Conn max_fragmented_recv_size: %u ",
-+		   sp->max_fragmented_recv_size);
-+	seq_printf(m, "max_fragmented_send_size: %u max_receive_size:%u",
-+		   sp->max_fragmented_send_size,
-+		   sp->max_recv_size);
++	ret = wait_event_interruptible_timeout(sc->status_wait,
++					       sc->status == SMBDIRECT_SOCKET_CONNECTED ||
++					       sc->first_error,
++					       msecs_to_jiffies(sp->negotiate_timeout_msec));
++	if (sc->rdma.cm_id) {
++		/*
++		 * Maybe src and dev are updated in the meantime.
++		 */
++		src_addr.ss = sc->rdma.cm_id->route.addr.src_addr;
++		if (src_addr.sa.sa_family != AF_UNSPEC)
++			src = &src_addr.sa;
++		dst_addr.ss = sc->rdma.cm_id->route.addr.dst_addr;
++		if (dst_addr.sa.sa_family != AF_UNSPEC)
++			dst = &dst_addr.sa;
 +
-+	seq_puts(m, "\n");
-+	seq_printf(m, "Conn keep_alive_interval: %u ",
-+		   sp->keepalive_interval_msec * 1000);
-+	seq_printf(m, "max_readwrite_size: %u rdma_readwrite_threshold: %u",
-+		   sp->max_read_write_size,
-+		   rdma_readwrite_threshold);
++		if (sc->ib.dev) {
++			memcpy(_devname, sc->ib.dev->name, IB_DEVICE_NAME_MAX);
++			devname = _devname;
++		}
++	}
++	if (ret == 0)
++		ret = -ETIMEDOUT;
++	if (ret < 0)
++		smbdirect_socket_schedule_cleanup(sc, ret);
++	if (sc->first_error) {
++		ret = sc->first_error;
++		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
++			"connection failed %1pe device: %.*s local: %pISpsfc remote: %pISpsfc\n",
++			SMBDIRECT_DEBUG_ERR_PTR(ret),
++			IB_DEVICE_NAME_MAX, devname, src, dst);
++		return ret;
++	}
 +
-+	seq_puts(m, "\n");
-+	seq_printf(m, "Debug count_get_receive_buffer: %llu ",
-+		   sc->statistics.get_receive_buffer);
-+	seq_printf(m, "count_put_receive_buffer: %llu count_send_empty: %llu",
-+		   sc->statistics.put_receive_buffer,
-+		   sc->statistics.send_empty);
-+
-+	seq_puts(m, "\n");
-+	seq_printf(m, "Read Queue count_enqueue_reassembly_queue: %llu ",
-+		   sc->statistics.enqueue_reassembly_queue);
-+	seq_printf(m, "count_dequeue_reassembly_queue: %llu ",
-+		   sc->statistics.dequeue_reassembly_queue);
-+	seq_printf(m, "reassembly_data_length: %u ",
-+		   sc->recv_io.reassembly.data_length);
-+	seq_printf(m, "reassembly_queue_length: %u",
-+		   sc->recv_io.reassembly.queue_length);
-+
-+	seq_puts(m, "\n");
-+	seq_printf(m, "Current Credits send_credits: %u ",
-+		   atomic_read(&sc->send_io.credits.count));
-+	seq_printf(m, "receive_credits: %u receive_credit_target: %u",
-+		   atomic_read(&sc->recv_io.credits.count),
-+		   sc->recv_io.credits.target);
-+
-+	seq_puts(m, "\n");
-+	seq_printf(m, "Pending send_pending: %u ",
-+		   atomic_read(&sc->send_io.pending.count));
-+
-+	seq_puts(m, "\n");
-+	seq_printf(m, "MR responder_resources: %u ",
-+		   sp->responder_resources);
-+	seq_printf(m, "max_frmr_depth: %u mr_type: 0x%x",
-+		   sp->max_frmr_depth,
-+		   sc->mr_io.type);
-+
-+	seq_puts(m, "\n");
-+	seq_printf(m, "MR mr_ready_count: %u mr_used_count: %u",
-+		   atomic_read(&sc->mr_io.ready.count),
-+		   atomic_read(&sc->mr_io.used.count));
++	return 0;
 +}
++
+ static void smbdirect_connection_idle_timer_work(struct work_struct *work)
+ {
+ 	struct smbdirect_socket *sc =
 -- 
 2.43.0
 
