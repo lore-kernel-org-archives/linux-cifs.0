@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C2A20C48A
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4225318152
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 18:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764093981; cv=none; b=SMGmrubWLL3wfokEUBwJzfFT8vl9wouOZFYvUmvp218gffEaxJM2vp/iFMqvjuCvBpL0sqQO0tlQI1UGcZd5Bfhd/OXa8waipqja3jtxdRCmCfaXB8m0GcjrZlt1qGR++f8+eAJgpH6BNBHPjjIoxfAwFZoma0d17FaCIIQHDog=
+	t=1764093992; cv=none; b=g8JojwfipbdJhtDwv+NvdXiNAsnbrPPIOEANE5jEcVJayrPEt+boPDeb+tB7S5Dn1gjBTG08GkXQMFYfxl7FWdWLplMfK7PTtFY06aNzLgywPtyjD/UtDv23/SLr5sswQR287+yCjDD6uP40MEx9+sTES+WGMEj5nGd2aR4e0xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764093981; c=relaxed/simple;
-	bh=VGok4gvIZCM+WHw12mFyh8RVZXEme1TZCdS17jliTKA=;
+	s=arc-20240116; t=1764093992; c=relaxed/simple;
+	bh=5e+4tUlL4pmYVAOvhYAt0cXbnpyqNo094PP+KU44FLU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y3vZIARxegfqICzztJiUE3w1Pm1mxll4cFdIPIK7nbFv/gmW3Yg3turXssWAiMk3GzgPS35LPvGkn+vfpucdQ2wqDXCn+Q6xXfArA0raZwos/NtK6OBKuGT4n5fa1vQE+S83Zbkr8e4ZaTggqxOBP4VpLVMUJbiH7+71AGP+STg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=tkFXeLHn; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=d1wpy+f9d8fVqAoSWEMVTTUkgnHWCzPP9Gk/Fo+BzGpgvQaL9XFtHQJwXOWb3rjjsrjES9MwsXYdMCUJXA8ildhI9hqYmqWa4puTbiv+rpWL6VRDtE2IU5kEznYiJIXeL3k39KMV+aHoMpAo2e/SWJuRvbaoMlL6juw7vlwpWdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=PnayvQKU; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="tkFXeLHn"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="PnayvQKU"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=octnfcbzKHl9HbGtvbHo3ac/1He9gMP6otpI2tm785w=; b=tkFXeLHnBgjpGY4RWtzGW3IHfn
-	B+UvOlk/48zcYd10rCVqjtPT9jPBGnXnRP82VTNeWanM4Q2vEP65giSEM5VEOOoYn2VochghNBM8i
-	nQeNX3q3QOxRLRaN7xu+ba1qVkigOnspBh5uLtpBflGzrMQtNqpCY58RzzPsgPtiUNQQH1wQxP6+L
-	4Gg5aH/69LeOwwgwWw40iLLpvj/NrOMkOt3hE2RosJBPyzWZzUJ4CbBaI59vBSTI8zZGfxi5EDpFO
-	DL8TfV2gEnEUG1vuSmQq7viP6ODpc15XlIXzR/YUAuzRmd5vyrtX/Q6e+uJdxUCWAytvK/zJqjqbY
-	ojf2pDC6nobbNfbMh5+O6UL3gsuyTseuPw8j1QnteEPF8aB9GC0V+7o+IFuOTVr2VuoA1n38HvPdk
-	KouxRtCOWG9JrMZ7FsAQMtlVvVFatIIQBEDJHl33exYlRf8+lnoVeK3Natkluk3/AM3LZARC4Q1UJ
-	tsjphUNegMZEPhnHk3LHLX49;
+	bh=nhvs8Ks+L5+0PWdzhox0gnpQcTmxDYOw68mg+HkYe2Q=; b=PnayvQKUuJHsVAzPeEMwlgoTig
+	mKGuFvYelfhaiNyKNAUsfSjWsSJAIkzqTGkvfBiYa3zwTBy5Kl+YdSf+Ua+LQrVygB0GUuxRdHgQS
+	5GmJK9L6bqaNTuEQQ/sCWYpJjy3qVD0crVr0AY3rAcVZpGSa7eAtrcNz3BxlROrtPHecI95lTf6c/
+	rFlQ0sqzxZWzAHcBOMPsi5BU17I3mLoGO3nZftKZC2CROMkFVkSBHsQOP4g1zkARqpL4RoTXDhKx/
+	OpCfzXoZdCU7pInQpgAMMjGvdxCJtkAChQk46KytDGAjni0Ctyp93QF2HhJWBFoMcb0O0m7kk76ev
+	GZFx8YcAa39izr6MXHhOxEXQkhRShAr7vvgi7MT5S+W6DiadhPzXGjGdHC7Xi2YKNTVxQXaXw54z6
+	eRGe3N2rgCykn625g+8Bzr9VG//3GYKuXTWDUQYvIBSAS5E2V5BVh1VorOiew599tlsL8iPrCFnI2
+	/VcMn375O0kyddTxZ3VeGh9i;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vNxNh-00Fday-2Z;
-	Tue, 25 Nov 2025 18:03:14 +0000
+	id 1vNxNo-00Fdba-0Z;
+	Tue, 25 Nov 2025 18:03:20 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -40,9 +40,9 @@ Cc: metze@samba.org,
 	Long Li <longli@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v4 062/145] smb: client: make use of smbdirect_socket_set_logging()
-Date: Tue, 25 Nov 2025 18:55:08 +0100
-Message-ID: <d27914583422a94ad9ab48d698a7cdc0c167c0f2.1764091285.git.metze@samba.org>
+Subject: [PATCH v4 063/145] smb: client: make use of smbdirect_socket_wake_up_all()
+Date: Tue, 25 Nov 2025 18:55:09 +0100
+Message-ID: <db1ab14841d3d7d108074d16054983bd3e0c6872.1764091285.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1764091285.git.metze@samba.org>
 References: <cover.1764091285.git.metze@samba.org>
@@ -54,8 +54,9 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This will allow the logging to keep working as before,
-when we move to common functions in the next commits.
+This is a superset of smbd_disconnect_wake_up_all() and
+calling wake_up_all(&sc->rw_io.credits.wait_queue); in addition
+should not matter as it's not used on the client anyway.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -66,65 +67,63 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/smbdirect.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ fs/smb/client/smbdirect.c | 22 +++-------------------
+ 1 file changed, 3 insertions(+), 19 deletions(-)
 
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 05ac030ab653..3d3b6fa65781 100644
+index 3d3b6fa65781..4dae3d1eb93e 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -156,6 +156,43 @@ static void smbd_disconnect_rdma_connection(struct smbdirect_socket *sc);
-  */
- #include "../common/smbdirect/smbdirect_all_c_files.c"
+@@ -216,22 +216,6 @@ do {									\
+ #define log_rdma_mr(level, fmt, args...) \
+ 		log_rdma(level, LOG_RDMA_MR, fmt, ##args)
  
-+static bool smbd_logging_needed(struct smbdirect_socket *sc,
-+				void *private_ptr,
-+				unsigned int lvl,
-+				unsigned int cls)
-+{
-+#define BUILD_BUG_SAME(x) BUILD_BUG_ON(x != SMBDIRECT_LOG_ ##x)
-+	BUILD_BUG_SAME(ERR);
-+	BUILD_BUG_SAME(INFO);
-+#undef BUILD_BUG_SAME
-+#define BUILD_BUG_SAME(x) BUILD_BUG_ON(x != SMBDIRECT_ ##x)
-+	BUILD_BUG_SAME(LOG_OUTGOING);
-+	BUILD_BUG_SAME(LOG_INCOMING);
-+	BUILD_BUG_SAME(LOG_READ);
-+	BUILD_BUG_SAME(LOG_WRITE);
-+	BUILD_BUG_SAME(LOG_RDMA_SEND);
-+	BUILD_BUG_SAME(LOG_RDMA_RECV);
-+	BUILD_BUG_SAME(LOG_KEEP_ALIVE);
-+	BUILD_BUG_SAME(LOG_RDMA_EVENT);
-+	BUILD_BUG_SAME(LOG_RDMA_MR);
-+#undef BUILD_BUG_SAME
-+
-+	if (lvl <= smbd_logging_level || cls & smbd_logging_class)
-+		return true;
-+	return false;
-+}
-+
-+static void smbd_logging_vaprintf(struct smbdirect_socket *sc,
-+				  const char *func,
-+				  unsigned int line,
-+				  void *private_ptr,
-+				  unsigned int lvl,
-+				  unsigned int cls,
-+				  struct va_format *vaf)
-+{
-+	cifs_dbg(VFS, "%s:%u %pV", func, line, vaf);
-+}
-+
- #define log_rdma(level, class, fmt, args...)				\
- do {									\
- 	if (level <= smbd_logging_level || class & smbd_logging_class)	\
-@@ -1839,6 +1876,7 @@ static struct smbd_connection *_smbd_get_connection(
- 	if (!workqueue)
- 		goto create_wq_failed;
- 	smbdirect_socket_prepare_create(sc, sp, workqueue);
-+	smbdirect_socket_set_logging(sc, NULL, smbd_logging_needed, smbd_logging_vaprintf);
- 	/*
- 	 * from here we operate on the copy.
+-static void smbd_disconnect_wake_up_all(struct smbdirect_socket *sc)
+-{
+-	/*
+-	 * Wake up all waiters in all wait queues
+-	 * in order to notice the broken connection.
+-	 */
+-	wake_up_all(&sc->status_wait);
+-	wake_up_all(&sc->send_io.lcredits.wait_queue);
+-	wake_up_all(&sc->send_io.credits.wait_queue);
+-	wake_up_all(&sc->send_io.pending.dec_wait_queue);
+-	wake_up_all(&sc->send_io.pending.zero_wait_queue);
+-	wake_up_all(&sc->recv_io.reassembly.wait_queue);
+-	wake_up_all(&sc->mr_io.ready.wait_queue);
+-	wake_up_all(&sc->mr_io.cleanup.wait_queue);
+-}
+-
+ static void smbd_disconnect_rdma_work(struct work_struct *work)
+ {
+ 	struct smbdirect_socket *sc =
+@@ -288,7 +272,7 @@ static void smbd_disconnect_rdma_work(struct work_struct *work)
+ 	 * Wake up all waiters in all wait queues
+ 	 * in order to notice the broken connection.
  	 */
+-	smbd_disconnect_wake_up_all(sc);
++	smbdirect_socket_wake_up_all(sc);
+ }
+ 
+ static void smbd_disconnect_rdma_connection(struct smbdirect_socket *sc)
+@@ -353,7 +337,7 @@ static void smbd_disconnect_rdma_connection(struct smbdirect_socket *sc)
+ 	 * Wake up all waiters in all wait queues
+ 	 * in order to notice the broken connection.
+ 	 */
+-	smbd_disconnect_wake_up_all(sc);
++	smbdirect_socket_wake_up_all(sc);
+ 
+ 	queue_work(sc->workqueue, &sc->disconnect_work);
+ }
+@@ -1662,7 +1646,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
+ 	 * Most likely this was already called via
+ 	 * smbd_disconnect_rdma_work(), but call it again...
+ 	 */
+-	smbd_disconnect_wake_up_all(sc);
++	smbdirect_socket_wake_up_all(sc);
+ 
+ 	log_rdma_event(INFO, "cancelling recv_io.posted.refill_work\n");
+ 	disable_work_sync(&sc->recv_io.posted.refill_work);
 -- 
 2.43.0
 
