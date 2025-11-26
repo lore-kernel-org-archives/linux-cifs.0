@@ -1,169 +1,168 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92571D5CC7
-	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 01:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A531F30DD39
+	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 03:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764121792; cv=none; b=NN6jqe/UcdaZaDWXRgkIIaqtWwJdsGSZ1G1aF6kVTPjr/npqikcBRfWZlqhisbOmovYslH9pOcncsUEXTVBFBK8EhjoqNEwsLeci18UddMbKQ4OL2KfgRxujhFN/N28PV16n8OfW7ytHtGXAc/cjQOLWAwF8I9IpuTc5dvSneng=
+	t=1764127708; cv=none; b=i7/j4RuH53ZFs8eJgU+bG7ukch/oaw79YBxjPo0p+rlr6nBUUzXlbJf7SOpcsycr7PbbLJHro+qgWMetywfUnckYH5Rkj8PEBtVMzYJXFGmmwwbU1j8diZiE2STaaThnzFidkgu1QsXob77B+Xz6L8mlyPo9DN9HKvaPZ2NxtV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764121792; c=relaxed/simple;
-	bh=pWKdAtmbcjOBC/rjEzN8Ynk6y/vXR4p9htT1qe9JR4k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Xs9IdcoBaiXUX2ZDpowI0N74QdGEkRZrpzZyYxhzUVdIYcy0Y/VwyoJwn8afXDLAzcksMPRug7pURLKjt5We962l1R6Y3cdUUae9EsEi21E8xQ9nCvQ2ScTWfAKqSoAc+36KgRkYirv/PFA30NWhq3cdhA5ZPcwvMO1vcDZRcNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jcQ5ODI+; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764127708; c=relaxed/simple;
+	bh=Lu5N6inwW+tz5t8BGYRwY1h8KMhRWG6gft21lmfUKtE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FLx6O2BgSXVkfq0SokET2EypZhTrd/OqRn2+MjzIBHR6WA0qVQtFiQcPAATADIPbb5M/xsVyuTXFjVuFaR9j100y8wMcQKMwCzqM/DR57BI6cvoWkHS8xYVD5CbViDxWaIeEuCejIfP8/zEg4s/9aFovmnLp6u96kSklQ93ljwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2YtQ+Vb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jcQ5ODI+"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-299e43c1adbso7429505ad.3
-        for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 17:49:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764121790; x=1764726590; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c2JIwhg1M/+/Us4TNcrvjEWCQJJcUG3hiuOxKjzzsq8=;
-        b=jcQ5ODI+PFrMXzjVV/SSc+gsg6lDKiqqPtAwlNgmH5En1koBOf40KLSaLk8OrCppUl
-         qTnA4qNS7yI56q8cCfisfrKWzPJ+ceW+O4xYxUHloRZrdRR8oZvuW1zlmVWpFwotlrDt
-         RvzgcwW25xn8mIrOlL2S6Uy53z5lF9sll3cVAzs8Y0INZ9iMYBsRgnkFHStSYO5Rw8+N
-         2za0owNybyNhRcPMntkALozfH5ERHcOR0qXVceJhBpVpV98lkk4XJdjz5IBDfrx6mZhL
-         uqmA70mgFrMnYJYdsgcRp4/OqLQfZay/YEpZBNPG7RihRuQ762RCzAs6dsIz0b0ebM4L
-         Vm9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764121790; x=1764726590;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=c2JIwhg1M/+/Us4TNcrvjEWCQJJcUG3hiuOxKjzzsq8=;
-        b=hUPLs26Qa+GU+bWAgt2tlwHItrHWV9Yn2Nf5DgeQEmtVQ4gVEDvbMGy+mTtVfeQRyA
-         Y0sSAcTdxJgbtRxbJcuyEhwP9ch11zSGaVPRhm13GnC6Klh9ByugzlQbHz04Fcq8ndZf
-         JVK7xWHn2xYT6VfA/TpUP/9RNk+fhs/yG1bh+bFdQOFE9vRZsXUamBcNrLU5xHJCEYhq
-         NHFAziXrxeVR2AeGCMEv+S/tCByJUCZJSM13mnvJ8oksIPNS7DtxFnUggcdG0Bp7DXym
-         qgCdYv5n6LXD0Q1U6NO0RkR0WwkfsMwpcA3hRIAu9AK4SloMoJ2MrCZoqZ267Bwm8whU
-         llbA==
-X-Forwarded-Encrypted: i=1; AJvYcCXNN8o6cZAfXUYsPU5B0QnvuZCvK+88EUHCAS6RsyEAQrZS1I39KOTrmbYSZ7qPNK6CTUz9l58fE6vM@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6XMABTAxW4OVfTGpQi1NiQnYH6CV6YFdDRQyqNAR9wjuCZTMs
-	70LZvqH7d9VLoT5za2x0DWbUkYybKu7++Hn0M4M7Eoi4RjIgP1EsEINN
-X-Gm-Gg: ASbGncujDO4Q0pf17CdK1InQ4pnplFM/12VTXygsbvxd4BR3xdL4YpXNH6O2Mtnw+BN
-	RMt3hFDR7e2+NChw6pSMG8Hcf6AONqAJjl024ZqEox0GDtl/kTDfF/Hx8HvwfKx0vh1FJDYO7/v
-	vJhEoUDw1z2SmTSgK18q1Wigr4xTXfMwMCbxw5gDIoM9MS40aYgDfM/yMEfsl/fGmgIfzVbvKFo
-	2HEzoVynafEqN5e2/83SXEYsQ3oEFhxZ3CFmFoUZ5Pb/AizNPR5QWcFdYEUi7APLINY10s4rK0g
-	MxUPJLDxTSX6wHtR5msyDIeNf2TQgyGQ7N4a/Z0qRTg8OZsEYBci5+HgBbDmDbDjzw1OU2CuU/+
-	vDIAot+xCXr0uXQ8zQkbQkcLnCxmrIhhH4po/AQdf6RRRomTCE+zprWy9xsMb81m+ligOysKYr/
-	zoSAqRk+FtcwY9dNaFhVTR21oNVRKPNRf3WfXHE18AFXR1juhSiLkxTU1pijRGLUgSZ5mNNGJR
-X-Google-Smtp-Source: AGHT+IHrljL275fXtsXNqEjG58xd1IF8GPPmptkpdwAzH5JqK8ILh0LAGkZo45N/WI2fpgRCE5WxoQ==
-X-Received: by 2002:a17:903:1ae3:b0:290:c94a:f4c8 with SMTP id d9443c01a7336-29b6be83ec2mr109629045ad.1.1764121790102;
-        Tue, 25 Nov 2025 17:49:50 -0800 (PST)
-Received: from poi.localdomain (KD118158218050.ppp-bb.dion.ne.jp. [118.158.218.50])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b138c08sm174994755ad.25.2025.11.25.17.49.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 17:49:49 -0800 (PST)
-From: Qianchang Zhao <pioooooooooip@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: gregkh@linuxfoundation.org,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Zhitong Liu <liuzhitong1993@gmail.com>,
-	Qianchang Zhao <pioooooooooip@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: ipc: fix use-after-free in ipc_msg_send_request
-Date: Wed, 26 Nov 2025 10:49:33 +0900
-Message-Id: <20251126014933.10085-1-pioooooooooip@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CAKYAXd8=buKQRve+pdBFp9ce+5MiR02ZnHtGHy-hYDfhGWn=pQ@mail.gmail.com>
-References: <CAKYAXd8=buKQRve+pdBFp9ce+5MiR02ZnHtGHy-hYDfhGWn=pQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2YtQ+Vb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 585F6C19421
+	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 03:28:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764127708;
+	bh=Lu5N6inwW+tz5t8BGYRwY1h8KMhRWG6gft21lmfUKtE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=o2YtQ+Vb3boPIDZyoqcX9NkXSE2WSf04U8/h/H/6WUlmXxcOs3kw/4qLoQd3lrtfD
+	 YgdjrAVsvQuLDCh0K6tFhPEC8kJlsJEHVfKONBgDT+WDOHGhbRpy9MzCjeSDXJf7qa
+	 Y9SzqBVFzN2hEY08P+XZeUCqU1C7spJ0Lnxh29iyR5Um+EK37lZig8R3Bbc1f4wHf4
+	 OhUpCHA2czsIJIaSviHm0EUnZP+hLGJqiWazpIX53QaOydici/3rpar1QnT6vtdVsl
+	 kut5Wkd+kJn4JSZAXofljwPHyf/tfpvB6LuSoyLBQsiI9CS1uLLTJ97pskIhSaUAYE
+	 VIHOBNrEzBmZA==
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-64320b9bb4bso919415a12.0
+        for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 19:28:28 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUZpNIaFqWLXyiujJ+qLwyADSQM0TBmADQFxRGnMoVMtEIDQ0d0yrnvHfXX4qUJGO26P5kbf8TdqQYf@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAngRnxLZ3eLZ/GEmzRtE50wateTbRzC+UPS017wSLT+dVQuzk
+	zdOjA27W9A3rwE99Z4X3ejsWEA6dIZi9qrfJzgPMQEE0atU8gSsP89vZ6NgUUXi1uv+f34niKjv
+	p4ExIWHxevtVolrxCfyq9lc/SF1nJVZI=
+X-Google-Smtp-Source: AGHT+IGbYpV7qsBDltxociGa2DuCApHME1J2Vp7kiM/cYEyQ7yYZYmKpuI5tekI1dv752JhsAahwqIsKQ2dy7Dw+YXc=
+X-Received: by 2002:a05:6402:5343:20b0:640:abb1:5eff with SMTP id
+ 4fb4d7f45d1cf-645396588c5mr15692547a12.8.1764127706874; Tue, 25 Nov 2025
+ 19:28:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAKYAXd8=buKQRve+pdBFp9ce+5MiR02ZnHtGHy-hYDfhGWn=pQ@mail.gmail.com>
+ <20251126014933.10085-1-pioooooooooip@gmail.com>
+In-Reply-To: <20251126014933.10085-1-pioooooooooip@gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 26 Nov 2025 12:28:13 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9wdmE66cg-T9d=+wGAL=0qb77S7uWd7PFi40pJsd9VLg@mail.gmail.com>
+X-Gm-Features: AWmQ_blB7nWD4OovujzloM_S5atxtDrOoFe2F9cRKe2lJUCOIuDSGRwhkSNGu08
+Message-ID: <CAKYAXd9wdmE66cg-T9d=+wGAL=0qb77S7uWd7PFi40pJsd9VLg@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: ipc: fix use-after-free in ipc_msg_send_request
+To: Qianchang Zhao <pioooooooooip@gmail.com>
+Cc: Steve French <smfrench@gmail.com>, gregkh@linuxfoundation.org, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Zhitong Liu <liuzhitong1993@gmail.com>, stable@vger.kernel.org
+Content-Type: multipart/mixed; boundary="0000000000004eba5f064476fd05"
 
-ipc_msg_send_request() waits for a generic netlink reply using an
-ipc_msg_table_entry on the stack. The generic netlink handler
-(handle_generic_event()/handle_response()) fills entry->response under
-ipc_msg_table_lock, but ipc_msg_send_request() used to validate and free
-entry->response without holding the same lock.
+--0000000000004eba5f064476fd05
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Under high concurrency this allows a race where handle_response() is
-copying data into entry->response while ipc_msg_send_request() has just
-freed it, leading to a slab-use-after-free reported by KASAN in
-handle_generic_event():
+On Wed, Nov 26, 2025 at 10:49=E2=80=AFAM Qianchang Zhao <pioooooooooip@gmai=
+l.com> wrote:
+>
+> ipc_msg_send_request() waits for a generic netlink reply using an
+> ipc_msg_table_entry on the stack. The generic netlink handler
+> (handle_generic_event()/handle_response()) fills entry->response under
+> ipc_msg_table_lock, but ipc_msg_send_request() used to validate and free
+> entry->response without holding the same lock.
+>
+> Under high concurrency this allows a race where handle_response() is
+> copying data into entry->response while ipc_msg_send_request() has just
+> freed it, leading to a slab-use-after-free reported by KASAN in
+> handle_generic_event():
+>
+>   BUG: KASAN: slab-use-after-free in handle_generic_event+0x3c4/0x5f0 [ks=
+mbd]
+>   Write of size 12 at addr ffff888198ee6e20 by task pool/109349
+>   ...
+>   Freed by task:
+>     kvfree
+>     ipc_msg_send_request [ksmbd]
+>     ksmbd_rpc_open -> ksmbd_session_rpc_open [ksmbd]
+>
+> Fix by:
+> - Taking ipc_msg_table_lock in ipc_msg_send_request() while validating
+>   entry->response, freeing it when invalid, and removing the entry from
+>   ipc_msg_table.
+> - Returning the final entry->response pointer to the caller only after
+>   the hash entry is removed under the lock.
+> - Returning NULL in the error path, preserving the original API
+>   semantics.
+>
+> This makes all accesses to entry->response consistent with
+> handle_response(), which already updates and fills the response buffer
+> under ipc_msg_table_lock, and closes the race that allowed the UAF.
+>
+> Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+> Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+I have directly updated your patch and applied it to #ksmbd-for-next-next.
+Let me know if the attached patch has some issue.
+Thanks!
 
-  BUG: KASAN: slab-use-after-free in handle_generic_event+0x3c4/0x5f0 [ksmbd]
-  Write of size 12 at addr ffff888198ee6e20 by task pool/109349
-  ...
-  Freed by task:
-    kvfree
-    ipc_msg_send_request [ksmbd]
-    ksmbd_rpc_open -> ksmbd_session_rpc_open [ksmbd]
+--0000000000004eba5f064476fd05
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-ksmbd-ipc-fix-use-after-free-in-ipc_msg_send_request.patch"
+Content-Disposition: attachment; 
+	filename="0001-ksmbd-ipc-fix-use-after-free-in-ipc_msg_send_request.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mifg26wb0>
+X-Attachment-Id: f_mifg26wb0
 
-Fix by:
-- Taking ipc_msg_table_lock in ipc_msg_send_request() while validating
-  entry->response, freeing it when invalid, and removing the entry from
-  ipc_msg_table.
-- Returning the final entry->response pointer to the caller only after
-  the hash entry is removed under the lock.
-- Returning NULL in the error path, preserving the original API
-  semantics.
-
-This makes all accesses to entry->response consistent with
-handle_response(), which already updates and fills the response buffer
-under ipc_msg_table_lock, and closes the race that allowed the UAF.
-
-Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
-Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
----
- fs/smb/server/transport_ipc.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
-index 46f87fd1c..7b1a060da 100644
---- a/fs/smb/server/transport_ipc.c
-+++ b/fs/smb/server/transport_ipc.c
-@@ -532,6 +532,7 @@ static int ipc_validate_msg(struct ipc_msg_table_entry *entry)
- static void *ipc_msg_send_request(struct ksmbd_ipc_msg *msg, unsigned int handle)
- {
- 	struct ipc_msg_table_entry entry;
-+	void *response = NULL;
- 	int ret;
- 
- 	if ((int)handle < 0)
-@@ -553,6 +554,8 @@ static void *ipc_msg_send_request(struct ksmbd_ipc_msg *msg, unsigned int handle
- 	ret = wait_event_interruptible_timeout(entry.wait,
- 					       entry.response != NULL,
- 					       IPC_WAIT_TIMEOUT);
-+
-+	down_write(&ipc_msg_table_lock);
- 	if (entry.response) {
- 		ret = ipc_validate_msg(&entry);
- 		if (ret) {
-@@ -560,11 +563,19 @@ static void *ipc_msg_send_request(struct ksmbd_ipc_msg *msg, unsigned int handle
- 			entry.response = NULL;
- 		}
- 	}
-+
-+	response = entry.response;
-+	hash_del(&entry.ipc_table_hlist);
-+	up_write(&ipc_msg_table_lock);
-+
-+	return response;
-+
- out:
- 	down_write(&ipc_msg_table_lock);
- 	hash_del(&entry.ipc_table_hlist);
- 	up_write(&ipc_msg_table_lock);
--	return entry.response;
-+
-+	return NULL;
- }
- 
- static int ksmbd_ipc_heartbeat_request(void)
--- 
-2.34.1
-
+RnJvbSAzODU4NjY1MzEzZjFmMGUxYzA5OTM0NDE4YjQzZWE2MzM3ZGQ1YjdmIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBRaWFuY2hhbmcgWmhhbyA8cGlvb29vb29vb29pcEBnbWFpbC5j
+b20+CkRhdGU6IFdlZCwgMjYgTm92IDIwMjUgMTI6MjQ6MTggKzA5MDAKU3ViamVjdDogW1BBVENI
+XSBrc21iZDogaXBjOiBmaXggdXNlLWFmdGVyLWZyZWUgaW4gaXBjX21zZ19zZW5kX3JlcXVlc3QK
+CmlwY19tc2dfc2VuZF9yZXF1ZXN0KCkgd2FpdHMgZm9yIGEgZ2VuZXJpYyBuZXRsaW5rIHJlcGx5
+IHVzaW5nIGFuCmlwY19tc2dfdGFibGVfZW50cnkgb24gdGhlIHN0YWNrLiBUaGUgZ2VuZXJpYyBu
+ZXRsaW5rIGhhbmRsZXIKKGhhbmRsZV9nZW5lcmljX2V2ZW50KCkvaGFuZGxlX3Jlc3BvbnNlKCkp
+IGZpbGxzIGVudHJ5LT5yZXNwb25zZSB1bmRlcgppcGNfbXNnX3RhYmxlX2xvY2ssIGJ1dCBpcGNf
+bXNnX3NlbmRfcmVxdWVzdCgpIHVzZWQgdG8gdmFsaWRhdGUgYW5kIGZyZWUKZW50cnktPnJlc3Bv
+bnNlIHdpdGhvdXQgaG9sZGluZyB0aGUgc2FtZSBsb2NrLgoKVW5kZXIgaGlnaCBjb25jdXJyZW5j
+eSB0aGlzIGFsbG93cyBhIHJhY2Ugd2hlcmUgaGFuZGxlX3Jlc3BvbnNlKCkgaXMKY29weWluZyBk
+YXRhIGludG8gZW50cnktPnJlc3BvbnNlIHdoaWxlIGlwY19tc2dfc2VuZF9yZXF1ZXN0KCkgaGFz
+IGp1c3QKZnJlZWQgaXQsIGxlYWRpbmcgdG8gYSBzbGFiLXVzZS1hZnRlci1mcmVlIHJlcG9ydGVk
+IGJ5IEtBU0FOIGluCmhhbmRsZV9nZW5lcmljX2V2ZW50KCk6CgogIEJVRzogS0FTQU46IHNsYWIt
+dXNlLWFmdGVyLWZyZWUgaW4gaGFuZGxlX2dlbmVyaWNfZXZlbnQrMHgzYzQvMHg1ZjAgW2tzbWJk
+XQogIFdyaXRlIG9mIHNpemUgMTIgYXQgYWRkciBmZmZmODg4MTk4ZWU2ZTIwIGJ5IHRhc2sgcG9v
+bC8xMDkzNDkKICAuLi4KICBGcmVlZCBieSB0YXNrOgogICAga3ZmcmVlCiAgICBpcGNfbXNnX3Nl
+bmRfcmVxdWVzdCBba3NtYmRdCiAgICBrc21iZF9ycGNfb3BlbiAtPiBrc21iZF9zZXNzaW9uX3Jw
+Y19vcGVuIFtrc21iZF0KCkZpeCBieToKLSBUYWtpbmcgaXBjX21zZ190YWJsZV9sb2NrIGluIGlw
+Y19tc2dfc2VuZF9yZXF1ZXN0KCkgd2hpbGUgdmFsaWRhdGluZwogIGVudHJ5LT5yZXNwb25zZSwg
+ZnJlZWluZyBpdCB3aGVuIGludmFsaWQsIGFuZCByZW1vdmluZyB0aGUgZW50cnkgZnJvbQogIGlw
+Y19tc2dfdGFibGUuCi0gUmV0dXJuaW5nIHRoZSBmaW5hbCBlbnRyeS0+cmVzcG9uc2UgcG9pbnRl
+ciB0byB0aGUgY2FsbGVyIG9ubHkgYWZ0ZXIKICB0aGUgaGFzaCBlbnRyeSBpcyByZW1vdmVkIHVu
+ZGVyIHRoZSBsb2NrLgotIFJldHVybmluZyBOVUxMIGluIHRoZSBlcnJvciBwYXRoLCBwcmVzZXJ2
+aW5nIHRoZSBvcmlnaW5hbCBBUEkKICBzZW1hbnRpY3MuCgpUaGlzIG1ha2VzIGFsbCBhY2Nlc3Nl
+cyB0byBlbnRyeS0+cmVzcG9uc2UgY29uc2lzdGVudCB3aXRoCmhhbmRsZV9yZXNwb25zZSgpLCB3
+aGljaCBhbHJlYWR5IHVwZGF0ZXMgYW5kIGZpbGxzIHRoZSByZXNwb25zZSBidWZmZXIKdW5kZXIg
+aXBjX21zZ190YWJsZV9sb2NrLCBhbmQgY2xvc2VzIHRoZSByYWNlIHRoYXQgYWxsb3dlZCB0aGUg
+VUFGLgoKQ2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcKUmVwb3J0ZWQtYnk6IFFpYW5jaGFuZyBa
+aGFvIDxwaW9vb29vb29vb2lwQGdtYWlsLmNvbT4KUmVwb3J0ZWQtYnk6IFpoaXRvbmcgTGl1IDxs
+aXV6aGl0b25nMTk5M0BnbWFpbC5jb20+ClNpZ25lZC1vZmYtYnk6IFFpYW5jaGFuZyBaaGFvIDxw
+aW9vb29vb29vb2lwQGdtYWlsLmNvbT4KQWNrZWQtYnk6IE5hbWphZSBKZW9uIDxsaW5raW5qZW9u
+QGtlcm5lbC5vcmc+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9z
+b2Z0LmNvbT4KLS0tCiBmcy9zbWIvc2VydmVyL3RyYW5zcG9ydF9pcGMuYyB8IDcgKysrKystLQog
+MSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1n
+aXQgYS9mcy9zbWIvc2VydmVyL3RyYW5zcG9ydF9pcGMuYyBiL2ZzL3NtYi9zZXJ2ZXIvdHJhbnNw
+b3J0X2lwYy5jCmluZGV4IDJjMDhjY2NmYTY4MC4uMmRiYWJlMmQ4MDA1IDEwMDY0NAotLS0gYS9m
+cy9zbWIvc2VydmVyL3RyYW5zcG9ydF9pcGMuYworKysgYi9mcy9zbWIvc2VydmVyL3RyYW5zcG9y
+dF9pcGMuYwpAQCAtNTUzLDEyICs1NTMsMTYgQEAgc3RhdGljIHZvaWQgKmlwY19tc2dfc2VuZF9y
+ZXF1ZXN0KHN0cnVjdCBrc21iZF9pcGNfbXNnICptc2csIHVuc2lnbmVkIGludCBoYW5kbGUKIAl1
+cF93cml0ZSgmaXBjX21zZ190YWJsZV9sb2NrKTsKIAogCXJldCA9IGlwY19tc2dfc2VuZChtc2cp
+OwotCWlmIChyZXQpCisJaWYgKHJldCkgeworCQlkb3duX3dyaXRlKCZpcGNfbXNnX3RhYmxlX2xv
+Y2spOwogCQlnb3RvIG91dDsKKwl9CiAKIAlyZXQgPSB3YWl0X2V2ZW50X2ludGVycnVwdGlibGVf
+dGltZW91dChlbnRyeS53YWl0LAogCQkJCQkgICAgICAgZW50cnkucmVzcG9uc2UgIT0gTlVMTCwK
+IAkJCQkJICAgICAgIElQQ19XQUlUX1RJTUVPVVQpOworCisJZG93bl93cml0ZSgmaXBjX21zZ190
+YWJsZV9sb2NrKTsKIAlpZiAoZW50cnkucmVzcG9uc2UpIHsKIAkJcmV0ID0gaXBjX3ZhbGlkYXRl
+X21zZygmZW50cnkpOwogCQlpZiAocmV0KSB7CkBAIC01NjcsNyArNTcxLDYgQEAgc3RhdGljIHZv
+aWQgKmlwY19tc2dfc2VuZF9yZXF1ZXN0KHN0cnVjdCBrc21iZF9pcGNfbXNnICptc2csIHVuc2ln
+bmVkIGludCBoYW5kbGUKIAkJfQogCX0KIG91dDoKLQlkb3duX3dyaXRlKCZpcGNfbXNnX3RhYmxl
+X2xvY2spOwogCWhhc2hfZGVsKCZlbnRyeS5pcGNfdGFibGVfaGxpc3QpOwogCXVwX3dyaXRlKCZp
+cGNfbXNnX3RhYmxlX2xvY2spOwogCXJldHVybiBlbnRyeS5yZXNwb25zZTsKLS0gCjIuMjUuMQoK
+--0000000000004eba5f064476fd05--
