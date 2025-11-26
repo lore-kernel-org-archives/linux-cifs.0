@@ -1,177 +1,169 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726302C9D
-	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 01:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92571D5CC7
+	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 01:49:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764119248; cv=none; b=T0+g92AzkMb9oEnIOd7WzP37xJ+0wgOrF48cMQQpu8mc3yCRTJjaisCaQZCLD7KedaLpl8BijxXh397qOHxGYp2UYdZby3hrsaboIhCgOou93APTRPMzZ2dl0vsPYWTgzKXetYZ5pJ4pa870ZTxUccI3F4T77Aoo6D7+9dBxdbM=
+	t=1764121792; cv=none; b=NN6jqe/UcdaZaDWXRgkIIaqtWwJdsGSZ1G1aF6kVTPjr/npqikcBRfWZlqhisbOmovYslH9pOcncsUEXTVBFBK8EhjoqNEwsLeci18UddMbKQ4OL2KfgRxujhFN/N28PV16n8OfW7ytHtGXAc/cjQOLWAwF8I9IpuTc5dvSneng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764119248; c=relaxed/simple;
-	bh=4j4prJ1loIfsv2jK9hZf/AhlJq1vyu2k3SCgc+a0DiY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C24tMYacBtdlirGe8DPEyNxAkoHNGNzg4EsBIeHQ30/9oiaBfLV0xyYUMo4dLQCfVglAVQkDtg4ibnctpEexQI5aOddUuskCyK3vJh0Ym/qUTbe0+a2Hr5Aj8INCvMZfPmuaRix3pIg8IEslomYwl1et9PSUsKEaZHm1tAuZlfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2jJBe86; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764121792; c=relaxed/simple;
+	bh=pWKdAtmbcjOBC/rjEzN8Ynk6y/vXR4p9htT1qe9JR4k=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Xs9IdcoBaiXUX2ZDpowI0N74QdGEkRZrpzZyYxhzUVdIYcy0Y/VwyoJwn8afXDLAzcksMPRug7pURLKjt5We962l1R6Y3cdUUae9EsEi21E8xQ9nCvQ2ScTWfAKqSoAc+36KgRkYirv/PFA30NWhq3cdhA5ZPcwvMO1vcDZRcNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jcQ5ODI+; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2jJBe86"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 078A7C19421
-	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 01:07:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764119248;
-	bh=4j4prJ1loIfsv2jK9hZf/AhlJq1vyu2k3SCgc+a0DiY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=W2jJBe86jX0Q1jEWgMJtbB0EOn0DCWLa46xqczWnqUsnQkHpl5viQRTOZ/j0COO+W
-	 LwAAabZNdt55FF7QTylxpIVy4ZuwteytBj8b1ZjjLglwc1mgsVu3rvV6R0OPAGBS0A
-	 DpWw/o1l13zW9vRIpVoMVGtHuAW8Ooo3QkkIeq1iYM88gqqAZiSwHOlc3vjYH+THs1
-	 8zcxiwX5eQILRvMFldZoD30EWPtDuJ6WiOJq1JrPf07sQLnWlichZuuAuXBHGjazJY
-	 UBbNbr9U6dNu+47k35R8vvLT8k6zpc7upPv79LcDMaRv7gWEgKhKctJhh+gPv5aG8e
-	 hV3WV5HI8smgw==
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6406f3dcc66so9891040a12.3
-        for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 17:07:27 -0800 (PST)
-X-Gm-Message-State: AOJu0YwOBGs7tMOhXuB1b22B3PsCSYTK/KJ4tMe5SG2XWL0toiWxpgxa
-	ZP5TsEpVHrBbFkqF7ghKT6UV9tU/Q49M/zH1PXbf0enthB9+anBQuZJuLfkDFFZZ+oVgTfldEaJ
-	/h+yTvnJcVf+xs6QrbiRRnERJtjWNZNo=
-X-Google-Smtp-Source: AGHT+IEnf08wlMbr4Q08I0+n1zOXDqkv7FG8rzgZ6TbR/EuZYOpwQBXw8/gnAR7H+t5q6Zbl5m5+Vhh99twJNTFQhjc=
-X-Received: by 2002:a05:6402:13ce:b0:640:947e:70ce with SMTP id
- 4fb4d7f45d1cf-64555b85acamr15860662a12.5.1764119246619; Tue, 25 Nov 2025
- 17:07:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jcQ5ODI+"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-299e43c1adbso7429505ad.3
+        for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 17:49:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764121790; x=1764726590; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c2JIwhg1M/+/Us4TNcrvjEWCQJJcUG3hiuOxKjzzsq8=;
+        b=jcQ5ODI+PFrMXzjVV/SSc+gsg6lDKiqqPtAwlNgmH5En1koBOf40KLSaLk8OrCppUl
+         qTnA4qNS7yI56q8cCfisfrKWzPJ+ceW+O4xYxUHloRZrdRR8oZvuW1zlmVWpFwotlrDt
+         RvzgcwW25xn8mIrOlL2S6Uy53z5lF9sll3cVAzs8Y0INZ9iMYBsRgnkFHStSYO5Rw8+N
+         2za0owNybyNhRcPMntkALozfH5ERHcOR0qXVceJhBpVpV98lkk4XJdjz5IBDfrx6mZhL
+         uqmA70mgFrMnYJYdsgcRp4/OqLQfZay/YEpZBNPG7RihRuQ762RCzAs6dsIz0b0ebM4L
+         Vm9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764121790; x=1764726590;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=c2JIwhg1M/+/Us4TNcrvjEWCQJJcUG3hiuOxKjzzsq8=;
+        b=hUPLs26Qa+GU+bWAgt2tlwHItrHWV9Yn2Nf5DgeQEmtVQ4gVEDvbMGy+mTtVfeQRyA
+         Y0sSAcTdxJgbtRxbJcuyEhwP9ch11zSGaVPRhm13GnC6Klh9ByugzlQbHz04Fcq8ndZf
+         JVK7xWHn2xYT6VfA/TpUP/9RNk+fhs/yG1bh+bFdQOFE9vRZsXUamBcNrLU5xHJCEYhq
+         NHFAziXrxeVR2AeGCMEv+S/tCByJUCZJSM13mnvJ8oksIPNS7DtxFnUggcdG0Bp7DXym
+         qgCdYv5n6LXD0Q1U6NO0RkR0WwkfsMwpcA3hRIAu9AK4SloMoJ2MrCZoqZ267Bwm8whU
+         llbA==
+X-Forwarded-Encrypted: i=1; AJvYcCXNN8o6cZAfXUYsPU5B0QnvuZCvK+88EUHCAS6RsyEAQrZS1I39KOTrmbYSZ7qPNK6CTUz9l58fE6vM@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6XMABTAxW4OVfTGpQi1NiQnYH6CV6YFdDRQyqNAR9wjuCZTMs
+	70LZvqH7d9VLoT5za2x0DWbUkYybKu7++Hn0M4M7Eoi4RjIgP1EsEINN
+X-Gm-Gg: ASbGncujDO4Q0pf17CdK1InQ4pnplFM/12VTXygsbvxd4BR3xdL4YpXNH6O2Mtnw+BN
+	RMt3hFDR7e2+NChw6pSMG8Hcf6AONqAJjl024ZqEox0GDtl/kTDfF/Hx8HvwfKx0vh1FJDYO7/v
+	vJhEoUDw1z2SmTSgK18q1Wigr4xTXfMwMCbxw5gDIoM9MS40aYgDfM/yMEfsl/fGmgIfzVbvKFo
+	2HEzoVynafEqN5e2/83SXEYsQ3oEFhxZ3CFmFoUZ5Pb/AizNPR5QWcFdYEUi7APLINY10s4rK0g
+	MxUPJLDxTSX6wHtR5msyDIeNf2TQgyGQ7N4a/Z0qRTg8OZsEYBci5+HgBbDmDbDjzw1OU2CuU/+
+	vDIAot+xCXr0uXQ8zQkbQkcLnCxmrIhhH4po/AQdf6RRRomTCE+zprWy9xsMb81m+ligOysKYr/
+	zoSAqRk+FtcwY9dNaFhVTR21oNVRKPNRf3WfXHE18AFXR1juhSiLkxTU1pijRGLUgSZ5mNNGJR
+X-Google-Smtp-Source: AGHT+IHrljL275fXtsXNqEjG58xd1IF8GPPmptkpdwAzH5JqK8ILh0LAGkZo45N/WI2fpgRCE5WxoQ==
+X-Received: by 2002:a17:903:1ae3:b0:290:c94a:f4c8 with SMTP id d9443c01a7336-29b6be83ec2mr109629045ad.1.1764121790102;
+        Tue, 25 Nov 2025 17:49:50 -0800 (PST)
+Received: from poi.localdomain (KD118158218050.ppp-bb.dion.ne.jp. [118.158.218.50])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b138c08sm174994755ad.25.2025.11.25.17.49.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Nov 2025 17:49:49 -0800 (PST)
+From: Qianchang Zhao <pioooooooooip@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: gregkh@linuxfoundation.org,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Zhitong Liu <liuzhitong1993@gmail.com>,
+	Qianchang Zhao <pioooooooooip@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: ipc: fix use-after-free in ipc_msg_send_request
+Date: Wed, 26 Nov 2025 10:49:33 +0900
+Message-Id: <20251126014933.10085-1-pioooooooooip@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CAKYAXd8=buKQRve+pdBFp9ce+5MiR02ZnHtGHy-hYDfhGWn=pQ@mail.gmail.com>
+References: <CAKYAXd8=buKQRve+pdBFp9ce+5MiR02ZnHtGHy-hYDfhGWn=pQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1764080338.git.metze@samba.org> <CAKYAXd_HKKBKx_B7+Z+b_jt+rHazuMkskYYPAp6BROPuy0uBfA@mail.gmail.com>
-In-Reply-To: <CAKYAXd_HKKBKx_B7+Z+b_jt+rHazuMkskYYPAp6BROPuy0uBfA@mail.gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 26 Nov 2025 10:07:14 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8Nb6Ay1-J0GeDUCzRDWWYtRtcU-2FZ1LrX9p8soKpaKQ@mail.gmail.com>
-X-Gm-Features: AWmQ_blBYvP1q6cepw1F9ocRFzh8URcE5zVIZr5F4HETE1xj2kMQdhzvD5ERR5Y
-Message-ID: <CAKYAXd8Nb6Ay1-J0GeDUCzRDWWYtRtcU-2FZ1LrX9p8soKpaKQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/4] smb: smbdirect/client/server: relax
- WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks
-To: Stefan Metzmacher <metze@samba.org>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>, 
-	Paulo Alcantara <pc@manguebit.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 26, 2025 at 8:50=E2=80=AFAM Namjae Jeon <linkinjeon@kernel.org>=
- wrote:
->
-> On Tue, Nov 25, 2025 at 11:22=E2=80=AFPM Stefan Metzmacher <metze@samba.o=
-rg> wrote:
-> >
-> > Hi,
-> >
-> > here are some small cleanups for a problem Nanjae reported,
-> > where two WARN_ON_ONCE(sc->status !=3D ...) checks where triggered
-> > by a Windows 11 client.
-> >
-> > The patches should relax the checks if an error happened before,
-> > they are intended for 6.18 final, as far as I can see the
-> > problem was introduced during the 6.18 cycle only.
-> >
-> > Given that v1 of this patchset produced a very useful WARN_ONCE()
-> > message, I'd really propose to keep this for 6.18, also for the
-> > client where the actual problem may not exists, but if they
-> > exist, it will be useful to have the more useful messages
-> > in 6.16 final.
-Anyway, Applied this patch-set to #ksmbd-for-next-next.
-Please check the below issue.
-> First, the warning message has been improved. Thanks.
-> However, when copying a 6-7GB file on a Windows client, the following
-> error occurs. These error messages did not occur when testing with the
-> older ksmbd rdma(https://github.com/namjaejeon/ksmbd).
->
-> [  424.088714] ksmbd: smb_direct: disconnected
-> [  424.088729] ksmbd: sock_read failed: -107
-> [  424.088881] ksmbd: Failed to send message: -107
-> [  424.088908] ksmbd: Failed to send message: -107
-> [  424.088922] ksmbd: Failed to send message: -107
-> [  424.088980] ksmbd: Failed to send message: -107
-> [  424.089044] ksmbd: Failed to send message: -107
-> [  424.089058] ksmbd: Failed to send message: -107
-> [  424.089062] ksmbd: Failed to send message: -107
-> [  424.089068] ksmbd: Failed to send message: -107
-> [  424.089078] ksmbd: Failed to send message: -107
-> [  424.089085] ksmbd: Failed to send message: -107
-> [  424.089104] ksmbd: smb_direct: Send error. status=3D'WR flushed (5)', =
-opcode=3D0
-> [  424.089111] ksmbd: Failed to send message: -107
-> [  424.089140] ksmbd: Failed to send message: -107
-> [  424.089160] ksmbd: Failed to send message: -107
-> [  424.090146] ksmbd: Failed to send message: -107
-> [  424.090160] ksmbd: Failed to send message: -107
-> [  424.090180] ksmbd: Failed to send message: -107
-> [  424.090188] ksmbd: Failed to send message: -107
-> [  424.090200] ksmbd: Failed to send message: -107
-> [  424.090228] ksmbd: Failed to send message: -107
-> [  424.090245] ksmbd: Failed to send message: -107
-> [  424.090261] ksmbd: Failed to send message: -107
-> [  424.090274] ksmbd: Failed to send message: -107
-> [  424.090317] ksmbd: Failed to send message: -107
-> [  424.090323] ksmbd: Failed to send message: -107
-> [  432.648368] ksmbd: smb_direct: disconnected
-> [  432.648383] ksmbd: sock_read failed: -107
-> [  432.648800] ksmbd: smb_direct: Send error. status=3D'WR flushed (5)', =
-opcode=3D0
-> [  432.649835] ksmbd: Failed to send message: -107
-> [  432.649870] ksmbd: Failed to send message: -107
-> [  432.649883] ksmbd: Failed to send message: -107
-> [  432.649894] ksmbd: Failed to send message: -107
-> [  432.649913] ksmbd: Failed to send message: -107
-> [  432.649966] ksmbd: Failed to send message: -107
-> [  432.650023] ksmbd: Failed to send message: -107
-> [  432.650077] ksmbd: Failed to send message: -107
-> [  432.650138] ksmbd: Failed to send message: -107
-> [  432.650151] ksmbd: Failed to send message: -107
-> [  432.650173] ksmbd: Failed to send message: -107
-> [  432.650182] ksmbd: Failed to send message: -107
-> [  432.650196] ksmbd: Failed to send message: -107
-> [  432.650205] ksmbd: Failed to send message: -107
-> [  432.650219] ksmbd: Failed to send message: -107
-> [  432.650229] ksmbd: Failed to send message: -107
-> [  432.650238] ksmbd: Failed to send message: -107
-> [  432.650256] ksmbd: Failed to send message: -107
-> [  432.650270] ksmbd: Failed to send message: -107
-> [  450.254342] ksmbd: Failed to send message: -107
-> [  450.254644] ksmbd: Failed to send message: -107
-> [  450.254672] ksmbd: Failed to send message: -107
-> [  450.254688] ksmbd: Failed to send message: -107
-> [  450.254825] ksmbd: Failed to send message: -107
-> [  450.254859] ksmbd: smb_direct: disconnected
-> [  450.254866] ksmbd: sock_read failed: -107
-> [  450.255282] ksmbd: smb_direct: Send error. status=3D'WR flushed (5)', =
-opcode=3D0
-> [  450.255342] ksmbd: smb_direct: Send error. status=3D'WR flushed (5)', =
-opcode=3D0
->
-> >
-> > Thanks!
-> > metze
-> >
-> > v3: move __SMBDIRECT_SOCKET_DISCONNECT() defines before including
-> >     smbdirect headers in order to avoid problems with the follow
-> >     up changes for 6.19
-> >
-> > v2: adjust for the case where the recv completion arrives before
-> >     RDMA_CM_EVENT_ESTABLISHED and improve commit messages
-> >
-> > Stefan Metzmacher (4):
-> >   smb: smbdirect: introduce SMBDIRECT_DEBUG_ERR_PTR() helper
-> >   smb: smbdirect: introduce SMBDIRECT_CHECK_STATUS_{WARN,DISCONNECT}()
-> >   smb: server: relax WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks in
-> >     recv_done() and smb_direct_cm_handler()
-> >   smb: client: relax WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks in
-> >     recv_done() and smbd_conn_upcall()
-> >
-> >  fs/smb/client/smbdirect.c                  | 28 ++++++------
-> >  fs/smb/common/smbdirect/smbdirect_socket.h | 51 ++++++++++++++++++++++
-> >  fs/smb/server/transport_rdma.c             | 40 +++++++++++++----
-> >  3 files changed, 98 insertions(+), 21 deletions(-)
-> >
-> > --
-> > 2.43.0
-> >
+ipc_msg_send_request() waits for a generic netlink reply using an
+ipc_msg_table_entry on the stack. The generic netlink handler
+(handle_generic_event()/handle_response()) fills entry->response under
+ipc_msg_table_lock, but ipc_msg_send_request() used to validate and free
+entry->response without holding the same lock.
+
+Under high concurrency this allows a race where handle_response() is
+copying data into entry->response while ipc_msg_send_request() has just
+freed it, leading to a slab-use-after-free reported by KASAN in
+handle_generic_event():
+
+  BUG: KASAN: slab-use-after-free in handle_generic_event+0x3c4/0x5f0 [ksmbd]
+  Write of size 12 at addr ffff888198ee6e20 by task pool/109349
+  ...
+  Freed by task:
+    kvfree
+    ipc_msg_send_request [ksmbd]
+    ksmbd_rpc_open -> ksmbd_session_rpc_open [ksmbd]
+
+Fix by:
+- Taking ipc_msg_table_lock in ipc_msg_send_request() while validating
+  entry->response, freeing it when invalid, and removing the entry from
+  ipc_msg_table.
+- Returning the final entry->response pointer to the caller only after
+  the hash entry is removed under the lock.
+- Returning NULL in the error path, preserving the original API
+  semantics.
+
+This makes all accesses to entry->response consistent with
+handle_response(), which already updates and fills the response buffer
+under ipc_msg_table_lock, and closes the race that allowed the UAF.
+
+Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+---
+ fs/smb/server/transport_ipc.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
+index 46f87fd1c..7b1a060da 100644
+--- a/fs/smb/server/transport_ipc.c
++++ b/fs/smb/server/transport_ipc.c
+@@ -532,6 +532,7 @@ static int ipc_validate_msg(struct ipc_msg_table_entry *entry)
+ static void *ipc_msg_send_request(struct ksmbd_ipc_msg *msg, unsigned int handle)
+ {
+ 	struct ipc_msg_table_entry entry;
++	void *response = NULL;
+ 	int ret;
+ 
+ 	if ((int)handle < 0)
+@@ -553,6 +554,8 @@ static void *ipc_msg_send_request(struct ksmbd_ipc_msg *msg, unsigned int handle
+ 	ret = wait_event_interruptible_timeout(entry.wait,
+ 					       entry.response != NULL,
+ 					       IPC_WAIT_TIMEOUT);
++
++	down_write(&ipc_msg_table_lock);
+ 	if (entry.response) {
+ 		ret = ipc_validate_msg(&entry);
+ 		if (ret) {
+@@ -560,11 +563,19 @@ static void *ipc_msg_send_request(struct ksmbd_ipc_msg *msg, unsigned int handle
+ 			entry.response = NULL;
+ 		}
+ 	}
++
++	response = entry.response;
++	hash_del(&entry.ipc_table_hlist);
++	up_write(&ipc_msg_table_lock);
++
++	return response;
++
+ out:
+ 	down_write(&ipc_msg_table_lock);
+ 	hash_del(&entry.ipc_table_hlist);
+ 	up_write(&ipc_msg_table_lock);
+-	return entry.response;
++
++	return NULL;
+ }
+ 
+ static int ksmbd_ipc_heartbeat_request(void)
+-- 
+2.34.1
+
