@@ -1,38 +1,67 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7394E33C1BB
-	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 16:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330D33451B0
+	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 22:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764173004; cv=none; b=IiF2xCIZ65dP3A1IdhPqpC4ihhbcNOYFcvKvmt2tXBKL7FgITGDWoinOpTiImDN3Qhi619oNmZ/THQ4Sv7Cop4PddxhbCTqDvFho7tFUTmWJH8XnC/JAtkM6ydem9MGovfJnzDVp08rVEictSB9nKvSlHYu3WHHfFkulmPNzY7c=
+	t=1764195546; cv=none; b=ljrgN7ryqNae9Vmc2Ua1Fli22+E9bgIFKuuE2WfVaxVni9TM9xyF3/4o3wvvUx2BY1GJNrr7hsVTjQMS6pJ0Bna9Pf3szgxDM3qRS9rt3MUPLodXizgTXPDAKnI67dOJpnzS1aRkIHuKT7387GGH4OaFft8jFq5PwP941/E7zp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764173004; c=relaxed/simple;
-	bh=qcvzwavDhA/NxMkwQOaaM+R2JqlgHaVLy+dUAFv2gX8=;
+	s=arc-20240116; t=1764195546; c=relaxed/simple;
+	bh=sIWbRcx7sC05bYi/YIY2zR/NKUvh0KWELOSEGo3Hfzw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iZ+B1ptFghgflSQ4IaSS8XTCXNA+OZsAtO0phFI8wX+8UbEHL7MC3fldI7Ob66U1TplBUcONsVOGLyBfPEZkZodI41gJMeU6kpByEL+MGyEM61kJWqiITmNkwW+Ge/YF4tebhTjMhAmSW+Q40CfQlTOMXuhIZ+ZEycyfls7J9JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=xkatiZ2C; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	 In-Reply-To:Content-Type; b=MBtt4FMQ9O1SVsSxQiuw4eNIBM2gBnCzSeLRzN6VsA0dJBsduMh+GBMRU/dp3gT7/HxQymZ8lC4Tbp1sYfYbyzOYGNE9jQexrP0KQm16uTFw/GZ8CGJXRuhqDpxtAp6w7cD8lvpIPTFPDu8OY0aMY8rb4dm7e+qiuGDvYYuJhhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Ceh0248k; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="xkatiZ2C"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=kHoyiQwUTzWQKihuxwrE7MsLoLeulN1ryAICzfbKsfQ=; b=xkatiZ2CuLawXdj/V0+CWISWxF
-	+C9CD6hj8plU5w3nXImCMjirNRBbre2X189TIgAVJxSrmkIP8w8yRZNgb+9bxAimFjbf7Sdbj4EeN
-	bSNAxxAQtgr9cjPPPmDK4L7so5rz+aUmuLZ5eIPIQHtgnhL9xMUcbAntlzj/9aKn9D5069gVtMLyq
-	7Ikb0M6JB3YdRoBnnYdGf3QOIaimfeIZ+H88+QtWKLioZ1rQ4cxKgeM/YF+TQ0fgxxhSpJCtBuB91
-	xPEbEMZZ8ELhlMP/Ry+LBUlaIsFLPrtdJwKJwaaeP26VzqTa2dumj6DBE/tw/fNN5H8sHMqM1JFHz
-	/xC1xNOpYHlwhI/UHSx+gkgwgGeJHRncImwXDEAD44OtP6NxZDd4+Yk2KLlH2LIP/rAC2ympQJvMu
-	si8sS5LKbjYvNFCIlyLWBDaF8XowNUSfxDZJpMxvX5eG8Hwhj3wF8AyDszhIZxAM7mA4yOOFHERk4
-	PQtC1VP75eYmvOiHQ/ZQrqL2;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vOHzE-00FrnC-0m;
-	Wed, 26 Nov 2025 16:03:20 +0000
-Message-ID: <ad3feff5-553d-4d98-b702-9c7a594dd7c0@samba.org>
-Date: Wed, 26 Nov 2025 17:03:19 +0100
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Ceh0248k"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-9486248f01bso11662439f.0
+        for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 14:19:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764195542; x=1764800342; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1wowXlow3FMc8/tNrN2yLigPPDUDtx0JGtrYUEW5hUk=;
+        b=Ceh0248kyaTc90MipJKQFJgX3pPuS4aCyr7FKFyuiJzy3OQ/nOTtsx4lt5ihaAC9Jf
+         wAT2Q6NI1gM6Oe9YzpFy1mCOAbkJ0fQKQerimlqRWQRutwNWAvyCJI6vn+tfrP23Uy+k
+         qIutfsaaHsQ8qoU/9dqZE/Y9eSb16YwGVPjVgqEyzZWUHY9ElHelTOxsrCwiO9qlYOpB
+         Wp2O43aKUDOL0CaR0d5pgOfUYklhoKpoivCoYqr6bCusqZCPvTaAxRDdumWMNf2YJaHK
+         rKIhcr45r7JnISjXQxWENBcHmMnuTI0TxuapbThn+Hc9e4VP7M4F4mFpdqbHIipsHI5O
+         sSOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764195542; x=1764800342;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1wowXlow3FMc8/tNrN2yLigPPDUDtx0JGtrYUEW5hUk=;
+        b=TM7uDn/RqWVx+/M6Gp/3mgK8cSubPW+3T07JH+RApGbfHUQmlS8A2Gr9t7uQADpFTv
+         OZfM3vDkfONXTEaA7j1rKcpMUT3aA2GNpHgWDmsZqljJrv9DNSCgvrlvavdURkB/DZnM
+         FXO7UWvL3TXltk5q3H47ufA7rg7TAcVsHD4c99KnJpHgGnczufUVCY/6bJZDgmBySB61
+         OtLlHRn8W1ACnmPrRsHdSpOFV1rnBP8k37IXiJKKTh0+O5IniLJHbT3PeHAdMbecZkwF
+         jo8K5xgsr2BNmuD4DB7T/xQ8opVadeO3GhqZD12kavBdfSa1wKekFQAlqmy9ynZK+hNz
+         LFUA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKrlICUkTnmFWm9+D5E8jU5f+ht2i3MQApROAvub9ugU+6mC3wE33ZKaAmQVfJEsqZYL2CUsb/INWs@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0/VdQ1KniQECWu1HH6xd8oz7OYsaHNZjjtWOrMqG5pa6EqR/B
+	jlT4/mk4bXnDx16Pg2HnZOjyzg+zpn71wm54A9NPUwnXvKrdXohgBlbaKhzZGSKHb0c=
+X-Gm-Gg: ASbGncuCZzoBXPrTVsFHKJ/a8W6+dGuxpx4LBOhHfxnWA5Ha436LprIzlzmAJCvrMUi
+	QexFKOS+JADAMDaxCwe7Kf0ZDJG+SC3yDzcFrGJC59gQND70h8tnEaQc2aCqWEVUlvI/ebW2u7O
+	xytUa/w5y6q3VehCyM/l84v4ihX+HREL1LM8ZY3zxUf6KdAQbVAt6Cd1FpHf6cYumFLtYkJCRNU
+	U6Psr3Za4IEBbDuFOnFB8vmsv+vTAwarIc4/zDBpS48bfJTxdCHXQIejsMEhwvA+NFftAOnuIu6
+	IwIUwygc14Nhmfc9ah9pkpo971vxb1hN8ioMCHQpuhbT1sllfVaEohuZJcrSyNsMnT/lZR4pbAZ
+	BuQvuHyTKFXilkKaZvOTaSkE8u3mx+9Hjnw434xBC9eZdxoqjfdX15bnTqfjnzt+XH+8BQtaqr/
+	b0X0EZLWYGtSg7ImCA
+X-Google-Smtp-Source: AGHT+IGxkxc8fCZt/xF4NNM9fIWKpLzM300DpmX1FeSS/Z4JaygfyFk1znrns1dtxauVsXPqqT3cZQ==
+X-Received: by 2002:a05:6602:26c9:b0:948:81a5:7ac9 with SMTP id ca18e2360f4ac-94948b3d514mr1644646239f.18.1764195542254;
+        Wed, 26 Nov 2025 14:19:02 -0800 (PST)
+Received: from [192.168.1.99] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-94938651ce7sm811919039f.10.2025.11.26.14.19.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Nov 2025 14:19:01 -0800 (PST)
+Message-ID: <46280bc6-0db9-4526-aa7d-3e1143c33303@kernel.dk>
+Date: Wed, 26 Nov 2025 15:19:00 -0700
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,67 +69,41 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/4] smb: smbdirect/client/server: relax
- WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>,
- samba-technical@lists.samba.org, Tom Talpey <tom@talpey.com>,
- Steve French <smfrench@gmail.com>
-References: <cover.1764080338.git.metze@samba.org>
- <CAKYAXd_HKKBKx_B7+Z+b_jt+rHazuMkskYYPAp6BROPuy0uBfA@mail.gmail.com>
- <2786ee25-b543-48a8-8fff-e6c7ff341774@samba.org>
- <CAKYAXd8N-j8K1CUUH9_+wXpEZBo5i=K=ywkQPjJmmo76JbmXng@mail.gmail.com>
- <bd457989-d73e-4098-b3f7-c6871f49d188@samba.org>
+Subject: Re: [PATCH] io_uring/net: wire up support for
+ sk->sk_prot->uring_cmd() with SOCKET_URING_OP_PASSTHROUGH_FLAG
+To: Stefan Metzmacher <metze@samba.org>, io-uring@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, netdev@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251126111931.1788970-1-metze@samba.org>
 Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <bd457989-d73e-4098-b3f7-c6871f49d188@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20251126111931.1788970-1-metze@samba.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Am 26.11.25 um 16:18 schrieb Stefan Metzmacher via samba-technical:
-> Am 26.11.25 um 16:17 schrieb Namjae Jeon:
->> On Wed, Nov 26, 2025 at 4:16 PM Stefan Metzmacher <metze@samba.org> wrote:
->>>
->>> Am 26.11.25 um 00:50 schrieb Namjae Jeon:
->>>> On Tue, Nov 25, 2025 at 11:22 PM Stefan Metzmacher <metze@samba.org> wrote:
->>>>>
->>>>> Hi,
->>>>>
->>>>> here are some small cleanups for a problem Nanjae reported,
->>>>> where two WARN_ON_ONCE(sc->status != ...) checks where triggered
->>>>> by a Windows 11 client.
->>>>>
->>>>> The patches should relax the checks if an error happened before,
->>>>> they are intended for 6.18 final, as far as I can see the
->>>>> problem was introduced during the 6.18 cycle only.
->>>>>
->>>>> Given that v1 of this patchset produced a very useful WARN_ONCE()
->>>>> message, I'd really propose to keep this for 6.18, also for the
->>>>> client where the actual problem may not exists, but if they
->>>>> exist, it will be useful to have the more useful messages
->>>>> in 6.16 final.
->>>> First, the warning message has been improved. Thanks.
->>>> However, when copying a 6-7GB file on a Windows client, the following
->>>> error occurs. These error messages did not occur when testing with the
->>>> older ksmbd rdma(https://github.com/namjaejeon/ksmbd).
->>>
->>> With transport_rdma.* from restored from 6.17?
->> I just tested it and this issue does not occur on ksmbd rdma of the 6.17 kernel.
+On 11/26/25 4:19 AM, Stefan Metzmacher wrote:
+> This will allow network protocols to implement async operations
+> instead of using ioctl() syscalls.
 > 
-> 6.17 or just transport_rdma.* from 6.17, but the rest from 6.18?
+> By using the high bit there's more than enough room for generic
+> calls to be added, but also more than enough for protocols to
+> implement their own specific opcodes.
 > 
+> The IPPROTO_SMBDIRECT socket layer [1] I'm currently working on,
+> will use this in future in order to let Samba use efficient RDMA offload.
 
-Can you also test with 6.17 + fad988a2158d743da7971884b93482a73735b25e
-Maybe that changed things in order to let RDMA READs fail or cause a
-disconnect.
+Patch looks fine to me, but I think it needs to be submitted with an
+actual user of it too. If not, then it's just unused infrastructure...
 
-Otherwise I'd suggest to test the following commits in order
-to find where the problem was introduced:
-177368b9924314bde7d2ea6dc93de0d9ba728b61
+> [1]
+> https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/master-ipproto-smbdirect
 
-After this it gets more tricky.
+This looks interesting, however!
 
-metze
-
-
+-- 
+Jens Axboe
 
