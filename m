@@ -1,169 +1,143 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A956256C84
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 23:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68943625
+	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 00:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764115164; cv=none; b=gw6u4BDSyo9wVH7FjnSXQbVOgj1agaTT2gyjYXt/zML7VnQnfdWRoRM5OAqdradeYvzYHV4cgWwRajH//6f7+G1ItlYePgA4jlEpPwD3e6N/X+jXXG/WIBlbfvm8mwaoGlgWNoAfLz8elT8p0S02He1TxKj1oe33tvAxWpBDN34=
+	t=1764115321; cv=none; b=glfKd65dyadl3umDdtwXs4rzn34A5vDZKKk3ZKVcOK/idIug8Vh/eeejSjud8fZVSrchVsxE2ejHHW4hW4q2OlFb1QA9bzYoodYAclpJQwqPCcpIrWVvNCnJyYjgovrBl3SZQRBK9yRBOpcajioSr4pBFPfYVPEARpVaFXgM77I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764115164; c=relaxed/simple;
-	bh=RovQq1KhcIqyH6tmSHlLo8msvWJrI2AjLdxdreD11qo=;
+	s=arc-20240116; t=1764115321; c=relaxed/simple;
+	bh=+XDXpyBZS1sTODjc5N9yid75ggmhqCspW2eKXF8HKtM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rNG/lbHh6fWCEWRPWdeZQ67xOhRW1N+tfngZqLFel/cpXMURXy/WQx64Xym285dpvRQPnOdd46TXs/h1dTomM66oEKzRt/7VkK554xzoegRsA/e239SQ45Wyf6Zd9+w6WEZupPHAfnkQaDcVTGSorPqEHIDa3BdQW55JqIdiDhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U2tjWbTj; arc=none smtp.client-ip=209.85.219.53
+	 To:Cc:Content-Type; b=j2MwYdW3YYW35oWvVOKe5m8sWUvKnx58ew0mi7PEH2bGihEgbZgHk0pQS3kpIIBzgLEXb9f6sRr+psfOqwLAeSFISeMypGzGwgX6jMaAeP8QRE2htDNsT4Y8IKiQH3YLIpAsNT5K9KqGJzTngv9iqvZ6gajcdF/56aKVy1kr+Oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nqKmY651; arc=none smtp.client-ip=209.85.219.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2tjWbTj"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-8824ce98111so94717586d6.0
-        for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 15:59:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nqKmY651"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-882399d60baso50490126d6.0
+        for <linux-cifs@vger.kernel.org>; Tue, 25 Nov 2025 16:01:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764115162; x=1764719962; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764115318; x=1764720118; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LGKAbXSOb/hIN/3EXOfiiEv3A7Hp4O1wFMrKhdxoDso=;
-        b=U2tjWbTjdirFao59AQ0YcM2zFFoeCBck29IcmEaOQqhoTrxKnwsXuPvcKpqutMDISs
-         BFPvOyHzj64i0Yu5VNCiDngCkp0bY1za/Kumaw+iDUeMbKCGaSuHbXo5ogbXGfXfIoSm
-         wAkXsDtep5hgU3lemrLFObJJ69fCFcGMHLIO7+G82tHbHYEt/ltUwj7MYSOLsqjxWOAB
-         MQCiwjHcDr31M5MNe1C97q7vKthybQohEmAYl8XjLDkxH8iXY7BGVc8UTpIqFPwZZuEa
-         JILswsyIDKWGkNOvlAns32fS+W6hrw3VQI5436tyDhmj1MCg2gr1JSzu0NUNJe/h34Zp
-         PqAQ==
+        bh=YaSSSTOEdPXrwvpfE69f6cHaGVAff9hm8HrlgzHFCzY=;
+        b=nqKmY651V5PrFucjB22nupw4R0cfivCSxNTWadBAU5TetTKby8zT1IfkdBXxqmGVGR
+         Lk9Rx0HW7NyVkqibDvQjQMpeEveSsRTdT66VF4E7mjrBsiE1QIC7KzDvDCcZGlAZ4+hG
+         O47EuliwokqYi6fItKuwAsmOPSvoqN2aBMigWLS1irXPB2MI/eKxWERsTqnUuMfPFaZW
+         NfiiAzpC1mVLFTpNvKeZJCMv7NQk5xgXhZTdAfA6ke5yJ7xsEWy1ogQF65ugBNdejLqV
+         L2ESwHYCYfw1OC6wnl57zudSvrkdohcwAT3OsqzBIvyNBdls8U4puO+Ax+l3gHPu0nMx
+         /9vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764115162; x=1764719962;
+        d=1e100.net; s=20230601; t=1764115318; x=1764720118;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=LGKAbXSOb/hIN/3EXOfiiEv3A7Hp4O1wFMrKhdxoDso=;
-        b=vutSDGei8rUDKKdZWCN3hyNm2KcaCCuhGczZizz+L/hVoupFqpoBuxBP36jHeif7qq
-         CIYgDRedbc0WWNbSCbZzO5nWJngrXlR10JqAnU14X5C3h4pCVqIuA4qw/vHAMy/zj147
-         CMGWgMYyJ6lbXITgR9sbtp7cxJKhs59d5XmxxzENkkjvz8L68O+UAeAjsN+k3oog35CF
-         p5g5gGVBTHHKAuO35AE1EED1IiLWDnfq56My+ivTLnNwvvYZ0dDwtWhj4tPGciIBSmbN
-         AHW3Jf2iYY1ZbpLIQNEmlU7eipicOwAHUmeuu7v2xh0gu73CK3Pd3CAopoiR9tcmNzZR
-         Vb2w==
-X-Forwarded-Encrypted: i=1; AJvYcCUxjkXl5meqbHgdvOM3/VtNE7AWht/jCF/7bj63ptQFvo4Vv5g4cAmioGDMxqbia9nAdLfsR88C21rI@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSUQUsLii52pkUu544ngQy5WfzT6WHmsXJPaN4gNZdWyit6BKW
-	3RezAXA42ms5PkOLuj4n0eJ7JmK2137Ctgmrrw6GhslMJKQMnsC1909IW0yDcQJWyC5DdFIo0s4
-	LAEWOuNj7Wy1A1oHKeTeeHwUsEdk8PLo=
-X-Gm-Gg: ASbGncsdmByRp2VBXuxz6TFKNZJjLvCmxFiRyG1O1X3kPRR1aLy1sUXbuDhE+2iXF/r
-	nCwUxV5vbzqumpsNxa+kHlsn6sAbNiJg4Q8rC1sZgm8Qu2EVc8zofknYmiovE4GuOkn08LkOJh4
-	Crwv3xGEMIU9gXXnyUjVoQpAS+I3Ix+5kZK167DoLg+i5Cm8DXjlWAi4piHU/tKSrZ0eekFBq35
-	l6ER+AueyVKiInttTaTVzTRXEa9gxSzJ0iW5aoJAPBcyNiUzqNFwaXzUbab/7EGKMZWcE7L0lgD
-	GUh1a8DozCA9+aJM0i06VxfYTOLOtHVn5VrMwqMLimi4LBHO+fq5i+3ROaQpAv6Nzi7/A7Qn4af
-	YKa2h1OZepBdFJcZ0/2I3YPsp9ZFjs9XeNEgfTg0PClQeqps3rXAxMmjCdY3au/qhZEabteakqZ
-	3k4QNw0TfO0DT89sY7wKNb
-X-Google-Smtp-Source: AGHT+IGvGBuP3gj1SzITT5yPR2BBx6IbHMF7PVeMxEYas9l4hy811l7wO/nNXAm0PljlOCe8AHwUQ0nz9gaJMntdsT4=
-X-Received: by 2002:a05:6214:508e:b0:880:298b:3a6d with SMTP id
- 6a1803df08f44-8847c515c4bmr283137986d6.35.1764115162003; Tue, 25 Nov 2025
- 15:59:22 -0800 (PST)
+        bh=YaSSSTOEdPXrwvpfE69f6cHaGVAff9hm8HrlgzHFCzY=;
+        b=aMwI6t7Ly6Xr1m9IHex/Sa40X7VSSAzGnSI62oQ8dOInqOcxH0/l19UmrInKnIHIPA
+         StckdCMa9Y6N4dwDsnEqGERJ1frbuC2kKH2yUuPrg1F8VPKEYYmRtFH3+GdcHSgKyiNX
+         4k34+G9J8MJLO6KyazPTHV7BTilavfi+rHarzLFGDMubrVkMwy8pgqQXnDTuqF4tibht
+         FVCdhIUhPmATR82H42I5B4UpAgTya98pNEkajVmqh0lSeRbtr02NuxiwiSUVv64JKuxc
+         L0YDpX1Jn9C2felKDpjMawAl/l+WwHs418IDdqn0w1guSo351XzSz3WZctsEiG04rYEj
+         /q/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWqHpt3hTkGdivCSbyljLuHbKce2NnBywsNpdG4l+l72SgGLMrlDv8LxQqHRm9kt85FtRQ6X1Udk1fx@vger.kernel.org
+X-Gm-Message-State: AOJu0YyR3YI9m1Pgx7b4MQhPd/hp3HzOIqmW2E7S4/T3upPn/snBWzQX
+	CVoXFjosh7Ch1mRPxy2ENAggJcRSOIChi+b6hx267pRmW7C7MtsbzgY8BqjZgSSyKB6Z8klpDvA
+	HkFZYyNf0W/vU1uLRu2WW3bnZnre1DMg=
+X-Gm-Gg: ASbGnct7h4qka/20RnGBYXvffgyFocy9FmW4Z2qqKo4ONGgDfVagog2K9b/rH+tDZfz
+	iB+I3jgKqea8/7WkRT5yHDd/LX93KLvW5wlp1TsB8A3d3ZjG8JoOI+aP87tK0kxzrQyEmabotzN
+	71zrdeqJckKDzCNcrwt4zyFco/YE6UYlk2onmBX+uRvrQ0Htl4SsaPBnwMibz1iSq7L8NMltNza
+	zX6a4Ct6aHEl8eoLj9sS/KB/iyibuCJSYLmp57OzESxphJuhYwcuUB1dBIHh1WvVe4MwtPCB91b
+	eRFOK6qv9+n8Ol6dlMPBum0UcnTBdBxyhWIBJm6AUkdJn7GchpR9LpI/P7bq92E8xUKFLeX3ftz
+	9SFhd+7NU2PWx92/wRwDAv9i3WzTv8PtX83d2NbwkEhITTD4mVFX9O4gtSJKOPk5UAKn4mtuxS1
+	tcX1neH9r76A==
+X-Google-Smtp-Source: AGHT+IH51IPA7dnzkdqYSZ2c+m1BcbaD/LmQCjY7kHofERYTrCSZPA7X/dmVToNHWejPwJa3FQbJ9WQmLnwdKf1qxmQ=
+X-Received: by 2002:a05:6214:4a8a:b0:880:2b54:2b91 with SMTP id
+ 6a1803df08f44-8863af6db9fmr78215956d6.36.1764115318151; Tue, 25 Nov 2025
+ 16:01:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251125195541.1701938-1-pc@manguebit.org>
-In-Reply-To: <20251125195541.1701938-1-pc@manguebit.org>
+References: <20251124200036.1582605-1-pc@manguebit.org>
+In-Reply-To: <20251124200036.1582605-1-pc@manguebit.org>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 25 Nov 2025 17:59:10 -0600
-X-Gm-Features: AWmQ_bmprbLgOxltibCwh_wV-OG1URFYExJL_Nr4aLpjs1iyFt2y0OVllv-h8HI
-Message-ID: <CAH2r5mutuLO4s6azh8g7D6Xs286mW_NyptEkF_6X3Uy4kY=FBw@mail.gmail.com>
-Subject: Re: [PATCH] cifscreds: fix parsing of commands and parameters
+Date: Tue, 25 Nov 2025 18:01:44 -0600
+X-Gm-Features: AWmQ_bmIm9Tjjon9TNUad3lCMSQ-ZuPZ7ZMab0WfcYrr7nwCar7ff1kHCRms3Zg
+Message-ID: <CAH2r5mvMrSxG+qmUz80XXDR-x0XNukdpRBP88KuG0n9mJtxrbw@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: fix memory leak in cifs_construct_tcon()
 To: Paulo Alcantara <pc@manguebit.org>
-Cc: piastryyy@gmail.com, Xiaoli Feng <xifeng@redhat.com>, Jay Shin <jaeshin@redhat.com>, 
-	linux-cifs@vger.kernel.org
+Cc: Jay Shin <jaeshin@redhat.com>, stable@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	David Howells <dhowells@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-added to cifs-utils for-next
+merged into cifs-2.6.git for-next and added RB from David Howells
 
-Do you know if this is a regression of cifs-utils and if so what release/wh=
-en?
-
-On Tue, Nov 25, 2025 at 1:55=E2=80=AFPM Paulo Alcantara <pc@manguebit.org> =
+On Mon, Nov 24, 2025 at 2:00=E2=80=AFPM Paulo Alcantara <pc@manguebit.org> =
 wrote:
 >
-> Fix the parsing of '--username' and '--timeout' options as both
-> require an argument by fixing the value passed in @optstring when
-> calling getopt_long(3).
+> When having a multiuser mount with domain=3D specified and using
+> cifscreds, cifs_set_cifscreds() will end up setting @ctx->domainname,
+> so it needs to be freed before leaving cifs_construct_tcon().
 >
-> Also fix the matching of commands by breaking the loop when an exact
-> match is found.  Otherwise `cifscreds clear ...` would return
-> "Ambiguous command" due to "clearall" command.
+> This fixes the following memory leak reported by kmemleak:
 >
-> * Before patch
+>   mount.cifs //srv/share /mnt -o domain=3DZELDA,multiuser,...
+>   su - testuser
+>   cifscreds add -d ZELDA -u testuser
+>   ...
+>   ls /mnt/1
+>   ...
+>   umount /mnt
+>   echo scan > /sys/kernel/debug/kmemleak
+>   cat /sys/kernel/debug/kmemleak
+>   unreferenced object 0xffff8881203c3f08 (size 8):
+>     comm "ls", pid 5060, jiffies 4307222943
+>     hex dump (first 8 bytes):
+>       5a 45 4c 44 41 00 cc cc                          ZELDA...
+>     backtrace (crc d109a8cf):
+>       __kmalloc_node_track_caller_noprof+0x572/0x710
+>       kstrdup+0x3a/0x70
+>       cifs_sb_tlink+0x1209/0x1770 [cifs]
+>       cifs_get_fattr+0xe1/0xf50 [cifs]
+>       cifs_get_inode_info+0xb5/0x240 [cifs]
+>       cifs_revalidate_dentry_attr+0x2d1/0x470 [cifs]
+>       cifs_getattr+0x28e/0x450 [cifs]
+>       vfs_getattr_nosec+0x126/0x180
+>       vfs_statx+0xf6/0x220
+>       do_statx+0xab/0x110
+>       __x64_sys_statx+0xd5/0x130
+>       do_syscall_64+0xbb/0x380
+>       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 >
-> $ ./cifscreds add -u testuser w22-root2.zelda.test
-> error: Could not resolve address for testuser
-> $ ./cifscreds add -u testuser -d ZELDA
-> Password:
-> $ grep 'cifs:[ad]' /proc/keys
-> 198de7a1 I--Q---     1 perm 0d0d0000     0     0 logon     cifs:d:testuse=
-r: 13
->                                                                   ^^ wron=
-g desc
-> $ ./cifscreds clear -u testuser w22-root2.zelda.test
-> Ambiguous command
-> $ ./cifscreds clear -u testuser -d ZELDA
-> Ambiguous command
->
-> * After patch
->
-> $ ./cifscreds add -u testuser w22-root2.zelda.test
-> Password:
-> $ ./cifscreds add -u testuser -d ZELDA
-> Password:
-> $ grep 'cifs:[ad]' /proc/keys
-> 089183a9 I--Q---     1 perm 0d0d0000     0     0 logon     cifs:a:192.168=
-.124.32: 17
-> 0ca5ed80 I--Q---     1 perm 0d0d0000     0     0 logon     cifs:d:ZELDA: =
-17
-> $ ./cifscreds clear -u testuser w22-root2.zelda.test
-> $ ./cifscreds clear -u testuser -d ZELDA
->
-> Reported-by: Xiaoli Feng <xifeng@redhat.com>
-> Reported-by: Jay Shin <jaeshin@redhat.com>
+> Fixes: f2aee329a68f ("cifs: set domainName when a domain-key is used in m=
+ultiuser")
 > Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-> Cc: Steve French <smfrench@gmail.com>
+> Cc: Jay Shin <jaeshin@redhat.com>
+> Cc: stable@vger.kernel.org
 > Cc: linux-cifs@vger.kernel.org
 > ---
->  cifscreds.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  fs/smb/client/connect.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/cifscreds.c b/cifscreds.c
-> index 295059f9683d..e8713be23d71 100644
-> --- a/cifscreds.c
-> +++ b/cifscreds.c
-> @@ -71,7 +71,7 @@ static struct command commands[] =3D {
->  static struct option longopts[] =3D {
->         {"username", 1, NULL, 'u'},
->         {"domain", 0, NULL, 'd' },
-> -       {"timeout", 0, NULL, 't' },
-> +       {"timeout", 1, NULL, 't' },
->         {NULL, 0, NULL, 0}
->  };
+> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+> index 55cb4b0cbd48..2f94d93b95e9 100644
+> --- a/fs/smb/client/connect.c
+> +++ b/fs/smb/client/connect.c
+> @@ -4451,6 +4451,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, k=
+uid_t fsuid)
 >
-> @@ -477,7 +477,7 @@ int main(int argc, char **argv)
->         if (argc =3D=3D 1)
->                 return usage();
->
-> -       while((n =3D getopt_long(argc, argv, "dut:", longopts, NULL)) !=
-=3D -1) {
-> +       while((n =3D getopt_long(argc, argv, "du:t:", longopts, NULL)) !=
-=3D -1) {
->                 switch (n) {
->                 case 'd':
->                         arg.keytype =3D (char) n;
-> @@ -507,7 +507,7 @@ int main(int argc, char **argv)
->                 if (cmd->name[n] =3D=3D 0) {
->                         /* exact match */
->                         best =3D cmd;
-> -                       continue;
-> +                       break;
->                 }
->
->                 /* partial match */
+>  out:
+>         kfree(ctx->username);
+> +       kfree(ctx->domainname);
+>         kfree_sensitive(ctx->password);
+>         kfree(origin_fullpath);
+>         kfree(ctx);
 > --
 > 2.51.1
 >
