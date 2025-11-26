@@ -1,90 +1,312 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307FA32E6B8
-	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 15:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE161314D35
+	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 15:46:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764170338; cv=none; b=oyeNP3dIUncOVDirprDDYTuewXwIBqPfejozWtWC2WWbIOl92wnVjt2ksNAI4UygWjr1VznEPptjR1TDt1GdfXiObxLp6KkiyrICjIP2nwqegKTz5JbkEuhfrDgTYRItyw3avEshTf1q2WJlXPu/ZFxOkhDOxgi83VuqmB+F/cg=
+	t=1764172022; cv=none; b=IvH4a5BrxxNawi5zuRJb4Kk390bAaUWG3yw0vGT/hBbSefRalOzpQe/wSVOKzwMgX87ZEiBTh1UgSTSqgwaEahOhfG6EaxPGZCQx4/uMC+kfoTdrY7R7WXEAP6Tu0p+rUgb+unvk0ixnLitMMVZPLodLJ6tIMVluzPTZJJBoX98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764170338; c=relaxed/simple;
-	bh=aLCZ5IQRG4S4UYkf3VihXYPz8/JOTP6xv4YiwhnB/8g=;
+	s=arc-20240116; t=1764172022; c=relaxed/simple;
+	bh=YNSIGSbbbEcnnk/EDfVA2YDstoqG6kQJ22PjK8tnkyE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m71ZrN8YfJ88N4UwXlPZ762YN57890+GUZdPakQgW65apoNPekG/JlwsKoCfzD7vLTnRvMC+KtIC6VsPk44TvI+WgeFzlsZ3jnyONWzqiDtu/N5spzbW5E2c9HCCi77npUXVsEwJxIVBj4BEsdMU020avhhndsMJ2jBDkaXBDDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=fsCwMiNi; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	 In-Reply-To:Content-Type; b=ptcGfuNJxsBFDbY0xuB3U5A87QQVJEyFTB5J/FEGnbpYtTei6rlTqght7fajrBpMCSFYiLlag2I7qpjtlNNY0ohYhKNQs5SCqGrTuO3vFiNanpfJMw3z3ISFLYS9xtHmVjCESF4yPnxqxzu7MHevK14dqMFAmsc+cbpRC0VIWMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UxaFJiDh; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="fsCwMiNi"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=aLCZ5IQRG4S4UYkf3VihXYPz8/JOTP6xv4YiwhnB/8g=; b=fsCwMiNiuXukd0mGo234i3ogJ3
-	4TpMfRX9sF1crtmB5FsA7xGRZkRqCwvEem2FNJC+RjZiC1HdZ/5QvYQkscYep1LNt8qsZfY8kR8MI
-	i8OlE/0x31CTc+c9Sth3ej1tYgvQzCemsJsg/q/QwxTHWesVr5umHi7rvebuqsYFB2Zgp/4T4ghLO
-	AglUP0AIWJ7WyeAn6GtY8AiGpDNtnKZUcz9LrxUoMCgwyKCeKR8R22Ijj6dQCqrh/Wi9U5CF5sXX4
-	xentPmM45ADuB8vCfPu1t7sgjWHd2VussDM48/AjmTuOaJd2/6i3uaDo+PYv367ycJtpF9zuWFImc
-	g5N7m4ImyHs6Pf/H5thqhz30BpFOkzMbTCqhyoW8Q2dg+EzZEbZG7SG/wMpPbxYAV5xsPGmU1+0Ub
-	sbkmpOM3pVDBHtqUs2s403+9TDXz/t2vsahwa2LMAxE5o8Xsz4OdQAq79RJUDpI2p6h6InX8qq3//
-	3qAifWz39l76SqcseFpL5Or3;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vOHIB-00FrQd-06;
-	Wed, 26 Nov 2025 15:18:51 +0000
-Message-ID: <bd457989-d73e-4098-b3f7-c6871f49d188@samba.org>
-Date: Wed, 26 Nov 2025 16:18:50 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UxaFJiDh"
+Message-ID: <816dc39e-432c-420d-94c9-ea98d9ceeecc@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764172007;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5YWluvWb8kLOWBbF4D5DVIhYl2+1SN29yNbQ0umOsLA=;
+	b=UxaFJiDhVz8gF6E1QL12TtUIzjIucmu0JoahCG1tAT7joGqvDw9OxE9oi8sQdj86NeQ+Xt
+	s3JULibFQe9MDBoobBdYKL3FkxbLvvXpt8iZpCkOFDJCFGoNeouM3kX3GfBRLGZis5CD+m
+	+NwiTgjOp1bQS426XBOSG9AA+rrZ98M=
+Date: Wed, 26 Nov 2025 16:46:45 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/4] smb: smbdirect/client/server: relax
- WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
- Long Li <longli@microsoft.com>, Paulo Alcantara <pc@manguebit.org>
-References: <cover.1764080338.git.metze@samba.org>
- <CAKYAXd_HKKBKx_B7+Z+b_jt+rHazuMkskYYPAp6BROPuy0uBfA@mail.gmail.com>
- <2786ee25-b543-48a8-8fff-e6c7ff341774@samba.org>
- <CAKYAXd8N-j8K1CUUH9_+wXpEZBo5i=K=ywkQPjJmmo76JbmXng@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAKYAXd8N-j8K1CUUH9_+wXpEZBo5i=K=ywkQPjJmmo76JbmXng@mail.gmail.com>
+Subject: Re: [PATCH v2] RDMA/siw: reclassify sockets in order to avoid false
+ positives from lockdep
+To: Stefan Metzmacher <metze@samba.org>, linux-rdma@vger.kernel.org
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ netdev@vger.kernel.org, linux-cifs@vger.kernel.org
+References: <20251126150842.1837072-1-metze@samba.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Bernard Metzler <bernard.metzler@linux.dev>
+In-Reply-To: <20251126150842.1837072-1-metze@samba.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Am 26.11.25 um 16:17 schrieb Namjae Jeon:
-> On Wed, Nov 26, 2025 at 4:16 PM Stefan Metzmacher <metze@samba.org> wrote:
->>
->> Am 26.11.25 um 00:50 schrieb Namjae Jeon:
->>> On Tue, Nov 25, 2025 at 11:22 PM Stefan Metzmacher <metze@samba.org> wrote:
->>>>
->>>> Hi,
->>>>
->>>> here are some small cleanups for a problem Nanjae reported,
->>>> where two WARN_ON_ONCE(sc->status != ...) checks where triggered
->>>> by a Windows 11 client.
->>>>
->>>> The patches should relax the checks if an error happened before,
->>>> they are intended for 6.18 final, as far as I can see the
->>>> problem was introduced during the 6.18 cycle only.
->>>>
->>>> Given that v1 of this patchset produced a very useful WARN_ONCE()
->>>> message, I'd really propose to keep this for 6.18, also for the
->>>> client where the actual problem may not exists, but if they
->>>> exist, it will be useful to have the more useful messages
->>>> in 6.16 final.
->>> First, the warning message has been improved. Thanks.
->>> However, when copying a 6-7GB file on a Windows client, the following
->>> error occurs. These error messages did not occur when testing with the
->>> older ksmbd rdma(https://github.com/namjaejeon/ksmbd).
->>
->> With transport_rdma.* from restored from 6.17?
-> I just tested it and this issue does not occur on ksmbd rdma of the 6.17 kernel.
+On 26.11.2025 16:08, Stefan Metzmacher wrote:
+> While developing IPPROTO_SMBDIRECT support for the code
+> under fs/smb/common/smbdirect [1], I noticed false positives like this:
+> 
+> [T79] ======================================================
+> [T79] WARNING: possible circular locking dependency detected
+> [T79] 6.18.0-rc4-metze-kasan-lockdep.01+ #1 Tainted: G           OE
+> [T79] ------------------------------------------------------
+> [T79] kworker/2:0/79 is trying to acquire lock:
+> [T79] ffff88801f968278 (sk_lock-AF_INET){+.+.}-{0:0},
+>                          at: sock_set_reuseaddr+0x14/0x70
+> [T79]
+>          but task is already holding lock:
+> [T79] ffffffffc10f7230 (lock#9){+.+.}-{4:4},
+>                          at: rdma_listen+0x3d2/0x740 [rdma_cm]
+> [T79]
+>          which lock already depends on the new lock.
+> 
+> [T79]
+>          the existing dependency chain (in reverse order) is:
+> [T79]
+>          -> #1 (lock#9){+.+.}-{4:4}:
+> [T79]        __lock_acquire+0x535/0xc30
+> [T79]        lock_acquire.part.0+0xb3/0x240
+> [T79]        lock_acquire+0x60/0x140
+> [T79]        __mutex_lock+0x1af/0x1c10
+> [T79]        mutex_lock_nested+0x1b/0x30
+> [T79]        cma_get_port+0xba/0x7d0 [rdma_cm]
+> [T79]        rdma_bind_addr_dst+0x598/0x9a0 [rdma_cm]
+> [T79]        cma_bind_addr+0x107/0x320 [rdma_cm]
+> [T79]        rdma_resolve_addr+0xa3/0x830 [rdma_cm]
+> [T79]        destroy_lease_table+0x12b/0x420 [ksmbd]
+> [T79]        ksmbd_NTtimeToUnix+0x3e/0x80 [ksmbd]
+> [T79]        ndr_encode_posix_acl+0x6e9/0xab0 [ksmbd]
+> [T79]        ndr_encode_v4_ntacl+0x53/0x870 [ksmbd]
+> [T79]        __sys_connect_file+0x131/0x1c0
+> [T79]        __sys_connect+0x111/0x140
+> [T79]        __x64_sys_connect+0x72/0xc0
+> [T79]        x64_sys_call+0xe7d/0x26a0
+> [T79]        do_syscall_64+0x93/0xff0
+> [T79]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [T79]
+>          -> #0 (sk_lock-AF_INET){+.+.}-{0:0}:
+> [T79]        check_prev_add+0xf3/0xcd0
+> [T79]        validate_chain+0x466/0x590
+> [T79]        __lock_acquire+0x535/0xc30
+> [T79]        lock_acquire.part.0+0xb3/0x240
+> [T79]        lock_acquire+0x60/0x140
+> [T79]        lock_sock_nested+0x3b/0xf0
+> [T79]        sock_set_reuseaddr+0x14/0x70
+> [T79]        siw_create_listen+0x145/0x1540 [siw]
+> [T79]        iw_cm_listen+0x313/0x5b0 [iw_cm]
+> [T79]        cma_iw_listen+0x271/0x3c0 [rdma_cm]
+> [T79]        rdma_listen+0x3b1/0x740 [rdma_cm]
+> [T79]        cma_listen_on_dev+0x46a/0x750 [rdma_cm]
+> [T79]        rdma_listen+0x4b0/0x740 [rdma_cm]
+> [T79]        ksmbd_rdma_init+0x12b/0x270 [ksmbd]
+> [T79]        ksmbd_conn_transport_init+0x26/0x70 [ksmbd]
+> [T79]        server_ctrl_handle_work+0x1e5/0x280 [ksmbd]
+> [T79]        process_one_work+0x86c/0x1930
+> [T79]        worker_thread+0x6f0/0x11f0
+> [T79]        kthread+0x3ec/0x8b0
+> [T79]        ret_from_fork+0x314/0x400
+> [T79]        ret_from_fork_asm+0x1a/0x30
+> [T79]
+>          other info that might help us debug this:
+> 
+> [T79]  Possible unsafe locking scenario:
+> 
+> [T79]        CPU0                    CPU1
+> [T79]        ----                    ----
+> [T79]   lock(lock#9);
+> [T79]                                lock(sk_lock-AF_INET);
+> [T79]                                lock(lock#9);
+> [T79]   lock(sk_lock-AF_INET);
+> [T79]
+>           *** DEADLOCK ***
+> 
+> [T79] 5 locks held by kworker/2:0/79:
+> [T79] #0: ffff88800120b158 ((wq_completion)events_long){+.+.}-{0:0},
+>                             at: process_one_work+0xfca/0x1930
+> [T79] #1: ffffc9000474fd00 ((work_completion)(&ctrl->ctrl_work))
+>                             {+.+.}-{0:0},
+>                             at: process_one_work+0x804/0x1930
+> [T79] #2: ffffffffc11307d0 (ctrl_lock){+.+.}-{4:4},
+>                             at: server_ctrl_handle_work+0x21/0x280 [ksmbd]
+> [T79] #3: ffffffffc11347b0 (init_lock){+.+.}-{4:4},
+>                             at: ksmbd_conn_transport_init+0x18/0x70 [ksmbd]
+> [T79] #4: ffffffffc10f7230 (lock#9){+.+.}-{4:4},
+>                              at: rdma_listen+0x3d2/0x740 [rdma_cm]
+> [T79]
+>          stack backtrace:
+> [T79] CPU: 2 UID: 0 PID: 79 Comm: kworker/2:0 Kdump: loaded
+>        Tainted: G           OE
+>        6.18.0-rc4-metze-kasan-lockdep.01+ #1 PREEMPT(voluntary)
+> [T79] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+> [T79] Hardware name: innotek GmbH VirtualBox/VirtualBox,
+>        BIOS VirtualBox 12/01/2006
+> [T79] Workqueue: events_long server_ctrl_handle_work [ksmbd]
+> ...
+> [T79]  print_circular_bug+0xfd/0x130
+> [T79]  check_noncircular+0x150/0x170
+> [T79]  check_prev_add+0xf3/0xcd0
+> [T79]  validate_chain+0x466/0x590
+> [T79]  __lock_acquire+0x535/0xc30
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  lock_acquire.part.0+0xb3/0x240
+> [T79]  ? sock_set_reuseaddr+0x14/0x70
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? __kasan_check_write+0x14/0x30
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? apparmor_socket_post_create+0x180/0x700
+> [T79]  lock_acquire+0x60/0x140
+> [T79]  ? sock_set_reuseaddr+0x14/0x70
+> [T79]  lock_sock_nested+0x3b/0xf0
+> [T79]  ? sock_set_reuseaddr+0x14/0x70
+> [T79]  sock_set_reuseaddr+0x14/0x70
+> [T79]  siw_create_listen+0x145/0x1540 [siw]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? local_clock_noinstr+0xe/0xd0
+> [T79]  ? __pfx_siw_create_listen+0x10/0x10 [siw]
+> [T79]  ? trace_preempt_on+0x4c/0x130
+> [T79]  ? __raw_spin_unlock_irqrestore+0x4a/0x90
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? preempt_count_sub+0x52/0x80
+> [T79]  iw_cm_listen+0x313/0x5b0 [iw_cm]
+> [T79]  cma_iw_listen+0x271/0x3c0 [rdma_cm]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  rdma_listen+0x3b1/0x740 [rdma_cm]
+> [T79]  ? _raw_spin_unlock+0x2c/0x60
+> [T79]  ? __pfx_rdma_listen+0x10/0x10 [rdma_cm]
+> [T79]  ? rdma_restrack_add+0x12c/0x630 [ib_core]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  cma_listen_on_dev+0x46a/0x750 [rdma_cm]
+> [T79]  rdma_listen+0x4b0/0x740 [rdma_cm]
+> [T79]  ? __pfx_rdma_listen+0x10/0x10 [rdma_cm]
+> [T79]  ? cma_get_port+0x30d/0x7d0 [rdma_cm]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? rdma_bind_addr_dst+0x598/0x9a0 [rdma_cm]
+> [T79]  ksmbd_rdma_init+0x12b/0x270 [ksmbd]
+> [T79]  ? __pfx_ksmbd_rdma_init+0x10/0x10 [ksmbd]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? register_netdevice_notifier+0x1dc/0x240
+> [T79]  ksmbd_conn_transport_init+0x26/0x70 [ksmbd]
+> [T79]  server_ctrl_handle_work+0x1e5/0x280 [ksmbd]
+> [T79]  process_one_work+0x86c/0x1930
+> [T79]  ? __pfx_process_one_work+0x10/0x10
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? assign_work+0x16f/0x280
+> [T79]  worker_thread+0x6f0/0x11f0
+> 
+> I was not able to reproduce this as I was testing with various
+> runs switching siw and rxe as well as IPPROTO_SMBDIRECT sockets,
+> while the above stack used siw with the non IPPROTO_SMBDIRECT
+> patches [1].
+> 
+> Even if this patch doesn't solve the above I think it's
+> a good idea to reclassify the sockets used by siw,
+> I also send patches for rxe to reclassify, as well
+> as my IPPROTO_SMBDIRECT socket patches [1] will do it,
+> this should minimize potential false positives.
+> 
+> [1]
+> https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/master-ipproto-smbdirect
+> 
+> Cc: Bernard Metzler <bernard.metzler@linux.dev>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: linux-rdma@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-cifs@vger.kernel.org
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+> 
+> ---
+> 
+> v2: - use CONFIG_DEBUG_LOCK_ALLOC (Bernard)
+>      - add a comment (Bernard)
+>      - AF_INET vs. AF_INET6 (Bernard)
+> ---
+>   drivers/infiniband/sw/siw/siw_cm.c | 51 ++++++++++++++++++++++++++++++
+>   1 file changed, 51 insertions(+)
+> 
+> diff --git a/drivers/infiniband/sw/siw/siw_cm.c b/drivers/infiniband/sw/siw/siw_cm.c
+> index 708b13993fdf..79dd44cd6bc3 100644
+> --- a/drivers/infiniband/sw/siw/siw_cm.c
+> +++ b/drivers/infiniband/sw/siw/siw_cm.c
+> @@ -39,6 +39,55 @@ static void siw_cm_llp_error_report(struct sock *s);
+>   static int siw_cm_upcall(struct siw_cep *cep, enum iw_cm_event_type reason,
+>   			 int status);
+>   
+> +
+> +#ifdef CONFIG_DEBUG_LOCK_ALLOC
+> +/*
+> + * lockdep can detect false positive circular dependencies
+> + * when there are user-space socket API users or in kernel
+> + * users switching between a tcp and rdma transport.
+> + * Maybe also switching between siw and rxe may cause
+> + * problems as per default sockets are only classified
+> + * by family and not by ip protocol. And there might
+> + * be different locks used between the application
+> + * and the low level sockets.
+> + *
+> + * Problems were seen with ksmbd.ko and cifs.ko,
+> + * switching transports, use git blame to find
+> + * more details.
+> + */
+> +static struct lock_class_key siw_sk_key[2];
+> +static struct lock_class_key siw_slock_key[2];
+> +#endif /* CONFIG_DEBUG_LOCK_ALLOC */
+> +
+> +static inline void siw_reclassify_socket(struct socket *sock)
+> +{
+> +#ifdef CONFIG_DEBUG_LOCK_ALLOC
+> +	struct sock *sk = sock->sk;
+> +
+> +	if (WARN_ON_ONCE(!sock_allow_reclassification(sk)))
+> +		return;
+> +
+> +	switch (sk->sk_family) {
+> +	case AF_INET:
+> +		sock_lock_init_class_and_name(sk,
+> +					      "slock-AF_INET-RDMA-SIW",
+> +					      &siw_slock_key[0],
+> +					      "sk_lock-AF_INET-RDMA-SIW",
+> +					      &siw_sk_key[0]);
+> +		break;
+> +	case AF_INET6:
+> +		sock_lock_init_class_and_name(sk,
+> +					      "slock-AF_INET6-RDMA-SIW",
+> +					      &siw_slock_key[1],
+> +					      "sk_lock-AF_INET6-RDMA-SIW",
+> +					      &siw_sk_key[1]);
+> +		break;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +	}
+> +#endif /* CONFIG_DEBUG_LOCK_ALLOC */
+> +}
+> +
+>   static void siw_sk_assign_cm_upcalls(struct sock *sk)
+>   {
+>   	struct siw_cep *cep = sk_to_cep(sk);
+> @@ -1394,6 +1443,7 @@ int siw_connect(struct iw_cm_id *id, struct iw_cm_conn_param *params)
+>   	rv = sock_create(v4 ? AF_INET : AF_INET6, SOCK_STREAM, IPPROTO_TCP, &s);
+>   	if (rv < 0)
+>   		goto error;
+> +	siw_reclassify_socket(s);
+>   
+>   	/*
+>   	 * NOTE: For simplification, connect() is called in blocking
+> @@ -1770,6 +1820,7 @@ int siw_create_listen(struct iw_cm_id *id, int backlog)
+>   	rv = sock_create(addr_family, SOCK_STREAM, IPPROTO_TCP, &s);
+>   	if (rv < 0)
+>   		return rv;
+> +	siw_reclassify_socket(s);
+>   
+>   	/*
+>   	 * Allow binding local port when still in TIME_WAIT from last close.
 
-6.17 or just transport_rdma.* from 6.17, but the rest from 6.18?
+Thank you, looks good.
 
-
+Acked-by: Bernard Metzler <bernard.metzler@linux.dev>
