@@ -1,154 +1,286 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1995C1A23B9;
-	Wed, 26 Nov 2025 11:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD78270ED9
+	for <linux-cifs@vger.kernel.org>; Wed, 26 Nov 2025 14:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764155991; cv=none; b=Bzi6NdLppUsU4ToIjWEmqWTeFCuJ1JSZfLUt+pmTxbx9fw5rMhBv8QDe8Pf6NT6kz4OzJhxkYiSr+EOsVTibvXmLQnp2y/euj+dLf8JSeKaEAwWNAZAbPfp9Zfx4MgFkqFa59CSwdNNyJOa+D8Ucm7d00tDoAZf/7AlfyS3FAwk=
+	t=1764166618; cv=none; b=pJ7LLkX12As+cDEvs/B7vA01KOuZk2kBpc2kAazkjJpYDWIx7kzVpnVPD0d/pHVDzTFR6Iws8N+hYzSZhOnjXEtLAx21VAQM7eYnlyXKZAKxEPI6RrADA+TRW3vHCuqSv+fK5lECWsfEwxMW/bccZatwadKhMqCS9M4gZUlJs7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764155991; c=relaxed/simple;
-	bh=g3hn8AjbhMVAx+wCU06zKPVtYRw9XskdtyCrp63n4I4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xqapl84fCl/5H55UEELgdiE5G+rHospGMj9MG4RiG9PCXVix5Lf2LD2hUNSbuLkk/2MkhO91rjvyYedwmGxqjQKttKtt0w7N8z05GXvDbGwLyvf1F9UcXLbHwOKczTREcV4efxrJO0EYfk3FZ5tnfBSgOIdxhhHlcDwxmIFr3/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=WQIGuiAF; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1764166618; c=relaxed/simple;
+	bh=AEDGAQM1/PF1m0UH1fIaRJ1Q+AToRWT6itSQj3b2oVw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BvcpayVhZND/U+yPxo2wRyHW8oZinjW6jCEJRn6ZL9OFmXcvd4AIQADyx3TsnPR/gzKnCW4pe2FoXXDVtWIajDq9MAUkizaL6Wan2ztpC5SJuYif8yWmWRXiUY5CIE4t9cih9kQ5IClgr15Qw3AqmfkS89HtEFXPBCFq8YYClgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ax3yLXFB; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="WQIGuiAF"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=8Gw8eUmrcCieUahIupp42RD4TKbZ1gHNJBT+5hmtk8k=; b=WQIGuiAFdol8RQXtAa4GO+t2cb
-	1ivw7FA3SmrTyxzaq6BkYUc78UK184SnZ4Zcld7Aar9vGoZ6I1aHYRPeWaoa2Rn3DvNLRN/tNEU6t
-	wZMnfGt62MenU5XW8qgExaqNbthCGObMVFu9WcP9rmV3o3KwPcgl413PHSxihdt/fLkcZ9PRfn0+z
-	wdZjq1u1Cbe8MuBYSB6eZlrQ5G0d1aSYrjsrcR2TkgHIX7/wwBG93p2EuBEpdz8yY7YOaHpl5bUpA
-	aq99/BrfaI1XI0+QYNlw0NaGYsTi5zCCBzrQjj5dWq07hUBNNCi9eNGCSuRgO4Iyd5OL92wyCYLyJ
-	vzu0jPSy0KvtlHsgffe7cfHmmcJUGN+ACMWtDHP/hz/lH2t+17c4RFF6LKCFBD0sBqLBrWvPDX0EK
-	1nIZ9TbkORTxjaS28PHTmaPVdMRdg1mjtgHx6j6Kv68FYC3fjJwHzb+TY38+2IVu9cRMW+aFXVNBE
-	gxbamThM8YgIyQHVf9jSxY40;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vODYn-00FpGv-10;
-	Wed, 26 Nov 2025 11:19:45 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: io-uring@vger.kernel.org
-Cc: metze@samba.org,
-	Jens Axboe <axboe@kernel.dk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	netdev@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] io_uring/net: wire up support for sk->sk_prot->uring_cmd() with SOCKET_URING_OP_PASSTHROUGH_FLAG
-Date: Wed, 26 Nov 2025 12:19:31 +0100
-Message-ID: <20251126111931.1788970-1-metze@samba.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ax3yLXFB"
+Message-ID: <25ae6db1-856f-4592-a4fa-8a927426ed72@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764166603;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Wn1Lc3gEV2pfftZ9XKs0zcUYmlQ97wa6T4ZGjCCqTy0=;
+	b=Ax3yLXFBjFyT2vbBi6ihHz0fk81f6PZRPeXhzTSsMqsb9ErfWjc+5UZ7Juc1uiQWwE6Re5
+	z7f4PixpQPE9GEhEmVx+H46HOQA1lw7BWDzE/qFBaNc+g3cv3VGIqsTGf1xyFSBR5x7I+g
+	RWm+bxLUwx5NpUVFGGHnHsYnlX5S0vY=
+Date: Wed, 26 Nov 2025 15:16:40 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] RDMA/siw: reclassify sockets in order to avoid false
+ positives from lockdep
+To: Stefan Metzmacher <metze@samba.org>, linux-rdma@vger.kernel.org
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ netdev@vger.kernel.org, linux-cifs@vger.kernel.org
+References: <20251126104254.1779732-1-metze@samba.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Bernard Metzler <bernard.metzler@linux.dev>
+In-Reply-To: <20251126104254.1779732-1-metze@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-This will allow network protocols to implement async operations
-instead of using ioctl() syscalls.
+On 26.11.2025 11:42, Stefan Metzmacher wrote:
+> While developing IPPROTO_SMBDIRECT support for the code
+> under fs/smb/common/smbdirect [1], I noticed false positives like this:
+> 
+> [T79] ======================================================
+> [T79] WARNING: possible circular locking dependency detected
+> [T79] 6.18.0-rc4-metze-kasan-lockdep.01+ #1 Tainted: G           OE
+> [T79] ------------------------------------------------------
+> [T79] kworker/2:0/79 is trying to acquire lock:
+> [T79] ffff88801f968278 (sk_lock-AF_INET){+.+.}-{0:0},
+>                          at: sock_set_reuseaddr+0x14/0x70
+> [T79]
+>          but task is already holding lock:
+> [T79] ffffffffc10f7230 (lock#9){+.+.}-{4:4},
+>                          at: rdma_listen+0x3d2/0x740 [rdma_cm]
+> [T79]
+>          which lock already depends on the new lock.
+> 
+> [T79]
+>          the existing dependency chain (in reverse order) is:
+> [T79]
+>          -> #1 (lock#9){+.+.}-{4:4}:
+> [T79]        __lock_acquire+0x535/0xc30
+> [T79]        lock_acquire.part.0+0xb3/0x240
+> [T79]        lock_acquire+0x60/0x140
+> [T79]        __mutex_lock+0x1af/0x1c10
+> [T79]        mutex_lock_nested+0x1b/0x30
+> [T79]        cma_get_port+0xba/0x7d0 [rdma_cm]
+> [T79]        rdma_bind_addr_dst+0x598/0x9a0 [rdma_cm]
+> [T79]        cma_bind_addr+0x107/0x320 [rdma_cm]
+> [T79]        rdma_resolve_addr+0xa3/0x830 [rdma_cm]
+> [T79]        destroy_lease_table+0x12b/0x420 [ksmbd]
+> [T79]        ksmbd_NTtimeToUnix+0x3e/0x80 [ksmbd]
+> [T79]        ndr_encode_posix_acl+0x6e9/0xab0 [ksmbd]
+> [T79]        ndr_encode_v4_ntacl+0x53/0x870 [ksmbd]
+> [T79]        __sys_connect_file+0x131/0x1c0
+> [T79]        __sys_connect+0x111/0x140
+> [T79]        __x64_sys_connect+0x72/0xc0
+> [T79]        x64_sys_call+0xe7d/0x26a0
+> [T79]        do_syscall_64+0x93/0xff0
+> [T79]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [T79]
+>          -> #0 (sk_lock-AF_INET){+.+.}-{0:0}:
+> [T79]        check_prev_add+0xf3/0xcd0
+> [T79]        validate_chain+0x466/0x590
+> [T79]        __lock_acquire+0x535/0xc30
+> [T79]        lock_acquire.part.0+0xb3/0x240
+> [T79]        lock_acquire+0x60/0x140
+> [T79]        lock_sock_nested+0x3b/0xf0
+> [T79]        sock_set_reuseaddr+0x14/0x70
+> [T79]        siw_create_listen+0x145/0x1540 [siw]
+> [T79]        iw_cm_listen+0x313/0x5b0 [iw_cm]
+> [T79]        cma_iw_listen+0x271/0x3c0 [rdma_cm]
+> [T79]        rdma_listen+0x3b1/0x740 [rdma_cm]
+> [T79]        cma_listen_on_dev+0x46a/0x750 [rdma_cm]
+> [T79]        rdma_listen+0x4b0/0x740 [rdma_cm]
+> [T79]        ksmbd_rdma_init+0x12b/0x270 [ksmbd]
+> [T79]        ksmbd_conn_transport_init+0x26/0x70 [ksmbd]
+> [T79]        server_ctrl_handle_work+0x1e5/0x280 [ksmbd]
+> [T79]        process_one_work+0x86c/0x1930
+> [T79]        worker_thread+0x6f0/0x11f0
+> [T79]        kthread+0x3ec/0x8b0
+> [T79]        ret_from_fork+0x314/0x400
+> [T79]        ret_from_fork_asm+0x1a/0x30
+> [T79]
+>          other info that might help us debug this:
+> 
+> [T79]  Possible unsafe locking scenario:
+> 
+> [T79]        CPU0                    CPU1
+> [T79]        ----                    ----
+> [T79]   lock(lock#9);
+> [T79]                                lock(sk_lock-AF_INET);
+> [T79]                                lock(lock#9);
+> [T79]   lock(sk_lock-AF_INET);
+> [T79]
+>           *** DEADLOCK ***
+> 
+> [T79] 5 locks held by kworker/2:0/79:
+> [T79] #0: ffff88800120b158 ((wq_completion)events_long){+.+.}-{0:0},
+>                             at: process_one_work+0xfca/0x1930
+> [T79] #1: ffffc9000474fd00 ((work_completion)(&ctrl->ctrl_work))
+>                             {+.+.}-{0:0},
+>                             at: process_one_work+0x804/0x1930
+> [T79] #2: ffffffffc11307d0 (ctrl_lock){+.+.}-{4:4},
+>                             at: server_ctrl_handle_work+0x21/0x280 [ksmbd]
+> [T79] #3: ffffffffc11347b0 (init_lock){+.+.}-{4:4},
+>                             at: ksmbd_conn_transport_init+0x18/0x70 [ksmbd]
+> [T79] #4: ffffffffc10f7230 (lock#9){+.+.}-{4:4},
+>                              at: rdma_listen+0x3d2/0x740 [rdma_cm]
+> [T79]
+>          stack backtrace:
+> [T79] CPU: 2 UID: 0 PID: 79 Comm: kworker/2:0 Kdump: loaded
+>        Tainted: G           OE
+>        6.18.0-rc4-metze-kasan-lockdep.01+ #1 PREEMPT(voluntary)
+> [T79] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+> [T79] Hardware name: innotek GmbH VirtualBox/VirtualBox,
+>        BIOS VirtualBox 12/01/2006
+> [T79] Workqueue: events_long server_ctrl_handle_work [ksmbd]
+> ...
+> [T79]  print_circular_bug+0xfd/0x130
+> [T79]  check_noncircular+0x150/0x170
+> [T79]  check_prev_add+0xf3/0xcd0
+> [T79]  validate_chain+0x466/0x590
+> [T79]  __lock_acquire+0x535/0xc30
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  lock_acquire.part.0+0xb3/0x240
+> [T79]  ? sock_set_reuseaddr+0x14/0x70
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? __kasan_check_write+0x14/0x30
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? apparmor_socket_post_create+0x180/0x700
+> [T79]  lock_acquire+0x60/0x140
+> [T79]  ? sock_set_reuseaddr+0x14/0x70
+> [T79]  lock_sock_nested+0x3b/0xf0
+> [T79]  ? sock_set_reuseaddr+0x14/0x70
+> [T79]  sock_set_reuseaddr+0x14/0x70
+> [T79]  siw_create_listen+0x145/0x1540 [siw]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? local_clock_noinstr+0xe/0xd0
+> [T79]  ? __pfx_siw_create_listen+0x10/0x10 [siw]
+> [T79]  ? trace_preempt_on+0x4c/0x130
+> [T79]  ? __raw_spin_unlock_irqrestore+0x4a/0x90
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? preempt_count_sub+0x52/0x80
+> [T79]  iw_cm_listen+0x313/0x5b0 [iw_cm]
+> [T79]  cma_iw_listen+0x271/0x3c0 [rdma_cm]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  rdma_listen+0x3b1/0x740 [rdma_cm]
+> [T79]  ? _raw_spin_unlock+0x2c/0x60
+> [T79]  ? __pfx_rdma_listen+0x10/0x10 [rdma_cm]
+> [T79]  ? rdma_restrack_add+0x12c/0x630 [ib_core]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  cma_listen_on_dev+0x46a/0x750 [rdma_cm]
+> [T79]  rdma_listen+0x4b0/0x740 [rdma_cm]
+> [T79]  ? __pfx_rdma_listen+0x10/0x10 [rdma_cm]
+> [T79]  ? cma_get_port+0x30d/0x7d0 [rdma_cm]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? rdma_bind_addr_dst+0x598/0x9a0 [rdma_cm]
+> [T79]  ksmbd_rdma_init+0x12b/0x270 [ksmbd]
+> [T79]  ? __pfx_ksmbd_rdma_init+0x10/0x10 [ksmbd]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? register_netdevice_notifier+0x1dc/0x240
+> [T79]  ksmbd_conn_transport_init+0x26/0x70 [ksmbd]
+> [T79]  server_ctrl_handle_work+0x1e5/0x280 [ksmbd]
+> [T79]  process_one_work+0x86c/0x1930
+> [T79]  ? __pfx_process_one_work+0x10/0x10
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? assign_work+0x16f/0x280
+> [T79]  worker_thread+0x6f0/0x11f0
+> 
+> I was not able to reproduce this as I was testing with various
+> runs switching siw and rxe as well as IPPROTO_SMBDIRECT sockets,
+> while the above stack used siw with the non IPPROTO_SMBDIRECT
+> patches [1].
+> 
+> Even if this patch doesn't solve the above I think it's
+> a good idea to reclassify the sockets used by siw,
+> I also send patches for rxe to reclassify, as well
+> as my IPPROTO_SMBDIRECT socket patches [1] will do it,
+> this should minimize potential false positives.
+> 
+> [1]
+> https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/master-ipproto-smbdirect
+> 
+> Cc: Bernard Metzler <bernard.metzler@linux.dev>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: linux-rdma@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-cifs@vger.kernel.org
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+> ---
+>   drivers/infiniband/sw/siw/siw_cm.c | 18 ++++++++++++++++++
+>   1 file changed, 18 insertions(+)
+> 
+> diff --git a/drivers/infiniband/sw/siw/siw_cm.c b/drivers/infiniband/sw/siw/siw_cm.c
+> index 708b13993fdf..b83abf0ea15e 100644
+> --- a/drivers/infiniband/sw/siw/siw_cm.c
+> +++ b/drivers/infiniband/sw/siw/siw_cm.c
+> @@ -39,6 +39,22 @@ static void siw_cm_llp_error_report(struct sock *s);
+>   static int siw_cm_upcall(struct siw_cep *cep, enum iw_cm_event_type reason,
+>   			 int status);
+>   
+> +
+> +static struct lock_class_key siw_sk_key;
+> +static struct lock_class_key siw_slock_key;
+> +
+> +static inline void siw_reclassify_socket(struct socket *sock)
+> +{
+> +	struct sock *sk = sock->sk;
+> +
+> +	if (WARN_ON_ONCE(!sock_allow_reclassification(sk)))
+> +		return;
+> +
+> +	sock_lock_init_class_and_name(sk,
+> +				      "slock-RDMA-SIW", &siw_slock_key,
+> +				      "sk_lock-RDMA-SIW", &siw_sk_key);
+> +}
+> +
+>   static void siw_sk_assign_cm_upcalls(struct sock *sk)
+>   {
+>   	struct siw_cep *cep = sk_to_cep(sk);
+> @@ -1394,6 +1410,7 @@ int siw_connect(struct iw_cm_id *id, struct iw_cm_conn_param *params)
+>   	rv = sock_create(v4 ? AF_INET : AF_INET6, SOCK_STREAM, IPPROTO_TCP, &s);
+>   	if (rv < 0)
+>   		goto error;
+> +	siw_reclassify_socket(s);
+>   
+>   	/*
+>   	 * NOTE: For simplification, connect() is called in blocking
+> @@ -1770,6 +1787,7 @@ int siw_create_listen(struct iw_cm_id *id, int backlog)
+>   	rv = sock_create(addr_family, SOCK_STREAM, IPPROTO_TCP, &s);
+>   	if (rv < 0)
+>   		return rv;
+> +	siw_reclassify_socket(s);
+>   
+>   	/*
+>   	 * Allow binding local port when still in TIME_WAIT from last close.
 
-By using the high bit there's more than enough room for generic
-calls to be added, but also more than enough for protocols to
-implement their own specific opcodes.
+Thanks very much, makes all sense to me. I stumbled across it a while
+ago as well and quietly ignored it. Your solution is better.
+If I look through the other use cases of sock_lock_init_class_and_name(),
+I found it gated by
+#ifdef CONFIG_DEBUG_LOCK_ALLOC
+(see for example drivers/nvme/host/tcp.c). I think wee need that
+since only then the related sock_lock_xxx objects and functions are
+defined.
+drivers/nvme/host/tcp.c also has a nice comment on why this is
+needed. I think we shall have such comment as well - just to remind us
+later what we did.
 
-The IPPROTO_SMBDIRECT socket layer [1] I'm currently working on,
-will use this in future in order to let Samba use efficient RDMA offload.
+Thank you!
+Bernard.
 
-[1]
-https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/master-ipproto-smbdirect
-
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Willem de Bruijn <willemb@google.com>
-Cc: io-uring@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-cifs@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-
----
-
-This is based on for-6.19/io_uring + the 3
-"Introduce getsockname io_uring_cmd" patches from
-https://lore.kernel.org/io-uring/20251125211806.2673912-1-krisman@suse.de/
-as the addition of SOCKET_URING_OP_GETSOCKNAME would
-conflict with the addition of SOCKET_URING_OP_PASSTHROUGH_FLAG
----
- include/net/sock.h            | 4 ++++
- include/uapi/linux/io_uring.h | 7 +++++++
- io_uring/cmd_net.c            | 2 ++
- 3 files changed, 13 insertions(+)
-
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 60bcb13f045c..ffcee4792589 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -98,6 +98,7 @@ typedef struct {
- struct sock;
- struct proto;
- struct net;
-+struct io_uring_cmd;
- 
- typedef __u32 __bitwise __portpair;
- typedef __u64 __bitwise __addrpair;
-@@ -1272,6 +1273,9 @@ struct proto {
- 
- 	int			(*ioctl)(struct sock *sk, int cmd,
- 					 int *karg);
-+	int			(*uring_cmd)(struct sock *sk,
-+					struct io_uring_cmd *ioucmd,
-+					unsigned int issue_flags);
- 	int			(*init)(struct sock *sk);
- 	void			(*destroy)(struct sock *sk);
- 	void			(*shutdown)(struct sock *sk, int how);
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index b5b23c0d5283..62ce6cb7d145 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -1010,6 +1010,13 @@ enum io_uring_socket_op {
- 	SOCKET_URING_OP_SETSOCKOPT,
- 	SOCKET_URING_OP_TX_TIMESTAMP,
- 	SOCKET_URING_OP_GETSOCKNAME,
-+
-+	/*
-+	 * This lets the sk->sk_prot->uring_cmd()
-+	 * handle it, giving it enough space for
-+	 * custom opcodes.
-+	 */
-+	SOCKET_URING_OP_PASSTHROUGH_FLAG = 0x80000000
- };
- 
- /*
-diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
-index 5d11caf5509c..964f1764fa67 100644
---- a/io_uring/cmd_net.c
-+++ b/io_uring/cmd_net.c
-@@ -182,6 +182,8 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 	case SOCKET_URING_OP_GETSOCKNAME:
- 		return io_uring_cmd_getsockname(sock, cmd, issue_flags);
- 	default:
-+		if (cmd->cmd_op & SOCKET_URING_OP_PASSTHROUGH_FLAG && prot->uring_cmd)
-+			return prot->uring_cmd(sk, cmd, issue_flags);
- 		return -EOPNOTSUPP;
- 	}
- }
--- 
-2.43.0
 
