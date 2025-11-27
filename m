@@ -1,161 +1,79 @@
-Received: from flow-b3-smtp.messagingengine.com (flow-b3-smtp.messagingengine.com [202.12.124.138])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B87223BD06;
-	Thu, 27 Nov 2025 11:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31CD32B9AB;
+	Thu, 27 Nov 2025 12:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764241909; cv=none; b=SvzTXwdWFYZrtPnsGFT+IktpOo8uPRIlqyvnkNERx7kzf7aU2jg2NP+pLKwkxPUmKITlZcOyv66TZLrwIyv03gg0Ms2Vi9BILAdLnnWi71YUpDQ2CcUIV5MSrdZ6gKBZ10hdfyaS2AEP0YputqTQClLbiynWYjJMs8Y3vWzwtJ0=
+	t=1764245414; cv=none; b=ZSVM2GqORQblEnAn6YzDQwmPz236kBjZFEOQ+o8gyOJMuPSLMy0SO6Sg9+wkoWIBH5P8tSM3BM8MfxsQ57NCjqhwc8iid6hZxhnhoHZR1zUilCMLscNBVIDdnzfAvjLTqHwE+ysLUVLDr16o/1uhn+KGRlxn24o2NJi+n8Cb6z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764241909; c=relaxed/simple;
-	bh=GbIDAT9rtj7UlTcfXk6NmMiPhN0t9jJouRITwhbuniQ=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=fAjqoGyAp9J3imr3YX+bTtZO8yFfHgOICh6l6dkC7WNIc8ANqrBpYTkcW0T6ICDK2mX8x9RlQ92VvvZvu3nkKH7FtqpkvBR4gkDpD84Oosl33Y5r8cDgTFwjqhH0Xi9EG1Ou8FvdY9yQ8Cs/ZXvzadDdufcyqaHoM+LM2P/59wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=c+VxFWOo; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YK6ML7HD; arc=none smtp.client-ip=202.12.124.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1764245414; c=relaxed/simple;
+	bh=C7MVLvgjgS9a0L9qwa1j+bF+TVGED+r0Nji9vIH+zOE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=O939FoiE3kZ/AdAmX8c48y9zPPTYE+nxpkX7HdKHdk3ezKg6fm9VbMSRaz9fXH9HcA467EsWDEbCwAD+z0/JQ7yxokRLo3wUvbg2252wsIJOwqqKPV+IxOzwHeU0x/wgD+3U6YWFDDjT/TcY3+27YO1UA07IoOh57vKJb3DKdzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YvBOuKP9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="c+VxFWOo";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YK6ML7HD"
-Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailflow.stl.internal (Postfix) with ESMTP id E54531300112;
-	Thu, 27 Nov 2025 06:11:45 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Thu, 27 Nov 2025 06:11:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm1; t=
-	1764241905; x=1764249105; bh=m1kV6hlzxb2O2XlqHGM1BPPCpFOnIPzOUy0
-	n7fZKnGU=; b=c+VxFWOo9uq1DK4cCUXO6NBeE5V6mjiuePKe7uq7i7Uzw+e5z1r
-	KSIFI9qcaqcHz/n4M2JGC1ShKl/MbAFLeZ5Gkz2dElDfo78nIMMAzxNeatPtEK9e
-	Ru07vJE9mRlHzolsNc6YCOBgflzvX8LDXidjAqnXlE38xqoVzFriH4DNrf2ruGli
-	heSyikJBEqbjPgZS6+el63Q1N05e2qxh4QAGs1ZfrzHXS7yCHKjO1lQEOkmReEhx
-	qnzUYADGoVR0mdu9DH1ddnFcsMreV9GoBSAI6qINupHzYFkPg0j5YH5S3fkJCJTp
-	FrDhzYk2BwjOPy5YmiyxBPmHIMvYQb6zYWA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1764241905; x=
-	1764249105; bh=m1kV6hlzxb2O2XlqHGM1BPPCpFOnIPzOUy0n7fZKnGU=; b=Y
-	K6ML7HDTpTVp9PjUPBfoTqh+u1zoLmFqmw+hkFRFq+N9YuLOKVRydNumSmfQAYgx
-	OAttLjP+MFjq5RGkd91Hsq1Qcr44B8QVwobJrDtMl5UulnzgmDvIeua0pUppOct1
-	22Hh23EtIDNgAw6sEMv/72llJaTe/P8BT5wbDKTpu7rR9nT1jj5Z/uUAWxmrcbAy
-	V/h1oahiRy9rLpbiThxDQ+oIi8S+8z6uK9W6qpNro9kteF6xAi8wW7pXkY8pEIxL
-	mzXa3JvSnawJshJHoyvNpEsRSBSqP/ndEheTdpqPjD3QX1ywhnT1v/sxGhBhdxEW
-	zJ9oWyeEY/D8XM1NtqTaw==
-X-ME-Sender: <xms:8TEoabu7JYFYMUfT7S8_I5--Lo9rbrFJdwoaNpvJDL9YrWnILVfvgQ>
-    <xme:8TEoaRi_IAui-deAtJacilhZHHf4PFcDfB7m1UWRGkdliewWwXHx4qEADYj6VQBh7
-    Qhd33fJ6UAMn6BXa5LXo7PE8unF5m36jwIvdlqBrbZforJtLg>
-X-ME-Received: <xmr:8TEoabwy5w0jZKY1rlGFdR9h2JuLLKcSlLcY3KhHiDFqYSQUh_uGJMNO0XTo5J1Em-XAiAWPRrsI0FwLL4oUHwxhQtwrO4uben-LiXPBsZkx>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgeejtdekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epvdeuteelkeejkeevteetvedtkeegleduieeftdeftefgtddtleejgfelgfevffeinecu
-    ffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurf
-    grrhgrmhepmhgrihhlfhhrohhmpehnvghilhgssehofihnmhgrihhlrdhnvghtpdhnsggp
-    rhgtphhtthhopeegtddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepvhhirhhose
-    iivghnihhvrdhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehsvghlihhnuhigsehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqgihfshesvhhgvg
-    hrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhunhhiohhnfhhssehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqshgvtghurhhith
-    ihqdhmohguuhhlvgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
-    uhigqdhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugi
-    dqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhu
-    gidqfhhsuggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
-    hnuhigqdgtihhfshesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:8TEoaX4jhOU-RJfrf3t1xEcR-lNfjS28e99wANWzbIhtgXOc8tvlQQ>
-    <xmx:8TEoadfn3ihxo_f2JsQabXyhrsPX7Ty6n2NXo-mzGemtFZUciGdvkw>
-    <xmx:8TEoafruRCtJU5PoM56axqXYQfY267HfKJE3cT5se9N7bV25X2ebug>
-    <xmx:8TEoaR1xv1E0dscVlFpB4htOxcDXJkE0QaT7-sPWv8fjNCO-_Nn03g>
-    <xmx:8TEoacuIUsW2XK9lNoDW8FFI-jSTzwnKCqQ_3XoqxqRE8twj9TVgjbxl>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 27 Nov 2025 06:11:35 -0500 (EST)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YvBOuKP9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C511CC4CEF8;
+	Thu, 27 Nov 2025 12:10:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764245414;
+	bh=C7MVLvgjgS9a0L9qwa1j+bF+TVGED+r0Nji9vIH+zOE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=YvBOuKP9HpqWLMGBdXEknJfm+KH/82MMdqtTjarygEBS23Uzb67F4pm8JLpJXQkR9
+	 pOOjAnnxZowXT53bzbN+fOpbYxTT5sskcpZ+BxbmJgkiuqmAWNDnq5dVL47atfNwPd
+	 ONzthabtx7l1GdAgWBIO2HAZ6KiqwYheVDzVkTnNXHWumG1dNP2Ev/Z5zEGa/JdSEj
+	 l4xxyuK845wart7W6npz5IRhiJa2tJq+Pme6NBentZbEMNOmxv87moofnSA2Fn44/5
+	 8kkNuVeXCEpUPVdQ3WRmhy56pyZY7QXBlWOS1vTuk2pRSU0yC+I2PYdBd6pKt1U5WE
+	 FhNAELA30d0Jg==
+From: Leon Romanovsky <leon@kernel.org>
+To: linux-rdma@vger.kernel.org, Stefan Metzmacher <metze@samba.org>
+Cc: Bernard Metzler <bernard.metzler@linux.dev>, 
+ Jason Gunthorpe <jgg@ziepe.ca>, netdev@vger.kernel.org, 
+ linux-cifs@vger.kernel.org
+In-Reply-To: <20251126150842.1837072-1-metze@samba.org>
+References: <20251126150842.1837072-1-metze@samba.org>
+Subject: Re: [PATCH v2] RDMA/siw: reclassify sockets in order to avoid
+ false positives from lockdep
+Message-Id: <176424541100.1853134.12455314070226986319.b4-ty@kernel.org>
+Date: Thu, 27 Nov 2025 07:10:11 -0500
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Christian Brauner" <brauner@kernel.org>
-Cc: "Jeff Layton" <jlayton@kernel.org>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Amir Goldstein" <amir73il@gmail.com>, "Jan Kara" <jack@suse.cz>,
- linux-fsdevel@vger.kernel.org, "Chris Mason" <clm@fb.com>,
- "David Sterba" <dsterba@suse.com>, "David Howells" <dhowells@redhat.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- "Danilo Krummrich" <dakr@kernel.org>, "Tyler Hicks" <code@tyhicks.com>,
- "Miklos Szeredi" <miklos@szeredi.hu>,
- "Chuck Lever" <chuck.lever@oracle.com>,
- "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Namjae Jeon" <linkinjeon@kernel.org>,
- "Steve French" <smfrench@gmail.com>,
- "Sergey Senozhatsky" <senozhatsky@chromium.org>,
- "Carlos Maiolino" <cem@kernel.org>,
- "John Johansen" <john.johansen@canonical.com>,
- "Paul Moore" <paul@paul-moore.com>, "James Morris" <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>,
- "Stephen Smalley" <stephen.smalley.work@gmail.com>,
- "Ondrej Mosnacek" <omosnace@redhat.com>,
- "Mateusz Guzik" <mjguzik@gmail.com>,
- "Lorenzo Stoakes" <lorenzo.stoakes@oracle.com>,
- "Stefan Berger" <stefanb@linux.ibm.com>,
- "Darrick J. Wong" <djwong@kernel.org>, linux-kernel@vger.kernel.org,
- netfs@lists.linux.dev, ecryptfs@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
- linux-cifs@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-security-module@vger.kernel.org, selinux@vger.kernel.org
-Subject: Re: [PATCH v6 00/15] Create and use APIs to centralise locking for
- directory ops
-In-reply-to: <20251114-liedgut-eidesstattlich-8c116178202f@brauner>
-References: <20251113002050.676694-1-neilb@ownmail.net>,
- <20251114-baden-banknoten-96fb107f79d7@brauner>,
- <20251114-liedgut-eidesstattlich-8c116178202f@brauner>
-Date: Thu, 27 Nov 2025 22:11:33 +1100
-Message-id: <176424189349.634289.4480398011245842622@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-a6db3
 
-On Sat, 15 Nov 2025, Christian Brauner wrote:
-> On Fri, Nov 14, 2025 at 01:24:41PM +0100, Christian Brauner wrote:
-> > On Thu, Nov 13, 2025 at 11:18:23AM +1100, NeilBrown wrote:
-> > > Following is a new version of this series:
-> > >  - fixed a bug found by syzbot
-> > >  - cleanup suggested by Stephen Smalley
-> > >  - added patch for missing updates in smb/server - thanks Jeff Layton
-> >=20
-> > The codeflow right now is very very gnarly in a lot of places which
-> > obviously isn't your fault. But start_creating() and end_creating()
-> > would very naturally lend themselves to be CLASS() guards.
-> >=20
-> > Unrelated: I'm very inclined to slap a patch on top that renames
-> > start_creating()/end_creating() and start_dirop()/end_dirop() to
-> > vfs_start_creating()/vfs_end_creating() and
-> > vfs_start_dirop()/vfs_end_dirop(). After all they are VFS level
-> > maintained helpers and I try to be consistent with the naming in the
-> > codebase making it very easy to grep.
->=20
-> @Neil, @Jeff, could you please look at:
-> https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git/log/?h=3Dvfs.all
->=20
-> and specifically at the merge conflict resolution I did for:
->=20
-> https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git/commit/?h=3Dvfs=
-.all&id=3Df28c9935f78bffe6fee62f7fb9f6c5af7e30d9b2
->=20
-> and tell me whether it all looks sane?
->=20
 
-That merge is a7b062be95fed490d1dcd350d3b5657f243d7d4f today, and I
-agree with Jeff that it looks good.
+On Wed, 26 Nov 2025 16:08:42 +0100, Stefan Metzmacher wrote:
+> While developing IPPROTO_SMBDIRECT support for the code
+> under fs/smb/common/smbdirect [1], I noticed false positives like this:
+> 
+> [T79] ======================================================
+> [T79] WARNING: possible circular locking dependency detected
+> [T79] 6.18.0-rc4-metze-kasan-lockdep.01+ #1 Tainted: G           OE
+> [T79] ------------------------------------------------------
+> [T79] kworker/2:0/79 is trying to acquire lock:
+> [T79] ffff88801f968278 (sk_lock-AF_INET){+.+.}-{0:0},
+>                         at: sock_set_reuseaddr+0x14/0x70
+> [T79]
+>         but task is already holding lock:
+> [T79] ffffffffc10f7230 (lock#9){+.+.}-{4:4},
+>                         at: rdma_listen+0x3d2/0x740 [rdma_cm]
+> [T79]
+>         which lock already depends on the new lock.
+> 
+> [...]
 
-Thanks,
-NeilBrown
+Applied, thanks!
+
+[1/1] RDMA/siw: reclassify sockets in order to avoid false positives from lockdep
+      https://git.kernel.org/rdma/rdma/c/3a2c32d357db8d
+
+Best regards,
+-- 
+Leon Romanovsky <leon@kernel.org>
+
