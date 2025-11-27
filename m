@@ -1,111 +1,140 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3553A2BDC3F
-	for <linux-cifs@vger.kernel.org>; Thu, 27 Nov 2025 12:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D1B2750ED;
+	Thu, 27 Nov 2025 13:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764246431; cv=none; b=ukat24bn9ln39LNrZ1WNOVFV8z9535qSsSJ2MDghljJEEppAuegcfAtx2vurqhjq6BjFuoqRyYpyZqgRxwXM0Gx8vn+3rGFzYX1u16VslYQWk3qZ9KP5TaR3c0dvfCDEGAK/bExU0UgviVyyR+lH89w+8vqhqC5Aq/dgwmTd4sU=
+	t=1764250231; cv=none; b=W2SdHI35L7Z8ybuQclYJJ4cAajWr4xpgyITkHxnfGlorHfT99kPQa5sSjplAYP3q9PMqDXmLQ8yq6wiH86WBtnXfMhsgHT+N1UtslQoT1dAb41lYMCJxJMr0HJ7fbko8JSPZKirWheK+QQS50Y1iPd27Apo7aaPPtqGSzZvsv1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764246431; c=relaxed/simple;
-	bh=GhVq6uSn5RaWMTsZxzMiWgV+Auc8xzOn19mSRt51ar8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wu7XV5bXbdzTUFr1c4UfCBvNMzwP1LtBqEk2cgSZ4CQiByEVksYuwKQQ4ZlQrr8z+L+IXwvR6OmhGJwl8ydzRNpr+aOGdpBFD612DyWDDryZkS8Yl7j4f9Rr690PPLIWUPrmyr7pQYGABWCYn6I/3LRAyp82RPDKE34NAKIxnQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i5lqCoEM; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764250231; c=relaxed/simple;
+	bh=LuW33Qmw6b+FBxoiMZUsrTuCLWkTEsGgiIgp0uKhm3c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UPnkI/WEIcVWsH1hDDwErGMVNukOokLl2HSn+jTbpgVWlOaCiopE7ZcegkNDRrsK02jKxPeUoLZmrlA5OLSfxFbRR9G1vSgWHvj+v1ROuetU7QGy4PgMCShzs81ySTldKtKsWBEgl0YKP3bxOQmBeUaodZm/8ljJKZb4rEnFkH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=hLttpL+f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i5lqCoEM"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-297ea936b39so2378455ad.1
-        for <linux-cifs@vger.kernel.org>; Thu, 27 Nov 2025 04:27:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764246429; x=1764851229; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VBrweXDCkzKL99FGdZJb4s2u6Q85xoJBbuuJYA1XKX4=;
-        b=i5lqCoEMCzW3IG+qnCEmjLE/5G6c2n6ruk30OLkXuyz8GS3Zi2tFpJjp7d1yYl4KF5
-         kU2RQhWiJa/KziyHxF+Ly05NNnTrIVHODZqz1zx/e/EyMUX8qaFjIhU7VM3MT8s++CLM
-         +97WYQ5XAhkKA/bXSWHzSd1PUkvnguU5etbc+IvYb4hrvITb8KXqwr2jsAfnEBUjW6y3
-         H35en4xtJdTyBmxuORS0EwLcxfGsf9bwV/263R+fjaxwXLbdRWAuPJyf4NKkPYmgEDyp
-         9fNCx6uRrvFCpVb7b9CONVRludXz8SkJv9xme8fg2xXOcgCMayw7XBz1e8eHMOoEdkzj
-         w1cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764246429; x=1764851229;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VBrweXDCkzKL99FGdZJb4s2u6Q85xoJBbuuJYA1XKX4=;
-        b=w4or1CejO+fDd/3uTlLlgywlE5kZUthirmVeeUG5+q7gKMY7Dh5kUVnrc7N3VAeye2
-         TV/FweMEaP4HOCnCfQoCbPCLOgGmv2EfJ7/JUkRV6f6L+jjcwvwFIzVVMjibN+Yy8+ts
-         /rM56X8GoqQZswPasMMNxKeXr7Eb0xew9V4f2SMr84hJDTc4FmA+IJS2rZFA5Z/RMhzQ
-         CHbKvnwIn8N2s3mwLtkO511PFrXCLbSd/k29ThkLyz2R3RT3PKKedusDwlqNm/tsTaDN
-         lB4FMSvqThI6G2V0b7dNU1Xlzyt9De+/IxpVAp0zwO0hIsECxtS8GzJVdcYmhD/mkir2
-         mzJg==
-X-Forwarded-Encrypted: i=1; AJvYcCVh7SPkvxGM+XogK+plusZVAhO7ZGcjbTsXnIrTFtqrwiHQ0S1kCBm/Ok7i7M7HXr3U5gWSnsEekSkm@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2aqecNtaco7h3CZ8auXx1YtqK6sI8AZ84dd3WryMnXKDRe64o
-	/0mHVFIcovAidr4m4XYRkvlzP0uT3npsYukjn8d2RrhpWSxxIjIxqci5
-X-Gm-Gg: ASbGnct0XyGh4hLZr5AjUV6tEgsVyFrhZeGva8kNnv+IgTrZ9VB7X+MLXGW+n/rwvfq
-	FG9yKfb15KaCkoAvaQ3q7YB1wFYyhpyEXmx1zTgjZzkCj1GvTStcyUCc3XtB0TPv/soV2b6UmJV
-	J4BYp8PVkYS45IVT4qrr2+7znkBaixpErbgoriSEh3yE4L/RwvzUSBQbx5mNeGGhcQKOfiUDTYR
-	YjKXIsfbfqwlhkD5+iFAZ4RAcYCe8USAzchhL5l9BMGngX8dWgJ/BcBJcGil41NBFXgwwFrShZM
-	NXBmJse9sAHVTNNisIscnGqsNU/BYYWArO95VkvsqZbdJaHfQKGM9ENeIrdKimAueyELs1OfYFY
-	+8hL6rQf3bBvw7QBueImFEvMD95gZZdvF0wmr+Xl36p5GqN9OSsj868od/y7Q6hfbJpG/IHpVQs
-	WJyTUnTIJ95jOD3NibSwjVXS2ebGwy
-X-Google-Smtp-Source: AGHT+IFFSz0gxCcLoQEe2IoqmHI/7A23cwj5j2pf9jMsj2EshBK94+Uduzwctn4OkLsfVFb6T6pNlQ==
-X-Received: by 2002:a17:903:388d:b0:299:db45:c5a9 with SMTP id d9443c01a7336-29b702764c5mr131269475ad.9.1764246429393;
-        Thu, 27 Nov 2025 04:27:09 -0800 (PST)
-Received: from morax ([2401:4900:be78:dfa0:1977:daf6:20e6:4457])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-29bcec452a9sm16942955ad.12.2025.11.27.04.27.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Nov 2025 04:27:08 -0800 (PST)
-From: Aaditya Kansal <aadityakansal390@gmail.com>
-To: sfrench@samba.org,
-	pc@manguebit.org
-Cc: ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bharathsm@microsoft.com,
-	skhan@linuxfoundation.org,
-	david.hunter.linux@gmail.com,
-	Aaditya Kansal <aadityakansal390@gmail.com>
-Subject: [PATCH] ksmbd: Add check in cifs_mkdir() for SMB2/3
-Date: Thu, 27 Nov 2025 17:56:37 +0530
-Message-ID: <20251127122637.2094566-1-aadityakansal390@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="hLttpL+f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC1DBC4CEF8;
+	Thu, 27 Nov 2025 13:30:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1764250231;
+	bh=LuW33Qmw6b+FBxoiMZUsrTuCLWkTEsGgiIgp0uKhm3c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hLttpL+fSi/4VGEdZbJXeBfo5lC65USaTdPOiDBNJuEFlBhC/rGbVORs8f/Rp8B+2
+	 09EtLwc5Mtx9Z3M0REc8V8xAVdo71b7TRTCiEx6ylelSVDwDRSmrkDNYkxiiTnN1L0
+	 D3RkJHvopkyo+bOmwr0KcXe6OrT2lOhTC/MjPGQA=
+Date: Thu, 27 Nov 2025 14:30:28 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Bharath SM <bharathsm.hsk@gmail.com>
+Cc: Henrique Carvalho <henrique.carvalho@suse.com>, stable@vger.kernel.org,
+	Shyam Prasad N <sprasad@microsoft.com>, apais@microsoft.com,
+	Bharath S M <bharathsm@microsoft.com>,
+	David Howells <dhowells@redhat.com>, smfrench@gmail.com,
+	linux-cifs@vger.kernel.org, Laura Kerner <laura.kerner@ichaus.de>
+Subject: Re: [PATCH 6.6.y] smb: client: support kvec iterators in async read
+ path
+Message-ID: <2025112707-pummel-film-6bd6@gregkh>
+References: <20250710165040.3525304-1-henrique.carvalho@suse.com>
+ <2944136.1752224518@warthog.procyon.org.uk>
+ <aHE0--yUyFJqK6lb@precision>
+ <CAGypqWyyA6nUfH-bGhQxLYD74O7EcE_6_W15=AB8jvi6yZiV_Q@mail.gmail.com>
+ <2025112112-icon-bunkmate-bfad@gregkh>
+ <CAGypqWy8=Oq6CC0YGFSr72L7kqrEDOytboSqJFJBxxV5tGQgFA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGypqWy8=Oq6CC0YGFSr72L7kqrEDOytboSqJFJBxxV5tGQgFA@mail.gmail.com>
 
-Add a version check in cifs_mkdir(). The check skips a function call to
-cifs_mkdir_qinfo() for SMB 2/3.
+On Fri, Nov 21, 2025 at 02:31:20AM -0800, Bharath SM wrote:
+> On Fri, Nov 21, 2025 at 2:02 AM Greg KH <gregkh@linuxfoundation.org> wrote:
+> >
+> > On Thu, Nov 06, 2025 at 06:02:39AM -0800, Bharath SM wrote:
+> > > On Fri, Jul 11, 2025 at 9:01 AM Henrique Carvalho
+> > > <henrique.carvalho@suse.com> wrote:
+> > > >
+> > > > On Fri, Jul 11, 2025 at 10:01:58AM +0100, David Howells wrote:
+> > > > > Henrique Carvalho <henrique.carvalho@suse.com> wrote:
+> > > > >
+> > > > > > Add cifs_limit_kvec_subset() and select the appropriate limiter in
+> > > > > > cifs_send_async_read() to handle kvec iterators in async read path,
+> > > > > > fixing the EIO bug when running executables in cifs shares mounted
+> > > > > > with nolease.
+> > > > > >
+> > > > > > This patch -- or equivalent patch, does not exist upstream, as the
+> > > > > > upstream code has suffered considerable API changes. The affected path
+> > > > > > is currently handled by netfs lib and located under netfs/direct_read.c.
+> > > > >
+> > > > > Are you saying that you do see this upstream too?
+> > > > >
+> > > >
+> > > > No, the patch only targets the 6.6.y stable tree. Since version 6.8,
+> > > > this path has moved into the netfs layer, so the original bug no longer
+> > > > exists.
+> > > >
+> > > > The bug was fixed at least since the commit referred in the commit
+> > > > message -- 3ee1a1fc3981. In this commit, the call to cifs_user_readv()
+> > > > is replaced by a call to netfs_unbuffered_read_iter(), inside the
+> > > > function cifs_strict_readv().
+> > > >
+> > > > netfs_unbuffered_read_iter() itself was introduced in commit
+> > > > 016dc8516aec8, along with other netfs api changes, present in kernel
+> > > > versions 6.8+.
+> > > >
+> > > > Backporting netfs directly would be non-trivial. Instead, I:
+> > > >
+> > > > - add cifs_limit_kvec_subset(), modeled on the existing
+> > > >   cifs_limit_bvec_subset()
+> > > > - choose between the kvec or bvec limiter function early in
+> > > >   cifs_write_from_iter().
+> > > >
+> > > > The Fixes tag references d08089f649a0c, which implements
+> > > > cifs_limit_bvec_subset() and uses it inside cifs_write_from_iter().
+> > > >
+> > > > > > Reproducer:
+> > > > > >
+> > > > > > $ mount.cifs //server/share /mnt -o nolease
+> > > > > > $ cat - > /mnt/test.sh <<EOL
+> > > > > > echo hallo
+> > > > > > EOL
+> > > > > > $ chmod +x /mnt/test.sh
+> > > > > > $ /mnt/test.sh
+> > > > > > bash: /mnt/test.sh: /bin/bash: Defekter Interpreter: Eingabe-/Ausgabefehler
+> > > > > > $ rm -f /mnt/test.sh
+> > > > >
+> > > > > Is this what you are expecting to see when it works or when it fails?
+> > > > >
+> > > >
+> > > > This is the reproducer for the observed bug. In english it reads "Bad
+> > > > interpreter: Input/Output error".
+> > > >
+> > > > FYI: I tried to follow Option 3 of the stable-kernel rules for submission:
+> > > > <https://www.kernel.org/doc/html/v6.15/process/stable-kernel-rules.html>
+> > > > Please let me know if you'd prefer a different approach or any further
+> > > > changes.
+> > > Thanks Henrique.
+> > >
+> > > Hi Greg,
+> > >
+> > > We are observing the same issue with the 6.6 Kernel, Can you please
+> > > help include this patch in the 6.6 stable kernel.?
+> >
+> > Pleas provide a working backport and we will be glad to imclude it.
+> >
+> This fix is not needed now in the stable kernels as "[PATCH] cifs: Fix
+> uncached read into ITER_KVEC iterator" submitted
+> in email thread "Request to backport data corruption fix to stable"
+> fixes this issue.
 
-Signed-off-by: Aaditya Kansal <aadityakansal390@gmail.com>
----
- fs/smb/client/inode.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I do not understand, what commit fixed this?  You attached a fix, but
+that's not needed?
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index cac355364e43..f6f223a5a97b 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -2314,9 +2314,9 @@ struct dentry *cifs_mkdir(struct mnt_idmap *idmap, struct inode *inode,
- 		goto mkdir_out;
- 	}
- 
--	/* TODO: skip this for smb2/smb3 */
--	rc = cifs_mkdir_qinfo(inode, direntry, mode, full_path, cifs_sb, tcon,
--			      xid);
-+	if (server->vals->protocol_id == SMB10_PROT_ID)
-+		rc = cifs_mkdir_qinfo(inode, direntry, mode, full_path, cifs_sb,
-+				tcon, xid);
- mkdir_out:
- 	/*
- 	 * Force revalidate to get parent dir info when needed since cached
--- 
-2.52.0
+confused,
+
+greg k-h
 
