@@ -1,196 +1,299 @@
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5888332EA7
-	for <linux-cifs@vger.kernel.org>; Thu, 27 Nov 2025 14:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A875C3115A6;
+	Thu, 27 Nov 2025 15:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764253153; cv=none; b=dIando5Bb3lWUHBeKnlKjGgaX823cKAXo3H6moiBfLChouhyRC9/jL+6IF4dICq5/p9idtARi5xpJ0jCdHIQHIdZYbZboaMU0jsiD5jf40+YXoPO+EPLoXgYUuK+kAL8F7Y13mThk3XD2PyMU2cn9U5aMhCIqiIjzJqT7TpfuxU=
+	t=1764255877; cv=none; b=klJnxXcjRHI1CFUb2MHWmNu3/msP37uiX1SaQCs+JZ9/5Zb/fdYv9DoWk2Qj+uD3aIiu1r6YPBrorZkhzAlAw6Oy9LaghXtH44Mz1S4Gpj26aKNVx9QkQu68J5uVaPneitlWno34DqcICOXFdHFIa9KGILiP6OFiq0qwi6/0/1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764253153; c=relaxed/simple;
-	bh=+rK0NdDFqbxjsxwEGy5d1mdUZ/tS/dpwvMX+IXOJ0vg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=twDVhmF3M1jlaEiYEg2OAP6aRwJP59CD9eHiXK1MSWxhwSo8LHMVuiSw0Fq/8pkB5VLkD9g983awQ8hQER8kGi/y6hLqxZtNlDSEOQSZrBOwX/tsLiT+HgUNmBVVJZzNQQl2oGtgItfSCeYPLfY2K8rCeUuK3eNX9yejrwl0b8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HkR2ObvF; arc=none smtp.client-ip=74.125.224.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764255877; c=relaxed/simple;
+	bh=EEdtEUfRJchKSbrlGprN9bM16DeXtFkQowltcg6/ffU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dI+oQQ/PWxLrBu+PqFzGKOhnx97rnixAw/vK7bl8Iw9jA4GPKnNknp9LA646GsJJOOyMK63KqodGlN8+B3kdz4Q+h2vrRfWgm0hdsKB3oMTIFmkSrahqBiBinZPcmpv7S7Jkd4VrzVQJDKHvNTTraiFdHEjRYmrELkXM1wDnM7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=GwI0maNH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HkR2ObvF"
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-640d8b78608so698607d50.1
-        for <linux-cifs@vger.kernel.org>; Thu, 27 Nov 2025 06:19:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764253149; x=1764857949; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SiuHFLg406W9DhQLXabUumf69AD24Rb67vEaZ3vvDD0=;
-        b=HkR2ObvFvjWpKTiF9mnknd9EVrWxDh3UaZqr9H1TFSrb/Xmbe/0nozzY8M94BkzBpi
-         AiISjUkchR6K/YLVW3Q5uqjx9vyrL/fLc23PnmxIgEx7Y67lrotjj5vZkabIWD2tEgwH
-         EV+pgXon7HloIzseVuMMcXQ+NFkRQVwYKdKc6CsETUXKAzhEjMGEAuOnoeEMB0m6zPof
-         psu7C48hrI4lVJkybqFdhJcqgs11fVsreG3JNr2sItpRYgqCzsMJtdL4ev1ERITDAIcI
-         KnLDChEW8eb4yq3cwaQYoEbBq4mg9CZRkLzGDx6nze4AxSEvI48Yvu6wCm31BPvVrdnB
-         /lsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764253149; x=1764857949;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=SiuHFLg406W9DhQLXabUumf69AD24Rb67vEaZ3vvDD0=;
-        b=Mtuqi+AXO1qe8uLz4M97W3JZin3Nfponav2CQN77XhqyqObZ9sI77VXaB5CvlUzYJH
-         g9rnN3KEJDDM1YS1ZumGU6is03qDUGd4bdAcN3YqqX822O92tCOPbegK7nriqAaeqJ9S
-         os1Tc88Ehrt1VfRlEiUICcDHwachMytU2vLSx9W+fehnDaaHq14PxLEcciHB0/abyVVj
-         f5ZNZKfEhPaFuvn1yAZBBWZQDPNULJ4LyNwJNJ7iirtzfC0/7Sd4bLGUsFSWJAZS0ZZT
-         6n0cNlNwsMVvVCfISKDYHDRr+fg2Y6/kCZlKv5Pzwp5yitQOyawwFIx3Edn5eemes9HT
-         1uOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVnowp09Kz6UKcwrIFEU3MZHBC0MPuzH0JZePDUhpur+G4cwH7A/4OK7NCgC+uiLCAnP0RV6RZt8eW4@vger.kernel.org
-X-Gm-Message-State: AOJu0YydiamvJdMvHH8qsdVXod2EmQj2wB+E/z9v4FDfgjjbKPzksvWT
-	FnWOVKO53AZJ3OvUc2+1OHqpByx9NpMKCNT5XXmsWBGdEspGnaJP1GDKW+4qpyy1QNDij5mZ4tF
-	MmF2CYW7UlFVpuLt8vduUbHgYRyP4/WU=
-X-Gm-Gg: ASbGncu/UACCB54sFL/U3Hnh6SwkaDVm0Ri8yfn38YLSFgBWNJ1heowPy+B9sO9sg14
-	U1+IoHu7w4xjQd/tk54cCCqFpUXgdeWtCebc8DofRoz+D/iaO8GdBeCgfrzY2GoIwmawTBo95lk
-	D/qKiBs5RzDa06e9cA7z0U/SogYXa6OslJ3TbApEmwS4fM255lqXG/X1jPvV/W4NkFYNp2wKXUV
-	8qLQjWsuXJoVFXYU1dLpmTifv51EeaCgW1uSVtiHeDbube+hhfYs63GW5RoxikFkq+FcA==
-X-Google-Smtp-Source: AGHT+IH9PoAq9XPvTiPzII5EfnthmkcpC3LouL1/7BuNls425a7Mp4OkuOlhOHCMfx8jqaUvqg0nrmdyPfdfvCBZVjI=
-X-Received: by 2002:a05:690e:787:b0:63f:b5a5:373 with SMTP id
- 956f58d0204a3-64302a2aab4mr13618764d50.10.1764253148641; Thu, 27 Nov 2025
- 06:19:08 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="GwI0maNH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3B5DC4CEF8;
+	Thu, 27 Nov 2025 15:04:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1764255877;
+	bh=EEdtEUfRJchKSbrlGprN9bM16DeXtFkQowltcg6/ffU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=GwI0maNHVhwiQVImCj347YUnhTgTr9mn+sAywq/jBf7FYGp3gcGKN3uLYsHTWXmM8
+	 wqyXuBgX1ybAnqrtg/HS0+nfxW7nNfXW5jwYaWQJxMLWP1n5mToazgHbXJrIZM5cX3
+	 t2/SPwcAK39Y0v9alC4OZ07XOUvpGOrf8l7CNTdU=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Jay Shin <jaeshin@redhat.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	David Howells <dhowells@redhat.com>,
+	linux-cifs@vger.kernel.org,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.17 146/175] smb: client: handle lack of IPC in dfs_cache_refresh()
+Date: Thu, 27 Nov 2025 15:46:39 +0100
+Message-ID: <20251127144048.287424369@linuxfoundation.org>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20251127144042.945669935@linuxfoundation.org>
+References: <20251127144042.945669935@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250710165040.3525304-1-henrique.carvalho@suse.com>
- <2944136.1752224518@warthog.procyon.org.uk> <aHE0--yUyFJqK6lb@precision>
- <CAGypqWyyA6nUfH-bGhQxLYD74O7EcE_6_W15=AB8jvi6yZiV_Q@mail.gmail.com>
- <2025112112-icon-bunkmate-bfad@gregkh> <CAGypqWy8=Oq6CC0YGFSr72L7kqrEDOytboSqJFJBxxV5tGQgFA@mail.gmail.com>
- <2025112707-pummel-film-6bd6@gregkh>
-In-Reply-To: <2025112707-pummel-film-6bd6@gregkh>
-From: Bharath SM <bharathsm.hsk@gmail.com>
-Date: Thu, 27 Nov 2025 06:18:57 -0800
-X-Gm-Features: AWmQ_bkZnXYHxZVlrw2maEPUy5EOPfRwX8Q8KPo1yxUBs5GKouSjvLobSq3_es0
-Message-ID: <CAGypqWyRS0YJ_pgRw4Lx_JkhYYQhXy3DBAW4D+U5sC_HSmZvBQ@mail.gmail.com>
-Subject: Re: [PATCH 6.6.y] smb: client: support kvec iterators in async read path
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Henrique Carvalho <henrique.carvalho@suse.com>, stable@vger.kernel.org, 
-	Shyam Prasad N <sprasad@microsoft.com>, apais@microsoft.com, 
-	Bharath S M <bharathsm@microsoft.com>, David Howells <dhowells@redhat.com>, smfrench@gmail.com, 
-	linux-cifs@vger.kernel.org, Laura Kerner <laura.kerner@ichaus.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 27, 2025 at 5:30=E2=80=AFAM Greg KH <gregkh@linuxfoundation.org=
-> wrote:
->
-> On Fri, Nov 21, 2025 at 02:31:20AM -0800, Bharath SM wrote:
-> > On Fri, Nov 21, 2025 at 2:02=E2=80=AFAM Greg KH <gregkh@linuxfoundation=
-.org> wrote:
-> > >
-> > > On Thu, Nov 06, 2025 at 06:02:39AM -0800, Bharath SM wrote:
-> > > > On Fri, Jul 11, 2025 at 9:01=E2=80=AFAM Henrique Carvalho
-> > > > <henrique.carvalho@suse.com> wrote:
-> > > > >
-> > > > > On Fri, Jul 11, 2025 at 10:01:58AM +0100, David Howells wrote:
-> > > > > > Henrique Carvalho <henrique.carvalho@suse.com> wrote:
-> > > > > >
-> > > > > > > Add cifs_limit_kvec_subset() and select the appropriate limit=
-er in
-> > > > > > > cifs_send_async_read() to handle kvec iterators in async read=
- path,
-> > > > > > > fixing the EIO bug when running executables in cifs shares mo=
-unted
-> > > > > > > with nolease.
-> > > > > > >
-> > > > > > > This patch -- or equivalent patch, does not exist upstream, a=
-s the
-> > > > > > > upstream code has suffered considerable API changes. The affe=
-cted path
-> > > > > > > is currently handled by netfs lib and located under netfs/dir=
-ect_read.c.
-> > > > > >
-> > > > > > Are you saying that you do see this upstream too?
-> > > > > >
-> > > > >
-> > > > > No, the patch only targets the 6.6.y stable tree. Since version 6=
-.8,
-> > > > > this path has moved into the netfs layer, so the original bug no =
-longer
-> > > > > exists.
-> > > > >
-> > > > > The bug was fixed at least since the commit referred in the commi=
-t
-> > > > > message -- 3ee1a1fc3981. In this commit, the call to cifs_user_re=
-adv()
-> > > > > is replaced by a call to netfs_unbuffered_read_iter(), inside the
-> > > > > function cifs_strict_readv().
-> > > > >
-> > > > > netfs_unbuffered_read_iter() itself was introduced in commit
-> > > > > 016dc8516aec8, along with other netfs api changes, present in ker=
-nel
-> > > > > versions 6.8+.
-> > > > >
-> > > > > Backporting netfs directly would be non-trivial. Instead, I:
-> > > > >
-> > > > > - add cifs_limit_kvec_subset(), modeled on the existing
-> > > > >   cifs_limit_bvec_subset()
-> > > > > - choose between the kvec or bvec limiter function early in
-> > > > >   cifs_write_from_iter().
-> > > > >
-> > > > > The Fixes tag references d08089f649a0c, which implements
-> > > > > cifs_limit_bvec_subset() and uses it inside cifs_write_from_iter(=
-).
-> > > > >
-> > > > > > > Reproducer:
-> > > > > > >
-> > > > > > > $ mount.cifs //server/share /mnt -o nolease
-> > > > > > > $ cat - > /mnt/test.sh <<EOL
-> > > > > > > echo hallo
-> > > > > > > EOL
-> > > > > > > $ chmod +x /mnt/test.sh
-> > > > > > > $ /mnt/test.sh
-> > > > > > > bash: /mnt/test.sh: /bin/bash: Defekter Interpreter: Eingabe-=
-/Ausgabefehler
-> > > > > > > $ rm -f /mnt/test.sh
-> > > > > >
-> > > > > > Is this what you are expecting to see when it works or when it =
-fails?
-> > > > > >
-> > > > >
-> > > > > This is the reproducer for the observed bug. In english it reads =
-"Bad
-> > > > > interpreter: Input/Output error".
-> > > > >
-> > > > > FYI: I tried to follow Option 3 of the stable-kernel rules for su=
-bmission:
-> > > > > <https://www.kernel.org/doc/html/v6.15/process/stable-kernel-rule=
-s.html>
-> > > > > Please let me know if you'd prefer a different approach or any fu=
-rther
-> > > > > changes.
-> > > > Thanks Henrique.
-> > > >
-> > > > Hi Greg,
-> > > >
-> > > > We are observing the same issue with the 6.6 Kernel, Can you please
-> > > > help include this patch in the 6.6 stable kernel.?
-> > >
-> > > Pleas provide a working backport and we will be glad to imclude it.
-> > >
-> > This fix is not needed now in the stable kernels as "[PATCH] cifs: Fix
-> > uncached read into ITER_KVEC iterator" submitted
-> > in email thread "Request to backport data corruption fix to stable"
-> > fixes this issue.
->
-> I do not understand, what commit fixed this?  You attached a fix, but
-> that's not needed?
+6.17-stable review patch.  If anyone has any objections, please let me know.
 
-For the issue described originally in this thread, both David and
-Henrique has submitted different fixes.
-Since David's patch already merged to stable kernel 6.6 recently, we
-don't need the patch submitted by Henriqie in this thread.
+------------------
 
-Link to david's patch that is already in 6.6 stable:
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/fs/=
-smb/client?h=3Dlinux-6.6.y&id=3D25d6e76639323ee3d1fb4df7066c6d79190f6c33
+From: Paulo Alcantara <pc@manguebit.org>
 
-Thank you.!
+[ Upstream commit fac56c4651ae95f3f2b468c2cf1884cf0e6d18c1 ]
+
+In very rare cases, DFS mounts could end up with SMB sessions without
+any IPC connections.  These mounts are only possible when having
+unexpired cached DFS referrals, hence not requiring any IPC
+connections during the mount process.
+
+Try to establish those missing IPC connections when refreshing DFS
+referrals.  If the server is still rejecting it, then simply ignore
+and leave expired cached DFS referral for any potential DFS failovers.
+
+Reported-by: Jay Shin <jaeshin@redhat.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Cc: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/client/cifsproto.h |  2 ++
+ fs/smb/client/connect.c   | 38 ++++++++++++---------------
+ fs/smb/client/dfs_cache.c | 55 +++++++++++++++++++++++++++++++++------
+ 3 files changed, 66 insertions(+), 29 deletions(-)
+
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index e8fba98690ce3..8c00ff52a12a6 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -615,6 +615,8 @@ extern int E_md4hash(const unsigned char *passwd, unsigned char *p16,
+ extern struct TCP_Server_Info *
+ cifs_find_tcp_session(struct smb3_fs_context *ctx);
+ 
++struct cifs_tcon *cifs_setup_ipc(struct cifs_ses *ses, bool seal);
++
+ void __cifs_put_smb_ses(struct cifs_ses *ses);
+ 
+ extern struct cifs_ses *
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index dd12f3eb61dcb..d65ab7e4b1c26 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -2015,39 +2015,31 @@ static int match_session(struct cifs_ses *ses,
+ /**
+  * cifs_setup_ipc - helper to setup the IPC tcon for the session
+  * @ses: smb session to issue the request on
+- * @ctx: the superblock configuration context to use for building the
+- *       new tree connection for the IPC (interprocess communication RPC)
++ * @seal: if encryption is requested
+  *
+  * A new IPC connection is made and stored in the session
+  * tcon_ipc. The IPC tcon has the same lifetime as the session.
+  */
+-static int
+-cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
++struct cifs_tcon *cifs_setup_ipc(struct cifs_ses *ses, bool seal)
+ {
+ 	int rc = 0, xid;
+ 	struct cifs_tcon *tcon;
+ 	char unc[SERVER_NAME_LENGTH + sizeof("//x/IPC$")] = {0};
+-	bool seal = false;
+ 	struct TCP_Server_Info *server = ses->server;
+ 
+ 	/*
+ 	 * If the mount request that resulted in the creation of the
+ 	 * session requires encryption, force IPC to be encrypted too.
+ 	 */
+-	if (ctx->seal) {
+-		if (server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION)
+-			seal = true;
+-		else {
+-			cifs_server_dbg(VFS,
+-				 "IPC: server doesn't support encryption\n");
+-			return -EOPNOTSUPP;
+-		}
++	if (seal && !(server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION)) {
++		cifs_server_dbg(VFS, "IPC: server doesn't support encryption\n");
++		return ERR_PTR(-EOPNOTSUPP);
+ 	}
+ 
+ 	/* no need to setup directory caching on IPC share, so pass in false */
+ 	tcon = tcon_info_alloc(false, netfs_trace_tcon_ref_new_ipc);
+ 	if (tcon == NULL)
+-		return -ENOMEM;
++		return ERR_PTR(-ENOMEM);
+ 
+ 	spin_lock(&server->srv_lock);
+ 	scnprintf(unc, sizeof(unc), "\\\\%s\\IPC$", server->hostname);
+@@ -2057,13 +2049,13 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
+ 	tcon->ses = ses;
+ 	tcon->ipc = true;
+ 	tcon->seal = seal;
+-	rc = server->ops->tree_connect(xid, ses, unc, tcon, ctx->local_nls);
++	rc = server->ops->tree_connect(xid, ses, unc, tcon, ses->local_nls);
+ 	free_xid(xid);
+ 
+ 	if (rc) {
+-		cifs_server_dbg(VFS, "failed to connect to IPC (rc=%d)\n", rc);
++		cifs_server_dbg(VFS | ONCE, "failed to connect to IPC (rc=%d)\n", rc);
+ 		tconInfoFree(tcon, netfs_trace_tcon_ref_free_ipc_fail);
+-		goto out;
++		return ERR_PTR(rc);
+ 	}
+ 
+ 	cifs_dbg(FYI, "IPC tcon rc=%d ipc tid=0x%x\n", rc, tcon->tid);
+@@ -2071,9 +2063,7 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
+ 	spin_lock(&tcon->tc_lock);
+ 	tcon->status = TID_GOOD;
+ 	spin_unlock(&tcon->tc_lock);
+-	ses->tcon_ipc = tcon;
+-out:
+-	return rc;
++	return tcon;
+ }
+ 
+ static struct cifs_ses *
+@@ -2347,6 +2337,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
+ {
+ 	struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&server->dstaddr;
+ 	struct sockaddr_in *addr = (struct sockaddr_in *)&server->dstaddr;
++	struct cifs_tcon *ipc;
+ 	struct cifs_ses *ses;
+ 	unsigned int xid;
+ 	int retries = 0;
+@@ -2525,7 +2516,12 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
+ 	list_add(&ses->smb_ses_list, &server->smb_ses_list);
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 
+-	cifs_setup_ipc(ses, ctx);
++	ipc = cifs_setup_ipc(ses, ctx->seal);
++	spin_lock(&cifs_tcp_ses_lock);
++	spin_lock(&ses->ses_lock);
++	ses->tcon_ipc = !IS_ERR(ipc) ? ipc : NULL;
++	spin_unlock(&ses->ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	free_xid(xid);
+ 
+diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
+index 4dada26d56b5f..f2ad0ccd08a77 100644
+--- a/fs/smb/client/dfs_cache.c
++++ b/fs/smb/client/dfs_cache.c
+@@ -1120,24 +1120,63 @@ static bool target_share_equal(struct cifs_tcon *tcon, const char *s1)
+ 	return match;
+ }
+ 
+-static bool is_ses_good(struct cifs_ses *ses)
++static bool is_ses_good(struct cifs_tcon *tcon, struct cifs_ses *ses)
+ {
+ 	struct TCP_Server_Info *server = ses->server;
+-	struct cifs_tcon *tcon = ses->tcon_ipc;
++	struct cifs_tcon *ipc = NULL;
+ 	bool ret;
+ 
++	spin_lock(&cifs_tcp_ses_lock);
+ 	spin_lock(&ses->ses_lock);
+ 	spin_lock(&ses->chan_lock);
++
+ 	ret = !cifs_chan_needs_reconnect(ses, server) &&
+-		ses->ses_status == SES_GOOD &&
+-		!tcon->need_reconnect;
++		ses->ses_status == SES_GOOD;
++
+ 	spin_unlock(&ses->chan_lock);
++
++	if (!ret)
++		goto out;
++
++	if (likely(ses->tcon_ipc)) {
++		if (ses->tcon_ipc->need_reconnect) {
++			ret = false;
++			goto out;
++		}
++	} else {
++		spin_unlock(&ses->ses_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
++
++		ipc = cifs_setup_ipc(ses, tcon->seal);
++
++		spin_lock(&cifs_tcp_ses_lock);
++		spin_lock(&ses->ses_lock);
++		if (!IS_ERR(ipc)) {
++			if (!ses->tcon_ipc) {
++				ses->tcon_ipc = ipc;
++				ipc = NULL;
++			}
++		} else {
++			ret = false;
++			ipc = NULL;
++		}
++	}
++
++out:
+ 	spin_unlock(&ses->ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
++	if (ipc && server->ops->tree_disconnect) {
++		unsigned int xid = get_xid();
++
++		(void)server->ops->tree_disconnect(xid, ipc);
++		_free_xid(xid);
++	}
++	tconInfoFree(ipc, netfs_trace_tcon_ref_free_ipc);
+ 	return ret;
+ }
+ 
+ /* Refresh dfs referral of @ses */
+-static void refresh_ses_referral(struct cifs_ses *ses)
++static void refresh_ses_referral(struct cifs_tcon *tcon, struct cifs_ses *ses)
+ {
+ 	struct cache_entry *ce;
+ 	unsigned int xid;
+@@ -1153,7 +1192,7 @@ static void refresh_ses_referral(struct cifs_ses *ses)
+ 	}
+ 
+ 	ses = CIFS_DFS_ROOT_SES(ses);
+-	if (!is_ses_good(ses)) {
++	if (!is_ses_good(tcon, ses)) {
+ 		cifs_dbg(FYI, "%s: skip cache refresh due to disconnected ipc\n",
+ 			 __func__);
+ 		goto out;
+@@ -1241,7 +1280,7 @@ static void refresh_tcon_referral(struct cifs_tcon *tcon, bool force_refresh)
+ 	up_read(&htable_rw_lock);
+ 
+ 	ses = CIFS_DFS_ROOT_SES(ses);
+-	if (!is_ses_good(ses)) {
++	if (!is_ses_good(tcon, ses)) {
+ 		cifs_dbg(FYI, "%s: skip cache refresh due to disconnected ipc\n",
+ 			 __func__);
+ 		goto out;
+@@ -1309,7 +1348,7 @@ void dfs_cache_refresh(struct work_struct *work)
+ 	tcon = container_of(work, struct cifs_tcon, dfs_cache_work.work);
+ 
+ 	list_for_each_entry(ses, &tcon->dfs_ses_list, dlist)
+-		refresh_ses_referral(ses);
++		refresh_ses_referral(tcon, ses);
+ 	refresh_tcon_referral(tcon, false);
+ 
+ 	queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
+-- 
+2.51.0
+
+
+
