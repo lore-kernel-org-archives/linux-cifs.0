@@ -1,80 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0EB32B987;
-	Thu, 27 Nov 2025 12:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3553A2BDC3F
+	for <linux-cifs@vger.kernel.org>; Thu, 27 Nov 2025 12:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764245418; cv=none; b=Rg9qJNtfPCNwBSzqWas4C6FUZUw7LLe6vu23SowV8QVqVzXqoXW2/HAobtA20hVAHhBEth/Br2NeEtnH86NpFCWXnAjgZTW6iTU9K75v9kKkP+tBOk4MazkSL5D8DedOQk8LpCJsZqBLdmmJnQCiwaK4zZo4w7vu8HswRR7dLAk=
+	t=1764246431; cv=none; b=ukat24bn9ln39LNrZ1WNOVFV8z9535qSsSJ2MDghljJEEppAuegcfAtx2vurqhjq6BjFuoqRyYpyZqgRxwXM0Gx8vn+3rGFzYX1u16VslYQWk3qZ9KP5TaR3c0dvfCDEGAK/bExU0UgviVyyR+lH89w+8vqhqC5Aq/dgwmTd4sU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764245418; c=relaxed/simple;
-	bh=Tw8ZxnDtRksKWjLeoEr5RzNFz3CSj5Rza0zXH0X5J5M=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=j+FTxr6aruk5RIgMtAMUXa1lyN8GHInYIYWqxyWoD7UQSBwQ45bGIu3mnurWDsdXtbEacmq+GU3VmGEXhJuH2btlGTqDnxlRrTu4rR3LzNKFDOEfdLtdZEDRkva59DOYNJi8Kvaquup8+dzFfCmGUqkdkaTHUYi9AOuqi3OrN1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dbjjwRHk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764246431; c=relaxed/simple;
+	bh=GhVq6uSn5RaWMTsZxzMiWgV+Auc8xzOn19mSRt51ar8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wu7XV5bXbdzTUFr1c4UfCBvNMzwP1LtBqEk2cgSZ4CQiByEVksYuwKQQ4ZlQrr8z+L+IXwvR6OmhGJwl8ydzRNpr+aOGdpBFD612DyWDDryZkS8Yl7j4f9Rr690PPLIWUPrmyr7pQYGABWCYn6I/3LRAyp82RPDKE34NAKIxnQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i5lqCoEM; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dbjjwRHk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ED71C4CEF8;
-	Thu, 27 Nov 2025 12:10:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764245417;
-	bh=Tw8ZxnDtRksKWjLeoEr5RzNFz3CSj5Rza0zXH0X5J5M=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=dbjjwRHkGDr/xSfPV+oueR8C+iPyK0ofE2v34nPYeEkigq+An5mE52EZncusXmWke
-	 pKpbHiVfke2kKhb9NkQ4u9KNB6PsFPDhQ8LOAJExIO6/JlIeXoQ8IO/9iUPwKlQs34
-	 2aSZqAGy/zbPFJNQq0bkR1F2W2IKrQhmanXcrS28zDqmPw3L/qM2wsbwdvyC3q+qDC
-	 2FftQMSslX1pNYY5TqubWnyF/FtiPdT+ZGYL5TmZoeaXRoks8rSrepkqqlPthkjB04
-	 RxUPF1AGQBnKD0pf34V35CiL4x0DkRWJVC8AjO8aq6GLHXrYEsQ5GSain6TgDjCJ38
-	 DOxaEV6JgmMzg==
-From: Leon Romanovsky <leon@kernel.org>
-To: linux-rdma@vger.kernel.org, Stefan Metzmacher <metze@samba.org>
-Cc: Zhu Yanjun <zyjzyj2000@gmail.com>, Zhu Yanjun <yanjun.zhu@linux.dev>, 
- Jason Gunthorpe <jgg@ziepe.ca>, netdev@vger.kernel.org, 
- linux-cifs@vger.kernel.org
-In-Reply-To: <20251127105614.2040922-1-metze@samba.org>
-References: <20251127105614.2040922-1-metze@samba.org>
-Subject: Re: [PATCH v3] RDMA/rxe: reclassify sockets in order to avoid
- false positives from lockdep
-Message-Id: <176424541467.1853134.8527838747212328732.b4-ty@kernel.org>
-Date: Thu, 27 Nov 2025 07:10:14 -0500
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i5lqCoEM"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-297ea936b39so2378455ad.1
+        for <linux-cifs@vger.kernel.org>; Thu, 27 Nov 2025 04:27:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764246429; x=1764851229; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VBrweXDCkzKL99FGdZJb4s2u6Q85xoJBbuuJYA1XKX4=;
+        b=i5lqCoEMCzW3IG+qnCEmjLE/5G6c2n6ruk30OLkXuyz8GS3Zi2tFpJjp7d1yYl4KF5
+         kU2RQhWiJa/KziyHxF+Ly05NNnTrIVHODZqz1zx/e/EyMUX8qaFjIhU7VM3MT8s++CLM
+         +97WYQ5XAhkKA/bXSWHzSd1PUkvnguU5etbc+IvYb4hrvITb8KXqwr2jsAfnEBUjW6y3
+         H35en4xtJdTyBmxuORS0EwLcxfGsf9bwV/263R+fjaxwXLbdRWAuPJyf4NKkPYmgEDyp
+         9fNCx6uRrvFCpVb7b9CONVRludXz8SkJv9xme8fg2xXOcgCMayw7XBz1e8eHMOoEdkzj
+         w1cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764246429; x=1764851229;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VBrweXDCkzKL99FGdZJb4s2u6Q85xoJBbuuJYA1XKX4=;
+        b=w4or1CejO+fDd/3uTlLlgywlE5kZUthirmVeeUG5+q7gKMY7Dh5kUVnrc7N3VAeye2
+         TV/FweMEaP4HOCnCfQoCbPCLOgGmv2EfJ7/JUkRV6f6L+jjcwvwFIzVVMjibN+Yy8+ts
+         /rM56X8GoqQZswPasMMNxKeXr7Eb0xew9V4f2SMr84hJDTc4FmA+IJS2rZFA5Z/RMhzQ
+         CHbKvnwIn8N2s3mwLtkO511PFrXCLbSd/k29ThkLyz2R3RT3PKKedusDwlqNm/tsTaDN
+         lB4FMSvqThI6G2V0b7dNU1Xlzyt9De+/IxpVAp0zwO0hIsECxtS8GzJVdcYmhD/mkir2
+         mzJg==
+X-Forwarded-Encrypted: i=1; AJvYcCVh7SPkvxGM+XogK+plusZVAhO7ZGcjbTsXnIrTFtqrwiHQ0S1kCBm/Ok7i7M7HXr3U5gWSnsEekSkm@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2aqecNtaco7h3CZ8auXx1YtqK6sI8AZ84dd3WryMnXKDRe64o
+	/0mHVFIcovAidr4m4XYRkvlzP0uT3npsYukjn8d2RrhpWSxxIjIxqci5
+X-Gm-Gg: ASbGnct0XyGh4hLZr5AjUV6tEgsVyFrhZeGva8kNnv+IgTrZ9VB7X+MLXGW+n/rwvfq
+	FG9yKfb15KaCkoAvaQ3q7YB1wFYyhpyEXmx1zTgjZzkCj1GvTStcyUCc3XtB0TPv/soV2b6UmJV
+	J4BYp8PVkYS45IVT4qrr2+7znkBaixpErbgoriSEh3yE4L/RwvzUSBQbx5mNeGGhcQKOfiUDTYR
+	YjKXIsfbfqwlhkD5+iFAZ4RAcYCe8USAzchhL5l9BMGngX8dWgJ/BcBJcGil41NBFXgwwFrShZM
+	NXBmJse9sAHVTNNisIscnGqsNU/BYYWArO95VkvsqZbdJaHfQKGM9ENeIrdKimAueyELs1OfYFY
+	+8hL6rQf3bBvw7QBueImFEvMD95gZZdvF0wmr+Xl36p5GqN9OSsj868od/y7Q6hfbJpG/IHpVQs
+	WJyTUnTIJ95jOD3NibSwjVXS2ebGwy
+X-Google-Smtp-Source: AGHT+IFFSz0gxCcLoQEe2IoqmHI/7A23cwj5j2pf9jMsj2EshBK94+Uduzwctn4OkLsfVFb6T6pNlQ==
+X-Received: by 2002:a17:903:388d:b0:299:db45:c5a9 with SMTP id d9443c01a7336-29b702764c5mr131269475ad.9.1764246429393;
+        Thu, 27 Nov 2025 04:27:09 -0800 (PST)
+Received: from morax ([2401:4900:be78:dfa0:1977:daf6:20e6:4457])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-29bcec452a9sm16942955ad.12.2025.11.27.04.27.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Nov 2025 04:27:08 -0800 (PST)
+From: Aaditya Kansal <aadityakansal390@gmail.com>
+To: sfrench@samba.org,
+	pc@manguebit.org
+Cc: ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bharathsm@microsoft.com,
+	skhan@linuxfoundation.org,
+	david.hunter.linux@gmail.com,
+	Aaditya Kansal <aadityakansal390@gmail.com>
+Subject: [PATCH] ksmbd: Add check in cifs_mkdir() for SMB2/3
+Date: Thu, 27 Nov 2025 17:56:37 +0530
+Message-ID: <20251127122637.2094566-1-aadityakansal390@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-a6db3
+Content-Transfer-Encoding: 8bit
 
+Add a version check in cifs_mkdir(). The check skips a function call to
+cifs_mkdir_qinfo() for SMB 2/3.
 
-On Thu, 27 Nov 2025 11:56:14 +0100, Stefan Metzmacher wrote:
-> While developing IPPROTO_SMBDIRECT support for the code
-> under fs/smb/common/smbdirect [1], I noticed false positives like this:
-> 
-> [+0,003927] ============================================
-> [+0,000532] WARNING: possible recursive locking detected
-> [+0,000611] 6.18.0-rc5-metze-kasan-lockdep.02+ #1 Tainted: G           OE
-> [+0,000835] --------------------------------------------
-> [+0,000729] ksmbd:r5445/3609 is trying to acquire lock:
-> [+0,000709] ffff88800b9570f8 (k-sk_lock-AF_INET){+.+.}-{0:0},
->                               at: inet_shutdown+0x52/0x360
-> [+0,000831]
->             but task is already holding lock:
-> [+0,000684] ffff88800654af78 (k-sk_lock-AF_INET){+.+.}-{0:0},
->                            at: smbdirect_sk_close+0x122/0x790 [smbdirect]
-> [+0,000928]
->             other info that might help us debug this:
-> [+0,005552]  Possible unsafe locking scenario:
-> 
-> [...]
+Signed-off-by: Aaditya Kansal <aadityakansal390@gmail.com>
+---
+ fs/smb/client/inode.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Applied, thanks!
-
-[1/1] RDMA/rxe: reclassify sockets in order to avoid false positives from lockdep
-      https://git.kernel.org/rdma/rdma/c/80a85a771deb11
-
-Best regards,
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index cac355364e43..f6f223a5a97b 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -2314,9 +2314,9 @@ struct dentry *cifs_mkdir(struct mnt_idmap *idmap, struct inode *inode,
+ 		goto mkdir_out;
+ 	}
+ 
+-	/* TODO: skip this for smb2/smb3 */
+-	rc = cifs_mkdir_qinfo(inode, direntry, mode, full_path, cifs_sb, tcon,
+-			      xid);
++	if (server->vals->protocol_id == SMB10_PROT_ID)
++		rc = cifs_mkdir_qinfo(inode, direntry, mode, full_path, cifs_sb,
++				tcon, xid);
+ mkdir_out:
+ 	/*
+ 	 * Force revalidate to get parent dir info when needed since cached
 -- 
-Leon Romanovsky <leon@kernel.org>
+2.52.0
 
