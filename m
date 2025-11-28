@@ -1,127 +1,125 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9E6248886
-	for <linux-cifs@vger.kernel.org>; Fri, 28 Nov 2025 18:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068F72C08B6
+	for <linux-cifs@vger.kernel.org>; Fri, 28 Nov 2025 22:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764355917; cv=none; b=Ybqih115FxZhPrepRjOsp7HmnGi8YxLk6N/P4dDN1AsRgEvVefAKYiZyZEJpruLBKqREcyl7uA6e6Mg1g6Cyni44VQ5sVAHy/fk1Ht00VJ3sq6gouYZK76rBsdWHfGvsDz4G4f0YOFXgHyvjzcV3fWBAydgmnJIvDtnBA8L8sd8=
+	t=1764368504; cv=none; b=iLOyU+uX9yUEZiSzKsL/chsPLm5D4tuhDZwEqNgBUJon6oMe0ef75fm7G+ShaTCN1ha8BxW4ruCtEynlreADG8L/SO2Ko+MdEEDHkr5JGHT1z/hmqyTCiJYQ3gQMUy9/R57Js6yCKKwpZz7LlLHtvZ4gljkR5QopNLNhEVi9mlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764355917; c=relaxed/simple;
-	bh=mR6YrckDN5ohKcIpS46MyUYYjGQ0iujR6crQdAUZUaQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UOK9DivV+qLL0zM3E0mpqgAYq6AtTnt466atXlAw1JopEwnfwLuRrUOkrMGf0+irfO64WTv6P2Bplz/EIJMkhSA2pIOGvBSvulFfT8LOPC/x2BUM3XYpQjlmKihBZjVLSGhopPOFA8bEsp1pHiNhcU47n6UTpuX+SkQS/xhHPIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=GJZuYFkO; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1764368504; c=relaxed/simple;
+	bh=SQTVp2Fzpk0NoZcAVL+rErGbsCS+UUMcmvwU/jMKSLc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p7ASQQOLbpy6KfITAmfdrj16icIMYqVv0GwnihiNJ8o5KX8Cya4ey4JhjIOSvpivRNnpfpu2T5Iqs6BOyCYNVwXOdkT99REcOZT0erthPhFmRn5C0mnq672XVxL6tyYWAiSOI/LUiZ91Ah1NAgvM7FzitLCKFa4vwFIgZnOWQeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mEsOnfPe; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="GJZuYFkO"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=Vx5DHGXnqdyqUkxWDveNCIl8IbJ47O9ltzJT0QrI3D8=; b=GJZuYFkOXZHBrcYuFLVfILD8yc
-	8wKmsrUW9zyJefL3trLURemL+GX8I7oFIQ1liznsXU2HFVSnAZ9mJUcPewOBl57BfPoukVUXhPHjQ
-	KBg2GGWw22GCJ4plWkbPZ/Iea37vyG2YyC8UB5GCx1RF1ud+oPzkY3geKYivGC+3UuH7P4Sfno5NO
-	kcEJwGe3ToQsv1cMrjYL9tElk/G3sYSYkJJMHBvo7sjy9XNIfxOSzYzZLUm0ddr3ipJrOaS8lemmf
-	l2DF1+VqKoKB7k+ApAmLE+daewKxy34y1MqjwXvvLkC/iSH9kSNiBXkgebMEoFsjuGsnE1nTlpw9V
-	TpvY2VqJN6y5AuHfuM0Ctk9W6jVMFXfK6HYONr1ec6BjrFTk8WeVuMAonRdnMX0h96ljCKuy3c74K
-	AZYlqke92f1D04BWuNq7OX7q9FKNt++NEKIK4lNq1oW8KudmxjCHDOeot6Aj6TJK8j1y/9SW9VKLw
-	jbYr2+l1hMIqb2R1iFXPQhwr;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vP3ZR-00GB0G-0G;
-	Fri, 28 Nov 2025 18:51:53 +0000
-Message-ID: <e67a626a-828a-434d-8921-4bd8fcaeabcb@samba.org>
-Date: Fri, 28 Nov 2025 19:51:52 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mEsOnfPe"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-343806688c5so1658959a91.0
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Nov 2025 14:21:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764368502; x=1764973302; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6P18mAZ1MqIvbh3CmMm45KSEcmyyptIsJafX5Z8hVww=;
+        b=mEsOnfPe1MmbaOXdCmcOe9zlD7foecT34f3cdDyjJSltfw7qWTJb5F/vW6YxZOla3M
+         siLCqucECoMPj6LQOP+gpU7GzZjuilcbmAvgFag5KG59XqopR2MmjL0+L35fuhzDkKLO
+         e2wOSntE1gq/Vt/zOeg4864kUcA/28pP0H3WNGh3n/MO7E54NKV6b2qVSAOL9gKThX9L
+         AZg2C0C1133VK5UykZZj7eT0uxZbdWX581ExlyryucxXyGBhKh/2fd0x0yCGD66VihJr
+         nbnXVJOGthSkC4QtBA6p/7rvBQ+UEYANc8jrGeEGEn1LODZm9wgHhOLGDThCxaB9SM4Q
+         y9ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764368502; x=1764973302;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6P18mAZ1MqIvbh3CmMm45KSEcmyyptIsJafX5Z8hVww=;
+        b=ul7WS1ed0Rrv+5voCNlZBMOdDdnA4apSq8MAXDPYmkg0m4tF+n1Nn+dCU3hF4qE8kr
+         tiz5whjRYjISK7o5CDrAHNiRWUDqNiX1abjQeftSbha+yfrbpBffzJxKyGeRzkfWqbtI
+         cSLSvXeB4ZncofLcSAmmuiahsg0zTjM4jvTDHoGtwKanv/BY512QmbjGujw+i5z/I/Q9
+         1f5tYZLXT8uxAgki6YKhPA5b7tqskSPhwMJTZTR1Yq1XbA507N6TWBbXI7wEKr/PJu46
+         vQpnkuKVdiI9v+1V1zEHCuZTB+RZJJhaxJgh1TSx5ON6+EyXiLSdib2AkjRMZDDv09sp
+         Qyxw==
+X-Forwarded-Encrypted: i=1; AJvYcCWkCW5d/cL0fsmRc4LAYsyu4lJM+wQNXXnJGhw+GU8AcYur0yBLyrzV+w1X8zJK8YgLhpWHOchfSAFN@vger.kernel.org
+X-Gm-Message-State: AOJu0YziPxO+7iiQF2bjc4KEKhcJ7KJGDjTlyrmpCJ1TPNipXqJeIwo7
+	EdEE1Ody9BWjHcyAsVYBKAdN0elLvwPkC0wRGPjgQyeLO/yyHGtT1/gEnURllZpfW2bEDH7BYO4
+	2RmzBp++tZ0RaTKYRRT6ZzqnV4Itrs3T3g+4/
+X-Gm-Gg: ASbGnctNZ25wVE8ZDPqHilYTxVpSeYjpWp5aAlc2y1j+V/TmVqFQEsxvZCQTeJSrlYi
+	yVSy1pFhQX1y+7UILvQP63+u6gewEC5l7tCG6aX9Q9INFQi5LyPbTbLGGaFbi57/cuD2ESLT3tV
+	b4XaweTcUWV+hRzy1d2o0T5HxTKJBkgRUUoP6iql7alxBLXXkUVnnaUqtgmXZxSMIR89Nmdm/hk
+	FfuV5cIiqhRENGdvjWLeF/CTMdSwP85Rzh1bO8EkBPa6fs2wLVk4sLVyHprASziPPxy+UJUg4WL
+	HpUNKQGZ
+X-Google-Smtp-Source: AGHT+IGouVmSRU2+5FPtU7PZ4bxQ1L1TS/rzuH0An62oT/VAqyxTOEwsLF/KPWgDyeqL2eIE6oHNOz0m/r6ekRLZB7U=
+X-Received: by 2002:a17:90b:3b41:b0:340:be44:dd11 with SMTP id
+ 98e67ed59e1d1-3475ed6944amr17150643a91.27.1764368502014; Fri, 28 Nov 2025
+ 14:21:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] MAINTAINERS: change git.samba.org to https
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>
-References: <20251128134951.2331836-1-metze@samba.org>
- <CAH2r5msBaRVPNkaMy0iQKPq9COR+p5+UUNf-B-Fh6=v7zKNRnQ@mail.gmail.com>
- <7ff0bc80-f94c-4cc9-b85a-0ddc1393c9a1@samba.org>
- <CAH2r5msAQ7JZvOksSWJiW9SrZmX85yzcbHJ1Zb7r=P9yU+p5Ew@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAH2r5msAQ7JZvOksSWJiW9SrZmX85yzcbHJ1Zb7r=P9yU+p5Ew@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <cover.1763994509.git.lucien.xin@gmail.com> <20251127183008.5ee6757f@kernel.org>
+In-Reply-To: <20251127183008.5ee6757f@kernel.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Fri, 28 Nov 2025 17:21:30 -0500
+X-Gm-Features: AWmQ_blWIFPPlXbZwBvgkwqvDmPpeWwfQI3WVoQuGLEtMYmvXkBsPdiaHSosH1o
+Message-ID: <CADvbK_crxSB+TwDgEtjV6TUEeO9VYtsE6rqy7L_=rzoDrCfORQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 00/16] net: introduce QUIC infrastructure and
+ core subcomponents
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Am 28.11.25 um 19:15 schrieb Steve French:
-> ok - this change seems harmless.   I also want to look at way to add
-> you to MAINTAINERS to make clear you are "expert" at RDMA/SMBDIRECT
-> and either reviewer or co-maintainer for smb client/server/common more
-> generally.  Wanted to look at a few other examples in MAINTAINERS and
-> compare
+On Thu, Nov 27, 2025 at 9:30=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 24 Nov 2025 09:28:13 -0500 Xin Long wrote:
+> > The QUIC protocol, defined in RFC 9000, is a secure, multiplexed transp=
+ort
+> > built on top of UDP. It enables low-latency connection establishment,
+> > stream-based communication with flow control, and supports connection
+> > migration across network paths, while ensuring confidentiality, integri=
+ty,
+> > and availability.
+>
+> Please look thru the Claude review and address the legit complaints:
+>
+> https://netdev-ai.bots.linux.dev/ai-review.html?id=3D8ac157b3-6222-4e89-a=
+c52-28e4ca52d6c4
+>
+> If the tool is confused but not in an dumb way - it may be worth adding
+> a relevant comment or info in the commit message. Otherwise a note under
+> --- would be appreciated to avoid maintainers having to re-check the
+> comments you already considered and disproved.
+Thanks for the link.
 
-I compared things like
-NETWORKING [GENERAL]
-and
-NETWORKING [SOCKETS]
+I just went through the tool=E2=80=99s report. It found one real issue in
+quic_packet_backlog_work(), which I=E2=80=99ll fix. The other items aren=E2=
+=80=99t
+actual problems, and I=E2=80=99ll add some inline comments or --- notes to
+explain them.
 
-They are 2 sections, but some files overlab.
-
-scripts/get_maintainer.pl include/net/sock.h
-Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING [SOCKETS])
-Kuniyuki Iwashima <kuniyu@google.com> (maintainer:NETWORKING [SOCKETS])
-Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING [SOCKETS])
-Willem de Bruijn <willemb@google.com> (maintainer:NETWORKING [SOCKETS])
-"David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING [GENERAL])
-Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING [GENERAL])
-Simon Horman <horms@kernel.org> (reviewer:NETWORKING [GENERAL])
-netdev@vger.kernel.org (open list:NETWORKING [GENERAL])
-linux-kernel@vger.kernel.org (open list)
-
-And I think we might want an additional section that covers
-F:     fs/smb/common/smbdirect/
-F:     fs/smb/client/smbdirect.*
-F:     fs/smb/server/transport_rdma.*
-
-That way the maintainers for the smbdirect section will appear
-first followed by the more general results.
-
-I first thought to have excludes for fs/smb/common/smbdirect/
-in the cifs.ko and ksmbd.ko sections, but we can leave that out
-and just let it overlab.
-
-> On Fri, Nov 28, 2025 at 12:00 PM Stefan Metzmacher <metze@samba.org> wrote:
->>
->> Am 28.11.25 um 18:48 schrieb Steve French:
->>> On Fri, Nov 28, 2025 at 7:49 AM Stefan Metzmacher <metze@samba.org> wrote:
->>>>
->>>> This is the preferred way to access the server.
->>>
->>> Are you sure that is the preferred way?  75% of the entries in
->>> MAINTAINERS use "git git://" not "git http://" but ... I did notice
->>> that for all github and gitlab ones they use "git http://"
->>
->> It seems a lot of them were created long time ago.
->>
->>> But maybe for samba.org there is an advantage to https?!
->>
->> Yes, the admins of git.samba.org prefer that clients use https://
->> instead of git://
->>
->> I also checked what linux-net uses and it also uses https most of the time:
->>
->> $ git lo -187 linux-next/master  | grep 'Merge branch .*\/\/'| grep https | wc -l
->> 178
->> $ git lo -187 linux-next/master  | grep 'Merge branch .*\/\/'| grep -v https | cut -d ' ' -f2-
->> Merge branch 'main' of git://git.infradead.org/users/willy/xarray.git
->> Merge branch 'master' of git://www.linux-watchdog.org/linux-watchdog-next.git
->> Merge branch 'master' of git://git.code.sf.net/p/tomoyo/tomoyo.git
->> Merge branch 'next' of git://linuxtv.org/media-ci/media-pending.git
->> Merge branch 'docs-next' of git://git.lwn.net/linux.git
->> Merge branch 'master' of git://git.kernel.org/pub/scm/virt/kvm/kvm.git
->>
->> metze
-> 
-> 
-> 
-
+>
+> Thanks for adding the MAINTAINERS entry, two notes on that:
+>  - the entries must be sorted, so you need to move it down under Q
+>    instead of putting it next to SCTP
+>  - you seem to have copy/pasted the uAPI path for SCTP to the entry
+>    instead of QUIC ;)
+You're right, thanks!
