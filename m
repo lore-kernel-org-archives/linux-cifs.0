@@ -1,150 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB3722F76F
-	for <linux-cifs@vger.kernel.org>; Fri, 28 Nov 2025 22:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444DC19EED3
+	for <linux-cifs@vger.kernel.org>; Sat, 29 Nov 2025 03:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764369319; cv=none; b=kT/FqTButWXQxvaH0eHEkGjGh5wAYjVAL6K8uj7jYHO8daxXz25tH2kvo29jGgcOS257tRt7qr4PgsU02ooTgaqJg09bR2q8+ito9yMrDR2J7n7Qf1RoJb18vjCckgJ/zm09geoFEkHodXlfzA+ZP5cnZX2pCSooLLg9I9rKNGo=
+	t=1764388538; cv=none; b=F8K5jy56PFIe8z53kHQobDqyhKdtcL1OQ6Bp3j71SfKx0fy5SGJaGhbYN7xI2QLcL5SBdEM7CTC5yxWnRAqd1UEpw70UhyIC1pnRf2tdiCm0abzXUQ8yV+1hRP85nZa1JWMlCAuEX+V6qOOcYNsFdnSMRLhYt6vvhfSqEZLnn+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764369319; c=relaxed/simple;
-	bh=S+Mpc1wlbHkCS86rCBjYrtHFETwOD9dQfan7zpMgPu4=;
+	s=arc-20240116; t=1764388538; c=relaxed/simple;
+	bh=9qBX1u+aps4zqCWy5m1wc1K+mQdd1zT6chat9qWT4Y4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cR1IUq5ULgHpfLQSNlChxE3UTSnJL/Y5MXND81JMOlRz0y0lLuU/XcAo4Ea/JRFDeFa5/VJbxb3y1Sqz0OZqtOhSsObfy3BUZzy/YEOXh8d6hyrQoPybxnyUmQuJZuXiplIs2Gq2fNTa9OIO7lXKvkXaTCnJA54wsob8AWDtx2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rY6TgPc0; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=cjzhSR8zxyhob2hSLTbVSD4r51i0SvdzVSg97i/M1+w3PBQq7kaQkwshJTaA4+r0Wy+BwJ3yccFpUM+dFfQsLz8+aDlbAvsbPuW1pWRJnVcWBLqnH9JMar7XJmZlIgkIvhef9iKWyCCIWXVAzsYr2Q6lQPY8ze0wf+wKUaGeEEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hr+HX7TD; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rY6TgPc0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86A2EC113D0
-	for <linux-cifs@vger.kernel.org>; Fri, 28 Nov 2025 22:35:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764369318;
-	bh=S+Mpc1wlbHkCS86rCBjYrtHFETwOD9dQfan7zpMgPu4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=rY6TgPc0LPw+M54diNjS8Zoi5/60XDm7NvRevHwd76iSwCpZeQnYsqCm6N3E+eyU9
-	 Noi5AF07zACktN5qIUS1eqjG2lyO1ykDNVGG8gSStxNs95vR6QSIBCK8u3BT8jctdQ
-	 UT6Gl4OEwi9BP5JeEByslkFuiZrUk9NpORdcpem/LyLXZiN57CPACMjQkqwxuL/YXF
-	 ifM+Bp3ISaIKFVNMZ77zkEMwj4x3JO+roo3ZuN/ZZOpq2bzdXge/qA3PjSPCpOKpLI
-	 MnYOEoRmA5M4bM6OA0eHqgUA+D2r1aRIBJeEjQ/I9kE23Oldj46VnBovlYU4i9bXh4
-	 Se/DYHEniQBQg==
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6419aaced59so3476780a12.0
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Nov 2025 14:35:18 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCURaXgKV3JNK+R27sDfBC/rBfRi9CjNC/A2Dm9fcDJNegANnAaFmiEp4n5eKaLlWHJvgnlRqpaaMgGo@vger.kernel.org
-X-Gm-Message-State: AOJu0YzG/Koyw6ZiFquyk3Y733SEm42+TeboCQTKGNXJYyAZqCTwR/KX
-	WeOvKSKnO8DganZ57o4j9m7ZcLbWG44hdUBI/W5EaZNqBKE/EytIW/7yV3bhrqM+3Km3emtQzxS
-	sdgmonaZjpkdvnu0a4W5aqqaHMKzseSg=
-X-Google-Smtp-Source: AGHT+IGZJMfP+2VSSrV4uP88weqgT8/jFOOGQ0EKxJ1Cf5a0QhAsxPSjnendDLzoTrW5XwUwYKqUPIVgpgHgXUO/gnY=
-X-Received: by 2002:a05:6402:2713:b0:640:ecaa:1973 with SMTP id
- 4fb4d7f45d1cf-6455469c1cfmr24132348a12.24.1764369317091; Fri, 28 Nov 2025
- 14:35:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hr+HX7TD"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-882475d8851so25947456d6.2
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Nov 2025 19:55:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764388536; x=1764993336; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I6SrfljXqUvNeC7BBVdJLhUKTLQlOe3hkrVbnAJPqxI=;
+        b=hr+HX7TD4JYyPK93uuIiEgMXrXK2jOGIhrRK7mV33496aYQH7Bm/5t9yhKokMcR4jz
+         ynrx1lCOYj3sM7guOipPyPZ0d8OGzZPdkEnTPZtpE/H8xjd+Z5ZIqpveK0RWUXQxtppV
+         GKYxbPsfCR0ghXpNPXbcDcrs7W5d5t4StpD4gAsdISqEazOn+Xst6YAvRhpScCCpRcWE
+         1GZAKK6wxM4EXE0jEdv1ypPxyEH1Dv7N5OkraK5lwok7h7PjaKfJZRLiScZaOq6aKg8v
+         pH+CIQrgb912XwtxqTUO8PLh+i3SyLpD/7jI2orhhcem4AVvyAEjI3zmp7pfuLbEEDt7
+         y93Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764388536; x=1764993336;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=I6SrfljXqUvNeC7BBVdJLhUKTLQlOe3hkrVbnAJPqxI=;
+        b=HUqbk/42iTXJWMtXFMvv6cjyHEtONMq0JpFWLo9cRPxkBY+OnKViS8r6G2plMHCYw+
+         upTtitlbFCjzmh69Z/71QG5d0NLgXpjNrGXJfCPAyCuuJoth+wJKQN/B3hB6oxXj1o/U
+         WAmJ5XOHdvX0glgDOjj7JNjEd8hWpefdg8EA5fch7puaapX1lgsh2cwn8asevUVmFKLw
+         JKSKoJnYYkiTz+zuMk5j3U6hajo/5O1yW3fazews44cWvJBEkG17GDEVvkZh9+/ZcBcF
+         kCm3oTpU9ig7y3owSwnMQkg/fOkjnQ5UPFAUHGEZNKh+gdVeWoPYBAMgQFzEJn9m744+
+         k7fA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIcJj+zct6ZJSQekZ9q1jE90UbTHowoClZKRPSa1tuNeNOEmj3P0R2OQD8HHeoi1Evjr/XkFx7uSNq@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtJVH1DutjJNKTLBbCWU99UtogQKu77WUt+DgRtPOsKC5l1n1n
+	vjNj0mbELx5ul59FYFAt3qnetdQXm9Lo2G60gvNCw6+K78zP4BAIGmq1dxS0IEAhqADehNqjG7C
+	dA9BOsI8lNWY0ncNhndFaBw9Lu7EmSqc=
+X-Gm-Gg: ASbGncuYiIF9FbnUgkz5xzp+STep6mIbLIIogiB2yh8X0Q58Rw3ZLDRIqzlpbbdacwZ
+	n0nhfmIJZlDuCc1BbF86HYWCv8xqjDl+uYmrlilsABdmlOfIXDdwjP0bSeKSVnhMBS+NqtQ8R+a
+	Ii4rlu1ahFfzlHRf/wdaX6FgMRFiddSEpjTOm5WAEzZkFidJjV14Wi5PsjCagIMhJdMkKWD5hG/
+	jIVnTXDJn/L1zTxQiZUBX9I0ChEWDBOk9eVQnLkGFjJpNl9nxXCG89vC8xPyXq4/B/aYuDkP4uD
+	wGHgN+WDBgaMntHCkKm4u4a+Yujm/l3td+I5VP4q/uDrL4q5pBUlOQ8DWD/jMzjQ/4lMY7WgUXS
+	e+6PZ9YHPvtVn1ZDZIA2X6V18cFchvsyWAlUcWDvo9dddNTdVJ5YcLfA/mvUloIQPAu2hAbebUB
+	sfyFWi84mTJGmPWOt/ZI4d
+X-Google-Smtp-Source: AGHT+IEgMp/WFBD1bv7s9vSClIUduNlVCjrwEPexmixtaZ+OLnnPd0b/puUpYw8yJ2dP4eCUn/iy89/STbZsLNugpZg=
+X-Received: by 2002:ad4:5d42:0:b0:880:2c08:88e with SMTP id
+ 6a1803df08f44-8847c5206f8mr491522266d6.45.1764388536172; Fri, 28 Nov 2025
+ 19:55:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251128134951.2331836-1-metze@samba.org> <CAH2r5msBaRVPNkaMy0iQKPq9COR+p5+UUNf-B-Fh6=v7zKNRnQ@mail.gmail.com>
- <7ff0bc80-f94c-4cc9-b85a-0ddc1393c9a1@samba.org> <CAH2r5msAQ7JZvOksSWJiW9SrZmX85yzcbHJ1Zb7r=P9yU+p5Ew@mail.gmail.com>
- <e67a626a-828a-434d-8921-4bd8fcaeabcb@samba.org>
-In-Reply-To: <e67a626a-828a-434d-8921-4bd8fcaeabcb@samba.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 29 Nov 2025 07:35:05 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9CouGFSOjFCL3gk=tggsX7r02wcs8XkzOdxM0XJ93NHQ@mail.gmail.com>
-X-Gm-Features: AWmQ_bm56QToV0Lx9Q4KqE7qKuIHb8umGTkIDJmcRY4S_9T82enMsgEoYuNgVqs
-Message-ID: <CAKYAXd9CouGFSOjFCL3gk=tggsX7r02wcs8XkzOdxM0XJ93NHQ@mail.gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: change git.samba.org to https
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org
+References: <20251127122637.2094566-1-aadityakansal390@gmail.com>
+In-Reply-To: <20251127122637.2094566-1-aadityakansal390@gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 28 Nov 2025 21:55:23 -0600
+X-Gm-Features: AWmQ_bmQEFbMCKSVBaKhdFBjTWyneNqWb3qsdigY1kwee128nndeddkdnSkBYVA
+Message-ID: <CAH2r5mtA3cYYDMkqai3Gs7Op44O2e4cZ_V=stS1o9MnDFu4T5A@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: Add check in cifs_mkdir() for SMB2/3
+To: Aaditya Kansal <aadityakansal390@gmail.com>
+Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bharathsm@microsoft.com, 
+	skhan@linuxfoundation.org, david.hunter.linux@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-You should first buy a Mellanox connectX series NIC. That's what most
-people use. ksmbd rdma is actually having issues with Windows client +
-connectX-7 after applying your work. This is what I was most worried
-about when you started this, and the patches are so fucking chopped up
-that they're hard to find. I'm absolutely against splitting the
-smbdirect section, and every time you unilaterally apply something to
-smbdirect.ko, it affects ksmbd rdma.
+Looking at this more carefully it looks like the comment is wrong (it
+can't be skipped for SMB2 and later currently, there is code in it
+that is non-SMB1 specific).  Looks like this patch is incorrect.
+There is a general todo to rewrite cifs_mkdir() more cleanly (and
+partition out the smb1 mkdir code and smb1 posix mkdir code more
+cleanly via an smb1 specific helper function) but looks like we can't
+skip cifs_mkdir_qinfo() as your patch would
 
-Thanks.
+On Thu, Nov 27, 2025 at 6:27=E2=80=AFAM Aaditya Kansal
+<aadityakansal390@gmail.com> wrote:
+>
+> Add a version check in cifs_mkdir(). The check skips a function call to
+> cifs_mkdir_qinfo() for SMB 2/3.
+>
+> Signed-off-by: Aaditya Kansal <aadityakansal390@gmail.com>
+> ---
+>  fs/smb/client/inode.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+> index cac355364e43..f6f223a5a97b 100644
+> --- a/fs/smb/client/inode.c
+> +++ b/fs/smb/client/inode.c
+> @@ -2314,9 +2314,9 @@ struct dentry *cifs_mkdir(struct mnt_idmap *idmap, =
+struct inode *inode,
+>                 goto mkdir_out;
+>         }
+>
+> -       /* TODO: skip this for smb2/smb3 */
+> -       rc =3D cifs_mkdir_qinfo(inode, direntry, mode, full_path, cifs_sb=
+, tcon,
+> -                             xid);
+> +       if (server->vals->protocol_id =3D=3D SMB10_PROT_ID)
+> +               rc =3D cifs_mkdir_qinfo(inode, direntry, mode, full_path,=
+ cifs_sb,
+> +                               tcon, xid);
+>  mkdir_out:
+>         /*
+>          * Force revalidate to get parent dir info when needed since cach=
+ed
+> --
+> 2.52.0
+>
+>
 
-On Sat, Nov 29, 2025 at 3:51=E2=80=AFAM Stefan Metzmacher <metze@samba.org>=
- wrote:
->
-> Am 28.11.25 um 19:15 schrieb Steve French:
-> > ok - this change seems harmless.   I also want to look at way to add
-> > you to MAINTAINERS to make clear you are "expert" at RDMA/SMBDIRECT
-> > and either reviewer or co-maintainer for smb client/server/common more
-> > generally.  Wanted to look at a few other examples in MAINTAINERS and
-> > compare
->
-> I compared things like
-> NETWORKING [GENERAL]
-> and
-> NETWORKING [SOCKETS]
->
-> They are 2 sections, but some files overlab.
->
-> scripts/get_maintainer.pl include/net/sock.h
-> Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING [SOCKETS])
-> Kuniyuki Iwashima <kuniyu@google.com> (maintainer:NETWORKING [SOCKETS])
-> Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING [SOCKETS])
-> Willem de Bruijn <willemb@google.com> (maintainer:NETWORKING [SOCKETS])
-> "David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING [GENERAL])
-> Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING [GENERAL])
-> Simon Horman <horms@kernel.org> (reviewer:NETWORKING [GENERAL])
-> netdev@vger.kernel.org (open list:NETWORKING [GENERAL])
-> linux-kernel@vger.kernel.org (open list)
->
-> And I think we might want an additional section that covers
-> F:     fs/smb/common/smbdirect/
-> F:     fs/smb/client/smbdirect.*
-> F:     fs/smb/server/transport_rdma.*
->
-> That way the maintainers for the smbdirect section will appear
-> first followed by the more general results.
->
-> I first thought to have excludes for fs/smb/common/smbdirect/
-> in the cifs.ko and ksmbd.ko sections, but we can leave that out
-> and just let it overlab.
->
-> > On Fri, Nov 28, 2025 at 12:00=E2=80=AFPM Stefan Metzmacher <metze@samba=
-.org> wrote:
-> >>
-> >> Am 28.11.25 um 18:48 schrieb Steve French:
-> >>> On Fri, Nov 28, 2025 at 7:49=E2=80=AFAM Stefan Metzmacher <metze@samb=
-a.org> wrote:
-> >>>>
-> >>>> This is the preferred way to access the server.
-> >>>
-> >>> Are you sure that is the preferred way?  75% of the entries in
-> >>> MAINTAINERS use "git git://" not "git http://" but ... I did notice
-> >>> that for all github and gitlab ones they use "git http://"
-> >>
-> >> It seems a lot of them were created long time ago.
-> >>
-> >>> But maybe for samba.org there is an advantage to https?!
-> >>
-> >> Yes, the admins of git.samba.org prefer that clients use https://
-> >> instead of git://
-> >>
-> >> I also checked what linux-net uses and it also uses https most of the =
-time:
-> >>
-> >> $ git lo -187 linux-next/master  | grep 'Merge branch .*\/\/'| grep ht=
-tps | wc -l
-> >> 178
-> >> $ git lo -187 linux-next/master  | grep 'Merge branch .*\/\/'| grep -v=
- https | cut -d ' ' -f2-
-> >> Merge branch 'main' of git://git.infradead.org/users/willy/xarray.git
-> >> Merge branch 'master' of git://www.linux-watchdog.org/linux-watchdog-n=
-ext.git
-> >> Merge branch 'master' of git://git.code.sf.net/p/tomoyo/tomoyo.git
-> >> Merge branch 'next' of git://linuxtv.org/media-ci/media-pending.git
-> >> Merge branch 'docs-next' of git://git.lwn.net/linux.git
-> >> Merge branch 'master' of git://git.kernel.org/pub/scm/virt/kvm/kvm.git
-> >>
-> >> metze
-> >
-> >
-> >
->
+
+--=20
+Thanks,
+
+Steve
