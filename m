@@ -1,107 +1,145 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A63C23EABC
-	for <linux-cifs@vger.kernel.org>; Sat, 29 Nov 2025 18:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF8ECA6F
+	for <linux-cifs@vger.kernel.org>; Sun, 30 Nov 2025 00:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764440801; cv=none; b=BygBQJGdBIKJyC/GFaOe/6BwpEVOFwZEBMmtD0oZWZp0cjaRYbrEYKpfCxbSHLnoAQji4Qslcw3oJuN/c+xLgcJEIENMmBJtsidx8RiM2EGeAnSATFDzy/C31rKK+fWP432phStqBY2tstLfYob1SXHlruE3YuBL16sy360455k=
+	t=1764460896; cv=none; b=CeAZlu8jxnKVKP5WabbyLKdvvZEtBE1SDabeHichyKnE9AoF6tjBrHzMTozlvFLolsfs9t+j1JMNgrya3Uhea3FTrqIIjKC8ncoA2QcWQHFyb4XxOc5K6HeZHMPtIQgltcyfUTzRmTcCyNNd8NJzKefh4NTus4mT9R8qsSuGwjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764440801; c=relaxed/simple;
-	bh=FjR1mEntDRObhFwEuwXhUYzmEdGdSC5tkuVCgZxGZDw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KlUGDLcvRMrwgiENLpcUrD997y6KLwhXpSzEVRzhQNCobuhiyLceoXZPYQRTAijhLfSInOXnjmDzqvfRzTkERRk35CwJre8rl4fvngYFdTn7vt+E6lcqOnfcFpKh+OA/5QwJ7wGzLDISIwtqvqmTFeYU/SJTrz8NI7+Mk4Csj+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=neVAk/po; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764460896; c=relaxed/simple;
+	bh=LSJ70a7sqpVfPbtWx1NwHyhEjI0E0jggLRDHw6XUKNY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AmlODYUYqYTWAVwfDQ1GHMLHaCf4tRWXoYRPwWPfGlvDVUl4Vc4bE8xXAUQhw2EmCr9lnd9v95RPqxX65GvOg868jiLbYoSlhyFcHfpNljrSJk/bgFqQVQSo5I2lsWwuwuoyTZ0ppiJEpzcI4pBHkZhPeHKI3NWXYB6Ub5TIbCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=packett.cool; spf=pass smtp.mailfrom=packett.cool; dkim=pass (2048-bit key) header.d=packett.cool header.i=@packett.cool header.b=cTTUT3M1; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=packett.cool
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=packett.cool
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="neVAk/po"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-297ea936b39so9461395ad.1
-        for <linux-cifs@vger.kernel.org>; Sat, 29 Nov 2025 10:26:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764440799; x=1765045599; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3JC72Qo3TOw1s9p+vntPcAPUKDQuPh5dqE0qtCY/uIg=;
-        b=neVAk/poM+FjQYpmrmh8llX2yqbRLirruQKfNjFcXcIxwzs5at9ywBBKnxAyxcbJnT
-         j1ci9fKbKlb2iCoKyLEQN8RSf1jxc4Qy48jL2Mn84yld84IZu1wwRVs0skhQnL+kwyE7
-         WcpVnK7iQMMTVfS60u+0t4IlhNt9zgxTofpqAbs74v6nXVfuL6jc1tDri0QeNn5TIjiJ
-         J1z3mXiUi/tsCo1yJub4wW06KUK3yow2P5ZGx0tUdOEEjh9ag7M1hS5jwoO2in2bydLJ
-         mf5QeT4H44aaegfUV1ytr+P7I4eF6c2yO2nt3jV/HIDq9xo2WDz0Q3NqZoL7PHSmm0AT
-         +1EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764440799; x=1765045599;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3JC72Qo3TOw1s9p+vntPcAPUKDQuPh5dqE0qtCY/uIg=;
-        b=Gz8Cgeh7JjF3O/4gUQiHrlRXVriUDs4C08SPDuLn9ZXmqhnTM9oi9UWSfiqYCjoFfE
-         z6aZOGNhdqKShL+Frq1ryvkHqt75u9PW/0YmASGcC3AV2OGnP5IF+tgztq+IKaj4HLmZ
-         7Uw0jjkS40j1XxEjbWt4/Xaw+tE+6c+JT4LA+xHOk6vCIpRYqKmDpIPkPcgmUADVUuOF
-         ij7atBTxxK10NZvGGqcM6aRfoV8qbnk3+GlWd1OR0+Qp5ycgpeoqberwkT6qVzxl3gtV
-         qjWVq8r6orL2HACdaaLv1a4qJqDliNUrcPPaGcTM2NUhNiD5vuiEll98ImWidIVM1Sqf
-         e7VQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVtdDLYQzilx/bWPgOJajrTTL4XEKP8lQoyUxS09aiL9FJcEyE+XaMKfWCvL8Danq9eX44J3wGoxd0x@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/M19lVni/pnswXkcQKmx+tqL+TS5Ls6oRcdJulTNNP20r5cd+
-	iN6lvF7t9l6+JeI8GNLhn4V3bQZBXeBmfVs36dcP9rJZaPLDsJ1tTbg/
-X-Gm-Gg: ASbGncvaRQUnD+RaiFGAqORjTfIAFzPXYuo4wBmfnDnMsrPNS8RipK01SS5A6YZ631C
-	ipDdeZ77DH+IRO1/2HNbcX/CmdxK8dfuiNha207peY7WR7A2I5GPnoHgf6j6TGajLVDOXnWe/Og
-	HDuefwKbAsnhg7CZxjKxCCNzMBgOdks45snqTafXo1f2GYhsrXskCWFsq17mKOmQZRDmNkRwXB7
-	FbqxnPb9gwwCYqQw54vc16bvHiZcLm56ZROhsECIL8z6fEXgShWojnDKlxHD0qnhVGfTkMd09Qy
-	dzjymoBxdlZFPZx4nzPY+ZM5j4be46EA6bz5blbETYfUYRyCv5GPcN/cO8nzPZJfRd4eZMEfgCY
-	NSkWgiBVU47F3TW6FIgzSA4GHHQUGLBUGVQ3XsZFU5Pkwjn8ZagzsDziTq6yARoOVlkhkU1X3X5
-	GZmqtgbo8OBCYg5g0=
-X-Google-Smtp-Source: AGHT+IHFWCBKPxYkoDnGrX3Bcm9s9hshcjYoD0pvajZbvW2Kn2yTSUnpKDGOc1WjpWgPnlDwkvZVcQ==
-X-Received: by 2002:a05:6a20:a109:b0:345:42cb:50b8 with SMTP id adf61e73a8af0-3615437dbfdmr20262810637.8.1764440799603;
-        Sat, 29 Nov 2025 10:26:39 -0800 (PST)
-Received: from morax ([2405:201:4039:48b0:c6f2:57d3:9f1d:7d73])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-be4fb248be1sm7796131a12.3.2025.11.29.10.26.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Nov 2025 10:26:39 -0800 (PST)
-From: Aaditya Kansal <aadityakansal390@gmail.com>
-To: sfrench@samba.org,
-	pc@manguebit.org
-Cc: ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bharathsm@microsoft.com,
-	skhan@linuxfoundation.org,
-	david.hunter.linux@gmail.com,
-	Aaditya Kansal <aadityakansal390@gmail.com>
-Subject: [PATCH] smb: client: Remove incorrect TODO in cifs_mkdir()
-Date: Sat, 29 Nov 2025 23:56:23 +0530
-Message-ID: <20251129182623.530415-1-aadityakansal390@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=packett.cool header.i=@packett.cool header.b="cTTUT3M1"
+Message-ID: <6713ea38-b583-4c86-b74a-bea55652851d@packett.cool>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=packett.cool;
+	s=key1; t=1764460882;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=srEr3LoKq1Czaq8I5z3/A4FoFBjqxOV0LMrfiR1/IRI=;
+	b=cTTUT3M1OgZOXf9KsjND5eMtqvOa5Da+1AeeP4jR0sw0vC4IDg5Xa7CSv88SWqP6ld8c4U
+	feLTIFGjsHi46wUcXcnZnBNFYyUA+k4gt6/btlcqIgvR4xvfo97KEbgbLW8O6jDXdJrKlx
+	N47LnE5fWNIgP4vLf6QeSzk7h8hxo+Mf0b3ed+iyBgZDt5MyHgOMDd1kv+b3MkRIf/97oF
+	Xk4+Fm9asGPOO/UHvFRyAPJkp7+BxqbSkXxGSQ7XQCxe3dquat/XoNWuSDCvFSrDBacD6P
+	XPihqavrhekC6KevGwsdpq2omOGhg4neyyNLaEyfIuqzGpoqSCNpP7XeImwedA==
+Date: Sat, 29 Nov 2025 21:01:05 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH v6 06/15] VFS: introduce start_creating_noperm() and
+ start_removing_noperm()
+To: NeilBrown <neil@brown.name>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Amir Goldstein <amir73il@gmail.com>
+Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+ Jeff Layton <jlayton@kernel.org>, Chris Mason <clm@fb.com>,
+ David Sterba <dsterba@suse.com>, David Howells <dhowells@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
+ Tyler Hicks <code@tyhicks.com>, Miklos Szeredi <miklos@szeredi.hu>,
+ Chuck Lever <chuck.lever@oracle.com>, Olga Kornievskaia
+ <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Carlos Maiolino <cem@kernel.org>, John Johansen
+ <john.johansen@canonical.com>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Stephen Smalley <stephen.smalley.work@gmail.com>,
+ Ondrej Mosnacek <omosnace@redhat.com>, Mateusz Guzik <mjguzik@gmail.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Stefan Berger <stefanb@linux.ibm.com>, "Darrick J. Wong"
+ <djwong@kernel.org>, linux-kernel@vger.kernel.org, netfs@lists.linux.dev,
+ ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-security-module@vger.kernel.org,
+ selinux@vger.kernel.org
+References: <20251113002050.676694-1-neilb@ownmail.net>
+ <20251113002050.676694-7-neilb@ownmail.net>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Val Packett <val@packett.cool>
+In-Reply-To: <20251113002050.676694-7-neilb@ownmail.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Remove a TODO comment which suggested skipping the call to
-cifs_mkdir_qinfo() for SMB 2/3. This is incorrect because
-cifs_mkdir_qinfo() contains SMB 2/3 related code.
+Hi,
 
-Signed-off-by: Aaditya Kansal <aadityakansal390@gmail.com>
----
- fs/smb/client/inode.c | 1 -
- 1 file changed, 1 deletion(-)
+On 11/12/25 9:18 PM, NeilBrown wrote:
+> From: NeilBrown <neil@brown.name>
+>
+> xfs, fuse, ipc/mqueue need variants of start_creating or start_removing
+> which do not check permissions.
+> This patch adds _noperm versions of these functions.
+> [..]
+> diff --git a/fs/fuse/dir.c b/fs/fuse/dir.c
+> index 316922d5dd13..a0d5b302bcc2 100644
+> --- a/fs/fuse/dir.c
+> +++ b/fs/fuse/dir.c
+> @@ -1397,27 +1397,25 @@ int fuse_reverse_inval_entry(struct fuse_conn *fc, u64 parent_nodeid,
+>   	if (!parent)
+>   		return -ENOENT;
+>   
+> -	inode_lock_nested(parent, I_MUTEX_PARENT);
+>   	if (!S_ISDIR(parent->i_mode))
+> -		goto unlock;
+> +		goto put_parent;
+>   
+>   	err = -ENOENT;
+>   	dir = d_find_alias(parent);
+>   	if (!dir)
+> -		goto unlock;
+> +		goto put_parent;
+>   
+> -	name->hash = full_name_hash(dir, name->name, name->len);
+> -	entry = d_lookup(dir, name);
+> +	entry = start_removing_noperm(dir, name);
+>   	dput(dir);
+> -	if (!entry)
+> -		goto unlock;
+> +	if (IS_ERR(entry))
+> +		goto put_parent;
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index cac355364e43..20acbe88f1c3 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -2314,7 +2314,6 @@ struct dentry *cifs_mkdir(struct mnt_idmap *idmap, struct inode *inode,
- 		goto mkdir_out;
- 	}
- 
--	/* TODO: skip this for smb2/smb3 */
- 	rc = cifs_mkdir_qinfo(inode, direntry, mode, full_path, cifs_sb, tcon,
- 			      xid);
- mkdir_out:
--- 
-2.52.0
+This broke xdg-document-portal (and potentially other FUSE filesystems) 
+by introducing a massive deadlock.
+
+❯ doas cat /proc/40751/stack # main thread
+[<0>] __fuse_simple_request+0x37c/0x5c0 [fuse]
+[<0>] fuse_lookup_name+0x12c/0x2a0 [fuse]
+[<0>] fuse_lookup+0x9c/0x1e8 [fuse]
+[<0>] lookup_one_qstr_excl+0xd4/0x160
+[<0>] start_removing_noperm+0x5c/0x90
+[<0>] fuse_reverse_inval_entry+0x64/0x1e0 [fuse]
+[<0>] fuse_dev_do_write+0x13a8/0x16a8 [fuse]
+[<0>] fuse_dev_write+0x64/0xa8 [fuse]
+[<0>] do_iter_readv_writev+0x170/0x1d0
+[<0>] vfs_writev+0x100/0x2d0
+[<0>] do_writev+0x88/0x130
+
+d_lookup which was previously used here —from what I could understand by 
+reading it— is cache-only and does not call into the FS's lookup at all.
+
+This new start_removing_noperm calls start_dirop which calls 
+lookup_one_qstr_excl which according to its own comment is the "one and 
+only case when ->lookup() gets called on non in-lookup dentries". Well, 
+->lookup() is the request back to the userspace FUSE server.. but the 
+FUSE server is waiting for the write() to the FUSE device that invokes 
+this operation to return! We cannot reenter the FUSE server 
+from fuse_reverse_inval_entry.
+
+x-d-p issue link: https://github.com/flatpak/xdg-desktop-portal/issues/1871
+
+Reverting the fuse/dir.c changes has fixed that for me.
+
+Thanks,
+~val
 
