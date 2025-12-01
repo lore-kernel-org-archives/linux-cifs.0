@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13552882D0;
-	Mon,  1 Dec 2025 22:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2AB6207A0B;
+	Mon,  1 Dec 2025 22:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764626957; cv=none; b=qy31Z2s7lB/a7ngNhJIKFwnMAF1QXa8MRIFwGD68dTcelMALtM6lIBacDI4zjNfmezC4GXhExO2nqbjfEn23flFVkrSW+7AGBgh81W1e379IGZgf8CDjsZZmpSW/Aul/B1Zh8EVID/SBxY42GWVDKieUvArH3f1Bs6tGS5zogMw=
+	t=1764627900; cv=none; b=Luk9Y3OVm9SKUNTSlRwV4NynJxfzjJ3uqeUXf9AJ9Uywic9HvEAoNFp7OOgnqPb7bv59S8uwXOac5YwyFJVULdCt9Wovihn7+TSy8/j0m4KZBXxyfp+dDagFBFrs1jBXF9gloDSIcR5guMAhRCSC9oPJj+c7KR18DrP7JeOKXeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764626957; c=relaxed/simple;
-	bh=Js3ghnFZJ7YTPR0bCSccW+BMGxnMoOTm8M8mf0LkAOw=;
+	s=arc-20240116; t=1764627900; c=relaxed/simple;
+	bh=LjiXOvEuoYChsYdCrGieOP2zkx/TDmNC8xATxaxPeR8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W680d2Yjs20w5BT3lWRl+geGWJCFiADLx5gkU6etAQMNBb4+BB5mu/KWtx6OvntPNiGltC6/JPaVfCP0JTxy6Tv8CqKcOAMTP2FW8QyFvHec88LpvkEW2MAoSZv79NIAySvmaOLY3LCTMhIwObxR3Iu7x7x8NhvxCAFHcZbourk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sSm/h4Uj; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Cm8BFjFIb4bOEeOGIh/8AntYJB2fDqqtl04PS4E3ToAupXUexpfbw9uCHzWjjr8TqnzZmZNw0BBslP6uHdg+KJJcN9NL1p7P/q0PYHEgxkMzmLlQ51abQelC8BsgZrLQzTd1Ib9fvHXtkJinaDqATx9xZrPglQzxPbdzw2KgXh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KbX3s+H+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sSm/h4Uj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D5E1C4CEF1;
-	Mon,  1 Dec 2025 22:09:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KbX3s+H+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FABBC4CEF1;
+	Mon,  1 Dec 2025 22:24:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764626956;
-	bh=Js3ghnFZJ7YTPR0bCSccW+BMGxnMoOTm8M8mf0LkAOw=;
+	s=k20201202; t=1764627899;
+	bh=LjiXOvEuoYChsYdCrGieOP2zkx/TDmNC8xATxaxPeR8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sSm/h4UjHJahCOwLj3mfF5fHKlXG2eyUlXEMS0j3tRlCV4sMROlID8tHAzaHED3Zt
-	 O2YrmpmkOyAdPeSt110PVdmH2cpFth73Yag3gWx0A0eRAIDF7n0xXL1fJjDXhSTmGx
-	 KYCyGWMwyJrD9bvGjTvNl/4fIxXlBvUBDRcEQ48eg7IYNCCuyv4d6qscXabQg/sha1
-	 lEaJfGk87zFwpYgPNXC6w2+nhh8aqLXiwKWAWAJtSqD15HL+SKnRXDYCVO/DHNmNxr
-	 sQg3pkJX+iCREfxdZ+7sYCdhKeYH2uaJicgei5D2H6UepxWpSYwaZDVu4kcZtYxUtt
-	 bHi3q8RcVrwhw==
+	b=KbX3s+H+sK464N6IL6114RU8eDk922KnTyVqz8QQq/4c8ksGsVts0Kci+M0xIAIOB
+	 xESViSoWKKxvuHSZggK3ygPLlKasNiEC9s9h31vLYgeTf5LdeXLmYUOj2Si4wnRsZz
+	 M7yndkdiML2/p76Rl9/7LPrq/mtB3FvGjHx6Q0m9ZMwus1ehSfOTAR1LJvQdl1wDHK
+	 JHSB0dNoziwJIWhhMVwygR/sKl4FjKlcAi1pr56+SQPGhdPR01ojjMOLX70nTEHxIB
+	 3xqoPD6bmT8vnjtFEde9vCRkWkhvLDxs6lD0w1uORYwMa0wvKaX2H+EnQVePF49y9z
+	 +D1+fW38BtrLQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: Paulo Alcantara <pc@manguebit.org>,
@@ -34,12 +34,12 @@ Cc: Paulo Alcantara <pc@manguebit.org>,
 	linux-cifs@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.15.y] smb: client: fix memory leak in cifs_construct_tcon()
-Date: Mon,  1 Dec 2025 17:09:13 -0500
-Message-ID: <20251201220913.1279668-1-sashal@kernel.org>
+Subject: [PATCH 5.10.y] smb: client: fix memory leak in cifs_construct_tcon()
+Date: Mon,  1 Dec 2025 17:24:51 -0500
+Message-ID: <20251201222451.1290758-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <2025120143-confider-enzyme-4aa6@gregkh>
-References: <2025120143-confider-enzyme-4aa6@gregkh>
+In-Reply-To: <2025120144-dismiss-quilt-863b@gregkh>
+References: <2025120144-dismiss-quilt-863b@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -93,23 +93,23 @@ Cc: Jay Shin <jaeshin@redhat.com>
 Cc: stable@vger.kernel.org
 Cc: linux-cifs@vger.kernel.org
 Signed-off-by: Steve French <stfrench@microsoft.com>
-[ applied fix to fs/cifs/connect.c ]
+[ Different path + ctx -> vol_info ]
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
  fs/cifs/connect.c | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 51ceaf9ea3151..677c757fffffb 100644
+index 5fc418f9210a5..29da38dfccdb9 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -3926,6 +3926,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
+@@ -5162,6 +5162,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
  
  out:
- 	kfree(ctx->username);
-+	kfree(ctx->domainname);
- 	kfree_sensitive(ctx->password);
- 	kfree(ctx);
+ 	kfree(vol_info->username);
++	kfree(vol_info->domainname);
+ 	kfree_sensitive(vol_info->password);
+ 	kfree(vol_info);
  
 -- 
 2.51.0
