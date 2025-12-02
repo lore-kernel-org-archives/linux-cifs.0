@@ -1,119 +1,95 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4812C2C21F8
-	for <linux-cifs@vger.kernel.org>; Tue,  2 Dec 2025 17:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954EA2F7477
+	for <linux-cifs@vger.kernel.org>; Tue,  2 Dec 2025 21:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764697519; cv=none; b=UrcyGwun9yCUYuIZyO4u/qB0D/Lf5bhT2rA4wwouH1d3DibRMiJzBETKh8jZXw7pJKB7YEZOedeRLljeFvc4idvghGs0Z4vg0pkwy6pc8QsCO/lNS3ukUe04l5mnsMcmUXKfZ5n4KyslcSRC9+Bgh6iFN5e6Mu2i4LHu7tGWKM0=
+	t=1764710156; cv=none; b=REwnrVDEMpLqLKyoW8H40c0ttmfxbB0zIn8I8wMjithn2ZR6cfDSzMuQRF62qJA4/t6St0fy1D5Lh8zzZMNogYSiv3HiTY7lyGBwCyok4PkG5VYmulsiILgccIir3QQ3qqVOBYB+iy/GIG4y6XB+mbFIaIkhWXusLn0UENPv3Jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764697519; c=relaxed/simple;
-	bh=tamybLxNrophK48+LjH+nI7WJXO09o5rS7gtzjOP3xc=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=YBweOTdUepVc2fMkJFLGrmNwXHXTtlk1GZmjnDkz8Xne/2TpiLlCBHQU0PP0wQ79a8j96uC5IOecQiY4QHqlAn8g+P3dFAXJRf+ffsa/rShU8rFJiZIKjn3EjgfOUmEjAQqUEm8b3VmBuHcMycBXCBQ4BllW9WaOIkdWbtpN4ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QKcBS+nU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764710156; c=relaxed/simple;
+	bh=xJ5/fJjGrIbULTHJkoc34pxVrh48ZymCPJjfjh383sA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jN8BaCqeiNFNoKVOYI1y4NGS/0R2sSer9qx4FOgYqToeCy0Z9OQqj3RpAbYz1lhUZTsoaRVDXz20y0kaBXM+C56LonYHZGYekz7H0Batxm+Fl88g/aNdiTuH77d2+kT7pQs7UGvfTpkS5gKwW7PQvcygNWaMtfh2Tvrrh9UYSzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=PMrju5s6; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QKcBS+nU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764697517;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=sO3YMt7bwHXHXoImGSFPk/MGZ4Jh8BA+UgosjHsNIMw=;
-	b=QKcBS+nUZ3pdpR6CbZyztYk3NYDNUMWBmlal0W1KXoUzJlHS38S5mPehB1l2YR//lP5NpT
-	5VgSD7Fq/gLKL8EveHANEzjA1QfNIWOXlV23guQMqQ64ixo7WIyD1+DF0IiyFbYhwMR8M5
-	0n7+h/PWF4wbulg0laMqbEKLQ0HCZl4=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-530-ww52pWIROKa1BUU12KTOWQ-1; Tue,
- 02 Dec 2025 12:45:12 -0500
-X-MC-Unique: ww52pWIROKa1BUU12KTOWQ-1
-X-Mimecast-MFC-AGG-ID: ww52pWIROKa1BUU12KTOWQ_1764697510
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0D0671801303;
-	Tue,  2 Dec 2025 17:45:10 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B0CCF30001A4;
-	Tue,  2 Dec 2025 17:45:07 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Steve French <sfrench@samba.org>
-cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
-    Shyam Prasad N <sprasad@microsoft.com>, linux-cifs@vger.kernel.org,
-    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Fix handling of a beyond-EOF DIO/unbuffered read over SMB1
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="PMrju5s6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=gRXwD70uletccTPFHozrCt8PmOX7/Wh1rB8nIsb7Ri4=; b=PMrju5s6uFH8IXzK2fJUxJdTXT
+	LXz/nhCKxuBi4myiATZvnDZptIOnWVWY2tkDb/aAL8kMJhxFs370QVp0byqUJxGlit1jAxYtQjfVo
+	K4hiLpqfdUtuO1FUS2BhQmlbRlJ5TpI1XGYSx3juWxYd20Q0kATr08Dvsgte+N5x0NwyUBhWMempd
+	OnF8c2K5OdpIUSQtiWzhf9oKwvEXwPvXlFIOWAKHQQ3fNoDmJbrwjzcorzZIscpMqENdimS1ghYaz
+	tCxn3ts9dOEO73gEgopKUgEg6QYF0VVk20SCQG7o+yhKzQhVnrGMonbRbBauHWJ0w6OmABeO6vJRW
+	ieV5wQFqDtUpFsAjs8TCAj2amvGEpT9t7FvnM8lA/BSQMU25btBPibFFW+JatflbETrtP9T2D+ukk
+	AI7PSR+ToYdtzLgeQBR/gzxCqG4wV9cAhM482/8hE83K/QJvD/L4CP8p4agWDRCETcvB0s7YRu28Z
+	M2L2/NYYvWw/wrLP2kUVPRZM;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vQXir-00GhsP-1M;
+	Tue, 02 Dec 2025 21:15:45 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>
+Subject: [RFC PATCH 0/4] smb:smbdirect/server: introduce smb_direct_negotiate_recv_work
+Date: Tue,  2 Dec 2025 22:15:23 +0100
+Message-ID: <cover.1764709225.git.metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1597478.1764697506.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 Dec 2025 17:45:06 +0000
-Message-ID: <1597479.1764697506@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
 
-    =
+Hi,
 
-If a DIO read or an unbuffered read request extends beyond the EOF, the
-server will return a short read and a status code indicating that EOF was
-hit, which gets translated to -ENODATA.  Note that the client does not cap
-the request at i_size, but asks for the amount requested in case there's a
-race on the server with a third party.
+here's a patchset that implements a better solution
+to the problem that the initial recv completion might
+arrive before the RDMA_CM_EVENT_ESTABLISHED event.
 
-Now, on the client side, the request will get split into multiple
-subrequests if rsize is smaller than the full request size.  A subrequest
-that starts before or at the EOF and returns short data up to the EOF will
-be correctly handled, with the NETFS_SREQ_HIT_EOF flag being set,
-indicating to netfslib that we can't read more.
+The last patch is not intended to be applied, but
+it helps to see the event flow it generated,
+see the commit message.
 
-If a subrequest, however, starts after the EOF and not at it, HIT_EOF will
-not be flagged, its error will be set to -ENODATA and it will be abandoned=
-.
-This will cause the request as a whole to fail with -ENODATA.
+This is based on the 4 smbirect patches within
+v6.19-rc-smb-fixes:
 
-Fix this by setting NETFS_SREQ_HIT_EOF on any subrequest that lies beyond
-the EOF marker.
+dc10cf1368af8cb816dcaa2502ba7d44fff20612
+smb: client: relax WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks in recv_done() and smbd_conn_upcall()
+425c32750b48956a6e156b6a4609d281ee471359
+smb: server: relax WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks in recv_done() and smb_direct_cm_handler()
+1adb2dab9727c5beaaf253f67bf4fc2c54ae70e7
+smb: smbdirect: introduce SMBDIRECT_CHECK_STATUS_{WARN,DISCONNECT}()
+1f3fd108c5c5a9885c6c276a2489c49b60a6b90d
+smb: smbdirect: introduce SMBDIRECT_DEBUG_ERR_PTR() helper
 
-This can be reproduced by mounting with "cache=3Dnone,sign,vers=3D1.0" and
-doing a read of a file that's significantly bigger than the size of the
-file (e.g. attempting to read 64KiB from a 16KiB file).
+I've tested them on top of v6.18 (without the other patches
+in v6.19-rc-smb-fixes).
 
-Fixes: a68c74865f51 ("cifs: Fix SMB1 readv/writev callback in the same way=
- as SMB2/3")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Shyam Prasad N <sprasad@microsoft.com>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/smb/client/cifssmb.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sadly there are still problems with Mellanox setups
+as well as irdma (in iwarp mode). I'm trying to
+prepare patches to debug this next.
 
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 645831708e1b..1871d2c1a8e0 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -1395,7 +1395,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 	} else {
- 		size_t trans =3D rdata->subreq.transferred + rdata->got_bytes;
- 		if (trans < rdata->subreq.len &&
--		    rdata->subreq.start + trans =3D=3D ictx->remote_i_size) {
-+		    rdata->subreq.start + trans >=3D ictx->remote_i_size) {
- 			rdata->result =3D 0;
- 			__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
- 		} else if (rdata->got_bytes > 0) {
+Stefan Metzmacher (4):
+  smb: smbdirect: introduce smbdirect_socket.connect.{lock,work}
+  smb: server: initialize recv_io->cqe.done = recv_done just once
+  smb: server: defer the initial recv completion logic to
+    smb_direct_negotiate_recv_work()
+  fs/smb/server/transport_rdma.c TMP DEBUG connect work
+
+ fs/smb/common/smbdirect/smbdirect_socket.h |  12 +
+ fs/smb/server/transport_rdma.c             | 321 +++++++++++++++++++--
+ 2 files changed, 304 insertions(+), 29 deletions(-)
+
+-- 
+2.43.0
 
