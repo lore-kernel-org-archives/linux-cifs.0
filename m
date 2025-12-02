@@ -1,47 +1,50 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954EA2F7477
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954732F60A7
 	for <linux-cifs@vger.kernel.org>; Tue,  2 Dec 2025 21:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764710156; cv=none; b=REwnrVDEMpLqLKyoW8H40c0ttmfxbB0zIn8I8wMjithn2ZR6cfDSzMuQRF62qJA4/t6St0fy1D5Lh8zzZMNogYSiv3HiTY7lyGBwCyok4PkG5VYmulsiILgccIir3QQ3qqVOBYB+iy/GIG4y6XB+mbFIaIkhWXusLn0UENPv3Jw=
+	t=1764710157; cv=none; b=G7NS/ZhmZneDd4/LSR8XjatTzY/86kjVBxKPNxy+GogiylYIw4o6CHhSWSVfwOBLG4/22G2o6ZJmisClHXh0jeGUUpBOtk5/klYvQbCXjtNIw2ABc382lWik+kAEGG+dICPa29inXKMCMkcH/PIbWGQDqX16NSGM95x8vELEvsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764710156; c=relaxed/simple;
-	bh=xJ5/fJjGrIbULTHJkoc34pxVrh48ZymCPJjfjh383sA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jN8BaCqeiNFNoKVOYI1y4NGS/0R2sSer9qx4FOgYqToeCy0Z9OQqj3RpAbYz1lhUZTsoaRVDXz20y0kaBXM+C56LonYHZGYekz7H0Batxm+Fl88g/aNdiTuH77d2+kT7pQs7UGvfTpkS5gKwW7PQvcygNWaMtfh2Tvrrh9UYSzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=PMrju5s6; arc=none smtp.client-ip=144.76.82.148
+	s=arc-20240116; t=1764710157; c=relaxed/simple;
+	bh=v7OhROcstayu/IS2Z1fN9Wh/ZvTREzRdLp/c1fjfRU4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=B0Z1xOrgpZnW+Hl3keWorwftHlfFQusROWCqcLN+l0HTB6Iov0I+3NFYf4AoS8EJWk4sYecHtr4tIlnQGtMOocGRrSQpN4eJTuIYlb09nPlc2IWm2+vYz/3daTs6gnBXIdduQwvulAawBvyiWlgML9vqB6CHqzztPpUqTeCiQqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=zRVetU2G; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="PMrju5s6"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="zRVetU2G"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=gRXwD70uletccTPFHozrCt8PmOX7/Wh1rB8nIsb7Ri4=; b=PMrju5s6uFH8IXzK2fJUxJdTXT
-	LXz/nhCKxuBi4myiATZvnDZptIOnWVWY2tkDb/aAL8kMJhxFs370QVp0byqUJxGlit1jAxYtQjfVo
-	K4hiLpqfdUtuO1FUS2BhQmlbRlJ5TpI1XGYSx3juWxYd20Q0kATr08Dvsgte+N5x0NwyUBhWMempd
-	OnF8c2K5OdpIUSQtiWzhf9oKwvEXwPvXlFIOWAKHQQ3fNoDmJbrwjzcorzZIscpMqENdimS1ghYaz
-	tCxn3ts9dOEO73gEgopKUgEg6QYF0VVk20SCQG7o+yhKzQhVnrGMonbRbBauHWJ0w6OmABeO6vJRW
-	ieV5wQFqDtUpFsAjs8TCAj2amvGEpT9t7FvnM8lA/BSQMU25btBPibFFW+JatflbETrtP9T2D+ukk
-	AI7PSR+ToYdtzLgeQBR/gzxCqG4wV9cAhM482/8hE83K/QJvD/L4CP8p4agWDRCETcvB0s7YRu28Z
-	M2L2/NYYvWw/wrLP2kUVPRZM;
+	bh=nFx/LeqE9ahJ9gho311pUXSBD1x8oa7Rl1ekFX2Cs0w=; b=zRVetU2Gi8ONfTdpJMWyDkX+4D
+	mUNg9Fl1DGz57JdIw6jsBhKAPVBMzZo2UoaUOwQZqdoD/zcZP6GdTsmToKZWhStERwj4Ka91L7LNM
+	s5lFivIXoM3M0z0p4N+qz58IoPA7hswmqX9l2mQuuxXQPD0GeXjwjIituQwajFvmYcZZV0efJPT4e
+	XhFEC/Qfqzv6X8IVHMvdyt0dIjCMXizAZb9mTNE8kLFLSMhoMNIXz2BtYcu7AsyE9qbbHUjD5KbxL
+	H2zAzpeJmlljAawnXRszt6E8UDH1DzKve2RqSGicsO2/+6rg6EoMp6q26ojZzDf5WBGFbsyu2NEfo
+	ynIECMEPocnqnCYNCLhdEF19fjSz7ft5vnOtMpYjEIPcEyu2dgH8Wc0fw41blfvyDuWMjn7cLw2zj
+	B2Eh3NGnfl2qAlnVH08natoTaDyF/bSLInwffFc/K5m75yEr5PtzkPm3Xva/Peog9gU3SWr63Igin
+	AE5PP6VY3Js2m7Rb1sIBo7K/;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vQXir-00GhsP-1M;
-	Tue, 02 Dec 2025 21:15:45 +0000
+	id 1vQXix-00Ghsl-2Q;
+	Tue, 02 Dec 2025 21:15:51 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
 Cc: metze@samba.org,
-	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>
-Subject: [RFC PATCH 0/4] smb:smbdirect/server: introduce smb_direct_negotiate_recv_work
-Date: Tue,  2 Dec 2025 22:15:23 +0100
-Message-ID: <cover.1764709225.git.metze@samba.org>
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Subject: [RFC PATCH 1/4] smb: smbdirect: introduce smbdirect_socket.connect.{lock,work}
+Date: Tue,  2 Dec 2025 22:15:24 +0100
+Message-ID: <bb7abd609300057a839001f2501f5e1827d825a8.1764709225.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1764709225.git.metze@samba.org>
+References: <cover.1764709225.git.metze@samba.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -50,46 +53,54 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+This will first be used by the server in order to defer
+the processing of the initial recv of the negotiation
+request.
 
-here's a patchset that implements a better solution
-to the problem that the initial recv completion might
-arrive before the RDMA_CM_EVENT_ESTABLISHED event.
+But in future it will also be used by the client in order
+to implement an async connect.
 
-The last patch is not intended to be applied, but
-it helps to see the event flow it generated,
-see the commit message.
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+---
+ fs/smb/common/smbdirect/smbdirect_socket.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-This is based on the 4 smbirect patches within
-v6.19-rc-smb-fixes:
-
-dc10cf1368af8cb816dcaa2502ba7d44fff20612
-smb: client: relax WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks in recv_done() and smbd_conn_upcall()
-425c32750b48956a6e156b6a4609d281ee471359
-smb: server: relax WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks in recv_done() and smb_direct_cm_handler()
-1adb2dab9727c5beaaf253f67bf4fc2c54ae70e7
-smb: smbdirect: introduce SMBDIRECT_CHECK_STATUS_{WARN,DISCONNECT}()
-1f3fd108c5c5a9885c6c276a2489c49b60a6b90d
-smb: smbdirect: introduce SMBDIRECT_DEBUG_ERR_PTR() helper
-
-I've tested them on top of v6.18 (without the other patches
-in v6.19-rc-smb-fixes).
-
-Sadly there are still problems with Mellanox setups
-as well as irdma (in iwarp mode). I'm trying to
-prepare patches to debug this next.
-
-Stefan Metzmacher (4):
-  smb: smbdirect: introduce smbdirect_socket.connect.{lock,work}
-  smb: server: initialize recv_io->cqe.done = recv_done just once
-  smb: server: defer the initial recv completion logic to
-    smb_direct_negotiate_recv_work()
-  fs/smb/server/transport_rdma.c TMP DEBUG connect work
-
- fs/smb/common/smbdirect/smbdirect_socket.h |  12 +
- fs/smb/server/transport_rdma.c             | 321 +++++++++++++++++++--
- 2 files changed, 304 insertions(+), 29 deletions(-)
-
+diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
+index 384b19177e1c..ee4c2726771a 100644
+--- a/fs/smb/common/smbdirect/smbdirect_socket.h
++++ b/fs/smb/common/smbdirect/smbdirect_socket.h
+@@ -132,6 +132,14 @@ struct smbdirect_socket {
+ 
+ 	struct smbdirect_socket_parameters parameters;
+ 
++	/*
++	 * The state for connect/negotiation
++	 */
++	struct {
++		spinlock_t lock;
++		struct work_struct work;
++	} connect;
++
+ 	/*
+ 	 * The state for keepalive and timeout handling
+ 	 */
+@@ -353,6 +361,10 @@ static __always_inline void smbdirect_socket_init(struct smbdirect_socket *sc)
+ 	INIT_WORK(&sc->disconnect_work, __smbdirect_socket_disabled_work);
+ 	disable_work_sync(&sc->disconnect_work);
+ 
++	spin_lock_init(&sc->connect.lock);
++	INIT_WORK(&sc->connect.work, __smbdirect_socket_disabled_work);
++	disable_work_sync(&sc->connect.work);
++
+ 	INIT_WORK(&sc->idle.immediate_work, __smbdirect_socket_disabled_work);
+ 	disable_work_sync(&sc->idle.immediate_work);
+ 	INIT_DELAYED_WORK(&sc->idle.timer_work, __smbdirect_socket_disabled_work);
 -- 
 2.43.0
 
