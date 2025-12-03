@@ -1,175 +1,169 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA335274658;
-	Wed,  3 Dec 2025 18:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9391307AD9
+	for <linux-cifs@vger.kernel.org>; Wed,  3 Dec 2025 19:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764785918; cv=none; b=oGLWctiJ3hLAJ8nF/SVPaUWZLPPReOPyt4dx1gF+e7RlUPt2lXTxBH7YHGTFTfnjizBP/ijKm8BuuB+/jmXg6shfaQ3WPo/0M9rW0VN7uZL7FS0OOiE48BPKJXx/EynzQowyuDOWOMXTcsrfqouDRmm7Jmxq3Cd6TwEW8P26xmk=
+	t=1764790165; cv=none; b=gSbHGe+ROmj9nphuONc2xipzGUPkkrGAIqZf0xCIt463Zg5SDHmalOhd7pbDEkffkkMiJWgUa97WTSMiYu6+PK3ii23zGMtlvQB48t5Cy/KDt0CkAe/PtJCrpPY9yhBSWW9hz8oR7OFiKGlxEeRT0tjiLOqCONrovVA48wHAlkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764785918; c=relaxed/simple;
-	bh=hbAYP3r5Mc8rBGU7W8VttBkj22/9LAAVAUjCF/9VK5c=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=H3jgZko6EPnr/c91CLAp90Y1XJ2t8lGXPuA9kSTMVAD+e60TMWgKlFI9so8En9iYJM0n58KUvZYiDFVd9uhq2PyulhC3zyFAo42LY6Q3vVO5z9/iCNzghIvPH0z4ZulYC3qTgm8dvglvHWtRD78IXgRmoJdu9He9edlvt9/0Woo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=N5T71W+O; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1764790165; c=relaxed/simple;
+	bh=nMkmjGXRVyyxnY8Zfdzvj3s+CvbzFa4myvYAW4xIuYY=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=e94XnuiENniH0IBysaAZtkDlaE3ceyiVQno3KA7Eho8GGlo9uabHw8F/+mxgsVFsaGzC8nsrUDTRBk9WnCKHCKUiIhppujoBqsBFFJ7ZQrVcvPUgqQidYO0xINWwc/6dgmLA5u7cjm1XiFCMpD9nG+b9gtFTeMglh6qB1NxDuV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P6GN/F4r; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="N5T71W+O"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=/AcU12eHhR/9X7R00vtfR14efmupqHLbJmjtNundrMg=; b=N5T71W+O5rt7M25YpfrDrPAdCG
-	MWvqkseWOlTu+3Ygk/7p+NrDRS4BPnyQKWvJdHBCTEgUeXl7BCzaLbA5Yo2tepp/ZHpAu66+6pBmx
-	qqCo9MyeIOecDE6SELE6fvpR71LDlVtEA6TPmF/52oNx78HrEhJtGjuJj06uYndPCFlHb3X75hn4G
-	VNDSJWcvQGPW4OgAcBz81QY2sutZRP+m9YO2fOXNMsMJ00CyJdPDpyy4R8ziSZ2ycB97sc1nLP1NT
-	J6PNWPqJrF2lfS26pFCmkICBnwwEEAKJR4gs4R4nKHIXOFvtlixGRmOiLOHa/U3z6NZKu16ZEx5jx
-	YyTtgz5kNK4tavXf9+E7vTvWr9iD+aod/H3miCahM3UMXi7PkXpzPLsVggW/W7CiMzYwQNBuW9CZN
-	VeZTwesX36RQOjO22jmKc4DCxcHv29N5p7PXEiKmAO4AwpxtSnoTcpGylI/XSUJUEc2nLrgSx05OL
-	8rMg7HayeNJHFdsKf4KK75wn;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vQrQu-00Gqnx-1W;
-	Wed, 03 Dec 2025 18:18:32 +0000
-Message-ID: <35eec2e6-bf37-43d6-a2d8-7a939a68021b@samba.org>
-Date: Wed, 3 Dec 2025 19:18:31 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6GN/F4r"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764790162;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MCGJPkB/jAsO8BmWJbd7QmxOjLhr4HMBn8S9GeWmxNA=;
+	b=P6GN/F4rL+ysTq3o6Ei5v6aN+neOutn2ZbksPw0tWrhzwz4ddf1Avde6/mujXdDYu3vU2x
+	5GmmaAlH4R1UiWeutK4XgLcL3oLecSy1l2I6/DOKanWtO+iXFKq71mrOLG9uaTgFUmK+js
+	08ioS912ezWWEtUiXOJqsQbbGeYxRh8=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-641-a8SRREW7NTmLQUuxKSVH3g-1; Wed,
+ 03 Dec 2025 14:29:19 -0500
+X-MC-Unique: a8SRREW7NTmLQUuxKSVH3g-1
+X-Mimecast-MFC-AGG-ID: a8SRREW7NTmLQUuxKSVH3g_1764790158
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 670D3180060D;
+	Wed,  3 Dec 2025 19:29:18 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CD2B019560AD;
+	Wed,  3 Dec 2025 19:29:16 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
+    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Remove dead function prototypes
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-From: Stefan Metzmacher <metze@samba.org>
-Subject: Problem with smbdirect rw credits and initiator_depth
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1951983.1764790155.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 03 Dec 2025 19:29:15 +0000
+Message-ID: <1951984.1764790155@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Namjae,
+    =
 
-I found the problem why the 6.17.9 code of transport_rdma.c deadlocks
-with a Windows client, when using irdma in roce mode, while the 6.18
-code works fine.
+Remove a bunch of dead function prototypes.
 
-irdma/roce in 6.17.9 code => deadlock in wait_for_rw_credits()
-[   T8653] ksmbd: smb_direct: initiator_depth:8 peer_initiator_depth:16
-[   T8653] ksmbd: smb_direct: max_rw_credits:9
-[   T7013] ------------[ cut here ]------------
-[   T7013] needed:31 > max:9
-[   T7013] WARNING: CPU: 1 PID: 7013 at transport_rdma.c:975 wait_for_credits+0x3b8/0x430 [ksmbd]
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Paulo Alcantara <pc@manguebit.org>
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/smb/client/cifsproto.h |    6 ------
+ fs/smb/client/smb2proto.h |   12 ------------
+ 2 files changed, 18 deletions(-)
 
-When the client starts to send an array with larger number of smb2_buffer_desc_v1
-elements in a single SMB2 write request (most likely 31 in the above example)
-wait_for_rw_credits() will simply deadlock, as there are only 9 credits possible
-and 31 are requested.
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index e2cf6d1dd63b..ac745a7e2d18 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -80,7 +80,6 @@ extern char *cifs_build_path_to_root(struct smb3_fs_cont=
+ext *ctx,
+ 				     struct cifs_sb_info *cifs_sb,
+ 				     struct cifs_tcon *tcon,
+ 				     int add_treename);
+-extern char *build_wildcard_path_from_dentry(struct dentry *direntry);
+ char *cifs_build_devname(char *nodename, const char *prepath);
+ void delete_mid(struct TCP_Server_Info *server, struct mid_q_entry *mid);
+ void __release_mid(struct TCP_Server_Info *server, struct mid_q_entry *mi=
+d);
+@@ -159,8 +158,6 @@ extern bool is_valid_oplock_break(char *, struct TCP_S=
+erver_Info *);
+ extern bool backup_cred(struct cifs_sb_info *);
+ extern bool is_size_safe_to_change(struct cifsInodeInfo *cifsInode, __u64=
+ eof,
+ 				   bool from_readdir);
+-extern void cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
+-			    unsigned int bytes_written);
+ void cifs_write_subrequest_terminated(struct cifs_io_subrequest *wdata, s=
+size_t result);
+ extern struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *, in=
+t);
+ extern int cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
+@@ -188,8 +185,6 @@ unsigned int header_assemble(struct smb_hdr *buffer, c=
+har smb_command,
+ extern int small_smb_init_no_tc(const int smb_cmd, const int wct,
+ 				struct cifs_ses *ses,
+ 				void **request_buf);
+-extern enum securityEnum select_sectype(struct TCP_Server_Info *server,
+-				enum securityEnum requested);
+ extern int CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+ 			  struct TCP_Server_Info *server,
+ 			  const struct nls_table *nls_cp);
+@@ -638,7 +633,6 @@ int cifs_try_adding_channels(struct cifs_ses *ses);
+ int smb3_update_ses_channels(struct cifs_ses *ses, struct TCP_Server_Info=
+ *server,
+ 					bool from_reconnect, bool from_reconfigure);
+ bool is_ses_using_iface(struct cifs_ses *ses, struct cifs_server_iface *i=
+face);
+-void cifs_ses_mark_for_reconnect(struct cifs_ses *ses);
+ =
 
-In the 6.18 code we have commit 0bd73ae09ba1b73137d0830b21820d24700e09b1
-smb: server: allocate enough space for RW WRs and ib_drain_qp()
-
-It makes sure we allocate qp_attr.cap.max_rdma_ctxs and qp_attr.cap.max_send_wr
-correct. qp_attr.cap.max_rdma_ctxs was filled by sc->rw_io.credits.max before,
-so I changed sc->rw_io.credits.max, but that might need to be split from
-each other.
-
-But after that change we no longer deadlock when the client starts sending
-larger SMB2 writes, with a larger number of smb2_buffer_desc_v1 elements
-it no longer deadlocks, 159 more than enough.
-
-irdma/roce:
-[   T6505] ksmbd: smb_direct: initiator_depth:8 peer_initiator_depth:16
-...
-[   T6505] ksmbd: smb_direct: sc->rw_io.credits.num_pages=13 sc->rw_io.credits.max:159
-
-My current theory about the Mellanox problem is, that the number of pending
-RDMA Read operations should be limited by the negotiated initiator_depth, which is at max
-SMB_DIRECT_CM_INITIATOR_DEPTH (8). And we're overflowing the hardware limits by
-posting too much RDMA Read sqes.
-
-The change in 0bd73ae09ba1b73137d0830b21820d24700e09b1 didn't change the
-resulting values of sc->rw_io.credits.max for iwarp devices, it only adjusted
-the number for qp_attr.cap.max_send_wr.
-
-So for iwarp we deadlock in both versions of transport_rdma.c, when
-the client starts to send an array of 17 of smb2_buffer_desc_v1 elements
-(I was able to see that using siw on the server, so that tcpdump was
-able to capture it, see:
-https://www.samba.org/~metze/caps/smb2/rdma/linux-6.18-regression/2025-12-03/rdma1-siw-r6.18-ace-fixed-hang-01-stream13.pcap.gz
-With roce it's directly using 17:
-https://www.samba.org/~metze/caps/smb2/rdma/linux-6.18-regression/2025-12-03/rdma1-rxe-r6.18-race-fixed-rw-credits-reverted-hang-01.pcap.gz
-
-The first few SMB2 writes use 2 smb2_buffer_desc_v1 elements and at the end
-the Windows client switches to 17 smb2_buffer_desc_v1 elements.
-
-irdma/iwarp:
-[Wed Dec  3 13:45:22 2025] [   T7621] ksmbd: smb_direct: initiator_depth:8 peer_initiator_depth:127
-..
-[Wed Dec  3 13:45:22 2025] [   T7621] ksmbd: smb_direct: sc->rw_io.credits.num_pages=256 sc->rw_io.credits.max:9
-...
-[Wed Dec  3 13:45:22 2025] [   T8638] ------------[ cut here ]------------
-[Wed Dec  3 13:45:22 2025] [   T8638] needed:17 > max:9
-
-
-siw/iwarp:
-[Wed Dec  3 13:49:30 2025] [   T7621] ksmbd: smb_direct: initiator_depth:8 peer_initiator_depth:16
-...
-[Wed Dec  3 13:49:30 2025] [   T7621] ksmbd: smb_direct: sc->rw_io.credits.num_pages=256 sc->rw_io.credits.max:9
-...
-[Wed Dec  3 13:49:30 2025] [   T9353] ------------[ cut here ]------------
-[Wed Dec  3 13:49:30 2025] [   T9353] needed:17 > max:9
-
-I've prepared 3 branches for testing:
-
-for-6.18/ksmbd-smbdirect-regression-v1
-https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/for-6.18/ksmbd-smbdirect-regression-v1
-
-This has some pr_notice() messages and a WARN_ONCE() when the wait_for_rw_credits() happens.
-
-for-6.18/ksmbd-smbdirect-regression-v2
-https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/for-6.18/ksmbd-smbdirect-regression-v2
-
-This is based on for-6.18/ksmbd-smbdirect-regression-v1 but reverts
-commit 0bd73ae09ba1b73137d0830b21820d24700e09b1, this might fix your setup.
-
-for-6.18/ksmbd-smbdirect-regression-v3
-https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/for-6.18/ksmbd-smbdirect-regression-v3
-
-This reverts everything to the state of v6.17.9 +
-This has some pr_notice() messages and a WARN_ONCE() when the wait_for_rw_credits() happens.
-
-Can you please test them with the priority of testing
-for-6.18/ksmbd-smbdirect-regression-v2 first and the others if you have
-more time.
-
-I typically use this running on a 6.18 kernel:
-modprobe ksmbd
-ksmbd.control -s
-rmmod ksmbd
-cd fs/smb/server
-make -j$(getconf _NPROCESSORS_ONLN) -C /lib/modules/$(uname -r)/build M=$(pwd) KBUILD_MODPOST_WARN=1 modules
-insmod ksmbd.ko
-ksmbd.mountd
-
-The in one window:
-bpftrace -e 'kprobe:smb_direct_rdma_xmit { printf("%s: %s pid=%d %s\n", strftime("%F %H:%M:%S", nsecs(sw_tai)), comm, pid, func); }'
-And in another window:
-dmesg -T -w
-
-
-I assume the solution is to change smb_direct_rdma_xmit, so that
-it doesn't try to get credits for all RDMA read/write requests at once.
-Instead after collecting all ib_send_wr structures from all rdma_rw_ctx_wrs()
-we chunk the list to stay in the negotiated initiator depth,
-before passing to ib_post_send().
-
-At least we need to limit this for RDMA read requests, for RDMA write requests
-we may not need to chunk and post them all together, but still chunking might
-be good in order to avoid blocking concurrent RDMA sends.
-
-Tom is this assumption correct?
-
-Thanks!
-metze
+ int
+ cifs_ses_get_chan_index(struct cifs_ses *ses,
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index 152e888512aa..063c9f83bbcd 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -41,15 +41,11 @@ extern struct mid_q_entry *smb2_setup_async_request(
+ 			struct TCP_Server_Info *server, struct smb_rqst *rqst);
+ extern struct cifs_tcon *smb2_find_smb_tcon(struct TCP_Server_Info *serve=
+r,
+ 						__u64 ses_id, __u32  tid);
+-extern void smb2_echo_request(struct work_struct *work);
+ extern __le32 smb2_get_lease_state(struct cifsInodeInfo *cinode);
+ extern bool smb2_is_valid_oplock_break(char *buffer,
+ 				       struct TCP_Server_Info *srv);
+ extern int smb3_handle_read_data(struct TCP_Server_Info *server,
+ 				 struct mid_q_entry *mid);
+-extern int smb2_query_reparse_tag(const unsigned int xid, struct cifs_tco=
+n *tcon,
+-				struct cifs_sb_info *cifs_sb, const char *path,
+-				__u32 *reparse_tag);
+ struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data,
+ 				     struct super_block *sb,
+ 				     const unsigned int xid,
+@@ -302,17 +298,9 @@ extern int smb2_query_info_compound(const unsigned in=
+t xid,
+ 				    struct kvec *rsp, int *buftype,
+ 				    struct cifs_sb_info *cifs_sb);
+ /* query path info from the server using SMB311 POSIX extensions*/
+-int smb311_posix_query_path_info(const unsigned int xid,
+-				 struct cifs_tcon *tcon,
+-				 struct cifs_sb_info *cifs_sb,
+-				 const char *full_path,
+-				 struct cifs_open_info_data *data);
+ int posix_info_parse(const void *beg, const void *end,
+ 		     struct smb2_posix_info_parsed *out);
+ int posix_info_sid_size(const void *beg, const void *end);
+-int smb2_make_nfs_node(unsigned int xid, struct inode *inode,
+-		       struct dentry *dentry, struct cifs_tcon *tcon,
+-		       const char *full_path, umode_t mode, dev_t dev);
+ int smb2_rename_pending_delete(const char *full_path,
+ 			       struct dentry *dentry,
+ 			       const unsigned int xid);
 
