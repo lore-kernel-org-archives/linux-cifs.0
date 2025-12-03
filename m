@@ -1,169 +1,142 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9391307AD9
-	for <linux-cifs@vger.kernel.org>; Wed,  3 Dec 2025 19:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31FF2D77FE
+	for <linux-cifs@vger.kernel.org>; Wed,  3 Dec 2025 21:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764790165; cv=none; b=gSbHGe+ROmj9nphuONc2xipzGUPkkrGAIqZf0xCIt463Zg5SDHmalOhd7pbDEkffkkMiJWgUa97WTSMiYu6+PK3ii23zGMtlvQB48t5Cy/KDt0CkAe/PtJCrpPY9yhBSWW9hz8oR7OFiKGlxEeRT0tjiLOqCONrovVA48wHAlkA=
+	t=1764798018; cv=none; b=OkYw8Gmpd4oK3bOPSf1aEb3kXf4EXF/8uDn+4HZdaV6+T2dJmcvU+L2Y+301YFVMyGNgWs638k9D+Ac+gmbiDFYyAGmjE2GtyFYd5fmzFvtSYwyuzxc9mf8RMAU6VaWDCwwbJLIVImIl3sGRADApIrjptL9bNAyCwZcyfy3y5FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764790165; c=relaxed/simple;
-	bh=nMkmjGXRVyyxnY8Zfdzvj3s+CvbzFa4myvYAW4xIuYY=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=e94XnuiENniH0IBysaAZtkDlaE3ceyiVQno3KA7Eho8GGlo9uabHw8F/+mxgsVFsaGzC8nsrUDTRBk9WnCKHCKUiIhppujoBqsBFFJ7ZQrVcvPUgqQidYO0xINWwc/6dgmLA5u7cjm1XiFCMpD9nG+b9gtFTeMglh6qB1NxDuV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P6GN/F4r; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764798018; c=relaxed/simple;
+	bh=4mv07ydDIBDY+yYYyDcrBWUbY7+M8hTG8ElX+6UDZ0M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QpQ0sg3a8qRcwdjReOrm578pfgcX8KeOHAiaTBzBnduAA6REQ7UdViWR+A4AxA32E/xY9gj5JsYhB7x+F8JV7UOKONlpKUK5TdEfa2kxm/ViCZqXSXdSezJ6nonHSbZ4R9/1xT/MBRxff+3r4A+k1/3KHClSOsrrFkalfidCNqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JopjRNVf; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6GN/F4r"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764790162;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MCGJPkB/jAsO8BmWJbd7QmxOjLhr4HMBn8S9GeWmxNA=;
-	b=P6GN/F4rL+ysTq3o6Ei5v6aN+neOutn2ZbksPw0tWrhzwz4ddf1Avde6/mujXdDYu3vU2x
-	5GmmaAlH4R1UiWeutK4XgLcL3oLecSy1l2I6/DOKanWtO+iXFKq71mrOLG9uaTgFUmK+js
-	08ioS912ezWWEtUiXOJqsQbbGeYxRh8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-641-a8SRREW7NTmLQUuxKSVH3g-1; Wed,
- 03 Dec 2025 14:29:19 -0500
-X-MC-Unique: a8SRREW7NTmLQUuxKSVH3g-1
-X-Mimecast-MFC-AGG-ID: a8SRREW7NTmLQUuxKSVH3g_1764790158
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 670D3180060D;
-	Wed,  3 Dec 2025 19:29:18 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CD2B019560AD;
-	Wed,  3 Dec 2025 19:29:16 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Steve French <sfrench@samba.org>
-cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
-    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Remove dead function prototypes
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JopjRNVf"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ee44df7750so2242401cf.3
+        for <linux-cifs@vger.kernel.org>; Wed, 03 Dec 2025 13:40:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764798016; x=1765402816; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q4dm3yP8EhvjXM7HY/9hUsT4foK9V8lDuxE0CKRUWT0=;
+        b=JopjRNVfU98l9It7LMYoUhECOIZCRNVLf0qZlNdpSwpW5jgp0T66PjPIXbWyNoPj++
+         3SRcvNaHbMhd9kwusY/dUlBn8TC9ba7eAsfXVOI3qceQQJHvbOCFy/gq913qo+/ewSb+
+         RGaF66b1947U5FPdmNczKYBuMREq7O6Sqq+ja3EokwUNNVE1xQOcrehoouzmKMJhj5Gu
+         T3z2VluD5UyRB7LdBzOwQlGFlZT0bivIkXWtnJ2s74Ik4tUlm+la5i4S+XN4FpKiylhK
+         x70cgbsdtTJvSjd+jzS6OEU5bFS9B9ejKTcTBuzzG/V6T2fdyEFcrezEWyjd2eAfiq9g
+         Ifcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764798016; x=1765402816;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=q4dm3yP8EhvjXM7HY/9hUsT4foK9V8lDuxE0CKRUWT0=;
+        b=gfoMOJ8PjdU/HW0/OXoYo+Ia72U3V4ep8fv3i4bxLOyKKfNF6e2Cn9VYaFSmhAJ1qM
+         VlhtteLz+Dmh2CkkZRejNz3fmnLwoaXlqvVw5Y2RMKAcYA4HKnCXQ2rdo2/4SXwa2+hK
+         vD3ERp591RZwxE9FxAu6ERuRanY4klozc8ayzywPg1oi3I7lof+ZsGoEDlZGWFCYXKOQ
+         xZeuES0ldd5roAOjWg/0qCJ/Nr655ACh7mjtSgbVUa4hAl015oiRKZnUEchl7gD/FAcd
+         llX4KbK57eqU4fZ+1+yYfh0+/0/7X8L1d14X26+xewageFG618+UH43x4dB6eK1cDTeV
+         7M/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUqPU++UYpCKOgw029WW1DcNnSir+K0xNLhcVtChJSxkDFuJexgUDpXh74fYyY7PtrOeuf1FcfmGBQk@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTmPuvRRfsOOjHj5mcuinghziI1gx+4Sj+QoVnrLkrQFRLy1q4
+	mxHvA/bPtvsQCyikp5RyXNRKr5q430lneYMNiIS27LIZNm/u10ApzhMG/Ll+yOZaMV+a+BfR9BE
+	uEu1hJZ/+hAQ86KGsgCGrkdjTrO60D2o=
+X-Gm-Gg: ASbGnctgxIPy7dsgljsvmi8oEyh3AHZau5TdN0dyziO+tVgEq2tizh3s78SoUwKrQYy
+	ZjqqPjVW/bRrs/Gd7atAEzQrLkno2OY2cvvCIgj+U9IJvA7nm6lMHSIzKFP34Zl0FEh4+pr0JA1
+	MZrU35c6k5sh+IuSDUkae/HS8EJAE87493yLEOCxKsHzyYRdwjdP6B7R7Q0+p5lVNFO/tiVw88T
+	zdGA4++8w+f23vzBJcPwjr7T0wt96bagtYaWMqVFB74rH7mD2kAECG7IxXRL7+EmAN9KyRlUS/A
+	MBe8XY30cUbluInn01M4AfX9hlFaFAyKt78yAhowOA0xXx9hwE68AaqwGpYp071wG35JjnE44tT
+	/subRN396RgKWw/MH8FTXw6O7uEhZ+HTAyIQuYuXMDRnx5SyJ0Og5IA9/FqmepqzWTrcHza53iH
+	Txyn6I2cX/lw==
+X-Google-Smtp-Source: AGHT+IG1RqtM4CjFZIoV9HQ/AGJf69t++XxRfMRR9/KEWXX168CW0sh0DFIGvs6Sts+Nzs+IjWJ+CH1r+PDY8raGX3I=
+X-Received: by 2002:a05:622a:188e:b0:4ee:4a3a:bd10 with SMTP id
+ d75a77b69052e-4f017691727mr61297771cf.60.1764798015667; Wed, 03 Dec 2025
+ 13:40:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1951983.1764790155.1@warthog.procyon.org.uk>
+References: <1597479.1764697506@warthog.procyon.org.uk> <0cf36b63a8f7c807a785f3cbee41beb2@manguebit.org>
+In-Reply-To: <0cf36b63a8f7c807a785f3cbee41beb2@manguebit.org>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 3 Dec 2025 15:40:04 -0600
+X-Gm-Features: AWmQ_bmPZtnFFmlM888CIxDrVHAGDo88ZyE8SdWbeAXL99pNPNJhCXfBTmmIgG4
+Message-ID: <CAH2r5msAgsWfnCt171TcmhvCw39GtQ8nU8SwzrVpP=xw2vGypg@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Fix handling of a beyond-EOF DIO/unbuffered read
+ over SMB1
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: David Howells <dhowells@redhat.com>, Steve French <sfrench@samba.org>, 
+	Shyam Prasad N <sprasad@microsoft.com>, linux-cifs@vger.kernel.org, netfs@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, stable@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 03 Dec 2025 19:29:15 +0000
-Message-ID: <1951984.1764790155@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-    =
+On Wed, Dec 3, 2025 at 12:03=E2=80=AFPM Paulo Alcantara <pc@manguebit.org> =
+wrote:
+>
+> David Howells <dhowells@redhat.com> writes:
+>
+> >
+> > If a DIO read or an unbuffered read request extends beyond the EOF, the
+> > server will return a short read and a status code indicating that EOF w=
+as
+> > hit, which gets translated to -ENODATA.  Note that the client does not =
+cap
+> > the request at i_size, but asks for the amount requested in case there'=
+s a
+> > race on the server with a third party.
+> >
+> > Now, on the client side, the request will get split into multiple
+> > subrequests if rsize is smaller than the full request size.  A subreque=
+st
+> > that starts before or at the EOF and returns short data up to the EOF w=
+ill
+> > be correctly handled, with the NETFS_SREQ_HIT_EOF flag being set,
+> > indicating to netfslib that we can't read more.
+> >
+> > If a subrequest, however, starts after the EOF and not at it, HIT_EOF w=
+ill
+> > not be flagged, its error will be set to -ENODATA and it will be abando=
+ned.
+> > This will cause the request as a whole to fail with -ENODATA.
+> >
+> > Fix this by setting NETFS_SREQ_HIT_EOF on any subrequest that lies beyo=
+nd
+> > the EOF marker.
+> >
+> > This can be reproduced by mounting with "cache=3Dnone,sign,vers=3D1.0" =
+and
+> > doing a read of a file that's significantly bigger than the size of the
+> > file (e.g. attempting to read 64KiB from a 16KiB file).
+> >
+> > Fixes: a68c74865f51 ("cifs: Fix SMB1 readv/writev callback in the same =
+way as SMB2/3")
+> > Signed-off-by: David Howells <dhowells@redhat.com>
+> > cc: Steve French <sfrench@samba.org>
+> > cc: Paulo Alcantara <pc@manguebit.org>
+> > cc: Shyam Prasad N <sprasad@microsoft.com>
+> > cc: linux-cifs@vger.kernel.org
+> > cc: netfs@lists.linux.dev
+> > cc: linux-fsdevel@vger.kernel.org
+>
+> Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+>
+> Dave, looks like we're missing a similar fix for smb2_readv_callback()
+> as well.
+>
+> Can you handle it?
 
-Remove a bunch of dead function prototypes.
+Any luck reproducing it for smb2/smb3/smb3.1.1?
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- fs/smb/client/cifsproto.h |    6 ------
- fs/smb/client/smb2proto.h |   12 ------------
- 2 files changed, 18 deletions(-)
+--=20
+Thanks,
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index e2cf6d1dd63b..ac745a7e2d18 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -80,7 +80,6 @@ extern char *cifs_build_path_to_root(struct smb3_fs_cont=
-ext *ctx,
- 				     struct cifs_sb_info *cifs_sb,
- 				     struct cifs_tcon *tcon,
- 				     int add_treename);
--extern char *build_wildcard_path_from_dentry(struct dentry *direntry);
- char *cifs_build_devname(char *nodename, const char *prepath);
- void delete_mid(struct TCP_Server_Info *server, struct mid_q_entry *mid);
- void __release_mid(struct TCP_Server_Info *server, struct mid_q_entry *mi=
-d);
-@@ -159,8 +158,6 @@ extern bool is_valid_oplock_break(char *, struct TCP_S=
-erver_Info *);
- extern bool backup_cred(struct cifs_sb_info *);
- extern bool is_size_safe_to_change(struct cifsInodeInfo *cifsInode, __u64=
- eof,
- 				   bool from_readdir);
--extern void cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
--			    unsigned int bytes_written);
- void cifs_write_subrequest_terminated(struct cifs_io_subrequest *wdata, s=
-size_t result);
- extern struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *, in=
-t);
- extern int cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
-@@ -188,8 +185,6 @@ unsigned int header_assemble(struct smb_hdr *buffer, c=
-har smb_command,
- extern int small_smb_init_no_tc(const int smb_cmd, const int wct,
- 				struct cifs_ses *ses,
- 				void **request_buf);
--extern enum securityEnum select_sectype(struct TCP_Server_Info *server,
--				enum securityEnum requested);
- extern int CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
- 			  struct TCP_Server_Info *server,
- 			  const struct nls_table *nls_cp);
-@@ -638,7 +633,6 @@ int cifs_try_adding_channels(struct cifs_ses *ses);
- int smb3_update_ses_channels(struct cifs_ses *ses, struct TCP_Server_Info=
- *server,
- 					bool from_reconnect, bool from_reconfigure);
- bool is_ses_using_iface(struct cifs_ses *ses, struct cifs_server_iface *i=
-face);
--void cifs_ses_mark_for_reconnect(struct cifs_ses *ses);
- =
-
- int
- cifs_ses_get_chan_index(struct cifs_ses *ses,
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index 152e888512aa..063c9f83bbcd 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -41,15 +41,11 @@ extern struct mid_q_entry *smb2_setup_async_request(
- 			struct TCP_Server_Info *server, struct smb_rqst *rqst);
- extern struct cifs_tcon *smb2_find_smb_tcon(struct TCP_Server_Info *serve=
-r,
- 						__u64 ses_id, __u32  tid);
--extern void smb2_echo_request(struct work_struct *work);
- extern __le32 smb2_get_lease_state(struct cifsInodeInfo *cinode);
- extern bool smb2_is_valid_oplock_break(char *buffer,
- 				       struct TCP_Server_Info *srv);
- extern int smb3_handle_read_data(struct TCP_Server_Info *server,
- 				 struct mid_q_entry *mid);
--extern int smb2_query_reparse_tag(const unsigned int xid, struct cifs_tco=
-n *tcon,
--				struct cifs_sb_info *cifs_sb, const char *path,
--				__u32 *reparse_tag);
- struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data,
- 				     struct super_block *sb,
- 				     const unsigned int xid,
-@@ -302,17 +298,9 @@ extern int smb2_query_info_compound(const unsigned in=
-t xid,
- 				    struct kvec *rsp, int *buftype,
- 				    struct cifs_sb_info *cifs_sb);
- /* query path info from the server using SMB311 POSIX extensions*/
--int smb311_posix_query_path_info(const unsigned int xid,
--				 struct cifs_tcon *tcon,
--				 struct cifs_sb_info *cifs_sb,
--				 const char *full_path,
--				 struct cifs_open_info_data *data);
- int posix_info_parse(const void *beg, const void *end,
- 		     struct smb2_posix_info_parsed *out);
- int posix_info_sid_size(const void *beg, const void *end);
--int smb2_make_nfs_node(unsigned int xid, struct inode *inode,
--		       struct dentry *dentry, struct cifs_tcon *tcon,
--		       const char *full_path, umode_t mode, dev_t dev);
- int smb2_rename_pending_delete(const char *full_path,
- 			       struct dentry *dentry,
- 			       const unsigned int xid);
-
+Steve
