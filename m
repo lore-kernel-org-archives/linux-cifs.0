@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5C0330B06;
-	Wed,  3 Dec 2025 15:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4073B352F95;
+	Wed,  3 Dec 2025 16:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764777131; cv=none; b=bzGRtxaOTElZ3QrLDIOM3vGcwaLDcD3D7XLxTj8TPQgT2ZXubjJ0NgoEFGdy2Bn2/Tw52uHtJoDDMiWeVd1HFcBAzN8Th1tujGtBegLl7hX9cFEOVxRYf+HNL9fhrWCvDx+8WZmcAUFEmQuYo4rRtKY5QG9TCqZ7CU3BC9KU5HQ=
+	t=1764778599; cv=none; b=Tmn/5/vku6jhf0RDbgU+HIV4d4SOlLtPojnOt71PfSLIAhIjD8t+Cdm0PbVoZuata+9pNUM9zWcSp0qMEoVaj7NgbVrlOQYIouv1eNH9nnnkUWOIMjjrSCOt6VrKWc6nriVWUb4BsNxuiYJ4eUpFQsyXAahyjIefBqFhtQPxQKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764777131; c=relaxed/simple;
-	bh=Y5gCbpbOO1NVJZjVnlDdO+I1RMSVjrmG08ReE3F3c6A=;
+	s=arc-20240116; t=1764778599; c=relaxed/simple;
+	bh=8bdRHbgj6GBrXGjBh26PrekPZKqdMsxBtA2BuRfYRVU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TubC52mc6gsS1Zrk6QACC7H04tSs8BpI3Zf91bQCJFBkw/q6a/60zP/v2h6pMdcENY8CadViW3yfEZeQMCiW5hoUXQrVPsN0eg3FCIO6NCb6FfrybLeBVP2OE+FE7BJiduq6jlRsTqIkPs6huZcGWInOqqdc+jA/jrEFz5tirbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=rqPKTQL1; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=D6S20L1LvVBkSXBcHCHSj9cTD475vrrh5MYLcbHShMdd7c77yrCtlWyVh02iw6FUaaxCpnDzjiFqvV6TBo5Jkg3ZkmrBuV0bp6LvNB1WnwSCbeg7Qzu9TfUvW7OtchpSKYAemFJTJH3YNvnSuQA3uq/i4J0vnUubuUO24FSjhuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=GuYPyfj3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="rqPKTQL1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A093CC116B1;
-	Wed,  3 Dec 2025 15:52:10 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="GuYPyfj3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A876AC4CEF5;
+	Wed,  3 Dec 2025 16:16:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1764777131;
-	bh=Y5gCbpbOO1NVJZjVnlDdO+I1RMSVjrmG08ReE3F3c6A=;
+	s=korg; t=1764778599;
+	bh=8bdRHbgj6GBrXGjBh26PrekPZKqdMsxBtA2BuRfYRVU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rqPKTQL1xqPmrruWynba7BVEjeV+TfA07c8yc7qLXGsDoecmkr6yqIu/6hbHqzyiJ
-	 8HiQI/ZozWgQN5p5YgFZYa61XWEmF7h50bZwR6QcEGZzIWUg5ysvMJtanvzUVNeDRW
-	 R/TmIR3539c2zbNEU6KqqQCXTeo+aK1DwKk8eEm0=
+	b=GuYPyfj31MXQOagAdMHdg9pI+UIIZba9MKGvXV5A7BFaxNFPrZp4tfnwyRdYwassZ
+	 /FNxLsYsVpv75jg15Rr97G8+oUECewsOJviKSok7Aje0mHrTvw8WoxpoWvNpuoa7yh
+	 tKao9dtob/DO1xsqrBefARNyLqWQw2pnVkr8P+oU=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -31,13 +31,14 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	David Howells <dhowells@redhat.com>,
 	Jay Shin <jaeshin@redhat.com>,
 	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.17 091/146] smb: client: fix memory leak in cifs_construct_tcon()
-Date: Wed,  3 Dec 2025 16:27:49 +0100
-Message-ID: <20251203152349.790977408@linuxfoundation.org>
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.15 383/392] smb: client: fix memory leak in cifs_construct_tcon()
+Date: Wed,  3 Dec 2025 16:28:53 +0100
+Message-ID: <20251203152428.287701996@linuxfoundation.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251203152346.456176474@linuxfoundation.org>
-References: <20251203152346.456176474@linuxfoundation.org>
+In-Reply-To: <20251203152414.082328008@linuxfoundation.org>
+References: <20251203152414.082328008@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -49,13 +50,13 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.17-stable review patch.  If anyone has any objections, please let me know.
+5.15-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
 From: Paulo Alcantara <pc@manguebit.org>
 
-commit 3184b6a5a24ec9ee74087b2a550476f386df7dc2 upstream.
+[ Upstream commit 3184b6a5a24ec9ee74087b2a550476f386df7dc2 ]
 
 When having a multiuser mount with domain= specified and using
 cifscreds, cifs_set_cifscreds() will end up setting @ctx->domainname,
@@ -98,20 +99,22 @@ Cc: Jay Shin <jaeshin@redhat.com>
 Cc: stable@vger.kernel.org
 Cc: linux-cifs@vger.kernel.org
 Signed-off-by: Steve French <stfrench@microsoft.com>
+[ applied fix to fs/cifs/connect.c ]
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/client/connect.c |    1 +
+ fs/cifs/connect.c |    1 +
  1 file changed, 1 insertion(+)
 
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -4455,6 +4455,7 @@ cifs_construct_tcon(struct cifs_sb_info
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3926,6 +3926,7 @@ cifs_construct_tcon(struct cifs_sb_info
  
  out:
  	kfree(ctx->username);
 +	kfree(ctx->domainname);
  	kfree_sensitive(ctx->password);
- 	kfree(origin_fullpath);
  	kfree(ctx);
+ 
 
 
