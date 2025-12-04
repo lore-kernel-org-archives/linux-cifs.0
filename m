@@ -1,43 +1,46 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9918536C5A0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990F236A01F
 	for <linux-cifs@vger.kernel.org>; Thu,  4 Dec 2025 18:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764871596; cv=none; b=YgTleBGTc2EdzwvX0YkdDsZIa1D9xsPzuf7Tor7qKKrWobpMfy2LfKzzdDmMAbPOE1sJaewt9pqbz28n/A2iXkrQLpi4wvBo0ngdx8H/Pp4cRb5h1u9+ZR5LK5NUxRsiVRlVD5lNO4cIqO7oSlmN/u4PCEc/ErzWUNa+XV4gJko=
+	t=1764871598; cv=none; b=RSUJTb95wpf1iNwlfjhHDszNwk+wDKIe7dR9zG9HnA31OtMFdCQKY+jDa3rMs9/vLgScYnjF/oGExZMcTQ/TXd1uH3253c+axps0pnAExRv2P9ZcH3G9GD4lEaE6J63n1arkxZrLRb30ebIVpzlRjbMqTdf79LKwIKSjyVt5pE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764871596; c=relaxed/simple;
-	bh=oGGsZ0VBKAMKbSnky2yeeEFMDeaaL9dNDgOC0OThVZw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=noDL6QkdncmD5LrFZGalZJ2eMLaYbSWptd5bi7xIyphcJGUYTPKiUlkm+FHl8QjrThFcCQgu7ZrsutYJCsVSFAMUavQa+9Hi7O/kXTnwVpI7nuFjDh405SA7zj7LfkhOx0bSjBK4zSy5COwZxYaee73BU2L0jRSjd7evr/7QGuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=cx/F7eRA; arc=none smtp.client-ip=143.255.12.172
+	s=arc-20240116; t=1764871598; c=relaxed/simple;
+	bh=p3Ef8YjpFzUkf0lakBtEGhbxe+MCiWLYbB2yai8rnJ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Oa7X7su5d9Ci+Tf6DLs0LvFvKGk3a9L6wsCUOVx0WGfhkC71VOeJ4YrNQv/ahFx75Bt4N/8AXR9YNR41RbjMHp2dXlSH+jZoJpJAWWtswrWr1gpjacJyDk82WLHRm9jR8itAlnJAtXEOwAFCry0mj+uxb3kCWmJAtTJLu3BBjq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=6W9yuDaX; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="cx/F7eRA"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="6W9yuDaX"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=mf1soghjnKrBnk+Bcbsoqz37jKyxwDBSYzxvQff/Fq0=; b=cx/F7eRAfwfItxEsW4iJxsK8db
-	cBI8kINtFICeyVHZTQZ3gIn6INvl4FBsDQQ03CXmOTAWEmiUmfZwdiYd84S4s/lLEw7U3we+a4uwR
-	yGAsx5v7kB/9XRjYfmTfEbSc+iiFOjZvB4OeCqHxz8hlli7FOsxpF4CGb7VAUEJ8hhPzrtAKt14Wo
-	zixBJR24M1UncnQio4rDAk894TvBL4zvEycCSvQGzZNonfhyktKz1s+j40N7lupDd5YYW5ndaDt2c
-	i5Uilg1yFfRqsEjNsIxtOM2nxatVHT2gSY8ZtLHDUbT/ZNbVHQvh7ieTXi2K0D5lftDwBnRzwj6G8
-	B+kG7zrw==;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
+	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
+	Content-ID:Content-Description;
+	bh=o6V/OwSd+NhygMB7t6/bN9/+lHSV9lflyWkuxkqZpfc=; b=6W9yuDaXiIVGzhxV5/N9gBNbmE
+	BeTRsy652M05chv9lK9KSEEih95e9iFqNpJGCYH8fWCzFHTAHPiud1NzEttCdTWQxxHD6VJJ5jRDy
+	s57CKL63pyBEglL9rFRJhR1Xok0SknElLmU2bH/TaCssO5pn05hPg+ZWik8XLHnDGWQePbwyY48ls
+	x4IBbKM0ef6YYldHxwtd9hg2He0S3nubMmBLisYui8g1mf+wMFN8Q8bjeY5bdClUEHSJjbeq3BV6e
+	Nxp0va8Lw/D1rUD3piCQQTeKkao051cVezJYWOOUEqlCttL7NtL/W0c8fhtqb9+k47epczhfuBOVq
+	cRo6KUKw==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99)
-	id 1vRDik-00000000Dfg-0ZsS;
+	id 1vRDik-00000000Dfr-1i0H;
 	Thu, 04 Dec 2025 15:06:26 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: smfrench@gmail.com
 Cc: "Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
 	Pierguido Lambri <plambri@redhat.com>,
+	David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH 1/3] smb: client: relax session and tcon reconnect attempts
-Date: Thu,  4 Dec 2025 15:06:23 -0300
-Message-ID: <20251204180626.244415-1-pc@manguebit.org>
+Subject: [PATCH 3/3] smb: client: Add tracepoint for krb5 auth
+Date: Thu,  4 Dec 2025 15:06:25 -0300
+Message-ID: <20251204180626.244415-3-pc@manguebit.org>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20251204180626.244415-1-pc@manguebit.org>
+References: <20251204180626.244415-1-pc@manguebit.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -46,117 +49,167 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the client re-establishes connection to the server, it will queue
-a worker thread that will attempt to reconnect sessions and tcons on
-every two seconds, which is kinda overkill as it is a very common
-scenario when having expired passwords or KRB5 TGT tickets, or deleted
-shares.
+Add tracepoint to help debugging krb5 auth failures.
 
-Use an exponential backoff strategy to handle session/tcon reconnect
-attempts in the worker thread to prevent the client from overloading
-the system when it is very unlikely to re-establish any session/tcon
-soon while client is idle.
+Example:
+
+$ trace-cmd record -e smb3_kerberos_auth
+$ mount.cifs ...
+$ trace-cmd report
+mount.cifs-1667 [003] .....  5810.668549: smb3_kerberos_auth: vers=2
+host=w22-dc1.zelda.test ip=192.168.124.30:445 sec=krb5 uid=0 cruid=0
+user=root pid=1667 upcall_target=app err=-126
 
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Reviewed-by: David Howells <dhowells@redhat.com>
 Cc: Pierguido Lambri <plambri@redhat.com>
+Cc: David Howells <dhowells@redhat.com>
 Cc: linux-cifs@vger.kernel.org
 ---
- fs/smb/client/cifsglob.h | 21 +++++++++++++++++++++
- fs/smb/client/connect.c  |  4 ++--
- fs/smb/client/smb2pdu.c  |  6 +++---
- 3 files changed, 26 insertions(+), 5 deletions(-)
+ fs/smb/client/cifs_spnego.c | 25 ++++++++++------
+ fs/smb/client/smb2pdu.c     |  2 --
+ fs/smb/client/trace.h       | 60 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 76 insertions(+), 11 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index f9c1f553ffd0..3eca5bfb7030 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -745,6 +745,7 @@ struct TCP_Server_Info {
- 	struct session_key session_key;
- 	unsigned long lstrp; /* when we got last response from this server */
- 	unsigned long neg_start; /* when negotiate started (jiffies) */
-+	unsigned long reconn_delay; /* when resched session and tcon reconnect */
- 	struct cifs_secmech secmech; /* crypto sec mech functs, descriptors */
- #define	CIFS_NEGFLAVOR_UNENCAP	1	/* wct == 17, but no ext_sec */
- #define	CIFS_NEGFLAVOR_EXTENDED	2	/* wct == 17, ext_sec bit set */
-@@ -2292,4 +2293,24 @@ struct cifs_calc_sig_ctx {
- 	struct shash_desc *shash;
- };
+diff --git a/fs/smb/client/cifs_spnego.c b/fs/smb/client/cifs_spnego.c
+index da935bd1ce87..48e90773462c 100644
+--- a/fs/smb/client/cifs_spnego.c
++++ b/fs/smb/client/cifs_spnego.c
+@@ -84,12 +84,13 @@ struct key *
+ cifs_get_spnego_key(struct cifs_ses *sesInfo,
+ 		    struct TCP_Server_Info *server)
+ {
+-	struct sockaddr_in *sa = (struct sockaddr_in *) &server->dstaddr;
+ 	struct sockaddr_in6 *sa6 = (struct sockaddr_in6 *) &server->dstaddr;
++	struct sockaddr_in *sa = (struct sockaddr_in *) &server->dstaddr;
++	const char *hostname = server->hostname;
++	const char *sec = "krb5";
+ 	char *description, *dp;
+-	size_t desc_len;
+ 	struct key *spnego_key;
+-	const char *hostname = server->hostname;
++	size_t desc_len;
  
-+#define CIFS_RECONN_DELAY_SECS	30
-+#define CIFS_MAX_RECONN_DELAY	(4 * CIFS_RECONN_DELAY_SECS)
-+
-+static inline void cifs_queue_server_reconn(struct TCP_Server_Info *server)
-+{
-+	if (!delayed_work_pending(&server->reconnect)) {
-+		WRITE_ONCE(server->reconn_delay, 0);
-+		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
-+	}
-+}
-+
-+static inline void cifs_requeue_server_reconn(struct TCP_Server_Info *server)
-+{
-+	unsigned long delay = READ_ONCE(server->reconn_delay);
-+
-+	delay = umin(delay + CIFS_RECONN_DELAY_SECS, CIFS_MAX_RECONN_DELAY);
-+	WRITE_ONCE(server->reconn_delay, delay);
-+	queue_delayed_work(cifsiod_wq, &server->reconnect, delay * HZ);
-+}
-+
- #endif	/* _CIFS_GLOB_H */
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index b306ee97a20a..3838dd14d4da 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -425,7 +425,7 @@ static int __cifs_reconnect(struct TCP_Server_Info *server,
- 			spin_unlock(&server->srv_lock);
- 			cifs_swn_reset_server_dstaddr(server);
- 			cifs_server_unlock(server);
--			mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
-+			cifs_queue_server_reconn(server);
- 		}
- 	} while (server->tcpStatus == CifsNeedReconnect);
+ 	/* length of fields (with semicolons): ver=0xyz ip4=ipaddress
+ 	   host=hostname sec=mechanism uid=0xFF user=username */
+@@ -130,15 +131,14 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo,
  
-@@ -564,7 +564,7 @@ static int reconnect_dfs_server(struct TCP_Server_Info *server)
- 		spin_unlock(&server->srv_lock);
- 		cifs_swn_reset_server_dstaddr(server);
- 		cifs_server_unlock(server);
--		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
-+		cifs_queue_server_reconn(server);
- 	} while (server->tcpStatus == CifsNeedReconnect);
+ 	/* for now, only sec=krb5 and sec=mskrb5 and iakerb are valid */
+ 	if (server->sec_kerberos)
+-		dp += sprintf(dp, ";sec=krb5");
++		sec = "krb5";
+ 	else if (server->sec_mskerberos)
+-		dp += sprintf(dp, ";sec=mskrb5");
++		sec = "mskrb5";
+ 	else if (server->sec_iakerb)
+-		dp += sprintf(dp, ";sec=iakerb");
+-	else {
++		sec = "iakerb";
++	else
+ 		cifs_dbg(VFS, "unknown or missing server auth type, use krb5\n");
+-		dp += sprintf(dp, ";sec=krb5");
+-	}
++	dp += sprintf(dp, ";sec=%s", sec);
  
- 	dfs_cache_noreq_update_tgthint(ref_path, target_hint);
+ 	dp += sprintf(dp, ";uid=0x%x",
+ 		      from_kuid_munged(&init_user_ns, sesInfo->linux_uid));
+@@ -159,6 +159,13 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo,
+ 	cifs_dbg(FYI, "key description = %s\n", description);
+ 	scoped_with_creds(spnego_cred)
+ 		spnego_key = request_key(&cifs_spnego_key_type, description, "");
++	trace_smb3_kerberos_auth(CIFS_SPNEGO_UPCALL_VERSION,
++				 hostname, &server->dstaddr, sec,
++				 from_kuid_munged(&init_user_ns, sesInfo->linux_uid),
++				 from_kuid_munged(&init_user_ns, sesInfo->cred_uid),
++				 sesInfo->user_name, current->pid,
++				 sesInfo->upcall_target == UPTARGET_MOUNT ? "mount" : "app",
++				 IS_ERR(spnego_key) ? PTR_ERR(spnego_key) : 0);
+ 
+ #ifdef CONFIG_CIFS_DEBUG2
+ 	if (cifsFYI && !IS_ERR(spnego_key)) {
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index e26d29d75f9f..0d2940808be6 100644
+index 0d2940808be6..599cdc6db46c 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -493,7 +493,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	spin_unlock(&ses->ses_lock);
- 
- 	if (smb2_command != SMB2_INTERNAL_CMD)
--		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
-+		cifs_queue_server_reconn(server);
- 
- 	atomic_inc(&tconInfoReconnectCount);
- out:
-@@ -4312,7 +4312,7 @@ void smb2_reconnect_server(struct work_struct *work)
- done:
- 	cifs_dbg(FYI, "Reconnecting tcons and channels finished\n");
- 	if (resched)
--		queue_delayed_work(cifsiod_wq, &server->reconnect, 2 * HZ);
-+		cifs_requeue_server_reconn(server);
- 	mutex_unlock(&pserver->reconnect_mutex);
- 
- 	/* now we can safely release srv struct */
-@@ -4336,7 +4336,7 @@ SMB2_echo(struct TCP_Server_Info *server)
- 	    server->ops->need_neg(server)) {
- 		spin_unlock(&server->srv_lock);
- 		/* No need to send echo on newly established connections */
--		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
-+		cifs_queue_server_reconn(server);
- 		return rc;
+@@ -1691,8 +1691,6 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
+ 	spnego_key = cifs_get_spnego_key(ses, server);
+ 	if (IS_ERR(spnego_key)) {
+ 		rc = PTR_ERR(spnego_key);
+-		if (rc == -ENOKEY)
+-			cifs_dbg(VFS, "Verify user has a krb5 ticket and keyutils is installed\n");
+ 		spnego_key = NULL;
+ 		goto out;
  	}
- 	spin_unlock(&server->srv_lock);
+diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
+index 252073352e79..0d0261777aa9 100644
+--- a/fs/smb/client/trace.h
++++ b/fs/smb/client/trace.h
+@@ -1692,6 +1692,66 @@ DEFINE_SMB3_CREDIT_EVENT(waitff_credits);
+ DEFINE_SMB3_CREDIT_EVENT(overflow_credits);
+ DEFINE_SMB3_CREDIT_EVENT(set_credits);
+ 
++DECLARE_EVENT_CLASS(smb3_kerberos_class,
++		    TP_PROTO(int vers,
++			     const char *host,
++			     const struct __kernel_sockaddr_storage *addr,
++			     const char *sec,
++			     uid_t uid,
++			     uid_t cruid,
++			     const char *user,
++			     pid_t pid,
++			     const char *upcall_target,
++			     int rc),
++		    TP_ARGS(vers, host, addr, sec, uid, cruid, user, pid, upcall_target, rc),
++		    TP_STRUCT__entry(
++			    __field(int, vers)
++			    __string(host, host)
++			    __array(__u8, addr, sizeof(struct sockaddr_storage))
++			    __string(sec, sec)
++			    __field(uid_t, uid)
++			    __field(uid_t, cruid)
++			    __string(user, user)
++			    __field(pid_t, pid)
++			    __string(upcall_target, upcall_target)
++			    __field(int, rc)
++		    ),
++		    TP_fast_assign(
++			    struct sockaddr_storage *pss = NULL;
++
++			    __entry->vers = vers;
++			    __assign_str(host);
++			    pss = (struct sockaddr_storage *)__entry->addr;
++			    *pss = *addr;
++			    __assign_str(sec);
++			    __entry->uid = uid;
++			    __entry->cruid = cruid;
++			    __assign_str(user);
++			    __entry->pid = pid;
++			    __assign_str(upcall_target);
++			    __entry->rc = rc;
++		    ),
++		    TP_printk("vers=%d host=%s ip=%pISpsfc sec=%s uid=%d cruid=%d user=%s pid=%d upcall_target=%s err=%d",
++			      __entry->vers, __get_str(host), __entry->addr,
++			      __get_str(sec), __entry->uid, __entry->cruid,
++			      __get_str(user), __entry->pid, __get_str(upcall_target),
++			      __entry->rc))
++
++#define DEFINE_SMB3_KERBEROS_EVENT(name) \
++DEFINE_EVENT(smb3_kerberos_class, smb3_##name, \
++	TP_PROTO(int vers, \
++		 const char *host, \
++		 const struct __kernel_sockaddr_storage *addr, \
++		 const char *sec, \
++		 uid_t uid, \
++		 uid_t cruid, \
++		 const char *user, \
++		 pid_t pid, \
++		 const char *upcall_target, \
++		 int rc), \
++	TP_ARGS(vers, host, addr, sec, uid, cruid, user, pid, upcall_target, rc))
++
++DEFINE_SMB3_KERBEROS_EVENT(kerberos_auth);
+ 
+ TRACE_EVENT(smb3_tcon_ref,
+ 	    TP_PROTO(unsigned int tcon_debug_id, int ref,
 -- 
 2.52.0
 
