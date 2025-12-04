@@ -1,148 +1,93 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FBC2FB621
-	for <linux-cifs@vger.kernel.org>; Thu,  4 Dec 2025 05:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6113093D2
+	for <linux-cifs@vger.kernel.org>; Thu,  4 Dec 2025 06:15:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764827773; cv=none; b=dBtIy1Gv+cQ8knnigY2noEWgffbTNIU4bHBWqbuVvB7QtVZJ+HCVsjkj/7QzY31mPJW17kf/rbI2FGWMTVyFjT75X259so0D3s/ja5tU+UySAhIDCA8HKGv7/vhli4VuHKWOcciHOkDW/WVQvHao5iWx2xsWaW6YQQnz/tV3lbc=
+	t=1764828914; cv=none; b=XBlbB9Mfjs9X9yB9I06ocl+njK5jMBuK5c1F5adEpD+rOOIyrMmoZq3Fp7WZH9UkA7D60iggQWc9/e8VhBWsyO289Baz8ziEaRrXGsMy6vVonMNtPWnSbWJyVDCGp10Z3igL4rIOD+uQD03gv5wWjbjMD1si4zhbudzElXda6Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764827773; c=relaxed/simple;
-	bh=Qsk8pHHcsyflKI1E3+J3FIUX9RIpsBEQCkWOEMZeLhc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pk7y+eTvDEZWfMwk08pQt1NgPToJZI0LdnRX+SHDHgks5KARAiX23ODRYPrumRhosCsukTq1TDFpQxwbOlnBQkFSaIzVlIp2SVtBvMSGtGrgY/5518KXWy3xHunBeCsMGlnJUhbreOTrY+3aTi5GX/4nQ54FTPrQ5pVEZGA50hE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=a7VTP4TY; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1764828914; c=relaxed/simple;
+	bh=2iJ9aAEUqPfyb9xNgOSo2GwKBxBeJAG7JTACF98eF0w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ASshwi0b368iVeD3mjkhKhgwiZr+5B78awA1zSLRthBne8GpO2jlC0UnzMLWo9yD5h9XU4jUY7CXcVac1qFVhWXS2SluuEkhmqBTOGOUHMdQIcAij6uOSyBliovNIncjI81r6dhyB5oB+jU65mhrELx9wbGWyMeYtzDnvAschgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fL04aeQT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="a7VTP4TY"
-Message-ID: <af214141-4a8f-4d79-819c-26edb016be66@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1764827757;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JVRQeuE3di9JM/1OKvwjd3eqJZQjVEvy+FDcFLt8V0I=;
-	b=a7VTP4TYGJ9nwWpuf3FlxRN5LojmES2BoHTLgxEUJInkW/SH9jkMAPvDuuJgx3a2BJc9SU
-	53s6+rzTBA9nFtZ78g+8xxPS27K/Tt8YkR2GEtlaDlAc7hoQgEqH4LvXHLSo4L8SJ8NwCp
-	Ana1xP97uV9n5C3W9uT3R+wecfMnCFA=
-Date: Thu, 4 Dec 2025 13:55:16 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fL04aeQT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BA97C16AAE
+	for <linux-cifs@vger.kernel.org>; Thu,  4 Dec 2025 06:15:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764828914;
+	bh=2iJ9aAEUqPfyb9xNgOSo2GwKBxBeJAG7JTACF98eF0w=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=fL04aeQT9WGOHnljjdn0PEeeH6msSeG80wKJdWRXR1UE4EaJJWxebqTa356+w5mRt
+	 1jYID9ITGxcCuh/OEuCQ3Uc50GSYhRBUjn+P4tborgxI0+vGB51PlJcwfhSgyF6s50
+	 wd1omWjtUk9rwGw7FjqWRSO/hFLSUTf9YNZe36mE9LYrITsDTVzvuNi/4GwDrqJ90g
+	 83j+pqG3tXuvHoSFsX4UOPVWc5esenB5XgY8RNrr4l6wADpECXHu4PJZNSWfWiJrws
+	 CY3n7k1FHAuUCr512zA+WVqER8xJK8ktkmsJtg8yirCgqFQdbhwKfsaDBSpu2HylK0
+	 wf1EfMHavmJ/A==
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-640aa1445c3so739972a12.1
+        for <linux-cifs@vger.kernel.org>; Wed, 03 Dec 2025 22:15:13 -0800 (PST)
+X-Gm-Message-State: AOJu0YwKM7RqYPGR4al9kcNverSPsuGyKDbVI6eZTYn1D1hHV/J4R7q2
+	vocBXHP+etZQyLWV5kYZ8gpmlNPizmH/1BbyJhEruKMJWTsmSjce/+lQwfiinaZP/9DErZvBZfF
+	gZbsTgfX1rW1DAPCmTFt9Y0sdI/RTRLQ=
+X-Google-Smtp-Source: AGHT+IFxtDGpV6cSoBjid7NXl2nNNlvUO22CPgShgaWv2gAPA+BSMjTzEAceAhHyjGEcY2KykD0gNZz0BELIzyBWCSE=
+X-Received: by 2002:a05:6402:51c8:b0:640:b06f:87c5 with SMTP id
+ 4fb4d7f45d1cf-6479c3ed957mr4197603a12.1.1764828912627; Wed, 03 Dec 2025
+ 22:15:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 01/10] smb/client: reduce loop count in
- map_smb2_to_linux_error() by half
-To: Steve French <smfrench@gmail.com>
-Cc: linkinjeon@kernel.org, linkinjeon@samba.org, linux-cifs@vger.kernel.org,
- linux-kernel@vger.kernel.org, chenxiaosong@chenxiaosong.com,
- ChenXiaoSong <chenxiaosong@kylinos.cn>,
- samba-technical <samba-technical@lists.samba.org>
-References: <20251204045818.2590727-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251204045818.2590727-2-chenxiaosong.chenxiaosong@linux.dev>
- <CAH2r5mu25T8sBO4P25St_H0F0KMenn+5QGWx1Tfa+=6AsF6aNw@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <CAH2r5mu25T8sBO4P25St_H0F0KMenn+5QGWx1Tfa+=6AsF6aNw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <cover.1764709225.git.metze@samba.org>
+In-Reply-To: <cover.1764709225.git.metze@samba.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 4 Dec 2025 15:15:00 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8Bj0u+eSXBi1Y1GDZyXC_umupM7BK_i++61YtoGtkuAA@mail.gmail.com>
+X-Gm-Features: AWmQ_bm0HucYiko1C4C4j8Wn5MpQTju3luFj6zaAqhwTiWK2Ni49drh40mPUyYs
+Message-ID: <CAKYAXd8Bj0u+eSXBi1Y1GDZyXC_umupM7BK_i++61YtoGtkuAA@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/4] smb:smbdirect/server: introduce smb_direct_negotiate_recv_work
+To: Stefan Metzmacher <metze@samba.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for your review.
-
-I'll test these patches as soon as possible. Besides smbtorture and 
-xfstests, what other testing tools are available for SMB?
-
-Thanks,
-ChenXiaoSong.
-
-On 12/4/25 13:49, Steve French wrote:
-> Have merged the first three patches (see below) in this series into
-> cifs-2.6.git for-next pending additional review and testing.   The
-> other seven may also be ok - but want to look more carefully at them,
-> more review appreciated
-> 
-> ba521f56912f (HEAD -> for-next, origin/for-next) smb: add two elements
-> to smb2_error_map_table array
-> 905d8999d67d smb/client: remove unused elements from smb2_error_map_table array
-> 26866d690bd1 smb/client: reduce loop count in map_smb2_to_linux_error() by half
-> 
-> On Wed, Dec 3, 2025 at 10:59 PM <chenxiaosong.chenxiaosong@linux.dev> wrote:
->>
->> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->>
->> The smb2_error_map_table array currently has 1740 elements. When searching
->> for the last element and calling smb2_print_status(), 3480 comparisons
->> are needed.
->>
->> The loop in smb2_print_status() is unnecessary, smb2_print_status() can be
->> removed, and only iterate over the array once, printing the message when
->> the target status code is found.
->>
->> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
->> ---
->>   fs/smb/client/smb2maperror.c | 30 ++++++------------------------
->>   1 file changed, 6 insertions(+), 24 deletions(-)
->>
->> diff --git a/fs/smb/client/smb2maperror.c b/fs/smb/client/smb2maperror.c
->> index 12c2b868789f..d1df6e518d21 100644
->> --- a/fs/smb/client/smb2maperror.c
->> +++ b/fs/smb/client/smb2maperror.c
->> @@ -2418,24 +2418,6 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
->>          {0, 0, NULL}
->>   };
->>
->> -/*****************************************************************************
->> - Print an error message from the status code
->> - *****************************************************************************/
->> -static void
->> -smb2_print_status(__le32 status)
->> -{
->> -       int idx = 0;
->> -
->> -       while (smb2_error_map_table[idx].status_string != NULL) {
->> -               if ((smb2_error_map_table[idx].smb2_status) == status) {
->> -                       pr_notice("Status code returned 0x%08x %s\n", status,
->> -                                 smb2_error_map_table[idx].status_string);
->> -               }
->> -               idx++;
->> -       }
->> -       return;
->> -}
->> -
->>   int
->>   map_smb2_to_linux_error(char *buf, bool log_err)
->>   {
->> @@ -2452,16 +2434,16 @@ map_smb2_to_linux_error(char *buf, bool log_err)
->>                  return 0;
->>          }
->>
->> -       /* mask facility */
->> -       if (log_err && (smb2err != STATUS_MORE_PROCESSING_REQUIRED) &&
->> -           (smb2err != STATUS_END_OF_FILE))
->> -               smb2_print_status(smb2err);
->> -       else if (cifsFYI & CIFS_RC)
->> -               smb2_print_status(smb2err);
->> +       log_err = (log_err && (smb2err != STATUS_MORE_PROCESSING_REQUIRED) &&
->> +                  (smb2err != STATUS_END_OF_FILE)) ||
->> +                 (cifsFYI & CIFS_RC);
->>
->>          for (i = 0; i < sizeof(smb2_error_map_table) /
->>                          sizeof(struct status_to_posix_error); i++) {
->>                  if (smb2_error_map_table[i].smb2_status == smb2err) {
->> +                       if (log_err)
->> +                               pr_notice("Status code returned 0x%08x %s\n", smb2err,
->> +                                         smb2_error_map_table[i].status_string);
->>                          rc = smb2_error_map_table[i].posix_error;
->>                          break;
->>                  }
->> --
->> 2.43.0
->>
-> 
-> 
-
+On Wed, Dec 3, 2025 at 6:15=E2=80=AFAM Stefan Metzmacher <metze@samba.org> =
+wrote:
+>
+> Hi,
+>
+> here's a patchset that implements a better solution
+> to the problem that the initial recv completion might
+> arrive before the RDMA_CM_EVENT_ESTABLISHED event.
+>
+> The last patch is not intended to be applied, but
+> it helps to see the event flow it generated,
+> see the commit message.
+>
+> This is based on the 4 smbirect patches within
+> v6.19-rc-smb-fixes:
+>
+> dc10cf1368af8cb816dcaa2502ba7d44fff20612
+> smb: client: relax WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks in recv_done()=
+ and smbd_conn_upcall()
+> 425c32750b48956a6e156b6a4609d281ee471359
+> smb: server: relax WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks in recv_done()=
+ and smb_direct_cm_handler()
+> 1adb2dab9727c5beaaf253f67bf4fc2c54ae70e7
+> smb: smbdirect: introduce SMBDIRECT_CHECK_STATUS_{WARN,DISCONNECT}()
+> 1f3fd108c5c5a9885c6c276a2489c49b60a6b90d
+> smb: smbdirect: introduce SMBDIRECT_DEBUG_ERR_PTR() helper
+>
+> I've tested them on top of v6.18 (without the other patches
+> in v6.19-rc-smb-fixes).
+>
+> Sadly there are still problems with Mellanox setups
+> as well as irdma (in iwarp mode). I'm trying to
+> prepare patches to debug this next.
+I have tested with Mellanox NICs.
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks!
