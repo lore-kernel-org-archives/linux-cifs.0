@@ -1,32 +1,32 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4EA30274F
-	for <linux-cifs@vger.kernel.org>; Thu,  4 Dec 2025 05:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E744199931
+	for <linux-cifs@vger.kernel.org>; Thu,  4 Dec 2025 05:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764824402; cv=none; b=Lh6bISIcbgc3x3cZbPMGAYR067gGO9ueQ3/6xcv2z1a+lwlrIhDiQRfDExrkttxHKCcDx7I3EXEu/GJv5ER/OuZ5DoviJEWswwwOd82f4BD0pJjAsoK0dAHlHuJ+m6UTLpkHId27s0UJosSl4sSNd1Do5ATVTYq4qSePSASYNKk=
+	t=1764824404; cv=none; b=D7hiEilmJTDlcukcw1Qqu0I1y2mrWQdOELWY9KZC9HMLe487EnPhXNDuNuO3U5KyDQc8+2DbaYYrUN2Rp/+ixd4JTN8qu27lV6QJqaXheh5cBGlROQttP43Sk3Egk2jSvntdc9lt3fuQbR6in3xBuQtkFrZo3SqiJmCWiFin3DM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764824402; c=relaxed/simple;
-	bh=4+703upttbLBXrs3HCR/osHe0MWHMFb29STOXf/zQlw=;
+	s=arc-20240116; t=1764824404; c=relaxed/simple;
+	bh=kIB9E0S4MLXrqcQMCK41YTJVE8Ih+JwGuHTZBMonWCg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FvhNGXEu+V2hpQ4g4e9t28FKINXZdLeyk9Winy1pXeo789gUWC3YL6p9hPYIACmsxNW272SpFVzhP6d+IIjc89rhdHqwoIAXG13arEiENmTLgshs0RgGZmB4oC88v80g74VsMA08eRpEUY7moEHhzKyj0uROLgN8buj05lssJ8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QQ8J43FU; arc=none smtp.client-ip=95.215.58.188
+	 MIME-Version; b=rcGpZZ6KD7JsOHHfENKbFiK5p2T7uRvL36cVHnRT8h+x9rgk3ZfIu6Bc1/nUpsjdxigzcT14j1WHIeckjocBGcRqkq7trME5hli/jOFkAucbdx5x9HWR1emIQ+WXPAMCgB8zaD2hP3E951wGOsSi/E3rRzebx6PWp3KId9Hb4cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e+Pcjfi5; arc=none smtp.client-ip=95.215.58.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QQ8J43FU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e+Pcjfi5"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1764824398;
+	t=1764824400;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/IbInYvILPYcoixt21Z2SWUU0ENgDuclZexoYjmKwdA=;
-	b=QQ8J43FU7vXA9gornvj10rsWDLILzH2n09kzLp482izhx8quqiH4BcUWNRT3lkpgB8VFXZ
-	CEo5Rg8eAQQne0uP90loN+LpECh+cymdFtzyMrdr4sjTi/3iGmsQpFV5uH8dtFS3mtH6kG
-	KNLgBsLjI81NE+92vbRIdnpWI+bUQUw=
+	bh=e9cc8Nr2lduaK+xF7eBStk2AhlwQzHHel2LcG+oQ/q0=;
+	b=e+Pcjfi5V7Id4QXL7bPTpctQWL64AXxqG1CnqyjJJ8MnqP5w5eG2ZMhCjszMutwIBbgjG6
+	/jAFko6VBYb0EnZVhCMEBCHlDGoB33AYl+18wFwxp6+DTpnTrkfph2gzWdiDK3HglXXsG6
+	ifu9QOnTSn7tabtDWm7AbbUfAvQQrRU=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: sfrench@samba.org,
 	smfrench@gmail.com,
@@ -36,9 +36,9 @@ Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	chenxiaosong@chenxiaosong.com,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 07/10] smb/client: introduce smb2maperror KUnit tests
-Date: Thu,  4 Dec 2025 12:58:15 +0800
-Message-ID: <20251204045818.2590727-8-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH 08/10] smb/server: rename include guard in smb_common.h
+Date: Thu,  4 Dec 2025 12:58:16 +0800
+Message-ID: <20251204045818.2590727-9-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251204045818.2590727-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251204045818.2590727-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -52,125 +52,35 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-The KUnit tests are executed when cifs.ko is loaded.
-
-The maperror_test_check_sort() checks whether the array is properly sorted.
-
-The maperror_test_get_err_map() checks whether the expected element can be
-correctly searched for in the smb2_error_map_table array.
+To avoid conflicts with the include guard in the soon-to-be-created
+common/common.h header.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/Kconfig               | 13 ++++++
- fs/smb/client/smb2maperror.c | 77 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 90 insertions(+)
+ fs/smb/server/smb_common.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/Kconfig b/fs/smb/Kconfig
-index ef425789fa6a..95b29d089e60 100644
---- a/fs/smb/Kconfig
-+++ b/fs/smb/Kconfig
-@@ -9,3 +9,16 @@ config SMBFS
- 	tristate
- 	default y if CIFS=y || SMB_SERVER=y
- 	default m if CIFS=m || SMB_SERVER=m
-+
-+config SMB_KUNIT_TEST
-+	bool "SMB KUnit tests" if !KUNIT_ALL_TESTS
-+	depends on KUNIT
-+	default KUNIT_ALL_TESTS
-+	help
-+	  Only useful for kernel devs running KUnit test harness and are not
-+	  for inclusion into a production build.
-+
-+	  For more information on KUnit and unit tests in general please refer
-+	  to the KUnit documentation in Documentation/dev-tools/kunit/.
-+
-+	  If unsure, say N.
-diff --git a/fs/smb/client/smb2maperror.c b/fs/smb/client/smb2maperror.c
-index f5d999f3b569..95e4a41ecc5a 100644
---- a/fs/smb/client/smb2maperror.c
-+++ b/fs/smb/client/smb2maperror.c
-@@ -2497,3 +2497,80 @@ void smb2_init_maperror(void)
- 	     sizeof(struct status_to_posix_error),
- 	     cmp_smb2_status, NULL);
- }
-+
-+#if IS_ENABLED(CONFIG_SMB_KUNIT_TEST)
-+#include <kunit/test.h>
-+
-+static void maperror_test_check_sort(struct kunit *test)
-+{
-+	bool is_sorted = true;
-+	unsigned int i;
-+
-+	for (i = 1; i < err_map_num; i++) {
-+		if (smb2_error_map_table[i].smb2_status >=
-+		    smb2_error_map_table[i - 1].smb2_status)
-+			continue;
-+
-+		pr_err("smb2_error_map_table array order is incorrect\n");
-+		is_sorted = false;
-+		break;
-+	}
-+
-+	KUNIT_EXPECT_EQ(test, true, is_sorted);
-+}
-+
-+static void
-+get_and_cmp_err_map(struct kunit *test, struct status_to_posix_error *expect)
-+{
-+	struct status_to_posix_error *result;
-+
-+	result = smb2_get_err_map(expect->smb2_status);
-+	KUNIT_EXPECT_PTR_NE(test, NULL, result);
-+	KUNIT_EXPECT_EQ(test, expect->posix_error, result->posix_error);
-+	KUNIT_EXPECT_STREQ(test, expect->status_string, result->status_string);
-+}
-+
-+static void maperror_test_get_err_map(struct kunit *test)
-+{
-+	struct status_to_posix_error expect;
-+
-+	/* first element */
-+	expect = smb2_error_map_table[0];
-+	get_and_cmp_err_map(test, &expect);
-+
-+	/* last element */
-+	expect = smb2_error_map_table[err_map_num - 1];
-+	get_and_cmp_err_map(test, &expect);
-+
-+	expect = (struct status_to_posix_error) {
-+		.smb2_status = STATUS_SERIAL_COUNTER_TIMEOUT,
-+		.posix_error = -ETIMEDOUT,
-+		.status_string = "STATUS_SERIAL_COUNTER_TIMEOUT",
-+	};
-+	get_and_cmp_err_map(test, &expect);
-+
-+	expect = (struct status_to_posix_error) {
-+		.smb2_status = STATUS_IO_REPARSE_TAG_NOT_HANDLED,
-+		.posix_error = -EOPNOTSUPP,
-+		.status_string = "STATUS_REPARSE_NOT_HANDLED",
-+	};
-+	get_and_cmp_err_map(test, &expect);
-+}
-+
-+/*
-+ * Before running these test cases, the smb2_init_maperror()
-+ * function is called first.
-+ */
-+static struct kunit_case maperror_test_cases[] = {
-+	KUNIT_CASE(maperror_test_check_sort),
-+	KUNIT_CASE(maperror_test_get_err_map),
-+	{}
-+};
-+
-+static struct kunit_suite maperror_suite = {
-+	.name = "smb2-maperror",
-+	.test_cases = maperror_test_cases,
-+};
-+
-+kunit_test_suite(maperror_suite);
-+#endif /* CONFIG_SMB_KUNIT_TEST */
+diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
+index ae4dac515b6c..8cea25c01d81 100644
+--- a/fs/smb/server/smb_common.h
++++ b/fs/smb/server/smb_common.h
+@@ -3,8 +3,8 @@
+  *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
+  */
+ 
+-#ifndef __SMB_COMMON_H__
+-#define __SMB_COMMON_H__
++#ifndef __SMB_SERVER_COMMON_H__
++#define __SMB_SERVER_COMMON_H__
+ 
+ #include <linux/kernel.h>
+ 
+@@ -196,4 +196,4 @@ unsigned int ksmbd_server_side_copy_max_chunk_size(void);
+ unsigned int ksmbd_server_side_copy_max_total_size(void);
+ bool is_asterisk(char *p);
+ __le32 smb_map_generic_desired_access(__le32 daccess);
+-#endif /* __SMB_COMMON_H__ */
++#endif /* __SMB_SERVER_COMMON_H__ */
 -- 
 2.43.0
 
