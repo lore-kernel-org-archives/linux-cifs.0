@@ -1,32 +1,32 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6522586E8
-	for <linux-cifs@vger.kernel.org>; Thu,  4 Dec 2025 04:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963442D5936
+	for <linux-cifs@vger.kernel.org>; Thu,  4 Dec 2025 04:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764824395; cv=none; b=KRBZ4yHj6Lo/PImRbijpsSqWxxyBbqmQtvF9JbKJY6J5E5/nngkV5tlexyxx4O3E5oAQHrnoqdY8RyD2htDYUIX8xeMSJhFd07NkPQA3xUcHMW7Hnng+rzVAvYJFhTG3fri38aRlNsF4KMueJwpAS9Gij8vsqQqbHdjAoBrVpKA=
+	t=1764824397; cv=none; b=hskSfS3136pKbtGYh19Tl8Az4yxYWNbR0EJKMEX7Cmp4j73F3r8ckMVpjJflO5snHgPowCMkWsnPYYgRFcq8GvYhFIgOtDHklo9eyXU431RHNaK6qZbIZT+Kc2H6n7uNjSCTJMou4QpbXe7A1P+duwrSMxSdbUgFPSthKrQoKfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764824395; c=relaxed/simple;
-	bh=IBYCJ0URnZmHAFg6rVEL8/OhHpGcyVNVskFuPS8njGA=;
+	s=arc-20240116; t=1764824397; c=relaxed/simple;
+	bh=GpiP28Us9v7/dQoXwcAvnftubvrrsWxq7Q4tJTESinM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DqH4+yagKPtCVYgIpH0+8wICyP1qjcUFN7Ny0s+OYzSo6cO7LXbmWtTvIqPZ139Fcpt+HldHYlduCPUvM+jZv70Do61u9OBh1lSXKjSUkhe9hWviKxQFRq5L8MM5MbDi/GUj0EIrVz0O8d62cS7nT779Vi5yUsco+clmBdKnbno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Q1RhsfUj; arc=none smtp.client-ip=95.215.58.187
+	 MIME-Version; b=VTNGQh+Ky1xYoOzggLX7X/Q77sRpNEMF0ttizo+tQhEtqLJmWhGBGqRAYg5/+R/KcMXVVAEaNk0Zq9zKVTJAgx8uFVPck2cX8RkYm6YyjyGGUIKoYtNGKhZy26qCjIz9fccbOgtDa893YYGr5qG66si9BH6FaqgqSUoZ8AbZVJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X4pOXzZA; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q1RhsfUj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X4pOXzZA"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1764824391;
+	t=1764824393;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dwt91f0JwYANteB0KGN5KnaqVqKN9Td/UOVyuvc+nkw=;
-	b=Q1RhsfUjnszoMkw5Z56ZiTv6rKSw2p+I+BvEFjEPKyAAnyYNvDM7d/HPiSJbtyGqFORyOg
-	cg0rkRMFfv+ut95vt8zo8TK1z2xHYypwavurEqW/sFDzfDD41TVSvGCS3juppN8khBZg6F
-	YdYxgRbyNlhv6GZggj17juQbvbDg/iE=
+	bh=CCS9W0lF6HDGhdijp7vL3LJGT24noIkWUUQS/1Ee9+o=;
+	b=X4pOXzZAphkjm1PliFqquNW9NEKklaTCK7rzT1nNEn5efFy0d9jyrx5IIOJPv5weVsCllD
+	2aVbIEbqH8uloaIOrOJMM5t5R5MLljfToMpndCo3+SQhZOM6+NPjxi3/s9Jlcb6REQ+4gp
+	SEszs7MLwIlsxzrMvB52oDCe3e8ZD4g=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: sfrench@samba.org,
 	smfrench@gmail.com,
@@ -36,9 +36,9 @@ Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	chenxiaosong@chenxiaosong.com,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 04/10] smb/client: sort smb2_error_map_table array
-Date: Thu,  4 Dec 2025 12:58:12 +0800
-Message-ID: <20251204045818.2590727-5-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH 05/10] smb/client: use bsearch() to find target status code
+Date: Thu,  4 Dec 2025 12:58:13 +0800
+Message-ID: <20251204045818.2590727-6-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251204045818.2590727-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251204045818.2590727-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -52,105 +52,62 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Sort the array in ascending order, and then we can use binary search
-algorithm to quickly find the target status code.
-
-Since the smb2_init_maperror() is called only once when the module is
-loaded, the array is sorted just once.
+The smb2_error_map_table array currently has 1742 elements. When searching
+for the last element, the original loop-based search method requires 1742
+comparisons, while binary search algorithm requires only 10 comparisons.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifsfs.c       |  2 ++
- fs/smb/client/smb2maperror.c | 25 ++++++++++++++++++++++++-
- fs/smb/client/smb2proto.h    |  1 +
- 3 files changed, 27 insertions(+), 1 deletion(-)
+ fs/smb/client/smb2maperror.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 6eccb9ed9daa..77d14b3dd650 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -49,6 +49,7 @@
- #endif
- #include "fs_context.h"
- #include "cached_dir.h"
-+#include "smb2proto.h"
- 
- /*
-  * DOS dates from 1980/1/1 through 2107/12/31
-@@ -1908,6 +1909,7 @@ static int __init
- init_cifs(void)
- {
- 	int rc = 0;
-+	smb2_init_maperror();
- 	cifs_proc_init();
- 	INIT_LIST_HEAD(&cifs_tcp_ses_list);
- /*
 diff --git a/fs/smb/client/smb2maperror.c b/fs/smb/client/smb2maperror.c
-index a77467d2d81c..1bd4196386dd 100644
+index 1bd4196386dd..df8db12ff7a9 100644
 --- a/fs/smb/client/smb2maperror.c
 +++ b/fs/smb/client/smb2maperror.c
-@@ -8,6 +8,7 @@
-  *
-  */
- #include <linux/errno.h>
-+#include <linux/sort.h>
- #include "cifsglob.h"
- #include "cifs_debug.h"
- #include "smb2pdu.h"
-@@ -22,7 +23,7 @@ struct status_to_posix_error {
- 	char *status_string;
- };
- 
--static const struct status_to_posix_error smb2_error_map_table[] = {
-+static struct status_to_posix_error smb2_error_map_table[] = {
- 	{STATUS_WAIT_1, -EIO, "STATUS_WAIT_1"},
- 	{STATUS_WAIT_2, -EIO, "STATUS_WAIT_2"},
- 	{STATUS_WAIT_3, -EIO, "STATUS_WAIT_3"},
-@@ -2418,6 +2419,20 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
- 	"STATUS_SMB_NO_PREAUTH_INTEGRITY_HASH_OVERLAP"},
- };
- 
-+static unsigned int err_map_num = sizeof(smb2_error_map_table) /
-+				     sizeof(struct status_to_posix_error);
-+
-+static int cmp_smb2_status(const void *_a, const void *_b)
-+{
-+	const struct status_to_posix_error *a = _a, *b = _b;
-+
-+	if (a->smb2_status < b->smb2_status)
-+		return -1;
-+	if (a->smb2_status > b->smb2_status)
-+		return 1;
-+	return 0;
-+}
-+
- int
+@@ -2437,9 +2437,9 @@ int
  map_smb2_to_linux_error(char *buf, bool log_err)
  {
-@@ -2461,3 +2476,11 @@ map_smb2_to_linux_error(char *buf, bool log_err)
- 			   le32_to_cpu(smb2err), rc);
- 	return rc;
- }
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)buf;
+-	unsigned int i;
+ 	int rc = -EIO;
+ 	__le32 smb2err = shdr->Status;
++	struct status_to_posix_error *err_map, key;
+ 
+ 	if (smb2err == 0) {
+ 		trace_smb3_cmd_done(le32_to_cpu(shdr->Id.SyncId.TreeId),
+@@ -2453,17 +2453,21 @@ map_smb2_to_linux_error(char *buf, bool log_err)
+ 		   (smb2err != STATUS_END_OF_FILE)) ||
+ 		  (cifsFYI & CIFS_RC);
+ 
+-	for (i = 0; i < sizeof(smb2_error_map_table) /
+-			sizeof(struct status_to_posix_error); i++) {
+-		if (smb2_error_map_table[i].smb2_status == smb2err) {
+-			if (log_err)
+-				pr_notice("Status code returned 0x%08x %s\n", smb2err,
+-					  smb2_error_map_table[i].status_string);
+-			rc = smb2_error_map_table[i].posix_error;
+-			break;
+-		}
+-	}
++	key = (struct status_to_posix_error) {
++		.smb2_status = smb2err,
++	};
++	err_map = bsearch(&key, smb2_error_map_table, err_map_num,
++			  sizeof(struct status_to_posix_error),
++			  cmp_smb2_status);
++	if (!err_map)
++		goto out;
 +
-+void smb2_init_maperror(void)
-+{
-+	/* Sort in ascending order */
-+	sort(smb2_error_map_table, err_map_num,
-+	     sizeof(struct status_to_posix_error),
-+	     cmp_smb2_status, NULL);
-+}
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index 5241daaae543..c988f6b37a1b 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -21,6 +21,7 @@ struct smb_rqst;
-  *****************************************************************
-  */
- extern int map_smb2_to_linux_error(char *buf, bool log_err);
-+extern void smb2_init_maperror(void);
- extern int smb2_check_message(char *buf, unsigned int length,
- 			      struct TCP_Server_Info *server);
- extern unsigned int smb2_calc_size(void *buf);
++	rc = err_map->posix_error;
++	if (log_err)
++		pr_notice("Status code returned 0x%08x %s\n", smb2err,
++			  err_map->status_string);
+ 
++out:
+ 	/* on error mapping not found  - return EIO */
+ 
+ 	cifs_dbg(FYI, "Mapping SMB2 status code 0x%08x to POSIX err %d\n",
 -- 
 2.43.0
 
