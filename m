@@ -1,46 +1,43 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9921036C5A2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9918536C5A0
 	for <linux-cifs@vger.kernel.org>; Thu,  4 Dec 2025 18:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764871595; cv=none; b=GgeDm4gsK0YMIthlKsEbm4lT42O2RHtYo/aedIIPlrw9D3t7dYMIlZ7sC+KfMoaDD5Wf/VPK58XDdEfqAJjSQ11+1VVx19UtyoabzHmAznoG3tlURnPoJWk5B5FbN3LI0zlKWHbo4tg02QN9PpY9Ot2bfkQeg/gUcXkI2sGu3YI=
+	t=1764871596; cv=none; b=YgTleBGTc2EdzwvX0YkdDsZIa1D9xsPzuf7Tor7qKKrWobpMfy2LfKzzdDmMAbPOE1sJaewt9pqbz28n/A2iXkrQLpi4wvBo0ngdx8H/Pp4cRb5h1u9+ZR5LK5NUxRsiVRlVD5lNO4cIqO7oSlmN/u4PCEc/ErzWUNa+XV4gJko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764871595; c=relaxed/simple;
-	bh=xqvzQ2x5DYDGOHIFPsmK/RCVTnEOdk8ea+8nq55xgjQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PnH8OhDCaIG/iHtXL6I65z9hJk/jlcD1+ushiopLwAMSJvoF5jB/prI333IlVOq2phfKZDn3iovsvMJBS9MPRMtTxRpgkBG0dF50EdplG5mOTa4laCuQybtFbcK1xFk7NhpSve+sejMsNuzZ6XX/lP5tsSTvQPY75jaLp+VPzjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=B7472bbB; arc=none smtp.client-ip=143.255.12.172
+	s=arc-20240116; t=1764871596; c=relaxed/simple;
+	bh=oGGsZ0VBKAMKbSnky2yeeEFMDeaaL9dNDgOC0OThVZw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=noDL6QkdncmD5LrFZGalZJ2eMLaYbSWptd5bi7xIyphcJGUYTPKiUlkm+FHl8QjrThFcCQgu7ZrsutYJCsVSFAMUavQa+9Hi7O/kXTnwVpI7nuFjDh405SA7zj7LfkhOx0bSjBK4zSy5COwZxYaee73BU2L0jRSjd7evr/7QGuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=cx/F7eRA; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="B7472bbB"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="cx/F7eRA"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
-	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
-	Content-ID:Content-Description;
-	bh=uECrD5oxA154R1fanGj6CDqqDGvu0PmN7uCO1zSKF9s=; b=B7472bbBKikys+HjotAhHuqMCO
-	ueGCzIkD7jURRfB+M40B2CUTziIZkUhEjMaT843+WhpSFWJcGuHZMH0D25rX/T1tIhvB1YaRnh2a5
-	XaCSxxcnLHq3TAlxHfX0j/QejLXxM19415wa6LEetuv8+dz8XelieFCZ0f9KTUe4vQl/7DtVsCJtw
-	nqzMc6pz4EWYSWeX6PcDSGImh77hxld0+QICrYnvfuTkAgAfIQY50BESnNMyznQepNbm+gpVKk5n/
-	KkHn5Rlgw8+6J2uFYAqeTQH2C1+MlJ7IP3x0kCUnKnkweYCnc3SAOPTZ+eWd9Ef640ekuvzk7Hruu
-	ydeI4qyg==;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=mf1soghjnKrBnk+Bcbsoqz37jKyxwDBSYzxvQff/Fq0=; b=cx/F7eRAfwfItxEsW4iJxsK8db
+	cBI8kINtFICeyVHZTQZ3gIn6INvl4FBsDQQ03CXmOTAWEmiUmfZwdiYd84S4s/lLEw7U3we+a4uwR
+	yGAsx5v7kB/9XRjYfmTfEbSc+iiFOjZvB4OeCqHxz8hlli7FOsxpF4CGb7VAUEJ8hhPzrtAKt14Wo
+	zixBJR24M1UncnQio4rDAk894TvBL4zvEycCSvQGzZNonfhyktKz1s+j40N7lupDd5YYW5ndaDt2c
+	i5Uilg1yFfRqsEjNsIxtOM2nxatVHT2gSY8ZtLHDUbT/ZNbVHQvh7ieTXi2K0D5lftDwBnRzwj6G8
+	B+kG7zrw==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99)
-	id 1vRDik-00000000Dfl-18y4;
+	id 1vRDik-00000000Dfg-0ZsS;
 	Thu, 04 Dec 2025 15:06:26 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: smfrench@gmail.com
 Cc: "Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	Pierguido Lambri <plambri@redhat.com>,
 	David Howells <dhowells@redhat.com>,
+	Pierguido Lambri <plambri@redhat.com>,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH 2/3] smb: client: improve error message when creating SMB session
-Date: Thu,  4 Dec 2025 15:06:24 -0300
-Message-ID: <20251204180626.244415-2-pc@manguebit.org>
+Subject: [PATCH 1/3] smb: client: relax session and tcon reconnect attempts
+Date: Thu,  4 Dec 2025 15:06:23 -0300
+Message-ID: <20251204180626.244415-1-pc@manguebit.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251204180626.244415-1-pc@manguebit.org>
-References: <20251204180626.244415-1-pc@manguebit.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,50 +46,117 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When failing to create a new SMB session with 'sec=krb5' for example,
-the following error message isn't very useful
+When the client re-establishes connection to the server, it will queue
+a worker thread that will attempt to reconnect sessions and tcons on
+every two seconds, which is kinda overkill as it is a very common
+scenario when having expired passwords or KRB5 TGT tickets, or deleted
+shares.
 
-	CIFS: VFS: \\srv Send error in SessSetup = -126
-
-Improve it by printing the following instead on dmesg
-
-	CIFS: VFS: \\srv failed to create a new SMB session with Kerberos: -126
+Use an exponential backoff strategy to handle session/tcon reconnect
+attempts in the worker thread to prevent the client from overloading
+the system when it is very unlikely to re-establish any session/tcon
+soon while client is idle.
 
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Reviewed-by: David Howells <dhowells@redhat.com>
 Cc: Pierguido Lambri <plambri@redhat.com>
-Cc: David Howells <dhowells@redhat.com>
 Cc: linux-cifs@vger.kernel.org
 ---
- fs/smb/client/connect.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ fs/smb/client/cifsglob.h | 21 +++++++++++++++++++++
+ fs/smb/client/connect.c  |  4 ++--
+ fs/smb/client/smb2pdu.c  |  6 +++---
+ 3 files changed, 26 insertions(+), 5 deletions(-)
 
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index f9c1f553ffd0..3eca5bfb7030 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -745,6 +745,7 @@ struct TCP_Server_Info {
+ 	struct session_key session_key;
+ 	unsigned long lstrp; /* when we got last response from this server */
+ 	unsigned long neg_start; /* when negotiate started (jiffies) */
++	unsigned long reconn_delay; /* when resched session and tcon reconnect */
+ 	struct cifs_secmech secmech; /* crypto sec mech functs, descriptors */
+ #define	CIFS_NEGFLAVOR_UNENCAP	1	/* wct == 17, but no ext_sec */
+ #define	CIFS_NEGFLAVOR_EXTENDED	2	/* wct == 17, ext_sec bit set */
+@@ -2292,4 +2293,24 @@ struct cifs_calc_sig_ctx {
+ 	struct shash_desc *shash;
+ };
+ 
++#define CIFS_RECONN_DELAY_SECS	30
++#define CIFS_MAX_RECONN_DELAY	(4 * CIFS_RECONN_DELAY_SECS)
++
++static inline void cifs_queue_server_reconn(struct TCP_Server_Info *server)
++{
++	if (!delayed_work_pending(&server->reconnect)) {
++		WRITE_ONCE(server->reconn_delay, 0);
++		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
++	}
++}
++
++static inline void cifs_requeue_server_reconn(struct TCP_Server_Info *server)
++{
++	unsigned long delay = READ_ONCE(server->reconn_delay);
++
++	delay = umin(delay + CIFS_RECONN_DELAY_SECS, CIFS_MAX_RECONN_DELAY);
++	WRITE_ONCE(server->reconn_delay, delay);
++	queue_delayed_work(cifsiod_wq, &server->reconnect, delay * HZ);
++}
++
+ #endif	/* _CIFS_GLOB_H */
 diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 3838dd14d4da..bc28e21340e7 100644
+index b306ee97a20a..3838dd14d4da 100644
 --- a/fs/smb/client/connect.c
 +++ b/fs/smb/client/connect.c
-@@ -4238,8 +4238,10 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
- 	struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&pserver->dstaddr;
- 	struct sockaddr_in *addr = (struct sockaddr_in *)&pserver->dstaddr;
- 	bool is_binding = false;
-+	bool new_ses;
+@@ -425,7 +425,7 @@ static int __cifs_reconnect(struct TCP_Server_Info *server,
+ 			spin_unlock(&server->srv_lock);
+ 			cifs_swn_reset_server_dstaddr(server);
+ 			cifs_server_unlock(server);
+-			mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
++			cifs_queue_server_reconn(server);
+ 		}
+ 	} while (server->tcpStatus == CifsNeedReconnect);
  
- 	spin_lock(&ses->ses_lock);
-+	new_ses = ses->ses_status == SES_NEW;
- 	cifs_dbg(FYI, "%s: channel connect bitmap: 0x%lx\n",
- 		 __func__, ses->chans_need_reconnect);
+@@ -564,7 +564,7 @@ static int reconnect_dfs_server(struct TCP_Server_Info *server)
+ 		spin_unlock(&server->srv_lock);
+ 		cifs_swn_reset_server_dstaddr(server);
+ 		cifs_server_unlock(server);
+-		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
++		cifs_queue_server_reconn(server);
+ 	} while (server->tcpStatus == CifsNeedReconnect);
  
-@@ -4325,7 +4327,10 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+ 	dfs_cache_noreq_update_tgthint(ref_path, target_hint);
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index e26d29d75f9f..0d2940808be6 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -493,7 +493,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	spin_unlock(&ses->ses_lock);
+ 
+ 	if (smb2_command != SMB2_INTERNAL_CMD)
+-		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
++		cifs_queue_server_reconn(server);
+ 
+ 	atomic_inc(&tconInfoReconnectCount);
+ out:
+@@ -4312,7 +4312,7 @@ void smb2_reconnect_server(struct work_struct *work)
+ done:
+ 	cifs_dbg(FYI, "Reconnecting tcons and channels finished\n");
+ 	if (resched)
+-		queue_delayed_work(cifsiod_wq, &server->reconnect, 2 * HZ);
++		cifs_requeue_server_reconn(server);
+ 	mutex_unlock(&pserver->reconnect_mutex);
+ 
+ 	/* now we can safely release srv struct */
+@@ -4336,7 +4336,7 @@ SMB2_echo(struct TCP_Server_Info *server)
+ 	    server->ops->need_neg(server)) {
+ 		spin_unlock(&server->srv_lock);
+ 		/* No need to send echo on newly established connections */
+-		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
++		cifs_queue_server_reconn(server);
+ 		return rc;
  	}
- 
- 	if (rc) {
--		cifs_server_dbg(VFS, "Send error in SessSetup = %d\n", rc);
-+		if (new_ses) {
-+			cifs_server_dbg(VFS, "failed to create a new SMB session with %s: %d\n",
-+					get_security_type_str(ses->sectype), rc);
-+		}
- 		spin_lock(&ses->ses_lock);
- 		if (ses->ses_status == SES_IN_SETUP)
- 			ses->ses_status = SES_NEED_RECON;
+ 	spin_unlock(&server->srv_lock);
 -- 
 2.52.0
 
