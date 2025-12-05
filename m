@@ -1,119 +1,160 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7AC224891;
-	Fri,  5 Dec 2025 02:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593DC227EA7
+	for <linux-cifs@vger.kernel.org>; Fri,  5 Dec 2025 03:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764902216; cv=none; b=qOkW0gIjCa0fgsP6MFRZlQxzG6QBPp5OtHUXU+o5GVFWflmM6t5r7l/DXN/4dSdpbO1kXA1nlwQkgcw7Y9CTIrXt1IQuJjqUg1zkSTGphiIKNMXmcbpxc5FvsXtmu1JZJBUQXKwLPQlulpLjHstULLeDMBiY27RdOg2KEVVxe/Y=
+	t=1764903789; cv=none; b=kQEboYPMxku0sURGxOtIh1ARdXICUFKk+u120Z0v3t1mFSwSSzPJj0x3gbF0KBIlvkO/nbInYt2HKCq353YgPgDde0a9wJDXWkobQDw+y7uNYBrcPqnEjhlPLChVbnW0u+sIOpiaNYcP7Jskf1X3OvXQiVHYVEBHpe4a0T4vA34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764902216; c=relaxed/simple;
-	bh=TJw26I1TDQ2HwfpPYV01mmqi31HyIzZpvW01ZcONxdU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YW8bYdXpwvuxJSbQ4Azz6xjLygDJXDxodbZeyN0x9gOcdgQBfRNhbqG74MlbT3S4MfTlF0ZVjO9ufwz+gPU7R03QIKSm0Z5sz7fruIjGqxUt9/C/zJeAmGv/Z8wAWbJI8Y3sXG7Fik2SaDyuVUpoBk3YU+aDgZPhFxGAqPRWFww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CPsUzEbA; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1764903789; c=relaxed/simple;
+	bh=MixeF3Ku4JL305ZRhH2nAkHdzGFLbS33wbvGfd4M+xs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lPeZy0OLcYE9efB3Wrp9q5F2O+f+ienBl71K+JpQxYoAXnAn0clCPR9cgADX3YI/3Jl76WWgeWsTKwt2riwtAg6mZ2HYJoFG8vuwvIEhcWqFWZfdT2oZGc1RWWEmcBlXxt7HVSkMwc4CwMGbiAgHlbt/a7W4T9yNhd0vQGtVSwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FlHo6klL; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CPsUzEbA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764902214; x=1796438214;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=TJw26I1TDQ2HwfpPYV01mmqi31HyIzZpvW01ZcONxdU=;
-  b=CPsUzEbA+5Fwhyvb4vpTD4O4cwOUgXuU93NhZ5OWL+xtBiWGi0yrJ/2r
-   xROHpxLtCNOrU0ItuwL3rFm04jn+2p/wvtnmecFJ7MnvbyoywQbdMPpcc
-   yArAmgaeJxKA5O7Yt7DAB2y6gPSHEmNg5/XMZD+Q2Nm6GOvRuEjY33oIZ
-   Syg6I3yZnfx/iR9RKtZa0LSsvDK3tC4w7OQ9NL+FeO797YKyKizNTYSdV
-   oGvugL0ETXRpt1aFthuXLlpi79gIxej1Y122ds3fdZ/QmEgD4nsGsveFw
-   rlg8AKiiGkgonA2HSfiygjMCApaBsm/ZA+Nj85CkAc50qKwlgQNkBBigw
-   Q==;
-X-CSE-ConnectionGUID: rAJqVcLeT/mqVRZj8cVmAw==
-X-CSE-MsgGUID: KyTwsdTGSsKJv+I+A4q6xA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11632"; a="67010122"
-X-IronPort-AV: E=Sophos;i="6.20,250,1758610800"; 
-   d="scan'208";a="67010122"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2025 18:36:54 -0800
-X-CSE-ConnectionGUID: thqaZtd8TDSbBtPsk2hRFg==
-X-CSE-MsgGUID: MAe4tz/yS96VvArJMXkEUg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,250,1758610800"; 
-   d="scan'208";a="194968442"
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 04 Dec 2025 18:36:51 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vRLge-00000000EUj-2l8Q;
-	Fri, 05 Dec 2025 02:36:48 +0000
-Date: Fri, 5 Dec 2025 10:35:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: chenxiaosong.chenxiaosong@linux.dev, sfrench@samba.org,
-	smfrench@gmail.com, linkinjeon@kernel.org, linkinjeon@samba.org
-Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, chenxiaosong@chenxiaosong.com,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: Re: [PATCH 10/10] smb: move client/smb2maperror.c to common/
-Message-ID: <202512051006.j5kB1bVW-lkp@intel.com>
-References: <20251204045818.2590727-11-chenxiaosong.chenxiaosong@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FlHo6klL"
+Message-ID: <82820283-25ea-46d6-a7c3-7bb6cb273bb4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764903775;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jc1z7FAyJv372BAoJNNRB5Zl9FwJKeN8XhhPorVJcQE=;
+	b=FlHo6klLpEBBiXRkfOoVZj9iRLpI+5OVGARmzbPrpQ9gaHEru1SO6djKBSV3D1Zt3F6971
+	aMnYP5y3kGHA3DZh3T6doWwlRUDPXS2ixjrxYhftX+q0ys2SjuFtoC+G6Gc8Dsh4RIEVn9
+	kv12z/zC/31OFYOi/jJ/FdQt/oGM0RM=
+Date: Fri, 5 Dec 2025 11:02:14 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251204045818.2590727-11-chenxiaosong.chenxiaosong@linux.dev>
+Subject: Re: [PATCH 09/10] smb: create common/common.h and common/common.c
+To: Steve French <smfrench@gmail.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, linkinjeon@samba.org,
+ linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+ chenxiaosong@chenxiaosong.com, ChenXiaoSong <chenxiaosong@kylinos.cn>,
+ "Stefan (metze) Metzmacher" <metze@samba.org>
+References: <20251204045818.2590727-1-chenxiaosong.chenxiaosong@linux.dev>
+ <20251204045818.2590727-10-chenxiaosong.chenxiaosong@linux.dev>
+ <CAKYAXd_-ctfkz1E_Sqh0bJMarUE8rDrd2o7yKKa_cOFGPaYELg@mail.gmail.com>
+ <5f7758db-cf88-4335-9a03-72be1f7d6b65@linux.dev>
+ <CAH2r5mv74OszZ610pTn+vZq3ubRdx=+au=SHRNFpyt2rigKkYQ@mail.gmail.com>
+ <7eac3a36-d2a2-400f-a4a2-7cec245a2709@linux.dev>
+ <CAH2r5mtEmJdCuG_U3fhk66Luf+XN4xPK5T3ozpOuuDOrTDHncA@mail.gmail.com>
+ <b5a416d2-b097-4378-b25d-a6ab077f1eed@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <b5a416d2-b097-4378-b25d-a6ab077f1eed@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
+MD4 is also used in SMB2_sess_auth_rawntlmssp_authenticate(), so for now 
+we won't move smb2maperror to common/. We can reconsider this in the 
+future when ksmbd actually needs to use smb2maperror.
 
-kernel test robot noticed the following build warnings:
+Thanks,
+ChenXiaoSong.
 
-[auto build test WARNING on linus/master]
-[cannot apply to cifs/for-next brauner-vfs/vfs.all v6.18 v6.18-rc7 v6.18-rc6 next-20251203 v6.18 next-20251204]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On 12/5/25 10:14, ChenXiaoSong wrote:
+> Alternatively, we could consider placing MD4 into an smb1_common.ko, and 
+> creating an smb2_common.ko for the SMB2/3 common code. What do you think?
+> 
+> Thanks,
+> ChenXiaoSong.
+> 
+> On 12/5/25 09:50, Steve French wrote:
+>> On Thu, Dec 4, 2025 at 7:44 PM ChenXiaoSong
+>> <chenxiaosong.chenxiaosong@linux.dev> wrote:
+>>>
+>>> Now, where should common/smb2maperror.c go? Should it be built into both
+>>> cifs.ko and ksmbd.ko?
+>>>
+>>> Thanks,
+>>> ChenXiaoSong.
+>>
+>> I am open to other opinions - especially from Metze and Namjae who are
+>> dealing with similar issues in splitting out the RDMA/smbdirect code,
+>> but I lean toward (at least for now) just including it in both cifs.ko
+>> or ksmbd.ko, or not moving the C code yet (just move to common headers
+>> for #defines, inlined functions that are put in headers etc.).  I
+>> consider moving the common C functions into a common C file used by
+>> cifs.ko and ksmbd.ko is lower priority than other cleanup.
+>>
+>> Do you have a list of all of the (general types of) functions that
+>> smb3common.ko could contain?  IIRC you mentioned for mapping errors
+>> but what other routines could easily make it into this proposed common
+>> module with low risk?
+>>
+>>>
+>>> On 12/5/25 09:36, Steve French wrote:
+>>>> i lean against an 'smbcommon.ko'   - it can be helpful to move common
+>>>> code (headers, #defines etc) into fs/smb/common but other than
+>>>> smbdirect code (where smbdirect.ko makes sense for cifs.ko, ksmbd.ko,
+>>>> Samba and user space AI apps e.g. to use), I lean against creating new
+>>>> modules for the client and server.
+>>>>
+>>>> ksmbd.ko for server code
+>>>> cifs.ko (or maybe someday renamed to smb3.ko) for client code
+>>>> smbdirect.ko for the RDMA/smbdirect code shared by ksmbd/cifs.ko/ 
+>>>> userspace tools
+>>>>
+>>>> maybe (as they did for the md4 code creating an cifs_md4.ko so that
+>>>> less secure code doesn't have to be linked in if unneeded) someday we
+>>>> could split an "smb1.ko" out for the SMB1 related code (since we want
+>>>> to discourage use of old insecure dialects, and could shrink cifs.ko,
+>>>> and slightly simplify it)
+>>>>
+>>>> Finding common code is good - but let's not complicate things by
+>>>> creating lots of new modules - in the short term the focus is on
+>>>> sanely splitting the common RDMA/smbdirect code out (because 1) it is
+>>>> large enough 2) it will have use cases outside of cifs.ko and
+>>>> ksmbd.ko).  But I lean against creating multiple new modules in the
+>>>> short term.
+>>>>
+>>>> On Thu, Dec 4, 2025 at 6:59 PM ChenXiaoSong
+>>>> <chenxiaosong.chenxiaosong@linux.dev> wrote:
+>>>>>
+>>>>> OK, I will create new smb2maperror.ko and will send v2 soon.
+>>>>>
+>>>>> Thanks for your review and suggestions.
+>>>>>
+>>>>> Thanks,
+>>>>> ChenXiaoSong.
+>>>>>
+>>>>> On 12/5/25 08:35, Namjae Jeon wrote:
+>>>>>> On Thu, Dec 4, 2025 at 2:00 PM 
+>>>>>> <chenxiaosong.chenxiaosong@linux.dev> wrote:
+>>>>>>>
+>>>>>>> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>>>>>>>
+>>>>>>> Preparation for moving client/smb2maperror.c to common/.
+>>>>>>>
+>>>>>>> We can put cifs_md4 and smb2maperror into a single smb_common.ko,
+>>>>>>> instead of creating two separate .ko (cifs_md4.ko and 
+>>>>>>> smb2maperror.ko).
+>>>>>> Sorry, I prefer not to create new *.ko for only smb2maperror.
+>>>>>>>
+>>>>>>>      - rename md4.h -> common.h, and update include guard
+>>>>>>>      - create common.c, and move module info from cifs_md4.c into 
+>>>>>>> common.c
+>>>>>> ksmbd does not use md4 in smb/common, I don't prefer this either.
+>>>>>> I would appreciate it if you could send me the patch set again 
+>>>>>> except these.
+>>>>>>>
+>>>>>>> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>>>>>
+>>>>
+>>>>
+>>>
+>>
+>>
+> 
 
-url:    https://github.com/intel-lab-lkp/linux/commits/chenxiaosong-chenxiaosong-linux-dev/smb-client-reduce-loop-count-in-map_smb2_to_linux_error-by-half/20251204-130530
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20251204045818.2590727-11-chenxiaosong.chenxiaosong%40linux.dev
-patch subject: [PATCH 10/10] smb: move client/smb2maperror.c to common/
-config: i386-randconfig-063-20251205 (https://download.01.org/0day-ci/archive/20251205/202512051006.j5kB1bVW-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251205/202512051006.j5kB1bVW-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512051006.j5kB1bVW-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> fs/smb/common/smb2maperror.c:2419:14: sparse: sparse: restricted __le32 degrades to integer
-   fs/smb/common/smb2maperror.c:2419:31: sparse: sparse: restricted __le32 degrades to integer
-   fs/smb/common/smb2maperror.c:2421:14: sparse: sparse: restricted __le32 degrades to integer
-   fs/smb/common/smb2maperror.c:2421:31: sparse: sparse: restricted __le32 degrades to integer
-
-vim +2419 fs/smb/common/smb2maperror.c
-
-ddfbefbd393fb1 fs/cifs/smb2maperror.c       Steve French 2011-03-15  2411  
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2412  static unsigned int err_map_num = sizeof(smb2_error_map_table) /
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2413  				     sizeof(struct status_to_posix_error);
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2414  
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2415  static int cmp_smb2_status(const void *_a, const void *_b)
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2416  {
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2417  	const struct status_to_posix_error *a = _a, *b = _b;
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2418  
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04 @2419  	if (a->smb2_status < b->smb2_status)
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2420  		return -1;
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2421  	if (a->smb2_status > b->smb2_status)
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2422  		return 1;
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2423  	return 0;
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2424  }
-99d0698b9bf5cf fs/smb/client/smb2maperror.c ChenXiaoSong 2025-12-04  2425  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
