@@ -1,234 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6426C2FB962
-	for <linux-cifs@vger.kernel.org>; Fri,  5 Dec 2025 12:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B12F3148DB;
+	Fri,  5 Dec 2025 13:09:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764937302; cv=none; b=nDMwFIj74qUURUxZzOGqD0aD1EdV9CE7dL3I/Bu2GPLMxMCGXs+U9xo9Da0U3NEZVYGgFA9vgbvDPzzG34KjVvvA83cyJ75BXIfPw1Pv8ZI8Nq73dIdfcIwMIVs1iZzAG+PD57odwVgkmpJVlYcltHm2/ZYdRQVgG4+RY4e6ITY=
+	t=1764940194; cv=none; b=QsfBP2oXtSZEnVdCG0YMIpiA3UAgB2+TZVbuksQwGnAbKC/9HrrrEtGLJ3PemECNC0LrNYiqWHNbC4SDj23TYuN6jojTtXJXBtBIV59SJ+uk1QuCvi0gkkwjiq0lA1Ce2Mi68jUPPKL8kjiC7hf7bxE6dtlgkiujMgTOx/eDmBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764937302; c=relaxed/simple;
-	bh=l7rkcdapF5ZfdsVnOuJihnwt6rQaKjn0Y0lW0Vu+Jkg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hto9O0LA84Rykdy6kgThvU0SSRyuptxYBualeLtCJIHotbf+5IXGBP47ijPkbsAAsVzKM8gPQSykmcpIpbsurZ77AuYhgePHWXZtL7115P998fgDQCTtu9Z2qFYvsiyJhqIEi5Rh1LgcFj4ZpLxRkHWxPMxxiwkBBP3OUs/aaho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oJtXNbNZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764940194; c=relaxed/simple;
+	bh=9RNU4p5uFmDusX++mA9qmxru388NNiGnDSKeKxa8cHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D9NCZ3LdpuqatC6fKbTGAwg9KmBcquD3z7708KBbL8DGMn+3Hxjdso51MeoxM03HysNXHu3XNCaE7969SRSl28s6g90YG7z70kOaUqdZiplvFxDxvc6+vMTfCSjGQfDKizlJEoLLW3CwXkpfret2Mpc35mp7RBQPAY9MxmDBTjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M6blm17K; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oJtXNbNZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E4D9C116C6
-	for <linux-cifs@vger.kernel.org>; Fri,  5 Dec 2025 12:21:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M6blm17K"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5E58C4CEF1;
+	Fri,  5 Dec 2025 13:09:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764937302;
-	bh=l7rkcdapF5ZfdsVnOuJihnwt6rQaKjn0Y0lW0Vu+Jkg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=oJtXNbNZc9TLGD3/HRUzeWDYvrFpyRUxUNdeT7ANhgsYz1aEaIK/4QimdA3JDyin6
-	 MG3nbJ2Qb97M75nQnE35cjtY0sLHFGq0mVAFnCMrkD1Q/wW/L3Q0HLnztsJOWDEmo8
-	 iMNBzN+ekkAhSOBpvnFTfAgKeYKr0VTG4i1IxiK7tVoRrTolAmfPoJL9D30UPQzGcd
-	 bnbUc+3rzkE1ipCl6Va/obJuEyI7Xsa7Pjj1K2HKER82/BZmIW0UrmiPYTScrAkbxF
-	 65msgrY5Un+CuDhNtcwVT6ylLgQpLyJqll9TniAE38jbiZ657W9iaojg9x7t3cZe21
-	 R3wh8CFwmlkMg==
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6418738efa0so3604413a12.1
-        for <linux-cifs@vger.kernel.org>; Fri, 05 Dec 2025 04:21:41 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUmgX5pCnJY2LDe/S/XcrQMcTR1qpcrPNRcZGyWvqLWsWuYmfLB7jb0KmYcFBiRAuchkqy15Aw6qqIK@vger.kernel.org
-X-Gm-Message-State: AOJu0YykpWbPaZYJj2/uKZi5gGIRYl1F4kStpxZhyiKehA99wj4hALfk
-	f2wKoEW06tq2x74xqyxwx2P36d5hACSSaWHhtuvfDc4PrHxTAbORtWiXdoALYQrbvcxp50ZL182
-	y52lub8wPAWKbbEAxVBJ8NvvgMwwyFQA=
-X-Google-Smtp-Source: AGHT+IGgjLo9huSCRNebWVzSQI2ChgV3ePC8ePmME7tnid80AFmod6ZSidLlBTJsKsJEZoHqMuOD/c/jqy/sTjkFF1Q=
-X-Received: by 2002:a05:6402:4308:b0:645:ccf0:379 with SMTP id
- 4fb4d7f45d1cf-6479c4e6e7dmr7754820a12.21.1764937300649; Fri, 05 Dec 2025
- 04:21:40 -0800 (PST)
+	s=k20201202; t=1764940192;
+	bh=9RNU4p5uFmDusX++mA9qmxru388NNiGnDSKeKxa8cHs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=M6blm17KY/7Fq4E/y+hGFEVsLYFddZCYcUxIBMzoPfppxfvFklHuno+W5dLVHbLyU
+	 w2jwooxrs+UVERpIVLszZHqL8Ehl2H1cjiNIE3120zTvz03YpYRpaTeqOkLaINb/nb
+	 zuErmpPjOVfOjq2IQ2/soZP8Vdopaynk4/ICCE3cnwdaEHJy6HejOOPNUOMxSc74Yw
+	 ZPD0ECuy7uAqjgJeho3o8qTmC7FN+47xrgd02l8E2C+BxMzHiQf/qgbHuZFjALtAYT
+	 pnfnQsV5rOHOvHXwVprjTt2IuqljVra8/M62hXIPRouHbjdqZataGSgGdRwLlo5TtA
+	 cbn/WwSlmrBMg==
+Date: Fri, 5 Dec 2025 14:09:41 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Miklos Szeredi <miklos@szeredi.hu>
+Cc: Al Viro <viro@zeniv.linux.org.uk>, Amir Goldstein <amir73il@gmail.com>, 
+	NeilBrown <neil@brown.name>, Val Packett <val@packett.cool>, Jan Kara <jack@suse.cz>, 
+	linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>, Chris Mason <clm@fb.com>, 
+	David Sterba <dsterba@suse.com>, David Howells <dhowells@redhat.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, Tyler Hicks <code@tyhicks.com>, 
+	Chuck Lever <chuck.lever@oracle.com>, Olga Kornievskaia <okorniev@redhat.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Carlos Maiolino <cem@kernel.org>, John Johansen <john.johansen@canonical.com>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Ondrej Mosnacek <omosnace@redhat.com>, Mateusz Guzik <mjguzik@gmail.com>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Stefan Berger <stefanb@linux.ibm.com>, 
+	"Darrick J. Wong" <djwong@kernel.org>, linux-kernel@vger.kernel.org, netfs@lists.linux.dev, 
+	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, linux-xfs@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	selinux@vger.kernel.org
+Subject: Re: [PATCH] fuse: fix conversion of fuse_reverse_inval_entry() to
+ start_removing()
+Message-ID: <20251205-unmoralisch-jahrtausend-cca02ad0e4fa@brauner>
+References: <20251113002050.676694-1-neilb@ownmail.net>
+ <20251113002050.676694-7-neilb@ownmail.net>
+ <6713ea38-b583-4c86-b74a-bea55652851d@packett.cool>
+ <176454037897.634289.3566631742434963788@noble.neil.brown.name>
+ <CAOQ4uxjihcBxJzckbJis8hGcWO61QKhiqeGH+hDkTUkDhu23Ww@mail.gmail.com>
+ <20251201083324.GA3538@ZenIV>
+ <CAJfpegs+o01jgY76WsGnk9j41LS5V0JQSk--d6xsJJp4VjTh8Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <35eec2e6-bf37-43d6-a2d8-7a939a68021b@samba.org>
- <CAKYAXd9p=7BzmSSKi5n41OKkkw4qrr4cWpWet7rUfC+VT-6h1g@mail.gmail.com>
- <f59e0dc7-e91c-4a13-8d49-fe183c10b6f4@samba.org> <CAKYAXd-MF1j+CkbWakFJK2ov_SfRUXaRuT6jE0uHZoLxTu130Q@mail.gmail.com>
-In-Reply-To: <CAKYAXd-MF1j+CkbWakFJK2ov_SfRUXaRuT6jE0uHZoLxTu130Q@mail.gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 5 Dec 2025 21:21:27 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd__T=L9aWwOuY7Z8fJgMf404=KQ2dTpNRd3mq9dnYCxRw@mail.gmail.com>
-X-Gm-Features: AQt7F2piEZ0QRJp5iXF854cczQM8xFRGxr2AxF1ktuXJQh-ifBY-76_4ojsBp9A
-Message-ID: <CAKYAXd__T=L9aWwOuY7Z8fJgMf404=KQ2dTpNRd3mq9dnYCxRw@mail.gmail.com>
-Subject: Re: Problem with smbdirect rw credits and initiator_depth
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Tom Talpey <tom@talpey.com>, 
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000db6a430645337c83"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJfpegs+o01jgY76WsGnk9j41LS5V0JQSk--d6xsJJp4VjTh8Q@mail.gmail.com>
 
---000000000000db6a430645337c83
-Content-Type: text/plain; charset="UTF-8"
-
-> > Can you at least post the dmesg output generated by this:
-> > https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=7e724ebc58e986f4e101a55f4ab5e96912239918
-> > Assuming that this wasn't triggered:
-> > if (WARN_ONCE(needed > max_possible, "needed:%u > max:%u\n", needed, max_possible))
-> I didn't know you wanted it. I will share it after office.
-I have attached v2 and v3 logs. Let me know if you need something more,
+On Mon, Dec 01, 2025 at 03:03:08PM +0100, Miklos Szeredi wrote:
+> On Mon, 1 Dec 2025 at 09:33, Al Viro <viro@zeniv.linux.org.uk> wrote:
 > >
-> > Did you run the bpftrace command? Did it print a lot of
-> > 'smb_direct_rdma_xmit' message over the whole time of the file copy?
-> No, I didn't check it. but I will try this.
-/mnt# bpftrace ksmbd-rdma-xmit.bt
-Attaching 1 probe...
+> > On Mon, Dec 01, 2025 at 09:22:54AM +0100, Amir Goldstein wrote:
+> >
+> > > I don't think there is a point in optimizing parallel dir operations
+> > > with FUSE server cache invalidation, but maybe I am missing
+> > > something.
+> >
+> > The interesting part is the expected semantics of operation;
+> > d_invalidate() side definitely doesn't need any of that cruft,
+> > but I would really like to understand what that function
+> > is supposed to do.
+> >
+> > Miklos, could you post a brain dump on that?
+> 
+> This function is supposed to invalidate a dentry due to remote changes
+> (FUSE_NOTIFY_INVAL_ENTRY).  Originally it was supplied a parent ID and
+> a name and called d_invalidate() on the looked up dentry.
+> 
+> Then it grew a variant (FUSE_NOTIFY_DELETE) that was also supplied a
+> child ID, which was matched against the looked up inode.  This was
+> commit 451d0f599934 ("FUSE: Notifying the kernel of deletion."),
+> Apparently this worked around the fact that at that time
+> d_invalidate() returned -EBUSY if the target was still in use and
+> didn't unhash the dentry in that case.
+> 
+> That was later changed by commit bafc9b754f75 ("vfs: More precise
+> tests in d_invalidate") to unconditionally unhash the target, which
+> effectively made FUSE_NOTIFY_INVAL_ENTRY and FUSE_NOTIFY_DELETE
+> equivalent and the code in question unnecessary.
+> 
+> For the future, we could also introduce FUSE_NOTIFY_MOVE, that would
+> differentiate between a delete and a move, while
+> FUSE_NOTIFY_INVAL_ENTRY would continue to be the common (deleted or
+> moved) notification.
+> 
+> Attaching untested patch to remove this cruft.
 
-The absence of any output after Attaching 1 probe... indicates that
-the smb_direct_rdma_xmit function has not been called ?
-
---000000000000db6a430645337c83
-Content-Type: text/plain; charset="US-ASCII"; name="wip_v2.txt"
-Content-Disposition: attachment; filename="wip_v2.txt"
-Content-Transfer-Encoding: base64
-Content-ID: <f_misu0is10>
-X-Attachment-Id: f_misu0is10
-
-WyAgNDE0Ljc4NDU2OV0ga3NtYmQ6IHJ1bm5pbmcKWyAgNzg4LjE4MzMxMF0ga3NtYmQ6IHNtYl9k
-aXJlY3Q6IGRldltyb2NlcDFzMGYwXTogbWF4X3FwX3JkX2F0b209MTYgbWF4X2Zhc3RfcmVnX3Bh
-Z2VfbGlzdF9sZW49NjU1MzYgbWF4X3NnbF9yZD0zIG1heF9zZ2VfcmQ9MzAgbWF4X2NxZT00MTk0
-MzAzIG1heF9xcF93cj04MTkyIG1heF9zZW5kX3NnZT0zMCBtYXhfcmVjdl9zZ2U9MzIgZGV2aWNl
-X2NhcF9mbGFncz0weDE0MjUzMjFjMzYga2VybmVsX2NhcF9mbGFncz0weDJlClsgIDc4OC4xODMz
-MzRdIGtzbWJkOiBzbWJfZGlyZWN0OiBpbml0aWF0b3JfZGVwdGg6OCBwZWVyX2luaXRpYXRvcl9k
-ZXB0aDoxNgpbICA3ODguMTgzMzM3XSBrc21iZDogc21iX2RpcmVjdDogbWF4X3NlbmRfc2dlcz00
-IG1heF9yZWFkX3dyaXRlX3NpemU9ODM4ODYwOApbICA3ODguMTgzMzM5XSBrc21iZDogc21iX2Rp
-cmVjdDogc2MtPnJ3X2lvLmNyZWRpdHMubnVtX3BhZ2VzPTI1NiBzYy0+cndfaW8uY3JlZGl0cy5t
-YXg6OQpbICA3ODguMTgzMzQyXSBrc21iZDogc21iX2RpcmVjdDogbWF4X3NnZV9wZXJfd3I6MzAg
-d3JzX3Blcl9jcmVkaXQ6MTAgbWF4X3J3X3dyczo5MApbICA3ODguMTkzMTg2XSBrc21iZDogc21i
-X2RpcmVjdDogZGV2W3JvY2VwMXMwZjBdOiBtYXhfcXBfcmRfYXRvbT0xNiBtYXhfZmFzdF9yZWdf
-cGFnZV9saXN0X2xlbj02NTUzNiBtYXhfc2dsX3JkPTMgbWF4X3NnZV9yZD0zMCBtYXhfY3FlPTQx
-OTQzMDMgbWF4X3FwX3dyPTgxOTIgbWF4X3NlbmRfc2dlPTMwIG1heF9yZWN2X3NnZT0zMiBkZXZp
-Y2VfY2FwX2ZsYWdzPTB4MTQyNTMyMWMzNiBrZXJuZWxfY2FwX2ZsYWdzPTB4MmUKWyAgNzg4LjE5
-MzIwOV0ga3NtYmQ6IHNtYl9kaXJlY3Q6IGluaXRpYXRvcl9kZXB0aDo4IHBlZXJfaW5pdGlhdG9y
-X2RlcHRoOjE2ClsgIDc4OC4xOTMyMTNdIGtzbWJkOiBzbWJfZGlyZWN0OiBtYXhfc2VuZF9zZ2Vz
-PTQgbWF4X3JlYWRfd3JpdGVfc2l6ZT04Mzg4NjA4ClsgIDc4OC4xOTMyMTZdIGtzbWJkOiBzbWJf
-ZGlyZWN0OiBzYy0+cndfaW8uY3JlZGl0cy5udW1fcGFnZXM9MjU2IHNjLT5yd19pby5jcmVkaXRz
-Lm1heDo5ClsgIDc4OC4xOTMyMTldIGtzbWJkOiBzbWJfZGlyZWN0OiBtYXhfc2dlX3Blcl93cjoz
-MCB3cnNfcGVyX2NyZWRpdDoxMCBtYXhfcndfd3JzOjkwClsgIDc4OC4xOTk3MzFdIGtzbWJkOiBz
-bWJfZGlyZWN0OiBkZXZbcm9jZXAxczBmMV06IG1heF9xcF9yZF9hdG9tPTE2IG1heF9mYXN0X3Jl
-Z19wYWdlX2xpc3RfbGVuPTY1NTM2IG1heF9zZ2xfcmQ9MyBtYXhfc2dlX3JkPTMwIG1heF9jcWU9
-NDE5NDMwMyBtYXhfcXBfd3I9ODE5MiBtYXhfc2VuZF9zZ2U9MzAgbWF4X3JlY3Zfc2dlPTMyIGRl
-dmljZV9jYXBfZmxhZ3M9MHgxNDI1MzIxYzM2IGtlcm5lbF9jYXBfZmxhZ3M9MHgyZQpbICA3ODgu
-MTk5NzU2XSBrc21iZDogc21iX2RpcmVjdDogaW5pdGlhdG9yX2RlcHRoOjggcGVlcl9pbml0aWF0
-b3JfZGVwdGg6MTYKWyAgNzg4LjE5OTc2MF0ga3NtYmQ6IHNtYl9kaXJlY3Q6IG1heF9zZW5kX3Nn
-ZXM9NCBtYXhfcmVhZF93cml0ZV9zaXplPTgzODg2MDgKWyAgNzg4LjE5OTc2M10ga3NtYmQ6IHNt
-Yl9kaXJlY3Q6IHNjLT5yd19pby5jcmVkaXRzLm51bV9wYWdlcz0yNTYgc2MtPnJ3X2lvLmNyZWRp
-dHMubWF4OjkKWyAgNzg4LjE5OTc2Nl0ga3NtYmQ6IHNtYl9kaXJlY3Q6IG1heF9zZ2VfcGVyX3dy
-OjMwIHdyc19wZXJfY3JlZGl0OjEwIG1heF9yd193cnM6OTAKWyAgNzg4LjIwODE0NF0ga3NtYmQ6
-IHNtYl9kaXJlY3Q6IGRldltyb2NlcDFzMGYxXTogbWF4X3FwX3JkX2F0b209MTYgbWF4X2Zhc3Rf
-cmVnX3BhZ2VfbGlzdF9sZW49NjU1MzYgbWF4X3NnbF9yZD0zIG1heF9zZ2VfcmQ9MzAgbWF4X2Nx
-ZT00MTk0MzAzIG1heF9xcF93cj04MTkyIG1heF9zZW5kX3NnZT0zMCBtYXhfcmVjdl9zZ2U9MzIg
-ZGV2aWNlX2NhcF9mbGFncz0weDE0MjUzMjFjMzYga2VybmVsX2NhcF9mbGFncz0weDJlClsgIDc4
-OC4yMDgxNjJdIGtzbWJkOiBzbWJfZGlyZWN0OiBpbml0aWF0b3JfZGVwdGg6OCBwZWVyX2luaXRp
-YXRvcl9kZXB0aDoxNgpbICA3ODguMjA4MTYzXSBrc21iZDogc21iX2RpcmVjdDogbWF4X3NlbmRf
-c2dlcz00IG1heF9yZWFkX3dyaXRlX3NpemU9ODM4ODYwOApbICA3ODguMjA4MTY1XSBrc21iZDog
-c21iX2RpcmVjdDogc2MtPnJ3X2lvLmNyZWRpdHMubnVtX3BhZ2VzPTI1NiBzYy0+cndfaW8uY3Jl
-ZGl0cy5tYXg6OQpbICA3ODguMjA4MTY2XSBrc21iZDogc21iX2RpcmVjdDogbWF4X3NnZV9wZXJf
-d3I6MzAgd3JzX3Blcl9jcmVkaXQ6MTAgbWF4X3J3X3dyczo5MApbICA3OTEuNTAyMzM3XSBrc21i
-ZDogc21iX2RpcmVjdDogZGlzY29ubmVjdGVkClsgIDc5MS41MDIzNDRdIGtzbWJkOiBGYWlsZWQg
-dG8gc2VuZCBtZXNzYWdlOiAtMTA3ClsgIDc5MS41MDIzNTRdIGtzbWJkOiBzb2NrX3JlYWQgZmFp
-bGVkOiAtMTA3ClsgIDc5MS41MDIzNzhdIGtzbWJkOiBGYWlsZWQgdG8gc2VuZCBtZXNzYWdlOiAt
-MTA3ClsgIDc5MS41MDI0MDFdIGtzbWJkOiBGYWlsZWQgdG8gc2VuZCBtZXNzYWdlOiAtMTA3Clsg
-IDc5MS41MDI0MjFdIGtzbWJkOiBGYWlsZWQgdG8gc2VuZCBtZXNzYWdlOiAtMTA3ClsgIDc5MS41
-MDM0MDddIGtzbWJkOiBGYWlsZWQgdG8gc2VuZCBtZXNzYWdlOiAtMTA3ClsgIDc5MS41MDM0Mzhd
-IGtzbWJkOiBGYWlsZWQgdG8gc2VuZCBtZXNzYWdlOiAtMTA3ClsgIDc5MS41MDM0NjJdIGtzbWJk
-OiBGYWlsZWQgdG8gc2VuZCBtZXNzYWdlOiAtMTA3ClsgIDc5MS41MDM4MjBdIGtzbWJkOiBzbWJf
-ZGlyZWN0OiBTZW5kIGVycm9yLiBzdGF0dXM9J1dSIGZsdXNoZWQgKDUpJywgb3Bjb2RlPTAKWyAg
-NzkxLjUwNDc1Nl0ga3NtYmQ6IEZhaWxlZCB0byBzZW5kIG1lc3NhZ2U6IC0xMDcKWyAgNzkxLjUw
-NDc3Nl0ga3NtYmQ6IEZhaWxlZCB0byBzZW5kIG1lc3NhZ2U6IC0xMDcKWyAgNzkxLjUwNDc5M10g
-a3NtYmQ6IEZhaWxlZCB0byBzZW5kIG1lc3NhZ2U6IC0xMDcKWyAgNzkxLjUwNDgxMV0ga3NtYmQ6
-IEZhaWxlZCB0byBzZW5kIG1lc3NhZ2U6IC0xMDcKWyAgNzkxLjUwNDgyOF0ga3NtYmQ6IEZhaWxl
-ZCB0byBzZW5kIG1lc3NhZ2U6IC0xMDcKWyAgNzkxLjUwNDg0NF0ga3NtYmQ6IEZhaWxlZCB0byBz
-ZW5kIG1lc3NhZ2U6IC0xMDcKWyAgNzkxLjUwNDg3OF0ga3NtYmQ6IEZhaWxlZCB0byBzZW5kIG1l
-c3NhZ2U6IC0xMDcKWyAgNzkxLjUwNDkwMV0ga3NtYmQ6IEZhaWxlZCB0byBzZW5kIG1lc3NhZ2U6
-IC0xMDcKWyAgNzkxLjU2Nzk2Ml0ga3NtYmQ6IHNtYl9kaXJlY3Q6IGRldltyb2NlcDFzMGYxXTog
-bWF4X3FwX3JkX2F0b209MTYgbWF4X2Zhc3RfcmVnX3BhZ2VfbGlzdF9sZW49NjU1MzYgbWF4X3Nn
-bF9yZD0zIG1heF9zZ2VfcmQ9MzAgbWF4X2NxZT00MTk0MzAzIG1heF9xcF93cj04MTkyIG1heF9z
-ZW5kX3NnZT0zMCBtYXhfcmVjdl9zZ2U9MzIgZGV2aWNlX2NhcF9mbGFncz0weDE0MjUzMjFjMzYg
-a2VybmVsX2NhcF9mbGFncz0weDJlClsgIDc5MS41NjgwNDRdIGtzbWJkOiBzbWJfZGlyZWN0OiBp
-bml0aWF0b3JfZGVwdGg6OCBwZWVyX2luaXRpYXRvcl9kZXB0aDoxNgpbICA3OTEuNTY4MDUxXSBr
-c21iZDogc21iX2RpcmVjdDogbWF4X3NlbmRfc2dlcz00IG1heF9yZWFkX3dyaXRlX3NpemU9ODM4
-ODYwOApbICA3OTEuNTY4MDU4XSBrc21iZDogc21iX2RpcmVjdDogc2MtPnJ3X2lvLmNyZWRpdHMu
-bnVtX3BhZ2VzPTI1NiBzYy0+cndfaW8uY3JlZGl0cy5tYXg6OQpbICA3OTEuNTY4MDY0XSBrc21i
-ZDogc21iX2RpcmVjdDogbWF4X3NnZV9wZXJfd3I6MzAgd3JzX3Blcl9jcmVkaXQ6MTAgbWF4X3J3
-X3dyczo5MApbICA4MDEuOTI1MjgxXSBrc21iZDogRmFpbGVkIHRvIHNlbmQgbWVzc2FnZTogLTEw
-NwpbICA4MDEuOTI1MzY1XSBrc21iZDogRmFpbGVkIHRvIHNlbmQgbWVzc2FnZTogLTEwNwpbICA4
-MDEuOTI1MzkyXSBrc21iZDogc21iX2RpcmVjdDogZGlzY29ubmVjdGVkClsgIDgwMS45MjUzOTld
-IGtzbWJkOiBzb2NrX3JlYWQgZmFpbGVkOiAtMTA3ClsgIDgwMS45MjY2NTFdIGtzbWJkOiBzbWJf
-ZGlyZWN0OiBTZW5kIGVycm9yLiBzdGF0dXM9J1dSIGZsdXNoZWQgKDUpJywgb3Bjb2RlPTAKWyAg
-ODAxLjkyNjY2NV0ga3NtYmQ6IHNtYl9kaXJlY3Q6IFNlbmQgZXJyb3IuIHN0YXR1cz0nV1IgZmx1
-c2hlZCAoNSknLCBvcGNvZGU9MApbICA4MDEuOTI3NzE3XSBrc21iZDogRmFpbGVkIHRvIHNlbmQg
-bWVzc2FnZTogLTEwNwpbICA4MDEuOTI3NzM4XSBrc21iZDogRmFpbGVkIHRvIHNlbmQgbWVzc2Fn
-ZTogLTEwNwpbICA4MDEuOTM1OTQwXSBrc21iZDogc21iX2RpcmVjdDogZGV2W3JvY2VwMXMwZjFd
-OiBtYXhfcXBfcmRfYXRvbT0xNiBtYXhfZmFzdF9yZWdfcGFnZV9saXN0X2xlbj02NTUzNiBtYXhf
-c2dsX3JkPTMgbWF4X3NnZV9yZD0zMCBtYXhfY3FlPTQxOTQzMDMgbWF4X3FwX3dyPTgxOTIgbWF4
-X3NlbmRfc2dlPTMwIG1heF9yZWN2X3NnZT0zMiBkZXZpY2VfY2FwX2ZsYWdzPTB4MTQyNTMyMWMz
-NiBrZXJuZWxfY2FwX2ZsYWdzPTB4MmUKWyAgODAxLjkzNTk4Ml0ga3NtYmQ6IHNtYl9kaXJlY3Q6
-IGluaXRpYXRvcl9kZXB0aDo4IHBlZXJfaW5pdGlhdG9yX2RlcHRoOjE2ClsgIDgwMS45MzU5ODhd
-IGtzbWJkOiBzbWJfZGlyZWN0OiBtYXhfc2VuZF9zZ2VzPTQgbWF4X3JlYWRfd3JpdGVfc2l6ZT04
-Mzg4NjA4ClsgIDgwMS45MzU5OTNdIGtzbWJkOiBzbWJfZGlyZWN0OiBzYy0+cndfaW8uY3JlZGl0
-cy5udW1fcGFnZXM9MjU2IHNjLT5yd19pby5jcmVkaXRzLm1heDo5ClsgIDgwMS45MzU5OTldIGtz
-bWJkOiBzbWJfZGlyZWN0OiBtYXhfc2dlX3Blcl93cjozMCB3cnNfcGVyX2NyZWRpdDoxMCBtYXhf
-cndfd3JzOjkwClsgIDgwNS4yNTkxMzddIGtzbWJkOiBzbWJfZGlyZWN0OiBkaXNjb25uZWN0ZWQK
-WyAgODA1LjI1OTE1M10ga3NtYmQ6IHNvY2tfcmVhZCBmYWlsZWQ6IC0xMDcKWyAgODA1LjI1OTE2
-NV0ga3NtYmQ6IEZhaWxlZCB0byBzZW5kIG1lc3NhZ2U6IC0xMDcKWyAgODA1LjI1OTIxNV0ga3Nt
-YmQ6IEZhaWxlZCB0byBzZW5kIG1lc3NhZ2U6IC0xMDcKWyAgODA1LjI1OTc0OF0ga3NtYmQ6IHNt
-Yl9kaXJlY3Q6IFNlbmQgZXJyb3IuIHN0YXR1cz0nV1IgZmx1c2hlZCAoNSknLCBvcGNvZGU9MApb
-ICA4MDUuMjU5NzY3XSBrc21iZDogc21iX2RpcmVjdDogU2VuZCBlcnJvci4gc3RhdHVzPSdXUiBm
-bHVzaGVkICg1KScsIG9wY29kZT0wClsgIDgwNS4yNjQwMzRdIGtzbWJkOiBzbWJfZGlyZWN0OiBk
-ZXZbcm9jZXAxczBmMV06IG1heF9xcF9yZF9hdG9tPTE2IG1heF9mYXN0X3JlZ19wYWdlX2xpc3Rf
-bGVuPTY1NTM2IG1heF9zZ2xfcmQ9MyBtYXhfc2dlX3JkPTMwIG1heF9jcWU9NDE5NDMwMyBtYXhf
-cXBfd3I9ODE5MiBtYXhfc2VuZF9zZ2U9MzAgbWF4X3JlY3Zfc2dlPTMyIGRldmljZV9jYXBfZmxh
-Z3M9MHgxNDI1MzIxYzM2IGtlcm5lbF9jYXBfZmxhZ3M9MHgyZQpbICA4MDUuMjY0MjU2XSBrc21i
-ZDogc21iX2RpcmVjdDogaW5pdGlhdG9yX2RlcHRoOjggcGVlcl9pbml0aWF0b3JfZGVwdGg6MTYK
-WyAgODA1LjI2NDI2NF0ga3NtYmQ6IHNtYl9kaXJlY3Q6IG1heF9zZW5kX3NnZXM9NCBtYXhfcmVh
-ZF93cml0ZV9zaXplPTgzODg2MDgKWyAgODA1LjI2NDI2OV0ga3NtYmQ6IHNtYl9kaXJlY3Q6IHNj
-LT5yd19pby5jcmVkaXRzLm51bV9wYWdlcz0yNTYgc2MtPnJ3X2lvLmNyZWRpdHMubWF4OjkKWyAg
-ODA1LjI2NDI3NV0ga3NtYmQ6IHNtYl9kaXJlY3Q6IG1heF9zZ2VfcGVyX3dyOjMwIHdyc19wZXJf
-Y3JlZGl0OjEwIG1heF9yd193cnM6OTAKCg==
---000000000000db6a430645337c83
-Content-Type: text/plain; charset="US-ASCII"; name="wip_v3.txt"
-Content-Disposition: attachment; filename="wip_v3.txt"
-Content-Transfer-Encoding: base64
-Content-ID: <f_misu0n9o1>
-X-Attachment-Id: f_misu0n9o1
-
-WyAgOTE0LjY3MDQ5MV0ga3NtYmQ6IHJ1bm5pbmcKWyAgOTc4LjYzNjI0MF0ga3NtYmQ6IHNtYl9k
-aXJlY3Q6IGRldltyb2NlcDFzMGYwXTogbWF4X3FwX3JkX2F0b209MTYgbWF4X2Zhc3RfcmVnX3Bh
-Z2VfbGlzdF9sZW49NjU1MzYgbWF4X3NnbF9yZD0zIG1heF9zZ2VfcmQ9MzAgbWF4X2NxZT00MTk0
-MzAzIG1heF9xcF93cj04MTkyIG1heF9zZW5kX3NnZT0zMCBtYXhfcmVjdl9zZ2U9MzIgZGV2aWNl
-X2NhcF9mbGFncz0weDE0MjUzMjFjMzYga2VybmVsX2NhcF9mbGFncz0weDJlClsgIDk3OC42MzYy
-NThdIGtzbWJkOiBzbWJfZGlyZWN0OiBpbml0aWF0b3JfZGVwdGg6OCBwZWVyX2luaXRpYXRvcl9k
-ZXB0aDoxNgpbICA5NzguNjM2MjYxXSBrc21iZDogc21iX2RpcmVjdDogbWF4X3JkbWFfcndfc2l6
-ZTo4Mzg4NjA4IHBhZ2VzX3Blcl9yd19jcmVkaXQ6MjU2IG1heF9yd19jcmVkaXRzOjkKWyAgOTc4
-LjYzNjI2M10ga3NtYmQ6IHNtYl9kaXJlY3Q6IG1heF9zZW5kX3NnZXM6NCBtYXhfc2dlX3Blcl93
-cjozMCB3cnNfcGVyX2NyZWRpdDoxMCBtYXhfcndfd3JzOjkwClsgIDk3OC42NTU4MzZdIGtzbWJk
-OiBzbWJfZGlyZWN0OiBkZXZbcm9jZXAxczBmMF06IG1heF9xcF9yZF9hdG9tPTE2IG1heF9mYXN0
-X3JlZ19wYWdlX2xpc3RfbGVuPTY1NTM2IG1heF9zZ2xfcmQ9MyBtYXhfc2dlX3JkPTMwIG1heF9j
-cWU9NDE5NDMwMyBtYXhfcXBfd3I9ODE5MiBtYXhfc2VuZF9zZ2U9MzAgbWF4X3JlY3Zfc2dlPTMy
-IGRldmljZV9jYXBfZmxhZ3M9MHgxNDI1MzIxYzM2IGtlcm5lbF9jYXBfZmxhZ3M9MHgyZQpbICA5
-NzguNjU1ODYzXSBrc21iZDogc21iX2RpcmVjdDogaW5pdGlhdG9yX2RlcHRoOjggcGVlcl9pbml0
-aWF0b3JfZGVwdGg6MTYKWyAgOTc4LjY1NTg2N10ga3NtYmQ6IHNtYl9kaXJlY3Q6IG1heF9yZG1h
-X3J3X3NpemU6ODM4ODYwOCBwYWdlc19wZXJfcndfY3JlZGl0OjI1NiBtYXhfcndfY3JlZGl0czo5
-ClsgIDk3OC42NTU4NzFdIGtzbWJkOiBzbWJfZGlyZWN0OiBtYXhfc2VuZF9zZ2VzOjQgbWF4X3Nn
-ZV9wZXJfd3I6MzAgd3JzX3Blcl9jcmVkaXQ6MTAgbWF4X3J3X3dyczo5MApbICA5NzguNjY3Njcx
-XSBrc21iZDogc21iX2RpcmVjdDogZGV2W3JvY2VwMXMwZjFdOiBtYXhfcXBfcmRfYXRvbT0xNiBt
-YXhfZmFzdF9yZWdfcGFnZV9saXN0X2xlbj02NTUzNiBtYXhfc2dsX3JkPTMgbWF4X3NnZV9yZD0z
-MCBtYXhfY3FlPTQxOTQzMDMgbWF4X3FwX3dyPTgxOTIgbWF4X3NlbmRfc2dlPTMwIG1heF9yZWN2
-X3NnZT0zMiBkZXZpY2VfY2FwX2ZsYWdzPTB4MTQyNTMyMWMzNiBrZXJuZWxfY2FwX2ZsYWdzPTB4
-MmUKWyAgOTc4LjY2NzY5N10ga3NtYmQ6IHNtYl9kaXJlY3Q6IGluaXRpYXRvcl9kZXB0aDo4IHBl
-ZXJfaW5pdGlhdG9yX2RlcHRoOjE2ClsgIDk3OC42Njc3MDFdIGtzbWJkOiBzbWJfZGlyZWN0OiBt
-YXhfcmRtYV9yd19zaXplOjgzODg2MDggcGFnZXNfcGVyX3J3X2NyZWRpdDoyNTYgbWF4X3J3X2Ny
-ZWRpdHM6OQpbICA5NzguNjY3NzA1XSBrc21iZDogc21iX2RpcmVjdDogbWF4X3NlbmRfc2dlczo0
-IG1heF9zZ2VfcGVyX3dyOjMwIHdyc19wZXJfY3JlZGl0OjEwIG1heF9yd193cnM6OTAKWyAgOTc4
-LjY4ODg3M10ga3NtYmQ6IHNtYl9kaXJlY3Q6IGRldltyb2NlcDFzMGYxXTogbWF4X3FwX3JkX2F0
-b209MTYgbWF4X2Zhc3RfcmVnX3BhZ2VfbGlzdF9sZW49NjU1MzYgbWF4X3NnbF9yZD0zIG1heF9z
-Z2VfcmQ9MzAgbWF4X2NxZT00MTk0MzAzIG1heF9xcF93cj04MTkyIG1heF9zZW5kX3NnZT0zMCBt
-YXhfcmVjdl9zZ2U9MzIgZGV2aWNlX2NhcF9mbGFncz0weDE0MjUzMjFjMzYga2VybmVsX2NhcF9m
-bGFncz0weDJlClsgIDk3OC42ODg4OTRdIGtzbWJkOiBzbWJfZGlyZWN0OiBpbml0aWF0b3JfZGVw
-dGg6OCBwZWVyX2luaXRpYXRvcl9kZXB0aDoxNgpbICA5NzguNjg4ODk2XSBrc21iZDogc21iX2Rp
-cmVjdDogbWF4X3JkbWFfcndfc2l6ZTo4Mzg4NjA4IHBhZ2VzX3Blcl9yd19jcmVkaXQ6MjU2IG1h
-eF9yd19jcmVkaXRzOjkKWyAgOTc4LjY4ODg5OF0ga3NtYmQ6IHNtYl9kaXJlY3Q6IG1heF9zZW5k
-X3NnZXM6NCBtYXhfc2dlX3Blcl93cjozMCB3cnNfcGVyX2NyZWRpdDoxMCBtYXhfcndfd3JzOjkw
-Cg==
---000000000000db6a430645337c83--
+Should we revert the fuse specific bits of c9ba789dad15 ("VFS: introduce
+start_creating_noperm() and start_removing_noperm()") and then apply
+your changes afterwards?
