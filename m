@@ -1,111 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B12F3148DB;
-	Fri,  5 Dec 2025 13:09:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C38331A78
+	for <linux-cifs@vger.kernel.org>; Fri,  5 Dec 2025 13:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764940194; cv=none; b=QsfBP2oXtSZEnVdCG0YMIpiA3UAgB2+TZVbuksQwGnAbKC/9HrrrEtGLJ3PemECNC0LrNYiqWHNbC4SDj23TYuN6jojTtXJXBtBIV59SJ+uk1QuCvi0gkkwjiq0lA1Ce2Mi68jUPPKL8kjiC7hf7bxE6dtlgkiujMgTOx/eDmBI=
+	t=1764941215; cv=none; b=bIgWPvKVrvZTHx7+d7BHPhFV9L4NpGac3AymXiG4uGSzxkTSl84Qr7f5GYDo08OZ6ih/tmofEozMBOs2yo0/1/W4Wcs7DeR1IOEQXYefNsiIf9ozyfSQ7Juro/pfQhTqNiWKkPEMccAs9zXRNF90Se6srvcq2RuAA6yKWhL+u8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764940194; c=relaxed/simple;
-	bh=9RNU4p5uFmDusX++mA9qmxru388NNiGnDSKeKxa8cHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D9NCZ3LdpuqatC6fKbTGAwg9KmBcquD3z7708KBbL8DGMn+3Hxjdso51MeoxM03HysNXHu3XNCaE7969SRSl28s6g90YG7z70kOaUqdZiplvFxDxvc6+vMTfCSjGQfDKizlJEoLLW3CwXkpfret2Mpc35mp7RBQPAY9MxmDBTjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M6blm17K; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764941215; c=relaxed/simple;
+	bh=zUYUihyU+5bVpkT+6WKXmtpr0BGZrQLsvYStT4Koz0c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=K/2pO7em/Vpo45nOyEZQl+/LhZEIyIfoVoYz46IjyjjwfJHgWpt7El26roD7R3rqKYbPOXMNhZ/uEH9VITGHHue9AroDRj48Ha1b4bzb6QFn4VUJio40YVOTBfSZZFOXXXXwaXx2Nv+asdWY9BXCNZ6XK7Qmk5GVV/O9J17pex8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aWdCvx7r; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M6blm17K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5E58C4CEF1;
-	Fri,  5 Dec 2025 13:09:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764940192;
-	bh=9RNU4p5uFmDusX++mA9qmxru388NNiGnDSKeKxa8cHs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M6blm17KY/7Fq4E/y+hGFEVsLYFddZCYcUxIBMzoPfppxfvFklHuno+W5dLVHbLyU
-	 w2jwooxrs+UVERpIVLszZHqL8Ehl2H1cjiNIE3120zTvz03YpYRpaTeqOkLaINb/nb
-	 zuErmpPjOVfOjq2IQ2/soZP8Vdopaynk4/ICCE3cnwdaEHJy6HejOOPNUOMxSc74Yw
-	 ZPD0ECuy7uAqjgJeho3o8qTmC7FN+47xrgd02l8E2C+BxMzHiQf/qgbHuZFjALtAYT
-	 pnfnQsV5rOHOvHXwVprjTt2IuqljVra8/M62hXIPRouHbjdqZataGSgGdRwLlo5TtA
-	 cbn/WwSlmrBMg==
-Date: Fri, 5 Dec 2025 14:09:41 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Miklos Szeredi <miklos@szeredi.hu>
-Cc: Al Viro <viro@zeniv.linux.org.uk>, Amir Goldstein <amir73il@gmail.com>, 
-	NeilBrown <neil@brown.name>, Val Packett <val@packett.cool>, Jan Kara <jack@suse.cz>, 
-	linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>, Chris Mason <clm@fb.com>, 
-	David Sterba <dsterba@suse.com>, David Howells <dhowells@redhat.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, Tyler Hicks <code@tyhicks.com>, 
-	Chuck Lever <chuck.lever@oracle.com>, Olga Kornievskaia <okorniev@redhat.com>, 
-	Dai Ngo <Dai.Ngo@oracle.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Carlos Maiolino <cem@kernel.org>, John Johansen <john.johansen@canonical.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Ondrej Mosnacek <omosnace@redhat.com>, Mateusz Guzik <mjguzik@gmail.com>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Stefan Berger <stefanb@linux.ibm.com>, 
-	"Darrick J. Wong" <djwong@kernel.org>, linux-kernel@vger.kernel.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, linux-xfs@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org
-Subject: Re: [PATCH] fuse: fix conversion of fuse_reverse_inval_entry() to
- start_removing()
-Message-ID: <20251205-unmoralisch-jahrtausend-cca02ad0e4fa@brauner>
-References: <20251113002050.676694-1-neilb@ownmail.net>
- <20251113002050.676694-7-neilb@ownmail.net>
- <6713ea38-b583-4c86-b74a-bea55652851d@packett.cool>
- <176454037897.634289.3566631742434963788@noble.neil.brown.name>
- <CAOQ4uxjihcBxJzckbJis8hGcWO61QKhiqeGH+hDkTUkDhu23Ww@mail.gmail.com>
- <20251201083324.GA3538@ZenIV>
- <CAJfpegs+o01jgY76WsGnk9j41LS5V0JQSk--d6xsJJp4VjTh8Q@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aWdCvx7r"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764941208;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VOu/pciDgcF7ZyY8CZ3QBp/GQHrh32EkE7MVswuQoHU=;
+	b=aWdCvx7r+PNOqL2v9GjaLsS9jvSOrQ90KlfHXDSc6v3s7gghoTYOnx86rgCwBIlDJ2NlJg
+	REGQTvIa2OtjpD0cLSxQswlCVQA6XxXbAQTbX6Vy+hzhe1+L2f1WcyDS3SGK3lKg1vrDY3
+	cbXidjRVLP3PcbecaoEemratV4o/Br0=
+From: chenxiaosong.chenxiaosong@linux.dev
+To: sfrench@samba.org,
+	smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	linkinjeon@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	liuzhengyuan@kylinos.cn,
+	huhai@kylinos.cn,
+	liuyun01@kylinos.cn,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH v3 1/9] smb/client: reduce loop count in map_smb2_to_linux_error() by half
+Date: Fri,  5 Dec 2025 21:25:27 +0800
+Message-ID: <20251205132536.2703110-2-chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <20251205132536.2703110-1-chenxiaosong.chenxiaosong@linux.dev>
+References: <20251205132536.2703110-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJfpegs+o01jgY76WsGnk9j41LS5V0JQSk--d6xsJJp4VjTh8Q@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Dec 01, 2025 at 03:03:08PM +0100, Miklos Szeredi wrote:
-> On Mon, 1 Dec 2025 at 09:33, Al Viro <viro@zeniv.linux.org.uk> wrote:
-> >
-> > On Mon, Dec 01, 2025 at 09:22:54AM +0100, Amir Goldstein wrote:
-> >
-> > > I don't think there is a point in optimizing parallel dir operations
-> > > with FUSE server cache invalidation, but maybe I am missing
-> > > something.
-> >
-> > The interesting part is the expected semantics of operation;
-> > d_invalidate() side definitely doesn't need any of that cruft,
-> > but I would really like to understand what that function
-> > is supposed to do.
-> >
-> > Miklos, could you post a brain dump on that?
-> 
-> This function is supposed to invalidate a dentry due to remote changes
-> (FUSE_NOTIFY_INVAL_ENTRY).  Originally it was supplied a parent ID and
-> a name and called d_invalidate() on the looked up dentry.
-> 
-> Then it grew a variant (FUSE_NOTIFY_DELETE) that was also supplied a
-> child ID, which was matched against the looked up inode.  This was
-> commit 451d0f599934 ("FUSE: Notifying the kernel of deletion."),
-> Apparently this worked around the fact that at that time
-> d_invalidate() returned -EBUSY if the target was still in use and
-> didn't unhash the dentry in that case.
-> 
-> That was later changed by commit bafc9b754f75 ("vfs: More precise
-> tests in d_invalidate") to unconditionally unhash the target, which
-> effectively made FUSE_NOTIFY_INVAL_ENTRY and FUSE_NOTIFY_DELETE
-> equivalent and the code in question unnecessary.
-> 
-> For the future, we could also introduce FUSE_NOTIFY_MOVE, that would
-> differentiate between a delete and a move, while
-> FUSE_NOTIFY_INVAL_ENTRY would continue to be the common (deleted or
-> moved) notification.
-> 
-> Attaching untested patch to remove this cruft.
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Should we revert the fuse specific bits of c9ba789dad15 ("VFS: introduce
-start_creating_noperm() and start_removing_noperm()") and then apply
-your changes afterwards?
+The smb2_error_map_table array currently has 1743 elements. When searching
+for the last element and calling smb2_print_status(), 3486 comparisons
+are needed.
+
+The loop in smb2_print_status() is unnecessary, smb2_print_status() can be
+removed, and only iterate over the array once, printing the message when
+the target status code is found.
+
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/client/smb2maperror.c | 30 ++++++------------------------
+ 1 file changed, 6 insertions(+), 24 deletions(-)
+
+diff --git a/fs/smb/client/smb2maperror.c b/fs/smb/client/smb2maperror.c
+index 12c2b868789f..d1df6e518d21 100644
+--- a/fs/smb/client/smb2maperror.c
++++ b/fs/smb/client/smb2maperror.c
+@@ -2418,24 +2418,6 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
+ 	{0, 0, NULL}
+ };
+ 
+-/*****************************************************************************
+- Print an error message from the status code
+- *****************************************************************************/
+-static void
+-smb2_print_status(__le32 status)
+-{
+-	int idx = 0;
+-
+-	while (smb2_error_map_table[idx].status_string != NULL) {
+-		if ((smb2_error_map_table[idx].smb2_status) == status) {
+-			pr_notice("Status code returned 0x%08x %s\n", status,
+-				  smb2_error_map_table[idx].status_string);
+-		}
+-		idx++;
+-	}
+-	return;
+-}
+-
+ int
+ map_smb2_to_linux_error(char *buf, bool log_err)
+ {
+@@ -2452,16 +2434,16 @@ map_smb2_to_linux_error(char *buf, bool log_err)
+ 		return 0;
+ 	}
+ 
+-	/* mask facility */
+-	if (log_err && (smb2err != STATUS_MORE_PROCESSING_REQUIRED) &&
+-	    (smb2err != STATUS_END_OF_FILE))
+-		smb2_print_status(smb2err);
+-	else if (cifsFYI & CIFS_RC)
+-		smb2_print_status(smb2err);
++	log_err = (log_err && (smb2err != STATUS_MORE_PROCESSING_REQUIRED) &&
++		   (smb2err != STATUS_END_OF_FILE)) ||
++		  (cifsFYI & CIFS_RC);
+ 
+ 	for (i = 0; i < sizeof(smb2_error_map_table) /
+ 			sizeof(struct status_to_posix_error); i++) {
+ 		if (smb2_error_map_table[i].smb2_status == smb2err) {
++			if (log_err)
++				pr_notice("Status code returned 0x%08x %s\n", smb2err,
++					  smb2_error_map_table[i].status_string);
+ 			rc = smb2_error_map_table[i].posix_error;
+ 			break;
+ 		}
+-- 
+2.43.0
+
