@@ -1,32 +1,32 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5A821C16A
-	for <linux-cifs@vger.kernel.org>; Sat,  6 Dec 2025 15:19:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DB6273D75
+	for <linux-cifs@vger.kernel.org>; Sat,  6 Dec 2025 15:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765034381; cv=none; b=EL6+sqSJSYi5Ik95WcWpj/F4Znkk0GV7ozWtY2CiBqjuq5MfgUYrGqd1PJnAAFATDhL++ebsfcE+3ZUpXIMT8UZmp2cwVWqFHo/Jf6F6Ww9ZZT3PqML/KfuNPYTkfKmWae237uCAl0uWr1yBYj29lhQDFlOJzEQyTtrhW7ss6po=
+	t=1765034383; cv=none; b=pQp6sy01L0S35xrnj8HHXaDyG6gj8lz6PPyajY/hsEqrrWHHwronzpeulM1XP01FJ5bw8225YkUpB30W3s0SlNSOWVxNF6eIVMwPAn1JcQ6RxGe8Cq7ApD7ZmtbsLeIJNiox3H+2VbuQWpK2ayG7Y23xLkhgmHbLeKT4d5h9pDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765034381; c=relaxed/simple;
-	bh=zUYUihyU+5bVpkT+6WKXmtpr0BGZrQLsvYStT4Koz0c=;
+	s=arc-20240116; t=1765034383; c=relaxed/simple;
+	bh=pkfzsbbhoS8dSc0sCXHcgR0baQMXz4nmCTpdqOcLZkM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oCqYso7nU3l6JjUAaEkeX+/d9ml1+yMHGxDjlvY/skrCTVc/OAIOkLnEsgaoD5+MAw0qpnnjbXyZ9X3vUt1H+jhHkgS9R6CYeYVrobKEpyCKFrptO8LiJxFi/2kauClWkLOUXG97X3KEqr4hL0nkkBCOck0bGACdf9c3HtaN4Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qNQBkE3b; arc=none smtp.client-ip=91.218.175.186
+	 MIME-Version; b=WMeSoUAJ0F3sB2MGzf+7Uq8WBsJF9GJXh47soJmx+SOoq93dYc1Pj3wazaZY7WYCnCAQGTEXto6Rik6zzIe8ZK/3kB6aTWcaVr19XFfBU/cmnFJgo1MgvKG5Dx6IVHfUL9KHDClfAydlu+NfKIwaJEmS+IYa3DHqSFglrFYyHDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xhwduOHC; arc=none smtp.client-ip=91.218.175.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qNQBkE3b"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xhwduOHC"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765034375;
+	t=1765034378;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VOu/pciDgcF7ZyY8CZ3QBp/GQHrh32EkE7MVswuQoHU=;
-	b=qNQBkE3bp9Zmxa92Es61ewEzcJ93+2gfE9UrxaXdloF1n8bqYBqbmGWnvk0Y3pdCUqHUM+
-	fQReqogvFBOkIfSwbnYAXu9FaRWQX1+/gwF7tdzc4D9RSrUp1mbRoXlW1LdyB9PcbltNQQ
-	Xm61re4P2nelBKXBG7HioKAGACOHkYU=
+	bh=tpu2+fHhdm+SVBxmfXBwkvLZquyK3vrWeg83HtvStqA=;
+	b=xhwduOHCws3w47hmiK6h00O6y+krTM38LRKxoeRjtbNY3z8ED3MUQ2Jm2+0qY+oCWjB5xu
+	SIMEYhtAcB+iZMU5tQf/1Enok++oUxervXChj59q+Y7SDEaSVUG4akLjs40FsxjGpGpei7
+	W3Gd7ipyArY4c734eMfJ5ybgzZsjT8s=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: sfrench@samba.org,
 	smfrench@gmail.com,
@@ -38,9 +38,9 @@ Cc: linux-cifs@vger.kernel.org,
 	huhai@kylinos.cn,
 	liuyun01@kylinos.cn,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v4 01/10] smb/client: reduce loop count in map_smb2_to_linux_error() by half
-Date: Sat,  6 Dec 2025 23:18:17 +0800
-Message-ID: <20251206151826.2932970-2-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH v4 02/10] smb/client: remove unused elements from smb2_error_map_table array
+Date: Sat,  6 Dec 2025 23:18:18 +0800
+Message-ID: <20251206151826.2932970-3-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251206151826.2932970-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251206151826.2932970-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -54,71 +54,38 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-The smb2_error_map_table array currently has 1743 elements. When searching
-for the last element and calling smb2_print_status(), 3486 comparisons
-are needed.
+STATUS_SUCCESS and STATUS_WAIT_0 are both zero, and since zero indicates
+success, they are not needed.
 
-The loop in smb2_print_status() is unnecessary, smb2_print_status() can be
-removed, and only iterate over the array once, printing the message when
-the target status code is found.
+Since smb2_print_status() has been removed, the last element in the array
+is no longer needed.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smb2maperror.c | 30 ++++++------------------------
- 1 file changed, 6 insertions(+), 24 deletions(-)
+ fs/smb/client/smb2maperror.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/fs/smb/client/smb2maperror.c b/fs/smb/client/smb2maperror.c
-index 12c2b868789f..d1df6e518d21 100644
+index d1df6e518d21..118e32cc8edc 100644
 --- a/fs/smb/client/smb2maperror.c
 +++ b/fs/smb/client/smb2maperror.c
-@@ -2418,24 +2418,6 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
- 	{0, 0, NULL}
+@@ -23,8 +23,6 @@ struct status_to_posix_error {
  };
  
--/*****************************************************************************
-- Print an error message from the status code
-- *****************************************************************************/
--static void
--smb2_print_status(__le32 status)
--{
--	int idx = 0;
--
--	while (smb2_error_map_table[idx].status_string != NULL) {
--		if ((smb2_error_map_table[idx].smb2_status) == status) {
--			pr_notice("Status code returned 0x%08x %s\n", status,
--				  smb2_error_map_table[idx].status_string);
--		}
--		idx++;
--	}
--	return;
--}
--
+ static const struct status_to_posix_error smb2_error_map_table[] = {
+-	{STATUS_SUCCESS, 0, "STATUS_SUCCESS"},
+-	{STATUS_WAIT_0,  0, "STATUS_WAIT_0"},
+ 	{STATUS_WAIT_1, -EIO, "STATUS_WAIT_1"},
+ 	{STATUS_WAIT_2, -EIO, "STATUS_WAIT_2"},
+ 	{STATUS_WAIT_3, -EIO, "STATUS_WAIT_3"},
+@@ -2415,7 +2413,6 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
+ 	{STATUS_IPSEC_INTEGRITY_CHECK_FAILED, -EIO,
+ 	"STATUS_IPSEC_INTEGRITY_CHECK_FAILED"},
+ 	{STATUS_IPSEC_CLEAR_TEXT_DROP, -EIO, "STATUS_IPSEC_CLEAR_TEXT_DROP"},
+-	{0, 0, NULL}
+ };
+ 
  int
- map_smb2_to_linux_error(char *buf, bool log_err)
- {
-@@ -2452,16 +2434,16 @@ map_smb2_to_linux_error(char *buf, bool log_err)
- 		return 0;
- 	}
- 
--	/* mask facility */
--	if (log_err && (smb2err != STATUS_MORE_PROCESSING_REQUIRED) &&
--	    (smb2err != STATUS_END_OF_FILE))
--		smb2_print_status(smb2err);
--	else if (cifsFYI & CIFS_RC)
--		smb2_print_status(smb2err);
-+	log_err = (log_err && (smb2err != STATUS_MORE_PROCESSING_REQUIRED) &&
-+		   (smb2err != STATUS_END_OF_FILE)) ||
-+		  (cifsFYI & CIFS_RC);
- 
- 	for (i = 0; i < sizeof(smb2_error_map_table) /
- 			sizeof(struct status_to_posix_error); i++) {
- 		if (smb2_error_map_table[i].smb2_status == smb2err) {
-+			if (log_err)
-+				pr_notice("Status code returned 0x%08x %s\n", smb2err,
-+					  smb2_error_map_table[i].status_string);
- 			rc = smb2_error_map_table[i].posix_error;
- 			break;
- 		}
 -- 
 2.43.0
 
