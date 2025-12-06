@@ -1,43 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360802FE07B;
-	Sat,  6 Dec 2025 14:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513852FE58C;
+	Sat,  6 Dec 2025 14:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765029780; cv=none; b=RFAIpWM7AK0UZgoCZEckysNJ2qoUTjT4WfHOW6Q45D9gHJx+x/wQmXsrgJAG2Te8/FM6q9kVQQR4K59ys176FHv466F5zvmb7LqgoqUkyVvwfcqyUkCTmmvQu0kUtjDq9GGKpktJrPV2K7f9Poii936pTsLZaPZM9+XUIewWBHw=
+	t=1765029834; cv=none; b=oYoff0I2Dty98+hZF5bxymi4zZBioqV8ohOTkxuaTeOgK1RPvUHVd9hn5bSoMv+rx1c6vu0grZjugsKHaoW2CRRvz7Nlfc0UxIdJ7OZv4+lHyC1mY8jVopxB5fKS6O5VnzlAOMzMPlBOPjbSIYGov1lLl7C/vYf5i/YKBp6MuUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765029780; c=relaxed/simple;
-	bh=NzjKNhNrGPhJ1zkrIoEVkRBmKWVtXVkk4l/qmfRLAmM=;
+	s=arc-20240116; t=1765029834; c=relaxed/simple;
+	bh=X0iKf/mzWfXeAmjBbHV4DqH7woOS//wu71pCfbmSVjs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A+R8u4QjqNJDAfexOhHTEUmK9fNDOL0ksVOiH+L9STNH3bdASwTBUmkK2dQvPiyVhVgSUycLuNlJ/6LQl0pGQgFpeQ/jTvOKZyx/ISpg7N5dEz8wYk7QRwEmXIMNnRSup3ktv8SDo1uA1eK5iIvIFAFz9R81lSgh557thnTjacU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u88EYyWt; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=mIVp8e6XQp1zKv1jTajsjaHj3fQ34NwM2f0oCBRCjteR3JE+o+4ABP4/f1ffXBG4hs3p9Y89OLqRgnN4MZYMdFIxbCg0RNjLTiTfdq5c7RBWORLkIKLKgdTTBO0GQkbwqzn62KhzUW3kXQiGQdfr8vIVZICwj5Oh9NFIjszO3nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XbDKM5qs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u88EYyWt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8394EC4CEF5;
-	Sat,  6 Dec 2025 14:02:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XbDKM5qs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B49E7C113D0;
+	Sat,  6 Dec 2025 14:03:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765029779;
-	bh=NzjKNhNrGPhJ1zkrIoEVkRBmKWVtXVkk4l/qmfRLAmM=;
+	s=k20201202; t=1765029834;
+	bh=X0iKf/mzWfXeAmjBbHV4DqH7woOS//wu71pCfbmSVjs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=u88EYyWtCsIPWg47nYRY82b4ca0BIkPVYU5s6oYkahK5CdsAdc3aj5NCauiBXHNKA
-	 eqLR7ZuweSF8ofWC0StMTpXXuKkGvgLdtxqQRG7ItFVUdXF5oqH2Gyl5uqiEr7zNYk
-	 BG4gHuZi6Abq7lwPYjtYP9gZm8NEfk30B4wfexOTQ85nY/ri4zgP9ATiBX8JeNPFik
-	 VGHARiR+PvK1J/6hvY5RjhlB7ZVKxP93b+qveRZIJNdJVhaBpnBY1aGR7nqqQ36Art
-	 X3n5fgDaNh3xY1ozHck+Vaq8wzk7RwOg3+yZ44Q6pJPg1qMptXIlZTnE8xudorXPH6
-	 deO/LOihDaBVg==
+	b=XbDKM5qsWGPeCQHtpBM3rxzCPiSJqo6dOlbMfIBYHlld1s0milSVnRO9ELTwge2W0
+	 /mzAs+v3e4V+x3mTM5SLuNLfr9SyKsxgCilkU3Cy1gnHhWphE4+X0+ZUZOyeRmSpAP
+	 +0YilCWUQ0dVTxY2FMS8nlSg8fkM60BtEA+auPcZaVfgnv2Q2vW+iB5i/vPg1jGv88
+	 etrGoJGK9JyLvbVaFtbqG1Wbtdr6Ap5VuJUhpvPUku7GhpVRkRaV7xWCVCI/Un52t7
+	 fiTz4nd3FsQDbBLFz5j5C8+iCwHW1Z4tei2ZXSM7B8NPzpzgN7yOqQR6XEbERZg40c
+	 hBYdw9NB3kXcg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: ChenXiaoSong <chenxiaosong@kylinos.cn>,
+Cc: Qianchang Zhao <pioooooooooip@gmail.com>,
+	Zhitong Liu <liuzhitong1993@gmail.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
 	smfrench@gmail.com,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-6.1] smb/server: fix return value of smb2_ioctl()
-Date: Sat,  6 Dec 2025 09:02:08 -0500
-Message-ID: <20251206140252.645973-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.6] ksmbd: vfs: fix race on m_flags in vfs_cache
+Date: Sat,  6 Dec 2025 09:02:32 -0500
+Message-ID: <20251206140252.645973-27-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251206140252.645973-1-sashal@kernel.org>
 References: <20251206140252.645973-1-sashal@kernel.org>
@@ -52,16 +53,46 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.18
 Content-Transfer-Encoding: 8bit
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+From: Qianchang Zhao <pioooooooooip@gmail.com>
 
-[ Upstream commit 269df046c1e15ab34fa26fd90db9381f022a0963 ]
+[ Upstream commit 991f8a79db99b14c48d20d2052c82d65b9186cad ]
 
-__process_request() will not print error messages if smb2_ioctl()
-always returns 0.
+ksmbd maintains delete-on-close and pending-delete state in
+ksmbd_inode->m_flags. In vfs_cache.c this field is accessed under
+inconsistent locking: some paths read and modify m_flags under
+ci->m_lock while others do so without taking the lock at all.
 
-Fix this by returning the correct value at the end of function.
+Examples:
 
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+ - ksmbd_query_inode_status() and __ksmbd_inode_close() use
+   ci->m_lock when checking or updating m_flags.
+ - ksmbd_inode_pending_delete(), ksmbd_set_inode_pending_delete(),
+   ksmbd_clear_inode_pending_delete() and ksmbd_fd_set_delete_on_close()
+   used to read and modify m_flags without ci->m_lock.
+
+This creates a potential data race on m_flags when multiple threads
+open, close and delete the same file concurrently. In the worst case
+delete-on-close and pending-delete bits can be lost or observed in an
+inconsistent state, leading to confusing delete semantics (files that
+stay on disk after delete-on-close, or files that disappear while still
+in use).
+
+Fix it by:
+
+ - Making ksmbd_query_inode_status() look at m_flags under ci->m_lock
+   after dropping inode_hash_lock.
+ - Adding ci->m_lock protection to all helpers that read or modify
+   m_flags (ksmbd_inode_pending_delete(), ksmbd_set_inode_pending_delete(),
+   ksmbd_clear_inode_pending_delete(), ksmbd_fd_set_delete_on_close()).
+ - Keeping the existing ci->m_lock protection in __ksmbd_inode_close(),
+   and moving the actual unlink/xattr removal outside the lock.
+
+This unifies the locking around m_flags and removes the data race while
+preserving the existing delete-on-close behaviour.
+
+Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
+Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
 Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
@@ -71,45 +102,144 @@ LLM Generated explanations, may be completely bogus:
 
 
 
- fs/smb/server/smb2pdu.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ fs/smb/server/vfs_cache.c | 88 +++++++++++++++++++++++++++------------
+ 1 file changed, 62 insertions(+), 26 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index f901ae18e68ad..a2830ec67e782 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -8164,7 +8164,7 @@ int smb2_ioctl(struct ksmbd_work *work)
- 		id = req->VolatileFileId;
+diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
+index dfed6fce89049..6ef116585af64 100644
+--- a/fs/smb/server/vfs_cache.c
++++ b/fs/smb/server/vfs_cache.c
+@@ -112,40 +112,62 @@ int ksmbd_query_inode_status(struct dentry *dentry)
  
- 	if (req->Flags != cpu_to_le32(SMB2_0_IOCTL_IS_FSCTL)) {
--		rsp->hdr.Status = STATUS_NOT_SUPPORTED;
-+		ret = -EOPNOTSUPP;
- 		goto out;
- 	}
- 
-@@ -8184,8 +8184,9 @@ int smb2_ioctl(struct ksmbd_work *work)
- 	case FSCTL_DFS_GET_REFERRALS:
- 	case FSCTL_DFS_GET_REFERRALS_EX:
- 		/* Not support DFS yet */
-+		ret = -EOPNOTSUPP;
- 		rsp->hdr.Status = STATUS_FS_DRIVER_REQUIRED;
--		goto out;
-+		goto out2;
- 	case FSCTL_CREATE_OR_GET_OBJECT_ID:
- 	{
- 		struct file_object_buf_type1_ioctl_rsp *obj_buf;
-@@ -8475,8 +8476,10 @@ int smb2_ioctl(struct ksmbd_work *work)
- 		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
- 	else if (ret < 0 || rsp->hdr.Status == 0)
- 		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+ 	read_lock(&inode_hash_lock);
+ 	ci = __ksmbd_inode_lookup(dentry);
+-	if (ci) {
+-		ret = KSMBD_INODE_STATUS_OK;
+-		if (ci->m_flags & (S_DEL_PENDING | S_DEL_ON_CLS))
+-			ret = KSMBD_INODE_STATUS_PENDING_DELETE;
+-		atomic_dec(&ci->m_count);
+-	}
+ 	read_unlock(&inode_hash_lock);
++	if (!ci)
++		return ret;
 +
-+out2:
- 	smb2_set_err_rsp(work);
--	return 0;
++	down_read(&ci->m_lock);
++	if (ci->m_flags & (S_DEL_PENDING | S_DEL_ON_CLS))
++		ret = KSMBD_INODE_STATUS_PENDING_DELETE;
++	else
++		ret = KSMBD_INODE_STATUS_OK;
++	up_read(&ci->m_lock);
++
++	atomic_dec(&ci->m_count);
+ 	return ret;
+ }
+ 
+ bool ksmbd_inode_pending_delete(struct ksmbd_file *fp)
+ {
+-	return (fp->f_ci->m_flags & (S_DEL_PENDING | S_DEL_ON_CLS));
++	struct ksmbd_inode *ci = fp->f_ci;
++	int ret;
++
++	down_read(&ci->m_lock);
++	ret = (ci->m_flags & (S_DEL_PENDING | S_DEL_ON_CLS));
++	up_read(&ci->m_lock);
++
 +	return ret;
  }
  
- /**
+ void ksmbd_set_inode_pending_delete(struct ksmbd_file *fp)
+ {
+-	fp->f_ci->m_flags |= S_DEL_PENDING;
++	struct ksmbd_inode *ci = fp->f_ci;
++
++	down_write(&ci->m_lock);
++	ci->m_flags |= S_DEL_PENDING;
++	up_write(&ci->m_lock);
+ }
+ 
+ void ksmbd_clear_inode_pending_delete(struct ksmbd_file *fp)
+ {
+-	fp->f_ci->m_flags &= ~S_DEL_PENDING;
++	struct ksmbd_inode *ci = fp->f_ci;
++
++	down_write(&ci->m_lock);
++	ci->m_flags &= ~S_DEL_PENDING;
++	up_write(&ci->m_lock);
+ }
+ 
+ void ksmbd_fd_set_delete_on_close(struct ksmbd_file *fp,
+ 				  int file_info)
+ {
+-	if (ksmbd_stream_fd(fp)) {
+-		fp->f_ci->m_flags |= S_DEL_ON_CLS_STREAM;
+-		return;
+-	}
++	struct ksmbd_inode *ci = fp->f_ci;
+ 
+-	fp->f_ci->m_flags |= S_DEL_ON_CLS;
++	down_write(&ci->m_lock);
++	if (ksmbd_stream_fd(fp))
++		ci->m_flags |= S_DEL_ON_CLS_STREAM;
++	else
++		ci->m_flags |= S_DEL_ON_CLS;
++	up_write(&ci->m_lock);
+ }
+ 
+ static void ksmbd_inode_hash(struct ksmbd_inode *ci)
+@@ -257,27 +279,41 @@ static void __ksmbd_inode_close(struct ksmbd_file *fp)
+ 	struct file *filp;
+ 
+ 	filp = fp->filp;
+-	if (ksmbd_stream_fd(fp) && (ci->m_flags & S_DEL_ON_CLS_STREAM)) {
+-		ci->m_flags &= ~S_DEL_ON_CLS_STREAM;
+-		err = ksmbd_vfs_remove_xattr(file_mnt_idmap(filp),
+-					     &filp->f_path,
+-					     fp->stream.name,
+-					     true);
+-		if (err)
+-			pr_err("remove xattr failed : %s\n",
+-			       fp->stream.name);
++
++	if (ksmbd_stream_fd(fp)) {
++		bool remove_stream_xattr = false;
++
++		down_write(&ci->m_lock);
++		if (ci->m_flags & S_DEL_ON_CLS_STREAM) {
++			ci->m_flags &= ~S_DEL_ON_CLS_STREAM;
++			remove_stream_xattr = true;
++		}
++		up_write(&ci->m_lock);
++
++		if (remove_stream_xattr) {
++			err = ksmbd_vfs_remove_xattr(file_mnt_idmap(filp),
++						     &filp->f_path,
++						     fp->stream.name,
++						     true);
++			if (err)
++				pr_err("remove xattr failed : %s\n",
++				       fp->stream.name);
++		}
+ 	}
+ 
+ 	if (atomic_dec_and_test(&ci->m_count)) {
++		bool do_unlink = false;
++
+ 		down_write(&ci->m_lock);
+ 		if (ci->m_flags & (S_DEL_ON_CLS | S_DEL_PENDING)) {
+ 			ci->m_flags &= ~(S_DEL_ON_CLS | S_DEL_PENDING);
+-			up_write(&ci->m_lock);
+-			ksmbd_vfs_unlink(filp);
+-			down_write(&ci->m_lock);
++			do_unlink = true;
+ 		}
+ 		up_write(&ci->m_lock);
+ 
++		if (do_unlink)
++			ksmbd_vfs_unlink(filp);
++
+ 		ksmbd_inode_free(ci);
+ 	}
+ }
 -- 
 2.51.0
 
