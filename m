@@ -1,116 +1,83 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F30A243964;
-	Mon,  8 Dec 2025 16:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A2522D785
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Dec 2025 16:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765210407; cv=none; b=F2oAJT8dU2znVbdOl7x0AIO/3N7uhN35NHwo3kO/qsUpylfZkUT7MHfG9IodCg23PFXUPUUUwJAv21uHeyKbr3zluy+luAhGaO8OeNPzQ0ppd5h4rP4Jr6y4j3TYt7jasTQiIQpAj89U/WIZhe2gsUznq1X2VSQOrsFrHREvzus=
+	t=1765211124; cv=none; b=Ol/XpeTTt6MvC3iCRRy/VNRIXbOmv3XBXGehOpy7UwoGNn0bGD0qQjhhstJm3q/df9CVa2a5G+5wVC654sPOWHkOxygwqRQic2h8UXUrNXfsfJTKbG3nxevGCOg3x2jCX7CBJ3qIiHekj1U8ZDeIh+y5HG3N78WZTmvKH0MYkQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765210407; c=relaxed/simple;
-	bh=8JEPUqKIeNRlLUwKZuNZt7U9h0L+xV6BD64dp5nFH+g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l+yt6BpUtTyHY8cDgxjDMghaFeI5aJfACjkQH+f/OBpzqOZ0ADAZXgmRsXnZ0qdAJSvmLXFwPCAcPd/sLUnlLtmsBJSi6r1Y68zOSbUsYmWQT1B+NyR+1juTyCF5pxjqLbFAr7yeJFz9xiF5nlIb+RKheI4D0dDHZ6vTPwCLTz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=z1JlFzbp; arc=none smtp.client-ip=144.76.82.148
+	s=arc-20240116; t=1765211124; c=relaxed/simple;
+	bh=xlTEHXzooNNDeBGXIesmCNyNHRun9mTjr4WRgeJFFxo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jmdrELrIYCSMz9CYmrDIShhEj6FL0tKiKbM/8CU7Zfs8oZ8d2c9fkBAv/wViNCGvJZIMnEd1o0byEDXP0riH63FhH4ZyzQzeZyP09XobuagwK7IcdBPbGocqO+0C8uaxBzaSHZtn6IWxvdzWiLqaUCTg1GyBP5KUcg1ecD+AQLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=IMQgl7hK; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="z1JlFzbp"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="IMQgl7hK"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=giSEI3/gk3foCShfgVWOQvyhQ7VqEwhYgaxukEY4fvk=; b=z1JlFzbpV/pt/+LT08Gy3Vh8uy
-	QPUk0QbxFS6ZX2IBaV/bD0QbBNehfJadhdWOXQarRLK71qvlj1hn94d+LdgPNvfXqz9IhhRQjtMgN
-	4G9XTWg6+YLA1ypZZW/GAJdAnwq9Jz4i3Gv7A08jB5Q4qugPu69uxxo3X+679lmzGZgzi8DpixXN/
-	PvELwTbRRQLq57JiXLTMTRPLL+iLl/vEtF0cvochqUP131pp1iV+G8HHc1cn9eKIut8sYeKRIJbl7
-	j6Aiu/AmHQRiDy5HhI4qUlvJ412TrmYVVSoMR/lg84oP/4MD02O25IVZLq/fdY+BTO/eydhtCOTdT
-	GWF9evP3trVsTC/dhhYTl+bC1/mbSYTIowfhn99me6KNlg7YG3DlpjWWTLMP6C2CPcoGHbkVOmyUy
-	ZmVXeFw4SlJn9KXkLsX59E79yiM4iYsnXzVa2349sxGjWapCPXuiz9QakHiwICVLxR2Vvxe7M8bYZ
-	ZJxcLiolWc55Y49uvfPqG+VX;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=CiKrVI85vD3bbzXcBhDbKFazTe0ABFjTGTTal9tlVOY=; b=IMQgl7hKwD6HCTpMYBDwu+KKlQ
+	jchSddw9z5IgIpRHGKOHcRkqD3NymoZfuZs3u+CAzVCKDiZLUxlk+6RECScEhK+7D55qp8opVGoIp
+	MlvlZq2khacm4An+PjHWgW/DScwTmi7KfFiUuLUlURjcRfNDqoaEJ2IyPhU+JwPIEWtyw5nfSsh7a
+	68frh69d7NkPvzY0MYGmnvDmT7U2ntwF6JNgut7ey5ogF4MrEnyc5JyWkjSPY2Mt/yKxLb+mKvGwf
+	4b9CgF9qcYzPx7+xXmzSDibOy0YgnMuvhmWGBp1P8KbzQ28Dzs5gGwtZt1QEl8B4lD3cm0sUWjRYq
+	rPty2b970THA2alk3ej3HE6W5xSxdk9U1HY0ZHws5x/y191kJi+vz6e4myCOe9cnQ7qKy14EP5YFU
+	OZsxdM5UUMWLECvZ8WDyIm07bwXe55JvYa396R36NHPcAigqnm1FCHJzub+B7oy5zr3p+N+xoEccX
+	6m14GW2zRMSWHnJPy5+Bi/6b;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vSdrW-00HPwG-30;
-	Mon, 08 Dec 2025 16:13:22 +0000
-Message-ID: <226b2608-b6b9-4041-a5b8-e00de6582344@samba.org>
-Date: Mon, 8 Dec 2025 17:13:22 +0100
+	id 1vSdUL-00HPnf-26;
+	Mon, 08 Dec 2025 15:49:25 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>
+Subject: [PATCH] smb: server: reset smb_direct_port = SMB_DIRECT_PORT_INFINIBAND on init
+Date: Mon,  8 Dec 2025 16:49:19 +0100
+Message-ID: <20251208154919.934760-1-metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Problem with smbdirect rw credits and initiator_depth
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Tom Talpey <tom@talpey.com>,
- "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-References: <35eec2e6-bf37-43d6-a2d8-7a939a68021b@samba.org>
- <CAKYAXd9p=7BzmSSKi5n41OKkkw4qrr4cWpWet7rUfC+VT-6h1g@mail.gmail.com>
- <f59e0dc7-e91c-4a13-8d49-fe183c10b6f4@samba.org>
- <CAKYAXd-MF1j+CkbWakFJK2ov_SfRUXaRuT6jE0uHZoLxTu130Q@mail.gmail.com>
- <CAKYAXd__T=L9aWwOuY7Z8fJgMf404=KQ2dTpNRd3mq9dnYCxRw@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAKYAXd__T=L9aWwOuY7Z8fJgMf404=KQ2dTpNRd3mq9dnYCxRw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Am 05.12.25 um 13:21 schrieb Namjae Jeon:
->>> Can you at least post the dmesg output generated by this:
->>> https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=7e724ebc58e986f4e101a55f4ab5e96912239918
->>> Assuming that this wasn't triggered:
->>> if (WARN_ONCE(needed > max_possible, "needed:%u > max:%u\n", needed, max_possible))
->> I didn't know you wanted it. I will share it after office.
-> I have attached v2 and v3 logs. Let me know if you need something more,
+This allows testing with different devices (iwrap vs. non-iwarp) without
+'rmmod ksmbd && modprobe ksmbd', but instead
+'ksmbd.control -s && ksmbd.mountd' is enough.
 
-Thanks!
+In the long run we want to listen on iwarp and non-iwarp at the same time,
+but requires more changes, most likely also in the rdma layer.
 
-A difference is that max_sgl_rd=3 is non 0, so it likely
-takes a different code path for compared to irdma (roce) and rxe.
-This can also be forced with the force_mr=1 module parameter of ib_core...
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+---
+ fs/smb/server/transport_rdma.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-It would be good to see captures while testing with rxe for ksmbd.
-
->>>
->>> Did you run the bpftrace command? Did it print a lot of
->>> 'smb_direct_rdma_xmit' message over the whole time of the file copy?
->> No, I didn't check it. but I will try this.
-> /mnt# bpftrace ksmbd-rdma-xmit.bt
-> Attaching 1 probe...
-> 
-> The absence of any output after Attaching 1 probe... indicates that
-> the smb_direct_rdma_xmit function has not been called ?
-
-It seems to, does the client has smb signing required?
-
-I tested ksmbd with 'server signing = mandatory' and
-as far as I remember copying a 5GB iso from and to
-the server worked fine.
-
-I used this bpftrace script to show that smbdirect
-was really used, but without RDMA read/write offload:
-
-
-kprobe:smb_direct_rdma_xmit {
-         printf("%s: %s pid=%d %s: BEGIN\n", strftime("%F %H:%M:%S", nsecs(sw_tai)), comm, pid, func)
-}
-
-kretprobe:smb_direct_rdma_xmit {
-         //printf("%s: %s pid=%d %s: RETURN\n", strftime("%F %H:%M:%S", nsecs(sw_tai)), comm, pid, func)
-}
-kprobe:read_done {
-         printf("%s: %s pid=%d %s\n", strftime("%F %H:%M:%S", nsecs(sw_tai)), comm, pid, func)
-}
-
-kprobe:write_done {
-         printf("%s: %s pid=%d %s\n", strftime("%F %H:%M:%S", nsecs(sw_tai)), comm, pid, func)
-}
-
-kprobe:smb2_write {
-         printf("%s: %s pid=%d %s\n", strftime("%F %H:%M:%S", nsecs(sw_tai)), comm, pid, func)
-}
-kprobe:smb2_read {
-         printf("%s: %s pid=%d %s\n", strftime("%F %H:%M:%S", nsecs(sw_tai)), comm, pid, func)
-}
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index f585359684d4..05f008ea51cd 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -2708,6 +2708,7 @@ int ksmbd_rdma_init(void)
+ {
+ 	int ret;
+ 
++	smb_direct_port = SMB_DIRECT_PORT_INFINIBAND;
+ 	smb_direct_listener.cm_id = NULL;
+ 
+ 	ret = ib_register_client(&smb_direct_ib_client);
+-- 
+2.43.0
 
