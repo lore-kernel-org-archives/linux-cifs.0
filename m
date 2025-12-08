@@ -1,83 +1,103 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A2522D785
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Dec 2025 16:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B985154BF5;
+	Mon,  8 Dec 2025 21:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765211124; cv=none; b=Ol/XpeTTt6MvC3iCRRy/VNRIXbOmv3XBXGehOpy7UwoGNn0bGD0qQjhhstJm3q/df9CVa2a5G+5wVC654sPOWHkOxygwqRQic2h8UXUrNXfsfJTKbG3nxevGCOg3x2jCX7CBJ3qIiHekj1U8ZDeIh+y5HG3N78WZTmvKH0MYkQw=
+	t=1765229413; cv=none; b=mxnYYeqzsOJY9h5qsE9CaGPHW/1+x1WolbqBS2ZJyKJVKw3EFDuuncOED/fS4hjx5I6snEsZU/JYcLXgMOe6ZAJeCdYizCswof00gA2AaUvDfHi/n1hWDeJxn5bO1FfGyDCUpIoiR7gMWcMZH4lxUEay9S/uOmaYYIjuMDRhRmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765211124; c=relaxed/simple;
-	bh=xlTEHXzooNNDeBGXIesmCNyNHRun9mTjr4WRgeJFFxo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jmdrELrIYCSMz9CYmrDIShhEj6FL0tKiKbM/8CU7Zfs8oZ8d2c9fkBAv/wViNCGvJZIMnEd1o0byEDXP0riH63FhH4ZyzQzeZyP09XobuagwK7IcdBPbGocqO+0C8uaxBzaSHZtn6IWxvdzWiLqaUCTg1GyBP5KUcg1ecD+AQLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=IMQgl7hK; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1765229413; c=relaxed/simple;
+	bh=dSjRYMAUi+Fh7KbgzZuw4JPY3nICl9XaJqm4MWGB49I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=moCxJB/vCf/ttIjMrwibp2Do7ZhQblR3HdrPbYH6zHyoaND0Ss1+ZiUZOhyR4kj8zR+a6in5wBsif8/+4nlrx3D5ZcpP4EdjyXNO6wJxP9c2mdLADTB0QoJRTvQRBujZYuHxMDWwEFTC41miA56KR1YRo5yDnpqUGMpctlyNeZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=maG8/Yby; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="IMQgl7hK"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=CiKrVI85vD3bbzXcBhDbKFazTe0ABFjTGTTal9tlVOY=; b=IMQgl7hKwD6HCTpMYBDwu+KKlQ
-	jchSddw9z5IgIpRHGKOHcRkqD3NymoZfuZs3u+CAzVCKDiZLUxlk+6RECScEhK+7D55qp8opVGoIp
-	MlvlZq2khacm4An+PjHWgW/DScwTmi7KfFiUuLUlURjcRfNDqoaEJ2IyPhU+JwPIEWtyw5nfSsh7a
-	68frh69d7NkPvzY0MYGmnvDmT7U2ntwF6JNgut7ey5ogF4MrEnyc5JyWkjSPY2Mt/yKxLb+mKvGwf
-	4b9CgF9qcYzPx7+xXmzSDibOy0YgnMuvhmWGBp1P8KbzQ28Dzs5gGwtZt1QEl8B4lD3cm0sUWjRYq
-	rPty2b970THA2alk3ej3HE6W5xSxdk9U1HY0ZHws5x/y191kJi+vz6e4myCOe9cnQ7qKy14EP5YFU
-	OZsxdM5UUMWLECvZ8WDyIm07bwXe55JvYa396R36NHPcAigqnm1FCHJzub+B7oy5zr3p+N+xoEccX
-	6m14GW2zRMSWHnJPy5+Bi/6b;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vSdUL-00HPnf-26;
-	Mon, 08 Dec 2025 15:49:25 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: metze@samba.org,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>
-Subject: [PATCH] smb: server: reset smb_direct_port = SMB_DIRECT_PORT_INFINIBAND on init
-Date: Mon,  8 Dec 2025 16:49:19 +0100
-Message-ID: <20251208154919.934760-1-metze@samba.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="maG8/Yby"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765229412; x=1796765412;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dSjRYMAUi+Fh7KbgzZuw4JPY3nICl9XaJqm4MWGB49I=;
+  b=maG8/YbyXXG1hoGIfOIkwHPqpcJ9S+7kN8g9dSYeiWqL4IzY4WkVwmCp
+   dwa+Dqyt1/msndHQIAAeqoLwqC8JgBfqYb3c5fdS9yysWWFbSfT5VVbb+
+   o48dlKw2drg/Nkg0NS0c/l7DVJma4+38XyzRZqflKli0sA6w64bCKQATt
+   uBMd8x9lyRXo7go3uJ9Xpd/Hd7Di2JCZiPERynfFgUNEwqHRdMBAhmomZ
+   ofNxohyaZuM52ZY2ZgA7kDkVlC8+cgt30YjCgczGx1XT27CD3sxb7KJ7F
+   OzesIkPgsQM65XwzZ0bxkyLSUrZ0V4c73UoqJfJiOQvHeTdEydd46UVUC
+   g==;
+X-CSE-ConnectionGUID: Dfk1I395RZ2Hj2LQa7ugaw==
+X-CSE-MsgGUID: N27oqpnbTXm8LaRL+JEqvw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11636"; a="69771987"
+X-IronPort-AV: E=Sophos;i="6.20,259,1758610800"; 
+   d="scan'208";a="69771987"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 13:30:11 -0800
+X-CSE-ConnectionGUID: jP1R5lP0QQON8jm1kSvOZA==
+X-CSE-MsgGUID: YtrADeo/QX2B6BVobaAPzA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,259,1758610800"; 
+   d="scan'208";a="201163656"
+Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 08 Dec 2025 13:30:09 -0800
+Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vSio1-000000000sP-2vJg;
+	Mon, 08 Dec 2025 21:30:05 +0000
+Date: Tue, 9 Dec 2025 05:29:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: chenxiaosong.chenxiaosong@linux.dev, sfrench@samba.org,
+	smfrench@gmail.com, linkinjeon@kernel.org, linkinjeon@samba.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: Re: [PATCH v4 08/10] smb/client: introduce smb2maperror KUnit tests
+Message-ID: <202512090558.gcQGSnU4-lkp@intel.com>
+References: <20251206151826.2932970-9-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251206151826.2932970-9-chenxiaosong.chenxiaosong@linux.dev>
 
-This allows testing with different devices (iwrap vs. non-iwarp) without
-'rmmod ksmbd && modprobe ksmbd', but instead
-'ksmbd.control -s && ksmbd.mountd' is enough.
+Hi,
 
-In the long run we want to listen on iwarp and non-iwarp at the same time,
-but requires more changes, most likely also in the rdma layer.
+kernel test robot noticed the following build errors:
 
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
----
- fs/smb/server/transport_rdma.c | 1 +
- 1 file changed, 1 insertion(+)
+[auto build test ERROR on brauner-vfs/vfs.all]
+[also build test ERROR on linus/master v6.18]
+[cannot apply to cifs/for-next next-20251208]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index f585359684d4..05f008ea51cd 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -2708,6 +2708,7 @@ int ksmbd_rdma_init(void)
- {
- 	int ret;
- 
-+	smb_direct_port = SMB_DIRECT_PORT_INFINIBAND;
- 	smb_direct_listener.cm_id = NULL;
- 
- 	ret = ib_register_client(&smb_direct_ib_client);
+url:    https://github.com/intel-lab-lkp/linux/commits/chenxiaosong-chenxiaosong-linux-dev/smb-client-reduce-loop-count-in-map_smb2_to_linux_error-by-half/20251206-232731
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
+patch link:    https://lore.kernel.org/r/20251206151826.2932970-9-chenxiaosong.chenxiaosong%40linux.dev
+patch subject: [PATCH v4 08/10] smb/client: introduce smb2maperror KUnit tests
+config: i386-randconfig-004-20251208 (https://download.01.org/0day-ci/archive/20251209/202512090558.gcQGSnU4-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251209/202512090558.gcQGSnU4-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512090558.gcQGSnU4-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> ld.lld: error: undefined symbol: kunit_binary_str_assert_format
+   >>> referenced by smb2maperror_test.c:40 (fs/smb/client/smb2maperror_test.c:40)
+   >>>               fs/smb/client/smb2maperror.o:(maperror_test_check_search) in archive vmlinux.a
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
