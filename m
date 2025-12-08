@@ -1,32 +1,32 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0A830F55F
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Dec 2025 06:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB26C30F816
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Dec 2025 06:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765175024; cv=none; b=aSM11PxNMr3bIJsytj/8if4ka2VtMCvFtNKH9cOKRlqYfsCt75pkh2YqVVKRMZy+WEcTg714/JHV+3ZOUciBLv6lvyvlSsGJ669/siqFWNKQWPKRX+CVmqbWuR+QIEsyjpCkDlqxdNQeT9bsjSPq/ql0yl8uzQUuxlJ7xzhBHbQ=
+	t=1765175027; cv=none; b=YJfPSdGRP3Ma/2UzvbOs+IJ3NdCURrb0FwIBsSCHRxAPSohLjy3QETCqUcvMIGazRjHzJ2dVdJMA//YCM5I9c0xgkL4vkdNhLprpbqMg5MeIthXfQv8j+VXyfV8JQmLnyVVreBwyOZrR56HXHFrWvAR39CNYX6oiMWreuBUhoQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765175024; c=relaxed/simple;
-	bh=Jbr6hDrJGdOAfgRj6MVJeQmsY5kBlK/eJHBTMHzJ8dU=;
+	s=arc-20240116; t=1765175027; c=relaxed/simple;
+	bh=Sm7xJItM3A8nowZ/aAgVOb18ozcro+lPJ3CuXTL/RHE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p6M4hp203o2laPkFQ6si5DP0eoQ+BYPWS1yRKaCjC+5V3EONJsy8Qg4M3vqyfXD3iLealRRk3h6UbKv0m/OEsii2+/vfQ7HleGQrLXS/clwVFU5/0QfvW5vZYu4eos6pGeDETRVHE6MJoVwFqhbX7iBZ3iPpOgva+hWseNFz8Xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ItY/iznT; arc=none smtp.client-ip=95.215.58.187
+	 MIME-Version; b=pYgMjCUqFur1To5KNajvs6vIHJrWhKnLwIK6m0//+p/oE4jDPbYVI3g1YwVHIM1mNryG1kGbU3h78xYYnyVRw2oIkkaWEGeYxUcpqLt/5dPz2bWrI9BgOq9rwa7oRvkgr567wApl9+wjMKaL+x1+w0KsFL0/pzegAPVEZ1PyIvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ru1AR2pA; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ItY/iznT"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ru1AR2pA"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765175021;
+	t=1765175024;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kuW2WgMjghek4WLdk+I5pqvQp7iACii/bZ47s+mxCrs=;
-	b=ItY/iznTBhkn//G6wu3RtgaZjXXB5Zs+IN6xlAA6ywqPNrzql6sMICeaJlggRwcNB43iym
-	7sVc9kDpFvI7isoum3hB6KIBj6w9CHHu0fN9AqdEtMLClFMStkuE6gCm1P1oa9LWYJlqVu
-	Bw2ihoovyfEti4JnaJcqeU6adhj9lMM=
+	bh=APRdAn0mnH6LsGxaYp180UZYgqFVPyYSJQSWTFgU0lQ=;
+	b=ru1AR2pAVet3MxtbKX2dsSjLlARKm38kpPSQUZ5viZVlq3siKNhwE7Rkx2Tde47iA74uP3
+	ZnQXshVzLAxA+0qVequX8AIftbYTcpGPK58tDwpW84AbWrDj1dNw6d9OZyl1AXeNCfkckE
+	dkJdZc19aqQ9DAJ2xIEVILYFYy5Udn8=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: sfrench@samba.org,
 	smfrench@gmail.com,
@@ -38,9 +38,9 @@ Cc: linux-cifs@vger.kernel.org,
 	huhai@kylinos.cn,
 	liuyun01@kylinos.cn,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 23/30] smb/client: use bsearch() to find target in mapping_table_ERRDOS array
-Date: Mon,  8 Dec 2025 14:20:53 +0800
-Message-ID: <20251208062100.3268777-24-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH 24/30] smb/client: remove useless elements from mapping_table_ERRDOS array
+Date: Mon,  8 Dec 2025 14:20:54 +0800
+Message-ID: <20251208062100.3268777-25-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -54,59 +54,25 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-The array currently has 39 elements. When searching for the last element,
-the original loop-based search method requires 39 comparisons, while
-binary search algorithm requires only 5 comparisons.
+The last element in the array is no longer needed.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/netmisc.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+ fs/smb/client/netmisc.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/fs/smb/client/netmisc.c b/fs/smb/client/netmisc.c
-index 594a7fae0060..d7d1b9b4abcd 100644
+index d7d1b9b4abcd..553d2a33b6de 100644
 --- a/fs/smb/client/netmisc.c
 +++ b/fs/smb/client/netmisc.c
-@@ -813,6 +813,8 @@ DEFINE_CMP_FUNC(smb_to_posix_error, smb_err);
- DEFINE_SEARCH_FUNC(ntstatus_to_dos, ntstatus, ntstatus_to_dos_map, ntstatus_to_dos_num);
- /* search_in_nt_errs */
- DEFINE_SEARCH_FUNC(nt_err_code_struct, nt_errcode, nt_errs, nt_err_num);
-+/* search_in_mapping_table_ERRDOS */
-+DEFINE_SEARCH_FUNC(smb_to_posix_error, smb_err, mapping_table_ERRDOS, errdos_num);
+@@ -98,7 +98,6 @@ static struct smb_to_posix_error mapping_table_ERRDOS[] = {
+ 	{ERRnetlogonNotStarted, -ENOPROTOOPT},
+ 	{ERRsymlink, -EOPNOTSUPP},
+ 	{ErrTooManyLinks, -EMLINK},
+-	{0, 0}
+ };
  
- /*****************************************************************************
-  Print an error message from the status code
-@@ -861,6 +863,7 @@ map_smb_to_linux_error(char *buf, bool logErr)
- 	int rc = -EIO;	/* if transport error smb error may not be set */
- 	__u8 smberrclass;
- 	__u16 smberrcode;
-+	struct smb_to_posix_error *err_map;
- 
- 	/* BB if NT Status codes - map NT BB */
- 
-@@ -887,19 +890,9 @@ map_smb_to_linux_error(char *buf, bool logErr)
- 	/* DOS class smb error codes - map DOS */
- 	if (smberrclass == ERRDOS) {
- 		/* 1 byte field no need to byte reverse */
--		for (i = 0;
--		     i <
--		     sizeof(mapping_table_ERRDOS) /
--		     sizeof(struct smb_to_posix_error); i++) {
--			if (mapping_table_ERRDOS[i].smb_err == 0)
--				break;
--			else if (mapping_table_ERRDOS[i].smb_err ==
--								smberrcode) {
--				rc = mapping_table_ERRDOS[i].posix_code;
--				break;
--			}
--			/* else try next error mapping one to see if match */
--		}
-+		err_map = search_in_mapping_table_ERRDOS(smberrcode);
-+		if (err_map)
-+			rc = err_map->posix_code;
- 	} else if (smberrclass == ERRSRV) {
- 		/* server class of error codes */
- 		for (i = 0;
+ static unsigned int errdos_num = sizeof(mapping_table_ERRDOS) /
 -- 
 2.43.0
 
