@@ -1,32 +1,32 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD9A2857CD
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Dec 2025 06:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61371242D9D
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Dec 2025 06:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765174979; cv=none; b=Ez1igEn2WKiwuj7A/LQ8AWksImjOK4hVTOenMa1egS3CSm2CFnQiLA7ylojvBLmCSiC3x4qjwVYRz0l43OcU9mT9Juwrj1gLf878WHYgX0/XbqkH1lQFwXnQkWQaYdYRJO+oTjkOPc/GpdYacYLa5X73VSYxu5Tk1HDl/5gKF3U=
+	t=1765174982; cv=none; b=CwBg76dVETd/O9fiU11wLfDvFFiY6Dveu2JFT9+9AbnqRk2uGwxTPbNPV2in2pIDBBMZnD0wTvT5vl7nof7jwO1Bhgq6LqVdFs8GMgGMLX/GAP6QOlDOqeXMKMEPqed1ptP8B2dnp/xwkB+JdJKjkUw0//ciXgSelI6D/tyvuL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765174979; c=relaxed/simple;
-	bh=fKS+U1mJaVzlw8uXfIlfZi8G1HAdNP7FKnWjrfzKfQQ=;
+	s=arc-20240116; t=1765174982; c=relaxed/simple;
+	bh=w0nNCAawtWga2Wz7UljYjaZNJs1R7DG4IhmvbN7y/hw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XIAeY5wnKJSOxvE/XsK5JRjVp7UYx46Itm4eZPLs//SZNOVXa9wXpbkXQu+3peEGMljYAifw48hrS4zAvKOo5zGzTToBlMyZBNi1I1rzoKGhIufL9weNI09D6bOAoBIm+R4Y2Juu7m6wsca2w7YGQe0KnvO4EBTdg757SUZj+xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ar8GPVUN; arc=none smtp.client-ip=95.215.58.181
+	 MIME-Version; b=C4AIt0jqof7IJBDI4UNp6hRMSzsQg7ZDIRPpZ68ebt3feFxUsXTySKYphTiFC/i+vKJlgAyw3sRLPZ+Xx4NC+ijLFlHn4bDvqYNUORPPUO8hrZg+oOODD3iOaxhhX4oTVKCxa402WVXTCFAJMUKj0cqeeHG3G9sFu0kZTeGW0HI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F7fMAAhL; arc=none smtp.client-ip=95.215.58.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ar8GPVUN"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F7fMAAhL"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765174975;
+	t=1765174978;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sp0Fz8CbZFpfKpsDmGee+Y1J5MG5yvjRZvwAWlnxrSc=;
-	b=Ar8GPVUN+V6ad+LG73E90RR8AX1tiQs+qH9kqmYroWCMgM66LQbYV49uwP/9UAZigJSlsD
-	t5/Z95m0FkejK/RLMJxZ48If3Yz6h3o33Ub81WvM1BdvOETmAz6b1ycxAWshvdAoAUZ9aC
-	w0SRrIRT4Dk7jX5kCq4xYccAjXRU2q0=
+	bh=K1lLUuJbzKaoVowgzOVVnSVe2ltCt18Z1gofNbgQXKI=;
+	b=F7fMAAhLT/QEFhI6YEI7tE1VkGZB4ujNJJgejYJHLjKYIiKnGcpb/ewcqVkODhvDyLM+Sd
+	Yv2uGZutBdzUKGva4E7p5t4acF5aB7d7e+rZOawB5kJ7Xyn3Jo7prvSPuSX1THypP3hYgZ
+	gCF4JphhFmTZO3qZnPSlgtJxI/8IrR8=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: sfrench@samba.org,
 	smfrench@gmail.com,
@@ -38,9 +38,9 @@ Cc: linux-cifs@vger.kernel.org,
 	huhai@kylinos.cn,
 	liuyun01@kylinos.cn,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 08/30] smb/client: sort ntstatus_to_dos_map array
-Date: Mon,  8 Dec 2025 14:20:38 +0800
-Message-ID: <20251208062100.3268777-9-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH 09/30] smb/client: create netmisc_test.c and introduce DEFINE_CHECK_SORT_FUNC()
+Date: Mon,  8 Dec 2025 14:20:39 +0800
+Message-ID: <20251208062100.3268777-10-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -54,103 +54,80 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Sort the array in ascending order, and then we can use binary search
-algorithm to quickly find the target NT error code.
-
-The array is sorted only once in smb1_init_maperror() when cifs.ko
-is loaded.
+We are going to define 4 functions to check the sort results, introduce the
+macro DEFINE_CHECK_SORT_FUNC() to reduce duplicate code.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifsfs.c    |  2 ++
- fs/smb/client/cifsproto.h |  1 +
- fs/smb/client/netmisc.c   | 20 ++++++++++++++++++--
- 3 files changed, 21 insertions(+), 2 deletions(-)
+ fs/smb/client/netmisc.c      |  4 ++++
+ fs/smb/client/netmisc_test.c | 46 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 50 insertions(+)
+ create mode 100644 fs/smb/client/netmisc_test.c
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 77d14b3dd650..3e3affce585e 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -49,6 +49,7 @@
- #endif
- #include "fs_context.h"
- #include "cached_dir.h"
-+#include "cifsproto.h"
- #include "smb2proto.h"
- 
- /*
-@@ -1909,6 +1910,7 @@ static int __init
- init_cifs(void)
- {
- 	int rc = 0;
-+	smb_init_maperror();
- 	smb2_init_maperror();
- 	cifs_proc_init();
- 	INIT_LIST_HEAD(&cifs_tcp_ses_list);
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 3528c365a452..675413d701b3 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -188,6 +188,7 @@ extern int cifs_convert_address(struct sockaddr *dst, const char *src, int len);
- extern void cifs_set_port(struct sockaddr *addr, const unsigned short int port);
- extern int map_smb_to_linux_error(char *buf, bool logErr);
- extern int map_and_check_smb_error(struct mid_q_entry *mid, bool logErr);
-+extern void smb_init_maperror(void);
- extern void header_assemble(struct smb_hdr *, char /* command */ ,
- 			    const struct cifs_tcon *, int /* length of
- 			    fixed section (word count) in two byte units */);
 diff --git a/fs/smb/client/netmisc.c b/fs/smb/client/netmisc.c
-index 73c40ae91607..54ede1db2c7f 100644
+index 54ede1db2c7f..32197a3a4e81 100644
 --- a/fs/smb/client/netmisc.c
 +++ b/fs/smb/client/netmisc.c
-@@ -16,6 +16,7 @@
- #include <asm/div64.h>
- #include <asm/byteorder.h>
- #include <linux/inet.h>
-+#include <linux/sort.h>
- #include "cifsfs.h"
- #include "cifspdu.h"
- #include "cifsglob.h"
-@@ -216,11 +217,13 @@ cifs_set_port(struct sockaddr *addr, const unsigned short int port)
- convert a NT status code to a dos class/code
-  *****************************************************************************/
- /* NT status -> dos error map */
--static const struct {
-+struct ntstatus_to_dos {
- 	__u8 dos_class;
- 	__u16 dos_code;
- 	__u32 ntstatus;
--} ntstatus_to_dos_map[] = {
-+};
-+
-+static struct ntstatus_to_dos ntstatus_to_dos_map[] = {
- 	{
- 	ERRDOS, ERRgeneral, NT_STATUS_UNSUCCESSFUL}, {
- 	ERRDOS, ERRbadfunc, NT_STATUS_NOT_IMPLEMENTED}, {
-@@ -778,6 +781,12 @@ static const struct {
- 	0, 0, 0 }
- };
- 
-+static unsigned int ntstatus_to_dos_num = sizeof(ntstatus_to_dos_map) /
-+					  sizeof(struct ntstatus_to_dos);
-+
-+/* cmp_ntstatus_to_dos */
-+DEFINE_CMP_FUNC(ntstatus_to_dos, ntstatus);
-+
- /*****************************************************************************
-  Print an error message from the status code
-  *****************************************************************************/
-@@ -1040,3 +1049,10 @@ struct timespec64 cnvrtDosUnixTm(__le16 le_date, __le16 le_time, int offset)
- 	ts.tv_nsec = 0;
- 	return ts;
+@@ -1056,3 +1056,7 @@ void smb_init_maperror(void)
+ 	sort(ntstatus_to_dos_map, ntstatus_to_dos_num,
+ 	     sizeof(struct ntstatus_to_dos), cmp_ntstatus_to_dos, NULL);
  }
 +
-+void smb_init_maperror(void)
-+{
-+	/* Sort in ascending order */
-+	sort(ntstatus_to_dos_map, ntstatus_to_dos_num,
-+	     sizeof(struct ntstatus_to_dos), cmp_ntstatus_to_dos, NULL);
++#if IS_ENABLED(CONFIG_SMB_KUNIT_TESTS)
++#include "netmisc_test.c"
++#endif /* CONFIG_SMB_KUNIT_TESTS */
+diff --git a/fs/smb/client/netmisc_test.c b/fs/smb/client/netmisc_test.c
+new file mode 100644
+index 000000000000..f937b7b3d3f2
+--- /dev/null
++++ b/fs/smb/client/netmisc_test.c
+@@ -0,0 +1,46 @@
++// SPDX-License-Identifier: LGPL-2.1
++/*
++ *
++ *   KUnit tests of SMB1 maperror
++ *
++ *   Copyright (C) 2025 KylinSoft Co., Ltd. All rights reserved.
++ *   Author(s): ChenXiaoSong <chenxiaosong@kylinos.cn>
++ *
++ */
++
++#include <kunit/test.h>
++
++#define DEFINE_CHECK_SORT_FUNC(__array, __num, __field)			\
++static void __array ## _check_sort(struct kunit *test)			\
++{									\
++	bool is_sorted = true;						\
++	unsigned int i;							\
++									\
++	for (i = 1; i < __num; i++) {					\
++		if (__array[i].__field >= __array[i - 1].__field)	\
++			continue;					\
++									\
++		pr_err("%s array order is incorrect\n", #__array);	\
++		is_sorted = false;					\
++		break;							\
++	}								\
++									\
++	KUNIT_EXPECT_EQ(test, true, is_sorted);				\
 +}
++
++/*
++ * Before running these test cases, the smb_init_maperror()
++ * function is called first.
++ */
++static struct kunit_case maperror_test_cases[] = {
++	{}
++};
++
++static struct kunit_suite maperror_suite = {
++	.name = "smb1_maperror",
++	.test_cases = maperror_test_cases,
++};
++
++kunit_test_suite(maperror_suite);
++
++MODULE_LICENSE("GPL");
 -- 
 2.43.0
 
