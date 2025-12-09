@@ -1,32 +1,32 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14BF826ED45
-	for <linux-cifs@vger.kernel.org>; Tue,  9 Dec 2025 01:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36C526C384
+	for <linux-cifs@vger.kernel.org>; Tue,  9 Dec 2025 01:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765242712; cv=none; b=J0KojHzY5WrfuZy1CGDOwyrTWppi0hQFxiHdx6VQAnk+f0AV2/M1MqHtbaskeVmvPNlAgwWOIv6WWYz+arrS5jtPG+5Qhe3RBmTtEP74a5kB0j1fSlPQKrKugkTKVPfB1CpvmaKtfFD19UQ52LWRzPq88uQ6tMeK6PEGL4bhRUE=
+	t=1765242715; cv=none; b=r3ajwLs+FpCVGeOZE/q9ziLGVCdovrBasOa04rTQzaY60L8mtQ8QdjCspSxp6+7f/hU0G3nOa2zTFdAsVmSA25B/cW45An7hAhxXSV8n4wLJKWqkIgYhF3Qguu+639EUvHqDF0iFSv6+YkxCk/G1MpLz+udo43bVc2GoRbjouss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765242712; c=relaxed/simple;
-	bh=zqUbClEpYmVLCkf7LSfQQ4EH11MAwGyGwPNOrhw21yc=;
+	s=arc-20240116; t=1765242715; c=relaxed/simple;
+	bh=s7VZl24wrvdHOlGNyUf/2ymjzy6HDwB6sniTLqxBdeo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=caky/xu/tCwBu7IIoi0bIyo3CNouwTTIPwdpg2VwqQyMKzeOco0J8UdKXVbtiIr4xH97DJq2RePF8IkuVp/TBVw7CDC3VTptJqIyXbA5aryEMHgffTlxJ54+a0uYsbU5bRX4GjmduAAxdYqsVWcqa2MXKmrAWcqt++0waEoS1wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JxBx0zLa; arc=none smtp.client-ip=95.215.58.182
+	 MIME-Version; b=AyA3qy4Za0qQOoVoLSPSpzJRIumNDcgXDh1XblrbDwbim+bSn2UbuFHHSzmJd1MLsnrj1ZtgTMMXuell0KCgRkXYHjuyktS5qaL+oqvYTp8No99/iCuaL3zvY1DcRjQnuX5704jcRnD1QKfcHqSoMhsUj1VH1QIXJnW1taMxcp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ouczwonw; arc=none smtp.client-ip=95.215.58.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JxBx0zLa"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ouczwonw"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765242709;
+	t=1765242712;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=V+0v70GJZbVxaMdU0OSc+Xgiqw3vx4uMcK6LzyG70gs=;
-	b=JxBx0zLajpAfT63Jax6yqM8lTNbukkcazCN3QgarSlEJ/I7lBzSjKB0Q5nehFaUjY2mPeR
-	LPXVWoE7VMxXqmOqGhjuGGtewqUqb+HqkxoE+M0IfDNvleaY/ckabsOYvXlP97IzalXgVI
-	qTojtPQYcILQAIaH01VTBxMeonM3OjA=
+	bh=tjE8pX5ZoXdQdNPZglHQcPDEH+jxhHyONwZG2h4XXjc=;
+	b=ouczwonwQqa91LdnY/vDa9ueLdUXd/Wc4kellO715mf0R2S3jpUif8QsY5j2hkqU0+xWfe
+	2N59IQMwmXd1qWi2djTOLnr5a/ysz2rEZYrHRO4fwaJQskZ7i4AVkTP6DDOiTuaykczCYR
+	ilMvbztQAKKzmg9z/E5qbHEMsjq4jWo=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: sfrench@samba.org,
 	smfrench@gmail.com,
@@ -38,9 +38,9 @@ Cc: linux-cifs@vger.kernel.org,
 	huhai@kylinos.cn,
 	liuyun01@kylinos.cn,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 02/13] smb: move notify completion filter flags into common/smb2pdu.h
-Date: Tue,  9 Dec 2025 09:10:08 +0800
-Message-ID: <20251209011020.3270989-3-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH 03/13] smb: move SMB2 Notify Action Flags into common/smb2pdu.h
+Date: Tue,  9 Dec 2025 09:10:09 +0800
+Message-ID: <20251209011020.3270989-4-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251209011020.3270989-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251209011020.3270989-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -54,53 +54,49 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Some of these definitions are already in common/smb2pdu.h, remove the
-duplicate client side definitions, and move FILE_NOTIFY_CHANGE_NAME to
+Some of these definitions are already in common/smb2pdu.h. Remove the
+duplicate client side definitions, and add all SMB2 Notify Action Flags to
 common header file.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifspdu.h | 14 --------------
- fs/smb/common/smb2pdu.h |  1 +
- 2 files changed, 1 insertion(+), 14 deletions(-)
+ fs/smb/client/cifspdu.h | 9 ---------
+ fs/smb/common/smb2pdu.h | 2 ++
+ 2 files changed, 2 insertions(+), 9 deletions(-)
 
 diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index 31c33e20b8ac..4315a06d296b 100644
+index 4315a06d296b..8f0547d1fe0e 100644
 --- a/fs/smb/client/cifspdu.h
 +++ b/fs/smb/client/cifspdu.h
-@@ -1357,20 +1357,6 @@ typedef struct smb_com_transaction_change_notify_rsp {
- 	__u16 ByteCount;
+@@ -1358,15 +1358,6 @@ typedef struct smb_com_transaction_change_notify_rsp {
  	/* __u8 Pad[3]; */
  } __packed TRANSACT_CHANGE_NOTIFY_RSP;
--/* Completion Filter flags for Notify */
--#define FILE_NOTIFY_CHANGE_FILE_NAME    0x00000001
--#define FILE_NOTIFY_CHANGE_DIR_NAME     0x00000002
--#define FILE_NOTIFY_CHANGE_NAME         0x00000003
--#define FILE_NOTIFY_CHANGE_ATTRIBUTES   0x00000004
--#define FILE_NOTIFY_CHANGE_SIZE         0x00000008
--#define FILE_NOTIFY_CHANGE_LAST_WRITE   0x00000010
--#define FILE_NOTIFY_CHANGE_LAST_ACCESS  0x00000020
--#define FILE_NOTIFY_CHANGE_CREATION     0x00000040
--#define FILE_NOTIFY_CHANGE_EA           0x00000080
--#define FILE_NOTIFY_CHANGE_SECURITY     0x00000100
--#define FILE_NOTIFY_CHANGE_STREAM_NAME  0x00000200
--#define FILE_NOTIFY_CHANGE_STREAM_SIZE  0x00000400
--#define FILE_NOTIFY_CHANGE_STREAM_WRITE 0x00000800
  
- #define FILE_ACTION_ADDED		0x00000001
- #define FILE_ACTION_REMOVED		0x00000002
+-#define FILE_ACTION_ADDED		0x00000001
+-#define FILE_ACTION_REMOVED		0x00000002
+-#define FILE_ACTION_MODIFIED		0x00000003
+-#define FILE_ACTION_RENAMED_OLD_NAME	0x00000004
+-#define FILE_ACTION_RENAMED_NEW_NAME	0x00000005
+-#define FILE_ACTION_ADDED_STREAM	0x00000006
+-#define FILE_ACTION_REMOVED_STREAM	0x00000007
+-#define FILE_ACTION_MODIFIED_STREAM	0x00000008
+-
+ /*
+  * response contains array of the following structures
+  * See MS-FSCC 2.7.1
 diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index 7b954b607165..0565385d735a 100644
+index 0565385d735a..ddb0609bc186 100644
 --- a/fs/smb/common/smb2pdu.h
 +++ b/fs/smb/common/smb2pdu.h
-@@ -991,6 +991,7 @@ struct smb2_set_info_rsp {
- /* notify completion filter flags. See MS-FSCC 2.6 and MS-SMB2 2.2.35 */
- #define FILE_NOTIFY_CHANGE_FILE_NAME		0x00000001
- #define FILE_NOTIFY_CHANGE_DIR_NAME		0x00000002
-+#define FILE_NOTIFY_CHANGE_NAME			0x00000003
- #define FILE_NOTIFY_CHANGE_ATTRIBUTES		0x00000004
- #define FILE_NOTIFY_CHANGE_SIZE			0x00000008
- #define FILE_NOTIFY_CHANGE_LAST_WRITE		0x00000010
+@@ -1016,6 +1016,8 @@ struct smb2_set_info_rsp {
+ #define FILE_ACTION_REMOVED_STREAM              0x00000007
+ #define FILE_ACTION_MODIFIED_STREAM             0x00000008
+ #define FILE_ACTION_REMOVED_BY_DELETE           0x00000009
++#define FILE_ACTION_ID_NOT_TUNNELLED            0x0000000A
++#define FILE_ACTION_TUNNELLED_ID_COLLISION      0x0000000B
+ 
+ /* See MS-SMB2 2.2.35 */
+ struct smb2_change_notify_req {
 -- 
 2.43.0
 
