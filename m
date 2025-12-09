@@ -1,194 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F6E1FF5E3;
-	Tue,  9 Dec 2025 00:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A192367CE;
+	Tue,  9 Dec 2025 00:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765239407; cv=none; b=NMTHUK+4WSfyKoFAbEqzAnAquLOxXqCZJAb1eBJxzJ8GGYzUJVvckaS7vxOawuMvtJFRkkhfGxxlnWHY2lbAOgLI3nm3wL9L9FSywplSsv2po+oCz73ccYQ2zdUBvX38gFtkSVRxqolFCwTWgKdtTcZL/C9hTDgzmH7xOZ+ahno=
+	t=1765239445; cv=none; b=acDKcJ4KOVtkGaSbRsgaLm8yhokxKinpLAYiIjobYb182tx+qacAAQsYhpxApLsQmNTfNg9U40hlj9uQnyk+h7W8enTscMFY5sZcnb9N22Y3jOuLrF2pZaIY9z3EDocMaguqzOsuycta+WonzFQtZtiSrK3I5LpsBCtZZ/xRLpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765239407; c=relaxed/simple;
-	bh=Ea0sBalcDvFTyrYPkBNo4mKzsS73wAnYysjCCH3DnOk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s+4RAwifAVw+Ms7SkpUTpRWUl8pmmoiU1W+1VjTeWDt1vQkhP6aBeiuq2mgSMfJiWUzslnmGyYXm1F9G58rJ9iJyRAMJYCNl91oqOAhzBIEkzmyvEvA0C+wtqoLtfD8KcXCAhdPrOqDmKS6lc4k8MD2wmolpRKglSRtCdfQXPvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YMgOoV2T; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YMgOoV2T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F3E2C113D0;
-	Tue,  9 Dec 2025 00:16:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765239407;
-	bh=Ea0sBalcDvFTyrYPkBNo4mKzsS73wAnYysjCCH3DnOk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YMgOoV2TeminFcnJ3we8wP734DQiZ+kX0iP7xD9ZqZWsa8eAhrssHveMQu50NEiUn
-	 e298POD76qtvQk75qmCDpw03T0FZfTl4kUmCYpRrsGGF3iBnPufnbs/lvJniEqhyD5
-	 PgJfMwkk/i0bFEXgeTvZl6wYpo1fNE3nsdlgWPhOP7j7qqDU3RxenrqqMoTu+ERYS6
-	 Hc6gmASxDDTUz5f1wOgBJHFHDq/qYKftldTMGASfT3h+ovricdq8Eq9ziuF9stY5IE
-	 lQJf5U1PEMgfd5FtJW2/FJ3u6UO73ZBiHL2HPOlqmk9wuRr7ZjfAcVulsXZIu2FqZl
-	 yyYoqpuR0ltWQ==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: ChenXiaoSong <chenxiaosong@kylinos.cn>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	smfrench@gmail.com,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-6.1] smb/server: fix return value of smb2_ioctl()
-Date: Mon,  8 Dec 2025 19:14:59 -0500
-Message-ID: <20251209001610.611575-7-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251209001610.611575-1-sashal@kernel.org>
-References: <20251209001610.611575-1-sashal@kernel.org>
+	s=arc-20240116; t=1765239445; c=relaxed/simple;
+	bh=2kioe1iLcrJ0bZwBfz7LBtD+yA6vX3AuhEnFDvpzjFk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ArLSb9Jv+ozkipHFz8vinypoA28W+P9FVHSwHqIzD22DWcssU4atnpapOEHhj06qtBXCsW6tFGLtmHlRtfIsBMGoUpU72hTl4yWu/zrAGvysCEzwcQv0nAQqiEGoPC+p/sRRk+j53QQe/E+fvGZboXKwQG+I8yhY579zpKBcWTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 6a62cfa8d49411f0a38c85956e01ac42-20251209
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_7B, HR_CTT_TXT
+	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_LANG
+	HR_MAILER_MTBG, HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER
+	HR_SJ_NOR_SYM, HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_PRE_RE, HR_SJ_WS
+	HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED
+	IP_UNFAMILIAR, SRC_UNFAMILIAR, DN_TRUSTED, SRC_TRUSTED, SA_UNTRUSTED
+	SA_LOWREP, SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS
+	DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD_SPF, CIE_UNKNOWN, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.6,REQID:f107c090-ed9f-4872-b3e3-0e3ddc3d7fa5,IP:10,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:1,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:6
+X-CID-INFO: VERSION:1.3.6,REQID:f107c090-ed9f-4872-b3e3-0e3ddc3d7fa5,IP:10,URL
+	:0,TC:0,Content:-5,EDM:0,RT:0,SF:1,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:6
+X-CID-META: VersionHash:a9d874c,CLOUDID:f1905d3260c0dbc3092b470ca5d85a49,BulkI
+	D:251209081716TZZ7JI8T,BulkQuantity:0,Recheck:0,SF:19|38|64|66|72|78|80|81
+	|82|83|102|127|841|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,
+	RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,D
+	KP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FSD
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 6a62cfa8d49411f0a38c85956e01ac42-20251209
+X-User: chenxiaosong@kylinos.cn
+Received: from [192.168.43.10] [(116.162.231.116)] by mailgw.kylinos.cn
+	(envelope-from <chenxiaosong@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
+	with ESMTP id 858923963; Tue, 09 Dec 2025 08:17:15 +0800
+Message-ID: <93da5441-e942-427c-aa7f-138d7e750ca5@kylinos.cn>
+Date: Tue, 9 Dec 2025 08:17:07 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.18
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/30] smb/client: fix NT_STATUS_NO_DATA_DETECTED value
+To: chenxiaosong.chenxiaosong@linux.dev, sfrench@samba.org,
+ smfrench@gmail.com, linkinjeon@kernel.org, linkinjeon@samba.org
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+ liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn
+References: <20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev>
+ <20251208062100.3268777-2-chenxiaosong.chenxiaosong@linux.dev>
+Content-Language: en-US
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+In-Reply-To: <20251208062100.3268777-2-chenxiaosong.chenxiaosong@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-[ Upstream commit 269df046c1e15ab34fa26fd90db9381f022a0963 ]
+Hi Steve and Namjae,
 
-__process_request() will not print error messages if smb2_ioctl()
-always returns 0.
+Some of these macro values seem to differ from the documentation 
+(possibly due to typos or updates in the docs). Should we, like Samba, 
+use a script to automatically regenerate these macro definitions on a 
+regular basis?
 
-Fix this by returning the correct value at the end of function.
+Thanks,
+ChenXiaoSong.
 
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-## ANALYSIS SUMMARY
-
-### 1. Problem Being Fixed
-
-The `smb2_ioctl()` function in ksmbd (the in-kernel SMB server) **always
-returns 0** even when errors occur. Looking at the caller
-`__process_request()` in `fs/smb/server/server.c:148-151`:
-
-```c
-ret = cmds->proc(work);  // calls smb2_ioctl
-
-if (ret < 0)
-    ksmbd_debug(CONN, "Failed to process %u [%d]\n", command, ret);
-```
-
-Since `smb2_ioctl()` returns 0 on error paths, the debug message is
-never printed and errors are silently swallowed.
-
-### 2. Technical Analysis of the Fix
-
-The fix makes three changes:
-
-1. **Line 8167**: Adds `ret = -EOPNOTSUPP` when `req->Flags !=
-   SMB2_0_IOCTL_IS_FSCTL` (was previously not setting ret)
-
-2. **Line 8187-8189**: For DFS referrals, adds `ret = -EOPNOTSUPP` and
-   uses new `out2` label to skip the ret-to-status translation (since
-   DFS needs specific STATUS_FS_DRIVER_REQUIRED)
-
-3. **Line 8479**: Changes `return 0;` to `return ret;`
-
-The function's documentation says: "Return: 0 on success, otherwise
-error" - this fix makes the code match that contract.
-
-### 3. Stable Kernel Criteria Assessment
-
-| Criterion | Assessment |
-|-----------|------------|
-| Obviously correct | ✅ YES - Function was documented to return errors
-but didn't |
-| Fixes real bug | ✅ YES - Error reporting/debugging was broken |
-| Small and contained | ✅ YES - ~10 lines changed in one function |
-| No new features | ✅ YES - Only corrects error return behavior |
-| Tested | ✅ YES - Acked by ksmbd maintainer (Namjae Jeon) |
-
-### 4. Risk Assessment
-
-**LOW RISK:**
-- The fix only affects the return value in error paths
-- Does not change the SMB protocol behavior or response status codes
-- The `out2` label is a minor structural change to preserve DFS-specific
-  status
-- ksmbd is self-contained; this won't affect other subsystems
-- Error logging/visibility improvement with zero functional risk
-
-### 5. Concerns
-
-- **No explicit stable tags** (no `Cc: stable@vger.kernel.org`)
-- **No Fixes: tag** indicating when the bug was introduced
-- The bug has likely existed since ksmbd was added (v5.15), so affects
-  all stable branches with ksmbd
-
-### 6. User Impact
-
-Users of ksmbd who encounter errors during IOCTL handling:
-- **Before**: Silent failures, no debug messages, harder to diagnose
-  issues
-- **After**: Proper error returns enabling logging and debugging
-
-### Conclusion
-
-This is a straightforward bug fix that corrects an obviously broken
-return value. The fix is small, surgical, and low-risk. It improves
-error visibility for ksmbd users and makes the code match its documented
-behavior. The maintainer Ack from Namjae Jeon adds confidence. Despite
-lacking explicit stable tags, it clearly meets all stable kernel
-criteria.
-
-**YES**
-
- fs/smb/server/smb2pdu.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 8975b6f2f5800..447e76da44409 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -8164,7 +8164,7 @@ int smb2_ioctl(struct ksmbd_work *work)
- 		id = req->VolatileFileId;
- 
- 	if (req->Flags != cpu_to_le32(SMB2_0_IOCTL_IS_FSCTL)) {
--		rsp->hdr.Status = STATUS_NOT_SUPPORTED;
-+		ret = -EOPNOTSUPP;
- 		goto out;
- 	}
- 
-@@ -8184,8 +8184,9 @@ int smb2_ioctl(struct ksmbd_work *work)
- 	case FSCTL_DFS_GET_REFERRALS:
- 	case FSCTL_DFS_GET_REFERRALS_EX:
- 		/* Not support DFS yet */
-+		ret = -EOPNOTSUPP;
- 		rsp->hdr.Status = STATUS_FS_DRIVER_REQUIRED;
--		goto out;
-+		goto out2;
- 	case FSCTL_CREATE_OR_GET_OBJECT_ID:
- 	{
- 		struct file_object_buf_type1_ioctl_rsp *obj_buf;
-@@ -8475,8 +8476,10 @@ int smb2_ioctl(struct ksmbd_work *work)
- 		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
- 	else if (ret < 0 || rsp->hdr.Status == 0)
- 		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
-+
-+out2:
- 	smb2_set_err_rsp(work);
--	return 0;
-+	return ret;
- }
- 
- /**
--- 
-2.51.0
+On 12/8/25 2:20 PM, chenxiaosong.chenxiaosong@linux.dev wrote:
+> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> 
+> This was reported by the KUnit tests in the later patches.
+> 
+> See MS-ERREF 2.3.1 STATUS_NO_DATA_DETECTED. Keep it consistent with the
+> value in the documentation.
+> 
+> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> ---
+>   fs/smb/client/nterr.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/smb/client/nterr.h b/fs/smb/client/nterr.h
+> index 180602c22355..4fd79a82c817 100644
+> --- a/fs/smb/client/nterr.h
+> +++ b/fs/smb/client/nterr.h
+> @@ -41,7 +41,7 @@ extern const struct nt_err_code_struct nt_errs[];
+>   #define NT_STATUS_MEDIA_CHANGED    0x8000001c
+>   #define NT_STATUS_END_OF_MEDIA     0x8000001e
+>   #define NT_STATUS_MEDIA_CHECK      0x80000020
+> -#define NT_STATUS_NO_DATA_DETECTED 0x8000001c
+> +#define NT_STATUS_NO_DATA_DETECTED 0x80000022
+>   #define NT_STATUS_STOPPED_ON_SYMLINK 0x8000002d
+>   #define NT_STATUS_DEVICE_REQUIRES_CLEANING 0x80000288
+>   #define NT_STATUS_DEVICE_DOOR_OPEN 0x80000288
 
