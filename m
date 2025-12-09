@@ -1,108 +1,208 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A192367CE;
-	Tue,  9 Dec 2025 00:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3BE2C0F62;
+	Tue,  9 Dec 2025 00:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765239445; cv=none; b=acDKcJ4KOVtkGaSbRsgaLm8yhokxKinpLAYiIjobYb182tx+qacAAQsYhpxApLsQmNTfNg9U40hlj9uQnyk+h7W8enTscMFY5sZcnb9N22Y3jOuLrF2pZaIY9z3EDocMaguqzOsuycta+WonzFQtZtiSrK3I5LpsBCtZZ/xRLpc=
+	t=1765239479; cv=none; b=E8RB/8B8et8MWqdtH7h/ju80cAnS6NW9wCo4ss/klMjD/3V3/NM2kHxadRJzvcT8OgANLzPzOxLGDegihgcgbJ07NiJKZ1Q85v4UWgG0z+9+UsFMij66kQi9pwClqZrkQnPejAx074mKDhc9ikmOIyrX/gsYLt98TqxdES2Su1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765239445; c=relaxed/simple;
-	bh=2kioe1iLcrJ0bZwBfz7LBtD+yA6vX3AuhEnFDvpzjFk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ArLSb9Jv+ozkipHFz8vinypoA28W+P9FVHSwHqIzD22DWcssU4atnpapOEHhj06qtBXCsW6tFGLtmHlRtfIsBMGoUpU72hTl4yWu/zrAGvysCEzwcQv0nAQqiEGoPC+p/sRRk+j53QQe/E+fvGZboXKwQG+I8yhY579zpKBcWTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 6a62cfa8d49411f0a38c85956e01ac42-20251209
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_7B, HR_CTT_TXT
-	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_LANG
-	HR_MAILER_MTBG, HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER
-	HR_SJ_NOR_SYM, HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_PRE_RE, HR_SJ_WS
-	HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED
-	IP_UNFAMILIAR, SRC_UNFAMILIAR, DN_TRUSTED, SRC_TRUSTED, SA_UNTRUSTED
-	SA_LOWREP, SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS
-	DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD_SPF, CIE_UNKNOWN, GTI_FG_BS
-	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:f107c090-ed9f-4872-b3e3-0e3ddc3d7fa5,IP:10,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:1,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:6
-X-CID-INFO: VERSION:1.3.6,REQID:f107c090-ed9f-4872-b3e3-0e3ddc3d7fa5,IP:10,URL
-	:0,TC:0,Content:-5,EDM:0,RT:0,SF:1,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:6
-X-CID-META: VersionHash:a9d874c,CLOUDID:f1905d3260c0dbc3092b470ca5d85a49,BulkI
-	D:251209081716TZZ7JI8T,BulkQuantity:0,Recheck:0,SF:19|38|64|66|72|78|80|81
-	|82|83|102|127|841|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,
-	RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,D
-	KP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FSD
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 6a62cfa8d49411f0a38c85956e01ac42-20251209
-X-User: chenxiaosong@kylinos.cn
-Received: from [192.168.43.10] [(116.162.231.116)] by mailgw.kylinos.cn
-	(envelope-from <chenxiaosong@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
-	with ESMTP id 858923963; Tue, 09 Dec 2025 08:17:15 +0800
-Message-ID: <93da5441-e942-427c-aa7f-138d7e750ca5@kylinos.cn>
-Date: Tue, 9 Dec 2025 08:17:07 +0800
+	s=arc-20240116; t=1765239479; c=relaxed/simple;
+	bh=D21DNG/AwzkTcS5+b923mUwVoD/kjUs4AYJ1WUyQV+M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LAZ+VLjVXySpraKl9VkpVjapw5p5uGVxz7mHQsquHyzYRHgRfg5WGpMrFawsco4nGLbiTsBtxYWdSCj+YYkrar3OSo0gIGKkiLTfzWwNcJpPPqj4bum8/Q5QhCGHP5iYaxBScISJxFF1G3t4EHOaTNm53m7YFtijBzTDKRBL6iI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qbn7OhdT; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qbn7OhdT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83B3AC113D0;
+	Tue,  9 Dec 2025 00:17:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765239478;
+	bh=D21DNG/AwzkTcS5+b923mUwVoD/kjUs4AYJ1WUyQV+M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=qbn7OhdTd/0kS2I0flCoMf4TW93bhTsFYIKmNb4Tpa0HPPHyiaPKS2dy4Z1wvmpum
+	 DUgjHoyycuRGsoYmhzTpH90peiY97492QFTyCoJCkW/1pyUdGKyXU2jQ3dmJyI+3Od
+	 uppsQdao0WTU19K67dvTxQVNXDd2c17jaJMEwekZF+8MP2EARSI1/6AkFz9XoRat8B
+	 zc1WgCnNyQRmhn0FjomRaWrKkWe7JcEV8PIwuP1ChC4W9LQWJrytWhFY8RQMbGJstR
+	 xvtDsyx2UaErR9wXDSlDmsIg0Wj3DQbLFJG64iLRbDNfcKU5Uy9ySMhMWTekWcNtrn
+	 l16h6RpG+uy5A==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: ChenXiaoSong <chenxiaosong@kylinos.cn>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	smfrench@gmail.com,
+	linux-cifs@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.18-6.1] smb/server: fix return value of smb2_query_dir()
+Date: Mon,  8 Dec 2025 19:15:26 -0500
+Message-ID: <20251209001610.611575-34-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251209001610.611575-1-sashal@kernel.org>
+References: <20251209001610.611575-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/30] smb/client: fix NT_STATUS_NO_DATA_DETECTED value
-To: chenxiaosong.chenxiaosong@linux.dev, sfrench@samba.org,
- smfrench@gmail.com, linkinjeon@kernel.org, linkinjeon@samba.org
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
- liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn
-References: <20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251208062100.3268777-2-chenxiaosong.chenxiaosong@linux.dev>
-Content-Language: en-US
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.18
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
-In-Reply-To: <20251208062100.3268777-2-chenxiaosong.chenxiaosong@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Hi Steve and Namjae,
+[ Upstream commit dafe22bc676d4fcb1ccb193c8cc3dda57942509d ]
 
-Some of these macro values seem to differ from the documentation 
-(possibly due to typos or updates in the docs). Should we, like Samba, 
-use a script to automatically regenerate these macro definitions on a 
-regular basis?
+__process_request() will not print error messages if smb2_query_dir()
+always returns 0.
 
-Thanks,
-ChenXiaoSong.
+Fix this by returning the correct value at the end of function.
 
-On 12/8/25 2:20 PM, chenxiaosong.chenxiaosong@linux.dev wrote:
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> 
-> This was reported by the KUnit tests in the later patches.
-> 
-> See MS-ERREF 2.3.1 STATUS_NO_DATA_DETECTED. Keep it consistent with the
-> value in the documentation.
-> 
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> ---
->   fs/smb/client/nterr.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/smb/client/nterr.h b/fs/smb/client/nterr.h
-> index 180602c22355..4fd79a82c817 100644
-> --- a/fs/smb/client/nterr.h
-> +++ b/fs/smb/client/nterr.h
-> @@ -41,7 +41,7 @@ extern const struct nt_err_code_struct nt_errs[];
->   #define NT_STATUS_MEDIA_CHANGED    0x8000001c
->   #define NT_STATUS_END_OF_MEDIA     0x8000001e
->   #define NT_STATUS_MEDIA_CHECK      0x80000020
-> -#define NT_STATUS_NO_DATA_DETECTED 0x8000001c
-> +#define NT_STATUS_NO_DATA_DETECTED 0x80000022
->   #define NT_STATUS_STOPPED_ON_SYMLINK 0x8000002d
->   #define NT_STATUS_DEVICE_REQUIRES_CLEANING 0x80000288
->   #define NT_STATUS_DEVICE_DOOR_OPEN 0x80000288
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+## Analysis of smb/server: fix return value of smb2_query_dir()
+
+### 1. COMMIT MESSAGE ANALYSIS
+
+The commit message clearly states:
+- `__process_request()` will not print error messages if
+  `smb2_query_dir()` always returns 0
+- The fix returns the correct error value `rc` instead of 0
+
+**Notable absences:**
+- No `Cc: stable@vger.kernel.org` tag
+- No `Fixes:` tag identifying when the bug was introduced
+
+**Positive signals:**
+- Acked by Namjae Jeon (ksmbd maintainer)
+- Signed off by Steve French (SMB maintainer)
+
+### 2. CODE CHANGE ANALYSIS
+
+The change is a single-line fix in the error handling path:
+
+```c
+- return 0;
++       return rc;
+```
+
+**Technical mechanism of the bug:**
+Looking at the context, this is in an error handling block where:
+1. `rc` contains an error code (-EINVAL, -EACCES, -ENOENT, -EBADF,
+   -ENOMEM, -EFAULT, or -EIO)
+2. The appropriate SMB status is set in `rsp->hdr.Status`
+3. Error response is prepared with `smb2_set_err_rsp(work)`
+4. Cleanup is done with `ksmbd_fd_put()` and `ksmbd_revert_fsids()`
+5. **BUG**: The function returns 0 (success) instead of `rc` (the actual
+   error)
+
+**Root cause:** The caller `__process_request()` uses the return value
+to determine if an error occurred. Returning 0 masks all errors,
+preventing proper error logging and handling.
+
+### 3. CLASSIFICATION
+
+This is a **bug fix** - incorrect error return value handling. The
+function was silently discarding error information that callers need.
+
+### 4. SCOPE AND RISK ASSESSMENT
+
+| Factor | Assessment |
+|--------|------------|
+| Lines changed | 1 |
+| Files touched | 1 |
+| Complexity | Trivial |
+| Subsystem | ksmbd (kernel SMB server) |
+| Risk level | **Very Low** |
+
+The fix is surgical and obviously correct - the `rc` variable already
+contains the appropriate error code, it just wasn't being returned.
+
+### 5. USER IMPACT
+
+- **Affected users:** ksmbd server users
+- **Severity:** Medium - error conditions in directory queries are not
+  properly reported
+- **Consequences of the bug:**
+  - Error messages not printed when they should be
+  - Callers may not handle error conditions properly
+  - Debugging ksmbd issues becomes harder
+
+### 6. STABILITY INDICATORS
+
+- Acked by ksmbd maintainer
+- Signed off by SMB maintainer
+- Simple, self-contained change
+
+### 7. DEPENDENCY CHECK
+
+- No dependencies on other commits
+- ksmbd has been in the kernel since 5.15
+- The fix applies to existing code paths
+
+### STABLE KERNEL CRITERIA EVALUATION
+
+| Criterion | Met? | Notes |
+|-----------|------|-------|
+| Obviously correct | ✅ | Trivially correct - return error code instead
+of 0 |
+| Fixes real bug | ✅ | Error propagation was broken |
+| Small and contained | ✅ | Single line change |
+| No new features | ✅ | Pure bug fix |
+| Tested | ⚠️ | No Tested-by tag, but very low risk |
+
+### RISK VS BENEFIT
+
+**Benefits:**
+- Fixes broken error propagation in ksmbd directory queries
+- Enables proper error logging for debugging
+- Very low risk due to trivial nature of fix
+
+**Risks:**
+- Minimal - the change is from "always return 0" to "return actual error
+  code"
+- Behavior change only affects error paths
+
+### CONCLUSION
+
+This is a straightforward, obviously correct bug fix. The function was
+incorrectly returning 0 (success) in all error cases, causing error
+information to be lost. The fix is a single line change that returns the
+actual error code that was already being computed.
+
+While the commit lacks explicit stable tags, it meets all stable
+criteria: obviously correct, fixes a real bug affecting error handling,
+trivially small scope, and no new features. The risk is minimal and the
+fix improves error handling in ksmbd.
+
+**YES**
+
+ fs/smb/server/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index f901ae18e68ad..8975b6f2f5800 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -4560,7 +4560,7 @@ int smb2_query_dir(struct ksmbd_work *work)
+ 	smb2_set_err_rsp(work);
+ 	ksmbd_fd_put(work, dir_fp);
+ 	ksmbd_revert_fsids(work);
+-	return 0;
++	return rc;
+ }
+ 
+ /**
+-- 
+2.51.0
 
