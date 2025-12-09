@@ -1,258 +1,147 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33942236F0
-	for <linux-cifs@vger.kernel.org>; Tue,  9 Dec 2025 02:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA7D18B0A;
+	Tue,  9 Dec 2025 03:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765249067; cv=none; b=rqpsDw3cfLysF3zQU60UWSexaZVDwF7YLDKMwAJbdEuz8o5wMH7cPGdFyGgTHgdxp8rgR8m1OLPK1rpkFVCkGCmW/DSGSbBGtIvcUgV76SvL8+mruoNfhR58nvwlYI61xLNjMY2wc40nHEMyAARnqvZy49F2SlnD3WdqJqChJdI=
+	t=1765251973; cv=none; b=aaIkuvbX/QwHJIZ3143pltHTIihIVQhj41CT7GOzDgpKR9EOfnVCgaZnaGe2XKswgqmuf5fPdm6QnwGIz66Jc5iRlfDvCKaUDOg+8W+vbeZIDFwY8a0w1Ta/SCq9ugZAdW3D4WBnekg5icUDSV6aslQLQeXfp+Cwm80AKZNMsPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765249067; c=relaxed/simple;
-	bh=d6iakszXcR8ptnE9T+sXk8klHJLomPQXF9MpmsIsI08=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r5AIbCnrbNE6yDI03uNIJZrDJpTQj8NiNRpratfOdqItj7daYR+0v7JiXoAiR0zOGUMr93di8DBw046P19HtDgRUAOqaT3WjVlua8pxpj/Zmretl4PZjAwZlwX/1rdJQMHP6+p56DJ+6yudQ4J8W9LVMxz/wLcYLrpdz07Fk730=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gMq2Jxw7; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1765251973; c=relaxed/simple;
+	bh=Q0I5+eglbrHneyRdqxspYQFUaik0t9UNaPQovrD2kSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=umNUSSdihepfHh4Wpw+UgiqXTb5hCidS1Cw1fD3DJNDGQx/dWaoe5Fy5/pe7Y81lqkTSNNYaA85LzaGs33Tt3PcO4qER66+vlUMs97rVvlmxMJz2SRf5H6GHY0QzAZaHmZIUkHfSy4bBM3pERLmx5BayLil9OvQbC/7TVxBVmeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MuAZeLi+; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gMq2Jxw7"
-Message-ID: <6ff6fa14-15d2-487d-8d6f-373bd64fcb46@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765249053;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/jarh1JW4RJNshxJMbDLC4mpC3qO6a3sku0tvnMGKSk=;
-	b=gMq2Jxw7vxD9kZjyumu7xtn73NtNp3gcEEWGRgnOQBEw3xJBozsYu2NVJ7RXD+0jdwb4Kw
-	JA0auGEs2YwQet3MupEqneZxMqd4nBKhxj7yq/ZxC9ZSEXpo8F3ztPB/SwUT2czzQWYWNK
-	357n/RLClLBnE2UZJnakpou/2MeVl2U=
-Date: Tue, 9 Dec 2025 10:56:49 +0800
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MuAZeLi+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765251971; x=1796787971;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Q0I5+eglbrHneyRdqxspYQFUaik0t9UNaPQovrD2kSA=;
+  b=MuAZeLi+f/d6Oz11F/dqIgVbSpHE+puKe2Ga2ZsFY1Q78M/lml5qHzEq
+   xQVSlKWGd2q4roCQCQbiGsObbuqRto5fXSYVuO0NaWFfYQqqZxbFw6Bce
+   5I/mBi60mvEweRK6Ic7n4I82OnxAcQctXJqwEw/3WnbDiCYyRXpgYq/vV
+   QetIAC3yKDXgu98kzlfIeIvMTJQJBhkLi5YwTUZmn2xswpl/qgrDElvnB
+   r/ufaTyycMGutNRJFzTMnAfSNQLgffLxaI+FgLFhTHb/uboijjowC2GoR
+   cN2lHt1I7q20r90RUXpTiNl6vLA3SYJY7nLYY8RCsCmJP+A46o3NGNdo3
+   w==;
+X-CSE-ConnectionGUID: vjz5w9nLQr61pUk2UCqeuQ==
+X-CSE-MsgGUID: by8cS3+iRoexlDb1rX/f4A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11636"; a="66211024"
+X-IronPort-AV: E=Sophos;i="6.20,260,1758610800"; 
+   d="scan'208";a="66211024"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 19:46:11 -0800
+X-CSE-ConnectionGUID: yMDG5PiRRqygdlDPtlLQfA==
+X-CSE-MsgGUID: w9soYkFmTACJ3ZOwPAt3sA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,260,1758610800"; 
+   d="scan'208";a="219465116"
+Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 08 Dec 2025 19:46:07 -0800
+Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vSoft-000000001Hh-36Cu;
+	Tue, 09 Dec 2025 03:46:05 +0000
+Date: Tue, 9 Dec 2025 11:45:31 +0800
+From: kernel test robot <lkp@intel.com>
+To: chenxiaosong.chenxiaosong@linux.dev, sfrench@samba.org,
+	smfrench@gmail.com, linkinjeon@kernel.org, linkinjeon@samba.org
+Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org, liuzhengyuan@kylinos.cn,
+	huhai@kylinos.cn, liuyun01@kylinos.cn,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: Re: [PATCH v4 08/10] smb/client: introduce smb2maperror KUnit tests
+Message-ID: <202512091143.FGQ64S2k-lkp@intel.com>
+References: <20251206151826.2932970-9-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 13/13] smb: move some SMB1 definitions into
- common/smb1pdu.h
-To: Steve French <smfrench@gmail.com>
-Cc: sfrench@samba.org, linkinjeon@kernel.org, linkinjeon@samba.org,
- linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
- liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn,
- ZhangGuoDong <zhangguodong@kylinos.cn>,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20251209011020.3270989-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251209011020.3270989-14-chenxiaosong.chenxiaosong@linux.dev>
- <CAH2r5muXiti986tsg7fwLTEw7CceJ6UdtTh6s7CXWqU-D+COAw@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <CAH2r5muXiti986tsg7fwLTEw7CceJ6UdtTh6s7CXWqU-D+COAw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251206151826.2932970-9-chenxiaosong.chenxiaosong@linux.dev>
 
-ksmbd only implements SMB_COM_NEGOTIATE. Please refer to the 
-init_smb1_rsp_hdr() function
+Hi,
 
-Thanks,
-ChenXiaoSong.
+kernel test robot noticed the following build errors:
 
-On 12/9/25 10:52, Steve French wrote:
-> One option to consider is moving smb1 definitions into a client only
-> (fs/smb/client) header since ksmbd doesn't use SMB1 technically they
-> aren't 'common'
-> 
-> Did you find ksmbd server cases where it depends on any of these?
-> 
-> On Mon, Dec 8, 2025 at 7:12 PM <chenxiaosong.chenxiaosong@linux.dev> wrote:
->>
->> From: ZhangGuoDong <zhangguodong@kylinos.cn>
->>
->> These definitions are only used by SMB1, so move them into the new
->> common/smb1pdu.h.
->>
->> Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
->> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
->> Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
->> ---
->>   fs/smb/client/cifspdu.h    |  2 +-
->>   fs/smb/common/smb1pdu.h    | 59 ++++++++++++++++++++++++++++++++++++++
->>   fs/smb/common/smb2pdu.h    | 44 ----------------------------
->>   fs/smb/common/smbglob.h    |  2 --
->>   fs/smb/server/smb_common.h |  1 +
->>   5 files changed, 61 insertions(+), 47 deletions(-)
->>   create mode 100644 fs/smb/common/smb1pdu.h
->>
->> diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
->> index 758ea29769da..bf6329cb4fd4 100644
->> --- a/fs/smb/client/cifspdu.h
->> +++ b/fs/smb/client/cifspdu.h
->> @@ -12,7 +12,7 @@
->>   #include <net/sock.h>
->>   #include <linux/unaligned.h>
->>   #include "../common/smbfsctl.h"
->> -#include "../common/smb2pdu.h"
->> +#include "../common/smb1pdu.h"
->>
->>   #define CIFS_PROT   0
->>   #define POSIX_PROT  (CIFS_PROT+1)
->> diff --git a/fs/smb/common/smb1pdu.h b/fs/smb/common/smb1pdu.h
->> new file mode 100644
->> index 000000000000..11797471b2eb
->> --- /dev/null
->> +++ b/fs/smb/common/smb1pdu.h
->> @@ -0,0 +1,59 @@
->> +/* SPDX-License-Identifier: LGPL-2.1 */
->> +/*
->> + *
->> + *   Copyright (c) International Business Machines  Corp., 2002,2009
->> + *                 2018 Samsung Electronics Co., Ltd.
->> + *   Author(s): Steve French (sfrench@us.ibm.com)
->> + *              Namjae Jeon (linkinjeon@kernel.org)
->> + *
->> + */
->> +
->> +#ifndef _COMMON_SMB1_PDU_H
->> +#define _COMMON_SMB1_PDU_H
->> +
->> +#define SMB1_PROTO_NUMBER              cpu_to_le32(0x424d53ff)
->> +
->> +/*
->> + * See MS-CIFS 2.2.3.1
->> + *     MS-SMB 2.2.3.1
->> + */
->> +struct smb_hdr {
->> +       __be32 smb_buf_length;  /* BB length is only two (rarely three) bytes,
->> +               with one or two byte "type" preceding it that will be
->> +               zero - we could mask the type byte off */
->> +       __u8 Protocol[4];
->> +       __u8 Command;
->> +       union {
->> +               struct {
->> +                       __u8 ErrorClass;
->> +                       __u8 Reserved;
->> +                       __le16 Error;
->> +               } __packed DosError;
->> +               __le32 CifsError;
->> +       } __packed Status;
->> +       __u8 Flags;
->> +       __le16 Flags2;          /* note: le */
->> +       __le16 PidHigh;
->> +       union {
->> +               struct {
->> +                       __le32 SequenceNumber;  /* le */
->> +                       __u32 Reserved; /* zero */
->> +               } __packed Sequence;
->> +               __u8 SecuritySignature[8];      /* le */
->> +       } __packed Signature;
->> +       __u8 pad[2];
->> +       __u16 Tid;
->> +       __le16 Pid;
->> +       __u16 Uid;
->> +       __le16 Mid;
->> +       __u8 WordCount;
->> +} __packed;
->> +
->> +/* See MS-CIFS 2.2.4.52.1 */
->> +typedef struct smb_negotiate_req {
->> +       struct smb_hdr hdr;     /* wct = 0 */
->> +       __le16 ByteCount;
->> +       unsigned char DialectsArray[];
->> +} __packed SMB_NEGOTIATE_REQ;
->> +
->> +#endif /* _COMMON_SMB1_PDU_H */
->> diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
->> index 2d68bd24f3bd..098f147680c5 100644
->> --- a/fs/smb/common/smb2pdu.h
->> +++ b/fs/smb/common/smb2pdu.h
->> @@ -1642,42 +1642,6 @@ struct smb2_lease_ack {
->>          __le64 LeaseDuration;
->>   } __packed;
->>
->> -/*
->> - * See MS-CIFS 2.2.3.1
->> - *     MS-SMB 2.2.3.1
->> - */
->> -struct smb_hdr {
->> -       __be32 smb_buf_length;  /* BB length is only two (rarely three) bytes,
->> -               with one or two byte "type" preceding it that will be
->> -               zero - we could mask the type byte off */
->> -       __u8 Protocol[4];
->> -       __u8 Command;
->> -       union {
->> -               struct {
->> -                       __u8 ErrorClass;
->> -                       __u8 Reserved;
->> -                       __le16 Error;
->> -               } __packed DosError;
->> -               __le32 CifsError;
->> -       } __packed Status;
->> -       __u8 Flags;
->> -       __le16 Flags2;          /* note: le */
->> -       __le16 PidHigh;
->> -       union {
->> -               struct {
->> -                       __le32 SequenceNumber;  /* le */
->> -                       __u32 Reserved; /* zero */
->> -               } __packed Sequence;
->> -               __u8 SecuritySignature[8];      /* le */
->> -       } __packed Signature;
->> -       __u8 pad[2];
->> -       __u16 Tid;
->> -       __le16 Pid;
->> -       __u16 Uid;
->> -       __le16 Mid;
->> -       __u8 WordCount;
->> -} __packed;
->> -
->>   #define OP_BREAK_STRUCT_SIZE_20                24
->>   #define OP_BREAK_STRUCT_SIZE_21                36
->>
->> @@ -1782,14 +1746,6 @@ struct smb_hdr {
->>   #define SET_MINIMUM_RIGHTS (FILE_READ_EA | FILE_READ_ATTRIBUTES \
->>                                  | READ_CONTROL | SYNCHRONIZE)
->>
->> -/* See MS-CIFS 2.2.4.52.1 */
->> -typedef struct smb_negotiate_req {
->> -       struct smb_hdr hdr;     /* wct = 0 */
->> -       __le16 ByteCount;
->> -       unsigned char DialectsArray[];
->> -} __packed SMB_NEGOTIATE_REQ;
->> -
->> -
->>   /*
->>    * [POSIX-SMB2] SMB3 POSIX Extensions
->>    * Link: https://gitlab.com/samba-team/smb3-posix-spec/-/blob/master/smb3_posix_extensions.md
->> diff --git a/fs/smb/common/smbglob.h b/fs/smb/common/smbglob.h
->> index 7853b5771128..353dc4f0971a 100644
->> --- a/fs/smb/common/smbglob.h
->> +++ b/fs/smb/common/smbglob.h
->> @@ -11,8 +11,6 @@
->>   #ifndef _COMMON_SMB_GLOB_H
->>   #define _COMMON_SMB_GLOB_H
->>
->> -#define SMB1_PROTO_NUMBER              cpu_to_le32(0x424d53ff)
->> -
->>   struct smb_version_values {
->>          char            *version_string;
->>          __u16           protocol_id;
->> diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
->> index b8da31cdbfd1..f47ce4a6719c 100644
->> --- a/fs/smb/server/smb_common.h
->> +++ b/fs/smb/server/smb_common.h
->> @@ -11,6 +11,7 @@
->>   #include "glob.h"
->>   #include "nterr.h"
->>   #include "../common/smbglob.h"
->> +#include "../common/smb1pdu.h"
->>   #include "../common/smb2pdu.h"
->>   #include "../common/fscc.h"
->>   #include "smb2pdu.h"
->> --
->> 2.43.0
->>
-> 
-> 
+[auto build test ERROR on brauner-vfs/vfs.all]
+[also build test ERROR on linus/master v6.18]
+[cannot apply to cifs/for-next next-20251208]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/chenxiaosong-chenxiaosong-linux-dev/smb-client-reduce-loop-count-in-map_smb2_to_linux_error-by-half/20251206-232731
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
+patch link:    https://lore.kernel.org/r/20251206151826.2932970-9-chenxiaosong.chenxiaosong%40linux.dev
+patch subject: [PATCH v4 08/10] smb/client: introduce smb2maperror KUnit tests
+config: i386-randconfig-063-20251208 (https://download.01.org/0day-ci/archive/20251209/202512091143.FGQ64S2k-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251209/202512091143.FGQ64S2k-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512091143.FGQ64S2k-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   ld: fs/smb/client/smb2maperror.o: in function `test_cmp_map':
+>> fs/smb/client/smb2maperror_test.c:40:(.text+0x1d4): undefined reference to `kunit_binary_str_assert_format'
+>> ld: fs/smb/client/smb2maperror_test.c:40:(.text+0x20c): undefined reference to `__kunit_do_failed_assertion'
+>> ld: fs/smb/client/smb2maperror_test.c:39:(.text+0x245): undefined reference to `kunit_binary_assert_format'
+   ld: fs/smb/client/smb2maperror_test.c:39:(.text+0x263): undefined reference to `__kunit_do_failed_assertion'
+   ld: fs/smb/client/smb2maperror_test.c:38:(.text+0x274): undefined reference to `kunit_binary_assert_format'
+   ld: fs/smb/client/smb2maperror_test.c:38:(.text+0x2ba): undefined reference to `__kunit_do_failed_assertion'
+>> ld: fs/smb/client/smb2maperror_test.c:37:(.text+0x2da): undefined reference to `kunit_binary_ptr_assert_format'
+   ld: fs/smb/client/smb2maperror_test.c:37:(.text+0x314): undefined reference to `__kunit_do_failed_assertion'
+   ld: fs/smb/client/smb2maperror.o: in function `maperror_test_check_sort':
+>> fs/smb/client/smb2maperror_test.c:28:(.text.unlikely+0x4b): undefined reference to `kunit_binary_assert_format'
+>> ld: fs/smb/client/smb2maperror_test.c:28:(.text.unlikely+0x60): undefined reference to `__kunit_do_failed_assertion'
+
+
+vim +40 fs/smb/client/smb2maperror_test.c
+
+    12	
+    13	static void maperror_test_check_sort(struct kunit *test)
+    14	{
+    15		bool is_sorted = true;
+    16		unsigned int i;
+    17	
+    18		for (i = 1; i < err_map_num; i++) {
+    19			if (smb2_error_map_table[i].smb2_status >=
+    20			    smb2_error_map_table[i - 1].smb2_status)
+    21				continue;
+    22	
+    23			pr_err("smb2_error_map_table array order is incorrect\n");
+    24			is_sorted = false;
+    25			break;
+    26		}
+    27	
+  > 28		KUNIT_EXPECT_EQ(test, true, is_sorted);
+    29	}
+    30	
+    31	static void
+    32	test_cmp_map(struct kunit *test, struct status_to_posix_error *expect)
+    33	{
+    34		struct status_to_posix_error *result;
+    35	
+    36		result = smb2_get_err_map(expect->smb2_status);
+  > 37		KUNIT_EXPECT_PTR_NE(test, NULL, result);
+    38		KUNIT_EXPECT_EQ(test, expect->smb2_status, result->smb2_status);
+  > 39		KUNIT_EXPECT_EQ(test, expect->posix_error, result->posix_error);
+  > 40		KUNIT_EXPECT_STREQ(test, expect->status_string, result->status_string);
+    41	}
+    42	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
