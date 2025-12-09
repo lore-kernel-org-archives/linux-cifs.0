@@ -1,191 +1,215 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071322FB96A
-	for <linux-cifs@vger.kernel.org>; Tue,  9 Dec 2025 23:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B999318DB37
+	for <linux-cifs@vger.kernel.org>; Tue,  9 Dec 2025 23:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765323679; cv=none; b=pFULcziVTuqDz7/4oaN/bVnz9hVqdl8Hh0iLVbfQncIBCbh56YCsbLpCZCzQEK2xU6969sKzYM44wut/MKleeFuJkxzaVZqyekSa2RTVJ2lhsfvaCXTm2iiBDAuDyPRgsq4udLafdVRNdoc+AxgQm1E0uMvtFypNaKarGM/O+Bg=
+	t=1765323972; cv=none; b=XjqSXS9WxF8plLaU+DEJFp1JnA9f4HtzGOHHLqgTJBEBnMnJecu60Rivyo9nnlIl0ppR8uQdfoVN6Wib9yHBCxsAKrhrt0DZFkObEuvR5ZeAIy39MXrECFfsuL+t8SVvY5z7Xc0uiebFb4nHEyd+7alUCGoOwfwkmXcsT1UJ5TM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765323679; c=relaxed/simple;
-	bh=E9xQLrondd4HWPHPAKzjV5hcg7qt89PPS1zscwvzS+c=;
+	s=arc-20240116; t=1765323972; c=relaxed/simple;
+	bh=9pdZuG/1Dym7mrTDxn8+uCydHlztyGss3vKnCrxk2to=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lbI2q0qZn1Y9sacVCh+lN65fELeozmuJi1UxTEBk4nY8rSR8bbATY7eF8BsLnZDBmnNHKcRmS25K2vNAZz7lzuaTmUf4fco/uqO1Xh6q7rlUtTkQ9qYZ5L+gmtGyPcsNRSqZcim4MOJMPC3qyTwgGdVgcD+scAnfPhcsrDpl1TM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q0x11RHg; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=fgoS9m2KXMTiQGspUkAELTgJIhmqrDVaYPKXCIudB8bsWdw1g4u72HlMMBxV+sG2Szf2pmZ65oKKARHxW3z39fm/QyUIgmyNVTvj9NIHiOTDSVdXSEO0iNFqC0vOjTaegMrfmrFzvpFQY/QMhOS0zRaCNByxxgVPdFfXHt6qJRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nmKEMpAF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q0x11RHg"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-880576ebe38so68520136d6.2
-        for <linux-cifs@vger.kernel.org>; Tue, 09 Dec 2025 15:41:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765323677; x=1765928477; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eol7a1otwHvjyBvBv9DBEFIYPmlvmYWzkxkdqs2RWmE=;
-        b=Q0x11RHg97q+x+uByOHeDFP/lin0VrSKCHO0KrdpDea8yjVuc7aJwhEb1OCe6tesPx
-         zI2Qvngu/iMR8KMZXsB7sK1KCUtpCwpRMG7h767la3/iY5ijaMX9eF8+9Zsco8l4mIEb
-         SG80eNfwKguSq6f9iIhl24i+Q5KUWXf4606AmPd2hfMIM8iJB8DqFkRINirP3UOesOTa
-         CAaSGv+9LV5L4YL7ZpbTqw902p1rda45/kwc15aycy8fAhWr2vVdUXbvBn+kZ7JLIF/d
-         lrAzjWWtE0s1lS7WtxI0GvpLQmfUzA2KfGGZRG+d6qt8RXe01RZtx7m00e2H0FPJjSjN
-         dpSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765323677; x=1765928477;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=eol7a1otwHvjyBvBv9DBEFIYPmlvmYWzkxkdqs2RWmE=;
-        b=ZYOGPW2fs9FUW831Cs6AmAhaNcGIVVGXOmkWhAlbNcdp+q/rz9bAQHc3Dnhg7m1FWQ
-         ctl/1UxRxZ/yF+DBevGTz9SX+meISmpJMtQ9j2rogLw9iCs3Mip0oB/wvBrplSCjGt+W
-         2nA89gO9FMop12TBbczYTp32E0AKz8/4HahBKWADVsnkbiuY7pSFVcT/o9VHkJT7uPoR
-         TO7LN8Bzejnkj7gGY1r8Xsd4HElnYNta1Hzskb5G9rWd2tlvemodLwh2Gr8EGr6rGvL8
-         iRytbwRGjnuKVD4PEbgztSpCrN3jrj9yTBCDQbQDUU3UhKpI0O+/yeRGrqmuZApwsfjj
-         h0JQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUeYUDUv7YSD0D4fEluVjhOcJinZZPQuAm5+L9/Ok/vPWmFEzh5TohrUWo1igCpvaf/VbXWk2OoKg+G@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2CktmiEqjCMdL1iHR23IfM/2/ObwKd8cRl1M/TIz63GSi9XN+
-	LYrfbnf4Pd6jVrziDb7EpPZf0mOgu2fiOAc+0/vGuLLDlaoChSop5gE0yJMrJkqCqK8x0bA+b2T
-	Xis7z3QxX6xGjwF9+EOA24i1MfC+PZMg=
-X-Gm-Gg: AY/fxX78DAese2Y33BqQGrbfl/V25BLY7JTRrUWlDjjHOFCJXdjW7Dg5yEyZrIJyPUf
-	0Z/4YEgbXuzFPHwykTagHv2osn6cX8zz8kqFwF3CFGLF+LQR//EBo7zC9R618FOm9Sbrc552mW3
-	H9sZ5Hoy7ZcYAvdDuBqtl0f1p+4tVU3N65moqwVoSD8g7Da065CcxuxbgR8UqmAwuSPEW0uDMxT
-	0qAVqLL5YGMXmehWDHY9ox+FdE3zv1ylCociTTvrhD+DB6JTWwZ3MG8BW8ueXYbtf/akCsFWjGh
-	03gjm3x75599V+h0U8Efx04L849W8PxZwKZoOBoXexF0arqg4kWT0FetoiTw5RGV6T8N24a6ME6
-	l61LAAalya2pczfhbyCCJtt2mKwnxueRPBkOHaPeKqnvAiTWe88GwNHAgdATOs7MYBHra/TfDcA
-	/+gU6LZLU=
-X-Google-Smtp-Source: AGHT+IH42Y9jMF9Ybm6PN2AjrAz3LmpBej4NKEjOFolTxZUH6/Ywh7BxkXaqCBXy+lipcuJ9VY003XRl/1ZPyupV1Q0=
-X-Received: by 2002:a05:6214:2a81:b0:882:437d:282d with SMTP id
- 6a1803df08f44-88863a86b5cmr8841026d6.30.1765323676845; Tue, 09 Dec 2025
- 15:41:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nmKEMpAF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DE4DC2BC87
+	for <linux-cifs@vger.kernel.org>; Tue,  9 Dec 2025 23:46:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765323972;
+	bh=9pdZuG/1Dym7mrTDxn8+uCydHlztyGss3vKnCrxk2to=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=nmKEMpAF5HIiKWuLaRCUO81MnxToWfQInKGHMLKIWbzMgHaUguChxZEDJHTGpX9ge
+	 DUYbjflKvKG2sMP/nFgUiwLFrN6aFEm0Ar6ESNLa358S1qmB6Z0SWRVsHWPggxhJCq
+	 iA1LC36MH4lQ+E4EGVGXA4chAmOB5OQT9cGTO248naPm29s5qBFpksA0sEHkZWnmc/
+	 +QHBrq+Yg+savt+4erLvKNQFQFbCvJe6p/XPixCfU7czhRfbgbMfYQ11CC4C4ZD2IH
+	 BVSDKwou8K8hUmwMz3yf8w5WnJNXNSUBUq5qLuq1KQGC5nmBI8WVtX/xgWKKFw9C1z
+	 Pbu3TWxA9iWGA==
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-647a3bca834so8050701a12.2
+        for <linux-cifs@vger.kernel.org>; Tue, 09 Dec 2025 15:46:12 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUe1Y5y4SuUBU6OKRhiyYSydY7c9XgEcSVw/fO9WZ5rAb6YXVTRTgrnjeOk3ov7F7AsV6TL97+dP59G@vger.kernel.org
+X-Gm-Message-State: AOJu0Yys6h91fbWY/84sDIjDcsDJoW77QKRdaqJkQxi+++kngg11jM2g
+	wQIJlGg+Xm9h/J+/LCRLKa9mCQOyNzWLQITBxTppHmM9614mNUioNI4z/h6cLOo+hG6/eer+kfb
+	VTivbaCNhoVpP8ep5kZbSYW9eDb1RG5w=
+X-Google-Smtp-Source: AGHT+IEV0usO/WOC//KV++wjWTBfv1yrMoEAufsrNOjU6fhQNONu57NOe7af0VQXkQnlqnYEGFg1Zy+YQ7ZB6NBcOPA=
+X-Received: by 2002:a05:6402:144d:b0:640:ca0a:dc1c with SMTP id
+ 4fb4d7f45d1cf-6496cb6b889mr696447a12.7.1765323970748; Tue, 09 Dec 2025
+ 15:46:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev>
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 9 Dec 2025 17:41:05 -0600
-X-Gm-Features: AQt7F2oXHR39caH7I73uR_kA-pVetWgyUVVWKj4yM8h7hQjnWT6try-qF04sxWU
-Message-ID: <CAH2r5mvy6zoD3UKto6uOknFFMKCncJOPiDYqEUwKB_Zcpuj2pw@mail.gmail.com>
-Subject: Re: [PATCH 00/30] smb: improve search speed of SMB1 maperror
+References: <20251209011020.3270989-1-chenxiaosong.chenxiaosong@linux.dev> <20251209011020.3270989-12-chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <20251209011020.3270989-12-chenxiaosong.chenxiaosong@linux.dev>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 10 Dec 2025 08:45:57 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8so+qB4zAXmj2mNSxqQ4emJe6eqhg-UgpKYgP+URk_yA@mail.gmail.com>
+X-Gm-Features: AQt7F2p6wucrjKrfunNecKvM8qeEVH23hzqQT93erdy6WDGFlR5PUc7XutdvVxo
+Message-ID: <CAKYAXd8so+qB4zAXmj2mNSxqQ4emJe6eqhg-UgpKYgP+URk_yA@mail.gmail.com>
+Subject: Re: [PATCH 11/13] smb: introduce struct create_posix_ctxt_rsp
 To: chenxiaosong.chenxiaosong@linux.dev
-Cc: linkinjeon@kernel.org, linkinjeon@samba.org, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, liuzhengyuan@kylinos.cn, huhai@kylinos.cn, 
-	liuyun01@kylinos.cn, ChenXiaoSong <chenxiaosong@kylinos.cn>, 
-	samba-technical <samba-technical@lists.samba.org>
+Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn, 
+	ZhangGuoDong <zhangguodong@kylinos.cn>, ChenXiaoSong <chenxiaosong@kylinos.cn>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Merged nine of the client patches from this series into cifs-2.6.git
-for-next.  They looked safe.  Good catch on fixing some of these
-incorrect error definitions.
-
-a691ac0cdd97 (HEAD -> for-next, origin/for-next) smb: move
-file_notify_information to common/fscc.h
-c0fd2fbe4f73 smb: move SMB2 Notify Action Flags into common/smb2pdu.h
-787a2b803211 smb: move notify completion filter flags into common/smb2pdu.h
-14a6f0e19fc7 smb/client: add parentheses to NT error code definitions
-containing bitwise OR operator
-1e4c7c9ab176 smb: add documentation references for smb2 change notify
-definitions
-833f0f46368f smb/client: add 4 NT error code definitions
-3a0a34572269 smb/client: fix NT_STATUS_UNABLE_TO_FREE_VM value
-954cbce76316 smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value
-b9695d00b605 smb/client: fix NT_STATUS_NO_DATA_DETECTED value
-3d99347a2e1a (linus/master, linus/HEAD) Merge tag
-'v6.19-rc-part1-smb3-client-fixes' of
-git://git.samba.org/sfrench/cifs-2.6
-
-On Mon, Dec 8, 2025 at 12:22=E2=80=AFAM <chenxiaosong.chenxiaosong@linux.de=
+On Tue, Dec 9, 2025 at 10:12=E2=80=AFAM <chenxiaosong.chenxiaosong@linux.de=
 v> wrote:
 >
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> From: ZhangGuoDong <zhangguodong@kylinos.cn>
 >
-> Before applying this patchset, the patchset ("smb: improve search speed o=
-f SMB2 maperror") must
-> be applied first, which introduces `CONFIG_SMB_KUNIT_TESTS` and avoids so=
-me conflicts in `fs/smb/client/cifsfs.c`:
-> https://chenxiaosong.com/lkml-improve-search-speed-of-smb2-maperror.html =
-(Redirect to the LKML link)
+> Modify the following places:
 >
-> When searching for the last element, the comparison counts are shown in t=
-he table below:
+>   - introduce new struct create_posix_ctxt_rsp
+>   - some fields in "struct create_posix_rsp" -> "struct create_posix_ctxt=
+_rsp"
+>   - create_posix_rsp_buf(): offsetof(..., nlink) -> offsetof(..., ctxt_rs=
+p)
+I don't know why we need to add a new create_posix_ctxt_rsp struct.
 >
-> +--------------------+--------+--------+
-> |                    |Before  |After   |
-> |                    |Patchset|Patchset|
-> +--------------------+--------+--------+
-> | ntstatus_to_dos_map|   525  |    9   |
-> +--------------------+--------+--------+
-> |             nt_errs|   516  |    9   |
-> +--------------------+--------+--------+
-> |mapping_table_ERRDOS|    39  |    5   |
-> +--------------------+--------+--------+
-> |mapping_table_ERRSRV|    37  |    5   |
-> +--------------------+--------+--------+
+> Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
+> ---
+>  fs/smb/client/smb2pdu.c |  9 +++++----
+>  fs/smb/client/smb2pdu.h |  6 ++----
+>  fs/smb/common/smb2pdu.h | 18 ++++++++++++++++++
+>  fs/smb/server/oplock.c  |  8 ++++----
+>  fs/smb/server/smb2pdu.h |  6 ++----
+>  5 files changed, 31 insertions(+), 16 deletions(-)
 >
-> ChenXiaoSong (30):
->   smb/client: fix NT_STATUS_NO_DATA_DETECTED value
->   smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value
->   smb/client: fix NT_STATUS_UNABLE_TO_FREE_VM value
->   smb/server: remove unused nterr.h
->   smb/client: add 4 NT error code definitions
->   smb/client: add parentheses to NT error code definitions containing
->     bitwise OR operator
->   smb/client: introduce DEFINE_CMP_FUNC()
->   smb/client: sort ntstatus_to_dos_map array
->   smb/client: create netmisc_test.c and introduce
->     DEFINE_CHECK_SORT_FUNC()
->   smb/client: introduce KUnit test to check sort result of
->     ntstatus_to_dos_map array
->   smb/client: introduce DEFINE_SEARCH_FUNC()
->   smb/client: use bsearch() to find target in ntstatus_to_dos_map array
->   smb/client: remove useless elements from ntstatus_to_dos_map array
->   smb/client: introduce DEFINE_CHECK_SEARCH_FUNC()
->   smb/client: introduce KUnit test to check search result of
->     ntstatus_to_dos_map array
->   smb/client: sort nt_errs array
->   smb/client: introduce KUnit test to check sort result of nt_errs array
->   smb/client: use bsearch() to find target in nt_errs array
->   smb/client: remove useless elements from nt_errs array
->   smb/client: introduce KUnit test to check search result of nt_errs
->     array
->   smb/client: sort mapping_table_ERRDOS array
->   smb/client: introduce KUnit test to check sort result of
->     mapping_table_ERRDOS array
->   smb/client: use bsearch() to find target in mapping_table_ERRDOS array
->   smb/client: remove useless elements from mapping_table_ERRDOS array
->   smb/client: introduce KUnit test to check search result of
->     mapping_table_ERRDOS array
->   smb/client: sort mapping_table_ERRSRV array
->   smb/client: introduce KUnit test to check sort result of
->     mapping_table_ERRSRV array
->   smb/client: use bsearch() to find target in mapping_table_ERRSRV array
->   smb/client: remove useless elements from mapping_table_ERRSRV array
->   smb/client: introduce KUnit test to check search result of
->     mapping_table_ERRSRV array
+> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> index ef2c6ac500f7..ec0f83db5591 100644
+> --- a/fs/smb/client/smb2pdu.c
+> +++ b/fs/smb/client/smb2pdu.c
+> @@ -2298,9 +2298,9 @@ parse_posix_ctxt(struct create_context *cc, struct =
+smb2_file_all_info *info,
 >
->  fs/smb/client/cifsfs.c       |    2 +
->  fs/smb/client/cifsproto.h    |    1 +
->  fs/smb/client/netmisc.c      |  155 ++++--
->  fs/smb/client/netmisc_test.c |  114 ++++
->  fs/smb/client/nterr.c        |   12 +-
->  fs/smb/client/nterr.h        | 1017 +++++++++++++++++-----------------
->  fs/smb/server/nterr.h        |  543 ------------------
->  fs/smb/server/smb2misc.c     |    1 -
->  fs/smb/server/smb_common.h   |    1 -
->  9 files changed, 739 insertions(+), 1107 deletions(-)
->  create mode 100644 fs/smb/client/netmisc_test.c
->  delete mode 100644 fs/smb/server/nterr.h
+>         memset(posix, 0, sizeof(*posix));
 >
+> -       posix->nlink =3D le32_to_cpu(*(__le32 *)(beg + 0));
+> -       posix->reparse_tag =3D le32_to_cpu(*(__le32 *)(beg + 4));
+> -       posix->mode =3D le32_to_cpu(*(__le32 *)(beg + 8));
+> +       posix->ctxt_rsp.nlink =3D le32_to_cpu(*(__le32 *)(beg + 0));
+> +       posix->ctxt_rsp.reparse_tag =3D le32_to_cpu(*(__le32 *)(beg + 4))=
+;
+> +       posix->ctxt_rsp.mode =3D le32_to_cpu(*(__le32 *)(beg + 8));
+>
+>         sid =3D beg + 12;
+>         sid_len =3D posix_info_sid_size(sid, end);
+> @@ -2319,7 +2319,8 @@ parse_posix_ctxt(struct create_context *cc, struct =
+smb2_file_all_info *info,
+>         memcpy(&posix->group, sid, sid_len);
+>
+>         cifs_dbg(FYI, "nlink=3D%d mode=3D%o reparse_tag=3D%x\n",
+> -                posix->nlink, posix->mode, posix->reparse_tag);
+> +                posix->ctxt_rsp.nlink, posix->ctxt_rsp.mode,
+> +                posix->ctxt_rsp.reparse_tag);
+>  }
+>
+>  int smb2_parse_contexts(struct TCP_Server_Info *server,
+> diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
+> index 78bb99f29d38..4928fb620233 100644
+> --- a/fs/smb/client/smb2pdu.h
+> +++ b/fs/smb/client/smb2pdu.h
+> @@ -251,11 +251,9 @@ struct smb2_file_id_extd_directory_info {
+>
+>  extern char smb2_padding[7];
+>
+> -/* equivalent of the contents of SMB3.1.1 POSIX open context response */
+> +/* See POSIX-SMB2 2.2.14.2.16 */
+>  struct create_posix_rsp {
+> -       u32 nlink;
+> -       u32 reparse_tag;
+> -       u32 mode;
+> +       struct create_posix_ctxt_rsp ctxt_rsp;
+>         struct smb_sid owner; /* var-sized on the wire */
+>         struct smb_sid group; /* var-sized on the wire */
+>  } __packed;
+> diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+> index 72f2cfc47da8..698ab9d7d16b 100644
+> --- a/fs/smb/common/smb2pdu.h
+> +++ b/fs/smb/common/smb2pdu.h
+> @@ -1814,4 +1814,22 @@ typedef struct smb_negotiate_req {
+>         unsigned char DialectsArray[];
+>  } __packed SMB_NEGOTIATE_REQ;
+>
+> +
+> +/*
+> + * [POSIX-SMB2] SMB3 POSIX Extensions
+> + * Link: https://gitlab.com/samba-team/smb3-posix-spec/-/blob/master/smb=
+3_posix_extensions.md
+> + */
+> +
+> +/*
+> + * SMB2_CREATE_POSIX_CONTEXT Response
+> + * See POSIX-SMB2 2.2.14.2.16
+> + */
+> +struct create_posix_ctxt_rsp {
+> +       __le32 nlink;
+> +       __le32 reparse_tag;
+> +       __le32 mode;
+> +       // var sized owner SID
+> +       // var sized group SID
+> +} __packed;
+> +
+>  #endif                         /* _COMMON_SMB2PDU_H */
+> diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+> index 1f07ebf431d7..8658402ff893 100644
+> --- a/fs/smb/server/oplock.c
+> +++ b/fs/smb/server/oplock.c
+> @@ -1703,7 +1703,7 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_fi=
+le *fp)
+>         buf =3D (struct create_posix_rsp *)cc;
+>         memset(buf, 0, sizeof(struct create_posix_rsp));
+>         buf->ccontext.DataOffset =3D cpu_to_le16(offsetof
+> -                       (struct create_posix_rsp, nlink));
+> +                       (struct create_posix_rsp, ctxt_rsp));
+>         /*
+>          * DataLength =3D nlink(4) + reparse_tag(4) + mode(4) +
+>          * domain sid(28) + unix group sid(16).
+> @@ -1730,9 +1730,9 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_fi=
+le *fp)
+>         buf->Name[14] =3D 0xCD;
+>         buf->Name[15] =3D 0x7C;
+>
+> -       buf->nlink =3D cpu_to_le32(inode->i_nlink);
+> -       buf->reparse_tag =3D cpu_to_le32(fp->volatile_id);
+> -       buf->mode =3D cpu_to_le32(inode->i_mode & 0777);
+> +       buf->ctxt_rsp.nlink =3D cpu_to_le32(inode->i_nlink);
+> +       buf->ctxt_rsp.reparse_tag =3D cpu_to_le32(fp->volatile_id);
+> +       buf->ctxt_rsp.mode =3D cpu_to_le32(inode->i_mode & 0777);
+>         /*
+>          * SidBuffer(44) contain two sids(Domain sid(28), UNIX group sid(=
+16)).
+>          * Domain sid(28) =3D revision(1) + num_subauth(1) + authority(6)=
+ +
+> diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
+> index 66cdc8e4a648..09311a9eb1de 100644
+> --- a/fs/smb/server/smb2pdu.h
+> +++ b/fs/smb/server/smb2pdu.h
+> @@ -83,13 +83,11 @@ struct create_durable_rsp {
+>         } Data;
+>  } __packed;
+>
+> -/* equivalent of the contents of SMB3.1.1 POSIX open context response */
+> +/* See POSIX-SMB2 2.2.14.2.16 */
+>  struct create_posix_rsp {
+>         struct create_context_hdr ccontext;
+>         __u8    Name[16];
+> -       __le32 nlink;
+> -       __le32 reparse_tag;
+> -       __le32 mode;
+> +       struct create_posix_ctxt_rsp ctxt_rsp;
+>         /* SidBuffer contain two sids(Domain sid(28), UNIX group sid(16))=
+ */
+>         u8 SidBuffer[44];
+>  } __packed;
 > --
 > 2.43.0
 >
-
-
---=20
-Thanks,
-
-Steve
