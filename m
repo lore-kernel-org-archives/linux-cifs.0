@@ -1,49 +1,50 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580397080D
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Dec 2025 04:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403D1200110
+	for <linux-cifs@vger.kernel.org>; Wed, 10 Dec 2025 04:34:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765341189; cv=none; b=aEXP/zBSoOmtbUKizuM8BKMaAVzt3pIrYSKIQETcPCZFIDBGgEVrZeORv4fGza4yGz/Usip/5VFe53bXwIPO8O5L/zoGQw7CBLaDDZ3AUAUFcqvrM2qdX9LPnRiceXiPL5AbbObakWy2RDdsaGId2g+OvMEQ2IfRvhHfQ6X9lv0=
+	t=1765341273; cv=none; b=Nl6pHUjb7m4K6gCl44Ai45A4nmnT+ew7vMdS90/bTmNhkZmuMKLSev/OMds3Y2s6OH1Ex33hHXRVyjXoMt6UHOpAm80oPMt4r/IWmOe2bArkEXzSi5y2ijpSsGQsmqE6gj/gpQjj4VgEkHIysiD5DnhJnSWCKHib2VG6ICbozzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765341189; c=relaxed/simple;
-	bh=csH4AYm5Xl7y9BqWS3SZrKlQbmAUTe1Ai921FDfiBTk=;
+	s=arc-20240116; t=1765341273; c=relaxed/simple;
+	bh=NOpPfac8HllyOEfDMlVJ0O9I3GTIt7fwPUP90o86SHY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NDrW8FLdNNC6ixqMvl67KtTA2h2AVccXJWerhi0przptMykMa27N4dpp/QAkix+xLtJzyqioaKZbfG39O6pgKABupefvp7thXc8NCRw4pnMSFwtV7RpU02foh5WHOKOWC77xHkO6g/xV+aSTpwEg2mvxgQbtFJ7zajVG5CcebKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xmgMSLSv; arc=none smtp.client-ip=91.218.175.186
+	 In-Reply-To:Content-Type; b=sOS9fw/0pDnU7xpFsXKYUOEWz+9l8pWHcxsZRfBmgxyS9HPdHQpPU7R+3k/rD1swqTqCM26YNg7sxOq6Yd8ZKbP1+IQW2bdecNWzqVXS13VFsm9aiykdYZhqx1rS1SvBldBzqSJ6sYAgU78Xrh7dBAk1SfX133Tf4muRp7c/Xtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v/wcJCxl; arc=none smtp.client-ip=91.218.175.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xmgMSLSv"
-Message-ID: <8a5f7591-14cf-4dcf-86e6-9684a3e9dcae@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v/wcJCxl"
+Message-ID: <88f9bfb3-4f8e-4ddc-9fb5-fcd12c9c93dc@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765341185;
+	t=1765341268;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jabQ4utqUAlD8GqxNKDd6jXKxgXsiiMOnfUKRCz1PTs=;
-	b=xmgMSLSvvdpOYiUwDqpokhmeLyqc6tZ/sSrXCLO2lKSp1pgwEmmyoiChFLeFdrMGLq+TbG
-	naNgv2T5pJ4jD30KrcnRnI2+b52YJX8VFSgdqxDxvmYm/n6ceHRWbE0XYCHQ3d9EX4OQbv
-	3lfhkWAx1mi0Q/ZR6D2jANeyLrnoW7s=
-Date: Wed, 10 Dec 2025 12:32:23 +0800
+	bh=7kItuku8GNZDhTk0LtpWkpM5IYZfAbW+9v0Ie8AyYIY=;
+	b=v/wcJCxlHGfCHbPlD5P+ccW8H2t/qgohfZzzZPuJTVCtklzRc2uNMdeIY25tb9I4lnjaZG
+	zKndkKN8ja/BnlFhOQv4h8W1HtsSFCpEuA+Nh7sHiqsMaeB8xm3ZtHEJL62yrP59BuvdaP
+	c1b8pwVFIqBUNMHMUbdDwTx9Lykblc8=
+Date: Wed, 10 Dec 2025 12:34:22 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 00/30] smb: improve search speed of SMB1 maperror
+Subject: Re: [PATCH 00/13 smb: move duplicate definitions into common header
+ file, part 2
 To: sfrench@samba.org, smfrench@gmail.com, linkinjeon@kernel.org,
  linkinjeon@samba.org
 Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
  liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn
-References: <20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev>
+References: <20251209011020.3270989-1-chenxiaosong.chenxiaosong@linux.dev>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <20251209011020.3270989-1-chenxiaosong.chenxiaosong@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
@@ -60,80 +61,54 @@ see the link: https://chenxiaosong.com/en/smb-patch.html
 Thanks,
 ChenXiaoSong.
 
-On 12/8/25 14:20, chenxiaosong.chenxiaosong@linux.dev wrote:
+On 12/9/25 09:10, chenxiaosong.chenxiaosong@linux.dev wrote:
 > From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > 
-> Before applying this patchset, the patchset ("smb: improve search speed of SMB2 maperror") must
-> be applied first, which introduces `CONFIG_SMB_KUNIT_TESTS` and avoids some conflicts in `fs/smb/client/cifsfs.c`:
-> https://chenxiaosong.com/lkml-improve-search-speed-of-smb2-maperror.html (Redirect to the LKML link)
+> I'm currently working on implementing the SMB2 change notify feature in
+> ksmbd, and noticed several duplicated definitions that exist on both client
+> and server. Maybe we can clean these up first.
 > 
-> When searching for the last element, the comparison counts are shown in the table below:
+> This is a continuous effort to move duplicated definitions in both client
+> and server into common header files, which makes the code easier to
+> maintain.
 > 
-> +--------------------+--------+--------+
-> |                    |Before  |After   |
-> |                    |Patchset|Patchset|
-> +--------------------+--------+--------+
-> | ntstatus_to_dos_map|   525  |    9   |
-> +--------------------+--------+--------+
-> |             nt_errs|   516  |    9   |
-> +--------------------+--------+--------+
-> |mapping_table_ERRDOS|    39  |    5   |
-> +--------------------+--------+--------+
-> |mapping_table_ERRSRV|    37  |    5   |
-> +--------------------+--------+--------+
+> The previous work is here:
+> https://lore.kernel.org/linux-cifs/20251117112838.473051-1-chenxiaosong.chenxiaosong@linux.dev/
 > 
-> ChenXiaoSong (30):
->    smb/client: fix NT_STATUS_NO_DATA_DETECTED value
->    smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value
->    smb/client: fix NT_STATUS_UNABLE_TO_FREE_VM value
->    smb/server: remove unused nterr.h
->    smb/client: add 4 NT error code definitions
->    smb/client: add parentheses to NT error code definitions containing
->      bitwise OR operator
->    smb/client: introduce DEFINE_CMP_FUNC()
->    smb/client: sort ntstatus_to_dos_map array
->    smb/client: create netmisc_test.c and introduce
->      DEFINE_CHECK_SORT_FUNC()
->    smb/client: introduce KUnit test to check sort result of
->      ntstatus_to_dos_map array
->    smb/client: introduce DEFINE_SEARCH_FUNC()
->    smb/client: use bsearch() to find target in ntstatus_to_dos_map array
->    smb/client: remove useless elements from ntstatus_to_dos_map array
->    smb/client: introduce DEFINE_CHECK_SEARCH_FUNC()
->    smb/client: introduce KUnit test to check search result of
->      ntstatus_to_dos_map array
->    smb/client: sort nt_errs array
->    smb/client: introduce KUnit test to check sort result of nt_errs array
->    smb/client: use bsearch() to find target in nt_errs array
->    smb/client: remove useless elements from nt_errs array
->    smb/client: introduce KUnit test to check search result of nt_errs
->      array
->    smb/client: sort mapping_table_ERRDOS array
->    smb/client: introduce KUnit test to check sort result of
->      mapping_table_ERRDOS array
->    smb/client: use bsearch() to find target in mapping_table_ERRDOS array
->    smb/client: remove useless elements from mapping_table_ERRDOS array
->    smb/client: introduce KUnit test to check search result of
->      mapping_table_ERRDOS array
->    smb/client: sort mapping_table_ERRSRV array
->    smb/client: introduce KUnit test to check sort result of
->      mapping_table_ERRSRV array
->    smb/client: use bsearch() to find target in mapping_table_ERRSRV array
->    smb/client: remove useless elements from mapping_table_ERRSRV array
->    smb/client: introduce KUnit test to check search result of
->      mapping_table_ERRSRV array
+> ChenXiaoSong (7):
+>    smb: add documentation references for smb2 change notify definitions
+>    smb: move notify completion filter flags into common/smb2pdu.h
+>    smb: move SMB2 Notify Action Flags into common/smb2pdu.h
+>    smb: move file_notify_information to common/fscc.h
+>    smb: move File Attributes definitions into common/fscc.h
+>    smb: update struct duplicate_extents_to_file_ex
+>    smb/server: add comment to FileSystemName of
+>      FileFsAttributeInformation
 > 
->   fs/smb/client/cifsfs.c       |    2 +
->   fs/smb/client/cifsproto.h    |    1 +
->   fs/smb/client/netmisc.c      |  155 ++++--
->   fs/smb/client/netmisc_test.c |  114 ++++
->   fs/smb/client/nterr.c        |   12 +-
->   fs/smb/client/nterr.h        | 1017 +++++++++++++++++-----------------
->   fs/smb/server/nterr.h        |  543 ------------------
->   fs/smb/server/smb2misc.c     |    1 -
->   fs/smb/server/smb_common.h   |    1 -
->   9 files changed, 739 insertions(+), 1107 deletions(-)
->   create mode 100644 fs/smb/client/netmisc_test.c
->   delete mode 100644 fs/smb/server/nterr.h
+> ZhangGuoDong (6):
+>    smb: move smb3_fs_vol_info into common/fscc.h
+>    smb: move some definitions from common/smb2pdu.h into common/fscc.h
+>    smb/client: remove DeviceType Flags and Device Characteristics
+>      definitions
+>    smb: introduce struct create_posix_ctxt_rsp
+>    smb: introduce struct file_posix_info
+>    smb: move some SMB1 definitions into common/smb1pdu.h
+> 
+>   fs/smb/client/cifspdu.h    |  67 +-----
+>   fs/smb/client/inode.c      |  22 +-
+>   fs/smb/client/readdir.c    |  28 +--
+>   fs/smb/client/reparse.h    |   4 +-
+>   fs/smb/client/smb2pdu.c    |   9 +-
+>   fs/smb/client/smb2pdu.h    |  21 +-
+>   fs/smb/common/fscc.h       | 419 ++++++++++++++++++++++++++++++++++-
+>   fs/smb/common/smb1pdu.h    |  59 +++++
+>   fs/smb/common/smb2pdu.h    | 433 ++-----------------------------------
+>   fs/smb/common/smbglob.h    |   2 -
+>   fs/smb/server/oplock.c     |   8 +-
+>   fs/smb/server/smb2pdu.c    |  91 ++++----
+>   fs/smb/server/smb2pdu.h    |  27 +--
+>   fs/smb/server/smb_common.h |   9 +-
+>   14 files changed, 589 insertions(+), 610 deletions(-)
+>   create mode 100644 fs/smb/common/smb1pdu.h
 > 
 
