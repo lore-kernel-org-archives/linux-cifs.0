@@ -1,114 +1,79 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403D1200110
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Dec 2025 04:34:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8FF30EF75;
+	Wed, 10 Dec 2025 13:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765341273; cv=none; b=Nl6pHUjb7m4K6gCl44Ai45A4nmnT+ew7vMdS90/bTmNhkZmuMKLSev/OMds3Y2s6OH1Ex33hHXRVyjXoMt6UHOpAm80oPMt4r/IWmOe2bArkEXzSi5y2ijpSsGQsmqE6gj/gpQjj4VgEkHIysiD5DnhJnSWCKHib2VG6ICbozzA=
+	t=1765375189; cv=none; b=nMeFavNXTgAVW/7N/qY0gF0w0+oWYcZXCVGrUAzx45hzZM9Ya5/geERiaJQgqlpqCkyAQLjf0d4N2qGFFFrCm0Mck9Zi6r5oFcLtKEARXXHPm618tNGeO0Q3RE7X9elf/vWZNMGcxRUaQ/9RbqQr7O9xvlRNH//qbtzsuH66M+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765341273; c=relaxed/simple;
-	bh=NOpPfac8HllyOEfDMlVJ0O9I3GTIt7fwPUP90o86SHY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sOS9fw/0pDnU7xpFsXKYUOEWz+9l8pWHcxsZRfBmgxyS9HPdHQpPU7R+3k/rD1swqTqCM26YNg7sxOq6Yd8ZKbP1+IQW2bdecNWzqVXS13VFsm9aiykdYZhqx1rS1SvBldBzqSJ6sYAgU78Xrh7dBAk1SfX133Tf4muRp7c/Xtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v/wcJCxl; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1765375189; c=relaxed/simple;
+	bh=RebNYuRfoX4Yj8jydBW04p/P8mIT5OiHxq+3RzaFj5Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BX+azSbepu/V0a4ku7kk+z9Iv2Qyx9aa2375jdRtP/F5q4OeFsnHLzR46HvG+znSOzhUlY2XU/3OI9qxcU9ByFrlyfCuj8GUPc8ikTF3zY6UzTGERUOeBH8JakcYU46bvYzjjD0ByouHiGJIyj2GCn23KsVvSPKgJ0dUespF+Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=gq7k1J8K; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v/wcJCxl"
-Message-ID: <88f9bfb3-4f8e-4ddc-9fb5-fcd12c9c93dc@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765341268;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7kItuku8GNZDhTk0LtpWkpM5IYZfAbW+9v0Ie8AyYIY=;
-	b=v/wcJCxlHGfCHbPlD5P+ccW8H2t/qgohfZzzZPuJTVCtklzRc2uNMdeIY25tb9I4lnjaZG
-	zKndkKN8ja/BnlFhOQv4h8W1HtsSFCpEuA+Nh7sHiqsMaeB8xm3ZtHEJL62yrP59BuvdaP
-	c1b8pwVFIqBUNMHMUbdDwTx9Lykblc8=
-Date: Wed, 10 Dec 2025 12:34:22 +0800
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="gq7k1J8K"
+Received: from VelichayshiyPC.. (unknown [77.93.122.67])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 1E9CB400CDE4;
+	Wed, 10 Dec 2025 13:52:29 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 1E9CB400CDE4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1765374749;
+	bh=XKeuBlL4Brmw4J+3EC9u4xqKoy8ajsWzQPA5DOca5/Q=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gq7k1J8Kdg0hrEmA+MY55xQuEQDocI7DKStPdqc1Gau3lecatDTuLdYovzzy+aWm9
+	 HZVuotpxGuQgiYOuaeMtvq4X/syYDRfLuD1Nhe4/Klmqn7aTpBrtSHfA3Nrkn7Dggf
+	 5vjhTHv6pFdguggNTJ0gFoCy31yZ2mRS+qH9JB8Q=
+From: Alexey Velichayshiy <a.velichayshiy@ispras.ru>
+To: a.velichayshiy@ispras.ru,
+	Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: [PATCH] ksmbd: remove redundant DACL check in smb_check_perm_dacl
+Date: Wed, 10 Dec 2025 16:51:33 +0300
+Message-ID: <20251210135149.10837-1-a.velichayshiy@ispras.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 00/13 smb: move duplicate definitions into common header
- file, part 2
-To: sfrench@samba.org, smfrench@gmail.com, linkinjeon@kernel.org,
- linkinjeon@samba.org
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
- liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn
-References: <20251209011020.3270989-1-chenxiaosong.chenxiaosong@linux.dev>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251209011020.3270989-1-chenxiaosong.chenxiaosong@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Steve and Namjae,
+A zero value of pdacl->num_aces is already handled at the start of
+smb_check_perm_dacl() so the second check is useless.
 
-I have tested all patches using KUnit tests, xfstests, and smbtorture, 
-and no additional test failures were observed. The detailed test results 
-can be found in: https://chenxiaosong.com/en/smb-test-20251210.html
+Drop the unreachable code block, no functional impact intended.
 
-For more detailed information about the patches to be reviewed, please 
-see the link: https://chenxiaosong.com/en/smb-patch.html
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Thanks,
-ChenXiaoSong.
+Signed-off-by: Alexey Velichayshiy <a.velichayshiy@ispras.ru>
+---
+ fs/smb/server/smbacl.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-On 12/9/25 09:10, chenxiaosong.chenxiaosong@linux.dev wrote:
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> 
-> I'm currently working on implementing the SMB2 change notify feature in
-> ksmbd, and noticed several duplicated definitions that exist on both client
-> and server. Maybe we can clean these up first.
-> 
-> This is a continuous effort to move duplicated definitions in both client
-> and server into common header files, which makes the code easier to
-> maintain.
-> 
-> The previous work is here:
-> https://lore.kernel.org/linux-cifs/20251117112838.473051-1-chenxiaosong.chenxiaosong@linux.dev/
-> 
-> ChenXiaoSong (7):
->    smb: add documentation references for smb2 change notify definitions
->    smb: move notify completion filter flags into common/smb2pdu.h
->    smb: move SMB2 Notify Action Flags into common/smb2pdu.h
->    smb: move file_notify_information to common/fscc.h
->    smb: move File Attributes definitions into common/fscc.h
->    smb: update struct duplicate_extents_to_file_ex
->    smb/server: add comment to FileSystemName of
->      FileFsAttributeInformation
-> 
-> ZhangGuoDong (6):
->    smb: move smb3_fs_vol_info into common/fscc.h
->    smb: move some definitions from common/smb2pdu.h into common/fscc.h
->    smb/client: remove DeviceType Flags and Device Characteristics
->      definitions
->    smb: introduce struct create_posix_ctxt_rsp
->    smb: introduce struct file_posix_info
->    smb: move some SMB1 definitions into common/smb1pdu.h
-> 
->   fs/smb/client/cifspdu.h    |  67 +-----
->   fs/smb/client/inode.c      |  22 +-
->   fs/smb/client/readdir.c    |  28 +--
->   fs/smb/client/reparse.h    |   4 +-
->   fs/smb/client/smb2pdu.c    |   9 +-
->   fs/smb/client/smb2pdu.h    |  21 +-
->   fs/smb/common/fscc.h       | 419 ++++++++++++++++++++++++++++++++++-
->   fs/smb/common/smb1pdu.h    |  59 +++++
->   fs/smb/common/smb2pdu.h    | 433 ++-----------------------------------
->   fs/smb/common/smbglob.h    |   2 -
->   fs/smb/server/oplock.c     |   8 +-
->   fs/smb/server/smb2pdu.c    |  91 ++++----
->   fs/smb/server/smb2pdu.h    |  27 +--
->   fs/smb/server/smb_common.h |   9 +-
->   14 files changed, 589 insertions(+), 610 deletions(-)
->   create mode 100644 fs/smb/common/smb1pdu.h
-> 
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index 5aa7a66334d9..05598d994a68 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -1307,9 +1307,6 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 			granted |= le32_to_cpu(ace->access_req);
+ 			ace = (struct smb_ace *)((char *)ace + le16_to_cpu(ace->size));
+ 		}
+-
+-		if (!pdacl->num_aces)
+-			granted = GENERIC_ALL_FLAGS;
+ 	}
+ 
+ 	if (!uid)
+-- 
+2.43.0
 
