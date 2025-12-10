@@ -1,166 +1,114 @@
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1401A23B628
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Dec 2025 02:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B1A2222AC
+	for <linux-cifs@vger.kernel.org>; Wed, 10 Dec 2025 04:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765334970; cv=none; b=n1FjkztPTXkQ+5CFtk5TheZojheoGL5MwrDYaKgzFlQEqCohBig6v40v9V/Gh4NZ676sJjIRNlrGzciL8n0o1Zt5Ho4rJ04gCBXAFLaV/UiXFsJtLv3xg0oNOv3wfxuwBmOFpZhqVkNkTtgIEAG7k9uLeHhG3lsHRVlT/kcM5E0=
+	t=1765340984; cv=none; b=r2NUI155pMTZbDzOKovQ2vrXHUgYg4FUSDEgF3YfFU0t1a2gTPZcoPeUUhEgHOoQNC6ECGI/gJ4Jv5Lkaye/C+rQUpkArAXbsQ7QaX2E5rs8UJdbTJBHqc82jrBgKDJNKGzV0K3dkKzNA2Y1/mHAqetcbS83qiE2GaZQ9LYy3/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765334970; c=relaxed/simple;
-	bh=y72akw+UWw4czhJ8v26CmIJ45aFE1fVEf6ynDqJVkDQ=;
+	s=arc-20240116; t=1765340984; c=relaxed/simple;
+	bh=+3oD+13uzi54tQXltKZN4lKugLDxKrj5aQEg5TDiY0s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UOXrK0NWKLueHL6fkX4SUUJ2Enn0PSglZt5orc3zUnyqk7F4DhF3SAvE8/4zqx5okKZk94t0kUoZxt+8uH7C1JBXNy95gAbqtWVdwPUEmuGzQ76mEVlT1Ki2HSGgHFeEQYl6UtmU7CiJrvANwSnZ6y8NRXfkxIqijU/FixoMrYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Luovh8ev; arc=none smtp.client-ip=95.215.58.173
+	 In-Reply-To:Content-Type; b=KAMzfU4yiwrT+f036+KbyeRzAY1deiJaZdRUGGfyEaAOcDCzfcbLgd2D21pbt0uNDiX1+spHdoMxLfbc40mu3GpcpRRkHxWSIQTLym3iAoXVVKK7+T/jT+m0q4onPIdticllMnwwZJ71Ts2qPZKcT5xX1Ii/mlkGUI8UkIxC6OI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uRqoEoYT; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Luovh8ev"
-Message-ID: <48879a08-fcf0-47bb-bf39-c6d36e25f8ee@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uRqoEoYT"
+Message-ID: <ce09c209-c97e-4dcb-b3a7-b18ba56a86a1@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765334965;
+	t=1765340967;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PsTCVBUUtyItyxH7P6RmGKMR8cgMZp0nmX0G1k3Kzbs=;
-	b=Luovh8evpN4Szs0bZFJY9oG2XRbpxgumknls9U5ljOOhvy/Z/C2D+BYc4et9rMtORNOuQB
-	Mo2ukRlGGVN7HTsNrmbPODigj4FpY4lvbyGjE1RoWLr8EsGscWKDWH2s6w3B3IkzgTXkWE
-	S+aQ9VhpOqxZpyVGPonJcbG1PkzEa0c=
-Date: Wed, 10 Dec 2025 10:48:42 +0800
+	bh=13ycvtHZ6gq39kTVHwlVgZbeJV0gcG4wiOcNMZx9uyQ=;
+	b=uRqoEoYTU5iqBB+5tG0LoyxlpoGlPynVK6RD0AnMYbRVv3CBNT1JFyAx9nNi42mJmr4Snk
+	02UjUZDCd21bBH+p1P/NikDzS8u+/nFHqlvpwT0oheC62WnovvtUD3Q7SzjLYN7O4oJY3D
+	WouPB7c2D+r0HIWRJoufUW0moCC9kiI=
+Date: Wed, 10 Dec 2025 12:29:20 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 00/30] smb: improve search speed of SMB1 maperror
-To: Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
- Namjae Jeon <linkinjeon@samba.org>, Steve French <sfrench@samba.org>
+Subject: Re: [PATCH v4 00/10] smb: improve search speed of SMB2 maperror
+To: sfrench@samba.org, smfrench@gmail.com, linkinjeon@kernel.org,
+ linkinjeon@samba.org
 Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
- liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev>
- <CAH2r5mvy6zoD3UKto6uOknFFMKCncJOPiDYqEUwKB_Zcpuj2pw@mail.gmail.com>
+ liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn
+References: <20251206151826.2932970-1-chenxiaosong.chenxiaosong@linux.dev>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <CAH2r5mvy6zoD3UKto6uOknFFMKCncJOPiDYqEUwKB_Zcpuj2pw@mail.gmail.com>
+In-Reply-To: <20251206151826.2932970-1-chenxiaosong.chenxiaosong@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
 Hi Steve and Namjae,
 
-I have updated the list of patches that have not been merged yet: 
-https://chenxiaosong.com/en/smb-patch.html
+I have tested all patches using KUnit tests, xfstests, and smbtorture, 
+and no additional test failures were observed. The detailed test results 
+can be found in: https://chenxiaosong.com/en/smb-test-20251210.html
 
-I will provide the test results for these patches today.
+For more detailed information about the patches to be reviewed, please 
+see the link: https://chenxiaosong.com/en/smb-patch.html
 
 Thanks,
 ChenXiaoSong.
 
-On 12/10/25 07:41, Steve French wrote:
-> Merged nine of the client patches from this series into cifs-2.6.git
-> for-next.  They looked safe.  Good catch on fixing some of these
-> incorrect error definitions.
+On 12/6/25 23:18, chenxiaosong.chenxiaosong@linux.dev wrote:
+> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > 
-> a691ac0cdd97 (HEAD -> for-next, origin/for-next) smb: move
-> file_notify_information to common/fscc.h
-> c0fd2fbe4f73 smb: move SMB2 Notify Action Flags into common/smb2pdu.h
-> 787a2b803211 smb: move notify completion filter flags into common/smb2pdu.h
-> 14a6f0e19fc7 smb/client: add parentheses to NT error code definitions
-> containing bitwise OR operator
-> 1e4c7c9ab176 smb: add documentation references for smb2 change notify
-> definitions
-> 833f0f46368f smb/client: add 4 NT error code definitions
-> 3a0a34572269 smb/client: fix NT_STATUS_UNABLE_TO_FREE_VM value
-> 954cbce76316 smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value
-> b9695d00b605 smb/client: fix NT_STATUS_NO_DATA_DETECTED value
-> 3d99347a2e1a (linus/master, linus/HEAD) Merge tag
-> 'v6.19-rc-part1-smb3-client-fixes' of
-> git://git.samba.org/sfrench/cifs-2.6
+> Before applying this patchset, when searching for the last element of
+> smb2_error_map_table array and calling smb2_print_status(),
+> 3486 comparisons are needed.
 > 
-> On Mon, Dec 8, 2025 at 12:22 AM <chenxiaosong.chenxiaosong@linux.dev> wrote:
->>
->> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->>
->> Before applying this patchset, the patchset ("smb: improve search speed of SMB2 maperror") must
->> be applied first, which introduces `CONFIG_SMB_KUNIT_TESTS` and avoids some conflicts in `fs/smb/client/cifsfs.c`:
->> https://chenxiaosong.com/lkml-improve-search-speed-of-smb2-maperror.html (Redirect to the LKML link)
->>
->> When searching for the last element, the comparison counts are shown in the table below:
->>
->> +--------------------+--------+--------+
->> |                    |Before  |After   |
->> |                    |Patchset|Patchset|
->> +--------------------+--------+--------+
->> | ntstatus_to_dos_map|   525  |    9   |
->> +--------------------+--------+--------+
->> |             nt_errs|   516  |    9   |
->> +--------------------+--------+--------+
->> |mapping_table_ERRDOS|    39  |    5   |
->> +--------------------+--------+--------+
->> |mapping_table_ERRSRV|    37  |    5   |
->> +--------------------+--------+--------+
->>
->> ChenXiaoSong (30):
->>    smb/client: fix NT_STATUS_NO_DATA_DETECTED value
->>    smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value
->>    smb/client: fix NT_STATUS_UNABLE_TO_FREE_VM value
->>    smb/server: remove unused nterr.h
->>    smb/client: add 4 NT error code definitions
->>    smb/client: add parentheses to NT error code definitions containing
->>      bitwise OR operator
->>    smb/client: introduce DEFINE_CMP_FUNC()
->>    smb/client: sort ntstatus_to_dos_map array
->>    smb/client: create netmisc_test.c and introduce
->>      DEFINE_CHECK_SORT_FUNC()
->>    smb/client: introduce KUnit test to check sort result of
->>      ntstatus_to_dos_map array
->>    smb/client: introduce DEFINE_SEARCH_FUNC()
->>    smb/client: use bsearch() to find target in ntstatus_to_dos_map array
->>    smb/client: remove useless elements from ntstatus_to_dos_map array
->>    smb/client: introduce DEFINE_CHECK_SEARCH_FUNC()
->>    smb/client: introduce KUnit test to check search result of
->>      ntstatus_to_dos_map array
->>    smb/client: sort nt_errs array
->>    smb/client: introduce KUnit test to check sort result of nt_errs array
->>    smb/client: use bsearch() to find target in nt_errs array
->>    smb/client: remove useless elements from nt_errs array
->>    smb/client: introduce KUnit test to check search result of nt_errs
->>      array
->>    smb/client: sort mapping_table_ERRDOS array
->>    smb/client: introduce KUnit test to check sort result of
->>      mapping_table_ERRDOS array
->>    smb/client: use bsearch() to find target in mapping_table_ERRDOS array
->>    smb/client: remove useless elements from mapping_table_ERRDOS array
->>    smb/client: introduce KUnit test to check search result of
->>      mapping_table_ERRDOS array
->>    smb/client: sort mapping_table_ERRSRV array
->>    smb/client: introduce KUnit test to check sort result of
->>      mapping_table_ERRSRV array
->>    smb/client: use bsearch() to find target in mapping_table_ERRSRV array
->>    smb/client: remove useless elements from mapping_table_ERRSRV array
->>    smb/client: introduce KUnit test to check search result of
->>      mapping_table_ERRSRV array
->>
->>   fs/smb/client/cifsfs.c       |    2 +
->>   fs/smb/client/cifsproto.h    |    1 +
->>   fs/smb/client/netmisc.c      |  155 ++++--
->>   fs/smb/client/netmisc_test.c |  114 ++++
->>   fs/smb/client/nterr.c        |   12 +-
->>   fs/smb/client/nterr.h        | 1017 +++++++++++++++++-----------------
->>   fs/smb/server/nterr.h        |  543 ------------------
->>   fs/smb/server/smb2misc.c     |    1 -
->>   fs/smb/server/smb_common.h   |    1 -
->>   9 files changed, 739 insertions(+), 1107 deletions(-)
->>   create mode 100644 fs/smb/client/netmisc_test.c
->>   delete mode 100644 fs/smb/server/nterr.h
->>
->> --
->> 2.43.0
->>
+> After applying this patchset, only 10 comparisons are required.
 > 
+> v1: https://lore.kernel.org/linux-cifs/20251204045818.2590727-1-chenxiaosong.chenxiaosong@linux.dev/
+> The three patches from v1 have already been applied to the for-next branch of cifs-2.6.git.
+> Please replace the following patches:
+> 
+>    - [v1 01/10] smb/client: reduce loop count in map_smb2_to_linux_error() by half: https://git.samba.org/sfrench/?p=sfrench/cifs-2.6.git;a=commitdiff;h=26866d690bd180e1860548c43e70fdefe50638ff
+>      - Replace it with this version(v4) patch #0001: update commit message: array has 1743 elements
+> 
+>    - [v1 02/10] smb/client: remove unused elements from smb2_error_map_table array: https://git.samba.org/sfrench/?p=sfrench/cifs-2.6.git;a=commitdiff;h=905d8999d67dcbe4ce12ef87996e4440e068196d
+>      - It is the same as patch #0002 in this version(v4).
+> 
+>    - [v1 03/10] smb: add two elements to smb2_error_map_table array: https://git.samba.org/sfrench/?p=sfrench/cifs-2.6.git;a=commitdiff;h=ba521f56912f6ff5121e54c17c855298f947c9ea
+>      - Replace it with this version(v4) patch #0003 #0004.
+> 
+> v3: https://lore.kernel.org/linux-cifs/20251205132536.2703110-1-chenxiaosong.chenxiaosong@linux.dev/
+> v3->v4:
+>    - Patch #0008: the KUnit test searches all elements of the smb2_error_map_table array
+>    - Create patch #0009
+> 
+> ChenXiaoSong (10):
+>    smb/client: reduce loop count in map_smb2_to_linux_error() by half
+>    smb/client: remove unused elements from smb2_error_map_table array
+>    smb: rename to STATUS_SMB_NO_PREAUTH_INTEGRITY_HASH_OVERLAP
+>    smb/client: add two elements to smb2_error_map_table array
+>    smb/client: sort smb2_error_map_table array
+>    smb/client: use bsearch() to find target status code
+>    smb/client: introduce smb2_get_err_map()
+>    smb/client: introduce smb2maperror KUnit tests
+>    smb/client: update some SMB2 status strings
+>    smb/server: rename include guard in smb_common.h
+> 
+>   fs/smb/Kconfig                    |  17 +++++
+>   fs/smb/client/cifsfs.c            |   2 +
+>   fs/smb/client/smb2glob.h          |   6 ++
+>   fs/smb/client/smb2maperror.c      | 101 +++++++++++++++++-------------
+>   fs/smb/client/smb2maperror_test.c |  71 +++++++++++++++++++++
+>   fs/smb/client/smb2proto.h         |   4 +-
+>   fs/smb/common/smb2status.h        |   5 +-
+>   fs/smb/server/smb2pdu.c           |   2 +-
+>   fs/smb/server/smb_common.h        |   6 +-
+>   9 files changed, 165 insertions(+), 49 deletions(-)
+>   create mode 100644 fs/smb/client/smb2maperror_test.c
 > 
 
