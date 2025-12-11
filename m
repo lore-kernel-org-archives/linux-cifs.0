@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F31330FC31
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 12:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C91D3101C4
+	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 12:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765455534; cv=none; b=RAupOU8BY9rQXjAtK4aGyAj4LtmQSRzN2Wwjyyazn2bbgR2i8Q/4X6JjEV6nVco+dBa6KlnksGwbYbdyIAChaMTANp+/72/xhbu/9yfF4SQB7jxB1cLOqTgdWtqxP2nWnKrl6BF+ScRzWiddfbx+OR3o3s8ez8B3C3+wvKDZijA=
+	t=1765455535; cv=none; b=klIY9GrTKAjya9NwDhhzuzfQ7STuXwps2O0MmzUFHoi0/f83XJCJ6AdUsD4ZcWrmE+Qzbq8rVYD4+D29KS6l1qvIQbABzCj2/HITFCvg7DdIZtbzXif/V04CIlY47Y/2bgSlzf2zDs2k81z5O7iN8wnxhUBwpPyl/VS/1huu9X4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765455534; c=relaxed/simple;
-	bh=+Wo+l71IAU0AqaO6ZoV2OG/pvIDGGYqR2GhGhU27Y68=;
+	s=arc-20240116; t=1765455535; c=relaxed/simple;
+	bh=l9zo0EXonEq03TFI/f6JGfF7B1OyrUbKh6aUqoUh/vQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jfhTkF2eISqG5D8oYyNDZMQGF64+NZvlyOYonksACmLj0Xc+AsV9KaNSTjMpTFwv5Oi7tTy3EQ0OADivKT1ZRE6+KqQP11Le3TDG78OSMa4V/efAvnzVWifCUQTRY9CCaECwlwigG53zbsk9ttY7LY2+nnV1t6RXa1dTBHs6wYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fwTjA+sl; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=aQ60aBYHlQiSXBdaRIKKaebSbdPAIyiGUO4MfiTCtHvfJk3nvHysiZ65mEWKvteXjATG4O6lngQlhgOW8m7XE4oeBwJRH0S/YPsF4fmDJ9pyXUhFgZU8/AmtgnlzVtHqCopuEOUnQ9XFs4AtBVWc0uUziLOYkhRUaURTSlxpn1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=blEuCVr7; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwTjA+sl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="blEuCVr7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765455524;
+	s=mimecast20190719; t=1765455530;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=U+sZRfUhZLYVTFCknqCPjwaISkbiMEC9lHaFs7CeHiY=;
-	b=fwTjA+sloccFX6sTKin+LDWjwJEhvUE1x6zZ7/68s7z6hTMIISiwxe6ch12qn3lBAG9vKG
-	GBL3ynGeUDFjgyrMFf/U+HqmN4xYFaQNFHE92HzSit/UVfpUQQ3BJSJwtLiHYypFmR2Ib8
-	B4goAocOT3tU5KH8rXH4kkHMS3ib5W4=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=AJBBsTnUoSekD8Jtjh4VEvFM2BerBPLv40YPx1hJJCY=;
+	b=blEuCVr7YBSw/3iWqBz2UVPtH6i8TeAov4pF2YEgysW7NdGBz3FWhO0bPppUP42y/NQoD7
+	M9yZzIMyDQ1AYJVTV10G820af27nXuKZhDSwXIHWxRFKLW9+InDgYtnUEbuzLHeDr9SjD8
+	DBlXnYcLNQhm26Ze/ATFfmGRt6W/iPU=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-392-kz4gVK2sNH-hU3h-RKxHCQ-1; Thu,
- 11 Dec 2025 07:18:39 -0500
-X-MC-Unique: kz4gVK2sNH-hU3h-RKxHCQ-1
-X-Mimecast-MFC-AGG-ID: kz4gVK2sNH-hU3h-RKxHCQ_1765455518
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-225-YtZfbOEFOAGZpslpj4TF5w-1; Thu,
+ 11 Dec 2025 07:18:49 -0500
+X-MC-Unique: YtZfbOEFOAGZpslpj4TF5w-1
+X-Mimecast-MFC-AGG-ID: YtZfbOEFOAGZpslpj4TF5w_1765455528
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 968F119560A5;
-	Thu, 11 Dec 2025 12:18:38 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E4BAC18009C0;
+	Thu, 11 Dec 2025 12:18:47 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.14])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D93F0180049F;
-	Thu, 11 Dec 2025 12:18:36 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1F8531956056;
+	Thu, 11 Dec 2025 12:18:45 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Steve French <sfrench@samba.org>
 Cc: David Howells <dhowells@redhat.com>,
@@ -50,9 +50,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 14/18] cifs: Scripted clean up fs/smb/client/cifs_swn.h
-Date: Thu, 11 Dec 2025 12:17:08 +0000
-Message-ID: <20251211121715.759074-16-dhowells@redhat.com>
+Subject: [PATCH 17/18] cifs: Scripted clean up fs/smb/client/reparse.h
+Date: Thu, 11 Dec 2025 12:17:11 +0000
+Message-ID: <20251211121715.759074-19-dhowells@redhat.com>
 In-Reply-To: <20251211121715.759074-2-dhowells@redhat.com>
 References: <20251211121715.759074-2-dhowells@redhat.com>
 Precedence: bulk
@@ -62,7 +62,7 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
 Remove externs, correct argument names and reformat declarations.
 
@@ -74,32 +74,30 @@ cc: linux-cifs@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-kernel@vger.kernel.org
 ---
- fs/smb/client/cifs_swn.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ fs/smb/client/reparse.h | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/fs/smb/client/cifs_swn.h b/fs/smb/client/cifs_swn.h
-index 8a9d2a5c9077..955d07b69450 100644
---- a/fs/smb/client/cifs_swn.h
-+++ b/fs/smb/client/cifs_swn.h
-@@ -14,15 +14,15 @@ struct sk_buff;
- struct genl_info;
+diff --git a/fs/smb/client/reparse.h b/fs/smb/client/reparse.h
+index 19caab2fd11e..cfbb7dd28958 100644
+--- a/fs/smb/client/reparse.h
++++ b/fs/smb/client/reparse.h
+@@ -130,11 +130,12 @@ bool cifs_reparse_point_to_fattr(struct cifs_sb_info *cifs_sb,
+ 				 struct cifs_fattr *fattr,
+ 				 struct cifs_open_info_data *data);
+ int create_reparse_symlink(const unsigned int xid, struct inode *inode,
+-				struct dentry *dentry, struct cifs_tcon *tcon,
+-				const char *full_path, const char *symname);
+-int mknod_reparse(unsigned int xid, struct inode *inode,
+-		       struct dentry *dentry, struct cifs_tcon *tcon,
+-		       const char *full_path, umode_t mode, dev_t dev);
+-struct reparse_data_buffer *smb2_get_reparse_point_buffer(const struct kvec *rsp_iov, u32 *len);
++			   struct dentry *dentry, struct cifs_tcon *tcon,
++			   const char *full_path, const char *symname);
++int mknod_reparse(unsigned int xid, struct inode *inode, struct dentry *dentry,
++		  struct cifs_tcon *tcon, const char *full_path, umode_t mode,
++		  dev_t dev);
++struct reparse_data_buffer *smb2_get_reparse_point_buffer(const struct kvec *rsp_iov,
++							  u32 *plen);
  
- #ifdef CONFIG_CIFS_SWN_UPCALL
--extern int cifs_swn_register(struct cifs_tcon *tcon);
-+int cifs_swn_register(struct cifs_tcon *tcon);
- 
--extern int cifs_swn_unregister(struct cifs_tcon *tcon);
-+int cifs_swn_unregister(struct cifs_tcon *tcon);
- 
--extern int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
-+int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
- 
--extern void cifs_swn_dump(struct seq_file *m);
-+void cifs_swn_dump(struct seq_file *m);
- 
--extern void cifs_swn_check(void);
-+void cifs_swn_check(void);
- 
- static inline bool cifs_swn_set_server_dstaddr(struct TCP_Server_Info *server)
- {
+ #endif /* _CIFS_REPARSE_H */
 
