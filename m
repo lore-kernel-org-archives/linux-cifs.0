@@ -1,72 +1,644 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1F022E3E7
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 01:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F332D0C7E
+	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 12:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765417081; cv=none; b=s7mCz+3hpnLsxMXNZNyre/Td36lloDyecu4moTsBmOQEl9IyRp2vMSCM02EocSlOycgGv+U+MW9KQ1zrvoErH5paq6nV8GVOUeg02uNs3Js0z/paZa5k6U1Vd15cZMEJEi23My6xaJsvcwf84W7Ueel7eqI+ge+zHB03CJhQc0Q=
+	t=1765455483; cv=none; b=WtiIKkwSbMcc/YnpWAnbt5nD7QI/u5T+9QFuoSuXtcsBicjG0NJAw/w2qm+fSFMR2VndlmwoKZjzbS+B3o1pM7IiL87g9sCzSVlp/nkpH3EFrXfHW/LzMKBY/d1ay4thP5oKBRbfT7VsUEGa5v41bPO6GMvBvl33Ym0renBLm/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765417081; c=relaxed/simple;
-	bh=tZu5vbLY3ZjIHrWSnO/LiB84Zc0T3BIwkwE6LmQuO7g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LCTWRFctsapMjb/jXi3KspkTBklhO1NW/bP63dro6VzSQWCCJLvEdAdFM7bXDhwGPan0GKN3j/vn9p7i7Uz5PAortmYmTkRARdq3xxAsBEHCeTr4PxN1xpD2McMTDiV2eYjbp1eVj59KWcMcu0QUSbZaoaJHmtsFo8zqr9O7uu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fcyxiHFI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765455483; c=relaxed/simple;
+	bh=QyX21bZ34PSxh2U4QCKl5o7Gmk5VIil7DJqXWaB1Eo4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FZW6lK79ksIgUhcVfLRwc6U6yPki1+mL9YzUMzkTbvDy5zf4oLupDN5zbHXgEjyiIxehTzex6A5lSXxFwTGu05c9sM/jCZA0fFhcBsnRxno+wsAZSufpyWJcrYNf/BRNGZFlghSldt8x0NnfJbmLQlQbIDy0gHMw7PMCr0MTLJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NY/Y9OT4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fcyxiHFI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8399DC113D0
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 01:38:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765417081;
-	bh=tZu5vbLY3ZjIHrWSnO/LiB84Zc0T3BIwkwE6LmQuO7g=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=fcyxiHFIZa4zSN+V7V+ENSAkyl8YCK1Ce4eciyByQyX5SCOLRwXr8ciROFhLyDuNq
-	 GQJ64Ol1W827IFQc6F1V/VYudipUNGeMyjBtfUMN82kITeNNbRitCrHt2A/EfZe/A0
-	 WYH3x9Iy56wjkAC2XwbTATnjD+SI5X/Af/n77K8wWLv99rEj/nPv6ZrUS9gAAkm+hZ
-	 6LFPVCiONYeNRMDsM39cndVzTPurlBfcVY1AI8IUU2yvp7OVZzdaonKQGUQ8jsHD84
-	 YD+AXdfXAyCEPYjrK2icDZvFKmslNwyRKLcTtHZIGKiIKxdaZpEZ2Mw2VDVzIs+wf8
-	 Xdz1vOSQX41hA==
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-64198771a9bso961808a12.2
-        for <linux-cifs@vger.kernel.org>; Wed, 10 Dec 2025 17:38:01 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVbgmWtKoaFisNVBLZXcYQPZAPol/jkjP6UkSJqzPk5mx1BNIkCjsZS/OdrejrSInhz/h2wNDSkbv47@vger.kernel.org
-X-Gm-Message-State: AOJu0YwU3jKOmjaPlmf04oOjfDzQT2kJxzSWR4NFnLOttMHA6sjgiz1+
-	36ILzD5nhSPq7AXCHtmYuvjyJPabG8cS+a7XnhMQknMxPRAtNoVRgKc7uBjAj9l3uVwSBq4q9wo
-	b9T+p8CJIFL1hZYBXxonYW3cMzhrrva0=
-X-Google-Smtp-Source: AGHT+IGl3ket0qWWzyDfyZxZ0ZMbL0rJyicsgD3zzpXXcvcITRr2ZIJGmrEdOuZwhTI2JSP5BnMiqL7vqfhJKkXk0pc=
-X-Received: by 2002:a05:6402:1468:b0:640:cdad:d2c0 with SMTP id
- 4fb4d7f45d1cf-6496d5cacc8mr3979211a12.25.1765417080018; Wed, 10 Dec 2025
- 17:38:00 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NY/Y9OT4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765455478;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4jpRkUpGU7n/LKLS7pSzR+aL/zWQOCOZC/Fq6K0O3ZU=;
+	b=NY/Y9OT4mMQN9y0Fh7XIdkx5ANz/68Zi09z6oKwzR8EaqriEWZkKJtmnJzizTgiiIQhRdP
+	bqgor+YbT3n/DXay0Hvk+AxvmqSQlZ5ip3D5FT3Zc0BcKffCc8mJFDaOsiXaywRBD/rZvX
+	G8L6hSg9rVGZRwPfxZ2EolccMFnle9M=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-522-_nw2G2_-PjmFfFYjQSH3oQ-1; Thu,
+ 11 Dec 2025 07:17:55 -0500
+X-MC-Unique: _nw2G2_-PjmFfFYjQSH3oQ-1
+X-Mimecast-MFC-AGG-ID: _nw2G2_-PjmFfFYjQSH3oQ_1765455474
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 09614195609E;
+	Thu, 11 Dec 2025 12:17:54 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.14])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0F98E1955F2D;
+	Thu, 11 Dec 2025 12:17:51 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Enzo Matsumiya <ematsumiya@suse.de>,
+	linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 00/18] cifs: Scripted header file cleanup
+Date: Thu, 11 Dec 2025 12:16:54 +0000
+Message-ID: <20251211121715.759074-2-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251210135149.10837-1-a.velichayshiy@ispras.ru>
-In-Reply-To: <20251210135149.10837-1-a.velichayshiy@ispras.ru>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 11 Dec 2025 10:37:48 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-fadJV1vJrKMyDwJ9=Mho50vU5VM1uhBYGq6pY99boTQ@mail.gmail.com>
-X-Gm-Features: AQt7F2oNvrf6NvfqzaA8UbFeuMblAUKMz7zdXzUuanGN477KeypXjYVzbVfx-Bw
-Message-ID: <CAKYAXd-fadJV1vJrKMyDwJ9=Mho50vU5VM1uhBYGq6pY99boTQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: remove redundant DACL check in smb_check_perm_dacl
-To: Alexey Velichayshiy <a.velichayshiy@ispras.ru>
-Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	lvc-project@linuxtesting.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Dec 10, 2025 at 10:52=E2=80=AFPM Alexey Velichayshiy
-<a.velichayshiy@ispras.ru> wrote:
->
-> A zero value of pdacl->num_aces is already handled at the start of
-> smb_check_perm_dacl() so the second check is useless.
->
-> Drop the unreachable code block, no functional impact intended.
->
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->
-> Signed-off-by: Alexey Velichayshiy <a.velichayshiy@ispras.ru>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+Hi Steve,
+
+Could you consider taking these patches that clean up the formatting of
+declarations in the header file?  They remove the externs, (re)name the
+arguments in the declarations to match those in the C file and format them
+to wrap at 79 chars (this is configurable - search for 79 in the script),
+aligning all the first argument on each line with the char after the
+opening bracket.
+
+I've attached the script below so that you can also run it yourself.  It
+does all the git manipulation to generate one commit per header file
+changed.  Run as:
+
+	./cifs.pl fs/smb/client/*.[ch]
+
+in the kernel source root dir.
+
+The script can be rerun later to readjust any added changes.
+
+The patches can be found here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-cleanup
+
+Thanks,
+David
+---
+	#!/usr/bin/perl -w
+	use strict;
+	unless (@ARGV) {
+	    die "Usage: $0 <c_file1> [<c_file2> ...]\n";
+	}
+
+	# Data tracking
+	my %funcs = ();		# Func name => { func prototype }
+	my %headers = ();	# Header filename => { header content }
+	my %c_files = ();	# C filename => { ordered func list, header pref }
+	my %cmarkers = ();	# C filename marker => { header filename it's in }
+
+	# Parse state
+	my $pathname = "-";
+	my $lineno = 0;
+
+	sub error(@) {
+	    print STDERR $pathname, ":", $lineno, ": ", @_, "\n";
+	    exit(1);
+	}
+
+	sub pad($) {
+	    # Reindent the function arguments to line the arguments up with the char
+	    # after the opening bracket on the func argument list
+	    my ($lines) = @_;
+	    return $lines if ($#{$lines} <= 0);
+	    my $has_empty = 0;
+	    for (my $i = 0; $i <= $#{$lines}; $i++) {
+		$lines->[$i] =~ s/^[ \t]+//;
+		$has_empty = 1 if ($lines->[$i] eq "");
+	    }
+
+	    if ($has_empty) {
+		my @clean = grep /.+/, @{$lines};
+		$lines = \@clean;
+	    }
+
+	    my $indlen = index($lines->[0], "(");
+	    return $lines if ($indlen < 0);
+	    my $indent = "";
+	    $indlen++;
+	    $indent .= "\t" x ($indlen / 8);
+	    $indent .= " " x ($indlen % 8);
+
+	    my @padded = ();
+	    my $acc = "";
+	    my $len = -$indlen;
+	    for (my $i = 0; $i <= $#{$lines}; $i++) {
+		my $argument = $lines->[$i];
+		my $arglen = length($argument);
+		my $last = ($i == $#{$lines} ? 1 : 0);
+
+		if ($i == 0 ||
+		    $i == 1) {
+		    $acc .= $argument;
+		    $acc .= ";" if ($last);
+		    $len += $arglen + $last;
+		    next;
+		}
+		if (!$acc) {
+		    $acc = $indent . $argument;
+		    $acc .= ";" if ($last);
+		    $len += $arglen + $last;
+		    next;
+		}
+		if ($indlen + $len + 1 + $arglen + $last > 79) {
+		    push @padded, $acc;
+		    $acc = $indent . $argument;
+		    $acc .= ";" if ($last);
+		    $len = $arglen + $last;
+		    next;
+		}
+
+		$acc .= " " . $argument;
+		$acc .= ";" if ($last);
+		$len += 1 + $arglen + $last;
+	    }
+	    push @padded, $acc if ($acc);
+	    return \@padded;
+	}
+
+	sub earliest(@) {
+	    my $ret = -1;
+	    foreach (@_) {
+		$ret = $_ if ($ret < 0 || ($_ >= 0 && $_ < $ret));
+	    }
+	    return $ret;
+	}
+
+	foreach my $file (@ARGV) {
+	    # Open the file for reading.
+	    next if $file =~ /trace[.]h$/;
+	    next if $file =~ /smbdirect[.][ch]$/;
+	    open my $fh, "<$file"
+		or die "Could not open file '$file'";
+	    $pathname = $file;
+	    $lineno = 0;
+
+	    my $filename;
+	    my @file_content = ();
+	    my @copy = ();
+
+	    my $state = 0;
+	    my $qual = "";
+	    my $type = "";
+	    my $funcname = "";
+	    my @funcdef = ();
+	    my $bracket = 0;
+	    my $comment = 0;
+	    my $smb1 = 0;
+	    my $header = 0;
+	    my $inline = 0;
+	    my $file_marker = "";
+	    my $config = "";
+	    my $c_file = 0;
+
+	    $filename = $pathname;
+	    $filename =~ s!.*/!!;
+
+	    if ($file =~ m!.h$!) {
+		my %new_h_file = (
+		    path    => $pathname,
+		    fname   => $filename,
+		    content => [],
+		    );
+		$header = \%new_h_file;
+		$headers{$filename} = \%new_h_file;
+	    } elsif ($file =~ m!.c$!) {
+		my %new_c_file = (
+		    path  => $pathname,
+		    fname => $filename,
+		    funcs => [],
+		    );
+		$c_file = \%new_c_file;
+		$c_files{$filename} = \%new_c_file;
+	    } else {
+		warn("Ignoring unexpected file $file\n");
+		next;
+	    }
+
+	    $smb1 = 1 if ($file =~ m!/smb1ops.c|/cifssmb.c|/cifstransport.c!);
+
+	    foreach my $line (<$fh>) {
+		$lineno++;
+		chomp($line);
+		push @copy, $line;
+		if (!$line) {
+		    # Blank line
+		    push @file_content, @copy;
+		    @copy = ();
+		    next;
+		}
+
+		# Handle continuation or end of block comment.  Look for C file
+		# prototype insertion point markers.
+		if ($comment) {
+		    if ($line =~ m![*]/!) {
+			if ($comment == 2 && $file_marker) {
+			    $cmarkers{$file_marker} = $file_marker;
+			    push @copy, "#C_MARKER " . $filename;
+			    $file_marker = 0;
+			}
+			$comment = 0;
+		    } else {
+			$comment++;
+			if ($comment == 2 && $line =~ m! [*] ([a-z][a-z_0-9]*[.][c])$!) {
+			    $file_marker = $1;
+			    print("Found file marker ", $file_marker, " in ", $filename, "\n");
+			}
+		    }
+		    push @file_content, @copy;
+		    @copy = ();
+		    next;
+		}
+
+		# Check cpp directives, particularly looking for SMB1 bits
+		if ($line =~ /^[#]/) {
+		    if ($header) {
+			if ($line =~ /ifdef.*(CONFIG_[A-Z0-9_])/) {
+			    error("multiconfig") if $config;
+			    $config = $1;
+			    $smb1++ if ($config eq "CONFIG_CIFS_ALLOW_INSECURE_LEGACY");
+			} elsif ($line =~ /endif/) {
+			    $smb1-- if ($config eq "CONFIG_CIFS_ALLOW_INSECURE_LEGACY");
+			    $config = "";
+			}
+		    }
+		    push @file_content, @copy;
+		    @copy = ();
+		    next;
+		}
+
+		# Exclude interference in finding func names and return types
+		if ($line =~ /^[{]/ ||
+		    $line =~ /##/ ||
+		    $line =~ /^[_a-z0-9A-Z]+:$/ || # goto label
+		    $line =~ /^do [{]/ ||
+		    $line =~ m!^//!) {
+		    push @file_content, @copy;
+		    @copy = ();
+		    next;
+		}
+
+		# Start of a block comment
+		if ($line =~ m!^/[*]!) {
+		    $comment = 1 unless ($line =~ m![*]/!);
+		    push @file_content, @copy;
+		    @copy = ();
+		    next;
+		}
+
+		# End of a braced section, such as a function implementation
+		if ($line =~ /^[}]/) {
+			$type = "";
+			$qual = "";
+			$funcname = "";
+			@funcdef = ();
+			push @file_content, @copy;
+			@copy = ();
+			next;
+		}
+
+		if ($line =~ /^typedef/) {
+		    $type = "";
+		    $qual = "";
+		    $funcname = "";
+		    @funcdef = ();
+		    push @file_content, @copy;
+		    @copy = ();
+		    next;
+		}
+
+		# Extract function qualifiers.  There may be multiple of these in more
+		# or less any order.  Some of them cause the func to be skipped (e.g. inline).
+
+		if ($line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)\W/ ||
+		    $line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)$/) {
+		    error("Unexpected qualifier '$1'") if ($state != 0);
+		    while ($line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)\W/ ||
+			   $line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)$/) {
+			$qual .= " " if ($qual);
+			$qual .= $1;
+			$inline = 1 if ($1 eq "inline");
+			$inline = 1 if ($1 eq "__always_inline");
+			$line = substr($line, length($1));
+			$line =~ s/^\s+//;
+		    }
+		}
+
+		if ($state == 0) {
+		    # Extract what we assume to be the return type
+		    if ($line =~ /^\s/) {
+			push @file_content, @copy;
+			@copy = ();
+			next;
+		    }
+		    while ($line =~ /^(unsigned|signed|bool|char|short|int|long|void|const|volatile|(struct|union|enum)\s+[_a-zA-Z][_a-zA-Z0-9]*|[*]|__init|__exit|__le16|__le32|__le64|__be16|__be32|__be64)/) {
+			$type .= " " if $type;
+			$type .= $1;
+			$line = substr($line, length($1));
+			$line =~ s/^\s+//;
+		    }
+		    if ($line =~ /^struct [{]/) {
+			# Ignore structure definitions
+			$type = "";
+			$qual = "";
+			$funcname = "";
+			@funcdef = ();
+			push @file_content, @copy;
+			@copy = ();
+			next;
+		    }
+		    if (index($line, "=") >= 0) {
+			# Ignore assignments
+			$type = "";
+			$qual = "";
+			$funcname = "";
+			@funcdef = "";
+			push @file_content, @copy;
+			@copy = ();
+			next;
+		    }
+
+		    # Try and extract a function's type and name
+		    while ($line =~ /(^[_a-zA-Z][_a-zA-Z0-9]*)/) {
+			my $name = $1;
+			$line = substr($line, length($name));
+			next if ($line =~ /^[{]/);
+			$line =~ s/^\s+//;
+
+			my $ch = substr($line, 0, 1);
+			last if ($ch eq "[" || $ch eq ";"); # Global variables
+
+			if ($ch eq "(") {
+			    # Found the function name
+			    $state = 1;
+			    $line = substr($line, 1);
+			    $funcname = $name;
+			    my $tmp = $qual . $type . " " . $funcname . "(";
+			    $tmp =~ s/[*] /*/;
+			    push @funcdef, $tmp;
+			    $bracket = 1;
+			    last;
+			}
+
+			if ($type) {
+			    last if (index($line, ";") >= 0 && index($line, "(") == -1);
+			    error("Unexpected name '$name' after '$type'");
+			}
+
+			$type .= " " if $type;
+			$type .= $name;
+			if ($line =~ /^(\s*[*]+)/) {
+			    my $ptr = $1;
+			    $type .= $ptr;
+			    $line = substr($line, length($ptr));
+			}
+		    }
+		}
+
+		# Try and extract a function's argument list
+		my $from = 0;
+		if ($state == 1) {
+		    while (1) {
+			my $o = index($line, "(", $from);
+			my $c = index($line, ")", $from);
+			my $m = index($line, ",", $from);
+
+			my $b = earliest($o, $c, $m);
+			if ($b < 0) {
+			    push @funcdef, $line
+				unless ($line eq "");
+			    last;
+			}
+			my $ch = substr($line, $b, 1);
+
+			# Push the arguments separately on to the list
+			if ($ch eq ",") {
+			    push @funcdef, substr($line, 0, $b + 1);
+			    $line = substr($line, $b + 1);
+			    $from = 0;
+			} elsif ($ch eq "(") {
+			    # Handle brackets in the argument list (e.g. function
+			    # pointers)
+			    $bracket++;
+			    $from = $b + 1;
+			} elsif ($ch eq ")") {
+			    $bracket--;
+			    if ($bracket == 0) {
+				push @funcdef, substr($line, 0, $b + 1);
+				$line = substr($line, $b + 1);
+				$state = 2;
+				last;
+			    }
+			    $from = $b + 1;
+			}
+		    }
+		}
+
+		if ($state == 2) {
+		    $inline = 1 if ($qual =~ /inline/);
+		    #print("QUAL $qual $type $funcname $inline ", $#funcdef, "\n");
+		    if (!$header &&
+			$qual !~ /static/ &&
+			$funcname ne "__acquires" &&
+			$funcname ne "__releases" &&
+			$funcname ne "module_init" &&
+			$funcname ne "module_exit" &&
+			$funcname ne "module_param" &&
+			$funcname ne "module_param_call" &&
+			$funcname ne "PROC_FILE_DEFINE" &&
+			$funcname !~ /MODULE_/ &&
+			$funcname !~ /DEFINE_/) {
+
+			# Okay, we appear to have a function implementation
+			my $func;
+
+			if (exists($funcs{$funcname})) {
+			    $func = $funcs{$funcname};
+			    $func->{body} = pad(\@funcdef);
+			} else {
+			    my %new_func = (
+				name => $funcname,
+				cond => "",
+				);
+			    $func = \%new_func;
+			    $funcs{$funcname} = $func;
+			    $func->{body} = pad(\@funcdef);
+			}
+			$func->{body} = pad(\@funcdef);
+
+			if ($funcname eq "cifs_inval_name_dfs_link_error") {
+			    $func->{cond} = "#ifdef CONFIG_CIFS_DFS_UPCALL";
+			} elsif ($funcname eq "cifs_listxattr") {
+			    $func->{cond} = "#ifdef CONFIG_CIFS_XATTR";
+			}
+
+			push @{$c_file->{funcs}}, $func;
+		    } elsif (!$header || $inline) {
+			# Ignore inline function implementations and other weirdies
+			push @file_content, @copy;
+		    } elsif ($header && !$inline) {
+			push @file_content, "#FUNCPROTO " . $funcname;
+
+			my $func;
+
+			if (exists($funcs{$funcname})) {
+			    $func = $funcs{$funcname};
+			    $func->{lineno} = $lineno;
+			    $func->{pathname} = $pathname;
+			} else {
+			    my %new_func = (
+				name => $funcname,
+				cond => "",
+				lineno => $lineno,
+				pathname => $pathname,
+				);
+			    $func = \%new_func;
+			    $funcs{$funcname} = $func;
+			}
+		    }
+
+		    @funcdef = ();
+		    $type = "";
+		    $qual = "";
+		    $funcname = "";
+		    $inline = 0;
+		    $state = 0;
+		    @copy = ();
+		}
+		if ($line =~ /;/) {
+		    $type = "";
+		    $qual = "";
+		    $funcname = "";
+		    @funcdef = ();
+		    $state = 0;
+		    push @file_content, @copy;
+		    @copy = ();
+		}
+	    }
+	    close($fh);
+
+	    if ($header) {
+		$header->{content} = \@file_content;
+	    }
+	}
+
+	sub write_header($)
+	{
+	    my ($header) = @_;
+	    my $path = $header->{path};
+
+	    my @output = ();
+
+	    foreach my $line (@{$header->{content}}) {
+		if ($line =~ "^[#]C_MARKER (.*)") {
+		    next;
+		} elsif ($line =~ "^[#]FUNCPROTO ([_a-zA-Z0-9]+)") {
+		    my $funcname = $1;
+		    my $func = $funcs{$funcname};
+		    if (!$func->{body}) {
+			print($func->{pathname}, ":", $func->{lineno}, ": '", $funcname,
+			      "' dead prototype\n");
+			next;
+		    }
+		    #push @output, $line;
+		    push @output, @{$func->{body}};
+		} else {
+		    push @output, $line;
+		}
+	    }
+
+	    open my $fh, ">$path"
+		or die "Could not open file '$path' for writing";
+	    foreach my $f (@output) {
+		print($fh $f, "\n") or die $path;
+	    }
+	    close($fh) or die $path;
+
+	    print("Git $path\n");
+	    if (system("git diff -s --exit-code $path") == 0) {
+		print("- no changes, skipping\n");
+		return;
+	    }
+
+	    if (system("git add $path") != 0) {
+		die("'git add $path' failed\n");
+	    }
+
+	    open $fh, ">.commit_message"
+		or die "Could not open file '.commit_message' for writing";
+	    print($fh
+		  qq/
+	cifs: Scripted clean up $path
+
+	Remove externs, correct argument names and reformat declarations.
+
+	Signed-off-by: David Howells <dhowells\@redhat.com>
+	cc: Steve French <sfrench\@samba.org>
+	cc: Paulo Alcantara <pc\@manguebit.org>
+	cc: Enzo Matsumiya <ematsumiya\@suse.de>
+	cc: linux-cifs\@vger.kernel.org
+	cc: linux-fsdevel\@vger.kernel.org
+	cc: linux-kernel\@vger.kernel.org
+	/);
+	    close($fh) or die ".commit_message";
+
+	    if (system("git commit -F .commit_message") != 0) {
+		die("'git commit $path' failed\n");
+	    }
+	}
+
+	foreach my $h (keys(%headers)) {
+	    write_header($headers{$h});
+	}
+
+David Howells (18):
+  cifs: Scripted clean up fs/smb/client/cached_dir.h
+  cifs: Scripted clean up fs/smb/client/dfs.h
+  cifs: Scripted clean up fs/smb/client/cifsproto.h
+  cifs: Scripted clean up fs/smb/client/cifs_unicode.h
+  cifs: Scripted clean up fs/smb/client/netlink.h
+  cifs: Scripted clean up fs/smb/client/cifsfs.h
+  cifs: Scripted clean up fs/smb/client/dfs_cache.h
+  cifs: Scripted clean up fs/smb/client/dns_resolve.h
+  cifs: Scripted clean up fs/smb/client/cifsglob.h
+  cifs: Scripted clean up fs/smb/client/fscache.h
+  cifs: Scripted clean up fs/smb/client/fs_context.h
+  cifs: Scripted clean up fs/smb/client/cifs_spnego.h
+  cifs: Scripted clean up fs/smb/client/compress.h
+  cifs: Scripted clean up fs/smb/client/cifs_swn.h
+  cifs: Scripted clean up fs/smb/client/cifs_debug.h
+  cifs: Scripted clean up fs/smb/client/smb2proto.h
+  cifs: Scripted clean up fs/smb/client/reparse.h
+  cifs: Scripted clean up fs/smb/client/ntlmssp.h
+
+ fs/smb/client/cached_dir.h   |  30 +-
+ fs/smb/client/cifs_debug.h   |   3 +-
+ fs/smb/client/cifs_spnego.h  |   4 +-
+ fs/smb/client/cifs_swn.h     |  10 +-
+ fs/smb/client/cifs_unicode.h |  17 +-
+ fs/smb/client/cifsfs.h       | 114 +++--
+ fs/smb/client/cifsglob.h     |  12 +-
+ fs/smb/client/cifsproto.h    | 965 +++++++++++++++++------------------
+ fs/smb/client/compress.h     |   3 +-
+ fs/smb/client/dfs.h          |   3 +-
+ fs/smb/client/dfs_cache.h    |  19 +-
+ fs/smb/client/dns_resolve.h  |   4 +-
+ fs/smb/client/fs_context.h   |  16 +-
+ fs/smb/client/fscache.h      |  10 +-
+ fs/smb/client/netlink.h      |   4 +-
+ fs/smb/client/ntlmssp.h      |  15 +-
+ fs/smb/client/reparse.h      |  13 +-
+ fs/smb/client/smb2proto.h    | 468 ++++++++---------
+ 18 files changed, 822 insertions(+), 888 deletions(-)
+
