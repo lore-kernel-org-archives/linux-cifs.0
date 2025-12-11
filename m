@@ -1,77 +1,120 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400F330F7FB
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 15:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6310281508;
+	Thu, 11 Dec 2025 19:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765467827; cv=none; b=XG5FOhjaHNt9wYpxsH0+QvTkDMFhAUxWVD/a/XAjvTOHW64tsK9eNNcNnz3QXfv2Nl8LG5hKdb2FmQuqIMVuItMtQ1NugW3isaoEPo4jd+ziGCVyoqtw+ARU7bAcdSS7UM+O/uIMQB3v+3++MvUCGKR1xGUA8UVIvYExIxYTIqU=
+	t=1765481920; cv=none; b=pDw7I1NK03IRQaK5lCtl9YZs/nXoeErhNEijLbwlzHU1mRB1cgnjNbrUhHhHd8HzEw4+zSq7jlSt4+49Trv0Qi9yF73bR9qo64Fn53Cra1SXa3Mnha6qsSsgJx0um7O0n3n26W3oYb+J2dgffZC704wR2EfQMTU1LapVV7/ylfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765467827; c=relaxed/simple;
-	bh=ilnAXuWOLAFvv+OdUW1wEi8XOZ4s+XNFiN3LipVmKXE=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=X6cfAZUacVODfIncy9WsjQ/kchOOKb/R7++uYhAZ4NUekRH9Wnlyz6gygpCa4dEnHnnfleuPWIaiQ7cDRZG1qW2WPeN+tMWIcESeBr9Ru1aJY5xoTdaydEL0NWy/0gCrbK1PnZoC+3OcrPbMFVSOdIy8osELLU+yNvBVted3fi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ayVEc/sk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1765481920; c=relaxed/simple;
+	bh=VNEQaViSc7HQzpBLfK4KjjSt7RNitEzMmt7R8hRYEjc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=qQcnph70ZRxwIxEyiHsEXjz9VBeDBQ1UOnG8d0Elz8oP2JN1xuswoF/u8TFnLzlmcPWnIi8RohNof5Oby1QHerJtqjilxIwUtS8NcVJc1yOf28blp/NyJpSoVBgnqoyTWFOdUi2zflYJAkot+zoRRy37GcrptgF/ZLNd0SEx8AI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=GkPmW8dz; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ayVEc/sk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765467824;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ilnAXuWOLAFvv+OdUW1wEi8XOZ4s+XNFiN3LipVmKXE=;
-	b=ayVEc/skJecqPVNs2C/mG7kr55TAomqI9z2hbpofW61kX8Di74sYf/TvJn14xrrZsBzJRS
-	HEKdkMEZQhurmlPF/3eWHX2QE7OUmHzjPiW531y/Zo8ifZynViI9xLuGgnF7HrD+sWRMbx
-	/nSUmR1tvNvbYBabNjYQm+iGfxaTYw0=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-440-7SuUl1uhN2mlmc8mJjXJwg-1; Thu,
- 11 Dec 2025 10:43:40 -0500
-X-MC-Unique: 7SuUl1uhN2mlmc8mJjXJwg-1
-X-Mimecast-MFC-AGG-ID: 7SuUl1uhN2mlmc8mJjXJwg_1765467819
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8497D18002C9;
-	Thu, 11 Dec 2025 15:43:38 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BE8D8180035F;
-	Thu, 11 Dec 2025 15:43:35 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <e0c39a29-03ea-42dd-bc17-0483d74a0951@linux.dev>
-References: <e0c39a29-03ea-42dd-bc17-0483d74a0951@linux.dev> <db17608e-8e3f-4740-9189-6d310c77105c@linux.dev> <650896.1765407799@warthog.procyon.org.uk> <693d276d-6e0e-4457-9ace-ac1291fe2df5@linux.dev> <CAH2r5msTSRvKRwQYjuVP62KB5beoS99e4eYKYHQ9ZPTYejykRA@mail.gmail.com> <782578.1765465450@warthog.procyon.org.uk>
-To: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
-    liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn,
-    Paulo Alcantara <pc@manguebit.org>,
-    CIFS <linux-cifs@vger.kernel.org>, Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH 2/2] cifs: Autogenerate SMB2 error mapping table
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="GkPmW8dz"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Cc:To:From:Date:Message-ID;
+	bh=xqdUuiLfCko2dH2H/SzZD5QI6OXn3iPafWwcV35BbrM=; b=GkPmW8dzNWKDj7K/8vtS5eD3HB
+	SnlBqm7rlPA/HfGzFyw3eFkhfKuUlXtZbB5A3NQlWz70Ryi+wkj2SGFewibrk+oXpRo4YBUCpUXsq
+	0kWHgPyrthmaOR0Nsjdt9BHR+DfTaJ9GkH70t4rjByHUn/VY836KPovaHdtgAj8u/CFZXRbNOm7qd
+	qL0bldlJt07zRW3TZbSOaYFLtq/OqKLW+1Tgdd+0mhR41orbkRJO82fz791oW2rEilBzcEjwmTqz3
+	B+8ouRq5RMq8JdaeGOrLKR+Dq253fh27YQl5YMuOCUBB0LP9+C7bmwOlAwh6bqmqkntPClD2O16Bv
+	iYX8eAwWxNGf613xUZG1JuesLNynWWTQNW9IGzk51WQV5ntGmblqSTJS99YziS2L+p76FZYZDV2jw
+	SsVHe0D+ZasYwBMWj/aI0Q6C6vh+fBtJjkGI7VwnaDSXYMEObiYD/AV+NcNaq7zF3kmK6FS1jG1VD
+	ygrsCB8g3+5vmhpG2JFeQgKC;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vTmUf-000Ixy-2K;
+	Thu, 11 Dec 2025 19:38:29 +0000
+Message-ID: <a3760b26-7458-40a0-ae79-bb94dd0e1d01@samba.org>
+Date: Thu, 11 Dec 2025 20:38:29 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <783996.1765467814.1@warthog.procyon.org.uk>
-Date: Thu, 11 Dec 2025 15:43:34 +0000
-Message-ID: <783997.1765467814@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Subject: Re: Problem with smbdirect rw credits and initiator_depth
+From: Stefan Metzmacher <metze@samba.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Tom Talpey <tom@talpey.com>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+References: <35eec2e6-bf37-43d6-a2d8-7a939a68021b@samba.org>
+ <CAKYAXd9p=7BzmSSKi5n41OKkkw4qrr4cWpWet7rUfC+VT-6h1g@mail.gmail.com>
+ <f59e0dc7-e91c-4a13-8d49-fe183c10b6f4@samba.org>
+ <CAKYAXd-MF1j+CkbWakFJK2ov_SfRUXaRuT6jE0uHZoLxTu130Q@mail.gmail.com>
+ <CAKYAXd__T=L9aWwOuY7Z8fJgMf404=KQ2dTpNRd3mq9dnYCxRw@mail.gmail.com>
+ <86b3c222-d765-4a6c-bb79-915609fa3d27@samba.org>
+Content-Language: en-US
+In-Reply-To: <86b3c222-d765-4a6c-bb79-915609fa3d27@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev> wrote:
+Am 10.12.25 um 17:42 schrieb Stefan Metzmacher:
+> Am 05.12.25 um 13:21 schrieb Namjae Jeon:
+>>>> Can you at least post the dmesg output generated by this:
+>>>> https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=7e724ebc58e986f4e101a55f4ab5e96912239918
+>>>> Assuming that this wasn't triggered:
+>>>> if (WARN_ONCE(needed > max_possible, "needed:%u > max:%u\n", needed, max_possible))
+>>> I didn't know you wanted it. I will share it after office.
+>> I have attached v2 and v3 logs. Let me know if you need something more,
+>>>>
+>>>> Did you run the bpftrace command? Did it print a lot of
+>>>> 'smb_direct_rdma_xmit' message over the whole time of the file copy?
+>>> No, I didn't check it. but I will try this.
+>> /mnt# bpftrace ksmbd-rdma-xmit.bt
+>> Attaching 1 probe...
+>>
+>> The absence of any output after Attaching 1 probe... indicates that
+>> the smb_direct_rdma_xmit function has not been called ?
+> 
+> Assuming the client requires signing, I may found the
+> reason for a recv credit problem.
+> 
+> ksmbd uses this:
+> 
+> smb_direct_max_fragmented_recv_size = 1024 * 1024
+> smb_direct_max_receive_size = 1364;
+> smb_direct_receive_credit_max = 255;
+> 
+> In order for the client to fill the full eassembly buffer,
+> all our recv buffers are moved into it, which means
+> 255 * (1364 - 24) = 341700 (0x536C4) bytes of payload,
+> after that we no longer able to grant and new recv credits to
+> the peer, which tries to send up to 1048576 (0x100000).
+> 
+> I found this using smbclient to download a large file
+> from a Windows server without using rdma offload.
+> 
+> So I guess you are seeing the problem when Windows
+> tries to copy a file to ksmbd.
+> 
+> For smbclient I made it work by changing
+> max_fragmented_recv_size to the minimum value of
+> 131072 (0x20000), this value is smaller than
+> all local recv buffers 255 * (1364 - 24) = 341700 (0x536C4).
+>
+> I try to find what difference we have between 6.17.9
+> and 6.18 tomorrow.
 
-> These two patches look good. Thanks for your patches.
+The above is not a problem with 6.17.9 nor
+with 6.18 in the server, as I found this logic
+hiding in smb_direct_prepare().
 
-Note that that there's a bit at the second patch which should've been merged
-into the first, modifying fs/smb/common/smb2status.h.
+         sp->max_fragmented_recv_size =
+                 (sp->recv_credit_max * sp->max_recv_size) / 2;
 
-David
+It explains why I saw the strange 173910 value in captures...
+
+But this is broken in the client as it doesn't
+have this logic.
+
+metze
 
