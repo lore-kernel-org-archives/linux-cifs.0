@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047C230F807
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 12:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F31330FC31
+	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 12:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765455533; cv=none; b=PuseNS5GdOM+AP13DCG1efR2n9t+6EWXhiWWUvfnq/ULMVS9Dx9shsNkAo8+5zkhnxGHvdhdAmUmYymOgxkVnjkHwb37Cj2y8UCTMZBOIWeZXCnjxD9agF2ipO7e4iOxsOghiNdo0qF4WvxSCs7WMDnuuCYv7rycKiUtCmgknC4=
+	t=1765455534; cv=none; b=RAupOU8BY9rQXjAtK4aGyAj4LtmQSRzN2Wwjyyazn2bbgR2i8Q/4X6JjEV6nVco+dBa6KlnksGwbYbdyIAChaMTANp+/72/xhbu/9yfF4SQB7jxB1cLOqTgdWtqxP2nWnKrl6BF+ScRzWiddfbx+OR3o3s8ez8B3C3+wvKDZijA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765455533; c=relaxed/simple;
-	bh=kHsDSsBbEJjgzmCquEl2lb6YJgpKoKwc0ROqUXOGtwU=;
+	s=arc-20240116; t=1765455534; c=relaxed/simple;
+	bh=+Wo+l71IAU0AqaO6ZoV2OG/pvIDGGYqR2GhGhU27Y68=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZPNlfqK7Cu4e6MSGaxsQaGdSSaBMXBuU2TvpdcSbMiSYn6Yc9OGxn+WN3rnwMPHZT4DTsTnBMH7UfJBVuX5fvrf+6mwc2wwKLCFvUs6fwR60bqL+HhbOSAVztbZxE9STaAzRGNi8j0/6uuyrkmoV+zUpeFTVids1vml2jokZJrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OaHaHRLF; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=jfhTkF2eISqG5D8oYyNDZMQGF64+NZvlyOYonksACmLj0Xc+AsV9KaNSTjMpTFwv5Oi7tTy3EQ0OADivKT1ZRE6+KqQP11Le3TDG78OSMa4V/efAvnzVWifCUQTRY9CCaECwlwigG53zbsk9ttY7LY2+nnV1t6RXa1dTBHs6wYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fwTjA+sl; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OaHaHRLF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwTjA+sl"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765455526;
+	s=mimecast20190719; t=1765455524;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uzr6N7b5JybtHCAVwGJNHrVs+Vz79HR5PooQE+V9Huo=;
-	b=OaHaHRLFJp2O6c3nY1Sbrz+9gPIB7620aHtlw+IAEoi2TG5W8oeIQsihnkGEVa0sLlA58z
-	LAJCIeEGOp81m9QqpPl8mEPWw6/oiDMKTzqfTI1YREoE/KBpkn1DJSDo8m7t4rq/uvn9rg
-	4kRoTtpM1E0R9JNfcxwtU55L3amV8d8=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=U+sZRfUhZLYVTFCknqCPjwaISkbiMEC9lHaFs7CeHiY=;
+	b=fwTjA+sloccFX6sTKin+LDWjwJEhvUE1x6zZ7/68s7z6hTMIISiwxe6ch12qn3lBAG9vKG
+	GBL3ynGeUDFjgyrMFf/U+HqmN4xYFaQNFHE92HzSit/UVfpUQQ3BJSJwtLiHYypFmR2Ib8
+	B4goAocOT3tU5KH8rXH4kkHMS3ib5W4=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-256-V4OYB4LeOZyTvdbitEz3wQ-1; Thu,
- 11 Dec 2025 07:18:42 -0500
-X-MC-Unique: V4OYB4LeOZyTvdbitEz3wQ-1
-X-Mimecast-MFC-AGG-ID: V4OYB4LeOZyTvdbitEz3wQ_1765455521
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-392-kz4gVK2sNH-hU3h-RKxHCQ-1; Thu,
+ 11 Dec 2025 07:18:39 -0500
+X-MC-Unique: kz4gVK2sNH-hU3h-RKxHCQ-1
+X-Mimecast-MFC-AGG-ID: kz4gVK2sNH-hU3h-RKxHCQ_1765455518
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9F6511800592;
-	Thu, 11 Dec 2025 12:18:41 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 968F119560A5;
+	Thu, 11 Dec 2025 12:18:38 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.14])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D9F861956056;
-	Thu, 11 Dec 2025 12:18:39 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D93F0180049F;
+	Thu, 11 Dec 2025 12:18:36 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Steve French <sfrench@samba.org>
 Cc: David Howells <dhowells@redhat.com>,
@@ -50,9 +50,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 15/18] cifs: Scripted clean up fs/smb/client/cifs_debug.h
-Date: Thu, 11 Dec 2025 12:17:09 +0000
-Message-ID: <20251211121715.759074-17-dhowells@redhat.com>
+Subject: [PATCH 14/18] cifs: Scripted clean up fs/smb/client/cifs_swn.h
+Date: Thu, 11 Dec 2025 12:17:08 +0000
+Message-ID: <20251211121715.759074-16-dhowells@redhat.com>
 In-Reply-To: <20251211121715.759074-2-dhowells@redhat.com>
 References: <20251211121715.759074-2-dhowells@redhat.com>
 Precedence: bulk
@@ -62,7 +62,7 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
 Remove externs, correct argument names and reformat declarations.
 
@@ -74,21 +74,32 @@ cc: linux-cifs@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-kernel@vger.kernel.org
 ---
- fs/smb/client/cifs_debug.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ fs/smb/client/cifs_swn.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/fs/smb/client/cifs_debug.h b/fs/smb/client/cifs_debug.h
-index e0035ff42dba..35bd5c8e1d71 100644
---- a/fs/smb/client/cifs_debug.h
-+++ b/fs/smb/client/cifs_debug.h
-@@ -15,7 +15,8 @@
- #define pr_fmt(fmt) "CIFS: " fmt
+diff --git a/fs/smb/client/cifs_swn.h b/fs/smb/client/cifs_swn.h
+index 8a9d2a5c9077..955d07b69450 100644
+--- a/fs/smb/client/cifs_swn.h
++++ b/fs/smb/client/cifs_swn.h
+@@ -14,15 +14,15 @@ struct sk_buff;
+ struct genl_info;
  
- void cifs_dump_mem(char *label, void *data, int length);
--void cifs_dump_detail(void *buf, size_t buf_len, struct TCP_Server_Info *server);
-+void cifs_dump_detail(void *buf, size_t buf_len,
-+		      struct TCP_Server_Info *server);
- void cifs_dump_mids(struct TCP_Server_Info *server);
- extern bool traceSMB;		/* flag which enables the function below */
- void dump_smb(void *buf, int smb_buf_length);
+ #ifdef CONFIG_CIFS_SWN_UPCALL
+-extern int cifs_swn_register(struct cifs_tcon *tcon);
++int cifs_swn_register(struct cifs_tcon *tcon);
+ 
+-extern int cifs_swn_unregister(struct cifs_tcon *tcon);
++int cifs_swn_unregister(struct cifs_tcon *tcon);
+ 
+-extern int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
++int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
+ 
+-extern void cifs_swn_dump(struct seq_file *m);
++void cifs_swn_dump(struct seq_file *m);
+ 
+-extern void cifs_swn_check(void);
++void cifs_swn_check(void);
+ 
+ static inline bool cifs_swn_set_server_dstaddr(struct TCP_Server_Info *server)
+ {
 
