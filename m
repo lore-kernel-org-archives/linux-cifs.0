@@ -1,32 +1,32 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1D72877E6
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 14:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E67A248F72
+	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 14:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765463641; cv=none; b=Ka9qOODxvnWrnG6Ur3S7P+M22vIAw+TGqPsJdbyVAySqO/AxXCn0cHrgHDF8r1d7IpEsSQGiPK4zLOboHA/LC3qh8xMjnKCBG94LcghCKYJiDwPR0zvBQoORwrsv8+FrjLIObluSVU6Iz4CwgLeaWvIW1sCKvh22yViLLlr+RTQ=
+	t=1765463641; cv=none; b=VMznZ+EtrggGo9A8TqEXybf4WnOwsqjsx35RtJvTxlAyhJkSZ9KKCzEbVTfJnyBK/PkclEwvRdlcsmjtpPd/lMlkl14FfCZcf84aEKgDuKZPZ3SP7nkgfUP65vMsnb6lfYN/28bYua29QoG3bP7L2OnKYTFGWuFP7IZ8mK+nr4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1765463641; c=relaxed/simple;
-	bh=CsZR8rYNEUCtvS0RAQlsSC+xnNIUYUmzL5it3zqQ2M0=;
+	bh=XOuSJQyYqIGcE79QSyKPELFt53248Al3LYainA5CQN0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tkk72uJvxMJesymzMGn5po8MWLb1g8vPAEbb1MjdUPVKKjC/IaNeXEspK8IuhzWjc1sOsPrVJF2yA8zJqHLEyj4JsGbRg5CuTVhDcPhgADXjJ8MkYP/UGiEHziCu6rIa3hoWwF3+c6iEwRhgWmaKAH52NL4V6EgL4TTOUzQOsUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w+A9xoEe; arc=none smtp.client-ip=91.218.175.181
+	 MIME-Version; b=bveGQ8E+oE03wBlNzi2oq6nz/uoVn9w+oYOUKlGGpYBlWPk6c/pGYNTjS/V/vsb8W/6WQ3w1xmf35DCG+qNLkIYNGQqP3xFsgRzS5ukULY2Yh+yBVRt4XbG4/029kcHY6GSBJdX2+yCB69NIe6Jj4EzQf0pHj8mSJJoN/SVvOz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gyANQZ01; arc=none smtp.client-ip=91.218.175.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w+A9xoEe"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gyANQZ01"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765463634;
+	t=1765463637;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bnCsvMm36uLOzY0gtANpF8iFfxAX2j/CmQVsyvgEwWk=;
-	b=w+A9xoEezKhkprAkoUGIQLrK/Mo13THmg/0Fmelu0EaoqzHRUNyvPUlgxjzWCKx4Ie1sOA
-	PVV95twWQqtRvZ9BuGZK3+2usaG0P4KjiJJps/1PYIKgLxBgeTx3mF2CRv6FRnzK+Y6bi7
-	iM0xLE5wQzpqpNDhnX/jEj2nv9OD4wk=
+	bh=DUaM8R4HFwegycxKHXiuzYrU6BKgkAd9rH4gJamrx1c=;
+	b=gyANQZ01mdloBvm4+xZ23HtflZEwH2nSuFk+Ol4724gZxjCYGRBIjT6LZwdGMb4d0Rf7WR
+	VauqunKilWXURE2l2LbiaDeSM040YjG63CS3beoPEeXgrRwrNS4wwpBagIQ4kKB0JIIFXS
+	tTRmAOupx8gnXA+K4c+R9c7s/xFk5+0=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: sfrench@samba.org,
 	smfrench@gmail.com,
@@ -36,9 +36,9 @@ Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ZhangGuoDong <zhangguodong@kylinos.cn>,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2 5/7] smb: move some definitions from common/smb2pdu.h into common/fscc.h
-Date: Thu, 11 Dec 2025 22:32:26 +0800
-Message-ID: <20251211143228.172470-6-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH v2 6/7] smb: introduce struct create_posix_ctxt_rsp
+Date: Thu, 11 Dec 2025 22:32:27 +0800
+Message-ID: <20251211143228.172470-7-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251211143228.172470-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251211143228.172470-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -52,726 +52,140 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-These definitions are specified in MS-FSCC, so move them into fscc.h.
+Modify the following places:
 
-Only add some documentation references, no other changes.
+  - introduce new struct create_posix_ctxt_rsp
+  - some fields in "struct create_posix_rsp" -> "struct create_posix_ctxt_rsp"
+  - create_posix_rsp_buf(): offsetof(..., nlink) -> offsetof(..., ctxt_rsp)
 
 Co-developed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 ---
- fs/smb/common/fscc.h    | 316 ++++++++++++++++++++++++++++++++++++++++
- fs/smb/common/smb2pdu.h | 307 --------------------------------------
- 2 files changed, 316 insertions(+), 307 deletions(-)
+ fs/smb/client/smb2pdu.c |  9 +++++----
+ fs/smb/client/smb2pdu.h |  6 ++----
+ fs/smb/common/smb2pdu.h | 17 +++++++++++++++++
+ fs/smb/server/oplock.c  |  8 ++++----
+ fs/smb/server/smb2pdu.h |  6 ++----
+ 5 files changed, 30 insertions(+), 16 deletions(-)
 
-diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
-index 5949facd005a..14688ab7ebd5 100644
---- a/fs/smb/common/fscc.h
-+++ b/fs/smb/common/fscc.h
-@@ -12,6 +12,210 @@
- #ifndef _COMMON_SMB_FSCC_H
- #define _COMMON_SMB_FSCC_H
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 5d57c895ca37..b532eb2026ae 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -2362,9 +2362,9 @@ parse_posix_ctxt(struct create_context *cc, struct smb2_file_all_info *info,
  
-+/* Reparse structures - see MS-FSCC 2.1.2 */
-+
-+/* struct fsctl_reparse_info_req is empty, only response structs (see below) */
-+struct reparse_data_buffer {
-+	__le32	ReparseTag;
-+	__le16	ReparseDataLength;
-+	__u16	Reserved;
-+	__u8	DataBuffer[]; /* Variable Length */
-+} __packed;
-+
-+struct reparse_guid_data_buffer {
-+	__le32	ReparseTag;
-+	__le16	ReparseDataLength;
-+	__u16	Reserved;
-+	__u8	ReparseGuid[16];
-+	__u8	DataBuffer[]; /* Variable Length */
-+} __packed;
-+
-+struct reparse_mount_point_data_buffer {
-+	__le32	ReparseTag;
-+	__le16	ReparseDataLength;
-+	__u16	Reserved;
-+	__le16	SubstituteNameOffset;
-+	__le16	SubstituteNameLength;
-+	__le16	PrintNameOffset;
-+	__le16	PrintNameLength;
-+	__u8	PathBuffer[]; /* Variable Length */
-+} __packed;
-+
-+#define SYMLINK_FLAG_RELATIVE 0x00000001
-+
-+struct reparse_symlink_data_buffer {
-+	__le32	ReparseTag;
-+	__le16	ReparseDataLength;
-+	__u16	Reserved;
-+	__le16	SubstituteNameOffset;
-+	__le16	SubstituteNameLength;
-+	__le16	PrintNameOffset;
-+	__le16	PrintNameLength;
-+	__le32	Flags;
-+	__u8	PathBuffer[]; /* Variable Length */
-+} __packed;
-+
-+/* For IO_REPARSE_TAG_NFS - see MS-FSCC 2.1.2.6 */
-+#define NFS_SPECFILE_LNK	0x00000000014B4E4C
-+#define NFS_SPECFILE_CHR	0x0000000000524843
-+#define NFS_SPECFILE_BLK	0x00000000004B4C42
-+#define NFS_SPECFILE_FIFO	0x000000004F464946
-+#define NFS_SPECFILE_SOCK	0x000000004B434F53
-+struct reparse_nfs_data_buffer {
-+	__le32	ReparseTag;
-+	__le16	ReparseDataLength;
-+	__u16	Reserved;
-+	__le64	InodeType; /* NFS_SPECFILE_* */
-+	__u8	DataBuffer[];
-+} __packed;
-+
-+/* For IO_REPARSE_TAG_LX_SYMLINK - see MS-FSCC 2.1.2.7 */
-+struct reparse_wsl_symlink_data_buffer {
-+	__le32	ReparseTag;
-+	__le16	ReparseDataLength;
-+	__u16	Reserved;
-+	__le32	Version; /* Always 2 */
-+	__u8	Target[]; /* Variable Length UTF-8 string without nul-term */
-+} __packed;
-+
-+/* See MS-FSCC 2.3.7 */
-+struct duplicate_extents_to_file {
-+	__u64 PersistentFileHandle; /* source file handle, opaque endianness */
-+	__u64 VolatileFileHandle;
-+	__le64 SourceFileOffset;
-+	__le64 TargetFileOffset;
-+	__le64 ByteCount;  /* Bytes to be copied */
-+} __packed;
-+
-+/* See MS-FSCC 2.3.9 */
-+#define DUPLICATE_EXTENTS_DATA_EX_SOURCE_ATOMIC	0x00000001
-+struct duplicate_extents_to_file_ex {
-+	__le64 StructureSize; /* MUST be set to 0x30 */
-+	__u64 PersistentFileHandle; /* source file handle, opaque endianness */
-+	__u64 VolatileFileHandle;
-+	__le64 SourceFileOffset;
-+	__le64 TargetFileOffset;
-+	__le64 ByteCount;  /* Bytes to be copied */
-+	__le32 Flags;
-+	__le32 Reserved;
-+} __packed;
-+
-+/* See MS-FSCC 2.3.20 */
-+struct fsctl_get_integrity_information_rsp {
-+	__le16	ChecksumAlgorithm;
-+	__le16	Reserved;
-+	__le32	Flags;
-+	__le32	ChecksumChunkSizeInBytes;
-+	__le32	ClusterSizeInBytes;
-+} __packed;
-+
-+/* See MS-FSCC 2.3.52 */
-+struct file_allocated_range_buffer {
-+	__le64	file_offset;
-+	__le64	length;
-+} __packed;
-+
-+/* See MS-FSCC 2.3.55 */
-+struct fsctl_query_file_regions_req {
-+	__le64	FileOffset;
-+	__le64	Length;
-+	__le32	DesiredUsage;
-+	__le32	Reserved;
-+} __packed;
-+
-+/* See MS-FSCC 2.3.56.1 */
-+#define FILE_USAGE_INVALID_RANGE	0x00000000
-+#define FILE_USAGE_VALID_CACHED_DATA	0x00000001
-+#define FILE_USAGE_NONCACHED_DATA	0x00000002
-+struct file_region_info {
-+	__le64	FileOffset;
-+	__le64	Length;
-+	__le32	DesiredUsage;
-+	__le32	Reserved;
-+} __packed;
-+
-+/* See MS-FSCC 2.3.56 */
-+struct fsctl_query_file_region_rsp {
-+	__le32 Flags;
-+	__le32 TotalRegionEntryCount;
-+	__le32 RegionEntryCount;
-+	__u32  Reserved;
-+	struct  file_region_info Regions[];
-+} __packed;
-+
-+/* See MS-FSCC 2.3.58 */
-+struct fsctl_query_on_disk_vol_info_rsp {
-+	__le64	DirectoryCount;
-+	__le64	FileCount;
-+	__le16	FsFormatMajVersion;
-+	__le16	FsFormatMinVersion;
-+	__u8	FsFormatName[24];
-+	__le64	FormatTime;
-+	__le64	LastUpdateTime;
-+	__u8	CopyrightInfo[68];
-+	__u8	AbstractInfo[68];
-+	__u8	FormatImplInfo[68];
-+	__u8	LastModifyImplInfo[68];
-+} __packed;
-+
-+/* See MS-FSCC 2.3.73 */
-+struct fsctl_set_integrity_information_req {
-+	__le16	ChecksumAlgorithm;
-+	__le16	Reserved;
-+	__le32	Flags;
-+} __packed;
-+
-+/* See MS-FSCC 2.3.75 */
-+struct fsctl_set_integrity_info_ex_req {
-+	__u8	EnableIntegrity;
-+	__u8	KeepState;
-+	__u16	Reserved;
-+	__le32	Flags;
-+	__u8	Version;
-+	__u8	Reserved2[7];
-+} __packed;
-+
-+/*
-+ * this goes in the ioctl buffer when doing FSCTL_SET_ZERO_DATA
-+ * See MS-FSCC 2.3.85
-+ */
-+struct file_zero_data_information {
-+	__le64	FileOffset;
-+	__le64	BeyondFinalZero;
-+} __packed;
-+
-+/*
-+ * This level 18, although with struct with same name is different from cifs
-+ * level 0x107. Level 0x107 has an extra u64 between AccessFlags and
-+ * CurrentByteOffset.
-+ * See MS-FSCC 2.4.2
-+ */
-+struct smb2_file_all_info { /* data block encoding of response to level 18 */
-+	__le64 CreationTime;	/* Beginning of FILE_BASIC_INFO equivalent */
-+	__le64 LastAccessTime;
-+	__le64 LastWriteTime;
-+	__le64 ChangeTime;
-+	__le32 Attributes;
-+	__u32  Pad1;		/* End of FILE_BASIC_INFO_INFO equivalent */
-+	__le64 AllocationSize;	/* Beginning of FILE_STANDARD_INFO equivalent */
-+	__le64 EndOfFile;	/* size ie offset to first free byte in file */
-+	__le32 NumberOfLinks;	/* hard links */
-+	__u8   DeletePending;
-+	__u8   Directory;
-+	__u16  Pad2;		/* End of FILE_STANDARD_INFO equivalent */
-+	__le64 IndexNumber;
-+	__le32 EASize;
-+	__le32 AccessFlags;
-+	__le64 CurrentByteOffset;
-+	__le32 Mode;
-+	__le32 AlignmentRequirement;
-+	__le32 FileNameLength;
-+	union {
-+		char __pad;	/* Legacy structure padding */
-+		DECLARE_FLEX_ARRAY(char, FileName);
-+	};
-+} __packed; /* level 18 Query */
-+
- /* See MS-FSCC 2.4.8 */
- typedef struct {
- 	__le32 NextEntryOffset;
-@@ -46,6 +250,11 @@ typedef struct {
- 	char FileName[];
- } __packed FILE_DIRECTORY_INFO;   /* level 0x101 FF resp data */
+ 	memset(posix, 0, sizeof(*posix));
  
-+/* See MS-FSCC 2.4.13 */
-+struct smb2_file_eof_info { /* encoding of request for level 10 */
-+	__le64 EndOfFile; /* new end of file value */
-+} __packed; /* level 20 Set */
-+
- /* See MS-FSCC 2.4.14 */
- typedef struct {
- 	__le32 NextEntryOffset;
-@@ -80,6 +289,26 @@ typedef struct {
- 	char FileName[];
- } __packed FILE_ID_FULL_DIR_INFO; /* level 0x105 FF rsp data */
+-	posix->nlink = le32_to_cpu(*(__le32 *)(beg + 0));
+-	posix->reparse_tag = le32_to_cpu(*(__le32 *)(beg + 4));
+-	posix->mode = le32_to_cpu(*(__le32 *)(beg + 8));
++	posix->ctxt_rsp.nlink = le32_to_cpu(*(__le32 *)(beg + 0));
++	posix->ctxt_rsp.reparse_tag = le32_to_cpu(*(__le32 *)(beg + 4));
++	posix->ctxt_rsp.mode = le32_to_cpu(*(__le32 *)(beg + 8));
  
-+/* See MS-FSCC 2.4.27 */
-+struct smb2_file_internal_info {
-+	__le64 IndexNumber;
-+} __packed; /* level 6 Query */
-+
-+/* See MS-FSCC 2.4.28.2 */
-+struct smb2_file_link_info { /* encoding of request for level 11 */
-+	/* New members MUST be added within the struct_group() macro below. */
-+	__struct_group(smb2_file_link_info_hdr, __hdr, __packed,
-+		__u8   ReplaceIfExists; /* 1 = replace existing link with new */
-+					/* 0 = fail if link already exists */
-+		__u8   Reserved[7];
-+		__u64  RootDirectory;  /* MBZ for network operations (why says spec?) */
-+		__le32 FileNameLength;
-+	);
-+	char   FileName[];     /* Name to be assigned to new link */
-+} __packed; /* level 11 Set */
-+static_assert(offsetof(struct smb2_file_link_info, FileName) == sizeof(struct smb2_file_link_info_hdr),
-+	      "struct member likely outside of __struct_group()");
-+
- /* See MS-FSCC 2.4.34 */
- struct smb2_file_network_open_info {
- 	struct_group_attr(network_open_info, __packed,
-@@ -94,6 +323,37 @@ struct smb2_file_network_open_info {
- 	__le32 Reserved;
- } __packed; /* level 34 Query also similar returned in close rsp and open rsp */
+ 	sid = beg + 12;
+ 	sid_len = posix_info_sid_size(sid, end);
+@@ -2383,7 +2383,8 @@ parse_posix_ctxt(struct create_context *cc, struct smb2_file_all_info *info,
+ 	memcpy(&posix->group, sid, sid_len);
  
-+/* See MS-FSCC 2.4.42.2 */
-+struct smb2_file_rename_info { /* encoding of request for level 10 */
-+	/* New members MUST be added within the struct_group() macro below. */
-+	__struct_group(smb2_file_rename_info_hdr, __hdr, __packed,
-+		__u8   ReplaceIfExists; /* 1 = replace existing target with new */
-+					/* 0 = fail if target already exists */
-+		__u8   Reserved[7];
-+		__u64  RootDirectory;  /* MBZ for network operations (why says spec?) */
-+		__le32 FileNameLength;
-+	);
-+	char   FileName[];     /* New name to be assigned */
-+	/* padding - overall struct size must be >= 24 so filename + pad >= 6 */
-+} __packed; /* level 10 Set */
-+static_assert(offsetof(struct smb2_file_rename_info, FileName) == sizeof(struct smb2_file_rename_info_hdr),
-+	      "struct member likely outside of __struct_group()");
-+
-+/* File System Information Classes */
-+/* See MS-FSCC 2.5 */
-+#define FS_VOLUME_INFORMATION		1 /* Query */
-+#define FS_LABEL_INFORMATION		2 /* Set */
-+#define FS_SIZE_INFORMATION		3 /* Query */
-+#define FS_DEVICE_INFORMATION		4 /* Query */
-+#define FS_ATTRIBUTE_INFORMATION	5 /* Query */
-+#define FS_CONTROL_INFORMATION		6 /* Query, Set */
-+#define FS_FULL_SIZE_INFORMATION	7 /* Query */
-+#define FS_OBJECT_ID_INFORMATION	8 /* Query, Set */
-+#define FS_DRIVER_PATH_INFORMATION	9 /* Query */
-+#define FS_SECTOR_SIZE_INFORMATION	11 /* SMB3 or later. Query */
-+/* See POSIX Extensions to MS-FSCC 2.3.1.1 */
-+#define FS_POSIX_INFORMATION		100 /* SMB3.1.1 POSIX. Query */
-+
- /* See MS-FSCC 2.5.1 */
- #define MAX_FS_NAME_LEN		52
- typedef struct {
-@@ -130,6 +390,46 @@ typedef struct {
- #define FILE_CASE_PRESERVED_NAMES	0x00000002
- #define FILE_CASE_SENSITIVE_SEARCH	0x00000001
+ 	cifs_dbg(FYI, "nlink=%d mode=%o reparse_tag=%x\n",
+-		 posix->nlink, posix->mode, posix->reparse_tag);
++		 posix->ctxt_rsp.nlink, posix->ctxt_rsp.mode,
++		 posix->ctxt_rsp.reparse_tag);
+ }
  
-+/*
-+ * File System Control Information
-+ * See MS-FSCC 2.5.2
-+ */
-+struct smb2_fs_control_info {
-+	__le64 FreeSpaceStartFiltering;
-+	__le64 FreeSpaceThreshold;
-+	__le64 FreeSpaceStopFiltering;
-+	__le64 DefaultQuotaThreshold;
-+	__le64 DefaultQuotaLimit;
-+	__le32 FileSystemControlFlags;
-+	__le32 Padding;
-+} __packed;
-+
-+/* See MS-FSCC 2.5.4 */
-+struct smb2_fs_full_size_info {
-+	__le64 TotalAllocationUnits;
-+	__le64 CallerAvailableAllocationUnits;
-+	__le64 ActualAvailableAllocationUnits;
-+	__le32 SectorsPerAllocationUnit;
-+	__le32 BytesPerSector;
-+} __packed;
-+
-+/* See MS-FSCC 2.5.7 */
-+#define SSINFO_FLAGS_ALIGNED_DEVICE		0x00000001
-+#define SSINFO_FLAGS_PARTITION_ALIGNED_ON_DEVICE 0x00000002
-+#define SSINFO_FLAGS_NO_SEEK_PENALTY		0x00000004
-+#define SSINFO_FLAGS_TRIM_ENABLED		0x00000008
-+
-+/* sector size info struct */
-+struct smb3_fs_ss_info {
-+	__le32 LogicalBytesPerSector;
-+	__le32 PhysicalBytesPerSectorForAtomicity;
-+	__le32 PhysicalBytesPerSectorForPerf;
-+	__le32 FSEffPhysicalBytesPerSectorForAtomicity;
-+	__le32 Flags;
-+	__le32 ByteOffsetForSectorAlignment;
-+	__le32 ByteOffsetForPartitionAlignment;
-+} __packed;
-+
- /* See MS-FSCC 2.5.8 */
- typedef struct {
- 	__le64 TotalAllocationUnits;
-@@ -200,6 +500,22 @@ typedef struct {
- #define FILE_ATTRIBUTE_NO_SCRUB_DATA_LE		cpu_to_le32(FILE_ATTRIBUTE_NO_SCRUB_DATA)
- #define FILE_ATTRIBUTE_MASK_LE			cpu_to_le32(FILE_ATTRIBUTE_MASK)
+ int smb2_parse_contexts(struct TCP_Server_Info *server,
+diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
+index 78bb99f29d38..4928fb620233 100644
+--- a/fs/smb/client/smb2pdu.h
++++ b/fs/smb/client/smb2pdu.h
+@@ -251,11 +251,9 @@ struct smb2_file_id_extd_directory_info {
  
-+/*
-+ * SMB2 Notify Action Flags
-+ * See MS-FSCC 2.7.1
-+ */
-+#define FILE_ACTION_ADDED                       0x00000001
-+#define FILE_ACTION_REMOVED                     0x00000002
-+#define FILE_ACTION_MODIFIED                    0x00000003
-+#define FILE_ACTION_RENAMED_OLD_NAME            0x00000004
-+#define FILE_ACTION_RENAMED_NEW_NAME            0x00000005
-+#define FILE_ACTION_ADDED_STREAM                0x00000006
-+#define FILE_ACTION_REMOVED_STREAM              0x00000007
-+#define FILE_ACTION_MODIFIED_STREAM             0x00000008
-+#define FILE_ACTION_REMOVED_BY_DELETE           0x00000009
-+#define FILE_ACTION_ID_NOT_TUNNELLED            0x0000000A
-+#define FILE_ACTION_TUNNELLED_ID_COLLISION      0x0000000B
-+
- /*
-  * Response contains array of the following structures
-  * See MS-FSCC 2.7.1
+ extern char smb2_padding[7];
+ 
+-/* equivalent of the contents of SMB3.1.1 POSIX open context response */
++/* See POSIX-SMB2 2.2.14.2.16 */
+ struct create_posix_rsp {
+-	u32 nlink;
+-	u32 reparse_tag;
+-	u32 mode;
++	struct create_posix_ctxt_rsp ctxt_rsp;
+ 	struct smb_sid owner; /* var-sized on the wire */
+ 	struct smb_sid group; /* var-sized on the wire */
+ } __packed;
 diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index 5dfdf9ec11c7..9a0685902233 100644
+index 9a0685902233..c46b15e9a2d5 100644
 --- a/fs/smb/common/smb2pdu.h
 +++ b/fs/smb/common/smb2pdu.h
-@@ -1003,22 +1003,6 @@ struct smb2_set_info_rsp {
- #define FILE_NOTIFY_CHANGE_STREAM_SIZE		0x00000400
- #define FILE_NOTIFY_CHANGE_STREAM_WRITE		0x00000800
+@@ -1771,4 +1771,21 @@ struct smb2_lease_ack {
+ #define SET_MINIMUM_RIGHTS (FILE_READ_EA | FILE_READ_ATTRIBUTES \
+ 				| READ_CONTROL | SYNCHRONIZE)
  
--/*
-- * SMB2 Notify Action Flags
-- * See MS-FSCC 2.7.1
-- */
--#define FILE_ACTION_ADDED                       0x00000001
--#define FILE_ACTION_REMOVED                     0x00000002
--#define FILE_ACTION_MODIFIED                    0x00000003
--#define FILE_ACTION_RENAMED_OLD_NAME            0x00000004
--#define FILE_ACTION_RENAMED_NEW_NAME            0x00000005
--#define FILE_ACTION_ADDED_STREAM                0x00000006
--#define FILE_ACTION_REMOVED_STREAM              0x00000007
--#define FILE_ACTION_MODIFIED_STREAM             0x00000008
--#define FILE_ACTION_REMOVED_BY_DELETE           0x00000009
--#define FILE_ACTION_ID_NOT_TUNNELLED            0x0000000A
--#define FILE_ACTION_TUNNELLED_ID_COLLISION      0x0000000B
--
- /* See MS-SMB2 2.2.35 */
- struct smb2_change_notify_req {
- 	struct smb2_hdr hdr;
-@@ -1495,105 +1479,6 @@ struct network_interface_info_ioctl_rsp {
- 	};
++/*
++ * [POSIX-SMB2] SMB3 POSIX Extensions
++ * Link: https://gitlab.com/samba-team/smb3-posix-spec/-/blob/master/smb3_posix_extensions.md
++ */
++
++/*
++ * SMB2_CREATE_POSIX_CONTEXT Response
++ * See POSIX-SMB2 2.2.14.2.16
++ */
++struct create_posix_ctxt_rsp {
++	__le32 nlink;
++	__le32 reparse_tag;
++	__le32 mode;
++	// var sized owner SID
++	// var sized group SID
++} __packed;
++
+ #endif				/* _COMMON_SMB2PDU_H */
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 1f07ebf431d7..8658402ff893 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -1703,7 +1703,7 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
+ 	buf = (struct create_posix_rsp *)cc;
+ 	memset(buf, 0, sizeof(struct create_posix_rsp));
+ 	buf->ccontext.DataOffset = cpu_to_le16(offsetof
+-			(struct create_posix_rsp, nlink));
++			(struct create_posix_rsp, ctxt_rsp));
+ 	/*
+ 	 * DataLength = nlink(4) + reparse_tag(4) + mode(4) +
+ 	 * domain sid(28) + unix group sid(16).
+@@ -1730,9 +1730,9 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
+ 	buf->Name[14] = 0xCD;
+ 	buf->Name[15] = 0x7C;
+ 
+-	buf->nlink = cpu_to_le32(inode->i_nlink);
+-	buf->reparse_tag = cpu_to_le32(fp->volatile_id);
+-	buf->mode = cpu_to_le32(inode->i_mode & 0777);
++	buf->ctxt_rsp.nlink = cpu_to_le32(inode->i_nlink);
++	buf->ctxt_rsp.reparse_tag = cpu_to_le32(fp->volatile_id);
++	buf->ctxt_rsp.mode = cpu_to_le32(inode->i_mode & 0777);
+ 	/*
+ 	 * SidBuffer(44) contain two sids(Domain sid(28), UNIX group sid(16)).
+ 	 * Domain sid(28) = revision(1) + num_subauth(1) + authority(6) +
+diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
+index 66cdc8e4a648..09311a9eb1de 100644
+--- a/fs/smb/server/smb2pdu.h
++++ b/fs/smb/server/smb2pdu.h
+@@ -83,13 +83,11 @@ struct create_durable_rsp {
+ 	} Data;
  } __packed;
  
--/* this goes in the ioctl buffer when doing FSCTL_SET_ZERO_DATA */
--struct file_zero_data_information {
--	__le64	FileOffset;
--	__le64	BeyondFinalZero;
--} __packed;
--
--/* See MS-FSCC 2.3.7 */
--struct duplicate_extents_to_file {
--	__u64 PersistentFileHandle; /* source file handle, opaque endianness */
--	__u64 VolatileFileHandle;
--	__le64 SourceFileOffset;
--	__le64 TargetFileOffset;
--	__le64 ByteCount;  /* Bytes to be copied */
--} __packed;
--
--/* See MS-FSCC 2.3.9 */
--#define DUPLICATE_EXTENTS_DATA_EX_SOURCE_ATOMIC	0x00000001
--struct duplicate_extents_to_file_ex {
--	__le64 StructureSize; /* MUST be set to 0x30 */
--	__u64 PersistentFileHandle; /* source file handle, opaque endianness */
--	__u64 VolatileFileHandle;
--	__le64 SourceFileOffset;
--	__le64 TargetFileOffset;
--	__le64 ByteCount;  /* Bytes to be copied */
--	__le32 Flags;
--	__le32 Reserved;
--} __packed;
--
--
--/* See MS-FSCC 2.3.20 */
--struct fsctl_get_integrity_information_rsp {
--	__le16	ChecksumAlgorithm;
--	__le16	Reserved;
--	__le32	Flags;
--	__le32	ChecksumChunkSizeInBytes;
--	__le32	ClusterSizeInBytes;
--} __packed;
--
--/* See MS-FSCC 2.3.55 */
--struct fsctl_query_file_regions_req {
--	__le64	FileOffset;
--	__le64	Length;
--	__le32	DesiredUsage;
--	__le32	Reserved;
--} __packed;
--
--/* DesiredUsage flags see MS-FSCC 2.3.56.1 */
--#define FILE_USAGE_INVALID_RANGE	0x00000000
--#define FILE_USAGE_VALID_CACHED_DATA	0x00000001
--#define FILE_USAGE_NONCACHED_DATA	0x00000002
--
--struct file_region_info {
--	__le64	FileOffset;
--	__le64	Length;
--	__le32	DesiredUsage;
--	__le32	Reserved;
--} __packed;
--
--/* See MS-FSCC 2.3.56 */
--struct fsctl_query_file_region_rsp {
--	__le32 Flags;
--	__le32 TotalRegionEntryCount;
--	__le32 RegionEntryCount;
--	__u32  Reserved;
--	struct  file_region_info Regions[];
--} __packed;
--
--/* See MS-FSCC 2.3.58 */
--struct fsctl_query_on_disk_vol_info_rsp {
--	__le64	DirectoryCount;
--	__le64	FileCount;
--	__le16	FsFormatMajVersion;
--	__le16	FsFormatMinVersion;
--	__u8	FsFormatName[24];
--	__le64	FormatTime;
--	__le64	LastUpdateTime;
--	__u8	CopyrightInfo[68];
--	__u8	AbstractInfo[68];
--	__u8	FormatImplInfo[68];
--	__u8	LastModifyImplInfo[68];
--} __packed;
--
--/* See MS-FSCC 2.3.73 */
--struct fsctl_set_integrity_information_req {
--	__le16	ChecksumAlgorithm;
--	__le16	Reserved;
--	__le32	Flags;
--} __packed;
--
--/* See MS-FSCC 2.3.75 */
--struct fsctl_set_integrity_info_ex_req {
--	__u8	EnableIntegrity;
--	__u8	KeepState;
--	__u16	Reserved;
--	__le32	Flags;
--	__u8	Version;
--	__u8	Reserved2[7];
--} __packed;
--
- /* Integrity ChecksumAlgorithm choices for above */
- #define	CHECKSUM_TYPE_NONE	0x0000
- #define	CHECKSUM_TYPE_CRC64	0x0002
-@@ -1602,72 +1487,6 @@ struct fsctl_set_integrity_info_ex_req {
- /* Integrity flags for above */
- #define FSCTL_INTEGRITY_FLAG_CHECKSUM_ENFORCEMENT_OFF	0x00000001
- 
--/* Reparse structures - see MS-FSCC 2.1.2 */
--
--/* struct fsctl_reparse_info_req is empty, only response structs (see below) */
--struct reparse_data_buffer {
--	__le32	ReparseTag;
--	__le16	ReparseDataLength;
--	__u16	Reserved;
--	__u8	DataBuffer[]; /* Variable Length */
--} __packed;
--
--struct reparse_guid_data_buffer {
--	__le32	ReparseTag;
--	__le16	ReparseDataLength;
--	__u16	Reserved;
--	__u8	ReparseGuid[16];
--	__u8	DataBuffer[]; /* Variable Length */
--} __packed;
--
--struct reparse_mount_point_data_buffer {
--	__le32	ReparseTag;
--	__le16	ReparseDataLength;
--	__u16	Reserved;
--	__le16	SubstituteNameOffset;
--	__le16	SubstituteNameLength;
--	__le16	PrintNameOffset;
--	__le16	PrintNameLength;
--	__u8	PathBuffer[]; /* Variable Length */
--} __packed;
--
--#define SYMLINK_FLAG_RELATIVE 0x00000001
--
--struct reparse_symlink_data_buffer {
--	__le32	ReparseTag;
--	__le16	ReparseDataLength;
--	__u16	Reserved;
--	__le16	SubstituteNameOffset;
--	__le16	SubstituteNameLength;
--	__le16	PrintNameOffset;
--	__le16	PrintNameLength;
--	__le32	Flags;
--	__u8	PathBuffer[]; /* Variable Length */
--} __packed;
--
--/* For IO_REPARSE_TAG_NFS - see MS-FSCC 2.1.2.6 */
--#define NFS_SPECFILE_LNK	0x00000000014B4E4C
--#define NFS_SPECFILE_CHR	0x0000000000524843
--#define NFS_SPECFILE_BLK	0x00000000004B4C42
--#define NFS_SPECFILE_FIFO	0x000000004F464946
--#define NFS_SPECFILE_SOCK	0x000000004B434F53
--struct reparse_nfs_data_buffer {
--	__le32	ReparseTag;
--	__le16	ReparseDataLength;
--	__u16	Reserved;
--	__le64	InodeType; /* NFS_SPECFILE_* */
--	__u8	DataBuffer[];
--} __packed;
--
--/* For IO_REPARSE_TAG_LX_SYMLINK - see MS-FSCC 2.1.2.7 */
--struct reparse_wsl_symlink_data_buffer {
--	__le32	ReparseTag;
--	__le16	ReparseDataLength;
--	__u16	Reserved;
--	__le32	Version; /* Always 2 */
--	__u8	Target[]; /* Variable Length UTF-8 string without nul-term */
--} __packed;
--
- struct validate_negotiate_info_req {
- 	__le32 Capabilities;
- 	__u8   Guid[SMB2_CLIENT_GUID_SIZE];
-@@ -1787,84 +1606,6 @@ struct smb2_query_info_rsp {
- 	__u8   Buffer[];
+-/* equivalent of the contents of SMB3.1.1 POSIX open context response */
++/* See POSIX-SMB2 2.2.14.2.16 */
+ struct create_posix_rsp {
+ 	struct create_context_hdr ccontext;
+ 	__u8    Name[16];
+-	__le32 nlink;
+-	__le32 reparse_tag;
+-	__le32 mode;
++	struct create_posix_ctxt_rsp ctxt_rsp;
+ 	/* SidBuffer contain two sids(Domain sid(28), UNIX group sid(16)) */
+ 	u8 SidBuffer[44];
  } __packed;
- 
--/*
-- *	PDU query infolevel structure definitions
-- */
--
--/* See MS-FSCC 2.3.52 */
--struct file_allocated_range_buffer {
--	__le64	file_offset;
--	__le64	length;
--} __packed;
--
--struct smb2_file_internal_info {
--	__le64 IndexNumber;
--} __packed; /* level 6 Query */
--
--struct smb2_file_rename_info { /* encoding of request for level 10 */
--	/* New members MUST be added within the struct_group() macro below. */
--	__struct_group(smb2_file_rename_info_hdr, __hdr, __packed,
--		__u8   ReplaceIfExists; /* 1 = replace existing target with new */
--					/* 0 = fail if target already exists */
--		__u8   Reserved[7];
--		__u64  RootDirectory;  /* MBZ for network operations (why says spec?) */
--		__le32 FileNameLength;
--	);
--	char   FileName[];     /* New name to be assigned */
--	/* padding - overall struct size must be >= 24 so filename + pad >= 6 */
--} __packed; /* level 10 Set */
--static_assert(offsetof(struct smb2_file_rename_info, FileName) == sizeof(struct smb2_file_rename_info_hdr),
--	      "struct member likely outside of __struct_group()");
--
--struct smb2_file_link_info { /* encoding of request for level 11 */
--	/* New members MUST be added within the struct_group() macro below. */
--	__struct_group(smb2_file_link_info_hdr, __hdr, __packed,
--		__u8   ReplaceIfExists; /* 1 = replace existing link with new */
--					/* 0 = fail if link already exists */
--		__u8   Reserved[7];
--		__u64  RootDirectory;  /* MBZ for network operations (why says spec?) */
--		__le32 FileNameLength;
--	);
--	char   FileName[];     /* Name to be assigned to new link */
--} __packed; /* level 11 Set */
--static_assert(offsetof(struct smb2_file_link_info, FileName) == sizeof(struct smb2_file_link_info_hdr),
--	      "struct member likely outside of __struct_group()");
--
--/*
-- * This level 18, although with struct with same name is different from cifs
-- * level 0x107. Level 0x107 has an extra u64 between AccessFlags and
-- * CurrentByteOffset.
-- */
--struct smb2_file_all_info { /* data block encoding of response to level 18 */
--	__le64 CreationTime;	/* Beginning of FILE_BASIC_INFO equivalent */
--	__le64 LastAccessTime;
--	__le64 LastWriteTime;
--	__le64 ChangeTime;
--	__le32 Attributes;
--	__u32  Pad1;		/* End of FILE_BASIC_INFO_INFO equivalent */
--	__le64 AllocationSize;	/* Beginning of FILE_STANDARD_INFO equivalent */
--	__le64 EndOfFile;	/* size ie offset to first free byte in file */
--	__le32 NumberOfLinks;	/* hard links */
--	__u8   DeletePending;
--	__u8   Directory;
--	__u16  Pad2;		/* End of FILE_STANDARD_INFO equivalent */
--	__le64 IndexNumber;
--	__le32 EASize;
--	__le32 AccessFlags;
--	__le64 CurrentByteOffset;
--	__le32 Mode;
--	__le32 AlignmentRequirement;
--	__le32 FileNameLength;
--	union {
--		char __pad;	/* Legacy structure padding */
--		DECLARE_FLEX_ARRAY(char, FileName);
--	};
--} __packed; /* level 18 Query */
--
--struct smb2_file_eof_info { /* encoding of request for level 10 */
--	__le64 EndOfFile; /* new end of file value */
--} __packed; /* level 20 Set */
--
- /* Level 100 query info */
- struct smb311_posix_qinfo {
- 	__le64 CreationTime;
-@@ -1890,54 +1631,6 @@ struct smb311_posix_qinfo {
- 	 */
- } __packed;
- 
--/* File System Information Classes */
--#define FS_VOLUME_INFORMATION		1 /* Query */
--#define FS_LABEL_INFORMATION		2 /* Set */
--#define FS_SIZE_INFORMATION		3 /* Query */
--#define FS_DEVICE_INFORMATION		4 /* Query */
--#define FS_ATTRIBUTE_INFORMATION	5 /* Query */
--#define FS_CONTROL_INFORMATION		6 /* Query, Set */
--#define FS_FULL_SIZE_INFORMATION	7 /* Query */
--#define FS_OBJECT_ID_INFORMATION	8 /* Query, Set */
--#define FS_DRIVER_PATH_INFORMATION	9 /* Query */
--#define FS_SECTOR_SIZE_INFORMATION	11 /* SMB3 or later. Query */
--#define FS_POSIX_INFORMATION		100 /* SMB3.1.1 POSIX. Query */
--
--struct smb2_fs_full_size_info {
--	__le64 TotalAllocationUnits;
--	__le64 CallerAvailableAllocationUnits;
--	__le64 ActualAvailableAllocationUnits;
--	__le32 SectorsPerAllocationUnit;
--	__le32 BytesPerSector;
--} __packed;
--
--#define SSINFO_FLAGS_ALIGNED_DEVICE		0x00000001
--#define SSINFO_FLAGS_PARTITION_ALIGNED_ON_DEVICE 0x00000002
--#define SSINFO_FLAGS_NO_SEEK_PENALTY		0x00000004
--#define SSINFO_FLAGS_TRIM_ENABLED		0x00000008
--
--/* sector size info struct */
--struct smb3_fs_ss_info {
--	__le32 LogicalBytesPerSector;
--	__le32 PhysicalBytesPerSectorForAtomicity;
--	__le32 PhysicalBytesPerSectorForPerf;
--	__le32 FSEffPhysicalBytesPerSectorForAtomicity;
--	__le32 Flags;
--	__le32 ByteOffsetForSectorAlignment;
--	__le32 ByteOffsetForPartitionAlignment;
--} __packed;
--
--/* File System Control Information */
--struct smb2_fs_control_info {
--	__le64 FreeSpaceStartFiltering;
--	__le64 FreeSpaceThreshold;
--	__le64 FreeSpaceStopFiltering;
--	__le64 DefaultQuotaThreshold;
--	__le64 DefaultQuotaLimit;
--	__le32 FileSystemControlFlags;
--	__le32 Padding;
--} __packed;
--
- /* See MS-SMB2 2.2.23 through 2.2.25 */
- struct smb2_oplock_break {
- 	struct smb2_hdr hdr;
 -- 
 2.43.0
 
