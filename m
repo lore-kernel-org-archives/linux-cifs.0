@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041DB2D46DB
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 12:18:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CE32C11CE
+	for <linux-cifs@vger.kernel.org>; Thu, 11 Dec 2025 12:18:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765455511; cv=none; b=aYjkNzWnZLbc4AMpMKc34C/FltRdoKkmI0BQDCS9PqSZHfdd3YRqBWCERyFdI0IbTBw2j1mEwUVI+tsQAJQJTjulMhZhBkPq4vhgQ+nKH3EeiwBO01XUYX5vPEC72LMpddtbegN+vh+l5zghCcDgcpXScN2+uvC1IhgrOcy8Pps=
+	t=1765455514; cv=none; b=B7lrzLMfy2YEcGaWgZSK801oZQw72RjOyQKnE8FVkkXzdQVj/mIHItjtrZnK1vQEZR3lqYinCGumTeLU+lJ+45+ndJzctERrW7NmVYy1+VpkZdV5CzXROEDfP3xuSGY5IAtufBMjz9Wjm8pIIOd5cBzovhOxvUkWZaIwUCyuDtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765455511; c=relaxed/simple;
-	bh=o0MayiftDnLIdmHvfSlZ8/ZHloBTKIoCsuSPWWVhOlc=;
+	s=arc-20240116; t=1765455514; c=relaxed/simple;
+	bh=V2FIfxbj6NUEd+Pb09ufbOelsQwMm6m90XXQ5nd29xI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H5tfGl5ucQvn8/JRbq+8OPnpvzsOlXEcUUleZhOLmIQ3ESC62clCzywTQ9yGcMEFh2ptLlW+XxNrAcMoZ1FKV5F2Ow5B0kGLF+4H90/6C8DCnHXen4N2QEJIHfUfxy0T/ararh1fRV2dac43B1/ayE6WY/TzeD+Ej60uw1/HD8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DjAov+Vo; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=n31AaqKJ9SeVpxlxRyqsvyVV1PKeGxIfLWVNV0MChZXkJC/FO5n158yJK/xKKPbzWsBqsguIiYb94RuSMn/D94W2w0v+fWzSUjmj4CZSlw28kG/XyGbbBCY5QCX8ZGJ11evJ1tNZmulDClqmU7gR83lnbVkQ4lIDppWXBtkdC3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JBW1xKel; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DjAov+Vo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JBW1xKel"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765455505;
+	s=mimecast20190719; t=1765455508;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eFJzJ1e1EZECnAmehQNetdpj4AilrLDU4YxRrL1opts=;
-	b=DjAov+VoPX//Td4IqPJiCgtGqPMOR96zOzs35Oi8Y9B8mocpPt/gAeov+OOJKc9YRfXoo9
-	yXXYgvkvI2WZdzTB0itC8w6gMEb7uzc0O2htgpRnK73BRs54OgZ77U15qcda2x0tOuWS6V
-	3PZyrnnFHxaE8iYO02Z59lYwWUmXpKo=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=hr2Frj82z7mY9fcOShwiQSfQlG9xZaviuZh/z2HfbTQ=;
+	b=JBW1xKel7eUTS4IapYLbmdajg9byo5b7tz7MRJ8FnGfipoLalOI3ZroJFA0ju16gXwLvoJ
+	6L7FmyCjkVh94CYJ1+u5wrSDWgzwOOsUhVcYdm7nYBTkepTAXcaT061zntfvQYYr9wgrMy
+	Ct0cp2cpPgW4LLg+AqZbwCSGrqj0V70=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-493-tEk_SZllOkGUWJ-EijuHsQ-1; Thu,
- 11 Dec 2025 07:18:21 -0500
-X-MC-Unique: tEk_SZllOkGUWJ-EijuHsQ-1
-X-Mimecast-MFC-AGG-ID: tEk_SZllOkGUWJ-EijuHsQ_1765455500
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-549-QPiUMRVqNrC7sWecJh8CrQ-1; Thu,
+ 11 Dec 2025 07:18:25 -0500
+X-MC-Unique: QPiUMRVqNrC7sWecJh8CrQ-1
+X-Mimecast-MFC-AGG-ID: QPiUMRVqNrC7sWecJh8CrQ_1765455503
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9457D1800343;
-	Thu, 11 Dec 2025 12:18:20 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B71C418011EE;
+	Thu, 11 Dec 2025 12:18:23 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.14])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AFA3B180045B;
-	Thu, 11 Dec 2025 12:18:18 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 06F0B1953986;
+	Thu, 11 Dec 2025 12:18:21 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Steve French <sfrench@samba.org>
 Cc: David Howells <dhowells@redhat.com>,
@@ -50,9 +50,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 08/18] cifs: Scripted clean up fs/smb/client/dns_resolve.h
-Date: Thu, 11 Dec 2025 12:17:02 +0000
-Message-ID: <20251211121715.759074-10-dhowells@redhat.com>
+Subject: [PATCH 09/18] cifs: Scripted clean up fs/smb/client/cifsglob.h
+Date: Thu, 11 Dec 2025 12:17:03 +0000
+Message-ID: <20251211121715.759074-11-dhowells@redhat.com>
 In-Reply-To: <20251211121715.759074-2-dhowells@redhat.com>
 References: <20251211121715.759074-2-dhowells@redhat.com>
 Precedence: bulk
@@ -62,7 +62,7 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
 Remove externs, correct argument names and reformat declarations.
 
@@ -74,22 +74,51 @@ cc: linux-cifs@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-kernel@vger.kernel.org
 ---
- fs/smb/client/dns_resolve.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/smb/client/cifsglob.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/fs/smb/client/dns_resolve.h b/fs/smb/client/dns_resolve.h
-index 36bc4a6a55bf..951fbab5e61d 100644
---- a/fs/smb/client/dns_resolve.h
-+++ b/fs/smb/client/dns_resolve.h
-@@ -15,8 +15,8 @@
- #include "cifsglob.h"
- #include "cifsproto.h"
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 3eca5bfb7030..9cff21fb7266 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1327,8 +1327,8 @@ struct tcon_link {
+ 	struct cifs_tcon	*tl_tcon;
+ };
  
--int dns_resolve_name(const char *dom, const char *name,
--		     size_t namelen, struct sockaddr *ip_addr);
-+int dns_resolve_name(const char *dom, const char *name, size_t namelen,
-+		     struct sockaddr *ip_addr);
+-extern struct tcon_link *cifs_sb_tlink(struct cifs_sb_info *cifs_sb);
+-extern void smb3_free_compound_rqst(int num_rqst, struct smb_rqst *rqst);
++struct tcon_link *cifs_sb_tlink(struct cifs_sb_info *cifs_sb);
++void smb3_free_compound_rqst(int num_rqst, struct smb_rqst *rqst);
  
- static inline int dns_resolve_unc(const char *dom, const char *unc,
- 				  struct sockaddr *ip_addr)
+ static inline struct cifs_tcon *
+ tlink_tcon(struct tcon_link *tlink)
+@@ -1342,7 +1342,7 @@ cifs_sb_master_tlink(struct cifs_sb_info *cifs_sb)
+ 	return cifs_sb->master_tlink;
+ }
+ 
+-extern void cifs_put_tlink(struct tcon_link *tlink);
++void cifs_put_tlink(struct tcon_link *tlink);
+ 
+ static inline struct tcon_link *
+ cifs_get_tlink(struct tcon_link *tlink)
+@@ -1353,7 +1353,7 @@ cifs_get_tlink(struct tcon_link *tlink)
+ }
+ 
+ /* This function is always expected to succeed */
+-extern struct cifs_tcon *cifs_sb_master_tcon(struct cifs_sb_info *cifs_sb);
++struct cifs_tcon *cifs_sb_master_tcon(struct cifs_sb_info *cifs_sb);
+ 
+ #define CIFS_OPLOCK_NO_CHANGE 0xfe
+ 
+@@ -1526,8 +1526,8 @@ cifsFileInfo_get_locked(struct cifsFileInfo *cifs_file)
+ }
+ 
+ struct cifsFileInfo *cifsFileInfo_get(struct cifsFileInfo *cifs_file);
+-void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_hdlr,
+-		       bool offload);
++void _cifsFileInfo_put(struct cifsFileInfo *cifs_file,
++		       bool wait_oplock_handler, bool offload);
+ void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
+ int cifs_file_flush(const unsigned int xid, struct inode *inode,
+ 		    struct cifsFileInfo *cfile);
 
