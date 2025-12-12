@@ -1,63 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76EFE3168E5;
-	Fri, 12 Dec 2025 10:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2913126C3
+	for <linux-cifs@vger.kernel.org>; Fri, 12 Dec 2025 10:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765534303; cv=none; b=iBiIG/WKq6IQBnu5Tj/T9qgs8Ub7jQBOnWly7ZZBzo9+KF9Ab2fyl0HPWb9NW/MtKUBbnXyjdaqsARXKvQo/GQ1eIvG5B0Lt2QasymIsv8piuPkYwWt+4urSPzOz+cI90icOSs/F1Vp6Irqeo5Vod87HwREqAKLiSv/96fmRuKg=
+	t=1765534814; cv=none; b=jfv6x/GBOZVJjCZdEUQN0PjLsBIUrCjB4j2xk/SJBHnfRblY6vCkzlU3y/XAbodaG+W5vdFLtwdI5uRJC4v/Rr4dAbinX42QPm5FnjehlOCOAEzOrh2Da9kT4nwfEP4kslsNYnlpaAftB0qBQkM0LRBwJUIM6q7BW3+1V+Jx4Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765534303; c=relaxed/simple;
-	bh=3kFJnwY8+lB1Dopi9Ff1MMohqeniZPyTFPs1e7VSyPQ=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=RrscXm8p5KAG/rDQLQBpeDl1gOfxVVaRHKEalC5vtJDgc+5GQ5wSu7aHmSThunZLA5kS+EwgvQS9k/f5c5sc4mLrmUEjadQ9ZaIJdZBmzf/IcpJ0UuH6r7v794D09m4KfRl7mIgNiCZJGMbLIWwKmX1xPv5lQuoAvtedk9JZatE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R4eL/RAD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765534814; c=relaxed/simple;
+	bh=pdEkipOlWIO5AoUrg7oAkPUuJ8iZwbpJUSD8P/EisK4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oKxCBQfD+hRfV7rKgKtaoGMcjuPR7GCO3PZrHX540AMVwQoH8LgbYn0VIodG45by90NEY3eMAaHgwkOaJZyAXaF0A6CNetRZrnsmfwYaIsL0+Yifl/rpi9pgI49+Y2efvwqiVW4M4K4lGcJylXo+QjK1QJdrMwIZnKVhafoad2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xdecg7LF; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R4eL/RAD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54873C4CEF5;
-	Fri, 12 Dec 2025 10:11:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765534303;
-	bh=3kFJnwY8+lB1Dopi9Ff1MMohqeniZPyTFPs1e7VSyPQ=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=R4eL/RADm/0sjhOBoxNkSefhsK8BC0usnswntYj0aMaxusewNiaTC62j1ChxUJER3
-	 hDwXOeLHT1W2D+an0tq5ccDtC0meIZS02Vk/aTZyfxO+JEoz2EMtZTUB/DAjwUj5uo
-	 3d3y66ZmOmAJJysoEy77P+zj4zjHZVTLFXk6Zc6T2fNi0W/N4GA76YXXzDe9XOpyoB
-	 eeMuCJUGTXKa4m6Up7r/yBpoB+XJNtaIMiPCkCXjZG+pYgO+e+ZQVu4WBThqZ4udFP
-	 XJAVt8LCftwMINZpHt+GZy70FGxz9iYI8XWY4WU1CWwt2QJ/vasx/AHXHfUaTIqure
-	 /JxOZ7e0wLTIw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F27E43809A90;
-	Fri, 12 Dec 2025 10:08:37 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5ms9Xd8YEYzsw5DLYvayq0JyUqW4eSBUWwunzhNMVmJWng@mail.gmail.com>
-References: <CAH2r5ms9Xd8YEYzsw5DLYvayq0JyUqW4eSBUWwunzhNMVmJWng@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5ms9Xd8YEYzsw5DLYvayq0JyUqW4eSBUWwunzhNMVmJWng@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v6.19-rc-smb3-server-fixes
-X-PR-Tracked-Commit-Id: 2e0d224d89884819e6f25953bbe860ae6a49555f
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ce825345dd63f62cdab80a8c45f943bb65511aa1
-Message-Id: <176553411663.2108206.13994456797847564253.pr-tracker-bot@kernel.org>
-Date: Fri, 12 Dec 2025 10:08:36 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xdecg7LF"
+Message-ID: <d8768340-fc1f-440c-a2ed-92fbce332e60@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1765534808;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PoObOd7w+JFjj3KTqG5P3Iy/n3JAr/Tu4DPWQjO6vcg=;
+	b=xdecg7LF6JVjU+E4df1jLTOJB3AubGHfvD733Zf22p6jfVOsImXrSlVThtOrqdXlKWanuT
+	cGdd8QMFgo74GwX84Z2qY6USwtuCLgeMQlBetjyVZUi7oCFjkf2ur2YxeMdJM8CjzUyH85
+	27JY1OQ7FMjmylbP5zuCehHO/+4Lfjs=
+Date: Fri, 12 Dec 2025 18:19:51 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Subject: Re: [PATCH 2/2] cifs: Autogenerate SMB2 error mapping table
+To: David Howells <dhowells@redhat.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Steve French <smfrench@gmail.com>, Steve French <sfrench@samba.org>,
+ Namjae Jeon <linkinjeon@samba.org>
+Cc: liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn,
+ Paulo Alcantara <pc@manguebit.org>, CIFS <linux-cifs@vger.kernel.org>,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <8f3290fe-d74c-4cd6-86f4-017c52e1872e@linux.dev>
+ <db17608e-8e3f-4740-9189-6d310c77105c@linux.dev>
+ <650896.1765407799@warthog.procyon.org.uk>
+ <693d276d-6e0e-4457-9ace-ac1291fe2df5@linux.dev>
+ <CAH2r5msTSRvKRwQYjuVP62KB5beoS99e4eYKYHQ9ZPTYejykRA@mail.gmail.com>
+ <782578.1765465450@warthog.procyon.org.uk>
+ <811840.1765532505@warthog.procyon.org.uk>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <811840.1765532505@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-The pull request you sent on Fri, 12 Dec 2025 03:05:20 -0600:
+Maybe we can merge the SMB1 and SMB2 error codes into a single header 
+file, but SMB1 seems to use fewer error codes. We should ask for Steve’s 
+and Namjae's opinions on this.
 
-> git://git.samba.org/ksmbd.git tags/v6.19-rc-smb3-server-fixes
+Thanks,
+ChenXiaoSong.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ce825345dd63f62cdab80a8c45f943bb65511aa1
+On 12/12/25 5:41 PM, David Howells wrote:
+> ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev> wrote:
+> 
+>> Please see my minor suggestions and KUnit test results at this link:
+>> https://chenxiaosong.com/en/smb-map-error.html
+> 
+> Okay.  Note it would be useful if you could reply to the email with minor
+> suggestions so that they're archived along with the emails.
+> 
+> Also note that the format we end up going with for smb2status.h is up for
+> discussion.  My preferred idea is something along the lines of:
+> 
+> 	enum nt_status_codes {
+> 		STATUS_SUCCESS		= 0x00000000, // 0
+> 		STATUS_WAIT_0		= STATUS_SUCCESS,
+> 		STATUS_WAIT_1		= 0x00000001, // -EIO
+> 		STATUS_WAIT_2		= 0x00000002, // -EIO
+> 		STATUS_WAIT_3		= 0x00000003, // -EIO
+> 		...
+> 	};
+> 
+> and switching to using cpu-endian in the code.
+> 
+> David
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
