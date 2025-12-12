@@ -1,137 +1,63 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59203115BC;
-	Fri, 12 Dec 2025 09:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDA12F6921;
+	Fri, 12 Dec 2025 10:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765533521; cv=none; b=YcgN9LJqJxC3RidB+WaJWvdCQnr8KWVa3GF53mCPQkm0HOTuO7El3f+7pJ/e8cB8cFgaaELOu9RSSsPIOrYl7MWgeLBeRR2XmDAVmU2LKqtp4G21U24FlioKNCUX3HbEBDGlEKuKcGdngsGZer47L9L2UHDkFdPvaifL0oChl4U=
+	t=1765534301; cv=none; b=UumdBhd6yzv8x3/SyTTUh3ysZpbPxgo03W9HFbbMeg5LeodHO8CSnz7teMEw+u8n/gFKj7oLDUgW3ibssnAK/iZ7e2p30nqQ0Ls6tTguVyMbpMFwIULh2fJXi2KCG4I9Bout/4dAQE0jkaa2LHkdGaAgD0xsk4Ad4UXcDjrvlWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765533521; c=relaxed/simple;
-	bh=t9CR6EwyhO4sYhVu+6wRyTXxLbFwujmcmCsCeTnKGro=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Yk+TNvqeDGVKeSGXtCAxOU1QP7tqzE30dhlwIlLFmkFcpcDI77jlLwHGgS5pGICgJ1h6ku7X1HT2Ra0TQ88pkp1Hjt7/4+3+SEl2JYIE0W6z7RJRbojdT7WRm/Ew3d+6ulijYu04BABj3Q/KzHrLyGCPYDH/wUfmJVfRSEda44w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=zl8hKaZ7; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1765534301; c=relaxed/simple;
+	bh=PdBCSIkO+rnHooB2/ofKOApE7EQR9VQMfXgjoQ8Ea7k=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=ju1mje4HUf15kXDIaRKXR9w8lKuV1NkBidXZ3eULhM6W0sha8xc+biDPIAGP7Q0MNPSZC5mNibun+siHYfgvHo8fKaH9SsPgiMQ/TMt/HGwnz9K+GuzQNg1pSgA8qCeqA07wsUXN9ypB8qLvSylUA+vJUcs/OXSEHGWt3CGq8x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KJcMC1aP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="zl8hKaZ7"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Cc:To:From:Date:Message-ID;
-	bh=ZVBNcKvAT/C0NG+5tRlwSQ20tkjXXDUOROuseYu9Eng=; b=zl8hKaZ78yR1BzjhEmEtZRYs/A
-	BrqmunMreUTx4dEPOnZCX7E0Ua6ofVQ7NZVZXcEWqW18ymyXVqlcCFv5nbuAjFdnuBYmJDyLyby8I
-	7WzL3zn+VFAMUydPypRwM3eu8QBdqTpBuCDq/yQIQW0f+z1GrHMyOQN0KkLEQo4VhnrhpgZqITd5H
-	m5tsDIJtyHvYp9Xydc9Ue+xeWRasWndUs2H46HVOT2t7wvs6n2r2ljPab8j+lBVUFp+icHzHKk/ia
-	xImGyYMYBvBPrvxIlbBuQmLFqM106vOg8JitylllmoNUtDoF/llnemQPMbem5GS2pfw8lZxo2tElW
-	sWIL3A6H0Ajupw5bV7QZP7APmb5yQtKpHtsYpKQ1KfDHD2NVR7YQBuynlq0gqK/2K4cUaXGPpt5HP
-	ciDERxPtjS9BadMCbHLJNwk5Lj4WYiJbXk2nPfwiHnOoqyDTaPP3fj5MEfKDb6h79Joj51o+9jipi
-	NXmJoVdS2SAJosY5aNDeDuHQ;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vTzv2-000O7w-12;
-	Fri, 12 Dec 2025 09:58:36 +0000
-Message-ID: <3c0c9728-6601-41f1-892f-469e83dd7f19@samba.org>
-Date: Fri, 12 Dec 2025 10:58:35 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KJcMC1aP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E587C4CEF1;
+	Fri, 12 Dec 2025 10:11:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765534301;
+	bh=PdBCSIkO+rnHooB2/ofKOApE7EQR9VQMfXgjoQ8Ea7k=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=KJcMC1aPrKKELfPDFTc/0i4VhUPQTtRgAmQ1utMfuw6ii2y7cMJZVbJWnzphPWya5
+	 qXpnUDVBvsYeBOX3wibNPMlUIvag6InTVt+HsPxKxAQXYjL9bLrYfy94KHdSSv/X2U
+	 qDedG/lyHGcZ32K8r0Jr1JJMYq6XvMXHl9ia7ejQupIFjfLWuX1CS+Ywjm0aLpmomU
+	 qAM9fGyracEMj0sDfSWRFzjcooy+66TnyUSoEt13LMp07eiGuSydRzU4SXD8KjiFwq
+	 d7vytI9bgf6v7ERlk99teYnkr8xln7CmmHhOnWh0af+iwMT+Bm8cLXOutfjJB/roCo
+	 KEYulHnPtrthA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F30B33809A90;
+	Fri, 12 Dec 2025 10:08:35 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5msAbUgccRkUFLPAyzR9+7L=4+=q6csmx6WXTAzMwOriYQ@mail.gmail.com>
+References: <CAH2r5msAbUgccRkUFLPAyzR9+7L=4+=q6csmx6WXTAzMwOriYQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5msAbUgccRkUFLPAyzR9+7L=4+=q6csmx6WXTAzMwOriYQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v6.19-rc-part2-smb3-client-fixes
+X-PR-Tracked-Commit-Id: ab0347e67dacd121eedc2d3a6ee6484e5ccca43d
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 10cc3e9a11dc0d5d8450ecf6db99551c867f3203
+Message-Id: <176553411462.2108206.18037727979548930484.pr-tracker-bot@kernel.org>
+Date: Fri, 12 Dec 2025 10:08:34 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, samba-technical <samba-technical@lists.samba.org>, CIFS <linux-cifs@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Problem with smbdirect rw credits and initiator_depth
-From: Stefan Metzmacher <metze@samba.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Tom Talpey <tom@talpey.com>,
- "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-References: <35eec2e6-bf37-43d6-a2d8-7a939a68021b@samba.org>
- <CAKYAXd9p=7BzmSSKi5n41OKkkw4qrr4cWpWet7rUfC+VT-6h1g@mail.gmail.com>
- <f59e0dc7-e91c-4a13-8d49-fe183c10b6f4@samba.org>
- <CAKYAXd-MF1j+CkbWakFJK2ov_SfRUXaRuT6jE0uHZoLxTu130Q@mail.gmail.com>
- <CAKYAXd__T=L9aWwOuY7Z8fJgMf404=KQ2dTpNRd3mq9dnYCxRw@mail.gmail.com>
- <86b3c222-d765-4a6c-bb79-915609fa3d27@samba.org>
- <a3760b26-7458-40a0-ae79-bb94dd0e1d01@samba.org>
-Content-Language: en-US
-In-Reply-To: <a3760b26-7458-40a0-ae79-bb94dd0e1d01@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-Am 11.12.25 um 20:38 schrieb Stefan Metzmacher:
-> Am 10.12.25 um 17:42 schrieb Stefan Metzmacher:
->> Am 05.12.25 um 13:21 schrieb Namjae Jeon:
->>>>> Can you at least post the dmesg output generated by this:
->>>>> https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=7e724ebc58e986f4e101a55f4ab5e96912239918
->>>>> Assuming that this wasn't triggered:
->>>>> if (WARN_ONCE(needed > max_possible, "needed:%u > max:%u\n", needed, max_possible))
->>>> I didn't know you wanted it. I will share it after office.
->>> I have attached v2 and v3 logs. Let me know if you need something more,
->>>>>
->>>>> Did you run the bpftrace command? Did it print a lot of
->>>>> 'smb_direct_rdma_xmit' message over the whole time of the file copy?
->>>> No, I didn't check it. but I will try this.
->>> /mnt# bpftrace ksmbd-rdma-xmit.bt
->>> Attaching 1 probe...
->>>
->>> The absence of any output after Attaching 1 probe... indicates that
->>> the smb_direct_rdma_xmit function has not been called ?
->>
->> Assuming the client requires signing, I may found the
->> reason for a recv credit problem.
->>
->> ksmbd uses this:
->>
->> smb_direct_max_fragmented_recv_size = 1024 * 1024
->> smb_direct_max_receive_size = 1364;
->> smb_direct_receive_credit_max = 255;
->>
->> In order for the client to fill the full eassembly buffer,
->> all our recv buffers are moved into it, which means
->> 255 * (1364 - 24) = 341700 (0x536C4) bytes of payload,
->> after that we no longer able to grant and new recv credits to
->> the peer, which tries to send up to 1048576 (0x100000).
->>
->> I found this using smbclient to download a large file
->> from a Windows server without using rdma offload.
->>
->> So I guess you are seeing the problem when Windows
->> tries to copy a file to ksmbd.
->>
->> For smbclient I made it work by changing
->> max_fragmented_recv_size to the minimum value of
->> 131072 (0x20000), this value is smaller than
->> all local recv buffers 255 * (1364 - 24) = 341700 (0x536C4).
->>
->> I try to find what difference we have between 6.17.9
->> and 6.18 tomorrow.
-> 
-> The above is not a problem with 6.17.9 nor
-> with 6.18 in the server, as I found this logic
-> hiding in smb_direct_prepare().
-> 
->          sp->max_fragmented_recv_size =
->                  (sp->recv_credit_max * sp->max_recv_size) / 2;
-> 
-> It explains why I saw the strange 173910 value in captures...
+The pull request you sent on Thu, 11 Dec 2025 20:11:52 -0600:
 
-It also explains why the branch I proposed for 6.19
-was worse than 6.18, as this logic got lost.
+> git://git.samba.org/sfrench/cifs-2.6.git tags/v6.19-rc-part2-smb3-client-fixes
 
-Today I tested with smbclient downloading a 32MB file
-from ksmbd (in the state of 6.17.9, basically
-for-6.18/ksmbd-smbdirect-regression-v3)
-and was able to generate a problem that seems to
-be verify similar as what you are seeing with 6.18
-and the Mellanox setup.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/10cc3e9a11dc0d5d8450ecf6db99551c867f3203
 
-During the stream of fragments ksmbd sends a pdu
-a keepalive pdu (RemainingLength = 0 and DataLength = 0)
-granting credits, this truncates the smb2 read response.
+Thank you!
 
-Maybe a7eef6144c97bd7031d40ebc6e8fdd038ea3f46f
-smb: server: queue post_recv_credits_work in put_recvmsg() and avoid count_avail_recvmsg
-makes it more likely to happen, but I'm exploring that.
-
-metze
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
