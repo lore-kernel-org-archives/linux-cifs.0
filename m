@@ -1,46 +1,46 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3212BE7DB
-	for <linux-cifs@vger.kernel.org>; Fri, 12 Dec 2025 09:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3012D315777
+	for <linux-cifs@vger.kernel.org>; Fri, 12 Dec 2025 09:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765532518; cv=none; b=ragHlRNY3yyTgdp0laf9bvbXJd1C8XrRM0woMgs147WYRFaT21U1j1WYsLm+bpp7uzKdEL0ET9i7UXqflAgiHnhMutxnW8L/Nh+nEK1d0DFMJaoY7rgYX4q4M6eJ3geCDLa0HpNXxJivIXd2wra2GkPS1DthUiYt+s39rTTzJU0=
+	t=1765532952; cv=none; b=TZ8q/NLkCwS6Y35wVdWIySJYwByGXZRZtQr6ZYBmSq3UcalkzZXi5xzI8PqaSR5jKtvp4kdSxuxWIpU3sY1lYHgZp2NdAp7ZNwFYP575Myj++Qag0pegFRyPMJ6vanOU/TdkJS0zec5mg7fr+j16FsiZZQLLg8pnqdR04f7YWE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765532518; c=relaxed/simple;
-	bh=BF9ek5MpVI6SUJFQOia7nonzzEAfmhXaRQHQCCLHQKA=;
+	s=arc-20240116; t=1765532952; c=relaxed/simple;
+	bh=wpBFBDuDWb9NiXONHazc3uaqXm34+URFYA/aMybgsXI=;
 	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=naOrcnKD402Qjably2hldDDsfOQmFbk9rTV66nGD6RRglHiAmYkrLx7AYBW1Ry44DX8cT0HySJZvcNaYOLfqoQCpPpKTxXfedqLBjETA6D5oV4EYML+Xm1XTww7G1B9mYbEU5RpAYWbFbvnsnNZjS991KrvfEEIBaF6BixE4PZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ix6doKwU; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Date:Message-ID; b=boWk1w1QeumvlB/L/3Lya5F1q/XSN+MOJGlI4wKh6IjFX/bjoqjT0VICk8KuCDHbctp+tGpvrMa9w0xOM7E2f9KS+Rt12OEae+11YDOEHgQ0rx04zf29iGGLO13g8fYZRRDrdseb+yDcq41n4i+ZAAk+vvtT4TbVzvknpiVMJNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TohaTBPI; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ix6doKwU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TohaTBPI"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765532515;
+	s=mimecast20190719; t=1765532949;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=AKaBD+kakiww/gs3KzKGxRoDKBObQTNyCy5SSxqvpc8=;
-	b=Ix6doKwU+VrAMMnvZ4SJTSmXV9qfPTkpz32f6ZPD+rUeQ1TPivogx/6VtJ5rVzzjGSVmbg
-	xgSutO8nlLcmKCvAV0z8oVyGYegIBJIIRo79jlpsg35U+DkDfdxbweJL3uK+88LZC9+STG
-	u/jmUYwDUz9TzqEgOIE2eXPNZJzmKTk=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=KyAXgVeEtfxWWcNlohEAxyTXawepOYfe6YL/T7Tr5qs=;
+	b=TohaTBPIDlJwmBE9EnFrd24Zh3mbzgNKCidqcu66CJ3Q5UEhra2G1i+amOL6oCEHuHCgKO
+	3kP/4gcv4FDvgFgx08ZeNevvCGwTGq5j2JuhrGPaNQh3icHsQifa/s7m47//yj0f3+9EYp
+	5N/l539QnqNS/TyINAFb5Pm3+1qKjXg=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-632-m3HbcGHjPMWeUmQ8Y_AqjA-1; Fri,
- 12 Dec 2025 04:41:52 -0500
-X-MC-Unique: m3HbcGHjPMWeUmQ8Y_AqjA-1
-X-Mimecast-MFC-AGG-ID: m3HbcGHjPMWeUmQ8Y_AqjA_1765532510
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-517-UHcr-PQWNkW5i9s2YUKnxA-1; Fri,
+ 12 Dec 2025 04:49:05 -0500
+X-MC-Unique: UHcr-PQWNkW5i9s2YUKnxA-1
+X-Mimecast-MFC-AGG-ID: UHcr-PQWNkW5i9s2YUKnxA_1765532944
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 470E21800358;
-	Fri, 12 Dec 2025 09:41:50 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AD8821956089;
+	Fri, 12 Dec 2025 09:49:03 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EC85D19560B4;
-	Fri, 12 Dec 2025 09:41:46 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A25601956056;
+	Fri, 12 Dec 2025 09:49:00 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
 	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
 	Kingdom.
@@ -62,32 +62,17 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <811839.1765532505.1@warthog.procyon.org.uk>
-Date: Fri, 12 Dec 2025 09:41:45 +0000
-Message-ID: <811840.1765532505@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-ID: <812015.1765532939.1@warthog.procyon.org.uk>
+Date: Fri, 12 Dec 2025 09:48:59 +0000
+Message-ID: <812016.1765532939@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
 ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev> wrote:
 
 > Please see my minor suggestions and KUnit test results at this link:
 > https://chenxiaosong.com/en/smb-map-error.html
 
-Okay.  Note it would be useful if you could reply to the email with minor
-suggestions so that they're archived along with the emails.
-
-Also note that the format we end up going with for smb2status.h is up for
-discussion.  My preferred idea is something along the lines of:
-
-	enum nt_status_codes {
-		STATUS_SUCCESS		= 0x00000000, // 0
-		STATUS_WAIT_0		= STATUS_SUCCESS,
-		STATUS_WAIT_1		= 0x00000001, // -EIO
-		STATUS_WAIT_2		= 0x00000002, // -EIO
-		STATUS_WAIT_3		= 0x00000003, // -EIO
-		...
-	};
-
-and switching to using cpu-endian in the code.
+Can we just eliminate nterr.h?  It seems to be duplicate with smb2status.h.
 
 David
 
