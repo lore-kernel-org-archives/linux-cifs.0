@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D5A2F83B0;
-	Mon, 15 Dec 2025 00:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4ED42FD68C;
+	Mon, 15 Dec 2025 00:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765759310; cv=none; b=EYQsFsNE1+87pU0kRpWKWolz2GBSl+Ufb+fLTZw/DSKQKv2lFMKh7+dfDgRjbr7aZR9EAO8QgHSi8LMUw5VjqJv86G/6GfdtNNYyO3SGe0GjTXaHTzjmrieGOVosWqozVVL0B9LTQnHKiwfoLMA797hCp7S5OwQ+dowCQDjWd0k=
+	t=1765759324; cv=none; b=GO9ZIv55LAATVXDkwcAwtulZm0JTeoiHg2wD0WBXD6+cSIhgeE15o6+F+keixj4WOGKWnxrQnOj6BMcjE6x/ETSl47Utq75bGP0eWhxCVOdQojXaoaLxTwv4KWofDCaEluNq4sOFUBbHJ4Eupw8BBzfHTRJ1X9vjLyrIVeAlqac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765759310; c=relaxed/simple;
-	bh=l6PLGSrfAr2bnC3zFhkGdV6nRMZEaikE9zMrnkeSBLM=;
+	s=arc-20240116; t=1765759324; c=relaxed/simple;
+	bh=Exx19kNqscoPiqkjyL+qj80xYlvnVO4kglWg+jprW5w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MOka6A3aBwNM7iqGZdSn2VzaSp+FqFwuCiLQj6NnKOa7eK/GUdO6FRt9X7NlqCexWPXb8uJajtNs4JJbsmpJQk9xTLeo9dgKE7otf9KA0533b5GLBc0UZ9KzmXy7RjD9sa6Q/J4sKvhVbSIOofAhNm0EiB5PVteGf9vyZMSnjBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AzsV5G92; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=kwJ/qPkLFQkGDQ2k5L5pNrVSoU8WBJS3EfD3RGwNbPL/8jk/JCX0ch+q6TunDbvBVSsNOHUl7IWx5znNISeTwodYsIQiOq/thY73UAPcKSbLstsV6UIAIUAVbwdARUNw/1x5r0q/yZvm+SqdMLJewz4t17UD/UgjRoayb0jTsyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=elgCEVsM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AzsV5G92"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CC12C4CEFB;
-	Mon, 15 Dec 2025 00:41:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="elgCEVsM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D339C4CEFB;
+	Mon, 15 Dec 2025 00:42:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765759310;
-	bh=l6PLGSrfAr2bnC3zFhkGdV6nRMZEaikE9zMrnkeSBLM=;
+	s=k20201202; t=1765759324;
+	bh=Exx19kNqscoPiqkjyL+qj80xYlvnVO4kglWg+jprW5w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AzsV5G925o4R4rkqCHz6wpIwXSx+NjO4NVIvJ9wQa+mdo/A8XUmMRSwzHjHACzBMD
-	 wmDKxBNgQM1n9W6AMJ+YINDrrMi+Y0FDA2PjbOLEj5n/CNU2iVkgtFTpR8Lv7vGnVp
-	 gblZv4fXRZahKTShOos1UTWGRewE8yDtF6rr6yGP17RkcpjqpdylBZLxGNMNTRkAa3
-	 BRQFuuSuof8KHmZjpc6r4eoayprBVDwk2veVTOV1WUkJw2L7YWLdrTSOP6nloULfNj
-	 p1BrQwMTHuIFhbZQtCOFfF12snSUAUh0jyinV0xFFa9prW2tJgeiiCwKYYccAAr+XV
-	 n+iYw89zRsHbg==
+	b=elgCEVsMX0nph+AR8rGMojDuRyvZpkaBcCaNNyCDA/5PsPxuevl5Y5GhPyRDFh/lT
+	 JyvZUWEa6apRq9fVNS1XihRB9+QZLQMh0HgI2UMW6PnCSf7E+iSl4f2oPtgusJE77w
+	 LhafBVUge7SVq0Q2WTd+79p6dADTPTOFnBH7dNgyVJQQPriR58iuN7+isTdUVq2dJQ
+	 ufxvJ7z50wdsGz/RvaGa7urlkIn5DmmHYBC+5HMN3VXRPoeQObea2lvD7j7VSQ8tpu
+	 /s67y9pmCTt2v88R/WGsLiR2FlBZymSy5F6YSkH6CxshVTAeZvRTYqjda1ev6GD1Pc
+	 /hKmI7hZNfUjA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -36,9 +36,9 @@ Cc: ChenXiaoSong <chenxiaosong@kylinos.cn>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.18-6.1] smb/client: fix NT_STATUS_NO_DATA_DETECTED value
-Date: Sun, 14 Dec 2025 19:41:19 -0500
-Message-ID: <20251215004145.2760442-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.1] smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value
+Date: Sun, 14 Dec 2025 19:41:25 -0500
+Message-ID: <20251215004145.2760442-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251215004145.2760442-1-sashal@kernel.org>
 References: <20251215004145.2760442-1-sashal@kernel.org>
@@ -51,16 +51,15 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.18.1
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-[ Upstream commit a1237c203f1757480dc2f3b930608ee00072d3cc ]
+[ Upstream commit b2b50fca34da5ec231008edba798ddf92986bd7f ]
 
 This was reported by the KUnit tests in the later patches.
 
-See MS-ERREF 2.3.1 STATUS_NO_DATA_DETECTED. Keep it consistent with the
+See MS-ERREF 2.3.1 STATUS_DEVICE_DOOR_OPEN. Keep it consistent with the
 value in the documentation.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
@@ -71,91 +70,102 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-## Analysis of Commit: smb/client: fix NT_STATUS_NO_DATA_DETECTED value
+## Commit Analysis: smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value
 
 ### 1. COMMIT MESSAGE ANALYSIS
-- Subject clearly states "fix" indicating a bug fix
-- References MS-ERREF 2.3.1 (Microsoft's official NTSTATUS
-  documentation) as the authoritative source
-- Bug was discovered through KUnit tests
-- Has Acked-by from Paulo Alcantara (Red Hat SMB maintainer) and Signed-
-  off-by from Steve French (primary SMB/CIFS maintainer)
+
+The commit message clearly indicates this is fixing an incorrect
+constant value:
+- A KUnit test caught the bug
+- References Microsoft documentation (MS-ERREF 2.3.1
+  STATUS_DEVICE_DOOR_OPEN)
+- Goal is to align with official Microsoft specification
 
 ### 2. CODE CHANGE ANALYSIS
 
-The change is a single-line fix in a header file:
+The change is a single-line fix in `fs/smb/client/nterr.h`:
+
 ```c
--#define NT_STATUS_NO_DATA_DETECTED 0x8000001c
-+#define NT_STATUS_NO_DATA_DETECTED 0x80000022
+-#define NT_STATUS_DEVICE_DOOR_OPEN 0x80000288
++#define NT_STATUS_DEVICE_DOOR_OPEN 0x80000289
 ```
 
-**Critical bug identified**: The OLD value `0x8000001c` was
-**duplicated** with another constant defined just a few lines above:
-```c
-#define NT_STATUS_MEDIA_CHANGED    0x8000001c
-```
+**The Bug:** Looking at the context, I can see the critical issue:
+- `NT_STATUS_DEVICE_REQUIRES_CLEANING` = `0x80000288`
+- `NT_STATUS_DEVICE_DOOR_OPEN` = `0x80000288` (WRONG - duplicate value!)
 
-This is clearly a bug - two distinct Windows NT error status codes were
-sharing the same numeric value. This would cause:
-- Incorrect error code interpretation when servers return
-  STATUS_NO_DATA_DETECTED (0x80000022)
-- Potential confusion between STATUS_MEDIA_CHANGED and
-  STATUS_NO_DATA_DETECTED
+Both status codes had the same value, which is clearly incorrect. These
+are NT status codes that should be unique. According to Microsoft's MS-
+ERREF specification, the correct values should be:
+- `NT_STATUS_DEVICE_REQUIRES_CLEANING` = `0x80000288`
+- `NT_STATUS_DEVICE_DOOR_OPEN` = `0x80000289`
 
-The new value `0x80000022` matches the official Microsoft MS-ERREF
-specification for STATUS_NO_DATA_DETECTED.
+This is a classic copy-paste error or transcription mistake when the
+values were originally added.
 
 ### 3. CLASSIFICATION
-- **Bug fix**: Yes - corrects a provably incorrect constant value
+
+- **Bug fix**: Yes - correcting a wrong constant value
 - **Feature addition**: No
-- **New API**: No
-- **Specification compliance fix**: Aligns with official Microsoft
-  documentation
+- **Exception category**: N/A - this is a straightforward data
+  correction
 
 ### 4. SCOPE AND RISK ASSESSMENT
-- **Size**: 1 line changed
-- **Files**: 1 header file
-- **Risk**: Extremely low - simply correcting a wrong numeric constant
-- **Subsystem**: SMB client (commonly used for network file sharing)
 
-This is about as low-risk as a fix can get - it's correcting a single
-constant value to match official documentation. The previous value was
-demonstrably wrong (duplicate of another constant).
+- **Lines changed**: 1
+- **Files touched**: 1 (header file with constant definitions)
+- **Complexity**: Trivial
+- **Risk of regression**: Virtually zero - only changes which error code
+  is mapped to which value
+
+The fix is as minimal and surgical as possible. Changing a constant from
+an incorrect value to the correct documented value cannot introduce new
+bugs.
 
 ### 5. USER IMPACT
-SMB is widely used for file sharing across networks. Having correct
-error status codes is important for proper error handling. While the
-practical impact depends on how this constant is used, having correct
-protocol constants is essential for interoperability.
+
+These status codes relate to device media handling (tape drives,
+removable media):
+- `NT_STATUS_DEVICE_REQUIRES_CLEANING` - device needs cleaning
+- `NT_STATUS_DEVICE_DOOR_OPEN` - device door is open
+
+Without this fix, SMB clients receiving `NT_STATUS_DEVICE_DOOR_OPEN`
+from a server would incorrectly interpret it as
+`NT_STATUS_DEVICE_REQUIRES_CLEANING`. While these are relatively obscure
+errors, correct protocol implementation matters for:
+- Proper error reporting to users
+- Automated error handling systems
+- Protocol compliance
 
 ### 6. STABILITY INDICATORS
-- Acked by Red Hat's SMB maintainer
-- Signed off by the primary CIFS/SMB maintainer (Steve French)
-- KUnit tests caught this issue, indicating testing coverage
+
+- **Acked-by**: Paulo Alcantara (Red Hat) - well-known SMB subsystem
+  reviewer
+- **Signed-off-by**: Steve French - SMB/CIFS maintainer
+- **Testing**: Found by KUnit tests, indicating solid test coverage
 
 ### 7. DEPENDENCY CHECK
+
 - No dependencies on other commits
-- Standalone fix to a header constant
-- SMB client code exists in stable trees
+- The header file exists in all stable trees with SMB client support
+- Will apply cleanly
 
-### Summary
+### CONCLUSION
 
-**Meets stable criteria:**
-- ✅ Obviously correct (matches official MS-ERREF documentation)
-- ✅ Fixes a real bug (duplicate constant value)
-- ✅ Extremely small and contained (single line change)
-- ✅ No new features or APIs
-- ✅ Low risk (just correcting a constant value)
+This is an ideal stable backport candidate:
 
-**Risk vs Benefit:**
-- Risk: Minimal - changing a constant to its documented correct value
-- Benefit: Correct SMB error handling, protocol compliance
+1. **Obviously correct**: Just fixing a wrong constant to match official
+   documentation
+2. **Fixes a real bug**: Duplicate/incorrect NT status code values
+3. **Small and contained**: Single line change to a constant definition
+4. **No new features**: Pure correction
+5. **Zero regression risk**: The worst case is unchanged behavior for
+   code that was incorrectly handling the duplicate value
+6. **Properly reviewed**: Acked by maintainer
 
-This is a textbook example of a safe stable backport candidate: an
-obviously wrong value is corrected to match official documentation, the
-change is tiny, and there's no possibility of regression since the old
-value was demonstrably incorrect (it was a duplicate of
-NT_STATUS_MEDIA_CHANGED).
+The fix ensures correct SMB protocol behavior by aligning NT status
+codes with Microsoft's official specification. It's a textbook example
+of what belongs in stable trees.
 
 **YES**
 
@@ -163,18 +173,18 @@ NT_STATUS_MEDIA_CHANGED).
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/smb/client/nterr.h b/fs/smb/client/nterr.h
-index b3516c71cff77..09263c91d07a4 100644
+index e3a607b45e719..b3516c71cff77 100644
 --- a/fs/smb/client/nterr.h
 +++ b/fs/smb/client/nterr.h
-@@ -41,7 +41,7 @@ extern const struct nt_err_code_struct nt_errs[];
- #define NT_STATUS_MEDIA_CHANGED    0x8000001c
- #define NT_STATUS_END_OF_MEDIA     0x8000001e
- #define NT_STATUS_MEDIA_CHECK      0x80000020
--#define NT_STATUS_NO_DATA_DETECTED 0x8000001c
-+#define NT_STATUS_NO_DATA_DETECTED 0x80000022
+@@ -44,7 +44,7 @@ extern const struct nt_err_code_struct nt_errs[];
+ #define NT_STATUS_NO_DATA_DETECTED 0x8000001c
  #define NT_STATUS_STOPPED_ON_SYMLINK 0x8000002d
  #define NT_STATUS_DEVICE_REQUIRES_CLEANING 0x80000288
- #define NT_STATUS_DEVICE_DOOR_OPEN 0x80000289
+-#define NT_STATUS_DEVICE_DOOR_OPEN 0x80000288
++#define NT_STATUS_DEVICE_DOOR_OPEN 0x80000289
+ #define NT_STATUS_UNSUCCESSFUL 0xC0000000 | 0x0001
+ #define NT_STATUS_NOT_IMPLEMENTED 0xC0000000 | 0x0002
+ #define NT_STATUS_INVALID_INFO_CLASS 0xC0000000 | 0x0003
 -- 
 2.51.0
 
