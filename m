@@ -1,46 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C1C3570C6;
-	Tue, 16 Dec 2025 12:02:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EAB6396579;
+	Tue, 16 Dec 2025 12:32:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765886550; cv=none; b=m3QM/gNYEeE5DGxJrP2AreYAf7pzoTMrQm6590bTh7rNjVEPXBdbU1W3C/8M2AOXJf8njZvHSZ8c62Ve4utlf4eFwmJhzXHJX/JgvQE7uZYXGldrX8iAd2aHNnfI7ideRHsyAbNGSw3lxSvPUqbAJEuGpsCFzgM/vHCKlGL7cHc=
+	t=1765888325; cv=none; b=CWRpf9r59C9XTUIB85xwy9M5V39sI0sTfwWusaRM24B6ugC9U1WA59tnvp3WC+39FU0cfl8ScCmTi8bdcFi9xzJOlPjuGETu0Ylqc6l6UM2DRO1Z0cBcE12UpAVAYxv77pWhwQXkUuLJVOHGI830AYuY0Vr6SPJpaxNUy3nCIe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765886550; c=relaxed/simple;
-	bh=36VYshdriOcE46Tx1LMjxHl3F0RddSQCDoLFep7w098=;
+	s=arc-20240116; t=1765888325; c=relaxed/simple;
+	bh=F0E8z3YJS7za89WtMyi2ZHrRlSWo61zD/M21UzUw104=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pHpZzLBN2rk7/xYA2Rqy76Zigidw7zm43tsl4bGh3l3P9uIvkpFJS1PmLkk2r59TBr+yoTOaxvnURQTaffBM4MuHEYhBkykOG5+p1w1NdU6oGvR3x/cDglX+JtaiPJ0wrqjNyor8yxwQ5WZOLNldCQNU5fHy4qA3rOpCTk8WFf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ceSLbCIM; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=HePL37YdaRRVRiCGaQ3cAwqG88/1p96YVYvYyMM03KeZqgBINmTtrHpDa8IxkyFvneeSWrFM4rIFyd9CxOrjruc+v37Jjqx2al2g8DWzmY5IjXomwDHUx9A4NtJgRnQ3AgCnJrdyFpOWt9AUn1x9dFBuDrugRN3G5ZECzkj2rCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=BwjRHzBS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ceSLbCIM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDDD1C16AAE;
-	Tue, 16 Dec 2025 12:02:28 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="BwjRHzBS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6CDAC4CEF1;
+	Tue, 16 Dec 2025 12:32:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1765886549;
-	bh=36VYshdriOcE46Tx1LMjxHl3F0RddSQCDoLFep7w098=;
+	s=korg; t=1765888325;
+	bh=F0E8z3YJS7za89WtMyi2ZHrRlSWo61zD/M21UzUw104=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ceSLbCIMgneJamJSPsjqhGuXoygbFjYn1rvIFVHW+TJh9++ZGXt2hySmpW3//W+Pi
-	 XwaPjz4RCrPa0y040CHghPu31sMOdSjxSvT/kPLIIq3WqT0OEpHWSXMQ3oqNqq94D1
-	 x2Su7AFCRfcJVUlw6yvf35+gySqwg82g1yDt3EG8=
+	b=BwjRHzBSrjwfPm7KOrzdRSxhBpsdJ7D2vgisduC/0lCwzA4XhCGhw1nl8seDQsrkY
+	 BlhgLhr2DgeMV5W//f+pdIQKHF1qFnybPkec1uYcAxK7vEXxJ7eB5g3iHxy5kd3hNl
+	 CE7ZJS3ubtkOOxjHhOYsY5ch1MOY+71sAOUHlXxQ=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	Shyam Prasad N <sprasad@microsoft.com>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.org>,
 	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.17 470/507] cifs: Fix handling of a beyond-EOF DIO/unbuffered read over SMB2
-Date: Tue, 16 Dec 2025 12:15:11 +0100
-Message-ID: <20251216111402.472265965@linuxfoundation.org>
+Subject: [PATCH 6.18 501/614] smb: smbdirect: introduce SMBDIRECT_DEBUG_ERR_PTR() helper
+Date: Tue, 16 Dec 2025 12:14:28 +0100
+Message-ID: <20251216111419.521874013@linuxfoundation.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251216111345.522190956@linuxfoundation.org>
-References: <20251216111345.522190956@linuxfoundation.org>
+In-Reply-To: <20251216111401.280873349@linuxfoundation.org>
+References: <20251216111401.280873349@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -52,59 +54,63 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.17-stable review patch.  If anyone has any objections, please let me know.
+6.18-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
-From: David Howells <dhowells@redhat.com>
+From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit 4ae4dde6f34a4124c65468ae4fa1f915fb40f900 ]
+[ Upstream commit 1f3fd108c5c5a9885c6c276a2489c49b60a6b90d ]
 
-If a DIO read or an unbuffered read request extends beyond the EOF, the
-server will return a short read and a status code indicating that EOF was
-hit, which gets translated to -ENODATA.  Note that the client does not cap
-the request at i_size, but asks for the amount requested in case there's a
-race on the server with a third party.
+This can be used like this:
 
-Now, on the client side, the request will get split into multiple
-subrequests if rsize is smaller than the full request size.  A subrequest
-that starts before or at the EOF and returns short data up to the EOF will
-be correctly handled, with the NETFS_SREQ_HIT_EOF flag being set,
-indicating to netfslib that we can't read more.
+  int err = somefunc();
+  pr_warn("err=%1pe\n", SMBDIRECT_DEBUG_ERR_PTR(err));
 
-If a subrequest, however, starts after the EOF and not at it, HIT_EOF will
-not be flagged, its error will be set to -ENODATA and it will be abandoned.
-This will cause the request as a whole to fail with -ENODATA.
+This will be used in the following fixes in order
+to be prepared to identify real world problems
+more easily.
 
-Fix this by setting NETFS_SREQ_HIT_EOF on any subrequest that lies beyond
-the EOF marker.
-
-Fixes: 1da29f2c39b6 ("netfs, cifs: Fix handling of short DIO read")
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-cc: Shyam Prasad N <sprasad@microsoft.com>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Paulo Alcantara <pc@manguebit.org>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
+Stable-dep-of: 425c32750b48 ("smb: server: relax WARN_ON_ONCE(SMBDIRECT_SOCKET_*) checks in recv_done() and smb_direct_cm_handler()")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/smb2pdu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/smb/common/smbdirect/smbdirect_socket.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index f925b2da76c1d..64fe2de662ff9 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4629,7 +4629,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 	} else {
- 		size_t trans = rdata->subreq.transferred + rdata->got_bytes;
- 		if (trans < rdata->subreq.len &&
--		    rdata->subreq.start + trans == ictx->remote_i_size) {
-+		    rdata->subreq.start + trans >= ictx->remote_i_size) {
- 			__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
- 			rdata->result = 0;
- 		}
+diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
+index ee5a90d691c89..611986827a5e2 100644
+--- a/fs/smb/common/smbdirect/smbdirect_socket.h
++++ b/fs/smb/common/smbdirect/smbdirect_socket.h
+@@ -74,6 +74,19 @@ const char *smbdirect_socket_status_string(enum smbdirect_socket_status status)
+ 	return "<unknown>";
+ }
+ 
++/*
++ * This can be used with %1pe to print errors as strings or '0'
++ * And it avoids warnings like: warn: passing zero to 'ERR_PTR'
++ * from smatch -p=kernel --pedantic
++ */
++static __always_inline
++const void * __must_check SMBDIRECT_DEBUG_ERR_PTR(long error)
++{
++	if (error == 0)
++		return NULL;
++	return ERR_PTR(error);
++}
++
+ enum smbdirect_keepalive_status {
+ 	SMBDIRECT_KEEPALIVE_NONE,
+ 	SMBDIRECT_KEEPALIVE_PENDING,
 -- 
 2.51.0
 
