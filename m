@@ -1,63 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818C134AAF9;
-	Tue, 16 Dec 2025 08:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2CB341AC5;
+	Tue, 16 Dec 2025 11:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765872435; cv=none; b=XOY4gAWnofHXH1RRBSxerpxTEgLdf0S460zvjRE5ucO+uWt9315216J8ocFYIsg5LxsC74T/yT0KUo3d/CozTsLFM8rrYQwJ9A6yeZlIXA5JJXyb8EJPpV67pm65t/qDokGMC9N50GLhxOPxlI0CwP76kkc1cavCzx1vsBqMNqM=
+	t=1765884882; cv=none; b=XFHPgTgDA+ocTUUm8iLOiRJsWYiaBd/EmzW9Y7qZmot19XwqBPfKuLNnJJ1fyQWO/e+VuXajTFcarWpiCMKX1WqvZ0HnUtPOw3s9GccgnK2VUNyDtTgoEETz9PRZKQ0yuNqAsE2uv9MXTaVxOR8IlRTqZeq8P1HKL3GlFrv3jgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765872435; c=relaxed/simple;
-	bh=XJT1c9dqQBKD51DsUZRIv0656jhKt+6qbTEm5ztoPqQ=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=PUqK5f9q+feIIlv38n33XJEWIDBILrPmdm08QevELxX8PsvwR2Vyfoty/BsvE/jVkI56ouIn3bjStPVs1Od6aM5eZ6mlIszXHt4fM/MMw4qtWPck476EMnIVNa0HkW8B1qCw99RfvsZ+RxFdtIfKQP3OaO/leVsFnhDuvdoZkMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KwIohlt7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765884882; c=relaxed/simple;
+	bh=Yka1063WsBDL5EBUQSy5YiyHqs00dVg0CEw0JGL1uN4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pKz6rUn+OJXoEyCmGY2M1EwlGbTdU9Z/ZCuWHbKaa3hwqph/scF3C4cxdFzldqZkWkTeaJ5V5CYDXnUgejG0Klih+3a9JOF7ySIrjUsmri6A//zP99tdPvx2h5EORnMLQSoXltUwp3wuxxd4kaTW2xgEP8MRV3ZZormc7dFKYrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Qy4ekxbn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KwIohlt7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C354C16AAE;
-	Tue, 16 Dec 2025 08:07:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765872435;
-	bh=XJT1c9dqQBKD51DsUZRIv0656jhKt+6qbTEm5ztoPqQ=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=KwIohlt7sjVoATV8Zd1ulQNz/XRVt99h1vexuXQFO6h/6U9HgL0q1XwrFoalGT8pH
-	 PmDJjdJX2n761MWMsV09UXZpfmkOYaBq6dhNL38hbKklWmZ7n/3x+LEnRL//CFo9Pe
-	 lR2bTzIa/w3rjXLkKHLhhlhFA5wfprGCMPlVjfWPglIQ+RCM9cc9vEATf4nkrcknK/
-	 USpqQyewk2Q0M0HJJ0CME5b7YlhlW9U9Dxf2SQ+vtTIchWxKp6aaT6tIDh6FLQdMGN
-	 nhBfoB7Vfqc20STRMf39X9VkY4bN2RqMSoo/drzpWVrzBZM8oKPyVBQw1YfSLI0uMm
-	 oEAnKO3IyCRQQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3BAAE380CECA;
-	Tue, 16 Dec 2025 08:04:07 +0000 (UTC)
-Subject: Re: [GIT PULL[ ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5msK2mYp39bX0=R+phV--knmAcLCXTdqYSWfuEfb=59dxA@mail.gmail.com>
-References: <CAH2r5msK2mYp39bX0=R+phV--knmAcLCXTdqYSWfuEfb=59dxA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5msK2mYp39bX0=R+phV--knmAcLCXTdqYSWfuEfb=59dxA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v6.19-rc1-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: 95d7a890e4b03e198836d49d699408fd1867cb55
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 53ec4a79ff4b36d9711cfe030eeebc36afbc51dd
-Message-Id: <176587224587.917451.16004614562498577580.pr-tracker-bot@kernel.org>
-Date: Tue, 16 Dec 2025 08:04:05 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Stefan (metze) Metzmacher" <metze@samba.org>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Qy4ekxbn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1C82C4CEF1;
+	Tue, 16 Dec 2025 11:34:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1765884882;
+	bh=Yka1063WsBDL5EBUQSy5YiyHqs00dVg0CEw0JGL1uN4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Qy4ekxbnNBg3DisQuYWm/6a0OjnIU/cxSSbtUrWb4t0XnxQs6o9UTkCysv7zCn6pV
+	 2RE3wHvvWYv4nzY0Bt3MnkVyDMiJ6M3Qk1dJxsrCclgnKLKy9NYKMwlbAMjIkCr7Wi
+	 RQt4AbpYvwfoUzSUeFvKt2PlCjuJZ+ZrYlXyFvHM=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.12 328/354] cifs: Fix handling of a beyond-EOF DIO/unbuffered read over SMB2
+Date: Tue, 16 Dec 2025 12:14:55 +0100
+Message-ID: <20251216111332.792869420@linuxfoundation.org>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20251216111320.896758933@linuxfoundation.org>
+References: <20251216111320.896758933@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Mon, 15 Dec 2025 23:06:36 -0600:
+6.12-stable review patch.  If anyone has any objections, please let me know.
 
-> git://git.samba.org/ksmbd.git tags/v6.19-rc1-ksmbd-server-fixes
+------------------
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/53ec4a79ff4b36d9711cfe030eeebc36afbc51dd
+From: David Howells <dhowells@redhat.com>
 
-Thank you!
+[ Upstream commit 4ae4dde6f34a4124c65468ae4fa1f915fb40f900 ]
 
+If a DIO read or an unbuffered read request extends beyond the EOF, the
+server will return a short read and a status code indicating that EOF was
+hit, which gets translated to -ENODATA.  Note that the client does not cap
+the request at i_size, but asks for the amount requested in case there's a
+race on the server with a third party.
+
+Now, on the client side, the request will get split into multiple
+subrequests if rsize is smaller than the full request size.  A subrequest
+that starts before or at the EOF and returns short data up to the EOF will
+be correctly handled, with the NETFS_SREQ_HIT_EOF flag being set,
+indicating to netfslib that we can't read more.
+
+If a subrequest, however, starts after the EOF and not at it, HIT_EOF will
+not be flagged, its error will be set to -ENODATA and it will be abandoned.
+This will cause the request as a whole to fail with -ENODATA.
+
+Fix this by setting NETFS_SREQ_HIT_EOF on any subrequest that lies beyond
+the EOF marker.
+
+Fixes: 1da29f2c39b6 ("netfs, cifs: Fix handling of short DIO read")
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: Shyam Prasad N <sprasad@microsoft.com>
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/client/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 7aa87908e0ff1..b0ff9f7e8cea8 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -4634,7 +4634,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 	} else {
+ 		size_t trans = rdata->subreq.transferred + rdata->got_bytes;
+ 		if (trans < rdata->subreq.len &&
+-		    rdata->subreq.start + trans == ictx->remote_i_size) {
++		    rdata->subreq.start + trans >= ictx->remote_i_size) {
+ 			__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
+ 			rdata->result = 0;
+ 		}
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.51.0
+
+
+
