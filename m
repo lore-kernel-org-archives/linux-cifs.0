@@ -1,123 +1,63 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9541C23278D
-	for <linux-cifs@vger.kernel.org>; Tue, 16 Dec 2025 05:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818C134AAF9;
+	Tue, 16 Dec 2025 08:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765861615; cv=none; b=oaaQ2JNQsp91uqizu45SJH44UA+/bm+oMAz72sBJ15uWsS6W93R8/sSrcR+i8Q+qqnh3WhH7C7nWsBFBvwR/cNmwj75oDLNdyN84LAQPjgcy13CR7LWvgXZTVx+Zp1zqe3dNpqlz6qq+dTAGdCkBJ5kFRsVfZG8waxtfYSXXL50=
+	t=1765872435; cv=none; b=XOY4gAWnofHXH1RRBSxerpxTEgLdf0S460zvjRE5ucO+uWt9315216J8ocFYIsg5LxsC74T/yT0KUo3d/CozTsLFM8rrYQwJ9A6yeZlIXA5JJXyb8EJPpV67pm65t/qDokGMC9N50GLhxOPxlI0CwP76kkc1cavCzx1vsBqMNqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765861615; c=relaxed/simple;
-	bh=bpvoSGuynFlzVyRocZ+AvYhqFy9Bx6fQ/mUZKOvC0ZQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=kqin9cQtRhiSxqn/3cwY1szbay5j4l8BCSHxNeDFEnBiYASDkRyzNJUTRnTIS6PLUf7QS4JN8Urtf7Fk/82PNe4CRPWrIAibk9wQcXPxVeFFZAWqO5E0uhJaJKeC0BnKbkI4ZLqEtqpEDl5x5SIknQpClPPrBSUQj+HKPfHs0d4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=luSZyK3A; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1765872435; c=relaxed/simple;
+	bh=XJT1c9dqQBKD51DsUZRIv0656jhKt+6qbTEm5ztoPqQ=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=PUqK5f9q+feIIlv38n33XJEWIDBILrPmdm08QevELxX8PsvwR2Vyfoty/BsvE/jVkI56ouIn3bjStPVs1Od6aM5eZ6mlIszXHt4fM/MMw4qtWPck476EMnIVNa0HkW8B1qCw99RfvsZ+RxFdtIfKQP3OaO/leVsFnhDuvdoZkMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KwIohlt7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="luSZyK3A"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8b2f2c5ec36so428147585a.1
-        for <linux-cifs@vger.kernel.org>; Mon, 15 Dec 2025 21:06:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765861608; x=1766466408; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ezfPhqVi7PyUysNcDNov/p19LHfEvrYvWg6QlkuT+O0=;
-        b=luSZyK3A88gljKHRL9tF8FW/gNiTmx2NYexcea5nVy5O3yuTN+59xDHMq1iAjkyN5V
-         KngcQNeEKeTRHDKrj8s31D2Z5GNTrDRZlZ7Iz0pspGCwtODehX1sMhcxVF6/b/LCfarW
-         iMZU69X4kGHYiDVdrUSrezxdIM3RVzTgAUsW2uMgEbXi2r+2XfoKgRBvfWYr4Uiqh8Qs
-         1OlIwA85SGCg5xGnCSuo3UJNAs+Eh7bu5+j3loy1mxKCY95xAcZcr4L98077zWzFB3Nt
-         czpnMMUHiQjqgVvQg0EZHeZv2j/mwRXJBrZ3kD8SQADhB7Vfil4N99/AoDP7v6Xiu6jT
-         +yrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765861608; x=1766466408;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ezfPhqVi7PyUysNcDNov/p19LHfEvrYvWg6QlkuT+O0=;
-        b=hEydMjwHi94kiTdqaYrO0gP2phRPCXv+osjZ6Yg5VpE5+rrkE14BfDgQDz+7ncPgm2
-         ImJwf+MGmS6xwNaRx7TcayRdJ1uQbB+0PSz0qotS39lFcCeXNd12vV5W8N7C79nHyPSy
-         GbR6dMTDBNNmCqPNGhkRcoXrKVeAKSfhRaDXF6Gu+j8ab9XBtGdCI+lz+jVmxDjWGlYJ
-         HiUW1x7in6M4vhioLmrntK9IJujYm5NgeQKHbLSnqGkAhEat6g6Lo37Q4kkxkVp1DB+H
-         xW4rVQ5WxlCkFNqHDWV6xjJ8vyks+BAh58K9PuPUeCmNAjPGzLcLSs9f/vk9MgfK3o6L
-         y1nw==
-X-Forwarded-Encrypted: i=1; AJvYcCVViO82ICVcXtvtHWkMXC8zZB6JvcW1OOr+R5C8f3pHMlHy5ToljWA148aoR2ruya9f9d+Zxd7VOUJz@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4aYq9dyiM3dOpKtsYkdsS6s/+MwQaBtnDTZ3lCqDT1T+72aNc
-	YvnGg7+dwcrUNmTA+LgTYJcjNvg0IgxJFo7eCl1DyOZO0aoccYwBQn0QmAoC0vryzi2oxmAiGZs
-	E+covaY0hRf75TxTdu3MThr6XDmTYjew=
-X-Gm-Gg: AY/fxX7REklaKAQ9vcU5sRtzApLlCHYdl2ZRSnied8rTZ5umRxm1p2M67lqQlzIvlHE
-	C5drRKjwNC2wQfxW150bL+inrutMb86mwPx4Mcfnd8COOUI2cx6mGmnmeFTbuTProbHR8E/2Wm+
-	D8hAowi415uEaeTkoLvqVxM0vXV+Fj69bWU/XMcCfDJkJKWVQzPSSJCFRC2GDx5AoeQZqyK9nrv
-	g2k7J+Ilot0vt0qZeykdyDMVZas6wR2eCChyEezP+XZIcsHNhHq7HGpnTrI7O3fi+OmgLf5xoUH
-	3t+1tgHJFMY0XEH3RtGvxMKrc5umtA1Gk7BEJm9JKyO/y/drZcEbB5/roxtgPnExplb0t4FUxaF
-	TQtM/+CeySrxtX4dEwEZaVxAhrKHCgwmhv1PMv7Ijl3kw4Z6+ZPk=
-X-Google-Smtp-Source: AGHT+IGZDteOnpeGtIOAjzZ+VofZyiXgdJxmjhJtSjauU8wA3YCIe08YlbPtWtRSVbBZUJRCgSSJuoRBuB6dePyyx4M=
-X-Received: by 2002:a05:620a:f06:b0:892:8439:2efa with SMTP id
- af79cd13be357-8bb39dc4866mr1801080485a.23.1765861607863; Mon, 15 Dec 2025
- 21:06:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KwIohlt7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C354C16AAE;
+	Tue, 16 Dec 2025 08:07:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765872435;
+	bh=XJT1c9dqQBKD51DsUZRIv0656jhKt+6qbTEm5ztoPqQ=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=KwIohlt7sjVoATV8Zd1ulQNz/XRVt99h1vexuXQFO6h/6U9HgL0q1XwrFoalGT8pH
+	 PmDJjdJX2n761MWMsV09UXZpfmkOYaBq6dhNL38hbKklWmZ7n/3x+LEnRL//CFo9Pe
+	 lR2bTzIa/w3rjXLkKHLhhlhFA5wfprGCMPlVjfWPglIQ+RCM9cc9vEATf4nkrcknK/
+	 USpqQyewk2Q0M0HJJ0CME5b7YlhlW9U9Dxf2SQ+vtTIchWxKp6aaT6tIDh6FLQdMGN
+	 nhBfoB7Vfqc20STRMf39X9VkY4bN2RqMSoo/drzpWVrzBZM8oKPyVBQw1YfSLI0uMm
+	 oEAnKO3IyCRQQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3BAAE380CECA;
+	Tue, 16 Dec 2025 08:04:07 +0000 (UTC)
+Subject: Re: [GIT PULL[ ksmbd server fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5msK2mYp39bX0=R+phV--knmAcLCXTdqYSWfuEfb=59dxA@mail.gmail.com>
+References: <CAH2r5msK2mYp39bX0=R+phV--knmAcLCXTdqYSWfuEfb=59dxA@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5msK2mYp39bX0=R+phV--knmAcLCXTdqYSWfuEfb=59dxA@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v6.19-rc1-ksmbd-server-fixes
+X-PR-Tracked-Commit-Id: 95d7a890e4b03e198836d49d699408fd1867cb55
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 53ec4a79ff4b36d9711cfe030eeebc36afbc51dd
+Message-Id: <176587224587.917451.16004614562498577580.pr-tracker-bot@kernel.org>
+Date: Tue, 16 Dec 2025 08:04:05 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Stefan (metze) Metzmacher" <metze@samba.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 15 Dec 2025 23:06:36 -0600
-X-Gm-Features: AQt7F2oGCRTgxpwpaKnogvq-n0i5X02nxx5arLL_1fIlbVoOIytQfSfw9f6VWcI
-Message-ID: <CAH2r5msK2mYp39bX0=R+phV--knmAcLCXTdqYSWfuEfb=59dxA@mail.gmail.com>
-Subject: [GIT PULL[ ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, 
-	"Stefan (metze) Metzmacher" <metze@samba.org>
-Content-Type: text/plain; charset="UTF-8"
 
-Please pull the following changes since commit
-8f0b4cce4481fb22653697cced8d0d04027cb1e8:
+The pull request you sent on Mon, 15 Dec 2025 23:06:36 -0600:
 
-  Linux 6.19-rc1 (2025-12-14 16:05:07 +1200)
+> git://git.samba.org/ksmbd.git tags/v6.19-rc1-ksmbd-server-fixes
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/53ec4a79ff4b36d9711cfe030eeebc36afbc51dd
 
-  git://git.samba.org/ksmbd.git tags/v6.19-rc1-ksmbd-server-fixes
-
-for you to fetch changes up to 95d7a890e4b03e198836d49d699408fd1867cb55:
-
-  ksmbd: fix buffer validation by including null terminator size in EA
-length (2025-12-14 18:35:56 -0600)
-
-----------------------------------------------------------------
-Seven smb3 server fixes
-- Fix set xattr name validation
-- Fix session refcount leak
-- Two minor cleanup
-- Three smbdirect (RDMA) fixes (improve receive completion, and connect)
-----------------------------------------------------------------
-Alexey Velichayshiy (1):
-      ksmbd: remove redundant DACL check in smb_check_perm_dacl
-
-Chen Ni (1):
-      ksmbd: convert comma to semicolon
-
-Namjae Jeon (2):
-      ksmbd: Fix refcount leak when invalid session is found on session lookup
-      ksmbd: fix buffer validation by including null terminator size
-in EA length
-
-Stefan Metzmacher (3):
-      smb: smbdirect: introduce smbdirect_socket.connect.{lock,work}
-      smb: server: initialize recv_io->cqe.done = recv_done just once
-      smb: server: defer the initial recv completion logic to
-smb_direct_negotiate_recv_work()
-
- fs/smb/common/smbdirect/smbdirect_socket.h |  12 ++++
- fs/smb/server/mgmt/user_session.c          |   4 +-
- fs/smb/server/smb2pdu.c                    |   4 +-
- fs/smb/server/smbacl.c                     |   3 -
- fs/smb/server/transport_rdma.c             | 175
-++++++++++++++++++++++++++++++++++++++++++---------
- fs/smb/server/vfs.c                        |   2 +-
- 6 files changed, 164 insertions(+), 36 deletions(-)
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
