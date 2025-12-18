@@ -1,84 +1,63 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C18533A9C1
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Dec 2025 17:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA02934D4F6;
+	Thu, 18 Dec 2025 20:43:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766077914; cv=none; b=qg45L4rGGMqD7Io2OfbcQ08xfx43+gcmCZcLlZak0t96qgE+qUevai7uWcu6DuOpCN8Kr41sCpV9uX6KfubFnEq41/fJzsJ9ti5eNv/FFHgew1rv6LTr7RAcZqhpvtt3nVE76cw91qkt5CfAiinwcbOJH3EKjD0dzM8vMp05Alc=
+	t=1766090619; cv=none; b=EVdgFoOg0UxoZBSyFjdQNvFzHyAcvKzh2v3OYFqRs8gRfpWj8wVJtbLTO3duGn1z++DxGN3sbRMYr1mnbnRUFnamaeOhC3dFyobZWinkreow87EyZ45kUr8cT8Ujn9poAWmUSNBZ2kyRWgMvYomxD5ZwHPfll16BG6mt25lNI3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766077914; c=relaxed/simple;
-	bh=mGxiKyJaCBQhYX40L2XWsihEyQhbl9s/7ky9baEafdM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U8b0pH58JbIpRLD42EuLCCRTEeBV2qZCIC9anaxQ3RCRaaK5/fw+PH2zQ8K4TPSpcBu+M1Mk4l6bloPDDkT2L37ARJdhdMkfNVrdMaZriRSP1be0s0cRJeFR8OUDku5ryPxLqSA5VHAuOZyf9pAbM/6SoRguYhUVz8LUxqI5Cyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LGCVq41o; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1766090619; c=relaxed/simple;
+	bh=fJZa5A5YQb5Cjr6Uv5pUKCPzyW8bT0Si8mQklNzTGVU=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=puLd6mcve0Kw/a6XKTwMNBkngwJd0xY4hZ6T+X3zaSilBgxPQqsHYg9FBmcdZotmqyEy8WL+KXeKVXLnIKGWGJCAlMvbs57/6d1eLZJN4uEHQUerBfwIsQc2HZzWOEt90EWdcj0qyUzna/mfXNGLWIijYZru2zJcybm/ORc8IZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dBEX/qvn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LGCVq41o"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766077908;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ZFAtD/RB9n5Guzhe8ZLAAvMAto4IAOHtdvk4NjvK7X8=;
-	b=LGCVq41ocN60wgKsVnRMCSYqmv6n52InWzySPbOxBK0wlqnPlRBODx9BcyvRs2PYYqOtDL
-	OiramZrhWOz8EwfiAfM5chPsKaVgP27yOWMTc0zU6syhjNIhs5tP83Zx67rOlASKnhlznd
-	tQiVV1TnNYBXq5Zkq3eHB0zLMzoqqWY=
-From: chenxiaosong.chenxiaosong@linux.dev
-To: dhowells@redhat.com,
-	sfrench@samba.org,
-	smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	linkinjeon@samba.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org
-Cc: linux-cifs@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH] smb/server: fix SMB2_MIN_SUPPORTED_HEADER_SIZE value
-Date: Fri, 19 Dec 2025 01:10:38 +0800
-Message-ID: <20251218171038.55266-1-chenxiaosong.chenxiaosong@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dBEX/qvn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E75EC4CEFB;
+	Thu, 18 Dec 2025 20:43:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766090619;
+	bh=fJZa5A5YQb5Cjr6Uv5pUKCPzyW8bT0Si8mQklNzTGVU=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=dBEX/qvnmnzV9gew2URFyV6SZs/4z0xxnRlZUO3bKEZZE+4Mu667ClLPNVEcnv46b
+	 Z0W15bXhhNqcv/xj87wTVI4cVJomkXlEGXvILuwlOfKvd6qf2s1Lh/KIHuifD4jRua
+	 I86m13tMbd6Rl7Vv+aE3hXT5h7Yj32f84levSrlTTs2ePue1m9Nj7FIOuxu+kp2W47
+	 mKJHCKlHuUBv5O8jAr1e3cYI5nPzJMdvGugYNQ+Vq8tzMiUumAhBpY8psg2PwEt42E
+	 Pq4So0/Rz+2X6p5RI6+aPIEcarASZATvMBAwU2dIenRzNksHymxhf7cTYGdo2gAkMB
+	 yKh6/qDoS/BPg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2BF7380AA41;
+	Thu, 18 Dec 2025 20:40:29 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mtxKs7+wFMoE2m9gMZLc9vr3Jj9eEm21JZCNsunuiydDQ@mail.gmail.com>
+References: <CAH2r5mtxKs7+wFMoE2m9gMZLc9vr3Jj9eEm21JZCNsunuiydDQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mtxKs7+wFMoE2m9gMZLc9vr3Jj9eEm21JZCNsunuiydDQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v6.19-rc1-smb3-client-fixes
+X-PR-Tracked-Commit-Id: d8a4af8f3d9d3367b2c49b0d9dee529556bdd2f4
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: a91e1138b7cb0e4dfa12ef823c6eedb34b28bd08
+Message-Id: <176609042858.3123765.1898081444473697947.pr-tracker-bot@kernel.org>
+Date: Thu, 18 Dec 2025 20:40:28 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+The pull request you sent on Thu, 18 Dec 2025 10:48:23 -0600:
 
-See RFC1002 4.3.1.
+> git://git.samba.org/sfrench/cifs-2.6.git tags/v6.19-rc1-smb3-client-fixes
 
-The LENGTH field is the number of bytes following the LENGTH
-field.  In other words, LENGTH is the combined size of the
-TRAILER field(s).
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/a91e1138b7cb0e4dfa12ef823c6eedb34b28bd08
 
-Link: https://lore.kernel.org/linux-cifs/e4fbcbad-459a-412c-918c-0279ec890353@linux.dev/
-Reported-by: David Howells <dhowells@redhat.com>
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/server/connection.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thank you!
 
-diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index b6b4f1286b9c..da6dfd0d80c2 100644
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -296,7 +296,7 @@ bool ksmbd_conn_alive(struct ksmbd_conn *conn)
- }
- 
- #define SMB1_MIN_SUPPORTED_HEADER_SIZE (sizeof(struct smb_hdr))
--#define SMB2_MIN_SUPPORTED_HEADER_SIZE (sizeof(struct smb2_hdr) + 4)
-+#define SMB2_MIN_SUPPORTED_HEADER_SIZE (sizeof(struct smb2_hdr))
- 
- /**
-  * ksmbd_conn_handler_loop() - session thread to listen on new smb requests
 -- 
-2.43.0
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
