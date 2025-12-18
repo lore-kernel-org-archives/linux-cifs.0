@@ -1,148 +1,97 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3612A33E342;
-	Thu, 18 Dec 2025 15:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B213431F5
+	for <linux-cifs@vger.kernel.org>; Thu, 18 Dec 2025 15:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766070608; cv=none; b=Q8qDer3OPEsnYh7fj0vA6JyQx2rfTpJAFoI/ccrUASDr1vmE0oKQaEnq0kT9m7ZqOnzdXuyJRHj1cW2kchMHz2dsGOr41RuMRp4kEkEIeKFhSTog0Db35Aznd7p4M1rZfYpFfMR16Jjm2Et/5ywRMlFUJxLMsZ/lH/VolCsNexE=
+	t=1766071056; cv=none; b=TehXDc6WdzMyyMDt7kAiKrW1y49genquhaZYhyQuaCTcedBkq1BV9j+SRgWWHdATP+/K+B1mAQPhJdWRI8pvzn/rS3NrFFSL0CPSv9s6zxDE8syJZ1E6cKPsEqKgwxI1z77zAGI/DOAznA9GatQ5sH8+H990Xuc3gIbYHYKfXH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766070608; c=relaxed/simple;
-	bh=BUmnQxqOJ3d00ZoaOpUEYSmpHz3NYcD6l1+3MK6nDHE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M3VGLJNmTyiXRx/orGFdAIcfmYmY2WnR8xNBsMCFJfTKhIP1ERJSC86U/bJfnGuEhfYTCqmsEDfs2FLHjAKYv9taLyeTEiUslTnFKzK0tn/+/Ccrj83LIhYTJ5gxKPD513cOtShpNCHQk9+MII5umJRMdauobWBK/ewPoOt2s3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pjdooKeH; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1766071056; c=relaxed/simple;
+	bh=wiQaayGqV6R38Tz/VLdb3rRA8ZnWrvRCRpcP9/jPE68=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LBUwbOppU9BWok+nl7Lsz1uWq1+maTqmIL4QXg0X2CCP2Sw0UaVsyuFM5t9et7gqRBu43HfIKxm8a1L/rK1aA3Bu8W+rpH9E+ld/l0MyAzFed8hsT2eY4krMR0Jk40h44RDebeXMYrr01/ffsrwy2Lk7Vi8caYdYc5zlKZGuX0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IdQPFvDY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pjdooKeH"
-Message-ID: <b5ebd3be-c567-44bb-9411-add5e79234dc@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766070592;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y6p6e/EZtS1hyywF6vdE4TQ+N9KvYFnksenMNlGoM3E=;
-	b=pjdooKeHo20UlE+eNbSSyoDL8aAJeLpUdbhzUrzvJPNy8EMF7p0lz2X3FuIE9PZprDIQv6
-	k5OOM5ColSzuPioxGHLLJ1G8v4ZBqqDQjjQe5kVSLwtHm3mgua4UD94GyNeKN4JTg3YMNF
-	+xSuwSX3byYe6NFX0ahdrdFhnx9jQkI=
-Date: Thu, 18 Dec 2025 23:09:32 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IdQPFvDY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B8DDC116C6
+	for <linux-cifs@vger.kernel.org>; Thu, 18 Dec 2025 15:17:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766071055;
+	bh=wiQaayGqV6R38Tz/VLdb3rRA8ZnWrvRCRpcP9/jPE68=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=IdQPFvDYI5CH7/mSuUv1lxEOOFlD7P9TC/gqDERynpBqhJBKPPzfQEJdb2tbvecKK
+	 6WD6Fx4j1fKLuR9XdSknDb/r+62Tm7S0qOKo5hZVZsGvhnFeIFdHLdtlV8yP0p5UVu
+	 KqNIh+EmM27nIIBBH/dkHzrHsJ0Ig8EgCEzR+XKi+VOMR1X97ETSAUKgRrmhm7Xll+
+	 TPDVxEs/aj9uYyR+kQaFCxHZnj+eQg4GqNa6hLO3zsoRps4haBTeL3f/QfQKlSfszs
+	 J0/eqtZ2tqHSDKcmx5sP/1+hoyTc/vjNTPaZu9Q9Bk7pBWGGycudq0p1+3OY9jWLgC
+	 x2aDCqlRoutTA==
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b727f452fffso294704066b.1
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Dec 2025 07:17:35 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV+XEXjboCGGdD68d+sOSTPaphk5EvhBOWJQ0myqGnBRkGtgE83G7DgG+SjQqKF8WhSWHEdXO4/+wmh@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqCQQcr0VIq6UJzIts+dARgQ3JGaAQsO34hXHvn9Yp8mcU9ZYr
+	P9Mh22COiRqez1dkLyBBV1Ox5DJ5etIrlKZto2sM7yRSzF5I7ZENJryHEJM3F6Tj2gnMubDlacj
+	TXrtW/lCnge9c/fF+FCal3j7VByucvHE=
+X-Google-Smtp-Source: AGHT+IFtGcuOep+jKQD/k1z01d9sAmC6HG3VaUnfceAOvl0dHhDVM8Ca+5LZGkSHRIpF0xfLmjuSIV5QBHqNYKY37zo=
+X-Received: by 2002:a17:907:3e12:b0:b7d:27dd:9a54 with SMTP id
+ a640c23a62f3a-b8020634a93mr383586866b.31.1766071054068; Thu, 18 Dec 2025
+ 07:17:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] ksmbd: Fix to handle removal of rfc1002 header from
- smb_hdr
-To: David Howells <dhowells@redhat.com>, Namjae Jeon <linkinjeon@kernel.org>,
- Steve French <sfrench@samba.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey
- <tom@talpey.com>, Paulo Alcantara <pc@manguebit.org>,
- Shyam Prasad N <sprasad@microsoft.com>, linux-cifs@vger.kernel.org,
- netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <712257.1766069339@warthog.procyon.org.uk>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <712257.1766069339@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20251201225732.1520128-1-dhowells@redhat.com> <20251201225732.1520128-2-dhowells@redhat.com>
+ <CAKYAXd9Ju4MFkkH5Jxfi1mO0AWEr=R35M3vQ_Xa7Yw34JoNZ0A@mail.gmail.com> <611045.1766064976@warthog.procyon.org.uk>
+In-Reply-To: <611045.1766064976@warthog.procyon.org.uk>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 19 Dec 2025 00:17:22 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8r1j9Z_yV2EHyUJ-yN+Z4U5s6jNqni97SY0U+D8YpMVw@mail.gmail.com>
+X-Gm-Features: AQt7F2pS84S-3B8FBwyVSpBfwG6J7RVNHTbpgdtOqDmfedWyD4ctvYVJJCzjZo4
+Message-ID: <CAKYAXd8r1j9Z_yV2EHyUJ-yN+Z4U5s6jNqni97SY0U+D8YpMVw@mail.gmail.com>
+Subject: Re: [PATCH v6 1/9] cifs: Remove the RFC1002 header from smb_hdr
+To: David Howells <dhowells@redhat.com>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Stefan Metzmacher <metze@samba.org>, Tom Talpey <tom@talpey.com>, 
+	linux-cifs@vger.kernel.org, netfs@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-`ksmbd_conn_handler_loop()` calls `get_rfc1002_len()`. Does this need to 
-be updated as well?
-
-Thanks,
-ChenXiaoSong.
-
-On 12/18/25 10:48 PM, David Howells wrote:
-> Hi Namjae,
-> 
-> Does this (untested) patch fix the problem for you?
-> 
+On Thu, Dec 18, 2025 at 10:36=E2=80=AFPM David Howells <dhowells@redhat.com=
+> wrote:
+>
+> Namjae Jeon <linkinjeon@kernel.org> wrote:
+>
+> > Why did you only change smb client after changing smb_hdr structure in
+> > smb/common?  smb server also uses smb_hdr structure to handle smb1 nego=
+tiate
+> > request.
+>
+> Apologies, but I was under the impression from Steve that ksmbd didn't su=
+pport
+> SMB1 and was never going to.  Further, I'm pretty certain I have been bui=
+lding
+> the server and it hasn't shown up any errors - and Steve hasn't mentioned=
+ any
+> either.
+ksmbd needs to handle SMB1 requests to support auto-negotiation. This
+process is triggered specifically during connections with Windows
+clients, So it cannot be tested using cifs.ko. And this patch will
+break the connection between ksmbd and Windows.
+>
+> > Also, Why didn't you cc me on the patch that updates smb/common?
+>
+> You're not mentioned in the MAINTAINERS record for CIFS.  I did, however,=
+ send
+> it to the linux-cifs mailing list six times, though.
+I cannot afford to review all cifs patches. Since this patch changes
+smb/common, I think that the patch prefix should not have been 'cifs'.
+That is likely why I missed it. Furthermore, smb/common is explicitly
+listed under the ksmbd entry in the MAINTAINERS file. Maybe I should
+be added as a reviewer for the cifs entry...
+>
 > David
-> ---
-> The commit that removed the RFC1002 header from struct smb_hdr didn't also
-> fix the places in ksmbd that use it in order to provide graceful rejection
-> of SMB1 protocol requests.
-> 
-> Fixes: 83bfbd0bb902 ("cifs: Remove the RFC1002 header from smb_hdr")
-> Reported-by: Namjae Jeon <linkinjeon@kernel.org>
-> Link: https://lore.kernel.org/r/CAKYAXd9Ju4MFkkH5Jxfi1mO0AWEr=R35M3vQ_Xa7Yw34JoNZ0A@mail.gmail.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Steve French <sfrench@samba.org>
-> cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-> cc: Tom Talpey <tom@talpey.com>
-> cc: Paulo Alcantara <pc@manguebit.org>
-> cc: Shyam Prasad N <sprasad@microsoft.com>
-> cc: linux-cifs@vger.kernel.org
-> cc: netfs@lists.linux.dev
-> cc: linux-fsdevel@vger.kernel.org
-> ---
->   fs/smb/server/server.c     |    2 +-
->   fs/smb/server/smb_common.c |   10 +++++-----
->   2 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-> index 3cea16050e4f..bedc8390b6db 100644
-> --- a/fs/smb/server/server.c
-> +++ b/fs/smb/server/server.c
-> @@ -95,7 +95,7 @@ static inline int check_conn_state(struct ksmbd_work *work)
->   
->   	if (ksmbd_conn_exiting(work->conn) ||
->   	    ksmbd_conn_need_reconnect(work->conn)) {
-> -		rsp_hdr = work->response_buf;
-> +		rsp_hdr = smb2_get_msg(work->response_buf);
->   		rsp_hdr->Status.CifsError = STATUS_CONNECTION_DISCONNECTED;
->   		return 1;
->   	}
-> diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-> index b23203a1c286..d6084580b59d 100644
-> --- a/fs/smb/server/smb_common.c
-> +++ b/fs/smb/server/smb_common.c
-> @@ -140,7 +140,7 @@ int ksmbd_verify_smb_message(struct ksmbd_work *work)
->   	if (smb2_hdr->ProtocolId == SMB2_PROTO_NUMBER)
->   		return ksmbd_smb2_check_message(work);
->   
-> -	hdr = work->request_buf;
-> +	hdr = smb2_get_msg(work->request_buf);
->   	if (*(__le32 *)hdr->Protocol == SMB1_PROTO_NUMBER &&
->   	    hdr->Command == SMB_COM_NEGOTIATE) {
->   		work->conn->outstanding_credits++;
-> @@ -278,7 +278,6 @@ static int ksmbd_negotiate_smb_dialect(void *buf)
->   						  req->DialectCount);
->   	}
->   
-> -	proto = *(__le32 *)((struct smb_hdr *)buf)->Protocol;
->   	if (proto == SMB1_PROTO_NUMBER) {
->   		struct smb_negotiate_req *req;
->   
-> @@ -320,8 +319,8 @@ static u16 get_smb1_cmd_val(struct ksmbd_work *work)
->    */
->   static int init_smb1_rsp_hdr(struct ksmbd_work *work)
->   {
-> -	struct smb_hdr *rsp_hdr = (struct smb_hdr *)work->response_buf;
-> -	struct smb_hdr *rcv_hdr = (struct smb_hdr *)work->request_buf;
-> +	struct smb_hdr *rsp_hdr = (struct smb_hdr *)smb2_get_msg(work->response_buf);
-> +	struct smb_hdr *rcv_hdr = (struct smb_hdr *)smb2_get_msg(work->request_buf);
->   
->   	rsp_hdr->Command = SMB_COM_NEGOTIATE;
->   	*(__le32 *)rsp_hdr->Protocol = SMB1_PROTO_NUMBER;
-> @@ -412,9 +411,10 @@ static int init_smb1_server(struct ksmbd_conn *conn)
->   
->   int ksmbd_init_smb_server(struct ksmbd_conn *conn)
->   {
-> +	struct smb_hdr *rcv_hdr = (struct smb_hdr *)smb2_get_msg(conn->request_buf);
->   	__le32 proto;
->   
-> -	proto = *(__le32 *)((struct smb_hdr *)conn->request_buf)->Protocol;
-> +	proto = *(__le32 *)rcv_hdr->Protocol;
->   	if (conn->need_neg == false) {
->   		if (proto == SMB1_PROTO_NUMBER)
->   			return -EINVAL;
-> 
-> 
-
+>
+>
