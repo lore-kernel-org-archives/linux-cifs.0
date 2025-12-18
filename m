@@ -1,161 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73D81F7098
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Dec 2025 16:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3276231845
+	for <linux-cifs@vger.kernel.org>; Thu, 18 Dec 2025 16:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766074932; cv=none; b=KWbn/AMj4pnVIrWhUzt/FvpjEEGDnE6zmN7T0TdDHtS7WNAVufWd7RISsMX4GxOSqFUYzoxZ78DgXU7lLi2dHGn7sqkmhmMh1XN10PyopJXCfVRzIFzY6MJhqMT+n3nZSdhhrqm4onBtf/2WUS1S0/61y768UOH7ql5SrEghbtg=
+	t=1766076519; cv=none; b=uClRAiip+De+JjCBZqsHW+oX2nIxQBtvZoxxG4U2oJyqlKP5iYb+xafMCQq9d+1p5owi3aCXpBR2FAP/PoEPhZgSlru1j8nG0sO0ECoG5wqW1FjjBkTEDd/8Mx1r35qWUDx6lRnYzErV1cmFKIxAFLGHtjKq8ZQeThxk5AfGZzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766074932; c=relaxed/simple;
-	bh=1KjwagivxN6bJH97+BBZrIikBoJ3jm4kvAJ19GSKhDE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XVUNhIkkuyTE1AOSZPtjYmR6JtjoPEo3LG+TIo3R8gLzUX3J3OUqQ8KuGTcXkuzTonC6CRGj8jx+LWnuBHWzCHyfi0mzt3xHVJPhO1znBktD3oP/PGmFwg25Y8Auzyxom9RLZDplAWmK74ra+6yDq4b3Ev6COCKCObJrvdgIlWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d80aXgte; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1766076519; c=relaxed/simple;
+	bh=Kk018iHIf5ZFmooGRmZFOCt43CRly+SvfgKpMRht6LY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=WDjnxKxCWiHNxMXmwwfnHtxDmZP8k/wKRdmpXVXGluzZfcIyvR7Cxus6Tf7Zdh87nbp4l2aUaTSwEXpSvt8e5ytB6uob7uADCHjefK9LvPN00dJbveOgMMMYjLRFVvCEcVQtdjD+7aW98f/YdsNFx82re1K6c+JmAZW0IgQCpp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q8Ey1XbV; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d80aXgte"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 968F3C4CEFB
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Dec 2025 16:22:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766074932;
-	bh=1KjwagivxN6bJH97+BBZrIikBoJ3jm4kvAJ19GSKhDE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=d80aXgte8O18MK3XAVadRFml9P8BTAaVh2gmcwkf8E0ijsjhVGXQGIA/WSvWc0ypL
-	 iWMGmQ2lywVxN7b3OFOjSzVtPx75iCuad8r6mhqCpS2bvc+VsE3G+SqikkdMXS8MP6
-	 1IHAIlWb2RRsgkDk4+/2QxG//EYRbnIVHOJasnoEpTuQVJySjYsxkoz17ZD1yKKGVu
-	 OKPBl9gexYK3862X7jpH4LskKzglol4lT7yRZuy23O6sknHsIBUAFv6CTYPE+/UPLn
-	 83JygMsBwVcNlm4iCJ4wP01QUlxK14jd2+6j29emlBX1Q3XnCTW/uLIVVYg46jaQik
-	 7XvmIO60bYY2g==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-64b7318f1b0so910570a12.2
-        for <linux-cifs@vger.kernel.org>; Thu, 18 Dec 2025 08:22:12 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVeCMDPAQekUpwjFxogj+QtLkMfkx80ZaXA5etpbc+jP9d2A+m5KM6bJGNVNc2ORsQPN9j/sfmQZKEx@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyMFevomYk+FbTLuk2ZpuqQ4oLe05W06n2Am0Ig2rrdkCPjNx9
-	rmsiY4jBsODu5i0xLpjZP9qmRySWRwXxNWIyFsSAkrfwYJqv/p4hczIfhlBnjF+oEMJWrRY/Nl0
-	JmodfMm7q/sEl2h5jmpYBPklkzcD7CIQ=
-X-Google-Smtp-Source: AGHT+IFU3E1sjZarnpPoMTz9FMi/bbnUASHMb9ds5I3lpt7FiJsflopghXP0cIBEk8sAM+WmRsyl1jl0mQ5J7Qk3oi4=
-X-Received: by 2002:a05:6402:40c7:b0:64b:83cb:d943 with SMTP id
- 4fb4d7f45d1cf-64b83cbdc15mr712275a12.6.1766074931208; Thu, 18 Dec 2025
- 08:22:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q8Ey1XbV"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8b2a4b6876fso130315485a.3
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Dec 2025 08:48:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766076515; x=1766681315; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MLpoJSmCfWycvShqEwJzCH9EVU1nJAFYZqCQsxXxh70=;
+        b=Q8Ey1XbVgN8xIao0Nj72PNrRwff0xEYQBRFlgL9UF9wBD6A7AmJ36pt3tTBgDNGM9H
+         /Pgn+5gP0Fqk8rweYzgmgGeDidHaWdcxwENPZYBhKnYhEHSDZeEo7opHx81gk6IVtnxn
+         +KnamniUNi4Kqo95fzXWzpbZQIS0S3U11KpltFKhUtud1n+dDYElYmt76Utyq70aB5i7
+         yQ9z+Ufw5+qHZb0nSQBfoYTQLbpUBXkTFP2H6Y09pvNcSfv3MHJ6PSQJRggJ1+ICDq7c
+         NgrcCnWehVYVgZ83llTxeyXJP1KXEenz5vY7GKVFUK9XliAIq5SjRattdRKjm74wjVqu
+         uHAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766076515; x=1766681315;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MLpoJSmCfWycvShqEwJzCH9EVU1nJAFYZqCQsxXxh70=;
+        b=Dr8TueB8eR8r13UO1T4fPKeFY5NBHXtTs771xnRrcsea7lHI8hyUwUicVZcjhmN+qx
+         zLA3Wwj1S3OOi2WkBvwN1gnNDudMSOx5dVYd5pa//hGUz1lhzmAvRnU0UppLWLhLn6i5
+         9VcCdD47X/uuf1oyMDsQG1t3KBAUmnesKMkSWY+TAsCGpQuw2X22gx0Df8zHcB0KE71g
+         W1P0NowTbf9f+SV5xq1kTpDHJJhiojaSjztCCq1Zsc+IBAmanbTE+fQ4zMvD5MAiUeHn
+         n/6/+UJB/yT64rIVfbfdBnfYC+GbRvFEE1cLDh1oafaOdcaSlIqOqy+eA5Hmv+q36oEu
+         wF7w==
+X-Gm-Message-State: AOJu0YyyyRJ46QliBT32Z1Db4oa2zBemznJsms3gO9w1j0raa2/J8JvR
+	vxoSHkt/bJfGbKu86fIM4LwmYyqziQg7dowAw8oe7uVAYC9OrGdiHgkl0BXX0BdB95/ck8j/+nw
+	Nia+tTI+Jx0zlC52BBBO1K4Wn/fILKjg=
+X-Gm-Gg: AY/fxX59D7symusqL4cxv8wShNU/WSitiUWohmAV1KsO2n4ANhEEAtsVK0OGFti447F
+	KdQc4yzzmQxCcRzgzFenMYxWZ2q85olID601XNBWop0TC017pH9fvbgpuOlBfpB65mUxs3dh5iu
+	besWzWo31OoWFgydyNlkkfSnAFYCH9b5+/z0fIBc6uyLg/amHpgM8jaaOsRkIKLthLUf4KiL61M
+	OkW8zlz6rToDChd3U9036VY6jVmA7nq5L7+pvhJ3hjXH1DZfupXsQGASJVWSyNaERChw7DECvgr
+	KF0Pf4bLdNe/2e/zNEibXMS8sr9UxmY3busx6ctwIkTIXCpJiwBiwQe4SRv/0aGJQL7pfqIT/mI
+	uGDfuqs7IgNPcdCDgOuWGZEu0CMexwW0v/j2q5cKZix8d/m32HFM=
+X-Google-Smtp-Source: AGHT+IFx1mI4k+UL84MzSOrCwSrXOX1KoyNVUlYQxw//z+bwcxyexunq+mTAZGNMPUCMdW0i9+pvj6UnB2xJ6p8B/RU=
+X-Received: by 2002:a05:620a:198e:b0:8b2:f9ac:a896 with SMTP id
+ af79cd13be357-8c08f67b906mr45284185a.32.1766076514719; Thu, 18 Dec 2025
+ 08:48:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <712257.1766069339@warthog.procyon.org.uk>
-In-Reply-To: <712257.1766069339@warthog.procyon.org.uk>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 19 Dec 2025 01:21:59 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_Yjc_ByJdbx6N++G6DT02WTXnPpw2rqW=cZgvoCns=Tw@mail.gmail.com>
-X-Gm-Features: AQt7F2pMQm-q3FOu8j6FHMifBarCz04C8N2xggbWupXnzfihE7S88r26UN3qQN0
-Message-ID: <CAKYAXd_Yjc_ByJdbx6N++G6DT02WTXnPpw2rqW=cZgvoCns=Tw@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: Fix to handle removal of rfc1002 header from smb_hdr
-To: David Howells <dhowells@redhat.com>
-Cc: Steve French <sfrench@samba.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, Paulo Alcantara <pc@manguebit.org>, 
-	Shyam Prasad N <sprasad@microsoft.com>, linux-cifs@vger.kernel.org, netfs@lists.linux.dev, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 18 Dec 2025 10:48:23 -0600
+X-Gm-Features: AQt7F2rrXbIXC5a-ScQkjTgX-JnYGivLkhlci4bAZDH88wUR4d2nR6b_cBkN_HU
+Message-ID: <CAH2r5mtxKs7+wFMoE2m9gMZLc9vr3Jj9eEm21JZCNsunuiydDQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 18, 2025 at 11:49=E2=80=AFPM David Howells <dhowells@redhat.com=
-> wrote:
->
-> Hi Namjae,
-Hi David,
->
-> Does this (untested) patch fix the problem for you?
-I sent the v2 patch to the list now.  I have tested it with cifs.ko
-and windows clients.
-Thanks!
->
-> David
-> ---
-> The commit that removed the RFC1002 header from struct smb_hdr didn't als=
-o
-> fix the places in ksmbd that use it in order to provide graceful rejectio=
-n
-> of SMB1 protocol requests.
->
-> Fixes: 83bfbd0bb902 ("cifs: Remove the RFC1002 header from smb_hdr")
-> Reported-by: Namjae Jeon <linkinjeon@kernel.org>
-> Link: https://lore.kernel.org/r/CAKYAXd9Ju4MFkkH5Jxfi1mO0AWEr=3DR35M3vQ_X=
-a7Yw34JoNZ0A@mail.gmail.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Steve French <sfrench@samba.org>
-> cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-> cc: Tom Talpey <tom@talpey.com>
-> cc: Paulo Alcantara <pc@manguebit.org>
-> cc: Shyam Prasad N <sprasad@microsoft.com>
-> cc: linux-cifs@vger.kernel.org
-> cc: netfs@lists.linux.dev
-> cc: linux-fsdevel@vger.kernel.org
-> ---
->  fs/smb/server/server.c     |    2 +-
->  fs/smb/server/smb_common.c |   10 +++++-----
->  2 files changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-> index 3cea16050e4f..bedc8390b6db 100644
-> --- a/fs/smb/server/server.c
-> +++ b/fs/smb/server/server.c
-> @@ -95,7 +95,7 @@ static inline int check_conn_state(struct ksmbd_work *w=
-ork)
->
->         if (ksmbd_conn_exiting(work->conn) ||
->             ksmbd_conn_need_reconnect(work->conn)) {
-> -               rsp_hdr =3D work->response_buf;
-> +               rsp_hdr =3D smb2_get_msg(work->response_buf);
->                 rsp_hdr->Status.CifsError =3D STATUS_CONNECTION_DISCONNEC=
-TED;
->                 return 1;
->         }
-> diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-> index b23203a1c286..d6084580b59d 100644
-> --- a/fs/smb/server/smb_common.c
-> +++ b/fs/smb/server/smb_common.c
-> @@ -140,7 +140,7 @@ int ksmbd_verify_smb_message(struct ksmbd_work *work)
->         if (smb2_hdr->ProtocolId =3D=3D SMB2_PROTO_NUMBER)
->                 return ksmbd_smb2_check_message(work);
->
-> -       hdr =3D work->request_buf;
-> +       hdr =3D smb2_get_msg(work->request_buf);
->         if (*(__le32 *)hdr->Protocol =3D=3D SMB1_PROTO_NUMBER &&
->             hdr->Command =3D=3D SMB_COM_NEGOTIATE) {
->                 work->conn->outstanding_credits++;
-> @@ -278,7 +278,6 @@ static int ksmbd_negotiate_smb_dialect(void *buf)
->                                                   req->DialectCount);
->         }
->
-> -       proto =3D *(__le32 *)((struct smb_hdr *)buf)->Protocol;
->         if (proto =3D=3D SMB1_PROTO_NUMBER) {
->                 struct smb_negotiate_req *req;
->
-> @@ -320,8 +319,8 @@ static u16 get_smb1_cmd_val(struct ksmbd_work *work)
->   */
->  static int init_smb1_rsp_hdr(struct ksmbd_work *work)
->  {
-> -       struct smb_hdr *rsp_hdr =3D (struct smb_hdr *)work->response_buf;
-> -       struct smb_hdr *rcv_hdr =3D (struct smb_hdr *)work->request_buf;
-> +       struct smb_hdr *rsp_hdr =3D (struct smb_hdr *)smb2_get_msg(work->=
-response_buf);
-> +       struct smb_hdr *rcv_hdr =3D (struct smb_hdr *)smb2_get_msg(work->=
-request_buf);
->
->         rsp_hdr->Command =3D SMB_COM_NEGOTIATE;
->         *(__le32 *)rsp_hdr->Protocol =3D SMB1_PROTO_NUMBER;
-> @@ -412,9 +411,10 @@ static int init_smb1_server(struct ksmbd_conn *conn)
->
->  int ksmbd_init_smb_server(struct ksmbd_conn *conn)
->  {
-> +       struct smb_hdr *rcv_hdr =3D (struct smb_hdr *)smb2_get_msg(conn->=
-request_buf);
->         __le32 proto;
->
-> -       proto =3D *(__le32 *)((struct smb_hdr *)conn->request_buf)->Proto=
-col;
-> +       proto =3D *(__le32 *)rcv_hdr->Protocol;
->         if (conn->need_neg =3D=3D false) {
->                 if (proto =3D=3D SMB1_PROTO_NUMBER)
->                         return -EINVAL;
->
+Please pull the following changes since commit
+8f0b4cce4481fb22653697cced8d0d04027cb1e8:
+
+  Linux 6.19-rc1 (2025-12-14 16:05:07 +1200)
+
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.19-rc1-smb3-client-fixes
+
+for you to fetch changes up to d8a4af8f3d9d3367b2c49b0d9dee529556bdd2f4:
+
+  cifs: update internal module version number (2025-12-16 17:43:02 -0600)
+
+----------------------------------------------------------------
+3 smb3 client fixes
+- important fix for reconnect problem
+- minor cleanup
+----------------------------------------------------------------
+Bharath SM (1):
+      smb: align durable reconnect v2 context to 8 byte boundary
+
+Steve French (1):
+      cifs: update internal module version number
+
+ZhangGuoDong (1):
+      smb: move some SMB1 definitions into common/smb1pdu.h
+
+ fs/smb/client/cifsfs.h     |  4 ++--
+ fs/smb/client/cifspdu.h    |  2 +-
+ fs/smb/common/smb1pdu.h    | 56
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/smb/common/smb2pdu.h    | 41 +----------------------------------------
+ fs/smb/common/smbglob.h    |  2 --
+ fs/smb/server/smb_common.h |  1 +
+ 6 files changed, 61 insertions(+), 45 deletions(-)
+ create mode 100644 fs/smb/common/smb1pdu.h
+
+
+-- 
+Thanks,
+
+Steve
