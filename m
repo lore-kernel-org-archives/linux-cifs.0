@@ -1,84 +1,124 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52CAA2D29B7
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Dec 2025 13:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FDD613E02A;
+	Fri, 19 Dec 2025 14:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766152412; cv=none; b=Emzz+IC7td5bfMmonD35U4NvH67N+MPAtwRi6tay6wLL3sOgY4/XTSOvYTnQSYyJAWaV180ZMfw/qcK29F4Io9DIywN88wvetRtrjZnshRnTjVFuceQq9a/SocEB70jJ8rNpj3m9aH7RxaVmEzgxrPHh4ijfYzHAhRvido+GtOU=
+	t=1766153057; cv=none; b=okFODgMEQ/o4G+mDdO4PrsutlyjbFDQKrz+z03rXDM0Zip/XGBnXicm8ECBsV0H99NvOLsVWwERBtxBo91Tzo2UWuj+u6hj2LmcqOOXLhLXMOAFfQrgFBiRgLNiEHquzlmB2qH0gf5XQYZiVUHcP9xQ8DxR2MxrRIPtkHxyRnB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766152412; c=relaxed/simple;
-	bh=QBHv0mhA2dinl3lqgV6s93PFZ5Km8at0j6xebx+l9TQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kaiuYj4MXQmQhCV4gphR1+feeNknduSTfuLxYePJy83x+iz87XuY1sxOHKmhih7qtO/MnxUui5C+0pBGIkdOsdEOocQwfoozdwjBtbV9iqGT52KBLmAXsP/wuL2YQFc1asd++JqLQ4qhzi5hMXR2ST88PftmPrmsw1cwuAA2mls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BolAVjzt; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1766153057; c=relaxed/simple;
+	bh=lb1Ntz2Kr1h3lPXH9iuyKpE+eZFBhtVfhjMw6MwoW7c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k6Lbrh5/U4ml6qq4FpiChgLiHbklC5WQvXxgAnpjjmbdrWMjld8UKCQNCTOpnZlGYMDzYof0w8oSIju6KtkhKwH25xrj8k8AQZnH6hRKdwgCvp2q6PDBihKy6Fm2TKx5vSlWCXjcX833sBM5IBdU+dyojrQHVALg5UQs45MGQKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=kB5Leuhl; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BolAVjzt"
-Message-ID: <f6c69efd-f3ae-4884-873a-0e261f771368@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766152405;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/4riFPoYLi6ZumPKDCiua9YGVBezfIBdnXweC8dRiUM=;
-	b=BolAVjzt0a+EofBfDZGe0TVU1HVG+cJh2F+PAh79g4VaQDqn8Mjqh2tHxpoCXTTsvkDHfk
-	/F3qz964auDWUr9sIrYKu2yAdcC84wSBUTNiNJ2VgmRsvL9tY97GUhRW73JWXVZB/tubm6
-	GTNgH8b57A1VZgLSe4tOdgdjWE6oNYs=
-Date: Fri, 19 Dec 2025 21:53:07 +0800
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="kB5Leuhl"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=oGrtxTNHWv12XqgB1T2iiuzx13WIcYvkHIUNhdXByGk=; b=kB5LeuhlfK6/YGz4Gyb4J7JNIc
+	cNPakImySVmcy0cFJQWJg7H+/3r3eusdCNr4Yh6WF6PeTeQnGPyn7m063q4TFmXjGDUTvtYF1LhS1
+	KH5t6JfWu1dMETqvfSvpD1MKQOu015HaiGbe23ZLltNKWGNqEwOTmaY47ne2fgkSaJDDRfAaZAvNT
+	fOIb7PyH/qDuIvzVJjnY/OA2TQjxooQ6IxwHf9b9t8tqkJfxIIYChuyzGQcNF3p5/nLtkbHWJC7R3
+	4orhlnGBC1pFgQ0RbAha36lmpzdhotZKi6pucNmsTdfFlPYExWwzlzgB1BxIbeFlluLc/OhAMUNwE
+	T69csLakAodG5FesjxEALSAO8xUoYShQy41gyyhXl9uaMmkWXRta8PGiS7JlAGzncE+R1wFHMyAnH
+	/013FYUYXgjj1i5AcXZPB3f0b1/WzB/iYchw306448MtV+tKqAw7WxkYk58hG2WZH/2ELWEr7sjQO
+	qSk4Fx0YtabARi6nfZwPXXEp;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vWb5Y-001MsZ-1h;
+	Fri, 19 Dec 2025 14:04:12 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-rdma@vger.kernel.org
+Cc: metze@samba.org,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	netdev@vger.kernel.org,
+	linux-cifs@vger.kernel.org
+Subject: [PATCH] RDMA/rxe: let rxe_reclassify_recv_socket() call sk_owner_put()
+Date: Fri, 19 Dec 2025 15:04:08 +0100
+Message-ID: <20251219140408.2300163-1-metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] smb/server: fix SMB2_MIN_SUPPORTED_HEADER_SIZE value
-To: Namjae Jeon <linkinjeon@kernel.org>, David Howells <dhowells@redhat.com>
-Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org,
- pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
- linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20251218171038.55266-1-chenxiaosong.chenxiaosong@linux.dev>
- <CAKYAXd-W9xN9rQ4_Y9eudV2CJ7ZObys9YLXib-=wHymH4kfExg@mail.gmail.com>
- <9b5eec32-d702-4d77-b4dd-5c33939ae6e2@linux.dev>
- <CAKYAXd-Lub=zOOE5cW5jEWNYhTJcmX3grZLLXFpZTcwWA4UYBA@mail.gmail.com>
- <805496.1766132276@warthog.procyon.org.uk>
- <CAKYAXd_owC9vmSF+ukH-GgG5mWwFWGtwrXNT-8gfUZGHVDTcRA@mail.gmail.com>
- <812021.1766141424@warthog.procyon.org.uk>
- <CAKYAXd-MGFZL5AKPebdnEJhg32rHOTJHXvGd0OmfkWhdQCoi-w@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <CAKYAXd-MGFZL5AKPebdnEJhg32rHOTJHXvGd0OmfkWhdQCoi-w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Hi Namjae and David,
+On kernels build with CONFIG_PROVE_LOCKING, CONFIG_MODULES
+and CONFIG_DEBUG_LOCK_ALLOC 'rmmod rdma_rxe' is no longer
+possible.
 
-Should SMB2_MIN_SUPPORTED_HEADER_SIZE(will rename to 
-SMB_MIN_SUPPORTED_PDU_SIZE) be sizeof(struct smb2_pdu), i.e. 
-sizeof(struct smb2_hdr) + 2?
+For the global recv sockets rxe_net_exit() is where we
+call rxe_release_udp_tunnel-> udp_tunnel_sock_release(),
+which means the sockets are destroyed before 'rmmod rdma_rxe'
+finishes, so there's no need to protect against
+rxe_recv_slock_key and rxe_recv_sk_key disappearing
+while the sockets are still alive.
 
-If my understanding is incorrect, please let me know.
+Fixes: 80a85a771deb ("RDMA/rxe: reclassify sockets in order to avoid false positives from lockdep")
+Cc: Zhu Yanjun <zyjzyj2000@gmail.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Leon Romanovsky <leon@kernel.org>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-rdma@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-cifs@vger.kernel.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+---
+ drivers/infiniband/sw/rxe/rxe_net.c | 32 +++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-Thanks,
-ChenXiaoSong.
-
-On 12/19/25 7:52 PM, Namjae Jeon wrote:
-> On Fri, Dec 19, 2025 at 7:50 PM David Howells <dhowells@redhat.com> wrote:
->>
->> Namjae Jeon <linkinjeon@kernel.org> wrote:
->>
->>> ChenXiaoSong, If you agree with this, Can you make the v2 patch ?
->>
->> Can I suggest adding a comment to indicate what the +4 represents in the
->> SMB2/3 case?
-> He will add comments for both SMB1 and SMB2/3 cases to clarify why the
-> +2 or +4 is added.
->>
->> David
->>
+diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/rxe/rxe_net.c
+index 0195d361e5e3..0bd0902b11f7 100644
+--- a/drivers/infiniband/sw/rxe/rxe_net.c
++++ b/drivers/infiniband/sw/rxe/rxe_net.c
+@@ -64,7 +64,39 @@ static inline void rxe_reclassify_recv_socket(struct socket *sock)
+ 		break;
+ 	default:
+ 		WARN_ON_ONCE(1);
++		return;
+ 	}
++	/*
++	 * sock_lock_init_class_and_name() calls
++	 * sk_owner_set(sk, THIS_MODULE); in order
++	 * to make sure the referenced global
++	 * variables rxe_recv_slock_key and
++	 * rxe_recv_sk_key are not removed
++	 * before the socket is closed.
++	 *
++	 * However this prevents rxe_net_exit()
++	 * from being called and 'rmmod rdma_rxe'
++	 * is refused because of the references.
++	 *
++	 * For the global sockets in recv_sockets,
++	 * we are sure that rxe_net_exit() will call
++	 * rxe_release_udp_tunnel -> udp_tunnel_sock_release.
++	 *
++	 * So we don't need the additional reference to
++	 * our own (THIS_MODULE).
++	 */
++	sk_owner_put(sk);
++	/*
++	 * We also call sk_owner_clear() otherwise
++	 * sk_owner_put(sk) in sk_prot_free will
++	 * fail, which is called via
++	 * sk_free -> __sk_free -> sk_destruct
++	 * and sk_destruct calls __sk_destruct
++	 * directly or via call_rcu()
++	 * so sk_prot_free() might be called
++	 * after rxe_net_exit().
++	 */
++	sk_owner_clear(sk);
+ #endif /* CONFIG_DEBUG_LOCK_ALLOC */
+ }
+ 
+-- 
+2.43.0
 
