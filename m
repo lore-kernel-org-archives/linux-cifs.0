@@ -1,110 +1,79 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F272FE057
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Dec 2025 10:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131A330149F
+	for <linux-cifs@vger.kernel.org>; Fri, 19 Dec 2025 10:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766140981; cv=none; b=u5s/NE9mar4NTrGsGVy4qeSB+8otM608oNFdkkJCD0/MghD9i3ZgbOKuaYXaZBXNAu2fFZ8RuxZn76Df5LRCSt9lXoYxHKE5ogA/iGnMtdeNP3IDmfUMGHgDe3CvxWe2GueDGseoRgkQFV4ex6MxVigV5ZrQ4s9NIsxlmSBb86w=
+	t=1766141440; cv=none; b=tS+F9jiBGrUeN5wGsrTfD4wcYtrdHDKLr+i40rRzVh+uwvx3LGEGiX9Z1IjYU7kembQ4ggOSrYvPXBUjWl+D33yl5cLHvvXlQqQfb5YZeuAM4jvnQAhv+hmvStjcIu0V6HlJGWtpEUrwN94Fxv+lDTH4jvIbSIWiMyAYOrzEhCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766140981; c=relaxed/simple;
-	bh=cAU5++DbUQ+DVOWdI3V+oojdtXIBNdCuL9U9em2w7wQ=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=bwDd3H1BNFdkheAtCbMFKYzM7p+FoNBgKRbo6t9r4jPX3BTpxcs1Vs/08WLIQZohqEp94uvItVwl6LFWoXGpdzgiXcSFP7iJtZU7c256ExSmKYCJuKGM4B98cTfz4/h0AzkGa7IA4J18EBGniiw5bP3jvE8eKNqX1JJdjqhI+5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fUW8Zx8z; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1766141440; c=relaxed/simple;
+	bh=ofxbx3sXR4paZuEun5zDDrq/I96N1ooYk5unAT6srIY=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=qBs/77IGmaLWfogsINnk40mNdnfMCcPCD3WiQd4bPzYhZJ1wGGJDETUxMIiD8FHXcaZmT51W4F3AMIZ+rg4SKrkBl646RXWySSngxR+3xRMJzAgmcN0E0EeBbJTaV1BllUJyKNuzdoNlsetx9GQoIuvJ0kfslI14MyEsvmJkV4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qk1cHMci; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fUW8Zx8z"
-Date: Fri, 19 Dec 2025 18:42:43 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766140976;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qk1cHMci"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766141436;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tAbi4nAyOKZRpETXOXNcBSuA/plXjnyXrBFFrSVQKgY=;
-	b=fUW8Zx8zXk2jl+hnWcnvpVUUEYDyMBx4CWG9qpDy3G4BAnviXDTGpwFNGMj1dqVDcaw9HU
-	T6I2MF/NbkmhjLCdm1gLQforGR6tJE94frwE6lqn5M7FANZM4+PYnWXvhl7tvpfUL3f4JM
-	rqNlRcE6qDPX93aTpAEaj7tmMn2yTcY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-To: Namjae Jeon <linkinjeon@kernel.org>, David Howells <dhowells@redhat.com>
-CC: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org, pc@manguebit.org,
- ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
- bharathsm@microsoft.com, senozhatsky@chromium.org,
- linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: Re: [PATCH] smb/server: fix SMB2_MIN_SUPPORTED_HEADER_SIZE value
+	bh=ofxbx3sXR4paZuEun5zDDrq/I96N1ooYk5unAT6srIY=;
+	b=Qk1cHMciWAm4+7wnVnxbDodvv60SUBbZMxi9kKJmKyn1Z12XefF4BjleMoA0XKuu5cyeb9
+	+ezhYVCBqH8znXibqJSM2nOIbNBM5eIxG+WqojJD/uftnvyQUD5v8AA4wct0nrrDYw2TWM
+	JJNsEkvQgW8BcsFX21mxYiVrz4wSAUM=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-224-70pvqtglOCy1FmFnh7q5WQ-1; Fri,
+ 19 Dec 2025 05:50:32 -0500
+X-MC-Unique: 70pvqtglOCy1FmFnh7q5WQ-1
+X-Mimecast-MFC-AGG-ID: 70pvqtglOCy1FmFnh7q5WQ_1766141430
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 646421800642;
+	Fri, 19 Dec 2025 10:50:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0659D30001A7;
+	Fri, 19 Dec 2025 10:50:25 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
 In-Reply-To: <CAKYAXd_owC9vmSF+ukH-GgG5mWwFWGtwrXNT-8gfUZGHVDTcRA@mail.gmail.com>
-References: <20251218171038.55266-1-chenxiaosong.chenxiaosong@linux.dev> <CAKYAXd-W9xN9rQ4_Y9eudV2CJ7ZObys9YLXib-=wHymH4kfExg@mail.gmail.com> <9b5eec32-d702-4d77-b4dd-5c33939ae6e2@linux.dev> <CAKYAXd-Lub=zOOE5cW5jEWNYhTJcmX3grZLLXFpZTcwWA4UYBA@mail.gmail.com> <805496.1766132276@warthog.procyon.org.uk> <CAKYAXd_owC9vmSF+ukH-GgG5mWwFWGtwrXNT-8gfUZGHVDTcRA@mail.gmail.com>
-Message-ID: <056E09CC-95A0-4775-82AB-3DB8756CA94F@linux.dev>
+References: <CAKYAXd_owC9vmSF+ukH-GgG5mWwFWGtwrXNT-8gfUZGHVDTcRA@mail.gmail.com> <20251218171038.55266-1-chenxiaosong.chenxiaosong@linux.dev> <CAKYAXd-W9xN9rQ4_Y9eudV2CJ7ZObys9YLXib-=wHymH4kfExg@mail.gmail.com> <9b5eec32-d702-4d77-b4dd-5c33939ae6e2@linux.dev> <CAKYAXd-Lub=zOOE5cW5jEWNYhTJcmX3grZLLXFpZTcwWA4UYBA@mail.gmail.com> <805496.1766132276@warthog.procyon.org.uk>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: dhowells@redhat.com,
+    ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>,
+    sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org,
+    pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+    tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
+    linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: Re: [PATCH] smb/server: fix SMB2_MIN_SUPPORTED_HEADER_SIZE value
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <812020.1766141424.1@warthog.procyon.org.uk>
+Date: Fri, 19 Dec 2025 10:50:24 +0000
+Message-ID: <812021.1766141424@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-OK, I will send v2 soon=2E
-Thanks,
-ChenXiaoSong=2E
+Namjae Jeon <linkinjeon@kernel.org> wrote:
 
-On December 19, 2025 6:32:18 PM GMT+08:00, Namjae Jeon <linkinjeon@kernel=
-=2Eorg> wrote:
->On Fri, Dec 19, 2025 at 5:18=E2=80=AFPM David Howells <dhowells@redhat=2E=
-com> wrote:
->>
->> Namjae Jeon <linkinjeon@kernel=2Eorg> wrote:
->>
->> > > We should rename them to `SMB1_MIN_SUPPORTED_PDU_SIZE` and
->> > > `SMB2_MIN_SUPPORTED_PDU_SIZE`=2E
->> > >
->> > > But we "should not" add "+4" to them=2E
->> > Not adding the +4 will trigger a slab-out-of-bounds issue=2E
->> > You should check ksmbd_smb2_check_message() and
->> > ksmbd_negotiate_smb_dialect() as well as ksmbd_conn_handler_loop()=2E
->> > =2E=2E=2E
->> > >    pdu_size =3D get_rfc1002_len(hdr_buf);
->> > >    =2E=2E=2E
->> > >    if (pdu_size < SMB1_MIN_SUPPORTED_HEADER_SIZE)
->> > >    =2E=2E=2E
->> > >    if (pdu_size < SMB2_MIN_SUPPORTED_HEADER_SIZE)
->>
->> As previously mentioned, the problem I have with the +4 accounting for =
-the
->> RFC1002 header is that the size value in pdu_size does not include the =
-size of
->> the RFC1002 header, so the comparison seems to be allowing an overlong =
-header=2E
->>
->> However, I think the +4 actually makes sense for SMB2/3 - assuming the =
-+4
->> isn't actually for the RFC1002 size, but is rather for the StructureSiz=
-e of
->> the operation header that follows immediately after the smb2_hdr=2E
->Right=2E
->>
->> If that's the case, I would guess that the SMB1 variant might want a +2=
- to
->> allow for the BCC field=2E=2E=2E  but according to the code in cifs sid=
-e that I've
->> looked at, some servers may only provide half a BCC field - or maybe ev=
-en
->> forget to put it in entirely=2E
->ksmbd only handles SMB1 negotiate requests in smb1 protocol, And the
->BCC (Byte Count) field of smb1 negotiate request must be greater than
->or equal to 2=2E This is why I originally treated any SMB1 request
->smaller than smb_hdr + 4 as an invalid packet=2E However, even if we add
->+2, it will be no problem because ksmbd_negotiate_smb_dialect() checks
->to verify if the BCC field is less than 2=2E
->
->ChenXiaoSong, If you agree with this, Can you make the v2 patch ?
->
->Thanks=2E
->>
->> David
->>
+> ChenXiaoSong, If you agree with this, Can you make the v2 patch ?
+
+Can I suggest adding a comment to indicate what the +4 represents in the
+SMB2/3 case?
+
+David
+
