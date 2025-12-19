@@ -1,79 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62B421ABDC
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Dec 2025 11:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52CAA2D29B7
+	for <linux-cifs@vger.kernel.org>; Fri, 19 Dec 2025 13:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766145189; cv=none; b=hr7jfGSWNtL201GY6wWOPoWd28YXQoVcef46t4e9Q7oBAcbX15uqnMRLbhdAqmOi32+XQJd1+EN8KMng3ZAclSyI41XVJy+kOd8KbVTCH79RnAtZ0sgrYpruyHiPSfoughzQC1j8ob+LTJuWYkT8RTOFtdSKAbo+cPZKBOjjdlQ=
+	t=1766152412; cv=none; b=Emzz+IC7td5bfMmonD35U4NvH67N+MPAtwRi6tay6wLL3sOgY4/XTSOvYTnQSYyJAWaV180ZMfw/qcK29F4Io9DIywN88wvetRtrjZnshRnTjVFuceQq9a/SocEB70jJ8rNpj3m9aH7RxaVmEzgxrPHh4ijfYzHAhRvido+GtOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766145189; c=relaxed/simple;
-	bh=KVEw7bwL9ZZOPodgOW69hotv68PBxsxQdo5ga7NcbTE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rncSQxXpiLk69I6R8Bm20tUP7EQQ0QwurN+SDN6dKjhhBVcewd1hlGuTRkklhiN1FT9TxhMaVNypNpRz2YQAaHMq9Li7QU+d8sEcHk6h+b1dj3II1aarzw4muI+7BGsvCgY28sgMi+r07xQX777sdo5lD10R3NbARRQ77fl7I44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gK2MCkv+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1766152412; c=relaxed/simple;
+	bh=QBHv0mhA2dinl3lqgV6s93PFZ5Km8at0j6xebx+l9TQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kaiuYj4MXQmQhCV4gphR1+feeNknduSTfuLxYePJy83x+iz87XuY1sxOHKmhih7qtO/MnxUui5C+0pBGIkdOsdEOocQwfoozdwjBtbV9iqGT52KBLmAXsP/wuL2YQFc1asd++JqLQ4qhzi5hMXR2ST88PftmPrmsw1cwuAA2mls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BolAVjzt; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gK2MCkv+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00D3EC19424
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Dec 2025 11:53:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766145189;
-	bh=KVEw7bwL9ZZOPodgOW69hotv68PBxsxQdo5ga7NcbTE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=gK2MCkv+y+3hkOn+6kZpubFRxsYnEPF7PSObHMTuFTLgdwYr8y72u9TsbTGd78dSw
-	 Lu1Ag95cHuAuOGb2jKZUJdPbia5uVSlEW0rqStpftEiZK/2qohlHUG5gFFfGIsQKYR
-	 eN28uDF22tDfedx19EaViwQzel+BbLpkFlKxrWhXLkkhb9DCLw9KQuXLEVHrVsGLfc
-	 aigYK+J0holMosRpYwBhRBGpM7kKqk5Pxjs70K+KXFjcwvcbEL6JqVeMhz4VH16R6u
-	 21kXLCZ587YeLuzqxXMJFwD4Xm1mGHteDEttntNDbyo4rP8B39vJJjFPrz7RaRF5fg
-	 tMCCO9OT8E6bA==
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-64b58553449so331597a12.1
-        for <linux-cifs@vger.kernel.org>; Fri, 19 Dec 2025 03:53:08 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVTtjJSgliKyNbrZ0WuJq9e3ISxIrzKYISFmUlFJz7eYbTYbjumBMYqFKKYoJottos0bW7BguyHyoIb@vger.kernel.org
-X-Gm-Message-State: AOJu0YyX57+vUerCc4fFKn8vsoahaxiF+oewG9p4qTcJk4BknVLRlgIQ
-	0LQJ6yEZXiLVmb3ILi30muImBrZVg4921hNfL9fy3BkGjocjMEIEnwzLfp9tBA/Fj/7ezt55zs8
-	ZlPoxSdtrmJuPg30CbuZFfknuHAGfq3s=
-X-Google-Smtp-Source: AGHT+IGgerITzEBGMe4LCJqC1KyO/VaA0XE+WGA3vkS+ib/5bPR8yuV56KHSJozJx3EUagW++x499IWXhn9eEmTFTFU=
-X-Received: by 2002:a17:907:720f:b0:b73:79e9:7d3b with SMTP id
- a640c23a62f3a-b8036f29b57mr254379666b.25.1766145187525; Fri, 19 Dec 2025
- 03:53:07 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BolAVjzt"
+Message-ID: <f6c69efd-f3ae-4884-873a-0e261f771368@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766152405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/4riFPoYLi6ZumPKDCiua9YGVBezfIBdnXweC8dRiUM=;
+	b=BolAVjzt0a+EofBfDZGe0TVU1HVG+cJh2F+PAh79g4VaQDqn8Mjqh2tHxpoCXTTsvkDHfk
+	/F3qz964auDWUr9sIrYKu2yAdcC84wSBUTNiNJ2VgmRsvL9tY97GUhRW73JWXVZB/tubm6
+	GTNgH8b57A1VZgLSe4tOdgdjWE6oNYs=
+Date: Fri, 19 Dec 2025 21:53:07 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH] smb/server: fix SMB2_MIN_SUPPORTED_HEADER_SIZE value
+To: Namjae Jeon <linkinjeon@kernel.org>, David Howells <dhowells@redhat.com>
+Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org,
+ pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+ tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
+ linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
 References: <20251218171038.55266-1-chenxiaosong.chenxiaosong@linux.dev>
  <CAKYAXd-W9xN9rQ4_Y9eudV2CJ7ZObys9YLXib-=wHymH4kfExg@mail.gmail.com>
- <9b5eec32-d702-4d77-b4dd-5c33939ae6e2@linux.dev> <CAKYAXd-Lub=zOOE5cW5jEWNYhTJcmX3grZLLXFpZTcwWA4UYBA@mail.gmail.com>
- <805496.1766132276@warthog.procyon.org.uk> <CAKYAXd_owC9vmSF+ukH-GgG5mWwFWGtwrXNT-8gfUZGHVDTcRA@mail.gmail.com>
+ <9b5eec32-d702-4d77-b4dd-5c33939ae6e2@linux.dev>
+ <CAKYAXd-Lub=zOOE5cW5jEWNYhTJcmX3grZLLXFpZTcwWA4UYBA@mail.gmail.com>
+ <805496.1766132276@warthog.procyon.org.uk>
+ <CAKYAXd_owC9vmSF+ukH-GgG5mWwFWGtwrXNT-8gfUZGHVDTcRA@mail.gmail.com>
  <812021.1766141424@warthog.procyon.org.uk>
-In-Reply-To: <812021.1766141424@warthog.procyon.org.uk>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 19 Dec 2025 20:52:53 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-MGFZL5AKPebdnEJhg32rHOTJHXvGd0OmfkWhdQCoi-w@mail.gmail.com>
-X-Gm-Features: AQt7F2ptjsxiKNTYdH3u05xqRBkYMZ61unWK3FWdX3fTXT2VcLg7oXkoKmOoV_w
-Message-ID: <CAKYAXd-MGFZL5AKPebdnEJhg32rHOTJHXvGd0OmfkWhdQCoi-w@mail.gmail.com>
-Subject: Re: [PATCH] smb/server: fix SMB2_MIN_SUPPORTED_HEADER_SIZE value
-To: David Howells <dhowells@redhat.com>
-Cc: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>, sfrench@samba.org, 
-	smfrench@gmail.com, linkinjeon@samba.org, pc@manguebit.org, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
-	bharathsm@microsoft.com, senozhatsky@chromium.org, linux-cifs@vger.kernel.org, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ <CAKYAXd-MGFZL5AKPebdnEJhg32rHOTJHXvGd0OmfkWhdQCoi-w@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <CAKYAXd-MGFZL5AKPebdnEJhg32rHOTJHXvGd0OmfkWhdQCoi-w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Dec 19, 2025 at 7:50=E2=80=AFPM David Howells <dhowells@redhat.com>=
- wrote:
->
-> Namjae Jeon <linkinjeon@kernel.org> wrote:
->
-> > ChenXiaoSong, If you agree with this, Can you make the v2 patch ?
->
-> Can I suggest adding a comment to indicate what the +4 represents in the
-> SMB2/3 case?
-He will add comments for both SMB1 and SMB2/3 cases to clarify why the
-+2 or +4 is added.
->
-> David
->
+Hi Namjae and David,
+
+Should SMB2_MIN_SUPPORTED_HEADER_SIZE(will rename to 
+SMB_MIN_SUPPORTED_PDU_SIZE) be sizeof(struct smb2_pdu), i.e. 
+sizeof(struct smb2_hdr) + 2?
+
+If my understanding is incorrect, please let me know.
+
+Thanks,
+ChenXiaoSong.
+
+On 12/19/25 7:52 PM, Namjae Jeon wrote:
+> On Fri, Dec 19, 2025 at 7:50 PM David Howells <dhowells@redhat.com> wrote:
+>>
+>> Namjae Jeon <linkinjeon@kernel.org> wrote:
+>>
+>>> ChenXiaoSong, If you agree with this, Can you make the v2 patch ?
+>>
+>> Can I suggest adding a comment to indicate what the +4 represents in the
+>> SMB2/3 case?
+> He will add comments for both SMB1 and SMB2/3 cases to clarify why the
+> +2 or +4 is added.
+>>
+>> David
+>>
+
