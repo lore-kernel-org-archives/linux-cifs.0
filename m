@@ -1,99 +1,129 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCAE242D67
-	for <linux-cifs@vger.kernel.org>; Sat, 20 Dec 2025 03:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DDC257452
+	for <linux-cifs@vger.kernel.org>; Sat, 20 Dec 2025 03:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766201175; cv=none; b=aXnxCB/mvU6zhI0HOHp+pCOLrSzDuuhGzh+ZVNspvguriDyF2/zOWpdo91AbWrer4UJCrbEtW91g4CkWJXIdJPDXk1kKwOCH3dpZAsJR6rTDabFRhV00iE2uxSabYqCqVg1e92zQy7x+WtFNHkYye9bU0r2RD0NdnI+nFzLKIy0=
+	t=1766202724; cv=none; b=Dg6dtqI+yx8m0GYzz6wJIhTUSQHtd4zEczC02oAyKXoSlQ7HDUuZG3QxSgtxzz2PA+vHqruzZA/Q/gaL/Ajxr6/RBUuImefRon4kMmPY3XwojOZhJo3J3m8baGgHDM2txbv4fIyv/kOeCKvDAIhEqUN9xIgJR7Sk0QYQlPLmMoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766201175; c=relaxed/simple;
-	bh=+L+tFw8jFfJHDMO3dzPfRRS2F2bpDR/3rMAiRgnlyk0=;
+	s=arc-20240116; t=1766202724; c=relaxed/simple;
+	bh=OwbHp0AbLWSXtOh2YPalZlSa2qLKhue0yTJYw57Gl28=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p1QimIwCSpK2gBc0UI7Psbsz5BT8F67iw+pasWuhxr8izccwFEhHbDjw65yZXdiZ7dEWt7mcQisR4aQxwu5KeOObR1NsEEv2c9rPENCkpLQB7BfvE+Lp0JPyS0ofiIpMxnnK3DNyyzndddTbvM4S0LOXtQXdy7LrKWwTr0Pdmw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QKXM6qh2; arc=none smtp.client-ip=95.215.58.189
+	 In-Reply-To:Content-Type; b=X3Z15Bo+pBaJ6oNY9llcYPtDgFGbKeKdS4tcOy4WnP5gdACKgcLDiRAPrtHSGSv4/oeYyD9W5fPT6Jd4Y1D3WC7wxm8sqiBKASzXDFPono/HaH/3y4vTqZxhPMIheiv5Z5CTbLq1c/nRUC58H9embd5ceZcEsIvZqM8ucH+GlTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UnGU7HCB; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QKXM6qh2"
-Message-ID: <1534b209-eedc-4cc7-bf7b-ea98dfbed4b2@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UnGU7HCB"
+Message-ID: <9ccc0635-7c0e-4a18-8469-9c5b6d9b268f@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766201169;
+	t=1766202711;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=rDgXj9lFgnzAV6NHita0m9UqJTXd4laen9wb3d+Syn8=;
-	b=QKXM6qh2ocr61CsA4+GK65HlxKsaZVN0FTp5P+P5e9P1VTEwzBjUcTclPGrS1V/hC5Af3j
-	Zy7fH4dHGrb+uxrfYW2sAaHne/nn3/IdhasICM2ci+zJJTw4j7lfzAvCSDxuD5dBfGOoXr
-	6XpiEJdYm5nGEbDmqjXbqHGBT6Nt8g4=
-Date: Sat, 20 Dec 2025 11:25:47 +0800
+	bh=4YmgFoa/sYdHKV9LZw+lYy5sZn0vDTnpqdQhf3UADQU=;
+	b=UnGU7HCBraNr8WLWlbXUntWPSVqbGJn09SHZTiz1WTynG1HnEE4sFn2jvXS1emCrpsi/Oz
+	tA+TJiCMbEuXZx6QwEPHQx5Dagu/fyiOD0zUoBwPeHk7PCGHWNZDW18VUmBAWisL40BT7A
+	1uCZLi6HzfPOalExJ8Dz6K/CqylBaQg=
+Date: Fri, 19 Dec 2025 19:51:37 -0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH RFC v3 2/3] smb/server: fix minimum SMB2 PDU size
-To: chenxiaosong.chenxiaosong@linux.dev, sfrench@samba.org,
- smfrench@gmail.com, linkinjeon@kernel.org, linkinjeon@samba.org,
- pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
- dhowells@redhat.com
-Cc: linux-cifs@vger.kernel.org
-References: <20251219235419.338880-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251219235419.338880-3-chenxiaosong.chenxiaosong@linux.dev>
-Content-Language: en-US
+Subject: Re: [PATCH] RDMA/rxe: let rxe_reclassify_recv_socket() call
+ sk_owner_put()
+To: Stefan Metzmacher <metze@samba.org>, linux-rdma@vger.kernel.org
+Cc: Zhu Yanjun <zyjzyj2000@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, netdev@vger.kernel.org,
+ linux-cifs@vger.kernel.org
+References: <20251219140408.2300163-1-metze@samba.org>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251219235419.338880-3-chenxiaosong.chenxiaosong@linux.dev>
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20251219140408.2300163-1-metze@samba.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Hi Namjae,
-
-Thank you for reviewing patch 01 and 03. I will update the patches 
-according to your suggestions.
-
-Do you have any suggestions for this patch 02?
-
-Thanks,
-ChenXiaoSong.
-
-On 12/20/25 7:54 AM, chenxiaosong.chenxiaosong@linux.dev wrote:
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+在 2025/12/19 6:04, Stefan Metzmacher 写道:
+> On kernels build with CONFIG_PROVE_LOCKING, CONFIG_MODULES
+> and CONFIG_DEBUG_LOCK_ALLOC 'rmmod rdma_rxe' is no longer
+> possible.
 > 
-> The minimum SMB2 PDU size should be updated to the size of
-> `struct smb2_pdu`.
+> For the global recv sockets rxe_net_exit() is where we
+> call rxe_release_udp_tunnel-> udp_tunnel_sock_release(),
+> which means the sockets are destroyed before 'rmmod rdma_rxe'
+> finishes, so there's no need to protect against
+> rxe_recv_slock_key and rxe_recv_sk_key disappearing
+> while the sockets are still alive.
 > 
-> Suggested-by: David Howells <dhowells@redhat.com>
-> Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> Fixes: 80a85a771deb ("RDMA/rxe: reclassify sockets in order to avoid false positives from lockdep")
+> Cc: Zhu Yanjun <zyjzyj2000@gmail.com>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Cc: linux-rdma@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-cifs@vger.kernel.org
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+
+Thanks a lot. IIRC, there is a similar commit for SIW driver. Thus, I am 
+not sure if there is a similar problem in SIW driver or not.
+
+Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+
+Zhu Yanjun
+
 > ---
->   fs/smb/server/connection.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>   drivers/infiniband/sw/rxe/rxe_net.c | 32 +++++++++++++++++++++++++++++
+>   1 file changed, 32 insertions(+)
 > 
-> diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-> index f372486ebcc5..4a8eb4fef763 100644
-> --- a/fs/smb/server/connection.c
-> +++ b/fs/smb/server/connection.c
-> @@ -296,7 +296,7 @@ bool ksmbd_conn_alive(struct ksmbd_conn *conn)
+> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/rxe/rxe_net.c
+> index 0195d361e5e3..0bd0902b11f7 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_net.c
+> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
+> @@ -64,7 +64,39 @@ static inline void rxe_reclassify_recv_socket(struct socket *sock)
+>   		break;
+>   	default:
+>   		WARN_ON_ONCE(1);
+> +		return;
+>   	}
+> +	/*
+> +	 * sock_lock_init_class_and_name() calls
+> +	 * sk_owner_set(sk, THIS_MODULE); in order
+> +	 * to make sure the referenced global
+> +	 * variables rxe_recv_slock_key and
+> +	 * rxe_recv_sk_key are not removed
+> +	 * before the socket is closed.
+> +	 *
+> +	 * However this prevents rxe_net_exit()
+> +	 * from being called and 'rmmod rdma_rxe'
+> +	 * is refused because of the references.
+> +	 *
+> +	 * For the global sockets in recv_sockets,
+> +	 * we are sure that rxe_net_exit() will call
+> +	 * rxe_release_udp_tunnel -> udp_tunnel_sock_release.
+> +	 *
+> +	 * So we don't need the additional reference to
+> +	 * our own (THIS_MODULE).
+> +	 */
+> +	sk_owner_put(sk);
+> +	/*
+> +	 * We also call sk_owner_clear() otherwise
+> +	 * sk_owner_put(sk) in sk_prot_free will
+> +	 * fail, which is called via
+> +	 * sk_free -> __sk_free -> sk_destruct
+> +	 * and sk_destruct calls __sk_destruct
+> +	 * directly or via call_rcu()
+> +	 * so sk_prot_free() might be called
+> +	 * after rxe_net_exit().
+> +	 */
+> +	sk_owner_clear(sk);
+>   #endif /* CONFIG_DEBUG_LOCK_ALLOC */
 >   }
->   
->   #define SMB1_MIN_SUPPORTED_PDU_SIZE (sizeof(struct smb_pdu))
-> -#define SMB2_MIN_SUPPORTED_HEADER_SIZE (sizeof(struct smb2_hdr) + 4)
-> +#define SMB2_MIN_SUPPORTED_PDU_SIZE (sizeof(struct smb2_pdu))
->   
->   /**
->    * ksmbd_conn_handler_loop() - session thread to listen on new smb requests
-> @@ -396,7 +396,7 @@ int ksmbd_conn_handler_loop(void *p)
->   
->   		if (((struct smb2_hdr *)smb2_get_msg(conn->request_buf))->ProtocolId ==
->   		    SMB2_PROTO_NUMBER) {
-> -			if (pdu_size < SMB2_MIN_SUPPORTED_HEADER_SIZE)
-> +			if (pdu_size < SMB2_MIN_SUPPORTED_PDU_SIZE)
->   				break;
->   		}
 >   
 
