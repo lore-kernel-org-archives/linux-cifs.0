@@ -1,113 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DB91DDC2B
-	for <linux-cifs@vger.kernel.org>; Sat, 20 Dec 2025 02:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCAE242D67
+	for <linux-cifs@vger.kernel.org>; Sat, 20 Dec 2025 03:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766197059; cv=none; b=m7SjvYyj8HndtvvIGVBFdqEZj6IpS5ON45rkiL65okvfiDPrOKuivprHK7VotvSTcJ9uA8pTBCC/pKLDxdoD4+ktzo7nf4ipjBvAG2GElvw1UyIsEuJZpgSH0avo4az83ailw5NDH8l426G/yOUvtV8xIxLCbWmsxz9wrREVj9M=
+	t=1766201175; cv=none; b=aXnxCB/mvU6zhI0HOHp+pCOLrSzDuuhGzh+ZVNspvguriDyF2/zOWpdo91AbWrer4UJCrbEtW91g4CkWJXIdJPDXk1kKwOCH3dpZAsJR6rTDabFRhV00iE2uxSabYqCqVg1e92zQy7x+WtFNHkYye9bU0r2RD0NdnI+nFzLKIy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766197059; c=relaxed/simple;
-	bh=FdiQ6TCrxPgrtd91/nGqoxzyxLgjtAmJ50voemxE8S4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kWcTZO45JAWMlkuzZ+32luMQyWsUEzDY01tK0bEyXPUnaMZavqp09qL3SUx9weU18ZYmbu6jfazNosOM6LHlenHvIoXHUDadINTnEYBc+ijeFRFoM3XbPEWhLHeeilOLm3c/5uKo+X0Jcq8SslBG7o7re9PDe1vCPuOjrDUszWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c5Us2QBG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1766201175; c=relaxed/simple;
+	bh=+L+tFw8jFfJHDMO3dzPfRRS2F2bpDR/3rMAiRgnlyk0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p1QimIwCSpK2gBc0UI7Psbsz5BT8F67iw+pasWuhxr8izccwFEhHbDjw65yZXdiZ7dEWt7mcQisR4aQxwu5KeOObR1NsEEv2c9rPENCkpLQB7BfvE+Lp0JPyS0ofiIpMxnnK3DNyyzndddTbvM4S0LOXtQXdy7LrKWwTr0Pdmw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QKXM6qh2; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c5Us2QBG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BA23C4AF0C
-	for <linux-cifs@vger.kernel.org>; Sat, 20 Dec 2025 02:17:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766197059;
-	bh=FdiQ6TCrxPgrtd91/nGqoxzyxLgjtAmJ50voemxE8S4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=c5Us2QBGx9QNoY2rSnEKzLOfPZEQoQpIIlzU8jw+obHDOqNLWe0bL/TfiD/UHyhp7
-	 fUOEG4fno1pr1wVYA1PipS598UqcUiexZYz8fQw6unbd3W/0RYq1PdDbP1LQe5tCvI
-	 hfOlg5JSSI/SLFXCAilJ7SLyHU3lQSJUMLlcRLsh9tO5FCalBc2/4JoBp5uI83YNW7
-	 Qej+EgEsccHgdDafQ25rOoMRwRwc1mXMneS+ZLLLuZeJs2ZT8WhBTTKJO7wtBtXIMT
-	 QIDNpMDaGV2bUZTUQxRxZ4xNvYv85ZZyUYdhAkvBc3tCiXgEKpEC9D0XxyetQNkchv
-	 Q5KAtZlPEySyA==
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b7277324054so418087666b.0
-        for <linux-cifs@vger.kernel.org>; Fri, 19 Dec 2025 18:17:39 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWnjfPhVMg1XIJWnZMRygm5cDWoa91stM96D5ISevWRoI2JrYyBYu99BElnKBAj8GvAJp2+IRY8NkGc@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIDeT9+JBXgxs2phs5aTOSvTadcfh0v0rF87mjIm910qEdaGIr
-	1RGDaw5I6GoMGfhW/Q1ozepN5yEzWe8ViLqbp+LbJ4NO9oQmvKL5yLGozRAhzRIWe8NUcPfT8c5
-	CO8o8Eflt7vCZHtTEf1UxbuaTcozsGhk=
-X-Google-Smtp-Source: AGHT+IHqsuB8rTJGCu8W0i+UO2KlB2jS9PTeHZneZ1QNX7ezKB521Ky7D3BFjfBRW2Ge1A37R8kzLjr80OSl9+uHoJM=
-X-Received: by 2002:a17:907:c24:b0:b73:76c5:8f7c with SMTP id
- a640c23a62f3a-b80371f7236mr478932766b.43.1766197057782; Fri, 19 Dec 2025
- 18:17:37 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QKXM6qh2"
+Message-ID: <1534b209-eedc-4cc7-bf7b-ea98dfbed4b2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766201169;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rDgXj9lFgnzAV6NHita0m9UqJTXd4laen9wb3d+Syn8=;
+	b=QKXM6qh2ocr61CsA4+GK65HlxKsaZVN0FTp5P+P5e9P1VTEwzBjUcTclPGrS1V/hC5Af3j
+	Zy7fH4dHGrb+uxrfYW2sAaHne/nn3/IdhasICM2ci+zJJTw4j7lfzAvCSDxuD5dBfGOoXr
+	6XpiEJdYm5nGEbDmqjXbqHGBT6Nt8g4=
+Date: Sat, 20 Dec 2025 11:25:47 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251219235419.338880-1-chenxiaosong.chenxiaosong@linux.dev> <20251219235419.338880-4-chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251219235419.338880-4-chenxiaosong.chenxiaosong@linux.dev>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 20 Dec 2025 11:17:25 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_bhyFYSB_tmXGTczjgMPsEyVnSQUKztNfRzJH0bTdHvA@mail.gmail.com>
-X-Gm-Features: AQt7F2rNtcvh7E0CS19NsHF0cE5G0z6w8q2gTaVWKRZSKyYtAkeBp8k8NsZSTsU
-Message-ID: <CAKYAXd_bhyFYSB_tmXGTczjgMPsEyVnSQUKztNfRzJH0bTdHvA@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 3/3] smb: use sizeof() to get __SMB2_HEADER_STRUCTURE_SIZE
-To: chenxiaosong.chenxiaosong@linux.dev
-Cc: sfrench@samba.org, smfrench@gmail.com, linkinjeon@samba.org, 
-	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
-	tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org, 
-	dhowells@redhat.com, linux-cifs@vger.kernel.org, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH RFC v3 2/3] smb/server: fix minimum SMB2 PDU size
+To: chenxiaosong.chenxiaosong@linux.dev, sfrench@samba.org,
+ smfrench@gmail.com, linkinjeon@kernel.org, linkinjeon@samba.org,
+ pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+ tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
+ dhowells@redhat.com
+Cc: linux-cifs@vger.kernel.org
+References: <20251219235419.338880-1-chenxiaosong.chenxiaosong@linux.dev>
+ <20251219235419.338880-3-chenxiaosong.chenxiaosong@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <20251219235419.338880-3-chenxiaosong.chenxiaosong@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, Dec 20, 2025 at 8:55=E2=80=AFAM <chenxiaosong.chenxiaosong@linux.de=
-v> wrote:
->
+Hi Namjae,
+
+Thank you for reviewing patch 01 and 03. I will update the patches 
+according to your suggestions.
+
+Do you have any suggestions for this patch 02?
+
+Thanks,
+ChenXiaoSong.
+
+On 12/20/25 7:54 AM, chenxiaosong.chenxiaosong@linux.dev wrote:
 > From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->
-> I have checked the size of the structure using GDB:
->
->   gdb ./build/fs/smb/server/ksmbd.ko
->   (gdb) p sizeof(struct smb2_hdr)
->   $1 =3D 64
->
->   gdb ./build/fs/smb/client/cifs.ko
->   (gdb) p sizeof(struct smb2_hdr)
->   $1 =3D 64
->
+> 
+> The minimum SMB2 PDU size should be updated to the size of
+> `struct smb2_pdu`.
+> 
+> Suggested-by: David Howells <dhowells@redhat.com>
+> Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
 > Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-When reading the patch description, I don't know why this change is needed.
-You don't need to include this patch on the v3 patch-set.
-Thanks!
 > ---
->  fs/smb/common/smb2pdu.h | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-> index f5ebbe31384a..f2a6b7191f43 100644
-> --- a/fs/smb/common/smb2pdu.h
-> +++ b/fs/smb/common/smb2pdu.h
-> @@ -107,10 +107,6 @@
->   *
->   */
->
-> -#define __SMB2_HEADER_STRUCTURE_SIZE   64
-> -#define SMB2_HEADER_STRUCTURE_SIZE                             \
-> -       cpu_to_le16(__SMB2_HEADER_STRUCTURE_SIZE)
-> -
->  #define SMB2_PROTO_NUMBER cpu_to_le32(0x424d53fe)
->  #define SMB2_TRANSFORM_PROTO_NUM cpu_to_le32(0x424d53fd)
->  #define SMB2_COMPRESSION_TRANSFORM_ID cpu_to_le32(0x424d53fc)
-> @@ -157,6 +153,10 @@ struct smb2_hdr {
->         __u8   Signature[16];
->  } __packed;
->
-> +#define __SMB2_HEADER_STRUCTURE_SIZE   (sizeof(struct smb2_hdr))
-> +#define SMB2_HEADER_STRUCTURE_SIZE                             \
-> +       cpu_to_le16(__SMB2_HEADER_STRUCTURE_SIZE)
-> +
->  struct smb3_hdr_req {
->         __le32 ProtocolId;      /* 0xFE 'S' 'M' 'B' */
->         __le16 StructureSize;   /* 64 */
-> --
-> 2.43.0
->
+>   fs/smb/server/connection.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+> index f372486ebcc5..4a8eb4fef763 100644
+> --- a/fs/smb/server/connection.c
+> +++ b/fs/smb/server/connection.c
+> @@ -296,7 +296,7 @@ bool ksmbd_conn_alive(struct ksmbd_conn *conn)
+>   }
+>   
+>   #define SMB1_MIN_SUPPORTED_PDU_SIZE (sizeof(struct smb_pdu))
+> -#define SMB2_MIN_SUPPORTED_HEADER_SIZE (sizeof(struct smb2_hdr) + 4)
+> +#define SMB2_MIN_SUPPORTED_PDU_SIZE (sizeof(struct smb2_pdu))
+>   
+>   /**
+>    * ksmbd_conn_handler_loop() - session thread to listen on new smb requests
+> @@ -396,7 +396,7 @@ int ksmbd_conn_handler_loop(void *p)
+>   
+>   		if (((struct smb2_hdr *)smb2_get_msg(conn->request_buf))->ProtocolId ==
+>   		    SMB2_PROTO_NUMBER) {
+> -			if (pdu_size < SMB2_MIN_SUPPORTED_HEADER_SIZE)
+> +			if (pdu_size < SMB2_MIN_SUPPORTED_PDU_SIZE)
+>   				break;
+>   		}
+>   
+
