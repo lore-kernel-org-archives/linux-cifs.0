@@ -1,73 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D557A2472BA;
-	Sun, 21 Dec 2025 10:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12CD4249EB
+	for <linux-cifs@vger.kernel.org>; Sun, 21 Dec 2025 15:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766312964; cv=none; b=rDzSu4JG75GFAx8upPvTdsMcjsF/R3fhwhBEye8ecFCU3Hpu+b7qYqKMyAA9mSW1jD0ZBp25rmlhaEARdMrumm0irUCxEKQWX3QkbTmsxf70skeO+Z3+zVamwiY8FwfW2Tg7pIrhWEVkVfFLre10Y7kXLUpwHQXC1S8d7M4+aSc=
+	t=1766330632; cv=none; b=Oj5NkiKdOyFBcEwdo6aYFS409cFHbScm1yKDkpjOJjlrBWMFR4OGiQSRAaS3EJZS34OEHiSP9ES+LzM58W0bLGcJI32sQ1o0VzXq5kZ38T+OmNdCEy1FwPdPsa1l0SZHSm9cOBgd9ENNhIOzc4YSl90DMPENg1/kQHdVvyJMS0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766312964; c=relaxed/simple;
-	bh=PU/pk328aJBx84jd19OJQ3evhxWyuQPC6TH76pCd5WE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=mUgO2b7yCz2u8FVa5HsITl5IeZUK7GILmmp2gZEZrizw0BtHXaQemH1gM+JwJR/S2pGrwAP+LgVKcod/55Ehn1IR0c60oPEo5j+ox3AxnzFX6AxYCmTgtUEK1EwExKrBY0QLqRVjnoDzf3BdB6sv8pfY41+gC5ZoHJtAyKIFQwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VnRgC/Kl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1766330632; c=relaxed/simple;
+	bh=xue1vwmyeNU5eCphuVqX2DLp15V0doeCJ8XcZIwhvtE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BUM76yMkYeoFoNiLyOmucJpWEPsInsCfy59k6Uk6WeF/bgfGiuqCth/Q9oUnRlDoUTPLXM06xf/XeKIZ0NJHu4W1rQyzbY7f0M/3gaYPqKiYMik/rJKEO1CK1s7T34xIViv6RIletoaMt2rS1nCshif7vsH73G1FfbMmMzuvfsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=k/ug6oE7; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VnRgC/Kl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16DFCC4CEFB;
-	Sun, 21 Dec 2025 10:29:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766312964;
-	bh=PU/pk328aJBx84jd19OJQ3evhxWyuQPC6TH76pCd5WE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=VnRgC/KlI1IQsPjT2gw977tZt+ORy+RfrIhcUEVdu/V37jK+0eTiKNHVrxiyDBPeq
-	 1vS+yQu8qbrnveyfsyQza31V1n3B9URtBT5mUnCaxOJ//bP3voFUBTYsVEOcRIilN3
-	 9yXWWVzxHW2XU+hwfFtFPGAuCR2H8Z8HedaavvdqV24yoJW3NgWqKfU2SmckgErkPk
-	 dOJA9FXRpVe+y/+mQUlMhZb4Z2N0/XBvt2FilCjT6d/C517kPO8TqWegdx+woriPVt
-	 ebdTcBYesGDx+cENuHBCpAOGXTw0Mc5u52RtiVlSg+t8xwilkKDp25pq5d0t6jQYg+
-	 dIfmhGDkVn6Jg==
-From: Leon Romanovsky <leon@kernel.org>
-To: linux-rdma@vger.kernel.org, Stefan Metzmacher <metze@samba.org>
-Cc: Zhu Yanjun <zyjzyj2000@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, netdev@vger.kernel.org, 
- linux-cifs@vger.kernel.org
-In-Reply-To: <20251219140408.2300163-1-metze@samba.org>
-References: <20251219140408.2300163-1-metze@samba.org>
-Subject: Re: [PATCH] RDMA/rxe: let rxe_reclassify_recv_socket() call
- sk_owner_put()
-Message-Id: <176631296153.2404623.1401232430474772017.b4-ty@kernel.org>
-Date: Sun, 21 Dec 2025 05:29:21 -0500
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="k/ug6oE7"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766330624;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0sfjisTuBGNcAyl/mZ39j4OTECN9Lo34hWli/lEpY5I=;
+	b=k/ug6oE7aeBH+yJOqmNZ9HDB2826eI00UxwYPsMtyD1Y7ydPe2dn3MBvY5GaP+lXipskr4
+	T6Wp+LZdpStkwW0kHmLhAh399WGFpG8WxjFYu1TROrDWd8Aw0sAthfVF4szKIuujqTlnqw
+	GRBybnf1croPvLmNzqghubjpj5JdQwg=
+From: chenxiaosong.chenxiaosong@linux.dev
+To: sfrench@samba.org,
+	smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	linkinjeon@samba.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [RFC PATCH cifs-utils v2 0/1] smbinfo: add notify subcommand
+Date: Sun, 21 Dec 2025 23:22:15 +0800
+Message-ID: <20251221152216.363567-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-a6db3
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-On Fri, 19 Dec 2025 15:04:08 +0100, Stefan Metzmacher wrote:
-> On kernels build with CONFIG_PROVE_LOCKING, CONFIG_MODULES
-> and CONFIG_DEBUG_LOCK_ALLOC 'rmmod rdma_rxe' is no longer
-> possible.
-> 
-> For the global recv sockets rxe_net_exit() is where we
-> call rxe_release_udp_tunnel-> udp_tunnel_sock_release(),
-> which means the sockets are destroyed before 'rmmod rdma_rxe'
-> finishes, so there's no need to protect against
-> rxe_recv_slock_key and rxe_recv_sk_key disappearing
-> while the sockets are still alive.
-> 
-> [...]
+If you have any better ideas, please let me know.
 
-Applied, thanks!
+v1: https://lore.kernel.org/linux-cifs/20251217134456.16735-1-chenxiaosong.chenxiaosong@linux.dev/T/#t
+v1->v2:
+  - `watch_tree`: False -> True
+  - Continuously calls `ioctl()` until interrupted by `Ctrl+C`
 
-[1/1] RDMA/rxe: let rxe_reclassify_recv_socket() call sk_owner_put()
-      https://git.kernel.org/rdma/rdma/c/de41cbc64d02ae
+ChenXiaoSong (1):
+  smbinfo: add notify subcommand
 
-Best regards,
+ smbinfo     | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ smbinfo.rst |  2 ++
+ 2 files changed, 77 insertions(+)
+
 -- 
-Leon Romanovsky <leon@kernel.org>
+2.43.0
 
