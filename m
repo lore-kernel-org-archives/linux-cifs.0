@@ -1,79 +1,82 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C561A00F0
-	for <linux-cifs@vger.kernel.org>; Wed, 24 Dec 2025 08:55:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CB134D914;
+	Wed, 24 Dec 2025 14:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766566520; cv=none; b=O6Tcm4hjm0WfzrVp3coR/gJVnURgMv00N4mZXamrPKyjUgLsr7wEdZY9vsfhSk5Lu3GxlBuiCF812apuZ46F5eZmBHFFVco9JEJsY7UHi4R3xYscAWcUW2ITzE3PYqCATwCOTi9m/7MvuZDZAm2FYg2f4P95nup2o8yZK8Pyw+o=
+	t=1766586039; cv=none; b=qt/AYN5r6pcwqphUqA/P2tFkQ2aoNPfDcirRV41ArbCrqHYjDZ0avE8eMd8m9eGc9IEKbNGPHefZCowZLMaYgKnkkQzADMZbVs/6lBVnEXHhRBOab5ICd0e8xmiczz+N7Mlu7zmvLbAX8gDEn8ZjHDdKAGledDQnde+QjMOV76o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766566520; c=relaxed/simple;
-	bh=UHHGboSGU3FxN2m5/weH+D+0RiWy+pljLCpoAz7wW3c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bPEYPInd4FRz3u/zMTmrfol80quPoxqrCz18MCAfbV94i/qdEypy237YzdhWTJnKWy0BA5Jwu3zmNjnW3h9s5O6dhSwrljXzf7L2h1z+UKYhgCCzfLzL7dy6d7Vk4ZIIHXk5dB9lBYynNPtzfqVu426Zb0nmBnqVszYPYntgSa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QyO172K+; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1766586039; c=relaxed/simple;
+	bh=t6JydTRdh3ZejSzmxvzlZ9+tQHQAbTb2slGusDLDQZ8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B+BXs5VDTpCziwXXDRE5ccxwFxA97xhiUqwzVhZWG5qdOPmrvz4FJbUnk2pPLb5Y3ORJgphkRj1V/Thspz22ylnk2GczSkDli8cry6hsiB1HspjIQjHA4kDy+GVXgsGktACtUEhMppr5Ov0+CjSvVELhGLW9xhjpCoa7MqqBNSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=TSZVIPfE; arc=none smtp.client-ip=45.254.49.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QyO172K+"
-Message-ID: <6dbc433c-eba7-4deb-bc28-3df63a27bc63@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766566516;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j7pNL6HYNnIsZ5mCBFhrfn9tYuEml2MjkdobdEFO1TA=;
-	b=QyO172K+sb7IohcaTbPZInFkou6G9hxL3zql+G5uGEG5Ly6H8PwxGK8t7HDE6dgKq9XHrU
-	qWULsCJ5BySqwf9GfkAAAyb4j58+OP8Eo8VnQrhreFnC1YMcG9cK/1fiWNYQmRTYZjlB+/
-	yrKfDry8SNdXLXnQEutFQIt0C3x5d34=
-Date: Wed, 24 Dec 2025 16:54:35 +0800
+	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="TSZVIPfE"
+Received: from LAPTOP-N070L597.localdomain (unknown [222.191.246.242])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 2e6fcae01;
+	Wed, 24 Dec 2025 22:20:25 +0800 (GMT+08:00)
+From: Zilin Guan <zilin@seu.edu.cn>
+To: linkinjeon@kernel.org
+Cc: smfrench@gmail.com,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jianhao.xu@seu.edu.cn,
+	Zilin Guan <zilin@seu.edu.cn>
+Subject: [PATCH] ksmbd: Fix memory leak in get_file_all_info()
+Date: Wed, 24 Dec 2025 14:20:16 +0000
+Message-Id: <20251224142016.250752-1-zilin@seu.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v5 5/5] smb/client: introduce KUnit test to check search
- result of smb2_error_map_table
-To: David Howells <dhowells@redhat.com>
-Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
- ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
- bharathsm@microsoft.com, senozhatsky@chromium.org,
- linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20251224023145.608165-6-chenxiaosong.chenxiaosong@linux.dev>
- <20251224023145.608165-1-chenxiaosong.chenxiaosong@linux.dev>
- <1168035.1766564530@warthog.procyon.org.uk>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <1168035.1766564530@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-HM-Tid: 0a9b50bb7aef03a1kunm72037eb03566
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlDH08aVkMdHRlLSxlPSRpNT1YeHw5VEwETFhoSFy
+	QUDg9ZV1kYEgtZQVlJSUlVSkJKVUlPTVVJT0lZV1kWGg8SFR0UWUFZT0tIVUpLSUhOQ0NVSktLVU
+	tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=TSZVIPfEJa6/XyK2/idShVN4jnqltUEpqKJGtf8YNeb8Du8m7r1qdc4qjjCB5WmFnFJ9nNV5wM2Pjd2z+saJ/z7YuyN6w8tOWaLvyJRt6ctHOkVG7q/d2Z3j0oJsh6hy+38OriOip1xnl314og2P5UbEXHDpIyBKniliyzpjMkQ=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
+	bh=VaZ4rzoSi1+FjLevS2eVmgQmJET0wPEI+fuaCFCVFAU=;
+	h=date:mime-version:subject:message-id:from;
 
-Thanks for your suggestions, they are very helpful.
+In get_file_all_info(), if vfs_getattr() fails, the function returns
+immediately without freeing the allocated filename, leading to a memory
+leak.
 
-I will update these patches in the next version.
+Fix this by freeing the filename before returning in this error case.
 
-Thanks,
-ChenXiaoSong.
+Fixes: 5614c8c487f6a ("ksmbd: replace generic_fillattr with vfs_getattr")
+Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+---
+ fs/smb/server/smb2pdu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-在 2025/12/24 16:22, David Howells 写道:
-> chenxiaosong.chenxiaosong@linux.dev wrote:
-> 
->> +
->> +#if IS_ENABLED(CONFIG_SMB_KUNIT_TESTS)
->> +#include "smb2maperror_test.c"
->> +#endif /* CONFIG_SMB_KUNIT_TESTS */
-> 
-> This feels weird, but I think I can see what you're doing.  I guess it's not a
-> kunit test in loadable module form?
-> 
->> +	for (i = 0; i < err_map_num; i++) {
-> 
-> ARRAY_SIZE(smb2_error_map_table).
-> 
-> David
-> 
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 8aa483800014..4472638ab11a 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -4923,8 +4923,10 @@ static int get_file_all_info(struct ksmbd_work *work,
+ 
+ 	ret = vfs_getattr(&fp->filp->f_path, &stat, STATX_BASIC_STATS,
+ 			  AT_STATX_SYNC_AS_STAT);
+-	if (ret)
++	if (ret) {
++		kfree(filename);
+ 		return ret;
++	}
+ 
+ 	ksmbd_debug(SMB, "filename = %s\n", filename);
+ 	delete_pending = ksmbd_inode_pending_delete(fp);
+-- 
+2.34.1
 
