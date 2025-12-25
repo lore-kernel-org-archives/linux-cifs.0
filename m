@@ -1,32 +1,32 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AA91DE89A
-	for <linux-cifs@vger.kernel.org>; Thu, 25 Dec 2025 02:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A89241690
+	for <linux-cifs@vger.kernel.org>; Thu, 25 Dec 2025 02:11:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766628717; cv=none; b=sKJA8CNxmpD0wVNWvsVvaReUr+XJHOv2EfMP/dvHQqPFCWcYIcopGcwGMA6n5Ho6jBS8tPyQUiQYHotM7YWw5ha48YaaRshQeUPT6bpyc/9/E/O7n3ddUZIDZL8Ol8oUe5K6M7pfM584Ckj04jNdFaOvGa8lPLZ0JitRQQTD85k=
+	t=1766628721; cv=none; b=iltlNRcWpFQQPRqE5OBgi0w4/TUEMH+PmugrRlEHOEhrihG1sVFwekYXEFM31TTICGIer6xx9loDOKbhXvQsBqrsNQurzY1kuj+OJG4bnkoUO8QOtJP1jfpJTSAVm+EM2mqwgbVa04M6FjnZ7Z5yrkfBtk/hk1gYWrL+4vOXNkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766628717; c=relaxed/simple;
-	bh=WbdxjAad2JdENKQZWFAYLPEg0mmxeR9eK1hEth/+AtQ=;
+	s=arc-20240116; t=1766628721; c=relaxed/simple;
+	bh=MMp84n3lBvw+h28eBEGsuaKkwHZsrm952EwPfM4fK94=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ksqqZMeN+D0cKy+tpHAN8d60YteY6u40VJLVa9Sns35ys6NTXox+Wq84PMuEKa2Fc6FCE1vg1srBAiBB21BGcuf64YPW3zoR8bcdTBxxwnCrjrzHG2ZQgLZmeQq0n14grdFDq1IVFNuyW02RoutvP1DlVeLkb6p+wnvqq4DD9pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ut+PIdcF; arc=none smtp.client-ip=91.218.175.171
+	 MIME-Version; b=tSLX6mkHK835/xHai+20JG6tJuCls3pOCK3fP7QeuV2t0rMXWQrYr3hVija5GE6KiZWeFPFNYvFTaQuLip4uMdYAReQk826fJH2dRA/+5eqS4hykqnCzXspt1L9fgO8f4Lbt3t9WeE3GdFZ8k7gDMcEDG39FXDgrP4AmZqNy5mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GAA9yNFM; arc=none smtp.client-ip=91.218.175.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ut+PIdcF"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GAA9yNFM"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766628714;
+	t=1766628717;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CGxqa6Dis+NnvWijecQJsmpN+Kt+xmwenu+TF1WYDRA=;
-	b=Ut+PIdcFodRIqTR8L2TcPxm9jd0Zh1+YDcHVsAtQ3p33CZOHwHFAAvVCeMeU0PEw43NfFF
-	Xb/PI85qcyC9VpImmtjpkZo2AGFLPH4HTi4Ae6WlBxaxo9cubaBGBlTnyEfcaejofEv+vp
-	OYHHx53wk3YGEdHTtXIjDvpRD+SQwbE=
+	bh=4CeaKNQbmdyqWpjpgN1OWDp8T9hYSDfhTSTpAu8RtXE=;
+	b=GAA9yNFMGBgvz3q2BGdE8k7U++qi0AYtrCkLCegILN+1hjg0lIF1kRaBAd2SUQfqt4LnMC
+	7T0lB73lVe+PTUnE+MdEI24WfXdAHKq6m6v5eGPuU6MX8JFD5wAkuj4kIJ4RkJkVRBE1yT
+	DqmwGep84SabwUL2PwN67QX8RkFkUKQ=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -39,9 +39,9 @@ To: smfrench@gmail.com,
 	dhowells@redhat.com
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v6 4/5] smb/client: use bsearch() to find target in smb2_error_map_table
-Date: Thu, 25 Dec 2025 10:10:34 +0800
-Message-ID: <20251225021035.656639-5-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH v6 5/5] smb/client: introduce KUnit test to check search result of smb2_error_map_table
+Date: Thu, 25 Dec 2025 10:10:35 +0800
+Message-ID: <20251225021035.656639-6-chenxiaosong.chenxiaosong@linux.dev>
 In-Reply-To: <20251225021035.656639-1-chenxiaosong.chenxiaosong@linux.dev>
 References: <20251225021035.656639-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
@@ -55,87 +55,115 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-The smb2_error_map_table array currently has 1740 elements. When searching
-for the last element, the original loop-based search method requires 1740
-comparisons, while binary search algorithm requires only 10 comparisons.
+The KUnit test are executed when cifs.ko is loaded.
+
+Just like `fs/ext4/mballoc.c` includes `fs/ext4/mballoc-test.c`.
+`smb2maperror.c` also includes `smb2maperror_test.c`, allowing KUnit
+tests to access any functions and variables in `smb2maperror.c`.
+
+The maperror_test_check_search() checks whether all elements can be
+correctly found in the array.
 
 Suggested-by: David Howells <dhowells@redhat.com>
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smb2maperror.c | 46 +++++++++++++++++++++++++++---------
- 1 file changed, 35 insertions(+), 11 deletions(-)
+ fs/smb/Kconfig                    | 17 +++++++++++
+ fs/smb/client/smb2maperror.c      |  4 +++
+ fs/smb/client/smb2maperror_test.c | 48 +++++++++++++++++++++++++++++++
+ 3 files changed, 69 insertions(+)
+ create mode 100644 fs/smb/client/smb2maperror_test.c
 
+diff --git a/fs/smb/Kconfig b/fs/smb/Kconfig
+index ef425789fa6a..85f7ad5fbc5e 100644
+--- a/fs/smb/Kconfig
++++ b/fs/smb/Kconfig
+@@ -9,3 +9,20 @@ config SMBFS
+ 	tristate
+ 	default y if CIFS=y || SMB_SERVER=y
+ 	default m if CIFS=m || SMB_SERVER=m
++
++config SMB_KUNIT_TESTS
++	tristate "KUnit tests for SMB" if !KUNIT_ALL_TESTS
++	depends on SMBFS && KUNIT
++	default KUNIT_ALL_TESTS
++	help
++	  This builds the SMB KUnit tests.
++
++	  KUnit tests run during boot and output the results to the debug log
++	  in TAP format (https://testanything.org/). Only useful for kernel devs
++	  running KUnit test harness and are not for inclusion into a production
++	  build.
++
++	  For more information on KUnit and unit tests in general please refer
++	  to the KUnit documentation in Documentation/dev-tools/kunit/.
++
++	  If unsure, say N.
 diff --git a/fs/smb/client/smb2maperror.c b/fs/smb/client/smb2maperror.c
-index 3731e32c22a3..b0241e6adbb6 100644
+index b0241e6adbb6..b7005f0a9e2c 100644
 --- a/fs/smb/client/smb2maperror.c
 +++ b/fs/smb/client/smb2maperror.c
-@@ -27,13 +27,38 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
- #include "smb2_mapping_table.c"
- };
+@@ -113,3 +113,7 @@ int __init smb2_init_maperror(void)
  
-+static __always_inline int cmp_smb2_status(const void *_a, const void *_b)
-+{
-+	const struct status_to_posix_error *a = _a, *b = _b;
+ 	return 0;
+ }
 +
-+	if (a->smb2_status < b->smb2_status)
-+		return -1;
-+	if (a->smb2_status > b->smb2_status)
-+		return 1;
-+	return 0;
++#if IS_ENABLED(CONFIG_SMB_KUNIT_TESTS)
++#include "smb2maperror_test.c"
++#endif /* CONFIG_SMB_KUNIT_TESTS */
+diff --git a/fs/smb/client/smb2maperror_test.c b/fs/smb/client/smb2maperror_test.c
+new file mode 100644
+index 000000000000..6ac6cdac623b
+--- /dev/null
++++ b/fs/smb/client/smb2maperror_test.c
+@@ -0,0 +1,48 @@
++// SPDX-License-Identifier: LGPL-2.1
++/*
++ *
++ *   KUnit tests of SMB2 maperror
++ *
++ *   Copyright (C) 2025 KylinSoft Co., Ltd. All rights reserved.
++ *   Author(s): ChenXiaoSong <chenxiaosong@kylinos.cn>
++ *
++ */
++
++#include <kunit/test.h>
++
++static void
++test_cmp_map(struct kunit *test, struct status_to_posix_error *expect)
++{
++	struct status_to_posix_error *result;
++
++	result = smb2_get_err_map(expect->smb2_status);
++	KUNIT_EXPECT_PTR_NE(test, NULL, result);
++	KUNIT_EXPECT_EQ(test, expect->smb2_status, result->smb2_status);
++	KUNIT_EXPECT_EQ(test, expect->posix_error, result->posix_error);
++	KUNIT_EXPECT_STREQ(test, expect->status_string, result->status_string);
 +}
 +
-+static struct status_to_posix_error *smb2_get_err_map(__le32 smb2_status)
++static void maperror_test_check_search(struct kunit *test)
 +{
-+	struct status_to_posix_error *err_map, key;
++	unsigned int i;
++	struct status_to_posix_error expect;
 +
-+	key = (struct status_to_posix_error) {
-+		.smb2_status = smb2_status,
-+	};
-+	err_map = __inline_bsearch(&key, smb2_error_map_table,
-+				   ARRAY_SIZE(smb2_error_map_table),
-+				   sizeof(struct status_to_posix_error),
-+				   cmp_smb2_status);
-+	return err_map;
++	for (i = 0; i < ARRAY_SIZE(smb2_error_map_table); i++) {
++		expect = smb2_error_map_table[i];
++		test_cmp_map(test, &expect);
++	}
 +}
 +
- int
- map_smb2_to_linux_error(char *buf, bool log_err)
- {
- 	struct smb2_hdr *shdr = (struct smb2_hdr *)buf;
--	unsigned int i;
- 	int rc = -EIO;
- 	__le32 smb2err = shdr->Status;
-+	struct status_to_posix_error *err_map;
- 
- 	if (smb2err == 0) {
- 		trace_smb3_cmd_done(le32_to_cpu(shdr->Id.SyncId.TreeId),
-@@ -47,17 +72,16 @@ map_smb2_to_linux_error(char *buf, bool log_err)
- 		   (smb2err != STATUS_END_OF_FILE)) ||
- 		  (cifsFYI & CIFS_RC);
- 
--	for (i = 0; i < sizeof(smb2_error_map_table) /
--			sizeof(struct status_to_posix_error); i++) {
--		if (smb2_error_map_table[i].smb2_status == smb2err) {
--			if (log_err)
--				pr_notice("Status code returned 0x%08x %s\n", smb2err,
--					  smb2_error_map_table[i].status_string);
--			rc = smb2_error_map_table[i].posix_error;
--			break;
--		}
--	}
-+	err_map = smb2_get_err_map(smb2err);
-+	if (!err_map)
-+		goto out;
++static struct kunit_case maperror_test_cases[] = {
++	KUNIT_CASE(maperror_test_check_search),
++	{}
++};
 +
-+	rc = err_map->posix_error;
-+	if (log_err)
-+		pr_notice("Status code returned 0x%08x %s\n", smb2err,
-+			  err_map->status_string);
- 
-+out:
- 	/* on error mapping not found  - return EIO */
- 
- 	cifs_dbg(FYI, "Mapping SMB2 status code 0x%08x to POSIX err %d\n",
++static struct kunit_suite maperror_suite = {
++	.name = "smb2_maperror",
++	.test_cases = maperror_test_cases,
++};
++
++kunit_test_suite(maperror_suite);
++
++MODULE_LICENSE("GPL");
 -- 
 2.43.0
 
