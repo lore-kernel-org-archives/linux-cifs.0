@@ -1,87 +1,72 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AACB30C62E
-	for <linux-cifs@vger.kernel.org>; Wed, 24 Dec 2025 16:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DBD22127E
+	for <linux-cifs@vger.kernel.org>; Thu, 25 Dec 2025 02:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766593427; cv=none; b=ihDPErVZEPLLSG/FqS/AUFiWzRSGldXZ8MeUJnkqk825a6UjyyVRe0X85+nW4/lkJtmackdCd/RGC2qDy82JXg1GhE59dZ5jUYuqp7UOwXCvsdrLTlK58dexWky/LXY6lZ/yCtI4T/7O3gUyzd5HuSXplTDul6PkXBVisAvpC4A=
+	t=1766628008; cv=none; b=LRN2Xl5zHZRYkANeVk47G7Mbnd/zDvBIuAUA8VbnDsBImY1P3QViZryBO0MK03i0u4oNttRz7ruYbL3GjeVfCC3g+9guh6cXeuOt6mgic7fyY8jwY/X1HPO3E16LDYee39fdrqUaFD9eitbiyT2WyBq21hADhKyZZIYlVhYA8ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766593427; c=relaxed/simple;
-	bh=40rm2Uf4N9nAJx6nCLyOt97jUyaf1uPHPjYNP05d9xs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Prlt0DaNFDSei7pl8JN6t+hKW7PN3hkbFfkL2KYtpnbC37BnIQYvOSxIE04Ll7DXTiOSXevc5O1jvi0sV7y6HTq5CQlSmHifqQDAFc78ZBQw4Q4TZyIJgsT6Sbi5AvlFj6UJ3iooBPdw9QtZcoFmArlQtSemcKL0GesJ9OJTcHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Pql3UZ9g; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1766628008; c=relaxed/simple;
+	bh=PJAjFawFtuvQmiZBKO/ONWIJjsXMMw3AJGnr4f+obVA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cZ/499f9OFaClTGd1FKeimT5RuKlQop/9+X4r9fgw+8B1H+Rp7mkajMBtSfHO1AlbyFUYB7QZKj9XXAnedVlyq/XRKPpa0JeXWceJWFb4qBpjm1ECd1hVSaa8ejD+gBJJOMUqDmrYjM740FiR00zNhRhLrRDQGab2z0fsLO9E+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X9aacYVH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Pql3UZ9g"
-Message-ID: <39ca2ff6-c363-47d7-9d4f-fd6f137afc09@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766593418;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DPnvnXkrCvgg42/CMlGi7s56UOKFkvD/J4T5uPYVQjo=;
-	b=Pql3UZ9gahJ9EyTye/66g9fktj8EjiZnzoT0LGmsk43CCl4YbUVp9jKfGnQoERHwU/SjIV
-	EGfZ5NVTJDbs9hm+DrK8uef60eIVoGpceWnXUijjW0WX/b0VgKtCjqnb8VA1afNrsWqPpN
-	UqX5CQ3JG3vU9Ek4rrNB7ua3YMEtpIg=
-Date: Thu, 25 Dec 2025 00:23:20 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X9aacYVH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41899C4AF09
+	for <linux-cifs@vger.kernel.org>; Thu, 25 Dec 2025 02:00:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766628008;
+	bh=PJAjFawFtuvQmiZBKO/ONWIJjsXMMw3AJGnr4f+obVA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=X9aacYVHa04DKdhfT11thyJ/OlV/c0WsmGwVsDTgNpEw8jfsr1NebtMxsJUEdfz9D
+	 38xSupDlI4PlHSldgGCkk9iaN/Ve2v4PO293uFnuE7U0qoYSjRvuUsHFxgI3m66BFT
+	 bJMF9hO8qhZsyGHxLhCDCqUzP963rN8k2vKZHCN4HkwW7FEzYnigwrroWansVEmHmJ
+	 mFBVKNvcd92EXToWDPDqoy9Az64ONGZMr7LaOHnfXoHUsJyk4uhbKP9wblcrWLgw//
+	 gtrv7aN0uJUNqmaCmtWx7Vqqeu2gkR7/aPqY4wbbTYzBYFbsmuT2zxcPpZOIRUx3/+
+	 cP42FMgHhZ2Tw==
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-64b8123c333so9190603a12.3
+        for <linux-cifs@vger.kernel.org>; Wed, 24 Dec 2025 18:00:08 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUIStrL88SAGjnckBpOy1DTMo+0ZG48pZp7AQHDjWrplNWboT3mgFQvQbkKHhOEKwxZY4TcJ65rH0Zf@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzj8oEdpb6PDHQL0XM1LpWHkE103ZL43EW3UBJnSUsUGUqbiz7c
+	eiWnxmQzgVMFzQO27s1s5r9GYpNsF/nWIOO9xAsV0rCgAn/fOXsBKS17jEtb+vttvYZwZa971yX
+	PP9idEud36byE9gSdY+Qz2+xpqaV8Yjo=
+X-Google-Smtp-Source: AGHT+IHXjjJATKD8fNfFAHEWcURkHM9hBd7O9PZ6hQ+41yaBJ43zr/9QZKIsfHu+D68BAUSzXdJekAHhC08l7sooJn8=
+X-Received: by 2002:a17:906:c148:b0:b72:eaba:aac2 with SMTP id
+ a640c23a62f3a-b8036f5c415mr1997991966b.26.1766628006850; Wed, 24 Dec 2025
+ 18:00:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] cifs: Fix memory and information leak in
- smb3_reconfigure()
-To: Zilin Guan <zilin@seu.edu.cn>, sfrench@samba.org,
- Steve French <smfrench@gmail.com>
-Cc: pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- tom@talpey.com, bharathsm@microsoft.com, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
- jianhao.xu@seu.edu.cn
-References: <20251224152142.289149-1-zilin@seu.edu.cn>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251224152142.289149-1-zilin@seu.edu.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20251224142016.250752-1-zilin@seu.edu.cn>
+In-Reply-To: <20251224142016.250752-1-zilin@seu.edu.cn>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 25 Dec 2025 10:59:54 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-9uNzcRW2qRrw1jLEbmUAPGMfOet453WMU2d7K_D-pzA@mail.gmail.com>
+X-Gm-Features: AQt7F2pO7XgxnG2D3b8cWbvBQIl2O-nSw_Kjcv1WWpZ_oXGKZDIshYVVq87M3v4
+Message-ID: <CAKYAXd-9uNzcRW2qRrw1jLEbmUAPGMfOet453WMU2d7K_D-pzA@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: Fix memory leak in get_file_all_info()
+To: Zilin Guan <zilin@seu.edu.cn>
+Cc: smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	jianhao.xu@seu.edu.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Good catch. Looks good to me.
-
-Thanks,
-ChenXiaoSong.
-
-On 12/24/25 11:21 PM, Zilin Guan wrote:
-> In smb3_reconfigure(), if smb3_sync_session_ctx_passwords() fails, the
-> function returns immediately without freeing and erasing the newly
-> allocated new_password and new_password2. This causes both a memory leak
-> and a potential information leak.
-> 
-> Fix this by calling kfree_sensitive() on both password buffers before
-> returning in this error case.
-> 
-> Fixes: 0f0e357902957 ("cifs: during remount, make sure passwords are in sync")
+On Wed, Dec 24, 2025 at 11:20=E2=80=AFPM Zilin Guan <zilin@seu.edu.cn> wrot=
+e:
+>
+> In get_file_all_info(), if vfs_getattr() fails, the function returns
+> immediately without freeing the allocated filename, leading to a memory
+> leak.
+>
+> Fix this by freeing the filename before returning in this error case.
+>
+> Fixes: 5614c8c487f6a ("ksmbd: replace generic_fillattr with vfs_getattr")
 > Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-> ---
->   fs/smb/client/fs_context.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index c2de97e4ad59..d4291d3a9a48 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -1139,6 +1139,8 @@ static int smb3_reconfigure(struct fs_context *fc)
->   	rc = smb3_sync_session_ctx_passwords(cifs_sb, ses);
->   	if (rc) {
->   		mutex_unlock(&ses->session_mutex);
-> +		kfree_sensitive(new_password);
-> +		kfree_sensitive(new_password2);
->   		return rc;
->   	}
->   
-
+Applied it to #ksmbd-for-next-next.
+Thanks!
