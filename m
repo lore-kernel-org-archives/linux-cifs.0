@@ -1,114 +1,116 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082132BD5AF
-	for <linux-cifs@vger.kernel.org>; Fri, 26 Dec 2025 12:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EED638DD3
+	for <linux-cifs@vger.kernel.org>; Fri, 26 Dec 2025 13:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766750811; cv=none; b=atDea02gj0zfPXNGivfNevTvI7oV6+hnY6dfus/eotMRjl0p9DaEeEMegCP9PTDa8O5BfVvahV5Gamk+0Q2EI6q90/E3SSP/cGuZSq3F8bBq4/3h7dXk9NqW0tk0yrdxE2ll/vYA6jxa+wyCPEMOvfRxI/Ol79XSUHdv/IFQM78=
+	t=1766756287; cv=none; b=s0U1/7cWu1dVJbX6UHXt+BizANjE4um82zJOYqb83AVhklRe8E4vWI+YIlNFzPD0D2+exgKEmjMl83JquSPUtFdBobui8OeUUibopyAoMb/rwiTw5gUN4+/SbQ/58otoa4sFkhxmAZXFaIMpTjcbtFIbt31Yl3uU35f2YQ4wgtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766750811; c=relaxed/simple;
-	bh=F1snz0vmw3bS7HHmZTQ26ewjlPBBg8J98SitUhAUiLA=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=jCn/1GASO6x5lYxd/VMwWsFjI1c8f42t1Aq/Oj/uKVTY6Cgb8l574QRr8dVFHlyO0dXmGHyd00gUtJSYU4LKxiXebZdGPrBsXfNEOXH/DoOrvup77DoqevcStk05niNOeqWdV/whgcbNffyBhhNTjfBuwIYKRYCGYNFMbGSUPFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fLAkiQcq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1766756287; c=relaxed/simple;
+	bh=4HyKDzkQjduXHUNdSo3NkLs4KgSLo+v9q9nWY3KBMKg=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=m2EHXw65ZkO5Fd5HLT8ZH/PNGecfiHBJzVcMA/VAj5VvFi2cUcGOtcJFEMJe5FdQtNccTotkpB/I2rWAW9BdpPRyUt7b3n7lqfdlw6eWfSnoOn85obsP1Ol4I8RGKKNymzPWpou0hNwm7LWJA49wGHeuVH2U5o+PYqB16LPsplA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=khMWwOBV; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLAkiQcq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766750807;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=M5DD5Yxm/LbPWdScs5RvwZ9UchlrLY8ErE/DnLhahn4=;
-	b=fLAkiQcqdsSAsfipGOnE2im5jljE3/bvV9/XWCO/0vmYS0dgYqqRZhkC9oOmTB0Z6bd+CY
-	D1DYrP7fItcXvfmOVcVIr+npEJ+aXaW59wlW8Up5hkfF7jLWfgRRv/tOfhm8DvCaTnKs/d
-	k7j88tOpy5wUgEaWjMDgufMzKoXICWU=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-553-ZcPWBN9xPDuLsr4ZBL2Jbg-1; Fri,
- 26 Dec 2025 07:06:44 -0500
-X-MC-Unique: ZcPWBN9xPDuLsr4ZBL2Jbg-1
-X-Mimecast-MFC-AGG-ID: ZcPWBN9xPDuLsr4ZBL2Jbg_1766750803
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B138E1955F34;
-	Fri, 26 Dec 2025 12:06:42 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9A27530001B9;
-	Fri, 26 Dec 2025 12:06:39 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20251225021035.656639-5-chenxiaosong.chenxiaosong@linux.dev>
-References: <20251225021035.656639-5-chenxiaosong.chenxiaosong@linux.dev> <20251225021035.656639-1-chenxiaosong.chenxiaosong@linux.dev>
-To: chenxiaosong.chenxiaosong@linux.dev
-Cc: dhowells@redhat.com, smfrench@gmail.com, linkinjeon@kernel.org,
-    pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
-    tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
-    linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: Re: [PATCH v6 4/5] smb/client: use bsearch() to find target in smb2_error_map_table
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="khMWwOBV"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4f1b147eaa9so57740811cf.3
+        for <linux-cifs@vger.kernel.org>; Fri, 26 Dec 2025 05:38:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766756285; x=1767361085; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=F+SQqlRXglp7x7SFLFfN3jmEzOPO4uSsy0i01Y94E6A=;
+        b=khMWwOBV1ldsptMTx05l9sp+C1qH/CajwD/r2mBpHNMOA+ZZP8eNiV0kZhyPpYji2H
+         aLS2HmM31nl+i71lf+O5O980QOOp3gumXX6fnmcX0GEa+dwivFuhF13CLL22A7DtjKeY
+         fUDvUU1kwYd7MPe1sjZCEDECZI6LB3+eMdbB+IviPlpmRKXxQnyYS1JqI0hQCo/xhkzr
+         1k9MOQjxe5uJ3GAZzQ/pk0cnYcxmMUVQ7NqyFEPHLSwvQJSJGHpcqEav3kc4ZEPtm4HG
+         W56y+jIz/BF0qNHocHRDRbdOXKUm0xo721FUFnndeCkAWS3ITeWRhRvs4Ja8hLRn+sQg
+         h0Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766756285; x=1767361085;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F+SQqlRXglp7x7SFLFfN3jmEzOPO4uSsy0i01Y94E6A=;
+        b=HUA9mzGEglZJDYnwe002/OEgAi1XcUGMdpfNJjWrDXde+oJV/w2IjqgIisuKEMP/VC
+         fHp5DZsK7cNA2iOtPJ212XBb0mbrnnM/b7/vB8oO+f1hTZIfVvcoFLUjdFGctgW0I1xZ
+         fPI3J3xSNZBHOjCGtDrflSUa705NNXao3X48y1a6wmb6Hd8hTeIyb1DJ5Pqnkbrs/t6C
+         nP2L/Qq59TBg1nAvDfKUd24YjeoTsD1mddUZBHbraEKfk0pzBGuxxdYxa+HXnKR7tA+R
+         ZJVG9cfxHkd2aDo7Mw4gWYVOL13hRCVNG9eySUI1AMiAwmrYWG8tnD6uXCAEMb5Aw1iY
+         aL+w==
+X-Gm-Message-State: AOJu0Yz1GKsLghcXhhrX5pCf5DNJ3jckXzphyFpr0WOn4ZIOwGL0Q2wr
+	du43Y18hHxSM6HH5Jo3p86jrmmM8l3sFi/7uu21oPDoOdqc7aaorFmt+kxOCkkO6gmwFrZaiik9
+	0LU9RYiYn3aatt1ChaTOxWy9HYQbG9cAunFBC
+X-Gm-Gg: AY/fxX6Hiq9HIKTjRMRczZPeIAJUQ6Ik9CYmTuDF1DfF1NoMD9d/msQCHPEl5fCMiIe
+	33d9Nnotl+BBDtvriXeo6muT4CS7CQMdlPTEWzk2cEPoVIhUmyjpk9Dgjo1CzqsZXyByax1yIQj
+	8vxFq0xPd8gSdL3S00ULOdY0EK60TsntXwMNN3iZHbLoea9SlG6z+HhEgso1LIPXWCRw9Qjdue1
+	Hnh5lbONhNRadWhrC4axrB0rRlJyIuU95RvA+FG3CTwZp4raMQJOOigL1h0CKN23J7AHQbjoFVw
+	TAKdanX02Gr+5Xsv8u0V0aNd1JorXeUVSTXtpnExD8hso/zZRnY9jrH+tXG5aYxtXJboGMbV0dP
+	zjqN9/IHfKG9vXpfZCIuGgYjohV1WlMsmcILOHednERQZMvTPnA==
+X-Google-Smtp-Source: AGHT+IHqZp/xZQSdZ4LNjzmzEk+cdUkbPaQnwlveT+L9MoRvI2H2zQNrryaST4+0A3YUMvDysUiJWy5v7qxdJhw14DI=
+X-Received: by 2002:ac8:6f11:0:b0:4f3:530f:d752 with SMTP id
+ d75a77b69052e-4f4abdf0a9fmr334131681cf.81.1766756284901; Fri, 26 Dec 2025
+ 05:38:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1236710.1766750798.1@warthog.procyon.org.uk>
-Date: Fri, 26 Dec 2025 12:06:38 +0000
-Message-ID: <1236711.1766750798@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 26 Dec 2025 07:37:53 -0600
+X-Gm-Features: AQt7F2pV6NtAKyrdLQoI0swPnuN190yO3Q110OBc9nlILISz91z5wyNJRx9jvjE
+Message-ID: <CAH2r5msp+pQr8o77F41w7vdiV369y2e=vfn2MC2P12zR7mLKJQ@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-chenxiaosong.chenxiaosong@linux.dev wrote:
+Please pull the following changes since commit
+9448598b22c50c8a5bb77a9103e2d49f134c9578:
 
-> +static __always_inline int cmp_smb2_status(const void *_a, const void *_b)
-> +{
-> +	const struct status_to_posix_error *a = _a, *b = _b;
-> +
-> +	if (a->smb2_status < b->smb2_status)
-> +		return -1;
-> +	if (a->smb2_status > b->smb2_status)
-> +		return 1;
-> +	return 0;
-> +}
+  Linux 6.19-rc2 (2025-12-21 15:52:04 -0800)
 
-Actually...  It's probably sufficient to do:
+are available in the Git repository at:
 
-	static __always_inline
-	int cmp_smb2_status(const void *_a, const void *_b)
-	{
-		const struct status_to_posix_error *a = _a, *b = _b;
+  git://git.samba.org/ksmbd.git tags/v6.19-rc2-smb3-server-fixes
 
-		return b->smb2_status - a->smb2_status;
-	}
+for you to fetch changes up to 4c7d8eb9a79ae5400eac19c4f6f0815bff674452:
 
-as __inline_bsearch() only cares about the zeroness or sign of the return
-value.  (Note the arguments to the subtraction might need to be flipped).
+  smb/server: fix minimum SMB2 PDU size (2025-12-21 19:20:46 -0600)
 
-It might even better just to cast the smb status you're looking for to the key
-parameter:
+----------------------------------------------------------------
+Four smb3 server fixes:
+- Fix parsing of SMB1 negotiate request by adjusting offsets
+affected by the removal of the RFC1002 length field from the SMB
+header.
+-  Update minimum PDU size macros for both SMB1 and SMB2.
+- Rename smb2_get_msg function to smb_get_msg to better reflect
+its role in handling both SMB1 and SMB2 requests.
+----------------------------------------------------------------
+ChenXiaoSong (2):
+      smb/server: fix minimum SMB1 PDU size
+      smb/server: fix minimum SMB2 PDU size
 
-	__inline_bsearch((const void *)(long)status, ...);
+David Howells (1):
+      ksmbd: Fix to handle removal of rfc1002 header from smb_hdr
 
-and then do this in the comparison function:
+Namjae Jeon (1):
+      ksmbd: rename smb2_get_msg to smb_get_msg
 
-	static __always_inline
-	int cmp_smb2_status(const void *key, const void *_b)
-	{
-		const struct status_to_posix_error *b = _b;
-		int status = (long)key;
+ fs/smb/server/auth.c       |  4 +--
+ fs/smb/server/connection.c | 11 +++---
+ fs/smb/server/oplock.c     |  8 ++---
+ fs/smb/server/server.c     |  2 +-
+ fs/smb/server/smb2pdu.c    | 70 +++++++++++++++++++--------------------
+ fs/smb/server/smb2pdu.h    |  9 -----
+ fs/smb/server/smb_common.c | 26 +++++++--------
+ fs/smb/server/smb_common.h |  9 +++++
+ 8 files changed, 70 insertions(+), 69 deletions(-)
 
-		return b->smb2_status - status;
-	}
+-- 
+Thanks,
 
-as __inline_bsearch() doesn't attempt to dereference key.
-
-David
-
+Steve
