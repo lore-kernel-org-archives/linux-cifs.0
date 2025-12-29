@@ -1,102 +1,120 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6961B6D08
-	for <linux-cifs@vger.kernel.org>; Mon, 29 Dec 2025 16:27:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B73823182D
+	for <linux-cifs@vger.kernel.org>; Mon, 29 Dec 2025 17:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767025665; cv=none; b=bwcO+Je4Lj1RroDWt7f7xNe1FGnkXQ2J6DIc2a5vso4E2izhq+MRJ0jN8ijHuLFFAfS7n+UzD3L6ZC6mOlJtKSKNjXhY0HzcsmKqQ2X4equAyqMe5puVPAwjfzdTx7sLCAO1RmOrCSLl3EVu/xbuinztSd8J9s2/y6pizwslx7k=
+	t=1767030127; cv=none; b=qT7ekjQNgDzun6wHed/v5wGYreEq2bINLWRItclbEbCpF3Nb/x7tfW1GoVDguGU3En96LB9LzBH2jZbrRt5vwdtbFjUHYG9RcVtR+hGo8jLYUH0wEBFNZSMB2acaTonxqSslEl/Wwqs149f7ill1Uf8B5Dm57jex5q9doK3cDtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767025665; c=relaxed/simple;
-	bh=mS9wO3kB7ynn4B/XOoa9EkZsIXNmxElY0kasBdtyzS4=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=ks3JoUa1QUORm3xo+hrebzssv8ZPrt0uvklwionTeIav2Qb+KL8cuXyGaHW8LXKtvLkDLhPSgB7Ok+FRoqQLgwWPddQ9Oq6e1lrMCGbbJ0sljsmUJxcYaR6KHIBBgYa21EnPAud0ZEXSyxMWVJwVthzeI0+MUs9injh5MFiqjHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eQ3NzjO/; arc=none smtp.client-ip=209.85.219.46
+	s=arc-20240116; t=1767030127; c=relaxed/simple;
+	bh=5Pi5NSOcEf2nB9BdFdQypcpflBTRYolgdeeZ3iT8Omk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=MOBCtZ1pQwgeLAvu3aknA35MOj0Mhoxw3G/De46qmrniYhFrNrpvZ84yg4x7tfoGdnT1gszxbkXAiLchH7AECKsfcy7vHtntgjrkFEX+V4Ac6dKZKhgQBnqZHETJQMGf6G15rFFAPAxC3mQSCpOPV7K982CFyFVLrxAiN3Y/CJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EDRB1fLb; arc=none smtp.client-ip=209.85.219.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eQ3NzjO/"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-88888c41a13so117332926d6.3
-        for <linux-cifs@vger.kernel.org>; Mon, 29 Dec 2025 08:27:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDRB1fLb"
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-88fdac49a85so63507776d6.0
+        for <linux-cifs@vger.kernel.org>; Mon, 29 Dec 2025 09:42:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767025662; x=1767630462; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pbWcRbcgn585u91Vth3la1gVUcFLW76M51pOmAMIaR8=;
-        b=eQ3NzjO/+PSP8OUZLMC3hCtcFYstaX7pistAdTQ7rHCqH7oauZbJbhYnd5I35/7Sod
-         7J8Q0xgIiNeHUEBcZwZQt84Z+q/s4UvO3sTS9/mC7cESpsvQ5iWdAmuhkQqb5GYMXFx8
-         W4oSRTIRX4AJjIL+B0vM3XDJ1JM24XjsCLGUdPrjtLuIuuxAN+8BLDMhENRtkxhYdh6m
-         pE+uVKZsb1V5kv2hNAPrJqIfXOXQS1AFZzKky9M+FZCNGNBJZJ3rjmhhL5kSgVBCiThy
-         /pxSXnoLjlX9dTr5QKs9dsTeUfL+gFsw7Ke6Sdg7r6NdGG8mGtklPpSLbaQAuYdCGMR5
-         aJhw==
+        d=gmail.com; s=20230601; t=1767030124; x=1767634924; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xrKl52JlksvEIcIFuiJ7Ow4OKF8FM9/WcP4vXfmxSJ0=;
+        b=EDRB1fLb1xmfYXjlIvTbeHMdaPtmBo5nzQMNUFhth9cNC62GgKeo4JR0KhNN2Xy71P
+         zAsdjvmTsxiOJTwxXAeUL+I9xchlbo/3VTTJ6iEMlPzs07EXbUNY86dLFpuSYsWordEv
+         BsUxGI4RYukstJ/JBQxaAYOTfYN9trQxaVM9ZsyZTPdm8RLGEJIZpZ4xQoxTUUJHR0JG
+         01TvJn78DubGG5tM2obtK6N9M2XO/pIZ4LF2bUfDYUn1vPV23UiCgjPQ/bcmRN9adb2b
+         78Pjxzpg3QZjU/OBAsYsJle3uNbyehcNpOa9I7fEfflgGMJAHGclhRNJczdgptyUvnKI
+         nh1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767025662; x=1767630462;
-        h=to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pbWcRbcgn585u91Vth3la1gVUcFLW76M51pOmAMIaR8=;
-        b=epC015u06feSnF36iE65bIaExrqQnEd5mHqitB5L3fmWgtLbQCjRK2uxUjSX69Wt+1
-         JZ0E/ToZ/e3gOo79G36uwck0wpbYGUN+b+/8KOTDsjRtGXe7h8tgGS7cfautOVbsrFLr
-         tBXCQ30xmwJXgGP6eSxtZPB8m/2DWv6Yg3EVT190S9caaAHPaLUBU7GHpzJCsl5tFPV1
-         qognSW3Kqq2P2yxCjOxNs+79vrI5konp6PBK0eeteSZ6tW0tRYNh49o3D1xGXbNrWX0k
-         IyGSKok0er9HhkyQjKODrotXMihPV2QStY7D9PRiAcL2IV0/ofxOK/WmUIz7VJ0231/u
-         72Lw==
-X-Gm-Message-State: AOJu0YzdNKRhdxY/P0QP2J2SvshEe5B3JE1NSYy2xKejbei9AV0ynl0l
-	BbESEl5VVGfWbLDzE+GcfSS5807+eQjFbTdNP91aM3qb/vaieYN86Iftbb7ie3kDciX+1knln1J
-	bdjdyBzp8kkLVxSUKvBmvGTdrYkG78JECRwpa
-X-Gm-Gg: AY/fxX6J3ns3t8PVyjI2ygLL34+402mZtht0vtkIXd3+UyaWdxLomQZYRQYlABxJeR1
-	z67tN7S5delRvY5BkwLH/CsBhR7wCzXBIUleZbOHySi6GgP+dd5j5HLWUm0qTevu6SiefCVBgvC
-	2SyUb/0mZ51/9Zu/Y21BO8AGx/wRTXbf/c42/DzPY5oWWwC6ApdrAvpOKDY9owbvq5CbkwhZ03S
-	WgHENykZMzv5spfQLYrG7qN58cxpZmJeaaJ8rSjEvRT7rIsDNoNq0URBDGbAtKiLoOPYa09Gj1O
-	EzLmEYsfiM3Ebax/z3nzqsaZpt5rm2cs4vs6cWV3qUBPEcPqs0t83kfyjdvB1AGW9kmi81US2QB
-	nJufllFE/l0yWk6n5U6pZW1AYIBfUxlUTCXAoViOvoCFrUZFqUOY=
-X-Google-Smtp-Source: AGHT+IG0VP2oic8c7v2T8hxQckIGALsgbbyvvjOtAChGdBHE6G6zlHdJiDvuCw9NHXoXxhGkT1+FNLRVqzSkAXONQpQ=
-X-Received: by 2002:a05:6214:14e7:b0:880:23fb:9e63 with SMTP id
- 6a1803df08f44-88d83a7888dmr338651896d6.56.1767025662512; Mon, 29 Dec 2025
- 08:27:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767030124; x=1767634924;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xrKl52JlksvEIcIFuiJ7Ow4OKF8FM9/WcP4vXfmxSJ0=;
+        b=e1od3AbylZIHA0iuN27mbKRXhmsLRBWolWkFi/mC2NnXJmC5HuTvbvZWRsmiATAeR/
+         sDZM9SlhG8KpCITtLVKdY3Btapa5VL3C8HkQEFW20bil8VZfa2dRi0O9cDgPpSGw3RHq
+         KlzHamcUatLjM2GsPvUkMRZp6jXWgrR76WIzStG0dNSFhQnnL//l/7ATZLFjZmhB7nIm
+         vMSZ7uIaqSvvie5OPo4uUWZnN/M9uqoeM9Mx5vdAmHbn9VSrLFeVXEadGVbAVVVmWmoP
+         8tNuJ7Bf+qHB7VQbAUlavFZOPTbOcH/XWBWpLH6tTH/4jAoFGZCbCn7OofnX4oEQAQhF
+         861Q==
+X-Gm-Message-State: AOJu0Yy4gTPPzMyuWK8b0LZPegzW3wc5uO/Gy0ysXrlKrNel0OXCsdRC
+	vHAlhQ7CEkx7cSPwY3MW8sMngZsEMZDqoYFaRILyH5d17YMRPGb2HSNmEYS8f0SfQdq7qnu8yF1
+	T8ZyWSf65uy9NDMx6npPnLhQS4t4K9A8Jrw==
+X-Gm-Gg: AY/fxX5BmKrDWTa9CryZCrr5Pz7s162OBgeST+OybO+2A/J/SbqRSXyo4/7+zuiW7tf
+	PF63sasgh9YJDuH2TCIyLLf52Q16OK3lWB4Q9lK0Md2msX6Nhvr/XoTDASWgmvKtYOWb87B7Xi3
+	RVCHvYoZICBmFcgDsKHM5yLsspSHf0XfgZn9l6I4RY3LQvD5SLlsCgIAsRwP8yXYBP2brbUm2AE
+	T5XbXIHpmezZod4iBSt8ld6Fkm+yEr9tXTLXFj4jAGK5mU0g7fgidQH9eQY60rLTBtQlRojJHNC
+	UgTz97Qly6MjXy6uIdIZWcx4it1LKcgWPPVKzy1gi3F0c+OGX2lkPNANnd3M53OI02afi7NeDKJ
+	NtUyziuhMmJG742c21pSNkTKdSqQP5GyNAlxzKGwLB1DLSfvW9svuvWSbD/kcCuYD
+X-Google-Smtp-Source: AGHT+IGDXyN/pdArpROL5V2KWZWp5yffqQpPGp7Ycvn2c8u7b6ZNBrrJvdpu7/JCJoAUpmfVRkgyEdKRZijxD/tgJTE=
+X-Received: by 2002:a05:6214:b28:b0:88a:2360:7f15 with SMTP id
+ 6a1803df08f44-88d851fdae6mr322970976d6.12.1767030123576; Mon, 29 Dec 2025
+ 09:42:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <CAH2r5mvKO3oSX+PtgLfYjRGd70HpGWdeh_Q+FX8b6qALY7s2zw@mail.gmail.com>
+In-Reply-To: <CAH2r5mvKO3oSX+PtgLfYjRGd70HpGWdeh_Q+FX8b6qALY7s2zw@mail.gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Mon, 29 Dec 2025 10:27:30 -0600
-X-Gm-Features: AQt7F2rQduVLVC6PjOKt-2hM5EzQfXwPrNKm0K4_iY0HyGkoMdpUhiFPRg1c1V0
-Message-ID: <CAH2r5mvKO3oSX+PtgLfYjRGd70HpGWdeh_Q+FX8b6qALY7s2zw@mail.gmail.com>
-Subject: [PATCH v2] smb3 client: add missing tracepoint for unsupported ioctls
+Date: Mon, 29 Dec 2025 11:41:51 -0600
+X-Gm-Features: AQt7F2rh7RsRfbnbOzDbQxBqTp26tXhYB0ghlEgnvYvStdkU-Y6cdipPgTMHJVo
+Message-ID: <CAH2r5msC4AkhcH+pZAU3kyAVLgbuSO-Bnf3RoXDt61sTb6p6Ag@mail.gmail.com>
+Subject: Re: [PATCH v2] smb3 client: add missing tracepoint for unsupported ioctls
 To: CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000ec7526064719b803"
+Content-Type: multipart/mixed; boundary="000000000000d333cf06471ac2e6"
 
---000000000000ec7526064719b803
+--000000000000d333cf06471ac2e6
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In v2 added missing null check
-
-In debugging a recent problem with an xfstest, noticed that we weren't
-tracing cases where the ioctl was not supported.  Add dynamic tracepoint:
-    "trace-cmd record -e smb3_unsupported_ioctl"
-and then after running an app which calls unsupported ioctl,
-"trace-cmd show"would display e.g.
-      xfs_io-7289    [012] .....  1205.137765: smb3_unsupported_ioctl:
-xid=19 fid=0x4535bb84 ioctl cmd=0x801c581f
-
-See attached
+v3 attached.  Minor change to remove a few lines of code from v2.
 
 
--- 
+On Mon, Dec 29, 2025 at 10:27=E2=80=AFAM Steve French <smfrench@gmail.com> =
+wrote:
+>
+> In v2 added missing null check
+>
+> In debugging a recent problem with an xfstest, noticed that we weren't
+> tracing cases where the ioctl was not supported.  Add dynamic tracepoint:
+>     "trace-cmd record -e smb3_unsupported_ioctl"
+> and then after running an app which calls unsupported ioctl,
+> "trace-cmd show"would display e.g.
+>       xfs_io-7289    [012] .....  1205.137765: smb3_unsupported_ioctl:
+> xid=3D19 fid=3D0x4535bb84 ioctl cmd=3D0x801c581f
+>
+> See attached
+>
+>
+> --
+> Thanks,
+>
+> Steve
+
+
+
+--=20
 Thanks,
 
 Steve
 
---000000000000ec7526064719b803
+--000000000000d333cf06471ac2e6
 Content-Type: text/x-patch; charset="US-ASCII"; 
 	name="0001-smb3-client-add-missing-tracepoint-for-unsupported-i.patch"
 Content-Disposition: attachment; 
 	filename="0001-smb3-client-add-missing-tracepoint-for-unsupported-i.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_mjrdfb860>
-X-Attachment-Id: f_mjrdfb860
+Content-ID: <f_mjrg3kvx0>
+X-Attachment-Id: f_mjrg3kvx0
 
-RnJvbSA5NmFjNGMxYWNlNGJlM2ZmZThlNDM0NWI4YTUwNDY2YTY1YTc2MDg3IE1vbiBTZXAgMTcg
+RnJvbSAzYWI3ZTdkNjUxNjJmMGMxNTNkZmU0MTgzOWEwNWFmYzJhZmU0NjAwIE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
 CkRhdGU6IE1vbiwgMjkgRGVjIDIwMjUgMTA6MjM6MTIgLTA2MDAKU3ViamVjdDogW1BBVENIXSBz
 bWIzIGNsaWVudDogYWRkIG1pc3NpbmcgdHJhY2Vwb2ludCBmb3IgdW5zdXBwb3J0ZWQgaW9jdGxz
@@ -108,23 +126,21 @@ aWNoIGNhbGxzIHVuc3VwcG9ydGVkIGlvY3RsLAoidHJhY2UtY21kIHNob3cid291bGQgZGlzcGxh
 eSBlLmcuCiAgICAgIHhmc19pby03Mjg5ICAgIFswMTJdIC4uLi4uICAxMjA1LjEzNzc2NTogc21i
 M191bnN1cHBvcnRlZF9pb2N0bDogeGlkPTE5IGZpZD0weDQ1MzViYjg0IGlvY3RsIGNtZD0weDgw
 MWM1ODFmCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5j
-b20+Ci0tLQogZnMvc21iL2NsaWVudC9pb2N0bC5jIHwgNSArKysrKwogZnMvc21iL2NsaWVudC90
-cmFjZS5oIHwgMSArCiAyIGZpbGVzIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdp
-dCBhL2ZzL3NtYi9jbGllbnQvaW9jdGwuYyBiL2ZzL3NtYi9jbGllbnQvaW9jdGwuYwppbmRleCAw
-YTk5MzVjZTA1YTUuLjg1OWQ5OTJmMGY3MCAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9pb2N0
-bC5jCisrKyBiL2ZzL3NtYi9jbGllbnQvaW9jdGwuYwpAQCAtNTg4LDYgKzU4OCwxMSBAQCBsb25n
-IGNpZnNfaW9jdGwoc3RydWN0IGZpbGUgKmZpbGVwLCB1bnNpZ25lZCBpbnQgY29tbWFuZCwgdW5z
-aWduZWQgbG9uZyBhcmcpCiAJCQlicmVhazsKIAkJZGVmYXVsdDoKIAkJCWNpZnNfZGJnKEZZSSwg
-InVuc3VwcG9ydGVkIGlvY3RsXG4iKTsKKwkJCWlmIChwU01CRmlsZSA9PSBOVUxMKQorCQkJCXRy
-YWNlX3NtYjNfdW5zdXBwb3J0ZWRfaW9jdGwoeGlkLCAwLCBjb21tYW5kKTsKKwkJCWVsc2UKKwkJ
-CQl0cmFjZV9zbWIzX3Vuc3VwcG9ydGVkX2lvY3RsKHhpZCwKKwkJCQkJcFNNQkZpbGUtPmZpZC5w
-ZXJzaXN0ZW50X2ZpZCwgY29tbWFuZCk7CiAJCQlicmVhazsKIAl9CiBjaWZzX2lvY19leGl0Ogpk
-aWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC90cmFjZS5oIGIvZnMvc21iL2NsaWVudC90cmFjZS5o
-CmluZGV4IGIwZmJjMmRmNjQyZS4uYTU4NGE3NzQzMTEzIDEwMDY0NAotLS0gYS9mcy9zbWIvY2xp
-ZW50L3RyYWNlLmgKKysrIGIvZnMvc21iL2NsaWVudC90cmFjZS5oCkBAIC0xNTc5LDYgKzE1Nzks
-NyBAQCBERUZJTkVfRVZFTlQoc21iM19pb2N0bF9jbGFzcywgc21iM18jI25hbWUsICBcCiAJVFBf
-QVJHUyh4aWQsIGZpZCwgY29tbWFuZCkpCiAKIERFRklORV9TTUIzX0lPQ1RMX0VWRU5UKGlvY3Rs
-KTsKK0RFRklORV9TTUIzX0lPQ1RMX0VWRU5UKHVuc3VwcG9ydGVkX2lvY3RsKTsKIAogREVDTEFS
-RV9FVkVOVF9DTEFTUyhzbWIzX3NodXRkb3duX2NsYXNzLAogCVRQX1BST1RPKF9fdTMyIGZsYWdz
-LAotLSAKMi41MS4wCgo=
---000000000000ec7526064719b803--
+b20+Ci0tLQogZnMvc21iL2NsaWVudC9pb2N0bC5jIHwgMyArKysKIGZzL3NtYi9jbGllbnQvdHJh
+Y2UuaCB8IDEgKwogMiBmaWxlcyBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQg
+YS9mcy9zbWIvY2xpZW50L2lvY3RsLmMgYi9mcy9zbWIvY2xpZW50L2lvY3RsLmMKaW5kZXggMGE5
+OTM1Y2UwNWE1Li5hODIwYmU1NDdkZDIgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvaW9jdGwu
+YworKysgYi9mcy9zbWIvY2xpZW50L2lvY3RsLmMKQEAgLTU4OCw2ICs1ODgsOSBAQCBsb25nIGNp
+ZnNfaW9jdGwoc3RydWN0IGZpbGUgKmZpbGVwLCB1bnNpZ25lZCBpbnQgY29tbWFuZCwgdW5zaWdu
+ZWQgbG9uZyBhcmcpCiAJCQlicmVhazsKIAkJZGVmYXVsdDoKIAkJCWNpZnNfZGJnKEZZSSwgInVu
+c3VwcG9ydGVkIGlvY3RsXG4iKTsKKwkJCXRyYWNlX3NtYjNfdW5zdXBwb3J0ZWRfaW9jdGwoeGlk
+LAorCQkJCXBTTUJmaWxlID8gcFNNQkZpbGUtPmZpZC5wZXJzaXN0ZW50X2ZpZCA6IDAsCisJCQkJ
+Y29tbWFuZCk7CiAJCQlicmVhazsKIAl9CiBjaWZzX2lvY19leGl0OgpkaWZmIC0tZ2l0IGEvZnMv
+c21iL2NsaWVudC90cmFjZS5oIGIvZnMvc21iL2NsaWVudC90cmFjZS5oCmluZGV4IGIwZmJjMmRm
+NjQyZS4uYTU4NGE3NzQzMTEzIDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L3RyYWNlLmgKKysr
+IGIvZnMvc21iL2NsaWVudC90cmFjZS5oCkBAIC0xNTc5LDYgKzE1NzksNyBAQCBERUZJTkVfRVZF
+TlQoc21iM19pb2N0bF9jbGFzcywgc21iM18jI25hbWUsICBcCiAJVFBfQVJHUyh4aWQsIGZpZCwg
+Y29tbWFuZCkpCiAKIERFRklORV9TTUIzX0lPQ1RMX0VWRU5UKGlvY3RsKTsKK0RFRklORV9TTUIz
+X0lPQ1RMX0VWRU5UKHVuc3VwcG9ydGVkX2lvY3RsKTsKIAogREVDTEFSRV9FVkVOVF9DTEFTUyhz
+bWIzX3NodXRkb3duX2NsYXNzLAogCVRQX1BST1RPKF9fdTMyIGZsYWdzLAotLSAKMi41MS4wCgo=
+--000000000000d333cf06471ac2e6--
