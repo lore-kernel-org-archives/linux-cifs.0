@@ -1,72 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706832A1BF
-	for <linux-cifs@vger.kernel.org>; Mon, 29 Dec 2025 02:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9754B3A1E66
+	for <linux-cifs@vger.kernel.org>; Mon, 29 Dec 2025 03:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766977116; cv=none; b=bwdrb5hAiFcm00whA+9NfUamVCKiB0XjwIJyTmESoZJzzg4z9lUNzPjQZTWy0hulwo+dRhxgWNDpLLgHOnj3bxIxlubBIqS+MAtkyACGbsfDOHMSg2xOOTpwCWC+iDE9A5+JUkvavzJ2I4Uhads20ChP4Q9bCS84NTncLWiiBhQ=
+	t=1766978201; cv=none; b=MpYhcQklyhOm6FWnUWk2sOC9FCyBURRUE7/rvDWtETrL63MPZdzb5t1bqd6hnWAWf1fV9+5usXDUIjuEuvz1J1fttpaCjMiKON8n/JLqA9aKR1dSTGBs2nLIiGeK74cXt//T3+HOTdDDXAVMLZ/lfhGfcAf2t9B6Xmmz5rR705s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766977116; c=relaxed/simple;
-	bh=Ri0wpBdIuUZ/4R5PVmvD9pEDUB8kReSZJRe5qvO9RLI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LwlFgjek5AaFJANtq/l3rfeaD3Jgni33PlBLSJCZxmKSaNAecdDigZdgsxv1QQ5XdJR5vqbcCv8CTSPpDRvVZEpvx+lu+HdWQhExA59kbsvdghQW14rNt/19cxfvjtvlFAXQMArp176kFv+fUWMXzn28vUcCPR/f1DjQEHSqWkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hF65Y4+5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1766978201; c=relaxed/simple;
+	bh=XZG1rMvy/pifYMA702duD6sJvIxfomlwPrngvSoa4r8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nGUnJSTCJnRWoIr/XyePebxz9CjFV8IE5nPmUrzkHxnMWZ5FZjuEJ6pfVzEAPrUnxZ6p/dqndxzAONYRirsHQrB8uml72VTO3gkt4TT6GHR9Z37XFcAA5TRTlilrkFyu0ni9KF22OgTzW588FNfjUnuYAPJJfkxXGObSeJijG1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e5A1FEwD; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hF65Y4+5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A8F3C4AF10
-	for <linux-cifs@vger.kernel.org>; Mon, 29 Dec 2025 02:58:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766977116;
-	bh=Ri0wpBdIuUZ/4R5PVmvD9pEDUB8kReSZJRe5qvO9RLI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=hF65Y4+5sMUUmfTYv+lYMPmQA9RjoSEYCF61vRW74y6heAN+gDqLTcW96eYhy1o3v
-	 ZNkORJmafzGGClBI/UUywWBUyKhXKQduOi2OZK/rvzaI/XwvQOP0VX1vRe1LiYoG3X
-	 3PzL66x4TNTJFNgwFKX7/wuD+TVN2OOlKIdcoyuyQgA8PA/QrijSALR+tf7/zNhRlz
-	 T6s9sRSr4wy0uvCkwVYt5M8Y0SmG68a/w+mCXz/b75FFq/7LNvJZF8EueEcCQ3h4Tu
-	 J0mh0KYdMLrz5atlrdbr59vJdFl5k9CZv62TUqHU1wkoEvmE1nsxCQaHGNgbZmBAco
-	 zqNHYdWWVKe4Q==
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b7ffbf4284dso1133865466b.3
-        for <linux-cifs@vger.kernel.org>; Sun, 28 Dec 2025 18:58:35 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXfxCU2tArHSS27dBC8Kjn6zNiL2SWyb3L6cW6XUjCwrdMtfRxlcR320LjNmSom01CNZ5ODUK0QrKqO@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBZx+7ZrFpzrQSEbBTggNJoTn4Ei0w0xneiKWGOOWRoimzWMPp
-	Xkw86VMIv5YVJcJ45MraRbYI+Q1H/tlZuKw7ivsPN1C3zPkuz+NbnQkbo155b/ciL4Tw7+cNGKv
-	pUGtYemGuA8qUET92JKuFrzTO0rhz//I=
-X-Google-Smtp-Source: AGHT+IG6jppezIoOQ8FdNRZIB6E6J4N879smmTSgSrXt53MaZPWpEQqNVQJ6bsug0LVNNVgOr1yCBX4J8IpNNHxJAzk=
-X-Received: by 2002:a17:907:d8c:b0:b72:6143:60c2 with SMTP id
- a640c23a62f3a-b803722fd2dmr3100261766b.51.1766977114610; Sun, 28 Dec 2025
- 18:58:34 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e5A1FEwD"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766978195;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=E0Ha8VPEWvNkXPtn0OvfIzT40DiwRwwsRk5YGRneN18=;
+	b=e5A1FEwD/HUSzT4bgdEelss5ZaWc8U5DMvzvPGu9PzMpwgWOMoctQJr42wE3qRGTTvPWHh
+	MSankjWMWrfgC5PCgfn0C1m+pE9FA2qMY3snDqmg9/fMgVf1pQkgApi+JDVNnd8S2iJtuZ
+	lIOSaGVqp0tD+piu6PRpJiDoeqDtX0U=
+From: chenxiaosong.chenxiaosong@linux.dev
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH v2 0/1] smb/server: fix some refcount leaks
+Date: Mon, 29 Dec 2025 11:15:17 +0800
+Message-ID: <20251229031518.1027240-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251228145101.1010774-1-chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251228145101.1010774-1-chenxiaosong.chenxiaosong@linux.dev>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 29 Dec 2025 11:58:22 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9Su4zWzAsh1DOyrYHwz+XKzOUpqsrMWCGKdEUorLgYyA@mail.gmail.com>
-X-Gm-Features: AQt7F2olrhjna1mkIizsXpsfflG1OsmzfN0e9nhTnKXpmg3YEUIL6HCql5YEKe4
-Message-ID: <CAKYAXd9Su4zWzAsh1DOyrYHwz+XKzOUpqsrMWCGKdEUorLgYyA@mail.gmail.com>
-Subject: Re: [PATCH] smb/server: call ksmbd_session_rpc_close() on error path
- in create_smb2_pipe()
-To: chenxiaosong.chenxiaosong@linux.dev
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, linux-cifs@vger.kernel.org, 
-	ZhangGuoDong <zhangguodong@kylinos.cn>, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sun, Dec 28, 2025 at 11:52=E2=80=AFPM <chenxiaosong.chenxiaosong@linux.d=
-ev> wrote:
->
-> From: ZhangGuoDong <zhangguodong@kylinos.cn>
->
-> When ksmbd_iov_pin_rsp() fails, we should call ksmbd_session_rpc_close().
->
-> Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+
+v1: https://lore.kernel.org/linux-cifs/20251229021330.1026506-1-chenxiaosong.chenxiaosong@linux.dev/
+v1->v2:
+  - Call ksmbd_put_durable_fd() immediately after ksmbd_vfs_getattr() has completed.
+
+The following patches from v1 have already been merged into ksmbd.git ksmbd-for-next-next:
+ - 0d762babd1db smb/server: fix refcount leak in parse_durable_handle_context()
+
+My dear team member, ZhangGuoDong, has caught some refcount leak issues.
+
+Other patches pending review (including those from others) can be found at the following link:
+https://chenxiaosong.com/en/smb-patch.html
+
+ZhangGuoDong (1):
+  smb/server: fix refcount leak in smb2_open()
+
+ fs/smb/server/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+-- 
+2.43.0
+
