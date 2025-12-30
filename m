@@ -1,92 +1,70 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780781A262D
-	for <linux-cifs@vger.kernel.org>; Mon, 29 Dec 2025 18:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CE9EAE7
+	for <linux-cifs@vger.kernel.org>; Tue, 30 Dec 2025 03:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767033011; cv=none; b=leKcIy3/poVXM2nnCs7fwAhNfeYcEm0rk1IWsAo/189gqECb21tzi+aD1ppUbmk+TOt3HCZDoTAk3r+QoEnAT9dvMJxUhDPg2v9SM1Mzk36iROAWyZzloRy4sFpslfbh1Tu6rS4gqAEgbC+p+BIZUWOYFSu7zM9z/K3gXjAfTIw=
+	t=1767067020; cv=none; b=Tv86iXZnGLkY7BWUGOhUPWYtuVDcFhZhWTMekK2k9j7dLtAUiFsweGhw2KhIHvmbyEOIQ2CK/tBxkR5pDFf8Ea7M8bKpwA/r68oXQn1Rqdom5O3dvxaSl6AGBgZsL3B0crbO47SsdRU1qnKWT8m7hXLaxS9U4l8x5sMJXVXk/p0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767033011; c=relaxed/simple;
-	bh=NsADr57Sfr73PBFRiUmCAx9OAAedIrL+O73wPmmfj2w=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=fBvWqFJYSG57PZCXz+5ovgeR2MtyraJHwekqTkgO0dS2m+ZDM4y4GTZnMdLtbO7W9o+UvAY0KqUkmyNpKz+rDP3CvdYiUNkZAWNtnJPspO6OJ5KKLXcfhU1tXFXBqAY/hFLmd3DWhLCTuwMqsExb1WLKML7jhvKSOf4UIsqgQe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UtVQ6Ci2; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767067020; c=relaxed/simple;
+	bh=yDd7TFbw7N1UdDjRVRO/x409L1FR6tQUoNfvF+mnpg8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DNv0qKko5uVJm0TfawwKda+tRwLS0oX7rqV2yAIBzJd5jNsP7QjByHFypOhtmcSU5/utcqQh4NVbmdZjW/mFQcKnYb4xJEyFLNK1e5titYVXyt0jEo+ZfVqNWW4tUb5nAENGtiYct3ZK/U+egkJiVbt49Bav77qH+B5rpmGUfU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PxQewRjP; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UtVQ6Ci2"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-88888d80590so137489586d6.3
-        for <linux-cifs@vger.kernel.org>; Mon, 29 Dec 2025 10:30:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767033009; x=1767637809; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=J5A8IchAU7xjROn47L3+QhV6exIzgEFrHYKUKsvij6c=;
-        b=UtVQ6Ci27aTPDG4+nFhhsEDR2GMTCten5G4+Nywl2UNxv1YHxDQOmIEhHHxK5oMvCo
-         hIiFRPAcn7XYB1AcyoHvX/Zr937SW0Cv+A9FxE5nsLS0BpUjyhZZ6y9LeLAVkl33J5D3
-         xmBfDcpnaz0m7SzABYFa6vphGr2HUoBSm55nQYzfQEsS2Oy8/Rc8OSA42ZOanUT27Em5
-         g51CuiRmVH8XM6cPus7IbLkmC1P2qdIwxEC+jD3Eni0IavnAwbtk2wDtI59DLYymH6xr
-         lhR8Nmt0DrzJITqag87zWDsdv7CQgXYj3Lr+1XrCGkne/MlQ2YCnJaY8YTANtdZg8T7z
-         3jxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767033009; x=1767637809;
-        h=to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J5A8IchAU7xjROn47L3+QhV6exIzgEFrHYKUKsvij6c=;
-        b=oSZ4QvS7bjoPTeC0zQdYh88Sw3nru26aN48lrjougImXNbuD3At15GgGN5z18MS2vj
-         +Vebl1ltDAX2blNI1LmsY/RpQ6gOwCdSutGzKV/P6GJV3FOqSic1yFex5YVSwZC62fYf
-         /lYm+kxgUay+rA3T3G6+AWW/tO+bbYRKhYLU405rytHbIYX7ejsA3SggX9PKQji1546J
-         hi9MQk3cRTZdoHOkYDFpDMLIm5MsBqiMFPK8DO4mx0c2jKwHIKjoMaOIU6F+ogxQMfRb
-         WSF5Oaeuwv5GLeSSZOT/Jds2ccpKoi7xBlsymzu5UwBFaSFcGSHSwcT3SB6WlYaPQyEP
-         2dgw==
-X-Gm-Message-State: AOJu0YzkmRCLU6zQ4FmSae6E7cmebmuh2gPbnghmb6cLs+PY5qStKHxu
-	IhKZzJUsvaEVrOI52RdGCeU5KtN4cLJ73ABbaGpRDyvmt3H6PEyXUSzPoGeMv3+nEhP4adaGRQ1
-	P0alGFg+2gPbYhJIEBYWXQp/KosXulV4LACmA
-X-Gm-Gg: AY/fxX4roQ0fbk6cxtkyCB3sfTSBcjwHc9y7f52Q+vV6ACuHdqGROeM+xTaB8jqByji
-	odyScDpNQySD7w+Bt+JljwxQpagFCog0FJgpM3G1wpJ+S0EXxgWrGpX+a1fbcT+/bHBYWc1zJMa
-	2jrrEf7b8Kcn351GJEIKNkVg1OUBZdWcMAkLPsZmD/rToHZ7OKicWHqpQTi2u25yy0Ag/NciRpC
-	fIxPplYIuPyjLstg/k/GbH521hzIOCcerRE097Nw+SQOZUOtCCSsxjPo7toDlTfODI3fMDCMi+8
-	n6AvkTjK1q7Xcxepx0P+vnRMJmwBstLZ61cmDyhbOYXtuq+l7XYJINZ1E8BOezx/fiRnduQlJss
-	aYlUnfmKIb8HXy+0tZ4fonEZvLHsG8LbY80qVA94ycbmmgaDHs1k9MrH6vlFNwAyNF5CPnqcLal
-	3mB7N9REE3
-X-Google-Smtp-Source: AGHT+IELYBtQ1P6/II7jvKVJvIP/tpdu1cvDnECHGPR3tyueFFAOomyT2A+RFg58lpQaLgFdF5zGgafGfHj8Y8L0NX8=
-X-Received: by 2002:ad4:4091:0:b0:880:4c02:c4d with SMTP id
- 6a1803df08f44-88d881ba374mr362179546d6.66.1767033008897; Mon, 29 Dec 2025
- 10:30:08 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PxQewRjP"
+Message-ID: <c7d613d6-4424-495f-baf3-cf30ea70dc00@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767067015;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A9iqidlUIBs9U2uR5dsNYRKr3Bgf41aEJQzY8B92Ylc=;
+	b=PxQewRjPx5kNjRXFx5Z85qyAAyZ8v4F+piM27xjG9OdyDQRR3qfvTXt6UCyz4Fu3MgF5ez
+	h4ScT38u3kHhDull6MstXwA478dZf0vRuyKN2maRSXR7gKeL97mfQThWYj0OVBc0IHRli0
+	nvwMCOdfePx8wbpA+vvxEPKU+7QyAHA=
+Date: Tue, 30 Dec 2025 11:55:59 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 29 Dec 2025 12:29:57 -0600
-X-Gm-Features: AQt7F2qRgmpV7RsrIUSLPphR2bx7uMJ45fsX_qmNCWVJu9G6eUq2RXhTjuofppw
-Message-ID: <CAH2r5msjKJHoc_fmhbDHEyvgqAGYdORWKTtDdimzBNaTbAAZQg@mail.gmail.com>
-Subject: unsupported ioctls called by various xfstests
-To: CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v6 2/5] cifs: Autogenerate SMB2 error mapping table
+To: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org, Steve French <stfrench@microsoft.com>,
+ smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
+ ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+ bharathsm@microsoft.com, senozhatsky@chromium.org
+References: <20251225021035.656639-1-chenxiaosong.chenxiaosong@linux.dev>
+ <20251225021035.656639-3-chenxiaosong.chenxiaosong@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <20251225021035.656639-3-chenxiaosong.chenxiaosong@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-These are the six unsupported ioctls I spot when running xfstests on
-SMB3.1.1 mounts to Samba. Will be interesting to check which ones we
-can implement
+Hi David,
 
-#           TASK-PID     CPU#  |||||  TIMESTAMP  FUNCTION
-        fsstress-20591   [008] .....  3456.488138:
-smb3_unsupported_ioctl: xid=182517 fid=0x402198ef ioctl cmd=0x40285881
-        fsstress-20591   [012] .....  3456.414404:
-smb3_unsupported_ioctl: xid=181925 fid=0x2443a23 ioctl cmd=0x800c581e
-          xfs_io-20572   [014] .....  3456.376141:
-smb3_unsupported_ioctl: xid=181905 fid=0x0 ioctl cmd=0x801c581f
-        fsstress-20590   [013] .....  3456.412290:
-smb3_unsupported_ioctl: xid=181915 fid=0x7b5c4fb1 ioctl cmd=0x8100587e
-        fsstress-20591   [012] .....  3456.413995:
-smb3_unsupported_ioctl: xid=181922 fid=0x0 ioctl cmd=0xc0205865
-        fsstress-20591   [012] .....  3456.413977:
-smb3_unsupported_ioctl: xid=181921 fid=0x0 ioctl cmd=0xc0205866
+I would like to make two minor changes to this patch of yours in the 
+next version:
 
+   1. Update comment: sorted by NT status code (cpu-endian, ascending)
+   2. Update coding style: use tabs instead of spaces
 
--- 
+Do you agree?
+
 Thanks,
+ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Steve
+On 12/25/25 10:10, chenxiaosong.chenxiaosong@linux.dev wrote:
+> From: David Howells <dhowells@redhat.com>
+> 
+> +# Generate an SMB2 status -> error mapping table, sorted by NT status code.
+
