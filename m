@@ -1,23 +1,23 @@
 Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6211A38F9
-	for <linux-cifs@vger.kernel.org>; Tue, 30 Dec 2025 16:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2189C190664
+	for <linux-cifs@vger.kernel.org>; Tue, 30 Dec 2025 16:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767113337; cv=none; b=caUR/bfu7GDtgrVflq27usMwQZ0s1SpMSQNxtHPjxqptZ+kP7+rpzC1xaY0YQ21VdSs5A84+cP8O7BD0q/ZQm7o7J8Y6YGCVE+o1WE+q5XjY67Rnq0pY4d8ioJsP5JCpH7bw35wjGc4mkMLg56s2WgK4koZZ6qQdAGl1SWko7hs=
+	t=1767113479; cv=none; b=E+nXO/Ln7zd8PMjNmmVPoGyT3mDFkTQMNTUEgUfrTzPSLNITIkX1AGeiblexBwOYh5K26CAmwcV5nDBcla7oye3BhMhi+Tl0N0tkNWQPTHpZX73Gj8XY5u+Er+W6TJM0cEe7jc+sYTiVS4A2LCfm37l7cjn32/Hy5eYwiR2wNoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767113337; c=relaxed/simple;
-	bh=Eb/ydp10nAC4Z9OugI1M0Rof5+Bt06PSsoXl9leeQwc=;
+	s=arc-20240116; t=1767113479; c=relaxed/simple;
+	bh=VrujULnHWXB8R4x1rYWvyuacDJ45wVEK8pzefc1R1KQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OhbVSa2jcsOqKebLRUJ6Wxn4gNem8Y/jWnc/649cjqPp7u/OSszq+Kh6r4ZLH6XHpqs77FF56kHt1JXiBz3oD+stMHCwIfTqYui0z3oe9anrxcOiBY9A9eUcxlQz/sPrrSmjimY4CAVhiS9OnEV0RXm+VhRCZIxyWB46+RiPVVc=
+	 MIME-Version; b=RWAUJ3taN0pbj8HZbjOdL5QkInFb7GeQ7vL66YJFH0BHYu70dUEtfm9QFyxBOgSwaONopAXi7ezEq2BBGIN86PPMy1nUdeB8l59XQ/HypeP+v7CZg4Sd2cEV0WoI7r/CphiVED3mhgnVcUSfRzuRQvSyTshCy65lUYaE63ooUSM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=193.43.8.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
 Received: from lenovo-93812.smb.basealt.ru (unknown [193.43.11.202])
 	(Authenticated sender: alekseevamo)
-	by air.basealt.ru (Postfix) with ESMTPSA id A77B323377;
-	Tue, 30 Dec 2025 19:48:49 +0300 (MSK)
+	by air.basealt.ru (Postfix) with ESMTPSA id 516D023395;
+	Tue, 30 Dec 2025 19:51:12 +0300 (MSK)
 From: Maria Alexeeva <alxvmr@altlinux.org>
 To: smfrench@gmail.com
 Cc: pc@manguebit.com,
@@ -27,13 +27,12 @@ Cc: pc@manguebit.com,
 	vt@altlinux.org,
 	Maria Alexeeva <alxvmr@altlinux.org>,
 	Ivan Volchenko <ivolchenko86@gmail.com>
-Subject: [PATCH v3 1/1] fs/smb/client/fs_context: Add hostname option for CIFS module to work with domain-based dfs resources with Kerberos authentication
-Date: Tue, 30 Dec 2025 20:47:59 +0400
-Message-ID: <20251230164759.259346-2-alxvmr@altlinux.org>
+Subject: [PATCH v2] mount.cifs: add support for domain-based DFS targets with Kerberos via hostname resolution
+Date: Tue, 30 Dec 2025 20:50:32 +0400
+Message-ID: <20251230165032.259573-1-alxvmr@altlinux.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20251230164759.259346-1-alxvmr@altlinux.org>
-References: <CAH2r5mvDa8E8NKNHevoWYARY_52DJ+WQX3oetYw-pwysMyAKYQ@mail.gmail.com>
- <20251230164759.259346-1-alxvmr@altlinux.org>
+References: <20251230164759.259346-1-alxvmr@altlinux.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -42,118 +41,354 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Paths to domain-based dfs resources are defined using the domain name
-of the server in the format:
-\\<DOMAIN.NAME>\<dfsroot>\<path>
+Enhance the mount.cifs utility to support mounting of domain-based DFS shares using
+Kerberos authentication by enabling hostname-based resolution of DFS targets.
 
-The CIFS module, when requesting a TGS, uses the server name
-(<DOMAIN.NAME>) it obtained from the UNC for the initial connection.
-It then composes an SPN that does not match any entities
-in the domain because it is the domain name itself.
+Previously, only IP addresses were resolved and passed to the kernel, which
+prevented Kerberos from functioning properly with DFS shares
+that require hostname-based access.
 
-To eliminate this behavior, a hostname option is added, which is
-the name of the server to connect to and is used in composing the SPN.
-In the future this option will be used in the cifs-utils development.
+This patch:
+1. Adds hostlist support to track hostnames alongside resolved IP addresses.
+2. Modifies resolve_host() into resolve_host_with_names() to collect both IPs and
+   associated DNS names.
+3. Updates mount retry logic to iterate over hostnames as well as addresses.
+4. Appends hostname= mount option when available to allow the kernel to use
+   hostname for Kerberos validation.
+5. Includes fallback to existing logic when Kerberos is not used.
+6. Introduces helper iterlist() to simplify parsing of comma-separated lists.
+7. Buffer size fix for AD site names: Updates the buffer size used to store
+   Active Directory site names from MAXCDNAME to MAXLABEL, in line with
+   Active Directory specifications.
+   According to [MS-ADTS] and RFC 1035, site names in AD are limited to DNS label
+   size (MAXLABEL, 63 bytes), not full domain name size (MAXCDNAME, 255 bytes).
 
 Suggested-by: Ivan Volchenko <ivolchenko86@gmail.com>
 Signed-off-by: Maria Alexeeva <alxvmr@altlinux.org>
 ---
- fs/smb/client/fs_context.c | 35 +++++++++++++++++++++++++++++------
- fs/smb/client/fs_context.h |  3 +++
- 2 files changed, 32 insertions(+), 6 deletions(-)
+ cldap_ping.c   |  2 +-
+ cldap_ping.h   |  2 +-
+ mount.cifs.c   | 28 +++++++++++++++++-----------
+ resolve_host.c | 43 ++++++++++++++++++++++++++++++++++++-------
+ resolve_host.h |  5 +++++
+ util.c         | 14 ++++++++++++++
+ util.h         |  1 +
+ 7 files changed, 75 insertions(+), 20 deletions(-)
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index d4291d3a9a48..f0d1895fe4bb 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -177,6 +177,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
- 	fsparam_string("password2", Opt_pass2),
- 	fsparam_string("ip", Opt_ip),
- 	fsparam_string("addr", Opt_ip),
-+	fsparam_string("hostname", Opt_hostname),
- 	fsparam_string("domain", Opt_domain),
- 	fsparam_string("dom", Opt_domain),
- 	fsparam_string("srcaddr", Opt_srcaddr),
-@@ -866,16 +867,23 @@ static int smb3_fs_context_validate(struct fs_context *fc)
- 		return -ENOENT;
+diff --git a/cldap_ping.c b/cldap_ping.c
+index 5c20f84..e8cba50 100644
+--- a/cldap_ping.c
++++ b/cldap_ping.c
+@@ -280,7 +280,7 @@ int netlogon_get_client_site(char *netlogon_response, size_t netlogon_size, char
+ 	for (int i=0; i < 8; i++) {
+ 		// iterate over DnsForestName, DnsDomainName, NetbiosDomainName, NetbiosComputerName, UserName, DcSiteName
+ 		// to finally get to our desired ClientSiteName field
+-		if (read_dns_string(netlogon_response, netlogon_size, sitename, MAXCDNAME, &offset) < 0) {
++		if (read_dns_string(netlogon_response, netlogon_size, sitename, MAXLABEL, &offset) < 0) {
+ 			return CLDAP_PING_PARSE_ERROR_NETLOGON;
+ 		}
+ 	}
+diff --git a/cldap_ping.h b/cldap_ping.h
+index 9a23e72..a15a14c 100644
+--- a/cldap_ping.h
++++ b/cldap_ping.h
+@@ -8,7 +8,7 @@
+ 
+ // returns CLDAP_PING_TRYNEXT if you should use another dc
+ // any other error code < 0 is a fatal error
+-// site_name must be of MAXCDNAME size!
++// site_name must be of MAXLABEL size!
+ int cldap_ping(char *domain, sa_family_t family, void *addr, char *site_name);
+ 
+ #endif /* _CLDAP_PING_H_ */
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 1923913..dc3925a 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -190,6 +190,7 @@ struct parsed_mount_info {
+ 	char password[MOUNT_PASSWD_SIZE + 1];
+ 	char password2[MOUNT_PASSWD_SIZE + 1];
+ 	char addrlist[MAX_ADDR_LIST_LEN];
++	char hostlist[MAX_HOST_LIST_LEN];
+ 	unsigned int got_user:1;
+ 	unsigned int got_password:1;
+ 	unsigned int got_password2:1;
+@@ -1939,6 +1940,7 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
+ {
+ 	int rc;
+ 	char *newopts = NULL;
++	char *hostlist;
+ 
+ 	rc = drop_capabilities(0);
+ 	if (rc)
+@@ -1983,8 +1985,10 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
+ 	if (rc)
+ 		goto assemble_exit;
+ 
++	parsed_info->hostlist[0] = '\0';
+ 	if (parsed_info->addrlist[0] == '\0') {
+-		rc = resolve_host(parsed_info->host, parsed_info->addrlist);
++		hostlist = parsed_info->is_krb5 ? parsed_info->hostlist : NULL;
++		rc = resolve_host_with_names(parsed_info->host, parsed_info->addrlist, hostlist);
+ 		if (rc == 0 && parsed_info->verboseflag)
+ 			fprintf(stderr, "Host \"%s\" resolved to the following IP addresses: %s\n", parsed_info->host, parsed_info->addrlist);
+ 	}
+@@ -2142,6 +2146,7 @@ int main(int argc, char **argv)
+ 	char *options = NULL;
+ 	char *orig_dev = NULL;
+ 	char *currentaddress, *nextaddress;
++	char *currenthost, *nexthost;
+ 	char *value = NULL;
+ 	char *ep = NULL;
+ 	int rc = 0;
+@@ -2300,12 +2305,14 @@ assemble_retry:
  	}
  
-+	if (ctx->got_opt_hostname) {
-+		kfree(ctx->server_hostname);
-+		ctx->server_hostname = ctx->opt_hostname;
-+		pr_notice("changing server hostname to name provided in hostname= option\n");
+ 	currentaddress = parsed_info->addrlist;
+-	nextaddress = strchr(currentaddress, ',');
+-	if (nextaddress)
+-		*nextaddress++ = '\0';
++	nextaddress = NULL;
++	currenthost = parsed_info->hostlist;
++	nexthost = NULL;
+ 
+ mount_retry:
+ 	options[0] = '\0';
++	iterlist(&currentaddress, &nextaddress);
++	iterlist(&currenthost, &nexthost);
+ 	if (!currentaddress) {
+ 		fprintf(stderr, "Unable to find suitable address.\n");
+ 		rc = parsed_info->nofail ? 0 : EX_FAIL;
+@@ -2329,9 +2336,14 @@ mount_retry:
+ 		strlcat(options, parsed_info->prefix, options_size);
+ 	}
+ 
+-	if (sloppy)
++	if (sloppy || currenthost)
+ 		strlcat(options, ",sloppy", options_size);
+ 
++	if (currenthost) {
++		strlcat(options, ",hostname=", options_size);
++		strlcat(options, currenthost, options_size);
 +	}
 +
- 	if (!ctx->got_ip) {
- 		int len;
--		const char *slash;
+ 	if (parsed_info->verboseflag)
+ 		fprintf(stderr, "%s kernel mount options: %s",
+ 			thisprogram, options);
+@@ -2378,12 +2390,6 @@ mount_retry:
+ 				fprintf(stderr, "mount error(%d): could not connect to %s",
+ 					errno, currentaddress);
+ 			}
+-			currentaddress = nextaddress;
+-			if (currentaddress) {
+-				nextaddress = strchr(currentaddress, ',');
+-				if (nextaddress)
+-					*nextaddress++ = '\0';
+-			}
+ 			goto mount_retry;
+ 		case ENODEV:
+ 			fprintf(stderr,
+diff --git a/resolve_host.c b/resolve_host.c
+index 918c6ad..5b6aed8 100644
+--- a/resolve_host.c
++++ b/resolve_host.c
+@@ -37,7 +37,7 @@
+ /*
+  * resolve hostname to comma-separated list of address(es)
+  */
+-int resolve_host(const char *host, char *addrstr) {
++int resolve_host_with_names(const char *host, char *addrstr, char *hoststr) {
+ 	int rc;
+ 	/* 10 for max width of decimal scopeid */
+ 	char tmpbuf[NI_MAXHOST + 1 + 10 + 1];
+@@ -114,7 +114,7 @@ int resolve_host(const char *host, char *addrstr) {
  
--		/* No ip= option specified? Try to get it from UNC */
--		/* Use the address part of the UNC. */
--		slash = strchr(&ctx->UNC[2], '\\');
--		len = slash - &ctx->UNC[2];
-+		/*
-+		 * No ip= option specified? Try to get it from server_hostname
-+		 * Use the address part of the UNC parsed into server_hostname
-+		 * or hostname= option if specified.
-+		 */
-+		len = strlen(ctx->server_hostname);
- 		if (!cifs_convert_address((struct sockaddr *)&ctx->dstaddr,
--					  &ctx->UNC[2], len)) {
-+					  ctx->server_hostname, len)) {
- 			pr_err("Unable to determine destination address\n");
- 			return -EHOSTUNREACH;
+ 
+ 	// Is this a DFS domain where we need to do a cldap ping to find the closest node?
+-	if (count_v4 > 1 || count_v6 > 1) {
++	if (count_v4 > 1 || count_v6 > 1 || hoststr) {
+ 		int res;
+ 		ns_msg global_domain_handle;
+ 		unsigned char global_domain_lookup[4096];
+@@ -122,6 +122,8 @@ int resolve_host(const char *host, char *addrstr) {
+ 		unsigned char site_domain_lookup[4096];
+ 		char dname[MAXCDNAME];
+ 		int srv_cnt;
++		int number_addresses = 0;
++		const char *hostname;
+ 
+ 		res = res_init();
+ 		if (res != 0)
+@@ -144,7 +146,7 @@ int resolve_host(const char *host, char *addrstr) {
+ 
+ 		// No or just one DC we are done
+ 		if (srv_cnt < 2)
+-			goto resolve_host_out;
++			goto resolve_host_global;
+ 
+ 		char site_name[MAXCDNAME];
+ 		site_name[0] = '\0';
+@@ -200,7 +202,6 @@ int resolve_host(const char *host, char *addrstr) {
+ 		if (res < 0)
+ 			goto resolve_host_out;
+ 
+-		int number_addresses = 0;
+ 		for (int i = 0; i < ns_msg_count(site_domain_handle, ns_s_ar); i++) {
+ 			if (i > MAX_ADDRESSES)
+ 				break;
+@@ -214,6 +215,7 @@ int resolve_host(const char *host, char *addrstr) {
+ 				case ns_t_aaaa:
+ 					if (ns_rr_rdlen(rr) != NS_IN6ADDRSZ)
+ 						continue;
++					hostname = ns_rr_name(rr);
+ 					ipaddr = inet_ntop(AF_INET6, ns_rr_rdata(rr), tmpbuf,
+ 									   sizeof(tmpbuf));
+ 					if (!ipaddr) {
+@@ -224,6 +226,7 @@ int resolve_host(const char *host, char *addrstr) {
+ 				case ns_t_a:
+ 					if (ns_rr_rdlen(rr) != NS_INADDRSZ)
+ 						continue;
++					hostname = ns_rr_name(rr);
+ 					ipaddr = inet_ntop(AF_INET, ns_rr_rdata(rr), tmpbuf,
+ 									   sizeof(tmpbuf));
+ 					if (!ipaddr) {
+@@ -237,14 +240,22 @@ int resolve_host(const char *host, char *addrstr) {
+ 
+ 			number_addresses++;
+ 
+-			if (i == 0)
++			if (i == 0) {
+ 				*addrstr = '\0';
+-			else
++				if (hoststr)
++					*hoststr = '\0';
++			} else {
+ 				strlcat(addrstr, ",", MAX_ADDR_LIST_LEN);
++				if (hoststr)
++					strlcat(hoststr, ",", MAX_ADDR_LIST_LEN);
++			}
+ 
+ 			strlcat(addrstr, tmpbuf, MAX_ADDR_LIST_LEN);
++			if (hoststr)
++				strlcat(hoststr, hostname, MAX_HOST_LIST_LEN);
  		}
-@@ -1591,6 +1599,21 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 		}
- 		ctx->got_ip = true;
- 		break;
-+	case Opt_hostname:
-+		if (strnlen(param->string, CIFS_NI_MAXHOST) == CIFS_NI_MAXHOST) {
-+			pr_warn("host name too long\n");
-+			goto cifs_parse_mount_err;
-+		}
+ 
++resolve_host_global:
+ 		// Preferred site ips is now the first entry in addrstr, fill up with other sites till MAX_ADDRESS
+ 		for (int i = 0; i < ns_msg_count(global_domain_handle, ns_s_ar); i++) {
+ 			if (number_addresses > MAX_ADDRESSES)
+@@ -259,6 +270,7 @@ int resolve_host(const char *host, char *addrstr) {
+ 				case ns_t_aaaa:
+ 					if (ns_rr_rdlen(rr) != NS_IN6ADDRSZ)
+ 						continue;
++					hostname = ns_rr_name(rr);
+ 					ipaddr = inet_ntop(AF_INET6, ns_rr_rdata(rr), tmpbuf,
+ 									   sizeof(tmpbuf));
+ 					if (!ipaddr) {
+@@ -269,6 +281,7 @@ int resolve_host(const char *host, char *addrstr) {
+ 				case ns_t_a:
+ 					if (ns_rr_rdlen(rr) != NS_INADDRSZ)
+ 						continue;
++					hostname = ns_rr_name(rr);
+ 					ipaddr = inet_ntop(AF_INET, ns_rr_rdata(rr), tmpbuf,
+ 									   sizeof(tmpbuf));
+ 					if (!ipaddr) {
+@@ -280,6 +293,12 @@ int resolve_host(const char *host, char *addrstr) {
+ 					continue;
+ 			}
+ 
++			if (number_addresses == 0) {
++				*addrstr = '\0';
++				if (hoststr)
++					*hoststr = '\0';
++			}
 +
-+		kfree(ctx->opt_hostname);
-+		ctx->opt_hostname = kstrdup(param->string, GFP_KERNEL);
-+		if (ctx->opt_hostname == NULL) {
-+			cifs_errorf(fc, "OOM when copying hostname string\n");
-+			goto cifs_parse_mount_err;
-+		}
-+		cifs_dbg(FYI, "Host name set\n");
-+		ctx->got_opt_hostname = true;
-+		break;
- 	case Opt_domain:
- 		if (strnlen(param->string, CIFS_MAX_DOMAINNAME_LEN)
- 				== CIFS_MAX_DOMAINNAME_LEN) {
-diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-index 7af7cbbe4208..ff1a04661ef5 100644
---- a/fs/smb/client/fs_context.h
-+++ b/fs/smb/client/fs_context.h
-@@ -184,6 +184,7 @@ enum cifs_param {
- 	Opt_pass,
- 	Opt_pass2,
- 	Opt_ip,
-+	Opt_hostname,
- 	Opt_domain,
- 	Opt_srcaddr,
- 	Opt_iocharset,
-@@ -214,6 +215,7 @@ struct smb3_fs_context {
- 	bool gid_specified;
- 	bool sloppy;
- 	bool got_ip;
-+	bool got_opt_hostname;
- 	bool got_version;
- 	bool got_rsize;
- 	bool got_wsize;
-@@ -226,6 +228,7 @@ struct smb3_fs_context {
- 	char *domainname;
- 	char *source;
- 	char *server_hostname;
-+	char *opt_hostname;
- 	char *UNC;
- 	char *nodename;
- 	char workstation_name[CIFS_MAX_WORKSTATION_LEN];
+ 			char *found = strstr(addrstr, tmpbuf);
+ 
+ 			if (found) {
+@@ -293,9 +312,15 @@ int resolve_host(const char *host, char *addrstr) {
+ 				}
+ 			}
+ 
++			if (number_addresses > 0) {
++				strlcat(addrstr, ",", MAX_ADDR_LIST_LEN);
++				if (hoststr)
++					strlcat(hoststr, ",", MAX_HOST_LIST_LEN);
++			}
+ 			number_addresses++;
+-			strlcat(addrstr, ",", MAX_ADDR_LIST_LEN);
+ 			strlcat(addrstr, tmpbuf, MAX_ADDR_LIST_LEN);
++			if (hoststr)
++				strlcat(hoststr, hostname, MAX_HOST_LIST_LEN);
+ 		}
+ 	}
+ 
+@@ -303,3 +328,7 @@ resolve_host_out:
+ 	freeaddrinfo(addrlist);
+ 	return rc;
+ }
++
++int resolve_host(const char *host, char *addrstr) {
++	return resolve_host_with_names(host, addrstr, NULL);
++}
+diff --git a/resolve_host.h b/resolve_host.h
+index f2b19e6..b507757 100644
+--- a/resolve_host.h
++++ b/resolve_host.h
+@@ -22,6 +22,7 @@
+ #define _RESOLVE_HOST_H_
+ 
+ #include <arpa/inet.h>
++#include <resolv.h>
+ 
+ /* currently maximum length of IPv6 address string */
+ #define MAX_ADDRESS_LEN INET6_ADDRSTRLEN
+@@ -31,6 +32,10 @@
+ /* limit list of addresses to MAX_ADDRESSES max-size addrs */
+ #define MAX_ADDR_LIST_LEN ((MAX_ADDRESS_LEN + 1) * MAX_ADDRESSES)
+ 
++/* limit list of hostnames to MAX_ADDRESSES max-size names */
++#define MAX_HOST_LIST_LEN ((MAXCDNAME + 1) * MAX_ADDRESSES)
++
++extern int resolve_host_with_names(const char *host, char *addrstr, char *hoststr);
+ extern int resolve_host(const char *host, char *addrstr);
+ 
+ #endif /* _RESOLVE_HOST_H_ */
+diff --git a/util.c b/util.c
+index 546f284..1f7aaa8 100644
+--- a/util.c
++++ b/util.c
+@@ -83,3 +83,17 @@ getusername(uid_t uid)
+ 	return username;
+ }
+ 
++int
++iterlist(char **curr, char **next) {
++	if (!*curr || *curr[0] == '\0' || *curr == *next) {
++		*curr = *next = NULL;
++		return 0;
++	}
++	*curr = *next ? *next : *curr;
++	*next = strchr(*curr, ',');
++	if (*next)
++		*(*next)++ = '\0';
++	else
++		*next = *curr;
++	return 1;
++}
+diff --git a/util.h b/util.h
+index 2864130..59e4200 100644
+--- a/util.h
++++ b/util.h
+@@ -29,5 +29,6 @@ extern size_t strlcpy(char *d, const char *s, size_t bufsize);
+ extern size_t strlcat(char *d, const char *s, size_t bufsize);
+ 
+ extern char *getusername(uid_t uid);
++extern int iterlist(char **curr, char **next);
+ #endif /* _LIBUTIL_H */
+ 
+
+base-commit: 25ba696a213f9a6d7b4fcdd157757695710c8886
 -- 
 2.50.1
 
