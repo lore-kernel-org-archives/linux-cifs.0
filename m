@@ -1,67 +1,77 @@
-Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F29532862F
-	for <linux-cifs@vger.kernel.org>; Tue, 30 Dec 2025 16:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C700327C12
+	for <linux-cifs@vger.kernel.org>; Tue, 30 Dec 2025 16:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767113710; cv=none; b=GivhKzjqUvKO0kxuuog1ShwsY2pj/4iCSzuqE/UHQqWYDczqD1+9fjmECMxN7PRSaN4MBKAA3mngEJ7+oODAg0dBbFSQfvf8WgTTelkqshLwFIOnVZRzDKSo6kCYX+CBhpP8OJBD8k6JCAqis3Mybh9wv8idE3kasLffL0u0R+M=
+	t=1767113965; cv=none; b=nKg1l3dF+XX3CoXa2kTzeAnBkQFcxyLAYJagc+53843waGOHg4Eg7TDmdXcRE9/os1OHqCmwLPoSm+NYBE6BEJVUiFc0EgRz604KkBe1Cr1BclYVrGcGrZlDIDbL3fKUnH34T/EvyZwppBHGj/co6Iw0xA61UyLoqKH6KkNw2uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767113710; c=relaxed/simple;
-	bh=+ylrM6DUEna8gSVUDwMFrd0L3TG0DdXd12LPLjhKaEw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gtm1Zl+5l1AN1HXt0W2i0Jmna2ML72J9NMqP4CIIBzG0EnxffDx2GoAD7IDmFtEzsU56Vfop7m/gygA+WdMbpwEpFxzh3GSv/C4qmsKKStkmb3+COyGBE9rbDbgnJXpnrSCo/fnb9+AHp8KgfVkqVf8HOB/Ei+V9ZtlG+sMyjWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=193.43.8.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from lenovo-93812.smb.basealt.ru (unknown [193.43.11.202])
-	(Authenticated sender: alekseevamo)
-	by air.basealt.ru (Postfix) with ESMTPSA id CE50A2336D;
-	Tue, 30 Dec 2025 19:48:34 +0300 (MSK)
-From: Maria Alexeeva <alxvmr@altlinux.org>
-To: smfrench@gmail.com
-Cc: pc@manguebit.com,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	tom@talpey.com,
-	vt@altlinux.org,
-	Maria Alexeeva <alxvmr@altlinux.org>
-Subject: [PATCH v3 0/1] Add hostname option for CIFS module
-Date: Tue, 30 Dec 2025 20:47:58 +0400
-Message-ID: <20251230164759.259346-1-alxvmr@altlinux.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <CAH2r5mvDa8E8NKNHevoWYARY_52DJ+WQX3oetYw-pwysMyAKYQ@mail.gmail.com>
-References: <CAH2r5mvDa8E8NKNHevoWYARY_52DJ+WQX3oetYw-pwysMyAKYQ@mail.gmail.com>
+	s=arc-20240116; t=1767113965; c=relaxed/simple;
+	bh=5woCp2LWdf8IOxJYnoaq7xPPHGqflFJSYPZw+w0CI/k=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=aGtOEN59IUZW+S7aS2TP3+jaTOHa9jARcWvzaLXCb97WBKgBcHw4/j+TbXE1xDgvCsagaCs/9sJKwoNRMIOQs0Xe/9kzEvwisdU5mSFc4Lcfos2tuXo2zfJ/vTQpDQu+qYR0xKvknobSFX8jYvENiCkiqlS3vqCIUdCJ4Br7FVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=USVoo/RZ; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="USVoo/RZ"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8b31a665ba5so1126367985a.2
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Dec 2025 08:59:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767113961; x=1767718761; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YzkgLgT+5zazTXceqcCwS8eR2Df8LtqOkwkS5eUSVRw=;
+        b=USVoo/RZ5sQbAKwEXmt48NVlh/Plqp3DflryeWQWZq2FGrYSoRNpbUH3qYdpuTkWOe
+         txoqmzjBpftp8ke77XvJ4tnND3mF+RMoPTm/dT7gbeypqu6NPsOubgl70XaPlb9N9zHO
+         0V5nhsViVRGppDw7M35SVkq/mjl8GQJ08AhVATV1bj9R9sVr6TP1POVjzNEqlfuBqGWM
+         h7UY/kwTPndvtNrSwWETx+n4Q3D0AZ2F1mBbuEMx2P4Zk9lifKHWW/OWTMDIviA0XOB7
+         OGl0HdixS23XblmGV3fhcp9xBpyD4i1LCsco45kL3pfpq0SUmpROJ2bhBKrnJZzJl0Hd
+         20ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767113961; x=1767718761;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YzkgLgT+5zazTXceqcCwS8eR2Df8LtqOkwkS5eUSVRw=;
+        b=i9DPFBnr121xkHwxWk8lcPJxPYS2bYNCoDmRyhQ+ZbMLbQDSc4XGfXnMSSU0nlh7E0
+         wxeTZJUUlIvpF1JiE7ONyYUA2Tzef3GnqHK+4ODcS/dchtAiExZC4Ptc7zI7xx3QVa5z
+         nZEelEVitBh0M03qgqq4283dIbMmby7HnV96UFyIkhC/DvBTgnMtGia4LWUFUcJ1THNL
+         ugW0zhwUz5HfoQcUg1lms12nHf2IQdqfe2I3SaJFe/BJb5Nk0Ma9EjCQmuN4l6O5NxTH
+         X3NpjsrVN9O8mW8yl2T4OFEQ/V+zzi7kQv3EUwZbwQ5C7wyGC5I3ZQjHOGfmomEyfFRb
+         TKBw==
+X-Gm-Message-State: AOJu0Yyb8novVfYUlbbV8DAyYNJOJKKqMeN8l2qafEwsdhc3xYN+Yl6T
+	ZS7Igz3uGkaIBgf0btr8hXYQngLqSILIiV6G96IneLE0jAcq+TsS6PidtwXF3BPWsUij5yZYJdQ
+	KAU8HKBgVwjnheAjiUiCCq5DYaX6KNRikl8l2
+X-Gm-Gg: AY/fxX5BbFdHGxP3RP27c6PTGmDaAlynBwWRxFvcjE+jJyoANcPliaUdHSP5vduzmID
+	kkxYqnr/lrup7oPdF8YQKJs7hFxTqoTlldUTlaQ3bUvXYNdT5l+ND4QImrKZJKbqtBZEiWxi7j3
+	ShmH1FnOujnJZ44eDln6v2cnV8vjBrqrrjcW13JWz7eAh7yE5K3wgKpGslTxFBL3XZQjMIpue54
+	1RX4KRkeKfqQRxp+p5N5O/8wx/2i5+fzIgDASwPooqy7s8OoyBPdhanznvD1xCz8QbCy65tRe1O
+	v5Qe8bK4zlx4G81YRQ2II8XYrbPhjqQC7iZxlVR4ZbzQIi6bJWhI8YDS12/ACKBaSpmKEESIPfo
+	qaYn1uAsk+/EwI+k08oZm2Q/drlsG8sNkaVM9ut2zmsFb/hahHRefQ5MN57vuiS+6
+X-Google-Smtp-Source: AGHT+IFhlcMBMv1cwxoVewKSOq8HWL0IsvkGVQoXdMvZSv+168TMhMNoJ9u5DAwSztFvkI8we3gayjbRr4ZwWi4GusI=
+X-Received: by 2002:a05:620a:708a:b0:8b2:ffe7:42fe with SMTP id
+ af79cd13be357-8c08fbe9d54mr4697517485a.32.1767113961234; Tue, 30 Dec 2025
+ 08:59:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 30 Dec 2025 10:59:10 -0600
+X-Gm-Features: AQt7F2qF_WkAGpxy0SpT2902G5G7ZzX1yY5RjbBgbOQXJGZjo35W5CCNpoYuP5M
+Message-ID: <CAH2r5mt=iRzzb=z6_T6-_FgiFkkDUR0U__gf-YN=F8Xe0jxQbw@mail.gmail.com>
+Subject: WSLv1 vs. v2 symlink format
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Good afternoon!
+Do you know which versions of Windows only support the older WSLv1 format?
 
-Unfortunately, our correspondence was interrupted at the stage of discussing 
-the shortcomings of the previous patch versions - we still have not received 
-the promised comments and suggestions from you.
-We have decided to revert to using the name hostname for this option, 
-as its application is not limited solely to domain-based DFS resources. 
-For example, it can also be used for mounting via CNAME.
+https://lore.kernel.org/linux-cifs/20250712161418.17696-2-pali@kernel.org/
 
-We will send the updated versions of the patches for both the CIFS module and 
-cifs-utils in the following emails.
-
-Maria Alexeeva (1):
-  fs/smb/client/fs_context: Add hostname option for CIFS module to work
-    with domain-based dfs resources with Kerberos authentication
-
- fs/smb/client/fs_context.c | 35 +++++++++++++++++++++++++++++------
- fs/smb/client/fs_context.h |  3 +++
- 2 files changed, 32 insertions(+), 6 deletions(-)
-
-
-base-commit: f8f9c1f4d0c7a64600e2ca312dec824a0bc2f1da
 -- 
-2.50.1
+Thanks,
 
+Steve
