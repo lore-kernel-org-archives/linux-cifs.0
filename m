@@ -1,94 +1,108 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E7B2F290B
-	for <linux-cifs@vger.kernel.org>; Tue, 30 Dec 2025 21:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0009881732
+	for <linux-cifs@vger.kernel.org>; Wed, 31 Dec 2025 13:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767129303; cv=none; b=u0q4B8lgCJJdJfQc3FTANVuyGOzjOMlvCGHtk5jkR6hWDMCBS4HNLXCKkCFPIUWLMJjhlD6sPbdVmptLcmhx4HQ7JgLF8sMzsIGA3uEMcbAryGxaYiIJjMstBdNMSBlbAm+ZgnWhwDJHlRtpOKjn0QyrpVxDzPNFTCw88xkCXgI=
+	t=1767186635; cv=none; b=J+7cSsn12/vGE7DH8VvCUPqotncR7EQ8AXEQReukDjUBcMtbTywKv7RGAWrcq/Q4a13lkiqaPgoDtM7BnNib4BZaY2XLft3zePrCzwlVdiePzC5WPdIro3C1Zw9uIwnnn/jycFTMdQHeAqnNzCwjOd7++WyUjiweEY5jiF2itr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767129303; c=relaxed/simple;
-	bh=jQtXx7rfttznbaFkCyLXJ0WcnYaJY7Du1Rtzd5AylmA=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=EmN8VAyWCDWzOSh10xz+eH7q9v7na6EvojfV+Hix+zn8nU6TFx1E5HBpIj1a89rFlfiwBQrEL2XJe7puzhEieWIfGItQKqG9rY98J6PHbUbOmVzEI3xmln0O+vx/l01HrEuE0+DZdmjzTooSu08ABx10cxAH58SPRrQny7kDGVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XnwZn018; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1767186635; c=relaxed/simple;
+	bh=lnu1l5c65iTLAQVILtQ0S5elCIdKvvoT6TAUrWEGVtc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TJWVB3rISfC23ByJ5Y1sOBjtBQd/ZiLE3uj3jM+mKc8Rn/i+C/qxDEx+tpBOi1DoDapG2yQylQaxevJxVFqx7+1Y3HpWYlJUKxMc04ZsRAs86qCZwBJcurgYviQMWoceFgmvt5+RwgfB6+EwhZIwJrRDiw+4cg/3aGIYEupedNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZtRhPiRv; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XnwZn018"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767129300;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZtRhPiRv"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767186628;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SPnN+QRccYwBCGvlV8wop5ggg6r6if2lTY8/+SxRg8U=;
-	b=XnwZn018YUOY5NGg33ZPfb9OjuRvKzylkG0n//W+QMSuemkTwNdABm9Fy0udbkh+qsdt0b
-	mu0Rlbx+COUVjejDQcP1SjpbadgZfS9Uokr+Xqe7c/7CX6xQ5eJo3S2bcdEtxCVsP3vBq2
-	ecDpd73Lj5gaDHolmOwvvafPEIbVZ8s=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-690-6cbCq3VSN9miFBnFc4XcfA-1; Tue,
- 30 Dec 2025 16:14:51 -0500
-X-MC-Unique: 6cbCq3VSN9miFBnFc4XcfA-1
-X-Mimecast-MFC-AGG-ID: 6cbCq3VSN9miFBnFc4XcfA_1767129289
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 85FF3195DE56;
-	Tue, 30 Dec 2025 21:14:49 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E7D4330001A2;
-	Tue, 30 Dec 2025 21:14:46 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <00150dea-4a30-49e3-a1c2-cd6e6561e238@linux.dev>
-References: <00150dea-4a30-49e3-a1c2-cd6e6561e238@linux.dev> <5b74f84d-3de5-40fd-b0c8-f2743834bc1a@linux.dev> <93b7f27c-ed92-4169-912a-c83088c85df9@linux.dev> <20251225021035.656639-1-chenxiaosong.chenxiaosong@linux.dev> <20251225021035.656639-3-chenxiaosong.chenxiaosong@linux.dev> <1266596.1766836803@warthog.procyon.org.uk> <1276266.1766850638@warthog.procyon.org.uk> <1692b7a8-c208-4aa7-a9f4-02fea6d31733@linux.dev>
-To: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-    linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
-    sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
-    senozhatsky@chromium.org, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v6 2/5] cifs: Autogenerate SMB2 error mapping table
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=InNrp3B5vVkt5rqucW7pykP9N4MUsRFIVlK/n55cTZQ=;
+	b=ZtRhPiRvzcHNzMPlnXJEzYKpYE/gQZ14HFm6139Ytx1vFkWYoJXFGxcNyvhKMYwPIPSDzP
+	0CXItRuYuHtOBLRzEku07OTzgp9TIohTPiGbMSQ1KdF4wNYvA9vdBBmouJXNicjSsNMveB
+	KFw9EuhaJ8BBiBPSavBLceRBMzvELaY=
+From: chenxiaosong.chenxiaosong@linux.dev
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH v7 0/5] smb: improve search speed of SMB2 maperror
+Date: Wed, 31 Dec 2025 21:09:13 +0800
+Message-ID: <20251231130918.1168557-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1369033.1767129285.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 30 Dec 2025 21:14:45 +0000
-Message-ID: <1369034.1767129285@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev> wrote:
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-> David, what do you think of the modifications? Call le32_to_cpu() to get=
- a
-> cpu-endian value before comparison.
+Sort `smb2_error_map_table` array at build time, thanks to David for his patches.
 
-In fact, you could store the cpu-endian values in the table.  It's only
-accessed by this routine (and the kunit test).  Either:
+v6: https://lore.kernel.org/linux-cifs/20251225021035.656639-1-chenxiaosong.chenxiaosong@linux.dev/
+v6->v7:
+  - Patch #02: store the cpu-endian values in the table
+               update coding style of `gen_smb2_mapping` script: use tabs instead of spaces
+               update comment: sorted by NT status code (cpu-endian, ascending)
+  - Patch #04: update cmp_smb2_status(): the first argument is a cpu-endian value
 
-+    print(OUT_FILE "{ /*$code*/ le32_to_cpu($status), $error, \"$full_sta=
-tus\" },\n");
+v4: https://lore.kernel.org/linux-cifs/20251206151826.2932970-1-chenxiaosong.chenxiaosong@linux.dev/
+The following patches from v4 have already been merged into the mainline:
+  - 01ab0d1640e3 smb/server: rename include guard in smb_common.h
+  - d8f52650b24d smb/client: update some SMB2 status strings
+  - d159702c9492 smb/client: add two elements to smb2_error_map_table array
+  - 523ecd976632 smb: rename to STATUS_SMB_NO_PREAUTH_INTEGRITY_HASH_OVERLAP
+  - bf80d1517dc8 smb/client: remove unused elements from smb2_error_map_table array
+  - 6c1eb31ecb97 smb/client: reduce loop count in map_smb2_to_linux_error() by half
 
-or:
+When searching for the last element and printing error message,
+the comparison count are shown in the table below:
 
-+    print(OUT_FILE "{ $code, $error, \"$full_status\" },\n");
++----------+--------+--------+
+|          | Before | After  |
+|          |Patchset|Patchset|
++----------+--------+--------+
+|Comparison|  3486  |   10   |
+|  Count   |        |        |
++----------+--------+--------+
 
-as $code is the hex status value.  You don't really need to include $statu=
-s -
-except that that uses the enum symbol - as the corresponding status name(s=
-)
-are included in $full_status.
+ChenXiaoSong (3):
+  smb/client: check whether smb2_error_map_table is sorted in ascending
+    order
+  smb/client: use bsearch() to find target in smb2_error_map_table
+  smb/client: introduce KUnit test to check search result of
+    smb2_error_map_table
 
-David
+David Howells (2):
+  cifs: Label SMB2 statuses with errors
+  cifs: Autogenerate SMB2 error mapping table
+
+ fs/smb/Kconfig                    |   17 +
+ fs/smb/client/Makefile            |   14 +
+ fs/smb/client/cifsfs.c            |    5 +
+ fs/smb/client/gen_smb2_mapping    |   86 +
+ fs/smb/client/smb2maperror.c      | 2467 +-------------------
+ fs/smb/client/smb2maperror_test.c |   48 +
+ fs/smb/client/smb2proto.h         |    1 +
+ fs/smb/common/smb2status.h        | 3488 ++++++++++++++---------------
+ 8 files changed, 1975 insertions(+), 4151 deletions(-)
+ create mode 100644 fs/smb/client/gen_smb2_mapping
+ create mode 100644 fs/smb/client/smb2maperror_test.c
+
+-- 
+2.43.0
 
