@@ -1,169 +1,105 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D194D2EAB6E
-	for <linux-cifs@vger.kernel.org>; Wed, 31 Dec 2025 13:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A616423C50A
+	for <linux-cifs@vger.kernel.org>; Fri,  2 Jan 2026 03:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767186647; cv=none; b=g5AphbLvrSE82lQ/kDspJq9t3vuyp6gu4I/dkFSELL559tAmibzOZ04kOmqFSR6wfaE1+Mx1CpKTHKb5/kaIn+nrOiijH7xs7PuKRHwlAD0SfIG+5NyU54ZYcaY2LCDB5HMzKWUN/caZDX+kvb1lKTBHvfi4yH7W0P0Cv8tfJds=
+	t=1767326062; cv=none; b=DN3Sx1E8Zxwl4rwSTpbHmu2XbUjyhGOEX3cbufg51UuanpuvGF5CYWEPL2SSstj1kaGcN/MCgFvp8gRf9wA5YOMDSdlEm33A3+xBF66hCoIO0nirkT4j8FPsKAFwKudKbST0SZoIamc+7DBis83vnbfIKfvQgNH6sZd4dNaaM88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767186647; c=relaxed/simple;
-	bh=lpWRF3Ci1wo8k6AS9LFI1ISEQH5/aN81d3vR6wCZzzQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TYo/bMrOodLCqDEIovs9i9z8QRubxcxgPnqbPR0zJ/amg1x6QgRniPAYoMqTn4ID9VpKFOvrqitL0GM3Qvybfo0k91Q32mP85ZOJXp5sVltSe/tGJ+kfUSthBALtJ3VRyH1gEM5hZFjzyrUDWD3IsV5IXs921TrqLH/OSm059nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IcctbQrA; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1767326062; c=relaxed/simple;
+	bh=y3mA4ItRr+3SbF71gxTpXk0OO5uUGSsVm733vrUDM8M=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Wr+ru2dmVoLtenczW5Mn1pn9Cwkh2bCtBI5TWrLu2CIsgP+WQ4yIBFT3cmojxB2QXkzJIjz8NYnNkBbeoca5p6CVjAE9YbUEk6THWsHneaZS3GV2RF2Ta5foZ5hS1afp7HalrT/r0+fezedsZPkNL3X52DKZMO8YNN4F8964Wz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DEt4p425; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IcctbQrA"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767186643;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Fei/wXoQGrkvo1fMXEqhe/0t/900q/FR4pOHv/RgRYk=;
-	b=IcctbQrA9prRu29C8t6TjYrsy4QvToiu2eJAMsg9ahMhvGCtc6+eSx7axQ0jfthI60PDK3
-	pOl/MtA35pjgHLQ5q5p24bZ2nkJMtPBdg/zag1RJ7XLQZtVBjgBqiwuuKKc+HVtllkETxu
-	h0cCfI8hFWrpA36wuxSiw5vdujZ1A0U=
-From: chenxiaosong.chenxiaosong@linux.dev
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com
-Cc: linux-cifs@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v7 5/5] smb/client: introduce KUnit test to check search result of smb2_error_map_table
-Date: Wed, 31 Dec 2025 21:09:18 +0800
-Message-ID: <20251231130918.1168557-6-chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20251231130918.1168557-1-chenxiaosong.chenxiaosong@linux.dev>
-References: <20251231130918.1168557-1-chenxiaosong.chenxiaosong@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DEt4p425"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4ed9c19248bso101613471cf.1
+        for <linux-cifs@vger.kernel.org>; Thu, 01 Jan 2026 19:54:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767326059; x=1767930859; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rRhSPZP5WvVax8UHgJMah0AYxpmKWUf7qtYho6M4+vY=;
+        b=DEt4p425QZbBEs2CMQS5h21JS6GR+RdP3RkxGqT2xr/6tBADe5OCXotvP/dPIjGWdZ
+         S5i+YaCzqGV5pVvdJ2bRorIaCMQ0ctBLsSY9hwd4aJSSZ98EAG+4s9uaqsjjqJ/mkEW/
+         j+RBGfdIgLlajHZ7U4c1YApx0l7UXzRn4KAccU+3M2VXtY0ThS59JidPPwrPDLXMwAqc
+         FEJiVSTH6EXPUxjCtgShn7LzePi16CZ4OB43tU0MZYeFkZUHsFVd/0yCxZiRl0TMqgGk
+         j3pNPFf1j5JjMzsUzDyZ4Nkr+UAJDTD9iPeHR+p6CUzMN8LcH3fYEdaxpsGXnFs3D3PT
+         jqdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767326059; x=1767930859;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rRhSPZP5WvVax8UHgJMah0AYxpmKWUf7qtYho6M4+vY=;
+        b=mIBLmc+EawAPzpG1267ng+tEyJWwt9SamEo+LRoHunQFYamnnJTa41eoW1tQau0Bkg
+         nWugIstFbUnj+2g4pmY7LBwePoiHPmjrreD0zxkYULAr7lZZUSCJQK/V/XBmDIzxJcmK
+         iv4gfffBMw41XgFH2Z/uGETpKXZGniNZui64omNm8yjEtMOw0mvDZ0XgcNLIjV0UHckp
+         fj21iNggLwcLA1Mve4obzyPNZQUbO0EM0Jjmr0sF5uI1gONGrZKLnUDncV2HQsqRlQSK
+         0nBAjMi3bCSabPXofe2bJ0Q2NipKCuQ+NuCGbaWBSjLpT9FMUZ9oS+F2t8P500DF5t2R
+         HvwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWtY1yKfXsLV7xcGTPByuj2cmQOaD+WS1qgyiXg+d6f8/MD2YRwU5GfJylbwp38J4fASkrI+7w9R71o@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5ublqMdIh37auxFlo1MwvajtzmzoHsexo7UtFNyslUI+sWosI
+	FXDEX2hb9LrWAvRbyzgW+j0XW2J+TL2feFD4Q3V3/USOYFKBUC2b4v6kjsO6/yQB7RBKeKukhpN
+	siLmakD4f3tecADk3fJ77ibXxNRFyev0=
+X-Gm-Gg: AY/fxX7fMCiuR1Np9FqzL33g/0C6oXvXbtAkB0DS6hCMsAoJ9KPQH7QmmSAFnh0iyEw
+	sigN87ALORYih3ShMqRkyCjApzmVSppv1YTqhBl9eNDXCrG04tgLJecIjS1NplP2ZQDoi73khzL
+	WqEZIt/9r4TulSsrufys7ra6ZuR5i3W3qfZNbJQlynaA3bSx8UxaqdDwhd2jDlKOWc5avv08/tG
+	FnvP5AizruJIitVJgS6G1pwuJIChqQN0Y8pkTxKHrXzpa7UT4ActaKqmeIImKXvxMJ+6eI2PKgT
+	M0NZiT6jKGks3YeZSmv5tHfgs+6SNzQvN8X9WlP21UJT2/9It/DMojoUkQEPkZkhNUgD86yjQOT
+	/56MQtU8HimcfzIurFBCCVuJOzT6eDPkN+yHCjOL9VU7q91muWgw=
+X-Google-Smtp-Source: AGHT+IEruY3B8PsYyfhU2KJWgqnP5UPeAQQYE+5t227ZFfh2eWyT+mUh+/8GM7Fe6RDH+QfmRwUOApYD+hObp5G6BEk=
+X-Received: by 2002:a05:622a:cc:b0:4ee:9b1:e2c with SMTP id
+ d75a77b69052e-4f4abd35e3emr676950681cf.33.1767326059533; Thu, 01 Jan 2026
+ 19:54:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 1 Jan 2026 21:54:08 -0600
+X-Gm-Features: AQt7F2pwwh0jRIe3Kk8_vBAPCszjYv7yqwf3XEpUv3Aw8Zv9DY1qKFo2paF9YBc
+Message-ID: <CAH2r5mtb82d1+_nY=Kk6F3VN-8V3sY8f-PXtK0E=sa_C6vgtUw@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Please pull the following changes since commit
+f8f9c1f4d0c7a64600e2ca312dec824a0bc2f1da:
 
-The KUnit test are executed when cifs.ko is loaded.
+  Linux 6.19-rc3 (2025-12-28 13:24:26 -0800)
 
-Just like `fs/ext4/mballoc.c` includes `fs/ext4/mballoc-test.c`.
-`smb2maperror.c` also includes `smb2maperror_test.c`, allowing KUnit
-tests to access any functions and variables in `smb2maperror.c`.
+are available in the Git repository at:
 
-The maperror_test_check_search() checks whether all elements can be
-correctly found in the array.
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.19-rc3-smb3-client-fixes
 
-Suggested-by: David Howells <dhowells@redhat.com>
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/Kconfig                    | 17 +++++++++++
- fs/smb/client/smb2maperror.c      |  4 +++
- fs/smb/client/smb2maperror_test.c | 48 +++++++++++++++++++++++++++++++
- 3 files changed, 69 insertions(+)
- create mode 100644 fs/smb/client/smb2maperror_test.c
+for you to fetch changes up to fa2fd0b10f66b08bc44745feed1761d7c1539d6e:
 
-diff --git a/fs/smb/Kconfig b/fs/smb/Kconfig
-index ef425789fa6a..85f7ad5fbc5e 100644
---- a/fs/smb/Kconfig
-+++ b/fs/smb/Kconfig
-@@ -9,3 +9,20 @@ config SMBFS
- 	tristate
- 	default y if CIFS=y || SMB_SERVER=y
- 	default m if CIFS=m || SMB_SERVER=m
-+
-+config SMB_KUNIT_TESTS
-+	tristate "KUnit tests for SMB" if !KUNIT_ALL_TESTS
-+	depends on SMBFS && KUNIT
-+	default KUNIT_ALL_TESTS
-+	help
-+	  This builds the SMB KUnit tests.
-+
-+	  KUnit tests run during boot and output the results to the debug log
-+	  in TAP format (https://testanything.org/). Only useful for kernel devs
-+	  running KUnit test harness and are not for inclusion into a production
-+	  build.
-+
-+	  For more information on KUnit and unit tests in general please refer
-+	  to the KUnit documentation in Documentation/dev-tools/kunit/.
-+
-+	  If unsure, say N.
-diff --git a/fs/smb/client/smb2maperror.c b/fs/smb/client/smb2maperror.c
-index 93d52a8cd1fe..1797b1990c18 100644
---- a/fs/smb/client/smb2maperror.c
-+++ b/fs/smb/client/smb2maperror.c
-@@ -114,3 +114,7 @@ int __init smb2_init_maperror(void)
- 
- 	return 0;
- }
-+
-+#if IS_ENABLED(CONFIG_SMB_KUNIT_TESTS)
-+#include "smb2maperror_test.c"
-+#endif /* CONFIG_SMB_KUNIT_TESTS */
-diff --git a/fs/smb/client/smb2maperror_test.c b/fs/smb/client/smb2maperror_test.c
-new file mode 100644
-index 000000000000..6ac6cdac623b
---- /dev/null
-+++ b/fs/smb/client/smb2maperror_test.c
-@@ -0,0 +1,48 @@
-+// SPDX-License-Identifier: LGPL-2.1
-+/*
-+ *
-+ *   KUnit tests of SMB2 maperror
-+ *
-+ *   Copyright (C) 2025 KylinSoft Co., Ltd. All rights reserved.
-+ *   Author(s): ChenXiaoSong <chenxiaosong@kylinos.cn>
-+ *
-+ */
-+
-+#include <kunit/test.h>
-+
-+static void
-+test_cmp_map(struct kunit *test, struct status_to_posix_error *expect)
-+{
-+	struct status_to_posix_error *result;
-+
-+	result = smb2_get_err_map(expect->smb2_status);
-+	KUNIT_EXPECT_PTR_NE(test, NULL, result);
-+	KUNIT_EXPECT_EQ(test, expect->smb2_status, result->smb2_status);
-+	KUNIT_EXPECT_EQ(test, expect->posix_error, result->posix_error);
-+	KUNIT_EXPECT_STREQ(test, expect->status_string, result->status_string);
-+}
-+
-+static void maperror_test_check_search(struct kunit *test)
-+{
-+	unsigned int i;
-+	struct status_to_posix_error expect;
-+
-+	for (i = 0; i < ARRAY_SIZE(smb2_error_map_table); i++) {
-+		expect = smb2_error_map_table[i];
-+		test_cmp_map(test, &expect);
-+	}
-+}
-+
-+static struct kunit_case maperror_test_cases[] = {
-+	KUNIT_CASE(maperror_test_check_search),
-+	{}
-+};
-+
-+static struct kunit_suite maperror_suite = {
-+	.name = "smb2_maperror",
-+	.test_cases = maperror_test_cases,
-+};
-+
-+kunit_test_suite(maperror_suite);
-+
-+MODULE_LICENSE("GPL");
+  smb: client: fix UBSAN array-index-out-of-bounds in
+smb2_copychunk_range (2025-12-30 09:17:41 -0600)
+
+----------------------------------------------------------------
+Two smb3 client fixes
+- Fix array out of bounds error in copy_file_range
+- Add tracepoint to help debug ioctl failures
+----------------------------------------------------------------
+Henrique Carvalho (1):
+      smb: client: fix UBSAN array-index-out-of-bounds in smb2_copychunk_range
+
+Steve French (1):
+      smb3 client: add missing tracepoint for unsupported ioctls
+
+ fs/smb/client/ioctl.c   | 3 +++
+ fs/smb/client/smb2ops.c | 6 ++++++
+ fs/smb/client/trace.h   | 1 +
+ 3 files changed, 10 insertions(+)
+
+
 -- 
-2.43.0
+Thanks,
 
+Steve
