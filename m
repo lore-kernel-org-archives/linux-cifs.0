@@ -1,106 +1,63 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0500E21B9C1
-	for <linux-cifs@vger.kernel.org>; Fri,  2 Jan 2026 14:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D4532F9D83;
+	Fri,  2 Jan 2026 17:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767364639; cv=none; b=syqIrpxBQBnyNhvKLvFbjlws7mgNCsuHggk5cJWWK842Irj9Bie61Xo4VfQ+tv8UT61+xysGPqFZSBpoiTxtF9oGXxxjt3cGEPNRLPNwfD6yuJP5SsFpC2kFSCIhQA5LQMvbeCUgCqqEZSQM+Pw4Monu8UCOSM1u0y9NmToR+Gg=
+	t=1767376606; cv=none; b=D9Co+xkKLkP7WE5mpEqecKh/76c4jscD4xs+FfSLrsgPE7Brm+X03CpJZFAr1PrCtXPlnEsCzVrP2wET0J6qA3+Gz+YO4mP0We0y5D2kWaaXrKwyEz4OGgZZmGBP0MdviGILINwOj/Y65jNs+5Y5WLV+sD43hZd2JSD242sxkRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767364639; c=relaxed/simple;
-	bh=/KrYmvFUpydZv2ktL2TLJkEEJAUF5MVRH4Zva/Z2G0Q=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=aw1ob91ann1cQclXR8NVayWkcokQ2IoNbq9pqL7tpeom9RdkRQK+OpmX1NrV2eWH9jacFjHhFCkqBsKeke4LFv/O0l552AwEjxjUQZ84FVHa4JwWKwAKR9DjKniww3qqYfRHBeYVSZkGJWIg5jCo4ukCVE7Ihy3zVqN0naazGzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=axg3nR7o; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767376606; c=relaxed/simple;
+	bh=N28ldKO8sDSLHD0d6MJyt3gyEjrzUP1/KeGKkHya4Rg=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=AAQrXaWj5RRbjONr9EnXtPwym1tdvUwDnsEMy5W9P9RAdXsMTW6Zq0cNDYe9PkHWsAPAsvUD0XjABAQ46NxjYeGpSkCAeifcxj26/dA06fQaoD9JcVNa1HGsCUdb9dVxNlb5KABiNp3Kabwat3uTUgoEoZw925J/zzVYDH2Aneo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=us6SuGp8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="axg3nR7o"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-88a35a00502so125155846d6.0
-        for <linux-cifs@vger.kernel.org>; Fri, 02 Jan 2026 06:37:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767364635; x=1767969435; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jmpSJOVIFg4M2aacWsc9e3hmgzuy+9LOHvIW6f6DhhE=;
-        b=axg3nR7oUhgwZFamBHR64i89X3s2/60rMvw5tXIQu9cYfJQQtaQdU4WR8geT0kSma1
-         5RS9SW2CJs6VNbWcKkyuy69jpXr2nJ+8rrCjz1jBmeNpcBcEzTg7GGSBOicbAK74vN2/
-         fsHXdIYrOTDNS7oA/blfxm2EJkq8BfYxsKZ10NTlSwH5EZtaABAQoAw8fmIZCxAnOdSR
-         iNg+xGbx7gnsK/kOTIfNxEJswT6mou+P4HEvkKdlTQv0UIyVwk/yg/fNPFHCK1OpPRbL
-         90j/n1utG9d7AnjoexL/fQkbJV6qgAUv3nY0We24Y0LI5TykeMYE9znGgIli7MhHIL2s
-         pktw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767364635; x=1767969435;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jmpSJOVIFg4M2aacWsc9e3hmgzuy+9LOHvIW6f6DhhE=;
-        b=UYIwA5ObD2r8mu5QTEZRBUVi8QbwAu1JnHbYVYTeKppP+EpDXeV88Yjz1t9+ezD9Yo
-         SX04Qe8Utscc4MMECqF6J/yjaTXII6ALhB1difekwma9+Pna7Xz0tGwq5cEm8fcrJDl8
-         l2C3N4zYlgjU6tHjY0/Gg0nhWr4yeRxo1l6e3/TWL7VpssfpZY2jwfffWUuIJQw+Bd15
-         Vj8zNSY126vUGwNZe4+mJUw7I+UHri63GalmLYWaxvkXmeNG77ntH7D9lYDEauFU6QUD
-         0FLJF8v+DzKAyR9uDGg9tUyvrxuH1FiGcdr9Ob3TbKVkBdoIEPsBfXh+T+TIlwDA+V5i
-         Xwkg==
-X-Forwarded-Encrypted: i=1; AJvYcCVA1mwXiAxmEzcXUivICiU4xgj++OWYPZFwm2oczylbD1ckrK7XL+ZwcXOvhnaW/OVzR3qOgP5d16F7@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxa2379wyg2TtDarZBqwVH6LnqtAEuJu9wuxhgg3AjrRSzyI8ec
-	Z/nY522qqJLzhgf2tmZ71+qRkaXuFkEVM9hncdzAVrGKZwc5MqjDYuc7lvwGiAw33wDp22aZsqR
-	AxYwKtXrMbiwN8pUdSq8cTtKuY2x4pq4=
-X-Gm-Gg: AY/fxX4BdzKTHw2kz7QMN5VPGjVWcZVOEEDv9FwrpEoAZzVJfwGt57jhP8DyF9TLaGr
-	gCXREGT+2feKMPGK1NjTJBuhL08el2kUNcBUtFvjJjdirdIJlCGb0rLLATlFfC7Rq+cFUEiYEka
-	7Gg7sXOBuKij/iboPvN4slyyQGXqdrhi7qOZ4l5ZdTPZwLINFS+jruH5eAVu8HKDJdblkxFz1SC
-	Wxle8JafdibO6G+Il+vLHSrp4fm311xWKGvJhmtncbvfu+K/+Btc0fdy5X6TPWsCO9TTZNcYGNc
-	36Qv94B3wmEy+Z7Ni2B0bDffjbAZW9/WPNnMarrhroQ7uFqx/h98PQXv0f++6v27g/Inu/iVnPU
-	COlrce1gJZ9ycMB+Eyfntkp8ACjeykyvONKQkvZi8uZ7tF0s7fQU=
-X-Google-Smtp-Source: AGHT+IEE2iqiN1E5UIb/YYfs6lj3Yj3uCVZRA6sxMGHpHx+t1Aygzz9I0cMBXLvuWS2L7ibk1mog/EV5GNp8x5CEnI8=
-X-Received: by 2002:a05:6214:6115:b0:88a:42b1:25e7 with SMTP id
- 6a1803df08f44-88d8252611cmr655446896d6.29.1767364634657; Fri, 02 Jan 2026
- 06:37:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="us6SuGp8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E4F8C116B1;
+	Fri,  2 Jan 2026 17:56:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767376606;
+	bh=N28ldKO8sDSLHD0d6MJyt3gyEjrzUP1/KeGKkHya4Rg=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=us6SuGp80/DQejSYO5SeXY7+K6Z0DPA4fQ+WiVKGW3DOog/CrCTlEc0TgSUB3ud6a
+	 fatHavQcJErqBsnM2D1lvackUB/D0FwEYAFcEeSHtnbn4LDo6EoSyxCnq59jBPaAzZ
+	 ia41YZ+o+85C15b4Ek6C4czLQ2LG/5OkubqtVUfxmoWWop0cKsTI0EDRDCSCEBMKRN
+	 IlqXa5/W8BUlhJQtMUd5ujPMNvsCKpT/piVbE5xRksH5frP5TaILodiecbuzkme6nj
+	 PQzw5k09GLfaUG1Y9LsjK6R1/1ysY2YcalflP+iFbpL9/pwd4WbR9A/2YUflabyuav
+	 Fx6wVMXU7JJlA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78C54380A960;
+	Fri,  2 Jan 2026 17:53:27 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mtb82d1+_nY=Kk6F3VN-8V3sY8f-PXtK0E=sa_C6vgtUw@mail.gmail.com>
+References: <CAH2r5mtb82d1+_nY=Kk6F3VN-8V3sY8f-PXtK0E=sa_C6vgtUw@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mtb82d1+_nY=Kk6F3VN-8V3sY8f-PXtK0E=sa_C6vgtUw@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v6.19-rc3-smb3-client-fixes
+X-PR-Tracked-Commit-Id: fa2fd0b10f66b08bc44745feed1761d7c1539d6e
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 047b4e783ce2af73b3287dfabfeaa51684932757
+Message-Id: <176737640598.3971834.3560712920483781049.pr-tracker-bot@kernel.org>
+Date: Fri, 02 Jan 2026 17:53:25 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 2 Jan 2026 08:37:03 -0600
-X-Gm-Features: AQt7F2oSuGIeM3Cv7RcApeTZCAv4r6P2bHK04YA1bQCwKv8bRnwAcKzL9lfFFI0
-Message-ID: <CAH2r5mtZfrePFu5F-xiQXaaE_piwoe1i=BkpwFmve_ywKiCpsA@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-Please pull the following changes since commit
-f8f9c1f4d0c7a64600e2ca312dec824a0bc2f1da:
+The pull request you sent on Thu, 1 Jan 2026 21:54:08 -0600:
 
-  Linux 6.19-rc3 (2025-12-28 13:24:26 -0800)
+> git://git.samba.org/sfrench/cifs-2.6.git tags/v6.19-rc3-smb3-client-fixes
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/047b4e783ce2af73b3287dfabfeaa51684932757
 
-  git://git.samba.org/ksmbd.git tags/v6.19-rc3-smb3-server-fixes
-
-for you to fetch changes up to f416c556997aa56ec4384c6b6efd6a0e6ac70aa7:
-
-  smb/server: fix refcount leak in smb2_open() (2025-12-29 17:39:58 -0600)
-
-----------------------------------------------------------------
-Four smb3 server fixes
-- Fix memory leak
-- Fix two refcount leaks
-- Fix error path in create_smb2_pipe
-----------------------------------------------------------------
-ZhangGuoDong (3):
-      smb/server: call ksmbd_session_rpc_close() on error path in
-create_smb2_pipe()
-      smb/server: fix refcount leak in parse_durable_handle_context()
-      smb/server: fix refcount leak in smb2_open()
-
-Zilin Guan (1):
-      ksmbd: Fix memory leak in get_file_all_info()
-
- fs/smb/server/smb2pdu.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
