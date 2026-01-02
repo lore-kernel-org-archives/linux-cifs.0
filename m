@@ -1,58 +1,58 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A616423C50A
-	for <linux-cifs@vger.kernel.org>; Fri,  2 Jan 2026 03:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0500E21B9C1
+	for <linux-cifs@vger.kernel.org>; Fri,  2 Jan 2026 14:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767326062; cv=none; b=DN3Sx1E8Zxwl4rwSTpbHmu2XbUjyhGOEX3cbufg51UuanpuvGF5CYWEPL2SSstj1kaGcN/MCgFvp8gRf9wA5YOMDSdlEm33A3+xBF66hCoIO0nirkT4j8FPsKAFwKudKbST0SZoIamc+7DBis83vnbfIKfvQgNH6sZd4dNaaM88=
+	t=1767364639; cv=none; b=syqIrpxBQBnyNhvKLvFbjlws7mgNCsuHggk5cJWWK842Irj9Bie61Xo4VfQ+tv8UT61+xysGPqFZSBpoiTxtF9oGXxxjt3cGEPNRLPNwfD6yuJP5SsFpC2kFSCIhQA5LQMvbeCUgCqqEZSQM+Pw4Monu8UCOSM1u0y9NmToR+Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767326062; c=relaxed/simple;
-	bh=y3mA4ItRr+3SbF71gxTpXk0OO5uUGSsVm733vrUDM8M=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Wr+ru2dmVoLtenczW5Mn1pn9Cwkh2bCtBI5TWrLu2CIsgP+WQ4yIBFT3cmojxB2QXkzJIjz8NYnNkBbeoca5p6CVjAE9YbUEk6THWsHneaZS3GV2RF2Ta5foZ5hS1afp7HalrT/r0+fezedsZPkNL3X52DKZMO8YNN4F8964Wz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DEt4p425; arc=none smtp.client-ip=209.85.160.174
+	s=arc-20240116; t=1767364639; c=relaxed/simple;
+	bh=/KrYmvFUpydZv2ktL2TLJkEEJAUF5MVRH4Zva/Z2G0Q=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=aw1ob91ann1cQclXR8NVayWkcokQ2IoNbq9pqL7tpeom9RdkRQK+OpmX1NrV2eWH9jacFjHhFCkqBsKeke4LFv/O0l552AwEjxjUQZ84FVHa4JwWKwAKR9DjKniww3qqYfRHBeYVSZkGJWIg5jCo4ukCVE7Ihy3zVqN0naazGzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=axg3nR7o; arc=none smtp.client-ip=209.85.219.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DEt4p425"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4ed9c19248bso101613471cf.1
-        for <linux-cifs@vger.kernel.org>; Thu, 01 Jan 2026 19:54:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="axg3nR7o"
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-88a35a00502so125155846d6.0
+        for <linux-cifs@vger.kernel.org>; Fri, 02 Jan 2026 06:37:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767326059; x=1767930859; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767364635; x=1767969435; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=rRhSPZP5WvVax8UHgJMah0AYxpmKWUf7qtYho6M4+vY=;
-        b=DEt4p425QZbBEs2CMQS5h21JS6GR+RdP3RkxGqT2xr/6tBADe5OCXotvP/dPIjGWdZ
-         S5i+YaCzqGV5pVvdJ2bRorIaCMQ0ctBLsSY9hwd4aJSSZ98EAG+4s9uaqsjjqJ/mkEW/
-         j+RBGfdIgLlajHZ7U4c1YApx0l7UXzRn4KAccU+3M2VXtY0ThS59JidPPwrPDLXMwAqc
-         FEJiVSTH6EXPUxjCtgShn7LzePi16CZ4OB43tU0MZYeFkZUHsFVd/0yCxZiRl0TMqgGk
-         j3pNPFf1j5JjMzsUzDyZ4Nkr+UAJDTD9iPeHR+p6CUzMN8LcH3fYEdaxpsGXnFs3D3PT
-         jqdw==
+        bh=jmpSJOVIFg4M2aacWsc9e3hmgzuy+9LOHvIW6f6DhhE=;
+        b=axg3nR7oUhgwZFamBHR64i89X3s2/60rMvw5tXIQu9cYfJQQtaQdU4WR8geT0kSma1
+         5RS9SW2CJs6VNbWcKkyuy69jpXr2nJ+8rrCjz1jBmeNpcBcEzTg7GGSBOicbAK74vN2/
+         fsHXdIYrOTDNS7oA/blfxm2EJkq8BfYxsKZ10NTlSwH5EZtaABAQoAw8fmIZCxAnOdSR
+         iNg+xGbx7gnsK/kOTIfNxEJswT6mou+P4HEvkKdlTQv0UIyVwk/yg/fNPFHCK1OpPRbL
+         90j/n1utG9d7AnjoexL/fQkbJV6qgAUv3nY0We24Y0LI5TykeMYE9znGgIli7MhHIL2s
+         pktw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767326059; x=1767930859;
+        d=1e100.net; s=20230601; t=1767364635; x=1767969435;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rRhSPZP5WvVax8UHgJMah0AYxpmKWUf7qtYho6M4+vY=;
-        b=mIBLmc+EawAPzpG1267ng+tEyJWwt9SamEo+LRoHunQFYamnnJTa41eoW1tQau0Bkg
-         nWugIstFbUnj+2g4pmY7LBwePoiHPmjrreD0zxkYULAr7lZZUSCJQK/V/XBmDIzxJcmK
-         iv4gfffBMw41XgFH2Z/uGETpKXZGniNZui64omNm8yjEtMOw0mvDZ0XgcNLIjV0UHckp
-         fj21iNggLwcLA1Mve4obzyPNZQUbO0EM0Jjmr0sF5uI1gONGrZKLnUDncV2HQsqRlQSK
-         0nBAjMi3bCSabPXofe2bJ0Q2NipKCuQ+NuCGbaWBSjLpT9FMUZ9oS+F2t8P500DF5t2R
-         HvwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWtY1yKfXsLV7xcGTPByuj2cmQOaD+WS1qgyiXg+d6f8/MD2YRwU5GfJylbwp38J4fASkrI+7w9R71o@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5ublqMdIh37auxFlo1MwvajtzmzoHsexo7UtFNyslUI+sWosI
-	FXDEX2hb9LrWAvRbyzgW+j0XW2J+TL2feFD4Q3V3/USOYFKBUC2b4v6kjsO6/yQB7RBKeKukhpN
-	siLmakD4f3tecADk3fJ77ibXxNRFyev0=
-X-Gm-Gg: AY/fxX7fMCiuR1Np9FqzL33g/0C6oXvXbtAkB0DS6hCMsAoJ9KPQH7QmmSAFnh0iyEw
-	sigN87ALORYih3ShMqRkyCjApzmVSppv1YTqhBl9eNDXCrG04tgLJecIjS1NplP2ZQDoi73khzL
-	WqEZIt/9r4TulSsrufys7ra6ZuR5i3W3qfZNbJQlynaA3bSx8UxaqdDwhd2jDlKOWc5avv08/tG
-	FnvP5AizruJIitVJgS6G1pwuJIChqQN0Y8pkTxKHrXzpa7UT4ActaKqmeIImKXvxMJ+6eI2PKgT
-	M0NZiT6jKGks3YeZSmv5tHfgs+6SNzQvN8X9WlP21UJT2/9It/DMojoUkQEPkZkhNUgD86yjQOT
-	/56MQtU8HimcfzIurFBCCVuJOzT6eDPkN+yHCjOL9VU7q91muWgw=
-X-Google-Smtp-Source: AGHT+IEruY3B8PsYyfhU2KJWgqnP5UPeAQQYE+5t227ZFfh2eWyT+mUh+/8GM7Fe6RDH+QfmRwUOApYD+hObp5G6BEk=
-X-Received: by 2002:a05:622a:cc:b0:4ee:9b1:e2c with SMTP id
- d75a77b69052e-4f4abd35e3emr676950681cf.33.1767326059533; Thu, 01 Jan 2026
- 19:54:19 -0800 (PST)
+        bh=jmpSJOVIFg4M2aacWsc9e3hmgzuy+9LOHvIW6f6DhhE=;
+        b=UYIwA5ObD2r8mu5QTEZRBUVi8QbwAu1JnHbYVYTeKppP+EpDXeV88Yjz1t9+ezD9Yo
+         SX04Qe8Utscc4MMECqF6J/yjaTXII6ALhB1difekwma9+Pna7Xz0tGwq5cEm8fcrJDl8
+         l2C3N4zYlgjU6tHjY0/Gg0nhWr4yeRxo1l6e3/TWL7VpssfpZY2jwfffWUuIJQw+Bd15
+         Vj8zNSY126vUGwNZe4+mJUw7I+UHri63GalmLYWaxvkXmeNG77ntH7D9lYDEauFU6QUD
+         0FLJF8v+DzKAyR9uDGg9tUyvrxuH1FiGcdr9Ob3TbKVkBdoIEPsBfXh+T+TIlwDA+V5i
+         Xwkg==
+X-Forwarded-Encrypted: i=1; AJvYcCVA1mwXiAxmEzcXUivICiU4xgj++OWYPZFwm2oczylbD1ckrK7XL+ZwcXOvhnaW/OVzR3qOgP5d16F7@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxa2379wyg2TtDarZBqwVH6LnqtAEuJu9wuxhgg3AjrRSzyI8ec
+	Z/nY522qqJLzhgf2tmZ71+qRkaXuFkEVM9hncdzAVrGKZwc5MqjDYuc7lvwGiAw33wDp22aZsqR
+	AxYwKtXrMbiwN8pUdSq8cTtKuY2x4pq4=
+X-Gm-Gg: AY/fxX4BdzKTHw2kz7QMN5VPGjVWcZVOEEDv9FwrpEoAZzVJfwGt57jhP8DyF9TLaGr
+	gCXREGT+2feKMPGK1NjTJBuhL08el2kUNcBUtFvjJjdirdIJlCGb0rLLATlFfC7Rq+cFUEiYEka
+	7Gg7sXOBuKij/iboPvN4slyyQGXqdrhi7qOZ4l5ZdTPZwLINFS+jruH5eAVu8HKDJdblkxFz1SC
+	Wxle8JafdibO6G+Il+vLHSrp4fm311xWKGvJhmtncbvfu+K/+Btc0fdy5X6TPWsCO9TTZNcYGNc
+	36Qv94B3wmEy+Z7Ni2B0bDffjbAZW9/WPNnMarrhroQ7uFqx/h98PQXv0f++6v27g/Inu/iVnPU
+	COlrce1gJZ9ycMB+Eyfntkp8ACjeykyvONKQkvZi8uZ7tF0s7fQU=
+X-Google-Smtp-Source: AGHT+IEE2iqiN1E5UIb/YYfs6lj3Yj3uCVZRA6sxMGHpHx+t1Aygzz9I0cMBXLvuWS2L7ibk1mog/EV5GNp8x5CEnI8=
+X-Received: by 2002:a05:6214:6115:b0:88a:42b1:25e7 with SMTP id
+ 6a1803df08f44-88d8252611cmr655446896d6.29.1767364634657; Fri, 02 Jan 2026
+ 06:37:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -60,12 +60,13 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 1 Jan 2026 21:54:08 -0600
-X-Gm-Features: AQt7F2pwwh0jRIe3Kk8_vBAPCszjYv7yqwf3XEpUv3Aw8Zv9DY1qKFo2paF9YBc
-Message-ID: <CAH2r5mtb82d1+_nY=Kk6F3VN-8V3sY8f-PXtK0E=sa_C6vgtUw@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
+Date: Fri, 2 Jan 2026 08:37:03 -0600
+X-Gm-Features: AQt7F2oSuGIeM3Cv7RcApeTZCAv4r6P2bHK04YA1bQCwKv8bRnwAcKzL9lfFFI0
+Message-ID: <CAH2r5mtZfrePFu5F-xiQXaaE_piwoe1i=BkpwFmve_ywKiCpsA@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
 Please pull the following changes since commit
@@ -75,29 +76,29 @@ f8f9c1f4d0c7a64600e2ca312dec824a0bc2f1da:
 
 are available in the Git repository at:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.19-rc3-smb3-client-fixes
+  git://git.samba.org/ksmbd.git tags/v6.19-rc3-smb3-server-fixes
 
-for you to fetch changes up to fa2fd0b10f66b08bc44745feed1761d7c1539d6e:
+for you to fetch changes up to f416c556997aa56ec4384c6b6efd6a0e6ac70aa7:
 
-  smb: client: fix UBSAN array-index-out-of-bounds in
-smb2_copychunk_range (2025-12-30 09:17:41 -0600)
+  smb/server: fix refcount leak in smb2_open() (2025-12-29 17:39:58 -0600)
 
 ----------------------------------------------------------------
-Two smb3 client fixes
-- Fix array out of bounds error in copy_file_range
-- Add tracepoint to help debug ioctl failures
+Four smb3 server fixes
+- Fix memory leak
+- Fix two refcount leaks
+- Fix error path in create_smb2_pipe
 ----------------------------------------------------------------
-Henrique Carvalho (1):
-      smb: client: fix UBSAN array-index-out-of-bounds in smb2_copychunk_range
+ZhangGuoDong (3):
+      smb/server: call ksmbd_session_rpc_close() on error path in
+create_smb2_pipe()
+      smb/server: fix refcount leak in parse_durable_handle_context()
+      smb/server: fix refcount leak in smb2_open()
 
-Steve French (1):
-      smb3 client: add missing tracepoint for unsupported ioctls
+Zilin Guan (1):
+      ksmbd: Fix memory leak in get_file_all_info()
 
- fs/smb/client/ioctl.c   | 3 +++
- fs/smb/client/smb2ops.c | 6 ++++++
- fs/smb/client/trace.h   | 1 +
- 3 files changed, 10 insertions(+)
-
+ fs/smb/server/smb2pdu.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
 -- 
 Thanks,
