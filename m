@@ -1,63 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992C12BE032;
-	Fri,  2 Jan 2026 17:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362E3315D5E
+	for <linux-cifs@vger.kernel.org>; Fri,  2 Jan 2026 18:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767376609; cv=none; b=ZiDHGnUYGs037XS1gx08OK/kJ4vTzY6Y9IBY+VqT4ePCq81pIYyCau7iGQoZnfWDsI7G5p9rYNTu9nFxPEEQ8qa6zXiSYtyI6aYSo/8YDrj6tZjiZLRKmykMSU01fZLfWMfvFBYPKOPHHVoj77TrZP+a3le9KV1ozhK4gC+u1+c=
+	t=1767379436; cv=none; b=SPWakl+SFydPHWAiV6xSR+GojSY7VQ55VMTVLkjek4nUT9eG5W56o1c/f69pOeJIkeDI0q2L/D5DwAc4GZf1NMGpvvtpDNRj4zBidIQzARshQ776vcybY8KS5WVHFspjkaxCMZ7taBm6eT4jx3P9U4pTrFwtbs5meoULrau7vuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767376609; c=relaxed/simple;
-	bh=q3/1iBX1MRB2ozI11HT/JbSyHih3ovXBRtYj0t/o0Kg=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=o39pX3hXKUA432pNvyq7dwoDilbsYf7+cuXBf7Qy+95lvUhBCUhy9knOYKRkILrD3/L2BJGFmPvwS3zvWzF/85JlZSZ0DU/KNiu6g+xWdLuf//x8WqU2FLvBAr1d75eJ1Vc7cnF3ALwGefUrP9dOzJo48zKTBblLosuam3UnNmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vApp38Kn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767379436; c=relaxed/simple;
+	bh=xXFwLaJLVN0S3AO/xbklyFdgLL/H9ocBcD1lYUeNo80=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=YedsXhMD1Uc9ltezQPUm4foKDg0pe30Owl7r1D88oFwJyDynYwR2+IIb0JM8a5d9DQmcfK0w2/bWI3w62UogXy+Xrqe3caJ0Bzh6KG1NzYvvmO4m3d4PIyzKKfKvVLAK6mv0xsBC6VoS/0l3e01+N1yXjmXpcs9qXYx8UwthdKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bssv3Xup; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vApp38Kn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BD1CC19421;
-	Fri,  2 Jan 2026 17:56:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767376608;
-	bh=q3/1iBX1MRB2ozI11HT/JbSyHih3ovXBRtYj0t/o0Kg=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=vApp38KnmIKZujGzaYwBE47ISpmDlJXsubmNocKM4uhfJQnKUB1w7qhMv23/bWDNN
-	 CP++M+Pl6D2GsiW+tcMP5N8NSD5oUFgLwCafPRFi8r8R3cemBb7ZkCgDFlG6kYDs0F
-	 MZaCocDoWjyXcvmdhTkT0KCTUUjTtCKUObEX4fZ38p/xc6DGqAYdUYDP/PP+zhvXzA
-	 fVFXfxCp69Kku+KGxAolWYoq0l/iEVIECpZals0Py3x7a44O4rvchOSJLj/qa9S+Gu
-	 9/0VtpnzUByaq03U7W4gHpMUMwrWi0vnYnaQNofe0+uJCySOwzR+5kkPK+d6NbKl/J
-	 /KLTpmgVXeVHw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 788CB380A960;
-	Fri,  2 Jan 2026 17:53:29 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtZfrePFu5F-xiQXaaE_piwoe1i=BkpwFmve_ywKiCpsA@mail.gmail.com>
-References: <CAH2r5mtZfrePFu5F-xiQXaaE_piwoe1i=BkpwFmve_ywKiCpsA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtZfrePFu5F-xiQXaaE_piwoe1i=BkpwFmve_ywKiCpsA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v6.19-rc3-smb3-server-fixes
-X-PR-Tracked-Commit-Id: f416c556997aa56ec4384c6b6efd6a0e6ac70aa7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e3a97ab1bbc36be6467fd606c0af1120b6146ddc
-Message-Id: <176737640796.3971834.17501196255447746084.pr-tracker-bot@kernel.org>
-Date: Fri, 02 Jan 2026 17:53:27 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bssv3Xup"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767379433;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xXFwLaJLVN0S3AO/xbklyFdgLL/H9ocBcD1lYUeNo80=;
+	b=Bssv3XupFWLSzOgBsuk5wSKBqlKuOZqkR0ozjF/awDd0ctLJhCLzvvoG2O8vXUCMJctygb
+	F3bp/LIN1QgjoexMSTuTU06td+I/RqOGDrihFZuygelgLsWkbIXYf50CNS4uBKZbubRog9
+	V2bHOp+j6gwHZfJ1UIA8MkZ68SRZxM8=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-445-Bc0jOwyGPkes5HuU1_9Bdg-1; Fri,
+ 02 Jan 2026 13:43:47 -0500
+X-MC-Unique: Bc0jOwyGPkes5HuU1_9Bdg-1
+X-Mimecast-MFC-AGG-ID: Bc0jOwyGPkes5HuU1_9Bdg_1767379426
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BF1EF19560B2;
+	Fri,  2 Jan 2026 18:43:45 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4895030001A2;
+	Fri,  2 Jan 2026 18:43:43 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <qvtkweac7g5ejiicsnb7cqxlxl35toi2ykdmguaszqkcnir355@zvaw3oxlxzex>
+References: <qvtkweac7g5ejiicsnb7cqxlxl35toi2ykdmguaszqkcnir355@zvaw3oxlxzex> <1430101.1764595523@warthog.procyon.org.uk>
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
+    Steve French <sfrench@samba.org>,
+    Shyam Prasad N <sprasad@microsoft.com>,
+    Stefan Metzmacher <metze@samba.org>, linux-cifs@vger.kernel.org,
+    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: Can we sort out the prototypes within the cifs headers?
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1460703.1767379422.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 02 Jan 2026 18:43:42 +0000
+Message-ID: <1460704.1767379422@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-The pull request you sent on Fri, 2 Jan 2026 08:37:03 -0600:
+Enzo Matsumiya <ematsumiya@suse.de> wrote:
 
-> git://git.samba.org/ksmbd.git tags/v6.19-rc3-smb3-server-fixes
+> +1 for the cleanups, thanks for doing that.
+> =
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e3a97ab1bbc36be6467fd606c0af1120b6146ddc
+> On backports, I think points 1-3 could be done together, but in separate
+> commits (per header file) to minimise conflicts.
+> =
 
-Thank you!
+> 4 looks good to have.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Hi Enzo,
+
+Could you have a look at:
+
+https://lore.kernel.org/linux-cifs/20251222223006.1075635-1-dhowells@redha=
+t.com/T/#t
+
+see if you're okay with it?
+
+Thanks,
+David
+
