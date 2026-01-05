@@ -1,62 +1,60 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362E3315D5E
-	for <linux-cifs@vger.kernel.org>; Fri,  2 Jan 2026 18:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1C71F63CD
+	for <linux-cifs@vger.kernel.org>; Mon,  5 Jan 2026 07:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767379436; cv=none; b=SPWakl+SFydPHWAiV6xSR+GojSY7VQ55VMTVLkjek4nUT9eG5W56o1c/f69pOeJIkeDI0q2L/D5DwAc4GZf1NMGpvvtpDNRj4zBidIQzARshQ776vcybY8KS5WVHFspjkaxCMZ7taBm6eT4jx3P9U4pTrFwtbs5meoULrau7vuI=
+	t=1767599923; cv=none; b=eJHPRKxM+PVl9A8lDSUPV+9Kh7bWwn2hGPBZZvDr4F64gt+wHsPpAr16RvYu8mguGpwDohIs4XgbqiyhzEkgOzf79rmUtIuQJnPGzreGNImBSUSgWT/1G7o+cRUxKAv5dYAsFV91Ema4OQ3E1hAuHWPeorI+1eb88SGKlErsrxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767379436; c=relaxed/simple;
-	bh=xXFwLaJLVN0S3AO/xbklyFdgLL/H9ocBcD1lYUeNo80=;
+	s=arc-20240116; t=1767599923; c=relaxed/simple;
+	bh=N5zwnbXolPEoDsJIXCJjUml42ECM3gXg3VCKQ4IeOmI=;
 	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=YedsXhMD1Uc9ltezQPUm4foKDg0pe30Owl7r1D88oFwJyDynYwR2+IIb0JM8a5d9DQmcfK0w2/bWI3w62UogXy+Xrqe3caJ0Bzh6KG1NzYvvmO4m3d4PIyzKKfKvVLAK6mv0xsBC6VoS/0l3e01+N1yXjmXpcs9qXYx8UwthdKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bssv3Xup; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Date:Message-ID; b=akxEir8h+fo4OOLJ/G36k+alBadMZ2UtKsQbn3akX1WmYiOqFOidN1xev1Q5ZcU5yzIrzzbp0M43S8VpRHyEVpwuO27Zgm7tsi+erA5KrrBnWp6MKHByTZ3/EDTXsN1zhdNFco1CwA4nUGOK4CYJWYBA61EB6mKbiuIq9XENCVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zng1Vvu1; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bssv3Xup"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zng1Vvu1"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767379433;
+	s=mimecast20190719; t=1767599920;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xXFwLaJLVN0S3AO/xbklyFdgLL/H9ocBcD1lYUeNo80=;
-	b=Bssv3XupFWLSzOgBsuk5wSKBqlKuOZqkR0ozjF/awDd0ctLJhCLzvvoG2O8vXUCMJctygb
-	F3bp/LIN1QgjoexMSTuTU06td+I/RqOGDrihFZuygelgLsWkbIXYf50CNS4uBKZbubRog9
-	V2bHOp+j6gwHZfJ1UIA8MkZ68SRZxM8=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=DEGOUP7rUZVPB/aEZDgrW/onoEFhGzG7TdkAzmYsEWw=;
+	b=Zng1Vvu1gCjf92UpSU6tX4RY6ZwiO91j2P+2FomR7ADk3T203idTp+0omRrx+TheunSodR
+	z56wFFzZ1nUCun8n9eMb3N28v3btXjyJ+6+ms5WXfoDgu1mXYH7fAMgGCPA/VADERFUpR6
+	5cRXyrtWMGvICzWT2xb9WEESXmcYKEQ=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-445-Bc0jOwyGPkes5HuU1_9Bdg-1; Fri,
- 02 Jan 2026 13:43:47 -0500
-X-MC-Unique: Bc0jOwyGPkes5HuU1_9Bdg-1
-X-Mimecast-MFC-AGG-ID: Bc0jOwyGPkes5HuU1_9Bdg_1767379426
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-544-27mGmtnOPvupbxakgHaOLA-1; Mon,
+ 05 Jan 2026 02:58:34 -0500
+X-MC-Unique: 27mGmtnOPvupbxakgHaOLA-1
+X-Mimecast-MFC-AGG-ID: 27mGmtnOPvupbxakgHaOLA_1767599913
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BF1EF19560B2;
-	Fri,  2 Jan 2026 18:43:45 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 56D061956089;
+	Mon,  5 Jan 2026 07:58:25 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4895030001A2;
-	Fri,  2 Jan 2026 18:43:43 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9170B180044F;
+	Mon,  5 Jan 2026 07:58:21 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
 	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
 	Kingdom.
 	Registered in England and Wales under Company Registration No. 3798903
 From: David Howells <dhowells@redhat.com>
-In-Reply-To: <qvtkweac7g5ejiicsnb7cqxlxl35toi2ykdmguaszqkcnir355@zvaw3oxlxzex>
-References: <qvtkweac7g5ejiicsnb7cqxlxl35toi2ykdmguaszqkcnir355@zvaw3oxlxzex> <1430101.1764595523@warthog.procyon.org.uk>
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
-    Steve French <sfrench@samba.org>,
-    Shyam Prasad N <sprasad@microsoft.com>,
-    Stefan Metzmacher <metze@samba.org>, linux-cifs@vger.kernel.org,
-    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: Can we sort out the prototypes within the cifs headers?
+In-Reply-To: <20251231130918.1168557-3-chenxiaosong.chenxiaosong@linux.dev>
+References: <20251231130918.1168557-3-chenxiaosong.chenxiaosong@linux.dev> <20251231130918.1168557-1-chenxiaosong.chenxiaosong@linux.dev>
+To: chenxiaosong.chenxiaosong@linux.dev
+Cc: dhowells@redhat.com, smfrench@gmail.com, linkinjeon@kernel.org,
+    pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+    tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
+    linux-cifs@vger.kernel.org, Steve French <stfrench@microsoft.com>,
+    ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: Re: [PATCH v7 2/5] cifs: Autogenerate SMB2 error mapping table
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -64,32 +62,19 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1460703.1767379422.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Jan 2026 18:43:42 +0000
-Message-ID: <1460704.1767379422@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-ID: <1696855.1767599900.1@warthog.procyon.org.uk>
+Date: Mon, 05 Jan 2026 07:58:20 +0000
+Message-ID: <1696856.1767599900@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Enzo Matsumiya <ematsumiya@suse.de> wrote:
+chenxiaosong.chenxiaosong@linux.dev wrote:
 
-> +1 for the cleanups, thanks for doing that.
-> =
+> +	__u32 smb2_status;
 
-> On backports, I think points 1-3 could be done together, but in separate
-> commits (per header file) to minimise conflicts.
-> =
+Note that you only really need to use __u32, __u16, __u8 and suchlike in UAPI
+structs that userspace will be able to #include.  You can use u32, u16, u8 in
+kernel internals.  But don't worry too much about it - it's not worth
+respinning the patches over.
 
-> 4 looks good to have.
-
-Hi Enzo,
-
-Could you have a look at:
-
-https://lore.kernel.org/linux-cifs/20251222223006.1075635-1-dhowells@redha=
-t.com/T/#t
-
-see if you're okay with it?
-
-Thanks,
 David
 
