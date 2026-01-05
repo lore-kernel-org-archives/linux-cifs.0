@@ -1,166 +1,149 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D068B3491C4
-	for <linux-cifs@vger.kernel.org>; Mon,  5 Jan 2026 16:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6AA71A5B9D
+	for <linux-cifs@vger.kernel.org>; Mon,  5 Jan 2026 17:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767629879; cv=none; b=U46UH7q5/kLlskAoP0YhPYG67j2mTNkEa6XVmHYkn5a/P4JKoJS51n0nfYoRQ5QfISWuRzmwrZk4fILO0HG3webhO/O4gUxZ81FxxgbQ3UwqR+qkUBNeSdX3/6tRYGKLHGV1cjd9H2y6d7t5ygBSH3Cng8XL1k3SRlu2yohunSo=
+	t=1767632427; cv=none; b=Vx481Wk2LcSj/7rEtyuDejqTqV0ZAFmuZccGH7/zR06N3TqFg/tzdka5m0PpFymSPieEHgrI4WRGdWmyON4bVu68ISCXptl90DrA7Kj0FuVCdvOTYo0HB+w692hdA+pag13oXfToXOWQTm9Gfr2a+4SJ7Ggoj9WdA7CyW+78+v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767629879; c=relaxed/simple;
-	bh=U5JNXzUelt2oG0k9H/UBmnR6vsa+uU0PmVwCu88IDgo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p5GoceMixr0N8rSnL4w7mi4asWaBAZ8zTC5dcjRJ+jBNbdcxSEisgz6Nyp/qBF1gwJl8VQRB9PqPyWTzmoSpZVnzTqu6RxewF+PeQJ8pex44+ASi82kNr9wkSGxKpqxKi0srePcMavPv84ql3iNJvo1bfZsbh4o+GAZjda9yeyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QypB5P8l; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=4dq0llcP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QypB5P8l; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=4dq0llcP; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1767632427; c=relaxed/simple;
+	bh=fsTdfd2pTvpqFwE7trhZyndXq9M/GlsC7r4ggq/GZCc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ReWQUfYx2oSDicXItcw38Z5YmOVOQpQn4jcRF0LzcoVJBDpMetXN1oV+cE4Llzd1/tNxCF/sN8oEPX8tKax4c+pi57gakfBkmIbhRzXUizZrkWqsZrvXwG2mER4e8smmRa/L+ErXSttrMWb+jb3UGQMvMZ8wFV1a85igsrOgHNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wo9oWWmb; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QypB5P8l";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="4dq0llcP";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QypB5P8l";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="4dq0llcP"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 2AB3F5BDB2;
-	Mon,  5 Jan 2026 16:17:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1767629876; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1DFvpD5WZqumQjvq1dY5e6M7m22Rg2kOe+aJWOauueI=;
-	b=QypB5P8lC9ySNMO/aFcfMrp5FtgSNBMU41gE6ylcGLUvLr+yC2KQZmI3MVlS7JtFCMEug2
-	1w5I0/hej5J0RF39b71dWUF1guZ9rrQbtPoFRuEQ/Hm5aUv5gmWzms6zBurKME7qCNTBQN
-	GPxHeM1OlYe2wx9IQhFPMNm0MxiNf8c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1767629876;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1DFvpD5WZqumQjvq1dY5e6M7m22Rg2kOe+aJWOauueI=;
-	b=4dq0llcPZ9X/rG0A876zUi75iCbx1NxTHqZD21FYu6ZMJmGR2DhQUaaia+eKNgO52k5MH5
-	kLTxocHqXLfZyUCw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1767629876; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1DFvpD5WZqumQjvq1dY5e6M7m22Rg2kOe+aJWOauueI=;
-	b=QypB5P8lC9ySNMO/aFcfMrp5FtgSNBMU41gE6ylcGLUvLr+yC2KQZmI3MVlS7JtFCMEug2
-	1w5I0/hej5J0RF39b71dWUF1guZ9rrQbtPoFRuEQ/Hm5aUv5gmWzms6zBurKME7qCNTBQN
-	GPxHeM1OlYe2wx9IQhFPMNm0MxiNf8c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1767629876;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1DFvpD5WZqumQjvq1dY5e6M7m22Rg2kOe+aJWOauueI=;
-	b=4dq0llcPZ9X/rG0A876zUi75iCbx1NxTHqZD21FYu6ZMJmGR2DhQUaaia+eKNgO52k5MH5
-	kLTxocHqXLfZyUCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id ACD9A3EA63;
-	Mon,  5 Jan 2026 16:17:55 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id VqwLHTPkW2ngHQAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 05 Jan 2026 16:17:55 +0000
-Date: Mon, 5 Jan 2026 13:17:49 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Aaditya Kansal <aadityakansal390@gmail.com>
-Cc: sfrench@samba.org, linux-cifs@vger.kernel.org, pc@manguebit.org, 
-	ronniesahlberg@gmail.com
-Subject: Re: [PATCH] smb: client: terminate session upon signature
- verification failure
-Message-ID: <s4kmfu25glkgu44wl46e3q3bjvyhlbcvnlaiuqkuey4qlg4d5o@s7ispothcved>
-References: <20251226201939.36293-1-aadityakansal390@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wo9oWWmb"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-88fca7bce90so634646d6.3
+        for <linux-cifs@vger.kernel.org>; Mon, 05 Jan 2026 09:00:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767632425; x=1768237225; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sfNaizK9N9JP9SLJof3wI6kMshDb/53QFTGW44BecrI=;
+        b=Wo9oWWmbYaVPSQiiOyNWqgl9xF95uvHUMxhnX6GMe7z/BlVz/0/S9uVE2BHLRTfjlx
+         IqUdJ+ZmLbsc9OT8pOqSltJHiFwZ7FkG9bZ3sqGG/+V3/bynMNA5hmTrM5X2vAFGxLSH
+         LmsikNXOOfeFkoRgD3zlMsORckhA6YzEIZ0hENXGn18NsHNw05nRk1pwoQ6HWU5f2cY2
+         f0hYYIYQ79a8ch8NLSbJvXksbz1vXiMMX3L8eRjaUfvd2N6Qc+BhI4qVKpeMZAZmFcU9
+         2KGCZvOBzyMBOM1n/qBhHCf0kogGGRLiqxNATBFx9BrL6ZxC+aEbSTJRs55CPbivem2A
+         7lKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767632425; x=1768237225;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sfNaizK9N9JP9SLJof3wI6kMshDb/53QFTGW44BecrI=;
+        b=t9ospbmQWitzlrG2Wn5YPuRSN0Kp2n0YRfLXbPVC1/4bIYFm7vlF6rg9TfclCyhRVr
+         jYXmABPxmhkw8CJM2DsYJWXZLWCjV1E63Te2+gI05GNSVRy8DK512c7LrlXwtrIlpqvJ
+         X7TPxh2Q4Un9cwdpJMJFI4v91Em9K5VAk+oI7jYjjyTxD6IMOEZag+TTS+RreF/rvpHS
+         RtUhpCUxTTOzEitCHrU6XCV0gp3UQvbBZswcf5VijFtYp/yGcyotEbT+tFGXeJ+1T5H2
+         F/TUnzEtNNMp1SlnryCdnO16gLJ6iZJAG4yYD6opzVY35f30N+MHLGK4Er9C0qjLkcIB
+         UDEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUKcGLrnSRwsAiwzGffHml6DyoEP0BURVvfVmgLyPPedJgUb1V2ND3lUy7JHFiusdUO9U47iObkSKMS@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlSOSbGT151VYp529ks9IXnp6ryrSCgMtEdGL8KWW5OOFTbLIV
+	4Jv0eIlYNLuskIr/u8yIokq6eWXcxNsXg6yaG3PzZdqM0T/FiXBvDS4hj46eHL1ojVFBYd9CqDw
+	KhCCA99yKeyV586AliUtX14xucz3m4DI=
+X-Gm-Gg: AY/fxX5KXf0Vj2ZAb56M4bQYDKtUrFgttf/kp0YLUuxkxwVgA5ZS0jgCedoS430JxsF
+	blVeH2x4FEMa+KsWCK+oRcNENezYjcFItI0PV91YyQ7TWioDOARIhi/rMHrzgPTqtjWHKD7YM7x
+	7+P73OV8yX4DRW0uw6q7MOE8uRnLMfx7Ki+xSKC1LdyT8qHzfG/vClcSdhtmfzKaEsCq6Hxk/mI
+	PRnUQ1J7rmxw0MNAoHq7Tkqj/uE/JEcRHtslFpo8xQzO9nz3FQIa+KE95dDyXbOKaSPWRmD/HHg
+	8oB/RLGS1SxcnYPZRnGJ4oQcWwwoNM7+ScyvpKfW5s9qWNiXMc8Nul1V3Nud2JAqNgzZpadSKyJ
+	loY5aLEoYXvrzYFPgFiOmagn5SzNvNyVAq7bLa/NPixNiDLhBhb8613qJ09jFJN02tLdicv+AjD
+	LZO6eT9Cu08w==
+X-Google-Smtp-Source: AGHT+IGflIT9WVQ6mYb1n3BeRwSZDmem/qiFKFaYaFFq2RoepcCKhQyHkU+X4uiZ33fJffKQXWLA+l1U6y2gHzI5dYQ=
+X-Received: by 2002:a05:6214:4291:b0:890:19d1:532c with SMTP id
+ 6a1803df08f44-89075ebb1c7mr3587476d6.34.1767632424363; Mon, 05 Jan 2026
+ 09:00:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20251226201939.36293-1-aadityakansal390@gmail.com>
-X-Spam-Flag: NO
-X-Spam-Score: -3.80
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[samba.org,vger.kernel.org,manguebit.org,gmail.com];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo]
+References: <20251226201939.36293-1-aadityakansal390@gmail.com> <s4kmfu25glkgu44wl46e3q3bjvyhlbcvnlaiuqkuey4qlg4d5o@s7ispothcved>
+In-Reply-To: <s4kmfu25glkgu44wl46e3q3bjvyhlbcvnlaiuqkuey4qlg4d5o@s7ispothcved>
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 5 Jan 2026 11:00:11 -0600
+X-Gm-Features: AQt7F2osvuq_ibU9eLfXSRoWNYRc7txM6vtxiG4xHaSvgvQHEtDHYTVWR9YHa-4
+Message-ID: <CAH2r5msUWXyzLTK1BtJ2feNe7Sj7+P-y6aix6Tdc4yJgUc8TEw@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: terminate session upon signature
+ verification failure
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: Aaditya Kansal <aadityakansal390@gmail.com>, sfrench@samba.org, 
+	linux-cifs@vger.kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/27, Aaditya Kansal wrote:
->Currently, when the SMB signature verification fails, the error is
->logged without any action to terminate the session.
+On Mon, Jan 5, 2026 at 10:37=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de>=
+ wrote:
 >
->Call cifs_reconnect() to terminate the session if the signature
->verification fails.
+> On 12/27, Aaditya Kansal wrote:
+> >Currently, when the SMB signature verification fails, the error is
+> >logged without any action to terminate the session.
+> >
+> >Call cifs_reconnect() to terminate the session if the signature
+> >verification fails.
+> >
+> >Signed-off-by: Aaditya Kansal <aadityakansal390@gmail.com>
 >
->Signed-off-by: Aaditya Kansal <aadityakansal390@gmail.com>
-
-Thanks, I think this was long overdue.
-
->---
-> fs/smb/client/cifstransport.c | 7 +++++--
-> 1 file changed, 5 insertions(+), 2 deletions(-)
+> Thanks, I think this was long overdue.
 >
->diff --git a/fs/smb/client/cifstransport.c b/fs/smb/client/cifstransport.c
->index 28d1cee90625..89818bb983ec 100644
->--- a/fs/smb/client/cifstransport.c
->+++ b/fs/smb/client/cifstransport.c
->@@ -169,12 +169,15 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+> >---
+> > fs/smb/client/cifstransport.c | 7 +++++--
+> > 1 file changed, 5 insertions(+), 2 deletions(-)
+> >
+> >diff --git a/fs/smb/client/cifstransport.c b/fs/smb/client/cifstransport=
+.c
+> >index 28d1cee90625..89818bb983ec 100644
+> >--- a/fs/smb/client/cifstransport.c
+> >+++ b/fs/smb/client/cifstransport.c
+> >@@ -169,12 +169,15 @@ cifs_check_receive(struct mid_q_entry *mid, struct=
+ TCP_Server_Info *server,
+> >
+> >               iov[0].iov_base =3D mid->resp_buf;
+> >               iov[0].iov_len =3D len;
+> >-              /* FIXME: add code to kill session */
+> >+
+> >               rc =3D cifs_verify_signature(&rqst, server,
+> >                                          mid->sequence_number);
+> >-              if (rc)
+> >+              if (rc) {
+> >                       cifs_server_dbg(VFS, "SMB signature verification =
+returned error =3D %d\n",
+> >                                rc);
+> >+                      cifs_reconnect(server, true);
 >
-> 		iov[0].iov_base = mid->resp_buf;
-> 		iov[0].iov_len = len;
->-		/* FIXME: add code to kill session */
->+
-> 		rc = cifs_verify_signature(&rqst, server,
-> 					   mid->sequence_number);
->-		if (rc)
->+		if (rc) {
-> 			cifs_server_dbg(VFS, "SMB signature verification returned error = %d\n",
-> 				 rc);
->+			cifs_reconnect(server, true);
+> I'd like to hear opinions on having reconnect happen only if signing
+> is required by server, otherwise only log the error (current behaviour).
 
-I'd like to hear opinions on having reconnect happen only if signing
-is required by server, otherwise only log the error (current behaviour).
+I was thinking the reverse - if the signature verification on the
+client fails but it was the server,
+not the client, who forced signing, then we could skip the reconnect
+(and just log), but if
+client forces signing (sign mount option eg. or
+/proc/fs/cifs/SecuritfyFlags setting forcing
+signing) then we should be more strict and reconnect
 
->+			return rc;
->+		}
-> 	}
+> >+                      return rc;
+> >+              }
+> >       }
+> >
+> >       /* BB special case reconnect tid and uid here? */
+> >--
 >
-> 	/* BB special case reconnect tid and uid here? */
->-- 
+> Nonetheless,
+>
+> Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
+>
+>
+> Cheers,
+>
 
-Nonetheless,
 
-Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
+--=20
+Thanks,
 
-
-Cheers,
+Steve
