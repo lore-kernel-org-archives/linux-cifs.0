@@ -1,204 +1,125 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D4221ADFE4
-	for <linux-cifs@vger.kernel.org>; Wed,  7 Jan 2026 04:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2C61DED42;
+	Wed,  7 Jan 2026 14:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767760356; cv=none; b=OuyqMdMPxTKVeJXudihHN35yeNYLsCVWO2oSnfbIzlMJ3CC0gUrzKCP/nRcK2aKOmTJAUEkctWRnKbEtfbCMQdopFJNf3042uLyz4VVA4bcncEvFNQeh7Qct1UmHqFggo2Wl+hcDkfVbk5JiCmh6E3dzRzh7oYBx4JUzXv2wWmo=
+	t=1767795632; cv=none; b=io1xBoFB5Q3d5U2Yl+DqsubRAnWafxlSPriUZZB1sym31dpJBp825IV9GVkRwuTcw7G9SiVUWMhxvUQDsi6CKtGkEyRMAxggCwrJ569Lwph5ZCQyZuVxu3vBpwkL7XIPJ31YEOfshfJuEpbhfU6kCn4aBAzhXgO4X783b4QmnyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767760356; c=relaxed/simple;
-	bh=NTWHjICRKTlBE03RsjxMDEw/PUfZH4D1Vjg4yVuC0HY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I8g+uUx0DB2zAH93Di23Qip7wUrD42xvVmXmnvqOS9EoBuMxw122UyCm6ZkUkICTnzE03KmxRmFtlN9eh3QSmpAkLbNkzvf+dT1g6Pne92VRFxcjvRT5X6LscTWEXKlcYJ5KidDqWrV/FaqLTLTmj7gaAYS+2pYPrZJ7D/kXR2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Nyp6nAjK; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1767795632; c=relaxed/simple;
+	bh=01i4PcQIyZNEKL5dnGjZ3BeIzI5aRHisNJ+n2qZAaaI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Dbrtzk07VPBHX0tPrTsNHWUP5SF0bQlrlQtRGEJQwb7XSLEWxmsyRsVctk2RCbF5Y18glxS6zjzYDqoif0uxTonAeccbHAEqhSMu8GQOeCppduG8s+Q+jcqF1g+cLLLJxckAaKZR/tj0epFsSMmwCXsBVFYL7a+/vmRd4jrK5IY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rYLEvJyC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Nyp6nAjK"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767760351;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jZU/GWSd6eb43Hz8owIt0yfyWHFceUggyhtzDjLPRQ4=;
-	b=Nyp6nAjKnHYau2Vl8r6mXhARyLoX+f1Afc6n7eEzU61oiXmn2bAwWVvpULonJzwHmxXPqC
-	SD9wQ+twiEbZWFsTJFWAO0lsQ6irmOZW2pFFI1tyIlmQhSMWdwXO4FeEF+cbyu5YSDLUWY
-	XCOzOLxNxwYQqk6diVbk+03JDf77eAs=
-From: chenxiaosong.chenxiaosong@linux.dev
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com
-Cc: linux-cifs@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v3 1/1] smbinfo: add notify subcommand
-Date: Wed,  7 Jan 2026 12:31:08 +0800
-Message-ID: <20260107043109.1456095-2-chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20260107043109.1456095-1-chenxiaosong.chenxiaosong@linux.dev>
-References: <20260107043109.1456095-1-chenxiaosong.chenxiaosong@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rYLEvJyC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C873AC4CEF7;
+	Wed,  7 Jan 2026 14:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767795632;
+	bh=01i4PcQIyZNEKL5dnGjZ3BeIzI5aRHisNJ+n2qZAaaI=;
+	h=From:Subject:Date:To:Cc:From;
+	b=rYLEvJyCyZAtJUnWrAjuM7ELo8ynjkvDesXkPEQHUU2+ZAFUtBeLcjGIHB4mzmedl
+	 6Tuc8C6G+wPsAaIB+xb+1ndvwfGNY9d97n5/PTK+x8Tt6TcFEqKhuvSZOFbJnVxKfY
+	 q+e/E7E7aWOpraV4AmrqRtZuYNLFqTF4DCg3vm93EeZvf+qao2oy160s8fx06W7562
+	 oKiki+0bc8m+2Ix48DziKQcw2GHtVidmlVf7zqjpp0eWes/Z3KBC5I5Kv2n6x8VAtK
+	 QSdlpGwSdJT3W0RSUiKs/zgJNOSDTUmDlG1f7lvgL0AH5AcD+J7h7npBg4OzUx+4Qn
+	 YJckYxHiP8eIw==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH 0/6] vfs: properly deny directory leases on filesystems
+ with special lease handling
+Date: Wed, 07 Jan 2026 09:20:08 -0500
+Message-Id: <20260107-setlease-6-19-v1-0-85f034abcc57@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MQQqAIBBA0avErBvQRKOuEi3MphoICyciCO+et
+ HyL/18QSkwCffVCopuFj1ig6wrC5uNKyHMxNKpxSqsWha6dvBA61B0aP7XezkYFq6E0Z6KFn/8
+ 3jDl/yHF0Jl8AAAA=
+X-Change-ID: 20260107-setlease-6-19-3ab7a5d30c51
+To: Christian Brauner <brauner@kernel.org>, 
+ Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+ Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+ Bharath SM <bharathsm@microsoft.com>, Trond Myklebust <trondmy@kernel.org>, 
+ Anna Schumaker <anna@kernel.org>, Eric Van Hensbergen <ericvh@kernel.org>, 
+ Latchesar Ionkov <lucho@ionkov.net>, 
+ Dominique Martinet <asmadeus@codewreck.org>, 
+ Christian Schoenebeck <linux_oss@crudebyte.com>, 
+ Andreas Gruenbacher <agruenba@redhat.com>, Xiubo Li <xiubli@redhat.com>, 
+ Ilya Dryomov <idryomov@gmail.com>, Hans de Goede <hansg@kernel.org>, 
+ NeilBrown <neil@brown.name>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-cifs@vger.kernel.org, 
+ samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, v9fs@lists.linux.dev, gfs2@lists.linux.dev, 
+ ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1845; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=01i4PcQIyZNEKL5dnGjZ3BeIzI5aRHisNJ+n2qZAaaI=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBpXmuifTbkqt+ZOrvgDQRwzfOoI08t58vlX62jN
+ WYGuxH12bGJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaV5rogAKCRAADmhBGVaC
+ FbVmD/9VkhtBy64WYZM/vE1bLRtTONQcJjUhRSw9Tneh6sbfwAd+eM5oqOPvGn0GHjhJ6CSNHus
+ k7SJy68/c1G27gmxHO108IMZwMt8rEBqlxm8c9lagraQFBt57AAMGWEBGwtdi+P/AIXsNJe+0g4
+ 6f4tXPC77qc+M2+MbH+Iyku4WDT1u5XFkluyFymfw0tlY8EGgMfkU1rea2yIDaEr8mwtUi6QvF2
+ RWnOtApZPcfhtJuGfVbiVU/RnXe3BvP2MrEgyvjgyXZm8uNyoH8LwwqiaQelzsyhCH1ESLz3tU5
+ Jm9MzDYu7g3ZRsGS9BWxQ+NZ68fWzDVi0dUS89L+toWsXkbMKa5XN6DEwo/5w5vHGN8r9xQHGv5
+ VxY3g/f4fuMY3BOzG5Ain+x6Civsd/Rcx95xm4rP0Y8pYMuuxL6qP0Fdimx+HyVfkK65emJlp/l
+ NDxZ7klS+oHVegAp8z2EYKlguAvOCduo+nQ36z91gBsAyWrSOKnVl8EGN7uCwiO0ZwUtMnaNfaO
+ n4wCVRl55B1l76zxjfCZKn/c0FLPL08SXz7gOvuwAo+XrizlwUfhk4wxLnbOJtrXBDCMRB6X40l
+ R6PxnGnG7l65AYNss70s34L9b9JAxSZUM5axw4J2pIDM1FB/23UX0vlVbTnXKUNwUzAD7Cn+Nzv
+ FmXYssKm9gwAYow==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Filesystems currently have to set the ->setlease() method explicitly in
+order to deny attempts to set a lease or delegation. With the advent of
+directory delegations, we now need to set ->setlease on the directory
+file_operations for several filesystems to simple_nosetlease() to ensure
+this.
 
-Add `notify` subcommand to query a directory for change notifications.
+This patchset does that. There should be no noticeable change in
+behavior, other than fixing the support detection in xfstests, allowing
+lease/delegation tests to be properly skipped on these filesystems.
 
-Example:
+It's probably simplest to merge these all at once via Christian's tree
+if he's amenable, but Acks would be welcome. Ideally these would go in
+for v6.19.
 
-  ./smbinfo notify /mnt/dir
-  # Then create a new file `/server/export/dir/file` on SMB server
-  Notify completed, returned data_len is 20
-  00000000:  00 00 00 00 01 00 00 00  08 00 00 00 66 00 69 00  ............f.i.
-  00000010:  6c 00 65 00                                       l.e.
-  # Call `ioctl()` again
+Long term, I think it would be best to change leases/delegations to be
+an opt-in thing, such that leases are always denied by default if the
+method isn't set. That's a larger patchset though as we'd need to audit
+all of the file_operations that currently have ->setlease() as NULL.
 
-Press `Ctrl+C` to exit `smbinfo`.
-
-Link: https://lore.kernel.org/linux-cifs/CAH2r5msHiZWzP5hdtPgb+wV3DL3J31RtgQRLQeuhCa_ULt3PfA@mail.gmail.com/
-Suggested-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- smbinfo     | 78 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- smbinfo.rst |  2 ++
- 2 files changed, 80 insertions(+)
+Jeff Layton (6):
+      nfs: properly disallow delegation requests on directories
+      smb/client: properly disallow delegations on directories
+      9p: don't allow delegations to be set on directories
+      gfs2: don't allow delegations to be set on directories
+      ceph: don't allow delegations to be set on directories
+      vboxsf: don't allow delegations to be set on directories
 
-diff --git a/smbinfo b/smbinfo
-index 2e9e42d..57e8a0a 100755
---- a/smbinfo
-+++ b/smbinfo
-@@ -27,6 +27,7 @@ import struct
- import stat
- import datetime
- import calendar
-+import threading
- 
- VERBOSE = False
- 
-@@ -36,6 +37,7 @@ CIFS_ENUMERATE_SNAPSHOTS = 0x800ccf06
- CIFS_DUMP_KEY            = 0xc03acf08
- CIFS_DUMP_FULL_KEY       = 0xc011cf0a
- CIFS_GET_TCON_INFO       = 0x800ccf0c
-+CIFS_IOC_NOTIFY_INFO     = 0xc009cf0b
- 
- # large enough input buffer length
- INPUT_BUFFER_LENGTH = 16384
-@@ -294,6 +296,10 @@ def main():
-     sap.add_argument("file")
-     sap.set_defaults(func=cmd_gettconinfo)
- 
-+    sap = subp.add_parser("notify", help="Query a directory for change notifications")
-+    sap.add_argument("file")
-+    sap.set_defaults(func=cmd_notify)
-+
-     # parse arguments
-     args = ap.parse_args()
- 
-@@ -905,5 +911,77 @@ def cmd_gettconinfo(args):
-     print("TCON Id: 0x%x"%tcon.tid)
-     print("Session Id: 0x%x"%tcon.session_id)
- 
-+def cmd_notify(args):
-+    try:
-+        fd = os.open(args.file, os.O_RDONLY)
-+    except Exception as e:
-+        print("syscall failed: %s"%e)
-+        return False
-+
-+    thread = threading.Thread(target=notify_thread, args=(fd,))
-+    thread.start()
-+
-+    try:
-+        thread.join()
-+    except KeyboardInterrupt:
-+        pass
-+    finally:
-+        os.close(fd)
-+        return False
-+
-+def notify_thread(fd):
-+    fmt = "<IBI"
-+    # See `struct smb3_notify_info` in linux kernel fs/smb/client/cifs_ioctl.h
-+    completion_filter = 0xFFF
-+    watch_tree = True
-+    data_len = 1000
-+
-+    while True:
-+        buf = bytearray(struct.pack(fmt, completion_filter, watch_tree, data_len))
-+        buf.extend(bytearray(data_len))
-+
-+        try:
-+            fcntl.ioctl(fd, CIFS_IOC_NOTIFY_INFO, buf, True)
-+        except Exception as e:
-+            print("syscall failed: %s"%e)
-+            return False
-+
-+        _, _, data_len_returned = struct.unpack_from(fmt, buf, 0)
-+        print("Notify completed, returned data_len is", data_len_returned)
-+        notify_data, = struct.unpack_from(f'{data_len_returned}s', buf, struct.calcsize(fmt))
-+        print_notify(notify_data)
-+
-+def print_notify(notify_data):
-+    if notify_data is None:
-+        return
-+
-+    data_size = len(notify_data)
-+    if data_size == 0:
-+        return
-+
-+    BYTES_PER_LINE = 16
-+    for offset in range(0, data_size, BYTES_PER_LINE):
-+        chunk = notify_data[offset:offset + BYTES_PER_LINE]
-+
-+        # raw hex data
-+        hex_bytes = "".join(
-+            (" " if i % 8 == 0 else "") + f"{x:02x} "
-+            for i, x in enumerate(chunk)
-+        )
-+
-+        # padding
-+        pad_len = BYTES_PER_LINE - len(chunk)
-+        pad = "   " * pad_len
-+        if pad_len >= 8:
-+            pad += " " * (pad_len // 8)
-+
-+        # ASCII
-+        ascii_part = "".join(
-+            chr(x) if 31 < x < 127 else "."
-+            for x in chunk
-+        )
-+
-+        print(f"{offset:08x}: {hex_bytes}{pad} {ascii_part}")
-+
- if __name__ == '__main__':
-     main()
-diff --git a/smbinfo.rst b/smbinfo.rst
-index 17270c5..91b8895 100644
---- a/smbinfo.rst
-+++ b/smbinfo.rst
-@@ -98,6 +98,8 @@ the SMB3 traffic of this mount can be decryped e.g. via wireshark
- 
- `gettconinfo`: Prints both the TCON Id and Session Id for a cifs file.
- 
-+`notify`: Query a directory for change notifications.
-+
- *****
- NOTES
- *****
+ fs/9p/vfs_dir.c        | 2 ++
+ fs/ceph/dir.c          | 2 ++
+ fs/gfs2/file.c         | 1 +
+ fs/nfs/dir.c           | 1 +
+ fs/nfs/nfs4file.c      | 2 --
+ fs/smb/client/cifsfs.c | 4 +---
+ fs/vboxsf/dir.c        | 1 +
+ 7 files changed, 8 insertions(+), 5 deletions(-)
+---
+base-commit: 7f98ab9da046865d57c102fd3ca9669a29845f67
+change-id: 20260107-setlease-6-19-3ab7a5d30c51
+
+Best regards,
 -- 
-2.43.0
+Jeff Layton <jlayton@kernel.org>
 
