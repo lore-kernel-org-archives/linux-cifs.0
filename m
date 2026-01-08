@@ -1,80 +1,93 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4C843A20F;
-	Thu,  8 Jan 2026 09:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B931437881;
+	Thu,  8 Jan 2026 09:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767864298; cv=none; b=g/db5RVsdZoqNHRoE0ErCHPKT5fJLT+D7oialtLm0ZoCVYdR13NcSuSdNw2rAWQx2PoDT3fYB5+wHd+Qg74/f+LRe3o7wMPPyeWeot9ayMnsUXJjMXcvS7PXgdgwQ4uCki2dEyLHHRv2F7UH8ySslMhCRamKjVNb53DUbWkc3Gg=
+	t=1767866137; cv=none; b=XTM/B89jJEaC2bePYJQmpGWoRtocvd5rae6Wc9nFD0MDv0FvbTguxSMTk4rlkIRtEVXg3+31y4YGfdSLfEiruQ4EeUP5jVIhTvTW/r2tB9CmR/BlDiYpB/IDqXSfspvOyK+++HZ7kQO9osKctAemcFlrqEbDYS/WMp2ghP3PGZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767864298; c=relaxed/simple;
-	bh=yttrd/eJ2yxcEzFLZWXppW/kffU28ZPHb/N3HOkJVzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xwt9/Ap5ULMDXgJBfgoSCyz/cn2Y3xdQL7D5Dv9Lc3uJriwblRoEWu9WFN82UhQXpBoNfyhPvfSl09qE/lKGInxTFwuoL2v1CldU4mSNybPhIiKe1EqndVRNzZg0SMhTMWF4hrAzSTbcOZpRPJJJs7dGPugALmIRu80TRaRI8t4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FjlRmM8n; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1767866137; c=relaxed/simple;
+	bh=B6S8TBSEiyZ4YvS8fr2U3VKqbBmcKmxGs9b0vsWOMtE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tIWbNG3CoB92SvA5iK4rj7jla/JuZ8RvGi4GWoGKMUX6lePWcq5dHYjRNXMgPApUcLqbbqbjtKkPUT3Ala5pyxaCLy5C/G+eQzPW6J/bzRvUk64ADuEoRsqARlTSkBz2bQe8Kbq64SYWE1dK46G+gvZALojFHwItlaKjCuW/6gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=1lgx+Ttr; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FjlRmM8n"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=yttrd/eJ2yxcEzFLZWXppW/kffU28ZPHb/N3HOkJVzM=; b=FjlRmM8nkIwznD5H8n7jrbipqI
-	ZYom57ErGnVY32s1Pzlqojdoqe7yrdCalIPZaWZ8mfSSjNB8Bpdi0n79Fjlf+9inNnE6WBBJTEdyI
-	OujX7VFQfwvvJONFqmhQFwGXWo4WIdJH0jQjXBHieogaMpw059F/4F5BtCqGqnmK9bTpLZh8E9NhP
-	txe1+QTBUDOWB54/iyTd8UJoQL1w8KDjUazbCnMg+Jm3s8rKVMZolJCIrc3uO5WEkGB58dsSQyGGU
-	MLTOpha3+UqbxXRZzeJWM1f2rEh+j3+Oq6Syf/ooyF6Tzk8kfvLzJUfz6i7w+jvJIYPzmuukYIjZr
-	IzaJW7sQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vdmFn-0000000GRiW-1B3x;
-	Thu, 08 Jan 2026 09:24:27 +0000
-Date: Thu, 8 Jan 2026 01:24:27 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Hans de Goede <hansg@kernel.org>, NeilBrown <neil@brown.name>,
-	Christoph Hellwig <hch@infradead.org>, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	linux-nfs@vger.kernel.org, v9fs@lists.linux.dev,
-	gfs2@lists.linux.dev, ceph-devel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 1/6] nfs: properly disallow delegation requests on
- directories
-Message-ID: <aV93y-xeWk16s48r@infradead.org>
-References: <20260107-setlease-6-19-v1-0-85f034abcc57@kernel.org>
- <20260107-setlease-6-19-v1-1-85f034abcc57@kernel.org>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="1lgx+Ttr"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=V322NNHDb3UZVoqZIix2wB9FULXm13D1D7TjShLxhms=; b=1lgx+TtrnOTcAWNaHwOJeJJVHn
+	DyPjOfISZ4Kg/UeId70CNJkWdYZL/7CyDc0hGhjp5dOzsF4RdiVapAEoNCy0ub06Efqc2ul//Ytgg
+	9iGRubksPBx36SZADmZcTH/atant2NAwafFCklQmAws4ZaSpEIPHjyx+iEU7+jRTTdBIobpdCBxq2
+	Ov3/I3120b6hGm6/07ct1YEOTxQx1pEm0b3zaz2vLH3dlGfLtPYVLRglb+JIWT3IQlQIDgIV9bOsy
+	V3PDm49bgH3If+PQjrOSiKjhfvZgR3n4o3mbMhYsX863RlE77jdGj7Y2POsUQ5Twr+Q4iGOMTugA4
+	+/cTyhpuEehxGFkwoY9a1UEtidB0a0zk7U2bKjfrJHhwctV8WZTc011KVTpG0T7+D+RFZdfRL8YzC
+	kW4e2dO9Z1+4uk7YorinwXnfFsNK3v/3o324J699DM3d3/rOY5teeMg3osG179RtWb8bFIgoN20l5
+	f1rPWJJUBq+R+l4Zu3QFl334;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vdm6s-003RwX-1B;
+	Thu, 08 Jan 2026 09:15:14 +0000
+Message-ID: <a0453a42-ee41-466a-b8aa-8eaaa38d7905@samba.org>
+Date: Thu, 8 Jan 2026 10:15:13 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260107-setlease-6-19-v1-1-85f034abcc57@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 05/16] quic: provide quic.h header files for
+ kernel and userspace
+To: Yohei Kojima <yk@y-koj.net>, Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev,
+ davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
+ linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
+ Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
+ Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1767621882.git.lucien.xin@gmail.com>
+ <127ed26fc7689a580c52316a2a82d8f418228b23.1767621882.git.lucien.xin@gmail.com>
+ <aV9AwNITeyL71INz@desktop.y-koj.net>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <aV9AwNITeyL71INz@desktop.y-koj.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 07, 2026 at 09:20:09AM -0500, Jeff Layton wrote:
-> Checking for S_ISREG() in nfs4_setlease() is incorrect, since that op is
-> never called for directories. The right way to deny lease requests on
-> directories is to set the ->setlease() operation to simple_nosetlease()
-> in the directory file_operations.
+Am 08.01.26 um 06:29 schrieb Yohei Kojima:
+>> +
+>> +/* Socket Options APIs */
+>> +#define QUIC_SOCKOPT_EVENT				0
+>> +#define QUIC_SOCKOPT_STREAM_OPEN			1
+>> +#define QUIC_SOCKOPT_STREAM_RESET			2
+>> +#define QUIC_SOCKOPT_STREAM_STOP_SENDING		3
+>> +#define QUIC_SOCKOPT_CONNECTION_ID			4
+>> +#define QUIC_SOCKOPT_CONNECTION_CLOSE			5
+>> +#define QUIC_SOCKOPT_CONNECTION_MIGRATION		6
+>> +#define QUIC_SOCKOPT_KEY_UPDATE				7
+> 
+> This is a trivial point, but it would be better to align the indentation
+> of the line above.
 
-This fixes generic/786 on NFSv4.2 for me, so:
+This is just the diff output in mail, now in my reply
+the value 5 is also moved one tab to much.
 
-Tested-by: Christoph Hellwig <hch@lst.de>
+It's all aligned correctly in the actual file.
+
+metze
