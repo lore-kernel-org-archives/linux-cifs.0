@@ -1,117 +1,105 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D802620FC
-	for <linux-cifs@vger.kernel.org>; Thu,  8 Jan 2026 22:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F113382C3
+	for <linux-cifs@vger.kernel.org>; Thu,  8 Jan 2026 22:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767910803; cv=none; b=aoJObmUm6C/39QPHrnOoWmhRcCIxfakaxbLfJ6LDZmuwYVW7xB9u70LRcEDd984YWP5S2zkvAi62UAZo+qhAM+Pqdlw5VbDNjFU1ND554kwcXY5z02zFZpusd06qkIysSbqemYAAraI90g0WyKtjOMB2izCYF3/1BAcLgmJHrOA=
+	t=1767912445; cv=none; b=Lo83ucVP7qOJTWI8+VPtTGiQtE6Xdy/LZezoFc2Jh6N+O4HRq/r3A/OQA/nyGEDTHrHebrgEOYKTs52LcWZx5snGAjSiF5RsCXeyFwE5C9NJXxyMIofX+JU0INmMqW6AnrdWXcpMRFO+iBz0rH7pXEiRJEC6sVJ7f+DL67g3oLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767910803; c=relaxed/simple;
-	bh=+wSVc2IT5bsrbZWZdITGeeRuH5v05cIZtgKBrisJhGI=;
+	s=arc-20240116; t=1767912445; c=relaxed/simple;
+	bh=bpLucB2OVlqnpdSgR5fVsT/9lEifzVxq4+Kg3z371KE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g7y3kdti0OyhMFW0G/Zn4EKAgRpTwnQmGtMeZJUcZa73AXQZ+75crcjV3lKWtHTo8RvKo8/AxTfI3kqg7SodQ12T8r+DHZqD+JKa69ta/7CmPc8BBtcGACnrsCZO2TrCHx80Cc3K0SvEPrtrGO0sLgg71P4pb/ID1mZ3bUeYOlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LiduMBaU; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=QHmQoBYO3Lqh4AU5CB6ELHrmoewShoxkJQVY/8lp02OPCrimo/4aKJiwjL2RRkEOzgVnEwYl8mBKYect95vqW+PFW5L/oOaJkYO041O2TCjpTBdqi8gJNvgv65moF+xYDqmOy3vWcAMS2ZolkZmILbesTYQIgw/Jj5sV4IWkPSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kNZ/y6ld; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LiduMBaU"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2a0d67f1877so30883625ad.2
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Jan 2026 14:20:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767910801; x=1768515601; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3eSpvqBcCMdUnYFu5r+IbcRJ+Ycs9RPex6ZaryNeYwM=;
-        b=LiduMBaUtvatD5wq2FLyHAQk1vgB0NTDSSHFfstiRLFFpeeuvjpy5QSiIWnFq3iZ/p
-         yfUCwHBzhDfDMsWPBOuP9UN4JeKF+OHhZ+B5Ss6q7J5VKkBCMDIcIu7JyXaCZJNAsqlm
-         aYlLpNhVXNVsnqws5yLkCuA8tWKvBKvDQdeLzluerI3ZIqJdnSVKNMLTJZoRLNCEQkqw
-         mb58YRIaGvYsERKsn5x7t2cO73A8YCtbN9+6Lsqw7UM5OUo/kWb0eErE7gdWP47uaxrF
-         pgpiDPCYHD8CNEqnwKHkOcnTV4Wpw7q8QazYcRc9xiWWhfXE/NS8yAwA3xa2aRS8JS0Q
-         cVAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767910801; x=1768515601;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3eSpvqBcCMdUnYFu5r+IbcRJ+Ycs9RPex6ZaryNeYwM=;
-        b=Lnru9Q1oaktO0yDU8uIOtOC7zoHJvrE5gUrQqZ39L7oPKGip1SmZC+wbqT9FglQlPH
-         LhMPkrB5ARJ8Qz0jhFT0msTF7LSHt1bkGDvP9YwJnUA6TSXk4wWhiM8q4DkFLXxnuBUp
-         nTKQINXf0evd67LBlnHzBc4jyeo5svLhv9ux+gScR4QES7JIc1qFe9Qx2Xq84ig8JT3I
-         +aGGisoY2RkQNj/Tq1dZz4oIyHMcZelpTlcNuA3NWgdImZOJMzZARcnjvM+AMg4eIY3p
-         235H4fmDLWes2eZxscgOOMXmvhchA6E4+BoEhM6JmInL2c4L/7F56qCrjbq8zksi4axa
-         zhQw==
-X-Forwarded-Encrypted: i=1; AJvYcCV8HcxkN4ngBI6ZHMRTuHjxmNH/BRIuDgoRlhvPZe7/bXGmi0tf0PkRZtT1owMyDfp+GfHcpkNPw5KD@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhfogfOdlJx9RfxvMnaCC2m0VdTfpGRHdU9zYEyyBDXTkG2X7I
-	+hKhLN4GHTOrE6r1x9P9ClVaF/cbq9FVRHjO28zYWJ5f/g5+xVIVPtEMGw2gTyBDc8ay2NgJ+ym
-	wBrHNB5bplP1s/qLuILLww0TPFUdDDNQ=
-X-Gm-Gg: AY/fxX7v3FewgBkPrfPxO1rIEvRAQx2euGTQvqmy38qzVhl2kvQPyZzdVNInK9ujYv/
-	gFPgyUngF+kssiO8oSzi5qEF9YqVIm+whnQW3f3mhtF1tVML0hEaxEPUzU1olSYfXRxQrGTmdIq
-	znff0w93jcofuVGD6PIyv3enoFw/wdYBBvsJgxbHoJxxbZ3hul39d1hPccoXqhbFFgF2hQpbN8q
-	9smlpUePziZR965yV3FfpJPRdXBwkogaCXkeEfnSDCLDIz3uahP0CKU4HKoYr7Cylw8Bs4=
-X-Google-Smtp-Source: AGHT+IE6kkegFDt+9XCzD+S56azqAPTIJarvZtVAkqkfUkoYB3glBC/TJm42hBLD2pQUlnWfdjMc3cigjDPJ1b82sgo=
-X-Received: by 2002:a17:902:fc43:b0:2a0:ccdb:218d with SMTP id
- d9443c01a7336-2a3ee442824mr75598785ad.17.1767910801242; Thu, 08 Jan 2026
- 14:20:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kNZ/y6ld"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E95E3C19421
+	for <linux-cifs@vger.kernel.org>; Thu,  8 Jan 2026 22:47:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767912444;
+	bh=bpLucB2OVlqnpdSgR5fVsT/9lEifzVxq4+Kg3z371KE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=kNZ/y6ld9T/Ac6XqHUpuWQ8PCKoHqDZK4KRIN0fR0qhZUAZgmdbhls/DOYhiAGX7z
+	 lKJXMbj5kAIa3yPHcJzWdDqHLZWZUws36K4s8WUtTHBy0kZ1G+0Jbjoh7BgoGMTVB0
+	 EHN+7t2qxXK5Wg9JwteHTuHVEx86cGwPSYmACkxAaR6cPMp9ZisNCP6MINj41SffBs
+	 rGpQYrIDRH61Pi646aQVZ+ZmxyNbNF5rChS8TKq0svn+ns7GoUEV1FIGJpWNhiL7jz
+	 wNVHZ83G97Pf5PZFUJN8TAkCmyWsi/CmvHe4Mf70Y4ziokGk5SSSZrPhqGGZMeQCS4
+	 YWE8KQUzoe6Nw==
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b8018eba13cso609730366b.1
+        for <linux-cifs@vger.kernel.org>; Thu, 08 Jan 2026 14:47:24 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXzYhbffp5ZSUwjr3glFbYPnTpzeUbT2DS6TzELUYKL/bpYQhGQrsR0PImhTC3mCKjcN/EQjKt3zdgL@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4KAbDBGlU7CKeZYjGHXyKkWS41Z16m9vdkhwTwYWXfUfyWGEp
+	IsNfFvQLFTYEJHNQ2MU6dJmKqYFK0wy1nVS2WEkQmdLIUxhATY/IHSbtbtnJu3jdfsN+jHMFUrT
+	qfQKHAal49AKus9bjLQ7JHsR8WloTf20=
+X-Google-Smtp-Source: AGHT+IHRRvrZk+LJHsAd5/mP4TyTtkU5XrZgqXx3MfUuP0vWFtvlehE6tE5BFAh0/XFz8o1ILqvfmo203M6g5zkxlKk=
+X-Received: by 2002:a17:907:c1e:b0:b72:c261:3ad2 with SMTP id
+ a640c23a62f3a-b84451dab67mr854015966b.50.1767912442100; Thu, 08 Jan 2026
+ 14:47:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1767621882.git.lucien.xin@gmail.com> <d5e0dce5e52d72ed2e1847fe15060aa62e423510.1767621882.git.lucien.xin@gmail.com>
- <0df97c1d-aa75-4472-aad6-33eaa919ce28@redhat.com>
-In-Reply-To: <0df97c1d-aa75-4472-aad6-33eaa919ce28@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 8 Jan 2026 17:19:49 -0500
-X-Gm-Features: AQt7F2oQeSaDlFSlRPZRuDsHDmuOmu--yt6QSCtiFGQnIoBOFFX8SGhuo0gGWpA
-Message-ID: <CADvbK_eVM5T3u7hiXR=S3ydHCAneCP_wLM7Q4Tc=D6eJ9tv4sA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 02/16] net: build socket infrastructure for
- QUIC protocol
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <20260108-setlease-6-20-v1-0-ea4dec9b67fa@kernel.org> <20260108-setlease-6-20-v1-7-ea4dec9b67fa@kernel.org>
+In-Reply-To: <20260108-setlease-6-20-v1-7-ea4dec9b67fa@kernel.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 9 Jan 2026 07:47:09 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-JTE+233AwpvrXTsbfrbY+U_pvyUTQQSwz0mXh43jt=A@mail.gmail.com>
+X-Gm-Features: AQt7F2q41Fu16p_9dWtEjvrFao8uwKCSAe9mKCbLxMeS3Ih2bsPKkzatUTosKic
+Message-ID: <CAKYAXd-JTE+233AwpvrXTsbfrbY+U_pvyUTQQSwz0mXh43jt=A@mail.gmail.com>
+Subject: Re: [PATCH 07/24] exfat: add setlease file operation
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Luis de Bethencourt <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>, 
+	Nicolas Pitre <nico@fluxnic.net>, Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, 
+	Anders Larsen <al@alarsen.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, David Sterba <dsterba@suse.com>, Chris Mason <clm@fb.com>, 
+	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>, 
+	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>, 
+	Hongbo Li <lihongbo22@huawei.com>, Chunhai Guo <guochunhai@vivo.com>, Jan Kara <jack@suse.com>, 
+	"Theodore Ts'o" <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+	David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>, Dave Kleikamp <shaggy@kernel.org>, 
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>, Viacheslav Dubeyko <slava@dubeyko.com>, 
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>, 
+	Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>, 
+	Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg <martin@omnibond.com>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Amir Goldstein <amir73il@gmail.com>, 
+	Phillip Lougher <phillip@squashfs.org.uk>, Carlos Maiolino <cem@kernel.org>, 
+	Hugh Dickins <hughd@google.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Sungjong Seo <sj1557.seo@samsung.com>, 
+	Yuezhang Mo <yuezhang.mo@sony.com>, Chuck Lever <chuck.lever@oracle.com>, 
+	Alexander Aring <alex.aring@gmail.com>, Andreas Gruenbacher <agruenba@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
+	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, 
+	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, 
+	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>, Hans de Goede <hansg@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
+	linux-f2fs-devel@lists.sourceforge.net, linux-mtd@lists.infradead.org, 
+	jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org, 
+	ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org, 
+	linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, linux-mm@kvack.org, 
+	gfs2@lists.linux.dev, linux-doc@vger.kernel.org, v9fs@lists.linux.dev, 
+	ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 8, 2026 at 9:40=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
+On Fri, Jan 9, 2026 at 2:14=E2=80=AFAM Jeff Layton <jlayton@kernel.org> wro=
+te:
 >
-> On 1/5/26 3:04 PM, Xin Long wrote:
-> > +static int quic_net_proc_init(struct net *net)
-> > +{
-> > +     quic_net(net)->proc_net =3D proc_net_mkdir(net, "quic", net->proc=
-_net);
-> > +     if (!quic_net(net)->proc_net)
-> > +             return -ENOMEM;
-> > +
-> > +     if (!proc_create_net_single("snmp", 0444, quic_net(net)->proc_net=
-,
-> > +                                 quic_snmp_seq_show, NULL))
-> > +             goto free;
-> > +     return 0;
-> > +free:
+> Add the setlease file_operation to exfat_file_operations and
+> exfat_dir_operations, pointing to generic_setlease.  A future patch
+> will change the default behavior to reject lease attempts with -EINVAL
+> when there is no setlease file operation defined. Add generic_setlease
+> to retain the ability to set leases on this filesystem.
 >
-> Minor nits: I think an empty line before the label makes the code more
-> readable, and I would prefer #if IS_ENABLED() over #ifdef.
->
-Will replace all #ifdefs with #if IS_ENABLED().
-
-Thanks.
-> Other than that:
->
-> Acked-by: Paolo Abeni <pabeni@redhat.com>
->
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks!
