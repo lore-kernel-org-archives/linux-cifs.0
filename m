@@ -1,293 +1,116 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23AE02E7F1E
-	for <linux-cifs@vger.kernel.org>; Thu,  8 Jan 2026 17:40:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C702D7DDF
+	for <linux-cifs@vger.kernel.org>; Thu,  8 Jan 2026 17:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767894013; cv=none; b=siwzTo/jCakyrmyI+XgSnt545yVYhh0ml7yzFmlU25uwDBXbLVF4ucEPxaS/V+bTAp15MySsuXfG0/OkMfjJ/hh1ha1PSGOd3+4LIlYAuNCOZ491wAki4+sLZVcQQJk7R2upwAJ5Qx7n70HUe8ME+dPOFcDggcR3xGVxwvQMSTY=
+	t=1767894297; cv=none; b=VzsVVlQfMKFv5AK/mvQu1VqDpsQsml79Goj38Cya4dROyngAUVlBQwu6FR+mNrBfk5h85D9lxzXZGsYL4zqTYescZGjdDFbLfqNlLBkAvwbuSRN1bulMWGmgetX7oVsY6ULUCx8lUx9R308D5TvduOVpDo5+sO1ym5RkRYnKts0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767894013; c=relaxed/simple;
-	bh=9ISoZ8/AESNCpXRzK2y7Gh8rToQ7FulDj9jwvBYDW5M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IZkqFbWOl+UnDLIIlurFrLhoRH2HQUTACcdrbYxn7xnY1kAu5+3tFC4PAunxxO44bqVOCurN8IQyw5g1P6Px3YzdBCAksBD4IZOvd+jKN62cWbCGNKCRCcceOm/xeZfgDDO7QkACJY49uqDbo4TGcVTy7i+xjTj0o+VtRSoShTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=v6o0xZII; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=iQxzzizV; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=v6o0xZII; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=iQxzzizV; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1767894297; c=relaxed/simple;
+	bh=ss/QmZtegoT8QUE92ql/8y/No8UIkLe6lLm4BxyGzgg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gmyxxGgw40Yw/iuph60Wn3MA9i84SUdlYVmgARWSU7sVGIK8lFRr6OR5J2xqjx6fBwQQ/mjClVb1lIeiC+X0EOeRof8n4tDI3ij+3723ZX/8HLa0gzomskujwUzUtHmpblGlp2EhXlIOk/rBrfae2DzsLMOYPmuPTpUIlz7gaxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=grvXtx+Y; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="v6o0xZII";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="iQxzzizV";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="v6o0xZII";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="iQxzzizV"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 722E55CBEB;
-	Thu,  8 Jan 2026 17:40:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1767894008; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pbYulziCehk0+dq0CXHXUlJblsepps/x0pBz736+F88=;
-	b=v6o0xZIIolBq3Kc+VF6+9Ya5E6t2G34FsAJ4qlruIPlrp3yRFZ1mosmLKssOtf8GopFPv6
-	pdM5KNdg6uqkpzJC2OCiQs93p2MdVtM1C1AsH2TngC8tV9OjZ7anbkGl2iE3fhCSU9mvhX
-	K1VxnfPudBQRQJ1Q1ovU0oM49Yj5Rmo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1767894008;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pbYulziCehk0+dq0CXHXUlJblsepps/x0pBz736+F88=;
-	b=iQxzzizVuPHl0WVwxtpKrivs8r+dbY1HBg67emHdQ+8PTu3CciNeemY/i1L/NaN8QOR0LX
-	w4waIzEE2aIOLGCA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1767894008; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pbYulziCehk0+dq0CXHXUlJblsepps/x0pBz736+F88=;
-	b=v6o0xZIIolBq3Kc+VF6+9Ya5E6t2G34FsAJ4qlruIPlrp3yRFZ1mosmLKssOtf8GopFPv6
-	pdM5KNdg6uqkpzJC2OCiQs93p2MdVtM1C1AsH2TngC8tV9OjZ7anbkGl2iE3fhCSU9mvhX
-	K1VxnfPudBQRQJ1Q1ovU0oM49Yj5Rmo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1767894008;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pbYulziCehk0+dq0CXHXUlJblsepps/x0pBz736+F88=;
-	b=iQxzzizVuPHl0WVwxtpKrivs8r+dbY1HBg67emHdQ+8PTu3CciNeemY/i1L/NaN8QOR0LX
-	w4waIzEE2aIOLGCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5CF653EA65;
-	Thu,  8 Jan 2026 17:40:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id TDitFvjrX2kXBAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 08 Jan 2026 17:40:08 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 0782CA0B23; Thu,  8 Jan 2026 18:40:08 +0100 (CET)
-Date: Thu, 8 Jan 2026 18:40:07 +0100
-From: Jan Kara <jack@suse.cz>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Luis de Bethencourt <luisbg@kernel.org>, 
-	Salah Triki <salah.triki@gmail.com>, Nicolas Pitre <nico@fluxnic.net>, 
-	Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Anders Larsen <al@alarsen.net>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	David Sterba <dsterba@suse.com>, Chris Mason <clm@fb.com>, Gao Xiang <xiang@kernel.org>, 
-	Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>, 
-	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>, 
-	Hongbo Li <lihongbo22@huawei.com>, Chunhai Guo <guochunhai@vivo.com>, Jan Kara <jack@suse.com>, 
-	Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, 
-	Jaegeuk Kim <jaegeuk@kernel.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
-	David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>, 
-	Dave Kleikamp <shaggy@kernel.org>, Ryusuke Konishi <konishi.ryusuke@gmail.com>, 
-	Viacheslav Dubeyko <slava@dubeyko.com>, Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, 
-	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, 
-	Joseph Qi <joseph.qi@linux.alibaba.com>, Mike Marshall <hubcap@omnibond.com>, 
-	Martin Brandenburg <martin@omnibond.com>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Amir Goldstein <amir73il@gmail.com>, Phillip Lougher <phillip@squashfs.org.uk>, 
-	Carlos Maiolino <cem@kernel.org>, Hugh Dickins <hughd@google.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Namjae Jeon <linkinjeon@kernel.org>, Sungjong Seo <sj1557.seo@samsung.com>, 
-	Yuezhang Mo <yuezhang.mo@sony.com>, Chuck Lever <chuck.lever@oracle.com>, 
-	Alexander Aring <alex.aring@gmail.com>, Andreas Gruenbacher <agruenba@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
-	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Hans de Goede <hansg@kernel.org>, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-mtd@lists.infradead.org, 
-	jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev, 
-	ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org, linux-unionfs@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-mm@kvack.org, gfs2@lists.linux.dev, 
-	linux-doc@vger.kernel.org, v9fs@lists.linux.dev, ceph-devel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: Re: [PATCH 00/24] vfs: require filesystems to explicitly opt-in to
- lease support
-Message-ID: <m3mywef74xhcakianlrovrnaadnhzhfqjfusulkcnyioforfml@j2xnk7dzkmv4>
-References: <20260108-setlease-6-20-v1-0-ea4dec9b67fa@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grvXtx+Y"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2a0c09bb78cso17850495ad.0
+        for <linux-cifs@vger.kernel.org>; Thu, 08 Jan 2026 09:44:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767894291; x=1768499091; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ss/QmZtegoT8QUE92ql/8y/No8UIkLe6lLm4BxyGzgg=;
+        b=grvXtx+YX8ETlnBUL7z97klEGcrQd5hbLXDFB6kjGgEdItZ619Go+VlsWbhhoAzeI5
+         W1e/egTR6d67EoApj4JvkyxtIfI/CLaI9EDUXKvAJVENV3d45e/INBnWMGrLjlyfrwVJ
+         uHwkKuMFS2Ubvxs+1MRSxu90lugbcMCsHc+MuruVLLGnMxCSR2ELGnGsPTqXpPdbhIxn
+         nqrUqlXh4qXT27DCjttxbqg99aNK81pEJQr4KG20LCtk89AvjnxqKT4a3bEYDnyP45cw
+         Aq/d6YM2Z9IwvvZtYAVQsy4V5+P9qr5rLx9aCcqsFj/F08MWGIHbyNbgucep6oiwWamY
+         7kpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767894291; x=1768499091;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ss/QmZtegoT8QUE92ql/8y/No8UIkLe6lLm4BxyGzgg=;
+        b=XdSNDZ7v3ZgJQ5to99NrBnmwQfQuzebKcb2ap+h66DnPZPGkGTcMklaTjk53z+Kbt3
+         uRoAuhwt2kgqDC/4iQylO/sLJw/SmE1fxEWc+ZvxsUm7AkgKCbqBNS68sSxOfcIsc7mK
+         HTdaNW45wNV1er5gWmEWWNhMESfbGhnkQoXl3XshmE2SSl9Q+4Owg23JfWUmeZJQUypa
+         gMdRbSF6HvbR5t05LXdf91zPtPhBJHo7zLcIHKSHLa3ZtdhcKIn6hbMM2NFISsX6bIZT
+         lshGQP5hPa3zWvD+J0ELT75CzWgsfuKrDQhnp4IhAEcBvmlQrO0IHblP1svI5CBoWsle
+         SQdg==
+X-Forwarded-Encrypted: i=1; AJvYcCWa7BfpcqxQsklOWTWfH3YoFOBIB1mQnszlFi64TISDqg+9Nru2mngDgLdrhCi6dqQPjv+PInb+g3l2@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+Iezmko7q8/DpEonTs8mDBvzjw3DN+8uCxFuVCu/n9kmRpluG
+	MpkxDD51TQrUM6vec4AsDM9YgSbLyrn6lfd5Xj/hXejp9pwaEdOda5+6EZlqEz3zvvnsMrC+iOL
+	2wW56sYtQZLMO9m26OeSxk8i4lItOjyY=
+X-Gm-Gg: AY/fxX7j2ogLdAwBHFN3vJuUOLEXhDU+6csoCk4pZnTRuQbaowtxOWM3Vg6TRUYejje
+	p/1g2SeLfHUCYEio9V2a5k0OMOxxGJbrofLb/QknfCwNv93YGUeS0pi5WWqyYDBX90gzSXabcZR
+	RDg9qGHAAXa5a7ZFICBBjJP3outphIGFG/eB6B3QoHmHcsVuMUE8UAGGZYLrt+y1lKszKIydQl7
+	vxfutjSfsso3KekB0rt3hWE8I3bljIzUr4Y/n0QCCqnDShoV/FBZ9EzI9XkPYskpF48BYg/Hsg9
+	yIwmJhz+1KUp15c1WzrcwHrbSDtCs4XoRBRjalA=
+X-Google-Smtp-Source: AGHT+IGo23JTAhDe6YZ04HEPRhsvfMI0iFv39hHhbnRbHjZlEOShm5/5yd/f68zNrStyS0OL76jXKcU4YQTPqscbaUY=
+X-Received: by 2002:a17:902:d4d1:b0:2a0:b432:4a6 with SMTP id
+ d9443c01a7336-2a3edb775abmr78034655ad.15.1767894290166; Thu, 08 Jan 2026
+ 09:44:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260108-setlease-6-20-v1-0-ea4dec9b67fa@kernel.org>
-X-Spam-Score: -2.30
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,fluxnic.net,infradead.org,suse.cz,alarsen.net,zeniv.linux.org.uk,suse.com,fb.com,linux.alibaba.com,google.com,huawei.com,vivo.com,mit.edu,dilger.ca,mail.parknet.co.jp,nod.at,dubeyko.com,paragon-software.com,fasheh.com,evilplan.org,omnibond.com,szeredi.hu,squashfs.org.uk,linux-foundation.org,samsung.com,sony.com,oracle.com,redhat.com,lwn.net,ionkov.net,codewreck.org,crudebyte.com,samba.org,manguebit.org,microsoft.com,talpey.com,vger.kernel.org,lists.ozlabs.org,lists.sourceforge.net,lists.infradead.org,lists.linux.dev,lists.orangefs.org,kvack.org,lists.samba.org];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLwapsqjcu3srfensh8n36bg4p)];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[86];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Level: 
-X-Spam-Flag: NO
+References: <cover.1767621882.git.lucien.xin@gmail.com> <127ed26fc7689a580c52316a2a82d8f418228b23.1767621882.git.lucien.xin@gmail.com>
+ <1f31a9ac-01dd-4bb1-9a5a-ec67b381c5c0@redhat.com>
+In-Reply-To: <1f31a9ac-01dd-4bb1-9a5a-ec67b381c5c0@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 8 Jan 2026 12:44:37 -0500
+X-Gm-Features: AQt7F2o6dW95jyJ167axiY2PfCkYBHxaTuo-Pd8v15qVpoBoDqajatltW2Rygls
+Message-ID: <CADvbK_c2YE8KfXE2KP0=a_zaUm-AWNOwpmyeDCQURA3AtbDpOQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 05/16] quic: provide quic.h header files for
+ kernel and userspace
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu 08-01-26 12:12:55, Jeff Layton wrote:
-> Yesterday, I sent patches to fix how directory delegation support is
-> handled on filesystems where the should be disabled [1]. That set is
-> appropriate for v6.19. For v7.0, I want to make lease support be more
-> opt-in, rather than opt-out:
-> 
-> For historical reasons, when ->setlease() file_operation is set to NULL,
-> the default is to use the kernel-internal lease implementation. This
-> means that if you want to disable them, you need to explicitly set the
-> ->setlease() file_operation to simple_nosetlease() or the equivalent.
-> 
-> This has caused a number of problems over the years as some filesystems
-> have inadvertantly allowed leases to be acquired simply by having left
-> it set to NULL. It would be better if filesystems had to opt-in to lease
-> support, particularly with the advent of directory delegations.
-> 
-> This series has sets the ->setlease() operation in a pile of existing
-> local filesystems to generic_setlease() and then changes
-> kernel_setlease() to return -EINVAL when the setlease() operation is not
-> set.
-> 
-> With this change, new filesystems will need to explicitly set the
-> ->setlease() operations in order to provide lease and delegation
-> support.
-> 
-> I mainly focused on filesystems that are NFS exportable, since NFS and
-> SMB are the main users of file leases, and they tend to end up exporting
-> the same filesystem types. Let me know if I've missed any.
+On Thu, Jan 8, 2026 at 10:01=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 1/5/26 3:04 PM, Xin Long wrote:
+> > This commit adds quic.h to include/uapi/linux, providing the necessary
+> > definitions for the QUIC socket API. Exporting this header allows both
+> > user space applications and kernel subsystems to access QUIC-related
+> > control messages, socket options, and event/notification interfaces.
+> >
+> > Since kernel_get/setsockopt() is no longer available to kernel consumer=
+s,
+> > a corresponding internal header, include/linux/quic.h, is added.
+>
+> Re-adding kernel_get/setsockopt() variants after removal, but just for a
+> single protocol is a bit ackward. The current series does not have any
+> user.
+>
+> Do such helpers save a lot of duplicate code? Otherwise I would instead
+> expose quic_do_{get,set}sockopt().
+>
+Not much, just when using quic_do_{get,set}sockopt(), KERNEL_SOCKPTR()
+will be used around the optval and optlen.
 
-So, what about kernfs and fuse? They seem to be exportable and don't have
-.setlease set...
+It should be fine to change to expose quic_do_{get,set}sockopt().
 
-								Honza
-
-> 
-> [1]: https://lore.kernel.org/linux-fsdevel/20260107-setlease-6-19-v1-0-85f034abcc57@kernel.org/
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
-> Jeff Layton (24):
->       fs: add setlease to generic_ro_fops and read-only filesystem directory operations
->       affs: add setlease file operation
->       btrfs: add setlease file operation
->       erofs: add setlease file operation
->       ext2: add setlease file operation
->       ext4: add setlease file operation
->       exfat: add setlease file operation
->       f2fs: add setlease file operation
->       fat: add setlease file operation
->       gfs2: add a setlease file operation
->       jffs2: add setlease file operation
->       jfs: add setlease file operation
->       nilfs2: add setlease file operation
->       ntfs3: add setlease file operation
->       ocfs2: add setlease file operation
->       orangefs: add setlease file operation
->       overlayfs: add setlease file operation
->       squashfs: add setlease file operation
->       tmpfs: add setlease file operation
->       udf: add setlease file operation
->       ufs: add setlease file operation
->       xfs: add setlease file operation
->       filelock: default to returning -EINVAL when ->setlease operation is NULL
->       fs: remove simple_nosetlease()
-> 
->  Documentation/filesystems/porting.rst |  9 +++++++++
->  Documentation/filesystems/vfs.rst     |  9 ++++++---
->  fs/9p/vfs_dir.c                       |  2 --
->  fs/9p/vfs_file.c                      |  2 --
->  fs/affs/dir.c                         |  2 ++
->  fs/affs/file.c                        |  2 ++
->  fs/befs/linuxvfs.c                    |  2 ++
->  fs/btrfs/file.c                       |  2 ++
->  fs/btrfs/inode.c                      |  2 ++
->  fs/ceph/dir.c                         |  2 --
->  fs/ceph/file.c                        |  1 -
->  fs/cramfs/inode.c                     |  2 ++
->  fs/efs/dir.c                          |  2 ++
->  fs/erofs/data.c                       |  2 ++
->  fs/erofs/dir.c                        |  2 ++
->  fs/exfat/dir.c                        |  2 ++
->  fs/exfat/file.c                       |  2 ++
->  fs/ext2/dir.c                         |  2 ++
->  fs/ext2/file.c                        |  2 ++
->  fs/ext4/dir.c                         |  2 ++
->  fs/ext4/file.c                        |  2 ++
->  fs/f2fs/dir.c                         |  2 ++
->  fs/f2fs/file.c                        |  2 ++
->  fs/fat/dir.c                          |  2 ++
->  fs/fat/file.c                         |  2 ++
->  fs/freevxfs/vxfs_lookup.c             |  2 ++
->  fs/fuse/dir.c                         |  1 -
->  fs/gfs2/file.c                        |  3 +--
->  fs/isofs/dir.c                        |  2 ++
->  fs/jffs2/dir.c                        |  2 ++
->  fs/jffs2/file.c                       |  2 ++
->  fs/jfs/file.c                         |  2 ++
->  fs/jfs/namei.c                        |  2 ++
->  fs/libfs.c                            | 20 ++------------------
->  fs/locks.c                            |  3 +--
->  fs/nfs/dir.c                          |  1 -
->  fs/nfs/file.c                         |  1 -
->  fs/nilfs2/dir.c                       |  3 ++-
->  fs/nilfs2/file.c                      |  2 ++
->  fs/ntfs3/dir.c                        |  3 +++
->  fs/ntfs3/file.c                       |  3 +++
->  fs/ocfs2/file.c                       |  5 +++++
->  fs/orangefs/dir.c                     |  4 +++-
->  fs/orangefs/file.c                    |  1 +
->  fs/overlayfs/file.c                   |  2 ++
->  fs/overlayfs/readdir.c                |  2 ++
->  fs/qnx4/dir.c                         |  2 ++
->  fs/qnx6/dir.c                         |  2 ++
->  fs/read_write.c                       |  2 ++
->  fs/smb/client/cifsfs.c                |  1 -
->  fs/squashfs/dir.c                     |  2 ++
->  fs/squashfs/file.c                    |  4 +++-
->  fs/udf/dir.c                          |  2 ++
->  fs/udf/file.c                         |  2 ++
->  fs/ufs/dir.c                          |  2 ++
->  fs/ufs/file.c                         |  2 ++
->  fs/vboxsf/dir.c                       |  1 -
->  fs/vboxsf/file.c                      |  1 -
->  fs/xfs/xfs_file.c                     |  3 +++
->  include/linux/fs.h                    |  1 -
->  mm/shmem.c                            |  2 ++
->  61 files changed, 116 insertions(+), 42 deletions(-)
-> ---
-> base-commit: 731ce71a6c8adb8b8f873643beacaeedc1564500
-> change-id: 20260107-setlease-6-20-299eb5695c5a
-> 
-> Best regards,
-> -- 
-> Jeff Layton <jlayton@kernel.org>
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks.
