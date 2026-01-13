@@ -1,181 +1,101 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2705D3876D9
-	for <linux-cifs@vger.kernel.org>; Tue, 13 Jan 2026 11:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3DC3921E9;
+	Tue, 13 Jan 2026 13:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768305021; cv=none; b=nrJaVxYM6NE5/n68blWm+sJJYxcMHIgAJd/7Nc+B2wjSJQgtR8cXiQ6YYqikgK6cwR1K6DF5vp98nF6Cy7kpDsvQyg+zKXgB0+hfoeOw1A+TYhmllW7YHMRLeLSEBcZmGZjjemiKSyGFCSs/XnHAIg0SGYsJe3QDnMBT8wCjMpQ=
+	t=1768312735; cv=none; b=tprG+Jd2ALHQhbat6iA6+yVmg9Ayo94d2zlD3fvn/t1uVuzhuG1mW24qQPomHxY5VqG3/toMP0Rnho19feNH+0lUmSPOLKlQ6T77W9khWcISqSWeyO2JVl5oDksJwTvqTRaFxnrlb0SJdeZo37L4c+2s2u/iTbiIyLFFkDbX4uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768305021; c=relaxed/simple;
-	bh=64fWHMTVbg6ilRs9vJOrLHCWPXz1/YG17gH59/Gq9z8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PAO4fVeGFAWWt9ykF5Jdl2QZJR3KgjzcWud+yviKVunEv71IsDIzLn52+ng2N8h2qrBVvmP1R7hWk69/2rZng1/1uWiUGCR71mUeUGCSDVRRz97GkfgiqY0iO5lplucZncEdUTgAzRcw30AIe9EU4T8Owm4CcjeRiHR06/yyfwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ybfTbTlO; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WR78M5pV; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ybfTbTlO; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WR78M5pV; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1768312735; c=relaxed/simple;
+	bh=Mdtt2cEJZpAolbsyohBBtRFFKdaOQF7vilJVbgvlUGo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=smhH7rzVL/WLtxRLJ2NREqx0NSzCmVj6Vqr0hvD5xfCKEktUmXDdGjBlOuTLAtUYpWS0s1l7wFxrmdQOX+hzP+K6WVOm2a+BAQW+8Dqa7Aa5+fCq3gew3idzL5ZS8XMwwF829UtyUElqCa/jVJ/1GZHJjHLIx9BDV79zINTQE18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IHCBTIj9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ybfTbTlO";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WR78M5pV";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ybfTbTlO";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WR78M5pV"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 6C99E33684;
-	Tue, 13 Jan 2026 11:50:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1768305018; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EgNRi+aV6jB9u6bCyM5aaBQD8Pz1HwmkA+frhGt+2U8=;
-	b=ybfTbTlOs0mjZYU+kOegPaJWwwsyWdZJFvh/IhjhtlM+NswaBFD0Tcq3sXMo6UKipzVpMG
-	FOEApY0GPyhr2lPsXDFcfVvt5o0XanTfz9/NW6c8E+QvjvxXUjBcPOUbL1nx8qBShfURNv
-	jgrkqpn6HBCaqCUIco8/Ufm4pyyN7Co=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1768305018;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EgNRi+aV6jB9u6bCyM5aaBQD8Pz1HwmkA+frhGt+2U8=;
-	b=WR78M5pVO0K7T2BZI6ht+0pgqH5o/ONc4tEDfRjHT2gRrEdfy2XRdboRvibOPeAsXlQzdJ
-	lPGJ8C+NLCo8x1Aw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=ybfTbTlO;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=WR78M5pV
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1768305018; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EgNRi+aV6jB9u6bCyM5aaBQD8Pz1HwmkA+frhGt+2U8=;
-	b=ybfTbTlOs0mjZYU+kOegPaJWwwsyWdZJFvh/IhjhtlM+NswaBFD0Tcq3sXMo6UKipzVpMG
-	FOEApY0GPyhr2lPsXDFcfVvt5o0XanTfz9/NW6c8E+QvjvxXUjBcPOUbL1nx8qBShfURNv
-	jgrkqpn6HBCaqCUIco8/Ufm4pyyN7Co=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1768305018;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EgNRi+aV6jB9u6bCyM5aaBQD8Pz1HwmkA+frhGt+2U8=;
-	b=WR78M5pVO0K7T2BZI6ht+0pgqH5o/ONc4tEDfRjHT2gRrEdfy2XRdboRvibOPeAsXlQzdJ
-	lPGJ8C+NLCo8x1Aw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5EC433EA63;
-	Tue, 13 Jan 2026 11:50:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 7oscF3oxZmnSLgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 13 Jan 2026 11:50:18 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 27F84A08CF; Tue, 13 Jan 2026 12:50:18 +0100 (CET)
-Date: Tue, 13 Jan 2026 12:50:18 +0100
-From: Jan Kara <jack@suse.cz>
-To: Chuck Lever <cel@kernel.org>
-Cc: vira@imap.suse.de, Christian Brauner <brauner@kernel.org>, 
-	Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-f2fs-devel@lists.sourceforge.net, hirofumi@mail.parknet.co.jp, linkinjeon@kernel.org, 
-	sj1557.seo@samsung.com, yuezhang.mo@sony.com, almaz.alexandrovich@paragon-software.com, 
-	slava@dubeyko.com, glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu, 
-	adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org, pc@manguebit.org, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, trondmy@kernel.org, anna@kernel.org, 
-	jaegeuk@kernel.org, chao@kernel.org, hansg@kernel.org, senozhatsky@chromium.org, 
-	Chuck Lever <chuck.lever@oracle.com>
-Subject: Re: [PATCH v3 07/16] ext4: Report case sensitivity in fileattr_get
-Message-ID: <76zoosya47hgvau4bajvpqupogjpbx5wtljtwltp7pzggkyj7m@lco5on2kmf7g>
-References: <20260112174629.3729358-1-cel@kernel.org>
- <20260112174629.3729358-8-cel@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IHCBTIj9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9631AC116C6;
+	Tue, 13 Jan 2026 13:58:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768312734;
+	bh=Mdtt2cEJZpAolbsyohBBtRFFKdaOQF7vilJVbgvlUGo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IHCBTIj9UNV7zFILfsvU9XgyRBUFUE6V1XXitdJsXV4An6QT0u9i2rDGeRj289vt4
+	 WkiQzfDRs5U6wYFLdweectESwFc4BRcilU+itHS6DCLfB7DAhWRozee85uqhuEjqlF
+	 Prv9Hfrz6iNh61KNTwvjFiJs3keHSxpck+Gwzx2D8YrMgW+dctCS7kPQk2sR+wY3Ye
+	 LVdXdKWUHDiQx93VDVxTV8xlHdDI5QYAJcuuO/W8J/CHNXaaxZsTvPy16ArXawSW3w
+	 k9kverbXLU/aJEA2C9xjImlMARaL5kA/oeRmR1ID5IDE6jpqCg9Q35w4USUFRQJJvu
+	 tdxB439zhtF1w==
+Message-ID: <774aac29-837d-4692-b744-e168d969a221@kernel.org>
+Date: Tue, 13 Jan 2026 08:58:45 -0500
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260112174629.3729358-8-cel@kernel.org>
-X-Spam-Score: -4.01
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLa77mm4gi8mw7uppieotozii3)];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_CC(0.00)[imap.suse.de,kernel.org,suse.cz,vger.kernel.org,lists.sourceforge.net,mail.parknet.co.jp,samsung.com,sony.com,paragon-software.com,dubeyko.com,physik.fu-berlin.de,vivo.com,mit.edu,dilger.ca,samba.org,manguebit.org,gmail.com,microsoft.com,chromium.org,oracle.com];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,suse.com:email]
-X-Spam-Level: 
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 6C99E33684
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/16] Exposing case folding behavior
+To: Christian Brauner <brauner@kernel.org>
+Cc: vira@so61, Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+ linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, hirofumi@mail.parknet.co.jp,
+ linkinjeon@kernel.org, sj1557.seo@samsung.com, yuezhang.mo@sony.com,
+ almaz.alexandrovich@paragon-software.com, slava@dubeyko.com,
+ glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu,
+ adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org,
+ pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+ trondmy@kernel.org, anna@kernel.org, jaegeuk@kernel.org, chao@kernel.org,
+ hansg@kernel.org, senozhatsky@chromium.org,
+ Chuck Lever <chuck.lever@oracle.com>
+References: <20260112174629.3729358-1-cel@kernel.org>
+ <20260113-vorort-pudding-ef90f426d5cf@brauner>
+From: Chuck Lever <cel@kernel.org>
+Content-Language: en-US
+Organization: kernel.org
+In-Reply-To: <20260113-vorort-pudding-ef90f426d5cf@brauner>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon 12-01-26 12:46:20, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
+On 1/13/26 4:04 AM, Christian Brauner wrote:
+> On Mon, Jan 12, 2026 at 12:46:13PM -0500, Chuck Lever wrote:
+>> From: Chuck Lever <chuck.lever@oracle.com>
+>>
+>> Following on from
+>>
+>> https://lore.kernel.org/linux-nfs/20251021-zypressen-bazillus-545a44af57fd@brauner/T/#m0ba197d75b7921d994cf284f3cef3a62abb11aaa
+>>
+>> I'm attempting to implement enough support in the Linux VFS to
+>> enable file services like NFSD and ksmbd (and user space
+>> equivalents) to provide the actual status of case folding support
+>> in local file systems. The default behavior for local file systems
+>> not explicitly supported in this series is to reflect the usual
+>> POSIX behaviors:
+>>
+>>   case-insensitive = false
+>>   case-preserving = true
+>>
+>> The case-insensitivity and case-preserving booleans can be consumed
+>> immediately by NFSD. These two booleans have been part of the NFSv3
+>> and NFSv4 protocols for decades, in order to support NFS clients on
+>> non-POSIX systems.
+>>
+>> Support for user space file servers is why this series exposes case
+>> folding information via a user-space API. I don't know of any other
+>> category of user-space application that requires access to case
+>> folding info.
 > 
-> Report ext4's case sensitivity behavior via file_kattr boolean
-> fields. ext4 always preserves case at rest.
-> 
-> Case sensitivity is a per-directory setting in ext4. If the queried
-> inode is a casefolded directory, report case-insensitive; otherwise
-> report case-sensitive (standard POSIX behavior).
-> 
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+> This all looks good to me.
+> Just one question: This reads like you are exposing the new file attr
+> bits via userspace but I can only see changes to the kernel internal
+> headers not the uapi headers. So are you intentionally not exposing this
+> as a new uapi extension to file attr or is this an accident?
 
-Looks good. Feel free to add:
+The intention is to expose the new bits to user space. IIRC those got
+removed from uapi headers when I converted from using statx. I can fix
+that up and post a v4.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
 
-								Honza
-
-> ---
->  fs/ext4/ioctl.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/fs/ext4/ioctl.c b/fs/ext4/ioctl.c
-> index 7ce0fc40aec2..653035017c7f 100644
-> --- a/fs/ext4/ioctl.c
-> +++ b/fs/ext4/ioctl.c
-> @@ -996,6 +996,14 @@ int ext4_fileattr_get(struct dentry *dentry, struct file_kattr *fa)
->  	if (ext4_has_feature_project(inode->i_sb))
->  		fa->fsx_projid = from_kprojid(&init_user_ns, ei->i_projid);
->  
-> +	/*
-> +	 * ext4 always preserves case. If this inode is a casefolded
-> +	 * directory, report case-insensitive; otherwise report
-> +	 * case-sensitive (standard POSIX behavior).
-> +	 */
-> +	fa->case_insensitive = IS_CASEFOLDED(inode);
-> +	fa->case_preserving = true;
-> +
->  	return 0;
->  }
->  
-> -- 
-> 2.52.0
-> 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Chuck Lever
