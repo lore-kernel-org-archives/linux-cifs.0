@@ -1,537 +1,190 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDBB82C11CA
-	for <linux-cifs@vger.kernel.org>; Thu, 15 Jan 2026 17:14:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DCE3BF2F6;
+	Thu, 15 Jan 2026 17:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768497289; cv=none; b=YS5phwFB9eDta68E3xlNUaxPpTrqR7mR49dKj9xjstKzcUllR2h9Diiy6892L8UV0+Syj5o649CP75ca8tDPGpZmxv96NV9zsDC+pOpUOGsYpZ8PAoM7TqLOsaClymqLEPti57mxzCdt8DEzgK9oh1VofgRu0MrJsU8+MRq37Zs=
+	t=1768499282; cv=none; b=LH8vQq7prCvD+4iih/TJR9/uUEZaH0rW97MRLW8iZM8BTRNHbNHNkQsI0HWUFlxSm+lP3t+mpKl1msd2yFfQfsJ96MerBwvsozic+cTOz4F+uhT7Fqk7HAnC/U8t93J2LtCr56yKkt7M0uDxIvn1m9kvEJb7ctySHqGN/MdelHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768497289; c=relaxed/simple;
-	bh=JJqkpuUFuIe/gFYva1ohWTEXB+T9x5tVlAQa7/2p+6k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JEIMcY9NFrHiqsskkGqXtv+WNQGH1LyDNClCr1OChuvu+54L4MPY3LG4nwt5fVD/l1uzm0ogSTYGU12f7TIE/tYDVhHqsMN1sxf/A87LDawoyTcvRFZdz0Cdx0st4RT4O8FW3MvdprDXNo6g26x/EulXdYKH+XskwLDKBJfgpZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mA5kE7IE; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768499282; c=relaxed/simple;
+	bh=Jgrg+43s0ldgv37NKbEktTlLcn8JlZ4Z62/aDsJl2fE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CujYPFGutf/UKSzzB9mUg8xSAjsxk+hfR2VTrWMsOrY1IWpDdpjgpZEid4pkF5DXxUmxBjenSGlV7d97fBc/otdENxEaIuYjPrUqHYVmrmnk6dZsEaFyc5892YFXpC7UBbBx98oGimLga8BDcCxIxxKfYFlR8T4l9toyOStidIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sv2wZs8W; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mA5kE7IE"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b4755f37c3eso656597a12.3
-        for <linux-cifs@vger.kernel.org>; Thu, 15 Jan 2026 09:14:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768497287; x=1769102087; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tYFKy8wmeOF9/xLY0YwTs32UNcdqHUMzReGDert9fzo=;
-        b=mA5kE7IE0vF1VZaBLmTRgxBZHHWHZcO2Meuo4Uv8YYNWr3i12Z4ioRW/UuHAATBsod
-         lmcPYHlmHL7R0/4wuc8g7JV+eKWtbZU6pES0RxdqQVlQpqcCg2k+xBqgdmezMfUgpiEB
-         n1RZOAfylvn4jh1ahtqeoe73aT8wQ1O++BafFwYFxTs8quUTsW9x0Y6WaGOEs27lweQp
-         BKBHOyWC4uv42MzP8fDmLAkijmOoL967AEMlP5G0M/fkZ5H54etTbUVyq91mftTibNnK
-         cWbCa5a+i/RMuvA3CG+a0LtB0zst/siPS9yopQcjiIBpholdpObsIzw3VnRdLVpb/CpV
-         AWnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768497287; x=1769102087;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tYFKy8wmeOF9/xLY0YwTs32UNcdqHUMzReGDert9fzo=;
-        b=H8pRxXJ8sYq04k2Q+eLxlv3qkQHnDmXQ6r6swBasBau7G4bQ/pCT7hvSsHutkUv/XZ
-         aRAliBv7fbAVUUe+4sBmhaXAnewylRltc26b+RlyNdANRaxBi+g8KCThtrFRAqgNKlwm
-         oEMAraTAFG/t9RcD2UnpIJ86JEXGhmDYNRZ6dN8qjZQrxsiNocpt+RCZAeWC50CP3SLQ
-         oetkGwcYEi5SrMgrsCSEM5bSOOJq3Es3N3gYqqlgw2nk3d6oHb87dv8XS571IMhXv9mv
-         72r17zq8X3BYYoEb4lbcExi4v41SOguRQYGYgWk+hMcCHbdtV/yAtDoKyPWu99GYKbXL
-         BEJA==
-X-Forwarded-Encrypted: i=1; AJvYcCXlxmnDrFgPOgC1sdCHfUGjI3NNG1sVeyrVXaEVIGKJrWiVFMvn6bMyvSzlGq1CKFnnUm+X5KjJVdEm@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLfJzY+2iA+o0yyOFEHJNxqsgMH/TXMAqS87DpOi2TAqJSme1T
-	0FpnjzI9nl597LLcqNE+Rw0wIKyz9lT19sNSIotTSMFDdQIRkyWMrmjBbqLrjavL
-X-Gm-Gg: AY/fxX6xAXWQqGfZtUe3G5Y3aZiDqNCdbjmELDmtWwM4RCWwv9LAC88ShycHXk4T5lt
-	QW4Ja5zb4R7kO23c04Ak5ckRRXqtaYI2atRzC02oHecaOWqkw+v7p7yeKnrhmf+Lw18C/cr2rv4
-	ecYf1auChPzEC5VRNvb60ftXrXyHYG4d/GbgRGrYSe2T/uyvduhXnTL9kAVP9MPfEyqlxZie/1V
-	Y5VC8Af30BE2vMtjVnqAxVqX5SPYoiy6/BNkoPqjKGTAd72Y7+tlCT1v818MvvbbNg89SFEwuxF
-	hOq1mqqxtXPK2PLdYWuobTOg2fVtJvBwesynyTJV0J/7ul+sLZB7mVMM8YaqpuXEzUT91GDI/wO
-	gd2x0PE8jfdREnSpYXXFmpot04gqByRax4W7LI1SLcVIc0Q5LFS2b55uMZLT9TVxBxBcwu7WWWA
-	pHJQIA5zT66ApIpHwuiqkwaz+8A+8XAvI99kTbYOPQaIwR5bRd0AszQXfqKpsTpQ==
-X-Received: by 2002:a05:6214:d49:b0:880:4c2d:dc8c with SMTP id 6a1803df08f44-89274384cf2mr83259406d6.18.1768490228405;
-        Thu, 15 Jan 2026 07:17:08 -0800 (PST)
-Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-890770cc6edsm201030056d6.4.2026.01.15.07.16.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 07:17:07 -0800 (PST)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>,
-	quic@lists.linux.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Metzmacher <metze@samba.org>,
-	Moritz Buhl <mbuhl@openbsd.org>,
-	Tyler Fanelli <tfanelli@redhat.com>,
-	Pengtao He <hepengtao@xiaomi.com>,
-	Thomas Dreibholz <dreibh@simula.no>,
-	linux-cifs@vger.kernel.org,
-	Steve French <smfrench@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Tom Talpey <tom@talpey.com>,
-	kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Steve Dickson <steved@redhat.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Alexander Aring <aahringo@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	John Ericson <mail@johnericson.me>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	"D . Wythe" <alibuda@linux.alibaba.com>,
-	Jason Baron <jbaron@akamai.com>,
-	illiliti <illiliti@protonmail.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Daniel Stenberg <daniel@haxx.se>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: [PATCH net-next v7 13/16] quic: add timer management
-Date: Thu, 15 Jan 2026 10:11:13 -0500
-Message-ID: <b03eca5d40a46cc647c3ef4003213ea0b5c6d00f.1768489876.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <cover.1768489876.git.lucien.xin@gmail.com>
-References: <cover.1768489876.git.lucien.xin@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sv2wZs8W"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6A44C16AAE;
+	Thu, 15 Jan 2026 17:47:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768499282;
+	bh=Jgrg+43s0ldgv37NKbEktTlLcn8JlZ4Z62/aDsJl2fE=;
+	h=From:Subject:Date:To:Cc:From;
+	b=sv2wZs8WpKeI0wpddsdCzx5FPuJfiv0htyo+0abzJrCCFK9q4146ZE28BG441jorg
+	 Qo1tIee7N/1MnShJaAey62z4lfLsmhIXMLkZMLSEMlmEhDwdr2qsSYaFrVZPxb77cF
+	 i3aSCJl0gIo+M7JBkTxdAg7VvCpYnqzbG7R2Ohvdin1j12CbILNcI3w/DNWL7f9jbe
+	 DBukUrRoDDoNluFnmhgrGDxPlIkvSUMcrjLUpjjJ1T7VqZOaz0YENa8tKyKu6CaX47
+	 KOmCoEsEsYyGz5wli5gj5MnM7JWLaAPtkHWHG4sSZOBoGuAC5psY5ECRaP4FTl6A5n
+	 5/8prxsy2NgBw==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH 00/29] fs: require filesystems to explicitly opt-in to nfsd
+ export support
+Date: Thu, 15 Jan 2026 12:47:31 -0500
+Message-Id: <20260115-exportfs-nfsd-v1-0-8e80160e3c0c@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MQQqAIBBA0avErBMcyaKuEi0kx5qNhhMRiHdPW
+ r7F/wWEMpPA0hXI9LBwig3Yd7CfLh6k2DeD0WbUiIOi90r5DqJiEK/QWLR6MjS7GVpzZQr8/r9
+ 1q/UDI1yMc18AAAA=
+X-Change-ID: 20260114-exportfs-nfsd-12515072e9a9
+To: Christian Brauner <brauner@kernel.org>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, Amir Goldstein <amir73il@gmail.com>, 
+ Hugh Dickins <hughd@google.com>, 
+ Baolin Wang <baolin.wang@linux.alibaba.com>, 
+ Andrew Morton <akpm@linux-foundation.org>, Theodore Ts'o <tytso@mit.edu>, 
+ Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>, 
+ Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, 
+ Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, 
+ Sandeep Dhavale <dhavale@google.com>, Hongbo Li <lihongbo22@huawei.com>, 
+ Chunhai Guo <guochunhai@vivo.com>, Carlos Maiolino <cem@kernel.org>, 
+ Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>, 
+ Viacheslav Dubeyko <slava@dubeyko.com>, Chris Mason <clm@fb.com>, 
+ David Sterba <dsterba@suse.com>, Luis de Bethencourt <luisbg@kernel.org>, 
+ Salah Triki <salah.triki@gmail.com>, 
+ Phillip Lougher <phillip@squashfs.org.uk>, Steve French <sfrench@samba.org>, 
+ Paulo Alcantara <pc@manguebit.org>, 
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+ Shyam Prasad N <sprasad@microsoft.com>, 
+ Bharath SM <bharathsm@microsoft.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+ Mike Marshall <hubcap@omnibond.com>, 
+ Martin Brandenburg <martin@omnibond.com>, Mark Fasheh <mark@fasheh.com>, 
+ Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>, 
+ Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, 
+ Ryusuke Konishi <konishi.ryusuke@gmail.com>, 
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+ Dave Kleikamp <shaggy@kernel.org>, David Woodhouse <dwmw2@infradead.org>, 
+ Richard Weinberger <richard@nod.at>, Jan Kara <jack@suse.cz>, 
+ Andreas Gruenbacher <agruenba@redhat.com>, 
+ OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+ Jaegeuk Kim <jaegeuk@kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-nfs@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ linux-mm@kvack.org, linux-ext4@vger.kernel.org, 
+ linux-erofs@lists.ozlabs.org, linux-xfs@vger.kernel.org, 
+ ceph-devel@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+ linux-unionfs@vger.kernel.org, devel@lists.orangefs.org, 
+ ocfs2-devel@lists.linux.dev, ntfs3@lists.linux.dev, 
+ linux-nilfs@vger.kernel.org, jfs-discussion@lists.sourceforge.net, 
+ linux-mtd@lists.infradead.org, gfs2@lists.linux.dev, 
+ linux-f2fs-devel@lists.sourceforge.net, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4009; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=Jgrg+43s0ldgv37NKbEktTlLcn8JlZ4Z62/aDsJl2fE=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBpaSg9V9dGf/ZUraP4b1Pq5RtyBLPKPHN6qkaxn
+ 8S9nULay2GJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaWkoPQAKCRAADmhBGVaC
+ FU2HEACr1dom+IcUewiIOnk7xEbGWbqcKSzh/u8bfD7LubFnaY7GNt5n6p3PgjmIFAgE/Lfk2v+
+ Do5G648LuI9AgNBffpq3Rou0EGw9+wxjXyRaSItdEWDshxbLnMS5D2dtmXeB4x2mF6Xo8wPho9c
+ ncOUEwjZL61T/UOLGxpSOojluUsBXenixeUCTgPYWeDSKZSd1PrbfIIvNT3wwmmIpQAv0lasork
+ Zl4qe+BiG1G0IPtketcJGFYIgXNp76Hnll+P8/EqVrDG+4nPn8MGAy3xqMQyq4+dCzENDy0DmS3
+ AJMlGepQMU/y0tAmS4R1R2P27jpCMwpBj8HhdNo0JThYFgmCYeGwPxsTOTNG8XmrWn4zye1BAl9
+ Oz/kXfQnSFwMzweZ9J7fT16IxYVpb12aXvYdwcnZ+IE/Suh66Nx8n52d4tuSwNkKYQf6d05G1bU
+ I+lA7kAnXjIh/p4o4pNnALEld2Rn49OAx/yxtN5VOYrjpBIK6yRyYTXjz0PnCRFsn3V65+xhhPM
+ CJTSVK9ZzU4nspmDSK5hdCvs1pnGqYR9dLF7QV60eUBpiDYnfsiOG+KZmrsLuWOd2/7/8V8giqf
+ SBbuLOXJmeBQ1IbyaaZbzwsaK+7PAPY92+HTJ8jsZ6+vQhAXLJ40Y1ug6UAG1bGirhSbW+Ru3JH
+ SgoO6jBDoISNHpA==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-This patch introduces 'quic_timer' to unify and manage the five main
-timers used in QUIC: loss detection, delayed ACK, path validation,
-PMTU probing, and pacing. These timers are critical for driving
-retransmissions, connection liveness, and flow control.
+In recent years, a number of filesystems that can't present stable
+filehandles have grown struct export_operations. They've mostly done
+this for local use-cases (enabling open_by_handle_at() and the like).
+Unfortunately, having export_operations is generally sufficient to make
+a filesystem be considered exportable via nfsd, but that requires that
+the server present stable filehandles.
 
-Each timer type is initialized, started, reset, or stopped using a common
-set of operations.
+This patchset declares a new EXPORT_OP_STABLE_HANDLES flag, adds it to
+all of the filesystems that have stable filehandles, and then adds a
+check in nfsd to ensure that that flag is set for any filesystem to
+which it has been presented a handle. When a filesystem doesn't have
+this flag, it will treat the filehandle as stale.
 
-- quic_timer_reset(): Reset a timer with type and timeout
-
-- quic_timer_start(): Start a timer with type and timeout
-
-- quic_timer_stop(): Stop a timer with type
-
-Although handler functions for each timer are defined, they are currently
-placeholders; their logic will be implemented in upcoming patches for
-packet transmission and outqueue handling.
-
-Deferred timer actions are also integrated through quic_release_cb(),
-which dispatches to the appropriate handler when timers expire.
-
-Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
-v5:
-  - Rename QUIC_TSQ_DEFERRED to QUIC_PACE_DEFERRED.
----
- net/quic/Makefile |   2 +-
- net/quic/socket.c |  33 ++++++++
- net/quic/socket.h |  33 ++++++++
- net/quic/timer.c  | 196 ++++++++++++++++++++++++++++++++++++++++++++++
- net/quic/timer.h  |  47 +++++++++++
- 5 files changed, 310 insertions(+), 1 deletion(-)
- create mode 100644 net/quic/timer.c
- create mode 100644 net/quic/timer.h
+Jeff Layton (29):
+      exportfs: add new EXPORT_OP_STABLE_HANDLES flag
+      tmpfs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      ext4: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      ext2: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      erofs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      efs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      xfs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      ceph: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      btrfs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      befs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      ufs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      udf: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      affs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      squashfs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      smb/client: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      ovl: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      orangefs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      ocfs2: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      ntfs3: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      nilfs2: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      nfs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      jfs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      jffs2: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      isofs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      gfs2: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      fuse: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      fat: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      f2fs: add EXPORT_OP_STABLE_HANDLES flag to export operations
+      nfsd: only allow filesystems that set EXPORT_OP_STABLE_HANDLES
 
-diff --git a/net/quic/Makefile b/net/quic/Makefile
-index 58bb18f7926d..2ccf01ad9e22 100644
---- a/net/quic/Makefile
-+++ b/net/quic/Makefile
-@@ -6,4 +6,4 @@
- obj-$(CONFIG_IP_QUIC) += quic.o
- 
- quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o \
--	  cong.o pnspace.o crypto.o
-+	  cong.o pnspace.o crypto.o timer.o
-diff --git a/net/quic/socket.c b/net/quic/socket.c
-index 7fd6955824bc..dde1d9becf06 100644
---- a/net/quic/socket.c
-+++ b/net/quic/socket.c
-@@ -47,6 +47,8 @@ static int quic_init_sock(struct sock *sk)
- 	quic_conn_id_set_init(quic_dest(sk), 0);
- 	quic_cong_init(quic_cong(sk));
- 
-+	quic_timer_init(sk);
-+
- 	if (quic_stream_init(quic_streams(sk)))
- 		return -ENOMEM;
- 
-@@ -68,6 +70,8 @@ static void quic_destroy_sock(struct sock *sk)
- {
- 	u8 i;
- 
-+	quic_timer_free(sk);
-+
- 	for (i = 0; i < QUIC_PNSPACE_MAX; i++)
- 		quic_pnspace_free(quic_pnspace(sk, i));
- 	for (i = 0; i < QUIC_CRYPTO_MAX; i++)
-@@ -194,6 +198,35 @@ static int quic_getsockopt(struct sock *sk, int level, int optname,
- 
- static void quic_release_cb(struct sock *sk)
- {
-+	/* Similar to tcp_release_cb(). */
-+	unsigned long nflags, flags = smp_load_acquire(&sk->sk_tsq_flags);
-+
-+	do {
-+		if (!(flags & QUIC_DEFERRED_ALL))
-+			return;
-+		nflags = flags & ~QUIC_DEFERRED_ALL;
-+	} while (!try_cmpxchg(&sk->sk_tsq_flags, &flags, nflags));
-+
-+	if (flags & QUIC_F_LOSS_DEFERRED) {
-+		quic_timer_loss_handler(sk);
-+		__sock_put(sk);
-+	}
-+	if (flags & QUIC_F_SACK_DEFERRED) {
-+		quic_timer_sack_handler(sk);
-+		__sock_put(sk);
-+	}
-+	if (flags & QUIC_F_PATH_DEFERRED) {
-+		quic_timer_path_handler(sk);
-+		__sock_put(sk);
-+	}
-+	if (flags & QUIC_F_PMTU_DEFERRED) {
-+		quic_timer_pmtu_handler(sk);
-+		__sock_put(sk);
-+	}
-+	if (flags & QUIC_F_PACE_DEFERRED) {
-+		quic_timer_pace_handler(sk);
-+		__sock_put(sk);
-+	}
- }
- 
- static int quic_disconnect(struct sock *sk, int flags)
-diff --git a/net/quic/socket.h b/net/quic/socket.h
-index fc203eecbb8b..5e9b21430f42 100644
---- a/net/quic/socket.h
-+++ b/net/quic/socket.h
-@@ -21,6 +21,7 @@
- #include "cong.h"
- 
- #include "protocol.h"
-+#include "timer.h"
- 
- extern struct proto quic_prot;
- extern struct proto quicv6_prot;
-@@ -32,6 +33,31 @@ enum quic_state {
- 	QUIC_SS_ESTABLISHED	= TCP_ESTABLISHED,
- };
- 
-+enum quic_tsq_enum {
-+	QUIC_MTU_REDUCED_DEFERRED,
-+	QUIC_LOSS_DEFERRED,
-+	QUIC_SACK_DEFERRED,
-+	QUIC_PATH_DEFERRED,
-+	QUIC_PMTU_DEFERRED,
-+	QUIC_PACE_DEFERRED,
-+};
-+
-+enum quic_tsq_flags {
-+	QUIC_F_MTU_REDUCED_DEFERRED	= BIT(QUIC_MTU_REDUCED_DEFERRED),
-+	QUIC_F_LOSS_DEFERRED		= BIT(QUIC_LOSS_DEFERRED),
-+	QUIC_F_SACK_DEFERRED		= BIT(QUIC_SACK_DEFERRED),
-+	QUIC_F_PATH_DEFERRED		= BIT(QUIC_PATH_DEFERRED),
-+	QUIC_F_PMTU_DEFERRED		= BIT(QUIC_PMTU_DEFERRED),
-+	QUIC_F_PACE_DEFERRED		= BIT(QUIC_PACE_DEFERRED),
-+};
-+
-+#define QUIC_DEFERRED_ALL (QUIC_F_MTU_REDUCED_DEFERRED |	\
-+			   QUIC_F_LOSS_DEFERRED |		\
-+			   QUIC_F_SACK_DEFERRED |		\
-+			   QUIC_F_PATH_DEFERRED |		\
-+			   QUIC_F_PMTU_DEFERRED |		\
-+			   QUIC_F_PACE_DEFERRED)
-+
- struct quic_sock {
- 	struct inet_sock		inet;
- 	struct list_head		reqs;
-@@ -48,6 +74,8 @@ struct quic_sock {
- 	struct quic_cong		cong;
- 	struct quic_pnspace		space[QUIC_PNSPACE_MAX];
- 	struct quic_crypto		crypto[QUIC_CRYPTO_MAX];
-+
-+	struct quic_timer		timers[QUIC_TIMER_MAX];
- };
- 
- struct quic6_sock {
-@@ -125,6 +153,11 @@ static inline struct quic_crypto *quic_crypto(const struct sock *sk, u8 level)
- 	return &quic_sk(sk)->crypto[level];
- }
- 
-+static inline void *quic_timer(const struct sock *sk, u8 type)
-+{
-+	return (void *)&quic_sk(sk)->timers[type];
-+}
-+
- static inline bool quic_is_establishing(struct sock *sk)
- {
- 	return sk->sk_state == QUIC_SS_ESTABLISHING;
-diff --git a/net/quic/timer.c b/net/quic/timer.c
-new file mode 100644
-index 000000000000..6f957385a341
---- /dev/null
-+++ b/net/quic/timer.c
-@@ -0,0 +1,196 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* QUIC kernel implementation
-+ * (C) Copyright Red Hat Corp. 2023
-+ *
-+ * This file is part of the QUIC kernel implementation
-+ *
-+ * Initialization/cleanup for QUIC protocol support.
-+ *
-+ * Written or modified by:
-+ *    Xin Long <lucien.xin@gmail.com>
-+ */
-+
-+#include "socket.h"
-+
-+void quic_timer_sack_handler(struct sock *sk)
-+{
-+}
-+
-+static void quic_timer_sack_timeout(struct timer_list *t)
-+{
-+	struct quic_sock *qs = container_of(t, struct quic_sock, timers[QUIC_TIMER_SACK].t);
-+	struct sock *sk = &qs->inet.sk;
-+
-+	bh_lock_sock(sk);
-+	if (sock_owned_by_user(sk)) {
-+		if (!test_and_set_bit(QUIC_SACK_DEFERRED, &sk->sk_tsq_flags))
-+			sock_hold(sk);
-+		goto out;
-+	}
-+
-+	quic_timer_sack_handler(sk);
-+out:
-+	bh_unlock_sock(sk);
-+	sock_put(sk);
-+}
-+
-+void quic_timer_loss_handler(struct sock *sk)
-+{
-+}
-+
-+static void quic_timer_loss_timeout(struct timer_list *t)
-+{
-+	struct quic_sock *qs = container_of(t, struct quic_sock, timers[QUIC_TIMER_LOSS].t);
-+	struct sock *sk = &qs->inet.sk;
-+
-+	bh_lock_sock(sk);
-+	if (sock_owned_by_user(sk)) {
-+		if (!test_and_set_bit(QUIC_LOSS_DEFERRED, &sk->sk_tsq_flags))
-+			sock_hold(sk);
-+		goto out;
-+	}
-+
-+	quic_timer_loss_handler(sk);
-+out:
-+	bh_unlock_sock(sk);
-+	sock_put(sk);
-+}
-+
-+void quic_timer_path_handler(struct sock *sk)
-+{
-+}
-+
-+static void quic_timer_path_timeout(struct timer_list *t)
-+{
-+	struct quic_sock *qs = container_of(t, struct quic_sock, timers[QUIC_TIMER_PATH].t);
-+	struct sock *sk = &qs->inet.sk;
-+
-+	bh_lock_sock(sk);
-+	if (sock_owned_by_user(sk)) {
-+		if (!test_and_set_bit(QUIC_PATH_DEFERRED, &sk->sk_tsq_flags))
-+			sock_hold(sk);
-+		goto out;
-+	}
-+
-+	quic_timer_path_handler(sk);
-+out:
-+	bh_unlock_sock(sk);
-+	sock_put(sk);
-+}
-+
-+void quic_timer_reset_path(struct sock *sk)
-+{
-+	struct quic_cong *cong = quic_cong(sk);
-+	u64 timeout = cong->pto * 2;
-+
-+	/* Calculate timeout based on cong.pto, but enforce a lower bound. */
-+	if (timeout < QUIC_MIN_PATH_TIMEOUT)
-+		timeout = QUIC_MIN_PATH_TIMEOUT;
-+	quic_timer_reset(sk, QUIC_TIMER_PATH, timeout);
-+}
-+
-+void quic_timer_pmtu_handler(struct sock *sk)
-+{
-+}
-+
-+static void quic_timer_pmtu_timeout(struct timer_list *t)
-+{
-+	struct quic_sock *qs = container_of(t, struct quic_sock, timers[QUIC_TIMER_PMTU].t);
-+	struct sock *sk = &qs->inet.sk;
-+
-+	bh_lock_sock(sk);
-+	if (sock_owned_by_user(sk)) {
-+		if (!test_and_set_bit(QUIC_PMTU_DEFERRED, &sk->sk_tsq_flags))
-+			sock_hold(sk);
-+		goto out;
-+	}
-+
-+	quic_timer_pmtu_handler(sk);
-+out:
-+	bh_unlock_sock(sk);
-+	sock_put(sk);
-+}
-+
-+void quic_timer_pace_handler(struct sock *sk)
-+{
-+}
-+
-+static enum hrtimer_restart quic_timer_pace_timeout(struct hrtimer *hr)
-+{
-+	struct quic_sock *qs = container_of(hr, struct quic_sock, timers[QUIC_TIMER_PACE].hr);
-+	struct sock *sk = &qs->inet.sk;
-+
-+	bh_lock_sock(sk);
-+	if (sock_owned_by_user(sk)) {
-+		if (!test_and_set_bit(QUIC_PACE_DEFERRED, &sk->sk_tsq_flags))
-+			sock_hold(sk);
-+		goto out;
-+	}
-+
-+	quic_timer_pace_handler(sk);
-+out:
-+	bh_unlock_sock(sk);
-+	sock_put(sk);
-+	return HRTIMER_NORESTART;
-+}
-+
-+void quic_timer_reset(struct sock *sk, u8 type, u64 timeout)
-+{
-+	struct timer_list *t = quic_timer(sk, type);
-+
-+	if (timeout && !mod_timer(t, jiffies + usecs_to_jiffies(timeout)))
-+		sock_hold(sk);
-+}
-+
-+void quic_timer_start(struct sock *sk, u8 type, u64 timeout)
-+{
-+	struct timer_list *t;
-+	struct hrtimer *hr;
-+
-+	if (type == QUIC_TIMER_PACE) {
-+		hr = quic_timer(sk, type);
-+
-+		if (!hrtimer_is_queued(hr)) {
-+			hrtimer_start(hr, ns_to_ktime(timeout), HRTIMER_MODE_ABS_PINNED_SOFT);
-+			sock_hold(sk);
-+		}
-+		return;
-+	}
-+
-+	t = quic_timer(sk, type);
-+	if (timeout && !timer_pending(t)) {
-+		if (!mod_timer(t, jiffies + usecs_to_jiffies(timeout)))
-+			sock_hold(sk);
-+	}
-+}
-+
-+void quic_timer_stop(struct sock *sk, u8 type)
-+{
-+	if (type == QUIC_TIMER_PACE) {
-+		if (hrtimer_try_to_cancel(quic_timer(sk, type)) == 1)
-+			sock_put(sk);
-+		return;
-+	}
-+	if (timer_delete(quic_timer(sk, type)))
-+		sock_put(sk);
-+}
-+
-+void quic_timer_init(struct sock *sk)
-+{
-+	timer_setup(quic_timer(sk, QUIC_TIMER_LOSS), quic_timer_loss_timeout, 0);
-+	timer_setup(quic_timer(sk, QUIC_TIMER_SACK), quic_timer_sack_timeout, 0);
-+	timer_setup(quic_timer(sk, QUIC_TIMER_PATH), quic_timer_path_timeout, 0);
-+	timer_setup(quic_timer(sk, QUIC_TIMER_PMTU), quic_timer_pmtu_timeout, 0);
-+	/* Use hrtimer for pace timer, ensuring precise control over send timing. */
-+	hrtimer_setup(quic_timer(sk, QUIC_TIMER_PACE), quic_timer_pace_timeout,
-+		      CLOCK_MONOTONIC, HRTIMER_MODE_ABS_PINNED_SOFT);
-+}
-+
-+void quic_timer_free(struct sock *sk)
-+{
-+	quic_timer_stop(sk, QUIC_TIMER_LOSS);
-+	quic_timer_stop(sk, QUIC_TIMER_SACK);
-+	quic_timer_stop(sk, QUIC_TIMER_PATH);
-+	quic_timer_stop(sk, QUIC_TIMER_PMTU);
-+	quic_timer_stop(sk, QUIC_TIMER_PACE);
-+}
-diff --git a/net/quic/timer.h b/net/quic/timer.h
-new file mode 100644
-index 000000000000..61b094325334
---- /dev/null
-+++ b/net/quic/timer.h
-@@ -0,0 +1,47 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/* QUIC kernel implementation
-+ * (C) Copyright Red Hat Corp. 2023
-+ *
-+ * This file is part of the QUIC kernel implementation
-+ *
-+ * Written or modified by:
-+ *    Xin Long <lucien.xin@gmail.com>
-+ */
-+
-+enum {
-+	QUIC_TIMER_LOSS,	/* Loss detection timer: triggers retransmission on packet loss */
-+	QUIC_TIMER_SACK,	/* ACK delay timer, also used as idle timer alias */
-+	QUIC_TIMER_PATH,	/* Path validation timer: verifies network path connectivity */
-+	QUIC_TIMER_PMTU,	/* Packetization Layer Path MTU Discovery probing timer */
-+	QUIC_TIMER_PACE,	/* Pacing timer: controls packet transmission pacing */
-+	QUIC_TIMER_MAX,
-+	QUIC_TIMER_IDLE = QUIC_TIMER_SACK,
-+};
-+
-+struct quic_timer {
-+	union {
-+		struct timer_list t;
-+		struct hrtimer hr;
-+	};
-+};
-+
-+#define QUIC_MIN_PROBE_TIMEOUT	5000000
-+
-+#define QUIC_MIN_PATH_TIMEOUT	1500000
-+
-+#define QUIC_MIN_IDLE_TIMEOUT	1000000
-+#define QUIC_DEF_IDLE_TIMEOUT	30000000
-+
-+void quic_timer_reset(struct sock *sk, u8 type, u64 timeout);
-+void quic_timer_start(struct sock *sk, u8 type, u64 timeout);
-+void quic_timer_stop(struct sock *sk, u8 type);
-+void quic_timer_init(struct sock *sk);
-+void quic_timer_free(struct sock *sk);
-+
-+void quic_timer_reset_path(struct sock *sk);
-+
-+void quic_timer_loss_handler(struct sock *sk);
-+void quic_timer_pace_handler(struct sock *sk);
-+void quic_timer_path_handler(struct sock *sk);
-+void quic_timer_sack_handler(struct sock *sk);
-+void quic_timer_pmtu_handler(struct sock *sk);
+ fs/affs/namei.c          |  1 +
+ fs/befs/linuxvfs.c       |  1 +
+ fs/btrfs/export.c        |  1 +
+ fs/ceph/export.c         |  1 +
+ fs/efs/super.c           |  1 +
+ fs/erofs/super.c         |  1 +
+ fs/ext2/super.c          |  1 +
+ fs/ext4/super.c          |  1 +
+ fs/f2fs/super.c          |  1 +
+ fs/fat/nfs.c             |  2 ++
+ fs/fuse/inode.c          |  2 ++
+ fs/gfs2/export.c         |  1 +
+ fs/isofs/export.c        |  1 +
+ fs/jffs2/super.c         |  1 +
+ fs/jfs/super.c           |  1 +
+ fs/nfs/export.c          |  3 ++-
+ fs/nfsd/nfsfh.c          |  4 ++++
+ fs/nilfs2/namei.c        |  1 +
+ fs/ntfs3/super.c         |  1 +
+ fs/ocfs2/export.c        |  1 +
+ fs/orangefs/super.c      |  1 +
+ fs/overlayfs/export.c    |  2 ++
+ fs/smb/client/export.c   |  1 +
+ fs/squashfs/export.c     |  3 ++-
+ fs/udf/namei.c           |  1 +
+ fs/ufs/super.c           |  1 +
+ fs/xfs/xfs_export.c      |  1 +
+ include/linux/exportfs.h | 16 +++++++++-------
+ mm/shmem.c               |  1 +
+ 29 files changed, 45 insertions(+), 9 deletions(-)
+---
+base-commit: c537e12daeecaecdcd322c56a5f70659d2de7bde
+change-id: 20260114-exportfs-nfsd-12515072e9a9
+
+Best regards,
 -- 
-2.47.1
+Jeff Layton <jlayton@kernel.org>
 
