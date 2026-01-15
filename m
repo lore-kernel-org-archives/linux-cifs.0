@@ -1,148 +1,170 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFBB733B94A;
-	Thu, 15 Jan 2026 09:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791063AE6E9
+	for <linux-cifs@vger.kernel.org>; Thu, 15 Jan 2026 15:14:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768470620; cv=none; b=MvgXfII6Xsn0xmkpW17u5njFufm9XgurD1HA9L5zg4auP95DTsQeJeFQAN17zWGntpPIkdQHtP1INcmopQWE7H0Lbr31/s657oqWUZigLCzc6lWq+p7w5hxaQ6EWPYquvVuxQ67CxK4/S4FTBlJE/kUQP/ZyzLTv0HWXNgOpxJw=
+	t=1768490100; cv=none; b=d593fNueWI/VAkF992Nek0bGD01wIVLylQLhZblNEMTB2fTEf/kJVkRz9W9x9D4G6IMOwIp73dev5nrrPHR+SWRA9GfS+LeApvpG6BMS4binMfUXEki+02YkiEFtMyNimFObWbhUT6y9mivpypC3qB+D8dwZfFSkVVY3teSHbvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768470620; c=relaxed/simple;
-	bh=qqpPoEO9gxcbBz4eYjFFtHnZrz2YL4OjzesdybMW56U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Skbj99Zg2G6ZvFZb/dB0EHlJdUxpY9ygFqMipECi2gTVSD4Fl/IWY7PddMf7pLwrFoNIf/KYmv06bNVFVaoKY00PaOZgvw3HvIZ3OyVigzsHEhYcmxKtcPfhXKQVvaP1Spe9cPVhL1XBTfhNcmLBfHe9gwB2+KB2oLZ/9dTT0Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=aYY/26LQ; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1768490100; c=relaxed/simple;
+	bh=EmdrmrQatIkWYrWc3Tso6zV2W4IPfCbeSJjTG87cs5k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eMrkOUxfmHgy4OqUwmrtOaPFNbgdMPCk+RZitubJssL8AX8sufBqeFDaBiq0wdrOLY5jEp0mNK7ZhJBOaRKI5hOcZXA2bmVClAjG0NTYJ66VtauxP6GwcHZapIth2dI0eKRqcYKWTNdM3JkLTIkkQKsJclI8ny3wvEyQf0VKSk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BBoWYs2h; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="aYY/26LQ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=9WtjOjpx4ppvSOVIH8gVktPsx8DdXwLIbQqIiFGBX0I=; b=aYY/26LQqpbS35ZotWEZPdyMDM
-	5uG2Dl/qkktZ7xfDWu/n5pKDCi/wE6ttd7Ir7e0bxqoKBffL8wI0jwIvnGFL2UN7ZGAV8T7I9ADJo
-	qs7dpB6PAiQyLWwlwOlPxUwBjfEzEvYPGzlqQVTqoXYrKTAHyVW8L5qzXYJgWzIUVqWAaUdSM3tng
-	2pGoP0ZG1Yoj1l9pwD+gop4QcWkdRBNBu/02PSca41TVmVbyyi/Uqqzqr7r11U7Jw8d2OEQlu7O6f
-	tOgQiSf43/iceccS6xaRR9a9tcrzxxAoIzyIIzKAl+zVtiZjuisEw8PVrXw+2Lg+GXDsOMt8Yysgp
-	a5FC7P+7FS3ueA50LpKyKsluANUcPWFXhxIUZ+wHXTarz+DvecdIkuMwjaXUwxNRZsGV98lByuKQ6
-	aXFjZbVPRS6iQukaCgCEmHtiZOrEo4Av+vIF/NfISI3aOY7z5PKKDoHHzldVz06GqxTJzg3YNmPdc
-	bReHPn5xhpakqS5WLwsqNb3f;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vgJzc-00000000H3G-1w5o;
-	Thu, 15 Jan 2026 09:50:16 +0000
-Message-ID: <b58fa352-2386-4145-b42e-9b4b1d484e17@samba.org>
-Date: Thu, 15 Jan 2026 10:50:15 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BBoWYs2h"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-88a2ad13c24so8877266d6.1
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Jan 2026 07:14:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768490082; x=1769094882; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0XFWhnozczQdBY9wOF6c5V46t5MOgQ+lGzwQjjTNU9A=;
+        b=BBoWYs2hHEOUT6FyQjNm4QI4AIsE5LVnSjCdAXGzD8YvxFZFVkmNnZ/xT+kOqH9z9n
+         MsS0ahH62YfoiSIgriBzvWEtmB0vo1PFHlAQaWDKzDQozcfFRBGQPCzgeVp2zriI4SF+
+         HSkE5uvCSjP5HpZSpOd9cV2mCgwhWbSBQ+XC/+IkuSOXzCOpnJbdWkCNWZCj83U9vHUb
+         EedyEpXj6Yzy3T3UO6UlPh3YkHcXzBbp2NhWIqLAUSVXL/hWhbPxF9E1stM0L5orYWZr
+         /e6nXGYWsGtNa3CHB9TWKFhuwduoGbfX/lrDglH4XwW7mTHSj/Tz6TBHT7cYBCtNglZg
+         F2Lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768490082; x=1769094882;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0XFWhnozczQdBY9wOF6c5V46t5MOgQ+lGzwQjjTNU9A=;
+        b=HENS9FeCx3z7z96fipK+sgjnpigCC4kJPNXFwlJVrE47AeK9qq0yJF6ZI3ES41P+uw
+         G9u7vpTaCOTyeQG7YWb5vFQpSOSpVMI8A66vYhMXogcmM7eNW78eXxUy6geCalDv6xOx
+         6E4VNg6vbCccaTvuqtT3xKGIBKCstHQ/EguItouMIyy3H4x48CD6O093oll8Af2LjxK/
+         IlogUHSwkKeWTZRnim9xQeIJ7R34F4NjUZX2hxknFuD6gqmgADU1bvO0fXMjbxafwa2d
+         fT+8GoAPuxvEOxMgJnUxHQ8JkZh8jYx1vXZnn9EDL48QcAA3O8ektNnRXVpMVj+ZjGH6
+         b12g==
+X-Forwarded-Encrypted: i=1; AJvYcCUPiyyaBZnXXsqzZCGbFNIEBR6BDJBX24LwstPd3UQ3v2tnWWMh0r2sQrNDFdbPC3HEdwkJhuz41m+Q@vger.kernel.org
+X-Gm-Message-State: AOJu0YzviORwp8erIq658/WQy0tBBqkpIKFxV0sjWHz8WE8+VezBstRU
+	lKv2bhOCZjg0QRWsN6tylrWPyw+Cx29GAkFwfmgqczvXlv7fE+kVxqvF
+X-Gm-Gg: AY/fxX4+npbemdWK+gGcrG1cwh4yukeqDrl+lXvrJD+rPHRX6/FBMSaLp7N5RV1WxYU
+	yjiBu2wl1WVn5SjztB3RxMT9m5u+ZC96sP7pCGp+3aV0F3aw6/gA/BCYpqYfSxwaRznXEbEsczb
+	BSUdKWOu0Ms2C70xV5N+6snLizmc9QWgtQb2cf2Iap1sfgMEL2AS4uuoGq7VpxykKqylf2UJHJz
+	rS/5WcQ5AyIWr8mbdMxq/pLmdEpSJUozKVB6a1JDyP6OEHVvKlcPcXpqr6C6vz1zcuzV7NjUwtL
+	BtAjpcey9wwAcyUEYI4xhUZ0gMEn49MjnM2D5rGdsS8jz4TgSxyLjoD4Y3swswJsW3QY/6h3Xfx
+	XpqvF578mDPnGVA/kCLuOTILEkZAmXn0zhYrS9O/F5ZOcGzajbgEBs9EdmveDuBm2C7Yl11o/zx
+	xqC/p7JkVTJ/2XKo6UTCu0v7Rmevr84/1LqeT/5DsY12cQJ33/ako=
+X-Received: by 2002:a05:6214:4003:b0:890:58b4:3e7c with SMTP id 6a1803df08f44-892743ded60mr90739606d6.33.1768490081454;
+        Thu, 15 Jan 2026 07:14:41 -0800 (PST)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-890770cc6edsm201030056d6.4.2026.01.15.07.14.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jan 2026 07:14:40 -0800 (PST)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	quic@lists.linux.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Metzmacher <metze@samba.org>,
+	Moritz Buhl <mbuhl@openbsd.org>,
+	Tyler Fanelli <tfanelli@redhat.com>,
+	Pengtao He <hepengtao@xiaomi.com>,
+	Thomas Dreibholz <dreibh@simula.no>,
+	linux-cifs@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Tom Talpey <tom@talpey.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Steve Dickson <steved@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Alexander Aring <aahringo@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	John Ericson <mail@johnericson.me>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Jason Baron <jbaron@akamai.com>,
+	illiliti <illiliti@protonmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Daniel Stenberg <daniel@haxx.se>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: [PATCH net-next v7 01/16] net: define IPPROTO_QUIC and SOL_QUIC constants
+Date: Thu, 15 Jan 2026 10:11:01 -0500
+Message-ID: <87ccdbc3b8abe4fb1df5a97c0baf39d2b943eeef.1768489876.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <cover.1768489876.git.lucien.xin@gmail.com>
+References: <cover.1768489876.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Problem with smbdirect rw credits and initiator_depth
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Tom Talpey <tom@talpey.com>,
- "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-References: <35eec2e6-bf37-43d6-a2d8-7a939a68021b@samba.org>
- <CAKYAXd9p=7BzmSSKi5n41OKkkw4qrr4cWpWet7rUfC+VT-6h1g@mail.gmail.com>
- <f59e0dc7-e91c-4a13-8d49-fe183c10b6f4@samba.org>
- <CAKYAXd-MF1j+CkbWakFJK2ov_SfRUXaRuT6jE0uHZoLxTu130Q@mail.gmail.com>
- <CAKYAXd__T=L9aWwOuY7Z8fJgMf404=KQ2dTpNRd3mq9dnYCxRw@mail.gmail.com>
- <86b3c222-d765-4a6c-bb79-915609fa3d27@samba.org>
- <a3760b26-7458-40a0-ae79-bb94dd0e1d01@samba.org>
- <3c0c9728-6601-41f1-892f-469e83dd7f19@samba.org>
- <721eb7b1-dea9-4510-8531-05b2c95cb240@samba.org>
- <CAKYAXd-WTsVEyONDmOMbKseyAp29q71KiUPwGDp2L_a53oL0vg@mail.gmail.com>
- <183d92a0-6478-41bb-acb3-ccefd664d62f@samba.org>
- <ee6873d7-6e47-4d42-9822-cb55b2bfb79e@samba.org>
- <6a248fde-e0cd-489b-a640-d096fb458807@samba.org>
- <CAKYAXd-42_fSHBL7iZbuOtYFKqKyhPS-4C+nqbX=-Djq5L6Okg@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAKYAXd-42_fSHBL7iZbuOtYFKqKyhPS-4C+nqbX=-Djq5L6Okg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Am 15.01.26 um 03:01 schrieb Namjae Jeon:
-> On Thu, Jan 15, 2026 at 3:13 AM Stefan Metzmacher <metze@samba.org> wrote:
->>
->> Am 15.12.25 um 21:17 schrieb Stefan Metzmacher:
->>> Am 14.12.25 um 23:56 schrieb Stefan Metzmacher:
->>>> Am 13.12.25 um 03:14 schrieb Namjae Jeon:
->>>>>> I've put these changes a long with rw credit fixes into my
->>>>>> for-6.18/ksmbd-smbdirect-regression-v4 branch, are you able to
->>>>>> test this?
->>>>> Problems still occur. See:
->>>>
->>>> :-( Would you be able to use rxe and cake a network capture?
->>>>
->>>> Using test files with all zeros, e.g.
->>>> dd if=/dev/zero of=/tmp/4096MBzeros-sparse.dat seek=4096MB bs=1 count=1
->>>> would allow gzip --best on the capture file to compress well...
->>>
->>> I think I found something that explains it and
->>> I was able to reproduce and what I have in mind.
->>>
->>> We increment recv_io.posted.count after ib_post_recv()
->>>
->>> And manage_credits_prior_sending() uses
->>>
->>> new_credits = recv_io.posted.count - recv_io.credits.count
->>>
->>> But there is a race between the hardware receiving a message
->>> and recv_done being called in order to decrement recv_io.posted.count
->>> again. During that race manage_credits_prior_sending() might grant
->>> too much credits.
->>>
->>> Please test my for-6.18/ksmbd-smbdirect-regression-v5 branch,
->>> I haven't tested this branch yet, I'm running out of time
->>> for the day.
->>>
->>> But I tested it with smbclient and having a similar
->>> logic in fs/smb/common/smbdirect/smbdirect_connection.c
->>
->> I was able to reproduce the problem and the fix I created
->> for-6.18/ksmbd-smbdirect-regression-v5 was not correct.
->>
->> I needed to use
->>
->> available = atomic_xchg(&sc->recv_io.credits.available, 0);
->>
->> instead of
->>
->> available = atomic_read(&sc->recv_io.credits.available);
->> atomic_sub(new_credits, &sc->recv_io.credits.available);
->>
->> This following branch works for me:
->> for-6.18/ksmbd-smbdirect-regression-v7
->> and with the fixes again master this should also work:
->> for-6.19/ksmbd-smbdirect-regression-v1
->>
->> I'll post real patches tomorrow.
->>
->> Please check.
-> Okay, I will test it with two branches.
-> I'll try it too, but I recommend running frametest for performance
-> difference and stress testing.
-> 
-> https://support.dvsus.com/hc/en-us/articles/212925466-How-to-use-frametest
-> 
-> ex) frametest.exe -w 4k -t 20 -n 2000
+This patch adds IPPROTO_QUIC and SOL_QUIC constants to the networking
+subsystem. These definitions are essential for applications to set
+socket options and protocol identifiers related to the QUIC protocol.
 
-That works fine, but
+QUIC does not possess a protocol number allocated from IANA, and like
+IPPROTO_MPTCP, IPPROTO_QUIC is merely a value used when opening a QUIC
+socket with:
 
-  frametest.exe -r 4k -t 20 -n 2000
+  socket(AF_INET, SOCK_STREAM, IPPROTO_QUIC);
 
-generates a continues stream of such messages:
-ksmbd: Failed to send message: -107
+Note we did not opt for UDP ULP for QUIC implementation due to several
+considerations:
 
-Both with 6.17.2 and for-6.19/ksmbd-smbdirect-regression-v1,
-so this is not a regression.
+- QUIC's connection Migration requires at least 2 UDP sockets for one
+  QUIC connection at the same time, not to mention the multipath
+  feature in one of its draft RFCs.
 
-I'll now check if the is related to the other problems
-I found and fixes in for-6.18/ksmbd-smbdirect-regression-v5
+- In-Kernel QUIC, as a Transport Protocol, wants to provide users with
+  the TCP or SCTP like Socket APIs, like connect()/listen()/accept()...
+  Note that a single UDP socket might even be used for multiple QUIC
+  connections.
 
-metze
+The use of IPPROTO_QUIC type sockets over UDP tunnel will effectively
+address these challenges and provides a more flexible and scalable
+solution.
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+---
+ include/linux/socket.h  | 1 +
+ include/uapi/linux/in.h | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index ec715ad4bf25..dc80de8d8c50 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -401,6 +401,7 @@ struct ucred {
+ #define SOL_MCTP	285
+ #define SOL_SMC		286
+ #define SOL_VSOCK	287
++#define SOL_QUIC	288
+ 
+ /* IPX options */
+ #define IPX_TYPE	1
+diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+index ced0fc3c3aa5..34becd90d3a6 100644
+--- a/include/uapi/linux/in.h
++++ b/include/uapi/linux/in.h
+@@ -85,6 +85,8 @@ enum {
+ #define IPPROTO_RAW		IPPROTO_RAW
+   IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
+ #define IPPROTO_SMC		IPPROTO_SMC
++  IPPROTO_QUIC = 261,		/* A UDP-Based Multiplexed and Secure Transport	*/
++#define IPPROTO_QUIC		IPPROTO_QUIC
+   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
+ #define IPPROTO_MPTCP		IPPROTO_MPTCP
+   IPPROTO_MAX
+-- 
+2.47.1
 
