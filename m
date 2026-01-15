@@ -1,113 +1,148 @@
-Received: from mail.parknet.co.jp (mail.parknet.co.jp [210.171.160.6])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532F626A1B9;
-	Thu, 15 Jan 2026 08:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.171.160.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFBB733B94A;
+	Thu, 15 Jan 2026 09:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768467545; cv=none; b=Cs+hEsdr2pQjfz2FoOEvXclhoU0Uw3MkrD/RYrQxaLEw5uiV33YQMUuw0VKtuS7yTUGLZz92PB6EFFSvi/JeTJc5f1MbBMWlIMajw81H/zasyAbcVwzLFFn6rWdPVXbnMIgztB0y5nXQibk0vw1pK+rIjKDl9jtMPcSDTXl8OeI=
+	t=1768470620; cv=none; b=MvgXfII6Xsn0xmkpW17u5njFufm9XgurD1HA9L5zg4auP95DTsQeJeFQAN17zWGntpPIkdQHtP1INcmopQWE7H0Lbr31/s657oqWUZigLCzc6lWq+p7w5hxaQ6EWPYquvVuxQ67CxK4/S4FTBlJE/kUQP/ZyzLTv0HWXNgOpxJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768467545; c=relaxed/simple;
-	bh=8YPpj0NEeIuqe+udAz3jb2y7qjyI7ASecGv0DFM4yLU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=XaWtVm0fFk92nSoEUREI11wjHS9/BbhQCVfNA62rCwoRqK7kXYduMnmKzXygK85hw/ZC59Mp/2MaeRfxFl9YiLbDn8MVJ/g0vA0yUsYu28/lsvDIMckAQoyuf+ieB2UzQldBmeN2UPx2dCNNZlAAbsNe2BmLcwOwHAtEJSrDhrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.parknet.co.jp; spf=pass smtp.mailfrom=parknet.co.jp; dkim=pass (2048-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b=OYfw2Sur; dkim=permerror (0-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b=ArK7qpn4; arc=none smtp.client-ip=210.171.160.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.parknet.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=parknet.co.jp
+	s=arc-20240116; t=1768470620; c=relaxed/simple;
+	bh=qqpPoEO9gxcbBz4eYjFFtHnZrz2YL4OjzesdybMW56U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Skbj99Zg2G6ZvFZb/dB0EHlJdUxpY9ygFqMipECi2gTVSD4Fl/IWY7PddMf7pLwrFoNIf/KYmv06bNVFVaoKY00PaOZgvw3HvIZ3OyVigzsHEhYcmxKtcPfhXKQVvaP1Spe9cPVhL1XBTfhNcmLBfHe9gwB2+KB2oLZ/9dTT0Gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=aYY/26LQ; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b="OYfw2Sur";
-	dkim=permerror (0-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b="ArK7qpn4"
-Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
-	by mail.parknet.co.jp (Postfix) with ESMTPSA id 59948209655C;
-	Thu, 15 Jan 2026 17:58:53 +0900 (JST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=parknet.co.jp;
-	s=20250114; t=1768467533;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=239oZ275b6smCS74K1tWdjRS0BNLiePy77vuyzqmFog=;
-	b=OYfw2Sur1UuFe52+b+QneplE8FQ8rN3ZPZNmHUjXZ8I3EUbVeENQa9S7UE9y2K/+XwV3SQ
-	I/ZZv2vblo2O4gCBhhbii9EMgTIhTnJ/l+EBkDsJz7Ar+ySVu32QBZ6Gv6ZPTUT/orvUyF
-	1QfiBPAonvwEk/e0naEnhF3vz9jWm+xYwR6FdzXz0RU8n3PI0yjEuiVMmzDnXYu3FOUwsO
-	ju7euX7+j6w8JoZ6Ylar2ikJfzTuIaPaPoZvjemwpemy6GSLCFLAZkIp5MRiF8qr7GeUC3
-	Po5ictZNHCSisTuUNKKDZ7KlEQmc0+zpktZuVHakaOIbuZMCSLmk2ou/QrzuiQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=parknet.co.jp;
-	s=20250114-ed25519; t=1768467533;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=239oZ275b6smCS74K1tWdjRS0BNLiePy77vuyzqmFog=;
-	b=ArK7qpn4FSYfiTqDwLBIMwdc8g0BdjAmYQzNjX9MTC6w813MFWfk5weBlFC8Egh9ZmVWC0
-	pvksDNyaiFFxs1Dg==
-Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
-	by ibmpc.myhome.or.jp (8.18.1/8.18.1/Debian-7) with ESMTPS id 60F8wqQB134411
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 15 Jan 2026 17:58:53 +0900
-Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
-	by devron.myhome.or.jp (8.18.1/8.18.1/Debian-7) with ESMTPS id 60F8wpYn351446
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 15 Jan 2026 17:58:51 +0900
-Received: (from hirofumi@localhost)
-	by devron.myhome.or.jp (8.18.1/8.18.1/Submit) id 60F8wnRr351445;
-	Thu, 15 Jan 2026 17:58:49 +0900
-From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-To: Chuck Lever <cel@kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-        <linux-fsdevel@vger.kernel.org>, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        <linux-nfs@vger.kernel.org>, linux-f2fs-devel@lists.sourceforge.net,
-        linkinjeon@kernel.org, sj1557.seo@samsung.com, yuezhang.mo@sony.com,
-        almaz.alexandrovich@paragon-software.com, slava@dubeyko.com,
-        glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu,
-        adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org,
-        pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
-        trondmy@kernel.org, anna@kernel.org, jaegeuk@kernel.org,
-        chao@kernel.org, hansg@kernel.org, senozhatsky@chromium.org,
-        Chuck
- Lever <chuck.lever@oracle.com>
-Subject: Re: [PATCH v4 02/16] fat: Implement fileattr_get for case sensitivity
-In-Reply-To: <20260114142900.3945054-3-cel@kernel.org>
-References: <20260114142900.3945054-1-cel@kernel.org>
-	<20260114142900.3945054-3-cel@kernel.org>
-Date: Thu, 15 Jan 2026 17:58:49 +0900
-Message-ID: <874ionw8ty.fsf@mail.parknet.co.jp>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="aYY/26LQ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=9WtjOjpx4ppvSOVIH8gVktPsx8DdXwLIbQqIiFGBX0I=; b=aYY/26LQqpbS35ZotWEZPdyMDM
+	5uG2Dl/qkktZ7xfDWu/n5pKDCi/wE6ttd7Ir7e0bxqoKBffL8wI0jwIvnGFL2UN7ZGAV8T7I9ADJo
+	qs7dpB6PAiQyLWwlwOlPxUwBjfEzEvYPGzlqQVTqoXYrKTAHyVW8L5qzXYJgWzIUVqWAaUdSM3tng
+	2pGoP0ZG1Yoj1l9pwD+gop4QcWkdRBNBu/02PSca41TVmVbyyi/Uqqzqr7r11U7Jw8d2OEQlu7O6f
+	tOgQiSf43/iceccS6xaRR9a9tcrzxxAoIzyIIzKAl+zVtiZjuisEw8PVrXw+2Lg+GXDsOMt8Yysgp
+	a5FC7P+7FS3ueA50LpKyKsluANUcPWFXhxIUZ+wHXTarz+DvecdIkuMwjaXUwxNRZsGV98lByuKQ6
+	aXFjZbVPRS6iQukaCgCEmHtiZOrEo4Av+vIF/NfISI3aOY7z5PKKDoHHzldVz06GqxTJzg3YNmPdc
+	bReHPn5xhpakqS5WLwsqNb3f;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vgJzc-00000000H3G-1w5o;
+	Thu, 15 Jan 2026 09:50:16 +0000
+Message-ID: <b58fa352-2386-4145-b42e-9b4b1d484e17@samba.org>
+Date: Thu, 15 Jan 2026 10:50:15 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: Problem with smbdirect rw credits and initiator_depth
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Tom Talpey <tom@talpey.com>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+References: <35eec2e6-bf37-43d6-a2d8-7a939a68021b@samba.org>
+ <CAKYAXd9p=7BzmSSKi5n41OKkkw4qrr4cWpWet7rUfC+VT-6h1g@mail.gmail.com>
+ <f59e0dc7-e91c-4a13-8d49-fe183c10b6f4@samba.org>
+ <CAKYAXd-MF1j+CkbWakFJK2ov_SfRUXaRuT6jE0uHZoLxTu130Q@mail.gmail.com>
+ <CAKYAXd__T=L9aWwOuY7Z8fJgMf404=KQ2dTpNRd3mq9dnYCxRw@mail.gmail.com>
+ <86b3c222-d765-4a6c-bb79-915609fa3d27@samba.org>
+ <a3760b26-7458-40a0-ae79-bb94dd0e1d01@samba.org>
+ <3c0c9728-6601-41f1-892f-469e83dd7f19@samba.org>
+ <721eb7b1-dea9-4510-8531-05b2c95cb240@samba.org>
+ <CAKYAXd-WTsVEyONDmOMbKseyAp29q71KiUPwGDp2L_a53oL0vg@mail.gmail.com>
+ <183d92a0-6478-41bb-acb3-ccefd664d62f@samba.org>
+ <ee6873d7-6e47-4d42-9822-cb55b2bfb79e@samba.org>
+ <6a248fde-e0cd-489b-a640-d096fb458807@samba.org>
+ <CAKYAXd-42_fSHBL7iZbuOtYFKqKyhPS-4C+nqbX=-Djq5L6Okg@mail.gmail.com>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <CAKYAXd-42_fSHBL7iZbuOtYFKqKyhPS-4C+nqbX=-Djq5L6Okg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Chuck Lever <cel@kernel.org> writes:
+Am 15.01.26 um 03:01 schrieb Namjae Jeon:
+> On Thu, Jan 15, 2026 at 3:13 AM Stefan Metzmacher <metze@samba.org> wrote:
+>>
+>> Am 15.12.25 um 21:17 schrieb Stefan Metzmacher:
+>>> Am 14.12.25 um 23:56 schrieb Stefan Metzmacher:
+>>>> Am 13.12.25 um 03:14 schrieb Namjae Jeon:
+>>>>>> I've put these changes a long with rw credit fixes into my
+>>>>>> for-6.18/ksmbd-smbdirect-regression-v4 branch, are you able to
+>>>>>> test this?
+>>>>> Problems still occur. See:
+>>>>
+>>>> :-( Would you be able to use rxe and cake a network capture?
+>>>>
+>>>> Using test files with all zeros, e.g.
+>>>> dd if=/dev/zero of=/tmp/4096MBzeros-sparse.dat seek=4096MB bs=1 count=1
+>>>> would allow gzip --best on the capture file to compress well...
+>>>
+>>> I think I found something that explains it and
+>>> I was able to reproduce and what I have in mind.
+>>>
+>>> We increment recv_io.posted.count after ib_post_recv()
+>>>
+>>> And manage_credits_prior_sending() uses
+>>>
+>>> new_credits = recv_io.posted.count - recv_io.credits.count
+>>>
+>>> But there is a race between the hardware receiving a message
+>>> and recv_done being called in order to decrement recv_io.posted.count
+>>> again. During that race manage_credits_prior_sending() might grant
+>>> too much credits.
+>>>
+>>> Please test my for-6.18/ksmbd-smbdirect-regression-v5 branch,
+>>> I haven't tested this branch yet, I'm running out of time
+>>> for the day.
+>>>
+>>> But I tested it with smbclient and having a similar
+>>> logic in fs/smb/common/smbdirect/smbdirect_connection.c
+>>
+>> I was able to reproduce the problem and the fix I created
+>> for-6.18/ksmbd-smbdirect-regression-v5 was not correct.
+>>
+>> I needed to use
+>>
+>> available = atomic_xchg(&sc->recv_io.credits.available, 0);
+>>
+>> instead of
+>>
+>> available = atomic_read(&sc->recv_io.credits.available);
+>> atomic_sub(new_credits, &sc->recv_io.credits.available);
+>>
+>> This following branch works for me:
+>> for-6.18/ksmbd-smbdirect-regression-v7
+>> and with the fixes again master this should also work:
+>> for-6.19/ksmbd-smbdirect-regression-v1
+>>
+>> I'll post real patches tomorrow.
+>>
+>> Please check.
+> Okay, I will test it with two branches.
+> I'll try it too, but I recommend running frametest for performance
+> difference and stress testing.
+> 
+> https://support.dvsus.com/hc/en-us/articles/212925466-How-to-use-frametest
+> 
+> ex) frametest.exe -w 4k -t 20 -n 2000
 
-> +int fat_fileattr_get(struct dentry *dentry, struct file_kattr *fa)
-> +{
-> +	struct msdos_sb_info *sbi = MSDOS_SB(dentry->d_sb);
-> +
-> +	/*
-> +	 * FAT filesystems are case-insensitive by default. MSDOS
-> +	 * supports a 'nocase' mount option for case-sensitive behavior.
-> +	 *
-> +	 * VFAT long filename entries preserve case. Without VFAT, only
-> +	 * uppercased 8.3 short names are stored.
-> +	 */
-> +	fa->case_insensitive = !sbi->options.nocase;
-> +	fa->case_nonpreserving = !sbi->options.isvfat;
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(fat_fileattr_get);
+That works fine, but
 
-Hm, if "nocase" option is specified for msdos, it would be the case
-preserving (ignores/breaks the spec though).
+  frametest.exe -r 4k -t 20 -n 2000
 
-I.e. on msdos mount with "nocase" works like the following
+generates a continues stream of such messages:
+ksmbd: Failed to send message: -107
 
-    $ touch aAa.txT
-    $ ls
-    aAa.txT
+Both with 6.17.2 and for-6.19/ksmbd-smbdirect-regression-v1,
+so this is not a regression.
 
-Thanks.
--- 
-OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+I'll now check if the is related to the other problems
+I found and fixes in for-6.18/ksmbd-smbdirect-regression-v5
+
+metze
+
