@@ -1,535 +1,793 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4847C1FF1B5
-	for <linux-cifs@vger.kernel.org>; Thu, 15 Jan 2026 16:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10AF23624C4
+	for <linux-cifs@vger.kernel.org>; Thu, 15 Jan 2026 16:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768495651; cv=none; b=NtJv0W+Y0YEXEb44rQ3+Fi5E76WTRselVG7ZOlLl+medidrZD+e5EK9SRE/ssVWsWCpWIY6eop8qta2ssGktczH+cGgP/sWoJyD0+7EE7U4xRzOxEtJoU6AYVVOF4paoaytD52RkB+IoQxNQ4geZ/ciQ7xJRanQia6krl43KVoM=
+	t=1768495994; cv=none; b=A7qeN8R5YTDVf66Sx1enIBintpJPMd9GPvqgPaUu/R6l9cQcX9S5sJd2/hP4mwslvqtOiEh70LmRqohCnWkLAz1dne7R8e9+wGY158xJqrpt+J1RvugnVC8V1Jx0DheuCPVtpI461E0BU3ehB+kYieWh/CC7vqH2xq3PAYrCBQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768495651; c=relaxed/simple;
-	bh=r+nwv/FHkhhG+Ppq9tyGxQ2Dk2mG5eSC1LQyrYfn5VA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=f9sXM5pdDZgoxPYSl4jy1XD1A9yfobCAuAjLirh2cgo22sltZXiAATjP19TPIUmQkrfZAFAvQtJE/oxfnliy+BjRS8E4ssOAjNPonXz/N1gylC793W5LqVISEw30c2KDoeJva2a9G1CmvU7xh/lwjU2QmkQruXPc39KcDuYSLkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bhfBW2Ty; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768495994; c=relaxed/simple;
+	bh=DlUpTgBVOZ7hdfU5MaDQtdbs1Q+/fhjP1nMdDgPBHyA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EP+WYnqBHmECqn6whZohSRUoj8gy5kh7bx8eQ5e1BkhrNVV0RxPH7mHJtmI85YlOl0LK3avR4Ata/+f0MuzxgsHcu11K0DpsWoh8FjKM9brfGBQuPgjmswCvqjJnvo2BMyaKXj2prrXIBLehyuLoD63vNAY6BMoIew7cCKRdgH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OTNicD5S; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Rq3sSbsn; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OTNicD5S; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Rq3sSbsn; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bhfBW2Ty"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-88888c41a13so15599506d6.3
-        for <linux-cifs@vger.kernel.org>; Thu, 15 Jan 2026 08:47:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768495648; x=1769100448; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=K9+pEtAJKEEvqwoPwL7EgzMpvUR424r/l3oTBf3c3ZE=;
-        b=bhfBW2TyuddwNl/ZDAQWGAtYIzel4GsEjR9Z2W9It21ggDKlKpV/Gb3fPS8WF+l0D9
-         k0u23i/GOoyOnLfCOh9UuJEINMQ4n10JdrKo28/KZhXMe8WyilNdZ+QJ/YUCguhtISrG
-         5JpwzVsF5rP0jBsBicL6QxWMxBw31PS/CDvAKo1h1eYbYbD08ZHuE1f6J661ldhvAzrb
-         GXj/oxCABLSNlHIPISNI4RcqgKxl/gWsjgKXP2G3uVV7IeffgxBAciWqLgm61F+mN23A
-         cx35CaLaIpo0HElCEkA+P3YBIpaX0Ieb89jhJNFgMV5PGcMd6xX1DZfwYo0LEk8ciU+W
-         s3yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768495648; x=1769100448;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K9+pEtAJKEEvqwoPwL7EgzMpvUR424r/l3oTBf3c3ZE=;
-        b=lwB3KICq0HiCYX3lGKvBmGzP1Lo7ubMwjULVUi0hxYOFnkNyg4VxwprFHPq1RCZ8q4
-         P9VEC8Ibc2eX80BMAIthy/SatRq++QrMzndNx8YIkoJ7SJpecbf7jPPGMDBq27tUt+fO
-         RklhY4j77yADeMLbrM75dklhOyg77UjP6eykhgYu+XnMIL4hLcx7D4FZ78kXubgMVEIQ
-         bjH/UszhlWY6siIUXNG5NO6xwKGBALunnbgr3i8/Srvys78IDvUaOdHyL08a3b/PsbQo
-         vK7a95Wbw7rfiBnYaETx9Tk7uurGjtahgSXFynBUItFr/c+SaJf13Q1U3FU28ZrVEp51
-         /RBA==
-X-Forwarded-Encrypted: i=1; AJvYcCU33KOzsMtDwBYS8Fmm+2Y2pQ5HPIP5trbkfje3Wyn0V0Uxz72F80oUYv6FlomTVKder6K2JU9NMyQ2@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx73VXIPidZmtjj8yc7FVngkOOM8cdt9qtiX2Z570VAL+J9eRGI
-	uJTqRS9qnB8OlwSbaHKDD5+HFBHgeABcfWltTVtfP3xqzH0PIC1GDeylZNOMMoZ+
-X-Gm-Gg: AY/fxX5dotBJMGyeQ5qdoFVI0Dhkt04d4oC5SdjJ7JFBk+U+IRIFANvjrEhRffRDlfv
-	AO/WtKzuGYsBLoGUyslHab9m4V8IrTiKgkvaKmFuZYgQP+JbHCQH6qKUT3rEWncfE6PZZpSR93E
-	HoaCBraVHnbuefYG0e9LdGbGYqzifGGK2NAqONIY8QNv4liJ8E8O2m6G5X3McFQygeBbZnPabL6
-	JodJehynvxGpukpRt95CyMbGzA5JxCU9Y1adPMU3vpFOXrlT+BwLiuwqjrkCRIE4xr4mNoe6pDF
-	NIlDoNPmIllajrKNpFhioE6RKVX3zkQNHKE+qzd3URxk0pUxfqpYrB2rcYKfqfadJngSiJ+MniE
-	JDmwCYXSgr9mcYSIDI+f+sS30BT9rTCIZYgZjKA4IctsjayyCIhQgg9cVp2q1Ww2PD2+Jju5/16
-	/bQkIRQvaDneXkZ2BWaaQzAuzlgCtpog0R6mTwZlcc3zHHZzCrngs=
-X-Received: by 2002:ad4:468f:0:b0:880:5edf:d0fc with SMTP id 6a1803df08f44-89275c0af00mr59171986d6.44.1768490069520;
-        Thu, 15 Jan 2026 07:14:29 -0800 (PST)
-Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-890770cc6edsm201030056d6.4.2026.01.15.07.14.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 07:14:28 -0800 (PST)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>,
-	quic@lists.linux.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Metzmacher <metze@samba.org>,
-	Moritz Buhl <mbuhl@openbsd.org>,
-	Tyler Fanelli <tfanelli@redhat.com>,
-	Pengtao He <hepengtao@xiaomi.com>,
-	Thomas Dreibholz <dreibh@simula.no>,
-	linux-cifs@vger.kernel.org,
-	Steve French <smfrench@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Tom Talpey <tom@talpey.com>,
-	kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Steve Dickson <steved@redhat.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Alexander Aring <aahringo@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	John Ericson <mail@johnericson.me>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	"D . Wythe" <alibuda@linux.alibaba.com>,
-	Jason Baron <jbaron@akamai.com>,
-	illiliti <illiliti@protonmail.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Daniel Stenberg <daniel@haxx.se>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: [PATCH net-next v7 00/16] net: introduce QUIC infrastructure and core subcomponents
-Date: Thu, 15 Jan 2026 10:11:00 -0500
-Message-ID: <cover.1768489876.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.47.1
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OTNicD5S";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Rq3sSbsn";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OTNicD5S";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Rq3sSbsn"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 37FA733747;
+	Thu, 15 Jan 2026 16:53:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1768495990; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EUp7vJBm5RwTWETMhegI0NKFZOuxIWgQjM+/1VZyAiY=;
+	b=OTNicD5S+DnlFt+w5IcceK3Vn14l/uA40FtWy5tIg8sWyD11mfpxPgq2WL6N0mHDvd1qkR
+	LR30OsKREqTv+luTdQW4EA2X510iFBHGrdARcqijSaQIrTb4iSOaTpO0Ju7q2zItXKxvgt
+	NFQ4+262AFNwApEIgBL3x5Pz7HE+xfA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1768495990;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EUp7vJBm5RwTWETMhegI0NKFZOuxIWgQjM+/1VZyAiY=;
+	b=Rq3sSbsn83NZPdMF10wiY3L7b1jz87k2ealxcBy+5DKXgHhR/f3iKFE3qE3b5R70peyeHg
+	wE3ki/ZMwNgvcXDw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=OTNicD5S;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Rq3sSbsn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1768495990; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EUp7vJBm5RwTWETMhegI0NKFZOuxIWgQjM+/1VZyAiY=;
+	b=OTNicD5S+DnlFt+w5IcceK3Vn14l/uA40FtWy5tIg8sWyD11mfpxPgq2WL6N0mHDvd1qkR
+	LR30OsKREqTv+luTdQW4EA2X510iFBHGrdARcqijSaQIrTb4iSOaTpO0Ju7q2zItXKxvgt
+	NFQ4+262AFNwApEIgBL3x5Pz7HE+xfA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1768495990;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EUp7vJBm5RwTWETMhegI0NKFZOuxIWgQjM+/1VZyAiY=;
+	b=Rq3sSbsn83NZPdMF10wiY3L7b1jz87k2ealxcBy+5DKXgHhR/f3iKFE3qE3b5R70peyeHg
+	wE3ki/ZMwNgvcXDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 54FC43EA63;
+	Thu, 15 Jan 2026 16:53:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id PAr6BnUbaWnicAAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Thu, 15 Jan 2026 16:53:09 +0000
+Date: Thu, 15 Jan 2026 13:53:06 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: David Howells <dhowells@redhat.com>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	henrique.carvalho@suse.com
+Subject: Re: [PATCH 00/37] cifs: Scripted header file cleanup and SMB1 split
+Message-ID: <sijmvmcozfmtp3rkamjbgr6xk7ola2wlxc2wvs4t4lcanjsaza@w4bcxcxkmyfc>
+References: <20251222223006.1075635-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-Introduction
-============
-
-The QUIC protocol, defined in RFC 9000, is a secure, multiplexed transport
-built on top of UDP. It enables low-latency connection establishment,
-stream-based communication with flow control, and supports connection
-migration across network paths, while ensuring confidentiality, integrity,
-and availability.
-
-This implementation introduces QUIC support in Linux Kernel, offering
-several key advantages:
-
-- In-Kernel QUIC Support for Subsystems: Enables kernel subsystems
-  such as SMB and NFS to operate over QUIC with minimal changes. Once the
-  handshake is complete via the net/handshake APIs, data exchange proceeds
-  over standard in-kernel transport interfaces.
-
-- Standard Socket API Semantics: Implements core socket operations
-  (listen(), accept(), connect(), sendmsg(), recvmsg(), close(),
-  getsockopt(), setsockopt(), getsockname(), and getpeername()),
-  allowing user space to interact with QUIC sockets in a familiar,
-  POSIX-compliant way.
-
-- ALPN-Based Connection Dispatching: Supports in-kernel ALPN
-  (Application-Layer Protocol Negotiation) routing, allowing demultiplexing
-  of QUIC connections across different user-space processes based
-  on the ALPN identifiers.
-
-- Performance Enhancements: Handles all control messages in-kernel
-  to reduce syscall overhead, incorporates zero-copy mechanisms such as
-  sendfile() minimize data movement, and is also structured to support
-  future crypto hardware offloads.
-
-This implementation offers fundamental support for the following RFCs:
-
-- RFC9000 - QUIC: A UDP-Based Multiplexed and Secure Transport
-- RFC9001 - Using TLS to Secure QUIC
-- RFC9002 - QUIC Loss Detection and Congestion Control
-- RFC9221 - An Unreliable Datagram Extension to QUIC
-- RFC9287 - Greasing the QUIC Bit
-- RFC9368 - Compatible Version Negotiation for QUIC
-- RFC9369 - QUIC Version 2
-
-The socket APIs for QUIC follow the RFC draft [1]:
-
-- The Sockets API Extensions for In-kernel QUIC Implementations
-
-Implementation
-==============
-
-The central design is to implement QUIC within the kernel while delegating
-the handshake to userspace.
-
-Only the processing and creation of raw TLS Handshake Messages are handled
-in userspace, facilitated by a TLS library like GnuTLS. These messages are
-exchanged between kernel and userspace via sendmsg() and recvmsg(), with
-cryptographic details conveyed through control messages (cmsg).
-
-The entire QUIC protocol, aside from the TLS Handshake Messages processing
-and creation, is managed within the kernel. Rather than using a Upper Layer
-Protocol (ULP) layer, this implementation establishes a socket of type
-IPPROTO_QUIC (similar to IPPROTO_MPTCP), operating over UDP tunnels.
-
-For kernel consumers, they can initiate a handshake request from the kernel
-to userspace using the existing net/handshake netlink. The userspace
-component, such as tlshd service [2], then manages the processing
-of the QUIC handshake request.
-
-- Handshake Architecture:
-
-  ┌──────┐  ┌──────┐
-  │ APP1 │  │ APP2 │ ...
-  └──────┘  └──────┘
-  ┌──────────────────────────────────────────┐
-  │     {quic_client/server_handshake()}     │<─────────────┐
-  └──────────────────────────────────────────┘       ┌─────────────┐
-   {send/recvmsg()}      {set/getsockopt()}          │    tlshd    │
-   [CMSG handshake_info] [SOCKOPT_CRYPTO_SECRET]     └─────────────┘
-                         [SOCKOPT_TRANSPORT_PARAM_EXT]    │   ^
-                │ ^                  │ ^                  │   │
-  Userspace     │ │                  │ │                  │   │
-  ──────────────│─│──────────────────│─│──────────────────│───│───────
-  Kernel        │ │                  │ │                  │   │
-                v │                  v │                  v   │
-  ┌──────────────────┬───────────────────────┐       ┌─────────────┐
-  │ protocol, timer, │ socket (IPPROTO_QUIC) │<──┐   │ handshake   │
-  │                  ├───────────────────────┤   │   │netlink APIs │
-  │ common, family,  │ outqueue  |  inqueue  │   │   └─────────────┘
-  │                  ├───────────────────────┤   │      │       │
-  │ stream, connid,  │         frame         │   │   ┌─────┐ ┌─────┐
-  │                  ├───────────────────────┤   │   │     │ │     │
-  │ path, pnspace,   │         packet        │   │───│ SMB │ │ NFS │...
-  │                  ├───────────────────────┤   │   │     │ │     │
-  │ cong, crypto     │       UDP tunnels     │   │   └─────┘ └─────┘
-  └──────────────────┴───────────────────────┘   └──────┴───────┘
-
-- User Data Architecture:
-
-  ┌──────┐  ┌──────┐
-  │ APP1 │  │ APP2 │ ...
-  └──────┘  └──────┘
-   {send/recvmsg()}   {set/getsockopt()}              {recvmsg()}
-   [CMSG stream_info] [SOCKOPT_KEY_UPDATE]            [EVENT conn update]
-                      [SOCKOPT_CONNECTION_MIGRATION]  [EVENT stream update]
-                      [SOCKOPT_STREAM_OPEN/RESET/STOP]
-                │ ^               │ ^                     ^
-  Userspace     │ │               │ │                     │
-  ──────────────│─│───────────────│─│─────────────────────│───────────
-  Kernel        │ │               │ │                     │
-                v │               v │  ┌──────────────────┘
-  ┌──────────────────┬───────────────────────┐
-  │ protocol, timer, │ socket (IPPROTO_QUIC) │<──┐{kernel_send/recvmsg()}
-  │                  ├───────────────────────┤   │{kernel_set/getsockopt()}
-  │ common, family,  │ outqueue  |  inqueue  │   │{kernel_recvmsg()}
-  │                  ├───────────────────────┤   │
-  │ stream, connid,  │         frame         │   │   ┌─────┐ ┌─────┐
-  │                  ├───────────────────────┤   │   │     │ │     │
-  │ path, pnspace,   │         packet        │   │───│ SMB │ │ NFS │...
-  │                  ├───────────────────────┤   │   │     │ │     │
-  │ cong, crypto     │       UDP tunnels     │   │   └─────┘ └─────┘
-  └──────────────────┴───────────────────────┘   └──────┴───────┘
-
-Interface
-=========
-
-This implementation supports a mapping of QUIC into sockets APIs. Similar
-to TCP and SCTP, a typical Server and Client use the following system call
-sequence to communicate:
-
-    Client                             Server
-  ──────────────────────────────────────────────────────────────────────
-  sockfd = socket(IPPROTO_QUIC)      listenfd = socket(IPPROTO_QUIC)
-  bind(sockfd)                       bind(listenfd)
-                                     listen(listenfd)
-  connect(sockfd)
-  quic_client_handshake(sockfd)
-                                     sockfd = accept(listenfd)
-                                     quic_server_handshake(sockfd, cert)
-
-  sendmsg(sockfd)                    recvmsg(sockfd)
-  close(sockfd)                      close(sockfd)
-                                     close(listenfd)
-
-Please note that quic_client_handshake() and quic_server_handshake()
-functions are currently sourced from libquic [3]. These functions are
-responsible for receiving and processing the raw TLS handshake messages
-until the completion of the handshake process.
-
-For utilization by kernel consumers, it is essential to have tlshd
-service [2] installed and running in userspace. This service receives
-and manages kernel handshake requests for kernel sockets. In the kernel,
-the APIs closely resemble those used in userspace:
-
-    Client                             Server
-  ────────────────────────────────────────────────────────────────────────
-  __sock_create(IPPROTO_QUIC, &sock)  __sock_create(IPPROTO_QUIC, &sock)
-  kernel_bind(sock)                   kernel_bind(sock)
-                                      kernel_listen(sock)
-  kernel_connect(sock)
-  tls_client_hello_x509(args:{sock})
-                                      kernel_accept(sock, &newsock)
-                                      tls_server_hello_x509(args:{newsock})
-
-  kernel_sendmsg(sock)                kernel_recvmsg(newsock)
-  sock_release(sock)                  sock_release(newsock)
-                                      sock_release(sock)
-
-Please be aware that tls_client_hello_x509() and tls_server_hello_x509()
-are APIs from net/handshake/. They are used to dispatch the handshake
-request to the userspace tlshd service and subsequently block until the
-handshake process is completed.
-
-Use Cases
-=========
-
-- Samba
-
-  Stefan Metzmacher has integrated Linux QUIC into Samba for both client
-  and server roles [4].
-
-- tlshd
-
-  The tlshd daemon [2] facilitates Linux QUIC handshake requests from
-  kernel sockets. This is essential for enabling protocols like SMB
-  and NFS over QUIC.
-
-- curl
-
-  Linux QUIC is being integrated into curl [5] for HTTP/3. Example usage:
-
-  # curl --http3-only https://nghttp2.org:4433/
-  # curl --http3-only https://www.google.com/
-  # curl --http3-only https://facebook.com/
-  # curl --http3-only https://outlook.office.com/
-  # curl --http3-only https://cloudflare-quic.com/
-
-- httpd-portable
-
-  Moritz Buhl has deployed an HTTP/3 server over Linux QUIC [6] that is
-  accessible via Firefox and curl:
-
-  https://d.moritzbuhl.de/pub
-
-- NetPerfMeter
-
-  The latest NetPerfMeter release supports Linux QUIC and can be used to
-  run performance evaluations [10].
-
-Test Coverage
-=============
-
-The Coverage (gcov) of Functional and Interop Tests:
-
-https://d.moritzbuhl.de/lcov
-
-- Functional Tests
-
-  The libquic self-tests (make check) pass on all major architectures:
-  x86_64, i386, s390x, aarch64, ppc64le.
-
-- Interop tests
-
-  Interoperability was validated using the QUIC Interop Runner [7] against
-  all major userland QUIC stacks. Results are available at:
-
-  https://d.moritzbuhl.de/
-
-- Fuzzing via Syzkaller
-
-  Syzkaller has been running kernel fuzzing with QUIC for weeks using
-  tests/syzkaller/ in libquic [3]..
-
-- Performance Testing
-
-  Performance was benchmarked using iperf [8] over a 100G NIC with
-  using various MTUs and packet sizes:
-
-  - QUIC vs. kTLS:
-
-    UNIT        size:1024      size:4096      size:16384     size:65536
-    Gbits/sec   QUIC | kTLS    QUIC | kTLS    QUIC | kTLS    QUIC | kTLS
-    ────────────────────────────────────────────────────────────────────
-    mtu:1500    2.27 | 3.26    3.02 | 6.97    3.36 | 9.74    3.48 | 10.8
-    ────────────────────────────────────────────────────────────────────
-    mtu:9000    3.66 | 3.72    5.87 | 8.92    7.03 | 11.2    8.04 | 11.4
-
-  - QUIC(disable_1rtt_encryption) vs. TCP:
-
-    UNIT        size:1024      size:4096      size:16384     size:65536
-    Gbits/sec   QUIC | TCP     QUIC | TCP     QUIC | TCP     QUIC | TCP
-    ────────────────────────────────────────────────────────────────────
-    mtu:1500    3.09 | 4.59    4.46 | 14.2    5.07 | 21.3    5.18 | 23.9
-    ────────────────────────────────────────────────────────────────────
-    mtu:9000    4.60 | 4.65    8.41 | 14.0    11.3 | 28.9    13.5 | 39.2
-
-
-  The performance gap between QUIC and kTLS may be attributed to:
-
-  - The absence of Generic Segmentation Offload (GSO) for QUIC.
-  - An additional data copy on the transmission (TX) path.
-  - Extra encryption required for header protection in QUIC.
-  - A longer header length for the stream data in QUIC.
-
-Patches
-=======
-
-Note: This implementation is organized into five parts and submitted across
-two patchsets for review. This patchset includes Parts 1–2, while Parts 3–5
-will be submitted in a subsequent patchset. For complete series, see [9].
-
-1. Infrastructure (2):
-
-  net: define IPPROTO_QUIC and SOL_QUIC constants
-  net: build socket infrastructure for QUIC protocol
-
-2. Subcomponents (14):
-
-  quic: provide common utilities and data structures
-  quic: provide family ops for address and protocol
-  quic: provide quic.h header files for kernel and userspace
-  quic: add stream management
-  quic: add connection id management
-  quic: add path management
-  quic: add congestion control
-  quic: add packet number space
-  quic: add crypto key derivation and installation
-  quic: add crypto packet encryption and decryption
-  quic: add timer management
-  quic: add frame encoder and decoder base
-  quic: add packet builder base
-  quic: add packet parser base
-
-3. Data Processing (7):
-
-  quic: implement outqueue transmission and flow control
-  quic: implement outqueue sack and retransmission
-  quic: implement inqueue receiving and flow control
-  quic: implement frame creation functions
-  quic: implement frame processing functions
-  quic: implement packet creation functions
-  quic: implement packet processing functions
-
-4. Socket APIs (6):
-
-  quic: support bind/listen/connect/accept/close()
-  quic: support sendmsg() and recvmsg()
-  quic: support socket options related to interaction after handshake
-  quic: support socket options related to settings prior to handshake
-  quic: support socket options related to setup during handshake
-  quic: support socket ioctls and socket dump via procfs
-
-5. Documentation and Selftests (3):
-
-  quic: create sample test using handshake APIs for kernel consumers
-  Documentation: describe QUIC protocol interface in quic.rst
-  selftests: net: add tests for QUIC protocol
-
-Notice: The QUIC module is currently labeled as "EXPERIMENTAL".
-
-All contributors are recognized in the respective patches with the tag of
-'Signed-off-by:'. Special thanks to Moritz Buhl and Stefan Metzmacher whose
-practical use cases and insightful feedback, which have been instrumental
-in shaping the design and advancing the development.
-
-References
-==========
-
-[1]  https://datatracker.ietf.org/doc/html/draft-lxin-quic-socket-apis
-[2]  https://github.com/oracle/ktls-utils
-[3]  https://github.com/lxin/quic
-[4]  https://gitlab.com/samba-team/samba/-/merge_requests/4019
-[5]  https://github.com/moritzbuhl/curl/tree/linux_curl
-[6]  https://github.com/moritzbuhl/httpd-portable
-[7]  https://github.com/quic-interop/quic-interop-runner
-[8]  https://github.com/lxin/iperf
-[9]  https://github.com/lxin/net-next/commits/quic/
-[10] https://www.nntb.no/~dreibh/netperfmeter/
-
-Changes in v2-v7: See individual patch changelogs for details.
-
-Xin Long (16):
-  net: define IPPROTO_QUIC and SOL_QUIC constants
-  net: build socket infrastructure for QUIC protocol
-  quic: provide common utilities and data structures
-  quic: provide family ops for address and protocol
-  quic: provide quic.h header files for kernel and userspace
-  quic: add stream management
-  quic: add connection id management
-  quic: add path management
-  quic: add congestion control
-  quic: add packet number space
-  quic: add crypto key derivation and installation
-  quic: add crypto packet encryption and decryption
-  quic: add timer management
-  quic: add frame encoder and decoder base
-  quic: add packet builder base
-  quic: add packet parser base
-
- Documentation/networking/ip-sysctl.rst |   52 +
- MAINTAINERS                            |    9 +
- include/linux/quic.h                   |   20 +
- include/linux/socket.h                 |    1 +
- include/uapi/linux/in.h                |    2 +
- include/uapi/linux/quic.h              |  235 +++++
- net/Kconfig                            |    1 +
- net/Makefile                           |    1 +
- net/quic/Kconfig                       |   36 +
- net/quic/Makefile                      |    9 +
- net/quic/common.c                      |  583 +++++++++++
- net/quic/common.h                      |  204 ++++
- net/quic/cong.c                        |  307 ++++++
- net/quic/cong.h                        |  120 +++
- net/quic/connid.c                      |  225 +++++
- net/quic/connid.h                      |  163 ++++
- net/quic/crypto.c                      | 1222 ++++++++++++++++++++++++
- net/quic/crypto.h                      |   83 ++
- net/quic/family.c                      |  372 ++++++++
- net/quic/family.h                      |   33 +
- net/quic/frame.c                       |  561 +++++++++++
- net/quic/frame.h                       |  195 ++++
- net/quic/packet.c                      |  957 +++++++++++++++++++
- net/quic/packet.h                      |  130 +++
- net/quic/path.c                        |  524 ++++++++++
- net/quic/path.h                        |  172 ++++
- net/quic/pnspace.c                     |  225 +++++
- net/quic/pnspace.h                     |  150 +++
- net/quic/protocol.c                    |  421 ++++++++
- net/quic/protocol.h                    |   62 ++
- net/quic/socket.c                      |  436 +++++++++
- net/quic/socket.h                      |  214 +++++
- net/quic/stream.c                      |  400 ++++++++
- net/quic/stream.h                      |  119 +++
- net/quic/timer.c                       |  196 ++++
- net/quic/timer.h                       |   47 +
- 36 files changed, 8487 insertions(+)
- create mode 100644 include/linux/quic.h
- create mode 100644 include/uapi/linux/quic.h
- create mode 100644 net/quic/Kconfig
- create mode 100644 net/quic/Makefile
- create mode 100644 net/quic/common.c
- create mode 100644 net/quic/common.h
- create mode 100644 net/quic/cong.c
- create mode 100644 net/quic/cong.h
- create mode 100644 net/quic/connid.c
- create mode 100644 net/quic/connid.h
- create mode 100644 net/quic/crypto.c
- create mode 100644 net/quic/crypto.h
- create mode 100644 net/quic/family.c
- create mode 100644 net/quic/family.h
- create mode 100644 net/quic/frame.c
- create mode 100644 net/quic/frame.h
- create mode 100644 net/quic/packet.c
- create mode 100644 net/quic/packet.h
- create mode 100644 net/quic/path.c
- create mode 100644 net/quic/path.h
- create mode 100644 net/quic/pnspace.c
- create mode 100644 net/quic/pnspace.h
- create mode 100644 net/quic/protocol.c
- create mode 100644 net/quic/protocol.h
- create mode 100644 net/quic/socket.c
- create mode 100644 net/quic/socket.h
- create mode 100644 net/quic/stream.c
- create mode 100644 net/quic/stream.h
- create mode 100644 net/quic/timer.c
- create mode 100644 net/quic/timer.h
-
--- 
-2.47.1
-
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20251222223006.1075635-1-dhowells@redhat.com>
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Spam-Flag: NO
+X-Spam-Score: -4.01
+X-Rspamd-Queue-Id: 37FA733747
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Level: 
+
+On 12/22, David Howells wrote:
+>Hi Steve,
+>
+>Could you consider taking these patches?  There are two parts to the set.
+>
+>The first part cleans up the formatting of declarations in the header file.
+>They remove the externs, (re)name the arguments in the declarations to
+>match those in the C file and format them to wrap at 79 chars (this is
+>configurable - search for 79 in the script), aligning all the first
+>argument on each line with the char after the opening bracket.
+>
+>I've attached the script below so that you can also run it yourself.  It
+>does all the git manipulation to generate one commit per header file
+>changed.  Run as:
+>
+>	./cifs.pl fs/smb/client/*.[ch]
+>
+>in the kernel source root dir.
+>
+>The script can be rerun later to readjust any added changes.
+>
+>Paulo has given his R-b for this subset (labelled cifs: Scripted clean up).
+>
+>The second part splits the SMB1 parts of cifs protocol layer out into their
+>own files.  cifstransport.c is renamed to smb1transport.c also for
+>consistency, though cifssmb.c is left unrenamed (I could rename that to
+>smb1pdu.c).  This is pretty much all moving stuff around and few actual
+>code changes.  There is one bugfix, though, to cifs_dump_mids().
+>
+>I've left the splitting of the SMB1 parts of the cifs filesystem layer for
+>a future set of patches as that's would involve removing embedded parts of
+>functions and is easier to get wrong.
+>
+>The patches can be found here also:
+>
+>	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-cleanup
+>
+>Thanks,
+>David
+
+Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
+
+
+Cheers,
+
+Enzo
+
+>---
+>	#!/usr/bin/perl -w
+>	use strict;
+>	unless (@ARGV) {
+>	    die "Usage: $0 <c_file1> [<c_file2> ...]\n";
+>	}
+>
+>	# Data tracking
+>	my %funcs = ();		# Func name => { func prototype }
+>	my %headers = ();	# Header filename => { header content }
+>	my %c_files = ();	# C filename => { ordered func list, header pref }
+>	my %cmarkers = ();	# C filename marker => { header filename it's in }
+>
+>	# Parse state
+>	my $pathname = "-";
+>	my $lineno = 0;
+>
+>	sub error(@) {
+>	    print STDERR $pathname, ":", $lineno, ": ", @_, "\n";
+>	    exit(1);
+>	}
+>
+>	sub pad($) {
+>	    # Reindent the function arguments to line the arguments up with the char
+>	    # after the opening bracket on the func argument list
+>	    my ($lines) = @_;
+>	    return $lines if ($#{$lines} <= 0);
+>	    my $has_empty = 0;
+>	    for (my $i = 0; $i <= $#{$lines}; $i++) {
+>		$lines->[$i] =~ s/^[ \t]+//;
+>		$has_empty = 1 if ($lines->[$i] eq "");
+>	    }
+>
+>	    if ($has_empty) {
+>		my @clean = grep /.+/, @{$lines};
+>		$lines = \@clean;
+>	    }
+>
+>	    my $indlen = index($lines->[0], "(");
+>	    return $lines if ($indlen < 0);
+>	    my $indent = "";
+>	    $indlen++;
+>	    $indent .= "\t" x ($indlen / 8);
+>	    $indent .= " " x ($indlen % 8);
+>
+>	    my @padded = ();
+>	    my $acc = "";
+>	    my $len = -$indlen;
+>	    for (my $i = 0; $i <= $#{$lines}; $i++) {
+>		my $argument = $lines->[$i];
+>		my $arglen = length($argument);
+>		my $last = ($i == $#{$lines} ? 1 : 0);
+>
+>		if ($i == 0 ||
+>		    $i == 1) {
+>		    $acc .= $argument;
+>		    $acc .= ";" if ($last);
+>		    $len += $arglen + $last;
+>		    next;
+>		}
+>		if (!$acc) {
+>		    $acc = $indent . $argument;
+>		    $acc .= ";" if ($last);
+>		    $len += $arglen + $last;
+>		    next;
+>		}
+>		if ($indlen + $len + 1 + $arglen + $last > 79) {
+>		    push @padded, $acc;
+>		    $acc = $indent . $argument;
+>		    $acc .= ";" if ($last);
+>		    $len = $arglen + $last;
+>		    next;
+>		}
+>
+>		$acc .= " " . $argument;
+>		$acc .= ";" if ($last);
+>		$len += 1 + $arglen + $last;
+>	    }
+>	    push @padded, $acc if ($acc);
+>	    return \@padded;
+>	}
+>
+>	sub earliest(@) {
+>	    my $ret = -1;
+>	    foreach (@_) {
+>		$ret = $_ if ($ret < 0 || ($_ >= 0 && $_ < $ret));
+>	    }
+>	    return $ret;
+>	}
+>
+>	foreach my $file (@ARGV) {
+>	    # Open the file for reading.
+>	    next if $file =~ /trace[.]h$/;
+>	    next if $file =~ /smbdirect[.][ch]$/;
+>	    open my $fh, "<$file"
+>		or die "Could not open file '$file'";
+>	    $pathname = $file;
+>	    $lineno = 0;
+>
+>	    my $filename;
+>	    my @file_content = ();
+>	    my @copy = ();
+>
+>	    my $state = 0;
+>	    my $qual = "";
+>	    my $type = "";
+>	    my $funcname = "";
+>	    my @funcdef = ();
+>	    my $bracket = 0;
+>	    my $comment = 0;
+>	    my $smb1 = 0;
+>	    my $header = 0;
+>	    my $inline = 0;
+>	    my $file_marker = "";
+>	    my $config = "";
+>	    my $c_file = 0;
+>
+>	    $filename = $pathname;
+>	    $filename =~ s!.*/!!;
+>
+>	    if ($file =~ m!.h$!) {
+>		my %new_h_file = (
+>		    path    => $pathname,
+>		    fname   => $filename,
+>		    content => [],
+>		    );
+>		$header = \%new_h_file;
+>		$headers{$filename} = \%new_h_file;
+>	    } elsif ($file =~ m!.c$!) {
+>		my %new_c_file = (
+>		    path  => $pathname,
+>		    fname => $filename,
+>		    funcs => [],
+>		    );
+>		$c_file = \%new_c_file;
+>		$c_files{$filename} = \%new_c_file;
+>	    } else {
+>		warn("Ignoring unexpected file $file\n");
+>		next;
+>	    }
+>
+>	    $smb1 = 1 if ($file =~ m!/smb1ops.c|/cifssmb.c|/cifstransport.c!);
+>
+>	    foreach my $line (<$fh>) {
+>		$lineno++;
+>		chomp($line);
+>		push @copy, $line;
+>		if (!$line) {
+>		    # Blank line
+>		    push @file_content, @copy;
+>		    @copy = ();
+>		    next;
+>		}
+>
+>		# Handle continuation or end of block comment.  Look for C file
+>		# prototype insertion point markers.
+>		if ($comment) {
+>		    if ($line =~ m![*]/!) {
+>			if ($comment == 2 && $file_marker) {
+>			    $cmarkers{$file_marker} = $file_marker;
+>			    push @copy, "#C_MARKER " . $filename;
+>			    $file_marker = 0;
+>			}
+>			$comment = 0;
+>		    } else {
+>			$comment++;
+>			if ($comment == 2 && $line =~ m! [*] ([a-z][a-z_0-9]*[.][c])$!) {
+>			    $file_marker = $1;
+>			    print("Found file marker ", $file_marker, " in ", $filename, "\n");
+>			}
+>		    }
+>		    push @file_content, @copy;
+>		    @copy = ();
+>		    next;
+>		}
+>
+>		# Check cpp directives, particularly looking for SMB1 bits
+>		if ($line =~ /^[#]/) {
+>		    if ($header) {
+>			if ($line =~ /ifdef.*(CONFIG_[A-Z0-9_])/) {
+>			    error("multiconfig") if $config;
+>			    $config = $1;
+>			    $smb1++ if ($config eq "CONFIG_CIFS_ALLOW_INSECURE_LEGACY");
+>			} elsif ($line =~ /endif/) {
+>			    $smb1-- if ($config eq "CONFIG_CIFS_ALLOW_INSECURE_LEGACY");
+>			    $config = "";
+>			}
+>		    }
+>		    push @file_content, @copy;
+>		    @copy = ();
+>		    next;
+>		}
+>
+>		# Exclude interference in finding func names and return types
+>		if ($line =~ /^[{]/ ||
+>		    $line =~ /##/ ||
+>		    $line =~ /^[_a-z0-9A-Z]+:$/ || # goto label
+>		    $line =~ /^do [{]/ ||
+>		    $line =~ m!^//!) {
+>		    push @file_content, @copy;
+>		    @copy = ();
+>		    next;
+>		}
+>
+>		# Start of a block comment
+>		if ($line =~ m!^/[*]!) {
+>		    $comment = 1 unless ($line =~ m![*]/!);
+>		    push @file_content, @copy;
+>		    @copy = ();
+>		    next;
+>		}
+>
+>		# End of a braced section, such as a function implementation
+>		if ($line =~ /^[}]/) {
+>			$type = "";
+>			$qual = "";
+>			$funcname = "";
+>			@funcdef = ();
+>			push @file_content, @copy;
+>			@copy = ();
+>			next;
+>		}
+>
+>		if ($line =~ /^typedef/) {
+>		    $type = "";
+>		    $qual = "";
+>		    $funcname = "";
+>		    @funcdef = ();
+>		    push @file_content, @copy;
+>		    @copy = ();
+>		    next;
+>		}
+>
+>		# Extract function qualifiers.  There may be multiple of these in more
+>		# or less any order.  Some of them cause the func to be skipped (e.g. inline).
+>
+>		if ($line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)\W/ ||
+>		    $line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)$/) {
+>		    error("Unexpected qualifier '$1'") if ($state != 0);
+>		    while ($line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)\W/ ||
+>			   $line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)$/) {
+>			$qual .= " " if ($qual);
+>			$qual .= $1;
+>			$inline = 1 if ($1 eq "inline");
+>			$inline = 1 if ($1 eq "__always_inline");
+>			$line = substr($line, length($1));
+>			$line =~ s/^\s+//;
+>		    }
+>		}
+>
+>		if ($state == 0) {
+>		    # Extract what we assume to be the return type
+>		    if ($line =~ /^\s/) {
+>			push @file_content, @copy;
+>			@copy = ();
+>			next;
+>		    }
+>		    while ($line =~ /^(unsigned|signed|bool|char|short|int|long|void|const|volatile|(struct|union|enum)\s+[_a-zA-Z][_a-zA-Z0-9]*|[*]|__init|__exit|__le16|__le32|__le64|__be16|__be32|__be64)/) {
+>			$type .= " " if $type;
+>			$type .= $1;
+>			$line = substr($line, length($1));
+>			$line =~ s/^\s+//;
+>		    }
+>		    if ($line =~ /^struct [{]/) {
+>			# Ignore structure definitions
+>			$type = "";
+>			$qual = "";
+>			$funcname = "";
+>			@funcdef = ();
+>			push @file_content, @copy;
+>			@copy = ();
+>			next;
+>		    }
+>		    if (index($line, "=") >= 0) {
+>			# Ignore assignments
+>			$type = "";
+>			$qual = "";
+>			$funcname = "";
+>			@funcdef = "";
+>			push @file_content, @copy;
+>			@copy = ();
+>			next;
+>		    }
+>
+>		    # Try and extract a function's type and name
+>		    while ($line =~ /(^[_a-zA-Z][_a-zA-Z0-9]*)/) {
+>			my $name = $1;
+>			$line = substr($line, length($name));
+>			next if ($line =~ /^[{]/);
+>			$line =~ s/^\s+//;
+>
+>			my $ch = substr($line, 0, 1);
+>			last if ($ch eq "[" || $ch eq ";"); # Global variables
+>
+>			if ($ch eq "(") {
+>			    # Found the function name
+>			    $state = 1;
+>			    $line = substr($line, 1);
+>			    $funcname = $name;
+>			    my $tmp = $qual . $type . " " . $funcname . "(";
+>			    $tmp =~ s/[*] /*/;
+>			    push @funcdef, $tmp;
+>			    $bracket = 1;
+>			    last;
+>			}
+>
+>			if ($type) {
+>			    last if (index($line, ";") >= 0 && index($line, "(") == -1);
+>			    error("Unexpected name '$name' after '$type'");
+>			}
+>
+>			$type .= " " if $type;
+>			$type .= $name;
+>			if ($line =~ /^(\s*[*]+)/) {
+>			    my $ptr = $1;
+>			    $type .= $ptr;
+>			    $line = substr($line, length($ptr));
+>			}
+>		    }
+>		}
+>
+>		# Try and extract a function's argument list
+>		my $from = 0;
+>		if ($state == 1) {
+>		    while (1) {
+>			my $o = index($line, "(", $from);
+>			my $c = index($line, ")", $from);
+>			my $m = index($line, ",", $from);
+>
+>			my $b = earliest($o, $c, $m);
+>			if ($b < 0) {
+>			    push @funcdef, $line
+>				unless ($line eq "");
+>			    last;
+>			}
+>			my $ch = substr($line, $b, 1);
+>
+>			# Push the arguments separately on to the list
+>			if ($ch eq ",") {
+>			    push @funcdef, substr($line, 0, $b + 1);
+>			    $line = substr($line, $b + 1);
+>			    $from = 0;
+>			} elsif ($ch eq "(") {
+>			    # Handle brackets in the argument list (e.g. function
+>			    # pointers)
+>			    $bracket++;
+>			    $from = $b + 1;
+>			} elsif ($ch eq ")") {
+>			    $bracket--;
+>			    if ($bracket == 0) {
+>				push @funcdef, substr($line, 0, $b + 1);
+>				$line = substr($line, $b + 1);
+>				$state = 2;
+>				last;
+>			    }
+>			    $from = $b + 1;
+>			}
+>		    }
+>		}
+>
+>		if ($state == 2) {
+>		    $inline = 1 if ($qual =~ /inline/);
+>		    #print("QUAL $qual $type $funcname $inline ", $#funcdef, "\n");
+>		    if (!$header &&
+>			$qual !~ /static/ &&
+>			$funcname ne "__acquires" &&
+>			$funcname ne "__releases" &&
+>			$funcname ne "module_init" &&
+>			$funcname ne "module_exit" &&
+>			$funcname ne "module_param" &&
+>			$funcname ne "module_param_call" &&
+>			$funcname ne "PROC_FILE_DEFINE" &&
+>			$funcname !~ /MODULE_/ &&
+>			$funcname !~ /DEFINE_/) {
+>
+>			# Okay, we appear to have a function implementation
+>			my $func;
+>
+>			if (exists($funcs{$funcname})) {
+>			    $func = $funcs{$funcname};
+>			    $func->{body} = pad(\@funcdef);
+>			} else {
+>			    my %new_func = (
+>				name => $funcname,
+>				cond => "",
+>				);
+>			    $func = \%new_func;
+>			    $funcs{$funcname} = $func;
+>			    $func->{body} = pad(\@funcdef);
+>			}
+>			$func->{body} = pad(\@funcdef);
+>
+>			if ($funcname eq "cifs_inval_name_dfs_link_error") {
+>			    $func->{cond} = "#ifdef CONFIG_CIFS_DFS_UPCALL";
+>			} elsif ($funcname eq "cifs_listxattr") {
+>			    $func->{cond} = "#ifdef CONFIG_CIFS_XATTR";
+>			}
+>
+>			push @{$c_file->{funcs}}, $func;
+>		    } elsif (!$header || $inline) {
+>			# Ignore inline function implementations and other weirdies
+>			push @file_content, @copy;
+>		    } elsif ($header && !$inline) {
+>			push @file_content, "#FUNCPROTO " . $funcname;
+>
+>			my $func;
+>
+>			if (exists($funcs{$funcname})) {
+>			    $func = $funcs{$funcname};
+>			    $func->{lineno} = $lineno;
+>			    $func->{pathname} = $pathname;
+>			} else {
+>			    my %new_func = (
+>				name => $funcname,
+>				cond => "",
+>				lineno => $lineno,
+>				pathname => $pathname,
+>				);
+>			    $func = \%new_func;
+>			    $funcs{$funcname} = $func;
+>			}
+>		    }
+>
+>		    @funcdef = ();
+>		    $type = "";
+>		    $qual = "";
+>		    $funcname = "";
+>		    $inline = 0;
+>		    $state = 0;
+>		    @copy = ();
+>		}
+>		if ($line =~ /;/) {
+>		    $type = "";
+>		    $qual = "";
+>		    $funcname = "";
+>		    @funcdef = ();
+>		    $state = 0;
+>		    push @file_content, @copy;
+>		    @copy = ();
+>		}
+>	    }
+>	    close($fh);
+>
+>	    if ($header) {
+>		$header->{content} = \@file_content;
+>	    }
+>	}
+>
+>	sub write_header($)
+>	{
+>	    my ($header) = @_;
+>	    my $path = $header->{path};
+>
+>	    my @output = ();
+>
+>	    foreach my $line (@{$header->{content}}) {
+>		if ($line =~ "^[#]C_MARKER (.*)") {
+>		    next;
+>		} elsif ($line =~ "^[#]FUNCPROTO ([_a-zA-Z0-9]+)") {
+>		    my $funcname = $1;
+>		    my $func = $funcs{$funcname};
+>		    if (!$func->{body}) {
+>			print($func->{pathname}, ":", $func->{lineno}, ": '", $funcname,
+>			      "' dead prototype\n");
+>			next;
+>		    }
+>		    #push @output, $line;
+>		    push @output, @{$func->{body}};
+>		} else {
+>		    push @output, $line;
+>		}
+>	    }
+>
+>	    open my $fh, ">$path"
+>		or die "Could not open file '$path' for writing";
+>	    foreach my $f (@output) {
+>		print($fh $f, "\n") or die $path;
+>	    }
+>	    close($fh) or die $path;
+>
+>	    print("Git $path\n");
+>	    if (system("git diff -s --exit-code $path") == 0) {
+>		print("- no changes, skipping\n");
+>		return;
+>	    }
+>
+>	    if (system("git add $path") != 0) {
+>		die("'git add $path' failed\n");
+>	    }
+>
+>	    open $fh, ">.commit_message"
+>		or die "Could not open file '.commit_message' for writing";
+>	    print($fh
+>		  qq/
+>	cifs: Scripted clean up $path
+>
+>	Remove externs, correct argument names and reformat declarations.
+>
+>	Signed-off-by: David Howells <dhowells\@redhat.com>
+>	cc: Steve French <sfrench\@samba.org>
+>	cc: Paulo Alcantara <pc\@manguebit.org>
+>	cc: Enzo Matsumiya <ematsumiya\@suse.de>
+>	cc: linux-cifs\@vger.kernel.org
+>	cc: linux-fsdevel\@vger.kernel.org
+>	cc: linux-kernel\@vger.kernel.org
+>	/);
+>	    close($fh) or die ".commit_message";
+>
+>	    if (system("git commit -F .commit_message") != 0) {
+>		die("'git commit $path' failed\n");
+>	    }
+>	}
+>
+>	foreach my $h (keys(%headers)) {
+>	    write_header($headers{$h});
+>	}
+>
+>David Howells (37):
+>  cifs: Scripted clean up fs/smb/client/cached_dir.h
+>  cifs: Scripted clean up fs/smb/client/dfs.h
+>  cifs: Scripted clean up fs/smb/client/cifsproto.h
+>  cifs: Scripted clean up fs/smb/client/cifs_unicode.h
+>  cifs: Scripted clean up fs/smb/client/netlink.h
+>  cifs: Scripted clean up fs/smb/client/cifsfs.h
+>  cifs: Scripted clean up fs/smb/client/dfs_cache.h
+>  cifs: Scripted clean up fs/smb/client/dns_resolve.h
+>  cifs: Scripted clean up fs/smb/client/cifsglob.h
+>  cifs: Scripted clean up fs/smb/client/fscache.h
+>  cifs: Scripted clean up fs/smb/client/fs_context.h
+>  cifs: Scripted clean up fs/smb/client/cifs_spnego.h
+>  cifs: Scripted clean up fs/smb/client/compress.h
+>  cifs: Scripted clean up fs/smb/client/cifs_swn.h
+>  cifs: Scripted clean up fs/smb/client/cifs_debug.h
+>  cifs: Scripted clean up fs/smb/client/smb2proto.h
+>  cifs: Scripted clean up fs/smb/client/reparse.h
+>  cifs: Scripted clean up fs/smb/client/ntlmssp.h
+>  cifs: SMB1 split: Rename cifstransport.c
+>  cifs: SMB1 split: Create smb1proto.h for SMB1 declarations
+>  cifs: SMB1 split: Separate out SMB1 decls into smb1proto.h
+>  cifs: SMB1 split: Move some SMB1 receive bits to smb1transport.c
+>  cifs: SMB1 split: Move some SMB1 received PDU checking bits to
+>    smb1transport.c
+>  cifs: SMB1 split: Add some #includes
+>  cifs: SMB1 split: Split SMB1 protocol defs into smb1pdu.h
+>  cifs: SMB1 split: Adjust #includes
+>  cifs: SMB1 split: Move BCC access functions
+>  cifs: SMB1 split: Don't return smb_hdr from cifs_{,small_}buf_get()
+>  cifs: Fix cifs_dump_mids() to call ->dump_detail
+>  cifs: SMB1 split: Move inline funcs
+>  cifs: SMB1 split: cifs_debug.c
+>  cifs: SMB1 split: misc.c
+>  cifs: SMB1 split: netmisc.c
+>  cifs: SMB1 split: cifsencrypt.c
+>  cifs: SMB1 split: sess.c
+>  cifs: SMB1 split: connect.c
+>  cifs: SMB1 split: Make BCC accessors conditional
+>
+> fs/smb/client/Makefile        |   10 +-
+> fs/smb/client/cached_dir.h    |   30 +-
+> fs/smb/client/cifs_debug.c    |   18 +-
+> fs/smb/client/cifs_debug.h    |    1 -
+> fs/smb/client/cifs_spnego.h   |    4 +-
+> fs/smb/client/cifs_swn.h      |   10 +-
+> fs/smb/client/cifs_unicode.c  |    1 -
+> fs/smb/client/cifs_unicode.h  |   17 +-
+> fs/smb/client/cifsacl.c       |    1 -
+> fs/smb/client/cifsencrypt.c   |  124 --
+> fs/smb/client/cifsfs.c        |    1 -
+> fs/smb/client/cifsfs.h        |  114 +-
+> fs/smb/client/cifsglob.h      |   29 +-
+> fs/smb/client/cifspdu.h       | 2377 +--------------------------------
+> fs/smb/client/cifsproto.h     |  780 ++++-------
+> fs/smb/client/cifssmb.c       |  147 +-
+> fs/smb/client/cifstransport.c |  263 ----
+> fs/smb/client/compress.h      |    3 +-
+> fs/smb/client/connect.c       |  252 ----
+> fs/smb/client/dfs.h           |    3 +-
+> fs/smb/client/dfs_cache.h     |   19 +-
+> fs/smb/client/dir.c           |    1 -
+> fs/smb/client/dns_resolve.h   |    4 +-
+> fs/smb/client/file.c          |    1 -
+> fs/smb/client/fs_context.c    |    1 -
+> fs/smb/client/fs_context.h    |   16 +-
+> fs/smb/client/fscache.h       |   17 +-
+> fs/smb/client/inode.c         |    1 -
+> fs/smb/client/ioctl.c         |    1 -
+> fs/smb/client/link.c          |    1 -
+> fs/smb/client/misc.c          |  302 +----
+> fs/smb/client/netlink.h       |    4 +-
+> fs/smb/client/netmisc.c       |  824 +-----------
+> fs/smb/client/ntlmssp.h       |   15 +-
+> fs/smb/client/readdir.c       |    1 -
+> fs/smb/client/reparse.h       |   14 +-
+> fs/smb/client/sess.c          |  982 --------------
+> fs/smb/client/smb1debug.c     |   25 +
+> fs/smb/client/smb1encrypt.c   |  139 ++
+> fs/smb/client/smb1maperror.c  |  825 ++++++++++++
+> fs/smb/client/smb1misc.c      |  189 +++
+> fs/smb/client/smb1ops.c       |  279 ++--
+> fs/smb/client/smb1pdu.h       | 2354 ++++++++++++++++++++++++++++++++
+> fs/smb/client/smb1proto.h     |  336 +++++
+> fs/smb/client/smb1session.c   |  995 ++++++++++++++
+> fs/smb/client/smb1transport.c |  561 ++++++++
+> fs/smb/client/smb2file.c      |    2 +-
+> fs/smb/client/smb2inode.c     |    2 +-
+> fs/smb/client/smb2pdu.c       |    2 +-
+> fs/smb/client/smb2proto.h     |  468 +++----
+> fs/smb/client/smbencrypt.c    |    1 -
+> fs/smb/client/transport.c     |    1 -
+> fs/smb/client/xattr.c         |    1 -
+> fs/smb/common/smb2pdu.h       |    3 +
+> 54 files changed, 6310 insertions(+), 6262 deletions(-)
+> delete mode 100644 fs/smb/client/cifstransport.c
+> create mode 100644 fs/smb/client/smb1debug.c
+> create mode 100644 fs/smb/client/smb1encrypt.c
+> create mode 100644 fs/smb/client/smb1maperror.c
+> create mode 100644 fs/smb/client/smb1misc.c
+> create mode 100644 fs/smb/client/smb1pdu.h
+> create mode 100644 fs/smb/client/smb1proto.h
+> create mode 100644 fs/smb/client/smb1session.c
+> create mode 100644 fs/smb/client/smb1transport.c
+>
