@@ -1,127 +1,138 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AFE25228C;
-	Wed, 14 Jan 2026 20:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B43D13D521
+	for <linux-cifs@vger.kernel.org>; Thu, 15 Jan 2026 02:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768420891; cv=none; b=RFLSVhUu0UvB+yLS9GDCCrFTuUdEURPFqBGcc7APjBkD5hE4uKc2IAQOqqG4syhk7FJol68ZqVHqRwAeRhH6jXs+LDKsQ8xVUKYCdLlVhXw0DovuBjAe7uaIixYg9qWGEPFh0mhQjv5dGCCtEPltfiacAZkoXHB5kjkH+Xy8ryU=
+	t=1768442498; cv=none; b=u5Qk1YVwJddBj5SgR8ZIR/HVnZfq6S9bi6dru7N1S/A4Q602JswK9YitBYhuyVuHNxb5mCjYFtmKqVU5AbpPmOEpP/0mATYPvp0bAqHITXhlsn8dlL0Llq0IvrV7vqKaUsGxppsQWYAcJTlmTxGUA0xP6SD8yYoRWAGAwJ1o3NA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768420891; c=relaxed/simple;
-	bh=UjkIcWoNSe9/a1EUTFB+7URBpKEndTzvxBxd5f8spV4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P7IkxCWi/UOMhrhu/KElqhj/5rnUYpl1pxz3j/7oNjAjDrc+8EKZD00NXTjTcYaXzZ6H/gU7JMj0QrasjhqH21S+5hclxQ3a9f0PGO3AaitrJPQl0ikL3nj/8+cBpWy3sCiwabSSNEpvC0539z0hB1VLAvEetynFzZbqQ/Ct3f0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hBZwUrWp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768442498; c=relaxed/simple;
+	bh=DkVv3ggPA/6N7/ir/fzJJuTkTVceOMxCAOgDYhUF5P0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YPqK+dj/Jg7r2pIXdhLAu+cBuo2ImUyxZHyxHYK0RByTSlSRQo7ZBYaFapDSI7+XK481kwXw+msutDw4PcExIwkE35v3W3kPJBE3kWPzd/o00ogs9QGR0vMdoq5aSjYbsBtaHENiDeww02cuhmiyGthm0pkH2q/iP7sXwPLqZDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c9z8iLqp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hBZwUrWp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F65BC4CEF7;
-	Wed, 14 Jan 2026 20:01:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c9z8iLqp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D79A1C16AAE
+	for <linux-cifs@vger.kernel.org>; Thu, 15 Jan 2026 02:01:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768420891;
-	bh=UjkIcWoNSe9/a1EUTFB+7URBpKEndTzvxBxd5f8spV4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hBZwUrWpkL7RNu1xJ2TiDEUsEWnQvVHTuq5cXS+8nyD7SG5Fh5ZhgVNWowLeQ7Tc0
-	 g+uWq71bqae6Iev8H5mVgUAdPVj+NLr7hR091p+EixtcdjV5G8lXJ/q+b3WomXtG1s
-	 bop0BcRwdDYFAunxuihoSnRx/IpWVXMoE5kplK8mCxexB7AWACk2ciiErmZ2uYl3SO
-	 LNfFoOGHwpHYIfA6yNzyYLHWioN6voRWLcJbGCv+grQjNJnmLK16A+BVB3sErelXBF
-	 HIK6FJc0y+d5AikHOkaA01i2j5Igi01j8vJNeEcBIqQTJGTA1FiFHTT6mECNnRRWMO
-	 O1EKRXZzIefcQ==
-Date: Wed, 14 Jan 2026 12:01:30 -0800
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Chuck Lever <cel@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, vira@imap.suse.de,
-	Christian Brauner <brauner@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Yuezhang Mo <yuezhang.mo@sony.com>,
-	almaz.alexandrovich@paragon-software.com,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	glaubitz@physik.fu-berlin.de, frank.li@vivo.com,
-	Theodore Tso <tytso@mit.edu>, adilger.kernel@dilger.ca,
-	Carlos Maiolino <cem@kernel.org>, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Chao Yu <chao@kernel.org>, Hans de Goede <hansg@kernel.org>,
-	senozhatsky@chromium.org, Chuck Lever <chuck.lever@oracle.com>
-Subject: Re: [PATCH v4 01/16] fs: Add case sensitivity info to file_kattr
-Message-ID: <20260114200130.GJ15551@frogsfrogsfrogs>
-References: <20260114142900.3945054-1-cel@kernel.org>
- <20260114142900.3945054-2-cel@kernel.org>
- <3kq2tbdcoxxw3y2gseg7vtnhnze5ee536fu4rnsn22yjrpsmb4@fpfueqqiji5q>
- <7b6aa90f-79dc-443a-8e5f-3c9b88892271@app.fastmail.com>
+	s=k20201202; t=1768442497;
+	bh=DkVv3ggPA/6N7/ir/fzJJuTkTVceOMxCAOgDYhUF5P0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=c9z8iLqpwIdQWJ8QIKm6ytf8a4iHzOqfpkkmFjUega5KKE04PLbDVehATuR0KatG+
+	 jcAYhfOW3Hcbg0r0pdTpeHGofQ6qD2zQxvp+OCGoYOcqwJeePnxOUMvLTDODGcBHpl
+	 45EPtEFMJiZ3on2bG83fAi1aBOG1A2uommo7/elCT593Ip12Ls5/iA6WCRXMDQhyvj
+	 ptPqWyvyU9UdOY9jeE4xgt3cmFtqaPss6PcZYuI5gLepYSLNZVsFHIQo3jteOGomJl
+	 Jk0TxiURwuh8xf2jBiIYPVEykZ4sTC7aBXOVZ3uCOEzUiDzk42ekDIQ7FUiFzFXqQt
+	 Ajh4ewB1MJNXA==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b86f81d8051so65373866b.1
+        for <linux-cifs@vger.kernel.org>; Wed, 14 Jan 2026 18:01:37 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUv05JnSfq97cEXfJcCPtNFoWL+OrC7gXEbHPRFMg/rnYUd1gWjW7Cqv80Mp9gcysRdhy4OpLBagnTW@vger.kernel.org
+X-Gm-Message-State: AOJu0YwirvBxDW/EgBt8pMNQz/BXFuVeunFtYi+mgjSzi24rpI1vet1/
+	t0p5xkugdRRC7dNbK4ibR9T/qbiKaiphP1Jb59iylatPrl0AmokT92bo9yDhPZ6U6qQQ/Q+lR9y
+	SehBTigMc2mMq+k1N8Ulx7OxFzRDcBS0=
+X-Received: by 2002:a17:907:96a7:b0:b87:e76:67a5 with SMTP id
+ a640c23a62f3a-b8777c1a984mr130471266b.24.1768442496411; Wed, 14 Jan 2026
+ 18:01:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7b6aa90f-79dc-443a-8e5f-3c9b88892271@app.fastmail.com>
+References: <35eec2e6-bf37-43d6-a2d8-7a939a68021b@samba.org>
+ <CAKYAXd9p=7BzmSSKi5n41OKkkw4qrr4cWpWet7rUfC+VT-6h1g@mail.gmail.com>
+ <f59e0dc7-e91c-4a13-8d49-fe183c10b6f4@samba.org> <CAKYAXd-MF1j+CkbWakFJK2ov_SfRUXaRuT6jE0uHZoLxTu130Q@mail.gmail.com>
+ <CAKYAXd__T=L9aWwOuY7Z8fJgMf404=KQ2dTpNRd3mq9dnYCxRw@mail.gmail.com>
+ <86b3c222-d765-4a6c-bb79-915609fa3d27@samba.org> <a3760b26-7458-40a0-ae79-bb94dd0e1d01@samba.org>
+ <3c0c9728-6601-41f1-892f-469e83dd7f19@samba.org> <721eb7b1-dea9-4510-8531-05b2c95cb240@samba.org>
+ <CAKYAXd-WTsVEyONDmOMbKseyAp29q71KiUPwGDp2L_a53oL0vg@mail.gmail.com>
+ <183d92a0-6478-41bb-acb3-ccefd664d62f@samba.org> <ee6873d7-6e47-4d42-9822-cb55b2bfb79e@samba.org>
+ <6a248fde-e0cd-489b-a640-d096fb458807@samba.org>
+In-Reply-To: <6a248fde-e0cd-489b-a640-d096fb458807@samba.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 15 Jan 2026 11:01:23 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-42_fSHBL7iZbuOtYFKqKyhPS-4C+nqbX=-Djq5L6Okg@mail.gmail.com>
+X-Gm-Features: AZwV_QiICHmZTgWfUa8HpPmEG2AIn5JtvyNQUfRqLhCdXNs6jRjKxnX9Ow3akaM
+Message-ID: <CAKYAXd-42_fSHBL7iZbuOtYFKqKyhPS-4C+nqbX=-Djq5L6Okg@mail.gmail.com>
+Subject: Re: Problem with smbdirect rw credits and initiator_depth
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Tom Talpey <tom@talpey.com>, 
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 14, 2026 at 02:01:14PM -0500, Chuck Lever wrote:
-> 
-> 
-> On Wed, Jan 14, 2026, at 1:11 PM, Jan Kara wrote:
-> > On Wed 14-01-26 09:28:44, Chuck Lever wrote:
-> >> From: Chuck Lever <chuck.lever@oracle.com>
-> >> 
-> >> Enable upper layers such as NFSD to retrieve case sensitivity
-> >> information from file systems by adding case_insensitive and
-> >> case_nonpreserving boolean fields to struct file_kattr.
-> >> 
-> >> These fields default to false (POSIX semantics: case-sensitive and
-> >> case-preserving), allowing filesystems to set them only when
-> >> behavior differs from the default.
-> >> 
-> >> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> > ...
-> >> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-> >> index 66ca526cf786..07286d34b48b 100644
-> >> --- a/include/uapi/linux/fs.h
-> >> +++ b/include/uapi/linux/fs.h
-> >> @@ -229,10 +229,20 @@ struct file_attr {
-> >>  	__u32 fa_nextents;	/* nextents field value (get)   */
-> >>  	__u32 fa_projid;	/* project identifier (get/set) */
-> >>  	__u32 fa_cowextsize;	/* CoW extsize field value (get/set) */
-> >> +	/* VER1 additions: */
-> >> +	__u32 fa_case_behavior;	/* case sensitivity (get) */
-> >> +	__u32 fa_reserved;
-> >>  };
-> >>  
-> >>  #define FILE_ATTR_SIZE_VER0 24
-> >> -#define FILE_ATTR_SIZE_LATEST FILE_ATTR_SIZE_VER0
-> >> +#define FILE_ATTR_SIZE_VER1 32
-> >> +#define FILE_ATTR_SIZE_LATEST FILE_ATTR_SIZE_VER1
-> >> +
-> >> +/*
-> >> + * Case sensitivity flags for fa_case_behavior
-> >> + */
-> >> +#define FS_CASE_INSENSITIVE	0x00000001	/* case-insensitive lookups */
-> >> +#define FS_CASE_NONPRESERVING	0x00000002	/* case not preserved */
+On Thu, Jan 15, 2026 at 3:13=E2=80=AFAM Stefan Metzmacher <metze@samba.org>=
+ wrote:
+>
+> Am 15.12.25 um 21:17 schrieb Stefan Metzmacher:
+> > Am 14.12.25 um 23:56 schrieb Stefan Metzmacher:
+> >> Am 13.12.25 um 03:14 schrieb Namjae Jeon:
+> >>>> I've put these changes a long with rw credit fixes into my
+> >>>> for-6.18/ksmbd-smbdirect-regression-v4 branch, are you able to
+> >>>> test this?
+> >>> Problems still occur. See:
+> >>
+> >> :-( Would you be able to use rxe and cake a network capture?
+> >>
+> >> Using test files with all zeros, e.g.
+> >> dd if=3D/dev/zero of=3D/tmp/4096MBzeros-sparse.dat seek=3D4096MB bs=3D=
+1 count=3D1
+> >> would allow gzip --best on the capture file to compress well...
 > >
-> > This is a matter of taste so not sure what others think about it but
-> > file_attr already have fa_xflags field and there is already one flag which
-> > doesn't directly correspond to on-disk representation (FS_XFLAG_HASATTR) so
-> > we could also put the two new flags in there... I have hard time imagining
-> > fa_case_behavior would grow past the two flags you've introduced so u32
-> > seems a bit wasteful.
-> 
-> No problem. I'll wait for additional guidance on this.
+> > I think I found something that explains it and
+> > I was able to reproduce and what I have in mind.
+> >
+> > We increment recv_io.posted.count after ib_post_recv()
+> >
+> > And manage_credits_prior_sending() uses
+> >
+> > new_credits =3D recv_io.posted.count - recv_io.credits.count
+> >
+> > But there is a race between the hardware receiving a message
+> > and recv_done being called in order to decrement recv_io.posted.count
+> > again. During that race manage_credits_prior_sending() might grant
+> > too much credits.
+> >
+> > Please test my for-6.18/ksmbd-smbdirect-regression-v5 branch,
+> > I haven't tested this branch yet, I'm running out of time
+> > for the day.
+> >
+> > But I tested it with smbclient and having a similar
+> > logic in fs/smb/common/smbdirect/smbdirect_connection.c
+>
+> I was able to reproduce the problem and the fix I created
+> for-6.18/ksmbd-smbdirect-regression-v5 was not correct.
+>
+> I needed to use
+>
+> available =3D atomic_xchg(&sc->recv_io.credits.available, 0);
+>
+> instead of
+>
+> available =3D atomic_read(&sc->recv_io.credits.available);
+> atomic_sub(new_credits, &sc->recv_io.credits.available);
+>
+> This following branch works for me:
+> for-6.18/ksmbd-smbdirect-regression-v7
+> and with the fixes again master this should also work:
+> for-6.19/ksmbd-smbdirect-regression-v1
+>
+> I'll post real patches tomorrow.
+>
+> Please check.
+Okay, I will test it with two branches.
+I'll try it too, but I recommend running frametest for performance
+difference and stress testing.
 
-Sounds like a better use of space in struct file_attr than adding
-another pair of u32.
+https://support.dvsus.com/hc/en-us/articles/212925466-How-to-use-frametest
 
---D
+ex) frametest.exe -w 4k -t 20 -n 2000
 
-> 
-> -- 
-> Chuck Lever
-> 
+Thanks.
+>
+> Thanks!
+> metze
+>
