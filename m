@@ -1,110 +1,226 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F002E224B0E
-	for <linux-cifs@vger.kernel.org>; Fri, 16 Jan 2026 14:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F46D2877E8;
+	Fri, 16 Jan 2026 14:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768573908; cv=none; b=mrxexWtk+4I1r7ra7oIJLLHzuHn/VRlatRPmzY/dE/LU8pZgbCBN45+PN2E5TD/fq/vKjYgQs3zgieT7qkhiJP/5BmqReBgkviRY6R7W8PY7xDh5jbdVQrEUJAkFNXhip8m/dky29eYqD72gD9ss8pUON+0N3QnWvjvhoY0UCCI=
+	t=1768574781; cv=none; b=JZwXksnCgaDiYBA1NaEO6hByfgO2qlElrSeFvrWJ6AInuYJSE3Ba+0R/jR9C+uyQ8InFCrbn394J588RfeYU1gTNEyCxiavMPtDOxKr8iwO8jJtDBp9+iCQL9Nilzb5aKwiYNxghXowdDCUUS8dBbGEo7zHu95cei4xz9+crUro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768573908; c=relaxed/simple;
-	bh=7q0W8nTjswikItGggKjqhBPI0Alsvd1nVRiRZiHOPww=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LJMCACsKZ2IMSeqyVFH9v+ZfREqk6JZ/rEJLk6FbSXrcxiCqD9XWIBKVNnXNMbTefgZfJl1gVXJzdQOsZvTVNZDv60N3P5B4ejrLXA4FGEq9K6vMjIQo1SBq49HK2aLNsuDaverL2WJl/pg9PdMqScQYzIVtYkouBd/PMJ0Naek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sGD5hFGi; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1768574781; c=relaxed/simple;
+	bh=o8n9v+A8uQ1g3lXW02yP/a69ri374d7UcRTZHdCsRfo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZZVbJ9Eu75PBDJdzHyo+vERmcBOjhA2Eun8btZV9Mh66r81RA7e+ZusCUkPDEquX42tGtyr9OKXhO7j6Wn/LcBZroEK/hmYM7ntKb8IPdgrx9SaU7a3Jou4xJ+Nr+i5YY3jK4/FSniKAJfBdN7yn83cunuv4uQ6JVBRaHGatDUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ovd30LnK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sGD5hFGi"
-Message-ID: <3782f12b-b2be-42d0-a91b-eb1239548684@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768573903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+Y3so5kiFx6TKmQLP22NKR2OBaYe4Z76bjuqjw74dnM=;
-	b=sGD5hFGioLFTxBC6HQmR4l1bwcBNOUj5dDm/Oc/J71TGa3rRhQTpZcY8Qjx3n+D1X0A/we
-	NaxruQJ8+Fv1Q/CbNVU4QfBjXFxJZogLXo8PIv61vLMamhD5c8lC79cNCw1qj/h0o1+PwO
-	K90u3SfTXFASHu2UQyBnlOfkrAidgsU=
-Date: Fri, 16 Jan 2026 22:30:57 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ovd30LnK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D52CC116C6;
+	Fri, 16 Jan 2026 14:46:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768574780;
+	bh=o8n9v+A8uQ1g3lXW02yP/a69ri374d7UcRTZHdCsRfo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ovd30LnKAovneMXvvNa8BsiFcuewh18ZU+tmt32Z9MW1ETPkcpdSIknDhL2yh+AHC
+	 XKfYtiapFj5qix0+mOay6JtRThxrd48PUYKP0xA3e2mge50zfzlCeTASmXatU+ok+T
+	 5g0XsefbC7F0x9fkioI0nS41J0SD3NuC3bVZVmzC+xHKB5km2x7mgIOkii97NAKGYZ
+	 KF1ayeTq2zztaOkVQh+2yLrjKSw01NeZ0MQkmupsphQYwYaRoPKFrzlMXMJr+WRK7W
+	 wn1FS8XW3k6541PIyJl8GqGdacKfg3WKse8lPJWZtvgfO4zkq+0Acuz5uUKwKhTDXO
+	 bznniMeWHselg==
+From: Chuck Lever <cel@kernel.org>
+To: Al Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>
+Cc: <linux-fsdevel@vger.kernel.org>,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	<linux-nfs@vger.kernel.org>,
+	linux-f2fs-devel@lists.sourceforge.net,
+	hirofumi@mail.parknet.co.jp,
+	linkinjeon@kernel.org,
+	sj1557.seo@samsung.com,
+	yuezhang.mo@sony.com,
+	almaz.alexandrovich@paragon-software.com,
+	slava@dubeyko.com,
+	glaubitz@physik.fu-berlin.de,
+	frank.li@vivo.com,
+	tytso@mit.edu,
+	adilger.kernel@dilger.ca,
+	cem@kernel.org,
+	sfrench@samba.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	trondmy@kernel.org,
+	anna@kernel.org,
+	jaegeuk@kernel.org,
+	chao@kernel.org,
+	hansg@kernel.org,
+	senozhatsky@chromium.org,
+	Chuck Lever <chuck.lever@oracle.com>
+Subject: [PATCH v5 00/16] Exposing case folding behavior
+Date: Fri, 16 Jan 2026 09:45:59 -0500
+Message-ID: <20260116144616.2098618-1-cel@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v8 2/5] cifs: Autogenerate SMB2 error mapping table
-To: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aurelien.aptel@gmail.com>
-Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
- ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
- bharathsm@microsoft.com, senozhatsky@chromium.org, dhowells@redhat.com,
- linux-cifs@vger.kernel.org, Steve French <stfrench@microsoft.com>,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20260106071507.1420900-1-chenxiaosong.chenxiaosong@linux.dev>
- <20260106071507.1420900-3-chenxiaosong.chenxiaosong@linux.dev>
- <CA+5B0FOT_H1vO+9cfSbpFsUauQ_V1KM0GGKjp=+_K+z-SEWNeA@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <CA+5B0FOT_H1vO+9cfSbpFsUauQ_V1KM0GGKjp=+_K+z-SEWNeA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-I am concerned that X macros may make the code harder to read. What do 
-others think?
+From: Chuck Lever <chuck.lever@oracle.com>
 
-Thanks,
-ChenXiaoSong <chenxiaosong@kylinos.cn>
+Following on from
 
-On 1/16/26 21:48, Aurélien Aptel wrote:
-> May I suggest using X macros?
-> you don't need pre-processing and generation of files and you can keep
-> as much metadata as you want in the macro at zero runtime cost and
-> build what you need.
-> 
-> You can have one .h file like this:
-> 
-> #define SMB2_ERR_LIST \
->   X(STATUS_WAIT_1, 0x00000000, -EIO, <whatever else>) \
->   X(STATUS_WAIT_2, 0x00000001, -EIO, <whatever else>) \
-> ...
-> 
-> and then do things like:
-> 
-> enum smb2_error {
-> #define X(code, val, ...) code = cpu_to_le32(val),
-> SMB2_ERR_LIST
-> #undef X
-> };
-> 
-> Might have to use typed enum to get the le32 through
->   https://gcc.gnu.org/onlinedocs/gcc/Enum-Extensions.html
-> 
-> struct smb2_errno_map { le32 code; const char *name; int errno; };
-> struct smb2_errno_map smb2_to_errno[] = {
-> #define X(name, val, errno, ...) {cpu_to_le32(val), #name, errno},
-> SMB2_ERR_LIST
-> #undef X
-> };
-> 
-> Also you can use bsearch() to do log(N) lookup. But maybe the compiler
-> optimizes a larger switch to the same thing already.
-> 
-> static int cmp_smb2_err(const void *key, const void *elt)
-> {
->      return *(const enum smb2_error *)key - ((const struct
-> smb2_errno_map *)elt)->val;
-> }
-> 
-> int smb2_err_lookup(enum smb2_error err)
-> {
->      struct smb2_errno_map *res = bsearch(&err, smb2_to_errno,
-> ARRAY_SIZE(smb2_to_errno), sizeof(smb2_to_errno[0]), cmp_smb2_err);
->      ...
-> }
-> 
-> 
-> (code untested)
+https://lore.kernel.org/linux-nfs/20251021-zypressen-bazillus-545a44af57fd@brauner/T/#m0ba197d75b7921d994cf284f3cef3a62abb11aaa
+
+I'm attempting to implement enough support in the Linux VFS to
+enable file services like NFSD and ksmbd (and user space
+equivalents) to provide the actual status of case folding support
+in local file systems. The default behavior for local file systems
+not explicitly supported in this series is to reflect the usual
+POSIX behaviors:
+
+  case-insensitive = false
+  case-nonpreserving = true
+
+The case-insensitivity and case-nonpreserving booleans can be
+consumed immediately by NFSD. These two attributes have been part of
+the NFSv3 and NFSv4 protocols for decades, in order to support NFS
+client implementations on non-POSIX systems.
+
+Support for user space file servers is why this series exposes case
+folding information via a user-space API. I don't know of any other
+category of user-space application that requires access to case
+folding info.
+
+
+The Linux NFS community has a growing interest in supporting NFS
+clients on Windows and MacOS platforms, where file name behavior does
+not align with traditional POSIX semantics.
+
+One example of a Windows-based NFS client is [1]. This client
+implementation explicitly requires servers to report
+FATTR4_WORD0_CASE_INSENSITIVE = TRUE for proper operation, a hard
+requirement for Windows client interoperability because Windows
+applications expect case-insensitive behavior. When an NFS client
+knows the server is case-insensitive, it can avoid issuing multiple
+LOOKUP/READDIR requests to search for case variants, and applications
+like Win32 programs work correctly without manual workarounds or
+code changes.
+
+Even the Linux client can take advantage of this information. Trond
+merged patches 4 years ago [2] that introduce support for case
+insensitivity, in support of the Hammerspace NFS server. In
+particular, when a client detects a case-insensitive NFS share,
+negative dentry caching must be disabled (a lookup for "FILE.TXT"
+failing shouldn't cache a negative entry when "file.txt" exists)
+and directory change invalidation must clear all cached case-folded
+file name variants.
+
+Hammerspace servers and several other NFS server implementations
+operate in multi-protocol environments, where a single file service
+instance caters to both NFS and SMB clients. In those cases, things
+work more smoothly for everyone when the NFS client can see and adapt
+to the case folding behavior that SMB users rely on and expect. NFSD
+needs to support the case-insensitivity and case-nonpreserving
+booleans properly in order to participate as a first-class citizen
+in such environments.
+
+Series based on v6.19-rc5.
+
+[1] https://github.com/kofemann/ms-nfs41-client
+
+[2] https://patchwork.kernel.org/project/linux-nfs/cover/20211217203658.439352-1-trondmy@kernel.org/
+
+---
+
+Changes since v4:
+- Observe the MSDOS "nocase" mount option
+- Define new FS_XFLAGs for the user API
+
+Changes since v3:
+- Change fa->case_preserving to fa->case_nonpreserving
+- VFAT is case preserving
+- Make new fields available to user space
+
+Changes since v2:
+- Remove unicode labels
+- Replace vfs_get_case_info
+- Add support for several more local file system implementations
+- Add support for in-kernel SMB server
+
+Changes since RFC:
+- Use file_getattr instead of statx
+- Postpone exposing Unicode version until later
+- Support NTFS and ext4 in addition to FAT
+- Support NFSv4 fattr4 in addition to NFSv3 PATHCONF
+
+
+Chuck Lever (16):
+  fs: Add case sensitivity info to file_kattr
+  fat: Implement fileattr_get for case sensitivity
+  exfat: Implement fileattr_get for case sensitivity
+  ntfs3: Implement fileattr_get for case sensitivity
+  hfs: Implement fileattr_get for case sensitivity
+  hfsplus: Report case sensitivity in fileattr_get
+  ext4: Report case sensitivity in fileattr_get
+  xfs: Report case sensitivity in fileattr_get
+  cifs: Implement fileattr_get for case sensitivity
+  nfs: Implement fileattr_get for case sensitivity
+  f2fs: Add case sensitivity reporting to fileattr_get
+  vboxsf: Implement fileattr_get for case sensitivity
+  isofs: Implement fileattr_get for case sensitivity
+  nfsd: Report export case-folding via NFSv3 PATHCONF
+  nfsd: Implement NFSv4 FATTR4_CASE_INSENSITIVE and
+    FATTR4_CASE_PRESERVING
+  ksmbd: Report filesystem case sensitivity via FS_ATTRIBUTE_INFORMATION
+
+ fs/exfat/exfat_fs.h      |  2 ++
+ fs/exfat/file.c          | 16 ++++++++++++++--
+ fs/exfat/namei.c         |  1 +
+ fs/ext4/ioctl.c          |  6 ++++++
+ fs/f2fs/file.c           |  6 ++++++
+ fs/fat/fat.h             |  3 +++
+ fs/fat/file.c            | 20 ++++++++++++++++++++
+ fs/fat/namei_msdos.c     |  1 +
+ fs/fat/namei_vfat.c      |  1 +
+ fs/file_attr.c           |  6 ++++++
+ fs/hfs/dir.c             |  1 +
+ fs/hfs/hfs_fs.h          |  2 ++
+ fs/hfs/inode.c           | 12 ++++++++++++
+ fs/hfsplus/inode.c       |  7 +++++++
+ fs/isofs/dir.c           | 11 +++++++++++
+ fs/nfs/client.c          |  9 +++++++--
+ fs/nfs/inode.c           | 18 ++++++++++++++++++
+ fs/nfs/internal.h        |  3 +++
+ fs/nfs/nfs3proc.c        |  2 ++
+ fs/nfs/nfs3xdr.c         |  7 +++++--
+ fs/nfs/nfs4proc.c        |  2 ++
+ fs/nfs/proc.c            |  3 +++
+ fs/nfs/symlink.c         |  3 +++
+ fs/nfsd/nfs3proc.c       | 18 ++++++++++--------
+ fs/nfsd/nfs4xdr.c        | 30 ++++++++++++++++++++++++++----
+ fs/nfsd/vfs.c            | 25 +++++++++++++++++++++++++
+ fs/nfsd/vfs.h            |  2 ++
+ fs/ntfs3/file.c          | 22 ++++++++++++++++++++++
+ fs/ntfs3/inode.c         |  1 +
+ fs/ntfs3/namei.c         |  2 ++
+ fs/ntfs3/ntfs_fs.h       |  1 +
+ fs/smb/client/cifsfs.c   | 18 ++++++++++++++++++
+ fs/smb/server/smb2pdu.c  | 25 +++++++++++++++++++------
+ fs/vboxsf/dir.c          |  1 +
+ fs/vboxsf/file.c         |  6 ++++--
+ fs/vboxsf/super.c        |  4 ++++
+ fs/vboxsf/utils.c        | 30 ++++++++++++++++++++++++++++++
+ fs/vboxsf/vfsmod.h       |  6 ++++++
+ fs/xfs/xfs_ioctl.c       |  6 ++++++
+ include/linux/fileattr.h |  6 +++++-
+ include/linux/nfs_xdr.h  |  2 ++
+ include/uapi/linux/fs.h  |  2 ++
+ 42 files changed, 322 insertions(+), 27 deletions(-)
+
+-- 
+2.52.0
 
