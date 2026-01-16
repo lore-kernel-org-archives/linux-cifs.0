@@ -1,270 +1,653 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27943325739
-	for <linux-cifs@vger.kernel.org>; Fri, 16 Jan 2026 17:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768586074; cv=none; b=ViafONaANRUALJDbguGhZIh0wbTd63ZOybOSDuALJldikO640oMhKKshnyVg0hBXHvYaWZAIwtgL9vWL88U7CX+C3xgOuhM5y9a8y5Hd7EJC/KgYl51WoBleMxozJk9IdH/G191vyqxAsrGI+nAjqqei0Xapbvzc04+MNgV7MTk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768586074; c=relaxed/simple;
-	bh=zOUgS9cIXWtt+OFT+FgmnROWq+iTmnVsZJ31/tf5xKg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BeBgN8JrTvor4iJbrHvnOAEIgMpG2MNkH4oSZBQjEkPJz6eCH4USc8q74OhtYrsk3gycJocvf9uHIYt2jTdbWC0R6QwK3BLtrlvlYdCCbNXxQqFIpBULSd3RD6u1nHeQiP46n3FgshJIxgYpwasy5FHb7zV9rpamWh6seUZYQlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=TMCO6zr5; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52783A1D02
+	for <linux-cifs@vger.kernel.org>; Fri, 16 Jan 2026 19:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768593369; cv=pass; b=epawLE4izLVkk2vnrQyUCFaX+xgB595Xn+1WXXD8oChWVbHzO7OE09vj7tf/t7w9lii2+7Ftsrvxfz+VEwPKZMLE+CqFWVMqdo4oYy+8KlX/Y5FaYAN060kiuR3uP1GSNk61sTnc6xvDcPJ0zqwWsKPrxvgmlXV3eHtWRJxWOj4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768593369; c=relaxed/simple;
+	bh=IWmMPimbXDtPvSp9dAjyQtCrQgxzce8BWN+6we3ehRM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q2tY9Ej9zJBcc+Wxo6KN5V85Wpl5XRzpEYVC+XKXfE6GyNpt0+tSoqWKZXPY9TpreEpkF/l2PKrfRuQw4aDpH3j144fJULWZylRIULI+93NkMtwhPCT3qoLT7mXhdUI6H135J7obMZo8Y86NJkgfjfE7f7AU45kT1MrEuKQzJtU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CHvi/iaX; arc=pass smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="TMCO6zr5"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-480142406b3so11400885e9.1
-        for <linux-cifs@vger.kernel.org>; Fri, 16 Jan 2026 09:54:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CHvi/iaX"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-34be2be4b7cso1376051a91.3
+        for <linux-cifs@vger.kernel.org>; Fri, 16 Jan 2026 11:56:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768593365; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fzLHDXUdsYRn66EQpfazxkeHyYMMRPvHHPJ8uTUHhvax0/0qwK+7ooo8GiY/JYm4E4
+         aaVmYL7QQAsZ+BCssIXQm/eIk3gQxhWIYowemnJb6b0G/bUdLLYJJOgpqAHHYhzpmYkD
+         HmjKRCewcoGn5qOK49f3jBuIFy3gmfDd2rH1ywqAfyueY3O2YjIcws7XX8gIUIHVYUqK
+         Y7uZbiWCUwoe3VEQ5J6vh8utBTgFAUBvi7AgegkkCSV+HgShhT+EL+XZoD6vhfu6V/Yi
+         uVp0kmFqffRjUvlkWLYNLklaxKsZNpIohqpR2QevtP/wzRhz71yL8UXdXPFKBdPYkU/J
+         /cXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=v7luFe9q5FyU1n9+ffSge7aXZuT6jKQVxOiNsHnXneU=;
+        fh=vGWaKmyKLY59d6B+EG+7Hoo9S/ljnKMqlsF911vzvYg=;
+        b=gwIDfK4pTNafiCZPLFF157Vro5XP4rIC2cU5jMRA5gCfj+SgqrW3q/lgXm+EYPrvoC
+         fxbHI+PzuVE3OuCXiM33V9nzFUFMDIkgtRn86ItOew/UpivbZQ23EQT5Lz5YsGs6cA1i
+         45DT+Lh8gSu4Ku0p8NHVWKQUxi+3KcYjUzlsUkhWNybBugS4ZycsJClt/VbY17i59BGt
+         1Om+7OpqPv+0H/vUNOK80rvUq1rePyd/9nCBGBLWuhuTgFz85BSCXgscx8iKPVFrzTnr
+         Kjk8RDk7K40Rg/8Uv9FfpTmEKIA+UN+BMOIa8Zkha9MaId4YrxGqHX11uglPezSKELDO
+         Txtg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768586071; x=1769190871; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dCoN+wTEKMK6+sDOH6rgER1drfsGvKBj0S2n6sfd+Zw=;
-        b=TMCO6zr5tUog7m5kcQr5WzUMi3R+yd3tFTPOdfaMrHTbnIWUfwH2xG/Bb68bKNhXMZ
-         l+PJbkvcA1Q/CPCP9GwuefF9+5CrAYMi50UXi4QjjuJCVqcZMH1ygMQLAGnERc5YxEtQ
-         VIa7uf797Huf4spAKfoDSzuwTAftEd3X8kQcYrG3C2xqJHTDBV3II8q5ztlEJPUYYAXq
-         NnGLlLwBV6blUF43HFGy9vqYfhomB6KeEF+/niO3+xvT0erjI+s1nDXCh2KokXW/+9ds
-         1J9a3Ib8to84DwtOlHU2Y9GjxUZDUf9A2yXw9uTOupVg8Q0/AgGLMn1Vei24cqNerwqn
-         OG1w==
+        d=gmail.com; s=20230601; t=1768593365; x=1769198165; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v7luFe9q5FyU1n9+ffSge7aXZuT6jKQVxOiNsHnXneU=;
+        b=CHvi/iaXxSTBLKYH0jXZesaAt/lhArn8zHqbsFZYIXLmows2RrebCZhXmn5opwRutL
+         DLzyZO7Vg+R4AtuwtUG+phfpF+jaXxkUt7BM3YuK3DyBPe19Kz8/t3kWUmZlquNVorsK
+         3CGpnEqggfI15kDtD6/bBwC+u1x5F/inodLrGtbUwsCCywmfOT8aoItaP7l7dWw/pY/C
+         ziZxc6hO007a9B1DS5eZ58MNM3hpS71HX8pOyOiEfBaAyd718E0f6BxcsjYx6ZVxeuXC
+         MOiq6W7uf3foH9ZGkU9nsZUm6TawTZwbUjZz6Z65WoSEu8gZeTW5PENXNkrplWJTo1mS
+         mwqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768586071; x=1769190871;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dCoN+wTEKMK6+sDOH6rgER1drfsGvKBj0S2n6sfd+Zw=;
-        b=uUELdtd/QXxrXyPy/o37C8ZwUgT00LCbEf7kjS6K4FPCGH+JJ+cZF+JY9l2YCzwjnM
-         gXWTM5uB4N8L9eXiFCafxSm8TBiX+s5KUWnaFWkM/ebCXq+CGnzAHyanw1x/RzMEzDDR
-         9eJmetMNetchNbOEb63vB7jUXpL1xhcb7V1o5QLSbEufTfLD2jysJmbqYfJxpXU638Ux
-         b6BqesDpeGZAakRvK5YN7jgu4lonRnyrWjfn4WocnGmY7mu3K5+3KXXMmvfbpU5/RQ3x
-         PdnJoIvFWaop0J1sULQCLc4BYR1I6FrPtv79qzoC8tY35lTSWtdOVYvw8AURPN+P9Whj
-         8IDw==
-X-Forwarded-Encrypted: i=1; AJvYcCUKvLsK/jy50LkZOO7X8yu1/5BknZXkpuArRlcRN8psj+Xv3AzpVd9Gt31OD2Tq0jYB9EPgYRQChsFJ@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFovh1wjTH2enRts3QRx8i5HjItAUzIPf22GQ5jD0Rydrj4OGe
-	co74BsytlP7So5Kb+gGuPkhHbQsZu/ZXJgDvI4r4UHhVVFaSh3i72q6sOxOyN0G8T/1QTRdRPbI
-	EZzV2
-X-Gm-Gg: AY/fxX5L1zDKvlXf7CeZg5/iZ+U1qIG8AxCF7ekfAdpt90fJjOhQnVre7zPWM2gwbfU
-	LnLwQDakJppXRiXBDL4AkI/tyl5suA6jWlUATzMitcEP+MEn0NuK+fHF/I6pzVUTbf+xXUwqrn1
-	+w6zR2WdRiTxOOf+0jqG9X6hWP6bqw75ENc6c6bPsn64LpYCjc+/F4JtR2yPg5tBh4obqgcRZot
-	Fgin5PSmKgpOecZgLR2b7GP/Vjx2dvlUgEzEMsZf+8hgeukfl8ZpvWsI07AIX53vfNzVBPuLfsd
-	rlE0SdT2Di7wIohPDJJGboE32p/U6S/dCwI21IImTocjIYinuktjIFoF/hdSA9Mgh4MmJDgCQ+l
-	p2koX8oyaz/dFAGmwJ69MivEImxbpzOsPI2RuBns/UT5OmZ9LiJiwAhiY47wCmYecIVbqzQuf/y
-	ZIv0w+oxQPHIfTUD1p0A==
-X-Received: by 2002:a05:600c:4eca:b0:47e:e2b0:15b8 with SMTP id 5b1f17b1804b1-48025ded313mr10876035e9.4.1768586071299;
-        Fri, 16 Jan 2026 09:54:31 -0800 (PST)
-Received: from precision ([138.121.131.195])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b6b34c11dasm3444616eec.2.2026.01.16.09.54.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jan 2026 09:54:30 -0800 (PST)
-Date: Fri, 16 Jan 2026 14:54:24 -0300
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] smb: client: introduce multichannel async work during
- mount
-Message-ID: <7p7wumkoaywahsazb43kkhvdy74nxpgijqfofo7knrvy42cf54@luja4rcxi63s>
-References: <20260116153548.223614-1-henrique.carvalho@suse.com>
- <crmq6jjsp5iknahbeo2d6lf7gbmrnmqcqgnfuq4sjxulw3sdku@ik35hhy3zkst>
+        d=1e100.net; s=20230601; t=1768593365; x=1769198165;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=v7luFe9q5FyU1n9+ffSge7aXZuT6jKQVxOiNsHnXneU=;
+        b=IMqsYGYiGSWxgCs20So0xPHwfAybGW40hwKc4F0VP94QHBFCv/NB7ugnqbc+p6N6qM
+         Ah+quHXYE8MqonKwbZi3i4NLjzFbu7mPYW62ScNNE+ef/OmPw0r/vwRvF/4zMBDellOo
+         uG+9EUZJ23inqZqhsOJNeqDxLhooEyjBQs1WUgSZbJiQ8oqMaXzLW/83klGxoLFbTaeO
+         agIuUHgIlqwF1PyS22+z9Wetl/OkGUZ4vj3ExEo5L/VDdTs5j5xJqdPe23va2sEeQHcT
+         Shz6oSKtbw/7sJekpmCRSNnc5EMQKopElZ6zgJDBpRBptg3FgjwbBz1WvzUqeivT1/xU
+         rPIA==
+X-Forwarded-Encrypted: i=1; AJvYcCWP5OpKIxdWIIKKM8NNg5YKEuB+3/87nDEwkSm8pgThzUEVuJ8WMcCyyjvLJoktBg3iUzgyCI7XtfXs@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7iOLM/sST9L3nvvGu0S6gFXHSN76TiYU2xWG5Z9bOA/BNeewS
+	G2D4Cixyu2zELDHxCKXx9+9zRqnxPWczuEVslGbAstY7Do8O6yyVrrNbsZIAIu6ohs/hROVa5en
+	rc3rY4QENSxgUaTy0F/5c9DbJySTYzXo=
+X-Gm-Gg: AY/fxX5+MLKoJBTsw+nLGUvgSGUOcH/+9RezVxQk0o97y5fYgfwJf5hPrDeZdZQcsTu
+	Ld/5e01eluwyRL4OXty0nITW5TE11MNtrjRQwd4XHp3WbhzydCqxZd7G33qbEfz02zlPfRomUkr
+	NT+cJtkFckSpkW3lY2qhZzuyz2ds3tfGTNMgVAUH19PVTK4eYG4hww9eGlce4SuWPnZ6036M7qs
+	wMiZa9nIbnfzuEu2fDlEl5x2juazZ7D0PLu3iLg4zzIDyOT9SK7U2VjtRt8Pl0gXTqwfbeASw==
+X-Received: by 2002:a17:90b:48c2:b0:340:9ba6:8af4 with SMTP id
+ 98e67ed59e1d1-35272fb1053mr3036032a91.35.1768593365059; Fri, 16 Jan 2026
+ 11:56:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <crmq6jjsp5iknahbeo2d6lf7gbmrnmqcqgnfuq4sjxulw3sdku@ik35hhy3zkst>
+References: <cover.1768489876.git.lucien.xin@gmail.com> <89a67cd3c41feb4e0129bcdcdf0bfe178528c735.1768489876.git.lucien.xin@gmail.com>
+ <0daa8090-b63f-4d7c-870e-d32dd7f85266@samba.org>
+In-Reply-To: <0daa8090-b63f-4d7c-870e-d32dd7f85266@samba.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Fri, 16 Jan 2026 14:55:53 -0500
+X-Gm-Features: AZwV_Qh58N4F8YGBusGZIfolR_j7I81bm-7lOEb96rjlzEdRB88nU29XlG5Ywms
+Message-ID: <CADvbK_fmU=0GeB-32uv=+MOxHA8ZXjQeysqF1=z1f0eBt7pgTg@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 16/16] quic: add packet parser base
+To: Stefan Metzmacher <metze@samba.org>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Moritz Buhl <mbuhl@openbsd.org>, 
+	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, 
+	Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 16, 2026 at 02:18:56PM -0300, Enzo Matsumiya wrote:
-> On 01/16, Henrique Carvalho wrote:
-> > Mounts can experience large delays when servers advertise interfaces
-> > that are unreachable from the client.
-> > 
-> > Decouple channel addition from the synchronous mount path by introducing
-> > struct mchan_mount and running channel setup as background work. This
-> > prevents mount stalls caused by slow or unreachable interfaces.
-> > 
-> > Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+On Fri, Jan 16, 2026 at 11:20=E2=80=AFAM Stefan Metzmacher <metze@samba.org=
+> wrote:
+>
+> Am 15.01.26 um 16:11 schrieb Xin Long:
+> > This patch usess 'quic_packet' to handle packing of QUIC packets on the
+> > receive (RX) path.
+> >
+> > It introduces mechanisms to parse the ALPN from client Initial packets
+> > to determine the correct listener socket. Received packets are then
+> > routed and processed accordingly. Similar to the TX path, handling for
+> > application and handshake packets is not yet implemented.
+> >
+> > - quic_packet_parse_alpn()`: Parse the ALPN from a client Initial packe=
+t,
+> >    then locate the appropriate listener using the ALPN.
+> >
+> > - quic_packet_rcv(): Locate the appropriate socket to handle the packet
+> >    via quic_packet_process().
+> >
+> > - quic_packet_process()`: Process the received packet.
+> >
+> > In addition to packet flow, this patch adds support for ICMP-based MTU
+> > updates by locating the relevant socket and updating the stored PMTU
+> > accordingly.
+> >
+> > - quic_packet_rcv_err_pmtu(): Find the socket and update the PMTU via
+> >    quic_packet_mss_update().
+> >
+> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
 > > ---
-> > fs/smb/client/cifsglob.h |  7 ++++
-> > fs/smb/client/connect.c  | 75 ++++++++++++++++++++++++++++++++++++++--
-> > 2 files changed, 79 insertions(+), 3 deletions(-)
-> 
-> Ack for the fix idea, but I have a few comments on the patch itself
-> (inline reply below).
-
-Thanks!
-
-> 
-> > diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> > index 7d815dd96ad1..ed2f0a13655a 100644
-> > --- a/fs/smb/client/cifsglob.h
-> > +++ b/fs/smb/client/cifsglob.h
-> > @@ -1803,6 +1803,13 @@ struct cifs_mount_ctx {
-> > 	struct cifs_tcon *tcon;
-> > };
-> > 
-> > +struct mchan_mount {
-> > +	struct kref refcount;
-> > +	struct work_struct work;
+> > v5:
+> >    - In quic_packet_rcv_err(), remove the unnecessary quic_is_listen()
+> >      check and move quic_get_mtu_info() out of sock lock (suggested
+> >      by Paolo).
+> >    - Replace cancel_work_sync() to disable_work_sync() (suggested by
+> >      Paolo).
+> > v6:
+> >    - Fix the loop using skb_dequeue() in quic_packet_backlog_work(), an=
+d
+> >      kfree_skb() when sk is not found (reported by AI Reviews).
+> >    - Remove skb_pull() from quic_packet_rcv(), since it is now handled
+> >      in quic_path_rcv().
+> >    - Note for AI reviews: add if (dst) check in quic_packet_rcv_err_pmt=
+u(),
+> >      although quic_packet_route() >=3D 0 already guarantees it is not N=
+ULL.
+> >    - Note for AI reviews: it is safe to do *plen -=3D QUIC_HLEN in
+> >      quic_packet_get_version_and_connid(), since quic_packet_get_sock()
+> >      already checks if (skb->len < QUIC_HLEN).
+> >    - Note for AI reviews: cb->length - cb->number_len - QUIC_TAG_LEN
+> >      cannot underflow, because quic_crypto_header_decrypt() already che=
+cks
+> >      if (cb->length < QUIC_PN_MAX_LEN + QUIC_SAMPLE_LEN).
+> >    - Note for AI reviews: the cast (u16)length in quic_packet_parse_alp=
+n()
+> >      is safe, as there is a prior check if (length > (u16)len); len is
+> >      skb->len, which cannot exceed U16_MAX.
+> >    - Note for AI reviews: it's correct to do if (flags &
+> >      QUIC_F_MTU_REDUCED_DEFERRED) in quic_release_cb(), since
+> >      QUIC_MTU_REDUCED_DEFERRED is the bit used with test_and_set_bit().
+> >    - Note for AI reviews: move skb_cb->backlog =3D 1 before adding skb =
+to
+> >      backlog, although it's safe to write skb_cb after adding to backlo=
+g
+> >      with sk_lock.slock, as skb dequeue from backlog requires sk_lock.s=
+lock.
+> > v7:
+> >    - Pass udp sk to quic_packet_rcv(), quic_packet_rcv_err() and
+> >      quic_sock_lookup().
+> >    - Move the call to skb_linearize() and skb_set_owner_sk_safe() to
+> >      .quic_path_rcv()/quic_packet_rcv().
+> > ---
+> >   net/quic/packet.c   | 644 +++++++++++++++++++++++++++++++++++++++++++=
++
+> >   net/quic/packet.h   |   9 +
+> >   net/quic/protocol.c |   6 +
+> >   net/quic/protocol.h |   4 +
+> >   net/quic/socket.c   | 134 +++++++++
+> >   net/quic/socket.h   |   5 +
+> >   6 files changed, 802 insertions(+)
+> >
+> > diff --git a/net/quic/packet.c b/net/quic/packet.c
+> > index 348e760aa197..415eda603355 100644
+> > --- a/net/quic/packet.c
+> > +++ b/net/quic/packet.c
+> > @@ -14,6 +14,650 @@
+> >
+> >   #define QUIC_HLEN           1
+> >
+> > +#define QUIC_LONG_HLEN(dcid, scid) \
+> > +     (QUIC_HLEN + QUIC_VERSION_LEN + 1 + (dcid)->len + 1 + (scid)->len=
+)
 > > +
-> > +	struct cifs_ses *ses;
+> > +#define QUIC_VERSION_NUM     2
+> > +
+> > +/* Supported QUIC versions and their compatible versions. Used for Com=
+patible Version
+> > + * Negotiation in rfc9368#section-2.3.
+> > + */
+> > +static u32 quic_versions[QUIC_VERSION_NUM][4] =3D {
+> > +     /* Version,     Compatible Versions */
+> > +     { QUIC_VERSION_V1,      QUIC_VERSION_V2,        QUIC_VERSION_V1, =
+       0 },
+> > +     { QUIC_VERSION_V2,      QUIC_VERSION_V2,        QUIC_VERSION_V1, =
+       0 },
 > > +};
 > > +
-> > static inline void __free_dfs_info_param(struct dfs_info3_param *param)
-> > {
-> > 	kfree(param->path_name);
-> > diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> > index 778664206722..56c5df9df943 100644
-> > --- a/fs/smb/client/connect.c
-> > +++ b/fs/smb/client/connect.c
-> > @@ -64,6 +64,10 @@ static int generic_ip_connect(struct TCP_Server_Info *server);
-> > static void tlink_rb_insert(struct rb_root *root, struct tcon_link *new_tlink);
-> > static void cifs_prune_tlinks(struct work_struct *work);
-> > 
-> > +static struct mchan_mount *mchan_mount_alloc(struct smb3_fs_context *ctx);
-> > +static void mchan_mount_release(struct kref *refcount);
-> > +static void mchan_mount_work_fn(struct work_struct *work);
-> > +
-> > /*
-> >  * Resolve hostname and set ip addr in tcp ses. Useful for hostnames that may
-> >  * get their ip addresses changed at some point.
-> > @@ -3898,15 +3902,78 @@ int cifs_is_path_remote(struct cifs_mount_ctx *mnt_ctx)
-> > 	return rc;
-> > }
-> > 
-> > +static struct mchan_mount *
-> > +mchan_mount_alloc(struct smb3_fs_context *ctx)
+> > +/* Get the compatible version list for a given QUIC version. */
+> > +u32 *quic_packet_compatible_versions(u32 version)
 > > +{
-> > +	int rc;
-> > +	struct TCP_Server_Info *server;
-> > +	struct mchan_mount *mchan_mount;
+> > +     u8 i;
 > > +
-> > +	mchan_mount = kzalloc(sizeof(*mchan_mount), GFP_KERNEL);
-> > +	if (!mchan_mount)
-> > +		return ERR_PTR(-ENOMEM);
-> > +
-> > +	INIT_WORK(&mchan_mount->work, mchan_mount_work_fn);
-> > +	kref_init(&mchan_mount->refcount);
-> > +
-> > +	server = cifs_get_tcp_session(ctx, NULL);
-> 
-> server ref is not put later.
-> 
-
-Ack. Thanks.
-
-> > +	if (IS_ERR(server)) {
-> > +		rc = PTR_ERR(server);
-> > +		goto error;
-> > +	}
-> > +
-> > +	mchan_mount->ses = cifs_get_smb_ses(server, ctx);
-> > +	if (IS_ERR(mchan_mount->ses)) {
-> > +		cifs_put_tcp_session(server, false);
-> > +		rc = PTR_ERR(mchan_mount->ses);
-> > +		goto error;
-> > +	}
-> > +
-> > +	return mchan_mount;
-> > +
-> > +error:
-> > +	kfree(mchan_mount);
-> > +
-> > +	return ERR_PTR(rc);
+> > +     for (i =3D 0; i < QUIC_VERSION_NUM; i++)
+> > +             if (version =3D=3D quic_versions[i][0])
+> > +                     return quic_versions[i];
+> > +     return NULL;
 > > +}
 > > +
-> > +static void
-> > +mchan_mount_release(struct kref *refcount)
+> > +/* Convert version-specific type to internal standard packet type. */
+> > +static u8 quic_packet_version_get_type(u32 version, u8 type)
 > > +{
-> > +	struct mchan_mount *mchan_mount = container_of(refcount, struct mchan_mount, refcount);
+> > +     if (version =3D=3D QUIC_VERSION_V1)
+> > +             return type;
 > > +
-> > +	cifs_put_smb_ses(mchan_mount->ses);
-> > +	kfree(mchan_mount);
+> > +     switch (type) {
+> > +     case QUIC_PACKET_INITIAL_V2:
+> > +             return QUIC_PACKET_INITIAL;
+> > +     case QUIC_PACKET_0RTT_V2:
+> > +             return QUIC_PACKET_0RTT;
+> > +     case QUIC_PACKET_HANDSHAKE_V2:
+> > +             return QUIC_PACKET_HANDSHAKE;
+> > +     case QUIC_PACKET_RETRY_V2:
+> > +             return QUIC_PACKET_RETRY;
+> > +     default:
+> > +             return -1;
+> > +     }
+> > +     return -1;
 > > +}
 > > +
-> > +static void
-> > +mchan_mount_work_fn(struct work_struct *work)
+> > +/* Parse QUIC version and connection IDs (DCID and SCID) from a Long h=
+eader packet buffer. */
+> > +static int quic_packet_get_version_and_connid(struct quic_conn_id *dci=
+d, struct quic_conn_id *scid,
+> > +                                           u32 *version, u8 **pp, u32 =
+*plen)
 > > +{
-> > +	struct mchan_mount *mchan_mount = container_of(work, struct mchan_mount, work);
+> > +     u64 len, v;
 > > +
-> > +	smb3_update_ses_channels(mchan_mount->ses, mchan_mount->ses->server, false, false);
-> > +	kref_put(&mchan_mount->refcount, mchan_mount_release);
-> 
-> If you're going to use kref_put just for the kref_init ref (1), makes
-> more sense to just ditch it and do regular alloc/free path.
-> 
-
-Yes, you are correct. This is vestigial from an earlier version of this
-patch, when this struct actually required refcounting. I decided to
-simplify the patch and now it's not even needed.
-
+> > +     *pp +=3D QUIC_HLEN;
+> > +     *plen -=3D QUIC_HLEN;
+> > +
+> > +     if (!quic_get_int(pp, plen, &v, QUIC_VERSION_LEN))
+> > +             return -EINVAL;
+> > +     *version =3D v;
+> > +
+> > +     if (!quic_get_int(pp, plen, &len, 1) ||
+> > +         len > *plen || len > QUIC_CONN_ID_MAX_LEN)
+> > +             return -EINVAL;
+> > +     quic_conn_id_update(dcid, *pp, len);
+> > +     *plen -=3D len;
+> > +     *pp +=3D len;
+> > +
+> > +     if (!quic_get_int(pp, plen, &len, 1) ||
+> > +         len > *plen || len > QUIC_CONN_ID_MAX_LEN)
+> > +             return -EINVAL;
+> > +     quic_conn_id_update(scid, *pp, len);
+> > +     *plen -=3D len;
+> > +     *pp +=3D len;
+> > +     return 0;
 > > +}
 > > +
-> > #ifdef CONFIG_CIFS_DFS_UPCALL
-> > int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
-> > {
-> > 	struct cifs_mount_ctx mnt_ctx = { .cifs_sb = cifs_sb, .fs_ctx = ctx, };
-> > +	struct mchan_mount *mchan_mount = NULL;
-> > 	int rc;
-> > 
-> > 	rc = dfs_mount_share(&mnt_ctx);
-> > 	if (rc)
-> > 		goto error;
+> > +/* Change the QUIC version for the connection.
+> > + *
+> > + * Frees existing initial crypto keys and installs new initial keys co=
+mpatible with the new
+> > + * version.
+> > + */
+> > +static int quic_packet_version_change(struct sock *sk, struct quic_con=
+n_id *dcid, u32 version)
+> > +{
+> > +     struct quic_crypto *crypto =3D quic_crypto(sk, QUIC_CRYPTO_INITIA=
+L);
 > > +
-> > +	if (ctx->multichannel) {
-> > +		mchan_mount = mchan_mount_alloc(ctx);
-> > +		if (IS_ERR(mchan_mount)) {
-> > +			rc = PTR_ERR(mchan_mount);
-> > +			goto error;
-> > +		}
-> > +	}
+> > +     if (quic_crypto_initial_keys_install(crypto, dcid, version, quic_=
+is_serv(sk)))
+> > +             return -1;
 > > +
-> > 	if (!ctx->dfs_conn)
-> > 		goto out;
-> > 
-> > @@ -3925,17 +3992,19 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
-> > 	ctx->prepath = NULL;
-> > 
-> > out:
-> > -	smb3_update_ses_channels(mnt_ctx.ses, mnt_ctx.server,
-> > -				  false /* from_reconnect */,
-> > -				  false /* disable_mchan */);
-> > 	rc = mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
-> > 	if (rc)
-> > 		goto error;
-> > 
-> > +	if (ctx->multichannel)
-> > +		queue_work(cifsiod_wq, &mchan_mount->work);
+> > +     quic_packet(sk)->version =3D version;
+> > +     return 0;
+> > +}
 > > +
-> > 	free_xid(mnt_ctx.xid);
-> > 	return rc;
-> > 
-> > error:
-> > +	if (ctx->multichannel && !IS_ERR_OR_NULL(mchan_mount))
-> > +		kref_put(&mchan_mount->refcount, mchan_mount_release);
-> > 	cifs_mount_put_conns(&mnt_ctx);
-> > 	return rc;
-> > }
-> > -- 
-> 
-> In general, I'd suggest getting ses ref with cifs_smb_ses_inc_refcount()
-> instead (you already have the session here, cifs_get_smb_ses() does a
-> full search + checks + possible reconnect).
-> 
-> Then move cifs_put_smb_ses() to the end of mchan_mount_work_fn().
-> 
+> > +/* Select the best compatible QUIC version from offered list.
+> > + *
+> > + * Considers the local preferred version, currently chosen version, an=
+d versions offered by
+> > + * the peer. Selects the best compatible version based on client/serve=
+r role and updates the
+> > + * connection version accordingly.
+> > + */
+> > +int quic_packet_select_version(struct sock *sk, u32 *versions, u8 coun=
+t)
+> > +{
+> > +     struct quic_packet *packet =3D quic_packet(sk);
+> > +     struct quic_config *c =3D quic_config(sk);
+> > +     u8 i, pref_found =3D 0, ch_found =3D 0;
+> > +     u32 preferred, chosen, best =3D 0;
+> > +
+> > +     preferred =3D c->version ?: QUIC_VERSION_V1;
+> > +     chosen =3D packet->version;
+> > +
+> > +     for (i =3D 0; i < count; i++) {
+> > +             if (!quic_packet_compatible_versions(versions[i]))
+> > +                     continue;
+> > +             if (preferred =3D=3D versions[i])
+> > +                     pref_found =3D 1;
+> > +             if (chosen =3D=3D versions[i])
+> > +                     ch_found =3D 1;
+> > +             if (best < versions[i]) /* Track highest offered version.=
+ */
+> > +                     best =3D versions[i];
+> > +     }
+> > +
+> > +     if (!pref_found && !ch_found && !best)
+> > +             return -1;
+> > +
+> > +     if (quic_is_serv(sk)) { /* Server prefers preferred version if of=
+fered, else chosen. */
+> > +             if (pref_found)
+> > +                     best =3D preferred;
+> > +             else if (ch_found)
+> > +                     best =3D chosen;
+> > +     } else { /* Client prefers chosen version, else preferred. */
+> > +             if (ch_found)
+> > +                     best =3D chosen;
+> > +             else if (pref_found)
+> > +                     best =3D preferred;
+> > +     }
+> > +
+> > +     if (packet->version =3D=3D best)
+> > +             return 0;
+> > +
+> > +     /* Change to selected best version. */
+> > +     return quic_packet_version_change(sk, &quic_paths(sk)->orig_dcid,=
+ best);
+> > +}
+> > +
+> > +/* Extracts a QUIC token from a buffer in the Client Initial packet. *=
+/
+> > +static int quic_packet_get_token(struct quic_data *token, u8 **pp, u32=
+ *plen)
+> > +{
+> > +     u64 len;
+> > +
+> > +     if (!quic_get_var(pp, plen, &len) || len > *plen)
+> > +             return -EINVAL;
+> > +     quic_data(token, *pp, len);
+> > +     *plen -=3D len;
+> > +     *pp +=3D len;
+> > +     return 0;
+> > +}
+> > +
+> > +/* Process PMTU reduction event on a QUIC socket. */
+> > +void quic_packet_rcv_err_pmtu(struct sock *sk)
+> > +{
+> > +     struct quic_path_group *paths =3D quic_paths(sk);
+> > +     struct quic_packet *packet =3D quic_packet(sk);
+> > +     struct quic_config *c =3D quic_config(sk);
+> > +     u32 pathmtu, info, taglen;
+> > +     struct dst_entry *dst;
+> > +     bool reset_timer;
+> > +
+> > +     if (!ip_sk_accept_pmtu(sk))
+> > +             return;
+> > +
+> > +     info =3D clamp(paths->mtu_info, QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX=
+_PMTU);
+> > +     /* If PLPMTUD is not enabled, update MSS using the route and ICMP=
+ info. */
+> > +     if (!c->plpmtud_probe_interval) {
+> > +             if (quic_packet_route(sk) < 0)
+> > +                     return;
+> > +
+> > +             dst =3D __sk_dst_get(sk);
+> > +             if (dst)
+> > +                     dst->ops->update_pmtu(dst, sk, NULL, info, true);
+> > +             quic_packet_mss_update(sk, info - packet->hlen);
+> > +             return;
+> > +     }
+> > +     /* PLPMTUD is enabled: adjust to smaller PMTU, subtract headers a=
+nd AEAD tag.  Also
+> > +      * notify the QUIC path layer for possible state changes and prob=
+ing.
+> > +      */
+> > +     taglen =3D quic_packet_taglen(packet);
+> > +     info =3D info - packet->hlen - taglen;
+> > +     pathmtu =3D quic_path_pl_toobig(paths, info, &reset_timer);
+> > +     if (reset_timer)
+> > +             quic_timer_reset(sk, QUIC_TIMER_PMTU, c->plpmtud_probe_in=
+terval);
+> > +     if (pathmtu)
+> > +             quic_packet_mss_update(sk, pathmtu + taglen);
+> > +}
+> > +
+> > +/* Handle ICMP Toobig packet and update QUIC socket path MTU. */
+> > +static int quic_packet_rcv_err(struct sock *sk, struct sk_buff *skb)
+> > +{
+> > +     union quic_addr daddr, saddr;
+> > +     u32 info;
+> > +
+> > +     /* All we can do is lookup the matching QUIC socket by addresses.=
+ */
+> > +     quic_get_msg_addrs(skb, &saddr, &daddr);
+> > +     sk =3D quic_sock_lookup(skb, &daddr, &saddr, sk, NULL);
+> > +     if (!sk)
+> > +             return -ENOENT;
+> > +
+> > +     if (quic_get_mtu_info(skb, &info)) {
+> > +             sock_put(sk);
+> > +             return 0;
+> > +     }
+> > +
+> > +     /* Success: update socket path MTU info. */
+> > +     bh_lock_sock(sk);
+> > +     quic_paths(sk)->mtu_info =3D info;
+> > +     if (sock_owned_by_user(sk)) {
+> > +             /* Socket is in use by userspace context.  Defer MTU proc=
+essing to later via
+> > +              * tasklet.  Ensure the socket is not dropped before defe=
+rral.
+> > +              */
+> > +             if (!test_and_set_bit(QUIC_MTU_REDUCED_DEFERRED, &sk->sk_=
+tsq_flags))
+> > +                     sock_hold(sk);
+> > +             goto out;
+> > +     }
+> > +     /* Otherwise, process the MTU reduction now. */
+> > +     quic_packet_rcv_err_pmtu(sk);
+> > +out:
+> > +     bh_unlock_sock(sk);
+> > +     sock_put(sk);
+> > +     return 1;
+> > +}
+> > +
+> > +#define QUIC_PACKET_BACKLOG_MAX              4096
+> > +
+> > +/* Queue a packet for later processing when sleeping is allowed. */
+> > +static int quic_packet_backlog_schedule(struct net *net, struct sk_buf=
+f *skb)
+> > +{
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     struct quic_net *qn =3D quic_net(net);
+> > +
+> > +     if (cb->backlog)
+> > +             return 0;
+> > +
+> > +     if (skb_queue_len_lockless(&qn->backlog_list) >=3D QUIC_PACKET_BA=
+CKLOG_MAX) {
+> > +             QUIC_INC_STATS(net, QUIC_MIB_PKT_RCVDROP);
+> > +             kfree_skb(skb);
+> > +             return -1;
+> > +     }
+> > +
+> > +     cb->backlog =3D 1;
+> > +     skb_queue_tail(&qn->backlog_list, skb);
+> > +     queue_work(quic_wq, &qn->work);
+> > +     return 1;
+> > +}
+> > +
+> > +#define TLS_MT_CLIENT_HELLO  1
+> > +#define TLS_EXT_alpn         16
+> > +
+> > +/*  TLS Client Hello Msg:
+> > + *
+> > + *    uint16 ProtocolVersion;
+> > + *    opaque Random[32];
+> > + *    uint8 CipherSuite[2];
+> > + *
+> > + *    struct {
+> > + *        ExtensionType extension_type;
+> > + *        opaque extension_data<0..2^16-1>;
+> > + *    } Extension;
+> > + *
+> > + *    struct {
+> > + *        ProtocolVersion legacy_version =3D 0x0303;
+> > + *        Random rand;
+> > + *        opaque legacy_session_id<0..32>;
+> > + *        CipherSuite cipher_suites<2..2^16-2>;
+> > + *        opaque legacy_compression_methods<1..2^8-1>;
+> > + *        Extension extensions<8..2^16-1>;
+> > + *    } ClientHello;
+> > + */
+> > +
+> > +#define TLS_CH_RANDOM_LEN    32
+> > +#define TLS_CH_VERSION_LEN   2
+> > +
+> > +/* Extract ALPN data from a TLS ClientHello message.
+> > + *
+> > + * Parses the TLS ClientHello handshake message to find the ALPN (Appl=
+ication Layer Protocol
+> > + * Negotiation) TLS extension. It validates the TLS ClientHello struct=
+ure, including version,
+> > + * random, session ID, cipher suites, compression methods, and extensi=
+ons. Once the ALPN
+> > + * extension is found, the ALPN protocols list is extracted and stored=
+ in @alpn.
+> > + *
+> > + * Return: 0 on success or no ALPN found, a negative error code on fai=
+led parsing.
+> > + */
+> > +static int quic_packet_get_alpn(struct quic_data *alpn, u8 *p, u32 len=
+)
+> > +{
+> > +     int err =3D -EINVAL, found =3D 0;
+> > +     u64 length, type;
+> > +
+> > +     /* Verify handshake message type (ClientHello) and its length. */
+> > +     if (!quic_get_int(&p, &len, &type, 1) || type !=3D TLS_MT_CLIENT_=
+HELLO)
+> > +             return err;
+> > +     if (!quic_get_int(&p, &len, &length, 3) ||
+> > +         length < TLS_CH_RANDOM_LEN + TLS_CH_VERSION_LEN)
+> > +             return err;
+> > +     if (len > (u32)length) /* Limit len to handshake message length i=
+f larger. */
+> > +             len =3D length;
+> > +     /* Skip legacy_version (2 bytes) + random (32 bytes). */
+> > +     p +=3D TLS_CH_RANDOM_LEN + TLS_CH_VERSION_LEN;
+> > +     len -=3D TLS_CH_RANDOM_LEN + TLS_CH_VERSION_LEN;
+> > +     /* legacy_session_id_len must be zero (QUIC requirement). */
+> > +     if (!quic_get_int(&p, &len, &length, 1) || length)
+> > +             return err;
+> > +
+> > +     /* Skip cipher_suites (2 bytes length + variable data). */
+> > +     if (!quic_get_int(&p, &len, &length, 2) || length > (u64)len)
+> > +             return err;
+> > +     len -=3D length;
+> > +     p +=3D length;
+> > +
+> > +     /* Skip legacy_compression_methods (1 byte length + variable data=
+). */
+> > +     if (!quic_get_int(&p, &len, &length, 1) || length > (u64)len)
+> > +             return err;
+> > +     len -=3D length;
+> > +     p +=3D length;
+> > +
+> > +     if (!quic_get_int(&p, &len, &length, 2)) /* Read TLS extensions l=
+ength (2 bytes). */
+> > +             return err;
+> > +     if (len > (u32)length) /* Limit len to extensions length if large=
+r. */
+> > +             len =3D length;
+> > +     while (len > 4) { /* Iterate over extensions to find ALPN (type T=
+LS_EXT_alpn). */
+> > +             if (!quic_get_int(&p, &len, &type, 2))
+> > +                     break;
+> > +             if (!quic_get_int(&p, &len, &length, 2))
+> > +                     break;
+> > +             if (len < (u32)length) /* Incomplete TLS extensions. */
+> > +                     return 0;
+> > +             if (type =3D=3D TLS_EXT_alpn) { /* Found ALPN extension. =
+*/
+> > +                     len =3D length;
+> > +                     found =3D 1;
+> > +                     break;
+> > +             }
+> > +             /* Skip non-ALPN extensions. */
+> > +             p +=3D length;
+> > +             len -=3D length;
+> > +     }
+> > +     if (!found) { /* no ALPN extension found: set alpn->len =3D 0 and=
+ alpn->data =3D p. */
+> > +             quic_data(alpn, p, 0);
+> > +             return 0;
+> > +     }
+> > +
+> > +     /* Parse ALPN protocols list length (2 bytes). */
+> > +     if (!quic_get_int(&p, &len, &length, 2) || length > (u64)len)
+> > +             return err;
+> > +     quic_data(alpn, p, length); /* Store ALPN protocols list in alpn-=
+>data. */
+> > +     len =3D length;
+> > +     while (len) { /* Validate ALPN protocols list format. */
+> > +             if (!quic_get_int(&p, &len, &length, 1) || length > (u64)=
+len) {
+> > +                     /* Malformed ALPN entry: set alpn->len =3D 0 and =
+alpn->data =3D NULL. */
+> > +                     quic_data(alpn, NULL, 0);
+> > +                     return err;
+> > +             }
+> > +             len -=3D length;
+> > +             p +=3D length;
+> > +     }
+> > +     pr_debug("%s: alpn_len: %d\n", __func__, alpn->len);
+> > +     return 0;
+> > +}
+> > +
+> > +/* Parse ALPN from a QUIC Initial packet.
+> > + *
+> > + * This function processes a QUIC Initial packet to extract the ALPN f=
+rom the TLS ClientHello
+> > + * message inside the QUIC CRYPTO frame. It verifies packet type, vers=
+ion compatibility,
+> > + * decrypts the packet payload, and locates the CRYPTO frame to parse =
+the TLS ClientHello.
+> > + * Finally, it calls quic_packet_get_alpn() to extract the ALPN extens=
+ion data.
+> > + *
+> > + * Return: 0 on success or no ALPN found, a negative error code on fai=
+led parsing.
+> > + */
+> > +static int quic_packet_parse_alpn(struct sk_buff *skb, struct quic_dat=
+a *alpn)
+> > +{
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     struct net *net =3D sock_net(skb->sk);
+> > +     u8 *p =3D skb->data, *data, type;
+> > +     struct quic_conn_id dcid, scid;
+> > +     u32 len =3D skb->len, version;
+> > +     struct quic_crypto *crypto;
+> > +     struct quic_data token;
+> > +     u64 offset, length;
+> > +     int err =3D -EINVAL;
+> > +
+> > +     if (!sysctl_quic_alpn_demux)
+> > +             return 0;
+>
+> Can this be made dynamic, turning it on if someone
+> listens on a socket with QUIC_SOCKOPT_ALPN set?
+>
+> Otherwise I guess it silently doesn't work
+> and needs administrator interaction.
+>
+Makes sense to me.
 
-Yes, that is better.
+I will replace this with a static_key when adding QUIC_SOCKOPT_ALPN
+socket options in patchset-2:
 
-Will send a v2.
+        if (!static_branch_unlikely(&quic_alpn_demux_key))
+                return 0;
 
-Thanks for your review.
+static_branch_inc() and static_branch_dec() it in quic_hash() and
+quic_unhash() if alpn is set for listening sockets.
 
--- 
-Henrique
-SUSE Labs
+Thanks.
