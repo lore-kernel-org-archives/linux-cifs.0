@@ -1,142 +1,211 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201CB28640F
-	for <linux-cifs@vger.kernel.org>; Fri, 16 Jan 2026 21:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2436D2F49F8
+	for <linux-cifs@vger.kernel.org>; Fri, 16 Jan 2026 22:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768599447; cv=none; b=bkUgg+q1PCVtJgRUCo+QWzRHBDbBnLy2dWNGTVQr4P9RnymEhAtVLyULIneZ7QserPgNHbn0wIORUQBSfZvPicva6Bc1vnydxNacYBtZgoAGGwon8B5MbCxiq5w0emp4yMo+k/uqAGrjyJBYNMs6xqfUAKaaKdkezNqOAfElLd4=
+	t=1768601245; cv=none; b=No0eEG4yf3xo+F5iOMXUCJOz5K3khMi9aqvSoZ5pEjmXB9qu03b5OINY4e5J3/yBRGtC/ZgNnNIK4Azuo5U2LAs83zeMUuVw4EkyBtGybbjDT5xi7+rcO0XEfrov98Mcwr3rWWhFUsgEW27snftjyI7+XCYGa9EfCsKujD1aJxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768599447; c=relaxed/simple;
-	bh=y2Km9ikx0bGX69q42CxA6vSKHrKUAglF8jf9UWTjIC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Edns4aNx52En3FzGi7YhguKUQGDlXSFIoZ9EsizLU7R8KbiNXUGDjINdMT4fvg2uvUROjSTSx+OVPhvwc2xreIJCgrUvNZX7Xt2IBKvqUkkEJbn0hiHTWhsvUIasP5WdTGsGjbpDkusVhtvgiYlMFqGE0tM5thvAb1Xp2Z9cZMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ixeOV/cA; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1768601245; c=relaxed/simple;
+	bh=Kq8P0WX0ctY1DhgN4F3UvQ+3cexK4p97UmeNenMzZs4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aVFmyFqSX4PPhCq4IBO9ZnnEpPcFoUFCjazN9/SgAuFlJzBpeGJDQH2wlk+waSxBlOUP5V+0wtgLpaQJsntcsJMRFFQh+NkdfxqtT+fVK9XYfl1dyHZTSHQ0a4wH8DYlRpkeazoz2ifpiJvqH+COWKmKJuqNcaYetE2GYiZEQ2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=AbK1mAQ5; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ixeOV/cA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768599444; x=1800135444;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=y2Km9ikx0bGX69q42CxA6vSKHrKUAglF8jf9UWTjIC8=;
-  b=ixeOV/cAxlyKLHMFCyzLYYCYP5YBeNUEH4HehRNUO3ovnnyVoqny8XbI
-   Mb5QMy+pkg+EfWQegAo6/lIng84TTZZlTp3QkY5GzhZgvd69HMK+mNR2c
-   KtL7H1BzWTL5Ph6mEPTO5CfEa2yOpqQUMze7UoVzc+boOMiJ7i1SqGG7A
-   5Ng55oqjjiqv1QJw3tscap1m0l5Z2D5diKu1o9ctoOpH9ix16eeVRulJ3
-   //XI02lfHqGtnUEoG+rVQrcnhkMcy4Wag+fVHgN7oXj0L8Ly9OV/Tl5kR
-   HyzXkLUnGCvb6hXG0nMLK205UMtqPXx/5qlK/s/F0iA9sWZYd6UKC5UXm
-   g==;
-X-CSE-ConnectionGUID: XZZFnsMYQZCVN15ucoSnyw==
-X-CSE-MsgGUID: yZuAKBilSmqcdfGsNUL1NA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11673"; a="69967758"
-X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
-   d="scan'208";a="69967758"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 13:37:23 -0800
-X-CSE-ConnectionGUID: uA+1L0aXQgq4HXw30AIFig==
-X-CSE-MsgGUID: ui5XdWVRSQOst+iwvjOO7Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
-   d="scan'208";a="204573067"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 16 Jan 2026 13:37:21 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vgrVO-00000000LGS-2xqD;
-	Fri, 16 Jan 2026 21:37:18 +0000
-Date: Sat, 17 Jan 2026 05:37:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Henrique Carvalho <henrique.carvalho@suse.com>, sfrench@samba.org
-Cc: oe-kbuild-all@lists.linux.dev, pc@manguebit.org,
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-	bharathsm@microsoft.com, ematsumiya@suse.de,
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="AbK1mAQ5"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47ee974e230so22467415e9.2
+        for <linux-cifs@vger.kernel.org>; Fri, 16 Jan 2026 14:07:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1768601242; x=1769206042; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y6m0+JOPyOojbbK1y55z3kuOmh+4woC7skc4mTyiMmU=;
+        b=AbK1mAQ53LKXoR7AxzGjZGSUGozJ9TOLSxIeTjz7cNPHv/Jm8uxjP4DXAgRgPsw0eW
+         kLaHdx6rcplHKMlsBlrW+VipvCOv4oHpf2RaXnKbSjoWY0kvsEiCtaQ7w3CKJALM3yDP
+         QWsNJCVKdcME5oD4HjZV/uKPYd1fSPxr8KpL2E7pScDmL/CQRxJKEuuJB7cBFfPscop6
+         9xEe9BR6+kjgoj6YIBhZSp4j1yF07wcv5QLpZyJnrLsFhUSKbwKz2RdBlfKw/zV/TrTF
+         2krQ7KtEgC24SENRIDiwQ2WPYY0KkSCOWKtTZqnI/lu41WZ+cMTvCnG7fLp/8zMG95Ui
+         d2yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768601242; x=1769206042;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y6m0+JOPyOojbbK1y55z3kuOmh+4woC7skc4mTyiMmU=;
+        b=Sii5UyAWAdvxyC+V/rp/AiCp4z5vQEckFhttIW6gK+GY9VhFImDUVBZSp4eHLR0Yk3
+         CtubOGuC3vzBbdgQoWLEzTpNlcUY28TudueNHLVSqNnD+UUBShFg7ClNJl3B3BA3n5oy
+         H+3wy+G93tOCffDm0KK+YXNy8+bPCEhX4tszZ4DyKScY4q+q1GzMVcoPigj0E7HZIuso
+         8aXnt7ffpgw7WgOFErEPvPEvhQkHU2ZXtyR3ipFHXS7sLFar1wGJHGbV7oaNPVgJNm/y
+         KFOBab0yV2Ccql6Hl4/uP5NGlFxt5rxBXZaL/8mC/u2hqojeBxMUYb2MkGo+Htn/o/6A
+         EUkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW2FO2S/fZP5CPbsjCq5B1YDsQ77T72tiSnAvZoSiQSkiatD/Pde/HrCka0eHLiUSJEBJuhONMZc5O5@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4y1Umrz0mijykHujcVcVb0pZ5wbaATP0+lwavGwcTOQTMXjQf
+	G769Yu5CZr9F/uQbQX48GsbwR3sH/4pRNqzFxVLPj+TN4rUj9cqLEwj5vKFrMx/W6n8=
+X-Gm-Gg: AY/fxX6Vz4WfK6y/6XKH3xSyff9ZzgeTqwK4gGXh5nCV9PWT/omjImAsu0zb9qYNef0
+	j/iBD1+64wLs54wfTSsWsvMFWIQQ9il7e7zXdTp8E6n0zkjtFnojtypedVNTQiMfSRbtaFMaKbK
+	XdoNEQFr02ZR1jrVRycQkyu09/eovZKspsF4/v+dejHA550Xiu145MptEg+xYzmyMqwYXzts0tQ
+	yq6mt8F+nzU5PZSdFctZrooIgqNU8LyK3tFQxyfWnVF4cURU4pPIF7zv/+4vmIX564WrvXnJuGP
+	YJBeD9EuhR8e57uYOKATvcbfBYT24MdRGsHGJltC4jvhZUHueomxsaINEgoZZJrlDwo/l+93GHM
+	LrUhHwDDmKQxXYTXXyLzdqgkLeDc7x9bTwg+7tvA7+ZSqhadYSD2LWvSK/K05SdvjU7aH4OmfTM
+	SEDw+sMG3vg+zAcN2HW/GD1UczKyV/MwAT8U2z9xIw46UPm2I=
+X-Received: by 2002:a05:600c:4e43:b0:471:700:f281 with SMTP id 5b1f17b1804b1-4801e34835amr52366485e9.25.1768601242280;
+        Fri, 16 Jan 2026 14:07:22 -0800 (PST)
+Received: from precision.tendawifi.com ([138.121.131.195])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b6b3679980sm3737890eec.31.2026.01.16.14.07.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jan 2026 14:07:21 -0800 (PST)
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: sfrench@samba.org
+Cc: pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	ematsumiya@suse.de,
 	linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] smb: client: introduce multichannel async work during
- mount
-Message-ID: <202601170529.AH74foBz-lkp@intel.com>
-References: <20260116153548.223614-1-henrique.carvalho@suse.com>
+Subject: [PATCH v2 1/2] smb: client: introduce multichannel async work during mount
+Date: Fri, 16 Jan 2026 19:06:40 -0300
+Message-ID: <20260116220641.322213-1-henrique.carvalho@suse.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260116153548.223614-1-henrique.carvalho@suse.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Henrique,
+Mounts can experience large delays when servers advertise interfaces
+that are unreachable from the client.
 
-kernel test robot noticed the following build warnings:
+To fix this, decouple channel addition from the synchronous mount path
+by introducing struct mchan_mount and running channel setup as
+background work.
 
-[auto build test WARNING on cifs/for-next]
-[also build test WARNING on linus/master v6.19-rc5 next-20260116]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+---
+ fs/smb/client/cifsglob.h |  5 ++++
+ fs/smb/client/connect.c  | 58 +++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 60 insertions(+), 3 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Henrique-Carvalho/smb-client-introduce-multichannel-async-work-during-mount/20260116-234138
-base:   git://git.samba.org/sfrench/cifs-2.6.git for-next
-patch link:    https://lore.kernel.org/r/20260116153548.223614-1-henrique.carvalho%40suse.com
-patch subject: [PATCH] smb: client: introduce multichannel async work during mount
-config: parisc-defconfig (https://download.01.org/0day-ci/archive/20260117/202601170529.AH74foBz-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260117/202601170529.AH74foBz-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601170529.AH74foBz-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> fs/smb/client/connect.c:3907:1: warning: 'mchan_mount_alloc' defined but not used [-Wunused-function]
-    3907 | mchan_mount_alloc(struct smb3_fs_context *ctx)
-         | ^~~~~~~~~~~~~~~~~
-
-
-vim +/mchan_mount_alloc +3907 fs/smb/client/connect.c
-
-  3905	
-  3906	static struct mchan_mount *
-> 3907	mchan_mount_alloc(struct smb3_fs_context *ctx)
-  3908	{
-  3909		int rc;
-  3910		struct TCP_Server_Info *server;
-  3911		struct mchan_mount *mchan_mount;
-  3912	
-  3913		mchan_mount = kzalloc(sizeof(*mchan_mount), GFP_KERNEL);
-  3914		if (!mchan_mount)
-  3915			return ERR_PTR(-ENOMEM);
-  3916	
-  3917		INIT_WORK(&mchan_mount->work, mchan_mount_work_fn);
-  3918		kref_init(&mchan_mount->refcount);
-  3919	
-  3920		server = cifs_get_tcp_session(ctx, NULL);
-  3921		if (IS_ERR(server)) {
-  3922			rc = PTR_ERR(server);
-  3923			goto error;
-  3924		}
-  3925	
-  3926		mchan_mount->ses = cifs_get_smb_ses(server, ctx);
-  3927		if (IS_ERR(mchan_mount->ses)) {
-  3928			cifs_put_tcp_session(server, false);
-  3929			rc = PTR_ERR(mchan_mount->ses);
-  3930			goto error;
-  3931		}
-  3932	
-  3933		return mchan_mount;
-  3934	
-  3935	error:
-  3936		kfree(mchan_mount);
-  3937	
-  3938		return ERR_PTR(rc);
-  3939	}
-  3940	
-
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 3eca5bfb7030..ebb106e927c4 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1796,6 +1796,11 @@ struct cifs_mount_ctx {
+ 	struct cifs_tcon *tcon;
+ };
+ 
++struct mchan_mount {
++	struct work_struct work;
++	struct cifs_ses *ses;
++};
++
+ static inline void __free_dfs_info_param(struct dfs_info3_param *param)
+ {
+ 	kfree(param->path_name);
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index ce620503e9f7..d6c93980d1b6 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -64,6 +64,10 @@ static int generic_ip_connect(struct TCP_Server_Info *server);
+ static void tlink_rb_insert(struct rb_root *root, struct tcon_link *new_tlink);
+ static void cifs_prune_tlinks(struct work_struct *work);
+ 
++static struct mchan_mount *mchan_mount_alloc(struct cifs_ses *ses);
++static void mchan_mount_free(struct mchan_mount *mchan_mount);
++static void mchan_mount_work_fn(struct work_struct *work);
++
+ /*
+  * Resolve hostname and set ip addr in tcp ses. Useful for hostnames that may
+  * get their ip addresses changed at some point.
+@@ -3899,15 +3903,61 @@ int cifs_is_path_remote(struct cifs_mount_ctx *mnt_ctx)
+ 	return rc;
+ }
+ 
++static struct mchan_mount *
++mchan_mount_alloc(struct cifs_ses *ses)
++{
++	struct mchan_mount *mchan_mount;
++
++	mchan_mount = kzalloc(sizeof(*mchan_mount), GFP_KERNEL);
++	if (!mchan_mount)
++		return ERR_PTR(-ENOMEM);
++
++	INIT_WORK(&mchan_mount->work, mchan_mount_work_fn);
++
++	spin_lock(&cifs_tcp_ses_lock);
++	cifs_smb_ses_inc_refcount(ses);
++	spin_unlock(&cifs_tcp_ses_lock);
++	mchan_mount->ses = ses;
++
++	return mchan_mount;
++}
++
++static void
++mchan_mount_free(struct mchan_mount *mchan_mount)
++{
++	cifs_put_smb_ses(mchan_mount->ses);
++	kfree(mchan_mount);
++}
++
++static void
++mchan_mount_work_fn(struct work_struct *work)
++{
++	struct mchan_mount *mchan_mount = container_of(work, struct mchan_mount, work);
++
++	smb3_update_ses_channels(mchan_mount->ses, mchan_mount->ses->server, false, false);
++
++	mchan_mount_free(mchan_mount);
++}
++
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ {
+ 	struct cifs_mount_ctx mnt_ctx = { .cifs_sb = cifs_sb, .fs_ctx = ctx, };
++	struct mchan_mount *mchan_mount = NULL;
+ 	int rc;
+ 
+ 	rc = dfs_mount_share(&mnt_ctx);
+ 	if (rc)
+ 		goto error;
++
++	if (ctx->multichannel) {
++		mchan_mount = mchan_mount_alloc(mnt_ctx.ses);
++		if (IS_ERR(mchan_mount)) {
++			rc = PTR_ERR(mchan_mount);
++			goto error;
++		}
++	}
++
+ 	if (!ctx->dfs_conn)
+ 		goto out;
+ 
+@@ -3926,17 +3976,19 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ 	ctx->prepath = NULL;
+ 
+ out:
+-	smb3_update_ses_channels(mnt_ctx.ses, mnt_ctx.server,
+-				  false /* from_reconnect */,
+-				  false /* disable_mchan */);
+ 	rc = mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
+ 	if (rc)
+ 		goto error;
+ 
++	if (ctx->multichannel)
++		queue_work(cifsiod_wq, &mchan_mount->work);
++
+ 	free_xid(mnt_ctx.xid);
+ 	return rc;
+ 
+ error:
++	if (ctx->multichannel && !IS_ERR_OR_NULL(mchan_mount))
++		mchan_mount_free(mchan_mount);
+ 	cifs_mount_put_conns(&mnt_ctx);
+ 	return rc;
+ }
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.50.1
+
