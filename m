@@ -1,254 +1,183 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33ECF136351
-	for <linux-cifs@vger.kernel.org>; Sat, 17 Jan 2026 03:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768618817; cv=pass; b=TAqncBoCfghld6dm5Ql1C5mjk+xrxDwk0QiGIso9rldVzw8c0hea+dBZ8NIvARl9nC0FDtawgtt9LjP3d171yJywEZQPs/Ro5PRhpJ/jSwTCOYkhojMjVhvvH8srpRoYehBhJwSsvF7/jprhvH6/5SJzgk277TduDdSYjs/6Nr8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768618817; c=relaxed/simple;
-	bh=9u7ntoS7JO6Zuuh8BQh2Fn75SrSlyIZfjl6zov6dt3Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pNtZAOaAruKRITTnsNcPVJV4VRpyGOwEzkGFgozdshMCAlOe6kh3RrzmKd1lxXZdd1w7X/ImyhSZ1C1LYr8k/ly2bMOYn0y8GcjRhCNaWs3QIhdwXddfSsmK2B7NcLT0EWAORqfw1CTsH+zgb3EenmxQDWCFPhQFOilSZfpEXkc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zlt4hEua; arc=pass smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 338712D59FA;
+	Sat, 17 Jan 2026 13:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768655707; cv=none; b=UH0Av7BZ/y2pizPyJEz1Uxzr3vNRREpHUVYwlULrQ/mACnShdRNokxiL8QJMNunNXc7mN8XU4gA+Stw6UTgnxXGNxqZnIxrOYPtCnTLDTYjpoZlyeXdw8XZld5v/hOwC3r0nWiTQy8MZG06FR9GFkp2CwcGp+l0ayHSo6IDF918=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768655707; c=relaxed/simple;
+	bh=l/DF1wPnxXSSVfJ1mac+OCGGhsj9MWS54a0RhZAVCHI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=LghWcidHN93alcfdoc9DecjKc58hhysz/zNPbhIrt8XX/frEupn2r7iCL5yCM8Z9yYxVXtJDwLO/Nx9jyeOj47VaBSQUdKUU6k9OB1Nt+sI2wj2f7r/XsJyUy63BI7hyKA8V5w+Jzx5qlm/qnnXxt5LvgeLnoPYr/dxK8XOkEtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Lr06b2V7; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zlt4hEua"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8888a1c50e8so32909086d6.0
-        for <linux-cifs@vger.kernel.org>; Fri, 16 Jan 2026 19:00:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768618815; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Q2CJsPanlbm1Mb7SiACi/mVF4Ymez2Me8Y3RlvZzMzEQvs2v1U/6Im6tRmQHirHdmk
-         Y/5LOgnqfa7kIBvwgUIipd4v5tBGh86RNWzrSe/brv8DivWgHRmoXtdz+WrMJ457VbG1
-         GaTgnWuQS5awa+f7SZ1BtvdZxwa+6OX2FdlteFbjR9+lr9zOHxOKt2hffZ2z5ci+yeSu
-         AlAuSsj5FY+THsbYGYq1bBgw7yc/SA2irgFgtiUwMuFshAGRLMvRqPy8K507CQHtnXjN
-         P+PuKWMztQBcY6r3ts3aCy5wPanpC9v6ORNgO1CLrWgNnCb4VPjA2zaNN+hSfnOjl3GL
-         1ZRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=UZCVd0YMFyNPW15zeMXyMtu6UQyFGLqzjtd5fZJqsBM=;
-        fh=kvjeg0eh59E4UGW2xW7yGZeIXGVBc15mSG5YzSeLI4E=;
-        b=SSSEfvo0MGMbTF2ZUjwjqIIak+fxV3DtoXReroTuohLTUcp6tGZV4K/xZxoUziC7eI
-         NxwA1T4ei9ONIegGjgu3P4w6ricZvoPpKncwzIP5vb8yPd789GCaYLyk7EErePaKYKDw
-         h7hwu60dE/6qdH9Rg8uKeGz0/jgkW1E8CRx8PDrVMXejEmfXAzC3xWKaw6tgMJ9QTSq6
-         o9feKtDMkT7tgXNKRxjE99xV7uz0ESjW8OIFxIuF4KyjvQEOFcfeRoCo1EuQ8bZl6rVm
-         Xxe+qFN4TbdIchgcMTzhjllZQK1VF2InCSkP3ZVOpUii+uTTHTo+Miew+A87BpcplTUM
-         tIag==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768618815; x=1769223615; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UZCVd0YMFyNPW15zeMXyMtu6UQyFGLqzjtd5fZJqsBM=;
-        b=Zlt4hEua2Us/SI0slDNGkwOFYPUQ01Kv3Pv4NVFR+2Qf2Pj7HJp2+AfelOmciXM8IK
-         8IYQj/HaEwP7aYWlFwINVGaYk9eAeZ6oppab57OvhzQzm/v5kzUR+OIxFUH7qaLdPNVP
-         OvULOTuiOgo2FwkcEt4NXS2i6AsKzpvhSfbvh6jHHxJ7C/uZCJNthqXhCu7RADfy868L
-         MwhJKhTUjJheb6g8Z2Dlm8biIKlvJNdFDwtXKIInqef+pL2jtDakm1os0gHmH1dfoMDk
-         bfABDuj2lf1EuhJIzycDGrrbggcpNzUvsq2KjWgHX8IpqBVu1X+sYBJJ1QLE1YehMw+M
-         U/2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768618815; x=1769223615;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=UZCVd0YMFyNPW15zeMXyMtu6UQyFGLqzjtd5fZJqsBM=;
-        b=F/8KXKuaO9cP8m+sy7l5IDgrRasG2p85AhDTd90N92WtbikOWFLA9kTtfgCZPcesra
-         LcTgQZ8h5f1OmH1Mg/fhv3spKbBr0UzJn+c4ClRgVZVuWsXaBXT6DxjbOxtKXMshssr9
-         v1ijUBTFn8excPyztD4AAI8MrRDlfhXTylyOCcUJwasRFE9i1oBDx5fnn/7K0OefFmYj
-         c3IZY2o/b8mA0RVrM0KkKkORKLG/xfDV0TLEUTLhmM7Uxnorc3lVWBeeBxxVswAArson
-         XtbT7pV4LNSkZFYa78kIt6tX60o+LUaBXxrcpenvi5iWIUMhRbk/p1VhenYeE68Do/V9
-         5/qg==
-X-Forwarded-Encrypted: i=1; AJvYcCV3Q6S2HQfmXuC6yxeEPETZPFDtfvY3pVd28HiCsCmT/FEGINe6Of4bwIOD6gc3jWzEZhArfBVqIXl2@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqO0QlT901DRZ37z1Aka+x+RY002nBXGPK1ys0VKrFZnUQv7S5
-	A3kULJ8dH6ZpoLRiD5+ssm6or5bb69/JvdHT8Xyh008pnbfys/RO+1zN3ONBPBRfQ9eqK4l9pqE
-	nr478AuUPLVy3RoOSpe4yhBdLuTxFXOo=
-X-Gm-Gg: AY/fxX4OQ0EaPa88sVzhPTUqpwi1qub0VJY0jX5mWVb8ppFT3667PutRH3a7lx1quge
-	D7jamqtmhrJoPnvckzEhkFEZqubjWgvsh9/roTbVy1F6ONhpBaid31cw4XjbNgO0/l65ETKaaFP
-	giRTZKe/fSg+5t2O1BdKmApKulkjCV3+0ly6Srbiexx4h20uNh+BhPxjQXKKt4y5W+TjhAcuXOg
-	O71/RqDQErNx/ZfEWPS64spxJwoUJ12dr/kfu8tLqHd5ZfdQS4+hUhzqdf0yCjAOCV3OeBpY5Hr
-	iJWAQParfpiQR6A0Ei56cEaLTFRYnr7n4Rbu9+si5m+p9C+vIMDR9bUzkhKppvqdUv5qNuvWBz0
-	F8eiBk8GN4Mcm1BGgYso/rO7M4YdK7R2fGTcq6eiGGrll0+eHXGzr3EJz56AOB5nM5yD9WdLWMW
-	ru/B4mq+WjZQ==
-X-Received: by 2002:a05:6214:e69:b0:890:33cd:eea1 with SMTP id
- 6a1803df08f44-8942dbf4f13mr74809276d6.17.1768618814821; Fri, 16 Jan 2026
- 19:00:14 -0800 (PST)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Lr06b2V7"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Cc:To:From:Date:Message-ID;
+	bh=OcasvqJwPlOLCeDPMt/ZehSCYT1FwbI/POlsHrBzyt0=; b=Lr06b2V7hVIcBtrQbP7CICshMS
+	rJz4RdvgvdbLcErNfZBV8CP0NTogIAHGBkhNYY7986JCO4XpSpzm4o7sDFtxiFpLvH34Hsu0RLDDD
+	N5OtQnSCp0eT+K1OWcnTbVk0hGx8hg9Z1WAg3vjqii7THPV+MWq3dZ2CQBWhULSoPsBwL18oEPu1p
+	QnrwNZhl/JoGunRWxt9Kd7A1vAht9hgG6ikapzub9jEK1jH8eB9UuBClBfr/PPf6wKfVzajmouovm
+	fni4y5KdyhIEWsI5qKH7Q/ZKm8Szt7gtLvuBAaMvLr54sx1jWj3NYDakrHq/MHQUR43lx5Pxy138j
+	MKCRY/2GOTIBiHok4YpFmoX1HwOtqoR4w/ajJEK3pfGUlHu7LG1PZz272OooZraXHJkUomQyQYUKc
+	GtU8PYHY+q6uwaneH70Gl2rshK0Sf4R5xpC+jS6rvPYNQaYSWaZTcAj+PuyqFU3b7L1AnvL82qgQH
+	XoRsbwm+y2W4w9s8f4cTCd6E;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vh68t-00000000guU-099H;
+	Sat, 17 Jan 2026 13:15:03 +0000
+Message-ID: <84554ae8-574c-4476-88df-ed9cfcc347f5@samba.org>
+Date: Sat, 17 Jan 2026 14:15:02 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260116220641.322213-1-henrique.carvalho@suse.com>
-In-Reply-To: <20260116220641.322213-1-henrique.carvalho@suse.com>
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 16 Jan 2026 21:00:01 -0600
-X-Gm-Features: AZwV_QiHUAcxwjrlHSXJetgsCMI_G1aYwSF1WHV8uH5YltM6xxvVqB_Ew37mfps
-Message-ID: <CAH2r5msry=T5pv+is1qzOPBvHtpWG4_GT-oLYOLcKF4obf0jOw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] smb: client: introduce multichannel async work
- during mount
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	ematsumiya@suse.de, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Problem with smbdirect rw credits and initiator_depth
+From: Stefan Metzmacher <metze@samba.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Tom Talpey <tom@talpey.com>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+References: <35eec2e6-bf37-43d6-a2d8-7a939a68021b@samba.org>
+ <CAKYAXd9p=7BzmSSKi5n41OKkkw4qrr4cWpWet7rUfC+VT-6h1g@mail.gmail.com>
+ <f59e0dc7-e91c-4a13-8d49-fe183c10b6f4@samba.org>
+ <CAKYAXd-MF1j+CkbWakFJK2ov_SfRUXaRuT6jE0uHZoLxTu130Q@mail.gmail.com>
+ <CAKYAXd__T=L9aWwOuY7Z8fJgMf404=KQ2dTpNRd3mq9dnYCxRw@mail.gmail.com>
+ <86b3c222-d765-4a6c-bb79-915609fa3d27@samba.org>
+ <a3760b26-7458-40a0-ae79-bb94dd0e1d01@samba.org>
+ <3c0c9728-6601-41f1-892f-469e83dd7f19@samba.org>
+ <721eb7b1-dea9-4510-8531-05b2c95cb240@samba.org>
+ <CAKYAXd-WTsVEyONDmOMbKseyAp29q71KiUPwGDp2L_a53oL0vg@mail.gmail.com>
+ <183d92a0-6478-41bb-acb3-ccefd664d62f@samba.org>
+ <ee6873d7-6e47-4d42-9822-cb55b2bfb79e@samba.org>
+ <6a248fde-e0cd-489b-a640-d096fb458807@samba.org>
+ <CAKYAXd-42_fSHBL7iZbuOtYFKqKyhPS-4C+nqbX=-Djq5L6Okg@mail.gmail.com>
+ <b58fa352-2386-4145-b42e-9b4b1d484e17@samba.org>
+ <8b4cc986-cf06-42a9-ab5d-8b35615fa809@samba.org>
+Content-Language: en-US
+In-Reply-To: <8b4cc986-cf06-42a9-ab5d-8b35615fa809@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-tentatively applied to cifs-2.6.git for-next pending more testing and revie=
-w
+Am 17.01.26 um 00:08 schrieb Stefan Metzmacher:
+> Am 15.01.26 um 10:50 schrieb Stefan Metzmacher:
+>> Am 15.01.26 um 03:01 schrieb Namjae Jeon:
+>>> On Thu, Jan 15, 2026 at 3:13 AM Stefan Metzmacher <metze@samba.org> wrote:
+>>>>
+>>>> Am 15.12.25 um 21:17 schrieb Stefan Metzmacher:
+>>>>> Am 14.12.25 um 23:56 schrieb Stefan Metzmacher:
+>>>>>> Am 13.12.25 um 03:14 schrieb Namjae Jeon:
+>>>>>>>> I've put these changes a long with rw credit fixes into my
+>>>>>>>> for-6.18/ksmbd-smbdirect-regression-v4 branch, are you able to
+>>>>>>>> test this?
+>>>>>>> Problems still occur. See:
+>>>>>>
+>>>>>> :-( Would you be able to use rxe and cake a network capture?
+>>>>>>
+>>>>>> Using test files with all zeros, e.g.
+>>>>>> dd if=/dev/zero of=/tmp/4096MBzeros-sparse.dat seek=4096MB bs=1 count=1
+>>>>>> would allow gzip --best on the capture file to compress well...
+>>>>>
+>>>>> I think I found something that explains it and
+>>>>> I was able to reproduce and what I have in mind.
+>>>>>
+>>>>> We increment recv_io.posted.count after ib_post_recv()
+>>>>>
+>>>>> And manage_credits_prior_sending() uses
+>>>>>
+>>>>> new_credits = recv_io.posted.count - recv_io.credits.count
+>>>>>
+>>>>> But there is a race between the hardware receiving a message
+>>>>> and recv_done being called in order to decrement recv_io.posted.count
+>>>>> again. During that race manage_credits_prior_sending() might grant
+>>>>> too much credits.
+>>>>>
+>>>>> Please test my for-6.18/ksmbd-smbdirect-regression-v5 branch,
+>>>>> I haven't tested this branch yet, I'm running out of time
+>>>>> for the day.
+>>>>>
+>>>>> But I tested it with smbclient and having a similar
+>>>>> logic in fs/smb/common/smbdirect/smbdirect_connection.c
+>>>>
+>>>> I was able to reproduce the problem and the fix I created
+>>>> for-6.18/ksmbd-smbdirect-regression-v5 was not correct.
+>>>>
+>>>> I needed to use
+>>>>
+>>>> available = atomic_xchg(&sc->recv_io.credits.available, 0);
+>>>>
+>>>> instead of
+>>>>
+>>>> available = atomic_read(&sc->recv_io.credits.available);
+>>>> atomic_sub(new_credits, &sc->recv_io.credits.available);
+>>>>
+>>>> This following branch works for me:
+>>>> for-6.18/ksmbd-smbdirect-regression-v7
+>>>> and with the fixes again master this should also work:
+>>>> for-6.19/ksmbd-smbdirect-regression-v1
+>>>>
+>>>> I'll post real patches tomorrow.
+>>>>
+>>>> Please check.
+>>> Okay, I will test it with two branches.
+>>> I'll try it too, but I recommend running frametest for performance
+>>> difference and stress testing.
+>>>
+>>> https://support.dvsus.com/hc/en-us/articles/212925466-How-to-use-frametest
+>>>
+>>> ex) frametest.exe -w 4k -t 20 -n 2000
+>>
+>> That works fine, but
+>>
+>>   frametest.exe -r 4k -t 20 -n 2000
+>>
+>> generates a continues stream of such messages:
+>> ksmbd: Failed to send message: -107
+>>
+>> Both with 6.17.2 and for-6.19/ksmbd-smbdirect-regression-v1,
+>> so this is not a regression.
+>>
+>> I'll now check if the is related to the other problems
+>> I found and fixes in for-6.18/ksmbd-smbdirect-regression-v5
+> 
+> Ok, I found the problem.
+> 
+> On send we are not allowed to consume the last send credit
+> without granting any credit to the peer.
+> 
+>      MS-SMBD 3.1.5.1 Sending Upper Layer Messages
+> 
+>      ...
+>      If Connection.SendCredits is 1 and the CreditsGranted field of the message is 0, stop
+>      processing.
+>      ...
+> 
+>      MS-SMBD 3.1.5.9 Managing Credits Prior to Sending
+> 
+>      ...
+>      If Connection.ReceiveCredits is zero, or if Connection.SendCredits is one and the
+>      Connection.SendQueue is not empty, the sender MUST allocate and post at least one receive of size
+>      Connection.MaxReceiveSize and MUST increment Connection.ReceiveCredits by the number
+>      allocated and posted. If no receives are posted, the processing MUST return a value of zero to indicate
+>      to the caller that no Send message can be currently performed.
+>      ...
+> 
+> It works in my master-ipproto-smbdirect branch, see the top commit.
+> 
+> I'll backport the related logic to ksmbd on top of
+> for-6.19/ksmbd-smbdirect-regression-v1 tomorrow.
 
-On Fri, Jan 16, 2026 at 4:07=E2=80=AFPM Henrique Carvalho
-<henrique.carvalho@suse.com> wrote:
->
-> Mounts can experience large delays when servers advertise interfaces
-> that are unreachable from the client.
->
-> To fix this, decouple channel addition from the synchronous mount path
-> by introducing struct mchan_mount and running channel setup as
-> background work.
->
-> Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
-> ---
->  fs/smb/client/cifsglob.h |  5 ++++
->  fs/smb/client/connect.c  | 58 +++++++++++++++++++++++++++++++++++++---
->  2 files changed, 60 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> index 3eca5bfb7030..ebb106e927c4 100644
-> --- a/fs/smb/client/cifsglob.h
-> +++ b/fs/smb/client/cifsglob.h
-> @@ -1796,6 +1796,11 @@ struct cifs_mount_ctx {
->         struct cifs_tcon *tcon;
->  };
->
-> +struct mchan_mount {
-> +       struct work_struct work;
-> +       struct cifs_ses *ses;
-> +};
-> +
->  static inline void __free_dfs_info_param(struct dfs_info3_param *param)
->  {
->         kfree(param->path_name);
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index ce620503e9f7..d6c93980d1b6 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -64,6 +64,10 @@ static int generic_ip_connect(struct TCP_Server_Info *=
-server);
->  static void tlink_rb_insert(struct rb_root *root, struct tcon_link *new_=
-tlink);
->  static void cifs_prune_tlinks(struct work_struct *work);
->
-> +static struct mchan_mount *mchan_mount_alloc(struct cifs_ses *ses);
-> +static void mchan_mount_free(struct mchan_mount *mchan_mount);
-> +static void mchan_mount_work_fn(struct work_struct *work);
-> +
->  /*
->   * Resolve hostname and set ip addr in tcp ses. Useful for hostnames tha=
-t may
->   * get their ip addresses changed at some point.
-> @@ -3899,15 +3903,61 @@ int cifs_is_path_remote(struct cifs_mount_ctx *mn=
-t_ctx)
->         return rc;
->  }
->
-> +static struct mchan_mount *
-> +mchan_mount_alloc(struct cifs_ses *ses)
-> +{
-> +       struct mchan_mount *mchan_mount;
-> +
-> +       mchan_mount =3D kzalloc(sizeof(*mchan_mount), GFP_KERNEL);
-> +       if (!mchan_mount)
-> +               return ERR_PTR(-ENOMEM);
-> +
-> +       INIT_WORK(&mchan_mount->work, mchan_mount_work_fn);
-> +
-> +       spin_lock(&cifs_tcp_ses_lock);
-> +       cifs_smb_ses_inc_refcount(ses);
-> +       spin_unlock(&cifs_tcp_ses_lock);
-> +       mchan_mount->ses =3D ses;
-> +
-> +       return mchan_mount;
-> +}
-> +
-> +static void
-> +mchan_mount_free(struct mchan_mount *mchan_mount)
-> +{
-> +       cifs_put_smb_ses(mchan_mount->ses);
-> +       kfree(mchan_mount);
-> +}
-> +
-> +static void
-> +mchan_mount_work_fn(struct work_struct *work)
-> +{
-> +       struct mchan_mount *mchan_mount =3D container_of(work, struct mch=
-an_mount, work);
-> +
-> +       smb3_update_ses_channels(mchan_mount->ses, mchan_mount->ses->serv=
-er, false, false);
-> +
-> +       mchan_mount_free(mchan_mount);
-> +}
-> +
->  #ifdef CONFIG_CIFS_DFS_UPCALL
->  int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx=
-)
->  {
->         struct cifs_mount_ctx mnt_ctx =3D { .cifs_sb =3D cifs_sb, .fs_ctx=
- =3D ctx, };
-> +       struct mchan_mount *mchan_mount =3D NULL;
->         int rc;
->
->         rc =3D dfs_mount_share(&mnt_ctx);
->         if (rc)
->                 goto error;
-> +
-> +       if (ctx->multichannel) {
-> +               mchan_mount =3D mchan_mount_alloc(mnt_ctx.ses);
-> +               if (IS_ERR(mchan_mount)) {
-> +                       rc =3D PTR_ERR(mchan_mount);
-> +                       goto error;
-> +               }
-> +       }
-> +
->         if (!ctx->dfs_conn)
->                 goto out;
->
-> @@ -3926,17 +3976,19 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, stru=
-ct smb3_fs_context *ctx)
->         ctx->prepath =3D NULL;
->
->  out:
-> -       smb3_update_ses_channels(mnt_ctx.ses, mnt_ctx.server,
-> -                                 false /* from_reconnect */,
-> -                                 false /* disable_mchan */);
->         rc =3D mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
->         if (rc)
->                 goto error;
->
-> +       if (ctx->multichannel)
-> +               queue_work(cifsiod_wq, &mchan_mount->work);
-> +
->         free_xid(mnt_ctx.xid);
->         return rc;
->
->  error:
-> +       if (ctx->multichannel && !IS_ERR_OR_NULL(mchan_mount))
-> +               mchan_mount_free(mchan_mount);
->         cifs_mount_put_conns(&mnt_ctx);
->         return rc;
->  }
-> --
-> 2.50.1
->
->
+for-6.19/ksmbd-smbdirect-regression-v2 has the fixes and works for
+me, I'll prepare official patches (most likely) on Monday.
+
+metze
 
 
---=20
-Thanks,
-
-Steve
