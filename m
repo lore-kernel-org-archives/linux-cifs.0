@@ -1,77 +1,121 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from lithops.sigma-star.at (mailout.nod.at [116.203.167.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351AF1D6193
-	for <linux-cifs@vger.kernel.org>; Sun, 18 Jan 2026 09:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58331288D6;
+	Sun, 18 Jan 2026 15:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.167.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768728044; cv=none; b=PRl0uYWwGpJiY8MsvB4tAeMNEvtN0miqNC2vuIc9Dln63vozPliTPwMKF0PCyut5grTlqgt4wlwUpK+eEfcE5FQo8D4KlgkHkYAJv6TROfS1iF9ZqGnYQrjan2nu4o2C1Xf0TQUzQ8znwh6py70gu6+H5SV7ZELuHzZ8jJPGdJU=
+	t=1768750973; cv=none; b=k1z7f31q48O+MTV0oOzpLVzrCBRDQV2K6lmvWwTTVZBizTtqG80KgcEKDbuyjsgEO/idzxVOmrMgSWcyywUGiIZzqh3kzjGYx57pPkbA0SUfz2jy+x+n6LPB8pdz+KCeY5fssUO5KBlGfbVgEd4rjPDS37gY8W6pKcQCKQHhjVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768728044; c=relaxed/simple;
-	bh=HkHM6XZeP6YwhjUcxo5AK9688Oc/LEY25XayGIU8mvI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g7cFmhDedX58CVoR9x+r+g0G/Kb7suPkNGJp5etgJ9ImP7vxS3bwOB+/JnfHHlP29la0vr8Up31P1n1ujQxr+8PD00hBU/HC2tKcO2YEpI+M2PNziMqqHQxPRseg0xGC2V4cHwZb7NCl+nzefa+mzLovwd1mn74mu/tgTLbF+mA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vvXw5kWr; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vvXw5kWr"
-Message-ID: <c78f52c3-da95-442e-a860-636738616061@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768728041;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kzbhh6WP2ww1CPTldgxHBaP9Wj1tLUI3rjKrLN7Hsfc=;
-	b=vvXw5kWr3yQaCc+s5fnfly4Vl0EVWp8WpGSz4S6yVmH02xJkLyQsEes0JYqpIWpRDAq5u7
-	gWH80s3mzunab9v+aRw3YgdnqVboFwv5L1vs1ecPwEWxCJmmeeOkS1PuzNwAQHMv4PnU0q
-	twN8HV2hUKxPfmLnKE90mhenfFD8gI0=
-Date: Sun, 18 Jan 2026 17:19:50 +0800
+	s=arc-20240116; t=1768750973; c=relaxed/simple;
+	bh=7o8IJfB7ac3jZiXayX/iEYSCvbbdHx+mVAVSDEiNdGc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=LDDue4+mUwzYjUswgDOBJQGC8zcsfTsIaSQZ9JzPxmv8ldM1o0jXvyxW8oXJByJuJ9WjRH/ZO4BAgXyjRAxnTfMMruuJ9D4hyAcT1IO4BkvvcDdCNC4OULFio89jbtAiE7gmTE3rkjOjqMxzAfaW56F5/yKUShaB1PaF6HtnUGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nod.at; spf=fail smtp.mailfrom=nod.at; arc=none smtp.client-ip=116.203.167.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nod.at
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nod.at
+Received: from localhost (localhost [127.0.0.1])
+	by lithops.sigma-star.at (Postfix) with ESMTP id 6720229ABCA;
+	Sun, 18 Jan 2026 16:36:05 +0100 (CET)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+	by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id f1jux-Dqp4vA; Sun, 18 Jan 2026 16:36:04 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by lithops.sigma-star.at (Postfix) with ESMTP id 9282529859D;
+	Sun, 18 Jan 2026 16:36:04 +0100 (CET)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+	by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id HokZmavtm8SI; Sun, 18 Jan 2026 16:36:04 +0100 (CET)
+Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
+	by lithops.sigma-star.at (Postfix) with ESMTP id 04C202918DC;
+	Sun, 18 Jan 2026 16:36:04 +0100 (CET)
+Date: Sun, 18 Jan 2026 16:36:03 +0100 (CET)
+From: Richard Weinberger <richard@nod.at>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, 
+	chuck lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
+	Olga Kornievskaia <okorniev@redhat.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	Amir Goldstein <amir73il@gmail.com>, hughd <hughd@google.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, tytso <tytso@mit.edu>, 
+	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>, 
+	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, 
+	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, 
+	Sandeep Dhavale <dhavale@google.com>, 
+	Hongbo Li <lihongbo22@huawei.com>, Chunhai Guo <guochunhai@vivo.com>, 
+	Carlos Maiolino <cem@kernel.org>, Ilya Dryomov <idryomov@gmail.com>, 
+	Alex Markuze <amarkuze@redhat.com>, 
+	Viacheslav Dubeyko <slava@dubeyko.com>, Chris Mason <clm@fb.com>, 
+	David Sterba <dsterba@suse.com>, 
+	Luis de Bethencourt <luisbg@kernel.org>, 
+	Salah Triki <salah.triki@gmail.com>, 
+	Phillip Lougher <phillip@squashfs.org.uk>, 
+	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam <sprasad@microsoft.com>, Bharath SM <bharathsm@microsoft.com>, 
+	Miklos Szeredi <miklos@szeredi.hu>, 
+	Mike Marshall <hubcap@omnibond.com>, 
+	Martin Brandenburg <martin@omnibond.com>, 
+	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, 
+	Joseph Qi <joseph.qi@linux.alibaba.com>, 
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, 
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>, 
+	Trond Myklebust <trondmy@kernel.org>, anna <anna@kernel.org>, 
+	Dave Kleikamp <shaggy@kernel.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Jan Kara <jack@suse.cz>, 
+	Andreas Gruenbacher <agruenba@redhat.com>, 
+	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, 
+	Christoph Hellwig <hch@infradead.org>, 
+	linux-nfs <linux-nfs@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
+	linux-mm <linux-mm@kvack.org>, 
+	linux-ext4 <linux-ext4@vger.kernel.org>, 
+	linux-erofs <linux-erofs@lists.ozlabs.org>, 
+	linux-xfs <linux-xfs@vger.kernel.org>, 
+	ceph-devel <ceph-devel@vger.kernel.org>, 
+	linux-btrfs <linux-btrfs@vger.kernel.org>, 
+	linux-cifs <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>, 
+	linux-unionfs <linux-unionfs@vger.kernel.org>, 
+	devel <devel@lists.orangefs.org>, 
+	ocfs2-devel <ocfs2-devel@lists.linux.dev>, 
+	ntfs3 <ntfs3@lists.linux.dev>, 
+	linux-nilfs <linux-nilfs@vger.kernel.org>, 
+	jfs-discussion <jfs-discussion@lists.sourceforge.net>, 
+	linux-mtd <linux-mtd@lists.infradead.org>, 
+	gfs2 <gfs2@lists.linux.dev>, 
+	linux-f2fs-devel <linux-f2fs-devel@lists.sourceforge.net>
+Message-ID: <2119146172.135240.1768750563673.JavaMail.zimbra@nod.at>
+In-Reply-To: <20260115-exportfs-nfsd-v1-23-8e80160e3c0c@kernel.org>
+References: <20260115-exportfs-nfsd-v1-0-8e80160e3c0c@kernel.org> <20260115-exportfs-nfsd-v1-23-8e80160e3c0c@kernel.org>
+Subject: Re: [PATCH 23/29] jffs2: add EXPORT_OP_STABLE_HANDLES flag to
+ export operations
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v9 1/1] smb/client: introduce KUnit test to check search
- result of smb2_error_map_table
-To: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
- ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
- bharathsm@microsoft.com, senozhatsky@chromium.org, dhowells@redhat.com,
- Ye Bin <yebin10@huawei.com>, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Cc: linux-cifs@vger.kernel.org
-References: <20260118091313.1988168-1-chenxiaosong.chenxiaosong@linux.dev>
- <20260118091313.1988168-2-chenxiaosong.chenxiaosong@linux.dev>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20260118091313.1988168-2-chenxiaosong.chenxiaosong@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF146 (Linux)/8.8.12_GA_3809)
+Thread-Topic: jffs2: add EXPORT_OP_STABLE_HANDLES flag to export operations
+Thread-Index: pUsbo+Kg1d9ytlyubsob1wi+Ql8B0A==
 
-When `CONFIG_EXT4_FS=m`, the `mballoc-test.c` KUnit tests in the ext4 
-module cannot be executed. I have reported the ext4 issue to my friend 
-Ye Bin <yebin10@huawei.com>, and he will modify ext4 to handle this case 
-in a similar way to how we did for SMB.
+----- Urspr=C3=BCngliche Mail -----
+> Add the EXPORT_OP_STABLE_HANDLES flag to jffs2 export operations to indic=
+ate
+> that this filesystem can be exported via NFS.
+>=20
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+> fs/jffs2/super.c | 1 +
+> 1 file changed, 1 insertion(+)
+
+Acked-by: Richard Weinberger <richard@nod.at>
 
 Thanks,
-ChenXiaoSong <chenxiaosong@kylinos.cn>
-
-On 1/18/26 17:13, chenxiaosong.chenxiaosong@linux.dev wrote:
-> --- a/fs/smb/client/smb2maperror.c
-> +++ b/fs/smb/client/smb2maperror.c
-> @@ -114,3 +114,11 @@ int __init smb2_init_maperror(void)
->   
->   	return 0;
->   }
-> +
-> +#define SMB_CLIENT_KUNIT_AVAILABLE \
-> +	((IS_MODULE(CONFIG_CIFS) && IS_ENABLED(CONFIG_KUNIT)) || \
-> +	 (IS_BUILTIN(CONFIG_CIFS) && IS_BUILTIN(CONFIG_KUNIT)))
-> +
-> +#if SMB_CLIENT_KUNIT_AVAILABLE && IS_ENABLED(CONFIG_SMB_KUNIT_TESTS)
-> +#include "smb2maperror_test.c"
-> +#endif /* CONFIG_SMB_KUNIT_TESTS */
-
+//richard
