@@ -1,141 +1,220 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D50B3A7830
-	for <linux-cifs@vger.kernel.org>; Mon, 19 Jan 2026 16:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B0638BF8D
+	for <linux-cifs@vger.kernel.org>; Mon, 19 Jan 2026 16:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768841016; cv=none; b=lOaAIHRwGMfUsw/Yzr32Crd4uMum78utYKZcbWybEE9SPJmyR9QWSSxLRuT1HFhpRFxSL+Ud/1wqWYKEEjirQni32y2m/qbiSq35S2lqu53LEVz9blzv37aQ2nKUaaPmzuGCBZJ+gS6tF7j2mnzz1yVikI44qiBJ6CSh34mv8Tg=
+	t=1768841053; cv=none; b=B5SAoXArBUfxs7eJ7d3FA0uh1BaagM2Mpkz+i5RyjIHe69bgWJ0vG1mxfmf/98vmlVlWMM2dFftK4eb69K+1hCBMRl4kxcqCt9cQx1j1qZqOnPt4fvXa/6+0zfu1EEwQLSyR87edncgxjR/NbzfC8Mn+MSxPxFyxLAsRg5rRDzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768841016; c=relaxed/simple;
-	bh=CQ3IL8fqKnWIgvRv+IOv0Cfz8J1ZjzxNV5oCIJJcLY4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RigvV8gVAQ6lrBFAOApDNlm78XmHDZanQ8UqSvC8XnpFHMzkHo7TTPoyvcis17+3hIBIRLXveiF7B/1Z/mlRITTkXEqcaYQJerTTHx89LWuTiY+KlRFbEZCwOczmVZMx+7G5QCbdxwY2UKaMxmMhFmAPn/5AiLrIuLOHurcj9Jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I08FL+hn; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768841053; c=relaxed/simple;
+	bh=svT1/kO9Fm5LsQQ+8iGaf2OpTuO3oOkak0aa4SyIkHo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AoimbagxPz4zDIebnQQy7TFN+7eTm1UNtqbea67UnXQHSaVFSLVxO+PBApZundcL2UcbLcEFMVnNeXHsJojuEV9vyiNmbkBtIk1uddhcOG1+Wf+et9jsge8/Ya5q6Fv2Cht2ZXymBq2XG2NJc0xsuM1zyF4tshVRQSElxX2v51A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=T6GdVkkS; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I08FL+hn"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-64b921d9e67so7600355a12.3
-        for <linux-cifs@vger.kernel.org>; Mon, 19 Jan 2026 08:43:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="T6GdVkkS"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4801c1ad878so33473535e9.1
+        for <linux-cifs@vger.kernel.org>; Mon, 19 Jan 2026 08:43:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768841011; x=1769445811; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t7xapJC59KqqTTsHRvPEloTsuOjJhUfycEcUpCAL4U8=;
-        b=I08FL+hnhz8d4kYl7Y2qUf8KhTCV3L1gtSSYiUt44LfuwlJOhbuXloyFunmZ9tNOVl
-         9RitHVVjJ1hi2U5+dH19ve+S5OSb0vxhAvjiJ4hKFGFD33p+sqLphDuH6giQCXBMz2CY
-         6HE9IU+g1NQYM7UojcBIqap0wIhOhJR1a3Olt8Wq682EaAzfzDXjfRqUgsdIWkTHbmDC
-         dnmxSuWuEkfrVI4iJJEASrwV2WkB2wOt9C0R5PWwkXIvwcuNWrPlPauMwIINawvCoalA
-         m9uPz3sLVwivbMRhJ+EpVLIx+DVdAMpOF87J/A41Ie5jnE4mhIuTEQUJ2YQvda+ZBdY4
-         oUXA==
+        d=suse.com; s=google; t=1768841031; x=1769445831; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MgLzccUWq4iGBHcGxE8g+OXGVNhTfRDHPShYoi/owx8=;
+        b=T6GdVkkSTFKjLYKA+FDler/x0SM5G4h2OXRRHftKizuu67DfzxW/+FoILEHwDAb/Mx
+         j3xOdAeUma/+8jaH6hEUfUewiPlAhbb0kTpephokBXhmSKmJD1vg7ah1+sxq0Kck7N4U
+         iOqbh/zxXux4Z7ujW8wzTMuMb+/xQONXrCviuGz2v3pH+N2+r7XN8z7VSjb6d0Od94ru
+         Brxuw34uxrS45XGXZ8pGnU8qPZB6HwcfY2pZtGHJpo15Jgrw42RSkyOVAmzTHec3kGW7
+         PU8W47o2gC327TgcVO+HCSqqapTVcqMaaVBEuac4zqMveWrP9cgykmf75+8LZ9tLlitr
+         5e1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768841011; x=1769445811;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=t7xapJC59KqqTTsHRvPEloTsuOjJhUfycEcUpCAL4U8=;
-        b=vP1FVoGqWss2nmlZ5VgwC27kk9HXuSjG0mbfhCmJvIaLUOamLj3wRlrF+DcpUgznbQ
-         cerc+QR5HKR69/qvoWLcP2XJ1RjDkMneqvLMIFwcYMWE4bflGTIm2LChZ/nbOeLXEgMz
-         esZKtdl5mhr+64CGPBhgnbMypNQcdXsOnOsQXXPhxx3Uv4nlPu5XpgyNy+1jOjZgdKpx
-         yBx5HN3XWVC+cTpNBuMMT08gUyZcaU+4q9DENG0ETTfybb9WjiKXTdpPMwl/ndye3EQh
-         Nc/zXRzvfj8oIo8hY8O8rnNwA87clisA0T9ApJ6z2uOiR26lncRsXkb6nhgx2N14mXJc
-         JXgg==
-X-Forwarded-Encrypted: i=1; AJvYcCXk9poJ8RbZRgJj6wYWFvzhzTHFa3NLGfnbe++PTfil/judeHxZiA5pnTTCvdTIKYoKguLcNEm0Sk/p@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOj1Vl59aOed0RouBq4yCjwnCRa4uCehcF8M8yXEyk0JiVcCFV
-	35PuJZHg9PZ8WqPdVDkhcS1P3m+1jxduy47iWYw2nbRXjXiR3SezgOL7XOQuzuQs/PCn1Z9Xpqz
-	pZjtwfVcp4Z+sg3a/qiQS+NLr7ZT9Ems=
-X-Gm-Gg: AZuq6aJ3H1nrUkqVCeg1tFcqcGVDC8Et2Yg731Pwd8Axmm+0Vft5nv5+OWIUKa1FkkA
-	alWPP6Z+/0BC3l6w5KdYGmPsUnjGlZ+PryiZwKVJQo35cgc5+3aYbIc2tRLbHl+Ph5KGp1HjWEW
-	jhDK4UuCeM14vfZkl9TQ5VWl1yFX1AaApcyMjbOAo3dxx9ONTNKZnsTR6hEZx2TgfOyb0vuKj2B
-	au07aqx9A3GctBGLCckolyzt1A8diq3C1gj15dLyuzYSddds0sdNOy5QaXNgHfdqL1Ae4MhleTZ
-	eV01Bh5sKDP5x5ajDN43D6oCMbI3D2/EOYBcNKyo
-X-Received: by 2002:a05:6402:5106:b0:64c:584c:556c with SMTP id
- 4fb4d7f45d1cf-654bb6192admr8530585a12.30.1768841011353; Mon, 19 Jan 2026
- 08:43:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768841031; x=1769445831;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MgLzccUWq4iGBHcGxE8g+OXGVNhTfRDHPShYoi/owx8=;
+        b=EJVU208z7zusJTZru066gs13HvpCONnPFhINy3Vo2ucqVlYBNxu4JmMxvrxF25TFbT
+         Kkot23gpG7IU39iMBARqmdfPiA5VdD9plTJB/bSfw7SSZ3AEQsbLExn1VevT9smvkytF
+         Ej7imdu+M7IOj91wkWDtfo723BYEaLANig5WfVDoHPZZUP0W3hkgw0DD+en2DvA2RCy6
+         oKvA3x5UAlarfPKCph/VdxsH/LWZyE7L/+VdYuVp6qR74kFYlo/d5OpglqPmWdlAyOKT
+         8/jYFUoT6v60jghyLJvVJLZoryGjhyLsngYJ/PMFfK1a5UdLtQCVrMxd0lhViepwnDE3
+         E4Vw==
+X-Forwarded-Encrypted: i=1; AJvYcCXnFQEldMwuUjldUzd32npW9uyaFvR7VZz/fJq1Iz6BQVZm5EuBl7uShlap8rUbCKs1giJGuxMFvK6W@vger.kernel.org
+X-Gm-Message-State: AOJu0YzY9baKA67hCAZheacNC3Ug4Gc/YoV4ptpIlppcFl5eSv/TFgmD
+	Vvthi6Os/a1A9tgPa6zXehQD5f1eeVXCjY0aJsjf28xmuESK0CCJPGrWeF8kR5Rm/cQ=
+X-Gm-Gg: AY/fxX6NuwTi+NSVETk/nC2xxkYnHOFz3RLiAEFPAnKHoxpLsTFIj/SRkRjcRdsbHSl
+	3N8fiRY8DZV1G/GFfTOBqu4KAveuGUJyY1QwJOVrjMsPykCl4r/dSgUERHv/FroJZgdG2oaEN95
+	pc8K/Q01LyCQpe8gOvP4+OxfSR1nTm12ZuKCuxp6yWPNM2pV8e+WUtgpLhdUTT/LwvFtOqfohUM
+	YFxDQeq+JhUNXZSTZSmFI79ZKqkfyHenQFiLJ8nXf4rJF9ib9nMj883pl59E5r2IBHpE4OiKCKB
+	rx2H7SIjP7JbM4BBUwGi/ektGqhH1ItbPjyxRe9dzxCXJJ5cwPyKf5d9ug8eETpuyVUC3U0GyfY
+	Ctld1OR1FLGFLSvl7T/bjraSmo0g2yWnN/4JYsTkpOxtxhoFbv0zOdvWCuO9GQtix78HOr7sadL
+	w+mHGpJDGo87sRAlC0
+X-Received: by 2002:a05:600c:4f54:b0:46e:761b:e7ff with SMTP id 5b1f17b1804b1-4801e34821cmr129307645e9.28.1768841030730;
+        Mon, 19 Jan 2026 08:43:50 -0800 (PST)
+Received: from precision ([177.115.55.201])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b6bd8e7cd9sm12539518eec.16.2026.01.19.08.43.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jan 2026 08:43:50 -0800 (PST)
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: sfrench@samba.org
+Cc: pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	ematsumiya@suse.de,
+	linux-cifs@vger.kernel.org
+Subject: [PATCH v3 1/2] smb: client: introduce multichannel async work during mount
+Date: Mon, 19 Jan 2026 13:42:12 -0300
+Message-ID: <20260119164213.539322-1-henrique.carvalho@suse.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260119-exportfs-nfsd-v2-0-d93368f903bd@kernel.org> <20260119-exportfs-nfsd-v2-27-d93368f903bd@kernel.org>
-In-Reply-To: <20260119-exportfs-nfsd-v2-27-d93368f903bd@kernel.org>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Mon, 19 Jan 2026 17:43:19 +0100
-X-Gm-Features: AZwV_QgQ6YFmczFqASwqjyOa509PoCTPsOB-sET1G173IBHOd4X5kFjH9N6z5MI
-Message-ID: <CAOQ4uxjyTdf21G1Y=_5Eox58drVPA0gAMeSQZxh=T36_yzssNw@mail.gmail.com>
-Subject: Re: [PATCH v2 27/31] fuse: add EXPORT_OP_STABLE_HANDLES flag to
- export operations
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
-	Hugh Dickins <hughd@google.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, "Theodore Ts'o" <tytso@mit.edu>, 
-	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>, Gao Xiang <xiang@kernel.org>, 
-	Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>, 
-	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>, 
-	Hongbo Li <lihongbo22@huawei.com>, Chunhai Guo <guochunhai@vivo.com>, 
-	Carlos Maiolino <cem@kernel.org>, Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>, 
-	Viacheslav Dubeyko <slava@dubeyko.com>, Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, 
-	Luis de Bethencourt <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>, 
-	Phillip Lougher <phillip@squashfs.org.uk>, Steve French <sfrench@samba.org>, 
-	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Mike Marshall <hubcap@omnibond.com>, 
-	Martin Brandenburg <martin@omnibond.com>, Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, 
-	Joseph Qi <joseph.qi@linux.alibaba.com>, 
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, 
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Dave Kleikamp <shaggy@kernel.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>, Jan Kara <jack@suse.cz>, 
-	Andreas Gruenbacher <agruenba@redhat.com>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
-	Jaegeuk Kim <jaegeuk@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	David Laight <david.laight.linux@gmail.com>, Dave Chinner <david@fromorbit.com>, 
-	Christoph Hellwig <hch@infradead.org>, linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-ext4@vger.kernel.org, 
-	linux-erofs@lists.ozlabs.org, linux-xfs@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	linux-unionfs@vger.kernel.org, devel@lists.orangefs.org, 
-	ocfs2-devel@lists.linux.dev, ntfs3@lists.linux.dev, 
-	linux-nilfs@vger.kernel.org, jfs-discussion@lists.sourceforge.net, 
-	linux-mtd@lists.infradead.org, gfs2@lists.linux.dev, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 19, 2026 at 5:30=E2=80=AFPM Jeff Layton <jlayton@kernel.org> wr=
-ote:
->
-> Add the EXPORT_OP_STABLE_HANDLES flag to fuse export operations to indica=
-te
-> that this filesystem can be exported via NFS.
->
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Mounts can experience large delays when servers advertise interfaces
+that are unreachable from the client.
 
-> ---
->  fs/fuse/inode.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
-> index 819e50d666224a6201cfc7f450e0bd37bfe32810..df92414e903b200fedb9dc777=
-b913dae1e2d0741 100644
-> --- a/fs/fuse/inode.c
-> +++ b/fs/fuse/inode.c
-> @@ -1215,6 +1215,7 @@ static const struct export_operations fuse_export_o=
-perations =3D {
->         .fh_to_parent   =3D fuse_fh_to_parent,
->         .encode_fh      =3D fuse_encode_fh,
->         .get_parent     =3D fuse_get_parent,
-> +       .flags          =3D EXPORT_OP_STABLE_HANDLES,
->  };
->
->  static const struct super_operations fuse_super_operations =3D {
->
-> --
-> 2.52.0
->
+To fix this, decouple channel addition from the synchronous mount path
+by introducing struct mchan_mount and running channel setup as
+background work.
+
+Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+---
+V2 -> V3: restored comments present in smb3_update_ses_channels() and
+added Shyam's RB
+V1 -> V2: remove vestigial fields from mchan_mount and replaced
+get_smb_session function for smb_ses_inc_refcount
+
+ fs/smb/client/cifsglob.h |  5 ++++
+ fs/smb/client/connect.c  | 61 ++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 63 insertions(+), 3 deletions(-)
+
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 3eca5bfb7030..ebb106e927c4 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1796,6 +1796,11 @@ struct cifs_mount_ctx {
+ 	struct cifs_tcon *tcon;
+ };
+ 
++struct mchan_mount {
++	struct work_struct work;
++	struct cifs_ses *ses;
++};
++
+ static inline void __free_dfs_info_param(struct dfs_info3_param *param)
+ {
+ 	kfree(param->path_name);
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index ce620503e9f7..1b984669de29 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -64,6 +64,10 @@ static int generic_ip_connect(struct TCP_Server_Info *server);
+ static void tlink_rb_insert(struct rb_root *root, struct tcon_link *new_tlink);
+ static void cifs_prune_tlinks(struct work_struct *work);
+ 
++static struct mchan_mount *mchan_mount_alloc(struct cifs_ses *ses);
++static void mchan_mount_free(struct mchan_mount *mchan_mount);
++static void mchan_mount_work_fn(struct work_struct *work);
++
+ /*
+  * Resolve hostname and set ip addr in tcp ses. Useful for hostnames that may
+  * get their ip addresses changed at some point.
+@@ -3899,15 +3903,64 @@ int cifs_is_path_remote(struct cifs_mount_ctx *mnt_ctx)
+ 	return rc;
+ }
+ 
++static struct mchan_mount *
++mchan_mount_alloc(struct cifs_ses *ses)
++{
++	struct mchan_mount *mchan_mount;
++
++	mchan_mount = kzalloc(sizeof(*mchan_mount), GFP_KERNEL);
++	if (!mchan_mount)
++		return ERR_PTR(-ENOMEM);
++
++	INIT_WORK(&mchan_mount->work, mchan_mount_work_fn);
++
++	spin_lock(&cifs_tcp_ses_lock);
++	cifs_smb_ses_inc_refcount(ses);
++	spin_unlock(&cifs_tcp_ses_lock);
++	mchan_mount->ses = ses;
++
++	return mchan_mount;
++}
++
++static void
++mchan_mount_free(struct mchan_mount *mchan_mount)
++{
++	cifs_put_smb_ses(mchan_mount->ses);
++	kfree(mchan_mount);
++}
++
++static void
++mchan_mount_work_fn(struct work_struct *work)
++{
++	struct mchan_mount *mchan_mount = container_of(work, struct mchan_mount, work);
++
++	smb3_update_ses_channels(mchan_mount->ses,
++				 mchan_mount->ses->server,
++				 false /* from_reconnect */,
++				 false /* disable_mchan */);
++
++	mchan_mount_free(mchan_mount);
++}
++
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ {
+ 	struct cifs_mount_ctx mnt_ctx = { .cifs_sb = cifs_sb, .fs_ctx = ctx, };
++	struct mchan_mount *mchan_mount = NULL;
+ 	int rc;
+ 
+ 	rc = dfs_mount_share(&mnt_ctx);
+ 	if (rc)
+ 		goto error;
++
++	if (ctx->multichannel) {
++		mchan_mount = mchan_mount_alloc(mnt_ctx.ses);
++		if (IS_ERR(mchan_mount)) {
++			rc = PTR_ERR(mchan_mount);
++			goto error;
++		}
++	}
++
+ 	if (!ctx->dfs_conn)
+ 		goto out;
+ 
+@@ -3926,17 +3979,19 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ 	ctx->prepath = NULL;
+ 
+ out:
+-	smb3_update_ses_channels(mnt_ctx.ses, mnt_ctx.server,
+-				  false /* from_reconnect */,
+-				  false /* disable_mchan */);
+ 	rc = mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
+ 	if (rc)
+ 		goto error;
+ 
++	if (ctx->multichannel)
++		queue_work(cifsiod_wq, &mchan_mount->work);
++
+ 	free_xid(mnt_ctx.xid);
+ 	return rc;
+ 
+ error:
++	if (ctx->multichannel && !IS_ERR_OR_NULL(mchan_mount))
++		mchan_mount_free(mchan_mount);
+ 	cifs_mount_put_conns(&mnt_ctx);
+ 	return rc;
+ }
+-- 
+2.50.1
+
