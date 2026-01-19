@@ -1,72 +1,71 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199D71519B4
-	for <linux-cifs@vger.kernel.org>; Mon, 19 Jan 2026 05:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94533FEF
+	for <linux-cifs@vger.kernel.org>; Mon, 19 Jan 2026 05:35:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768800617; cv=none; b=fitfTj2jwP3fF28UTPLLEtBTddYyOaz8J91AFbNPR8iQLXdbLoi9zdTrBoxbtUahKx/Wfgy+MYNV45pAu9f2Zjipz1es20mbOhrccpiQqX2YAQUiBH7Eg7sjgq1aUZX0s/hmPVRUHwb7jtEfujuGvYUdqwQVZBZ8pl3BrnJG6JU=
+	t=1768800957; cv=none; b=rECutvSaV1eCEj4WS5fnJQeMZiESg30oxhGSpn+WErwCBU0zMKT9oMwbSetkWfXMRdW9HBI+NDHlG2YKAB1wfvOdI8FkbRgkbCrMO4NNMCUGctI2H9BQnz9oIDx0ho6WkcAfn9n3aoWfNARdNXPwCRkoxsjhnhnyEnJoZjfIod0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768800617; c=relaxed/simple;
-	bh=RyPx8KEWd4KJnb1b0QmwcCM+EcVBb5TUkbFAEccvs0U=;
+	s=arc-20240116; t=1768800957; c=relaxed/simple;
+	bh=7BqMaEVGz86vKGb+0SFdOvMcuI+zvbPIRz1iv1NasSA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AjeKzsxzMDqenM5iJ8FUiymwVs5l6UKRdxAMUl2HSHa65Z2J9/1duqKhTib4gYjAm8FGiBjQ7lWHWvA5ouHASmNnkNDlu//9iMnmQKFxe1RPkxIA3ZI8cSeBBYiObtGIttQJmpm+VWk2YNKkPz5z8COw/lRx56Gck8UBkZnUJfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LKIEFhGq; arc=none smtp.client-ip=209.85.208.52
+	 To:Cc:Content-Type; b=dbH2D25v98iMmo30bhrry3H1wkjQHth9y/qMZuqCC/GDpt9G/jPnMAw2Ggu3NsiGTyi9vZE9new98tw4UaKhLK/ZFbcbqZglXsXDToEVGr6z1ZJlXy6Tn8P7Y/dWueT9lx/jsixKLoaC9ClMQZOw2Tdqy7cNMkKukB+3s/U5XFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kJOA42b9; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LKIEFhGq"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-64b9b0b4d5dso8101443a12.1
-        for <linux-cifs@vger.kernel.org>; Sun, 18 Jan 2026 21:30:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kJOA42b9"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b8765b80a52so632260066b.2
+        for <linux-cifs@vger.kernel.org>; Sun, 18 Jan 2026 21:35:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768800614; x=1769405414; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1768800954; x=1769405754; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=C9k76Br+Q+WxdY7O1w/viGg0SCaIwXt90RJF+siNjxE=;
-        b=LKIEFhGqW5RSSem+O+40CO8DrnZRJzF09cnXZw/nk5GyExWMmAvoeFFV1qHbnSNHjM
-         Um03vxA8YD3ComTnNL9c3msIt0mgVab7OXQp3N9QbIpAPK/bEj+lmjmF/l3+nCNV9WQJ
-         Pgs8Tss5XhAqL9z/54Bkerj6fP0s2BYy3ZiqiItyjkdwozHVeefAiAA26HsTHn2GyCdY
-         JD/rUC5FrxT1GQ6XtPVxBLVa7JJ795GblfSbmCPM5TohJ6fyrK5yHZMspbEnRdW+nR+T
-         J9wYRY4xbCD4nzU2xD2BCvxw0LK0hGaOVO4eQXv71+f5p9QmGuUnznKCsDwyrdBa5Mp8
-         dwmw==
+        bh=Hd7wfKHqWK+kRwmSI+Pf2BPzDIcGFJfolbhnvsHNpOo=;
+        b=kJOA42b90wa3Cjpfbtul5LBmwYbBI9zn9PK6MGTwzryosW3PXhKaqywyXQflWqhZju
+         kRxKSXOZEzj+c2tK1IlgK9HL0I3UV+U2dCs6qDrIRfgcBbY4RjTrG/+lN6Ofty+tEHzH
+         Xrph8mUeToq8hQBVmvDlcjwgjYFXEdaRO5M+WQcFNb8KIGC3FDTx+MSwQk93FRvNXO62
+         30geejn5Lc1eGNR6sgPmKg67P6yZGb9FZXgruob8SizFjuCH35QIjosx2/FDr2vvtM7o
+         7neBw5bg+eJdiZienpA1eLvNNn6gSqXqjUF6mSw58H3SfP6t5v5H5BcchVge2yTegFQH
+         uTZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768800614; x=1769405414;
+        d=1e100.net; s=20230601; t=1768800954; x=1769405754;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=C9k76Br+Q+WxdY7O1w/viGg0SCaIwXt90RJF+siNjxE=;
-        b=fqgT9DT0vU/+I/TyoRuqgRdIeuXkeZK0yMe6rFI7qIXTmbOZqIHiXfYD3YUrWQNKLY
-         RNOmQZJtUZ2gGEAj6Up/ALQC9vv215kCK7sXmsarGtNR+IPQBPGvs0C3k/un6rIsPF5F
-         oTssG/Mc6/VxunsCGCANCOqyhLNhVBusc2gcUnXaFjiV3q+oiFaqvuAiv9Z3p1HvpzWd
-         yX485nHJTAcgsWVa0Stseq1UrjLqKUnSCegqpn1n29yoOU0okPad4HRKAY18idJp6QJt
-         WaKUcsvz/115CLSf6/6aYovQivHjHIEcj9j7mhntouu6lUts743Af8C5i6OWHLbjn275
-         oDZA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKLMCUEaI2qxtAvsUkxVk86RVlGJLbpt2IuPn9IUhzg/AqrVTeHLbJ4uKq/ZwY6JsAuLzlqPZGmmOB@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJCz6APapV3tU1DTogmeahun/EsGBSLRdII6CshH2p5xaGCmIo
-	CM8BlwJJ+XE3Y1ueyHwLKnoNwYsQlczy4EeX7QXAXk5pdSTUk5uWjf9DiLzVw83BC2L5boOpznU
-	wmUkGQCcT2z5EWN+8PfETUKsoW9TLcm8=
-X-Gm-Gg: AY/fxX7eifhaM4edf++8w63gvvUffjQ2O65rOQl0cHSBsqkDBeJyi+7eWZEST57wd6l
-	9tRQXhekCr42+jNKSQ/itSHXhRMxrUj/cupcbsojYpXF6IvRBmzs6OLCs11DHQ/Np0PiJWDlS+E
-	l1IYks+l8QtvPvUdnyYqMHwCYsYKu6bGQZHiw1emrW0rLswsQH+vsj79Row6/cjrLPb6vO5xq/1
-	R5bdqq3CzhBBABfERCaa9sdO8q08ngfqnI8fpXT4wr5vdApimkCW1JyVhSUJfvKMPZzMA==
-X-Received: by 2002:a17:906:f584:b0:b73:278a:a499 with SMTP id
- a640c23a62f3a-b879690c3ccmr765457866b.15.1768800614164; Sun, 18 Jan 2026
- 21:30:14 -0800 (PST)
+        bh=Hd7wfKHqWK+kRwmSI+Pf2BPzDIcGFJfolbhnvsHNpOo=;
+        b=NvfypHYIvsc9MFGtjV0YSyxHtia7/rzY26GXx5lY1RaxfSHi0AOnJRLeGT4swaead5
+         ZaSQh7o6f8OH4XC2k1XKHeqYxdfo/y3y6yd0W8JXFP9nxkCluZv48RDHs7z6dTUozP+A
+         amvknuopXsZ69WK/CAdJoSWhQJE/RspFWjzbgmn41v85JTST5y2+4HjauZrDEfkWtRx8
+         YHPVjNbGv1N12kxU+sXxHFfkI2nf0e5G6Nzc0FfDE66j3MMhaMZLIdpu8x6cNOfONtU3
+         yk5D/+iyQDi322cuddYPmn1ffczBfWxgJ7hyGasN5FSNbRHIfAnwbRxRRObROQRH5+U+
+         bElw==
+X-Forwarded-Encrypted: i=1; AJvYcCWK8e16w6up1b8E3955boMO19apATcOVi7aBXsiDPVz13JtQH2h/pTTptrjTQA+eR4ZluPK5NtTMljW@vger.kernel.org
+X-Gm-Message-State: AOJu0YztawmmVFpRytF7QSM/Lv5FaUhthWU4DtXzhFdegmeFCaydaYm3
+	GMg0xuz8gldkJ26V2hTb7LOuR5xZN6D+s7RN2vUfA2rMZx8mHvFaqUewjnGxCZTHGwVbeTTBxUJ
+	IQXH2GIALdpQuoMv/1iNPUM5+sY3RkpM=
+X-Gm-Gg: AY/fxX6AsJU7o8U6hb2qMZHS0nJqnESN4wRwrFAqp5yoqyHBrve9zkkZiSzPn32D4g9
+	gGuH2EHtqw6+uwvzQaLHkz+6RdZuCqs0BhgpUcyNMYAHt6at0eY7U3buJHa4HakbRPlXp9Lxmvx
+	QmIqHKXwSdSIpD39jE7M2c/DlbNpVhaoV9Lp9s5Qsl1RKkcKPml29/YPqGZGHNDSr29/kntwGTL
+	c1YeiE/HLX7huuTbMgWGugwOz1spHTyTR0nUEiTPSmhvxctHR7XoPm5+i22MFm25izxng==
+X-Received: by 2002:a17:907:d92:b0:b87:1d30:7ec with SMTP id
+ a640c23a62f3a-b8792f7985dmr857948166b.37.1768800953994; Sun, 18 Jan 2026
+ 21:35:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260116220641.322213-1-henrique.carvalho@suse.com>
-In-Reply-To: <20260116220641.322213-1-henrique.carvalho@suse.com>
+References: <20260116220641.322213-1-henrique.carvalho@suse.com> <20260116220641.322213-2-henrique.carvalho@suse.com>
+In-Reply-To: <20260116220641.322213-2-henrique.carvalho@suse.com>
 From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Mon, 19 Jan 2026 11:00:03 +0530
-X-Gm-Features: AZwV_QiL7jOtTY6qN2cLGp9CcH8huF9rKD9WvMyXPoUmYGm0NMgWjyhXjijbm5M
-Message-ID: <CANT5p=r5+Fw6g-gyA25pw1pX_FCXtnxw2qUG8bt4iTNQnyrxUw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] smb: client: introduce multichannel async work
- during mount
+Date: Mon, 19 Jan 2026 11:05:43 +0530
+X-Gm-Features: AZwV_Qg-Q8E_Wfq9keyd2uV2er65we5frsiI-TXndbaeRY2-SMkStcJBg3Fu0oY
+Message-ID: <CANT5p=oot1H3NufPO-6JJ-iBpjyhiZytSRekZy6vxWL+LCO-mg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] smb: client: add multichannel async work for !CONFIG_CIFS_DFS_UPCALL
 To: Henrique Carvalho <henrique.carvalho@suse.com>
 Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
 	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
@@ -74,120 +73,36 @@ Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Henrique,
-
-Thanks for submitting the patch.
-
 On Sat, Jan 17, 2026 at 3:37=E2=80=AFAM Henrique Carvalho
 <henrique.carvalho@suse.com> wrote:
 >
-> Mounts can experience large delays when servers advertise interfaces
-> that are unreachable from the client.
->
-> To fix this, decouple channel addition from the synchronous mount path
-> by introducing struct mchan_mount and running channel setup as
-> background work.
+> Multichannel support is independent of DFS configuration. Extend the
+> async multichannel setup to non-DFS cifs.ko.
 >
 > Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 > ---
->  fs/smb/client/cifsglob.h |  5 ++++
->  fs/smb/client/connect.c  | 58 +++++++++++++++++++++++++++++++++++++---
->  2 files changed, 60 insertions(+), 3 deletions(-)
+>  fs/smb/client/connect.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
 >
-> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> index 3eca5bfb7030..ebb106e927c4 100644
-> --- a/fs/smb/client/cifsglob.h
-> +++ b/fs/smb/client/cifsglob.h
-> @@ -1796,6 +1796,11 @@ struct cifs_mount_ctx {
->         struct cifs_tcon *tcon;
->  };
->
-> +struct mchan_mount {
-> +       struct work_struct work;
-> +       struct cifs_ses *ses;
-> +};
-> +
->  static inline void __free_dfs_info_param(struct dfs_info3_param *param)
->  {
->         kfree(param->path_name);
 > diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index ce620503e9f7..d6c93980d1b6 100644
+> index d6c93980d1b6..c635b503af52 100644
 > --- a/fs/smb/client/connect.c
 > +++ b/fs/smb/client/connect.c
-> @@ -64,6 +64,10 @@ static int generic_ip_connect(struct TCP_Server_Info *=
-server);
->  static void tlink_rb_insert(struct rb_root *root, struct tcon_link *new_=
-tlink);
->  static void cifs_prune_tlinks(struct work_struct *work);
->
-> +static struct mchan_mount *mchan_mount_alloc(struct cifs_ses *ses);
-> +static void mchan_mount_free(struct mchan_mount *mchan_mount);
-> +static void mchan_mount_work_fn(struct work_struct *work);
-> +
->  /*
->   * Resolve hostname and set ip addr in tcp ses. Useful for hostnames tha=
-t may
->   * get their ip addresses changed at some point.
-> @@ -3899,15 +3903,61 @@ int cifs_is_path_remote(struct cifs_mount_ctx *mn=
-t_ctx)
->         return rc;
->  }
->
-> +static struct mchan_mount *
-> +mchan_mount_alloc(struct cifs_ses *ses)
-> +{
-> +       struct mchan_mount *mchan_mount;
-> +
-> +       mchan_mount =3D kzalloc(sizeof(*mchan_mount), GFP_KERNEL);
-> +       if (!mchan_mount)
-> +               return ERR_PTR(-ENOMEM);
-> +
-> +       INIT_WORK(&mchan_mount->work, mchan_mount_work_fn);
-> +
-> +       spin_lock(&cifs_tcp_ses_lock);
-> +       cifs_smb_ses_inc_refcount(ses);
-> +       spin_unlock(&cifs_tcp_ses_lock);
-> +       mchan_mount->ses =3D ses;
-> +
-> +       return mchan_mount;
-> +}
-> +
-> +static void
-> +mchan_mount_free(struct mchan_mount *mchan_mount)
-> +{
-> +       cifs_put_smb_ses(mchan_mount->ses);
-> +       kfree(mchan_mount);
-> +}
-> +
-> +static void
-> +mchan_mount_work_fn(struct work_struct *work)
-> +{
-> +       struct mchan_mount *mchan_mount =3D container_of(work, struct mch=
-an_mount, work);
-> +
-> +       smb3_update_ses_channels(mchan_mount->ses, mchan_mount->ses->serv=
-er, false, false);
-
-I would keep the comment descriptions of the last two args.
-Makes it easier to read.
-
-> +
-> +       mchan_mount_free(mchan_mount);
-> +}
-> +
->  #ifdef CONFIG_CIFS_DFS_UPCALL
->  int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx=
-)
+> @@ -3997,6 +3997,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct=
+ smb3_fs_context *ctx)
 >  {
+>         int rc =3D 0;
 >         struct cifs_mount_ctx mnt_ctx =3D { .cifs_sb =3D cifs_sb, .fs_ctx=
  =3D ctx, };
 > +       struct mchan_mount *mchan_mount =3D NULL;
->         int rc;
 >
->         rc =3D dfs_mount_share(&mnt_ctx);
+>         rc =3D cifs_mount_get_session(&mnt_ctx);
+>         if (rc)
+> @@ -4024,14 +4025,27 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, stru=
+ct smb3_fs_context *ctx)
 >         if (rc)
 >                 goto error;
-> +
+>
 > +       if (ctx->multichannel) {
 > +               mchan_mount =3D mchan_mount_alloc(mnt_ctx.ses);
 > +               if (IS_ERR(mchan_mount)) {
@@ -196,17 +111,6 @@ Makes it easier to read.
 > +               }
 > +       }
 > +
->         if (!ctx->dfs_conn)
->                 goto out;
->
-> @@ -3926,17 +3976,19 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, stru=
-ct smb3_fs_context *ctx)
->         ctx->prepath =3D NULL;
->
->  out:
-> -       smb3_update_ses_channels(mnt_ctx.ses, mnt_ctx.server,
-> -                                 false /* from_reconnect */,
-> -                                 false /* disable_mchan */);
 >         rc =3D mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
 >         if (rc)
 >                 goto error;
@@ -227,7 +131,11 @@ ct smb3_fs_context *ctx)
 > 2.50.1
 >
 >
-But otherwise, this looks good to me.
+
+Looks good to me.
+Thanks for submitting this. We recently noticed that the
+non-DFS-enabled cifs_mount was missing multichannel support. This
+change should cover it.
 
 --=20
 Regards,
