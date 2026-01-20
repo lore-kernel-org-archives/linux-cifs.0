@@ -1,219 +1,212 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6AEF41760;
-	Tue, 20 Jan 2026 14:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768919757; cv=none; b=KWNo29C9PgCkXpJxVEbtUHgb+CDZGdA+v52sTnvNBDlCLbB3E6qELfY6rFmCWsoCOIupnly+sRL5AZZovAcQNGmDtOKY+DSGv427PswciCnbWcOXADwmDM3HpxAOwbEdLdyIjxcnB2DntZgOqBEx5CxX9t2c3KbI6ErHYj0vQho=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768919757; c=relaxed/simple;
-	bh=dpS+PxEHDbPvZHdk4rsi82HgYDznM+Ad7e2Y2GUOqM0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=l3ROzX5hO9aVu9HYfQFvjpY+usvZpRiH73716KcAt19Wl1LROIOiP09lrpGHAvXMBmba40XMwQ3tcedHWV2Js8s7BjpOQTaLV/jVQPTEH6anyJ3srIWIupeCRMgX7tlzzVgtQpx8gDc2GFzzuGD5HOed0fuyQXG7/n2ydfeM8X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c0Yb6Fai; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2853445BD68
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 14:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768921112; cv=pass; b=KuD5P2Qh6hJbHJadRmz3dwj5LopUZEv3jwDqfpUpI3KrG8+Zw1D98lw6mGskWQXvu7pz8PNP3zLDS+7roL+J+xc5LKPL9W/fljXQKXjd8Kx7iHoZ6VV1rgKqE8BkxHkReBS/CYp4PRjEEU0q1kAkHqvYDbivRzJ6SD2t7yA1bYM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768921112; c=relaxed/simple;
+	bh=AV9hAIQr5RzI8gRTr0Om3D11rvB2xShikwoc1m16OHI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jWBReB89mXXxYxIC5l18qRgaA12q3evSw/5oQYwmSpkPysiO99uYRaP91NIenxH6EC18PLbpfpoA/WCkRCrMEyWVuHzdr5ndNyyCiextePE+SEkoP30/a4Roumu9QZHgv/pmmDqXcI3G4ZSh/hsT5U5sbo3tMYZgI9nTnaV1mXE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VrT3A/XG; arc=pass smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c0Yb6Fai"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1E02C16AAE;
-	Tue, 20 Jan 2026 14:35:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768919756;
-	bh=dpS+PxEHDbPvZHdk4rsi82HgYDznM+Ad7e2Y2GUOqM0=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=c0Yb6FaiYwLqlqQz3OwDA/IDqUxyfXBp9KbKpjmBBfSeVXvxXUbg9q9NdfGgmZWgW
-	 LBb/OzfIa5D1/ur6fI8X1Vk7TdmXZKRMcEbjf9JlXnfEB9MYhrugESVBOALo3dfsJN
-	 c3kyXsUItLSCJTQSL1vvZL/3HJKK84XphEQiwTOn6YtKVhBnj9QBGOT4f0CwrcGO8u
-	 yGALNKq6Knah/9QOmKYxcHJkuuYwydE3ayRFjpzgUGf4tYVBIXe6uQ3AjWXvBoJsWL
-	 PgAgzCMENAMM68Vji4VPbqanPmS2G1JSuw16TDRDByd2ZHk+IW8jbpd/hMVDkrbbE8
-	 vt/1AfPD2XjbQ==
-Message-ID: <2ed97731c54ef130ea58861a91c80dacd785de9a.camel@kernel.org>
-Subject: Re: [PATCH v2 01/31] Documentation: document EXPORT_OP_NOLOCKS
-From: Jeff Layton <jlayton@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Christian Brauner <brauner@kernel.org>, Alexander Viro	
- <viro@zeniv.linux.org.uk>, Chuck Lever <chuck.lever@oracle.com>, NeilBrown	
- <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo	
- <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Amir Goldstein	
- <amir73il@gmail.com>, Hugh Dickins <hughd@google.com>, Baolin Wang	
- <baolin.wang@linux.alibaba.com>, Andrew Morton <akpm@linux-foundation.org>,
-  Theodore Ts'o	 <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>,
- Jan Kara	 <jack@suse.com>, Gao Xiang <xiang@kernel.org>, Chao Yu
- <chao@kernel.org>, Yue Hu	 <zbestahu@gmail.com>, Jeffle Xu
- <jefflexu@linux.alibaba.com>, Sandeep Dhavale	 <dhavale@google.com>, Hongbo
- Li <lihongbo22@huawei.com>, Chunhai Guo	 <guochunhai@vivo.com>, Carlos
- Maiolino <cem@kernel.org>, Ilya Dryomov	 <idryomov@gmail.com>, Alex Markuze
- <amarkuze@redhat.com>, Viacheslav Dubeyko	 <slava@dubeyko.com>, Chris Mason
- <clm@fb.com>, David Sterba <dsterba@suse.com>,  Luis de Bethencourt	
- <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>, Phillip Lougher	
- <phillip@squashfs.org.uk>, Steve French <sfrench@samba.org>, Paulo
- Alcantara	 <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N	 <sprasad@microsoft.com>, Bharath SM
- <bharathsm@microsoft.com>, Miklos Szeredi	 <miklos@szeredi.hu>, Mike
- Marshall <hubcap@omnibond.com>, Martin Brandenburg	 <martin@omnibond.com>,
- Mark Fasheh <mark@fasheh.com>, Joel Becker	 <jlbec@evilplan.org>, Joseph Qi
- <joseph.qi@linux.alibaba.com>, Konstantin Komarov
- <almaz.alexandrovich@paragon-software.com>, Ryusuke Konishi
- <konishi.ryusuke@gmail.com>,  Trond Myklebust <trondmy@kernel.org>, Anna
- Schumaker <anna@kernel.org>, Dave Kleikamp <shaggy@kernel.org>, David
- Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>, Jan
- Kara <jack@suse.cz>,  Andreas Gruenbacher	 <agruenba@redhat.com>, OGAWA
- Hirofumi <hirofumi@mail.parknet.co.jp>, Jaegeuk Kim <jaegeuk@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, David Laight	
- <david.laight.linux@gmail.com>, Dave Chinner <david@fromorbit.com>, 
-	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-ext4@vger.kernel.org, 	linux-erofs@lists.ozlabs.org,
- linux-xfs@vger.kernel.org, 	ceph-devel@vger.kernel.org,
- linux-btrfs@vger.kernel.org, 	linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, 	linux-unionfs@vger.kernel.org,
- devel@lists.orangefs.org, 	ocfs2-devel@lists.linux.dev,
- ntfs3@lists.linux.dev, linux-nilfs@vger.kernel.org, 
-	jfs-discussion@lists.sourceforge.net, linux-mtd@lists.infradead.org, 
-	gfs2@lists.linux.dev, linux-f2fs-devel@lists.sourceforge.net, 
-	linux-doc@vger.kernel.org
-Date: Tue, 20 Jan 2026 09:35:48 -0500
-In-Reply-To: <707f08e114bf603caf7de020bb630d5477e86bca.camel@kernel.org>
-References: <20260119-exportfs-nfsd-v2-0-d93368f903bd@kernel.org>
-			 <20260119-exportfs-nfsd-v2-1-d93368f903bd@kernel.org>
-			 <aW8yV6v8ZDiynOUm@infradead.org>
-		 <9b64bed72e43d0bf24e9b1e3bc770c4a87082762.camel@kernel.org>
-	 <707f08e114bf603caf7de020bb630d5477e86bca.camel@kernel.org>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VrT3A/XG"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-81f4e136481so2566645b3a.3
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 06:58:30 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768921110; cv=none;
+        d=google.com; s=arc-20240605;
+        b=C37Nj9XqqaMbtwJ/dvptel2JLUmqwCtQw5oolg+jG5suWRodiKOF9daz2Lu1kCTRYo
+         uK+oBpHyCDjAG0wTgEI8v4W5VByxWqXfQUh+oEyGkYdwtQnR+K8pAzrvk1Dsd29fgHMC
+         iIVVFA+8HrjM2WRvDFvuXOFO/qWCgIJ3EYUjl5U1BWUbJvH70ZbTiKl1fUAq5ImT2VoY
+         Y0Q11ltVt2E2DbUjDDy14dKdfooKLXebemQGJvnUEw31mmDrZ/eeeTX3inT+p8ZMvjSI
+         zzApbPPb+br1YdFue6o5JfnwLRhK5qQUfFUs053tXJr57liiegR1doDlTiZaGczw+I5j
+         J6dw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=EUfRwMQV3KapT7k/eehULUSMHqVaGxUA4eRrbnoBX9U=;
+        fh=lgDaE31ze+7oScZrvl+iOGYm3nGhFCxvSW+65lJZQco=;
+        b=k2TFirxB+XlXG5Rv5FVlDEAQJls5SGts2AX0zNt4JgjBq/mbwAVNrNCqnyLAAtEouR
+         n2zWiM+4cUAai8r1dcLFFpShEniEFd/klxot2b5PNC8XcpzGDUKBnpyEbFQR4VZogC/4
+         +/2pQk298gVhcGZO7cB8D1K+zJjDewlsfC/i5gD97hu/K6kMqfzfWqGVOyhg2oHTg4y+
+         Pn6uoiSC3ryluggNry5aAzRCsAV3I8P8CWxuliulpUsOxwSctKDsOJXoAwS3w3DBaJu1
+         /v/jw72mEDyTphYj5ljR9tKHBBEV+APDhHC/6+K+kKTP8YbtRccNsPpm6FLNF5ifkB9I
+         0p9g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768921110; x=1769525910; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EUfRwMQV3KapT7k/eehULUSMHqVaGxUA4eRrbnoBX9U=;
+        b=VrT3A/XGeXGv/3EgNntOVwTUsGMRpoH6LR4CIPrz2kzgzQ9RkSGlwoi03OUqReXrWN
+         /LnaVEUR8wStMnwYf6r2euogFv+e8OOaESrNnfb8SYV+tJh3NI4vcm0GrNjUBHliP48Y
+         e1eniaPCJOOnbYCNWCtFIxRCajPUthpQxwj5PNqKbCJFzc3/ahONyuZLLuPfwjQioy1k
+         Atfe0DVCpxvthof+93Ymty4ZdeLJ8hy5jV7+mXIyDvJP14o+vUHJ6ixUSavix3/5fnwW
+         45BVqZfW+njhnvUS7eF4x34L5EBQifb4zsmWlCiAelWzLCyrTsmkG3SDRf2n0b4UCeK2
+         j6vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768921110; x=1769525910;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=EUfRwMQV3KapT7k/eehULUSMHqVaGxUA4eRrbnoBX9U=;
+        b=ReU28o+y5WsCZVlqRpQ1fAJE9/wloNlZ1eXO1YYcbrIkrOv5+bcVgvMcHJd0vULWu1
+         bIfwyZDjnXaarO5qB4xAkanLDE01tGsDnstjDm+ZSKSCcAq3920/KWhcYWnT0zpf/Xwb
+         TTZIkhSVDS8BTBtl39qeh7et0sdyji7GFv03u9rJacVdfpjWc2j7sUGHEt4rqn2GEUAR
+         pI0j1qqzwNDOJzTeuVpA+BSIg7qdf7WXbaCdV4EYnvRpVP5MgioBP7ZDCrWVRa14gvx/
+         XRbyzMax7d8DpNRzF/1jzyi+ZzsDOGVQyjUW34Qj2TIn4J5ZQ02ppmngNpMH/jDpQ6j6
+         d/jA==
+X-Forwarded-Encrypted: i=1; AJvYcCVgsdN5qGL0yPEnJ7N3MW2yOYkaWCFk9SS+JOdxb988jPzPk/UyHfV5QLnGq1vMWmquRjywxrdMFDfo@vger.kernel.org
+X-Gm-Message-State: AOJu0YzU6By46IB2QlexivNbj5ddVfylj8gVzGPNkhvJB7Cw2jBWjwu0
+	4OZHpqdubYTc7+Bd6n5ZfVsFjSx4skW1eZKGked7l/vPk0g6mflpawmKR/a/NK7meSh8t8o3xW6
+	UDQ/4m1TAuiBOZKrjs771nOuDxUzrUhM=
+X-Gm-Gg: AY/fxX4HWmaKjvIV2XdwpSh4znE8fiNa+DW3xFIAJ4mD2buGmu8bHXIqNRguU0p8cxT
+	f4+Uw28QHUl9IUjicQxeVPrtXuWwVQQnvPVEtnuD/7VbXM1LmYXZOABCt6B7TV4mgq94q68bKnE
+	DYS5Gz+h/NIeReYdjOqBt/LzQmdMcyiRsnVNvbUXQn+3RuKkIKp7qMfzA66eue1hRSjw+BEM+wV
+	jBBieuy1QSTv0nhjvawHTVGn3mXL3+bxwBX+JCl1PL/cef5yQ8gNh0PsfehWk4Kg6sS29Md0/Ug
+	WwRx2iivyVqsfgGtAKxLIM7BAw/rpgs6Igx4I04=
+X-Received: by 2002:a05:6a21:692:b0:38d:f0f3:b940 with SMTP id
+ adf61e73a8af0-38e00d47b68mr13733048637.57.1768921110331; Tue, 20 Jan 2026
+ 06:58:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <cover.1768489876.git.lucien.xin@gmail.com> <e3f770ef8d9aba101e1f5dc2f2f72bb0d2a30b94.1768489876.git.lucien.xin@gmail.com>
+ <6c6d5644-3354-46ba-bbc9-e76789648abf@redhat.com>
+In-Reply-To: <6c6d5644-3354-46ba-bbc9-e76789648abf@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 20 Jan 2026 09:58:18 -0500
+X-Gm-Features: AZwV_Qg7dfPxOkDkqOzOQW_7YKwWAViU6i2Li95CyFWjfHPIuFun67eybDn2Dd4
+Message-ID: <CADvbK_dh-O9NuNE4XL2ic2WUy9ysWc1NzbsJ99kv0ZciAw7ttQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 06/16] quic: add stream management
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2026-01-20 at 09:12 -0500, Jeff Layton wrote:
-> On Tue, 2026-01-20 at 08:20 -0500, Jeff Layton wrote:
-> > On Mon, 2026-01-19 at 23:44 -0800, Christoph Hellwig wrote:
-> > > On Mon, Jan 19, 2026 at 11:26:18AM -0500, Jeff Layton wrote:
-> > > > +  EXPORT_OP_NOLOCKS - Disable file locking on this filesystem. Som=
-e
-> > > > +    filesystems cannot properly support file locking as implemente=
-d by
-> > > > +    nfsd. A case in point is reexport of NFS itself, which can't b=
-e done
-> > > > +    safely without coordinating the grace period handling. Other c=
-lustered
-> > > > +    and networked filesystems can be problematic here as well.
-> > >=20
-> > > I'm not sure this is very useful.  It really needs to document what
-> > > locking semantics nfs expects, because otherwise no reader will know
-> > > if they set this or not.
-> >=20
-> > Fair point. I'll see if I can draft something better. Suggestions
-> > welcome.
->=20
-> How about this?
->=20
-> +  EXPORT_OP_NOLOCKS - Disable file locking on this filesystem. Filesyste=
-ms
-> +    that want to support locking over NFS must support POSIX file lockin=
-g
-> +    semantics and must handle lock recovery requests from clients after =
-a
-> +    reboot. Most local disk, RAM, or pseudo-filesystems use the generic =
-POSIX
-> +    locking support in the kernel and naturally provide this capability.=
- Network
-> +    or clustered filesystems usually need special handling to do this pr=
-operly.
+On Tue, Jan 20, 2026 at 7:32=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 1/15/26 4:11 PM, Xin Long wrote:
+> > +struct quic_stream {
+> > +     struct hlist_node node;
+> > +     s64 id;                         /* Stream ID as defined in RFC 90=
+00 Section 2.1 */
+> > +     struct {
+> > +             /* Sending-side stream level flow control */
+> > +             u64 last_max_bytes;     /* Maximum send offset advertised=
+ by peer at last update */
+> > +             u64 max_bytes;          /* Current maximum offset we are =
+allowed to send to */
+> > +             u64 bytes;              /* Bytes already sent to peer */
+> > +
+> > +             u32 errcode;            /* Application error code to send=
+ in RESET_STREAM */
+> > +             u32 frags;              /* Number of sent STREAM frames n=
+ot yet acknowledged */
+> > +             u8 state;               /* Send stream state, per rfc9000=
+#section-3.1 */
+> > +
+> > +             u8 data_blocked:1;      /* True if flow control blocks se=
+nding more data */
+> > +             u8 done:1;              /* True if application indicated =
+end of stream (FIN sent) */
+>
+> Minor nit: AFAICS with the current struct layout the bitfield above does
+> not save any space, compared to plain u8 and will lead to worse code.
+>
+Makes sense, will change to plain u8.
 
-Even better, I think?
-
-+
-+  EXPORT_OP_NOLOCKS - Disable file locking on this filesystem. Filesystems
-+    that want to support locking over NFS must support POSIX file locking
-+    semantics. When the server reboots, the clients will issue requests to
-+    recover their locks, which nfsd will issue to the filesystem as new lo=
-ck
-+    requests. Those must succeed in order for lock recovery to work. Most
-+    local disk, RAM, or pseudo-filesystems use the generic POSIX locking
-+    support in the kernel and naturally provide this capability. Network o=
-r
-+    clustered filesystems usually need special handling to do this properl=
-y.
-+    Set this flag on filesystems that can't guarantee the proper semantics
-+    (e.g. reexported NFS).
-
---=20
-Jeff Layton <jlayton@kernel.org>
+Thanks.
+> > +     } send;
+> > +     struct {
+> > +             /* Receiving-side stream level flow control */
+> > +             u64 max_bytes;          /* Maximum offset peer is allowed=
+ to send to */
+> > +             u64 window;             /* Remaining receive window befor=
+e advertise a new limit */
+> > +             u64 bytes;              /* Bytes consumed by application =
+from the stream */
+> > +
+> > +             u64 highest;            /* Highest received offset */
+> > +             u64 offset;             /* Offset up to which data is in =
+buffer or consumed */
+> > +             u64 finalsz;            /* Final size of the stream if FI=
+N received */
+> > +
+> > +             u32 frags;              /* Number of received STREAM fram=
+es pending reassembly */
+> > +             u8 state;               /* Receive stream state, per rfc9=
+000#section-3.2 */
+> > +
+> > +             u8 stop_sent:1;         /* True if STOP_SENDING has been =
+sent */
+> > +             u8 done:1;              /* True if FIN received and final=
+ size validated */
+>
+> ... same here...
+>
+> > +     } recv;
+> > +};
+> > +
+> > +struct quic_stream_limits {
+> > +     /* Stream limit parameters defined in rfc9000#section-18.2 */
+> > +     u64 max_stream_data_bidi_remote;        /* initial_max_stream_dat=
+a_bidi_remote */
+> > +     u64 max_stream_data_bidi_local;         /* initial_max_stream_dat=
+a_bidi_local */
+> > +     u64 max_stream_data_uni;                /* initial_max_stream_dat=
+a_uni */
+> > +     u64 max_streams_bidi;                   /* initial_max_streams_bi=
+di */
+> > +     u64 max_streams_uni;                    /* initial_max_streams_un=
+i */
+> > +
+> > +     s64 next_bidi_stream_id;        /* Next bidi stream ID to open or=
+ accept */
+> > +     s64 next_uni_stream_id;         /* Next uni stream ID to open or =
+accept */
+> > +     s64 max_bidi_stream_id;         /* Highest allowed bidi stream ID=
+ */
+> > +     s64 max_uni_stream_id;          /* Highest allowed uni stream ID =
+*/
+> > +     s64 active_stream_id;           /* Most recently opened stream ID=
+ */
+> > +
+> > +     u8 bidi_blocked:1;      /* STREAMS_BLOCKED_BIDI sent, awaiting AC=
+K */
+> > +     u8 uni_blocked:1;       /* STREAMS_BLOCKED_UNI sent, awaiting ACK=
+ */
+> > +     u8 bidi_pending:1;      /* MAX_STREAMS_BIDI needs to be sent */
+> > +     u8 uni_pending:1;       /* MAX_STREAMS_UNI needs to be sent */
+>
+> ... and here.
+>
+> Other than that LGTM. With the bitfield replaced with plain u8 feel free
+> to add my
+>
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
+>
