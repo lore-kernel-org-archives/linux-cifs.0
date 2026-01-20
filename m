@@ -1,252 +1,263 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5680C3A641E
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 21:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768943229; cv=pass; b=QXJLN1qKLcuj9kA4b2wnzBuzkq6ull6SjXr/lfCT2oDA3WGzsiPhmOO4/RbJLAYu9bZ8U6K/wvxnHqH4tuuRjyhdFETVNKgVGEGgioPO2MxR7EeRiLDbSA4ujujpD3J+YNn9cHvJ4LpDi40rFgNMY8XHcuCyvKgMBDjoFD7yCQs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768943229; c=relaxed/simple;
-	bh=iOhVl2p7IvLcwoAOJZtY5j6TNwfE1GKs3DXwErOn2IA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZDRcdfHEEO/LH2rUGqpcJK/w+xCJ4wvoUB1YNOJhDAv84IWsjsAND741KzExqpk6/qAdGBKjZFhCx4uMaYB2UArmeJrU/rYrZk2VQdQMXp4iQDw3mkyxYOr+kiyfxnLORwDASS2GrlpocrxXdHj/drdXkRwAOBMV07TT+xGRmE0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kKEZgNbP; arc=pass smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54793B8BA3;
+	Tue, 20 Jan 2026 21:48:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768945739; cv=none; b=BnTu6vlGUNJNTDtaYkI+wYo8ifrdU5854GGiFoqCU7wVVoR2SBipnPtz/Vpx1o+/FHcbP5ePScw2RgzEcQhtPPYwIpK26yc5mWub5Z90yJr36+uNHLShC3ypw3gvgNxOp93ZcX3stv0fQc5z3om11cHwjm3Ypmrb8d7tr8w8V9U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768945739; c=relaxed/simple;
+	bh=96b8Nubirwao54BkP50ZkP0NSv+GbSST6a8dD5+v4ms=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=FRyqL7YsIcCk3/LqjzLmDr6BRzoVVaHCii+uuXPmvlcfc+7CTsPxKuXFAj5KiCNS73lTjxfu5qBh+Dpb8APTDJIhONiJQKkyXo0q8cikYl0wVd/Q4ZPqGgVnOwQeUN/puRHPslTlvNbJ5V01JtHmMgJIG/RxWDapBO+3z2moItI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YSN+IBTl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kKEZgNbP"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7f216280242so93576b3a.1
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 13:07:05 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768943225; cv=none;
-        d=google.com; s=arc-20240605;
-        b=VsgLp7VheMtvNsGegmlhSb2niyT2d7SaFz6oFGbVf1Tz2rP2dIwlyo2UVm+pUzFb04
-         zN8fnKcJVIK9b915WJuSwxyg7q9afeB34xd9aJv2jAQOBlW0mAIcZ79ymKdsqjZ5fPHm
-         UY1EGZCoGqWKpFtOQNGq/U2dWCqwxs+2VVVkF3DNqHoJdGsQMKmSFRoPw+ifi7WJRN/1
-         R+mpFCNOPbDeBlX1Eg0ZU6hpuG+GMvlss0uRsDjzIpJofIFHNScGtV1viGkBKKadfyec
-         QNeAR2Op914BatqHOBltTy8KlqvMj8xG727P++mzpQ2iRU0LIhKlxrha6WEa9BYda9Xo
-         XwJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=jCJeW3GJ/JJ5bqM+NSKjsXir49GDnjGF+idw2elGnxk=;
-        fh=eUP1fmGy+oMogg75QCs5ppyUMH3sUu5JQgj4PbSk6mk=;
-        b=X79uiwtPzTP8S6ctl7798ENhln/NxipUM5qJA2ShzpK3ZqArSZfKE78BYEncjc8RFj
-         oZOk+RAeipWTOZNlthl8zcYo51gsD+qK1E7WMxldgmzI+QssEYBivEhIHzJq2fKH57uX
-         ro2tMBMUghLgCjxUCZE1BP+tjzeZiw7Y4NLtiyfDDkfD9dKvgHWtduPQj5xtp9ler8ri
-         taFlxpg7jhYvdvIgBLwRP1AJKdxztjyzsfsFBwiQYph/csP4DCcuya22jen22akXBRub
-         7+WhoW+ZR5DIUxIhiIlCgmbR6bB/OBhzVoB0h+SGqB3x347HvJGq3QtfZIer96QWo2If
-         4EQA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768943225; x=1769548025; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jCJeW3GJ/JJ5bqM+NSKjsXir49GDnjGF+idw2elGnxk=;
-        b=kKEZgNbPCUoHZ7b8WwANXIrLpMLAkKWZ6vFlOaCpQQ4wjMIR01Bpsmg6BlDf9anKmq
-         svue+XKj7AOQCOeiJoPEGJ3IwOgTgSacJigzhZW5SD99ejSOaNvww7/C5CxrvhR3Zido
-         gf7NJFszPHRJAdpSuVW9NS8KAgE8O/deUjGTAta3Xaj3Bp1KaPMLZZSNYdiYDwx064AY
-         /GTj5QRnMflSB4BjB8/xPSqahF3ej6Zjd1sF3+80cD0FiWOTB6Z3FGdKQ5UOfKO0vfGO
-         k/lNeuX9O8evdcu/HU1gIaPv2aMP/8AzTlRREJGT6lIIhl1D5TBmzhh8+zmdfXB6tT6t
-         B6Ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768943225; x=1769548025;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=jCJeW3GJ/JJ5bqM+NSKjsXir49GDnjGF+idw2elGnxk=;
-        b=kyZwLbayocrqhuAxqIcEcWLTHKiVO+q3hueyQ7N04cjxjbqAFe3+UDsnxp7jL3UZTA
-         tDTLmXck/WpSYUHR98pxN8yge5vPqAn+auP0pct8xnVaLb8B40eNxxfcUxWiKM1Jr5/M
-         Wh2vWDoxcUrWG/fVKMyMKsy1vBh6sUlsi/muQGWmZ7Y+tKYRm3wSn+TncE54Y/0hjjKN
-         hDQ/duCvp/l+wkYzK4h1aUZ4nnVktnuqRtUyH0BuvmXwvZ86gCwwF+sVmCyETHgQhjGA
-         hxlpdDIW+mC56YxEp/PSPRQcwgP8633WLhocquPp3nZmNPxMiXmgDPKABynCCUNPjvdl
-         aPew==
-X-Forwarded-Encrypted: i=1; AJvYcCUuD4lCecMY8NvPibCGCxHxRByDLsgzLF5A3HPWP9lywmkEaqbQJBejOZkfQQm+dLlGQII8wmiD9BBf@vger.kernel.org
-X-Gm-Message-State: AOJu0YytyrkCce4g6KvivxaUyKA7zIIAsWiK/41f13iIOn+Q0q99htAw
-	BRXwTWdbbHzKbdu5GFVCBHv7CWCGocjCLzRuyoeF+u6xpD+ieFoXsDzS2kUcPCT5cguVwm5MzaW
-	00DhwgSMgdthQmBf/WWB4RdD3yWXQaOgkE9nBw9Hzxg==
-X-Gm-Gg: AY/fxX4eRq8PiPOGO+W6gik2rb+WUoeSyyLP8xbiJB/q9lKgeNzmtHhD49XHX0/MpKy
-	alD0+texnmPehUctYvCbnzrlxBVsFplmZWMJ0XkFo/R21O/xCIpt4R8lO5k0i/cprEf4n06Ar0h
-	yPyzJr2jGJC3VGDl+nXhIDtqa9qes9CF8GsjZEWWtkwfwgmMo85bNVxgEpPegSCIX7OaAyU5Gzp
-	pVT9Fud9A4Ra1jFZxRUcmTfmMXmQeJe9hRExsMDjunkVcEpfrS1KZQ8tzgLssiPF1fAuuunNvt9
-	RqDT8qkrXyW4pBMwK+K+vsdePXQBHQ==
-X-Received: by 2002:a05:6300:2288:b0:343:9397:c4d6 with SMTP id
- adf61e73a8af0-38dff368bd5mr12999445637.23.1768943225140; Tue, 20 Jan 2026
- 13:07:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YSN+IBTl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB88EC16AAE;
+	Tue, 20 Jan 2026 21:48:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768945738;
+	bh=96b8Nubirwao54BkP50ZkP0NSv+GbSST6a8dD5+v4ms=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=YSN+IBTls9vtdpn3pRtNBdf73N0qA/tQk3w4RgvlWzio2fknpGVb/a0o7P7flK/1y
+	 zzJtGo9wujbVTBo7Axx4HQ/eOiOPbO6DnlaRheiScvIv1C8xSZxJoQ9koobwUIo3/z
+	 bcm+sMkCuZPeonMVjryuEdKbJLcNDMKql+Ek0XSn5s5bTJgS271HmzsqC3P/8RVnbU
+	 03MMFgLCRnZ3UTWInrk2WkKm17NMBn3d1bcHjdTgKopkzmxW8tAteaboWwKj5BrV20
+	 Y92l4G1JtVIu1HmY5gXGwvqSrpdFYgSn3e/bU6+kNyrad4sDexNfki+wGKWiarbNRN
+	 562IzeWDAwUbg==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id C6BC1F40068;
+	Tue, 20 Jan 2026 16:48:56 -0500 (EST)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Tue, 20 Jan 2026 16:48:56 -0500
+X-ME-Sender: <xms:SPhvaQtWESY-A74K_HEn66lmVvpKNm5MFxR6oEthFHsJh9f_m8HVhg>
+    <xme:SPhvaYRYYoD8hzZ-gIklJVxdAnFdEQdnVq654EzYKHMt8mKFQ1HUDx-gqtBhm_VwW
+    y-Z6EZs6GGoSKSpdopfG6bYC-99jxEd1TpQw3BiJGcJttr32OeEtWRt>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugeduheefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
+    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
+    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
+    hilhdrtghomhdpnhgspghrtghpthhtohepfedvpdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopehsvghnohiihhgrthhskhihsegthhhrohhmihhumhdrohhrghdprhgtphhtth
+    hopegrughilhhgvghrrdhkvghrnhgvlhesughilhhgvghrrdgtrgdprhgtphhtthhopehs
+    lhgrvhgrseguuhgsvgihkhhordgtohhmpdhrtghpthhtoheprhhonhhnihgvshgrhhhlsg
+    gvrhhgsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnnhgrsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopegsrhgruhhnvghrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    gtvghmsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegthhgroheskhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtohepughjfihonhhgsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:SPhvaamXZA19JIcSMetmmNDyPupKYtpsGBX8RUilZqnOb0aJRtehUQ>
+    <xmx:SPhvaeTpcVU1Wim3vGB6ES93L_VTC352WS9ZxeyR0pY82SdQj2k7jQ>
+    <xmx:SPhvaf64sRrImZuiE0FT-3g9SeUWs7whMFXlvnbGOZ0KmNQDNm2Ajg>
+    <xmx:SPhvaVEUXZXhb9_ub-oDB-zXsCXaXQzldUQIcPSpt844LE_RlPLPmA>
+    <xmx:SPhvaZHRcYWU9BKUQSIRIo2WYqA9j8HDF7yWiIXBvkQ32EK5DSe3aB5a>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 89A9B780070; Tue, 20 Jan 2026 16:48:56 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1768489876.git.lucien.xin@gmail.com> <3771dfc211626a9f0c603c90113e38f325ceb456.1768489876.git.lucien.xin@gmail.com>
- <71705484-46fc-469f-9357-07a076ee0e73@redhat.com> <CADvbK_dYbMa-nVi_8M-XS1QcVUw25t4CZdvcq_HcACx38bH86g@mail.gmail.com>
-In-Reply-To: <CADvbK_dYbMa-nVi_8M-XS1QcVUw25t4CZdvcq_HcACx38bH86g@mail.gmail.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 20 Jan 2026 16:06:53 -0500
-X-Gm-Features: AZwV_QhXAoJQwRs6pDZ6UAmUhYn8QaE6UDSDLYJNb4NfLJfMXHf3sVWRjS6qDQY
-Message-ID: <CADvbK_chN0KTnibDW6VL3pR4iPQqrHznDXYCUDneB=vEnVD0MA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 08/16] quic: add path management
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-ThreadId: AfQWKZtCjdVF
+Date: Tue, 20 Jan 2026 16:48:31 -0500
+From: "Chuck Lever" <cel@kernel.org>
+To: "Darrick J. Wong" <djwong@kernel.org>,
+ "Christian Brauner" <brauner@kernel.org>
+Cc: "Alexander Viro" <viro@zeniv.linux.org.uk>, "Jan Kara" <jack@suse.cz>,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+ "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>,
+ "Namjae Jeon" <linkinjeon@kernel.org>,
+ "Sungjong Seo" <sj1557.seo@samsung.com>,
+ "Yuezhang Mo" <yuezhang.mo@sony.com>,
+ almaz.alexandrovich@paragon-software.com,
+ "Viacheslav Dubeyko" <slava@dubeyko.com>, glaubitz@physik.fu-berlin.de,
+ frank.li@vivo.com, "Theodore Tso" <tytso@mit.edu>,
+ adilger.kernel@dilger.ca, "Carlos Maiolino" <cem@kernel.org>,
+ "Steve French" <sfrench@samba.org>, "Paulo Alcantara" <pc@manguebit.org>,
+ "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
+ "Shyam Prasad N" <sprasad@microsoft.com>,
+ "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>, "Jaegeuk Kim" <jaegeuk@kernel.org>,
+ "Chao Yu" <chao@kernel.org>, "Hans de Goede" <hansg@kernel.org>,
+ senozhatsky@chromium.org, "Chuck Lever" <chuck.lever@oracle.com>
+Message-Id: <38bf1452-8cf8-477b-bcc3-9fe442033bc5@app.fastmail.com>
+In-Reply-To: <20260120172608.GQ15551@frogsfrogsfrogs>
+References: <20260120142439.1821554-1-cel@kernel.org>
+ <20260120142439.1821554-2-cel@kernel.org>
+ <20260120172608.GQ15551@frogsfrogsfrogs>
+Subject: Re: [PATCH v6 01/16] fs: Add case sensitivity flags to file_kattr
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 20, 2026 at 10:34=E2=80=AFAM Xin Long <lucien.xin@gmail.com> wr=
-ote:
->
-> On Tue, Jan 20, 2026 at 9:13=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > On 1/15/26 4:11 PM, Xin Long wrote:
-> > > @@ -0,0 +1,524 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > > +/* QUIC kernel implementation
-> > > + * (C) Copyright Red Hat Corp. 2023
-> > > + *
-> > > + * This file is part of the QUIC kernel implementation
-> > > + *
-> > > + * Initialization/cleanup for QUIC protocol support.
-> > > + *
-> > > + * Written or modified by:
-> > > + *    Xin Long <lucien.xin@gmail.com>
-> > > + */
-> > > +
-> > > +#include <net/udp_tunnel.h>
-> > > +#include <linux/quic.h>
-> > > +
-> > > +#include "common.h"
-> > > +#include "family.h"
-> > > +#include "path.h"
-> > > +
-> > > +static int (*quic_path_rcv)(struct sock *sk, struct sk_buff *skb, u8=
- err);
-> >
-> > It's unclear why an indirect call is needed here. At least some
-> > explanation is needed in the commit message, possibly you could call
-> > directly a static function.
-> >
-> This patchset makes the path subcomponent more independent from the core
-> implementation. Aside from a few shared helper functions, it doesn't
-> rely on code outside the subcomponent, in particular socket.c and
-> packet.c.
->
-> Other subcomponents, such as stream, connid, pnspace, cong,
-> crypto, common, and family follow the same approach. They expose
-> APIs to the core QUIC logic and don=E2=80=99t see the main process.
->
-> Will leave an explanation here.
->
-To achieve this, instead of introducing an indirect call, we can use
-an 'extern' declaration of quic_packet_rcv() once it is introduced.
-Before that point, the code simply falls back to calling kfree_skb(skb).
 
-Will update it.
 
-Thanks.
+On Tue, Jan 20, 2026, at 12:26 PM, Darrick J. Wong wrote:
+> On Tue, Jan 20, 2026 at 09:24:24AM -0500, Chuck Lever wrote:
+>> From: Chuck Lever <chuck.lever@oracle.com>
+>> 
+>> Enable upper layers such as NFSD to retrieve case sensitivity
+>> information from file systems by adding FS_XFLAG_CASEFOLD and
+>> FS_XFLAG_CASENONPRESERVING flags.
+>> 
+>> Filesystems report case-insensitive or case-nonpreserving behavior
+>> by setting these flags directly in fa->fsx_xflags. The default
+>> (flags unset) indicates POSIX semantics: case-sensitive and
+>> case-preserving. These flags are read-only; userspace cannot set
+>> them via ioctl.
+>> 
+>> Relocate struct file_kattr initialization from fileattr_fill_xflags()
+>> and fileattr_fill_flags() to vfs_fileattr_get() and the ioctl/syscall
+>> call sites. This allows filesystem ->fileattr_get() callbacks to set
+>> flags directly in fa->fsx_xflags before invoking the fill functions,
+>> which previously would have zeroed those values. Callers that bypass
+>> vfs_fileattr_get() must now zero-initialize the struct themselves.
+>> 
+>> Case sensitivity information is exported to userspace via the
+>> fa_xflags field in the FS_IOC_FSGETXATTR ioctl and file_getattr()
+>> system call.
+>> 
+>> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+>> ---
+>>  fs/file_attr.c           | 14 ++++++--------
+>>  fs/xfs/xfs_ioctl.c       |  2 +-
+>>  include/linux/fileattr.h |  3 ++-
+>>  include/uapi/linux/fs.h  |  2 ++
+>
+> This ought to go to linux-api because you're changing the userspace api.
+> Granted it's only adding a flag definition to an existing ioctl, but
+> FS_XFLAG_CASEFOLD /does/ collide with Andrey's fsverity xflag patch...
+>
+> (The rest of the changes looks ok to me.)
 
-> > > +
-> > > +static int quic_udp_rcv(struct sock *sk, struct sk_buff *skb)
-> > > +{
-> > > +     memset(skb->cb, 0, sizeof(skb->cb));
-> > > +     QUIC_SKB_CB(skb)->seqno =3D -1;
-> > > +     QUIC_SKB_CB(skb)->time =3D quic_ktime_get_us();
-> > > +
-> > > +     skb_pull(skb, sizeof(struct udphdr));
-> > > +     skb_dst_force(skb);
-> > > +     quic_path_rcv(sk, skb, 0);
-> > > +     return 0;
-> >
-> > Why not:
-> >         return quic_path_rcv(sk, skb, 0);
-> > ?
-> I checked the udp tunnel users:
+Process question for Christian: Do you want to see a v7 of this
+series with Cc: linux-api before proceeding, or are you taking
+both Andrey's and mine and can resolve the conflict, or ... ?
+
+
+> --D
 >
-> - bareudp: bareudp_udp_encap_recv()
-> - vxlan: vxlan_rcv()
-> - geneve: geneve_udp_encap_recv()
-> - tipc: tipc_udp_recv()
-> - sctp: sctp_udp_rcv()
->
-> they all are returning 0 in .encap_udp(), I think because they all
-> take care of the
-> skb freeing in their err path already.
->
-> is it safe to return error to UDP stack if the skb is already freed?
-> Do you know?
->
-> >
-> > > +static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk, u=
-nion quic_addr *a)
-> > > +{
-> > > +     struct udp_tunnel_sock_cfg tuncfg =3D {};
-> > > +     struct udp_port_cfg udp_conf =3D {};
-> > > +     struct net *net =3D sock_net(sk);
-> > > +     struct quic_uhash_head *head;
-> > > +     struct quic_udp_sock *us;
-> > > +     struct socket *sock;
-> > > +
-> > > +     us =3D kzalloc(sizeof(*us), GFP_KERNEL);
-> > > +     if (!us)
-> > > +             return NULL;
-> > > +
-> > > +     quic_udp_conf_init(sk, &udp_conf, a);
-> > > +     if (udp_sock_create(net, &udp_conf, &sock)) {
-> > > +             pr_debug("%s: failed to create udp sock\n", __func__);
-> > > +             kfree(us);
-> > > +             return NULL;
-> > > +     }
-> > > +
-> > > +     tuncfg.encap_type =3D 1;
-> > > +     tuncfg.encap_rcv =3D quic_udp_rcv;
-> > > +     tuncfg.encap_err_lookup =3D quic_udp_err;
-> > > +     setup_udp_tunnel_sock(net, sock, &tuncfg);
-> > > +
-> > > +     refcount_set(&us->refcnt, 1);
-> > > +     us->sk =3D sock->sk;
-> > > +     memcpy(&us->addr, a, sizeof(*a));
-> > > +     us->bind_ifindex =3D sk->sk_bound_dev_if;
-> > > +
-> > > +     head =3D quic_udp_sock_head(net, ntohs(a->v4.sin_port));
-> > > +     hlist_add_head(&us->node, &head->head);
-> > > +     INIT_WORK(&us->work, quic_udp_sock_put_work);
-> > > +
-> > > +     return us;
-> > > +}
-> > > +
-> > > +static bool quic_udp_sock_get(struct quic_udp_sock *us)
-> > > +{
-> > > +     return refcount_inc_not_zero(&us->refcnt);
-> > > +}
-> > > +
-> > > +static void quic_udp_sock_put(struct quic_udp_sock *us)
-> > > +{
-> > > +     if (refcount_dec_and_test(&us->refcnt))
-> > > +             queue_work(quic_wq, &us->work);
-> >
-> > Why using a workqueue here? AFAICS all the caller are in process
-> > context. Is that to break a possible deadlock due to nested mutex?
-> > Likely a comment on the refcount/locking scheme would help.
-> >
-> quic_udp_sock_put() will also be called in the RX path via
-> quic_path_unbind() for the connection migration (after changing
-> to a new path.), which is in the patchset-2.
->
-> I will leave a comment for an explanation here.
->
-> Thanks.
+>>  4 files changed, 11 insertions(+), 10 deletions(-)
+>> 
+>> diff --git a/fs/file_attr.c b/fs/file_attr.c
+>> index 13cdb31a3e94..2700200c5b9c 100644
+>> --- a/fs/file_attr.c
+>> +++ b/fs/file_attr.c
+>> @@ -15,12 +15,10 @@
+>>   * @fa:		fileattr pointer
+>>   * @xflags:	FS_XFLAG_* flags
+>>   *
+>> - * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).  All
+>> - * other fields are zeroed.
+>> + * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).
+>>   */
+>>  void fileattr_fill_xflags(struct file_kattr *fa, u32 xflags)
+>>  {
+>> -	memset(fa, 0, sizeof(*fa));
+>>  	fa->fsx_valid = true;
+>>  	fa->fsx_xflags = xflags;
+>>  	if (fa->fsx_xflags & FS_XFLAG_IMMUTABLE)
+>> @@ -46,11 +44,9 @@ EXPORT_SYMBOL(fileattr_fill_xflags);
+>>   * @flags:	FS_*_FL flags
+>>   *
+>>   * Set ->flags, ->flags_valid and ->fsx_xflags (translated flags).
+>> - * All other fields are zeroed.
+>>   */
+>>  void fileattr_fill_flags(struct file_kattr *fa, u32 flags)
+>>  {
+>> -	memset(fa, 0, sizeof(*fa));
+>>  	fa->flags_valid = true;
+>>  	fa->flags = flags;
+>>  	if (fa->flags & FS_SYNC_FL)
+>> @@ -84,6 +80,8 @@ int vfs_fileattr_get(struct dentry *dentry, struct file_kattr *fa)
+>>  	struct inode *inode = d_inode(dentry);
+>>  	int error;
+>>  
+>> +	memset(fa, 0, sizeof(*fa));
+>> +
+>>  	if (!inode->i_op->fileattr_get)
+>>  		return -ENOIOCTLCMD;
+>>  
+>> @@ -323,7 +321,7 @@ int ioctl_setflags(struct file *file, unsigned int __user *argp)
+>>  {
+>>  	struct mnt_idmap *idmap = file_mnt_idmap(file);
+>>  	struct dentry *dentry = file->f_path.dentry;
+>> -	struct file_kattr fa;
+>> +	struct file_kattr fa = {};
+>>  	unsigned int flags;
+>>  	int err;
+>>  
+>> @@ -355,7 +353,7 @@ int ioctl_fssetxattr(struct file *file, void __user *argp)
+>>  {
+>>  	struct mnt_idmap *idmap = file_mnt_idmap(file);
+>>  	struct dentry *dentry = file->f_path.dentry;
+>> -	struct file_kattr fa;
+>> +	struct file_kattr fa = {};
+>>  	int err;
+>>  
+>>  	err = copy_fsxattr_from_user(&fa, argp);
+>> @@ -434,7 +432,7 @@ SYSCALL_DEFINE5(file_setattr, int, dfd, const char __user *, filename,
+>>  	struct filename *name __free(putname) = NULL;
+>>  	unsigned int lookup_flags = 0;
+>>  	struct file_attr fattr;
+>> -	struct file_kattr fa;
+>> +	struct file_kattr fa = {};
+>>  	int error;
+>>  
+>>  	BUILD_BUG_ON(sizeof(struct file_attr) < FILE_ATTR_SIZE_VER0);
+>> diff --git a/fs/xfs/xfs_ioctl.c b/fs/xfs/xfs_ioctl.c
+>> index 59eaad774371..f0417c4d1fca 100644
+>> --- a/fs/xfs/xfs_ioctl.c
+>> +++ b/fs/xfs/xfs_ioctl.c
+>> @@ -496,7 +496,7 @@ xfs_ioc_fsgetxattra(
+>>  	xfs_inode_t		*ip,
+>>  	void			__user *arg)
+>>  {
+>> -	struct file_kattr	fa;
+>> +	struct file_kattr	fa = {};
+>>  
+>>  	xfs_ilock(ip, XFS_ILOCK_SHARED);
+>>  	xfs_fill_fsxattr(ip, XFS_ATTR_FORK, &fa);
+>> diff --git a/include/linux/fileattr.h b/include/linux/fileattr.h
+>> index f89dcfad3f8f..709de829659f 100644
+>> --- a/include/linux/fileattr.h
+>> +++ b/include/linux/fileattr.h
+>> @@ -16,7 +16,8 @@
+>>  
+>>  /* Read-only inode flags */
+>>  #define FS_XFLAG_RDONLY_MASK \
+>> -	(FS_XFLAG_PREALLOC | FS_XFLAG_HASATTR)
+>> +	(FS_XFLAG_PREALLOC | FS_XFLAG_HASATTR | \
+>> +	 FS_XFLAG_CASEFOLD | FS_XFLAG_CASENONPRESERVING)
+>>  
+>>  /* Flags to indicate valid value of fsx_ fields */
+>>  #define FS_XFLAG_VALUES_MASK \
+>> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+>> index 66ca526cf786..919148beaa8c 100644
+>> --- a/include/uapi/linux/fs.h
+>> +++ b/include/uapi/linux/fs.h
+>> @@ -253,6 +253,8 @@ struct file_attr {
+>>  #define FS_XFLAG_FILESTREAM	0x00004000	/* use filestream allocator */
+>>  #define FS_XFLAG_DAX		0x00008000	/* use DAX for IO */
+>>  #define FS_XFLAG_COWEXTSIZE	0x00010000	/* CoW extent size allocator hint */
+>> +#define FS_XFLAG_CASEFOLD	0x00020000	/* case-insensitive lookups */
+>> +#define FS_XFLAG_CASENONPRESERVING 0x00040000	/* case not preserved */
+>>  #define FS_XFLAG_HASATTR	0x80000000	/* no DIFLAG for this	*/
+>>  
+>>  /* the read-only stuff doesn't really belong here, but any other place is
+>> -- 
+>> 2.52.0
+>> 
+>>
+
+-- 
+Chuck Lever
