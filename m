@@ -1,166 +1,142 @@
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazolkn19011029.outbound.protection.outlook.com [52.103.14.29])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A983D5242
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 12:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.14.29
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768911692; cv=fail; b=A8H74nhKCvXvEiEWFg1R7OOs/DuIYc7jb+hn3nEm3i2po5ds+kC53oFK5K+EwdtUOZU4d00+NzsRljbEY5iPb2QSsN0VIqKheR/K5yO+xGap6EfxFHV0DL5WMKoUzuqQHNOX6/KYYGqroCiNfI2ll76+cnVhrIo/VZPjQxPJvWc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768911692; c=relaxed/simple;
-	bh=DZAU0hE5brAYBTjDuUNzKuMXLHRygXuBeaO4lOGZFAg=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=HXIdokpLFcpuWX3Ab2xunclDSq+eSt4yosTz/s23T8swFkU3InGFZHRZf3Zqa2H1LfDyzgMa682f2Jc3Mn7+h4IW8jsBPQCOdd7hTGp+kDtDUdjYInmzroRJRvepWxKJZgyFFkpGZ2xcA5Z5b49zfwUHyi9rFbTXL6i7m+HWw/0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=gt23RpIY; arc=fail smtp.client-ip=52.103.14.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9053BFE5B
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 12:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768911822; cv=none; b=BER9S3x+LzlGTlsUTQnz8VNV5ELSyuIn3sRomcBVcy2XcPUFzLLSmlXVvL6c6Z0Ugyj5sZjcqtnI/uC6WQOK3iY8cNBPlyXXDgkG6w3djCdvMuEoSq47Qx13ba/zPkbVtEJ87VCKKJa0tysD0ilWYAx6yaJZa1j6A0GkqDc0+ZQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768911822; c=relaxed/simple;
+	bh=1XPv3uNkmWHVj9nBvtujA7kYi4ti9RusPKYh5MYQv+A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KuxWXx0cHpuJia+FoxsTtwEmrccNs0jeac3ETQftyYJLytblBxAom6QM3alKdfvfOp25OouNt75Sppf5q13aaMAAR5NBLIpwKbSEnPw82kpOrsq5PHYn4a3S0PxxkIRox+CJgNzGudgDLZKvQptKyTwc8v8OYzhIqwnh0jojSrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Drdyl/Vp; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EkvhBGSu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="gt23RpIY"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yGcIAebhb6ew8JJWiramydAOIObbbNxeM3xfmEEt9gqpykAhIsmjb4sO/mD5vIvSxsQ5gTkGlgipbfSYYvq8S6jZRqfoi6rS7AyXZzM/y8U4E9vUQDliQPVML990wAZXr4f1ZmJBFymWkwQ3InOAr6YvgbO2U8jWZGlKMEfoWzgGIkvR85+m70egpZU8sLDJ2tXbyU/F6TzZwK8CdVKNDMIvVx2fbFadQ47ns8xfHKc+TFCLwFXqHW69gDFhahh2EUC5isvfyEi6eiAbxvoXgJJY2QyJn4iCrN6YddBfqABWWV9q5JDYZco8rn0t1/YAgrUnrFd3GptN0BkUvRFxhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4ckMv2GVBDrkSL3BtslIN0XN6bqk3eaFcmtz/9TbVOI=;
- b=uNFHTc1kgkX5N2yqr6iWHd1nlBLwLO/LdYpGuOZvRsA2hWBnHXfEHJs5ZK+yJhY8kXOiZyFpCCgqI6Xmk6eVw4cvntctxH28E/kg7GFxzqZHewR2oeRzoTSPZoNWjtocPwewnPrHp4Zq0EHaeVeVaNKAx6++yJzPAAlZ4Vkw8CkfGBL0hjEsXsMn8Z7SdBxWsFy+liZthk6h6jSmc9vEZW2SADqDTMIpkjMLJJCyhuOeugCoQ7LDQWGet07eMw1VvIrM/+zYHgK1StHbPcZTAJKy01zBJZlpFWoarkhjG7H30tH/GzKWlr4QbiCqw0ALlprxwk5zwxaqEltrKSsFLw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4ckMv2GVBDrkSL3BtslIN0XN6bqk3eaFcmtz/9TbVOI=;
- b=gt23RpIYhqPgr0yeyxOvgQXBrtfv7A48LzbNKY5FF8uyG5uHrsALDn/e5WlF6yQGFWCTn1uk99nWoaztWIPZQ0ifilClYLL7UaDfoDWxF2F6M1O/Vw6IgXNHPY4SiIiH7n+hIuigj8o7J1vGsS0n2+4qHvN8MDaIpoy2rr0SxFH2CdPnE9UU0B/TF4Gq1JhV4IyVsZbKWq7//vk5eeEwV47ZHqQtE+6/K2BN4BvfxUrA/cm3dqeDH4n+uHqnOt6sI/OwQJio1joYrlGiihLHIsO4bqmpI08HgRJf2ghqWItbrtbp+UHx3XmcL2mK0BJulPNBhOyEyLrrqHr8O8oqDg==
-Received: from BY5PR19MB3112.namprd19.prod.outlook.com (2603:10b6:a03:183::25)
- by DS3PR19MB9199.namprd19.prod.outlook.com (2603:10b6:8:2e1::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Tue, 20 Jan
- 2026 12:21:28 +0000
-Received: from BY5PR19MB3112.namprd19.prod.outlook.com
- ([fe80::1f49:c79c:acc2:e0b4]) by BY5PR19MB3112.namprd19.prod.outlook.com
- ([fe80::1f49:c79c:acc2:e0b4%6]) with mapi id 15.20.9520.011; Tue, 20 Jan 2026
- 12:21:28 +0000
-From: Ivan Korytov <toreonify@altlinux.org>
-To: Steve French <sfrench@samba.org>
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Ivan Korytov <toreonify@altlinux.org>
-Subject: [PATCH] smb: client: Fix comparison of owner and group SIDs in populate_new_aces
-Date: Tue, 20 Jan 2026 15:14:26 +0300
-Message-ID:
- <BY5PR19MB31126CEA46F37CCF6F57F328A789A@BY5PR19MB3112.namprd19.prod.outlook.com>
-X-Mailer: git-send-email 2.50.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: WA2P291CA0019.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1e::26) To BY5PR19MB3112.namprd19.prod.outlook.com
- (2603:10b6:a03:183::25)
-X-Microsoft-Original-Message-ID:
- <20260120121424.1584156-3-toreonify@altlinux.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Drdyl/Vp";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EkvhBGSu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768911819;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aEG9JILWJtDxSikxSaJuovdTLx8v+TifArul6/N/tD0=;
+	b=Drdyl/VpUYttoby8mcxl7CUbA4qM6usq2UTT3YFy9ghCdUCQfXpUDUzfH0eqVQZtctBTsY
+	R+wmAy8tws6uMR8u9Re9Wjcgegnr9ZnBksIVoHpZMBchkRM7Rjc+gZ9daN44bvL+IEabkh
+	4QsAY1sI5m6f1sIK1ZvqFer6vO7/tuo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-KjRkcWZGP1K_-k8AOhyE9A-1; Tue, 20 Jan 2026 07:23:38 -0500
+X-MC-Unique: KjRkcWZGP1K_-k8AOhyE9A-1
+X-Mimecast-MFC-AGG-ID: KjRkcWZGP1K_-k8AOhyE9A_1768911817
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4325b81081aso4407438f8f.3
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 04:23:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768911817; x=1769516617; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aEG9JILWJtDxSikxSaJuovdTLx8v+TifArul6/N/tD0=;
+        b=EkvhBGSuPfqPRphz7f+oayrtgHhBvdVxYzE5GcF/IyrZA7lM/kGbqA4VS27Ykp9NA1
+         0IEzlcHcPAj935jEcGsWeyvOkNedsJiIbPF9FsG9R7rZ1QHH2Xwu3UO2uXJnn4UobcJV
+         Kd3tcwi3y4tPZqi3evFqZfbqhP33B5X+/xO1BnUlMJQXMtJfiifOREZsDga1hc3Ea+b+
+         zkRyzq8AUwCgBQHRLe059aU/spsq/thxQWl56Dz//LTkGl3olYmyzMCkJBqG97267d0q
+         COlWlq8Y2Kou2ZEYkTUPyEzGkMXfnHu+JS0QnpK3qK8iokzuy5TonQLkPfLmkMqT/6Dl
+         eeWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768911817; x=1769516617;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aEG9JILWJtDxSikxSaJuovdTLx8v+TifArul6/N/tD0=;
+        b=ZjscGN8Lj7N2HHBko8AeJ2oSD928BlN4xoxtu7gxBvLm/9FFdNz4lkQutKMm1rSPPd
+         RJjwNIjF2Ld41SxxvpKrXXVhbKEwE1uE/sn/HckzSnT6WFwEZsn7oB9f5ArBsNCAgOtw
+         rhJmErcqrKJm2tKZnYknfpeBJbd61tak2CLJsmPC9yHjQf0bVelE/lIwwluZb9lue2O+
+         Xxp0fSMeaLk0BOwqZsCc3bEs2tLIIruw1vL//gx888jz7v+I/GHH0Rl5mhjVH9tix4hD
+         CIeBwni8YXQen6777mc638LWGhpcEjk1d+kZKXW9IS5+Rz9ekcnmoK2yMWJPuMk2W+PL
+         t0+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXTtD+SokJ0d+G7BHe5IR2dGdeGoiKzjf1UOZOSIFrpE4FYWkWlYDW1YdM8pvobLDhpIEmWwKRDHGRT@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/QroHXewzex1wPe1Qde9yfFmKL8Fhu/JaLsccvc5VkSzLTwuj
+	rO6TkzL+/tc4AIvo9URnpmqMM0b7UNrPrGfOYq/MRa6tGmWEqN7OemG+I0J5bMHflowFq/O/h61
+	byh6e7PjUSImSE4VVum/SRWx8dGtXXKt2hbeLKwEkmo9msGdbEOmYcGINO47+i6g=
+X-Gm-Gg: AY/fxX4V78HS8/1AJFJmUNFdDWVP1tsV85X9l57qvlbooaL90XAUn8qwBRx1nnnIiRR
+	oR4Nm33fZ39j1fu6CneeoVpv1s+bMXBMqcOuFVDxeDlaaQAaCHWc69sv8+5ieNBlPPBQOVMVU9W
+	IZsiDbzgpJu6CXP1nNPjvnjcy8WrdUese8XGe+K4faKqb26hP5ay0tR+zHKskL0xIPE3VVFCwGo
+	VR3mVW/rW5M7bubzVW47l6jRsSbMwZvEMEMJB8XTGhmyH44bQRpgJw5p7icVnXQ1gTaCZbPgg29
+	yt4AXu0S96TkJ4U2uHsQk5FFaBJJ84mSzrRFD+OUjcFLC5sdwB+w1iKPjTPEvVFXH6WP3Q3mp03
+	ejG6HumjaES51
+X-Received: by 2002:a05:600c:3b1b:b0:480:3230:6c9b with SMTP id 5b1f17b1804b1-48041472847mr5520405e9.7.1768911817129;
+        Tue, 20 Jan 2026 04:23:37 -0800 (PST)
+X-Received: by 2002:a05:600c:3b1b:b0:480:3230:6c9b with SMTP id 5b1f17b1804b1-48041472847mr5519745e9.7.1768911816688;
+        Tue, 20 Jan 2026 04:23:36 -0800 (PST)
+Received: from [192.168.88.32] ([150.228.93.113])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4801e86c197sm247488175e9.1.2026.01.20.04.23.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jan 2026 04:23:36 -0800 (PST)
+Message-ID: <a9c9f16b-f695-4009-945c-ac3b03631596@redhat.com>
+Date: Tue, 20 Jan 2026 13:23:30 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Sender: Ivan Korytov <toreonify@outlook.com>
-X-MS-Exchange-MessageSentRepresentingType: 2
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY5PR19MB3112:EE_|DS3PR19MB9199:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5efdbc5a-279e-44e4-0c3a-08de581e6fbf
-X-MS-Exchange-SLBlob-MailProps:
-	WaIXnCbdHrPy8Gg0T1tV+ubdyTLMpos/TjOHsBsKfEWPvb2OGkk3kBr4lqjlruqzFMVBEr21bW/PFqkaVC9QLnpnlETJhR+ufvTqMgzgdTpQ8+16C9kuFVwW393R+sHxb49J13Imm/BRuGOC8kZmfj0vSlN477vUBxCh61uP7gLV1FtMTpmooVI21h8aNzY6CVjBKGITjyAilh2vgtssXBdk1jEMOpwLaNxfmESJmug9MYlH/RkWQf5onmsxYpNk8SP2vJ3u3LQ5L1LB/HLxhtwmNWVqRV9sqr39TyAm1dqwBp6r2gutBkWhifd9n9D2sG8SUMp/usdiY5OWbAiYmPanv6ZDVaMwODFJmRyum/JGs5ELfgntZLfyOwan32vTZpLw4Rr2BgvvOTsMQNZ2KPcHHPHFBxW5Gr1Fflnmnv77sFJe9+KyIwOllb3STH296DhdK0t0Kbc/bFxXkqZguu109/MpKY1SoxKp9Oq8av0CH0aCQ3opPuThhbJuDe9UJfblnGuVrr9l0bF3m7pttJA9wtpZfBapXnWOiyYnjuNk1QOfCB5i+95PUAu4/9S5W4cRMEz2J75zfhpj6clYQ/rZCw8soCdBDX6QuKuySWfwi4LG2FWzRvnNRZr60QCH21NtaXhF2G7Lrua6lIguXRYO4hUrb4zFbU4n6QPv0N5sRxT35F9fnrxFu3u3M2tBP4uu4pBX0QUERQOe6vAAwHOXd/qyyXdTdYeLUqfrejL7Mv83xPTsHMJtUeSHT8kgCySWH5+vOH0=
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|5072599009|461199028|39105399006|5062599005|8060799015|19110799012|15080799012|12121999013|23021999003|3412199025|440099028|40105399003|1710799026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?hp8dzmA1B4rKWrioGuilz2agKZOhk6zxRouDv2U9Cqcf9hOJiM2mKbeDfB5M?=
- =?us-ascii?Q?ayUi23+sHWVbDrBJ9NuIG0oZF3Xa9+9S8x7tvWzHVFRqJ9fJTpbU1kynSXM8?=
- =?us-ascii?Q?SSXCx5B1djdwA5+HHr1XLfZts3j1Bkwl+5nYlriztGND0/ewdk8Dg3t6GvED?=
- =?us-ascii?Q?hx1PL0Ou8traulYXPtkuEypATqia1C1cAgP4fBd5VPz0cnVFC+1KNbfsUb1y?=
- =?us-ascii?Q?vRZJPt4+pR7v4GMHhGoGHfBe/BKdZ1G85/YXKDOn2EWH/Bl2gsF8O3T0sW5E?=
- =?us-ascii?Q?gTuUM2+Y0z3w8r+kicz4y9TUfLS4/LeFLpteD3l123MhdnqgyBsKQg6D7HYn?=
- =?us-ascii?Q?1AP68GBy7c4UM42OtLvr5elpxNXywKiTFPjzrEaJ5gCkv3Vlr3KRAgKORGD2?=
- =?us-ascii?Q?zyRb1wGdUL4/vGUxuOjCNXY09LfYMXPW36RunlH93TN+VYzlhNhJ8uBzJF7P?=
- =?us-ascii?Q?TzZq7I4nCRoMcMq8eRpEcOZu+fquLF07uuUhsc33rpiZ5j0lM4nPAdEGCf3C?=
- =?us-ascii?Q?/Z9VgmXPuMU1X81lEUkTACAckHYMALMV5I9vx+qium1ZAiAaYR/R29yv9Dlo?=
- =?us-ascii?Q?3Yt8ec77E6qBeclWWl7g9Ro7aWFUhQn6VTU1Uiu2hhe3IuDCooTpiB3er61o?=
- =?us-ascii?Q?Gmrat1yzpLqC9zyqbWqThgWNI11gzrAptPdTxorMWXUjyrCUD7ZE43Xh2WnD?=
- =?us-ascii?Q?bSgpyhr7pDD8KZDgalsN+COmhGwVYoJAzyH1aWVEZKhz306f5kD1hxo5scbA?=
- =?us-ascii?Q?0G3gifle2J02gmDhplFBMwnsnBGRnBHHxmOQGR0+wySmxOUYNlNOZdL7G/hb?=
- =?us-ascii?Q?hbWMDT4HRHvHFCnELRwA9oIDVnmcZGPg2XM7SaR0MOmT3IBkInVXU8ssCj9Q?=
- =?us-ascii?Q?jmuNODEP0KP1YgNp4RufPn2MQQbFVg+IG1aX6+Zi8oQLfwYfC7VXvB2ubOun?=
- =?us-ascii?Q?asxf9qeBj9+tYFFpwITuTcZHq5S1jNTUf7HFJsuqKr0XIKMJEZuqou2bcLw+?=
- =?us-ascii?Q?5CWOauFVPUo7Spj5lyMInD6ZCMfXR6FRxIeBn//hcOaHJMhPD6aR1WZPkFd7?=
- =?us-ascii?Q?y6hsiYxd/WsZclZYXMOb2vfeih6+DQm5ArjdCFdXor0OZSgSUbtLpgVSrtlp?=
- =?us-ascii?Q?s7IMTnOplGMDdOOTWZjH+hCfXNDoMz+rRqRtmbSMXFzTNApMtHdT6Z+ImrtG?=
- =?us-ascii?Q?bcqahWuvxt3Nbb/5BGINJzUS00E+lVwdH+akf8VRoiwmtB7TK80wWf1mOFO0?=
- =?us-ascii?Q?K21ZZk0W23ZKxWq5R5x0Na6HdVwP8dIjUrubvzjpXQ=3D=3D?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?jiMWgjDpLSlfEvOON9qpDN6bzrzSODmHVhZjJmhurXQnycFAxgorv5jZuqWt?=
- =?us-ascii?Q?OmEdQwBJi+UZg/DjEyAj1BmaSwbggmvm1UGtUpc8PbDuJHgLL1o7CsvzSJZn?=
- =?us-ascii?Q?zxnb04Xh3TNR9Xzrn8yh2a3g/JSI2b4lRMuohW2Q1G1b2JtHbQ+gR6x2V3jR?=
- =?us-ascii?Q?P4mryDmkwyi9F4hUlUyMdpWovBYTVOEhUX77YzmTIW7tniI5lQWpEFoB+hTC?=
- =?us-ascii?Q?Vkx5+LUTc0fqnUec7gk8hA/Sb0DvX7ZmVhWCMML0HM7HPeYQUUJq9SxNKO9Q?=
- =?us-ascii?Q?UpNNNqsC1bV008Zx3lp4Pm02LurjchBaoROrkfAKAzReexnvJxBhRXiPWfWV?=
- =?us-ascii?Q?cb9fO86NfT20l7LTaBMnUTphrwVCfBWw9WvKN2xrkY5loo+FHrk0WPUFM6fV?=
- =?us-ascii?Q?TfPLLLtPsjipcIidR6KzP2hbmpzY6z6aSfOeMrJFtUHSj3UKpoFjDw3cvRRQ?=
- =?us-ascii?Q?U8h87wnPM+o63GSpip0PbPEfVEiQiU0lw+YkfSFGHvFDQHgpPeF11APkO5At?=
- =?us-ascii?Q?SEnSfmq0eP3GGkePGuKMNjqhiXIvKmfs6+sJJNFPqHYU+39vYPNMm08GhQdr?=
- =?us-ascii?Q?jXh6D9SLyb59PGrQjZD77Qram238NSAmdqGudNd3I/nKUSWmKcxtIiTezZlA?=
- =?us-ascii?Q?JpW6wBDSCspd0gVOrmkgvHTN3Jolf+HRhuZmaXhlvVHeNY7xQn1HXr+exiO2?=
- =?us-ascii?Q?7rg0ABWsX2QaliR8bG7W9MQNCn2YJylZ7/zkR7fS/y8Ch9YWEmSLv+LE4l2A?=
- =?us-ascii?Q?m3bXM0BVJn2xTAqxPagkzQi2yccI+53QQNlu6Nst6HAfxo8xDqGIUUdShOzv?=
- =?us-ascii?Q?t760MEE2AJlXIEVyEhRPv8mp/q/AT5WDIEHnIgJL3rEEPdoV7sem/joHz+gB?=
- =?us-ascii?Q?UlCDO706xrUr6xqCIc94ZoIja/RcFarHaetUkgpSV2DJvwDQ75Pw7cD3kWNK?=
- =?us-ascii?Q?bTh98JXbtu37RAxH07hS3HkhiUGUEFQ/YY6N4MQuNbzjfvyv5nHLzeMXBiNb?=
- =?us-ascii?Q?gfnLsrBvrrTLcxKBLzl2fPz155ppZwfa9grHf+NoE9xDZ7NSzgGnsop3D+Gz?=
- =?us-ascii?Q?Yw0QROaODAn0Xj/59GWjU8nFqrNAHN1X7dhRKBBIaiG2ObXPAyFPw/5SwXNq?=
- =?us-ascii?Q?4cRzHzvRKQO6+zTTj1qaepQnoN4Rj+fp6Mw4DKNxum//Y5AWT4mku9poZTYZ?=
- =?us-ascii?Q?lKzfVpWsF78HKyvj/jrMZ2Du7hAf0XiVrMKJJvMLqC5uOj5njmJ+LJrVtPH+?=
- =?us-ascii?Q?BmJgXjvZ9kHH4WSlr9tSwhL6SRJL8sQ0QHtp5ZMlZ+MXP+XOrazoDrQE/s1N?=
- =?us-ascii?Q?mIa7yCOPS1qPL2ZJorlbsRDbFFhSCimCdVl+AeXASYs+KOmpYXQ9v+jCOhDJ?=
- =?us-ascii?Q?7lDCZGUvKFbiPqPmS0AQWdjVpHc7?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5efdbc5a-279e-44e4-0c3a-08de581e6fbf
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR19MB3112.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2026 12:21:28.5547
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS3PR19MB9199
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 05/16] quic: provide quic.h header files for
+ kernel and userspace
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+ quic@lists.linux.dev
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
+ linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
+ Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
+ Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1768489876.git.lucien.xin@gmail.com>
+ <32a34bfa4fcd69de5c738db95dbd71ac8e361d24.1768489876.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <32a34bfa4fcd69de5c738db95dbd71ac8e361d24.1768489876.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-memcmp used for comparison of owner and group SIDs was producing incorrect
-result because fields in smb_sid structure aren't always fully populated
-to allow a byte-to-byte comparison (as they can be uninitialized in unused
-regions).
+On 1/15/26 4:11 PM, Xin Long wrote:
+> This commit adds quic.h to include/uapi/linux, providing the necessary
+> definitions for the QUIC socket API. Exporting this header allows both
+> user space applications and kernel subsystems to access QUIC-related
+> control messages, socket options, and event/notification interfaces.
+> 
+> Since kernel_get/setsockopt() is no longer available to kernel consumers,
+> a corresponding internal header, include/linux/quic.h, is added. This
+> exposes quic_do_get/setsockopt() to handle QUIC socket options directly
+> for kernel subsystems.
+> 
+> Detailed descriptions of these structures are available in [1], and will
+> be also provided when adding corresponding socket interfaces in the
+> later patches.
+> 
+> [1] https://datatracker.ietf.org/doc/html/draft-lxin-quic-socket-apis
+> 
+> Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+> Signed-off-by: Thomas Dreibholz <dreibh@simula.no>
+> Signed-off-by: Xin Long <lucien.xin@gmail.com>
 
-memcmp always took the false branch and assigned ACLs as if they were
-assigned for nonidentical SIDs, which produced an incorrect DACL that
-didn't reflect user intensions when using chmod.
-
-Existing function compare_sids compares each field separately and takes
-into account variable length fields.
-
-Signed-off-by: Ivan Korytov <toreonify@altlinux.org>
----
- fs/smb/client/cifsacl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index 7e6e473bd4a0..9346a459e380 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -995,7 +995,7 @@ static void populate_new_aces(char *nacl_base,
- 	 * updated in the inode.
- 	 */
- 
--	if (!memcmp(pownersid, pgrpsid, sizeof(struct smb_sid))) {
-+	if (!compare_sids(pownersid, pgrpsid)) {
- 		/*
- 		 * Case when owner and group SIDs are the same.
- 		 * Set the more restrictive of the two modes.
--- 
-2.50.1
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
