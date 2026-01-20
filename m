@@ -1,62 +1,60 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE691155389
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 06:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A3B36C0AC
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 06:22:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768890131; cv=none; b=o0Ddg5kruygnRgMI7BSwWZ1zxpX8TMASzhp9RYeM9mtXjLWbjkGWIRLLxgSdqaqOBl7GjNUU1t2etqYqop2LCNeikX4dUzhJLg0AR74lsk+ppjdzQK1oxFPsKTOSl+m+Z4cwh0aE21EnPHTKniMImUkdlhATuIthg40fpAoiEIs=
+	t=1768890131; cv=none; b=tyqkj4B8dVL77prPxVwUYtfZ2Re+ijmsE/JEKfqfSyIyQSsOI110hhGDa2ACz6HubNysYNyEqGH+oVuuOuE5/dt20Cvmge/s3gzUuQeq2LOuFzDM8RZTMSncVBbSkwiWNuwSiuYgJ4dVigor0I5AcCLEhaMnWjvbfNXe/j7qPuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1768890131; c=relaxed/simple;
-	bh=EQIDBdej8gAOAgnYltWx3u0qXhBCCE6o3HHvVWpTwuI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F2teYzjIuUluV6Cc6AN7coTOSAfNEcQ3qXnbxvRO75lLIoRb+20rYuBqViC0II7JGOx3XpsCkJ90LP/8tFKGH+HnGDrf+n6zsWc+1JhDk2t8liFxZS+iz1jlnvwA2h/+RYhJs9vCNtBJshYrevKx5XtTmdZwOnOR0P7SvAIyZhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lxegLSMx; arc=none smtp.client-ip=209.85.214.181
+	bh=HXgh91TckTtaWRQtCBliw0DRm62hUVsJoLGoBTGStPA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eSVRYTGNRET/YIKNGvn+QjJ4mrtYPw1SmXQ3dTEkc2D7zaVGi6k5rV/woHA9RxEc7NinDkfsTYjxBY8xXlbHEFfW32ExwfzTeWwLr0j3k8NfcZ7pqjtRZCukYC/unozpFFbqF5h8dNlgJb17743g5AJj/cZxEPPHvOMLcE0sXIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F0DdUgeX; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lxegLSMx"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2a07f8dd9cdso31278625ad.1
-        for <linux-cifs@vger.kernel.org>; Mon, 19 Jan 2026 22:22:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F0DdUgeX"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2a09757004cso44641555ad.3
+        for <linux-cifs@vger.kernel.org>; Mon, 19 Jan 2026 22:22:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768890129; x=1769494929; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QE670D9mNJ1A3NOHdJRodKpp+UQmT7FeQl+lVas6lQk=;
-        b=lxegLSMxuqj587OKZdozzsWSgzNP7AIy+l3BiB1voajeAD9P8mYWm63pmk5AwRlb3a
-         Z/U48xDcztv3FGN88Mb17aTcaa6u9arpGFaEvaftmT7kbDyaQ5oQpJzk1z/QNMII3d//
-         qSix1n1htsJ1tPML1Xqx88JxHXEciOx5OJzyLqki8McPQfBLJYQoRz5fRl7W5Br+1WkB
-         kNBCVgN7dI3GtFA2P+09psGJ6gMMhIFfwbPHPf0jRBNLF87PELWrGeh4YclAIzpqFEx+
-         fQkbk1mqDp7o6TQGKqlCshGXVQA5U3DrgTohKgJSi9WzcveEmjh7UrjAsLo9BI5lmjmu
-         nX2g==
+        d=gmail.com; s=20230601; t=1768890128; x=1769494928; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6EKchlZhWxO3Iv5CDV1JWVC2GKSqiNAkqsBWADytBNE=;
+        b=F0DdUgeXTNEJLv8wFfn0gZF3AfdG24tJeaqTNk380WANf9GqWzhV84Xw2KgK3okkwg
+         UniAdQktgETAF0l5IT6BpDHX0u1qyEGkq4mfPC3NDO1jXbAw5Ozg3mvfomul2zc8xb+F
+         ep4o5mS/o3oORwpk9lWPxCYklziEwe4kAILtTQG1+qt0UBX9gl89dz+ENhbH+wq2Fg4R
+         Qv8+34/dtdlyqb+wRSK7TaJOL0nCf536R8lm8MOcw7PCa0qYmEyaEj2yocXsnPEd/152
+         zevgGBZL22JU+/Bvb8LxlTALtuhvoLhIdz9TgqQ1BSqjaUCwXa+a5fWAWwcHhXNwMXA5
+         RCLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768890129; x=1769494929;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QE670D9mNJ1A3NOHdJRodKpp+UQmT7FeQl+lVas6lQk=;
-        b=Z90NE9NmMSnrhMbDizEZCB7aIhiUUuIH6+zmHdz+6Migr3wt07D7oxl0chFQg6dHRB
-         7zE0bVlTIhlXxwlvpgSe/hPKB7mZvoOlBp8/I2sp4O2s+GvIJEimt/vDS/DZQawHjhUQ
-         X1C5tcc0M//JHWlyibKFgRORNKMt0sjev+kMZVohsZ6rPI4sQ6lmG8Dg/avJh3EJ/8Il
-         DKlfzxBXek7Pxq+y3P1ig9IudOEZ+HvZnVH0EGvqxVpv1KQQMmlLrQUV6+0VrxdHBH6h
-         sejoRuRao5x36XOGpzlBKGSRF305a3TNfirGe7d65iwTRUBZgWWwghU3NqNDye1yQ4jo
-         8XGg==
-X-Gm-Message-State: AOJu0Yx0JVxVVGGrpxXoujYEdO9yn3exz0DHBgfO5ZpwzyJ7GJdTAoKv
-	r5v1sqavDfztvSQFQpRwv9YyavNMLUsUFW6TH27rNL9ILtNUFkONZZt9S7NkNQ==
-X-Gm-Gg: AZuq6aIRWQ0DmDg5BQnZ4/cNAe3QuZeU7AzM6IJ8T9H/F85qgHsAyd6cHknl66h/oKj
-	7u5io2s4QA/kLvF6pP6wyhKaunK4RNac9oR9NHHfSQseXgPk4ORGp0omzpbTUsPMOnwGP17gcHs
-	/aXzBytqgkAAwuHB4xk4BahWnuBA4oKk+CxUxxY+ys7ZOwT8Zo7EE3zuaCtvHVU5gI40zVz/zst
-	TeyTbwhJl7yz4W56xmoODuo8ydP8NDkWBC/Zug1So+cZn4arvH1XwLiFJkK3sz1UPooleufoQfq
-	Q9ZO+nluJjoJi0S+Ngt+u3FucL/zUWnKKECdn51ftD4xYwL1FvbCNQyDK2/atmmpijVzLmVvuL4
-	gduQpfZtL4nVXHeW1HZa9rJSIF4CxZ6+JtgxngHhV4/Cvfh839DicOmBg4cO8IXoJ0EtKNRS/tc
-	dcgcAifwr84qG9XTbgcJiMr5BKA87zrC6uQnidN1vX
-X-Received: by 2002:a17:903:13ce:b0:297:c048:fb60 with SMTP id d9443c01a7336-2a76a389391mr9107705ad.25.1768890128714;
-        Mon, 19 Jan 2026 22:22:08 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768890128; x=1769494928;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6EKchlZhWxO3Iv5CDV1JWVC2GKSqiNAkqsBWADytBNE=;
+        b=NegYXw/fTeG5i/Ju/yTnpl8yqjNTS2J7vMKq79n7CnfqLAT6w+pxoR/IYkdfNrsnPu
+         kVXS/nA2iz9RiSpvqc2COCIylkT0bP3ESDJaJq/uIU7EqhbwgPH5uGNOUSPZ92yhHV5u
+         GrZNxwwfRjR51R6snuBh5dBQ+oi6DigfB68ua2TZpln/HPtqADVCCxkafQiLfIozdVu+
+         7OuA1xb6djG9kyMB93AMx/9SD+wVHUdS8/bOIs/tAa4Gpx1UedJsPLZTJE8Q8zylV6uL
+         L4uPywUdJ9KII3zR5wxZ2wSM6SI/xsHlQ9EA0jKhUOE7qXUfv15l8LhCijeAo7ulQl16
+         AiBg==
+X-Gm-Message-State: AOJu0YyqJhYpPwT2TtMfiXfezhTd6CBCmAv4Uj/Kr6EKS+uvHWjaiw5Q
+	nVfar/JxSR89SS8ggrZfy31+aahuR9FHEl0ZLUQjbkEheP1gFQYqC/Jl+/SMsA==
+X-Gm-Gg: AZuq6aLxjmm0uxC3YpHWVtHkPD5Ce6E0YL2M7O7a5bE1U8s5Gc5uVarUpyA1eeQTWv0
+	kHi5UswIAvYdTpQpoFJcKX/TqkpAmSED5vKfu/QaNIeUPgDcgHlLVevifYssYVX3qZ0CO8M6UXX
+	9QVjZ4BbbQn7ct+Z9NjuJKFy9y7NDR83LzWJBL7XcF6c6MIhBdutxZxwE1XNlZcNMvrOyn0QKsO
+	crFO5DjDAyn+xnNrXrngIIaEpvqitZq5gRnIPH8ZOot2ZA+uGoGobo/16VyDaSmhSCIqeTkLGRD
+	KOEQZinN3NInCnSbMmbgTSizUJZM8Zetdk3E5QpPDhXcZTAEHKeJmQxHiRo9r1z1O/OGZTCNCH6
+	mfhOtzwysQPVQQgKmLHGS67rtE6rtXRk5VnL8qB7kHFWhPw/SPWjent4VPZpKRb1yv5kdr2cJot
+	LRbxTN8lzz9UXi3HT2+/OTsmPzDuf8rc/vttEay+QX
+X-Received: by 2002:a17:903:384f:b0:2a0:a484:6b87 with SMTP id d9443c01a7336-2a7175be723mr148911325ad.47.1768890127776;
+        Mon, 19 Jan 2026 22:22:07 -0800 (PST)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.152])
         by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a7193dd523sm112497855ad.62.2026.01.19.22.22.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 22:22:08 -0800 (PST)
+        Mon, 19 Jan 2026 22:22:07 -0800 (PST)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -65,12 +63,10 @@ To: linux-cifs@vger.kernel.org,
 	bharathsm@microsoft.com,
 	dhowells@redhat.com
 Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH 2/4] netfs: avoid double increment of retry_count in subreq
-Date: Tue, 20 Jan 2026 11:51:35 +0530
-Message-ID: <20260120062152.628822-2-sprasad@microsoft.com>
+Subject: [PATCH 1/4] netfs: when subreq is marked for retry, do not check if it faced an error
+Date: Tue, 20 Jan 2026 11:51:34 +0530
+Message-ID: <20260120062152.628822-1-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260120062152.628822-1-sprasad@microsoft.com>
-References: <20260120062152.628822-1-sprasad@microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -81,29 +77,99 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-This change fixes the instance of double incrementing of
-retry_count. The increment of this count already happens
-when netfs_reissue_write gets called. Incrementing this
-value before is not necessary.
+The *_subreq_terminated functions today only process the NEED_RETRY
+flag when the subreq was successful or failed with EAGAIN error.
+However, there could be other retriable errors for network filesystems.
+
+Avoid this by processing the NEED_RETRY irrespective of the error
+code faced by the subreq. If it was specifically marked for retry,
+the error code must not matter.
 
 Cc: David Howells <dhowells@redhat.com>
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/netfs/write_retry.c | 1 -
- 1 file changed, 1 deletion(-)
+ fs/netfs/read_collect.c  | 6 ++++--
+ fs/netfs/read_retry.c    | 4 ++--
+ fs/netfs/write_collect.c | 8 ++++----
+ fs/netfs/write_issue.c   | 1 +
+ 4 files changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/fs/netfs/write_retry.c b/fs/netfs/write_retry.c
-index fc9c3e0d34d81..29489a23a2209 100644
---- a/fs/netfs/write_retry.c
-+++ b/fs/netfs/write_retry.c
-@@ -98,7 +98,6 @@ static void netfs_retry_write_stream(struct netfs_io_request *wreq,
- 			subreq->start	= start;
- 			subreq->len	= len;
- 			__clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
--			subreq->retry_count++;
- 			trace_netfs_sreq(subreq, netfs_sreq_trace_retry);
+diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
+index a95e7aadafd07..743830a149bb6 100644
+--- a/fs/netfs/read_collect.c
++++ b/fs/netfs/read_collect.c
+@@ -547,13 +547,15 @@ void netfs_read_subreq_terminated(struct netfs_io_subrequest *subreq)
+ 	}
  
- 			/* Renegotiate max_len (wsize) */
+ 	if (unlikely(subreq->error < 0)) {
+-		trace_netfs_failure(rreq, subreq, subreq->error, netfs_fail_read);
+ 		if (subreq->source == NETFS_READ_FROM_CACHE) {
+ 			netfs_stat(&netfs_n_rh_read_failed);
+ 			__set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
+ 		} else {
+ 			netfs_stat(&netfs_n_rh_download_failed);
+-			__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
++			if (!test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags)) {
++				__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
++				trace_netfs_failure(rreq, subreq, subreq->error, netfs_fail_read);
++			}
+ 		}
+ 		trace_netfs_rreq(rreq, netfs_rreq_trace_set_pause);
+ 		set_bit(NETFS_RREQ_PAUSE, &rreq->flags);
+diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
+index b99e84a8170af..7793ba5e3e8fc 100644
+--- a/fs/netfs/read_retry.c
++++ b/fs/netfs/read_retry.c
+@@ -12,6 +12,7 @@
+ static void netfs_reissue_read(struct netfs_io_request *rreq,
+ 			       struct netfs_io_subrequest *subreq)
+ {
++	subreq->error = 0;
+ 	__clear_bit(NETFS_SREQ_MADE_PROGRESS, &subreq->flags);
+ 	__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
+ 	netfs_stat(&netfs_n_rh_retry_read_subreq);
+@@ -242,8 +243,7 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+ 	subreq = list_next_entry(subreq, rreq_link);
+ abandon:
+ 	list_for_each_entry_from(subreq, &stream->subrequests, rreq_link) {
+-		if (!subreq->error &&
+-		    !test_bit(NETFS_SREQ_FAILED, &subreq->flags) &&
++		if (!test_bit(NETFS_SREQ_FAILED, &subreq->flags) &&
+ 		    !test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags))
+ 			continue;
+ 		subreq->error = -ENOMEM;
+diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
+index cbf3d9194c7bf..61eab34ea67ef 100644
+--- a/fs/netfs/write_collect.c
++++ b/fs/netfs/write_collect.c
+@@ -492,11 +492,11 @@ void netfs_write_subrequest_terminated(void *_op, ssize_t transferred_or_error)
+ 
+ 	if (IS_ERR_VALUE(transferred_or_error)) {
+ 		subreq->error = transferred_or_error;
+-		if (subreq->error == -EAGAIN)
+-			set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
+-		else
++		/* if need retry is set, error should not matter */
++		if (!test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags)) {
+ 			set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+-		trace_netfs_failure(wreq, subreq, transferred_or_error, netfs_fail_write);
++			trace_netfs_failure(wreq, subreq, transferred_or_error, netfs_fail_write);
++		}
+ 
+ 		switch (subreq->source) {
+ 		case NETFS_WRITE_TO_CACHE:
+diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
+index dd8743bc8d7fe..34894da5a23ec 100644
+--- a/fs/netfs/write_issue.c
++++ b/fs/netfs/write_issue.c
+@@ -250,6 +250,7 @@ void netfs_reissue_write(struct netfs_io_stream *stream,
+ 	iov_iter_truncate(&subreq->io_iter, size);
+ 
+ 	subreq->retry_count++;
++	subreq->error = 0;
+ 	__clear_bit(NETFS_SREQ_MADE_PROGRESS, &subreq->flags);
+ 	__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
+ 	netfs_stat(&netfs_n_wh_retry_write_subreq);
 -- 
 2.43.0
 
