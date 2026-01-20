@@ -1,99 +1,210 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76AC52C3256
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 17:03:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F0B2C326A;
+	Tue, 20 Jan 2026 17:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768928612; cv=none; b=cfZw8DrUvnAQ5VktEVQkelJrOR5sKOmZ4CFI1DdDz3O89j4mg86qTf6qHqeLvManaisOGMqAoUB+ufoCmbO1t8B4Imng3+xiJP6LpVIaFngF5vI6rkGaEGsn3X6R+l4H14AluZzcOYOVValUm2S6yQQ1mzMgTtvyosHBnjtxjQk=
+	t=1768929969; cv=none; b=ehw1rCVbftTCxZWEtbQ3zlZgajHxUOLuQIPbSo3/zL8H6/IdP98Y+4B/xLO4VcgctUHmThzASD2OILzQbDKY1icn+mMCh2tU1pL6r/w1NFZZ8gFnthMKYrYEgCZBRUyilwa9YHmf5BcUcqPxIkzb6zDMTigeiP3ZguTFEVkaOiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768928612; c=relaxed/simple;
-	bh=69Ywl3w9xq+kGefBgpb2Nd4RIVYwrXLio17HcX3Zun8=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=avZQmlwNDLI/jPmJKK7RISuvQWjkbXEyeXLat4CiHxijs37oR+b9S+sn5ij6H2YHUh7i138yPHkrSzOLqCnnSyswDGpZ7eOBgS5qPPX1VOniEOA7ipNNqR7Vg8EWLJ4Ta14Hh81zizXBAp9UFxQE/fHr5PjFC8c3ixCc1cEtipE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H/R+/b69; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768929969; c=relaxed/simple;
+	bh=FIUbtAnKi1f9Ixtwf6Hj98EMVx/0loFgVG2T3r6WF14=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uuqKHIxlQgongijrSMsYLa9qqvlCvGf6CbZMUhabkAdHuBoBpnGXI2z6nSm9aqvT3wLwPGALnVVz/ZFCy3tfmyBsv+i2rz+XO8s8gPxhjGNiLjYiTFI4jSX2dDwCPDlftpd1pvHPGlHP4Ssz49ywwylX+UvvlRusc9D9gmIOpkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQAOvnfH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H/R+/b69"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768928609;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wL/I78IkyhL3WHhINDEYeLuEvurScAVQQm0lSm523Vc=;
-	b=H/R+/b695wCIbuXHcSqE6yGGzitw3HnggWXOE5iorRYV7IWp5YKLM+5uXP5jak8wLDatxJ
-	hklexMJatYGhvu4s12NGop3K8hdReAkWdVkxxrxS+oVihwcwKtn5B1DTbBJ9T9aUh+V9Y4
-	AZCYU5feoZpNpvWandNkOutr905u+jU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-571-SGfGbgscMzWPAetHdEZ2cQ-1; Tue,
- 20 Jan 2026 12:03:26 -0500
-X-MC-Unique: SGfGbgscMzWPAetHdEZ2cQ-1
-X-Mimecast-MFC-AGG-ID: SGfGbgscMzWPAetHdEZ2cQ_1768928604
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C53C219560AF;
-	Tue, 20 Jan 2026 17:03:24 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.2])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2A8F51800993;
-	Tue, 20 Jan 2026 17:03:22 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20260120062152.628822-4-sprasad@microsoft.com>
-References: <20260120062152.628822-4-sprasad@microsoft.com> <20260120062152.628822-1-sprasad@microsoft.com>
-To: nspmangalore@gmail.com
-Cc: dhowells@redhat.com, linux-cifs@vger.kernel.org, smfrench@gmail.com,
-    pc@manguebit.com, bharathsm@microsoft.com,
-    Shyam Prasad N <sprasad@microsoft.com>
-Subject: Re: [PATCH 4/4] cifs: make retry logic in read/write path consistent with other paths
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQAOvnfH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B773DC16AAE;
+	Tue, 20 Jan 2026 17:26:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768929968;
+	bh=FIUbtAnKi1f9Ixtwf6Hj98EMVx/0loFgVG2T3r6WF14=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oQAOvnfHwE78eIgKAIRtjx3D0fJsMFdeUHLCzYJaYSbsVMAoIf8DavjI4p9Ig8W+r
+	 orNBrgopcnEGNUsPOjBzAw3CY8JmSYEyPwonLuWljP12QZDK9k3MWDBh53R+AWXwZ6
+	 zhJoY9tYkeJqyfT9hbLB93MtK5Q0MgWiSkMhTjBy0ekfYujLfB+lI9+/dM3OQagJx3
+	 KpaO7nNxt5kXF7WpJGeywfLb2Ddy67/JvMP7PRrIPh6x0xVzraeG5oEBBV3YCDNXaG
+	 xu0rFDdtGxZHncy0o74bYgvxpzKcenLojcGLkF/BiK1TaFC4mzmUTGPYzxyaBxt7im
+	 NwSokwvhiUT7A==
+Date: Tue, 20 Jan 2026 09:26:08 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Chuck Lever <cel@kernel.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	hirofumi@mail.parknet.co.jp, linkinjeon@kernel.org,
+	sj1557.seo@samsung.com, yuezhang.mo@sony.com,
+	almaz.alexandrovich@paragon-software.com, slava@dubeyko.com,
+	glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu,
+	adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org,
+	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+	trondmy@kernel.org, anna@kernel.org, jaegeuk@kernel.org,
+	chao@kernel.org, hansg@kernel.org, senozhatsky@chromium.org,
+	Chuck Lever <chuck.lever@oracle.com>
+Subject: Re: [PATCH v6 01/16] fs: Add case sensitivity flags to file_kattr
+Message-ID: <20260120172608.GQ15551@frogsfrogsfrogs>
+References: <20260120142439.1821554-1-cel@kernel.org>
+ <20260120142439.1821554-2-cel@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1261424.1768928601.1@warthog.procyon.org.uk>
-Date: Tue, 20 Jan 2026 17:03:21 +0000
-Message-ID: <1261425.1768928601@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260120142439.1821554-2-cel@kernel.org>
 
-Hi Shyam,
+On Tue, Jan 20, 2026 at 09:24:24AM -0500, Chuck Lever wrote:
+> From: Chuck Lever <chuck.lever@oracle.com>
+> 
+> Enable upper layers such as NFSD to retrieve case sensitivity
+> information from file systems by adding FS_XFLAG_CASEFOLD and
+> FS_XFLAG_CASENONPRESERVING flags.
+> 
+> Filesystems report case-insensitive or case-nonpreserving behavior
+> by setting these flags directly in fa->fsx_xflags. The default
+> (flags unset) indicates POSIX semantics: case-sensitive and
+> case-preserving. These flags are read-only; userspace cannot set
+> them via ioctl.
+> 
+> Relocate struct file_kattr initialization from fileattr_fill_xflags()
+> and fileattr_fill_flags() to vfs_fileattr_get() and the ioctl/syscall
+> call sites. This allows filesystem ->fileattr_get() callbacks to set
+> flags directly in fa->fsx_xflags before invoking the fill functions,
+> which previously would have zeroed those values. Callers that bypass
+> vfs_fileattr_get() must now zero-initialize the struct themselves.
+> 
+> Case sensitivity information is exported to userspace via the
+> fa_xflags field in the FS_IOC_FSGETXATTR ioctl and file_getattr()
+> system call.
+> 
+> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+> ---
+>  fs/file_attr.c           | 14 ++++++--------
+>  fs/xfs/xfs_ioctl.c       |  2 +-
+>  include/linux/fileattr.h |  3 ++-
+>  include/uapi/linux/fs.h  |  2 ++
 
-Some immediate thoughts for you.
+This ought to go to linux-api because you're changing the userspace api.
+Granted it's only adding a flag definition to an existing ioctl, but
+FS_XFLAG_CASEFOLD /does/ collide with Andrey's fsverity xflag patch...
 
-nspmangalore@gmail.com wrote:
+(The rest of the changes looks ok to me.)
 
-> +			break;
-> +		} else
-> +			trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_progress);
+--D
 
-The 'else' is superfluous, given the 'break'.
-
-> +		trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_retry_needed);
-
-Btw, feel free to add more trace values if you want to distinguish 'retries'
-from 'replays' if that makes sense.
-
->  			break;
-> -		}
-> +		} else
-> +			trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_progress);
-
-Superfluous 'else' again.
-
-> -			wdata->result = -ENOSPC;
-> +			result = -ENOSPC;
-
-I wonder if wdata->result is redundant.  Can wdata->subreq.error be used
-instead (though that's unrelated to the subject of this patch).
-
-David
-
+>  4 files changed, 11 insertions(+), 10 deletions(-)
+> 
+> diff --git a/fs/file_attr.c b/fs/file_attr.c
+> index 13cdb31a3e94..2700200c5b9c 100644
+> --- a/fs/file_attr.c
+> +++ b/fs/file_attr.c
+> @@ -15,12 +15,10 @@
+>   * @fa:		fileattr pointer
+>   * @xflags:	FS_XFLAG_* flags
+>   *
+> - * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).  All
+> - * other fields are zeroed.
+> + * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).
+>   */
+>  void fileattr_fill_xflags(struct file_kattr *fa, u32 xflags)
+>  {
+> -	memset(fa, 0, sizeof(*fa));
+>  	fa->fsx_valid = true;
+>  	fa->fsx_xflags = xflags;
+>  	if (fa->fsx_xflags & FS_XFLAG_IMMUTABLE)
+> @@ -46,11 +44,9 @@ EXPORT_SYMBOL(fileattr_fill_xflags);
+>   * @flags:	FS_*_FL flags
+>   *
+>   * Set ->flags, ->flags_valid and ->fsx_xflags (translated flags).
+> - * All other fields are zeroed.
+>   */
+>  void fileattr_fill_flags(struct file_kattr *fa, u32 flags)
+>  {
+> -	memset(fa, 0, sizeof(*fa));
+>  	fa->flags_valid = true;
+>  	fa->flags = flags;
+>  	if (fa->flags & FS_SYNC_FL)
+> @@ -84,6 +80,8 @@ int vfs_fileattr_get(struct dentry *dentry, struct file_kattr *fa)
+>  	struct inode *inode = d_inode(dentry);
+>  	int error;
+>  
+> +	memset(fa, 0, sizeof(*fa));
+> +
+>  	if (!inode->i_op->fileattr_get)
+>  		return -ENOIOCTLCMD;
+>  
+> @@ -323,7 +321,7 @@ int ioctl_setflags(struct file *file, unsigned int __user *argp)
+>  {
+>  	struct mnt_idmap *idmap = file_mnt_idmap(file);
+>  	struct dentry *dentry = file->f_path.dentry;
+> -	struct file_kattr fa;
+> +	struct file_kattr fa = {};
+>  	unsigned int flags;
+>  	int err;
+>  
+> @@ -355,7 +353,7 @@ int ioctl_fssetxattr(struct file *file, void __user *argp)
+>  {
+>  	struct mnt_idmap *idmap = file_mnt_idmap(file);
+>  	struct dentry *dentry = file->f_path.dentry;
+> -	struct file_kattr fa;
+> +	struct file_kattr fa = {};
+>  	int err;
+>  
+>  	err = copy_fsxattr_from_user(&fa, argp);
+> @@ -434,7 +432,7 @@ SYSCALL_DEFINE5(file_setattr, int, dfd, const char __user *, filename,
+>  	struct filename *name __free(putname) = NULL;
+>  	unsigned int lookup_flags = 0;
+>  	struct file_attr fattr;
+> -	struct file_kattr fa;
+> +	struct file_kattr fa = {};
+>  	int error;
+>  
+>  	BUILD_BUG_ON(sizeof(struct file_attr) < FILE_ATTR_SIZE_VER0);
+> diff --git a/fs/xfs/xfs_ioctl.c b/fs/xfs/xfs_ioctl.c
+> index 59eaad774371..f0417c4d1fca 100644
+> --- a/fs/xfs/xfs_ioctl.c
+> +++ b/fs/xfs/xfs_ioctl.c
+> @@ -496,7 +496,7 @@ xfs_ioc_fsgetxattra(
+>  	xfs_inode_t		*ip,
+>  	void			__user *arg)
+>  {
+> -	struct file_kattr	fa;
+> +	struct file_kattr	fa = {};
+>  
+>  	xfs_ilock(ip, XFS_ILOCK_SHARED);
+>  	xfs_fill_fsxattr(ip, XFS_ATTR_FORK, &fa);
+> diff --git a/include/linux/fileattr.h b/include/linux/fileattr.h
+> index f89dcfad3f8f..709de829659f 100644
+> --- a/include/linux/fileattr.h
+> +++ b/include/linux/fileattr.h
+> @@ -16,7 +16,8 @@
+>  
+>  /* Read-only inode flags */
+>  #define FS_XFLAG_RDONLY_MASK \
+> -	(FS_XFLAG_PREALLOC | FS_XFLAG_HASATTR)
+> +	(FS_XFLAG_PREALLOC | FS_XFLAG_HASATTR | \
+> +	 FS_XFLAG_CASEFOLD | FS_XFLAG_CASENONPRESERVING)
+>  
+>  /* Flags to indicate valid value of fsx_ fields */
+>  #define FS_XFLAG_VALUES_MASK \
+> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+> index 66ca526cf786..919148beaa8c 100644
+> --- a/include/uapi/linux/fs.h
+> +++ b/include/uapi/linux/fs.h
+> @@ -253,6 +253,8 @@ struct file_attr {
+>  #define FS_XFLAG_FILESTREAM	0x00004000	/* use filestream allocator */
+>  #define FS_XFLAG_DAX		0x00008000	/* use DAX for IO */
+>  #define FS_XFLAG_COWEXTSIZE	0x00010000	/* CoW extent size allocator hint */
+> +#define FS_XFLAG_CASEFOLD	0x00020000	/* case-insensitive lookups */
+> +#define FS_XFLAG_CASENONPRESERVING 0x00040000	/* case not preserved */
+>  #define FS_XFLAG_HASATTR	0x80000000	/* no DIFLAG for this	*/
+>  
+>  /* the read-only stuff doesn't really belong here, but any other place is
+> -- 
+> 2.52.0
+> 
+> 
