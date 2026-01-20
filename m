@@ -1,162 +1,213 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1878B4418D9
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 14:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D56F4418EC
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 14:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768918401; cv=none; b=pj7JeqKMajxysWInS7hke6UqYfdlsE45OLz3F6GBBrtGlQOQyoIsNlaQ40GFaeK8tJ8RdcITtsm9U4WlUqlMS832xgABg0hfQVo//ZAPhOTJEC0cdszlVkXVVlhm0eKVP2jvo1a05UiAWZ6X71foSJtpNgSMXnd4y5yuC6TRidg=
+	t=1768918416; cv=none; b=hQe21M/YotmSgWEQ1+1+blZLWCYQtsRGUT3xWpTpDO12ieuF5IfODJ0NgG0C3/OZKdYIjMzu5H+eantNX+VrsEU5MJ/L5o8TDIXFB6yvZDhp+hcEnhvWONR2kkemJEsffZ7nf3MQrFtZmeWEOVzQsfIe63n1jnrZ9E7olDpWouA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768918401; c=relaxed/simple;
-	bh=1barDntHWr955DPKo7h1w6dJSd2uglhVezxCYv6rDNw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z3q4Ps3HZkWXDgH6HWd9O/XI3EA89SO/TFV9Bf+MhU0pNDOsab/3HWlxS32fnmY4N8qlAM3/fzUdh3DkiJeq70BjPJddc621wOwZ0I/V/bfXEVHA0zHG4i45vFMA/YqjZUXsuxAmLyx52FUtMBrbg+Td3DvaqM9bgKx2HhWplMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fjCSltE7; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1768918416; c=relaxed/simple;
+	bh=MTXAttGcmQV+gKT1VuxP3RbxteQV73dhqFSiu5vTsKw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T6KZnR+5DpsdcPL2hAJPn2Xa1EW3nvPf38I7dQb1TqwExluK4vIc3xIceeDcbKgGrXTj2+2+6VW/+mPGwzNMguwXLCL2FRGDIXDSKd9a1Q7LcQjz7Mzv3qONCxLqOjz2WAH+Nw3OTJDgVDXeovDaEl/UPa4CfB80kqg9xUY+SzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F6nRyobx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QiAfRtf9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fjCSltE7"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47ee301a06aso51046275e9.0
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 06:13:18 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F6nRyobx";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QiAfRtf9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768918412;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o4YIZav5bzJmQLAgwNywWVFJIuBH5AeoqXsTBWn1nZk=;
+	b=F6nRyobxxQ8YvcWxJKiDL0VR0iacWnJWXTrVL2kQW40sMKnf58/ifcxNcRLqEPi453oYOI
+	JQ35hNkdm3pXOysiNhIejzA1m2sbSH943hhLJWymVT4Bc8fY7/BUCPNEAAX30VnCJT6nyb
+	eEBsIRUWbpf/a+rFqafbcVOqHHCHOFg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-226-G3WWsc1cMz-VO8wvtJVO6w-1; Tue, 20 Jan 2026 09:13:31 -0500
+X-MC-Unique: G3WWsc1cMz-VO8wvtJVO6w-1
+X-Mimecast-MFC-AGG-ID: G3WWsc1cMz-VO8wvtJVO6w_1768918410
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42fd46385c0so3187402f8f.0
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 06:13:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768918397; x=1769523197; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xvB4FNxXmFE90bXlbaqeLF81xzyHl5CCjmWT93asNzY=;
-        b=fjCSltE7dO+jAH9J0DbX1wJAq0QsQkZ5LsFAbHgG2Sjkq79I4KFA+oRiq3XglQs3Ph
-         BloT56nTKPnU8aGzXMZZSj+5HnhQux2iaSGaRQa/Q/hBtu+OM0yDufTLQe7KjSJIcEyf
-         Pvg/tskOMZQAlASHGDTKy2MX4eSoXL6/2v+YwpPIWnA7Eo7wZDaREcRjvQqLdEYf2eKf
-         P3scuXIbureQp49vKBzM5yNYA/do1XGoakL9iIkjN8QLV80cfNERj0ZAgVs8oAer1dP7
-         NnaPHSNfmxIZ+LNngNzIqkbVk81FJzhMF8XnzdMahfv0KFfTsI1QKGckEfJi4z9WEZdn
-         XYKw==
+        d=redhat.com; s=google; t=1768918410; x=1769523210; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=o4YIZav5bzJmQLAgwNywWVFJIuBH5AeoqXsTBWn1nZk=;
+        b=QiAfRtf9cyycvkVyc0yBvW6VQG51+xrGU/cDcp2l5jHvShuJ2wEnJwTkyoAM7F6ezS
+         lawZ01R1YFkGLb4eYz3sxhbRXZSQtetWGBBtAWgh4jLxLSvsU6ixE1eNIiYyYP52vFj3
+         SunwV6p/dKBtZkav1sIi0/QMBW+RInhLSFNQeT9H6un+0j9BKLx7SopZQqv/5rNLeLjG
+         4aXNHB1a29nsZIlh7WAV6s3NjqmsV5Mp9gVxmWB9g4T5JjBsew3YKwTFnfTZZUXFg74B
+         qNunI4qEASWmzr6Vc+6iAnV37p4qYQa/T5Pud0IVf7dFXqMVbMs164MGefDnWTmnWeTU
+         QRUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768918397; x=1769523197;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xvB4FNxXmFE90bXlbaqeLF81xzyHl5CCjmWT93asNzY=;
-        b=mLAHB5QR/1OfDBhQiPJK9+G+hJjUG37OsatIm2/IMO4G/1+dWmYy8GToek78esFSZE
-         D+cNe3/bUu05MMSQeua2AzbClt7lCcUwZKgKgjeKVn7au1xObwF+zjcO0llE9tM76AHc
-         G3vc7aXINAs8HUlXZ8Akbs7LH7msJ1SxPckyI7Hk3E5ETJz3OPYXMoncISo0uvriQgsz
-         rUwZzdJ4Je05DkJWBLtl1CvgfDpMaHufOPouxQtOn1DLA1Fs+KOB/Br/jMjiskhEuxKJ
-         HPps9IsNPbeDRUtRQb6yRElbba4V/L59214bVNiL3jhBTygPLxMTCIjSz7yUbASgDWTV
-         /8ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWj17oDslU8PCmVzlRGW/4ONYSjokfsWtAleP3aDVqPN75NDW+BgedbkBeYDiga2bQZA/rbKW+A2YdD@vger.kernel.org
-X-Gm-Message-State: AOJu0YybnzV3Pyp53h6lwWocywTcJWpUxAVAGRTW1QQCExpBHuca1p1o
-	20EXKhF3sfa3j+L5tfyV+hO3VqhOWLE3WrU4SwSU6YP/L+nTzDY952ED4rzhe1xgY0Y=
-X-Gm-Gg: AY/fxX4oV/YRP5Xr3MfP4GIQnGsPkkIrZTYkmkQ3qTuX+tyspXjGLWzrYv8k8HRt57I
-	26KlKB4CBHQI7nk+qL7mdlDo1dqEcggo8ZjCu1rNmEEYG/0ygTmLYtAhe3eybDeq/JzSc03trvX
-	hogUagjEAecg32wLRRp8ubsr/l0WU2EECMaev4trAfDrRHT3tcP2QCOU0Tzic0n4Qp4s8y++3Pw
-	+ooKtEPhM5QVPZozPSO7qCXKZoZNnrQ/cePbjgH9B/DbwDpTPiEnI5JZvfVhXOyxsEy1CobhMiu
-	9jWwuCOrNGASQliTPpEctH0NbD2WS/b+UQzgqmTKFhBvSXy6VLlurFmBMZOrIPSO3W8+nTLV+DP
-	6mT8Fy4VUU8hKpcviLunTqb3Pgfe9h4mWS9lCKLdMNjs96aJUvU5L1ppo0YmP5pstFw5blHpfrA
-	ANcXt/Cv/LwWR6Xh/E
-X-Received: by 2002:a05:600c:3f06:b0:475:dde5:d91b with SMTP id 5b1f17b1804b1-4801eb0359amr195117725e9.17.1768918397245;
-        Tue, 20 Jan 2026 06:13:17 -0800 (PST)
-Received: from precision ([177.115.49.199])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b6fb72e477sm2659777eec.29.2026.01.20.06.13.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 06:13:16 -0800 (PST)
-Date: Tue, 20 Jan 2026 11:13:11 -0300
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, ematsumiya@suse.de, 
-	linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] smb: client: introduce multichannel async work
- during mount
-Message-ID: <eqzvsoomaa7wtsv5zwnelaziv3dlb7oxggc4cw2gn4nj4mwosv@h27txgrld4et>
-References: <20260116220641.322213-1-henrique.carvalho@suse.com>
- <CANT5p=r5+Fw6g-gyA25pw1pX_FCXtnxw2qUG8bt4iTNQnyrxUw@mail.gmail.com>
- <CANT5p=oLDiauPjeOV-4FNxB-oiu+_p5r=AbrK7V--kOZBcAncA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1768918410; x=1769523210;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o4YIZav5bzJmQLAgwNywWVFJIuBH5AeoqXsTBWn1nZk=;
+        b=wQjs4siLouHQKm0b2jvCu43i4huyVwZKYvZBmoiD8cUwCOL35lUynrPt1RiiIh7HG3
+         hOYMD3bmXdvy7i6X6ASPOVGEan1AJI2sVe+vBiVC+cxsdIRLjV7JQ316U3kZRgY+Vv3L
+         ECrtj5B8WmwnjthgEbjlaRoYHRShFHTv+HkkM0vtPq0n3LIToGS6/dw9Wk0OKVD/IaiZ
+         KrXNpKKgsGbepR2V3VqpfVZurbVKEEUgU5e6eYAAtYYNjbh8XfaRXyG8+XmuSh/PQpHl
+         rxaZVaorj4Y/rGqBozhfWNEwiUaFaDN86szuilr6fsjmB1BNq/CpK3Ss9bglpudtm5kB
+         5R8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUW2IjdYl6JG+3sHl7E6ZhZbTWvZluPauB9PIN2zF2yP+DAFixetfuquElx6ZS9BI4e9C6ixFreGttd@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSTWt933/ZoCVWSpg4nrO9OQt3PR+jCjhUOVY3HYnZPxS99Pnv
+	yH03r7DrNky5QG5d4Wu81wCiEltKMdoBsvc0WDtS3Rc2Nlg9ln+FgnOy2MA7Om801z8NDM3k67P
+	IEj7XFMBUw6yo+YL1NgXFaP6F5cOM9CrpP1TXUArV3FuOPeceMYxzsRg1IhGnkrA=
+X-Gm-Gg: AZuq6aIC/KiicYAgAnKpGdKkLxSgQ7hOmI7d15CpI1IjrjkvJXRlX3cOopv4U/BdXb0
+	EOaLArCreQGcatkNNtNLNiiGWbVm0OxDhtaMF2k+mcGKKvPzyc9SB4lytlFBLAkHQhJkmQQE6Gy
+	7YR647IlxoPv9n9o2qBcerctD8BQXFgJo+Xu4gVQMOCL5y6Y2F5qqZf6Z7krbjmpWqBOGVeqrQL
+	VZBL5lVDE0tHnsh8QiArM2DXiQVYMYUtTIjWS469VNsGKiMz0QuLdUh/tanUzo5G2NfV8NdtR+b
+	jDnjMSixaASxcRDkJCsO7zg3h67YanafN67dlNWs0VIXC0GzCKBvUyJvfsVSShGOE1vrBJI12+Z
+	uqTVjRA/0E60g
+X-Received: by 2002:a5d:5887:0:b0:432:8504:8d5b with SMTP id ffacd0b85a97d-43569bcb816mr18237033f8f.50.1768918409947;
+        Tue, 20 Jan 2026 06:13:29 -0800 (PST)
+X-Received: by 2002:a5d:5887:0:b0:432:8504:8d5b with SMTP id ffacd0b85a97d-43569bcb816mr18236980f8f.50.1768918409485;
+        Tue, 20 Jan 2026 06:13:29 -0800 (PST)
+Received: from [192.168.88.32] ([150.228.93.113])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43596b62700sm581337f8f.42.2026.01.20.06.13.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jan 2026 06:13:28 -0800 (PST)
+Message-ID: <71705484-46fc-469f-9357-07a076ee0e73@redhat.com>
+Date: Tue, 20 Jan 2026 15:13:22 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANT5p=oLDiauPjeOV-4FNxB-oiu+_p5r=AbrK7V--kOZBcAncA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 08/16] quic: add path management
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+ quic@lists.linux.dev
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
+ linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
+ Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
+ Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1768489876.git.lucien.xin@gmail.com>
+ <3771dfc211626a9f0c603c90113e38f325ceb456.1768489876.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <3771dfc211626a9f0c603c90113e38f325ceb456.1768489876.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Shyam,
+On 1/15/26 4:11 PM, Xin Long wrote:
+> @@ -0,0 +1,524 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/* QUIC kernel implementation
+> + * (C) Copyright Red Hat Corp. 2023
+> + *
+> + * This file is part of the QUIC kernel implementation
+> + *
+> + * Initialization/cleanup for QUIC protocol support.
+> + *
+> + * Written or modified by:
+> + *    Xin Long <lucien.xin@gmail.com>
+> + */
+> +
+> +#include <net/udp_tunnel.h>
+> +#include <linux/quic.h>
+> +
+> +#include "common.h"
+> +#include "family.h"
+> +#include "path.h"
+> +
+> +static int (*quic_path_rcv)(struct sock *sk, struct sk_buff *skb, u8 err);
 
-On Tue, Jan 20, 2026 at 09:01:00AM +0530, Shyam Prasad N wrote:
-> 
-> Hi Henrique,
-> 
-> I reviewed this once more. Now that the adding channel logic is async
-> I'm concerned that there maybe a possible race with adding a channel
-> to ses->chans array before it is fully ready.
-> Earlier this would not be a problem since channel additions were
-> synchronous. Now that it is async, we want to make sure that the
-> channel is fully set up before it is added to this array.
-> We do not want cifs_pick_channel to pick a channel that is still not
-> fully initialized. Can you please look into this aspect?
->
+It's unclear why an indirect call is needed here. At least some
+explanation is needed in the commit message, possibly you could call
+directly a static function.
 
-I think we are safe here.
+> +
+> +static int quic_udp_rcv(struct sock *sk, struct sk_buff *skb)
+> +{
+> +	memset(skb->cb, 0, sizeof(skb->cb));
+> +	QUIC_SKB_CB(skb)->seqno = -1;
+> +	QUIC_SKB_CB(skb)->time = quic_ktime_get_us();
+> +
+> +	skb_pull(skb, sizeof(struct udphdr));
+> +	skb_dst_force(skb);
+> +	quic_path_rcv(sk, skb, 0);
+> +	return 0;
 
-In cifs_pick_channel, we iterate over the channel indexes, from 0 to
-ses->chan_count - 1 and we pick only the good channels, meaning channels
-not set to terminate or !CIFS_CHAN_NEEDS_RECONNECT -- all this guarded
-by chan_lock:
+Why not:
+	return quic_path_rcv(sk, skb, 0);
+?
 
-	spin_lock(&ses->chan_lock);
-	start = atomic_inc_return(&ses->chan_seq);
-	for (i = 0; i < ses->chan_count; i++) {
-		cur = (start + i) % ses->chan_count;
-		server = ses->chans[cur].server;
-		if (!server || server->terminate)
-			continue;
+> +static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk, union quic_addr *a)
+> +{
+> +	struct udp_tunnel_sock_cfg tuncfg = {};
+> +	struct udp_port_cfg udp_conf = {};
+> +	struct net *net = sock_net(sk);
+> +	struct quic_uhash_head *head;
+> +	struct quic_udp_sock *us;
+> +	struct socket *sock;
+> +
+> +	us = kzalloc(sizeof(*us), GFP_KERNEL);
+> +	if (!us)
+> +		return NULL;
+> +
+> +	quic_udp_conf_init(sk, &udp_conf, a);
+> +	if (udp_sock_create(net, &udp_conf, &sock)) {
+> +		pr_debug("%s: failed to create udp sock\n", __func__);
+> +		kfree(us);
+> +		return NULL;
+> +	}
+> +
+> +	tuncfg.encap_type = 1;
+> +	tuncfg.encap_rcv = quic_udp_rcv;
+> +	tuncfg.encap_err_lookup = quic_udp_err;
+> +	setup_udp_tunnel_sock(net, sock, &tuncfg);
+> +
+> +	refcount_set(&us->refcnt, 1);
+> +	us->sk = sock->sk;
+> +	memcpy(&us->addr, a, sizeof(*a));
+> +	us->bind_ifindex = sk->sk_bound_dev_if;
+> +
+> +	head = quic_udp_sock_head(net, ntohs(a->v4.sin_port));
+> +	hlist_add_head(&us->node, &head->head);
+> +	INIT_WORK(&us->work, quic_udp_sock_put_work);
+> +
+> +	return us;
+> +}
+> +
+> +static bool quic_udp_sock_get(struct quic_udp_sock *us)
+> +{
+> +	return refcount_inc_not_zero(&us->refcnt);
+> +}
+> +
+> +static void quic_udp_sock_put(struct quic_udp_sock *us)
+> +{
+> +	if (refcount_dec_and_test(&us->refcnt))
+> +		queue_work(quic_wq, &us->work);
 
-		if (CIFS_CHAN_NEEDS_RECONNECT(ses, cur))
-			continue;
+Why using a workqueue here? AFAICS all the caller are in process
+context. Is that to break a possible deadlock due to nested mutex?
+Likely a comment on the refcount/locking scheme would help.
 
-So in order to reach a channel we have to increment ses->chan_count and
-set the chan as not needing reconnect.
+/P
 
-Channel addition is done by cifs_ses_add_channel inside
-cifs_try_adding_channels. Inside cifs_ses_add_channel, ses->chan_count
-is incremented in the following code
-
-	spin_lock(&ses->chan_lock);
-	chan = &ses->chans[ses->chan_count];
-	chan->server = chan_server;
-	if (IS_ERR(chan->server)) {
-		rc = PTR_ERR(chan->server);
-		chan->server = NULL;
-		spin_unlock(&ses->chan_lock);
-		goto out;
-	}
-	chan->iface = iface;
-	ses->chan_count++;
-	atomic_set(&ses->chan_seq, 0);
-
-	/* Mark this channel as needing connect/setup */
-	cifs_chan_set_need_reconnect(ses, chan->server);
-
-	spin_unlock(&ses->chan_lock);
-
-Notice the channel is marked as needing connect/setup and that is only
-unset inside cifs_setup_session when the setup is successful.
-
-	} else {
-		spin_lock(&ses->ses_lock);
-		if (ses->ses_status == SES_IN_SETUP)
-			ses->ses_status = SES_GOOD;
-		spin_lock(&ses->chan_lock);
-		cifs_chan_clear_in_reconnect(ses, server);
-		cifs_chan_clear_need_reconnect(ses, server);
-		spin_unlock(&ses->chan_lock);
-		spin_unlock(&ses->ses_lock);
-	}
-
-Now, I've noticed more than one issue in cifs_pick_channel...
-
-First, we seem to allow channels in reconnect to be picked, which is
-wrong. Second, we don't check if start is actually a good channel when
-we round robin. Do you agree?
-
-But these *are not* related to this patch and should be addressed in a
-different patch. If you agree I will create a fix for it.
