@@ -1,210 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F0B2C326A;
-	Tue, 20 Jan 2026 17:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595B31D6DA9
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 20:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768929969; cv=none; b=ehw1rCVbftTCxZWEtbQ3zlZgajHxUOLuQIPbSo3/zL8H6/IdP98Y+4B/xLO4VcgctUHmThzASD2OILzQbDKY1icn+mMCh2tU1pL6r/w1NFZZ8gFnthMKYrYEgCZBRUyilwa9YHmf5BcUcqPxIkzb6zDMTigeiP3ZguTFEVkaOiw=
+	t=1768940317; cv=none; b=dK9XV9iSAAaD0GY1wpCWbXsWhQjbzjIhPlmYiW53VY9xyzuDA/XRTC9tZeopQPrxHI6FUMW+WahG17omuhyH5vTHY/g3mkEG/CAf/eoP6LTQF2PMwC323KPyYbGm89nOBmXVvCsc8bfiIfEpln4E+YNhSpMLIkxz5Y1cjL8BgQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768929969; c=relaxed/simple;
-	bh=FIUbtAnKi1f9Ixtwf6Hj98EMVx/0loFgVG2T3r6WF14=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uuqKHIxlQgongijrSMsYLa9qqvlCvGf6CbZMUhabkAdHuBoBpnGXI2z6nSm9aqvT3wLwPGALnVVz/ZFCy3tfmyBsv+i2rz+XO8s8gPxhjGNiLjYiTFI4jSX2dDwCPDlftpd1pvHPGlHP4Ssz49ywwylX+UvvlRusc9D9gmIOpkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQAOvnfH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768940317; c=relaxed/simple;
+	bh=yBxT+m83nb9w1YbD2+jmfMP2icuuejMufFTl4ndUXYA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eG4TIrsKY7Jo7RL13lRnKcl/pVnXBUIPvSHxdcLfL8Ok7ynq+5bR6uTWy/R+QOan3kpCbAB2bcvMvVdsxyF2FQ33NH60NnLEJK4ryGZiWIiFZKNuBHs1IuaxK2ecEZeI/2itfvGHtW52VtHdWWOlPX2a4be5GTE1DMNdKfsZYBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=BcMpE5Au; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQAOvnfH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B773DC16AAE;
-	Tue, 20 Jan 2026 17:26:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768929968;
-	bh=FIUbtAnKi1f9Ixtwf6Hj98EMVx/0loFgVG2T3r6WF14=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oQAOvnfHwE78eIgKAIRtjx3D0fJsMFdeUHLCzYJaYSbsVMAoIf8DavjI4p9Ig8W+r
-	 orNBrgopcnEGNUsPOjBzAw3CY8JmSYEyPwonLuWljP12QZDK9k3MWDBh53R+AWXwZ6
-	 zhJoY9tYkeJqyfT9hbLB93MtK5Q0MgWiSkMhTjBy0ekfYujLfB+lI9+/dM3OQagJx3
-	 KpaO7nNxt5kXF7WpJGeywfLb2Ddy67/JvMP7PRrIPh6x0xVzraeG5oEBBV3YCDNXaG
-	 xu0rFDdtGxZHncy0o74bYgvxpzKcenLojcGLkF/BiK1TaFC4mzmUTGPYzxyaBxt7im
-	 NwSokwvhiUT7A==
-Date: Tue, 20 Jan 2026 09:26:08 -0800
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Chuck Lever <cel@kernel.org>
-Cc: Al Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	hirofumi@mail.parknet.co.jp, linkinjeon@kernel.org,
-	sj1557.seo@samsung.com, yuezhang.mo@sony.com,
-	almaz.alexandrovich@paragon-software.com, slava@dubeyko.com,
-	glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu,
-	adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org,
-	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
-	trondmy@kernel.org, anna@kernel.org, jaegeuk@kernel.org,
-	chao@kernel.org, hansg@kernel.org, senozhatsky@chromium.org,
-	Chuck Lever <chuck.lever@oracle.com>
-Subject: Re: [PATCH v6 01/16] fs: Add case sensitivity flags to file_kattr
-Message-ID: <20260120172608.GQ15551@frogsfrogsfrogs>
-References: <20260120142439.1821554-1-cel@kernel.org>
- <20260120142439.1821554-2-cel@kernel.org>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="BcMpE5Au"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47edd6111b4so53396605e9.1
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 12:18:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1768940313; x=1769545113; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oIbsA0Loih7BP/Jtm/8EUYOGygDGkj0hk4PtQDvPBdA=;
+        b=BcMpE5Aug9MMk3r5aV+CWD/jJoVQm+zOUCHeEJeEg5oUyiwBIjoKjs4wqoxE4SL7nC
+         F0bZDzdi6kaHY58yHSX8OVLjllwzBSYLXANi+f2vQciUOI0y7NhX8Bg1niUGR7XaSK0l
+         oKoxwyE+0J01JiWhQtygNjwQLlx57SHzMvBAcJVFoTtySTYq3SkneV1pgcHBnyKGkjhZ
+         w6brO6EKiZoGdMK5C4jHGlV466+0C7DDNe4/F0RFqJRmipVefwLdP8KvKowyrhX6N1s9
+         Cx4Wulf1lGNr0ighnl63BhttZ2AHnBn2RYT17si/aUvc8FZotZxLFE7uexlYLllCKEoB
+         TUIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768940313; x=1769545113;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oIbsA0Loih7BP/Jtm/8EUYOGygDGkj0hk4PtQDvPBdA=;
+        b=TGXxEUqTYatzvLLQVCH0NC9fZ0EctV5p6b/v0J/E5pFag3GVnkXf/LlQDU/DBPFpo8
+         wRHgaybmnSc0c/OikHy5dpEdkpW1Y4m1hCv3BC/New9T/LCucKv1G7VQVjkgS4WgPqk8
+         5iSkXYyZ1rodivpeTkyCf7i5MDlaHTboSGdsaGDSVUDL6RVUmsXxWIHk0KhLediELNnB
+         yq5O3aFzOQaRONEl8UxUacZBzGWhNntf1Q49E6KROa0rzN7TVrgLkMaQG9y06ykHMYZB
+         F/qx9PLSFIJ0aUMe1wDOyuX+lHVpabA/7mJDqtwbsTWZMoQr0FRPuHlCH/tPmqQquon6
+         rMKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUGQg0b9fOPF9N2UW/aQrvJibSdPgptRRlgD+4lUjEEgjAfSOXhTkAeoWrz5Z19PViP8DIeA9qb85aL@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVBvAy0+jDrVR70SRjW5UhL9M5i8Ja2tEBtRPiwD6hA/qcyYdO
+	KWaKf7vMlZRbpmzpc4p5vDBJi6lj2XcfkOXMlHAhEWvnxDS6rx79vI8Rvddw5t8UrHIPl2nvPNm
+	Gj07r
+X-Gm-Gg: AY/fxX5anDXLMbHjVdkdgKeAdC0L137dockADhKFVk/UBJzmdqIctRIhh/ArO7svQI8
+	YpKM3yOfQqEr11vT1Y8DOmVkJ2ryOF7fXVNbZinsp+MAznm3dy+lyPD+6xZYduQsVQIJEVkXxPg
+	0RMKKO3wuT5rZXQscdabuB7uGUdpfaj6YzuOGNjYP2fV+HkXTbQFWsRQt8g/T1UhyovSXbc0HNF
+	NiKxV7ih3i7AKa/l8QWZ8KI1lHDUueqwnZ3njBbVZkLOfHGmDhNy/PT4cdXNKtXlOUo4iuGNCIe
+	sZMjzcuA0M1J1Tc2Jclhy/dk8Z5Rt9E58VSWY1TxCjsia05nXxkLGP6r6vI37vvyvTEwIsqhsUW
+	xyuDLuKuC64CX2M1M3B6tW/feaZy5yH/ljhNBlsAXQTmUlwqTT3gc7ULGxQ22OMwjfL8PpVk9zt
+	321mYmzG9Ur2C7HUYq
+X-Received: by 2002:a05:600c:8705:b0:47d:5e02:14e5 with SMTP id 5b1f17b1804b1-4801e2f057emr171947805e9.5.1768940313380;
+        Tue, 20 Jan 2026 12:18:33 -0800 (PST)
+Received: from precision ([177.115.49.199])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7093325e4sm2041281eec.28.2026.01.20.12.18.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jan 2026 12:18:32 -0800 (PST)
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: sfrench@samba.org
+Cc: pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	ematsumiya@suse.de,
+	linux-cifs@vger.kernel.org
+Subject: [PATCH] smb: client: fix cifs_pick_channel when channels are equally loaded
+Date: Tue, 20 Jan 2026 17:18:22 -0300
+Message-ID: <20260120201822.2218308-1-henrique.carvalho@suse.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260120142439.1821554-2-cel@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 20, 2026 at 09:24:24AM -0500, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
-> 
-> Enable upper layers such as NFSD to retrieve case sensitivity
-> information from file systems by adding FS_XFLAG_CASEFOLD and
-> FS_XFLAG_CASENONPRESERVING flags.
-> 
-> Filesystems report case-insensitive or case-nonpreserving behavior
-> by setting these flags directly in fa->fsx_xflags. The default
-> (flags unset) indicates POSIX semantics: case-sensitive and
-> case-preserving. These flags are read-only; userspace cannot set
-> them via ioctl.
-> 
-> Relocate struct file_kattr initialization from fileattr_fill_xflags()
-> and fileattr_fill_flags() to vfs_fileattr_get() and the ioctl/syscall
-> call sites. This allows filesystem ->fileattr_get() callbacks to set
-> flags directly in fa->fsx_xflags before invoking the fill functions,
-> which previously would have zeroed those values. Callers that bypass
-> vfs_fileattr_get() must now zero-initialize the struct themselves.
-> 
-> Case sensitivity information is exported to userspace via the
-> fa_xflags field in the FS_IOC_FSGETXATTR ioctl and file_getattr()
-> system call.
-> 
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> ---
->  fs/file_attr.c           | 14 ++++++--------
->  fs/xfs/xfs_ioctl.c       |  2 +-
->  include/linux/fileattr.h |  3 ++-
->  include/uapi/linux/fs.h  |  2 ++
+cifs_pick_channel uses (start % chan_count) when channels are equally
+loaded, but that can return a channel that failed the eligibility
+checks.
 
-This ought to go to linux-api because you're changing the userspace api.
-Granted it's only adding a flag definition to an existing ioctl, but
-FS_XFLAG_CASEFOLD /does/ collide with Andrey's fsverity xflag patch...
+Drop the fallback and return the scan-selected channel instead. If none
+is eligible, keep the existing behavior of using the primary channel.
 
-(The rest of the changes looks ok to me.)
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+---
+ fs/smb/client/transport.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
---D
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index 75697f6d2566..26987f261850 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -807,11 +807,16 @@ cifs_cancelled_callback(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ }
+ 
+ /*
+- * Return a channel (master if none) of @ses that can be used to send
+- * regular requests.
++ * cifs_pick_channel - pick an eligible channel for network operations
+  *
+- * If we are currently binding a new channel (negprot/sess.setup),
+- * return the new incomplete channel.
++ * @ses: session reference
++ *
++ * Select an eligible channel (not terminating and not marked as needing
++ * reconnect), preferring the least loaded one. If no eligible channel is
++ * found, fall back to the primary channel (index 0).
++ *
++ * Return: TCP_Server_Info pointer for the chosen channel, or NULL if @ses is
++ * NULL.
+  */
+ struct TCP_Server_Info *cifs_pick_channel(struct cifs_ses *ses)
+ {
+@@ -850,10 +855,6 @@ struct TCP_Server_Info *cifs_pick_channel(struct cifs_ses *ses)
+ 			max_in_flight = server->in_flight;
+ 	}
+ 
+-	/* if all channels are equally loaded, fall back to round-robin */
+-	if (min_in_flight == max_in_flight)
+-		index = (uint)start % ses->chan_count;
+-
+ 	server = ses->chans[index].server;
+ 	spin_unlock(&ses->chan_lock);
+ 
+-- 
+2.50.1
 
->  4 files changed, 11 insertions(+), 10 deletions(-)
-> 
-> diff --git a/fs/file_attr.c b/fs/file_attr.c
-> index 13cdb31a3e94..2700200c5b9c 100644
-> --- a/fs/file_attr.c
-> +++ b/fs/file_attr.c
-> @@ -15,12 +15,10 @@
->   * @fa:		fileattr pointer
->   * @xflags:	FS_XFLAG_* flags
->   *
-> - * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).  All
-> - * other fields are zeroed.
-> + * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).
->   */
->  void fileattr_fill_xflags(struct file_kattr *fa, u32 xflags)
->  {
-> -	memset(fa, 0, sizeof(*fa));
->  	fa->fsx_valid = true;
->  	fa->fsx_xflags = xflags;
->  	if (fa->fsx_xflags & FS_XFLAG_IMMUTABLE)
-> @@ -46,11 +44,9 @@ EXPORT_SYMBOL(fileattr_fill_xflags);
->   * @flags:	FS_*_FL flags
->   *
->   * Set ->flags, ->flags_valid and ->fsx_xflags (translated flags).
-> - * All other fields are zeroed.
->   */
->  void fileattr_fill_flags(struct file_kattr *fa, u32 flags)
->  {
-> -	memset(fa, 0, sizeof(*fa));
->  	fa->flags_valid = true;
->  	fa->flags = flags;
->  	if (fa->flags & FS_SYNC_FL)
-> @@ -84,6 +80,8 @@ int vfs_fileattr_get(struct dentry *dentry, struct file_kattr *fa)
->  	struct inode *inode = d_inode(dentry);
->  	int error;
->  
-> +	memset(fa, 0, sizeof(*fa));
-> +
->  	if (!inode->i_op->fileattr_get)
->  		return -ENOIOCTLCMD;
->  
-> @@ -323,7 +321,7 @@ int ioctl_setflags(struct file *file, unsigned int __user *argp)
->  {
->  	struct mnt_idmap *idmap = file_mnt_idmap(file);
->  	struct dentry *dentry = file->f_path.dentry;
-> -	struct file_kattr fa;
-> +	struct file_kattr fa = {};
->  	unsigned int flags;
->  	int err;
->  
-> @@ -355,7 +353,7 @@ int ioctl_fssetxattr(struct file *file, void __user *argp)
->  {
->  	struct mnt_idmap *idmap = file_mnt_idmap(file);
->  	struct dentry *dentry = file->f_path.dentry;
-> -	struct file_kattr fa;
-> +	struct file_kattr fa = {};
->  	int err;
->  
->  	err = copy_fsxattr_from_user(&fa, argp);
-> @@ -434,7 +432,7 @@ SYSCALL_DEFINE5(file_setattr, int, dfd, const char __user *, filename,
->  	struct filename *name __free(putname) = NULL;
->  	unsigned int lookup_flags = 0;
->  	struct file_attr fattr;
-> -	struct file_kattr fa;
-> +	struct file_kattr fa = {};
->  	int error;
->  
->  	BUILD_BUG_ON(sizeof(struct file_attr) < FILE_ATTR_SIZE_VER0);
-> diff --git a/fs/xfs/xfs_ioctl.c b/fs/xfs/xfs_ioctl.c
-> index 59eaad774371..f0417c4d1fca 100644
-> --- a/fs/xfs/xfs_ioctl.c
-> +++ b/fs/xfs/xfs_ioctl.c
-> @@ -496,7 +496,7 @@ xfs_ioc_fsgetxattra(
->  	xfs_inode_t		*ip,
->  	void			__user *arg)
->  {
-> -	struct file_kattr	fa;
-> +	struct file_kattr	fa = {};
->  
->  	xfs_ilock(ip, XFS_ILOCK_SHARED);
->  	xfs_fill_fsxattr(ip, XFS_ATTR_FORK, &fa);
-> diff --git a/include/linux/fileattr.h b/include/linux/fileattr.h
-> index f89dcfad3f8f..709de829659f 100644
-> --- a/include/linux/fileattr.h
-> +++ b/include/linux/fileattr.h
-> @@ -16,7 +16,8 @@
->  
->  /* Read-only inode flags */
->  #define FS_XFLAG_RDONLY_MASK \
-> -	(FS_XFLAG_PREALLOC | FS_XFLAG_HASATTR)
-> +	(FS_XFLAG_PREALLOC | FS_XFLAG_HASATTR | \
-> +	 FS_XFLAG_CASEFOLD | FS_XFLAG_CASENONPRESERVING)
->  
->  /* Flags to indicate valid value of fsx_ fields */
->  #define FS_XFLAG_VALUES_MASK \
-> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-> index 66ca526cf786..919148beaa8c 100644
-> --- a/include/uapi/linux/fs.h
-> +++ b/include/uapi/linux/fs.h
-> @@ -253,6 +253,8 @@ struct file_attr {
->  #define FS_XFLAG_FILESTREAM	0x00004000	/* use filestream allocator */
->  #define FS_XFLAG_DAX		0x00008000	/* use DAX for IO */
->  #define FS_XFLAG_COWEXTSIZE	0x00010000	/* CoW extent size allocator hint */
-> +#define FS_XFLAG_CASEFOLD	0x00020000	/* case-insensitive lookups */
-> +#define FS_XFLAG_CASENONPRESERVING 0x00040000	/* case not preserved */
->  #define FS_XFLAG_HASATTR	0x80000000	/* no DIFLAG for this	*/
->  
->  /* the read-only stuff doesn't really belong here, but any other place is
-> -- 
-> 2.52.0
-> 
-> 
