@@ -1,94 +1,94 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2853445BD68
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 14:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC64500978
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 15:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.171
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768921112; cv=pass; b=KuD5P2Qh6hJbHJadRmz3dwj5LopUZEv3jwDqfpUpI3KrG8+Zw1D98lw6mGskWQXvu7pz8PNP3zLDS+7roL+J+xc5LKPL9W/fljXQKXjd8Kx7iHoZ6VV1rgKqE8BkxHkReBS/CYp4PRjEEU0q1kAkHqvYDbivRzJ6SD2t7yA1bYM=
+	t=1768923286; cv=pass; b=r8ZbP1Vb6x/F/O6PrkxwQIMjRp7zgQrC//sKIXe6FXVxqCEonJRxZtSfRI4SH2/WbLtarmdYB2mZoBQ0AADvDGkjjfspnrseJ/Sl6LripX3LuD0IMueXs21ietG5c5k7qogxigsN8CiLbzl9xbNA/xIVvedKdrKpYqHUWwl4b2Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768921112; c=relaxed/simple;
-	bh=AV9hAIQr5RzI8gRTr0Om3D11rvB2xShikwoc1m16OHI=;
+	s=arc-20240116; t=1768923286; c=relaxed/simple;
+	bh=1yN6HAEO40QcoyUmpcQZqYl18nEWpx0GzR2VbJpP/3Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jWBReB89mXXxYxIC5l18qRgaA12q3evSw/5oQYwmSpkPysiO99uYRaP91NIenxH6EC18PLbpfpoA/WCkRCrMEyWVuHzdr5ndNyyCiextePE+SEkoP30/a4Roumu9QZHgv/pmmDqXcI3G4ZSh/hsT5U5sbo3tMYZgI9nTnaV1mXE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VrT3A/XG; arc=pass smtp.client-ip=209.85.210.172
+	 To:Cc:Content-Type; b=FCemAQb+oDEQ7lF3yW+NQk97e9nrzOJQO1Jgb/SzMycqST8PXLNzdTFQn4sxnrdJAMgeFhfmVJXnbe7PHfmgWOZN+oZLv6cG73czEnbI1+74kD0G3PVGYQ5LV6iNKsGnoeIkmUGFlbRvSXyYJHmVRqUuwsIfWAHCpJ75EEhV9Mk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G+R+UBtl; arc=pass smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VrT3A/XG"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-81f4e136481so2566645b3a.3
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 06:58:30 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768921110; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G+R+UBtl"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-81f47610542so3126857b3a.0
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 07:34:44 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768923284; cv=none;
         d=google.com; s=arc-20240605;
-        b=C37Nj9XqqaMbtwJ/dvptel2JLUmqwCtQw5oolg+jG5suWRodiKOF9daz2Lu1kCTRYo
-         uK+oBpHyCDjAG0wTgEI8v4W5VByxWqXfQUh+oEyGkYdwtQnR+K8pAzrvk1Dsd29fgHMC
-         iIVVFA+8HrjM2WRvDFvuXOFO/qWCgIJ3EYUjl5U1BWUbJvH70ZbTiKl1fUAq5ImT2VoY
-         Y0Q11ltVt2E2DbUjDDy14dKdfooKLXebemQGJvnUEw31mmDrZ/eeeTX3inT+p8ZMvjSI
-         zzApbPPb+br1YdFue6o5JfnwLRhK5qQUfFUs053tXJr57liiegR1doDlTiZaGczw+I5j
-         J6dw==
+        b=CTG1fcSF/dRVrXJlvgLtGWU/LSC+Wi363GsATbQCe9kZRZD3wb3TxW4TN0I69ju0B4
+         Vl1fPJbZ2/N1VN6dbNTLnxMnriwnYzmW6c3gxXMfJ0725s9SkuLlFpnK/LiKKRgsjrrt
+         +y5vPYfsLzs1VlTiQZUEAMNOYC8H81V2lFV8hyWz33OZotcco7RPgd4R1tp8DcPrCtMc
+         T/JtI6y8BXbVsVUwnVo5siigkjkFPURXdI5C2eiQ2jLmywQR/b9AaQf+OPSt1CbRLKKQ
+         uPOgzLESKpK8EjJVVvJ5NXnSZ7ptbUFpHOwzGe0L1R2iSa7P9bWy4rK0oUjEmWdredmh
+         rnAQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=EUfRwMQV3KapT7k/eehULUSMHqVaGxUA4eRrbnoBX9U=;
-        fh=lgDaE31ze+7oScZrvl+iOGYm3nGhFCxvSW+65lJZQco=;
-        b=k2TFirxB+XlXG5Rv5FVlDEAQJls5SGts2AX0zNt4JgjBq/mbwAVNrNCqnyLAAtEouR
-         n2zWiM+4cUAai8r1dcLFFpShEniEFd/klxot2b5PNC8XcpzGDUKBnpyEbFQR4VZogC/4
-         +/2pQk298gVhcGZO7cB8D1K+zJjDewlsfC/i5gD97hu/K6kMqfzfWqGVOyhg2oHTg4y+
-         Pn6uoiSC3ryluggNry5aAzRCsAV3I8P8CWxuliulpUsOxwSctKDsOJXoAwS3w3DBaJu1
-         /v/jw72mEDyTphYj5ljR9tKHBBEV+APDhHC/6+K+kKTP8YbtRccNsPpm6FLNF5ifkB9I
-         0p9g==;
+        bh=T2NmNela4GRw6AQkwyD5Rk7RKIpCKu04jdsKYK8kc2M=;
+        fh=WVfIhs6EtOBv2ydgkkjAWEoVsiPhZMOEw4Dmq8Wwn7c=;
+        b=TfUSR+Xda9aM1pKtjSZd0azZ1DxgNoQJJtz2LbzXjgVJcLaPykbTOO2tOCLJkTvOmS
+         0CNkCffVf9zOEKXmuNUSRxuArD1e8Jb7UDoqIxpd/3xXa6H9AAdUV2qv+4nKo0zIee4n
+         hAzSgqPc7RPNng6iVCz0I+ePCIhXNScl9b9Oi0cr3CwOUWP6Zibm+Kdwr3/TMKpaUsOn
+         qHmMmNyRZeBSsj38aP5UMrsKcqSBe89vgFjJz1DNKN07rI1KvTHlwYlCyWa5tEnk99hV
+         CCFYl5B2KzVxNhDWejpED6YjI883Qq0Cpp8O86/K5uzxl+XbvH2HY2bybm+3cQRRP6MA
+         WnqA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768921110; x=1769525910; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1768923284; x=1769528084; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EUfRwMQV3KapT7k/eehULUSMHqVaGxUA4eRrbnoBX9U=;
-        b=VrT3A/XGeXGv/3EgNntOVwTUsGMRpoH6LR4CIPrz2kzgzQ9RkSGlwoi03OUqReXrWN
-         /LnaVEUR8wStMnwYf6r2euogFv+e8OOaESrNnfb8SYV+tJh3NI4vcm0GrNjUBHliP48Y
-         e1eniaPCJOOnbYCNWCtFIxRCajPUthpQxwj5PNqKbCJFzc3/ahONyuZLLuPfwjQioy1k
-         Atfe0DVCpxvthof+93Ymty4ZdeLJ8hy5jV7+mXIyDvJP14o+vUHJ6ixUSavix3/5fnwW
-         45BVqZfW+njhnvUS7eF4x34L5EBQifb4zsmWlCiAelWzLCyrTsmkG3SDRf2n0b4UCeK2
-         j6vA==
+        bh=T2NmNela4GRw6AQkwyD5Rk7RKIpCKu04jdsKYK8kc2M=;
+        b=G+R+UBtlydBQVVO2eq7SJyphEixE7YnJUt9J9M5iJlBf+qydvWP7oHuwlnS199qoZH
+         +ziFM3VW84z4V+PaANii7+gTOY8FBSkpXepUGXivvwXMKYazNfRYgonSNJtzX1tBDvx3
+         A/rsYc8poIKmv8cgGNgMYdc6iJjSF1Klw9KYvrCo/8jKC84eIgRY5lWlHEQ3/LLIHmqc
+         d/P0eBkD/kCgp+knHMoQjYNlA8fLwEXnnJ41BjguPFATNq8IZaVoh4CuXNvAFJAlyBPv
+         X/UgFl8Hx/pkxr0H/j5BETIwzENnQ6YRH7yJvbozWisBdTRetyz1h0w+Th2DG3+buuCc
+         EEBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768921110; x=1769525910;
+        d=1e100.net; s=20230601; t=1768923284; x=1769528084;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=EUfRwMQV3KapT7k/eehULUSMHqVaGxUA4eRrbnoBX9U=;
-        b=ReU28o+y5WsCZVlqRpQ1fAJE9/wloNlZ1eXO1YYcbrIkrOv5+bcVgvMcHJd0vULWu1
-         bIfwyZDjnXaarO5qB4xAkanLDE01tGsDnstjDm+ZSKSCcAq3920/KWhcYWnT0zpf/Xwb
-         TTZIkhSVDS8BTBtl39qeh7et0sdyji7GFv03u9rJacVdfpjWc2j7sUGHEt4rqn2GEUAR
-         pI0j1qqzwNDOJzTeuVpA+BSIg7qdf7WXbaCdV4EYnvRpVP5MgioBP7ZDCrWVRa14gvx/
-         XRbyzMax7d8DpNRzF/1jzyi+ZzsDOGVQyjUW34Qj2TIn4J5ZQ02ppmngNpMH/jDpQ6j6
-         d/jA==
-X-Forwarded-Encrypted: i=1; AJvYcCVgsdN5qGL0yPEnJ7N3MW2yOYkaWCFk9SS+JOdxb988jPzPk/UyHfV5QLnGq1vMWmquRjywxrdMFDfo@vger.kernel.org
-X-Gm-Message-State: AOJu0YzU6By46IB2QlexivNbj5ddVfylj8gVzGPNkhvJB7Cw2jBWjwu0
-	4OZHpqdubYTc7+Bd6n5ZfVsFjSx4skW1eZKGked7l/vPk0g6mflpawmKR/a/NK7meSh8t8o3xW6
-	UDQ/4m1TAuiBOZKrjs771nOuDxUzrUhM=
-X-Gm-Gg: AY/fxX4HWmaKjvIV2XdwpSh4znE8fiNa+DW3xFIAJ4mD2buGmu8bHXIqNRguU0p8cxT
-	f4+Uw28QHUl9IUjicQxeVPrtXuWwVQQnvPVEtnuD/7VbXM1LmYXZOABCt6B7TV4mgq94q68bKnE
-	DYS5Gz+h/NIeReYdjOqBt/LzQmdMcyiRsnVNvbUXQn+3RuKkIKp7qMfzA66eue1hRSjw+BEM+wV
-	jBBieuy1QSTv0nhjvawHTVGn3mXL3+bxwBX+JCl1PL/cef5yQ8gNh0PsfehWk4Kg6sS29Md0/Ug
-	WwRx2iivyVqsfgGtAKxLIM7BAw/rpgs6Igx4I04=
-X-Received: by 2002:a05:6a21:692:b0:38d:f0f3:b940 with SMTP id
- adf61e73a8af0-38e00d47b68mr13733048637.57.1768921110331; Tue, 20 Jan 2026
- 06:58:30 -0800 (PST)
+        bh=T2NmNela4GRw6AQkwyD5Rk7RKIpCKu04jdsKYK8kc2M=;
+        b=I8xakhs3Deprp/l7j5oRJXi75p3gdORfEwVAfhBLpt2x61Cn8JU3v87Uq8eSB8i0fb
+         hqQyiXQUBIslaIIE/hQLy08sHJf4KfkPif+W/98iH6keenampT+u3r+c9eVVgJAWbNt5
+         pY7Ek7sECWJ0G9dP+kjGZ+NyTuADxTQkle3vOa67kyixmmZSQ0y2VzdybdG79EXSjAu9
+         JViJaV9AeYCpLgWkW6PkuUxedxkCg76B/8FhBxTm9GhTHQy7vwsqYkcvrcA+3P+W3QwU
+         viMT6V6GN7wEOwDMcE67p3oKZFgZN0pA/rj0GJOvA1JNs646ykKKPtWwdSyt/mkCw0lw
+         PPTg==
+X-Forwarded-Encrypted: i=1; AJvYcCXd1ZESXcA69qQ2cesBP+FcNTOsCasXNcBtzkQDQ3P8CJu46Lvk2U+InWgPb70wKE1qMkXs9KU6LcCt@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKUu0fmziBhj5sNKIVN7UjDrF35pBSCkX7cUVcX29ryuKDhMZm
+	yfwBKKGOcVR7ywgJLljY5buZyLklgD/6n/7oVcFOfyPsdlRot8UAjUXdJ8hnxcb/LCSrSLusZBm
+	1fT/3OutiCxofJ05NwPEdUWHZ7IkfDa0=
+X-Gm-Gg: AZuq6aLk83ipPlWOXV+WnpQVtzz1uuS0U6JcTsBeoxskoVHzMzCEHNpk380TMkX88MG
+	u5vdmO5L/kQ9NCoF1TKM5VMGD4n6JzPPwj8jOcH+CYRAfWQFdSo702wU53+1uy0clYEWQnvAhLn
+	3EMCuNscMxAl1yjMmnZF9dihPEaontyEBpYPIComE+eRIf86d0ix+7+BjR/vveEYvOYd5qs0TL+
+	evbVvOWvf7NuDQODTnyWvUhVxK7w91a8v5XT8ZFqtIOG/hj0LaN0DI8l//le+KkzKitIbiy3e4b
+	hOBM8s1mL4U+RKAevFjJjBmaCzVp
+X-Received: by 2002:a05:6a00:138d:b0:81f:9907:e503 with SMTP id
+ d2e1a72fcca58-81f9f6ab90emr15585317b3a.16.1768923284205; Tue, 20 Jan 2026
+ 07:34:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1768489876.git.lucien.xin@gmail.com> <e3f770ef8d9aba101e1f5dc2f2f72bb0d2a30b94.1768489876.git.lucien.xin@gmail.com>
- <6c6d5644-3354-46ba-bbc9-e76789648abf@redhat.com>
-In-Reply-To: <6c6d5644-3354-46ba-bbc9-e76789648abf@redhat.com>
+References: <cover.1768489876.git.lucien.xin@gmail.com> <3771dfc211626a9f0c603c90113e38f325ceb456.1768489876.git.lucien.xin@gmail.com>
+ <71705484-46fc-469f-9357-07a076ee0e73@redhat.com>
+In-Reply-To: <71705484-46fc-469f-9357-07a076ee0e73@redhat.com>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 20 Jan 2026 09:58:18 -0500
-X-Gm-Features: AZwV_Qg7dfPxOkDkqOzOQW_7YKwWAViU6i2Li95CyFWjfHPIuFun67eybDn2Dd4
-Message-ID: <CADvbK_dh-O9NuNE4XL2ic2WUy9ysWc1NzbsJ99kv0ZciAw7ttQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 06/16] quic: add stream management
+Date: Tue, 20 Jan 2026 10:34:32 -0500
+X-Gm-Features: AZwV_Qh1cQDFjcFB0vVqm1_VmBk3f4OEQi8_hpHzwrIYtAE_UmESsrIJnbspVXo
+Message-ID: <CADvbK_dYbMa-nVi_8M-XS1QcVUw25t4CZdvcq_HcACx38bH86g@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 08/16] quic: add path management
 To: Paolo Abeni <pabeni@redhat.com>
 Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
@@ -107,106 +107,135 @@ Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 20, 2026 at 7:32=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+On Tue, Jan 20, 2026 at 9:13=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
 te:
 >
 > On 1/15/26 4:11 PM, Xin Long wrote:
-> > +struct quic_stream {
-> > +     struct hlist_node node;
-> > +     s64 id;                         /* Stream ID as defined in RFC 90=
-00 Section 2.1 */
-> > +     struct {
-> > +             /* Sending-side stream level flow control */
-> > +             u64 last_max_bytes;     /* Maximum send offset advertised=
- by peer at last update */
-> > +             u64 max_bytes;          /* Current maximum offset we are =
-allowed to send to */
-> > +             u64 bytes;              /* Bytes already sent to peer */
+> > @@ -0,0 +1,524 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/* QUIC kernel implementation
+> > + * (C) Copyright Red Hat Corp. 2023
+> > + *
+> > + * This file is part of the QUIC kernel implementation
+> > + *
+> > + * Initialization/cleanup for QUIC protocol support.
+> > + *
+> > + * Written or modified by:
+> > + *    Xin Long <lucien.xin@gmail.com>
+> > + */
 > > +
-> > +             u32 errcode;            /* Application error code to send=
- in RESET_STREAM */
-> > +             u32 frags;              /* Number of sent STREAM frames n=
-ot yet acknowledged */
-> > +             u8 state;               /* Send stream state, per rfc9000=
-#section-3.1 */
+> > +#include <net/udp_tunnel.h>
+> > +#include <linux/quic.h>
 > > +
-> > +             u8 data_blocked:1;      /* True if flow control blocks se=
-nding more data */
-> > +             u8 done:1;              /* True if application indicated =
-end of stream (FIN sent) */
+> > +#include "common.h"
+> > +#include "family.h"
+> > +#include "path.h"
+> > +
+> > +static int (*quic_path_rcv)(struct sock *sk, struct sk_buff *skb, u8 e=
+rr);
 >
-> Minor nit: AFAICS with the current struct layout the bitfield above does
-> not save any space, compared to plain u8 and will lead to worse code.
+> It's unclear why an indirect call is needed here. At least some
+> explanation is needed in the commit message, possibly you could call
+> directly a static function.
 >
-Makes sense, will change to plain u8.
+This patchset makes the path subcomponent more independent from the core
+implementation. Aside from a few shared helper functions, it doesn't
+rely on code outside the subcomponent, in particular socket.c and
+packet.c.
+
+Other subcomponents, such as stream, connid, pnspace, cong,
+crypto, common, and family follow the same approach. They expose
+APIs to the core QUIC logic and don=E2=80=99t see the main process.
+
+Will leave an explanation here.
+
+> > +
+> > +static int quic_udp_rcv(struct sock *sk, struct sk_buff *skb)
+> > +{
+> > +     memset(skb->cb, 0, sizeof(skb->cb));
+> > +     QUIC_SKB_CB(skb)->seqno =3D -1;
+> > +     QUIC_SKB_CB(skb)->time =3D quic_ktime_get_us();
+> > +
+> > +     skb_pull(skb, sizeof(struct udphdr));
+> > +     skb_dst_force(skb);
+> > +     quic_path_rcv(sk, skb, 0);
+> > +     return 0;
+>
+> Why not:
+>         return quic_path_rcv(sk, skb, 0);
+> ?
+I checked the udp tunnel users:
+
+- bareudp: bareudp_udp_encap_recv()
+- vxlan: vxlan_rcv()
+- geneve: geneve_udp_encap_recv()
+- tipc: tipc_udp_recv()
+- sctp: sctp_udp_rcv()
+
+they all are returning 0 in .encap_udp(), I think because they all
+take care of the
+skb freeing in their err path already.
+
+is it safe to return error to UDP stack if the skb is already freed?
+Do you know?
+
+>
+> > +static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk, uni=
+on quic_addr *a)
+> > +{
+> > +     struct udp_tunnel_sock_cfg tuncfg =3D {};
+> > +     struct udp_port_cfg udp_conf =3D {};
+> > +     struct net *net =3D sock_net(sk);
+> > +     struct quic_uhash_head *head;
+> > +     struct quic_udp_sock *us;
+> > +     struct socket *sock;
+> > +
+> > +     us =3D kzalloc(sizeof(*us), GFP_KERNEL);
+> > +     if (!us)
+> > +             return NULL;
+> > +
+> > +     quic_udp_conf_init(sk, &udp_conf, a);
+> > +     if (udp_sock_create(net, &udp_conf, &sock)) {
+> > +             pr_debug("%s: failed to create udp sock\n", __func__);
+> > +             kfree(us);
+> > +             return NULL;
+> > +     }
+> > +
+> > +     tuncfg.encap_type =3D 1;
+> > +     tuncfg.encap_rcv =3D quic_udp_rcv;
+> > +     tuncfg.encap_err_lookup =3D quic_udp_err;
+> > +     setup_udp_tunnel_sock(net, sock, &tuncfg);
+> > +
+> > +     refcount_set(&us->refcnt, 1);
+> > +     us->sk =3D sock->sk;
+> > +     memcpy(&us->addr, a, sizeof(*a));
+> > +     us->bind_ifindex =3D sk->sk_bound_dev_if;
+> > +
+> > +     head =3D quic_udp_sock_head(net, ntohs(a->v4.sin_port));
+> > +     hlist_add_head(&us->node, &head->head);
+> > +     INIT_WORK(&us->work, quic_udp_sock_put_work);
+> > +
+> > +     return us;
+> > +}
+> > +
+> > +static bool quic_udp_sock_get(struct quic_udp_sock *us)
+> > +{
+> > +     return refcount_inc_not_zero(&us->refcnt);
+> > +}
+> > +
+> > +static void quic_udp_sock_put(struct quic_udp_sock *us)
+> > +{
+> > +     if (refcount_dec_and_test(&us->refcnt))
+> > +             queue_work(quic_wq, &us->work);
+>
+> Why using a workqueue here? AFAICS all the caller are in process
+> context. Is that to break a possible deadlock due to nested mutex?
+> Likely a comment on the refcount/locking scheme would help.
+>
+quic_udp_sock_put() will also be called in the RX path via
+quic_path_unbind() for the connection migration (after changing
+to a new path.), which is in the patchset-2.
+
+I will leave a comment for an explanation here.
 
 Thanks.
-> > +     } send;
-> > +     struct {
-> > +             /* Receiving-side stream level flow control */
-> > +             u64 max_bytes;          /* Maximum offset peer is allowed=
- to send to */
-> > +             u64 window;             /* Remaining receive window befor=
-e advertise a new limit */
-> > +             u64 bytes;              /* Bytes consumed by application =
-from the stream */
-> > +
-> > +             u64 highest;            /* Highest received offset */
-> > +             u64 offset;             /* Offset up to which data is in =
-buffer or consumed */
-> > +             u64 finalsz;            /* Final size of the stream if FI=
-N received */
-> > +
-> > +             u32 frags;              /* Number of received STREAM fram=
-es pending reassembly */
-> > +             u8 state;               /* Receive stream state, per rfc9=
-000#section-3.2 */
-> > +
-> > +             u8 stop_sent:1;         /* True if STOP_SENDING has been =
-sent */
-> > +             u8 done:1;              /* True if FIN received and final=
- size validated */
->
-> ... same here...
->
-> > +     } recv;
-> > +};
-> > +
-> > +struct quic_stream_limits {
-> > +     /* Stream limit parameters defined in rfc9000#section-18.2 */
-> > +     u64 max_stream_data_bidi_remote;        /* initial_max_stream_dat=
-a_bidi_remote */
-> > +     u64 max_stream_data_bidi_local;         /* initial_max_stream_dat=
-a_bidi_local */
-> > +     u64 max_stream_data_uni;                /* initial_max_stream_dat=
-a_uni */
-> > +     u64 max_streams_bidi;                   /* initial_max_streams_bi=
-di */
-> > +     u64 max_streams_uni;                    /* initial_max_streams_un=
-i */
-> > +
-> > +     s64 next_bidi_stream_id;        /* Next bidi stream ID to open or=
- accept */
-> > +     s64 next_uni_stream_id;         /* Next uni stream ID to open or =
-accept */
-> > +     s64 max_bidi_stream_id;         /* Highest allowed bidi stream ID=
- */
-> > +     s64 max_uni_stream_id;          /* Highest allowed uni stream ID =
-*/
-> > +     s64 active_stream_id;           /* Most recently opened stream ID=
- */
-> > +
-> > +     u8 bidi_blocked:1;      /* STREAMS_BLOCKED_BIDI sent, awaiting AC=
-K */
-> > +     u8 uni_blocked:1;       /* STREAMS_BLOCKED_UNI sent, awaiting ACK=
- */
-> > +     u8 bidi_pending:1;      /* MAX_STREAMS_BIDI needs to be sent */
-> > +     u8 uni_pending:1;       /* MAX_STREAMS_UNI needs to be sent */
->
-> ... and here.
->
-> Other than that LGTM. With the bitfield replaced with plain u8 feel free
-> to add my
->
-> Acked-by: Paolo Abeni <pabeni@redhat.com>
->
