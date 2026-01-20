@@ -1,213 +1,231 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D56F4418EC
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 14:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FAA369228;
+	Tue, 20 Jan 2026 14:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768918416; cv=none; b=hQe21M/YotmSgWEQ1+1+blZLWCYQtsRGUT3xWpTpDO12ieuF5IfODJ0NgG0C3/OZKdYIjMzu5H+eantNX+VrsEU5MJ/L5o8TDIXFB6yvZDhp+hcEnhvWONR2kkemJEsffZ7nf3MQrFtZmeWEOVzQsfIe63n1jnrZ9E7olDpWouA=
+	t=1768919083; cv=none; b=REbXhLecrMhBz8MdtntBfr4r714A23D2+Tpx8abRDUc7BtV0V+aV3hDfUy7DJiI4Hriw3HFigdBF1bVC/DlkD3RGHNMj0MVAEa/wXEpv/6YsQuKeezSL02VvdczDe53Fdu6IQY0MMqPD6RrcR/lOTSMs1RPrxt+1wu2IHouj9FQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768918416; c=relaxed/simple;
-	bh=MTXAttGcmQV+gKT1VuxP3RbxteQV73dhqFSiu5vTsKw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T6KZnR+5DpsdcPL2hAJPn2Xa1EW3nvPf38I7dQb1TqwExluK4vIc3xIceeDcbKgGrXTj2+2+6VW/+mPGwzNMguwXLCL2FRGDIXDSKd9a1Q7LcQjz7Mzv3qONCxLqOjz2WAH+Nw3OTJDgVDXeovDaEl/UPa4CfB80kqg9xUY+SzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F6nRyobx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QiAfRtf9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768919083; c=relaxed/simple;
+	bh=SNDjWdUHDlEK8zYuD+1L0xIAKN3iebn1E+V2M1UVhfQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ji/vN5eyiqwQv3coSZBVYffxFVJH+BaZLJDbLG/qR/dOVFTrm+pHnBiklc50PoWfw+WHs0rUo5Xr/F45WEHB5uq9GSb1oTQmq7JpXFNHvP3+fpcMz4fB7FIB1GJ3rizlWfFBkszGLJkrnDaNTTA7WKmO7BoQzusl7EB/+iH84EE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bgdO4zZ/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F6nRyobx";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QiAfRtf9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768918412;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o4YIZav5bzJmQLAgwNywWVFJIuBH5AeoqXsTBWn1nZk=;
-	b=F6nRyobxxQ8YvcWxJKiDL0VR0iacWnJWXTrVL2kQW40sMKnf58/ifcxNcRLqEPi453oYOI
-	JQ35hNkdm3pXOysiNhIejzA1m2sbSH943hhLJWymVT4Bc8fY7/BUCPNEAAX30VnCJT6nyb
-	eEBsIRUWbpf/a+rFqafbcVOqHHCHOFg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-226-G3WWsc1cMz-VO8wvtJVO6w-1; Tue, 20 Jan 2026 09:13:31 -0500
-X-MC-Unique: G3WWsc1cMz-VO8wvtJVO6w-1
-X-Mimecast-MFC-AGG-ID: G3WWsc1cMz-VO8wvtJVO6w_1768918410
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42fd46385c0so3187402f8f.0
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 06:13:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768918410; x=1769523210; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=o4YIZav5bzJmQLAgwNywWVFJIuBH5AeoqXsTBWn1nZk=;
-        b=QiAfRtf9cyycvkVyc0yBvW6VQG51+xrGU/cDcp2l5jHvShuJ2wEnJwTkyoAM7F6ezS
-         lawZ01R1YFkGLb4eYz3sxhbRXZSQtetWGBBtAWgh4jLxLSvsU6ixE1eNIiYyYP52vFj3
-         SunwV6p/dKBtZkav1sIi0/QMBW+RInhLSFNQeT9H6un+0j9BKLx7SopZQqv/5rNLeLjG
-         4aXNHB1a29nsZIlh7WAV6s3NjqmsV5Mp9gVxmWB9g4T5JjBsew3YKwTFnfTZZUXFg74B
-         qNunI4qEASWmzr6Vc+6iAnV37p4qYQa/T5Pud0IVf7dFXqMVbMs164MGefDnWTmnWeTU
-         QRUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768918410; x=1769523210;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o4YIZav5bzJmQLAgwNywWVFJIuBH5AeoqXsTBWn1nZk=;
-        b=wQjs4siLouHQKm0b2jvCu43i4huyVwZKYvZBmoiD8cUwCOL35lUynrPt1RiiIh7HG3
-         hOYMD3bmXdvy7i6X6ASPOVGEan1AJI2sVe+vBiVC+cxsdIRLjV7JQ316U3kZRgY+Vv3L
-         ECrtj5B8WmwnjthgEbjlaRoYHRShFHTv+HkkM0vtPq0n3LIToGS6/dw9Wk0OKVD/IaiZ
-         KrXNpKKgsGbepR2V3VqpfVZurbVKEEUgU5e6eYAAtYYNjbh8XfaRXyG8+XmuSh/PQpHl
-         rxaZVaorj4Y/rGqBozhfWNEwiUaFaDN86szuilr6fsjmB1BNq/CpK3Ss9bglpudtm5kB
-         5R8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUW2IjdYl6JG+3sHl7E6ZhZbTWvZluPauB9PIN2zF2yP+DAFixetfuquElx6ZS9BI4e9C6ixFreGttd@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSTWt933/ZoCVWSpg4nrO9OQt3PR+jCjhUOVY3HYnZPxS99Pnv
-	yH03r7DrNky5QG5d4Wu81wCiEltKMdoBsvc0WDtS3Rc2Nlg9ln+FgnOy2MA7Om801z8NDM3k67P
-	IEj7XFMBUw6yo+YL1NgXFaP6F5cOM9CrpP1TXUArV3FuOPeceMYxzsRg1IhGnkrA=
-X-Gm-Gg: AZuq6aIC/KiicYAgAnKpGdKkLxSgQ7hOmI7d15CpI1IjrjkvJXRlX3cOopv4U/BdXb0
-	EOaLArCreQGcatkNNtNLNiiGWbVm0OxDhtaMF2k+mcGKKvPzyc9SB4lytlFBLAkHQhJkmQQE6Gy
-	7YR647IlxoPv9n9o2qBcerctD8BQXFgJo+Xu4gVQMOCL5y6Y2F5qqZf6Z7krbjmpWqBOGVeqrQL
-	VZBL5lVDE0tHnsh8QiArM2DXiQVYMYUtTIjWS469VNsGKiMz0QuLdUh/tanUzo5G2NfV8NdtR+b
-	jDnjMSixaASxcRDkJCsO7zg3h67YanafN67dlNWs0VIXC0GzCKBvUyJvfsVSShGOE1vrBJI12+Z
-	uqTVjRA/0E60g
-X-Received: by 2002:a5d:5887:0:b0:432:8504:8d5b with SMTP id ffacd0b85a97d-43569bcb816mr18237033f8f.50.1768918409947;
-        Tue, 20 Jan 2026 06:13:29 -0800 (PST)
-X-Received: by 2002:a5d:5887:0:b0:432:8504:8d5b with SMTP id ffacd0b85a97d-43569bcb816mr18236980f8f.50.1768918409485;
-        Tue, 20 Jan 2026 06:13:29 -0800 (PST)
-Received: from [192.168.88.32] ([150.228.93.113])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43596b62700sm581337f8f.42.2026.01.20.06.13.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Jan 2026 06:13:28 -0800 (PST)
-Message-ID: <71705484-46fc-469f-9357-07a076ee0e73@redhat.com>
-Date: Tue, 20 Jan 2026 15:13:22 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bgdO4zZ/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8FA8C19424;
+	Tue, 20 Jan 2026 14:24:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768919083;
+	bh=SNDjWdUHDlEK8zYuD+1L0xIAKN3iebn1E+V2M1UVhfQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=bgdO4zZ/3xo4YfJtHIBmuO1U6CbWpE4NUIvnTgMQRyWQCxmJglPDSlFCS97eXq/Ua
+	 THmUAeRC2dPhonFSRWWWxouSKimWivD/J6A1tKUCd2idI7i9JH8QU2uOSsucz67fU9
+	 RgwjAsig6fjtE79YZ5RMXa1k1a9/etcQMyeAxJj7o72BRpslbGlGVNI2ZTynMJW5l3
+	 Vwwpr+ngaMvZntVbpgDp3aAJGvJqA//52Avvrv/p0Qo0TV/9D0DMlSzJw4ynoSMQ6d
+	 hYIvFN0tK7dsS0mefMZanXnV6fvPfhbxsxMgkVSi7/bqBk7t2IIz9wozw0IQ1ZTRYg
+	 Rw9dT/LNzNFtQ==
+From: Chuck Lever <cel@kernel.org>
+To: Al Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>
+Cc: <linux-fsdevel@vger.kernel.org>,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	<linux-nfs@vger.kernel.org>,
+	linux-f2fs-devel@lists.sourceforge.net,
+	hirofumi@mail.parknet.co.jp,
+	linkinjeon@kernel.org,
+	sj1557.seo@samsung.com,
+	yuezhang.mo@sony.com,
+	almaz.alexandrovich@paragon-software.com,
+	slava@dubeyko.com,
+	glaubitz@physik.fu-berlin.de,
+	frank.li@vivo.com,
+	tytso@mit.edu,
+	adilger.kernel@dilger.ca,
+	cem@kernel.org,
+	sfrench@samba.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	trondmy@kernel.org,
+	anna@kernel.org,
+	jaegeuk@kernel.org,
+	chao@kernel.org,
+	hansg@kernel.org,
+	senozhatsky@chromium.org,
+	Chuck Lever <chuck.lever@oracle.com>
+Subject: [PATCH v6 00/16] Exposing case folding behavior
+Date: Tue, 20 Jan 2026 09:24:23 -0500
+Message-ID: <20260120142439.1821554-1-cel@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 08/16] quic: add path management
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
- quic@lists.linux.dev
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
- linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
- Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1768489876.git.lucien.xin@gmail.com>
- <3771dfc211626a9f0c603c90113e38f325ceb456.1768489876.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <3771dfc211626a9f0c603c90113e38f325ceb456.1768489876.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/15/26 4:11 PM, Xin Long wrote:
-> @@ -0,0 +1,524 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/* QUIC kernel implementation
-> + * (C) Copyright Red Hat Corp. 2023
-> + *
-> + * This file is part of the QUIC kernel implementation
-> + *
-> + * Initialization/cleanup for QUIC protocol support.
-> + *
-> + * Written or modified by:
-> + *    Xin Long <lucien.xin@gmail.com>
-> + */
-> +
-> +#include <net/udp_tunnel.h>
-> +#include <linux/quic.h>
-> +
-> +#include "common.h"
-> +#include "family.h"
-> +#include "path.h"
-> +
-> +static int (*quic_path_rcv)(struct sock *sk, struct sk_buff *skb, u8 err);
+From: Chuck Lever <chuck.lever@oracle.com>
 
-It's unclear why an indirect call is needed here. At least some
-explanation is needed in the commit message, possibly you could call
-directly a static function.
+Following on from
 
-> +
-> +static int quic_udp_rcv(struct sock *sk, struct sk_buff *skb)
-> +{
-> +	memset(skb->cb, 0, sizeof(skb->cb));
-> +	QUIC_SKB_CB(skb)->seqno = -1;
-> +	QUIC_SKB_CB(skb)->time = quic_ktime_get_us();
-> +
-> +	skb_pull(skb, sizeof(struct udphdr));
-> +	skb_dst_force(skb);
-> +	quic_path_rcv(sk, skb, 0);
-> +	return 0;
+https://lore.kernel.org/linux-nfs/20251021-zypressen-bazillus-545a44af57fd@brauner/T/#m0ba197d75b7921d994cf284f3cef3a62abb11aaa
 
-Why not:
-	return quic_path_rcv(sk, skb, 0);
-?
+I'm attempting to implement enough support in the Linux VFS to
+enable file services like NFSD and ksmbd (and user space
+equivalents) to provide the actual status of case folding support
+in local file systems. The default behavior for local file systems
+not explicitly supported in this series is to reflect the usual
+POSIX behaviors:
 
-> +static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk, union quic_addr *a)
-> +{
-> +	struct udp_tunnel_sock_cfg tuncfg = {};
-> +	struct udp_port_cfg udp_conf = {};
-> +	struct net *net = sock_net(sk);
-> +	struct quic_uhash_head *head;
-> +	struct quic_udp_sock *us;
-> +	struct socket *sock;
-> +
-> +	us = kzalloc(sizeof(*us), GFP_KERNEL);
-> +	if (!us)
-> +		return NULL;
-> +
-> +	quic_udp_conf_init(sk, &udp_conf, a);
-> +	if (udp_sock_create(net, &udp_conf, &sock)) {
-> +		pr_debug("%s: failed to create udp sock\n", __func__);
-> +		kfree(us);
-> +		return NULL;
-> +	}
-> +
-> +	tuncfg.encap_type = 1;
-> +	tuncfg.encap_rcv = quic_udp_rcv;
-> +	tuncfg.encap_err_lookup = quic_udp_err;
-> +	setup_udp_tunnel_sock(net, sock, &tuncfg);
-> +
-> +	refcount_set(&us->refcnt, 1);
-> +	us->sk = sock->sk;
-> +	memcpy(&us->addr, a, sizeof(*a));
-> +	us->bind_ifindex = sk->sk_bound_dev_if;
-> +
-> +	head = quic_udp_sock_head(net, ntohs(a->v4.sin_port));
-> +	hlist_add_head(&us->node, &head->head);
-> +	INIT_WORK(&us->work, quic_udp_sock_put_work);
-> +
-> +	return us;
-> +}
-> +
-> +static bool quic_udp_sock_get(struct quic_udp_sock *us)
-> +{
-> +	return refcount_inc_not_zero(&us->refcnt);
-> +}
-> +
-> +static void quic_udp_sock_put(struct quic_udp_sock *us)
-> +{
-> +	if (refcount_dec_and_test(&us->refcnt))
-> +		queue_work(quic_wq, &us->work);
+  case-insensitive = false
+  case-nonpreserving = true
 
-Why using a workqueue here? AFAICS all the caller are in process
-context. Is that to break a possible deadlock due to nested mutex?
-Likely a comment on the refcount/locking scheme would help.
+The case-insensitivity and case-nonpreserving booleans can be
+consumed immediately by NFSD. These two attributes have been part of
+the NFSv3 and NFSv4 protocols for decades, in order to support NFS
+client implementations on non-POSIX systems.
 
-/P
+Support for user space file servers is why this series exposes case
+folding information via a user-space API. I don't know of any other
+category of user-space application that requires access to case
+folding info.
+
+
+The Linux NFS community has a growing interest in supporting NFS
+clients on Windows and MacOS platforms, where file name behavior does
+not align with traditional POSIX semantics.
+
+One example of a Windows-based NFS client is [1]. This client
+implementation explicitly requires servers to report
+FATTR4_WORD0_CASE_INSENSITIVE = TRUE for proper operation, a hard
+requirement for Windows client interoperability because Windows
+applications expect case-insensitive behavior. When an NFS client
+knows the server is case-insensitive, it can avoid issuing multiple
+LOOKUP/READDIR requests to search for case variants, and applications
+like Win32 programs work correctly without manual workarounds or
+code changes.
+
+Even the Linux client can take advantage of this information. Trond
+merged patches 4 years ago [2] that introduce support for case
+insensitivity, in support of the Hammerspace NFS server. In
+particular, when a client detects a case-insensitive NFS share,
+negative dentry caching must be disabled (a lookup for "FILE.TXT"
+failing shouldn't cache a negative entry when "file.txt" exists)
+and directory change invalidation must clear all cached case-folded
+file name variants.
+
+Hammerspace servers and several other NFS server implementations
+operate in multi-protocol environments, where a single file service
+instance caters to both NFS and SMB clients. In those cases, things
+work more smoothly for everyone when the NFS client can see and adapt
+to the case folding behavior that SMB users rely on and expect. NFSD
+needs to support the case-insensitivity and case-nonpreserving
+booleans properly in order to participate as a first-class citizen
+in such environments.
+
+Series based on v6.19-rc5.
+
+[1] https://github.com/kofemann/ms-nfs41-client
+
+[2] https://patchwork.kernel.org/project/linux-nfs/cover/20211217203658.439352-1-trondmy@kernel.org/
+
+---
+
+Changes since v5:
+- Finish the conversion to FS_XFLAGs (thanks Darrick)
+- NFSv4 GETATTR now clears the attr mask bit if nfsd_get_case_info()
+  fails
+
+Changes since v4:
+- Observe the MSDOS "nocase" mount option
+- Define new FS_XFLAGs for the user API
+
+Changes since v3:
+- Change fa->case_preserving to fa_case_nonpreserving
+- VFAT is case preserving
+- Make new fields available to user space
+
+Changes since v2:
+- Remove unicode labels
+- Replace vfs_get_case_info
+- Add support for several more local file system implementations
+- Add support for in-kernel SMB server
+
+Changes since RFC:
+- Use file_getattr instead of statx
+- Postpone exposing Unicode version until later
+- Support NTFS and ext4 in addition to FAT
+- Support NFSv4 fattr4 in addition to NFSv3 PATHCONF
+
+
+Chuck Lever (16):
+  fs: Add case sensitivity flags to file_kattr
+  fat: Implement fileattr_get for case sensitivity
+  exfat: Implement fileattr_get for case sensitivity
+  ntfs3: Implement fileattr_get for case sensitivity
+  hfs: Implement fileattr_get for case sensitivity
+  hfsplus: Report case sensitivity in fileattr_get
+  ext4: Report case sensitivity in fileattr_get
+  xfs: Report case sensitivity in fileattr_get
+  cifs: Implement fileattr_get for case sensitivity
+  nfs: Implement fileattr_get for case sensitivity
+  f2fs: Add case sensitivity reporting to fileattr_get
+  vboxsf: Implement fileattr_get for case sensitivity
+  isofs: Implement fileattr_get for case sensitivity
+  nfsd: Report export case-folding via NFSv3 PATHCONF
+  nfsd: Implement NFSv4 FATTR4_CASE_INSENSITIVE and
+    FATTR4_CASE_PRESERVING
+  ksmbd: Report filesystem case sensitivity via FS_ATTRIBUTE_INFORMATION
+
+ fs/exfat/exfat_fs.h      |  2 ++
+ fs/exfat/file.c          | 16 ++++++++++++++--
+ fs/exfat/namei.c         |  1 +
+ fs/ext4/ioctl.c          |  7 +++++++
+ fs/f2fs/file.c           |  7 +++++++
+ fs/fat/fat.h             |  3 +++
+ fs/fat/file.c            | 21 +++++++++++++++++++++
+ fs/fat/namei_msdos.c     |  1 +
+ fs/fat/namei_vfat.c      |  1 +
+ fs/file_attr.c           | 14 ++++++--------
+ fs/hfs/dir.c             |  1 +
+ fs/hfs/hfs_fs.h          |  2 ++
+ fs/hfs/inode.c           | 13 +++++++++++++
+ fs/hfsplus/inode.c       |  8 ++++++++
+ fs/isofs/dir.c           | 15 +++++++++++++++
+ fs/nfs/client.c          |  9 +++++++--
+ fs/nfs/inode.c           | 20 ++++++++++++++++++++
+ fs/nfs/internal.h        |  3 +++
+ fs/nfs/nfs3proc.c        |  2 ++
+ fs/nfs/nfs3xdr.c         |  7 +++++--
+ fs/nfs/nfs4proc.c        |  2 ++
+ fs/nfs/proc.c            |  3 +++
+ fs/nfs/symlink.c         |  3 +++
+ fs/nfsd/nfs3proc.c       | 18 ++++++++++--------
+ fs/nfsd/nfs4xdr.c        | 31 +++++++++++++++++++++++++++----
+ fs/nfsd/vfs.c            | 25 +++++++++++++++++++++++++
+ fs/nfsd/vfs.h            |  2 ++
+ fs/ntfs3/file.c          | 23 +++++++++++++++++++++++
+ fs/ntfs3/inode.c         |  1 +
+ fs/ntfs3/namei.c         |  2 ++
+ fs/ntfs3/ntfs_fs.h       |  1 +
+ fs/smb/client/cifsfs.c   | 20 ++++++++++++++++++++
+ fs/smb/server/smb2pdu.c  | 25 +++++++++++++++++++------
+ fs/vboxsf/dir.c          |  1 +
+ fs/vboxsf/file.c         |  6 ++++--
+ fs/vboxsf/super.c        |  4 ++++
+ fs/vboxsf/utils.c        | 31 +++++++++++++++++++++++++++++++
+ fs/vboxsf/vfsmod.h       |  6 ++++++
+ fs/xfs/xfs_ioctl.c       |  9 ++++++++-
+ include/linux/fileattr.h |  3 ++-
+ include/linux/nfs_xdr.h  |  2 ++
+ include/uapi/linux/fs.h  |  2 ++
+ 42 files changed, 337 insertions(+), 36 deletions(-)
+
+-- 
+2.52.0
 
