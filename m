@@ -1,241 +1,199 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC64500978
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 15:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38CD477E5D
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 15:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768923286; cv=pass; b=r8ZbP1Vb6x/F/O6PrkxwQIMjRp7zgQrC//sKIXe6FXVxqCEonJRxZtSfRI4SH2/WbLtarmdYB2mZoBQ0AADvDGkjjfspnrseJ/Sl6LripX3LuD0IMueXs21ietG5c5k7qogxigsN8CiLbzl9xbNA/xIVvedKdrKpYqHUWwl4b2Q=
+	t=1768924437; cv=pass; b=YqVa3ZH66CeY0NPAoIyQQaDs9QeMeXxqu/ubGRo+Ysjg/jOidyp4OxcZRzEJ5ro7Ndhdf2Tn4UeejeGLZd4ZMC9a9KvJsZm4/MTPdifdU08zBQa3LMlHBJkoZZrELXON5AtGtxWB1CHiZT+ux4sA+L6K6fEED9B/UipbZaJ8mFY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768923286; c=relaxed/simple;
-	bh=1yN6HAEO40QcoyUmpcQZqYl18nEWpx0GzR2VbJpP/3Y=;
+	s=arc-20240116; t=1768924437; c=relaxed/simple;
+	bh=6WGjy/MDqAPwoUHtLdbrKYEHGiyvyJlKOG3epR239kI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FCemAQb+oDEQ7lF3yW+NQk97e9nrzOJQO1Jgb/SzMycqST8PXLNzdTFQn4sxnrdJAMgeFhfmVJXnbe7PHfmgWOZN+oZLv6cG73czEnbI1+74kD0G3PVGYQ5LV6iNKsGnoeIkmUGFlbRvSXyYJHmVRqUuwsIfWAHCpJ75EEhV9Mk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G+R+UBtl; arc=pass smtp.client-ip=209.85.210.171
+	 To:Cc:Content-Type; b=hMcTEuP8d82f8/LjrHdKjmnE0ywwtN6dnb3ngLlGhqYxpiHd6JjLhp2tRfiyJbWQwlHqqEXJifc4D1yqMLCQVDendm8YyCVQZl08VzA03iAYAKSIW+0Mia0FnbbXWI6slO1hQxmhQQ6gaPOrOnmsIm5xf15C0IZgFllb6ANgV0A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b4feXn3K; arc=pass smtp.client-ip=209.85.218.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G+R+UBtl"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-81f47610542so3126857b3a.0
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 07:34:44 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768923284; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b4feXn3K"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b86f69bbe60so864953066b.1
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 07:53:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768924433; cv=none;
         d=google.com; s=arc-20240605;
-        b=CTG1fcSF/dRVrXJlvgLtGWU/LSC+Wi363GsATbQCe9kZRZD3wb3TxW4TN0I69ju0B4
-         Vl1fPJbZ2/N1VN6dbNTLnxMnriwnYzmW6c3gxXMfJ0725s9SkuLlFpnK/LiKKRgsjrrt
-         +y5vPYfsLzs1VlTiQZUEAMNOYC8H81V2lFV8hyWz33OZotcco7RPgd4R1tp8DcPrCtMc
-         T/JtI6y8BXbVsVUwnVo5siigkjkFPURXdI5C2eiQ2jLmywQR/b9AaQf+OPSt1CbRLKKQ
-         uPOgzLESKpK8EjJVVvJ5NXnSZ7ptbUFpHOwzGe0L1R2iSa7P9bWy4rK0oUjEmWdredmh
-         rnAQ==
+        b=AGHO2vSN9Z+VINOOgJQVWMnBaw0vAZGJECrnGAevL7P5nNh6E40YRicAlulLqglGNm
+         hC9zekV8yIglXWU8FmlVi+xzd+MGPzeKb0UdKJVXhfDlF+sOZc7pKCfkzDGkZGrjtJhG
+         FU5So2KKlWJH9FppKrT5EQ4m+GcPTzo124wB2iFcB2nMtBkNF13PuHcMsN65MsEjX+ia
+         Y2cqAsG2QV/DXaYljC1myqiSMLJSXur/M4ZhOb+KL9Z+WjSn2OV/7Wc8i1stLhNHbfga
+         qdFZKegHm6j4kyJNHewi8WvkCyl+VEIFDT0MtpJ0Nn+YE0+u9NBsX+Y2bpWvxW212Vkw
+         OS+Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=T2NmNela4GRw6AQkwyD5Rk7RKIpCKu04jdsKYK8kc2M=;
-        fh=WVfIhs6EtOBv2ydgkkjAWEoVsiPhZMOEw4Dmq8Wwn7c=;
-        b=TfUSR+Xda9aM1pKtjSZd0azZ1DxgNoQJJtz2LbzXjgVJcLaPykbTOO2tOCLJkTvOmS
-         0CNkCffVf9zOEKXmuNUSRxuArD1e8Jb7UDoqIxpd/3xXa6H9AAdUV2qv+4nKo0zIee4n
-         hAzSgqPc7RPNng6iVCz0I+ePCIhXNScl9b9Oi0cr3CwOUWP6Zibm+Kdwr3/TMKpaUsOn
-         qHmMmNyRZeBSsj38aP5UMrsKcqSBe89vgFjJz1DNKN07rI1KvTHlwYlCyWa5tEnk99hV
-         CCFYl5B2KzVxNhDWejpED6YjI883Qq0Cpp8O86/K5uzxl+XbvH2HY2bybm+3cQRRP6MA
-         WnqA==;
+        bh=W6HCb/o0H/gI7OzTdZtLzpDb9mEo4Ku2JR+Fd/tOEsU=;
+        fh=ZRg3by0+DuXE5UFowmZ+gYBElUse2HJLilGpb1ckRxQ=;
+        b=YI3hpxo6bEOPr/WbvZ+EJ5npORY8pp/rhRJxzPB0/2K2tY4VQxH6+ncy0HO3dKCTf6
+         zZ9YgRHozhJbFaXyPqXwDaelwG8CioQDzEsioaleenxrEf412TBwzrnPOAGuWbgN5b7Y
+         +EcphmBDTppCfF2TMls8/GaBY20Z5tkVaLXTlcCpJtbKOS1HotffUCPn0gCcNBh8eSxp
+         U+3hxmJqiKYP/XpxDjRCu+hgkNRqPndDRkoTiVM9BlnowU8ojkroOJSYTylgZEdHGYgX
+         C9/MF2SiR4xg12DqXsR91sK/2/kvEePnLEPI9JTsdxQE5gGEEun09CoutrwKv2cI45B4
+         DCVA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768923284; x=1769528084; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1768924433; x=1769529233; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=T2NmNela4GRw6AQkwyD5Rk7RKIpCKu04jdsKYK8kc2M=;
-        b=G+R+UBtlydBQVVO2eq7SJyphEixE7YnJUt9J9M5iJlBf+qydvWP7oHuwlnS199qoZH
-         +ziFM3VW84z4V+PaANii7+gTOY8FBSkpXepUGXivvwXMKYazNfRYgonSNJtzX1tBDvx3
-         A/rsYc8poIKmv8cgGNgMYdc6iJjSF1Klw9KYvrCo/8jKC84eIgRY5lWlHEQ3/LLIHmqc
-         d/P0eBkD/kCgp+knHMoQjYNlA8fLwEXnnJ41BjguPFATNq8IZaVoh4CuXNvAFJAlyBPv
-         X/UgFl8Hx/pkxr0H/j5BETIwzENnQ6YRH7yJvbozWisBdTRetyz1h0w+Th2DG3+buuCc
-         EEBA==
+        bh=W6HCb/o0H/gI7OzTdZtLzpDb9mEo4Ku2JR+Fd/tOEsU=;
+        b=b4feXn3KTT3UEFlGY2uvGewl/3HGxrWLkf2LuK/dGgm4lhaMBATbiuKcHiUljgtY37
+         TQZWwuUbWblZqTfg7FwA5NDroUN+MYWJiESCz7zalV/A0l6MeJolDnnE/GBvMiiNcFaf
+         jarynsxfbtMESmfeqQ6KhDYDr4qUvrj66X6xVFr7toUocuVhdjAt0Yba0qQZk8BaAd4R
+         RJVfz3XOZ8cWIctlKRdVEd3pudLwFA02IvynrwKj+qI7QmX/eyOOfll43odtVgbAwZN5
+         r+ebJIj3PZrS/FuY1eu1vwnZ2t4wvxWjX2D/j5SxQfw4+uo+3dlHiT+18Hw6nCqHhw6Z
+         nYpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768923284; x=1769528084;
+        d=1e100.net; s=20230601; t=1768924433; x=1769529233;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=T2NmNela4GRw6AQkwyD5Rk7RKIpCKu04jdsKYK8kc2M=;
-        b=I8xakhs3Deprp/l7j5oRJXi75p3gdORfEwVAfhBLpt2x61Cn8JU3v87Uq8eSB8i0fb
-         hqQyiXQUBIslaIIE/hQLy08sHJf4KfkPif+W/98iH6keenampT+u3r+c9eVVgJAWbNt5
-         pY7Ek7sECWJ0G9dP+kjGZ+NyTuADxTQkle3vOa67kyixmmZSQ0y2VzdybdG79EXSjAu9
-         JViJaV9AeYCpLgWkW6PkuUxedxkCg76B/8FhBxTm9GhTHQy7vwsqYkcvrcA+3P+W3QwU
-         viMT6V6GN7wEOwDMcE67p3oKZFgZN0pA/rj0GJOvA1JNs646ykKKPtWwdSyt/mkCw0lw
-         PPTg==
-X-Forwarded-Encrypted: i=1; AJvYcCXd1ZESXcA69qQ2cesBP+FcNTOsCasXNcBtzkQDQ3P8CJu46Lvk2U+InWgPb70wKE1qMkXs9KU6LcCt@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKUu0fmziBhj5sNKIVN7UjDrF35pBSCkX7cUVcX29ryuKDhMZm
-	yfwBKKGOcVR7ywgJLljY5buZyLklgD/6n/7oVcFOfyPsdlRot8UAjUXdJ8hnxcb/LCSrSLusZBm
-	1fT/3OutiCxofJ05NwPEdUWHZ7IkfDa0=
-X-Gm-Gg: AZuq6aLk83ipPlWOXV+WnpQVtzz1uuS0U6JcTsBeoxskoVHzMzCEHNpk380TMkX88MG
-	u5vdmO5L/kQ9NCoF1TKM5VMGD4n6JzPPwj8jOcH+CYRAfWQFdSo702wU53+1uy0clYEWQnvAhLn
-	3EMCuNscMxAl1yjMmnZF9dihPEaontyEBpYPIComE+eRIf86d0ix+7+BjR/vveEYvOYd5qs0TL+
-	evbVvOWvf7NuDQODTnyWvUhVxK7w91a8v5XT8ZFqtIOG/hj0LaN0DI8l//le+KkzKitIbiy3e4b
-	hOBM8s1mL4U+RKAevFjJjBmaCzVp
-X-Received: by 2002:a05:6a00:138d:b0:81f:9907:e503 with SMTP id
- d2e1a72fcca58-81f9f6ab90emr15585317b3a.16.1768923284205; Tue, 20 Jan 2026
- 07:34:44 -0800 (PST)
+        bh=W6HCb/o0H/gI7OzTdZtLzpDb9mEo4Ku2JR+Fd/tOEsU=;
+        b=rYMVd0ruJTCldgaqsnRGcEDWoGyqyVZwtnEsoJBYihF4dxZlkA/d0IIqeoStsRtyDf
+         CzPJbpkF2XzXBad8+MYTGBcM2GQ9Kthj4HDX10uv5uTPmmQK6PxjR0giJQPmugHS1R3a
+         yu/VS9GUyQC62mEwno1xoXn6WzNiNt+C27g+Z0xtoB29HHeBKlBzb6lWCNVSNwG9LJ4w
+         j/k61ZeavFvtFJX1ALNZxWWzTCam6vjbmRbUCserAp36/tFmALloATjxnMnhtASnaagP
+         e8zEth2KnoTQ5SwFpWbC0Ou9etP89K97ePziSkfzxo1N7m2eiZx9Wn0Ey2jgFcCGPlZY
+         bdoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU5cP2pkm384mbkNPnhQUK7FIcQAnXpbYMTDX/p7o4/Lq2IOZMcXsYxc4eVoMLnVSVgLZeFZAWnbqsy@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywna/rLmXZDuvdsWeEdavvSnnRkZeo+LE/5VY/qyv9a+66eIqI4
+	BGVBvK6XE5FfxmKUoh5Gg6H3hQpm8/eFj9ZZ0rSLb6Y9q2B5Vm+p4IMhUoZ8pbdzm/lJg6bv0Za
+	KSJQ8o/AGMbJiEnD6vFMi4xHfI54XlTo=
+X-Gm-Gg: AZuq6aI3B6OWzUgHJJ9fN/R9lYT14b29TQpRyyr7XxN/kOPWvjzzreD+iMiYKxakteY
+	olcHYzMtxkNADUFasmCapD98OsUtMHJKovnlj96IodVnzhUNs88HpKHYX4EGnaUSYmAkidKhMTW
+	uDonNJPUDK/1k/BNZEfCGTpzV7WrIDmue+S+noLN6EWT7a3cnHATO9hTWKRr6ODqjd3YkjmEH0p
+	iCL8Yt6jE9aXZ28N84Qc2HpRMnvNJvgZjhwnm1+SOYN90/YbErcJaeCLLsv6bVHblyYQw==
+X-Received: by 2002:a17:907:7285:b0:b87:892:f440 with SMTP id
+ a640c23a62f3a-b8796afd621mr1300588166b.38.1768924432729; Tue, 20 Jan 2026
+ 07:53:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1768489876.git.lucien.xin@gmail.com> <3771dfc211626a9f0c603c90113e38f325ceb456.1768489876.git.lucien.xin@gmail.com>
- <71705484-46fc-469f-9357-07a076ee0e73@redhat.com>
-In-Reply-To: <71705484-46fc-469f-9357-07a076ee0e73@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 20 Jan 2026 10:34:32 -0500
-X-Gm-Features: AZwV_Qh1cQDFjcFB0vVqm1_VmBk3f4OEQi8_hpHzwrIYtAE_UmESsrIJnbspVXo
-Message-ID: <CADvbK_dYbMa-nVi_8M-XS1QcVUw25t4CZdvcq_HcACx38bH86g@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 08/16] quic: add path management
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <20260116220641.322213-1-henrique.carvalho@suse.com>
+ <CANT5p=r5+Fw6g-gyA25pw1pX_FCXtnxw2qUG8bt4iTNQnyrxUw@mail.gmail.com>
+ <CANT5p=oLDiauPjeOV-4FNxB-oiu+_p5r=AbrK7V--kOZBcAncA@mail.gmail.com> <eqzvsoomaa7wtsv5zwnelaziv3dlb7oxggc4cw2gn4nj4mwosv@h27txgrld4et>
+In-Reply-To: <eqzvsoomaa7wtsv5zwnelaziv3dlb7oxggc4cw2gn4nj4mwosv@h27txgrld4et>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Tue, 20 Jan 2026 21:23:40 +0530
+X-Gm-Features: AZwV_QgCRcPpZua2iaFuOR2uCmQ9Bsjv5X5BXSG8K6ypCm1rHz69gAkwmetS1AA
+Message-ID: <CANT5p=pFdcROqgAdjYJGBB1XV4uFseomOF9sdvZtOJhUGz4Vxg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] smb: client: introduce multichannel async work
+ during mount
+To: Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	ematsumiya@suse.de, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 20, 2026 at 9:13=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Tue, Jan 20, 2026 at 7:43=E2=80=AFPM Henrique Carvalho
+<henrique.carvalho@suse.com> wrote:
 >
-> On 1/15/26 4:11 PM, Xin Long wrote:
-> > @@ -0,0 +1,524 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/* QUIC kernel implementation
-> > + * (C) Copyright Red Hat Corp. 2023
-> > + *
-> > + * This file is part of the QUIC kernel implementation
-> > + *
-> > + * Initialization/cleanup for QUIC protocol support.
-> > + *
-> > + * Written or modified by:
-> > + *    Xin Long <lucien.xin@gmail.com>
-> > + */
-> > +
-> > +#include <net/udp_tunnel.h>
-> > +#include <linux/quic.h>
-> > +
-> > +#include "common.h"
-> > +#include "family.h"
-> > +#include "path.h"
-> > +
-> > +static int (*quic_path_rcv)(struct sock *sk, struct sk_buff *skb, u8 e=
-rr);
+> Hi Shyam,
 >
-> It's unclear why an indirect call is needed here. At least some
-> explanation is needed in the commit message, possibly you could call
-> directly a static function.
+> On Tue, Jan 20, 2026 at 09:01:00AM +0530, Shyam Prasad N wrote:
+> >
+> > Hi Henrique,
+> >
+> > I reviewed this once more. Now that the adding channel logic is async
+> > I'm concerned that there maybe a possible race with adding a channel
+> > to ses->chans array before it is fully ready.
+> > Earlier this would not be a problem since channel additions were
+> > synchronous. Now that it is async, we want to make sure that the
+> > channel is fully set up before it is added to this array.
+> > We do not want cifs_pick_channel to pick a channel that is still not
+> > fully initialized. Can you please look into this aspect?
+> >
 >
-This patchset makes the path subcomponent more independent from the core
-implementation. Aside from a few shared helper functions, it doesn't
-rely on code outside the subcomponent, in particular socket.c and
-packet.c.
-
-Other subcomponents, such as stream, connid, pnspace, cong,
-crypto, common, and family follow the same approach. They expose
-APIs to the core QUIC logic and don=E2=80=99t see the main process.
-
-Will leave an explanation here.
-
-> > +
-> > +static int quic_udp_rcv(struct sock *sk, struct sk_buff *skb)
-> > +{
-> > +     memset(skb->cb, 0, sizeof(skb->cb));
-> > +     QUIC_SKB_CB(skb)->seqno =3D -1;
-> > +     QUIC_SKB_CB(skb)->time =3D quic_ktime_get_us();
-> > +
-> > +     skb_pull(skb, sizeof(struct udphdr));
-> > +     skb_dst_force(skb);
-> > +     quic_path_rcv(sk, skb, 0);
-> > +     return 0;
+> I think we are safe here.
 >
-> Why not:
->         return quic_path_rcv(sk, skb, 0);
-> ?
-I checked the udp tunnel users:
+> In cifs_pick_channel, we iterate over the channel indexes, from 0 to
+> ses->chan_count - 1 and we pick only the good channels, meaning channels
+> not set to terminate or !CIFS_CHAN_NEEDS_RECONNECT -- all this guarded
+> by chan_lock:
+>
+>         spin_lock(&ses->chan_lock);
+>         start =3D atomic_inc_return(&ses->chan_seq);
+>         for (i =3D 0; i < ses->chan_count; i++) {
+>                 cur =3D (start + i) % ses->chan_count;
+>                 server =3D ses->chans[cur].server;
+>                 if (!server || server->terminate)
+>                         continue;
+>
+>                 if (CIFS_CHAN_NEEDS_RECONNECT(ses, cur))
+>                         continue;
+>
+> So in order to reach a channel we have to increment ses->chan_count and
+> set the chan as not needing reconnect.
+>
+> Channel addition is done by cifs_ses_add_channel inside
+> cifs_try_adding_channels. Inside cifs_ses_add_channel, ses->chan_count
+> is incremented in the following code
+>
+>         spin_lock(&ses->chan_lock);
+>         chan =3D &ses->chans[ses->chan_count];
+>         chan->server =3D chan_server;
+>         if (IS_ERR(chan->server)) {
+>                 rc =3D PTR_ERR(chan->server);
+>                 chan->server =3D NULL;
+>                 spin_unlock(&ses->chan_lock);
+>                 goto out;
+>         }
+>         chan->iface =3D iface;
+>         ses->chan_count++;
+>         atomic_set(&ses->chan_seq, 0);
+>
+>         /* Mark this channel as needing connect/setup */
+>         cifs_chan_set_need_reconnect(ses, chan->server);
+>
+>         spin_unlock(&ses->chan_lock);
+>
+> Notice the channel is marked as needing connect/setup and that is only
+> unset inside cifs_setup_session when the setup is successful.
+>
+>         } else {
+>                 spin_lock(&ses->ses_lock);
+>                 if (ses->ses_status =3D=3D SES_IN_SETUP)
+>                         ses->ses_status =3D SES_GOOD;
+>                 spin_lock(&ses->chan_lock);
+>                 cifs_chan_clear_in_reconnect(ses, server);
+>                 cifs_chan_clear_need_reconnect(ses, server);
+>                 spin_unlock(&ses->chan_lock);
+>                 spin_unlock(&ses->ses_lock);
+>         }
+>
 
-- bareudp: bareudp_udp_encap_recv()
-- vxlan: vxlan_rcv()
-- geneve: geneve_udp_encap_recv()
-- tipc: tipc_udp_recv()
-- sctp: sctp_udp_rcv()
+Sounds good. I didn't have a failing case here. Just wanted to make
+sure that we've accounted for this scenario.
+You can add my RB to this patch.
 
-they all are returning 0 in .encap_udp(), I think because they all
-take care of the
-skb freeing in their err path already.
+> Now, I've noticed more than one issue in cifs_pick_channel...
+>
+> First, we seem to allow channels in reconnect to be picked, which is
+> wrong. Second, we don't check if start is actually a good channel when
+> we round robin. Do you agree?
 
-is it safe to return error to UDP stack if the skb is already freed?
-Do you know?
+in_reconnect isn't relevant anymore. I was using it to make sure
+multiple session setups aren't taking place in parallel. But later
+realized that we have cannot avoid session_mutex for this.
 
 >
-> > +static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk, uni=
-on quic_addr *a)
-> > +{
-> > +     struct udp_tunnel_sock_cfg tuncfg =3D {};
-> > +     struct udp_port_cfg udp_conf =3D {};
-> > +     struct net *net =3D sock_net(sk);
-> > +     struct quic_uhash_head *head;
-> > +     struct quic_udp_sock *us;
-> > +     struct socket *sock;
-> > +
-> > +     us =3D kzalloc(sizeof(*us), GFP_KERNEL);
-> > +     if (!us)
-> > +             return NULL;
-> > +
-> > +     quic_udp_conf_init(sk, &udp_conf, a);
-> > +     if (udp_sock_create(net, &udp_conf, &sock)) {
-> > +             pr_debug("%s: failed to create udp sock\n", __func__);
-> > +             kfree(us);
-> > +             return NULL;
-> > +     }
-> > +
-> > +     tuncfg.encap_type =3D 1;
-> > +     tuncfg.encap_rcv =3D quic_udp_rcv;
-> > +     tuncfg.encap_err_lookup =3D quic_udp_err;
-> > +     setup_udp_tunnel_sock(net, sock, &tuncfg);
-> > +
-> > +     refcount_set(&us->refcnt, 1);
-> > +     us->sk =3D sock->sk;
-> > +     memcpy(&us->addr, a, sizeof(*a));
-> > +     us->bind_ifindex =3D sk->sk_bound_dev_if;
-> > +
-> > +     head =3D quic_udp_sock_head(net, ntohs(a->v4.sin_port));
-> > +     hlist_add_head(&us->node, &head->head);
-> > +     INIT_WORK(&us->work, quic_udp_sock_put_work);
-> > +
-> > +     return us;
-> > +}
-> > +
-> > +static bool quic_udp_sock_get(struct quic_udp_sock *us)
-> > +{
-> > +     return refcount_inc_not_zero(&us->refcnt);
-> > +}
-> > +
-> > +static void quic_udp_sock_put(struct quic_udp_sock *us)
-> > +{
-> > +     if (refcount_dec_and_test(&us->refcnt))
-> > +             queue_work(quic_wq, &us->work);
->
-> Why using a workqueue here? AFAICS all the caller are in process
-> context. Is that to break a possible deadlock due to nested mutex?
-> Likely a comment on the refcount/locking scheme would help.
->
-quic_udp_sock_put() will also be called in the RX path via
-quic_path_unbind() for the connection migration (after changing
-to a new path.), which is in the patchset-2.
+> But these *are not* related to this patch and should be addressed in a
+> different patch. If you agree I will create a fix for it.
 
-I will leave a comment for an explanation here.
 
-Thanks.
+
+--=20
+Regards,
+Shyam
