@@ -1,30 +1,32 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D442B407562
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Jan 2026 11:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404BC3EF0D8
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Jan 2026 11:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768996217; cv=none; b=UDryj6uhv6VzYn4H71LD5jN6//MVECeNgKF/UNe676qBuqy85VPTDBCBUh7G28CDifYyT+8iWH1ycFz3ijGITlabzvRMgJcW2tDJw/r+aLdI91nYMp4MMvoGVVo1WxN1Kb9Sz4+I1jl0VRYcOFtOn1gw3JRu1SUhQTyvjIVB7yY=
+	t=1768996222; cv=none; b=gAXX34SzMVaSEnTYOtViLf0K3J0JWSPnex+ccTqlboVng5/B/0HoxNXOWSrxTHb4+EyPX3FewPmNvypqt3ViuZYQcSXOQ5jl+WZurGNqIQnhxwwWkxgliEuDFDTAAPSCIAS0WBoU4orIHgi8RVH0FlO6v34etXI0vaYFSD6KGpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768996217; c=relaxed/simple;
-	bh=x3bH6MlfYgUnGRwzoV8lg3XaLJR4NM8antQly7ibNoU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hlIGNyO2myLisqybub2ZFO4AOH6VfQgu+CnAem9TgSH/JB/BP3wvr7GrCmoFG5zMDFOFZIakUsovWZd4WWqHY1EnEscIyqJxHyYU3HbeF1OhBGLkfEL5oTaNZhD73DRQLtgNEJIYXo5rLVfX23q6jXiTLPHJC5HMYOAomm1AV0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=i9rTqcrW; arc=none smtp.client-ip=91.218.175.188
+	s=arc-20240116; t=1768996222; c=relaxed/simple;
+	bh=U/xu2IRNmPk+3F3Kel5UpljkQW2UHi9Su5e98+/afOA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Hpv95VuKGXuNiJV/iyTZXy4dCLXydZkGi/g3J0a58+Wn91xFBVM4LTcWpMzLjhZcrRidZlenMa5/T7cpOw8a09et7vsX8jDLqTzpKCMkeqDtJapo4JnpFH6zFAVb12EH0XgAf7l8dCY2uurpXE7LYLa6vWZtZ5/CJV7JeRbGl+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EAlDNb8n; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="i9rTqcrW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EAlDNb8n"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768996211;
+	t=1768996214;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=P0y/cM9SHhDziEhJURviJ6EceCr35nuyB+be22MiWaQ=;
-	b=i9rTqcrWpm6zAuS+967c7umTdxw4AlMZju4LfatUEuKRVsSYGu0kYaVa4249VnZJAGx29D
-	UATXIgyt1UpZrT+KIk3jTw16FGQCoGQn7S+mIwz1m6e+yckablnae355h7JU9g2LW8f+94
-	4KnHbYQj6SYM5KCvowN032lNi8bXjCY=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mWp53q80Z0nsPaBKdPo6kp2Mf3A1DciLTv5dSJhgV0Q=;
+	b=EAlDNb8nYQ3TioUIqkkkX05LNFP8YI9UBffj8KzvV+Cd3AsGO2RKMZ+0yQGPU8a19BhpKH
+	5QuDT965ThpWgzWLWY2JL5KeozZ6d4FHnVei0lYXzp2tFOlbeS+/2pGyNDN3L1AwzvXh5I
+	5qaq9nDJHzH1Gm09MlcQBcymGAigiXo=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -38,9 +40,11 @@ To: smfrench@gmail.com,
 	hehuiwen@kylinos.cn
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 00/17] smb/client: update SMB1 maperror
-Date: Wed, 21 Jan 2026 19:48:55 +0800
-Message-ID: <20260121114912.2138032-1-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH 01/17] smb/client: map NT_STATUS_INVALID_INFO_CLASS to ERRbadpipe
+Date: Wed, 21 Jan 2026 19:48:56 +0800
+Message-ID: <20260121114912.2138032-2-chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <20260121114912.2138032-1-chenxiaosong.chenxiaosong@linux.dev>
+References: <20260121114912.2138032-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -50,42 +54,29 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+From: Huiwen He <hehuiwen@kylinos.cn>
 
-My dear team member, Huiwen He, added some NT error code macro definitions
-and updated some arrays of SMB1 maperror. He will also update the relevant
-code in the userspace Samba repository.
+See MS-CIFS 2.2.2.4 STATUS_INVALID_INFO_CLASS.
 
-This is a preparation to improve the search speed of the SMB1 maperror.
-Huiwen He and I will soon complete the patches of improving the search
-speed of the SMB1 maperror (I have already sent the first version).
+Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/client/smb1maperror.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Huiwen He (17):
-  smb/client: map NT_STATUS_INVALID_INFO_CLASS to ERRbadpipe
-  smb/client: add NT_STATUS_OS2_INVALID_LEVEL
-  smb/client: rename ERRinvlevel to ERRunknownlevel
-  smb/client: add NT_STATUS_VARIABLE_NOT_FOUND
-  smb/client: add NT_STATUS_BIOS_FAILED_TO_CONNECT_INTERRUPT
-  smb/client: add NT_STATUS_VOLUME_DISMOUNTED
-  smb/client: add NT_STATUS_DIRECTORY_IS_A_REPARSE_POINT
-  smb/client: add NT_STATUS_ENCRYPTION_FAILED
-  smb/client: add NT_STATUS_DECRYPTION_FAILED
-  smb/client: add NT_STATUS_RANGE_NOT_FOUND
-  smb/client: add NT_STATUS_NO_RECOVERY_POLICY
-  smb/client: add NT_STATUS_NO_EFS
-  smb/client: add NT_STATUS_WRONG_EFS
-  smb/client: add NT_STATUS_NO_USER_KEYS
-  smb/client: add NT_STATUS_VOLUME_NOT_UPGRADED
-  smb/client: remove some literal NT error codes from
-    ntstatus_to_dos_map
-  smb/client: remove useless comment in mapping_table_ERRSRV
-
- fs/smb/client/nterr.c        | 15 ++++++++++++
- fs/smb/client/nterr.h        | 13 +++++++++++
- fs/smb/client/smb1maperror.c | 45 ++++++++++++------------------------
- fs/smb/client/smberr.h       |  2 +-
- 4 files changed, 44 insertions(+), 31 deletions(-)
-
+diff --git a/fs/smb/client/smb1maperror.c b/fs/smb/client/smb1maperror.c
+index 1565f249452d..31b907362989 100644
+--- a/fs/smb/client/smb1maperror.c
++++ b/fs/smb/client/smb1maperror.c
+@@ -119,7 +119,7 @@ static const struct {
+ 	{
+ 	ERRDOS, ERRgeneral, NT_STATUS_UNSUCCESSFUL}, {
+ 	ERRDOS, ERRbadfunc, NT_STATUS_NOT_IMPLEMENTED}, {
+-	ERRDOS, ERRinvlevel, NT_STATUS_INVALID_INFO_CLASS}, {
++	ERRDOS, ERRbadpipe, NT_STATUS_INVALID_INFO_CLASS}, {
+ 	ERRDOS, 24, NT_STATUS_INFO_LENGTH_MISMATCH}, {
+ 	ERRHRD, ERRgeneral, NT_STATUS_ACCESS_VIOLATION}, {
+ 	ERRHRD, ERRgeneral, NT_STATUS_IN_PAGE_ERROR}, {
 -- 
 2.43.0
 
