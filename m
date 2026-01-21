@@ -1,161 +1,160 @@
-Received: from flow-a3-smtp.messagingengine.com (flow-a3-smtp.messagingengine.com [103.168.172.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891EC340287;
-	Wed, 21 Jan 2026 04:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.138
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768968671; cv=none; b=RSzuF6ZR+f/yZ0DaO2XOWsHWENAO3JjL1RaARqSfLt3BUtp7n8NCBXhdiVoTuxtgXoGxSa/xxDjItb63qIiI5T+Oi8kdpiXsTJYGXDk5OI2qpK7GNYMM/qPy08wBYZR9/usbtTX20H8XKnNC31VvOlXH+pXZUi36Ok1urU+JbAc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768968671; c=relaxed/simple;
-	bh=S5q/wXvTe1ksmG2l2GU/dxpNKU7+kV4/8bzM26nMQjw=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=OAGaq7j0Y5gqY1ephbSGsu/3aPmhs6hhytC4nkJMsLkAzh96Ww8xHvVJiKji9i/ci7jaTpNLidLNk/UIx0hOK5kr9izUVyVztF40/+GrOyPZRELTQpBHYma/B22CJSOjt+0MDuEOE3CjqvF5QGdJxJuJ7YnGlrUqZ6t0ZxgHDDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=k3Rxmu5u; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gAJ0npOh; arc=none smtp.client-ip=103.168.172.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FF93D34AE
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Jan 2026 04:45:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768970735; cv=pass; b=aEkDtAloT5SPxvyuveOWjeziLZ5p/BhvuzqKIpnxOUpNzxpQCGRreGsDtc+qz4cLHj6Rbs0aYPXGE60hFAKAXRIYh40U2hws7PkBE4FLLHv9eRbxk2VRMJhAfXwrvax30WHrKdN6hmeTex6+d2ZEoAbq2VYa1+AGxFHyhdtdqxM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768970735; c=relaxed/simple;
+	bh=gCUN6OAIvzGb/MjgerTWWaca6dxhvDUmClKm+Del618=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kCt8nr85+rxswTIZ6NKA7uj9jtvSWDVUXCdCZwl+kVgW3lQAymsl5ZOfEJS2Wvyy6zAAxBs1zECBUMIUq2Oq4o8JOJD8QRmUc03FZkZSsRqOmwotYWxV+WJnGlpacL4/DnPW2uDAF+ZuvOhhiPOOblfyqKhRzcR4mDbVrjE/XiY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bT9ZYK3B; arc=pass smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="k3Rxmu5u";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gAJ0npOh"
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailflow.phl.internal (Postfix) with ESMTP id CDA9513807C6;
-	Tue, 20 Jan 2026 23:10:49 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Tue, 20 Jan 2026 23:10:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
-	1768968649; x=1768975849; bh=VHtydnr8fLS7IJeEIN+Bebc9EhZyuKs8Mry
-	gf/E6Mwk=; b=k3Rxmu5uR9LzcxYLB3t0g9OZO0rJkXHWHzZwWU2baOA0T+BauMb
-	JVwdNn8FXLcfJjWpT/PesgXD8rWNCNVfalot0ujFj+m9iIfbTfXgug2Q3yJqrVyB
-	8eJIYj37xg9eo1bP9zpmammhxmuGoBzvKOGPf5Qihx0i4Xtur2zoOlGt4VqfI2Aq
-	VcQiUYFS9VLDwzq7PFAV47UiRi8Z6ewfEdkzCtfuUcbBtYGQ4REwO/NQfx0wGxZa
-	zaqsbkKg/7unaAaTepYNC7FeekN9e3dyldZZ6WnZ81ri0JmX1JvDTDOyA9r/um3Q
-	0UTk91MwX8RKLgf76R+Fpg0kqrT6VIZzfKQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1768968649; x=
-	1768975849; bh=VHtydnr8fLS7IJeEIN+Bebc9EhZyuKs8Mrygf/E6Mwk=; b=g
-	AJ0npOh094R5rlQ+lB6V86VTqskShc/USfs9jmX1TOsWUZfsPdWnx0W03o0QsD0J
-	ole/Eq8d6vjOz/TwgxXAi4GUViQNE7aP9SFrw1QS88PkqsRNgUMpp2Dsk75jigEL
-	Tq3UezOIFJ8hQFHcKj89Ey79saQSKP0MwkW63MgMtbV/mnNXN/xKVwew/W1KuJOB
-	UtSIMWwNUT/KJ08KW4iRnFlHq35eiupz+giAs+7ptzAfWnDBN/iL/8qtRpNmSEaA
-	7+qwUSVwzkTj44zrlBWH3L4VcAF8ddte590kdslQTISEXKuf5ZNRlxQrYy4fTjd4
-	+bXU8lH/3WUCP5TODW9mQ==
-X-ME-Sender: <xms:x1FwaXcQqjPpSgnEH0JKgQq9qBmBgEL4xriEE0RJAFk0DGbOHo3GJQ>
-    <xme:x1FwaRGn5TWEli8N0_6q7i-Js7HZaHfbVLccEQrr6Mlj8opNJxVvGV2IOF4DACpZJ
-    67k8djIbKVq6CJIz8sMWvyebtGqxQwHb9fq0iYg9h6RLbhG>
-X-ME-Received: <xmr:x1FwaeOCYluQbHVqHC0b8yb2QyAzu4oYGvwgfL3Rv1YcRePq4NfK1L8su9uzG-K39Rf20ZSVJLGZZZsgDaJ4alcLa9ozRYjqUp45LbFlfXWe>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugedvvdejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurheptgfgggfhvfevufgjfhffkfhrsehtjeertddttdejnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epudetfefhudevhedvfeeufedvffekveekgfdtfefggfekheejgefhteeihffggfelnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
-    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepjedvpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
-    hrtghpthhtohepghhuohgthhhunhhhrghisehvihhvohdrtghomhdprhgtphhtthhopehl
-    ihhnuhigqdigfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinh
-    hugidquhhnihhonhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehl
-    ihhnuhigqdhnihhlfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
-    hinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
-    uhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
-    hnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
-    lhhinhhugidqvgigthegsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:x1FwaR8X47pB82llCoOnx-_tqfG4Wgl__nF7iR7DTsvnBKEgoxWWLA>
-    <xmx:x1FwadL_4AgUdEoAdrrjBUzKm_QwvAZ5_vABwDi-yZXKOEZQmRVN-g>
-    <xmx:x1FwacjsPmz0p5xJHKbK1Llgy6XHSkD5sIUV00neAVndqU1R0osl9Q>
-    <xmx:x1FwaQ-U7Yh5HcQNL5v5YvAtJgbgLMSzKZeFpndI7b9KPjw4FZERdA>
-    <xmx:yVFwafa--UBBDa_lEtTQJ8XgCJ_3LeDDEGWDRnQKAI7NA5gXIajXqhW->
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 20 Jan 2026 23:10:25 -0500 (EST)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bT9ZYK3B"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b876c0d5318so811222266b.0
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 20:45:33 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768970732; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RQsW5FGibRR5F9vLMBINlH6oltXLdoYCJqo4gQHnFLvCEPNOYKUOGFCXR8b48IXZCS
+         +cfA9zKPthybqQjmWfYLzejZx1XzIN9ex3/jlmzWXzXSVPt2gpWlRc4uh8mQ763OBGaT
+         7kA8Bqe5Mmfap696Hvy5Q38qNY+Bcxe76tKoubWy1OgoRz2vrKwkLTHuvKNLOTnHmlL8
+         rAyDsIKX0DPMM7RPIdiWHBJur5fwqk4to5kXn+wWbXF32pwrW2Af/PGow0BsEuLztz9n
+         EjBFkr9+muS/SG7GqzEHeXtMwmHvN+7KCwZNGHNAZVl4gzOntF70xzHaYkWDpVo22yAt
+         GUGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=C8x3buc9DsmMK03+taROY+CIGN/wpygJa9yxTRvp0FQ=;
+        fh=ivCwkVCbTDUI/zL2b/roBiCbp/G9xQ3FpSiz58Fn7qk=;
+        b=eYRJ+LCy+JAwth7Yy9HyfMF9fOqRC1lNDCX9GaGrfRzP0iM8cOp1FzboayqZicpUZ4
+         s/0o/0SZfOBDm2o+KBhzO0T6zGH0LElcJEXUUOJFPRUe4Z8zGlnS3Rn1V21hjTy6tWRZ
+         RVWIeB2c9SPoh4v2jHLUQ3V+zAaMyt1gQmarTAp31HEOV+u5ateND2ZoVmHk3LvRmp6d
+         cb37D4n9UTuV4UYVmGcSOn7wQ/W2ctPv6zf79rvTEPKtejBk3/2gFAiMdyQVRAGJyPcq
+         SN9T3b6215xNf/Kf+xZVXq7eW0+oxC9ejR2QYZ5PzHYV2V3fOUG+bd5uyOFQZFHoOFIz
+         HhFw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768970732; x=1769575532; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C8x3buc9DsmMK03+taROY+CIGN/wpygJa9yxTRvp0FQ=;
+        b=bT9ZYK3Byu4Wy4yGcGahNJ1pRpmSDl6mb2pyRKU+H3v9Ibk33sEufX07In0qpFpzyK
+         tk/SPPXuJM66JAcul94dj6LMT7HdgJqul2nxwDDF1qFfu6Yc/YQ0Dvxa74WHNtWhSH5E
+         e+Al2eg2wnslRifuX8aLSWHZoJ4oCtesLH+2J9pg4YBJ1fhVbF2D1l1lyNYASFHWR2WK
+         uQupYfYTZ/chYCa6Gqh3cUS03n1x86Wh+psV0RVajDirjxyDw4q2mcurUjGPqBT+ulV1
+         Jzuy8c3/VlS4fk52Q95l1B4Rm5s6u4s5GdksGS8pwGqzL+wvoXggql8U/FlWqbqLgMGl
+         0zOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768970732; x=1769575532;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=C8x3buc9DsmMK03+taROY+CIGN/wpygJa9yxTRvp0FQ=;
+        b=N93xw3rjy++UF5QYDzIZjVj93JiZEC3vLyE1ZQF3QRWzlbDw4A1rcKJ8Kli9fW4HMI
+         fkIGxFebfC6YnZLeIwIGoMz95Sv/F3rMtGE1Y7EwAA2ers19Pzyg/ZGhyLfL+O6N9LBA
+         4xDRUhbrSqFe9Dx1wU6oROW0JZTC0QI0CUD5vcLEnN4vgSUsWzpALs0UwIG6csJ/RaX+
+         Xf7EwGgVI7obanBR2cahn6qEDr+fJTKAkM4grS5MvjqGQrYIoOcn8ynikFcDXyKpZrwG
+         EmcZw4zQHcD/7/I6yrJgb5ICOs0cEMvD0LC76pH4+7dRKVA+v9b4TY3q047pJO5ZehsW
+         x18w==
+X-Gm-Message-State: AOJu0Ywj8dz1r49YTR5hM+DKbObNDNHHAEK/qm40P7M0pJdnD/7aXRET
+	mf4AMg/MtPblBlDUFbqXri+19CsGxohXA/3ATCpe9JcxadtgTLYOOJD1dL+6wvyLCOZe29tvgnW
+	UZJGsgw0cngNclLhHhPGqNU7Vt06Y6xvFbwgtbDQ=
+X-Gm-Gg: AZuq6aIvQx13KmQ3uF6Xz9brygXJBqS2MRZpQjQPk9WawbH3DkW5Oc+hfHxymY78Qj5
+	/oLMgJIG6tigkEX8aKc02AqPSxLC1d2ecuaYVZDgbsi5Zc5lFSadzZlVrZIYwJUCGZgy4Gtk9lF
+	UvLdFR/Wjq6xi9Wsncd5tAMqSPxCv+P90EZA/fAscpEVVd581axRmAGEZKlLQzuNv+Q4oq+fNol
+	h+TGLVI9f7yE50WifKP8/a3EDrhg2oD8y6FOQ4w9Y57RSBMt34/QzLvTFqKk4zptz2oj05p6FfG
+	wsB9
+X-Received: by 2002:a17:907:a08:b0:b86:f999:15ba with SMTP id
+ a640c23a62f3a-b8800261037mr324014966b.18.1768970731755; Tue, 20 Jan 2026
+ 20:45:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Jeff Layton" <jlayton@kernel.org>
-Cc: "Christoph Hellwig" <hch@infradead.org>,
- "Amir Goldstein" <amir73il@gmail.com>,
- "Christian Brauner" <brauner@kernel.org>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Chuck Lever" <chuck.lever@oracle.com>,
- "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>,
- "Hugh Dickins" <hughd@google.com>,
- "Baolin Wang" <baolin.wang@linux.alibaba.com>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "Theodore Ts'o" <tytso@mit.edu>,
- "Andreas Dilger" <adilger.kernel@dilger.ca>, "Jan Kara" <jack@suse.com>,
- "Gao Xiang" <xiang@kernel.org>, "Chao Yu" <chao@kernel.org>,
- "Yue Hu" <zbestahu@gmail.com>, "Jeffle Xu" <jefflexu@linux.alibaba.com>,
- "Sandeep Dhavale" <dhavale@google.com>,
- "Hongbo Li" <lihongbo22@huawei.com>, "Chunhai Guo" <guochunhai@vivo.com>,
- "Carlos Maiolino" <cem@kernel.org>, "Ilya Dryomov" <idryomov@gmail.com>,
- "Alex Markuze" <amarkuze@redhat.com>,
- "Viacheslav Dubeyko" <slava@dubeyko.com>, "Chris Mason" <clm@fb.com>,
- "David Sterba" <dsterba@suse.com>,
- "Luis de Bethencourt" <luisbg@kernel.org>,
- "Salah Triki" <salah.triki@gmail.com>,
- "Phillip Lougher" <phillip@squashfs.org.uk>,
- "Steve French" <sfrench@samba.org>, "Paulo Alcantara" <pc@manguebit.org>,
- "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
- "Shyam Prasad N" <sprasad@microsoft.com>,
- "Bharath SM" <bharathsm@microsoft.com>,
- "Miklos Szeredi" <miklos@szeredi.hu>,
- "Mike Marshall" <hubcap@omnibond.com>,
- "Martin Brandenburg" <martin@omnibond.com>,
- "Mark Fasheh" <mark@fasheh.com>, "Joel Becker" <jlbec@evilplan.org>,
- "Joseph Qi" <joseph.qi@linux.alibaba.com>,
- "Konstantin Komarov" <almaz.alexandrovich@paragon-software.com>,
- "Ryusuke Konishi" <konishi.ryusuke@gmail.com>,
- "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "Dave Kleikamp" <shaggy@kernel.org>,
- "David Woodhouse" <dwmw2@infradead.org>,
- "Richard Weinberger" <richard@nod.at>, "Jan Kara" <jack@suse.cz>,
- "Andreas Gruenbacher" <agruenba@redhat.com>,
- "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>,
- "Jaegeuk Kim" <jaegeuk@kernel.org>, linux-nfs@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-ext4@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-xfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-cifs@vger.kernel.org, linux-unionfs@vger.kernel.org,
- devel@lists.orangefs.org, ocfs2-devel@lists.linux.dev,
- ntfs3@lists.linux.dev, linux-nilfs@vger.kernel.org,
- jfs-discussion@lists.sourceforge.net, linux-mtd@lists.infradead.org,
- gfs2@lists.linux.dev, linux-f2fs-devel@lists.sourceforge.net
-Subject: Re: [PATCH 00/29] fs: require filesystems to explicitly opt-in to
- nfsd export support
-In-reply-to: <9fdf7a8c04861306b453a78233f4bd6004c465f4.camel@kernel.org>
-References: <>, <9fdf7a8c04861306b453a78233f4bd6004c465f4.camel@kernel.org>
-Date: Wed, 21 Jan 2026 15:10:22 +1100
-Message-id: <176896862299.16766.6206046829320088529@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+References: <20260120062152.628822-1-sprasad@microsoft.com>
+ <20260120062152.628822-4-sprasad@microsoft.com> <1261425.1768928601@warthog.procyon.org.uk>
+In-Reply-To: <1261425.1768928601@warthog.procyon.org.uk>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Wed, 21 Jan 2026 10:15:20 +0530
+X-Gm-Features: AZwV_QipLpKyE_Go5y-JgWqa4hOk6JPI0S-9DvRdX30TjYKrDfZQ1sRu6tXnqYM
+Message-ID: <CANT5p=p2wha1GYpTqRUyxxYaajH3tQbAhCdqZZBmrCqkMjswCw@mail.gmail.com>
+Subject: Re: [PATCH 4/4] cifs: make retry logic in read/write path consistent
+ with other paths
+To: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com, 
+	bharathsm@microsoft.com, Shyam Prasad N <sprasad@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 19 Jan 2026, Jeff Layton wrote:
-> 
-> There is another approach we could consider: We could move the
-> export_operations that are needed for local filehandle access into a
-> new struct filehandle_operations or something. It does mean adding an
-> extra pointer to the super_block for the new operations vector, but it
-> might be more intuitive.
+Thanks for the review, David.
 
-If that sort of change were seen to be valuable, I would rather not
-create a filehandle_operations but merge some (or all) of
-export_operations into super_operations.
-Maybe then the existence of s_export_op would return to mean "NFS export
-supported" even if it is empty.
+On Tue, Jan 20, 2026 at 10:33=E2=80=AFPM David Howells <dhowells@redhat.com=
+> wrote:
+>
+> Hi Shyam,
+>
+> Some immediate thoughts for you.
+>
+> nspmangalore@gmail.com wrote:
+>
+> > +                     break;
+> > +             } else
+> > +                     trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace=
+_io_progress);
+>
+> The 'else' is superfluous, given the 'break'.
+>
+> > +             trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_retr=
+y_needed);
 
-Thanks,
-NeilBrown
+checkpatch warned me about this too. I felt that the same change
+needed to go into both read and write codepath, one of which I had not
+changed w.r.t the behaviour.
+I don't mind submitting another version with this change.
+
+>
+> Btw, feel free to add more trace values if you want to distinguish 'retri=
+es'
+> from 'replays' if that makes sense.
+
+I think it should be fine.
+In fact, I was wondering if we can move these trace points to within
+the subreq_terminated functions in netfs itself. Do you see any
+problem with that?
+That can be a follow-up patch though.
+
+>
+> >                       break;
+> > -             }
+> > +             } else
+> > +                     trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace=
+_io_progress);
+>
+> Superfluous 'else' again.
+>
+> > -                     wdata->result =3D -ENOSPC;
+> > +                     result =3D -ENOSPC;
+>
+> I wonder if wdata->result is redundant.  Can wdata->subreq.error be used
+> instead (though that's unrelated to the subject of this patch).
+
+I agree. I did notice that too. But wanted to make pointed changes
+with this patch.
+
+>
+> David
+>
+
+
+--=20
+Regards,
+Shyam
