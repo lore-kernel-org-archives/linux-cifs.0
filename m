@@ -1,153 +1,161 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3F1330679
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Jan 2026 18:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E023C36B05B
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Jan 2026 19:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769021999; cv=pass; b=Fs0cVSvPkLpMTaT50Mgg7ZEKOJaLJOcuKRH1Ws3rHUQZ/JLUVjx4Dvf7RT92oD47tC2G77Kj3FcfiuPYbFx/U25MQRlNa/GiKcfC+YwLGrfz/Ksl953ZOHbRjr5pItGBmv83sXAD+5DGt4LR6PjC2dWXkSPFVe1LQc0DrVvow6o=
+	t=1769022013; cv=pass; b=Ww2JVWc9MzVWTGLoyYCrgaQEx/KP28vfw0ol8lO6LEMm8DwWeXwik9yxuLYRgt8erU6/kkwvZfhVvRnVxTIar+uG+k54ZZYS730sL3YqBBDjOMfLeG35kjjNEXoIJCGVkYQUL+HUnJ43DH4MBaP2XHaWWds2MK6i/rbN+4Q90yE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769021999; c=relaxed/simple;
-	bh=0g11WUsJt9cOA2Y9tdkQTYooIxWC13epF+iUWH3lAFo=;
+	s=arc-20240116; t=1769022013; c=relaxed/simple;
+	bh=P50vKKEGRcti/ilk0zXXEyTeAkMnj2pLP0nOzx4jcho=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rf3RvPbXCP2cqElyEPZzBIMeOTMe1ob9j5uwvYvPQL0O6rkEHp2l1rIfQzeVxiboNK+Ygg9tJCuNXE8OFHR340zngzoZYSnMyitUEd8i1SKBpXCPu31XjoSjY29kCZS2fuJ7Yq0BVtc8rIQNkG6xOVgPzb0o+sDYbxMz5XjjPoo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M5QOXskU; arc=pass smtp.client-ip=209.85.219.47
+	 To:Cc:Content-Type; b=lyzON5uLaYJ4YHtAKDdKhZeymxwrCU/kQyhiIewdg0Yrk/ZH/6VGYxX7DCxlaluQj0M04WgxsACJj5UDrcUULM7mXiYe/7tvFszbHbKUvSD51ouXHRpVcmVbqNGdWqBwMj9XpnKb4MwpGVhiNk3oUWpFlXC91aGODE7P4ogCMHo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ke3b0iRs; arc=pass smtp.client-ip=209.85.208.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M5QOXskU"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-888bd3bd639so1573446d6.1
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Jan 2026 10:59:57 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769021996; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ke3b0iRs"
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-658072a4e56so379730a12.0
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Jan 2026 11:00:09 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769022008; cv=none;
         d=google.com; s=arc-20240605;
-        b=UN1Wq3ujzE6EtqZTb8NyGnuIioYaoNmfoy1czL3lv7/o23RfYyIzDZNgmhJJNAesro
-         Ty/diThgICv624xaqyyT7hFqqrSvrGlrN9E476QbFIJsHAjnF646lfXBfjD71gV1pbOS
-         Fo0SrqeS0urOezLYuitf1CMLh+C7Y5DTkMV4E5fFNVtamH6vSfPEZuyDG0smpwpWFEaI
-         mjKZ2a4DeHKdqM2wVeudsVhNvd9/CGwB+YJiAdUp8leQFaPuqywMLO9/mwl2anRkgw12
-         gTLR7StSXEN25qTav3jgsDNXPTF51yoEMkE77rrRgzswNQc9AYfoKUk64ZahbKM2Pzlt
-         kRkg==
+        b=ICNgK/vVE1+LigmTC+nS2RcB8tnvgRzZNp3opTry7R3kg33wCXKht2oEvkAIXqrZca
+         Zh4O+iXVJQaGoeXqpNuiaS+U8zCEwQnNavmeRHkJewsBJgza/ytqs9ng4fRqXbWBzda+
+         1UROnD4Q+FXGvzPfB4qFKvXBitVa+42/QJ9GzctyoEmhKlPbFct/+YSOc/Y8Wbq9z2A9
+         G2lHBJDzFjfsGs39MnTvAXWtCXR263LUHtCZHIJ/9JxsHu0UWONYxvqDfSFPaiJ3WDQE
+         mCzu5zhe8rpSb/ewcW4Gymp9OfMnSHTrkAfwjZBv415vwSWqZimtuj2DeVUBzwgajVYZ
+         TBRw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=kO7WWK+KC5k2InywWarhMQ20qyxjNQJl0ylzZyDEuwU=;
-        fh=VNwkftLXIEhvENIYcK/ONI17znYYwUE1BfUsjFv5sRg=;
-        b=i/gEim47cv9WdVL9dXJCLo1cSWHThtSV4w4gYw4OHlM+EzH/FJTbEoT5GxBJiMwOX4
-         S7uMCa91hv79czSUoPwNREGf8emNpgoyZaWAH6VK5xnCgeDrT+C8EfFuzmcuIv4/bbJL
-         4I/TmbNMiQs06h3jzmcxjCR4hsBNN1GYxciq5sOf+Tj1qmfZydzSjGod0HJ/DB902KgC
-         KyAkYsIgniyfEjrmSjMxBONxormrvxvKzFDbEP5nMdazgwS2aVLELzv9W5fcQmVUXt3V
-         X0YPfs7p3+ZYhNiA6lWs6Ygg2wAGdn+Fwllgi8AoSVS9/0L3RSc5tFhV2e2mhF2RPNHC
-         37Mg==;
+        bh=P50vKKEGRcti/ilk0zXXEyTeAkMnj2pLP0nOzx4jcho=;
+        fh=sG7aJquoe5F/zQZy/z889PGjt7VAYK9mtLxmvurU7z0=;
+        b=L35NCpQRCXFRXk9riJg+eiD1fLIPfG1m9HFs28AaoTmUOfnm+HEnOywTYlYQY+l0C/
+         sSNlehYN3BnB3FX+ljsS3ytAyUlOKt9e991uYvYbt63wg8mkN4EI58NUIqKSAJFjtRjQ
+         XD+66DSNxDR1hEt9zn0YzJ4WQOxiOBaWY2vfJKfpa8ne/B/pudNgUOIWXMPVHiFXtgiW
+         iNlA+964vm68bDKFcukfOcrgTr26l/13igZWXQ9oFFgykITTL8f5sa6qnZ0Itrn2MmN5
+         N5ewoM9/gmMBIYJqXUrfaUYFgfH7EZ/IgiIcVYThON4j2GypqAnh+iFg5oJLsD8aw2QG
+         acpA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769021996; x=1769626796; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769022008; x=1769626808; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kO7WWK+KC5k2InywWarhMQ20qyxjNQJl0ylzZyDEuwU=;
-        b=M5QOXskUIXbK7T6VAtmvRaRhrDoHjgCk7UUZL8AnwPj0TE6hiDaKLoBQyD9CiQNGMf
-         4BavbqJT/sciI1eFZl/43ppfkB745Wls2y9+5qwRR+eprxPrYh8tkta8N4GztAMgx45A
-         oOLyC3vhdPa9NzPeWvNycU/w8aJj5aroua0Dzi1OgNJuF048zN53SMZio3rJxX5r6OMv
-         yvZkdtTGpgpi9t6q4YKDlxTUUxLzl9+YXfg73BfuWEfJT5Lek1fpdYY1hPevhOl4fD5h
-         y9Zh48fHYpWrvs0hJYs9CtJaoDwUHc/oR5RF7kHmOgB4sb3QhBxa2xqKwfHy8z+nEbRn
-         YGIQ==
+        bh=P50vKKEGRcti/ilk0zXXEyTeAkMnj2pLP0nOzx4jcho=;
+        b=ke3b0iRsOPGdb9oGItiqf3p2ocGTfsItthso0F5B2fak03CUA0liWLn/Ve+kCx5qdQ
+         JombE0ayrWVRZQXIZl23qp9IKs0OR39m8RilvLRQvVGHRFm30KkpG++OotWZ92AwuCGc
+         mfAvUOj8NIFwo25zttpr2t9oiEAh7Td8L4n9JqF49lbt65BYqwZMpd8IuL+pjuR3w7Cx
+         uwF7vQXLdVLV63Ny5cgNkQ66Jb7r0JOenkZbCMRNua5Ow/a8OGWNheD6DVKMa3a6U1VX
+         hddDJM9Nq2Z5pHCrVaA1w4AG9WOs41axr0x1rUqjUrhki3bUl8DCRQXOnsnH+8mR9kKE
+         KgeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769021996; x=1769626796;
+        d=1e100.net; s=20230601; t=1769022008; x=1769626808;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=kO7WWK+KC5k2InywWarhMQ20qyxjNQJl0ylzZyDEuwU=;
-        b=cJtz9CIEhm9lZ++gcI6MtaoomePoVNNjXqa6dAOiHw5cBJgNID8fwcC+Pc5ZHQSI6Q
-         CLvc9G5lHsxE6RErPVgkFdyAcpWUE2bdmewDztw7MdJTQVKVC6Fg7xbDfNLCcMA2XlTG
-         eoupPxpg+fY6Ig1uOHuxRRG1pHtfk+OUdvylL5ga85FpXbEjNys9IC+aNVI5U/zuiT2T
-         mngmbDcrdoVK9+SL10eDisL4lSQN8BAErvSH2m2Yn3wMYnScIAaix/e1XiN1P9zO9Plh
-         YWwXJz3Bu/wP8VTQRsz56lZuGeL3ja/nybzn0baob13foZbiFcJ5OTj5PG3Qb4PJ8Nrx
-         ouEw==
-X-Forwarded-Encrypted: i=1; AJvYcCVBVujRpqMQPvIDDtKUciJ7Vw641wxCtxifm7Dz972GAhEgbuWir4/7t7+JZKJc5nfoEgPzNPuABolj@vger.kernel.org
-X-Gm-Message-State: AOJu0YyW8YvbdbdLlaM/LjCB51drb2KJtTPUxqHJo4lSIGf3bEC0+w5J
-	HzEMi3xvVaPShlUnWgOIy+tLHqmwePXu2J4NnZtfW1i1PXPIYwSn3xCi8xsjP4HXRf9xddOgu1C
-	HL2Qx2sOYNi6OesjJqlUX5AD7ReaQuBQ=
-X-Gm-Gg: AZuq6aIA1d2ODHf4ktNL3ULxFzFyK7iATjPEzu9wuMPmjTwQTdxDyceVBARPUG4+/lU
-	uzlAqGDGcoA3suFrS25VEfKIqcdGCKeZIOyx1AXldlGng0KOihDt7YIhZeR1kGiNwHPdES9IxrE
-	mK05j9HgR3RL0IMmg493xnobK2goYuyAeaaRbObTS6YHjRY8H8ZkmTfr2Uu1hsEC5lhuEQI526u
-	WvNF4Q2cHkTukmLm59SKYk9Q0gGtqDhFfr15ED9xB/RryMIH+mjm2IRU4BvrsaNHEGcDTQC/g0M
-	3asBhqD6m7JkdLDhP+M+RrxSyDHscCBfcj8+CUXxA3rdKeNjI0iHacSPqZX9Rw1I4AUK9//drlW
-	B2PHC6c9lNVTPSMfJNdfeKEbZ9rM8vjasyM+9wj+jsCoz/ujCb1OOpFfEooK8cWwCiTMqCjjdz6
-	SH40PcGJV+
-X-Received: by 2002:a05:6214:21c6:b0:892:66bb:fdbb with SMTP id
- 6a1803df08f44-8947df8cc68mr6555776d6.23.1769021995975; Wed, 21 Jan 2026
- 10:59:55 -0800 (PST)
+        bh=P50vKKEGRcti/ilk0zXXEyTeAkMnj2pLP0nOzx4jcho=;
+        b=oYUhrpTyGBMw3xL25mE3c/TDCQjaySRhU21XXkC7TGGHQCEwEakm07A663vtzovZyU
+         TJ1XaK+5ycns13dh6LfT35YHw8OY2ymmFCH+JIo9tOCQ9qKpmcvwMfs96rca/bDjA9M/
+         DblH6omjgfN7VDGpF7QDEvD9BhJdJyduLuc8Uk7LuRQoJGQUv2wPry3K0kq1ofzE/ruQ
+         ZRxWhAeSRbg67ZcZ48Jj+YMgAUcvzQylbJLshHrQ2XrY79WZQgCqMNdVqU3TD7ArrEIA
+         xvKFRiuMohJ2Qgzdh6Q+JU1JnsVrSjBGh/jRPmZln/8NvYMgQ23i/192epVpI3pE/UmR
+         iRiw==
+X-Forwarded-Encrypted: i=1; AJvYcCVmmcmgKnetHx9qXhQ+pAGjc7dlZY9gLwwwA1J5geYVmd5jzXqM/HpYbs3VyUoToNw19CE6OyBIoWt/@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRY4u5S1Mp8uiBP5KkKEBHjZdsUqBfPu+yeD26GwDu97pkfaM3
+	4VbJq5UQLSc7uryfabmtFL6R09mIAEDKhI+4uYEXU6VMAb9FEzZIISrYWHlvkTWRa8DOTRD6vD2
+	0hiA6ljLjISWjM6N4oKSi/Zi1emswqdo=
+X-Gm-Gg: AZuq6aIqxj7Rh53vCGQxag1Q/lCZ3I+io8hZH1oUBpp+avNzas4EFaEt7s9UUKvQZqE
+	o6IeO0azEKa3BOSjSxRG9dVASW574EzIxUqCzFl+jKYRXTSXXmJ7UMk5qY6CS3kFUeiBexOr8kQ
+	RWhcspgegvKFMliFMz4Ya0JUZWtR+1KM3YrpLdU+z/obBgsMfEWNT3OAefBtakOXCTLqxdoQ5em
+	zI7c98AMNb3P7/nrlI89pTspvvnBF1XfznmlXnUDfVr79ftDQ/YAS8yX2o8OTHGdxeUHNMxUb0n
+	TNb66694KrOWicj1Fz75TiJmftw=
+X-Received: by 2002:a17:906:6a13:b0:b87:206a:a23b with SMTP id
+ a640c23a62f3a-b8792f79852mr1477117366b.34.1769022007470; Wed, 21 Jan 2026
+ 11:00:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260121114912.2138032-1-chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <20260121114912.2138032-1-chenxiaosong.chenxiaosong@linux.dev>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 21 Jan 2026 12:59:44 -0600
-X-Gm-Features: AZwV_Qij9SMUytYC3z7_bs6WHM7CX5NEYJgvSk-Pa8y1WHEC3HHepVpYsVRAiO0
-Message-ID: <CAH2r5msdoWT3wEyie7g0qX-U6yDcyfq2qxQf6L7gsQgVGX2wcg@mail.gmail.com>
-Subject: Re: [PATCH 00/17] smb/client: update SMB1 maperror
-To: chenxiaosong.chenxiaosong@linux.dev
-Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, hehuiwen@kylinos.cn, 
-	linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260115-exportfs-nfsd-v1-0-8e80160e3c0c@kernel.org>
+ <CAOQ4uxjOJMwv_hRVTn3tJHDLMQHbeaCGsdLupiZYcwm7M2rm3g@mail.gmail.com>
+ <9c99197dde2eafa55a1b55dce2f0d4d02c77340a.camel@kernel.org>
+ <176877859306.16766.15009835437490907207@noble.neil.brown.name>
+ <aW3SAKIr_QsnEE5Q@infradead.org> <176880736225.16766.4203157325432990313@noble.neil.brown.name>
+ <20260119-kanufahren-meerjungfrau-775048806544@brauner> <176885553525.16766.291581709413217562@noble.neil.brown.name>
+ <20260120-entmilitarisieren-wanken-afd04b910897@brauner> <176890211061.16766.16354247063052030403@noble.neil.brown.name>
+ <20260120-hacken-revision-88209121ac2c@brauner> <a35ac736d9ebc6c92a6e7d61aeb5198234102442.camel@kernel.org>
+ <176896790525.16766.11792073987699294594@noble.neil.brown.name> <ccb32c576cc4ebf943d5ec35e3d7ba4ae8892acd.camel@kernel.org>
+In-Reply-To: <ccb32c576cc4ebf943d5ec35e3d7ba4ae8892acd.camel@kernel.org>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Wed, 21 Jan 2026 19:59:56 +0100
+X-Gm-Features: AZwV_Qh050IhjThhArfxNo-53HjJR0uLCcITEQOtntS-75Lw875opD6ONQssxps
+Message-ID: <CAOQ4uxg+dC1o+6V7Nvxf8UW3H=0OvsGjEe76LNY6q8ZcpGDDJw@mail.gmail.com>
+Subject: Re: [PATCH 00/29] fs: require filesystems to explicitly opt-in to
+ nfsd export support
+To: Jeff Layton <jlayton@kernel.org>
+Cc: NeilBrown <neil@brown.name>, Christian Brauner <brauner@kernel.org>, 
+	Christoph Hellwig <hch@infradead.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Chuck Lever <chuck.lever@oracle.com>, Olga Kornievskaia <okorniev@redhat.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Hugh Dickins <hughd@google.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	"Theodore Ts'o" <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>, 
+	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>, 
+	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>, 
+	Hongbo Li <lihongbo22@huawei.com>, Chunhai Guo <guochunhai@vivo.com>, 
+	Carlos Maiolino <cem@kernel.org>, Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>, 
+	Viacheslav Dubeyko <slava@dubeyko.com>, Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, 
+	Luis de Bethencourt <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>, 
+	Phillip Lougher <phillip@squashfs.org.uk>, Steve French <sfrench@samba.org>, 
+	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Bharath SM <bharathsm@microsoft.com>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Mike Marshall <hubcap@omnibond.com>, 
+	Martin Brandenburg <martin@omnibond.com>, Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, 
+	Joseph Qi <joseph.qi@linux.alibaba.com>, 
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, 
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
+	Anna Schumaker <anna@kernel.org>, Dave Kleikamp <shaggy@kernel.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>, Jan Kara <jack@suse.cz>, 
+	Andreas Gruenbacher <agruenba@redhat.com>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, linux-nfs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-ext4@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
+	linux-xfs@vger.kernel.org, ceph-devel@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	linux-unionfs@vger.kernel.org, devel@lists.orangefs.org, 
+	ocfs2-devel@lists.linux.dev, ntfs3@lists.linux.dev, 
+	linux-nilfs@vger.kernel.org, jfs-discussion@lists.sourceforge.net, 
+	linux-mtd@lists.infradead.org, gfs2@lists.linux.dev, 
+	linux-f2fs-devel@lists.sourceforge.net
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-tentatively merged into cifs-2.6.git for-next pending more review and testi=
-ng
-
-On Wed, Jan 21, 2026 at 5:50=E2=80=AFAM <chenxiaosong.chenxiaosong@linux.de=
-v> wrote:
+On Wed, Jan 21, 2026 at 12:56=E2=80=AFPM Jeff Layton <jlayton@kernel.org> w=
+rote:
 >
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+...
+> > But if you really really want to set this new flag on almost every
+> > export_operations, can I ask that you please set it on EVERY export
+> > operations, then allow maintainers to remove it as they see fit.
+> > I think that approach would be much easier to review.
+> >
 >
-> My dear team member, Huiwen He, added some NT error code macro definition=
-s
-> and updated some arrays of SMB1 maperror. He will also update the relevan=
-t
-> code in the userspace Samba repository.
->
-> This is a preparation to improve the search speed of the SMB1 maperror.
-> Huiwen He and I will soon complete the patches of improving the search
-> speed of the SMB1 maperror (I have already sent the first version).
->
-> Huiwen He (17):
->   smb/client: map NT_STATUS_INVALID_INFO_CLASS to ERRbadpipe
->   smb/client: add NT_STATUS_OS2_INVALID_LEVEL
->   smb/client: rename ERRinvlevel to ERRunknownlevel
->   smb/client: add NT_STATUS_VARIABLE_NOT_FOUND
->   smb/client: add NT_STATUS_BIOS_FAILED_TO_CONNECT_INTERRUPT
->   smb/client: add NT_STATUS_VOLUME_DISMOUNTED
->   smb/client: add NT_STATUS_DIRECTORY_IS_A_REPARSE_POINT
->   smb/client: add NT_STATUS_ENCRYPTION_FAILED
->   smb/client: add NT_STATUS_DECRYPTION_FAILED
->   smb/client: add NT_STATUS_RANGE_NOT_FOUND
->   smb/client: add NT_STATUS_NO_RECOVERY_POLICY
->   smb/client: add NT_STATUS_NO_EFS
->   smb/client: add NT_STATUS_WRONG_EFS
->   smb/client: add NT_STATUS_NO_USER_KEYS
->   smb/client: add NT_STATUS_VOLUME_NOT_UPGRADED
->   smb/client: remove some literal NT error codes from
->     ntstatus_to_dos_map
->   smb/client: remove useless comment in mapping_table_ERRSRV
->
->  fs/smb/client/nterr.c        | 15 ++++++++++++
->  fs/smb/client/nterr.h        | 13 +++++++++++
->  fs/smb/client/smb1maperror.c | 45 ++++++++++++------------------------
->  fs/smb/client/smberr.h       |  2 +-
->  4 files changed, 44 insertions(+), 31 deletions(-)
->
-> --
-> 2.43.0
+> We could probably do that, but I think the main ones that excludes it
+> are kernfs, pidfs and nsfs. ovl and fuse also have export ops in
+> certain modes that exclude NFS access, so the flag was left off of
+> those as well.
 >
 
+For the record, my comments regarding fuse_export_fid_operations
+and ovl_export_fid_operations variants were purely semantic -
+it did not make sense to mark them as _STABLE_HANDLE, but
+it does not matter if you set a flag on those ops, because they do
+not implement ->fh_to_dentry(), on purpose, they are not
+exportfs_can_decode_fh() by design.
 
---=20
 Thanks,
-
-Steve
+Amir.
