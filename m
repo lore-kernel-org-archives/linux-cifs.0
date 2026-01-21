@@ -1,339 +1,122 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C73329378
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Jan 2026 04:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768970780; cv=pass; b=Bqiz7vJkKocaT8G6YgZil2o3DtZurpIbdCw/sESOUuboSYCwT+d/DVKCb+3N7pkOXNiO68oaWcLsB0pzGlHk2p/jse0W2OktuobJifia07LZ418r2/w1bmSghfwtgdtkl0h+LyU4nNwHTaZR2Q2bV+cg9bRj5tDYStoW/18Y/1I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768970780; c=relaxed/simple;
-	bh=tJ1tsnFyg5/uSbAATL51hCVR13F0q3uOMS9E/Iswv68=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Abx/SiG0OHZ+dkWUzpL8G4AWAgTYWaq/j8/nF4yUWulL3do1zRAEcORexN2OVxUtlcN1uyt0gEyr4xYI8aLfjM6HPyxjZenhSw7ysoYRWJjSDEBCjENq50dRum41SvEKCH4awtIt4JOkn4YLV2QMj0I+HHD+T+QHcBCJ3xshMV0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U5znAiHs; arc=pass smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9BE6BFCE;
+	Wed, 21 Jan 2026 09:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768987073; cv=none; b=FLjYUmlYMcxXoOxDG5TGCetkkDY/tIjnE2AB9jBPOkiQNiDxc2X0qfMny8ldiGaI/TOW98f3bzioMD7c16gsheBJnk4rTsV8xei1fuvqe8+ZSNY6+QuHFfZET5S6OvG5vSHcrNlOWUexW5V5PU0uwjzITOU0zy59iFTuz1rVgqA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768987073; c=relaxed/simple;
+	bh=zw5vJ+ZC4/w8uoZ94zfN7TTnawq76kDFNZ0VoHKbhx0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JwnhuGVwy3Zi/UA+sS/mbpp5Y2RU8yIwuPCr8FrUKXOxkHq5Vag8DaYDfrXUxOmD8dt1GpKRkEKFtXhntXWuvscYbyNqBk0kdaTRSv28MmW6H1vgQVVSsZKgpFm0t7GIXFTNhTxa+UCJgLcLa9V6yDJGfcaeleBc8m2ET4tyoKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dL4371OF; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U5znAiHs"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-658072a4e56so2377210a12.0
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Jan 2026 20:46:17 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768970776; cv=none;
-        d=google.com; s=arc-20240605;
-        b=McJkdrYEpV4GZmSxpzohXwxXOWR4f2nNzec9IAeGvz6v72JONQdm20+LtXk3rJd/vD
-         I3kEcQmfnJ8Q8g3HkWg+07r/2F6k7zmQK8qaqca9zfeoyfZ1aatM/y47I6sj8iXwkBCB
-         vTF4bvhIFlqJ6INyEJLgqaeheyltISPGtGNJO0rzVfpmjD5vutxDVDM8ESYrF4B/zs37
-         5hSp37hHYCMhwaNaYMrEwQY9dvUgK/Wm+exYRRKEZfiCPCgyYdE7JYrpHRfY3EgFAX9Q
-         J0tjQIV2e4CNzso3WUhcxWloGgo/pN+lXJbzPx8FGjuh8x9lmRVxAb8mjMX1QRPWZTKx
-         5OJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=inFuWc3Vso60kcBd09IUR5CK0wb0W76w6o0BhvM17mo=;
-        fh=RqTa0eh/O6oIjzxnOQBsiZlmbu9yuXjiRpUfV9QsEWU=;
-        b=cyvaMYpY36s8WUcR3ra60emFbGtER3cm0kId7ESzBjnrTIQzawy59+nlpS37NC1mPy
-         pyB5vknYjN5ku4K8WpBft9VJMewdMKpbuzDwQVW/lE4ZQRqUnrgMDl/G4tkR79arpUP/
-         9VI4wxDW9xZ9wxlJLyHL6lBOWNIDIgUVPK9FXll7/bKIj1Nc2AZvqCSuDKZp2qn2OdCr
-         iiUN7lAvkn6T9WTCnB4Ok1HfJXhUj2xUshIs9kq4e4xOSmjRji0evJQz8uhCO3k95Tmu
-         0xoID8z/Cal1JJFY1ttGXS5q1yOraxabBtD70Ose95IcuwWKmpwJpsdBTH5AN7WD4N/x
-         NeWA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768970776; x=1769575576; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=inFuWc3Vso60kcBd09IUR5CK0wb0W76w6o0BhvM17mo=;
-        b=U5znAiHszD7YyRtJP1fEQcNV9QDJtk+Z95gsSb1OLTtqDr1KbXG21PaNlnAP7k/Syd
-         xra1fdN/0jv4+IXzOU1kHKjwPgEg5Laa7K36nRQOI09OaJHDLLTGdtjYf8dRKCfBLc53
-         Dx/LgkZyBP+asMjfAFPFpAD9f8T5P0OO2wKu10tq56/DVhax0UAsjFGpllpJlgMWJOmR
-         AVKHf8cwlbq0BfAi6qvOU6ROdd8PdPNnZ0imsb5VrT0toJtg0LAPbltRc5MRQiiWPOLh
-         WkXUrbhu5gdbbXXH/xVyQyR8CN4Wk+Mv0+vPEe4QQrUYYNHBRv+2v4yYyvL6oXDtaCEv
-         k/AA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768970776; x=1769575576;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=inFuWc3Vso60kcBd09IUR5CK0wb0W76w6o0BhvM17mo=;
-        b=ASKBeD2v89/GUM5iIYJnGOoP/aVbPWbhxeFz0pdN7WuvuJtss/Pz6OQ3e/JNbvXnYf
-         ynpd4L4CTRufgIbe8kmpwGJ29y9vDwK3WYjz8ZWLGEir+H8oIPZBL51rpWDpSkh8ZlS0
-         m2RJST0pIRvQsiPXw6ZDKWf5+iyG86bDjgYBnCGLEx5aWTFMhJE5Rca19Bz7L16PkfXY
-         fhQDaAWoZsSfN375R2sjF6DcAta3HGeM39Vr+6cJBQy64jGHhUpxIqcYUpK2/Bd1fSMC
-         L6ZIjjfyfaqvAYOkPGqe1qIUZlSWE4xdeuLWxoGL1fS35iB/VuXalsoBFHWlISwTglHG
-         ovgA==
-X-Gm-Message-State: AOJu0Ywr38AW+QVHLWd9nsXXRafeK3PFxVvdEnKryAmJr8Hb2EKWCMMp
-	86nxlA40/WjlIZOBMdT/WSDNmOHTZPv+G3YK40t65JyEe9KX0zYBthI6n/r+y5JJLMP8lDcWa4Y
-	zrwPpI+P8oAzzdV2MYGMzu+crJc4d0Aw=
-X-Gm-Gg: AY/fxX6skOWNZx+85Q+mppTYO0+tt0DUNzTdrPSBq6JV4n9NGS8c6VpT583p9hk2iqT
-	f/E4m/0mc6W8FA3xDiiTxCb38feZOFKK2/9QBVd7MrBWJHxi7bCCdajSXzyn3UJ3WIWNuNBvP2k
-	5rT9dFb22ICSPa03+N/8F/jPoO4Lo0VKR3QFcn4USNpxOZaXEEfZsaaLhaPA9ODD8EVMdlJ4Mgk
-	HRl4Ux6ZHmV0UMuducaH7u6rvPDgfAfpUeUqbtSEHWhyU+6nuiw2uatEU08yRYK4731Qw==
-X-Received: by 2002:a17:907:a41:b0:b86:f558:ecaa with SMTP id
- a640c23a62f3a-b8792dc7e5amr1611210566b.27.1768970776196; Tue, 20 Jan 2026
- 20:46:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dL4371OF"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=QMRVjotEayLOv8XTxaxuE0M55enKBYtQeaeNcrACLfc=; b=dL4371OFHyaeDBmxzj7GOgrMx3
+	3K3xbidZALqODJsAS8whqERF7Cf9V7Fo7hOwrsqaJ52l4+3LZ3NOo6ToaJTvHKZRqcoXdeIkI5i2Y
+	/IGCwCDyqZvkKB3vxuq/jXLgMBASekbT7z2m5uG7UV6Z1vT7LxO5FNkuYsqXQ65ggC8pblORDhMxn
+	g88h/3uSdhW32hsFMLKV41gZ2EzUh0QwXmfBFzhtXFBCIM8iZiBvymXdqRapwUqUsREyNCfkJfKnN
+	emlY1xCH7+a+KdQVe/KemipvA79Ca3KD2ZAnJ6dAOXDUOz1nqP1FfvsKk+szaZfJ4qnOmyQQriS0o
+	bmhS62CA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1viUKw-00000005AiH-18Yv;
+	Wed, 21 Jan 2026 09:17:14 +0000
+Date: Wed, 21 Jan 2026 01:17:14 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Christoph Hellwig <hch@infradead.org>, Jeff Layton <jlayton@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	Hugh Dickins <hughd@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Theodore Ts'o <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
+	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
+	Sandeep Dhavale <dhavale@google.com>,
+	Hongbo Li <lihongbo22@huawei.com>,
+	Chunhai Guo <guochunhai@vivo.com>, Carlos Maiolino <cem@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Alex Markuze <amarkuze@redhat.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>, Chris Mason <clm@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	Luis de Bethencourt <luisbg@kernel.org>,
+	Salah Triki <salah.triki@gmail.com>,
+	Phillip Lougher <phillip@squashfs.org.uk>,
+	Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	Mike Marshall <hubcap@omnibond.com>,
+	Martin Brandenburg <martin@omnibond.com>,
+	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>, Dave Kleikamp <shaggy@kernel.org>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Richard Weinberger <richard@nod.at>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	David Laight <david.laight.linux@gmail.com>,
+	Dave Chinner <david@fromorbit.com>, linux-nfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-ext4@vger.kernel.org,
+	linux-erofs@lists.ozlabs.org, linux-xfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-unionfs@vger.kernel.org, devel@lists.orangefs.org,
+	ocfs2-devel@lists.linux.dev, ntfs3@lists.linux.dev,
+	linux-nilfs@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
+	linux-mtd@lists.infradead.org, gfs2@lists.linux.dev,
+	linux-f2fs-devel@lists.sourceforge.net, linux-doc@vger.kernel.org,
+	steve@digidescorp.com
+Subject: Re: [PATCH v2 02/31] exportfs: add new EXPORT_OP_STABLE_HANDLES flag
+Message-ID: <aXCZmmBRSJR3ftHn@infradead.org>
+References: <20260119-exportfs-nfsd-v2-0-d93368f903bd@kernel.org>
+ <20260119-exportfs-nfsd-v2-2-d93368f903bd@kernel.org>
+ <aW8ztQ-RbhxwzMk7@infradead.org>
+ <56fr33ju43h6zzp6jrzrkyfag6r3jz6wpnk45oe5byy6fqyvti@d43hgikfuk7t>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260120062152.628822-1-sprasad@microsoft.com>
- <20260120062152.628822-4-sprasad@microsoft.com> <CAH2r5mvKYsepPBqi8f0P6KXZBuov4L6EdCx9vac7u7t7e953qQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mvKYsepPBqi8f0P6KXZBuov4L6EdCx9vac7u7t7e953qQ@mail.gmail.com>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Wed, 21 Jan 2026 10:16:04 +0530
-X-Gm-Features: AZwV_QgOA1v6C6lQxCK5FctJE-2InQZugONitIE14Ank37_BDsLY_9f239baSNE
-Message-ID: <CANT5p=qQ7Sxhiu5HAFqveM8sLvy2RG_gjC_zcuitxoeD5Er0-Q@mail.gmail.com>
-Subject: Re: [PATCH 4/4] cifs: make retry logic in read/write path consistent
- with other paths
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, bharathsm@microsoft.com, 
-	dhowells@redhat.com, Shyam Prasad N <sprasad@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <56fr33ju43h6zzp6jrzrkyfag6r3jz6wpnk45oe5byy6fqyvti@d43hgikfuk7t>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Jan 21, 2026 at 7:26=E2=80=AFAM Steve French <smfrench@gmail.com> w=
-rote:
->
-> Checkpatch flagged this with minor warning. Let me know if you do
-> updated version of it
->
-> 0004-cifs-make-retry-logic-in-read-write-path-consistent-.patch
-> ------------------------------------------------------------------------
-> WARNING: else is not generally useful after a break or return
-> #64: FILE: fs/smb/client/smb2pdu.c:4629:
-> + break;
-> + } else
->
-> total: 0 errors, 1 warnings, 138 lines checked
+On Tue, Jan 20, 2026 at 09:40:07AM +0100, Jan Kara wrote:
+> (with explanations before I couldn't quite see the difference between shmem
+> and kernfs). I'd note that fat or shmem (which are both exportable)
+> satisfy this only with reasonably high probability as they use
+> get_random_u32() for initializing their i_generation but I guess it's as
+> good as it gets for them.
 
-I saw that too Steve. I'll submit a v2 patch for this.
+For tmpfs random generations are as good as it gets, in fact that's what
+XFS starts with when allocating new inode clusters (which could have
+previous been used for for inodes as well).
 
->
-> On Tue, Jan 20, 2026 at 12:22=E2=80=AFAM <nspmangalore@gmail.com> wrote:
-> >
-> > From: Shyam Prasad N <sprasad@microsoft.com>
-> >
-> > Today in most other code paths in cifs.ko, the decision of whether
-> > to retry a command depends on two mount options: retrans and hard.
-> > However, the read/write code paths diverged from this and would only
-> > retry if the error returned was -EAGAIN. However, there are other
-> > replayable errors in cifs.ko, for which is_replayable_errors helper
-> > was written. This change makes read/write codepaths consistent with
-> > other code-paths.
-> >
-> > This change also does the following:
-> > 1. The SMB2 read/write code diverged significantly (presumably since
-> > they were changed during netfs refactor at different times). This
-> > changes the response verification logic to be consistent.
-> > 2. Moves the netfs tracepoints to slightly different locations in order
-> > to make debugging easier.
-> >
-> > Cc: David Howells <dhowells@redhat.com>
-> > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> > ---
-> >  fs/smb/client/cifsglob.h |  2 ++
-> >  fs/smb/client/smb2pdu.c  | 70 +++++++++++++++++++++++++++++++---------
-> >  2 files changed, 56 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> > index 3eca5bfb70303..f6ebd3fd176d7 100644
-> > --- a/fs/smb/client/cifsglob.h
-> > +++ b/fs/smb/client/cifsglob.h
-> > @@ -1507,6 +1507,8 @@ struct cifs_io_subrequest {
-> >         int                             result;
-> >         bool                            have_xid;
-> >         bool                            replay;
-> > +       unsigned int                    retries;        /* number of re=
-tries so far */
-> > +       unsigned int                    cur_sleep;      /* time to slee=
-p before replay */
-> >         struct kvec                     iov[2];
-> >         struct TCP_Server_Info          *server;
-> >  #ifdef CONFIG_CIFS_SMB_DIRECT
-> > diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> > index 5d57c895ca37a..89f728392a734 100644
-> > --- a/fs/smb/client/smb2pdu.c
-> > +++ b/fs/smb/client/smb2pdu.c
-> > @@ -4616,17 +4616,19 @@ smb2_readv_callback(struct TCP_Server_Info *ser=
-ver, struct mid_q_entry *mid)
-> >         case MID_RESPONSE_RECEIVED:
-> >                 credits.value =3D le16_to_cpu(shdr->CreditRequest);
-> >                 credits.instance =3D server->reconnect_instance;
-> > -               /* result already set, check signature */
-> > -               if (server->sign && !mid->decrypted) {
-> > -                       int rc;
-> > +               rdata->result =3D smb2_check_receive(mid, server, 0);
-> > +               if (rdata->result !=3D 0) {
-> > +                       rdata->subreq.error =3D rdata->result;
-> > +                       if (is_replayable_error(rdata->result)) {
-> > +                               trace_netfs_sreq(&rdata->subreq, netfs_=
-sreq_trace_io_req_submitted);
-> > +                               __set_bit(NETFS_SREQ_NEED_RETRY, &rdata=
-->subreq.flags);
-> > +                       } else {
-> > +                               trace_netfs_sreq(&rdata->subreq, netfs_=
-sreq_trace_io_bad);
-> > +                       }
-> > +                       break;
-> > +               } else
-> > +                       trace_netfs_sreq(&rdata->subreq, netfs_sreq_tra=
-ce_io_progress);
-> >
-> > -                       iov_iter_truncate(&rqst.rq_iter, rdata->got_byt=
-es);
-> > -                       rc =3D smb2_verify_signature(&rqst, server);
-> > -                       if (rc)
-> > -                               cifs_tcon_dbg(VFS, "SMB signature verif=
-ication returned error =3D %d\n",
-> > -                                        rc);
-> > -               }
-> > -               /* FIXME: should this be counted toward the initiating =
-task? */
-> >                 task_io_account_read(rdata->got_bytes);
-> >                 cifs_stats_bytes_read(tcon, rdata->got_bytes);
-> >                 break;
-> > @@ -4748,7 +4750,7 @@ smb2_async_readv(struct cifs_io_subrequest *rdata=
-)
-> >         rc =3D smb2_new_read_req(
-> >                 (void **) &buf, &total_len, &io_parms, rdata, 0, 0);
-> >         if (rc)
-> > -               return rc;
-> > +               goto out;
-> >
-> >         if (smb3_encryption_required(io_parms.tcon))
-> >                 flags |=3D CIFS_TRANSFORM_REQ;
-> > @@ -4795,6 +4797,17 @@ smb2_async_readv(struct cifs_io_subrequest *rdat=
-a)
-> >
-> >  async_readv_out:
-> >         cifs_small_buf_release(buf);
-> > +
-> > +out:
-> > +       /* if the send error is retryable, let netfs know about it */
-> > +       if (is_replayable_error(rc) &&
-> > +           smb2_should_replay(tcon,
-> > +                              &rdata->retries,
-> > +                              &rdata->cur_sleep)) {
-> > +               trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_re=
-try_needed);
-> > +               __set_bit(NETFS_SREQ_NEED_RETRY, &rdata->subreq.flags);
-> > +       }
-> > +
-> >         return rc;
-> >  }
-> >
-> > @@ -4908,14 +4921,20 @@ smb2_writev_callback(struct TCP_Server_Info *se=
-rver, struct mid_q_entry *mid)
-> >
-> >         switch (mid->mid_state) {
-> >         case MID_RESPONSE_RECEIVED:
-> > -               trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_pr=
-ogress);
-> >                 credits.value =3D le16_to_cpu(rsp->hdr.CreditRequest);
-> >                 credits.instance =3D server->reconnect_instance;
-> >                 result =3D smb2_check_receive(mid, server, 0);
-> >                 if (result !=3D 0) {
-> > -                       trace_netfs_sreq(&wdata->subreq, netfs_sreq_tra=
-ce_io_bad);
-> > +                       if (is_replayable_error(result)) {
-> > +                               trace_netfs_sreq(&wdata->subreq, netfs_=
-sreq_trace_io_req_submitted);
-> > +                               __set_bit(NETFS_SREQ_NEED_RETRY, &wdata=
-->subreq.flags);
-> > +                       } else {
-> > +                               wdata->subreq.error =3D result;
-> > +                               trace_netfs_sreq(&wdata->subreq, netfs_=
-sreq_trace_io_bad);
-> > +                       }
-> >                         break;
-> > -               }
-> > +               } else
-> > +                       trace_netfs_sreq(&wdata->subreq, netfs_sreq_tra=
-ce_io_progress);
-> >
-> >                 written =3D le32_to_cpu(rsp->DataLength);
-> >                 /*
-> > @@ -4930,7 +4949,7 @@ smb2_writev_callback(struct TCP_Server_Info *serv=
-er, struct mid_q_entry *mid)
-> >                 cifs_stats_bytes_written(tcon, written);
-> >
-> >                 if (written < wdata->subreq.len) {
-> > -                       wdata->result =3D -ENOSPC;
-> > +                       result =3D -ENOSPC;
-> >                 } else if (written > 0) {
-> >                         wdata->subreq.len =3D written;
-> >                         __set_bit(NETFS_SREQ_MADE_PROGRESS, &wdata->sub=
-req.flags);
-> > @@ -4972,6 +4991,7 @@ smb2_writev_callback(struct TCP_Server_Info *serv=
-er, struct mid_q_entry *mid)
-> >         }
-> >  #endif
-> >         if (result) {
-> > +               wdata->result =3D result;
-> >                 cifs_stats_fail_inc(tcon, SMB2_WRITE_HE);
-> >                 trace_smb3_write_err(wdata->rreq->debug_id,
-> >                                      wdata->subreq.debug_index,
-> > @@ -4994,6 +5014,14 @@ smb2_writev_callback(struct TCP_Server_Info *ser=
-ver, struct mid_q_entry *mid)
-> >                               server->credits, server->in_flight,
-> >                               0, cifs_trace_rw_credits_write_response_c=
-lear);
-> >         wdata->credits.value =3D 0;
-> > +
-> > +       /* see if we need to retry */
-> > +       if (is_replayable_error(wdata->result) &&
-> > +           smb2_should_replay(tcon,
-> > +                              &wdata->retries,
-> > +                              &wdata->cur_sleep))
-> > +               wdata->replay =3D true;
-> > +
-> >         cifs_write_subrequest_terminated(wdata, result ?: written);
-> >         release_mid(server, mid);
-> >         trace_smb3_rw_credits(rreq_debug_id, subreq_debug_index, 0,
-> > @@ -5112,7 +5140,7 @@ smb2_async_writev(struct cifs_io_subrequest *wdat=
-a)
-> >         }
-> >  #endif
-> >
-> > -       if (wdata->subreq.retry_count > 0)
-> > +       if (wdata->replay)
-> >                 smb2_set_replay(server, &rqst);
-> >
-> >         cifs_dbg(FYI, "async write at %llu %u bytes iter=3D%zx\n",
-> > @@ -5159,6 +5187,16 @@ smb2_async_writev(struct cifs_io_subrequest *wda=
-ta)
-> >  async_writev_out:
-> >         cifs_small_buf_release(req);
-> >  out:
-> > +       /* if the send error is retryable, let netfs know about it */
-> > +       if (is_replayable_error(rc) &&
-> > +           smb2_should_replay(tcon,
-> > +                              &wdata->retries,
-> > +                              &wdata->cur_sleep)) {
-> > +               wdata->replay =3D true;
-> > +               trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_re=
-try_needed);
-> > +               __set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
-> > +       }
-> > +
-> >         if (rc) {
-> >                 trace_smb3_rw_credits(wdata->rreq->debug_id,
-> >                                       wdata->subreq.debug_index,
-> > --
-> > 2.43.0
-> >
->
->
-> --
-> Thanks,
->
-> Steve
+fat on the other hand looks broken, as it also set a new generation when
+reading inodes from disk.  So I don't think fat should be nfs exportable,
+even if the export ops predate other uses.
 
-
-
---=20
-Regards,
-Shyam
