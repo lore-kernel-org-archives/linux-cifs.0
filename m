@@ -1,47 +1,48 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D775535D61C;
-	Thu, 22 Jan 2026 17:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2D834F466;
+	Thu, 22 Jan 2026 17:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769102292; cv=none; b=MykF92+9ptDls56fcvh3FixwRxmdKDbtZdsDZZwp0lRfgmrl1gXEvbyarR74H8eOlWKA/09gpwGSmUw42eRGpwsQ6YHyWFnDhKaq7KUj+znt6bFGevCyIOlwU+E8/WGSLMurVZI5wW1QPfapgQjgg8/sXFzky9I4BkTxkI4ly6A=
+	t=1769102293; cv=none; b=G91zZBE4NfoMlhpl9ZPOxseS5voNgwszLiFbHrMbjQQZgt+mLTOnOcIoQnaSQu2JRDHLSOcteBKIjU13SJ4dWeJbI/Vc5njtSE7X9uzvfQiF8DrE1w9fh8ELPzXiPccIjGoh4qzLa+WRCcoscH5mFcxpoYmFvtVZBDUEnIlJx20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769102292; c=relaxed/simple;
-	bh=gmjBqouVgAjoAW0cNpWPDmIehLwQZ78Jn2P6G6dkHmQ=;
+	s=arc-20240116; t=1769102293; c=relaxed/simple;
+	bh=250cL9+9NqqZNgobs8NbfoXmqisn0ETolzUz0eJ/6fE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CJtSefHkkm1EGCP8cCbgBMCn3Zj7aujdTJyxYjMXaW0NpzDRJat0uH9s3BU2vQylGYovxO5OCDkyPaWwJ++UOEFwkxaj8ENIrD/QbmlwHpXSkToM/xUZsqvz0epifhK5369k4SbTXExRRLorQPSbjMyh5zUeUb7Z9GTKEqq4gGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=O/KAP8Da; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=kmbecJ8aN3wyv7vBFutJXvetPdvP4wlF0euQ9h0jcG4VPNU8ZkoiHU++NCB2RfwFJ1rQjf6gX6IYs8t528jKwzLhKNB0nO5uJxFGGr9Ax5joL26Tf2QVv0BbcUIg1dh3nO92jZDNbAXEVxU3Jvb9AnKZEiC5sgE2REdox17L1Tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=inCslENd; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="O/KAP8Da"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="inCslENd"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=d08UIbiLZxlISyTqKx4cxuO+hj/eYNMSbUnKWLaqiCY=; b=O/KAP8DaO31h7pXleJqa8R/180
-	kZ6SauP4cP2r3sQW7LviFNGWHvsV9pJ/L1YQezo3uwW9oxpxSZVJELjZLpkQfrGJ1D9xRsL7P3aJe
-	mMH1NjsEFShc7V8Qq1SR0Xy4csKHbQvnasYT5C7EjLqa55++jfULHtcCkPCe8KGoXlKjy9Wun8Kxj
-	RX3e5IcrQSD0xPzUE9UyjDjerEHlEsfU3ksjAbJyQV6/AirSlXfdVa8wntaFYYPnmoilGRQjAYGC0
-	IaLQETF1ljDbLrTSPWdp4GmlpYLCzBajctGa4N9Wo88sCBFnuhupWjqtujitEgAj1AMp96X3chqKN
-	Rd24vJfjh44BtVNkQ6r4DM1lK12EiHOQTng+k0G/YMnDMqRbT1YVq+Qdpb+QEP1hELQVrRnoge6vz
-	e1KiVj445+dXwz7MPDWUZaDCECLTtfxEyiTx/SoA29tPNYMZI8T/c6HsAZrHMTC/KuUBYCGTBWmwg
-	kjGVksxhbjfKNsOw895crBb3;
+	bh=Cu3s3UVqlV3jXo4mNPjEzR4+choiioBXbWumx2VvZuw=; b=inCslENdETQKb3AMUImXAp8tyt
+	8iJX2pDU3KyJMhSEq1cDmLtIbDFn3octzavQK1OLjl3f8doWv2i3RzwkDw72caStV9d4misoIJFOv
+	oDA2faIL3Fz2a8IXPTuMw5rBi/44AOSsAnEKxUatLKQSkSMd+n7NK5PzdIZ8JjmBJIEDx5EXwHlqP
+	hoB7XtgAxkR3DOM/Mal27kYMGxkuJJkoIUyDcqo5Q3Q0qJq4GOaPmdIXkYil6d57feju9H7PpZW24
+	iG695p5UzV+dxfzevRxwUBEAe9blJxKaccTY8t+ndPer1IFJbENzWvr0nBfTglMAdDi8ubjEDFfo1
+	Jp3rnpW+bXD/+/qGkxc1Oh4g58fhCWCR8lr0YNYEvdwnY84nqRdru3XV/NHVmTkiCkKStt/6Zlqvl
+	p2Ni4K+pk5eCtm8CVTPf2nueXKzdx+DQhGCRUnlJMvkHd08jXTLzbc0CfwrrEVuwco7g+YRf16IyE
+	0ZW/B3W2gJ4BgkXHbG4/Wp0Y;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1viyJZ-00000001pla-2UNW;
-	Thu, 22 Jan 2026 17:17:49 +0000
+	id 1viyJl-00000001pof-0weW;
+	Thu, 22 Jan 2026 17:18:01 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
 Cc: metze@samba.org,
 	stable@vger.kernel.org,
-	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>
-Subject: [PATCH v2 07/20] smb: server: let send_done handle a completion without IB_SEND_SIGNALED
-Date: Thu, 22 Jan 2026 18:16:47 +0100
-Message-ID: <6f1ab798f3584ee2da3eaf34d4c8a744f8187b54.1769101771.git.metze@samba.org>
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH v2 09/20] smb: client: let recv_done() queue a refill when the peer is low on credits
+Date: Thu, 22 Jan 2026 18:16:49 +0100
+Message-ID: <004a666f07d6058731489f9565bcbaab512e76ab.1769101771.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1769101771.git.metze@samba.org>
 References: <cover.1769101771.git.metze@samba.org>
@@ -53,69 +54,58 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With smbdirect_send_batch processing we likely have requests without
-IB_SEND_SIGNALED, which will be destroyed in the final request
-that has IB_SEND_SIGNALED set.
+In captures I saw that Windows was granting 191 credits in a batch
+when its peer posted a lot of messages. We are asking for a
+credit target of 255 and 191 is 252*3/4.
 
-If the connection is broken all requests are signaled
-even without explicit IB_SEND_SIGNALED.
+So we also use that logic in order to fill the
+recv buffers available to the peer.
 
+Fixes: 02548c477a90 ("smb: client: queue post_recv_credits_work also if the peer raises the credit target")
 Cc: <stable@vger.kernel.org> # 6.18.x
-Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/transport_rdma.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ fs/smb/client/smbdirect.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 6c063c05a6ed..541e51a7c0ce 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -1059,6 +1059,31 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 		    ib_wc_status_msg(wc->status), wc->status,
- 		    wc->opcode);
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 6679abbb9797..61693b4a83fc 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -663,6 +663,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 		container_of(wc->wr_cqe, struct smbdirect_recv_io, cqe);
+ 	struct smbdirect_socket *sc = response->socket;
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
++	int current_recv_credits;
+ 	u16 old_recv_credit_target;
+ 	u32 data_offset = 0;
+ 	u32 data_length = 0;
+@@ -747,7 +748,8 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 		}
  
-+	if (unlikely(!(sendmsg->wr.send_flags & IB_SEND_SIGNALED))) {
-+		/*
-+		 * This happens when smbdirect_send_io is a sibling
-+		 * before the final message, it is signaled on
-+		 * error anyway, so we need to skip
-+		 * smbdirect_connection_free_send_io here,
-+		 * otherwise is will destroy the memory
-+		 * of the siblings too, which will cause
-+		 * use after free problems for the others
-+		 * triggered from ib_drain_qp().
-+		 */
-+		if (wc->status != IB_WC_SUCCESS)
-+			goto skip_free;
+ 		atomic_dec(&sc->recv_io.posted.count);
+-		atomic_dec(&sc->recv_io.credits.count);
++		current_recv_credits = atomic_dec_return(&sc->recv_io.credits.count);
 +
-+		/*
-+		 * This should not happen!
-+		 * But we better just close the
-+		 * connection...
-+		 */
-+		pr_err("unexpected send completion wc->status=%s (%d) wc->opcode=%d\n",
-+		       ib_wc_status_msg(wc->status), wc->status, wc->opcode);
-+		smb_direct_disconnect_rdma_connection(sc);
-+		return;
-+	}
-+
- 	/*
- 	 * Free possible siblings and then the main send_io
- 	 */
-@@ -1072,6 +1097,7 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 	lcredits += 1;
+ 		old_recv_credit_target = sc->recv_io.credits.target;
+ 		sc->recv_io.credits.target =
+ 			le16_to_cpu(data_transfer->credits_requested);
+@@ -783,7 +785,8 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 		 * reassembly queue and wake up the reading thread
+ 		 */
+ 		if (data_length) {
+-			if (sc->recv_io.credits.target > old_recv_credit_target)
++			if (current_recv_credits <= (sc->recv_io.credits.target / 4) ||
++			    sc->recv_io.credits.target > old_recv_credit_target)
+ 				queue_work(sc->workqueue, &sc->recv_io.posted.refill_work);
  
- 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
-+skip_free:
- 		pr_err("Send error. status='%s (%d)', opcode=%d\n",
- 		       ib_wc_status_msg(wc->status), wc->status,
- 		       wc->opcode);
+ 			enqueue_reassembly(sc, response, data_length);
 -- 
 2.43.0
 
