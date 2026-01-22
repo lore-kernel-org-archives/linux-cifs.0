@@ -1,74 +1,49 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B825A349B00
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Jan 2026 02:10:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+Received: from n169-111.mail.139.com (n169-111.mail.139.com [120.232.169.111])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C74030DD01;
+	Thu, 22 Jan 2026 03:46:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769047852; cv=none; b=mwhPzkBSk9WmneFSdQtIiwxy7p5rNOq16iRm41ZIUCugqzSWnjtjE8kViXVWSbPpmGDAXnGAT767zQTx32VcQ2gqc7/bXGrH/0y8Kh/2x6HrjV+6FXpTHw0Yihm5I3QZY47ovMZgUXwosSHGOQKhnRXctcwANxxd0kFYlrEtTyk=
+	t=1769053598; cv=none; b=nntF2HJUUG0ocuFV42fx8e7gABb73SlWHJNi5IoEZVkybMhp8Sl8Ikk2vIm20TVaEaKW2lS+xZnPcxWAcD5L6/eZzu3GFW9kzcY502SV3oQxM/fF88FTWQe7s5hyVHEQA5iBlsBrfiuBuGY9bhdUgq3Jeq/K2a1ZNUwvzkhJ5wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769047852; c=relaxed/simple;
-	bh=G66EWuJIRf3dPEbAum1+c7XXWoBPspYm0WKrtwIzvEE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hpcGLUMclrQdYycY2Q3u2kkbqY6k5eWuz1Syzq+rwkUM0shqLpcFHK/kdQdzpPvOqaVm54PO6xGT6TYueH2XiymqhlxL8azFWABCEKMS2Pp1b+UjGuyLCItiVpQXLnJraidkhZw+L0vkQa2vnOAZZ0EWpxvR/Yo7vkS8Di6KvTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ec0og6xl; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1769053598; c=relaxed/simple;
+	bh=g744lz6iU9xFRdnsnHyyhaVQs6SpUU91JT0OadSyyg0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=j90a5B0L9PhChCOn9q0WWxqQq58VNhXO5uk90cjbtagAHIB3cqIOWYA3VKS66bKln4mtATpWvK0wihRxX4c9vbQofUFJ+sLL6xR4Sitv9wPzmsCpomMZwLiWRrsQXyjdpcK6UPBZBFpXZg7cZD6sFwpy6qfnf+CBSspsbC+QCuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=Iy5h1HxG; arc=none smtp.client-ip=120.232.169.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ec0og6xl"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2a76f90872cso2594285ad.3
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Jan 2026 18:10:49 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="Iy5h1HxG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769047849; x=1769652649; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=U+v2634kVJ+SsDKjB7tM4SD9Z9ptuM0rR4tFrzs+qLY=;
-        b=Ec0og6xlVoYPyp3Hncmj458qx0jX3EM6gu8BfSbo9/DLHbih8kUu0/uD2PgKV5qrGZ
-         VAAcJnnqlEatqAiMSIDqnNKsME0cbZShTgySUxCgHoVddkW/T4J5dTN7xMvg8hvFkVr5
-         GJB387Z88mRM3oMl50iAZVWcE+6ypBX4C+2ain1Yy7k1V4UcZuPYZt+v0JMFJur5W6vM
-         fqecJ2y/lqlCKq6oZ6QxIwtYnJMnkBAHj3tTtAYjAIlKtC3CcBZtba/6udFc41Fcod6J
-         rZ/tTnhGNVRXz7eaT2WNZ+CQ2p7M7bbvIPoDHXi3xeDd6TTDH7gebiYC5yNF3nurEVqo
-         xwVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769047849; x=1769652649;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U+v2634kVJ+SsDKjB7tM4SD9Z9ptuM0rR4tFrzs+qLY=;
-        b=koadblaU/Ir++RSXq052bX59MHw7ujGKi4vOmCO6fe0XrB0hWz+9FOn2Q4xSROPL/+
-         AXAP1DnptTBHUVDUmuoMGalD8Vs8ke/z5qqwSNpT5dEm19xPv1jsH8r/kTPBCQrCeeo9
-         rGi5BfduSHq+znx4fjiQEFMk+udHwBZ/IGt6cKtpEgRwgNKP2uY4+J7ZHwrorN8IIgSD
-         gPTtATtsyIIqXSL4I7Vtq6/xgobhehP1b/5cVZMICcKNyRwD3kO6AT09prel+sRIWBBB
-         rF0Q7TIEJm+SBe082fXCkN3nAa/1N0c0l+CW7rTGdq+Lg+0QhVCghhyPxYYGewPyvUCw
-         Ch7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUyXbN/nRV8XXbNy+M0wBeTQYhDuDhOR59n5E4DswWjnEDv3Vr7cHBUfruo9HqkKMV9BT8D9l9Ddkvk@vger.kernel.org
-X-Gm-Message-State: AOJu0YymbssDq/HrgzdC5ErnlZMyxSkOC4Gec+JVaupKAEg+vdcLY5tQ
-	SG4L1j6kssdpM82lDF9pufUuLoTR4mUegGF1Mp+UmSStkjnESa6rLK0=
-X-Gm-Gg: AZuq6aLUM10vRbKQD4t0qA1X1k67QGl3wO8xfI0spRzKyuE30WRkVKKNoFIMd7oAAAI
-	bMCf5363JceW4PCr1EZsUhuAp87wX9B5BZD4f7sfqmESUxDMJr/X5LY/qoxiiZ5KJYr7WxGS0uq
-	bwNx7c/B6XLFNwkz1C7zcXR06DCuxATflm4wRTO8CwSihph5ed5cWG7exWECMMUQYNgl2KUZQCO
-	MuSqiOundzVhLdtf6Iyh9kBWjsc0+t1yg1vgBK9HaqzfwfUKkA35BVcg2BIhsjMWw+DbNzzpOZR
-	v+ueXOio7gKwBQ/O7bmBnEec27Qz1DJUNpn8cglC8SRcH+vEX0y63l7l8q2hu8ibFvqzU9VkaOp
-	uH1fK4KY0wGYmGUPfipO6bVuSx5qnRollfc1w8DvMz2cLU5i9TVNk+WpYiWePEc/e17X0ceGdgb
-	ejkYv5ESg3JwlIFqA=
-X-Received: by 2002:a17:903:1ca:b0:295:ceaf:8d76 with SMTP id d9443c01a7336-2a71893cf55mr199951955ad.47.1769047848994;
-        Wed, 21 Jan 2026 18:10:48 -0800 (PST)
-Received: from DESKTOP-BKIPFGN ([38.76.140.13])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a7c975c386sm12590035ad.73.2026.01.21.18.10.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 18:10:48 -0800 (PST)
-From: Kery Qi <qikeyu2017@gmail.com>
-To: linkinjeon@kernel.org,
-	smfrench@gmail.com
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	mmakassikis@freebox.fr,
-	linux-cifs@vger.kernel.org,
+	d=139.com; s=dkim; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=Iy5h1HxGWG96b8PvFjSXUudZazlxfy+k67BEtqx1SLvLNMIwNSLE27Mu5FU7NFR39rK78mLfFQMQU
+	 M240QSrWo0WKBdlNq4Z06D4BtH9iAnKrROWn4bcOEebTj8myglpK6tehOaw1fX5wEfIKpjMIVXElcl
+	 fQWW2TO4PmxwCLug=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM:                                                                                        
+X-RM-SPAM-FLAG:00000000
+Received:from NTT-kernel-dev (unknown[60.247.85.88])
+	by rmsmtp-lg-appmail-17-12016 (RichMail) with SMTP id 2ef069719c9511d-0a1eb;
+	Thu, 22 Jan 2026 11:42:14 +0800 (CST)
+X-RM-TRANSID:2ef069719c9511d-0a1eb
+From: Rajani Kantha <681739313@139.com>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	linkinjeon@kernel.org
+Cc: patches@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	Kery Qi <qikeyu2017@gmail.com>
-Subject: [PATCH] ksmbd: validate DataOffset in smb2_write_pipe()
-Date: Thu, 22 Jan 2026 10:10:16 +0800
-Message-ID: <20260122021015.1954-2-qikeyu2017@gmail.com>
-X-Mailer: git-send-email 2.50.1.windows.1
+	senozhatsky@chromium.org,
+	sfrench@samba.org,
+	hyc.lee@gmail.com,
+	linux-cifs@vger.kernel.org,
+	pioooooooooip@gmail.com,
+	liuzhitong1993@gmail.com,
+	stfrench@microsoft.com
+Subject: [PATCH 5.15.y] ksmbd: fix use-after-free in ksmbd_tree_connect_put under concurrency
+Date: Thu, 22 Jan 2026 11:42:12 +0800
+Message-Id: <20260122034212.3111671-1-681739313@139.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -77,41 +52,105 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The check of DataOffset in smb2_write_pipe() is insufficient. If
-DataOffset is 0 or smaller than offsetof(struct smb2_write_req, Buffer),
-data_buf will point to the SMB2 header instead of the actual data
-buffer, leading to out-of-bounds read.
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-This is the same issue that was fixed in smb2_write() by commit
-ac60778b87e4 ("ksmbd: prevent out of bound read for SMB2_WRITE"),
-but the fix was not applied to smb2_write_pipe().
+[ Upstream commit b39a1833cc4a2755b02603eec3a71a85e9dff926 ]
 
-Add a check to ensure DataOffset is at least offsetof(struct
-smb2_write_req, Buffer) to prevent this issue.
+Under high concurrency, A tree-connection object (tcon) is freed on
+a disconnect path while another path still holds a reference and later
+executes *_put()/write on it.
 
-Fixes: 158a66b245739 ("ksmbd: validate length in smb2_write()")
-Signed-off-by: Kery Qi <qikeyu2017@gmail.com>
+Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Rajani Kantha <681739313@139.com>
 ---
- fs/smb/server/smb2pdu.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ fs/ksmbd/mgmt/tree_connect.c | 18 ++++--------------
+ fs/ksmbd/mgmt/tree_connect.h |  1 -
+ fs/ksmbd/smb2pdu.c           |  3 ---
+ 3 files changed, 4 insertions(+), 18 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 2fcd0d4d1fb0..1f1086023e74 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -6932,6 +6932,12 @@ static noinline int smb2_write_pipe(struct ksmbd_work *work)
- 		goto out;
+diff --git a/fs/ksmbd/mgmt/tree_connect.c b/fs/ksmbd/mgmt/tree_connect.c
+index d2c81a8a11dd..0b6847f04fcc 100644
+--- a/fs/ksmbd/mgmt/tree_connect.c
++++ b/fs/ksmbd/mgmt/tree_connect.c
+@@ -76,7 +76,6 @@ ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
+ 	tree_conn->t_state = TREE_NEW;
+ 	status.tree_conn = tree_conn;
+ 	atomic_set(&tree_conn->refcount, 1);
+-	init_waitqueue_head(&tree_conn->refcount_q);
+ 
+ 	ret = xa_err(xa_store(&sess->tree_conns, tree_conn->id, tree_conn,
+ 			      GFP_KERNEL));
+@@ -98,14 +97,8 @@ ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
+ 
+ void ksmbd_tree_connect_put(struct ksmbd_tree_connect *tcon)
+ {
+-	/*
+-	 * Checking waitqueue to releasing tree connect on
+-	 * tree disconnect. waitqueue_active is safe because it
+-	 * uses atomic operation for condition.
+-	 */
+-	if (!atomic_dec_return(&tcon->refcount) &&
+-	    waitqueue_active(&tcon->refcount_q))
+-		wake_up(&tcon->refcount_q);
++	if (atomic_dec_and_test(&tcon->refcount))
++		kfree(tcon);
+ }
+ 
+ int ksmbd_tree_conn_disconnect(struct ksmbd_session *sess,
+@@ -117,14 +110,11 @@ int ksmbd_tree_conn_disconnect(struct ksmbd_session *sess,
+ 	xa_erase(&sess->tree_conns, tree_conn->id);
+ 	write_unlock(&sess->tree_conns_lock);
+ 
+-	if (!atomic_dec_and_test(&tree_conn->refcount))
+-		wait_event(tree_conn->refcount_q,
+-			   atomic_read(&tree_conn->refcount) == 0);
+-
+ 	ret = ksmbd_ipc_tree_disconnect_request(sess->id, tree_conn->id);
+ 	ksmbd_release_tree_conn_id(sess, tree_conn->id);
+ 	ksmbd_share_config_put(tree_conn->share_conf);
+-	kfree(tree_conn);
++	if (atomic_dec_and_test(&tree_conn->refcount))
++		kfree(tree_conn);
+ 	return ret;
+ }
+ 
+diff --git a/fs/ksmbd/mgmt/tree_connect.h b/fs/ksmbd/mgmt/tree_connect.h
+index 6377a70b811c..bf47c3f65f03 100644
+--- a/fs/ksmbd/mgmt/tree_connect.h
++++ b/fs/ksmbd/mgmt/tree_connect.h
+@@ -32,7 +32,6 @@ struct ksmbd_tree_connect {
+ 	int				maximal_access;
+ 	bool				posix_extensions;
+ 	atomic_t			refcount;
+-	wait_queue_head_t		refcount_q;
+ 	unsigned int			t_state;
+ };
+ 
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index c0b5985701bf..b4a1aa1bc960 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -2169,7 +2169,6 @@ int smb2_tree_disconnect(struct ksmbd_work *work)
+ 		goto err_out;
  	}
  
-+	if (le16_to_cpu(req->DataOffset) <
-+	    offsetof(struct smb2_write_req, Buffer)) {
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
- 	data_buf = (char *)(((char *)&req->hdr.ProtocolId) +
- 			   le16_to_cpu(req->DataOffset));
+-	WARN_ON_ONCE(atomic_dec_and_test(&tcon->refcount));
+ 	tcon->t_state = TREE_DISCONNECTED;
+ 	write_unlock(&sess->tree_conns_lock);
  
+@@ -2179,8 +2178,6 @@ int smb2_tree_disconnect(struct ksmbd_work *work)
+ 		goto err_out;
+ 	}
+ 
+-	work->tcon = NULL;
+-
+ 	rsp->StructureSize = cpu_to_le16(4);
+ 	err = ksmbd_iov_pin_rsp(work, rsp,
+ 				sizeof(struct smb2_tree_disconnect_rsp));
 -- 
 2.34.1
+
 
