@@ -1,48 +1,47 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55B038A704;
-	Thu, 22 Jan 2026 17:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90EFC36D4E2;
+	Thu, 22 Jan 2026 17:17:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769102252; cv=none; b=bkfBaqCnZrDXM7lmYmlQA1aGwVwRct2uk/Y5fmiqXlqPC2JWH9SCHZJ0xqWl8TFKyzH6tJpjsay1Gn5wOiWFGKRcHE42u+iqWo+6M942DugOJ54bEsY3ZFs+vSx+mJwp9xg+1666bHSy5IqQ49jXKJ5oFPfh4XKo+BUWp8eNQIQ=
+	t=1769102260; cv=none; b=oaa2xreUCVK5iKCMLSLh+d+GjmYmaO5xOquLCgjNKATRLWm7DltQwo4LGYRWfsj/bMbeK+4RT2mEyc2OHRZs7nLy9GvvLx9jz816NCaprTz4Qu7qEzNTC1ne18iBiDn8SgR+sp9yC4lH3CNyPY7nn556UHYa9qbrg43vDYUYM1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769102252; c=relaxed/simple;
-	bh=wHrHAh9qAYZKlLsJaVkNP46Ozl070JWNB04EUoTPRhA=;
+	s=arc-20240116; t=1769102260; c=relaxed/simple;
+	bh=CdNDbKrKi0sLQRDTf5m4+2lDaEM79mJU6UQjQhNWHp0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EbA+jk6IsjRIarpC9QAmLBpZkgVYEm24RWerunhZB8ijUdAktxJya8Xky9F3j2v1DW3275YfrHzInjM0koXFr/X4w1zd1ux2J/xtsJwfEol3pnWJVqZSL/8Z/HVrZozN0WEgD3RkR81LU7wU9jQVZX/7dcGAsgIWfWR7Ybb5/X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=KA/yPfd9; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=JeNVY/CWB9HD6GDw3RwHoVGA3yhPYvpbvyM2bj6zWT6uCr5LnGWkPtgTgvqhu66+gCtjj6lS4fbydZwuhZapNMI7JzPCcSuDnelrVQpAaH3aqD8RLq9ztJo8F8n5ABRGIn8WaP0TZYRpBiYql+9xpxMDrgsS7u6zYbQuYTChW/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=hzt6slvP; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="KA/yPfd9"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="hzt6slvP"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=v4W3CyHbe9Vycjmp+cFUJEqqnnmW3pjhgP12dine9WY=; b=KA/yPfd90+J9ckBkW9un96sSqh
-	X2DSUQ474p6vBoGa5Ec96SEtBzUZ+vs+5r53LDbaO2Dq2LtnJqQJXVTqBvSvRqPMVnysjhEYm4OdJ
-	Yf54y1MefYgCFf4v58kHWAeap5mE9jRMrczbBM6ZtaksDizjjI+Nb8HxKrOzfPKLuJceI80iVHk9o
-	6X6mgz1vQGCVWrFf+5tK6rtpxll5y6Ar0+BxAYnJcnliPML1kUwuT+jmbCGSkzd+rrNNs+6WlE0EV
-	uL8hIHpssvtkEpIl88WOBNPNmCoe5UFgIn3Z90BV0n2C0BRrtAL+qfjywS0tk5lX/XJ+nmlGIbrC6
-	8PMAZVTD2W1n7zdxg5WEsLOwzuKZP7ZDxZF0/SRLGd1yI7R7iruhqeovmR1gMayD/JGidTI36ML/W
-	55/wR6HtCDRR//2qNuf8GfI/Tu4TxVrHvLQPvkeLQECTkiiimNirEENH94mCtKAk0e01A2CADmEm2
-	YVbvQFXBbsQDUgeB08SHijLN;
+	bh=bvmeilW/ZMqg94/0tjFWHiAg/QLsv3yjkQmwtp7/jLY=; b=hzt6slvPMikFScRsMhjpDKzcM3
+	kKmpxyPfcTREKLEDzfuN68uBw+Ma/XUpN0tOOyJEjemeunoRCDO8KKwcYZaVqihO1L0rYDJuEeOQw
+	S/7w2OXFLYQeQ32vb/XNtQw05cEgFqVlJd2sqDvDJrd07nBT8Y3rtePQbUWJX1wHtWSy5pQFw0wAL
+	HvePNfzkajwGCzs4iBInz2GPlJXBpxlf5WqW2H5sTqBEoYcRKjj/8KuekM/VVkeBEMxMwqOb9jbLf
+	vxXfu6tMPn1nlCy+igMfCPaV7OTALSwVw6PcOn1vCuw4eJVvp0bCjt65ScmeGScZDb3NTwc3cv65a
+	G37zg7j7dT3jp79z9rVCF1B25xtrU2r/QDesIQPkiiCK/cHp25NjTY5ie/886RVWcUOH8hlRQfrmk
+	rKsVOqXSeMtsNI2DiSQRSjGsMM1J9LdE+UgOcFsaaK6Xt3838c/7Sh4u8OpBMdr5qp5XWM5pKlvRU
+	gTVAQ7aR38Gr6pRzeNX9IKr6;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1viyJ2-00000001pkE-2cAb;
-	Thu, 22 Jan 2026 17:17:16 +0000
+	id 1viyJD-00000001pkn-2FAL;
+	Thu, 22 Jan 2026 17:17:27 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
 Cc: metze@samba.org,
 	stable@vger.kernel.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v2 01/20] smb: smbdirect: introduce smbdirect_socket.recv_io.credits.available
-Date: Thu, 22 Jan 2026 18:16:41 +0100
-Message-ID: <3f2675c368391b2cb0de67670e24031b3bcf2714.1769101771.git.metze@samba.org>
+	Tom Talpey <tom@talpey.com>
+Subject: [PATCH v2 03/20] smb: server: make use of smbdirect_socket.recv_io.credits.available
+Date: Thu, 22 Jan 2026 18:16:43 +0100
+Message-ID: <0a91e6523460654ffc25632968d57c56a0e3af41.1769101771.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1769101771.git.metze@samba.org>
 References: <cover.1769101771.git.metze@samba.org>
@@ -68,41 +67,78 @@ available credits, which will be incremented
 when we posted new recv buffers and drained when
 we grant the credits to the peer.
 
-Fixes: 5fb9b459b368 ("smb: client: count the number of posted recv_io messages in order to calculated credits")
+This fixes regression Namjae reported with
+the 6.18 release.
+
 Fixes: 89b021a72663 ("smb: server: manage recv credits by counting posted recv_io and granted credits")
 Cc: <stable@vger.kernel.org> # 6.18.x
+Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/common/smbdirect/smbdirect_socket.h | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/smb/server/transport_rdma.c | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
 
-diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
-index ee4c2726771a..403a8b2cd30e 100644
---- a/fs/smb/common/smbdirect/smbdirect_socket.h
-+++ b/fs/smb/common/smbdirect/smbdirect_socket.h
-@@ -239,6 +239,7 @@ struct smbdirect_socket {
- 		 */
- 		struct {
- 			u16 target;
-+			atomic_t available;
- 			atomic_t count;
- 		} credits;
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index 05f008ea51cd..c7abd621bd11 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -1028,6 +1028,8 @@ static void smb_direct_post_recv_credits(struct work_struct *work)
+ 		}
+ 	}
  
-@@ -387,6 +388,7 @@ static __always_inline void smbdirect_socket_init(struct smbdirect_socket *sc)
- 	INIT_WORK(&sc->recv_io.posted.refill_work, __smbdirect_socket_disabled_work);
- 	disable_work_sync(&sc->recv_io.posted.refill_work);
++	atomic_add(credits, &sc->recv_io.credits.available);
++
+ 	if (credits)
+ 		queue_work(sc->workqueue, &sc->idle.immediate_work);
+ }
+@@ -1074,19 +1076,37 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
  
-+	atomic_set(&sc->recv_io.credits.available, 0);
- 	atomic_set(&sc->recv_io.credits.count, 0);
+ static int manage_credits_prior_sending(struct smbdirect_socket *sc)
+ {
++	int missing;
++	int available;
+ 	int new_credits;
  
- 	INIT_LIST_HEAD(&sc->recv_io.reassembly.list);
+ 	if (atomic_read(&sc->recv_io.credits.count) >= sc->recv_io.credits.target)
+ 		return 0;
+ 
+-	new_credits = atomic_read(&sc->recv_io.posted.count);
+-	if (new_credits == 0)
++	missing = (int)sc->recv_io.credits.target - atomic_read(&sc->recv_io.credits.count);
++	available = atomic_xchg(&sc->recv_io.credits.available, 0);
++	new_credits = (u16)min3(U16_MAX, missing, available);
++	if (new_credits <= 0) {
++		/*
++		 * If credits are available, but not granted
++		 * we need to re-add them again.
++		 */
++		if (available)
++			atomic_add(available, &sc->recv_io.credits.available);
+ 		return 0;
++	}
+ 
+-	new_credits -= atomic_read(&sc->recv_io.credits.count);
+-	if (new_credits <= 0)
+-		return 0;
++	if (new_credits < available) {
++		/*
++		 * Readd the remaining available again.
++		 */
++		available -= new_credits;
++		atomic_add(available, &sc->recv_io.credits.available);
++	}
+ 
++	/*
++	 * Remember we granted the credits
++	 */
+ 	atomic_add(new_credits, &sc->recv_io.credits.count);
+ 	return new_credits;
+ }
 -- 
 2.43.0
 
