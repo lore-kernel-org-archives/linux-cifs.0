@@ -1,67 +1,75 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1B82F7455
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Jan 2026 04:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF5030E0F2
+	for <linux-cifs@vger.kernel.org>; Thu, 22 Jan 2026 05:25:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769056763; cv=none; b=rIkoGALqI9+hStQJCDDQmUbWP5DiFqHDpufPS3W0+qbYlBRHJ1RS2vDJwppHOEFETJfsSe7Bwh18mWtIxp1Md8Rrj03qhERgAFaErJ0k7ltLFjslZDU80A5i5IV56IGJgT+ZbQDuZEGbnESFQKXtGgslVhXIIrVpDk10kOQqlP4=
+	t=1769059518; cv=none; b=RkAsxz4Yxzq23YrjEp4g3dQDXL6mypEzGao1ez4WD58o6+ExGwBrhSz/NzArrWguLaqEOrdDMG0ZeeodAvraeW1ys/8F4zABnb/QZbZA9uG6aS+UE3WUnGqMBQ106JPkIDLTuJ9ry9zY1YEQqVwoB1LslLu9GtijIk0wK5IQLTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769056763; c=relaxed/simple;
-	bh=fDqAGxji++BWAUpi6px6M3aZsyp/Qc/208yYVvF7ptc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dm3zF0nne6unQp9QS7Ll+KgWdpFV0pYvuAir5VpWHm6jCKrqU9OGNAESMrnWQU3ws3FZFKWW/Vcm5WLvBy3AT4CMveq08S+Xx5emVvXZwiFMwQJeFCdGZtiRbWYWqJ2MRPt8S0wC3vpVIH09WHCw3opFalhfup9ymznea558c5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VwZet5vd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769059518; c=relaxed/simple;
+	bh=6JT8MZVP1Ap5L2DNrTI1EKIcJtFWR+hvjlK5Y5fjPWA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UGAE46otBbpIbw8vILFIChe5AzfhzQpJYheS823vI+MPsJpiMX8f2gKmG0nrxCsbU45ZWaHmOE5kSzdXytvuUXMqMDNuzypFxYwxNqt21M7uQ0feQDbiK1HuFBYg1+LERJ3/h6geNbqJJGomgZ/n1OnS+47HxXBOo9nXchPEm80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=P3RdW3tR; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VwZet5vd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FF16C19422
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Jan 2026 04:39:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769056763;
-	bh=fDqAGxji++BWAUpi6px6M3aZsyp/Qc/208yYVvF7ptc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=VwZet5vdXEYTvfAcBrTzWhHh+lkDaUK2c3bfHELrF7PGUlFHFfxTViTzlIAk/Egtg
-	 UvL7ydbS9cLLXalKq0ZPUzoQAmo2kI3HjfWGDcNshBGedrGaaJDjLMMZz1i/JGuXxc
-	 SkpHNJFXuCGALSSl3JwHAHEoNWss0lgCSAOlXNiR0Y58Hj9GcGkW+fsTC11EqTu95h
-	 J+dhtXPe2diWdlHb4i5JQfeg/KuTDwXliAGkcCibIqle0hABX6e4rGTXIzQ6Uv1to5
-	 NnU9PvmWND55SBNZL2lRPN257DXmY/Bky18Qocql1t/gZFybFTz/sLfrXiUZIEtcfd
-	 0/ovTWxX0pXuA==
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b87f00ec06aso91367466b.1
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Jan 2026 20:39:23 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCURQCc1naZyKpcdcknCqXi7IuFu9jiwpL9rOf74H0E6J4GYy9w1jssBZ/BdZkprbUVYbsJPM84Hwt0W@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+N+slD3b76ZDwDKz1O1s4/oEbaunruu37H5DLY3ovyksyjXCd
-	iZE25ETaopsD538QwyeOD3HDX3MsPIZMMydybmLZJKydwaY7Zz07pMveJhdxOD4Qvt+EPpQn0ZR
-	bEpH6PlDRJ0yLYqKxe6lxu1uZTDjLoVc=
-X-Received: by 2002:a17:907:1b25:b0:b87:d09c:1825 with SMTP id
- a640c23a62f3a-b88002350aemr557590666b.13.1769056761666; Wed, 21 Jan 2026
- 20:39:21 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="P3RdW3tR"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769059514;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7REIbDaCB1lEin5PXxOt4pSVBOjFuZZX55aIbl5xep4=;
+	b=P3RdW3tR30IqtqOPaQDewvM6Z5aBFlU/6VRdTRdBro4iFHcBiKRdHi6AViEQJH6e5C5OYR
+	NNtYGNbaUTh2HseyfCnegTHqeYWBUcBpM9HRLLCXszXRfLmJFkU4RtZU4LpWQruLv0IffQ
+	3CkR1PQy2/ABIRrI+g6pN1JGdpEDinI=
+From: chenxiaosong.chenxiaosong@linux.dev
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH 0/7] smb/client: update SMB1 maperror, part 2
+Date: Thu, 22 Jan 2026 13:23:55 +0800
+Message-ID: <20260122052402.2209206-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260122021015.1954-2-qikeyu2017@gmail.com>
-In-Reply-To: <20260122021015.1954-2-qikeyu2017@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 22 Jan 2026 13:39:09 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9B2zLEfxWKfCGEEgBPA91N=fUR_7zDmntv=Bp0zD_7wg@mail.gmail.com>
-X-Gm-Features: AZwV_Qh9dl8ob2JneRcqNI8A8xMu17cD3Sx7b5zrZ3hXgH4Bmm5JusKfuDulJbM
-Message-ID: <CAKYAXd9B2zLEfxWKfCGEEgBPA91N=fUR_7zDmntv=Bp0zD_7wg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: validate DataOffset in smb2_write_pipe()
-To: Kery Qi <qikeyu2017@gmail.com>
-Cc: smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com, 
-	mmakassikis@freebox.fr, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jan 22, 2026 at 11:10=E2=80=AFAM Kery Qi <qikeyu2017@gmail.com> wro=
-te:
->
-> The check of DataOffset in smb2_write_pipe() is insufficient. If
-> DataOffset is 0 or smaller than offsetof(struct smb2_write_req, Buffer),
-> data_buf will point to the SMB2 header instead of the actual data
-> buffer, leading to out-of-bounds read.
-How can out-of-bounds occur when the previous checks ensure that the
-length does not exceed the request buffer?
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+
+This is a preparation to improve the search speed of the SMB1 maperror.
+
+The previous work is here:
+part 1: https://lore.kernel.org/linux-cifs/20260121114912.2138032-1-chenxiaosong.chenxiaosong@linux.dev/
+
+ChenXiaoSong (7):
+  smb/client: map NT_STATUS_NOTIFY_ENUM_DIR
+  smb/client: map NT_STATUS_BUFFER_OVERFLOW
+  smb/client: map NT_STATUS_MORE_PROCESSING_REQUIRED
+  smb/client: map NT_STATUS_PRIVILEGE_NOT_HELD
+  smb/client: rename to NT_STATUS_SOME_NOT_MAPPED
+  smb/client: rename to NT_ERROR_INVALID_DATATYPE
+  smb/client: move NT_STATUS_MORE_ENTRIES
+
+ fs/smb/client/nterr.c        |  3 ++-
+ fs/smb/client/nterr.h        | 12 ++++++------
+ fs/smb/client/smb1maperror.c |  4 ++++
+ 3 files changed, 12 insertions(+), 7 deletions(-)
+
+-- 
+2.43.0
+
