@@ -1,153 +1,205 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1540238A704;
-	Thu, 22 Jan 2026 17:18:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336012BE7D2;
+	Fri, 23 Jan 2026 00:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769102366; cv=none; b=Ne6ami2SeEeI/wbLOT4AulLP3493ugP0hlj7AqNsGLY0/NZFB84XaPZuERgaAelu/ob9Uhfay2ZzDyC6pIGIWUzwTuXKMvDHdA3yRlu3R+hRdEvoOjYmaLjTHacMw3YL5glRED4sZkecjSoxohONnouK8taq7VT6p2wiviNo3IU=
+	t=1769128008; cv=none; b=G1HRtP9PyNMF4vMqzKi86y9rm63yu78pI1PhVdedtL7guJdRxAYjyvzvpQna11tEofLiylyB634YBtWRvA09HPIX9wGaehaSLuppstuf3rmnOvrcFW+2swWG3Swwji/4ZdL7hu1seDAgXsI0PuTmzRCNjcdhkFvImLGZXixXEM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769102366; c=relaxed/simple;
-	bh=ZGrPSFuWmxmxsQLFSb93ZqF0JHFkuQotZFhs07LMso8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RLW2kOlmhOq20mmfwKt9SuB4HWAuSpQAGI7Cksya9IoUH2DFUpl3cmjbuYTcdHGOMjnGiiTJEVZKjs76Lgf8yhhgq15bohozZmTAQSnyXePjqaNmgaVZ9OtxkR5Q9DEfJEa9CUrQ0vlLBytX+3cV6pXNMmUy4NMH7ucuCrVXLTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=kOT4JiJP; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1769128008; c=relaxed/simple;
+	bh=YfAXxf1cY4mpxIHAXBxlEMPMeobd0tAG5Xh8cUgRe68=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=slVTnW6cgtkCXYdSERI0lgIzfbvgP10OU8xm6LBxYLvnNLt/jEnAU55dmpQ4S+hCLPbgK1DYPtQ69ievZ+Bf+JCtKkrk4AgbepBoSRovG5ISa/kr+3/prY7UGzX5lKn2q9njaNKM4djlzeIdMtwd0NY5GrHef46g4EPCGgC9yCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sgUZWjFj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="kOT4JiJP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=OxZaEovOMdl5c7ORn9VMOJTag57etUFGJ7a841QveUE=; b=kOT4JiJPwcJpW7u6gfe6TcOnNB
-	4zbJnxlTbvzW3eeFuIIhCz7hLb7Uvy6LhMEf5B6BaJzid/PEgGSSbPY0h1L7rz4k1DUBUFHjcKvwG
-	o+a4Ygygv2rYMP4DZsqRnhGoYmPzHjhfpR20quatlbdtI0p4SHupsjo1j+TQrTe0I2ncxfWBlZwJn
-	vOqiCHb0+aptUX/aQlMon9kGmxa3atDzTh8apLFlnTOWgRg0HhGIqBLWoCja2Jq4hqsFX21pQsfrS
-	mDaybVrsBM45dEb622hr2htlJUnATPRiDw9S+GJ764ud4mOvGT45lzGErSFcyOlK+DlsEZuD1kN+X
-	tnEB8G6PJlDBYcNa1jTRYVKW8BqhYYFtcwxPZyz1pdZC6SpysjefeTnEwH9R0Hc6T8cvkPXdJ+wAe
-	TXHNFzJkfzsWhp1Cdot26CQHeJ+sBdXRLxTTv+nVv9OHKY8ENDjaqwzutuGPBqnHfv0xKFSRZbihQ
-	9Q0GN9TX3tcHCoDGeATNyH8R;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1viyKb-00000001pyn-2Jce;
-	Thu, 22 Jan 2026 17:18:53 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: metze@samba.org,
-	stable@vger.kernel.org,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v2 18/20] smb: client: fix last send credit problem causing disconnects
-Date: Thu, 22 Jan 2026 18:16:58 +0100
-Message-ID: <8626d5c8bd6fb285d8095f32e653e61fb3d70150.1769101771.git.metze@samba.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1769101771.git.metze@samba.org>
-References: <cover.1769101771.git.metze@samba.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sgUZWjFj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FF66C116C6;
+	Fri, 23 Jan 2026 00:26:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769128007;
+	bh=YfAXxf1cY4mpxIHAXBxlEMPMeobd0tAG5Xh8cUgRe68=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sgUZWjFj8UxZ2ChZk6Og6wlP6cNdN3AVy1A3DaINVBfqqudi37G6Ax/h9H4aHnttZ
+	 VxxaqJkeguW43TyDiwz3QIb9/AwLqHYIJFQ2S3SUMkcnHV7u1il9CeCyhadfCXIO2W
+	 kXCIyEp1UPZusG031b3IWNGqsu/SWAwGjgCP558+XHHMvjhFAsn7A6EsNE0GmPyjF6
+	 zg280RvYUHGuhiLYpjOvN4WzN3vB2Mm0o0ph9ZdFEi3YMumUc8b0Y2wwVHk37JjNVm
+	 ZrqO6h+yfpWNbWwLGr/XNyxxcAiOqN8b4Flkim1K+Ijqq9bS3unUlg/xh+pZaGgUL3
+	 VP2yHzSNVOjGQ==
+Date: Thu, 22 Jan 2026 16:26:46 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Chuck Lever <cel@kernel.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-api@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, hirofumi@mail.parknet.co.jp,
+	linkinjeon@kernel.org, sj1557.seo@samsung.com, yuezhang.mo@sony.com,
+	almaz.alexandrovich@paragon-software.com, slava@dubeyko.com,
+	glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu,
+	adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org,
+	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+	trondmy@kernel.org, anna@kernel.org, jaegeuk@kernel.org,
+	chao@kernel.org, hansg@kernel.org, senozhatsky@chromium.org,
+	Chuck Lever <chuck.lever@oracle.com>
+Subject: Re: [PATCH v7 01/16] fs: Add case sensitivity flags to file_kattr
+Message-ID: <20260123002646.GL5945@frogsfrogsfrogs>
+References: <20260122160311.1117669-1-cel@kernel.org>
+ <20260122160311.1117669-2-cel@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260122160311.1117669-2-cel@kernel.org>
 
-When we are about to use the last send credit that was
-granted to us by the peer, we need to wait until
-we are ourself able to grant at least one credit
-to the peer. Otherwise it might not be possible
-for the peer to grant more credits.
+On Thu, Jan 22, 2026 at 11:02:56AM -0500, Chuck Lever wrote:
+> From: Chuck Lever <chuck.lever@oracle.com>
+> 
+> Enable upper layers such as NFSD to retrieve case sensitivity
+> information from file systems by adding FS_XFLAG_CASEFOLD and
+> FS_XFLAG_CASENONPRESERVING flags.
+> 
+> Filesystems report case-insensitive or case-nonpreserving behavior
+> by setting these flags directly in fa->fsx_xflags. The default
+> (flags unset) indicates POSIX semantics: case-sensitive and
+> case-preserving. These flags are read-only; userspace cannot set
+> them via ioctl.
+> 
+> Remove struct file_kattr initialization from fileattr_fill_xflags()
+> and fileattr_fill_flags(). Callers at ioctl/syscall entry points
+> zero-initialize the struct themselves, which allows them to pass
+> hints (flags_valid, fsx_valid) to the filesystem's ->fileattr_get()
+> callback via the fa argument. Filesystem handlers that invoke these
+> fill functions can now set flags directly in fa->fsx_xflags before
+> calling them, without the fill functions zeroing those values.
 
-The following sections in MS-SMBD are related to this:
+In hindsight I regret not asking for the file_kattr initialization
+change to be in a separate patch.
 
-3.1.5.1 Sending Upper Layer Messages
-...
-If Connection.SendCredits is 1 and the CreditsGranted field of the
-message is 0, stop processing.
-...
+> Case sensitivity information is exported to userspace via the
+> fa_xflags field in the FS_IOC_FSGETXATTR ioctl and file_getattr()
+> system call.
+> 
+> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
 
-3.1.5.9 Managing Credits Prior to Sending
-...
-If Connection.ReceiveCredits is zero, or if Connection.SendCredits is
-one and the Connection.SendQueue is not empty, the sender MUST allocate
-and post at least one receive of size Connection.MaxReceiveSize and MUST
-increment Connection.ReceiveCredits by the number allocated and posted.
-If no receives are posted, the processing MUST return a value of zero to
-indicate to the caller that no Send message can be currently performed.
-...
+The UAPI changes still look ok to me.  AFAICT the file_kattr
+initialization now seem like they don't zap fields to confuse
+vfs_fileattr_get.
 
-This is a similar logic as we have in the server.
+Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
 
-Cc: <stable@vger.kernel.org> # 6.18.x
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
----
- fs/smb/client/smbdirect.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+--D
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index dbb2d939bc44..20faa6d7f514 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -697,6 +697,15 @@ static void smbd_post_send_credits(struct work_struct *work)
- 
- 	atomic_add(posted, &sc->recv_io.credits.available);
- 
-+	/*
-+	 * If the last send credit is waiting for credits
-+	 * it can grant we need to wake it up
-+	 */
-+	if (posted &&
-+	    atomic_read(&sc->send_io.bcredits.count) == 0 &&
-+	    atomic_read(&sc->send_io.credits.count) == 0)
-+		wake_up(&sc->send_io.credits.wait_queue);
-+
- 	/* Promptly send an immediate packet as defined in [MS-SMBD] 3.1.1.1 */
- 	if (atomic_read(&sc->recv_io.credits.count) <
- 		sc->recv_io.credits.target - 1) {
-@@ -1394,6 +1403,26 @@ static int smbd_post_send_iter(struct smbdirect_socket *sc,
- 		goto err_wait_credit;
- 	}
- 
-+	new_credits = manage_credits_prior_sending(sc);
-+	if (new_credits == 0 &&
-+	    atomic_read(&sc->send_io.credits.count) == 0 &&
-+	    atomic_read(&sc->recv_io.credits.count) == 0) {
-+		queue_work(sc->workqueue, &sc->recv_io.posted.refill_work);
-+		rc = wait_event_interruptible(sc->send_io.credits.wait_queue,
-+					      atomic_read(&sc->send_io.credits.count) >= 1 ||
-+					      atomic_read(&sc->recv_io.credits.available) >= 1 ||
-+					      sc->status != SMBDIRECT_SOCKET_CONNECTED);
-+		if (sc->status != SMBDIRECT_SOCKET_CONNECTED)
-+			rc = -ENOTCONN;
-+		if (rc < 0) {
-+			log_outgoing(ERR, "disconnected not sending on last credit\n");
-+			rc = -EAGAIN;
-+			goto err_wait_credit;
-+		}
-+
-+		new_credits = manage_credits_prior_sending(sc);
-+	}
-+
- 	request = smbd_alloc_send_io(sc);
- 	if (IS_ERR(request)) {
- 		rc = PTR_ERR(request);
-@@ -1448,8 +1477,6 @@ static int smbd_post_send_iter(struct smbdirect_socket *sc,
- 
- 	/* Fill in the packet header */
- 	packet->credits_requested = cpu_to_le16(sp->send_credit_target);
--
--	new_credits = manage_credits_prior_sending(sc);
- 	packet->credits_granted = cpu_to_le16(new_credits);
- 
- 	packet->flags = 0;
--- 
-2.43.0
-
+> ---
+>  fs/file_attr.c           | 12 ++++--------
+>  fs/xfs/xfs_ioctl.c       |  2 +-
+>  include/linux/fileattr.h |  3 ++-
+>  include/uapi/linux/fs.h  |  2 ++
+>  4 files changed, 9 insertions(+), 10 deletions(-)
+> 
+> diff --git a/fs/file_attr.c b/fs/file_attr.c
+> index 13cdb31a3e94..6e37040fc5fa 100644
+> --- a/fs/file_attr.c
+> +++ b/fs/file_attr.c
+> @@ -15,12 +15,10 @@
+>   * @fa:		fileattr pointer
+>   * @xflags:	FS_XFLAG_* flags
+>   *
+> - * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).  All
+> - * other fields are zeroed.
+> + * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).
+>   */
+>  void fileattr_fill_xflags(struct file_kattr *fa, u32 xflags)
+>  {
+> -	memset(fa, 0, sizeof(*fa));
+>  	fa->fsx_valid = true;
+>  	fa->fsx_xflags = xflags;
+>  	if (fa->fsx_xflags & FS_XFLAG_IMMUTABLE)
+> @@ -46,11 +44,9 @@ EXPORT_SYMBOL(fileattr_fill_xflags);
+>   * @flags:	FS_*_FL flags
+>   *
+>   * Set ->flags, ->flags_valid and ->fsx_xflags (translated flags).
+> - * All other fields are zeroed.
+>   */
+>  void fileattr_fill_flags(struct file_kattr *fa, u32 flags)
+>  {
+> -	memset(fa, 0, sizeof(*fa));
+>  	fa->flags_valid = true;
+>  	fa->flags = flags;
+>  	if (fa->flags & FS_SYNC_FL)
+> @@ -323,7 +319,7 @@ int ioctl_setflags(struct file *file, unsigned int __user *argp)
+>  {
+>  	struct mnt_idmap *idmap = file_mnt_idmap(file);
+>  	struct dentry *dentry = file->f_path.dentry;
+> -	struct file_kattr fa;
+> +	struct file_kattr fa = {};
+>  	unsigned int flags;
+>  	int err;
+>  
+> @@ -355,7 +351,7 @@ int ioctl_fssetxattr(struct file *file, void __user *argp)
+>  {
+>  	struct mnt_idmap *idmap = file_mnt_idmap(file);
+>  	struct dentry *dentry = file->f_path.dentry;
+> -	struct file_kattr fa;
+> +	struct file_kattr fa = {};
+>  	int err;
+>  
+>  	err = copy_fsxattr_from_user(&fa, argp);
+> @@ -434,7 +430,7 @@ SYSCALL_DEFINE5(file_setattr, int, dfd, const char __user *, filename,
+>  	struct filename *name __free(putname) = NULL;
+>  	unsigned int lookup_flags = 0;
+>  	struct file_attr fattr;
+> -	struct file_kattr fa;
+> +	struct file_kattr fa = {};
+>  	int error;
+>  
+>  	BUILD_BUG_ON(sizeof(struct file_attr) < FILE_ATTR_SIZE_VER0);
+> diff --git a/fs/xfs/xfs_ioctl.c b/fs/xfs/xfs_ioctl.c
+> index 59eaad774371..f0417c4d1fca 100644
+> --- a/fs/xfs/xfs_ioctl.c
+> +++ b/fs/xfs/xfs_ioctl.c
+> @@ -496,7 +496,7 @@ xfs_ioc_fsgetxattra(
+>  	xfs_inode_t		*ip,
+>  	void			__user *arg)
+>  {
+> -	struct file_kattr	fa;
+> +	struct file_kattr	fa = {};
+>  
+>  	xfs_ilock(ip, XFS_ILOCK_SHARED);
+>  	xfs_fill_fsxattr(ip, XFS_ATTR_FORK, &fa);
+> diff --git a/include/linux/fileattr.h b/include/linux/fileattr.h
+> index f89dcfad3f8f..709de829659f 100644
+> --- a/include/linux/fileattr.h
+> +++ b/include/linux/fileattr.h
+> @@ -16,7 +16,8 @@
+>  
+>  /* Read-only inode flags */
+>  #define FS_XFLAG_RDONLY_MASK \
+> -	(FS_XFLAG_PREALLOC | FS_XFLAG_HASATTR)
+> +	(FS_XFLAG_PREALLOC | FS_XFLAG_HASATTR | \
+> +	 FS_XFLAG_CASEFOLD | FS_XFLAG_CASENONPRESERVING)
+>  
+>  /* Flags to indicate valid value of fsx_ fields */
+>  #define FS_XFLAG_VALUES_MASK \
+> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+> index 66ca526cf786..919148beaa8c 100644
+> --- a/include/uapi/linux/fs.h
+> +++ b/include/uapi/linux/fs.h
+> @@ -253,6 +253,8 @@ struct file_attr {
+>  #define FS_XFLAG_FILESTREAM	0x00004000	/* use filestream allocator */
+>  #define FS_XFLAG_DAX		0x00008000	/* use DAX for IO */
+>  #define FS_XFLAG_COWEXTSIZE	0x00010000	/* CoW extent size allocator hint */
+> +#define FS_XFLAG_CASEFOLD	0x00020000	/* case-insensitive lookups */
+> +#define FS_XFLAG_CASENONPRESERVING 0x00040000	/* case not preserved */
+>  #define FS_XFLAG_HASATTR	0x80000000	/* no DIFLAG for this	*/
+>  
+>  /* the read-only stuff doesn't really belong here, but any other place is
+> -- 
+> 2.52.0
+> 
+> 
