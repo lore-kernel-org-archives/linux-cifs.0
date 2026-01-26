@@ -1,109 +1,170 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16FBF487BE
-	for <linux-cifs@vger.kernel.org>; Mon, 26 Jan 2026 01:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FCA313550
+	for <linux-cifs@vger.kernel.org>; Mon, 26 Jan 2026 14:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769389585; cv=none; b=bKsuDK8pO14sTvJgekUBg0T/Bm5ipZyJl38kLiIWJehBRiClNqKJxQUAkTbILUvOhlpTL6OR4cHNhReLAMyAkntWPAKlbGLRGG4Drgs40v/OdslM9IxoNxYUaTVFNdYk9FAE2Iz/8IICqQWq2BYKnawJTfpKoLkVW41Den6OEJE=
+	t=1769439180; cv=none; b=F3gU0bSIEdxtzkdGjGnuQVGWZBA0jT5UalzOyFBnn9/pyT0Rho//KuGi8ktEsKRrBtlaOAZONnNeiu9B+KKsSvmHgbcNRsRF1M4ZedQO8QWYZOOg9NWFGmlMtmX9hUSQ4X3MuTVwdpHPbvpYWSHjn+oa5+TgklNLDU673iY+yuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769389585; c=relaxed/simple;
-	bh=/47TYBrga9IeIm0khcfVs19o8N+gdIMJ/AX5PYO/N28=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JZVRwyKSPoPxo7yxz4ja6NNwN20wetOdd22Wa/x9BRJvh42J4GOcAySaJ2mKQegQBSKomdm7OzIOFyLC0f7rU3CEXTvbfP/luMLKSvE1IeHsWxeoapBKytMdovQpsdzrk+fGFsNx55zJRcSKVaxGNY6fgeFvDEHINmQqjBQmosg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YZpD2zV6; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1769439180; c=relaxed/simple;
+	bh=EmdrmrQatIkWYrWc3Tso6zV2W4IPfCbeSJjTG87cs5k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VOQvnipxgC5yqQnoUBaYHNwXB4tspOcTF0tqQG/17fI7/uiJ6UteQ9Flq4A5f3jFo8lkz+4WED91Y86anysTRf3/XBKnjHTukCYcdkG/59owp75mZPWXb/Ih0pYx5+Lz6Wqvrdx1GPcXFc2sL4VMDoSNrRAukzxZt298Wtjhcq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VfRDDCKM; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YZpD2zV6"
-Message-ID: <f063be7f-7d09-4f07-9a44-7c8f1484de25@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769389580;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t/WgvXxTG03zzIYztM1YjVL8bEbGZbcXzqgLSgsGDKI=;
-	b=YZpD2zV6Bx5oqGUtNwmPJSLo9U+hJujHQHUHc5frQE5trzH/HB31NOtCfM+izfMKVVqJRO
-	Y6TlqgymyI3Mo1OyGlyIu5nqX/VY+mY8R2tqeY2VNRg4FNfijZhIgCBHLg+4KJqaWQkImK
-	U+XoPAAwp1qXE+JFCfQTSi7H69x54D8=
-Date: Mon, 26 Jan 2026 09:05:30 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VfRDDCKM"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8c6a50c17fdso518711485a.2
+        for <linux-cifs@vger.kernel.org>; Mon, 26 Jan 2026 06:52:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769439178; x=1770043978; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0XFWhnozczQdBY9wOF6c5V46t5MOgQ+lGzwQjjTNU9A=;
+        b=VfRDDCKMrqDWX8AYXvj6Eo/MVLJzPs7hWwdXq47jEpvhuoXSgEpYFrkWUPii0xv4Qc
+         KLARZdRW/PJC0WhOTS3TBcQU/4y7aScNg1TgCOjGQ2f+30GzAsUAb6LtxWBqd15Wqd4H
+         3QKnzXetBKeaKtwHhB1EKzzaxddCCj0jhGau8qELLLyh8dzc5khlk8CRgyFfb589txdz
+         sBwsMjZoi4hTbBy08doGv6Jt7vfUIQdijEdlpaxvhFowZwcMdbJ5OX6iqclb9O6rZh/g
+         YSxmzQxpTKD5nV75eYHfnODh6WO5BzMr415UtncTComlWNkXusF/LqBycrZzsxhkf/Vi
+         yDpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769439178; x=1770043978;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0XFWhnozczQdBY9wOF6c5V46t5MOgQ+lGzwQjjTNU9A=;
+        b=gq4xl0FaCE7R/K5GSch2JV+Cl61GjqLeeyB/e7mAy02jWGmwn6HJuGTjeNkYECO5xK
+         nJeIKT1TnSsm0XA47ultvYXptW3Ze5WqAQN6Nf4VFMU6vFmaFJTNSP0AiSr0wfWpyYrF
+         xOnZ+NNEQhR35tOUnBYlfdRNMLoPk6kEo3H5Xk5sof2nB3rpCm2XJ1hTiLIkmABjxvmf
+         CQAj2/o4SJjo7zeBm6CVSrfu7MtJzYfDiwRDicEjtflH/6DSWgapHFRY0SqZ0QHCBVoI
+         1IdqvBT9PEQw2WvLj9xgMGaNorjlZxFtKAH2X2UT/SjZ3uOKpDXrMtBPqdPzKWE7wjuL
+         vfKA==
+X-Forwarded-Encrypted: i=1; AJvYcCVxLX/F58ofN1CETeyMgJs5kb3U8i0o/CveVYzKLL+37Ui59bSgoAKUlABhP43I02tzMlvOV35aEvuB@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7IohqMav/KreZw8WM+GJvR3i+3FXZOh2P1OGV1Y8Z55TP43AG
+	FOVapBi0MMtNMaPRE0ine3oZD0o+Rkc490N8GKDNtpCrsOqXMu4vQcRV
+X-Gm-Gg: AZuq6aKFiHGZ0ucMzcWksn5vrbFc/W7EQCxkHkDEHu/Kr3ulQusyvl1S8FkavpJUWmX
+	wCYgKyV8DGq96Qaym0YOvUWMP266LuVMFNK9qtcKz4cmC3g+05woszosDjDplAl78AZ78weKYs9
+	6itt/AMBpzcsKtLJUKZr9bpXMgJG04uyhZ+lzNeHnvGpcQ4HWy6+4RwainV1b3K3Q/WSwoBHyHB
+	gnHoM6FnSxXDTrMh/X9sLP9vRaRFlKiYatRwa0T27drQsy8dT9GW+B0Ag0342C0+kjoo8CPMYNf
+	2iQvQbKqa/6GX90dobM8KSLtb4R8YWuIAdpH+pH8zvUJ7mwOCB2SPtWirNVOvRPYcCBZTfWCtpl
+	5Kf2u7nSX7HeJVhOEHGn78Qab3cxOXEnmutnOHaTAA2XD1XTodhJjA/ovy+91PmI58XfkxRtA79
+	E43c9wOP7vUdk8dZn7O0mrOpY30ElQL20S78tZ/JQvtcqe+cj4XqM=
+X-Received: by 2002:a05:620a:2a05:b0:8b2:eb66:c64 with SMTP id af79cd13be357-8c6f95c5255mr555017185a.29.1769439177669;
+        Mon, 26 Jan 2026 06:52:57 -0800 (PST)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c6e37d2422sm1018611585a.18.2026.01.26.06.52.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jan 2026 06:52:57 -0800 (PST)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	quic@lists.linux.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Metzmacher <metze@samba.org>,
+	Moritz Buhl <mbuhl@openbsd.org>,
+	Tyler Fanelli <tfanelli@redhat.com>,
+	Pengtao He <hepengtao@xiaomi.com>,
+	Thomas Dreibholz <dreibh@simula.no>,
+	linux-cifs@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Tom Talpey <tom@talpey.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Steve Dickson <steved@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Alexander Aring <aahringo@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	John Ericson <mail@johnericson.me>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Jason Baron <jbaron@akamai.com>,
+	illiliti <illiliti@protonmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Daniel Stenberg <daniel@haxx.se>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: [PATCH net-next v8 01/15] net: define IPPROTO_QUIC and SOL_QUIC constants
+Date: Mon, 26 Jan 2026 09:50:59 -0500
+Message-ID: <d774ce5dc1fdb45b2d68b63fed3975da91c1729f.1769439073.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <cover.1769439073.git.lucien.xin@gmail.com>
+References: <cover.1769439073.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: Decimated subseconds in smbinfo filebasicinfo timestamp output
-To: Sam Denison <dev@denisons.org>, Steve French <smfrench@gmail.com>,
- Steven French <Steven.French@microsoft.com>
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
-References: <n3ma17AT6PhgrI6OfkbdTz3n_ak9jHfcYoGaAOdyxsY63h-GVDNpzS98XsQlTPN6r2nYxdQ_ODsxNX7fPh8J0PpSJ7-Tvt_8uqjtpfQamGw=@denisons.org>
- <hrQNBHikNUU26Klip-roC5Vuq474cWlMtfx-yvROP7k6iAyEW66dCc8negCRm4xdOuRqAQDa346BJQKyFLl3HveGykv-jkKihJarU5MYpFQ=@denisons.org>
- <f147af48-6c01-47f4-ba51-71b77c1ea94a@linux.dev>
- <Sj-xdM9FhG-h2q9G9x6pAEQN2TZEyWvq3Vh66-KRyGXnoDxar4KfSmsStO9n2mWnJgez0zqgn7STXBXjedgRKRLs23ql190kfqKNrl1J48Y=@denisons.org>
- <LV9PR21MB4757D8624474C50468BEAE81E48EA@LV9PR21MB4757.namprd21.prod.outlook.com>
- <LV9PR21MB4757E63CE7D0DE2610AF2655E489A@LV9PR21MB4757.namprd21.prod.outlook.com>
- <50b282c2-6a06-42cc-b52e-b545fd8d9e01@linux.dev>
- <hAshiKr_dint37zHnaRbpo9UNdT9my5xllqfyLLXWYZR5jpRVn2lpTvzgWWng3w-INoptu8YHCUMVtda0JV-ekS3zNGePJgJMqL3wKw6HWQ=@denisons.org>
- <CAH2r5ms02k4feJEmfzenU-DgFMSDFDiCc1=o_JpyaiWcnOU1Tg@mail.gmail.com>
- <shU8wpo2oNyUu4RkVuN0VHmIES1SzKRN9in6AJDn4EKDDGwMkzl2ShJ8i-4AfFOSKDDnEhxZVGH_w8y9JxO683d_QQzMJOig7eOb0AmaFBs=@denisons.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <shU8wpo2oNyUu4RkVuN0VHmIES1SzKRN9in6AJDn4EKDDGwMkzl2ShJ8i-4AfFOSKDDnEhxZVGH_w8y9JxO683d_QQzMJOig7eOb0AmaFBs=@denisons.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-Acked-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+This patch adds IPPROTO_QUIC and SOL_QUIC constants to the networking
+subsystem. These definitions are essential for applications to set
+socket options and protocol identifiers related to the QUIC protocol.
 
-Thanks,
-ChenXiaoSong <chenxiaosong@kylinos.cn>
+QUIC does not possess a protocol number allocated from IANA, and like
+IPPROTO_MPTCP, IPPROTO_QUIC is merely a value used when opening a QUIC
+socket with:
 
-On 1/26/26 03:26, Sam Denison wrote:
-> From: Sam Denison <dev@denisons.org>
-> Date: Sun, 25 Jan 2026 19:15:01 +0000
-> Subject: [PATCH] smbinfo: fix decimated subseconds in smbinfo filebasicinfo
->  timestamp output
-> 
-> The output of `./smbinfo filebasicinfo /mnt/file` is as follows:
-> 
->   Creation Time: 2026-01-25 19:15:01.070729
->   Last Access Time: 2026-01-25 19:15:01.070729
->   Last Write Time: 2026-01-25 19:15:01.070729
->   Last Change Time: 2026-01-25 19:15:01.070729
-> 
-> The output of `stat /mnt/file` is as follows:
-> 
->   Access: 2026-01-25 19:15:01.707294600 +0000
->   Modify: 2026-01-25 19:15:01.707294600 +0000
->   Change: 2026-01-25 19:15:01.707294600 +0000
->    Birth: 2026-01-25 19:15:01.707294600 +0000
-> 
-> In `win_to_datetime()`, when converting `usec` to a value in seconds,
-> one zero needs to be removed from the divisor.
-> 
-> Signed-off-by: Sam Denison <dev@denisons.org>
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> ---
->  smbinfo | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/smbinfo b/smbinfo
-> index 57e8a0a..a168186 100755
-> --- a/smbinfo
-> +++ b/smbinfo
-> @@ -428,7 +428,7 @@ def cmd_fileallinfo(args):
->  def win_to_datetime(smb2_time):
->      usec = (smb2_time / 10) % 1000000
->      sec  = (smb2_time - 116444736000000000) // 10000000
-> -    return datetime.datetime.fromtimestamp(sec + usec/10000000)
-> +    return datetime.datetime.fromtimestamp(sec + usec/1000000)
->  
->  def cmd_filebasicinfo(args):
->      qi = QueryInfoStruct(info_type=0x1, file_info_class=4, input_buffer_length=40)
-> -- 
-> 2.43.0
+  socket(AF_INET, SOCK_STREAM, IPPROTO_QUIC);
+
+Note we did not opt for UDP ULP for QUIC implementation due to several
+considerations:
+
+- QUIC's connection Migration requires at least 2 UDP sockets for one
+  QUIC connection at the same time, not to mention the multipath
+  feature in one of its draft RFCs.
+
+- In-Kernel QUIC, as a Transport Protocol, wants to provide users with
+  the TCP or SCTP like Socket APIs, like connect()/listen()/accept()...
+  Note that a single UDP socket might even be used for multiple QUIC
+  connections.
+
+The use of IPPROTO_QUIC type sockets over UDP tunnel will effectively
+address these challenges and provides a more flexible and scalable
+solution.
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+---
+ include/linux/socket.h  | 1 +
+ include/uapi/linux/in.h | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index ec715ad4bf25..dc80de8d8c50 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -401,6 +401,7 @@ struct ucred {
+ #define SOL_MCTP	285
+ #define SOL_SMC		286
+ #define SOL_VSOCK	287
++#define SOL_QUIC	288
+ 
+ /* IPX options */
+ #define IPX_TYPE	1
+diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+index ced0fc3c3aa5..34becd90d3a6 100644
+--- a/include/uapi/linux/in.h
++++ b/include/uapi/linux/in.h
+@@ -85,6 +85,8 @@ enum {
+ #define IPPROTO_RAW		IPPROTO_RAW
+   IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
+ #define IPPROTO_SMC		IPPROTO_SMC
++  IPPROTO_QUIC = 261,		/* A UDP-Based Multiplexed and Secure Transport	*/
++#define IPPROTO_QUIC		IPPROTO_QUIC
+   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
+ #define IPPROTO_MPTCP		IPPROTO_MPTCP
+   IPPROTO_MAX
+-- 
+2.47.1
 
