@@ -1,141 +1,175 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from n169-114.mail.139.com (n169-114.mail.139.com [120.232.169.114])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41B7200C2
-	for <linux-cifs@vger.kernel.org>; Tue, 27 Jan 2026 00:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769472722; cv=pass; b=cVXytk+pSnYSY+aJ2Ts7qJWHSxI0WMOZE4pTX196E72/2WBoK6M4yWATuOELs5HLoTgxtBnu28Vc1Y5lMMx67CcqwMaVTE087fJ6X28FTjKQxlYn5mZKKq1YFvj4/cJEt3vetrIeT1fd3QK+spa6FlOk4TVgN37+VtZkx0UNubo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769472722; c=relaxed/simple;
-	bh=9AFIZarNXXIq+CScBeq92wMz5SXuJiRvtxK3qSM3RHw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SJtQrklQ66zmvIfY4I3A1Ei0h1+e6COHV/4k1Kb3e3CrJx/ffV4/K3pSEuYFSSDhrs/9fl/N+JrRW+UQsIPmhGhp4loow6cmy8S6suc1Y3I+Z3YTnmT4Vc51Cq2TBReZWYI3Y5xDpXQRwuU6SnNc+k2Cn6KVylEmo5lEeNGkdJA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BgG2zya6; arc=pass smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4B52BCF4A;
+	Tue, 27 Jan 2026 08:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.114
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769502731; cv=none; b=gjYX8nh6F1hH5Ry0I5OLyDYsZuvy+bbZQZ4pW2OuoF4OS234VsCjHaTDk6axi9vaUMa7gJQ5yFXGw3sZsaBd0VOHjFnYfrrRh9ITHDrrMJZkOZVVWqHJQI9rRl5kgVRa9z2fIqkOXKa9fXtERuVt8LpdPWotx/MpTaWah4SGqoQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769502731; c=relaxed/simple;
+	bh=7R/0y3r+kLaNah1uVZ+xLzGFJEfXNObb51z6mKttBuY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rXaiKRomi8GXb2t+cxhC1cnlApnMDEShXy4JT3jI+h0jumeCdUIzFbH6+VjhSjH2ZHd1q3e+/kTAtqkt6G7RqSn+9Xm1NSJQHYQyOLpq64Ap8dKopsG8ZjSzwPgfungYId/22h/LYHH5gaDksIngZ8ot58ZQfORROwdIhT9IPoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=n9XI7u0V; arc=none smtp.client-ip=120.232.169.114
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BgG2zya6"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-5018ec2ae21so57176451cf.0
-        for <linux-cifs@vger.kernel.org>; Mon, 26 Jan 2026 16:12:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769472719; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AMD7cZe8YrWckyMhFkjrncu0DqSIuAo1HoBvQ2ZTzkqJtBaeOC1tcqtd7PIGLDpMc5
-         348+lki28SUb8sAQmaWh6R+oo9lH8ghRwpILKkZvqsKDihm0B2DrHSKPgWahIxhzoOgx
-         t44UjtF++eID1Ffio0eZZ5OpUYMxGGJ72SXfBSejf/0knmx+TZnOfDcxtk3EScwABLao
-         XSESoJTVYSEUOpFIl2sg62dy9jZeuWOdkYyzBDgq/W0W38p5FUOmD+ehnEoc4apIBrUl
-         MXOvCOtxjhKZYDIbIbNQ9EiO/MoDOgouH+Rs0ku+MWfQSig7I2uQ8WZ9a4ukGd62YSQQ
-         09BQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=9AFIZarNXXIq+CScBeq92wMz5SXuJiRvtxK3qSM3RHw=;
-        fh=8AP1p8I+o0N3IzLZIBuKsFbhJqWBf8Hr/sdfXxJ45VI=;
-        b=b9InFBeVyjk6PGvI0C+bkdlgkSO9EWgFgAw7pBZyYnpSaB8Otr1OMJVqAYPSju/HeD
-         RFMTCovdllBEOHnhggeGqK2H0uGphSlEfnR1Dng9b0nuz2EMmCkzvv4RQObapeeRhDej
-         A0eQzaIy5pw6tVW30M7CvRkiWNRwgIkhM58ykifXGFhyAzY5fr3iHHwFNsf/GaNsDy94
-         VRvRD2ouXySAHElaI4OYN/NoELJp0hj+bU2kQsGgTytQ8oRT1CsHDfyYVxoBjolS5U0Y
-         z6v8XkVS0cAABLhOLyiuhtuFk29K9zbEFSlu8V6bJYXzmEm6VgWPqUFjSX8CH7a9Ojre
-         qqUw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="n9XI7u0V"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769472719; x=1770077519; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9AFIZarNXXIq+CScBeq92wMz5SXuJiRvtxK3qSM3RHw=;
-        b=BgG2zya69SLMSP4oWKOZs4o421kvLePu75GHylMixLXeN9EcYFV6ZE2VDp9YG0xSRS
-         Aig2hv/d2F9uFt7Zui1a8DyrZLA3BZHVq+GHUx/Dbd3M557bWkz+XkLTv/KQJRfdhWcI
-         J08nMez7kpXlBUfpuL5KwqzzExm8NrVhsX3fTOi4iXX+M650eyfdzniMCN4smFCrVOPA
-         9q6v3/ov4mhzNqH07p0XDysubiDQnkAUfIxkNvYdtB+e3UJtna1YwHD9hWJlA3NZ+Wwm
-         18FimnluevPlPsyNIMyvq3MDn45BlWol0OLMFjctQvObowg8egh1DLVo4PG9C+XjzCao
-         MZyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769472719; x=1770077519;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9AFIZarNXXIq+CScBeq92wMz5SXuJiRvtxK3qSM3RHw=;
-        b=sgLwyzX43he4webEiWInIJw8zFo8S5Fd5dTbeHiTo6VWBw4UTacdKKXjlKaXJRZBe0
-         ZXfQ5WqN2nwh45If02+MRror/QGUi4Vm8+1lxsRi3CvXiOfNnHiIU9WWcdMpo+Kl/6Cr
-         sk8mFA8wBGsecfIgcobXpfS918LgrnK5xvXLDYWSH1unFN7zOGRxWqYiZz8did2cweMX
-         s3OUs5K5ohSnFyKFYa2wZ4HCRs+2hccCwRyDH/OHvYnHp2O7Y2jiOD4jyhzyx3ALRGJA
-         V3q3FLLIIEtxVfPX7e62yl4saw5YFGsSPc9e9FsQgNktQpBl5SyRlJdcDPvFD/AYHjqz
-         Cp3A==
-X-Forwarded-Encrypted: i=1; AJvYcCUF0kS9DOgqrtCAdbHoKWXXQ+hBg0oltcd6bRLnD5B4tiUobAazGe2uVNU2MlrNddG3woSV+CC0bzbT@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtXThKZhiTyGL7ZJ+DfnfLWOHzgFwclBbLAD5lRU2r7JglFHdK
-	YaDAR+azRdcuitl9Wc+K8PeGNelLufaSmqQry3U/1/4vnVHcueGLJyLkcFXSGdaSuhdqD07cy5r
-	Y6Bcnkl6+qHprdDiodu2O/J99JyjLfhk=
-X-Gm-Gg: AZuq6aJrQFuV+Cbe3QBw+zo4bYj465SummDHnAsaf2gfCOwWOqo4Nn0ow5lQ6uxDovy
-	qfhr47IToPkF+IbuZXndLMTRR0HIy6zW7KVbZewM+8KAOP2fX4xtJbmERr68m2yuVJ57ENjYesn
-	BLXk83KukZSdwe5RSckA+m0HMX8CrZlHQbT2qxX0KCANrlwVnxmrmis+RG8IoDemm0nIYPOH4Gp
-	HQ4P+4swOFC0xO+qk9oU80GdSH/QHY3mHXx3MUbGpI2yRqkNYQenfKnEUeUw+zAvX7Ugnn3hoZ0
-	TKwGSR5fnRPxOiUQYRqTcxmVGDy1jlGt6vifkRkG8CcHDC6ys5dnhCWZT71bSijY3k+TdKdVzSU
-	wZK69Ge0Q7K+Llc47d8OHoR2hBNSKFYlpCWncV2GA2dWjPSUU5jhT0LXoDLb0nwwVaCrv00VYVh
-	giT0VWFxAC6Q==
-X-Received: by 2002:ac8:5dd2:0:b0:4f4:ee07:91b9 with SMTP id
- d75a77b69052e-50314d19321mr85031261cf.47.1769472719600; Mon, 26 Jan 2026
- 16:11:59 -0800 (PST)
+	d=139.com; s=dkim; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=n9XI7u0V4MPYME59knGIekq7ypZg6um6ycLKJ1g+yZ/irZ+9pYxcjq0gp37RLqGMq9cPuuMANJRZ3
+	 rVep8bkee4QpDza2bdGvrC0jDz4jBPEZ5+HPYZRnlk7yXJNdVEBO+tO8O6ITcUw42sMyf2yfZ9huKW
+	 vRQA6ZP7H5FIWmGk=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM:                                                                                        
+X-RM-SPAM-FLAG:00000000
+Received:from NTT-kernel-dev (unknown[60.247.85.88])
+	by rmsmtp-lg-appmail-43-12057 (RichMail) with SMTP id 2f19697877f71d1-011ea;
+	Tue, 27 Jan 2026 16:31:53 +0800 (CST)
+X-RM-TRANSID:2f19697877f71d1-011ea
+From: Li hongliang <1468888505@139.com>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	linkinjeon@kernel.org
+Cc: patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	sfrench@samba.org,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	sujana.subramaniam@sap.com,
+	sashal@kernel.org,
+	linux-cifs@vger.kernel.org,
+	norbert@doyensec.com,
+	stfrench@microsoft.com
+Subject: [PATCH 6.6.y] ksmbd: fix use-after-free in ksmbd_session_rpc_open
+Date: Tue, 27 Jan 2026 16:31:49 +0800
+Message-Id: <20260127083149.3344689-1-1468888505@139.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <n3ma17AT6PhgrI6OfkbdTz3n_ak9jHfcYoGaAOdyxsY63h-GVDNpzS98XsQlTPN6r2nYxdQ_ODsxNX7fPh8J0PpSJ7-Tvt_8uqjtpfQamGw=@denisons.org>
- <hrQNBHikNUU26Klip-roC5Vuq474cWlMtfx-yvROP7k6iAyEW66dCc8negCRm4xdOuRqAQDa346BJQKyFLl3HveGykv-jkKihJarU5MYpFQ=@denisons.org>
- <f147af48-6c01-47f4-ba51-71b77c1ea94a@linux.dev> <Sj-xdM9FhG-h2q9G9x6pAEQN2TZEyWvq3Vh66-KRyGXnoDxar4KfSmsStO9n2mWnJgez0zqgn7STXBXjedgRKRLs23ql190kfqKNrl1J48Y=@denisons.org>
- <LV9PR21MB4757D8624474C50468BEAE81E48EA@LV9PR21MB4757.namprd21.prod.outlook.com>
- <LV9PR21MB4757E63CE7D0DE2610AF2655E489A@LV9PR21MB4757.namprd21.prod.outlook.com>
- <50b282c2-6a06-42cc-b52e-b545fd8d9e01@linux.dev> <hAshiKr_dint37zHnaRbpo9UNdT9my5xllqfyLLXWYZR5jpRVn2lpTvzgWWng3w-INoptu8YHCUMVtda0JV-ekS3zNGePJgJMqL3wKw6HWQ=@denisons.org>
- <CAH2r5ms02k4feJEmfzenU-DgFMSDFDiCc1=o_JpyaiWcnOU1Tg@mail.gmail.com> <shU8wpo2oNyUu4RkVuN0VHmIES1SzKRN9in6AJDn4EKDDGwMkzl2ShJ8i-4AfFOSKDDnEhxZVGH_w8y9JxO683d_QQzMJOig7eOb0AmaFBs=@denisons.org>
-In-Reply-To: <shU8wpo2oNyUu4RkVuN0VHmIES1SzKRN9in6AJDn4EKDDGwMkzl2ShJ8i-4AfFOSKDDnEhxZVGH_w8y9JxO683d_QQzMJOig7eOb0AmaFBs=@denisons.org>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 26 Jan 2026 18:11:48 -0600
-X-Gm-Features: AZwV_Qi7RD4u7prfj7yRWFBYp5x4ZNxQNyd-aJFoxjJsWx_l3krrhiUl698WXkE
-Message-ID: <CAH2r5muJwNMq1ZB_5By6Lk05Mg5-BWdf9Bqck5d+2Ysu+wv6-A@mail.gmail.com>
-Subject: Re: Decimated subseconds in smbinfo filebasicinfo timestamp output
-To: Sam Denison <dev@denisons.org>
-Cc: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>, 
-	Steven French <Steven.French@microsoft.com>, 
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
-	"samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-merged into cifs-utils for-next
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-On Sun, Jan 25, 2026 at 1:26=E2=80=AFPM Sam Denison <dev@denisons.org> wrot=
-e:
->
-> Okay, like this?
->
-> I=E2=80=99ve attached the patch kindly written by ChenXiaoSong, if I unde=
-rstand the intention this is simply to allow me to take credit and do littl=
-e to no work! I only edited the dates and times in the patches header and e=
-xamples. I haven=E2=80=99t ran a single Git command! Hope the patch still w=
-orks.
->
-> I=E2=80=99ve CCed linux-cifs@vger.kernel.org and samba-technical@lists.sa=
-mba.org as requested
->
-> Sam
->
->
-> On Tuesday, 20 January 2026 at 15:40, Steve French <smfrench@gmail.com> w=
-rote:
->
-> > You can send your patch as an attachment to us, you shouldn't need to c=
-hange your email address or worry about smtp.
-> >
-> > Thanks,
-> >
-> > Steve
+[ Upstream commit a1f46c99d9ea411f9bf30025b912d881d36fc709 ]
+
+A UAF issue can occur due to a race condition between
+ksmbd_session_rpc_open() and __session_rpc_close().
+Add rpc_lock to the session to protect it.
+
+Cc: stable@vger.kernel.org
+Reported-by: Norbert Szetei <norbert@doyensec.com>
+Tested-by: Norbert Szetei <norbert@doyensec.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+[ KSMBD_DEFAULT_GFP is introduced by commit 0066f623bce8 ("ksmbd: use __GFP_RETRY_MAYFAIL")
+ after linux-6.13. Here we still use GFP_KERNEL. ]
+Signed-off-by: Li hongliang <1468888505@139.com>
+---
+ fs/smb/server/mgmt/user_session.c | 20 ++++++++++++++------
+ fs/smb/server/mgmt/user_session.h |  1 +
+ 2 files changed, 15 insertions(+), 6 deletions(-)
+
+diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
+index 0ca788009c93..450a9f8ca7c7 100644
+--- a/fs/smb/server/mgmt/user_session.c
++++ b/fs/smb/server/mgmt/user_session.c
+@@ -59,10 +59,12 @@ static void ksmbd_session_rpc_clear_list(struct ksmbd_session *sess)
+ 	struct ksmbd_session_rpc *entry;
+ 	long index;
+ 
++	down_write(&sess->rpc_lock);
+ 	xa_for_each(&sess->rpc_handle_list, index, entry) {
+ 		xa_erase(&sess->rpc_handle_list, index);
+ 		__session_rpc_close(sess, entry);
+ 	}
++	up_write(&sess->rpc_lock);
+ 
+ 	xa_destroy(&sess->rpc_handle_list);
+ }
+@@ -92,7 +94,7 @@ int ksmbd_session_rpc_open(struct ksmbd_session *sess, char *rpc_name)
+ {
+ 	struct ksmbd_session_rpc *entry, *old;
+ 	struct ksmbd_rpc_command *resp;
+-	int method;
++	int method, id;
+ 
+ 	method = __rpc_method(rpc_name);
+ 	if (!method)
+@@ -102,26 +104,29 @@ int ksmbd_session_rpc_open(struct ksmbd_session *sess, char *rpc_name)
+ 	if (!entry)
+ 		return -ENOMEM;
+ 
++	down_read(&sess->rpc_lock);
+ 	entry->method = method;
+-	entry->id = ksmbd_ipc_id_alloc();
+-	if (entry->id < 0)
++	entry->id = id = ksmbd_ipc_id_alloc();
++	if (id < 0)
+ 		goto free_entry;
+-	old = xa_store(&sess->rpc_handle_list, entry->id, entry, GFP_KERNEL);
++	old = xa_store(&sess->rpc_handle_list, id, entry, GFP_KERNEL);
+ 	if (xa_is_err(old))
+ 		goto free_id;
+ 
+-	resp = ksmbd_rpc_open(sess, entry->id);
++	resp = ksmbd_rpc_open(sess, id);
+ 	if (!resp)
+ 		goto erase_xa;
+ 
++	up_read(&sess->rpc_lock);
+ 	kvfree(resp);
+-	return entry->id;
++	return id;
+ erase_xa:
+ 	xa_erase(&sess->rpc_handle_list, entry->id);
+ free_id:
+ 	ksmbd_rpc_id_free(entry->id);
+ free_entry:
+ 	kfree(entry);
++	up_read(&sess->rpc_lock);
+ 	return -EINVAL;
+ }
+ 
+@@ -129,9 +134,11 @@ void ksmbd_session_rpc_close(struct ksmbd_session *sess, int id)
+ {
+ 	struct ksmbd_session_rpc *entry;
+ 
++	down_write(&sess->rpc_lock);
+ 	entry = xa_erase(&sess->rpc_handle_list, id);
+ 	if (entry)
+ 		__session_rpc_close(sess, entry);
++	up_write(&sess->rpc_lock);
+ }
+ 
+ int ksmbd_session_rpc_method(struct ksmbd_session *sess, int id)
+@@ -438,6 +445,7 @@ static struct ksmbd_session *__session_create(int protocol)
+ 	sess->sequence_number = 1;
+ 	rwlock_init(&sess->tree_conns_lock);
+ 	atomic_set(&sess->refcnt, 2);
++	init_rwsem(&sess->rpc_lock);
+ 
+ 	ret = __init_smb2_session(sess);
+ 	if (ret)
+diff --git a/fs/smb/server/mgmt/user_session.h b/fs/smb/server/mgmt/user_session.h
+index f21348381d59..c5749d6ec715 100644
+--- a/fs/smb/server/mgmt/user_session.h
++++ b/fs/smb/server/mgmt/user_session.h
+@@ -63,6 +63,7 @@ struct ksmbd_session {
+ 	rwlock_t			tree_conns_lock;
+ 
+ 	atomic_t			refcnt;
++	struct rw_semaphore		rpc_lock;
+ };
+ 
+ static inline int test_session_flag(struct ksmbd_session *sess, int bit)
+-- 
+2.34.1
 
 
-
---=20
-Thanks,
-
-Steve
