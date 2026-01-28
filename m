@@ -1,116 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7348A26C39E;
-	Wed, 28 Jan 2026 14:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D895155757
+	for <linux-cifs@vger.kernel.org>; Wed, 28 Jan 2026 15:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769609487; cv=none; b=khwGZiGjh6DSFO4vaIMssyM8KQdAzLVLFkq2xCIS4YaGut99u3RL+hhGFTpmHsUXObl1h+EOwrbnUj3W5rKDOCeRWxxf0l/5Tdsk+cQm7D96BsndcOcBFf4A+5WJnxKuSlyD2zw3V97s6O0jg/PaCBafzPQDZMf1FKqQgug2POQ=
+	t=1769614263; cv=none; b=EJMrhWk8VQlc8RwdISiJpQHSI4CkfFExRk2jo0yWnaASMyqGbQU2zo16XBGk2iqbFm1LwEBy2IPuAghzzyI+Ahthty0Vq+Hc4s2xFS7KETRuQxjSDCRrtDdYE6eNy/BK79zOGXLr/s3SBn9OABz1t1XQPv+1tAt931xf65VOUy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769609487; c=relaxed/simple;
-	bh=NeCsJKpQ1A8EmAKIgTzJT47TrR9C6KHVrQEyy0hkTTQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EgAUApNzFNCx7cBIqQzKxbpqhaoWsVqgJsEVEENccY7X08lHmagcpzvTIiZhrAliqWYXNxnEEKf/EM5AgBnwFFHCx9CFjzMVRnZwb1xKxJRi2Hwex0RpOwgXigchc0KIexrqMrAKn4nNscGHcIM7+2k0rN5ogEY56L/De3bBW2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fX70evCQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769614263; c=relaxed/simple;
+	bh=0LF0WzNqpv+gvZlbI7zC8jh7iY56HH6T96ljIpkWEn8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Noa/CO15Wj8HcVN8Y+VyYeTe680et+ITwYs5UAQfCX65XyOBbuRqxVqdY9x+71j0SyCOLyAqxWpGtWZGNry0xZW/IwFCtHIg7FT8bUj0i+WvwKpr6qN5d4Mc+DOGdxPDPvYnbcL8XZvqrdxhFVvnyFJawmzPOyLOSHosY9UurO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fPAk2YGj; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fX70evCQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DF4AC116C6;
-	Wed, 28 Jan 2026 14:11:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769609486;
-	bh=NeCsJKpQ1A8EmAKIgTzJT47TrR9C6KHVrQEyy0hkTTQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fX70evCQLvMC0bS+86dVvfP6EkkB3dgn5p3xGFkoZfkvRjHg4jwzZi/qUSnB0F2/S
-	 /tx3Mg7R5o6lFycwsotp3qvaRr3DrPv1L730XlDweKOii0aq34gtiaieIyJaBc+ULy
-	 Crq+pIL5Hy36wSMiaOeuhMhh6Oc44RbTbM/jYAWlnQ3jdgS49Mqx2pfCJORcBiABwx
-	 8Wu+HuoMPloQeUniIMLDoyH8UbARFvdDPC1EmMs/jyLyAKePN0FTmO4P+GhDeysCYm
-	 q74vWuDwIAGN+DG/mNk7hLRzQC1RskpYrDahk95DRwyn7e5jNc4RxUn9rsQuyv7WF5
-	 FscUFnH2tt1LQ==
-Date: Wed, 28 Jan 2026 16:11:23 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Stefan Metzmacher <metze@samba.org>
-Cc: linux-rdma@vger.kernel.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, Jason Gunthorpe <jgg@ziepe.ca>,
-	Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>, Namjae Jeon <linkinjeon@kernel.org>
-Subject: Re: [RFC PATCH 0/3] RDMA/smbdirect: introduce and use
- rdma_restrict_node_type()
-Message-ID: <20260128141123.GG40916@unreal>
-References: <cover.1769025321.git.metze@samba.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fPAk2YGj"
+Message-ID: <bcd3d847-c38f-4c88-af07-3da09dad476b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769614254;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E5GkLaSPEAbkbWV7JSieeuvI5xjPgHd1OVou8qjcKRw=;
+	b=fPAk2YGjCobio8anJpK3hHObc7a2PqPLPkb2m22YpaMBaVzkeTo2jzPo20i0YuVFyUA3yn
+	86A+ejBezxpbF6VQt8LspEWQdO5cDpqpSidABKBp+3FPlYYjHCXdqJzsGfvlGOImJKGmVp
+	CUTUTDboeNDAUGwpX6XTZ71LfSXKnCU=
+Date: Wed, 28 Jan 2026 23:29:59 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1769025321.git.metze@samba.org>
+Subject: xfstests failed test cases
+To: Steve French <smfrench@gmail.com>, Shyam Prasad N
+ <nspmangalore@gmail.com>, David Howells <dhowells@redhat.com>,
+ Henrique Carvalho <henrique.carvalho@suse.com>,
+ Bharath S M <bharathsm@microsoft.com>,
+ Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <CAH2r5mv41nFwJQwszD82MQbtDV75zVy6=tbwqxDTOsw2hwfBpw@mail.gmail.com>
+ <CANT5p=qmo_KORMQbnjonapAaGHq=UvWAMzR0jNKBBvx3UUkyjQ@mail.gmail.com>
+ <CANT5p=pfQE2A++j6W4sEudrSLH6ct=ho4i=k2ZDEecUAX0cReg@mail.gmail.com>
+ <CAH2r5mvakK7=1i-fZTE9hLLYd_Q3o5z557vQZ5QQtdOTkZeSew@mail.gmail.com>
+ <CAH2r5mufJgC85ULoVzYSMXDq4=-RUiJ2YgppM434vz1Q4B1d+A@mail.gmail.com>
+ <CAH2r5msVifsc-E0TjaYXt2Afh1MiCsJTSwMnsDAdUShRgkJ_4A@mail.gmail.com>
+ <CAH2r5mukVmnfK7X3jXWwRnD-_RAMuUgzXpi+HzNjxOat4tobJA@mail.gmail.com>
+ <CAH2r5mvW23-eUsjDQ_0oLrmj406Og5sDs-yPgqh6jPwdSEG+Tg@mail.gmail.com>
+ <CAH2r5mu909vLwAQcKFQX7cWz421V1QmSiBAKyJeC8gUcGVb0Ew@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <CAH2r5mu909vLwAQcKFQX7cWz421V1QmSiBAKyJeC8gUcGVb0Ew@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jan 21, 2026 at 09:07:10PM +0100, Stefan Metzmacher wrote:
-> Hi,
-> 
-> for smbdirect it required to use different ports depending
-> on the RDMA protocol. E.g. for iWarp 5445 is needed
-> (as tcp port 445 already used by the raw tcp transport for SMB),
-> while InfiniBand, RoCEv1 and RoCEv2 use port 445, as they
-> use an independent port range (even for RoCEv2, which uses udp
-> port 4791 itself).
-> 
-> Currently ksmbd is not able to function correctly at
-> all if the system has iWarp (RDMA_NODE_RNIC) interface(s)
-> and any InfiniBand, RoCEv1 and/or RoCEv2 interface(s)
-> at the same time.
-> 
-> And cifs.ko uses 5445 with a fallback to 445, which
-> means depending on the available interfaces, it tries
-> 5445 in the RoCE range or may tries iWarp with 445
-> as a fallback. This leads to strange error messages
-> and strange network captures.
-> 
-> To avoid these problems they will be able to
-> use rdma_restrict_node_type(RDMA_NODE_RNIC) before
-> trying port 5445 and rdma_restrict_node_type(RDMA_NODE_IB_CA)
-> before trying port 445. It means we'll get early
-> -ENODEV early from rdma_resolve_addr() without any
-> network traffic and timeouts.
-> 
-> This is marked as RFC as I want to get feedback
-> if the rdma_restrict_node_type() function is acceptable
-> for the RDMA layer. And because the current form of
-> the smb patches are not tested, I only tested the
-> rdma part with my branch the prepares IPPROTO_SMBDIRECT
-> sockets.
-> 
-> I'm not sure if this would be acceptable for 6.19
-> in order to avoid the smb layer problems, if the
-> RDMA layer change is only acceptable for 7.0 that's
-> also fine.
-> 
-> This is based on the following fix applied:
-> smb: server: reset smb_direct_port = SMB_DIRECT_PORT_INFINIBAND on init
-> https://lore.kernel.org/linux-cifs/20251208154919.934760-1-metze@samba.org/
-> It's not yet in Linus' tree, so if this gets ready
-> before it's merged we can squash it.
-> 
-> Stefan Metzmacher (3):
->   RDMA/core: introduce rdma_restrict_node_type()
->   smb: client: make use of rdma_restrict_node_type()
->   smb: server: make use of rdma_restrict_node_type()
+I have reproduced the failures of these test cases. For detailed 
+information, please check the link: 
+https://chenxiaosong.com/en/smb-buildbot.html (I will ensure this link 
+is always accessible).
 
-The approach looks reasonable. Do you want me to take it through RDMA
-tree?
+Perhaps sending these issues to the mailing list could help resolve them 
+more quickly.
 
-Thanks
+Thanks,
+ChenXiaoSong <chenxiaosong@kylinos.cn>
 
+On 1/25/26 03:45, Steve French wrote:
+> I did see a crash in cifs/103
+> (http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/ 
+> builders/12/builds/38/steps/19/logs/stdio)
+> running mchan test run to Windows.  Ideas?
+
+On 1/25/26 12:36, Steve French wrote:
+> Any thoughts on the failures with current for-next (to WIndows, fast
+> VM, with multichannel) for tests generic/533 and generic/565
 > 
->  drivers/infiniband/core/cma.c      |  30 ++++++++
->  drivers/infiniband/core/cma_priv.h |   1 +
->  fs/smb/client/smbdirect.c          |  26 +++++++
->  fs/smb/server/transport_rdma.c     | 108 +++++++++++++++++++++--------
->  include/rdma/rdma_cm.h             |  17 +++++
->  5 files changed, 154 insertions(+), 28 deletions(-)
+> +++ /data/xfstests-dev/results//smb3mcmfs/generic/565.out.bad
+> 2026-01-24 22:13:17.098765412 -0600
+> @@ -1,4 +1,6 @@
+> QA output created by 565
+> +mkdir: cannot create directory '/mnt/test/test-565': Input/output error
+> +/mnt/scratch/copy: Input/output error cmp: /mnt/test/test-565/file:
+> No such file or directory
+> md5sums after xdev copy:
+> -81615449a98aaaad8dc179b3bec87f38 TEST_DIR/test-565/file
+> -81615449a98aaaad8dc179b3bec87f38 SCRATCH_MNT/copy
+> +md5sum: /mnt/test/test-565/file: No such file or directory
 > 
-> -- 
-> 2.43.0
+> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/12/builds/46/steps/138/logs/stdio
 > 
+> and
+> 
+> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/12/builds/46/steps/136/logs/stdio
+> 
+> and also git/0003
+> 
+> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/12/builds/46/steps/160/logs/stdio
+> 
+> Does this fail for you as well?
+
