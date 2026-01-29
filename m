@@ -1,153 +1,95 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC1129ACD1
-	for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 12:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769688800; cv=pass; b=UAJS/TPf+2W33PEsDgev9LA/tsiKP7LwOKJZM0KemH/Sc9Y3GyFsIZsDgq/OY3M0QaFD/w0WcUF/A1hKf9h9XDD3GGF8pI5KTgnW1lPMq3wQrX0DWg5e+4kRpcBwnQw5d/ntjgbFlgU9fLHhAXWfbjFH5pwaWVp2uGK0WKdDjoQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769688800; c=relaxed/simple;
-	bh=OFkhbvXyiQtGuGUYi0Xxrr9+QTe7DEqriM+02bUoq90=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MnDSRsRDP5oxEjuzSvoivt/MENCGiZqXpkGeh/KrRrQ4Z9PNTglPFN5Ge6lApqFuUpcm6cM8oy0tsXMU0uvDhDVmSlLkpIS9/L0sDEWSzWHIgx16RZLAwc1IcuyQRzHD+IhqdIl+3kpEwf3SNylG8MfpxE+SfQSQ53ap31EF+is=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LlIWBjUs; arc=pass smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204B63876CA
+	for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 12:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769689289; cv=none; b=mXW6EW2nqRE6WWS4eIzeVLx0Bc+qmt0MsZVPR0pRkS3Fp71ZcX1JMFuCLjXmvdI3ulaudqr7p06ntvWEeMBvnwztZ4ppJIUEfyf0u2YB4XmCOeh9WeQqrQr3GL7qUbvxZCl+/c292GhhUHWzjorx4LJZQOux/M0N2u+Y5OxhZqM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769689289; c=relaxed/simple;
+	bh=Myi6GaG4tpI2HhbXCxGEX7kbKfOlW3tLSZgiDbGjfZE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V7VRQC0565x3+v6SfGEOhwyP0W3JcyerYXrQVs0obcMJSjELVNys6rBMoqVN8+QIIRVU71RfPa+QIkc81TrOkF+J//riy1e9nFSpiOd9LBdHsu6TcOGDO4mzhu0stDQlct9ialWxxGYd8QkNckSXZOPDT+vanq53tC18jyrqH3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LO33bMoC; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LlIWBjUs"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-658cc45847cso1163506a12.0
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 04:13:19 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769688798; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dz1Qm/mtl+NUdhbcGZIjYhBUM0FfHb+KJCnik/j5Cy3+sJbGdYZL+fi4oXvcrst6Dc
-         mWG/vd8gIAuq8Kc3YgRw2/EbVg2ZeGjhuP8lnr7OPCJ2FgyCtauYgWfxlhjBEENeMZCt
-         GvzNgd71X3PYd6aJU471mVCbMeuYiI1fIioHYEqpPtMuiFCfqXpKhBZ3FTvud1LqOFnW
-         7PVZP63wlC8CPfME1jrgdnVUYzoO3RrQcWb71te1hm9RpapnB55IZsV12aYHEbBKUm6P
-         FeL/HUkVINLUyHRdckvAigKqMoalZ98Knh+uLLDLuUM2QVMABwLNqPr0o2ROBVg5JibK
-         PLHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=dVRo0gb1o6gTeziHK7Wfsfwm0G0vzfIXHYbGlbgsvDI=;
-        fh=ivCwkVCbTDUI/zL2b/roBiCbp/G9xQ3FpSiz58Fn7qk=;
-        b=fsJJ7UOENtHpKuN8aOtstqIx8epNMTHI1tOXwuersN0arltzqBnEvvivJLELASBPRS
-         gUS9ASQ14echrvJNx3T+GPoEqwGNp1XQDtYKIhq6D8iXJK2GRipkzjCgS08kIJHIF08W
-         IMQuHkgTvakr2wPLti8pONXjl2ZhCWeUHwUWhAr2WLUVVdM9PR2vShiAE1HUK6Ld+VR+
-         XgAj5cPIhlImdTTMiZ5XQw72cDa3WJmpZuWsLNMDKanleWS1Plo6CkohQnoA8zYl0Zot
-         z5x5rtN78PAgUuXQaOt2EHsJknl+z9vnDb0RcADui6GL43QD2MA/OQr8BErEUKT3Xi5K
-         VcxA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769688798; x=1770293598; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dVRo0gb1o6gTeziHK7Wfsfwm0G0vzfIXHYbGlbgsvDI=;
-        b=LlIWBjUs96F3yscCvayZTXzjkLsq86hcxsele8I94YiONdnEOPjK/e2U3f9Z60o2Vy
-         sgl1M8neg0R6Oixk4ohjTMck3AC4cRKyhlcyi2NixdCih5IJofm0/OgPI1DPTxeY58Lx
-         0H/X0OaCQWmffamcICR6z+3+EOsstmFXON/Ixfaa24ss62YN7CTuascpQpFNJx3UtGXV
-         Tep1h2KGFmwFsmIQ0TwAzvssiGkjV8FAW9DBtFgom8Ox3kP/camujhZK7yvgBcnrkrTw
-         i+FtzXsAzGwnVuiiyzrzgt1SPD7Kc+8ylJGCMQ80M8bij0MGAvcXnmcOPQcn2jo+hCyo
-         aH/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769688798; x=1770293598;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dVRo0gb1o6gTeziHK7Wfsfwm0G0vzfIXHYbGlbgsvDI=;
-        b=rHYxuoXxDR3e89S2u5KV664u0JXLyrGlMPL0dLfTiXiYL0BBHJQ1PXqEEPe6m5ytR+
-         owj9cHMDwDgR5Jw/Jl9do7/hUsHUtPR393jPvF78Pp32N9zxKBrnTe5D5vb6lzIbysvO
-         mHvd67VRFTKGwxx1iPsSxncKzzTpV0cEJF2Xkzc5IUm8ztsGaXi+VVw/t4RglBg6G3Hn
-         qXpWT6B/Iv0v+UclTF2c6DIuhRm2FVoGNeUXRjOD4zR2R/SEvq/PjL78Jy7ZTppmqvu4
-         e9qphNioXRfw3BFr3C0UG851BRG7fP6eFG6HcaxrBj3JoAqx1ovShLgmBqOMOD6OFYI4
-         g8Yg==
-X-Gm-Message-State: AOJu0YyIE07S9Gk/sK3kxPygqj5aNeW4UZV+s6xVq47L+vmnzT1Z7jgM
-	ffn5HIZ0OfsV6oHetAcnnA0g6MWyZJFh9d8vorifog1CMmYpRPxjZBc2hJgjMU3q4ANsEP0dQ2o
-	6l14HahpxrbYvbOhmnjCNsvPExaHXg8E=
-X-Gm-Gg: AZuq6aJw0B2Wa95gLS8H9eTXBAasAwX/XfnX3ZnX7SxkXAV/RK9X0YG+Tvbswo9sqOK
-	YrQu2ZJiugrSOjSLxa6mCG4+s5Oyw6+xcssAiq0lXYcMvbwabjgqni3jbDgGDI1ExB2gaa6jvJ0
-	y9HDkRrQr77oTpJlQI9Fw0KROlibbmszpt0QQsIDcSebTJzIoCU7iF6C0iyg8auZjNBgL84/+PW
-	Od10CsRYLfeER5nE+3SS4B7/LzYGKsbP23IHPTA65bvldYJAY3wRsez1N1cqlOXZWoMqw==
-X-Received: by 2002:a17:907:6d16:b0:b88:641b:b0e0 with SMTP id
- a640c23a62f3a-b8dab35550dmr502605766b.49.1769688797729; Thu, 29 Jan 2026
- 04:13:17 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LO33bMoC"
+Message-ID: <f1b9cd58-8a61-4fa7-a7e9-198c2c468c59@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769689284;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nmTmcNqj6IUJh7kYyi48msH2r5G3wd2KEuGJVwxN7M0=;
+	b=LO33bMoChxSi5qEwh5O8h3mIaE9h72NrTY4N1kYNYu4DxE1l3Zq5yZC4gDvJs4SVHEl56R
+	VxfUp6fS0rqXxnLbPSxSz/mDPmGsawh2dDaJ5yT4ccJLsJovuTNOidU9MVNsfDYtvu4OaM
+	BW3CaB6qttGMGyXO9RUOp+DJY17em0o=
+Date: Thu, 29 Jan 2026 20:20:23 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260120062152.628822-1-sprasad@microsoft.com> <1652302.1769037531@warthog.procyon.org.uk>
-In-Reply-To: <1652302.1769037531@warthog.procyon.org.uk>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Thu, 29 Jan 2026 17:43:04 +0530
-X-Gm-Features: AZwV_QhsWUMtup-9SGLmiCEsP0i6Zj36exRvFntaJU7Wwt8wfm8t9oKOPM-No3c
-Message-ID: <CANT5p=qptmBxhOoO_y+OnuX+_rjMeqGUTJ87y_tA+eVX6eJqBQ@mail.gmail.com>
-Subject: Re: [PATCH 1/4] netfs: when subreq is marked for retry, do not check
- if it faced an error
-To: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com, 
-	bharathsm@microsoft.com, Shyam Prasad N <sprasad@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: xfstests failed test cases
+To: Steve French <smfrench@gmail.com>, Shyam Prasad N
+ <nspmangalore@gmail.com>, David Howells <dhowells@redhat.com>,
+ Henrique Carvalho <henrique.carvalho@suse.com>,
+ Bharath S M <bharathsm@microsoft.com>,
+ Meetakshi Setiya <meetakshisetiyaoss@gmail.com>,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+References: <CAH2r5mv41nFwJQwszD82MQbtDV75zVy6=tbwqxDTOsw2hwfBpw@mail.gmail.com>
+ <CANT5p=qmo_KORMQbnjonapAaGHq=UvWAMzR0jNKBBvx3UUkyjQ@mail.gmail.com>
+ <CANT5p=pfQE2A++j6W4sEudrSLH6ct=ho4i=k2ZDEecUAX0cReg@mail.gmail.com>
+ <CAH2r5mvakK7=1i-fZTE9hLLYd_Q3o5z557vQZ5QQtdOTkZeSew@mail.gmail.com>
+ <CAH2r5mufJgC85ULoVzYSMXDq4=-RUiJ2YgppM434vz1Q4B1d+A@mail.gmail.com>
+ <CAH2r5msVifsc-E0TjaYXt2Afh1MiCsJTSwMnsDAdUShRgkJ_4A@mail.gmail.com>
+ <CAH2r5mukVmnfK7X3jXWwRnD-_RAMuUgzXpi+HzNjxOat4tobJA@mail.gmail.com>
+ <CAH2r5mvW23-eUsjDQ_0oLrmj406Og5sDs-yPgqh6jPwdSEG+Tg@mail.gmail.com>
+ <CAH2r5mu909vLwAQcKFQX7cWz421V1QmSiBAKyJeC8gUcGVb0Ew@mail.gmail.com>
+ <bcd3d847-c38f-4c88-af07-3da09dad476b@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <bcd3d847-c38f-4c88-af07-3da09dad476b@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jan 22, 2026 at 4:48=E2=80=AFAM David Howells <dhowells@redhat.com>=
- wrote:
->
-> nspmangalore@gmail.com wrote:
->
-> > @@ -547,13 +547,15 @@ void netfs_read_subreq_terminated(struct netfs_io=
-_subrequest *subreq)
-> >       }
-> >
-> >       if (unlikely(subreq->error < 0)) {
-> > -             trace_netfs_failure(rreq, subreq, subreq->error, netfs_fa=
-il_read);
-> >               if (subreq->source =3D=3D NETFS_READ_FROM_CACHE) {
-> >                       netfs_stat(&netfs_n_rh_read_failed);
-> >                       __set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
-> >               } else {
-> >                       netfs_stat(&netfs_n_rh_download_failed);
-> > -                     __set_bit(NETFS_SREQ_FAILED, &subreq->flags);
-> > +                     if (!test_bit(NETFS_SREQ_NEED_RETRY, &subreq->fla=
-gs)) {
-> > +                             __set_bit(NETFS_SREQ_FAILED, &subreq->fla=
-gs);
-> > +                             trace_netfs_failure(rreq, subreq, subreq-=
->error, netfs_fail_read);
-> > +                     }
-> >               }
-> >               trace_netfs_rreq(rreq, netfs_rreq_trace_set_pause);
-> >               set_bit(NETFS_RREQ_PAUSE, &rreq->flags);
->
-> I think I suggested moving the check for NETFS_SREQ_NEED_RETRY up in the
-> function - above any checks of subreq->error, but after the initial stat
-> counting.
+I found the key factor that triggers kmemleak in cifs/103, the directory 
+exported by the server must be read-only.
 
-So you want to do this check regardless of whether there's an error or not?
-In that case, I think I'll still need to check if there is an error to
-set NETFS_RREQ_PAUSE only on error, right?
+When sharing a folder on Windows, do not check "Allow Change", set the 
+permissions of the shared directory to read-only.
 
->
-> Ditto for netfs_write_subrequest_terminated().  Actually, the
-> transferred_or_error argument of that should be got rid of and the filesy=
-stem
-> update the subreq->error and subreq->transferred fields directly as for r=
-eads.
->
+Alternatively, `smb.conf` of Samba is configured as follows:
+```
+[test]
+     ...
+     read only = yes
+[test2]
+     ...
+     read only = yes
+```
 
-I can try making the write path similar to read. Passing just the
-subreq. But that will mean changes to all the callers.
-I hope that's okay.
+For detailed information, please check the link: 
+https://chenxiaosong.com/en/smb-buildbot.html#cifs-103
 
-> I can poke at this tomorrow if you want.
->
-> David
->
+I will first try to analyze the code, and if that doesn't work, I will 
+try to bisect it.
 
+Thanks,
+ChenXiaoSong <chenxiaosong@kylinos.cn>
 
---=20
-Regards,
-Shyam
+On 1/28/26 23:29, ChenXiaoSong wrote:
+> I have reproduced the failures of these test cases. For detailed 
+> information, please check the link: https://chenxiaosong.com/en/smb- 
+> buildbot.html (I will ensure this link is always accessible).
+> 
+> Perhaps sending these issues to the mailing list could help resolve them 
+> more quickly.
+
