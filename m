@@ -1,199 +1,347 @@
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD083271EB
-	for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 19:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A76F2FE575
+	for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 20:46:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769715880; cv=pass; b=X30EyhBpfBQ2g57nzKgc/jp2KlwJhtxeAFff/stRuoABBmc18cJsJQtpM4v3aqJ5o4mKr9QntqiAyLKhBGQGYOyI7FZA8+2an71xVEA/pSnisIV4/QWOzflsIWL5dpTAmYLHkgroXpdlUE4IVIEffG3XQAEP4y914DGWc+Gt23c=
+	t=1769719590; cv=pass; b=i+xvSh+g4f8H73XdCJdGAig6ynmhlDry0wJSgGFLGDpdUHLldLMsj9CWXm0Oc5SgL6JiUOSj8YSK1znHpRCAxsrn5R1xuZhD7wrqbHXrMgxLY9+3nD5h/5DBdt1vAOr2kCfSBDXPHfVEAQGRqWQlPVqeuh6gNgv1PkDHcPHOJXI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769715880; c=relaxed/simple;
-	bh=Y0rOjxXytJB+38cdl2LNr6UYE5fA4/7cWyfoN0StXhU=;
+	s=arc-20240116; t=1769719590; c=relaxed/simple;
+	bh=zjHuPkHntjyTBGXYffHqPoUIemI1XaG2Oi8mFrXilLU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kdg+8Dmoyly+d/JxFlMtUDpft0pPmPtQ08XEoQFAMi9Ta4o+CIxv+u+qFBkghVEaezStB9dSr/iGHPVO7oGeFJi6Ac6XlGJR4YMnQRodX0CHwu2nHYet8iXiAhJmHyA8cvmwLoncymePYHNZL4Ca1timyY/VkeHIl9CF4aRIX9g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+U+QY4/; arc=pass smtp.client-ip=209.85.217.43
+	 To:Cc:Content-Type; b=vD5PYvxug6fef7G/sOnwo4EKF9jZ3uJsmDJTzehQFx2VP1wnmXUeQ2tPo1Mw80T40PWMjYjrcksBvBzMobJH0YbXHkqgYAsmsqg/c2ZNJDkV6gjzXL1ZZdVQnLXQyk09CyehaiR1EtPGJUSkSon+1vPAWAuI78eh/P6KV5xPndg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JXMJ2GUz; arc=pass smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+U+QY4/"
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-5f547823192so560408137.0
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 11:44:37 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769715877; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JXMJ2GUz"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-34c363eb612so811940a91.0
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 12:46:29 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769719588; cv=none;
         d=google.com; s=arc-20240605;
-        b=LUdMmVag8Gb4iyz4apU9MCaC0XjibYDZlsWQQr/7yetF4CUEMRh5VgOKMiPPoXxeAE
-         y3gCdVj0qGVKk8zScmPrjq4KxdXHntMBYsRUo+DjJv7TzN9HaA8kaAuitVCNq6x7rPiP
-         x90TGGiog1TO9yc/foDBTiQO+E8DaSA8TOy2Ha1qGtkU8PhGR5twXhpNxVxrcA7XXrMx
-         3RTqRejXjih3SMzAVVXqcEuYj+etp3SPyaKhjvpdC+SrbMp/I8tJHR4L4dAsNVgt4cat
-         J2m9b8Ng+fBrpUZP851+Iq5suv6t7TheFna2+BCYjHJV1UON9NugtnlSVc8cM4VqExjG
-         4Z7w==
+        b=NJ6LslgfoxARifbdMIsOV0ODxpHr943RQWHSh7RcpMSOE79D+69oScCwdRTMVCxQda
+         YeKiMFNovt5Tx+9Q9w+l09It2/MDczio9QXsDOUrbsBNPZr4vtbgagusL04Zlb/Qkz1Y
+         aDbq0zRPyvcyQXyHR8IKGlx+c128uSMOhG7kR4RGzt0s8lmJqN1DcfNSf2C8SxNY/xra
+         qrU46Z59MSnos/wqqbWn5QriQHiOvVpCtwGZ4U1t9OwsKttxG0G1aH2xLBJNsSHpxsdb
+         B/V7uaLJze8Jcroc7t9mfk1Opsjabcp3bVeP3reAf12mUxZPCVFH+xZzWC+h7f6o87jd
+         09/Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=gbwVti2MveWgbF61EO9aejU185mP/ZCSwXbR5m8XjS0=;
-        fh=0hYt+0NCa3mjOco2W3gCymCqC5JKZJaWRxtoOvm8wpg=;
-        b=lj0GArI8I1YuqRIyoBXR+MITTTSj5aMXi47q7oZ7ehGpResJ9dnDGQOWTfBWMG1Q3d
-         j6IAUgdiMSzKTnNYVIzaTK0iRdGGI4PHa7DmZfNpB78p3wt4u+VSuPJWjkA2dwjjbtqj
-         zYIsY5e+FLS7niwmr077N24OXwLqNGC/I59HwHix+EVgqSW94JcKpmac5YeVlD34C3Vc
-         MRrZpaC2xWkTRdsA46FRNYVQWAEmKLGdIdGUGUAl1w8ci6r1L+CM8ZqRG61bHlxSTt1s
-         AqqXFCW7TAqXZzd8kRIZU+qbv5HP+cfzAY3MvlsGPou5t8veR/75OU7laM6KO1MlIN7j
-         6Oow==;
+        bh=0rjX5Jj8ZcoFZqsTgog/aLHedGrxKuSlvfvYk7WheXw=;
+        fh=12trUenuBia6EgwSDIWUNWD7JKPyGqpcJrfpb0g35Oo=;
+        b=I8KwQm/Qfzb7IWJEL/cKesAUY7B3cJXOImv/KOWGNWAw+a1d5RVM/jIhdBGEw9NQ3Q
+         lYQTXxrxuAOVLuzwgvg9/7KbynKor25bHM0R+ih4E1HB6jW4MLv4J9d5is7RlpkOFWdj
+         jEgsEfOjBqwX370paZZ9fgeFTVDE6eZs6bzfbaqQflGh1o/xonRjTpHE5fMsPZiNe5CJ
+         B1ml+CH9O3rxUW+/BvET4vCuWJcjxVYUWIjZjZpUv6ehqZQPZRsSKvkOKxBrfg2R2K+f
+         zbSHXY7BkoBC3SyN0stIqVO01Cz8AXDSaIIxWGLq66yvG+Xa9ljAIYbaup6ZNyS95ZlM
+         2VUg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769715877; x=1770320677; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769719588; x=1770324388; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gbwVti2MveWgbF61EO9aejU185mP/ZCSwXbR5m8XjS0=;
-        b=i+U+QY4/8SKhsKGIab8XPm0cB5toASuCzlmBZhre8O882K7JKZAre1VMB/ducovgef
-         Jj3DLv2X4YwzLkc0zx8Ig+4VbOfPKgxq41QkXNkxncXbE8Yvcq+C8lLw3ZhXMwjQKZKE
-         EQ5UKTI2yt1Yb1jjnEMoRn9y+lzcaxg7T8v2jpoYcyPIA/X9198+J7UMc2/Z9qbCZNsm
-         Eu2MYEvmxzq6+7oCYyoJXIS9y42G7JJ9V8fyQk2YcF9tevTqpI2++qGbttdNVcqop9iT
-         ltflJ1Fd6Z+z4dwRjWbQMk+7pJD4w1CLKnzTHHpDXNn5ydPPaTczmwj0xQ8aYUTbqFC/
-         vHzw==
+        bh=0rjX5Jj8ZcoFZqsTgog/aLHedGrxKuSlvfvYk7WheXw=;
+        b=JXMJ2GUzQ/5ZRG+Bg41Vcc4QMkK8O/Hv83Xx/lPjFnmGJLLZ7uNHmoGSOgWkMIedZ5
+         eaW+z3ZqSOVkcQZoilKRO75Qcm5kgZiKems23sRy6S1mjIRLM/7bUv76hD92NBpJbWay
+         RTZj30hFU8A7YqI5mYIKuF7mm0e0Lx8ECY+wcvcGpVo1+IyclvJSRaGVu2f40lqGqI4p
+         GPqqqnUI6j34goHizL0dM47kV7T/eSrrpH13rt5gDGAPJvTwREsoGUB3gSz5jTGY/pU2
+         oud1xe7Dd73IFpI93btLX8ir8iBXwlhBzWjINq1a0awNBcqx1KmdKXLT/SoWE2eyq7vL
+         hjrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769715877; x=1770320677;
+        d=1e100.net; s=20230601; t=1769719588; x=1770324388;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=gbwVti2MveWgbF61EO9aejU185mP/ZCSwXbR5m8XjS0=;
-        b=MkJaMj1E8jX2CNnf2yLgkJDD4VfsKfw+H2mBsjWdPWQXjMZCcPKyMqPMz3vlpwYB6F
-         j5FlI1K2mmFwOw+M1x85C2a/frxYoctJ0ZlCFcTt3h6zvsJWUeDvEe4TQRYzxClQ1g/p
-         j/r853t1fx2iKu9sauqUM5cePDIjXfVnvw5IB3pCZZ3KwzxnomPPCl2iH6tJsx+erQXm
-         ncGyVZSxg2yf3TDMHgsD7gq5E0Af3dFKrDeHsHtiMW0ZAodU/PdJ/wDsm5RPi7hr5sh6
-         T+QalpXOHtD0nDkF4z5PLtxr/Y6tolzyUkZTBuDWubiGdpT56vwp2QKe3gbrB85iIhj7
-         WILA==
-X-Forwarded-Encrypted: i=1; AJvYcCVCYUVHUULD9fmldnPWFzNduWDK77zOfG1q893gxjFM5yzhw2Wjb1auiS5uf78sR3+9NfZnz+3bBKfb@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbPV1QyEnkkjasDHSrGUvPs8aongFqqp83xS9+FlSHc5CZevBF
-	HUVS8cTk7ziBczFsUzo+V97iaAnIaghZLtPiy0Hhh+sfY1fizBVyHVVcczlwq/ZkKBa/9jH4kv1
-	xAsC+JAZYZNa3GNGumHoEIp1ty6pZJnY=
-X-Gm-Gg: AZuq6aI2IfBbnrmS2geV0ydEgznSyvDfybdr/rOp5KujJ9VeOpbFWuMRowihvk/frMn
-	7Q3OHeELYtLRZ1m92BpX5hfh2pkrLR2ceNzfSsLf5h5eWvQaTEP9Fx5lmzlM+PX+HdxRumqA/N2
-	jvhar00ZWh5OKstkg6W8QTERIr74KzJBIuI6mTQ8CQFpd6oyRl3vfCQm9dZbwQaCkCsrJDsczYH
-	l3TGP9YA6YHLvSzzbpS/MTGMeDpbTB8aJGhNDY3wdXkLpLJUtUFQhM4TQBieuuCceN+bh/B4Wuy
-	eEsiT5kF4y2K1xd6zPFriGtIQNzB3w==
-X-Received: by 2002:a05:6102:3a0d:b0:5f5:33e4:12ea with SMTP id
- ada2fe7eead31-5f8e25b8bb5mr192452137.31.1769715876891; Thu, 29 Jan 2026
- 11:44:36 -0800 (PST)
+        bh=0rjX5Jj8ZcoFZqsTgog/aLHedGrxKuSlvfvYk7WheXw=;
+        b=aCzHxed1szv4cZMA1NPxP1mIrrEuamGZzk+wwcrDwfpiN7UxfYUi6t0mvHMckelU+3
+         p+VSjKpOz3FR0pT4AMEoJO5j/YcyYG+r2q08mo/US7dckcuZFOsENjYxyWlbf4wGS3/p
+         hg7CbfcIDPvP/YxhUZ3xjr7ghpz2RKIKWDmDPkzvnd9jsi+P4Mo36OCr8c3qveqRe/Nm
+         1ArHcA15c/CKmE36bhLgZiecec2wqxJpvJ/obOsuFSHGeiN7gjopAMOaG7PB37cpaepF
+         LiINGg6wjVRARBVd9v6pSHCDbjArjPq9tKUXKuZ8cSodFHzdDI8VjXhT4spT6feWnj0E
+         xBhg==
+X-Forwarded-Encrypted: i=1; AJvYcCWNrk8cJVI0EE6oLxFWi5y6BRTK605FAdjw647zGuumbn48M0WDsF8EMQ3ft9ehim3dx0JMC9ULmLLR@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAC6P+1Ablm71v/eSZyC2BF6e2Ky2FkbRR5k5Hc+yZD62tBrWt
+	PiBSJf3MrMTl+UtXVTN1WNLw7912E06VUscAe8btZd+LdwFp1hJNiw62MZyGGkSGGlXyZixC7E5
+	QceT5vQGQRBQ2c2hCOJds6tWw40WAlQ0=
+X-Gm-Gg: AZuq6aJk/ahoqseu3j43SDdK8rcAqLeb6zxJ5SGq0GGiceGTRmGylP8seraU16MUeXa
+	MFJGI6onAdvww2gtKOz9BLPf/x26ZWpZT0Zv756xh1iCOwj73yefjaX9YFOqRW07hYjNNKomnqx
+	cF0rwT7TI0DfBPQ2+3epGQyfDwgrhJ6Sq+Tc7yQ20tdhZYsz7QGoQ4zpOk4q5TVtof6dMHDEUx8
+	FfEsSC2plsrRDxxbGhldd2S4CyBLQlhBkDDifAIoIRAn+cti4Uc9QUFqKWLgZYfacqNTA5hIuoy
+	aRuaypSCAcTrbhp/NDoTY7AHwsFKuQ==
+X-Received: by 2002:a17:90a:e708:b0:341:6164:c27d with SMTP id
+ 98e67ed59e1d1-3543b2e008emr555530a91.3.1769719588438; Thu, 29 Jan 2026
+ 12:46:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <9b38b4291e2b1b47ee17f7247c4c66f5bcdccffe.1769439073.git.lucien.xin@gmail.com>
- <20260128161505.1454974-1-horms@kernel.org>
-In-Reply-To: <20260128161505.1454974-1-horms@kernel.org>
+References: <cover.1769439073.git.lucien.xin@gmail.com> <2367f77787fa0a29913f48c91087397dcc82c35f.1769439073.git.lucien.xin@gmail.com>
+ <a7b64f16-5ca9-4344-b7e8-c0d4508e43cc@redhat.com>
+In-Reply-To: <a7b64f16-5ca9-4344-b7e8-c0d4508e43cc@redhat.com>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 29 Jan 2026 14:44:24 -0500
-X-Gm-Features: AZwV_QiOMgB9Wkbq9Dg2c4rBLhA6Us48hykz0TzV8M9p-NxQPJtuqm3d7-FhuP0
-Message-ID: <CADvbK_cNUg+N5jAnmJXGBri27+AkwuFFhbKUqONkAgu1ZAmOJg@mail.gmail.com>
-Subject: Re: [net-next,v8,09/15] quic: add congestion control
-To: Simon Horman <horms@kernel.org>
-Cc: jlayton@kernel.org, davem@davemloft.net, daniel@haxx.se, kuba@kernel.org, 
-	dhowells@redhat.com, chuck.lever@oracle.com, andrew.gospodarek@broadcom.com, 
-	matttbe@kernel.org, tfanelli@redhat.com, metze@samba.org, 
-	marcelo.leitner@gmail.com, edumazet@google.com, linkinjeon@kernel.org, 
-	hepengtao@xiaomi.com, illiliti@protonmail.com, quic@lists.linux.dev, 
-	mail@johnericson.me, jbaron@akamai.com, alibuda@linux.alibaba.com, 
-	tom@talpey.com, steved@redhat.com, sd@queasysnail.net, pc@manguebit.com, 
-	smfrench@gmail.com, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, xiyou.wangcong@gmail.com, dreibh@simula.no, 
-	kernel-tls-handshake@lists.linux.dev, mbuhl@openbsd.org, aahringo@redhat.com, 
-	hare@suse.de
+Date: Thu, 29 Jan 2026 15:46:17 -0500
+X-Gm-Features: AZwV_QilFyKAwMZw3eJvCjDZfe87Lm1Eud11Dux0qE2Wke45cccXOPKvoyXi4XU
+Message-ID: <CADvbK_f3v+0hXyBHiZeR0uFEn+rvq_wT=QDv8G-e8qvB-e-3rQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 08/15] quic: add path management
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 28, 2026 at 11:15=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
+On Thu, Jan 29, 2026 at 11:20=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
 ote:
 >
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
-l.html
-> ---
-> quic: add congestion control
->
-> This patch introduces quic_cong for RTT measurement and congestion
-> control. It implements a congestion control state machine with slow
-> start, congestion avoidance, and recovery phases using New Reno.
->
-> > diff --git a/net/quic/cong.c b/net/quic/cong.c
+> On 1/26/26 3:51 PM, Xin Long wrote:
+> > This patch introduces 'quic_path_group' for managing paths, represented
+> > by 'struct quic_path'. A connection may use two paths simultaneously
+> > for connection migration.
+> >
+> > Each path is associated with a UDP tunnel socket (sk), and a single
+> > UDP tunnel socket can be related to multiple paths from different socke=
+ts.
+> > These UDP tunnel sockets are wrapped in 'quic_udp_sock' structures and
+> > stored in a hash table.
+> >
+> > It includes mechanisms to bind and unbind paths, detect alternative pat=
+hs
+> > for migration, and swap paths to support seamless transition between
+> > networks.
+> >
+> > - quic_path_bind(): Bind a path to a port and associate it with a UDP s=
+k.
+> >
+> > - quic_path_unbind(): Unbind a path from a port and disassociate it fro=
+m a
+> >   UDP sk.
+> >
+> > - quic_path_swap(): Swap two paths to facilitate connection migration.
+> >
+> > - quic_path_detect_alt(): Determine if a packet is using an alternative
+> >   path, used for connection migration.
+> >
+> >  It also integrates basic support for Packetization Layer Path MTU
+> > Discovery (PLPMTUD), using PING frames and ICMP feedback to adjust path
+> > MTU and handle probe confirmation or resets during routing changes.
+> >
+> > - quic_path_pl_recv(): state transition and pmtu update after the probe
+> >   packet is acked.
+> >
+> > - quic_path_pl_toobig(): state transition and pmtu update after
+> >   receiving a toobig or needfrag icmp packet.
+> >
+> > - quic_path_pl_send(): state transition and pmtu update after sending a
+> >   probe packet.
+> >
+> > - quic_path_pl_reset(): restart the probing when path routing changes.
+> >
+> > - quic_path_pl_confirm(): check if probe packet gets acked.
+> >
+> > Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
+> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> > ---
+> > v3:
+> >   - Fix annotation in quic_udp_sock_lookup() (noted by Paolo).
+> >   - Use inet_sk_get_local_port_range() instead of
+> >     inet_get_local_port_range() (suggested by Paolo).
+> >   - Adjust global UDP tunnel socket hashtable operations for the new
+> >     hashtable type.
+> >   - Delete quic_workqueue; use system_wq for UDP tunnel socket destroy.
+> > v4:
+> >   - Cache UDP tunnel socket pointer and its source address in struct
+> >     quic_path for RCU-protected lookup/access.
+> >   - Return -EAGAIN instead of -EINVAL in quic_path_bind() when UDP
+> >     socket is being released in workqueue.
+> >   - Move udp_tunnel_sock_release() out of the mutex_lock to avoid a
+> >     warning of lockdep in quic_udp_sock_put_work().
+> >   - Introduce quic_wq for UDP socket release work, so all pending works
+> >     can be flushed before destroying the hashtable in quic_exit().
+> > v5:
+> >   - Rename quic_path_free() to quic_path_unbind() (suggested by Paolo).
+> >   - Remove the 'serv' member from struct quic_path_group, since
+> >     quic_is_serv() defined in a previous patch now uses
+> >     sk->sk_max_ack_backlog for server-side detection.
+> >   - Use quic_ktime_get_us() to set skb_cb->time, as RTT is measured
+> >     in microseconds and jiffies_to_usecs() is not accurate enough.
+> > v6:
+> >   - Do not reset transport_header for QUIC in quic_udp_rcv(), allowing
+> >     removal of udph_offset and enabling access to the UDP header via
+> >     udp_hdr(); Pull skb->data in quic_udp_rcv() to allow access to the
+> >     QUIC header via skb->data.
+> > v7:
+> >   - Pass udp sk to quic_path_rcv() and move the call to skb_linearize()
+> >     and skb_set_owner_sk_safe() to .quic_path_rcv().
+> >   - Delete the call to skb_linearize() and skb_set_owner_sk_safe() from
+> >     quic_udp_err(), as it should not change skb in .encap_err_lookup()
+> >     (noted by AI review).
+> > v8:
+> >   - Remove indirect quic_path_rcv and late call quic_packet_rcv()
+> >     directly via extern (noted by Paolo).
+> >   - Add a comment in quic_udp_rcv() clarifying it must return 0.
+> >   - Add a comment in quic_udp_sock_put() clarifying the UDP socket
+> >     may be freed in atomic RX context during connection migration.
+> >   - Reorder some quic_path_group members to reduce struct size.
+> > ---
+> >  net/quic/Makefile   |   2 +-
+> >  net/quic/path.c     | 520 ++++++++++++++++++++++++++++++++++++++++++++
+> >  net/quic/path.h     | 170 +++++++++++++++
+> >  net/quic/protocol.c |  11 +
+> >  net/quic/socket.c   |   3 +
+> >  net/quic/socket.h   |   7 +
+> >  6 files changed, 712 insertions(+), 1 deletion(-)
+> >  create mode 100644 net/quic/path.c
+> >  create mode 100644 net/quic/path.h
+> >
+> > diff --git a/net/quic/Makefile b/net/quic/Makefile
+> > index eee7501588d3..1565fb5cef9d 100644
+> > --- a/net/quic/Makefile
+> > +++ b/net/quic/Makefile
+> > @@ -5,4 +5,4 @@
+> >
+> >  obj-$(CONFIG_IP_QUIC) +=3D quic.o
+> >
+> > -quic-y :=3D common.o family.o protocol.o socket.o stream.o connid.o
+> > +quic-y :=3D common.o family.o protocol.o socket.o stream.o connid.o pa=
+th.o
+> > diff --git a/net/quic/path.c b/net/quic/path.c
 > > new file mode 100644
-> > index 000000000000..1a8b7f8db977
+> > index 000000000000..9556607a009e
 > > --- /dev/null
-> > +++ b/net/quic/cong.c
->
-> [ ... ]
->
-> > +/* rfc9002#section-5: Estimating the Round-Trip Time */
-> > +void quic_cong_rtt_update(struct quic_cong *cong, u64 time, u32 ack_de=
-lay)
+> > +++ b/net/quic/path.c
+> > @@ -0,0 +1,520 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/* QUIC kernel implementation
+> > + * (C) Copyright Red Hat Corp. 2023
+> > + *
+> > + * This file is part of the QUIC kernel implementation
+> > + *
+> > + * Initialization/cleanup for QUIC protocol support.
+> > + *
+> > + * Written or modified by:
+> > + *    Xin Long <lucien.xin@gmail.com>
+> > + */
+> > +
+> > +#include <net/udp_tunnel.h>
+> > +#include <linux/quic.h>
+> > +
+> > +#include "common.h"
+> > +#include "family.h"
+> > +#include "path.h"
+> > +
+> > +static int quic_udp_rcv(struct sock *sk, struct sk_buff *skb)
 > > +{
-> > +     u32 adjusted_rtt, rttvar_sample;
->
-> [ ... ]
->
-> > +     /* rfc9002#section-5.3:
-> > +      *   adjusted_rtt =3D latest_rtt
-> > +      *   if (latest_rtt >=3D min_rtt + ack_delay):
-> > +      *     adjusted_rtt =3D latest_rtt - ack_delay
-> > +      *   smoothed_rtt =3D 7/8 * smoothed_rtt + 1/8 * adjusted_rtt
-> > +      *   rttvar_sample =3D abs(smoothed_rtt - adjusted_rtt)
-> > +      *   rttvar =3D 3/4 * rttvar + 1/4 * rttvar_sample
+> > +     memset(skb->cb, 0, sizeof(skb->cb));
+> > +     QUIC_SKB_CB(skb)->seqno =3D -1;
+> > +     QUIC_SKB_CB(skb)->time =3D quic_ktime_get_us();
+> > +
+> > +     skb_pull(skb, sizeof(struct udphdr));
+> > +     skb_dst_force(skb);
+> > +     kfree_skb(skb);
+> > +     return 0; /* .encap_rcv must return 0 if skb was either consumed =
+or dropped. */
+> > +}
+> > +
+> > +static int quic_udp_err(struct sock *sk, struct sk_buff *skb)
+> > +{
+> > +     return 0;
+> > +}
+> > +
+> > +static void quic_udp_sock_put_work(struct work_struct *work)
+> > +{
+> > +     struct quic_udp_sock *us =3D container_of(work, struct quic_udp_s=
+ock, work);
+> > +     struct quic_uhash_head *head;
+> > +     struct sock *sk =3D us->sk;
+> > +
+> > +     /* Hold the sock to safely access it in quic_udp_sock_lookup() ev=
+en after
+> > +      * udp_tunnel_sock_release(). The release must occur before __hli=
+st_del()
+> > +      * so a new UDP tunnel socket can be created for the same address=
+ and port
+> > +      * if quic_udp_sock_lookup() fails to find one.
+> > +      *
+> > +      * Note: udp_tunnel_sock_release() cannot be called under the mut=
+ex due to
+> > +      * some lockdep warnings.
 > > +      */
-> > +     adjusted_rtt =3D cong->latest_rtt;
-> > +     if (cong->latest_rtt >=3D cong->min_rtt + ack_delay)
-> > +             adjusted_rtt =3D cong->latest_rtt - ack_delay;
+> > +     sock_hold(sk);
+> > +     udp_tunnel_sock_release(sk->sk_socket);
 > > +
-> > +     cong->smoothed_rtt =3D (cong->smoothed_rtt * 7 + adjusted_rtt) / =
-8;
-> > +     if (cong->smoothed_rtt >=3D adjusted_rtt)
-> > +             rttvar_sample =3D cong->smoothed_rtt - adjusted_rtt;
-> > +     else
-> > +             rttvar_sample =3D adjusted_rtt - cong->smoothed_rtt;
->
-> The comment above references abs(smoothed_rtt - adjusted_rtt). Paolo Aben=
-i
-> suggested using abs_diff() from linux/math.h for this calculation in v3
-> review, and it was acknowledged. Could abs_diff() be used here instead of
-> the manual if-else?
->
-> https://lore.kernel.org/netdev/a9427359-a798-4f3a-88ef-c10a0bf614ec@redha=
-t.com/
->
-Wow, AI truly has a good memory.
-Right, I somehow missed this. will apply abs_diff() here.
-
-> [ ... ]
->
-> > diff --git a/net/quic/cong.h b/net/quic/cong.h
-> > new file mode 100644
-> > index 000000000000..e6cfb0fa1b6c
-> > --- /dev/null
-> > +++ b/net/quic/cong.h
->
-> [ ... ]
->
-> > +struct quic_cong {
-> > +     /* RTT tracking */
-> > +     u32 max_ack_delay;      /* max_ack_delay from rfc9000#section-18.=
-2 */
-> > +     u32 smoothed_rtt;       /* Smoothed RTT */
-> > +     u32 latest_rtt;         /* Latest RTT sample */
-> > +     u32 min_rtt;            /* Lowest observed RTT */
-> > +     u32 rttvar;             /* RTT variation */
-> > +     u32 pto;                /* Probe timeout */
+> > +     head =3D quic_udp_sock_head(sock_net(sk), ntohs(us->addr.v4.sin_p=
+ort));
+> > +     mutex_lock(&head->lock);
+> > +     __hlist_del(&us->node);
+> > +     mutex_unlock(&head->lock);
 > > +
-> > +     /* Timing & pacing */
-> > +     u64 recovery_time;      /* Recovery period start timestamp */
-> > +     u64 pacing_rate;        /* Packet sending speed Bytes/sec */
-> > +     u64 pacing_time;        /* Next scheduled send timestamp (ns) */
-> > +     u64 time;               /* Cachedached current timestamp */
->                                    ^^^^^^^^^^
+> > +     sock_put(sk);
+> > +     kfree(us);
+> > +}
+> > +
+> > +static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk, uni=
+on quic_addr *a)
+> > +{
+> > +     struct udp_tunnel_sock_cfg tuncfg =3D {};
+> > +     struct udp_port_cfg udp_conf =3D {};
+> > +     struct net *net =3D sock_net(sk);
+> > +     struct quic_uhash_head *head;
+> > +     struct quic_udp_sock *us;
+> > +     struct socket *sock;
+> > +
+> > +     us =3D kzalloc(sizeof(*us), GFP_KERNEL);
+> > +     if (!us)
+> > +             return NULL;
+> > +
+> > +     quic_udp_conf_init(sk, &udp_conf, a);
+> > +     if (udp_sock_create(net, &udp_conf, &sock)) {
+> > +             pr_debug("%s: failed to create udp sock\n", __func__);
+> > +             kfree(us);
+> > +             return NULL;
+> > +     }
+> > +
+> > +     tuncfg.encap_type =3D 1;
+> > +     tuncfg.encap_rcv =3D quic_udp_rcv;
+> > +     tuncfg.encap_err_lookup =3D quic_udp_err;
+> > +     setup_udp_tunnel_sock(net, sock, &tuncfg);
 >
-> There appears to be a typo here - "Cachedached" should be "Cached".
-Will fix this typo.
+> Possibly you need to adjust UDP_MAX_TUNNEL_TYPES in udp_offload.c. You
+> could check running a kernel with QUIC enabled and geneve, vxlan, FOU
+> and xfrm disabled.
+It does not currently implement gro_receive, so there is no need to touch
+UDP_MAX_TUNNEL_TYPES. Adding .gro_receive support for QUIC can be
+considered as a future enhancement.
 
-Thanks.
+>
+> > +
+> > +     refcount_set(&us->refcnt, 1);
+> > +     us->sk =3D sock->sk;
+> > +     memcpy(&us->addr, a, sizeof(*a));
+> > +     us->bind_ifindex =3D sk->sk_bound_dev_if;
+> > +
+> > +     head =3D quic_udp_sock_head(net, ntohs(a->v4.sin_port));
+> > +     hlist_add_head(&us->node, &head->head);
+> > +     INIT_WORK(&us->work, quic_udp_sock_put_work);
+>
+> Is unclear to me if quick udp socket lookup be done locklessy with
+> future series?
+>
+No, quic udp socket lookup will not be done locklessy.
+As this is not on the DATA path, I didn't intend to use RCU things on it.
