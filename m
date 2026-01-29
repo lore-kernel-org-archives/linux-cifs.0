@@ -1,156 +1,199 @@
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECFC2D0600
-	for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 19:40:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD083271EB
+	for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 19:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769715656; cv=pass; b=V9oZoPNXTNtE0pT0gfxg7Uc4sQ0Ry3DqLEGgXa1tgC/TOncyx9TZpv34bG40Wp7EkwEj5Uy/Roc2NIUN7Wk3SH+AAROnOgvdZlC3da7FyBocUYD4nsC7qo/GIc3Dyi4Ehm6UhlQlYHp8SOLfCPtwflRtmEJRjsHy5Gky7GjnaX8=
+	t=1769715880; cv=pass; b=X30EyhBpfBQ2g57nzKgc/jp2KlwJhtxeAFff/stRuoABBmc18cJsJQtpM4v3aqJ5o4mKr9QntqiAyLKhBGQGYOyI7FZA8+2an71xVEA/pSnisIV4/QWOzflsIWL5dpTAmYLHkgroXpdlUE4IVIEffG3XQAEP4y914DGWc+Gt23c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769715656; c=relaxed/simple;
-	bh=OQufuj5kkmYMxx6ttww64CZWm+ndiofyh3a3rNhNfCY=;
+	s=arc-20240116; t=1769715880; c=relaxed/simple;
+	bh=Y0rOjxXytJB+38cdl2LNr6UYE5fA4/7cWyfoN0StXhU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c+sH9JN2gLZCqTkM2X/ifQjWIsrva8dn1CHwh7eDBeJnZzRa2QRJ2JJO0SE4eh3jL7Sb//Vbubncsv11ZY89aLXdTQEHquH1DU93eXxn1IXF6P+JRqLyvriF68pUBXCmcl0MGNbzblzJQeB4vAWA50pFG2rWxVFpZkys1DnIt68=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TDUaVZHL; arc=pass smtp.client-ip=209.85.217.42
+	 To:Cc:Content-Type; b=kdg+8Dmoyly+d/JxFlMtUDpft0pPmPtQ08XEoQFAMi9Ta4o+CIxv+u+qFBkghVEaezStB9dSr/iGHPVO7oGeFJi6Ac6XlGJR4YMnQRodX0CHwu2nHYet8iXiAhJmHyA8cvmwLoncymePYHNZL4Ca1timyY/VkeHIl9CF4aRIX9g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+U+QY4/; arc=pass smtp.client-ip=209.85.217.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TDUaVZHL"
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-5f539e05d63so482030137.0
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 11:40:54 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769715654; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+U+QY4/"
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-5f547823192so560408137.0
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 11:44:37 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769715877; cv=none;
         d=google.com; s=arc-20240605;
-        b=hAPpZyU6WS01VhyLp+pEERAVZbzeLUVF6LAc66Mu9LTXooYeXu7itxX2Aw/st1fSu6
-         rvrGwog5aeFm2KbJkxFvXfWbAaC6fDZRRJxd9h+XJDrmq5CDFsCzNpUDQ90EmplF1YRG
-         EqdpFw9676X3jxYAjpK68qrhljA+xZyTLXS5gRMm820yV3UgAB4nXirltfN3fu7k/hV7
-         tTj1LuI+aX1A38swnuRaRQfGfqXB48mPXRLwk6A3jNQB3M5BFXBysjmykzOatLQayU9c
-         mqr5pvOHZ9C2lt2fX2DL9FZWerWfxZ+U2h+99IVefUQjNYQPovID4N4mZTFjxNAF5ft8
-         Wx4g==
+        b=LUdMmVag8Gb4iyz4apU9MCaC0XjibYDZlsWQQr/7yetF4CUEMRh5VgOKMiPPoXxeAE
+         y3gCdVj0qGVKk8zScmPrjq4KxdXHntMBYsRUo+DjJv7TzN9HaA8kaAuitVCNq6x7rPiP
+         x90TGGiog1TO9yc/foDBTiQO+E8DaSA8TOy2Ha1qGtkU8PhGR5twXhpNxVxrcA7XXrMx
+         3RTqRejXjih3SMzAVVXqcEuYj+etp3SPyaKhjvpdC+SrbMp/I8tJHR4L4dAsNVgt4cat
+         J2m9b8Ng+fBrpUZP851+Iq5suv6t7TheFna2+BCYjHJV1UON9NugtnlSVc8cM4VqExjG
+         4Z7w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=vWXOUBeb3b+nw5Cfis8wSYxSsjd/F4GCHIXMwqvZur4=;
-        fh=OkPVkVCWnL8rse8iTr8tmm74XvDDoxVULWsITY5hGps=;
-        b=jTmqzmqlBFEjUUBbNvYxPQ+JQlrMj8tiTdFL94OtdO0t8jJbb/2tHUf190ttpNszqW
-         VCy4F+LsjKDZJfXI/Kr+ChGWWmaXbvsM0FhhSkVc7t0Jzn5Mh5BjcGg+eVPX71LeIaPW
-         tKQOu91tmQbR9zOgzrZUxfy1PfAf0paN5G12pQi9+ASIfxKV60WOIZNR3iM3xY5/PX6k
-         iGJ8lR+wQyAMRr9gJrrQWLaq/KKiQ+FlnWiAOSIgdqbump1bemxWuL6pBQvZyyOBA9fw
-         FnJoX8WoMuNsnUB5kzqlm9EwIJf4W6PB2c9zrA4SWv8bUMdVcwiSGUw6YWfLKzEr2Kxq
-         QOIg==;
+        bh=gbwVti2MveWgbF61EO9aejU185mP/ZCSwXbR5m8XjS0=;
+        fh=0hYt+0NCa3mjOco2W3gCymCqC5JKZJaWRxtoOvm8wpg=;
+        b=lj0GArI8I1YuqRIyoBXR+MITTTSj5aMXi47q7oZ7ehGpResJ9dnDGQOWTfBWMG1Q3d
+         j6IAUgdiMSzKTnNYVIzaTK0iRdGGI4PHa7DmZfNpB78p3wt4u+VSuPJWjkA2dwjjbtqj
+         zYIsY5e+FLS7niwmr077N24OXwLqNGC/I59HwHix+EVgqSW94JcKpmac5YeVlD34C3Vc
+         MRrZpaC2xWkTRdsA46FRNYVQWAEmKLGdIdGUGUAl1w8ci6r1L+CM8ZqRG61bHlxSTt1s
+         AqqXFCW7TAqXZzd8kRIZU+qbv5HP+cfzAY3MvlsGPou5t8veR/75OU7laM6KO1MlIN7j
+         6Oow==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769715654; x=1770320454; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769715877; x=1770320677; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vWXOUBeb3b+nw5Cfis8wSYxSsjd/F4GCHIXMwqvZur4=;
-        b=TDUaVZHLKS6j8mBQqgRKfis+WbqxJrpZLP6/Xvs0c3IEw8N2Cmsmn2ZLJUljZSeULi
-         YLt50yi0EpsnbAVU0Kam8JKrRFpMcyE8J4N7xOpJ1YuFCE1IziipaSTAqGpxLLUeCWZF
-         7rRjbV5T21seHDGe89XVSx7JWPNdoK3DzjRkjpMH7u1np7+IWm6fFrNrDnbN7q/+8zJx
-         i/MCvMOy1UiN0xAsXsUwQMIP2KVfPCYyIhO79+cHR0vv7GMApT3N50WP31XHZiIV5XWT
-         1PUPignZ5q6gMwP8VcxpNYKVrfXZ7tFUR2qsR2yyGiMAZ7dTvugzHjYu/P9fkpd4BtJu
-         wJWA==
+        bh=gbwVti2MveWgbF61EO9aejU185mP/ZCSwXbR5m8XjS0=;
+        b=i+U+QY4/8SKhsKGIab8XPm0cB5toASuCzlmBZhre8O882K7JKZAre1VMB/ducovgef
+         Jj3DLv2X4YwzLkc0zx8Ig+4VbOfPKgxq41QkXNkxncXbE8Yvcq+C8lLw3ZhXMwjQKZKE
+         EQ5UKTI2yt1Yb1jjnEMoRn9y+lzcaxg7T8v2jpoYcyPIA/X9198+J7UMc2/Z9qbCZNsm
+         Eu2MYEvmxzq6+7oCYyoJXIS9y42G7JJ9V8fyQk2YcF9tevTqpI2++qGbttdNVcqop9iT
+         ltflJ1Fd6Z+z4dwRjWbQMk+7pJD4w1CLKnzTHHpDXNn5ydPPaTczmwj0xQ8aYUTbqFC/
+         vHzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769715654; x=1770320454;
+        d=1e100.net; s=20230601; t=1769715877; x=1770320677;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=vWXOUBeb3b+nw5Cfis8wSYxSsjd/F4GCHIXMwqvZur4=;
-        b=ME7ndDJNbP5Q73iOPcJJeBZ6WLDAnAFeDJomP+kxKYDu0VcjVaaxiuD9//krG3ZEf5
-         fPVFkwGRweZ2g1cbbTDeLjhSyMBmWVgTpSs3Zrhe8t+6pMRr1xpUo5OjmQIyqgpvgrxP
-         a75Cdcjy+zuFP2smQSLr9dgm++R3BsqKYwOwXOsF7NW95wZV1PHVqEJVM7Agc0IFROCD
-         JpkdMO3EecAm0uAIfckKWwjb2rj8O77yw0aLPs2CtsucBj04iEO06vZ9zvxQ/1d4WTxD
-         AINYyi/n2JDkwIxrS9LEogAeOvBZrYKjXKlqU51+bdZlV/Lt0LxlbCV+lrOfrn8B6Rlt
-         KNVA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbVHAzmS3Oqb2SyIB8zaZTDgR4+fbyaG3NNBPC+dV1hKCxFtHviA+TF66kJixeUyjBt7iLH38ct0eN@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5CHQJ1KGo0fVt/x484bneDtq5pIRxr+REWd+Nu1VFnd4h4uu6
-	YXddWCe1PjbZaapeGSY5epidOTMfuxE8dTmZBkCfaXns8CMK4nGcBjphF6fa3P+22U1UycFd8al
-	j744+N2n8ej3ykS/cbeO3GXxY071CN1E=
-X-Gm-Gg: AZuq6aLldPGC24ncc4GKsqJjoD4nHfEFXQlU909c+bfWuWkTI7y4Ry1gudHufPd4PPq
-	KRPd8Q0jiofInTX2VU6ByWwv9uL7OpeuDYfZsDqF2x77By+dvBFCraxg3FwyvBjqBGSbU7zEkok
-	hEUtug2MA5MGSARFFfJmOuoXX9PeuH0oCTBAY6na0RsZ6lXqeADSf4pOsPwPhZi/CB3p9qxe0e3
-	Cebkn6lBwqipNz8zVB2c0WY89N8uCuGVdmmiqV4TaxHyht0AaGlJwZHf8pq4fjLC71Lf3S82tky
-	NU1ugYnAlHlefP/3F8nTSmLzpT0tJQ==
-X-Received: by 2002:a05:6102:304e:b0:5f5:2e08:bbab with SMTP id
- ada2fe7eead31-5f8e23e7d3amr226299137.6.1769715653861; Thu, 29 Jan 2026
- 11:40:53 -0800 (PST)
+        bh=gbwVti2MveWgbF61EO9aejU185mP/ZCSwXbR5m8XjS0=;
+        b=MkJaMj1E8jX2CNnf2yLgkJDD4VfsKfw+H2mBsjWdPWQXjMZCcPKyMqPMz3vlpwYB6F
+         j5FlI1K2mmFwOw+M1x85C2a/frxYoctJ0ZlCFcTt3h6zvsJWUeDvEe4TQRYzxClQ1g/p
+         j/r853t1fx2iKu9sauqUM5cePDIjXfVnvw5IB3pCZZ3KwzxnomPPCl2iH6tJsx+erQXm
+         ncGyVZSxg2yf3TDMHgsD7gq5E0Af3dFKrDeHsHtiMW0ZAodU/PdJ/wDsm5RPi7hr5sh6
+         T+QalpXOHtD0nDkF4z5PLtxr/Y6tolzyUkZTBuDWubiGdpT56vwp2QKe3gbrB85iIhj7
+         WILA==
+X-Forwarded-Encrypted: i=1; AJvYcCVCYUVHUULD9fmldnPWFzNduWDK77zOfG1q893gxjFM5yzhw2Wjb1auiS5uf78sR3+9NfZnz+3bBKfb@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbPV1QyEnkkjasDHSrGUvPs8aongFqqp83xS9+FlSHc5CZevBF
+	HUVS8cTk7ziBczFsUzo+V97iaAnIaghZLtPiy0Hhh+sfY1fizBVyHVVcczlwq/ZkKBa/9jH4kv1
+	xAsC+JAZYZNa3GNGumHoEIp1ty6pZJnY=
+X-Gm-Gg: AZuq6aI2IfBbnrmS2geV0ydEgznSyvDfybdr/rOp5KujJ9VeOpbFWuMRowihvk/frMn
+	7Q3OHeELYtLRZ1m92BpX5hfh2pkrLR2ceNzfSsLf5h5eWvQaTEP9Fx5lmzlM+PX+HdxRumqA/N2
+	jvhar00ZWh5OKstkg6W8QTERIr74KzJBIuI6mTQ8CQFpd6oyRl3vfCQm9dZbwQaCkCsrJDsczYH
+	l3TGP9YA6YHLvSzzbpS/MTGMeDpbTB8aJGhNDY3wdXkLpLJUtUFQhM4TQBieuuCceN+bh/B4Wuy
+	eEsiT5kF4y2K1xd6zPFriGtIQNzB3w==
+X-Received: by 2002:a05:6102:3a0d:b0:5f5:33e4:12ea with SMTP id
+ ada2fe7eead31-5f8e25b8bb5mr192452137.31.1769715876891; Thu, 29 Jan 2026
+ 11:44:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1769439073.git.lucien.xin@gmail.com> <1cbfbd45fda48c82f629b000fc102ee011515e12.1769439073.git.lucien.xin@gmail.com>
- <9c17e0f5-0a07-4800-9356-0ee9445e3922@redhat.com>
-In-Reply-To: <9c17e0f5-0a07-4800-9356-0ee9445e3922@redhat.com>
+References: <9b38b4291e2b1b47ee17f7247c4c66f5bcdccffe.1769439073.git.lucien.xin@gmail.com>
+ <20260128161505.1454974-1-horms@kernel.org>
+In-Reply-To: <20260128161505.1454974-1-horms@kernel.org>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 29 Jan 2026 14:40:40 -0500
-X-Gm-Features: AZwV_Qjx14-1bOrrh8LVqqfM15IbyrS2KpNfixIqKIZVNgumQoCFAq17MEBRSlw
-Message-ID: <CADvbK_f7++7shAGwYLcz=ph-te_d+z+bMxiaTtY2Ahze+Wagqg@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 03/15] quic: provide common utilities and data structures
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Date: Thu, 29 Jan 2026 14:44:24 -0500
+X-Gm-Features: AZwV_QiOMgB9Wkbq9Dg2c4rBLhA6Us48hykz0TzV8M9p-NxQPJtuqm3d7-FhuP0
+Message-ID: <CADvbK_cNUg+N5jAnmJXGBri27+AkwuFFhbKUqONkAgu1ZAmOJg@mail.gmail.com>
+Subject: Re: [net-next,v8,09/15] quic: add congestion control
+To: Simon Horman <horms@kernel.org>
+Cc: jlayton@kernel.org, davem@davemloft.net, daniel@haxx.se, kuba@kernel.org, 
+	dhowells@redhat.com, chuck.lever@oracle.com, andrew.gospodarek@broadcom.com, 
+	matttbe@kernel.org, tfanelli@redhat.com, metze@samba.org, 
+	marcelo.leitner@gmail.com, edumazet@google.com, linkinjeon@kernel.org, 
+	hepengtao@xiaomi.com, illiliti@protonmail.com, quic@lists.linux.dev, 
+	mail@johnericson.me, jbaron@akamai.com, alibuda@linux.alibaba.com, 
+	tom@talpey.com, steved@redhat.com, sd@queasysnail.net, pc@manguebit.com, 
+	smfrench@gmail.com, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, xiyou.wangcong@gmail.com, dreibh@simula.no, 
+	kernel-tls-handshake@lists.linux.dev, mbuhl@openbsd.org, aahringo@redhat.com, 
+	hare@suse.de
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 29, 2026 at 11:26=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+On Wed, Jan 28, 2026 at 11:15=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
 ote:
 >
-> On 1/26/26 3:51 PM, Xin Long wrote:
-> > +struct quic_skb_cb {
-> > +     /* Callback and temporary context when encryption/decryption comp=
-letes in async mode */
-> > +     void (*crypto_done)(struct sk_buff *skb, int err);
-> > +     void *crypto_ctx;
-> > +     union {
-> > +             struct sk_buff *last;   /* Last packet in bundle on TX */
-> > +             u64 time;               /* Arrival timestamp in UDP tunne=
-l on RX */
-> > +     };
-> > +     s64 number;             /* Parsed packet number, or the largest p=
-reviously seen */
-> > +     u32 seqno;              /* Dest connection ID number on RX */
-> > +     u16 errcode;            /* Error code if encryption/decryption fa=
-ils */
-> > +     u16 length;             /* Payload length + packet number length =
-*/
-> > +
-> > +     u16 number_offset;      /* Offset of packet number field */
-> > +     u8 number_len;          /* Length of the packet number field */
-> > +     u8 level;               /* Encryption level: Initial, Handshake, =
-App, or Early */
-> > +
-> > +     u8 key_update:1;        /* Key update triggered by this packet */
-> > +     u8 key_phase:1;         /* Key phase used (0 or 1) */
-> > +     u8 backlog:1;           /* Enqueued into backlog list */
-> > +     u8 resume:1;            /* Crypto already processed (encrypted or=
- decrypted) */
-> > +     u8 path:1;              /* Packet arrived from a new or migrating=
- path */
-> > +     u8 ecn:2;               /* ECN marking used on TX */
-> > +};
-> > +
-> > +#define QUIC_SKB_CB(skb)     ((struct quic_skb_cb *)&((skb)->cb[0]))
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
 >
-> Please add a build time check on quic_skb_cb size.
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
+l.html
+> ---
+> quic: add congestion control
 >
-I may put this in quic_init():
+> This patch introduces quic_cong for RTT measurement and congestion
+> control. It implements a congestion control state machine with slow
+> start, congestion avoidance, and recovery phases using New Reno.
+>
+> > diff --git a/net/quic/cong.c b/net/quic/cong.c
+> > new file mode 100644
+> > index 000000000000..1a8b7f8db977
+> > --- /dev/null
+> > +++ b/net/quic/cong.c
+>
+> [ ... ]
+>
+> > +/* rfc9002#section-5: Estimating the Round-Trip Time */
+> > +void quic_cong_rtt_update(struct quic_cong *cong, u64 time, u32 ack_de=
+lay)
+> > +{
+> > +     u32 adjusted_rtt, rttvar_sample;
+>
+> [ ... ]
+>
+> > +     /* rfc9002#section-5.3:
+> > +      *   adjusted_rtt =3D latest_rtt
+> > +      *   if (latest_rtt >=3D min_rtt + ack_delay):
+> > +      *     adjusted_rtt =3D latest_rtt - ack_delay
+> > +      *   smoothed_rtt =3D 7/8 * smoothed_rtt + 1/8 * adjusted_rtt
+> > +      *   rttvar_sample =3D abs(smoothed_rtt - adjusted_rtt)
+> > +      *   rttvar =3D 3/4 * rttvar + 1/4 * rttvar_sample
+> > +      */
+> > +     adjusted_rtt =3D cong->latest_rtt;
+> > +     if (cong->latest_rtt >=3D cong->min_rtt + ack_delay)
+> > +             adjusted_rtt =3D cong->latest_rtt - ack_delay;
+> > +
+> > +     cong->smoothed_rtt =3D (cong->smoothed_rtt * 7 + adjusted_rtt) / =
+8;
+> > +     if (cong->smoothed_rtt >=3D adjusted_rtt)
+> > +             rttvar_sample =3D cong->smoothed_rtt - adjusted_rtt;
+> > +     else
+> > +             rttvar_sample =3D adjusted_rtt - cong->smoothed_rtt;
+>
+> The comment above references abs(smoothed_rtt - adjusted_rtt). Paolo Aben=
+i
+> suggested using abs_diff() from linux/math.h for this calculation in v3
+> review, and it was acknowledged. Could abs_diff() be used here instead of
+> the manual if-else?
+>
+> https://lore.kernel.org/netdev/a9427359-a798-4f3a-88ef-c10a0bf614ec@redha=
+t.com/
+>
+Wow, AI truly has a good memory.
+Right, I somehow missed this. will apply abs_diff() here.
 
-BUILD_BUG_ON(sizeof(struct quic_skb_cb) > sizeof_field(struct sk_buff, cb))=
-;
+> [ ... ]
+>
+> > diff --git a/net/quic/cong.h b/net/quic/cong.h
+> > new file mode 100644
+> > index 000000000000..e6cfb0fa1b6c
+> > --- /dev/null
+> > +++ b/net/quic/cong.h
+>
+> [ ... ]
+>
+> > +struct quic_cong {
+> > +     /* RTT tracking */
+> > +     u32 max_ack_delay;      /* max_ack_delay from rfc9000#section-18.=
+2 */
+> > +     u32 smoothed_rtt;       /* Smoothed RTT */
+> > +     u32 latest_rtt;         /* Latest RTT sample */
+> > +     u32 min_rtt;            /* Lowest observed RTT */
+> > +     u32 rttvar;             /* RTT variation */
+> > +     u32 pto;                /* Probe timeout */
+> > +
+> > +     /* Timing & pacing */
+> > +     u64 recovery_time;      /* Recovery period start timestamp */
+> > +     u64 pacing_rate;        /* Packet sending speed Bytes/sec */
+> > +     u64 pacing_time;        /* Next scheduled send timestamp (ns) */
+> > +     u64 time;               /* Cachedached current timestamp */
+>                                    ^^^^^^^^^^
+>
+> There appears to be a typo here - "Cachedached" should be "Cached".
+Will fix this typo.
 
-thanks.
+Thanks.
