@@ -1,146 +1,152 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885C727E06C
-	for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 11:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC1129ACD1
+	for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 12:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769686697; cv=pass; b=hH9KvS6bY8HvVf1poqjYQOUADbqcGbT5qUJXYKBGIgKVIielmdLKUUqDNmMdNOgtIc9iG95giyXhwONd8HZlx9vhf/FVebpVQzHzRcrthAQpybvS6aR3CZItbB/08VJYTzgetowun2QzUi2UvcWiVH4oHDHIiQXqluEDxdiVg3E=
+	t=1769688800; cv=pass; b=UAJS/TPf+2W33PEsDgev9LA/tsiKP7LwOKJZM0KemH/Sc9Y3GyFsIZsDgq/OY3M0QaFD/w0WcUF/A1hKf9h9XDD3GGF8pI5KTgnW1lPMq3wQrX0DWg5e+4kRpcBwnQw5d/ntjgbFlgU9fLHhAXWfbjFH5pwaWVp2uGK0WKdDjoQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769686697; c=relaxed/simple;
-	bh=SB5MXNj4MZ59gpPwqS6cX38vB24oWguTL4eyUujyXig=;
+	s=arc-20240116; t=1769688800; c=relaxed/simple;
+	bh=OFkhbvXyiQtGuGUYi0Xxrr9+QTe7DEqriM+02bUoq90=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M85JyqOE8/HngIJG7YWtm0S+xRuYmuZXFi2HbNjpkn5uTyWc2BLXtiM5S6eNVnmU8kd6Uv7z49TJsLaGqWeBIE0uJpqxWpuwlHOBevIqXNsG4habxye6+RYeA07ud3ysVOqsSQKVWxFk2Ox+Zyqqa+vIevoHPqV4tBZtdc9Md1U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MpQFD02G; arc=pass smtp.client-ip=209.85.218.49
+	 To:Cc:Content-Type; b=MnDSRsRDP5oxEjuzSvoivt/MENCGiZqXpkGeh/KrRrQ4Z9PNTglPFN5Ge6lApqFuUpcm6cM8oy0tsXMU0uvDhDVmSlLkpIS9/L0sDEWSzWHIgx16RZLAwc1IcuyQRzHD+IhqdIl+3kpEwf3SNylG8MfpxE+SfQSQ53ap31EF+is=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LlIWBjUs; arc=pass smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpQFD02G"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b87677a8abeso130902766b.1
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 03:38:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769686694; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LlIWBjUs"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-658cc45847cso1163506a12.0
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 04:13:19 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769688798; cv=none;
         d=google.com; s=arc-20240605;
-        b=JO3b7MA7zyfRtT9kovolK/BA4pj3UQSgsJK4S6S6EOzTlMXr51zfig4FxtbiqmFg06
-         eRdU/Libld928Y3WkmEbUcXYkY8eWfeb09ssfPlP1e9Zfjx5DSsnDf6Ec69KXQZ7mUwt
-         O4H3tKoAfhRx+6T7WopzXOiy7jYg7Pw7hrasnSzk2OpT6X441+wLWOK3AIUtQqgvptIF
-         4RpCyCeSd77RwmrjoRml9bhqc5gh35PWhvDvLB59WU/btd/I77B3wTIfAjc326J85/up
-         RRoSdw4MYDwhDFW0jrjrj3xZSaaykKAu7MoOxmQIVaBGpW3v2JcXV7Pu7iuD9rXvt3Ov
-         rjng==
+        b=dz1Qm/mtl+NUdhbcGZIjYhBUM0FfHb+KJCnik/j5Cy3+sJbGdYZL+fi4oXvcrst6Dc
+         mWG/vd8gIAuq8Kc3YgRw2/EbVg2ZeGjhuP8lnr7OPCJ2FgyCtauYgWfxlhjBEENeMZCt
+         GvzNgd71X3PYd6aJU471mVCbMeuYiI1fIioHYEqpPtMuiFCfqXpKhBZ3FTvud1LqOFnW
+         7PVZP63wlC8CPfME1jrgdnVUYzoO3RrQcWb71te1hm9RpapnB55IZsV12aYHEbBKUm6P
+         FeL/HUkVINLUyHRdckvAigKqMoalZ98Knh+uLLDLuUM2QVMABwLNqPr0o2ROBVg5JibK
+         PLHA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=BFEK/kGeKRGmi1BOPZ9w7K9oAIyztWxWFc7fwh1Dn1U=;
+        bh=dVRo0gb1o6gTeziHK7Wfsfwm0G0vzfIXHYbGlbgsvDI=;
         fh=ivCwkVCbTDUI/zL2b/roBiCbp/G9xQ3FpSiz58Fn7qk=;
-        b=OTK4vc7APZXpF4ex2Ytc+vwFzaHBSM2ibTjarN8iwKxBG3venh+mnjJGUYUxSb4s8w
-         XDcXmGUYEMpAKp2d/cuWrfMAx+mvbtrr1qCTRqf7HmvgzFRcb3ejkQdUyC73Taz6Czel
-         BKRcRijCU1SBt3/b/ziIcV40xp9vRDeigx3pustfx6pQt1JsUhdtUudWlpCtBYDGORl4
-         UebL6soT2PZO4rstEW8727KJlhQ1iu/SrlHAgqPaTiVq6ymQDENZShLGeSJsppxkGffU
-         Opir2qejtOZ3/fzPZKZa91Y+x2d8UGF/rrIgAbdor5cIANKNd2clvv9zpO/LTSvgnNYF
-         Yh7Q==;
+        b=fsJJ7UOENtHpKuN8aOtstqIx8epNMTHI1tOXwuersN0arltzqBnEvvivJLELASBPRS
+         gUS9ASQ14echrvJNx3T+GPoEqwGNp1XQDtYKIhq6D8iXJK2GRipkzjCgS08kIJHIF08W
+         IMQuHkgTvakr2wPLti8pONXjl2ZhCWeUHwUWhAr2WLUVVdM9PR2vShiAE1HUK6Ld+VR+
+         XgAj5cPIhlImdTTMiZ5XQw72cDa3WJmpZuWsLNMDKanleWS1Plo6CkohQnoA8zYl0Zot
+         z5x5rtN78PAgUuXQaOt2EHsJknl+z9vnDb0RcADui6GL43QD2MA/OQr8BErEUKT3Xi5K
+         VcxA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769686694; x=1770291494; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769688798; x=1770293598; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BFEK/kGeKRGmi1BOPZ9w7K9oAIyztWxWFc7fwh1Dn1U=;
-        b=MpQFD02GVoN+l0wg6rTjk2xd5vtP/eIkx2rhhHHLQNdx64aajgyNtO3NVfZhLbIAjh
-         pE2SmXKNwCKYoPtWCUAq7tlvsHLamWRcHcOii9FxxjF8s4v1Z68gVCm+ozeTjXPM/GTr
-         p/EhxgTaJL6LPBG5YcyxUS2cQn55PbfvpGc/edtbOUUcdovDpMmCtrYxQ10hG59+BGMp
-         dXWpBRU16YBlpxuKujnvVcafBZcWUx81crEbaeCEiS5gaWygwykWJPn5UahXCsPmeUCV
-         8X6222bA8XMs4Ji9GhBuerHyUK3eKetZ4rcWXUmJmCZPpuzLJs7u8zCYbGtc9X/sUlOv
-         Pvjg==
+        bh=dVRo0gb1o6gTeziHK7Wfsfwm0G0vzfIXHYbGlbgsvDI=;
+        b=LlIWBjUs96F3yscCvayZTXzjkLsq86hcxsele8I94YiONdnEOPjK/e2U3f9Z60o2Vy
+         sgl1M8neg0R6Oixk4ohjTMck3AC4cRKyhlcyi2NixdCih5IJofm0/OgPI1DPTxeY58Lx
+         0H/X0OaCQWmffamcICR6z+3+EOsstmFXON/Ixfaa24ss62YN7CTuascpQpFNJx3UtGXV
+         Tep1h2KGFmwFsmIQ0TwAzvssiGkjV8FAW9DBtFgom8Ox3kP/camujhZK7yvgBcnrkrTw
+         i+FtzXsAzGwnVuiiyzrzgt1SPD7Kc+8ylJGCMQ80M8bij0MGAvcXnmcOPQcn2jo+hCyo
+         aH/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769686694; x=1770291494;
+        d=1e100.net; s=20230601; t=1769688798; x=1770293598;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=BFEK/kGeKRGmi1BOPZ9w7K9oAIyztWxWFc7fwh1Dn1U=;
-        b=CNp2dLex9ym4cby1uIcWB81gF6N2bAW9DbSTsDfUKCc8otAdBD23byvfwpCOkjcR3p
-         2/Rw11mwjC+igtVUng89vyqA9PBfq0E3heHSNKM07BAXE4UrSfgWwAhAV9DnATizXqKR
-         fTuev/vt4PhEtizyCj1CNG3GLixvmKdUA7wUYqKHivAT/yPW/p4il4ghzK22pkm3K3Pw
-         ghw6K5vGIN3zVkk35YqXZelxIEYyQUF7OZ4/F/0Y1diGloL2H5O42eGQOmBVmznh+vhL
-         3S70zQ5C+BzUVDoC9h5mZYLn7US1c/KACWa9xOo6rtJdUUFFUX7X77M/QH0sNmQvZabv
-         4tfQ==
-X-Gm-Message-State: AOJu0YxNqXoQLxZZ7G8vhDLw1dS/pixKKrFbvsDoawPjtaLZCMRVLtmP
-	Xry/3UDI4PM0V8+cV1JPNpVZsbj/mgWjLloA/HTBt00bO4J3V69KhrnIOiGdhdqvmK+82X3Jw51
-	y84KOA36vit21oTCnVn4ugqXq/dNGy3lgPoNN
-X-Gm-Gg: AZuq6aIzFMBaIQNBKHzR6WWzplMbkVuIcNU0iNiRwVAzlWDFN9ATQiew12Ij79A22b8
-	8ITMx4omULf3lYkUMV/7ZY3TsGDhRAF33sxvEJTBnfHNZKvqexVO97NtnidH7SKxDorBonA0A90
-	jvo/E/S5lxJ9VufiTAXMWZEJVThKAGFX2dxi52a57UXcxqgkf427ijAWSb6zyMlcTvSZd+53jMF
-	Ghy6fXHwq9QxpjDTFQi8iE7wYCHfsAZEA0PWR26OwdMxD3HAWGB7O9zUZ2yw6/OdJzWTQ==
-X-Received: by 2002:a17:907:6eac:b0:b88:464f:3db8 with SMTP id
- a640c23a62f3a-b8dab457b60mr543664466b.49.1769686693638; Thu, 29 Jan 2026
- 03:38:13 -0800 (PST)
+        bh=dVRo0gb1o6gTeziHK7Wfsfwm0G0vzfIXHYbGlbgsvDI=;
+        b=rHYxuoXxDR3e89S2u5KV664u0JXLyrGlMPL0dLfTiXiYL0BBHJQ1PXqEEPe6m5ytR+
+         owj9cHMDwDgR5Jw/Jl9do7/hUsHUtPR393jPvF78Pp32N9zxKBrnTe5D5vb6lzIbysvO
+         mHvd67VRFTKGwxx1iPsSxncKzzTpV0cEJF2Xkzc5IUm8ztsGaXi+VVw/t4RglBg6G3Hn
+         qXpWT6B/Iv0v+UclTF2c6DIuhRm2FVoGNeUXRjOD4zR2R/SEvq/PjL78Jy7ZTppmqvu4
+         e9qphNioXRfw3BFr3C0UG851BRG7fP6eFG6HcaxrBj3JoAqx1ovShLgmBqOMOD6OFYI4
+         g8Yg==
+X-Gm-Message-State: AOJu0YyIE07S9Gk/sK3kxPygqj5aNeW4UZV+s6xVq47L+vmnzT1Z7jgM
+	ffn5HIZ0OfsV6oHetAcnnA0g6MWyZJFh9d8vorifog1CMmYpRPxjZBc2hJgjMU3q4ANsEP0dQ2o
+	6l14HahpxrbYvbOhmnjCNsvPExaHXg8E=
+X-Gm-Gg: AZuq6aJw0B2Wa95gLS8H9eTXBAasAwX/XfnX3ZnX7SxkXAV/RK9X0YG+Tvbswo9sqOK
+	YrQu2ZJiugrSOjSLxa6mCG4+s5Oyw6+xcssAiq0lXYcMvbwabjgqni3jbDgGDI1ExB2gaa6jvJ0
+	y9HDkRrQr77oTpJlQI9Fw0KROlibbmszpt0QQsIDcSebTJzIoCU7iF6C0iyg8auZjNBgL84/+PW
+	Od10CsRYLfeER5nE+3SS4B7/LzYGKsbP23IHPTA65bvldYJAY3wRsez1N1cqlOXZWoMqw==
+X-Received: by 2002:a17:907:6d16:b0:b88:641b:b0e0 with SMTP id
+ a640c23a62f3a-b8dab35550dmr502605766b.49.1769688797729; Thu, 29 Jan 2026
+ 04:13:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260120062152.628822-4-sprasad@microsoft.com>
- <20260120062152.628822-1-sprasad@microsoft.com> <1653031.1769038583@warthog.procyon.org.uk>
- <1653265.1769039401@warthog.procyon.org.uk>
-In-Reply-To: <1653265.1769039401@warthog.procyon.org.uk>
+References: <20260120062152.628822-1-sprasad@microsoft.com> <1652302.1769037531@warthog.procyon.org.uk>
+In-Reply-To: <1652302.1769037531@warthog.procyon.org.uk>
 From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Thu, 29 Jan 2026 17:08:02 +0530
-X-Gm-Features: AZwV_QiHhKM4y3f3-0qv5thdrSkrXUgwx6Up5V-rH3M241keTZz20WhihQeOkwk
-Message-ID: <CANT5p=pXP3+CywpmK-on2uTvxO3S=31_B85_UDR7RoK1dQVtMA@mail.gmail.com>
-Subject: Re: [PATCH 4/4] cifs: make retry logic in read/write path consistent
- with other paths
+Date: Thu, 29 Jan 2026 17:43:04 +0530
+X-Gm-Features: AZwV_QhsWUMtup-9SGLmiCEsP0i6Zj36exRvFntaJU7Wwt8wfm8t9oKOPM-No3c
+Message-ID: <CANT5p=qptmBxhOoO_y+OnuX+_rjMeqGUTJ87y_tA+eVX6eJqBQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] netfs: when subreq is marked for retry, do not check
+ if it faced an error
 To: David Howells <dhowells@redhat.com>
 Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com, 
 	bharathsm@microsoft.com, Shyam Prasad N <sprasad@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 22, 2026 at 5:20=E2=80=AFAM David Howells <dhowells@redhat.com>=
+On Thu, Jan 22, 2026 at 4:48=E2=80=AFAM David Howells <dhowells@redhat.com>=
  wrote:
 >
-> David Howells <dhowells@redhat.com> wrote:
+> nspmangalore@gmail.com wrote:
 >
-> > Better to offload the pause to netfslib if we can.
+> > @@ -547,13 +547,15 @@ void netfs_read_subreq_terminated(struct netfs_io=
+_subrequest *subreq)
+> >       }
+> >
+> >       if (unlikely(subreq->error < 0)) {
+> > -             trace_netfs_failure(rreq, subreq, subreq->error, netfs_fa=
+il_read);
+> >               if (subreq->source =3D=3D NETFS_READ_FROM_CACHE) {
+> >                       netfs_stat(&netfs_n_rh_read_failed);
+> >                       __set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
+> >               } else {
+> >                       netfs_stat(&netfs_n_rh_download_failed);
+> > -                     __set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+> > +                     if (!test_bit(NETFS_SREQ_NEED_RETRY, &subreq->fla=
+gs)) {
+> > +                             __set_bit(NETFS_SREQ_FAILED, &subreq->fla=
+gs);
+> > +                             trace_netfs_failure(rreq, subreq, subreq-=
+>error, netfs_fail_read);
+> > +                     }
+> >               }
+> >               trace_netfs_rreq(rreq, netfs_rreq_trace_set_pause);
+> >               set_bit(NETFS_RREQ_PAUSE, &rreq->flags);
 >
-> I would suggest you look at doing it in netfs_retry_writes().  Something =
-like:
+> I think I suggested moving the check for NETFS_SREQ_NEED_RETRY up in the
+> function - above any checks of subreq->error, but after the initial stat
+> counting.
+
+So you want to do this check regardless of whether there's an error or not?
+In that case, I think I'll still need to check if there is an error to
+set NETFS_RREQ_PAUSE only on error, right?
+
 >
->  (1) Add a timestamp to netfs_io_request to record either the first op be=
-ing
->      issued or the last op being issued.
+> Ditto for netfs_write_subrequest_terminated().  Actually, the
+> transferred_or_error argument of that should be got rid of and the filesy=
+stem
+> update the subreq->error and subreq->transferred fields directly as for r=
+eads.
 >
->  (2) After netfs_retry_writes() finishes waiting for subreqs to quiesce, =
-wait
->      for the requisite amount of time since the timestamp recorded in (1)
->      before continuing the retry.
->
->  (3) Add a method to netfs_request_ops to allow netfslib to ask the files=
-ystem
->      what backoff delay it wants to insert.  This could call
->      smb2_should_replay().
->
-> Alternatively, set a flag on cifs_io_request indicating backoff is requir=
-ed
-> and do it in cifs_prepare_write() before waiting for credits if the flag =
-is
-> set - or maybe in cifs_issue_write() - at which point clear the flag.
+
+I can try making the write path similar to read. Passing just the
+subreq. But that will mean changes to all the callers.
+I hope that's okay.
+
+> I can poke at this tomorrow if you want.
 >
 > David
 >
 
-I get your point here David. (And good catch!)
-The problem in my patch was the sleep in the cifsd thread.
-I think I can handle the sleep fully in cifs.ko by changing where the
-msleep happens.
-
-I plan to do the following:
-1. Take the msleep out of smb2_should_replay
-2. Sleep before doing the actual replay (This will be the back-off
-*before* replaying)
-
-That way, I'll be able to safely call smb2_should_replay in the
-callback functions and sleep in smb2_async_readv/writev functions.
-I'll submit a revised patch series soon.
 
 --=20
 Regards,
