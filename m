@@ -1,157 +1,147 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E4D330B15
-	for <linux-cifs@vger.kernel.org>; Wed, 28 Jan 2026 17:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769620680; cv=none; b=g4YVqe51SGxMA+3e1DSdnVwSCgbAu9J/f2dbU21Q6W1TJVCycmBvc3MAbtzqAb9eSkYT5uJSEbJw8MRClae7G6C27kjFLKs87FkdCc1VD9typLwRhC+KJF97FOyQwSW5AizqlePiofNmTyuKIV05AV5Th3nN7HG7il+fHO4EUiA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769620680; c=relaxed/simple;
-	bh=BGqnVmp1eJvMacXoI673ldZKkJTfLCVUC3t8ZxfuCwY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=skY05bdls1rQ3O70zqjgXaEONtPkadtin1RDVzEzzxpmITjz2gIxQ3ZX+8f67MMjOvT/zVNToRQfblWmIUQQNqzvY39gSpmleMwFBkAsHNlN8duEeGf0WmAJvR6/dv3DcB2YYRoMy6pJYWPPB2mFgWiQikn8eWcLG2mbkhWXCwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=QCIYXqIX; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885C727E06C
+	for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 11:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769686697; cv=pass; b=hH9KvS6bY8HvVf1poqjYQOUADbqcGbT5qUJXYKBGIgKVIielmdLKUUqDNmMdNOgtIc9iG95giyXhwONd8HZlx9vhf/FVebpVQzHzRcrthAQpybvS6aR3CZItbB/08VJYTzgetowun2QzUi2UvcWiVH4oHDHIiQXqluEDxdiVg3E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769686697; c=relaxed/simple;
+	bh=SB5MXNj4MZ59gpPwqS6cX38vB24oWguTL4eyUujyXig=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M85JyqOE8/HngIJG7YWtm0S+xRuYmuZXFi2HbNjpkn5uTyWc2BLXtiM5S6eNVnmU8kd6Uv7z49TJsLaGqWeBIE0uJpqxWpuwlHOBevIqXNsG4habxye6+RYeA07ud3ysVOqsSQKVWxFk2Ox+Zyqqa+vIevoHPqV4tBZtdc9Md1U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MpQFD02G; arc=pass smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="QCIYXqIX"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-4359228b7c6so83005f8f.2
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Jan 2026 09:17:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpQFD02G"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b87677a8abeso130902766b.1
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 03:38:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769686694; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JO3b7MA7zyfRtT9kovolK/BA4pj3UQSgsJK4S6S6EOzTlMXr51zfig4FxtbiqmFg06
+         eRdU/Libld928Y3WkmEbUcXYkY8eWfeb09ssfPlP1e9Zfjx5DSsnDf6Ec69KXQZ7mUwt
+         O4H3tKoAfhRx+6T7WopzXOiy7jYg7Pw7hrasnSzk2OpT6X441+wLWOK3AIUtQqgvptIF
+         4RpCyCeSd77RwmrjoRml9bhqc5gh35PWhvDvLB59WU/btd/I77B3wTIfAjc326J85/up
+         RRoSdw4MYDwhDFW0jrjrj3xZSaaykKAu7MoOxmQIVaBGpW3v2JcXV7Pu7iuD9rXvt3Ov
+         rjng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=BFEK/kGeKRGmi1BOPZ9w7K9oAIyztWxWFc7fwh1Dn1U=;
+        fh=ivCwkVCbTDUI/zL2b/roBiCbp/G9xQ3FpSiz58Fn7qk=;
+        b=OTK4vc7APZXpF4ex2Ytc+vwFzaHBSM2ibTjarN8iwKxBG3venh+mnjJGUYUxSb4s8w
+         XDcXmGUYEMpAKp2d/cuWrfMAx+mvbtrr1qCTRqf7HmvgzFRcb3ejkQdUyC73Taz6Czel
+         BKRcRijCU1SBt3/b/ziIcV40xp9vRDeigx3pustfx6pQt1JsUhdtUudWlpCtBYDGORl4
+         UebL6soT2PZO4rstEW8727KJlhQ1iu/SrlHAgqPaTiVq6ymQDENZShLGeSJsppxkGffU
+         Opir2qejtOZ3/fzPZKZa91Y+x2d8UGF/rrIgAbdor5cIANKNd2clvv9zpO/LTSvgnNYF
+         Yh7Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1769620677; x=1770225477; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6AJCBY/tn9iOXEaPRhRwwP52ntozIkhH10hpJi9Uxfw=;
-        b=QCIYXqIX4S1leR4PqjDNaKfuzvj8PYyES41JLnLA4lgg/zA+XQ5FiEagKlSznLW15B
-         4H1ymrd6jf8WGQxX0JYtJHEr5oHTtcyUVDcs9X45aLledpLSfNbWUzWI4v9ZPKaMHiIy
-         aiTsi929c9RFpk5B49MB8MoTJvUOT8hpBMMHXXJx7iA634yJny8Jy0ET3sIu4VPkDhZ+
-         o0LFAMpPh+XRs81FfCuDsKVonGrHoYNgOpK20PlKO3XZ6GEG1kk44zdNdNxB5pgnv+WT
-         PgtGCTehQUDJ1fiqIOoQOAoVAUsBfK0rMZKVMYgCt69Vs6yQVwftVI+KqKGLKQAaVMyv
-         GTGQ==
+        d=gmail.com; s=20230601; t=1769686694; x=1770291494; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BFEK/kGeKRGmi1BOPZ9w7K9oAIyztWxWFc7fwh1Dn1U=;
+        b=MpQFD02GVoN+l0wg6rTjk2xd5vtP/eIkx2rhhHHLQNdx64aajgyNtO3NVfZhLbIAjh
+         pE2SmXKNwCKYoPtWCUAq7tlvsHLamWRcHcOii9FxxjF8s4v1Z68gVCm+ozeTjXPM/GTr
+         p/EhxgTaJL6LPBG5YcyxUS2cQn55PbfvpGc/edtbOUUcdovDpMmCtrYxQ10hG59+BGMp
+         dXWpBRU16YBlpxuKujnvVcafBZcWUx81crEbaeCEiS5gaWygwykWJPn5UahXCsPmeUCV
+         8X6222bA8XMs4Ji9GhBuerHyUK3eKetZ4rcWXUmJmCZPpuzLJs7u8zCYbGtc9X/sUlOv
+         Pvjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769620677; x=1770225477;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6AJCBY/tn9iOXEaPRhRwwP52ntozIkhH10hpJi9Uxfw=;
-        b=Ajrjj1V8fmlQKn47A6ImeBg9gwr0192cmvEdymFdpYk8VavR2Ol4KUKlOKLpbXjy2Y
-         o6VBUfHYA2krdvvZcLJ7G2bSEoE5m+iWdqHf+zG2J99qTAzolAHSSSWkQcojMZ3hgh7+
-         8VmUgluGmP+MM3wTNNYGx8aht2qnVnE1d/mOrukPiDMQ6YiDqHRG1mO05snkUcyrWTLd
-         DcUnsdl+7LtDJwZ7xlsdoeAVI2R6OiyX91eUUKFgEUXxN6FMQkK9wtV/7NfyyceqxnSm
-         ux/53twwCAkqA0JuCx3ljRmETpZ3ZgBK3JbunZ8L4gsZmZ36uqA2Qpg5HOxValkGr8Ay
-         mSiA==
-X-Forwarded-Encrypted: i=1; AJvYcCVgwNH3UBqz+4Ge4k7y5zCxt0yXbQc75y2KuHQPPdIEGMLLgBJlnVzoYOOIZ1CKcTOgEbaLApu5qTRE@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvQ4mOFjAzYBZp0Km4O8M19Adbdw0OswkQRbMOI2c8V0llL6E2
-	mGh5WDrRlCnNHQVe6IGWA8X57u4OvDK0emG8kE5HjrQJspFp8glKxV6NQzj5QRMmyjk=
-X-Gm-Gg: AZuq6aKxeCWDrR9FfSQ+CMyKN924HBT3/dzM6bYfGX3M5ghDS7lCSEZ4kbpBQXKWQM0
-	ohfDMUCuiFuFnInZDN7VZWhM2jMy4/jtxBj2UCFBSSRpDIO5uUiOCNZGeyQ+6IVGKUispvgiOup
-	qcAWFRWC2SRGAl8cuzEN7bc2En05Eo2YMT4PKbWdLPG0Xz6BKs0MfvQcbi0OzgQbcT1b+cQU3CE
-	g8POX1lYLUYpPjc7EOXd5KZ4IPJlGe0IEFZ1fYIcGr8ypwehsy5/SqR7bjRXgiGUm88rf4O8N1F
-	3rqswaolAmrcoQHy+NMfSVfpgtD1k7Chcpx417p9k78O+TnBj4GpvWnHVL8FZXQJoRELjAqG8og
-	x5Wtypoy8qUngA9svdUBsyqE+aygoNWlvoVWqfH0viXlck5u8tq0hn9KjgGJTK06Ft/qGf6ai5D
-	49Eer+0A3cKd5I28FwW0U=
-X-Received: by 2002:a05:6000:178e:b0:430:fd60:940f with SMTP id ffacd0b85a97d-435dd04c33amr8035567f8f.14.1769620677507;
-        Wed, 28 Jan 2026 09:17:57 -0800 (PST)
-Received: from precision ([2804:7f0:6401:4338:fe12:6a4e:72af:4ca4])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a16cf8f2sm3841611eec.7.2026.01.28.09.17.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jan 2026 09:17:57 -0800 (PST)
-Date: Wed, 28 Jan 2026 14:17:51 -0300
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, ematsumiya@suse.de, 
-	linux-cifs@vger.kernel.org, stable@vger.kernel.org, Steve French <stfrench@microsoft.com>
-Subject: Re: [PATCH v2] smb: client: split cached_fid bitfields to avoid
- shared-byte RMW races
-Message-ID: <pkihyoewqokamtfcawpoe7mpqqu4rf7zwtfnymd5dxxb75cg64@efxg7to7rzqk>
-References: <20260127160128.243441-1-henrique.carvalho@suse.com>
- <CANT5p=q8trAvAMwVOczAuet2qFV_m0w9a9PJdJEtPhAsf5DGsQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1769686694; x=1770291494;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BFEK/kGeKRGmi1BOPZ9w7K9oAIyztWxWFc7fwh1Dn1U=;
+        b=CNp2dLex9ym4cby1uIcWB81gF6N2bAW9DbSTsDfUKCc8otAdBD23byvfwpCOkjcR3p
+         2/Rw11mwjC+igtVUng89vyqA9PBfq0E3heHSNKM07BAXE4UrSfgWwAhAV9DnATizXqKR
+         fTuev/vt4PhEtizyCj1CNG3GLixvmKdUA7wUYqKHivAT/yPW/p4il4ghzK22pkm3K3Pw
+         ghw6K5vGIN3zVkk35YqXZelxIEYyQUF7OZ4/F/0Y1diGloL2H5O42eGQOmBVmznh+vhL
+         3S70zQ5C+BzUVDoC9h5mZYLn7US1c/KACWa9xOo6rtJdUUFFUX7X77M/QH0sNmQvZabv
+         4tfQ==
+X-Gm-Message-State: AOJu0YxNqXoQLxZZ7G8vhDLw1dS/pixKKrFbvsDoawPjtaLZCMRVLtmP
+	Xry/3UDI4PM0V8+cV1JPNpVZsbj/mgWjLloA/HTBt00bO4J3V69KhrnIOiGdhdqvmK+82X3Jw51
+	y84KOA36vit21oTCnVn4ugqXq/dNGy3lgPoNN
+X-Gm-Gg: AZuq6aIzFMBaIQNBKHzR6WWzplMbkVuIcNU0iNiRwVAzlWDFN9ATQiew12Ij79A22b8
+	8ITMx4omULf3lYkUMV/7ZY3TsGDhRAF33sxvEJTBnfHNZKvqexVO97NtnidH7SKxDorBonA0A90
+	jvo/E/S5lxJ9VufiTAXMWZEJVThKAGFX2dxi52a57UXcxqgkf427ijAWSb6zyMlcTvSZd+53jMF
+	Ghy6fXHwq9QxpjDTFQi8iE7wYCHfsAZEA0PWR26OwdMxD3HAWGB7O9zUZ2yw6/OdJzWTQ==
+X-Received: by 2002:a17:907:6eac:b0:b88:464f:3db8 with SMTP id
+ a640c23a62f3a-b8dab457b60mr543664466b.49.1769686693638; Thu, 29 Jan 2026
+ 03:38:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANT5p=q8trAvAMwVOczAuet2qFV_m0w9a9PJdJEtPhAsf5DGsQ@mail.gmail.com>
+References: <20260120062152.628822-4-sprasad@microsoft.com>
+ <20260120062152.628822-1-sprasad@microsoft.com> <1653031.1769038583@warthog.procyon.org.uk>
+ <1653265.1769039401@warthog.procyon.org.uk>
+In-Reply-To: <1653265.1769039401@warthog.procyon.org.uk>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Thu, 29 Jan 2026 17:08:02 +0530
+X-Gm-Features: AZwV_QiHhKM4y3f3-0qv5thdrSkrXUgwx6Up5V-rH3M241keTZz20WhihQeOkwk
+Message-ID: <CANT5p=pXP3+CywpmK-on2uTvxO3S=31_B85_UDR7RoK1dQVtMA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] cifs: make retry logic in read/write path consistent
+ with other paths
+To: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com, 
+	bharathsm@microsoft.com, Shyam Prasad N <sprasad@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 28, 2026 at 05:03:03PM +0530, Shyam Prasad N wrote:
-> On Tue, Jan 27, 2026 at 9:39 PM Henrique Carvalho
-> <henrique.carvalho@suse.com> wrote:
-> >
-> > is_open, has_lease and on_list are stored in the same bitfield byte in
-> > struct cached_fid but are updated in different code paths that may run
-> > concurrently. Bitfield assignments generate byte read–modify–write
-> > operations (e.g. `orb $mask, addr` on x86_64), so updating one flag can
-> > restore stale values of the others.
-> >
-> > A possible interleaving is:
-> >     CPU1: load old byte (has_lease=1, on_list=1)
-> >     CPU2: clear both flags (store 0)
-> >     CPU1: RMW store (old | IS_OPEN) -> reintroduces cleared bits
-> >
-> > To avoid this class of races, convert these flags to separate bool
-> > fields.
-> >
-> > Cc: stable@vger.kernel.org
-> > Fixes: ebe98f1447bbc ("cifs: enable caching of directories for which a lease is held")
-> > Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
-> > Signed-off-by: Steve French <stfrench@microsoft.com>
-> > ---
-> > v1 -> v2: Add Fixes: and Cc: stable tags
-> >
-> >  fs/smb/client/cached_dir.h | 8 ++++----
-> >  1 file changed, 4 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-> > index 1e383db7c3374..5091bf45345e8 100644
-> > --- a/fs/smb/client/cached_dir.h
-> > +++ b/fs/smb/client/cached_dir.h
-> > @@ -36,10 +36,10 @@ struct cached_fid {
-> >         struct list_head entry;
-> >         struct cached_fids *cfids;
-> >         const char *path;
-> > -       bool has_lease:1;
-> > -       bool is_open:1;
-> > -       bool on_list:1;
-> > -       bool file_all_info_is_valid:1;
-> > +       bool has_lease;
-> > +       bool is_open;
-> > +       bool on_list;
-> > +       bool file_all_info_is_valid;
-> >         unsigned long time; /* jiffies of when lease was taken */
-> >         unsigned long last_access_time; /* jiffies of when last accessed */
-> >         struct kref refcount;
-> > --
-> > 2.52.0
-> >
-> >
-> 
-> Does making them as separate bool fields ensure that compiler does not
-> optimize them into bitfields anyway?
+On Thu, Jan 22, 2026 at 5:20=E2=80=AFAM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> David Howells <dhowells@redhat.com> wrote:
+>
+> > Better to offload the pause to netfslib if we can.
+>
+> I would suggest you look at doing it in netfs_retry_writes().  Something =
+like:
+>
+>  (1) Add a timestamp to netfs_io_request to record either the first op be=
+ing
+>      issued or the last op being issued.
+>
+>  (2) After netfs_retry_writes() finishes waiting for subreqs to quiesce, =
+wait
+>      for the requisite amount of time since the timestamp recorded in (1)
+>      before continuing the retry.
+>
+>  (3) Add a method to netfs_request_ops to allow netfslib to ask the files=
+ystem
+>      what backoff delay it wants to insert.  This could call
+>      smb2_should_replay().
+>
+> Alternatively, set a flag on cifs_io_request indicating backoff is requir=
+ed
+> and do it in cifs_prepare_write() before waiting for credits if the flag =
+is
+> set - or maybe in cifs_issue_write() - at which point clear the flag.
+>
+> David
+>
 
-Fair question, I hadn't thought about it.
+I get your point here David. (And good catch!)
+The problem in my patch was the sleep in the cifsd thread.
+I think I can handle the sleep fully in cifs.ko by changing where the
+msleep happens.
 
-However, according to C11 standard, that is not allowed:
+I plan to do the following:
+1. Take the msleep out of smb2_should_replay
+2. Sleep before doing the actual replay (This will be the back-off
+*before* replaying)
 
-        2 Except for bit-fields, objects are composed of contiguous sequences of
-        one or more bytes, the number, order, and encoding of which are either
-        explicitly specified or implementation-defined. (6.2.6.1)
+That way, I'll be able to safely call smb2_should_replay in the
+callback functions and sleep in smb2_async_readv/writev functions.
+I'll submit a revised patch series soon.
 
-        15 Within a structure object, the non-bit-field members and the
-        units in which bit-fields reside have addresses that increase in
-        the order in which they are declared. [...]
-
-> Ideally, we want to protect these fields with a mutex / spinlock,
-> which doesn't leave us suspect to such issues.
-
-So having them as separate bool fields should be enough.
-
--- 
-Henrique
-SUSE Labs
+--=20
+Regards,
+Shyam
