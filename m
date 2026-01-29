@@ -1,137 +1,191 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B34345754
-	for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 16:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0053321CA0D
+	for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 17:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769705605; cv=none; b=lOljOamM0mUPQQuMkHUOW0SJ3nQKchfc5JcAkJ6orUDflEymcwjzEP52NsbsvzvIM738fa7ymUZUPxeFqUM8+c8a7DdW6qkmcJR5c3t3CVNupnaXXJ7GGdVDqbSCvcj9v+oECGD718sfxuhasnu077zWsd4Cqqr78gsgTOiPlpY=
+	t=1769708275; cv=none; b=A1+1nQyNqB3+qnnedsieAbJe7J3QeW4+04+OrTDqk3qrhiOhA60nMAFjShy6THeHq647JijHHKaBdXp3n2A29aqlFAyHn6achEDM5Rix/vc3Sz/RAMHhBcs9blp3yW45AmvjhDWJgKuTaWjpWI7pZPtQChVnAzYFzt+9F93+Do0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769705605; c=relaxed/simple;
-	bh=WOGhGhsnQIX0JLxRhL6uuprL7CVf0Nxffn2Etmsupas=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BK6wMYFtk2EuR6jHNBwcgLxOVKddHtyWYlBEIv5GXbbmOr5c+087Za41k9zOEEWlNQv26mlb26XiwIpy9MJAIcUKl6Rzyw8S8lo64BeZUMBv4nAOADpiJAHmSosT8wb8ZD4KXkKs5jJJVeVnczX7DbeYhLn3qQ+4oytcQa2+KhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a/MNHPCX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cx4bKnN2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1769708275; c=relaxed/simple;
+	bh=gGboFYBJHGwbQ6CmsqonPgIpA+0UuN62xAZ9Z1ScB3s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZlQrJYNhCLAoZYgCHMpimalhotUJwEO0sRmTcM1cyAoqCSgAUFtyJ0CiZxN8s7IrlgyYIGPIU01mFfOMzRSswpqnTBVrIlC+MkVMS9kl9eSXl10TYkN1ZOHD4xs0u+WK47U1ohFNLj3JMO2luKBhzsZ76GVUHBGzgp4Kr700qtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=biJEbX8C; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a/MNHPCX";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cx4bKnN2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769705603;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bxsJZ4lY7/i7NTzxVza1t8bxhbR1O4VQ7g3k6JdX5O0=;
-	b=a/MNHPCXAOieH2EuOzbb1eWwaCIuAq6rPmj127bwxtwly9V6Z+FTt5jQuEWd6a7nKnnIfk
-	B5HYVADOtfUdRyfKbOc9qKhsEVPXoQFMX6SKuy+Nwai80ZnFTkmzBK9et7pT3Zqrr/eqvW
-	QoUIIUAmvh5/cv2DWxvK98jg7FuTE9g=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-615-ZPCVX6liO-idzw6cTT1Wog-1; Thu, 29 Jan 2026 11:53:20 -0500
-X-MC-Unique: ZPCVX6liO-idzw6cTT1Wog-1
-X-Mimecast-MFC-AGG-ID: ZPCVX6liO-idzw6cTT1Wog_1769705599
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48079ae1001so7835545e9.0
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 08:53:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="biJEbX8C"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-81e93c5961cso1037271b3a.0
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Jan 2026 09:37:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769705599; x=1770310399; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bxsJZ4lY7/i7NTzxVza1t8bxhbR1O4VQ7g3k6JdX5O0=;
-        b=cx4bKnN23xNlNPkjVSliGWzQOYhrdEjGo2U01yQ5oJXM6nDK7FrqQbEw4KDWMbSk08
-         bR3+ek+VXil+s00UnNPRv6+QKZzNxMLNEWhRz2R3CcHpYaPRo+o8EUemjhBeeFdzmLfU
-         5NF4++VOTJduSzXEHlqTHcLqyR/8dRh0YHiGRW9vJmokPJPkV8eKRsm83Te9ZS90gqQ5
-         wRf5zYhxkI2iBORHx7LclJLjcn5+6+5b0abcYIZQBj5TgS3GI/IUPT/bMLPemLu1EAua
-         1AbVcKX6gfKFSpIrpUPeeClvtI/C0NtqJznrCy087PXVC+jQA8vhH72HHBop3PsQH8tV
-         a1Eg==
+        d=gmail.com; s=20230601; t=1769708273; x=1770313073; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XlNMowHZilVKV7zVKlSzSEcRiQso4KCzR8rbSekgQMU=;
+        b=biJEbX8CTUvIoszUtz1/t+rAbVRbJCgRPhcWMk9gaI8q6iy3sRbnISaVbCmWV80r9e
+         IseANUTkQrwduAOCMKxGPBJwSo4/XmK84cfjY0ZAeHql2FuN7dFOgFn65wZfQgfRdqol
+         uhcHbbNKMY51rZ060JQAGETJl9qBYEGkh0qJun0+tqWEhszfxCSprwWZpJLJv8vkyj55
+         KL1/CdE4+Amk0c/WAHo268pjrMPeG8lh1LGQ2nY6S6q5yTA+TJtQghwvqjaSV+XWHaSt
+         g5tMYPqUS02FZhoRpKB3arZKLHUvBdk0U5LMhACcXXbUvLZS21P5Zb/bUngfqhyny3Sz
+         w7Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769705599; x=1770310399;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bxsJZ4lY7/i7NTzxVza1t8bxhbR1O4VQ7g3k6JdX5O0=;
-        b=c37FnoaViChxM6wyiHR+mWdrxK5o/PPDdfZsP7ac9WzuLbQLp/kTj8GdRKKDx5+GGR
-         GJiwlHtD5JK+CQbYT1qFegX04ts4nfrbybL8JOVPXUe82GWQkyU4AJtloSfXtvVfsv8f
-         Qw7CiJDfGv+30C3pWbdcwOr66+kGYW9N2Q/2UeYs13x9Z/+f5OCDXB5HqT6V9xWDQsxU
-         hLtaA2YEUSKiuAGGToCXWtZjEnq3rlc+koopf60bsulC49u3ukAE33P4aQ3l6+Yppi7W
-         70KAPjnkai7SqeTZgi3xAkqYnBy15XdkqVL/MY0Emuu+MJ7u38Ps8TvkyP/nXzN0ciss
-         Vezg==
-X-Forwarded-Encrypted: i=1; AJvYcCWpiKZ2HV/pYsFe1Qqwy3+dAF5lmsIUS1dUSvpT0SvtIdhCmg+p5ru5Obi+DFE5yOA16EILw6QhWsnm@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw63Ae68X11JHwZeRSA/s0jycSMaRujdwT5rmkzCT/XobGjgZ6+
-	30sPOAxAlR8wpNs86gGQT/+HLoeHWuOduqkAQUCv7lbYPk52OpH7aiqLwEYn/EuqOkWgkxdQhst
-	Pg5/lfSGhIKNt03OmTCXTsHmtb9QzyybYjmcV6RuXsl1lod1ci5B8GlNLTZJw8g4=
-X-Gm-Gg: AZuq6aJPu/CdMia2NBW0AFNMIsWG1ESblw0IfK8BujQnoNPXrQsTng4iY1dJyahtsKW
-	kvQg1sxN6uevzFZDQ3QjaU1EuStb5YcNQUrgHsupvK9UZC2635SocRtfw/rgZU/KnKRjTGWUJW8
-	hDPjgPmiaYPVR1A2pQHSSGegCynDjElgpx7HiMgTk2LIOuh1EnMBxQ6P2DODdl1n8jTy2OQc4/U
-	y32VYNMW5UQZEW/+6UByqgIxKJKDX+j2s5yhs64DIA9oDady2Rp0CHO/nOelyrRwpcPScdhWJvJ
-	cadSMqRjDx4T1zZBESyQUFhDm3/o1MI0Sio8jASnlfoZn/yWHqQbO2yD0MJC2lzXyWo95+pQJY3
-	ALp2t+6DGBNI1
-X-Received: by 2002:a05:600c:4e90:b0:477:582e:7a81 with SMTP id 5b1f17b1804b1-48069c2a907mr105133585e9.4.1769705598732;
-        Thu, 29 Jan 2026 08:53:18 -0800 (PST)
-X-Received: by 2002:a05:600c:4e90:b0:477:582e:7a81 with SMTP id 5b1f17b1804b1-48069c2a907mr105133265e9.4.1769705598230;
-        Thu, 29 Jan 2026 08:53:18 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.56])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-481a5e195ecsm793975e9.4.2026.01.29.08.53.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jan 2026 08:53:17 -0800 (PST)
-Message-ID: <bbbaf4e5-1c31-4c84-adb4-dbb94b8d07f4@redhat.com>
-Date: Thu, 29 Jan 2026 17:53:14 +0100
+        d=1e100.net; s=20230601; t=1769708273; x=1770313073;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=XlNMowHZilVKV7zVKlSzSEcRiQso4KCzR8rbSekgQMU=;
+        b=RO66KRjmr74fgw+CYK3D2elFOIS87yMq89k3mAd8uQWtGelN7KmAj0C+AQhbcjpvJs
+         W9zB5jJcmf22TwJXutPbflTVhcRHTtfD3SX4OMje/sbQ7ex6CvgNVIOyrx3nKJN4Q+4E
+         /3atoO4l0U19VdKPNWDMZD+BwAQEqKZoWaF6THpDHJ4zNk9Nnu+G7QGqNjsYTIB3Yyyj
+         K8JSFK9xXGUAATcV/QO0xavf2ljdBniVu1cdKnmZ8NjubqX2Gq3uyInKTQUH2n54P0CV
+         mZ+m8X8n4+upWGcE2CK7IfGEmuhNfnAz4DESBUOumGE9cNT1yNJ5iDpy0Qqkf2tZtfhF
+         d7FA==
+X-Gm-Message-State: AOJu0YxRBN72i/bwuyhzdKH/WtmcmlEZJUn3nJfBIcxGSZiWDvCasFo7
+	J1KgVhXE8O5avUBWxCctwJTrxGuUb4hu1YJLUcbBPtXKvO0foKPXfOkcpkAcCA==
+X-Gm-Gg: AZuq6aJfhlcsdhjhzQ7Q9N5yx7Ggu6TOp4iXAOv6wtgAFV2LxtiAxyApPpfvhyTdi+C
+	IzXji6dy6MGKTS57RQMiUoxXL6GEUJZB8fIet1768LE9j8KDiUgh/In8LD0vpY91nb3D+XxmISS
+	bIOGdPbn9ONzC/o8yzcdQO1E4CjFYHMwf5kfYZxMoXDtevSW4bXi13qCcpcMLtE0UKfTt/lIvUg
+	agppN+sz1QEZVE4xGPjs1iKorFIaMwDTLM5bgn8AvPElgYwSSynmJTFyAI+h0QaOUfBtRL1wEB/
+	2smV3Z+z1Skrz07FE5LBZdwjIqwpGSCU39OsjxSdmUkMRPhNXp+1TtX1OmU9Maffc6ReuDVRD0Q
+	HpEJ51eXgIaPLFbLJ9ablQq3VPrRy6vNLRJQ/51xrG9yJ1Q+uIHd/cqkpo5Sy6/Tt9KlZu3xmNF
+	/W4U90qDLfxksEWedmvCdIP/iOzF89BWCbi9dK7l2MkeKniV7lxvo=
+X-Received: by 2002:a05:6a00:1893:b0:81f:b1d4:b486 with SMTP id d2e1a72fcca58-8236917312amr8964915b3a.8.1769708272749;
+        Thu, 29 Jan 2026 09:37:52 -0800 (PST)
+Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.200])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82379b6a5desm5512659b3a.28.2026.01.29.09.37.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 09:37:52 -0800 (PST)
+From: nspmangalore@gmail.com
+X-Google-Original-From: sprasad@microsoft.com
+To: linux-cifs@vger.kernel.org,
+	smfrench@gmail.com,
+	pc@manguebit.org,
+	bharathsm@microsoft.com,
+	dhowells@redhat.com,
+	netfs@lists.linux.dev
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Subject: [PATCH v3 2/4] netfs: when subreq is marked for retry, do not check if it faced an error
+Date: Thu, 29 Jan 2026 23:07:09 +0530
+Message-ID: <20260129173725.887651-2-sprasad@microsoft.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260129173725.887651-1-sprasad@microsoft.com>
+References: <20260129173725.887651-1-sprasad@microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 15/15] quic: add packet parser base
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
- quic@lists.linux.dev
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
- linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
- Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1769439073.git.lucien.xin@gmail.com>
- <46f93cbee41da1e1f7b7f408b17915fd93b39ec1.1769439073.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <46f93cbee41da1e1f7b7f408b17915fd93b39ec1.1769439073.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/26/26 3:51 PM, Xin Long wrote:
-> +/* Lookup listening socket for Client Initial packet (in process context). */
-> +static struct sock *quic_packet_get_listen_sock(struct sk_buff *skb)
-> +{
-> +	union quic_addr daddr, saddr;
-> +	struct quic_data alpns = {};
-> +	struct sock *sk;
-> +
-> +	quic_get_msg_addrs(skb, &daddr, &saddr);
-> +
-> +	if (quic_packet_parse_alpn(skb, &alpns))
-> +		return NULL;
-> +
-> +	local_bh_disable();
+From: Shyam Prasad N <sprasad@microsoft.com>
 
-Is this really needed? If so, it needs some comment explaining the
-rationale, otherwise please drop it.
+The *_subreq_terminated functions today only process the NEED_RETRY
+flag when the subreq was successful or failed with EAGAIN error.
+However, there could be other retriable errors for network filesystems.
 
-/P
+Avoid this by processing the NEED_RETRY irrespective of the error
+code faced by the subreq. If it was specifically marked for retry,
+the error code must not matter.
+
+Cc: David Howells <dhowells@redhat.com>
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+---
+ fs/netfs/read_collect.c  | 10 +++++++++-
+ fs/netfs/read_retry.c    |  4 ++--
+ fs/netfs/write_collect.c |  8 ++++----
+ fs/netfs/write_issue.c   |  1 +
+ 4 files changed, 16 insertions(+), 7 deletions(-)
+
+diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
+index a95e7aadafd07..7ac11125ca028 100644
+--- a/fs/netfs/read_collect.c
++++ b/fs/netfs/read_collect.c
+@@ -546,19 +546,27 @@ void netfs_read_subreq_terminated(struct netfs_io_subrequest *subreq)
+ 		}
+ 	}
+ 
++	/* if need retry is set, error should not matter. pause the rreq */
++	if (test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags)) {
++		trace_netfs_rreq(rreq, netfs_rreq_trace_set_pause);
++		set_bit(NETFS_RREQ_PAUSE, &rreq->flags);
++		goto skip_error_checks;
++	}
++
+ 	if (unlikely(subreq->error < 0)) {
+-		trace_netfs_failure(rreq, subreq, subreq->error, netfs_fail_read);
+ 		if (subreq->source == NETFS_READ_FROM_CACHE) {
+ 			netfs_stat(&netfs_n_rh_read_failed);
+ 			__set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
+ 		} else {
+ 			netfs_stat(&netfs_n_rh_download_failed);
+ 			__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
++			trace_netfs_failure(rreq, subreq, subreq->error, netfs_fail_read);
+ 		}
+ 		trace_netfs_rreq(rreq, netfs_rreq_trace_set_pause);
+ 		set_bit(NETFS_RREQ_PAUSE, &rreq->flags);
+ 	}
+ 
++skip_error_checks:
+ 	trace_netfs_sreq(subreq, netfs_sreq_trace_terminated);
+ 	netfs_subreq_clear_in_progress(subreq);
+ 	netfs_put_subrequest(subreq, netfs_sreq_trace_put_terminated);
+diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
+index b99e84a8170af..7793ba5e3e8fc 100644
+--- a/fs/netfs/read_retry.c
++++ b/fs/netfs/read_retry.c
+@@ -12,6 +12,7 @@
+ static void netfs_reissue_read(struct netfs_io_request *rreq,
+ 			       struct netfs_io_subrequest *subreq)
+ {
++	subreq->error = 0;
+ 	__clear_bit(NETFS_SREQ_MADE_PROGRESS, &subreq->flags);
+ 	__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
+ 	netfs_stat(&netfs_n_rh_retry_read_subreq);
+@@ -242,8 +243,7 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+ 	subreq = list_next_entry(subreq, rreq_link);
+ abandon:
+ 	list_for_each_entry_from(subreq, &stream->subrequests, rreq_link) {
+-		if (!subreq->error &&
+-		    !test_bit(NETFS_SREQ_FAILED, &subreq->flags) &&
++		if (!test_bit(NETFS_SREQ_FAILED, &subreq->flags) &&
+ 		    !test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags))
+ 			continue;
+ 		subreq->error = -ENOMEM;
+diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
+index cbf3d9194c7bf..61eab34ea67ef 100644
+--- a/fs/netfs/write_collect.c
++++ b/fs/netfs/write_collect.c
+@@ -492,11 +492,11 @@ void netfs_write_subrequest_terminated(void *_op, ssize_t transferred_or_error)
+ 
+ 	if (IS_ERR_VALUE(transferred_or_error)) {
+ 		subreq->error = transferred_or_error;
+-		if (subreq->error == -EAGAIN)
+-			set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
+-		else
++		/* if need retry is set, error should not matter */
++		if (!test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags)) {
+ 			set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+-		trace_netfs_failure(wreq, subreq, transferred_or_error, netfs_fail_write);
++			trace_netfs_failure(wreq, subreq, transferred_or_error, netfs_fail_write);
++		}
+ 
+ 		switch (subreq->source) {
+ 		case NETFS_WRITE_TO_CACHE:
+diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
+index dd8743bc8d7fe..34894da5a23ec 100644
+--- a/fs/netfs/write_issue.c
++++ b/fs/netfs/write_issue.c
+@@ -250,6 +250,7 @@ void netfs_reissue_write(struct netfs_io_stream *stream,
+ 	iov_iter_truncate(&subreq->io_iter, size);
+ 
+ 	subreq->retry_count++;
++	subreq->error = 0;
+ 	__clear_bit(NETFS_SREQ_MADE_PROGRESS, &subreq->flags);
+ 	__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
+ 	netfs_stat(&netfs_n_wh_retry_write_subreq);
+-- 
+2.43.0
 
