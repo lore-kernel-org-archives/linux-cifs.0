@@ -1,60 +1,60 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8077082F;
-	Sat, 31 Jan 2026 14:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3500F23ED6A;
+	Sat, 31 Jan 2026 15:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769871559; cv=none; b=HB8EQy83G2de67G0sEjPN0DVvhUvtp0q8HBIslaj9731szEORcHhFbv0oXXpblJ0HejOsWCPpvuV3q+ckKyOpqr0AybKlGMmEpukAu5ajnnSiPfWeTBTaR0ORj/LIkrLNIwX6CU50gru8cJ7QgIt3zGkwMuULMtpBXjHvQ+/XNc=
+	t=1769874679; cv=none; b=thuxuL6SvbdOniaxU7iKKDQupMqDHoaZikmw+jbDtLXbQGBV126Vi9htymDUP6Ri68Q1BZaORTeL7xJ0PoG6rv/lV7+GxLVLxiSy6Aw4KJWBLlDdSXWHvc+B/mTjUocQP3RESxvCpsjdR9Z2l2FbbOw9qdxo35qAyx81R5vMNEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769871559; c=relaxed/simple;
-	bh=FJggnOKJ4M4vVf7I9GTSgy+oWuGJtHrGxB91YuxGsQ4=;
+	s=arc-20240116; t=1769874679; c=relaxed/simple;
+	bh=XuJ3RHszb+aP1YfPvboAtfNg1PJ714UCPyazHCpK7ks=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GCFOtfSLHYlpeALTWoUDorDdFOzGoXFlaQSzgMY96V+MmabmJiNqyHinujyX1nd4MPIzVItyZVjW8r+GUAOUR9r2AcLDgTLlo4bOiN+fRpBDcKgXou8TIabjYeWUDst+K8+1xflNk08e3N0745+gC5e5NvgI/gOUxPxkG2t/Bzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d19pDV9r; arc=none smtp.client-ip=198.175.65.13
+	 Content-Type:Content-Disposition:In-Reply-To; b=cGlDK+D2xq/Av5GaZf7Fts5Q9F914sTgoEWu4v55W1MSUFayxDuiag0DWw3kujHmrzY4tXIFPSaICMzKMj5wt3xU5dSFIUHM4IkBNwf5YfSVw6Djv+G3geNRcICfDUzORCOVuasRQMgWKbY190TPkROVdm+7deWXvLkuZ+yJZ88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NzLHM8vH; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d19pDV9r"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NzLHM8vH"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769871557; x=1801407557;
+  t=1769874678; x=1801410678;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=FJggnOKJ4M4vVf7I9GTSgy+oWuGJtHrGxB91YuxGsQ4=;
-  b=d19pDV9r8vzK71v73KFK0IU6nO8UFxPI5kIwbhgdBCMej555oiDGqx0h
-   5GVxJc4bs8I/mu3sfgzfatgYD5vDIIiVJKsbx07Eih5WO/PJgq2+rhiW+
-   yYRMY1t/OTU5L05FSW/K8e5Cys3QgHrecHKn0+ESz3AOX402MsEIKE56m
-   j4pMPN+dkaHbMJQnaOVNSeU9cYh8Cyh8126LQHg/TWsOp+QfYQIQRsqpQ
-   nXUWA1ZxjgnPni4D+4mPYlcqyHFRuG92kz4lyRHgMyk0uyyY6wwvbHUhG
-   7ICnQrp8ClUOSdIUOeJYH4dcWkOIOQpcixDGN+f8gW7rd/2o9SQPDbznf
-   Q==;
-X-CSE-ConnectionGUID: rx4Q7J00QUSapXfFx6Cf4Q==
-X-CSE-MsgGUID: je5wcLsrQp2gG3hTJ1ILPQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11687"; a="82208505"
+  bh=XuJ3RHszb+aP1YfPvboAtfNg1PJ714UCPyazHCpK7ks=;
+  b=NzLHM8vHPhs93Sf5eBV8IYhEklyFT66vcqXFZDm6yZd1Oi6T+nwtG3nD
+   uFX/a0D4TTYVr50G7bydNV6KLmJzDstHfHCUAbnI8fRDOEXGmcUGwaKIc
+   4hJ2BErkhsUsPMr4aG1susz0ru+I1j25nxa4LjBN5mTEXKqKLs7T9YxWu
+   bXuzCjsZW5bISQVdtGrMjFWFVpiTC0WhhgNl9jzadloUO5x2SKMQR+wzU
+   MzliaWJxZdTFREl5lwY+dFWhMVICrZd27+JfDQdPyuSsXcieptPdZ33hL
+   Y0ix5uS/XiGwu2JfMvv3IlJhXmHeO1pQyvaXS6oRXW98jyYh4SXJMJAl/
+   g==;
+X-CSE-ConnectionGUID: fm+UOip3TUCyZkh6YqLLGA==
+X-CSE-MsgGUID: j+xPhiIRQzaupawdfLHq5Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11687"; a="74723905"
 X-IronPort-AV: E=Sophos;i="6.21,265,1763452800"; 
-   d="scan'208";a="82208505"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2026 06:59:16 -0800
-X-CSE-ConnectionGUID: RgIipO5TQQeW+CfDUag4Iw==
-X-CSE-MsgGUID: d6xD7hDbQDGcoIO6zLKf7A==
+   d="scan'208";a="74723905"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2026 07:51:17 -0800
+X-CSE-ConnectionGUID: Gx99YvakSWCbNX1oqFDnIg==
+X-CSE-MsgGUID: 1MTX5YCrQ+qWJS8xHgODIg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,265,1763452800"; 
-   d="scan'208";a="208346561"
+   d="scan'208";a="214001699"
 Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 31 Jan 2026 06:59:13 -0800
+  by fmviesa004.fm.intel.com with ESMTP; 31 Jan 2026 07:51:14 -0800
 Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
 	(envelope-from <lkp@intel.com>)
-	id 1vmCRK-00000000e6O-44F0;
-	Sat, 31 Jan 2026 14:59:10 +0000
-Date: Sat, 31 Jan 2026 22:58:22 +0800
+	id 1vmDFg-00000000e7y-2C4o;
+	Sat, 31 Jan 2026 15:51:12 +0000
+Date: Sat, 31 Jan 2026 23:50:48 +0800
 From: kernel test robot <lkp@intel.com>
 To: nspmangalore@gmail.com, linux-cifs@vger.kernel.org, smfrench@gmail.com,
 	pc@manguebit.org, bharathsm@microsoft.com
 Cc: oe-kbuild-all@lists.linux.dev, Shyam Prasad N <sprasad@microsoft.com>,
 	stable@vger.kernel.org
 Subject: Re: [PATCH 2/2] cifs: Fix locking usage for tcon fields
-Message-ID: <202601312208.PzE9vcRG-lkp@intel.com>
+Message-ID: <202601312343.JPu2GSIi-lkp@intel.com>
 References: <20260131080239.943483-2-sprasad@microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -80,31 +80,25 @@ url:    https://github.com/intel-lab-lkp/linux/commits/nspmangalore-gmail-com/ci
 base:   git://git.samba.org/sfrench/cifs-2.6.git for-next
 patch link:    https://lore.kernel.org/r/20260131080239.943483-2-sprasad%40microsoft.com
 patch subject: [PATCH 2/2] cifs: Fix locking usage for tcon fields
-config: x86_64-randconfig-004-20260131 (https://download.01.org/0day-ci/archive/20260131/202601312208.PzE9vcRG-lkp@intel.com/config)
-compiler: gcc-13 (Debian 13.3.0-16) 13.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260131/202601312208.PzE9vcRG-lkp@intel.com/reproduce)
+config: microblaze-defconfig (https://download.01.org/0day-ci/archive/20260131/202601312343.JPu2GSIi-lkp@intel.com/config)
+compiler: microblaze-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260131/202601312343.JPu2GSIi-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601312208.PzE9vcRG-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601312343.JPu2GSIi-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
    fs/smb/client/smb2ops.c: In function 'smb2_get_dfs_refer':
->> fs/smb/client/smb2ops.c:3178:17: error: too few arguments to function 'cifs_put_tcon'
+>> fs/smb/client/smb2ops.c:3178:17: error: too few arguments to function 'cifs_put_tcon'; expected 2, have 1
     3178 |                 cifs_put_tcon(tcon);
          |                 ^~~~~~~~~~~~~
    In file included from fs/smb/client/smb2ops.c:20:
    fs/smb/client/cifsproto.h:273:6: note: declared here
      273 | void cifs_put_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace);
          |      ^~~~~~~~~~~~~
---
-   fs/smb/client/cached_dir.c: In function 'cfids_laundromat_worker':
->> fs/smb/client/cached_dir.c:795:36: error: 'tcon' undeclared (first use in this function)
-     795 |                         spin_lock(&tcon->tc_lock);
-         |                                    ^~~~
-   fs/smb/client/cached_dir.c:795:36: note: each undeclared identifier is reported only once for each function it appears in
 
 
 vim +/cifs_put_tcon +3178 fs/smb/client/smb2ops.c
