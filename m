@@ -1,60 +1,60 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3500F23ED6A;
-	Sat, 31 Jan 2026 15:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855663382F0;
+	Sat, 31 Jan 2026 15:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769874679; cv=none; b=thuxuL6SvbdOniaxU7iKKDQupMqDHoaZikmw+jbDtLXbQGBV126Vi9htymDUP6Ri68Q1BZaORTeL7xJ0PoG6rv/lV7+GxLVLxiSy6Aw4KJWBLlDdSXWHvc+B/mTjUocQP3RESxvCpsjdR9Z2l2FbbOw9qdxo35qAyx81R5vMNEI=
+	t=1769874880; cv=none; b=Kma/vTm1Km4OffWuqTkCr3ZuBVFMLQ1TbuOeTKqzNJIlEYIYocQEB8r2BNS9onq/BsQfA8OqT0UdyoVpl1kSQlyH2hmX5Y2Zpv8ihKlAPg2GwR8h0KeqZZmIVs1m7h9rafpZ2X7uPxuPpqnsBLltCHp9+tRRVvMc1DQinWFaxiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769874679; c=relaxed/simple;
-	bh=XuJ3RHszb+aP1YfPvboAtfNg1PJ714UCPyazHCpK7ks=;
+	s=arc-20240116; t=1769874880; c=relaxed/simple;
+	bh=yP/+lWu8w6TVpcU/sK04du+syKfA7fdOXqbErdv8SGk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cGlDK+D2xq/Av5GaZf7Fts5Q9F914sTgoEWu4v55W1MSUFayxDuiag0DWw3kujHmrzY4tXIFPSaICMzKMj5wt3xU5dSFIUHM4IkBNwf5YfSVw6Djv+G3geNRcICfDUzORCOVuasRQMgWKbY190TPkROVdm+7deWXvLkuZ+yJZ88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NzLHM8vH; arc=none smtp.client-ip=198.175.65.15
+	 Content-Type:Content-Disposition:In-Reply-To; b=OX/e6bAr9LzpVAYmpWDr9Y8WX23aaqBzg4PbX+BlWUX9hlwyGu/ThPF12Fw3kt9euM8alhbF0J9q8SUXEXuhr38QOFExlRWrsRhEJuDRAj9b3tOdVyd6Mz4BNYd/KcERuywFIT+Kr40v7bolu4nrT5jU/7Ol66O0tIx5YO9s5fw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f37NOcNy; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NzLHM8vH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f37NOcNy"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769874678; x=1801410678;
+  t=1769874878; x=1801410878;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=XuJ3RHszb+aP1YfPvboAtfNg1PJ714UCPyazHCpK7ks=;
-  b=NzLHM8vHPhs93Sf5eBV8IYhEklyFT66vcqXFZDm6yZd1Oi6T+nwtG3nD
-   uFX/a0D4TTYVr50G7bydNV6KLmJzDstHfHCUAbnI8fRDOEXGmcUGwaKIc
-   4hJ2BErkhsUsPMr4aG1susz0ru+I1j25nxa4LjBN5mTEXKqKLs7T9YxWu
-   bXuzCjsZW5bISQVdtGrMjFWFVpiTC0WhhgNl9jzadloUO5x2SKMQR+wzU
-   MzliaWJxZdTFREl5lwY+dFWhMVICrZd27+JfDQdPyuSsXcieptPdZ33hL
-   Y0ix5uS/XiGwu2JfMvv3IlJhXmHeO1pQyvaXS6oRXW98jyYh4SXJMJAl/
-   g==;
-X-CSE-ConnectionGUID: fm+UOip3TUCyZkh6YqLLGA==
-X-CSE-MsgGUID: j+xPhiIRQzaupawdfLHq5Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11687"; a="74723905"
+  bh=yP/+lWu8w6TVpcU/sK04du+syKfA7fdOXqbErdv8SGk=;
+  b=f37NOcNyYVKnSTwbctSd3O7TVzwn+GF3zQeo7lLNnGfVkx+ipP8pXdtQ
+   Y8ee44Hxqr3eGHvHIsQJ/z54AMTpftq5v+SYKbawL70IWJ6J5TfldzTHT
+   9pLzzN3rcKdJTlS9ha1YRlFrqHDB4x7ZSwCFmVXP1IEBy99BpmaoIVqdq
+   Jo7u6PGANeg42bkZ+4whbDE79j33fARD5Jt0AB1xsj65pYNn8s2/geXlA
+   cif4rFQxZRF7SRvsDwYyvtL+nqOIYIVIIruA8Blcbub1yPRfHwOK5ZUjq
+   hLt8yaxmSfORHWxWFK8wotuDp6Fw2QLzPhMequke3RxanYQUDZORtH176
+   w==;
+X-CSE-ConnectionGUID: 4YvMylxZTTuK3wJZZXlwcQ==
+X-CSE-MsgGUID: +hk1m2nSS9i9ox5RZgmG+Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11687"; a="70118250"
 X-IronPort-AV: E=Sophos;i="6.21,265,1763452800"; 
-   d="scan'208";a="74723905"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2026 07:51:17 -0800
-X-CSE-ConnectionGUID: Gx99YvakSWCbNX1oqFDnIg==
-X-CSE-MsgGUID: 1MTX5YCrQ+qWJS8xHgODIg==
+   d="scan'208";a="70118250"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2026 07:54:38 -0800
+X-CSE-ConnectionGUID: mNM1mRCKRvO2CXNfpAHMEg==
+X-CSE-MsgGUID: HLs4j+UdQ/C/xg8xorcjOg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,265,1763452800"; 
-   d="scan'208";a="214001699"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 31 Jan 2026 07:51:14 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+   d="scan'208";a="208350889"
+Received: from igk-lkp-server01.igk.intel.com (HELO afc5bfd7f602) ([10.211.93.152])
+  by orviesa010.jf.intel.com with ESMTP; 31 Jan 2026 07:54:16 -0800
+Received: from kbuild by afc5bfd7f602 with local (Exim 4.98.2)
 	(envelope-from <lkp@intel.com>)
-	id 1vmDFg-00000000e7y-2C4o;
-	Sat, 31 Jan 2026 15:51:12 +0000
-Date: Sat, 31 Jan 2026 23:50:48 +0800
+	id 1vmDIc-000000002iX-0fps;
+	Sat, 31 Jan 2026 15:54:14 +0000
+Date: Sat, 31 Jan 2026 16:54:04 +0100
 From: kernel test robot <lkp@intel.com>
 To: nspmangalore@gmail.com, linux-cifs@vger.kernel.org, smfrench@gmail.com,
 	pc@manguebit.org, bharathsm@microsoft.com
 Cc: oe-kbuild-all@lists.linux.dev, Shyam Prasad N <sprasad@microsoft.com>,
 	stable@vger.kernel.org
 Subject: Re: [PATCH 2/2] cifs: Fix locking usage for tcon fields
-Message-ID: <202601312343.JPu2GSIi-lkp@intel.com>
+Message-ID: <202601311634.9WVpg186-lkp@intel.com>
 References: <20260131080239.943483-2-sprasad@microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -80,14 +80,14 @@ url:    https://github.com/intel-lab-lkp/linux/commits/nspmangalore-gmail-com/ci
 base:   git://git.samba.org/sfrench/cifs-2.6.git for-next
 patch link:    https://lore.kernel.org/r/20260131080239.943483-2-sprasad%40microsoft.com
 patch subject: [PATCH 2/2] cifs: Fix locking usage for tcon fields
-config: microblaze-defconfig (https://download.01.org/0day-ci/archive/20260131/202601312343.JPu2GSIi-lkp@intel.com/config)
-compiler: microblaze-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260131/202601312343.JPu2GSIi-lkp@intel.com/reproduce)
+config: s390-allnoconfig-bpf (https://download.01.org/0day-ci/archive/20260131/202601311634.9WVpg186-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260131/202601311634.9WVpg186-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601312343.JPu2GSIi-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601311634.9WVpg186-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
