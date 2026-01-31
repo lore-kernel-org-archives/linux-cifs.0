@@ -1,60 +1,62 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D298B36657F
-	for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 18:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85393367F4A
+	for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 18:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769885566; cv=none; b=ZQk092TWlbVJTMOcv0mMyKaqstBaDOeggluLBhN/Zd72gJ4I5Jo5O6GWQjU5ukwbY/34FPwFtN7WqMSpNHAfAEqnM+WtUJvd+uhob9cLAyQMpsrujeLankQaLr5+SMraLi5KkTqk9zntC/y2FA96P4VpYfHw8N7ImTH+sSZTzUw=
+	t=1769885566; cv=none; b=YOJ+bR3DfdEBUds/Bk8K9z+U/pwSiURdEXZXqjI9vVIv7/muconiB0yXf8tXLAYDKOiiWRcW1KUG3u39cE26aIaPD5IOC3kwwD3yV4f7zZFmMGZjSXpS39LDgfehi+FkUjxvXXCNrWgI02GjJEKpCPS4k39fLrfqSz5zVN+ok2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769885566; c=relaxed/simple;
-	bh=WELQ8A7lUsxeB7Xhp63wLAIhTFf2jgPHUwFuNrUfTSc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LpJONVW47yj7U9x4mpxEMDjlu5/TAEmgUe0Ew6zPBhuWs+fd86S79daI/+h2TMdbQNgpDxgDkDWMq6gFYLA89Ps7FAniuk8HRdJ8rHGYwbhUyjvdv+1jcU0mkdU+gCgcUiaPfbQz6up2d7EKMD9DhFt5wzf9Q85VEkhepBW6Gu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j0J1fDde; arc=none smtp.client-ip=209.85.210.174
+	bh=vQq02FMVpbjplRoufcM/laGJrK4kMg9CPakD66WlICU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qsiLpfycXXM146aZQ9fUpFjfmewEAKWKqhUmCG+S+9Ukhs9WHUkO+VcHDVCtD2l2us22lfJ/IOnt10tTnzlt/sYP6Ck6AjT2Is3drqOwnqsccUzbDDe1+z+25RtdwmMKDtUXLRQaV97Jl9Uuv/kO0jf/GqgrVgyflij0D0VwZOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBMVixJ2; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j0J1fDde"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-81dab89f286so1571177b3a.2
-        for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 10:52:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBMVixJ2"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-81e93c5961cso2614826b3a.0
+        for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 10:52:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769885564; x=1770490364; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=50/MBNc4NUeWmwMGMZPJMvHqKAOM1yXk8HEG5ImQG3E=;
-        b=j0J1fDdemOCBtZsyEf5gJs0clToAYNawZI5ppsuLbRh9u0IoYoN+tQoPKQZ9qYqQgo
-         4ViO8NzPhDI4P9c4mUy5ATBxUV9F9RvMDazhhxTiOw4Q2PJxnQWsgXtNIbdRRawOyKe+
-         nbMJ5zgnyG+BTsAh2vf/iKNZqA+sUFoKjR+3/blCOLzljfYNVUm9l49bIKrwN4QwaRqF
-         gRVmfEnGcKbl8ngY1PGYy9Nd9W6CjmZkqFo/AtTkY3Xq9TBpwNVUgfw1RHFKA2m8yxOJ
-         yr3uD+OjP0Abk7txyjvYGBWHFbkhjZuf8nhwbzuOrJumM6jD58Kr4Wf92aEbxXs0TaPs
-         5z8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769885564; x=1770490364;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1769885565; x=1770490365; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=50/MBNc4NUeWmwMGMZPJMvHqKAOM1yXk8HEG5ImQG3E=;
-        b=aHoFdpNsrensmrimRVgfw78ITG0gB3U0bPNf5whUrhgzmdnUOKSfi7y2Tcflslrhy2
-         I2N+tPfAGLODdA4WjMpSI57Az7zXXXhaTh7rH9n9J8jV6IDnnfyVx/gIMdrKMd3evqgJ
-         DMb7ZBBqrkAfW9Bd26QTGiPI9+f90oldVsQxoCnVxu6Co025fr80rYu9ipSkTuYxzXD6
-         NiSc/RQ98dDgYIAGDcKjZt09QxE3H+gHn57+EMWrISpkAisP53RyEfU3hBs2I1wfRsiU
-         MuJuBFG1r8wcksR8pVh2dkCjHfHZ+Vn9vIwFUgdII7ZzXeh5Jw4Nl5+Yobi1RYNZTDDO
-         hTpw==
-X-Gm-Message-State: AOJu0YyRUJAKrcyAzUA9lKxMyjxQUZwKZXIFlngwqWVd+mLdvrWNTyzi
-	HoPftcsAeEBnVG+X81Upd0nIKqgHDfp60RdXnWcvxCKSfFCBFeQ5rQ8GZG+zY6Fu
-X-Gm-Gg: AZuq6aJ90aL4eVuzeIVRgtHiNtwSrM773QGvS3qcjxkTgKuEH8D+sHS3joSn89Mz/By
-	MYuTzcm4EEjYH5VUYe1+QhesBlxnrG4eKUOQNe3VboeEi3Aakf7pjf0ijB9DqnKAGpv5LfrSWTq
-	NRN8dK7UFSGeEgl42XQXIJMThwryiyz1hCHa2hPJAK4Z9nkCeo9lRmz/VRMUr5DQ1lUHQ0ZVwzL
-	S6XOYXEfwJ/xqeDPjUZwnfhCjR26I9VESbvCkYY9V8/7L+c1jMhO1tY/acbv0rbaikq51SrIK7n
-	/A1jpgaI+obIKYYjFfF7/1KKOPCSLSCmLpSH6sMU6wPIAEQgeAvu1l5QA2/4DhPEoZV3fpRHml7
-	TG78yZr1rCIoV0BmBeSgFoFZ5a5Iv5/srAoH7CRnYDyFfEr9wxNLI7Ny/WnrpRhLq70rlkXpZVc
-	LSD1V/qzvJ8uJTWEsiS3aZRR5VvAYYkfYBDzLR+SA=
-X-Received: by 2002:a05:6a00:1ca6:b0:823:9e5:855e with SMTP id d2e1a72fcca58-823a9fe2988mr6853284b3a.0.1769885563644;
-        Sat, 31 Jan 2026 10:52:43 -0800 (PST)
+        bh=m/YpZuZ4iHVFgay+XuFU7jmeGrQlXbkaqzKeU5rDtPM=;
+        b=UBMVixJ2luyGImWx1dZvp32ZyEHMTSXR9xxh73zp7o4R/EG+lde0q3pYkdFRsa5wLm
+         SpC9bAEOJrvnN17cRMt6V5NR4OzNOXQcTmOy+BoEO1EM2EXXtEMLjRs1n7YmlAoblCbz
+         ARBfKs1bPNia1zmkZ/EoAyg/n6tol1t2rHROQ21JeKIP+ziN4m+xFcZsq9f4VBZ+cuSQ
+         qBG0du1VDXVDYswCoYSb0Ism2cwqvu1/n4v+Iws478F0ZALUMbO370HCHyHqR7ydN6K0
+         pBPYViN3EY11r+YOwNiF7SJkzvLLfEHLOWryXyZO8v4+sgBVrLzb3YGFuu7mID9ZSdUp
+         BKcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769885565; x=1770490365;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=m/YpZuZ4iHVFgay+XuFU7jmeGrQlXbkaqzKeU5rDtPM=;
+        b=rYbJjGS8hF/F8Eo/uNEsJR9E66ryYigaoWSIZ9IWSk1URjh/m226clNX/ikQ7SO5OT
+         OhOySf9DKwAW4rLqaizUE5UsV7EOFmn6AOvPpzCBqTlp5AajUV+GIj5uKoqCTtgx+PKH
+         eFjXH6V0mvxM5eD3EVjax+5KrwoeTB/Exx5VYggHOigN8zmdDf4o7WSGLzAQVSzU15dk
+         D8mYjFKyrNQBwqnvS6xeXprVX+mjrDOhjRo6LZhEPKur4Zlt3YvUn3+Ba1PTBzexrIYg
+         I6zZqoCPXf2qEMS6BOymBbs+CKvmbMBf+dVCKLvQ3igeMulN1BQtsFc6tGfJ+9yyFjIk
+         bxpQ==
+X-Gm-Message-State: AOJu0Yw5DU8bk9szgLnR4Xw2FiEJkOG4DOeESMPYV5bUoUPueWy/H0hM
+	OIaQBHgPndMuvR1Rk/x5E0t+jRSHXolW6W3GG9IQZa5bzYLvTo2kw52C4ZJJvG3Y
+X-Gm-Gg: AZuq6aIZ98wGthOEidpZ6Dnkci8QhRXZLUJaZ8MIHagpzaI7+ZqJZkcdyjaB3P3SPN1
+	akutlRAsElxYJmJvT+O/vGgn0quH+8bryXvzUTF9Rpu3daEcewIVwP7dWYvaRzN7bNvRw5GdYZr
+	U3HD/J0tNdfx04dmjznbgdDOH1rfeHqN9OWRHliDKLZFmHCJMvxjsJm2D0iHh4p6H9R2k7xjnjL
+	65R3Jgereh8llU5f6QddpOLWynD5EPHhVlaCq1RjIId6ksEvCN1QtqsDxO2ZTLSd9Hsb924mDaA
+	f0SvFL2Ey9sA9l4iG2C6fOELOYL6dChMq7uooehusL7Bf+Ddj8d/B1PyUkipOBnluYaqTvAmMDU
+	vdnnbC/bqxk7aUkY8P9yKIhOpCKfqCyApuXgL+eK7/7M/+G0K1L9Yv5BGZ0KzaE8oowra42qm0I
+	lMBxMkAoGhrafZkMqL6YLPgoyWVofH1J0kuNCmPIo=
+X-Received: by 2002:a05:6a00:4195:b0:823:d29:f4f0 with SMTP id d2e1a72fcca58-823ab9762d7mr6896203b3a.62.1769885564744;
+        Sat, 31 Jan 2026 10:52:44 -0800 (PST)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.56])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82379c22419sm11635760b3a.46.2026.01.31.10.52.42
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82379c22419sm11635760b3a.46.2026.01.31.10.52.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 Jan 2026 10:52:43 -0800 (PST)
+        Sat, 31 Jan 2026 10:52:44 -0800 (PST)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -63,11 +65,14 @@ To: linux-cifs@vger.kernel.org,
 	bharathsm@microsoft.com,
 	henrique.carvalho@suse.com,
 	ematsumiya@suse.de
-Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH v2 1/2] cifs: Corrections to lock ordering notes
-Date: Sun,  1 Feb 2026 00:21:12 +0530
-Message-ID: <20260131185238.973130-1-sprasad@microsoft.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2 2/2] cifs: Fix locking usage for tcon fields
+Date: Sun,  1 Feb 2026 00:21:13 +0530
+Message-ID: <20260131185238.973130-2-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260131185238.973130-1-sprasad@microsoft.com>
+References: <20260131185238.973130-1-sprasad@microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -78,78 +83,128 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-There were a couple of discrepencies in lock ordering for the locks
-that were specified in the lock ordering notes. Did an analysis
-of the current codebase (using LLM) and found two pairs whose ordering
-in these notes were wrong. It also found one lock that was recently
-removed, and a few locks that weren't documented here before.
+We used to use the cifs_tcp_ses_lock to protect a lot of objects
+that are not just the server, ses or tcon lists. We later introduced
+srv_lock, ses_lock and tc_lock to protect fields within the
+corresponding structs. This was done to provide a more granular
+protection and avoid unnecessary serialization.
 
+There were still a couple of uses of cifs_tcp_ses_lock to provide
+tcon fields. In this patch, I've replaced them with tc_lock.
+
+Cc: stable@vger.kernel.org
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/cifsglob.h | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ fs/smb/client/cached_dir.c | 4 ++--
+ fs/smb/client/smb2misc.c   | 6 +++---
+ fs/smb/client/smb2ops.c    | 8 +++-----
+ fs/smb/client/smb2pdu.c    | 2 ++
+ fs/smb/client/trace.h      | 1 +
+ 5 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 3eca5bfb70303..d797b953b6cf6 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1943,6 +1943,8 @@ require use of the stronger protocol */
-  */
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 1db7ab6c2529c..569030b3e68d4 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -788,11 +788,11 @@ static void cfids_laundromat_worker(struct work_struct *work)
+ 		cfid->dentry = NULL;
  
- /****************************************************************************
-+ * LOCK ORDERING NOTES:
-+ ****************************************************************************
-  * Here are all the locks (spinlock, mutex, semaphore) in cifs.ko, arranged according
-  * to the locking order. i.e. if two locks are to be held together, the lock that
-  * appears higher in this list needs to be taken before the other.
-@@ -1971,18 +1973,21 @@ require use of the stronger protocol */
-  * =====================================================================================
-  * Lock				Protects			Initialization fn
-  * =====================================================================================
-+ * cifs_mount_mutex		mount/unmount operations
-  * vol_list_lock
-  * vol_info->ctx_lock		vol_info->ctx
-  * cifs_sb_info->tlink_tree_lock	cifs_sb_info->tlink_tree	cifs_setup_cifs_sb
-  * TCP_Server_Info->		TCP_Server_Info			cifs_get_tcp_session
-  * reconnect_mutex
-- * TCP_Server_Info->srv_mutex	TCP_Server_Info			cifs_get_tcp_session
-  * cifs_ses->session_mutex	cifs_ses			sesInfoAlloc
-+ * TCP_Server_Info->_srv_mutex	TCP_Server_Info			cifs_get_tcp_session
-+ * cifs_tcp_ses_lock		cifs_tcp_ses_list		sesInfoAlloc
-  * cifs_tcon->open_file_lock	cifs_tcon->openFileList		tconInfoAlloc
-  *				cifs_tcon->pending_opens
-  * cifs_tcon->stat_lock		cifs_tcon->bytes_read		tconInfoAlloc
-  *				cifs_tcon->bytes_written
-- * cifs_tcp_ses_lock		cifs_tcp_ses_list		sesInfoAlloc
-+ * cifs_tcon->fscache_lock	cifs_tcon->fscache		tconInfoAlloc
-+ * cifs_tcon->sb_list_lock	cifs_tcon->cifs_sb_list		tconInfoAlloc
-  * GlobalMid_Lock		GlobalMaxActiveXid		init_cifs
-  *				GlobalCurrentXid
-  *				GlobalTotalActiveXid
-@@ -2005,6 +2010,8 @@ require use of the stronger protocol */
-  *				->chans_in_reconnect
-  * cifs_tcon->tc_lock		(anything that is not protected by another lock and can change)
-  *								tcon_info_alloc
-+ * cifs_swnreg_idr_mutex	cifs_swnreg_idr			cifs_swn.c
-+ *				(witness service registration, accesses tcon fields under tc_lock)
-  * inode->i_rwsem, taken by fs/netfs/locking.c e.g. should be taken before cifsInodeInfo locks
-  * cifsInodeInfo->open_file_lock	cifsInodeInfo->openFileList	cifs_alloc_inode
-  * cifsInodeInfo->writers_lock	cifsInodeInfo->writers		cifsInodeInfo_alloc
-@@ -2012,12 +2019,12 @@ require use of the stronger protocol */
-  *				->can_cache_brlcks
-  * cifsInodeInfo->deferred_lock	cifsInodeInfo->deferred_closes	cifsInodeInfo_alloc
-  * cached_fids->cfid_list_lock	cifs_tcon->cfids->entries	init_cached_dirs
-- * cached_fid->fid_lock		(anything that is not protected by another lock and can change)
-- *								init_cached_dir
-+ * cached_fid->dirents.de_mutex	cached_fid->dirents		alloc_cached_dir
-  * cifsFileInfo->fh_mutex	cifsFileInfo			cifs_new_fileinfo
-  * cifsFileInfo->file_info_lock	cifsFileInfo->count		cifs_new_fileinfo
-  *				->invalidHandle			initiate_cifs_search
-  *				->oplock_break_cancelled
-+ * smbdirect_mr->mutex		RDMA memory region management	(SMBDirect only)
-  * mid_q_entry->mid_lock	mid_q_entry->callback           alloc_mid
-  *								smb2_mid_entry_alloc
-  *				(Any fields of mid_q_entry that will need protection)
+ 		if (cfid->is_open) {
+-			spin_lock(&cifs_tcp_ses_lock);
++			spin_lock(&cfid->tcon->tc_lock);
+ 			++cfid->tcon->tc_count;
+ 			trace_smb3_tcon_ref(cfid->tcon->debug_id, cfid->tcon->tc_count,
+ 					    netfs_trace_tcon_ref_get_cached_laundromat);
+-			spin_unlock(&cifs_tcp_ses_lock);
++			spin_unlock(&cfid->tcon->tc_lock);
+ 			queue_work(serverclose_wq, &cfid->close_work);
+ 		} else
+ 			/*
+diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
+index f3cb62d914502..0871b9f1f86a6 100644
+--- a/fs/smb/client/smb2misc.c
++++ b/fs/smb/client/smb2misc.c
+@@ -820,14 +820,14 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
+ 	int rc;
+ 
+ 	cifs_dbg(FYI, "%s: tc_count=%d\n", __func__, tcon->tc_count);
+-	spin_lock(&cifs_tcp_ses_lock);
++	spin_lock(&tcon->tc_lock);
+ 	if (tcon->tc_count <= 0) {
+ 		struct TCP_Server_Info *server = NULL;
+ 
+ 		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
+ 				    netfs_trace_tcon_ref_see_cancelled_close);
+ 		WARN_ONCE(tcon->tc_count < 0, "tcon refcount is negative");
+-		spin_unlock(&cifs_tcp_ses_lock);
++		spin_unlock(&tcon->tc_lock);
+ 
+ 		if (tcon->ses) {
+ 			server = tcon->ses->server;
+@@ -841,7 +841,7 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
+ 	tcon->tc_count++;
+ 	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
+ 			    netfs_trace_tcon_ref_get_cancelled_close);
+-	spin_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&tcon->tc_lock);
+ 
+ 	rc = __smb2_handle_cancelled_cmd(tcon, SMB2_CLOSE_HE, 0,
+ 					 persistent_fid, volatile_fid);
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index c1aaf77e187b6..0b2abd0fdad11 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -3091,7 +3091,9 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
+ 						struct cifs_tcon,
+ 						tcon_list);
+ 		if (tcon) {
++			spin_lock(&tcon->tc_lock);
+ 			tcon->tc_count++;
++			spin_unlock(&tcon->tc_lock);
+ 			trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
+ 					    netfs_trace_tcon_ref_get_dfs_refer);
+ 		}
+@@ -3160,13 +3162,9 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
+  out:
+ 	if (tcon && !tcon->ipc) {
+ 		/* ipc tcons are not refcounted */
+-		spin_lock(&cifs_tcp_ses_lock);
+-		tcon->tc_count--;
++		cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_dfs_refer);
+ 		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
+ 				    netfs_trace_tcon_ref_dec_dfs_refer);
+-		/* tc_count can never go negative */
+-		WARN_ON(tcon->tc_count < 0);
+-		spin_unlock(&cifs_tcp_ses_lock);
+ 	}
+ 	kfree(utf16_path);
+ 	kfree(dfs_req);
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 5d57c895ca37a..c7e086dfb1765 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -4239,7 +4239,9 @@ void smb2_reconnect_server(struct work_struct *work)
+ 
+ 		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
+ 			if (tcon->need_reconnect || tcon->need_reopen_files) {
++				spin_lock(&tcon->tc_lock);
+ 				tcon->tc_count++;
++				spin_unlock(&tcon->tc_lock);
+ 				trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
+ 						    netfs_trace_tcon_ref_get_reconnect_server);
+ 				list_add_tail(&tcon->rlist, &tmp_list);
+diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
+index a584a77431132..191f02344dcdd 100644
+--- a/fs/smb/client/trace.h
++++ b/fs/smb/client/trace.h
+@@ -189,6 +189,7 @@
+ 	EM(netfs_trace_tcon_ref_put_cancelled_close_fid, "PUT Cn-Fid") \
+ 	EM(netfs_trace_tcon_ref_put_cancelled_mid,	"PUT Cn-Mid") \
+ 	EM(netfs_trace_tcon_ref_put_mnt_ctx,		"PUT MntCtx") \
++	EM(netfs_trace_tcon_ref_put_dfs_refer,		"PUT DfsRfr") \
+ 	EM(netfs_trace_tcon_ref_put_reconnect_server,	"PUT Reconn") \
+ 	EM(netfs_trace_tcon_ref_put_tlink,		"PUT Tlink ") \
+ 	EM(netfs_trace_tcon_ref_see_cancelled_close,	"SEE Cn-Cls") \
 -- 
 2.43.0
 
