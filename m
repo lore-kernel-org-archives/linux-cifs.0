@@ -1,219 +1,273 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855663382F0;
-	Sat, 31 Jan 2026 15:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBFD340DB1
+	for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 18:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769874880; cv=none; b=Kma/vTm1Km4OffWuqTkCr3ZuBVFMLQ1TbuOeTKqzNJIlEYIYocQEB8r2BNS9onq/BsQfA8OqT0UdyoVpl1kSQlyH2hmX5Y2Zpv8ihKlAPg2GwR8h0KeqZZmIVs1m7h9rafpZ2X7uPxuPpqnsBLltCHp9+tRRVvMc1DQinWFaxiw=
+	t=1769885241; cv=none; b=Uc6cHuo9l48X4zlCJddmMNgVGvUjYM2hhbvybgoWs2VJPn/oItGxyXin4XSB//IoKNjtg0sKuey5KCGq5AsP9eRuT7Xl0p3ROpZzORV4+ZUK9OPcd+3Opk5087aA6jMr+6BaiBhWdxv+1zT3fDlgEm7Q1hjVXSSH6+93BW9VtKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769874880; c=relaxed/simple;
-	bh=yP/+lWu8w6TVpcU/sK04du+syKfA7fdOXqbErdv8SGk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OX/e6bAr9LzpVAYmpWDr9Y8WX23aaqBzg4PbX+BlWUX9hlwyGu/ThPF12Fw3kt9euM8alhbF0J9q8SUXEXuhr38QOFExlRWrsRhEJuDRAj9b3tOdVyd6Mz4BNYd/KcERuywFIT+Kr40v7bolu4nrT5jU/7Ol66O0tIx5YO9s5fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f37NOcNy; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1769885241; c=relaxed/simple;
+	bh=GexA1esZ8rXgcv9tbZyJA5DRdvVuhFKD3hxWBNpfEeA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OFMOvy5wYXZ0jdXFzff1poJujWHlzbssd7h2MEQLZgoSUngKmV2O6BT7MKYuA0/h0qEnm124IJLZOuZKPgzvnRIb1TDgkOvysoOATgcWQIewC1KaG5JblBF5kWBX6bZNhhXA/kqVoPvFxf7ZCoJhMhN8mWcYrZnGQZyYWob4sXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gCxSVrnP; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f37NOcNy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769874878; x=1801410878;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=yP/+lWu8w6TVpcU/sK04du+syKfA7fdOXqbErdv8SGk=;
-  b=f37NOcNyYVKnSTwbctSd3O7TVzwn+GF3zQeo7lLNnGfVkx+ipP8pXdtQ
-   Y8ee44Hxqr3eGHvHIsQJ/z54AMTpftq5v+SYKbawL70IWJ6J5TfldzTHT
-   9pLzzN3rcKdJTlS9ha1YRlFrqHDB4x7ZSwCFmVXP1IEBy99BpmaoIVqdq
-   Jo7u6PGANeg42bkZ+4whbDE79j33fARD5Jt0AB1xsj65pYNn8s2/geXlA
-   cif4rFQxZRF7SRvsDwYyvtL+nqOIYIVIIruA8Blcbub1yPRfHwOK5ZUjq
-   hLt8yaxmSfORHWxWFK8wotuDp6Fw2QLzPhMequke3RxanYQUDZORtH176
-   w==;
-X-CSE-ConnectionGUID: 4YvMylxZTTuK3wJZZXlwcQ==
-X-CSE-MsgGUID: +hk1m2nSS9i9ox5RZgmG+Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11687"; a="70118250"
-X-IronPort-AV: E=Sophos;i="6.21,265,1763452800"; 
-   d="scan'208";a="70118250"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2026 07:54:38 -0800
-X-CSE-ConnectionGUID: mNM1mRCKRvO2CXNfpAHMEg==
-X-CSE-MsgGUID: HLs4j+UdQ/C/xg8xorcjOg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,265,1763452800"; 
-   d="scan'208";a="208350889"
-Received: from igk-lkp-server01.igk.intel.com (HELO afc5bfd7f602) ([10.211.93.152])
-  by orviesa010.jf.intel.com with ESMTP; 31 Jan 2026 07:54:16 -0800
-Received: from kbuild by afc5bfd7f602 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vmDIc-000000002iX-0fps;
-	Sat, 31 Jan 2026 15:54:14 +0000
-Date: Sat, 31 Jan 2026 16:54:04 +0100
-From: kernel test robot <lkp@intel.com>
-To: nspmangalore@gmail.com, linux-cifs@vger.kernel.org, smfrench@gmail.com,
-	pc@manguebit.org, bharathsm@microsoft.com
-Cc: oe-kbuild-all@lists.linux.dev, Shyam Prasad N <sprasad@microsoft.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 2/2] cifs: Fix locking usage for tcon fields
-Message-ID: <202601311634.9WVpg186-lkp@intel.com>
-References: <20260131080239.943483-2-sprasad@microsoft.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gCxSVrnP"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2a7b47a5460so18929605ad.1
+        for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 10:47:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769885239; x=1770490039; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hd/qnYLVO1Wsv2GV7hPybooZwU8uUpLJaZLIXvVL72o=;
+        b=gCxSVrnPNTp1SxxZ2AgM6TeZopd84YYLPowJxzz9dcKVU4pqxCF80xl8FmiC5nHyqA
+         eOtM+lSEQDubI5+yGJJPsXqJu+2fOwdr3ZMo0J5z3vimohTswAHd8bn4rIHCvgMeqTq+
+         iTGUx0OenHaxpuBJMyVUU3RxuyRLhzczESSCInYyKoaDO/vxizyKW7FwEDqrT8Kwh0jZ
+         ZfeqQa/lX0K09XmcPduufualM6dRXwtG1yg1hkp/zBh7PXmoBXVvi/XrVCVXG7OM8duz
+         ifYnvYsWjA9ZHGa+GVIh8peCqpkm3/FkRqyGZhYVukq2aWOjVKshPReiuGM0zC93ETY2
+         2uuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769885239; x=1770490039;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hd/qnYLVO1Wsv2GV7hPybooZwU8uUpLJaZLIXvVL72o=;
+        b=JpcgmYgYux3lqKLBNAH7CgJRTI9FHTHXsNlJXp6PNM+4xn2FsTwFWSjLi7qZs9WqG0
+         QwKz/Fs1uPL4CB1RpPgnylCyEium2cdTQXhaT296ljK75Hvt3kpjfZjq5gapJ7jeatfZ
+         KLdpuVjIVQ1PlrVptFxEW/QfUqs/pehMJzKkQTXjT2Cha9/nF7wwPhDCSi/47qfa4/uE
+         Lljp02rZAcnXy/DQ+E+U4kqpzTOWzmt8tXukEh2waSSWcpAXGOS9nEOSAKK/wSO3jc82
+         UfhBwOKU/x9ueeZN0M6T3ErdVQrh/G3LDWrQ1JPJtbyNUmtrRGXf3NSDLU2kFPLmR2P4
+         HLSg==
+X-Gm-Message-State: AOJu0YxK7FhVrEvBzu7dOyiGjjMRBDNu9sWJbGE8jlZQSeKpZ6DrX4BJ
+	6Vyhiyy2BB5SrOR0DErmFgVbVrELYwnzUK2A+KiWPax5BgMerYHBnU/oOfwi4s1W
+X-Gm-Gg: AZuq6aJnNEIkprczvsYYdVeJZXs53F6gF5MDYCvwsnGPS94YEqg4bpz0NSSnYLsUCK5
+	SfN/1YmijoTHTX8LG/mh1n1wT+Y/4UKYMsy5dx/K12NR0fWxnUrw2/12ZuiW8R+PrxsQasHN28s
+	yqvXrMOhDqimKvaWZNSJA4DuHI89NNgzk9ug6j/ZEtTl+7lAp55b4IwcVR/zQt4MkPJCXuY7foS
+	OOcTh0cl+1wFbGqA77l2OJP7mHl5lhQQr22ZJ2/4F16EKtRnDqdkEaX+u5VsF/lmochlXrrt4P8
+	FsQKWlssgTL3j3S6XxTl1C/Oyy6DptwQ5y0eEZStOc2Kc8cmmphAu+Ke8/QyxMiDOonAwQvb6l5
+	VF7SPG18JEY6CGYCC5WFkkMM85dPLAQzYcH78BP1ZzAduiCuBWdg14Mh29EHzHTzXeI7pegyR1e
+	ufpk2RKTDbGLNxoS5v8cIwqpKdgYGYxySFzZ9Z1GhXG1BbM11D7vY=
+X-Received: by 2002:a17:903:2f86:b0:2a7:a6fa:eddf with SMTP id d9443c01a7336-2a8d99514femr68793995ad.17.1769885238678;
+        Sat, 31 Jan 2026 10:47:18 -0800 (PST)
+Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.216])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a88b6e4110sm100145285ad.84.2026.01.31.10.47.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 31 Jan 2026 10:47:18 -0800 (PST)
+From: nspmangalore@gmail.com
+X-Google-Original-From: sprasad@microsoft.com
+To: linux-cifs@vger.kernel.org,
+	smfrench@gmail.com,
+	pc@manguebit.org,
+	bharathsm@microsoft.com
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Subject: [PATCH] cifs: open files should not hold ref on superblock
+Date: Sun,  1 Feb 2026 00:16:36 +0530
+Message-ID: <20260131184656.972897-1-sprasad@microsoft.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260131080239.943483-2-sprasad@microsoft.com>
+Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Shyam Prasad N <sprasad@microsoft.com>
 
-kernel test robot noticed the following build errors:
+Today whenever we deal with a file, in addition to holding
+a reference on the dentry, we also get a reference on the
+superblock. This happens in two cases:
+1. when a new cinode is allocated
+2. when an oplock break is being processed
 
-[auto build test ERROR on cifs/for-next]
-[also build test ERROR on linus/master v6.19-rc7 next-20260130]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This code change allows these code paths to use a ref on the
+dentry (and hence the inode). That way, umount is
+ensured to clean up SMB client resources when it's the last
+ref on the superblock (For ex: when same objects are shared).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/nspmangalore-gmail-com/cifs-Fix-locking-usage-for-tcon-fields/20260131-160419
-base:   git://git.samba.org/sfrench/cifs-2.6.git for-next
-patch link:    https://lore.kernel.org/r/20260131080239.943483-2-sprasad%40microsoft.com
-patch subject: [PATCH 2/2] cifs: Fix locking usage for tcon fields
-config: s390-allnoconfig-bpf (https://download.01.org/0day-ci/archive/20260131/202601311634.9WVpg186-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260131/202601311634.9WVpg186-lkp@intel.com/reproduce)
+The code change also moves the call to close all the files in
+deferred close list to the umount code path.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601311634.9WVpg186-lkp@intel.com/
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+---
+ fs/smb/client/cifsfs.c    |  4 ++--
+ fs/smb/client/cifsproto.h |  2 ++
+ fs/smb/client/connect.c   |  2 ++
+ fs/smb/client/file.c      | 11 -----------
+ fs/smb/client/misc.c      | 36 ++++++++++++++++++++++++++++++++++++
+ 5 files changed, 42 insertions(+), 13 deletions(-)
 
-All errors (new ones prefixed by >>):
-
-   fs/smb/client/smb2ops.c: In function 'smb2_get_dfs_refer':
->> fs/smb/client/smb2ops.c:3178:17: error: too few arguments to function 'cifs_put_tcon'; expected 2, have 1
-    3178 |                 cifs_put_tcon(tcon);
-         |                 ^~~~~~~~~~~~~
-   In file included from fs/smb/client/smb2ops.c:20:
-   fs/smb/client/cifsproto.h:273:6: note: declared here
-     273 | void cifs_put_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace);
-         |      ^~~~~~~~~~~~~
-
-
-vim +/cifs_put_tcon +3178 fs/smb/client/smb2ops.c
-
-  3078	
-  3079	static int
-  3080	smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
-  3081			   const char *search_name,
-  3082			   struct dfs_info3_param **target_nodes,
-  3083			   unsigned int *num_of_nodes,
-  3084			   const struct nls_table *nls_codepage, int remap)
-  3085	{
-  3086		int rc;
-  3087		__le16 *utf16_path = NULL;
-  3088		int utf16_path_len = 0;
-  3089		struct cifs_tcon *tcon;
-  3090		struct fsctl_get_dfs_referral_req *dfs_req = NULL;
-  3091		struct get_dfs_referral_rsp *dfs_rsp = NULL;
-  3092		u32 dfs_req_size = 0, dfs_rsp_size = 0;
-  3093		int retry_once = 0;
-  3094	
-  3095		cifs_dbg(FYI, "%s: path: %s\n", __func__, search_name);
-  3096	
-  3097		/*
-  3098		 * Try to use the IPC tcon, otherwise just use any
-  3099		 */
-  3100		tcon = ses->tcon_ipc;
-  3101		if (tcon == NULL) {
-  3102			spin_lock(&cifs_tcp_ses_lock);
-  3103			tcon = list_first_entry_or_null(&ses->tcon_list,
-  3104							struct cifs_tcon,
-  3105							tcon_list);
-  3106			if (tcon) {
-  3107				spin_lock(&tcon->tc_lock);
-  3108				tcon->tc_count++;
-  3109				spin_unlock(&tcon->tc_lock);
-  3110				trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-  3111						    netfs_trace_tcon_ref_get_dfs_refer);
-  3112			}
-  3113			spin_unlock(&cifs_tcp_ses_lock);
-  3114		}
-  3115	
-  3116		if (tcon == NULL) {
-  3117			cifs_dbg(VFS, "session %p has no tcon available for a dfs referral request\n",
-  3118				 ses);
-  3119			rc = -ENOTCONN;
-  3120			goto out;
-  3121		}
-  3122	
-  3123		utf16_path = cifs_strndup_to_utf16(search_name, PATH_MAX,
-  3124						   &utf16_path_len,
-  3125						   nls_codepage, remap);
-  3126		if (!utf16_path) {
-  3127			rc = -ENOMEM;
-  3128			goto out;
-  3129		}
-  3130	
-  3131		dfs_req_size = sizeof(*dfs_req) + utf16_path_len;
-  3132		dfs_req = kzalloc(dfs_req_size, GFP_KERNEL);
-  3133		if (!dfs_req) {
-  3134			rc = -ENOMEM;
-  3135			goto out;
-  3136		}
-  3137	
-  3138		/* Highest DFS referral version understood */
-  3139		dfs_req->MaxReferralLevel = DFS_VERSION;
-  3140	
-  3141		/* Path to resolve in an UTF-16 null-terminated string */
-  3142		memcpy(dfs_req->RequestFileName, utf16_path, utf16_path_len);
-  3143	
-  3144		for (;;) {
-  3145			rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
-  3146					FSCTL_DFS_GET_REFERRALS,
-  3147					(char *)dfs_req, dfs_req_size, CIFSMaxBufSize,
-  3148					(char **)&dfs_rsp, &dfs_rsp_size);
-  3149			if (fatal_signal_pending(current)) {
-  3150				rc = -EINTR;
-  3151				break;
-  3152			}
-  3153			if (!is_retryable_error(rc) || retry_once++)
-  3154				break;
-  3155			usleep_range(512, 2048);
-  3156		}
-  3157	
-  3158		if (!rc && !dfs_rsp)
-  3159			rc = smb_EIO(smb_eio_trace_dfsref_no_rsp);
-  3160		if (rc) {
-  3161			if (!is_retryable_error(rc) && rc != -ENOENT && rc != -EOPNOTSUPP)
-  3162				cifs_tcon_dbg(FYI, "%s: ioctl error: rc=%d\n", __func__, rc);
-  3163			goto out;
-  3164		}
-  3165	
-  3166		rc = parse_dfs_referrals(dfs_rsp, dfs_rsp_size,
-  3167					 num_of_nodes, target_nodes,
-  3168					 nls_codepage, remap, search_name,
-  3169					 true /* is_unicode */);
-  3170		if (rc && rc != -ENOENT) {
-  3171			cifs_tcon_dbg(VFS, "%s: failed to parse DFS referral %s: %d\n",
-  3172				      __func__, search_name, rc);
-  3173		}
-  3174	
-  3175	 out:
-  3176		if (tcon && !tcon->ipc) {
-  3177			/* ipc tcons are not refcounted */
-> 3178			cifs_put_tcon(tcon);
-  3179			trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-  3180					    netfs_trace_tcon_ref_dec_dfs_refer);
-  3181		}
-  3182		kfree(utf16_path);
-  3183		kfree(dfs_req);
-  3184		kfree(dfs_rsp);
-  3185		return rc;
-  3186	}
-  3187	
-
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index a3dc7cb1ab541..277dabd982cbd 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -331,10 +331,11 @@ static void cifs_kill_sb(struct super_block *sb)
+ 
+ 	/*
+ 	 * We need to release all dentries for the cached directories
+-	 * before we kill the sb.
++	 * and close all deferred file handles before we kill the sb.
+ 	 */
+ 	if (cifs_sb->root) {
+ 		close_all_cached_dirs(cifs_sb);
++		cifs_close_all_deferred_files_sb(cifs_sb);
+ 
+ 		/* finally release root dentry */
+ 		dput(cifs_sb->root);
+@@ -865,7 +866,6 @@ static void cifs_umount_begin(struct super_block *sb)
+ 	spin_unlock(&tcon->tc_lock);
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 
+-	cifs_close_all_deferred_files(tcon);
+ 	/* cancel_brl_requests(tcon); */ /* BB mark all brl mids as exiting */
+ 	/* cancel_notify_requests(tcon); */
+ 	if (tcon->ses && tcon->ses->server) {
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index f8c0615d4ee42..5feaeac16b0c5 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -302,6 +302,8 @@ extern void cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode);
+ 
+ extern void cifs_close_all_deferred_files(struct cifs_tcon *cifs_tcon);
+ 
++extern void cifs_close_all_deferred_files_sb(struct cifs_sb_info *cifs_sb);
++
+ void cifs_close_deferred_file_under_dentry(struct cifs_tcon *cifs_tcon,
+ 					   struct dentry *dentry);
+ 
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index ce620503e9f70..31745ef692390 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -4149,6 +4149,7 @@ cifs_umount(struct cifs_sb_info *cifs_sb)
+ 	if (cifs_sb->master_tlink) {
+ 		tcon = cifs_sb->master_tlink->tl_tcon;
+ 		if (tcon) {
++			cifs_close_all_deferred_files(tcon);
+ 			spin_lock(&tcon->sb_list_lock);
+ 			list_del_init(&cifs_sb->tcon_sb_link);
+ 			spin_unlock(&tcon->sb_list_lock);
+@@ -4163,6 +4164,7 @@ cifs_umount(struct cifs_sb_info *cifs_sb)
+ 		rb_erase(node, root);
+ 
+ 		spin_unlock(&cifs_sb->tlink_tree_lock);
++		cifs_close_all_deferred_files(tlink->tl_tcon);
+ 		cifs_put_tlink(tlink);
+ 		spin_lock(&cifs_sb->tlink_tree_lock);
+ 	}
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 7ff5cc9c5c5b7..0b80b11a9864d 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -712,8 +712,6 @@ struct cifsFileInfo *cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
+ 	mutex_init(&cfile->fh_mutex);
+ 	spin_lock_init(&cfile->file_info_lock);
+ 
+-	cifs_sb_active(inode->i_sb);
+-
+ 	/*
+ 	 * If the server returned a read oplock and we have mandatory brlocks,
+ 	 * set oplock level to None.
+@@ -768,7 +766,6 @@ static void cifsFileInfo_put_final(struct cifsFileInfo *cifs_file)
+ 	struct inode *inode = d_inode(cifs_file->dentry);
+ 	struct cifsInodeInfo *cifsi = CIFS_I(inode);
+ 	struct cifsLockInfo *li, *tmp;
+-	struct super_block *sb = inode->i_sb;
+ 
+ 	/*
+ 	 * Delete any outstanding lock records. We'll lose them when the file
+@@ -786,7 +783,6 @@ static void cifsFileInfo_put_final(struct cifsFileInfo *cifs_file)
+ 
+ 	cifs_put_tlink(cifs_file->tlink);
+ 	dput(cifs_file->dentry);
+-	cifs_sb_deactive(sb);
+ 	kfree(cifs_file->symlink_target);
+ 	kfree(cifs_file);
+ }
+@@ -3163,12 +3159,6 @@ void cifs_oplock_break(struct work_struct *work)
+ 	__u64 persistent_fid, volatile_fid;
+ 	__u16 net_fid;
+ 
+-	/*
+-	 * Hold a reference to the superblock to prevent it and its inodes from
+-	 * being freed while we are accessing cinode. Otherwise, _cifsFileInfo_put()
+-	 * may release the last reference to the sb and trigger inode eviction.
+-	 */
+-	cifs_sb_active(sb);
+ 	wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
+ 			TASK_UNINTERRUPTIBLE);
+ 
+@@ -3241,7 +3231,6 @@ void cifs_oplock_break(struct work_struct *work)
+ 	cifs_put_tlink(tlink);
+ out:
+ 	cifs_done_oplock_break(cinode);
+-	cifs_sb_deactive(sb);
+ }
+ 
+ static int cifs_swap_activate(struct swap_info_struct *sis,
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 9529fa385938e..dfeb1faff8568 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -28,6 +28,11 @@
+ #include "fs_context.h"
+ #include "cached_dir.h"
+ 
++struct tcon_list {
++	struct list_head entry;
++	struct cifs_tcon *tcon;
++};
++
+ /* The xid serves as a useful identifier for each incoming vfs request,
+    in a similar way to the mid which is useful to track each sent smb,
+    and CurrentXid can also provide a running counter (although it
+@@ -171,6 +176,7 @@ tconInfoFree(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
+ 	}
+ 	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count, trace);
+ 	free_cached_dirs(tcon->cfids);
++
+ 	atomic_dec(&tconInfoAllocCount);
+ 	kfree(tcon->nativeFileSystem);
+ 	kfree_sensitive(tcon->password);
+@@ -840,6 +846,36 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
+ 	}
+ }
+ 
++void cifs_close_all_deferred_files_sb(struct cifs_sb_info *cifs_sb)
++{
++	struct rb_root *root = &cifs_sb->tlink_tree;
++	struct rb_node *node;
++	struct cifs_tcon *tcon;
++	struct tcon_link *tlink;
++	struct tcon_list *tmp_list, *q;
++	LIST_HEAD(tcon_head);
++
++	spin_lock(&cifs_sb->tlink_tree_lock);
++	for (node = rb_first(root); node; node = rb_next(node)) {
++		tlink = rb_entry(node, struct tcon_link, tl_rbnode);
++		tcon = tlink_tcon(tlink);
++		if (IS_ERR(tcon))
++			continue;
++		tmp_list = kmalloc(sizeof(*tmp_list), GFP_ATOMIC);
++		if (tmp_list == NULL)
++			break;
++		tmp_list->tcon = tcon;
++		list_add_tail(&tmp_list->entry, &tcon_head);
++	}
++	spin_unlock(&cifs_sb->tlink_tree_lock);
++
++	list_for_each_entry_safe(tmp_list, q, &tcon_head, entry) {
++		cifs_close_all_deferred_files(tmp_list->tcon);
++		list_del(&tmp_list->entry);
++		kfree(tmp_list);
++	}
++}
++
+ void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
+ 					   struct dentry *dentry)
+ {
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
