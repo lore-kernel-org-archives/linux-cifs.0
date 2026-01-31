@@ -1,230 +1,225 @@
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D085D320CD3
-	for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 10:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769854057; cv=pass; b=cpvpHvO3Lnm+mrPU//impaoT7nTTfmmkiVPkXEpsZcFZPBPXxbpgmn+nTsi7V9FOWixx6NV0IYNKtjLSu41aDUfs19KchZB2LW1R7tZ6eCRAvdNor7ofAT+8PEnWBQWBMWXW4+De9rUWk2A+Y5VV2sgjBdPvSXvlu3fGID/8TuY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769854057; c=relaxed/simple;
-	bh=I6BM5qKMHQTqFv9AaN/yS5YuzmRJeJu0XeKHoefubnU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kG56fOPKnYei7MI5x2z5SD9tzFBDT8sA0yIOzAEh31FdO8p6DQ2AfACS8V7WncFwnhWh1qsF2mMWHRVL/O3TORte2oA1TbZ2I/ozM4rSwN13K6CkQWCUvyxvqqrR5BQCqWIo1dMSmoL4tB4LQ/kBLNrTWuIl7ESUZLOJjl5esys=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CG+hoyTO; arc=pass smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8077082F;
+	Sat, 31 Jan 2026 14:59:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769871559; cv=none; b=HB8EQy83G2de67G0sEjPN0DVvhUvtp0q8HBIslaj9731szEORcHhFbv0oXXpblJ0HejOsWCPpvuV3q+ckKyOpqr0AybKlGMmEpukAu5ajnnSiPfWeTBTaR0ORj/LIkrLNIwX6CU50gru8cJ7QgIt3zGkwMuULMtpBXjHvQ+/XNc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769871559; c=relaxed/simple;
+	bh=FJggnOKJ4M4vVf7I9GTSgy+oWuGJtHrGxB91YuxGsQ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GCFOtfSLHYlpeALTWoUDorDdFOzGoXFlaQSzgMY96V+MmabmJiNqyHinujyX1nd4MPIzVItyZVjW8r+GUAOUR9r2AcLDgTLlo4bOiN+fRpBDcKgXou8TIabjYeWUDst+K8+1xflNk08e3N0745+gC5e5NvgI/gOUxPxkG2t/Bzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d19pDV9r; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CG+hoyTO"
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-653780e9eb3so3992051a12.1
-        for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 02:07:35 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769854054; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fj8LWV/blkIJ0J8MCZEuurqUVawtB4zqKHDr5nfPZTCevzlA7LHR/Ga1AoA0xjbklp
-         MZ3sm+CYHuKUQiTHv+tUZDjKggbvUodYhUOIN/5Ydy8HcSdwe1nwXkTR2c+QMM7NcoKy
-         TaMdJDCuW5QEFCZKt++LgWuKFzNxwCd82HJVBAvahYPiKGdyvSIGKFobvNdN1h/JUfuD
-         aQJKQ4VVZEoec/TXygr7qOektk5KgN99jAzusLCzHgD1ppfqd46IIIa8zuQeCU/rEs2s
-         iPWveYQJCmZ/agNX7lJl70Mq0M0U9OtyS6K+Hzb6opgVNhzGzqOSY3mI412S6vXTNsLW
-         v2Kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ffws5UrLAUr9v0YnZlGYkxqmp7sDWWp3QAC/eDvakkk=;
-        fh=Kj6Xhbozit2MD3l/HPRkSkLzuBLT5FY/ZDfzQZkTkqU=;
-        b=IiuM5VW4z+OmWf37b250OQWbOZ+TD/pVigSMyCjFC4YSLd+j5B/CYN8nUozzU45kG4
-         Tg5OiVmOuB7Ip+tndPj9boI6A+TN+K5mhYqJOQUXGEJRwCSrO3Ob5G8EOtYXtLNxzZyK
-         XakQNb5JtSmRSLyv+DnRe1YRJ61TggLn2ToJM9GEnVVySsglbM+0TfMiTcjbLgjwzq8u
-         MOexZ4D7/hLyhShq59noGLfe6S60sVD7n172Y3pKk0pFuSiFKJkDL86O8eRxcb7jZoai
-         NhOO9TJURz0/FEEpkE3MuUPsKan3ghVacpUWLpWrrjCQvgSJTm/x2tubLDC24MXOTz31
-         5yoQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769854054; x=1770458854; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ffws5UrLAUr9v0YnZlGYkxqmp7sDWWp3QAC/eDvakkk=;
-        b=CG+hoyTOG4G0X7q7UXc54V7FsPR4V+wtbGeVQ9EQcIg5VhJCuSgEPm7NHIuaBSSxpz
-         Fn+kTV+oYi7tfsy3i6Lzj1IrK9/PUxCfPNr1IK1SI8I/nN37BNZWNvaZAIJA4vPfH+xe
-         MD6GM2Ym/vNbl27ehLQwNQVLdtF6B2EKSRkQRxJag3xRyZ7Y3CfOt06kA4Zfi8OKGX2J
-         HFzQpH6N7Z5zji1FFBPdRjMUGduX9oIIU8ufWk/jb8tIwO+38E8MxdOuQDtB9haNHoHd
-         q19fpzQhV/ddYUOjiHT25rbfJjjr57qjwz7nnCTpfSpQLkfwYWUu3sl+T8o8ayMAXA1/
-         IoaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769854054; x=1770458854;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ffws5UrLAUr9v0YnZlGYkxqmp7sDWWp3QAC/eDvakkk=;
-        b=M+FBNx1r+pbM5RZQJHPpxT7XMp9XsuwKFhElHK5hm1TPDfANR9VC3ld05losJF+ldZ
-         aM3sVrIN3g7eDBTie3oJ9pRedSIHF8nhwU0DJ/Lk2QaOipOBa+kw+Ra/4ftolxwBmXAV
-         /X1fvnciNSazYewkhm4s0qX5eC6ibGaKoiQVdoPGmX1hUo0CtiTGvm8J0UDqnxu90lH4
-         0HyTiKT4ahG6rLT+sMrGy7nkgSTFpqBKOYjhNVySD8s0lVi7K3/MKOCL/kGLaNSvH8dD
-         YsEsVUXA5RUfKEuNabm93arMpD1rhQxvIctkawfGjtYX2v8GGArmQlaKWoIoV1oI9qVA
-         Es1w==
-X-Gm-Message-State: AOJu0YyI8rC3OeVi6QkPrvnmlLN3CfexSrsaBnd0fzCrgMWmqvcxtMHS
-	StSknUq/9GSuBWi5OLH/6nDaK5RRc2zuBUjzv6fzAB51aza3ndvUvq79LS9WGWBSLOvC6N02D64
-	Ado2QWEvkW/ScnnVpJ4pF/BG1sQeN5iD8vNFQMVk=
-X-Gm-Gg: AZuq6aLj2yHska9ruTQuDI4pfszK2qkVm721+mmf2aeqHXgGRyrre3P6I43ILcPBexj
-	xwOc5+U+vnEPiS8bM4BSNGoTZxBHghqpmEfcm8X/6/qJdjInd8ZhMceTkl/nCVbMufVr/K5y0EY
-	tyGlY1F9xOwixy4tWmffO7xUiTC+U4eG6J33T0msA6vXkTYZkGrb0HjNAa4cXCBFZcdmvRnoGMk
-	d2AkfAHXaz3V16wC4xr3G+3EEfRdeYgcfqpzzok0idZ8YiQoVBSOYu/zbavgCCVirjWnQ==
-X-Received: by 2002:a17:907:944d:b0:b88:5ef6:17f4 with SMTP id
- a640c23a62f3a-b8dff57e898mr334181366b.17.1769854053665; Sat, 31 Jan 2026
- 02:07:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d19pDV9r"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769871557; x=1801407557;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FJggnOKJ4M4vVf7I9GTSgy+oWuGJtHrGxB91YuxGsQ4=;
+  b=d19pDV9r8vzK71v73KFK0IU6nO8UFxPI5kIwbhgdBCMej555oiDGqx0h
+   5GVxJc4bs8I/mu3sfgzfatgYD5vDIIiVJKsbx07Eih5WO/PJgq2+rhiW+
+   yYRMY1t/OTU5L05FSW/K8e5Cys3QgHrecHKn0+ESz3AOX402MsEIKE56m
+   j4pMPN+dkaHbMJQnaOVNSeU9cYh8Cyh8126LQHg/TWsOp+QfYQIQRsqpQ
+   nXUWA1ZxjgnPni4D+4mPYlcqyHFRuG92kz4lyRHgMyk0uyyY6wwvbHUhG
+   7ICnQrp8ClUOSdIUOeJYH4dcWkOIOQpcixDGN+f8gW7rd/2o9SQPDbznf
+   Q==;
+X-CSE-ConnectionGUID: rx4Q7J00QUSapXfFx6Cf4Q==
+X-CSE-MsgGUID: je5wcLsrQp2gG3hTJ1ILPQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11687"; a="82208505"
+X-IronPort-AV: E=Sophos;i="6.21,265,1763452800"; 
+   d="scan'208";a="82208505"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2026 06:59:16 -0800
+X-CSE-ConnectionGUID: RgIipO5TQQeW+CfDUag4Iw==
+X-CSE-MsgGUID: d6xD7hDbQDGcoIO6zLKf7A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,265,1763452800"; 
+   d="scan'208";a="208346561"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 31 Jan 2026 06:59:13 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vmCRK-00000000e6O-44F0;
+	Sat, 31 Jan 2026 14:59:10 +0000
+Date: Sat, 31 Jan 2026 22:58:22 +0800
+From: kernel test robot <lkp@intel.com>
+To: nspmangalore@gmail.com, linux-cifs@vger.kernel.org, smfrench@gmail.com,
+	pc@manguebit.org, bharathsm@microsoft.com
+Cc: oe-kbuild-all@lists.linux.dev, Shyam Prasad N <sprasad@microsoft.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 2/2] cifs: Fix locking usage for tcon fields
+Message-ID: <202601312208.PzE9vcRG-lkp@intel.com>
+References: <20260131080239.943483-2-sprasad@microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260131080239.943483-1-sprasad@microsoft.com> <20260131080239.943483-2-sprasad@microsoft.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <20260131080239.943483-2-sprasad@microsoft.com>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Sat, 31 Jan 2026 15:37:22 +0530
-X-Gm-Features: AZwV_Qj-pDqy7QmjR7e3bBFk7_e7OmyTKkXMmfVBRdDgVWHRta6Gvs9LEvuB9EM
-Message-ID: <CANT5p=qayd=CGCytZbbqLMgVpuMt0CgZSkdDFonD8mg4gx3eaw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] cifs: Fix locking usage for tcon fields
-To: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.org, 
-	bharathsm@microsoft.com
-Cc: Shyam Prasad N <sprasad@microsoft.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 31, 2026 at 1:33=E2=80=AFPM <nspmangalore@gmail.com> wrote:
->
-> From: Shyam Prasad N <sprasad@microsoft.com>
->
-> We used to use the cifs_tcp_ses_lock to protect a lot of objects
-> that are not just the server, ses or tcon lists. We later introduced
-> srv_lock, ses_lock and tc_lock to protect fields within the
-> corresponding structs. This was done to provide a more granular
-> protection and avoid unnecessary serialization.
->
-> There were still a couple of uses of cifs_tcp_ses_lock to provide
-> tcon fields. In this patch, I've replaced them with tc_lock.
->
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/smb/client/cached_dir.c | 4 ++--
->  fs/smb/client/smb2misc.c   | 6 +++---
->  fs/smb/client/smb2ops.c    | 8 +++-----
->  fs/smb/client/smb2pdu.c    | 2 ++
->  4 files changed, 10 insertions(+), 10 deletions(-)
->
-> diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-> index 1db7ab6c2529c..84c3aea18a1a7 100644
-> --- a/fs/smb/client/cached_dir.c
-> +++ b/fs/smb/client/cached_dir.c
-> @@ -788,11 +788,11 @@ static void cfids_laundromat_worker(struct work_str=
-uct *work)
->                 cfid->dentry =3D NULL;
->
->                 if (cfid->is_open) {
-> -                       spin_lock(&cifs_tcp_ses_lock);
-> +                       spin_lock(&tcon->tc_lock);
->                         ++cfid->tcon->tc_count;
->                         trace_smb3_tcon_ref(cfid->tcon->debug_id, cfid->t=
-con->tc_count,
->                                             netfs_trace_tcon_ref_get_cach=
-ed_laundromat);
-> -                       spin_unlock(&cifs_tcp_ses_lock);
-> +                       spin_unlock(&tcon->tc_lock);
->                         queue_work(serverclose_wq, &cfid->close_work);
->                 } else
->                         /*
-> diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-> index f3cb62d914502..0871b9f1f86a6 100644
-> --- a/fs/smb/client/smb2misc.c
-> +++ b/fs/smb/client/smb2misc.c
-> @@ -820,14 +820,14 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon,=
- __u64 persistent_fid,
->         int rc;
->
->         cifs_dbg(FYI, "%s: tc_count=3D%d\n", __func__, tcon->tc_count);
-> -       spin_lock(&cifs_tcp_ses_lock);
-> +       spin_lock(&tcon->tc_lock);
->         if (tcon->tc_count <=3D 0) {
->                 struct TCP_Server_Info *server =3D NULL;
->
->                 trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
->                                     netfs_trace_tcon_ref_see_cancelled_cl=
-ose);
->                 WARN_ONCE(tcon->tc_count < 0, "tcon refcount is negative"=
-);
-> -               spin_unlock(&cifs_tcp_ses_lock);
-> +               spin_unlock(&tcon->tc_lock);
->
->                 if (tcon->ses) {
->                         server =3D tcon->ses->server;
-> @@ -841,7 +841,7 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon, _=
-_u64 persistent_fid,
->         tcon->tc_count++;
->         trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
->                             netfs_trace_tcon_ref_get_cancelled_close);
-> -       spin_unlock(&cifs_tcp_ses_lock);
-> +       spin_unlock(&tcon->tc_lock);
->
->         rc =3D __smb2_handle_cancelled_cmd(tcon, SMB2_CLOSE_HE, 0,
->                                          persistent_fid, volatile_fid);
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index c1aaf77e187b6..6f930d6c78adb 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -3091,7 +3091,9 @@ smb2_get_dfs_refer(const unsigned int xid, struct c=
-ifs_ses *ses,
->                                                 struct cifs_tcon,
->                                                 tcon_list);
->                 if (tcon) {
-> +                       spin_lock(&tcon->tc_lock);
->                         tcon->tc_count++;
-> +                       spin_unlock(&tcon->tc_lock);
->                         trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_coun=
-t,
->                                             netfs_trace_tcon_ref_get_dfs_=
-refer);
->                 }
-> @@ -3160,13 +3162,9 @@ smb2_get_dfs_refer(const unsigned int xid, struct =
-cifs_ses *ses,
->   out:
->         if (tcon && !tcon->ipc) {
->                 /* ipc tcons are not refcounted */
-> -               spin_lock(&cifs_tcp_ses_lock);
-> -               tcon->tc_count--;
-> +               cifs_put_tcon(tcon);
->                 trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
->                                     netfs_trace_tcon_ref_dec_dfs_refer);
-> -               /* tc_count can never go negative */
-> -               WARN_ON(tcon->tc_count < 0);
-> -               spin_unlock(&cifs_tcp_ses_lock);
->         }
->         kfree(utf16_path);
->         kfree(dfs_req);
-> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index 5d57c895ca37a..c7e086dfb1765 100644
-> --- a/fs/smb/client/smb2pdu.c
-> +++ b/fs/smb/client/smb2pdu.c
-> @@ -4239,7 +4239,9 @@ void smb2_reconnect_server(struct work_struct *work=
-)
->
->                 list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
->                         if (tcon->need_reconnect || tcon->need_reopen_fil=
-es) {
-> +                               spin_lock(&tcon->tc_lock);
->                                 tcon->tc_count++;
-> +                               spin_unlock(&tcon->tc_lock);
->                                 trace_smb3_tcon_ref(tcon->debug_id, tcon-=
->tc_count,
->                                                     netfs_trace_tcon_ref_=
-get_reconnect_server);
->                                 list_add_tail(&tcon->rlist, &tmp_list);
-> --
-> 2.43.0
->
-Please ignore this. I'll send a v2 soon.
+Hi,
 
---=20
-Regards,
-Shyam
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on cifs/for-next]
+[also build test ERROR on linus/master v6.19-rc7 next-20260130]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/nspmangalore-gmail-com/cifs-Fix-locking-usage-for-tcon-fields/20260131-160419
+base:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+patch link:    https://lore.kernel.org/r/20260131080239.943483-2-sprasad%40microsoft.com
+patch subject: [PATCH 2/2] cifs: Fix locking usage for tcon fields
+config: x86_64-randconfig-004-20260131 (https://download.01.org/0day-ci/archive/20260131/202601312208.PzE9vcRG-lkp@intel.com/config)
+compiler: gcc-13 (Debian 13.3.0-16) 13.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260131/202601312208.PzE9vcRG-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601312208.PzE9vcRG-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   fs/smb/client/smb2ops.c: In function 'smb2_get_dfs_refer':
+>> fs/smb/client/smb2ops.c:3178:17: error: too few arguments to function 'cifs_put_tcon'
+    3178 |                 cifs_put_tcon(tcon);
+         |                 ^~~~~~~~~~~~~
+   In file included from fs/smb/client/smb2ops.c:20:
+   fs/smb/client/cifsproto.h:273:6: note: declared here
+     273 | void cifs_put_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace);
+         |      ^~~~~~~~~~~~~
+--
+   fs/smb/client/cached_dir.c: In function 'cfids_laundromat_worker':
+>> fs/smb/client/cached_dir.c:795:36: error: 'tcon' undeclared (first use in this function)
+     795 |                         spin_lock(&tcon->tc_lock);
+         |                                    ^~~~
+   fs/smb/client/cached_dir.c:795:36: note: each undeclared identifier is reported only once for each function it appears in
+
+
+vim +/cifs_put_tcon +3178 fs/smb/client/smb2ops.c
+
+  3078	
+  3079	static int
+  3080	smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
+  3081			   const char *search_name,
+  3082			   struct dfs_info3_param **target_nodes,
+  3083			   unsigned int *num_of_nodes,
+  3084			   const struct nls_table *nls_codepage, int remap)
+  3085	{
+  3086		int rc;
+  3087		__le16 *utf16_path = NULL;
+  3088		int utf16_path_len = 0;
+  3089		struct cifs_tcon *tcon;
+  3090		struct fsctl_get_dfs_referral_req *dfs_req = NULL;
+  3091		struct get_dfs_referral_rsp *dfs_rsp = NULL;
+  3092		u32 dfs_req_size = 0, dfs_rsp_size = 0;
+  3093		int retry_once = 0;
+  3094	
+  3095		cifs_dbg(FYI, "%s: path: %s\n", __func__, search_name);
+  3096	
+  3097		/*
+  3098		 * Try to use the IPC tcon, otherwise just use any
+  3099		 */
+  3100		tcon = ses->tcon_ipc;
+  3101		if (tcon == NULL) {
+  3102			spin_lock(&cifs_tcp_ses_lock);
+  3103			tcon = list_first_entry_or_null(&ses->tcon_list,
+  3104							struct cifs_tcon,
+  3105							tcon_list);
+  3106			if (tcon) {
+  3107				spin_lock(&tcon->tc_lock);
+  3108				tcon->tc_count++;
+  3109				spin_unlock(&tcon->tc_lock);
+  3110				trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
+  3111						    netfs_trace_tcon_ref_get_dfs_refer);
+  3112			}
+  3113			spin_unlock(&cifs_tcp_ses_lock);
+  3114		}
+  3115	
+  3116		if (tcon == NULL) {
+  3117			cifs_dbg(VFS, "session %p has no tcon available for a dfs referral request\n",
+  3118				 ses);
+  3119			rc = -ENOTCONN;
+  3120			goto out;
+  3121		}
+  3122	
+  3123		utf16_path = cifs_strndup_to_utf16(search_name, PATH_MAX,
+  3124						   &utf16_path_len,
+  3125						   nls_codepage, remap);
+  3126		if (!utf16_path) {
+  3127			rc = -ENOMEM;
+  3128			goto out;
+  3129		}
+  3130	
+  3131		dfs_req_size = sizeof(*dfs_req) + utf16_path_len;
+  3132		dfs_req = kzalloc(dfs_req_size, GFP_KERNEL);
+  3133		if (!dfs_req) {
+  3134			rc = -ENOMEM;
+  3135			goto out;
+  3136		}
+  3137	
+  3138		/* Highest DFS referral version understood */
+  3139		dfs_req->MaxReferralLevel = DFS_VERSION;
+  3140	
+  3141		/* Path to resolve in an UTF-16 null-terminated string */
+  3142		memcpy(dfs_req->RequestFileName, utf16_path, utf16_path_len);
+  3143	
+  3144		for (;;) {
+  3145			rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+  3146					FSCTL_DFS_GET_REFERRALS,
+  3147					(char *)dfs_req, dfs_req_size, CIFSMaxBufSize,
+  3148					(char **)&dfs_rsp, &dfs_rsp_size);
+  3149			if (fatal_signal_pending(current)) {
+  3150				rc = -EINTR;
+  3151				break;
+  3152			}
+  3153			if (!is_retryable_error(rc) || retry_once++)
+  3154				break;
+  3155			usleep_range(512, 2048);
+  3156		}
+  3157	
+  3158		if (!rc && !dfs_rsp)
+  3159			rc = smb_EIO(smb_eio_trace_dfsref_no_rsp);
+  3160		if (rc) {
+  3161			if (!is_retryable_error(rc) && rc != -ENOENT && rc != -EOPNOTSUPP)
+  3162				cifs_tcon_dbg(FYI, "%s: ioctl error: rc=%d\n", __func__, rc);
+  3163			goto out;
+  3164		}
+  3165	
+  3166		rc = parse_dfs_referrals(dfs_rsp, dfs_rsp_size,
+  3167					 num_of_nodes, target_nodes,
+  3168					 nls_codepage, remap, search_name,
+  3169					 true /* is_unicode */);
+  3170		if (rc && rc != -ENOENT) {
+  3171			cifs_tcon_dbg(VFS, "%s: failed to parse DFS referral %s: %d\n",
+  3172				      __func__, search_name, rc);
+  3173		}
+  3174	
+  3175	 out:
+  3176		if (tcon && !tcon->ipc) {
+  3177			/* ipc tcons are not refcounted */
+> 3178			cifs_put_tcon(tcon);
+  3179			trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
+  3180					    netfs_trace_tcon_ref_dec_dfs_refer);
+  3181		}
+  3182		kfree(utf16_path);
+  3183		kfree(dfs_req);
+  3184		kfree(dfs_rsp);
+  3185		return rc;
+  3186	}
+  3187	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
