@@ -1,231 +1,696 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C343336E496
-	for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 21:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A19385EE0
+	for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 21:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.175
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769896674; cv=pass; b=YKdUxlmh60fOJK9GwfEdJx7L3XpP/06Xx5IL7ibBji5lnIJLSbKNI3EUSJt/uQ/+UQp7whlvdFgwLUjd/2bU+nEKBsMvjKBHoK0ElPWbvLDusfqACBCmTSKPVAisoFM3Ji+NgReTIWpWMOy9WPNRwFQTxRFVAo4XVAOFPbUs08A=
+	t=1769896724; cv=pass; b=aPA1grQ/8glfGOvq1KvZ2W2hr/2NzU2n877pXfzL8TO3leOMjBL8kfnZZEeoKwdHEdfK54hj4IFtxzYGKrdmjHFEgI7M0NIbEpjVJBxLpuLWPoex7fXd2JA8RxafUE9l4RgXkceMSQZvUGp6ZYnBXjidB4IUs1DVdFPu8sY4Yjs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769896674; c=relaxed/simple;
-	bh=Prn/fACwnmk0xgtPykFy4fNHzJnnEKWU+lkrptSgG1M=;
+	s=arc-20240116; t=1769896724; c=relaxed/simple;
+	bh=+IFYfbx66iDHpQz8LyM0sFJnwNNgXGwt9EHRF5rs66o=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CDz1Jt1jIsPVquF78eKulVujQcYBF487USTEQ0XOoEL9f7q0WNZE2M85nyxQuRXlMtX7T201Vu8U0lGRYML9EUF4kFeTw5j+1mbejOHburxvZX1Z+Mbr+tTvqcrdniPZmXrQoLiW23icN4Po4bPrjnKb0QUpd1wk+6xA5gV2hmM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TmD8mgGA; arc=pass smtp.client-ip=209.85.160.174
+	 To:Cc:Content-Type; b=fMvCwKIP6zX50KGMBkx9CnZ1onh90rboOMdKNERU57ny3fcZy0ooEWUgmzS+LcAj4rRPv9P4RvgU92ayrcykJPWxTAuJraTGg0ogyiYWrnsOuPuwXR42mdb6vHMqEFoe0V30A5BeNuWfdDZJrJ5VGLG+7V0LzCVV494Dw5dYLI0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JBbSuKLg; arc=pass smtp.client-ip=209.85.222.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TmD8mgGA"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-502f101d1cfso29783591cf.1
-        for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 13:57:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769896672; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JBbSuKLg"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8c6b16bd040so373208685a.1
+        for <linux-cifs@vger.kernel.org>; Sat, 31 Jan 2026 13:58:42 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769896721; cv=none;
         d=google.com; s=arc-20240605;
-        b=WxyfATQY2KGAfx0gg/OOzGlEOL8euycWsJcXYIigeEa9AUeuj8n+oc3C0aKQKnQY/3
-         gx/wJFl+MNqa/i1W36EtmKjPHfFww/FPVgOVfQz6fl5RdHJwRb28CyAn04zJpA2bviJ/
-         3vt21xIDCVhzhGnFglw3COfT78kgSOeanjzFGwcCYNar1V8tiNS4qizYNSvw+o6DDiBN
-         05kzTMQFLbBzaW0ayu/z3JxcCbNt+wvI0SvhifaSHJdOVRWtWo+lV49IYlzLwkek8RQZ
-         w6YL7/18Qq3+SaxRRbeNtiTYZDi0cB/njla90qIAJ753YfXW0d+5ODUmlQ4KTBe9383e
-         UmVg==
+        b=LlU+OROjvkvz2ICxEezDqxDNOcgNXzC65NQr8/iFwz/DsqhMyEhj3zikPZwJKm/xIb
+         gClYBHyjW194wyKajYIUe+2v4Uhgrf1uf49uhePxeSaAbebWtiC9yiWsLUHG0Vq9nMEM
+         c+0eGpotY2jbTZjPy0BgeLNM6Bx00y6xczI4yzeKP9Q0drsRo/k2iU4vmRKrzuBBXzim
+         Z6XdA/p9A74RlR9vQBj9uYiB1mSNMdAjfvTdBALXl4zYzKWr6Y8LyQI387sGJmTyXaTA
+         s8/8dKnf+x9PukLDoSojszE+78Gcw3KntxR18Jg0yrpmElUdTrzbCI7phsFzgame43z6
+         29sg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=vIvVBz0UstT/2uCKGEJmSDOmyBvPjiiiupa3+JR3Pn0=;
-        fh=fz/wBVMx4xH19h6IcObuEdCqKjRJriuvIIIgaJAb4lU=;
-        b=WCwTfyQU2IeIodBnFG2DAUmulEXHk3Np71Vko3yY/6Hi9AyeF6ulRcRDMsqOotiwwK
-         +5H0TGUJisipxM4W3OrnFYFtep2A3ws4u2Nm/YeIGreNmEfHtuLgove0HeLSH6cfjwuF
-         ecMXE4ct1BxAVRE74hd1VB/gwQQWzPUwCiY3rIKOZazUzodfxleEsS4Gu7Oc3TS02rAl
-         pLRK47xHwyOSZuJqW43o8hZ6VwRNE0xh2bL71clwkHo/ZAW5fKCUylWfbj2tqRtKV1d+
-         Fdf5Fyto8mEFEt/JCt526elYcJh5223uGg5K8siZa15b5dQDE287PEFwT/iMEcHU70qf
-         TmNw==;
+        bh=fUb4GVY9sR/dfgvRbhWLpTPEHZGy2rgVgUKD5HMU4qE=;
+        fh=6qSQyaLfXUK2cREIqGy/JigMEhJkoRgvX6VOgfcpReU=;
+        b=FUP1ijKXq3XwOXO9S1xKTp4JanYaTV96vMlp5Ys9Sfw4F56egmhkRFkKHPu/+r2WBP
+         Fj1pqaDp0AeSPlNUlkw2174/wqhpbk7lf9f41I+IpeK6vL85hYJvLX6F2ORKBj40hUXl
+         Ot5+XF+akO4KO2Op2kpdQZ8yCbk9zJwHU7lo9f1EmCWaj8vTU2kDoKt2iC2yIZRE+/dl
+         NMIK8DmeCTV1weeYjS4H0UtiQnLkND92k38n9S2PpiA8rPqIq7uDW1M14cXcFesH037j
+         z11qle3qm5W6TJvE1qOx2cA3AKNwys2pvpxlkU8b6Rbe45tam1/yPsv3An4TqJ5vC8ow
+         B6mg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769896672; x=1770501472; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769896721; x=1770501521; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vIvVBz0UstT/2uCKGEJmSDOmyBvPjiiiupa3+JR3Pn0=;
-        b=TmD8mgGAnkMowLhPglAdMxR7QSMXOcVF5U+EFQgqaj3d96z9CwDTb25O1ivPwGf8b8
-         x4U7ATBMZJv4jF4rF73xyRaZYQ1RifPw544SCCH4f2LLGfqP7UmFZVwi72JJ98mYxuGh
-         A2psWQGKrn5XZVU8ki8WjX6DiFY4OgQbUTnruikszDNXzlP5Sq16+4mom/cmUCmWFY/7
-         +lQo9Q4ofuG8edal+mtN87EY8up4T7t0YOKpb9ffhCAMILv4MgOO4kublrNec+YP+DgV
-         eQHpnin5lx+0DjFklC1YbzKuw+5OcRfTih2uAJqcW7u6Tk18CjuQbwrANPy+NwDISR2u
-         8y4A==
+        bh=fUb4GVY9sR/dfgvRbhWLpTPEHZGy2rgVgUKD5HMU4qE=;
+        b=JBbSuKLg1zOOyUfCMtGX/kEbaLwYmuY+4JF0iQj/rODOHe76ur2+ewIJFREwUNp4/D
+         dYR0UUcMULBTN6tMZO2M+yjsw+iLL9QH6jkJ8IMBVi742+Ft1K7GXfJ2jSyAsdowXfil
+         Gg2DICavurAmZNYbfkgePCNE6scysmMi/r3NbReoMRT7AjENauqA2fEX3by1GqzLfAbV
+         JiFezw6k7lI8MH29bt51clpxlJ0rninfQhYGAzzobp51UC+uTd0b48u7bP679fHQ/9qY
+         90QfWpT1RjUjUIJE3Xy28CSkPSpczGIiKbx5INnjb69dYReMxA+l7+9SjW/tt1sxW8br
+         kyiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769896672; x=1770501472;
+        d=1e100.net; s=20230601; t=1769896721; x=1770501521;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=vIvVBz0UstT/2uCKGEJmSDOmyBvPjiiiupa3+JR3Pn0=;
-        b=AjodsDpcQH46yG+Hb5hi+zysAVllkuTS4vJvDlbycXX35XlevlfA67Sr9OidVFlVbo
-         NyPGFJWEoNJVJAO7XCOn0im7xeF1SeN+7044eFRg3MhcGBzK2HwTLuF42ceUhjZqZ3qk
-         jALpZidKrL/GiBtfMUbdoDxP67HS2SYikoEG3141Ll1/AL6G7AxZxCUGrgHG/L/oKkro
-         CUIJ0r/JI6sIkdRBKAHDNzLNHH29tI8m7a0q2XauMW7/wvl2a0yYXRnAt1rYbhxgFH+n
-         qOYMBlAekhhJe1MYyE2oDTlLj5HxImRgmnnjryVNFeecKjtRZCE3jlAPs4LbTobBbAdb
-         rn2A==
-X-Gm-Message-State: AOJu0Yx2FUmmZddmsa5M4ILuQc57Z0MnhTDyzkZK5NOxrJNKnLlYsyIh
-	JmezuVZr+irb44FZ3nsk7lvimXrVmDd/W69U8Lpll7MFUFM1rQaeje5bV0pqc+xrasBwQ/dOvcI
-	5+YHM/qNttU58J3luF5Dl/w1hYBBL1b0mWaa6
-X-Gm-Gg: AZuq6aLwulzNxi1wMKGLc4I5qd74kRmoCCFGJ9cBmZLxr5vwOkJs9pV4hvCxlLeg13U
-	Y8TQrj7tvELWlkBjBxutNs8iPZ5ehVYo+Ubf480erZjG4blmHaGb2czGFzsXouy4cwoHPnW2kSn
-	AQSV9B40p+l2eoKYp8l72dpE8lVkFDC7CrIU8ferxRioUcALdlSgpJhySWYAArsMGvuXOlldxcA
-	+oxt+PO2YR1GWKY7bBHagFV/7VyVoyZoUGuO74+W1YmG+n4jvnkoi+5/ve2kb2kF28RajoIYS68
-	zwnDJUEbWPLWM9P8PR+teW+/pqSkrd4FeRKRxv2UGo1TboxQuZr0RgYA9xKeKJkwzf2LS0toSKB
-	25wLzTw2bVSlzMz0I2G1zC/0Cnmh55U1vEo2PMmfktwGsJoWsaOcvPOoFpTM9nPI57a2xXQYoY4
-	Rzqx81rmNQ4Q==
-X-Received: by 2002:a05:622a:d:b0:4ff:c295:3c3e with SMTP id
- d75a77b69052e-505d215193amr84416641cf.10.1769896671560; Sat, 31 Jan 2026
- 13:57:51 -0800 (PST)
+        bh=fUb4GVY9sR/dfgvRbhWLpTPEHZGy2rgVgUKD5HMU4qE=;
+        b=nL2ETCvo5zfzS6Zu9yABqSnO8ea/k09eSKr0qWtZ9Ht83daEhcWL2GyBK2wNZkbHnV
+         uoUmcEN61U+oH/khIC1AinNa1rPl0WbbeO/+zbFwCUz3McowWAq2kX+eu8JS+UShoe/t
+         2aihODu36pVQUlUQJsE7HkXErclM+Xskd5MGsWGzmLOGXiUf7x6q3VzfLAJdVGLDyUwf
+         WQ+dpqEbgDBcNCyKQOensW9rgTizL6KadHSYxBvYY4zAkZVyXStGjdfoYJ/L1zvzl0Jj
+         h3RzCppEBa1TsKCCmE+CS7mVUVh4fSGoXPEqCy0I6sQwOwe7otd8Mfk4VlhA59xRnrSW
+         DeYA==
+X-Gm-Message-State: AOJu0YwLQ/KqqciDEPN0H/F9mkSdmdM8DXjvaVUUduRrPKHtxzeKmFE/
+	jMw/CFdnmQ1F5UKSyNo536yf51Hx5AxwLyvFV5CmV9Eo1yQoPzzJZd3pO8bREBW/RCBccyX55Z4
+	IVmDLOZTgrPvUMIm9aUbzcgbAln/Ucak=
+X-Gm-Gg: AZuq6aKdCE6iecPFp072nWo0jIMxwlLhx1RrWcAvO+9JUlrgU8S6D8FyrqsHaDW1B7S
+	P3ylgrJOXad1QFlmPO2BQjOnXmUzoLKI9OO3uTgfil4wSEx5BYZFogX7Gepq8SWTQ3hkxM5D6Gv
+	EMsaR7RlxY124HANLMs7xCpTyKZLwWcXtF+1GRgQ/24zKaUY66cvj1lXYQ+08h8z76aCg8bDj1r
+	CAClPTSDr+bQmiz+DU/kx1YNzw+FNkAumNqjaoCsNSbT/NsyfxuZAJGHe5GIGm1gjSmhNKdkM8K
+	iLaQzCpYs36MAMjl8sKNepbrSW7GEynGbA71KlRTrHyQzR4OA+FltmXeu4Yqp47EzWs6w5XJ1yS
+	4kkUSCmCrb/JjjGeX238QG5UPv03uD0SVfAyqTVwjH4fnlvaMOnrvcsWr54VdTGWZ05cYRair1t
+	40pazq67PNlQ==
+X-Received: by 2002:a05:620a:1997:b0:8b2:f2c5:e7f6 with SMTP id
+ af79cd13be357-8c9eb28ea2bmr870087285a.37.1769896721080; Sat, 31 Jan 2026
+ 13:58:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260131185238.973130-1-sprasad@microsoft.com>
-In-Reply-To: <20260131185238.973130-1-sprasad@microsoft.com>
+References: <20260131083325.945635-1-sprasad@microsoft.com>
+In-Reply-To: <20260131083325.945635-1-sprasad@microsoft.com>
 From: Steve French <smfrench@gmail.com>
-Date: Sat, 31 Jan 2026 15:57:40 -0600
-X-Gm-Features: AZwV_QgqTgpdWy8XU5eNzs2QaofKzkPOWCBrksnP_cwpxEzRdhXVQoCntppVo8o
-Message-ID: <CAH2r5muGfp8iqxagjOvJs+Ye12RQPc6136B-eB9=+bm3HmBnLA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] cifs: Corrections to lock ordering notes
+Date: Sat, 31 Jan 2026 15:58:29 -0600
+X-Gm-Features: AZwV_QjiLC5cz4EOGLGXHV_lcoXG-4XAawif2Yh6rr9DDDBQQ-qntFjvKBWHdRQ
+Message-ID: <CAH2r5msTWkjG629p+A-rz0Fm0ync7wbzu1UOO6kFexYnrMApng@mail.gmail.com>
+Subject: Re: [PATCH v4 1/4] cifs: on replayable errors back-off before replay,
+ not after
 To: nspmangalore@gmail.com
 Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, bharathsm@microsoft.com, 
-	henrique.carvalho@suse.com, ematsumiya@suse.de, 
+	dhowells@redhat.com, netfs@lists.linux.dev, 
 	Shyam Prasad N <sprasad@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Fixed typo and merged these two to cifs-2.6.git for-next
+merged these four into cifs-2.6.git for-next pending additional
+testing and review
 
-On Sat, Jan 31, 2026 at 12:52=E2=80=AFPM <nspmangalore@gmail.com> wrote:
+On Sat, Jan 31, 2026 at 2:33=E2=80=AFAM <nspmangalore@gmail.com> wrote:
 >
 > From: Shyam Prasad N <sprasad@microsoft.com>
 >
-> There were a couple of discrepencies in lock ordering for the locks
-> that were specified in the lock ordering notes. Did an analysis
-> of the current codebase (using LLM) and found two pairs whose ordering
-> in these notes were wrong. It also found one lock that was recently
-> removed, and a few locks that weren't documented here before.
+> On replayable errors, we call smb2_should_replays that does these
+> things today:
+> 1. decide if we need to replay the command again
+> 2. sleep to back-off the failed request
+> 3. update the next sleep value
+>
+> We will not be able to use this for async requests, when this is
+> processed in callbacks (as this will be called in cifsd threads that
+> should not sleep in response processing).
+>
+> Modify the behaviour by taking the sleep out of smb2_should_replay
+> and performing the sleep for back-off just before actually
+> performing the replay.
 >
 > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 > ---
->  fs/smb/client/cifsglob.h | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
+>  fs/smb/client/cached_dir.c |   6 +-
+>  fs/smb/client/smb2inode.c  |  21 +++++--
+>  fs/smb/client/smb2ops.c    |  32 ++++++++---
+>  fs/smb/client/smb2pdu.c    | 112 +++++++++++++++++++++++++++----------
+>  4 files changed, 129 insertions(+), 42 deletions(-)
 >
-> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> index 3eca5bfb70303..d797b953b6cf6 100644
-> --- a/fs/smb/client/cifsglob.h
-> +++ b/fs/smb/client/cifsglob.h
-> @@ -1943,6 +1943,8 @@ require use of the stronger protocol */
->   */
+> diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+> index 1db7ab6c2529c..df9977030d199 100644
+> --- a/fs/smb/client/cached_dir.c
+> +++ b/fs/smb/client/cached_dir.c
+> @@ -154,7 +154,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tco=
+n *tcon,
+>         struct cached_fid *cfid;
+>         struct cached_fids *cfids;
+>         const char *npath;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>         __le32 lease_flags =3D 0;
 >
->  /***********************************************************************=
-*****
-> + * LOCK ORDERING NOTES:
-> + ***********************************************************************=
-*****
->   * Here are all the locks (spinlock, mutex, semaphore) in cifs.ko, arran=
-ged according
->   * to the locking order. i.e. if two locks are to be held together, the =
-lock that
->   * appears higher in this list needs to be taken before the other.
-> @@ -1971,18 +1973,21 @@ require use of the stronger protocol */
->   * =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->   * Lock                                Protects                        I=
-nitialization fn
->   * =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> + * cifs_mount_mutex            mount/unmount operations
->   * vol_list_lock
->   * vol_info->ctx_lock          vol_info->ctx
->   * cifs_sb_info->tlink_tree_lock       cifs_sb_info->tlink_tree        c=
-ifs_setup_cifs_sb
->   * TCP_Server_Info->           TCP_Server_Info                 cifs_get_=
-tcp_session
->   * reconnect_mutex
-> - * TCP_Server_Info->srv_mutex  TCP_Server_Info                 cifs_get_=
-tcp_session
->   * cifs_ses->session_mutex     cifs_ses                        sesInfoAl=
-loc
-> + * TCP_Server_Info->_srv_mutex TCP_Server_Info                 cifs_get_=
-tcp_session
-
-Fixed typo "_srv_mutex" should be "srv_mutex"
-
-> + * cifs_tcp_ses_lock           cifs_tcp_ses_list               sesInfoAl=
-loc
-
-Would it be more logical to fix the code that calls it in the
-unexpected order or fix the lock
-description.  The original idea IIRC was to grab TCP session locks
-before locks on things
-that hang off it (like session, and tcon), but in this case it
-probably is ok but curious if
-changing the code would be more intuitive
-
->   * cifs_tcon->open_file_lock   cifs_tcon->openFileList         tconInfoA=
-lloc
->   *                             cifs_tcon->pending_opens
->   * cifs_tcon->stat_lock                cifs_tcon->bytes_read           t=
-conInfoAlloc
->   *                             cifs_tcon->bytes_written
-> - * cifs_tcp_ses_lock           cifs_tcp_ses_list               sesInfoAl=
-loc
-> + * cifs_tcon->fscache_lock     cifs_tcon->fscache              tconInfoA=
-lloc
-> + * cifs_tcon->sb_list_lock     cifs_tcon->cifs_sb_list         tconInfoA=
-lloc
->   * GlobalMid_Lock              GlobalMaxActiveXid              init_cifs
->   *                             GlobalCurrentXid
->   *                             GlobalTotalActiveXid
-> @@ -2005,6 +2010,8 @@ require use of the stronger protocol */
->   *                             ->chans_in_reconnect
->   * cifs_tcon->tc_lock          (anything that is not protected by anothe=
-r lock and can change)
->   *                                                             tcon_info=
-_alloc
-> + * cifs_swnreg_idr_mutex       cifs_swnreg_idr                 cifs_swn.=
-c
-> + *                             (witness service registration, accesses t=
-con fields under tc_lock)
->   * inode->i_rwsem, taken by fs/netfs/locking.c e.g. should be taken befo=
-re cifsInodeInfo locks
->   * cifsInodeInfo->open_file_lock       cifsInodeInfo->openFileList     c=
-ifs_alloc_inode
->   * cifsInodeInfo->writers_lock cifsInodeInfo->writers          cifsInode=
-Info_alloc
-> @@ -2012,12 +2019,12 @@ require use of the stronger protocol */
->   *                             ->can_cache_brlcks
->   * cifsInodeInfo->deferred_lock        cifsInodeInfo->deferred_closes  c=
-ifsInodeInfo_alloc
->   * cached_fids->cfid_list_lock cifs_tcon->cfids->entries       init_cach=
-ed_dirs
-> - * cached_fid->fid_lock                (anything that is not protected b=
-y another lock and can change)
-> - *                                                             init_cach=
-ed_dir
-> + * cached_fid->dirents.de_mutex        cached_fid->dirents             a=
-lloc_cached_dir
->   * cifsFileInfo->fh_mutex      cifsFileInfo                    cifs_new_=
-fileinfo
->   * cifsFileInfo->file_info_lock        cifsFileInfo->count             c=
-ifs_new_fileinfo
->   *                             ->invalidHandle                 initiate_=
-cifs_search
->   *                             ->oplock_break_cancelled
-> + * smbdirect_mr->mutex         RDMA memory region management   (SMBDirec=
-t only)
->   * mid_q_entry->mid_lock       mid_q_entry->callback           alloc_mid
->   *                                                             smb2_mid_=
-entry_alloc
->   *                             (Any fields of mid_q_entry that will need=
- protection)
+>         if (cifs_sb->root =3D=3D NULL)
+> @@ -304,6 +304,10 @@ int open_cached_dir(unsigned int xid, struct cifs_tc=
+on *tcon,
+>         smb2_set_related(&rqst[1]);
+>
+>         if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+> +
+>                 smb2_set_replay(server, &rqst[0]);
+>                 smb2_set_replay(server, &rqst[1]);
+>         }
+> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+> index 2ded3246600c0..498a26a7bd415 100644
+> --- a/fs/smb/client/smb2inode.c
+> +++ b/fs/smb/client/smb2inode.c
+> @@ -188,7 +188,7 @@ static int smb2_compound_op(const unsigned int xid, s=
+truct cifs_tcon *tcon,
+>         struct reparse_data_buffer *rbuf;
+>         struct TCP_Server_Info *server;
+>         int resp_buftype[MAX_COMPOUND];
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>         __u8 delete_pending[8] =3D {1,};
+>         struct kvec *rsp_iov, *iov;
+>         struct inode *inode =3D NULL;
+> @@ -638,18 +638,26 @@ static int smb2_compound_op(const unsigned int xid,=
+ struct cifs_tcon *tcon,
+>         num_rqst++;
+>
+>         if (cfile) {
+> -               if (retries)
+> +               if (retries) {
+> +                       /* Back-off before retry */
+> +                       if (cur_sleep)
+> +                               msleep(cur_sleep);
+>                         for (i =3D 1; i < num_rqst - 2; i++)
+>                                 smb2_set_replay(server, &rqst[i]);
+> +               }
+>
+>                 rc =3D compound_send_recv(xid, ses, server,
+>                                         flags, num_rqst - 2,
+>                                         &rqst[1], &resp_buftype[1],
+>                                         &rsp_iov[1]);
+>         } else {
+> -               if (retries)
+> +               if (retries) {
+> +                       /* Back-off before retry */
+> +                       if (cur_sleep)
+> +                               msleep(cur_sleep);
+>                         for (i =3D 0; i < num_rqst; i++)
+>                                 smb2_set_replay(server, &rqst[i]);
+> +               }
+>
+>                 rc =3D compound_send_recv(xid, ses, server,
+>                                         flags, num_rqst,
+> @@ -1180,7 +1188,7 @@ smb2_unlink(const unsigned int xid, struct cifs_tco=
+n *tcon, const char *name,
+>  {
+>         struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
+>         __le16 *utf16_path __free(kfree) =3D NULL;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>         struct TCP_Server_Info *server;
+>         struct cifs_open_parms oparms;
+>         struct smb2_create_req *creq;
+> @@ -1242,6 +1250,9 @@ smb2_unlink(const unsigned int xid, struct cifs_tco=
+n *tcon, const char *name,
+>                 goto err_free;
+>
+>         if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 for (int i =3D 0; i < ARRAY_SIZE(rqst);  i++)
+>                         smb2_set_replay(server, &rqst[i]);
+>         }
+> @@ -1262,7 +1273,7 @@ smb2_unlink(const unsigned int xid, struct cifs_tco=
+n *tcon, const char *name,
+>         if (rc =3D=3D -EINVAL && dentry) {
+>                 dentry =3D NULL;
+>                 retries =3D 0;
+> -               cur_sleep =3D 1;
+> +               cur_sleep =3D 0;
+>                 goto again;
+>         }
+>         /*
+> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+> index c1aaf77e187b6..f6806946d0eee 100644
+> --- a/fs/smb/client/smb2ops.c
+> +++ b/fs/smb/client/smb2ops.c
+> @@ -1184,7 +1184,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tco=
+n *tcon,
+>         struct smb2_file_full_ea_info *ea;
+>         struct smb2_query_info_rsp *rsp;
+>         int rc, used_len =3D 0;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -1314,6 +1314,9 @@ smb2_set_ea(const unsigned int xid, struct cifs_tco=
+n *tcon,
+>         smb2_set_related(&rqst[2]);
+>
+>         if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst[0]);
+>                 smb2_set_replay(server, &rqst[1]);
+>                 smb2_set_replay(server, &rqst[2]);
+> @@ -1582,7 +1585,7 @@ smb2_ioctl_query_info(const unsigned int xid,
+>         void *data[2];
+>         int create_options =3D is_dir ? CREATE_NOT_FILE : CREATE_NOT_DIR;
+>         void (*free_req1_func)(struct smb_rqst *r);
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -1731,6 +1734,9 @@ smb2_ioctl_query_info(const unsigned int xid,
+>         smb2_set_related(&rqst[2]);
+>
+>         if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst[0]);
+>                 smb2_set_replay(server, &rqst[1]);
+>                 smb2_set_replay(server, &rqst[2]);
+> @@ -2446,7 +2452,7 @@ smb2_query_dir_first(const unsigned int xid, struct=
+ cifs_tcon *tcon,
+>         struct smb2_query_directory_rsp *qd_rsp =3D NULL;
+>         struct smb2_create_rsp *op_rsp =3D NULL;
+>         struct TCP_Server_Info *server;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -2504,6 +2510,9 @@ smb2_query_dir_first(const unsigned int xid, struct=
+ cifs_tcon *tcon,
+>         smb2_set_related(&rqst[1]);
+>
+>         if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst[0]);
+>                 smb2_set_replay(server, &rqst[1]);
+>         }
+> @@ -2780,10 +2789,14 @@ bool smb2_should_replay(struct cifs_tcon *tcon,
+>                 return false;
+>
+>         if (tcon->retry || (*pretries)++ < tcon->ses->server->retrans) {
+> -               msleep(*pcur_sleep);
+> -               (*pcur_sleep) =3D ((*pcur_sleep) << 1);
+> -               if ((*pcur_sleep) > CIFS_MAX_SLEEP)
+> -                       (*pcur_sleep) =3D CIFS_MAX_SLEEP;
+> +               /* Update sleep time for exponential backoff */
+> +               if (!(*pcur_sleep))
+> +                       (*pcur_sleep) =3D 1;
+> +               else {
+> +                       (*pcur_sleep) =3D ((*pcur_sleep) << 1);
+> +                       if ((*pcur_sleep) > CIFS_MAX_SLEEP)
+> +                               (*pcur_sleep) =3D CIFS_MAX_SLEEP;
+> +               }
+>                 return true;
+>         }
+>
+> @@ -2814,7 +2827,7 @@ smb2_query_info_compound(const unsigned int xid, st=
+ruct cifs_tcon *tcon,
+>         int rc;
+>         __le16 *utf16_path;
+>         struct cached_fid *cfid;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -2904,6 +2917,9 @@ smb2_query_info_compound(const unsigned int xid, st=
+ruct cifs_tcon *tcon,
+>         smb2_set_related(&rqst[2]);
+>
+>         if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 if (!cfid) {
+>                         smb2_set_replay(server, &rqst[0]);
+>                         smb2_set_replay(server, &rqst[2]);
+> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> index 5d57c895ca37a..7d75ba675f774 100644
+> --- a/fs/smb/client/smb2pdu.c
+> +++ b/fs/smb/client/smb2pdu.c
+> @@ -2904,7 +2904,7 @@ int smb311_posix_mkdir(const unsigned int xid, stru=
+ct inode *inode,
+>         unsigned int total_len;
+>         __le16 *utf16_path =3D NULL;
+>         struct TCP_Server_Info *server;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -3016,8 +3016,12 @@ int smb311_posix_mkdir(const unsigned int xid, str=
+uct inode *inode,
+>         trace_smb3_posix_mkdir_enter(xid, tcon->tid, ses->Suid, full_path=
+, CREATE_NOT_FILE,
+>                                     FILE_WRITE_ATTRIBUTES);
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         /* resource #4: response buffer */
+>         rc =3D cifs_send_recv(xid, ses, server,
+> @@ -3265,7 +3269,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_=
+parms *oparms, __le16 *path,
+>         int resp_buftype =3D CIFS_NO_BUFFER;
+>         int rc =3D 0;
+>         int flags =3D 0;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -3293,8 +3297,12 @@ SMB2_open(const unsigned int xid, struct cifs_open=
+_parms *oparms, __le16 *path,
+>         trace_smb3_open_enter(xid, tcon->tid, tcon->ses->Suid, oparms->pa=
+th,
+>                 oparms->create_options, oparms->desired_access);
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, ses, server,
+>                             &rqst, &resp_buftype, flags,
+> @@ -3478,7 +3486,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon=
+ *tcon, u64 persistent_fid,
+>         int resp_buftype =3D CIFS_NO_BUFFER;
+>         int rc =3D 0;
+>         int flags =3D 0;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>         if (!tcon)
+>                 return smb_EIO(smb_eio_trace_null_pointers);
+> @@ -3518,8 +3526,12 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tco=
+n *tcon, u64 persistent_fid,
+>         if (rc)
+>                 goto ioctl_exit;
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, ses, server,
+>                             &rqst, &resp_buftype, flags,
+> @@ -3675,7 +3687,7 @@ __SMB2_close(const unsigned int xid, struct cifs_tc=
+on *tcon,
+>         int rc =3D 0;
+>         int flags =3D 0;
+>         bool query_attrs =3D false;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -3707,8 +3719,12 @@ __SMB2_close(const unsigned int xid, struct cifs_t=
+con *tcon,
+>         if (rc)
+>                 goto close_exit;
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, ses, server,
+>                             &rqst, &resp_buftype, flags, &rsp_iov);
+> @@ -3878,7 +3894,7 @@ query_info(const unsigned int xid, struct cifs_tcon=
+ *tcon,
+>         struct TCP_Server_Info *server;
+>         int flags =3D 0;
+>         bool allocated =3D false;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>         cifs_dbg(FYI, "Query Info\n");
+>
+> @@ -3912,8 +3928,12 @@ query_info(const unsigned int xid, struct cifs_tco=
+n *tcon,
+>         trace_smb3_query_info_enter(xid, persistent_fid, tcon->tid,
+>                                     ses->Suid, info_class, (__u32)info_ty=
+pe);
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, ses, server,
+>                             &rqst, &resp_buftype, flags, &rsp_iov);
+> @@ -4069,7 +4089,7 @@ SMB2_change_notify(const unsigned int xid, struct c=
+ifs_tcon *tcon,
+>         int resp_buftype =3D CIFS_NO_BUFFER;
+>         int flags =3D 0;
+>         int rc =3D 0;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -4100,8 +4120,12 @@ SMB2_change_notify(const unsigned int xid, struct =
+cifs_tcon *tcon,
+>         trace_smb3_notify_enter(xid, persistent_fid, tcon->tid, ses->Suid=
+,
+>                                 (u8)watch_tree, completion_filter);
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, ses, server,
+>                             &rqst, &resp_buftype, flags, &rsp_iov);
+> @@ -4405,7 +4429,7 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon=
+ *tcon, u64 persistent_fid,
+>         int resp_buftype =3D CIFS_NO_BUFFER;
+>         int flags =3D 0;
+>         int rc =3D 0;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -4431,8 +4455,12 @@ SMB2_flush(const unsigned int xid, struct cifs_tco=
+n *tcon, u64 persistent_fid,
+>
+>         trace_smb3_flush_enter(xid, persistent_fid, tcon->tid, ses->Suid)=
+;
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, ses, server,
+>                             &rqst, &resp_buftype, flags, &rsp_iov);
+> @@ -5190,7 +5218,7 @@ SMB2_write(const unsigned int xid, struct cifs_io_p=
+arms *io_parms,
+>         int flags =3D 0;
+>         unsigned int total_len;
+>         struct TCP_Server_Info *server;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -5238,8 +5266,12 @@ SMB2_write(const unsigned int xid, struct cifs_io_=
+parms *io_parms,
+>         rqst.rq_iov =3D iov;
+>         rqst.rq_nvec =3D n_vec + 1;
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, io_parms->tcon->ses, server,
+>                             &rqst,
+> @@ -5590,7 +5622,7 @@ SMB2_query_directory(const unsigned int xid, struct=
+ cifs_tcon *tcon,
+>         struct cifs_ses *ses =3D tcon->ses;
+>         struct TCP_Server_Info *server;
+>         int flags =3D 0;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -5615,8 +5647,12 @@ SMB2_query_directory(const unsigned int xid, struc=
+t cifs_tcon *tcon,
+>         if (rc)
+>                 goto qdir_exit;
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, ses, server,
+>                             &rqst, &resp_buftype, flags, &rsp_iov);
+> @@ -5725,7 +5761,7 @@ send_set_info(const unsigned int xid, struct cifs_t=
+con *tcon,
+>         struct cifs_ses *ses =3D tcon->ses;
+>         struct TCP_Server_Info *server;
+>         int flags =3D 0;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -5758,8 +5794,12 @@ send_set_info(const unsigned int xid, struct cifs_=
+tcon *tcon,
+>                 return rc;
+>         }
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, ses, server,
+>                             &rqst, &resp_buftype, flags,
+> @@ -5838,7 +5878,7 @@ SMB2_oplock_break(const unsigned int xid, struct ci=
+fs_tcon *tcon,
+>         struct kvec iov[1];
+>         struct kvec rsp_iov;
+>         int resp_buf_type;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -5868,8 +5908,12 @@ SMB2_oplock_break(const unsigned int xid, struct c=
+ifs_tcon *tcon,
+>         rqst.rq_iov =3D iov;
+>         rqst.rq_nvec =3D 1;
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, ses, server,
+>                             &rqst, &resp_buf_type, flags, &rsp_iov);
+> @@ -5971,7 +6015,7 @@ SMB311_posix_qfs_info(const unsigned int xid, struc=
+t cifs_tcon *tcon,
+>         struct TCP_Server_Info *server;
+>         FILE_SYSTEM_POSIX_INFO *info =3D NULL;
+>         int flags =3D 0;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -5992,8 +6036,12 @@ SMB311_posix_qfs_info(const unsigned int xid, stru=
+ct cifs_tcon *tcon,
+>         rqst.rq_iov =3D &iov;
+>         rqst.rq_nvec =3D 1;
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, ses, server,
+>                             &rqst, &resp_buftype, flags, &rsp_iov);
+> @@ -6036,7 +6084,7 @@ SMB2_QFS_attr(const unsigned int xid, struct cifs_t=
+con *tcon,
+>         struct TCP_Server_Info *server;
+>         unsigned int rsp_len, offset;
+>         int flags =3D 0;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -6073,8 +6121,12 @@ SMB2_QFS_attr(const unsigned int xid, struct cifs_=
+tcon *tcon,
+>         rqst.rq_iov =3D &iov;
+>         rqst.rq_nvec =3D 1;
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, ses, server,
+>                             &rqst, &resp_buftype, flags, &rsp_iov);
+> @@ -6136,7 +6188,7 @@ smb2_lockv(const unsigned int xid, struct cifs_tcon=
+ *tcon,
+>         int flags =3D CIFS_NO_RSP_BUF;
+>         unsigned int total_len;
+>         struct TCP_Server_Info *server;
+> -       int retries =3D 0, cur_sleep =3D 1;
+> +       int retries =3D 0, cur_sleep =3D 0;
+>
+>  replay_again:
+>         /* reinitialize for possible replay */
+> @@ -6172,8 +6224,12 @@ smb2_lockv(const unsigned int xid, struct cifs_tco=
+n *tcon,
+>         rqst.rq_iov =3D iov;
+>         rqst.rq_nvec =3D 2;
+>
+> -       if (retries)
+> +       if (retries) {
+> +               /* Back-off before retry */
+> +               if (cur_sleep)
+> +                       msleep(cur_sleep);
+>                 smb2_set_replay(server, &rqst);
+> +       }
+>
+>         rc =3D cifs_send_recv(xid, tcon->ses, server,
+>                             &rqst, &resp_buf_type, flags,
 > --
 > 2.43.0
 >
