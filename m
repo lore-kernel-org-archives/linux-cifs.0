@@ -1,117 +1,126 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2322D8DC3
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Feb 2026 08:14:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B5833122B
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Feb 2026 11:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769933689; cv=none; b=M05iNLnaxWFzgyAWYN8u1ijKSJIR9Uuu+gfarErvTwzycwho7cIM3gq0TZB10XCGy3qGzYcObNMBfhKzjMgiUJW4CZOQ411AYlG1gfrC3i/Hm1C5zjj6ZI2kcF7QxsMGlvf/Gpxwv496+LSYv5lKCwk8+sRXZdb5C4aJo9+PR34=
+	t=1769946859; cv=none; b=te8aPt1lJp1aBRimYghS21WOlfCoc3UABaOKCthuHx8JWuTOn6Y75fwrCUnRtsBGBx4XpkXao591y+lofNTm7RfjQCNf2p9x/ZvdM6lWJck9p6BtSl4IWhIQRewZHVUBA4K673uTuCnxzYrpJuyqKa4RkFZdXT5BOXoRvD5I++Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769933689; c=relaxed/simple;
-	bh=1VMg1QZKau42hn0oeZvoSDlNt4C8BC0vouvwHVuPMAk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fLNZAAyjFpqUrPcHnEdj3x5bjAbm2cbuhD23rOMtfvx6GQoIXO4hpkg8DqjgkClJHHErW1IcH/NBR5huClLJUYeGMdK52klvhcv8gD58p93qLI7WiT69ge06zSN0xorZS/2BTMCQMSwWq6iRTagWvSL0zU6A4mCRsVMWwyOFIT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CMgDd2uu; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1769946859; c=relaxed/simple;
+	bh=VpBFLvPRbCYtEBWFPtQ+S5uMF3TEzXl8m7qaemIa9OU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lqdBm0Krdq98Vlw0kvRgP//Kkzll1inAyTVKj9/SgJh1wHvLEJASCtCVTu1h/sXPif7F6dJ/AkCw1jrI74fOLbar58K4xCD4MuSFE6OZ99oIr1DF4zQNVI+F0gPAoZxLpSTugZcIWVlPLVUo8uaojmbTyAzZ7UzgjSEo6Ub/Sm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YDKxFfo9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CMgDd2uu"
-Message-ID: <d6a9cf34-e4ec-4792-afb0-5d7a39b46378@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769933684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=u0IH4iV2XH1mj1VuxjvgwPVWsRggOPvkZHdzBXTda4I=;
-	b=CMgDd2uuHruAvJQ4GeHwiYZ2G49XMuLLgEjNHuyYpO55fBeqaUeuGUTqxxRKb76b6x3rEe
-	/p8GlX2z61UE7LDYwxHQGNjhu1mnl89TwAiKGC7HdYBncbpd8+b3FXF+0S/lm+baO5c2FO
-	palE8UT8WbxjeJEHaSnrCE0aVNjA5bc=
-Date: Sun, 1 Feb 2026 16:14:27 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YDKxFfo9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E56A2C4CEF7;
+	Sun,  1 Feb 2026 11:54:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769946859;
+	bh=VpBFLvPRbCYtEBWFPtQ+S5uMF3TEzXl8m7qaemIa9OU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YDKxFfo9OUzqVa5SP5abnB38OPN7mEIdPoT+6zkFOvgSg7acrdAm3/T3srOrgxcWQ
+	 HIUNIzvmeDIJN5ghl+5eLejwz5dteBwtGsENs3YJTYFlISrYC8X0yZlqCx8rkIx72Y
+	 QX+Cy2LyFz/AcveTj7mVdoMfq1+6b/B8K1+CcqZ6ZqD75kRf8GqEAhI9mtH09yccV0
+	 e6b0HqcA7YbFRw/Z0oiMgiT6Cx2zDteDdZdEwvLQXK9kXLflFxF+hcSkXchOwekgor
+	 kH0kjv+gBWGBKerhO8uY08LEhmUQ+9i5/e5rFQgQEOr7s44mRD71bLF4EOilBcsGYg
+	 nlNuHKmcm4nBg==
+Received: by pali.im (Postfix)
+	id 2A3E4476; Sun,  1 Feb 2026 12:54:09 +0100 (CET)
+Date: Sun, 1 Feb 2026 12:54:09 +0100
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: chenxiaosong.chenxiaosong@linux.dev
+Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+	bharathsm@microsoft.com, senozhatsky@chromium.org,
+	dhowells@redhat.com, nspmangalore@gmail.com,
+	henrique.carvalho@suse.com, meetakshisetiyaoss@gmail.com,
+	ematsumiya@suse.de, linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: Re: [PATCH] smb/client: fix memory leak in smb2_open_file()
+Message-ID: <20260201115409.5owvqgxqkefmqkkh@pali>
+References: <20260201081017.998628-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: xfstests failed test cases
-To: Steve French <smfrench@gmail.com>, Shyam Prasad N
- <nspmangalore@gmail.com>, David Howells <dhowells@redhat.com>,
- Henrique Carvalho <henrique.carvalho@suse.com>,
- Bharath S M <bharathsm@microsoft.com>,
- Meetakshi Setiya <meetakshisetiyaoss@gmail.com>,
- ChenXiaoSong <chenxiaosong@kylinos.cn>, Paulo Alcantara <pc@manguebit.org>,
- Steve French <sfrench@samba.org>, Enzo Matsumiya <ematsumiya@suse.de>
-Cc: CIFS <linux-cifs@vger.kernel.org>
-References: <CAH2r5mv41nFwJQwszD82MQbtDV75zVy6=tbwqxDTOsw2hwfBpw@mail.gmail.com>
- <CANT5p=qmo_KORMQbnjonapAaGHq=UvWAMzR0jNKBBvx3UUkyjQ@mail.gmail.com>
- <CANT5p=pfQE2A++j6W4sEudrSLH6ct=ho4i=k2ZDEecUAX0cReg@mail.gmail.com>
- <CAH2r5mvakK7=1i-fZTE9hLLYd_Q3o5z557vQZ5QQtdOTkZeSew@mail.gmail.com>
- <CAH2r5mufJgC85ULoVzYSMXDq4=-RUiJ2YgppM434vz1Q4B1d+A@mail.gmail.com>
- <CAH2r5msVifsc-E0TjaYXt2Afh1MiCsJTSwMnsDAdUShRgkJ_4A@mail.gmail.com>
- <CAH2r5mukVmnfK7X3jXWwRnD-_RAMuUgzXpi+HzNjxOat4tobJA@mail.gmail.com>
- <CAH2r5mvW23-eUsjDQ_0oLrmj406Og5sDs-yPgqh6jPwdSEG+Tg@mail.gmail.com>
- <CAH2r5mu909vLwAQcKFQX7cWz421V1QmSiBAKyJeC8gUcGVb0Ew@mail.gmail.com>
- <bcd3d847-c38f-4c88-af07-3da09dad476b@linux.dev>
- <f1b9cd58-8a61-4fa7-a7e9-198c2c468c59@linux.dev>
- <9751f02d-d1df-4265-a7d6-b19761b21834@linux.dev>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <9751f02d-d1df-4265-a7d6-b19761b21834@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20260201081017.998628-1-chenxiaosong.chenxiaosong@linux.dev>
+User-Agent: NeoMutt/20180716
 
-I have already submitted a patch to fix this issue: 
-https://lore.kernel.org/linux-cifs/20260201081017.998628-1-chenxiaosong.chenxiaosong@linux.dev/
+Hello,
 
-Thanks,
-ChenXiaoSong <chenxiaosong@kylinos.cn>
+Thank you for looking at this issue and preparing a fix.
 
-On 2/1/26 2:30 PM, ChenXiaoSong wrote:
-> Steve and I have completed a git bisect and found the first bad commit:
-> [e255612b5ed9f179abe8196df7c2ba09dd227900] cifs: Add fallback for SMB2 
-> CREATE without FILE_READ_ATTRIBUTES
+On Sunday 01 February 2026 08:10:17 chenxiaosong.chenxiaosong@linux.dev wrote:
+> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > 
-> For detailed information, please check the link: https:// 
-> chenxiaosong.com/en/smb-buildbot.html#cifs-103-bisect
+> Reproducer:
 > 
-> Thanks,
-> ChenXiaoSong <chenxiaosong@kylinos.cn>
+>   1. On server, set the permissions of the shared directory to read-only
+>   2. mount -t cifs //${server_ip}/export /mnt
+>   4. dd if=/dev/zero of=/mnt/file bs=512 count=1000 oflag=direct
+>   5. umount /mnt
+>   6. sleep 1
+>   7. modprobe -r cifs
+
+Another possible trigger could be to pre-create file on the server and
+remove write permissions for the caller. Then opening it for write
+access will also trigger the fallback path, which also fails.
+
+> The error message is as follows:
 > 
-> On 1/29/26 8:20 PM, ChenXiaoSong wrote:
->> I found the key factor that triggers kmemleak in cifs/103, the 
->> directory exported by the server must be read-only.
->>
->> When sharing a folder on Windows, do not check "Allow Change", set the 
->> permissions of the shared directory to read-only.
->>
->> Alternatively, `smb.conf` of Samba is configured as follows:
->> ```
->> [test]
->>      ...
->>      read only = yes
->> [test2]
->>      ...
->>      read only = yes
->> ```
->>
->> For detailed information, please check the link: https:// 
->> chenxiaosong.com/en/smb-buildbot.html#cifs-103
->>
->> I will first try to analyze the code, and if that doesn't work, I will 
->> try to bisect it.
->>
->> Thanks,
->> ChenXiaoSong <chenxiaosong@kylinos.cn>
->>
->> On 1/28/26 23:29, ChenXiaoSong wrote:
->>> I have reproduced the failures of these test cases. For detailed 
->>> information, please check the link: https://chenxiaosong.com/en/smb- 
->>> buildbot.html (I will ensure this link is always accessible).
->>>
->>> Perhaps sending these issues to the mailing list could help resolve 
->>> them more quickly.
+>   =============================================================================
+>   BUG cifs_small_rq (Not tainted): Objects remaining on __kmem_cache_shutdown()
+>   -----------------------------------------------------------------------------
+> 
+>   Object 0x00000000d47521be @offset=14336
+>   ...
+>   WARNING: mm/slub.c:1251 at __kmem_cache_shutdown+0x34e/0x440, CPU#0: modprobe/1577
+>   ...
+>   Call Trace:
+>    <TASK>
+>    kmem_cache_destroy+0x94/0x190
+>    cifs_destroy_request_bufs+0x3e/0x50 [cifs]
+>    cleanup_module+0x4e/0x540 [cifs]
+>    __se_sys_delete_module+0x278/0x400
+>    __x64_sys_delete_module+0x5f/0x70
+>    x64_sys_call+0x2299/0x2ff0
+>    do_syscall_64+0x89/0x350
+>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>   ...
+>   kmem_cache_destroy cifs_small_rq: Slab cache still has objects when called from cifs_destroy_request_bufs+0x3e/0x50 [cifs]
+>   WARNING: mm/slab_common.c:532 at kmem_cache_destroy+0x16b/0x190, CPU#0: modprobe/1577
+> 
+> Link: https://lore.kernel.org/linux-cifs/9751f02d-d1df-4265-a7d6-b19761b21834@linux.dev/T/#mf14808c144448b715f711ce5f0477a071f08eaf6
+> Fixes: e255612b5ed9 ("cifs: Add fallback for SMB2 CREATE without FILE_READ_ATTRIBUTES")
+> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> ---
+>  fs/smb/client/smb2file.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
+> index 0f0514be29cd..9ab0df01b774 100644
+> --- a/fs/smb/client/smb2file.c
+> +++ b/fs/smb/client/smb2file.c
+> @@ -178,6 +178,7 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
+>  	rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, smb2_data, NULL, &err_iov,
+>  		       &err_buftype);
+>  	if (rc == -EACCES && retry_without_read_attributes) {
+> +		free_rsp_buf(err_buftype, err_iov.iov_base);
+>  		oparms->desired_access &= ~FILE_READ_ATTRIBUTES;
+>  		rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, smb2_data, NULL, &err_iov,
+>  			       &err_buftype);
+> -- 
+> 2.52.0
 > 
 
+This change looks good, the second SMB2_open() is reusing &err_iov and
+&err_buftype, so they need to be properly released before reuse.
+
+Reviewed-by: Pali Rohár <pali@kernel.org>
