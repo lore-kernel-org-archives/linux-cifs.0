@@ -1,30 +1,32 @@
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251CA3542C1
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Feb 2026 08:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39901353ED9
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Feb 2026 08:25:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770020717; cv=none; b=PPWUDnbLSBSwOVV6g9geL31U//2ut2JM0lhHLAx5dY8PPljpO+tB8dXGolY9GEkt/NHIslV6Ev77jcGNWFHB0+omuKIqH7eOf4biDQKjbbUkrJR5X3b19rzu/Je6clTjOIEa5FQuZP1YefTpCuoVMH84Lzl4ENN7sLcKOwCzY6E=
+	t=1770020719; cv=none; b=NEh/OilrvBGbztkbNYtDyhU+YRiNYYqrI7dCzKhWBpTVpHI7qjHRmnw+x4gBIS3ZTQZdK5ahlzHKjY2806x3ZlWAsqxXLC+L/QVXTTIfj4gyHwTMvYCt3e92ubDG+DMM/EoISFRmP3TmtUOSPIZmhOQW9gLoBocNoXScwNwPyAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770020717; c=relaxed/simple;
-	bh=XLhXMq+fYvC04UKrWEvN+sZRb7LDiymZB8SjpIvgAQE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=o85oEOLy9ZR7Hazfq53Zpci1XLiIHtF+CcWcwcHPeiy2sGIXT1llEifzsn3jqXkHVZD6hPWvm0/RDT0uaVmfbMeLOV6JPC0zwbxk7ZglH4shjYirzJoyVwucA9gUuQ+P165pawG/LhZxN/+KJu0WGy+hQacijxgvZtHrjqwJ0OE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZudD5ciY; arc=none smtp.client-ip=95.215.58.173
+	s=arc-20240116; t=1770020719; c=relaxed/simple;
+	bh=l9uZD36Pte5gANFkTdBqVIPzhJWC8Gm20c0aHqFP8uo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=aC8dmXRljbZz1K3eVbOy4Qh5sgZB9E+Am2P7PxGhVfbtQz0O0qUE0Y+OLu91h9o3k6TdX8+KvcTb7uMhzrM6q+gu2UteKb3TCBXXqdmbOzFbw+bRztTDw5fSoM80FfkX4jPoMksxOugPTnwcfPcY9JcqWQ45jSbx6WbIzWQOkHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HbIL8iAJ; arc=none smtp.client-ip=95.215.58.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZudD5ciY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HbIL8iAJ"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770020706;
+	t=1770020711;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=RoJbk1PCG8vfncTd+6FHt4ez5CMGOem1FyamDymaI6A=;
-	b=ZudD5ciYrFnZVSGcP0l3viZXud+5T3Boc3ErG34e/4rJ309rrPZa1Y8+lk5aZBpdGkDNz2
-	JyTCAmSCGx9b3s8Te01okks/8tpFLxXukq4a/RD9hC8wT+2Ae4oY/SRDHI2aTbae9tLSJ8
-	pzKNQ7xshDve7IrcOZUoG2dEv1cxsCg=
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Yja2NhSpLkNiRhEy2nDIxmqUR9/XWUpSmbfM4RptIuY=;
+	b=HbIL8iAJb8GG2IS+4embQrjJmFx9YGoCZ7jGd3MP2rqtTO64Ud6mSvyBm4V14aPGp53/mJ
+	Hu5UOoeN8IyJ8Iyew599+Vn7j1K+Q5TP4lnenXquDRJJLca+Bl8QMHQBpMpI4oG3Bf0zgO
+	qOeng88IQXksm+mmOE4yYePuHz05Nyk=
 From: chenxiaosong.chenxiaosong@linux.dev
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -42,44 +44,88 @@ To: smfrench@gmail.com,
 	pali@kernel.org
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2 0/2] smb/client: fix memory leaks
-Date: Mon,  2 Feb 2026 08:24:05 +0000
-Message-ID: <20260202082407.1881618-1-chenxiaosong.chenxiaosong@linux.dev>
+Subject: [PATCH v2 1/2] smb/client: fix memory leak in SendReceive()
+Date: Mon,  2 Feb 2026 08:24:06 +0000
+Message-ID: <20260202082407.1881618-2-chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <20260202082407.1881618-1-chenxiaosong.chenxiaosong@linux.dev>
+References: <20260202082407.1881618-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-v1->v2:
-  - Add "Reported-by: Paulo Alcantara <pc@manguebit.org>"
-  - Patch #02
-    - Add "Reviewed-by: Pali Rohár <pali@kernel.org>"
-    - Update the commit message description
+Reproducer:
 
-Steve, the patch #02 has already been merged into cifs-2.6.git for-next.
-Please replace it with the updated version.
+  1. server: supports SMB1, directories are exported read-only
+  2. client: mount -t cifs -o vers=1.0 //${server_ip}/export /mnt
+  3. client: dd if=/dev/zero of=/mnt/file bs=512 count=1000 oflag=direct
+  4. client: umount /mnt
+  5. client: sleep 1
+  6. client: modprobe -r cifs
 
-For detailed information, please see the link: https://chenxiaosong.com/en/smb-buildbot.html (I will ensure this link is always accessible).
+The error message is as follows:
 
-v1:
-  - smb/client: fix memory leak in SendReceive(): https://lore.kernel.org/linux-cifs/20260202064928.1879323-1-chenxiaosong.chenxiaosong@linux.dev/
-  - smb/client: fix memory leak in smb2_open_file(): https://lore.kernel.org/linux-cifs/20260201081017.998628-1-chenxiaosong.chenxiaosong@linux.dev/
+  =============================================================================
+  BUG cifs_small_rq (Not tainted): Objects remaining on __kmem_cache_shutdown()
+  -----------------------------------------------------------------------------
 
-ChenXiaoSong (2):
-  smb/client: fix memory leak in SendReceive()
-  smb/client: fix memory leak in smb2_open_file()
+  Object 0x00000000d34491e6 @offset=896
+  Object 0x00000000bde9fab3 @offset=4480
+  Object 0x00000000104a1f70 @offset=6272
+  Object 0x0000000092a51bb5 @offset=7616
+  Object 0x000000006714a7db @offset=13440
+  ...
+  WARNING: mm/slub.c:1251 at __kmem_cache_shutdown+0x379/0x3f0, CPU#7: modprobe/712
+  ...
+  Call Trace:
+   <TASK>
+   kmem_cache_destroy+0x69/0x160
+   cifs_destroy_request_bufs+0x39/0x40 [cifs]
+   cleanup_module+0x43/0xfc0 [cifs]
+   __se_sys_delete_module+0x1d5/0x300
+   __x64_sys_delete_module+0x1a/0x30
+   x64_sys_call+0x2299/0x2ff0
+   do_syscall_64+0x6e/0x270
+   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+  ...
+  kmem_cache_destroy cifs_small_rq: Slab cache still has objects when called from cifs_destroy_request_bufs+0x39/0x40 [cifs]
+  WARNING: mm/slab_common.c:532 at kmem_cache_destroy+0x142/0x160, CPU#7: modprobe/712
 
+Link: https://lore.kernel.org/linux-cifs/9751f02d-d1df-4265-a7d6-b19761b21834@linux.dev/T/#mf14808c144448b715f711ce5f0477a071f08eaf6
+Fixes: 6be09580df5c ("cifs: Make smb1's SendReceive() wrap cifs_send_recv()")
+Reported-by: Paulo Alcantara <pc@manguebit.org>
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
  fs/smb/client/smb1transport.c | 4 +++-
- fs/smb/client/smb2file.c      | 1 +
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/fs/smb/client/smb1transport.c b/fs/smb/client/smb1transport.c
+index 0528c1919961..0b8b852cfc0d 100644
+--- a/fs/smb/client/smb1transport.c
++++ b/fs/smb/client/smb1transport.c
+@@ -252,13 +252,15 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	rc = cifs_send_recv(xid, ses, ses->server,
+ 			    &rqst, &resp_buf_type, flags, &resp_iov);
+ 	if (rc < 0)
+-		return rc;
++		goto out;
+ 
+ 	if (out_buf) {
+ 		*pbytes_returned = resp_iov.iov_len;
+ 		if (resp_iov.iov_len)
+ 			memcpy(out_buf, resp_iov.iov_base, resp_iov.iov_len);
+ 	}
++
++out:
+ 	free_rsp_buf(resp_buf_type, resp_iov.iov_base);
+ 	return rc;
+ }
 -- 
 2.52.0
 
