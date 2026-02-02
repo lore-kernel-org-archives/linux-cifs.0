@@ -1,51 +1,50 @@
-Received: from n169-113.mail.139.com (n169-113.mail.139.com [120.232.169.113])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745601EDA2C;
-	Mon,  2 Feb 2026 03:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.113
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBCD21D3CD
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Feb 2026 06:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770002364; cv=none; b=e8aFb3Sm18NjcAlYTjLkTsLNHZs7NIgLkEelzLTDPZWQAr+wZOo/FUchvlceugHzu1Lmo/ljID7pXPApBPxgI/6EV5zdayrSgyLumDuQNH/Ucg/OZq1x1xpdJ4U/MkyM948idv36DkkOhxnarqwv+M4b+geGIHWvij9aqDkc5Xk=
+	t=1770015019; cv=none; b=rDEwZX29p7luUn0fxejeZr8Xri+ZDG3YcHUTAPQ29vOLg56DY0fV1WhrJDb/S2l1Y2XzhAYb9qpKrNvk9iLzUDPuQGIi/LcXgYqHft0wGm0Goo/8m87TKNw9j4g0c/fEPbCdr1kAnOebSGjP4RiMHpwI6hr+rXa1Hv+XinjXXkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770002364; c=relaxed/simple;
-	bh=hkKN4IEXtI+q3M1llnEEpthTvKvZyF+I4P0hEeDzTSA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oKq/knmty/cP5cJah1leHzGOtJ4bmBEuP1fn21tR9s0wM0yjg9cmk9dmUfqX9IUqO750M6bLYJkZspSkJk+/dkP/AiGhE3lxbRY/TXfBqLQD1Z2GLLLxjfVrOBvwF3Z9hZu9hZ7Tk8poiM9H2IGsH70ElPruXluOAvfhB9kVR6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=otFBNxGZ; arc=none smtp.client-ip=120.232.169.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
+	s=arc-20240116; t=1770015019; c=relaxed/simple;
+	bh=IM/zlXb8FWlb1TEWYdoVaUzIhieq5S52etee9Zfedw8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SLZd+S+Nebkj31OfqyjbMgzGqkX6UiNSePnpt4vxV/xcBjJ26R4mZOF4f/WiOc+XFPdQQCcVglnwBRx66I5IEvUloV6ZNcNc31BybbTLdGHX3kR+SN9WHrrM28qPKcCN/KfL3XOF3hYZZ/2QQsR6+CMOAMX4tBxK/GKu9s+PYyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sOCiC8nY; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="otFBNxGZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=otFBNxGZRAcu7HGFfDRkgVagwHwvyTUo7FzmhCjyj1eqqQEE/JefeS/IRjbXvbymPoY6I+ZEBr0Ya
-	 3yQIeIYG8wfAI8shSCRYF8fLW4sL+cKiLA3egnw7B45nlBAE1ILzjPNwdA7ckSy40MI9pZRv2yXmI2
-	 Ad/WqvhlMkudoe/c=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from NTT-kernel-dev (unknown[60.247.85.88])
-	by rmsmtp-lg-appmail-32-12046 (RichMail) with SMTP id 2f0e698016dadd9-00df7;
-	Mon, 02 Feb 2026 11:15:40 +0800 (CST)
-X-RM-TRANSID:2f0e698016dadd9-00df7
-From: Li hongliang <1468888505@139.com>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org,
-	linkinjeon@kernel.org
-Cc: patches@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	norbert@doyensec.com,
-	ysk@kzalloc.com,
-	sfrench@samba.org,
-	senozhatsky@chromium.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sOCiC8nY"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770015015;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rkP2S3WVu0q6bR000I+40Jp/dIDVayCV2VfvsePZiKc=;
+	b=sOCiC8nYBOWktqrvw+p+6fWIxjnP3k+lsZAVPqEXEXyDeGSPya4qsUfIGLQF4AWy2H/LqG
+	Jq6HP6ZD4apgFO1yTMBbpjI+V7WvGqdvv0B3QPSFonvvjwzxODlmXXoOwhJw0FmU0HQhuY
+	/8CN/R0+AoK5X6YVYypT3/RT7Gckx6M=
+From: chenxiaosong.chenxiaosong@linux.dev
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
 	tom@talpey.com,
-	akendo@akendo.eu,
-	set_pte_at@outlook.com,
-	linux-cifs@vger.kernel.org,
-	stfrench@microsoft.com
-Subject: [PATCH 6.1.y 1/2] ksmbd: fix use-after-free in ksmbd_session_rpc_open
-Date: Mon,  2 Feb 2026 11:15:50 +0800
-Message-Id: <20260202031550.514894-1-1468888505@139.com>
-X-Mailer: git-send-email 2.34.1
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	nspmangalore@gmail.com,
+	henrique.carvalho@suse.com,
+	meetakshisetiyaoss@gmail.com,
+	ematsumiya@suse.de,
+	pali@kernel.org
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH] smb/client: fix memory leak in SendReceive()
+Date: Mon,  2 Feb 2026 06:49:28 +0000
+Message-ID: <20260202064928.1879323-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -53,122 +52,75 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Namjae Jeon <linkinjeon@kernel.org>
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-[ Upstream commit a1f46c99d9ea411f9bf30025b912d881d36fc709 ]
+Reproducer:
 
-A UAF issue can occur due to a race condition between
-ksmbd_session_rpc_open() and __session_rpc_close().
-Add rpc_lock to the session to protect it.
+  1. server: supports SMB1, directories are exported read-only
+  2. client: mount -t cifs -o vers=1.0 //${server_ip}/export /mnt
+  3. client: dd if=/dev/zero of=/mnt/file bs=512 count=1000 oflag=direct
+  4. client: umount /mnt
+  5. client: sleep 1
+  6. client: modprobe -r cifs
 
-Cc: stable@vger.kernel.org
-Reported-by: Norbert Szetei <norbert@doyensec.com>
-Tested-by: Norbert Szetei <norbert@doyensec.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-[ KSMBD_DEFAULT_GFP is introduced by commit 0066f623bce8 ("ksmbd: use __GFP_RETRY_MAYFAIL")
- after linux-6.13. Here we still use GFP_KERNEL. ]
-Signed-off-by: Li hongliang <1468888505@139.com>
+The error message is as follows:
+
+  =============================================================================
+  BUG cifs_small_rq (Not tainted): Objects remaining on __kmem_cache_shutdown()
+  -----------------------------------------------------------------------------
+
+  Object 0x00000000d34491e6 @offset=896
+  Object 0x00000000bde9fab3 @offset=4480
+  Object 0x00000000104a1f70 @offset=6272
+  Object 0x0000000092a51bb5 @offset=7616
+  Object 0x000000006714a7db @offset=13440
+  ...
+  WARNING: mm/slub.c:1251 at __kmem_cache_shutdown+0x379/0x3f0, CPU#7: modprobe/712
+  ...
+  Call Trace:
+   <TASK>
+   kmem_cache_destroy+0x69/0x160
+   cifs_destroy_request_bufs+0x39/0x40 [cifs]
+   cleanup_module+0x43/0xfc0 [cifs]
+   __se_sys_delete_module+0x1d5/0x300
+   __x64_sys_delete_module+0x1a/0x30
+   x64_sys_call+0x2299/0x2ff0
+   do_syscall_64+0x6e/0x270
+   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+  ...
+  kmem_cache_destroy cifs_small_rq: Slab cache still has objects when called from cifs_destroy_request_bufs+0x39/0x40 [cifs]
+  WARNING: mm/slab_common.c:532 at kmem_cache_destroy+0x142/0x160, CPU#7: modprobe/712
+
+Link: https://lore.kernel.org/linux-cifs/9751f02d-d1df-4265-a7d6-b19761b21834@linux.dev/T/#mf14808c144448b715f711ce5f0477a071f08eaf6
+Fixes: 6be09580df5c ("cifs: Make smb1's SendReceive() wrap cifs_send_recv()")
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/server/mgmt/user_session.c | 20 ++++++++++++++------
- fs/smb/server/mgmt/user_session.h |  1 +
- 2 files changed, 15 insertions(+), 6 deletions(-)
+ fs/smb/client/smb1transport.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
-index f78820afd354..2603f7dcea58 100644
---- a/fs/smb/server/mgmt/user_session.c
-+++ b/fs/smb/server/mgmt/user_session.c
-@@ -59,10 +59,12 @@ static void ksmbd_session_rpc_clear_list(struct ksmbd_session *sess)
- 	struct ksmbd_session_rpc *entry;
- 	long index;
+diff --git a/fs/smb/client/smb1transport.c b/fs/smb/client/smb1transport.c
+index 0528c1919961..0b8b852cfc0d 100644
+--- a/fs/smb/client/smb1transport.c
++++ b/fs/smb/client/smb1transport.c
+@@ -252,13 +252,15 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	rc = cifs_send_recv(xid, ses, ses->server,
+ 			    &rqst, &resp_buf_type, flags, &resp_iov);
+ 	if (rc < 0)
+-		return rc;
++		goto out;
  
-+	down_write(&sess->rpc_lock);
- 	xa_for_each(&sess->rpc_handle_list, index, entry) {
- 		xa_erase(&sess->rpc_handle_list, index);
- 		__session_rpc_close(sess, entry);
+ 	if (out_buf) {
+ 		*pbytes_returned = resp_iov.iov_len;
+ 		if (resp_iov.iov_len)
+ 			memcpy(out_buf, resp_iov.iov_base, resp_iov.iov_len);
  	}
-+	up_write(&sess->rpc_lock);
- 
- 	xa_destroy(&sess->rpc_handle_list);
++
++out:
+ 	free_rsp_buf(resp_buf_type, resp_iov.iov_base);
+ 	return rc;
  }
-@@ -92,7 +94,7 @@ int ksmbd_session_rpc_open(struct ksmbd_session *sess, char *rpc_name)
- {
- 	struct ksmbd_session_rpc *entry, *old;
- 	struct ksmbd_rpc_command *resp;
--	int method;
-+	int method, id;
- 
- 	method = __rpc_method(rpc_name);
- 	if (!method)
-@@ -102,26 +104,29 @@ int ksmbd_session_rpc_open(struct ksmbd_session *sess, char *rpc_name)
- 	if (!entry)
- 		return -ENOMEM;
- 
-+	down_read(&sess->rpc_lock);
- 	entry->method = method;
--	entry->id = ksmbd_ipc_id_alloc();
--	if (entry->id < 0)
-+	entry->id = id = ksmbd_ipc_id_alloc();
-+	if (id < 0)
- 		goto free_entry;
--	old = xa_store(&sess->rpc_handle_list, entry->id, entry, GFP_KERNEL);
-+	old = xa_store(&sess->rpc_handle_list, id, entry, GFP_KERNEL);
- 	if (xa_is_err(old))
- 		goto free_id;
- 
--	resp = ksmbd_rpc_open(sess, entry->id);
-+	resp = ksmbd_rpc_open(sess, id);
- 	if (!resp)
- 		goto erase_xa;
- 
-+	up_read(&sess->rpc_lock);
- 	kvfree(resp);
--	return entry->id;
-+	return id;
- erase_xa:
- 	xa_erase(&sess->rpc_handle_list, entry->id);
- free_id:
- 	ksmbd_rpc_id_free(entry->id);
- free_entry:
- 	kfree(entry);
-+	up_read(&sess->rpc_lock);
- 	return -EINVAL;
- }
- 
-@@ -129,9 +134,11 @@ void ksmbd_session_rpc_close(struct ksmbd_session *sess, int id)
- {
- 	struct ksmbd_session_rpc *entry;
- 
-+	down_write(&sess->rpc_lock);
- 	entry = xa_erase(&sess->rpc_handle_list, id);
- 	if (entry)
- 		__session_rpc_close(sess, entry);
-+	up_write(&sess->rpc_lock);
- }
- 
- int ksmbd_session_rpc_method(struct ksmbd_session *sess, int id)
-@@ -404,6 +411,7 @@ static struct ksmbd_session *__session_create(int protocol)
- 	sess->sequence_number = 1;
- 	rwlock_init(&sess->tree_conns_lock);
- 	atomic_set(&sess->refcnt, 2);
-+	init_rwsem(&sess->rpc_lock);
- 
- 	ret = __init_smb2_session(sess);
- 	if (ret)
-diff --git a/fs/smb/server/mgmt/user_session.h b/fs/smb/server/mgmt/user_session.h
-index f4da293c4dbb..011362e975b0 100644
---- a/fs/smb/server/mgmt/user_session.h
-+++ b/fs/smb/server/mgmt/user_session.h
-@@ -63,6 +63,7 @@ struct ksmbd_session {
- 	rwlock_t			tree_conns_lock;
- 
- 	atomic_t			refcnt;
-+	struct rw_semaphore		rpc_lock;
- };
- 
- static inline int test_session_flag(struct ksmbd_session *sess, int bit)
 -- 
-2.34.1
-
+2.52.0
 
