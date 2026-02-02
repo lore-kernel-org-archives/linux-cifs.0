@@ -1,103 +1,170 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAB8364EA6
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Feb 2026 12:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E7536C596
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Feb 2026 14:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770035068; cv=none; b=U6ZaNjDBJmK1nnc/Q968fh6rpjRLoouNppxTLy2IQkDs0iOa8zoNzCN4uxoVO4Di4RgDPP4UZVCIfVbZaZw1Y6F7fIB2V0Ym4bk0RVW42aAwHaWr0Ilouln+tUTVCIC9ScngAAixPInb9xa9RWNCvWAExheJjnfWZl99ZW/4+sc=
+	t=1770042595; cv=none; b=GFbAckbfsd+zSMZ6fkHpxZv63ZgZPzg7hVgVAYgdhrbJgKcZk5tiYpABAEyeBhWhqKOJkLNsIKY7NcqZosYMJzMz/HHIgv+/W/BEvktzn7lkgp8oKP5mmNmD8rwLbbs3EvZDwyNaimRSRdnU3CIu4/0AgUd9xY1/VMgFP5/u224=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770035068; c=relaxed/simple;
-	bh=XLInijexvCsMsVqbceK+qEJM2ek4Uvx4dGdCJYvK7mE=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=n5HicwIO0IZAygafrnHwETMZOkXiX8CFwkB5AK7mmh6J7btx6NVRthqFpRjYszjfmnM+g5Vuj++IT8opGm0kTXuZfuZmQkEiesmQVUwCiEwmDptfxzvZnNJw0EURkPhFNeM4wX+jq2Sd/GwuraluJttBgUDFM6sSpxtzG/qbSpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=JrCm5ppG; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1770042595; c=relaxed/simple;
+	bh=EmdrmrQatIkWYrWc3Tso6zV2W4IPfCbeSJjTG87cs5k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bNwKHkuVqWxlya5V/FSH9T92vqLUoRUbCJWPLd1YNROcRSq8hwVJtHC9h6pZqHFxXK0OL6k2L29r2uQRdxLGiOkMMLOdQq6H4eFopuAr9t5w8oLReHm0J7ojYAE75g9utg0QDZEcef+Wt6sGUSor5SDhaLz6SDWH5EJSOUuj+Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XAa/Rnxu; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="JrCm5ppG"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=H+M5nSsXdUI3mvfDWn0rKtb3gVWDWwlIVIW5xLNTBHE=; b=JrCm5ppG1xHnU4I4avJKwi8R+M
-	zlIPNafZiCb3gmkPLayK74yVNy1C4ekwHiJYKqk4b3sCmOID0I+41Ar2nKk7XRWF/xhmukb4BeCLU
-	neoDrb4dFLQNlvDAPuI6fM7CEgrkV2UMITq4MDKN6vIvKO2TB1jNi2fsf5YlKgfThJgK/Ez+Ms3tM
-	G9gXMgMCRDwgsycST5RYEuF67z9ei2quKKmoqzlqrxfnLELIFAKpw+eQSf052x7MtJMCDPOYfh0Sw
-	I4sa68QFRfoOaF7zUAzvsivUw5LUHt20uuRp2aQFUNp4621iHKuAaDr46bF5CVsQ+bLkT3SQo9ttL
-	AUB6RANw==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99)
-	id 1vmsrh-00000001UUR-3qMi;
-	Mon, 02 Feb 2026 09:17:13 -0300
-Message-ID: <9d1cf884bff0ed167a73f957ded11de2@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: chenxiaosong.chenxiaosong@linux.dev, smfrench@gmail.com,
- linkinjeon@kernel.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
- dhowells@redhat.com, nspmangalore@gmail.com, henrique.carvalho@suse.com,
- meetakshisetiyaoss@gmail.com, ematsumiya@suse.de, pali@kernel.org
-Cc: linux-cifs@vger.kernel.org, ChenXiaoSong
- <chenxiaosong@chenxiaosong.com>, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: Re: [PATCH v3 1/1] smb/client: fix memory leak in SendReceive()
-In-Reply-To: <20260202094906.1933479-2-chenxiaosong.chenxiaosong@linux.dev>
-References: <20260202094906.1933479-1-chenxiaosong.chenxiaosong@linux.dev>
- <20260202094906.1933479-2-chenxiaosong.chenxiaosong@linux.dev>
-Date: Mon, 02 Feb 2026 09:17:13 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XAa/Rnxu"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-501488a12cbso55178141cf.3
+        for <linux-cifs@vger.kernel.org>; Mon, 02 Feb 2026 06:29:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770042593; x=1770647393; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0XFWhnozczQdBY9wOF6c5V46t5MOgQ+lGzwQjjTNU9A=;
+        b=XAa/Rnxud4FgrJ2tug3uvaSccjsKXHQCDQ3L/FdW++C2FV/jwmFBX7zwBYdSGh7d31
+         RDESBc5jX47/lEzObyowh4x+qP9J79h3cDtuznoUUWPvpESSirgUlULMux2HsTS7AeHw
+         iyPZ35htKVo1SDHWY7pA318EReM6WJ77643E0UwowHzRc4b+26QhixZibiWN+kVAm6rg
+         WDNCSg9rgIpvNHhyUwJFdxWeA+KTtD8xc6QoBFoo9NlTzCorwQiiuNLJ7qwKEk1khc2D
+         OLdQx/ixz9DtbCYuGcA2auXdbg6Lkk06aLfv5GjNmjdX+QA9THLLEzkKxwFcFgXcIBtc
+         Wo7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770042593; x=1770647393;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0XFWhnozczQdBY9wOF6c5V46t5MOgQ+lGzwQjjTNU9A=;
+        b=DnAcBCoezh3Ug/ZF1owk9qLsbLMYyuxTQU9zO/W3BK1Ya3/R6xJdywdD7lTT2xftpm
+         iVL8AsVaL95H9xztjgJy7C5k5UJIAjHOHlUey/u92PLx8iD+OoYwipEsq/AH33uFlfxL
+         CrBgQodeTJkWXAfqP7TjUgGdKYngm1MChmHYbmIAuGBrb75F4fyBVW0i1E2IZBfxTX0+
+         m/UqHDVUf9iH052BMihNWbgddAOv7r/MdGEAzwX3R8ZDGoeBLSqj1OuR4zHhFOfz7wmZ
+         0lMv9Bgv96xfbXy2guDANIPulL+iXmVmX6CX1NR+BN3KbbpQW0geV8QSX0yHn/okBwrL
+         nqjA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVvXqcic7QNlnzI/yYSgxqOcgzMoXhhxlyQITJu+qd0z6FJ4eypiPsUhAkDoa58uLb7ryEbfloku3D@vger.kernel.org
+X-Gm-Message-State: AOJu0YxC6tzLVyrak3klQJW6NaLcWriQ1Rno5jz8SNQUpzJ9gIAn3bMl
+	k55e96raOjIvQaWN2yGibHAZSJgOpRK8bdwvWzXBJIRIBBve8mZQsIhL
+X-Gm-Gg: AZuq6aKE2h/ZoTgQvN8oTTqrobid34Fe5jvrZTTOIccqjM6llPqiTJIwHXLVHCqidd0
+	PGvpbpsIvBz/M0J48WUrmF8KlbWt4mZzJGHomdOTOLyUVXA6BOsFziLXX87+DvWcXbH0SxGbWio
+	kNcf9Iw+H6BmbJHlawAbj0tilmN0wPaQ4tEXAUlQ5K0xPlR+Z4pCildGShgURsgdByBhPQmBvjh
+	/iw/lSDYDBxAKhHU4iUOVh7YRLIlcSV71VQihYt14v9B690fsaOYO4qDZJkV/C3maQO/BQyDFMx
+	bd+eE56/oBivdoCHW66dZECc9DW4MSUcaVr74ne0+5BD0JB3+iAb5nlmy6qR1zWu6rmt2agkmJN
+	aunadaKH/piQTTvr0mQ1kAlehZZrMxlg5BkeT0mPB1RRgKiNT+opvfUHp/7ahrMY9SKvDdaxtBI
+	RLa0QHE6uQHvRX5N0vUIz9eEdQMB+wIG9iN1kbcYjAhoMxZ/bIQ8c=
+X-Received: by 2002:a05:622a:110f:b0:4dd:ca89:8d7d with SMTP id d75a77b69052e-505d2288fd0mr169731871cf.56.1770042592748;
+        Mon, 02 Feb 2026 06:29:52 -0800 (PST)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50337ba3981sm106865171cf.16.2026.02.02.06.29.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Feb 2026 06:29:52 -0800 (PST)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	quic@lists.linux.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Metzmacher <metze@samba.org>,
+	Moritz Buhl <mbuhl@openbsd.org>,
+	Tyler Fanelli <tfanelli@redhat.com>,
+	Pengtao He <hepengtao@xiaomi.com>,
+	Thomas Dreibholz <dreibh@simula.no>,
+	linux-cifs@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Tom Talpey <tom@talpey.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Steve Dickson <steved@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Alexander Aring <aahringo@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	John Ericson <mail@johnericson.me>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Jason Baron <jbaron@akamai.com>,
+	illiliti <illiliti@protonmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Daniel Stenberg <daniel@haxx.se>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: [PATCH net-next v9 01/15] net: define IPPROTO_QUIC and SOL_QUIC constants
+Date: Mon,  2 Feb 2026 09:27:27 -0500
+Message-ID: <d774ce5dc1fdb45b2d68b63fed3975da91c1729f.1770042461.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <cover.1770042461.git.lucien.xin@gmail.com>
+References: <cover.1770042461.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-chenxiaosong.chenxiaosong@linux.dev writes:
+This patch adds IPPROTO_QUIC and SOL_QUIC constants to the networking
+subsystem. These definitions are essential for applications to set
+socket options and protocol identifiers related to the QUIC protocol.
 
-> From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
->
-> Reproducer:
->
->   1. server: supports SMB1, directories are exported read-only
->   2. client: mount -t cifs -o vers=1.0 //${server_ip}/export /mnt
->   3. client: dd if=/dev/zero of=/mnt/file bs=512 count=1000 oflag=direct
->   4. client: umount /mnt
->   5. client: sleep 1
->   6. client: modprobe -r cifs
->
-> The error message is as follows:
->
->   =============================================================================
->   BUG cifs_small_rq (Not tainted): Objects remaining on __kmem_cache_shutdown()
->   -----------------------------------------------------------------------------
->
->   Object 0x00000000d34491e6 @offset=896
->   Object 0x00000000bde9fab3 @offset=4480
->   Object 0x00000000104a1f70 @offset=6272
->   Object 0x0000000092a51bb5 @offset=7616
->   Object 0x000000006714a7db @offset=13440
->   ...
->   WARNING: mm/slub.c:1251 at __kmem_cache_shutdown+0x379/0x3f0, CPU#7: modprobe/712
->   ...
->   Call Trace:
->    <TASK>
->    kmem_cache_destroy+0x69/0x160
->    cifs_destroy_request_bufs+0x39/0x40 [cifs]
->    cleanup_module+0x43/0xfc0 [cifs]
->    __se_sys_delete_module+0x1d5/0x300
->    __x64_sys_delete_module+0x1a/0x30
->    x64_sys_call+0x2299/0x2ff0
->    do_syscall_64+0x6e/0x270
->    entry_SYSCALL_64_after_hwframe+0x76/0x7e
->   ...
->   kmem_cache_destroy cifs_small_rq: Slab cache still has objects when called from cifs_destroy_request_bufs+0x39/0x40 [cifs]
->   WARNING: mm/slab_common.c:532 at kmem_cache_destroy+0x142/0x160, CPU#7: modprobe/712
->
-> Link: https://lore.kernel.org/linux-cifs/9751f02d-d1df-4265-a7d6-b19761b21834@linux.dev/T/#mf14808c144448b715f711ce5f0477a071f08eaf6
-> Fixes: 6be09580df5c ("cifs: Make smb1's SendReceive() wrap cifs_send_recv()")
-> Reported-by: Paulo Alcantara <pc@manguebit.org>
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> ---
->  fs/smb/client/cifstransport.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+QUIC does not possess a protocol number allocated from IANA, and like
+IPPROTO_MPTCP, IPPROTO_QUIC is merely a value used when opening a QUIC
+socket with:
 
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+  socket(AF_INET, SOCK_STREAM, IPPROTO_QUIC);
+
+Note we did not opt for UDP ULP for QUIC implementation due to several
+considerations:
+
+- QUIC's connection Migration requires at least 2 UDP sockets for one
+  QUIC connection at the same time, not to mention the multipath
+  feature in one of its draft RFCs.
+
+- In-Kernel QUIC, as a Transport Protocol, wants to provide users with
+  the TCP or SCTP like Socket APIs, like connect()/listen()/accept()...
+  Note that a single UDP socket might even be used for multiple QUIC
+  connections.
+
+The use of IPPROTO_QUIC type sockets over UDP tunnel will effectively
+address these challenges and provides a more flexible and scalable
+solution.
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+---
+ include/linux/socket.h  | 1 +
+ include/uapi/linux/in.h | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index ec715ad4bf25..dc80de8d8c50 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -401,6 +401,7 @@ struct ucred {
+ #define SOL_MCTP	285
+ #define SOL_SMC		286
+ #define SOL_VSOCK	287
++#define SOL_QUIC	288
+ 
+ /* IPX options */
+ #define IPX_TYPE	1
+diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+index ced0fc3c3aa5..34becd90d3a6 100644
+--- a/include/uapi/linux/in.h
++++ b/include/uapi/linux/in.h
+@@ -85,6 +85,8 @@ enum {
+ #define IPPROTO_RAW		IPPROTO_RAW
+   IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
+ #define IPPROTO_SMC		IPPROTO_SMC
++  IPPROTO_QUIC = 261,		/* A UDP-Based Multiplexed and Secure Transport	*/
++#define IPPROTO_QUIC		IPPROTO_QUIC
+   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
+ #define IPPROTO_MPTCP		IPPROTO_MPTCP
+   IPPROTO_MAX
+-- 
+2.47.1
+
