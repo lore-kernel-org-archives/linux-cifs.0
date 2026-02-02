@@ -1,46 +1,48 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BA02D2488
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Feb 2026 12:19:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAB8364EA6
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Feb 2026 12:24:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770034780; cv=none; b=mkv6KpPlckgCF85QFksYk8MiyJajKmsxNbTyYaPqsjhlKwtz7zdcFSQzYlEikjemgc+YcckBRoh2AIzaF3RzdqOSQ+pnTtDxTC6mIlwKQgnnMHeK4sIjv6xfdRQHo0xrKOCg0J9HvaRO3Yy/SUlE8MNXzTlumfI+FDMLQaDx7+Q=
+	t=1770035068; cv=none; b=U6ZaNjDBJmK1nnc/Q968fh6rpjRLoouNppxTLy2IQkDs0iOa8zoNzCN4uxoVO4Di4RgDPP4UZVCIfVbZaZw1Y6F7fIB2V0Ym4bk0RVW42aAwHaWr0Ilouln+tUTVCIC9ScngAAixPInb9xa9RWNCvWAExheJjnfWZl99ZW/4+sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770034780; c=relaxed/simple;
-	bh=Ql/vIBgH6hdKbJr63AlkJ6k7vQw5WXH5XmC2yX7CTLw=;
+	s=arc-20240116; t=1770035068; c=relaxed/simple;
+	bh=XLInijexvCsMsVqbceK+qEJM2ek4Uvx4dGdCJYvK7mE=;
 	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=MRvk4OuafjPtdHx+XralGNrz9Bpv4ddKtUeexlcs5jTsMFXi9ULec+akPkOWCik9WZEJthl+9R5/QpJjCCSi5GsvsrhcyWkLr6m0z9DKSh/XY1yWFn7oOLsoLLGevIyztamHM8Dbn2dgVXl1PxSen4cuhuUNwyy111NW6tsb3d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=azsu6xOP; arc=none smtp.client-ip=143.255.12.172
+	 MIME-Version:Content-Type; b=n5HicwIO0IZAygafrnHwETMZOkXiX8CFwkB5AK7mmh6J7btx6NVRthqFpRjYszjfmnM+g5Vuj++IT8opGm0kTXuZfuZmQkEiesmQVUwCiEwmDptfxzvZnNJw0EURkPhFNeM4wX+jq2Sd/GwuraluJttBgUDFM6sSpxtzG/qbSpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=JrCm5ppG; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="azsu6xOP"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="JrCm5ppG"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
 	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=7wZt4/Ai8P37YICe+qjKpgPRKmTVgnGNoAIuREn/HJA=; b=azsu6xOPGeo3gRzO8cYuIcwx93
-	qhgj11dyJqFLKd70crr4OCDW4QQ8VRXIOAEcJAEBHwwf73L+3164eKVL0pLBsOiQySrRYW1QkGH1j
-	b2PVnJcjP74Di8fBkIBxKJEZuQntHQNUq/SwFzI1h4XDlZGDhyyC7jVSKhRKMFNLwefWYzu5RKuEd
-	+aXojWj5DayhHEfupbQip5TH6gXp1HDkZSA4IKJoF7/GQ2GjHQFQ/30H12UqPpBgXDYdZMgeP7Emy
-	eOn4JWhrYI0Or38pxVoriUpnA/fUts/CL9USZniroi43Ouqab9f62nYFCr8pPKzfLK3aJFUwzum9I
-	RLfekFNw==;
+	bh=H+M5nSsXdUI3mvfDWn0rKtb3gVWDWwlIVIW5xLNTBHE=; b=JrCm5ppG1xHnU4I4avJKwi8R+M
+	zlIPNafZiCb3gmkPLayK74yVNy1C4ekwHiJYKqk4b3sCmOID0I+41Ar2nKk7XRWF/xhmukb4BeCLU
+	neoDrb4dFLQNlvDAPuI6fM7CEgrkV2UMITq4MDKN6vIvKO2TB1jNi2fsf5YlKgfThJgK/Ez+Ms3tM
+	G9gXMgMCRDwgsycST5RYEuF67z9ei2quKKmoqzlqrxfnLELIFAKpw+eQSf052x7MtJMCDPOYfh0Sw
+	I4sa68QFRfoOaF7zUAzvsivUw5LUHt20uuRp2aQFUNp4621iHKuAaDr46bF5CVsQ+bLkT3SQo9ttL
+	AUB6RANw==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99)
-	id 1vmsu0-00000001UV1-2Wqj;
-	Mon, 02 Feb 2026 09:19:36 -0300
-Message-ID: <937b1d368866b9327410af890756ff08@manguebit.org>
+	id 1vmsrh-00000001UUR-3qMi;
+	Mon, 02 Feb 2026 09:17:13 -0300
+Message-ID: <9d1cf884bff0ed167a73f957ded11de2@manguebit.org>
 From: Paulo Alcantara <pc@manguebit.org>
 To: chenxiaosong.chenxiaosong@linux.dev, smfrench@gmail.com,
  linkinjeon@kernel.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
  tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
  dhowells@redhat.com, nspmangalore@gmail.com, henrique.carvalho@suse.com,
  meetakshisetiyaoss@gmail.com, ematsumiya@suse.de, pali@kernel.org
-Cc: linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: Re: [PATCH] smb/client: fix memory leak in smb2_open_file()
-In-Reply-To: <20260201081017.998628-1-chenxiaosong.chenxiaosong@linux.dev>
-References: <20260201081017.998628-1-chenxiaosong.chenxiaosong@linux.dev>
-Date: Mon, 02 Feb 2026 09:19:36 -0300
+Cc: linux-cifs@vger.kernel.org, ChenXiaoSong
+ <chenxiaosong@chenxiaosong.com>, ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: Re: [PATCH v3 1/1] smb/client: fix memory leak in SendReceive()
+In-Reply-To: <20260202094906.1933479-2-chenxiaosong.chenxiaosong@linux.dev>
+References: <20260202094906.1933479-1-chenxiaosong.chenxiaosong@linux.dev>
+ <20260202094906.1933479-2-chenxiaosong.chenxiaosong@linux.dev>
+Date: Mon, 02 Feb 2026 09:17:13 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,16 +53,16 @@ Content-Type: text/plain
 
 chenxiaosong.chenxiaosong@linux.dev writes:
 
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 >
 > Reproducer:
 >
->   1. On server, set the permissions of the shared directory to read-only
->   2. mount -t cifs //${server_ip}/export /mnt
->   4. dd if=/dev/zero of=/mnt/file bs=512 count=1000 oflag=direct
->   5. umount /mnt
->   6. sleep 1
->   7. modprobe -r cifs
+>   1. server: supports SMB1, directories are exported read-only
+>   2. client: mount -t cifs -o vers=1.0 //${server_ip}/export /mnt
+>   3. client: dd if=/dev/zero of=/mnt/file bs=512 count=1000 oflag=direct
+>   4. client: umount /mnt
+>   5. client: sleep 1
+>   6. client: modprobe -r cifs
 >
 > The error message is as follows:
 >
@@ -68,29 +70,34 @@ chenxiaosong.chenxiaosong@linux.dev writes:
 >   BUG cifs_small_rq (Not tainted): Objects remaining on __kmem_cache_shutdown()
 >   -----------------------------------------------------------------------------
 >
->   Object 0x00000000d47521be @offset=14336
+>   Object 0x00000000d34491e6 @offset=896
+>   Object 0x00000000bde9fab3 @offset=4480
+>   Object 0x00000000104a1f70 @offset=6272
+>   Object 0x0000000092a51bb5 @offset=7616
+>   Object 0x000000006714a7db @offset=13440
 >   ...
->   WARNING: mm/slub.c:1251 at __kmem_cache_shutdown+0x34e/0x440, CPU#0: modprobe/1577
+>   WARNING: mm/slub.c:1251 at __kmem_cache_shutdown+0x379/0x3f0, CPU#7: modprobe/712
 >   ...
 >   Call Trace:
 >    <TASK>
->    kmem_cache_destroy+0x94/0x190
->    cifs_destroy_request_bufs+0x3e/0x50 [cifs]
->    cleanup_module+0x4e/0x540 [cifs]
->    __se_sys_delete_module+0x278/0x400
->    __x64_sys_delete_module+0x5f/0x70
+>    kmem_cache_destroy+0x69/0x160
+>    cifs_destroy_request_bufs+0x39/0x40 [cifs]
+>    cleanup_module+0x43/0xfc0 [cifs]
+>    __se_sys_delete_module+0x1d5/0x300
+>    __x64_sys_delete_module+0x1a/0x30
 >    x64_sys_call+0x2299/0x2ff0
->    do_syscall_64+0x89/0x350
+>    do_syscall_64+0x6e/0x270
 >    entry_SYSCALL_64_after_hwframe+0x76/0x7e
 >   ...
->   kmem_cache_destroy cifs_small_rq: Slab cache still has objects when called from cifs_destroy_request_bufs+0x3e/0x50 [cifs]
->   WARNING: mm/slab_common.c:532 at kmem_cache_destroy+0x16b/0x190, CPU#0: modprobe/1577
+>   kmem_cache_destroy cifs_small_rq: Slab cache still has objects when called from cifs_destroy_request_bufs+0x39/0x40 [cifs]
+>   WARNING: mm/slab_common.c:532 at kmem_cache_destroy+0x142/0x160, CPU#7: modprobe/712
 >
 > Link: https://lore.kernel.org/linux-cifs/9751f02d-d1df-4265-a7d6-b19761b21834@linux.dev/T/#mf14808c144448b715f711ce5f0477a071f08eaf6
-> Fixes: e255612b5ed9 ("cifs: Add fallback for SMB2 CREATE without FILE_READ_ATTRIBUTES")
+> Fixes: 6be09580df5c ("cifs: Make smb1's SendReceive() wrap cifs_send_recv()")
+> Reported-by: Paulo Alcantara <pc@manguebit.org>
 > Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > ---
->  fs/smb/client/smb2file.c | 1 +
->  1 file changed, 1 insertion(+)
+>  fs/smb/client/cifstransport.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
 Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
