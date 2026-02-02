@@ -1,126 +1,129 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBCD21D3CD
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Feb 2026 06:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9359221FAC
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Feb 2026 06:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770015019; cv=none; b=rDEwZX29p7luUn0fxejeZr8Xri+ZDG3YcHUTAPQ29vOLg56DY0fV1WhrJDb/S2l1Y2XzhAYb9qpKrNvk9iLzUDPuQGIi/LcXgYqHft0wGm0Goo/8m87TKNw9j4g0c/fEPbCdr1kAnOebSGjP4RiMHpwI6hr+rXa1Hv+XinjXXkY=
+	t=1770015432; cv=none; b=TTlBQF7aS/GY5ho4N1J8j+L6WwQ+ucnXMcmqC0cO92BPPSaCtXWrdq7FnRmY80bfSKxAZqo3LxszSxSosoJPZrvnkBWSiwye6zzpMEHPxW4M+SCMqxZbq8uUgevRQVOplX9YGNjw7bQLkMrjRo9bHnA7STsOgtjQKSRNGGoZPR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770015019; c=relaxed/simple;
-	bh=IM/zlXb8FWlb1TEWYdoVaUzIhieq5S52etee9Zfedw8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SLZd+S+Nebkj31OfqyjbMgzGqkX6UiNSePnpt4vxV/xcBjJ26R4mZOF4f/WiOc+XFPdQQCcVglnwBRx66I5IEvUloV6ZNcNc31BybbTLdGHX3kR+SN9WHrrM28qPKcCN/KfL3XOF3hYZZ/2QQsR6+CMOAMX4tBxK/GKu9s+PYyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sOCiC8nY; arc=none smtp.client-ip=91.218.175.171
+	s=arc-20240116; t=1770015432; c=relaxed/simple;
+	bh=66PW05pBhmyYmyIa17BwxXAe/I387R2NwopiX7V15+k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JK/R7SV+/TbIUplBX4SknZ7aj/j8NshOLk1rSMzbI0gxMEdUiEHf8UzyW2ZgS1EUvUBU8N9icrlCSQmGeixZrRMLy14m0z7cKN/9n/wzAj3qJXxYQxoQAW/Yw5rKr+XPQ8x2lkVLS2w/92YHz+lM36XsOkKAXE06CJAVZeemxvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kpiNKo4s; arc=none smtp.client-ip=91.218.175.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sOCiC8nY"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kpiNKo4s"
+Message-ID: <efe55da5-67cb-47f2-94d8-76fbe9023c99@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770015015;
+	t=1770015427;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=rkP2S3WVu0q6bR000I+40Jp/dIDVayCV2VfvsePZiKc=;
-	b=sOCiC8nYBOWktqrvw+p+6fWIxjnP3k+lsZAVPqEXEXyDeGSPya4qsUfIGLQF4AWy2H/LqG
-	Jq6HP6ZD4apgFO1yTMBbpjI+V7WvGqdvv0B3QPSFonvvjwzxODlmXXoOwhJw0FmU0HQhuY
-	/8CN/R0+AoK5X6YVYypT3/RT7Gckx6M=
-From: chenxiaosong.chenxiaosong@linux.dev
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	nspmangalore@gmail.com,
-	henrique.carvalho@suse.com,
-	meetakshisetiyaoss@gmail.com,
-	ematsumiya@suse.de,
-	pali@kernel.org
-Cc: linux-cifs@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH] smb/client: fix memory leak in SendReceive()
-Date: Mon,  2 Feb 2026 06:49:28 +0000
-Message-ID: <20260202064928.1879323-1-chenxiaosong.chenxiaosong@linux.dev>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Od7qjQ5czU1GIbiVuvSvwzVniaqBkFojrd7As4edaMU=;
+	b=kpiNKo4sM1peiqFzfTjPM9qCh3a8Vgclw/cAuocgg1j+Kr/sz4h0jVoCuer/iUkoN77iJ5
+	wv4VbLtXiPKRnZl/BH0POFO9wxgciW5bSC1yU+4jgRXpvChTV1gulIGcu+YcB4+zNccFM8
+	rPKaDJPkRmL/8Frw+345p8dnC5TJSmk=
+Date: Mon, 2 Feb 2026 14:56:56 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: xfstests failed test cases
+To: Steve French <smfrench@gmail.com>, Shyam Prasad N
+ <nspmangalore@gmail.com>, David Howells <dhowells@redhat.com>,
+ Henrique Carvalho <henrique.carvalho@suse.com>,
+ Bharath S M <bharathsm@microsoft.com>,
+ Meetakshi Setiya <meetakshisetiyaoss@gmail.com>,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>, Paulo Alcantara <pc@manguebit.org>,
+ Steve French <sfrench@samba.org>, Enzo Matsumiya <ematsumiya@suse.de>,
+ =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, linkinjeon@kernel.org,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+References: <CAH2r5mv41nFwJQwszD82MQbtDV75zVy6=tbwqxDTOsw2hwfBpw@mail.gmail.com>
+ <CANT5p=qmo_KORMQbnjonapAaGHq=UvWAMzR0jNKBBvx3UUkyjQ@mail.gmail.com>
+ <CANT5p=pfQE2A++j6W4sEudrSLH6ct=ho4i=k2ZDEecUAX0cReg@mail.gmail.com>
+ <CAH2r5mvakK7=1i-fZTE9hLLYd_Q3o5z557vQZ5QQtdOTkZeSew@mail.gmail.com>
+ <CAH2r5mufJgC85ULoVzYSMXDq4=-RUiJ2YgppM434vz1Q4B1d+A@mail.gmail.com>
+ <CAH2r5msVifsc-E0TjaYXt2Afh1MiCsJTSwMnsDAdUShRgkJ_4A@mail.gmail.com>
+ <CAH2r5mukVmnfK7X3jXWwRnD-_RAMuUgzXpi+HzNjxOat4tobJA@mail.gmail.com>
+ <CAH2r5mvW23-eUsjDQ_0oLrmj406Og5sDs-yPgqh6jPwdSEG+Tg@mail.gmail.com>
+ <CAH2r5mu909vLwAQcKFQX7cWz421V1QmSiBAKyJeC8gUcGVb0Ew@mail.gmail.com>
+ <bcd3d847-c38f-4c88-af07-3da09dad476b@linux.dev>
+ <f1b9cd58-8a61-4fa7-a7e9-198c2c468c59@linux.dev>
+ <9751f02d-d1df-4265-a7d6-b19761b21834@linux.dev>
+ <d6a9cf34-e4ec-4792-afb0-5d7a39b46378@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
+In-Reply-To: <d6a9cf34-e4ec-4792-afb0-5d7a39b46378@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+I have submitted another patch to fix the SMB1 kmemleak issue: 
+https://lore.kernel.org/linux-cifs/20260202064928.1879323-1-chenxiaosong.chenxiaosong@linux.dev/
 
-Reproducer:
+Thanks,
+ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-  1. server: supports SMB1, directories are exported read-only
-  2. client: mount -t cifs -o vers=1.0 //${server_ip}/export /mnt
-  3. client: dd if=/dev/zero of=/mnt/file bs=512 count=1000 oflag=direct
-  4. client: umount /mnt
-  5. client: sleep 1
-  6. client: modprobe -r cifs
-
-The error message is as follows:
-
-  =============================================================================
-  BUG cifs_small_rq (Not tainted): Objects remaining on __kmem_cache_shutdown()
-  -----------------------------------------------------------------------------
-
-  Object 0x00000000d34491e6 @offset=896
-  Object 0x00000000bde9fab3 @offset=4480
-  Object 0x00000000104a1f70 @offset=6272
-  Object 0x0000000092a51bb5 @offset=7616
-  Object 0x000000006714a7db @offset=13440
-  ...
-  WARNING: mm/slub.c:1251 at __kmem_cache_shutdown+0x379/0x3f0, CPU#7: modprobe/712
-  ...
-  Call Trace:
-   <TASK>
-   kmem_cache_destroy+0x69/0x160
-   cifs_destroy_request_bufs+0x39/0x40 [cifs]
-   cleanup_module+0x43/0xfc0 [cifs]
-   __se_sys_delete_module+0x1d5/0x300
-   __x64_sys_delete_module+0x1a/0x30
-   x64_sys_call+0x2299/0x2ff0
-   do_syscall_64+0x6e/0x270
-   entry_SYSCALL_64_after_hwframe+0x76/0x7e
-  ...
-  kmem_cache_destroy cifs_small_rq: Slab cache still has objects when called from cifs_destroy_request_bufs+0x39/0x40 [cifs]
-  WARNING: mm/slab_common.c:532 at kmem_cache_destroy+0x142/0x160, CPU#7: modprobe/712
-
-Link: https://lore.kernel.org/linux-cifs/9751f02d-d1df-4265-a7d6-b19761b21834@linux.dev/T/#mf14808c144448b715f711ce5f0477a071f08eaf6
-Fixes: 6be09580df5c ("cifs: Make smb1's SendReceive() wrap cifs_send_recv()")
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/client/smb1transport.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/client/smb1transport.c b/fs/smb/client/smb1transport.c
-index 0528c1919961..0b8b852cfc0d 100644
---- a/fs/smb/client/smb1transport.c
-+++ b/fs/smb/client/smb1transport.c
-@@ -252,13 +252,15 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	rc = cifs_send_recv(xid, ses, ses->server,
- 			    &rqst, &resp_buf_type, flags, &resp_iov);
- 	if (rc < 0)
--		return rc;
-+		goto out;
- 
- 	if (out_buf) {
- 		*pbytes_returned = resp_iov.iov_len;
- 		if (resp_iov.iov_len)
- 			memcpy(out_buf, resp_iov.iov_base, resp_iov.iov_len);
- 	}
-+
-+out:
- 	free_rsp_buf(resp_buf_type, resp_iov.iov_base);
- 	return rc;
- }
--- 
-2.52.0
+On 2/1/26 4:14 PM, ChenXiaoSong wrote:
+> I have already submitted a patch to fix this issue: https:// 
+> lore.kernel.org/linux-cifs/20260201081017.998628-1- 
+> chenxiaosong.chenxiaosong@linux.dev/
+> 
+> Thanks,
+> ChenXiaoSong <chenxiaosong@kylinos.cn>
+> 
+> On 2/1/26 2:30 PM, ChenXiaoSong wrote:
+>> Steve and I have completed a git bisect and found the first bad commit:
+>> [e255612b5ed9f179abe8196df7c2ba09dd227900] cifs: Add fallback for SMB2 
+>> CREATE without FILE_READ_ATTRIBUTES
+>>
+>> For detailed information, please check the link: https:// 
+>> chenxiaosong.com/en/smb-buildbot.html#cifs-103-bisect
+>>
+>> Thanks,
+>> ChenXiaoSong <chenxiaosong@kylinos.cn>
+>>
+>> On 1/29/26 8:20 PM, ChenXiaoSong wrote:
+>>> I found the key factor that triggers kmemleak in cifs/103, the 
+>>> directory exported by the server must be read-only.
+>>>
+>>> When sharing a folder on Windows, do not check "Allow Change", set 
+>>> the permissions of the shared directory to read-only.
+>>>
+>>> Alternatively, `smb.conf` of Samba is configured as follows:
+>>> ```
+>>> [test]
+>>>      ...
+>>>      read only = yes
+>>> [test2]
+>>>      ...
+>>>      read only = yes
+>>> ```
+>>>
+>>> For detailed information, please check the link: https:// 
+>>> chenxiaosong.com/en/smb-buildbot.html#cifs-103
+>>>
+>>> I will first try to analyze the code, and if that doesn't work, I 
+>>> will try to bisect it.
+>>>
+>>> Thanks,
+>>> ChenXiaoSong <chenxiaosong@kylinos.cn>
+>>>
+>>> On 1/28/26 23:29, ChenXiaoSong wrote:
+>>>> I have reproduced the failures of these test cases. For detailed 
+>>>> information, please check the link: https://chenxiaosong.com/en/smb- 
+>>>> buildbot.html (I will ensure this link is always accessible).
+>>>>
+>>>> Perhaps sending these issues to the mailing list could help resolve 
+>>>> them more quickly.
+>>
+> 
 
