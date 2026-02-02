@@ -1,34 +1,34 @@
-Received: from n169-114.mail.139.com (n169-114.mail.139.com [120.232.169.114])
+Received: from n169-111.mail.139.com (n169-111.mail.139.com [120.232.169.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33001B4F1F;
-	Mon,  2 Feb 2026 03:17:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.114
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6241E2222B6;
+	Mon,  2 Feb 2026 03:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770002248; cv=none; b=erYaIOGIgUevIAngTfQms6LkOzJuMoomxYuZquadNPw6X57cCXzr+JO19I2LrnLGGWq0hllyc168Y1HvFjgEru7yMXd4EP040IcY/0rmUCmi5tJHsurFzuQ+tbZQvPzCWcbzVVaXNHp/RtS3U+h0njdWAKIaySk9FP14TUWciXg=
+	t=1770002274; cv=none; b=bhWtIGBzKSlBUWeD/4AYrpaFvrSmc359x3ZV5XK8A6q5PXBVNkW8G6vD2PlskDlUZXpeoMnDCt+tiu02ZLwhjzUyvjYjz3DNrmTmSHNyh7RBjDTbbD3Ie7jPJB1zYRAYGkxsHYIEY48NMUW48Sv3PaiRLxjZ5psxLHUGn6rawQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770002248; c=relaxed/simple;
-	bh=HMsz3kpyciQy5v9iuqnMxlhI16+FIExlcxR4iWeJkB8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JCBL7YhYN+1qe3osOCHjYQUk/3xhUrAsa+CrHn6sudz4gltIF3pQwO2kv7xgdT2Jv6IuJ/5lsGUgwOuZL8CQ/1XGsBqZC3BgVuuSFeMlCKCBzjb+hGxQKoZjQSRJisTfq9cCeUY5ZbD7cw1mMh9+Zn8Eyt5FBww65z50xI0aB78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=md2EZToZ; arc=none smtp.client-ip=120.232.169.114
+	s=arc-20240116; t=1770002274; c=relaxed/simple;
+	bh=MDzVHM7YROuf++46Vk38xpKbYu6aOucltD4Ht1ZlJPA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pR5VjG5XOl9zUre/yp3rrjBhwSYWEa0PdztlISHUc8TpG4oQ5dt0ZF08fhMGnait/v+kVe12HcrqTK+vENvt72x/DdaDg7jAyLVRkD6lql8XniE9zZSaboR62iaYJR9W0crm2CXNH7OvDjFvk46f0YXI0FtAq4wfVwcH43axLkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=1UZ7UKEs; arc=none smtp.client-ip=120.232.169.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="md2EZToZ"
+	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="1UZ7UKEs"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=139.com; s=dkim; l=0;
 	h=from:subject:message-id:to:cc:mime-version;
 	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=md2EZToZK87j0vas3ttn5WXJcRLuJA1Hart0GcbtKkF9IMp7bPzBHy2YouabBX1q/W5GtjwfN9G9F
-	 FDjymZczJSc6zCsBppyKbeWUi1XnjoIiow8y2npKJM+2AncXLrDrRw6UPCR29GXhhMwGGy79ttQJiY
-	 UbyV0iBfSCJfDfKo=
+	b=1UZ7UKEsBJ7jBuzBISnwejmv8U3BONhplW9EGsR4Lzt2keA7ZCVhKBtQz9n0LUetDOHl9EekCHbp3
+	 tA5YkapFt+FsYPfyOJY/FVA28nOBSVvpL4mBZzPBSVyyZt9IyLCW1sPhMJR4dtNXBcWOBm5JwxoSgo
+	 5IQvkWuxJ8FYCbj8=
 X-RM-TagInfo: emlType=0                                       
 X-RM-SPAM:                                                                                        
 X-RM-SPAM-FLAG:00000000
 Received:from NTT-kernel-dev (unknown[60.247.85.88])
-	by rmsmtp-lg-appmail-37-12051 (RichMail) with SMTP id 2f13698017857e9-01807;
-	Mon, 02 Feb 2026 11:18:32 +0800 (CST)
-X-RM-TRANSID:2f13698017857e9-01807
+	by rmsmtp-lg-appmail-10-12088 (RichMail) with SMTP id 2f38698017359d3-019f4;
+	Mon, 02 Feb 2026 11:17:11 +0800 (CST)
+X-RM-TRANSID:2f38698017359d3-019f4
 From: Li hongliang <1468888505@139.com>
 To: gregkh@linuxfoundation.org,
 	stable@vger.kernel.org,
@@ -43,9 +43,9 @@ Cc: patches@lists.linux.dev,
 	set_pte_at@outlook.com,
 	linux-cifs@vger.kernel.org,
 	stfrench@microsoft.com
-Subject: [PATCH 6.1.y 2/2] ksmbd: Fix race condition in RPC handle list access
-Date: Mon,  2 Feb 2026 11:17:11 +0800
-Message-Id: <20260202031711.515125-1-1468888505@139.com>
+Subject: [PATCH 6.6.y] ksmbd: Fix race condition in RPC handle list access
+Date: Mon,  2 Feb 2026 11:17:39 +0800
+Message-Id: <20260202031739.515222-1-1468888505@139.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -94,7 +94,7 @@ Signed-off-by: Li hongliang <1468888505@139.com>
  1 file changed, 17 insertions(+), 9 deletions(-)
 
 diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
-index 2603f7dcea58..89ae52e03858 100644
+index 450a9f8ca7c7..5986d6d0a90b 100644
 --- a/fs/smb/server/mgmt/user_session.c
 +++ b/fs/smb/server/mgmt/user_session.c
 @@ -104,29 +104,32 @@ int ksmbd_session_rpc_open(struct ksmbd_session *sess, char *rpc_name)
