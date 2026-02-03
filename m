@@ -1,38 +1,38 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E70342CA2;
-	Tue,  3 Feb 2026 15:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E55E3ACA78
+	for <linux-cifs@vger.kernel.org>; Tue,  3 Feb 2026 15:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770132340; cv=none; b=QH2NKRaTXjKTlq+l0iCqTyArlc/pOZsRHeKkFf8Urn9ig71UQjy5TByu9mLdP9y29mzeo3KV5L/3eNajpKgblgGq7in/jf0OVo3pr+ge4P1s4aPleEB1wSDQJhSQDWoYhhxNxURPU1H+Rumqnz2vj9b9UTdabdF9FMgMJ47oPgQ=
+	t=1770132884; cv=none; b=rThNaBFd7q3qJgWq5Lr1hdoxf0g0I0w9rG1DK+CZIipe7dTiQB2yEicPuturXGuAFmkBwLzRaixS1NyejPTCy0RP2D8UdB2Fv6yRzh6JBEdaA05FHKaQxaFTowzOxzUBazDTh2UeaUMpCoesaFg5ctrYxU+fjjgRd+bzyVrZV9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770132340; c=relaxed/simple;
-	bh=KpGFY1EFgTT3YdURkqZOy0mTfB/EVBem959UAQ9tkt4=;
+	s=arc-20240116; t=1770132884; c=relaxed/simple;
+	bh=TGaje7OyYxCAGf1IpBxS10iopHRuh7D9j8scJzYcMZc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gmWfMykkniD+FrwYTOBgFFddTbi0jSlLxFurX3pHj6pP2XdwWxLgs3ED8MIoff0LqZ1qTW5+Gg9h9x6K1SF+nanGXAg35t7mYvayH5stt2wkMCFljqL8+yRbT85baqVxcwsKvCw4WUTWtEAwEEL2XcUVpFArXuKo5C1nFXWkmgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=zuU8wOxT; arc=none smtp.client-ip=144.76.82.148
+	 In-Reply-To:Content-Type; b=ghw4Iqt8cUJhK+Uz7TGiJ7xF88Bv4Hi7ccE+/zAkjz0CcdQDw9KShc9BoHjUdH3dZ0G4z9E3n20+du8PCAmPb5q2aaQIGWWH2uSkFrW4P+PGTiv5KZBPH9mvAUsFKDA9sVk38lOwy5DZ/o+WJx72cutOWpT/aNYpO8PVgjwYmX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=bFAjElFi; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="zuU8wOxT"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="bFAjElFi"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=07aq2coEtVTvd2jUGzI08ZhoY3HMK59angzAN6vqB8k=; b=zuU8wOxT5mrtBVCwJZq2dcoCeR
-	pOnKC1haIrejgsE4oOG2easo7df2AUzoATjjsF1tBDd62+zcaTyLqm6BxnRIRke1i9+BMxu23AR5r
-	Fz4XycDldouWTJ+SNKfbulFLGwn2Zc9jYICKO6APBh7cA/N0psjzlxOSUtSACEtfKbjm5fb5YZk5j
-	wUg2gSN1VV2UBaIeqOQdgG8ytD9vMQORZTqWe2Fn7XCGYz6bot19hMVGOPmVkGXT5nzqmL1/msHfn
-	L8udJZZg8KQ7Aif57rfeMO7VGlh3jhdbHKxFOqfuYH0UfKZVYcRSw1//fTiOAC+6XTzAyUtfzh1u1
-	jT3kzlk5X6Wv/0PcwCS1oulmuw4WRRe41R+QSYliKW+rvE+JhGD2bR0MzJL6rOH/dwVcrlvoAgZb9
-	oZYpIwPqyXxvZMtqD+0dZvgfHQVniasQCMWutq42i49q+0sTkFsSemy6pntuWVAjdsdxEARxoT6WD
-	/G37smQxvfrxpXGfFiBKU74M;
+	bh=zOK8Z4aogisOi5gxd4CyoR5qgb8OCMTjCkj6yAjfp7I=; b=bFAjElFibiRlpBiMOhwsb845LV
+	/wtrbZgsIk2G6C2+Cr+PDkc+0i1HTOKbLP96JcX/dmIKBbmuD49x/LIvHmL1flsqt1UTrilg9EylM
+	Fl1tiin1nVYRsyteVaJCUDqB0NkL3w7UPan3tch+dlr3O20ArHcZKBv1IhStZ3pHVZ6uZiK3gszLO
+	Y8MpafEzmqxI6dZo6P0NJL7+U7gjMIFNd+u/nRbieXE4fl7Vh7Lo/2ne0AA9SZAKWfgGgwD2nGKEW
+	qsUHL9/dDBlz9p/3BcUpGrJWKhG9hVNPOI+AMR5t3R4kJFC8mFNq3b4VsTU7mJFzn7jjoqGjbdS1D
+	fde3SOlFkWGwxvKSv6S/4PY12wJlAkHvAYEJuEKjdobHh9ycWF6Ulr0LbXXJLLwzUUw6mLcDVNgZp
+	M4ZkCG9WpPcwrl817Q+xPdUpTnJJNb97p///CmAf/K9iULRUZr3jpnAzv987XEqPAyJFVWHA1VZgC
+	HfxBAwzxxSRMAj81K9bYJehr;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1vnIHX-00000003y9q-47yu;
-	Tue, 03 Feb 2026 15:25:36 +0000
-Message-ID: <1f77a9a6-9020-4d65-a6b9-fe68d4f6e46f@samba.org>
-Date: Tue, 3 Feb 2026 16:25:35 +0100
+	id 1vnIQK-00000003yKc-27IT;
+	Tue, 03 Feb 2026 15:34:40 +0000
+Message-ID: <68046261-f2d9-49a2-92ea-9c7abb97cd5e@samba.org>
+Date: Tue, 3 Feb 2026 16:34:40 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,84 +40,69 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/3] RDMA/smbdirect: introduce and use
- rdma_restrict_node_type()
-To: Leon Romanovsky <leon@kernel.org>
-Cc: linux-rdma@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, Jason Gunthorpe <jgg@ziepe.ca>,
- Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
- Long Li <longli@microsoft.com>, Namjae Jeon <linkinjeon@kernel.org>
-References: <cover.1769025321.git.metze@samba.org>
- <20260128141123.GG40916@unreal>
+Subject: Re: [PATCH] smb: common: add header guards to
+ fs/smb/common/smb2status.h
+To: Steve French <smfrench@gmail.com>, David Howells <dhowells@redhat.com>
+Cc: Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org
+References: <20260203152012.914137-1-metze@samba.org>
 Content-Language: en-US
 From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20260128141123.GG40916@unreal>
+In-Reply-To: <20260203152012.914137-1-metze@samba.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Am 28.01.26 um 15:11 schrieb Leon Romanovsky:
-> On Wed, Jan 21, 2026 at 09:07:10PM +0100, Stefan Metzmacher wrote:
->> Hi,
->>
->> for smbdirect it required to use different ports depending
->> on the RDMA protocol. E.g. for iWarp 5445 is needed
->> (as tcp port 445 already used by the raw tcp transport for SMB),
->> while InfiniBand, RoCEv1 and RoCEv2 use port 445, as they
->> use an independent port range (even for RoCEv2, which uses udp
->> port 4791 itself).
->>
->> Currently ksmbd is not able to function correctly at
->> all if the system has iWarp (RDMA_NODE_RNIC) interface(s)
->> and any InfiniBand, RoCEv1 and/or RoCEv2 interface(s)
->> at the same time.
->>
->> And cifs.ko uses 5445 with a fallback to 445, which
->> means depending on the available interfaces, it tries
->> 5445 in the RoCE range or may tries iWarp with 445
->> as a fallback. This leads to strange error messages
->> and strange network captures.
->>
->> To avoid these problems they will be able to
->> use rdma_restrict_node_type(RDMA_NODE_RNIC) before
->> trying port 5445 and rdma_restrict_node_type(RDMA_NODE_IB_CA)
->> before trying port 445. It means we'll get early
->> -ENODEV early from rdma_resolve_addr() without any
->> network traffic and timeouts.
->>
->> This is marked as RFC as I want to get feedback
->> if the rdma_restrict_node_type() function is acceptable
->> for the RDMA layer. And because the current form of
->> the smb patches are not tested, I only tested the
->> rdma part with my branch the prepares IPPROTO_SMBDIRECT
->> sockets.
->>
->> I'm not sure if this would be acceptable for 6.19
->> in order to avoid the smb layer problems, if the
->> RDMA layer change is only acceptable for 7.0 that's
->> also fine.
->>
->> This is based on the following fix applied:
->> smb: server: reset smb_direct_port = SMB_DIRECT_PORT_INFINIBAND on init
->> https://lore.kernel.org/linux-cifs/20251208154919.934760-1-metze@samba.org/
->> It's not yet in Linus' tree, so if this gets ready
->> before it's merged we can squash it.
->>
->> Stefan Metzmacher (3):
->>    RDMA/core: introduce rdma_restrict_node_type()
->>    smb: client: make use of rdma_restrict_node_type()
->>    smb: server: make use of rdma_restrict_node_type()
->
-> The approach looks reasonable.
+Hi Steve,
 
-Thanks!
+this is on top of your for-next branch as it depends on this
+patch from David:
 
-> Do you want me to take it through RDMA
-> tree?
+cifs: Label SMB2 statuses with errors
 
-As I also have other smb patches on top changing/using
-it I guess it would be easier if Steve would take them.
+While there I found that this patch:
+cifs: Autogenerate SMB2 error mapping table
 
-Steve, Leon what do you think?
+Generates this error:
+client/smb2maperror.c:55:60: SPARSE: error: restricted __le32 degrades to integer
+David can you check?
 
 Thanks!
 metze
+
+Am 03.02.26 um 16:20 schrieb Stefan Metzmacher:
+> This will allow it to be included multiple times without problems,
+> that's needed for the smbdirect move to common code.
+> 
+> Cc: Steve French <smfrench@gmail.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: Long Li <longli@microsoft.com>
+> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: linux-cifs@vger.kernel.org
+> Cc: samba-technical@lists.samba.org
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+> ---
+>   fs/smb/common/smb2status.h | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/fs/smb/common/smb2status.h b/fs/smb/common/smb2status.h
+> index 3b86dbf8c369..b6421bc5113c 100644
+> --- a/fs/smb/common/smb2status.h
+> +++ b/fs/smb/common/smb2status.h
+> @@ -9,6 +9,9 @@
+>    *
+>    */
+>   
+> +#ifndef FS_SMB_COMMON_SMB2STATUS_H
+> +#define FS_SMB_COMMON_SMB2STATUS_H
+> +
+>   /*
+>    *  0 1 2 3 4 5 6 7 8 9 0 A B C D E F 0 1 2 3 4 5 6 7 8 9 A B C D E F
+>    *  SEV C N <-------Facility--------> <------Error Status Code------>
+> @@ -1782,3 +1785,5 @@ struct ntstatus {
+>   #define STATUS_IPSEC_CLEAR_TEXT_DROP		cpu_to_le32(0xC0360007) // -EIO
+>   /* See MS-SMB2 3.3.5.4 */
+>   #define STATUS_SMB_NO_PREAUTH_INTEGRITY_HASH_OVERLAP cpu_to_le32(0xC05D0000) // -EIO
+> +
+> +#endif /* FS_SMB_COMMON_SMB2STATUS_H */
+
