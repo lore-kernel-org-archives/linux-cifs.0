@@ -1,126 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE31223DC9
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Feb 2026 22:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770159547; cv=none; b=SPn8RKwTGZc52je8WcfsEiwAF/E56f0U7ogBFUGOXRt/QdCzl/9TyIt91lg1TIxBkMbbfbkNrJw5WhDbTu3Jsq9KMdQj8OuolFNeXBsXunxaWVVwEjr+rD8B2pmRU6nFYFl1cur8WVuZuK3FUvmdcrdoRxsfoUA0dWoYIx+Zulo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770159547; c=relaxed/simple;
-	bh=tJNadpiFM50O70Wa/xME6qyZkIQ571lLqhqsljcE//s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u5/YW3J7oUUE9aqP/2yji1JYx3WcjTI4qBabxLoVGau14wTeY1gDaFJIxkq372ZpmJ4kvcICiOBHDWeCXssN+Nk3F2vWUwnYuir9/ttCJFxR1eTwGZQ90c5TYF/iZI7GgQMeDbbXl3spLasU9LqAu245CgxUWTSh2cZ+sakhTzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AqwgUlF/; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00F749620
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Feb 2026 00:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770164050; cv=pass; b=YlfJEHfsy4DR1f3d08L1KeGPlrkghL4z5BnZZ69zMxF5tVX6X0RY74u8GTh9CZrsrdXCdPkWFT1E0mSnW/qrB34HqsP2fN62PJniR+gLxZSiesqYJ9Yj7ERSmVdGm/C4/npYZ3FheUvm/Q3Evd3vZv+/Ig8o/0y2xsESuqRiZkM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770164050; c=relaxed/simple;
+	bh=uGiOKCRWfH/9tHeO8JA5iwxmIeC7MAPeGyQXc64CXyE=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=o+/nNdWcae1vTSprn1Vxbs1hmE1UcOYfpUoz/KJGnalHA/SFUrKK0459QF0ToQf6uu723AZ/0gVcnzKZbBAnEYl+E33CFmyKz4goU5UABCSPvK3/yz/fLr5W2TyqjeEC3Ee3S9q+aLWdLAWOxfnnHU0oc02n/s4W6AywoxIc5H0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iHwSqiFw; arc=pass smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AqwgUlF/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7F61C4AF0B
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Feb 2026 22:59:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770159546;
-	bh=tJNadpiFM50O70Wa/xME6qyZkIQ571lLqhqsljcE//s=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=AqwgUlF/wVShQbmJtrZJ3WLq/OV3bTA7D2dkMjFZe7PJewiemClCJ9fBY4uLa5lvx
-	 Nlud1I9Nx0cID63r3SMYDWwMGhRhD2HohuzyWBISEjlIeQiyum/V2wV29+nEfvOAwy
-	 X7iImRKP1gmYl1iZhazJoi33jrcnWZWOROdSCt/nttMYWI+dJlZ75uY/ze2BUAgDgm
-	 HcGtqbamfOjVmkZpNrBEV75hb6XI6HaYJcae/nA2wQ5VqAg/cLv1rTI1WLuzhrLyhT
-	 vxrpRvzFb1oiSsNwCeIm4S/pX2TmATAYbC53355OWVtHuW5Y5l8kc1iCCOTZWHWdqs
-	 OQZ6SBi3+gYlg==
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-658f1fde4bfso477236a12.1
-        for <linux-cifs@vger.kernel.org>; Tue, 03 Feb 2026 14:59:06 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXrcZ0ZJwio8KhWrJwL9En9jabBkkBqc87igbcw/X0kUers9Ljcqc4LLyzSpD+k7Xye1NAileJ1fFuh@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkCVX2BjWYz82N3Ir0QoqvdT3MUeZLv5Igy4d3Tlupjprs4XaZ
-	sVYbW5F27D1rVTToWblVNbVl8aC5UpyQG1rNwuEzl3KeXr9Nn+uEF24sGfxDxSBwOjz+F66q63p
-	RzLEbVdzSPWKzAwxH/kbga7eL4WgvkM0=
-X-Received: by 2002:a17:907:971b:b0:b87:85f:4598 with SMTP id
- a640c23a62f3a-b8e837d96bbmr290314266b.14.1770159545347; Tue, 03 Feb 2026
- 14:59:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iHwSqiFw"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-88888c41a13so79260366d6.3
+        for <linux-cifs@vger.kernel.org>; Tue, 03 Feb 2026 16:14:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770164044; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Dog+qvrysJdXMAo0rm6COLqwPeWR2lraHzChXmhldFD2YIUPo/i6Kcf1RMMTsGg57L
+         nVBZTDC9aNtHU6M4RQMLyJsPG/Icx8nLjZ//4t+gb7m9LaajpSnBXw1suPAyvgCTVDA9
+         Gf7Nn+fmuslzm9kCryuZWacGMQndaG6Hir/zMN8Q2JqUxOu31aDeTTxj0doTGvvI/wZS
+         KhClDcEIWk30V3bhZj0E4VLIfqCg6GnSm4npdX61mLvKUbaVapuU2H4qQb7zKAhw5SOB
+         wEiW1jDHh+8IUpnJThugWH8ahOFA0ok2KGN3d172hUZMfoibBN2mPzRUH18lxIMQEnSz
+         Nh3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=a3AAjoBFTodYV/D5OWB3BRynbF+lKZvNt0SqMCyfKh0=;
+        fh=Nf1mvuQ9XbZKOmPhacDz1X5aHl0t82a+aHbY+2n4zlg=;
+        b=JJxUXgNyAuQWAz8F2d3a+W7e3Py0XGwBK12pKFMtWwmiXoaM79Dl5mb37HU7zlgmbR
+         d8yYE3aK4p9KzKAS6uZ5M5ZbmuO/I9pGRyTY1DCLazfQnqlfhzDqWHUkyAwihWboP4r6
+         QpaP17yBGXhJEu36pam7r0A7ebEsznS/SB73mqpuLqwPnOZmV245KWsAs/oOW2Ptd54p
+         ujkv2bJupVF0Y2iM72ZtU+7ANU+S9BCzepWyk5I4uwKI5jfp6os3f+Nd07X7qHmpp++u
+         a/4P9ujFfK+/2AoaEQrd2rismkwJFU5hO4/YGeuwNu6+Zg3SBeI4r25RY0CkRdB6ha4Y
+         epTg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770164044; x=1770768844; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=a3AAjoBFTodYV/D5OWB3BRynbF+lKZvNt0SqMCyfKh0=;
+        b=iHwSqiFwfm9FfwjsejE+Bynld/qv1qA5WMeibwR78nLFJD1sdIoEhYDMmAuZdKpbVJ
+         UX3RDkHVeAQvxcb7NTdQ+bss+j9Xc0PyjiXZU9YvpMeIa/o5cPGcwZwo9RlSYMd8cbak
+         jGTUpe7/sWUUQp+1AHD1Qllz6YiIDmwnMAEt7rKRF0aGPdKFQ2aX3kFEQyMeFLXD20Ad
+         h70wSqHWgkRb2pyrKKeWvggG+9dyPd0xtMWXDzVqFJu9Fo/8PPcb0Ei9bVBySMwnpMJ2
+         7dU5NoSlXYwUyW9GgKl2wEATSBZLrr0kxE+B/2BNhaEPgVDI++orGy31Th0Optbu/xKW
+         YNGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770164044; x=1770768844;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a3AAjoBFTodYV/D5OWB3BRynbF+lKZvNt0SqMCyfKh0=;
+        b=vhFvFPB4+U8S173R4ZXjh2ADQ1XtG6m7gGlFbeYa6Bq7tbFT6/VgdALasD9BqBrlE2
+         w0yXmsB/1eOldX1LIiTubjV2LKeZfqxZE7B7NXtQIeKUfkNzRpG5g24wDuqtpDs5DsGb
+         mvNeNrj7Rcerr2DTIDSHPx1kzMqMFShuN+WgNnhzMSPLO0CCCaaSpaI9qGI7usIbWzB4
+         Qm8WkIyc+TvKml2aKUcCekS7hMdP3tS6X5pWsfeVjDZi23EeP6j+Pz/ifmX130XC6Sy8
+         bbzaT8n4/+MS1jHhU4+6JlARYb72ewiLRDOpuSNKuQnf1WRRPKftPyLTS9ZOmChbDkxp
+         5ReQ==
+X-Gm-Message-State: AOJu0YzTbIpnM4wrP2TFcmDOBUDH2Y4ABwaLepjQHB9P9O/sT3RKtzyH
+	sSHBtevI+qI6h2+FRgXzNhm3UaxtPEyMfRGq2CTLaYHd/eY597hIyLOL++45GXsL5ePBfCEhJCw
+	neVKX5LeNqliqWJtxoCpFO5TvzL6urZ8=
+X-Gm-Gg: AZuq6aLys7kNnUc9MBaVR7hHGvdrsNB0K9Kb4uYWnopczRMkMTHGQlrSHfMosKPuw7s
+	3hVr/swxiWP8ZySvODcUex2zwh1+7UkB4ziZHFaHQk7iI+nl+leYJY5UKCN5aA06e0BC6OiKHax
+	vOKuC1/nTU6i3W7TH3kvMCqxF5TkSjvmsDPPKbLoIXU9Mf5PY1rl1rzkh9913BhAjk2lU1jWSmY
+	FWER4Tw3aOfXTfHaKkKCaH34H93s3/B0z3RA7qSjr9em7PkldMwP8JePW44s5t78BRfcLHU6ZNY
+	7ZGFGVGDjBjQe6WPZNiriC7z9jmRQTxNxGJyXUUtdjLCbWRYY8fFyN5SsfAG4g+5M1wDFJNllkq
+	6k/AbQd0k3Nnp1vIi/uQzsIEoyBG4esWY0adN6PuNtVAKgMJmpw==
+X-Received: by 2002:a05:6214:f24:b0:894:7852:9bdf with SMTP id
+ 6a1803df08f44-8952211bc25mr17389686d6.16.1770164044012; Tue, 03 Feb 2026
+ 16:14:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1769025321.git.metze@samba.org>
-In-Reply-To: <cover.1769025321.git.metze@samba.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 4 Feb 2026 07:58:52 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-eyYhh9E2zkiraJX0ihct=yEpx-tgQvpAJ0fK+q1oUQQ@mail.gmail.com>
-X-Gm-Features: AZwV_QiaxFV2_vq5ig4lbGmwCExyMJg3gUgo8OLH5hhxOtefqrfin2SeP-FVFIQ
-Message-ID: <CAKYAXd-eyYhh9E2zkiraJX0ihct=yEpx-tgQvpAJ0fK+q1oUQQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] RDMA/smbdirect: introduce and use rdma_restrict_node_type()
-To: Stefan Metzmacher <metze@samba.org>
-Cc: linux-rdma@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>, 
-	Long Li <longli@microsoft.com>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 3 Feb 2026 18:13:51 -0600
+X-Gm-Features: AZwV_Qhxn41M54xaHij0Xmtlzf0sE7cDHHibJ468GfNsDM0F5YY8sIpwq1x2X4M
+Message-ID: <CAH2r5muFeTGASj_7gRrhJq+=k8SA5aEz=oOHzxOfpHojLBsSHg@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 22, 2026 at 5:07=E2=80=AFAM Stefan Metzmacher <metze@samba.org>=
- wrote:
->
-> Hi,
->
-> for smbdirect it required to use different ports depending
-> on the RDMA protocol. E.g. for iWarp 5445 is needed
-> (as tcp port 445 already used by the raw tcp transport for SMB),
-> while InfiniBand, RoCEv1 and RoCEv2 use port 445, as they
-> use an independent port range (even for RoCEv2, which uses udp
-> port 4791 itself).
->
-> Currently ksmbd is not able to function correctly at
-> all if the system has iWarp (RDMA_NODE_RNIC) interface(s)
-> and any InfiniBand, RoCEv1 and/or RoCEv2 interface(s)
-> at the same time.
->
-> And cifs.ko uses 5445 with a fallback to 445, which
-> means depending on the available interfaces, it tries
-> 5445 in the RoCE range or may tries iWarp with 445
-> as a fallback. This leads to strange error messages
-> and strange network captures.
->
-> To avoid these problems they will be able to
-> use rdma_restrict_node_type(RDMA_NODE_RNIC) before
-> trying port 5445 and rdma_restrict_node_type(RDMA_NODE_IB_CA)
-> before trying port 445. It means we'll get early
-> -ENODEV early from rdma_resolve_addr() without any
-> network traffic and timeouts.
->
-> This is marked as RFC as I want to get feedback
-> if the rdma_restrict_node_type() function is acceptable
-> for the RDMA layer. And because the current form of
-> the smb patches are not tested, I only tested the
-> rdma part with my branch the prepares IPPROTO_SMBDIRECT
-> sockets.
->
-> I'm not sure if this would be acceptable for 6.19
-> in order to avoid the smb layer problems, if the
-> RDMA layer change is only acceptable for 7.0 that's
-> also fine.
->
-> This is based on the following fix applied:
-> smb: server: reset smb_direct_port =3D SMB_DIRECT_PORT_INFINIBAND on init
-> https://lore.kernel.org/linux-cifs/20251208154919.934760-1-metze@samba.or=
-g/
-> It's not yet in Linus' tree, so if this gets ready
-> before it's merged we can squash it.
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Please pull the following changes since commit
+63804fed149a6750ffd28610c5c1c98cce6bd377:
 
-Thanks!
->
-> Stefan Metzmacher (3):
->   RDMA/core: introduce rdma_restrict_node_type()
->   smb: client: make use of rdma_restrict_node_type()
->   smb: server: make use of rdma_restrict_node_type()
->
->  drivers/infiniband/core/cma.c      |  30 ++++++++
->  drivers/infiniband/core/cma_priv.h |   1 +
->  fs/smb/client/smbdirect.c          |  26 +++++++
->  fs/smb/server/transport_rdma.c     | 108 +++++++++++++++++++++--------
->  include/rdma/rdma_cm.h             |  17 +++++
->  5 files changed, 154 insertions(+), 28 deletions(-)
->
-> --
-> 2.43.0
->
+  Linux 6.19-rc7 (2026-01-25 14:11:24 -0800)
+
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.19rc8-smb3-client-fixes
+
+for you to fetch changes up to 67b3da8d3051fba7e1523b3afce4f71c658f15f8:
+
+  smb/client: fix memory leak in SendReceive() (2026-02-02 10:13:57 -0600)
+
+----------------------------------------------------------------
+Two small client memory leak fixes
+
+----------------------------------------------------------------
+ChenXiaoSong (2):
+      smb/client: fix memory leak in smb2_open_file()
+      smb/client: fix memory leak in SendReceive()
+
+ fs/smb/client/cifstransport.c | 4 +++-
+ fs/smb/client/smb2file.c      | 1 +
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+-- 
+Thanks,
+
+Steve
