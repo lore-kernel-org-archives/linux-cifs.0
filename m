@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC6B3ACF1A;
-	Thu,  5 Feb 2026 11:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD64C3B8D79;
+	Thu,  5 Feb 2026 11:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770292532; cv=none; b=MaAPhV7BndJIYYG4oQuJuzdTqwOt98D8V23o1nd0ZFxF3ZTNgpEJlpPZVWAGWHghG87Q3cxpyNECgDuGQkWiylhO5/J7McEtvhZJLmQpSsWB+n5HFaPQFbK9k/StybCgn6GlCmSHUsBUkVg1n3bW7EhlMWYk5SFWKGfXRGR1N4Q=
+	t=1770292542; cv=none; b=uQz77c4fDANkL0gXQUH7kv0Rn68o8SNDXChf9SgtjLjHi3Cb58GsBwt6F6AOEHE4iB7/Vl0Rp/ScHpo+VZHsHn3DXoqFDrqW48JKIUfZHrY7rJuOjSGSvD4WOHGOjssKu3BCdxpfGYltrv9D6unBLr7ga9Cl4hq5scsg8uVcrbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770292532; c=relaxed/simple;
-	bh=eMBP8cLJYQcn7U8uiQZoqQPZDyjRAeNP+d8V03xmqlU=;
+	s=arc-20240116; t=1770292542; c=relaxed/simple;
+	bh=AgETDbq2Iqyu2H053F/M5EL3LNFz3ZVYlAiOaoe0lzs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PiZeLuinaebwJgPx5DFi12D9Ef8VQ1Kp2aWxAGSZnF8h9LdqHZgVzRdev6bcW1JljlOqb4qA+qIkQEalB+XRdZ6NJXhNPPbIYjYPAeBonPuELBvkJRdaSWftp87ynn0Zjclk2xgJv7Bnto+uKD8IcN95WBlLwaKnQd3r/Ja3Zqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M8kXQYPL; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=TIoJh/D15xwTyjTiQwI/J+SiUuDqJZGOuf3RK6PMhAWA5HEZ2/WKk8TKUdlYYNI4drNh5aGw3ww+8pkORbSKx6+noFMJHley4SVgxfFtt82U9J7tl4S6bHuXgjYHCZ/U8MVwXwHAscTk0KuGIv3H1v2kUwkelHDqmHcUDj2gGDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SpyqQuXp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M8kXQYPL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5ADC4CEF7;
-	Thu,  5 Feb 2026 11:55:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SpyqQuXp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FDA7C4CEF7;
+	Thu,  5 Feb 2026 11:55:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770292531;
-	bh=eMBP8cLJYQcn7U8uiQZoqQPZDyjRAeNP+d8V03xmqlU=;
+	s=k20201202; t=1770292542;
+	bh=AgETDbq2Iqyu2H053F/M5EL3LNFz3ZVYlAiOaoe0lzs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=M8kXQYPLi7aCDTBrjZPv1egf12WrNAiD1lVfQSYqOCToZ9GtT5ra/Z0fEmUrtYjhy
-	 hUrBmsEyPxatqkPKpY1J/vcF98ixkJeEy/ehZHi60QlvUp1NinN5Jy8v12sjHnE5Gs
-	 y5JY4fwAT9yI+zwIuC9igl+HOBXTXz7QKY7FWX2N4zgZW7Khq7JVZkoAPEskmMNInX
-	 t2Bw1yEOZ3/xasoPMQnnIdKJaZQ8NDPCe2HcxVTodRGTnU7XjaCG2dEs9iRHMNPrqB
-	 8QOpPQoOZJcaRzrQabcuBD7ErG5U1udsF2gDfdSh8Ns0DSN52khpSwqN/oa8wuiNAR
-	 gnX8jC8BiuGdw==
+	b=SpyqQuXpRAGpH3+vH/n98zu5gbmOz+58cl6EViCqzubX76p792fijE6oA9RM7b1IP
+	 OPVLLOUp20A983sG1YD5RjfDrNviTSjm2I7SU/9SQbtGJQlL5eYqQPAD/ei7LySiSo
+	 WeW8bh+m9ffWyxO7aqbKtEwLrn8gZWoBuJnGL+QKiYMOTuXzKknE3DWh1zeXRoKVbx
+	 T3BGvW5EXZAMZwcRPwrnO/GEbpXl5YqbgnnYm7l7ZeIuZAq2kjDlEA5ZE+lXZOdABa
+	 LtM8OkdT8V9VSH99DM/TW8uM1L+8b/hWS2sG3g3SSSQ5jCRqC63a3suSoy3Q7tyxNR
+	 CmrYGIbQBjN6A==
 From: Simon Horman <horms@kernel.org>
 To: lucien.xin@gmail.com
 Cc: Simon Horman <horms@kernel.org>,
@@ -62,12 +62,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	dreibh@simula.no,
 	davem@davemloft.net,
 	sd@queasysnail.net
-Subject: Re: [net-next,v9,06/15] quic: add stream management
-Date: Thu,  5 Feb 2026 11:55:18 +0000
-Message-ID: <20260205115518.2195328-1-horms@kernel.org>
+Subject: Re: [net-next,v9,09/15] quic: add congestion control
+Date: Thu,  5 Feb 2026 11:55:32 +0000
+Message-ID: <20260205115532.2195345-1-horms@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <d3a376cf555e7740330a50d83e6201c9084bff01.1770042461.git.lucien.xin@gmail.com>
-References: <d3a376cf555e7740330a50d83e6201c9084bff01.1770042461.git.lucien.xin@gmail.com>
+In-Reply-To: <a872188a6e4d7b39d6d6d0f6fad7e5077bce4bae.1770042461.git.lucien.xin@gmail.com>
+References: <a872188a6e4d7b39d6d6d0f6fad7e5077bce4bae.1770042461.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -81,50 +81,54 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-quic: add stream management
+quic: add congestion control
 
-This patch introduces stream management infrastructure for the QUIC
-protocol, including a hash table for tracking active streams, functions
-for acquiring and releasing streams, and logic for detecting stream
-ID limits.
+This patch introduces quic_cong for RTT measurement and congestion control,
+implementing a state machine with slow start, congestion avoidance, and
+recovery phases using the New Reno algorithm.
 
-> diff --git a/net/quic/socket.c b/net/quic/socket.c
-> index b86989080184..d6f25669c693 100644
-> --- a/net/quic/socket.c
-> +++ b/net/quic/socket.c
-> @@ -41,6 +41,9 @@ static int quic_init_sock(struct sock *sk)
->  	sk->sk_write_space = quic_write_space;
->  	sock_set_flag(sk, SOCK_USE_WRITE_QUEUE);
->
-> +	if (quic_stream_init(quic_streams(sk)))
-> +		return -ENOMEM;
-
-If quic_stream_init() fails here, the function returns before calling
-sk_sockets_allocated_inc() and sock_prot_inuse_add() below. However,
-when initialization fails, inet_create() calls sk_common_release() which
-invokes quic_destroy_sock():
-
-quic_init_sock()
-    quic_stream_init() fails
-    return -ENOMEM
-        -> sk_common_release()
-            -> quic_destroy_sock()
-                -> sk_sockets_allocated_dec()  // underflow
-                -> sock_prot_inuse_add(..., -1)  // underflow
-
-Can this cause counter underflow since the increments never executed but
-the decrements in quic_destroy_sock() are unconditional?
-
-> +
->  	WRITE_ONCE(sk->sk_sndbuf, READ_ONCE(sysctl_quic_wmem[1]));
->  	WRITE_ONCE(sk->sk_rcvbuf, READ_ONCE(sysctl_quic_rmem[1]));
->
-> @@ -52,6 +55,8 @@ static int quic_init_sock(struct sock *sk)
->
->  static void quic_destroy_sock(struct sock *sk)
->  {
-> +	quic_stream_free(quic_streams(sk));
-> +
->  	quic_data_free(quic_ticket(sk));
+> diff --git a/net/quic/cong.c b/net/quic/cong.c
+> --- /dev/null
+> +++ b/net/quic/cong.c
 
 [ ... ]
+
+> +static int quic_cong_check_persistent_congestion(struct quic_cong *cong, u64 time)
+> +{
+> +	u32 ssthresh;
+> +
+> +	/* rfc9002#section-7.6.1:
+> +	 *   (smoothed_rtt + max(4*rttvar, kGranularity) + max_ack_delay) *
+> +	 *      kPersistentCongestionThreshold
+> +	 */
+> +	ssthresh = cong->smoothed_rtt + max(4 * cong->rttvar, QUIC_KGRANULARITY);
+> +	ssthresh = (ssthresh + cong->max_ack_delay) * QUIC_KPERSISTENT_CONGESTION_THRESHOLD;
+> +	if (cong->time - time <= ssthresh)
+> +		return 0;
+
+[ ... ]
+
+> +/* rfc9002#section-5: Estimating the Round-Trip Time */
+> +void quic_cong_rtt_update(struct quic_cong *cong, u64 time, u32 ack_delay)
+> +{
+> +	u32 adjusted_rtt, rttvar_sample;
+> +
+> +	/* Ignore RTT sample if ACK delay is suspiciously large. */
+> +	if (ack_delay > cong->max_ack_delay * 2)
+> +		return;
+> +
+> +	/* rfc9002#section-5.1: latest_rtt = ack_time - send_time_of_largest_acked */
+> +	cong->latest_rtt = cong->time - time;
+
+The field cong->time is described as "Cached current timestamp" in struct
+quic_cong, but where is it written? The socket struct is zero-initialized,
+so cong->time will always be 0.
+
+When computing RTT with a positive packet send timestamp in the time
+parameter, does this cause unsigned integer underflow? For example, if the
+packet was sent at time 12345, computing 0 - 12345 wraps to a very large
+value.
+
+The same issue appears in quic_cong_check_persistent_congestion() where
+cong->time - time is compared against ssthresh, and in quic_reno_on_packet_lost()
+and quic_reno_on_process_ecn() where recovery_time is set to cong->time.
