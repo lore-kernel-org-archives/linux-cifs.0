@@ -1,85 +1,85 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33983D4125
-	for <linux-cifs@vger.kernel.org>; Thu,  5 Feb 2026 12:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717DA3D413F
+	for <linux-cifs@vger.kernel.org>; Thu,  5 Feb 2026 12:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770295710; cv=none; b=soYjdB0yXx7BA5TpqV4bzf4rzyr2dbp7Rbn00ivL8HWjNicz8P8hGQ8BVx5Xleft5SHRkUnDCBt3N3KkwAL7qiVGrWb8mAwKskZbO9jjN9sw4wGh+IzamMJehSz8iG6nXh5Go29Hl1dq1tERCSjAO+dQ3pYZPVrI/35cdocd4+g=
+	t=1770295915; cv=none; b=h4AMf9s0/DDaZCMz3AWEWcGP5LHKGAb+wScb4hetusZS1xnXrbw8gWQ5MR3qZ9Pi+4oZnJLczQ3TV1RlKcoCbAkPSFlQTC1R4eYsR2twijraTfZwbeVk3prB3Ja4zbkhplht6/WS4IkDFQjmmA0knU35v7SwQKF5qEkyXRqZL84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770295710; c=relaxed/simple;
-	bh=mIAhPyVOqRDwJMq/L+Fm+xDHGGiSnfR1mZdXuRd6K0Y=;
+	s=arc-20240116; t=1770295915; c=relaxed/simple;
+	bh=cIIrTOVlC3bXSKi+mZruvQiu25kMcY3J4iVTy2b63e0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BHC4Af/ITV3l4gSj4Px42AMpVhPko2XVzpQIb9LoZjIb3nwZeIYnZMCtG7O6VH8JNooqt+BOp/5jIm0gD3BqjcbaJ6whZ5yp8NETbYqoF3TnlhH2J1kUWoea0APl3l8+OMywTqgZBioQcJ9EpuiGhr4G1+TSkJfUMvyRgQB6ZAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c++inlcP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HtYGY4GN; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=pwfBJrWJ9c0D6O454Yy8aCRoXJ7EcLXp/Pw7EPdFHkIN9NMFl8D7F51aI5HpWS7e+jm8WdgYbIduZKbB9+kmb3WzLscLUYc5aJdziFmmESFvOTlUA2lx91bo37JYLf7wWmEXoi4yV1me4E0MVa9XjOmGoSyDdpKAKGYqXDQfO3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B1DibesS; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AQXTmh7A; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c++inlcP";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtYGY4GN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B1DibesS";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AQXTmh7A"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770295709;
+	s=mimecast20190719; t=1770295914;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=EWd7quC0GtIREsRfL2ubD1yE2knY7YDhEMVXNy1vPWY=;
-	b=c++inlcPZOJlMp5kZxO2TsNpPRYsmsWzxnGfPAiTQIJ+l47yKN5JdMkbRWOwFtilsD31M6
-	XK00fpoYl2W3051c3kxb1Q3bZg4tTTieB+8faIaJBBHRkMJoHRVy4VZ7umrTFRpYHN9enC
-	ah0DazBN+xxxkGgf40ltzwq/SoeNDdE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=+KqqY7o17giM2jgPy+d2XiGnDvxNW+2fee3IUyYpT+c=;
+	b=B1DibesSfMf+ZAa3f6axClUZDVcmnWHtT8sxYCQcCGJUyMfWYSgeHoKH1tD/JaTH0/wf58
+	/AQPfAEaZO39H/5h6oyAgTU0X6FSlJwhaMwowXyOP9npwvbydJ/9CQWZno9ZANXPD6gmBb
+	0vIgMiVbWxi99ywfOFURMyFDZJbVoXo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-4hOY2CmGMqm_5ZLp4BPNmA-1; Thu, 05 Feb 2026 07:48:28 -0500
-X-MC-Unique: 4hOY2CmGMqm_5ZLp4BPNmA-1
-X-Mimecast-MFC-AGG-ID: 4hOY2CmGMqm_5ZLp4BPNmA_1770295707
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42fdbba545fso1809474f8f.0
-        for <linux-cifs@vger.kernel.org>; Thu, 05 Feb 2026 04:48:27 -0800 (PST)
+ us-mta-479-Yo8bYRpENXyVcFcEZni4oQ-1; Thu, 05 Feb 2026 07:51:51 -0500
+X-MC-Unique: Yo8bYRpENXyVcFcEZni4oQ-1
+X-Mimecast-MFC-AGG-ID: Yo8bYRpENXyVcFcEZni4oQ_1770295910
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4830e7c6131so12995765e9.2
+        for <linux-cifs@vger.kernel.org>; Thu, 05 Feb 2026 04:51:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770295707; x=1770900507; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1770295910; x=1770900710; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=EWd7quC0GtIREsRfL2ubD1yE2knY7YDhEMVXNy1vPWY=;
-        b=HtYGY4GNsFbSF29QOp2wuL0c2JFLgmU4F+nR64qRuTU6EqzFkPCQK3rlmG0UKasv2V
-         Im8MS1Zk4iEFi6Pw+YjrrLkO/0BEaELp/NSsha3BNwG3SIytVzXA0rMxSd+Sq+gg/aeP
-         rBBTwU8SaGpPolSUWZXXxP5SgHUGQ+lSX+Kt49Oh9dO/ut+CZalwm5SczO86BqUyM0mr
-         wbJPgcZB8JqMSVPjSGzZPUmDTZOUqj2aGfXLbDHj28hNVrW7peMM1Dlz7vLSjWyk89Lz
-         BPMv+eLHCy4LyGepFe4+ub4CWVN2t+2dcADozWscBr4PJCbe4VGfhzJ/DllECuD9Fbbr
-         pE9Q==
+        bh=+KqqY7o17giM2jgPy+d2XiGnDvxNW+2fee3IUyYpT+c=;
+        b=AQXTmh7A3wMg4M4qTeXzbGgbHLL3W9iS5cysrP7ufRhL7cSknHPvepB37VBnqdMe+T
+         u/wxO833plyPePFB0zmt5LeUH2v6zjL+sAx3uabqx69DVeqFGPGHySZSQMHRCMNL1O5u
+         yE4eEE47k+lM3lCXJacxQzl5P1FTRHIEFtIVTquGMePQr7+LjvTkAnISe4OEFsuvEak0
+         dn790XcHT3Vln8M4Ub40ZslSczEzNWgW5W8bCaDvyPT3cgw6IBAk2GAPLwarsaowIbi5
+         ERGx0AyZqnkp/TQnc/q8z5yfikjflLgAYIMmjyB9wGD9ZTYOXue4bqQzLn7fhnrymzbl
+         kqIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770295707; x=1770900507;
+        d=1e100.net; s=20230601; t=1770295910; x=1770900710;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EWd7quC0GtIREsRfL2ubD1yE2knY7YDhEMVXNy1vPWY=;
-        b=M8/AprHVxAEh3yZr7yaGG0tHdd9/r+A9hweRWpmFTs5kJTQhWLZD9DezhnfBsZOSxD
-         efM4Oz4Kzg0ug33FYRLRXBMW2nNxhzIq+n3d1V3uywmpWrH9RhDxmKAEqOUsVQUX7C5o
-         bRJFiSW3ZwyUFImfIy4mkEHXgQE8w3jj8CI3qolPX5rSSL9QRzXtYBl9wHfvLZDfNRuK
-         kS3z4sacbJqoh6lNOsjdGSgaTEdpDzj9uUttRTXCm5nSQOnT6PJ1kUiIzuc2Ai5R3YpW
-         QrJBp+Dxm877U1H4FIUXLfU82kRk/lrWCz4cSDhCr3z1B7AmXVxSn8Dt/wC1qMacBNMx
-         uLLg==
-X-Forwarded-Encrypted: i=1; AJvYcCVDdLPI3gP5Kaqob/1pntZ0yWY1zdei26Fd1Qw4CRnlFpE4sk2X9b2CdTkVsLrVxvKQlyXAfg9XgKqK@vger.kernel.org
-X-Gm-Message-State: AOJu0YywrrCdVPDWAX0kMSrSMeYgtufDQMfhttalE60QSGVkH72LaT6Q
-	PmlSNE0REk9xkDVdT66VVS0lr6WK2HFv4nvfncJfUWWh1SGxCpNX+h3G/Fo7gyWxCCuE7Ph3KS0
-	KBtvetIbgGnb3IL8l298dFf36Kht1mQJkfZbwkXUh9OUNAvm9SWw2xfHF+npykBM=
-X-Gm-Gg: AZuq6aLrF30WoENfGABOfrzzsPPeAiBIPOxh4Qqf80E7PkjvpYs2BW+01kPuy31VF8d
-	buaH3j4HCOE12exjwRrdvYZNuFMOiwG42P6z/GZ0xXRQLrRrrMtK5rPyTi7b31OEM5/5e+LHKcp
-	/xSf+MUhBzJorRjTyF3wwDEr0Kz+m03Dun3C9iPtUopHPxf2A3v/4lqXy7vqeC3ayZB+j/EST8N
-	O9N+BJVuLUjMV/4f61xoaqsrmhFLGzfcweqfO0h8smEnDqPnoFRqsAEZBE4zmAaY2IocIMoxCtH
-	WKygTLpfrAtfFcuwnZeihbjcnsUmLPqDUvOArXn9sTsHraGcNpgHIBaIePDZARGxN7xFuwtLkim
-	nLEm1qbU6/7T9
-X-Received: by 2002:a05:6000:4212:b0:435:dbbb:992a with SMTP id ffacd0b85a97d-43620987791mr4703629f8f.6.1770295706632;
-        Thu, 05 Feb 2026 04:48:26 -0800 (PST)
-X-Received: by 2002:a05:6000:4212:b0:435:dbbb:992a with SMTP id ffacd0b85a97d-43620987791mr4703595f8f.6.1770295706171;
-        Thu, 05 Feb 2026 04:48:26 -0800 (PST)
+        bh=+KqqY7o17giM2jgPy+d2XiGnDvxNW+2fee3IUyYpT+c=;
+        b=G2Kp5UPNc8ovh3DArWJU17XdNhnRTRgBaiwy8xowr6PRsbgzebpF0zFvWIq+8BS2Vt
+         fMHLclvOhPF0sHOvSz04B3pYN6Pqkr4EmdgWazqRa+4pK8k42lwVZLtYrFooLn4N/OYo
+         qolbY2Jlgrda/G5rtxqt7Wcv+UQm4pHo07rgnKxEWIgBBbUXRnvO07cWVnQ5IDIP2Sl5
+         r1RSSSI/SHzSZyAwRg33EOOo6ZCYFNnqWj733zPcjTmG3ucPPhtoLE4HyL9b+pPWqeQE
+         Oka6ft1MFGVhsj1qf6+7ybIz663ibX+MKv2GXIR7eSk4HQLnMHLgUYZ/BolcpAXVW9qA
+         Lssw==
+X-Forwarded-Encrypted: i=1; AJvYcCWecK3SXtaV2d5EzAsy/wrA0pEl3AmsRGKgsoewyXpstVmHV4KvFOFEfVWTruwKnRD4+d8pEGkECshO@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWnic2chihhc8PrUtRaDwmMX4WzLVZkaS0BkHGRSJMc03OMWXD
+	RcmbF6Pfy003Rp3Brwu5VF5mHlYlqkwNIOV1IbfKz4Q3z3MOwpdCDiaQr1/3+TKSTCe5fPYwJ6Q
+	Od2LMBHGX9J16/DhYKZ/u2VU6U1xeAKArAsRKyRC+24djhq5bgOB3xi5TJJ0efFs=
+X-Gm-Gg: AZuq6aLGaXP9lPaJBELe7rJcf3Orrba6Op1rl8TEm5X2AKgxU7hwX41BhH4rT+/Eeyv
+	C4Xa3pCw1Ti+jO9ZHuEje1NRt2JRgixohNLuecXWh6aDmvajhghI0PtXpCyFFnew2K++chbX0lJ
+	4jU43uzaxemKcVH3C/7gQez9ofIpHDPhyV3zvpmvwEDdSk3d0CiHJjvKQ3FzZDVo76sJGqet8k4
+	5JGmWIXFy89JvySRK8a1mLENJ1omjcPwmjdKsc7a4NldAj8mWI7g9UOhbQd+iqCJ3nj2GcFj3b8
+	Ood7+qjbW2lb1pdSA+JYBSW3iCuEPqObrYepQQZ+llcIWbHYTWGkytKHW9fMbiF02WzDht6FWbH
+	Lr26fvRsQvcH6
+X-Received: by 2002:a05:600c:3e0d:b0:46e:59bd:f7d3 with SMTP id 5b1f17b1804b1-4830e96fb0cmr71819415e9.20.1770295910320;
+        Thu, 05 Feb 2026 04:51:50 -0800 (PST)
+X-Received: by 2002:a05:600c:3e0d:b0:46e:59bd:f7d3 with SMTP id 5b1f17b1804b1-4830e96fb0cmr71818865e9.20.1770295909848;
+        Thu, 05 Feb 2026 04:51:49 -0800 (PST)
 Received: from [192.168.88.32] ([216.128.11.114])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43617e25cefsm14701496f8f.9.2026.02.05.04.48.24
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4830fe5614asm63353995e9.4.2026.02.05.04.51.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Feb 2026 04:48:25 -0800 (PST)
-Message-ID: <e9b073b0-60b7-4a45-9b6d-85c15b51fb4f@redhat.com>
-Date: Thu, 5 Feb 2026 13:48:23 +0100
+        Thu, 05 Feb 2026 04:51:49 -0800 (PST)
+Message-ID: <1bcfe20e-0103-44a5-82b5-90cba7ba5a60@redhat.com>
+Date: Thu, 5 Feb 2026 13:51:46 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -87,8 +87,8 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,v9,02/15] net: build socket infrastructure for QUIC
- protocol
+Subject: Re: [net-next,v9,03/15] quic: provide common utilities and data
+ structures
 To: Simon Horman <horms@kernel.org>, lucien.xin@gmail.com
 Cc: steved@redhat.com, marcelo.leitner@gmail.com, aahringo@redhat.com,
  alibuda@linux.alibaba.com, jbaron@akamai.com, hare@suse.de, kuba@kernel.org,
@@ -101,11 +101,11 @@ Cc: steved@redhat.com, marcelo.leitner@gmail.com, aahringo@redhat.com,
  matttbe@kernel.org, netdev@vger.kernel.org, smfrench@gmail.com,
  metze@samba.org, mbuhl@openbsd.org, chuck.lever@oracle.com,
  dreibh@simula.no, davem@davemloft.net, sd@queasysnail.net
-References: <28a1e36188b1a84193ef2d78f12ecbc0e43ae7f1.1770042461.git.lucien.xin@gmail.com>
- <20260205115423.2195277-1-horms@kernel.org>
+References: <74174c085fb11b8a63e72a7df730b6f4a7479c5c.1770042461.git.lucien.xin@gmail.com>
+ <20260205115449.2195294-1-horms@kernel.org>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260205115423.2195277-1-horms@kernel.org>
+In-Reply-To: <20260205115449.2195294-1-horms@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
@@ -115,90 +115,87 @@ On 2/5/26 12:54 PM, Simon Horman wrote:
 > 
 > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 > ---
-> net: build socket infrastructure for QUIC protocol
+> quic: provide common utilities and data structures
 > 
-> This patch lays the groundwork for QUIC socket support in the kernel.
-> It defines the core structures and protocol hooks needed to create
-> QUIC sockets, without implementing any protocol behavior at this stage.
-> Basic integration is included to allow building the module via
-> CONFIG_IP_QUIC=m. This provides the scaffolding necessary for adding
-> actual QUIC socket behavior in follow-up patches.
+> This patch provides foundational data structures and utilities for
+> the QUIC stack, including hash tables for socket lookup, connection
+> ID management, and helpers for encoding/decoding transport parameters.
 > 
->> diff --git a/net/quic/protocol.c b/net/quic/protocol.c
+>> diff --git a/net/quic/common.c b/net/quic/common.c
 >> new file mode 100644
->> index 000000000000..6ab81f1c50cc
+>> index 000000000000..94321f3f213d
 >> --- /dev/null
->> +++ b/net/quic/protocol.c
+>> +++ b/net/quic/common.c
 > 
 > [ ... ]
 > 
->> @@ -0,0 +1,369 @@
-> 
-> [ ... ]
-> 
->> +static int quic_protosw_init(void)
+>> +/* Reads a QUIC transport parameter value. */
+>> +u8 quic_get_param(u64 *pdest, u8 **pp, u32 *plen)
 >> +{
->> +	int err;
+>> +	u64 valuelen;
 >> +
->> +	err = proto_register(&quic_prot, 1);
->> +	if (err)
->> +		return err;
+>> +	if (!quic_get_var(pp, plen, &valuelen))
+>> +		return 0;
 >> +
->> +	err = proto_register(&quicv6_prot, 1);
->> +	if (err) {
->> +		proto_unregister(&quic_prot);
->> +		return err;
->> +	}
+>> +	if (*plen < valuelen)
+>> +		return 0;
 >> +
->> +	inet_register_protosw(&quic_stream_protosw);
->> +	inet_register_protosw(&quic_dgram_protosw);
->> +	inet6_register_protosw(&quicv6_stream_protosw);
->> +	inet6_register_protosw(&quicv6_dgram_protosw);
+>> +	if (!quic_get_var(pp, plen, pdest))
+>> +		return 0;
 >> +
->> +	return 0;
+>> +	return (u8)valuelen;
 >> +}
 > 
-> Can the return values from inet6_register_protosw() be checked?
+> Does quic_get_param() need to verify that quic_get_var() consumed exactly
+> valuelen bytes?
 > 
-> Looking at the implementation, inet6_register_protosw() returns int and
-> can fail with -EINVAL (if p->type >= SOCK_MAX) or -EPERM (if trying to
-> override a permanent protocol). The calls at lines 234-235 don't check
-> these return values, so if registration fails, quic_protosw_init() still
-> returns 0 (success).
+> The function reads valuelen at the first quic_get_var() call, then decodes
+> the value with the second quic_get_var(). However, quic_get_var() determines
+> how many bytes to consume based on the varint prefix in the data, not from
+> valuelen.
 > 
-> More critically, quic_protosw_exit() unconditionally calls
-> inet6_unregister_protosw() on both structures:
-> 
-> static void quic_protosw_exit(void)
-> {
-> 	inet_unregister_protosw(&quic_dgram_protosw);
-> 	inet_unregister_protosw(&quic_stream_protosw);
-> 	proto_unregister(&quic_prot);
-> 
-> 	inet6_unregister_protosw(&quicv6_dgram_protosw);
-> 	inet6_unregister_protosw(&quicv6_stream_protosw);
-> 	proto_unregister(&quicv6_prot);
-> }
-> 
-> If a protosw was never successfully registered, its list field remains
-> zero-initialized (NULL pointers). inet6_unregister_protosw() calls
-> list_del_rcu(&p->list), which with NULL pointers will dereference NULL
-> in __list_del_entry() -> __list_del(NULL, NULL), causing a kernel crash.
-> 
-> Note that inet_register_protosw() returns void (cannot fail from caller's
-> perspective), but inet6_register_protosw() returns int (can fail). The
-> code correctly checks errors from proto_register() but not from
-> inet6_register_protosw().
-> 
-> Should the return values from inet6_register_protosw() be checked, and
-> should the cleanup path track which registrations succeeded so only those
-> are unregistered?
+> If a malformed packet has valuelen=2 but the varint encoding requires 4 bytes,
+> quic_get_var() will consume 4 bytes while the function returns valuelen=2.
+> This could desynchronize parsing of subsequent parameters since the caller
+> expects the buffer to have advanced by valuelen bytes based on the return
+> value.
 
-I think it's easy to infer that that such failures are impossible, but
-since a repost is needed please drop some sentence in the commit message
-to help AI see the point.
+Hard to tell without any caller for this function. Possibly you could
+drop it? IDK if enforcing such check would be correct/safe from an
+interoperability PoV.
 
-Thanks,
+>> diff --git a/net/quic/common.h b/net/quic/common.h
+>> new file mode 100644
+>> index 000000000000..bfec0aaf2907
+>> --- /dev/null
+>> +++ b/net/quic/common.h
+> 
+> [ ... ]
+> 
+>> +#define QUIC_CONN_ID_MAX_LEN	20
+> 
+> [ ... ]
+> 
+>> +struct quic_conn_id {
+>> +	u8 data[QUIC_CONN_ID_MAX_LEN];
+>> +	u8 len;
+>> +};
+>> +
+>> +static inline void quic_conn_id_update(struct quic_conn_id *conn_id, u8 *data, u32 len)
+>> +{
+>> +	memcpy(conn_id->data, data, len);
+>> +	conn_id->len = (u8)len;
+>> +}
+> 
+> Should quic_conn_id_update() validate that len does not exceed
+> QUIC_CONN_ID_MAX_LEN before the memcpy?
+> 
+> The destination buffer conn_id->data is a 20-byte array, but the len
+> parameter is u32 with no bounds check. If a caller passes len > 20, the
+> memcpy would overflow the buffer.
 
-Paolo
+It looks like the check responsibility is on the callers. I guess it
+would make things more robust and simpler move the check here.
+
+/P
 
