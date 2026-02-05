@@ -1,68 +1,73 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FB3450FE
-	for <linux-cifs@vger.kernel.org>; Thu,  5 Feb 2026 01:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9B978F4A;
+	Thu,  5 Feb 2026 11:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770253227; cv=none; b=p7v7YYjjBYAKL3KzjDB/UhXpNGP08PkpGPJqYVJFAMcrA3cOwem1PV1txVN9stF8KMzahpve1SF6iC/0DAz8jRm48Y1ghy4wMvTMEXYqamlngXcvj+0TB/YLaiQWxRaWSnxxrPSwGsbZf+8yfPSRALiyuFeD0qLgcXes2oSMBwE=
+	t=1770292489; cv=none; b=sqa6ix9GRUPE5yzEJ2cSrfSrR3+ddfQ8G2SGg+EZSKGNvixNSJr53c0YW/rhRE9QwDFgG4qoU+og8GMO/PXRAskiKS6KyrbksK9/3sCX/oSalnctyZ5KFqNpxxdky0yYHpliXbPKsm8ew/JB8f12QywUjZOkI3zuv+UsqEG4+GI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770253227; c=relaxed/simple;
-	bh=AafpgT0PSxpukQJB+x6eKlSVgw4Nu+RnQRSkV8mPNjc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G4t64XD5ILvsyIEIicLIIe3EGnXRVMZL1Hir6QsBMoMD+4+G0W95yeG2QLCS2SOTlSLQ0pDygkont34tujp7oce4WfUd1H3eXvZ1eDflgjQHaOx+8PmeCn0BIN6tzVJHR9y3pY852kke4z661z1i13dCgDWoPqnBgDeRis72dFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZIfSoVTp; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1770292489; c=relaxed/simple;
+	bh=kCdeLWxKgZc6wbf+RKoW+llvQv7Hn6zi0OILEmEz9cQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RBJR5GhXbx8aPlE5HWraAiybbhc9xuLA9CxImD576x0AmIILIWHN91tu7jo9BdDdHUmDOmMjVywAC75zOzZ6/ULN0FQuz0cZQNlEpoCpLjgfpklZIwcDQ4TbyGYk2WTid8rP3uLUP8saqmLyG9Bu3hiPuvx6E2HzZUU57v5jAOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZvUyS4iC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZIfSoVTp"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-81f38d974e0so28048b3a.0
-        for <linux-cifs@vger.kernel.org>; Wed, 04 Feb 2026 17:00:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770253226; x=1770858026; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AjjDUkU/HTlLa2ldCnHFGgqxMQtzMeMnD4QQi2azxx0=;
-        b=ZIfSoVTpvOF49eLJ0h5WeTT4Wi+z956XSLXza8l9PRPylwJHrTMq5WrwiVDozTt/0q
-         347oiz6L8YcifVUmjHzeKaIOzrefe4ek10uRvyydkeTuHFmAJFM4VukgLo+iU/VL+VPZ
-         gmnKCq1Fcd5AVTqsY1krgSFF8wYBgvjPGJQMY8wDe0iMhv/pey6eamDHLaf5Lotq/cA7
-         sCm8wEQ/Umk44rNYGSY9uPoar0anLgbRS2AMVsg74M3xMOejuRBGpiPN51Hu/Mk2O62y
-         3RM8Gn+HmUztDKjgF/bITITTnM5F+2rOcqgxms0HXxmS0R5D8a42+P4TM9kHWKz/+szB
-         nPjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770253226; x=1770858026;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AjjDUkU/HTlLa2ldCnHFGgqxMQtzMeMnD4QQi2azxx0=;
-        b=OI9X87npYKIff0Qp4oo161rZl/Tr26iULfsnZ0SHnNB3G0VTDRMJhmMF1tOQdjLiSW
-         C2MVAMvJkv72xUU9enKKxPuPmNHRlx+DAqBWw2bhCDhMMcltUS+Y4Bd6eZCSFGGQ97/3
-         WCatfxwBO7plEjdcz+QIMJaIjRtEWVVqYZIu3o39aXLhXzugdiPtD1WO1T1paHhvYlxx
-         FBIVvHjiR5OC8HXRoGHSdMp5BBMj6yYx/J3oYCeOUl3+NM0o07YqJ3aBvcFku9R3zogO
-         TdMzSuAPrkn5EHkZjN6rfF/QBwIH5NlL1LUcsg2/sKRQ0/9zgHfQxsqCHJRP2JvzXvS6
-         OXWA==
-X-Gm-Message-State: AOJu0YzmJteoaKX1kgbCFeTP0jyG7AwQG/5IMTfh6ZlO/LWBjuaCjIa/
-	PYQc5ei8cQ+iFVt1zw3ZwTELqgdRNzZD5Nr3ryu0hfZkLBPH4VA1GitD
-X-Gm-Gg: AZuq6aLiLET0H+YqeIctqJ5CsS71Rt9077HZl8gzdSHVoCu3K1567hMDXFVqnDs/tUf
-	VFGcbsYuVLX/C217KKcReCGo1s0bpn7kEXMQoBJVXdWRt+A0VorgP4igIXVJuMiI0WDRm0ueIeZ
-	/VZ+tfMIUoEsG1DydqdrfUfLHjsITQCG55JIhqrhpHaTL8AHh3OAhAs7SPZ8v7YBr7C5r4KUEel
-	Ky72+g1d9KvQDNnm++OzNx86fBG21MFfM6teQf34/ERuJVj649uiEK6hJVkmLCLTPzPoaf3P2kc
-	j/KMCy3p8Oybtp0/+z7zjbmGUGmvJX7wzLtUVGFPbrE6GgUdl1nlRIYP1cIbag3XOvd0KsDXxXA
-	Ui4gecMgVKg47mgx6gNBrOmS54ibHn9KAVy5XFQDQreYnAi3tDyOgtDxnsLeEKFFwI2bAvj3Tke
-	rDu0I3NmvdNmPwbAAYk/sOog==
-X-Received: by 2002:a05:6a00:1a90:b0:81e:86d7:b57a with SMTP id d2e1a72fcca58-8241c17bbb7mr3323051b3a.1.1770253226317;
-        Wed, 04 Feb 2026 17:00:26 -0800 (PST)
-Received: from morax ([49.36.183.137])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-8241d434ed5sm4143861b3a.39.2026.02.04.17.00.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 17:00:25 -0800 (PST)
-From: Aaditya Kansal <aadityakansal390@gmail.com>
-To: sfrench@samba.org
-Cc: linux-cifs@vger.kernel.org,
-	Aaditya Kansal <aadityakansal390@gmail.com>
-Subject: [PATCH v2] smb: client: terminate session upon failed client required signing
-Date: Thu,  5 Feb 2026 06:30:12 +0530
-Message-ID: <20260205010012.2011764-1-aadityakansal390@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZvUyS4iC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A031AC4CEF7;
+	Thu,  5 Feb 2026 11:54:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770292489;
+	bh=kCdeLWxKgZc6wbf+RKoW+llvQv7Hn6zi0OILEmEz9cQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ZvUyS4iCQkRge6TWPtq43LEMZnb0UYRc9QdlNHqbywxe33USBEF/xaLCv2dFXaiMT
+	 oEncF4vgArN6DlRdlsqr34yPQNsqKMmu6QMX91QexNps3W94T9ou+d/ewPjbrIFSNa
+	 M6qPO0tDlFozK2eTZRDQerraF2yq7IbrdOvmbaMhSvDZZMBWpK3Kr9VUtQjJWrq/Zt
+	 ZQeuxXzU2maz9p0+yBQ3Eo4x8g4lyRkUAQuNcYRE8TJDOn8NmRoGSLK/zFJ7Bl1I7D
+	 j/uL1gmhLZ4V8PX2MEHGoKYn3AXIgHoUCPgbSl4FTZOytBB8XdFlMIb6gQsnHgsqlf
+	 MgHZKkYBU30vQ==
+From: Simon Horman <horms@kernel.org>
+To: lucien.xin@gmail.com
+Cc: Simon Horman <horms@kernel.org>,
+	steved@redhat.com,
+	marcelo.leitner@gmail.com,
+	aahringo@redhat.com,
+	alibuda@linux.alibaba.com,
+	jbaron@akamai.com,
+	hare@suse.de,
+	kuba@kernel.org,
+	tom@talpey.com,
+	linux-cifs@vger.kernel.org,
+	daniel@haxx.se,
+	quic@lists.linux.dev,
+	jlayton@kernel.org,
+	tfanelli@redhat.com,
+	dhowells@redhat.com,
+	linkinjeon@kernel.org,
+	hepengtao@xiaomi.com,
+	pc@manguebit.com,
+	kernel-tls-handshake@lists.linux.dev,
+	illiliti@protonmail.com,
+	xiyou.wangcong@gmail.com,
+	andrew.gospodarek@broadcom.com,
+	mail@johnericson.me,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	matttbe@kernel.org,
+	netdev@vger.kernel.org,
+	smfrench@gmail.com,
+	metze@samba.org,
+	mbuhl@openbsd.org,
+	chuck.lever@oracle.com,
+	dreibh@simula.no,
+	davem@davemloft.net,
+	sd@queasysnail.net
+Subject: Re: [net-next,v9,02/15] net: build socket infrastructure for QUIC protocol
+Date: Thu,  5 Feb 2026 11:54:23 +0000
+Message-ID: <20260205115423.2195277-1-horms@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <28a1e36188b1a84193ef2d78f12ecbc0e43ae7f1.1770042461.git.lucien.xin@gmail.com>
+References: <28a1e36188b1a84193ef2d78f12ecbc0e43ae7f1.1770042461.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -71,45 +76,86 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently, when smb signature verification fails, the behaviour is to log
-the failure without any action to terminate the session.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Call cifs_reconnect() when client required signature verification fails.
-Otherwise, log the error without reconnecting.
-
-Signed-off-by: Aaditya Kansal <aadityakansal390@gmail.com>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-Changes in v2:
-- reconnect only triggered when client required signature verification fails
----
- fs/smb/client/cifstransport.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+net: build socket infrastructure for QUIC protocol
 
-diff --git a/fs/smb/client/cifstransport.c b/fs/smb/client/cifstransport.c
-index 28d1cee90625..6c1fbf0bef6d 100644
---- a/fs/smb/client/cifstransport.c
-+++ b/fs/smb/client/cifstransport.c
-@@ -169,12 +169,18 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 
- 		iov[0].iov_base = mid->resp_buf;
- 		iov[0].iov_len = len;
--		/* FIXME: add code to kill session */
-+
- 		rc = cifs_verify_signature(&rqst, server,
- 					   mid->sequence_number);
--		if (rc)
-+		if (rc) {
- 			cifs_server_dbg(VFS, "SMB signature verification returned error = %d\n",
- 				 rc);
-+
-+			if (!(server->sec_mode & SECMODE_SIGN_REQUIRED)) {
-+				cifs_reconnect(server, true);
-+				return rc;
-+			}
-+		}
- 	}
- 
- 	/* BB special case reconnect tid and uid here? */
--- 
-2.52.0
+This patch lays the groundwork for QUIC socket support in the kernel.
+It defines the core structures and protocol hooks needed to create
+QUIC sockets, without implementing any protocol behavior at this stage.
+Basic integration is included to allow building the module via
+CONFIG_IP_QUIC=m. This provides the scaffolding necessary for adding
+actual QUIC socket behavior in follow-up patches.
 
+> diff --git a/net/quic/protocol.c b/net/quic/protocol.c
+> new file mode 100644
+> index 000000000000..6ab81f1c50cc
+> --- /dev/null
+> +++ b/net/quic/protocol.c
+
+[ ... ]
+
+> @@ -0,0 +1,369 @@
+
+[ ... ]
+
+> +static int quic_protosw_init(void)
+> +{
+> +	int err;
+> +
+> +	err = proto_register(&quic_prot, 1);
+> +	if (err)
+> +		return err;
+> +
+> +	err = proto_register(&quicv6_prot, 1);
+> +	if (err) {
+> +		proto_unregister(&quic_prot);
+> +		return err;
+> +	}
+> +
+> +	inet_register_protosw(&quic_stream_protosw);
+> +	inet_register_protosw(&quic_dgram_protosw);
+> +	inet6_register_protosw(&quicv6_stream_protosw);
+> +	inet6_register_protosw(&quicv6_dgram_protosw);
+> +
+> +	return 0;
+> +}
+
+Can the return values from inet6_register_protosw() be checked?
+
+Looking at the implementation, inet6_register_protosw() returns int and
+can fail with -EINVAL (if p->type >= SOCK_MAX) or -EPERM (if trying to
+override a permanent protocol). The calls at lines 234-235 don't check
+these return values, so if registration fails, quic_protosw_init() still
+returns 0 (success).
+
+More critically, quic_protosw_exit() unconditionally calls
+inet6_unregister_protosw() on both structures:
+
+static void quic_protosw_exit(void)
+{
+	inet_unregister_protosw(&quic_dgram_protosw);
+	inet_unregister_protosw(&quic_stream_protosw);
+	proto_unregister(&quic_prot);
+
+	inet6_unregister_protosw(&quicv6_dgram_protosw);
+	inet6_unregister_protosw(&quicv6_stream_protosw);
+	proto_unregister(&quicv6_prot);
+}
+
+If a protosw was never successfully registered, its list field remains
+zero-initialized (NULL pointers). inet6_unregister_protosw() calls
+list_del_rcu(&p->list), which with NULL pointers will dereference NULL
+in __list_del_entry() -> __list_del(NULL, NULL), causing a kernel crash.
+
+Note that inet_register_protosw() returns void (cannot fail from caller's
+perspective), but inet6_register_protosw() returns int (can fail). The
+code correctly checks errors from proto_register() but not from
+inet6_register_protosw().
+
+Should the return values from inet6_register_protosw() be checked, and
+should the cleanup path track which registrations succeeded so only those
+are unregistered?
