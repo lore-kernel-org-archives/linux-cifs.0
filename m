@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7183A7F69;
-	Thu,  5 Feb 2026 11:55:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DFE3B5303;
+	Thu,  5 Feb 2026 11:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770292506; cv=none; b=XJOHf+/xSrsir513/Yd2sIZdh4ihnl+HW+0jF/WqAU69eozFNaeLOw521S0E+Z7fW8cfc42a4hZCUsDLSNKtHpNBy6igUoDjtzUWeR8gSS5v4gQpsxTxqx28UkjW/b1ZEnemPtPCvbTvd598/htwov9BFUi/r2lARII4Nlw5nYU=
+	t=1770292518; cv=none; b=ii8Vg2HeF6uXW6j5G1xk1575sc97ioDraHmJP3IcxCg08GjA3qnNavKR1UITB18IF34Bo3Jst/qUjFi5OtKhG2Eg76tURYcLkAHtnSuNFmLN1+HaGHbwKM3CB7kHO5WKlPOH4YDaPCD4KDTO0K9kEqxsXPneaQjhM97Il/ez1Ok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770292506; c=relaxed/simple;
-	bh=eEh9oWe3EbivTJiP0XSfCLNXXEAKP/YY9MULBTv57Do=;
+	s=arc-20240116; t=1770292518; c=relaxed/simple;
+	bh=vL96u07IieBDDsrKJi5YS65hKp6UbQzyncWbCYn6dLE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gwm8OQpB4NRSOTjxhfLIl20MKN3dl+cxN0jPP+Y8BqLZUnSgnqBaEyW4dTGoYMyq1qc3eO/ak7fk/SGw1nFYrO2Qw2RPcQzRgcs18CdYiGILiLp+bFLUupk64rer9AXniv67vowkyzoFYopvguLmf+clEb2VSU/1o20DEhSpeio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QhDNkXZ4; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=f2bQCKJA8bOqUNFIgptywq05UEGVXfoJs2P7NQOn24TwaFpUDz1otScliXU1KXmCH/c05bLB8gR+eQioa3uyHqVdNFPeKm0rjveWnU6LV/5olRfKRePztCGRVkHfOz0Pfaqg9z5Q+nsNmQKlEoEwSEVyjcbejf+BEVkJouibzyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oe2wTKU2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QhDNkXZ4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2390C4CEF7;
-	Thu,  5 Feb 2026 11:54:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oe2wTKU2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDCB1C4CEF7;
+	Thu,  5 Feb 2026 11:55:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770292505;
-	bh=eEh9oWe3EbivTJiP0XSfCLNXXEAKP/YY9MULBTv57Do=;
+	s=k20201202; t=1770292518;
+	bh=vL96u07IieBDDsrKJi5YS65hKp6UbQzyncWbCYn6dLE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QhDNkXZ4CWBS1Be7G2bkG/UdMnr9UoWQd2IRhmWKldIdYDkJLC56A5631DKNEMlX2
-	 X9tZ3piBj4AKIIIPPwqKkgn0oiovz9LLKtGeCW5y0WYO4PlNCL+ljRDgvSEctavOBt
-	 5vG8bIU2J30kh6NOnS2VsjGbeP5zvZDZRY68vNifNvnDPbDhTSZ8tXBqGHb+1byybj
-	 Az+EbequgltDZ0Bf8hOhJcD0SDIM+CctVefVtl0eLtc4FoKMU/eHP+MNgnKFRK+GQ7
-	 NidN0c+OzYcYvNBV9KY9tp2oYXZG2lgFdoaWgE75haxsuS51560g3pnwJFJxgG48qP
-	 ZoOx4QWQGgxZg==
+	b=Oe2wTKU2Zjb1ONJDJvHQMOYmHRew4YZazNHKEF/77JIPy3LS4P+39/2cFxXyFVhqv
+	 IxmVGOxoFICGOmoZxbLVLxTN7r+3nuS7L36a/23vsky/WwQkecfx+HemQaJrFHlofy
+	 fFHQYF9hov03stZXZTH9n8ukY9YyYU1M3fSRSEyAKlIDxiUZnvSiZL5H9kYP7eYOAj
+	 igWnUcFkivModP0SGJ/OgCAz8GsfK78W2Gswi0X9v4CVW/A/mbropGu5jrW/7GEMFr
+	 W1odFnFQLbLibTXQQz/CHd4zpMw9I2jXJdGNZHqG8PovPN7bkYZeSPWn5U8HspFvhM
+	 pQYVfUsvnXZMg==
 From: Simon Horman <horms@kernel.org>
 To: lucien.xin@gmail.com
 Cc: Simon Horman <horms@kernel.org>,
@@ -62,12 +62,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	dreibh@simula.no,
 	davem@davemloft.net,
 	sd@queasysnail.net
-Subject: Re: [net-next,v9,03/15] quic: provide common utilities and data structures
-Date: Thu,  5 Feb 2026 11:54:49 +0000
-Message-ID: <20260205115449.2195294-1-horms@kernel.org>
+Subject: Re: [net-next,v9,05/15] quic: provide quic.h header files for kernel and userspace
+Date: Thu,  5 Feb 2026 11:55:06 +0000
+Message-ID: <20260205115506.2195311-1-horms@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <74174c085fb11b8a63e72a7df730b6f4a7479c5c.1770042461.git.lucien.xin@gmail.com>
-References: <74174c085fb11b8a63e72a7df730b6f4a7479c5c.1770042461.git.lucien.xin@gmail.com>
+In-Reply-To: <b3e81a27cc3e4c03fa8357c2c77b238997e48610.1770042461.git.lucien.xin@gmail.com>
+References: <b3e81a27cc3e4c03fa8357c2c77b238997e48610.1770042461.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -81,77 +81,26 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-quic: provide common utilities and data structures
+quic: provide quic.h header files for kernel and userspace
 
-This patch provides foundational data structures and utilities for
-the QUIC stack, including hash tables for socket lookup, connection
-ID management, and helpers for encoding/decoding transport parameters.
+This commit adds quic.h header files in include/uapi/linux and
+include/linux to provide the necessary definitions for the QUIC
+socket API.
 
-> diff --git a/net/quic/common.c b/net/quic/common.c
-> new file mode 100644
-> index 000000000000..94321f3f213d
+> diff --git a/include/uapi/linux/quic.h b/include/uapi/linux/quic.h
 > --- /dev/null
-> +++ b/net/quic/common.c
+> +++ b/include/uapi/linux/quic.h
 
 [ ... ]
 
-> +/* Reads a QUIC transport parameter value. */
-> +u8 quic_get_param(u64 *pdest, u8 **pp, u32 *plen)
-> +{
-> +	u64 valuelen;
+> +enum quic_msg_flags {
+> +	/* flags for stream_flags */
+> +	MSG_QUIC_STREAM_NEW		= MSG_SYN,
+> +	MSG_QUIC_STREAM_FIN		= MSG_FIN,
+> +	MSG_QUIC_STREAM_UNI		= MSG_CONFIRM,
+> +	MSG_QUIC_STREAM_DONTWAIT	= MSG_WAITFORONE,
+> +	MSG_QUIC_STREAM_SNDBLOCK	= MSG_ERRQUEUE,
 > +
-> +	if (!quic_get_var(pp, plen, &valuelen))
-> +		return 0;
-> +
-> +	if (*plen < valuelen)
-> +		return 0;
-> +
-> +	if (!quic_get_var(pp, plen, pdest))
-> +		return 0;
-> +
-> +	return (u8)valuelen;
-> +}
+> +	/* extented flags for msg_flags */
 
-Does quic_get_param() need to verify that quic_get_var() consumed exactly
-valuelen bytes?
-
-The function reads valuelen at the first quic_get_var() call, then decodes
-the value with the second quic_get_var(). However, quic_get_var() determines
-how many bytes to consume based on the varint prefix in the data, not from
-valuelen.
-
-If a malformed packet has valuelen=2 but the varint encoding requires 4 bytes,
-quic_get_var() will consume 4 bytes while the function returns valuelen=2.
-This could desynchronize parsing of subsequent parameters since the caller
-expects the buffer to have advanced by valuelen bytes based on the return
-value.
-
-> diff --git a/net/quic/common.h b/net/quic/common.h
-> new file mode 100644
-> index 000000000000..bfec0aaf2907
-> --- /dev/null
-> +++ b/net/quic/common.h
-
-[ ... ]
-
-> +#define QUIC_CONN_ID_MAX_LEN	20
-
-[ ... ]
-
-> +struct quic_conn_id {
-> +	u8 data[QUIC_CONN_ID_MAX_LEN];
-> +	u8 len;
-> +};
-> +
-> +static inline void quic_conn_id_update(struct quic_conn_id *conn_id, u8 *data, u32 len)
-> +{
-> +	memcpy(conn_id->data, data, len);
-> +	conn_id->len = (u8)len;
-> +}
-
-Should quic_conn_id_update() validate that len does not exceed
-QUIC_CONN_ID_MAX_LEN before the memcpy?
-
-The destination buffer conn_id->data is a 20-byte array, but the len
-parameter is u32 with no bounds check. If a caller passes len > 20, the
-memcpy would overflow the buffer.
+This isn't a bug, but there's a typo: "extented" should be "extended".
