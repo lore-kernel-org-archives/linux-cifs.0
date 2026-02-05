@@ -1,114 +1,72 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F8C27A465
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Feb 2026 23:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED6A13A244
+	for <linux-cifs@vger.kernel.org>; Thu,  5 Feb 2026 00:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770246605; cv=none; b=ZtTsXwZNcWQcUfX9JK1sjHOpjQLgilEqNpMscdyFz5hAR3zDi0jWXbFxf85jqhhb5Y0hD9LVyQKbwP8tvnBqRaxoHHaRWuyDuFP6XV1VajusM5Fiq4VJvXGj7JdJ1PjolZjhhuZ039093X18s59xgClnYOE/vuKkJsKM5bas/KU=
+	t=1770251913; cv=none; b=RMk/4S1hohMu64oRDltT+s0TwUZirDxGWyP0AuSVoWt2OovGpwHP1RRS8W4t1bQ4GQzeWTWwGrONlg5vgcyqj7OK21hz/YiL1gCaY37nYVZjZ1bsEgO8BhYJQChoilmYPNbGIrZrUN0d4r9Ud1bw0yKTLA81uAATpvBitZHS0/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770246605; c=relaxed/simple;
-	bh=rImYixcrJnvPaJygPB3tSLn52Cqp/Pv1UYq8g825bEw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EzKxgdOCJcnQnlMBxO3AlMOEidEMkO03rfWpja6drBF0DWQxfL5ClkvbMa8i3w5DnpnzIGE0XGMTQbvAdAjXNWSOrs07aIB+KWMLJAP9WTcqyqLM/sGaUYJ4FuzpwZUpB46EBGThkFxuZR0uYsUXVenlK5pTc7Qpyrp4lt1dc6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=dc2+0DcA; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1770251913; c=relaxed/simple;
+	bh=+a4nidgfFaCoFca3mcn2cJExAPTlfk87g7q+Mh9VSho=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lmU5GG7kdJQ64Y29NY0LAzNptREeCbkLbhRQf4k5V4UKq15WSj41YSJ2WZCNUxcKgH0hA8g8aHzXUZpjjD8QyIJKQ9hUWtz/8HfkwyfZKckGb4x5vrVsaGNp+OPTTw2qS7LHEP89AQkayeCcgWTKRwS7YKiDG6Xv9sdBo0MuDMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B50tG9/0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="dc2+0DcA"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47edd6111b4so2912205e9.1
-        for <linux-cifs@vger.kernel.org>; Wed, 04 Feb 2026 15:10:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1770246603; x=1770851403; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bFp8KGfgyMquCSctoZKejUeMlDxZtbunAgT7dT1mhuE=;
-        b=dc2+0DcAGmBZSacQOH0OCansGVkSj65K31YU3rdTjoroMkdLkClQ6h0pvoXiTjhEDZ
-         QpTQqsyW4jEZcmwCQ8j20vmrp/jJJngCwoUCC/NS3xhxKRxbvjwi8uhNkIZj5p3RFDlY
-         eM22sqnUprgg1/aukr+XYmqe6ai2/grDzmXhMSMqPNxXog5Ro9pQPXK/lNjS5uOm4R+D
-         mA7HkN6CQaCb41UVrRRhNAuArpfqGy8Ao+vUdfkHsYxE0OTKJTXl521bG9wT/V4kzhtT
-         s61BRgA/TBYVHTanypBrOee6s9/KoJ0aAAqF0OFmMfxn/USrZ/kjdtw1TsMlFeZ2gxSF
-         p9MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770246603; x=1770851403;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bFp8KGfgyMquCSctoZKejUeMlDxZtbunAgT7dT1mhuE=;
-        b=NZW2FImR0ARk1Pu3RXk6SIiF6YSKrK9eJwcL/zG1UXhqyMYAcn3IoIxKHtEWgjmAIl
-         hfMIqky05IVzPDcXnbGBnQLOcmH57b+2wHiu3HyOsWy5iIVf2XGb0Tk8WraLN1AlNM7N
-         p1m5LzcxcuyLmc34v5JvSv+zqHesrQgy5FpKPFfcCs1v5sEqZn4d4GpImQ+61a8caGiF
-         g6tAIZ6JtlE+4NlvvfrOHiJeE9OqTFH1cTvKm/NlUWRTRNA8zGyl1jROHahs/WCPSQ4+
-         b4udPOghuV+Uz2dMdobfDbTkpr1hcPXwhZzVm5Ubzh7a0moI8t3eo2R4Xw7il217MwG0
-         oxoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVXVjbyXFJcINMLutUKmikGeGx+DapjCGBMWJ85eJ16A406y6AxtunjR5dXqGgEI2609gt02jepJP+Q@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxylb/XNWIt95wSfrQ06Rm6q3X9nYuk7EBq/mCTfq05+LQQ7jDh
-	yJtHJx9+kx7zoKPm86g8hxEqA0KAUPX22M/OXnQ2Hsv/HOJiJkqa/sU5VLuZdgdXSTg=
-X-Gm-Gg: AZuq6aJlB2n/ZqTVNOEhiCp0g7YE8O5TFbpAdOw8KYgcvgtBMXs3/Mxdadx6xwfE2Qi
-	k9+07OJikj78d9B3YcwFoOhL3PJEI2OsUO9McsWIJic5xJR3ieEEXdJVperTbUsRtPDTjmmsOGp
-	TAxIv1PbD4PqViuvt4yH+vHRq+7M0Wp6hNTP58UbCsW2t4RRi+RHtMj0HFDYlvYbY3jqlJ5Uksb
-	bcWUjixoG5JwluYlQ70pX2rldOaHZvQFLvturHE+Qoh4ruui2h7ct5YxWAkun2mtoHtXDaabWCu
-	uhbHIZavUhYcFzohONG8SBeljwWaA3gsS+8etiS8WscVhip7q4w55she5tTshZmD+fCCBgSKr6d
-	RYpZj0BxCeqAU03gwQwUiqXDmdklhewLQBywj9RqNKOWNumMsGOhFjh2o27XNDGHpvPRRmBg5Fp
-	1+TbI1fIWxv1eDz6ITxUPo2cBROKIucQ==
-X-Received: by 2002:a05:600c:8b8a:b0:47d:6140:3284 with SMTP id 5b1f17b1804b1-4830e99572dmr57949495e9.37.1770246602933;
-        Wed, 04 Feb 2026 15:10:02 -0800 (PST)
-Received: from precision ([2804:7f0:6401:4338:fe12:6a4e:72af:4ca4])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8ca2fa9f5c6sm285008685a.23.2026.02.04.15.09.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 15:10:01 -0800 (PST)
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: linkinjeon@kernel.org,
-	smfrench@gmail.com
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	linux-cifs@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] smb: server: fix leak of active_num_conn in ksmbd_tcp_new_connection()
-Date: Wed,  4 Feb 2026 20:06:43 -0300
-Message-ID: <20260204230643.387345-1-henrique.carvalho@suse.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B50tG9/0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66860C4AF09
+	for <linux-cifs@vger.kernel.org>; Thu,  5 Feb 2026 00:38:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770251913;
+	bh=+a4nidgfFaCoFca3mcn2cJExAPTlfk87g7q+Mh9VSho=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=B50tG9/077nldiCga5MWFBVCZommaIRpY54grguMgH9S8C1ka9WJ74i7piX2QZj4x
+	 FaqJljsRmBlSfUtPAhbsYFF+We20/nqz1tehT5wkHldDtS8eOfVdahJJgeXtue6P6x
+	 PI32ALbkCLEewWQ1ubHUaQCnremgWXxTBxR+2LtWzifx2kKG76RMs4ea12cwUU54uf
+	 tOaCjF7i9Cu9/8NfSGG7KSSQ0TDIXVTTmBY13abEEcfLiLub7omzo/NQTaLY2rU1bB
+	 TiFwOxExmx4i4D/pTtGm4bLy+vwK1kkQ+wb/QNBVak2/P47gvHybNnuvdsh4z95CPp
+	 CMd4lRebjyv9A==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b8845cb580bso58812866b.3
+        for <linux-cifs@vger.kernel.org>; Wed, 04 Feb 2026 16:38:33 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXGR/LrPCyw9M5nuM6lKfQiiBvK59GfzlihADVJxHLBK1AdwxCTWijMeVLFXvCTKzv30TAwUuOQvVz0@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmycXTzGf+YsK8aGjyWxaKPfVlplhHxSEZud+tbOsFnIakL+at
+	nEC1XvWVQjloOL6qNXa6eXIiaH8gN9fIPXsFWFALrHw1FL1Dq6JJz1ch+LMcsWBj26VLJYn0wed
+	zjdggsiFxzksfZVjFpexzVxlOsbokw00=
+X-Received: by 2002:a17:907:9405:b0:b8e:5e2:79fe with SMTP id
+ a640c23a62f3a-b8e9f0a7b29mr343960266b.15.1770251911905; Wed, 04 Feb 2026
+ 16:38:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260204230643.387345-1-henrique.carvalho@suse.com>
+In-Reply-To: <20260204230643.387345-1-henrique.carvalho@suse.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 5 Feb 2026 09:38:20 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9SMURYO5HNLh_tZfju=OnYiGqdLuDmRr4gnDZkb2bQ_w@mail.gmail.com>
+X-Gm-Features: AZwV_QgLbCcVWeIxytf8GRNtA0kX3BqLBfCf2VKNeHyaBf9a5ELyU_fsEOxI_LE
+Message-ID: <CAKYAXd9SMURYO5HNLh_tZfju=OnYiGqdLuDmRr4gnDZkb2bQ_w@mail.gmail.com>
+Subject: Re: [PATCH] smb: server: fix leak of active_num_conn in ksmbd_tcp_new_connection()
+To: Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com, 
+	linux-cifs@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On kthread_run() failure in ksmbd_tcp_new_connection(), the transport is
-freed via free_transport(), which does not decrement active_num_conn,
-leaking this counter.
-
-Replace free_transport() with ksmbd_tcp_disconnect().
-
-Fixes: 0d0d4680db22e ("ksmbd: add max connections parameter")
-Cc: stable@vger.kernel.org
-Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
----
- fs/smb/server/transport_tcp.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index 4bb07937d7efe..2436dabada957 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -40,6 +40,7 @@ static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops;
- 
- static void tcp_stop_kthread(struct task_struct *kthread);
- static struct interface *alloc_iface(char *ifname);
-+static void ksmbd_tcp_disconnect(struct ksmbd_transport *t);
- 
- #define KSMBD_TRANS(t)	(&(t)->transport)
- #define TCP_TRANS(t)	((struct tcp_transport *)container_of(t, \
-@@ -202,7 +203,7 @@ static int ksmbd_tcp_new_connection(struct socket *client_sk)
- 	if (IS_ERR(handler)) {
- 		pr_err("cannot start conn thread\n");
- 		rc = PTR_ERR(handler);
--		free_transport(t);
-+		ksmbd_tcp_disconnect(KSMBD_TRANS(t));
- 	}
- 	return rc;
- }
--- 
-2.52.0
-
+On Thu, Feb 5, 2026 at 8:10=E2=80=AFAM Henrique Carvalho
+<henrique.carvalho@suse.com> wrote:
+>
+> On kthread_run() failure in ksmbd_tcp_new_connection(), the transport is
+> freed via free_transport(), which does not decrement active_num_conn,
+> leaking this counter.
+>
+> Replace free_transport() with ksmbd_tcp_disconnect().
+>
+> Fixes: 0d0d4680db22e ("ksmbd: add max connections parameter")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+Looks good to me:)
+Applied it to #ksmbd-for-next-next.
+Thanks!
