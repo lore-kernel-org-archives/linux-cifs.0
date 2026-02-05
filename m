@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DFE3B5303;
-	Thu,  5 Feb 2026 11:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC6B3ACF1A;
+	Thu,  5 Feb 2026 11:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770292518; cv=none; b=ii8Vg2HeF6uXW6j5G1xk1575sc97ioDraHmJP3IcxCg08GjA3qnNavKR1UITB18IF34Bo3Jst/qUjFi5OtKhG2Eg76tURYcLkAHtnSuNFmLN1+HaGHbwKM3CB7kHO5WKlPOH4YDaPCD4KDTO0K9kEqxsXPneaQjhM97Il/ez1Ok=
+	t=1770292532; cv=none; b=MaAPhV7BndJIYYG4oQuJuzdTqwOt98D8V23o1nd0ZFxF3ZTNgpEJlpPZVWAGWHghG87Q3cxpyNECgDuGQkWiylhO5/J7McEtvhZJLmQpSsWB+n5HFaPQFbK9k/StybCgn6GlCmSHUsBUkVg1n3bW7EhlMWYk5SFWKGfXRGR1N4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770292518; c=relaxed/simple;
-	bh=vL96u07IieBDDsrKJi5YS65hKp6UbQzyncWbCYn6dLE=;
+	s=arc-20240116; t=1770292532; c=relaxed/simple;
+	bh=eMBP8cLJYQcn7U8uiQZoqQPZDyjRAeNP+d8V03xmqlU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f2bQCKJA8bOqUNFIgptywq05UEGVXfoJs2P7NQOn24TwaFpUDz1otScliXU1KXmCH/c05bLB8gR+eQioa3uyHqVdNFPeKm0rjveWnU6LV/5olRfKRePztCGRVkHfOz0Pfaqg9z5Q+nsNmQKlEoEwSEVyjcbejf+BEVkJouibzyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oe2wTKU2; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=PiZeLuinaebwJgPx5DFi12D9Ef8VQ1Kp2aWxAGSZnF8h9LdqHZgVzRdev6bcW1JljlOqb4qA+qIkQEalB+XRdZ6NJXhNPPbIYjYPAeBonPuELBvkJRdaSWftp87ynn0Zjclk2xgJv7Bnto+uKD8IcN95WBlLwaKnQd3r/Ja3Zqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M8kXQYPL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oe2wTKU2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDCB1C4CEF7;
-	Thu,  5 Feb 2026 11:55:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M8kXQYPL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5ADC4CEF7;
+	Thu,  5 Feb 2026 11:55:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770292518;
-	bh=vL96u07IieBDDsrKJi5YS65hKp6UbQzyncWbCYn6dLE=;
+	s=k20201202; t=1770292531;
+	bh=eMBP8cLJYQcn7U8uiQZoqQPZDyjRAeNP+d8V03xmqlU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Oe2wTKU2Zjb1ONJDJvHQMOYmHRew4YZazNHKEF/77JIPy3LS4P+39/2cFxXyFVhqv
-	 IxmVGOxoFICGOmoZxbLVLxTN7r+3nuS7L36a/23vsky/WwQkecfx+HemQaJrFHlofy
-	 fFHQYF9hov03stZXZTH9n8ukY9YyYU1M3fSRSEyAKlIDxiUZnvSiZL5H9kYP7eYOAj
-	 igWnUcFkivModP0SGJ/OgCAz8GsfK78W2Gswi0X9v4CVW/A/mbropGu5jrW/7GEMFr
-	 W1odFnFQLbLibTXQQz/CHd4zpMw9I2jXJdGNZHqG8PovPN7bkYZeSPWn5U8HspFvhM
-	 pQYVfUsvnXZMg==
+	b=M8kXQYPLi7aCDTBrjZPv1egf12WrNAiD1lVfQSYqOCToZ9GtT5ra/Z0fEmUrtYjhy
+	 hUrBmsEyPxatqkPKpY1J/vcF98ixkJeEy/ehZHi60QlvUp1NinN5Jy8v12sjHnE5Gs
+	 y5JY4fwAT9yI+zwIuC9igl+HOBXTXz7QKY7FWX2N4zgZW7Khq7JVZkoAPEskmMNInX
+	 t2Bw1yEOZ3/xasoPMQnnIdKJaZQ8NDPCe2HcxVTodRGTnU7XjaCG2dEs9iRHMNPrqB
+	 8QOpPQoOZJcaRzrQabcuBD7ErG5U1udsF2gDfdSh8Ns0DSN52khpSwqN/oa8wuiNAR
+	 gnX8jC8BiuGdw==
 From: Simon Horman <horms@kernel.org>
 To: lucien.xin@gmail.com
 Cc: Simon Horman <horms@kernel.org>,
@@ -62,12 +62,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	dreibh@simula.no,
 	davem@davemloft.net,
 	sd@queasysnail.net
-Subject: Re: [net-next,v9,05/15] quic: provide quic.h header files for kernel and userspace
-Date: Thu,  5 Feb 2026 11:55:06 +0000
-Message-ID: <20260205115506.2195311-1-horms@kernel.org>
+Subject: Re: [net-next,v9,06/15] quic: add stream management
+Date: Thu,  5 Feb 2026 11:55:18 +0000
+Message-ID: <20260205115518.2195328-1-horms@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <b3e81a27cc3e4c03fa8357c2c77b238997e48610.1770042461.git.lucien.xin@gmail.com>
-References: <b3e81a27cc3e4c03fa8357c2c77b238997e48610.1770042461.git.lucien.xin@gmail.com>
+In-Reply-To: <d3a376cf555e7740330a50d83e6201c9084bff01.1770042461.git.lucien.xin@gmail.com>
+References: <d3a376cf555e7740330a50d83e6201c9084bff01.1770042461.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -81,26 +81,50 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-quic: provide quic.h header files for kernel and userspace
+quic: add stream management
 
-This commit adds quic.h header files in include/uapi/linux and
-include/linux to provide the necessary definitions for the QUIC
-socket API.
+This patch introduces stream management infrastructure for the QUIC
+protocol, including a hash table for tracking active streams, functions
+for acquiring and releasing streams, and logic for detecting stream
+ID limits.
 
-> diff --git a/include/uapi/linux/quic.h b/include/uapi/linux/quic.h
-> --- /dev/null
-> +++ b/include/uapi/linux/quic.h
+> diff --git a/net/quic/socket.c b/net/quic/socket.c
+> index b86989080184..d6f25669c693 100644
+> --- a/net/quic/socket.c
+> +++ b/net/quic/socket.c
+> @@ -41,6 +41,9 @@ static int quic_init_sock(struct sock *sk)
+>  	sk->sk_write_space = quic_write_space;
+>  	sock_set_flag(sk, SOCK_USE_WRITE_QUEUE);
+>
+> +	if (quic_stream_init(quic_streams(sk)))
+> +		return -ENOMEM;
+
+If quic_stream_init() fails here, the function returns before calling
+sk_sockets_allocated_inc() and sock_prot_inuse_add() below. However,
+when initialization fails, inet_create() calls sk_common_release() which
+invokes quic_destroy_sock():
+
+quic_init_sock()
+    quic_stream_init() fails
+    return -ENOMEM
+        -> sk_common_release()
+            -> quic_destroy_sock()
+                -> sk_sockets_allocated_dec()  // underflow
+                -> sock_prot_inuse_add(..., -1)  // underflow
+
+Can this cause counter underflow since the increments never executed but
+the decrements in quic_destroy_sock() are unconditional?
+
+> +
+>  	WRITE_ONCE(sk->sk_sndbuf, READ_ONCE(sysctl_quic_wmem[1]));
+>  	WRITE_ONCE(sk->sk_rcvbuf, READ_ONCE(sysctl_quic_rmem[1]));
+>
+> @@ -52,6 +55,8 @@ static int quic_init_sock(struct sock *sk)
+>
+>  static void quic_destroy_sock(struct sock *sk)
+>  {
+> +	quic_stream_free(quic_streams(sk));
+> +
+>  	quic_data_free(quic_ticket(sk));
 
 [ ... ]
-
-> +enum quic_msg_flags {
-> +	/* flags for stream_flags */
-> +	MSG_QUIC_STREAM_NEW		= MSG_SYN,
-> +	MSG_QUIC_STREAM_FIN		= MSG_FIN,
-> +	MSG_QUIC_STREAM_UNI		= MSG_CONFIRM,
-> +	MSG_QUIC_STREAM_DONTWAIT	= MSG_WAITFORONE,
-> +	MSG_QUIC_STREAM_SNDBLOCK	= MSG_ERRQUEUE,
-> +
-> +	/* extented flags for msg_flags */
-
-This isn't a bug, but there's a typo: "extented" should be "extended".
