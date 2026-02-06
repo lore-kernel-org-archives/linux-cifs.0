@@ -1,62 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E502927E07E
-	for <linux-cifs@vger.kernel.org>; Fri,  6 Feb 2026 15:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1B7533D6CA
+	for <linux-cifs@vger.kernel.org>; Fri,  6 Feb 2026 15:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770390802; cv=none; b=i9Fcr4DiMV87gQ6iTJbOBZ9I4X1KHsBwdlhU1KWoqHPCLkAX1o/SDzh1C0xqwotwqdAnVwV7zMZn+EnyR71jqpaMRlyCtTUAkJgAADfVDJ+ypQYFkKfk5XjBu252kYRfr3qTqHh2ilAhFPqXs3BjOp08H6/4iw6M4EUe4a0FsKk=
+	t=1770390951; cv=none; b=mSujYXuG98E0fepCf2+W7pegkO2oJDus5WPgVPyB0PwlyRcDsNbMSrHdt5ioF1nuQ9U15wNFlUzEWOcrTZ2skpNFrwlKU2B2m6/0fcyY0yHMPGm4XISTlpZaXJgwiDlKWaotRSq8fGv9jgnDoIzG87ttw0t2fEtGOuxMcch/Qh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770390802; c=relaxed/simple;
-	bh=v5WsSDr2tQsBS6gRjKq1ZuVHOejbvcA+jUUZFzBkAh8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bBSwMmsac9z/zkuWZKcmmBjnZcsT0tvU+K+g8vlPboHdBxNCbXv1VPD5rGfuVQuRVmgo2dEpRHxbHe9gxgNhyBlIXiOFKuxPCY2auodqNRKhvLZjWeydSJ+gtfC7IZF+qREG0UhcXw6Z7UfeGHO/Q7bnec2rVm3j0E8t4nlvTUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O6xWP7GZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1770390951; c=relaxed/simple;
+	bh=ubRPE22dYPcVS743CCDeR7wr4K4O6mDQ7ObCOoewXDU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R9izRe0QPHY6ApTgV6DQR1ojzdCS8UmCDmFD6J5pORXk9yeSP4DlUCZjGRCi79VB3+K1JKz5GaUa5d7PHX0eDj+pdpsrWuBRXFVCrz3OaST3mhHAnN7JGBj2qh+LRnIQRPDgWbi0+GdIFDZ+EjWEM2moCY2f1mLF+JMfdA2mQ7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=sLCGhHjd; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6xWP7GZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FAD0C19422
-	for <linux-cifs@vger.kernel.org>; Fri,  6 Feb 2026 15:13:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770390801;
-	bh=v5WsSDr2tQsBS6gRjKq1ZuVHOejbvcA+jUUZFzBkAh8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=O6xWP7GZ5Yb6CxXDx2Hf0YMaSJQsvOG+XH7jYb5G27toJapP7F+YIt5qWGIlSvO6I
-	 Sv+Jt3ABzzPU6BX3Hzj+Uu7sDR5TGuuj1TpVgbBomSAahFlxCqmedpAojwnhixiJBc
-	 +bWVptgvzjYMzC0YEBszKp9Clz1neKjHhPbHDXZos/5oRCJpXFTeG3c88YJ4PAshce
-	 tkW3eprDMnlIXBMUorGPJ2tu6UbihfF9X93Ya88UARNAkJQNxFMp3pFF6v0CU9rAwZ
-	 srBFZyeZOBKNcx1fVMvubhijgJtNj7Bn6orPL/tAgFQLzusKBPUoY0S6ei8QwfgsSE
-	 u8mWp7eUtdL2A==
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b8850aa5b56so386485266b.2
-        for <linux-cifs@vger.kernel.org>; Fri, 06 Feb 2026 07:13:21 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXT99ygu1pM3lQbIbThiUcNQhqZmGFZyVrsynUgbWH0PO0IKfPSA3z5DYxrxUwOTRvnIZQ0qhcMmrUR@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdvupaI+KXvB70EYV90rNQbqyVRFOaSJ2j7nKmXYpCoyUx8aFV
-	gPflahDUn8LHa1UlK96jpKR2HyPxx7uUsvD0HhtXBSdYIg9Jmpe9Ju5J/rRKDKVs44tzLFhmZzL
-	2l6WRtJylR2UhDh0nrheKlBzWsu4+uWw=
-X-Received: by 2002:a17:906:f58b:b0:b8d:bf4d:7458 with SMTP id
- a640c23a62f3a-b8edf1ea7c4mr170888366b.24.1770390800136; Fri, 06 Feb 2026
- 07:13:20 -0800 (PST)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="sLCGhHjd"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=U1lpGlCPqpk8XjG9zwL1i8LWAkt1pVzR8V2hTITOLz0=; b=sLCGhHjdXrM/y6AAbUBkaIb3VJ
+	ZwJIBt0ZOgruYPGqOiUhB9CeG7TGg4bD3E4yuG9sJGS2fDbTK7VxUuKgNBOFiEpD+0UBnx4lCarAV
+	psljP//HtYe5orjxXoJWHHCv8t/6w1IgJMp7/f7MH6jVmw5o1RKBAf+dgm4WUCK4ZWvD/Zn2Vthqu
+	dmo70p+vsJisox4OWFvhszjy5e3ScXEsmpP60pC12JWVJHhtACoIMyGuzWzP1Az8uhSyWPDUwP2FP
+	xtEqIZ1rBOIUlr4ZiTYx/LD0CFNv2UcImJ1wduhf39EJhvROR70jDtdOziZMSztvi7Mltv1NlvMiC
+	3GSJNpkl/1hV0ffQDuPUj7eK18obzCT8J+CvbAHRAj8hrD6M9jvqLzBY5vpCS2nxJSaIxQJd8uG1+
+	87L62p5iXVUzdTLonrf6GVm1+Ds7GmtLKF6fKe/B6jatvfVtMooJZDtvghKVn66RDOJb+vgX10Afb
+	YpTUrC3o+e34IInDHswXu8IE;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1voNYi-00000004fHQ-37ah;
+	Fri, 06 Feb 2026 15:15:48 +0000
+Message-ID: <47c97aeb-ad4b-4032-aa2c-b04c85c74322@samba.org>
+Date: Fri, 6 Feb 2026 16:15:48 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1770311507.git.metze@samba.org>
-In-Reply-To: <cover.1770311507.git.metze@samba.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 7 Feb 2026 00:13:08 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8JgWAM-zc5CdNeuHOsKaBYKPp9NQBd9=Z8G-RNOLm9VA@mail.gmail.com>
-X-Gm-Features: AZwV_QjkO1J194Rkd9CCx2iguM3WblIOsNq5A4KXpPbfuqLTBvErm-_7ID82bno
-Message-ID: <CAKYAXd8JgWAM-zc5CdNeuHOsKaBYKPp9NQBd9=Z8G-RNOLm9VA@mail.gmail.com>
-Subject: Re: [PATCH v5 000/144] smb: smbdirect/client/server: moving to common
- functions and smbdirect.ko
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>, 
-	David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] smb: server: correct value for
+ smb_direct_max_fragmented_recv_size
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>
+References: <cover.1770307237.git.metze@samba.org>
+ <2e28ef145e4d88216e52f156ad592085adc55e61.1770307237.git.metze@samba.org>
+ <CAKYAXd-FraxgAm-yO6dM5XZF_MgOS0JzHhfwqVTZA1NkPztGew@mail.gmail.com>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <CAKYAXd-FraxgAm-yO6dM5XZF_MgOS0JzHhfwqVTZA1NkPztGew@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> Namjae, can you please test in your setup?
-There are no issues in my testing, but since there are a lot of
-patches in this series, I need a few more days to review them.
-Thanks.
+Am 06.02.26 um 16:09 schrieb Namjae Jeon:
+>> -/*  The maximum fragmented upper-layer payload receive size supported */
+>> -static int smb_direct_max_fragmented_recv_size = 1024 * 1024;
+>> +/*
+>> + * The maximum fragmented upper-layer payload receive size supported
+>> + *
+>> + * Assume max_payload_per_credit is
+>> + * smb_direct_receive_credit_max - 24 = 1340
+>> + *
+>> + * The maximum number would be
+>> + * smb_direct_receive_credit_max * max_payload_per_credit
+>> + *
+>> + *                       1340 * 255 = 341700 (0x536C4)
+>> + *
+>> + * The minimum value from the spec is 131072 (0x20000)
+>> + *
+>> + * For now we use the logic we used before:
+>> + *                 (1364 * 255) / 2 = 173910 (0x2A756)
+>> + */
+>> +static int smb_direct_max_fragmented_recv_size = (1364 * 255) / 2;
+>>
+>>   /*  The maximum single-message size which can be received */
+>>   static int smb_direct_max_receive_size = 1364;
+>> @@ -2531,6 +2546,29 @@ static int smb_direct_prepare(struct ksmbd_transport *t)
+>>                                    le32_to_cpu(req->max_receive_size));
+>>          sp->max_fragmented_send_size =
+>>                  le32_to_cpu(req->max_fragmented_size);
+>> +       /*
+>> +        * The maximum fragmented upper-layer payload receive size supported
+>> +        *
+>> +        * Assume max_payload_per_credit is
+>> +        * smb_direct_receive_credit_max - 24 = 1340
+>> +        *
+>> +        * The maximum number would be
+>> +        * smb_direct_receive_credit_max * max_payload_per_credit
+>> +        *
+>> +        *                       1340 * 255 = 341700 (0x536C4)
+>> +        *
+>> +        * The minimum value from the spec is 131072 (0x20000)
+>> +        *
+>> +        * For now we use the logic we used before:
+>> +        *                 (1364 * 255) / 2 = 173910 (0x2A756)
+> These comments explaining the calculation is currently duplicated in
+> both the global variable declaration and inside smb_direct_prepare().
+
+Yes, that's exactly what I wanted.
+
+In my smbdirect.ko patches smb_direct_prepare() will be removed
+and the comment moves to smbdirect_accept.c where there's no
+direct link between them anymore.
+
+I'd also like to keep this in order to remind me that
+we need a more useful solution to this.
+
+Windows offers a max fragmented size of 1048576 (0x100000)
+
+metze
+
