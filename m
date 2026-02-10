@@ -1,153 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D740334A797
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Feb 2026 14:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770734246; cv=none; b=NQpyi6UeuVw3L4Npyels8fuht+7ldX2tVGEUbI+h+f+7vXrO+rWMNuYaXauWYufT6C8iKBqS/0tAT7Z+3w01QzBO6Bw2qaO/TOsW0tx4LPHX1rnzCkoSulhczcHyHxbItDoV2wqCyAHbdYfNZfbb/et3BEQW+7gTkoEHNKIjKNw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770734246; c=relaxed/simple;
-	bh=YV590Pe1v4EJDAhoUB8bULTb+l8/REFI+8yDfNPGrJk=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AFD387370
+	for <linux-cifs@vger.kernel.org>; Tue, 10 Feb 2026 16:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770740675; cv=pass; b=niyMUW1/59SmkvbI+14tqDU3CEB8RK4+AcS4QmEbwkIO4maWgdwnPIvU4tc/aPAIdMSErL1ELeFWfDM3siYPq+AiJQsg50iKV5WXBXzeQnAdh5DVvFbuAtZI5x3UH0OC1N5JvE70Bs2FBWp8+4mTAIC1Gjj6BNN2/kHw/PmjX9Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770740675; c=relaxed/simple;
+	bh=BkWtyYpqejlmByRC727LdbfV/RYqAERDreFY/UP2Aa4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=adg87SpI9ECm6E+XVrP5EK2ry4vJ5tc7pzg7qSVqmho+em+pBshycODbZTcqtbxHfQn3dJmjwbokpBHrE+NxoZyI1vLsHRHkdkxSs7SGGokS4n2be4nBlkgx5lhvVLJhmzLK8GGuVG2jK/F8XwjaPUYQRvgicZC64kVj7Ns3YWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lW5qsELe; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=FiOSAxCpqrkF0So9EGLnrz848rxo0cfWT0UKvSmCZnC+x01h9HLH6iWjOZ8UsbRueGp6NGDrxTflHyMD/ozqlukrd4MUiS1lufd4L+SvDHBMfXXWzghhkKiyHm3ULaFLikkcAzhxKsx7/WnRajirePpQQdLsRu/rZscQ+5LJxWw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jXoHp7nY; arc=pass smtp.client-ip=209.85.167.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lW5qsELe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88B7EC116C6
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Feb 2026 14:37:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770734246;
-	bh=YV590Pe1v4EJDAhoUB8bULTb+l8/REFI+8yDfNPGrJk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=lW5qsELevl56yYpm9ptRpHkqfLfM22A0p5Q1AexDWN6BWBI/X9NcrKJC7MRiNCdBr
-	 baaM/N3SiZ3AeSk9f4/zHyTvRpe98oIcLM1VUSypmwDNWIQo8hmKbZxLiEWYT796xu
-	 GJ0cBKAegKnwF5kewYGb2azC39beNlBUaPzhsR/NLgulbPRNk87aJ5aGlH6B3nJ5Q0
-	 P4oQPtLTPUfsSAnYjCqZSp0C3hdeLnbpupXetRvTk3rHH1T4FYWUtxjr2uFrwM6EOy
-	 7P4dfdDhUeGXDYPwhx8NqwEy7EarEcMWZJJQLmanbOuh9sABbIVAhGfVyrSzenZUtN
-	 N88Fp7vWra5WQ==
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b8876d1a39bso598363866b.1
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Feb 2026 06:37:26 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUiwoVnu3RthmpKXO+jPjB7W1weN6F9Y4sr6UuhCKHD7cWZlc/5mbp3n2AeWfbQt7HPgRM/gbiwQlS3@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdqJ7w7eXrpFK6xZSNM3Yg+MyaRnB+/bmzMSzC4XLLQz5tsXGN
-	lLCkh5SbgJlb3FY6rYSkxUXQILLt8HeoQZZ0lLM2UsRymrpH9GpcZPmbehVeo12mmJ18cbZ8h/7
-	dboNiRXDUxnUcHBwUSVDmWw8cIKWdx+s=
-X-Received: by 2002:a17:907:9486:b0:b88:6327:d0eb with SMTP id
- a640c23a62f3a-b8edf456038mr876954566b.65.1770734245118; Tue, 10 Feb 2026
- 06:37:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jXoHp7nY"
+Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-45f0c1f1b54so3483926b6e.1
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Feb 2026 08:24:34 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770740674; cv=none;
+        d=google.com; s=arc-20240605;
+        b=E2gib4y27BaCmbuxy8vvmhU9iUVDDQcDfZdKvy4aONgKy6wNZcHKXXK8t9ViFlWYjb
+         ypts2uEKkTVCmJlHgXNjcYzJ+5mO3Bt9OAd/E2O7UNDPtFDPmSVj0rvPOOeV/oNLqum1
+         kRhXJjg7pFiidpwHKGIr19WhbE5swO+T6eYnQoNBvmRdreMOpC8MVpqGGJAVcULEdcAa
+         Qtc1A38wUEJX+p8cjazx+v6zPQmUFVVNwpNR49Nks1+1yda5E790jxsmpdAvtyEcicIG
+         EI3B0mG434+vVX7aPpRr5Eo2SCFa3MOd8urhxE7qWHhkHdIV37vKx3BTRdH+QmUAc8wT
+         KzzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=e87k8iFish9q2Uq3v9Uy7Fjw166hMufB5O7qErb387U=;
+        fh=mETyyNx601eptDds1AqIJUB3j27aq18ByceMhJ39OTw=;
+        b=IPtRdNoNyX5v0iHHfmAZPK7TCJNP8uZffGG/t4oClYoECbCr14B8TVr10XZvoePz6/
+         9Ys3+zLQWDch4+yTiDl5aJ5+HyLIKqhLeRqTwljRwLUThjeIaqegjY174R4xorgXpMXx
+         JPPed9FY/OPsUJf3ShT5Y5HeRq15gaAPaUS5IVRXHwNhEKPEBrKN394x0Abe7V4cG67e
+         a+d+UOvObWAny15uAFjDvghbK4QzZrUQ0vWye9flLzL2S8qplqYvSX2ERKFNgXqH6pXg
+         1hEZY4E/zkwehiOAXSd57YLXaBhmUjaUtM4eUtOROoS2lFJmEbhVqGVZf+zeaeMfc1/N
+         u1RA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770740674; x=1771345474; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=e87k8iFish9q2Uq3v9Uy7Fjw166hMufB5O7qErb387U=;
+        b=jXoHp7nY23Kq85huTPiHL1JsEK6nChfn2n6ItO9mJhQQLQMLKOQUwAVBSk5naFxJhY
+         R/CAa71VMkrHO+oF8K/OeGmgfjlswwdenQw7JEPsknyqg9LfdHHw0qjAjeMFHb7LmAQ0
+         sJGdIejhGm1kpLSexdcYBGDFglcXyj/uHKnuemJHLlww8nLSGLHYaDtZaLpyytNS4u7q
+         5lZFsffLsIby593IrGgzTQKuGXwsc2GUrRsA2zUNcdHq2LR4zmXIHCTuBkFVCbD5V0Zm
+         maODHoWpBu+PpgywObJIsMVDxwDufhdioUxtB/jrMD9+mMy1p548uzR+djRpr1ECBXDU
+         x+Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770740674; x=1771345474;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e87k8iFish9q2Uq3v9Uy7Fjw166hMufB5O7qErb387U=;
+        b=XujX3hZkdfy8eFLva6nva4i1H5DC36z0KRf4KlvfwjVYxqPjmcrCYsUeUTnD2YNIMs
+         dEuAsJsfPQVs20AP5u7uBAF6+NjeY4pOUtH9YUdDjxjV/lTPMMTBru2grB2ohK7LgOXs
+         FZUNgg/l9V5qAa6FS4OhMBDWGfNU3T83Ej0zZ46lamDofl7vqdJ5UmAlHwTXcQbh2707
+         9GUAknPtww/v9Lwj/UPd1rNarv4HDG5ptWAVLivvZlfBivNTTIcHT0I4E8I/dWdseKOg
+         vPzXIR4G2MqtLUser2NTaLw4gUWZU4ik6l5kIXiLSnWAtpOojDNe2Rf67c2TqREC5d7i
+         Da+A==
+X-Forwarded-Encrypted: i=1; AJvYcCXA68+KZBIzFzBOcdk0PAbh09fFX/CeNKFyCPlSAZwN0VjdNDKeLhTZClJGcvRcSBHGnjdo+1HufNfx@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/jnikrHX07snHKd+6ohCL0FL7fddzBjMu2kb19bXLuhcE0dRX
+	saMt92b27XQupr2xEPt/3pOVi86P+Hozh/+5qCwYO7gm/qEaD1PgAw3QoQLPrO5yw/pzxzZV0zq
+	9Ww2YuzgqWdRR6bZc2Lg5iL3gGqhbfzA=
+X-Gm-Gg: AZuq6aLFCvc0tfGrl+tuX/IjASdtS+mYvKwNwBhJ+gIvML3HsqerBtUWsuHhqN2WfS8
+	3d+hPtWbGj5u+AVNKCp7P+XiPRZHl2v/ExwD4VGJiKeZgQSVtoPvLMIHbwDJwlb+ZA7BTc81zuk
+	kD65C9RgiqBWLfxSLOOfzk2z6v2FNSNZA8Cww8WJc/Y7WAe3TSSs6ZS60ImXjNbzLsmPrqDs9bR
+	Sq2pLg/AWlMpIrtCbLJppUf4yyEReHa6orHCU76cojTQmoKerfV8/ppnxzRsDOabT5aSkrDYb9S
+	Xy5TV0A=
+X-Received: by 2002:a05:6808:4f23:b0:45f:42d6:2ffb with SMTP id
+ 5614622812f47-462fd051fdamr6992569b6e.41.1770740673692; Tue, 10 Feb 2026
+ 08:24:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1770311507.git.metze@samba.org> <CAKYAXd_CqpqXnh+k19NVdgQdDAnp6k5NbPqcyd0anocBJrGd_Q@mail.gmail.com>
- <7140153c-7858-474b-abe5-aee69bd196a2@samba.org> <d5d0ff21-83ed-44b9-bd3c-3cf3d2b14fc2@samba.org>
-In-Reply-To: <d5d0ff21-83ed-44b9-bd3c-3cf3d2b14fc2@samba.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 10 Feb 2026 23:37:12 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-vGej9K53-06iy+p6nVSDLuwVU_+41R=7EUfbTjx=O5Q@mail.gmail.com>
-X-Gm-Features: AZwV_QiNQiJHbm-KEQR705dX08IoY0RyBS_tAAWsEtGJEIufQXGzc_wqMZ8SDw0
-Message-ID: <CAKYAXd-vGej9K53-06iy+p6nVSDLuwVU_+41R=7EUfbTjx=O5Q@mail.gmail.com>
-Subject: Re: [PATCH v5 000/144] smb: smbdirect/client/server: moving to common
- functions and smbdirect.ko
-To: Stefan Metzmacher <metze@samba.org>
-Cc: David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, Tom Talpey <tom@talpey.com>, 
-	Steve French <smfrench@gmail.com>
+References: <20260120142439.1821554-1-cel@kernel.org> <20260123-zwirn-verfassen-c93175b7a1ee@brauner>
+ <41b1274b-0720-451d-80db-210697cdb6ac@app.fastmail.com> <20260124-gezollt-vorbild-4f65079ab1f1@brauner>
+ <a1692040-58d0-412d-b0fc-c7b7a62585c4@app.fastmail.com>
+In-Reply-To: <a1692040-58d0-412d-b0fc-c7b7a62585c4@app.fastmail.com>
+From: Cedric Blancher <cedric.blancher@gmail.com>
+Date: Tue, 10 Feb 2026 17:23:57 +0100
+X-Gm-Features: AZwV_Qjy3M0uZY-NRx3otdHnq6x-9RSVjw1ETeNOu6B1p4FZNE0JCUf2MFslsk8
+Message-ID: <CALXu0UcJf+R3HuzwUrUTjsuYWdFrLZOwAsEtSyto2T9Rtg4rsw@mail.gmail.com>
+Subject: Re: [PATCH v6 00/16] Exposing case folding behavior
+To: linux-nfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	linux-f2fs-devel@lists.sourceforge.net
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 10, 2026 at 4:11=E2=80=AFAM Stefan Metzmacher <metze@samba.org>=
- wrote:
+On Sun, 25 Jan 2026 at 23:05, Chuck Lever <cel@kernel.org> wrote:
 >
-> Am 09.02.26 um 14:22 schrieb Stefan Metzmacher via samba-technical:
-> > Am 09.02.26 um 08:29 schrieb Namjae Jeon:
-> >>>
-> >>> I tested with with mlx5_ib, irdma (roce) and rxe.
-> >>> There's still a known problem with iwarp.
-> >> Let me know what the known problem is.
-> >
-> > It's the rw credit deadlock, as use rw credits
-> > for the wrong thing, which means we easily deadlock
-> > if the client uses an array smbdirect_buffer_descriptor_v1,
-> > where the could larger than the possible rw credits
-> > be calculated. While the max possible rw credits we calculate
-> > is the value that is needed in order to
-> > transfer the maximal rw size into a single
-> > smbdirect_buffer_descriptor_v1.
-> >
-> > This commit adds a WARN_ONCE detection for the
-> > problem:
-> > https://git.samba.org/?p=3Dmetze/linux/wip.git;a=3Dcommitdiff;h=3De6260=
-d7a518972ae1ca627e411cc16095c044d59
-> >
-> > See the diff and commit messages of the top ~15 commits
-> > in my for-6.18/ksmbd-smbdirect-regression-v4, which try to
-> > fix the problem.
-> >
-> > I try to fix it once I have the needed pcie adapters in
-> > order to out my Chelsio T520-BT cards into the free x4 slot
-> > of my testservers.
-> >
-> > As there are some strange page fault problems with the irdma
-> > driver, see
-> > https://git.samba.org/?p=3Dmetze/linux/wip.git;a=3Dcommitdiff;h=3Da6b51=
-5cda103c1ac1537c92a4e9dbd75a31d92ef
-> > And also
-> > https://git.samba.org/?p=3Dmetze/samba/wip.git;a=3Dcommitdiff;h=3De784b=
-53167dc2cf4316b66a7599dab5b9e6c7208
-> >
-> > For the client problem with irdma, see
-> > https://git.samba.org/?p=3Dmetze/linux/wip.git;a=3Dcommitdiff;h=3Dfb5cc=
-2a59b4719015979a1f1355f66f27002b4cf
-> > irdma_map_mr_sg may merge sg elements any may not return
-> > the same value as the given sg_nents on success.
-> >
-> >>>
-> >>> So far I can't see any regression compared the
-> >>> state before these 144 patches.
-> >>>
-> >>> Namjae, can you please test in your setup?
+>
+>
+> On Sat, Jan 24, 2026, at 7:52 AM, Christian Brauner wrote:
+> > On Fri, Jan 23, 2026 at 10:39:55AM -0500, Chuck Lever wrote:
 > >>
-> >> Is there any reason to print the log below by default?
-> >> ksmbd: smb_direct: smbdirect_socket_schedule_cleanup(-ESHUTDOWN)
-> >> called from smbdirect_socket_shutdown in line=3D650 status=3DLISTENING
-> >> ksmbd: smb_direct: smbdirect_socket_schedule_cleanup(-ESHUTDOWN)
-> >> called from smbdirect_socket_shutdown in line=3D650 status=3DLISTENING
-> >> ksmbd: smb_direct: smbdirect_socket_schedule_cleanup(-ESHUTDOWN)
-> >> called from smbdirect_socket_shutdown in line=3D650 status=3DCONNECTED
-> >> ksmbd: smb_direct: smbdirect_socket_schedule_cleanup(-ESHUTDOWN)
-> >> called from smbdirect_socket_shutdown in line=3D650 status=3DCONNECTED
+> >>
+> >> On Fri, Jan 23, 2026, at 7:12 AM, Christian Brauner wrote:
+> >> >> Series based on v6.19-rc5.
+> >> >
+> >> > We're starting to cut it close even with the announced -rc8.
+> >> > So my current preference would be to wait for the 7.1 merge window.
+> >>
+> >> Hi Christian -
+> >>
+> >> Do you have a preference about continuing to post this series
+> >> during the merge window? I ask because netdev generally likes
+> >> a quiet period during the merge window.
 > >
-> > I can move the above message to level INFO.
-> >
-> >> ksmbd: smb_direct: status=3DERROR first_error=3D-ESHUTDOWN =3D> -ENOTC=
-ONN
-> >
-> > This is basically the same messages as the one we
-> > had in smb_direct_read() before:
-> >
-> >          if (sc->status !=3D SMBDIRECT_SOCKET_CONNECTED) {
-> >                  pr_err("disconnected\n");
-> >                  return -ENOTCONN;
-> >          }
-> >
-> > If I remember correctly it appeared just as:
-> >
-> > 'ksmbd: disconnected'
-> >
-> > I can just move the new message to level INFO too, ok?
+> > It's usually most helpful if people resend after -rc1 is out because
+> > then I can just pull it without having to worry about merge conflicts.
+> > But fwiw, I have you series in vfs-7.1.casefolding already. Let me push
+> > it out so you can see it.
 >
-> My master-fs-smb branch has 3 commits which should disable the
-> messages by default, let me know if your happy with the logic
-> and I'll squash them to the correct commit.
->
-> https://git.samba.org/?p=3Dmetze/linux/wip.git;a=3Dshortlog;h=3D8b2f53aec=
-19ebc180c11504600b5e5372d2220cb
-Looks good to me.
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-for this series.
->
-> metze
->
+> There will be at least one more revision of this series (and it can
+> happen in a few weeks) to split 1/16 as Darrick requested, and
+> address the nit that Jan noted.
+
+Are you targeting LInux 7.0 or Linux 7.1?
+
+Ced
+-- 
+Cedric Blancher <cedric.blancher@gmail.com>
+[https://plus.google.com/u/0/+CedricBlancher/]
+Institute Pasteur
