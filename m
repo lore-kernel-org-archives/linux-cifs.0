@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED8E2DC76F;
-	Tue, 10 Feb 2026 23:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 083C319ABD8;
+	Tue, 10 Feb 2026 23:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770766289; cv=none; b=ec9QGOCw2jBq/7F3cHhfciO4hS/4HDfVTP5Wq3RkDocj/CtoL87g7WKNjbY9AKQkRyu6jGxHJN+146aoaYTz/Wj0u5Xdk1WFZA+PeCpIzLb1hTcov+ElbEku25awZYtYDv/LxO1UPr7bbAZXZbuVArs1wibP+yPakMf6qVhkrqU=
+	t=1770766318; cv=none; b=QtVQuz8VnXxty+Et5fUF/5uRfextLzm26MLHJNiqTgwdXsdWW+4N/SfJJmuOi9LaB7ft5a7SN8t0dMtEuqyeoAyeKeKAVlZ2EjPY6GuJmX2Y6UYcjJg2h0rtO4XviISoR8ElnUe027vJ6lwo4sunlzDeABXSMN/NfUaKYUJ1erA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770766289; c=relaxed/simple;
-	bh=twtZnGMvMuAVmKcsvTkyEiO062K7s/3OsDbHarnmkCA=;
+	s=arc-20240116; t=1770766318; c=relaxed/simple;
+	bh=xrQZpZc1cemHRFxOCyXuTqEhnDLVKayiGat5slvaY4A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gVI1fo7oT+C1zxKpqE46W7T7vZKv15g6+XeueNTZmnpHfJG/6hMZTZcSRnC1+YXoQ/v4+QMAL8ViWJXRlN3APxzRtXUoM89ceg+3c0vmmbgEOUhUgWBsrFnVEN1uI7bNFZPhb0Gr5L2nmu9IwGOWGi+4OZSK5sna8uUEtdPZj7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JFpSGYX5; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=q9ZvEfCVXJYdttsrFeGqwM8Gx8/QvPqQpIfoT+psx+eZvbITOfVELd2QwUkVwLmbCcDtTABmq543Wf3iOGVr81ArMKDXTJqqFrURKm2YquBb0HSVO1hGX14iGRsSxEEhv60lJqwJHatr1DUmIB8xdsxGW7Rd5WFBvE+Q1Bcn4LA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OWssTH/G; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JFpSGYX5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B3D4C19425;
-	Tue, 10 Feb 2026 23:31:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OWssTH/G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8A77C116C6;
+	Tue, 10 Feb 2026 23:31:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770766288;
-	bh=twtZnGMvMuAVmKcsvTkyEiO062K7s/3OsDbHarnmkCA=;
+	s=k20201202; t=1770766317;
+	bh=xrQZpZc1cemHRFxOCyXuTqEhnDLVKayiGat5slvaY4A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JFpSGYX5xcANqrYT325bu6atZ1jKv+d/vkdqq/wsY3sBr/Y+DlOWsIcFBdFVH/5+/
-	 8wqYs7bgkYP34vddDCg5oOGjTU4kWGX58y01W0vU9473dSrb2Zo1lbE1y+Qmqj2SlV
-	 cJ7RoKTrvAL/cpMPhUXW+0rouvZk45mPKmBfjZndI2q8zrzjjlDMFLklECdxvfseGO
-	 3D7bk0e7NhwzDRguohFV8Dw11Cs41ni2JFyQoL3bIYE2p1lDcGGCGJvC2a7fMctBWb
-	 0RaVP3Jcyi+fqUc58r6WN8gKPKM4NNx7wivCEYFo3Y7a4xEinDn2EzD5wBSkw6z0Rk
-	 XsCX5A+PRGtxg==
+	b=OWssTH/GqZOR4gRxDexYNvLEJHynn5dhypdx0ZeD7yJUdoBjSOCS891KJMscV8BhL
+	 odVAnPWZcaiMdoAqbSegqxszd/V0YI6w8adjLvJjL1qmxlODKtysWqTn/TzE7L4mgV
+	 bwEXADDs1UlFXbOGGq1zLXrlbWe55GkKIPMRjnbe910IYQoz7bBs4VlP/U9OKmCaBt
+	 Znk2mCN3TiNCLgvKGPOQLBnDTYrAQ+Tck4RkNU7heQ9ZG0CCP/z8A/uyrSRkQ6N313
+	 knaow3zLjSgnsQPT7UKWAuMLTe4ARom+LI4CUlamH0ZcqGYb9TWinOdUZ81E3K2gt9
+	 heKW1M3YR629Q==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -35,9 +35,9 @@ Cc: Henrique Carvalho <henrique.carvalho@suse.com>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.19-6.6] smb: client: prevent races in ->query_interfaces()
-Date: Tue, 10 Feb 2026 18:30:49 -0500
-Message-ID: <20260210233123.2905307-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.19-6.1] smb: client: add proper locking around ses->iface_last_update
+Date: Tue, 10 Feb 2026 18:31:07 -0500
+Message-ID: <20260210233123.2905307-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260210233123.2905307-1-sashal@kernel.org>
 References: <20260210233123.2905307-1-sashal@kernel.org>
@@ -55,13 +55,10 @@ Content-Transfer-Encoding: 8bit
 
 From: Henrique Carvalho <henrique.carvalho@suse.com>
 
-[ Upstream commit c3c06e42e1527716c54f3ad2ced6a034b5f3a489 ]
+[ Upstream commit e97dcac3dc0bd37e4b56aaa6874b572a3a461102 ]
 
-It was possible for two query interface works to be concurrently trying
-to update the interfaces.
-
-Prevent this by checking and updating iface_last_update under
-iface_lock.
+There is a missing ses->iface_lock in cifs_setup_session,
+around ses->iface_last_update.
 
 Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
@@ -70,35 +67,51 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have a complete picture. Let me summarize my analysis.
+The locking infrastructure and documentation are identical in the stable
+branch. Now I have all the information needed for a thorough analysis.
 
 ---
 
-## Detailed Analysis
+## Complete Analysis
 
-### 1. Commit Message Analysis
+### 1. COMMIT MESSAGE ANALYSIS
 
-The commit message clearly describes a **race condition**: "It was
-possible for two query interface works to be concurrently trying to
-update the interfaces." The fix is to check and update
-`iface_last_update` atomically under `iface_lock`. Authored by Henrique
-Carvalho (SUSE) and signed off by Steve French (CIFS maintainer) - both
-trusted SMB subsystem contributors.
+The commit subject is "smb: client: add proper locking around
+ses->iface_last_update". The body explains that there is a "missing
+ses->iface_lock in cifs_setup_session, around ses->iface_last_update."
+This is a direct, clear statement of a locking bug fix. The commit is
+authored by Henrique Carvalho (SUSE employee) and accepted by Steve
+French (the SMB/CIFS maintainer).
 
-### 2. The Bug: TOCTOU Race on `iface_last_update`
+### 2. CODE CHANGE ANALYSIS
 
-The `iface_last_update` field is explicitly documented in `cifsglob.h`
-as **protected by `iface_lock`**:
+The patch is minimal — exactly 2 lines added:
 
-```1119:1123:fs/smb/client/cifsglob.h
-        /* ========= begin: protected by iface_lock ======== */
-        struct list_head iface_list;
-        size_t iface_count;
-        unsigned long iface_last_update; /* jiffies */
-        /* ========= end: protected by iface_lock ======== */
+```c
++               spin_lock(&ses->iface_lock);
+                ses->iface_last_update = 0;
++               spin_unlock(&ses->iface_lock);
 ```
 
-And confirmed in the lock ordering documentation:
+This wraps the write to `ses->iface_last_update` (which forces an
+interface list refresh) with the `ses->iface_lock` spinlock.
+
+### 3. BUG MECHANISM — THE DATA RACE
+
+**The documentation is unambiguous.** In `fs/smb/client/cifsglob.h`:
+
+```1111:1123:fs/smb/client/cifsglob.h
+ - iface_lock should be taken when accessing any of these fields
+ */
+spinlock_t iface_lock;
+/* ========= begin: protected by iface_lock ======== */
+struct list_head iface_list;
+size_t iface_count;
+unsigned long iface_last_update; /* jiffies */
+/* ========= end: protected by iface_lock ======== */
+```
+
+And in the locking documentation at lines 2000-2002:
 
 ```2000:2002:fs/smb/client/cifsglob.h
  - cifs_ses->iface_lock            cifs_ses->iface_list
@@ -107,184 +120,122 @@ And confirmed in the lock ordering documentation:
  - ->iface_last_update
 ```
 
-**Before the fix**, the code violated this contract in two ways:
+`iface_last_update` is explicitly documented as protected by
+`iface_lock`. The buggy code at `connect.c:4273` writes to this field
+without holding the lock.
 
-1. **`SMB3_request_interfaces()` (line 828-831)**: Read
-   `iface_last_update` **without any lock**:
-```827:831:fs/smb/client/smb2ops.c
-        /* do not query too frequently */
-        if (ses->iface_last_update &&
-            time_before(jiffies, ses->iface_last_update +
-                        (SMB_INTERFACE_POLL_INTERVAL * HZ)))
-                return 0;
-```
+**Concurrent access paths that create the race:**
 
-2. **`parse_server_interfaces()` (line 798)**: Wrote `iface_last_update
-   = jiffies` **without the lock** at the end of processing.
+1. **Writer (buggy, in `cifs_setup_session`):** Sets
+   `ses->iface_last_update = 0` during session reconnect — called from
+   `smb2_reconnect()`, `cifs_reconnect_tcon()`, `cifs_get_smb_ses()`,
+   and `cifs_ses_add_channel()`.
 
-The second check inside `parse_server_interfaces()` (line 641-646, under
-`iface_lock`) was meant to catch races, but it came **after** the
-expensive `SMB2_ioctl()` network call had already been made.
+2. **Reader (in `SMB3_request_interfaces`, smb2ops.c:828):** Reads
+   `iface_last_update` as an optimization check before performing an
+   expensive ioctl. This is called from the
+   `smb2_query_server_interfaces` delayed work that runs periodically
+   every `SMB_INTERFACE_POLL_INTERVAL` seconds.
 
-### 3. Race Scenario
+3. **Reader/Writer (in `parse_server_interfaces`, smb2ops.c:641):**
+   Reads `iface_last_update` with `iface_lock` held, writes
+   `iface_last_update` at lines 669 and 798.
 
-`SMB3_request_interfaces()` can be called from **multiple concurrent
-paths**:
-- `smb2_query_server_interfaces()` - periodic delayed work (every 600s)
-- `smb2_reconnect()` (via `query_server_interfaces` function pointer) -
-  reconnection path
-- `smb3_qfs_tcon()` - during mount
+**The concrete race scenario:** Thread A is doing a session reconnect
+and calls `cifs_setup_session()` which writes `iface_last_update = 0`
+without the lock. Concurrently, Thread B (the periodic delayed work
+`smb2_query_server_interfaces`) calls
+`SMB3_request_interfaces`/`parse_server_interfaces` which reads
+`iface_last_update` under `iface_lock`. This is a classic data race
+where a writer and reader access shared data without consistent
+synchronization.
 
-**Race sequence**:
-1. Thread A reads `iface_last_update` (no lock) → timer expired →
-   proceeds to `SMB2_ioctl()`
-2. Thread B reads `iface_last_update` (no lock) → same stale value →
-   also proceeds to `SMB2_ioctl()`
-3. Both threads enter `parse_server_interfaces()` concurrently
-4. Thread A takes `iface_lock`, marks ALL interfaces as `is_active = 0`,
-   drops lock
-5. Thread B takes `iface_lock`, marks ALL interfaces as `is_active = 0`
-   again, drops lock
-6. Both threads independently iterate the buffer, both try to match/add
-   interfaces
-7. In the cleanup (`out:` label), both threads iterate the list and call
-   `kref_put()` on inactive entries
+On weakly-ordered architectures (ARM64), this can lead to the reader
+seeing a torn or stale value of `iface_last_update`, potentially causing
+the interface list not to be refreshed when it should be (or vice
+versa). Even on x86-64 where `unsigned long` writes are naturally
+atomic, this violates the documented locking discipline and could
+confuse KCSAN (Kernel Concurrency Sanitizer).
 
-**Consequences**:
-- **Double `kref_put()` / use-after-free**: Both threads may identify
-  the same interface as inactive and call `kref_put()` on it,
-  potentially dropping the refcount below zero or causing UAF
-- **Corrupted `iface_count`**: Both threads decrement `ses->iface_count`
-  for the same interface
-- **List corruption**: While individual list operations are under
-  `iface_lock`, the mark-inactive → process → cleanup sequence is NOT
-  atomic, leading to incorrect state
-- **Unnecessary duplicate network I/O**: Both threads perform
-  `SMB2_ioctl()` when only one is needed
+### 4. SCOPE AND RISK ASSESSMENT
 
-### 4. The Fix
+- **Size:** 2 lines added — the smallest possible fix
+- **Files touched:** 1 (`fs/smb/client/connect.c`)
+- **Risk of regression:** Extremely low. The added
+  `spin_lock/spin_unlock` pair is properly nested inside the already-
+  held `ses_lock`. Looking at the locking hierarchy documented in
+  `cifsglob.h`, `ses_lock` and `iface_lock` are independent spinlocks
+  (no nested ordering requirement documented). The critical section is
+  one `unsigned long` assignment — negligible contention.
+- **Subsystem:** SMB client — a filesystem used by many enterprise users
+  for networked file access
 
-The fix is elegant and minimal (8 insertions, 11 deletions, net -3
-lines):
+### 5. USER IMPACT
 
-1. **In `SMB3_request_interfaces()`**: Wraps the `iface_last_update`
-   check **and** update in a single `spin_lock/spin_unlock` critical
-   section. Crucially, it sets `iface_last_update = jiffies` **before**
-   doing any work (optimistic update), ensuring the second thread will
-   see the updated timestamp and bail out immediately.
+This affects all users of the SMB/CIFS client who use multichannel
+sessions (Azure files, enterprise NAS). The race occurs during session
+reconnect — a critical recovery path that fires when a server connection
+drops. The race could cause:
+- **Missed interface refresh:** If the write to `iface_last_update = 0`
+  tears or is lost due to the race, the client might not refresh the
+  interface list during reconnect, potentially connecting secondary
+  channels to stale/wrong IP addresses
+- **Incorrect reconnection behavior:** After a server failover (common
+  with Azure files), secondary channels might connect to the wrong
+  server
 
-2. **In `parse_server_interfaces()`**: Removes the now-redundant
-   duplicate time check and the two `iface_last_update = jiffies`
-   assignments (one in the empty-list error path, one at end of
-   processing).
+### 6. AFFECTED VERSIONS
 
-This converts the race-prone check-then-act sequence into an atomic
-check-and-update.
+The buggy commit `d9a6d78096056a3cb5c5f07a730ab92f2f9ac4e6` was
+introduced in v6.7-rc1 and was already backported to stable branches:
+- 6.1.y (as `c9569bfd2868`)
+- 6.6.y (as `aabf4851d160`)
+- 6.12.y (as `d9a6d78096056`)
 
-### 5. Scope and Risk Assessment
+The code context is identical in all these branches — the fix applies
+cleanly.
 
-- **Files changed**: 1 (`fs/smb/client/smb2ops.c`)
-- **Lines changed**: 8 insertions, 11 deletions (net -3)
-- **Subsystem**: SMB/CIFS client - filesystem, important for enterprise
-  users
-- **Risk**: Very low - the change only adds proper locking around an
-  already-documented protected field
-- **Side effect consideration**: Setting `iface_last_update` before the
-  work means that if `SMB2_ioctl()` fails, the timestamp is still
-  updated. However, this is acceptable because: (a) the old code also
-  set it on error paths (the `-EOPNOTSUPP` case set it), and (b) the
-  600-second polling interval means it will retry relatively soon
+### 7. DEPENDENCY CHECK
 
-### 6. Stable Tree Applicability
+This fix is completely self-contained. It requires only:
+- `ses->iface_lock` spinlock to exist (present since the multichannel
+  feature was added)
+- The `iface_last_update` field to be in the `iface_lock`-protected
+  region (documented since its introduction)
 
-The vulnerable code exists in:
-- **v6.12**: Identical structure to mainline, should apply cleanly
-- **v6.6**: Similar structure but has a slightly different
-  `iface_last_update` placement (inside the while loop, not at end of
-  function - due to commit 78e727e58e54e being a v6.8 era change). The
-  core race (unlocked check in `SMB3_request_interfaces`) exists and the
-  fix concept applies, but minor adaptation may be needed.
+No other commits are needed.
 
-### 7. Dependencies
+### 8. CLASSIFICATION
 
-The fix is self-contained. It doesn't depend on any other commits. The
-only context difference for older stable trees (v6.6) is the location of
-`iface_last_update = jiffies` inside `parse_server_interfaces()`, but
-the fix's approach (move checking+setting to the caller under lock,
-remove from callee) works regardless.
-
-### 8. Summary
-
-This is a clear race condition fix in the SMB/CIFS client that:
-- Fixes a documented locking violation (`iface_last_update` accessed
-  without `iface_lock`)
-- Prevents potential use-after-free via double `kref_put()` on
-  interfaces
-- Prevents interface list state corruption affecting SMB multichannel
-- Is small (net -3 lines), surgical, single-file, and self-contained
-- Affects an important subsystem (filesystem client) used widely in
-  enterprise environments
-- Has very low regression risk
+This is a **race condition fix** (data race on a shared variable
+accessed without proper synchronization). It falls squarely into the
+"synchronization changes" category of stable-worthy fixes. The fix is:
+- Obviously correct (adds documented required locking)
+- Tested (accepted by maintainer)
+- Small (2 lines)
+- Fixes a real bug (data race during reconnect)
+- Contained (no side effects)
+- Does not introduce new features or APIs
 
 **YES**
 
- fs/smb/client/smb2ops.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+ fs/smb/client/connect.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index c1aaf77e187b6..edfd6a4e87e8b 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -637,13 +637,6 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 	p = buf;
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index ce620503e9f70..60c76375f0f50 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -4270,7 +4270,9 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+ 		ses->ses_status = SES_IN_SETUP;
  
- 	spin_lock(&ses->iface_lock);
--	/* do not query too frequently, this time with lock held */
--	if (ses->iface_last_update &&
--	    time_before(jiffies, ses->iface_last_update +
--			(SMB_INTERFACE_POLL_INTERVAL * HZ))) {
--		spin_unlock(&ses->iface_lock);
--		return 0;
--	}
- 
- 	/*
- 	 * Go through iface_list and mark them as inactive
-@@ -666,7 +659,6 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 				 "Empty network interface list returned by server %s\n",
- 				 ses->server->hostname);
- 		rc = -EOPNOTSUPP;
--		ses->iface_last_update = jiffies;
- 		goto out;
- 	}
- 
-@@ -795,8 +787,6 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 	     + sizeof(p->Next) && p->Next))
- 		cifs_dbg(VFS, "%s: incomplete interface info\n", __func__);
- 
--	ses->iface_last_update = jiffies;
--
- out:
- 	/*
- 	 * Go through the list again and put the inactive entries
-@@ -825,10 +815,17 @@ SMB3_request_interfaces(const unsigned int xid, struct cifs_tcon *tcon, bool in_
- 	struct TCP_Server_Info *pserver;
- 
- 	/* do not query too frequently */
-+	spin_lock(&ses->iface_lock);
- 	if (ses->iface_last_update &&
- 	    time_before(jiffies, ses->iface_last_update +
--			(SMB_INTERFACE_POLL_INTERVAL * HZ)))
-+			(SMB_INTERFACE_POLL_INTERVAL * HZ))) {
+ 		/* force iface_list refresh */
++		spin_lock(&ses->iface_lock);
+ 		ses->iface_last_update = 0;
 +		spin_unlock(&ses->iface_lock);
- 		return 0;
-+	}
-+
-+	ses->iface_last_update = jiffies;
-+
-+	spin_unlock(&ses->iface_lock);
+ 	}
+ 	spin_unlock(&ses->ses_lock);
  
- 	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
- 			FSCTL_QUERY_NETWORK_INTERFACE_INFO,
 -- 
 2.51.0
 
