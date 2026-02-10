@@ -1,113 +1,124 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7003612DB
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Feb 2026 11:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E60D1CAA7D;
+	Tue, 10 Feb 2026 14:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770721476; cv=none; b=jhe0SDaM+LqSUAAn56v1hAxpdqAKoHhwxR6zXROsDYuPqbrCK+eQ5ttB+5JFWfK9KRd4eqJbyibg3whgLF0HD3O1vHbJRk374uVsXwKAKZpblvY4cjQmIPEFpvQ41N0RggQOdHTt3TB9bcWvSkIGuaVUK2S3SMZxrANgjb0HjDE=
+	t=1770732745; cv=none; b=BFs7Y/P1thtlpZY1YVFk2TjKx3iB37rRIP2zU3obWCTuKC+NQjOYnWFQxDCdKzHWJiusgu21dOBD+JNRSnUrFA4vNiFH7JUZvwmH1n93nkCZ0BQ5Jqk82V1v9+Mv33LBwECHIdUEEijPClMipcVIfURKMXYj5SFFNEQg2CJydOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770721476; c=relaxed/simple;
-	bh=LG7YbVmhhGFwNk/Q0/CFSlgIHlx5jtDXvc+QsYLGRLg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gy7XtULNXOEgzJmXa0EipKx/8f3+Td3EbE4jCxD0zmI5PYw2JMy9Qg38zPsUAbzcTQm8TH3MGwLSw2eeZWAA3dz4VzUbcfx39lbT4Y9RrZUB8r6vfGrx7sUbP8GveclhE1oyK+AQLCbzyg07JIlUDLF8uyuZBL0I+XMHwzSSYVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nZKsnHJa; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1770732745; c=relaxed/simple;
+	bh=wJj0MQ31kzyA4d66mGVJoEAuoD4w9Rwh3HxHLDxZC20=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YbBa6dGRS+cx5+t6PYlS5+GlL3Zq9zUWreXG7m3RbfVlPY2tNxKvz2Z4u673gJ+n5McIv1UMtWOSwFsP7cfgRB17ZI9NCttEZKoaQk6KVpBZb0fJqla53AYmKaJTW096s+wuI9NOOqUE3FpzE6uyYHpoZW0QPwj2J0zwog05AmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hQm38ks1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nZKsnHJa"
-Message-ID: <3f24a647-6133-4d45-b71e-6ede06bab02e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770721472;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=c+PiHpBIgKkKo8SVoWPoVfzBO73+OGk74HdhlYR3zR4=;
-	b=nZKsnHJa/jwOE1X4NjbZkJ9+S/5xmk3vRtHKyVQwBe0u/jP6aIAniO+zW6NsR1uedtryzY
-	giXgA5eWve391cDt+1/KdvzMErCQd/pGOLQe0IElFQSuei7a6xOWKBgLsa6On/B1hU0zfW
-	476mgo+X/JJik21H6pCxmribiPml/Vg=
-Date: Tue, 10 Feb 2026 19:03:37 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hQm38ks1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 553C0C116C6;
+	Tue, 10 Feb 2026 14:12:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770732745;
+	bh=wJj0MQ31kzyA4d66mGVJoEAuoD4w9Rwh3HxHLDxZC20=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hQm38ks1bnFheH1XAS9wLlRN6N3gAtN+gkrc/aey/X7dRDVFSYiPgPX4TJgVb6BDS
+	 I3BnSJJg14PBYsAWj0ipSciRFPm+9CKbI+XU5bGV+KrAIvra7hVzCADnGpcO0X5pl6
+	 S994JyF016ODzysrBkbp5/3B+v9onXuxAFGv8c+BGhHjBO7qDoLDtlUcnl67rSGFRA
+	 KYgPbgn9Qa9YmnVxR9m9sQAZagkeW9/kmAkQlxpGqXwQvJe5FyLU2+3kaPA3W6gc1A
+	 OhOkzrmQyi8pyDaEFRV/qaLEPo3AtHD3lGXFC/EQXmnL0OfELo86i9h0kzw2zcKkyE
+	 2ZkNd7TvBzWLg==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sang-Soo Lee <constant.lee@samsung.com>,
+	Bahubali B Gumaji <bahubali.bg@samsung.com>,
+	Hyunchul Lee <hyc.lee@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>,
+	David Howells <dhowells@redhat.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ksmbd: fix non-IPv6 build
+Date: Tue, 10 Feb 2026 15:12:05 +0100
+Message-Id: <20260210141219.1573869-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v9 1/1] smb/client: introduce KUnit test to check search
- result of smb2_error_map_table
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: bharathsm@microsoft.com, chenxiaosong@kylinos.cn, dhowells@redhat.com,
- linkinjeon@kernel.org, Brendan Higgins <brendan.higgins@linux.dev>,
- David Gow <davidgow@google.com>, Rae Moar <raemoar63@gmail.com>,
- linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
- linux-cifs@vger.kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
- senozhatsky@chromium.org, smfrench@gmail.com, sprasad@microsoft.com,
- tom@talpey.com
-References: <20260118091313.1988168-1-chenxiaosong.chenxiaosong@linux.dev>
- <20260210081040.4156383-1-geert@linux-m68k.org>
- <5c4bbbea-d68c-4089-b3aa-adb4b05696ba@linux.dev>
- <CAMuHMdXBBCzWK8HPQ8zQYJ1_Pxim3_ku4_2-CnWXm3M4ysnQ+w@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong.chenxiaosong@linux.dev>
-In-Reply-To: <CAMuHMdXBBCzWK8HPQ8zQYJ1_Pxim3_ku4_2-CnWXm3M4ysnQ+w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-Thanks for your suggestions, these are really helpful. I will make the 
-changes as soon as possible.
+From: Arnd Bergmann <arnd@arndb.de>
 
-Thanks,
-ChenXiaoSong <chenxiaosong@kylinos.cn>
+The newly added procfs code fails to build when CONFIG_IPv6 is disabled:
 
-On 2/10/26 6:38 PM, Geert Uytterhoeven wrote:
-> Hi ChenXiaoSong,
-> 
-> On Tue, 10 Feb 2026 at 10:53, ChenXiaoSong
-> <chenxiaosong.chenxiaosong@linux.dev> wrote:
->> The KUnit test cases are only executed when the CONFIG_SMB_KUNIT_TESTS
->> is enabled.
-> 
-> ... which defaults to KUNIT_ALL_TESTS, so if KUNIT_ALL_TESTS is enabled,
-> the test is enabled by default, too.
-> 
->> Making it a separate test module would require exporting local variables
->> and functions so that the test code can access them. However, exporting
->> local variables and functions would likely make the code much uglier, as
->> it would require adding "#if" conditionals into the production code to
->> isolate the test code.
->>
->> Geert, please let me know if you have a better idea.
->>
->> I am also discussing this with the ext4 community, and we all hope to
->> find a way to make the tests a separate module.
-> 
-> There are ways to restrict exported symbols to test modules only,
-> see EXPORT_SYMBOL_FOR_TESTS_ONLY(), EXPORT_SYMBOL_FOR_MODULES(),
-> and EXPORT_SYMBOL_NS().
-> 
-> If it is really hard to convert the tests into a separate module,
-> you can add a new kernel/module parameter, which needs to be specified
-> explicitly to run the test. That would avoid running the tests when just
-> (auto)loading cifs.ko.
-> 
->> On 2/10/26 4:10 PM, Geert Uytterhoeven wrote:
->>> Thanks for your patch, which is now commit 480afcb19b61385d
->>> ("smb/client: introduce KUnit test to check search result of
->>> smb2_error_map_table") in linus/master
->>>
->>>> The KUnit test are executed when cifs.ko is loaded.
->>> This means the tests are_always_ executed when cifs.ko is loaded,
->>> which is different from how most other test modules work.
->>> Please make it a separate test module, so it can be loaded independently
->>> of the main cifs module.  That way people can enable all tests in
->>> production kernels, without affecting the system unless a test module
->>> is actually loaded.
-> 
-> Gr{oetje,eeting}s,
-> 
->                          Geert
-> 
+fs/smb/server/connection.c: In function 'proc_show_clients':
+fs/smb/server/connection.c:47:58: error: 'struct ksmbd_conn' has no member named 'inet6_addr'; did you mean 'inet_addr'?
+   47 |                         seq_printf(m, "%-20pI6c", &conn->inet6_addr);
+      |                                                          ^~~~~~~~~~
+      |                                                          inet_addr
+make[7]: *** [scripts/Makefile.build:279: fs/smb/server/connection.o] Error 1
+fs/smb/server/mgmt/user_session.c: In function 'show_proc_sessions':
+fs/smb/server/mgmt/user_session.c:215:65: error: 'struct ksmbd_conn' has no member named 'inet6_addr'; did you mean 'inet_addr'?
+  215 |                         seq_printf(m, " %-40pI6c", &chan->conn->inet6_addr);
+      |                                                                 ^~~~~~~~~~
+      |                                                                 inet_addr
+
+Rearrange the condition to allow adding a simple preprocessor conditional.
+
+Fixes: b38f99c1217a ("ksmbd: add procfs interface for runtime monitoring and statistics")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+Alternatively, the corresponding check in the ksmbd_conn could be removed,
+which would waste a few bytes per connection but avoid the #ifdef.
+---
+ fs/smb/server/connection.c        | 8 +++++---
+ fs/smb/server/mgmt/user_session.c | 8 +++++---
+ 2 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index f0bd244e7d55..e7e3e77006b1 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -41,10 +41,12 @@ static int proc_show_clients(struct seq_file *m, void *v)
+ 		jiffies_to_timespec64(jiffies - conn->last_active, &t);
+ 		ktime_get_real_ts64(&now);
+ 		t = timespec64_sub(now, t);
+-		if (conn->inet_addr)
+-			seq_printf(m, "%-20pI4", &conn->inet_addr);
+-		else
++#if IS_ENABLED(CONFIG_IPV6)
++		if (!conn->inet_addr)
+ 			seq_printf(m, "%-20pI6c", &conn->inet6_addr);
++		else
++#endif
++			seq_printf(m, "%-20pI4", &conn->inet_addr);
+ 		seq_printf(m, "   0x%-10x %-10u %-12d %-10d %ptT\n",
+ 			   conn->dialect,
+ 			   conn->total_credits,
+diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
+index 68b3e0cb54d3..47ce759c231e 100644
+--- a/fs/smb/server/mgmt/user_session.c
++++ b/fs/smb/server/mgmt/user_session.c
+@@ -209,10 +209,12 @@ static int show_proc_sessions(struct seq_file *m, void *v)
+ 		down_read(&chan->conn->session_lock);
+ 		ksmbd_user_session_get(session);
+ 
+-		if (chan->conn->inet_addr)
+-			seq_printf(m, " %-40pI4", &chan->conn->inet_addr);
+-		else
++#if IS_ENABLED(CONFIG_IPV6)
++		if (!chan->conn->inet_addr)
+ 			seq_printf(m, " %-40pI6c", &chan->conn->inet6_addr);
++		else
++#endif
++			seq_printf(m, " %-40pI4", &chan->conn->inet_addr);
+ 		seq_printf(m, " %-15s %-10llu %-10s\n",
+ 			   session_user_name(session),
+ 			   session->id,
+-- 
+2.39.5
 
