@@ -1,63 +1,182 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57283330663;
-	Tue, 10 Feb 2026 00:50:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25ECE26AE5;
+	Tue, 10 Feb 2026 08:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770684642; cv=none; b=QMzLXIf1x4+13r/37yHoiKhWD5WcGAZ113opbrfbgLgiaMxs+Q7Or2Dwz+XFHlCJ7wJHn0PKV/fhwewN8b7S3n85x3y9wiGXlxhsjT6UgOs6EjeX7Kbx64eS0L4tsbYtg/2kXVmfcY/41Hy8j5MKiQJOTbejQvGlCHyShHv15ZU=
+	t=1770711046; cv=none; b=LlCN98iffxw/4Kvm+THjEHNsdUDUIQqPw/xO1z0RNYtKDvG5wjrmXaGaThmVK11OAXbUjCjPPcSM5yL9BvV1l/IO8BwOm84NP+hwnluyAMOWgF5Hsw0EvU9LK1kml03aCYK86tsyRj9xAoGJWtlAcM3i+tjPrpdPgKL6t6cCnDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770684642; c=relaxed/simple;
-	bh=oeTlIv3fZhL76Zm6PAgDY+PXT5VYz5qeGbidt/SkYIA=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=iinjSP1wZHlTvYvD8S7xahWnBooFt8Fro4LyEhVofZ753aNgDzTOMsUniPBF9PUNJY7o/R7iaRhvc6Sw11j1FVdBIW3KfianwKFnbHBy4EXNu5D1WCME+iybhA9mIo4bESUOGiO357qV4BZlOPE8+vb3C2Rw1TmcGOIzZ+5J1DA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=maMYqoiQ; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="maMYqoiQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E505BC116C6;
-	Tue, 10 Feb 2026 00:50:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770684641;
-	bh=oeTlIv3fZhL76Zm6PAgDY+PXT5VYz5qeGbidt/SkYIA=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=maMYqoiQwpAFT15+o9hWqjHrDeAxxWHYhCc9XUhgZslMBvWoaWRS5sv/rUU8FFotN
-	 /VfOJTv5iIWgrb40+Hop9By0bAS5cyo80C/7J9f7Cg4RA4I0RNxYk4IR/mVxLfSxuq
-	 5a7Xk9WrjgZyGSI/eRjf/j1160rpKVnP06HxAQ7dP427nWFPp/tXEI5IQwJfK8melY
-	 fXsSoM7tLTi035t1IIIXc2NJYBH71ZSO4dSHBL+7isI763YS9GQuqdnnrMiJfArKlc
-	 T+BW8m42CBIRT/EKJBI0HxeKXmVd18KXa2RBm2AKOdFdkFtYxAP6osLctn2jRC3pF4
-	 PwL58u3nFmP0A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C2295380AA49;
-	Tue, 10 Feb 2026 00:50:38 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5msuFqDVtb8_HnGin3PyLZ7h4CUnU3yh+ZV_Za_sEWPdhw@mail.gmail.com>
-References: <CAH2r5msuFqDVtb8_HnGin3PyLZ7h4CUnU3yh+ZV_Za_sEWPdhw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5msuFqDVtb8_HnGin3PyLZ7h4CUnU3yh+ZV_Za_sEWPdhw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v7.0-rc-part1-smb3-client-fixes
-X-PR-Tracked-Commit-Id: 95080648ed52c6b97153ad989252576a3c070036
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8a5203c630c67d578975ff237413f5e0b5000af8
-Message-Id: <177068463735.3276324.1052283080114184351.pr-tracker-bot@kernel.org>
-Date: Tue, 10 Feb 2026 00:50:37 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	s=arc-20240116; t=1770711046; c=relaxed/simple;
+	bh=sapJatrsO4t8jUpkqfz2pWJkjkQH+MfQIcOAK6eeTuE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mcL/n/9HocnUI+SYKhOnHpyI8D6imP2mC+PQkgZQXSHX4m/GNZ8tVPhPRnd1qpHpDNQKuApuRzYC/soVAu5VNninzsfQ1U/3UYzK2t4La0uYEXs+UhimRMX5r66B2qdJ6Zh0d08u8jamz3pCSO/GnQjE/I+W9deNYBI/8ApRqrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A75BFC116C6;
+	Tue, 10 Feb 2026 08:10:42 +0000 (UTC)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: chenxiaosong.chenxiaosong@linux.dev
+Cc: bharathsm@microsoft.com,
+	chenxiaosong@kylinos.cn,
+	dhowells@redhat.com,
+	linkinjeon@kernel.org,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>,
+	Rae Moar <raemoar63@gmail.com>,
+	linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com,
+	linux-cifs@vger.kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	senozhatsky@chromium.org,
+	smfrench@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com
+Subject: Re: [PATCH v9 1/1] smb/client: introduce KUnit test to check search result of smb2_error_map_table
+Date: Tue, 10 Feb 2026 09:10:40 +0100
+Message-ID: <20260210081040.4156383-1-geert@linux-m68k.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260118091313.1988168-1-chenxiaosong.chenxiaosong@linux.dev>
+References: <20260118091313.1988168-1-chenxiaosong.chenxiaosong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Mon, 9 Feb 2026 15:56:46 -0600:
+ 	Hi ChenXiaoSong,
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/v7.0-rc-part1-smb3-client-fixes
+Thanks for your patch, which is now commit 480afcb19b61385d
+("smb/client: introduce KUnit test to check search result of
+smb2_error_map_table") in linus/master
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8a5203c630c67d578975ff237413f5e0b5000af8
+> The KUnit test are executed when cifs.ko is loaded.
 
-Thank you!
+This means the tests are _always_ executed when cifs.ko is loaded,
+which is different from how most other test modules work.
+Please make it a separate test module, so it can be loaded independently
+of the main cifs module.  That way people can enable all tests in
+production kernels, without affecting the system unless a test module
+is actually loaded.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> Just like `fs/ext4/mballoc.c` includes `fs/ext4/mballoc-test.c`.
+> `smb2maperror.c` also includes `smb2maperror_test.c`, allowing KUnit
+> tests to access any functions and variables in `smb2maperror.c`.
+> 
+> The maperror_test_check_search() checks whether all elements can be
+> correctly found in the array.
+> 
+> Suggested-by: David Howells <dhowells@redhat.com>
+> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> ---
+>  fs/smb/Kconfig                    | 17 ++++++++++++
+>  fs/smb/client/smb2maperror.c      |  8 ++++++
+>  fs/smb/client/smb2maperror_test.c | 45 +++++++++++++++++++++++++++++++
+>  3 files changed, 70 insertions(+)
+>  create mode 100644 fs/smb/client/smb2maperror_test.c
+> 
+> diff --git a/fs/smb/Kconfig b/fs/smb/Kconfig
+> index ef425789fa6a..85f7ad5fbc5e 100644
+> --- a/fs/smb/Kconfig
+> +++ b/fs/smb/Kconfig
+> @@ -9,3 +9,20 @@ config SMBFS
+>  	tristate
+>  	default y if CIFS=y || SMB_SERVER=y
+>  	default m if CIFS=m || SMB_SERVER=m
+> +
+> +config SMB_KUNIT_TESTS
+> +	tristate "KUnit tests for SMB" if !KUNIT_ALL_TESTS
+> +	depends on SMBFS && KUNIT
+> +	default KUNIT_ALL_TESTS
+> +	help
+> +	  This builds the SMB KUnit tests.
+> +
+> +	  KUnit tests run during boot and output the results to the debug log
+> +	  in TAP format (https://testanything.org/). Only useful for kernel devs
+> +	  running KUnit test harness and are not for inclusion into a production
+> +	  build.
+> +
+> +	  For more information on KUnit and unit tests in general please refer
+> +	  to the KUnit documentation in Documentation/dev-tools/kunit/.
+> +
+> +	  If unsure, say N.
+> diff --git a/fs/smb/client/smb2maperror.c b/fs/smb/client/smb2maperror.c
+> index 090bbd10623d..cd036365201f 100644
+> --- a/fs/smb/client/smb2maperror.c
+> +++ b/fs/smb/client/smb2maperror.c
+> @@ -114,3 +114,11 @@ int __init smb2_init_maperror(void)
+>  
+>  	return 0;
+>  }
+> +
+> +#define SMB_CLIENT_KUNIT_AVAILABLE \
+> +	((IS_MODULE(CONFIG_CIFS) && IS_ENABLED(CONFIG_KUNIT)) || \
+> +	 (IS_BUILTIN(CONFIG_CIFS) && IS_BUILTIN(CONFIG_KUNIT)))
+> +
+> +#if SMB_CLIENT_KUNIT_AVAILABLE && IS_ENABLED(CONFIG_SMB_KUNIT_TESTS)
+> +#include "smb2maperror_test.c"
+> +#endif /* CONFIG_SMB_KUNIT_TESTS */
+> diff --git a/fs/smb/client/smb2maperror_test.c b/fs/smb/client/smb2maperror_test.c
+> new file mode 100644
+> index 000000000000..38ea6b846a99
+> --- /dev/null
+> +++ b/fs/smb/client/smb2maperror_test.c
+> @@ -0,0 +1,45 @@
+> +// SPDX-License-Identifier: LGPL-2.1
+> +/*
+> + *
+> + *   KUnit tests of SMB2 maperror
+> + *
+> + *   Copyright (C) 2025 KylinSoft Co., Ltd. All rights reserved.
+> + *   Author(s): ChenXiaoSong <chenxiaosong@kylinos.cn>
+> + *
+> + */
+> +
+> +#include <kunit/test.h>
+> +
+> +static void
+> +test_cmp_map(struct kunit *test, const struct status_to_posix_error *expect)
+> +{
+> +	const struct status_to_posix_error *result;
+> +
+> +	result = smb2_get_err_map(expect->smb2_status);
+> +	KUNIT_EXPECT_PTR_NE(test, NULL, result);
+> +	KUNIT_EXPECT_EQ(test, expect->smb2_status, result->smb2_status);
+> +	KUNIT_EXPECT_EQ(test, expect->posix_error, result->posix_error);
+> +	KUNIT_EXPECT_STREQ(test, expect->status_string, result->status_string);
+> +}
+> +
+> +static void maperror_test_check_search(struct kunit *test)
+> +{
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(smb2_error_map_table); i++)
+> +		test_cmp_map(test, &smb2_error_map_table[i]);
+> +}
+> +
+> +static struct kunit_case maperror_test_cases[] = {
+> +	KUNIT_CASE(maperror_test_check_search),
+> +	{}
+> +};
+> +
+> +static struct kunit_suite maperror_suite = {
+> +	.name = "smb2_maperror",
+> +	.test_cases = maperror_test_cases,
+> +};
+> +
+> +kunit_test_suite(maperror_suite);
+> +
+> +MODULE_LICENSE("GPL");
+
+Gr{oetje,eeting}s,
+
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
