@@ -1,133 +1,290 @@
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AFD387370
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Feb 2026 16:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770740675; cv=pass; b=niyMUW1/59SmkvbI+14tqDU3CEB8RK4+AcS4QmEbwkIO4maWgdwnPIvU4tc/aPAIdMSErL1ELeFWfDM3siYPq+AiJQsg50iKV5WXBXzeQnAdh5DVvFbuAtZI5x3UH0OC1N5JvE70Bs2FBWp8+4mTAIC1Gjj6BNN2/kHw/PmjX9Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770740675; c=relaxed/simple;
-	bh=BkWtyYpqejlmByRC727LdbfV/RYqAERDreFY/UP2Aa4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FiOSAxCpqrkF0So9EGLnrz848rxo0cfWT0UKvSmCZnC+x01h9HLH6iWjOZ8UsbRueGp6NGDrxTflHyMD/ozqlukrd4MUiS1lufd4L+SvDHBMfXXWzghhkKiyHm3ULaFLikkcAzhxKsx7/WnRajirePpQQdLsRu/rZscQ+5LJxWw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jXoHp7nY; arc=pass smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED8E2DC76F;
+	Tue, 10 Feb 2026 23:31:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770766289; cv=none; b=ec9QGOCw2jBq/7F3cHhfciO4hS/4HDfVTP5Wq3RkDocj/CtoL87g7WKNjbY9AKQkRyu6jGxHJN+146aoaYTz/Wj0u5Xdk1WFZA+PeCpIzLb1hTcov+ElbEku25awZYtYDv/LxO1UPr7bbAZXZbuVArs1wibP+yPakMf6qVhkrqU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770766289; c=relaxed/simple;
+	bh=twtZnGMvMuAVmKcsvTkyEiO062K7s/3OsDbHarnmkCA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gVI1fo7oT+C1zxKpqE46W7T7vZKv15g6+XeueNTZmnpHfJG/6hMZTZcSRnC1+YXoQ/v4+QMAL8ViWJXRlN3APxzRtXUoM89ceg+3c0vmmbgEOUhUgWBsrFnVEN1uI7bNFZPhb0Gr5L2nmu9IwGOWGi+4OZSK5sna8uUEtdPZj7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JFpSGYX5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jXoHp7nY"
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-45f0c1f1b54so3483926b6e.1
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Feb 2026 08:24:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770740674; cv=none;
-        d=google.com; s=arc-20240605;
-        b=E2gib4y27BaCmbuxy8vvmhU9iUVDDQcDfZdKvy4aONgKy6wNZcHKXXK8t9ViFlWYjb
-         ypts2uEKkTVCmJlHgXNjcYzJ+5mO3Bt9OAd/E2O7UNDPtFDPmSVj0rvPOOeV/oNLqum1
-         kRhXJjg7pFiidpwHKGIr19WhbE5swO+T6eYnQoNBvmRdreMOpC8MVpqGGJAVcULEdcAa
-         Qtc1A38wUEJX+p8cjazx+v6zPQmUFVVNwpNR49Nks1+1yda5E790jxsmpdAvtyEcicIG
-         EI3B0mG434+vVX7aPpRr5Eo2SCFa3MOd8urhxE7qWHhkHdIV37vKx3BTRdH+QmUAc8wT
-         KzzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=e87k8iFish9q2Uq3v9Uy7Fjw166hMufB5O7qErb387U=;
-        fh=mETyyNx601eptDds1AqIJUB3j27aq18ByceMhJ39OTw=;
-        b=IPtRdNoNyX5v0iHHfmAZPK7TCJNP8uZffGG/t4oClYoECbCr14B8TVr10XZvoePz6/
-         9Ys3+zLQWDch4+yTiDl5aJ5+HyLIKqhLeRqTwljRwLUThjeIaqegjY174R4xorgXpMXx
-         JPPed9FY/OPsUJf3ShT5Y5HeRq15gaAPaUS5IVRXHwNhEKPEBrKN394x0Abe7V4cG67e
-         a+d+UOvObWAny15uAFjDvghbK4QzZrUQ0vWye9flLzL2S8qplqYvSX2ERKFNgXqH6pXg
-         1hEZY4E/zkwehiOAXSd57YLXaBhmUjaUtM4eUtOROoS2lFJmEbhVqGVZf+zeaeMfc1/N
-         u1RA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770740674; x=1771345474; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=e87k8iFish9q2Uq3v9Uy7Fjw166hMufB5O7qErb387U=;
-        b=jXoHp7nY23Kq85huTPiHL1JsEK6nChfn2n6ItO9mJhQQLQMLKOQUwAVBSk5naFxJhY
-         R/CAa71VMkrHO+oF8K/OeGmgfjlswwdenQw7JEPsknyqg9LfdHHw0qjAjeMFHb7LmAQ0
-         sJGdIejhGm1kpLSexdcYBGDFglcXyj/uHKnuemJHLlww8nLSGLHYaDtZaLpyytNS4u7q
-         5lZFsffLsIby593IrGgzTQKuGXwsc2GUrRsA2zUNcdHq2LR4zmXIHCTuBkFVCbD5V0Zm
-         maODHoWpBu+PpgywObJIsMVDxwDufhdioUxtB/jrMD9+mMy1p548uzR+djRpr1ECBXDU
-         x+Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770740674; x=1771345474;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e87k8iFish9q2Uq3v9Uy7Fjw166hMufB5O7qErb387U=;
-        b=XujX3hZkdfy8eFLva6nva4i1H5DC36z0KRf4KlvfwjVYxqPjmcrCYsUeUTnD2YNIMs
-         dEuAsJsfPQVs20AP5u7uBAF6+NjeY4pOUtH9YUdDjxjV/lTPMMTBru2grB2ohK7LgOXs
-         FZUNgg/l9V5qAa6FS4OhMBDWGfNU3T83Ej0zZ46lamDofl7vqdJ5UmAlHwTXcQbh2707
-         9GUAknPtww/v9Lwj/UPd1rNarv4HDG5ptWAVLivvZlfBivNTTIcHT0I4E8I/dWdseKOg
-         vPzXIR4G2MqtLUser2NTaLw4gUWZU4ik6l5kIXiLSnWAtpOojDNe2Rf67c2TqREC5d7i
-         Da+A==
-X-Forwarded-Encrypted: i=1; AJvYcCXA68+KZBIzFzBOcdk0PAbh09fFX/CeNKFyCPlSAZwN0VjdNDKeLhTZClJGcvRcSBHGnjdo+1HufNfx@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/jnikrHX07snHKd+6ohCL0FL7fddzBjMu2kb19bXLuhcE0dRX
-	saMt92b27XQupr2xEPt/3pOVi86P+Hozh/+5qCwYO7gm/qEaD1PgAw3QoQLPrO5yw/pzxzZV0zq
-	9Ww2YuzgqWdRR6bZc2Lg5iL3gGqhbfzA=
-X-Gm-Gg: AZuq6aLFCvc0tfGrl+tuX/IjASdtS+mYvKwNwBhJ+gIvML3HsqerBtUWsuHhqN2WfS8
-	3d+hPtWbGj5u+AVNKCp7P+XiPRZHl2v/ExwD4VGJiKeZgQSVtoPvLMIHbwDJwlb+ZA7BTc81zuk
-	kD65C9RgiqBWLfxSLOOfzk2z6v2FNSNZA8Cww8WJc/Y7WAe3TSSs6ZS60ImXjNbzLsmPrqDs9bR
-	Sq2pLg/AWlMpIrtCbLJppUf4yyEReHa6orHCU76cojTQmoKerfV8/ppnxzRsDOabT5aSkrDYb9S
-	Xy5TV0A=
-X-Received: by 2002:a05:6808:4f23:b0:45f:42d6:2ffb with SMTP id
- 5614622812f47-462fd051fdamr6992569b6e.41.1770740673692; Tue, 10 Feb 2026
- 08:24:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JFpSGYX5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B3D4C19425;
+	Tue, 10 Feb 2026 23:31:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770766288;
+	bh=twtZnGMvMuAVmKcsvTkyEiO062K7s/3OsDbHarnmkCA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=JFpSGYX5xcANqrYT325bu6atZ1jKv+d/vkdqq/wsY3sBr/Y+DlOWsIcFBdFVH/5+/
+	 8wqYs7bgkYP34vddDCg5oOGjTU4kWGX58y01W0vU9473dSrb2Zo1lbE1y+Qmqj2SlV
+	 cJ7RoKTrvAL/cpMPhUXW+0rouvZk45mPKmBfjZndI2q8zrzjjlDMFLklECdxvfseGO
+	 3D7bk0e7NhwzDRguohFV8Dw11Cs41ni2JFyQoL3bIYE2p1lDcGGCGJvC2a7fMctBWb
+	 0RaVP3Jcyi+fqUc58r6WN8gKPKM4NNx7wivCEYFo3Y7a4xEinDn2EzD5wBSkw6z0Rk
+	 XsCX5A+PRGtxg==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Henrique Carvalho <henrique.carvalho@suse.com>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	sfrench@samba.org,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 6.19-6.6] smb: client: prevent races in ->query_interfaces()
+Date: Tue, 10 Feb 2026 18:30:49 -0500
+Message-ID: <20260210233123.2905307-4-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260210233123.2905307-1-sashal@kernel.org>
+References: <20260210233123.2905307-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260120142439.1821554-1-cel@kernel.org> <20260123-zwirn-verfassen-c93175b7a1ee@brauner>
- <41b1274b-0720-451d-80db-210697cdb6ac@app.fastmail.com> <20260124-gezollt-vorbild-4f65079ab1f1@brauner>
- <a1692040-58d0-412d-b0fc-c7b7a62585c4@app.fastmail.com>
-In-Reply-To: <a1692040-58d0-412d-b0fc-c7b7a62585c4@app.fastmail.com>
-From: Cedric Blancher <cedric.blancher@gmail.com>
-Date: Tue, 10 Feb 2026 17:23:57 +0100
-X-Gm-Features: AZwV_Qjy3M0uZY-NRx3otdHnq6x-9RSVjw1ETeNOu6B1p4FZNE0JCUf2MFslsk8
-Message-ID: <CALXu0UcJf+R3HuzwUrUTjsuYWdFrLZOwAsEtSyto2T9Rtg4rsw@mail.gmail.com>
-Subject: Re: [PATCH v6 00/16] Exposing case folding behavior
-To: linux-nfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-f2fs-devel@lists.sourceforge.net
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.19
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, 25 Jan 2026 at 23:05, Chuck Lever <cel@kernel.org> wrote:
->
->
->
-> On Sat, Jan 24, 2026, at 7:52 AM, Christian Brauner wrote:
-> > On Fri, Jan 23, 2026 at 10:39:55AM -0500, Chuck Lever wrote:
-> >>
-> >>
-> >> On Fri, Jan 23, 2026, at 7:12 AM, Christian Brauner wrote:
-> >> >> Series based on v6.19-rc5.
-> >> >
-> >> > We're starting to cut it close even with the announced -rc8.
-> >> > So my current preference would be to wait for the 7.1 merge window.
-> >>
-> >> Hi Christian -
-> >>
-> >> Do you have a preference about continuing to post this series
-> >> during the merge window? I ask because netdev generally likes
-> >> a quiet period during the merge window.
-> >
-> > It's usually most helpful if people resend after -rc1 is out because
-> > then I can just pull it without having to worry about merge conflicts.
-> > But fwiw, I have you series in vfs-7.1.casefolding already. Let me push
-> > it out so you can see it.
->
-> There will be at least one more revision of this series (and it can
-> happen in a few weeks) to split 1/16 as Darrick requested, and
-> address the nit that Jan noted.
+From: Henrique Carvalho <henrique.carvalho@suse.com>
 
-Are you targeting LInux 7.0 or Linux 7.1?
+[ Upstream commit c3c06e42e1527716c54f3ad2ced6a034b5f3a489 ]
 
-Ced
+It was possible for two query interface works to be concurrently trying
+to update the interfaces.
+
+Prevent this by checking and updating iface_last_update under
+iface_lock.
+
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+Now I have a complete picture. Let me summarize my analysis.
+
+---
+
+## Detailed Analysis
+
+### 1. Commit Message Analysis
+
+The commit message clearly describes a **race condition**: "It was
+possible for two query interface works to be concurrently trying to
+update the interfaces." The fix is to check and update
+`iface_last_update` atomically under `iface_lock`. Authored by Henrique
+Carvalho (SUSE) and signed off by Steve French (CIFS maintainer) - both
+trusted SMB subsystem contributors.
+
+### 2. The Bug: TOCTOU Race on `iface_last_update`
+
+The `iface_last_update` field is explicitly documented in `cifsglob.h`
+as **protected by `iface_lock`**:
+
+```1119:1123:fs/smb/client/cifsglob.h
+        /* ========= begin: protected by iface_lock ======== */
+        struct list_head iface_list;
+        size_t iface_count;
+        unsigned long iface_last_update; /* jiffies */
+        /* ========= end: protected by iface_lock ======== */
+```
+
+And confirmed in the lock ordering documentation:
+
+```2000:2002:fs/smb/client/cifsglob.h
+ - cifs_ses->iface_lock            cifs_ses->iface_list
+   sesInfoAlloc
+ - ->iface_count
+ - ->iface_last_update
+```
+
+**Before the fix**, the code violated this contract in two ways:
+
+1. **`SMB3_request_interfaces()` (line 828-831)**: Read
+   `iface_last_update` **without any lock**:
+```827:831:fs/smb/client/smb2ops.c
+        /* do not query too frequently */
+        if (ses->iface_last_update &&
+            time_before(jiffies, ses->iface_last_update +
+                        (SMB_INTERFACE_POLL_INTERVAL * HZ)))
+                return 0;
+```
+
+2. **`parse_server_interfaces()` (line 798)**: Wrote `iface_last_update
+   = jiffies` **without the lock** at the end of processing.
+
+The second check inside `parse_server_interfaces()` (line 641-646, under
+`iface_lock`) was meant to catch races, but it came **after** the
+expensive `SMB2_ioctl()` network call had already been made.
+
+### 3. Race Scenario
+
+`SMB3_request_interfaces()` can be called from **multiple concurrent
+paths**:
+- `smb2_query_server_interfaces()` - periodic delayed work (every 600s)
+- `smb2_reconnect()` (via `query_server_interfaces` function pointer) -
+  reconnection path
+- `smb3_qfs_tcon()` - during mount
+
+**Race sequence**:
+1. Thread A reads `iface_last_update` (no lock) → timer expired →
+   proceeds to `SMB2_ioctl()`
+2. Thread B reads `iface_last_update` (no lock) → same stale value →
+   also proceeds to `SMB2_ioctl()`
+3. Both threads enter `parse_server_interfaces()` concurrently
+4. Thread A takes `iface_lock`, marks ALL interfaces as `is_active = 0`,
+   drops lock
+5. Thread B takes `iface_lock`, marks ALL interfaces as `is_active = 0`
+   again, drops lock
+6. Both threads independently iterate the buffer, both try to match/add
+   interfaces
+7. In the cleanup (`out:` label), both threads iterate the list and call
+   `kref_put()` on inactive entries
+
+**Consequences**:
+- **Double `kref_put()` / use-after-free**: Both threads may identify
+  the same interface as inactive and call `kref_put()` on it,
+  potentially dropping the refcount below zero or causing UAF
+- **Corrupted `iface_count`**: Both threads decrement `ses->iface_count`
+  for the same interface
+- **List corruption**: While individual list operations are under
+  `iface_lock`, the mark-inactive → process → cleanup sequence is NOT
+  atomic, leading to incorrect state
+- **Unnecessary duplicate network I/O**: Both threads perform
+  `SMB2_ioctl()` when only one is needed
+
+### 4. The Fix
+
+The fix is elegant and minimal (8 insertions, 11 deletions, net -3
+lines):
+
+1. **In `SMB3_request_interfaces()`**: Wraps the `iface_last_update`
+   check **and** update in a single `spin_lock/spin_unlock` critical
+   section. Crucially, it sets `iface_last_update = jiffies` **before**
+   doing any work (optimistic update), ensuring the second thread will
+   see the updated timestamp and bail out immediately.
+
+2. **In `parse_server_interfaces()`**: Removes the now-redundant
+   duplicate time check and the two `iface_last_update = jiffies`
+   assignments (one in the empty-list error path, one at end of
+   processing).
+
+This converts the race-prone check-then-act sequence into an atomic
+check-and-update.
+
+### 5. Scope and Risk Assessment
+
+- **Files changed**: 1 (`fs/smb/client/smb2ops.c`)
+- **Lines changed**: 8 insertions, 11 deletions (net -3)
+- **Subsystem**: SMB/CIFS client - filesystem, important for enterprise
+  users
+- **Risk**: Very low - the change only adds proper locking around an
+  already-documented protected field
+- **Side effect consideration**: Setting `iface_last_update` before the
+  work means that if `SMB2_ioctl()` fails, the timestamp is still
+  updated. However, this is acceptable because: (a) the old code also
+  set it on error paths (the `-EOPNOTSUPP` case set it), and (b) the
+  600-second polling interval means it will retry relatively soon
+
+### 6. Stable Tree Applicability
+
+The vulnerable code exists in:
+- **v6.12**: Identical structure to mainline, should apply cleanly
+- **v6.6**: Similar structure but has a slightly different
+  `iface_last_update` placement (inside the while loop, not at end of
+  function - due to commit 78e727e58e54e being a v6.8 era change). The
+  core race (unlocked check in `SMB3_request_interfaces`) exists and the
+  fix concept applies, but minor adaptation may be needed.
+
+### 7. Dependencies
+
+The fix is self-contained. It doesn't depend on any other commits. The
+only context difference for older stable trees (v6.6) is the location of
+`iface_last_update = jiffies` inside `parse_server_interfaces()`, but
+the fix's approach (move checking+setting to the caller under lock,
+remove from callee) works regardless.
+
+### 8. Summary
+
+This is a clear race condition fix in the SMB/CIFS client that:
+- Fixes a documented locking violation (`iface_last_update` accessed
+  without `iface_lock`)
+- Prevents potential use-after-free via double `kref_put()` on
+  interfaces
+- Prevents interface list state corruption affecting SMB multichannel
+- Is small (net -3 lines), surgical, single-file, and self-contained
+- Affects an important subsystem (filesystem client) used widely in
+  enterprise environments
+- Has very low regression risk
+
+**YES**
+
+ fs/smb/client/smb2ops.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
+
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index c1aaf77e187b6..edfd6a4e87e8b 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -637,13 +637,6 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
+ 	p = buf;
+ 
+ 	spin_lock(&ses->iface_lock);
+-	/* do not query too frequently, this time with lock held */
+-	if (ses->iface_last_update &&
+-	    time_before(jiffies, ses->iface_last_update +
+-			(SMB_INTERFACE_POLL_INTERVAL * HZ))) {
+-		spin_unlock(&ses->iface_lock);
+-		return 0;
+-	}
+ 
+ 	/*
+ 	 * Go through iface_list and mark them as inactive
+@@ -666,7 +659,6 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
+ 				 "Empty network interface list returned by server %s\n",
+ 				 ses->server->hostname);
+ 		rc = -EOPNOTSUPP;
+-		ses->iface_last_update = jiffies;
+ 		goto out;
+ 	}
+ 
+@@ -795,8 +787,6 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
+ 	     + sizeof(p->Next) && p->Next))
+ 		cifs_dbg(VFS, "%s: incomplete interface info\n", __func__);
+ 
+-	ses->iface_last_update = jiffies;
+-
+ out:
+ 	/*
+ 	 * Go through the list again and put the inactive entries
+@@ -825,10 +815,17 @@ SMB3_request_interfaces(const unsigned int xid, struct cifs_tcon *tcon, bool in_
+ 	struct TCP_Server_Info *pserver;
+ 
+ 	/* do not query too frequently */
++	spin_lock(&ses->iface_lock);
+ 	if (ses->iface_last_update &&
+ 	    time_before(jiffies, ses->iface_last_update +
+-			(SMB_INTERFACE_POLL_INTERVAL * HZ)))
++			(SMB_INTERFACE_POLL_INTERVAL * HZ))) {
++		spin_unlock(&ses->iface_lock);
+ 		return 0;
++	}
++
++	ses->iface_last_update = jiffies;
++
++	spin_unlock(&ses->iface_lock);
+ 
+ 	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+ 			FSCTL_QUERY_NETWORK_INTERFACE_INFO,
 -- 
-Cedric Blancher <cedric.blancher@gmail.com>
-[https://plus.google.com/u/0/+CedricBlancher/]
-Institute Pasteur
+2.51.0
+
