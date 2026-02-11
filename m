@@ -1,43 +1,36 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8220B352FAB
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Feb 2026 04:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED5C26290;
+	Wed, 11 Feb 2026 04:47:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770783018; cv=none; b=Afh3db/QrE3e6cNF4D0ApKwBo1fpcdZSIkCm9QYW7IuR9S/iPxsuXYqz670RI4QQZdabwEMINdsJ99gDVHZaU3EqunwZQyzP9g5wASZQIrKVUW3t+gkpt81BGrbEif1/Rnzi6bSwx2i+ddsR0FI87AVwkiDG5vkdVNCTNhKx9Fc=
+	t=1770785269; cv=none; b=O9aQn5u84FkVKpHRRnOAEgkDNZYA2Q8S1VyPWpnUrTX4miplvdsuNZJzl7l1/qDtzqT/XuzUln9m98m4LzzarrBpA3H+xl7Suh1o+PHKCjBbMIe5KDap9N3Ryzu9HS+KbIrJAVeAa/hf7ozoJVgHmn2xG5m2NmdzNsDW+S/tsn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770783018; c=relaxed/simple;
-	bh=+GKOjhN/WlK/hiEDCAa/sV8zrF0enuAcpG+AeGdBwjU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hRLBRrUyEVuhQm7alUXP00b9mVYEu13zcC7JGqFXGpDTmwg9c47JR+gBe9eKc4jVRRLiOuQQpgC6Eu/DoWx3wrltOaotxlivRGGPbMBAFVrNPO+mr5YBEd1aUfMYk4zJZ8vlhprmKiG+o07Br3DSdG2qbR0CDy7lI9RnCMTQyeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=PlRafheH; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="PlRafheH"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=lSD+Ax1sDSyorPnGecWqOahNzTslXs6aYJUbfdf0TGA=; b=PlRafheHu6m+6u/VkhqXRyqA0i
-	96DmHSxhcr/g9mqf4F28spEyOoixCO4OhOO0mzhon8cdzGWEm334RPSgJexpwC5o+bOgfGeedkjQA
-	ozQzGu3NcPgUU/sKpXNpQPN7Yzj7gqcTUUqdsS2UuU0JIACUbTuBZxdOoT9cwPSnLf3vNeQj2HyIA
-	OCN7hf07Ea0ssvHikxiqyXsaNsFQVf9jSlzPMddJ/ycZljh0Sm0OwY36rjbj3Tt5JZcR6Skkg4I91
-	955hUBG6WtY+o5hQwjA4HmRpvlhtntT0CsSbq97lG3PerrbozaC0HN8Brrs5Ya9QFhzXi43FSL+uy
-	3gZOs5BQ==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
-	id 1vq1YF-0000000019F-3V3t;
-	Wed, 11 Feb 2026 01:10:07 -0300
-From: Paulo Alcantara <pc@manguebit.org>
-To: smfrench@gmail.com
-Cc: Xiaoli Feng <xifeng@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH] smb: client: fix regression with mount options parsing
-Date: Wed, 11 Feb 2026 01:10:07 -0300
-Message-ID: <20260211041007.324919-1-pc@manguebit.org>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1770785269; c=relaxed/simple;
+	bh=HT9W7yDITFKALVK2NfYo4ZzoIAsxwYaenSYIPfnbSfw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EBIHIaFovaPLaCtlDPtetBUgCk8RKMbssJlVrxBp/yy9TMUas8fjwhH/ITxfnBhZaeME13yBgsBLO9tlz0ctYmL+7DzTtAqhBlHFuVnllCYyJt4h2SCVF99bE0a0YUT+iDEYo5NfAXg8N1i02XhwpW3YmqU+ykGWGpNcK/fJqyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-05 (Coremail) with SMTP id zQCowAD3hAjeCYxp4LwJCA--.6438S2;
+	Wed, 11 Feb 2026 12:47:26 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: sfrench@samba.org
+Cc: pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH] cifs: SMB1 split: Remove duplicate include of cifs_debug.h
+Date: Wed, 11 Feb 2026 12:46:44 +0800
+Message-Id: <20260211044644.2935921-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -45,49 +38,45 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAD3hAjeCYxp4LwJCA--.6438S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKry5KFyUXw1kKrW8Gr15urg_yoWxCrb_Aw
+	1fZrW8CFyUJFsxt3WUKr1jqF4j9r1rtw48ZFnIgw1vk3WDJF4kAw4DXwn7ZF429rW5ZFWx
+	W3sru3sYyr43GjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbTkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwVW8XwCF04k20xvY0x0EwIxGrw
+	CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
+	14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
+	IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxK
+	x2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI
+	0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JU-SdkUUUUU=
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-After commit 1ef15fbe6771 ("cifs: client: enforce consistent handling
-of multichannel and max_channels"), invalid mount options started to
-be ignored, allowing cifs.ko to proceed with the mount instead of
-baling out.
+Remove duplicate inclusion of cifs_debug.h in smb1transport.c to
+clean up redundant code.
 
-The problem was related to smb3_handle_conflicting_options() being
-called even when an invalid parameter had been parsed, overwriting the
-return value of vfs_parse_fs_string() in
-smb3_fs_context_parse_monolithic().
-
-Fix this by calling smb3_handle_conflicting_options() only when a
-valid mount option has been passed.
-
-Reproducer:
-
-$ mount.cifs //srv/share /mnt -o ${opts}
-$ mount -o remount,foo,${opts} /mnt # must fail
-
-Fixes: 1ef15fbe6771 ("cifs: client: enforce consistent handling of multichannel and max_channels")
-Reported-by: Xiaoli Feng <xifeng@redhat.com>
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
 ---
- fs/smb/client/fs_context.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ fs/smb/client/smb1transport.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index ec84204aee18..412c5b534791 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -825,9 +825,7 @@ static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
- 		if (ret < 0)
- 			break;
- 	}
--	ret = smb3_handle_conflicting_options(fc);
--
--	return ret;
-+	return ret ?: smb3_handle_conflicting_options(fc);
- }
+diff --git a/fs/smb/client/smb1transport.c b/fs/smb/client/smb1transport.c
+index 0b8b852cfc0d..93731b00ca5d 100644
+--- a/fs/smb/client/smb1transport.c
++++ b/fs/smb/client/smb1transport.c
+@@ -29,7 +29,6 @@
+ #include "cifs_debug.h"
+ #include "smbdirect.h"
+ #include "compress.h"
+-#include "cifs_debug.h"
  
- /*
+ /* Max number of iovectors we can use off the stack when sending requests. */
+ #define CIFS_MAX_IOV_SIZE 8
 -- 
-2.53.0
+2.25.1
 
