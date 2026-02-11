@@ -1,35 +1,32 @@
 Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED5C26290;
-	Wed, 11 Feb 2026 04:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAD6191F94;
+	Wed, 11 Feb 2026 04:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770785269; cv=none; b=O9aQn5u84FkVKpHRRnOAEgkDNZYA2Q8S1VyPWpnUrTX4miplvdsuNZJzl7l1/qDtzqT/XuzUln9m98m4LzzarrBpA3H+xl7Suh1o+PHKCjBbMIe5KDap9N3Ryzu9HS+KbIrJAVeAa/hf7ozoJVgHmn2xG5m2NmdzNsDW+S/tsn8=
+	t=1770785784; cv=none; b=KHILnF2SISNlkXTlj/XPUA/eV6BkO0CY/LPw6cAgihTjM1EzISB7THS+XW2Rjuuxmvs9Zob3cDIOGvKFU36RzTAHvOD7g2qXhOL4pO/S2KEv3I5h8VnzpAK13I0lEENSR4HuCKZ1bTMc0Ky4VVYu57/yV7D3wJv4M45Z8+FS9o0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770785269; c=relaxed/simple;
-	bh=HT9W7yDITFKALVK2NfYo4ZzoIAsxwYaenSYIPfnbSfw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EBIHIaFovaPLaCtlDPtetBUgCk8RKMbssJlVrxBp/yy9TMUas8fjwhH/ITxfnBhZaeME13yBgsBLO9tlz0ctYmL+7DzTtAqhBlHFuVnllCYyJt4h2SCVF99bE0a0YUT+iDEYo5NfAXg8N1i02XhwpW3YmqU+ykGWGpNcK/fJqyw=
+	s=arc-20240116; t=1770785784; c=relaxed/simple;
+	bh=Cw3fRHCHWp5gOXkdT+awUbBs3/UGFmPQz4uWhu0HFDQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QyPk8pAFK9NaaYDKQ9VF0npzllZDpEDkKeVF58U/6JYUI+dUf8d2iFvpXy+13yOcOk7RBxpQRa28knljiPXIGpjZSMU4v9wtizTSd7SETVRoXMlXXbl+67JMjmyjO8y2NPf0OarMk0aQ06xFgdBHJF62cNrbVqupvFO2x2Uu1yM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
 Received: from localhost (unknown [124.16.138.129])
-	by APP-05 (Coremail) with SMTP id zQCowAD3hAjeCYxp4LwJCA--.6438S2;
-	Wed, 11 Feb 2026 12:47:26 +0800 (CST)
+	by APP-05 (Coremail) with SMTP id zQCowAAXpgnwC4xp4twJCA--.47430S2;
+	Wed, 11 Feb 2026 12:56:16 +0800 (CST)
 From: Chen Ni <nichen@iscas.ac.cn>
-To: sfrench@samba.org
-Cc: pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
+To: linkinjeon@kernel.org,
+	smfrench@gmail.com,
+	linux-cifs@vger.kernel.org
+Cc: senozhatsky@chromium.org,
 	tom@talpey.com,
-	bharathsm@microsoft.com,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org,
 	Chen Ni <nichen@iscas.ac.cn>
-Subject: [PATCH] cifs: SMB1 split: Remove duplicate include of cifs_debug.h
-Date: Wed, 11 Feb 2026 12:46:44 +0800
-Message-Id: <20260211044644.2935921-1-nichen@iscas.ac.cn>
+Subject: [PATCH] smb: server: Remove duplicate include of misc.h
+Date: Wed, 11 Feb 2026 12:55:33 +0800
+Message-Id: <20260211045533.2936005-1-nichen@iscas.ac.cn>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -38,45 +35,43 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAD3hAjeCYxp4LwJCA--.6438S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrKry5KFyUXw1kKrW8Gr15urg_yoWxCrb_Aw
-	1fZrW8CFyUJFsxt3WUKr1jqF4j9r1rtw48ZFnIgw1vk3WDJF4kAw4DXwn7ZF429rW5ZFWx
-	W3sru3sYyr43GjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbTkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwVW8XwCF04k20xvY0x0EwIxGrw
-	CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
-	14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
-	IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxK
-	x2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI
-	0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JU-SdkUUUUU=
+X-CM-TRANSID:zQCowAAXpgnwC4xp4twJCA--.47430S2
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUY67AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2js
+	IEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE
+	5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeV
+	CFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l
+	c2xSY4AK67AK6r45MxAIw28IcxkI7VAKI48JMxAqzxv26xkF7I0En4kS14v26r126r1DMx
+	C20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAF
+	wI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20x
+	vE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v2
+	0xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxV
+	W8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjQtxDUUUUU==
 X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-Remove duplicate inclusion of cifs_debug.h in smb1transport.c to
-clean up redundant code.
+Remove duplicate inclusion of misc.h in server.c to clean up
+redundant code.
 
 Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
 ---
- fs/smb/client/smb1transport.c | 1 -
+ fs/smb/server/server.c | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/fs/smb/client/smb1transport.c b/fs/smb/client/smb1transport.c
-index 0b8b852cfc0d..93731b00ca5d 100644
---- a/fs/smb/client/smb1transport.c
-+++ b/fs/smb/client/smb1transport.c
-@@ -29,7 +29,6 @@
- #include "cifs_debug.h"
- #include "smbdirect.h"
- #include "compress.h"
--#include "cifs_debug.h"
+diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+index c2c074346da1..f7db120c92e1 100644
+--- a/fs/smb/server/server.c
++++ b/fs/smb/server/server.c
+@@ -21,7 +21,6 @@
+ #include "mgmt/user_session.h"
+ #include "crypto_ctx.h"
+ #include "auth.h"
+-#include "misc.h"
+ #include "stats.h"
  
- /* Max number of iovectors we can use off the stack when sending requests. */
- #define CIFS_MAX_IOV_SIZE 8
+ int ksmbd_debug_types;
 -- 
 2.25.1
 
