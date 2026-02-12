@@ -1,190 +1,243 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F28D27E7EC
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Feb 2026 20:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770926711; cv=none; b=VFdBMpVKedTf1fCBXIUBHspuJWzsQ5ttVUMWFCYlhA/CKjzr6uKkzrRHhEmoKzL/aw3Tf9X8zDe8AG7K12XI04UvBNEiX7LL7k9Geag5d8vWWF7MthsUhrMcFqMTL6wKJs52BeYD2nq+z9ByUR2EvDCL1/l/8p4ozbs479VYky0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770926711; c=relaxed/simple;
-	bh=OJPFDJFdCfE17d7ThD1BrxPn2sPYojgQGGlgyoLZNBQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fUCdjKe0mlPe0mKochOd8aJTnF9SIDdQjLESuYC6RXkYVLyyP/s7qpaYM/ararrC7yHA9x8D0cJPl49JwnlICzzDkkoHbZxKSpfGX71J4s2ysJcTNSaKZ9vCRfoeHNCWwPkquQiKGrQIq1D+b7AUm1G4zPMI6Eb8HaCUruVzbFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=hVlfkR8s; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449651D5147
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Feb 2026 21:08:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770930481; cv=pass; b=Bflv+4EsUuffTLVzNtiD4wVFbPUFr5UnrvxGdxhDKYmG0mrrnke/fOWPdT68mTxbikISzUHux9DohLXSK/v8n5LnN1jZr5+/5oV8AXHtkdKE9N+a6g7ts+KmPmXkiCIUkINq4bHiT7LtdmMIgcRtm70Mtr6Q4LlfgadtoEJXcNg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770930481; c=relaxed/simple;
+	bh=SOKCWCRr5YpFu/NFeMmLz1mRvSwOeviiUocMLbpIQso=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hpyIkstFbM6i5ZszviML4BMPA65oDAOcEkAVUuZrU2LUzAyC0XkU3gwmiN/0Imb2aoIco/VDOdMEmMFG64SYx/Cx/HyLgi9Eb8JvIFONojwYzNF/3lVh8UVt/95NjsuL7oDkuxsHvUeIXiKTJ+NltNEPu2KqWBxGvpgHLin/4Ks=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aSkrynDC; arc=pass smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="hVlfkR8s"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=NmBm15/rAYj+8bkANWYYgroNNHdwPYM9OWB/2l3XEQk=; b=hVlfkR8sHcKCRh7utDZFJCVIhd
-	49hml9zpZD1iOUVhSqbTsFKJQpmXK4wiR1y1aCNzE0mTwC7VleOe5bJ0Oy19EyRHMT0B7mwUEFgE9
-	UilsNyO+MVnoW56l5DY4da1IgJ4hC/MXm3Xo6vfNeRMkcbAjNB8zP+5M8cwC8NgTQJe7bSw/Tv0ot
-	8lQWYCKoJ2qR6GUs4Amkw5JtJbRAirrjVrBFdp1F0xvQwhZRirCjCN6WFI4sX7qrB3UyeI9QbZZJt
-	zqu2wmobys0ZMFgZjE35aTE6wYVZiJ5CWbC+c+8GKIoWYvkcd4cPE3byQpCIMERhnxIBU1yETYpRH
-	8aeLm06Z40tkC0Wjmq6xqwqabvE38snipV5fCFJfqw2tQ06A/Ihh9lpSGkhJ6wxoukoNLpvCA9mC+
-	VC/r/oOmrn+6VhKV3r3cReiGpZATvMwdM0optX45drB0sLnWXpJe3cZ7Ch1CKMm94sECytnegVRWr
-	rx0dCYoVB771HROpmZYbxnSM;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vqcvu-00000005zJ6-0NhJ;
-	Thu, 12 Feb 2026 20:05:02 +0000
-Message-ID: <3ecc1979-e736-4aa8-add0-670026808255@samba.org>
-Date: Thu, 12 Feb 2026 21:05:01 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aSkrynDC"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8c6f21c2d81so34576985a.2
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Feb 2026 13:08:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770930479; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Jd7x1GK2B5NpiVysBB4wmF2VAnIQHUP7lU+BRFwYjmbcQaGNmXvxPXhaBMcf53ad3J
+         JISIsMSSWx9zCDAq6RYDzkzNAZNYm5x7fQZnnSzifFV+B8PSJn2fmX7Tmm9dOyWlMUTi
+         gH+SwzZgv/TMEhJlVRmVfgLy29C6qdY9UnrVo/WO0GSrETJKVf1janp61Wz0IEogqo/p
+         2jxraXjxr4bGfEX9W/PxnH96DSSX1MLNSY72uD9VhkPuuwd7symvy1tuw7VwZAqw3Oi5
+         F4wrB9EKeDHc4VKffrz1uhzqFto3uojGi24tAAkL+raV+RYFxuGXn60RQDMmhkVaygmf
+         AXyQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=SOKCWCRr5YpFu/NFeMmLz1mRvSwOeviiUocMLbpIQso=;
+        fh=peQ+izGdoThSoAEN7Ed3MdxybtgVbOQs4KPyHnf35Qs=;
+        b=UPF6TXxD5AMLBLcpppIfUE7Xlw65+qqio0jMfO0LTph3a9Sivz3EvneuXam7LVA+XF
+         QGCa1g5eKiUxEmWkq9GpvKBkKjSOKoQuz77OhfqcIpYzSfH7CS0FPdFx4J1qqfcD26bq
+         DlhUeg21AlbBzbJ6s5qRjyGbQVCdfDCuQhonK7VaQS4s7es1z3p6hSUDch2/bTer0kKw
+         F76WS4jm4h4jXZjHLnOIb/gKuW2twurwLrOB5+OvF6WOO0gykNTFLC6s98vglf0kHLNg
+         l2Uprl2ToQZI0hbjwiOFzFGGof1YnOuRNsOzXNyDivX5Ts8s1HFbbzvfCR7yD1uWJhOT
+         HtEA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770930479; x=1771535279; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SOKCWCRr5YpFu/NFeMmLz1mRvSwOeviiUocMLbpIQso=;
+        b=aSkrynDCvZC026EHYISxkC3t9M4meg2wFSOJPIP+hQluUVrwndFnLSbzsHdIoPsHqV
+         xJzkI1NywtqC8zDPgVIRAjPsyuK6zxkG4I8lpaZ02SS5wMFm3MsvxRJiyYPJLl2Zn42p
+         9kY5g0DdmKybXqTTRybChyMeoQhGEbu+xib7djmNoOwO4rjMpWy3ZT5EXqKEUhC+ArjX
+         pNAMdbJ7K307GETJRMOVbvfhzB+y0bJXUZmRmhXZORFkDi+Jl4t/1uZ75jD9bwg81bap
+         xquIF9La3JrF1AJWtVlLr9SSOa+aww/tC1y+OHLkSmsL/1zifLglwuwmjq7BMWi0UmVy
+         MlWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770930479; x=1771535279;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=SOKCWCRr5YpFu/NFeMmLz1mRvSwOeviiUocMLbpIQso=;
+        b=mm/k+AveEaSsP7XwF1/woZ+DqSPha9XvOKx/2mF2plIF4/Ajee60RmME3Kv+yoV33x
+         BIc8iN6GbZnkPuv1waNDPYjn6OlOQLzMLmUrb3VKxBOgdO3uxq3e/Sr3YMH7MJMV1z3n
+         Z1tTRjj0Zr1hl2RlGrL/eI0+O3K6TieVfQnXyjMea2KBz9UKgjrNkOy3N0wxMwy1d6HF
+         ieO6K2u7v5c17+UiPrzjBJAUc5lmVwukMd/CxVgOJL/F9vknysdVnBlL3dGKo3pCI41+
+         6rsprizustrHjqB3Ti3/89O0BzMnM3FckqF+HeXWwk8kH0JoEiF9nP4DqcmpSLrCfHuq
+         oCBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUHeQQMKq5iW+TQw5XqF54837A+HaRPDq+LQNa5wfCoa2AirIGbOP3ccDWYfofFCnjHr/4T09qFAI3n@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/VNOmTff1vCIkmk00CNOaUt5rXUV5WpQXXaF9xoCJfNbCgbdh
+	LpphcEXfc87Qst1I62WkOdyEN0HzrPSdzhE/KW45CXVI4Np8m1G+FvAz5u0/VOxZkxYVHsC3Q9W
+	E5Srd59G0+F9O28EIL6iU8EhbcrW23Zg=
+X-Gm-Gg: AZuq6aKnGOXOtMTuWIVwhxy2T55SBusXNV43rj8P2Qbqvu4gNnppDFm2crmA6I9SFOy
+	F6DT8qcS0hFP/hXmLYppai8sE7nJZ4To7M0BrqWHYgDd++1OkdXQkRV8yELbwUWHj46U4AAKUHI
+	rQSjpVHAWEMktHZhVPaHc9CIRVWvh2AmKS6hACHwwZMbtl/9L3IEeS07ISgliQmvuJPZpF2qXjq
+	0dHDCjy0JNAq0KGN2agQF0gCe8eyrsrBzZnH4x0d5ffAxQs70RD6sEJDcEqvyEA/7tWhvRHOpMW
+	I6nzFMtciOZND0XcxwLSRrvE8y8B1BVcF5Qg1ckevOR8Pe22R4mdYcGA9mNJsOYXaLzA1wzLlGx
+	ec27Y56BPtRtOBd1N/jyh/Ug8BGdVD7xHDoFE7coF+OiuNdQ+6yJNysVZHNhOSQ1hENg5mSCoN5
+	3Nj8c/pFx9asoVjDIrlVzi
+X-Received: by 2002:a05:620a:40c3:b0:8cb:3870:5c1f with SMTP id
+ af79cd13be357-8cb4087e498mr42727685a.27.1770930479083; Thu, 12 Feb 2026
+ 13:07:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <cover.1770311507.git.metze@samba.org> <CAKYAXd_CqpqXnh+k19NVdgQdDAnp6k5NbPqcyd0anocBJrGd_Q@mail.gmail.com>
+ <7140153c-7858-474b-abe5-aee69bd196a2@samba.org> <d5d0ff21-83ed-44b9-bd3c-3cf3d2b14fc2@samba.org>
+ <CAKYAXd-vGej9K53-06iy+p6nVSDLuwVU_+41R=7EUfbTjx=O5Q@mail.gmail.com>
+ <CAH2r5muf=Th_AbA7SZaQKApyvr81FMB8WF-5yZ3ihzap1swQWg@mail.gmail.com>
+ <98d25ce1-1f1a-4517-89f0-8956bffaf9d3@samba.org> <CAH2r5mswN8W652Br4QQTzhtDXtXKvqea=dWVfUFF+xDYfOx6HA@mail.gmail.com>
+ <28d94c9f-b85e-4746-bb08-188090409682@samba.org> <CAH2r5mtA=DdpEiyqspNG3eoyjkGajnEwoRnOyXyBimDtCND9ig@mail.gmail.com>
+ <c5aef237-2a12-4be5-b917-de502780be85@samba.org>
+In-Reply-To: <c5aef237-2a12-4be5-b917-de502780be85@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 12 Feb 2026 15:07:46 -0600
+X-Gm-Features: AZwV_QjN7rb2ho4ZyDIkXJegbI16VanyWOg-Azt6CZXpDntDSupanVJzx0e8qYM
+Message-ID: <CAH2r5msAAN-EgOmRnoO7R4RPu2suNr+mgk5c5JAj9b-_kjwymg@mail.gmail.com>
 Subject: Re: [PATCH v5 000/144] smb: smbdirect/client/server: moving to common
  functions and smbdirect.ko
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>,
- linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- Tom Talpey <tom@talpey.com>, Steve French <smfrench@gmail.com>
-References: <cover.1770311507.git.metze@samba.org>
- <CAKYAXd_CqpqXnh+k19NVdgQdDAnp6k5NbPqcyd0anocBJrGd_Q@mail.gmail.com>
- <7140153c-7858-474b-abe5-aee69bd196a2@samba.org>
- <d5d0ff21-83ed-44b9-bd3c-3cf3d2b14fc2@samba.org>
- <CAKYAXd-vGej9K53-06iy+p6nVSDLuwVU_+41R=7EUfbTjx=O5Q@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAKYAXd-vGej9K53-06iy+p6nVSDLuwVU_+41R=7EUfbTjx=O5Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, David Howells <dhowells@redhat.com>, 
+	Paulo Alcantara <pc@manguebit.org>, Tom Talpey <tom@talpey.com>, CIFS <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Am 10.02.26 um 15:37 schrieb Namjae Jeon:
-> On Tue, Feb 10, 2026 at 4:11 AM Stefan Metzmacher <metze@samba.org> wrote:
->>
->> Am 09.02.26 um 14:22 schrieb Stefan Metzmacher via samba-technical:
->>> Am 09.02.26 um 08:29 schrieb Namjae Jeon:
->>>>>
->>>>> I tested with with mlx5_ib, irdma (roce) and rxe.
->>>>> There's still a known problem with iwarp.
->>>> Let me know what the known problem is.
->>>
->>> It's the rw credit deadlock, as use rw credits
->>> for the wrong thing, which means we easily deadlock
->>> if the client uses an array smbdirect_buffer_descriptor_v1,
->>> where the could larger than the possible rw credits
->>> be calculated. While the max possible rw credits we calculate
->>> is the value that is needed in order to
->>> transfer the maximal rw size into a single
->>> smbdirect_buffer_descriptor_v1.
->>>
->>> This commit adds a WARN_ONCE detection for the
->>> problem:
->>> https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=e6260d7a518972ae1ca627e411cc16095c044d59
->>>
->>> See the diff and commit messages of the top ~15 commits
->>> in my for-6.18/ksmbd-smbdirect-regression-v4, which try to
->>> fix the problem.
->>>
->>> I try to fix it once I have the needed pcie adapters in
->>> order to out my Chelsio T520-BT cards into the free x4 slot
->>> of my testservers.
->>>
->>> As there are some strange page fault problems with the irdma
->>> driver, see
->>> https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=a6b515cda103c1ac1537c92a4e9dbd75a31d92ef
->>> And also
->>> https://git.samba.org/?p=metze/samba/wip.git;a=commitdiff;h=e784b53167dc2cf4316b66a7599dab5b9e6c7208
->>>
->>> For the client problem with irdma, see
->>> https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=fb5cc2a59b4719015979a1f1355f66f27002b4cf
->>> irdma_map_mr_sg may merge sg elements any may not return
->>> the same value as the given sg_nents on success.
->>>
->>>>>
->>>>> So far I can't see any regression compared the
->>>>> state before these 144 patches.
->>>>>
->>>>> Namjae, can you please test in your setup?
->>>>
->>>> Is there any reason to print the log below by default?
->>>> ksmbd: smb_direct: smbdirect_socket_schedule_cleanup(-ESHUTDOWN)
->>>> called from smbdirect_socket_shutdown in line=650 status=LISTENING
->>>> ksmbd: smb_direct: smbdirect_socket_schedule_cleanup(-ESHUTDOWN)
->>>> called from smbdirect_socket_shutdown in line=650 status=LISTENING
->>>> ksmbd: smb_direct: smbdirect_socket_schedule_cleanup(-ESHUTDOWN)
->>>> called from smbdirect_socket_shutdown in line=650 status=CONNECTED
->>>> ksmbd: smb_direct: smbdirect_socket_schedule_cleanup(-ESHUTDOWN)
->>>> called from smbdirect_socket_shutdown in line=650 status=CONNECTED
->>>
->>> I can move the above message to level INFO.
->>>
->>>> ksmbd: smb_direct: status=ERROR first_error=-ESHUTDOWN => -ENOTCONN
->>>
->>> This is basically the same messages as the one we
->>> had in smb_direct_read() before:
->>>
->>>           if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
->>>                   pr_err("disconnected\n");
->>>                   return -ENOTCONN;
->>>           }
->>>
->>> If I remember correctly it appeared just as:
->>>
->>> 'ksmbd: disconnected'
->>>
->>> I can just move the new message to level INFO too, ok?
->>
->> My master-fs-smb branch has 3 commits which should disable the
->> messages by default, let me know if your happy with the logic
->> and I'll squash them to the correct commit.
->>
->> https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=8b2f53aec19ebc180c11504600b5e5372d2220cb
-> Looks good to me.
-> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-> for this series.
+I have updated ksmbd-for-next with the first 57 patches in the
+smbdirect/RDMA series.
 
-I squashed these and rebased on Linus' tree, as all other stuff is now
-already merged.
+418c4323705 (HEAD -> ksmbd-for-next, origin/ksmbd-for-next) smb:
+smbdirect: let smbdirect_internal.h define pr_fmt without
+SMBDIRECT_USE_INLINE_C_FILES
+fbb6a3b2d26d smb: smbdirect: let smbdirect_socket.h include all
+headers for used structures
+ae6c9a6e0550 smb: smbdirect: introduce
+smbdirect_socket_create_{kern,accepting}() and
+smbdirect_socket_release()
+437aba3f5a12 smb: smbdirect: introduce smbdirect_accept_connect_request()
+b3ddfc3f09be smb: smbdirect: introduce smbdirect_connect[_sync]()
+4ad8cf4f2959 smb: smbdirect: let
+smbdirect_socket_set_initial_parameters() call
+rdma_restrict_node_type()
+e6da0c18d7ba smb: smbdirect: introduce
+smbdirect_socket_init_{new,accepting}() and helpers
+ef37f9d51034 smb: smbdirect: introduce smbdirect_socket_shutdown()
+dfa0af2a16b6 smb: smbdirect: introduce smbdirect_connection_is_connected()
+f85af9e7c614 smb: smbdirect: introduce smbdirect_connection_wait_for_connec=
+ted()
+c35cf02d82cc smb: smbdirect: introduce
+smbdirect_connection_legacy_debug_proc_show()
+d35a8675ea36 smb: smbdirect: introduce smbdirect_mr_io_fill_buffer_descript=
+or()
+4cbd37ad2e75 smb: smbdirect: introduce smbdirect_connection_negotiation_don=
+e()
+b6942a30409b smb: smbdirect: introduce
+smbdirect_connection_send_immediate_work()
+d1b71276a998 smb: smbdirect: introduce
+smbdirect_connection_send_iter() and related functions
+84841c14ec8a smb: smbdirect: introduce smbdirect_connection_request_keep_al=
+ive()
+bd3c43a9716a smb: smbdirect: introduce smbdirect_connection_grant_recv_cred=
+its()
+6dd5b927120f smb: smbdirect: introduce smbdirect_connection_recvmsg()
+19b86a60f1f6 smb: smbdirect: introduce
+smbdirect_connection_rdma_{established,event_handler}()
+5a522e9a8c6d smb: smbdirect: introduce smbdirect_socket_destroy[_sync]()
+ddc50831c9be smb: smbdirect: introduce smbdirect_connection_recv_io_done()
+cbc524baa4bf smb: smbdirect: define SMBDIRECT_RDMA_CM_[RNR_]RETRY
+5452fd00c3c3 smb: smbdirect: define SMBDIRECT_MIN_{RECEIVE,FRAGMENTED}_SIZE
+5ab0987c492e smb: smbdirect: introduce smbdirect_rw.c with server rw code
+1fed7d7a575b smb: smbdirect: introduce smbdirect_mr.c with client mr code
+519897951f16 smb: smbdirect: introduce smbdirect_socket_wait_for_credits()
+ff104281df37 smb: smbdirect: introduce smbdirect_get_buf_page_count()
+e185a680089a smb: smbdirect: split out smbdirect_connection_recv_io_refill(=
+)
+09c02027a5ac smb: smbdirect: introduce
+smbdirect_connection_recv_io_refill_work()
+d42c83ba4b83 smb: smbdirect: introduce smbdirect_connection_post_recv_io()
+f2f3bb3d9b18 smb: smbdirect: introduce
+smbdirect_connection_{create,destroy}_qp()
+12139caae21f smb: smbdirect: introduce
+smbdirect_connection_negotiate_rdma_resources()
+30148e9426b8 smb: smbdirect: introduce smbdirect_connection_qp_event_handle=
+r()
+9d6ebcaad731 smb: smbdirect: introduce smbdirect_map_sges_from_iter()
+and helper functions
+dee0c074b3a0 smb: smbdirect: introduce
+smbdirect_connection_{create,destroy}_mem_pools()
+28b1dedc499d smb: smbdirect: introduce smbdirect_connection_send_io_done()
+bbbd815fdc94 smb: smbdirect: introduce
+smbdirect_connection_{alloc,free}_send_io()
+e1ff37aac3de smb: smbdirect: introduce
+smbdirect_socket.{send,recv}_io.mem.gfp_mask
+cbcf99b37f2d smb: smbdirect: introduce smbdirect_frwr_is_supported()
+67738ec11efd smb: smbdirect: set SMBDIRECT_KEEPALIVE_NONE before
+disable_delayed_work(&sc->idle.timer_work);
+3dc5533c82f1 smb: smbdirect: introduce smbdirect_connection_idle_timer_work=
+()
+754d0caee03e smb: smbdirect: introduce
+smbdirect_connection_reassembly_{append,first}_recv_io()
+8ac22b59de12 smb: smbdirect: introduce smbdirect_connection_{get,put}_recv_=
+io()
+084df3a8fff8 smb: smbdirect: introduce smbdirect_connection.c to be filled
+38fc1ca14df1 smb: smbdirect: introduce
+smbdirect_socket_schedule_cleanup[{_lvl,_status}]()
+4c9193a71b42 smb: smbdirect: introduce smbdirect_socket_cleanup_work()
+37cdd6f6b78b smb: smbdirect: introduce smbdirect_socket_wake_up_all()
+d393bc165a56 smb: smbdirect: introduce smbdirect_socket_set_logging()
+e40786a49a70 smb: smbdirect: introduce smbdirect_socket_prepare_create()
+cd1901e4253f smb: smbdirect: introduce smbdirect_socket.c to be filled
+60a8be543197 smb: server: include smbdirect_all_c_files.c
+c2edeca18a48 smb: client: include smbdirect_all_c_files.c
+04bdb6fe7fab smb: smbdirect: introduce smbdirect_internal.h
+8cddb86e72fc smb: smbdirect: introduce smbdirect_all_c_files.c
+54b3a5306dca smb: smbdirect: add some logging to
+SMBDIRECT_CHECK_STATUS_{WARN,DISCONNECT}()
+7f492e5767f9 smb: smbdirect: introduce smbdirect_socket.logging infrastruct=
+ure
+e1b49deab6cb smb: smbdirect: let smbdirect.h include #include <linux/types.=
+h>
+d53f4d93f3d6 Merge tag 'v7.0-rc-part1-ksmbd-and-smbdirect-fixes' of
+git://git.samba.org/ksmbd
 
-It is available in my for-7.0/smbdirect-ko-20260212-v6 branch
-at commit d4fd5f7a6a7e0f4918d988b3125a59d05fbc9ac2:
-git fetch https://git.samba.org/metze/linux/wip.git for-7.0/smbdirect-ko-20260212-v6
-https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/for-7.0/smbdirect-ko-20260212-v6
+On Thu, Feb 12, 2026 at 3:05=E2=80=AFPM Stefan Metzmacher <metze@samba.org>=
+ wrote:
+>
+> Am 12.02.26 um 22:01 schrieb Steve French:
+> > I have updated patch 33 and 55 (see attached) with the checkpatch sugge=
+stion
+>
+> Thanks!
+>
+> > On Thu, Feb 12, 2026 at 2:45=E2=80=AFPM Stefan Metzmacher <metze@samba.=
+org> wrote:
+> >>
+> >> Am 12.02.26 um 21:40 schrieb Steve French:
+> >>> Should we fixup patch 33 in your series to address the warning:
+> >>>
+> >>> 145/0033-smb-smbdirect-introduce-smbdirect_mr.c-with-client-m.patch
+> >>> -------------------------------------------------------------------
+> >>> WARNING: added, moved or deleted file(s), does MAINTAINERS need updat=
+ing?
+> >>> #45:
+> >>> new file mode 100644
+> >>>
+> >>> WARNING: Prefer kzalloc_obj over kzalloc with sizeof
+> >>> #84: FILE: fs/smb/common/smbdirect/smbdirect_mr.c:35:
+> >>> + mr =3D kzalloc(sizeof(*mr), GFP_KERNEL);
+> >>
+> >> If you want.
+> >>
+> >> kzalloc_obj was just recently added and the code is mostly
+> >> copy and paste from the client code.
+> >>
+> >
+> >
+>
 
-The logical diff compared to for-7.0/smbdirect-ko-20260205-v5 is only this:
 
-diff --git a/fs/smb/common/smbdirect/smbdirect_connection.c b/fs/smb/common/smbdirect/smbdirect_connection.c
-index 5a65424ad010..813ddd87c6ae 100644
---- a/fs/smb/common/smbdirect/smbdirect_connection.c
-+++ b/fs/smb/common/smbdirect/smbdirect_connection.c
-@@ -1304,7 +1304,7 @@ int smbdirect_connection_send_iter(struct smbdirect_socket *sc,
-                 return -EINVAL; /* It's a bug in upper layer to get there */
+--=20
+Thanks,
 
-         if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
--               smbdirect_log_write(sc, SMBDIRECT_LOG_ERR,
-+               smbdirect_log_write(sc, SMBDIRECT_LOG_INFO,
-                         "status=%s first_error=%1pe => %s\n",
-                         smbdirect_socket_status_string(sc->status),
-                         SMBDIRECT_DEBUG_ERR_PTR(sc->first_error),
-@@ -1801,7 +1801,7 @@ int smbdirect_connection_recvmsg(struct smbdirect_socket *sc,
-
-  again:
-         if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
--               smbdirect_log_read(sc, SMBDIRECT_LOG_ERR,
-+               smbdirect_log_read(sc, SMBDIRECT_LOG_INFO,
-                         "status=%s first_error=%1pe => %s\n",
-                         smbdirect_socket_status_string(sc->status),
-                         SMBDIRECT_DEBUG_ERR_PTR(sc->first_error),
-diff --git a/fs/smb/common/smbdirect/smbdirect_socket.c b/fs/smb/common/smbdirect/smbdirect_socket.c
-index 657710d0387a..33610e2af589 100644
---- a/fs/smb/common/smbdirect/smbdirect_socket.c
-+++ b/fs/smb/common/smbdirect/smbdirect_socket.c
-@@ -647,7 +647,7 @@ __SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_bind);
-
-  void smbdirect_socket_shutdown(struct smbdirect_socket *sc)
-  {
--       smbdirect_socket_schedule_cleanup(sc, -ESHUTDOWN);
-+       smbdirect_socket_schedule_cleanup_lvl(sc, SMBDIRECT_LOG_INFO, -ESHUTDOWN);
-  }
-  __SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_shutdown);
-
-metze
+Steve
