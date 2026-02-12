@@ -1,239 +1,143 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449651D5147
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Feb 2026 21:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3520330B2D
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Feb 2026 21:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.170
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770930481; cv=pass; b=Bflv+4EsUuffTLVzNtiD4wVFbPUFr5UnrvxGdxhDKYmG0mrrnke/fOWPdT68mTxbikISzUHux9DohLXSK/v8n5LnN1jZr5+/5oV8AXHtkdKE9N+a6g7ts+KmPmXkiCIUkINq4bHiT7LtdmMIgcRtm70Mtr6Q4LlfgadtoEJXcNg=
+	t=1770933352; cv=pass; b=DsuPX53ugKkEzDRzeyzHn6Io210Pl0wUROCSIi47ZfIJsUXja5X5XeE6zCjWo6QFgHxzXnQAh5IGgwkgqYftHz50xHrqSszrMc7W2TfUpxFI6fVPJHbv/k+NrTv+KmmvWkp26e7gUojy6UAMmmhnJgtRxfgVL+rcXcMhhTYbiQw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770930481; c=relaxed/simple;
-	bh=SOKCWCRr5YpFu/NFeMmLz1mRvSwOeviiUocMLbpIQso=;
+	s=arc-20240116; t=1770933352; c=relaxed/simple;
+	bh=GIbRXC4GFpVvvReTONtWDCPeijEBycf5fd5C05Sf+P0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hpyIkstFbM6i5ZszviML4BMPA65oDAOcEkAVUuZrU2LUzAyC0XkU3gwmiN/0Imb2aoIco/VDOdMEmMFG64SYx/Cx/HyLgi9Eb8JvIFONojwYzNF/3lVh8UVt/95NjsuL7oDkuxsHvUeIXiKTJ+NltNEPu2KqWBxGvpgHLin/4Ks=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aSkrynDC; arc=pass smtp.client-ip=209.85.222.180
+	 To:Cc:Content-Type; b=OKO+DbM4STZQHnNpK6W/ZLesPDP7nRMuq864UNnCm9UxEvCNPby5/3CxLGu36zRHYxwLLKhcD0VrSXlYYATHA4q9H46kR8v1VhRpS8AMf+EmfY8rIhsFiV4cV3+INvU9wAAZ/NlAB92EhEw9Ut5oDrkFEFuWinmbMXayMnjPQO4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QCZJqGsf; arc=pass smtp.client-ip=209.85.222.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aSkrynDC"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8c6f21c2d81so34576985a.2
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Feb 2026 13:08:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770930479; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QCZJqGsf"
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-8cb3b3e643dso23868585a.2
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Feb 2026 13:55:50 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770933348; cv=none;
         d=google.com; s=arc-20240605;
-        b=Jd7x1GK2B5NpiVysBB4wmF2VAnIQHUP7lU+BRFwYjmbcQaGNmXvxPXhaBMcf53ad3J
-         JISIsMSSWx9zCDAq6RYDzkzNAZNYm5x7fQZnnSzifFV+B8PSJn2fmX7Tmm9dOyWlMUTi
-         gH+SwzZgv/TMEhJlVRmVfgLy29C6qdY9UnrVo/WO0GSrETJKVf1janp61Wz0IEogqo/p
-         2jxraXjxr4bGfEX9W/PxnH96DSSX1MLNSY72uD9VhkPuuwd7symvy1tuw7VwZAqw3Oi5
-         F4wrB9EKeDHc4VKffrz1uhzqFto3uojGi24tAAkL+raV+RYFxuGXn60RQDMmhkVaygmf
-         AXyQ==
+        b=LXVRwve2PaS18UqhY48ld3y7LVPIX48+3n7MxkPl5mo8Wychw3gA+7mGXFf4Nnn3Ci
+         8eyLFfzzSIZ7sVeQOqjWkXCdmXYBjgJBvJRh706cUhNGwCraQcVo5qWtya9C/vAFmBIo
+         8J/XEz8BRKioW0d9h6r4/VDbSlmb4nWsmz3Yk+i3Cws3toThTidFqbSgrLb1ApLBrUpu
+         Rw5o/SaDrU+sIEnr56KzJfZ9EJNTq7V2idGpeGeiyMePpnXyurPhRisna5MDDBeQVlHY
+         B5s6mrVl8zx3X85k57DSsKa7LSY0dBrvIqwO8ZBIOERtn1yxghqYzzlW2M2244FTnAvl
+         6SkA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=SOKCWCRr5YpFu/NFeMmLz1mRvSwOeviiUocMLbpIQso=;
-        fh=peQ+izGdoThSoAEN7Ed3MdxybtgVbOQs4KPyHnf35Qs=;
-        b=UPF6TXxD5AMLBLcpppIfUE7Xlw65+qqio0jMfO0LTph3a9Sivz3EvneuXam7LVA+XF
-         QGCa1g5eKiUxEmWkq9GpvKBkKjSOKoQuz77OhfqcIpYzSfH7CS0FPdFx4J1qqfcD26bq
-         DlhUeg21AlbBzbJ6s5qRjyGbQVCdfDCuQhonK7VaQS4s7es1z3p6hSUDch2/bTer0kKw
-         F76WS4jm4h4jXZjHLnOIb/gKuW2twurwLrOB5+OvF6WOO0gykNTFLC6s98vglf0kHLNg
-         l2Uprl2ToQZI0hbjwiOFzFGGof1YnOuRNsOzXNyDivX5Ts8s1HFbbzvfCR7yD1uWJhOT
-         HtEA==;
+        bh=S+zip02OJXIOm12uEwGl05ud9Bik7dG9fiOw9PrORXg=;
+        fh=Ah9UfP+lSOOYrMEHPLnF6nj37sdm7N8iUsWpV56yBLw=;
+        b=XSIIDte/L8mGb66okqp0bNzZkEHmTo8eVBqSyTi74LvoncVuXsMZ6TbwMM6TxmO0ku
+         wMK5DmJbPBMsRdhSIlNTwFzThC0Lcysc/8MiKfkjpDaAi7eSldBfaN7AA/mppfpAWlM5
+         gZeVX+E+2XDtUxV5VEovFK9oU+c8A12gaeXSVyQ1xCX5N+kMXcxhH5JaqL8lxAUpy4LG
+         dZJKJq3kNelSlkZzbkEXMnmRxh9+il/nAXcTESDofwlJ9j3gF0PbG2CQULUNNE9Orbps
+         XiBanEcA9UGY/spK0yaHx55tvsHi/EK272rh19iWbIYR1R9shb1KjEW0aR3tsMCvPVK8
+         H+5A==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770930479; x=1771535279; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770933348; x=1771538148; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SOKCWCRr5YpFu/NFeMmLz1mRvSwOeviiUocMLbpIQso=;
-        b=aSkrynDCvZC026EHYISxkC3t9M4meg2wFSOJPIP+hQluUVrwndFnLSbzsHdIoPsHqV
-         xJzkI1NywtqC8zDPgVIRAjPsyuK6zxkG4I8lpaZ02SS5wMFm3MsvxRJiyYPJLl2Zn42p
-         9kY5g0DdmKybXqTTRybChyMeoQhGEbu+xib7djmNoOwO4rjMpWy3ZT5EXqKEUhC+ArjX
-         pNAMdbJ7K307GETJRMOVbvfhzB+y0bJXUZmRmhXZORFkDi+Jl4t/1uZ75jD9bwg81bap
-         xquIF9La3JrF1AJWtVlLr9SSOa+aww/tC1y+OHLkSmsL/1zifLglwuwmjq7BMWi0UmVy
-         MlWQ==
+        bh=S+zip02OJXIOm12uEwGl05ud9Bik7dG9fiOw9PrORXg=;
+        b=QCZJqGsfoLfGT3mepAnPM2yVtqoCBIpGG5k3bW8pkdTD/jeitVaIgPRlJBiAcZ3Fh2
+         qzIs+ld6+Mcg7bD7ALSKv+c1gi5NgSrCcbxqUzWkdRojtRyLI36oH81f++q001xyzY4P
+         tsG3Si3JEVTxiAqgBsO7i9y8K0avod1+enKfQFLD7eQg9qcGhzFABWbin4WHWq0VeFia
+         /JXTdJx9rAOd6tRV8kYJzKhqsSdkdR/widRUDbQmA7QlrPNTiADE34XfLeyFE+SSBt6B
+         sLeDwyTc/5+NxkQCvJ3j+VmpUDAofz49CgpetMWwHD9G4K6I8djgDkDcKhwgPDr9WpjV
+         1miw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770930479; x=1771535279;
+        d=1e100.net; s=20230601; t=1770933348; x=1771538148;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=SOKCWCRr5YpFu/NFeMmLz1mRvSwOeviiUocMLbpIQso=;
-        b=mm/k+AveEaSsP7XwF1/woZ+DqSPha9XvOKx/2mF2plIF4/Ajee60RmME3Kv+yoV33x
-         BIc8iN6GbZnkPuv1waNDPYjn6OlOQLzMLmUrb3VKxBOgdO3uxq3e/Sr3YMH7MJMV1z3n
-         Z1tTRjj0Zr1hl2RlGrL/eI0+O3K6TieVfQnXyjMea2KBz9UKgjrNkOy3N0wxMwy1d6HF
-         ieO6K2u7v5c17+UiPrzjBJAUc5lmVwukMd/CxVgOJL/F9vknysdVnBlL3dGKo3pCI41+
-         6rsprizustrHjqB3Ti3/89O0BzMnM3FckqF+HeXWwk8kH0JoEiF9nP4DqcmpSLrCfHuq
-         oCBw==
-X-Forwarded-Encrypted: i=1; AJvYcCUHeQQMKq5iW+TQw5XqF54837A+HaRPDq+LQNa5wfCoa2AirIGbOP3ccDWYfofFCnjHr/4T09qFAI3n@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/VNOmTff1vCIkmk00CNOaUt5rXUV5WpQXXaF9xoCJfNbCgbdh
-	LpphcEXfc87Qst1I62WkOdyEN0HzrPSdzhE/KW45CXVI4Np8m1G+FvAz5u0/VOxZkxYVHsC3Q9W
-	E5Srd59G0+F9O28EIL6iU8EhbcrW23Zg=
-X-Gm-Gg: AZuq6aKnGOXOtMTuWIVwhxy2T55SBusXNV43rj8P2Qbqvu4gNnppDFm2crmA6I9SFOy
-	F6DT8qcS0hFP/hXmLYppai8sE7nJZ4To7M0BrqWHYgDd++1OkdXQkRV8yELbwUWHj46U4AAKUHI
-	rQSjpVHAWEMktHZhVPaHc9CIRVWvh2AmKS6hACHwwZMbtl/9L3IEeS07ISgliQmvuJPZpF2qXjq
-	0dHDCjy0JNAq0KGN2agQF0gCe8eyrsrBzZnH4x0d5ffAxQs70RD6sEJDcEqvyEA/7tWhvRHOpMW
-	I6nzFMtciOZND0XcxwLSRrvE8y8B1BVcF5Qg1ckevOR8Pe22R4mdYcGA9mNJsOYXaLzA1wzLlGx
-	ec27Y56BPtRtOBd1N/jyh/Ug8BGdVD7xHDoFE7coF+OiuNdQ+6yJNysVZHNhOSQ1hENg5mSCoN5
-	3Nj8c/pFx9asoVjDIrlVzi
-X-Received: by 2002:a05:620a:40c3:b0:8cb:3870:5c1f with SMTP id
- af79cd13be357-8cb4087e498mr42727685a.27.1770930479083; Thu, 12 Feb 2026
- 13:07:59 -0800 (PST)
+        bh=S+zip02OJXIOm12uEwGl05ud9Bik7dG9fiOw9PrORXg=;
+        b=UDTKb8np1bVcmOgVVWLdF5AcUQPz4LSHn3icWGrk0eS/R0VDtuKieQTmkmKWPL5Q/B
+         yKu1cRoxF8cJmuR0uIfzZ85FAH4LjXplCYTu1kV37HhSqjJ1bOsIL+LTtbnqvGbOfevR
+         /4IvuDXfiXd8EIpHFm+xxzkFmdTqnmkHrR3SyaTX0cM33Can5Q5olgZTLZjs9k1sYHJI
+         GuhJrrRDXwP6gJi7ZaMbInYaLyx1JdmmVwPhI5HK8CE8bF/CMDAewKZuC1DGr3f9SFP+
+         Vzz47hAWoG+19Pg5B2Ga0yQ0cbm9IItcP/+Z0bY0mjUdARjDJ2Ad+vCHYye9E5+GOsNq
+         C0cw==
+X-Forwarded-Encrypted: i=1; AJvYcCUTZ76FegPBd4dHIF7Tg080CWoImN22+9bX7Ig6Pm7EwHwefXdMyKA8aRxwOy0tnY2S7aZT5l1d5+Sk@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXEK85fb36j3Uyi4PfPuoVZZC+SwxbB4i7rcdWZOHwGETi3j/z
+	OSzXtqiwm5w7T1U4Y08Pg0W9SdDk7AsnS2z2iRMwT1F0DxIxAkw3DzK3fXbIMvRljSeE8wbWlsS
+	n3naBZDe4i7nafZRCH6/esaQKGIw4gIA=
+X-Gm-Gg: AZuq6aLl/S3gPeA9iPoC5jLwHVR4af6XnDUSYD6H4dhctnnBSDpRVzk+SuaVfrtU/GQ
+	33GpzW0cH+kHxPNX2hEvFmcXAGNB5LPAoZ9tRFqecN2d1a989KxtioxjpTjoJhHKPVJBNvXKDzz
+	GiYmRq4NhHPiBseF7sLHF8uySLpmScIfZoWqtF5ZzxJqSRxi80BTJpdq0CxOkFAw32hduc1ofmB
+	Xwg0S1QdSuIHo2miOCI1gOp8PziIqB6iq2MZ73v46Ua6orOKmOvnJMbAYFYWyv9KG2YcxBR42Sw
+	fKgx//lt39kKD4hSWCIdXvEN2JTGyVuMp8VXKwJYKB2BDal0m/NkWHKyRcdar02+VaiqVUtlpzL
+	4E1NnL9oWwz5dir4pClu0iHclUYtgmMKadDOaEPikCeuCEaziPEWzCwWzx5kKzoaMNdNaC2JCVr
+	AieCIzDI9h4E7B5GdP8uFn
+X-Received: by 2002:ac8:7f06:0:b0:501:13ce:4e0a with SMTP id
+ d75a77b69052e-506a68090f0mr2697511cf.10.1770933347942; Thu, 12 Feb 2026
+ 13:55:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1770311507.git.metze@samba.org> <CAKYAXd_CqpqXnh+k19NVdgQdDAnp6k5NbPqcyd0anocBJrGd_Q@mail.gmail.com>
- <7140153c-7858-474b-abe5-aee69bd196a2@samba.org> <d5d0ff21-83ed-44b9-bd3c-3cf3d2b14fc2@samba.org>
- <CAKYAXd-vGej9K53-06iy+p6nVSDLuwVU_+41R=7EUfbTjx=O5Q@mail.gmail.com>
- <CAH2r5muf=Th_AbA7SZaQKApyvr81FMB8WF-5yZ3ihzap1swQWg@mail.gmail.com>
- <98d25ce1-1f1a-4517-89f0-8956bffaf9d3@samba.org> <CAH2r5mswN8W652Br4QQTzhtDXtXKvqea=dWVfUFF+xDYfOx6HA@mail.gmail.com>
- <28d94c9f-b85e-4746-bb08-188090409682@samba.org> <CAH2r5mtA=DdpEiyqspNG3eoyjkGajnEwoRnOyXyBimDtCND9ig@mail.gmail.com>
- <c5aef237-2a12-4be5-b917-de502780be85@samba.org>
-In-Reply-To: <c5aef237-2a12-4be5-b917-de502780be85@samba.org>
+References: <20260209175421.66469-1-adarshdas950@gmail.com>
+In-Reply-To: <20260209175421.66469-1-adarshdas950@gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 12 Feb 2026 15:07:46 -0600
-X-Gm-Features: AZwV_QjN7rb2ho4ZyDIkXJegbI16VanyWOg-Azt6CZXpDntDSupanVJzx0e8qYM
-Message-ID: <CAH2r5msAAN-EgOmRnoO7R4RPu2suNr+mgk5c5JAj9b-_kjwymg@mail.gmail.com>
-Subject: Re: [PATCH v5 000/144] smb: smbdirect/client/server: moving to common
- functions and smbdirect.ko
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, David Howells <dhowells@redhat.com>, 
-	Paulo Alcantara <pc@manguebit.org>, Tom Talpey <tom@talpey.com>, CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>
+Date: Thu, 12 Feb 2026 15:55:36 -0600
+X-Gm-Features: AZwV_Qjbiq0yoPxqiBI8n9JOGxm7MBN3CQ5muk9WnoGkR9gS3ipNVvumJDFJgbA
+Message-ID: <CAH2r5mtcGschT3qE9_8gxGg-Eo=Bm0ps2L64GujnWGFzWQ9RMA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] smb: simplify boolean expressions
+To: Adarsh Das <adarshdas950@gmail.com>
+Cc: sfrench@samba.org, linkinjeon@kernel.org, pc@manguebit.org, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+	bharathsm@microsoft.com, senozhatsky@chromium.org, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-I have updated ksmbd-for-next with the first 57 patches in the
-smbdirect/RDMA series.
+After getting feedback from others, it was felt that these two patches
+(eliminating the "=3D=3D true" and "=3D=3D false") don't improve readabilit=
+y
+enough to justify the risk that they would complicate future backports
+of fixes.   If we were already changing related code for a fix then
+cleanup like this could be added on to a fix but not worth the risk if
+not related to a fix
 
-418c4323705 (HEAD -> ksmbd-for-next, origin/ksmbd-for-next) smb:
-smbdirect: let smbdirect_internal.h define pr_fmt without
-SMBDIRECT_USE_INLINE_C_FILES
-fbb6a3b2d26d smb: smbdirect: let smbdirect_socket.h include all
-headers for used structures
-ae6c9a6e0550 smb: smbdirect: introduce
-smbdirect_socket_create_{kern,accepting}() and
-smbdirect_socket_release()
-437aba3f5a12 smb: smbdirect: introduce smbdirect_accept_connect_request()
-b3ddfc3f09be smb: smbdirect: introduce smbdirect_connect[_sync]()
-4ad8cf4f2959 smb: smbdirect: let
-smbdirect_socket_set_initial_parameters() call
-rdma_restrict_node_type()
-e6da0c18d7ba smb: smbdirect: introduce
-smbdirect_socket_init_{new,accepting}() and helpers
-ef37f9d51034 smb: smbdirect: introduce smbdirect_socket_shutdown()
-dfa0af2a16b6 smb: smbdirect: introduce smbdirect_connection_is_connected()
-f85af9e7c614 smb: smbdirect: introduce smbdirect_connection_wait_for_connec=
-ted()
-c35cf02d82cc smb: smbdirect: introduce
-smbdirect_connection_legacy_debug_proc_show()
-d35a8675ea36 smb: smbdirect: introduce smbdirect_mr_io_fill_buffer_descript=
-or()
-4cbd37ad2e75 smb: smbdirect: introduce smbdirect_connection_negotiation_don=
-e()
-b6942a30409b smb: smbdirect: introduce
-smbdirect_connection_send_immediate_work()
-d1b71276a998 smb: smbdirect: introduce
-smbdirect_connection_send_iter() and related functions
-84841c14ec8a smb: smbdirect: introduce smbdirect_connection_request_keep_al=
-ive()
-bd3c43a9716a smb: smbdirect: introduce smbdirect_connection_grant_recv_cred=
-its()
-6dd5b927120f smb: smbdirect: introduce smbdirect_connection_recvmsg()
-19b86a60f1f6 smb: smbdirect: introduce
-smbdirect_connection_rdma_{established,event_handler}()
-5a522e9a8c6d smb: smbdirect: introduce smbdirect_socket_destroy[_sync]()
-ddc50831c9be smb: smbdirect: introduce smbdirect_connection_recv_io_done()
-cbc524baa4bf smb: smbdirect: define SMBDIRECT_RDMA_CM_[RNR_]RETRY
-5452fd00c3c3 smb: smbdirect: define SMBDIRECT_MIN_{RECEIVE,FRAGMENTED}_SIZE
-5ab0987c492e smb: smbdirect: introduce smbdirect_rw.c with server rw code
-1fed7d7a575b smb: smbdirect: introduce smbdirect_mr.c with client mr code
-519897951f16 smb: smbdirect: introduce smbdirect_socket_wait_for_credits()
-ff104281df37 smb: smbdirect: introduce smbdirect_get_buf_page_count()
-e185a680089a smb: smbdirect: split out smbdirect_connection_recv_io_refill(=
-)
-09c02027a5ac smb: smbdirect: introduce
-smbdirect_connection_recv_io_refill_work()
-d42c83ba4b83 smb: smbdirect: introduce smbdirect_connection_post_recv_io()
-f2f3bb3d9b18 smb: smbdirect: introduce
-smbdirect_connection_{create,destroy}_qp()
-12139caae21f smb: smbdirect: introduce
-smbdirect_connection_negotiate_rdma_resources()
-30148e9426b8 smb: smbdirect: introduce smbdirect_connection_qp_event_handle=
-r()
-9d6ebcaad731 smb: smbdirect: introduce smbdirect_map_sges_from_iter()
-and helper functions
-dee0c074b3a0 smb: smbdirect: introduce
-smbdirect_connection_{create,destroy}_mem_pools()
-28b1dedc499d smb: smbdirect: introduce smbdirect_connection_send_io_done()
-bbbd815fdc94 smb: smbdirect: introduce
-smbdirect_connection_{alloc,free}_send_io()
-e1ff37aac3de smb: smbdirect: introduce
-smbdirect_socket.{send,recv}_io.mem.gfp_mask
-cbcf99b37f2d smb: smbdirect: introduce smbdirect_frwr_is_supported()
-67738ec11efd smb: smbdirect: set SMBDIRECT_KEEPALIVE_NONE before
-disable_delayed_work(&sc->idle.timer_work);
-3dc5533c82f1 smb: smbdirect: introduce smbdirect_connection_idle_timer_work=
-()
-754d0caee03e smb: smbdirect: introduce
-smbdirect_connection_reassembly_{append,first}_recv_io()
-8ac22b59de12 smb: smbdirect: introduce smbdirect_connection_{get,put}_recv_=
-io()
-084df3a8fff8 smb: smbdirect: introduce smbdirect_connection.c to be filled
-38fc1ca14df1 smb: smbdirect: introduce
-smbdirect_socket_schedule_cleanup[{_lvl,_status}]()
-4c9193a71b42 smb: smbdirect: introduce smbdirect_socket_cleanup_work()
-37cdd6f6b78b smb: smbdirect: introduce smbdirect_socket_wake_up_all()
-d393bc165a56 smb: smbdirect: introduce smbdirect_socket_set_logging()
-e40786a49a70 smb: smbdirect: introduce smbdirect_socket_prepare_create()
-cd1901e4253f smb: smbdirect: introduce smbdirect_socket.c to be filled
-60a8be543197 smb: server: include smbdirect_all_c_files.c
-c2edeca18a48 smb: client: include smbdirect_all_c_files.c
-04bdb6fe7fab smb: smbdirect: introduce smbdirect_internal.h
-8cddb86e72fc smb: smbdirect: introduce smbdirect_all_c_files.c
-54b3a5306dca smb: smbdirect: add some logging to
-SMBDIRECT_CHECK_STATUS_{WARN,DISCONNECT}()
-7f492e5767f9 smb: smbdirect: introduce smbdirect_socket.logging infrastruct=
-ure
-e1b49deab6cb smb: smbdirect: let smbdirect.h include #include <linux/types.=
-h>
-d53f4d93f3d6 Merge tag 'v7.0-rc-part1-ksmbd-and-smbdirect-fixes' of
-git://git.samba.org/ksmbd
-
-On Thu, Feb 12, 2026 at 3:05=E2=80=AFPM Stefan Metzmacher <metze@samba.org>=
+On Mon, Feb 9, 2026 at 11:57=E2=80=AFAM Adarsh Das <adarshdas950@gmail.com>=
  wrote:
 >
-> Am 12.02.26 um 22:01 schrieb Steve French:
-> > I have updated patch 33 and 55 (see attached) with the checkpatch sugge=
-stion
+> This series simplifies boolean expressions in the SMB code by removing
+> redundant comparisons with true/false.
 >
-> Thanks!
+> Adarsh Das (2):
+>   smb: remove redundant =3D=3D true comparisons
+>   smb: remove redundant =3D=3D false comparisons
 >
-> > On Thu, Feb 12, 2026 at 2:45=E2=80=AFPM Stefan Metzmacher <metze@samba.=
-org> wrote:
-> >>
-> >> Am 12.02.26 um 21:40 schrieb Steve French:
-> >>> Should we fixup patch 33 in your series to address the warning:
-> >>>
-> >>> 145/0033-smb-smbdirect-introduce-smbdirect_mr.c-with-client-m.patch
-> >>> -------------------------------------------------------------------
-> >>> WARNING: added, moved or deleted file(s), does MAINTAINERS need updat=
-ing?
-> >>> #45:
-> >>> new file mode 100644
-> >>>
-> >>> WARNING: Prefer kzalloc_obj over kzalloc with sizeof
-> >>> #84: FILE: fs/smb/common/smbdirect/smbdirect_mr.c:35:
-> >>> + mr =3D kzalloc(sizeof(*mr), GFP_KERNEL);
-> >>
-> >> If you want.
-> >>
-> >> kzalloc_obj was just recently added and the code is mostly
-> >> copy and paste from the client code.
-> >>
-> >
-> >
+>  fs/smb/client/cifsacl.c        |  2 +-
+>  fs/smb/client/connect.c        |  6 ++---
+>  fs/smb/client/file.c           |  5 ++--
+>  fs/smb/client/fs_context.c     |  6 ++---
+>  fs/smb/client/misc.c           |  2 +-
+>  fs/smb/client/smb2misc.c       |  4 ++--
+>  fs/smb/client/smb2ops.c        | 12 +++++-----
+>  fs/smb/client/smb2pdu.c        |  2 +-
+>  fs/smb/client/transport.c      |  2 +-
+>  fs/smb/server/oplock.c         |  6 ++---
+>  fs/smb/server/server.c         |  2 +-
+>  fs/smb/server/smb2misc.c       |  2 +-
+>  fs/smb/server/smb2pdu.c        | 44 ++++++++++++++++------------------
+>  fs/smb/server/smb_common.c     |  2 +-
+>  fs/smb/server/transport_rdma.c |  2 +-
+>  fs/smb/server/vfs.c            |  8 +++----
+>  fs/smb/server/vfs_cache.c      |  6 ++---
+>  17 files changed, 55 insertions(+), 58 deletions(-)
+>
+> --
+> 2.53.0
+>
 >
 
 
