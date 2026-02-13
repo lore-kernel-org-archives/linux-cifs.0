@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF28D241665;
-	Fri, 13 Feb 2026 13:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE75E23645D;
+	Fri, 13 Feb 2026 13:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770990838; cv=none; b=Qr8hFpVnxpFDfIkAxrf+qI3Qlqm8n0EjhBoncExA8rf/BFxkIbO46l5pHt0YgMFYzGYA30XEMk2zVTMXxBAzFQu1b07nFWp61Cc85zPzLJWKIQP4dVyd8Mnpvfl5rGjeiU3yp5CbdzcBvkzKJyJsdiSZB7SCznq5N25+hOZoimM=
+	t=1770990842; cv=none; b=PwZy4vw7ZdqJb0D5XJWougQz0O4rxDskERpsfnmDV2oQCXaGISUdrDBqamgqxUkpiFZws1pblhpqwUSkO8i/tQsBTQ5Pt0EbXankxVYLROkZkeOPu7MU1PLhdYSw1KxS+CghT5+LGQe+F21AI5TDahw5P2Q3a1s2ER5FsjrLdSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770990838; c=relaxed/simple;
-	bh=V1i9r5Ys2mI4LX6/pqhslP2btIAgBvl9r7ram1eHI0Q=;
+	s=arc-20240116; t=1770990842; c=relaxed/simple;
+	bh=3vCPX61sX20H+a717mSwIYx/yC5gWLrUFV97YX9D5/w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PwsmxzhEHzMvIyzGaIDG329usjSljbIsvCfMPFHeaPoFQS79AJ5vzYvRq2Sn8m7wYb9BOnlpEZctm0M7fgJP9qGkH29TKi0WpcxjSEnGTtwYWAGQFukaYLwS7ordXzBLebJWbrDU/K5oAl68Jqzyr+su4xuM4gydMgdclqxteac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=K18O0RvT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=TgZmtd1Gi3qnwOjXfn8fKbw4tL3rhIQGnZr42NSI09ZXnbrglexZodIwN+kb/Wl4FPGFfB34o1J7mMW5IV2YA0yUYL+Zz5GXND8koeh7+iqLuyTaIWKUg5vSWoxenHy51Q4H1FluMSMhP0LesQY57ukN/1YIAUUS1MikLt5n6C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=PaF+uQ9H; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="K18O0RvT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D55FC116C6;
-	Fri, 13 Feb 2026 13:53:57 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="PaF+uQ9H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BB3BC116C6;
+	Fri, 13 Feb 2026 13:54:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1770990838;
-	bh=V1i9r5Ys2mI4LX6/pqhslP2btIAgBvl9r7ram1eHI0Q=;
+	s=korg; t=1770990841;
+	bh=3vCPX61sX20H+a717mSwIYx/yC5gWLrUFV97YX9D5/w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=K18O0RvTJdZwlxEuOUWAIrlUv3gdAZHGmK33fHAstv+eP3bRpAEaa8z+CWgGTYHBQ
-	 eAb7V5Y5eVkQCT6U3uEipldkTv6su/vKeZnVWT4Rurj+sNHu+IJqmcXBbGC2p8KvwH
-	 Jhry2z3GA++TVaQXG6axYne/OVNUtfPCrk/uhHWg=
+	b=PaF+uQ9HrIwXK5DobvUSF0Vzd4rIuYCqwQUG0h2Y/shpSN21li1W2wptKE+0GMJ34
+	 Qx04Xb6qcoLlYjswLAz2u9Oql4LyR4Gd/85mkTrMxXCr56J0flYgfIVvaCitzsd1+E
+	 k0eIa1fBZE/xsvz9tYf5tPhrcycs7wVWr+kqeRE4=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -34,9 +34,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	samba-technical@lists.samba.org,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.18 09/49] smb: server: make use of smbdirect_socket.recv_io.credits.available
-Date: Fri, 13 Feb 2026 14:47:53 +0100
-Message-ID: <20260213134709.227991546@linuxfoundation.org>
+Subject: [PATCH 6.18 10/49] smb: server: let recv_done() queue a refill when the peer is low on credits
+Date: Fri, 13 Feb 2026 14:47:54 +0100
+Message-ID: <20260213134709.264495820@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260213134708.885500854@linuxfoundation.org>
 References: <20260213134708.885500854@linuxfoundation.org>
@@ -57,26 +57,16 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-commit 26ad87a2cfb8c1384620d1693a166ed87303046e upstream.
+commit 8106978d400cc88a99fb94927afe8fec7391ca3e upstream.
 
-The logic off managing recv credits by counting posted recv_io and
-granted credits is racy.
+In captures I saw that Windows was granting 191 credits in a batch
+when its peer posted a lot of messages. We are asking for a
+credit target of 255 and 191 is 252*3/4.
 
-That's because the peer might already consumed a credit,
-but between receiving the incoming recv at the hardware
-and processing the completion in the 'recv_done' functions
-we likely have a window where we grant credits, which
-don't really exist.
+So we also use that logic in order to fill the
+recv buffers available to the peer.
 
-So we better have a decicated counter for the
-available credits, which will be incremented
-when we posted new recv buffers and drained when
-we grant the credits to the peer.
-
-This fixes regression Namjae reported with
-the 6.18 release.
-
-Fixes: 89b021a72663 ("smb: server: manage recv credits by counting posted recv_io and granted credits")
+Fixes: a7eef6144c97 ("smb: server: queue post_recv_credits_work in put_recvmsg() and avoid count_avail_recvmsg")
 Cc: <stable@vger.kernel.org> # 6.18.x
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
@@ -88,62 +78,37 @@ Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/server/transport_rdma.c |   30 +++++++++++++++++++++++++-----
- 1 file changed, 25 insertions(+), 5 deletions(-)
+ fs/smb/server/transport_rdma.c |    6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 --- a/fs/smb/server/transport_rdma.c
 +++ b/fs/smb/server/transport_rdma.c
-@@ -926,6 +926,8 @@ static void smb_direct_post_recv_credits
+@@ -661,6 +661,7 @@ static void recv_done(struct ib_cq *cq,
+ 		struct smbdirect_data_transfer *data_transfer =
+ 			(struct smbdirect_data_transfer *)recvmsg->packet;
+ 		u32 remaining_data_length, data_offset, data_length;
++		int current_recv_credits;
+ 		u16 old_recv_credit_target;
+ 
+ 		if (wc->byte_len <
+@@ -699,7 +700,7 @@ static void recv_done(struct ib_cq *cq,
  		}
- 	}
  
-+	atomic_add(credits, &sc->recv_io.credits.available);
-+
- 	if (credits)
- 		queue_work(sc->workqueue, &sc->idle.immediate_work);
- }
-@@ -972,19 +974,37 @@ static void send_done(struct ib_cq *cq,
+ 		atomic_dec(&sc->recv_io.posted.count);
+-		atomic_dec(&sc->recv_io.credits.count);
++		current_recv_credits = atomic_dec_return(&sc->recv_io.credits.count);
  
- static int manage_credits_prior_sending(struct smbdirect_socket *sc)
- {
-+	int missing;
-+	int available;
- 	int new_credits;
+ 		old_recv_credit_target = sc->recv_io.credits.target;
+ 		sc->recv_io.credits.target =
+@@ -719,7 +720,8 @@ static void recv_done(struct ib_cq *cq,
+ 			wake_up(&sc->send_io.credits.wait_queue);
  
- 	if (atomic_read(&sc->recv_io.credits.count) >= sc->recv_io.credits.target)
- 		return 0;
+ 		if (data_length) {
+-			if (sc->recv_io.credits.target > old_recv_credit_target)
++			if (current_recv_credits <= (sc->recv_io.credits.target / 4) ||
++			    sc->recv_io.credits.target > old_recv_credit_target)
+ 				queue_work(sc->workqueue, &sc->recv_io.posted.refill_work);
  
--	new_credits = atomic_read(&sc->recv_io.posted.count);
--	if (new_credits == 0)
-+	missing = (int)sc->recv_io.credits.target - atomic_read(&sc->recv_io.credits.count);
-+	available = atomic_xchg(&sc->recv_io.credits.available, 0);
-+	new_credits = (u16)min3(U16_MAX, missing, available);
-+	if (new_credits <= 0) {
-+		/*
-+		 * If credits are available, but not granted
-+		 * we need to re-add them again.
-+		 */
-+		if (available)
-+			atomic_add(available, &sc->recv_io.credits.available);
- 		return 0;
-+	}
- 
--	new_credits -= atomic_read(&sc->recv_io.credits.count);
--	if (new_credits <= 0)
--		return 0;
-+	if (new_credits < available) {
-+		/*
-+		 * Readd the remaining available again.
-+		 */
-+		available -= new_credits;
-+		atomic_add(available, &sc->recv_io.credits.available);
-+	}
- 
-+	/*
-+	 * Remember we granted the credits
-+	 */
- 	atomic_add(new_credits, &sc->recv_io.credits.count);
- 	return new_credits;
- }
+ 			enqueue_reassembly(sc, recvmsg, (int)data_length);
 
 
