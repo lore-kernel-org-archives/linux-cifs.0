@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B8D35CBD8;
-	Fri, 13 Feb 2026 13:53:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0471241665;
+	Fri, 13 Feb 2026 13:53:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770990794; cv=none; b=HCFoAWsmIaqvmU/EQkYUqxP9NOXIOJF49IGER8z2NoRghFwutILjLDPU8bKiXclRkRnvPdaxpeafeVKRq9ZTMIWNK4NdOh3ouWTiXPb0W9bEFdHyh7B7wQcm1X/XSsbl4GGIj+fpsH15VQ9Ndy4lF68qpmklvI3XxCdCL9+QIME=
+	t=1770990832; cv=none; b=iG6n5kxNFfSym3fQjExTcknmYfyOBgZ4G4QJFdftk9Vgl8v6tDVY2dNNnFmKb1dh0wwSRzYJO19McHJK9FBO6gR3jq4T2xpsr+9Jtlr9ZfNTshbcMvO3Zz9E08TieNm3V+MIzNcrpxA9v+woTi2L8ueN2imkC6mtarG588TbPBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770990794; c=relaxed/simple;
-	bh=vhIKdRitTp2/uDmOXA3pm7uVlowRzSAeNutU9SD1iCw=;
+	s=arc-20240116; t=1770990832; c=relaxed/simple;
+	bh=jsBBsemJI59iStJR93LUQrX9Mow4VarxqWC4BMhiFrU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZiCulFSh7TBqoWtcdvwDvglzZpjhj4v3ajV0177Puf+JIRP4BMnCdfnWQNXWllfQjVrCpfyF6Pq8INIYKLjm4i8fbVYTH+IYNjRgdHZB6GOpBsS4BfrsUu286a/8qZrYfh3cO7aGJBEfgW/hC7/mOowqPl6uNR0DOzGUcixbFk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=XRzOkOrd; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=PkNnXsQtjjc0Pyqno6Z8iPcFmf6eVI6B57gLvz/Yg7JOfn3u+9u69noReyjjtUg/kB29bhqWQLGWHFh+vm1AIW9JQD1xymwrdLL9/gTuPAkccbAsp03EXJAyJBHKdVJbysJRBJXAEykpQk08vD9VfXkqtPANq4r/VcDE7kQMUgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=CMoUtk+z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="XRzOkOrd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F17D3C116C6;
-	Fri, 13 Feb 2026 13:53:13 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="CMoUtk+z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65E3CC116C6;
+	Fri, 13 Feb 2026 13:53:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1770990794;
-	bh=vhIKdRitTp2/uDmOXA3pm7uVlowRzSAeNutU9SD1iCw=;
+	s=korg; t=1770990831;
+	bh=jsBBsemJI59iStJR93LUQrX9Mow4VarxqWC4BMhiFrU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XRzOkOrdr4iyoSWaKmtRr00MuZwFuAqtU6mIxdJIcisgFB9ELcrTx2Tl1THhdLsXr
-	 +tY3fh6vNCxHCA9N0FbDYfBF9tQ8mK189B0fmt74dE8U0gdZmYJKCGqFS72JoYKQ8v
-	 uvQGZIySxkvtD2L1wORg3GQW7KVnkbEqYwZpfrj0=
+	b=CMoUtk+z5qIJGKkjxKciPxoyBP+LQi49TNXPclDAOML+8HLDCXf0kWVdos6n8+9DR
+	 5Q5PXgwIuWv4Xl12mzaZh3uvYAM+Tq16CqXL2Y0KH7lQ3eD9exOe/nuXimsiWueVNs
+	 nYN7JTf5ou7QKLeA+1ARCCknRK3Sey3JX3JZjHVY=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -35,9 +35,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	samba-technical@lists.samba.org,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.18 26/49] smb: client: let send_done handle a completion without IB_SEND_SIGNALED
-Date: Fri, 13 Feb 2026 14:48:10 +0100
-Message-ID: <20260213134709.844563012@linuxfoundation.org>
+Subject: [PATCH 6.18 07/49] smb: smbdirect: introduce smbdirect_socket.recv_io.credits.available
+Date: Fri, 13 Feb 2026 14:47:51 +0100
+Message-ID: <20260213134709.154527270@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260213134708.885500854@linuxfoundation.org>
 References: <20260213134708.885500854@linuxfoundation.org>
@@ -58,15 +58,24 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-commit cf74fcdc43b322b6188a0750b5ee79e38be6d078 upstream.
+commit 6e3c5052f9686192e178806e017b7377155f4bab upstream.
 
-With smbdirect_send_batch processing we likely have requests without
-IB_SEND_SIGNALED, which will be destroyed in the final request
-that has IB_SEND_SIGNALED set.
+The logic off managing recv credits by counting posted recv_io and
+granted credits is racy.
 
-If the connection is broken all requests are signaled
-even without explicit IB_SEND_SIGNALED.
+That's because the peer might already consumed a credit,
+but between receiving the incoming recv at the hardware
+and processing the completion in the 'recv_done' functions
+we likely have a window where we grant credits, which
+don't really exist.
 
+So we better have a decicated counter for the
+available credits, which will be incremented
+when we posted new recv buffers and drained when
+we grant the credits to the peer.
+
+Fixes: 5fb9b459b368 ("smb: client: count the number of posted recv_io messages in order to calculated credits")
+Fixes: 89b021a72663 ("smb: server: manage recv credits by counting posted recv_io and granted credits")
 Cc: <stable@vger.kernel.org> # 6.18.x
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -75,59 +84,30 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/client/smbdirect.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ fs/smb/common/smbdirect/smbdirect_socket.h |    2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 88fefb901c27..01d55bcc6d0f 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -554,6 +554,32 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 	log_rdma_send(INFO, "smbdirect_send_io 0x%p completed wc->status=%s\n",
- 		request, ib_wc_status_msg(wc->status));
+--- a/fs/smb/common/smbdirect/smbdirect_socket.h
++++ b/fs/smb/common/smbdirect/smbdirect_socket.h
+@@ -231,6 +231,7 @@ struct smbdirect_socket {
+ 		 */
+ 		struct {
+ 			u16 target;
++			atomic_t available;
+ 			atomic_t count;
+ 		} credits;
  
-+	if (unlikely(!(request->wr.send_flags & IB_SEND_SIGNALED))) {
-+		/*
-+		 * This happens when smbdirect_send_io is a sibling
-+		 * before the final message, it is signaled on
-+		 * error anyway, so we need to skip
-+		 * smbdirect_connection_free_send_io here,
-+		 * otherwise is will destroy the memory
-+		 * of the siblings too, which will cause
-+		 * use after free problems for the others
-+		 * triggered from ib_drain_qp().
-+		 */
-+		if (wc->status != IB_WC_SUCCESS)
-+			goto skip_free;
-+
-+		/*
-+		 * This should not happen!
-+		 * But we better just close the
-+		 * connection...
-+		 */
-+		log_rdma_send(ERR,
-+			"unexpected send completion wc->status=%s (%d) wc->opcode=%d\n",
-+			ib_wc_status_msg(wc->status), wc->status, wc->opcode);
-+		smbd_disconnect_rdma_connection(sc);
-+		return;
-+	}
-+
- 	/*
- 	 * Free possible siblings and then the main send_io
- 	 */
-@@ -567,6 +593,7 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 	lcredits += 1;
+@@ -375,6 +376,7 @@ static __always_inline void smbdirect_so
+ 	INIT_WORK(&sc->recv_io.posted.refill_work, __smbdirect_socket_disabled_work);
+ 	disable_work_sync(&sc->recv_io.posted.refill_work);
  
- 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
-+skip_free:
- 		if (wc->status != IB_WC_WR_FLUSH_ERR)
- 			log_rdma_send(ERR, "wc->status=%s wc->opcode=%d\n",
- 				ib_wc_status_msg(wc->status), wc->opcode);
--- 
-2.53.0
-
++	atomic_set(&sc->recv_io.credits.available, 0);
+ 	atomic_set(&sc->recv_io.credits.count, 0);
+ 
+ 	INIT_LIST_HEAD(&sc->recv_io.reassembly.list);
 
 
