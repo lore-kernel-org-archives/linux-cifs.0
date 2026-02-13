@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CBB423645D;
-	Fri, 13 Feb 2026 13:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ECB634CFC3;
+	Fri, 13 Feb 2026 13:50:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770990623; cv=none; b=fu/A03wh7C6QDNr7TBV9Wa0+jumhWbHzYhgTMBhtWWBB66zaFo1fP3yRFNupHQhLd70nTVmb/2OXUJc5tRTWvGQi6Xmt/7MhDk/1NkPm8s1qsO+jRkVHo2I9moVpKSVJ1DzlD1pizQHQmdK2l1OxH7ec5H/RSyK6Codm1+j7bp8=
+	t=1770990641; cv=none; b=PX69PIPnt+G09RNpv8RA1BQjuskckl2y7n9OJAb41nB94VoY1DA/GO6N5RiDF9kBqoS0Pm9GSl/xwwGH+jh16wrTyT3k32+7atzdhWg3dwB0qoaNtVj6hE+XjTqovzqTok5shE1KFk42nqjHrj7QEwofNkW6zVbA7p6lM8POFoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770990623; c=relaxed/simple;
-	bh=5zRP6uxcwC9qai8yZ+fD2VVtYcp39VdOXk4w8tS25zI=;
+	s=arc-20240116; t=1770990641; c=relaxed/simple;
+	bh=+QXBS5/8u1qeK/neHg3DTQD3+dUvoNxJX/vO2q7iNyk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B3PFz1VLvUAmVm5yzFrguM0gpDHk8F7aEu8at206eDP16AB/h+eEpvk9qRlUJ8jz5k/XI5oCctPy1iz96YsyTMukMgHcNHaYEM/GvHI5Z3ZiHL1kirinQZdlQwRRotkUEZq6ImnnZiXNqIubEmkChTslucjiaTqjbkxt9wGYbec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Q78XU1G5; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=gllmItZyGdX8K+GOzg8Juu0EU5IL1N8uZNI1IxcjK8N6TSkspI/bHQFP7cOzjT2RSRecxsdt2Z2sdRYRMcsj6VLo8PODjjzQQEu2EgmcRRHzalVtBsTIOtaxvGWShlmP8/WyaxYFhhxLHmkjpziCRLbuSpgkzd0Me1quChmEBbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=vZdBFhVt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Q78XU1G5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE306C116C6;
-	Fri, 13 Feb 2026 13:50:22 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="vZdBFhVt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FF2FC116C6;
+	Fri, 13 Feb 2026 13:50:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1770990623;
-	bh=5zRP6uxcwC9qai8yZ+fD2VVtYcp39VdOXk4w8tS25zI=;
+	s=korg; t=1770990641;
+	bh=+QXBS5/8u1qeK/neHg3DTQD3+dUvoNxJX/vO2q7iNyk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q78XU1G5sF2W5UdDH2LCUkDl6hZupF3Px9zpHrVXQzvrZCrr/DesFz0/MO1aOK1Sw
-	 VXr7tGtC68wY1ZyKVF+KsH2Hzeh1mo6VE58Tee/yrd/+c3FWFA4+VWTo5RDU9MwKy/
-	 oTWKShpjmUAGpAC4YHSev9qFAHjrURpx1dYSru7g=
+	b=vZdBFhVt3DIxHHpmvOZzczH+hZwWA3DjegOxRD9kqVuAi9yXvTDtEUFX5hirlGhFo
+	 BXj8+TXNgJ8G5y6t3df3FZsTlk8VpNCKuRYrGu76e3Bp1ZRZmTttQ048y8A5D5LflP
+	 4qlSiPe0xm7WEZUuQaOcQy/K7qhSTnRtlwax76n8=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -35,9 +35,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	samba-technical@lists.samba.org,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.19 25/49] smb: client: let smbd_post_send_negotiate_req() use smbd_post_send()
-Date: Fri, 13 Feb 2026 14:47:44 +0100
-Message-ID: <20260213134709.655229484@linuxfoundation.org>
+Subject: [PATCH 6.19 07/49] smb: smbdirect: introduce smbdirect_socket.recv_io.credits.available
+Date: Fri, 13 Feb 2026 14:47:26 +0100
+Message-ID: <20260213134708.994779039@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260213134708.713126210@linuxfoundation.org>
 References: <20260213134708.713126210@linuxfoundation.org>
@@ -58,14 +58,24 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-commit 5b1c6149657af840a02885135c700ab42e6aa322 upstream.
+commit 6e3c5052f9686192e178806e017b7377155f4bab upstream.
 
-The server has similar logic and it makes sure that
-request->wr is used instead of a stack struct ib_send_wr send_wr.
+The logic off managing recv credits by counting posted recv_io and
+granted credits is racy.
 
-This makes sure send_done can see request->wr.send_flags
-as the next commit will check for IB_SEND_SIGNALED
+That's because the peer might already consumed a credit,
+but between receiving the incoming recv at the hardware
+and processing the completion in the 'recv_done' functions
+we likely have a window where we grant credits, which
+don't really exist.
 
+So we better have a decicated counter for the
+available credits, which will be incremented
+when we posted new recv buffers and drained when
+we grant the credits to the peer.
+
+Fixes: 5fb9b459b368 ("smb: client: count the number of posted recv_io messages in order to calculated credits")
+Fixes: 89b021a72663 ("smb: server: manage recv credits by counting posted recv_io and granted credits")
 Cc: <stable@vger.kernel.org> # 6.18.x
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -74,69 +84,30 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/client/smbdirect.c |   32 +++++++-------------------------
- 1 file changed, 7 insertions(+), 25 deletions(-)
+ fs/smb/common/smbdirect/smbdirect_socket.h |    2 ++
+ 1 file changed, 2 insertions(+)
 
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -35,6 +35,10 @@ static void enqueue_reassembly(
- static struct smbdirect_recv_io *_get_first_reassembly(
- 		struct smbdirect_socket *sc);
+--- a/fs/smb/common/smbdirect/smbdirect_socket.h
++++ b/fs/smb/common/smbdirect/smbdirect_socket.h
+@@ -239,6 +239,7 @@ struct smbdirect_socket {
+ 		 */
+ 		struct {
+ 			u16 target;
++			atomic_t available;
+ 			atomic_t count;
+ 		} credits;
  
-+static int smbd_post_send(struct smbdirect_socket *sc,
-+			  struct smbdirect_send_batch *batch,
-+			  struct smbdirect_send_io *request);
-+
- static int smbd_post_recv(
- 		struct smbdirect_socket *sc,
- 		struct smbdirect_recv_io *response);
-@@ -1021,7 +1025,6 @@ out1:
- static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
- {
- 	struct smbdirect_socket_parameters *sp = &sc->parameters;
--	struct ib_send_wr send_wr;
- 	int rc;
- 	struct smbdirect_send_io *request;
- 	struct smbdirect_negotiate_req *packet;
-@@ -1052,33 +1055,12 @@ static int smbd_post_send_negotiate_req(
- 	request->sge[0].length = sizeof(*packet);
- 	request->sge[0].lkey = sc->ib.pd->local_dma_lkey;
+@@ -387,6 +388,7 @@ static __always_inline void smbdirect_so
+ 	INIT_WORK(&sc->recv_io.posted.refill_work, __smbdirect_socket_disabled_work);
+ 	disable_work_sync(&sc->recv_io.posted.refill_work);
  
--	ib_dma_sync_single_for_device(
--		sc->ib.dev, request->sge[0].addr,
--		request->sge[0].length, DMA_TO_DEVICE);
--
--	request->cqe.done = send_done;
--
--	send_wr.next = NULL;
--	send_wr.wr_cqe = &request->cqe;
--	send_wr.sg_list = request->sge;
--	send_wr.num_sge = request->num_sge;
--	send_wr.opcode = IB_WR_SEND;
--	send_wr.send_flags = IB_SEND_SIGNALED;
--
--	log_rdma_send(INFO, "sge addr=0x%llx length=%u lkey=0x%x\n",
--		request->sge[0].addr,
--		request->sge[0].length, request->sge[0].lkey);
--
--	atomic_inc(&sc->send_io.pending.count);
--	rc = ib_post_send(sc->ib.qp, &send_wr, NULL);
-+	rc = smbd_post_send(sc, NULL, request);
- 	if (!rc)
- 		return 0;
++	atomic_set(&sc->recv_io.credits.available, 0);
+ 	atomic_set(&sc->recv_io.credits.count, 0);
  
--	/* if we reach here, post send failed */
--	log_rdma_send(ERR, "ib_post_send failed rc=%d\n", rc);
--	atomic_dec(&sc->send_io.pending.count);
--
--	smbd_disconnect_rdma_connection(sc);
-+	if (rc == -EAGAIN)
-+		rc = -EIO;
- 
- dma_mapping_failed:
- 	smbd_free_send_io(request);
+ 	INIT_LIST_HEAD(&sc->recv_io.reassembly.list);
 
 
