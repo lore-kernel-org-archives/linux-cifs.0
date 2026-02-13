@@ -1,42 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BC2175D53;
-	Fri, 13 Feb 2026 13:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5031554723;
+	Fri, 13 Feb 2026 13:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770990647; cv=none; b=DLqHXG2JERrTD+xuKEnzhucb3ltwbRNgAL0hlDtITGsW5FmV14j/UwQi3Z2TyWU3xgcd19gmwNySbmeVHyDbD5/89XBIASnG/3JdzbLENEjMupjk3762Zauhj/acRd+BszO7QpOvD5RDmRWdt/RbRhEVpPY8MeTchOj5peSYm44=
+	t=1770990731; cv=none; b=LiAJtvNSpq4mq/bTIzPHz3icTkUT3f6LC0gy7rEAi3Kc8osWP9KbDDbI9w4G153R8xDjJBjx2EHCyhuQQMSgfxEgVOYAkxK3mY/hmyl+Sue5Ez4d98m5c4J3BV1jvvc+BKgSz8YdGD2/qzzrTYoR9wFOwJD1s0lcj2Qk1HWXYiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770990647; c=relaxed/simple;
-	bh=UMnXcL+7bEd++L685MmFVenymT2/8+a6r12+sKxxzmM=;
+	s=arc-20240116; t=1770990731; c=relaxed/simple;
+	bh=thiNL7EhKyCijG77xTI9sCL7dc6xI3UGW43eo/v4Zfg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j6XeXAjsFqpB8BUgfLe0Rl5WRYminArS2+OgQ2tBZhgKW6Vb0kXmrRbOsw8fSR7gOt+vf1aFlwQB37TbSg3SME5OPUmS+TxVahLjHatXxYosVqZrLZCvqFB0MComzMpbTn14RoqaY9w2K3Pvmwc7LPVpob8y31uXr7u99lZAYOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=f9I+Rl5G; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=QNzjXaE9hYldmpRSC6N4vaHsRWvzAVPbrjHgSAYms7z7/jQwJdEgbTGjQMgD2Xf5eR5KPSNPq3WYy8FnZQe267SOwRyuognHg3OfJ0M01iZ5P7qY/Cqw1sF/iBxpLonivKjBMsePO3y79g+sn+3qsuH5tCSGtxWU1oShZmy68OM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=twwiFxAk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="f9I+Rl5G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30400C116C6;
-	Fri, 13 Feb 2026 13:50:47 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="twwiFxAk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50EEEC116C6;
+	Fri, 13 Feb 2026 13:52:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1770990647;
-	bh=UMnXcL+7bEd++L685MmFVenymT2/8+a6r12+sKxxzmM=;
+	s=korg; t=1770990730;
+	bh=thiNL7EhKyCijG77xTI9sCL7dc6xI3UGW43eo/v4Zfg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=f9I+Rl5GfrhpRYGb7x8EvsxGQ7i0Im8AFyNNeJ6PWXIXKECpcszCTP/WuLmNR4XVj
-	 dWm/MjBfIqwu/M1SQ97AYc+veAjSykp1sF1fYWQiMGzTgImTVM7mBHZcEWfxcyTrw0
-	 ALoZLAlYDvnXDZmNXrqwR177caN1cUSa1i/d0eao=
+	b=twwiFxAkUg/EalZ+AeqodYHpaQjlJRCURPziStcLUjIjIlFRAb+pZsOJY96thD2QN
+	 yTZAlOV5OZWo03Q5duvQIs1d0b6gACnCud/+T07ElJj9JUjoLf1z+seRzosb/qzYCH
+	 uZYgHjnD/j348bLqKILgfRvU97R7pBxNcKICEE6A=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.19 09/49] smb: server: make use of smbdirect_socket.recv_io.credits.available
-Date: Fri, 13 Feb 2026 14:47:28 +0100
-Message-ID: <20260213134709.067091891@linuxfoundation.org>
+Subject: [PATCH 6.19 26/49] smb: client: let send_done handle a completion without IB_SEND_SIGNALED
+Date: Fri, 13 Feb 2026 14:47:45 +0100
+Message-ID: <20260213134709.690884092@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260213134708.713126210@linuxfoundation.org>
 References: <20260213134708.713126210@linuxfoundation.org>
@@ -57,93 +58,71 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-commit 26ad87a2cfb8c1384620d1693a166ed87303046e upstream.
+commit cf74fcdc43b322b6188a0750b5ee79e38be6d078 upstream.
 
-The logic off managing recv credits by counting posted recv_io and
-granted credits is racy.
+With smbdirect_send_batch processing we likely have requests without
+IB_SEND_SIGNALED, which will be destroyed in the final request
+that has IB_SEND_SIGNALED set.
 
-That's because the peer might already consumed a credit,
-but between receiving the incoming recv at the hardware
-and processing the completion in the 'recv_done' functions
-we likely have a window where we grant credits, which
-don't really exist.
+If the connection is broken all requests are signaled
+even without explicit IB_SEND_SIGNALED.
 
-So we better have a decicated counter for the
-available credits, which will be incremented
-when we posted new recv buffers and drained when
-we grant the credits to the peer.
-
-This fixes regression Namjae reported with
-the 6.18 release.
-
-Fixes: 89b021a72663 ("smb: server: manage recv credits by counting posted recv_io and granted credits")
 Cc: <stable@vger.kernel.org> # 6.18.x
-Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/server/transport_rdma.c |   30 +++++++++++++++++++++++++-----
- 1 file changed, 25 insertions(+), 5 deletions(-)
+ fs/smb/client/smbdirect.c |   27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -1028,6 +1028,8 @@ static void smb_direct_post_recv_credits
- 		}
- 	}
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -554,6 +554,32 @@ static void send_done(struct ib_cq *cq,
+ 	log_rdma_send(INFO, "smbdirect_send_io 0x%p completed wc->status=%s\n",
+ 		request, ib_wc_status_msg(wc->status));
  
-+	atomic_add(credits, &sc->recv_io.credits.available);
++	if (unlikely(!(request->wr.send_flags & IB_SEND_SIGNALED))) {
++		/*
++		 * This happens when smbdirect_send_io is a sibling
++		 * before the final message, it is signaled on
++		 * error anyway, so we need to skip
++		 * smbdirect_connection_free_send_io here,
++		 * otherwise is will destroy the memory
++		 * of the siblings too, which will cause
++		 * use after free problems for the others
++		 * triggered from ib_drain_qp().
++		 */
++		if (wc->status != IB_WC_SUCCESS)
++			goto skip_free;
 +
- 	if (credits)
- 		queue_work(sc->workqueue, &sc->idle.immediate_work);
- }
-@@ -1074,19 +1076,37 @@ static void send_done(struct ib_cq *cq,
- 
- static int manage_credits_prior_sending(struct smbdirect_socket *sc)
- {
-+	int missing;
-+	int available;
- 	int new_credits;
- 
- 	if (atomic_read(&sc->recv_io.credits.count) >= sc->recv_io.credits.target)
- 		return 0;
- 
--	new_credits = atomic_read(&sc->recv_io.posted.count);
--	if (new_credits == 0)
-+	missing = (int)sc->recv_io.credits.target - atomic_read(&sc->recv_io.credits.count);
-+	available = atomic_xchg(&sc->recv_io.credits.available, 0);
-+	new_credits = (u16)min3(U16_MAX, missing, available);
-+	if (new_credits <= 0) {
 +		/*
-+		 * If credits are available, but not granted
-+		 * we need to re-add them again.
++		 * This should not happen!
++		 * But we better just close the
++		 * connection...
 +		 */
-+		if (available)
-+			atomic_add(available, &sc->recv_io.credits.available);
- 		return 0;
++		log_rdma_send(ERR,
++			"unexpected send completion wc->status=%s (%d) wc->opcode=%d\n",
++			ib_wc_status_msg(wc->status), wc->status, wc->opcode);
++		smbd_disconnect_rdma_connection(sc);
++		return;
 +	}
++
+ 	/*
+ 	 * Free possible siblings and then the main send_io
+ 	 */
+@@ -567,6 +593,7 @@ static void send_done(struct ib_cq *cq,
+ 	lcredits += 1;
  
--	new_credits -= atomic_read(&sc->recv_io.credits.count);
--	if (new_credits <= 0)
--		return 0;
-+	if (new_credits < available) {
-+		/*
-+		 * Readd the remaining available again.
-+		 */
-+		available -= new_credits;
-+		atomic_add(available, &sc->recv_io.credits.available);
-+	}
- 
-+	/*
-+	 * Remember we granted the credits
-+	 */
- 	atomic_add(new_credits, &sc->recv_io.credits.count);
- 	return new_credits;
- }
+ 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
++skip_free:
+ 		if (wc->status != IB_WC_WR_FLUSH_ERR)
+ 			log_rdma_send(ERR, "wc->status=%s wc->opcode=%d\n",
+ 				ib_wc_status_msg(wc->status), wc->opcode);
 
 
