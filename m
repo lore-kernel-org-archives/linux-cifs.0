@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B1F34F24E;
-	Fri, 13 Feb 2026 13:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8CD223323;
+	Fri, 13 Feb 2026 13:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770990600; cv=none; b=ow+JVdAE1UVZoNBRd0hva/rCx7zQyQN590K+V+6UOHiHTyg0J9wdAOvyrVw33Fs1dygj5DhMAQ59/RsQ/k66jBGCMr2zNW8QavevM2LvVeWpOQkAmElRqEy2NKQ84zjJpRjr4sUk23VuW8Yzl2xw3y7B8ddQb3oJ732H8/+FUnc=
+	t=1770990609; cv=none; b=CCXMruRKY8lezsm7XRyoc7xjEo7HOtnbrwts7Rv1DOOfjFsj5P5KpyAXehTLCZeavFsL9/Hoig0h+KwqGMQ1NZd2f3qF8C3finvkhoPPshga7Ib2yoCPpG664k0X68aU+zoEDkLllJ5Y+XmEzDBQy3AnN44BYKp6yqF9HR06gyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770990600; c=relaxed/simple;
-	bh=cPdbR2DTjcqMhkbIAS0HrXf5mggzKWMfRuFthqH/8u4=;
+	s=arc-20240116; t=1770990609; c=relaxed/simple;
+	bh=zrpzGQeAEmafNpSdLLwHHu/MJpn9UBTMWv8teTr0wz4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rD6RB7G2Us+tEeI8h1YGBAPOW6UM6wjDMYxVBRvg1Lufba07Y7XFwWoihAkzqnmhm3gNDVQCi+xaGlFWM87iUk1J5fI5LWPfPOdlnoIIfTODnatFrWMBmdBtL8Fo+plw4fOnoOaq8fD/4DRLj/DXxMnYR0tJfCFIgMG2EMmfojI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=wVEgpeNw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=d94QcDlAumAOb2BwQkDxkXmB8woCEoUAD0qmxqtCO0VO8crY7GZmvBkv+4l0083paOKwmLyupCg2ym7k06EJLcbcokX+3kwwgpukk3SxeKZTqmrjC3R6vfbJCMjTm8kF+P4+wIQrziwkzyIYWpaCV/F3XLzqPbA80jWDvyKtxXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=oq1Omgd0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="wVEgpeNw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A3E2C116C6;
-	Fri, 13 Feb 2026 13:49:59 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="oq1Omgd0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5937DC116C6;
+	Fri, 13 Feb 2026 13:50:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1770990599;
-	bh=cPdbR2DTjcqMhkbIAS0HrXf5mggzKWMfRuFthqH/8u4=;
+	s=korg; t=1770990608;
+	bh=zrpzGQeAEmafNpSdLLwHHu/MJpn9UBTMWv8teTr0wz4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=wVEgpeNwur8Eg8JeZQhB4f10ZPY2RC+z8sOlSNCcWRQV4ToQ2d86xv0+rTEP/rduD
-	 Er9cd051JbxW8p8SP/gFgK1j5pg7hsX63TvfohtBNlcC520pdNuTuZg7x6ulkC3fzP
-	 +NTBuDqwPKzH9U6o1VpVeus2/us7YVNTRJ0yN3MI=
+	b=oq1Omgd0H1cL/41K4xbmKPz4+Vq7rx5xjzFAwJ7PECZ+0vb2BjoNQWjlfrS6vwbFO
+	 kovGYXwcYK0e8FGOEOJsULGJQjo41Xy1w3vjOAOtDTLMcG+sW+cji01HttXGmXE/HZ
+	 vjdkLXIZ5C1lBL0Q1hA3sKK7oNNuTYtKPFjBbuOw=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -35,9 +35,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	samba-technical@lists.samba.org,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.19 19/49] smb: client: port and use the wait_for_credits logic used by server
-Date: Fri, 13 Feb 2026 14:47:38 +0100
-Message-ID: <20260213134709.435029165@linuxfoundation.org>
+Subject: [PATCH 6.19 20/49] smb: client: split out smbd_ib_post_send()
+Date: Fri, 13 Feb 2026 14:47:39 +0100
+Message-ID: <20260213134709.471649789@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260213134708.713126210@linuxfoundation.org>
 References: <20260213134708.713126210@linuxfoundation.org>
@@ -58,15 +58,11 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-commit bb848d205f7ac0141af52a5acb6dd116d9b71177 upstream.
+commit bf30515caec590316e0d08208e4252eed4c160df upstream.
 
-This simplifies the logic and prepares the use of
-smbdirect_send_batch in order to make sure
-all messages in a multi fragment send are grouped
-together.
-
-We'll add the smbdirect_send_batch processin
-in a later patch.
+This is like smb_direct_post_send() in the server
+and will simplify porting the smbdirect_send_batch
+and credit related logic from the server.
 
 Cc: <stable@vger.kernel.org> # 6.18.x
 Cc: Steve French <smfrench@gmail.com>
@@ -79,102 +75,68 @@ Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/client/smbdirect.c |   70 ++++++++++++++++++++++++++++------------------
- 1 file changed, 43 insertions(+), 27 deletions(-)
+ fs/smb/client/smbdirect.c |   33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
 
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -1137,6 +1137,44 @@ static int smbd_post_send(struct smbdire
- 	return rc;
+@@ -1101,11 +1101,26 @@ static int manage_keep_alive_before_send
+ 	return 0;
  }
  
-+static int wait_for_credits(struct smbdirect_socket *sc,
-+			    wait_queue_head_t *waitq, atomic_t *total_credits,
-+			    int needed)
++static int smbd_ib_post_send(struct smbdirect_socket *sc,
++			     struct ib_send_wr *wr)
 +{
 +	int ret;
 +
-+	do {
-+		if (atomic_sub_return(needed, total_credits) >= 0)
-+			return 0;
-+
-+		atomic_add(needed, total_credits);
-+		ret = wait_event_interruptible(*waitq,
-+					       atomic_read(total_credits) >= needed ||
-+					       sc->status != SMBDIRECT_SOCKET_CONNECTED);
-+
-+		if (sc->status != SMBDIRECT_SOCKET_CONNECTED)
-+			return -ENOTCONN;
-+		else if (ret < 0)
-+			return ret;
-+	} while (true);
++	atomic_inc(&sc->send_io.pending.count);
++	ret = ib_post_send(sc->ib.qp, wr, NULL);
++	if (ret) {
++		pr_err("failed to post send: %d\n", ret);
++		smbd_disconnect_rdma_connection(sc);
++		ret = -EAGAIN;
++	}
++	return ret;
 +}
 +
-+static int wait_for_send_lcredit(struct smbdirect_socket *sc)
-+{
-+	return wait_for_credits(sc,
-+				&sc->send_io.lcredits.wait_queue,
-+				&sc->send_io.lcredits.count,
-+				1);
-+}
-+
-+static int wait_for_send_credits(struct smbdirect_socket *sc)
-+{
-+	return wait_for_credits(sc,
-+				&sc->send_io.credits.wait_queue,
-+				&sc->send_io.credits.count,
-+				1);
-+}
-+
- static int smbd_post_send_iter(struct smbdirect_socket *sc,
- 			       struct iov_iter *iter,
- 			       int *_remaining_data_length)
-@@ -1149,41 +1187,19 @@ static int smbd_post_send_iter(struct sm
- 	struct smbdirect_data_transfer *packet;
- 	int new_credits = 0;
+ /* Post the send request */
+ static int smbd_post_send(struct smbdirect_socket *sc,
+ 		struct smbdirect_send_io *request)
+ {
+-	int rc, i;
++	int i;
  
--wait_lcredit:
--	/* Wait for local send credits */
--	rc = wait_event_interruptible(sc->send_io.lcredits.wait_queue,
--		atomic_read(&sc->send_io.lcredits.count) > 0 ||
--		sc->status != SMBDIRECT_SOCKET_CONNECTED);
--	if (rc)
--		goto err_wait_lcredit;
+ 	for (i = 0; i < request->num_sge; i++) {
+ 		log_rdma_send(INFO,
+@@ -1126,15 +1141,7 @@ static int smbd_post_send(struct smbdire
+ 	request->wr.num_sge = request->num_sge;
+ 	request->wr.opcode = IB_WR_SEND;
+ 	request->wr.send_flags = IB_SEND_SIGNALED;
 -
--	if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
--		log_outgoing(ERR, "disconnected not sending on wait_credit\n");
-+	rc = wait_for_send_lcredit(sc);
-+	if (rc) {
-+		log_outgoing(ERR, "disconnected not sending on wait_lcredit\n");
- 		rc = -EAGAIN;
- 		goto err_wait_lcredit;
- 	}
--	if (unlikely(atomic_dec_return(&sc->send_io.lcredits.count) < 0)) {
--		atomic_inc(&sc->send_io.lcredits.count);
--		goto wait_lcredit;
+-	rc = ib_post_send(sc->ib.qp, &request->wr, NULL);
+-	if (rc) {
+-		log_rdma_send(ERR, "ib_post_send failed rc=%d\n", rc);
+-		smbd_disconnect_rdma_connection(sc);
+-		rc = -EAGAIN;
 -	}
 -
--wait_credit:
--	/* Wait for send credits. A SMBD packet needs one credit */
--	rc = wait_event_interruptible(sc->send_io.credits.wait_queue,
--		atomic_read(&sc->send_io.credits.count) > 0 ||
--		sc->status != SMBDIRECT_SOCKET_CONNECTED);
--	if (rc)
--		goto err_wait_credit;
+-	return rc;
++	return smbd_ib_post_send(sc, &request->wr);
+ }
  
--	if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
-+	rc = wait_for_send_credits(sc);
-+	if (rc) {
- 		log_outgoing(ERR, "disconnected not sending on wait_credit\n");
- 		rc = -EAGAIN;
- 		goto err_wait_credit;
- 	}
--	if (unlikely(atomic_dec_return(&sc->send_io.credits.count) < 0)) {
--		atomic_inc(&sc->send_io.credits.count);
--		goto wait_credit;
--	}
+ static int wait_for_credits(struct smbdirect_socket *sc,
+@@ -1280,12 +1287,6 @@ static int smbd_post_send_iter(struct sm
+ 		     le32_to_cpu(packet->data_length),
+ 		     le32_to_cpu(packet->remaining_data_length));
  
- 	request = mempool_alloc(sc->send_io.mem.pool, GFP_KERNEL);
- 	if (!request) {
+-	/*
+-	 * Now that we got a local and a remote credit
+-	 * we add us as pending
+-	 */
+-	atomic_inc(&sc->send_io.pending.count);
+-
+ 	rc = smbd_post_send(sc, request);
+ 	if (!rc)
+ 		return 0;
 
 
