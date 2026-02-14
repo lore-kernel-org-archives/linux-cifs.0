@@ -1,106 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F16A1DF75B;
-	Sat, 14 Feb 2026 15:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484101DFF7;
+	Sat, 14 Feb 2026 15:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771083600; cv=none; b=PYH+N6XfCCCYBfp4k5dwb8cOK671mmg9DpBYv8rNkfflBKD+oi1MjS98FhgvJb6amVOxbIt5xMhAL192m4s2omdirshKHKifUzr0VsqU61APwwy1KKOWimKBIONtlSm5WMrM9beZC1nPAj6L0q2rE+61zInTMvIak7Sy/zXAIbQ=
+	t=1771083945; cv=none; b=gZ03702w73NMGFeQ9RB2y1TEQd12CwU5jsEnNAh6T0FfXY165V2P/Cgmcu/QrCuG2FwzNEUW/zwA4QtLkzAJTFVyEOUuZXJZGUYrqFZrESjxGhQkn9uf1+MV3IFNdzbYX565m28c0e7CRn2Dp8zHQiv1otI4R+Remyt1EYNg3mU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771083600; c=relaxed/simple;
-	bh=7Ln5p6/GgZp7TptAdghOuzwP6zLRRUn3PjDlfScXZFs=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=dlHK43C7Quiu2HTT0ShRfrO/zucdUoRTLH7fCxqbZp1gh/1Qk15LN8KBHTwnssLl2G2L1At6/v2BwTXDcv6hTe6LTwzGi39P3ks9ycAmeB7Tu81AG7NhtCwigdXPIxf1gRwPcXWMj3zng41l4t4shOd38RnL8uuRveW0wYPcFFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SzS/zIiU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771083945; c=relaxed/simple;
+	bh=2b/Hz7E/hS5O1BPXPF/6BmcIdM80RX59SIW0Jgmtuqs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ln5UDrhZ6pB+rOqTKkFBIr2nYWHSfQkD/b73YcYEoXPY++5w02vZliz5pYDXUu3YIDvcX40oFCy6CgbvtfgP6yhB4dfDjOMvMntg/noGSC0vcdVIvK3JV9pG1zTBFrXWPrJ1uaPjtaLsZWjxTbVrYccMJDugorDIGDdnfQsd3ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=mv2f3Fj4; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SzS/zIiU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A684CC19422;
-	Sat, 14 Feb 2026 15:39:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771083600;
-	bh=7Ln5p6/GgZp7TptAdghOuzwP6zLRRUn3PjDlfScXZFs=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=SzS/zIiUOy2XuL1i3373nFcN/4DHgWJCWy5Szz5nhum9WW/H4iRYigR8EU7+z2bKC
-	 3sKCerPFYbrkHHVLYDZEipq2wXW1eQxLkPHZgmytAO/OEbJWEL0c5IqGG8S/+53t55
-	 w1Xm6/ACMGWUcU0pG3C27hGaqrMlAchQuBxgSC5Pk9oNUio43eTE7737ZMnvP+DB8l
-	 Ms0dThWwqpaE2BciRl2nk9lBBe0Hza2UWYfc82ry5weyfrp6FOnH2WWj1hsfj122c8
-	 Q3oI3FrbdqwX2Eq+vSHcy/BG87erpXIB4epTvNbfXl9ChVHIPlfL1gD+Si93zt5wo0
-	 SIUViQOA4nP0Q==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 899ADF40068;
-	Sat, 14 Feb 2026 10:39:58 -0500 (EST)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Sat, 14 Feb 2026 10:39:58 -0500
-X-ME-Sender: <xms:TpeQaYEwbefr58LTbT0PYn0GzQW7Z4dDVPzj-zKZZ2uPChYYNOt8QQ>
-    <xme:TpeQacJgjBMmfRfrEvb4PqvicUXnm9y57IntwCEt_FHjeo43D0oaqFxATycqq-kTJ
-    uK0oCyg_DK-DGT5RkfN6_TLKt2J8s0OJE-WLO5Mj3im9jhulZFX>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvudduheduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
-    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
-    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
-    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
-    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
-    hilhdrtghomhdpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghp
-    thhtohepnhhsphhmrghnghgrlhhorhgvsehgmhgrihhlrdgtohhmpdhrtghpthhtohepsg
-    hrrghunhgvrheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhsfhdqphgtsehlihhs
-    thhsrdhlihhnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopeguhhhofi
-    gvlhhlshesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhgvhihrihhnghhssehvghgv
-    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqtghifhhssehvghgvrh
-    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqfhhsuggvvhgvlhesvhhg
-    vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhnfhhssehvghgvrh
-    drkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:TpeQaYVaDTGC_TqOZguZYb-yx6eTkNymOAhexlSCoKU8Clw3vK2ssg>
-    <xmx:TpeQadC-QLztsDG6FrCXCHxXwGT4jVSF4NVEBR2THnZIWxzvjjM2dg>
-    <xmx:TpeQadEax2NAlTT5MdBTWDzPyZTHHHDTu5XbgPzuCvBjV5x-dahZxg>
-    <xmx:TpeQae4XVsw5veBt9PT59cwjMsdKHBApc2ytRVSfBwX9bjrl7frNsw>
-    <xmx:TpeQaTk9NkFh9Gi2UVfY6aNXL0Bt27NK1kqCDZYKWhgjKjvT4ExZSOil>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 66269780075; Sat, 14 Feb 2026 10:39:58 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="mv2f3Fj4"
+Received: from debian.lan (unknown [104.28.230.246])
+	by mail.ispras.ru (Postfix) with ESMTPSA id B6F56406C740;
+	Sat, 14 Feb 2026 15:45:33 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru B6F56406C740
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1771083934;
+	bh=oTfkgZXpjapkYtjWtm270jN3Ycp4DQI4x3V+ugTHea8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mv2f3Fj46VPIZWHd8f6zo+6m8q8FsHAiojEklclq9MlEeTmnAfY8889uGbTAJnKfg
+	 6faZYPMahC8PrKiGmQ1mGdcuGGgpzT9a8ZNmZDKEkgXqVU44v6lhGUsv0y2qpcWeUq
+	 5IJgwxHFhsnunKkxXWQDQpbDplTLWxgtRct77UrI=
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	NeilBrown <neil@brown.name>
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: call ksmbd_vfs_kern_path_end_removing() on some error paths
+Date: Sat, 14 Feb 2026 18:45:14 +0300
+Message-ID: <20260214154515.1229565-1-pchelkin@ispras.ru>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A-xRDuNKAwPJ
-Date: Sat, 14 Feb 2026 10:39:34 -0500
-From: "Chuck Lever" <cel@kernel.org>
-To: "Shyam Prasad N" <nspmangalore@gmail.com>,
- lsf-pc@lists.linux-foundation.org
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>, keyrings@vger.kernel.org,
- CIFS <linux-cifs@vger.kernel.org>, linux-nfs@vger.kernel.org,
- "Christian Brauner" <brauner@kernel.org>,
- "David Howells" <dhowells@redhat.com>
-Message-Id: <7570f43c-8f6c-4419-a8b8-141efdb1363a@app.fastmail.com>
-In-Reply-To: 
- <CANT5p=rDxeYKXoCJoWRwGGXv4tPCM2OuX+US_G3hm_tL3UyqtA@mail.gmail.com>
-References: 
- <CANT5p=rDxeYKXoCJoWRwGGXv4tPCM2OuX+US_G3hm_tL3UyqtA@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] Namespace-aware upcalls from kernel filesystems
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+There are two places where ksmbd_vfs_kern_path_end_removing() needs to be
+called in order to balance what the corresponding successful call to
+ksmbd_vfs_kern_path_start_removing() has done, i.e. drop inode locks and
+put the taken references.  Otherwise there might be potential deadlocks
+and unbalanced locks which are caught like:
 
-On Sat, Feb 14, 2026, at 5:06 AM, Shyam Prasad N wrote:
-> Kernel filesystems sometimes need to upcall to userspace to get some
-> work done, which cannot be achieved in kernel code (or rather it is
-> better to be done in userspace). Some examples are DNS resolutions,
-> user authentication, ID mapping etc.
->
-> Filesystems like SMB and NFS clients use the kernel keys subsystem for
-> some of these, which has an upcall facility that can exec a binary in
-> userspace. However, this upcall mechanism is not namespace aware and
-> upcalls to the host namespaces (namespaces of the init process).
+BUG: workqueue leaked lock or atomic: kworker/5:21/0x00000000/7596
+     last function: handle_ksmbd_work
+2 locks held by kworker/5:21/7596:
+ #0: ffff8881051ae448 (sb_writers#3){.+.+}-{0:0}, at: ksmbd_vfs_kern_path_locked+0x142/0x660
+ #1: ffff888130e966c0 (&type->i_mutex_dir_key#3/1){+.+.}-{4:4}, at: ksmbd_vfs_kern_path_locked+0x17d/0x660
+CPU: 5 PID: 7596 Comm: kworker/5:21 Not tainted 6.1.162-00456-gc29b353f383b #138
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
+Workqueue: ksmbd-io handle_ksmbd_work
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x44/0x5b
+ process_one_work.cold+0x57/0x5c
+ worker_thread+0x82/0x600
+ kthread+0x153/0x190
+ ret_from_fork+0x22/0x30
+ </TASK>
 
-Hello Shyam, we've been introducing netlink control interfaces, which
-are namespace-aware. The kernel TLS handshake mechanism now uses
-this approach, as does the new NFSD netlink protocol.
+Found by Linux Verification Center (linuxtesting.org).
 
+Fixes: d5fc1400a34b ("smb/server: avoid deadlock when linking with ReplaceIfExists")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+---
+ fs/smb/server/smb2pdu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index cbb31efdbaa2..2782eea214d0 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -6115,14 +6115,14 @@ static int smb2_create_link(struct ksmbd_work *work,
+ 				rc = -EINVAL;
+ 				ksmbd_debug(SMB, "cannot delete %s\n",
+ 					    link_name);
+-				goto out;
+ 			}
+ 		} else {
+ 			rc = -EEXIST;
+ 			ksmbd_debug(SMB, "link already exists\n");
+-			goto out;
+ 		}
+ 		ksmbd_vfs_kern_path_end_removing(&path);
++		if (rc)
++			goto out;
+ 	}
+ 	rc = ksmbd_vfs_link(work, target_name, link_name);
+ 	if (rc)
 -- 
-Chuck Lever
+2.51.0
+
