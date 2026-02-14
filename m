@@ -1,122 +1,130 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABDD27707
-	for <linux-cifs@vger.kernel.org>; Sat, 14 Feb 2026 10:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771063597; cv=pass; b=DPUvVOuaVpFeL92iucXi/qJhLulrMVEsYnrotfVfng2zA4BeWLLo6ftkcUjAXDQM77SwrAVGzqddGg6FJjRQOYbFjFNhlCH5e3l9nPvShu2DCDUhzdpMqsu3bakFFx2LC2hu4uSqIXMa83TNOrQ2VkovWaaRCRaCvoJXYN7ltRQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771063597; c=relaxed/simple;
-	bh=jY3VYgfZdwcEWaDFOTWHCBRqnN2ieQGX76J1TWV/hN8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=MYViDjjMXckgwvZMSmHnDBJ3DMEoeZ6TjPtIETgwSREX/AxT+ur732EPfXTohk9ypMn9KIitSkkFWcZZISIN3FPUiYP45VOtiDgOOSZ/Wo/JfYP64/6wQ2SzRXgX9H9EcqQEQ2TKQ6JFnLxdzEnRj6SluccjJIJbm5xqgmgT4mM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iJWG/0TD; arc=pass smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701C727BF7D
+	for <linux-cifs@vger.kernel.org>; Sat, 14 Feb 2026 10:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771065011; cv=none; b=QGNwMlerC2n0ZE4Cj6vlwbLvOUIKHSaitkmD0Zw9ndBpT62kmR08UWTgKtgbuZkPk4KfvlCl2sGwOI0SPsLxwx23lTwMnmIOHVvMB8S7OUpgMhXailypKajbHliHIBDGQpCL4hidqnflPXmboYSvm6I0k9fK43uMXpn8zARSYvg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771065011; c=relaxed/simple;
+	bh=66bFQJioCqB5CFI2x5MfSZGkiisxs5PAxra1l1UjAak=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S1RrxTPezM6A8UoPV76bmre1xr7Oo1XFhA+z066h08KLs0xR0YaSaCHuwJMXEIrHzoFg9ETsePa4CEpC7VdVClgSM0uQPEWHLzB/6/e8tjporMFLsXD8IQGcj1uRMoZbgH42iCNYMQtyHQRb1yZqaLaBJUSTX6vbaDShchxeVLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nVF6s2FI; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJWG/0TD"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b8d7f22d405so192188866b.0
-        for <linux-cifs@vger.kernel.org>; Sat, 14 Feb 2026 02:06:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771063595; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DtOr8N+QfFsM8vDYHr4zPoEW8VPPgDSO/Hqle4ZGqFEwpJ2oPteZeW40ke7mWZnzIr
-         xUJYZRY83e2YyxOWO0fYBHAANd5TuMuUTSDrgjvJpobXYk688EJE9qfSnRGgeCQ9n5mQ
-         sirG81zYcnU/HL8EnNzy10n7YlSFSBxfShEb2oyE2Ck0eFsOr5QpFf+EE/nwANKanIJS
-         eP1xIbqerXJZafNU7iGhFjqa0+fvi+Lq6cgXO9KKVmOsOrV9Pk7s25V+vwxVS1QJtaHk
-         gCo7/AQq1eKbKD1oKqOg+W7HUqf5X+uneIYPs0nenXeq422aDG4/l9jzzLf7AUQKq/ON
-         COkw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=PGGVJbddt208w/rGIVrn/yfhIsOw/8PIkZU+nOzBAdQ=;
-        fh=r7c1N6HNZosojyzzUJIIjr2YgXOI79h25XHxmf+w8Ik=;
-        b=SPThk18m9Kc8ZUA+YrTyTL1/XsoVOHXFca70Oh2nKYuURWTz9Nmt7A+rmg7r+k+l5G
-         CZdn6YPaBfL9yIZyS9rFp6CYfIxNcDgI9A7AqvkuuQAaKrwJU1XkcnHL8wRGi+0j5sl9
-         CgUNHER83alG8UJ4zlnYOiAjhYsbJKwDAJmhihkWtBvQ47GiU/piclTgyCJkWhJrMapG
-         h+7H6vplr7H3FRiq0hIAoCzDOzyovnph02xjJEs9jwy20GNHeXSXEi/pt+wGUpvMrjVj
-         l39rb61+j5zOSSl3x3yR5Z26DnaGPxDIx3d9DerbWyjH0gZcVVOGxCsfe6dayO8Lznsp
-         8nCQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nVF6s2FI"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2aaf5d53eaaso10819495ad.0
+        for <linux-cifs@vger.kernel.org>; Sat, 14 Feb 2026 02:30:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771063595; x=1771668395; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PGGVJbddt208w/rGIVrn/yfhIsOw/8PIkZU+nOzBAdQ=;
-        b=iJWG/0TDNqvsdOWejxmu1z4K6eR6SkFFPeweAMKUuf4LjlqhwlPSq5tZSYCbHIPKm1
-         EltXd2Tsle99bwwM3BWsEjIOZ+nolbgkUOW7pdQB3oScmn5W6gdTWWtnF1vbCuKB2nOf
-         we0xiWFbptRLuR1m/hb43AuR2tOT69JGivipnH8le1LKrV6Y8EMxSJVeaAF6KkG/75Jg
-         Th1xMmTon+pabWXfcBFHEA1Uh3V3RC8EaYDqxLc7yl348ADM3jt9Gzme7RyUZgyvhBqC
-         EOi/GKPhKPDijFB3bTJejzBSKCQij/BWO0zam99kZ7rACGVRhnrpWBaJr8uaVKdf4CWu
-         Exfg==
+        d=gmail.com; s=20230601; t=1771065009; x=1771669809; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4wUQJiyKQ4BFUx5XsHhu4xM8nw7tnHD69jYjWhXt4VA=;
+        b=nVF6s2FI78C1zL8ffEitHH/hHDILHLFjo9ZoPTae+3kp23VUtDT2K11hy+3M7W2yCq
+         KKqQmU+wLLm5vnYErcmh1hU0pj33DydDkC4p3Jd6V8w8kCBRmYDTA2onRvqsali9iCmB
+         xfSVriXcGZNenssPMySeYNhDdIcG0SeGYif2QM9Qdx0pt9ohTCcmp911wo20a1U1HBRe
+         JeOkDEuL0/ExGQOSkOJ9v/tTS0R+/yT8vdoWlglTfvX5y2/arFAFzl6EJFJ2STiT3eLH
+         S9pLU8SUpDVKgOFET5bQH+A9Lo1ENz/59ERBU8l9567VCyHsUDIwpgUAgjGdyHTk64zn
+         GLJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771063595; x=1771668395;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PGGVJbddt208w/rGIVrn/yfhIsOw/8PIkZU+nOzBAdQ=;
-        b=i7Q//KpUJymDViUe3teBeKCPNL+HBLg+03/NlsiELyYQvwC59dycHHNzt6dwq4YD33
-         6jaoBaNpQtarVxF8A9ATm0dLLJjm7ExmJmt8HXLlKG5TgjaT5FvPkJa6RgrwH0zJmzw2
-         xg4fDcg82PpTNgN8I8PBqtVqNtIfoecicFKyK9EaLj7jGRmv1rDd6eQ3iIugNxLsnGrf
-         kf9k3jTU+v5VlsCby7+3n/v56GXWDybnKS99iRbSe64HM6kWtO2e5SDEqsPmzU/qh3ve
-         0hVEDDzJoMoBc7reraGdFStDo6m2D0sh7Fvx1D0snQ2ky4rKf2xMB+AVkVNJSyOUl+Ig
-         Bbew==
-X-Forwarded-Encrypted: i=1; AJvYcCVlAndDAiyt7QkKKg6o8QQlcWHso8rUm8uhS0gRXU74nXVLdi7L+cBefUgJTSIXTFG2x1mhYbTly0LV@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVGpMq0xVfWhAQbEtC/YKncKllTyzrT3gqMuoISAsYdYqHBrb5
-	jBAZM9FMF6mi8xuDBXIgwhsMmbxHD9wLPoz8MBr14FQclxKl8lig39WKPgcqS8J0k2KRpIz6Yhm
-	ZuMkZhLLZQocF3ABntwuiEKXqwsJAblk=
-X-Gm-Gg: AZuq6aLbasmoV5wsvtWTwTU/X78uZkVkKgD6QJiHfPK9tSdgmhpdqe776R8S3AcBaBl
-	a3VY0W3jem+9ljy9n++XacdiwllssG6NR3ar7tdYM33oaGBd21XRuiiuTXIHw6zC7/ZajKeJgm7
-	2A4aThIBiCAa8L8Z7PTEF+GWeMpOiR5cGhoc2c/V93wyeGupgvaUVhvSFhxM2vm+2YxnRMYGy4k
-	7inESwIBzrqphkukSE7poYFB6qcEvoVlYTwxLlXO+wj8OP1EsnahRsj+1w+VXCXx95cFshjafww
-	Aws+bQ==
-X-Received: by 2002:a17:906:c14d:b0:b87:6d6b:1366 with SMTP id
- a640c23a62f3a-b8fb4462ebdmr258928566b.41.1771063594865; Sat, 14 Feb 2026
- 02:06:34 -0800 (PST)
+        d=1e100.net; s=20230601; t=1771065009; x=1771669809;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4wUQJiyKQ4BFUx5XsHhu4xM8nw7tnHD69jYjWhXt4VA=;
+        b=H/kQrmsB6FiVWWnj2MSvT8adUHLL5/YtmmkNTBL9IyY39Sn2br38lzy0ZBnNwfGrEu
+         6mPnQW2/ik5diatLeNEBf+QNgEFaJUaHQbZkNf25ytgYY9t+qE/g9jf5iCs1NGCkSU0K
+         pjcYchFOKKKrr1D4pR5Al81Goikgy/j1IM2UWiUNuEmzPLfk+cqv5SETkkn72Dp9ULr6
+         8l1g4iJBfk/kBlHFVuso+XljLWM9iFyO4nEbaVl3ElkmOThatj8wm6QHD9rTZX0r9MAo
+         aBAsYvk9QahpSTE2RRMk8wkr9MYmmauGiqUI02XMOlIL4SwhivqXw4KDvauRXJ35fuFD
+         Nk5w==
+X-Gm-Message-State: AOJu0Yzxws3eamAtVBiOtMRQ5mW/OfxJXuC6P1NT0pxe5XBwrE/FDrHt
+	Bsm4/gbaV6GjcoKgy3OqFTtUYNSY5PrO7xOs+S2d5UQGPA9V0W36i9xmyjQJS52D
+X-Gm-Gg: AZuq6aLVmlCXFwvgmHzvjJlDaA+D+Kavak0wuZk3r8yAgic17nBtjoHcEI/e+KYxuFW
+	plqQiCt5KTUqh5EM7aiE2HvJ1scUvVQ7Gek6ELM06tx6dmec/Vw9kpm4vcef+9v/FzTWbMhXxZs
+	AaTGFoajiMhxaUqbsa8lswpKWzNWrTP3+gcEb5o97qK7Yl4LL2bWjbOhuLIANT2aJcPMHLovyEI
+	Y9Yh6F4jH+KsEbLW65NenHdFJXLh55LlRypkWNOfUoPyDybVOpf8E1pSns0lZFJpuJi0y1V/uOl
+	tauQt8mVlgzFVCrBOhDKPXN//3qDMdXvl5nPZM5qwIZCMv2QkmAzuoXJdTRQwIIwFWho84opy2K
+	ydHqaHcKuJcP5bjQOeg8rJBNAmhxDx4kaeEFnxEAFYlxcOUbn5nrnbjVFuqXWqBCxkUa1RwBeD0
+	L03vF2uIyaKCfkqLI1w9lXmW3yvpNO7P0Zbt87LExcBIrZncW9RWAU/7oOo9RAuQ==
+X-Received: by 2002:a17:902:ce87:b0:2a9:5f11:3a26 with SMTP id d9443c01a7336-2ad1740bcaamr22696455ad.7.1771065008695;
+        Sat, 14 Feb 2026 02:30:08 -0800 (PST)
+Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.24])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ad1a6f9d4dsm15741395ad.8.2026.02.14.02.30.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Feb 2026 02:30:07 -0800 (PST)
+From: nspmangalore@gmail.com
+X-Google-Original-From: sprasad@microsoft.com
+To: linux-cifs@vger.kernel.org,
+	smfrench@gmail.com,
+	pc@manguebit.org,
+	bharathsm@microsoft.com,
+	henrique.carvalho@suse.com,
+	ematsumiya@suse.de
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Subject: [PATCH] cifs: some missing initializations on replay
+Date: Sat, 14 Feb 2026 15:59:13 +0530
+Message-ID: <20260214102943.190621-1-sprasad@microsoft.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Sat, 14 Feb 2026 15:36:22 +0530
-X-Gm-Features: AaiRm53SFCWgM_DXMfR7wPwL0TsGianlEbiEEbkirbl4xvQ7utf0iFrM8-H5s6I
-Message-ID: <CANT5p=rDxeYKXoCJoWRwGGXv4tPCM2OuX+US_G3hm_tL3UyqtA@mail.gmail.com>
-Subject: [LSF/MM/BPF TOPIC] Namespace-aware upcalls from kernel filesystems
-To: lsf-pc@lists.linux-foundation.org
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>, keyrings@vger.kernel.org, 
-	CIFS <linux-cifs@vger.kernel.org>, linux-nfs@vger.kernel.org, brauner@kernel.org, 
-	David Howells <dhowells@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Kernel filesystems sometimes need to upcall to userspace to get some
-work done, which cannot be achieved in kernel code (or rather it is
-better to be done in userspace). Some examples are DNS resolutions,
-user authentication, ID mapping etc.
+From: Shyam Prasad N <sprasad@microsoft.com>
 
-Filesystems like SMB and NFS clients use the kernel keys subsystem for
-some of these, which has an upcall facility that can exec a binary in
-userspace. However, this upcall mechanism is not namespace aware and
-upcalls to the host namespaces (namespaces of the init process).
+In several places in the code, we have a label to signify
+the start of the code where a request can be replayed if
+necessary. However, some of these places were missing the
+necessary reinitializations of certain local variables
+before replay.
 
-This can be an inconvenience or a blocker for container services,
-which run most code from containers and do not like to host any
-binaries in the host namespace. They now need to host an upcall
-handler in the host namespace, which can switch to the appropriate
-namespaces based on the parameters sent before getting the work done.
+This change makes sure that these variables get initialized
+after the label.
 
-I tried to prototype a namespace aware upcall mechanism for kernel keys here:
-https://www.spinics.net/lists/keyrings/msg17581.html
-But it has not been successful so far. I'm seeking reviews on this
-approach from security point of view.
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+---
+ fs/smb/client/smb2ops.c | 2 ++
+ fs/smb/client/smb2pdu.c | 1 +
+ 2 files changed, 3 insertions(+)
 
-Another option that I could think of is to host a device file in
-devfs. The mount could register with keys subsystem by keeping an FD
-open from inside a container. The keys subsystem could then upcall on
-the "right" FD based on some parameter supplied to it.
-
-Looking forward to hearing if there is a better approach to solving
-this problem.
-
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 262df6d2c2c82..ae39b3c027d2d 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -1185,6 +1185,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ replay_again:
+ 	/* reinitialize for possible replay */
++	used_len = 0;
+ 	flags = CIFS_CP_CREATE_CLOSE_OP;
+ 	oplock = SMB2_OPLOCK_LEVEL_NONE;
+ 	server = cifs_pick_channel(ses);
+@@ -1586,6 +1587,7 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 
+ replay_again:
+ 	/* reinitialize for possible replay */
++	buffer = NULL;
+ 	flags = CIFS_CP_CREATE_CLOSE_OP;
+ 	oplock = SMB2_OPLOCK_LEVEL_NONE;
+ 	server = cifs_pick_channel(ses);
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 4602b4dfe8322..7f3edf42b9c3f 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -2908,6 +2908,7 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
+ 
+ replay_again:
+ 	/* reinitialize for possible replay */
++	pc_buf = NULL;
+ 	flags = 0;
+ 	n_iov = 2;
+ 	server = cifs_pick_channel(ses);
 -- 
-Regards,
-Shyam
+2.43.0
+
