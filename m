@@ -1,114 +1,137 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE75E23645D;
-	Fri, 13 Feb 2026 13:54:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770990842; cv=none; b=PwZy4vw7ZdqJb0D5XJWougQz0O4rxDskERpsfnmDV2oQCXaGISUdrDBqamgqxUkpiFZws1pblhpqwUSkO8i/tQsBTQ5Pt0EbXankxVYLROkZkeOPu7MU1PLhdYSw1KxS+CghT5+LGQe+F21AI5TDahw5P2Q3a1s2ER5FsjrLdSY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770990842; c=relaxed/simple;
-	bh=3vCPX61sX20H+a717mSwIYx/yC5gWLrUFV97YX9D5/w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TgZmtd1Gi3qnwOjXfn8fKbw4tL3rhIQGnZr42NSI09ZXnbrglexZodIwN+kb/Wl4FPGFfB34o1J7mMW5IV2YA0yUYL+Zz5GXND8koeh7+iqLuyTaIWKUg5vSWoxenHy51Q4H1FluMSMhP0LesQY57ukN/1YIAUUS1MikLt5n6C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=PaF+uQ9H; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E8E21CC71
+	for <linux-cifs@vger.kernel.org>; Sat, 14 Feb 2026 07:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771053436; cv=pass; b=jbANacLM3E1xbKgtvZwo+xjUcBZM/x9ziadyo/RGYvMn4xLpc85aWAhhHeRdqFPTIZmFwPTNZQJEY9KB5deZ2TqOUV1nAanXDTegKzdYfOzuWySbJRZEIpsYvuVi8kCH7qeO9fwHm/lqRG/ES+OiIt8/1uvXA0GNmz5CUOlIehE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771053436; c=relaxed/simple;
+	bh=gQNoXCleUVB/GQPpd4WrtiebRYMrChKNbKymArpDsoI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kEEYnRpZ84fdkJg2cgEqpXGvHIsJqziPpgA9iAdlfRo6jv4xYbANPUk7Pwa3gN2xzNKTQWf2IXgj1zukb4qhUAcW4Cn3AU9+egxea0OyG3ErzE/BB1ImhxWf7LozzKvu9qu0jiWR8xxV0JfybQrnVrz9nN9qHBuVjc8cYE5Hk98=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lrdizb9w; arc=pass smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="PaF+uQ9H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BB3BC116C6;
-	Fri, 13 Feb 2026 13:54:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1770990841;
-	bh=3vCPX61sX20H+a717mSwIYx/yC5gWLrUFV97YX9D5/w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PaF+uQ9HrIwXK5DobvUSF0Vzd4rIuYCqwQUG0h2Y/shpSN21li1W2wptKE+0GMJ34
-	 Qx04Xb6qcoLlYjswLAz2u9Oql4LyR4Gd/85mkTrMxXCr56J0flYgfIVvaCitzsd1+E
-	 k0eIa1fBZE/xsvz9tYf5tPhrcycs7wVWr+kqeRE4=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Stefan Metzmacher <metze@samba.org>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.18 10/49] smb: server: let recv_done() queue a refill when the peer is low on credits
-Date: Fri, 13 Feb 2026 14:47:54 +0100
-Message-ID: <20260213134709.264495820@linuxfoundation.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260213134708.885500854@linuxfoundation.org>
-References: <20260213134708.885500854@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lrdizb9w"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b885a18f620so218358166b.3
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Feb 2026 23:17:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771053433; cv=none;
+        d=google.com; s=arc-20240605;
+        b=W2nY9pF5wfPunXxcmdfkhOiRi+ITrU0eCfjN1xuY6CYMD0htJKccKHunqGMoqbh9d/
+         z3XFmsYDINQDfiyDfdgfF7EE0YB1Zhk5tXZu3iwxsfw1+2DZfWf82i8SbsHdz2n+D0A1
+         bd5nzPtZhCiclvo1OwnnA7LKwRgWM9DaqVdDNzxrKenzOA9ZYMJ/RVXo60emVZIHlN+7
+         pmsCfsg+6YzcYoec6muzNYGsn5AFja7jQ2qddLjr9f3zBhu9pXgqDuq8SKmC18UgHj7/
+         Fvz73FXARwBSDvYbcoR6uGM5sMV7UdylT47h67vfqfwrT4H1Vwj7PSthGeVm9jlC/LsM
+         rkRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=PXOCxnckoWaD3Jt8dx7GoM00kL4FtZQ5Um1imPSB1Zs=;
+        fh=iYtOLZCZpwbqfWMOmPKG9pVjqSbbfrKng1F0YwjpMBY=;
+        b=lgpuchR7lQ5cCq8S6B3PDFoNXYPgrAQYZh2F/F1zjRaHWzOhOA18OkR2BJnZdAgf9f
+         iYF04+l1kDh4La/REmHXjjM7y/FHDM1UagZ6lx69fdgZIQ8ahM/y2Rw5+w3RaNoiI2j+
+         0mWeKmu4o5yGv16LbPcYy/1zq9Wut3roxcV25CN8E7V1ivOe6m1qih8zSBUrn7h12r//
+         AvffncN+cCsY5nQHFCAI/LhsLNJY+EmtpydSBvOcrglnypGZ9ytzSOIxLz+EK1rko7n0
+         F0bT3rmyCFz/HQyR+j8+xmF+kvfGMf83mhs5rZVeqiedepvV6l+RxyP4KqPQOkQWFiHr
+         X6Cg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771053433; x=1771658233; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PXOCxnckoWaD3Jt8dx7GoM00kL4FtZQ5Um1imPSB1Zs=;
+        b=Lrdizb9wJS90t/PVU7zcjPjgm8kKV8kPyx9S5yHdu+OIET3HFxcIQuStiY+a8b3KTv
+         UuHwxMTtlvAtPVmDm9K7UzD0C8dwaepjENQnzqVCr4+NQLF4UeWGqdo+XMp0Lc836ZUd
+         hPArXtF1Q2jCPTRY9Hflep3vjZLb9Czys/fjO2yyTGAWZ0ul3QaLNVhRoqJkzNESnVBF
+         79RdCmd/NcS/royXAqzwMvkuy6iE5JkdW7GDjAJi6bE28iQtSe3cNCndTJvx+po+duKG
+         2xpbbO/mz/zaIXkGrjm8eC5VgFsT5gOlsNs0uTXKW8Wm6ajd5tZn+WFOv7x6+cbLIQr7
+         FIYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771053433; x=1771658233;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PXOCxnckoWaD3Jt8dx7GoM00kL4FtZQ5Um1imPSB1Zs=;
+        b=Ziwwh7Lgp/ayr7pmUgWhys4EqRyBVwPSXWOX3rCVuY/3cJDPAPHdjlfjkYzKpyxe6l
+         R+Uukv6nmTbD1aNWpLpyihTDhwV1c+EUIYNzr6cxL/uJqlAScR1aExrJpNaNtjDVhJSX
+         TSaCSTDJEXkqyOi8iv1x0MziRJzRxDwvw4zpa6vsqE5ku4Ar2/Ezik5N7fkf24eSgAZJ
+         habRXQOOYi2KAHQ1zX/FpneOEThJXXf9w/899iVjSFZtFILs5JiF3nxSgComQm4a9Kyn
+         XLN90ksAORlh3qt1xKrahHF1olth8QqL9XLF1GxU6JmvU8FMFd5bQZ0gfOjXIne8axc5
+         VqyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVqtgrgFm8mXWGUTbW6SVlfF9kvjqrbc5JQy65AxaQ6n1W7nj/OxITrGQzeATXvRSzIFzjr7xvEfgn4@vger.kernel.org
+X-Gm-Message-State: AOJu0Yww97HgwlqwqGAfCsAOF390yyZOQPweraQifbK+rDYgSmKlI4eW
+	MRj5zjEdhvaxgHK0Ed0ENJ1rFDex2TylDf5sw3pj6MkN+VkNre0v0JnsBfe1rwEdnWQujll71Yq
+	sfg7/UTQt9+WhunyObW17R792iRM2iOo=
+X-Gm-Gg: AZuq6aJXeMS/zt4tj55glEk9F5pc/CiTUbNgBnVMkMRFHog4Ic7fSTSjAjjzYi1wbSy
+	8YJt1CL7EwaQYuXJ5UTTMd4b/prJl2v6aB/n0+MBhA/NKZwML6RpDAdfgYsiDCnhGd89QeHeD0m
+	dc4dOXi4i9EB/SqgIe3W3wZrAUqnDIxrCLBytQGryKtKuKOoLEfG5FUY0EfnOmuuA2ObUHhG2ix
+	kPInSVpZf1SxL9HFTMo0GBRKQhJbAppowRlj/t73b60yZ4bS9trk4ChKF+Q22aOxpd68bfPXLQ1
+	KeyC8Q==
+X-Received: by 2002:a17:907:747:b0:b8e:8874:8398 with SMTP id
+ a640c23a62f3a-b8facd3d887mr304112466b.27.1771053433145; Fri, 13 Feb 2026
+ 23:17:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CANT5p=oDUoq0JgTReUazFds5iLc+-gfiwL1iJXbeF-+YReXfSg@mail.gmail.com>
+ <2463050.1770046784@warthog.procyon.org.uk> <1475df6b259c785c9a00e5ea496712fd@manguebit.org>
+In-Reply-To: <1475df6b259c785c9a00e5ea496712fd@manguebit.org>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Sat, 14 Feb 2026 12:47:01 +0530
+X-Gm-Features: AZwV_QhKdUhmaXbxHYsP1AuqF1_Z06T6u57w2WDUfBiFYMkA8gifZi858eAmVJc
+Message-ID: <CANT5p=qpdk4Qf9vJAdzWtw7JF=vnWBHnvSzqNAo2W+Bj+z-_wA@mail.gmail.com>
+Subject: Re: Problem with existing SMB client mount code
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: David Howells <dhowells@redhat.com>, CIFS <linux-cifs@vger.kernel.org>, 
+	Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-6.18-stable review patch.  If anyone has any objections, please let me know.
+On Mon, Feb 2, 2026 at 10:51=E2=80=AFPM Paulo Alcantara <pc@manguebit.org> =
+wrote:
+>
+> David Howells <dhowells@redhat.com> writes:
+>
+> > The problem with not sharing the superblock is that you don't share any=
+ of the
+> > caches - not pagecache, not fscache.
+>
+> Yes, that would be a waste of system resources.  Not to mention that DFS
+> and multiuser mounts would end up duplicating a lot of connections
+> because they could no longer share superblocks.
 
-------------------
+My main problem is not the reuse of superblocks, but the filesystem
+not having an ability to split them when necessary.
+It is a case where user A and B both mount a share independently with
+the same mount opts on two different mount points. Since the
+filesystem sees that the superblocks can be reused, it does so.
+Later, user B decides to change some mount option with remount. That
+change will unfortunately affect user A mount too.
 
-From: Stefan Metzmacher <metze@samba.org>
+>
+> Besides, what about existing users that rely on the following to happen:
+>
+> mount.cifs //srv/share /mnt/1 -o ${opts}
+> mount.cifs //srv/share /mnt/1 -o ${opts} -> EBUSY
+> ...
+> mount.cifs //srv/share /mnt/1 -o ${opts} -> EBUSY
+Not sure that I understand this. If you run these commands today, do
+you get EBUSY?
+>
+> Instead of changing default behavior, what about using 'nosharesock'?
+> This way you'll guarantee that every mount has an unique superblock, so
+> your remount usecase will work.
 
-commit 8106978d400cc88a99fb94927afe8fec7391ca3e upstream.
+Yes. That can be done.
 
-In captures I saw that Windows was granting 191 credits in a batch
-when its peer posted a lot of messages. We are asking for a
-credit target of 255 and 191 is 252*3/4.
-
-So we also use that logic in order to fill the
-recv buffers available to the peer.
-
-Fixes: a7eef6144c97 ("smb: server: queue post_recv_credits_work in put_recvmsg() and avoid count_avail_recvmsg")
-Cc: <stable@vger.kernel.org> # 6.18.x
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/smb/server/transport_rdma.c |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -661,6 +661,7 @@ static void recv_done(struct ib_cq *cq,
- 		struct smbdirect_data_transfer *data_transfer =
- 			(struct smbdirect_data_transfer *)recvmsg->packet;
- 		u32 remaining_data_length, data_offset, data_length;
-+		int current_recv_credits;
- 		u16 old_recv_credit_target;
- 
- 		if (wc->byte_len <
-@@ -699,7 +700,7 @@ static void recv_done(struct ib_cq *cq,
- 		}
- 
- 		atomic_dec(&sc->recv_io.posted.count);
--		atomic_dec(&sc->recv_io.credits.count);
-+		current_recv_credits = atomic_dec_return(&sc->recv_io.credits.count);
- 
- 		old_recv_credit_target = sc->recv_io.credits.target;
- 		sc->recv_io.credits.target =
-@@ -719,7 +720,8 @@ static void recv_done(struct ib_cq *cq,
- 			wake_up(&sc->send_io.credits.wait_queue);
- 
- 		if (data_length) {
--			if (sc->recv_io.credits.target > old_recv_credit_target)
-+			if (current_recv_credits <= (sc->recv_io.credits.target / 4) ||
-+			    sc->recv_io.credits.target > old_recv_credit_target)
- 				queue_work(sc->workqueue, &sc->recv_io.posted.refill_work);
- 
- 			enqueue_reassembly(sc, recvmsg, (int)data_length);
-
-
+--=20
+Regards,
+Shyam
