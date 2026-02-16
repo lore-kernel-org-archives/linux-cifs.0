@@ -1,30 +1,32 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744C02475CB
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Feb 2026 08:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AA92475E3
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Feb 2026 08:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771230103; cv=none; b=e83B4uTxHOqFSAh8OuR0k/8HNMe9OkB/lE9PBsA2YANddYOBWh66LnUOj9fbDWkHUKTT5GTAQiZqVc8CrzCOzLZy49LAGmLKjN0LV4Cbmii4a9gQ5ThEE4V/HhAiEoLuMc3RCPRz83l/ORj+29YJryKxuG7NlcAUt9GlQY8q8Jk=
+	t=1771230107; cv=none; b=s/0FkHsw7vklep+YnSEwsmnPkcYAawbR04V6vh4y2hY85bD+YexdM0JUtQoBw8MH740dzbJw7qb33oVMeZiAyigF/SaMRmxxqNydpCg2qMf1Fmy6JA63/eGgScLnW7vCntOPYbZyfplQQpxeADOdyuSLawWXO7mJ6w7rj4j5vCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771230103; c=relaxed/simple;
-	bh=FWRI4OVGboiBc8ZRuHgaeZviS/w2tj/HpC8krRmNI5A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U1wWs3RPls+8nTjC6zc2OPpDkxHRE2B6xgDIrcFbyc7Qdsc8doLCKZPuUaYBbJ335yhgNMRwrYOpDUZ7CB35Mw7bRhUxWg69njfNpggDXRqWxyiJL4E/JZWkttgpasSnDFaXMlR5WlCTulvoqxhYXDFgGlxkemxKhe7esQR/kP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=K5Dywtbw; arc=none smtp.client-ip=95.215.58.186
+	s=arc-20240116; t=1771230107; c=relaxed/simple;
+	bh=xcnrTsEvQQsMwy7hD8XM2TFkMyIaYqb4InSp6f4BivE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KNcz7e4+a31keD1fxZ9kJH28FJlWOCM7fNTpLoJ3e6LeQsWNEXECmMaMqfcOEWnVklQyGtqp6OcwCQzxtaoMwicoypz9eUmkjWheVM6BI2CovzqdnoX6C9xL4kbMYwFI9JH4efIXIz9yxrp591JwBSqN5JUFM4fx1f2DmYHuyaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RTKIJDON; arc=none smtp.client-ip=95.215.58.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="K5Dywtbw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RTKIJDON"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771230099;
+	t=1771230103;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=TY3qLcRDR4C1jw0Jfv0QdPn1FFbpinpizXMe0WoUhV4=;
-	b=K5DywtbwbC9HClSkF3qnyHtjJQCCm+ROjZKPGEM0mJ8DNLBJ58rNsu7BXtsYYG8VuUYH20
-	7yEThTQ3lyNb9ekY9l4TQKS+NX9MSw+b66Y6Pw+5MlUVMRMx/yrp6dNSdLpNbVuiZkqhqR
-	m+Uv7SzduIp2WG4JQlvD1XZ8s1RpQzw=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VyyGKWLBr+53PHddrYJXBTJYh5DtS8RIHbKNPXNkl1Q=;
+	b=RTKIJDONou8BmbjEAS2ats7STiT+Lvd8SBLzF9ygBszZm4DHQtq00Zx+DXWtv0lbeDx7KE
+	59EsdpHKwu5ntBhwe5EWaYGK/xCGxZLi82U9f/lmhDS+ssU1YvfJuWo3okj2kTqjhCKLql
+	Ms2kUse4y4UWwiWrlRbV8aTBiCt91EE=
 From: zhang.guodong@linux.dev
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -38,10 +40,13 @@ To: smfrench@gmail.com,
 	chenxiaosong@kylinos.cn,
 	chenxiaosong.chenxiaosong@linux.dev
 Cc: linux-cifs@vger.kernel.org,
-	ZhangGuoDong <zhangguodong@kylinos.cn>
-Subject: [PATCH v3 0/5] smb: move duplicate definitions into common header file, part 2
-Date: Mon, 16 Feb 2026 08:20:13 +0000
-Message-ID: <20260216082018.156695-1-zhang.guodong@linux.dev>
+	ZhangGuoDong <zhangguodong@kylinos.cn>,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH v3 1/5] smb: move smb3_fs_vol_info into common/fscc.h
+Date: Mon, 16 Feb 2026 08:20:14 +0000
+Message-ID: <20260216082018.156695-2-zhang.guodong@linux.dev>
+In-Reply-To: <20260216082018.156695-1-zhang.guodong@linux.dev>
+References: <20260216082018.156695-1-zhang.guodong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -53,51 +58,127 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-v2->v3:
-  - Patch #01: "__u32 VolumeSerialNumber" -> "__le32 VolumeSerialNumber"
-  - Patch #02: rebased on cifs-2.6.git for-next
-  - Add patch #03
+The structure definition on the server side is specified in MS-CIFS
+2.2.8.2.3, but we should instead refer to MS-FSCC 2.5.9, just as the
+client side does.
 
-v1: https://lore.kernel.org/all/20251209011020.3270989-1-chenxiaosong.chenxiaosong@linux.dev/
-v2: https://lore.kernel.org/linux-cifs/20251211143228.172470-1-chenxiaosong.chenxiaosong@linux.dev/
-The following patches from v1 and v2 have already been merged into mainline:
-  - 94d5b8dbc5d9 smb: move some SMB1 definitions into common/smb1pdu.h
-  - 2b6abb893e71 smb: move File Attributes definitions into common/fscc.h
-  - c97503321ed3 smb: update struct duplicate_extents_to_file_ex
-  - 2e0d224d8988 smb/server: add comment to FileSystemName of FileFsAttributeInformation
-  - ab0347e67dac smb/client: remove DeviceType Flags and Device Characteristics definitions
-  - 08c2a7d2bae9 smb: move file_notify_information to common/fscc.h
-  - 6539e18517b6 smb: move SMB2 Notify Action Flags into common/smb2pdu.h
-  - 9ec7629b430a smb: move notify completion filter flags into common/smb2pdu.h
-  - bcdd6cfaf2ec smb: add documentation references for smb2 change notify definitions
+Modify the following places:
 
-This is a continuous effort to move duplicated definitions in both client
-and server into common header files, which makes the code easier to maintain.
+  - filesystem_vol_info -> smb3_fs_vol_info
+  - SerialNumber -> VolumeSerialNumber
+  - VolumeLabelSize -> VolumeLabelLength
 
-The previous work is here:
-  - part 1: https://lore.kernel.org/linux-cifs/20251117112838.473051-1-chenxiaosong.chenxiaosong@linux.dev/
+Then move it into common header file.
 
-ZhangGuoDong (5):
-  smb: move smb3_fs_vol_info into common/fscc.h
-  smb: move some definitions from common/smb2pdu.h into common/fscc.h
-  smb: move file_basic_info into common/fscc.h
-  smb: introduce struct create_posix_ctxt_rsp
-  smb: introduce struct file_posix_info
+Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Reviewed-by: Steve French <stfrench@microsoft.com>
+---
+ fs/smb/common/fscc.h       | 11 +++++++++++
+ fs/smb/common/smb2pdu.h    | 11 -----------
+ fs/smb/server/smb2pdu.c    | 10 +++++-----
+ fs/smb/server/smb_common.h |  8 --------
+ 4 files changed, 16 insertions(+), 24 deletions(-)
 
- fs/smb/client/inode.c      |  22 +--
- fs/smb/client/readdir.c    |  28 +--
- fs/smb/client/reparse.h    |   4 +-
- fs/smb/client/smb1pdu.h    |   9 -
- fs/smb/client/smb2pdu.c    |   9 +-
- fs/smb/client/smb2pdu.h    |  21 +-
- fs/smb/common/fscc.h       | 379 ++++++++++++++++++++++++++++++++++++-
- fs/smb/common/smb2pdu.h    | 360 ++---------------------------------
- fs/smb/server/oplock.c     |   8 +-
- fs/smb/server/smb2pdu.c    |  98 +++++-----
- fs/smb/server/smb2pdu.h    |  36 +---
- fs/smb/server/smb_common.h |   8 -
- 12 files changed, 486 insertions(+), 496 deletions(-)
-
+diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
+index 0123f34db1e8..d2e00eba1a98 100644
+--- a/fs/smb/common/fscc.h
++++ b/fs/smb/common/fscc.h
+@@ -138,6 +138,17 @@ typedef struct {
+ 	__le32 BytesPerSector;
+ } __packed FILE_SYSTEM_SIZE_INFO;	/* size info, level 0x103 */
+ 
++/* volume info struct - see MS-FSCC 2.5.9 */
++#define MAX_VOL_LABEL_LEN	32
++struct smb3_fs_vol_info {
++	__le64	VolumeCreationTime;
++	__le32	VolumeSerialNumber;
++	__le32	VolumeLabelLength; /* includes trailing null */
++	__u8	SupportsObjects; /* True if eg like NTFS, supports objects */
++	__u8	Reserved;
++	__u8	VolumeLabel[]; /* variable len */
++} __packed;
++
+ /* See MS-FSCC 2.5.10 */
+ typedef struct {
+ 	__le32 DeviceType;
+diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+index e482c86ceb00..69dd7c792804 100644
+--- a/fs/smb/common/smb2pdu.h
++++ b/fs/smb/common/smb2pdu.h
+@@ -1942,17 +1942,6 @@ struct smb2_fs_control_info {
+ 	__le32 Padding;
+ } __packed;
+ 
+-/* volume info struct - see MS-FSCC 2.5.9 */
+-#define MAX_VOL_LABEL_LEN	32
+-struct smb3_fs_vol_info {
+-	__le64	VolumeCreationTime;
+-	__u32	VolumeSerialNumber;
+-	__le32	VolumeLabelLength; /* includes trailing null */
+-	__u8	SupportsObjects; /* True if eg like NTFS, supports objects */
+-	__u8	Reserved;
+-	__u8	VolumeLabel[]; /* variable len */
+-} __packed;
+-
+ /* See MS-SMB2 2.2.23 through 2.2.25 */
+ struct smb2_oplock_break {
+ 	struct smb2_hdr hdr;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index cbb31efdbaa2..966a499d2eb8 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -5531,11 +5531,11 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
+ 	}
+ 	case FS_VOLUME_INFORMATION:
+ 	{
+-		struct filesystem_vol_info *info;
++		struct smb3_fs_vol_info *info;
+ 		size_t sz;
+ 		unsigned int serial_crc = 0;
+ 
+-		info = (struct filesystem_vol_info *)(rsp->Buffer);
++		info = (struct smb3_fs_vol_info *)(rsp->Buffer);
+ 		info->VolumeCreationTime = 0;
+ 		serial_crc = crc32_le(serial_crc, share->name,
+ 				      strlen(share->name));
+@@ -5544,14 +5544,14 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
+ 		serial_crc = crc32_le(serial_crc, ksmbd_netbios_name(),
+ 				      strlen(ksmbd_netbios_name()));
+ 		/* Taking dummy value of serial number*/
+-		info->SerialNumber = cpu_to_le32(serial_crc);
++		info->VolumeSerialNumber = cpu_to_le32(serial_crc);
+ 		len = smbConvertToUTF16((__le16 *)info->VolumeLabel,
+ 					share->name, PATH_MAX,
+ 					conn->local_nls, 0);
+ 		len = len * 2;
+-		info->VolumeLabelSize = cpu_to_le32(len);
++		info->VolumeLabelLength = cpu_to_le32(len);
+ 		info->Reserved = 0;
+-		sz = sizeof(struct filesystem_vol_info) + len;
++		sz = sizeof(struct smb3_fs_vol_info) + len;
+ 		rsp->OutputBufferLength = cpu_to_le32(sz);
+ 		break;
+ 	}
+diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
+index ca7e3610d074..b090b56743c4 100644
+--- a/fs/smb/server/smb_common.h
++++ b/fs/smb/server/smb_common.h
+@@ -90,14 +90,6 @@ struct smb_negotiate_rsp {
+ 	__le16 ByteCount;
+ } __packed;
+ 
+-struct filesystem_vol_info {
+-	__le64 VolumeCreationTime;
+-	__le32 SerialNumber;
+-	__le32 VolumeLabelSize;
+-	__le16 Reserved;
+-	__le16 VolumeLabel[];
+-} __packed;
+-
+ #define EXTENDED_INFO_MAGIC 0x43667364	/* Cfsd */
+ #define STRING_LENGTH 28
+ 
 -- 
 2.52.0
 
