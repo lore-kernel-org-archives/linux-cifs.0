@@ -1,80 +1,80 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB21123EAB7
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Feb 2026 04:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC73535965
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Feb 2026 04:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771301674; cv=pass; b=ZEGW+m6e/lOk9PHnIVgDc7lMjd2q4naMKAJT6iDa4UXjUnG/bw7x7BhVfIjFRbI3za0tKyghvW6UMDf/dkHeHn6QhyatiYBP4pWrOBt9Q801MDv0bve9EHkdHRfk2MeNuM51EdXXin9X8nvdTOOVlns+VZQsTo8yVya8acQIq2o=
+	t=1771301816; cv=pass; b=NO9AgM+1xF0h6Y6QIaWDpsKyAN/QTG8p8FUrZ9YheXFemDvilS5130QnDh9sxP6qV+yKJQiucyZ2OwwqVfCQIAJVIp/UUM8s1pOMUyrSkA00O1a3z+ut3Z+mL+MRqOAJGN9bxMdG1LzDFJ13CGgU+2L1OHuata8Tcnm1FU2MRis=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771301674; c=relaxed/simple;
-	bh=vl73Wg7pS+Ahm5P0YPj+Pe00Z8nc8FXlY1ga54JpjGA=;
+	s=arc-20240116; t=1771301816; c=relaxed/simple;
+	bh=qe+7XX/L5syn+cLvVHmf9Bl620oz//ebyw08Uel5J18=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RloOgjXu5n9xMYsalaM0y4q8ap373OgXz69BD1T8y+2IFoQoV+XA9TMAjm0Cf/6/iVYpcfYjSLJ2GI8YRAPgDFyuQHDkbVieMn7ivgkQ2zSnYKk+AzIIHV4imXK9+Cnf5iFMa0KVX3eblYbzeOWMeLN1lA06/5pxC97hAoxaTtE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=frU9r1aQ; arc=pass smtp.client-ip=209.85.208.42
+	 To:Cc:Content-Type; b=KG39l69hfxcbMI/OQ/jnbnW3YIF9RoLTI+vLcrB8qcshOP2jTTrKx1p7UhvlMIotg2AE242dUU7ZFAHvJLEmBhXt6fKJCCLsRvfNO2irbjY4vr0kfktTIbvl4ZTiPgAd+aZyCbS/MlwDkJS9t2XYbbMMKMoqGf5Q+c9EQp9UkKE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B+HXpIHG; arc=pass smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="frU9r1aQ"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-65807298140so5735946a12.2
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Feb 2026 20:14:32 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771301671; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B+HXpIHG"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-65c0d2f5fe1so2601188a12.3
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Feb 2026 20:16:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771301813; cv=none;
         d=google.com; s=arc-20240605;
-        b=J3926cMNVDdZg3Sg9Sga9TKanzgd0OYrH1gIHiBkLcvHCM+yjVk/hSk93LzGA+57UO
-         i28L+kBcIWM3iD2LwyM8RjNNPxAWQBFAD8tHXA88tuQ6+HHZhu2zMfytTuJxl3N162Cp
-         MlD0XsblEwAlX9ORKO0AAuTfWzvZzjf8Z6Fan9MBa2Tjm+M0skHH26HjNBur2uttpN8S
-         0tkyzMGyp2STOWjCwSbRKRGZUCstszL+MXcjR3Ll5wAXKU+dNceq2a141IZONWgLZr9E
-         FAyPwC1ir91snJw4LXvvCaqUJjkfS9rsdr8lVKwQgfygVGUaBtPgMUy2/yFmKqkf+u71
-         aSAg==
+        b=aU4eaxrtLz1Z4IXaHKKNwEOmegGL7wwsAJi5kGQXQGSopCUxHOQSkMxdFFWH1crQuI
+         wXXQJDmMf3IazRWKNR/whJAehO2e0m4opHdzpfY8Mm5NGi8HjbaWzpg2Psbf/VoG3902
+         iFqup6hRmD5kxa6ZPeuuhFOhh8n8CmF5gtOX9XeDoxapGkYyCCpJ4JyQTEtsysxk0keJ
+         4a0vz0t4FgYcWuINageV0tcRE7Z4Zop3/15o5JRT4KHZq0AxLj1RO7+0rHFDvvVLrMmz
+         wUF/kaSkfqulduyWG+YW2MsGqq6p/IDzP5rgroVUEyHJk34hyDHGuY//ODmQ4s3G+lUz
+         k+Tw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=vl73Wg7pS+Ahm5P0YPj+Pe00Z8nc8FXlY1ga54JpjGA=;
-        fh=LCvw48C4oY3eJKEWCrsE/pg/00TzVvAEvW+2/2FYoGk=;
-        b=HTYzsPa8F2ABQ24vjB5iMosNS3ESfMXFsxer3v1tczKg5xFkcrT1jqFZOhUsj9F/9e
-         pUWYAhz80zSVPrhpjlAvrrT0BT2VmFUAotcBcokpuohHMBjfLpRI3UdJrZnVAu5P8N21
-         M9DxW72NZMnCix/4W9QUR+snOmXKJ1f3JVnEfLBaWZrvtVjcBl2lLj3feQzyBrwGQLEN
-         gW9SsyBmZR5ut8TY/pJCThMCFhcVdJyzytcumE9xewP086QAmh3YtyXJxhzF8l/qEXRH
-         D+SwjqNGA3nVEJ4CKIhGn/kAjbB/2ojGt2rNATd4LXHi/68FBLBoSx6k9noKyju/r5fL
-         gm9A==;
+        bh=qe+7XX/L5syn+cLvVHmf9Bl620oz//ebyw08Uel5J18=;
+        fh=dGnP4pVYzjDoE76RipLDVoRFv6ug9sOteQ0RfHL1Sko=;
+        b=gNXJTefHe5lYdZWofdlgvFOO2p9RTEznJgZKQEg8t4hpctThh7Nz8VKMGQmmLWY0qH
+         V8K+zTRkXNqJp8oqET3/c7R1ho0lNXPOnqLcqHbHTS1HC0Y2EzEUHxfk4qSZgSFLyrPE
+         9+Q3/CgZdrhjyMxrI4q4GZ1cq0S7zNSHjU689CGFgHumBXdC49wdav4bCgCPRRKxPxDB
+         069sVtnWLYTenRQf92Sbk4PA2/tiLd77OgbGwHrun/fnAPMSt4ZlSfM8Rg5jauV/bns4
+         RA8M9fxShSvoHYj7a7edE3HtZd1qZETLCcGlTCvKvZ/XJX8OUEIUf1SG3ivmU/Mpzhi5
+         19yQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771301671; x=1771906471; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771301813; x=1771906613; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vl73Wg7pS+Ahm5P0YPj+Pe00Z8nc8FXlY1ga54JpjGA=;
-        b=frU9r1aQzw4+qVjkdlz0wFF4WcsZnuG+7GoE6RmXGgXbKH5XyIT7YRYi9o9kywK680
-         MpfuggRA0eNfMF06O8JKzkVMLPJOTPX6TOrjP7n2dos/DC3PfBCyWuuy+Wz+3nSf/KSC
-         SXY17n5EqmA1q77NyOBul2ZYU3Sl3jz0wmtro3G+8KT0cXL/bWB1pdvfahwXdLmil/F8
-         TsrENVvZnaQdWGghHJebwx1gx1uaRS/fNqOycVBM7LuMPAKcyj66FZHuHiebHgmLkojB
-         6KO/FCE/O/yFVjILTpjMcHbEHNVPPgTJLXEtNn9k/KAy9y1mAOwQDjCkmTv7kx4vLLZt
-         qBJQ==
+        bh=qe+7XX/L5syn+cLvVHmf9Bl620oz//ebyw08Uel5J18=;
+        b=B+HXpIHG0tSTxiI9EhZ0HTLNVrd3JB4Xvv9hlsXrPnUq9zZhsBfOYL7wVgqO8iCBF5
+         SWKUfVzoc4N1pQmQ1IQKOUlIsVnZj+lfAjxA7H4GHZyI3kpkMzeRiX3YobR2jN2wqRz8
+         WQTQcHTJBcgBnEvVz5XSNNPrZqz1f6/m2R5rlNI/0PZiYY+MGywlsDPuYgzXF3FLKGgJ
+         kzo1KOc5b7GMMQTnuV75QA6P9bj8PLhz2JzuIeMuak0GyoHUiteY8AlgXuYF7Vqrc1wl
+         cjTs4XuGF3YfbzY6i4QuSuaGGVPokJYkg9lnYv84pHCSpu8bT7DRa0zHVScqPqV4E9wm
+         NGfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771301671; x=1771906471;
+        d=1e100.net; s=20230601; t=1771301813; x=1771906613;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=vl73Wg7pS+Ahm5P0YPj+Pe00Z8nc8FXlY1ga54JpjGA=;
-        b=PUXFIasGmjprWiy7B+43WyGScoZBpLFh/z0MGBjXM75iJRXYI6sgSRH5gyakz/Gt6H
-         cA4zPCBuvKYc2QpvE1tltpw0TBSfPOh8WPSHtJY5JebkAgEdN5L8XwLCNMFPHGa7ZUeP
-         F+4iYt8ShCSny6QVG3Q4cBNty2zMw+l9EzbllhZ0qGmYP9em+GzCZe3jFlfEvEeMlV7/
-         /j3HahhyKTzL9wQnjVNvc0W/15SDMRMldgLpdF8qF4wLcfn4k96LO5TFboCifLgzLYos
-         UdTqN4+xyocQ7OV5SbZqDSgHYmqlcDhMHh7sxqZzC+0coZCBd0Ie+EYcniXup8Xq0sEy
-         E/Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCWvSQ+XdXjPbLG0oNYcX4md2ne1uxjpdafdhQxFlSlTR1L8qQntxD3BuUN1hFpEQaoQ9l0NCUrvtFgO@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIBhvqwuWQELH94NebEL4JF1zPGOThpNccWcYVOYZwMt6ToStV
-	NWpX+9SCDHUinhWnLSuBg6lWI2WS8VIUAIc27+KDlK5TRWZ/B6YmFHDfO9a+KM8wlNM2grQQvV3
-	Tpoun3Hjzi4DHCBf4mve7EkHNKiY2bak=
-X-Gm-Gg: AZuq6aIe8PAseOAzmjH8jLPxn6uraElVC1aOs8blnG/QPh45sh366Opm17CWgaNaxMU
-	eq+JQk1yH3VumeWXPC6oDxe5GlBNfA2KT08n95yPr+/X0Df7Im5cTX9AMS6r+P4hDRPtMuoqffg
-	I0QahfLb4tOhirXHOddRR0MrhtsA9ERjJx8aXSVvP7bdOqOJBLZI3/ccBFeptM711i2E52+uBkj
-	Jpl+EZJ3n3fbvCwboO/E/UupZ2hIRMG/vq7AOowpLJyEjQKzT2LSYOoOY34k0pgCdd9rvoDWInz
-	apSxJQ==
-X-Received: by 2002:a05:6402:278b:b0:65a:409c:6fe6 with SMTP id
- 4fb4d7f45d1cf-65bb1161199mr6549992a12.15.1771301671063; Mon, 16 Feb 2026
- 20:14:31 -0800 (PST)
+        bh=qe+7XX/L5syn+cLvVHmf9Bl620oz//ebyw08Uel5J18=;
+        b=bfpEaUKPoxDFF92zryfzl8agq1PLCPx8VJYjU9AaGucCpHWuuQStibJiwetee/FvIg
+         rB8iOhX0lLfPQqKNldgA7ApCiPktvWCEkNX7WsCPlvUvEWzjbSegCsE6v3n+c4BlFESL
+         zlDDfqbAfeu3qis4226ApXTOKdDoP0L2gthLeda0qQIiTHYt1+9EU2cs3eP+4i3K+tiB
+         3co1eW/lJ5FvG2gI9eKx2EF7Dv5EAxwFevjY6GXFJsoD1MhrrNzez708+CWXDYAd49CX
+         XksPCTd3rSZO0jWuJk4ipmZqqCvbyCnt3ZDn/bxZaz+Wb2VpamFiMwIDG8d19KdoKTRp
+         VkAA==
+X-Forwarded-Encrypted: i=1; AJvYcCWf0rCvBeqd9fMNZv87NOZiJSLJMveR+X4hRvVgws0ywaHGbHeZcHPD+4GGgWpclpPxwQew5E8Pcouk@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3AOtx630Ly8RVXVAAYrQysyL9KQ0L0kW+AmbbPFvn6BTEy11s
+	6a2ybS20rYkvKNX+rEyJeBvaRvefB0FVZRMz6xSKahF3RYTpbP5JeeJrYQUcLAum9y9TS/g/KaE
+	EHsQspOwMDB62HeC93xQafQYTP30L+5M=
+X-Gm-Gg: AZuq6aLV1cQbfWW3Et+pU/yMBl4Mv+QcxHN9zGzWLZKYzQx/EXSyaxULhidDN8ZI3VT
+	s0FVYtCCph92WG2Xrte092RkX9soo7NCL3dUGMoKosj9cJbkpasBfyCkuzdoGvwV5o6cexQ10sR
+	/Tz46d6TFK16gMnIHXKzJoGvmNL6r4pBrbmyqOxt/k6eHOVkxFpF/ERv/34yssoz6YeqUgkkGVR
+	VxuQZXnqxHGftm/kuVSdM48GH6+9T/1cRYnsrJ2qnuPId8H5JMZLQs64Y8iMytnUwatZnCb404w
+	vIYe7g==
+X-Received: by 2002:a17:907:3da2:b0:b87:d186:19e3 with SMTP id
+ a640c23a62f3a-b8fb44a3778mr761877266b.43.1771301812795; Mon, 16 Feb 2026
+ 20:16:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -82,49 +82,53 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <CANT5p=rDxeYKXoCJoWRwGGXv4tPCM2OuX+US_G3hm_tL3UyqtA@mail.gmail.com>
- <7570f43c-8f6c-4419-a8b8-141efdb1363a@app.fastmail.com>
-In-Reply-To: <7570f43c-8f6c-4419-a8b8-141efdb1363a@app.fastmail.com>
+ <aZJmthYtk33KYDud@melos.hm.i.d.cx>
+In-Reply-To: <aZJmthYtk33KYDud@melos.hm.i.d.cx>
 From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Tue, 17 Feb 2026 09:44:19 +0530
-X-Gm-Features: AaiRm52qcDduH0WOoiy86XQ-uP4UAzjzDBGWAMpuxDVbnPDCNM8VzO-fhxMilbY
-Message-ID: <CANT5p=rpJDx0xXfeS3G01VEWGS4SzTeFqm2vO6tEnq9kS=+iOw@mail.gmail.com>
+Date: Tue, 17 Feb 2026 09:46:41 +0530
+X-Gm-Features: AaiRm51QHtefjwH_4aVN8UbkRPTl2or_N2X9XdmE9IAJs0YnwmTtQVL_DTyVRpY
+Message-ID: <CANT5p=p6yw3eYJVXZc2CA2fBgBYpZ4W0uKivt2tCmtgos3GVdw@mail.gmail.com>
 Subject: Re: [LSF/MM/BPF TOPIC] Namespace-aware upcalls from kernel filesystems
-To: Chuck Lever <cel@kernel.org>
+To: David Leadbeater <dgl@dgl.cx>
 Cc: lsf-pc@lists.linux-foundation.org, 
 	linux-fsdevel <linux-fsdevel@vger.kernel.org>, keyrings@vger.kernel.org, 
-	CIFS <linux-cifs@vger.kernel.org>, linux-nfs@vger.kernel.org, 
-	Christian Brauner <brauner@kernel.org>, David Howells <dhowells@redhat.com>
+	CIFS <linux-cifs@vger.kernel.org>, linux-nfs@vger.kernel.org, brauner@kernel.org, 
+	David Howells <dhowells@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 14, 2026 at 9:10=E2=80=AFPM Chuck Lever <cel@kernel.org> wrote:
+On Mon, Feb 16, 2026 at 6:25=E2=80=AFAM David Leadbeater <dgl@dgl.cx> wrote=
+:
 >
+> On Sat, Feb 14, 2026 at 03:36:22PM +0530, Shyam Prasad N wrote:
+> > I tried to prototype a namespace aware upcall mechanism for kernel keys=
+ here:
+> > https://www.spinics.net/lists/keyrings/msg17581.html
+> > But it has not been successful so far. I'm seeking reviews on this
+> > approach from security point of view.
 >
-> On Sat, Feb 14, 2026, at 5:06 AM, Shyam Prasad N wrote:
-> > Kernel filesystems sometimes need to upcall to userspace to get some
-> > work done, which cannot be achieved in kernel code (or rather it is
-> > better to be done in userspace). Some examples are DNS resolutions,
-> > user authentication, ID mapping etc.
-> >
-> > Filesystems like SMB and NFS clients use the kernel keys subsystem for
-> > some of these, which has an upcall facility that can exec a binary in
-> > userspace. However, this upcall mechanism is not namespace aware and
-> > upcalls to the host namespaces (namespaces of the init process).
->
-> Hello Shyam, we've been introducing netlink control interfaces, which
-> are namespace-aware. The kernel TLS handshake mechanism now uses
-> this approach, as does the new NFSD netlink protocol.
->
->
-> --
-> Chuck Lever
+> I have more context from the containers side, but to me this doesn't
+> appear safe. Entering the right namespaces isn't enough to safely run
+> code within a container. The container runtime may have set up seccomp
+> or other limits which this upcall won't respect.
 
-Hi Chuck,
+Hi David,
+Thanks for these comments.
+Let me look into seccomp to see if kernel will have any visibility into it.
 
-Interesting. Let me explore this a bit more.
-I'm assuming that this is the file that I should be looking into:
-fs/nfsd/nfsctl.c
-And that there would be a corresponding handler in nfs-utils?
+>
+> I would like to see a solution to this though, we currently have custom
+> callback code to make this work. I'm not familiar enough with the
+> interfaces but an approach where something registers also seems
+> desirable because it is able to preserve backwards compatibility, which
+> changing the namespace the upcall runs in doesn't.
+
+Ack. Will explore the options and get back to this thread.
+
+>
+> David
+>
+
 
 --=20
 Regards,
