@@ -1,183 +1,147 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C50D28C006
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Feb 2026 22:34:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B895B288515
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Feb 2026 23:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771367680; cv=pass; b=iaMo0vljAfpKr2iASlzwKQ913vGQXTmODxGgNl0UJX7YRwJTheJJSomql00tRtwDOqLPcSTGtrRollE16VBQxkc6qPpF7Qk7mmHqm/gaGAY88J4DOJu7xK/g8TuHWUUBN51bMHRkTc6kIV/H3wq2Z4Gi6dbYVTXJ92OmfRDPpXc=
+	t=1771369584; cv=pass; b=u75DOc03rlGzRqncXMJt+y2byt8yxgxM6hw1Bg59DEr44jSMjLhvUcbgQyEMph4TIRYgXt4lZ7xq9Y20+jp9mwaGF9yjf2UDdKKOPQZwui/c+gDD+HkN7Sbtk343Q/+vaP2pRQUXMTdFLH464WOS5cA0bekCpW4v53+MLQoRN+I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771367680; c=relaxed/simple;
-	bh=IMPigmx7RO/axJBUTfV/VQEOJJagu2+u9L2biqqNjDs=;
+	s=arc-20240116; t=1771369584; c=relaxed/simple;
+	bh=uTZb17dt9cw8zb/biR3+4XI1aOrTrhhiBMlwlamQO6A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DEoi6wiXDWCH8zyWycYZDxkDysuzj+pLa8nvWaq0zyOrSFspVRC4CsfasYnbk8JYIEayXToTlwSPMIBF24VwVgNpZMOw0k2zPOG2rAnhnRmnxAxCq42w/bXOBuVBw6F9eQVyII13WbwqottlzqbpkL2VAT+y1ncr6ewumYu3/+k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=On51LtDs; arc=pass smtp.client-ip=209.85.219.54
+	 To:Cc:Content-Type; b=XIIWglY/eQY9v7Md3U3sPNcHuyc6Jo0g3D27S1bkkUVjUXHnUqhTp0Xkcq88TigJ8zTOaONHWcy23QlcQiDwbRZsnXRM//W3SPbHXwlfn2uCp/cOrzBBNob/sKT6zzhbdqh67E78+sNjq4O99KB3dw//BUzaa4d6N4nWt1+lq2U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=clyV6haT; arc=pass smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="On51LtDs"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-896fcfc591eso46282146d6.2
-        for <linux-cifs@vger.kernel.org>; Tue, 17 Feb 2026 14:34:39 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771367678; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="clyV6haT"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-89464760408so30995486d6.0
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Feb 2026 15:06:23 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771369583; cv=none;
         d=google.com; s=arc-20240605;
-        b=APGeGXvbx/GRpdVrpOwn++R9Zsvp9w79DSp6GyQB6vcLPHt9eJFlX1wCt6w1Hh+ymR
-         37pYfEEIq8qzX/UTEt/dpmsHaTWtWKF3kHWAO9XNybqO3X1VSb9gQ7n8jBv5LVVarTRo
-         upoYKycAFbWyF8YhS7GDrXmzbl4hrqqgErqufU8evcmyjizYao0MWg5i9aBTctpl/ivu
-         BQSGw3C6rNjz5PnC4//uLi7bMSUO5JMXTqNvgN5wpKNv4eLARf6mvtNwXYVLh4Xc+WC2
-         e6L7ROE81yCDYLVemfFWtmiTZyhH52EgGs6s7zgVZOAbLCOUcodjUA9MDslg9uQcBJSB
-         egYQ==
+        b=afKxIRX0hkpLw/jDhAWlYtiiWDQLLzsRkYQGA3oWk/wsG4FNRAKdO6KRdrzIHB8V/r
+         AM0GZ6+DKdbUP9jtGj627QkgDRvnPleqGt0/sOhnY+cPBrBSLGWVT23PRSGjykqTpdUu
+         QAcbEUmd+NjSgwLBzTFA+8Uh3seUHbIH+llfNIuY5tqyIwpVWC5ag+T0ErEY242AJrM2
+         ksHOWBZjzcaBKMxLHlK4a1ll7aUH7f6C6bBkncfTA1+1O9JCcs/Ru7TWEjoKp5idfSoH
+         T5D+ugWV8FV5748J+35Le/WKica+oRAvlgzmn3wJeugJPXg4gwYf0exTA1k9wjLkk1ON
+         M+uQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=HNwPRT26lkwvhqgnuQm7jDLq4NRWV0QtCBubhLBxY0M=;
-        fh=6aAC8ffY0/zFaam/d8UYqNXU0LtY0My9jRDsyo1Ka48=;
-        b=cBNJaV5mONxLyE/d9fFIZvaR5HSGKTk4U8J2qUUHJiRZESVme0oD4JpMVz5KurN7Hu
-         yZm856tWURLyx92MgyPWQ42jNf6BIzgtGS+CW2XJppffUWws4hCDlpxohbDC4WAbnaja
-         iUDZbtZXJz778k8JuclJp4AHy6FRBYJOsurgSk0yn004zyIMkXUFsi/nADRXOGsuejeU
-         ejFF6uyBMnKD/5ETmGSrxt+CDZI2Qpla+/N9wrqq0QgupdLbBCaereSVmyNrJMs+ywPL
-         2FfsNgiXLB3dH9P8l1zPak2J1BqclJPou8CaEX0knw+mg680+UlqQSFMYJF/XOkBI6VS
-         DteA==;
+        bh=TjL+u1sCdOP3YhPAEfgmMIqLhjjQgHUqk+pTdwOF/9U=;
+        fh=PpyYAz9Cfh9BLERj5zy9O1zgN07tXWw6mT4azTeXLhg=;
+        b=FxvEvRON836OTCcyl2JmEqIqyeoE1W1dto+kn77FM0v5DZa/YjCPhgvq3oO2X3hheM
+         x5DJjLRwt8rLx0Q12ZxeMaMjI2LCDi1Hmcf5Nm91BPOxk1DtZ2sBs51ii/b7fQT92SM1
+         JzGE8tfJe0d30dtVac8yVF8pKmLTzb8RYX9yInW5zRicFHj2XJLWy6Fl2EiYWZPJsvSt
+         7uD4FLMtZL8bKMAsmW9I3VwDOQQKM8n5L1hp4VUZTo5WGNO5QerLARX0FKeowxEKZ9PV
+         fcglVaTuj7Jkoj+4qwN/vO7tmaJn4k1GnaByE0BbRHaR+9HXbMC9cPyzTvrE+qUrcE3H
+         uG0w==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771367678; x=1771972478; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771369583; x=1771974383; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HNwPRT26lkwvhqgnuQm7jDLq4NRWV0QtCBubhLBxY0M=;
-        b=On51LtDsiYEnRHIbGC1nqkJg1f75HGEDloc1VW8Fb1NVBjZe/B6upqVL+xxPX3Yq0H
-         5mLAIAG9mzU3TpAXVM7fhFTIB69A4gSnFYdM5SomIT8/B3tXtTn4dYQcNVh+BOMg990d
-         SN9DF0uI1v3HVHHVCCAnbrNumy+tbTn0WALyBthXcvcfUPwRCJpoiFC7ALAqh2sjNJJ9
-         V+4xTiJeeYXzCoLCmLlUfRiN0eHec99gnw7CiqwOjxAW1HYZB4v/CuoyZCUe7DFK1Tsg
-         7G+cFjRvf1BzTGJSm9S+jIH5jGExYaOLICLhdzt7OD0tLmewvjj8c9abiuAOZIRLfhzA
-         IApw==
+        bh=TjL+u1sCdOP3YhPAEfgmMIqLhjjQgHUqk+pTdwOF/9U=;
+        b=clyV6haTtNv2LSXxUYA8spIdzPk/3xhXMR+JscDGbUyhC7bDmZa6iThF0qf4tA7ZNB
+         yKFfkIKT00/xoJs8IDBT5tPlmr8hLPlB2gan/zBC0lr08wEw/CEFqaVTXbAHcTHfq70d
+         tibARQ7ON0/poPUQADY51xldnclLxJIkxM5IbnB/QGW4xbFfTJtzBycjH+v7YUbVu9s8
+         rrYbaC5ycfDFNVaCSY8ejJlyzxcIfEU4WAtUX+OUdYFiHvToNQZAmvORVheoqxXSBLd1
+         AjzUHo0CZbNjsgoDnd3JfZvCmvf7y50M+F3bDMhqacPUuojXDcB7BaObnqdsWnSB6v5D
+         0UnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771367678; x=1771972478;
+        d=1e100.net; s=20230601; t=1771369583; x=1771974383;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=HNwPRT26lkwvhqgnuQm7jDLq4NRWV0QtCBubhLBxY0M=;
-        b=cnGkfq/Z43SSCcKYpvI34K8acZGbfyoaZ8f8Cb2DEcWnJoWF9LJUj+cO05sUsH3n/4
-         Q0v1LitW/I1oFd7G+YEZ+t1gWU9TzFFb0D3wnl5K0+AFSaVkzF/RcwAbh+TwhR8bsppB
-         ORrbFX2HtWJSoc5MHuulRBLMDf14TWUZ5tyyFJhxfcSjMOV1EoDAvejWI3iTs/lh8Dq5
-         cxrdnHNGUihMWbK9m8ng8YBm+wRElx3fjHijUuszbQhIObo2McmmDRMLhUVkC7yEFwfO
-         JjoYUGdUHTO21lQdwLE68UXiqK7J3NkIuFO4ZlVZ14rSWdii1P/DEQF3HBq362/MKKvM
-         GkSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlsiHPK3Z+1maqJXzTQ29tzlhu0FxgTa813n7+2J2BGyffXZvtL/YHM7Ng1Zr5J8h8kG2QJGJigd9H@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbJb1p+Bn9TJB/i90VZqFzRm2TVn7Bq0oWpoJkDZa+OuQrxMS+
-	yMcgulhRxtR6sGBERYU+ud76hJL3SCbWV5ZFsjss2OPp5sGgj4rTrfc8fPQCLV/lE/PkslzSTG9
-	Svqcl5qPWtVyobpODZvaGW8BnGWFAEUY=
-X-Gm-Gg: AZuq6aIKN4cB//m26xgZwpVRz1uJT8b500ORRnBYteicGZ7cUBKw76rpa/stio3mP0t
-	rldOZYCe8vZLU5kt6q15IBh7jKf3omHjfqb34bDQiCGcYEPl6dZR0ZEM9iL8IfDX6QaWv8zN8eL
-	px8oft4OCy2LUtFgtoMBwQk0U1xiQH1AhQGkNXxDiEl16dTSlwy4Z1QVSZTH1TtB4ciQYmTygb+
-	0hsnaM3josvA93/q3NTwoYenvgRm+v5Ik6MDKtdvN/LtN26oy4UtHjcNT4rxR7pMtpMgUEXhT6X
-	WC0gTmIAQRjFxLfAbBNtm0fl/JKx4MsVDuO6n6BelZFNiFux08JXYSVksSF4nkUZpogQGr7Xr3E
-	Kyani8k2U9LIf0ZcJmWsyt0vmgiD9SOkXqkudC6dHt8i3Wv3XhEpVNHuJXwqNIHLzpI+/c1QBKE
-	/JckD72ta+lQeyACsZpmgT6A==
-X-Received: by 2002:a05:6214:1cc4:b0:894:6510:4946 with SMTP id
- 6a1803df08f44-8973488141amr226640436d6.10.1771367678229; Tue, 17 Feb 2026
- 14:34:38 -0800 (PST)
+        bh=TjL+u1sCdOP3YhPAEfgmMIqLhjjQgHUqk+pTdwOF/9U=;
+        b=lXbJIuE6aQOiMNZg7rltajcQDQe1Qdn7YtXMNW5VVYoY9FeyPEa4rJ2ft/aaCEWrOe
+         3Cl6O4kxlE9MJZHDIFMeSye+5I46Q6uF2MwyOoXYOPufgHpQb3ur2G6ImCYI2bwZ0xTb
+         n39ueVl/hQYR3Szf7mIylc3NcLH6o7jqgKnnUnMtmjNltr2d6SWGjnHInltaBYHnSEoB
+         XRxjc4OpkzmIr/SUaL9swKLInvgtWVV2zTi6jQcrPtFnNOfKhMf1F9vZd+hAalV7pWKi
+         RsDr1r9tYS/9vjHy4hxEwaXRLulbIvT71yB5yEB1BKn9TYkCooINax6lVzi6Yf0bZjy+
+         eTDQ==
+X-Gm-Message-State: AOJu0YwbtSUWUXT8XUOudchFQqfBFf6aIqMyopKKxu/5aCvKZ/9mqDU+
+	xlIhbgh9UERtTVVngEh4ybJMggWn5Q4k5SBH5ZbDETVjFU3G+qK0inv3VLxBJbOheWj8LZ3DJW9
+	SjNbefyVTsY694etZVo7Fl8Q+CXOrTgrG2oLd
+X-Gm-Gg: AZuq6aKAQ7dvZVX2nZu/nBQkNIN4C0D+/1gIwefC/Vj3tLGX9jw95ULy7yMwIa0jzPG
+	5wpBn97IcAbEhjVeIuzlmggsQLhsA6SiuRj69/SXnDtt38ZMpkuAHEvUkKMMoGE4ptmFdr/1vKI
+	8nhkn7WTeYC2u1d6fNKREG0AayvRome9qcIjWtcATlxXgU+tmsWezAz+P1Ovre1vKHrShJTEPAF
+	PLxuqlvqR6/ZzuqRMRnBPMc6tbU1WimqgHZ4v3qe3+6JjnFBaCv2/9b399Lc7QHnkqirZvBwP9r
+	Cqz+w9t2ZRhAEmoYNRiejsfyIBOWdCn8ilTv8ou1pcRQyj2jj+u04habA6NY6krKL3DW/quW+3S
+	H8OzrjJI3JCChLL1s6d+ntFvoogU2GIvH1ngl/Rf6BGktMTIqkkiHCOxcPwMKxAe/tXh/UhTUgN
+	MSe3AWJ1/qcHueDzyAiy1dXA==
+X-Received: by 2002:a05:6214:20a9:b0:897:277:d04b with SMTP id
+ 6a1803df08f44-89736249dd0mr209928596d6.57.1771369582641; Tue, 17 Feb 2026
+ 15:06:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1770311507.git.metze@samba.org> <CAKYAXd_CqpqXnh+k19NVdgQdDAnp6k5NbPqcyd0anocBJrGd_Q@mail.gmail.com>
- <7140153c-7858-474b-abe5-aee69bd196a2@samba.org> <d5d0ff21-83ed-44b9-bd3c-3cf3d2b14fc2@samba.org>
- <CAKYAXd-vGej9K53-06iy+p6nVSDLuwVU_+41R=7EUfbTjx=O5Q@mail.gmail.com>
- <CAH2r5muf=Th_AbA7SZaQKApyvr81FMB8WF-5yZ3ihzap1swQWg@mail.gmail.com>
- <98d25ce1-1f1a-4517-89f0-8956bffaf9d3@samba.org> <CAH2r5mswN8W652Br4QQTzhtDXtXKvqea=dWVfUFF+xDYfOx6HA@mail.gmail.com>
- <28d94c9f-b85e-4746-bb08-188090409682@samba.org> <CAH2r5mtA=DdpEiyqspNG3eoyjkGajnEwoRnOyXyBimDtCND9ig@mail.gmail.com>
- <c5aef237-2a12-4be5-b917-de502780be85@samba.org> <CAH2r5msAAN-EgOmRnoO7R4RPu2suNr+mgk5c5JAj9b-_kjwymg@mail.gmail.com>
- <237aa80d-8bd2-4dad-9975-85e11e2bf1fd@samba.org> <CAH2r5ms2EYJMm+764mJ2nLZRBz2R7+5LAeKfxZ1mb13uSSoYiw@mail.gmail.com>
- <CAH2r5mvmLYjJnxZmH3Mdawpk97Os7Zk9t_m=FrVOAXALNTw7hw@mail.gmail.com> <880038e4-f339-496a-8845-f7d3a7f3b5c5@samba.org>
-In-Reply-To: <880038e4-f339-496a-8845-f7d3a7f3b5c5@samba.org>
+References: <aYx6-kjK8mJ6cKSB@4c764e5e3841>
+In-Reply-To: <aYx6-kjK8mJ6cKSB@4c764e5e3841>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 17 Feb 2026 16:34:26 -0600
-X-Gm-Features: AaiRm50kh9SlPDfouIqUIQvY2jJ7WJ9_ts9X0zFgonbf9ZfhV4Wca-jZ7MILeRY
-Message-ID: <CAH2r5mu28FLAwcS9=ej21enwo3aAYWsLCEvNGDc66p1p9Y0P7g@mail.gmail.com>
-Subject: Re: [PATCH v5 000/144] smb: smbdirect/client/server: moving to common
- functions and smbdirect.ko
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, David Howells <dhowells@redhat.com>, 
-	Paulo Alcantara <pc@manguebit.org>, Tom Talpey <tom@talpey.com>, CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>, Arnd Bergmann <arnd@kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
+Date: Tue, 17 Feb 2026 17:06:11 -0600
+X-Gm-Features: AaiRm536Sontdm51bKCfu-AnbdPK3oFGpq6c_POtbshmcD1ox0ZDOFIbZv3-P_g
+Message-ID: <CAH2r5mtQr6X0nZvr8GiH6-VxQo9K-nRuejU+S=gjF5R9EGX1xw@mail.gmail.com>
+Subject: Re: [BUG] cifs-utils: mount.cifs.c/parse_options: const variable is
+ being modified
+To: Rudi Heitbaum <rudi@heitbaum.com>
+Cc: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 17, 2026 at 3:25=E2=80=AFAM Stefan Metzmacher <metze@samba.org>=
- wrote:
->
-> Am 17.02.26 um 03:16 schrieb Steve French:
-> > I noticed build warnings on two files when I build with your updated
-> > branch. See below:
-> >
-> >    CHECK   client/smbdirect.c
-> > client/smbdirect.c:97:1: error: bad integer constant expression
-> > client/smbdirect.c:97:1: error: static assertion failed:
-> > "MODULE_INFO(parmtype, ...) contains embedded NUL byte"
-> > client/smbdirect.c:98:1: error: bad integer constant expression
-> > client/smbdirect.c:98:1: error: static assertion failed:
-> > "MODULE_INFO(parm, ...) contains embedded NUL byte"
-> > client/smbdirect.c:104:1: error: bad integer constant expression
-> > client/smbdirect.c:104:1: error: static assertion failed:
-> > "MODULE_INFO(parmtype, ...) contains embedded NUL byte"
-> > client/smbdirect.c:105:1: error: bad integer constant expression
-> > client/smbdirect.c:105:1: error: static assertion failed:
-> > "MODULE_INFO(parm, ...) contains embedded NUL byte"
-> >    CC [M]  server/server.o
-> >    CHECK   server/server.c
-> > server/server.c:629:1: error: bad integer constant expression
-> > server/server.c:629:1: error: static assertion failed:
-> > "MODULE_INFO(author, ...) contains embedded NUL byte"
-> > server/server.c:630:1: error: bad integer constant expression
-> > server/server.c:630:1: error: static assertion failed:
-> > "MODULE_INFO(description, ...) contains embedded NUL byte"
-> > server/server.c:631:1: error: bad integer constant expression
-> > server/server.c:631:1: error: static assertion failed:
-> > "MODULE_INFO(license, ...) contains embedded NUL byte"
-> > server/server.c:632:1: error: bad integer constant expression
-> > server/server.c:632:1: error: static assertion failed:
-> > "MODULE_INFO(softdep, ...) contains embedded NUL byte"
-> > server/server.c:633:1: error: bad integer constant expression
-> > server/server.c:633:1: error: static assertion failed:
-> > "MODULE_INFO(softdep, ...) contains embedded NUL byte"
-> > server/server.c:634:1: error: bad integer constant expression
-> > server/server.c:634:1: error: static assertion failed:
-> > "MODULE_INFO(softdep, ...) contains embedded NUL byte"
-> > server/server.c:635:1: error: bad integer constant expression
-> > server/server.c:635:1: error: static assertion failed:
-> > "MODULE_INFO(softdep, ...) contains embedded NUL byte"
-> > server/server.c:636:1: error: bad integer constant expression
-> > server/server.c:636:1: error: static assertion failed:
-> > "MODULE_INFO(softdep, ...) contains embedded NUL byte"
-> > server/server.c:637:1: error: bad integer constant expression
-> > server/server.c:637:1: error: static assertion failed:
-> > "MODULE_INFO(softdep, ...) contains embedded NUL byte"
-> > server/server.c:638:1: error: bad integer constant expression
-> > server/server.c:638:1: error: static assertion failed:
-> > "MODULE_INFO(softdep, ...) contains embedded NUL byte"
->
-> I didn't change any MODULE_INFO() code, I guess it also happens
-> without my patches?
->
-> I saw something similar with MODULE_LICENSE and maybe MODULE_DESCRIPTION
-> in the 6.19 merge windows.
->
-> And it was a bug in sparse.
->
-> I updated the version I use to this commit:
-> https://git.kernel.org/pub/scm/linux/kernel/git/viro/sparse.git/commit/?i=
-d=3D2634e39bf02697a18fece057208150362c985992
-> which is one above https://git.kernel.org/pub/scm/devel/sparse/sparse.git=
-/
+I don't see this warning on my Ubuntu test system which seems to be
+current for glibc
 
-Good catch - you were right it is a bug in sparse tool, not something
-you changed (I had to upgrade sparse since it wasn't getting run for
-the last few days due to requiring an upgrade).   I added the fix from
-Al which fixed the incorrect warning.
+               Ubuntu GLIBC 2.42-0ubuntu3.1) 2.42
+
+Are you using a newer GLIBC?  Do you want to submit a patch to fix
+this (does an explicit cast fix it?)?
+
+By the way, I didn't see your original email since gmail routed it to
+spam for some reason
+
+On Wed, Feb 11, 2026 at 6:50=E2=80=AFAM Rudi Heitbaum <rudi@heitbaum.com> w=
+rote:
+>
+> In the mount.cifs.c/parse_options function - data is passed in as const
+> char*.
+>
+> strchr returns a warning that the const has been discarded since the
+> latest glibc / ISO C22.
+>
+> code in question is:
+>
+> https://git.samba.org/?p=3Dcifs-utils.git;a=3Dblob;f=3Dmount.cifs.c;h=3D1=
+92391360bcaa29de964b65f77f0bf93dea64be5;hb=3DHEAD#l888
+>
+> 889: next_keyword =3D strchr(data, ','); - returns a const
+> 890: *next_keyword++ =3D 0; - modifies a const
+>
+> 897: if ((equals =3D strchr(data, '=3D')) !=3D NULL) { - returns a const
+> 898: *equals =3D '\0'; - modifies a const
+>
+> The warnings are:
+>
+> ../mount.cifs.c: In function 'parse_options':
+> ../mount.cifs.c:889:30: warning: assignment discards 'const' qualifier fr=
+om pointer target type [-Wdiscarded-qualifiers]
+>   889 |                 next_keyword =3D strchr(data, ',');       /* BB h=
+andle sep=3D */
+>       |                              ^
+> ../mount.cifs.c:897:29: warning: assignment discards 'const' qualifier fr=
+om pointer target type [-Wdiscarded-qualifiers]
+>   897 |                 if ((equals =3D strchr(data, '=3D')) !=3D NULL) {
+>       |                             ^
+>
+> Regards
+> Rudi
+>
 
 
 --=20
