@@ -1,110 +1,126 @@
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052F119DF4F;
-	Wed, 18 Feb 2026 03:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53EE52F6928;
+	Wed, 18 Feb 2026 04:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771383653; cv=none; b=AiHUdoRKgy56BUzOpLdr6PDYCuOW3kPFByO0Ms7MK0tdO9QhW1C/QWwyhqk/rN9TfZa5vcmFJN3mWkg0/fmtWpWvLai+c1IuNrQopAInl4cpW2T6T/mNeD7gF8B+r17ifMmNs6h4O5LlLzvk2ugfqrEQ3eGtQp5rVDTvqJxkh3E=
+	t=1771388920; cv=none; b=VDqK+hd47p47tRqFbmsZ7qdGSIrwKU18j9wmwKMAiKwbR53sXIzDZ/mhsJLA+TQLcCp9ZmL0CwrSf2FGxbJ3+IKg1Y/NKSKM9fdG9eXjXgSynK7u2t1ZW/CS1BTAeItibZM/1iqEzCVEV1Lhl6wmLzTQC2EidDYrsAAKUYfxpV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771383653; c=relaxed/simple;
-	bh=RAAkTtc2W9BDVPW6YOz8VxRJYFKM7eMDfP9VRjrKpmg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oZvfHHw7w9SNTbZwnZcKtSk5rca8i1Cvax+PbWdSLLPU1F8mN9ARCzziScH3Gm94D/nvXxEygSADmtaZZFkaz9nZH0QBJ1hXvv8tDzRHgES2cQC6uTa/lr21PlmAq/RHZ7pSkoh0pGxS3peRwnotZVse6FtK2tc9mG3P0imBX4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyphar.com; spf=pass smtp.mailfrom=cyphar.com; dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b=IbkSmj7W; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyphar.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cyphar.com
+	s=arc-20240116; t=1771388920; c=relaxed/simple;
+	bh=iy6RL7DwhoHeBMOhkBhLnVCwrgpiHotFkB/zdfz+Y6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HXutxs50T4/G9EtZTzD5eUwONyWHxmUU4grKEWjTUvwme2bebK+N4tydtXP6WIc8HXpbkQANgoRI8aIACL8L5NK0KhFmqCOJIj6mHJvHmVtm+Pf2kb9FeiFgrIK2lB1ibX2/nh2vKzx7hljTxGuZ30XELRc+EwCeH32bpVQ2ME8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c7uCHhcx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b="IbkSmj7W"
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4fG1V55NWLz9sGX;
-	Wed, 18 Feb 2026 04:00:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyphar.com; s=MBO0001;
-	t=1771383645;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RAAkTtc2W9BDVPW6YOz8VxRJYFKM7eMDfP9VRjrKpmg=;
-	b=IbkSmj7Wf13fCJ5Dk2vIP+xk/chtVjpODXk038uHEQN3+mZDJt99XDRcbXsKA8qaX1oFqX
-	ZrGbIwM2zYJAIb4BZ8MnwYnstULz7GoCKpnuXhTLx3hQ2zoOFwFfNxyay3I8x3q/VzmQtz
-	Sfx5sRiBOr8N+jdCMNBhD6NqcoyJCkr5Z69PcPNk9XiyZYnflfKLHWYXCpTJIh1I/W0tSv
-	DzqpvjV3k+kUU50aAl9TssLP4QxaRTTaxO8vPaKxBj+rZYl2s/i6HXQmLzcwJbgghRfPH4
-	LjdnQwC4FFcFmBN2q8e0T9oEMBvX5q/nFLpRqzypGE+8wpFfIRDBfTMliQz6iw==
-Date: Wed, 18 Feb 2026 14:00:28 +1100
-From: Aleksa Sarai <cyphar@cyphar.com>
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
-	CIFS <linux-cifs@vger.kernel.org>, linux-nfs@vger.kernel.org, David Howells <dhowells@redhat.com>
-Subject: Re: [LSF/MM/BPF TOPIC] Support to split superblocks during remount
-Message-ID: <2026-02-17-grimy-washed-domes-aluminum-0HKtw9@cyphar.com>
-References: <CANT5p=orpQdzqxjNronnnKUo5HFGjuVwkwpjiGHQRmwh8es0Pw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c7uCHhcx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92964C19422;
+	Wed, 18 Feb 2026 04:28:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771388920;
+	bh=iy6RL7DwhoHeBMOhkBhLnVCwrgpiHotFkB/zdfz+Y6M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=c7uCHhcxEnJef71GWQ2x6eNHs7T5bJ0Ewl1BkCBKF8An7DjZYCaYgcKxdIwlXVGsF
+	 /im4EyDdtScphtv1HDTGDyyCaLW3mOSFksnbvrAKmT2k1F5W/t22b32pc56HC1ze1B
+	 U6XF8TgKwvF97rgbqnk3Sed+nNu2jYIPC7k5AZSZrFZsSMjHySkQsxMJdrPOjHcLpe
+	 e8cjbcmQQN6GFR1rJfSpFPPAvwYC6V2voBIp58IpLqdK9aNhYjMp/jNJ7IcQl3Ye42
+	 Ksg/Nq8KMSThXJBsGSBU5EQhhvEyWMOH+ooypkjbW33bDsO1k+qbslVfcYtgJoGwqF
+	 uAfwuxGd9UrBg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org,
+	linux-crypto@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH] smb: client: Compare MACs in constant time
+Date: Tue, 17 Feb 2026 20:27:02 -0800
+Message-ID: <20260218042702.67907-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="pqa547cvfgjehkdu"
-Content-Disposition: inline
-In-Reply-To: <CANT5p=orpQdzqxjNronnnKUo5HFGjuVwkwpjiGHQRmwh8es0Pw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
+To prevent timing attacks, MAC comparisons need to be constant-time.
+Replace the memcmp() with the correct function, crypto_memneq().
 
---pqa547cvfgjehkdu
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [LSF/MM/BPF TOPIC] Support to split superblocks during remount
-MIME-Version: 1.0
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ fs/smb/client/smb1encrypt.c   | 3 ++-
+ fs/smb/client/smb2transport.c | 4 +++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-On 2026-02-17, Shyam Prasad N <nspmangalore@gmail.com> wrote:
-> Filesystems today use sget/sget_fc at the time of mount to share
-> superblocks when possible to reuse resources. Often the reuse of
-> superblocks is a function of the mount options supplied. At the time
-> of umount, VFS handles the cleaning up of the superblock and only
-> notifies the filesystem when the last of those references is dropped.
->=20
-> Some mount options could change during remount, and remount is
-> associated with a mount point and not the superblock it uses. Ideally,
-> during remount, the mount API needs to provide the filesystem an
-> option to call sget to get a new superblock (that can also be shared)
-> and do a put_super on the old superblock.
->=20
-> I do realize that there are challenges here about how to transparently
-> failover resources (files, inodes, dentries etc) to the new
-> superblock. I would still like to understand if this is an idea worth
-> pursuing?
+diff --git a/fs/smb/client/smb1encrypt.c b/fs/smb/client/smb1encrypt.c
+index 0dbbce2431ff..bf10fdeeedca 100644
+--- a/fs/smb/client/smb1encrypt.c
++++ b/fs/smb/client/smb1encrypt.c
+@@ -9,10 +9,11 @@
+  *
+  */
+ 
+ #include <linux/fips.h>
+ #include <crypto/md5.h>
++#include <crypto/utils.h>
+ #include "cifsproto.h"
+ #include "smb1proto.h"
+ #include "cifs_debug.h"
+ 
+ /*
+@@ -129,11 +130,11 @@ int cifs_verify_signature(struct smb_rqst *rqst,
+ 		return rc;
+ 
+ /*	cifs_dump_mem("what we think it should be: ",
+ 		      what_we_think_sig_should_be, 16); */
+ 
+-	if (memcmp(server_response_sig, what_we_think_sig_should_be, 8))
++	if (crypto_memneq(server_response_sig, what_we_think_sig_should_be, 8))
+ 		return -EACCES;
+ 	else
+ 		return 0;
+ 
+ }
+diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+index 8b9000a83181..81be2b226e26 100644
+--- a/fs/smb/client/smb2transport.c
++++ b/fs/smb/client/smb2transport.c
+@@ -18,10 +18,11 @@
+ #include <asm/processor.h>
+ #include <linux/mempool.h>
+ #include <linux/highmem.h>
+ #include <crypto/aead.h>
+ #include <crypto/sha2.h>
++#include <crypto/utils.h>
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+ #include "smb2proto.h"
+ #include "cifs_debug.h"
+ #include "../common/smb2status.h"
+@@ -615,11 +616,12 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	rc = smb3_calc_signature(rqst, server, true);
+ 
+ 	if (rc)
+ 		return rc;
+ 
+-	if (memcmp(server_response_sig, shdr->Signature, SMB2_SIGNATURE_SIZE)) {
++	if (crypto_memneq(server_response_sig, shdr->Signature,
++			  SMB2_SIGNATURE_SIZE)) {
+ 		cifs_dbg(VFS, "sign fail cmd 0x%x message id 0x%llx\n",
+ 			shdr->Command, shdr->MessageId);
+ 		return -EACCES;
+ 	} else
+ 		return 0;
 
-I gave a talk at LPC 2025 about making the mount API more amenable to
-reporting these kinds of confusing behaviours with regards to mount
-options[1].
+base-commit: 2961f841b025fb234860bac26dfb7fa7cb0fb122
+-- 
+2.53.0
 
-It seems to me that doing this kind of splitting is far less preferable
-than providing a more robust mechanism to tell userspace about what
-exact mount flags were ignored (or were already applied). This has some
-other issues (as Christian explains during the discussion segment) but
-it seems like a more workable solution to me and is closer to what
-userspace would want.
-
-[1]: https://www.youtube.com/watch?v=3DNX5IzF6JXp0
-
---=20
-Aleksa Sarai
-https://www.cyphar.com/
-
---pqa547cvfgjehkdu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iJEEABYKADkWIQS2TklVsp+j1GPyqQYol/rSt+lEbwUCaZUrSBsUgAAAAAAEAA5t
-YW51MiwyLjUrMS4xMSwyLDIACgkQKJf60rfpRG8f/QEA15/2cBMkygIGKx2Hjfyk
-7m89DdDG2KyFmD6Eeut1ExMBANGkff6GqlCerOVrFrfPYtjptTxZFTGoGHYwlH/u
-sEoE
-=HK5O
------END PGP SIGNATURE-----
-
---pqa547cvfgjehkdu--
