@@ -1,63 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABE237AA8A;
-	Tue, 17 Feb 2026 23:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052F119DF4F;
+	Wed, 18 Feb 2026 03:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771372244; cv=none; b=fKYhaMexzRh+BEFaiwWU3MeoXmgqNAqZhUmD2JAmCh9SMayVgT6Zh+GQrEI9bX99ZdvV0HZ5xh1HEObaVMS+nCKJ1fHwrve3IdPt1hMvqKM5lGrpuA0qUkaewKmT3M23/4qUML710wK/KSuzj2hxEntW9VEYaD8U2/McHM5y07w=
+	t=1771383653; cv=none; b=AiHUdoRKgy56BUzOpLdr6PDYCuOW3kPFByO0Ms7MK0tdO9QhW1C/QWwyhqk/rN9TfZa5vcmFJN3mWkg0/fmtWpWvLai+c1IuNrQopAInl4cpW2T6T/mNeD7gF8B+r17ifMmNs6h4O5LlLzvk2ugfqrEQ3eGtQp5rVDTvqJxkh3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771372244; c=relaxed/simple;
-	bh=D9zP7d0RTQdaIIhB1LVs0zK2GiB7/NoW6y5OPasgLfI=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=U+Tc4+8CEy3a3jNTHyKNOG4Jjs6n23xp7+RLZNzXDC7kGzNDb93crzTp5/EJ3Zb5UFS497Wj9Yp30OvsrDljfisnrE4GUTKg28OZ7P8Si0+YPRIQ9UgJrTcQo1Y8f//QWSi3C7TQsyf8XIwpf8XZUWwDFMiukjOdfTY/i8jSrPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vN5mw+XV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771383653; c=relaxed/simple;
+	bh=RAAkTtc2W9BDVPW6YOz8VxRJYFKM7eMDfP9VRjrKpmg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oZvfHHw7w9SNTbZwnZcKtSk5rca8i1Cvax+PbWdSLLPU1F8mN9ARCzziScH3Gm94D/nvXxEygSADmtaZZFkaz9nZH0QBJ1hXvv8tDzRHgES2cQC6uTa/lr21PlmAq/RHZ7pSkoh0pGxS3peRwnotZVse6FtK2tc9mG3P0imBX4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyphar.com; spf=pass smtp.mailfrom=cyphar.com; dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b=IbkSmj7W; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyphar.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cyphar.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vN5mw+XV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B49EC4CEF7;
-	Tue, 17 Feb 2026 23:50:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771372244;
-	bh=D9zP7d0RTQdaIIhB1LVs0zK2GiB7/NoW6y5OPasgLfI=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=vN5mw+XV7wVuIhpLAEyG1uvIPC1gdjgQTg8IQVD4gnO/aPv+YciwpWApUnjE+zdai
-	 /3TonvdRZiOCAuNuVz28duNuKi8Uft1nkSFOcdwk9Cw9ASh8Cm086RhOsmEOzMut06
-	 SkGWT71OjSRnyeGk1l4nnEFAVlBqsO2AlkJjFVHcvzg66m8LFFVwg0XurCJiw//IqB
-	 pKWW/fzqolV4nmkwf91UzR6H+Au6c8F9HnJWFips2feWzh3RMluBpfYHiUABa5syzd
-	 51CvXTKo6UvZnaEc6v9+3QtYF1V+7UL7mOOKf7KM8au1EfK4aJ7kai0CWZEeiVtkUS
-	 ytcZ4CpSnOSgA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0D5B93806667;
-	Tue, 17 Feb 2026 23:50:37 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mt+WBNhuWCOym8zPCfBFpxfoDF9O0gT0dbgt9q-ZJfxAQ@mail.gmail.com>
-References: <CAH2r5mt+WBNhuWCOym8zPCfBFpxfoDF9O0gT0dbgt9q-ZJfxAQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mt+WBNhuWCOym8zPCfBFpxfoDF9O0gT0dbgt9q-ZJfxAQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v7.0-rc-part2-smb3-client-fixes
-X-PR-Tracked-Commit-Id: dc96f01d54cc7c785c98ee6e2b53075949ac16ed
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 1d22968feb2095136dd5f03aae2832a6b6aa6628
-Message-Id: <177137223591.738845.7058411465728163932.pr-tracker-bot@kernel.org>
-Date: Tue, 17 Feb 2026 23:50:35 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b="IbkSmj7W"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4fG1V55NWLz9sGX;
+	Wed, 18 Feb 2026 04:00:45 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyphar.com; s=MBO0001;
+	t=1771383645;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RAAkTtc2W9BDVPW6YOz8VxRJYFKM7eMDfP9VRjrKpmg=;
+	b=IbkSmj7Wf13fCJ5Dk2vIP+xk/chtVjpODXk038uHEQN3+mZDJt99XDRcbXsKA8qaX1oFqX
+	ZrGbIwM2zYJAIb4BZ8MnwYnstULz7GoCKpnuXhTLx3hQ2zoOFwFfNxyay3I8x3q/VzmQtz
+	Sfx5sRiBOr8N+jdCMNBhD6NqcoyJCkr5Z69PcPNk9XiyZYnflfKLHWYXCpTJIh1I/W0tSv
+	DzqpvjV3k+kUU50aAl9TssLP4QxaRTTaxO8vPaKxBj+rZYl2s/i6HXQmLzcwJbgghRfPH4
+	LjdnQwC4FFcFmBN2q8e0T9oEMBvX5q/nFLpRqzypGE+8wpFfIRDBfTMliQz6iw==
+Date: Wed, 18 Feb 2026 14:00:28 +1100
+From: Aleksa Sarai <cyphar@cyphar.com>
+To: Shyam Prasad N <nspmangalore@gmail.com>
+Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>, linux-nfs@vger.kernel.org, David Howells <dhowells@redhat.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Support to split superblocks during remount
+Message-ID: <2026-02-17-grimy-washed-domes-aluminum-0HKtw9@cyphar.com>
+References: <CANT5p=orpQdzqxjNronnnKUo5HFGjuVwkwpjiGHQRmwh8es0Pw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pqa547cvfgjehkdu"
+Content-Disposition: inline
+In-Reply-To: <CANT5p=orpQdzqxjNronnnKUo5HFGjuVwkwpjiGHQRmwh8es0Pw@mail.gmail.com>
 
-The pull request you sent on Mon, 16 Feb 2026 22:54:52 -0600:
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/v7.0-rc-part2-smb3-client-fixes
+--pqa547cvfgjehkdu
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [LSF/MM/BPF TOPIC] Support to split superblocks during remount
+MIME-Version: 1.0
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/1d22968feb2095136dd5f03aae2832a6b6aa6628
+On 2026-02-17, Shyam Prasad N <nspmangalore@gmail.com> wrote:
+> Filesystems today use sget/sget_fc at the time of mount to share
+> superblocks when possible to reuse resources. Often the reuse of
+> superblocks is a function of the mount options supplied. At the time
+> of umount, VFS handles the cleaning up of the superblock and only
+> notifies the filesystem when the last of those references is dropped.
+>=20
+> Some mount options could change during remount, and remount is
+> associated with a mount point and not the superblock it uses. Ideally,
+> during remount, the mount API needs to provide the filesystem an
+> option to call sget to get a new superblock (that can also be shared)
+> and do a put_super on the old superblock.
+>=20
+> I do realize that there are challenges here about how to transparently
+> failover resources (files, inodes, dentries etc) to the new
+> superblock. I would still like to understand if this is an idea worth
+> pursuing?
 
-Thank you!
+I gave a talk at LPC 2025 about making the mount API more amenable to
+reporting these kinds of confusing behaviours with regards to mount
+options[1].
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+It seems to me that doing this kind of splitting is far less preferable
+than providing a more robust mechanism to tell userspace about what
+exact mount flags were ignored (or were already applied). This has some
+other issues (as Christian explains during the discussion segment) but
+it seems like a more workable solution to me and is closer to what
+userspace would want.
+
+[1]: https://www.youtube.com/watch?v=3DNX5IzF6JXp0
+
+--=20
+Aleksa Sarai
+https://www.cyphar.com/
+
+--pqa547cvfgjehkdu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iJEEABYKADkWIQS2TklVsp+j1GPyqQYol/rSt+lEbwUCaZUrSBsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMSwyLDIACgkQKJf60rfpRG8f/QEA15/2cBMkygIGKx2Hjfyk
+7m89DdDG2KyFmD6Eeut1ExMBANGkff6GqlCerOVrFrfPYtjptTxZFTGoGHYwlH/u
+sEoE
+=HK5O
+-----END PGP SIGNATURE-----
+
+--pqa547cvfgjehkdu--
