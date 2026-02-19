@@ -1,97 +1,84 @@
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF51A33D507;
-	Thu, 19 Feb 2026 11:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E0A2E62D9
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Feb 2026 11:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771498883; cv=none; b=s+P9/ig5ml93IIBMzZ4pPXiLKAbjnMhf7BARg+BypZH2f+Sr1sZ4QVo/8bGs52kbZCt47SUFwW79QFnoCbLb4i6fdasmeUJiVDU6o75tUak4MVfGwTHp/75YoBXis4oFgs2O5vHlYkRJNUMuQXcl7fEoaV2QgvtDJgeXegf/74I=
+	t=1771499126; cv=none; b=JSMxHE/An0W8pRknTPSRbzCQdsCZH5pfFcC285ENarIAwSHbv7zAAGIRRDn7NxPh9K2nS0ml8ZN1jSeIb44zKHtuMVOEMzt+GXCUFfACGu0xUpr7SEz9hoAEzSgVvnkqCtvSCh3Ml+iCIAJdYjjkXsVvT27ctrzSU9eXQypkuHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771498883; c=relaxed/simple;
-	bh=HoS2BTuNAHoMAcUY7XZu+2qmK3OILI+y5z/xFBzDr/8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FzYqSr/2xZgSmVnGlo8o1nOkDI/KogzUMNgRBgV93zn+qwJFkXcMnpn447G9W8O9uS5kkimvPfooJlWAou9dI9xrl6WWwLUfajC6H5AhDjKW5QBWqA8C0HnaQJLmRMVB54D/Byvrn49xSaIEsBebTRq1uvSro+6d6qCTWCtHbxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=cpId1vPc; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1771499126; c=relaxed/simple;
+	bh=RzmhYy1YRr6bYXScEiWZshagml89M/jfklX0W3SwmQ0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=s8shji4537F/i4sUjDrLTfh9QL0GIDUTK1PXM2KXqTKhx5BF1P5L25TcCSklDJ4Bo5d9Hsr0tYaSNZ/Blkt+VCFMO5s9g6l2g0Votw2CjiRwJ0gTIU4GdZyycBj4qFDkSig4yraNQxdC0KZPtTgBvHD1ghdBb3c5NVHASvRzqc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gpbtpYq2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="cpId1vPc"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=2zzN+9tLqwjQ+bn8xHkDPkcRVE1Cb1c3LsD64ID6TjU=;
-	t=1771498882; x=1772708482; b=cpId1vPcINH6jMlDTul5mtNRP9ul08Xv80KcJ46o6/2Osut
-	SJsBzOz69E/NZbxATz/ypB+8HDqSaNmvGVa1hc4XkRNoacywqW6DpRgBy4Pe+PGKlG04pPlgrfO0P
-	9KpLlDllBpMMF58CrvkvmKs1SzKhoqBgUBznWfqUMo4XJXWhs9iGH/DkYDvmDUSG6mFkG/RFUcwsn
-	fs6YtKg/IKEc39tC/u+kVeZy6CA1TQcaUz6z0yza/aTW3mzHw95BqvP9UJSRu7E3jqqqzKMACOTcl
-	lP5BgQME2t5j+pwxccZaeSusgCBiufT64bkKKSX8Q9YzmW9QKhk9GOu/pUvv30qg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1vt1mV-0000000D9fX-31Ja;
-	Thu, 19 Feb 2026 12:01:15 +0100
-Message-ID: <c62915b1956ee4c5d4bad9315f2bc44aeddbb9bc.camel@sipsolutions.net>
-Subject: Re: [PATCH 15/15] wifi: mac80211: Use AES-CMAC library in aes_s2v()
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A
- . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org, 
-	linux-wireless@vger.kernel.org
-Date: Thu, 19 Feb 2026 12:01:14 +0100
-In-Reply-To: <20260218213501.136844-16-ebiggers@kernel.org>
-References: <20260218213501.136844-1-ebiggers@kernel.org>
-	 <20260218213501.136844-16-ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gpbtpYq2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1771499124;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RzmhYy1YRr6bYXScEiWZshagml89M/jfklX0W3SwmQ0=;
+	b=gpbtpYq2GM8/JEQRIi4L5MwTwP1mVPMCU4gqdzuHGht/C4NUEImwN/dfsPtjVLJKMRrr4R
+	26zO9THlGc2MTiUQX2UWXXQvprUB50W0jEUUnbYPB8pM8a8mHv+03m/9qRcVIUtuh+VKxp
+	u+CTgsBbB61/6+NbnmjXZO14WQHEf48=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-186-nWpZEArGNse9g-kdbLVlmQ-1; Thu,
+ 19 Feb 2026 06:05:20 -0500
+X-MC-Unique: nWpZEArGNse9g-kdbLVlmQ-1
+X-Mimecast-MFC-AGG-ID: nWpZEArGNse9g-kdbLVlmQ_1771499119
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3635E18002E2;
+	Thu, 19 Feb 2026 11:05:19 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.45.225.173])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6371A1800361;
+	Thu, 19 Feb 2026 11:05:16 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAGypqWyDOfspVUMe3fm5bfQtC_wH2eEzRgppYvWUVDe1RHLy9Q@mail.gmail.com>
+References: <CAGypqWyDOfspVUMe3fm5bfQtC_wH2eEzRgppYvWUVDe1RHLy9Q@mail.gmail.com>
+To: Bharath SM <bharathsm.hsk@gmail.com>
+Cc: dhowells@redhat.com, Shyam Prasad N <sprasad@microsoft.com>,
+    Shyam Prasad <Shyam.Prasad@microsoft.com>,
+    Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Enzo Matsumiya <ematsumiya@suse.de>,
+    Henrique Carvalho <henrique.carvalho@suse.com>,
+    Bharath S M <bharathsm@microsoft.com>
+Subject: Re: [BUG] [~6.6 Kernel] Corruption when retrying encrypted sync writes
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1982282.1771499115.1@warthog.procyon.org.uk>
+Date: Thu, 19 Feb 2026 11:05:15 +0000
+Message-ID: <1982283.1771499115@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Wed, 2026-02-18 at 13:35 -0800, Eric Biggers wrote:
-> Now that AES-CMAC has a library API, convert aes_s2v() to use it instead
-> of a "cmac(aes)" crypto_shash.  The result is faster and simpler code.
->=20
-> It's also more reliable, since with the library the only step that can
-> fail is preparing the key.  In contrast, crypto_shash_digest(),
-> crypto_shash_init(), crypto_shash_update(), and crypto_shash_final()
-> could all fail and return an errno value.  aes_s2v() ignored these
-> errors, which was a bug.  So that bug is fixed as well.
->=20
-> As part of this, change the prototype of aes_s2v() to take the raw key
-> directly instead of a prepared key.  Its only two callers prepare a key
-> for each call, so it might as well be done directly in aes_s2v().
->=20
-> Since this removes the last dependency on the "cmac(aes)" crypto_shash
-> from mac80211, also remove the 'select CRYPTO_CMAC'.
->=20
+Bharath SM <bharathsm.hsk@gmail.com> wrote:
 
+> We are noticing a data corruption issue in kernels based on stable
+> 6.6.y. Especially, when a synchronous writes retried after a
+> connection reset.
+> ...
+> When SMB3 encryption is enabled, partial-page buffered writes hit the
+> synchronous write path in cifs_write_end()
 
+This is pre-netfslib, right?
 
-> -static int aes_s2v(struct crypto_shash *tfm,
-> +static int aes_s2v(const u8 *in_key, size_t key_len,
->  		   size_t num_elem, const u8 *addr[], size_t len[], u8 *v)
->  {
->  	u8 d[AES_BLOCK_SIZE], tmp[AES_BLOCK_SIZE] =3D {};
-> -	SHASH_DESC_ON_STACK(desc, tfm);
-> +	struct aes_cmac_key key;
-> +	struct aes_cmac_ctx ctx;
->  	size_t i;
-> +	int res;
-> =20
-> -	desc->tfm =3D tfm;
-> +	res =3D aes_cmac_preparekey(&key, in_key, key_len);
-> +	if (res)
-> +		return res;
+David
 
-Same here, maybe, technically, but also doesn't matter.
-
-Acked-by: Johannes Berg <johannes@sipsolutions.net>
-
-johannes
