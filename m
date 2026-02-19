@@ -1,182 +1,88 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316C32D3ECF
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Feb 2026 16:07:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771517269; cv=pass; b=Tci7N7oLmfl7cB8N+JQogeuM9qB7Y8Hqt2zk58CZmTNcpALloqnalgKSLXb6oJz91obJGrpdy5iuhxeNx9k8iMabE1yxGiykEO+MtkH5iwlxeciiVPYt2zmDmblkdHaEELCO2sFN4d7kidF378bTP+j5xdQMVfz/E3OyY+mRNbg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771517269; c=relaxed/simple;
-	bh=s33d5q8PF0qbSw8A373yA78fZ24lbbhVmFTFnEaTPvs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P3gRRNdf50hgjBeHqbI/sMaXXou2gFkYP9QZaslSEnbzVpQtKboZgDv/pwQmTfzZ5Zg20dBsZWaXebFQi+SE1PvdVnPe3UolAVtK4NQA3cobOur3Wdb/HHEotmWKz0bgWK4Nzp4dl4XYl1TfpJM/Zo0WAwsQ1oj2lOk0EM5M0Hw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SRJxstH7; arc=pass smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60EAE329363;
+	Thu, 19 Feb 2026 21:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771536373; cv=none; b=gZiJPqHylE1qBgDLLij3mZwCruzYEsmmU3chjRMcuP92/iiouBz8wXSPvbGDgwtDcW33RRbsPPOcIdtwrZ3upMtsk5HIX3yyYTHcBRqdrFpCv2ND3EG2qPSP2HZSNtYF7puOk+im9xv66gsmxdWi3n04lyf/YWoJzRC+pHc1yFQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771536373; c=relaxed/simple;
+	bh=k3eIOjmh31KGZ2V8juxtChJ2D5hufhrXBQDrTquxias=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rXRlFWsHqdy71k/5FwSDkdgDKcq9mHNLJrA5b//FGEy0l75QeF5zLY3Zktzldhl9PO3BeeTVbriDaWBsaUxwYMkxXL+goNgM06tMaQ5CfjwQlyt7K/ED0zeBV15x58m3rp5e0/jv0QceZMhK04we3yQ3zeMmc+8IuuOvmbUbP9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s8KM43Xh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SRJxstH7"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-897002b7576so13812786d6.3
-        for <linux-cifs@vger.kernel.org>; Thu, 19 Feb 2026 08:07:47 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771517267; cv=none;
-        d=google.com; s=arc-20240605;
-        b=VDbheIqrfMyFTvZhjyYRa4KINC2nrn3Pk0oKy/d3ZNcSPlkToRjwVQpFQTJJjH1xpG
-         79Rsu68Tx11a3QFgYGa2QmTRz6MlOo5Nae9SS9HhsSKgVui2X2O8wrPtlkkoSl4K6SJZ
-         JmW/YFHwBOUmUVwsW14yIBpJg8rUYjFB4ePO0/WIYtH1MfA5Z9V2RBlWrhFKiyXfK53F
-         mdiwlc90ggnRz6DezLsUKBdD/PU4MqEEd+qrVW70iCblGswFF6O4bNr0zrCJqLR9IHm7
-         uE/HmJeO9WR6ttctUwd4B94tPQtHXVYeI+5s2axsxMPb2uaW/70RhBeD386w1ybvpdlO
-         xAeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=87d7Hv2bQcpQQT95ywR2SjHEEcC7loTpsx1pjgmaVVw=;
-        fh=67tHa2+95eAmSJXjaXOR+X2vOxKGpB4VcyfjAEMgyoM=;
-        b=GaLTmsrPic8oBMV2NshKI8Hfg2qZIVcW4KuN0LIa1YFDFTc0CbXM6XK75oBtqQ/0z8
-         MO1jVSwG8wBo8kHYcg9QXn8omZ6011K4jHlstmNdmVo+lHuXhOrGx95RsKvvtLYMyI/r
-         cc+w8RBHDDlj2F2qsG+t0+XzQ6NShnjIJaXCh4R11cfuP1E4N6T52Tfac9BMR4roDd5n
-         c1H/byoUD1u5Ene5GSpXtxAqjdVWakx+jet4QyI85KFAePTvuJO+1+amdZNVQhuAL3In
-         aGfAowvd70AP71LFQRdlZJVsmjRPPMLHn3POyqSnF/GR0/2REN3194h2+X+D7YIjjsai
-         V5Mg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771517267; x=1772122067; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=87d7Hv2bQcpQQT95ywR2SjHEEcC7loTpsx1pjgmaVVw=;
-        b=SRJxstH7Smb3vjAS+oAeAcb9KpcnneY/wAlXnNdtqe58PC1RyjFTW8Rra7B3SROiEU
-         eFa5YxpuY9P8sXnKIDy4Nfz8R5DoEyLdH9vb2ohPzwAd/ZHxn5mKvSBydItK4+pDZ7VG
-         x63Sl5JnJ+/p7A1IZ+PQgEyrFnIZivc0L01klUbPv8ezJDNChIxdkYHirizKHQ/VmoQL
-         UKgRbMfnZaJDX6mmZBgrTkxdJhiqZ87YbpCoacdwyS6TKTr6UU99uPKl2cvjrmNOaMu+
-         vIbKce++Bz2w7a6R8aWxPPOcSfxi63+pIQ6gnlQ8XIHoIjNKq/mYl7K8Z+WSek/0VhQB
-         KdVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771517267; x=1772122067;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=87d7Hv2bQcpQQT95ywR2SjHEEcC7loTpsx1pjgmaVVw=;
-        b=ahgn/d9JNpsckB8ruTUMGJmdgpOuKhOCo5GtWM9Z3TxGajz5TimV5EH1Q2uhI2J1+r
-         HUz+U6CWlKOjeKqPGLsuFEV9a6uHUa3OFeQFg4udtArK4ThHKxei96bChhk8wCNQQX1E
-         MbydSh5jRum0M5/ZShAOEx7SNwdY7DRh+Pq23ilIlC8LRUimBz8f0+4wjPU3DCoGjOB+
-         geKCbZNDoZ24jCTvqxdn3a517RZ7MUbndThRhNGpHoM4SPV3bXxzMAk7Ace+dMzsi6mH
-         91j1U8ZU+2hM5a0N118g13hYEU5PUNnegnsd9lE+UeX5ts7Q3hEpOG39wOFp0VOE5/gc
-         j3Vg==
-X-Forwarded-Encrypted: i=1; AJvYcCWec/wJ1eQ4EmX2/TVfuQSt0NQtpcZWqX/b+wUISBJaROLroepJPCNTwCnjBjOe5MilIyc7xxLXr1pX@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPRRiJqOVcAyqVry0OBDL0yPMRxobtRZ4Kj7mre7aTI6mGFJWX
-	7k6aEb6KmjDaky9DjkSItSHuZio/RkYQv5FjSi0myBg0lyXj9F5Z7DmqLgnR0vM5D+LRUhTumML
-	9cMxxB6t65M+s+0GxhwHHkNASDw7DsDbS4g==
-X-Gm-Gg: AZuq6aJVUw4q1qVvp05QGYRfMTpY5ykfl2ARK77l8r87MOfb3HucOO+ioaRcX5YsAws
-	DbQSZXegx72FBJMQ/FZxYkZPg/F8v0pqQEECq203haelv9Moz+7qqgnDLorhP7plF4CZcN8mkDh
-	NGgsOhLpH26pCNqr1YKVSZa5TN5m56ILv6VGMwVNWJx+z7+9pvH1upRFukRZQc6LbG98IIINJkw
-	GMbkr989G+UmUjYlkmEAAa1IVp5DGSR74GBfH9XSM3LJ5aWUj7PtAvlGxLRmrO3b/b8H80hMneD
-	pdxdj7pixO55tVGCnalklS4YdQSCtUT3zzCv9qHH6BAf9Bu9vtleKweY/oRF+BIweTcmSEBtcAv
-	wZGD0SSxFdypwmyabZVEKTxS+gCb6xzMgUfLODV5atRP8+KC92g1qWAajhhK+FTfgz25UnUOdIY
-	OhIwfSRf2J3XL+PsIP7mFCAw==
-X-Received: by 2002:a05:6214:27cf:b0:896:fb19:97fe with SMTP id
- 6a1803df08f44-899580d934cmr78990826d6.51.1771517266665; Thu, 19 Feb 2026
- 08:07:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s8KM43Xh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5FF7C4CEF7;
+	Thu, 19 Feb 2026 21:26:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771536373;
+	bh=k3eIOjmh31KGZ2V8juxtChJ2D5hufhrXBQDrTquxias=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s8KM43XhU0arShApnLbNpQww9PEWG6/97TNtfrZH0HjUr+Z4brlGSTbbhezLDlMsp
+	 7jRtxA5Rb4YgrJdXftmRS7RSuHwZjfCEaShZ5FtoJ0qqtroxhhFs1/HQflZDllFqPo
+	 9nRUFgJP23iqKE7nTRZZ5tPo4o8sh6y7sVtPMyMLMxtHrHMDKpsI2kyWe1NJFem/hT
+	 XNDR9844+LCMGcGqyKi6tFGesrq2mhy6kfLQrVZLi0Y3wUY7qGNdWilcEnfwkN2cwy
+	 f2kW9UBgKQYQ+i4F9p5tDpmxIH8q86oGB2a2jQraPI0fjzf1YZxBUH6oNNqyKXrYL6
+	 ROaXgwKdprhpA==
+Date: Thu, 19 Feb 2026 13:26:11 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-wireless@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 03/15] crypto: arm64/aes - Fix 32-bit aes_mac_update()
+ arg treated as 64-bit
+Message-ID: <20260219212611.GA32578@quark>
+References: <20260218213501.136844-1-ebiggers@kernel.org>
+ <20260218213501.136844-4-ebiggers@kernel.org>
+ <21d30582-9cb2-4e7a-9aa8-36e16aa45ff9@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260120201822.2218308-1-henrique.carvalho@suse.com> <CANT5p=rWExftaNObvdueWpL97C0CEAUzx5G6cwKrd6ZhfjNRnw@mail.gmail.com>
-In-Reply-To: <CANT5p=rWExftaNObvdueWpL97C0CEAUzx5G6cwKrd6ZhfjNRnw@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 19 Feb 2026 10:07:34 -0600
-X-Gm-Features: AaiRm50629mCYVQ4fKsx1b9uoZ1uVJc2lUmJPx02X2HIpq5LQqTKMjQx6wupZXc
-Message-ID: <CAH2r5mtpPrbZazwSQfMQRjTauHC5zPv3e=NLAUpqY0pTyqDutA@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix cifs_pick_channel when channels are
- equally loaded
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: Henrique Carvalho <henrique.carvalho@suse.com>, sfrench@samba.org, pc@manguebit.org, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
-	bharathsm@microsoft.com, ematsumiya@suse.de, linux-cifs@vger.kernel.org, 
-	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <21d30582-9cb2-4e7a-9aa8-36e16aa45ff9@app.fastmail.com>
 
-merged into cifs-2.6.git for-next
+On Thu, Feb 19, 2026 at 10:23:39AM +0100, Ard Biesheuvel wrote:
+> On Wed, 18 Feb 2026, at 22:34, Eric Biggers wrote:
+> > Since the 'enc_after' argument to neon_aes_mac_update() and
+> > ce_aes_mac_update() has type 'int', it needs to be accessed using the
+> > corresponding 32-bit register, not the 64-bit register.  The upper half
+> > of the corresponding 64-bit register may contain garbage.
+> 
+> How could that happen? Setting the 32-bit alias of a GPR clears the upper half.
 
-On Wed, Jan 28, 2026 at 6:05=E2=80=AFAM Shyam Prasad N <nspmangalore@gmail.=
-com> wrote:
->
-> On Thu, Jan 22, 2026 at 8:13=E2=80=AFAM Henrique Carvalho
-> <henrique.carvalho@suse.com> wrote:
-> >
-> > cifs_pick_channel uses (start % chan_count) when channels are equally
-> > loaded, but that can return a channel that failed the eligibility
-> > checks.
-> >
-> > Drop the fallback and return the scan-selected channel instead. If none
-> > is eligible, keep the existing behavior of using the primary channel.
-> >
-> > Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
-> > ---
-> >  fs/smb/client/transport.c | 17 +++++++++--------
-> >  1 file changed, 9 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-> > index 75697f6d2566..26987f261850 100644
-> > --- a/fs/smb/client/transport.c
-> > +++ b/fs/smb/client/transport.c
-> > @@ -807,11 +807,16 @@ cifs_cancelled_callback(struct TCP_Server_Info *s=
-erver, struct mid_q_entry *mid)
-> >  }
-> >
-> >  /*
-> > - * Return a channel (master if none) of @ses that can be used to send
-> > - * regular requests.
-> > + * cifs_pick_channel - pick an eligible channel for network operations
-> >   *
-> > - * If we are currently binding a new channel (negprot/sess.setup),
-> > - * return the new incomplete channel.
-> > + * @ses: session reference
-> > + *
-> > + * Select an eligible channel (not terminating and not marked as needi=
-ng
-> > + * reconnect), preferring the least loaded one. If no eligible channel=
- is
-> > + * found, fall back to the primary channel (index 0).
-> > + *
-> > + * Return: TCP_Server_Info pointer for the chosen channel, or NULL if =
-@ses is
-> > + * NULL.
-> >   */
-> >  struct TCP_Server_Info *cifs_pick_channel(struct cifs_ses *ses)
-> >  {
-> > @@ -850,10 +855,6 @@ struct TCP_Server_Info *cifs_pick_channel(struct c=
-ifs_ses *ses)
-> >                         max_in_flight =3D server->in_flight;
-> >         }
-> >
-> > -       /* if all channels are equally loaded, fall back to round-robin=
- */
-> > -       if (min_in_flight =3D=3D max_in_flight)
-> > -               index =3D (uint)start % ses->chan_count;
-> > -
-> >         server =3D ses->chans[index].server;
-> >         spin_unlock(&ses->chan_lock);
-> >
-> > --
-> > 2.50.1
-> >
-> >
->
-> Had a discussion with Henrique in another email (couldn't find this
-> one initially).
-> Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
->
-> --
-> Regards,
-> Shyam
->
+The ABI doesn't guarantee that the upper 32 bits are cleared.  Try the
+following:
 
+void g(unsigned int a);
 
---=20
-Thanks,
+void f(unsigned long long a)
+{
+	g((unsigned int)a);
+}
 
-Steve
+Both gcc and clang generate code that simply tail-calls g(), leaving the
+upper 32 bits unchanged rather than zeroing them as per the cast:
+
+0000000000000000 <f>:
+       0: 14000000     	b	0x0 <f>
+
+So it's possible.  Now, it's certainly unlikely to happen in practice,
+as the real code doesn't use truncating casts like that, and the
+instructions that write to the 32-bit registers clear the upper 64 bits
+-- as you noted and as I've noted before in similar fixes (e.g.
+https://lore.kernel.org/r/20251102234209.62133-2-ebiggers@kernel.org/).
+
+So does it really matter?  Probably not.  However, given that the
+correct behavior wasn't *guaranteed*, I think that to be safe we should
+continue to consider patches like this to be bugfixes.
+
+- Eric
