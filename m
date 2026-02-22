@@ -1,35 +1,35 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531E91E7C03
-	for <linux-cifs@vger.kernel.org>; Sun, 22 Feb 2026 15:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFCF3D3B3
+	for <linux-cifs@vger.kernel.org>; Sun, 22 Feb 2026 15:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771773990; cv=none; b=aS2eIwxRDfZVD9dilocpnyR9/KQbDm1FnxfbU2HW6ULO1+LI9vI/BgpKvocu5exZVEbXBWSwoEfxrQl7ZXOE73PRinF0Hq/pvNET0AxWaLKl3/3IiepaBKmux/BwW0eYntP7br80mNOjc2IO/wkxfCPTn8g8U/FJrVl50Y4etUQ=
+	t=1771774966; cv=none; b=eDp3GZuDTnD22lQmrDKiXt40K6ntotnS9Jm/6Pn11ysE4WyJqgorcc19U1rPaA+VYOLmtgx7Gi00w4y1cy42sLSXna/9VMLKXii8qp3KFTYJtFj7q1V25F6Who7wKqvAwtr9b/aRtIBifQrv6jMPxzkpPzkhR3Mf3HVpsE+zUUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771773990; c=relaxed/simple;
-	bh=yncgU8v/ODnGI4L6Pj6IddrbJDF1Ty+AAigKvOvgaOU=;
+	s=arc-20240116; t=1771774966; c=relaxed/simple;
+	bh=EzG98uyqcabM0FwJWr60OtIfsMWBO6nWueWMXlAZ9qk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gzUN9mc8LTlfBGm6CGpB8jnhaF9NQFDK1wLsgyAOjFuhHCN7lSlWlVJayWBInbH2bc4jZHbKVr2ZGlux9OlYAgvSVpOAS9yw2lvIQ8JPCiDmiVjDRgguOTLw0lyDZsYaksktBojk1joKY8CvlMdqCZ47o11WHXrMw6Kp2yC6XbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=VRGMhveG; arc=none smtp.client-ip=91.218.175.178
+	 In-Reply-To:Content-Type; b=JLK3QfbA3Vik1YKElh7gZCkglRtYT1vGSqObycs8F/rxxWb1XRCbUaS/lfkYlfmSMHkB4+uiqmeBsQAxnQLQYg1+jNpL/V2INSnkJXjXSuqz/dKpswghamB5bdso+t6VEeGg+Ig5SYdR4uZVa1/0lAw+plxq4l5SOfoMGlSwANU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=nPis6mNq; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="VRGMhveG"
-Message-ID: <2b43ccf3-9b2b-4f9a-8cbf-4213b0cdc484@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="nPis6mNq"
+Message-ID: <9a8b5734-570d-4177-ba3d-14908bcc5e72@chenxiaosong.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1771773984;
+	s=key1; t=1771774959;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bs1T1utWZULGQhGcOdN4Gb6wDvkZ88NgeMhyhgjZjJc=;
-	b=VRGMhveGrIwSVYlmHEUMqmAq3dG6BJn6rcjm7sHOjKIuUPJw/bLUVigjwn1vorOlO7gOSB
-	Rl9tFnziaFFRcKmbEcl5CMf+aQj/4YR11AxXEOehcSWM7em5sd51024QrdU1204f74NCOp
-	TFjzHpuzq+/ry/jjK09iBZeo8TPYYthtLK9YjZiWP5z8P9hqAhjqBOun3qPyMrj7QE5Uz5
-	FH3mMN6SMI63Xkfco1YU0j78EGL+iwzStoys9tvy1+S+0iHjuG4zzAXMGCYwYneJ8VY+Wi
-	p14dqWqeqJK5NesLh7u3/RY0/1tGgyIZKOYFawqrOxgFjCt5LgLn+c7PdM/HQQ==
-Date: Sun, 22 Feb 2026 23:26:03 +0800
+	bh=gda0gR/QLNf6nK340Fj95V6nXzkAs+quC0bvkbNDac8=;
+	b=nPis6mNqzxbqwyd7O6Y6aX/hGauPSeDSa9e21Dz7kyxLeohQE9P/YEReEU99exJO+kwdcq
+	a5g3lhhFwWg0/Nmkoh3iBu6jNLR9u7WoX+geFK0vTv9u92ghf/iTiSSSXFEkOE9VTyXnx1
+	tRGmxywowQE5TCMe4hWOvvuX9cmRtGRuT7HKC7CwhllTDIv3sUp1o5uzJZPyZRCCESlFDm
+	giymRinZXIArFEo/oAQbiuaiA75xzBfHzu4ppI5aZh8zbAgnq4MtV3eaeJ+XY99uBCBE4R
+	tQUOISisOsbEG7uoZQTHZiYMoRMKvE0kex6HHR0BTNyJY5sGCMdIGEpKbvkxTA==
+Date: Sun, 22 Feb 2026 23:42:18 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -47,50 +47,23 @@ Cc: pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
 References: <20260216082018.156695-1-zhang.guodong@linux.dev>
  <CAKYAXd_MuUe9R4vnkmGEkWxG7endJFqGDiEprLcvgJDixakX2A@mail.gmail.com>
  <5481d68d-9864-457c-9589-3bfd4cb6a54d@chenxiaosong.com>
+ <2b43ccf3-9b2b-4f9a-8cbf-4213b0cdc484@chenxiaosong.com>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <5481d68d-9864-457c-9589-3bfd4cb6a54d@chenxiaosong.com>
+In-Reply-To: <2b43ccf3-9b2b-4f9a-8cbf-4213b0cdc484@chenxiaosong.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
-`num_subauth` is incremented by 1 at the end of `id_to_sid()`, so the 
-code is correct.
+By the way, when the client mount option specifies `posix`, it seems 
+that `parse_posix_ctxt()` is never executed, because the `struct 
+create_posix_rsp *posix` pointer passed to `smb2_parse_contexts()` is 
+always NULL.
 
 Thanks,
 ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 
-On 2026/2/22 15:39, ChenXiaoSong wrote:
-> Hi Namjae and Steve,
-> 
-> In server-side create_posix_rsp_buf(), there is the following comment:
-> 
->   * SidBuffer(44) contain two sids(Domain sid(28), UNIX group sid(16)).
->   * Domain sid(28) = revision(1) + num_subauth(1) + authority(6) +
->   *                  sub_auth(4 * 4(num_subauth)) + RID(4).
->   * UNIX group id(16) = revision(1) + num_subauth(1) + authority(6) +
->   *                     sub_auth(4 * 1(num_subauth)) + RID(4).
-> 
-> However, according to the SID description in the link below (Link[1]), 
-> the relative identifier (RID) seems to be the last subauth item 
-> (consistent with the client-side posix_info_sid_size()). Should we 
-> remove RID(4)? Please let me know if my understanding is incorrect.
-> 
-> Link[1]: 
-> https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers#sid-architecture
-> 
-> Thanks,
-> ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-> On 2026/2/20 09:27, Namjae Jeon wrote:
->>> ZhangGuoDong (5):
->>>    smb: move smb3_fs_vol_info into common/fscc.h
->>>    smb: move some definitions from common/smb2pdu.h into common/fscc.h
->>>    smb: move file_basic_info into common/fscc.h
->>>    smb: introduce struct create_posix_ctxt_rsp
->>>    smb: introduce struct file_posix_info
->> For patches 0004 and 0005, please move the complete definition to the
->> common header instead of a partial split. So we should also use a
->> flexible array member for this, and ensure that all related code is
->> updated to handle the flexible array correctly.
->> Thanks.
+On 2026/2/22 23:26, ChenXiaoSong wrote:
+> `num_subauth` is incremented by 1 at the end of `id_to_sid()`, so the 
+> code is correct.
