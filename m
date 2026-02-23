@@ -1,68 +1,103 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4279937881C
-	for <linux-cifs@vger.kernel.org>; Mon, 23 Feb 2026 21:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2EE33C52A;
+	Mon, 23 Feb 2026 21:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771881101; cv=none; b=Z2A0cPKu4rzYgTK92BF1Y990daIw/sPseYvAXe87Rd1yxErojuQrIuanHb/J3E8gXSkPNQq7RZSW4e+FeSZpmEa2qeZZfMC9vsaxhsikNW1K3n4/5krav5k7VmFw0vTviwvEeRxC1g3XwFhkAhAQ0XejliBwtCM/Cvx4kMO2ziQ=
+	t=1771882127; cv=none; b=I0HRYu6uH7/KOdZWnLr8UiDnp6yyYIuOPc30lLe6LnXOaUi7uVe26jye2oGkRAkRiA1T+ktSm8vHACAgX3BLCtFbfKRyPHaCgg7x40VEBe4XhHBcoRD2POrQP/vrFFEcu7LhZHGtRHoL9x4Bcn8D0uCi98GtjRMOEbNuq8hAbjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771881101; c=relaxed/simple;
-	bh=JGQ3fSO1WHuuw4xmkDzFAQnaYdLo7HDvhAjKWxtM8TA=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=U2H4NFAKYNyrRNjyPJeKcqrLDJdBKY3Cvj1Ucxljer8OJzE6kAD0+37lnPHZYo2v+XRFB+ywo3z/aW/E+WVOV1laa3aNxMoGJ0U6hPf+wixsjHsIURI70h4M0BopvpL4lsTFC97w/I9drE2PMdEQA01osvj356oHwwXrh6nm4us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=A5B8OhZt; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1771882127; c=relaxed/simple;
+	bh=6BWCpxN467P4dyN5eoO5k0IXEao0FX3AzWwouvG6AzY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rsWFQuQYT2ccErUT4gqVvug6yPkwzkeY5TNc2JL6mZo77wxtCNjsBSW4uC2BmXKUJ7eJyIdUoAwrDb1KkIntlv4AUZhoFpA1IB8xot4OnT3XKI6099XCrY9UxAKx7e7rCglTko9Jc/sVb/RG9reoRZWkxwNYC4lrVuWzrtXGQLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VQTSMin/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="A5B8OhZt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=nING/EBX3FGup9lRecZmmtiuOAkijwAQDBUItI7JuYc=; b=A5B8OhZtxjwrT5G99xnQXFtGnj
-	kkGhK0tUoAltL+p5PLf92hjYUmReQ04I16DqhMkHZXfmPzHA9/FrmVVhlt3/jbGwAGrhwU1evUdiD
-	VEMUKeO4hO3gJ1+3+8lAbhoMDfsV5b+Rh/iQm4DCThIlJpK7KAlDgdN60NKKJ6zyVhAwITacZ1Exm
-	S+Ff8F+v7Zm7kl9UvHGPcH2Wr7emCofqnGWNZBCD+XqzfCkA3l2lvsIPVLCUDL/yTg1F8V9eFSJ40
-	9AMhkMj2jM6aOxMUs9z9IaeJyQtw9RDZ4lnQVl2pTHANHRJAd0o1kV1BndEM5O9GTxKFW47cnuKHP
-	bxIwQRDg==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
-	id 1vudDD-00000000e6h-3Waw;
-	Mon, 23 Feb 2026 18:11:27 -0300
-Message-ID: <830a3b8b209e9e276da7ad9398f8711b@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: chenxiaosong.chenxiaosong@linux.dev, smfrench@gmail.com,
- linkinjeon@kernel.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
- dhowells@redhat.com, geert@linux-m68k.org
-Cc: linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: Re: [PATCH] smb/client: make SMB2 maperror KUnit tests a separate
- module
-In-Reply-To: <20260221080712.491144-1-chenxiaosong.chenxiaosong@linux.dev>
-References: <20260221080712.491144-1-chenxiaosong.chenxiaosong@linux.dev>
-Date: Mon, 23 Feb 2026 18:11:27 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VQTSMin/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 697D0C116C6;
+	Mon, 23 Feb 2026 21:28:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771882126;
+	bh=6BWCpxN467P4dyN5eoO5k0IXEao0FX3AzWwouvG6AzY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VQTSMin/rySHdNw1qv6QqInzrBz8ugXCsHyGhJzEBHqAJ79ihP31sS9Fh1wTaQf75
+	 ktJv7aJ6Z/B306tadSuT1z4nrJD4/AuPh2s0kxtomYtDEHd16vGjEskB14S+sjn0jB
+	 2IHv4vsjC+suPCFwtedKZVF0oAeIW/5mtTpwRHCBugAFAwgW1ogJ9ef3IVCAavuJzZ
+	 xvXkrheuicxBxL+LLJbvi4nzFJIEEo2Teoe5XTiH2hOwUWQ0ouqZ+lowj3/wFF36s3
+	 zm+1gMo+895d78oQljgJJ1zrD8etGyd+Z7wRsp+FbqOA3QR1cBnRxrhwlqdB3D5vPi
+	 jivuft6R2UJUQ==
+Date: Mon, 23 Feb 2026 13:28:44 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Subject: Re: [PATCH 00/15] AES-CMAC library
+Message-ID: <20260223212844.GA2132@quark>
+References: <20260218213501.136844-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260218213501.136844-1-ebiggers@kernel.org>
 
-chenxiaosong.chenxiaosong@linux.dev writes:
+On Wed, Feb 18, 2026 at 01:34:46PM -0800, Eric Biggers wrote:
+> This series can also be retrieved from:
+> 
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git aes-cmac-v1
+> 
+> This series adds support for AES CBC-based MACs to the crypto library,
+> specifically AES-CMAC, AES-XCBC-MAC, and AES-CBC-MAC.  The
+> implementation is fully optimized with the existing
+> architecture-optimized AES code, either single-block AES en/decryption
+> or arm64's neon_aes_mac_update() and ce_aes_mac_update().  As usual,
+> optimizations are now enabled by default as well.
+> 
+> AES-CMAC support will be useful for at least the SMB client and server,
+> and the bluetooth and mac80211 drivers.  Patches 8-15 convert these
+> users to use the crypto library API instead of crypto_shash, though
+> these patches will likely go in via subsystem trees later.  They result
+> in some significant simplifications and performance improvements.
+> 
+> As usual, a KUnit test suite, FIPS self-test, and traditional crypto API
+> wrapper algorithms are included as well.
+> 
+> Note that I'm also planning to add additional AES modes to the library.
+> This is just an initial set of AES modes to get things started.
+> Notably, with the SMB client and server already using the SHA* and MD5
+> libraries, "cmac(aes)" was the only remaining use of crypto_shash there.
+> So it makes sense to take care of that.
+> 
+> Eric Biggers (15):
+>   lib/crypto: aes: Add support for CBC-based MACs
+>   crypto: aes - Add cmac, xcbc, and cbcmac algorithms using library
+>   crypto: arm64/aes - Fix 32-bit aes_mac_update() arg treated as 64-bit
+>   lib/crypto: arm64/aes: Move assembly code for AES modes into libaes
+>   lib/crypto: arm64/aes: Migrate optimized CBC-based MACs into library
+>   lib/crypto: tests: Add KUnit tests for CBC-based MACs
+>   lib/crypto: aes: Add FIPS self-test for CMAC
+>   smb: client: Use AES-CMAC library for SMB3 signature calculation
+>   smb: client: Remove obsolete cmac(aes) allocation
+>   smb: client: Make generate_key() return void
+>   smb: client: Drop 'allocate_crypto' arg from smb*_calc_signature()
+>   ksmbd: Use AES-CMAC library for SMB3 signature calculation
+>   Bluetooth: SMP: Use AES-CMAC library API
+>   wifi: mac80211: Use AES-CMAC library in ieee80211_aes_cmac()
+>   wifi: mac80211: Use AES-CMAC library in aes_s2v()
 
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->
-> Build the SMB2 maperror KUnit tests as `smb2maperror_test.ko`.
->
-> Link: https://lore.kernel.org/linux-cifs/20260210081040.4156383-1-geert@linux-m68k.org/
-> Suggested-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> ---
->  fs/smb/client/Makefile            |  2 ++
->  fs/smb/client/smb2glob.h          | 12 ++++++++++++
->  fs/smb/client/smb2maperror.c      | 28 +++++++++++++++-------------
->  fs/smb/client/smb2maperror_test.c | 12 +++++++++---
->  4 files changed, 38 insertions(+), 16 deletions(-)
+Applied patches 1-7 and 14-15 to
+https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Patches 8-13 (smb client, smb server, and bluetooth) can go in via
+subsystem trees later.
+
+I edited "lib/crypto: arm64/aes: Move assembly code for AES modes into
+libaes" to update the file comments to remove the file paths.
+
+- Eric
