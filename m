@@ -1,158 +1,131 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970CD36683E
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Feb 2026 10:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771928696; cv=pass; b=VQdN4n4HkCwSQSNMjvh5ahYaRsqETGQe1283RuYa0sV89TxSpWJgtFT4/gzYWZmUdV/AGPaRC4KtMBsow43A6LmGceElPj3gKiKIbOQeH9AJgPgnZWT2aXauIrVuVpHgpWOteUMA4rTc4t95w+c+ya8Sbr94cjUgScgjRtfZGuk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771928696; c=relaxed/simple;
-	bh=hHRJy8QJuXqrZvRYe1s2e7pWgh0LxMfTN14cPF1l6/w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P2TDPhV9wze7rdDqqcL/4Uhx4VsHtfVxz9jCJyabOJHeK4LskscWPQEyg+B08YxiIq6I9xdK0wbMGKQ61oQIMUgCGsSeI2Aj3XQeghdXXv5ptEofEmO3MKdS9M/LyNmJ/+BdjqhVw+qM8LECy3ISPXIMYBUJeBIk/HuHpSFzKXE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MChaKYxW; arc=pass smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD9023EA83;
+	Tue, 24 Feb 2026 17:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771954239; cv=none; b=RjRZjcgK9TjA+SvRXXt20sdphBeOCDQb5Eb7MlCDh0zIqo2cDPM7iDXr9npWOTGrtTivay4xnzY/2cnw816JyEs8YocmHGBje9H71TW43B2kO5NA0daVXVHaImoQPxZXLKRwaUATcrKplCj+pU+D8UmsYbDpdbBSL1yDlCEWW5Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771954239; c=relaxed/simple;
+	bh=/gnHt29zu8QVhSKsTduQVCTxFtI94hREDZvkcYSekH4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CYSL7AN7BnmSB6ErN4rVngZpmHe5nia3SLWeHVs71MIOfzXpmc79nkkcDQqf6BTJQx8lfH7633VHWcUdLmRvhr+0PYxmwHSchgkAbMOOUL/6pl1I3RamEaKMukgP/m37fJKHewbzqWVy+ksJeR2DEeMGv8To4HFcxDT4YtDCzBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=saDX7/wI; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MChaKYxW"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-65f5bd5c8e3so773806a12.1
-        for <linux-cifs@vger.kernel.org>; Tue, 24 Feb 2026 02:24:55 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771928694; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FGehkqjw8T1jQuR2kZgxgelzoiy5raLv49svcz0RojFQ6MjmX3tW86EHL0fro3SNQS
-         11LgX/LM84RBlJVTL/J+USTcCes51SLkvPi6HHwj68GzBeYGGnoewB0b/w+KTh6BC6eZ
-         TV6s/yqLw2TL3tBDmvumE6eL9T83BNDoK7fx9rFIg5erDeQlvm2ORPmmpYJQ94TUAwX/
-         1XudKeD51m4idTHY4fBBAbom8cV5e1nDEkPnMFjXwbXu3FGBWFx4wN/ypg2mtfw5hu6P
-         fsB0s02oEXMUL30WPY+qCgNwE9ZOhDRmUSI51F4woSPAohHbb2LTnb8hXWGPLbqKZCHC
-         5FRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=R4CfP6ijHdd5S7Ck6QpALkZNQy7jw70n0RYyKMKxeBg=;
-        fh=dmmm9wkGT5qALgCl2eDs3QVBXibYNbe36DaZD6QixGk=;
-        b=gZhvTM1hqOAr+4nu8HvNK7iJkn7noQdTPbu4ayZyVl3vulff1/yyQ+3C8gVcAggsTl
-         P7AJxWBr4Xjgq8A72FWRpVMHQg5BzA8snYDrh8DQ6/I9PjmIHbddv7XaeF7UltJJPzM7
-         ulXS5NGkqdrLL5GdHyEmQd29rAG3mtcECEmE0/uTKbUlUY1zLBFxDZIVgDSTB6+i3RH3
-         Ka4RhQxwjMwtLzfeIf+3UKrDT+mOsi2KzCFydOGnnx/s6ykPOS0d9JwGrjDvD4lTSP5x
-         fWAEXfrvFmLP1dFqJLFLo73DgDoBq3Mo9moLgbF3mLcBBEcBSxD4E6U1PfKq7T/Q7V8L
-         isxg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771928694; x=1772533494; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R4CfP6ijHdd5S7Ck6QpALkZNQy7jw70n0RYyKMKxeBg=;
-        b=MChaKYxWvD+DZlEUZHvsI5mLm5EpSg1ddwUMmGClKk5+7mOWr0YwhCy2KJSflhFQYR
-         +d+KHhkDKi9kCl6afnU1ilBRws0fBmZmNBPo/EsPCJ/c2UbUJFpQI+5aYObhN6pGo9gD
-         CtypBg9If3bVDqJcbqCJjW6ymIJJLHkhCHMHe8Qs6rLZrSpYL3Nplxcn3OH8+jUr25kI
-         WeDzG8yTRbMDSiUD0b5URHmZnxqE+YllpX4S+3nP4cd4zRlYo6ToCH+mSJ/X1IW2QT3a
-         LJP5HdmauhUvgYH/bgElNAnrLRz/2mxp/cVF6Bq0+TlllmQDpEDKT0ifOg/ZJNn9mvL7
-         dGvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771928694; x=1772533494;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=R4CfP6ijHdd5S7Ck6QpALkZNQy7jw70n0RYyKMKxeBg=;
-        b=B9lDERRQdX9SU6ch7H8TLi8tzuaSiUZNbzlPmlQkuB4sGdj73aLtRxRFRGKQG+uYWx
-         iHwDb3ClK4U1MK+Scf2rBs3zMZ6StC3YF0wqYdqYFM9SY5TYRgSO3zIWkE3KWUsOyHjL
-         +q/bte3RLI8sLawGYGTbj3I7UtLds55RjKHERWrqmBnxGBkYE+q5kziC+qWuffF4dtp9
-         s8gIZrIw2KcRbVU8qeA6FWccaJBxQ4nZQUeRz85PfIoByZIH/Krpa5Q4p8vmSIgS5Pkd
-         w2zYyydOBZ2oS2hDa9NFFtT7Q5Ei0pIABd8YLc+yiyW3AyMzAEhweld/GwdfQ9KM4vQA
-         TBvg==
-X-Forwarded-Encrypted: i=1; AJvYcCVpk6v8YXFyNoz0ptg+ylBxCMumxjzNZBjGRKUgYV/tXuorY89DEhQFMxqGAkRcHEBR8AwRsy8JCts/@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXf5IZv30+tV67+V5DYoQbuqRmW/kH9adZzdvZ1XhynON8U7Ea
-	8hKRG9vlQKG/M5GfsD2zMeUYOMDM2oZes7cQrSzf0cV2tyJMWD/RIComaTxp/KJxdG43ZKr7O4e
-	Ev7EsUq0K1bzTldCuiAhiOnNW1VBMrKI=
-X-Gm-Gg: ATEYQzwauzyyWBVAsZlOFw6K5GsJJ6s8xTUYayuh/g5sAR9Pz5s2iBVA1ZSi2/UJB3+
-	Yc0piiu7ftx8h/+PFEJtQKw8QAnaWDwEvGM/J54kXh4miE/ck9pMdw2dRKAcc3B1e5KPAaCS5w/
-	XnU6HHKhKS/Rsc2p/Y+GnwxFNqPqQdmw6ZHjDJtwTQcp/VnwPJPsyPyfdDWYZgsjGgd1YTzgXjx
-	bznCtqN9momsstdM0gl8DWcUwjniLVbEiQRm9RzcSIJRaQZgclV3N5SmW61ptGIHLsCIfcV8Ix8
-	hoKQeA==
-X-Received: by 2002:a05:6402:13c2:b0:65c:23f0:a7f7 with SMTP id
- 4fb4d7f45d1cf-65ea4f1a749mr6987443a12.20.1771928693804; Tue, 24 Feb 2026
- 02:24:53 -0800 (PST)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="saDX7/wI"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=nlbCN83habiaQRkpO//4v1rFzC6YhydxQ4Hnz/IiFzI=; b=saDX7/wIrBTy2Te/s7VqM1bC6x
+	9C9vvqwMZe2PGJMJTkba+HqOmrdXNe5O4X0GJcUQUkAxb+AuNQmHNNaws13Kbt1QeGTMJRt69dbzy
+	oq2uPld9taFpVZ7pdGO4bK7k7Di5y3Qxhcer0TG+GlOyAxuWBrQfxf1Wgx3ofpctUiS6kQyFW+STP
+	DUY6OBGZbxIn27pUQFdW0eXsJbpH64068oXsRmtmTJVxOa7Ot4h3udmL6dAGl52N5/mXeQLAPJAWw
+	PE9aQRCdAGilnmfjXs0ng2hvT9U3/Dozo2U5wZZe0637uURLN3dLeF/zJaCEzHlSnhQq6AVIWSPaS
+	14ahF6TqoagC/oi7LZEeqR7Kr27zdlxF3tUBMoxdL/4gexaaO//cWwhMwwEMHKac+woI+Ffgrhcv9
+	jdbRbG55H3wngfAaM6+12u5PsHAit1QeE+3r21Ln0UAlDr6hDevIHhRpjgDfwqGGYK1CHt3vqSZ/+
+	JgGXEN58vytWkiYPEDMFLJx+;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vuvli-00000008DRZ-1P5r;
+	Tue, 24 Feb 2026 17:00:18 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-rdma@vger.kernel.org
+Cc: metze@samba.org,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: [PATCH] RDMA/core: check id_priv->restricted_node_type in cma_listen_on_dev()
+Date: Tue, 24 Feb 2026 17:59:52 +0100
+Message-ID: <20260224165951.3582093-2-metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANT5p=orpQdzqxjNronnnKUo5HFGjuVwkwpjiGHQRmwh8es0Pw@mail.gmail.com>
- <20260224051729.GB1762976@ZenIV>
-In-Reply-To: <20260224051729.GB1762976@ZenIV>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Tue, 24 Feb 2026 15:54:38 +0530
-X-Gm-Features: AaiRm52xL9joVWGaho_Wba2a4d4msaJGHOfSe3rD-ekT6QA6DAsfPGrW7BKXMFM
-Message-ID: <CANT5p=pDDjRGF1_vCKvmK+PvXpMQTOquZEEdddFN9mUdTiksHw@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] Support to split superblocks during remount
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	linux-nfs@vger.kernel.org, David Howells <dhowells@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 24, 2026 at 10:44=E2=80=AFAM Al Viro <viro@zeniv.linux.org.uk> =
-wrote:
->
-> On Tue, Feb 17, 2026 at 10:15:58AM +0530, Shyam Prasad N wrote:
-> > Filesystems today use sget/sget_fc at the time of mount to share
-> > superblocks when possible to reuse resources. Often the reuse of
-> > superblocks is a function of the mount options supplied. At the time
-> > of umount, VFS handles the cleaning up of the superblock and only
-> > notifies the filesystem when the last of those references is dropped.
-> >
-> > Some mount options could change during remount, and remount is
-> > associated with a mount point and not the superblock it uses. Ideally,
-> > during remount, the mount API needs to provide the filesystem an
-> > option to call sget to get a new superblock (that can also be shared)
-> > and do a put_super on the old superblock.
-> >
-> > I do realize that there are challenges here about how to transparently
-> > failover resources (files, inodes, dentries etc) to the new
-> > superblock.
->
-> That's putting it way too mildly.  A _lot_ of places rely upon the follow=
-ing:
->         * any struct inode instance belongs to the same superblock throug=
-h the
-> entire lifetime.  ->i_sb is assign-once and can be accessed as such.
->         * any struct dentry instance belongs to the same superblock throu=
-gh
-> the entire lifetime; ->d_sb is assign-once and can be accessed as such.  =
-If it's
-> postive, the corresponding inode will belong to the same superblock.
->         * any struct mount instance is associated with the same superbloc=
-k
-> through the entire lifetime; ->mnt_sb is assign-once and can be accessed =
-as such.
->         * any opened file is associated with the same dentry and mount th=
-rough
-> the entire lifetime; mount and dentry are from the same superblock.
->
-> Exclusion that would required to cope with the possibility of the above
-> being violated would cost far too much, and that's without going into the
-> amount of analysis needed to make sure that things wouldn't break.
->
-> Which filesystem do you have in mind?
+When listening on wildcard addresses we have a global list for
+the application layer rdma_cm_id and for any existing
+device or any device added in future we try to listen
+on any wildcard listener.
 
-The following code use sget* with test functions today:
-afs, btrfs, ceph, fuse, gfs2, nfs, ubifs, smb/client
-... which means that they can share superblocks.
+When the listener has a restricted_node_type we
+should prevent listening on devices with a different
+node type.
 
-If those test functions use mount options to decide whether to share a
-superblock (at least nfs and smb clients do this), those mount options
-can change during remount.
-At this point, the filesystems do not even have visibility into other
-mounts that share the superblock. Hence they cannot even fail such
-remounts.
-Side effect of such remounts is that changes to mount options will
-apply to all mounts that share the superblock, whether the user
-intended to do that or not.
+While there fix the documentation comment of
+rdma_restrict_node_type() to include rdma_resolve_addr()
+instead of having rdma_bind_addr() twice.
 
---=20
-Regards,
-Shyam
+Fixes: a760e80e90f5 ("RDMA/core: introduce rdma_restrict_node_type()")
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Leon Romanovsky <leon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: linux-rdma@vger.kernel.org
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+---
+ drivers/infiniband/core/cma.c | 6 +++++-
+ include/rdma/rdma_cm.h        | 2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/infiniband/core/cma.c b/drivers/infiniband/core/cma.c
+index e54c07c74575..9480d1a51c11 100644
+--- a/drivers/infiniband/core/cma.c
++++ b/drivers/infiniband/core/cma.c
+@@ -2729,6 +2729,9 @@ static int cma_listen_on_dev(struct rdma_id_private *id_priv,
+ 	*to_destroy = NULL;
+ 	if (cma_family(id_priv) == AF_IB && !rdma_cap_ib_cm(cma_dev->device, 1))
+ 		return 0;
++	if (id_priv->restricted_node_type != RDMA_NODE_UNSPECIFIED &&
++	    id_priv->restricted_node_type != cma_dev->device->node_type)
++		return 0;
+ 
+ 	dev_id_priv =
+ 		__rdma_create_id(net, cma_listen_handler, id_priv,
+@@ -2736,6 +2739,7 @@ static int cma_listen_on_dev(struct rdma_id_private *id_priv,
+ 	if (IS_ERR(dev_id_priv))
+ 		return PTR_ERR(dev_id_priv);
+ 
++	dev_id_priv->restricted_node_type = id_priv->restricted_node_type;
+ 	dev_id_priv->state = RDMA_CM_ADDR_BOUND;
+ 	memcpy(cma_src_addr(dev_id_priv), cma_src_addr(id_priv),
+ 	       rdma_addr_size(cma_src_addr(id_priv)));
+@@ -4194,7 +4198,7 @@ int rdma_restrict_node_type(struct rdma_cm_id *id, u8 node_type)
+ 	}
+ 
+ 	mutex_lock(&lock);
+-	if (id_priv->cma_dev)
++	if (READ_ONCE(id_priv->state) != RDMA_CM_IDLE)
+ 		ret = -EALREADY;
+ 	else
+ 		id_priv->restricted_node_type = node_type;
+diff --git a/include/rdma/rdma_cm.h b/include/rdma/rdma_cm.h
+index 6de6fd8bd15e..d639ff889e64 100644
+--- a/include/rdma/rdma_cm.h
++++ b/include/rdma/rdma_cm.h
+@@ -181,7 +181,7 @@ void rdma_destroy_id(struct rdma_cm_id *id);
+  *
+  * It needs to be called before the RDMA identifier is bound
+  * to an device, which mean it should be called before
+- * rdma_bind_addr(), rdma_bind_addr() and rdma_listen().
++ * rdma_bind_addr(), rdma_resolve_addr() and rdma_listen().
+  */
+ int rdma_restrict_node_type(struct rdma_cm_id *id, u8 node_type);
+ 
+-- 
+2.43.0
+
