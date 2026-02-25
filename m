@@ -1,32 +1,32 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7852329AB1D
-	for <linux-cifs@vger.kernel.org>; Wed, 25 Feb 2026 04:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629B428853E
+	for <linux-cifs@vger.kernel.org>; Wed, 25 Feb 2026 04:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771992735; cv=none; b=Pwv60nYfCCGZHhX4E+t4IKPuT/vJeh3NTXPTKfftuEwqgcm442XxnTIZdVqQ82PeND+z5Nrkl9bzYgSMpEFyvC+pEhb6vZ5kRgCiL6Z8cxKSz4U5AyfOD16GSW5U7ct4LZQJvczANl8yOm7dtrYbBpxe6zBhII1R0Ad8oZs3aGE=
+	t=1771992738; cv=none; b=citnZn1sNeba38bGONjNLJ9eRwopBdVx1o3OEyGegUAcy2idhtrZ8FhAMrzb6BI3bXo5Y3CM3yofypHYi4SGJBi8JHFTJ6uxqM+TPR8Lte76LTwPN6Z/tRVNnP7BFygJPN4qlKnGLe43VBej33rFKW50UhwX4QFYTribNGOb6Tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771992735; c=relaxed/simple;
-	bh=LlADQypREByTp5cT/ELb3tJ1Xmr0Kc3Dm/Ub89+9YMU=;
+	s=arc-20240116; t=1771992738; c=relaxed/simple;
+	bh=yZL6G67oydElwD8Jcw5LGtjjZ81Qt8uzkxMSur/fxTU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WARgT6rX/k3cLmcM6AzmfgM0EY++TyMovipZ/G6yLPhfkuqRXwof8DtOU6AtLYNf0qMbCAND/5GkdggkdqZ8PmA55wi/9vnam8Yt52obXZNIT6rflEUIvjViu1K/fhYtyQX+RjCnPAnCrHqcOqH59rr1nt9wvZfPCgDWXK0NepI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tfgIsgL9; arc=none smtp.client-ip=91.218.175.173
+	 MIME-Version; b=AxGvH/85HmPnlHE6qjg9S/Su8X7xH2earK1MwTsowddk6PxvNz9W/elSY/j0KkOOXdGzRJ93+lfbHVu0iIepxIUACD9iK4F4mSugapKtaD0MFicJAPNdUxi0SVxeTVmIigtC/6n9Fqk0cLb/B67JctXOpEQKft/RJNK5sn0RKAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PHuU+aVQ; arc=none smtp.client-ip=91.218.175.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tfgIsgL9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PHuU+aVQ"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771992732;
+	t=1771992734;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9GoG0+8g0p0QO8IWM77hg+ZpvSzNNw2Hk6K/fX6vCD0=;
-	b=tfgIsgL9YYRnXlWJIb6XOH53v/AHbEmDKjfXWsZJEZoqd2QAYfcGDldDgDuX30Hx0PA/Jg
-	C2BEWKtoGDzns4wnIBC7t4H2snhRPLEjQIwLGSCIMvtZllofVMQFJoHG5CTXUkJPMzu20w
-	3rGWbHH4hXGoHp0b1n4D4jJx7yjD+AI=
+	bh=i3ivYYuZccaUaxAd9Z8fo6OZXAihoIWC+Ycp9uxjj6o=;
+	b=PHuU+aVQE1vVkKGaOnO4fpJ1yNB8wJeGP2wN+vcappMlLPlkMwzdiJA0t6XGBsDVSapbXA
+	/ZPmxjoPH+kQKXghHM5VRWwbq10ZCxlVdRbjkCgCceGqB7oliRfCkm6v664Z1w2vankPGQ
+	vU8lJ2khHURMHkNm4sbm6lpYxs8FJ3o=
 From: zhang.guodong@linux.dev
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -34,9 +34,9 @@ To: smfrench@gmail.com,
 Cc: linux-cifs@vger.kernel.org,
 	ZhangGuoDong <zhangguodong@kylinos.cn>,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v4 4/5] smb: update some doc references
-Date: Wed, 25 Feb 2026 04:10:59 +0000
-Message-ID: <20260225041100.707468-5-zhang.guodong@linux.dev>
+Subject: [PATCH v4 5/5] smb: introduce struct file_posix_info
+Date: Wed, 25 Feb 2026 04:11:00 +0000
+Message-ID: <20260225041100.707468-6-zhang.guodong@linux.dev>
 In-Reply-To: <20260225041100.707468-1-zhang.guodong@linux.dev>
 References: <20260225041100.707468-1-zhang.guodong@linux.dev>
 Precedence: bulk
@@ -50,56 +50,434 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-To make it easier to locate the documentation during development.
+Extract the non-variable part of struct smb311_posix_qinfo/file_posix_info
+into a new struct.
+
+Modify the following places:
+
+  - introduce new struct file_posix_info
+  - some fields in "struct smb311_posix_qinfo" -> "struct file_posix_info"
+  - some fields in "struct smb2_posix_info" -> "struct file_posix_info"
 
 Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smb2pdu.h | 7 +++++--
- fs/smb/server/smb2pdu.h | 5 ++++-
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ fs/smb/client/inode.c   | 22 ++++++------
+ fs/smb/client/readdir.c | 28 ++++++++--------
+ fs/smb/client/reparse.h |  4 +--
+ fs/smb/client/smb2pdu.h | 15 +--------
+ fs/smb/common/fscc.h    | 43 +++++++++++++++++++++++-
+ fs/smb/common/smb2pdu.h | 25 --------------
+ fs/smb/server/smb2pdu.c | 74 ++++++++++++++++++++---------------------
+ fs/smb/server/smb2pdu.h | 21 +-----------
+ 8 files changed, 108 insertions(+), 124 deletions(-)
 
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index 3e844c55ab8a..ebed32bf1c05 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -842,16 +842,16 @@ static void smb311_posix_info_to_fattr(struct cifs_fattr *fattr,
+ 	memset(fattr, 0, sizeof(*fattr));
+ 
+ 	/* no fattr->flags to set */
+-	fattr->cf_cifsattrs = le32_to_cpu(info->DosAttributes);
+-	fattr->cf_uniqueid = le64_to_cpu(info->Inode);
++	fattr->cf_cifsattrs = le32_to_cpu(info->fpinfo.DosAttributes);
++	fattr->cf_uniqueid = le64_to_cpu(info->fpinfo.Inode);
+ 
+-	if (info->LastAccessTime)
+-		fattr->cf_atime = cifs_NTtimeToUnix(info->LastAccessTime);
++	if (info->fpinfo.LastAccessTime)
++		fattr->cf_atime = cifs_NTtimeToUnix(info->fpinfo.LastAccessTime);
+ 	else
+ 		ktime_get_coarse_real_ts64(&fattr->cf_atime);
+ 
+-	fattr->cf_ctime = cifs_NTtimeToUnix(info->ChangeTime);
+-	fattr->cf_mtime = cifs_NTtimeToUnix(info->LastWriteTime);
++	fattr->cf_ctime = cifs_NTtimeToUnix(info->fpinfo.ChangeTime);
++	fattr->cf_mtime = cifs_NTtimeToUnix(info->fpinfo.LastWriteTime);
+ 
+ 	if (data->adjust_tz) {
+ 		fattr->cf_ctime.tv_sec += tcon->ses->server->timeAdj;
+@@ -862,11 +862,11 @@ static void smb311_posix_info_to_fattr(struct cifs_fattr *fattr,
+ 	 * The srv fs device id is overridden on network mount so setting
+ 	 * @fattr->cf_rdev isn't needed here.
+ 	 */
+-	fattr->cf_eof = le64_to_cpu(info->EndOfFile);
+-	fattr->cf_bytes = le64_to_cpu(info->AllocationSize);
+-	fattr->cf_createtime = le64_to_cpu(info->CreationTime);
+-	fattr->cf_nlink = le32_to_cpu(info->HardLinks);
+-	fattr->cf_mode = wire_mode_to_posix(le32_to_cpu(info->Mode),
++	fattr->cf_eof = le64_to_cpu(info->fpinfo.EndOfFile);
++	fattr->cf_bytes = le64_to_cpu(info->fpinfo.AllocationSize);
++	fattr->cf_createtime = le64_to_cpu(info->fpinfo.CreationTime);
++	fattr->cf_nlink = le32_to_cpu(info->fpinfo.HardLinks);
++	fattr->cf_mode = wire_mode_to_posix(le32_to_cpu(info->fpinfo.Mode),
+ 					    fattr->cf_cifsattrs & ATTR_DIRECTORY);
+ 
+ 	if (cifs_open_data_reparse(data) &&
+diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
+index be22bbc4a65a..6239d70e7984 100644
+--- a/fs/smb/client/readdir.c
++++ b/fs/smb/client/readdir.c
+@@ -247,22 +247,22 @@ cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
+ 	posix_info_parse(info, NULL, &parsed);
+ 
+ 	memset(fattr, 0, sizeof(*fattr));
+-	fattr->cf_uniqueid = le64_to_cpu(info->Inode);
+-	fattr->cf_bytes = le64_to_cpu(info->AllocationSize);
+-	fattr->cf_eof = le64_to_cpu(info->EndOfFile);
++	fattr->cf_uniqueid = le64_to_cpu(info->fpinfo.Inode);
++	fattr->cf_bytes = le64_to_cpu(info->fpinfo.AllocationSize);
++	fattr->cf_eof = le64_to_cpu(info->fpinfo.EndOfFile);
+ 
+-	fattr->cf_atime = cifs_NTtimeToUnix(info->LastAccessTime);
+-	fattr->cf_mtime = cifs_NTtimeToUnix(info->LastWriteTime);
+-	fattr->cf_ctime = cifs_NTtimeToUnix(info->CreationTime);
++	fattr->cf_atime = cifs_NTtimeToUnix(info->fpinfo.LastAccessTime);
++	fattr->cf_mtime = cifs_NTtimeToUnix(info->fpinfo.LastWriteTime);
++	fattr->cf_ctime = cifs_NTtimeToUnix(info->fpinfo.CreationTime);
+ 
+-	fattr->cf_nlink = le32_to_cpu(info->HardLinks);
+-	fattr->cf_cifsattrs = le32_to_cpu(info->DosAttributes);
++	fattr->cf_nlink = le32_to_cpu(info->fpinfo.HardLinks);
++	fattr->cf_cifsattrs = le32_to_cpu(info->fpinfo.DosAttributes);
+ 
+ 	if (fattr->cf_cifsattrs & ATTR_REPARSE_POINT)
+-		fattr->cf_cifstag = le32_to_cpu(info->ReparseTag);
++		fattr->cf_cifstag = le32_to_cpu(info->fpinfo.ReparseTag);
+ 
+ 	/* The Mode field in the response can now include the file type as well */
+-	fattr->cf_mode = wire_mode_to_posix(le32_to_cpu(info->Mode),
++	fattr->cf_mode = wire_mode_to_posix(le32_to_cpu(info->fpinfo.Mode),
+ 					    fattr->cf_cifsattrs & ATTR_DIRECTORY);
+ 	fattr->cf_dtype = S_DT(fattr->cf_mode);
+ 
+@@ -277,9 +277,9 @@ cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
+ 	}
+ 
+ 	cifs_dbg(FYI, "posix fattr: dev %d, reparse %d, mode %o\n",
+-		 le32_to_cpu(info->DeviceId),
+-		 le32_to_cpu(info->ReparseTag),
+-		 le32_to_cpu(info->Mode));
++		 le32_to_cpu(info->fpinfo.DeviceId),
++		 le32_to_cpu(info->fpinfo.ReparseTag),
++		 le32_to_cpu(info->fpinfo.Mode));
+ 
+ 	sid_to_id(cifs_sb, &parsed.owner, fattr, SIDOWNER);
+ 	sid_to_id(cifs_sb, &parsed.group, fattr, SIDGROUP);
+@@ -517,7 +517,7 @@ static void cifs_fill_dirent_posix(struct cifs_dirent *de,
+ 	de->name = parsed.name;
+ 	de->namelen = parsed.name_len;
+ 	de->resume_key = info->Ignored;
+-	de->ino = le64_to_cpu(info->Inode);
++	de->ino = le64_to_cpu(info->fpinfo.Inode);
+ }
+ 
+ static void cifs_fill_dirent_unix(struct cifs_dirent *de,
+diff --git a/fs/smb/client/reparse.h b/fs/smb/client/reparse.h
+index 0164dc47bdfd..57dccca0e9d4 100644
+--- a/fs/smb/client/reparse.h
++++ b/fs/smb/client/reparse.h
+@@ -106,10 +106,10 @@ static inline bool cifs_open_data_reparse(struct cifs_open_info_data *data)
+ 	if (data->contains_posix_file_info) {
+ 		struct smb311_posix_qinfo *fi = &data->posix_fi;
+ 
+-		attrs = le32_to_cpu(fi->DosAttributes);
++		attrs = le32_to_cpu(fi->fpinfo.DosAttributes);
+ 		if (data->reparse_point) {
+ 			attrs |= ATTR_REPARSE_POINT;
+-			fi->DosAttributes = cpu_to_le32(attrs);
++			fi->fpinfo.DosAttributes = cpu_to_le32(attrs);
+ 		}
+ 
+ 	} else {
 diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
-index 78bb99f29d38..30d70097fe2f 100644
+index 30d70097fe2f..74a332d9cbeb 100644
 --- a/fs/smb/client/smb2pdu.h
 +++ b/fs/smb/client/smb2pdu.h
-@@ -224,7 +224,7 @@ struct smb2_file_reparse_point_info {
- 	__le32 Tag;
+@@ -274,20 +274,7 @@ struct create_posix_rsp {
+ struct smb2_posix_info {
+ 	__le32 NextEntryOffset;
+ 	__u32 Ignored;
+-	__le64 CreationTime;
+-	__le64 LastAccessTime;
+-	__le64 LastWriteTime;
+-	__le64 ChangeTime;
+-	__le64 EndOfFile;
+-	__le64 AllocationSize;
+-	__le32 DosAttributes;
+-	__le64 Inode;
+-	__le32 DeviceId;
+-	__le32 Zero;
+-	/* beginning of POSIX Create Context Response */
+-	__le32 HardLinks;
+-	__le32 ReparseTag;
+-	__le32 Mode;
++	struct file_posix_info fpinfo;
+ 	/*
+ 	 * var sized owner SID
+ 	 * var sized group SID
+diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
+index b4ccddca9256..0d8c522f757a 100644
+--- a/fs/smb/common/fscc.h
++++ b/fs/smb/common/fscc.h
+@@ -537,9 +537,50 @@ struct file_notify_information {
  } __packed;
  
--/* See MS-FSCC 2.4.21 */
-+/* See MS-FSCC 2.4.26 */
- struct smb2_file_id_information {
- 	__le64	VolumeSerialNumber;
- 	__u64  PersistentFileId; /* opaque endianness */
-@@ -251,7 +251,10 @@ struct smb2_file_id_extd_directory_info {
- 
- extern char smb2_padding[7];
- 
--/* equivalent of the contents of SMB3.1.1 POSIX open context response */
+ /*
+- * See POSIX Extensions to MS-FSCC 2.3.2.1
++ * [POSIX-FSCC] POSIX Extensions to MS-FSCC
+  * Link: https://gitlab.com/samba-team/smb3-posix-spec/-/blob/master/fscc_posix_extensions.md
+  */
++
 +/*
-+ * See POSIX-SMB2 2.2.14.2.16
-+ * Link: https://gitlab.com/samba-team/smb3-posix-spec/-/blob/master/smb3_posix_extensions.md
++ * This information class is used to query file posix information.
++ * See POSIX-FSCC 2.3.1.1
 + */
- struct create_posix_rsp {
- 	u32 nlink;
- 	u32 reparse_tag;
++struct file_posix_info {
++	__le64 CreationTime;
++	__le64 LastAccessTime;
++	__le64 LastWriteTime;
++	__le64 ChangeTime;
++	__le64 EndOfFile;
++	__le64 AllocationSize;
++	__le32 DosAttributes;
++	__le64 Inode;
++	__le32 DeviceId;
++	__le32 Zero;
++	/*
++	 * beginning of POSIX Create Context Response
++	 * See POSIX-SMB2 2.2.14.2.16
++	 */
++	__le32 HardLinks;
++	__le32 ReparseTag;
++	__le32 Mode;
++	// var sized owner SID
++	// var sized group SID
++	/* end of POSIX Create Context Response */
++	// le32 filenamelength
++	// u8 filename[]
++} __packed;
++
++/* Level 100 query info */
++struct smb311_posix_qinfo {
++	struct file_posix_info fpinfo;
++	u8     Sids[];
++	/*
++	 * le32 filenamelength
++	 * u8  filename[]
++	 */
++} __packed;
++
++/* See POSIX-FSCC 2.3.2.1 */
+ typedef struct {
+ 	/* For undefined recommended transfer size return -1 in that field */
+ 	__le32 OptimalTransferSize;  /* bsize on some os, iosize on other os */
+diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+index 85a4248d4f29..9abfabb79dad 100644
+--- a/fs/smb/common/smb2pdu.h
++++ b/fs/smb/common/smb2pdu.h
+@@ -1610,31 +1610,6 @@ struct smb2_query_info_rsp {
+ 	__u8   Buffer[];
+ } __packed;
+ 
+-/* Level 100 query info */
+-struct smb311_posix_qinfo {
+-	__le64 CreationTime;
+-	__le64 LastAccessTime;
+-	__le64 LastWriteTime;
+-	__le64 ChangeTime;
+-	__le64 EndOfFile;
+-	__le64 AllocationSize;
+-	__le32 DosAttributes;
+-	__le64 Inode;
+-	__le32 DeviceId;
+-	__le32 Zero;
+-	/* beginning of POSIX Create Context Response */
+-	__le32 HardLinks;
+-	__le32 ReparseTag;
+-	__le32 Mode;
+-	u8     Sids[];
+-	/*
+-	 * var sized owner SID
+-	 * var sized group SID
+-	 * le32 filenamelength
+-	 * u8  filename[]
+-	 */
+-} __packed;
+-
+ /* See MS-SMB2 2.2.23 through 2.2.25 */
+ struct smb2_oplock_break {
+ 	struct smb2_hdr hdr;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index b5dcd9cff2e2..460bf835ad40 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -4051,44 +4051,44 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
+ 
+ 		posix_info = (struct smb2_posix_info *)kstat;
+ 		posix_info->Ignored = 0;
+-		posix_info->CreationTime = cpu_to_le64(ksmbd_kstat->create_time);
++		posix_info->fpinfo.CreationTime = cpu_to_le64(ksmbd_kstat->create_time);
+ 		time = ksmbd_UnixTimeToNT(ksmbd_kstat->kstat->ctime);
+-		posix_info->ChangeTime = cpu_to_le64(time);
++		posix_info->fpinfo.ChangeTime = cpu_to_le64(time);
+ 		time = ksmbd_UnixTimeToNT(ksmbd_kstat->kstat->atime);
+-		posix_info->LastAccessTime = cpu_to_le64(time);
++		posix_info->fpinfo.LastAccessTime = cpu_to_le64(time);
+ 		time = ksmbd_UnixTimeToNT(ksmbd_kstat->kstat->mtime);
+-		posix_info->LastWriteTime = cpu_to_le64(time);
+-		posix_info->EndOfFile = cpu_to_le64(ksmbd_kstat->kstat->size);
+-		posix_info->AllocationSize = cpu_to_le64(ksmbd_kstat->kstat->blocks << 9);
+-		posix_info->DeviceId = cpu_to_le32(ksmbd_kstat->kstat->rdev);
+-		posix_info->HardLinks = cpu_to_le32(ksmbd_kstat->kstat->nlink);
+-		posix_info->Mode = cpu_to_le32(ksmbd_kstat->kstat->mode & 0777);
++		posix_info->fpinfo.LastWriteTime = cpu_to_le64(time);
++		posix_info->fpinfo.EndOfFile = cpu_to_le64(ksmbd_kstat->kstat->size);
++		posix_info->fpinfo.AllocationSize = cpu_to_le64(ksmbd_kstat->kstat->blocks << 9);
++		posix_info->fpinfo.DeviceId = cpu_to_le32(ksmbd_kstat->kstat->rdev);
++		posix_info->fpinfo.HardLinks = cpu_to_le32(ksmbd_kstat->kstat->nlink);
++		posix_info->fpinfo.Mode = cpu_to_le32(ksmbd_kstat->kstat->mode & 0777);
+ 		switch (ksmbd_kstat->kstat->mode & S_IFMT) {
+ 		case S_IFDIR:
+-			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_DIR << POSIX_FILETYPE_SHIFT);
++			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_DIR << POSIX_FILETYPE_SHIFT);
+ 			break;
+ 		case S_IFLNK:
+-			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_SYMLINK << POSIX_FILETYPE_SHIFT);
++			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_SYMLINK << POSIX_FILETYPE_SHIFT);
+ 			break;
+ 		case S_IFCHR:
+-			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_CHARDEV << POSIX_FILETYPE_SHIFT);
++			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_CHARDEV << POSIX_FILETYPE_SHIFT);
+ 			break;
+ 		case S_IFBLK:
+-			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_BLKDEV << POSIX_FILETYPE_SHIFT);
++			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_BLKDEV << POSIX_FILETYPE_SHIFT);
+ 			break;
+ 		case S_IFIFO:
+-			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_FIFO << POSIX_FILETYPE_SHIFT);
++			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_FIFO << POSIX_FILETYPE_SHIFT);
+ 			break;
+ 		case S_IFSOCK:
+-			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_SOCKET << POSIX_FILETYPE_SHIFT);
++			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_SOCKET << POSIX_FILETYPE_SHIFT);
+ 		}
+ 
+-		posix_info->Inode = cpu_to_le64(ksmbd_kstat->kstat->ino);
+-		posix_info->DosAttributes =
++		posix_info->fpinfo.Inode = cpu_to_le64(ksmbd_kstat->kstat->ino);
++		posix_info->fpinfo.DosAttributes =
+ 			S_ISDIR(ksmbd_kstat->kstat->mode) ?
+ 				FILE_ATTRIBUTE_DIRECTORY_LE : FILE_ATTRIBUTE_ARCHIVE_LE;
+ 		if (d_info->hide_dot_file && d_info->name[0] == '.')
+-			posix_info->DosAttributes |= FILE_ATTRIBUTE_HIDDEN_LE;
++			posix_info->fpinfo.DosAttributes |= FILE_ATTRIBUTE_HIDDEN_LE;
+ 		/*
+ 		 * SidBuffer(32) contain two sids(Domain sid(16), UNIX group sid(16)).
+ 		 * UNIX sid(16) = revision(1) + num_subauth(1) + authority(6) +
+@@ -5276,45 +5276,45 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
+ 		return ret;
+ 
+ 	file_info = (struct smb311_posix_qinfo *)rsp->Buffer;
+-	file_info->CreationTime = cpu_to_le64(fp->create_time);
++	file_info->fpinfo.CreationTime = cpu_to_le64(fp->create_time);
+ 	time = ksmbd_UnixTimeToNT(stat.atime);
+-	file_info->LastAccessTime = cpu_to_le64(time);
++	file_info->fpinfo.LastAccessTime = cpu_to_le64(time);
+ 	time = ksmbd_UnixTimeToNT(stat.mtime);
+-	file_info->LastWriteTime = cpu_to_le64(time);
++	file_info->fpinfo.LastWriteTime = cpu_to_le64(time);
+ 	time = ksmbd_UnixTimeToNT(stat.ctime);
+-	file_info->ChangeTime = cpu_to_le64(time);
+-	file_info->DosAttributes = fp->f_ci->m_fattr;
+-	file_info->Inode = cpu_to_le64(stat.ino);
++	file_info->fpinfo.ChangeTime = cpu_to_le64(time);
++	file_info->fpinfo.DosAttributes = fp->f_ci->m_fattr;
++	file_info->fpinfo.Inode = cpu_to_le64(stat.ino);
+ 	if (ksmbd_stream_fd(fp) == false) {
+-		file_info->EndOfFile = cpu_to_le64(stat.size);
+-		file_info->AllocationSize = cpu_to_le64(stat.blocks << 9);
++		file_info->fpinfo.EndOfFile = cpu_to_le64(stat.size);
++		file_info->fpinfo.AllocationSize = cpu_to_le64(stat.blocks << 9);
+ 	} else {
+-		file_info->EndOfFile = cpu_to_le64(fp->stream.size);
+-		file_info->AllocationSize = cpu_to_le64(fp->stream.size);
++		file_info->fpinfo.EndOfFile = cpu_to_le64(fp->stream.size);
++		file_info->fpinfo.AllocationSize = cpu_to_le64(fp->stream.size);
+ 	}
+-	file_info->HardLinks = cpu_to_le32(stat.nlink);
+-	file_info->Mode = cpu_to_le32(stat.mode & 0777);
++	file_info->fpinfo.HardLinks = cpu_to_le32(stat.nlink);
++	file_info->fpinfo.Mode = cpu_to_le32(stat.mode & 0777);
+ 	switch (stat.mode & S_IFMT) {
+ 	case S_IFDIR:
+-		file_info->Mode |= cpu_to_le32(POSIX_TYPE_DIR << POSIX_FILETYPE_SHIFT);
++		file_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_DIR << POSIX_FILETYPE_SHIFT);
+ 		break;
+ 	case S_IFLNK:
+-		file_info->Mode |= cpu_to_le32(POSIX_TYPE_SYMLINK << POSIX_FILETYPE_SHIFT);
++		file_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_SYMLINK << POSIX_FILETYPE_SHIFT);
+ 		break;
+ 	case S_IFCHR:
+-		file_info->Mode |= cpu_to_le32(POSIX_TYPE_CHARDEV << POSIX_FILETYPE_SHIFT);
++		file_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_CHARDEV << POSIX_FILETYPE_SHIFT);
+ 		break;
+ 	case S_IFBLK:
+-		file_info->Mode |= cpu_to_le32(POSIX_TYPE_BLKDEV << POSIX_FILETYPE_SHIFT);
++		file_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_BLKDEV << POSIX_FILETYPE_SHIFT);
+ 		break;
+ 	case S_IFIFO:
+-		file_info->Mode |= cpu_to_le32(POSIX_TYPE_FIFO << POSIX_FILETYPE_SHIFT);
++		file_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_FIFO << POSIX_FILETYPE_SHIFT);
+ 		break;
+ 	case S_IFSOCK:
+-		file_info->Mode |= cpu_to_le32(POSIX_TYPE_SOCKET << POSIX_FILETYPE_SHIFT);
++		file_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_SOCKET << POSIX_FILETYPE_SHIFT);
+ 	}
+ 
+-	file_info->DeviceId = cpu_to_le32(stat.rdev);
++	file_info->fpinfo.DeviceId = cpu_to_le32(stat.rdev);
+ 
+ 	/*
+ 	 * Sids(32) contain two sids(Domain sid(16), UNIX group sid(16)).
 diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
-index 9b3c4c9acb11..e7cf573e59f0 100644
+index e7cf573e59f0..f05273f48bd0 100644
 --- a/fs/smb/server/smb2pdu.h
 +++ b/fs/smb/server/smb2pdu.h
-@@ -83,7 +83,10 @@ struct create_durable_rsp {
- 	} Data;
+@@ -281,30 +281,11 @@ struct create_sd_buf_req {
+ struct smb2_posix_info {
+ 	__le32 NextEntryOffset;
+ 	__u32 Ignored;
+-	__le64 CreationTime;
+-	__le64 LastAccessTime;
+-	__le64 LastWriteTime;
+-	__le64 ChangeTime;
+-	__le64 EndOfFile;
+-	__le64 AllocationSize;
+-	__le32 DosAttributes;
+-	__le64 Inode;
+-	__le32 DeviceId;
+-	__le32 Zero;
+-	/* beginning of POSIX Create Context Response */
+-	__le32 HardLinks;
+-	__le32 ReparseTag;
+-	__le32 Mode;
++	struct file_posix_info fpinfo;
+ 	/* SidBuffer contain two sids (UNIX user sid(16), UNIX group sid(16)) */
+ 	u8 SidBuffer[32];
+ 	__le32 name_len;
+ 	u8 name[];
+-	/*
+-	 * var sized owner SID
+-	 * var sized group SID
+-	 * le32 filenamelength
+-	 * u8  filename[]
+-	 */
  } __packed;
  
--/* equivalent of the contents of SMB3.1.1 POSIX open context response */
-+/*
-+ * See POSIX-SMB2 2.2.14.2.16
-+ * Link: https://gitlab.com/samba-team/smb3-posix-spec/-/blob/master/smb3_posix_extensions.md
-+ */
- struct create_posix_rsp {
- 	struct create_context_hdr ccontext;
- 	__u8    Name[16];
+ /* functions */
 -- 
 2.53.0
 
