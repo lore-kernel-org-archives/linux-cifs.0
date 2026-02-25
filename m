@@ -1,44 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7E318B0A;
-	Wed, 25 Feb 2026 01:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B641E26E6F8;
+	Wed, 25 Feb 2026 01:39:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771983293; cv=none; b=lN2objda002iyPCAoANuDDPl5xC5wijqzU9Kq+qg+OHeb+cR9Jp1lQUuTOc+SU/ng3re4xmngMXR5HuuoImRemg0rNG4HYw9YCPlzDlRuWwlQheA1j7uDV3WcmnSDfRb60Z0g/v4hQFRfSc5Hk6T/YzJClzOpJB4quAAMR068Dw=
+	t=1771983569; cv=none; b=U57/MWQqJge/EyMpx3IdA8AiUc/yafEPYhOvkq0UCp88az2ABQD2HrA/Z28x79qVpFr4aLG4cxHe8y5wn/zcnAJwB+9F3r/ezDuT+aA/e8YmTe/UoJRp/LyMpyrPhyl6mgnO1QlwH+296HvHONY/FhTILl+vEghLn8A/5vOeGBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771983293; c=relaxed/simple;
-	bh=0JM3g76itItSZcuTgviLI0+yvWUzlMpDIrUZBWxJAeE=;
+	s=arc-20240116; t=1771983569; c=relaxed/simple;
+	bh=N5eQICA58o5uo/PDc9JZqKPovFyK/NOSHC0PCl3NGRI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YzT4UAGYnbobKmyYz8hPkRsEbFf+A97CaDuW9vlhKMKyxOkYjWDHAyt8uGfWQO99c8YQPwtqzmybqtgCoiwWQxMUiIS5KL/b+YykgJi5Ro+MheaXk1Xe6Yj8vHM9RjzV3DzUL+UfakfaNvzaJtzucfSOts/wS+5k8UDOcEs7+qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=BrZo0Hq/; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=BqnXdxw/NAMIBrAHQQN4rQllFZfDhtbAH8vkhlXWV8OcF9ZJtGCIlapVbKLEXbTpMjRa5G6mOP2UQ/fYVoGrguRDkSarGESzIojXkVKV8bRXFsJKjxvxTThNtacmbh8vQnbQJ6uFHC85T6R58dy9/1c+wr4KmZcWkIRvR2tPTfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=e+P+xSXk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="BrZo0Hq/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8D7BC116D0;
-	Wed, 25 Feb 2026 01:34:52 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="e+P+xSXk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F492C19423;
+	Wed, 25 Feb 2026 01:39:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1771983292;
-	bh=0JM3g76itItSZcuTgviLI0+yvWUzlMpDIrUZBWxJAeE=;
+	s=korg; t=1771983569;
+	bh=N5eQICA58o5uo/PDc9JZqKPovFyK/NOSHC0PCl3NGRI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BrZo0Hq/GkYouxfrqqaO0a1oq6Y89nS+1b002JJw9iY9zNi5eX/7cg2SclGlx7R1G
-	 ImyEqBxJPMeV3ZiYOdPTNf2789lvkjTlnysT1VHrfhO2zSgmYt7cHRaxAeYMcNc9GB
-	 1RHYVBuSZ6Y/cLa+1Yd6EKCXEOitrQGdkuhepe6w=
+	b=e+P+xSXkYngjvKrrIdz2qFiq2967TGnUFGV4oYXZucDMCv2XWUGZ2RZlnrt8k+wBK
+	 h6cMpvX0PHD1yjX4hsrDmo0j8XgkDWnhJIAP4MvZT2wPkv1/q2RXRVfbhwpBsDWRrJ
+	 cqWrEGP861H2K3QFbUZ/fDl1+Mgi9U1LCJUr5nsE=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
+	Xiaoli Feng <xifeng@redhat.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.19 427/781] smb: client: correct value for smbd_max_fragmented_recv_size
-Date: Tue, 24 Feb 2026 17:18:56 -0800
-Message-ID: <20260225012410.174214663@linuxfoundation.org>
+Subject: [PATCH 6.19 627/781] smb: client: fix regression with mount options parsing
+Date: Tue, 24 Feb 2026 17:22:16 -0800
+Message-ID: <20260225012415.191230749@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260225012359.695468795@linuxfoundation.org>
 References: <20260225012359.695468795@linuxfoundation.org>
@@ -57,76 +54,54 @@ Content-Transfer-Encoding: 8bit
 
 ------------------
 
-From: Stefan Metzmacher <metze@samba.org>
+From: Paulo Alcantara <pc@manguebit.org>
 
-[ Upstream commit 4a93d1ee2d0206970b6eb13fbffe07938cd95948 ]
+[ Upstream commit 72f4d48034864b93700d1d23fc418d90fa28d7ae ]
 
-When we download a file without rdma offload or get
-a large directly enumeration from the server,
-the server might want to send up to smbd_max_fragmented_recv_size
-bytes, but if it is too large all our recv buffers
-might already be moved to the recv_io.reassembly.list
-and we're no longer able to grant recv credits.
+After commit 1ef15fbe6771 ("cifs: client: enforce consistent handling
+of multichannel and max_channels"), invalid mount options started to
+be ignored, allowing cifs.ko to proceed with the mount instead of
+baling out.
 
-The maximum fragmented upper-layer payload receive size supported
+The problem was related to smb3_handle_conflicting_options() being
+called even when an invalid parameter had been parsed, overwriting the
+return value of vfs_parse_fs_string() in
+smb3_fs_context_parse_monolithic().
 
-Assume max_payload_per_credit is
-smbd_max_receive_size - 24 = 1340
+Fix this by calling smb3_handle_conflicting_options() only when a
+valid mount option has been passed.
 
-The maximum number would be
-smbd_receive_credit_max * max_payload_per_credit
+Reproducer:
 
-                      1340 * 255 = 341700 (0x536C4)
+$ mount.cifs //srv/share /mnt -o ${opts}
+$ mount -o remount,foo,${opts} /mnt # must fail
 
-The minimum value from the spec is 131072 (0x20000)
-
-For now we use the logic we used in ksmbd before:
-                (1364 * 255) / 2 = 173910 (0x2A756)
-
-Fixes: 03bee01d6215 ("CIFS: SMBD: Add SMB Direct protocol initial values and constants")
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
+Fixes: 1ef15fbe6771 ("cifs: client: enforce consistent handling of multichannel and max_channels")
+Reported-by: Xiaoli Feng <xifeng@redhat.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Cc: David Howells <dhowells@redhat.com>
 Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/smbdirect.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ fs/smb/client/fs_context.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 01d55bcc6d0f9..c8cef098d4806 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -101,8 +101,23 @@ int smbd_send_credit_target = 255;
- /* The maximum single message size can be sent to remote peer */
- int smbd_max_send_size = 1364;
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index d4291d3a9a485..2527d2d29f190 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -826,9 +826,7 @@ static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
+ 		if (ret < 0)
+ 			break;
+ 	}
+-	ret = smb3_handle_conflicting_options(fc);
+-
+-	return ret;
++	return ret ?: smb3_handle_conflicting_options(fc);
+ }
  
--/*  The maximum fragmented upper-layer payload receive size supported */
--int smbd_max_fragmented_recv_size = 1024 * 1024;
-+/*
-+ * The maximum fragmented upper-layer payload receive size supported
-+ *
-+ * Assume max_payload_per_credit is
-+ * smbd_max_receive_size - 24 = 1340
-+ *
-+ * The maximum number would be
-+ * smbd_receive_credit_max * max_payload_per_credit
-+ *
-+ *                       1340 * 255 = 341700 (0x536C4)
-+ *
-+ * The minimum value from the spec is 131072 (0x20000)
-+ *
-+ * For now we use the logic we used in ksmbd before:
-+ *                 (1364 * 255) / 2 = 173910 (0x2A756)
-+ */
-+int smbd_max_fragmented_recv_size = (1364 * 255) / 2;
- 
- /*  The maximum single-message size which can be received */
- int smbd_max_receive_size = 1364;
+ /*
 -- 
 2.51.0
 
