@@ -1,229 +1,164 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A2B2F0C48
-	for <linux-cifs@vger.kernel.org>; Wed, 25 Feb 2026 18:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772043542; cv=pass; b=hy4CLXRd2OWBU0c/1HtST0NiPJAm+avwRdpVhvcLSdpoehwegihKckHNGnxGz7tqwFUvACu31JXcrckLAqaeyEbuAO9UxF1DHMrsXGTQTP36cu0lCQiRSHFVRvqX2fJ+b6YzCB1tqRlBrS37MCwFJuVApCNmtx7JgslC5WTF4EU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772043542; c=relaxed/simple;
-	bh=LRDz82JED2xeQckEz7H9ChbpfUpio2zNn3f/OFDohv4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FhGujbm2ciONuKxNRYnJOvevOmpf0x0pgkMf22zFDgGAtjKODRyWkrAo/lhyAHhaE4jV2793ie9+ODwxTpe9VvC0dFQnLHZdOgv3SG02Rz6V0ombGtP4CtlyS+vKtBJudveQPJ5F8pO565vb25+gg3+Rjq7fYFRuksxQQ7uz/Mw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enakta.com; spf=pass smtp.mailfrom=enakta.com; dkim=pass (2048-bit key) header.d=enakta-com.20230601.gappssmtp.com header.i=@enakta-com.20230601.gappssmtp.com header.b=MmZQJqoD; arc=pass smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enakta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enakta.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EFE2E3B15;
+	Wed, 25 Feb 2026 21:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772056394; cv=none; b=oeOPDbRaG3mFgIqOmtFn3V/DyLpGvS9GB2DHuYdAdhS0FCoAAP8gt6SLVxLgvayqp2koWeElrbN2EZSo4/UqV2NZeuyPAWA15sWKOdZYQ/G/ybXjVUTjuCo28uTqECHyor4KYreOCFpcPb/WHpcy5XZTwZ5KqXDn5Wouez8Nuds=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772056394; c=relaxed/simple;
+	bh=ngkxbF9p/Ks5NDUgIRotTSx0LgZaqTKY/4iAP44uvNE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DQt8KG0i38TeSPfswjmbhwwky4yopIvJrOTZdE6n8jMXm35xkWQQkkaDmqalI99lZDi++Cc+8qTLhjXFFbNZQ7AfHgpo0K3bQ+8JnPl31A1DN9utNkpW/r5TBUM8SEvETyakuUecn/7OyzUaWEMjaSFs2/Q7QULN4WxZYuM3e5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hHQvwfkS; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enakta-com.20230601.gappssmtp.com header.i=@enakta-com.20230601.gappssmtp.com header.b="MmZQJqoD"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-354a18c48b5so5813261a91.1
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Feb 2026 10:19:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772043540; cv=none;
-        d=google.com; s=arc-20240605;
-        b=D9l5+HGqcCecLlvNI5dTMXiLg4oGVbGf8dwW+fGWRllpQy+cyUrhNSENYWd3F5dnuz
-         WdoAGyXdCM98CAAJxjTPpPhWelosmiVnbMdDsDCvdH4eIcE4vAe0glxCqL4wM2o2e/zP
-         TekUtRd7GQapdt+JDTmmGsGRWUArUJvyYN/kJoE891H1kMa6ER6+8E1yCZdRTKgPvD+m
-         DIeP88h6nLnIckDCYX1dz+t/qXmoEnYTMkl9o45vDb3NqxhhM6yk8g5Q85HYgQDw5OSK
-         I5SMPp9UHp2N1zJCv5kqzO2OzhrrJW8m9ZCzh9Hpmw2iMxTvYQkglO0f3If1WOfSf+aN
-         8eyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=zUmyD9mZSPiz34Jxj++5qqJO6oRTMfL2GZK09sjFXQc=;
-        fh=IC4dYosEsdX1pI0u7/smn16KgxSOLKL5tWaBtRSFqmg=;
-        b=lQtCUQcUPzm3gqjxOdLQ5oHIt/RW4XTGnOqcV8icZRSSVvndfI7uun/bivg6dpzspy
-         0LIqrnRhUQkmxDA/ZCLbl1V5odlUpqcoJQ5Lnj3DwQUyBcZrsLBH4TaTrwyWuIDQJ2vL
-         8IXoJdqCp9RtmFygyFvvEmFPegIKrQGvs8h9f+zYr+TxNuIKSoyzblm/zPMXGvcqxaoF
-         9KAZmYoX2EibT1mjTxP+ih2MSMA52YKUHIVU6WuzUboajJrFpB6ViqL3nTFplOMPUsb0
-         ytz+ZCuC0y7ZJPHvdmbQiv8ccqm0cUhx2vkCLVA1Dg/2IBVSCHRFTgTcXmfNWmOkh3PI
-         cUjw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=enakta-com.20230601.gappssmtp.com; s=20230601; t=1772043540; x=1772648340; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zUmyD9mZSPiz34Jxj++5qqJO6oRTMfL2GZK09sjFXQc=;
-        b=MmZQJqoD8T6f/BYIYZM9jMLo0IgFRm0gJg3J04nFvOuk26Okp1RrUIkemPRUtRiaIf
-         I+SCGX6To7W7CkBeE2PnGfjc9eW4rDeVVwuYDRqWAk8nh0yVSW/FRnvWcfkoOYW3YiGW
-         Q4TRsim46L7l90IZKcKajJo6N0qfDbiZ8+s1GRomPftbQQv9c7PrTEUwTO1jBTFHALMD
-         kg54Ei0mvOZOLPGAylyp8Vu7Dx/EBpgA6i5yyEd3hK57IvUFpz8pN81Iyh01vfnnc5gy
-         BtnlXTDKqywozw12SSDF/GtRLZvSdzAuVlqZ5aHUdIu5jJ5CAHYChBmAY6L3S/uysoPn
-         xtvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772043540; x=1772648340;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zUmyD9mZSPiz34Jxj++5qqJO6oRTMfL2GZK09sjFXQc=;
-        b=c1R8gv+7qPeK0HlnW7DqamiC6fBBIPJQgkQGjFBcrPW+E0Si7bMCh5OPiiYbYYUs/C
-         qqIFRMfeQ3LKKa8jtyWlT4DqXmkkCuTftyhrysDOmIja1yZBacUZ5J4TPnAQLtt2Z1L7
-         x5nERXUBXwLWoeUJm2l0kMhEvifddZS957dDPBMfIx1s/EcW/4nLyvO464dbxTDB8vSW
-         bLOpdzzCCJLYpQxhI98CQ9ZSGJNSJ+4QGO+MJZ3oW0UROLM8tV+OkRyxUmcJDwDpAIQ6
-         33mEmVCAJzZdSx1X6qJxPQighSRmh44z8O//Fsp/l8LTGtyJlljfHWdFyLvhITG12eRV
-         bQsA==
-X-Forwarded-Encrypted: i=1; AJvYcCXYF4Ucnt1G3G12nh3s0TEe6qdOjBcRVcZ0u/ZCxK5JDL9BTrd8ieNVvBCFsgqrZxle2To0AGbwuhri@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywfzb0rTOcOxJG+mxZBLHqE5IWBpOLmXiQ5M48FmQyOM9mDNNCy
-	sGILgfo2di+h5iscbd6CSTBLByoZEMRnzqZHARZjmEnoduoisWorjW9uTsNsa00BSwrjIf712JL
-	DQKeobND+QaAtRVTCtXDq7gI624ZlOrvQVO5umGgn6Q==
-X-Gm-Gg: ATEYQzw/l3QVAwoBXyLEXNe5nhPe/tFZwiI9ywY0Ur48GlW2IJdnSeylCA88E2I2Diu
-	QvO4T777MAIfkzLo8aAr9k6rfTDVEqijC4GEJftFJ9019QKCW65EF0/cu6COcgoxmN+zcuyGSz8
-	lvb0/OB0UcQCiCMqHKLCPFG9bR1usOsN9eaptesE7YbJ8VnplaPtEy3ooMaNJSFGBFTbSR/RAVg
-	1D65N3iOkqRrULsi7lHD4j98KQIIcgHGQQv8yIU/DpPZXdSo6fqBX+25tFNQOD+nFvKJUKscxkJ
-	6RQurn4V5H/MKMubxkLsQlpEK/xi/8bzi0fPxeudP9B4zJu29NYvBOfNHpW2IYaZbaCrmYaDryg
-	KV6o=
-X-Received: by 2002:a17:90b:564d:b0:354:9c20:83e4 with SMTP id
- 98e67ed59e1d1-358ae7c8ae1mr14170605a91.2.1772043540402; Wed, 25 Feb 2026
- 10:19:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hHQvwfkS"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=a6oaRNyr6mu+qEfuVtfqg3VGjTMB/Odz9rQ5aiUlZ7g=; b=hHQvwfkSEXkWPjY4hLA5HBsFOk
+	ytEH+ILNZWBkpxti0Z7wB+OST0qYraGdEOoBbo+F/auUoQ2wvRr/aRD1nl3b7oWWtcrTqE7z7InJM
+	xW0ghVTEhMi7J3LST1cmG1tixKNglv9OgriDt9CFfXfoJneamZv0N/w4IibD76hUFwCX6ENPNVpdf
+	nL9bGvAUa28yJzQMNIwicqcCVjg5cCzi/eoYZVLkjIP6r1TEDf/M638+G/7HSMXQw44v/ZB8x12pe
+	9L6PvJvsTf52x5nRp2z9IuFtiThKzjO1T3+HNyPMgyO3scvjwGX/0NKy2zmd84BVyP2Ym9t3kJrkh
+	3K6bnyQg==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vvMoh-00000004xmx-0czJ;
+	Wed, 25 Feb 2026 21:53:11 +0000
+Message-ID: <2cb12a60-32f1-4656-8a9f-305bd0be069e@infradead.org>
+Date: Wed, 25 Feb 2026 13:53:10 -0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGk60SF8WxDMpx1ALrne40qycg5J-hxdBniFnoYG=QhvnX5ktQ@mail.gmail.com>
- <CAH2r5mvcrt3T9x-Wqpz_OXVr9cWtBSft=JpASsFDT25CYtXJmw@mail.gmail.com>
- <f47fdd45-21b9-45cb-b322-d7de77b6bdea@talpey.com> <CAH2r5mv-JuF3GgyMdpSnaqazT4xP9U_8PorRiVy2Pt_v5bhSbQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mv-JuF3GgyMdpSnaqazT4xP9U_8PorRiVy2Pt_v5bhSbQ@mail.gmail.com>
-From: Denis Nuja <dnuja@enakta.com>
-Date: Wed, 25 Feb 2026 18:18:49 +0000
-X-Gm-Features: AaiRm53y-pSZ_FU93QPHGKjNKt5HSaQemliMXq6RInicI5L2X8bpkZvQbudDpQQ
-Message-ID: <CAGk60SFUePkcYAWJmAYVMU_MxB6y0XuaMBoDT_ze5R5+Vxi7VQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: Kconfig: CONFIG_CIFS_SMB_DIRECT bool option silently dropped when
  CIFS=m and INFINIBAND=m
-To: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>, CIFS <linux-cifs@vger.kernel.org>, 
-	linux-kbuild@vger.kernel.org, Ned Pyle <ned.pyle@tuxera.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: Denis Nuja <dnuja@enakta.com>, linux-cifs@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, stfrench@microsoft.com,
+ Ned Pyle <ned.pyle@tuxera.com>
+References: <CAGk60SF8WxDMpx1ALrne40qycg5J-hxdBniFnoYG=QhvnX5ktQ@mail.gmail.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <CAGk60SF8WxDMpx1ALrne40qycg5J-hxdBniFnoYG=QhvnX5ktQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Thank you for looking into this Tom and Steve :)
+Hi,
 
-Cheers
-Denis
+On 2/25/26 8:08 AM, Denis Nuja wrote:
+> Hi everyone
+> 
+> CONFIG_CIFS_SMB_DIRECT cannot be enabled when CONFIG_CIFS=m and
+> CONFIG_INFINIBAND=m, despite all declared dependencies being
+> satisfied. The option is silently dropped by olddefconfig and
+> menuconfig refuses to save it, even though menuconfig displays it as
+> [*] (enabled).
+> 
+> Kernel version: 6.4.0
+> 
+> File: fs/smb/client/Kconfig
+> 
+> Current dependency:
+> 
+> if CIFS
+> config CIFS_SMB_DIRECT
+>     bool "SMB Direct support"
+>     depends on CIFS=m && INFINIBAND && INFINIBAND_ADDR_TRANS || CIFS=y
+> && INFINIBAND=y && INFINIBAND_ADDR_TRANS=y
+> 
+> Root cause:
+> 
+> CIFS_SMB_DIRECT is declared as bool (values: n or y only). With CIFS=m
+> and INFINIBAND=m, the left side of the || expression evaluates to:
+> 
+> CIFS=m && INFINIBAND && INFINIBAND_ADDR_TRANS
+> = m && m && y = m
 
-On Wed, 25 Feb 2026 at 17:09, Steve French <smfrench@gmail.com> wrote:
->
-> Good catch
->
-> Thanks,
->
-> Steve
->
-> On Wed, Feb 25, 2026, 11:08=E2=80=AFAM Tom Talpey <tom@talpey.com> wrote:
->>
->> It *did* reproduce - you saw the server config, but the client
->> config was not set!
->>
->> I bet this is the reason that Ubuntu and other distros don't enable
->> client SMBDirect by default! This is a significant issue and should
->> probably be fixed in numerous stable trees.
->>
->> Tom.
->>
->> On 2/25/2026 11:48 AM, Steve French wrote:
->> > It didn't repro with 7.0-rc1 when I tried it. Any ideas?
->> >
->> > smfrench@smfrench-ThinkPad-P16s-Gen-2:~/smb3-kernel$ ./scripts/config
->> > --enable CONFIG_CIFS_SMB_DIRECT
->> > smfrench@smfrench-ThinkPad-P16s-Gen-2:~/smb3-kernel$ make olddefconfig
->> > #
->> > # No change to .config
->> > #
->> > smfrench@smfrench-ThinkPad-P16s-Gen-2:~/smb3-kernel$ grep SMBDIRECT .c=
-onfig
->> > CONFIG_SMB_SERVER_SMBDIRECT=3Dy
->> >
->> > On Wed, Feb 25, 2026 at 10:24=E2=80=AFAM Denis Nuja <dnuja@enakta.com>=
- wrote:
->> >>
->> >> Hi everyone
->> >>
->> >> CONFIG_CIFS_SMB_DIRECT cannot be enabled when CONFIG_CIFS=3Dm and
->> >> CONFIG_INFINIBAND=3Dm, despite all declared dependencies being
->> >> satisfied. The option is silently dropped by olddefconfig and
->> >> menuconfig refuses to save it, even though menuconfig displays it as
->> >> [*] (enabled).
->> >>
->> >> Kernel version: 6.4.0
->> >>
->> >> File: fs/smb/client/Kconfig
->> >>
->> >> Current dependency:
->> >>
->> >> if CIFS
->> >> config CIFS_SMB_DIRECT
->> >>      bool "SMB Direct support"
->> >>      depends on CIFS=3Dm && INFINIBAND && INFINIBAND_ADDR_TRANS || CI=
-FS=3Dy
->> >> && INFINIBAND=3Dy && INFINIBAND_ADDR_TRANS=3Dy
->> >>
->> >> Root cause:
->> >>
->> >> CIFS_SMB_DIRECT is declared as bool (values: n or y only). With CIFS=
-=3Dm
->> >> and INFINIBAND=3Dm, the left side of the || expression evaluates to:
->> >>
->> >> CIFS=3Dm && INFINIBAND && INFINIBAND_ADDR_TRANS
->> >> =3D m && m && y =3D m
->> >>
->> >> The result is m (tristate), but since CIFS_SMB_DIRECT is a bool, the
->> >> Kconfig engine coerces m to n and silently drops the option. The righ=
-t
->> >> side of the || requires CIFS=3Dy && INFINIBAND=3Dy which forces both =
-to be
->> >> built-in =E2=80=94 an unnecessarily restrictive requirement.
->> >>
->> >> Additionally, the CIFS=3Dm/y conditions inside the depends on are
->> >> redundant since the option is already inside an if CIFS block, which
->> >> handles that guard.
->> >>
->> >> Observed behaviour:
->> >>
->> >> menuconfig shows [*] SMB Direct support (appears enabled)
->> >> Saving from menuconfig does not write CONFIG_CIFS_SMB_DIRECT=3Dy to .=
-config
->> >> olddefconfig emits warning: override: reassigning to symbol
->> >> CIFS_SMB_DIRECT and drops it
->> >> scripts/config --enable CONFIG_CIFS_SMB_DIRECT silently has no effect
->> >>
->> >> Proposed fix:
->> >>
->> >> Since the option is inside if CIFS, the CIFS=3Dm/y conditions are
->> >> redundant. The dependency should simply be:
->> >>
->> >> - depends on CIFS=3Dm && INFINIBAND && INFINIBAND_ADDR_TRANS || CIFS=
-=3Dy
->> >> && INFINIBAND=3Dy && INFINIBAND_ADDR_TRANS=3Dy
->> >> + depends on INFINIBAND && INFINIBAND_ADDR_TRANS
->> >>
->> >> This correctly expresses the intent (RDMA stack must be present)
->> >> without the tristate/bool coercion problem, and is consistent with ho=
-w
->> >> the surrounding if CIFS block already guards the option.
->> >>
->> >> The same issue affects CONFIG_CIFS_FSCACHE on line 191 with an
->> >> identical pattern:
->> >>
->> >> depends on CIFS=3Dm && FSCACHE || CIFS=3Dy && FSCACHE=3Dy
->> >>
->> >> which should also be simplified to:
->> >>
->> >> depends on FSCACHE
->> >>
->> >> To reproduce:
->> >>
->> >> # Start with a config where CONFIG_CIFS=3Dm, CONFIG_INFINIBAND=3Dm
->> >> scripts/config --enable CONFIG_CIFS_SMB_DIRECT
->> >> make olddefconfig
->> >> grep SMBDIRECT .config   # empty =E2=80=94 option was dropped
->> >>
->> >>
->> >> Cheers
->> >> Denis
->> >> Enakta Labs
->> >>
->> >
->> >
->>
+Where do you get the last "y = m" part?
+
+xconfig says: (This is 7.0-rc1. Guess I'll check 6.4.0 also.)
+
+Prompt: SMB Direct support
+Depends on: NETWORK_FILESYSTEMS [=y] && CIFS [=m] && (CIFS [=m]=m [=m] && INFINIBAND [=m] && INFINIBAND_ADDR_TRANS [=y] || CIFS [=m]=y [=y] && INFINIBAND [=m]=y [=y] && INFINIBAND_ADDR_TRANS [=y])
+
+so my .config has:
+CONFIG_CIFS=m
+CONFIG_CIFS_STATS2=y
+CONFIG_CIFS_ALLOW_INSECURE_LEGACY=y
+# CONFIG_CIFS_UPCALL is not set
+# CONFIG_CIFS_XATTR is not set
+CONFIG_CIFS_DEBUG=y
+# CONFIG_CIFS_DEBUG2 is not set
+# CONFIG_CIFS_DEBUG_DUMP_KEYS is not set
+# CONFIG_CIFS_DFS_UPCALL is not set
+# CONFIG_CIFS_SWN_UPCALL is not set
+CONFIG_CIFS_SMB_DIRECT=y
+# CONFIG_CIFS_COMPRESSION is not set
+
+Working in 7.0-rc1.
+What am I missing?
+
+
+> The result is m (tristate), but since CIFS_SMB_DIRECT is a bool, the
+> Kconfig engine coerces m to n and silently drops the option. The right
+> side of the || requires CIFS=y && INFINIBAND=y which forces both to be
+> built-in — an unnecessarily restrictive requirement.
+> 
+> Additionally, the CIFS=m/y conditions inside the depends on are
+> redundant since the option is already inside an if CIFS block, which
+> handles that guard.
+> 
+> Observed behaviour:
+> 
+> menuconfig shows [*] SMB Direct support (appears enabled)
+> Saving from menuconfig does not write CONFIG_CIFS_SMB_DIRECT=y to .config
+> olddefconfig emits warning: override: reassigning to symbol
+> CIFS_SMB_DIRECT and drops it
+> scripts/config --enable CONFIG_CIFS_SMB_DIRECT silently has no effect
+> 
+> Proposed fix:
+> 
+> Since the option is inside if CIFS, the CIFS=m/y conditions are
+> redundant. The dependency should simply be:
+> 
+> - depends on CIFS=m && INFINIBAND && INFINIBAND_ADDR_TRANS || CIFS=y
+> && INFINIBAND=y && INFINIBAND_ADDR_TRANS=y
+> + depends on INFINIBAND && INFINIBAND_ADDR_TRANS
+> 
+> This correctly expresses the intent (RDMA stack must be present)
+> without the tristate/bool coercion problem, and is consistent with how
+> the surrounding if CIFS block already guards the option.
+> 
+> The same issue affects CONFIG_CIFS_FSCACHE on line 191 with an
+> identical pattern:
+> 
+> depends on CIFS=m && FSCACHE || CIFS=y && FSCACHE=y
+> 
+> which should also be simplified to:
+> 
+> depends on FSCACHE
+> 
+> To reproduce:
+> 
+> # Start with a config where CONFIG_CIFS=m, CONFIG_INFINIBAND=m
+> scripts/config --enable CONFIG_CIFS_SMB_DIRECT
+> make olddefconfig
+> grep SMBDIRECT .config   # empty — option was dropped
+> 
+> 
+> Cheers
+> Denis
+> Enakta Labs
+> 
+
+-- 
+~Randy
+
