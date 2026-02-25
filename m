@@ -1,227 +1,270 @@
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11022104.outbound.protection.outlook.com [52.101.43.104])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1763D902B;
-	Wed, 25 Feb 2026 17:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.104
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772039295; cv=fail; b=sbg0kPumuTAzIIW38D15XkECS5cqc1E7gamL83wEKBQQV+Hxs0DaF+xPbJp55paUYqRZjV1wy288PHUgKiou8EOtgVdvF1Fy/ORsl6ofORZ2NLj92v265eqi1GhoM1OLaZYF9cTqotGsaO1jN4JMGAnue4UT9xWoXiWxxYCX+zg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772039295; c=relaxed/simple;
-	bh=ICQM54IsCDPAgs0ORfVR0Y22l+JKF+NA6fZv+fRoQ2M=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Vjhzzzj3BQqbv9X6bYsKSTrlYvJBqexBOZy0WdHW5DDZ+FVXDFornecb7yh2NnpHasiS5IqHy85wQPA3ToMU3yzO8KKaSzBIgLgbtevMeugxTwzn2T+jzjl2rXgTWO3qs8zuPt2gdEfIh06S4iLWqXPFe9J3swXYYa5jqESnXYQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com; spf=pass smtp.mailfrom=talpey.com; arc=fail smtp.client-ip=52.101.43.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JfPFQbDXw/qxylgwQt+eH3bPEfg7Psa9QcMPdtKav299CVONhigOgqjRxnmSLQNLTGS0op7bu2mjlAvI4GcFh00g9r5Zoy6VIgTAVKF9ubUqB0tkHotFqxZ2AsPUCXfXIv41y3iSpEA7eXdgdNsefbB3ENbKvhNvHQ2qVKr9J3TkVR1LQEGLnPxFx2fF+nw2aHNz1fuKz5Md0MtzjpNiTE6bp3aOeSy7a9KNnGZtWH3/KIqse5wIjPsQgmufIkB65v/dVxFvi2J5rQ0BZQCd7YVRO6lryn6LxSbGvdEoC+G15JDqHrskSCJMWmWQs21xG4APk23U+f82a8qU/Eth+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wZLFIAqBwkRyHb0f4G7IE7saohrY63hSoFiIJt2EcNw=;
- b=j2XMyIW5u4TEwtAVaKAacv90CKLoDrcYVQ01oPGk1eqqZ4PFM6jmeLqJkl1aTWYayeu1FjvDOtWgiYRdgLToktp99jMB1Bqomoi7up6KAZ0yjQ6YyxeDAajz9RRhMHYA5dvSXAis3A7uEdPleWVBPFP3omdaGYXS3kVORczDPstWxLngacdCmTKsxWORuhtb8Q600psqIF7NukYk4FameSykK25+LCDuJkVeKMY4uPMvqbNig48M4IeDVvPYQG0RC57TwDGvwkB898zi2rV0b12mO02bMA9gzSiY9UBsGmLalehj0Yy1AkkbsqhNAK9s2yNV9KPXaFVGYe3E+m51Tg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from DM6PR01MB5147.prod.exchangelabs.com (2603:10b6:5:5e::20) by
- PH7PR01MB8665.prod.exchangelabs.com (2603:10b6:510:30d::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.22; Wed, 25 Feb 2026 17:08:10 +0000
-Received: from DM6PR01MB5147.prod.exchangelabs.com
- ([fe80::5bd7:7a26:d6ec:59fd]) by DM6PR01MB5147.prod.exchangelabs.com
- ([fe80::5bd7:7a26:d6ec:59fd%3]) with mapi id 15.20.9632.017; Wed, 25 Feb 2026
- 17:08:10 +0000
-Message-ID: <f47fdd45-21b9-45cb-b322-d7de77b6bdea@talpey.com>
-Date: Wed, 25 Feb 2026 12:08:10 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kconfig: CONFIG_CIFS_SMB_DIRECT bool option silently dropped when
- CIFS=m and INFINIBAND=m
-To: Steve French <smfrench@gmail.com>, Denis Nuja <dnuja@enakta.com>
-Cc: linux-cifs@vger.kernel.org, linux-kbuild@vger.kernel.org,
- Ned Pyle <ned.pyle@tuxera.com>
-References: <CAGk60SF8WxDMpx1ALrne40qycg5J-hxdBniFnoYG=QhvnX5ktQ@mail.gmail.com>
- <CAH2r5mvcrt3T9x-Wqpz_OXVr9cWtBSft=JpASsFDT25CYtXJmw@mail.gmail.com>
-From: Tom Talpey <tom@talpey.com>
-Content-Language: en-US
-In-Reply-To: <CAH2r5mvcrt3T9x-Wqpz_OXVr9cWtBSft=JpASsFDT25CYtXJmw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DS7PR03CA0301.namprd03.prod.outlook.com (2603:10b6:8:2b::8)
- To DM6PR01MB5147.prod.exchangelabs.com (2603:10b6:5:5e::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781293E8C7A;
+	Wed, 25 Feb 2026 17:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772042327; cv=none; b=mXLsJt+1rxtLIBSZ9RN9AItxmpmYU0SOAHS1gTZKG1cm4iTtjfnAYQS76Pu6uemWHjKm332VhZ4VEOB0r+x8xQk6RUQODx/nGEwvxcNgSw0INcjNJLhh9Gda8Fhmy8JLgAN0VW4KErE6PEb9M6g502++KrzC08ejQkHL7lsCvX4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772042327; c=relaxed/simple;
+	bh=v0gF9Yip5vqOARGERS15X+Fy4jzc8bSZ5q+f4+jXpUg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CcrNxUTr7XjM9ykc8C3dwWr6hgItqCOLnFpTguLmnoS+iRAWIexPNDqwWWw8yQvEP4S7pFsuyhMpQ8/e4yRRjGFzJwtYoheBIjVQ6clYvvsIJZnrJE28QyuPmh86GagjoB0UxEYcHdze4TD2EjTtUGjBb/RIW7qZoOuE48qta/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zu8JNqj/; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zu8JNqj/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99D58C19421;
+	Wed, 25 Feb 2026 17:58:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772042327;
+	bh=v0gF9Yip5vqOARGERS15X+Fy4jzc8bSZ5q+f4+jXpUg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Zu8JNqj/+hKCuwHWQmCTVK1tpzyAwq+TjOic7LMbDsxpza4QKAWhfMSzlUs+0RVaB
+	 dVEVQkTrA/nffg0WU/RbRyizDjK8x/ZZIKCxA+UXJEwWrxt5Wpbq5rQUCtJM3nvtLx
+	 q+JxJeiHbsMLzLZ6iqjDQWOSGmPTmUhRf/ziwKMKjrPhiDtm/w8nMJInDFHB/sHrXC
+	 Do+b3hGxgat3Nv8fAK0fCFQp3tHzsLTxU+5lrdqimLhUJMr6yJEnnwPFXJhST7BjVB
+	 rb299g0C9pNfUgE11c2kcpJ0CTepo+iR7WwwBYjEhjklyRu8LgjuGzc8b730qjqJ6p
+	 y/a4iv4wHRlTw==
+Date: Wed, 25 Feb 2026 12:58:45 -0500
+From: Mike Snitzer <snitzer@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Luis de Bethencourt <luisbg@kernel.org>,
+	Salah Triki <salah.triki@gmail.com>,
+	Nicolas Pitre <nico@fluxnic.net>,
+	Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+	Anders Larsen <al@alarsen.net>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	David Sterba <dsterba@suse.com>, Chris Mason <clm@fb.com>,
+	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
+	Sandeep Dhavale <dhavale@google.com>,
+	Hongbo Li <lihongbo22@huawei.com>,
+	Chunhai Guo <guochunhai@vivo.com>, Jan Kara <jack@suse.com>,
+	Theodore Ts'o <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Richard Weinberger <richard@nod.at>,
+	Dave Kleikamp <shaggy@kernel.org>,
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Mike Marshall <hubcap@omnibond.com>,
+	Martin Brandenburg <martin@omnibond.com>,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	Amir Goldstein <amir73il@gmail.com>,
+	Phillip Lougher <phillip@squashfs.org.uk>,
+	Carlos Maiolino <cem@kernel.org>, Hugh Dickins <hughd@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Sungjong Seo <sj1557.seo@samsung.com>,
+	Yuezhang Mo <yuezhang.mo@sony.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Hans de Goede <hansg@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+	linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
+	ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org,
+	linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org, gfs2@lists.linux.dev, linux-doc@vger.kernel.org,
+	v9fs@lists.linux.dev, ceph-devel@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: Re: [PATCH 24/24] fs: remove simple_nosetlease()
+Message-ID: <aZ84VRrRVyGEzSJn@kernel.org>
+References: <20260108-setlease-6-20-v1-0-ea4dec9b67fa@kernel.org>
+ <20260108-setlease-6-20-v1-24-ea4dec9b67fa@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR01MB5147:EE_|PH7PR01MB8665:EE_
-X-MS-Office365-Filtering-Correlation-Id: c53e1dd0-3a66-4aae-ac18-08de74907401
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	Fq2Tx170Ph4XDG/rqmMIsbdCYCJBjiE6bKd6a/oMof/9xf1ArEeVGzwY46Zj7CaZe61aoKjbluBt2i3e7nncvpqlbaQAaPVha+2qTdE1OmBuh7YejWWcFYYQfmX39FMyNv35qSm8DllX1kPQ+0OuPEtw/hSid9KSPpSAsg9WFu+ZY5x5HLg6IXDh6LE3BGzW72BShVcI2rEvRNegRdwFsC/V0oW7G9TZyL5wuoiBFjMrMsCsjbAoYUwrgIobtG2Mz4jNDS49pyjutllLSDWnbxaPm43iBsUml0/rdLrKH1OQpU//I/lxB95oGATpYudglgnlJFDGJAMTzLqtYfMgGM1Wg8+8nQOltF6cv76UomcUC2gpVqwnL7UFFr73gnY3c1ARgUU3GOCQxKP4bv8/5U3Q0J6+IbHZAd+jVu6Wnc6YgwSHtAjYTqQNc6OAA8FYhA9E1p9IImYIrkia33x4F6lcE/JhCIRD5wXR7XD9+mC3/4p84cRDZDko86OvLKz3y/PIU80nb352UmOUHkADW2Rssfwe2Iz5ntaOhvjDMLetj/V4/xshCwNdHlM6NmR/v1R9lz5BVt6K6rlJjvVoj1aicFp7JN/PbkXjaBSqUFfn5NfPREGfvzN2A4fKnTlM+kY/Z4LTOOdGiUbVJHhm0LZg3RSzQKB0vhUBJbrvhDdx47SvCZ44Av/REq5OrPkuhVy2wH0dOpGStcqM35rWMvjkpkzzBRCsXNhzRP6DyfM=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR01MB5147.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?U2pvcytWbmdjYWpwSEZ1ZFdTb1h3RWhMUDNyNm12dk9sOUZMbEV1cDNiN1Ro?=
- =?utf-8?B?Qlc0bURwVDVjMDVUSDh4bjVnTjhRTlF4Qm5BMkJmSDdMekVaaGJnbGNiNG5l?=
- =?utf-8?B?N0pNZmYzdERKeWlxT09uN2c2dkFxc3h4VmtlOWJicXlDWi9jb002a0p4VUpP?=
- =?utf-8?B?aG9wWXlrdVludHVwdXpFaWpNcjNVRW13dlhVeVMrNEpLVDd5WXJGaG5iTFMw?=
- =?utf-8?B?eVI5Z25od1VyMXhlUkRMS2NCZGdxYkprQ0xncFEwbjJNWEV5UlVIS0RFMG12?=
- =?utf-8?B?eEZDaEFyQm5USGVveG5Yd3RLVXQ3YWJaNGNZNnd1c0JyTlN1Sk9jMm1VWXY3?=
- =?utf-8?B?NlJmVSs4QkY5RWsrc1RqUGNuZlRHMU14L2UzcUFYbmJ4dEdHVDQ1NW5Cd01O?=
- =?utf-8?B?WDNRRkJCQUJBd3VNN1B5NUdhQ3J5dW41aHUzdEhDRHpvVVpoOEw2RTJ0Wkpk?=
- =?utf-8?B?TVZuZFpPYmRQNUFtRzdvdXQ4eVFFR1ljUGt6c1VRNmxDMkIyRE43R0d2bXJC?=
- =?utf-8?B?N2tWNDUvYkxIQlQyOHFKdTYzNFprVEFMaUQ1MWFJaGpVZEtZazd5M1ZSanZF?=
- =?utf-8?B?R1ZHR25iNFRCK3k3QlFvaGZyVElWRFdScFJMcXlHSkVURDdZVyswVE1kd1V4?=
- =?utf-8?B?Yk9GSWdSYWFEWVpJUU11QWNiZkJSSFJka2xydndmeUNHL1J1RmVBb2VaSEc4?=
- =?utf-8?B?SWxrNytIWXNIeS9CNFlUNFg1RWRGTVNHRkQ4M0FSNzh0c2RwZk5YWC9NMDlh?=
- =?utf-8?B?V2ZXTmRhVi84TUVDeGM0bnNHVlBFVnpkaDNHZmIzTkxwOGIyajJuL1dMUytO?=
- =?utf-8?B?QUJkUDVjYTJ1SzNxUDNWYTlKQTFLbzFLTlVEOFlyNjN4Nkd0U1RuejYvMHVM?=
- =?utf-8?B?SjdTTEx4UFB1K0ErMmRtcWNvME1ISVhqTk9kWEtCUDdVdE9DUFlmZjB2MlRO?=
- =?utf-8?B?UXF6S1JyNzg0T21WNzZ0R2tRcDVtWXpHRmQxZFcwOWJTZDNsUHVKRnJuRjNa?=
- =?utf-8?B?aGc3Mklid21Ea3h3M3QwY2tYYW9sRDlhclo1NG5oMVlUNW9JT0tZQWNnWnR1?=
- =?utf-8?B?NmRXT052SGdDZ2hnTmN4eFFneVU3RkNnVmZ0V2taU211Ni9VaHoyeXhheEwy?=
- =?utf-8?B?WDVydnRRREhzVjhMVUJnQkFuV2JBdytjaDBJbThOMFVkNTJhNWdGd0xHcW9i?=
- =?utf-8?B?cXByU2RVTXFmdmYraDN5WStKN1ViZXJxeDZpb0owdU5xcVhlK1p2OTJLSjg4?=
- =?utf-8?B?K3ZCeHR3THV6ZG9VTXVZdWp1cXh3ek5QNGt5VDJ6U0xXTHlIa0ZOazFlTFRE?=
- =?utf-8?B?bTFzQndydE1NVWlVdmFpS1JBOWh6bFNMRVV0a1JLSFUvMmgyT1FsZlNuS1or?=
- =?utf-8?B?TWtQd012T3I1QVhqRnVCZm83SmZJUUxaVU9FeTZXeG9RYXJaNGZTYWNDK2to?=
- =?utf-8?B?NjlEUDJPZ1pNUDRGbUFVNENJWnZ5OWhKK1hxb3IwclAzNmlDdVRjOWRkTVE1?=
- =?utf-8?B?a1FyRlBvK3hrMGNYMnZZdlAyWVRJbFJoK2NTQmkrbjJubmNtTis5M1ZFd05n?=
- =?utf-8?B?VDZuVGQ5UFVxUkJEM3E0V2hGUno0RG5TWWF0d1BwaTdoWUpWOTQ4QjRUVytQ?=
- =?utf-8?B?NlNTU0Y1ZlE2cmo4MDlGMUxoZjg3QjdlZDhWNmVYTG1PL29nY0NYbmE2NE9F?=
- =?utf-8?B?dE5kWlRRVmpkMlp4bExzNmV4SzJzUnNaSncvTll6YTRsTGZxU1FpdG0rUGNw?=
- =?utf-8?B?WWZ3djZ3Z2QzYTJpSEliVnU4UlRESjB0Y0puWWFIUm9hNllEV1dsS1RIMlhX?=
- =?utf-8?B?NGJENjZBYzZSY29vb2hpMHZKWmwvLzNBaTVlUlB4b0NyR3J2cFA4VmxldnU3?=
- =?utf-8?B?OVY1TmFCYWQvdmp4SnltNFNHcVk2SUQ3cDdRYkZmS2NhWU5rTXZMN3NlNllT?=
- =?utf-8?B?UGlDV0EwcTlzREJITE0zRkZ1NURMK3ZVUG5WZURRWjFqZzZOUTdHME1OSjlJ?=
- =?utf-8?B?SnBxRzhCYVpCMGxkdnNRQXVaeUVMb1dOdndjNFFSaEtVTXptZnYyWUdHZmJZ?=
- =?utf-8?B?c0lIbXBlUklFV0Vtb2d2T2lVb3pMVUp3TDhKRUltQkFkUGljUE9pKy8yV0cz?=
- =?utf-8?B?RkFaUDFVWGRMUCtWYW1FdkNDeW81Q05kMGhmNEVWRmgrbGdaZXdZNmRNVU4z?=
- =?utf-8?B?dGdqNk93WWN1Yk4wU3RuTloyaEJPTGN4QU8wMytKeERYREJ3SncxbkFDZnc2?=
- =?utf-8?B?cGYxeXZOY0ZDb0IxOGh1WW1ZVHV4a0ZHMVdRSVRYNnEwZ0VZSndoRW95VEJF?=
- =?utf-8?Q?lmiMfqlx8IJEdJvTTw?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c53e1dd0-3a66-4aae-ac18-08de74907401
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR01MB5147.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 17:08:10.4613
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OenH5UGHRddNieE/u3iQpLKHtQ/JEhW5caQMERQQP10FUhanzlbeDbt9OfNNNXgj
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR01MB8665
+Content-Type: multipart/mixed; boundary="BuvfweD5MaN+t/uz"
+Content-Disposition: inline
+In-Reply-To: <20260108-setlease-6-20-v1-24-ea4dec9b67fa@kernel.org>
 
-It *did* reproduce - you saw the server config, but the client
-config was not set!
 
-I bet this is the reason that Ubuntu and other distros don't enable
-client SMBDirect by default! This is a significant issue and should
-probably be fixed in numerous stable trees.
+--BuvfweD5MaN+t/uz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Tom.
-
-On 2/25/2026 11:48 AM, Steve French wrote:
-> It didn't repro with 7.0-rc1 when I tried it. Any ideas?
+On Thu, Jan 08, 2026 at 12:13:19PM -0500, Jeff Layton wrote:
+> Setting ->setlease() to a NULL pointer now has the same effect as
+> setting it to simple_nosetlease(). Remove all of the setlease
+> file_operations that are set to simple_nosetlease, and the function
+> itself.
 > 
-> smfrench@smfrench-ThinkPad-P16s-Gen-2:~/smb3-kernel$ ./scripts/config
-> --enable CONFIG_CIFS_SMB_DIRECT
-> smfrench@smfrench-ThinkPad-P16s-Gen-2:~/smb3-kernel$ make olddefconfig
-> #
-> # No change to .config
-> #
-> smfrench@smfrench-ThinkPad-P16s-Gen-2:~/smb3-kernel$ grep SMBDIRECT .config
-> CONFIG_SMB_SERVER_SMBDIRECT=y
-> 
-> On Wed, Feb 25, 2026 at 10:24 AM Denis Nuja <dnuja@enakta.com> wrote:
->>
->> Hi everyone
->>
->> CONFIG_CIFS_SMB_DIRECT cannot be enabled when CONFIG_CIFS=m and
->> CONFIG_INFINIBAND=m, despite all declared dependencies being
->> satisfied. The option is silently dropped by olddefconfig and
->> menuconfig refuses to save it, even though menuconfig displays it as
->> [*] (enabled).
->>
->> Kernel version: 6.4.0
->>
->> File: fs/smb/client/Kconfig
->>
->> Current dependency:
->>
->> if CIFS
->> config CIFS_SMB_DIRECT
->>      bool "SMB Direct support"
->>      depends on CIFS=m && INFINIBAND && INFINIBAND_ADDR_TRANS || CIFS=y
->> && INFINIBAND=y && INFINIBAND_ADDR_TRANS=y
->>
->> Root cause:
->>
->> CIFS_SMB_DIRECT is declared as bool (values: n or y only). With CIFS=m
->> and INFINIBAND=m, the left side of the || expression evaluates to:
->>
->> CIFS=m && INFINIBAND && INFINIBAND_ADDR_TRANS
->> = m && m && y = m
->>
->> The result is m (tristate), but since CIFS_SMB_DIRECT is a bool, the
->> Kconfig engine coerces m to n and silently drops the option. The right
->> side of the || requires CIFS=y && INFINIBAND=y which forces both to be
->> built-in — an unnecessarily restrictive requirement.
->>
->> Additionally, the CIFS=m/y conditions inside the depends on are
->> redundant since the option is already inside an if CIFS block, which
->> handles that guard.
->>
->> Observed behaviour:
->>
->> menuconfig shows [*] SMB Direct support (appears enabled)
->> Saving from menuconfig does not write CONFIG_CIFS_SMB_DIRECT=y to .config
->> olddefconfig emits warning: override: reassigning to symbol
->> CIFS_SMB_DIRECT and drops it
->> scripts/config --enable CONFIG_CIFS_SMB_DIRECT silently has no effect
->>
->> Proposed fix:
->>
->> Since the option is inside if CIFS, the CIFS=m/y conditions are
->> redundant. The dependency should simply be:
->>
->> - depends on CIFS=m && INFINIBAND && INFINIBAND_ADDR_TRANS || CIFS=y
->> && INFINIBAND=y && INFINIBAND_ADDR_TRANS=y
->> + depends on INFINIBAND && INFINIBAND_ADDR_TRANS
->>
->> This correctly expresses the intent (RDMA stack must be present)
->> without the tristate/bool coercion problem, and is consistent with how
->> the surrounding if CIFS block already guards the option.
->>
->> The same issue affects CONFIG_CIFS_FSCACHE on line 191 with an
->> identical pattern:
->>
->> depends on CIFS=m && FSCACHE || CIFS=y && FSCACHE=y
->>
->> which should also be simplified to:
->>
->> depends on FSCACHE
->>
->> To reproduce:
->>
->> # Start with a config where CONFIG_CIFS=m, CONFIG_INFINIBAND=m
->> scripts/config --enable CONFIG_CIFS_SMB_DIRECT
->> make olddefconfig
->> grep SMBDIRECT .config   # empty — option was dropped
->>
->>
->> Cheers
->> Denis
->> Enakta Labs
->>
-> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+>  fs/9p/vfs_dir.c        |  2 --
+>  fs/9p/vfs_file.c       |  2 --
+>  fs/ceph/dir.c          |  2 --
+>  fs/ceph/file.c         |  1 -
+>  fs/fuse/dir.c          |  1 -
+>  fs/gfs2/file.c         |  2 --
+>  fs/libfs.c             | 18 ------------------
+>  fs/nfs/dir.c           |  1 -
+>  fs/nfs/file.c          |  1 -
+>  fs/smb/client/cifsfs.c |  1 -
+>  fs/vboxsf/dir.c        |  1 -
+>  fs/vboxsf/file.c       |  1 -
+>  include/linux/fs.h     |  1 -
+>  13 files changed, 34 deletions(-)
 > 
 
+<snip>
+
+> diff --git a/fs/libfs.c b/fs/libfs.c
+> index 697c6d5fc12786c036f0086886297fb5cd52ae00..f1860dff86f2703266beecf31e9d2667af7a9684 100644
+> --- a/fs/libfs.c
+> +++ b/fs/libfs.c
+> @@ -1699,24 +1699,6 @@ struct inode *alloc_anon_inode(struct super_block *s)
+>  }
+>  EXPORT_SYMBOL(alloc_anon_inode);
+>  
+> -/**
+> - * simple_nosetlease - generic helper for prohibiting leases
+> - * @filp: file pointer
+> - * @arg: type of lease to obtain
+> - * @flp: new lease supplied for insertion
+> - * @priv: private data for lm_setup operation
+> - *
+> - * Generic helper for filesystems that do not wish to allow leases to be set.
+> - * All arguments are ignored and it just returns -EINVAL.
+> - */
+> -int
+> -simple_nosetlease(struct file *filp, int arg, struct file_lease **flp,
+> -		  void **priv)
+> -{
+> -	return -EINVAL;
+> -}
+> -EXPORT_SYMBOL(simple_nosetlease);
+> -
+>  /**
+>   * simple_get_link - generic helper to get the target of "fast" symlinks
+>   * @dentry: not used here
+> diff --git a/fs/nfs/dir.c b/fs/nfs/dir.c
+> index 71df279febf797880ded19e45528c3df4cea2dde..23a78a742b619dea8b76ddf28f4f59a1c8a015e2 100644
+> --- a/fs/nfs/dir.c
+> +++ b/fs/nfs/dir.c
+> @@ -66,7 +66,6 @@ const struct file_operations nfs_dir_operations = {
+>  	.open		= nfs_opendir,
+>  	.release	= nfs_closedir,
+>  	.fsync		= nfs_fsync_dir,
+> -	.setlease	= simple_nosetlease,
+>  };
+>  
+>  const struct address_space_operations nfs_dir_aops = {
+> diff --git a/fs/nfs/file.c b/fs/nfs/file.c
+> index d020aab40c64ebda30d130b6acee1b9194621457..9d269561961825f88529551b0f0287920960ac62 100644
+> --- a/fs/nfs/file.c
+> +++ b/fs/nfs/file.c
+> @@ -962,7 +962,6 @@ const struct file_operations nfs_file_operations = {
+>  	.splice_read	= nfs_file_splice_read,
+>  	.splice_write	= iter_file_splice_write,
+>  	.check_flags	= nfs_check_flags,
+> -	.setlease	= simple_nosetlease,
+>  	.fop_flags	= FOP_DONTCACHE,
+>  };
+>  EXPORT_SYMBOL_GPL(nfs_file_operations);
+
+Hey Jeff,
+
+I've noticed an NFS reexport regression in v6.19 and now v7.0-rc1
+(similar but different due to your series that requires opt-in via
+.setlease).
+
+Bisect first pointed out this commit:
+10dcd5110678 nfs: properly disallow delegation requests on directories
+
+And now with v7.0-rc1 its the fact that NFS doesn't provide .setlease
+so lstat() on parent dir (of file that I touch) gets -EINVAL.
+
+So its a confluence of NFS's dir delegations and your setlease changes.
+
+If I reexport NFSv4.2 filesystem in terms of NFSv4.1, the regression
+is seen by doing (lstat reproducer that gemini spit out for me is
+attached):
+
+$ touch /mnt/share41/test
+$ strace ./lstat /mnt/share41
+...
+lstat("/mnt/share41", 0x7ffec0d79920)   = -1 EINVAL (Invalid argument)
+
+If I immediately re-run it works:
+...
+lstat("/mnt/share41", {st_mode=S_IFDIR|0777, st_size=4096, ...}) = 0
+
+I'm not sure what the proper fix is yet, but I feel like you've missed
+that NFS itself can be (re)exported?
+
+Thanks,
+Mike
+
+--BuvfweD5MaN+t/uz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="lstat.c"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+    // 1. Check if the filename was provided via argv
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    struct stat file_stats;
+
+    // 2. Pass the filename to the lstat syscall
+    if (lstat(argv[1], &file_stats) < 0) {
+        perror("lstat error");
+        return EXIT_FAILURE;
+    }
+
+    // 3. Display some basic metadata
+    printf("Information for: %s\n", argv[1]);
+    printf("---------------------------\n");
+    printf("File Size: \t\t%lld bytes\n", (long long)file_stats.st_size);
+    printf("Number of Links: \t%ld\n", (long)file_stats.st_nlink);
+    printf("File inode: \t\t%ld\n", (long)file_stats.st_ino);
+
+    // 4. Determine file type using macros
+    printf("File Type: \t\t");
+    if (S_ISLNK(file_stats.st_mode)) printf("Symbolic Link\n");
+    else if (S_ISREG(file_stats.st_mode)) printf("Regular File\n");
+    else if (S_ISDIR(file_stats.st_mode)) printf("Directory\n");
+    else printf("Other\n");
+
+    return EXIT_SUCCESS;
+}
+
+--BuvfweD5MaN+t/uz--
