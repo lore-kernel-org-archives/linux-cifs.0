@@ -1,133 +1,227 @@
-Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11022104.outbound.protection.outlook.com [52.101.43.104])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7C83E8C45
-	for <linux-cifs@vger.kernel.org>; Wed, 25 Feb 2026 16:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772038200; cv=none; b=juuXsxDGe2WOt4UKGP2KwlgrUJiTdIcbXpxAGIn55IAKlEmkMy39l0bL8LeVDtg0uYIO52ZItPf4a2IYHQIyNE8InlpQlnpBiucJE54hjb9E9r6sV5OeESQPajsWu8/Yp7VpB2ddKA3eGaSUvB7VZg1+3jsnj39feIasZqZzrWQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772038200; c=relaxed/simple;
-	bh=FkYpPYnCpizXz06xGA6Rez+sR7b+2iPrse9OvaUwAwM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HSWwb7N6/xt3k839k/GsTPoRer44chJ5OFeHFahbwz1iBL5p3g5hA1KF8w9XhhIxV9NuBBxDXqjAXBkrBBnGw2FmNQ/K+Mm4shlvxpvVpUVP8UGOPgw9x8+1tx5ykLxlt1VmTvfm3QRP722Z09uWCHMLX4etaNCLTv2TQE/DWxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dMjISKWn; arc=none smtp.client-ip=74.125.82.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dMjISKWn"
-Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-12758ce1e8dso1002322c88.0
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Feb 2026 08:49:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772038198; x=1772642998; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0gT3Brz5SkDMo/RA3FDp7Ea/ZKHRMvaWFqhCGPHZH80=;
-        b=dMjISKWnE4qrjQz0FM+TH6eyuvWmRecpJ/yHAAbj1fWal2yi0qPJjyVMDjQ4sbRLva
-         UsHZJzKwLV18+I1U49exeluvFgx6dScYKNnysly624cVmYh+yTpGn3nMeGzXeiJ2K1mV
-         Tyn9TtaqknmDJea/jmPDexbbG8YAacmrcK79V0asz7FGxIi1y/PwpF3QvnAVC/9bAWQu
-         QTybpyHfPInuFzX4TfqU9K4YY2S1HMIoMMf+cDxN9sFJpA+wdzE9zBSiiTVGO7wseMCT
-         ndIcwjMoWZ7JAuP1v4kkeGec7Sog5+JItpp1/LnsquNczHZxUSqcHXd1VR+Y0zN4Tcm4
-         k7fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772038198; x=1772642998;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0gT3Brz5SkDMo/RA3FDp7Ea/ZKHRMvaWFqhCGPHZH80=;
-        b=YzFSi/1LsJf3CFfxKPdSLxetSt6bEkr2wrFIfPInhbY9eLnxTTKthNwREo3v3Cp/4F
-         tO/xPkaig1M6dwLn61dWasmXZEQVn6ONKLuzcVVClPYk41aKKTp7Ix6NTuxai2z8HsEG
-         QBMiGURDZBZE6oO2c9iJYjXn8XFNZ+TVH+jGdGxaDmry6y9tYk1v6K/K5Ilv2Q6z73eM
-         c8S+Ez3XweowhjAc86oqSWME1sMysIGSitUVjVRrO5tskW++/DaYkj9VGszIkzS4IpFA
-         EqcGtBqe7v8Aw3wV2tvsmfBk0m4y2mLVktNfH6FVIVnea2UK++J8V0zOb7/GEX3M0jDY
-         4I0A==
-X-Forwarded-Encrypted: i=1; AJvYcCVLq3R/pkr0v/bTf2yiANjuuq70y3oWluwBrAONfszGaYaOLuBk5oGPzeP5/k39N2e4KHjc2SdpQAIa@vger.kernel.org
-X-Gm-Message-State: AOJu0YybM0cir7aPXzPWaLjToKki0kVB6zrwlk/W37A+1ZWh4jZad3D5
-	b9exO4Oo2gccJNKRb4pLX8rPs1Nf7as778maIyMhugY5OxbwzrVDE/SA
-X-Gm-Gg: ATEYQzxzWvPO0hhD3NkKUq7HMwkwWucZ9/lSuOoZTEdhaqi5Zcvgs2PNXgOLVl4aq/9
-	2RQyTuJAzhD1jQxhuzo9i9/N95fqE7ZIdD3ppE4xGwlAcxhjCHTavP6MOtYJMAKJixq4NLgalL3
-	x63rq0h7ulsl8NjXQpAFnwC6/2v4OS+CHDKm677ZBtJnvPfDsnJT03r9MJ8L4+8gZTMrmH6P+Ql
-	0oMNTkVNU4mf74Js7BFGBF/3VKpl3++/dhUV63+AJ5tGmCb6hqq2/LqAUwrWo8LsZ3NvPJ9K11w
-	oJaiGXolaRfjMB0TL9yt7KFjiwDcaCeoCpSOyFNegyXs3nvt6IR89MtdGitAi3sXU3/Od97lq52
-	YU0sAGqK6xOrSDMArc16VblpjxtytRvsYEycKbAk5Ut3NFRiuGNTKFlI55nETXWZavUWlIEb1e6
-	l1H9erjJndPW5EYUK5jHSOzbg/fl6BOHLKUSeJs3NHik8iSsQ=
-X-Received: by 2002:a05:7022:524:b0:119:e569:fbb3 with SMTP id a92af1059eb24-1276ad7b9c4mr8511362c88.34.1772038197849;
-        Wed, 25 Feb 2026 08:49:57 -0800 (PST)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1276afa0bedsm14167584c88.16.2026.02.25.08.49.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 08:49:57 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Wed, 25 Feb 2026 08:49:55 -0800
-From: Guenter Roeck <linux@roeck-us.net>
-To: chenxiaosong.chenxiaosong@linux.dev
-Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-	bharathsm@microsoft.com, senozhatsky@chromium.org,
-	dhowells@redhat.com, linux-cifs@vger.kernel.org,
-	ZhangGuoDong <zhangguodong@kylinos.cn>,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: Re: [PATCH v2 1/1] smb/server: fix refcount leak in smb2_open()
-Message-ID: <97979f06-7dd2-46bd-9bdd-3a9c45fc5b1d@roeck-us.net>
-References: <20251229031518.1027240-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251229031518.1027240-2-chenxiaosong.chenxiaosong@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1763D902B;
+	Wed, 25 Feb 2026 17:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.104
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772039295; cv=fail; b=sbg0kPumuTAzIIW38D15XkECS5cqc1E7gamL83wEKBQQV+Hxs0DaF+xPbJp55paUYqRZjV1wy288PHUgKiou8EOtgVdvF1Fy/ORsl6ofORZ2NLj92v265eqi1GhoM1OLaZYF9cTqotGsaO1jN4JMGAnue4UT9xWoXiWxxYCX+zg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772039295; c=relaxed/simple;
+	bh=ICQM54IsCDPAgs0ORfVR0Y22l+JKF+NA6fZv+fRoQ2M=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Vjhzzzj3BQqbv9X6bYsKSTrlYvJBqexBOZy0WdHW5DDZ+FVXDFornecb7yh2NnpHasiS5IqHy85wQPA3ToMU3yzO8KKaSzBIgLgbtevMeugxTwzn2T+jzjl2rXgTWO3qs8zuPt2gdEfIh06S4iLWqXPFe9J3swXYYa5jqESnXYQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com; spf=pass smtp.mailfrom=talpey.com; arc=fail smtp.client-ip=52.101.43.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JfPFQbDXw/qxylgwQt+eH3bPEfg7Psa9QcMPdtKav299CVONhigOgqjRxnmSLQNLTGS0op7bu2mjlAvI4GcFh00g9r5Zoy6VIgTAVKF9ubUqB0tkHotFqxZ2AsPUCXfXIv41y3iSpEA7eXdgdNsefbB3ENbKvhNvHQ2qVKr9J3TkVR1LQEGLnPxFx2fF+nw2aHNz1fuKz5Md0MtzjpNiTE6bp3aOeSy7a9KNnGZtWH3/KIqse5wIjPsQgmufIkB65v/dVxFvi2J5rQ0BZQCd7YVRO6lryn6LxSbGvdEoC+G15JDqHrskSCJMWmWQs21xG4APk23U+f82a8qU/Eth+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wZLFIAqBwkRyHb0f4G7IE7saohrY63hSoFiIJt2EcNw=;
+ b=j2XMyIW5u4TEwtAVaKAacv90CKLoDrcYVQ01oPGk1eqqZ4PFM6jmeLqJkl1aTWYayeu1FjvDOtWgiYRdgLToktp99jMB1Bqomoi7up6KAZ0yjQ6YyxeDAajz9RRhMHYA5dvSXAis3A7uEdPleWVBPFP3omdaGYXS3kVORczDPstWxLngacdCmTKsxWORuhtb8Q600psqIF7NukYk4FameSykK25+LCDuJkVeKMY4uPMvqbNig48M4IeDVvPYQG0RC57TwDGvwkB898zi2rV0b12mO02bMA9gzSiY9UBsGmLalehj0Yy1AkkbsqhNAK9s2yNV9KPXaFVGYe3E+m51Tg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from DM6PR01MB5147.prod.exchangelabs.com (2603:10b6:5:5e::20) by
+ PH7PR01MB8665.prod.exchangelabs.com (2603:10b6:510:30d::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.22; Wed, 25 Feb 2026 17:08:10 +0000
+Received: from DM6PR01MB5147.prod.exchangelabs.com
+ ([fe80::5bd7:7a26:d6ec:59fd]) by DM6PR01MB5147.prod.exchangelabs.com
+ ([fe80::5bd7:7a26:d6ec:59fd%3]) with mapi id 15.20.9632.017; Wed, 25 Feb 2026
+ 17:08:10 +0000
+Message-ID: <f47fdd45-21b9-45cb-b322-d7de77b6bdea@talpey.com>
+Date: Wed, 25 Feb 2026 12:08:10 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: Kconfig: CONFIG_CIFS_SMB_DIRECT bool option silently dropped when
+ CIFS=m and INFINIBAND=m
+To: Steve French <smfrench@gmail.com>, Denis Nuja <dnuja@enakta.com>
+Cc: linux-cifs@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ Ned Pyle <ned.pyle@tuxera.com>
+References: <CAGk60SF8WxDMpx1ALrne40qycg5J-hxdBniFnoYG=QhvnX5ktQ@mail.gmail.com>
+ <CAH2r5mvcrt3T9x-Wqpz_OXVr9cWtBSft=JpASsFDT25CYtXJmw@mail.gmail.com>
+From: Tom Talpey <tom@talpey.com>
+Content-Language: en-US
+In-Reply-To: <CAH2r5mvcrt3T9x-Wqpz_OXVr9cWtBSft=JpASsFDT25CYtXJmw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DS7PR03CA0301.namprd03.prod.outlook.com (2603:10b6:8:2b::8)
+ To DM6PR01MB5147.prod.exchangelabs.com (2603:10b6:5:5e::20)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251229031518.1027240-2-chenxiaosong.chenxiaosong@linux.dev>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR01MB5147:EE_|PH7PR01MB8665:EE_
+X-MS-Office365-Filtering-Correlation-Id: c53e1dd0-3a66-4aae-ac18-08de74907401
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	Fq2Tx170Ph4XDG/rqmMIsbdCYCJBjiE6bKd6a/oMof/9xf1ArEeVGzwY46Zj7CaZe61aoKjbluBt2i3e7nncvpqlbaQAaPVha+2qTdE1OmBuh7YejWWcFYYQfmX39FMyNv35qSm8DllX1kPQ+0OuPEtw/hSid9KSPpSAsg9WFu+ZY5x5HLg6IXDh6LE3BGzW72BShVcI2rEvRNegRdwFsC/V0oW7G9TZyL5wuoiBFjMrMsCsjbAoYUwrgIobtG2Mz4jNDS49pyjutllLSDWnbxaPm43iBsUml0/rdLrKH1OQpU//I/lxB95oGATpYudglgnlJFDGJAMTzLqtYfMgGM1Wg8+8nQOltF6cv76UomcUC2gpVqwnL7UFFr73gnY3c1ARgUU3GOCQxKP4bv8/5U3Q0J6+IbHZAd+jVu6Wnc6YgwSHtAjYTqQNc6OAA8FYhA9E1p9IImYIrkia33x4F6lcE/JhCIRD5wXR7XD9+mC3/4p84cRDZDko86OvLKz3y/PIU80nb352UmOUHkADW2Rssfwe2Iz5ntaOhvjDMLetj/V4/xshCwNdHlM6NmR/v1R9lz5BVt6K6rlJjvVoj1aicFp7JN/PbkXjaBSqUFfn5NfPREGfvzN2A4fKnTlM+kY/Z4LTOOdGiUbVJHhm0LZg3RSzQKB0vhUBJbrvhDdx47SvCZ44Av/REq5OrPkuhVy2wH0dOpGStcqM35rWMvjkpkzzBRCsXNhzRP6DyfM=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR01MB5147.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?U2pvcytWbmdjYWpwSEZ1ZFdTb1h3RWhMUDNyNm12dk9sOUZMbEV1cDNiN1Ro?=
+ =?utf-8?B?Qlc0bURwVDVjMDVUSDh4bjVnTjhRTlF4Qm5BMkJmSDdMekVaaGJnbGNiNG5l?=
+ =?utf-8?B?N0pNZmYzdERKeWlxT09uN2c2dkFxc3h4VmtlOWJicXlDWi9jb002a0p4VUpP?=
+ =?utf-8?B?aG9wWXlrdVludHVwdXpFaWpNcjNVRW13dlhVeVMrNEpLVDd5WXJGaG5iTFMw?=
+ =?utf-8?B?eVI5Z25od1VyMXhlUkRMS2NCZGdxYkprQ0xncFEwbjJNWEV5UlVIS0RFMG12?=
+ =?utf-8?B?eEZDaEFyQm5USGVveG5Yd3RLVXQ3YWJaNGNZNnd1c0JyTlN1Sk9jMm1VWXY3?=
+ =?utf-8?B?NlJmVSs4QkY5RWsrc1RqUGNuZlRHMU14L2UzcUFYbmJ4dEdHVDQ1NW5Cd01O?=
+ =?utf-8?B?WDNRRkJCQUJBd3VNN1B5NUdhQ3J5dW41aHUzdEhDRHpvVVpoOEw2RTJ0Wkpk?=
+ =?utf-8?B?TVZuZFpPYmRQNUFtRzdvdXQ4eVFFR1ljUGt6c1VRNmxDMkIyRE43R0d2bXJC?=
+ =?utf-8?B?N2tWNDUvYkxIQlQyOHFKdTYzNFprVEFMaUQ1MWFJaGpVZEtZazd5M1ZSanZF?=
+ =?utf-8?B?R1ZHR25iNFRCK3k3QlFvaGZyVElWRFdScFJMcXlHSkVURDdZVyswVE1kd1V4?=
+ =?utf-8?B?Yk9GSWdSYWFEWVpJUU11QWNiZkJSSFJka2xydndmeUNHL1J1RmVBb2VaSEc4?=
+ =?utf-8?B?SWxrNytIWXNIeS9CNFlUNFg1RWRGTVNHRkQ4M0FSNzh0c2RwZk5YWC9NMDlh?=
+ =?utf-8?B?V2ZXTmRhVi84TUVDeGM0bnNHVlBFVnpkaDNHZmIzTkxwOGIyajJuL1dMUytO?=
+ =?utf-8?B?QUJkUDVjYTJ1SzNxUDNWYTlKQTFLbzFLTlVEOFlyNjN4Nkd0U1RuejYvMHVM?=
+ =?utf-8?B?SjdTTEx4UFB1K0ErMmRtcWNvME1ISVhqTk9kWEtCUDdVdE9DUFlmZjB2MlRO?=
+ =?utf-8?B?UXF6S1JyNzg0T21WNzZ0R2tRcDVtWXpHRmQxZFcwOWJTZDNsUHVKRnJuRjNa?=
+ =?utf-8?B?aGc3Mklid21Ea3h3M3QwY2tYYW9sRDlhclo1NG5oMVlUNW9JT0tZQWNnWnR1?=
+ =?utf-8?B?NmRXT052SGdDZ2hnTmN4eFFneVU3RkNnVmZ0V2taU211Ni9VaHoyeXhheEwy?=
+ =?utf-8?B?WDVydnRRREhzVjhMVUJnQkFuV2JBdytjaDBJbThOMFVkNTJhNWdGd0xHcW9i?=
+ =?utf-8?B?cXByU2RVTXFmdmYraDN5WStKN1ViZXJxeDZpb0owdU5xcVhlK1p2OTJLSjg4?=
+ =?utf-8?B?K3ZCeHR3THV6ZG9VTXVZdWp1cXh3ek5QNGt5VDJ6U0xXTHlIa0ZOazFlTFRE?=
+ =?utf-8?B?bTFzQndydE1NVWlVdmFpS1JBOWh6bFNMRVV0a1JLSFUvMmgyT1FsZlNuS1or?=
+ =?utf-8?B?TWtQd012T3I1QVhqRnVCZm83SmZJUUxaVU9FeTZXeG9RYXJaNGZTYWNDK2to?=
+ =?utf-8?B?NjlEUDJPZ1pNUDRGbUFVNENJWnZ5OWhKK1hxb3IwclAzNmlDdVRjOWRkTVE1?=
+ =?utf-8?B?a1FyRlBvK3hrMGNYMnZZdlAyWVRJbFJoK2NTQmkrbjJubmNtTis5M1ZFd05n?=
+ =?utf-8?B?VDZuVGQ5UFVxUkJEM3E0V2hGUno0RG5TWWF0d1BwaTdoWUpWOTQ4QjRUVytQ?=
+ =?utf-8?B?NlNTU0Y1ZlE2cmo4MDlGMUxoZjg3QjdlZDhWNmVYTG1PL29nY0NYbmE2NE9F?=
+ =?utf-8?B?dE5kWlRRVmpkMlp4bExzNmV4SzJzUnNaSncvTll6YTRsTGZxU1FpdG0rUGNw?=
+ =?utf-8?B?WWZ3djZ3Z2QzYTJpSEliVnU4UlRESjB0Y0puWWFIUm9hNllEV1dsS1RIMlhX?=
+ =?utf-8?B?NGJENjZBYzZSY29vb2hpMHZKWmwvLzNBaTVlUlB4b0NyR3J2cFA4VmxldnU3?=
+ =?utf-8?B?OVY1TmFCYWQvdmp4SnltNFNHcVk2SUQ3cDdRYkZmS2NhWU5rTXZMN3NlNllT?=
+ =?utf-8?B?UGlDV0EwcTlzREJITE0zRkZ1NURMK3ZVUG5WZURRWjFqZzZOUTdHME1OSjlJ?=
+ =?utf-8?B?SnBxRzhCYVpCMGxkdnNRQXVaeUVMb1dOdndjNFFSaEtVTXptZnYyWUdHZmJZ?=
+ =?utf-8?B?c0lIbXBlUklFV0Vtb2d2T2lVb3pMVUp3TDhKRUltQkFkUGljUE9pKy8yV0cz?=
+ =?utf-8?B?RkFaUDFVWGRMUCtWYW1FdkNDeW81Q05kMGhmNEVWRmgrbGdaZXdZNmRNVU4z?=
+ =?utf-8?B?dGdqNk93WWN1Yk4wU3RuTloyaEJPTGN4QU8wMytKeERYREJ3SncxbkFDZnc2?=
+ =?utf-8?B?cGYxeXZOY0ZDb0IxOGh1WW1ZVHV4a0ZHMVdRSVRYNnEwZ0VZSndoRW95VEJF?=
+ =?utf-8?Q?lmiMfqlx8IJEdJvTTw?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c53e1dd0-3a66-4aae-ac18-08de74907401
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR01MB5147.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 17:08:10.4613
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OenH5UGHRddNieE/u3iQpLKHtQ/JEhW5caQMERQQP10FUhanzlbeDbt9OfNNNXgj
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR01MB8665
 
-Hi,
+It *did* reproduce - you saw the server config, but the client
+config was not set!
 
-On Mon, Dec 29, 2025 at 11:15:18AM +0800, chenxiaosong.chenxiaosong@linux.dev wrote:
-> From: ZhangGuoDong <zhangguodong@kylinos.cn>
+I bet this is the reason that Ubuntu and other distros don't enable
+client SMBDirect by default! This is a significant issue and should
+probably be fixed in numerous stable trees.
+
+Tom.
+
+On 2/25/2026 11:48 AM, Steve French wrote:
+> It didn't repro with 7.0-rc1 when I tried it. Any ideas?
 > 
-> When ksmbd_vfs_getattr() fails, the reference count of ksmbd_file
-> must be released.
+> smfrench@smfrench-ThinkPad-P16s-Gen-2:~/smb3-kernel$ ./scripts/config
+> --enable CONFIG_CIFS_SMB_DIRECT
+> smfrench@smfrench-ThinkPad-P16s-Gen-2:~/smb3-kernel$ make olddefconfig
+> #
+> # No change to .config
+> #
+> smfrench@smfrench-ThinkPad-P16s-Gen-2:~/smb3-kernel$ grep SMBDIRECT .config
+> CONFIG_SMB_SERVER_SMBDIRECT=y
 > 
-> Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
-> Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> ---
->  fs/smb/server/smb2pdu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On Wed, Feb 25, 2026 at 10:24 AM Denis Nuja <dnuja@enakta.com> wrote:
+>>
+>> Hi everyone
+>>
+>> CONFIG_CIFS_SMB_DIRECT cannot be enabled when CONFIG_CIFS=m and
+>> CONFIG_INFINIBAND=m, despite all declared dependencies being
+>> satisfied. The option is silently dropped by olddefconfig and
+>> menuconfig refuses to save it, even though menuconfig displays it as
+>> [*] (enabled).
+>>
+>> Kernel version: 6.4.0
+>>
+>> File: fs/smb/client/Kconfig
+>>
+>> Current dependency:
+>>
+>> if CIFS
+>> config CIFS_SMB_DIRECT
+>>      bool "SMB Direct support"
+>>      depends on CIFS=m && INFINIBAND && INFINIBAND_ADDR_TRANS || CIFS=y
+>> && INFINIBAND=y && INFINIBAND_ADDR_TRANS=y
+>>
+>> Root cause:
+>>
+>> CIFS_SMB_DIRECT is declared as bool (values: n or y only). With CIFS=m
+>> and INFINIBAND=m, the left side of the || expression evaluates to:
+>>
+>> CIFS=m && INFINIBAND && INFINIBAND_ADDR_TRANS
+>> = m && m && y = m
+>>
+>> The result is m (tristate), but since CIFS_SMB_DIRECT is a bool, the
+>> Kconfig engine coerces m to n and silently drops the option. The right
+>> side of the || requires CIFS=y && INFINIBAND=y which forces both to be
+>> built-in — an unnecessarily restrictive requirement.
+>>
+>> Additionally, the CIFS=m/y conditions inside the depends on are
+>> redundant since the option is already inside an if CIFS block, which
+>> handles that guard.
+>>
+>> Observed behaviour:
+>>
+>> menuconfig shows [*] SMB Direct support (appears enabled)
+>> Saving from menuconfig does not write CONFIG_CIFS_SMB_DIRECT=y to .config
+>> olddefconfig emits warning: override: reassigning to symbol
+>> CIFS_SMB_DIRECT and drops it
+>> scripts/config --enable CONFIG_CIFS_SMB_DIRECT silently has no effect
+>>
+>> Proposed fix:
+>>
+>> Since the option is inside if CIFS, the CIFS=m/y conditions are
+>> redundant. The dependency should simply be:
+>>
+>> - depends on CIFS=m && INFINIBAND && INFINIBAND_ADDR_TRANS || CIFS=y
+>> && INFINIBAND=y && INFINIBAND_ADDR_TRANS=y
+>> + depends on INFINIBAND && INFINIBAND_ADDR_TRANS
+>>
+>> This correctly expresses the intent (RDMA stack must be present)
+>> without the tristate/bool coercion problem, and is consistent with how
+>> the surrounding if CIFS block already guards the option.
+>>
+>> The same issue affects CONFIG_CIFS_FSCACHE on line 191 with an
+>> identical pattern:
+>>
+>> depends on CIFS=m && FSCACHE || CIFS=y && FSCACHE=y
+>>
+>> which should also be simplified to:
+>>
+>> depends on FSCACHE
+>>
+>> To reproduce:
+>>
+>> # Start with a config where CONFIG_CIFS=m, CONFIG_INFINIBAND=m
+>> scripts/config --enable CONFIG_CIFS_SMB_DIRECT
+>> make olddefconfig
+>> grep SMBDIRECT .config   # empty — option was dropped
+>>
+>>
+>> Cheers
+>> Denis
+>> Enakta Labs
+>>
 > 
-> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> index 6a966c696f7d..dc730fe348e4 100644
-> --- a/fs/smb/server/smb2pdu.c
-> +++ b/fs/smb/server/smb2pdu.c
-> @@ -3007,10 +3007,10 @@ int smb2_open(struct ksmbd_work *work)
->  			file_info = FILE_OPENED;
->  
->  			rc = ksmbd_vfs_getattr(&fp->filp->f_path, &stat);
-> +			ksmbd_put_durable_fd(fp);
->  			if (rc)
->  				goto err_out2;
->  
-> -			ksmbd_put_durable_fd(fp);
->  			goto reconnected_fp;
->  		}
->  	} else if (req_op_level == SMB2_OPLOCK_LEVEL_LEASE)
-> -- 
+> 
 
-Running an experimental AI agent on this patch produced the following
-feedback:
-
-This isn't a bug introduced by your patch, but it looks like there is still a
-resource leak here. If ksmbd_override_fsids() fails, we jump to err_out2.
-At that point, fp is NULL because it hasn't been assigned dh_info.fp yet,
-so ksmbd_fd_put(work, fp) will not be called. However, dh_info.fp was
-already inserted into the session file table by ksmbd_reopen_durable_fd(),
-so it will leak in the session file table until the session is closed.
-Should fp = dh_info.fp; be moved before the ksmbd_override_fsids() check?
-
-PTAL and let me know if it has a point or if it is missing something.
-
-Thanks!
-
-Guenter
