@@ -1,80 +1,67 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DB843CEC4
-	for <linux-cifs@vger.kernel.org>; Thu, 26 Feb 2026 21:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED182395274;
+	Thu, 26 Feb 2026 21:41:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772141405; cv=none; b=CmfjNm2CNbHzkQGZf+VfecFlo46XAny7gM5GxayPqfy5FyQr/dGtrcnHaXmRKohva4l01BaZmnkki7nmjbbPBPvYe4fkrqVdBbGZfvvUJfcPLAW6IuiFRUnbgQf4lbhdwG+iRjuQw4wgeG2SglsDUlNmcd2laUM0E9hExweeSLI=
+	t=1772142076; cv=none; b=m2ic1Auh1B0ID3nIwqH/rFOiY2lObyWZKtGlYqoeVYr25F3PB/HlkiQS0RuE7T3nWwVI5n5apYHQm/2IZsyovCDgrBcS1NJcCu74/xn4sSskOrUjsLEcBqFPDusGbR2WzgPDqxI+8OfUda6dGQnzMmaL7tNme33JQEwiP6Mf0aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772141405; c=relaxed/simple;
-	bh=QRhkc2uP4bcM/LsatLWRGGTQ+sviFI9ge5Ts/pHpRGM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hBzorpz578b4Gj2JFsWFK/4y9TmeEITR6BBO1yTQLPaRG9+b5gS01Mn8gEcN1SbBkVu5c9iDHXQWa5RloJC9z6LwGInAcFQr3FNzN/nw7pdTkqH8mLhS4GVLB/b1owoYnB6+JUe894+rdbc7Fx7QeHd3fpWAVSTfBQzWMqACBqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=H32EvuyO; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1772142076; c=relaxed/simple;
+	bh=bjrQY/5YEHkk932/5+YfzU0/mm4cX89YjtImf6JCcTY=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=KqqBMrS9n6cuSbbPCyfQjDRaQ12Gqby+7CtGogM275FutuiSPMlmw/kZPpj9kihX+KlplWUxgWaY0tTvrbk+IxhcAIhVNK0ar4QqRsOD69wX9RP2t9eSDJgA14+H/nh7Xldf/Q0C0IRSiWK7D2YHIjHFALyMqWYw4miWIqnTu2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=C8lgxWNg; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="H32EvuyO"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772141401;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=yA2lI/2C+h5S4XfL+NjFfiE7eFsCkQ61mJturdSOo3k=;
-	b=H32EvuyOIig0mkZAMRT3EofA/29NLMI5sHQlNC52zBlbXZo5Pz28I7dXIjDSZ/5WTsy/ND
-	kLTGwfaZFF/HfdargXr72QhTTlkTEoo74nsv3ozxYbsT/HwiRGQ2j2vACd8itOOxrzjhJv
-	Jl/kMGoPxlPB4Uf0jhVn+ZPs2ZEGm3w=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Jeff Layton <jlayton@kernel.org>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	stable@vger.kernel.org,
-	Steve French <smfrench@gmail.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] smb: client: Don't log plaintext credentials in cifs_set_cifscreds
-Date: Thu, 26 Feb 2026 22:28:45 +0100
-Message-ID: <20260226212845.784172-2-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="C8lgxWNg"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Sj9a7yvXPZTsexmNw13k08Y6XmT9sbAg3WMWHrD1uuw=; b=C8lgxWNgIevTw8/MgOLsJ7NfEn
+	YFgYXI5naYlPUV42o7wFB3UThCx8zGDrCWAlAilv4dwAjR0DKHwmU26azIE/O9axjkhSmpzVH8jWR
+	f0ixW5s2JIt7VW2T9RI7nEvnI2kKVaLAmewiAd/gqh+5YAal+5TZk21s4G3vL6Oh04IYBLhjGo+RL
+	qgXJs1jbuo27/Sam6NnkCT4iwuiycZ6VrQelwIQAXZCIns47dtva6J/AUr3thnAtsvSES8MRVgQk1
+	eOT1347hmV2VJVThl++jJQzFVVHfWkxeC6ZqUQnXAl9dvDfAvaToqg2q8DaYbvV+SgiqLlhCZt3b4
+	bHMoh/Vw==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
+	id 1vvj6b-00000000tP2-3cV1;
+	Thu, 26 Feb 2026 18:41:09 -0300
+Message-ID: <03d69afbe9fa3ec36dc39d6864a97b35@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Thorsten Blum <thorsten.blum@linux.dev>, Steve French
+ <sfrench@samba.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam
+ Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
+ <bharathsm@microsoft.com>, Jeff Layton <jlayton@kernel.org>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>, stable@vger.kernel.org, Steve
+ French <smfrench@gmail.com>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] smb: client: Don't log plaintext credentials in
+ cifs_set_cifscreds
+In-Reply-To: <20260226212845.784172-2-thorsten.blum@linux.dev>
+References: <20260226212845.784172-2-thorsten.blum@linux.dev>
+Date: Thu, 26 Feb 2026 18:41:09 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 
-When debug logging is enabled, cifs_set_cifscreds() logs the key
-payload and exposes the plaintext username and password. Remove the
-debug log to avoid exposing credentials.
+Thorsten Blum <thorsten.blum@linux.dev> writes:
 
-Fixes: 8a8798a5ff90 ("cifs: fetch credentials out of keyring for non-krb5 auth multiuser mounts")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- fs/smb/client/connect.c | 1 -
- 1 file changed, 1 deletion(-)
+> When debug logging is enabled, cifs_set_cifscreds() logs the key
+> payload and exposes the plaintext username and password. Remove the
+> debug log to avoid exposing credentials.
+>
+> Fixes: 8a8798a5ff90 ("cifs: fetch credentials out of keyring for non-krb5 auth multiuser mounts")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+>  fs/smb/client/connect.c | 1 -
+>  1 file changed, 1 deletion(-)
 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 33dfe116ca52..038f87062419 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -2236,7 +2236,6 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx, struct cifs_ses *ses)
- 	/* find first : in payload */
- 	payload = upayload->data;
- 	delim = strnchr(payload, upayload->datalen, ':');
--	cifs_dbg(FYI, "payload=%s\n", payload);
- 	if (!delim) {
- 		cifs_dbg(FYI, "Unable to find ':' in payload (datalen=%d)\n",
- 			 upayload->datalen);
--- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
-
+Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
