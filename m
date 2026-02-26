@@ -1,179 +1,184 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351E619AD8B
-	for <linux-cifs@vger.kernel.org>; Thu, 26 Feb 2026 05:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772082597; cv=none; b=Ut1O31sE4bhD+yVCf/HMUeN+nGSzjcwxlfaPyer5mb7teVVjvGpDyCqL5avTWnQrXRITXuOewC2a+3sC5V1r2Mx0hiJ+OoG2Peteg61OKRRoyMQuQTd+rOnTD93jfWlMq4/ws7Aq1xaewCSWAqZ+ThjmORQqOhSDYuwJQUZyaAs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772082597; c=relaxed/simple;
-	bh=JSeV06WpX+js8iO//6fj9wiOthkWSK6/OAI9GBVmtTE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TfohvHkVqgSRIcCmh9tbTp8UorkctWL7+q7ngJ0WpAiR26vS6q5FGS5U64J0Wf3BrkRxiN2jtBHvi31j+buCXRMNyJJU7ijOV2Z35vP/8itlwyq3Fg7h0C1whfG9qb5lEFMF7QSi1yv0ymSOaIXvpBWtCXreOhdBUJIFVWv1/YQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nabn7gJE; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADCB38BF72
+	for <linux-cifs@vger.kernel.org>; Thu, 26 Feb 2026 08:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772096162; cv=pass; b=u6qhS40uxSEUfAD8Io8iSVMzaG9z8MUSFTp/LPABmFgjyM/5l9D53qfsb5IGtmoLgIHxsT782GXUOpEHOo39caiPYWs/MWAn5VSEC6fB+gupHM8Rc8lah7xWNqVba1VJiCaCXqRidVNda5GWLjW7pyT+VA0UT6M1HxRi0FICYSU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772096162; c=relaxed/simple;
+	bh=hUsdsK4bRIL5jxuasDA0P/arDJ9UXWokwgvYrOux0+g=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=oVWShoHJBKOr8ZMW3xLl3t71R7UNaMYxp6I4972QhLdjiENQ1RdEUXEkkNQpXI7bN9hlOVcG/PihYgcUnaST+oGDfN9q4Hx2bu7qgGIdTe1GWDZ5IiaxmLNHO1p0eqB8qlzoAOYIQ2H5QJshabb3BAaVGQj3RJJjb08txZw1c1M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gb11G/8d; arc=pass smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nabn7gJE"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-81df6a302b1so587824b3a.2
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Feb 2026 21:09:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gb11G/8d"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b7cf4a975d2so82868966b.2
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Feb 2026 00:56:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772096159; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HU4TQBK/aX1qfMQp5blYZC5VhZuo4TE82a3aa2PF1D7Wckp+gp5YAkg6RYkNS1WVOS
+         RPjNMxhr/50YsV5eERd3rCt/gpwSx/hCzY6zJuIAuNrSLFSHOQb7VSohxR2MSVfPz9ZF
+         Off5x3kMrxsMhOa6S5RaZkRtEEHU8rI4/I9h50OYIMZMBgs/u693Wdq2xqq9tElEX74Y
+         H8998TRxOLjQHu5Dvrw56guMdCnqMwhS/0FUkcWA8eu2gu0+xyL1ke55cllf7VKHIAy5
+         pDli6lXhNUaJBQJqlJ1pRaKwRNwq+2K83KWKQdNT8pR+qr73SyegBlysxfXxCZg+9zjb
+         QXcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=JE/Zh+nyv7Fk9f00ckbM3A24zhkB4+zbdHgKuu9vMLw=;
+        fh=ko9MV4PaNXTwxghsz5Rn5dYwKPWR8BjvSfbOHzi1ZkI=;
+        b=lCRfhz+G5/q14R7UtB5AENlcmgxk/gkntMELthSnGAl99W18EvEVmgw23tVIjUy4If
+         GcRA3CURoDw4LOsc5xhqpy6+bQbv5RRYtGgEncDa8pBO/rsvrDYt2a7yo0yhODsc6VMf
+         QOXmKG0wFAfpkmrbBnjJ+sNwsoB7OlZBWdDMtBQvYXYXUbFJcvvCcn6bXoOu4WJCBsZV
+         g5rCewN1yEIpxU46V4Dl6FoxuiQTvsBZWXvSedDb9I2n6c181xm/PgUNMzIYGB3kTNAT
+         ytgAZY3yXtsYVZmVaAVAHzjcBJ4HAyVpmTUOpIPN+sR28yfnORXYHY4duxnBXAEZ0rm7
+         KEVA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772082595; x=1772687395; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kn75Wv8qiro7iKe75/bRb2w4zFjtpLF7Xhz58wwjTks=;
-        b=nabn7gJEd8MSrS/qvr82y7ebtkttWms2XV2PfmflsLc6Wg7VKI8vcCGd3X+CCbjUwe
-         5M/p7mClkuIaHLEo0EsQa5qLK/+UGVAti4b1dL1Vh2jnZQ9mRRNkM/fcGkcxBhdJA/TA
-         Cfe3KMWbewhxS4dIfbOYP3dDqmg3tuV3Acm6t+OrJatSEwaB9OCSRjFJIFVMT78qNHcz
-         L+Hn7l/PRcJaglJgFea0gMsG+/e8O52CzPErQzxp72OKSUuPXT1ovksCOZOquTMh03l8
-         Zs+nt/3j08AYiQ2X44bFsqcjcLLgPz8Ve9j2kldyVdkad1XzUMy5q/XBwNEjKiIDufxM
-         3QdQ==
+        d=gmail.com; s=20230601; t=1772096159; x=1772700959; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JE/Zh+nyv7Fk9f00ckbM3A24zhkB4+zbdHgKuu9vMLw=;
+        b=Gb11G/8dSTWPAm85y/r3jZinZqockglSVQshP2MfHq3GOk+DHjKfGJLSy3VWpRRY2Y
+         yvsO0rh6E3HWAaEN4mXB5Zs+pQFQA5+o7h4B3AEf49v1BVp+oOAo2z/F2jnn+ZvOd35b
+         MSsxUHH2x4SlVQEwkOT/mSdfFI0YEinzLk0LW7v23Jp7nr+16nwXtrFbyiQt6e0HV0hX
+         pwonzhu9sAE0H0Oo5VlTQtG5sH2woMhQKnhTW8H6hMSIMDeUWCq4qx805L7+W8fvLJPu
+         qTTZP1K4ccsc2bgZHKKegQ9U65qWmkxw+nvB1pfY4vFq3rTmtcI8+5MxxdFOLnmtlfSY
+         pmXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772082595; x=1772687395;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kn75Wv8qiro7iKe75/bRb2w4zFjtpLF7Xhz58wwjTks=;
-        b=sEoZwgvWLvkyenDaF7VJIGO1ZW0anD91uiMrKeN3v5hKbUpVD9uNidwPNAQBXcVXU+
-         vFlaXNlJQXEvH7VAjxxLV0RF9D6uID+gr0SWv/ZKUOIt6rkNoCVFp9Klm5bcw1PuQ2iM
-         cDeVuNjnsAufBUrKr5tLE1E/4U1mo9CiLVj6eoGR3X9NaRQjxr3wIfkTYOXJSHp+epoV
-         rO6HA7UhhixMjGTmIV1Ga+uSmGVBs8bbiLLDG/hEjK/c5bkzhmUYqys8aG9KC1R/bNlE
-         bgaFRz3GvcFLKHPqDeKQayoLrj2UUlUN1pmk/5oKpK8snobzCX4lw3NVS5/4+dvjVaT5
-         41jQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX0WTuZXsOyHtGyEIjDR02z/gkeUNZ2OE+E3vCEGUegDsIw40dWHgzdUGLNXvRPNQFcHeZxWre/OiYl@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4gme2TFaHFe7zVOoSVT1jsYniu9fq/KcXCy91vW3lyt2An/5c
-	b4X9mH9VF+igC1n8kwJhyK+fqYP8plBTVXjnJiCsc/AMafBXStN3B+YW
-X-Gm-Gg: ATEYQzyBJP0sZV5eA2btR9qoY1xFAuoOZAoa2/kCVijPv34oBB53fsvpdW6AIh/ytEr
-	WXQAzB8+xtjgpcFWSY2Iii0PJvrvRbfTPQeXDSpvRTJQbebD7tpOuxoaq6cePaDomPJNio+GJix
-	ypvhzawBHpZMYDMuZeiitsZlOoCYtoxi33EMdRoYlpMh+tfBF03mHb/UFEc+j6UVijEji5ZRiz+
-	LEyVu0o6vyh7hBGOw+xv2+BpgQDRcydeyTRzKtRSKDbPyOERLNgEyhOVx9rjUHJeaR/ESxjQNL/
-	tk23eyWMrq7D3CBnBpT1Z3pRWq90XfX7UTn402ycxLct6DOa7fRTrXaHBtfs8vNwdoFzLWQwBLu
-	xxsCQ7AOSDqtoD0Lh9HpJiT2hb8ImyGoXaT+8RkKSSNSkbXikWBHhqLFOMhxfDigbKoq3f3MnBP
-	kFMGXBm/PQhSBm9+q654vmlJjeyK5XhOYhXcvGD0EK53nox+a8nK2DET5eyXYJOUN0PAl+1RTvp
-	Z/EDx8Rkyg=
-X-Received: by 2002:a05:6a21:7a43:b0:394:40a7:f3b3 with SMTP id adf61e73a8af0-395ad1c21fcmr2961455637.40.1772082595445;
-        Wed, 25 Feb 2026 21:09:55 -0800 (PST)
-Received: from ?IPV6:2600:1700:e321:62f0:da43:aeff:fecc:bfd5? ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c70fa84e602sm609089a12.32.2026.02.25.21.09.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Feb 2026 21:09:54 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <59d5c1a6-7a7f-464a-aa62-e53daff8870d@roeck-us.net>
-Date: Wed, 25 Feb 2026 21:09:53 -0800
+        d=1e100.net; s=20230601; t=1772096159; x=1772700959;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JE/Zh+nyv7Fk9f00ckbM3A24zhkB4+zbdHgKuu9vMLw=;
+        b=im/vtrib3ZoikkxsAql7NoZw0Ji8r0oz0geQ1UXYAsczdERKIL3T4MKqAGkvAA2CoR
+         8sP4ZO63jUZIwG93fKMfYoME0c4lUGWGLD6TRYxBYPAbksguuI6S2ftuKf2tZQa4MhbU
+         kaEKm68utOZOrexNG7xFGhM01B2zcwaqQ2L104lYYpM1zaBAD38hj57afsOTiipBMHEC
+         O/23AV4w1Zn1KRmZBk1H5teN92+uVohkDo/7tuObNtrIgVrP+emsimo+TYJDbYMmjIBf
+         zrdSWvvD+aEZ/VNF4IMFqN9BOoLmw1KQ3c2AoD48S1A5N4LliXpOaKRjwCwVfLKcTrux
+         xPrA==
+X-Gm-Message-State: AOJu0YzRulfo6UQxID/quBQCSPMUSbIhGo9caw67wZIMBV0B0UQWka2X
+	qgmFZyDkZo0iRQ4rIF+eWBEAdUix0mT15kZPYKOwgau28y6I5Co0MEmjp4TF4Dh23vn9u6y15Uu
+	kGc7huyin9EHrKvyI1RjOTZQmPsZv3jWy5jJGOxE=
+X-Gm-Gg: ATEYQzykD4CVSoxDKi7s9+fp+9TgmFzPkQ3qTvgnoEv4yn/9DqeuzcUdoReHpeuBKo1
+	7td9Nyjh9FRpI41cr97Q2w4hP5WgoTxjcKLrnlnNxpOIieV7TSnvdI+ZmncUcOcBDSOnb40IxT5
+	eO++AoZIeW/AF8e+mXzSWuKUa0jkOppLwTUVpDdRl0vRC0yPZd8e7j0E4PqWxaXsf60i0n6GBCH
+	W/2kewzndBDZ3K12Crri5ZG6eXAmMWHi6M47KGnbYg2eNgVL0SDCY1fQ4wC3pogV2X7Ckw0WMoC
+	F8kl9T8HdtAP6d1c
+X-Received: by 2002:a17:907:3c88:b0:b93:3792:4b0a with SMTP id
+ a640c23a62f3a-b935b8d28d3mr87478066b.31.1772096158457; Thu, 26 Feb 2026
+ 00:55:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/1] smb/server: fix refcount leak in smb2_open()
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
- ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
- bharathsm@microsoft.com, senozhatsky@chromium.org, dhowells@redhat.com,
- linux-cifs@vger.kernel.org, ZhangGuoDong <zhangguodong@kylinos.cn>,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20251229031518.1027240-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251229031518.1027240-2-chenxiaosong.chenxiaosong@linux.dev>
- <97979f06-7dd2-46bd-9bdd-3a9c45fc5b1d@roeck-us.net>
- <d3d93c04-fdd1-4b96-90f2-293a2d45f647@chenxiaosong.com>
-Content-Language: en-US
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- np3900V20aS7eD9K8GTU0TGC1pyz6IVJwIE=
-In-Reply-To: <d3d93c04-fdd1-4b96-90f2-293a2d45f647@chenxiaosong.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: RAJASI MANDAL <rajasimandalos@gmail.com>
+Date: Thu, 26 Feb 2026 14:25:47 +0530
+X-Gm-Features: AaiRm53cEVCb6LBTQKxlesr2EUNC_nkizBCUuByOlHC-bbZKjPMHRiW2KvLuE9k
+Message-ID: <CAEY6_V1BXj7pRcvmj4JW2VVdD7EW_74ir00MYJhQdyHokdd6TA@mail.gmail.com>
+Subject: xfstests failure on SMB mount due to workqueue flush warning (Azure
+ Linux 3.0)
+To: linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>, 
+	Bharath SM <bharathsm@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+I am seeing xfstests failures on SMB mounts on Azure Linux 3.0, caused
+by a kernel WARNING emitted during unmount/shutdown paths. I wanted to
+check if this is a known issue.
 
-On 2/25/26 20:12, ChenXiaoSong wrote:
-> Hi Guenter,
-> 
-> Thank you for taking the time to look into this issue.
-> 
-> I reviewed the relevant code in more detail and did not find any leak.
-> 
-> Both `ksmbd_put_durable_fd()` and `ksmbd_fd_put()` will eventually call `__ksmbd_remove_fd()` (remove fd from file table).
-> 
+Environment:
+Distro: Microsoft Azure Linux 3.0
+Kernel:
+6.6.121.1-1.azl3
+6.6.119.3-1.azl3
 
-Sorry for bothering you again. Are you sure ?
+Note: the Azure Linux 6.6 kernel is based on the upstream stable-6.6 kernel tree
 
-ksmbd_put_durable_fd() calls __ksmbd_close_fd() with NULL first parameter.
-__ksmbd_close_fd() only calls __ksmbd_remove_fd() if ft (the first parameter)
-is not NULL.
+Mount options:
+noperm,nosharesock,vers=3.0,mfsymlinks,acdirmax=30
 
-ksmbd_fd_put() does call __ksmbd_remove_fd() with first parameter, but ...
+The failure occurs because dmesg contains the following WARNING:
 
-> If my understanding is incorrect, please let me know.
-> 
-> Thanks,
-> ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-> 
-> 在 2026/2/26 00:49, Guenter Roeck 写道:
->> Running an experimental AI agent on this patch produced the following
->> feedback:
->>
->> This isn't a bug introduced by your patch, but it looks like there is still a
->> resource leak here. If ksmbd_override_fsids() fails, we jump to err_out2.
->> At that point, fp is NULL because it hasn't been assigned dh_info.fp yet,
->> so ksmbd_fd_put(work, fp) will not be called. However, dh_info.fp was
+[Thu Feb  5 10:01:08 2026] ------------[ cut here ]------------
+[Thu Feb  5 10:01:08 2026] workqueue: WQ_MEM_RECLAIM
+deferredclose:smb2_deferred_work_close [cifs] is flushing
+!WQ_MEM_RECLAIM inode_switch_wbs:0x0
+[Thu Feb  5 10:01:08 2026] WARNING: CPU: 0 PID: 696237 at
+kernel/workqueue.c:2975 check_flush_dependency.part.0+0xb8/0x100
+[Thu Feb  5 10:01:08 2026] Modules linked in: ccm cmac cifs cifs_arc4
+nls_ucs2_utils cifs_md4 rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver
+nfs lockd grace sunrpc netfs fscache binfmt_misc udp_diag tcp_diag
+inet_diag xt_MASQUERADE nf_conntrack_netlink xfrm_user xfrm_algo
+xt_addrtype br_netfilter bridge xt_owner tls xt_conntrack nft_compat
+nft_masq nft_nat nft_fib_ipv4 nft_fib nft_chain_nat nf_tables xt_LOG
+nf_log_syslog mlx5_ib ib_uverbs ib_core mlx5_core mlxfw cfg80211 8021q
+garp mrp stp llc intel_rapl_msr intel_rapl_common kvm_intel kvm
+irqbypass rapl hyperv_fb evdev mousedev sch_fq_codel fuse configfs
+dmi_sysfs crc32c_intel sha512_ssse3 hid_generic hid_hyperv
+sha256_ssse3 hid sha1_ssse3 ebt_ip ip6table_nat ip6table_mangle
+ip6table_filter ip6_tables iptable_security iptable_nat nf_nat
+nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 iptable_mangle
+iptable_filter ip_tables autofs4
+[Thu Feb  5 10:01:08 2026] CPU: 0 PID: 696237 Comm: kworker/0:1 Not
+tainted 6.6.119.3-1.azl3 #1
+[Thu Feb  5 10:01:08 2026] Hardware name: Microsoft Corporation
+Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1
+08/23/2024
+[Thu Feb  5 10:01:08 2026] Workqueue: deferredclose
+smb2_deferred_work_close [cifs]
+[Thu Feb  5 10:01:08 2026] RIP: 0010:check_flush_dependency.part.0+0xb8/0x100
+[Thu Feb  5 10:01:08 2026] Code: e0 49 8b 54 24 18 49 8d 8d b0 00 00
+00 4d 89 f0 48 81 c6 b0 00 00 00 48 c7 c7 f0 6c 77 85 c6 05 ea 0f 1c
+02 01 e8 48 a3 fd ff <0f> 0b eb b3 80 3d db 0f 1c 02 00 75 8c 8b b0 70
+09 00 00 49 8d 8d
+[Thu Feb  5 10:01:08 2026] RSP: 0000:ffffc9000738bb70 EFLAGS: 00010286
+[Thu Feb  5 10:01:08 2026] RAX: 0000000000000000 RBX: 0000000000000000
+RCX: 0000000000000027
+[Thu Feb  5 10:01:08 2026] RDX: ffff8882b7c21488 RSI: 0000000000000001
+RDI: ffff8882b7c21480
+[Thu Feb  5 10:01:08 2026] RBP: ffffc9000738bb90 R08: 0000000000000000
+R09: ffffc9000738b9d8
+[Thu Feb  5 10:01:08 2026] R10: 0000000000000003 R11: ffffffff86140928
+R12: ffff88819a90c540
+[Thu Feb  5 10:01:08 2026] R13: ffff8881008ffa00 R14: 0000000000000000
+R15: dead000000000100
+[Thu Feb  5 10:01:08 2026] FS:  0000000000000000(0000)
+GS:ffff8882b7c00000(0000) knlGS:0000000000000000
+[Thu Feb  5 10:01:08 2026] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[Thu Feb  5 10:01:08 2026] CR2: 000072545172a818 CR3: 000000022dd2c003
+CR4: 0000000000370ef0
+[Thu Feb  5 10:01:08 2026] Call Trace:
+[Thu Feb  5 10:01:08 2026]  <TASK>
+[Thu Feb  5 10:01:08 2026]  __flush_workqueue+0x179/0x420
+[Thu Feb  5 10:01:08 2026]  ? rcu_barrier+0x27b/0x300
+[Thu Feb  5 10:01:08 2026]  cgroup_writeback_umount+0x33/0x40
+[Thu Feb  5 10:01:08 2026]  generic_shutdown_super+0x38/0x110
+[Thu Feb  5 10:01:08 2026]  kill_anon_super+0x1c/0x50
+[Thu Feb  5 10:01:08 2026]  cifs_kill_sb+0x4e/0x60 [cifs]
+[Thu Feb  5 10:01:08 2026]  deactivate_locked_super+0x39/0xb0
+[Thu Feb  5 10:01:08 2026]  deactivate_super+0x44/0x50
+[Thu Feb  5 10:01:08 2026]  cifs_sb_deactive+0x24/0x30 [cifs]
+[Thu Feb  5 10:01:08 2026]  cifsFileInfo_put_final+0x12d/0x160 [cifs]
+[Thu Feb  5 10:01:08 2026]  _cifsFileInfo_put+0x352/0x4b0 [cifs]
+[Thu Feb  5 10:01:08 2026]  smb2_deferred_work_close+0x63/0x70 [cifs]
+[Thu Feb  5 10:01:08 2026]  process_one_work+0x18e/0x3a0
+[Thu Feb  5 10:01:08 2026]  worker_thread+0x285/0x3c0
+[Thu Feb  5 10:01:08 2026]  ? _raw_spin_unlock_irqrestore+0x12/0x40
+[Thu Feb  5 10:01:08 2026]  ? __pfx_worker_thread+0x10/0x10
+[Thu Feb  5 10:01:08 2026]  kthread+0xf6/0x130
+[Thu Feb  5 10:01:08 2026]  ? __pfx_kthread+0x10/0x10
+[Thu Feb  5 10:01:08 2026]  ret_from_fork+0x41/0x60
+[Thu Feb  5 10:01:08 2026]  ? __pfx_kthread+0x10/0x10
+[Thu Feb  5 10:01:08 2026]  ret_from_fork_asm+0x1b/0x30
+[Thu Feb  5 10:01:08 2026]  </TASK>
+[Thu Feb  5 10:01:08 2026] ---[ end trace 0000000000000000 ]---
 
-the AI is trying to make the point that ksmbd_fd_put() will not be called
-because fp == NULL.
 
-Thanks,
-Guenter
+Is someone here familiar with what's going on here?
 
->> already inserted into the session file table by ksmbd_reopen_durable_fd(),
->> so it will leak in the session file table until the session is closed.
->> Should fp = dh_info.fp; be moved before the ksmbd_override_fsids() check?
->>
->> PTAL and let me know if it has a point or if it is missing something.
-> 
-
+Regards,
+Rajasi
