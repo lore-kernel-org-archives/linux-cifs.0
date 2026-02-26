@@ -1,67 +1,68 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7636E28643A
-	for <linux-cifs@vger.kernel.org>; Thu, 26 Feb 2026 04:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351E619AD8B
+	for <linux-cifs@vger.kernel.org>; Thu, 26 Feb 2026 05:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772080074; cv=none; b=hmdnh21b5HaZ1Tojof1pEbc4xm6TywOZ1dEkMcABphus2GICMni3gcocvG7Xkg1DUAb5ZsERlVBOVU30BeOG6DFSetJzYwFNPZa/0u2MD1VbF776wZixi/DKPniV8JIYH6y7tfNXts+E6/2E1c0om/jspaL/EFpUmXCpsCfhv+U=
+	t=1772082597; cv=none; b=Ut1O31sE4bhD+yVCf/HMUeN+nGSzjcwxlfaPyer5mb7teVVjvGpDyCqL5avTWnQrXRITXuOewC2a+3sC5V1r2Mx0hiJ+OoG2Peteg61OKRRoyMQuQTd+rOnTD93jfWlMq4/ws7Aq1xaewCSWAqZ+ThjmORQqOhSDYuwJQUZyaAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772080074; c=relaxed/simple;
-	bh=WBfy3V4IcMBGEHu59aBLnhYDf395E/35FG2XiQilr2o=;
+	s=arc-20240116; t=1772082597; c=relaxed/simple;
+	bh=JSeV06WpX+js8iO//6fj9wiOthkWSK6/OAI9GBVmtTE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fa99kugOxANFpSTt7lKWaHUG277lxUpOa6+Mj1UFAWDzH7/6fge0WPdpPWLrfBv8Bvb2aO/lQhS0wBglFWYeApfbXEu3rmPQO5K92UKBEcwHC4lb6gI7bvMBqt8+qEVSaKpDtv0sTRBVEkkBbszM8PPSVOgQIJREKfIda2/LVKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZNXD+50X; arc=none smtp.client-ip=209.85.214.172
+	 In-Reply-To:Content-Type; b=TfohvHkVqgSRIcCmh9tbTp8UorkctWL7+q7ngJ0WpAiR26vS6q5FGS5U64J0Wf3BrkRxiN2jtBHvi31j+buCXRMNyJJU7ijOV2Z35vP/8itlwyq3Fg7h0C1whfG9qb5lEFMF7QSi1yv0ymSOaIXvpBWtCXreOhdBUJIFVWv1/YQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nabn7gJE; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZNXD+50X"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2adbd435864so1324965ad.2
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Feb 2026 20:27:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nabn7gJE"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-81df6a302b1so587824b3a.2
+        for <linux-cifs@vger.kernel.org>; Wed, 25 Feb 2026 21:09:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772080073; x=1772684873; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1772082595; x=1772687395; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=0hgYTjKG6CxePh4c18qcmDKdU8dbdd4hE3eggxiOExo=;
-        b=ZNXD+50XgT8RruOBMfHIe++uiyag5Noion2tnJz90aR23mPqBGilp7ns0mM9QgjJqv
-         UZdl8LdTwyw59AWowvp0D95cP7sxaYStsPMgT3L5bbXIKz0drYMq2KaVs3ibYRmUusui
-         ido/6DRE2S1AhDvudlNRfkt+VxWZSUlrUhDHsn96wBa7bQe/pO39ww+0ot0D8p+OOrMC
-         4H5wM8YOA2tMpIuCiXaZkXXjlv1hMvNJbtvj4oZkK2f/ojLP3MtvgkaXzSFR49FKK+Rn
-         S+rTKEU3nVxWY0Ff4mi7uYK46ECO45kSh4IFiwgbPzpcQ7iADqeshUuDrbFUgiqf+Csi
-         LPDA==
+        bh=Kn75Wv8qiro7iKe75/bRb2w4zFjtpLF7Xhz58wwjTks=;
+        b=nabn7gJEd8MSrS/qvr82y7ebtkttWms2XV2PfmflsLc6Wg7VKI8vcCGd3X+CCbjUwe
+         5M/p7mClkuIaHLEo0EsQa5qLK/+UGVAti4b1dL1Vh2jnZQ9mRRNkM/fcGkcxBhdJA/TA
+         Cfe3KMWbewhxS4dIfbOYP3dDqmg3tuV3Acm6t+OrJatSEwaB9OCSRjFJIFVMT78qNHcz
+         L+Hn7l/PRcJaglJgFea0gMsG+/e8O52CzPErQzxp72OKSUuPXT1ovksCOZOquTMh03l8
+         Zs+nt/3j08AYiQ2X44bFsqcjcLLgPz8Ve9j2kldyVdkad1XzUMy5q/XBwNEjKiIDufxM
+         3QdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772080073; x=1772684873;
+        d=1e100.net; s=20230601; t=1772082595; x=1772687395;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0hgYTjKG6CxePh4c18qcmDKdU8dbdd4hE3eggxiOExo=;
-        b=je+Sti18mhljlBFpEy/ekPLcwLr08/rQ7pxNV6rXDcp77OOFxU2OQ61PnRT34rSyrQ
-         MqVbpgOKy4I6x/P41Y573RaH3ERVGLJS00wmO9ulnd7IrbUHna6F0JuPMle8z6bDD5gX
-         GfSoqgqEI2x9rd2nOOUfQhMH1V6bE7B8pxelv7UNQ5NITJIWYxto5+UDcx1y2MsHm4lu
-         a34t5sWF0tozqS63jm/dRtoPyXorILOtBYfhLVHaH5IHfvpiM8mcTKWajZ0ZA5lHXBSb
-         6Q14TzSqzwEnxzUvwtWtFKvkspeoP2EIPY2bNbjuSZcLi1X5MtudF/IlDVf1bQqCQDLU
-         I2vw==
-X-Forwarded-Encrypted: i=1; AJvYcCWokdXDJCvhDWJEmQ1VjphkV5sHotoTS23myfB4M+DmSkGkl2uaq/CLOj8PwuRwM+k9aweLe8AuX69L@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhmxB82Bto7tjaIjlU55Okr62MppXTX9J9tw11X5UuaebyJALn
-	RjHeTd4bqd0WH1KPmigTL28YiOCLNdG7Ec1bOgowGCUGbEmTGntr3m15
-X-Gm-Gg: ATEYQzyS4BhN7vjfIk6879z27kfwcocbL8sSCPHr+5Au0y5b6BZB/MUbDWWaXrRaODe
-	6mtljxdv4cUToXObfDPa2Alal6rSoMdMJ8bL8KOLtRDeNRl2UB6TcifoMjd0A4Pe1Sc1s2tSftV
-	LkHlJvItICM6yRsJWAnag2B5sDM1bZa2GiWGiYSXMO7wovuqinOApHoZWTg4ne+jgDcgHMZzooS
-	i415MQ7u054CoJZ3I3pRW0awrfpXN8zJFFTQIuRxbt7hoclmSCV3bNlOGL5sJH0VIk1MDtGS64T
-	aN5PnScZEzWfxko+Shv1XvP/qzt6thnkKSr9aJfXdYFffV5npxsadqYpXgSTTYehoEj/dJsXk9D
-	uO6Lha8aavtnQzf+58fcSQ8mbYAzksUL6cuqvCJJ/mQcSBLPoYb/89vS2ji5uNmvU7qEfmfbH5n
-	OGGEO31QPG5pQbCWjXSmLrQWY0gch22qF5aploiE1mVXMwwZLokpnIdJ0rjj/Qiz6za3204up3
-X-Received: by 2002:a17:903:2c5:b0:29e:76b8:41e5 with SMTP id d9443c01a7336-2ad74513efemr180605555ad.30.1772080072843;
-        Wed, 25 Feb 2026 20:27:52 -0800 (PST)
+        bh=Kn75Wv8qiro7iKe75/bRb2w4zFjtpLF7Xhz58wwjTks=;
+        b=sEoZwgvWLvkyenDaF7VJIGO1ZW0anD91uiMrKeN3v5hKbUpVD9uNidwPNAQBXcVXU+
+         vFlaXNlJQXEvH7VAjxxLV0RF9D6uID+gr0SWv/ZKUOIt6rkNoCVFp9Klm5bcw1PuQ2iM
+         cDeVuNjnsAufBUrKr5tLE1E/4U1mo9CiLVj6eoGR3X9NaRQjxr3wIfkTYOXJSHp+epoV
+         rO6HA7UhhixMjGTmIV1Ga+uSmGVBs8bbiLLDG/hEjK/c5bkzhmUYqys8aG9KC1R/bNlE
+         bgaFRz3GvcFLKHPqDeKQayoLrj2UUlUN1pmk/5oKpK8snobzCX4lw3NVS5/4+dvjVaT5
+         41jQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX0WTuZXsOyHtGyEIjDR02z/gkeUNZ2OE+E3vCEGUegDsIw40dWHgzdUGLNXvRPNQFcHeZxWre/OiYl@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4gme2TFaHFe7zVOoSVT1jsYniu9fq/KcXCy91vW3lyt2An/5c
+	b4X9mH9VF+igC1n8kwJhyK+fqYP8plBTVXjnJiCsc/AMafBXStN3B+YW
+X-Gm-Gg: ATEYQzyBJP0sZV5eA2btR9qoY1xFAuoOZAoa2/kCVijPv34oBB53fsvpdW6AIh/ytEr
+	WXQAzB8+xtjgpcFWSY2Iii0PJvrvRbfTPQeXDSpvRTJQbebD7tpOuxoaq6cePaDomPJNio+GJix
+	ypvhzawBHpZMYDMuZeiitsZlOoCYtoxi33EMdRoYlpMh+tfBF03mHb/UFEc+j6UVijEji5ZRiz+
+	LEyVu0o6vyh7hBGOw+xv2+BpgQDRcydeyTRzKtRSKDbPyOERLNgEyhOVx9rjUHJeaR/ESxjQNL/
+	tk23eyWMrq7D3CBnBpT1Z3pRWq90XfX7UTn402ycxLct6DOa7fRTrXaHBtfs8vNwdoFzLWQwBLu
+	xxsCQ7AOSDqtoD0Lh9HpJiT2hb8ImyGoXaT+8RkKSSNSkbXikWBHhqLFOMhxfDigbKoq3f3MnBP
+	kFMGXBm/PQhSBm9+q654vmlJjeyK5XhOYhXcvGD0EK53nox+a8nK2DET5eyXYJOUN0PAl+1RTvp
+	Z/EDx8Rkyg=
+X-Received: by 2002:a05:6a21:7a43:b0:394:40a7:f3b3 with SMTP id adf61e73a8af0-395ad1c21fcmr2961455637.40.1772082595445;
+        Wed, 25 Feb 2026 21:09:55 -0800 (PST)
 Received: from ?IPV6:2600:1700:e321:62f0:da43:aeff:fecc:bfd5? ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8273a05e831sm841946b3a.58.2026.02.25.20.27.51
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c70fa84e602sm609089a12.32.2026.02.25.21.09.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Feb 2026 20:27:52 -0800 (PST)
+        Wed, 25 Feb 2026 21:09:54 -0800 (PST)
 Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <cf791e95-23c2-42d4-9bd6-828320a2f430@roeck-us.net>
-Date: Wed, 25 Feb 2026 20:27:50 -0800
+Message-ID: <59d5c1a6-7a7f-464a-aa62-e53daff8870d@roeck-us.net>
+Date: Wed, 25 Feb 2026 21:09:53 -0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -140,18 +141,17 @@ On 2/25/26 20:12, ChenXiaoSong wrote:
 > 
 > Both `ksmbd_put_durable_fd()` and `ksmbd_fd_put()` will eventually call `__ksmbd_remove_fd()` (remove fd from file table).
 > 
-Thanks a lot for taking the time and checking the code.
+
+Sorry for bothering you again. Are you sure ?
+
+ksmbd_put_durable_fd() calls __ksmbd_close_fd() with NULL first parameter.
+__ksmbd_close_fd() only calls __ksmbd_remove_fd() if ft (the first parameter)
+is not NULL.
+
+ksmbd_fd_put() does call __ksmbd_remove_fd() with first parameter, but ...
 
 > If my understanding is incorrect, please let me know.
 > 
-
-Just to make sure, I'll have another look at the code and provide
-your feedback to the AI agent.
-
-Again, thanks a lot for your time.
-
-Guenter
-
 > Thanks,
 > ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 > 
@@ -163,6 +163,13 @@ Guenter
 >> resource leak here. If ksmbd_override_fsids() fails, we jump to err_out2.
 >> At that point, fp is NULL because it hasn't been assigned dh_info.fp yet,
 >> so ksmbd_fd_put(work, fp) will not be called. However, dh_info.fp was
+
+the AI is trying to make the point that ksmbd_fd_put() will not be called
+because fp == NULL.
+
+Thanks,
+Guenter
+
 >> already inserted into the session file table by ksmbd_reopen_durable_fd(),
 >> so it will leak in the session file table until the session is closed.
 >> Should fp = dh_info.fp; be moved before the ksmbd_override_fsids() check?
