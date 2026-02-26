@@ -1,145 +1,84 @@
-Received: from flow-b7-smtp.messagingengine.com (flow-b7-smtp.messagingengine.com [202.12.124.142])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49AAB2D060D;
-	Thu, 26 Feb 2026 01:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9E836F43D;
+	Thu, 26 Feb 2026 01:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772069661; cv=none; b=Sc88sOZ/tASe6LRjOJbWwRYOcyfUKGmLhozvf56lciKIvrp12SQNvc5QvoEYzrA8IFPP56dvjE1mOmryed1gKf0F8K2S72OsFmpTHhpIStei4yFBBZboIL5MhscaxJ9dlSNBqgWSqG8LYEcUAol2En+J8kyJBGH+Xs9ZLAEyFpg=
+	t=1772069804; cv=none; b=kzVaGjNnejXju70gM/SLxJ0tKcMGwu65suTW9gA4zaS0TZLuH9TzgyLRmAvh0LWCcjo7CuMCv6XUbjPH6/UbTVbuDdHWWhiQMFFWvodd28ACNt6uLNhKrKxDj2N7RTaD2A3SB0P3Ra6MtgeYLtgqVh1On7WZviPSU57yprTE2Wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772069661; c=relaxed/simple;
-	bh=s0GI5iI3wRZDhofWKjF/FkmAMYAMF4AS6inKjugXtHI=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=tsB1oEd6BCOKX9TPmUubX5rybg/RijfIlGeTBfiweZ0/80qHKoxtZeajQDixfJYsgtKMXM+yytbk8+p/yn5EsEK6GCur0lfqAjjWeHulEnw9yRrl/9vDeAlp7PflImfxqT/5qVSdRBq3Ay3eLsMbluJH+IJOOZGsQnHCHCTXrz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=TyFPTUuN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ib+fb/df; arc=none smtp.client-ip=202.12.124.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1772069804; c=relaxed/simple;
+	bh=LRXBLkgeh8zF6uQEXLxQSZMtJpw6YopQGZe3FkQpfpA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lnhgPAZbhLkIYQ3kLZXXYkfasFZFJTNKag+neacgqLy6vZsfuETKqv9qGUsCcuz6ueSw5ZmKMnqZHOH5m+vv/KL1/qr79Ee1WYBY6lxjTyV+VFo7Y8Gk8Yw7MJ0h9ygXtOVYYPV6tV8SWwnedUMJxq1Toobuafn7MqPolx9ulJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=TdXwrR79; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="TyFPTUuN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ib+fb/df"
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailflow.stl.internal (Postfix) with ESMTP id 770D01301436;
-	Wed, 25 Feb 2026 20:34:18 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Wed, 25 Feb 2026 20:34:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm3; t=
-	1772069658; x=1772076858; bh=xFBd+sgdAigxjeaFROdJjStbv2bZWH9W94w
-	m4HgXADY=; b=TyFPTUuNpFO4HIfohypp+ntLH4SQw2KPz+k2oQocgPVXp9IMTnX
-	YTwXn0B0NRR1FYYXcaTtalmso1CAnAtpqQXesgp6NXUx9quUYAHLB9YpC7bcAFIk
-	TvZwg0C4FEHSiJIWxgFCFZeZtQNbnePdiIhVa5xxbKLS4C0AAupb2KhOapT87xq6
-	/3dFNWglRa3+Asvjf363pYv350SKI+bTeFGj0Ke0oZ/HCmva0nyqttckU6ALPSJC
-	tKc9PZzn6EA/vn9yNXu2DyW0UREtAZ/UTz1GA6V09Li6HeUdi6bLRfdCD5cAE4/8
-	WK60qtisykmi10YVhcXga6K3ltYHqs7v/qg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1772069658; x=
-	1772076858; bh=xFBd+sgdAigxjeaFROdJjStbv2bZWH9W94wm4HgXADY=; b=I
-	b+fb/dfhFB2brFsDKPdocEWfgR6l5L1tGXqcmDEUm3dOayVudiX+HaadK36d/22y
-	X+hujziwNR1hhTLDE2AI+F4JYwsusV2edxzfklPwQ2qZG64OmPoEcH5DheOy4vAg
-	yZobw4gbMhMooYzr+mwhaa5gBqWaBtLl4E4sefLwDLQNuUzHEvbFUl+50coVVzRQ
-	uUSfLvsYvt4ZHYuBH0TtNmKmiN2iTjqr/WfXIN4vsdjnHDbYjLnhZrQP2i/uHaKd
-	hi1uQRctV8MB4SMWSP8frR1+kHQsrbBVM9bNFci7X5iHcoMOp5CM90AYY1GGHLla
-	lsHXTe1M7Jgjucp7xuAqA==
-X-ME-Sender: <xms:GaOfaZdxVZrAzznSHl1LN0ciatDBWLW_4Ro8DTat2U9_lQfv7c3xVg>
-    <xme:GaOfaU3CQnGhH_qC9WVaUqiJ_NCnEVlJXvoCDEyQujfqIEFNjcJ-KobsK6_w0bXRA
-    1o46wyvYNXYHRmuB2DKHe8Qk8RpFZRs_31jtFSaYRrHAyZ0>
-X-ME-Received: <xmr:GaOfaZ56MuiAcHw3-TwPARtUbYmsMUpCo2Tgrqvdk_rKhN1qr8rZK8mNn6nhWrEZy_AkfhXlZTsDqCDkE90mmkyGUJoOWVM0jUxttdORdGVn>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeegjeduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurheptgfgggfhvfevufgjfhffkfhrsehtjeertddttdejnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epudetfefhudevhedvfeeufedvffekveekgfdtfefggfekheejgefhteeihffggfelnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
-    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepfedupdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
-    hrtghpthhtoheplhhinhhugidqgihfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopehlihhnuhigqdhunhhiohhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
-    hrtghpthhtoheplhhinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehlihhnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-    pdhrtghpthhtoheplhhinhhugidqtghifhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
-    hrtghpthhtohepvggtrhihphhtfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtoheptggvphhhqdguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:GaOfabL1dxc7_aM4UDs5Mnpgjmz6nRiprNnIb1cnNlkCnzS-DCI01w>
-    <xmx:GaOfadZA0aqqd6hc81DmwuMDHkptr7xfpw9R6OlYEqEEXQp_JHd2Tg>
-    <xmx:GaOfaQ1gMPhOOVjW9cB40OYojuSXNA5JDysMhyGtEuX2KAF1dKYb1w>
-    <xmx:GaOfaXPevv-IvnTNjJUThP9sr3Z22JJ883VL2eHqz1vQzs-Pzf2nZA>
-    <xmx:GqOfaQqK_qAYvtHo1ixO-4yAHtdC6htK7kcrEBnPb9SzuKAO8kARg5HQ>
-Feedback-ID: i9d664b8f:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 25 Feb 2026 20:34:09 -0500 (EST)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TdXwrR79"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=8suZ31zzY3Ppbic1BE0qzK+xmwyQjDiF2cYN0MnZlJs=; b=TdXwrR79zLQkmk1pzB+cbm08dp
+	fS+RtoCq+ga0XCDXQMpXTZLhX2hWC6YKov/jJidG8dEeiu92PYmjYPrheFn2oURoME2r1BVli5ys4
+	mTLrZsuybc61xyUhW7qowl7kUxXCQ1yJlzMhsQBzduQjoelMGEBISxzWcdSP2d8zYymoY1PK+S/x4
+	/qbK5QHBJmfT0ItnVyFBNqsT6HrcwGlseBIw+ad1pdAvWjpPldQUgF78sCLwBIzN5iPO5gn5JfD0S
+	54tTtmLaiZdSN+mkvbbu6yiIoluKtfoXsAl6EcmNPdzjpK5lFNlyu1Gx2djizK4bb+2rTAkFh9i1I
+	JF1MQCtQ==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vvQIx-00000005CJn-1I7J;
+	Thu, 26 Feb 2026 01:36:39 +0000
+Message-ID: <a1a8c33e-6e2c-4766-b7d9-b393204ea373@infradead.org>
+Date: Wed, 25 Feb 2026 17:36:38 -0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Al Viro" <viro@zeniv.linux.org.uk>
-Cc: "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
- "David Howells" <dhowells@redhat.com>,
- "Marc Dionne" <marc.dionne@auristor.com>, "Xiubo Li" <xiubli@redhat.com>,
- "Ilya Dryomov" <idryomov@gmail.com>, "Tyler Hicks" <code@tyhicks.com>,
- "Miklos Szeredi" <miklos@szeredi.hu>,
- "Richard Weinberger" <richard@nod.at>,
- "Anton Ivanov" <anton.ivanov@cambridgegreys.com>,
- "Johannes Berg" <johannes@sipsolutions.net>,
- "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>,
- "Chuck Lever" <chuck.lever@oracle.com>,
- "Jeff Layton" <jlayton@kernel.org>,
- "Amir Goldstein" <amir73il@gmail.com>,
- "Steve French" <sfrench@samba.org>,
- "Namjae Jeon" <linkinjeon@kernel.org>,
- "Carlos Maiolino" <cem@kernel.org>, linux-fsdevel@vger.kernel.org,
- linux-afs@lists.infradead.org, netfs@lists.linux.dev,
- ceph-devel@vger.kernel.org, ecryptfs@vger.kernel.org,
- linux-um@lists.infradead.org, linux-nfs@vger.kernel.org,
- linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/11] VFS: allow d_splice_alias() and d_add() to work on
- hashed dentries.
-In-reply-to: <177206761798.7472.8904569543245678825@noble.neil.brown.name>
-References: <20250812235228.3072318-1-neil@brown.name>, <>,
- <20250812235228.3072318-9-neil@brown.name>, <>,
- <20250813050717.GD222315@ZenIV>,
- <177206761798.7472.8904569543245678825@noble.neil.brown.name>
-Date: Thu, 26 Feb 2026 12:34:06 +1100
-Message-id: <177206964635.7472.10143856965392266372@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Kconfig: CONFIG_CIFS_SMB_DIRECT bool option silently dropped when
+ CIFS=m and INFINIBAND=m
+To: Denis Nuja <dnuja@enakta.com>
+Cc: linux-cifs@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ stfrench@microsoft.com, Ned Pyle <ned.pyle@tuxera.com>
+References: <CAGk60SF8WxDMpx1ALrne40qycg5J-hxdBniFnoYG=QhvnX5ktQ@mail.gmail.com>
+ <2cb12a60-32f1-4656-8a9f-305bd0be069e@infradead.org>
+ <c7fda6fb-5095-4fd5-ad1a-22319bdf0d4b@infradead.org>
+ <CAGk60SEw7xgSLc5+5EhgOnZkC6PTx-N98R94t5jQZ4wZKRVfkg@mail.gmail.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <CAGk60SEw7xgSLc5+5EhgOnZkC6PTx-N98R94t5jQZ4wZKRVfkg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 26 Feb 2026, NeilBrown wrote:
+
+
+On 2/25/26 3:05 PM, Denis Nuja wrote:
+> This was tested on kernel tree of SLES 15 SP7 running
+> 6.4.0-150700.53.31-default.
 > 
-> d_add_hashed() would be much the same as d_instantiate(), and that
-> could be used for d_splice_alias() when the dentry is hashed.
-> There aren't any cases where d_splice_alias() is called with a directory
-> inode and a hashed dentry.
+> Randy could you please confirm what is in your config for :
+> 
+> CONFIG_CIFS
+> CONFIG_INFINIBAND
+> CONFIG_INFINIBAND_ADDR_TRANS
 
-There are of course... mkdir() is given a hashed negative dentry and may
-need to use d_splice_alias() if there is any chance the inode was
-accessible (e.g. by fhandle) before the splice can happen.
+CONFIG_CIFS=m
+CONFIG_INFINIBAND=m
+CONFIG_INFINIBAND_ADDR_TRANS=y
 
-Maybe we could always give mkdir a d_in_lookup() alias?
+> 
+> in default builds of SUSE (and probably ubuntu i will check) it is :
+> 
+> CONFIG_INFINIBAND_ADDR_TRANS=y
+> CONFIG_INFINIBAND=m
+> CONFIG_CIFS=m
 
-As it is, generic "create object" code inside a filesystem may need to
-handle three cases:
+Same as mine.
 
- d_in_lookup() - use d_splice_alias()
- otherwise if non-dir: - use d_instantiate
- otherwise - use some new d_add_or_obtain (name taken from NFS) which 
-     does the right thing with directories.
+-- 
+~Randy
 
-Currently most d_drop() and use d_splice_alias() but I need to avoid the
-d_drop().
-
-Thanks,
-NeilBrown
