@@ -1,177 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904A53A783E;
-	Thu, 26 Feb 2026 22:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772146602; cv=none; b=qGRpibsGF4WetNUeXKRvNNbrYh4K6iNcifJHrwM3u0/OIlyBUZX5OD8iNOhCF7MJKZ4CHvNvMuTiH/ul0igZVTgVzdEY7/iVyG5Dy755z8kWejyJ+qu40fgyRMGHgk62FBQri+ywrJORCkgLb64+06A5448dSQQi+ZIpjPT3eTQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772146602; c=relaxed/simple;
-	bh=ElkHN/R2fcBT5rLZGFbsSk4BZBEcI1Z5rkz7cnL9q58=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kXmdDYzUiiVaMI7g7pMec5/wrwftZ2VX+GDrNZxvwZU9drFVcXboLVqblVoWvj8otDc2BLCYw29IfBmAxAkURNX3l+k3vaZCW5uk0TUokgnjWWqceDuQU3O2Oo1jFlhD31hLfmZiAbdYHExipr9i/BqV4/LCK7AM+EKNZ8nMwCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ln4pWb9Z; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1743394479
+	for <linux-cifs@vger.kernel.org>; Thu, 26 Feb 2026 23:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772147589; cv=pass; b=bwY7G8oXegD0rVVxeDbRycHHNTM1GQyD13c7P7S8TP751SbZbLxCdHJph1ibS62xa8+0wPzZJvfzCLmwuiovlMaFdipuTvtTn5Fx26/gkYN15Wop4U+XiN6T6bsLCFTvynqqbtAh7vmyojME5aMz2NoK1sI+2UWTs4FGbnXMOTw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772147589; c=relaxed/simple;
+	bh=aOi+wg3f3iVksQNawAKy3lAsdD/GcOd0squY+Ef/N4s=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=lYCTfEOcnOQ9r1wL9YpVmiXTI520tFNUS1Z3jZ8NejxHhy+r5DlLi+QsfNTXGmW82p31S++PW6PCh/GWqm2U1w5Grr3kVHM0a8m2dZBGTeZDVFmVDiPgd6w3pzBLRsDG14xmroY+r5lwFrK3L2g7pPKlVnLLHz+a07117G73Evg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LcIBNYr0; arc=pass smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ln4pWb9Z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E473EC116C6;
-	Thu, 26 Feb 2026 22:56:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772146602;
-	bh=ElkHN/R2fcBT5rLZGFbsSk4BZBEcI1Z5rkz7cnL9q58=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ln4pWb9ZIa3iii1vd5gskrCoKmm1t9tEjYVEd5fbke5FD8fPQDsw2mkbqPb5Bnw+S
-	 z3+EiWtdlhrUEY/TzIpfb4TaDwuEYYePiDKvB2OL6xLfeGklpk4bZ6oZPa7zFemslG
-	 rGqmK29WoeRiHAvoCn9ydRfTOnwb3b8GUvcCmKy2jWa2lV07OB5alxRd6yvLlYu4sb
-	 GaIsxiVCRS8rqhZm6xuDYkrjN+izm2sJOCaV0gENsM1vxdjD6EFWvjkPYxW+Mk0ppk
-	 CgdPwGLujPkowNzYZB2g8SKWMopeLJvORgQ3TQwNfrH9FkU9y/THXIshdB3DErq5Vf
-	 e80DkaSCt9oCA==
-Message-ID: <044291bc-9841-44fe-813e-c50772962f09@kernel.org>
-Date: Fri, 27 Feb 2026 07:56:18 +0900
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LcIBNYr0"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-896fd2c5337so17035416d6.2
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Feb 2026 15:13:07 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772147587; cv=none;
+        d=google.com; s=arc-20240605;
+        b=es1OrZZReq1ys79XZ/Puz0iC44VnDnxToqLsGZsmG+KmfMHTvECbLOrKLHv22F6aRH
+         iqOVSIdmScbTniHo/rB7/eismwWGu1fH5827c6QTd2mCziu6qOUDnymZGhIe7iH/salc
+         j0yGY9fEo3gZpOQ/6nOhzNWgLa36GomqW/0+cgzkUjWyHDpSNSjvQsXFrLkP69yyn1T4
+         hTLF3tUGCm1TPmno/jviitVyC3j1TdhHgNRN+a4q6r09gMkz7bKljppgZzRhcQIJh2Km
+         AcUbwSfPRrrR8ssrrJJwC4KP0g5bL1xRkcgoPMs3ErLDEelc7PSRI1mFhaZDYSc7hAyv
+         wjgg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=31JKZmQtcR2pQHnZFYk/YLEf6y/G5dEzMHaosWjd1xk=;
+        fh=DSKcvW4svhCRnKfagEYolZE+TqgnTy8fLPT+tm9bTDs=;
+        b=Hu2euMMjpy/eBrUSl/R89wWVQOxGl8oWc2N1NNFOxuc0Pttq2aOfPO5dC2VFPuKCRy
+         F6oaxm5sK6KavEwVdxc3YFsEWFhnjF0s5pTYGmlye6FfDy4rJwKHClX+bHXnHtQ/H2dg
+         KBystG9wa3djmbxSMWK8rtUKc9DzgQJHPh8OG301P53G+2OaMITWekAv4VqaMi4oF4yq
+         ddWq/gbid7hj/Btk5gw+N0JmWMdt39mfzy8jC936Aqb84wZzdH/TCNuJuEQ3cUqEneW+
+         H8KFHG0ocG7/epV+o3VFffD9FkNdm8k6mP7wdgCa6bKKPm9NckFFlsY47yNlspm2ZLL0
+         3BfA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772147587; x=1772752387; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=31JKZmQtcR2pQHnZFYk/YLEf6y/G5dEzMHaosWjd1xk=;
+        b=LcIBNYr0uMKKfsOD4nMKu4H2hdd85THl1dl9crA+plZN4Fv8AQMLQb0oGGaYCTyQC+
+         fI1Yt2urSkbq8acsBvMN59CYTJGAU3pfjVGIlyyBOm8KYu/jznBKT53HmkxqStbc1m5M
+         C3gGEzQahGr4KrBdZbsaL1aaz4dlYddVfrIPsmj1ZMifnXSklavBrcIPUWFealBseC2c
+         kUaoqKoUXfwGVdZxyrvJmTJIB8uNlPQ3BeVUsdzTX4fHMlTPsMYluIyhfAnC2u/0IVfn
+         zl8cOAambwiUTfso7oDec68QUBoYBiLSV0pZyVqUmo+0uxFfBetQ6i/t7Fb5q2KmToyp
+         qxvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772147587; x=1772752387;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=31JKZmQtcR2pQHnZFYk/YLEf6y/G5dEzMHaosWjd1xk=;
+        b=lPbJHL+eMI1V2rDdzZxP4zlKJbq3MZq5IyekI5ZKL9NrNvT0ENOf68KUt0p7Fj46HP
+         tt/TyrWfHOmyPZv+sJxeRYBUN/lhYS4XfO1rJIsEwqwaYhmAQvjZtQ85Vs4LODll3ZrH
+         WEzJBIobli8EHcl1ilkxLCIn5XsR5r17CftHT/JawNzYV1TcOZL+Xi3giV/1sTKzQPbS
+         NfXpJSLXiVCiz304Xs4JVlBzSNYm4KAVeNP8jm/HF+hmO1MASJ6rmw8IHwrXRjSmx25H
+         EA+h5GivfAXJCPDLdFq5kPsdFhCrLw8v4HXeJ5VOlByQVB0WE1ETytWPAd6tAudqFBgC
+         +Hzw==
+X-Forwarded-Encrypted: i=1; AJvYcCXpP0Dwhc0BEl1EN5Alg6zKBBjbognHlWi12JQXqfH3j9LDfPdk92jX1RI2g2rW0J0ODRu1z6mz9+Ae@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+C1UYNENmvZB2GRuHxN8cEW+Me1Cc+FuANetY8xU7EB+N+kZ0
+	MIqOFneWZ0ac5xntUav7cDRHPH3ZdGROqIXl+/pREWRfMCvQ0E7J3EPU7TbKM5ypun62nHpOXsq
+	dyijHUmkeM/RrKeo9DQC1s9VkAKSLnZ4=
+X-Gm-Gg: ATEYQzy/ABDD2dq2q+uxein+7IKb0nCIeVnU8ayxpi4Yq/v7FZdmFXf7ClvrTG0PteT
+	9/Gu9r+WKKaTYri1nEBVtrQweXeUmm1DdO4BTMRBQynNL+B+ZtqQTO56MkkU7l4NNwZ6u6nM2YK
+	DY2Uge2PjCXXQc7/GfdyoXnEoDue4uEq+/c51I6Oa0cnQmRPZ/V6zoMs0OjArNZZZZ4e7rKibeD
+	iYktHRWehbXuZZn7Z8ciz1idP+NtZmJ0AquoLae5C2Nnn5hFHRjcP0V7WO0W/tqtoNtgV2tQodI
+	Et1iCn5vIrGjG/9HaJdyZs+fmACyS4MDc4Eg7hhvFVlq/vM/ipBkVMAN4IBf0GxkdsIt8XDNnzz
+	gbEeXw/vxRogBBVEaNfyrJluK5oKfxoWPg/tES8CXSaaXYtt0sXzOe4xVnQo=
+X-Received: by 2002:ad4:4eee:0:b0:87c:765:dc6 with SMTP id 6a1803df08f44-899d1d56cb3mr13860466d6.8.1772147586790;
+ Thu, 26 Feb 2026 15:13:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/61] vfs: widen inode hash/lookup functions to u64
-To: Jeff Layton <jlayton@kernel.org>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
- Jan Kara <jack@suse.cz>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Dan Williams <dan.j.williams@intel.com>, Matthew Wilcox
- <willy@infradead.org>, Eric Biggers <ebiggers@kernel.org>,
- "Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song <muchun.song@linux.dev>,
- Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>,
- David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>,
- Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
- Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
- Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
- Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Bharath SM
- <bharathsm@microsoft.com>, Alexander Aring <alex.aring@gmail.com>,
- Ryusuke Konishi <konishi.ryusuke@gmail.com>,
- Viacheslav Dubeyko <slava@dubeyko.com>,
- Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov
- <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>,
- David Sterba <dsterba@suse.com>, Marc Dionne <marc.dionne@auristor.com>,
- Ian Kent <raven@themaw.net>, Luis de Bethencourt <luisbg@kernel.org>,
- Salah Triki <salah.triki@gmail.com>,
- "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
- Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>,
- Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
- Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>,
- Amir Goldstein <amir73il@gmail.com>, Christoph Hellwig <hch@infradead.org>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
- Yangtao Li <frank.li@vivo.com>,
- Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
- David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>,
- Dave Kleikamp <shaggy@kernel.org>,
- Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
- Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
- Joseph Qi <joseph.qi@linux.alibaba.com>, Mike Marshall
- <hubcap@omnibond.com>, Martin Brandenburg <martin@omnibond.com>,
- Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>,
- Zhihao Cheng <chengzhihao1@huawei.com>, Naohiro Aota <naohiro.aota@wdc.com>,
- Johannes Thumshirn <jth@kernel.org>,
- John Johansen <john.johansen@canonical.com>, Paul Moore
- <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>,
- Roberto Sassu <roberto.sassu@huawei.com>,
- Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
- Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>,
- Stephen Smalley <stephen.smalley.work@gmail.com>,
- Ondrej Mosnacek <omosnace@redhat.com>,
- Casey Schaufler <casey@schaufler-ca.com>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Sumit Semwal <sumit.semwal@linaro.org>, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Oleg Nesterov <oleg@redhat.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, James Clark
- <james.clark@linaro.org>, "Darrick J. Wong" <djwong@kernel.org>,
- Martin Schiller <ms@dev.tdt.de>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
- fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev,
- linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
- v9fs@lists.linux.dev, linux-afs@lists.infradead.org, autofs@vger.kernel.org,
- ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu,
- ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org,
- jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev,
- ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org,
- linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com,
- linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org,
- selinux@vger.kernel.org, amd-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-fscrypt@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org,
- linux-x25@vger.kernel.org
-References: <20260226-iino-u64-v1-0-ccceff366db9@kernel.org>
- <20260226-iino-u64-v1-1-ccceff366db9@kernel.org>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20260226-iino-u64-v1-1-ccceff366db9@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 26 Feb 2026 17:12:54 -0600
+X-Gm-Features: AaiRm51kf6IBHRa-vZDwoJBQwP49r0ftiy6Qm5269kgNg3KlEjoxPRhrJphqqbY
+Message-ID: <CAH2r5mszMp8yO6oUHPeCKCo5iqco2L6cJ=MnRXuBusBNrdd7Sw@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>, "Stefan (metze) Metzmacher" <metze@samba.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2/27/26 00:55, Jeff Layton wrote:
-> Change the inode hash/lookup VFS API functions to accept u64 parameters
-> instead of unsigned long for inode numbers and hash values. This is
-> preparation for widening i_ino itself to u64, which will allow
-> filesystems to store full 64-bit inode numbers on 32-bit architectures.
-> 
-> Since unsigned long implicitly widens to u64 on all architectures, this
-> change is backward-compatible with all existing callers.
-> 
-> Functions updated:
->   - hash(), find_inode_fast(), find_inode_by_ino_rcu(), test_inode_iunique()
->   - __insert_inode_hash(), iget_locked(), iget5_locked(), iget5_locked_rcu()
->   - ilookup(), ilookup5(), ilookup5_nowait()
->   - find_inode_nowait(), find_inode_rcu()
->   - inode_insert5(), insert_inode_locked4()
->   - insert_inode_locked() (local variable)
->   - dump_mapping() (local variable and format string)
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+Please pull the following changes since commit
+6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f:
 
-[...]
+  Linux 7.0-rc1 (2026-02-22 13:18:59 -0800)
 
-> -int insert_inode_locked4(struct inode *inode, unsigned long hashval,
-> +int insert_inode_locked4(struct inode *inode, u64 hashval,
->  		int (*test)(struct inode *, void *), void *data)
->  {
->  	struct inode *old;
-> @@ -2642,7 +2642,7 @@ void init_special_inode(struct inode *inode, umode_t mode, dev_t rdev)
->  		break;
->  	default:
->  		printk(KERN_DEBUG "init_special_inode: bogus i_mode (%o) for"
-> -				  " inode %s:%lu\n", mode, inode->i_sb->s_id,
-> +				  " inode %s:%llu\n", mode, inode->i_sb->s_id,
+are available in the Git repository at:
 
-Hmmm. the type of ino in struct inode is changed in patch 2, not this patch. So
-this feels incorrect. Why not just squash patch 2 in here ?
+  git://git.samba.org/ksmbd.git tags/v7.0-rc1-ksmbd-server-fixes
 
-While at it, maybe you could change this to use pr_debug() too ?
+for you to fetch changes up to 6b4f875aac344cdd52a1f34cc70ed2f874a65757:
+
+  ksmbd: fix signededness bug in smb_direct_prepare_negotiation()
+(2026-02-22 21:27:33 -0600)
+
+----------------------------------------------------------------
+Two ksmbd server fixes
+- auth security improvement
+- fix potential buffer overflow in smbdirect negotiation
+----------------------------------------------------------------
+Eric Biggers (1):
+      ksmbd: Compare MACs in constant time
+
+Nicholas Carlini (1):
+      ksmbd: fix signededness bug in smb_direct_prepare_negotiation()
+
+ fs/smb/server/Kconfig          | 1 +
+ fs/smb/server/auth.c           | 4 +++-
+ fs/smb/server/smb2pdu.c        | 5 +++--
+ fs/smb/server/transport_rdma.c | 4 ++--
+ 4 files changed, 9 insertions(+), 5 deletions(-)
 
 -- 
-Damien Le Moal
-Western Digital Research
+Thanks,
+
+Steve
