@@ -1,120 +1,146 @@
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B68E2F28FF
-	for <linux-cifs@vger.kernel.org>; Thu, 26 Feb 2026 22:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E8137880E;
+	Thu, 26 Feb 2026 22:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772144206; cv=none; b=phfRBimylmFGtBVkp28PgFG+bd9CB0g0i+qHVigrtMlHf0gGsAMLqZUVBqO77Uc2HTzpXCLmDpKd2RcfnNjzIRZdDYBQypw5usKz8fbpuB57rxb4imwPHyYjqSsOKXpdpNYjUfOirzc2hZHTAwOkQtyEkiuAEYtwk29YJ1S4soE=
+	t=1772145954; cv=none; b=u8aNsavlpdIlbAUP3G+5n+ME3BxMFqwlqkqf2OTLH6c8xim6fJnH7qs4rFM9+Rj1OkGwMfHxzgUxdFg0qoZxf34BgfXHlBkaXysU1obsxaZt0ao12sSJ7bRbQxXvzj1fvRTKvLheR9N5yjA5eF1XmhVS851w0C0Ixd+3aEMj+hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772144206; c=relaxed/simple;
-	bh=iL0X6SxJTGs5/y4dfrQqYApOfhtKgY8qI1wbVHj0Tdw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mKDVeJZiLtFuzZmIk1Mt5rmIWXyG8Z9RD3bUJWwacF3JJjFQ2flq+zNhz6e2qsWHIXW+uQcZjan4UTtRprSB/HDsQXM0EyXsg3vHpwvmMEK/fDZDhuN04MnxXztC1aGH8ajHO00hCC/jQjC9EzNod/D18+phUkZIMi24052L+Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Mi+x6QWj; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1772145954; c=relaxed/simple;
+	bh=6uKDFBvN4DDY9XeohP+RP+WtJXai/wgD+w8aBy8ELuI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kXAMcPeqn5ljCS0qZLhTL3OGkQo6bSKqKbqy86t5KuxFFquuxOMh9EVIT3HmTGe6Ys/tISETT3nRD6EQbo1Ba8sxVHcKTj/w2yuCMALFA7mjYR3eAmCmPmPf8qaWPe07sR+aJPeLt85Nnr4pZ+UV/D7jeUP6kW7Mlwxuih8CRZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BwPRsluw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Mi+x6QWj"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772144203;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ugPSjWS5dBR0Sc3U44fSFhQ5fFsnbuzL31EZNXnco3A=;
-	b=Mi+x6QWjACwpTjpntj1oNxu3T9jueuxuSY9+WTnjvRMybMcqyAlUGyXFD/H8/03i4rvkYt
-	rF3t42OUU4+zXTz9DpoGZIwl21+4vsVN+z/MwA0MmsCAWU+ZpNU0dHKuMmTl2nAQN1GRoq
-	moFf4k3CtJY22qBX5bBaeleUWsmYmuQ=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] smb: client: Use snprintf in cifs_set_cifscreds
-Date: Thu, 26 Feb 2026 23:15:22 +0100
-Message-ID: <20260226221522.796394-2-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BwPRsluw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCE84C116C6;
+	Thu, 26 Feb 2026 22:45:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772145954;
+	bh=6uKDFBvN4DDY9XeohP+RP+WtJXai/wgD+w8aBy8ELuI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BwPRsluwO3QANQshXwh32wR+hN95/ZQaqzcFJ2RER/i7epF+sSCYFo1KMXHOGf2R3
+	 tsLZpVKPhp6IYFncinO3pBIsCgu+rwpVvIo+0zjgm2iq8YIleJaPf8qGesVW5FdwrW
+	 Y5g7WUES2Mh6BiqhQR5w2ll+Cp6d1rgxOG/dhhV4E6xF4vMFhgwVRQ/1Ucgz8zHYT7
+	 7zI5Snsyyyon3Xpvj3HPGliG9ZUJpLobrX1MAnnbxvWUr9WMlrzKtKu7XY0mI84whC
+	 FEYZ5B/15gnGjYg5Ru8NFUa29UtrV2uULQrsiaYP8uXtKD59C94w045b6ZIGP74ugy
+	 vi3my4tvrpUOA==
+Message-ID: <6a5fb35d-b0d1-4d47-bb92-c176f5e12a40@kernel.org>
+Date: Fri, 27 Feb 2026 07:45:32 +0900
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 50/61] zonefs: update format strings for u64 i_ino
+To: Jeff Layton <jlayton@kernel.org>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
+ Jan Kara <jack@suse.cz>, Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Dan Williams <dan.j.williams@intel.com>, Matthew Wilcox
+ <willy@infradead.org>, Eric Biggers <ebiggers@kernel.org>,
+ "Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song <muchun.song@linux.dev>,
+ Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>,
+ David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>,
+ Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
+ Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+ Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+ Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Bharath SM
+ <bharathsm@microsoft.com>, Alexander Aring <alex.aring@gmail.com>,
+ Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+ Viacheslav Dubeyko <slava@dubeyko.com>,
+ Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov
+ <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>,
+ Christian Schoenebeck <linux_oss@crudebyte.com>,
+ David Sterba <dsterba@suse.com>, Marc Dionne <marc.dionne@auristor.com>,
+ Ian Kent <raven@themaw.net>, Luis de Bethencourt <luisbg@kernel.org>,
+ Salah Triki <salah.triki@gmail.com>,
+ "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+ Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>,
+ Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
+ Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>,
+ Amir Goldstein <amir73il@gmail.com>, Christoph Hellwig <hch@infradead.org>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+ Yangtao Li <frank.li@vivo.com>,
+ Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+ David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>,
+ Dave Kleikamp <shaggy@kernel.org>,
+ Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+ Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+ Joseph Qi <joseph.qi@linux.alibaba.com>, Mike Marshall
+ <hubcap@omnibond.com>, Martin Brandenburg <martin@omnibond.com>,
+ Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>,
+ Zhihao Cheng <chengzhihao1@huawei.com>, Naohiro Aota <naohiro.aota@wdc.com>,
+ Johannes Thumshirn <jth@kernel.org>,
+ John Johansen <john.johansen@canonical.com>, Paul Moore
+ <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>,
+ Roberto Sassu <roberto.sassu@huawei.com>,
+ Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+ Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>,
+ Stephen Smalley <stephen.smalley.work@gmail.com>,
+ Ondrej Mosnacek <omosnace@redhat.com>,
+ Casey Schaufler <casey@schaufler-ca.com>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Oleg Nesterov <oleg@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, James Clark
+ <james.clark@linaro.org>, "Darrick J. Wong" <djwong@kernel.org>,
+ Martin Schiller <ms@dev.tdt.de>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+ fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev,
+ linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+ linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
+ v9fs@lists.linux.dev, linux-afs@lists.infradead.org, autofs@vger.kernel.org,
+ ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu,
+ ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+ jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev,
+ ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org,
+ linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com,
+ linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org,
+ selinux@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org,
+ linux-x25@vger.kernel.org
+References: <20260226-iino-u64-v1-0-ccceff366db9@kernel.org>
+ <20260226-iino-u64-v1-50-ccceff366db9@kernel.org>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20260226-iino-u64-v1-50-ccceff366db9@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Replace unbounded sprintf() calls with the safer snprintf(). Avoid using
-magic numbers and use strlen() to calculate the key descriptor buffer
-size. Save the size in a local variable and reuse it for the bounded
-snprintf() calls. Remove CIFSCREDS_DESC_SIZE.
+On 2/27/26 00:55, Jeff Layton wrote:
+> Update format strings and local variable types in zonefs for the
+> i_ino type change from unsigned long to u64.
+> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- fs/smb/client/connect.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Acked-by: Damien Le Moal <dlemoal@kernel.org>
 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 33dfe116ca52..a055496c4835 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -2167,9 +2167,6 @@ void __cifs_put_smb_ses(struct cifs_ses *ses)
- 
- #ifdef CONFIG_KEYS
- 
--/* strlen("cifs:a:") + CIFS_MAX_DOMAINNAME_LEN + 1 */
--#define CIFSCREDS_DESC_SIZE (7 + CIFS_MAX_DOMAINNAME_LEN + 1)
--
- /* Populate username and pw fields from keyring if possible */
- static int
- cifs_set_cifscreds(struct smb3_fs_context *ctx, struct cifs_ses *ses)
-@@ -2177,6 +2174,7 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx, struct cifs_ses *ses)
- 	int rc = 0;
- 	int is_domain = 0;
- 	const char *delim, *payload;
-+	size_t desc_sz;
- 	char *desc;
- 	ssize_t len;
- 	struct key *key;
-@@ -2185,7 +2183,9 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx, struct cifs_ses *ses)
- 	struct sockaddr_in6 *sa6;
- 	const struct user_key_payload *upayload;
- 
--	desc = kmalloc(CIFSCREDS_DESC_SIZE, GFP_KERNEL);
-+	/* "cifs:a:" and "cifs:d:" are the same length; +1 for NUL terminator */
-+	desc_sz = strlen("cifs:a:") + CIFS_MAX_DOMAINNAME_LEN + 1;
-+	desc = kmalloc(desc_sz, GFP_KERNEL);
- 	if (!desc)
- 		return -ENOMEM;
- 
-@@ -2193,11 +2193,11 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx, struct cifs_ses *ses)
- 	switch (server->dstaddr.ss_family) {
- 	case AF_INET:
- 		sa = (struct sockaddr_in *)&server->dstaddr;
--		sprintf(desc, "cifs:a:%pI4", &sa->sin_addr.s_addr);
-+		snprintf(desc, desc_sz, "cifs:a:%pI4", &sa->sin_addr.s_addr);
- 		break;
- 	case AF_INET6:
- 		sa6 = (struct sockaddr_in6 *)&server->dstaddr;
--		sprintf(desc, "cifs:a:%pI6c", &sa6->sin6_addr.s6_addr);
-+		snprintf(desc, desc_sz, "cifs:a:%pI6c", &sa6->sin6_addr.s6_addr);
- 		break;
- 	default:
- 		cifs_dbg(FYI, "Bad ss_family (%hu)\n",
-@@ -2216,7 +2216,7 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx, struct cifs_ses *ses)
- 		}
- 
- 		/* didn't work, try to find a domain key */
--		sprintf(desc, "cifs:d:%s", ses->domainName);
-+		snprintf(desc, desc_sz, "cifs:d:%s", ses->domainName);
- 		cifs_dbg(FYI, "%s: desc=%s\n", __func__, desc);
- 		key = request_key(&key_type_logon, desc, "");
- 		if (IS_ERR(key)) {
 -- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
-
+Damien Le Moal
+Western Digital Research
