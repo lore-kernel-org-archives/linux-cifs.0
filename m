@@ -1,152 +1,246 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B787F39E192;
-	Fri, 27 Feb 2026 10:07:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772186831; cv=none; b=SUPeuNzjIEJ+ipI+jmDhzOgOuadSHRk8GheHfQqt+SC7VKICfATJKOI1xDVuNm5OFRkJdsOV4ojHynZutdizJxpewDBtAZPSYU4Nbt1OoMz3JVLXH/FwoFjS4mrLRPqvogbKOJO6/1VyoVSpHxyqYyXZXIakwmg3Tb+DowJ3Fi8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772186831; c=relaxed/simple;
-	bh=Mp1JXSTiLvThOX9+iafDoJIcaXcdqjP2+vG+mtpInGY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lcg1qTnGtQhxt5quDXzvXc3u59WD5Tvz+9tBRHoXa4RpQIAsuzic/NiSRjbecLsDtE9T9sDc5riyBw/BjfkuNeCd2bX4+EOOT4hcmjryOGDHnNJrL3MoPXzmgorL8VamgIgejZgTIJEyJlPCMciueFLYOpMWKkiUpLgCe35h+Fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LELv1nLz; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFBB25FA05
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Feb 2026 10:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772187916; cv=pass; b=aoDjKihCurbTdlVeZnbQEASAA/GUEQ7l55uXUSLR03wjfnAxx64N/ehNqu9RaksFKZKafO6w/0ERvyc2CM9cTTMiVQtrrlfOyFVNa+1Mqs6Z00oLr0lopWzTIlaTVHHVG3EicGDvBbaT24TTQppZG0slyHb2eZ3JFDx6dMNrCkc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772187916; c=relaxed/simple;
+	bh=RJBOQYX0Pp3A8/SMhWfr+8fGlBaTgeZwacGybWf4+WA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LKmq4tNr1gK4BdD0RV+He1dvsY2xmr7oFHlTLU49at4wwBqBX98tMATVM/zqMzgzZFIaNOC/S2vD4sQzHlWDqoY20xXuh2h1nIkHgNkGTeUJid3yboD4Q+eHI+nt2vA4s4XnA1h4WI8DVzwsfrXoN4XbZSxGC0aqgWZATZIXtL4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NOVbWqGO; arc=pass smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LELv1nLz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC9A2C116C6;
-	Fri, 27 Feb 2026 10:06:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772186830;
-	bh=Mp1JXSTiLvThOX9+iafDoJIcaXcdqjP2+vG+mtpInGY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LELv1nLziJIInpPEfBGwhAV2gMFZg12s7lFE0KxfTQldEo18NluQr9e3C+Zct+lyZ
-	 drhXLzadFmCAbIbeq3bsgUtgfAnwVSB9B/lX0VpyOvlAJ9ihOIftg2vbjxkn/BO8qX
-	 uVjQZAzhR6+W+W0J8fzC9LGfhszCyPHqWUyfeWWQk54n5K8J2+Lq3RSoWH238qvmja
-	 zUj111yecfmSqu9Gzo21TEY0Dy7GefpBTvyuB7b0hFZ8/UWmvbKQ/1AsQMoZt7sN+P
-	 SMQhFN/3rME7rBp2YRNdOAUhubk/iwSO58hKw1S3dlOGtmn8p+ue+G/QetiQW6CaQr
-	 Vs7VZ81sfYPdg==
-Date: Fri, 27 Feb 2026 11:06:39 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Matthew Wilcox <willy@infradead.org>, Eric Biggers <ebiggers@kernel.org>, 
-	"Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song <muchun.song@linux.dev>, 
-	Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>, 
-	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>, Jaegeuk Kim <jaegeuk@kernel.org>, 
-	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, 
-	NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Bharath SM <bharathsm@microsoft.com>, Alexander Aring <alex.aring@gmail.com>, 
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>, Viacheslav Dubeyko <slava@dubeyko.com>, 
-	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
-	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
-	David Sterba <dsterba@suse.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	Ian Kent <raven@themaw.net>, Luis de Bethencourt <luisbg@kernel.org>, 
-	Salah Triki <salah.triki@gmail.com>, "Tigran A. Aivazian" <aivazian.tigran@gmail.com>, 
-	Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>, 
-	Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, Nicolas Pitre <nico@fluxnic.net>, 
-	Tyler Hicks <code@tyhicks.com>, Amir Goldstein <amir73il@gmail.com>, 
-	Christoph Hellwig <hch@infradead.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
-	Yangtao Li <frank.li@vivo.com>, Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>, 
-	David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>, 
-	Dave Kleikamp <shaggy@kernel.org>, Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, 
-	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, 
-	Joseph Qi <joseph.qi@linux.alibaba.com>, Mike Marshall <hubcap@omnibond.com>, 
-	Martin Brandenburg <martin@omnibond.com>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Anders Larsen <al@alarsen.net>, Zhihao Cheng <chengzhihao1@huawei.com>, 
-	Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, 
-	Johannes Thumshirn <jth@kernel.org>, John Johansen <john.johansen@canonical.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>, 
-	Roberto Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
-	Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, Ondrej Mosnacek <omosnace@redhat.com>, 
-	Casey Schaufler <casey@schaufler-ca.com>, Alex Deucher <alexander.deucher@amd.com>, 
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, James Clark <james.clark@linaro.org>, 
-	"Darrick J. Wong" <djwong@kernel.org>, Martin Schiller <ms@dev.tdt.de>, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev, 
-	fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev, 
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	linux-nilfs@vger.kernel.org, v9fs@lists.linux.dev, linux-afs@lists.infradead.org, 
-	autofs@vger.kernel.org, ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu, 
-	ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org, 
-	jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev, 
-	devel@lists.orangefs.org, linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com, 
-	linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org, selinux@vger.kernel.org, 
-	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
-	linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org, 
-	linux-x25@vger.kernel.org
-Subject: Re: [PATCH 00/61] vfs: change inode->i_ino from unsigned long to u64
-Message-ID: <20260227-herab-wolken-c52d560f40d5@brauner>
-References: <20260226-iino-u64-v1-0-ccceff366db9@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NOVbWqGO"
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-65a26c220b6so2618955a12.0
+        for <linux-cifs@vger.kernel.org>; Fri, 27 Feb 2026 02:25:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772187914; cv=none;
+        d=google.com; s=arc-20240605;
+        b=COIN1GwxlhXglt/RpMQFNQqb/fNmab0kyxjnMBRjlgHTZ9AD1D/F+5+O99pyAD5Yod
+         9tlC4cbymk/MeaYQDthcusjx22f7sanbUkqIW78K68iInyuE1iw09AU4ycOMjLMjG4Z4
+         Zj5dLN1VTCPUqNxrzbYm85mUS1oQZEAtcX0bhuKA54+0DwQTOU1uHHI6SSNnEwu53dcJ
+         6JtwYbzZzGIjqyjBGzLicNQXPIGLPBYc4SzUrSoUjzHkqT13HB5BdOCcZHe5r+/3lhrx
+         T83uanGIakgVQ7NIQIwZ9hlE5MrI4ow2NNRsQwyVYDa+eaTAW0SUymZ0sYbhRrHvF0lw
+         NA1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=QEGgC2xnE+GR/vDIjG+6vP3Pe3y3IP0TYiEVmUz3f8c=;
+        fh=K9dBFgA4rcVCd6q/HmCHvDEvg8Z4K6HEDrACv4s2ZiI=;
+        b=IwjBMwpUjMSILFkhaZM5StNkdotUfqwMSk3cfYHdtbJcERr6AevQq2RZKkryzOmhvX
+         vjCOY27unddm43f1GOGvsLudHJ1Rdj5yUqjqdpUy7qgQWPQlQMQD6kGEeAeunoSI5j6J
+         qNNK4Sb4oS0aGvxhs9ET3qpk1GtlbKZwcjhF/yyUR/IWEIqW3gYwFW04tTiMSA7IJ+cB
+         OcsYl9ryvRddCmU7H34Ro4YP7dykcLoIgL2dthl1FrjE5W91EEH4Wv7jk+BXHf2fY7AM
+         /iuitNrdIRdpus+uBHnTq077MUb3p1OzVLPkpoaD5Y21HH6mqrvF2Z7cjpOHo9pGX2IG
+         Leig==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772187914; x=1772792714; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QEGgC2xnE+GR/vDIjG+6vP3Pe3y3IP0TYiEVmUz3f8c=;
+        b=NOVbWqGObgFISGWqGlxJP2dCuy1Xn7t+ef00+WWz24Yk+JvvUEsWsJFTKPpbU566wb
+         iwvw+A0Y3KhzB0Sw7/kJltxQaRayEXGWBI/1f5Cc1VfLLR9bsqN2HbDxDc2aWpMTvObf
+         Uj2Hbc+ui/OB8k56uQURo2ZFxm7HTM4vagD7GXnoeV+lfFxZmuSVJ16ZbbSBRBixBVAk
+         t1gtKpPySznzsUJPVF63w6EyJb14pBjC+NvkppzNp8Lt1kPgko3Wty94TqY7ayrB6gD8
+         pCvLjS7RzzzVv3/zRpZ+och9CYtdPs9R9IgWRnDB2D0esc4M00UDp1LuX1+4tTzAGPt3
+         xILQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772187914; x=1772792714;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QEGgC2xnE+GR/vDIjG+6vP3Pe3y3IP0TYiEVmUz3f8c=;
+        b=AOIDSaYxBMsEuNjYuo/zkWU/Fs42fOz+Qm9SSvD98V4npazztL7qNfAamV/0QnGxc1
+         JENgakTOd8TBeFG5vY+WMsq0IytmDtrV8LkeRLYUVoR25cApAzCuKBu8u4fxfc2CNHA6
+         pM4rLi+Gi/kvfTt6DcQcXzrlBZgRqMcH9BH3V2T5y8/0fztV5jaDz5n6fRzPMKyj5NhS
+         yOUNzfOk7c3gJ7ppgPlmxlu+5ui8SFGfJpfYWOaOwkyzfLZ0qX555ahiro9Rk5MoKmsy
+         3jlEdmjeLUYWIdIUUzo/Dh9O41wqW2sAG1AA+0t1bK2pvpKed5B2q6ZbLmFDcQRynu1G
+         DJ3A==
+X-Forwarded-Encrypted: i=1; AJvYcCU9A3ZDFiNsKXAQQt6p+IKtY+dXdrZV1UbOt+Yo5ye+9IuB2q/p54ToJgZEOx2O+hRXjqs7QeGO9rXE@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9nGGMN7l8JQB4fKl0U64y5WRs9CQX8Yt5mynedQOmVsGtn/lp
+	eKY8mjbChAl496zHfX9WWYhj0z9g7dRJ6qwerFZ6f2Deiz7OmlGeSNDGF8aJ1Xu1Oy8a/RZCelR
+	+mzs0jBdo/HnJSqLmLAPIgGW9XI2kpck=
+X-Gm-Gg: ATEYQzzlr+LNlY00036CcoAf9VqTPK2il9moBqQ3wc+/Qow+Id7OtCccu81KatXXiLd
+	89ivWjk/aEGu0gZirlX3NewK/TXt3k0EWkE9uPfs6SkAwS2DaiWXmPvtxVXRpzthFOi95k8KXyD
+	Mxc/X1uA4K3wkjHqskMaRZkT/qU+rHeXltwd24mZfr7N5FI67wOtWDyubH7tzEi4WELZtVvof6k
+	oujslEA9NAOaZ6ecW0mb0jKEiDkt0TJQPDkcwJ1uJ58ktyldXBnY0VNvrnYAPFd/990BXbtPKDz
+	/sp0Yg==
+X-Received: by 2002:a05:6402:26c5:b0:65f:8e80:4108 with SMTP id
+ 4fb4d7f45d1cf-65fdd6c0961mr1767288a12.11.1772187913362; Fri, 27 Feb 2026
+ 02:25:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260226-iino-u64-v1-0-ccceff366db9@kernel.org>
+References: <CAGypqWyDOfspVUMe3fm5bfQtC_wH2eEzRgppYvWUVDe1RHLy9Q@mail.gmail.com>
+In-Reply-To: <CAGypqWyDOfspVUMe3fm5bfQtC_wH2eEzRgppYvWUVDe1RHLy9Q@mail.gmail.com>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Fri, 27 Feb 2026 15:55:01 +0530
+X-Gm-Features: AaiRm53E8fzhZYzHDwzInONMWS_7okJV9lrIOMIkVUYNrkKfehamg0SxqX1C4V8
+Message-ID: <CANT5p=rRqPFdieYHeLqtOLtC0Jr-e9jMihj7a+SgCqQt3YWqfQ@mail.gmail.com>
+Subject: Re: [BUG] [~6.6 Kernel] Corruption when retrying encrypted sync writes
+To: Bharath SM <bharathsm.hsk@gmail.com>
+Cc: David Howells <dhowells@redhat.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Shyam Prasad <Shyam.Prasad@microsoft.com>, Steve French <smfrench@gmail.com>, 
+	CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Enzo Matsumiya <ematsumiya@suse.de>, Henrique Carvalho <henrique.carvalho@suse.com>, 
+	Bharath S M <bharathsm@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 26, 2026 at 10:55:02AM -0500, Jeff Layton wrote:
-> Christian said [1] to "just do it" when I proposed this, so here we are!
-> 
-> For historical reasons, the inode->i_ino field is an unsigned long,
-> which means that it's 32 bits on 32 bit architectures. This has caused a
-> number of filesystems to implement hacks to hash a 64-bit identifier
-> into a 32-bit field, and deprives us of a universal identifier field for
-> an inode.
-> 
-> This patchset changes the inode->i_ino field from an unsigned long to a
-> u64. This shouldn't make any material difference on 64-bit hosts, but
-> 32-bit hosts will see struct inode grow by at least 4 bytes. This could
-> have effects on slabcache sizes and field alignment.
-> 
-> The bulk of the changes are to format strings and tracepoints, since the
-> kernel itself doesn't care that much about the i_ino field. The first
-> patch changes some vfs function arguments, so check that one out
-> carefully.
-> 
-> With this change, we may be able to shrink some inode structures. For
-> instance, struct nfs_inode has a fileid field that holds the 64-bit
-> inode number. With this set of changes, that field could be eliminated.
-> I'd rather leave that sort of cleanups for later just to keep this
-> simple.
-> 
-> Much of this set was generated by LLM, but I attributed it to myself
-> since I consider this to be in the "menial tasks" category of LLM usage.
-> 
-> [1]: https://lore.kernel.org/linux-fsdevel/20260219-portrait-winkt-959070cee42f@brauner/
+On Wed, Feb 18, 2026 at 11:30=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.co=
+m> wrote:
+>
+> We are noticing a data corruption issue in kernels based on stable
+> 6.6.y. Especially, when a synchronous writes retried after a
+> connection reset.
+>
+> Based on investigation so far, it looks like we are having issue in
+> the following code path:
+> When SMB3 encryption is enabled, partial-page buffered writes hit the
+> synchronous write path in cifs_write_end() when the folio is not
+> uptodate (!folio_test_uptodate(folio)), it calls cifs_write() directly
+> with the kmap()'d page cache buffer, bypassing the async writeback
+> path.
+> cifs_write() calls SMB2_write(), which places the write payload in
+> rq_iov[1], pointing directly at the page cache buffer. When
+> smb3_init_transform_rq() builds the encryption request, it shares
+> rq_iov by pointer (new->rq_iov =3D old->rq_iov), and crypt_message()
+> encrypts in-place via aead_request_set_crypt(req, sg, sg, ...). This
+> destroys the original page cache data. If the write gets -EAGAIN after
+> encryption (e.g., connection reset), cifs_write() re-sends the
+> now-ciphertext buffer as if it were plaintext, resulting in
+> double-encrypted garbage on the server. The server accepts it and
+> returns success.
+> Please let me know if you have seen this issue in the past, your
+> comments on the analysis and probable fixes.
+>
+> Repro steps: Attached repro.zip with repro scripts and instructions:
+> 1) Mount with SMB3 encryption enabled
+> 2) Perform buffered writes in a loop (e.g., echo "known_pattern" >> file)
+> 3) Kill the TCP connection during writes (ss -K dport 445) to force
+> retryable errors
+> 4) Read the file back and compare against expected content
+>
+Looking at the callers, it looks like simple_fallocate_range*
+functions that make use of sync writes are also susceptible to this
+issue.
 
-I'm working under the assumption that we have crossed the threshold and
-people send patches they did completely themselves and also patches that
-were done with the help of or almost completely by a tool. You have to
-defend it one way or the other.
+> Issue can occur when all below conditions met in buffered writes:
+> 1) SMB2 encryption is active
+> 2) Sync write path: Writes reached SMB2_write via cifs_write
+> 3) Retryable network error for writes: When EAGAIN or ECONABORTED
+> returned from  cifs_send_recv().
+>
+> Here is a the sequence of operations leading to issue:
+> write(2) syscall
+>  =E2=94=94=E2=94=80 cifs_write_end()                          [file.c]
+>      =E2=94=94=E2=94=80 cifs_write()                          [file.c]
+>          =E2=94=82  iov[1].iov_base =3D write_data      =E2=86=90 page ca=
+che pointer enters iov[1]
+>          =E2=94=82
+>          =E2=94=94=E2=94=80 server->ops->sync_write()         [file.c]
+>              =E2=94=94=E2=94=80 smb2_sync_write()             [smb2ops.c:=
+]
+>                  =E2=94=94=E2=94=80 SMB2_write()              [smb2pdu.c:=
+]
+>                      =E2=94=82  rqst.rq_iov =3D iov     =E2=86=90 rqst po=
+ints to iov[]
+> (with page cache in [1])
+>                      =E2=94=82  rqst.rq_nvec =3D n_vec+1  =E2=86=90 BUG: =
+payload in
+> rq_iov, not rq_iter
+>                      =E2=94=82
+>                      =E2=94=94=E2=94=80 cifs_send_recv()      [transport.=
+c:1305]
+>                          =E2=94=94=E2=94=80 compound_send_recv()  [transp=
+ort.c:1071]
+>                              =E2=94=82
+>                              =E2=94=94=E2=94=80 smb_send_rqst()   [transp=
+ort.c:427]
+>                                  =E2=94=82  if (flags & CIFS_TRANSFORM_RE=
+Q)  =E2=86=90
+> YES for SMB3 encryption
+>                                  =E2=94=82
+>                                  =E2=94=94=E2=94=80 server->ops->init_tra=
+nsform_rq()
+> [smb2ops.c:~4398]
+>                                  =E2=94=82   =3D smb3_init_transform_rq()
+>                                  =E2=94=82     new->rq_iov =3D old->rq_io=
+v     =E2=86=90
+> SHARES pointer (not copied!)
+>                                  =E2=94=82     size =3D
+> iov_iter_count(old->rq_iter) =3D 0  =E2=86=90 empty, no copy
+>                                  =E2=94=82
+>                                  =E2=94=94=E2=94=80 __smb_send_rqst()  [t=
+ransport.c:272]
+>                                      =E2=94=82  =E2=86=92 crypt_message()=
+  [smb2ops.c:~4280]
+>                                      =E2=94=82     =E2=86=92 smb2_get_aea=
+d_req()
+> [smb2ops.c:~4196]
+>                                      =E2=94=82        sg =3D scatterwalk =
+from rq_iov[0..n]
+>                                      =E2=94=82
+> aead_request_set_crypt(req, sg, sg, ...)
+>                                      =E2=94=82
+>    ^^^  ^^^
+>                                      =E2=94=82
+> src=3Ddst =E2=86=92 IN-PLACE encrypt
+>                                      =E2=94=82
+>                                      =E2=94=82   iov[1] (=3D page cache) =
+is now
+> AES ciphertext
+>                                      =E2=94=82
+>                                      =E2=94=94=E2=94=80 kernel_sendmsg() =
+/ sock_sendmsg()
+>                                          =E2=86=92 sends encrypted data o=
+n wire
+>
+>          =E2=86=90 rc =3D -EAGAIN (connection dropped)
+>
+>          is_replayable_error(rc) =3D=3D true or cifs_write while loop det=
+ects EAGAIN
+>          goto replay_again                    =E2=86=90 loops back with c=
+orrupted iov[1]
+>              =E2=94=94=E2=94=80 SMB2_write() re-sends...
+>                  =E2=94=94=E2=94=80 smb3_init_transform_rq()  =E2=86=90 e=
+ncrypts ciphertext AGAIN
+>                      =E2=94=94=E2=94=80 crypt_message()       =E2=86=90 d=
+ouble-encrypted garbage
+>                          =E2=94=94=E2=94=80 server writes it to disk  =E2=
+=86=90  CORRUPTION
+>
+>
+>
+> Modifying SMB2_write function by adding payload to rq_iter seems to
+> help here. Need to further test.
+> With below fix, when rq_iter size > 0 code in smb3_init_transform_rq
+> allocates fresh pages, copies the data via copy_page_from_iter(), and
+> encrypts the copy instead of the original.
+> Please let me know your comments.
+>
+>
+>  rqst.rq_iov =3D iov;
+> -rqst.rq_nvec =3D n_vec + 1;
+> +rqst.rq_nvec =3D 1;
+> +iov_iter_kvec(&rqst.rq_iter, ITER_SOURCE, &iov[1], n_vec,
+> +              io_parms->length);
+> +rqst.rq_iter_size =3D io_parms->length;
 
-Frankly, as long as you understand what you're doing in general well and
-I know that you are a trusted and thorough developer/maintainer I could
-not care less if you tell me whether or not you did this all on your
-own or with the help of some tool. In my experience, laziness grows with
-experience but so does the amount of ideas. 
+Another option is to initialize iov_iter_xarray with rqst.rq_buffer,
+similar to what smb3_init_transform_rq does. But this should work too.
+Changes look good to me. Please submit a formal patch.
 
-So attribute it to yourself or attribute it partially to the tool. I
-personally don't care.
+--=20
+Regards,
+Shyam
