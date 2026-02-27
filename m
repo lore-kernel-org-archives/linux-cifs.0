@@ -1,35 +1,35 @@
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3BB3451B3
-	for <linux-cifs@vger.kernel.org>; Fri, 27 Feb 2026 04:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C03B346A06
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Feb 2026 04:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772165333; cv=none; b=b6C+uyvgTzGaoZ+xSnwLFDLiPtSjLm3mFma9sZfY5HZC8OwLwU3tCq3a9BTOJiHRkVybCDjXSC3Lm9FSoj8ClS5wCLrhYuP/WpIoR4lHO6RYkMV/E5pLnt04ZMqkOQjzrd1tSN/5Z9nck3KcRhw5/oiKvikFbb8Hy2Gls56zHhE=
+	t=1772165604; cv=none; b=XmaG/4pJ6Tr9Kapf8sOSkuEBDp7JO5eNzHH2chYnJ7CgP+OcNEigX2pKL8+s9JfDFm34NtSVhKpm72o+PCgJQ/BCAS926AistcRt6FfoxQrbq8zA0sewzqQhFx/cQPl+gmGK00netrVbwtK6L13CCZqSmLzEt5xF58ZGT+nOFq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772165333; c=relaxed/simple;
-	bh=nODrtvLmVVhMO+f0q8gayDVbU7HrFLWMl61xbWoymBo=;
+	s=arc-20240116; t=1772165604; c=relaxed/simple;
+	bh=qZgAKZ71FptSTrPhLg3idNbD6udVe5OvGVFiq8nnwpI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rvdh6oLqETzfMIPsUNImISFaUrcdidRQRze2WKW3oZN8C711wumQ8qaJfNQOWNJMq9d18oWdeZMtoC8f60vOxAIS08ppFockNVeZsJBrlO26cbnN7WNzfQgi/ArdvxbsSsQ/TM5bIg7G4KOkE7+y1n7hs0tb4gB+ZFi+oQxzam0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=ibQzzZtI; arc=none smtp.client-ip=95.215.58.173
+	 In-Reply-To:Content-Type; b=NYk+rueJkFsEh6yOVe7KlJ7KP4hQcJZdEZ5pdnUICCD4mW1rEJ0+EgxEsyW5UNvje1pOrjn2vSQARWJ7g0nw/Veb+vPjjW1sVsPVr7ji9e6EdwNCJOACcUXEskYkr/XbhoKkLT3u32o32D/GbGYXeBw6wZMqIWeP4F9XEHltL3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=v5vp2kOR; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="ibQzzZtI"
-Message-ID: <f3604a74-3caa-4737-bfc0-d93feb988176@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="v5vp2kOR"
+Message-ID: <90fdfba1-e0be-4656-87fc-1921d233da37@chenxiaosong.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1772165327;
+	s=key1; t=1772165600;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ANhl16UQX9s/ubY5XDKWQjefXS+3qQZo0aDYkOyLavY=;
-	b=ibQzzZtI6emil3OMLJFqgROumyPGOytXhpm8UNSs8crFhE6u7XRRZlTX3zXV7aiLCVIO0Y
-	3GTRk2kqGGgt//AJGw2afbhA1HHJyGz6ZKFBI/dlTw/7Yor8IgrYrUOaH6TPvo78OsDUGp
-	u95L49h7iC1BJCq5MAzQLmat7JljTKK3vgfYVWNSLNUj1na3pxKe8Basu+WIxVog/zM51U
-	cW0OK4OL4NOfkbmKUxv2YXcCTTjYY5aKSNkHDnAq76HoPHYVNN8+eLd0yIth5vL3Rr4nxF
-	RjkvjcSeOB7CZZqjGMoW4GL9cyisreVlgsz2HL/wQ3GAIY0CqvTLmyDP5oFLqw==
-Date: Fri, 27 Feb 2026 12:07:44 +0800
+	bh=x6ulSfKjuLuE3Cra3Fb4w/6aiZ0mC10Js7TDP7CKbNQ=;
+	b=v5vp2kOR8PyyVViUW01AWVQPaWA3+JhM2YPxy5lVsben/itsGdO3B2cteBk6ZljifsaCzZ
+	V1Tmws1hmM41PKF4NlC4uFHSipJigpddxwPRs7IYbwg1jrZo8eZAYF1Rjr8oak9pz2Axm9
+	7pE2IfoI/zgPjHka495And6sv4TEEvETrxgVHODYmttCzQ+4fJ3MBp8S3yVeMjcshhdBtX
+	NEym7NL0vOVI1i5AbItG+oQXCC7gv9tm2lRpicI1gmHZRJid1BmAHylaYVIgOkl5AtxKEC
+	lAuA5qc3xsxa8gQRMTNTyALw9pRd56E+9Tmrf7tRCdMPztb/PyqCM3hlIXVMuA==
+Date: Fri, 27 Feb 2026 12:12:21 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -37,8 +37,8 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Subject: Re: [PATCH v2 1/1] smb/server: fix refcount leak in smb2_open()
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
+To: linkinjeon@kernel.org
+Cc: Guenter Roeck <linux@roeck-us.net>, smfrench@gmail.com, pc@manguebit.org,
  ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
  bharathsm@microsoft.com, senozhatsky@chromium.org, dhowells@redhat.com,
  linux-cifs@vger.kernel.org, ZhangGuoDong <zhangguodong@kylinos.cn>,
@@ -48,91 +48,46 @@ References: <20251229031518.1027240-1-chenxiaosong.chenxiaosong@linux.dev>
  <97979f06-7dd2-46bd-9bdd-3a9c45fc5b1d@roeck-us.net>
  <d3d93c04-fdd1-4b96-90f2-293a2d45f647@chenxiaosong.com>
  <59d5c1a6-7a7f-464a-aa62-e53daff8870d@roeck-us.net>
+ <f3604a74-3caa-4737-bfc0-d93feb988176@chenxiaosong.com>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <59d5c1a6-7a7f-464a-aa62-e53daff8870d@roeck-us.net>
+In-Reply-To: <f3604a74-3caa-4737-bfc0-d93feb988176@chenxiaosong.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Hi Guenter,
+Hi Namjae,
 
-Sorry for the late reply. I had some family matters to take care of 
-yesterday.
+By the way, smb2_open() is over 900 lines long, and we have already 
+encountered several memory leaks in it, and there may be more. Perhaps 
+we should consider refactoring it to make it easier to maintain.
 
-Please see the following process:
-
-```
-smb2_open
-   smb2_check_durable_oplock
-     opinfo_get(fp) // inc refcount
-   ksmbd_reopen_durable_fd
-     __open_id(&work->sess->file_table, fp,
-       idr_alloc_cyclic(ft->idr, fp, ...)
-       __open_id_set(fp, id, type); // insert into file table
-   ksmbd_override_fsids // fail
-   ksmbd_put_durable_fd
-     __ksmbd_close_fd
-       __ksmbd_remove_fd  // remove dh_info.fp from file table
-   // dh_info.fp has already been removed from the file table
-   ksmbd_fd_put(..., fp) // fp == NULL
-```
+What do you think?
 
 Thanks,
 ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 
-On 2026/2/26 13:09, Guenter Roeck wrote:
-> Hi,
+On 2026/2/27 12:07, ChenXiaoSong wrote:
+> Hi Guenter,
 > 
-> On 2/25/26 20:12, ChenXiaoSong wrote:
->> Hi Guenter,
->>
->> Thank you for taking the time to look into this issue.
->>
->> I reviewed the relevant code in more detail and did not find any leak.
->>
->> Both `ksmbd_put_durable_fd()` and `ksmbd_fd_put()` will eventually 
->> call `__ksmbd_remove_fd()` (remove fd from file table).
->>
+> Sorry for the late reply. I had some family matters to take care of 
+> yesterday.
 > 
-> Sorry for bothering you again. Are you sure ?
+> Please see the following process:
 > 
-> ksmbd_put_durable_fd() calls __ksmbd_close_fd() with NULL first parameter.
-> __ksmbd_close_fd() only calls __ksmbd_remove_fd() if ft (the first 
-> parameter)
-> is not NULL.
-> 
-> ksmbd_fd_put() does call __ksmbd_remove_fd() with first parameter, but ...
-> 
->> If my understanding is incorrect, please let me know.
->>
->> Thanks,
->> ChenXiaoSong <chenxiaosong@chenxiaosong.com>
->>
->> 在 2026/2/26 00:49, Guenter Roeck 写道:
->>> Running an experimental AI agent on this patch produced the following
->>> feedback:
->>>
->>> This isn't a bug introduced by your patch, but it looks like there is 
->>> still a
->>> resource leak here. If ksmbd_override_fsids() fails, we jump to 
->>> err_out2.
->>> At that point, fp is NULL because it hasn't been assigned dh_info.fp 
->>> yet,
->>> so ksmbd_fd_put(work, fp) will not be called. However, dh_info.fp was
-> 
-> the AI is trying to make the point that ksmbd_fd_put() will not be called
-> because fp == NULL.
-> 
-> Thanks,
-> Guenter
-> 
->>> already inserted into the session file table by 
->>> ksmbd_reopen_durable_fd(),
->>> so it will leak in the session file table until the session is closed.
->>> Should fp = dh_info.fp; be moved before the ksmbd_override_fsids() 
->>> check?
->>>
->>> PTAL and let me know if it has a point or if it is missing something.
->>
+> ```
+> smb2_open
+>    smb2_check_durable_oplock
+>      opinfo_get(fp) // inc refcount
+>    ksmbd_reopen_durable_fd
+>      __open_id(&work->sess->file_table, fp,
+>        idr_alloc_cyclic(ft->idr, fp, ...)
+>        __open_id_set(fp, id, type); // insert into file table
+>    ksmbd_override_fsids // fail
+>    ksmbd_put_durable_fd
+>      __ksmbd_close_fd
+>        __ksmbd_remove_fd  // remove dh_info.fp from file table
+>    // dh_info.fp has already been removed from the file table
+>    ksmbd_fd_put(..., fp) // fp == NULL
+> ```
