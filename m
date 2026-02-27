@@ -1,76 +1,122 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7AF3358DB
-	for <linux-cifs@vger.kernel.org>; Fri, 27 Feb 2026 04:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F353321D4
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Feb 2026 05:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772167997; cv=none; b=TAeiQBODODfkiJV+KpYgbHil7oTPrEwlgScPSsCozBqSgvI7eyz/X8P0ejnoW6FecMEma9FJwNT251cDoRt6jsMNOMIYJMtc9elssRk77Gg0V+mzQ+5mcKJEHzUPYov9FM/uE3+nW9bj/x8mSWp8/7kQR6kHJ0RgTkMMpFFoEus=
+	t=1772171667; cv=none; b=F3Dhq4vr8Obw8bazyeJTtRcUjUfWRs8Wo4Wq+xHGymrMxRqxO0iFnXDYlemvpffFWnWqg0gKSAwNe90A7Ch3WmAgw6UZHrMp1zE2EVUOIFDHq1DMHNxCFO1Rovw8n+lCvS8YOaOVY3RpSvEKdKwhQRMtuuYbKz3+nV1wP2Wzg1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772167997; c=relaxed/simple;
-	bh=JtwmAbyNEEmo8vtYqAtOdIntGH/NkvGKPypjqiaULWg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fhDvI8KaRl1Wz+gVOHMxqS3bqYrY6jIWzcsvDNWBEC4fB1MbkRJWcCc4/JGM84Y4RgVp5ysKRPAf0AQHAf8mfEyYZR9tJHEkskr+N5/mU6kFfK2C3qP42MFIqGaThpBS6nbyYzmq2EucX01g8oril4T4VkbWFFWEL3nT4ULps6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=Tsen3Sgm; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1772171667; c=relaxed/simple;
+	bh=AkWz5k+2wIbunIL0p9X6aQXFpOqWdjrXbCIk8aWyUdU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZrkweCWDPn6n+YRNi9Uhkkj3iqoZooIRoBhXCBLMzzn2X/PfKiXZ8TUKBAKZiS5Np4Cr4Avi20e5c5MA7hrEmSTpZbFjy0z78ZNGG8AZmQI4SNxA97ldihvXen0YhMaN4eAviOcB0P0PYxb6Cqz4x+sz/ijiVKNyVGxIEl5j0W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LkYbAUTQ; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="Tsen3Sgm"
-Message-ID: <739c9e8d-238a-4f2d-938c-ed0ab9706098@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1772167992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5j8OLG7RvGxdPeUXucGehQ+0DC0FudAegj2hClQldVo=;
-	b=Tsen3Sgm8RCZY2DDCBWE7cnwFflGa8as7510ORvvCRTDRyIhSzSlLslrm1WRs3HEA7cxbl
-	o/lrpFCXSXi6/Pg3lbbppMxL9gAWAy5B9HUQYfWZJG9BhICEwW4z9v1yshOW96IPpCmvWU
-	UrO8Sr0vCeAl0cj5JBIqa0W83kX9MTFt0379Z9rKh5weZoq3fjH46syam2VcuWCpMayFZD
-	lQ2GV6bxcfh/bBvE3maqbCC21ykXu48ChftTdi5biXGU3ChQ1Ek/I8kzHR4AZ2YMHsNblU
-	R5lilVgPHyyumEaiPFZDsLr8LTG4thDwzpM7zqPznPFHoDQEzLKnvVq7ERFUIg==
-Date: Fri, 27 Feb 2026 12:53:05 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LkYbAUTQ"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-8274a3db5e3so427019b3a.0
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Feb 2026 21:54:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772171664; x=1772776464; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=QosvNuXboU32D9oyRT8fsiY7HceoagCHchzg2894r1Y=;
+        b=LkYbAUTQVFzYYLGsf90B+Sq0hovBM2zb4ghKOQ7aSWUW43cuRWulvnkeBsklv1Fys+
+         kc7yxX290UjvDtnn66EB3UU4lTgKa5fe1Sc2WOOcghG9sMNp1tmz6ehsCvWEDm0enxIe
+         o+fgEKb6Zyb0LKMjxxkreBQUgajptIzgMFvbpWheJLgGNPBAPh/yKBdzlJNsUJsYVYtS
+         BWmAZjdDhDzo/3gjAGzVapsmi0iYN1hHs2yIS89wGqWNKncPOJ12LCdMwEWLr7JVU4Qf
+         Aeu9tF4GnolKuNeirNWBAtFebTRO2VBtE/qyE3x8hkepJJHL3I6svzY6DePqm3UgQp5C
+         GejA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772171664; x=1772776464;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QosvNuXboU32D9oyRT8fsiY7HceoagCHchzg2894r1Y=;
+        b=U+djMd4LUWJFgC25vNmt5UqvnqA6fOJoT/LQ8kOe1txYle9YHtKOMD4k8bxfN3anty
+         /l0pzjQyg1r/YkfG2oGWoAqkQKcQ/OqEghcJBkQJAKIjln/xx8eeWCQ+grBQ7hokYhDC
+         myaiaZffoFXGHJIjPwOi+L27TYMBE3Hr7G5+uIzocqzyI8GzydfzIkxUVp7HTOqHPUBy
+         X65x3cDGkTw7tCX5qsfQQkPg9223rMGR3yxMWgQ3KhC3KFr1YA8G9visv6EQfMpg9sqZ
+         2cIEO9XoUkywbkrqhYk79vg9Ftt04sw8o6g2pSP0JQrkBOQVQMroR2dshHp5ekcCZ6B4
+         owjA==
+X-Forwarded-Encrypted: i=1; AJvYcCXAKQ5TDHIXwO6vqki/977QgrjIIkrcdVuq4VtSDEfKTVZmDLr9GlmgTnYq3/2eba7TXcZH1dtXSWaj@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiW3ec8AJLCTEjUH5y4YnSnZc6KKSormZ7czB5UBXY6+tN7K8Q
+	IJ/iQnhCiu/uzOAzQL1maDt0WSRsGly48GqpctIP+864PwO3wqpDAk2A
+X-Gm-Gg: ATEYQzzgmHEu3IGxv/GNTpVRjEKIBpbii2E71cRELtUnJxBvh1FdPyoKgxvpU4E5La/
+	ETvGTDrIngG84SjO9CzxAFE8qEptNiunlt/pGN8ulYuY6cA9dC4GHRP20Avfs3wYOGyW/Cot+ug
+	61mrSHFgtwx8FPOALa7jx9Dt6oiomW8vsgAsT7W59X6q1Ust/4rWs4ye0Au43pJYVNt6aRxwN9V
+	haeq3uUH7QuFZlLVrTJxX+1Y7qSTeIIFZNtg3tRh3CMYrS7OpxOnuJdf4TV9/vk7+X1xQA2XIHd
+	ut677/OWHu3tbU2EMo3yjTlZMU3Y4ojAsb1FlDLkWndO59JSWVqdcRtSUiRdhwqQM1ifB1xTlY+
+	ceckkpezlc0qq/yKUMyNQhS26KPFr9E5lGrycHBXfW5MWlYOX5BsxFNPv1JLYCSHNtQdFlD57QL
+	w43oHSCUL4lfIVrH/lEHFRsNwJmyJlsbHPhiY8
+X-Received: by 2002:a05:6a21:44c8:b0:395:7fb:9365 with SMTP id adf61e73a8af0-395c39df01dmr1569566637.8.1772171664134;
+        Thu, 26 Feb 2026 21:54:24 -0800 (PST)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c70fa5ef857sm3316593a12.7.2026.02.26.21.54.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Feb 2026 21:54:23 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Guenter Roeck <linux@roeck-us.net>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Subject: [PATCH] smb/server: Fix another refcount leak in smb2_open()
+Date: Thu, 26 Feb 2026 21:54:21 -0800
+Message-ID: <20260227055421.1777793-1-linux@roeck-us.net>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 1/1] smb/server: fix refcount leak in smb2_open()
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
- ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
- bharathsm@microsoft.com, senozhatsky@chromium.org, dhowells@redhat.com,
- linux-cifs@vger.kernel.org, ZhangGuoDong <zhangguodong@kylinos.cn>,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20251229031518.1027240-1-chenxiaosong.chenxiaosong@linux.dev>
- <20251229031518.1027240-2-chenxiaosong.chenxiaosong@linux.dev>
- <97979f06-7dd2-46bd-9bdd-3a9c45fc5b1d@roeck-us.net>
- <d3d93c04-fdd1-4b96-90f2-293a2d45f647@chenxiaosong.com>
- <59d5c1a6-7a7f-464a-aa62-e53daff8870d@roeck-us.net>
- <f3604a74-3caa-4737-bfc0-d93feb988176@chenxiaosong.com>
- <a99db1ba-2b96-44ba-b4b2-11754f6c6aab@roeck-us.net>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <a99db1ba-2b96-44ba-b4b2-11754f6c6aab@roeck-us.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Yes, you are correct. Thank you for pointing this out.
+If ksmbd_override_fsids() fails, we jump to err_out2. At that point, fp is
+NULL because it hasn't been assigned dh_info.fp yet, so ksmbd_fd_put(work,
+fp) will not be called. However, dh_info.fp was already inserted into the
+session file table by ksmbd_reopen_durable_fd(), so it will leak in the
+session file table until the session is closed.
 
-Could you submit a patch to fix this?
+Move fp = dh_info.fp; ahead of the ksmbd_override_fsids() check to fix the
+problem.
 
-Thanks,
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Found by an experimental AI code review agent at Google.
 
-On 2026/2/27 12:42, Guenter Roeck wrote:
-> 
-> void ksmbd_put_durable_fd(struct ksmbd_file *fp)
-> {
->          if (!atomic_dec_and_test(&fp->refcount))
->                  return;
-> 
->          __ksmbd_close_fd(NULL, fp);    // first parameter (ft) is NULL
-> }
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Fixes: c8efcc786146a ("ksmbd: add support for durable handles v1/v2")
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+ fs/smb/server/smb2pdu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 95901a78951c..8b680c96ee44 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -3011,13 +3011,14 @@ int smb2_open(struct ksmbd_work *work)
+ 				goto err_out2;
+ 			}
+ 
++			fp = dh_info.fp;
++
+ 			if (ksmbd_override_fsids(work)) {
+ 				rc = -ENOMEM;
+ 				ksmbd_put_durable_fd(dh_info.fp);
+ 				goto err_out2;
+ 			}
+ 
+-			fp = dh_info.fp;
+ 			file_info = FILE_OPENED;
+ 
+ 			rc = ksmbd_vfs_getattr(&fp->filp->f_path, &stat);
+-- 
+2.45.2
+
