@@ -1,246 +1,262 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFBB25FA05
-	for <linux-cifs@vger.kernel.org>; Fri, 27 Feb 2026 10:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772187916; cv=pass; b=aoDjKihCurbTdlVeZnbQEASAA/GUEQ7l55uXUSLR03wjfnAxx64N/ehNqu9RaksFKZKafO6w/0ERvyc2CM9cTTMiVQtrrlfOyFVNa+1Mqs6Z00oLr0lopWzTIlaTVHHVG3EicGDvBbaT24TTQppZG0slyHb2eZ3JFDx6dMNrCkc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772187916; c=relaxed/simple;
-	bh=RJBOQYX0Pp3A8/SMhWfr+8fGlBaTgeZwacGybWf4+WA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LKmq4tNr1gK4BdD0RV+He1dvsY2xmr7oFHlTLU49at4wwBqBX98tMATVM/zqMzgzZFIaNOC/S2vD4sQzHlWDqoY20xXuh2h1nIkHgNkGTeUJid3yboD4Q+eHI+nt2vA4s4XnA1h4WI8DVzwsfrXoN4XbZSxGC0aqgWZATZIXtL4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NOVbWqGO; arc=pass smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB8D33261C
+	for <linux-cifs@vger.kernel.org>; Fri, 27 Feb 2026 11:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772192073; cv=none; b=kqjNtE68Dv4Zw+q8t+NQCznWxFTSzcHq8lPIPiMfESNPqYPLNS6AtVlBtOHk40KMyAbbHroF78ZoQq/xcGEgCIgVur2dSCaVReZ+g/Q74HbHqxVFidEZUJUM7+t8/MGydhbRSwhMCVz0sm17SGS9DR7/vCGxCvvKyJ3QKl6qurc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772192073; c=relaxed/simple;
+	bh=/DYKZzwiZf7JORlpCwaYSZ4w+lIYmVegY+urJY1I7Zc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wn2Hp+jtQ+a+/cwsWX9k6+lcVxz2GKLm4KbowQF22bPZMV6D9xQywzv5hpIxIUu1H4l14S244WFXct+QWuUkcq/Dsep3bc4VUshCc7Y7VE9VxAT2JRFlmWpTB12eM8ymDS0S4QAZTaQ6CvSUdIJX7TnB3sJ47SV8Q0keH/WDRLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=yzNBLfXK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=OLWU5ivG; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=yzNBLfXK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=OLWU5ivG; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NOVbWqGO"
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-65a26c220b6so2618955a12.0
-        for <linux-cifs@vger.kernel.org>; Fri, 27 Feb 2026 02:25:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772187914; cv=none;
-        d=google.com; s=arc-20240605;
-        b=COIN1GwxlhXglt/RpMQFNQqb/fNmab0kyxjnMBRjlgHTZ9AD1D/F+5+O99pyAD5Yod
-         9tlC4cbymk/MeaYQDthcusjx22f7sanbUkqIW78K68iInyuE1iw09AU4ycOMjLMjG4Z4
-         Zj5dLN1VTCPUqNxrzbYm85mUS1oQZEAtcX0bhuKA54+0DwQTOU1uHHI6SSNnEwu53dcJ
-         6JtwYbzZzGIjqyjBGzLicNQXPIGLPBYc4SzUrSoUjzHkqT13HB5BdOCcZHe5r+/3lhrx
-         T83uanGIakgVQ7NIQIwZ9hlE5MrI4ow2NNRsQwyVYDa+eaTAW0SUymZ0sYbhRrHvF0lw
-         NA1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QEGgC2xnE+GR/vDIjG+6vP3Pe3y3IP0TYiEVmUz3f8c=;
-        fh=K9dBFgA4rcVCd6q/HmCHvDEvg8Z4K6HEDrACv4s2ZiI=;
-        b=IwjBMwpUjMSILFkhaZM5StNkdotUfqwMSk3cfYHdtbJcERr6AevQq2RZKkryzOmhvX
-         vjCOY27unddm43f1GOGvsLudHJ1Rdj5yUqjqdpUy7qgQWPQlQMQD6kGEeAeunoSI5j6J
-         qNNK4Sb4oS0aGvxhs9ET3qpk1GtlbKZwcjhF/yyUR/IWEIqW3gYwFW04tTiMSA7IJ+cB
-         OcsYl9ryvRddCmU7H34Ro4YP7dykcLoIgL2dthl1FrjE5W91EEH4Wv7jk+BXHf2fY7AM
-         /iuitNrdIRdpus+uBHnTq077MUb3p1OzVLPkpoaD5Y21HH6mqrvF2Z7cjpOHo9pGX2IG
-         Leig==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772187914; x=1772792714; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QEGgC2xnE+GR/vDIjG+6vP3Pe3y3IP0TYiEVmUz3f8c=;
-        b=NOVbWqGObgFISGWqGlxJP2dCuy1Xn7t+ef00+WWz24Yk+JvvUEsWsJFTKPpbU566wb
-         iwvw+A0Y3KhzB0Sw7/kJltxQaRayEXGWBI/1f5Cc1VfLLR9bsqN2HbDxDc2aWpMTvObf
-         Uj2Hbc+ui/OB8k56uQURo2ZFxm7HTM4vagD7GXnoeV+lfFxZmuSVJ16ZbbSBRBixBVAk
-         t1gtKpPySznzsUJPVF63w6EyJb14pBjC+NvkppzNp8Lt1kPgko3Wty94TqY7ayrB6gD8
-         pCvLjS7RzzzVv3/zRpZ+och9CYtdPs9R9IgWRnDB2D0esc4M00UDp1LuX1+4tTzAGPt3
-         xILQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772187914; x=1772792714;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QEGgC2xnE+GR/vDIjG+6vP3Pe3y3IP0TYiEVmUz3f8c=;
-        b=AOIDSaYxBMsEuNjYuo/zkWU/Fs42fOz+Qm9SSvD98V4npazztL7qNfAamV/0QnGxc1
-         JENgakTOd8TBeFG5vY+WMsq0IytmDtrV8LkeRLYUVoR25cApAzCuKBu8u4fxfc2CNHA6
-         pM4rLi+Gi/kvfTt6DcQcXzrlBZgRqMcH9BH3V2T5y8/0fztV5jaDz5n6fRzPMKyj5NhS
-         yOUNzfOk7c3gJ7ppgPlmxlu+5ui8SFGfJpfYWOaOwkyzfLZ0qX555ahiro9Rk5MoKmsy
-         3jlEdmjeLUYWIdIUUzo/Dh9O41wqW2sAG1AA+0t1bK2pvpKed5B2q6ZbLmFDcQRynu1G
-         DJ3A==
-X-Forwarded-Encrypted: i=1; AJvYcCU9A3ZDFiNsKXAQQt6p+IKtY+dXdrZV1UbOt+Yo5ye+9IuB2q/p54ToJgZEOx2O+hRXjqs7QeGO9rXE@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9nGGMN7l8JQB4fKl0U64y5WRs9CQX8Yt5mynedQOmVsGtn/lp
-	eKY8mjbChAl496zHfX9WWYhj0z9g7dRJ6qwerFZ6f2Deiz7OmlGeSNDGF8aJ1Xu1Oy8a/RZCelR
-	+mzs0jBdo/HnJSqLmLAPIgGW9XI2kpck=
-X-Gm-Gg: ATEYQzzlr+LNlY00036CcoAf9VqTPK2il9moBqQ3wc+/Qow+Id7OtCccu81KatXXiLd
-	89ivWjk/aEGu0gZirlX3NewK/TXt3k0EWkE9uPfs6SkAwS2DaiWXmPvtxVXRpzthFOi95k8KXyD
-	Mxc/X1uA4K3wkjHqskMaRZkT/qU+rHeXltwd24mZfr7N5FI67wOtWDyubH7tzEi4WELZtVvof6k
-	oujslEA9NAOaZ6ecW0mb0jKEiDkt0TJQPDkcwJ1uJ58ktyldXBnY0VNvrnYAPFd/990BXbtPKDz
-	/sp0Yg==
-X-Received: by 2002:a05:6402:26c5:b0:65f:8e80:4108 with SMTP id
- 4fb4d7f45d1cf-65fdd6c0961mr1767288a12.11.1772187913362; Fri, 27 Feb 2026
- 02:25:13 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="yzNBLfXK";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="OLWU5ivG";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="yzNBLfXK";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="OLWU5ivG"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 9F4115BDF8;
+	Fri, 27 Feb 2026 11:34:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1772192070; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IcwzK4XVgXogdPbxbbJoSTt0FD2Bb9QBnrGjayGfvZM=;
+	b=yzNBLfXK+tYE0mTr6cv5Xc9DRb7sKV/48FxOb3BL6L8gr8/SztQ86e+i75x3i5JU8MIHq+
+	Foif2ZfZ2YMDSp0zDP2cwq7GeXar2rH++IeEMIG0IG8EA6XFWp9OniiFoNgqCvn7ZiREVl
+	Gr+DUjT3EwrVCHZGW2sYQOAf/MFKpOk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1772192070;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IcwzK4XVgXogdPbxbbJoSTt0FD2Bb9QBnrGjayGfvZM=;
+	b=OLWU5ivGNUJ4qes+LLrsYb/10z52jI6sC6kltAiVjL01EcSLqvWRQMHNYmXIpO1KtmsG6u
+	ntaoFB5s3+I+wpCQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=yzNBLfXK;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=OLWU5ivG
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1772192070; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IcwzK4XVgXogdPbxbbJoSTt0FD2Bb9QBnrGjayGfvZM=;
+	b=yzNBLfXK+tYE0mTr6cv5Xc9DRb7sKV/48FxOb3BL6L8gr8/SztQ86e+i75x3i5JU8MIHq+
+	Foif2ZfZ2YMDSp0zDP2cwq7GeXar2rH++IeEMIG0IG8EA6XFWp9OniiFoNgqCvn7ZiREVl
+	Gr+DUjT3EwrVCHZGW2sYQOAf/MFKpOk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1772192070;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IcwzK4XVgXogdPbxbbJoSTt0FD2Bb9QBnrGjayGfvZM=;
+	b=OLWU5ivGNUJ4qes+LLrsYb/10z52jI6sC6kltAiVjL01EcSLqvWRQMHNYmXIpO1KtmsG6u
+	ntaoFB5s3+I+wpCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 834BF3EA69;
+	Fri, 27 Feb 2026 11:34:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id CsECIEaBoWmkLwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Fri, 27 Feb 2026 11:34:30 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 40858A06D4; Fri, 27 Feb 2026 12:34:30 +0100 (CET)
+Date: Fri, 27 Feb 2026 12:34:30 +0100
+From: Jan Kara <jack@suse.cz>
+To: Chuck Lever <cel@kernel.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, linux-api@vger.kernel.org, 
+	linux-f2fs-devel@lists.sourceforge.net, hirofumi@mail.parknet.co.jp, linkinjeon@kernel.org, 
+	sj1557.seo@samsung.com, yuezhang.mo@sony.com, almaz.alexandrovich@paragon-software.com, 
+	slava@dubeyko.com, glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu, 
+	adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org, pc@manguebit.org, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, trondmy@kernel.org, anna@kernel.org, 
+	jaegeuk@kernel.org, chao@kernel.org, hansg@kernel.org, senozhatsky@chromium.org, 
+	Chuck Lever <chuck.lever@oracle.com>, "Darrick J. Wong" <djwong@kernel.org>
+Subject: Re: [PATCH v8 01/17] fs: Move file_kattr initialization to callers
+Message-ID: <ih3mvucoroudud5l4pndgjxbxfxgcizu2mpli4fhkbnxwufrlm@cyoqgtmvlvpq>
+References: <20260217214741.1928576-1-cel@kernel.org>
+ <20260217214741.1928576-2-cel@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGypqWyDOfspVUMe3fm5bfQtC_wH2eEzRgppYvWUVDe1RHLy9Q@mail.gmail.com>
-In-Reply-To: <CAGypqWyDOfspVUMe3fm5bfQtC_wH2eEzRgppYvWUVDe1RHLy9Q@mail.gmail.com>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Fri, 27 Feb 2026 15:55:01 +0530
-X-Gm-Features: AaiRm53E8fzhZYzHDwzInONMWS_7okJV9lrIOMIkVUYNrkKfehamg0SxqX1C4V8
-Message-ID: <CANT5p=rRqPFdieYHeLqtOLtC0Jr-e9jMihj7a+SgCqQt3YWqfQ@mail.gmail.com>
-Subject: Re: [BUG] [~6.6 Kernel] Corruption when retrying encrypted sync writes
-To: Bharath SM <bharathsm.hsk@gmail.com>
-Cc: David Howells <dhowells@redhat.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Shyam Prasad <Shyam.Prasad@microsoft.com>, Steve French <smfrench@gmail.com>, 
-	CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Enzo Matsumiya <ematsumiya@suse.de>, Henrique Carvalho <henrique.carvalho@suse.com>, 
-	Bharath S M <bharathsm@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260217214741.1928576-2-cel@kernel.org>
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,vger.kernel.org,lists.sourceforge.net,mail.parknet.co.jp,samsung.com,sony.com,paragon-software.com,dubeyko.com,physik.fu-berlin.de,vivo.com,mit.edu,dilger.ca,samba.org,manguebit.org,gmail.com,microsoft.com,chromium.org,oracle.com];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	R_RATELIMIT(0.00)[to_ip_from(RLa77mm4gi8mw7uppieotozii3)];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email]
+X-Rspamd-Queue-Id: 9F4115BDF8
+X-Spam-Flag: NO
+X-Spam-Score: -4.01
+X-Spam-Level: 
 
-On Wed, Feb 18, 2026 at 11:30=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.co=
-m> wrote:
->
-> We are noticing a data corruption issue in kernels based on stable
-> 6.6.y. Especially, when a synchronous writes retried after a
-> connection reset.
->
-> Based on investigation so far, it looks like we are having issue in
-> the following code path:
-> When SMB3 encryption is enabled, partial-page buffered writes hit the
-> synchronous write path in cifs_write_end() when the folio is not
-> uptodate (!folio_test_uptodate(folio)), it calls cifs_write() directly
-> with the kmap()'d page cache buffer, bypassing the async writeback
-> path.
-> cifs_write() calls SMB2_write(), which places the write payload in
-> rq_iov[1], pointing directly at the page cache buffer. When
-> smb3_init_transform_rq() builds the encryption request, it shares
-> rq_iov by pointer (new->rq_iov =3D old->rq_iov), and crypt_message()
-> encrypts in-place via aead_request_set_crypt(req, sg, sg, ...). This
-> destroys the original page cache data. If the write gets -EAGAIN after
-> encryption (e.g., connection reset), cifs_write() re-sends the
-> now-ciphertext buffer as if it were plaintext, resulting in
-> double-encrypted garbage on the server. The server accepts it and
-> returns success.
-> Please let me know if you have seen this issue in the past, your
-> comments on the analysis and probable fixes.
->
-> Repro steps: Attached repro.zip with repro scripts and instructions:
-> 1) Mount with SMB3 encryption enabled
-> 2) Perform buffered writes in a loop (e.g., echo "known_pattern" >> file)
-> 3) Kill the TCP connection during writes (ss -K dport 445) to force
-> retryable errors
-> 4) Read the file back and compare against expected content
->
-Looking at the callers, it looks like simple_fallocate_range*
-functions that make use of sync writes are also susceptible to this
-issue.
+On Tue 17-02-26 16:47:25, Chuck Lever wrote:
+> From: Chuck Lever <chuck.lever@oracle.com>
+> 
+> fileattr_fill_xflags() and fileattr_fill_flags() zero the entire
+> file_kattr struct before populating select fields. This behavior
+> prevents callers from setting flags in fa->fsx_xflags before
+> calling these helpers; the zeroing clears any pre-set values.
+> 
+> As Darrick Wong observed, when a function named "fill_xflags"
+> modifies more than just xflags, filesystems must understand
+> implementation details beyond the function's apparent scope. When
+> initialization occurs at entry points, helper functions need not
+> duplicate that zeroing.
+> 
+> Move struct file_kattr zero-initialization from the fill functions
+> to their callers. Entry points such as ioctl_setflags(),
+> ioctl_fssetxattr(), and the file_getattr/file_setattr syscalls
+> now perform aggregate initialization directly. The fill functions
+> retain their field-setting logic but no longer clear the struct.
+> 
+> This change enables subsequent patches where filesystem
+> ->fileattr_get() handlers can set case-sensitivity flags
+> (FS_XFLAG_CASEFOLD, FS_XFLAG_CASENONPRESERVING) in fa->fsx_xflags
+> before calling the fill functions.
+> 
+> Suggested-by: Darrick J. Wong <djwong@kernel.org>
+> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
 
-> Issue can occur when all below conditions met in buffered writes:
-> 1) SMB2 encryption is active
-> 2) Sync write path: Writes reached SMB2_write via cifs_write
-> 3) Retryable network error for writes: When EAGAIN or ECONABORTED
-> returned from  cifs_send_recv().
->
-> Here is a the sequence of operations leading to issue:
-> write(2) syscall
->  =E2=94=94=E2=94=80 cifs_write_end()                          [file.c]
->      =E2=94=94=E2=94=80 cifs_write()                          [file.c]
->          =E2=94=82  iov[1].iov_base =3D write_data      =E2=86=90 page ca=
-che pointer enters iov[1]
->          =E2=94=82
->          =E2=94=94=E2=94=80 server->ops->sync_write()         [file.c]
->              =E2=94=94=E2=94=80 smb2_sync_write()             [smb2ops.c:=
-]
->                  =E2=94=94=E2=94=80 SMB2_write()              [smb2pdu.c:=
-]
->                      =E2=94=82  rqst.rq_iov =3D iov     =E2=86=90 rqst po=
-ints to iov[]
-> (with page cache in [1])
->                      =E2=94=82  rqst.rq_nvec =3D n_vec+1  =E2=86=90 BUG: =
-payload in
-> rq_iov, not rq_iter
->                      =E2=94=82
->                      =E2=94=94=E2=94=80 cifs_send_recv()      [transport.=
-c:1305]
->                          =E2=94=94=E2=94=80 compound_send_recv()  [transp=
-ort.c:1071]
->                              =E2=94=82
->                              =E2=94=94=E2=94=80 smb_send_rqst()   [transp=
-ort.c:427]
->                                  =E2=94=82  if (flags & CIFS_TRANSFORM_RE=
-Q)  =E2=86=90
-> YES for SMB3 encryption
->                                  =E2=94=82
->                                  =E2=94=94=E2=94=80 server->ops->init_tra=
-nsform_rq()
-> [smb2ops.c:~4398]
->                                  =E2=94=82   =3D smb3_init_transform_rq()
->                                  =E2=94=82     new->rq_iov =3D old->rq_io=
-v     =E2=86=90
-> SHARES pointer (not copied!)
->                                  =E2=94=82     size =3D
-> iov_iter_count(old->rq_iter) =3D 0  =E2=86=90 empty, no copy
->                                  =E2=94=82
->                                  =E2=94=94=E2=94=80 __smb_send_rqst()  [t=
-ransport.c:272]
->                                      =E2=94=82  =E2=86=92 crypt_message()=
-  [smb2ops.c:~4280]
->                                      =E2=94=82     =E2=86=92 smb2_get_aea=
-d_req()
-> [smb2ops.c:~4196]
->                                      =E2=94=82        sg =3D scatterwalk =
-from rq_iov[0..n]
->                                      =E2=94=82
-> aead_request_set_crypt(req, sg, sg, ...)
->                                      =E2=94=82
->    ^^^  ^^^
->                                      =E2=94=82
-> src=3Ddst =E2=86=92 IN-PLACE encrypt
->                                      =E2=94=82
->                                      =E2=94=82   iov[1] (=3D page cache) =
-is now
-> AES ciphertext
->                                      =E2=94=82
->                                      =E2=94=94=E2=94=80 kernel_sendmsg() =
-/ sock_sendmsg()
->                                          =E2=86=92 sends encrypted data o=
-n wire
->
->          =E2=86=90 rc =3D -EAGAIN (connection dropped)
->
->          is_replayable_error(rc) =3D=3D true or cifs_write while loop det=
-ects EAGAIN
->          goto replay_again                    =E2=86=90 loops back with c=
-orrupted iov[1]
->              =E2=94=94=E2=94=80 SMB2_write() re-sends...
->                  =E2=94=94=E2=94=80 smb3_init_transform_rq()  =E2=86=90 e=
-ncrypts ciphertext AGAIN
->                      =E2=94=94=E2=94=80 crypt_message()       =E2=86=90 d=
-ouble-encrypted garbage
->                          =E2=94=94=E2=94=80 server writes it to disk  =E2=
-=86=90  CORRUPTION
->
->
->
-> Modifying SMB2_write function by adding payload to rq_iter seems to
-> help here. Need to further test.
-> With below fix, when rq_iter size > 0 code in smb3_init_transform_rq
-> allocates fresh pages, copies the data via copy_page_from_iter(), and
-> encrypts the copy instead of the original.
-> Please let me know your comments.
->
->
->  rqst.rq_iov =3D iov;
-> -rqst.rq_nvec =3D n_vec + 1;
-> +rqst.rq_nvec =3D 1;
-> +iov_iter_kvec(&rqst.rq_iter, ITER_SOURCE, &iov[1], n_vec,
-> +              io_parms->length);
-> +rqst.rq_iter_size =3D io_parms->length;
+Looks good. Feel free to add:
 
-Another option is to initialize iov_iter_xarray with rqst.rq_buffer,
-similar to what smb3_init_transform_rq does. But this should work too.
-Changes look good to me. Please submit a formal patch.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
---=20
-Regards,
-Shyam
+								Honza
+
+> ---
+>  fs/file_attr.c     | 14 +++++---------
+>  fs/xfs/xfs_ioctl.c |  2 +-
+>  2 files changed, 6 insertions(+), 10 deletions(-)
+> 
+> diff --git a/fs/file_attr.c b/fs/file_attr.c
+> index 6d2a298a786d..42aa511111a0 100644
+> --- a/fs/file_attr.c
+> +++ b/fs/file_attr.c
+> @@ -15,12 +15,10 @@
+>   * @fa:		fileattr pointer
+>   * @xflags:	FS_XFLAG_* flags
+>   *
+> - * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).  All
+> - * other fields are zeroed.
+> + * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).
+>   */
+>  void fileattr_fill_xflags(struct file_kattr *fa, u32 xflags)
+>  {
+> -	memset(fa, 0, sizeof(*fa));
+>  	fa->fsx_valid = true;
+>  	fa->fsx_xflags = xflags;
+>  	if (fa->fsx_xflags & FS_XFLAG_IMMUTABLE)
+> @@ -48,11 +46,9 @@ EXPORT_SYMBOL(fileattr_fill_xflags);
+>   * @flags:	FS_*_FL flags
+>   *
+>   * Set ->flags, ->flags_valid and ->fsx_xflags (translated flags).
+> - * All other fields are zeroed.
+>   */
+>  void fileattr_fill_flags(struct file_kattr *fa, u32 flags)
+>  {
+> -	memset(fa, 0, sizeof(*fa));
+>  	fa->flags_valid = true;
+>  	fa->flags = flags;
+>  	if (fa->flags & FS_SYNC_FL)
+> @@ -325,7 +321,7 @@ int ioctl_setflags(struct file *file, unsigned int __user *argp)
+>  {
+>  	struct mnt_idmap *idmap = file_mnt_idmap(file);
+>  	struct dentry *dentry = file->f_path.dentry;
+> -	struct file_kattr fa;
+> +	struct file_kattr fa = {};
+>  	unsigned int flags;
+>  	int err;
+>  
+> @@ -357,7 +353,7 @@ int ioctl_fssetxattr(struct file *file, void __user *argp)
+>  {
+>  	struct mnt_idmap *idmap = file_mnt_idmap(file);
+>  	struct dentry *dentry = file->f_path.dentry;
+> -	struct file_kattr fa;
+> +	struct file_kattr fa = {};
+>  	int err;
+>  
+>  	err = copy_fsxattr_from_user(&fa, argp);
+> @@ -378,7 +374,7 @@ SYSCALL_DEFINE5(file_getattr, int, dfd, const char __user *, filename,
+>  	struct path filepath __free(path_put) = {};
+>  	unsigned int lookup_flags = 0;
+>  	struct file_attr fattr;
+> -	struct file_kattr fa;
+> +	struct file_kattr fa = {};
+>  	int error;
+>  
+>  	BUILD_BUG_ON(sizeof(struct file_attr) < FILE_ATTR_SIZE_VER0);
+> @@ -431,7 +427,7 @@ SYSCALL_DEFINE5(file_setattr, int, dfd, const char __user *, filename,
+>  	struct path filepath __free(path_put) = {};
+>  	unsigned int lookup_flags = 0;
+>  	struct file_attr fattr;
+> -	struct file_kattr fa;
+> +	struct file_kattr fa = {};
+>  	int error;
+>  
+>  	BUILD_BUG_ON(sizeof(struct file_attr) < FILE_ATTR_SIZE_VER0);
+> diff --git a/fs/xfs/xfs_ioctl.c b/fs/xfs/xfs_ioctl.c
+> index 4eeda4d4e3ab..369555275140 100644
+> --- a/fs/xfs/xfs_ioctl.c
+> +++ b/fs/xfs/xfs_ioctl.c
+> @@ -498,7 +498,7 @@ xfs_ioc_fsgetxattra(
+>  	xfs_inode_t		*ip,
+>  	void			__user *arg)
+>  {
+> -	struct file_kattr	fa;
+> +	struct file_kattr	fa = {};
+>  
+>  	xfs_ilock(ip, XFS_ILOCK_SHARED);
+>  	xfs_fill_fsxattr(ip, XFS_ATTR_FORK, &fa);
+> -- 
+> 2.53.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
