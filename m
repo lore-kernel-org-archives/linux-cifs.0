@@ -1,43 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBE02C08AD;
-	Sun,  1 Mar 2026 02:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7403B2C08AD;
+	Sun,  1 Mar 2026 02:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772330671; cv=none; b=TR/ALWvLw3yrFD9+cU0q7RYeN/hSnvdbH4bbJ+sn9slnZhSiR298QFi3zXhppBHXQjsaPbxM9hMJn1oZ2SUVH7fXYg89P2wRvChXc9VXUmqqvK9xK4P9Xern5A5H74O/9cu9BhXFjrnYIrv84VeITLOmjspx7lfvLS4IP+YKvCQ=
+	t=1772330680; cv=none; b=GnbSPRlli0nPfwrkJFcyjggiEH5ojhTivYN1UwiJ+JTr2f4/IARoOlJacMI5YNzMJ0Z1faaxyc7UfL2f3+dbvMeJ/IwwHxeCbgjO045RNbU/LjP8Ew9xPs3UYBzo7rOYJfkyD1FMNH9nEXLwkWTjCrz4ITdzNwcjOd9mejwxwo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772330671; c=relaxed/simple;
-	bh=js00iyEKSsFdrbbpTpmjkc7JFJyLdft8Dy30YHxmPcw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PoOKnbjOaXp59b6PBqtSGdLgzlx6Ey5jdLSb4DHOY7ep7lhlTlMEG79ZXtNlcsxJ4WE4F3NR/IaL5SdgxZ1mc2YFxK756vy4LbfUwI+e3Bro43xATF3zVhDJDKSKTeBjqxl4Zys89C9UZoEGtXLaIV/twJeLKXf91rgNd210Phk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lMJ1AQa5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772330680; c=relaxed/simple;
+	bh=VFO0+VjK6VTT4hAp0iYjW+9oXkn4yWow94c8FN1ox9w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rNDD7jc+N3ppwrRo9Xn2EHiohhxwuUgiLkLNvRRBtNO5WO20DExaaLX/5dBHm6wPF0Mr3mA3Tdt066Ue9/FV4v+9C/Yo3zQmbk2E/O+l9vP/AvI0u2J0Z2GMq/UrF3o4kSOko4wfhAWD9MbF3s+maIg7/vCSjgfq+t7zBp2PUjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enw0AOMb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lMJ1AQa5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF68FC19421;
-	Sun,  1 Mar 2026 02:04:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enw0AOMb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3030C19421;
+	Sun,  1 Mar 2026 02:04:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772330670;
-	bh=js00iyEKSsFdrbbpTpmjkc7JFJyLdft8Dy30YHxmPcw=;
+	s=k20201202; t=1772330680;
+	bh=VFO0+VjK6VTT4hAp0iYjW+9oXkn4yWow94c8FN1ox9w=;
 	h=From:To:Cc:Subject:Date:From;
-	b=lMJ1AQa5AiAQGFlqYL9H2TJ1oHmTcOHcgzq4aUWjxZiPbnXXJKyAyUzeAciIKZHLE
-	 MkAix5oOcor8n9sFe/SlWIRWlnvNtboI7ykzCOIR2W5p8Lxx0yf8Fmd6pA80o8sxzF
-	 iAThvxrqIs8zzOLB81WzCQ5U+q8SiLkaW8CXEFN+Uky5U8ZDpntbot92nNe78RpL2n
-	 gIgWEWxUr9ePX/ig76vhkd4/ch1U1EpCfRWBGJnLPAMThLGg44s3rmKsxdJvPcwDX3
-	 NrgXL4b3jObmRrE7K0qJSzmul1TXP8B9+SIh3GgHFdcTg2akQAw39Qp07Xkh77Sam/
-	 xU72fEUMvhPUw==
+	b=enw0AOMb3vugUQgKpDG2bzxPnPGbDBsq7RY0z1PeM3T2twinNyZR8g1xi2C+Qa0i4
+	 vo6ZlYhpSzpiyAyH2bdsypAEBOdmRYGAsQvVwyzWn1Wfwu01CVMhskmlI89Aww4+M3
+	 zEkFdC0mfFqj56Qa4OTiRS3jDf5XSZsMhjUeD4qsNQJSv1y7rYCWvIAW46TbBDpY9i
+	 UAfzsYIkl+z9XnVUhzWbJCtHly3UT3RB6zUDzAliSyIRJzYazcjzMOfNmiKo/5iJn3
+	 w6qdubd6YsCDoes+Nn3X1YTGzCIDQ4+h39iEclZHW08WOvnpwrgrkkeBJTqT/ZPCug
+	 Uo90dl/MJEbMg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	metze@samba.org
-Cc: Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Steve French <stfrench@microsoft.com>
-Subject: FAILED: Patch "smb: client: let smbd_post_send_negotiate_req() use smbd_post_send()" failed to apply to 5.10-stable tree
-Date: Sat, 28 Feb 2026 21:04:28 -0500
-Message-ID: <20260301020428.1732937-1-sashal@kernel.org>
+	linkinjeon@kernel.org
+Cc: Igor Stepansky <igor.stepansky@orca.security>,
+	Steve French <stfrench@microsoft.com>,
+	linux-cifs@vger.kernel.org
+Subject: FAILED: Patch "ksmbd: add chann_lock to protect ksmbd_chann_list xarray" failed to apply to 5.10-stable tree
+Date: Sat, 28 Feb 2026 21:04:38 -0500
+Message-ID: <20260301020438.1733124-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -59,91 +55,117 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 5b1c6149657af840a02885135c700ab42e6aa322 Mon Sep 17 00:00:00 2001
-From: Stefan Metzmacher <metze@samba.org>
-Date: Thu, 22 Jan 2026 18:16:59 +0100
-Subject: [PATCH] smb: client: let smbd_post_send_negotiate_req() use
- smbd_post_send()
+From 4f3a06cc57976cafa8c6f716646be6c79a99e485 Mon Sep 17 00:00:00 2001
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Mon, 9 Feb 2026 10:43:19 +0900
+Subject: [PATCH] ksmbd: add chann_lock to protect ksmbd_chann_list xarray
 
-The server has similar logic and it makes sure that
-request->wr is used instead of a stack struct ib_send_wr send_wr.
+ksmbd_chann_list xarray lacks synchronization, allowing use-after-free in
+multi-channel sessions (between lookup_chann_list() and ksmbd_chann_del).
 
-This makes sure send_done can see request->wr.send_flags
-as the next commit will check for IB_SEND_SIGNALED
+Adds rw_semaphore chann_lock to struct ksmbd_session and protects
+all xa_load/xa_store/xa_erase accesses.
 
-Cc: <stable@vger.kernel.org> # 6.18.x
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Cc: stable@vger.kernel.org
+Reported-by: Igor Stepansky <igor.stepansky@orca.security>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/smbdirect.c | 32 +++++++-------------------------
- 1 file changed, 7 insertions(+), 25 deletions(-)
+ fs/smb/server/mgmt/user_session.c |  5 +++++
+ fs/smb/server/mgmt/user_session.h |  1 +
+ fs/smb/server/smb2pdu.c           | 12 +++++++++++-
+ 3 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 20faa6d7f514d..88fefb901c27f 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -35,6 +35,10 @@ static void enqueue_reassembly(
- static struct smbdirect_recv_io *_get_first_reassembly(
- 		struct smbdirect_socket *sc);
+diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
+index 68b3e0cb54d38..8c2b14ea7b0ec 100644
+--- a/fs/smb/server/mgmt/user_session.c
++++ b/fs/smb/server/mgmt/user_session.c
+@@ -244,12 +244,14 @@ static void free_channel_list(struct ksmbd_session *sess)
+ 	struct channel *chann;
+ 	unsigned long index;
  
-+static int smbd_post_send(struct smbdirect_socket *sc,
-+			  struct smbdirect_send_batch *batch,
-+			  struct smbdirect_send_io *request);
-+
- static int smbd_post_recv(
- 		struct smbdirect_socket *sc,
- 		struct smbdirect_recv_io *response);
-@@ -1021,7 +1025,6 @@ static int smbd_ia_open(
- static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
++	down_write(&sess->chann_lock);
+ 	xa_for_each(&sess->ksmbd_chann_list, index, chann) {
+ 		xa_erase(&sess->ksmbd_chann_list, index);
+ 		kfree(chann);
+ 	}
+ 
+ 	xa_destroy(&sess->ksmbd_chann_list);
++	up_write(&sess->chann_lock);
+ }
+ 
+ static void __session_rpc_close(struct ksmbd_session *sess,
+@@ -434,7 +436,9 @@ static int ksmbd_chann_del(struct ksmbd_conn *conn, struct ksmbd_session *sess)
  {
- 	struct smbdirect_socket_parameters *sp = &sc->parameters;
--	struct ib_send_wr send_wr;
- 	int rc;
- 	struct smbdirect_send_io *request;
- 	struct smbdirect_negotiate_req *packet;
-@@ -1052,33 +1055,12 @@ static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
- 	request->sge[0].length = sizeof(*packet);
- 	request->sge[0].lkey = sc->ib.pd->local_dma_lkey;
+ 	struct channel *chann;
  
--	ib_dma_sync_single_for_device(
--		sc->ib.dev, request->sge[0].addr,
--		request->sge[0].length, DMA_TO_DEVICE);
--
--	request->cqe.done = send_done;
--
--	send_wr.next = NULL;
--	send_wr.wr_cqe = &request->cqe;
--	send_wr.sg_list = request->sge;
--	send_wr.num_sge = request->num_sge;
--	send_wr.opcode = IB_WR_SEND;
--	send_wr.send_flags = IB_SEND_SIGNALED;
--
--	log_rdma_send(INFO, "sge addr=0x%llx length=%u lkey=0x%x\n",
--		request->sge[0].addr,
--		request->sge[0].length, request->sge[0].lkey);
--
--	atomic_inc(&sc->send_io.pending.count);
--	rc = ib_post_send(sc->ib.qp, &send_wr, NULL);
-+	rc = smbd_post_send(sc, NULL, request);
- 	if (!rc)
- 		return 0;
++	down_write(&sess->chann_lock);
+ 	chann = xa_erase(&sess->ksmbd_chann_list, (long)conn);
++	up_write(&sess->chann_lock);
+ 	if (!chann)
+ 		return -ENOENT;
  
--	/* if we reach here, post send failed */
--	log_rdma_send(ERR, "ib_post_send failed rc=%d\n", rc);
--	atomic_dec(&sc->send_io.pending.count);
--
--	smbd_disconnect_rdma_connection(sc);
-+	if (rc == -EAGAIN)
-+		rc = -EIO;
+@@ -668,6 +672,7 @@ static struct ksmbd_session *__session_create(int protocol)
+ 	rwlock_init(&sess->tree_conns_lock);
+ 	atomic_set(&sess->refcnt, 2);
+ 	init_rwsem(&sess->rpc_lock);
++	init_rwsem(&sess->chann_lock);
  
- dma_mapping_failed:
- 	smbd_free_send_io(request);
+ 	ret = __init_smb2_session(sess);
+ 	if (ret)
+diff --git a/fs/smb/server/mgmt/user_session.h b/fs/smb/server/mgmt/user_session.h
+index 176d800c24906..d94f5e128a9b4 100644
+--- a/fs/smb/server/mgmt/user_session.h
++++ b/fs/smb/server/mgmt/user_session.h
+@@ -48,6 +48,7 @@ struct ksmbd_session {
+ 	char				sess_key[CIFS_KEY_SIZE];
+ 
+ 	struct hlist_node		hlist;
++	struct rw_semaphore		chann_lock;
+ 	struct xarray			ksmbd_chann_list;
+ 	struct xarray			tree_conns;
+ 	struct ida			tree_conn_ida;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 4d3154cc493ea..3efcc7da1b9f6 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -80,7 +80,13 @@ static inline bool check_session_id(struct ksmbd_conn *conn, u64 id)
+ 
+ struct channel *lookup_chann_list(struct ksmbd_session *sess, struct ksmbd_conn *conn)
+ {
+-	return xa_load(&sess->ksmbd_chann_list, (long)conn);
++	struct channel *chann;
++
++	down_read(&sess->chann_lock);
++	chann = xa_load(&sess->ksmbd_chann_list, (long)conn);
++	up_read(&sess->chann_lock);
++
++	return chann;
+ }
+ 
+ /**
+@@ -1559,8 +1565,10 @@ static int ntlm_authenticate(struct ksmbd_work *work,
+ 				return -ENOMEM;
+ 
+ 			chann->conn = conn;
++			down_write(&sess->chann_lock);
+ 			old = xa_store(&sess->ksmbd_chann_list, (long)conn, chann,
+ 					KSMBD_DEFAULT_GFP);
++			up_write(&sess->chann_lock);
+ 			if (xa_is_err(old)) {
+ 				kfree(chann);
+ 				return xa_err(old);
+@@ -1652,8 +1660,10 @@ static int krb5_authenticate(struct ksmbd_work *work,
+ 				return -ENOMEM;
+ 
+ 			chann->conn = conn;
++			down_write(&sess->chann_lock);
+ 			old = xa_store(&sess->ksmbd_chann_list, (long)conn,
+ 					chann, KSMBD_DEFAULT_GFP);
++			up_write(&sess->chann_lock);
+ 			if (xa_is_err(old)) {
+ 				kfree(chann);
+ 				return xa_err(old);
 -- 
 2.51.0
 
