@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9134082899;
-	Sun,  1 Mar 2026 01:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47820145A1F;
+	Sun,  1 Mar 2026 01:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772329062; cv=none; b=j1zNIXcg/ODLW/DcvVjBz8qR74DbhyYsjM/qyF0zUmvFiZRVXEawEtgONhtqqeQWV1fgtYTHbZc89/Hskf5odKxKCfRIWDwWB5us3A3M4ITUEgUXgIzd2sL+sBjyNwltgSOBxiyFopjgUG9mH7ukMsaH+U3acO/2SDOxGgnDh8w=
+	t=1772329065; cv=none; b=JpjnkESZiFavosF4JPQB2UOIpHLkQ3MAZovyJ06rF+toJiKS7pksHbX3pNOxEfzkSaa6IOlbk4D+8SYVED41DH/WQXdxAethRlD7RCzow555LYhlrEnJNiD6fRz1myrFZiBLqQoPhdMYcmGDgtlhstjZx+qKOjAHInYOLKbl3R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772329062; c=relaxed/simple;
-	bh=aTXKXrTkxlcbbUxAdwUy/30GrLOQjVcHMhZCzTYcemg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qdlTTI1Y5gXtKVuifF1857WiWtfgFUzgoDZJ3Ki+TpP7K2+oyCW1Sc7amH8d1mLOx5y+Gr6KhbGhkq2e0yvwWNzM57Qep8vv0fC+wu1zODNHzuDR5EzbtkR232JDmOp+0nGJdOZ2oQJQsLaS2ZBZrCgHA7sa1/taM0Pc8VGVIyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Upqf5f5X; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772329065; c=relaxed/simple;
+	bh=dBBX4dDKDkZeOHmedxkJ27ugHEOeVVe3XS/iFbEs/2A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h9ExkX7C4DQBTd4DbdsdOEEIj+NklXotPLZUkfrEMf6uFl3Izr5zf867WMBBJ/S6h9Xt7CGsoKEaTX3SupyaYw8U60j9p99Lz6e0iQcT0KXtVrXUf/CnFBLaZKhPNZ3xO6+FY3wBxdiyOu9vivfUd4STCUwAngSpqaYunEkoDns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PsoTonUf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Upqf5f5X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F56DC19421;
-	Sun,  1 Mar 2026 01:37:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PsoTonUf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38EBBC19421;
+	Sun,  1 Mar 2026 01:37:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772329062;
-	bh=aTXKXrTkxlcbbUxAdwUy/30GrLOQjVcHMhZCzTYcemg=;
+	s=k20201202; t=1772329065;
+	bh=dBBX4dDKDkZeOHmedxkJ27ugHEOeVVe3XS/iFbEs/2A=;
 	h=From:To:Cc:Subject:Date:From;
-	b=Upqf5f5Xpd0QECPlNdcqB7LU5wJiqwm6dOs8cAjFmhmQFWEBzh29bsUXnY6JVHdR0
-	 zNcZDvTYDLjEKt1an+1kJF+bzyQjYfmKI5ENOMdqj4KGgSkSFWa5zTwS1LLbvuJ7KI
-	 T8KuCF6YIMVl7ZseINCmqI/U4cCQJSejodyRs9kVFhknjb3H8r5hHhMu//UpJe15KM
-	 WI+CYS0TPRECDkG+428crO25j9CR2XP/99AMfY8U982ZbtxxbB/7MPtyAFT7i9daT1
-	 Rj9o+aTvcKXnzWpL/+uTYr37i/zqiOpOJiXI2LZgGGAL8g1JPxop2fjHXOuaGE/5XM
-	 fONeBoav6U+ZQ==
+	b=PsoTonUfq31MsJP1rLt5MLAwGnUeRdl6cCeSl5PrR9401QY4buca8STMlLmB9j6cF
+	 Qdkewt7avP2djcoqWsahdq9RckItjAFwX01fyAXS9/IWv0js5cXG5IrDCu8ajCq1Jk
+	 TpR9PZLlz0frv7U+wbki980tkWBk9sDgFUwlwckeauLmKbRmYily7YIo26e+3cQk6x
+	 C7fwJSs2lMEQPrs1AqX31c2QmMES7NMVlNfeoVYf2bc6jRcorJ1nMIy9VxkkTFFX7r
+	 uVQo9tU2ehlHts9isy+srIEJnwYnnBSzREtTTcGag0CA1qQ2kWqr7ut0baP1P2HoCO
+	 h3QJ+pgYjrKKA==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	metze@samba.org
@@ -35,9 +35,9 @@ Cc: Steve French <smfrench@gmail.com>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	Steve French <stfrench@microsoft.com>
-Subject: FAILED: Patch "smb: client: let send_done handle a completion without IB_SEND_SIGNALED" failed to apply to 6.6-stable tree
-Date: Sat, 28 Feb 2026 20:37:40 -0500
-Message-ID: <20260301013740.1697910-1-sashal@kernel.org>
+Subject: FAILED: Patch "smb: client: let smbd_post_send_negotiate_req() use smbd_post_send()" failed to apply to 6.6-stable tree
+Date: Sat, 28 Feb 2026 20:37:42 -0500
+Message-ID: <20260301013743.1697963-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -59,18 +59,17 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From cf74fcdc43b322b6188a0750b5ee79e38be6d078 Mon Sep 17 00:00:00 2001
+From 5b1c6149657af840a02885135c700ab42e6aa322 Mon Sep 17 00:00:00 2001
 From: Stefan Metzmacher <metze@samba.org>
-Date: Thu, 22 Jan 2026 18:17:00 +0100
-Subject: [PATCH] smb: client: let send_done handle a completion without
- IB_SEND_SIGNALED
+Date: Thu, 22 Jan 2026 18:16:59 +0100
+Subject: [PATCH] smb: client: let smbd_post_send_negotiate_req() use
+ smbd_post_send()
 
-With smbdirect_send_batch processing we likely have requests without
-IB_SEND_SIGNALED, which will be destroyed in the final request
-that has IB_SEND_SIGNALED set.
+The server has similar logic and it makes sure that
+request->wr is used instead of a stack struct ib_send_wr send_wr.
 
-If the connection is broken all requests are signaled
-even without explicit IB_SEND_SIGNALED.
+This makes sure send_done can see request->wr.send_flags
+as the next commit will check for IB_SEND_SIGNALED
 
 Cc: <stable@vger.kernel.org> # 6.18.x
 Cc: Steve French <smfrench@gmail.com>
@@ -82,54 +81,69 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/smbdirect.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ fs/smb/client/smbdirect.c | 32 +++++++-------------------------
+ 1 file changed, 7 insertions(+), 25 deletions(-)
 
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 88fefb901c27f..01d55bcc6d0f9 100644
+index 20faa6d7f514d..88fefb901c27f 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -554,6 +554,32 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 	log_rdma_send(INFO, "smbdirect_send_io 0x%p completed wc->status=%s\n",
- 		request, ib_wc_status_msg(wc->status));
+@@ -35,6 +35,10 @@ static void enqueue_reassembly(
+ static struct smbdirect_recv_io *_get_first_reassembly(
+ 		struct smbdirect_socket *sc);
  
-+	if (unlikely(!(request->wr.send_flags & IB_SEND_SIGNALED))) {
-+		/*
-+		 * This happens when smbdirect_send_io is a sibling
-+		 * before the final message, it is signaled on
-+		 * error anyway, so we need to skip
-+		 * smbdirect_connection_free_send_io here,
-+		 * otherwise is will destroy the memory
-+		 * of the siblings too, which will cause
-+		 * use after free problems for the others
-+		 * triggered from ib_drain_qp().
-+		 */
-+		if (wc->status != IB_WC_SUCCESS)
-+			goto skip_free;
++static int smbd_post_send(struct smbdirect_socket *sc,
++			  struct smbdirect_send_batch *batch,
++			  struct smbdirect_send_io *request);
 +
-+		/*
-+		 * This should not happen!
-+		 * But we better just close the
-+		 * connection...
-+		 */
-+		log_rdma_send(ERR,
-+			"unexpected send completion wc->status=%s (%d) wc->opcode=%d\n",
-+			ib_wc_status_msg(wc->status), wc->status, wc->opcode);
-+		smbd_disconnect_rdma_connection(sc);
-+		return;
-+	}
-+
- 	/*
- 	 * Free possible siblings and then the main send_io
- 	 */
-@@ -567,6 +593,7 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 	lcredits += 1;
+ static int smbd_post_recv(
+ 		struct smbdirect_socket *sc,
+ 		struct smbdirect_recv_io *response);
+@@ -1021,7 +1025,6 @@ static int smbd_ia_open(
+ static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
+ {
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+-	struct ib_send_wr send_wr;
+ 	int rc;
+ 	struct smbdirect_send_io *request;
+ 	struct smbdirect_negotiate_req *packet;
+@@ -1052,33 +1055,12 @@ static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
+ 	request->sge[0].length = sizeof(*packet);
+ 	request->sge[0].lkey = sc->ib.pd->local_dma_lkey;
  
- 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
-+skip_free:
- 		if (wc->status != IB_WC_WR_FLUSH_ERR)
- 			log_rdma_send(ERR, "wc->status=%s wc->opcode=%d\n",
- 				ib_wc_status_msg(wc->status), wc->opcode);
+-	ib_dma_sync_single_for_device(
+-		sc->ib.dev, request->sge[0].addr,
+-		request->sge[0].length, DMA_TO_DEVICE);
+-
+-	request->cqe.done = send_done;
+-
+-	send_wr.next = NULL;
+-	send_wr.wr_cqe = &request->cqe;
+-	send_wr.sg_list = request->sge;
+-	send_wr.num_sge = request->num_sge;
+-	send_wr.opcode = IB_WR_SEND;
+-	send_wr.send_flags = IB_SEND_SIGNALED;
+-
+-	log_rdma_send(INFO, "sge addr=0x%llx length=%u lkey=0x%x\n",
+-		request->sge[0].addr,
+-		request->sge[0].length, request->sge[0].lkey);
+-
+-	atomic_inc(&sc->send_io.pending.count);
+-	rc = ib_post_send(sc->ib.qp, &send_wr, NULL);
++	rc = smbd_post_send(sc, NULL, request);
+ 	if (!rc)
+ 		return 0;
+ 
+-	/* if we reach here, post send failed */
+-	log_rdma_send(ERR, "ib_post_send failed rc=%d\n", rc);
+-	atomic_dec(&sc->send_io.pending.count);
+-
+-	smbd_disconnect_rdma_connection(sc);
++	if (rc == -EAGAIN)
++		rc = -EIO;
+ 
+ dma_mapping_failed:
+ 	smbd_free_send_io(request);
 -- 
 2.51.0
 
