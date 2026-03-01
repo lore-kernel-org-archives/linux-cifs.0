@@ -1,40 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C467D269CE6;
-	Sun,  1 Mar 2026 01:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B66285C84;
+	Sun,  1 Mar 2026 01:28:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772328528; cv=none; b=iha6zivI5Dggloghc9/GfA1waaFri5YUbB24YpHaoK3MV/+fV3tEBv6UnZ6RgoU/fVw9scezAuO3RJ2aHMTMyjBRNt3KHvt4abWk0cJq2A4876/5id+h3qQ5AbIJxklbDWpJC3iXguS6g4uKMxTMSU6O+SZ6Wa3UWRUHTN5CAFc=
+	t=1772328538; cv=none; b=Qh0uiEPgz6jXea+jJPo1DlLrbpuMRFQlh5bNbd874cLHLDbTnhrkR+AFl78gbnLpcmAoD+Z0nNecK151mApWVVJmgrg49f+xeplvIoD5lHeaK5ZMeCJ5+blz5pmBmCCkOX1leDfNR7skv7+1riPZd6krKd1y1DpH6XjrFWvvKSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772328528; c=relaxed/simple;
-	bh=ikLkOkgf4c/+QbsyqOWBhhn+r005cWH3UE9tHGo16AQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DSMkb83LtTGYEXV4AjOVtTc33+9hWFfW5kygSxE+X24ohi0Ni3f6LZs0z78kVnx0BL4nO9jCPlxUxbTFkUWkSSf4fLIEDee4i2ppWaCH4UjGBVDQzdEQ2Fu+ZiyDTiFhCdRYDaqCPq3Rtnh/Dg3ASrmZSnoWKBLlFcUxi0ZW7vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmQmKtot; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772328538; c=relaxed/simple;
+	bh=dj9a1zw0iVDX0X264gbz2jbxQdfwfErx51IkqDHkr5Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jm8Yc/vUB/wjeTZAnZpwhLgxJavflS6D/eh6xv4ciimo3jooSsdYrjCeML6Ca+90Q2MhQ1Mlf5tBKXHMXVipzDwmI9GMgOLXamj3mp85iC2hkYeoz2Ogx8DPI+hJAMV63H33JM1dKLbUZS6HYur9DgoWuos1/C34J1b8sIeOxqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HGWgTAtK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmQmKtot"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8498DC19424;
-	Sun,  1 Mar 2026 01:28:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HGWgTAtK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 204D1C19424;
+	Sun,  1 Mar 2026 01:28:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772328528;
-	bh=ikLkOkgf4c/+QbsyqOWBhhn+r005cWH3UE9tHGo16AQ=;
+	s=k20201202; t=1772328537;
+	bh=dj9a1zw0iVDX0X264gbz2jbxQdfwfErx51IkqDHkr5Q=;
 	h=From:To:Cc:Subject:Date:From;
-	b=HmQmKtots5RnPoGsNCwVDKHEY3JXrwR547NXWAJKZpVxXfDNRxEqLRI3YQwTPtVo5
-	 DGDBvDMCY04q0JjB1nimIABjZceJpigtH3hacO+JQ/4jWkUGGKAY+xiVvxqG7Vs7m2
-	 Ng3A2lh3CGZUCLBBZVc6DG7pBQEKEttod/IqPSX7GQptkK9x68Dpyp4Isa4wKu5tQr
-	 7APtTHNU+ucKy7kJZ20Yg4eLU1aCgli3RedX9v5IvCWb+tutBwx7SWIN7joM3u1cAH
-	 5umABQDUzEEVu18ybtUmgeh9lgY4jZOeX24Otv0NAqUmGwQNhnVahhrkFA++JdLf8L
-	 s89pOoRM68Efg==
+	b=HGWgTAtK2uojT+jVRjYmca5FdDIt0Q0g6LyKfzPQC2rMt1O3hHYxUKxozoVgSDUjp
+	 RNi/rcnn3jvzZoKp1QwoMBFh+0zjT2FgA55Z4jf7UajcjzLiPb7nOlGPTlew6zLyb1
+	 C2ZagJ1W88GHegPBUz8F9WPLTLLW5HY5lzIEuQEPLKk4IGPrMBuRlMo7ejJCFEO2BT
+	 3q8FimffOpNznH5JH4p+9FySlIlIshJTD7Rn/L0lnHg4xVdFDrg5oJUfwbJ573lqrP
+	 qEhMPkrFXUVOL8ndupNJoOhFi0ER4bMALmOsVyAup9wbnMO2R9Dby4uxMiIlFyV7PM
+	 ouTE5FeuZp4pQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	sprasad@microsoft.com
-Cc: Yuchan Nam <entropy1110@gmail.com>,
+	pchelkin@ispras.ru
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: FAILED: Patch "cifs: some missing initializations on replay" failed to apply to 6.12-stable tree
-Date: Sat, 28 Feb 2026 20:28:46 -0500
-Message-ID: <20260301012846.1686559-1-sashal@kernel.org>
+	linux-cifs@vger.kernel.org
+Subject: FAILED: Patch "ksmbd: call ksmbd_vfs_kern_path_end_removing() on some error paths" failed to apply to 6.12-stable tree
+Date: Sat, 28 Feb 2026 20:28:55 -0500
+Message-ID: <20260301012856.1686760-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -56,62 +55,67 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 14f66f44646333d2bfd7ece36585874fd72f8286 Mon Sep 17 00:00:00 2001
-From: Shyam Prasad N <sprasad@microsoft.com>
-Date: Sat, 14 Feb 2026 15:59:13 +0530
-Subject: [PATCH] cifs: some missing initializations on replay
+From a09dc10d1353f0e92c21eae2a79af1c2b1ddcde8 Mon Sep 17 00:00:00 2001
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+Date: Sat, 14 Feb 2026 18:45:14 +0300
+Subject: [PATCH] ksmbd: call ksmbd_vfs_kern_path_end_removing() on some error
+ paths
 
-In several places in the code, we have a label to signify
-the start of the code where a request can be replayed if
-necessary. However, some of these places were missing the
-necessary reinitializations of certain local variables
-before replay.
+There are two places where ksmbd_vfs_kern_path_end_removing() needs to be
+called in order to balance what the corresponding successful call to
+ksmbd_vfs_kern_path_start_removing() has done, i.e. drop inode locks and
+put the taken references.  Otherwise there might be potential deadlocks
+and unbalanced locks which are caught like:
 
-This change makes sure that these variables get initialized
-after the label.
+BUG: workqueue leaked lock or atomic: kworker/5:21/0x00000000/7596
+     last function: handle_ksmbd_work
+2 locks held by kworker/5:21/7596:
+ #0: ffff8881051ae448 (sb_writers#3){.+.+}-{0:0}, at: ksmbd_vfs_kern_path_locked+0x142/0x660
+ #1: ffff888130e966c0 (&type->i_mutex_dir_key#3/1){+.+.}-{4:4}, at: ksmbd_vfs_kern_path_locked+0x17d/0x660
+CPU: 5 PID: 7596 Comm: kworker/5:21 Not tainted 6.1.162-00456-gc29b353f383b #138
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
+Workqueue: ksmbd-io handle_ksmbd_work
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x44/0x5b
+ process_one_work.cold+0x57/0x5c
+ worker_thread+0x82/0x600
+ kthread+0x153/0x190
+ ret_from_fork+0x22/0x30
+ </TASK>
 
+Found by Linux Verification Center (linuxtesting.org).
+
+Fixes: d5fc1400a34b ("smb/server: avoid deadlock when linking with ReplaceIfExists")
 Cc: stable@vger.kernel.org
-Reported-by: Yuchan Nam <entropy1110@gmail.com>
-Tested-by: Yuchan Nam <entropy1110@gmail.com>
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/smb2ops.c | 2 ++
- fs/smb/client/smb2pdu.c | 1 +
- 2 files changed, 3 insertions(+)
+ fs/smb/server/smb2pdu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 61c521712f863..7370d7a18cd0c 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -1185,6 +1185,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
- 
- replay_again:
- 	/* reinitialize for possible replay */
-+	used_len = 0;
- 	flags = CIFS_CP_CREATE_CLOSE_OP;
- 	oplock = SMB2_OPLOCK_LEVEL_NONE;
- 	server = cifs_pick_channel(ses);
-@@ -1588,6 +1589,7 @@ smb2_ioctl_query_info(const unsigned int xid,
- 
- replay_again:
- 	/* reinitialize for possible replay */
-+	buffer = NULL;
- 	flags = CIFS_CP_CREATE_CLOSE_OP;
- 	oplock = SMB2_OPLOCK_LEVEL_NONE;
- 	server = cifs_pick_channel(ses);
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 4602b4dfe8322..7f3edf42b9c3f 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -2908,6 +2908,7 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
- 
- replay_again:
- 	/* reinitialize for possible replay */
-+	pc_buf = NULL;
- 	flags = 0;
- 	n_iov = 2;
- 	server = cifs_pick_channel(ses);
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index cbb31efdbaa2e..2782eea214d0d 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -6115,14 +6115,14 @@ static int smb2_create_link(struct ksmbd_work *work,
+ 				rc = -EINVAL;
+ 				ksmbd_debug(SMB, "cannot delete %s\n",
+ 					    link_name);
+-				goto out;
+ 			}
+ 		} else {
+ 			rc = -EEXIST;
+ 			ksmbd_debug(SMB, "link already exists\n");
+-			goto out;
+ 		}
+ 		ksmbd_vfs_kern_path_end_removing(&path);
++		if (rc)
++			goto out;
+ 	}
+ 	rc = ksmbd_vfs_link(work, target_name, link_name);
+ 	if (rc)
 -- 
 2.51.0
 
