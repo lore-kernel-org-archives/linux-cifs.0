@@ -1,39 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD79220010A;
-	Sun,  1 Mar 2026 01:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048E92E2DF2;
+	Sun,  1 Mar 2026 01:45:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772329542; cv=none; b=PM+dcflVVR4ApGSHQvWLVGL9t7rKTUfJkbtJ4QaUZG9kkDHK4778+ekBQ9g9DHOh8ymDU9W420E/uiCTcCo1xSOlGljTQr6ef1VLxyRHT6NJ9mmqmZ6v6xiCu/JHYAFKcHU8ma1Q1ghIAqa2bj5snqsT0BghvvCRWYG14tAevCc=
+	t=1772329555; cv=none; b=gGj299DASvVapfhhDIEOFk3lBLPBPzqQ45bfdBfhkYGYPvlaeKQ303ypp4qwvfBUdmqinjjzXLN5gGgaHSxWAawTTNInsxQ1+HTL5mo69S8Y+Bwnuws3inWfF+mr+pN/fr2arXFspJiTiqw2/5eg9b2q11pNZKeow9+FGuIO/hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772329542; c=relaxed/simple;
-	bh=ADXywvsFL28fBcG5U+1XbOomq1Y3q/BrEPXYTyjNkNA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VSntbfXG7XszKPT0aHhvhUFH+p9WSCDdbnrECi9ILwk1sEI4k17mgRRGfbqmsq8lYTtHUZ791P2N9HmO4/NeNit1NJPyPS8MTKL/7YPGDCT+91HbFSTp4k/SmEX9rydbPJ+7HpNrEMg2rZmheurWDv9LG5IcYmXfbdJr64eQ8f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LMbcBoUg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772329555; c=relaxed/simple;
+	bh=gpxnI8CF1SxOHDcZn6EttRb4pPQwNTG2GqU1hALMVQ0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uXKzcYwSfAbDqvyPhpYjSRO7I7iLmPbqmEMdVIhlOGLfyV3I6fELwpi2SkfW7aH4ZtNNNpaUtIYKE5TNgJCJ64Ew24+XMNIEHaBDav7d6YMMQOARMF9aHhLM9FIoYcfngTq4hGfZkn+IH5V+82bOHNQsL7aJ0q8L2SK5cvdoYXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIBJNxkv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LMbcBoUg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AFA4C19421;
-	Sun,  1 Mar 2026 01:45:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIBJNxkv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEE22C19421;
+	Sun,  1 Mar 2026 01:45:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772329542;
-	bh=ADXywvsFL28fBcG5U+1XbOomq1Y3q/BrEPXYTyjNkNA=;
+	s=k20201202; t=1772329554;
+	bh=gpxnI8CF1SxOHDcZn6EttRb4pPQwNTG2GqU1hALMVQ0=;
 	h=From:To:Cc:Subject:Date:From;
-	b=LMbcBoUgE14ZdIBLtk5rJY+RidzX6EI6PpoMCMl4VNxxA0Ceq2m08zskhe0SCkfG4
-	 1NhlOlAnS1cEzdfQtYd0srNuvP9kY78DaiTWNaFPjx9jvt1dyjnXfnSsjXKYP4uOqd
-	 Epc086vOANZR4NMITAzHBn4lgtZy06g9f5gg60GkouLV0PVkDRWzX3t2swoLhmMQ3A
-	 D6itDxxBL3vVsySzg20sJ4VI6CexozjBiJLY6SIUrikgXO967sIyHmse8jiBOiQUKw
-	 LYODPXwBSoWBiEvdQ7kdZnkeoSENIsDFyvtmUV+NGy8vv2Rl44P+HQ2UqoaPt5EzsF
-	 QOQc5pouWbmsw==
+	b=VIBJNxkvL+VuxUyp3F05u9KNChMlCOM8fsnv0YX2YFE4Ip0bq48/1NQmtjkkLhKgU
+	 B2ihPzcf6u3FQ0e/DOwqu+lPX4vgFcxIq4TnFn2Cj1JEoqYHrtL84XcJ/Ha5Y41lM7
+	 Oeqr1ybXHapyIqjZknqP3Qdw7cCKWk3OJHe7maWBOns69H6bIPQ1B8jnU0biwJ76ub
+	 +SD0U6ij5SvyCre9SSg+jOWv3V60j6T2JnSwOmaCR/NenfemceeZDqDxrqzzqrZTn0
+	 YY4gPDuXFJyqBimAJttkZ6Cb70gxLxJB97cYnlZ7FAkHel6xboZY/Axo1MF0MkYTrq
+	 DY6ioK7XOMPZw==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	sprasad@microsoft.com
-Cc: Steve French <stfrench@microsoft.com>,
+	metze@samba.org
+Cc: Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: FAILED: Patch "cifs: Fix locking usage for tcon fields" failed to apply to 6.1-stable tree
-Date: Sat, 28 Feb 2026 20:45:40 -0500
-Message-ID: <20260301014541.1708363-1-sashal@kernel.org>
+	samba-technical@lists.samba.org,
+	Steve French <stfrench@microsoft.com>
+Subject: FAILED: Patch "smb: smbdirect: introduce smbdirect_socket.send_io.bcredits.*" failed to apply to 6.1-stable tree
+Date: Sat, 28 Feb 2026 20:45:52 -0500
+Message-ID: <20260301014552.1708704-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -55,134 +59,76 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 96c4af418586ee9a6aab61738644366426e05316 Mon Sep 17 00:00:00 2001
-From: Shyam Prasad N <sprasad@microsoft.com>
-Date: Sun, 1 Feb 2026 00:21:13 +0530
-Subject: [PATCH] cifs: Fix locking usage for tcon fields
+From 8e94268b21c8235d430ce1aa6dc0b15952744b9b Mon Sep 17 00:00:00 2001
+From: Stefan Metzmacher <metze@samba.org>
+Date: Thu, 22 Jan 2026 18:16:42 +0100
+Subject: [PATCH] smb: smbdirect: introduce smbdirect_socket.send_io.bcredits.*
 
-We used to use the cifs_tcp_ses_lock to protect a lot of objects
-that are not just the server, ses or tcon lists. We later introduced
-srv_lock, ses_lock and tc_lock to protect fields within the
-corresponding structs. This was done to provide a more granular
-protection and avoid unnecessary serialization.
+It turns out that our code will corrupt the stream of
+reassabled data transfer messages when we trigger an
+immendiate (empty) send.
 
-There were still a couple of uses of cifs_tcp_ses_lock to provide
-tcon fields. In this patch, I've replaced them with tc_lock.
+In order to fix this we'll have a single 'batch' credit per
+connection. And code getting that credit is free to use
+as much messages until remaining_length reaches 0, then
+the batch credit it given back and the next logical send can
+happen.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+Cc: <stable@vger.kernel.org> # 6.18.x
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/cached_dir.c | 4 ++--
- fs/smb/client/smb2misc.c   | 6 +++---
- fs/smb/client/smb2ops.c    | 8 +++-----
- fs/smb/client/smb2pdu.c    | 2 ++
- fs/smb/client/trace.h      | 1 +
- 5 files changed, 11 insertions(+), 10 deletions(-)
+ fs/smb/common/smbdirect/smbdirect_socket.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index df9977030d199..2a6b8ce80be23 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -792,11 +792,11 @@ static void cfids_laundromat_worker(struct work_struct *work)
- 		cfid->dentry = NULL;
+diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
+index 403a8b2cd30e4..95265192bb01b 100644
+--- a/fs/smb/common/smbdirect/smbdirect_socket.h
++++ b/fs/smb/common/smbdirect/smbdirect_socket.h
+@@ -162,6 +162,17 @@ struct smbdirect_socket {
+ 			mempool_t		*pool;
+ 		} mem;
  
- 		if (cfid->is_open) {
--			spin_lock(&cifs_tcp_ses_lock);
-+			spin_lock(&cfid->tcon->tc_lock);
- 			++cfid->tcon->tc_count;
- 			trace_smb3_tcon_ref(cfid->tcon->debug_id, cfid->tcon->tc_count,
- 					    netfs_trace_tcon_ref_get_cached_laundromat);
--			spin_unlock(&cifs_tcp_ses_lock);
-+			spin_unlock(&cfid->tcon->tc_lock);
- 			queue_work(serverclose_wq, &cfid->close_work);
- 		} else
- 			/*
-diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-index f3cb62d914502..0871b9f1f86a6 100644
---- a/fs/smb/client/smb2misc.c
-+++ b/fs/smb/client/smb2misc.c
-@@ -820,14 +820,14 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
- 	int rc;
++		/*
++		 * This is a coordination for smbdirect_send_batch.
++		 *
++		 * There's only one possible credit, which means
++		 * only one instance is running at a time.
++		 */
++		struct {
++			atomic_t count;
++			wait_queue_head_t wait_queue;
++		} bcredits;
++
+ 		/*
+ 		 * The local credit state for ib_post_send()
+ 		 */
+@@ -371,6 +382,9 @@ static __always_inline void smbdirect_socket_init(struct smbdirect_socket *sc)
+ 	INIT_DELAYED_WORK(&sc->idle.timer_work, __smbdirect_socket_disabled_work);
+ 	disable_delayed_work_sync(&sc->idle.timer_work);
  
- 	cifs_dbg(FYI, "%s: tc_count=%d\n", __func__, tcon->tc_count);
--	spin_lock(&cifs_tcp_ses_lock);
-+	spin_lock(&tcon->tc_lock);
- 	if (tcon->tc_count <= 0) {
- 		struct TCP_Server_Info *server = NULL;
++	atomic_set(&sc->send_io.bcredits.count, 0);
++	init_waitqueue_head(&sc->send_io.bcredits.wait_queue);
++
+ 	atomic_set(&sc->send_io.lcredits.count, 0);
+ 	init_waitqueue_head(&sc->send_io.lcredits.wait_queue);
  
- 		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
- 				    netfs_trace_tcon_ref_see_cancelled_close);
- 		WARN_ONCE(tcon->tc_count < 0, "tcon refcount is negative");
--		spin_unlock(&cifs_tcp_ses_lock);
-+		spin_unlock(&tcon->tc_lock);
+@@ -485,6 +499,8 @@ struct smbdirect_send_batch {
+ 	 */
+ 	bool need_invalidate_rkey;
+ 	u32 remote_key;
++
++	int credit;
+ };
  
- 		if (tcon->ses) {
- 			server = tcon->ses->server;
-@@ -841,7 +841,7 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
- 	tcon->tc_count++;
- 	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
- 			    netfs_trace_tcon_ref_get_cancelled_close);
--	spin_unlock(&cifs_tcp_ses_lock);
-+	spin_unlock(&tcon->tc_lock);
- 
- 	rc = __smb2_handle_cancelled_cmd(tcon, SMB2_CLOSE_HE, 0,
- 					 persistent_fid, volatile_fid);
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index f6806946d0eee..653e2f29384d4 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -3107,7 +3107,9 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
- 						struct cifs_tcon,
- 						tcon_list);
- 		if (tcon) {
-+			spin_lock(&tcon->tc_lock);
- 			tcon->tc_count++;
-+			spin_unlock(&tcon->tc_lock);
- 			trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
- 					    netfs_trace_tcon_ref_get_dfs_refer);
- 		}
-@@ -3176,13 +3178,9 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
-  out:
- 	if (tcon && !tcon->ipc) {
- 		/* ipc tcons are not refcounted */
--		spin_lock(&cifs_tcp_ses_lock);
--		tcon->tc_count--;
-+		cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_dfs_refer);
- 		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
- 				    netfs_trace_tcon_ref_dec_dfs_refer);
--		/* tc_count can never go negative */
--		WARN_ON(tcon->tc_count < 0);
--		spin_unlock(&cifs_tcp_ses_lock);
- 	}
- 	kfree(utf16_path);
- 	kfree(dfs_req);
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index fa22702a61a6e..a88b21e5b30e2 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4263,7 +4263,9 @@ void smb2_reconnect_server(struct work_struct *work)
- 
- 		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
- 			if (tcon->need_reconnect || tcon->need_reopen_files) {
-+				spin_lock(&tcon->tc_lock);
- 				tcon->tc_count++;
-+				spin_unlock(&tcon->tc_lock);
- 				trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
- 						    netfs_trace_tcon_ref_get_reconnect_server);
- 				list_add_tail(&tcon->rlist, &tmp_list);
-diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index a584a77431132..191f02344dcdd 100644
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -189,6 +189,7 @@
- 	EM(netfs_trace_tcon_ref_put_cancelled_close_fid, "PUT Cn-Fid") \
- 	EM(netfs_trace_tcon_ref_put_cancelled_mid,	"PUT Cn-Mid") \
- 	EM(netfs_trace_tcon_ref_put_mnt_ctx,		"PUT MntCtx") \
-+	EM(netfs_trace_tcon_ref_put_dfs_refer,		"PUT DfsRfr") \
- 	EM(netfs_trace_tcon_ref_put_reconnect_server,	"PUT Reconn") \
- 	EM(netfs_trace_tcon_ref_put_tlink,		"PUT Tlink ") \
- 	EM(netfs_trace_tcon_ref_see_cancelled_close,	"SEE Cn-Cls") \
+ struct smbdirect_recv_io {
 -- 
 2.51.0
 
