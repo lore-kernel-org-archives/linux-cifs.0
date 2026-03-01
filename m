@@ -1,141 +1,218 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D776926ED59
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Mar 2026 02:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772333001; cv=none; b=BoDguhBIUIJeEGApl+En2Luh9OBGnIU34zWbQNIpIHU4oz/5q83JDZG6FaEn0DQQgp+b+uxy/ZAOaZKjGpJH38nre2qKvx2jtRT4nrzOerlml3u6/ThEktgjiAhuUxjzEcXOSeeIVoKB18hIQ4LYCLzSLyVV8G3gwSOKPKW4RM0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772333001; c=relaxed/simple;
-	bh=StiYaJg5TnIgR97jqI7sw8c91dqPU9OEJIf6O1a7rcc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D23vrBJe0Qr7ZvYTZxux4TIa12PDbXHOrM2RwmBqZRPb9Kda1/7XaKr3Mu6V56k+OuuwwW6+GrM63mA9zT4faswPK9+KOFtqHS8AeDjEtZY7mgaCxUSfQ2wVPTCU+lLhMdGKgFO4jKd9YEpW6fvsDujBUvZRrnRT8BXjOrdvBew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fk+/fKfa; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E426430BAF
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Mar 2026 10:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772360186; cv=pass; b=ThE1Y8EOkcdE/Wx2cN+B9Xa7cmKV3RunTPxgqUJrM1h2Dflv5Ru+Hux3/gBbNxKrviz+BwN4nK/UbrQ7x/loiBVuA8Yam/ASIq9yx7g3wa9Hc2SbmHL1DkF/95pKzsLAGSUxubSu2ocZ/FlcKEbBP/jnT/uyz452SRFgmuUmraY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772360186; c=relaxed/simple;
+	bh=s7rfjnPtFd6SU6xoPH3SYe9hNrVk5+6PWUoUYgGCnIM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KQniZ0UHdc0Yizy9PmPTEGDp2OFhJKPCRjfPV77k/T8NkaKK0CYx4j4zfGA5VcMkTwo+u5cw5fnZth1nOiTaprVbahdfzXNqT7JIe/4JZ3QxORvLoWArORPsJUlqNitaMaFUbYxJ6pFnwY0h2lbZgVbGApa2k7Cxz2NrjD++9pU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N04lOntM; arc=pass smtp.client-ip=209.85.222.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fk+/fKfa"
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-c70fb6aa323so1092443a12.3
-        for <linux-cifs@vger.kernel.org>; Sat, 28 Feb 2026 18:43:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N04lOntM"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-948029fb1f2so1043455241.0
+        for <linux-cifs@vger.kernel.org>; Sun, 01 Mar 2026 02:16:25 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772360184; cv=none;
+        d=google.com; s=arc-20240605;
+        b=C9sdDPBOqmHnq9dR2O0c6bpy5kpM9xNW07WfLJoAvGzWgH719H6W6eHZ8i5JWKBcdA
+         o4M4Rk0Ph/YUNeDaO12mNSHBiQVn8xd14UvrgJZiLhkODhP1mcb9+HYMhWy9FBaBSG4N
+         wcXO8GgM+0oZlJ0/PopmskyQyqnvlC+EQmCrdQHEHBBM7BICKk9EMBqBDyCOLH0yo8Uz
+         0bS5rWWmXIIj8J2HpjXh/Vbl7p6JrLA0ISrboGKDLi5C7kcWG3BrUZpblZifj8Vyj3YU
+         JwmFKlU+CrhkORhEYXhn7EAm/VHYbPNXvp3kw/Fs/mom80+p1m0WfrB03f9hOnHfgTMZ
+         Gctw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ZrlN72XdG30IkaSiOSU/cpdfc/g67VmbA5qDRZerWc4=;
+        fh=kvCWJ2IepAC7CyDgcPozIW9zEPyEAKby42qcQqAUu3c=;
+        b=ksMJwxaYtq6brc/OKC+xZwHTJsAXL/4B1Rs49C2KdjcdZl/IBXaVheBtVary893K3P
+         iDKc5PHswaZ+QJcZoySUgccZ6HD64dwXbk031/A7EEy0llD92H78ECfJpULzwdPDJoeb
+         QoFSm1P/znglXFe67ORQm6cIqafRM5lgUftEUvnrZfHi4M0XFFqnwqwiENmDwKXotZ5V
+         0rYnPXx/ctclKfOn32zjKOBwQbEyaUhaf6rr29EhdA0QCJvdG0AmaJ5w5ECMOMyqjOD6
+         4pT5OtWE9ZlO973g0j0Bo/Vp+AWJcXvPseoQMDOp/E/wcAiTE4VURGlp4a12u0ECDSHs
+         QM2w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772333000; x=1772937800; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1772360184; x=1772964984; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k/4+K7t1AmwyZhD8tmPo2E9QsgNK7fdWts0ll2jiHOI=;
-        b=fk+/fKfadFRQ7MYgVDN1VuVfl4regnAJCFFnKsnVI6r492dj1JHXFRU4eg4nF1DnfX
-         Yejzn8vJxjB9ZRgtAQM6GbRb0H5XgmWZk7XhDfs2CEUFjNExW2nQeOnOdG95VvIA92UL
-         mbfZDSpSfP+g/sXHSgCK6xRxdgYXcUmT9fc6kJv9vwn/IsqP2GNTyIhsBw0/fSXiF4fz
-         P17VaME0dRXVtQeQIRiama8JI8O+jWqqxq8GGRFKr/81fgM7D+mS/TCjXyDPJDTUNVdN
-         vAEwp+EeCbW1EGte+BnFhO6V09fE+E9mOqsN4noP8ILIRhWi4zBKgsb1EwThyvmWjzMS
-         MMiQ==
+        bh=ZrlN72XdG30IkaSiOSU/cpdfc/g67VmbA5qDRZerWc4=;
+        b=N04lOntMi64Tm+WqmzZhhWbQVrZnkQBqb/MlNznFDsXrPLPhUMz2dw+9bZmRLd62x6
+         gIZip+2v7bDGN3YmJtyk4HJAS4UVN1WG1U0Aqu+faG+/IK+3n9PscrvR3J8Hc2r3L5vD
+         A5uXJoMIZWCHG9gWgha3KPr9hJU5Pwao6gkNx9B+qbzu5kCnHRCJ5NXOFZVE81rWZMuy
+         oNEWxKfvREP7ll/7g5gPcPb1e+5IBkH+hqPqacUdRkaFalxafjYraKIm9CEePams18fe
+         kE2Ybd6TdGJv+3qXBbPDTeW23hLy3ZGb08T1SoziBB2S3B18vq2kSbBKkP1SUMhuR+Hw
+         L1zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772333000; x=1772937800;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1772360184; x=1772964984;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=k/4+K7t1AmwyZhD8tmPo2E9QsgNK7fdWts0ll2jiHOI=;
-        b=SO8e5gVjNZ66Izw7RKB+qX0v5Np0IwpauBcswrBKJN59czQHw6wAcdDypSPmwMfI0W
-         DRs5SLf67rIyawOpF+x/f3RXILd6oxHASWYZJ/A0riJQmsJ4jkqqItJQyxNOVp0pG+PZ
-         /Ds8cZEoUnk5pQeWSW+R4/Xv3Nk8gyciRiNhAz4rTX7Lj2IAD9Eer8tQv8SNWHJF7ATT
-         1YgD/oCorVHeSU1EWXo3ZImUtgjUwyoB+NtjbvlZCbf6yMdggxJW2J4IAfCuMo3+L6Z9
-         h21sz3S0D78L6PFo5lxKQAcdLPeTcCIpQ3C7+lSlewJnfuAhezKayjD289qMjeXh+yaY
-         i+9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUCkNi0OEwR6fhca57Loe5z6AtEFUr/cU0Jnl6dfjy9VMS3JZGwbgEn3dRBw3Y2kqKhNaKB7EOKt4my@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4eFAZNFcSEPHnXY5k5RaWW+NRK2h/ubg+1lF4LPLbVb80F2wn
-	5l4XkhlYHTLmQt6CwZM0xQdPT4wZXKM6did0WS7gKsARXQp7w5IV1/xc
-X-Gm-Gg: ATEYQzwUIm3YFSspI5mFWjOMaIrNexzo/dCSpOmBP8BZNODwFaseq36HB7lpl46bWKm
-	T9acqzcxmMadKsWnrmmqfBIW1EQmlr4/8R4DQ2gU+bcKOa4pXRHilBPSbLT3Z9RhE7OQohCcAZ9
-	PcHf8xf74NbCIL4zf4at7vl21DUQJ3ae1TR2HW4+4Obu7+IIwxYB/cGfKknD178jeiW56bvAe6g
-	Eoo3aN7KtOTHJBtq4iSuTKLMzROfEuq0S2D+17Oqx/gSCWwtafYtE3dJsWZ7pdC7Z0ia2T3iQPK
-	01KG2gqJJt8eYT1XQu8weV8y1RwEtu3Z6csXyxifP7o9V6OFHl3zE60lAVe+YH136PHsViOrg1q
-	1tMpQ+4G/ee//3ICBsDoPlXO8Qke97yCJH9drDaSah0EmTOPWg9ynqpZ103hcOqnx9XrepDT87k
-	kZMT/TabmAdkC49PfxSgWsVPidaRLxnOFnaink8Cf2l56vhWdyH0FnBAM=
-X-Received: by 2002:a05:6a00:b42:b0:81f:9c54:65df with SMTP id d2e1a72fcca58-8274da052f5mr6154918b3a.50.1772333000173;
-        Sat, 28 Feb 2026 18:43:20 -0800 (PST)
-Received: from localhost.localdomain ([222.109.75.221])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82739d55216sm9299322b3a.11.2026.02.28.18.43.18
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 28 Feb 2026 18:43:19 -0800 (PST)
-From: Yuchan Nam <entropy1110@gmail.com>
-To: stable@vger.kernel.org
-Cc: sashal@kernel.org,
-	sprasad@microsoft.com,
-	stfrench@microsoft.com,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Yuchan Nam <entropy1110@gmail.com>
-Subject: [PATCH 6.6.y] cifs: some missing initializations on replay
-Date: Sun,  1 Mar 2026 11:43:08 +0900
-Message-ID: <20260301024308.80078-1-entropy1110@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260301013911.1700044-1-sashal@kernel.org>
-References: <20260301013911.1700044-1-sashal@kernel.org>
+        bh=ZrlN72XdG30IkaSiOSU/cpdfc/g67VmbA5qDRZerWc4=;
+        b=A8I1tjKGUmJ0bI7wil2mNIXuCLKgGdDZAgLgjHnIc5aQ5aKSBzr4wvBsMGr3sxQZEs
+         d21oR4DCAMD8p74J15bfDS6rOQaznkldMIgzbgBQ0Y66gAZjVRYA1YWmwaTGWzbMSQ2C
+         Z3rF3mloVMub6beoMCpErgFZg+gbXI7X+QrMzZVv4TWH0yUOT9bz1bhj5pRFv+CNtwU6
+         Glw4FJRKhGzxSKcWaPxhdZvj80G/2yZkkd9hgEU1CX4EyM3hFgkcvnjGm8b8mog808og
+         4rIs7dWoHb0cfqxigvsE9xbg3L9H1KnVBfxfqQMckwEMqUAanoDnjejT/Og9d8sDgB/l
+         vuOw==
+X-Forwarded-Encrypted: i=1; AJvYcCXd3jK9hkz7F7souCGHeSl/u/sqcriytkVDQcGnVoPPhkItklIMpBCLwd7sdunCgR83qpCb+NLWAZLo@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxz+UtZ1NJKiwkX6oUV9ap9VUAkkaD/YTVadPPd5FGtguznVLfY
+	yHRKGF3RoNnkv6IsHfM7YbmSDzrLIU9vBgiiX4bmzc5oyDx4XfBC/Z0iro6l3MiIm7HRvOj5I+/
+	OcZF1LcbuTvZUa4Nivo3oNrplrzojC+4=
+X-Gm-Gg: ATEYQzwkgqTJUzvh+BTibqqYphgxN0sgGL7OpNjJkCZb+4CY68+GkQyrauuii776iu1
+	FIffkovbG939fbcvZBf7nWFsD1PoVWpdk38xdcYZH0L5HAQlnuYSE4x1ZZuKIAYmmyy+IOm6WFQ
+	i8ymVbKIZHXmNE8QckgDJj2G0Y5zwjD8fN6CSPyn0xbXH5YEji71fiA4R5pDM7gsAQEtfPOaB0T
+	gu3gDERstPWjAwIWmqfK4Sve2udkey6sYi9vXqwAx9iDsPl4LPhiM/LgcRIc0Xvs/CVhENnZytb
+	vuaIgZNFM6At+LXfcE8opTRGb2EayNzpT1FDXX21aQ==
+X-Received: by 2002:a05:6102:5091:b0:5f7:24dc:3ac3 with SMTP id
+ ada2fe7eead31-5ff322bf4bdmr2863289137.7.1772360184080; Sun, 01 Mar 2026
+ 02:16:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260221145915.81749-1-dorjoychy111@gmail.com>
+In-Reply-To: <20260221145915.81749-1-dorjoychy111@gmail.com>
+From: Dorjoy Chowdhury <dorjoychy111@gmail.com>
+Date: Sun, 1 Mar 2026 16:16:13 +0600
+X-Gm-Features: AaiRm52S_i7uxGvz2GvDZgmu6T0jp37pcUwvZrAaDhnW-l9lgBlZerFtvlbrSME
+Message-ID: <CAFfO_h6Y1QcW7mNGdCuY-_J6zrF_F8aW+Q8O9SvoBbXTxteFjQ@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] OPENAT2_REGULAR flag support in openat2
+To: linux-fsdevel@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, ceph-devel@vger.kernel.org, 
+	gfs2@lists.linux.dev, linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	v9fs@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz, jlayton@kernel.org, 
+	chuck.lever@oracle.com, alex.aring@gmail.com, arnd@arndb.de, 
+	adilger@dilger.ca, mjguzik@gmail.com, smfrench@gmail.com, 
+	richard.henderson@linaro.org, mattst88@gmail.com, linmag7@gmail.com, 
+	tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com, 
+	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com, 
+	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, 
+	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org, pc@manguebit.org, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+	bharathsm@microsoft.com, shuah@kernel.org, miklos@szeredi.hu, 
+	hansg@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Shyam Prasad N <sprasad@microsoft.com>
+Ping...
+Requesting for review on this patch series please.
 
-[ Upstream commit 14f66f44646333d2bfd7ece36585874fd72f8286 ]
+Regards,
+Dorjoy
 
-In several places in the code, we have a label to signify
-the start of the code where a request can be replayed if
-necessary. However, some of these places were missing the
-necessary reinitializations of certain local variables
-before replay.
-
-This change makes sure that these variables get initialized
-after the label.
-
-Cc: stable@vger.kernel.org
-Reported-by: Yuchan Nam <entropy1110@gmail.com>
-Tested-by: Yuchan Nam <entropy1110@gmail.com>
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Yuchan Nam <entropy1110@gmail.com>
----
- fs/smb/client/smb2ops.c | 2 ++
- fs/smb/client/smb2pdu.c | 1 +
- 2 files changed, 3 insertions(+)
-
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 138b3ed..4239b68 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -1147,6 +1147,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
- 
- replay_again:
- 	/* reinitialize for possible replay */
-+	used_len = 0;
- 	flags = CIFS_CP_CREATE_CLOSE_OP;
- 	oplock = SMB2_OPLOCK_LEVEL_NONE;
- 	server = cifs_pick_channel(ses);
-@@ -1545,6 +1546,7 @@ smb2_ioctl_query_info(const unsigned int xid,
- 
- replay_again:
- 	/* reinitialize for possible replay */
-+	buffer = NULL;
- 	flags = CIFS_CP_CREATE_CLOSE_OP;
- 	oplock = SMB2_OPLOCK_LEVEL_NONE;
- 	server = cifs_pick_channel(ses);
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index a8890ae..595f043 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -2850,6 +2850,7 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
- 
- replay_again:
- 	/* reinitialize for possible replay */
-+	pc_buf = NULL;
- 	flags = 0;
- 	n_iov = 2;
- 	server = cifs_pick_channel(ses);
--- 
-2.43.0
-
+On Sat, Feb 21, 2026 at 8:59=E2=80=AFPM Dorjoy Chowdhury <dorjoychy111@gmai=
+l.com> wrote:
+>
+> Hi,
+>
+> I came upon this "Ability to only open regular files" uapi feature sugges=
+tion
+> from https://uapi-group.org/kernel-features/#ability-to-only-open-regular=
+-files
+> and thought it would be something I could do as a first patch and get to
+> know the kernel code a bit better.
+>
+> I only tested this new flag on my local system (fedora btrfs).
+>
+> Note that I had submitted a v4 previously (that had -EINVAL for the atomi=
+c_open
+> code paths) but did not do a get_maintainers.pl. It didn't get any review=
+ and
+> please ignore that one anyway. In this version, I have tried to properly =
+update
+> the filesystems that provide atomic_open (fs/ceph, fs/nfs, fs/smb, fs/gfs=
+2,
+> fs/fuse, fs/vboxsf, fs/9p) for the new OPENAT2_REGULAR flag. Some of them
+> (fs/fuse, fs/vboxsf, fs/9p) didn't need any changing. As far as I see, mo=
+st of
+> the filesystems do finish_no_open for ~O_CREAT and have file->f_mode |=3D=
+ FMODE_CREATED
+> for the O_CREAT code path which I assume means they always create new fil=
+e which
+> is a regular file. OPENAT2_REGULAR | O_DIRECTORY returns -EINVAL (instead=
+ of working
+> if path is either a directory or regular file) as it was easier to reason=
+ about when
+> making changes in all the filesystems.
+>
+> Changes in v4:
+> - changed O_REGULAR to OPENAT2_REGULAR
+> - OPENAT2_REGULAR does not affect O_PATH
+> - atomic_open codepaths updated to work properly for OPENAT2_REGULAR
+> - commit message includes the uapi-group URL
+> - v3 is at: https://lore.kernel.org/linux-fsdevel/20260127180109.66691-1-=
+dorjoychy111@gmail.com/T/
+>
+> Changes in v3:
+> - included motivation about O_REGULAR flag in commit message e.g., progra=
+ms not wanting to be tricked into opening device nodes
+> - fixed commit message wrongly referencing ENOTREGULAR instead of ENOTREG
+> - fixed the O_REGULAR flag in arch/parisc/include/uapi/asm/fcntl.h from 0=
+60000000 to 0100000000
+> - added 2 commits converting arch/{mips,sparc}/include/uapi/asm/fcntl.h O=
+_* macros from hex to octal
+> - v2 is at: https://lore.kernel.org/linux-fsdevel/20260126154156.55723-1-=
+dorjoychy111@gmail.com/T/
+>
+> Changes in v2:
+> - rename ENOTREGULAR to ENOTREG
+> - define ENOTREG in uapi/asm-generic/errno.h (instead of errno-base.h) an=
+d in arch/*/include/uapi/asm/errno.h files
+> - override O_REGULAR in arch/{alpha,sparc,parisc}/include/uapi/asm/fcntl.=
+h due to clash with include/uapi/asm-generic/fcntl.h
+> - I have kept the kselftest but now that O_REGULAR and ENOTREG can have d=
+ifferent value on different architectures I am not sure if it's right
+> - v1 is at: https://lore.kernel.org/linux-fsdevel/20260125141518.59493-1-=
+dorjoychy111@gmail.com/T/
+>
+> Thanks.
+>
+> Regards,
+> Dorjoy
+>
+> Dorjoy Chowdhury (4):
+>   openat2: new OPENAT2_REGULAR flag support
+>   kselftest/openat2: test for OPENAT2_REGULAR flag
+>   sparc/fcntl.h: convert O_* flag macros from hex to octal
+>   mips/fcntl.h: convert O_* flag macros from hex to octal
+>
+>  arch/alpha/include/uapi/asm/errno.h           |  2 +
+>  arch/alpha/include/uapi/asm/fcntl.h           |  1 +
+>  arch/mips/include/uapi/asm/errno.h            |  2 +
+>  arch/mips/include/uapi/asm/fcntl.h            | 22 +++++------
+>  arch/parisc/include/uapi/asm/errno.h          |  2 +
+>  arch/parisc/include/uapi/asm/fcntl.h          |  1 +
+>  arch/sparc/include/uapi/asm/errno.h           |  2 +
+>  arch/sparc/include/uapi/asm/fcntl.h           | 35 +++++++++---------
+>  fs/ceph/file.c                                |  4 ++
+>  fs/gfs2/inode.c                               |  2 +
+>  fs/namei.c                                    |  4 ++
+>  fs/nfs/dir.c                                  |  4 +-
+>  fs/open.c                                     |  4 +-
+>  fs/smb/client/dir.c                           | 11 +++++-
+>  include/linux/fcntl.h                         |  2 +
+>  include/uapi/asm-generic/errno.h              |  2 +
+>  include/uapi/asm-generic/fcntl.h              |  4 ++
+>  tools/arch/alpha/include/uapi/asm/errno.h     |  2 +
+>  tools/arch/mips/include/uapi/asm/errno.h      |  2 +
+>  tools/arch/parisc/include/uapi/asm/errno.h    |  2 +
+>  tools/arch/sparc/include/uapi/asm/errno.h     |  2 +
+>  tools/include/uapi/asm-generic/errno.h        |  2 +
+>  .../testing/selftests/openat2/openat2_test.c  | 37 ++++++++++++++++++-
+>  23 files changed, 119 insertions(+), 32 deletions(-)
+>
+> --
+> 2.53.0
+>
