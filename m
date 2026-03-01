@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB101DF271;
-	Sun,  1 Mar 2026 01:46:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D2A1DF271;
+	Sun,  1 Mar 2026 01:46:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772329587; cv=none; b=qkru4mcpVsm0xKdp4LYPzL17O6D9MkHHirz9K8DGg38fpaBK3xrZe1ld9XIijZPEMUE/UhDMbRrVvRM+uECs8ute6CmOwdL/nEUU+Z2n27KW7QW1u9SL0KFoZUOr51HQ73zTJFnVBWx2wA4cFRuCOU0ZpqFAMqkiCfoqiJb8710=
+	t=1772329590; cv=none; b=bAEFTLtS/iDpygIK7rh2N54znuidBvtzP0pbwn6JNvod4n/1DdDCDFoOVvDptnLim7/dem2cLyf3ZtBVVAlywrvmz/tbsZTlU/LoG0aIPJ0mwdYjQZDrJI/jTvORz/UqoNrZ3pJ59D6Q8R45PMwupR0LiV2UoAlIvR7AaiRwmeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772329587; c=relaxed/simple;
-	bh=abKYkDXL2ZttLEsvnVtPm8Mbgzy2blCCwj41hi+9ZRA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VAjZLByAf4oPCfvOpLBAkTzIgeQeeHBYtfjltnJOqqd6ED9S9XGQy2zUDtZVt/13vqv2SusEVV92kkkf6E0hk4k471/3Ah/Q3HVJlTxUWn+q/Z9JNbA4CVtAVa+KPyMTPD4aSBneA2GBSWDD3gh7lRYb8LAyWSV83QE0j4LS7RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pqTRV1p0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772329590; c=relaxed/simple;
+	bh=VKaTm4OSxeAy2B9v/snKREnkT7sUpb2RR9lyFfrM4g4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Apsn6YK6AUCMqGpKdnHiqmGEvYxwmfW4Qm1Fsg9i4hW6WDqRNwdC/e7R9eqNQXx8v9SaMyjsx4yN03WeQvQTy2STZu//o5yKFKUEGf26mTD/7K5R77uCMFa37jzXKvlRMdZ72Jrab4O7EJ9sb7RGlbVWb1cswNZa487kDMStOso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hzHLle/z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pqTRV1p0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38502C19421;
-	Sun,  1 Mar 2026 01:46:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hzHLle/z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E400AC19424;
+	Sun,  1 Mar 2026 01:46:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772329587;
-	bh=abKYkDXL2ZttLEsvnVtPm8Mbgzy2blCCwj41hi+9ZRA=;
+	s=k20201202; t=1772329589;
+	bh=VKaTm4OSxeAy2B9v/snKREnkT7sUpb2RR9lyFfrM4g4=;
 	h=From:To:Cc:Subject:Date:From;
-	b=pqTRV1p0SIrg24/0TT5NWZhdmTSpMbx5aSf3H/h/zzgFgJzoteONz/7JY844CPcOH
-	 8DnRlPBx4ihgV3Z3/ktNlgBWUse4vpfHhWmBW9u8AivFKUcZ8qqJKgcWv/ItmZmPfw
-	 ybo2Elt0i1T2GnWwRuI1eGdUyRclb4dch+gFQhj3iHU94RanyaiSXJArbvZVsnpnwX
-	 TogXZ3bnbQJk66ER/BMhBIZD9UH8y53eRdo9JLL26b5ePr62QPzOXKH70fUJUHfgPZ
-	 9PBfcgA2O08sz+U5WMTotE9+JcqsBrqhai1MQrNYeK098OW7v5nvEuw3Rpu+y7LHpm
-	 q+WVUOsddWwOg==
+	b=hzHLle/zyinVjQpMplrflUadnflQBdhBl9ePeayXpPfWcGXFyXyyl/BzItKUgQIbp
+	 IoL8k+UX52Bkm/ipC9PRzExN58MmD6V1SDjAGuJMAxAgzfPqFID9UMZAcPhU/5MNtX
+	 ZvV2Sk63MiSDCYcKZuEHO8I/GIz4ZNIGdr0v7/jRteyFLCl+CWi5hHNf8I38ImMHkw
+	 7TE+eI8hBuzz/SZz/uqpPgl7c8M6ku9usIT03X8kusMEgpyrCQFL+vWXazvipnBhSW
+	 dINekiV5lsau+xVtyau3j7nrlUxjAFTlH1sjYlnLYEf8Z/KtnkzFzsZkJtgonWhXiK
+	 xbKwlL8C16iPw==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	metze@samba.org
@@ -35,9 +35,9 @@ Cc: Steve French <smfrench@gmail.com>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	Steve French <stfrench@microsoft.com>
-Subject: FAILED: Patch "smb: client: introduce and use smbd_{alloc, free}_send_io()" failed to apply to 6.1-stable tree
-Date: Sat, 28 Feb 2026 20:46:24 -0500
-Message-ID: <20260301014625.1709333-1-sashal@kernel.org>
+Subject: FAILED: Patch "smb: client: let send_done handle a completion without IB_SEND_SIGNALED" failed to apply to 6.1-stable tree
+Date: Sat, 28 Feb 2026 20:46:27 -0500
+Message-ID: <20260301014627.1709443-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -59,18 +59,18 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From dc77da0373529d43175984b390106be2d8f03609 Mon Sep 17 00:00:00 2001
+From cf74fcdc43b322b6188a0750b5ee79e38be6d078 Mon Sep 17 00:00:00 2001
 From: Stefan Metzmacher <metze@samba.org>
-Date: Thu, 22 Jan 2026 18:16:55 +0100
-Subject: [PATCH] smb: client: introduce and use smbd_{alloc, free}_send_io()
+Date: Thu, 22 Jan 2026 18:17:00 +0100
+Subject: [PATCH] smb: client: let send_done handle a completion without
+ IB_SEND_SIGNALED
 
-This is basically a copy of smb_direct_{alloc,free}_sendmsg()
-in the server, with just using ib_dma_unmap_page() in all
-cases, which is the same as ib_dma_unmap_single().
+With smbdirect_send_batch processing we likely have requests without
+IB_SEND_SIGNALED, which will be destroyed in the final request
+that has IB_SEND_SIGNALED set.
 
-We'll use this logic in common code in future.
-(I basically backported it from my branch that
-as already has everything in common).
+If the connection is broken all requests are signaled
+even without explicit IB_SEND_SIGNALED.
 
 Cc: <stable@vger.kernel.org> # 6.18.x
 Cc: Steve French <smfrench@gmail.com>
@@ -82,176 +82,54 @@ Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/smbdirect.c | 87 ++++++++++++++++++++++++++-------------
- 1 file changed, 58 insertions(+), 29 deletions(-)
+ fs/smb/client/smbdirect.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 75c0ac9cc65c7..6cb40da7e5897 100644
+index 88fefb901c27f..01d55bcc6d0f9 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -493,10 +493,54 @@ static inline void *smbdirect_recv_io_payload(struct smbdirect_recv_io *response
- 	return (void *)response->packet;
- }
- 
-+static struct smbdirect_send_io *smbd_alloc_send_io(struct smbdirect_socket *sc)
-+{
-+	struct smbdirect_send_io *msg;
-+
-+	msg = mempool_alloc(sc->send_io.mem.pool, GFP_KERNEL);
-+	if (!msg)
-+		return ERR_PTR(-ENOMEM);
-+	msg->socket = sc;
-+	INIT_LIST_HEAD(&msg->sibling_list);
-+	msg->num_sge = 0;
-+
-+	return msg;
-+}
-+
-+static void smbd_free_send_io(struct smbdirect_send_io *msg)
-+{
-+	struct smbdirect_socket *sc = msg->socket;
-+	size_t i;
-+
-+	/*
-+	 * The list needs to be empty!
-+	 * The caller should take care of it.
-+	 */
-+	WARN_ON_ONCE(!list_empty(&msg->sibling_list));
-+
-+	/*
-+	 * Note we call ib_dma_unmap_page(), even if some sges are mapped using
-+	 * ib_dma_map_single().
-+	 *
-+	 * The difference between _single() and _page() only matters for the
-+	 * ib_dma_map_*() case.
-+	 *
-+	 * For the ib_dma_unmap_*() case it does not matter as both take the
-+	 * dma_addr_t and dma_unmap_single_attrs() is just an alias to
-+	 * dma_unmap_page_attrs().
-+	 */
-+	for (i = 0; i < msg->num_sge; i++)
-+		ib_dma_unmap_page(sc->ib.dev,
-+				  msg->sge[i].addr,
-+				  msg->sge[i].length,
-+				  DMA_TO_DEVICE);
-+
-+	mempool_free(msg, sc->send_io.mem.pool);
-+}
-+
- /* Called when a RDMA send is done */
- static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- {
--	int i;
- 	struct smbdirect_send_io *request =
- 		container_of(wc->wr_cqe, struct smbdirect_send_io, cqe);
- 	struct smbdirect_socket *sc = request->socket;
-@@ -505,12 +549,8 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
+@@ -554,6 +554,32 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
  	log_rdma_send(INFO, "smbdirect_send_io 0x%p completed wc->status=%s\n",
  		request, ib_wc_status_msg(wc->status));
  
--	for (i = 0; i < request->num_sge; i++)
--		ib_dma_unmap_single(sc->ib.dev,
--			request->sge[i].addr,
--			request->sge[i].length,
--			DMA_TO_DEVICE);
--	mempool_free(request, sc->send_io.mem.pool);
-+	/* Note this frees wc->wr_cqe, but not wc */
-+	smbd_free_send_io(request);
++	if (unlikely(!(request->wr.send_flags & IB_SEND_SIGNALED))) {
++		/*
++		 * This happens when smbdirect_send_io is a sibling
++		 * before the final message, it is signaled on
++		 * error anyway, so we need to skip
++		 * smbdirect_connection_free_send_io here,
++		 * otherwise is will destroy the memory
++		 * of the siblings too, which will cause
++		 * use after free problems for the others
++		 * triggered from ib_drain_qp().
++		 */
++		if (wc->status != IB_WC_SUCCESS)
++			goto skip_free;
++
++		/*
++		 * This should not happen!
++		 * But we better just close the
++		 * connection...
++		 */
++		log_rdma_send(ERR,
++			"unexpected send completion wc->status=%s (%d) wc->opcode=%d\n",
++			ib_wc_status_msg(wc->status), wc->status, wc->opcode);
++		smbd_disconnect_rdma_connection(sc);
++		return;
++	}
++
+ 	/*
+ 	 * Free possible siblings and then the main send_io
+ 	 */
+@@ -567,6 +593,7 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
  	lcredits += 1;
  
  	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
-@@ -963,15 +1003,13 @@ static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
- {
- 	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct ib_send_wr send_wr;
--	int rc = -ENOMEM;
-+	int rc;
- 	struct smbdirect_send_io *request;
- 	struct smbdirect_negotiate_req *packet;
- 
--	request = mempool_alloc(sc->send_io.mem.pool, GFP_KERNEL);
--	if (!request)
--		return rc;
--
--	request->socket = sc;
-+	request = smbd_alloc_send_io(sc);
-+	if (IS_ERR(request))
-+		return PTR_ERR(request);
- 
- 	packet = smbdirect_send_io_payload(request);
- 	packet->min_version = cpu_to_le16(SMBDIRECT_V1);
-@@ -983,7 +1021,6 @@ static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
- 	packet->max_fragmented_size =
- 		cpu_to_le32(sp->max_fragmented_recv_size);
- 
--	request->num_sge = 1;
- 	request->sge[0].addr = ib_dma_map_single(
- 				sc->ib.dev, (void *)packet,
- 				sizeof(*packet), DMA_TO_DEVICE);
-@@ -991,6 +1028,7 @@ static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
- 		rc = -EIO;
- 		goto dma_mapping_failed;
- 	}
-+	request->num_sge = 1;
- 
- 	request->sge[0].length = sizeof(*packet);
- 	request->sge[0].lkey = sc->ib.pd->local_dma_lkey;
-@@ -1020,13 +1058,11 @@ static int smbd_post_send_negotiate_req(struct smbdirect_socket *sc)
- 	/* if we reach here, post send failed */
- 	log_rdma_send(ERR, "ib_post_send failed rc=%d\n", rc);
- 	atomic_dec(&sc->send_io.pending.count);
--	ib_dma_unmap_single(sc->ib.dev, request->sge[0].addr,
--		request->sge[0].length, DMA_TO_DEVICE);
- 
- 	smbd_disconnect_rdma_connection(sc);
- 
- dma_mapping_failed:
--	mempool_free(request, sc->send_io.mem.pool);
-+	smbd_free_send_io(request);
- 	return rc;
- }
- 
-@@ -1187,7 +1223,7 @@ static int smbd_post_send_iter(struct smbdirect_socket *sc,
- 			       int *_remaining_data_length)
- {
- 	struct smbdirect_socket_parameters *sp = &sc->parameters;
--	int i, rc;
-+	int rc;
- 	int header_length;
- 	int data_length;
- 	struct smbdirect_send_io *request;
-@@ -1208,13 +1244,12 @@ static int smbd_post_send_iter(struct smbdirect_socket *sc,
- 		goto err_wait_credit;
- 	}
- 
--	request = mempool_alloc(sc->send_io.mem.pool, GFP_KERNEL);
--	if (!request) {
--		rc = -ENOMEM;
-+	request = smbd_alloc_send_io(sc);
-+	if (IS_ERR(request)) {
-+		rc = PTR_ERR(request);
- 		goto err_alloc;
- 	}
- 
--	request->socket = sc;
- 	memset(request->sge, 0, sizeof(request->sge));
- 
- 	/* Map the packet to DMA */
-@@ -1292,13 +1327,7 @@ static int smbd_post_send_iter(struct smbdirect_socket *sc,
- 		return 0;
- 
- err_dma:
--	for (i = 0; i < request->num_sge; i++)
--		if (request->sge[i].addr)
--			ib_dma_unmap_single(sc->ib.dev,
--					    request->sge[i].addr,
--					    request->sge[i].length,
--					    DMA_TO_DEVICE);
--	mempool_free(request, sc->send_io.mem.pool);
-+	smbd_free_send_io(request);
- 
- err_alloc:
- 	atomic_inc(&sc->send_io.credits.count);
++skip_free:
+ 		if (wc->status != IB_WC_WR_FLUSH_ERR)
+ 			log_rdma_send(ERR, "wc->status=%s wc->opcode=%d\n",
+ 				ib_wc_status_msg(wc->status), wc->opcode);
 -- 
 2.51.0
 
