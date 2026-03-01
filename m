@@ -1,39 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CB2284662;
-	Sun,  1 Mar 2026 01:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C467D269CE6;
+	Sun,  1 Mar 2026 01:28:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772328445; cv=none; b=fWyAq0x2EYFGnR0HXFLa3z7OLlPjipIQ9grr9VZhMNDJSwmWLRYIleIzq3uhjvoJJ9b+eJZ0a3Gr615M1Qb/Hfo0ZdEZiLx4W+L6mkueTJFdUdb3m991OYsYO21fP6W88GMf6Rtj2d0WkXHN9ABfsskXm+cDTX6PzHjdjLCy+j0=
+	t=1772328528; cv=none; b=iha6zivI5Dggloghc9/GfA1waaFri5YUbB24YpHaoK3MV/+fV3tEBv6UnZ6RgoU/fVw9scezAuO3RJ2aHMTMyjBRNt3KHvt4abWk0cJq2A4876/5id+h3qQ5AbIJxklbDWpJC3iXguS6g4uKMxTMSU6O+SZ6Wa3UWRUHTN5CAFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772328445; c=relaxed/simple;
-	bh=7lE4TiLtqxJKZ1xq5UojLvEOiVWMv8OnsoP+EEzA8jY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TmLrkzNhYHWjy8+E6uNYQz0YFC5T0zGMy1B1cBv0tr7ZD84hhFgRNpNlSJmaiHg2HQapWI7AanWOFLgGLe4k/2GnwWaHCvTMaN9JvWLq0Uaucmnhas4t0g6hQNCaaCQsQdTV6gtpv8qD4xC2cRplrSHG0Fv0pOKHjlo99Klg890=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F7AdZWgH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772328528; c=relaxed/simple;
+	bh=ikLkOkgf4c/+QbsyqOWBhhn+r005cWH3UE9tHGo16AQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DSMkb83LtTGYEXV4AjOVtTc33+9hWFfW5kygSxE+X24ohi0Ni3f6LZs0z78kVnx0BL4nO9jCPlxUxbTFkUWkSSf4fLIEDee4i2ppWaCH4UjGBVDQzdEQ2Fu+ZiyDTiFhCdRYDaqCPq3Rtnh/Dg3ASrmZSnoWKBLlFcUxi0ZW7vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmQmKtot; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F7AdZWgH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5A38C2BC86;
-	Sun,  1 Mar 2026 01:27:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmQmKtot"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8498DC19424;
+	Sun,  1 Mar 2026 01:28:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772328445;
-	bh=7lE4TiLtqxJKZ1xq5UojLvEOiVWMv8OnsoP+EEzA8jY=;
+	s=k20201202; t=1772328528;
+	bh=ikLkOkgf4c/+QbsyqOWBhhn+r005cWH3UE9tHGo16AQ=;
 	h=From:To:Cc:Subject:Date:From;
-	b=F7AdZWgH5WOc2hwfCfKYYr9x7cMoxX6H1L4do1h7v5ZEWSxpIfQtaESj3VtpKSKtX
-	 gWMsz4Qk3bEi+WHH556uMuVchb9NVC484gKxmN88i71z3AqGSk0ko7ArqgyzjiLz2R
-	 FGqPmo1pBqgrRpfhCKMmH0YfK87t/yRR3lSlNdB0JhKcJYZeh2mOw4Zx4LRlsHcK91
-	 7OaFVj7J1ywgi89bZZDxSpzj8afM+Q57fSyvRhrLHhxXPx2z+qMwg6ACWKDc4WutmE
-	 VMsub7N+8eefJgnlYtUvf9TFrap/8k0FbwwLUlJYbs+3J4BJ/l9w79Are9MgPfimHS
-	 jhaXDkiQyXEqw==
+	b=HmQmKtots5RnPoGsNCwVDKHEY3JXrwR547NXWAJKZpVxXfDNRxEqLRI3YQwTPtVo5
+	 DGDBvDMCY04q0JjB1nimIABjZceJpigtH3hacO+JQ/4jWkUGGKAY+xiVvxqG7Vs7m2
+	 Ng3A2lh3CGZUCLBBZVc6DG7pBQEKEttod/IqPSX7GQptkK9x68Dpyp4Isa4wKu5tQr
+	 7APtTHNU+ucKy7kJZ20Yg4eLU1aCgli3RedX9v5IvCWb+tutBwx7SWIN7joM3u1cAH
+	 5umABQDUzEEVu18ybtUmgeh9lgY4jZOeX24Otv0NAqUmGwQNhnVahhrkFA++JdLf8L
+	 s89pOoRM68Efg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	linkinjeon@kernel.org
-Cc: Igor Stepansky <igor.stepansky@orca.security>,
+	sprasad@microsoft.com
+Cc: Yuchan Nam <entropy1110@gmail.com>,
 	Steve French <stfrench@microsoft.com>,
-	linux-cifs@vger.kernel.org
-Subject: FAILED: Patch "ksmbd: add chann_lock to protect ksmbd_chann_list xarray" failed to apply to 6.12-stable tree
-Date: Sat, 28 Feb 2026 20:27:23 -0500
-Message-ID: <20260301012723.1684877-1-sashal@kernel.org>
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: FAILED: Patch "cifs: some missing initializations on replay" failed to apply to 6.12-stable tree
+Date: Sat, 28 Feb 2026 20:28:46 -0500
+Message-ID: <20260301012846.1686559-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -55,117 +56,62 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 4f3a06cc57976cafa8c6f716646be6c79a99e485 Mon Sep 17 00:00:00 2001
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 9 Feb 2026 10:43:19 +0900
-Subject: [PATCH] ksmbd: add chann_lock to protect ksmbd_chann_list xarray
+From 14f66f44646333d2bfd7ece36585874fd72f8286 Mon Sep 17 00:00:00 2001
+From: Shyam Prasad N <sprasad@microsoft.com>
+Date: Sat, 14 Feb 2026 15:59:13 +0530
+Subject: [PATCH] cifs: some missing initializations on replay
 
-ksmbd_chann_list xarray lacks synchronization, allowing use-after-free in
-multi-channel sessions (between lookup_chann_list() and ksmbd_chann_del).
+In several places in the code, we have a label to signify
+the start of the code where a request can be replayed if
+necessary. However, some of these places were missing the
+necessary reinitializations of certain local variables
+before replay.
 
-Adds rw_semaphore chann_lock to struct ksmbd_session and protects
-all xa_load/xa_store/xa_erase accesses.
+This change makes sure that these variables get initialized
+after the label.
 
 Cc: stable@vger.kernel.org
-Reported-by: Igor Stepansky <igor.stepansky@orca.security>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Reported-by: Yuchan Nam <entropy1110@gmail.com>
+Tested-by: Yuchan Nam <entropy1110@gmail.com>
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/server/mgmt/user_session.c |  5 +++++
- fs/smb/server/mgmt/user_session.h |  1 +
- fs/smb/server/smb2pdu.c           | 12 +++++++++++-
- 3 files changed, 17 insertions(+), 1 deletion(-)
+ fs/smb/client/smb2ops.c | 2 ++
+ fs/smb/client/smb2pdu.c | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
-index 68b3e0cb54d38..8c2b14ea7b0ec 100644
---- a/fs/smb/server/mgmt/user_session.c
-+++ b/fs/smb/server/mgmt/user_session.c
-@@ -244,12 +244,14 @@ static void free_channel_list(struct ksmbd_session *sess)
- 	struct channel *chann;
- 	unsigned long index;
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 61c521712f863..7370d7a18cd0c 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -1185,6 +1185,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
  
-+	down_write(&sess->chann_lock);
- 	xa_for_each(&sess->ksmbd_chann_list, index, chann) {
- 		xa_erase(&sess->ksmbd_chann_list, index);
- 		kfree(chann);
- 	}
+ replay_again:
+ 	/* reinitialize for possible replay */
++	used_len = 0;
+ 	flags = CIFS_CP_CREATE_CLOSE_OP;
+ 	oplock = SMB2_OPLOCK_LEVEL_NONE;
+ 	server = cifs_pick_channel(ses);
+@@ -1588,6 +1589,7 @@ smb2_ioctl_query_info(const unsigned int xid,
  
- 	xa_destroy(&sess->ksmbd_chann_list);
-+	up_write(&sess->chann_lock);
- }
+ replay_again:
+ 	/* reinitialize for possible replay */
++	buffer = NULL;
+ 	flags = CIFS_CP_CREATE_CLOSE_OP;
+ 	oplock = SMB2_OPLOCK_LEVEL_NONE;
+ 	server = cifs_pick_channel(ses);
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 4602b4dfe8322..7f3edf42b9c3f 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -2908,6 +2908,7 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
  
- static void __session_rpc_close(struct ksmbd_session *sess,
-@@ -434,7 +436,9 @@ static int ksmbd_chann_del(struct ksmbd_conn *conn, struct ksmbd_session *sess)
- {
- 	struct channel *chann;
- 
-+	down_write(&sess->chann_lock);
- 	chann = xa_erase(&sess->ksmbd_chann_list, (long)conn);
-+	up_write(&sess->chann_lock);
- 	if (!chann)
- 		return -ENOENT;
- 
-@@ -668,6 +672,7 @@ static struct ksmbd_session *__session_create(int protocol)
- 	rwlock_init(&sess->tree_conns_lock);
- 	atomic_set(&sess->refcnt, 2);
- 	init_rwsem(&sess->rpc_lock);
-+	init_rwsem(&sess->chann_lock);
- 
- 	ret = __init_smb2_session(sess);
- 	if (ret)
-diff --git a/fs/smb/server/mgmt/user_session.h b/fs/smb/server/mgmt/user_session.h
-index 176d800c24906..d94f5e128a9b4 100644
---- a/fs/smb/server/mgmt/user_session.h
-+++ b/fs/smb/server/mgmt/user_session.h
-@@ -48,6 +48,7 @@ struct ksmbd_session {
- 	char				sess_key[CIFS_KEY_SIZE];
- 
- 	struct hlist_node		hlist;
-+	struct rw_semaphore		chann_lock;
- 	struct xarray			ksmbd_chann_list;
- 	struct xarray			tree_conns;
- 	struct ida			tree_conn_ida;
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 4d3154cc493ea..3efcc7da1b9f6 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -80,7 +80,13 @@ static inline bool check_session_id(struct ksmbd_conn *conn, u64 id)
- 
- struct channel *lookup_chann_list(struct ksmbd_session *sess, struct ksmbd_conn *conn)
- {
--	return xa_load(&sess->ksmbd_chann_list, (long)conn);
-+	struct channel *chann;
-+
-+	down_read(&sess->chann_lock);
-+	chann = xa_load(&sess->ksmbd_chann_list, (long)conn);
-+	up_read(&sess->chann_lock);
-+
-+	return chann;
- }
- 
- /**
-@@ -1559,8 +1565,10 @@ static int ntlm_authenticate(struct ksmbd_work *work,
- 				return -ENOMEM;
- 
- 			chann->conn = conn;
-+			down_write(&sess->chann_lock);
- 			old = xa_store(&sess->ksmbd_chann_list, (long)conn, chann,
- 					KSMBD_DEFAULT_GFP);
-+			up_write(&sess->chann_lock);
- 			if (xa_is_err(old)) {
- 				kfree(chann);
- 				return xa_err(old);
-@@ -1652,8 +1660,10 @@ static int krb5_authenticate(struct ksmbd_work *work,
- 				return -ENOMEM;
- 
- 			chann->conn = conn;
-+			down_write(&sess->chann_lock);
- 			old = xa_store(&sess->ksmbd_chann_list, (long)conn,
- 					chann, KSMBD_DEFAULT_GFP);
-+			up_write(&sess->chann_lock);
- 			if (xa_is_err(old)) {
- 				kfree(chann);
- 				return xa_err(old);
+ replay_again:
+ 	/* reinitialize for possible replay */
++	pc_buf = NULL;
+ 	flags = 0;
+ 	n_iov = 2;
+ 	server = cifs_pick_channel(ses);
 -- 
 2.51.0
 
