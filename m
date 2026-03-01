@@ -1,42 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA081F9F70;
-	Sun,  1 Mar 2026 01:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1B3D2727EB;
+	Sun,  1 Mar 2026 01:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772328402; cv=none; b=AMeCXmbIOYnfe7ehQvMFjY2IhKrB8WdZko6nwQrJG6jL18JobRjcr9+ftEbHeh2sgRC7T6WXfAt0n101GW7oTtLenwADG9LkpfW0THzMEvCIk751d5VMW9J/kZT8ALpDN/ugJ//K4EgOTvo+oZN8EVi6iD0HvR8BuyQfyliEf2E=
+	t=1772328405; cv=none; b=jtiiOzyd/kaubp9Mzc84P7CWgQvHprwVoDotWfVqUtfeKJnePEuT/A5aP0wLUesWMDRxGkmA0QsBQcIc9PPT/7NYe4n1axknOeBnMsXUxvF/w7JChLOYIcUWBpGwK8ODpFeptgnlRl1HLsbx0EPlxGItKD1BjZES+RLnE4Y6w+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772328402; c=relaxed/simple;
-	bh=GDEn7hbfNX5yUE4a9iR1TnibA5IQ8pomPNgb6nU6m8U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qjWa7M03Ak0AfsEpRkoqRoKB757yM88CIlL7kGF5sJ3NhDJm/VmUSXeIPBB3uA3zmZZdePDZgli6ds8eAsS0DQ+OZVLO5G8/Rc5UpFx82ot6oxHjrfJGPk8g+5bqSvdQtoGQBgksNKRw5p+IBW+SN2sDIAOeaEsuJZRVnBUAtSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c+Wlf+vS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772328405; c=relaxed/simple;
+	bh=3fVMHjFYmq3eUCJtUX1P07OM7HpVPhocNNPPUg0EatY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RE2NQSyYL/RS7BoF+7kErrbw7w9H2e6ayYOMyFMhj+lYVYlZN9upaee2QsezArMM7DApO7+DfcKRX7Ze371Terim5sKzES4bpewEXthmIvn+gCtn0lHcPsQZ+HJp2QZr6sfdGWOD9MhiHHijpzh6qb57+jzyfpAXSg8xKwOCh0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVT0apkJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c+Wlf+vS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58DC4C19421;
-	Sun,  1 Mar 2026 01:26:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVT0apkJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1F10C19421;
+	Sun,  1 Mar 2026 01:26:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772328402;
-	bh=GDEn7hbfNX5yUE4a9iR1TnibA5IQ8pomPNgb6nU6m8U=;
+	s=k20201202; t=1772328404;
+	bh=3fVMHjFYmq3eUCJtUX1P07OM7HpVPhocNNPPUg0EatY=;
 	h=From:To:Cc:Subject:Date:From;
-	b=c+Wlf+vSrA+TCkki1aFksv3gGy30O97Rd+qJNFJJUpfJjq1R0OXRTEj0Sa+Ywwxgr
-	 Q0gFAC7EFeACGXdAKCiQrGBPksGAtUpTfLEjr9Mj6KlG7lr1Y3zjLPvhWWMxjrgy+r
-	 Ts/pvnxmkKrWobhtFI/N0d6+j9UwCYOHvvqce7sQ7Cb91ItHD3xVX9FbZNq0szKIiC
-	 ovkRCsnMWrGN5ljuZ17REqkjhfuU7oySULHbz5n9w/h8/8i2bmOpdAVxI7QqgcPyOX
-	 IB9s4crRLGtY7eI8a1TgkwTcU8GjDDrpYBEHN1WPIWJOqHSyiyqpUKC3zLmdOXFv2P
-	 kNo3U75rKsOVg==
+	b=BVT0apkJSKc+VB/4gIuX5J+8u8akKjIkPwVkGYWGAH6l7UrulZ3ykiFc7o2/LJZXX
+	 4EQDltl9OeYTA5vIt4o3fZ1LZw2vm7nb7N9jDEYTLPEdRXej2Lz/2vMjzaUfDHxOW4
+	 2Pews54PoXzhn64vQE6T3CWJrwvtpi86SKyOiY5rDqFP0mudcnjq8L23BzAoP5IDv+
+	 6uXqltz2aFdMsDhA/bzC4F1VbzDFW9Z40HJXOx8ZEzoFU2IV4q9jq3kmhPsVYSN5Ca
+	 8JnvfLatsyFreR7cXbr20s8LJy73Ykk+PVzoxx3qgWUth67Sppz0H5KXct5IACsozy
+	 NKH9qqkd/fbug==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	metze@samba.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
+Cc: Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	Steve French <stfrench@microsoft.com>
-Subject: FAILED: Patch "smb: server: let send_done handle a completion without IB_SEND_SIGNALED" failed to apply to 6.12-stable tree
-Date: Sat, 28 Feb 2026 20:26:39 -0500
-Message-ID: <20260301012640.1684085-1-sashal@kernel.org>
+Subject: FAILED: Patch "smb: client: remove pointless sc->recv_io.credits.count rollback" failed to apply to 6.12-stable tree
+Date: Sat, 28 Feb 2026 20:26:42 -0500
+Message-ID: <20260301012642.1684141-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -58,76 +59,48 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 9da82dc73cb03e85d716a2609364572367a5ff47 Mon Sep 17 00:00:00 2001
+From 6858531e5e8d68828eec349989cefce3f45a487f Mon Sep 17 00:00:00 2001
 From: Stefan Metzmacher <metze@samba.org>
-Date: Thu, 22 Jan 2026 18:16:47 +0100
-Subject: [PATCH] smb: server: let send_done handle a completion without
- IB_SEND_SIGNALED
+Date: Thu, 22 Jan 2026 18:16:51 +0100
+Subject: [PATCH] smb: client: remove pointless sc->recv_io.credits.count
+ rollback
 
-With smbdirect_send_batch processing we likely have requests without
-IB_SEND_SIGNALED, which will be destroyed in the final request
-that has IB_SEND_SIGNALED set.
+We either reach this code path before we call
+new_credits = manage_credits_prior_sending(sc),
+which means new_credits is still 0
+or the connection is already broken as
+smbd_post_send() already called
+smbd_disconnect_rdma_connection().
 
-If the connection is broken all requests are signaled
-even without explicit IB_SEND_SIGNALED.
+This will also simplify further changes.
 
 Cc: <stable@vger.kernel.org> # 6.18.x
-Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/server/transport_rdma.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ fs/smb/client/smbdirect.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 5c0cc5064e8c0..c94068b78a1d2 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -1059,6 +1059,31 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 		    ib_wc_status_msg(wc->status), wc->status,
- 		    wc->opcode);
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index f2ae35a9f047f..c9fcd35e0c77a 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -1288,9 +1288,6 @@ static int smbd_post_send_iter(struct smbdirect_socket *sc,
+ 					    DMA_TO_DEVICE);
+ 	mempool_free(request, sc->send_io.mem.pool);
  
-+	if (unlikely(!(sendmsg->wr.send_flags & IB_SEND_SIGNALED))) {
-+		/*
-+		 * This happens when smbdirect_send_io is a sibling
-+		 * before the final message, it is signaled on
-+		 * error anyway, so we need to skip
-+		 * smbdirect_connection_free_send_io here,
-+		 * otherwise is will destroy the memory
-+		 * of the siblings too, which will cause
-+		 * use after free problems for the others
-+		 * triggered from ib_drain_qp().
-+		 */
-+		if (wc->status != IB_WC_SUCCESS)
-+			goto skip_free;
-+
-+		/*
-+		 * This should not happen!
-+		 * But we better just close the
-+		 * connection...
-+		 */
-+		pr_err("unexpected send completion wc->status=%s (%d) wc->opcode=%d\n",
-+		       ib_wc_status_msg(wc->status), wc->status, wc->opcode);
-+		smb_direct_disconnect_rdma_connection(sc);
-+		return;
-+	}
-+
- 	/*
- 	 * Free possible siblings and then the main send_io
- 	 */
-@@ -1072,6 +1097,7 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 	lcredits += 1;
- 
- 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
-+skip_free:
- 		pr_err("Send error. status='%s (%d)', opcode=%d\n",
- 		       ib_wc_status_msg(wc->status), wc->status,
- 		       wc->opcode);
+-	/* roll back the granted receive credits */
+-	atomic_sub(new_credits, &sc->recv_io.credits.count);
+-
+ err_alloc:
+ 	atomic_inc(&sc->send_io.credits.count);
+ 	wake_up(&sc->send_io.credits.wait_queue);
 -- 
 2.51.0
 
