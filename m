@@ -1,148 +1,70 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7610031A567
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Mar 2026 15:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772378402; cv=pass; b=hfmEqiS3dfJXXCFdlpUtb0e1OYqo+t8Zd0TtBVgdVk8HOYlswRbQVuUDf0qEmPw5v8yB3b9zqEFEUDqj+/E2UNNWMs64tTaGY4etUUHROLGNAnIWrApA1bdsENaXF4dvdBpRcMVn07PKXZFzxX8E4p/E35zujyQ5IdBnv8/03c8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772378402; c=relaxed/simple;
-	bh=Fiwwjp3q58poFbwEi1UnSoyKncjAv5ZQQsyqXdz0VPE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rBSiB7M8JPYf7rX7RieXqaWJaMl/XwvC4J0bbTOMBbzMTB3FIpD/C0Ye/YUsNJDxIMCVVPXjfy3QNhXczN/4ZEzlGOnyyfKteEKN5/sfxgTDKdt9KucoB2CjTicJ6zi98ybO+kK5Aq5GrKtrDPJQhuLjaqg9gnvl6+t/uDG7fMM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H4sAIl9E; arc=pass smtp.client-ip=209.85.221.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CEE1E1DF0;
+	Sun,  1 Mar 2026 16:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772381652; cv=none; b=gY8ujLyKfu5YmWdou9lwLCrjtV1zcepPFQaizARYkm+ucL3J+Bx86XKf8PR2FoC4s+tauxhqO2Tv6DbfLwnKpKN9nMTynyu3DeRrkOcNh2r+CcZbChLwI7XkYGgsJnp8DrO0jtIn2qL14GQbSyeDnjp0vJQ2wkac8OT93OTZGfQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772381652; c=relaxed/simple;
+	bh=ywb14zP4hY5kGEa6vgvzGC50Elu8HIVGlLBTbLTT7W0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VxwuqN+NoiR0Iu3sHRMeyEjaDc/ZL+xP+nPaR/61t3dDc2OQKPkofpDDNkrGuSxcd2EbnnvHqlQpXpjoT/t5eLWmNvvMFHiWcbDjd4E6ISW3vZ3oi8HSfsz2agPgCaAj+qMsay0ZYvUUoyJ2V9Qh5RaDJUwdHCEwU31M8n8gl3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=gKKsS6Nx; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H4sAIl9E"
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-56a8d7bb872so3664618e0c.1
-        for <linux-cifs@vger.kernel.org>; Sun, 01 Mar 2026 07:20:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772378400; cv=none;
-        d=google.com; s=arc-20240605;
-        b=J6zpIpuiY/0klAqabkSQVNo18N4BNNrElo8kPZXUZWsWrDf60Pc42FtqaUtK7ek2iU
-         mElYyXjGJQZ7/GqhBVkYgxxhgFUtnjeQwiZK/QLlGxsJXzoy+qTX21Jd5pJF1Zc+8INF
-         /sq8+JwG82mfidU1qGLD4TVbAAmx4Jg20mp9W9aKvIAfqKo5I7MR64U3lQldmhMUOi2F
-         DWS1mgMQy85bcvqBm68zI6Ueh8bHBehs7N7iYsPAiVWAe3AsHZzhSVAj1CSoRMyYkg/5
-         MBRgfMSK49kJKuXclKJdIt7xw3lj83MMGwtNFoDVzy4MNyOmvAU1VFTXM4jpQl7/Bp+q
-         ve/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Fiwwjp3q58poFbwEi1UnSoyKncjAv5ZQQsyqXdz0VPE=;
-        fh=zQTIe8TPP5NZKyiz6L5nNjsmWOBw6ksntyUPkUI+ohg=;
-        b=dpXPzmkzD0nwwSYamMYcd2EpZ0hgVGcYOR0hMUJrzaGHhwPI38sOn0ygwZCX3fqelY
-         EkQNtQ8rllgd3agMUoyR/oBhQL14aY0oRME8LDLoB10iCm4hi8SngPVQCNTqdAdVn4z1
-         efHDrY/aSwC843+IbykJeVUTt4O+kufi+WSEWFsej7H70+0+DgQ9sknGpTzpfdjKYXon
-         WngZ2X0qafoMPOJQ3bIq59PR4Kq4j+Tnl/XiPtt9lXBXFHmjxAQ3sKeXRXG3zQBAJqgJ
-         12BN2UCaARWs61TTX2Ww6dmmskWZ1C7moiE64msRgYc8VDY5xQdaTRinSoP13o+9/008
-         K/7Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772378400; x=1772983200; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fiwwjp3q58poFbwEi1UnSoyKncjAv5ZQQsyqXdz0VPE=;
-        b=H4sAIl9El3DNOjSs6WpoPmMrg64nxdhM2ZU5p6QYdJgq0rtcVMiLtOknYAp3Sg1HnR
-         zuEPbTmKD1ahGkEt3CE7W/3H5T9dhJifaqxhoa4FnJIn1ZHEkCrP0KrT0cHSvWzxETnb
-         MbQOhGyR7CPg5xgLKg7YKeEJVtdUNLNdy+utBZZbL/Jp+UK/UYfxbYJC/r09iyrQkrq8
-         mxKbP0RTNPaULQk5XcC0nqNjCJTCy9r4hOpSX+4eaoRxRsX2lGltWHfOVKOZiO6+5udc
-         ZHmxplPmgnjfFEzR/g0/DYxbZ9xUIHWOxlu9NKNyarI58YO2J4A566bqfoxSDFengttt
-         GXiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772378400; x=1772983200;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Fiwwjp3q58poFbwEi1UnSoyKncjAv5ZQQsyqXdz0VPE=;
-        b=t+CamXofo7i77PgJFHGdAkuVxg0DHH+Yp+jbJWRKSR8rH7Wg0GDvCklXnrf9JQYGcT
-         XWtUulNQS08ucY5Eq+x5TCLLNbMH/Q0qY8vFrH0RpspekXyTTxnhBN7k9PrbIi8J9hEL
-         JPLugPCisfaNdmdPg5VXF2dBCSUp5OWustVNR+SzLcK3nf1B4BktwoOpH96MrIh8iRPJ
-         5uz7ydAmzSHzaQUx5RtM5h/ajZ9TrQ/FiyIC8iBz8Rs5y/cxeb6jtHBoSRxVMlPq3nqc
-         Req8aH2AXeP9siPNnnXWhHxNeOt/sujCzXU7v5nnufhHpU1xqmzAr/S/EIB2slyBprDN
-         5ZZA==
-X-Forwarded-Encrypted: i=1; AJvYcCU0in8nG3Fd3mz4VJiGiKYys48WuKW9NZoWJJckdhyxSjjWu4pBnfuBydkvdAfgK4GufLtThtAM1+HC@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQd6QMaxnjhrDOuyTcSfMGnEP03Xm9dzUZA98JAbFP/nybd3Iu
-	k1JO0pXBnGdqVZn9f3WGPoNceoUPreEAqmvnGPz2P8X6hzeaXqJUU6X0UDucKAJIebC+ekaUFBy
-	RL2R5xXdDWynOAoTCtyXM6eKCyzuYp1s=
-X-Gm-Gg: ATEYQzze2GOaA3G5eengk1P1ANQCnRRAUihe/JspMmBVtjG6eG+jxB88prmxeWR+Shf
-	oovCNGgmXUitZrQFl4k8KFl/8W6eD/N80YqNU2zmgcbPQ9K1PqsHbpJPXvnL0F6rKTamaa0RDry
-	YLsaQtNcbsZiyaaz4KKFi1A+pIzMfTuKRFsx/ySB7vVtNpDSVNT4PgzuuSzOZlchbWFsy2tu0SP
-	bJwjNBa+7o9DToC8KOeEKhtgUvwlNTAWNJFHDKeXk/ptR4txtZ1KQJ2ORAHBcQfenSMrEWKv6BO
-	fQkrbW8tF8z/XECA6WC/eDHwTvt++etrn9Y6wkfNmA==
-X-Received: by 2002:a05:6102:160c:b0:5ff:1981:aba6 with SMTP id
- ada2fe7eead31-5ff31fab9ffmr5005001137.0.1772378400433; Sun, 01 Mar 2026
- 07:20:00 -0800 (PST)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="gKKsS6Nx"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=ywb14zP4hY5kGEa6vgvzGC50Elu8HIVGlLBTbLTT7W0=; b=gKKsS6NxdTG++QVLjMlGYb3EoE
+	n9hMbe75uzA2VXkY6vLDoQtwVGpuYhlDsfUMKuDT7Hg5PHu39Bp45CwBZv2MNKqZC/GCBl3BD+Z4s
+	DWOVsOpxtZD1WTHKj1cala0dFHTjTMebKLY1jUu1t+57bVAtN/Ua0hny2swyX2gHqTFHGVHHlM7e/
+	jAcjW1qRMXxkRTs7y7iqZS0DzxXXghzyPL+e7qjwtBUUwegNqfCDr096zeC1SA+wTm8UV4b4vLkBR
+	Og31K5+9IWJFWEcjdS49kMgmILaigR78U/OzC2aP03yOMyLiYbhg+csh3yzMDp8YEnB9HZpTdotQo
+	suZZF4AaYbbbqi1PfxoYTov2L0IIo0th0WEArfSPgnlLUwq4ZhtzQ733otiIEv/rcBUNalzhYmD2C
+	qrzfDcM+nsBHo5m+J3NsrKKPHj3/oBY/jlk7TkOioJxZ/p425+cg8ozCFqwHQ74MAQpVBn5b1TCbY
+	i72NZDxKYfT4uV1CTmNBjOIq;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vwjQf-00000009OHb-36Qe;
+	Sun, 01 Mar 2026 16:14:01 +0000
+Message-ID: <4a0ba7d9-97f5-42fb-bdb9-9f985da18a2a@samba.org>
+Date: Sun, 1 Mar 2026 17:14:01 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260221145915.81749-1-dorjoychy111@gmail.com>
- <20260221145915.81749-2-dorjoychy111@gmail.com> <2f430eb613d4f6f6564f83d06f802ff47adea230.camel@kernel.org>
- <CAFfO_h7i86qdKZObdFpWd8Mh+8VXVMFYoGgYBgzomzhGJJFnEQ@mail.gmail.com>
- <ed5aeaa81ad9b87926fa7ebee0308aeb8df9f0ac.camel@kernel.org>
- <CAFfO_h5za6gV99TQS3pwHnf7zyCeVySn3CdRyV+_jFqjovGBqA@mail.gmail.com>
- <beead8bbff344ddfc279e0fc86db0dd5dd98562b.camel@kernel.org>
- <CAFfO_h4brg90tMNp6VAzs5Lo8Lbu=DK2csjDqr2zspOygKEFCg@mail.gmail.com> <73c8ea54bcda0b64093d84fe047914c0632c2d0c.camel@kernel.org>
-In-Reply-To: <73c8ea54bcda0b64093d84fe047914c0632c2d0c.camel@kernel.org>
-From: Dorjoy Chowdhury <dorjoychy111@gmail.com>
-Date: Sun, 1 Mar 2026 21:19:49 +0600
-X-Gm-Features: AaiRm51DyMEBRNPI1HVDhCyC4qT7r77uNpEMtKgft97OSaudIMk11BvPwkDJ_3M
-Message-ID: <CAFfO_h59LQSjncu_4YE5YB+mt-FL2c1GN-jF_WtoKj1u43DcuA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/4] openat2: new OPENAT2_REGULAR flag support
-To: Jeff Layton <jlayton@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, v9fs@lists.linux.dev, 
-	linux-kselftest@vger.kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	jack@suse.cz, chuck.lever@oracle.com, alex.aring@gmail.com, arnd@arndb.de, 
-	adilger@dilger.ca, mjguzik@gmail.com, smfrench@gmail.com, 
-	richard.henderson@linaro.org, mattst88@gmail.com, linmag7@gmail.com, 
-	tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com, 
-	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com, 
-	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, 
-	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org, pc@manguebit.org, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
-	bharathsm@microsoft.com, shuah@kernel.org, miklos@szeredi.hu, 
-	hansg@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: FAILED: Patch "smb: client: let smbd_post_send_negotiate_req()
+ use smbd_post_send()" failed to apply to 5.10-stable tree
+To: Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org
+Cc: Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
+ Long Li <longli@microsoft.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ Steve French <stfrench@microsoft.com>
+References: <20260301020428.1732937-1-sashal@kernel.org>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <20260301020428.1732937-1-sashal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Mar 1, 2026 at 9:17=E2=80=AFPM Jeff Layton <jlayton@kernel.org> wro=
-te:
->
-> On Sun, 2026-03-01 at 21:15 +0600, Dorjoy Chowdhury wrote:
-> > > >
-> > > > I only added a kselftest for the new flag in
-> > > > tools/testing/selftests/openat2/openat2_test.c in my second commit =
-in
-> > > > this patch series. Where are the fstests that I should add tests? I
-> > > > think you added the wrong URL above, probably a typo.
-> > > >
-> > > >
-> > >
-> > > I did indeed, sorry. They're here:
-> > >
-> > > https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git
-> > >
-> >
-> > Thanks! This is a separate git repository, so I guess for both
-> > manpages and fstests I need to submit separate patch series for
-> > O_REGULAR. Do I need to wait first for this patch series to be merged?
-> > How does it work?
-> >
-> >
->
-> No, you can submit them in parallel, but they probably won't get merged
-> until the kernel patches go in.
->
+Hi Sacha,
 
-Alright. I can look into submitting patches in parallel. Thanks for
-all the info!
+> The patch below does not apply to the 5.10-stable tree.
+...
+> Cc: <stable@vger.kernel.org> # 6.18.x
 
-Regards,
-Dorjoy
+I'm wondering why this was even tried at all,
+as it was marked down to 6.18 only...
+
+Or is that tag not what I think it is for?
+
+Thanks!
+metze
+
