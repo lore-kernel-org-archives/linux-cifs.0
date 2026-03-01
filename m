@@ -1,63 +1,63 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8D91A5B9E
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Mar 2026 02:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D776926ED59
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Mar 2026 02:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772332901; cv=none; b=FKMCUThx5vuFdLjPyebL+6Y5bdqpHfugv1mQUXlY3+W1NfGYUmpAM0gqmgxuu9KDGb9rTe4in7URSTZyx1TJ0Oi7JGfPePA6MEm89zA6Or5kh51Wdz2lu3co9Ht0PYLcokFQkVY8tELu6IYzXyszPzipdFqSTzjPxQs0rqLIkaw=
+	t=1772333001; cv=none; b=BoDguhBIUIJeEGApl+En2Luh9OBGnIU34zWbQNIpIHU4oz/5q83JDZG6FaEn0DQQgp+b+uxy/ZAOaZKjGpJH38nre2qKvx2jtRT4nrzOerlml3u6/ThEktgjiAhuUxjzEcXOSeeIVoKB18hIQ4LYCLzSLyVV8G3gwSOKPKW4RM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772332901; c=relaxed/simple;
-	bh=anpL46cBIm6UrMAbUnBQkqKmbT5nOqCfjQPsoRvAfHI=;
+	s=arc-20240116; t=1772333001; c=relaxed/simple;
+	bh=StiYaJg5TnIgR97jqI7sw8c91dqPU9OEJIf6O1a7rcc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UAIG0NhrQez1YjfFoXpu6rj2ZthaaVNz81Yot6AomGHTk34CpI9KulIi8WxwTqjujqL9FOyFMqWDtmzkaTKB6Cc2N7d+trMrDAIrMznA4v3z4lgRk/EnrQK7KlH5c8CPg7wlODGIS6A7tkuVrqCKEPta2Y8P76wxYwLcD2yDzho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gqux1boc; arc=none smtp.client-ip=209.85.210.179
+	 MIME-Version; b=D23vrBJe0Qr7ZvYTZxux4TIa12PDbXHOrM2RwmBqZRPb9Kda1/7XaKr3Mu6V56k+OuuwwW6+GrM63mA9zT4faswPK9+KOFtqHS8AeDjEtZY7mgaCxUSfQ2wVPTCU+lLhMdGKgFO4jKd9YEpW6fvsDujBUvZRrnRT8BXjOrdvBew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fk+/fKfa; arc=none smtp.client-ip=209.85.215.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gqux1boc"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-827270d50d4so3458262b3a.3
-        for <linux-cifs@vger.kernel.org>; Sat, 28 Feb 2026 18:41:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fk+/fKfa"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-c70fb6aa323so1092443a12.3
+        for <linux-cifs@vger.kernel.org>; Sat, 28 Feb 2026 18:43:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772332899; x=1772937699; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1772333000; x=1772937800; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rtIGa5DeHX6GKNql8ZP8pFgIuTIayoQ+uGd3ozZ2QhM=;
-        b=gqux1boc96rstQk7s34oWXn0IjVf16z5kS0aUBkWyv9JgXsEHKBfS18m4wrjq+qhm7
-         VpZw1H2mLpx23eLeTf5WpWTncXiy/fx9sjj/sswCHRAsQu03na/1gmc7GtJDxeoNHDeC
-         JYbT6+XUfOXpkKMXqmKJ5/ZUvY08TxxpmMXDk0v2ZBBb2QJgVvgePKl8+eTN5oQ+zzfz
-         XTM2EPWpHGTeM+2ndnpYYYrwxYFvfDherafe0U9ndRZ2ewhzO1D2gtVxPDXJyBctw8xo
-         TK0S97XwQtgwqopFPygYGO/CRHQ5az9DlsEQSKD5/j1LVtI94v9GMxiXg0SsV3+Wk904
-         Gr1A==
+        bh=k/4+K7t1AmwyZhD8tmPo2E9QsgNK7fdWts0ll2jiHOI=;
+        b=fk+/fKfadFRQ7MYgVDN1VuVfl4regnAJCFFnKsnVI6r492dj1JHXFRU4eg4nF1DnfX
+         Yejzn8vJxjB9ZRgtAQM6GbRb0H5XgmWZk7XhDfs2CEUFjNExW2nQeOnOdG95VvIA92UL
+         mbfZDSpSfP+g/sXHSgCK6xRxdgYXcUmT9fc6kJv9vwn/IsqP2GNTyIhsBw0/fSXiF4fz
+         P17VaME0dRXVtQeQIRiama8JI8O+jWqqxq8GGRFKr/81fgM7D+mS/TCjXyDPJDTUNVdN
+         vAEwp+EeCbW1EGte+BnFhO6V09fE+E9mOqsN4noP8ILIRhWi4zBKgsb1EwThyvmWjzMS
+         MMiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772332899; x=1772937699;
+        d=1e100.net; s=20230601; t=1772333000; x=1772937800;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=rtIGa5DeHX6GKNql8ZP8pFgIuTIayoQ+uGd3ozZ2QhM=;
-        b=gKo06ENtksUVZKGyNVP0sZ/kUD//yHuOm6vMMNi6tDp1QgVmM7qnTJkeSHbtWYdlTR
-         ZOtQ1XI1y/dFd+hRRgxZGOURumT0YNNfmbkool/wHkeRy5vOHpwfV/K1djVpE9sjz8Iq
-         8fXIGYwqM+hUThjyViqLX4nE55vRjEK8Nj6jPDvxo67GsAtPJ/a2a3dpRE7s5dCHQcbv
-         57CU0r7irPsuKcSjLMu+PAOFV188x/OOB+AxMhDFyeK+azXffLpkpuhvqQ0sSSoKbO8m
-         4x2sax35WVrsGb8Ri8mLB2O/PX73uYMKOdmAbPexMfiPpJeEdxazLBHW7Qxnt78Ag+5w
-         8WrA==
-X-Forwarded-Encrypted: i=1; AJvYcCX9NVZX6xuzpRmMuuljr73PSHBOx+XCioT2sMPQfxC408DbnlkgIJX/2r867W92RTBOOpncAwGGAC23@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCBEL4CEv2FAwpMmqadjw2hyoNFemIWVo0nhhnYyWJZ7Jht6as
-	DUgfJEA9qw7QsD9iWNFiMncQa5sNV8hld8oK0In/njXJREFjjuFFqFTG
-X-Gm-Gg: ATEYQzzTPmimz5ZRXidTBkRdPczkCEuu/gGqJs4REV+zuOoZAgCE7CkhEie61fSZ/RG
-	LZSJGuqzpbF+vP+u6qDbt8B/c6WNrDbx6HwKVsZ2ajAzPW9Ec2V1UtDa/B4A7yZIkzfHMpHP9Dj
-	19GoXH8tD4QmJ6EPfBgAgUZFDTgDiFUrlVq3azrFfikLqYDyCHoIqDwc62wM+ga85TXRR9bnCUS
-	vngQdRC0Y+twurGp0frQy/8uIWe33kV698lFILnXeEGCUUw3JaWW9MEueJV1LNdpmw9vO0gg/Dn
-	bcglqAZeWPQFakcOSWDLDvL0pbe+sN3vXtQ07wJf2lbnG3Hn4YumxfgUZzEdKBLPHGHfaJHRsxs
-	TmhBtO64yJKXHVNwVCUeMoUC97uiCBvDuYzA29JRzuRwq7ZsbRq1bJpqfvpUvobCg9DI4LJsIHp
-	lx6zj98uzV4PNpOxuJFUthEmhLC6bsHilHNY5LcYLDbIBqSz0sv9WMgIg=
-X-Received: by 2002:a05:6a20:a127:b0:394:f9f3:588e with SMTP id adf61e73a8af0-395c3ae862bmr8668720637.43.1772332899049;
-        Sat, 28 Feb 2026 18:41:39 -0800 (PST)
+        bh=k/4+K7t1AmwyZhD8tmPo2E9QsgNK7fdWts0ll2jiHOI=;
+        b=SO8e5gVjNZ66Izw7RKB+qX0v5Np0IwpauBcswrBKJN59czQHw6wAcdDypSPmwMfI0W
+         DRs5SLf67rIyawOpF+x/f3RXILd6oxHASWYZJ/A0riJQmsJ4jkqqItJQyxNOVp0pG+PZ
+         /Ds8cZEoUnk5pQeWSW+R4/Xv3Nk8gyciRiNhAz4rTX7Lj2IAD9Eer8tQv8SNWHJF7ATT
+         1YgD/oCorVHeSU1EWXo3ZImUtgjUwyoB+NtjbvlZCbf6yMdggxJW2J4IAfCuMo3+L6Z9
+         h21sz3S0D78L6PFo5lxKQAcdLPeTcCIpQ3C7+lSlewJnfuAhezKayjD289qMjeXh+yaY
+         i+9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUCkNi0OEwR6fhca57Loe5z6AtEFUr/cU0Jnl6dfjy9VMS3JZGwbgEn3dRBw3Y2kqKhNaKB7EOKt4my@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4eFAZNFcSEPHnXY5k5RaWW+NRK2h/ubg+1lF4LPLbVb80F2wn
+	5l4XkhlYHTLmQt6CwZM0xQdPT4wZXKM6did0WS7gKsARXQp7w5IV1/xc
+X-Gm-Gg: ATEYQzwUIm3YFSspI5mFWjOMaIrNexzo/dCSpOmBP8BZNODwFaseq36HB7lpl46bWKm
+	T9acqzcxmMadKsWnrmmqfBIW1EQmlr4/8R4DQ2gU+bcKOa4pXRHilBPSbLT3Z9RhE7OQohCcAZ9
+	PcHf8xf74NbCIL4zf4at7vl21DUQJ3ae1TR2HW4+4Obu7+IIwxYB/cGfKknD178jeiW56bvAe6g
+	Eoo3aN7KtOTHJBtq4iSuTKLMzROfEuq0S2D+17Oqx/gSCWwtafYtE3dJsWZ7pdC7Z0ia2T3iQPK
+	01KG2gqJJt8eYT1XQu8weV8y1RwEtu3Z6csXyxifP7o9V6OFHl3zE60lAVe+YH136PHsViOrg1q
+	1tMpQ+4G/ee//3ICBsDoPlXO8Qke97yCJH9drDaSah0EmTOPWg9ynqpZ103hcOqnx9XrepDT87k
+	kZMT/TabmAdkC49PfxSgWsVPidaRLxnOFnaink8Cf2l56vhWdyH0FnBAM=
+X-Received: by 2002:a05:6a00:b42:b0:81f:9c54:65df with SMTP id d2e1a72fcca58-8274da052f5mr6154918b3a.50.1772333000173;
+        Sat, 28 Feb 2026 18:43:20 -0800 (PST)
 Received: from localhost.localdomain ([222.109.75.221])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359037af175sm11857110a91.13.2026.02.28.18.41.37
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82739d55216sm9299322b3a.11.2026.02.28.18.43.18
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 28 Feb 2026 18:41:38 -0800 (PST)
+        Sat, 28 Feb 2026 18:43:19 -0800 (PST)
 From: Yuchan Nam <entropy1110@gmail.com>
 To: stable@vger.kernel.org
 Cc: sashal@kernel.org,
@@ -66,12 +66,12 @@ Cc: sashal@kernel.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	Yuchan Nam <entropy1110@gmail.com>
-Subject: [PATCH 6.12.y] cifs: some missing initializations on replay
-Date: Sun,  1 Mar 2026 11:41:31 +0900
-Message-ID: <20260301024131.79122-1-entropy1110@gmail.com>
+Subject: [PATCH 6.6.y] cifs: some missing initializations on replay
+Date: Sun,  1 Mar 2026 11:43:08 +0900
+Message-ID: <20260301024308.80078-1-entropy1110@gmail.com>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260301012846.1686559-1-sashal@kernel.org>
-References: <20260301012846.1686559-1-sashal@kernel.org>
+In-Reply-To: <20260301013911.1700044-1-sashal@kernel.org>
+References: <20260301013911.1700044-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -105,10 +105,10 @@ Signed-off-by: Yuchan Nam <entropy1110@gmail.com>
  2 files changed, 3 insertions(+)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 4e7e6ad..48d66a9 100644
+index 138b3ed..4239b68 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -1190,6 +1190,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+@@ -1147,6 +1147,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
  
  replay_again:
  	/* reinitialize for possible replay */
@@ -116,7 +116,7 @@ index 4e7e6ad..48d66a9 100644
  	flags = CIFS_CP_CREATE_CLOSE_OP;
  	oplock = SMB2_OPLOCK_LEVEL_NONE;
  	server = cifs_pick_channel(ses);
-@@ -1588,6 +1589,7 @@ smb2_ioctl_query_info(const unsigned int xid,
+@@ -1545,6 +1546,7 @@ smb2_ioctl_query_info(const unsigned int xid,
  
  replay_again:
  	/* reinitialize for possible replay */
@@ -125,10 +125,10 @@ index 4e7e6ad..48d66a9 100644
  	oplock = SMB2_OPLOCK_LEVEL_NONE;
  	server = cifs_pick_channel(ses);
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index b0ff9f7..9310dd9 100644
+index a8890ae..595f043 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -2856,6 +2856,7 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
+@@ -2850,6 +2850,7 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
  
  replay_again:
  	/* reinitialize for possible replay */
