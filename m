@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4716383C75
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Mar 2026 08:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C39B36DA1D
+	for <linux-cifs@vger.kernel.org>; Tue,  3 Mar 2026 08:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772526828; cv=none; b=Jj9aXzGTP2GvqTWizxmUUHb0sIOf8B7lfNLoJzr4fv7NY/uPtvqJXLnzhM9tqUtD46lwKoXYJ7mWsybN/A4/saaJrJnnpkOJVySmDarpHz47x7kJgMEdT5Eggj46fe9O6FxAlEDGNPsERjwSnJS5GkeMMZ9gArJLIjVAvh3mzss=
+	t=1772526840; cv=none; b=UvZllpolWqRueNaKo726ekFqPFXZP9+fRd0oRo0BM9EQ39fXv9UxxaPvzAGL2x/NCSO1lzMHDNEg2W5GJh/1E6gfw1wdBEW39mNkQ4eDKx2dk6QEaKX08FkrBZ/3Tfecpbsl1867aUiuQFjMR+smzaPkBiqqNTt/G5WiTYrV9jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772526828; c=relaxed/simple;
-	bh=7QntyN5kOXIJGpyZyT1tgNWgl6fmIxFLNL1UJzyR4DU=;
+	s=arc-20240116; t=1772526840; c=relaxed/simple;
+	bh=ZXBhN3fvM6cgBMN2UiwYKLCLU+IWWPTUpcXxsrjaxDE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aPpgBPNCobkyzQZe8dJT4i5VPZWLYkY++dA6eyb9gHpq5bbRPrZesHkcdk/OWbaEPnW270L3J5HGCUllYXyrF3LXA+R8sxKQFZBt8+0XQ7FeICctOlvEE/NRr2SGBXQb/6UUofh/HjB+f88MnHfgHY5i02kxRMddIAlu4Aok/XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZEb2vOrq; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=S6Bi/pTlMEwr9zzD3AZP8ViEYDv50zaNPmwWtxsU6ufeBYZ6PHoeQ4I2eO/ks2s9OryqmKk89zVF2ecxj4sg84UOcgGXBZjr0CBHrYKx2Qk72w42rbRpK2Jis3xZFANgpKFN0RktGIsTftJ9Ty9qAaEoluLY5q6KNIagrExylEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ORKIPtam; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZEb2vOrq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ORKIPtam"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772526826;
+	s=mimecast20190719; t=1772526838;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=aiV9Fl8WMW9sULzquq+EHX8jujpodN2k8hPeB80HJdY=;
-	b=ZEb2vOrqf9+ny0y+pcIFGswI6LWEEqkBoQy4/nFiU4UsOiIYp1sD2TMdn4iAJwnkWrLAWN
-	W0R/A8uI5kcnMYLeySUzujdLJ1glvbN9C7sFLWD/6HEFu6xlaZtFz1dL7kTYnCEwy7ZdQT
-	z7XhULtdg3KidMcyIoFOWb2ioXuy87Q=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=Q+n3C6EGPxvSt3Rgl6vkaTvXwcCH/3QpnO5pBFLGRLc=;
+	b=ORKIPtama3NXeDcDF4HtumGfG2ImhKfzdKPbjtgXcOYbWot1N0qMsgkCF1grUQ7cmIzUau
+	sFsOKbAuH1P9MILsZiA1YStyWe2ONDnuYviKrdKHVGH4YYSRmNXaIFPRDyV44FnfZ9CRDx
+	jDxbIv49GZFuFwAsTMQZ8dmVyO2b93Y=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-336-2B1GEzxwOJykol7IX0f9Ag-1; Tue,
- 03 Mar 2026 03:33:42 -0500
-X-MC-Unique: 2B1GEzxwOJykol7IX0f9Ag-1
-X-Mimecast-MFC-AGG-ID: 2B1GEzxwOJykol7IX0f9Ag_1772526819
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-530-wFlWTGnANrmdJp4L7vXSTA-1; Tue,
+ 03 Mar 2026 03:33:55 -0500
+X-MC-Unique: wFlWTGnANrmdJp4L7vXSTA-1
+X-Mimecast-MFC-AGG-ID: wFlWTGnANrmdJp4L7vXSTA_1772526832
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 74C1C18004BB;
-	Tue,  3 Mar 2026 08:33:38 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4FF671956096;
+	Tue,  3 Mar 2026 08:33:51 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.224.134])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D4D2319560A2;
-	Tue,  3 Mar 2026 08:33:27 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5CC161800349;
+	Tue,  3 Mar 2026 08:33:41 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: lucien.xin@gmail.com
 Cc: hepengtao@xiaomi.com,
@@ -79,11 +79,11 @@ Cc: hepengtao@xiaomi.com,
 	smfrench@gmail.com,
 	chuck.lever@oracle.com,
 	daniel@haxx.se
-Subject: Re: [net-next,v10,13/15] quic: add timer management
-Date: Tue,  3 Mar 2026 09:33:24 +0100
-Message-ID: <20260303083324.35531-1-pabeni@redhat.com>
-In-Reply-To: <bffaab8d4727991c8dd46c8b57a08507545a25a4.1771986861.git.lucien.xin@gmail.com>
-References: <bffaab8d4727991c8dd46c8b57a08507545a25a4.1771986861.git.lucien.xin@gmail.com>
+Subject: Re: [net-next,v10,14/15] quic: add packet builder base
+Date: Tue,  3 Mar 2026 09:33:38 +0100
+Message-ID: <20260303083338.35544-1-pabeni@redhat.com>
+In-Reply-To: <e49a24b97a25a9c25bd33411b8212978dd566bd3.1771986861.git.lucien.xin@gmail.com>
+References: <e49a24b97a25a9c25bd33411b8212978dd566bd3.1771986861.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -91,244 +91,122 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-quic: add timer management
+quic: add packet builder base
 
-This patch introduces 'quic_timer' to unify and manage the five main
-timers used in QUIC: loss detection, delayed ACK, path validation,
-PMTU probing, and pacing. These timers are critical for driving
-retransmissions, connection liveness, and flow control.
+This patch introduces 'quic_packet' to handle packing of QUIC packets on
+the transmit path, including frame packing, packet construction,
+encryption, bundling, and transmission logic.
 
 > diff --git a/net/quic/Makefile b/net/quic/Makefile
-> index 58bb18f7926d..2ccf01ad9e22 100644
+> index 2ccf01ad9e22..0f903f4a7ff1 100644
 > --- a/net/quic/Makefile
 > +++ b/net/quic/Makefile
-
-[ ... ]
-
-> diff --git a/net/quic/socket.c b/net/quic/socket.c
-> index 74e3e3939c61..93a7abefc226 100644
-> --- a/net/quic/socket.c
-> +++ b/net/quic/socket.c
-
-[ ... ]
-
-> diff --git a/net/quic/socket.h b/net/quic/socket.h
-> index d7811391cc8b..c5654fdc06b5 100644
-> --- a/net/quic/socket.h
-> +++ b/net/quic/socket.h
-
-[ ... ]
-
-> diff --git a/net/quic/timer.c b/net/quic/timer.c
+> @@ -6,4 +6,4 @@
+>  obj-$(CONFIG_IP_QUIC) += quic.o
+>
+>  quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o \
+> -	  cong.o pnspace.o crypto.o timer.o
+> +	  cong.o pnspace.o crypto.o timer.o packet.o
+> diff --git a/net/quic/packet.c b/net/quic/packet.c
 > new file mode 100644
-> index 000000000000..6f957385a341
+> index 000000000000..a56edc745bb1
 > --- /dev/null
-> +++ b/net/quic/timer.c
-> @@ -0,0 +1,196 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/* QUIC kernel implementation
-> + * (C) Copyright Red Hat Corp. 2023
-> + *
-> + * This file is part of the QUIC kernel implementation
-> + *
-> + * Initialization/cleanup for QUIC protocol support.
-> + *
-> + * Written or modified by:
-> + *    Xin Long <lucien.xin@gmail.com>
+> +++ b/net/quic/packet.c
+
+[ ... ]
+
+> +/* Perform routing for the QUIC packet on the specified path, update header length and MSS
+> + * accordingly, reset path and start PMTU timer.
 > + */
+> +int quic_packet_route(struct sock *sk)
+> +{
+> +	struct quic_path_group *paths = quic_paths(sk);
+> +	struct quic_packet *packet = quic_packet(sk);
+> +	union quic_addr *sa, *da;
+> +	u32 pmtu;
+> +	int err;
 > +
-> +#include "socket.h"
+> +	da = quic_path_daddr(paths, packet->path);
+> +	sa = quic_path_saddr(paths, packet->path);
+> +	err = quic_flow_route(sk, da, sa, &paths->fl);
+> +	if (err)
+> +		return err;
+> +
+> +	packet->hlen = quic_encap_len(da);
+> +	pmtu = min_t(u32, dst_mtu(__sk_dst_get(sk)), QUIC_PATH_MAX_PMTU);
+> +	quic_packet_mss_update(sk, pmtu - packet->hlen);
+> +
+> +	quic_path_pl_reset(paths);
+> +	quic_timer_reset(sk, QUIC_TIMER_PMTU, paths->plpmtud_interval);
+> +	return 0;
+> +}
+> +
+> +/* Configure the QUIC packet header and routing based on encryption level and path. */
+> +int quic_packet_config(struct sock *sk, u8 level, u8 path)
+> +{
 
 [ ... ]
 
-> +static void quic_timer_sack_timeout(struct timer_list *t)
-> +{
-> +	struct quic_sock *qs = container_of(t, struct quic_sock, timers[QUIC_TIMER_SACK].t);
-> +	struct sock *sk = &qs->inet.sk;
 > +
-> +	bh_lock_sock(sk);
-> +	if (sock_owned_by_user(sk)) {
-> +		if (!test_and_set_bit(QUIC_SACK_DEFERRED, &sk->sk_tsq_flags))
-> +			sock_hold(sk);
-> +		goto out;
-> +	}
-> +
-> +	quic_timer_sack_handler(sk);
-> +out:
-> +	bh_unlock_sock(sk);
-> +	sock_put(sk);
+> +	/* Perform routing and MSS update for the configured packet. */
+> +	if (quic_packet_route(sk) < 0)
+> +		return -1;
+> +	return 0;
 > +}
 
-[ ... ]
+Should quic_packet_config() propagate the error code from
+quic_packet_route() instead of returning -1?
 
-> +static void quic_timer_loss_timeout(struct timer_list *t)
-> +{
-> +	struct quic_sock *qs = container_of(t, struct quic_sock, timers[QUIC_TIMER_LOSS].t);
-> +	struct sock *sk = &qs->inet.sk;
-> +
-> +	bh_lock_sock(sk);
-> +	if (sock_owned_by_user(sk)) {
-> +		if (!test_and_set_bit(QUIC_LOSS_DEFERRED, &sk->sk_tsq_flags))
-> +			sock_hold(sk);
-> +		goto out;
-> +	}
-> +
-> +	quic_timer_loss_handler(sk);
-> +out:
-> +	bh_unlock_sock(sk);
-> +	sock_put(sk);
-> +}
+The function quic_packet_route() returns proper negative errno values
+(via quic_flow_route()), but quic_packet_config() replaces any error
+with -1 (which is -EPERM). This could be misleading when diagnosing
+routing failures.
 
-[ ... ]
-
-> +static void quic_timer_path_timeout(struct timer_list *t)
-> +{
-> +	struct quic_sock *qs = container_of(t, struct quic_sock, timers[QUIC_TIMER_PATH].t);
-> +	struct sock *sk = &qs->inet.sk;
-> +
-> +	bh_lock_sock(sk);
-> +	if (sock_owned_by_user(sk)) {
-> +		if (!test_and_set_bit(QUIC_PATH_DEFERRED, &sk->sk_tsq_flags))
-> +			sock_hold(sk);
-> +		goto out;
-> +	}
-> +
-> +	quic_timer_path_handler(sk);
-> +out:
-> +	bh_unlock_sock(sk);
-> +	sock_put(sk);
-> +}
-
-[ ... ]
-
-> +static void quic_timer_pmtu_timeout(struct timer_list *t)
-> +{
-> +	struct quic_sock *qs = container_of(t, struct quic_sock, timers[QUIC_TIMER_PMTU].t);
-> +	struct sock *sk = &qs->inet.sk;
-> +
-> +	bh_lock_sock(sk);
-> +	if (sock_owned_by_user(sk)) {
-> +		if (!test_and_set_bit(QUIC_PMTU_DEFERRED, &sk->sk_tsq_flags))
-> +			sock_hold(sk);
-> +		goto out;
-> +	}
-> +
-> +	quic_timer_pmtu_handler(sk);
-> +out:
-> +	bh_unlock_sock(sk);
-> +	sock_put(sk);
-> +}
-
-This isn't a bug, but the four timer_list-based timeout callbacks
-(quic_timer_sack_timeout, quic_timer_loss_timeout, quic_timer_path_timeout,
-quic_timer_pmtu_timeout) are structurally identical.
-
-Each extracts the sock via container_of, takes bh_lock_sock, checks
-sock_owned_by_user to conditionally defer via test_and_set_bit/sock_hold,
-otherwise calls the handler directly, then bh_unlock_sock/sock_put. They
-differ only in the timer index constant, the deferred bit name, and the
-handler function.
-
-This pattern could be consolidated into a single parameterized timeout
-callback using a data table that maps timer type to deferred bit and handler
-function pointer, reducing around 60 lines of near-duplicate code to
-roughly 15 lines. The TCP subsystem uses a similar approach for some of its
-timer infrastructure.
-
-That said, this follows the existing per-timer-callback pattern used
-elsewhere in the kernel networking stack (for example, tcp_write_timer,
-tcp_delack_timer are also separate functions), so this is a minor style
-observation rather than a defect.
-
-> +void quic_timer_reset(struct sock *sk, u8 type, u64 timeout)
-> +{
-> +	struct timer_list *t = quic_timer(sk, type);
-> +
-> +	if (timeout && !mod_timer(t, jiffies + usecs_to_jiffies(timeout)))
-> +		sock_hold(sk);
-> +}
-
-Can this function handle QUIC_TIMER_PACE safely? It unconditionally casts
-the result of quic_timer() to 'struct timer_list *' and calls mod_timer().
-
-Looking at the timer API in this patch:
-
-Both quic_timer_start() and quic_timer_stop() have explicit QUIC_TIMER_PACE
-guards that dispatch to hrtimer APIs:
-
-quic_timer_start():
-	if (type == QUIC_TIMER_PACE) {
-		hr = quic_timer(sk, type);
-		if (!hrtimer_is_queued(hr)) {
-			hrtimer_start(hr, ns_to_ktime(timeout), ...);
-			sock_hold(sk);
-		}
-		return;
-	}
-
-quic_timer_stop():
-	if (type == QUIC_TIMER_PACE) {
-		if (hrtimer_try_to_cancel(quic_timer(sk, type)) == 1)
-			sock_put(sk);
-		return;
-	}
-
-However, quic_timer_reset() does not have a similar guard. If a future
-caller invokes quic_timer_reset(sk, QUIC_TIMER_PACE, timeout), mod_timer()
-will operate on memory that is actually a 'struct hrtimer', potentially
-causing memory corruption.
-
-Should quic_timer_reset() either add a QUIC_TIMER_PACE guard consistent with
-quic_timer_start()/quic_timer_stop(), or document that this function must
-only be used with timer_list-based timers?
-
-> +void quic_timer_start(struct sock *sk, u8 type, u64 timeout)
-> +{
-> +	struct timer_list *t;
-> +	struct hrtimer *hr;
-> +
-> +	if (type == QUIC_TIMER_PACE) {
-> +		hr = quic_timer(sk, type);
-> +
-> +		if (!hrtimer_is_queued(hr)) {
-> +			hrtimer_start(hr, ns_to_ktime(timeout), HRTIMER_MODE_ABS_PINNED_SOFT);
-> +			sock_hold(sk);
-> +		}
-> +		return;
-> +	}
-> +
-> +	t = quic_timer(sk, type);
-> +	if (timeout && !timer_pending(t)) {
-> +		if (!mod_timer(t, jiffies + usecs_to_jiffies(timeout)))
-> +			sock_hold(sk);
-> +	}
-> +}
-> +
-> +void quic_timer_stop(struct sock *sk, u8 type)
-> +{
-> +	if (type == QUIC_TIMER_PACE) {
-> +		if (hrtimer_try_to_cancel(quic_timer(sk, type)) == 1)
-> +			sock_put(sk);
-> +		return;
-> +	}
-> +	if (timer_delete(quic_timer(sk, type)))
-> +		sock_put(sk);
-> +}
-
-[ ... ]
-
-> diff --git a/net/quic/timer.h b/net/quic/timer.h
+> diff --git a/net/quic/packet.h b/net/quic/packet.h
 > new file mode 100644
-> index 000000000000..61b094325334
+> index 000000000000..8c23be386207
 > --- /dev/null
-> +++ b/net/quic/timer.h
+> +++ b/net/quic/packet.h
+
+[ ... ]
+
+> +static inline u8 quic_packet_taglen(struct quic_packet *packet)
+> +{
+> +	return packet->taglen[!!packet->level];
+> +}
+> +
+> +static inline void quic_packet_set_taglen(struct quic_packet *packet, u8 taglen)
+> +{
+> +	packet->taglen[0] = taglen;
+> +}
+> +
+> +static inline u32 quic_packet_mss(struct quic_packet *packet)
+> +{
+> +	return packet->mss[0] - packet->taglen[!!packet->level];
+> +}
+> +
+> +static inline u32 quic_packet_max_payload(struct quic_packet *packet)
+> +{
+> +	return packet->mss[0] - packet->overhead - packet->taglen[!!packet->level];
+> +}
+> +
+> +static inline u32 quic_packet_max_payload_dgram(struct quic_packet *packet)
+> +{
+> +	return packet->mss[1] - packet->overhead - packet->taglen[!!packet->level];
+> +}
+
+This isn't a bug, but quic_packet_mss(), quic_packet_max_payload(),
+and quic_packet_max_payload_dgram() all repeat the expression
+'packet->taglen[!!packet->level]'.
+
+Could these use quic_packet_taglen(packet) instead for consistency?
 
 [ ... ]
 
