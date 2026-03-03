@@ -1,65 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F128C1990A7;
-	Tue,  3 Mar 2026 05:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39911352FBA
+	for <linux-cifs@vger.kernel.org>; Tue,  3 Mar 2026 07:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772514335; cv=none; b=GLQhzQyfvDD4I7zKGl4hBEGhBBSzIOPgyw8rXI5oQTS7Dj+XTVvF+xfChta6D4yV9CvfFA360e/nDBphDLJyxo4inBkZO+KCHiTZrCpDbLVQ9zGPEynzfJvPUkwi5w+QICGk8lD9avIYK97oAlkhiqLKIgtpjIJekp+7nXSC/2k=
+	t=1772523156; cv=none; b=YTIXpwAek62H+U6lCvmNZP+R/66U1C1e0WoQRPC0loXH6qtNDSsyH39yR9taZ9R6/3rjnHFvBDa1yQksQhdpQGBvfvbrwIoFINhpt8cjK8F4+hsp24vf0VbSN7Yml6Ea/MZihMom56JJPJKFRr+tYFdY8zdn+4pQGCrr0xjr1nA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772514335; c=relaxed/simple;
-	bh=pVNsw8FbQdsCS9MidUuH13rClfK4hay55esSvGYmbc4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gv2fPYJ3e7/opRH9x7gpWY4Ncjhqh9PUEZIqgU7FI+GVIVwUmSXgYI0dkScv3C7uWMSRcqTfStYOQayQ1b7UpSpkEkvswOApebjOGjmpaujIZG/MO0INbdIFGKQXIs6tRTApLIt2yeQVaibODp+253Wti8vIYKC55ngjMmH6Sfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cIPi4zKk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772523156; c=relaxed/simple;
+	bh=QgDURLHMJq1X/7PHnFLEwgyQGcx4aHUQgDbnik7U/xI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lA7ck9B5335GrCeKGThS6zGGyK7Q9IQc1DUBhRxIN0B6UF7s+qQxD1INdWbly+BdTaFE6o9sEfcOAa8aKMypIB1+tsKAW25wYO0n9G0SfghEjDl90/iJDJ1aCC2FlMZiHKKyXZWdeJzfCDv9tdoZEajpGGhyJi9RB54cmwwpMUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=FeCmMhJR; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cIPi4zKk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 472A3C116C6;
-	Tue,  3 Mar 2026 05:05:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772514334;
-	bh=pVNsw8FbQdsCS9MidUuH13rClfK4hay55esSvGYmbc4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cIPi4zKkoJBDg1OdyRZOdiyXq7bRp5ch+rtA9HWR+50RVJ5n18yqsHmxF1YAVwUNH
-	 tvrHGg2ckLHHqhNWWNkIwIuIpjiEmHmp4if0geuAu59i+PF4Ajw3elu418oUub18+f
-	 eEvHJ9xaKmm2SdDudYX5fWXrBGqgJzk/73BqSP5vz2drAbz7zo7i4CZWnIbPudKOnY
-	 Cr6GaRkWMQ+zNzz/1joHauzswpojvFCxZZ7g5FwzxaX5+zkp+ZZn07k3ajwDhI502Z
-	 IyeRjwJlQdBRTlHGkC8T471eZf1Q6Quy96co1yFykKW3DTZWLrRWMPv+3m2i7Ytxb3
-	 lk0G3FB86xrJg==
-Date: Mon, 2 Mar 2026 21:04:39 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org, linux-crypto@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] smb: client: Compare MACs in constant time
-Message-ID: <20260303050439.GB5238@sol>
-References: <20260218042702.67907-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="FeCmMhJR"
+Message-ID: <87181afa-553a-475c-8f08-3c292ba30ffb@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1772523149;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lVPyLe/gw81ykSP1mGqm0Yu6IFSMQ37cIPuUS7wyQ3k=;
+	b=FeCmMhJRlr+fGwB9WHktQWZA9Df236TPgbYWhsFp6lXnhnl/oCT+a8558WCu+pcLwDcpEI
+	5057hp+Vd4A14vXIyyAHcBfFS72kfEgZCRQ2LglTGaLd/oigG+eDm5ye2OJH/S4a0XyLqi
+	eQoWj9xP5xTEcas/3eJywOarpT/Mb1xX/wspOkSxGc1GBA7YG7bZp9b/DrY4fib2SgGZ5F
+	Vi78fPyKxzXuAZIvLdot7miL1ggap8RW1XDXGV6qgVGV4pSprl0hkL4y+KfBsAt6r5pMkY
+	1zoip+rm2Qaedr87rwDTDTiznQjrbhRg7SvnDGNhKhmcb7mWoWw4zSqGz0wUpA==
+Date: Tue, 3 Mar 2026 15:31:36 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260218042702.67907-1-ebiggers@kernel.org>
+Subject: Re: [PATCH v4 5/5] smb: introduce struct file_posix_info
+To: ZhangGuoDong <zhang.guodong@linux.dev>,
+ Namjae Jeon <linkinjeon@kernel.org>
+Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org,
+ ZhangGuoDong <zhangguodong@kylinos.cn>,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260225041100.707468-1-zhang.guodong@linux.dev>
+ <20260225041100.707468-6-zhang.guodong@linux.dev>
+ <CAKYAXd8ieg2fvYOK0BwBG8bbT18d9Z2A43-XoC21a5DArwsJKw@mail.gmail.com>
+ <b257491a-e821-4b2a-8465-1aa1102d35b9@linux.dev>
+ <09cb6f53-e5e1-4b42-9b25-b28860fe2a9e@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <09cb6f53-e5e1-4b42-9b25-b28860fe2a9e@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Feb 17, 2026 at 08:27:02PM -0800, Eric Biggers wrote:
-> To prevent timing attacks, MAC comparisons need to be constant-time.
-> Replace the memcmp() with the correct function, crypto_memneq().
+How about merging the two flexible array members and naming it 
+`sids_and_name[]`?
+
+在 2026/3/3 11:00, ZhangGuoDong 写道:
+> And we cannot use `SidBuffer[32]` because the size of `SidBuffer[]` on 
+> the client side is not necessarily 32.
 > 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->  fs/smb/client/smb1encrypt.c   | 3 ++-
->  fs/smb/client/smb2transport.c | 4 +++-
->  2 files changed, 5 insertions(+), 2 deletions(-)
+> 在 2026/3/3 10:41, ZhangGuoDong 写道:
+>> Hi Namjae,
+>>
+>> C structure cannot have two flexible array members.
+>>
+>> If we make `Sids[]` a flexible array member, then there cannot be any 
+>> members after it. However, this structure still has `filenamelength` 
+>> and `filename[]` after it. And `filename[]` is also a flexible array 
+>> member.
+>>
+>> Do you have any suggestions for this?
+>>
+>> 在 2026/2/27 12:37, Namjae Jeon 写道:
+>>> You need to add Sids[] flex array here.
+>>>> +       // var sized owner SID
+>>>> +       // var sized group SID
+>>>> +       /* end of POSIX Create Context Response */
+>>>> +       // le32 filenamelength
+>>>> +       // u8 filename[]
+>>>> +} __packed;
+>>
+> 
 
-Any feedback on this?  Just to clarify, this is intended to be taken
-through the smb tree.
+-- 
+Thanks,
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 
-- Eric
