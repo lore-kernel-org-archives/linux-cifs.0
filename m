@@ -1,166 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0802431716B
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Mar 2026 08:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27F332B985
+	for <linux-cifs@vger.kernel.org>; Tue,  3 Mar 2026 08:59:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772526855; cv=none; b=Wgu4Le9FFkME6HAbmmkpd8xe1i4bB1ZPg5zwfRIDx0sPV9JqAZai6RTvc8dbZpeRi+Xu0DXPicqoc1KPZrqpwfvfz7L5tNMUbjuTfzpSC8KkMt/Dyhgc8sHzwv59H33FAM+VJ1a+LjMj2PmgGuVw0kniRbxIUJ6siN9cxyFrXro=
+	t=1772528392; cv=none; b=EwlyDFzR3XvEgdAMe5jps6xU1LKvg6qGsZfgj7zm1279ENraVzupfkCzPPlad8bAEXsIYTjuxFNZLwnHssHf6YJ77G4LGJuiRNuOUUAumPShV067HEbVF64OmvFG6uoajHzmKQYvxkoajRMQwwOGtg2kASpQYwrhdqAQ4TZntRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772526855; c=relaxed/simple;
-	bh=28/2SD0zKnxVxONz58kqvH8l9p8IW3PnbEu16NUlN4Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gC6Do9ND82DRWJPXkwSFtwtDRJbPDqcbd8dTtdME8TmVCVywonGbpsOz6OoFplRU2/VxZAsYiYvNlLaMrf8X9UIK20eWmmmM0R5GXaR5M44YpfgWFqCby/R7/M8MW3kDUsoKEiZbzd4B3xi3cxiwm3JNYpZ3eHLKxQzFSUL9Z9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KPvlmQyY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1772528392; c=relaxed/simple;
+	bh=wjv3xguKblJCxburJ5j7m3VdHascX0qjLQyVCJDFHIg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CeORe1rZy1d1QnIhHYFs7tbyQjm2roNKAJLm4LIjjgS5nr6AgKFOcM68ZtxS2MxkLPt4ClwTCLCJBpgevBSfHORKlpRaNRyiBJtMEi1yEFIZ+9+cSr/Kjwbi7PtWAAERm6xsOov4QZX6sn6w5R2JOeC9nOXNkJCdrF2UL27UA4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=WEbJpQzk; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KPvlmQyY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772526853;
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="WEbJpQzk"
+Message-ID: <634dbb0b-9a5d-4f3d-ab5f-f4dc75e3527e@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1772528386;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oGGteXDhadojqghSFLLImSNgVRBGSngpOjwddhC7BTg=;
-	b=KPvlmQyY+cezzjS0QNCMwuUPcw5X9mJ5wRzS0dE+KMQUHMcIvtlMMVipHi+JkmAD4aj/5C
-	ukxu6/pnj8MPa8LYA/8CRluHudRUzvPuvYK0ofU1OLP6EbMea6UWy9qPV4IvpA80IXMWf4
-	CuvJ9pa7wJaIadGmoDX7/s3HjhHiaDo=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-654-UHN8XmceNhG8w14WNhQxuw-1; Tue,
- 03 Mar 2026 03:34:08 -0500
-X-MC-Unique: UHN8XmceNhG8w14WNhQxuw-1
-X-Mimecast-MFC-AGG-ID: UHN8XmceNhG8w14WNhQxuw_1772526844
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 63C481956048;
-	Tue,  3 Mar 2026 08:34:04 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.134])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6964219560A2;
-	Tue,  3 Mar 2026 08:33:54 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: lucien.xin@gmail.com
-Cc: hepengtao@xiaomi.com,
-	kuba@kernel.org,
-	jlayton@kernel.org,
-	metze@samba.org,
-	davem@davemloft.net,
-	kernel-tls-handshake@lists.linux.dev,
-	horms@kernel.org,
-	hare@suse.de,
-	aahringo@redhat.com,
-	tfanelli@redhat.com,
-	mail@johnericson.me,
-	andrew.gospodarek@broadcom.com,
-	linkinjeon@kernel.org,
-	dhowells@redhat.com,
-	matttbe@kernel.org,
-	xiyou.wangcong@gmail.com,
-	dreibh@simula.no,
-	jbaron@akamai.com,
-	quic@lists.linux.dev,
-	pc@manguebit.com,
-	marc@fiuczynski.com,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	alibuda@linux.alibaba.com,
-	steved@redhat.com,
-	illiliti@protonmail.com,
-	tom@talpey.com,
-	marcelo.leitner@gmail.com,
-	sd@queasysnail.net,
-	linux-cifs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	mbuhl@openbsd.org,
-	smfrench@gmail.com,
-	chuck.lever@oracle.com,
-	daniel@haxx.se
-Subject: Re: [net-next,v10,15/15] quic: add packet parser base
-Date: Tue,  3 Mar 2026 09:33:51 +0100
-Message-ID: <20260303083351.35558-1-pabeni@redhat.com>
-In-Reply-To: <08a63705058aff77dd54fb388870f0bca6036c95.1771986861.git.lucien.xin@gmail.com>
-References: <08a63705058aff77dd54fb388870f0bca6036c95.1771986861.git.lucien.xin@gmail.com>
+	bh=7SNIc1ZtQEq7gv+25vilN/Q3chOWmnP5d+qDGBMla3k=;
+	b=WEbJpQzkUIBmm6NPiFco2hBgfUGzQ0ZuktIMUSwBCIdVfk9wPfVPbBpN4H5TpgHDEC3vup
+	TyLPECUxhvkTwD7PCze6tNSaSU4mYkngup77tjxf/wfaKxihSaAXXgj7ABZYNF2sJCJQAx
+	7gy3rY6MtSWn3k8PghOggTYLsQGsSua3uZ8/OuYdqja31toPlQIuwZQfMYKPpHKXBVR7Pf
+	RCujZV70G5vwgH4vepF6MXsvN04OIkG35zRknA3RButymGdgqTtqo2Ek2bSqxCeroZbmu+
+	ZAsz1fv5q1DdmXhznPjbXHGepd4q/Qt0thfLIdH4BHSx5/gpFPg94ABd45lk2w==
+Date: Tue, 3 Mar 2026 16:58:48 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH v4 5/5] smb: introduce struct file_posix_info
+To: ZhangGuoDong <zhang.guodong@linux.dev>,
+ Namjae Jeon <linkinjeon@kernel.org>, smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org, ZhangGuoDong <zhangguodong@kylinos.cn>,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260225041100.707468-1-zhang.guodong@linux.dev>
+ <20260225041100.707468-6-zhang.guodong@linux.dev>
+ <CAKYAXd8ieg2fvYOK0BwBG8bbT18d9Z2A43-XoC21a5DArwsJKw@mail.gmail.com>
+ <b257491a-e821-4b2a-8465-1aa1102d35b9@linux.dev>
+ <09cb6f53-e5e1-4b42-9b25-b28860fe2a9e@linux.dev>
+ <87181afa-553a-475c-8f08-3c292ba30ffb@chenxiaosong.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <87181afa-553a-475c-8f08-3c292ba30ffb@chenxiaosong.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Migadu-Flow: FLOW_OUT
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Hi Steve,
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-quic: add packet parser base
+In client-side, it seems there is a bug in the smb2_compound_op():
 
-This patch uses 'quic_packet' to handle packing of QUIC packets on the
-receive (RX) path. It introduces mechanisms to parse the ALPN from
-client Initial packets to determine the correct listener socket.
-Received packets are then routed and processed accordingly.
+   SMB2_query_info_init(..., sizeof(struct smb311_posix_qinfo *) + ...)
 
-> diff --git a/net/quic/packet.c b/net/quic/packet.c
-> index a56edc745bb1..a23ce99a6656 100644
-> --- a/net/quic/packet.c
-> +++ b/net/quic/packet.c
+We should calculate the size of `struct smb311_posix_qinfo`, not the 
+size of its pointer.
 
-[ ... ]
+Code refactoring is very meaningful as it can uncover some potential issues.
 
-> +/* Extract the Destination Connection ID (DCID) from a QUIC Long header packet. */
-> +int quic_packet_get_dcid(struct quic_conn_id *dcid, struct sk_buff *skb)
-> +{
-> +	u32 plen = skb->len;
-> +	u8 *p = skb->data;
-> +	u64 len;
-> +
-> +	if (plen < QUIC_HLEN + QUIC_VERSION_LEN)
-> +		return -EINVAL;
-> +	plen -= (QUIC_HLEN + QUIC_VERSION_LEN);
-> +	p += (QUIC_HLEN + QUIC_VERSION_LEN);
-> +
-> +	if (!quic_get_int(&p, &plen, &len, 1) ||
-> +	    len > plen || len > QUIC_CONN_ID_MAX_LEN)
-> +		return -EINVAL;
-> +	quic_conn_id_update(dcid, p, len);
-> +	return 0;
-> +}
+Thanks,
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 
-This parsing logic looks nearly identical to what's already in
-quic_packet_get_version_and_connid().  Both skip QUIC_HLEN +
-QUIC_VERSION_LEN, read the length byte, validate against
-QUIC_CONN_ID_MAX_LEN, and call quic_conn_id_update().
-
-Could quic_packet_get_dcid() call quic_packet_get_version_and_connid()
-with dummy parameters, or could both share a helper to extract just the
-DCID portion?
-
-> diff --git a/net/quic/path.c b/net/quic/path.c
-> index 9414c4f813c5..655f38af4107 100644
-> --- a/net/quic/path.c
-> +++ b/net/quic/path.c
-> @@ -17,6 +17,8 @@
->  #include "family.h"
->  #include "path.h"
->
-> +extern int quic_packet_rcv(struct sock *sk, struct sk_buff *skb, u8 err);
-
-Could this include packet.h instead? The canonical declaration already
-exists in packet.h (after this patch). Using 'extern' here creates a
-duplicate signature.
-
-If the signature in packet.h changes later, this extern could silently
-become stale depending on calling conventions. Since packet.h has no
-include directives and wouldn't create a circular dependency, including
-it would keep the declaration in sync.
-
-> +
->  static int quic_udp_rcv(struct sock *sk, struct sk_buff *skb)
->  {
->  	memset(skb->cb, 0, sizeof(skb->cb));
+在 2026/3/3 15:31, ChenXiaoSong 写道:
+> How about merging the two flexible array members and naming it 
+> `sids_and_name[]`?
+> 
+> 在 2026/3/3 11:00, ZhangGuoDong 写道:
+>> And we cannot use `SidBuffer[32]` because the size of `SidBuffer[]` on 
+>> the client side is not necessarily 32.
+>>
+>> 在 2026/3/3 10:41, ZhangGuoDong 写道:
+>>> Hi Namjae,
+>>>
+>>> C structure cannot have two flexible array members.
+>>>
+>>> If we make `Sids[]` a flexible array member, then there cannot be any 
+>>> members after it. However, this structure still has `filenamelength` 
+>>> and `filename[]` after it. And `filename[]` is also a flexible array 
+>>> member.
+>>>
+>>> Do you have any suggestions for this?
+>>>
+>>> 在 2026/2/27 12:37, Namjae Jeon 写道:
+>>>> You need to add Sids[] flex array here.
+>>>>> +       // var sized owner SID
+>>>>> +       // var sized group SID
+>>>>> +       /* end of POSIX Create Context Response */
+>>>>> +       // le32 filenamelength
+>>>>> +       // u8 filename[]
+>>>>> +} __packed;
+>>>
+>>
+> 
 
