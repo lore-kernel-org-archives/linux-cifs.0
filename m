@@ -1,408 +1,397 @@
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+Received: from sonic311-30.consmr.mail.ne1.yahoo.com (sonic311-30.consmr.mail.ne1.yahoo.com [66.163.188.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A150837F006
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Mar 2026 18:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772561050; cv=pass; b=PaXUOSu+cIEVi4IGY9Uhl2upYnQCuvl4hJKi46fv5IKbeLpRNT5fMlzwAkq4vRfA8hcEtiXGSVh6LSAcZPiRWOwNe4w2s0/sVVPNzgcEA6scDfcy28fNU1V7Z7jalrSwBO6uM/WQBCKAapHlxioflcEPcHeM4ow+uSiiDTZ6tCc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772561050; c=relaxed/simple;
-	bh=A/Q2imQMMeqvsZ5UbZA9rEaEvY2B5iQcoFyt0Je0rcM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VeYoocsJO1u0vJjuDLOP6cWSVngVRLzY6KGu3EUNXekTXoRzHIC6hZBi3yJUl9lxu63EbluQVjYSQZdjVD9vWz9Qt0445ti04PY2XTlpuimOxSngT7fnaAhQFtaLB0pl1kT292eieHbQmZUHBf+yBYbfHgQcBD6MxcBOxAyiq8A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hMDSGf1o; arc=pass smtp.client-ip=74.125.224.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1612381AE7
+	for <linux-cifs@vger.kernel.org>; Tue,  3 Mar 2026 18:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.188.211
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772561202; cv=none; b=YU37da6vUZeBJE5Wx7OJA1eqiAEC0gX75RU6ewPOYSpGlYk8UdOwqxonm7w0En3MCDfHlWgCIn60ZdrHjMoMraBVr0ti3pBBuFOXF7x9kyXZiOyazbNYZg4J/1Vrt4Ny94vN6+zMu8Ld+ObxJHosB4jzNLr7iP+tHcEsEbE2HRI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772561202; c=relaxed/simple;
+	bh=wOL9rqR+KJuqvZSJgLCLuEPBH7mWkyi2JrXmHl9yjAs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pRgZfhNrMFGHSrW9awVMNxJrAhjpdlAJhGM6Gwj0YHmy+84BDuQgse1SPu2US4M2s5KLPRYb/GFTaquk6c81jrVZXQoCQdMylM5i/TnmIKgTorQPgRFztf1+nm1Klb2zu8dB32uPDH3v22Ub9FDoUNhOYeuMXOAkASH6Z6yBU/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=dJygi75l; arc=none smtp.client-ip=66.163.188.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hMDSGf1o"
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-64ad019bbd4so5345458d50.0
-        for <linux-cifs@vger.kernel.org>; Tue, 03 Mar 2026 10:04:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772561047; cv=none;
-        d=google.com; s=arc-20240605;
-        b=anKtK9ACErBzAb/LKQJfDild2Am8ncs12Ef7IudMlyTwbSu8kklYENYEUNMz2T8haE
-         OKg/AeoQ8yKcRc+pMgUTbqB4QWk98fR18os/VBaJncPG+bC1oXOT/i6xRlyQ9mlWMRrD
-         +M8YdgQW3tM/ViG8MwLX/RDm+3VsaU9FwMM5Lo7X+n9Cmnskn+GG66Ugrd+8jvm1ziLA
-         oRjkDbC37Q89hAdAy9w0o7IQwkZ5kFQid/ZZzITpwoj2n52QV4zo1YrI6v/Jr6pY2huM
-         FIbTR9o0SIcih5Nwax64ZRCOXeK3wHH29Rrt6e/e5JUsrDOj6Qs0I6fr86tnGzJ015y0
-         OJyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=faPW68IFZp86hffteR0tsFCN3/WHEpIKytHbzzwR5pM=;
-        fh=8oU3LP3I60gV6BqGePK97zvPwzGtzJNv2Ol/ZxfdUfs=;
-        b=g9LSUaGlMuW22tfXAony76JlRV7Ssimlq5Nw6uCxZ5MhiLVDfd0h24cMz7usabPk2l
-         9Ay62QEMMvM2OfIX/7BtGDhZaPuDN6YgkNx6CFUpnHePuSE1o6ZaqoOF1LpdE3gqZXO6
-         ew6y7b66QrpZj2uA7Y7CidOFU7BCDtfQd9aeT37IMsEcwufN/MDSj+/WaeilUIgvsOT1
-         k5YZ+0DpggKb/czw932nNtrWpP0DYvOdYipzdTPb8fR1FUttaY17U6DvW+Yi0ZWoRBJ7
-         11ktO4e8k/u5ij7uqabSJ2B5uiujbvij/7MQZ1jRXY7M4Mvj9cxQzKCEOqUZ1ZKmXsBU
-         t+HQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772561047; x=1773165847; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=faPW68IFZp86hffteR0tsFCN3/WHEpIKytHbzzwR5pM=;
-        b=hMDSGf1oEDmR4KUY4rHYQFICSKHdoiZSu/c8yIlu2M+4DwCPQqM9hxS+/z0dIbUOzS
-         WA5Bn/XAqBCI+sxToiitEJ9lLZ8YXx/GLa9mvwR1+3cLOj47jgMNhu4d74dfmF1P+3LZ
-         tYLcecoE1DiyzeCXTDijGgQjssRWZIBu2MwKsthj9wFHku4w8bcIqvB7NtYnNRlauPCR
-         SP3mi4TVLY+MIyP7i6u8MXQluu5n2COapD/1qfJyPYdzEAgITmFfUjXO9RHg4xZp+F/I
-         21JkPw1hHG+Zl57nHeKWHGqpIYp8yi8Bgzwyo5h5BOvXSZzii3uf2VwjIcnc7bnsMZ7z
-         iHKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772561047; x=1773165847;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=faPW68IFZp86hffteR0tsFCN3/WHEpIKytHbzzwR5pM=;
-        b=fQwMiFmQundaACotyH29FGi/rsXgH3T5qTm7RH7ptE8mDfPggI9vv0yxvrg26piZjg
-         q4I2piDtGYvEuyns06vS8A6snNElam8SV+eNyTrNDUPjJU4tCNpEPnu4enfkytaG0hWF
-         Hrw2bwXrmdS3SHLHbXvUG/A4U7N2aZ4KpWiboaijCySJ0tJtYTJQ8tNNqxW8Hn3+oVFz
-         pF1ug7xk2SZolUj1mP06yeHwrX08pqsGD2nVyY8RsLnn+PrmqxJt0WABGdVA1einATqs
-         7/ARqdD3jcBjaT14o4bPfCXqBmBWByDmqn8HJ3EN54qj2vV5YINa3F2xUrMHBz0v+cmz
-         X/eg==
-X-Forwarded-Encrypted: i=1; AJvYcCVvdYO+Qp/jCM/vHf9Ld65XpV7Hjx9K0vF55D7o9hkWPrlPYme/nqEbbUMAbIjsIqA6jbQ7AevlEmPV@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQkxDRDSDKEMUo9es8jA50dMJQP1EsBrBaEvcHXpISS8KoTzIP
-	7Cy4NxXR8CCwVya7Q/7r2S1Qrb4ErP7kFY326TtCP73agp8exnaVLLf7tvN3PZLHKEb3grRu5lJ
-	HavOIwge0XHSdnI2uPl0YzGJtChbgZPQ=
-X-Gm-Gg: ATEYQzx+Smt57gnKKsOU/AztACOb1YQf33IL4sUUVQ22i2fcEjy5T8XkCNqGsnKPNp1
-	ydRUikLGyNpUUg5oJ/C88iDiEIhFeVN15Pn2Qdpx2sqF0tK2Si0oGuRn22wpCPPsyl7c4Iao55r
-	9KsYjEwLvNmICMrnL6v/SlPUWyvKdAHWO5UwO6YjbC/VPVygDh72Dav0a97izt09wUhL69MvXYZ
-	lznKPSD1NuPENS3aIOQhgJama8eC0abaHkNH3/8Pe1s4qU+tCXWXxSBJWHFqJsxxpo/jI635I/h
-	l0SRbe7eQL4zfdPw5PxqpFJYoIwItcBnDjNEpyg=
-X-Received: by 2002:a05:690e:1a5a:b0:64c:e7c4:3db5 with SMTP id
- 956f58d0204a3-64ce7c4415cmr3369793d50.35.1772561047385; Tue, 03 Mar 2026
- 10:04:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="dJygi75l"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1772561191; bh=KjlUdjsOzm6pJry5XKEK2Wx6SVd9EaVKNafYPkrR4Uc=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=dJygi75lVKA43mVnaQwlBdfPAVdSis4jB5h3GrfRWjcs/eV+bjGnEl73Q1CkoLMfSAxuUxYWAgMHD/+ZMhEF8C/DvNjwgvm+IYU3QS+8vsQGMOvByOqQP7MjwgXU9nHznZlARxHB6CWUkkDiTVAq6T0ThlEqpJGZwSgJa+9GQo48tNjzsUCT7hSn96E3O6ItiyT22PKmVkcFCjTP0t6pfAE65VAnUDtzubQ0UAqSwQ6gk353h/MTAU/J5NqOQCiBWAIVfKkaZNzyYor20+PsN0xDvEqLDrQ9ywG7X0zbI1ztYyl5GKSDHETWf2rcE9rUFeZvn56NFy0s1fVLbgQkvw==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1772561191; bh=uiQpYOQ/+Be/Kyo9JbtDjh7SRSLZbCKMFxcEEhPL+gi=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=rmImhLtSV9rlGseo/NbhlSTfiqxJpx4YkQXN/i+eSzm20eNReczfpaCwUQz7V4t386mMOu4OQeLSiXRvZiFw09ltUikZPDvvXvWkO+k2MMxREQzzk2+CWKN4qX2sndFqFXR+nG0cXUKMCm8b10yV0r2BPnBsXwlxMabcoBt7qjs5TpMBd0P/81eokKunTjlCxVrUhFh86xx0vosMy/2BCyeGxv00Rd+RsxYmjHwbbMrv8h0leiJ23ZOyRA1Kjn5a9GZ262ozKNmyJFrGNoVOl3XRezYLaJEvgkOq6e+NauKqsggJamHCc2At8O5VAFnIlAj2albbhQL8+v96tWUPlA==
+X-YMail-OSG: 6qEKZb4VM1mOPvHn7Uky8BLhsENz.Nyl5rO4hX07ZBdzkKNvAbN93r7SwnGv8zQ
+ MOEAM1TyLxpPrC_1W4HY0I4nAGeFARjLGqVnBcy4RyeSkx3QXytRBKp5ZSBujFbe9ETIVatSforn
+ FSxNg1Gg1MLkmXWZ3hqwCf7mi9wgiueuIdFsohTnJsnlQHFlfO91UgUYi0f0KIOTpzE_gyo34vOd
+ TNFUNAVPak16uB8d0cDxn766g4TxsxPScRVT1LDVkTyXlC77dDNWN0NUAKMW7MA0IVIW30wXFKP1
+ f1QNH44tCLkGF3DdNc9QA8Gus7CxRd5RCO.6Pi3bJZKJmqmKRRQDZgF4XgnIKiUlYcb8n5jorqjp
+ w0LSJrTHs8Oe5.5.OlLBFGXheiICMdcMZQTKedlBkcui5awdhNPMQ7A8pUSBaJ352UyxgEeBRgct
+ Yk.pha._3m6itzIc7m6kHXmEXA_KgV1ZVYlmqhtX1fAsxmz1iIwlHjtwcdcJDknWj2Qr4W1aGLEh
+ 8fxu7gojbxyumw0KoUsciBvY1iRsKXAIIurtEWEYDWRokPlDxfq_aLegp7QjdsYaGbhuRi7IRGis
+ wuG_4SAsiXFTAGQkDdFTeGhzXwqV7rVp0CBrHW0VOI3ethXL.io5aAswpW_pVVzRSXe5_LsOv9Pf
+ vEru9Va5BfRMitItZnB0srVAMlfS9JT2jKZKnUukCSmvdMFqilxPCmJUV7Y70F67wvKIyHMch1n8
+ PqEjv14nznBVJHd1bb0Sx9mcwuP.kLGam5Ee72aUeQu7eJs5Nna6PDxEf5UYlk4Q8T.ecj9BMq8V
+ 3XMXfgIJxOWYkmRoO6LRk4TgVcidi8wU0ZBK.QI7G4YNdbvw3TMMefWpn.YSzt7Ijlu3Qie7N7lQ
+ tKkUpdShYtVFRZFoX3rn26CMSagxvLx2JWHeHr_U4ixL_nb57HwHo4XtR2NF0SigqK.OltfPfdTs
+ sno.Uuupgnzpd4rp4vPtei9eY4Sb4FwJdjaf_pFLg0iGkkYvhy9ou9dvIrgmwXYjG5l7E7DyPilp
+ Dcv2ybUAEE0wIS8AnrNbHUDq9fk5ezK.XVwG0ETQIzhaHgZfobl6sdO3BkyFvjSAu7sB1JNWfOw7
+ 9PsD4VmoQjqBNYo4S4IgvW6gTzvAOEFjY7mHdwYzSXuwbXJvv06SQ5GpUJ2fd98pbH6SiWrKcB.G
+ aYuzrJCBEYWog5v5MTcwWQbao1ozyZ_4IKN7lfm.rsu_Uz8MYThse5FBbU0knS6_cAeXxT_6dDo1
+ DhY8XarHMjenIoPp_EX5P259dokFnacHP3HSIGrj515pnUVXgzHa.8LTpNkqClAb9IU4SA1BIrSZ
+ Z3XMlTolP6RaTAX26CKfe0S7pMfb80D29HSvdOQZr0GnGMXPDCXRs60i3sLK1eQt8SOWzOlRxKEt
+ 8hrd8Wce7l.empNNiwxjvbKsGqNLjNyXHgqI8ZEcayTB34NRmyyGOykjIYDjDK_qcBWmxjyEpuqr
+ A4J8uH20SOGXs.QDHuQxCHYs9Ue7xaIbrzisfGInee459BUMC5NlfxokkWnBRTBZPKKWumcL6Az5
+ sRa60dpLeiEpzlapdK2_8lj6ZbTb_NCTVpN1dixQqAf4OZQp5yrcYCzlJxub6LZXox0eSHM1eLbG
+ P061TdlGuOyRibM_5ujixXXOoZNLevVmB23mMrQxMD2ZYdPA70.5D_i512mvXrCBQOlPvlfH7H2W
+ Z8YJd8.8eYBuVmFoQI9T91UwAGJYTKbruomiVZLqpPrPz34Fln8QHi2BnR3Hn8zWdTjthyhhwRGa
+ hlI52i47RQ_IaYVv7sj_F20auQjcc_m.4tCDZRQXAuO_pSXv4nVLeM1ulnVtQmAtPefBfKZ7_MFd
+ cRDdtvnXo3zt9E239CUTEl9169.cyiySvJPIPrM7emX0R7Aawd4OFz6TmDFfmcYFhwTazPpROqGQ
+ W.2WeJFnKonnweBXpRvaTKIz3_CeXlAh_uhpqEqy_gDayR_EiGOnw0MhlbXVQgsNyqnP.ILnmwjY
+ ke3pa6UhUF2FxSf6Nc3EhgR80iEPXCa7_uMXvZfSvtEBqWwlwegOWYveHcCtSNlvZ4XCMCntwO9E
+ Qwsvn6jiRhov8dlg4SJvkMCgFnmerEqV2K.4CfBGDj.7IPSLD5DdkUsuOdsENKCfsevzsvewXUua
+ ePjUyCJeo_GFXhVHx1Dmm02YkpV42riaWW7SrC8Khgjhx5h0.OMnxORbPpIy.KrI8pvK03iiOo65
+ KP_7ijkM8ZjTa2GvxkG.Si2zL54Eo3_xFVPaebbNtapmaJJlb4iyygGkUYzNnGKym48ssi4xkcRu
+ DFw--
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: b6543f29-25ec-4e47-a4ff-8569995f7946
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic311.consmr.mail.ne1.yahoo.com with HTTP; Tue, 3 Mar 2026 18:06:31 +0000
+Received: by hermes--production-gq1-6dfcf9f8b-82g65 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID ec3c5f6ef2538eb0ae6f07d34b315ce9;
+          Tue, 03 Mar 2026 18:06:25 +0000 (UTC)
+Message-ID: <e2dd87f8-663a-4630-a678-9235233fb87f@schaufler-ca.com>
+Date: Tue, 3 Mar 2026 10:06:19 -0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGypqWyDOfspVUMe3fm5bfQtC_wH2eEzRgppYvWUVDe1RHLy9Q@mail.gmail.com>
- <CANT5p=rRqPFdieYHeLqtOLtC0Jr-e9jMihj7a+SgCqQt3YWqfQ@mail.gmail.com>
-In-Reply-To: <CANT5p=rRqPFdieYHeLqtOLtC0Jr-e9jMihj7a+SgCqQt3YWqfQ@mail.gmail.com>
-From: Bharath SM <bharathsm.hsk@gmail.com>
-Date: Tue, 3 Mar 2026 10:03:55 -0800
-X-Gm-Features: AaiRm53cTYK1SjqTI4hc41PnEDGW4C0KU_faEUumpjdTsni8whGX3MCRLvdn8_g
-Message-ID: <CAGypqWwJpjNh6ohj6ymuJhLR8x=Zz9SHNx8Uo6NBJXZKjdN9RA@mail.gmail.com>
-Subject: Re: [BUG] [~6.6 Kernel] Corruption when retrying encrypted sync writes
-To: Shyam Prasad N <nspmangalore@gmail.com>, David Howells <dhowells@redhat.com>, 
-	Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Enzo Matsumiya <ematsumiya@suse.de>, 
-	Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: Shyam Prasad N <sprasad@microsoft.com>, Shyam Prasad <Shyam.Prasad@microsoft.com>, 
-	Bharath S M <bharathsm@microsoft.com>, Greg KH <gregkh@linuxfoundation.org>
-Content-Type: multipart/mixed; boundary="000000000000930448064c228737"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 105/110] security: replace PRIino with %llu/%llx format
+ strings
+To: Jeff Layton <jlayton@kernel.org>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
+ Jan Kara <jack@suse.cz>, Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Dan Williams <dan.j.williams@intel.com>, Matthew Wilcox
+ <willy@infradead.org>, Eric Biggers <ebiggers@kernel.org>,
+ "Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song <muchun.song@linux.dev>,
+ Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>,
+ David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>,
+ Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
+ Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+ Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+ Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Bharath SM
+ <bharathsm@microsoft.com>, Alexander Aring <alex.aring@gmail.com>,
+ Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+ Viacheslav Dubeyko <slava@dubeyko.com>,
+ Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov
+ <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>,
+ Christian Schoenebeck <linux_oss@crudebyte.com>,
+ David Sterba <dsterba@suse.com>, Marc Dionne <marc.dionne@auristor.com>,
+ Ian Kent <raven@themaw.net>, Luis de Bethencourt <luisbg@kernel.org>,
+ Salah Triki <salah.triki@gmail.com>,
+ "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+ Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>,
+ Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
+ Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>,
+ Amir Goldstein <amir73il@gmail.com>, Christoph Hellwig <hch@infradead.org>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+ Yangtao Li <frank.li@vivo.com>,
+ Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+ David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>,
+ Dave Kleikamp <shaggy@kernel.org>,
+ Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+ Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+ Joseph Qi <joseph.qi@linux.alibaba.com>, Mike Marshall
+ <hubcap@omnibond.com>, Martin Brandenburg <martin@omnibond.com>,
+ Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>,
+ Zhihao Cheng <chengzhihao1@huawei.com>, Damien Le Moal <dlemoal@kernel.org>,
+ Naohiro Aota <naohiro.aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>,
+ John Johansen <john.johansen@canonical.com>, Paul Moore
+ <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>,
+ Roberto Sassu <roberto.sassu@huawei.com>,
+ Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+ Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>,
+ Stephen Smalley <stephen.smalley.work@gmail.com>,
+ Ondrej Mosnacek <omosnace@redhat.com>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Oleg Nesterov <oleg@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, James Clark
+ <james.clark@linaro.org>, "Darrick J. Wong" <djwong@kernel.org>,
+ Martin Schiller <ms@dev.tdt.de>, Eric Paris <eparis@redhat.com>,
+ Joerg Reuter <jreuter@yaina.de>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Oliver Hartkopp <socketcan@hartkopp.net>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Remi Denis-Courmont <courmisch@gmail.com>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Xin Long <lucien.xin@gmail.com>, Magnus Karlsson
+ <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+ fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev,
+ linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+ linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
+ v9fs@lists.linux.dev, linux-afs@lists.infradead.org, autofs@vger.kernel.org,
+ ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu,
+ ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+ jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev,
+ ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org,
+ linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com,
+ linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org,
+ selinux@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org,
+ linux-x25@vger.kernel.org, audit@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
+ linux-sctp@vger.kernel.org, bpf@vger.kernel.org
+References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
+ <20260302-iino-u64-v2-105-e5388800dae0@kernel.org>
+Content-Language: en-US
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <20260302-iino-u64-v2-105-e5388800dae0@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.25198 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
---000000000000930448064c228737
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Feb 27, 2026 at 2:25=E2=80=AFAM Shyam Prasad N <nspmangalore@gmail.=
-com> wrote:
+On 3/2/2026 12:25 PM, Jeff Layton wrote:
+> Now that i_ino is u64 and the PRIino format macro has been removed,
+> replace all uses in security with the concrete format strings.
 >
-> On Wed, Feb 18, 2026 at 11:30=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.=
-com> wrote:
-> >
-> > We are noticing a data corruption issue in kernels based on stable
-> > 6.6.y. Especially, when a synchronous writes retried after a
-> > connection reset.
-> >
-> > Based on investigation so far, it looks like we are having issue in
-> > the following code path:
-> > When SMB3 encryption is enabled, partial-page buffered writes hit the
-> > synchronous write path in cifs_write_end() when the folio is not
-> > uptodate (!folio_test_uptodate(folio)), it calls cifs_write() directly
-> > with the kmap()'d page cache buffer, bypassing the async writeback
-> > path.
-> > cifs_write() calls SMB2_write(), which places the write payload in
-> > rq_iov[1], pointing directly at the page cache buffer. When
-> > smb3_init_transform_rq() builds the encryption request, it shares
-> > rq_iov by pointer (new->rq_iov =3D old->rq_iov), and crypt_message()
-> > encrypts in-place via aead_request_set_crypt(req, sg, sg, ...). This
-> > destroys the original page cache data. If the write gets -EAGAIN after
-> > encryption (e.g., connection reset), cifs_write() re-sends the
-> > now-ciphertext buffer as if it were plaintext, resulting in
-> > double-encrypted garbage on the server. The server accepts it and
-> > returns success.
-> > Please let me know if you have seen this issue in the past, your
-> > comments on the analysis and probable fixes.
-> >
-> > Repro steps: Attached repro.zip with repro scripts and instructions:
-> > 1) Mount with SMB3 encryption enabled
-> > 2) Perform buffered writes in a loop (e.g., echo "known_pattern" >> fil=
-e)
-> > 3) Kill the TCP connection during writes (ss -K dport 445) to force
-> > retryable errors
-> > 4) Read the file back and compare against expected content
-> >
-> Looking at the callers, it looks like simple_fallocate_range*
-> functions that make use of sync writes are also susceptible to this
-> issue.
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+
+For the security/smack changes:
+
+Acked-by: Casey Schaufler <casey@schaufler-ca.com>
+
+> ---
+>  security/apparmor/apparmorfs.c       |  4 ++--
+>  security/integrity/integrity_audit.c |  2 +-
+>  security/ipe/audit.c                 |  2 +-
+>  security/lsm_audit.c                 | 10 +++++-----
+>  security/selinux/hooks.c             | 10 +++++-----
+>  security/smack/smack_lsm.c           | 12 ++++++------
+>  6 files changed, 20 insertions(+), 20 deletions(-)
 >
-> > Issue can occur when all below conditions met in buffered writes:
-> > 1) SMB2 encryption is active
-> > 2) Sync write path: Writes reached SMB2_write via cifs_write
-> > 3) Retryable network error for writes: When EAGAIN or ECONABORTED
-> > returned from  cifs_send_recv().
-> >
-> > Here is a the sequence of operations leading to issue:
-> > write(2) syscall
-> >  =E2=94=94=E2=94=80 cifs_write_end()                          [file.c]
-> >      =E2=94=94=E2=94=80 cifs_write()                          [file.c]
-> >          =E2=94=82  iov[1].iov_base =3D write_data      =E2=86=90 page =
-cache pointer enters iov[1]
-> >          =E2=94=82
-> >          =E2=94=94=E2=94=80 server->ops->sync_write()         [file.c]
-> >              =E2=94=94=E2=94=80 smb2_sync_write()             [smb2ops.=
-c:]
-> >                  =E2=94=94=E2=94=80 SMB2_write()              [smb2pdu.=
-c:]
-> >                      =E2=94=82  rqst.rq_iov =3D iov     =E2=86=90 rqst =
-points to iov[]
-> > (with page cache in [1])
-> >                      =E2=94=82  rqst.rq_nvec =3D n_vec+1  =E2=86=90 BUG=
-: payload in
-> > rq_iov, not rq_iter
-> >                      =E2=94=82
-> >                      =E2=94=94=E2=94=80 cifs_send_recv()      [transpor=
-t.c:1305]
-> >                          =E2=94=94=E2=94=80 compound_send_recv()  [tran=
-sport.c:1071]
-> >                              =E2=94=82
-> >                              =E2=94=94=E2=94=80 smb_send_rqst()   [tran=
-sport.c:427]
-> >                                  =E2=94=82  if (flags & CIFS_TRANSFORM_=
-REQ)  =E2=86=90
-> > YES for SMB3 encryption
-> >                                  =E2=94=82
-> >                                  =E2=94=94=E2=94=80 server->ops->init_t=
-ransform_rq()
-> > [smb2ops.c:~4398]
-> >                                  =E2=94=82   =3D smb3_init_transform_rq=
-()
-> >                                  =E2=94=82     new->rq_iov =3D old->rq_=
-iov     =E2=86=90
-> > SHARES pointer (not copied!)
-> >                                  =E2=94=82     size =3D
-> > iov_iter_count(old->rq_iter) =3D 0  =E2=86=90 empty, no copy
-> >                                  =E2=94=82
-> >                                  =E2=94=94=E2=94=80 __smb_send_rqst()  =
-[transport.c:272]
-> >                                      =E2=94=82  =E2=86=92 crypt_message=
-()  [smb2ops.c:~4280]
-> >                                      =E2=94=82     =E2=86=92 smb2_get_a=
-ead_req()
-> > [smb2ops.c:~4196]
-> >                                      =E2=94=82        sg =3D scatterwal=
-k from rq_iov[0..n]
-> >                                      =E2=94=82
-> > aead_request_set_crypt(req, sg, sg, ...)
-> >                                      =E2=94=82
-> >    ^^^  ^^^
-> >                                      =E2=94=82
-> > src=3Ddst =E2=86=92 IN-PLACE encrypt
-> >                                      =E2=94=82
-> >                                      =E2=94=82   iov[1] (=3D page cache=
-) is now
-> > AES ciphertext
-> >                                      =E2=94=82
-> >                                      =E2=94=94=E2=94=80 kernel_sendmsg(=
-) / sock_sendmsg()
-> >                                          =E2=86=92 sends encrypted data=
- on wire
-> >
-> >          =E2=86=90 rc =3D -EAGAIN (connection dropped)
-> >
-> >          is_replayable_error(rc) =3D=3D true or cifs_write while loop d=
-etects EAGAIN
-> >          goto replay_again                    =E2=86=90 loops back with=
- corrupted iov[1]
-> >              =E2=94=94=E2=94=80 SMB2_write() re-sends...
-> >                  =E2=94=94=E2=94=80 smb3_init_transform_rq()  =E2=86=90=
- encrypts ciphertext AGAIN
-> >                      =E2=94=94=E2=94=80 crypt_message()       =E2=86=90=
- double-encrypted garbage
-> >                          =E2=94=94=E2=94=80 server writes it to disk  =
-=E2=86=90  CORRUPTION
-> >
-> >
-> >
-> > Modifying SMB2_write function by adding payload to rq_iter seems to
-> > help here. Need to further test.
-> > With below fix, when rq_iter size > 0 code in smb3_init_transform_rq
-> > allocates fresh pages, copies the data via copy_page_from_iter(), and
-> > encrypts the copy instead of the original.
-> > Please let me know your comments.
-> >
-> >
-> >  rqst.rq_iov =3D iov;
-> > -rqst.rq_nvec =3D n_vec + 1;
-> > +rqst.rq_nvec =3D 1;
-> > +iov_iter_kvec(&rqst.rq_iter, ITER_SOURCE, &iov[1], n_vec,
-> > +              io_parms->length);
-> > +rqst.rq_iter_size =3D io_parms->length;
+> diff --git a/security/apparmor/apparmorfs.c b/security/apparmor/apparmorfs.c
+> index be343479f80b71566be6fda90fc4e00912faad63..7b645f40e71c956f216fa6a7d69c3ecd4e2a5ff4 100644
+> --- a/security/apparmor/apparmorfs.c
+> +++ b/security/apparmor/apparmorfs.c
+> @@ -149,7 +149,7 @@ static int aafs_count;
+>  
+>  static int aafs_show_path(struct seq_file *seq, struct dentry *dentry)
+>  {
+> -	seq_printf(seq, "%s:[%" PRIino "u]", AAFS_NAME, d_inode(dentry)->i_ino);
+> +	seq_printf(seq, "%s:[%llu]", AAFS_NAME, d_inode(dentry)->i_ino);
+>  	return 0;
+>  }
+>  
+> @@ -2644,7 +2644,7 @@ static int policy_readlink(struct dentry *dentry, char __user *buffer,
+>  	char name[32];
+>  	int res;
+>  
+> -	res = snprintf(name, sizeof(name), "%s:[%" PRIino "u]", AAFS_NAME,
+> +	res = snprintf(name, sizeof(name), "%s:[%llu]", AAFS_NAME,
+>  		       d_inode(dentry)->i_ino);
+>  	if (res > 0 && res < sizeof(name))
+>  		res = readlink_copy(buffer, buflen, name, strlen(name));
+> diff --git a/security/integrity/integrity_audit.c b/security/integrity/integrity_audit.c
+> index d28dac23a4e7cf651856b80ab7756d250187ccde..d8d9e5ff1cd22b091f462d1e83d28d2d6bd983e9 100644
+> --- a/security/integrity/integrity_audit.c
+> +++ b/security/integrity/integrity_audit.c
+> @@ -62,7 +62,7 @@ void integrity_audit_message(int audit_msgno, struct inode *inode,
+>  	if (inode) {
+>  		audit_log_format(ab, " dev=");
+>  		audit_log_untrustedstring(ab, inode->i_sb->s_id);
+> -		audit_log_format(ab, " ino=%" PRIino "u", inode->i_ino);
+> +		audit_log_format(ab, " ino=%llu", inode->i_ino);
+>  	}
+>  	audit_log_format(ab, " res=%d errno=%d", !result, errno);
+>  	audit_log_end(ab);
+> diff --git a/security/ipe/audit.c b/security/ipe/audit.c
+> index 0de95dd4fbea15d4d913fc42e197c3120a9d24a0..93fb59fbddd60b56c0b22be2a38b809ef9e18b76 100644
+> --- a/security/ipe/audit.c
+> +++ b/security/ipe/audit.c
+> @@ -153,7 +153,7 @@ void ipe_audit_match(const struct ipe_eval_ctx *const ctx,
+>  		if (inode) {
+>  			audit_log_format(ab, " dev=");
+>  			audit_log_untrustedstring(ab, inode->i_sb->s_id);
+> -			audit_log_format(ab, " ino=%" PRIino "u", inode->i_ino);
+> +			audit_log_format(ab, " ino=%llu", inode->i_ino);
+>  		} else {
+>  			audit_log_format(ab, " dev=? ino=?");
+>  		}
+> diff --git a/security/lsm_audit.c b/security/lsm_audit.c
+> index 523f2ee116f0f928003aec30a105d6d4ecb49b0b..737f5a263a8f79416133315edf363ece3d79c722 100644
+> --- a/security/lsm_audit.c
+> +++ b/security/lsm_audit.c
+> @@ -202,7 +202,7 @@ void audit_log_lsm_data(struct audit_buffer *ab,
+>  		if (inode) {
+>  			audit_log_format(ab, " dev=");
+>  			audit_log_untrustedstring(ab, inode->i_sb->s_id);
+> -			audit_log_format(ab, " ino=%" PRIino "u", inode->i_ino);
+> +			audit_log_format(ab, " ino=%llu", inode->i_ino);
+>  		}
+>  		break;
+>  	}
+> @@ -215,7 +215,7 @@ void audit_log_lsm_data(struct audit_buffer *ab,
+>  		if (inode) {
+>  			audit_log_format(ab, " dev=");
+>  			audit_log_untrustedstring(ab, inode->i_sb->s_id);
+> -			audit_log_format(ab, " ino=%" PRIino "u", inode->i_ino);
+> +			audit_log_format(ab, " ino=%llu", inode->i_ino);
+>  		}
+>  		break;
+>  	}
+> @@ -228,7 +228,7 @@ void audit_log_lsm_data(struct audit_buffer *ab,
+>  		if (inode) {
+>  			audit_log_format(ab, " dev=");
+>  			audit_log_untrustedstring(ab, inode->i_sb->s_id);
+> -			audit_log_format(ab, " ino=%" PRIino "u", inode->i_ino);
+> +			audit_log_format(ab, " ino=%llu", inode->i_ino);
+>  		}
+>  
+>  		audit_log_format(ab, " ioctlcmd=0x%hx", a->u.op->cmd);
+> @@ -246,7 +246,7 @@ void audit_log_lsm_data(struct audit_buffer *ab,
+>  		if (inode) {
+>  			audit_log_format(ab, " dev=");
+>  			audit_log_untrustedstring(ab, inode->i_sb->s_id);
+> -			audit_log_format(ab, " ino=%" PRIino "u", inode->i_ino);
+> +			audit_log_format(ab, " ino=%llu", inode->i_ino);
+>  		}
+>  		break;
+>  	}
+> @@ -265,7 +265,7 @@ void audit_log_lsm_data(struct audit_buffer *ab,
+>  		}
+>  		audit_log_format(ab, " dev=");
+>  		audit_log_untrustedstring(ab, inode->i_sb->s_id);
+> -		audit_log_format(ab, " ino=%" PRIino "u", inode->i_ino);
+> +		audit_log_format(ab, " ino=%llu", inode->i_ino);
+>  		rcu_read_unlock();
+>  		break;
+>  	}
+> diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+> index 9430f44c81447708c67ddc35c5b4254f16731b8f..8f38de4d223ea59cfea6bbe73747d7b228e0c33f 100644
+> --- a/security/selinux/hooks.c
+> +++ b/security/selinux/hooks.c
+> @@ -1400,7 +1400,7 @@ static int inode_doinit_use_xattr(struct inode *inode, struct dentry *dentry,
+>  	if (rc < 0) {
+>  		kfree(context);
+>  		if (rc != -ENODATA) {
+> -			pr_warn("SELinux: %s:  getxattr returned %d for dev=%s ino=%" PRIino "u\n",
+> +			pr_warn("SELinux: %s:  getxattr returned %d for dev=%s ino=%llu\n",
+>  				__func__, -rc, inode->i_sb->s_id, inode->i_ino);
+>  			return rc;
+>  		}
+> @@ -1412,13 +1412,13 @@ static int inode_doinit_use_xattr(struct inode *inode, struct dentry *dentry,
+>  					     def_sid, GFP_NOFS);
+>  	if (rc) {
+>  		char *dev = inode->i_sb->s_id;
+> -		kino_t ino = inode->i_ino;
+> +		u64 ino = inode->i_ino;
+>  
+>  		if (rc == -EINVAL) {
+> -			pr_notice_ratelimited("SELinux: inode=%" PRIino "u on dev=%s was found to have an invalid context=%s.  This indicates you may need to relabel the inode or the filesystem in question.\n",
+> +			pr_notice_ratelimited("SELinux: inode=%llu on dev=%s was found to have an invalid context=%s.  This indicates you may need to relabel the inode or the filesystem in question.\n",
+>  					      ino, dev, context);
+>  		} else {
+> -			pr_warn("SELinux: %s:  context_to_sid(%s) returned %d for dev=%s ino=%" PRIino "u\n",
+> +			pr_warn("SELinux: %s:  context_to_sid(%s) returned %d for dev=%s ino=%llu\n",
+>  				__func__, context, -rc, dev, ino);
+>  		}
+>  	}
+> @@ -3477,7 +3477,7 @@ static void selinux_inode_post_setxattr(struct dentry *dentry, const char *name,
+>  					   &newsid);
+>  	if (rc) {
+>  		pr_err("SELinux:  unable to map context to SID"
+> -		       "for (%s, %" PRIino "u), rc=%d\n",
+> +		       "for (%s, %llu), rc=%d\n",
+>  		       inode->i_sb->s_id, inode->i_ino, -rc);
+>  		return;
+>  	}
+> diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
+> index 22b6bd322840c82697c38c07b19a4677e7da2598..2eb3368a3632b836df54ba8628c16f7215ddf3ea 100644
+> --- a/security/smack/smack_lsm.c
+> +++ b/security/smack/smack_lsm.c
+> @@ -182,7 +182,7 @@ static int smk_bu_inode(struct inode *inode, int mode, int rc)
+>  	char acc[SMK_NUM_ACCESS_TYPE + 1];
+>  
+>  	if (isp->smk_flags & SMK_INODE_IMPURE)
+> -		pr_info("Smack Unconfined Corruption: inode=(%s %" PRIino "u) %s\n",
+> +		pr_info("Smack Unconfined Corruption: inode=(%s %llu) %s\n",
+>  			inode->i_sb->s_id, inode->i_ino, current->comm);
+>  
+>  	if (rc <= 0)
+> @@ -195,7 +195,7 @@ static int smk_bu_inode(struct inode *inode, int mode, int rc)
+>  
+>  	smk_bu_mode(mode, acc);
+>  
+> -	pr_info("Smack %s: (%s %s %s) inode=(%s %" PRIino "u) %s\n", smk_bu_mess[rc],
+> +	pr_info("Smack %s: (%s %s %s) inode=(%s %llu) %s\n", smk_bu_mess[rc],
+>  		tsp->smk_task->smk_known, isp->smk_inode->smk_known, acc,
+>  		inode->i_sb->s_id, inode->i_ino, current->comm);
+>  	return 0;
+> @@ -214,7 +214,7 @@ static int smk_bu_file(struct file *file, int mode, int rc)
+>  	char acc[SMK_NUM_ACCESS_TYPE + 1];
+>  
+>  	if (isp->smk_flags & SMK_INODE_IMPURE)
+> -		pr_info("Smack Unconfined Corruption: inode=(%s %" PRIino "u) %s\n",
+> +		pr_info("Smack Unconfined Corruption: inode=(%s %llu) %s\n",
+>  			inode->i_sb->s_id, inode->i_ino, current->comm);
+>  
+>  	if (rc <= 0)
+> @@ -223,7 +223,7 @@ static int smk_bu_file(struct file *file, int mode, int rc)
+>  		rc = 0;
+>  
+>  	smk_bu_mode(mode, acc);
+> -	pr_info("Smack %s: (%s %s %s) file=(%s %" PRIino "u %pD) %s\n", smk_bu_mess[rc],
+> +	pr_info("Smack %s: (%s %s %s) file=(%s %llu %pD) %s\n", smk_bu_mess[rc],
+>  		sskp->smk_known, smk_of_inode(inode)->smk_known, acc,
+>  		inode->i_sb->s_id, inode->i_ino, file,
+>  		current->comm);
+> @@ -244,7 +244,7 @@ static int smk_bu_credfile(const struct cred *cred, struct file *file,
+>  	char acc[SMK_NUM_ACCESS_TYPE + 1];
+>  
+>  	if (isp->smk_flags & SMK_INODE_IMPURE)
+> -		pr_info("Smack Unconfined Corruption: inode=(%s %" PRIino "u) %s\n",
+> +		pr_info("Smack Unconfined Corruption: inode=(%s %llu) %s\n",
+>  			inode->i_sb->s_id, inode->i_ino, current->comm);
+>  
+>  	if (rc <= 0)
+> @@ -253,7 +253,7 @@ static int smk_bu_credfile(const struct cred *cred, struct file *file,
+>  		rc = 0;
+>  
+>  	smk_bu_mode(mode, acc);
+> -	pr_info("Smack %s: (%s %s %s) file=(%s %" PRIino "u %pD) %s\n", smk_bu_mess[rc],
+> +	pr_info("Smack %s: (%s %s %s) file=(%s %llu %pD) %s\n", smk_bu_mess[rc],
+>  		sskp->smk_known, smk_of_inode(inode)->smk_known, acc,
+>  		inode->i_sb->s_id, inode->i_ino, file,
+>  		current->comm);
 >
-> Another option is to initialize iov_iter_xarray with rqst.rq_buffer,
-> similar to what smb3_init_transform_rq does. But this should work too.
-> Changes look good to me. Please submit a formal patch.
-
-Thank you, Attached the patch please review. Also created the minimal
-repro script with network disconnects.
-
-Further investigation on this issue indicates that the issue is not
-specific to the 6.6 Kernel; instead,
-the issue can happen in kernels <6.10 including 6.1, 6.6 and 5.15 and beyon=
-d.
-
-On older kernels ~5.15 with deferred closes may reduce exposure
-because deferred handles might keep help pages
-in memory and which may help writes to avoid sync_write path.
-But commit 262b73ef442e (smb3 client: fix open hardlink on deferred
-close file error, backported till 6.1) appears to
-increase the likelihood of taking the sync_write path because we close
-deferred handles aggressively in some cases,
-which makes the existing encryption write corruption bug easier to
-trigger. The commit does not introduce the bug;
-It increases trigger frequency for writes taking sync_write path.
-
-I will send out this patch to the stable mailing list separately.
-
---000000000000930448064c228737
-Content-Type: application/octet-stream; 
-	name="0001-smb-client-fix-page-cache-corruption-from-in-place-e.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb-client-fix-page-cache-corruption-from-in-place-e.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_mmavluqd0>
-X-Attachment-Id: f_mmavluqd0
-
-RnJvbSBkOWRmMDVjYjVlZGRhZjE2MGEyOTQ3ZjQ1MTA3MjgwOTVmNjJlODczIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBCaGFyYXRoIFNNIDxiaGFyYXRoc21AbWljcm9zb2Z0LmNvbT4K
-RGF0ZTogVHVlLCAzIE1hciAyMDI2IDE0OjA1OjMwICswMDAwClN1YmplY3Q6IFtQQVRDSF0gc21i
-OiBjbGllbnQ6IGZpeCBwYWdlIGNhY2hlIGNvcnJ1cHRpb24gZnJvbSBpbi1wbGFjZQogZW5jcnlw
-dGlvbiBpbiBTTUIyX3dyaXRlCgpTTUIyX3dyaXRlKCkgcGFzc2VzIGRhdGEga3ZlY3MgaW5saW5l
-IGluIHJxX2lvdiBieSBzZXR0aW5nCnJxc3QucnFfbnZlYyA9IG5fdmVjICsgMS4gV2hlbiBTTUIz
-IGVuY3J5cHRpb24gaXMgbmVnb3RpYXRlZCwKc21iM19pbml0X3RyYW5zZm9ybV9ycSgpIC0+IGNy
-eXB0X21lc3NhZ2UoKSBlbmNyeXB0cyBkYXRhIGluIHRoZQprdmVjIGJ1ZmZlcnMgaW4tcGxhY2Uu
-CgpGb3Igc3luY2hyb25vdXMgd3JpdGVzIHRocm91Z2ggY2lmc193cml0ZSgpLCB0aGUga3ZlYyBi
-dWZmZXJzIHBvaW50CmRpcmVjdGx5IGludG8gdGhlIHBhZ2UgY2FjaGUgdmlhIGttYXAoKS4gSW4t
-cGxhY2UgZW5jcnlwdGlvbiBvdmVyd3JpdGVzCnRoZSBwYWdlIGNhY2hlIHdpdGggY2lwaGVydGV4
-dC4gSWYgdGhlIHNlbmQgZmFpbHMgd2l0aCBhIHJlcGxheWFibGUKZXJyb3Igc3VjaCBhcyAtRUFH
-QUlOIChlLmcuLCBmcm9tIGEgY29ubmVjdGlvbiByZXNldCksIFNNQjJfd3JpdGUoKQpyZXRyaWVz
-IHRoZSB3cml0ZSB1c2luZyB0aGUgc2FtZSBpb3ZbMV0gYnVmZmVyLiBTaW5jZSBpb3ZbMV0gbm93
-CmNvbnRhaW5zIGNpcGhlcnRleHQgZnJvbSB0aGUgZmlyc3QgYXR0ZW1wdCwgdGhlIHJldHJ5IGVu
-Y3J5cHRzIGFuZApzZW5kcyBjaXBoZXJ0ZXh0LWFzLWRhdGEgdG8gdGhlIHNlcnZlciwgcmVzdWx0
-aW5nIGluIGRhdGEgY29ycnVwdGlvbi4KClRoZSBjb3JydXB0aW9uIGlzIG1vc3QgbGlrZWx5IHRv
-IGJlIG9ic2VydmVkIHdoZW4gY29ubmVjdGlvbnMgYXJlCnVuc3RhYmxlLCBhcyByZWNvbm5lY3Rz
-IHRyaWdnZXIgd3JpdGUgcmV0cmllcyB0aGF0IHJlLXNlbmQgdGhlCmFscmVhZHktZW5jcnlwdGVk
-IHBhZ2UgY2FjaGUgZGF0YS4KClRoZSBzeW5jIHBhdGggY2FuIGJlIHJlYWNoZWQgZHVyaW5nIHBh
-cnRpYWwtcGFnZSBPX1dST05MWSB3cml0ZXMgd2hlbgp0aGUgcGFnZSBpcyBub3QgaW4gY2FjaGUg
-KGNvbW1vbiBmb3IgYXBwZW5kIHdvcmtsb2FkcyB3aXRoIHJlcGVhdGVkCm9wZW4vd3JpdGUvY2xv
-c2UgcGF0dGVybnMpLgoKVGhlIGFzeW5jIHdyaXRlIHBhdGggKHNtYjJfYXN5bmNfd3JpdGV2KSBp
-cyBub3QgYWZmZWN0ZWQgYmVjYXVzZSBpdApwYXNzZXMgZGF0YSB2aWEgcnFzdC5ycV9pdGVyLCB3
-aGljaCB0aGUgZW5jcnlwdGlvbiBsYXllciBoYW5kbGVzCndpdGhvdXQgbW9kaWZ5aW5nIHRoZSBz
-b3VyY2UgYnVmZmVycy4KCkZpeCBieSBzZXR0aW5nIHJxX252ZWMgPSAxIChoZWFkZXIgb25seSkg
-YW5kIG1vdmluZyBkYXRhIGt2ZWNzIGludG8KcnFfaXRlciB2aWEgaW92X2l0ZXJfa3ZlYygpLgoK
-U2lnbmVkLW9mZi1ieTogQmhhcmF0aCBTTSA8YmhhcmF0aHNtQG1pY3Jvc29mdC5jb20+ClJldmll
-d2VkLWJ5OiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29tPgpDYzogc3RhYmxl
-QHZnZXIua2VybmVsLm9yZyAjdjYuMX52Ni45Ci0tLQogZnMvc21iL2NsaWVudC9zbWIycGR1LmMg
-fCA2ICsrKysrLQogMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigt
-KQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvc21iMnBkdS5jIGIvZnMvc21iL2NsaWVudC9z
-bWIycGR1LmMKaW5kZXggYTg4OTBhZTIxNzE0Li5hODhhMTlkZWM0OTQgMTAwNjQ0Ci0tLSBhL2Zz
-L3NtYi9jbGllbnQvc21iMnBkdS5jCisrKyBiL2ZzL3NtYi9jbGllbnQvc21iMnBkdS5jCkBAIC01
-MDcyLDcgKzUwNzIsMTEgQEAgU01CMl93cml0ZShjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1
-Y3QgY2lmc19pb19wYXJtcyAqaW9fcGFybXMsCiAKIAltZW1zZXQoJnJxc3QsIDAsIHNpemVvZihz
-dHJ1Y3Qgc21iX3Jxc3QpKTsKIAlycXN0LnJxX2lvdiA9IGlvdjsKLQlycXN0LnJxX252ZWMgPSBu
-X3ZlYyArIDE7CisJcnFzdC5ycV9udmVjID0gMTsKKwlpb3ZfaXRlcl9rdmVjKCZycXN0LnJxX2l0
-ZXIsIElURVJfU09VUkNFLCAmaW92WzFdLCBuX3ZlYywKKwkJICAgICAgaW9fcGFybXMtPmxlbmd0
-aCk7CisJcnFzdC5ycV9pdGVyX3NpemUgPSBpb19wYXJtcy0+bGVuZ3RoOworCiAKIAlpZiAocmV0
-cmllcykKIAkJc21iMl9zZXRfcmVwbGF5KHNlcnZlciwgJnJxc3QpOwotLSAKMi40NS40Cgo=
---000000000000930448064c228737
-Content-Type: text/x-sh; charset="US-ASCII"; name="repro_corruption.sh"
-Content-Disposition: attachment; filename="repro_corruption.sh"
-Content-Transfer-Encoding: base64
-Content-ID: <f_mmavm0721>
-X-Attachment-Id: f_mmavm0721
-
-IyEvYmluL2Jhc2gNCiMNCiMgUmVwcm9kdWNlciBmb3IgcGFnZSBjYWNoZSBjb3JydXB0aW9uIGNh
-dXNlZCBieSBpbi1wbGFjZSBlbmNyeXB0aW9uDQojIGluIFNNQjJfd3JpdGUoKS4NCiMNCiMgU01C
-Ml93cml0ZSgpIHBhc3NlcyBwYWdlIGNhY2hlIGRhdGEgaW5saW5lIGluIHJxX2lvdiAocnFfbnZl
-YyA9IG5fdmVjICsgMSkuDQojIFdoZW4gU01CMyBlbmNyeXB0aW9uIGlzIGFjdGl2ZSwgY3J5cHRf
-bWVzc2FnZSgpIGVuY3J5cHRzIHRoZXNlIGJ1ZmZlcnMNCiMgaW4tcGxhY2UsIG92ZXJ3cml0aW5n
-IHBhZ2UgY2FjaGUgd2l0aCBjaXBoZXJ0ZXh0LiBPbiByZXBsYXkgYWZ0ZXIgYQ0KIyByZXBsYXlh
-YmxlIHNlbmQgZmFpbHVyZSwgdGhlIGNpcGhlcnRleHQgaXMgcmUtc2VudCBhcyBwbGFpbnRleHQu
-DQojIFRoZSBzZXJ2ZXIgc3RvcmVzIGNpcGhlcnRleHQgYXMgZmlsZSBjb250ZW50LiBObyBlcnJv
-ciB0byB1c2Vyc3BhY2UuDQojDQojIFRoZSBzeW5jIHdyaXRlIHBhdGggKGNpZnNfd3JpdGVfZW5k
-IC0+IGNpZnNfd3JpdGUgLT4gU01CMl93cml0ZSkgaXMgdGFrZW4NCiMgd2hlbiBPX1dST05MWSBw
-YXJ0aWFsIHdyaXRlcyBoaXQgYSBub24tdXB0b2RhdGUgcGFnZSBhdCBhIG1pZC1maWxlIG9mZnNl
-dC4NCiMNCiMgU3RyYXRlZ3k6IDEwIGNvbmN1cnJlbnQgT19XUk9OTFkgbWlkLWZpbGUgd3JpdGVy
-cyArIHBlcmlvZGljIHNzIC1LIHRvDQojIGtpbGwgdGhlIHNvY2tldCBtaWQtZW5jcnlwdC4gVHlw
-aWNhbGx5IHJlcHJvZHVjZXMgaW4gMS0zIGN5Y2xlcy4NCiMNCiMgVXNhZ2U6IHN1ZG8gLi90ZXN0
-X3NtYjJfd3JpdGVfZW5jcnlwdF9jb3JydXB0aW9uLnNoIC9tbnQvc21ic2hhcmUvdGVzdGRpcg0K
-Iw0KDQoNCnNldCAtdQ0KDQpURVNURElSPSIkezE6LS59Ig0KTkZJTEVTPTEwDQpFUlJPUlM9MA0K
-DQpjbGVhbnVwKCkgew0KICAgIGtpbGwgLTkgJFBJRFMgMj4vZGV2L251bGwNCiAgICB3YWl0IDI+
-L2Rldi9udWxsDQp9DQp0cmFwIGNsZWFudXAgRVhJVA0KDQplY2hvICI9PT0gU01CMl93cml0ZSgp
-IGVuY3J5cHRpb24gcGFnZSBjYWNoZSBjb3JydXB0aW9uIHJlcHJvZHVjZXIgPT09Ig0KZWNobyAi
-RGlyOiAgICAkVEVTVERJUiINCmVjaG8gIktlcm5lbDogJCh1bmFtZSAtcikiDQplY2hvICJTdGFy
-dDogICQoZGF0ZSkiDQplY2hvICIiDQoNCm1rZGlyIC1wICIkVEVTVERJUiINCg0KIyBDcmVhdGUg
-ZmlsZXMgZmlsbGVkIHdpdGggYSBrbm93biBsZXR0ZXI6IGYxPSdBJywgZjI9J0InLCAuLi4sIGYx
-MD0nSicNCmVjaG8gIkNyZWF0aW5nIHRlc3QgZmlsZXMuLi4iDQpmb3IgZiBpbiAkKHNlcSAxICRO
-RklMRVMpOyBkbw0KICAgIEJZVEU9JCgoMHg0MCArIGYpKSAgIyAweDQxPSdBJywgMHg0Mj0nQics
-IC4uLiwgMHg0YT0nSicNCiAgICBweXRob24zIC1jICJvcGVuKCckVEVTVERJUi9mJHtmfS5kYXQn
-LCd3YicpLndyaXRlKGJ5dGVzKFskQllURV0pKjY1NTM2KSINCmRvbmUNCnN5bmM7IHNsZWVwIDEN
-CmVjaG8gIkRvbmUuIg0KDQojIFdyaXRlcjogT19XUk9OTFkgbWlkLWZpbGUgcGFydGlhbCB3cml0
-ZXMgKHRyaWdnZXJzIHN5bmMgcGF0aCkNCiMgLSBPX1dST05MWTogd3JpdGVfYmVnaW4oKSBza2lw
-cyByZWFkaW5nIHRoZSBwYWdlIC0+IHBhZ2Ugc3RheXMgbm90LXVwdG9kYXRlDQojIC0gTWlkLWZp
-bGU6IHdyaXRlX2JlZ2luKCkncyBFT0YgemVyby1maWxsIHNob3J0Y3V0IGRvZXMgbm90IGFwcGx5
-DQojIC0gMjAwIGJ5dGVzOiBwYXJ0aWFsIHBhZ2UsIHBhZ2UgbmV2ZXIgbWFya2VkIHVwdG9kYXRl
-DQojIC0+IGNpZnNfd3JpdGVfZW5kKCkgdGFrZXMgc3luYyBwYXRoOiBrbWFwIC0+IGNpZnNfd3Jp
-dGUgLT4gU01CMl93cml0ZQ0Kd3JpdGVyKCkgew0KICAgIGxvY2FsIGZuYW1lPSQxIGJ5dGU9JDIN
-CiAgICB3aGlsZSB0cnVlOyBkbw0KICAgICAgICBweXRob24zIC1jICINCmltcG9ydCBvcywgcmFu
-ZG9tDQp0cnk6DQogICAgZmQgPSBvcy5vcGVuKCckZm5hbWUnLCBvcy5PX1dST05MWSkNCiAgICBv
-ZmYgPSByYW5kb20ucmFuZGludCgxMDAsIDYwMDAwKQ0KICAgIG9zLmxzZWVrKGZkLCBvZmYsIG9z
-LlNFRUtfU0VUKQ0KICAgIG9zLndyaXRlKGZkLCBieXRlcyhbJGJ5dGVdKSAqIDIwMCkNCiAgICBv
-cy5jbG9zZShmZCkNCmV4Y2VwdDoNCiAgICBwYXNzDQoiIDI+L2Rldi9udWxsDQogICAgZG9uZQ0K
-fQ0KDQplY2hvICJTdGFydGluZyAkTkZJTEVTIHdyaXRlcnMuLi4iDQpQSURTPSIiDQpmb3IgZiBp
-biAkKHNlcSAxICRORklMRVMpOyBkbw0KICAgIEJZVEU9JCgoMHg0MCArIGYpKQ0KICAgIHdyaXRl
-ciAiJFRFU1RESVIvZiR7Zn0uZGF0IiAkQllURSAmDQogICAgUElEUz0iJFBJRFMgJCEiDQpkb25l
-DQoNCmVjaG8gIlJ1bm5pbmcgZGlzcnVwdGlvbiBjeWNsZXMuLi4iDQplY2hvICIiDQpmb3IgY3lj
-bGUgaW4gJChzZXEgMSAxNSk7IGRvDQogICAgIyBXYXJtIHVwOiBsZXQgd3JpdGVycyBydW4gbm9y
-bWFsbHkNCiAgICBzbGVlcCAzDQoNCiAgICAjIENvbGQgY2FjaGU6IGV2aWN0IHBhZ2VzIHNvIG5l
-eHQgd3JpdGVzIGhpdCBub24tdXB0b2RhdGUgcGFnZXMNCiAgICBlY2hvIDMgPiAvcHJvYy9zeXMv
-dm0vZHJvcF9jYWNoZXMgMj4vZGV2L251bGwNCg0KICAgICMgTGV0IHdyaXRlcyBhY2N1bXVsYXRl
-IG9uIGNvbGQgY2FjaGUgKGFsbCBnbyB0aHJvdWdoIHN5bmMgcGF0aCkNCiAgICBzbGVlcCAyDQoN
-CiAgICAjIEtpbGwgc29ja2V0OiBpZiBhIHdyaXRlIGlzIGJldHdlZW4gY3J5cHRfbWVzc2FnZSgp
-IGFuZCBUQ1Agc2VuZCwNCiAgICAjIGlvdlsxXSAocGFnZSBjYWNoZSkgaXMgYWxyZWFkeSBlbmNy
-eXB0ZWQgaW4tcGxhY2UuIFRoZSBzZW5kIGZhaWxzLA0KICAgICMgcmVwbGF5X2FnYWluIHJlLXNl
-bmRzIGNpcGhlcnRleHQgYXMgcGxhaW50ZXh0IHRvIHRoZSBzZXJ2ZXIuDQogICAgIyB3ZSBjYW4g
-YWxzbyByZXBsYWNlIHNzIC1LIHdpdGggdGNwa2lsbCBvciBzaW1pbGFyIHRvIHRhcmdldCB0aGUg
-c29ja2V0IG1vcmUgcHJlY2lzZWx5LCBidXQgc3MgLUsgaXMgc2ltcGxlciBhbmQgd29ya3Mgd2Vs
-bCBlbm91Z2guDQogICAgc3MgLUsgZHBvcnQgPSA0NDUgPiAvZGV2L251bGwgMj4mMQ0KICAgIGVj
-aG8gIiAgW2N5Y2xlICRjeWNsZV0gc29ja2V0IGtpbGxlZCBhdCAkKGRhdGUgKyVUKSINCg0KICAg
-ICMgV2FpdCBmb3IgcmVjb25uZWN0LCB0aGVuIHJlLXJlYWQgZnJvbSBzZXJ2ZXIgKG5vdCBsb2Nh
-bCBjYWNoZSkNCiAgICBzbGVlcCA0DQogICAgZWNobyAzID4gL3Byb2Mvc3lzL3ZtL2Ryb3BfY2Fj
-aGVzIDI+L2Rldi9udWxsDQogICAgc2xlZXAgMQ0KDQogICAgIyBWZXJpZnk6IGV2ZXJ5IGJ5dGUg
-c2hvdWxkIG1hdGNoIGV4cGVjdGVkIHZhbHVlDQogICAgQ1lDTEVfRVJST1JTPTANCiAgICBmb3Ig
-ZiBpbiAkKHNlcSAxICRORklMRVMpOyBkbw0KICAgICAgICBCWVRFPSQoKDB4NDAgKyBmKSkNCiAg
-ICAgICAgcHl0aG9uMyAtYyAiDQppbXBvcnQgc3lzDQp0cnk6DQogICAgZGF0YSA9IG9wZW4oJyRU
-RVNURElSL2Yke2Z9LmRhdCcsJ3JiJykucmVhZCgpDQpleGNlcHQgT1NFcnJvciBhcyBlOg0KICAg
-IHByaW50KGYnICBTS0lQIGYke2Z9LmRhdDoge2V9JykNCiAgICBzeXMuZXhpdCgwKQ0KZm9yIGks
-YiBpbiBlbnVtZXJhdGUoZGF0YSk6DQogICAgaWYgYiAhPSAkQllURToNCiAgICAgICAgcHJpbnQo
-ZicgIENPUlJVUFRJT04gZiR7Zn0uZGF0IG9mZnNldD0weHtpOnh9IGV4cD0weHskQllURTowMnh9
-KHtjaHIoJEJZVEUpfSkgZ290PTB4e2I6MDJ4fScpDQogICAgICAgIHN5cy5leGl0KDEpDQoiDQog
-ICAgICAgIGlmIFsgJD8gLW5lIDAgXTsgdGhlbg0KICAgICAgICAgICAgQ1lDTEVfRVJST1JTPSQo
-KENZQ0xFX0VSUk9SUyArIDEpKQ0KICAgICAgICAgICAgRVJST1JTPSQoKEVSUk9SUyArIDEpKQ0K
-ICAgICAgICBmaQ0KICAgIGRvbmUNCiAgICBlY2hvICIgIFtjeWNsZSAkY3ljbGVdIHZlcmlmaWVk
-ICgkQ1lDTEVfRVJST1JTIGVycm9ycykiDQpkb25lDQoNCmVjaG8gIiINCmVjaG8gIlN0b3BwaW5n
-IHdyaXRlcnMuLi4iDQpraWxsICRQSURTIDI+L2Rldi9udWxsDQp3YWl0IDI+L2Rldi9udWxsDQoN
-CmVjaG8gIiINCmVjaG8gIj09PSBSZXN1bHRzID09PSINCmVjaG8gIkVycm9yczogJEVSUk9SUyIN
-CmVjaG8gIkVuZDogICAgJChkYXRlKSINCg0KaWYgWyAkRVJST1JTIC1ndCAwIF07IHRoZW4NCiAg
-ICBlY2hvICJGQUlMOiBJbi1wbGFjZSBlbmNyeXB0aW9uIGNvcnJ1cHRlZCBwYWdlIGNhY2hlIGRh
-dGEuIg0KICAgIGVjaG8gIkZpeDogcGFzcyBkYXRhIHZpYSBycV9pdGVyIGluc3RlYWQgb2YgaW5s
-aW5lIGluIHJxX2lvdi4iDQplbHNlDQogICAgZWNobyAiUEFTUzogTm8gY29ycnVwdGlvbiBkZXRl
-Y3RlZC4gVHJ5IHJ1bm5pbmcgYWdhaW4uIg0KZmkNCg0Kcm0gLWYgIiRURVNURElSIi9mKi5kYXQN
-Cg==
---000000000000930448064c228737--
