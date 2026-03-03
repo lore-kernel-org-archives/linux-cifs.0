@@ -1,463 +1,291 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E0B481FBC
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Mar 2026 15:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2AFC3DBD63;
+	Tue,  3 Mar 2026 15:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772550875; cv=none; b=YrF9I9x6dD9gkmfGxZL6T99iAK8a34WAp5yHiHlnAav3sitjQ2ECl5toQQ2wsmWsOke1JQMpJhOwGdqkUIjrDXi9ml/EJBUjVEPkUiwkjwX/iX22aRgsSvcFD1K94WEWn15q/Si3r+w7LVqfbLCmiY3cCKLhRSS+zf6bqjKwDkg=
+	t=1772550887; cv=none; b=M7Bh9V5dFKHqgbsfLh+mu6oxHTPMthnodNwaj5Dhl38pAZwMQziw8d1F2ruCuALe590Vg5Ao5jkImZkvY5mRt0feggzs47Rqc2/E+lqEmY130ZQOqMWUs0II5lwNsn2HmnXKoiRIV2b0AtzXAK7tQXDeR+zIewX5jRFIfpf8Ziw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772550875; c=relaxed/simple;
-	bh=IKyGziBXPSCgND++3xlUln6VAW0U0+TOhpaylXnZsbI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KOGs30A7oYUM5cP6ZNVCJuaQm0sOjHjOcVRwll9oL1HF4srGz7gPA0CHB3BrWhWaLQdQZIPZwTzw+/zqRcsVyLBNBr866+9adlknR7/2Cb1Sb5VTlFzsPP4wsnqANc9UxAT6tY/6kul9v3gxrJ4X9yRzj5ir1vhTefMfUMjQUeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=a0Zq+fSS; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1772550887; c=relaxed/simple;
+	bh=LUIJz4FsIWfEPnQTh3nTlMuIExFTK9oFuiI/WIKZaBk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gJpLPi7BnaxtgCzHFKQpCXAEOmcKOgO/tWg1sHg2RmDCH79QnTexwn7O1fiUpnAAfAwaCAYNH+tK9MyaXyA51cDxKlag0HuYGz2qxzdyykEjCAu0O7PWuXanVZSN5V5To8gH3GQPKiz0CCCWkT9iJD/QidHQdGV6fQ5SgCePKHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bOtyGOy1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="a0Zq+fSS"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772550869;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NIupcZAVcTeUMQarbrkHhUdcRGWLXJYmP4Pk8fehCCY=;
-	b=a0Zq+fSSSDrrCclY1CLKHyzKKpqUwfwulKbnI7S8dJIj1vO2z995TmzKPCqSbPhd4NFZEH
-	YdKGB/slPgDkHIEbTfSuVY5cvisZZdYsfQzTtj1xpBL5m266p16G4sh7RoOCQRf/wTXKPL
-	qLTcRB2e6r7NlZev1q5XMKAr1GJR4GE=
-From: zhang.guodong@linux.dev
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	chenxiaosong@kylinos.cn,
-	chenxiaosong@chenxiaosong.com
-Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v5 7/7] smb: introduce struct file_posix_info
-Date: Tue,  3 Mar 2026 15:13:17 +0000
-Message-ID: <20260303151317.136332-8-zhang.guodong@linux.dev>
-In-Reply-To: <20260303151317.136332-1-zhang.guodong@linux.dev>
-References: <20260303151317.136332-1-zhang.guodong@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bOtyGOy1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B9D4C19422;
+	Tue,  3 Mar 2026 15:14:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772550886;
+	bh=LUIJz4FsIWfEPnQTh3nTlMuIExFTK9oFuiI/WIKZaBk=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=bOtyGOy1zgXQ9SeNybe47MisNVK0ZQsVj3kYL2VIBbakWQv9jitSA8b5wSqV3TSZA
+	 2X57FTDxFmpFCBUdF3ZkEt+1HevVNgJVJgYiUB6mFFR6y2tK63Zy5v+Xo8CQ9oi5lq
+	 gpCLjoUKYRhit+PJnWCGFSEE+ZiJCFkY/6ZZCOnXVS98tKxmr5riqyCyVllXXtec0G
+	 m64D3VUmoxSiXqHXbXd06UgIztTY4HD4WUwKmWwhCiSJL+QxzZqL+3+9L/eYvsVfiy
+	 d+NOX8HbnI/MVXcEi+uV5z+NakEKYD+7wk6B73CaNREtlYybAXNRghRJImB9cRspT7
+	 6RfeRfaYVfyEA==
+Message-ID: <4d3b9b92da613ad329b822f3f6043fa08f534451.camel@kernel.org>
+Subject: Re: [PATCH v2 001/110] vfs: introduce kino_t typedef and PRIino
+ format macro
+From: Jeff Layton <jlayton@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, Theodore Tso <tytso@mit.edu>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner
+ <brauner@kernel.org>, Jan Kara <jack@suse.cz>,  Steven Rostedt
+ <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mathieu
+ Desnoyers	 <mathieu.desnoyers@efficios.com>, Dan Williams
+ <dan.j.williams@intel.com>,  Matthew Wilcox <willy@infradead.org>, Eric
+ Biggers <ebiggers@kernel.org>, Muchun Song <muchun.song@linux.dev>,  Oscar
+ Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>, David
+ Howells <dhowells@redhat.com>,  Paulo Alcantara	 <pc@manguebit.org>,
+ Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara	 <jack@suse.com>,
+ Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,  Trond
+ Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck
+ Lever <chuck.lever@oracle.com>,  NeilBrown <neil@brown.name>, Olga
+ Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,  Tom
+ Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>, Ronnie Sahlberg
+ <ronniesahlberg@gmail.com>,  Shyam Prasad N <sprasad@microsoft.com>,
+ Bharath SM <bharathsm@microsoft.com>, Alexander Aring	
+ <alex.aring@gmail.com>, Ryusuke Konishi <konishi.ryusuke@gmail.com>, 
+ Viacheslav Dubeyko	 <slava@dubeyko.com>, Eric Van Hensbergen
+ <ericvh@kernel.org>, Latchesar Ionkov	 <lucho@ionkov.net>, Dominique
+ Martinet <asmadeus@codewreck.org>, Christian Schoenebeck
+ <linux_oss@crudebyte.com>, David Sterba <dsterba@suse.com>, Marc Dionne	
+ <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>, Luis de
+ Bethencourt	 <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>,
+ "Tigran A. Aivazian"	 <aivazian.tigran@gmail.com>, Ilya Dryomov
+ <idryomov@gmail.com>, Alex Markuze	 <amarkuze@redhat.com>, Jan Harkes
+ <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,  Nicolas Pitre <nico@fluxnic.net>,
+ Tyler Hicks <code@tyhicks.com>, Amir Goldstein <amir73il@gmail.com>, John
+ Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Yangtao Li
+ <frank.li@vivo.com>, Mikulas Patocka	 <mikulas@artax.karlin.mff.cuni.cz>,
+ David Woodhouse <dwmw2@infradead.org>,  Richard Weinberger	
+ <richard@nod.at>, Dave Kleikamp <shaggy@kernel.org>, Konstantin Komarov	
+ <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>, 
+ Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>,
+ Mike Marshall	 <hubcap@omnibond.com>, Martin Brandenburg
+ <martin@omnibond.com>, Miklos Szeredi	 <miklos@szeredi.hu>, Anders Larsen
+ <al@alarsen.net>, Zhihao Cheng	 <chengzhihao1@huawei.com>, Damien Le Moal
+ <dlemoal@kernel.org>, Naohiro Aota	 <naohiro.aota@wdc.com>, Johannes
+ Thumshirn <jth@kernel.org>, John Johansen	 <john.johansen@canonical.com>,
+ Paul Moore <paul@paul-moore.com>, James Morris	 <jmorris@namei.org>, "Serge
+ E. Hallyn" <serge@hallyn.com>, Mimi Zohar	 <zohar@linux.ibm.com>, Roberto
+ Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin
+ <dmitry.kasatkin@gmail.com>, Eric Snowberg <eric.snowberg@oracle.com>, Fan
+ Wu	 <wufan@kernel.org>, Stephen Smalley <stephen.smalley.work@gmail.com>,
+ Ondrej Mosnacek <omosnace@redhat.com>, Casey Schaufler
+ <casey@schaufler-ca.com>, Alex Deucher	 <alexander.deucher@amd.com>,
+ Christian =?ISO-8859-1?Q?K=F6nig?=	 <christian.koenig@amd.com>, David
+ Airlie <airlied@gmail.com>, Simona Vetter	 <simona@ffwll.ch>, Sumit Semwal
+ <sumit.semwal@linaro.org>, Eric Dumazet	 <edumazet@google.com>, Kuniyuki
+ Iwashima <kuniyu@google.com>, Paolo Abeni	 <pabeni@redhat.com>, Willem de
+ Bruijn <willemb@google.com>, "David S. Miller"	 <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman	 <horms@kernel.org>, Oleg
+ Nesterov <oleg@redhat.com>, Peter Zijlstra	 <peterz@infradead.org>, Ingo
+ Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland	 <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,  Jiri Olsa
+ <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, Adrian Hunter
+ <adrian.hunter@intel.com>,  James Clark <james.clark@linaro.org>, Martin
+ Schiller <ms@dev.tdt.de>, Eric Paris <eparis@redhat.com>,  Joerg Reuter
+ <jreuter@yaina.de>, Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg	
+ <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde
+ <mkl@pengutronix.de>, David Ahern <dsahern@kernel.org>,  Neal Cardwell
+ <ncardwell@google.com>, Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu	 <herbert@gondor.apana.org.au>, Remi Denis-Courmont
+ <courmisch@gmail.com>,  Marcelo Ricardo Leitner
+ <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, Magnus
+ Karlsson <magnus.karlsson@intel.com>,  Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ Alexei Starovoitov	 <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, 	linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, 	linux-trace-kernel@vger.kernel.org,
+ nvdimm@lists.linux.dev, 	fsverity@lists.linux.dev, linux-mm@kvack.org,
+ netfs@lists.linux.dev, 	linux-ext4@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, 	linux-nfs@vger.kernel.org,
+ linux-cifs@vger.kernel.org, 	samba-technical@lists.samba.org,
+ linux-nilfs@vger.kernel.org, 	v9fs@lists.linux.dev,
+ linux-afs@lists.infradead.org, autofs@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, codalist@telemann.coda.cs.cmu.edu, 
+	ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev, 
+	ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org, 
+	linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com, 
+	linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	selinux@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
+	linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org,
+ linux-x25@vger.kernel.org, 	audit@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, 	linux-can@vger.kernel.org,
+ linux-sctp@vger.kernel.org, bpf@vger.kernel.org
+Date: Tue, 03 Mar 2026 10:14:27 -0500
+In-Reply-To: <aabwflLfe2HcGv7X@infradead.org>
+References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
+	 <20260302-iino-u64-v2-1-e5388800dae0@kernel.org>
+	 <20260303012556.GA6520@macsyma-wired.lan>
+	 <20260303042546.GF13868@frogsfrogsfrogs>
+	 <33228005140684201de2ca0c157441d3b6a06413.camel@kernel.org>
+	 <aabkBadGzo7IZpSU@infradead.org>
+	 <19e4e79a59dcfc4c61c8cf263af345d0d7026fc8.camel@kernel.org>
+	 <aabpPQxCTweoTp8Z@infradead.org>
+	 <1310fc5c09cce52ec00344b936275fe584c88dea.camel@kernel.org>
+	 <aabwflLfe2HcGv7X@infradead.org>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-From: ZhangGuoDong <zhangguodong@kylinos.cn>
+On Tue, 2026-03-03 at 06:30 -0800, Christoph Hellwig wrote:
+> On Tue, Mar 03, 2026 at 09:19:42AM -0500, Jeff Layton wrote:
+> > On Tue, 2026-03-03 at 05:59 -0800, Christoph Hellwig wrote:
+> > > On Tue, Mar 03, 2026 at 08:43:15AM -0500, Jeff Layton wrote:
+> > > > On Tue, 2026-03-03 at 05:37 -0800, Christoph Hellwig wrote:
+> > > > > On Tue, Mar 03, 2026 at 05:53:39AM -0500, Jeff Layton wrote:
+> > > > > > Like I said to Ted, this is just temporary scaffolding for the =
+change.
+> > > > > > The PRIino macro is removed in the end. Given that, perhaps you=
+ can
+> > > > > > overlook the bikeshed's color in this instance?
+> > > > >=20
+> > > > > So why add it in the first place? =20
+> > > >=20
+> > > > Bisectability. The first version I did of this would have broken th=
+e
+> > > > ability to bisect properly across these changes. I don't love the
+> > > > "churn" here either, but this should be cleanly bisectable.
+> > >=20
+> > > What do you need to bisect in format string changes?  Splitting
+> > > every variable type change outside of the main i_ino out - sure.
+> > > But bisecting that "change to u64 in ext4" really broke ext4 and
+> > > not "change to u64" is not very useful.  Commits should do one
+> > > well defined thing.  Adding a weird transition layer for a format
+> > > thing that just gets dropped is not one well defined thing.
+> >=20
+> > In the middle stages of the series, you will get warnings or errors on
+> > 32-bit hosts when i_ino's type doesn't match what the format string
+> > expects.
+> >=20
+> > There are really only three options here:
+> >=20
+> > 1/ Do (almost) all of the changes in one giant patch
+> >=20
+> > 2/ Accept that the build may break during the interim stages
+> >=20
+> > 3/ This series: using a typedef and macro to work around the breakage
+> > until the type can be changed, at the expense of some extra churn in
+> > the codebase
+> >=20
+> > 3 seems like the lesser evil.
+>=20
+> No, 1 is by far the least evil.  Note that it's not really almost all,
+> as all the local variables can easily and sanely be split out.  It's
+> all of the format strings, and that makes sense.  The only "regressions"
+> there are incorrect format strings which have good warnings and can
+> be fixed easily.
 
-Extract the common part of struct smb311_posix_qinfo/file_posix_info
-into a new struct.
+Well, I've done 2 and 3 already. Why not 1? :)
 
-Modify the following places:
+It's not so much the regressions that are a problem here, but the merge
+conflicts for anyone wanting to backport later patches that are near
+these format changes. Having that change broken up by subsystem makes
+it easier to handle that piecemeal later.
 
-  - introduce new struct file_posix_info
-  - smb311_posix_qinfo -> file_posix_info
-  - remove struct smb311_posix_qinfo
-  - some fields in "struct smb2_posix_info" -> "struct file_posix_info"
+I think we'll be looking at close to a 1000 line patch that touches
+nearly 200 files if go that route. Roughly:
 
-Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/client/cifsglob.h  |  2 +-
- fs/smb/client/inode.c     |  2 +-
- fs/smb/client/readdir.c   | 28 ++++++++++++------------
- fs/smb/client/reparse.h   |  2 +-
- fs/smb/client/smb2inode.c |  4 ++--
- fs/smb/client/smb2pdu.h   | 21 +-----------------
- fs/smb/common/fscc.h      | 35 ++++++++++++++++++++++++++++-
- fs/smb/common/smb2pdu.h   | 25 ---------------------
- fs/smb/server/smb2pdu.c   | 46 +++++++++++++++++++--------------------
- fs/smb/server/smb2pdu.h   | 21 +-----------------
- 10 files changed, 78 insertions(+), 108 deletions(-)
+ 182 files changed, 910 insertions(+), 912 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 6f9b6c72962b..f49e76feb527 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -270,7 +270,7 @@ struct cifs_open_info_data {
- 	struct smb_sid posix_group;
- 	union {
- 		struct smb2_file_all_info fi;
--		struct smb311_posix_qinfo posix_fi;
-+		struct file_posix_info posix_fi;
- 	};
- };
- 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 3e844c55ab8a..11c5eeaa64fd 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -835,7 +835,7 @@ static void smb311_posix_info_to_fattr(struct cifs_fattr *fattr,
- 				       struct cifs_open_info_data *data,
- 				       struct super_block *sb)
- {
--	struct smb311_posix_qinfo *info = &data->posix_fi;
-+	struct file_posix_info *info = &data->posix_fi;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
- 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
- 
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index be22bbc4a65a..6239d70e7984 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -247,22 +247,22 @@ cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
- 	posix_info_parse(info, NULL, &parsed);
- 
- 	memset(fattr, 0, sizeof(*fattr));
--	fattr->cf_uniqueid = le64_to_cpu(info->Inode);
--	fattr->cf_bytes = le64_to_cpu(info->AllocationSize);
--	fattr->cf_eof = le64_to_cpu(info->EndOfFile);
-+	fattr->cf_uniqueid = le64_to_cpu(info->fpinfo.Inode);
-+	fattr->cf_bytes = le64_to_cpu(info->fpinfo.AllocationSize);
-+	fattr->cf_eof = le64_to_cpu(info->fpinfo.EndOfFile);
- 
--	fattr->cf_atime = cifs_NTtimeToUnix(info->LastAccessTime);
--	fattr->cf_mtime = cifs_NTtimeToUnix(info->LastWriteTime);
--	fattr->cf_ctime = cifs_NTtimeToUnix(info->CreationTime);
-+	fattr->cf_atime = cifs_NTtimeToUnix(info->fpinfo.LastAccessTime);
-+	fattr->cf_mtime = cifs_NTtimeToUnix(info->fpinfo.LastWriteTime);
-+	fattr->cf_ctime = cifs_NTtimeToUnix(info->fpinfo.CreationTime);
- 
--	fattr->cf_nlink = le32_to_cpu(info->HardLinks);
--	fattr->cf_cifsattrs = le32_to_cpu(info->DosAttributes);
-+	fattr->cf_nlink = le32_to_cpu(info->fpinfo.HardLinks);
-+	fattr->cf_cifsattrs = le32_to_cpu(info->fpinfo.DosAttributes);
- 
- 	if (fattr->cf_cifsattrs & ATTR_REPARSE_POINT)
--		fattr->cf_cifstag = le32_to_cpu(info->ReparseTag);
-+		fattr->cf_cifstag = le32_to_cpu(info->fpinfo.ReparseTag);
- 
- 	/* The Mode field in the response can now include the file type as well */
--	fattr->cf_mode = wire_mode_to_posix(le32_to_cpu(info->Mode),
-+	fattr->cf_mode = wire_mode_to_posix(le32_to_cpu(info->fpinfo.Mode),
- 					    fattr->cf_cifsattrs & ATTR_DIRECTORY);
- 	fattr->cf_dtype = S_DT(fattr->cf_mode);
- 
-@@ -277,9 +277,9 @@ cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
- 	}
- 
- 	cifs_dbg(FYI, "posix fattr: dev %d, reparse %d, mode %o\n",
--		 le32_to_cpu(info->DeviceId),
--		 le32_to_cpu(info->ReparseTag),
--		 le32_to_cpu(info->Mode));
-+		 le32_to_cpu(info->fpinfo.DeviceId),
-+		 le32_to_cpu(info->fpinfo.ReparseTag),
-+		 le32_to_cpu(info->fpinfo.Mode));
- 
- 	sid_to_id(cifs_sb, &parsed.owner, fattr, SIDOWNER);
- 	sid_to_id(cifs_sb, &parsed.group, fattr, SIDGROUP);
-@@ -517,7 +517,7 @@ static void cifs_fill_dirent_posix(struct cifs_dirent *de,
- 	de->name = parsed.name;
- 	de->namelen = parsed.name_len;
- 	de->resume_key = info->Ignored;
--	de->ino = le64_to_cpu(info->Inode);
-+	de->ino = le64_to_cpu(info->fpinfo.Inode);
- }
- 
- static void cifs_fill_dirent_unix(struct cifs_dirent *de,
-diff --git a/fs/smb/client/reparse.h b/fs/smb/client/reparse.h
-index 0164dc47bdfd..674a4686c035 100644
---- a/fs/smb/client/reparse.h
-+++ b/fs/smb/client/reparse.h
-@@ -104,7 +104,7 @@ static inline bool cifs_open_data_reparse(struct cifs_open_info_data *data)
- 	bool ret;
- 
- 	if (data->contains_posix_file_info) {
--		struct smb311_posix_qinfo *fi = &data->posix_fi;
-+		struct file_posix_info *fi = &data->posix_fi;
- 
- 		attrs = le32_to_cpu(fi->DosAttributes);
- 		if (data->reparse_point) {
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index 1c4663ed7e69..119a9ac2e6eb 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -325,7 +325,7 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 							  cfile->fid.volatile_fid,
- 							  SMB_FIND_FILE_POSIX_INFO,
- 							  SMB2_O_INFO_FILE, 0,
--							  sizeof(struct smb311_posix_qinfo) +
-+							  sizeof(struct file_posix_info) +
- 							  (PATH_MAX * 2) +
- 							  (sizeof(struct smb_sid) * 2), 0, NULL);
- 			} else {
-@@ -335,7 +335,7 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 							  COMPOUND_FID,
- 							  SMB_FIND_FILE_POSIX_INFO,
- 							  SMB2_O_INFO_FILE, 0,
--							  sizeof(struct smb311_posix_qinfo) +
-+							  sizeof(struct file_posix_info) +
- 							  (PATH_MAX * 2) +
- 							  (sizeof(struct smb_sid) * 2), 0, NULL);
- 			}
-diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
-index 30d70097fe2f..912017461f5f 100644
---- a/fs/smb/client/smb2pdu.h
-+++ b/fs/smb/client/smb2pdu.h
-@@ -274,26 +274,7 @@ struct create_posix_rsp {
- struct smb2_posix_info {
- 	__le32 NextEntryOffset;
- 	__u32 Ignored;
--	__le64 CreationTime;
--	__le64 LastAccessTime;
--	__le64 LastWriteTime;
--	__le64 ChangeTime;
--	__le64 EndOfFile;
--	__le64 AllocationSize;
--	__le32 DosAttributes;
--	__le64 Inode;
--	__le32 DeviceId;
--	__le32 Zero;
--	/* beginning of POSIX Create Context Response */
--	__le32 HardLinks;
--	__le32 ReparseTag;
--	__le32 Mode;
--	/*
--	 * var sized owner SID
--	 * var sized group SID
--	 * le32 filenamelength
--	 * u8  filename[]
--	 */
-+	struct file_posix_info fpinfo;
- } __packed;
- 
- /*
-diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
-index b4ccddca9256..da8f2ba0996c 100644
---- a/fs/smb/common/fscc.h
-+++ b/fs/smb/common/fscc.h
-@@ -537,9 +537,42 @@ struct file_notify_information {
- } __packed;
- 
- /*
-- * See POSIX Extensions to MS-FSCC 2.3.2.1
-+ * [POSIX-FSCC] POSIX Extensions to MS-FSCC
-  * Link: https://gitlab.com/samba-team/smb3-posix-spec/-/blob/master/fscc_posix_extensions.md
-  */
-+
-+/*
-+ * This information class is used to query file posix information.
-+ * Level 100 query info
-+ * See POSIX-FSCC 2.3.1.1
-+ */
-+struct file_posix_info {
-+	__le64 CreationTime;
-+	__le64 LastAccessTime;
-+	__le64 LastWriteTime;
-+	__le64 ChangeTime;
-+	__le64 EndOfFile;
-+	__le64 AllocationSize;
-+	__le32 DosAttributes;
-+	__le64 Inode;
-+	__le32 DeviceId;
-+	__le32 Zero;
-+	/*
-+	 * Beginning of POSIX Create Context Response
-+	 * See POSIX-SMB2 2.2.14.2.16
-+	 */
-+	__le32 HardLinks;
-+	__le32 ReparseTag;
-+	__le32 Mode;
-+	// var sized owner SID
-+	// var sized group SID
-+	/* End of POSIX Create Context Response */
-+	// le32 filenamelength
-+	// u8 filename[]
-+	u8 sids_and_name[];
-+} __packed;
-+
-+/* See POSIX-FSCC 2.3.2.1 */
- typedef struct {
- 	/* For undefined recommended transfer size return -1 in that field */
- 	__le32 OptimalTransferSize;  /* bsize on some os, iosize on other os */
-diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index 85a4248d4f29..9abfabb79dad 100644
---- a/fs/smb/common/smb2pdu.h
-+++ b/fs/smb/common/smb2pdu.h
-@@ -1610,31 +1610,6 @@ struct smb2_query_info_rsp {
- 	__u8   Buffer[];
- } __packed;
- 
--/* Level 100 query info */
--struct smb311_posix_qinfo {
--	__le64 CreationTime;
--	__le64 LastAccessTime;
--	__le64 LastWriteTime;
--	__le64 ChangeTime;
--	__le64 EndOfFile;
--	__le64 AllocationSize;
--	__le32 DosAttributes;
--	__le64 Inode;
--	__le32 DeviceId;
--	__le32 Zero;
--	/* beginning of POSIX Create Context Response */
--	__le32 HardLinks;
--	__le32 ReparseTag;
--	__le32 Mode;
--	u8     Sids[];
--	/*
--	 * var sized owner SID
--	 * var sized group SID
--	 * le32 filenamelength
--	 * u8  filename[]
--	 */
--} __packed;
--
- /* See MS-SMB2 2.2.23 through 2.2.25 */
- struct smb2_oplock_break {
- 	struct smb2_hdr hdr;
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index f73ea4d1db8f..cf1475fae918 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -4052,44 +4052,44 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
- 
- 		posix_info = (struct smb2_posix_info *)kstat;
- 		posix_info->Ignored = 0;
--		posix_info->CreationTime = cpu_to_le64(ksmbd_kstat->create_time);
-+		posix_info->fpinfo.CreationTime = cpu_to_le64(ksmbd_kstat->create_time);
- 		time = ksmbd_UnixTimeToNT(ksmbd_kstat->kstat->ctime);
--		posix_info->ChangeTime = cpu_to_le64(time);
-+		posix_info->fpinfo.ChangeTime = cpu_to_le64(time);
- 		time = ksmbd_UnixTimeToNT(ksmbd_kstat->kstat->atime);
--		posix_info->LastAccessTime = cpu_to_le64(time);
-+		posix_info->fpinfo.LastAccessTime = cpu_to_le64(time);
- 		time = ksmbd_UnixTimeToNT(ksmbd_kstat->kstat->mtime);
--		posix_info->LastWriteTime = cpu_to_le64(time);
--		posix_info->EndOfFile = cpu_to_le64(ksmbd_kstat->kstat->size);
--		posix_info->AllocationSize = cpu_to_le64(ksmbd_kstat->kstat->blocks << 9);
--		posix_info->DeviceId = cpu_to_le32(ksmbd_kstat->kstat->rdev);
--		posix_info->HardLinks = cpu_to_le32(ksmbd_kstat->kstat->nlink);
--		posix_info->Mode = cpu_to_le32(ksmbd_kstat->kstat->mode & 0777);
-+		posix_info->fpinfo.LastWriteTime = cpu_to_le64(time);
-+		posix_info->fpinfo.EndOfFile = cpu_to_le64(ksmbd_kstat->kstat->size);
-+		posix_info->fpinfo.AllocationSize = cpu_to_le64(ksmbd_kstat->kstat->blocks << 9);
-+		posix_info->fpinfo.DeviceId = cpu_to_le32(ksmbd_kstat->kstat->rdev);
-+		posix_info->fpinfo.HardLinks = cpu_to_le32(ksmbd_kstat->kstat->nlink);
-+		posix_info->fpinfo.Mode = cpu_to_le32(ksmbd_kstat->kstat->mode & 0777);
- 		switch (ksmbd_kstat->kstat->mode & S_IFMT) {
- 		case S_IFDIR:
--			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_DIR << POSIX_FILETYPE_SHIFT);
-+			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_DIR << POSIX_FILETYPE_SHIFT);
- 			break;
- 		case S_IFLNK:
--			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_SYMLINK << POSIX_FILETYPE_SHIFT);
-+			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_SYMLINK << POSIX_FILETYPE_SHIFT);
- 			break;
- 		case S_IFCHR:
--			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_CHARDEV << POSIX_FILETYPE_SHIFT);
-+			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_CHARDEV << POSIX_FILETYPE_SHIFT);
- 			break;
- 		case S_IFBLK:
--			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_BLKDEV << POSIX_FILETYPE_SHIFT);
-+			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_BLKDEV << POSIX_FILETYPE_SHIFT);
- 			break;
- 		case S_IFIFO:
--			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_FIFO << POSIX_FILETYPE_SHIFT);
-+			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_FIFO << POSIX_FILETYPE_SHIFT);
- 			break;
- 		case S_IFSOCK:
--			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_SOCKET << POSIX_FILETYPE_SHIFT);
-+			posix_info->fpinfo.Mode |= cpu_to_le32(POSIX_TYPE_SOCKET << POSIX_FILETYPE_SHIFT);
- 		}
- 
--		posix_info->Inode = cpu_to_le64(ksmbd_kstat->kstat->ino);
--		posix_info->DosAttributes =
-+		posix_info->fpinfo.Inode = cpu_to_le64(ksmbd_kstat->kstat->ino);
-+		posix_info->fpinfo.DosAttributes =
- 			S_ISDIR(ksmbd_kstat->kstat->mode) ?
- 				FILE_ATTRIBUTE_DIRECTORY_LE : FILE_ATTRIBUTE_ARCHIVE_LE;
- 		if (d_info->hide_dot_file && d_info->name[0] == '.')
--			posix_info->DosAttributes |= FILE_ATTRIBUTE_HIDDEN_LE;
-+			posix_info->fpinfo.DosAttributes |= FILE_ATTRIBUTE_HIDDEN_LE;
- 		/*
- 		 * SidBuffer(32) contain two sids(Domain sid(16), UNIX group sid(16)).
- 		 * UNIX sid(16) = revision(1) + num_subauth(1) + authority(6) +
-@@ -5261,14 +5261,14 @@ static int get_file_attribute_tag_info(struct smb2_query_info_rsp *rsp,
- static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
- 				struct ksmbd_file *fp, void *rsp_org)
- {
--	struct smb311_posix_qinfo *file_info;
-+	struct file_posix_info *file_info;
- 	struct inode *inode = file_inode(fp->filp);
- 	struct mnt_idmap *idmap = file_mnt_idmap(fp->filp);
- 	vfsuid_t vfsuid = i_uid_into_vfsuid(idmap, inode);
- 	vfsgid_t vfsgid = i_gid_into_vfsgid(idmap, inode);
- 	struct kstat stat;
- 	u64 time;
--	int out_buf_len = sizeof(struct smb311_posix_qinfo) + 32;
-+	int out_buf_len = sizeof(struct file_posix_info) + 32;
- 	int ret;
- 
- 	ret = vfs_getattr(&fp->filp->f_path, &stat, STATX_BASIC_STATS,
-@@ -5276,7 +5276,7 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
- 	if (ret)
- 		return ret;
- 
--	file_info = (struct smb311_posix_qinfo *)rsp->Buffer;
-+	file_info = (struct file_posix_info *)rsp->Buffer;
- 	file_info->CreationTime = cpu_to_le64(fp->create_time);
- 	time = ksmbd_UnixTimeToNT(stat.atime);
- 	file_info->LastAccessTime = cpu_to_le64(time);
-@@ -5323,9 +5323,9 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
- 	 *		  sub_auth(4 * 1(num_subauth)) + RID(4).
- 	 */
- 	id_to_sid(from_kuid_munged(&init_user_ns, vfsuid_into_kuid(vfsuid)),
--		  SIDUNIX_USER, (struct smb_sid *)&file_info->Sids[0]);
-+		  SIDUNIX_USER, (struct smb_sid *)&file_info->sids_and_name[0]);
- 	id_to_sid(from_kgid_munged(&init_user_ns, vfsgid_into_kgid(vfsgid)),
--		  SIDUNIX_GROUP, (struct smb_sid *)&file_info->Sids[16]);
-+		  SIDUNIX_GROUP, (struct smb_sid *)&file_info->sids_and_name[16]);
- 
- 	rsp->OutputBufferLength = cpu_to_le32(out_buf_len);
- 
-diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
-index e7cf573e59f0..f05273f48bd0 100644
---- a/fs/smb/server/smb2pdu.h
-+++ b/fs/smb/server/smb2pdu.h
-@@ -281,30 +281,11 @@ struct create_sd_buf_req {
- struct smb2_posix_info {
- 	__le32 NextEntryOffset;
- 	__u32 Ignored;
--	__le64 CreationTime;
--	__le64 LastAccessTime;
--	__le64 LastWriteTime;
--	__le64 ChangeTime;
--	__le64 EndOfFile;
--	__le64 AllocationSize;
--	__le32 DosAttributes;
--	__le64 Inode;
--	__le32 DeviceId;
--	__le32 Zero;
--	/* beginning of POSIX Create Context Response */
--	__le32 HardLinks;
--	__le32 ReparseTag;
--	__le32 Mode;
-+	struct file_posix_info fpinfo;
- 	/* SidBuffer contain two sids (UNIX user sid(16), UNIX group sid(16)) */
- 	u8 SidBuffer[32];
- 	__le32 name_len;
- 	u8 name[];
--	/*
--	 * var sized owner SID
--	 * var sized group SID
--	 * le32 filenamelength
--	 * u8  filename[]
--	 */
- } __packed;
- 
- /* functions */
--- 
-2.52.0
+There are some tracepoint changes in some of the per-subsystem patches
+that will need to be split out, so the count isn't exact, but it'll be
+fairly close.
 
+Since Christian will probably end up taking this series, I'd like to
+get his opinion before I respin anything.
+
+--
+Jeff Layton <jlayton@kernel.org>
