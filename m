@@ -1,205 +1,182 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBC634166B
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Mar 2026 23:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772495107; cv=pass; b=Tungsj23AW4pe9xvvsIG8/++hBAx8HZzKa87ACWU4Uf911gfewszlQwTeCGM4um+IkdomQeLYvz+mFrxJ3OcBqZwy4AOO9WnaChGAzNQoJ3AZftHhY5g+Th8Qigt7bIrD0I+zClU+OZEiEP/PGySuk+SQiqYPzxk0l7y393Gyxo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772495107; c=relaxed/simple;
-	bh=gI6mzU+h6MF7rNPJ4817XIF1lxMBARF2p+anpiUg0wA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VYufT7itpKHn6V7OTqGuDhZ9abDyHTzmGOyth/ATmKCto/4x8DiaaRuxNgzJdvk+Em3dMtQsN9BGo1TVbiOheajWo+ZaU6kEWA+/ewcmnmgFjxs9DX/zV4Jxx2TYTW7Z12ECnBMXbx+NALscAKsQpcaezw20Gxl2gTIxwMIUreo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Jlohau7m; arc=pass smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A877C191F84
+	for <linux-cifs@vger.kernel.org>; Tue,  3 Mar 2026 00:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772498490; cv=none; b=mS9R+TaS3x7oKt1oCgGBKhKetT1kA6/I/+Oboc8+WpFwgDvj5JVxIBcBZJScTvrPkob+nBYMPm3eSP3L5EzQBesDCnZrtd4uSAWtbHji0WZRE+20RT7+kIsjKCuegO8Na+NwNY+0Ps3CcQNf6lOEZt8HjtXfJIYiyOfcjPWPkMI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772498490; c=relaxed/simple;
+	bh=0YHxYX348zwyIKd/azJMpxWZ5aHQvZUIVF4Cz+9xqKE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=bskayJy56kQfkQGnG/bG4IkazB8yTUEoGXarid6D3e+d0gjU0B4Ee4Z1wYrYVcuXk8zUQW0pwk6MDPNlQSsRRMeDGBVJjigwxMCDMc902G3wb6X8FrN1R0InBY6X/PzwdCkhqTVq2LfGBCQbDfajrS5aICK4fSD50iBD0Ikt/NA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=math.lsu.edu; spf=pass smtp.mailfrom=math.lsu.edu; dkim=pass (2048-bit key) header.d=math.lsu.edu header.i=@math.lsu.edu header.b=CBFcaluK; arc=none smtp.client-ip=209.85.160.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=math.lsu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=math.lsu.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Jlohau7m"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3590042fa8eso2934309a91.1
-        for <linux-cifs@vger.kernel.org>; Mon, 02 Mar 2026 15:45:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772495103; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PIMNv9gMP6Nv9hQCpB6OdB3OMaeC/Aabw1GEt4Uwf9vPpqDL6bSLfW8EpNmkYE0xXk
-         mBYou2P0ypJe2JdBkoneiUp6127cCT/lac+4OfFG9ng8qiqGQLQMxWvM8W1DgbLXbf9s
-         bj0EXI1jM24XQCklbYycirx6TCaHoWorN5SQZY4pQc9OYmZYVslpKMIuFLKXi3VQyynQ
-         eszfgpBaF1WAT4YYTUlzhedqhwJfn2/HSb2QQePjGTT7DEGYKRXEab4Rfd4GCJEMfe30
-         l5VHGI/cdV7Nrnd8X2bt3+nIZ+k3gp/mZNxYbWqBzjwjGvw4PAb00Gd6LwVF3E2Ek87y
-         JB7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=u082M2vpZx7MrZkmV/F7ZdAH+CJQSjxHglDjea1+awA=;
-        fh=CaynKp/fhyVb1JbO6pqiC6I8ZJZp84MgGiCMtdkl02w=;
-        b=Vv++zlZ+NXV2M/YEq8fz9wlQLEf5gw9afFxFDsf83agPCIRquCgLIQ+pZkxyBAl7ZH
-         geR7jmdnNaUF1DWd1EUh1L0ecxqvmDPN9oR72x5A74JxbWCwIWV7l3t8S8ODrA/NpLU1
-         hzwsGWUYpCZPi25il6budyfxfzpoUBK4AFeeyxkix7BB603Ed/1LHqjJO1TlVuoOpKAf
-         6VvTdZi22uXdhzPEKV/+UqY4vQXM08CiQ9FLv8InVVjh+1XVRfKEh9A/l5m5ciSC3RCy
-         vp73u7pDneYGBMrazacBFj4rb8yVcQStjz2r5vMtQP34ZoUTTcH6OkwWdGtGlV3ikST4
-         7RJg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=math.lsu.edu header.i=@math.lsu.edu header.b="CBFcaluK"
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-415d7461fa5so44131fac.2
+        for <linux-cifs@vger.kernel.org>; Mon, 02 Mar 2026 16:41:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1772495103; x=1773099903; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u082M2vpZx7MrZkmV/F7ZdAH+CJQSjxHglDjea1+awA=;
-        b=Jlohau7m2sNM8GDzyvqU0a0nTQuf+qu3cuCrmzz+AyGIWXH4qCokGvv5cpbrkijbZ8
-         WRwHFHj16LfTWXlm4WMp2oskushe2aU51Uf7iEueAYb6Sf/iKTWkVDV0yWPIhOTx5azz
-         wqKhHTD6zu6NK3iV9QENRuadm6NkylGySmoWALotgY0ISXxjFj3wo67dI2BlvAkRV5XI
-         ZG+JJTzsKRSqI6u414/leBczUk5iRfk5XanaLpsPgJXqPgS32lVIvQ1ORDilRKNbPL56
-         zMkNc4huJ1L0FnaFxSjIE56/MA83Mo4T1IgNkG8jcxE29WJVn/oMGzZv9kp5nJLzeDQi
-         pIvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772495103; x=1773099903;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=math.lsu.edu; s=google; t=1772498486; x=1773103286; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=u082M2vpZx7MrZkmV/F7ZdAH+CJQSjxHglDjea1+awA=;
-        b=brQeesGye2ymcXVRaZ+aMVBwmjRGPfG6LATO34ZSUrKVrmkc1+2G0TBMotVbUAc0sx
-         ZF7LVTwx0qc4++RYyY8Ai5/5N9i8BehlHoCADTtZHwRM4ZzugQYaETEHGD2EnKyOH/hI
-         9fK2wfFmlqDpBiX/MGzJD7+3Eq981L3wmMu1YTJNNF4/zkCzyhS13hKJeApAucUHF2YB
-         7zVTLv29wOZ87QrHnoJD5HrWuUy5VBs4TQ0AdUpYYPkdAaCWcPAOtO0k/l6qaxecbMnt
-         oAzcJDi2222SJzIglE7sAhmjACedqthux3+Wav9nMiqW2C1dw57fryjmjEVZs6y71WHg
-         4XvA==
-X-Forwarded-Encrypted: i=1; AJvYcCWn4SmiBC46UnW5zQvYWizeIqJR+hLAe+4ZBzjby2FH1nawJfEixhNSbPxA1ifZqzFJmlo1Fo6Nx0MO@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjXAwCls+4lHAMxL+QlwB1rQ3fULRGn19e83nHP6jF5mWvKWGO
-	UzG3F4/G9WAY6MsM+MyDsRgPy+Qh1X6MEo59frJljVzvVKUEibx55t3BOy51l4H+T3xiYqmhlhu
-	zyZACEp1FwzaOOyOZKTtiwoog99+wLaCg6VdQA3u4
-X-Gm-Gg: ATEYQzwSIf28TKUWVg5mo6Ce7AD99W73sGsp7dRU4ZVHwZdzq+na0MbB0vJTNzfSuEu
-	vvmHo/CZpB3SD7shYQlEVgDLM4/mH/PwxAb42CrjzpbPIBhV5zxwZyDapjZXb9DtSHt0vVBnkpK
-	0Etouqa6LYgri0+/XIj/FdAeXpPAB2eWymeiRwx1mI3Cic772T4pvlI04h3aDBMKsgZRfMgUm2R
-	83ZjHWCUuM4ptI9suGwIzr7QCZN19BA2wafFBS8V7lKtF63lpWCPvKwWFpTSlQ5fmuwPRx0s7YE
-	iR2hJJs=
-X-Received: by 2002:a17:90b:578e:b0:356:2eff:df05 with SMTP id
- 98e67ed59e1d1-35965c9d15dmr12730172a91.16.1772495102745; Mon, 02 Mar 2026
- 15:45:02 -0800 (PST)
+        bh=3yGoz2Dlx4UbM7q1ZCmze9p4Q9867VyZ8uRtF35lnRE=;
+        b=CBFcaluKTI62SzWrIrNnuG+wd3zBm9ZhXFjAEb5hFEuVJwKbjJ6EkU3gYLLA+E0pD3
+         LfY9TdSE0CFas3Ri124KEnLwCCvk57oBAzOebt3Q9maYUMfzz/OUvA5Ka3+PgvsWS4JA
+         QmEeFPPgVViU1c+5e4+l3auu5A+NQwvj0GMzg0xvG68mDXrFrGwlC6Z68Jc6AeEBknYA
+         xxPuSrGco40/DQX7dm70jCz9sze/5JBRQzAWKQsn6pyy40vnhfwv9IsH0vxfcjmoR0Bg
+         korSmeql41Q5lbOXTfNhoBCNY0L1gL2rQAfwLSlKiLYUcGkX/U5H7XZRraQgf0RgkprZ
+         ayJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772498486; x=1773103286;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3yGoz2Dlx4UbM7q1ZCmze9p4Q9867VyZ8uRtF35lnRE=;
+        b=nfOvpfNU2jKRSHvhZ7k7oV8IHwO+rYwP2xrJyfTmDKgu4+Etxw6LAcBSah9mA5opv2
+         eHxmz2Hvsjl0S96u36h+yPofIKJMO3abRAM1WZ2gc6m+JTK63wFL+M+0P0LXM2pXr0aZ
+         0bCCaekMbeyaxkUEmhSw/x/ykP4+0RoVidJz1kzpjYqPU2VzJfvuLM/HswY65tRkz1Y3
+         BP7mzq5KxVa+UYo2GoMry5rpnm4iCIlsIqZyXxj/zCISuFSHBAjMrrDDPFYQrVqluc1y
+         P8W/+X130KaZu1voQvhAe9gv1vHlXkV6+iW4GlsUcsKNN9XCsRLAUlaHDU7WJ4veJ7RS
+         MbHw==
+X-Forwarded-Encrypted: i=1; AJvYcCUoujqCCZ8xkkU5l/mv+kewmEik8SQEzhTzdN+NNS29sNAi4v5VcQKCc283B7ngDgZZsZQTIe4HqACg@vger.kernel.org
+X-Gm-Message-State: AOJu0YyODtwNlhOCfhKiFnxtkpaQCXO8V7sW344782Pj6lg3mC8K6fk9
+	Yss2+lAid60oQsdZePYih0wqxNJ6wIMKjDJP6qdWT5CEo4F9nHCJyQ2zfZb11zRN013mtS0MXwR
+	mRF5j
+X-Gm-Gg: ATEYQzyrHVIqnbp4bGb0T+D/4qS7iz4h/g8SJFk/7eZ8nBH2CD8erpGxrnZ2p15Zp2K
+	t71L3UcDtRFDErle/tdEbpWo5rGbBIvckC8eFt+M7gjys5qXspirloPTAuoQofBej5pcHns1q7u
+	9kXxLF1VKgm1zfln1yyh+INqA2kL5imu2mugPXD12uvNEsKIqWY39ikebdN9F1WQle4jHABvLzO
+	1m1lOKdOXZ8UcuzG/UXhKOooUL5gwn6SX1dGlMde3CHNGzFsgMDCVbpmaEL2U9fJeJMEURMjEMX
+	Zg2UN02sI2T3U9gRKyKYa/S/xgqhZYatUx/w7s85fpNnC7eDcuG7v0UFakCrqYwZteYvA7rivVU
+	BB683boytdUzVaXIVbPCxNFeZD0E4skRJFAA977iA4XZM+QBpnAA5zDSCaqasE78kMeUXAZGP1m
+	0DGhXT6qqbQj5wztbngqoH71/DyLKwb1YxQ4qItUHHCwTZcj7qkuuc/MMUEymN9z+vWR4kd1njd
+	0k33EGrOx1FP5jj57Fmk4yidcuE8CKaDid4ejdivo6l9sxj1DrC5YKEG/skWw==
+X-Received: by 2002:a05:6870:24c:b0:409:5ae6:319a with SMTP id 586e51a60fabf-41626da0300mr6963663fac.1.1772498486233;
+        Mon, 02 Mar 2026 16:41:26 -0800 (PST)
+Received: from ?IPV6:2620:105:b002:2100:538a:f89d:7c57:26a7? ([2620:105:b002:2100:538a:f89d:7c57:26a7])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4160cff1aacsm12768388fac.9.2026.03.02.16.41.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Mar 2026 16:41:25 -0800 (PST)
+Message-ID: <63195a70-5978-4389-8016-6f2591d262d6@math.lsu.edu>
+Date: Mon, 2 Mar 2026 18:41:23 -0600
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org> <20260302-iino-u64-v2-3-e5388800dae0@kernel.org>
-In-Reply-To: <20260302-iino-u64-v2-3-e5388800dae0@kernel.org>
-From: Paul Moore <paul@paul-moore.com>
-Date: Mon, 2 Mar 2026 18:44:51 -0500
-X-Gm-Features: AaiRm51Sffi2V1GbWbKQK3xjBHaGrjaqO3h4_HvI_INFaL56ZEFyr07E1_3tePs
-Message-ID: <CAHC9VhRnmBuXEKkUPQhJ_LDzcksjoAJL-ne6mFoJdR1hnDdzsg@mail.gmail.com>
-Subject: Re: [PATCH v2 003/110] audit: widen ino fields to u64
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Matthew Wilcox <willy@infradead.org>, Eric Biggers <ebiggers@kernel.org>, 
-	"Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song <muchun.song@linux.dev>, 
-	Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>, 
-	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>, 
-	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
-	Steve French <sfrench@samba.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Alexander Aring <alex.aring@gmail.com>, Ryusuke Konishi <konishi.ryusuke@gmail.com>, 
-	Viacheslav Dubeyko <slava@dubeyko.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
-	Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, 
-	Christian Schoenebeck <linux_oss@crudebyte.com>, David Sterba <dsterba@suse.com>, 
-	Marc Dionne <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>, 
-	Luis de Bethencourt <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>, 
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>, Ilya Dryomov <idryomov@gmail.com>, 
-	Alex Markuze <amarkuze@redhat.com>, Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, 
-	Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>, Amir Goldstein <amir73il@gmail.com>, 
-	Christoph Hellwig <hch@infradead.org>, 
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Yangtao Li <frank.li@vivo.com>, 
-	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>, David Woodhouse <dwmw2@infradead.org>, 
-	Richard Weinberger <richard@nod.at>, Dave Kleikamp <shaggy@kernel.org>, 
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>, 
-	Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>, 
-	Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg <martin@omnibond.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>, 
-	Zhihao Cheng <chengzhihao1@huawei.com>, Damien Le Moal <dlemoal@kernel.org>, 
-	Naohiro Aota <naohiro.aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>, 
-	John Johansen <john.johansen@canonical.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>, 
-	Roberto Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
-	Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, Ondrej Mosnacek <omosnace@redhat.com>, 
-	Casey Schaufler <casey@schaufler-ca.com>, Alex Deucher <alexander.deucher@amd.com>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, Eric Dumazet <edumazet@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	James Clark <james.clark@linaro.org>, "Darrick J. Wong" <djwong@kernel.org>, 
-	Martin Schiller <ms@dev.tdt.de>, Eric Paris <eparis@redhat.com>, Joerg Reuter <jreuter@yaina.de>, 
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Oliver Hartkopp <socketcan@hartkopp.net>, 
-	Marc Kleine-Budde <mkl@pengutronix.de>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Remi Denis-Courmont <courmisch@gmail.com>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev, 
-	fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev, 
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org, 
-	v9fs@lists.linux.dev, linux-afs@lists.infradead.org, autofs@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu, 
-	ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org, 
-	jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev, 
-	ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org, 
-	linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com, 
-	linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org, 
-	selinux@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
-	linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org, 
-	linux-x25@vger.kernel.org, audit@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, 
-	linux-sctp@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: [Samba] SMB3 Unix Extensions - creating special files
+To: samba@lists.samba.org, linux-cifs@vger.kernel.org
+References: <1124e7cd-6a46-40a6-9f44-b7664a66654b@ed.ac.uk>
+ <7082aea3-b28b-4ef5-9b5c-64d5d8b78cbc@samba.org>
+ <a4a32c8e-3b7f-4748-8c50-48f18e8980b9@ed.ac.uk>
+ <45403dd0-b481-431b-8641-234978e48b1b@samba.org>
+ <4d0f156024f06daf3e0c3794c3fed854@manguebit.org>
+ <dbb8e4be-6e90-4ab7-a2d3-52daad3fff2d@ed.ac.uk>
+ <b35e6347503b65febbd0cbec69e52ab1@manguebit.org>
+ <CAH2r5mt_9GcPqg+v9QLXEroKJ9RQZ1MwtpPgprU+xHOSksiWqw@mail.gmail.com>
+ <0e9ebf38-6aa6-4498-a2cc-726b9c84aa4f@ed.ac.uk>
+ <1ee7cccb5fc35163cd8d0ed7777b37c0@manguebit.org>
+ <DB7PR05MB57711EF45DD1CFC24471B84BB17EA@DB7PR05MB5771.eurprd05.prod.outlook.com>
+Content-Language: en-US
+From: Nikkos Svoboda <nsvoboda@math.lsu.edu>
+In-Reply-To: <DB7PR05MB57711EF45DD1CFC24471B84BB17EA@DB7PR05MB5771.eurprd05.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 2, 2026 at 3:25=E2=80=AFPM Jeff Layton <jlayton@kernel.org> wro=
-te:
->
-> inode->i_ino is being widened from unsigned long to u64. The audit
-> subsystem uses unsigned long ino in struct fields, function parameters,
-> and local variables that store inode numbers from arbitrary filesystems.
-> On 32-bit platforms this truncates inode numbers that exceed 32 bits,
-> which will cause incorrect audit log entries and broken watch/mark
-> comparisons.
->
-> Widen all audit ino fields, parameters, and locals to u64, and update
-> the inode format string from %lu to %llu to match.
->
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  include/linux/audit.h   | 2 +-
->  kernel/audit.h          | 9 ++++-----
->  kernel/audit_fsnotify.c | 4 ++--
->  kernel/audit_watch.c    | 8 ++++----
->  kernel/auditsc.c        | 2 +-
->  5 files changed, 12 insertions(+), 13 deletions(-)
 
-We should also update audit_hash_ino() in kernel/audit.h.  It is a
-*very* basic hash function, so I think leaving the function as-is and
-just changing the inode parameter from u32 to u64 should be fine.
+   Jumping in here briefly, I believe the "default" symlink style requested by the client mount options is now "symlink=native", which creates the 0-sized files with extended attributes on the server.
 
---=20
-paul-moore.com
+   I'd also like to know:  Is it intended to allow creation of "actual" symlinks on a supported server filesystem via unix 3.1.1 Extensions? The mount option "symlink=unix" (which creates "actual" symlinks on the server), when used with SMB 3.1.1 unix extensions, causes symlink creation to fail on the client with "Operation not supported" (client kernel 6.17, ubuntu 24.04). That mount option appears to be referred to as "SMB1 unix create symlink command" which I presume means it is limited to the SMB1 unix extensions.
+
+   The archived e-mail conversation chain here (though it includes some outdated information) helped me to understand some of what the symlink= and reparse= mount options were intended for:
+https://lwn.net/ml/all/20241007183650.aw3skuztljpgk2bs@pali/
+
+
+----
+Nikkos Svoboda
+
+
+On 3/2/26 09:09, Matthew Richardson via samba wrote:
+> Hi,
+> 
+> Just got back to testing this and wondering if these patches made it into ML?
+> 
+> I've tested with 6.17 (Ubuntu Noble standard kernel) and latest 6.19 (mainline) and am seeing odd behaviour where it is creating regular files with 'special' metadata rather than 'real' special files. (This might be a different issue of course!). Reading existing special files (created on 'real' fs) works fine.
+> 
+> I'm basically using the same config as in my original post - server is running 4.23.6 with the following config:
+> 
+> [global]
+>      workgroup = WORKGROUP
+>      security = user
+>      map to guest = never
+>      log level = 3
+>      guest ok = no
+>      smb3 unix extensions = yes
+>      follow symlinks = yes
+> 
+> 
+> [myshare]
+>      path = /mnt/users
+>      browsable = yes
+>      writable = yes
+>      read only = no
+>      valid users = sambauser #uid/gid 1000
+>      create mask = 0777
+>      directory mask = 0777
+> 
+> Client is mounting as:
+> 
+> mount -t cifs //server.example.com/myshare /mnt/smb -o posix,vers=3.1.1,username=sambauser,pass=testing123
+> 
+> Reading existing special files created on real fs works fine:
+> 
+>> stat test_local
+> 
+> stat test_local
+>    File: test_local -> test.txt
+>    Size: 5               Blocks: 1          IO Block: 16384  symbolic link
+> Device: 0,49    Inode: 1099511631046  Links: 1
+> 
+> I can then do:
+> 
+> touch foo
+> ln -s foo foo_link
+> 
+>> stat foo_link
+>    File: foo_link -> mnt/smb/foo
+>    Size: 23              Blocks: 0          IO Block: 16384  symbolic link
+> Device: 0,48    Inode: 1099511629531  Links: 1
+> 
+> However on 'real' filesystem:
+>> stat foo_link
+>    File: foo_link
+>    Size: 0               Blocks: 0          IO Block: 4194304 regular empty file
+> Device: 3ch/60d Inode: 1099511629531  Links: 1
+> 
+> getfattr -d x_link
+> # file: x_link
+> user.DOSATTRIB=0sAAAFAAUAAAARAAAAIAQAAJmcGa5UqtwB
+> user.SmbReparse=0sDAAAoGgAAAAuAC4AAAAuAAAAAABvAHAAdAAvAGMAZQBwAGgALwBzAGMAcgBhAHQAYwBoAC8AdABlAHMAdAAvAHgAbwBwAHQALwBjAGUAcABoAC8AcwBjAHIAYQB0AGMAaAAvAHQAZQBzAHQALwB4AA==
+> 
+> Any suggestions appreciated as to what's going wrong - happy to provide network traces if that's needed.
+> 
+> Thanks,
+> 
+> Matthew
+> 
+> Matthew Richardson <m.richardson@ed.ac.uk> writes:
+> 
+>> I've just tried the 6.16 kernel from mainline (Linux vm-b
+>> 6.16.0-061600-generic #202507272138 SMP PREEMPT_DYNAMIC Sun Jul 27
+>> 22:00:36 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux) and while mkfifo works
+>> again, ln -s is still giving 'operation not supported'.
+> 
+> Yes - mainline is still broken.  I'll send a fix soon to ML.
+> The University of Edinburgh is a charitable body, registered in Scotland, with registration number SC005336. Is e buidheann carthannais a th’ ann an Oilthigh Dhùn Èideann, clàraichte an Alba, àireamh clàraidh SC005336.
+
