@@ -1,73 +1,64 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D0A1DE4EF
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Mar 2026 12:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F6F31E852
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Mar 2026 14:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772628403; cv=none; b=UWKawxSTGryHY/urg11B7GgaVJtCD4Vk35DLszUNVSC3xEH9rd0vJQSwP6Lmcy8OFxCaKat1ZjmL9Rq0Jg98z5vcIZXlG3Z8AFmCI4W+RUAApTlsVcLNMkyliCsFO6wgrmLMXbt3OzJiaJp4z1c9hUB3mmEIxXIo18AxZs8vGI0=
+	t=1772633035; cv=none; b=oh7pXBZNl7LOB+zq6ZX1IEMeN1I9St3Fc5JBxLVZp3v1R4hY7M4FxAkr+cRo28RtKLkVRxPuEOVNMgDSrxjjqJFIjsH4mWFZm0tMk8HWDlf+1So1qRJRmGn66WpzLU0b9yj+u1J6RGQGQT0KSD3Q7JjfelkXwcWa1sQnlM6TpJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772628403; c=relaxed/simple;
-	bh=X+cEgUYdBhzqmXNgOKBSdS0OGCTtnGXepLLe79iZaaw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a6rlFohEuudZ97/tCljJjJjWxUeLh5u/O3o/hUiLeHbGcEdMLNbmhnCRLJ1cvErWiYU31VaSn86tvfYdhs3vPqxIkOHB8d6ia2tOoAyQGBvZ7Sy+1HOb+GMTHGjlH37ome8vIicAX+Ykf30DHUTRluBs+qGNY+31a2ezaH0axqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SFYDrWoQ; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772633035; c=relaxed/simple;
+	bh=1FzlaWuFLHg0MFaCBjxXLnOMEXdljE44wTExL0KRcvQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Oxrjd5TG5oj0s6mBC+Lnvzvl+KTZvE8ultdXEly+meabViyHLamx5sp9+kYXctR5D0bjectpH9XEdbrw0O2HHhhz7YbG+epcp8uwM1UuoGvbL0StU1qjg4/TomYbu3/iUvZ54XYANP8Ttq4Hzth4RylKwdOp4DDLXE546BvJm14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NwhVFWa9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SFYDrWoQ"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-823c56765fdso3502451b3a.1
-        for <linux-cifs@vger.kernel.org>; Wed, 04 Mar 2026 04:46:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772628401; x=1773233201; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PRHZvjbEn20Mjv6PiYHb8lOHhFpRFIdSlhpdu6s0ORg=;
-        b=SFYDrWoQx1xs6xU+za7BEh8unzwo9BFEWcqiUMMvX4J2mcu0h4hR2M3SLR6QPTt6Cw
-         xqmXDPHLt3emOwkdhD81zTZFMuDZqOVZLYO3T6JoA6rbzSiZialtDq/jarkiJLvmC4fY
-         yW03ppKeuV0QFB0CYgUWChuij7xYQ/xcdhJXkx1MejI2kaNXeF704hLJ7tKG6pk5MquB
-         S4UtI90IBJ0nFKURaHCnbMWjrL9DtNChgzDcrbqKXhAzTHkYPTi41n3UvXdGzBA63st5
-         4lfEVWhNsthfmzsx2BO5KRJs0hopq5RD9Q2rv0x71CjPLeno4DWNxT9L6rg9/2+FQCxj
-         +ueg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772628401; x=1773233201;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PRHZvjbEn20Mjv6PiYHb8lOHhFpRFIdSlhpdu6s0ORg=;
-        b=N+Di17tUS8+fBt4rrNhz6pdGNwFxSua7oEdxOKrbwQw4/M5JcGCv6bLwRl/5dhqIJZ
-         UrUYMnHaLB10OeLlJ+mUEkLDNVkcwsEsplZ1OF37eCwpGr9hXmmKUcWpGAhlQt2NSQVf
-         f1dPgHyWX0DVEV8m5XORf6TcFbb1Hi5CzDsWqTgrFn+ZyhoDk545rBqnhJGZl29YrU/0
-         0JWiUsA/gUAb25Si2OiN6oZPrtMQ0Qb2CqiShu92bAVHoU+sYXMXj42aHfa8x5gbFVtU
-         qI22hBSySdK05bHJvmcwJGYSBNAFryRQQAifUhNMxSwXpsLZPt0DSamRXgX6WgInUibZ
-         N0og==
-X-Gm-Message-State: AOJu0YzfuZPYBP1t1HnUqsnoWFweOPz8R/SifC7ofgLzvcqzUWlz1G3H
-	amutccVwH7wHrbApsQDEf1TWKH+uR7MNZTimJ6AW6bpDExT+YCX7AhKZzmde25EcNcU=
-X-Gm-Gg: ATEYQzxKlpFenU6tCGV7lELC+Ybfd5DGC9dvjKCxP8+deNW9zyMxDJJVRTXX6FGnEUF
-	ecLdbX8Loy/a25UbpXDyBWTPWEjcc7cx17P0lczUJ9/XpciUuGm7BScP9OLLbxaHkZefKzUuYcd
-	OAkEQjcU/6dV3H8QvVrSwzw0TRUDzqf4+7gaMiV2UaMXctDOLrCqpJWTtkKGJ1MLiM+XsnHtYvD
-	mNODFO8FlXY3zQQsd2S7RGG1/NMC8cUkhOFio8JKjW7mWNx1In0M4hMHjm8k7YmQKQShtvMAcf0
-	YwG9UoOn0RwDg+m0Y8keURDjUDZMnP6MBqQQTU7OrMmELXtnus8o9H0rU7+rijALifgoZecBIcI
-	6njt8EbuCNj1MfegICHC1OwSCi2RdBbYxEsRsCSbtGDssgyQ4uHui3almIOLZCD38PAVdDUUgdG
-	2Df/VVGJoRRX2Fsxqf0zPxG/0FmoLxt+6MiBjOaN+yswO1ThO+kjg=
-X-Received: by 2002:a05:6a20:7f96:b0:38d:ec8c:7e55 with SMTP id adf61e73a8af0-3982df0e577mr1836844637.32.1772628400796;
-        Wed, 04 Mar 2026 04:46:40 -0800 (PST)
-Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.88])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7377062904sm1836317a12.30.2026.03.04.04.46.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 04:46:40 -0800 (PST)
-From: nspmangalore@gmail.com
-X-Google-Original-From: sprasad@microsoft.com
-To: linux-cifs@vger.kernel.org,
-	smfrench@gmail.com,
-	pc@manguebit.com,
-	bharathsm@microsoft.com,
-	dhowells@redhat.com
-Cc: Shyam Prasad N <sprasad@microsoft.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] cifs: open files should not hold ref on superblock
-Date: Wed,  4 Mar 2026 18:15:53 +0530
-Message-ID: <20260304124629.1616108-1-sprasad@microsoft.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NwhVFWa9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772633032;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+WIDnIhTkS9nHulT35K3M+7YjDAtdLL5oA2NtnO2on0=;
+	b=NwhVFWa9W66aYd6Qnj7ZEFoh6DU9gNopawFiZ/cz2eG+CxdTLO8WW3d83xhDAA3qscYw5Y
+	bm4ygz+VfF4ICGtuzs50ogCIsWmQ+uYBvVenu9Tj2jDvqwKgUT3/Ek/MopeG23dI7BzdVp
+	tNE6lADNWtrbJQijqvQBLZEZZz+ecU8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-614-cUu05l7LOtKvi_H8tPZRUA-1; Wed,
+ 04 Mar 2026 09:03:47 -0500
+X-MC-Unique: cUu05l7LOtKvi_H8tPZRUA-1
+X-Mimecast-MFC-AGG-ID: cUu05l7LOtKvi_H8tPZRUA_1772633024
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 698F61955F02;
+	Wed,  4 Mar 2026 14:03:39 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.44.32.194])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E9373180075F;
+	Wed,  4 Mar 2026 14:03:32 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Christian Brauner <christian@brauner.io>,
+	Paulo Alcantara <pc@manguebit.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 00/17] netfs: [WIP] Keep track of folios in a segmented bio_vec[] chain
+Date: Wed,  4 Mar 2026 14:03:07 +0000
+Message-ID: <20260304140328.112636-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -75,220 +66,278 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-From: Shyam Prasad N <sprasad@microsoft.com>
+Hi Willy, Christoph, et al.,
 
-Today whenever we deal with a file, in addition to holding
-a reference on the dentry, we also get a reference on the
-superblock. This happens in two cases:
-1. when a new cinode is allocated
-2. when an oplock break is being processed
+[!] This is a preview.  Please don't expect this to fully compile or work.
+    It's been somewhat tested with AFS and CIFS, but not 9P, Ceph or NFS -
+    and will not build with Ceph or NFS at the moment.
 
-The reasoning for holding the superblock ref was to make sure
-that when umount happens, if there are users of inodes and
-dentries, it does not try to clean them up and wait for the
-last ref to superblock to be dropped by last of such users.
+These patches get rid of folio_queue, rolling_buffer and ITER_FOLIOQ,
+replacing the folio queue construct used to manage buffers in netfslib with
+one based around a segmented chain of bio_vec arrays instead.  There are
+three main aims here:
 
-But the side effect of doing that is that umount silently drops
-a ref on the superblock and we could have deferred closes and
-lease breaks still holding these refs.
+ (1) The kernel file I/O subsystem seems to be moving towards consolidating
+     on the use of bio_vec arrays, so embrace this by moving netfslib to
+     keep track of its buffers for buffered I/O in bio_vec[] form.
 
-Ideally, we should ensure that all of these users of inodes and
-dentries are cleaned up at the time of umount, which is what this
-code is doing.
+ (2) Netfslib already uses a bio_vec[] to handle unbuffered/DIO, so the
+     number of different buffering schemes used can be reduced to just a
+     single one.
 
-This code change allows these code paths to use a ref on the
-dentry (and hence the inode). That way, umount is
-ensured to clean up SMB client resources when it's the last
-ref on the superblock (For ex: when same objects are shared).
+ (3) Always send an entire filesystem RPC request message to a TCP socket
+     with single kernel_sendmsg() call as this is faster, more efficient
+     and doesn't require the use of corking as it puts the entire
+     transmission loop inside of a single tcp_sendmsg().
 
-The code change also moves the call to close all the files in
-deferred close list to the umount code path. It also waits for
-oplock_break workers to be flushed before calling
-kill_anon_super (which eventually frees up those objects).
+For the replacement of folio_queue, a segmented chain of bio_vec arrays
+rather than a single monolithic array is provided:
 
-Fixes: 24261fc23db9 ("cifs: delay super block destruction until all cifsFileInfo objects are gone")
-Fixes: 705c79101ccf ("smb: client: fix use-after-free in cifs_oplock_break")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
----
- fs/smb/client/cifsfs.c    |  7 +++++--
- fs/smb/client/cifsproto.h |  1 +
- fs/smb/client/file.c      | 11 ----------
- fs/smb/client/misc.c      | 42 +++++++++++++++++++++++++++++++++++++++
- fs/smb/client/trace.h     |  2 ++
- 5 files changed, 50 insertions(+), 13 deletions(-)
+	struct bvecq {
+		struct bvecq		*next;
+		struct bvecq		*prev;
+		unsigned long long	fpos;
+		refcount_t		ref;
+		u32			priv;
+		u16			nr_segs;
+		u16			max_segs;
+		bool			inline_bv:1;
+		bool			free:1;
+		bool			unpin:1;
+		bool			discontig:1;
+		struct bio_vec		*bv;
+		struct bio_vec		__bv[];
+	};
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 99b04234a08e6..fcc56481d6cf2 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -330,10 +330,14 @@ static void cifs_kill_sb(struct super_block *sb)
- 
- 	/*
- 	 * We need to release all dentries for the cached directories
--	 * before we kill the sb.
-+	 * and close all deferred file handles before we kill the sb.
- 	 */
- 	if (cifs_sb->root) {
- 		close_all_cached_dirs(cifs_sb);
-+		cifs_close_all_deferred_files_sb(cifs_sb);
-+
-+		/* Wait for all pending oplock breaks to complete */
-+		flush_workqueue(cifsoplockd_wq);
- 
- 		/* finally release root dentry */
- 		dput(cifs_sb->root);
-@@ -864,7 +868,6 @@ static void cifs_umount_begin(struct super_block *sb)
- 	spin_unlock(&tcon->tc_lock);
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
--	cifs_close_all_deferred_files(tcon);
- 	/* cancel_brl_requests(tcon); */ /* BB mark all brl mids as exiting */
- 	/* cancel_notify_requests(tcon); */
- 	if (tcon->ses && tcon->ses->server) {
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 96d6b5325aa33..800a7e418c326 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -261,6 +261,7 @@ void cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode);
- 
- void cifs_close_all_deferred_files(struct cifs_tcon *tcon);
- 
-+void cifs_close_all_deferred_files_sb(struct cifs_sb_info *cifs_sb);
- void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
- 					   struct dentry *dentry);
- 
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 18f31d4eb98de..fb4f9aafe1386 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -711,8 +711,6 @@ struct cifsFileInfo *cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
- 	mutex_init(&cfile->fh_mutex);
- 	spin_lock_init(&cfile->file_info_lock);
- 
--	cifs_sb_active(inode->i_sb);
--
- 	/*
- 	 * If the server returned a read oplock and we have mandatory brlocks,
- 	 * set oplock level to None.
-@@ -767,7 +765,6 @@ static void cifsFileInfo_put_final(struct cifsFileInfo *cifs_file)
- 	struct inode *inode = d_inode(cifs_file->dentry);
- 	struct cifsInodeInfo *cifsi = CIFS_I(inode);
- 	struct cifsLockInfo *li, *tmp;
--	struct super_block *sb = inode->i_sb;
- 
- 	/*
- 	 * Delete any outstanding lock records. We'll lose them when the file
-@@ -785,7 +782,6 @@ static void cifsFileInfo_put_final(struct cifsFileInfo *cifs_file)
- 
- 	cifs_put_tlink(cifs_file->tlink);
- 	dput(cifs_file->dentry);
--	cifs_sb_deactive(sb);
- 	kfree(cifs_file->symlink_target);
- 	kfree(cifs_file);
- }
-@@ -3165,12 +3161,6 @@ void cifs_oplock_break(struct work_struct *work)
- 	__u64 persistent_fid, volatile_fid;
- 	__u16 net_fid;
- 
--	/*
--	 * Hold a reference to the superblock to prevent it and its inodes from
--	 * being freed while we are accessing cinode. Otherwise, _cifsFileInfo_put()
--	 * may release the last reference to the sb and trigger inode eviction.
--	 */
--	cifs_sb_active(sb);
- 	wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
- 			TASK_UNINTERRUPTIBLE);
- 
-@@ -3255,7 +3245,6 @@ void cifs_oplock_break(struct work_struct *work)
- 	cifs_put_tlink(tlink);
- out:
- 	cifs_done_oplock_break(cinode);
--	cifs_sb_deactive(sb);
- }
- 
- static int cifs_swap_activate(struct swap_info_struct *sis,
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index 22cde46309fe0..318533210648d 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -28,6 +28,11 @@
- #include "fs_context.h"
- #include "cached_dir.h"
- 
-+struct tcon_list {
-+	struct list_head entry;
-+	struct cifs_tcon *tcon;
-+};
-+
- /* The xid serves as a useful identifier for each incoming vfs request,
-    in a similar way to the mid which is useful to track each sent smb,
-    and CurrentXid can also provide a running counter (although it
-@@ -550,6 +555,43 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
- 	}
- }
- 
-+void cifs_close_all_deferred_files_sb(struct cifs_sb_info *cifs_sb)
-+{
-+	struct rb_root *root = &cifs_sb->tlink_tree;
-+	struct rb_node *node;
-+	struct cifs_tcon *tcon;
-+	struct tcon_link *tlink;
-+	struct tcon_list *tmp_list, *q;
-+	LIST_HEAD(tcon_head);
-+
-+	spin_lock(&cifs_sb->tlink_tree_lock);
-+	for (node = rb_first(root); node; node = rb_next(node)) {
-+		tlink = rb_entry(node, struct tcon_link, tl_rbnode);
-+		tcon = tlink_tcon(tlink);
-+		if (IS_ERR(tcon))
-+			continue;
-+		tmp_list = kmalloc_obj(struct tcon_list, GFP_ATOMIC);
-+		if (tmp_list == NULL)
-+			break;
-+		tmp_list->tcon = tcon;
-+		/* Take a reference on tcon to prevent it from being freed */
-+		spin_lock(&tcon->tc_lock);
-+		++tcon->tc_count;
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_get_close_defer_files);
-+		spin_unlock(&tcon->tc_lock);
-+		list_add_tail(&tmp_list->entry, &tcon_head);
-+	}
-+	spin_unlock(&cifs_sb->tlink_tree_lock);
-+
-+	list_for_each_entry_safe(tmp_list, q, &tcon_head, entry) {
-+		cifs_close_all_deferred_files(tmp_list->tcon);
-+		list_del(&tmp_list->entry);
-+		cifs_put_tcon(tmp_list->tcon, netfs_trace_tcon_ref_put_close_defer_files);
-+		kfree(tmp_list);
-+	}
-+}
-+
- void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
- 					   struct dentry *dentry)
- {
-diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index 9228f95cae2bd..acfbb63086ea2 100644
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -176,6 +176,7 @@
- 	EM(netfs_trace_tcon_ref_get_cached_laundromat,	"GET Ch-Lau") \
- 	EM(netfs_trace_tcon_ref_get_cached_lease_break,	"GET Ch-Lea") \
- 	EM(netfs_trace_tcon_ref_get_cancelled_close,	"GET Cn-Cls") \
-+	EM(netfs_trace_tcon_ref_get_close_defer_files,	"GET Cl-Def") \
- 	EM(netfs_trace_tcon_ref_get_dfs_refer,		"GET DfsRef") \
- 	EM(netfs_trace_tcon_ref_get_find,		"GET Find  ") \
- 	EM(netfs_trace_tcon_ref_get_find_sess_tcon,	"GET FndSes") \
-@@ -187,6 +188,7 @@
- 	EM(netfs_trace_tcon_ref_put_cancelled_close,	"PUT Cn-Cls") \
- 	EM(netfs_trace_tcon_ref_put_cancelled_close_fid, "PUT Cn-Fid") \
- 	EM(netfs_trace_tcon_ref_put_cancelled_mid,	"PUT Cn-Mid") \
-+	EM(netfs_trace_tcon_ref_put_close_defer_files,	"PUT Cl-Def") \
- 	EM(netfs_trace_tcon_ref_put_mnt_ctx,		"PUT MntCtx") \
- 	EM(netfs_trace_tcon_ref_put_dfs_refer,		"PUT DfsRfr") \
- 	EM(netfs_trace_tcon_ref_put_reconnect_server,	"PUT Reconn") \
--- 
-2.43.0
+The fields are:
+
+ (1) next, prev - Link segments together in a list.  I want this to be
+     NULL-terminated linear rather than circular to make it possible to
+     arbitrarily glue bits on the front.
+
+ (2) fpos, discontig - Note the current file position of the first byte of
+     the segment; all the bio_vecs in ->bv[] must be contiguous in the file
+     space.  The fpos can be used to find the folio by file position rather
+     then from the info in the bio_vec.
+
+     If there's a discontiguity, this should break over into a new bvecq
+     segment with the discontig flag set (though this is redundant if you
+     keep track of the file position).  Note that the beginning and end
+     file positions in a segment need not be aligned to any filesystem
+     block size.
+
+ (3) ref - Refcount.  Each bvecq keeps a ref on the next.  I'm not sure
+     this is entirely necessary, but it makes sharing slices easier.
+
+ (4) priv - Private data for the owner.  Dispensible; currently only used
+     for storing a debug ID for tracing in a patch not included here.
+
+ (5) max_segs, nr_segs.  The size of bv[] and the number of elements used.
+     I've assumed a maximum of 65535 bio_vecs in the array (which would
+     represent a ~1MiB allocation).
+
+ (6) bv, __bv, inline_bv.  bv points to the bio_vec[] array handled by
+     this segment.  This may begin at __bv and if it does inline_bv should
+     be set (otherwise it's impossible to distinguish a separately
+     allocated bio_vec[] that follows immediately by coincidence).
+
+ (7) free, unpin.  free is set if the memory pointed to by the bio_vecs
+     needs freeing in some way upon I/O completion.  unpin is set if this
+     means using GUP unpinning rather than put_page().
+
+I've also defined an iov_iter iterator type ITER_BVECQ to walk this sort of
+construct so that it can be passed directly to sendmsg() or block-based DIO
+(as cachefiles does).
+
+This series makes the following changes to netfslib:
+
+ (1) The folio_queue chain used to hold folios for buffered I/O is replaced
+     with a bvecq chain.  Each bio_vec then holds (a portion of) one folio.
+     Each bvecq holds a contiguous sequence of folios, but adjacent bvecqs
+     in a chain may be discontiguous.
+
+ (2) For unbuffered/DIO, the source iov_iter is extracted into a bvecq
+     chain.
+
+ (3) An abstract position representation ('bvecq_pos') is created that can
+     used to hold a position in a bvecq chain.  For the moment, this takes
+     a ref on the bvecq it points to, but that may be excessive.
+
+ (4) Buffer tracking is managed with three cursors:  The load_cursor, at
+     which new folios are added as we go; the dispatch_cursor, at which new
+     subrequests' buffers start when they're created; and the
+     collect_cursor, the point at which folios are being unlocked.
+
+     Not all cursors are necessarily needed in all situations and during
+     buffered writeback, we actually need a dispatch cursor per stream (one
+     for the network filesystem and one for the cache).
+
+ (5) ->prepare_read(), buffer setting up and ->issue_read() are merged, as
+     are the write variants, with the filesystem calling back up to
+     netfslib to prepare its buffer.  This simplifies the process of
+     setting up a subrequest.  It may even make sense to have the
+     filesystem allocate the subrequest.
+
+ (6) For the moment, dispatch tracking is removed from netfs_io_request and
+     netfs_io_stream.  The problem is that we have several different ways
+     (including in the retry code) in which we need to track things, some
+     of which (e.g. retry) might happen simultaneously with the main
+     dispatch, so keeping things separate helps.  Netfslib sets up a
+     context struct, passes it to ->issue_read/write(), which passes it
+     back to netfs_prepare_read/write_buffer().
+
+ (7) Netfslib dispatches I/O by accumulating enough bufferage to dispatch
+     at least one subrequest, then looping to generate as many as the
+     filesystem wants to (they may be limited by other constraints,
+     e.g. max RDMA segment count or negotiated max size).  This loop could
+     be moved down into the filesystem.  A new method is provided by which
+     netfslib can ask the filesystem to provide an estimate of the data
+     that should be accumulated before dispatch begins.
+
+ (8) Reading from the cache is now managed by querying the cache to provide
+     a list of the next data extents within the cache.  For the moment this
+     uses FIEMAP, but should at some point into the future transition to
+     using a block-fs metadata-independent way of tracking this.
+
+ (9) AFS directories are switched to using a bvecq rather than a
+     folio_queue to hold their contents.
+
+(10) Make CIFS use a bvecq rather than a folio_queue for holding a
+     temporary encryption buffer.
+
+(11) CIFS RDMA is given the ability to extract ITER_BVECQ and support for
+     extracting ITER_FOLIOQ, ITER_BVEC and ITER_KVEC is removed.
+
+(12) All the folio_queue and rolling_buffer code is removed.
+
+Two further things that I'm working on (but not in this branch) are:
+
+ (1) Make it so that a filesystem can be given a copy of a subchain which
+     it can then tack header and trailer protocol elements upon to form a
+     single message (I have this working for cifs) and even join copies
+     together with intervening protocol elements to form compounds.
+
+ (2) Make it so that a filesystem can 'splice' out the contents of the TCP
+     receive queue into a bvecq chain.  This allows the socket lock to be
+     dropped much more quickly and the copying of data read to the
+     destination buffers to happen without the lock.  I have this working
+     for cifs too.  Kernel recvmsg() doesn't then block kernel sendmsg()
+     for anywhere near as long.
+
+There are also some things I want to consider for the future:
+
+ (1) Create one or more batched iteration functions to 'unlock' all the
+     folios in a bio_vec[], where 'unlock' is the appropriate action for
+     ending a read or a write.  Batching should hopefully also improve the
+     efficiency of wrangling the marks on the xarray.  Very often these
+     marks are going to be represented by contiguous bits, so there may be
+     a way to change them in bulk.
+
+ (2) Rather than walking the bvecq chain to get each individual folio out
+     via bv_page, use the file position stored on the bvecq and the sum of
+     bv_len to iterate over the appropriate range in i_pages.
+
+ (3) Change iov_iter to store the initial starting point and for
+     iov_iter_revert() to reset to that and advance.  This would (a) help
+     prevent over-reversion and (b) dispense with the need for a prev
+     pointer.
+
+ (4) Use bvecq to replace scatterlist.  One problem with replacing
+     scatterlist is that crypto drivers like to glue bits on the front of
+     the scatterlists they're given (something trivial with that API) - and
+     this is one way to achieve it.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-next
+
+Thanks,
+David
+
+David Howells (17):
+  netfs: Fix unbuffered/DIO writes to dispatch subrequests in strict
+    sequence
+  vfs: Implement a FIEMAP callback
+  iov_iter: Add a segmented queue of bio_vec[]
+  Add a function to kmap one page of a multipage bio_vec
+  netfs: Add some tools for managing bvecq chains
+  afs: Use a bvecq to hold dir content rather than folioq
+  netfs: Add a function to extract from an iter into a bvecq
+  cifs: Use a bvecq for buffering instead of a folioq
+  cifs: Support ITER_BVECQ in smb_extract_iter_to_rdma()
+  netfs: Switch to using bvecq rather than folio_queue and
+    rolling_buffer
+  cifs: Remove support for ITER_KVEC/BVEC/FOLIOQ from
+    smb_extract_iter_to_rdma()
+  netfs: Remove netfs_alloc/free_folioq_buffer()
+  netfs: Remove netfs_extract_user_iter()
+  iov_iter: Remove ITER_FOLIOQ
+  netfs: Remove folio_queue and rolling_buffer
+  netfs: Check for too much data being read
+  netfs: Combine prepare and issue ops and grab the buffers on request
+
+ Documentation/core-api/folio_queue.rst | 209 ------
+ Documentation/core-api/index.rst       |   1 -
+ fs/9p/vfs_addr.c                       |  34 +-
+ fs/afs/dir.c                           |  41 +-
+ fs/afs/dir_edit.c                      |  42 +-
+ fs/afs/dir_search.c                    |  33 +-
+ fs/afs/file.c                          |  27 +-
+ fs/afs/fsclient.c                      |   8 +-
+ fs/afs/inode.c                         |  18 +-
+ fs/afs/internal.h                      |  16 +-
+ fs/afs/write.c                         |  35 +-
+ fs/afs/yfsclient.c                     |   6 +-
+ fs/cachefiles/io.c                     | 350 +++++----
+ fs/ceph/addr.c                         | 109 +--
+ fs/ioctl.c                             |  29 +-
+ fs/netfs/Makefile                      |   4 +-
+ fs/netfs/buffered_read.c               | 495 ++++++++-----
+ fs/netfs/buffered_write.c              |   2 +-
+ fs/netfs/bvecq.c                       | 634 +++++++++++++++++
+ fs/netfs/direct_read.c                 | 123 ++--
+ fs/netfs/direct_write.c                | 313 +++++++-
+ fs/netfs/fscache_io.c                  |   6 -
+ fs/netfs/internal.h                    | 164 ++++-
+ fs/netfs/iterator.c                    | 313 +++-----
+ fs/netfs/misc.c                        | 145 +---
+ fs/netfs/objects.c                     |  17 +-
+ fs/netfs/read_collect.c                | 124 ++--
+ fs/netfs/read_pgpriv2.c                |  68 +-
+ fs/netfs/read_retry.c                  | 226 +++---
+ fs/netfs/read_single.c                 | 177 +++--
+ fs/netfs/rolling_buffer.c              | 222 ------
+ fs/netfs/stats.c                       |   6 +-
+ fs/netfs/write_collect.c               |  96 ++-
+ fs/netfs/write_issue.c                 | 950 ++++++++++++++-----------
+ fs/netfs/write_retry.c                 | 144 ++--
+ fs/nfs/fscache.c                       |  13 +-
+ fs/smb/client/cifsglob.h               |   2 +-
+ fs/smb/client/cifssmb.c                |  13 +-
+ fs/smb/client/file.c                   | 149 ++--
+ fs/smb/client/smb2ops.c                |  78 +-
+ fs/smb/client/smb2pdu.c                |  28 +-
+ fs/smb/client/smbdirect.c              | 152 +---
+ fs/smb/client/transport.c              |  15 +-
+ include/linux/bvec.h                   |  54 ++
+ include/linux/fiemap.h                 |   3 +
+ include/linux/folio_queue.h            | 282 --------
+ include/linux/fscache.h                |  19 +
+ include/linux/iov_iter.h               |  66 +-
+ include/linux/netfs.h                  | 177 +++--
+ include/linux/rolling_buffer.h         |  61 --
+ include/linux/uio.h                    |  17 +-
+ include/trace/events/netfs.h           | 118 ++-
+ lib/iov_iter.c                         | 395 +++++-----
+ lib/scatterlist.c                      |  56 +-
+ lib/tests/kunit_iov_iter.c             | 183 ++---
+ net/9p/client.c                        |   8 +-
+ 56 files changed, 3815 insertions(+), 3261 deletions(-)
+ delete mode 100644 Documentation/core-api/folio_queue.rst
+ create mode 100644 fs/netfs/bvecq.c
+ delete mode 100644 fs/netfs/rolling_buffer.c
+ delete mode 100644 include/linux/folio_queue.h
+ delete mode 100644 include/linux/rolling_buffer.h
 
