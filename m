@@ -1,82 +1,92 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C53A30F932;
-	Wed,  4 Mar 2026 14:25:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8463A6F14
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Mar 2026 14:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772634354; cv=none; b=heqsBz5RNxpift6qiPQnYsOePNZ1JDhaco+SzWyzrzBtG5W5iU+dqDR10AcmtPUj+VBBsulRhx5NT2Ww1ytOnk0Dvf4CHbYQLzp2VybeWsVUACyAOY1cOAJfl0JZxMvnuQCS2OBsX5opOm6pNFcawDwUI4gbyUnbfzwuLjntkUk=
+	t=1772634861; cv=none; b=tacL3ecgffIlJezfS1c3KhF9CABaB+joZOBJJ+xKon09Fw6Acb2cyz15pTkj+pGatDPP4JIGwUj0WNUOc3aifdoxP7W5nrAIDktjhUwDmndMayjTXqybJMbBCKhOPUH86t56ouXVlehVS5JpbjMse5U1PKZjNVhG+nwVIQiouis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772634354; c=relaxed/simple;
-	bh=qdY5vaVJURTWs72EyZ8cPNPdS082XZvUtj3CCkb5nGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GXG2TnEjhYNcO0dZSzVZiJ4EkoXNE+HGbDNlyiAXjJe1RFoVo8fbmvuX4tY7ly1R6L3KUU7Vn+HMovdt8dZVizXw66xsZTgJQeyYGRx8nYfGuVGIZzRx0wX17ntvJizHQjtMS0kl3lU70ne53YrhjzzQKecRFAdkTOLfSKanviU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=x27lCMff; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1772634861; c=relaxed/simple;
+	bh=bpuGRVu4Y18L5xc3H1PJ2lREyhify4Ay9P9h5KY76nk=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=oYo3gRSZdjAw5Ma2J/UV/o6NmEEaC1WlQ1Wm8lbkCX+pCb5WDv246OdlEZ6n+X5XH0NEAfd73rAQxhty1/WFSieZgvmbEYzX3bJGc5h0tql+Zrxl6MgIAmNoph2te7xh4CdFeB/FK89dqilVZOMv9Vc8VbVxPIPkuXmA8kQx9Zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S35+Gxqf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="x27lCMff"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=tQK7I2fIPyvq2g9xdz8S+f6AJpFhfFODuiVP1vyE7vM=; b=x27lCMffnHSJWh4uGGnQkxH63X
-	o4wIOlq4UCohr2v8YTNWk4Vh1pQMQ5GovXc3B/niDcwWQx+cdDmfkDblQbflWLIs14f5Owl8Ykijj
-	ZLgMcyfYJY3DwuxvJbt6axXqAN8aqVD0iYeS2TzFYKkO6ATLbbnS2WiN7R6iBMDznnhiCHQA6kmOY
-	QjybGzXwM0xgAGt5nv3EkMn07NNyh37uIozjIM8/OR0ohai+SNA9krqCSDloUkU6fKldmw+ifEwNy
-	cQmzlD609M8++/ZnQwZQE3gKC6QQPLC6RDRFxfUD+uC97jQiBC8r+a6Rb3MG0ukbdEV7lrsMCKGnz
-	vNy90w9w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vxnAc-0000000HOlV-39DX;
-	Wed, 04 Mar 2026 14:25:50 +0000
-Date: Wed, 4 Mar 2026 06:25:50 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	Leon Romanovsky <leon@kernel.org>,
-	Christian Brauner <christian@brauner.io>,
-	Paulo Alcantara <pc@manguebit.com>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>,
-	Steve French <sfrench@samba.org>,
-	Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>,
-	Chuck Lever <chuck.lever@oracle.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S35+Gxqf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772634859;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZLC9JL4iyVNeLfPEDV0W2Yxh7iNZYOFRw/HOSKzzhuk=;
+	b=S35+GxqfnDyMeuj3hAGhe/v89Ard3q3ZkaUBfLnl5d3eHRXTzGrIzgC0nTD4C2knuWjyMW
+	HMHn4CCC+6/JuXD0Qr/V3qnRXqEiKmTQcF+T40JmaF8FTg2CrgICvZki1gkDzaIQj29pbQ
+	wpEW/CAhfrh7sjzaVJXMP9shvyhMEQY=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-629-S9NpySwlNAOll3R8_b-uzg-1; Wed,
+ 04 Mar 2026 09:34:14 -0500
+X-MC-Unique: S9NpySwlNAOll3R8_b-uzg-1
+X-Mimecast-MFC-AGG-ID: S9NpySwlNAOll3R8_b-uzg_1772634851
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8E89519560B0;
+	Wed,  4 Mar 2026 14:34:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.32.194])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 40E33300019F;
+	Wed,  4 Mar 2026 14:34:06 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <aahA7rQVf5liFYMv@infradead.org>
+References: <aahA7rQVf5liFYMv@infradead.org> <aag8fPUDCY_g-_LY@infradead.org> <20260304140328.112636-1-dhowells@redhat.com> <20260304140328.112636-3-dhowells@redhat.com> <114166.1772634114@warthog.procyon.org.uk>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
+    Jens Axboe <axboe@kernel.dk>, Leon Romanovsky <leon@kernel.org>,
+    Christian Brauner <christian@brauner.io>,
+    Paulo Alcantara <pc@manguebit.com>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>,
+    Steve French <sfrench@samba.org>,
+    Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>,
+    Chuck Lever <chuck.lever@oracle.com>
 Subject: Re: [RFC PATCH 02/17] vfs: Implement a FIEMAP callback
-Message-ID: <aahA7rQVf5liFYMv@infradead.org>
-References: <aag8fPUDCY_g-_LY@infradead.org>
- <20260304140328.112636-1-dhowells@redhat.com>
- <20260304140328.112636-3-dhowells@redhat.com>
- <114166.1772634114@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <114166.1772634114@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <156718.1772634844.1@warthog.procyon.org.uk>
+Date: Wed, 04 Mar 2026 14:34:04 +0000
+Message-ID: <156719.1772634844@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Wed, Mar 04, 2026 at 02:21:54PM +0000, David Howells wrote:
-> Christoph Hellwig <hch@infradead.org> wrote:
-> 
-> > On Wed, Mar 04, 2026 at 02:03:09PM +0000, David Howells wrote:
-> > > Implement a callback in the internal kernel FIEMAP API so that kernel users
-> > > can make use of it as the filler function expects to write to userspace.
-> > > This allows the FIEMAP data to be captured and parsed.  This is useful for
-> > > cachefiles and also potentially for knfsd and ksmbd to implement their
-> > > equivalents of FIEMAP remotely rather than using SEEK_DATA/SEEK_HOLE.
-> > 
-> > Hell no.  FIEMAP is purely a debugging toool and must not get anywhere
-> > near a data path.  NAK to all of this.
-> 
-> So I have to stick with SEEK_DATA/SEEK_HOLE for this?
+Christoph Hellwig <hch@infradead.org> wrote:
 
-Yes.  Why do you even want to move away from that?  It's the far
-better API.  Of course like all other reporting APIs it still is
-racy, but has far less problems than fiemap.
+> > So I have to stick with SEEK_DATA/SEEK_HOLE for this?
+> 
+> Yes.  Why do you even want to move away from that?  It's the far
+> better API.  Of course like all other reporting APIs it still is
+> racy, but has far less problems than fiemap.
+
+To find the next two extents of data, say, I have to make four calls into the
+backing filesystem rather than one - with all the context set up and locking
+those might incur.
+
+Granted, the vast majority of files aren't sparse, so one pair of
+SEEK_DATA/SEEK_HOLE should be able to establish that.
+
+David
 
