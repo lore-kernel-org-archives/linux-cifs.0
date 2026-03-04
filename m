@@ -1,304 +1,339 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7378F373C0B;
-	Wed,  4 Mar 2026 16:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772643582; cv=none; b=OuvtUVEsc5xfevolAorypMvoi86DzEVsg4UDWgjqBtaavTYbdqPAD41NNqf4TksOd9xmpMcvonMQum58rLlqXCH1QpSXZPe29YeZi0QXFxAUihEeHzeif36tRGbA0sQmCvc+HPEvil9SD8c4ZUrz3FAZDoFrf/KM6VBEbi9cEZU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772643582; c=relaxed/simple;
-	bh=Vco3uqMM+GGwamDaSgMVwORJh+OF+HTrP0JVrfOVsPw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=p3lvhq1uqQiiwFuAOncMEEBXM7YxCKbK2/oeWscxEqJkYJGwmXaH+f7IOv4YAZJYulXb7ytAMfkuIg3+Csgk72ippOsm54RwLJkGnRSoNNMWjwUGU+e/6zO8yCEpTZrNa0S4Yxc55/RQh4plKnSA3jqQiqf4t0XPczAHIXQhOLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CXD9BpWg; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E8A351C2C
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Mar 2026 20:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772655487; cv=pass; b=pFXAeTh4Vdstuib73dctHclKhDTZ/+0xkLNFHyJsQgevR7eTYQtJkfcBpRVGRplxXK/Qp96UGm3MpVz3c0EOtQGUwzCh3RmBUEDvaJ78Hc+PIWurpqTFvs2J66BAH2En9DmBBiorusxc/w5wygZUy5kA7pOk3mUMtxrsZ4hFHnU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772655487; c=relaxed/simple;
+	bh=X+iFFo+ejPRSbjGHSDnGyZTWBKwX4CEt3gumhiJnxws=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RXlxIiqiNBlCchXFYe2hY8jcAZ7Jp6QNWyDMDC+E/LCRaV3cQQNWYLm1k3JCuniFkHZMOdDWJaedcDoK+zvT3cmhVei36tPUIeKHOaDmF25zGKEdgCzdwUQs0JjEk90MjSSe4ib7er5Dy9CYswiU7ePiwMrUhctZpoHLV6OYKKY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b5f9959C; arc=pass smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CXD9BpWg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9FBAC2BCB0;
-	Wed,  4 Mar 2026 16:59:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772643582;
-	bh=Vco3uqMM+GGwamDaSgMVwORJh+OF+HTrP0JVrfOVsPw=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=CXD9BpWgkkINK6gZqwyX5n7YT6eyFHASQ0Cf19QSMh58zX8rxOu5w8xcN+ALcpoiN
-	 zbse2DEyA7vWamOUkFLS5cEPnwTisG+hpK4j3y8lhaSnEuoTtnggjrzLnvkaqpuG4Q
-	 /pLrkelh2wFBDJe2W+0q8sB/i9CBZKq+1QKdbV2czTHnDvJNKeh8dlDWRQIN1f4Oly
-	 wkxfWt/ojpUzF7aYV96/GCDXWlUslEu8HeL4mAwxYbk0tPCb3+ItQ1ysWx6N4nShGq
-	 zvEPbwgzgHkxslhDUcJzRX0BNjNVvspwFLrzcRh1590XHX+B39SAGRYWotYwfZVTOL
-	 Sc+WO/HYq9qBg==
-Message-ID: <e07e9b893ca04ce6ead4790e72c7f285a7159070.camel@kernel.org>
-Subject: Re: [PATCH 24/24] fs: remove simple_nosetlease()
-From: Jeff Layton <jlayton@kernel.org>
-To: Mike Snitzer <snitzer@kernel.org>
-Cc: Luis de Bethencourt <luisbg@kernel.org>, Salah Triki
- <salah.triki@gmail.com>,  Nicolas Pitre <nico@fluxnic.net>, Christoph
- Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Anders Larsen	
- <al@alarsen.net>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
- Brauner	 <brauner@kernel.org>, David Sterba <dsterba@suse.com>, Chris Mason
- <clm@fb.com>,  Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue
- Hu <zbestahu@gmail.com>, Jeffle Xu	 <jefflexu@linux.alibaba.com>, Sandeep
- Dhavale <dhavale@google.com>, Hongbo Li	 <lihongbo22@huawei.com>, Chunhai
- Guo <guochunhai@vivo.com>, Jan Kara	 <jack@suse.com>, Theodore Ts'o
- <tytso@mit.edu>, Andreas Dilger	 <adilger.kernel@dilger.ca>, Jaegeuk Kim
- <jaegeuk@kernel.org>, OGAWA Hirofumi	 <hirofumi@mail.parknet.co.jp>, David
- Woodhouse <dwmw2@infradead.org>,  Richard Weinberger	 <richard@nod.at>,
- Dave Kleikamp <shaggy@kernel.org>, Ryusuke Konishi	
- <konishi.ryusuke@gmail.com>, Viacheslav Dubeyko <slava@dubeyko.com>, 
- Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, Mark Fasheh
- <mark@fasheh.com>, Joel Becker	 <jlbec@evilplan.org>, Joseph Qi
- <joseph.qi@linux.alibaba.com>, Mike Marshall	 <hubcap@omnibond.com>, Martin
- Brandenburg <martin@omnibond.com>, Miklos Szeredi	 <miklos@szeredi.hu>,
- Amir Goldstein <amir73il@gmail.com>, Phillip Lougher	
- <phillip@squashfs.org.uk>, Carlos Maiolino <cem@kernel.org>, Hugh Dickins	
- <hughd@google.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, Andrew
- Morton	 <akpm@linux-foundation.org>, Namjae Jeon <linkinjeon@kernel.org>,
- Sungjong Seo	 <sj1557.seo@samsung.com>, Yuezhang Mo <yuezhang.mo@sony.com>,
- Chuck Lever	 <chuck.lever@oracle.com>, Alexander Aring
- <alex.aring@gmail.com>, Andreas Gruenbacher <agruenba@redhat.com>, Jonathan
- Corbet <corbet@lwn.net>, "Matthew Wilcox (Oracle)"	 <willy@infradead.org>,
- Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov
- <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, Christian
- Schoenebeck	 <linux_oss@crudebyte.com>, Xiubo Li <xiubli@redhat.com>, Ilya
- Dryomov	 <idryomov@gmail.com>, Trond Myklebust <trondmy@kernel.org>, Anna
- Schumaker	 <anna@kernel.org>, Steve French <sfrench@samba.org>, Paulo
- Alcantara	 <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N	 <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Bharath SM	 <bharathsm@microsoft.com>, Hans de Goede <hansg@kernel.org>, 
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
-	linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net, 
-	linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
- ocfs2-devel@lists.linux.dev, 	devel@lists.orangefs.org,
- linux-unionfs@vger.kernel.org, 	linux-xfs@vger.kernel.org,
- linux-mm@kvack.org, gfs2@lists.linux.dev, 	linux-doc@vger.kernel.org,
- v9fs@lists.linux.dev, ceph-devel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org
-Date: Wed, 04 Mar 2026 11:59:32 -0500
-In-Reply-To: <aZ84VRrRVyGEzSJn@kernel.org>
-References: <20260108-setlease-6-20-v1-0-ea4dec9b67fa@kernel.org>
-	 <20260108-setlease-6-20-v1-24-ea4dec9b67fa@kernel.org>
-	 <aZ84VRrRVyGEzSJn@kernel.org>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b5f9959C"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-89a15b9a556so20063696d6.3
+        for <linux-cifs@vger.kernel.org>; Wed, 04 Mar 2026 12:18:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772655485; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RNHShwK5/ouo+G4ebAncQpZrary9zuYC491upXkY09XUpW+ymXyi1p44OHyDU0YV6u
+         UjXe8kNsXhdlD0lgheXWZsmWiGnvqPBPhN6rmf0GxueEIIY+zRW6eTIfAnduutm5bFUJ
+         mJq+fXZMkZ6eGknLH5i6DDOoI34DzQkjh5Hi0zDnLTyjDICaOFc4GmmAKJBaunk+QHKJ
+         oQMe/4koJ8XsUfgFmDkvL2ZzWjBx3+ZvcILjavBZEUpBUYgQciZhLWfYWhgQ5BxONL1r
+         pcX5vvCrpRCfUycZHffd8zEzOyPxqG/srU0wmHOFXnON8/OY0bZ0T8lO88UCEFhINtM/
+         2acA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=EsfqB/Unked7GAS+ynxb74vvDt5c8106ZB+ARQ8juE8=;
+        fh=AhxD/KCvX7nhBOIGqueAzChr6nCyWRjQHNvLM8U+8w8=;
+        b=AJJNA0uc3TW60yt4efEPbRA9LBVrhhLqeCjhc6+SPd1xfX5diLlrrOe0FCP+j3mZSi
+         clYl1wJviYMWehH4AiVVIRYFkXxuJCxpKGYCKirqRATfz31k6dOvjxwMoYRLvZwx0Faq
+         ugAG6V3b+b5KHZUB/bDMbXjb+j1+JKM+YXMJBQzvVsxocY+ILpDP37S1OznUf9Kjqjug
+         D23xaF4npX44ZboMsHvjQs0koZe86lWeyX9qyttSledO9KbYOD/JOnvOmiFZpsN7fvjV
+         DGVdY6aDL5ERRj1NhAxw/Qa5XOQZnDwZlA04z9KCWOXVRJJXg5DEfBviNQJdxwjhQXAp
+         L5nQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772655485; x=1773260285; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EsfqB/Unked7GAS+ynxb74vvDt5c8106ZB+ARQ8juE8=;
+        b=b5f9959CDdr+nlI6EhwTvaya28saExUxYp/vd5JbMcRpqViDFEZ4fl6rvKtwaROSKa
+         valRS62EJXjjTCYHgLuM/y68OmWGQIKgqYUnm5D0HJ18vcUzJ1RWZhLylNZzQm+2RI6G
+         sIC7pjQM5JD6GJEeUiKkpCD7+A/ED2GbQN2FEdKbfQH9z6PC+7i8eKDXYkX6lvxhIHNS
+         GQ3LOShJllpA+WSwWXrto4x6LCkGIYUrNdfddEIPDgM0Cqk9xkhqwFJHOyciWZ8jQ+k1
+         vyosxRvPK+BfT1dgHWcxttGtnHYBl4SdYBVrFHZ2K1v7zi2/RX8O/mujOqZaLRvPibmN
+         qn0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772655485; x=1773260285;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=EsfqB/Unked7GAS+ynxb74vvDt5c8106ZB+ARQ8juE8=;
+        b=RyA4oWAkckvt5CtycbZO6jkTW603yG17V82hPf8CjRhzMMJWNfdTgxT/35FmbOOB/g
+         a/01UsrhHos+qqxz1En5sTBDKomRWq0KRxjQzV51By0K4KOd7UcocTy4ntVWqay4nAbF
+         Xq0ZswYv31ame5AUh2rb1S/k6kFDb+P0e9y4ajG5eNaLKxheyRxM9XNL5YZiOHfLa85j
+         c2tAVYupDiuzBwSEYRxy3rsn2xs1Ej3tAspqaCXGB61x8iAP62YXPnSRjVfiYkdQKroq
+         T53fTd6dpeDhZyYTC0nV/6hw4Ypd32dO2UjtuWuLlA4k0xC+mZ5qwyIINMwrY7DOk2hh
+         wDww==
+X-Gm-Message-State: AOJu0YxsqiY9d1gK5SUO8C6sWP/Bqw/RgJwP2cz4lp99XgPC3TsqC/kI
+	ZTABK05pRNPtAkpGyAgrdf8HimeiWEBKu2t3ia7iy5CPm0KD/YpboVLlB8T8IMJRCwpVD0lMkTV
+	I6DD2i9P8FfS+S+IKypa48Y+xouvMy1E=
+X-Gm-Gg: ATEYQzwN2Rst5hLmPBJa5XC1LUM5RiIxQJfks6vFViAZy2yrENnNqev+eOf0JrQu2mt
+	FiJAkx5oZg5Mz2dFoGlxoi/92poaFsHh+UetsovptHCpBqplrfRCTOwKN6eIj4q/rHNnIvBkQIf
+	sYIlx8sq6fmc4xBL/c5mP9dZ28KpL6KN4VGhBKmoUZjYP6YvhF142Nuk8TStNJZ5AUfv+8+E1A9
+	X3J8wxA3u0bxDwmu72mCtHERe0iuu3c2ypBvuvQXhZ73L1tc1wCmzw8P06wNeGsgmeyQnkefA+R
+	rQmYO0Wpmb30cVfCZYOsnLs8Ea8vV93BjX7iT6s2LHO5qoL8DnNbl4J0P9eb773eshuYBPRYt21
+	FdEZebSZQVdKyytONuEfbW8EinsGyBSow8Z7oovzXBNiU3p32F8x0ceE/MCJPDkKanc4dWt7k1y
+	qFeU/lYvDtZ2nV6OC6vN6DCG7dRbP4pKk=
+X-Received: by 2002:a05:6214:b61:b0:89a:e15:46fb with SMTP id
+ 6a1803df08f44-89a19d3ac6emr42086136d6.66.1772655484898; Wed, 04 Mar 2026
+ 12:18:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260304124629.1616108-1-sprasad@microsoft.com>
+In-Reply-To: <20260304124629.1616108-1-sprasad@microsoft.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 4 Mar 2026 14:17:52 -0600
+X-Gm-Features: AaiRm50imQUdwjoxGxgA7xB14I6-dF5o2toFh1i0wq6WKK2Qd6Nx46fT4vxKQyc
+Message-ID: <CAH2r5msx0CQqwBYQ5opG5m2yX+YtBniuvFkOTbQNCzm7ok=PkA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: open files should not hold ref on superblock
+To: nspmangalore@gmail.com
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, bharathsm@microsoft.com, 
+	dhowells@redhat.com, Shyam Prasad N <sprasad@microsoft.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2026-02-25 at 12:58 -0500, Mike Snitzer wrote:
-> On Thu, Jan 08, 2026 at 12:13:19PM -0500, Jeff Layton wrote:
-> > Setting ->setlease() to a NULL pointer now has the same effect as
-> > setting it to simple_nosetlease(). Remove all of the setlease
-> > file_operations that are set to simple_nosetlease, and the function
-> > itself.
-> >=20
-> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > ---
-> >  fs/9p/vfs_dir.c        |  2 --
-> >  fs/9p/vfs_file.c       |  2 --
-> >  fs/ceph/dir.c          |  2 --
-> >  fs/ceph/file.c         |  1 -
-> >  fs/fuse/dir.c          |  1 -
-> >  fs/gfs2/file.c         |  2 --
-> >  fs/libfs.c             | 18 ------------------
-> >  fs/nfs/dir.c           |  1 -
-> >  fs/nfs/file.c          |  1 -
-> >  fs/smb/client/cifsfs.c |  1 -
-> >  fs/vboxsf/dir.c        |  1 -
-> >  fs/vboxsf/file.c       |  1 -
-> >  include/linux/fs.h     |  1 -
-> >  13 files changed, 34 deletions(-)
-> >=20
->=20
-> <snip>
->=20
-> > diff --git a/fs/libfs.c b/fs/libfs.c
-> > index 697c6d5fc12786c036f0086886297fb5cd52ae00..f1860dff86f2703266beecf=
-31e9d2667af7a9684 100644
-> > --- a/fs/libfs.c
-> > +++ b/fs/libfs.c
-> > @@ -1699,24 +1699,6 @@ struct inode *alloc_anon_inode(struct super_bloc=
-k *s)
-> >  }
-> >  EXPORT_SYMBOL(alloc_anon_inode);
-> > =20
-> > -/**
-> > - * simple_nosetlease - generic helper for prohibiting leases
-> > - * @filp: file pointer
-> > - * @arg: type of lease to obtain
-> > - * @flp: new lease supplied for insertion
-> > - * @priv: private data for lm_setup operation
-> > - *
-> > - * Generic helper for filesystems that do not wish to allow leases to =
-be set.
-> > - * All arguments are ignored and it just returns -EINVAL.
-> > - */
-> > -int
-> > -simple_nosetlease(struct file *filp, int arg, struct file_lease **flp,
-> > -		  void **priv)
-> > -{
-> > -	return -EINVAL;
-> > -}
-> > -EXPORT_SYMBOL(simple_nosetlease);
-> > -
-> >  /**
-> >   * simple_get_link - generic helper to get the target of "fast" symlin=
-ks
-> >   * @dentry: not used here
-> > diff --git a/fs/nfs/dir.c b/fs/nfs/dir.c
-> > index 71df279febf797880ded19e45528c3df4cea2dde..23a78a742b619dea8b76ddf=
-28f4f59a1c8a015e2 100644
-> > --- a/fs/nfs/dir.c
-> > +++ b/fs/nfs/dir.c
-> > @@ -66,7 +66,6 @@ const struct file_operations nfs_dir_operations =3D {
-> >  	.open		=3D nfs_opendir,
-> >  	.release	=3D nfs_closedir,
-> >  	.fsync		=3D nfs_fsync_dir,
-> > -	.setlease	=3D simple_nosetlease,
-> >  };
-> > =20
-> >  const struct address_space_operations nfs_dir_aops =3D {
-> > diff --git a/fs/nfs/file.c b/fs/nfs/file.c
-> > index d020aab40c64ebda30d130b6acee1b9194621457..9d269561961825f88529551=
-b0f0287920960ac62 100644
-> > --- a/fs/nfs/file.c
-> > +++ b/fs/nfs/file.c
-> > @@ -962,7 +962,6 @@ const struct file_operations nfs_file_operations =
-=3D {
-> >  	.splice_read	=3D nfs_file_splice_read,
-> >  	.splice_write	=3D iter_file_splice_write,
-> >  	.check_flags	=3D nfs_check_flags,
-> > -	.setlease	=3D simple_nosetlease,
-> >  	.fop_flags	=3D FOP_DONTCACHE,
-> >  };
-> >  EXPORT_SYMBOL_GPL(nfs_file_operations);
->=20
-> Hey Jeff,
->=20
-> I've noticed an NFS reexport regression in v6.19 and now v7.0-rc1
-> (similar but different due to your series that requires opt-in via
-> .setlease).
->=20
-> Bisect first pointed out this commit:
-> 10dcd5110678 nfs: properly disallow delegation requests on directories
->=20
-> And now with v7.0-rc1 its the fact that NFS doesn't provide .setlease
-> so lstat() on parent dir (of file that I touch) gets -EINVAL.
->=20
-> So its a confluence of NFS's dir delegations and your setlease changes.
->=20
-> If I reexport NFSv4.2 filesystem in terms of NFSv4.1, the regression
-> is seen by doing (lstat reproducer that gemini spit out for me is
-> attached):
->=20
-> $ touch /mnt/share41/test
-> $ strace ./lstat /mnt/share41
-> ...
-> lstat("/mnt/share41", 0x7ffec0d79920)   =3D -1 EINVAL (Invalid argument)
->=20
-> If I immediately re-run it works:
-> ...
-> lstat("/mnt/share41", {st_mode=3DS_IFDIR|0777, st_size=3D4096, ...}) =3D =
-0
->=20
-> I'm not sure what the proper fix is yet, but I feel like you've missed
-> that NFS itself can be (re)exported?
->=20
->=20
+merged into cifs-2.6.git for-next pending more review and testing
 
-My apologies. I missed seeing this last week.
+On Wed, Mar 4, 2026 at 6:46=E2=80=AFAM <nspmangalore@gmail.com> wrote:
+>
+> From: Shyam Prasad N <sprasad@microsoft.com>
+>
+> Today whenever we deal with a file, in addition to holding
+> a reference on the dentry, we also get a reference on the
+> superblock. This happens in two cases:
+> 1. when a new cinode is allocated
+> 2. when an oplock break is being processed
+>
+> The reasoning for holding the superblock ref was to make sure
+> that when umount happens, if there are users of inodes and
+> dentries, it does not try to clean them up and wait for the
+> last ref to superblock to be dropped by last of such users.
+>
+> But the side effect of doing that is that umount silently drops
+> a ref on the superblock and we could have deferred closes and
+> lease breaks still holding these refs.
+>
+> Ideally, we should ensure that all of these users of inodes and
+> dentries are cleaned up at the time of umount, which is what this
+> code is doing.
+>
+> This code change allows these code paths to use a ref on the
+> dentry (and hence the inode). That way, umount is
+> ensured to clean up SMB client resources when it's the last
+> ref on the superblock (For ex: when same objects are shared).
+>
+> The code change also moves the call to close all the files in
+> deferred close list to the umount code path. It also waits for
+> oplock_break workers to be flushed before calling
+> kill_anon_super (which eventually frees up those objects).
+>
+> Fixes: 24261fc23db9 ("cifs: delay super block destruction until all cifsF=
+ileInfo objects are gone")
+> Fixes: 705c79101ccf ("smb: client: fix use-after-free in cifs_oplock_brea=
+k")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> ---
+>  fs/smb/client/cifsfs.c    |  7 +++++--
+>  fs/smb/client/cifsproto.h |  1 +
+>  fs/smb/client/file.c      | 11 ----------
+>  fs/smb/client/misc.c      | 42 +++++++++++++++++++++++++++++++++++++++
+>  fs/smb/client/trace.h     |  2 ++
+>  5 files changed, 50 insertions(+), 13 deletions(-)
+>
+> diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+> index 99b04234a08e6..fcc56481d6cf2 100644
+> --- a/fs/smb/client/cifsfs.c
+> +++ b/fs/smb/client/cifsfs.c
+> @@ -330,10 +330,14 @@ static void cifs_kill_sb(struct super_block *sb)
+>
+>         /*
+>          * We need to release all dentries for the cached directories
+> -        * before we kill the sb.
+> +        * and close all deferred file handles before we kill the sb.
+>          */
+>         if (cifs_sb->root) {
+>                 close_all_cached_dirs(cifs_sb);
+> +               cifs_close_all_deferred_files_sb(cifs_sb);
+> +
+> +               /* Wait for all pending oplock breaks to complete */
+> +               flush_workqueue(cifsoplockd_wq);
+>
+>                 /* finally release root dentry */
+>                 dput(cifs_sb->root);
+> @@ -864,7 +868,6 @@ static void cifs_umount_begin(struct super_block *sb)
+>         spin_unlock(&tcon->tc_lock);
+>         spin_unlock(&cifs_tcp_ses_lock);
+>
+> -       cifs_close_all_deferred_files(tcon);
+>         /* cancel_brl_requests(tcon); */ /* BB mark all brl mids as exiti=
+ng */
+>         /* cancel_notify_requests(tcon); */
+>         if (tcon->ses && tcon->ses->server) {
+> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+> index 96d6b5325aa33..800a7e418c326 100644
+> --- a/fs/smb/client/cifsproto.h
+> +++ b/fs/smb/client/cifsproto.h
+> @@ -261,6 +261,7 @@ void cifs_close_deferred_file(struct cifsInodeInfo *c=
+ifs_inode);
+>
+>  void cifs_close_all_deferred_files(struct cifs_tcon *tcon);
+>
+> +void cifs_close_all_deferred_files_sb(struct cifs_sb_info *cifs_sb);
+>  void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
+>                                            struct dentry *dentry);
+>
+> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> index 18f31d4eb98de..fb4f9aafe1386 100644
+> --- a/fs/smb/client/file.c
+> +++ b/fs/smb/client/file.c
+> @@ -711,8 +711,6 @@ struct cifsFileInfo *cifs_new_fileinfo(struct cifs_fi=
+d *fid, struct file *file,
+>         mutex_init(&cfile->fh_mutex);
+>         spin_lock_init(&cfile->file_info_lock);
+>
+> -       cifs_sb_active(inode->i_sb);
+> -
+>         /*
+>          * If the server returned a read oplock and we have mandatory brl=
+ocks,
+>          * set oplock level to None.
+> @@ -767,7 +765,6 @@ static void cifsFileInfo_put_final(struct cifsFileInf=
+o *cifs_file)
+>         struct inode *inode =3D d_inode(cifs_file->dentry);
+>         struct cifsInodeInfo *cifsi =3D CIFS_I(inode);
+>         struct cifsLockInfo *li, *tmp;
+> -       struct super_block *sb =3D inode->i_sb;
+>
+>         /*
+>          * Delete any outstanding lock records. We'll lose them when the =
+file
+> @@ -785,7 +782,6 @@ static void cifsFileInfo_put_final(struct cifsFileInf=
+o *cifs_file)
+>
+>         cifs_put_tlink(cifs_file->tlink);
+>         dput(cifs_file->dentry);
+> -       cifs_sb_deactive(sb);
+>         kfree(cifs_file->symlink_target);
+>         kfree(cifs_file);
+>  }
+> @@ -3165,12 +3161,6 @@ void cifs_oplock_break(struct work_struct *work)
+>         __u64 persistent_fid, volatile_fid;
+>         __u16 net_fid;
+>
+> -       /*
+> -        * Hold a reference to the superblock to prevent it and its inode=
+s from
+> -        * being freed while we are accessing cinode. Otherwise, _cifsFil=
+eInfo_put()
+> -        * may release the last reference to the sb and trigger inode evi=
+ction.
+> -        */
+> -       cifs_sb_active(sb);
+>         wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
+>                         TASK_UNINTERRUPTIBLE);
+>
+> @@ -3255,7 +3245,6 @@ void cifs_oplock_break(struct work_struct *work)
+>         cifs_put_tlink(tlink);
+>  out:
+>         cifs_done_oplock_break(cinode);
+> -       cifs_sb_deactive(sb);
+>  }
+>
+>  static int cifs_swap_activate(struct swap_info_struct *sis,
+> diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+> index 22cde46309fe0..318533210648d 100644
+> --- a/fs/smb/client/misc.c
+> +++ b/fs/smb/client/misc.c
+> @@ -28,6 +28,11 @@
+>  #include "fs_context.h"
+>  #include "cached_dir.h"
+>
+> +struct tcon_list {
+> +       struct list_head entry;
+> +       struct cifs_tcon *tcon;
+> +};
+> +
+>  /* The xid serves as a useful identifier for each incoming vfs request,
+>     in a similar way to the mid which is useful to track each sent smb,
+>     and CurrentXid can also provide a running counter (although it
+> @@ -550,6 +555,43 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon=
+)
+>         }
+>  }
+>
+> +void cifs_close_all_deferred_files_sb(struct cifs_sb_info *cifs_sb)
+> +{
+> +       struct rb_root *root =3D &cifs_sb->tlink_tree;
+> +       struct rb_node *node;
+> +       struct cifs_tcon *tcon;
+> +       struct tcon_link *tlink;
+> +       struct tcon_list *tmp_list, *q;
+> +       LIST_HEAD(tcon_head);
+> +
+> +       spin_lock(&cifs_sb->tlink_tree_lock);
+> +       for (node =3D rb_first(root); node; node =3D rb_next(node)) {
+> +               tlink =3D rb_entry(node, struct tcon_link, tl_rbnode);
+> +               tcon =3D tlink_tcon(tlink);
+> +               if (IS_ERR(tcon))
+> +                       continue;
+> +               tmp_list =3D kmalloc_obj(struct tcon_list, GFP_ATOMIC);
+> +               if (tmp_list =3D=3D NULL)
+> +                       break;
+> +               tmp_list->tcon =3D tcon;
+> +               /* Take a reference on tcon to prevent it from being free=
+d */
+> +               spin_lock(&tcon->tc_lock);
+> +               ++tcon->tc_count;
+> +               trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
+> +                                   netfs_trace_tcon_ref_get_close_defer_=
+files);
+> +               spin_unlock(&tcon->tc_lock);
+> +               list_add_tail(&tmp_list->entry, &tcon_head);
+> +       }
+> +       spin_unlock(&cifs_sb->tlink_tree_lock);
+> +
+> +       list_for_each_entry_safe(tmp_list, q, &tcon_head, entry) {
+> +               cifs_close_all_deferred_files(tmp_list->tcon);
+> +               list_del(&tmp_list->entry);
+> +               cifs_put_tcon(tmp_list->tcon, netfs_trace_tcon_ref_put_cl=
+ose_defer_files);
+> +               kfree(tmp_list);
+> +       }
+> +}
+> +
+>  void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
+>                                            struct dentry *dentry)
+>  {
+> diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
+> index 9228f95cae2bd..acfbb63086ea2 100644
+> --- a/fs/smb/client/trace.h
+> +++ b/fs/smb/client/trace.h
+> @@ -176,6 +176,7 @@
+>         EM(netfs_trace_tcon_ref_get_cached_laundromat,  "GET Ch-Lau") \
+>         EM(netfs_trace_tcon_ref_get_cached_lease_break, "GET Ch-Lea") \
+>         EM(netfs_trace_tcon_ref_get_cancelled_close,    "GET Cn-Cls") \
+> +       EM(netfs_trace_tcon_ref_get_close_defer_files,  "GET Cl-Def") \
+>         EM(netfs_trace_tcon_ref_get_dfs_refer,          "GET DfsRef") \
+>         EM(netfs_trace_tcon_ref_get_find,               "GET Find  ") \
+>         EM(netfs_trace_tcon_ref_get_find_sess_tcon,     "GET FndSes") \
+> @@ -187,6 +188,7 @@
+>         EM(netfs_trace_tcon_ref_put_cancelled_close,    "PUT Cn-Cls") \
+>         EM(netfs_trace_tcon_ref_put_cancelled_close_fid, "PUT Cn-Fid") \
+>         EM(netfs_trace_tcon_ref_put_cancelled_mid,      "PUT Cn-Mid") \
+> +       EM(netfs_trace_tcon_ref_put_close_defer_files,  "PUT Cl-Def") \
+>         EM(netfs_trace_tcon_ref_put_mnt_ctx,            "PUT MntCtx") \
+>         EM(netfs_trace_tcon_ref_put_dfs_refer,          "PUT DfsRfr") \
+>         EM(netfs_trace_tcon_ref_put_reconnect_server,   "PUT Reconn") \
+> --
+> 2.43.0
+>
 
-That's a very simple reproducer! That's very strange behavior,
-especially since NFS4 does provide a setlease operation:
 
-const struct file_operations nfs4_file_operations =3D {
-	[...]
-	.setlease       =3D nfs4_setlease,
-	[...]
-};
-
-I'm not sure why this would cause lstat() to return -EINVAL. What's
-happening on the wire when this occurs?
-
-I'll plan to take a look here soon either way.
 --=20
-Jeff Layton <jlayton@kernel.org>
+Thanks,
+
+Steve
