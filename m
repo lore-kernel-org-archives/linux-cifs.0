@@ -1,241 +1,228 @@
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E24634E774
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Mar 2026 23:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEDF481B1
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Mar 2026 23:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772666011; cv=pass; b=asQ/SvEar+Dwa1eDzXj1K60IuMuG3JIuaUjAdAmvmIRNOFu7mg/qKQ0aTYB5Y3Kq4yBjTFc60LxbrVchx32dGg/uzfV+3GBeH1Ztd6U9Zm+Mu95O+9FyL9fA874N8NbC8G3Yj7tEVvPUTR4t9UNqXotyc55F1F/TOtvGVaKHU8c=
+	t=1772666819; cv=pass; b=GteCJy+1jYfJq47Qyb1JG/EIi91UG16IG62uJDa+3c9rA6Y91peENFFttvQKyQhgHXrDfmqv9sVjbRM7Ed1DnEMYdEMrJkBgzwp//O9//aquLMaxr5W/E/8eBzOGu9cdjcqIALPefmFX9BOen5lMbKJR++cS7DqgiGm1taRufIk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772666011; c=relaxed/simple;
-	bh=5l7t5GUb2D/4t62FXPSct37+0hReMV23ketRmHriGMw=;
+	s=arc-20240116; t=1772666819; c=relaxed/simple;
+	bh=mNEKFaRMnDHfe0orczkAXGRlU1VB7gl1INEnkvG/KwA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PD4sCREhiSZUnk9xJsZ94RWse/7vW7HDRqaySeBbh4ampvIrbwYIOQPDJH0D9+JHqVBhtzOiqU5itJj65VzySJcyNTKV2W/0y76XlOVteFwUyMfM/jR9UvqfN1vy2VVYG/KZu3MBe+GnoQW/5DmRTKUfCRTglsdpCFlTxWPVrEQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FoM+7H9G; arc=pass smtp.client-ip=209.85.217.47
+	 To:Cc:Content-Type; b=iI3GdHd9q6lgdvgebq6ymguf6QYgdEC0d52rm0zIyhJ6zZ9FJhzY8Ueo+uYBmVNQHR7K9Mz2JMaCuN88uXvifWkXwsowC5gGJBggUMvxYb9FvXsCAUCFjiopRlUcwJZz2JnWmhy6WPr+sNPdVdHWFlreaEw/n+SaE/dM4/y/q4U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=izqTeLNJ; arc=pass smtp.client-ip=209.85.217.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FoM+7H9G"
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-5ffbbf07c11so638366137.2
-        for <linux-cifs@vger.kernel.org>; Wed, 04 Mar 2026 15:13:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772666008; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="izqTeLNJ"
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-5ffa0b23a1aso702680137.3
+        for <linux-cifs@vger.kernel.org>; Wed, 04 Mar 2026 15:26:57 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772666817; cv=none;
         d=google.com; s=arc-20240605;
-        b=fCfRBGFHe3SknM6HA/Bs/iN90p7rEF10o8jBR06oA1Z2/qVqPcfY9rDpoGiXREYtMP
-         +8NnT5BV+xBCeChtq/mjwvwYGLli3ViiqGtzKakpn8SO9gx9f3EZ7gGNGbC/IXRt3+lj
-         mAEmfHik6ZLZVZdXWPR+J7zqTzE6WeTpNOvFwu3s6gqFO17JeomRgXQbKi7xNyN4NGQZ
-         Q5YlbsqREyXC/0vkweTeZb9kiO+o37PFa6wLiJKI4K8DfuGXy2UpayijpjjKMlrCEN26
-         NbS4eTXew6pJslIiLG17treHvNRfzT2mJmeYh+6azVJl52foTKmJevB0rhXk5PDS8pRW
-         gtlA==
+        b=ljuAcDSkrIbVH8H0HMm2KxAouWkV6fQUoX5wLiiTjL/pEQhawkgdl07iOKcn85CxqC
+         73TqlwHmSndAAWOsJdyz50zPLPLbbLbjg/8VpXfqQM05qC9TyZqYgZkbA3bTd6loQRkC
+         sXqdFfJhbCw2bCLc5mGaPvFNUOwaz1XQLcMMP/J+90XkWvmr+LjIjmyJeqrTOY/8Xffn
+         c8mc0xEag73P0ESqobnfjZ1xsqlD8aoudZtd2YXHR799XYkvZrc+1bmAeHhfsnD6Z6ub
+         xNXOO1YduGeVx778AlcfPcBofzd7sBk5dYmRgx+deIniA3qqfylIzjHNtoK3lU+W1I8s
+         H+Bw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=cT8TknxJNuHJgHXdge5Ni6drCi6rxzjYWQCjsyroxlk=;
-        fh=2l4CjG9akMrdED3Cwo6tsLNl06S+LnGB6CPbH2YdbjY=;
-        b=lauUZCycafL/H+pgiGHEoXaBDdZeCohcNnA8Myjfoj9NOvZSxTON/Pi1f5PpfjYRXa
-         3nhi6W71oTcxa0lrG1K5jSiQxtTHKbIkSTQh3U8OF9DCosaZRfwflqs1etvDrVfS1HKv
-         MOzOeloute3cYZVqDQWhZM/jXLLw1BeYteaFztl3Ww15eyeA0tsnzqKkDJEY5x3rjfjE
-         d02cDJNrq8r6Ad1L1CbdHNX8+5Kc1Z/JX9CZrw8gyU7WoDp2VZUmn2GydATzO03itk1n
-         69Dhngg+Qw59qDJqnPjPnAe6jsHTySXYilk6X+TZzcYcVPse3SJT9PTWDPBynZJXdL6S
-         mKMw==;
+        bh=cTFDYsqZ964fQZj00eGDb1NQ/WjjGh2BRCQyhHEgw9o=;
+        fh=oZSMUTfFXbHl1R39FTsqI7go/eV92W3GLqOaydP6+kI=;
+        b=bB9H2lJmG1rwehzBr5HfZ7nueR9mzv2JxFNgYJLJYGBhTakfaAN2vw3l4ayw5rj3YT
+         4ThF0wrY8yXMnYIO/0AYMlh+ywC9aCpvARhK/Rp84rPcI9Qp7r2KA783BxbKwsyqXcMm
+         BmhueJiw/AQ5FQxTsGrG7OYM5fYTyedQpYVVCiAdsrmbfv5mQokLwfyKT7OSNITR7/dB
+         uiLM/C3xlrtu36YnTuhqC4GLSzo7cSQUqu0hyt26z/TJEz4RAafu/rliKyJyhecUjjYF
+         W+VAjZPvSEaO6UCBd8OUljRl0xK9gneCBFxPd0kgIlqjzSwyvsf8dKiNfSAcfYeS3+hE
+         Gq3Q==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772666008; x=1773270808; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1772666817; x=1773271617; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cT8TknxJNuHJgHXdge5Ni6drCi6rxzjYWQCjsyroxlk=;
-        b=FoM+7H9G6QmKyKIpSt7BuADbqN6Y46624d1yiJkV2lFt2bXbo6y7zJ7w69sefkqHYt
-         stw+2pKpN2Fve9nXj1jmeLSjMiwH5IuFwRfztJ44f0oFi5Xq3cjs8tikVUynRA4/HcUt
-         v3UwKJKuqOaoCAaedkq00VktAtmIbFmM1p3nt/HeKn+ZAfR6nBaBAsMPYEDDuvt1/YHw
-         e6QThDGY6a2QQNSFUYiVT7KxBEtQx621jO9D6+DCis7czg3KTr1y7yE2IqpfFR8Trf4V
-         jl89SG40RPLh9wtrDiLPaLS60YY9wXOmHtjg7qV1HP8ufdS6HQgrh2N6uCMrhsu9b++E
-         L7WA==
+        bh=cTFDYsqZ964fQZj00eGDb1NQ/WjjGh2BRCQyhHEgw9o=;
+        b=izqTeLNJ3HfRvPWHAlCZs+OC5FPcEQu2CpDIzTlRJWn0fztcypamBGdhwNXJigHZOC
+         kQxTZh+l7zyd90FHTiPScMAVWQQZZ1iXYgDZsJ1fgVUxzzI+IoB+ps7HCaoz/baECq1J
+         v4R1ClyKQy8b060NiH8s9fvZCWRO/Iu9T2j1nRWlHkfpUWHPjcsrgPPQwegt8OnlQzsa
+         LI9MbZU/a0gPDuK+oL+KigeI7YbZEvsZgEVtXHTve8PBLsuPweVY0jpWSdt9W2zJUh55
+         kOU0QjGiIE3F0Ica82vaD3XjGcqq4fbKnwu+H0RlwCNmVm4NcCaf4oM9mEwfyRzGDOjg
+         3YZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772666008; x=1773270808;
+        d=1e100.net; s=20230601; t=1772666817; x=1773271617;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=cT8TknxJNuHJgHXdge5Ni6drCi6rxzjYWQCjsyroxlk=;
-        b=f1wk8zD06DbADIiri+r47KWqQUU+zYdHj+CsGb8DwYwkKSMqu7jlORchEO3/SXN12p
-         2ZOlUyFJVHqE3QJRfOGnARnTr8g0R1HCap1pljnz5ul2VPufNY+dFqYg94MR5FcAmYZ8
-         KExI+sEtOSKX/awOH0goHPl1x5cGWJHV50M53Z+bq7zdPXDrt0zhdc3lZ4rFhnxTYwrZ
-         aNxtIkQtxLtMs/K+0+pyH23vjW3CyMD7v6LKZMte/n84+XtMtOy0fGML2JbeRj2a0rLU
-         KnMuTPm/hoK4IGy63Jnfw4+xAd1MuhDDzZlo6vDZ/C+MsZWAxS0NRy9aekcLERHEUXFS
-         +GhA==
-X-Forwarded-Encrypted: i=1; AJvYcCXK8bHFgrjR1GBC7eguSWia6XGJdILa1j3GKxjONyIn4VypjwH52aNAIEbfbH4MkktMUQDEhCS1SBi5@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfpUuQ47ob6qkn/s/sPqGubS5CnbTwbR5pc+RfpMMQt4BvDHgY
-	IAEq1rivYqYlq2965pNBckeLn41QErYsC+SmWcrMBBR2TWbAGCVM+u/W8daWJxbrgc/xySddC7/
-	oy4HVpSmOYn3zZtsJQne73V+OAKOIaVo=
-X-Gm-Gg: ATEYQzzLfQ6Ae16FbDbDtmYKpfh0LvWZqGAn/FVtLwSspqtqeJxOwoYSvzrVCHUsxtl
-	PLdO1os6/d8ml6UUugmFcDQnpUptlATLswy88OaiX65wUL/hSIu89DslEY6pk2wV2wKeiSOI64n
-	pqyBppTjLPzEketgNgniKQ7g1g4ZPchCyPDP/kueXfulJnYWp5KxZ3MOQgQwvrZrMLU6ov0Mg+b
-	FEgMv6wYszJBvLdUW+CfrMuor2RPzCrW4G//0cqXbbCy7wsJFQUW8XomLq0BZ7W+NJSQpxGNT5R
-	IdxDu5OZY/5410Fof1ptTxy3m/2xZLpAhrWqTlaJHUJUS2QHog8pdQ2gWmfKVffClVZxPp9IuF6
-	2HDGIzJjcRzk/JDf8
-X-Received: by 2002:a05:6102:5489:b0:5fe:652:5d2e with SMTP id
- ada2fe7eead31-5ffaaef0e47mr1704970137.24.1772666008447; Wed, 04 Mar 2026
- 15:13:28 -0800 (PST)
+        bh=cTFDYsqZ964fQZj00eGDb1NQ/WjjGh2BRCQyhHEgw9o=;
+        b=w/1jL8sPHQq0JbtoHTnmlAaI5MoKK/qzDxKCqQ7pEvA9JnVnMfqv+liz6DPogC8EOe
+         BBSbJa1bTnfb7acSRLRf7+sWYUt63IM0/jE1YYMi8wRkaLh2T01L3L/K9ap3NYfrQnx3
+         la2j5a5FheNcTa0J+SEZFobyqJHdCxHazTHnkk8awJ6PRW0YBZC0t0xKFO/OBOVn+1RP
+         ZwpiGjFkRFpoU7TovIKdutfJMzD0DAbfN8zCJs36uVRXTHm9HhzyuoV8+0h7WTNasSPX
+         OHx9zGf4q2/ZhaiGK70Osr+S38PslDGNAsb4kYMdPn0oz9LQeQZ3WihyFQRFxxdn/4bm
+         qyKA==
+X-Forwarded-Encrypted: i=1; AJvYcCVQUdbQ+l6WYfbOX49HgyV5lkHME8979ayYSDWIBSGtrMLGsOajV4DlsJIfARlgFNwmF9NQGDHeBmJX@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9cPoEQ9Enj4TebKOhn8TwwMK2W1miYSnzhmzZmc8niXTtFAHW
+	mdCArtn7VfMJTNDVpg7+iksRC1V4TwK9e9LQrq7Mz5OthpT0gvC9hkwaThnI08dDfbXf/WHMlhb
+	P44HvgJSYSixOdZV78/MN37WP80nLeZU=
+X-Gm-Gg: ATEYQzy74aXeRiJdH0rVJYk38qjJg2+Rc5lJLs2+bJBMS8VqgGkQ+81+2r9bXPOxnf9
+	ygJVZA24hjuYCfkfYtxKZq1VhDBj0B4qQdg9ZNbKAOS6GrBIcnikE8S7jRB3pQBHia6RGIrqlQF
+	0PsrIfoKVMpbK/fuGba9mkzGt9jiBu+uYLTWESgeQ322qnjVXFAF5JfP0cSi4jtIXMpBQnrrQtF
+	hkYmTLiuui4+SgdOP6IjWY8m+0GaVYSm/YJjQGdT8hpgIk9vWuUgEb3FxWEnZIytiiy8mFfaJkN
+	DW3fB9RFDYZbVuXQAkdrDka4xtH/ehWXEsasXzouYfskL3JRegb9aPPQeBy9tdmIF6IjeSR8vpD
+	T6Z6d6LmEiqBIZB9U
+X-Received: by 2002:a05:6102:6106:20b0:5ff:b684:f796 with SMTP id
+ ada2fe7eead31-5ffb684fcb5mr841879137.13.1772666816783; Wed, 04 Mar 2026
+ 15:26:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <e49a24b97a25a9c25bd33411b8212978dd566bd3.1771986861.git.lucien.xin@gmail.com>
- <20260303083338.35544-1-pabeni@redhat.com>
-In-Reply-To: <20260303083338.35544-1-pabeni@redhat.com>
+References: <cover.1771986861.git.lucien.xin@gmail.com> <e49a24b97a25a9c25bd33411b8212978dd566bd3.1771986861.git.lucien.xin@gmail.com>
+ <CAF6piCJDWjOmgkspuk28qAF8+9xj_o-zTXkUdB+3_waZqaMXBA@mail.gmail.com>
+In-Reply-To: <CAF6piCJDWjOmgkspuk28qAF8+9xj_o-zTXkUdB+3_waZqaMXBA@mail.gmail.com>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 4 Mar 2026 18:13:15 -0500
-X-Gm-Features: AaiRm527Z74RAkiN-mCfJkeNg8yTAxvy5WGzpm2A5_gQLEbJOF1OYgOVWbRr1Wc
-Message-ID: <CADvbK_eo-aMrhr39ai6i+QU4d30_-Z=_5Cn4K9Yr2=XQat_51w@mail.gmail.com>
-Subject: Re: [net-next,v10,14/15] quic: add packet builder base
+Date: Wed, 4 Mar 2026 18:26:43 -0500
+X-Gm-Features: AaiRm51sN3852302sTemIODlyAcPk2eG-uFfqRRmkPhePbFyqTDKIq6vNte4qKM
+Message-ID: <CADvbK_djqHEaj1nO1mAR0h9qpkTUX1cXGMPEjrswySM_1bXNvw@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 14/15] quic: add packet builder base
 To: Paolo Abeni <pabeni@redhat.com>
-Cc: hepengtao@xiaomi.com, kuba@kernel.org, jlayton@kernel.org, metze@samba.org, 
-	davem@davemloft.net, kernel-tls-handshake@lists.linux.dev, horms@kernel.org, 
-	hare@suse.de, aahringo@redhat.com, tfanelli@redhat.com, mail@johnericson.me, 
-	andrew.gospodarek@broadcom.com, linkinjeon@kernel.org, dhowells@redhat.com, 
-	matttbe@kernel.org, xiyou.wangcong@gmail.com, dreibh@simula.no, 
-	jbaron@akamai.com, quic@lists.linux.dev, pc@manguebit.com, 
-	marc@fiuczynski.com, edumazet@google.com, alibuda@linux.alibaba.com, 
-	steved@redhat.com, illiliti@protonmail.com, tom@talpey.com, 
-	marcelo.leitner@gmail.com, sd@queasysnail.net, linux-cifs@vger.kernel.org, 
-	netdev@vger.kernel.org, mbuhl@openbsd.org, smfrench@gmail.com, 
-	chuck.lever@oracle.com, daniel@haxx.se
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>, 
+	"Marc E . Fiuczynski" <marc@fiuczynski.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 3, 2026 at 3:33=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+On Tue, Mar 3, 2026 at 4:19=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
 e:
 >
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
+> On 2/25/26 3:34 AM, Xin Long wrote:
+> > +/* Transmit a QUIC packet, possibly encrypting and bundling it. */
+> > +int quic_packet_xmit(struct sock *sk, struct sk_buff *skb)
+> > +{
+> > +     struct quic_packet *packet =3D quic_packet(sk);
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     struct net *net =3D sock_net(sk);
+> > +     int err;
+> > +
+> > +     /* Skip encryption if taglen =3D=3D 0 (e.g., disable_1rtt_encrypt=
+ion). */
+> > +     if (!packet->taglen[quic_hdr(skb)->form])
+> > +             goto xmit;
+> > +
+> > +     cb->crypto_done =3D quic_packet_encrypt_done;
+> > +     /* Associate skb with sk to ensure sk is valid during async encry=
+ption completion. */
+> > +     WARN_ON(!skb_set_owner_sk_safe(skb, sk));
 >
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
-l.html
-> ---
-> quic: add packet builder base
+> This is the TX path, how can sk refcout be 0 here? Possibly use
+> skb_set_owner_r() directly? At least use the WARN_ON_ONCE() variant and
+> add a comment documenting why is needed,
 >
-> This patch introduces 'quic_packet' to handle packing of QUIC packets on
-> the transmit path, including frame packing, packet construction,
-> encryption, bundling, and transmission logic.
->
-> > diff --git a/net/quic/Makefile b/net/quic/Makefile
-> > index 2ccf01ad9e22..0f903f4a7ff1 100644
-> > --- a/net/quic/Makefile
-> > +++ b/net/quic/Makefile
-> > @@ -6,4 +6,4 @@
-> >  obj-$(CONFIG_IP_QUIC) +=3D quic.o
-> >
-> >  quic-y :=3D common.o family.o protocol.o socket.o stream.o connid.o pa=
-th.o \
-> > -       cong.o pnspace.o crypto.o timer.o
-> > +       cong.o pnspace.o crypto.o timer.o packet.o
-> > diff --git a/net/quic/packet.c b/net/quic/packet.c
-> > new file mode 100644
-> > index 000000000000..a56edc745bb1
-> > --- /dev/null
-> > +++ b/net/quic/packet.c
->
-> [ ... ]
->
-> > +/* Perform routing for the QUIC packet on the specified path, update h=
-eader length and MSS
-> > + * accordingly, reset path and start PMTU timer.
-> > + */
-> > +int quic_packet_route(struct sock *sk)
+skb_set_owner_r() will do memory account with the skb->truesize, which
+is not what it wants here. skb_set_owner_sk_safe() is used to keep the
+sk not released during async encryption completion, as the comment
+above says.
+
+I don't see another set_owner_sk helper for this. Please let me know if
+you have a better way for this.
+
+For now I will change from WARN_ON() to WARN_ON_ONCE(), but still keep
+skb_set_owner_sk_safe().
+
+> > +     err =3D quic_crypto_encrypt(quic_crypto(sk, packet->level), skb);
+> > +     if (err) {
+> > +             if (err !=3D -EINPROGRESS) {
+> > +                     QUIC_INC_STATS(net, QUIC_MIB_PKT_ENCDROP);
+> > +                     kfree_skb(skb);
+> > +                     return err;
+> > +             }
+> > +             QUIC_INC_STATS(net, QUIC_MIB_PKT_ENCBACKLOGS);
+> > +             return err;
+> > +     }
+> > +     if (!cb->resume) /* Encryption completes synchronously. */
+> > +             QUIC_INC_STATS(net, QUIC_MIB_PKT_ENCFASTPATHS);
+> > +
+> > +xmit:
+> > +     if (quic_packet_bundle(sk, skb))
+> > +             quic_packet_flush(sk);
+> > +     return 0;
+> > +}
+> > +
+> > +/* Create and transmit a new QUIC packet. */
+> > +int quic_packet_create_and_xmit(struct sock *sk)
+> > +{
+> > +     struct quic_packet *packet =3D quic_packet(sk);
+> > +     struct sk_buff *skb;
+> > +     int err;
+> > +
+> > +     err =3D quic_packet_number_check(sk);
+> > +     if (err)
+> > +             goto err;
+> > +
+> > +     if (packet->level)
+> > +             skb =3D quic_packet_handshake_create(sk);
+> > +     else
+> > +             skb =3D quic_packet_app_create(sk);
+> > +     if (!skb) {
+> > +             err =3D -ENOMEM;
+> > +             goto err;
+> > +     }
+> > +
+> > +     err =3D quic_packet_xmit(sk, skb);
+> > +     if (err && err !=3D -EINPROGRESS)
+> > +             goto err;
+> > +
+> > +     /* Return 1 if at least one ACK-eliciting (non-PING) frame was se=
+nt. */
+> > +     return !!packet->frames;
+> > +err:
+> > +     pr_debug("%s: err: %d\n", __func__, err);
+> > +     return 0;
+> > +}
+> > +
+> > +/* Flush any coalesced/bundled QUIC packets. */
+> > +void quic_packet_flush(struct sock *sk)
 > > +{
 > > +     struct quic_path_group *paths =3D quic_paths(sk);
 > > +     struct quic_packet *packet =3D quic_packet(sk);
-> > +     union quic_addr *sa, *da;
-> > +     u32 pmtu;
-> > +     int err;
 > > +
-> > +     da =3D quic_path_daddr(paths, packet->path);
-> > +     sa =3D quic_path_saddr(paths, packet->path);
-> > +     err =3D quic_flow_route(sk, da, sa, &paths->fl);
-> > +     if (err)
-> > +             return err;
-> > +
-> > +     packet->hlen =3D quic_encap_len(da);
-> > +     pmtu =3D min_t(u32, dst_mtu(__sk_dst_get(sk)), QUIC_PATH_MAX_PMTU=
-);
-> > +     quic_packet_mss_update(sk, pmtu - packet->hlen);
-> > +
-> > +     quic_path_pl_reset(paths);
-> > +     quic_timer_reset(sk, QUIC_TIMER_PMTU, paths->plpmtud_interval);
-> > +     return 0;
+> > +     if (packet->head) {
+> > +             quic_lower_xmit(sk, packet->head,
+> > +                             quic_path_daddr(paths, packet->path), &pa=
+ths->fl);
+> > +             packet->head =3D NULL;
+> > +     }
 > > +}
 > > +
-> > +/* Configure the QUIC packet header and routing based on encryption le=
-vel and path. */
-> > +int quic_packet_config(struct sock *sk, u8 level, u8 path)
+> > +void quic_packet_init(struct sock *sk)
 > > +{
->
-> [ ... ]
->
+> > +     struct quic_packet *packet =3D quic_packet(sk);
 > > +
-> > +     /* Perform routing and MSS update for the configured packet. */
-> > +     if (quic_packet_route(sk) < 0)
-> > +             return -1;
-> > +     return 0;
-> > +}
+> > +     INIT_LIST_HEAD(&packet->frame_list);
+> > +     packet->taglen[0] =3D QUIC_TAG_LEN;
+> > +     packet->taglen[1] =3D QUIC_TAG_LEN;
+> > +     packet->mss[0] =3D QUIC_MIN_UDP_PAYLOAD;
+> > +     packet->mss[1] =3D QUIC_MIN_UDP_PAYLOAD;
 >
-> Should quic_packet_config() propagate the error code from
-> quic_packet_route() instead of returning -1?
+> The magic number above looks quite obscure, and AFAICS looking at struct
+> quick_packet comments have different meaning. Please use some macro inste=
+ad.
 >
-> The function quic_packet_route() returns proper negative errno values
-> (via quic_flow_route()), but quic_packet_config() replaces any error
-> with -1 (which is -EPERM). This could be misleading when diagnosing
-> routing failures.
-Currently quic_packet_config() callers will either skip the process or
-return -ENETUNREACH on the failures. But maybe it's better to use the
-errno from quic_packet_route(). I will try to improve this.
-
->
-> > diff --git a/net/quic/packet.h b/net/quic/packet.h
-> > new file mode 100644
-> > index 000000000000..8c23be386207
-> > --- /dev/null
-> > +++ b/net/quic/packet.h
->
-> [ ... ]
->
-> > +static inline u8 quic_packet_taglen(struct quic_packet *packet)
-> > +{
-> > +     return packet->taglen[!!packet->level];
-> > +}
-> > +
-> > +static inline void quic_packet_set_taglen(struct quic_packet *packet, =
-u8 taglen)
-> > +{
-> > +     packet->taglen[0] =3D taglen;
-> > +}
-> > +
-> > +static inline u32 quic_packet_mss(struct quic_packet *packet)
-> > +{
-> > +     return packet->mss[0] - packet->taglen[!!packet->level];
-> > +}
-> > +
-> > +static inline u32 quic_packet_max_payload(struct quic_packet *packet)
-> > +{
-> > +     return packet->mss[0] - packet->overhead - packet->taglen[!!packe=
-t->level];
-> > +}
-> > +
-> > +static inline u32 quic_packet_max_payload_dgram(struct quic_packet *pa=
-cket)
-> > +{
-> > +     return packet->mss[1] - packet->overhead - packet->taglen[!!packe=
-t->level];
-> > +}
->
-> This isn't a bug, but quic_packet_mss(), quic_packet_max_payload(),
-> and quic_packet_max_payload_dgram() all repeat the expression
-> 'packet->taglen[!!packet->level]'.
->
-> Could these use quic_packet_taglen(packet) instead for consistency?
->
-OK.
-
-Thanks.
+Sure.
