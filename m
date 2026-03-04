@@ -1,96 +1,95 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3F82AD10
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Mar 2026 23:58:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548AE17DE36
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Mar 2026 00:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.177
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772582332; cv=pass; b=epQZjJft2DfHTCwkSRlfaDS2ghE0j+FngSgoNDeMqSDchTzf9bneru992eVDO6cgWjq30V02AcRrL7+br0MdC76oCcZl3LT/WUMfFa+tTUmswUCGbW8nLgdbT1RoHebJAMHUiZyzQIMDPYNcv2eWsK0xRfOcr1v6WzrDEkXKDcY=
+	t=1772582758; cv=pass; b=NjIIuKMk7thembHWoHkTVuprlrbSMp+Y/uMiKqyAM1gCA+tQACNA8tLCPNSCnD8NgjIOJkHKcZIf3thHktCyrhusr2tUJsyjhJ45beeru8eTfCkR4JDzD5i0SX3a+Ovwdb3T6DpDm+FViMX3lH05Rz2P9imfKXsGtleVCE4MCNc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772582332; c=relaxed/simple;
-	bh=kVpkg6v37u9kY5MUoy6DzCYUMm2N+Z6Ka7XSSPZlw2M=;
+	s=arc-20240116; t=1772582758; c=relaxed/simple;
+	bh=nXmEO9LmnbKqO+trR5UXQBshWB5/jKXpBWp7TM0Dh94=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qrjKnwehBMI46MvyY3X9DrHdhS3q8owDvmawdYsiVGgb4vrtrQYC6FNSxxN6oT5z5RYavhZ+o+jm68RwDhDgPlTdMaqd8kLX8XTyWXvDoO1HQ6i+Uq1SbuuW3hMMTc4/lfniLYjttD2EXBDtkwKOo8pVBeqZuSnXQqoY5D7ab/k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VPYgzUOy; arc=pass smtp.client-ip=209.85.219.47
+	 To:Cc:Content-Type; b=haKpOhJ32qoVCN/cU5VhlDBkx60t2IfYtrbO036XBAAwrnMxfwkb/OuqRVkbSo9fK+UvfXiis20IpJLe7qOt/vh5bSBq/rXTeas/kKd/Hri5NY9wdocftqsmqUGIB/bi/dxjyFwuXu3xzUKuBor+yIcgGSUlUi3DDACNoSL+YyY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E625iy/D; arc=pass smtp.client-ip=209.85.222.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPYgzUOy"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-899a5db525cso57300216d6.3
-        for <linux-cifs@vger.kernel.org>; Tue, 03 Mar 2026 15:58:51 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772582330; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E625iy/D"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8cb420f7500so597645585a.2
+        for <linux-cifs@vger.kernel.org>; Tue, 03 Mar 2026 16:05:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772582747; cv=none;
         d=google.com; s=arc-20240605;
-        b=KZMHYiP8k3SWB2eZBj0lvQho3RQ6mqifZiMxN9vagzk1Ro0ZChFsEEBt0gslW5hcIx
-         4Y+HdskZ3X90xQHFNq32l4XYVCLOGMto0XO8Xh98Qtz2wdjACp+7KBls6RYHcOo/yM+u
-         1/NqfLJFmipJfhPodQx9AgNSdRBNetVoyovq5912rBrOD/UxFGeIL85THP5XRUSAeItc
-         iIDLfL0vajKOocf9tipvsrXXJLQSST3gYUDtD7eeIuc4EtrwanShihbqCkcGPYxdsM45
-         sG8khs81H/+Po08Xxg9aorjL9UUQ68AqRkt8c+1yAsfw+i7xzNHdGcgS+pkpIzieMWYb
-         WcZA==
+        b=IN0y++3/8rzvsQP4V+PDgcw78Prennm4Cof8SGI14Ur8TgpyK3HAGIQXlLMa82GecE
+         vh50WtxU14DgkV9KxevqNBE72WIlrqZYIes+67jWSTXe9lc1oMi8iehFmcGtOfza6X4K
+         b9VPJNFdPfK/ts/s8zlUbSgDwcdNizU8wqTSRrU40IeY+/+SSabQxBpZ0FXdztyaD3Sq
+         drvq6Zs1lTj4CHvkMFx4XVGln8rOUB/FgpZ0FdkOMAdsgeNAMNKZG+1QKrfJs2V+Nu/p
+         7LJchyh6h67qlru2E0Ir5KbPvZaRD5l9luGlYeV7HjBwJua3PQTIKRiUzPDSd3fh4rT1
+         DmVA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=HLI0m0UT98/OOAJ8nkR/CWr1uZ0+Ku8t1rgsjfX3GXg=;
-        fh=nWGANkmQgSHdz312apVID0lb5xKseBXgwQ+7OTlLvNs=;
-        b=gVRJU+cscxtZan0rmlC/5SgYmJFeOnUfrOLxMowqHVe8GvwShcgjmel6yZ1ICyLL78
-         3ps6f01sI07U2TFdkhtCyPBAFmXdjuqUlLJHtPFQdEey18Dw2juaKSnfAg4XkSb1wLeR
-         bgsdlhlAbE/QKsf5xlTrSA0VQOQoyNDvjIIZ0Uberd1/872rBpAeyoNXBwZolsQynyoV
-         bMo9itbKCgPOYgfBaJWMSf1wU8EDM8zF7vtank8TIjeGcgUkBUXln91GSj6qZbM6tIqg
-         YoyAP2UgA4zLMNxzzcm6CVfeSCY1J+qD0w5qyWO2cVpxwXvS9vKYL4NgdmjoWirQEaLx
-         cqBw==;
+        bh=f2wZEqK79wMzpg1Pn5Tti1GvnwoERllu4E+cdGP0eOM=;
+        fh=EguGg28gP+sNk86speHtjXt8btN4ov8F/PL5eO0WaYI=;
+        b=exT+aQT1B5CjbmIEhCBsOvBJZ++O6KpsPXUM+RBZFPioClR2HhS8OWCLqsibE/t83M
+         CeeZLtkFUqgCEbA03fgF4fmEgUioNNG/vy35Gpf3uvCDxJlbqo5QkUmRtUOPOO65bBWN
+         kvWGlnMYhRg5up+pIwNrFQ85YUjpzxcqHC4MiP0F1aXsUhmTHKZhwZcm1kyaSpgnaYl+
+         r+CY86GDpKoJZSX557zxAjJymXlEMrQ4Zr1obF0REVseKf2kaeSpL57AKNfy6YDTx7Va
+         Vg+CVkTT4tLXs4PwPC5kuxOwic3QM8P7aNVknekYds/+sPul9hQwVIH/7xx5bv2siiGr
+         2SPw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772582330; x=1773187130; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1772582747; x=1773187547; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HLI0m0UT98/OOAJ8nkR/CWr1uZ0+Ku8t1rgsjfX3GXg=;
-        b=VPYgzUOyUwSfmTfzAUsg6SBuBQpYOBGRU4IG/gH4wGC9dw5xyPCUMzTy2/VOS0JxZR
-         /6DS9NZfHowKKBefi5g8vIW42MsLy+pV465eQxqb14N14Oo/m6bGzvxuTDERuQrlXjro
-         uEp4ZpgOrBIvItZpvgWONTCodhotirKwtuAHtXBcgfyyhTz/KkkTwjkz6xKD2XZdOt3C
-         xIYdA8+aq/+R+k3fcYVe64D30h621p+ctDz/An7nIkpyobTZVAtigsErscvVFxp5xl/z
-         BwtUpEGLKzeboQ62RE2lcOC+Iu7QCwbpFJCD5wQTTX294bI1uRazsm9WO6kSNT3w97IJ
-         MlBw==
+        bh=f2wZEqK79wMzpg1Pn5Tti1GvnwoERllu4E+cdGP0eOM=;
+        b=E625iy/DwKMZwIAfis2xksC336avtqsjkvlu3WHXsEJBLi6wz1CPPSMfYGKgMQwKC6
+         idM1ffxZj+ZhZd/e1BhHvZRygYEnvLP7LINWC0O7lkf+XGqVywjYCuk8iSmx02u0YHA3
+         btmJuVf5KLOWpB5q7vH0k4TJH1IhYHOxszp+FUVZrVhTPen7qjMKzJPydX+Jw+2xXutQ
+         CxsxQtDd+z1yjQk2A2DRz96wDFzF1sTE/mz1FsbvRnFj5YQnr/0Fv3lCpfNw1QB8Ulhn
+         t2MCN2ekIpqwSZCm21opg9G6E/UNDJT3YEZXTHgAkCvliVEbVjfKx8HxcrV1WbKylktY
+         Tdmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772582330; x=1773187130;
+        d=1e100.net; s=20230601; t=1772582747; x=1773187547;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=HLI0m0UT98/OOAJ8nkR/CWr1uZ0+Ku8t1rgsjfX3GXg=;
-        b=od8K+zSe8yBBmelqEW9vhqU6QEscGfh9SsQFGfNVE4KbWNkex42wsWyMQizsZ7saan
-         AUejbIHPMLPOI8bTCOIrQoNtgFt5YcyXKAGqY9r4R6396n7KT9egxPq+NFkZvu57V56F
-         koXsnCZC+IqwQ+yYMwyJHHwTA3z8FLlmgevJX3ZmaWobv/ReRwybpc8kxVn9HcmI7UfM
-         QUhmmB5UF6ovtqxlnwkZCed9Cxv2LIL5a+QzXlgpap9OosbVoUIHy0k4VeDpyywxDEy3
-         +HPqluJvIjG+oKnvbXAuRUfPcMvgtcK5kBgp/IxuJBxf/vqUxaZBeBiA0rgzzwJLaYMH
-         O6aQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWETvyPgzbrV+oxmP5S04bevOPWY5k+01xfNVefzt+PkHe15/C6aBYr9cX3bMeI4sERUte/KZvRmNP2@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEAZnl3JJE/x2BZuLn0V04FNqHG7AE2WGDUi9y0Zg2wrMJG3zZ
-	iOjTj/uJwHbL+T0kGTU1rNp5MZP40qRJFCUuIwrNtUp8gKzIhuxwCc2bDs1l0AvrDjK/FYsry/s
-	c7arjLQMzbTjUv6dEUQSLvoyz8lc9CCU=
-X-Gm-Gg: ATEYQzxsaFVVsE28MrvpN7p8uPkrNdqPfy6Ajoz8dHcU35PardlhSM0yd69Ji1SCK0z
-	QPnYK5NgrNJ02Q6Cbj302Wsl+24xTxQu8VsYg3zJnOBsKYsYfTcPww0TgE96awrSY5T1AkRMm2I
-	G7Ms6VNH8Wq1Xp+iSg26CVBb81MSI7lUvZR6OamssyUIopqEDRlnFkP/44aQyIkMpZKQxCCx2pg
-	9H53YJob2CG1cmd7rMiCT6feeX9la+ntho14NWk4xgDQfP86YkFeGlX1o54Klnh/OpFjW94qgQy
-	tXvlq6VBPnm60oA1db3blokQyrHIOB9H+dZivubYEXHYDuc8eIdtoWhPlw4Nhct1sT2sXvG1ix+
-	wmonoYCCVzC5ivElSagiZ2tqsDKRkRisNKbY1ntF6C1pGrX9TPn6LLtm4l2KDNi+lo8bJAp32r8
-	cy1a4rqdeuivbeMBe5EMT+giIzz0Gsb5Os
-X-Received: by 2002:a05:6214:2423:b0:899:f179:d187 with SMTP id
- 6a1803df08f44-89a199961aemr696436d6.6.1772582330334; Tue, 03 Mar 2026
- 15:58:50 -0800 (PST)
+        bh=f2wZEqK79wMzpg1Pn5Tti1GvnwoERllu4E+cdGP0eOM=;
+        b=pVEI0DQqlIjpxRNvP8CxZGa94SV6FAuWNfPzy+fJLfRveVqdI7GoqMiMWgOCzkrFMq
+         +rqCXuMelwhv3Ab5/G6nn0EwF175TXrp5QOq/oN++3UZZB+CuS0myUpL65DyHpDnA68c
+         7eE3Wl1JrAeE9QjO3SNeYZIeFVR94so51FE3pPD/QUr6K0tiY7aaXO77v4sgrBRNa7Ks
+         C1S965bSFQN6h+EzLtspB0AyXAOnb6FIbbXvTTg7JjkhhVEBVLJ+mDdLC69KJDPJ8MCU
+         13pJWEMqMhkci41f9dQyIl2bbVee2rgEVc+Vo1OmYEy0a0MRdVSI/SqHSGT9ra33wkty
+         M+8w==
+X-Forwarded-Encrypted: i=1; AJvYcCWm77zCf9oLy9gaBMOHBxlFLwUvAc002wND6tWfXSKooI/gsb90qs352vqrPEWkAIdWAXUNYzSvQP5M@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsQFJCMZ8KWSDXy76YQsjL7mcfJmfmrQnelrEylsOYXZ69+IcI
+	ggglMzdnB3Jq3HUI9hPwMyYlITVROKSShe/ssFG6+/Oqsf6AdtikC/0mcCbzBcEzJlwHEyOYY7c
+	P4+aFd0zaLjVdSTRsFtepgqWTRz/6lZc=
+X-Gm-Gg: ATEYQzwtdXfmrBpOPnezLCpY6STN1hi0xwy91BQfomaU2QL16pXDbi8xN0KGlzhol3j
+	k/eTNevBkFtMGdTBvTY//YNvbiFcRUB1qzokfUk6HgEd50UUUVXBYcHC3+tQk9qrITBQhCNnkLR
+	clBJN/8TxJ6IoCfC7K0VqQPJHv0dAFUEXUZe5qYXaYPQma0GgNMwf/u2MKUaQURPRqAolb1Fxb8
+	jnjK+bLU/LNJQxnpCg1NdPOby55EPU1m2qe0tOBNIIuBWXh9TdIPZEsVe+A34s7yZTjPINxVyfT
+	V4Ka5prqZIDtXxU3e2wEdm3qaD6ZKK2skRcrUi49JlbKJv1qvMU6bY4mTYWikLd3V34L3vAvoG9
+	XuAejxoZSiCdJw9Ov1iWtzvjByuWU5GfSRfpsfT025oUAjYlB0DHVf57Tgg/IFt0UcT/2+DRnx6
+	6I0F3tH8jg0u9inuD62Wnayw==
+X-Received: by 2002:a05:620a:280c:b0:89a:2f9b:10d3 with SMTP id
+ af79cd13be357-8cd5af0386amr34106185a.30.1772582746868; Tue, 03 Mar 2026
+ 16:05:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260303151317.136332-1-zhang.guodong@linux.dev> <20260303151317.136332-2-zhang.guodong@linux.dev>
-In-Reply-To: <20260303151317.136332-2-zhang.guodong@linux.dev>
+References: <20260303151317.136332-1-zhang.guodong@linux.dev> <20260303151317.136332-4-zhang.guodong@linux.dev>
+In-Reply-To: <20260303151317.136332-4-zhang.guodong@linux.dev>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 3 Mar 2026 17:58:39 -0600
-X-Gm-Features: AaiRm51Hb3SECM9eIJFDgBjZ7i9PQTW2kGgrTWHQJeMm8xCctK5jv5DHAgY49s0
-Message-ID: <CAH2r5msFB7KBUMmfwq7HwpF7+WLOySGhhfQm93OwZLWTmp1a9Q@mail.gmail.com>
-Subject: Re: [PATCH v5 1/7] smb/client: fix buffer size for smb311_posix_qinfo
- in smb2_compound_op()
+Date: Tue, 3 Mar 2026 18:05:34 -0600
+X-Gm-Features: AaiRm51AXEip8OYo37caTHE91cf5Jkot0RaLNlNRwo1mSLvjYhi_qZYKSXYKtso
+Message-ID: <CAH2r5mvoXiK=q7UPoqfjshRXab9ud_d-v-v6RJYiGM8AHQtHCw@mail.gmail.com>
+Subject: Re: [PATCH v5 3/7] smb/client: remove unused SMB311_posix_query_info()
 To: zhang.guodong@linux.dev
 Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
 	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
@@ -99,62 +98,72 @@ Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Good catch - were you able to repro a crash or other bug when running
-without the patch?
+merged into cifs-2.6.git for-next pending more testing
 
 On Tue, Mar 3, 2026 at 9:14=E2=80=AFAM <zhang.guodong@linux.dev> wrote:
 >
 > From: ZhangGuoDong <zhangguodong@kylinos.cn>
 >
-> Use `sizeof(struct smb311_posix_qinfo)` instead of sizeof its pointer,
-> so the allocated buffer matches the actual struct size.
+> It is currently unused, as now we are doing compounding instead
+> (see smb2_query_path_info()).
 >
-> Fixes: 6a5f6592a0b6 ("SMB311: Add support for query info using posix exte=
-nsions (level 100)")
-> Reported-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 > Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > ---
->  fs/smb/client/smb2inode.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  fs/smb/client/smb2pdu.c   | 18 ------------------
+>  fs/smb/client/smb2proto.h |  3 ---
+>  2 files changed, 21 deletions(-)
 >
-> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-> index 195a38fd61e8..1c4663ed7e69 100644
-> --- a/fs/smb/client/smb2inode.c
-> +++ b/fs/smb/client/smb2inode.c
-> @@ -325,7 +325,7 @@ static int smb2_compound_op(const unsigned int xid, s=
-truct cifs_tcon *tcon,
->                                                           cfile->fid.vola=
-tile_fid,
->                                                           SMB_FIND_FILE_P=
-OSIX_INFO,
->                                                           SMB2_O_INFO_FIL=
-E, 0,
-> -                                                         sizeof(struct s=
-mb311_posix_qinfo *) +
-> +                                                         sizeof(struct s=
-mb311_posix_qinfo) +
->                                                           (PATH_MAX * 2) =
-+
->                                                           (sizeof(struct =
-smb_sid) * 2), 0, NULL);
->                         } else {
-> @@ -335,7 +335,7 @@ static int smb2_compound_op(const unsigned int xid, s=
-truct cifs_tcon *tcon,
->                                                           COMPOUND_FID,
->                                                           SMB_FIND_FILE_P=
-OSIX_INFO,
->                                                           SMB2_O_INFO_FIL=
-E, 0,
-> -                                                         sizeof(struct s=
-mb311_posix_qinfo *) +
-> +                                                         sizeof(struct s=
-mb311_posix_qinfo) +
->                                                           (PATH_MAX * 2) =
-+
->                                                           (sizeof(struct =
-smb_sid) * 2), 0, NULL);
->                         }
+> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> index 8a1fcc097606..c43ca74e8704 100644
+> --- a/fs/smb/client/smb2pdu.c
+> +++ b/fs/smb/client/smb2pdu.c
+> @@ -3989,24 +3989,6 @@ int SMB2_query_info(const unsigned int xid, struct=
+ cifs_tcon *tcon,
+>                           NULL);
+>  }
+>
+> -#if 0
+> -/* currently unused, as now we are doing compounding instead (see smb311=
+_posix_query_path_info) */
+> -int
+> -SMB311_posix_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+> -                       u64 persistent_fid, u64 volatile_fid,
+> -                       struct smb311_posix_qinfo *data, u32 *plen)
+> -{
+> -       size_t output_len =3D sizeof(struct smb311_posix_qinfo) +
+> -                       (sizeof(struct smb_sid) * 2) + (PATH_MAX * 2);
+> -       *plen =3D 0;
+> -
+> -       return query_info(xid, tcon, persistent_fid, volatile_fid,
+> -                         SMB_FIND_FILE_POSIX_INFO, SMB2_O_INFO_FILE, 0,
+> -                         output_len, sizeof(struct smb311_posix_qinfo), =
+(void **)&data, plen);
+> -       /* Note caller must free "data" (passed in above). It may be allo=
+cated in query_info call */
+> -}
+> -#endif
+> -
+>  int
+>  SMB2_query_acl(const unsigned int xid, struct cifs_tcon *tcon,
+>                u64 persistent_fid, u64 volatile_fid,
+> diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+> index 881e42cf66ce..230bb1e9f4e1 100644
+> --- a/fs/smb/client/smb2proto.h
+> +++ b/fs/smb/client/smb2proto.h
+> @@ -167,9 +167,6 @@ int SMB2_flush_init(const unsigned int xid, struct sm=
+b_rqst *rqst,
+>                     struct cifs_tcon *tcon, struct TCP_Server_Info *serve=
+r,
+>                     u64 persistent_fid, u64 volatile_fid);
+>  void SMB2_flush_free(struct smb_rqst *rqst);
+> -int SMB311_posix_query_info(const unsigned int xid, struct cifs_tcon *tc=
+on,
+> -                           u64 persistent_fid, u64 volatile_fid,
+> -                           struct smb311_posix_qinfo *data, u32 *plen);
+>  int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+>                     u64 persistent_fid, u64 volatile_fid,
+>                     struct smb2_file_all_info *data);
 > --
 > 2.52.0
 >
