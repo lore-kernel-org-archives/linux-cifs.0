@@ -1,252 +1,299 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D8A395D8F;
-	Wed,  4 Mar 2026 22:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772663389; cv=none; b=QqgqmjN/e3bj1WHaBPQekVIiNecpFWy3PziFWy9e1nZmhe233blDyeU4e3sh82XKIK8JohEERxWWPd+4KRzUXh5e9x3V53FaCOm+Fp+xvQSfkvKWxawbmRfS1GvnM+bFZ7me1pw2zL8ujBpYy8pJltX9V64H+YlmyEAL9xX30qc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772663389; c=relaxed/simple;
-	bh=4g9Hc6BCi1UzcQ6UmFUsAKXtEqFK6/wIIRnu62xorDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MjZvILiPgwssanEB8Z/tZ9zpOIqjohBnm5YKJ4Nv/BRkKxTdrLDqc9Pf5OB2aIrG8xLLR/Debd/yB/e9euQqS6ompmJrSe0JDIU7e3Le6+6mONOuEaceWfcF0AoD2jbllCuD3CtUVxkbm2S1U9lLI85Tv5WGnulXuUApC3o/TXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H7E6g6Lm; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F6B39A04A
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Mar 2026 22:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772663536; cv=pass; b=XsbHPt4DYt4d4JO+giBUhwgChdDOyKdteaXq/vTXyaBBMGCQeEbOst1+SeIOt6BaMTVyYA56r0bi+cT9g4GXZyHHdYxj3R9Q5KKg6o8nGxNUDGk0vAVLmnWfrvgSl2QnAFgca2xNgfyaKX8FNcChS9pPp89Z9MjaHV8/nGQxuLo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772663536; c=relaxed/simple;
+	bh=KXu//3EBPLrBvO/MghuctSsCjd474Oji/fve+ps6wFU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RUcUdhDF9XkO84UvhqVzVvPTvPGikEuLTkEYQV7tzEGeaFESNkLYEsd1L8JsILP0eFfOv+n7yE3aAIvLTJ3ayVXS7nzNpU4VDq3WSYfu4/kAzo+1AUsE/Y05qtLwaO5yIGhJf3WtercGqlj8fEWtvha+dO3cWpTwkR2gGThp8+Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hn5q+uLu; arc=pass smtp.client-ip=209.85.222.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H7E6g6Lm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E566C4CEF7;
-	Wed,  4 Mar 2026 22:29:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772663388;
-	bh=4g9Hc6BCi1UzcQ6UmFUsAKXtEqFK6/wIIRnu62xorDM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=H7E6g6Lm08bdby4/2tHEolh5uuAfzAVSsM3yLpncdqLzpMpx2R/jiaVVx3BrpUlHV
-	 zLgQZLl3q+J8YOTxOWa4cFn0qM9qtzHl3urpYxu/J8dk/Ng4eTR5ve5/MwMG2EM0x4
-	 13hRsUgqaHxQn1bDCNJafYTopHM59GSiSSfWDaMrsTRgNMP0a8wibVOr0aBrw1II97
-	 INDpQBDBhw/6g/ZfJeCr4GjGF8S8trfaYHGCsvv3rBpIoZHp4hfWrZiyJa1NX9T5Ya
-	 lxm3zNjb7ZsIhtDD0mqurpzxaf9es4FePOHSAnjX78l7+ajL920pZ2wjsA901PjGJl
-	 9YO9TEkdx8L9Q==
-Date: Wed, 4 Mar 2026 17:29:46 -0500
-From: Mike Snitzer <snitzer@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Luis de Bethencourt <luisbg@kernel.org>,
-	Salah Triki <salah.triki@gmail.com>,
-	Nicolas Pitre <nico@fluxnic.net>,
-	Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-	Anders Larsen <al@alarsen.net>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	David Sterba <dsterba@suse.com>, Chris Mason <clm@fb.com>,
-	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
-	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Sandeep Dhavale <dhavale@google.com>,
-	Hongbo Li <lihongbo22@huawei.com>,
-	Chunhai Guo <guochunhai@vivo.com>, Jan Kara <jack@suse.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Richard Weinberger <richard@nod.at>,
-	Dave Kleikamp <shaggy@kernel.org>,
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Mike Marshall <hubcap@omnibond.com>,
-	Martin Brandenburg <martin@omnibond.com>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Amir Goldstein <amir73il@gmail.com>,
-	Phillip Lougher <phillip@squashfs.org.uk>,
-	Carlos Maiolino <cem@kernel.org>, Hugh Dickins <hughd@google.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Yuezhang Mo <yuezhang.mo@sony.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Hans de Goede <hansg@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
-	ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org,
-	linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-mm@kvack.org, gfs2@lists.linux.dev, linux-doc@vger.kernel.org,
-	v9fs@lists.linux.dev, ceph-devel@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: Re: [PATCH 24/24] fs: remove simple_nosetlease()
-Message-ID: <aaiyWlJelhHju741@kernel.org>
-References: <20260108-setlease-6-20-v1-0-ea4dec9b67fa@kernel.org>
- <20260108-setlease-6-20-v1-24-ea4dec9b67fa@kernel.org>
- <aZ84VRrRVyGEzSJn@kernel.org>
- <e07e9b893ca04ce6ead4790e72c7f285a7159070.camel@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hn5q+uLu"
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-94ace5d0e39so2199476241.2
+        for <linux-cifs@vger.kernel.org>; Wed, 04 Mar 2026 14:32:11 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772663531; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NFU3qo5c524n9I030vyf1idtAz0P8ui5TVBY5bWk4yAtZUA4s8HgGY1aC+1S7xlFy4
+         hvO5ECnXwwlyFQretFYZ75HCSgLVE6mIVth/dC4TD59VE+2sPBpuIT1Imm0W75LeneFj
+         48tIZVgC8+VG0gVVqIfxluX/ga9CUSoVtBEp3b5T/fGt9t7frv4x2sxg7G87y5DQL0ZH
+         mK9+Miv/TiPdU0Xqx6UiLJSPEVZYZHdR+m8dSsTtMbKko7OKLTdddrDxsA5mz9up6fOJ
+         yVkqSd8obCk238brMTp+GE+ImdN6qYKhTxaBaytZq1qoAmpYj+RxiLzyxYZNW6nT/EKf
+         OASw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=z/QRphmRzy8FO2fkKgVz78bs8tUVjsFCxQ1wuKvg3pk=;
+        fh=zF0NxwEP/aFb403WlzZP6N97NDPBflyfzv/ex/ztnmI=;
+        b=c61Ql40j4Y2Hkoh1tbu6Z3/hYD5JQqm0s0FFX4qzLNHxJu/CEQyhru1j6CExdK82Ip
+         pU4DOAjz+sXmZ6alhl4Bony1hjBbzGNAQo5dILkHxVoDDbFiIO6Z1u7AlbO4wsRl2JQc
+         IR2SJ7N6LYAjjJOkXnzB7O9elmH7GklhosSX2Pazcqw8JOWKTAGLPFiKEoTFp9yNLcU2
+         Vv6ozTXSHmZBFnys30PXs+Ch2gS6ymY+bAdx6KCtvvUHlkSRoS2CzaSYwLVQpEZkxiQg
+         8Tv76ZAP6TRHXave/CS7q3jxvCWPRQMeqK0FFoZHi8kvBgP3ME0YsPxH9G6dC404B2ls
+         hBWg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772663531; x=1773268331; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z/QRphmRzy8FO2fkKgVz78bs8tUVjsFCxQ1wuKvg3pk=;
+        b=hn5q+uLuYQJFI83/xK/Vuu128PMbAr3QfZZ9RqYskdHx245x8xq5+iWEkmBKjXVRTJ
+         WMgu7YsrRxEoaT04SPsiQAO4BNr4rw2qasTMDcuDvlB2lrrio59DXa9Zy42U8Qyo+sEg
+         9kybkTGGzEzY8rCnsToLHxesJ0/c/bY32aD0UTHti1nMghWOQX9UdqFsNrAoz+5G5kgd
+         5JLoXthawmt+qjd3YuC2927ikvctTSg03JTCLemU/R/6MBn2fcw8C/Ywy3q+kkZ4PCSt
+         tGLw6mtMxUMk87xaDhplsiyKya22DsSzpQOkvmtujdgqXWrHWaP83wzpJxjJxlwgXpcl
+         KPLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772663531; x=1773268331;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=z/QRphmRzy8FO2fkKgVz78bs8tUVjsFCxQ1wuKvg3pk=;
+        b=oKc7x6mKC6INf4faG67r5sNiylW8xCqkWIzdQB5HouM+yYFDzPny+qCaFPnpAgQw4k
+         RuoSC/vJF8YcQfzkjkRkfBuZdkRMrjSpC0xL9YQ9thmEcdr5PlZAPtYAoZ3KsSHJS+Wz
+         kT03oJ6gjRiyZM2ht7Vi84c8hexsdLA03jTgjGQERFkRZ6qysSgI1z1UxK8CXVbhXkLa
+         r9gKkVIa26g3Nb9RrL4s++iNXAJoV9LA6dOwvftLUcGpti5rwAxqRzxfIL4zYz6WIIVf
+         d2IIGnHYqZkzZ6B4cOTOQ344Jyqhpoa4pMs5TceXwrJssdHaEb9iwmTgjFoIlW84/+A+
+         +3Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCV6tekIiIPcICnZL/8PjnKBGGM89u/+y2GIdZa8314OWEKseYW7VNPd1EOChyOF/5A8X9QWCq5MMh3H@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXKXADMywVq/GMvT/SDpYONnX40nZLpbuZbv2fsFxk1ckCqtr8
+	5J+d/5OAsPfmo2Zy6hyZmXS3tDkB7ZqD/An2cefXbKDnO9REYHR6jfbRCIfPqUmrCVPe2ej5Oc1
+	Wb862510yZ8g3B7cRqRnORRzPrWF/QVw=
+X-Gm-Gg: ATEYQzzqcy2B69pX6mwM5RseJsYcskFr5S7wtA+W0cX+XgNOfzcLUjRZvsWM6R7EdRF
+	hB3nh/eusOcXt2bexbQswoHFK60Ff3hJcJl679gDRGvI4lBPJ4iXok3QZwn2Ob37x2jpPsi3mNo
+	8SI07iCF/9YhiD/v7c82gFYxE43ajt7SrEgDpAC5KmaFIQ/4J1bwzgB0r7nWibR01OzoxU7ZtM3
+	ezQJnUgBdKTQQtGJDegZx1M0Hd7v4fAA3hpZjVd1fZXVE/1PTNAMjt49mwOZQXXyAXZ0pPtBuKM
+	HJwWXzmRiz4HnD61hQn4tVkmwJgzhi7FUkDUvntEH84yBySGL4nepsz11y054FQRqts8XiUPkJB
+	zw3z19g==
+X-Received: by 2002:a05:6102:b0d:b0:5f8:e2c7:a3f2 with SMTP id
+ ada2fe7eead31-5ffaa6f6c3bmr1576946137.0.1772663530592; Wed, 04 Mar 2026
+ 14:32:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e07e9b893ca04ce6ead4790e72c7f285a7159070.camel@kernel.org>
+References: <3c6ae7299c2fff0fa689d4dcd43ef916e5697d65.1771986861.git.lucien.xin@gmail.com>
+ <20260303083255.35354-1-pabeni@redhat.com>
+In-Reply-To: <20260303083255.35354-1-pabeni@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Wed, 4 Mar 2026 17:31:57 -0500
+X-Gm-Features: AaiRm51Y186obU2AYuGIwk5fISUHhxMUkh7jtjQG4bgQBZwaKmERG0jYjFiCfpA
+Message-ID: <CADvbK_fHhrCh-5zPDY1sh16TEKhJTWhZcUS4-pw=49krocV3SA@mail.gmail.com>
+Subject: Re: [net-next,v10,12/15] quic: add crypto packet encryption and decryption
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: hepengtao@xiaomi.com, kuba@kernel.org, jlayton@kernel.org, metze@samba.org, 
+	davem@davemloft.net, kernel-tls-handshake@lists.linux.dev, horms@kernel.org, 
+	hare@suse.de, aahringo@redhat.com, tfanelli@redhat.com, mail@johnericson.me, 
+	andrew.gospodarek@broadcom.com, linkinjeon@kernel.org, dhowells@redhat.com, 
+	matttbe@kernel.org, xiyou.wangcong@gmail.com, dreibh@simula.no, 
+	jbaron@akamai.com, quic@lists.linux.dev, pc@manguebit.com, 
+	marc@fiuczynski.com, edumazet@google.com, alibuda@linux.alibaba.com, 
+	steved@redhat.com, illiliti@protonmail.com, tom@talpey.com, 
+	marcelo.leitner@gmail.com, sd@queasysnail.net, linux-cifs@vger.kernel.org, 
+	netdev@vger.kernel.org, mbuhl@openbsd.org, smfrench@gmail.com, 
+	chuck.lever@oracle.com, daniel@haxx.se
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 04, 2026 at 11:59:32AM -0500, Jeff Layton wrote:
-> On Wed, 2026-02-25 at 12:58 -0500, Mike Snitzer wrote:
-> > On Thu, Jan 08, 2026 at 12:13:19PM -0500, Jeff Layton wrote:
-> > > Setting ->setlease() to a NULL pointer now has the same effect as
-> > > setting it to simple_nosetlease(). Remove all of the setlease
-> > > file_operations that are set to simple_nosetlease, and the function
-> > > itself.
-> > > 
-> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > > ---
-> > >  fs/9p/vfs_dir.c        |  2 --
-> > >  fs/9p/vfs_file.c       |  2 --
-> > >  fs/ceph/dir.c          |  2 --
-> > >  fs/ceph/file.c         |  1 -
-> > >  fs/fuse/dir.c          |  1 -
-> > >  fs/gfs2/file.c         |  2 --
-> > >  fs/libfs.c             | 18 ------------------
-> > >  fs/nfs/dir.c           |  1 -
-> > >  fs/nfs/file.c          |  1 -
-> > >  fs/smb/client/cifsfs.c |  1 -
-> > >  fs/vboxsf/dir.c        |  1 -
-> > >  fs/vboxsf/file.c       |  1 -
-> > >  include/linux/fs.h     |  1 -
-> > >  13 files changed, 34 deletions(-)
-> > > 
-> > 
-> > <snip>
-> > 
-> > > diff --git a/fs/libfs.c b/fs/libfs.c
-> > > index 697c6d5fc12786c036f0086886297fb5cd52ae00..f1860dff86f2703266beecf31e9d2667af7a9684 100644
-> > > --- a/fs/libfs.c
-> > > +++ b/fs/libfs.c
-> > > @@ -1699,24 +1699,6 @@ struct inode *alloc_anon_inode(struct super_block *s)
-> > >  }
-> > >  EXPORT_SYMBOL(alloc_anon_inode);
-> > >  
-> > > -/**
-> > > - * simple_nosetlease - generic helper for prohibiting leases
-> > > - * @filp: file pointer
-> > > - * @arg: type of lease to obtain
-> > > - * @flp: new lease supplied for insertion
-> > > - * @priv: private data for lm_setup operation
-> > > - *
-> > > - * Generic helper for filesystems that do not wish to allow leases to be set.
-> > > - * All arguments are ignored and it just returns -EINVAL.
-> > > - */
-> > > -int
-> > > -simple_nosetlease(struct file *filp, int arg, struct file_lease **flp,
-> > > -		  void **priv)
-> > > -{
-> > > -	return -EINVAL;
-> > > -}
-> > > -EXPORT_SYMBOL(simple_nosetlease);
-> > > -
-> > >  /**
-> > >   * simple_get_link - generic helper to get the target of "fast" symlinks
-> > >   * @dentry: not used here
-> > > diff --git a/fs/nfs/dir.c b/fs/nfs/dir.c
-> > > index 71df279febf797880ded19e45528c3df4cea2dde..23a78a742b619dea8b76ddf28f4f59a1c8a015e2 100644
-> > > --- a/fs/nfs/dir.c
-> > > +++ b/fs/nfs/dir.c
-> > > @@ -66,7 +66,6 @@ const struct file_operations nfs_dir_operations = {
-> > >  	.open		= nfs_opendir,
-> > >  	.release	= nfs_closedir,
-> > >  	.fsync		= nfs_fsync_dir,
-> > > -	.setlease	= simple_nosetlease,
-> > >  };
-> > >  
-> > >  const struct address_space_operations nfs_dir_aops = {
-> > > diff --git a/fs/nfs/file.c b/fs/nfs/file.c
-> > > index d020aab40c64ebda30d130b6acee1b9194621457..9d269561961825f88529551b0f0287920960ac62 100644
-> > > --- a/fs/nfs/file.c
-> > > +++ b/fs/nfs/file.c
-> > > @@ -962,7 +962,6 @@ const struct file_operations nfs_file_operations = {
-> > >  	.splice_read	= nfs_file_splice_read,
-> > >  	.splice_write	= iter_file_splice_write,
-> > >  	.check_flags	= nfs_check_flags,
-> > > -	.setlease	= simple_nosetlease,
-> > >  	.fop_flags	= FOP_DONTCACHE,
-> > >  };
-> > >  EXPORT_SYMBOL_GPL(nfs_file_operations);
-> > 
-> > Hey Jeff,
-> > 
-> > I've noticed an NFS reexport regression in v6.19 and now v7.0-rc1
-> > (similar but different due to your series that requires opt-in via
-> > .setlease).
-> > 
-> > Bisect first pointed out this commit:
-> > 10dcd5110678 nfs: properly disallow delegation requests on directories
-> > 
-> > And now with v7.0-rc1 its the fact that NFS doesn't provide .setlease
-> > so lstat() on parent dir (of file that I touch) gets -EINVAL.
-> > 
-> > So its a confluence of NFS's dir delegations and your setlease changes.
-> > 
-> > If I reexport NFSv4.2 filesystem in terms of NFSv4.1, the regression
-> > is seen by doing (lstat reproducer that gemini spit out for me is
-> > attached):
-> > 
-> > $ touch /mnt/share41/test
-> > $ strace ./lstat /mnt/share41
-> > ...
-> > lstat("/mnt/share41", 0x7ffec0d79920)   = -1 EINVAL (Invalid argument)
-> > 
-> > If I immediately re-run it works:
-> > ...
-> > lstat("/mnt/share41", {st_mode=S_IFDIR|0777, st_size=4096, ...}) = 0
-> > 
-> > I'm not sure what the proper fix is yet, but I feel like you've missed
-> > that NFS itself can be (re)exported?
-> > 
-> > 
-> 
-> My apologies. I missed seeing this last week.
-> 
-> That's a very simple reproducer! That's very strange behavior,
-> especially since NFS4 does provide a setlease operation:
-> 
-> const struct file_operations nfs4_file_operations = {
-> 	[...]
-> 	.setlease       = nfs4_setlease,
-> 	[...]
-> };
+On Tue, Mar 3, 2026 at 3:33=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+>
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
+l.html
+> ---
+> quic: add crypto packet encryption and decryption
+>
+> This patch adds core support for packet-level encryption and decryption
+> using AEAD, including both payload protection and QUIC header protection.
+> It introduces helpers to encrypt and decrypt packets for secure QUIC
+> packet exchange and address validation.
+>
+> > diff --git a/net/quic/crypto.c b/net/quic/crypto.c
+> > index a9de418e604e..a84fd8d7bf93 100644
+> > --- a/net/quic/crypto.c
+> > +++ b/net/quic/crypto.c
+>
+> [ ... ]
+>
+> > @@ -231,6 +562,137 @@ static struct quic_cipher ciphers[QUIC_CIPHER_MAX=
+ + 1 - QUIC_CIPHER_MIN] =3D {
+>
+> [ ... ]
+>
+> > +/* Encrypts a QUIC packet before transmission.  This function performs=
+ AEAD encryption of
+> > + * the packet payload and applies header protection. It handles key ph=
+ase tracking and key
+> > + * update timing.
+> > + *
+> > + * Return: 0 on success, or a negative error code.
+> > + */
+> > +int quic_crypto_encrypt(struct quic_crypto *crypto, struct sk_buff *sk=
+b)
+> > +{
+> > +     u8 *iv, cha, ccm, phase =3D crypto->key_phase;
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     int err;
+> > +
+> > +     cb->key_phase =3D phase;
+> > +     iv =3D crypto->tx_iv[phase];
+> > +     /* Packet payload is already encrypted (e.g., resumed from async)=
+, proceed to header
+> > +      * protection only.
+> > +      */
+> > +     if (cb->resume)
+> > +             goto out;
+> > +
+> > +     /* If a key update is pending and this is the first packet using =
+the new key, save the
+> > +      * current time. Later used to clear old keys after some time has=
+ passed (see
+> > +      * quic_crypto_decrypt()).
+> > +      */
+> > +     if (crypto->key_pending && !crypto->key_update_send_time)
+> > +             crypto->key_update_send_time =3D quic_ktime_get_us();
+> > +
+> > +     ccm =3D quic_crypto_is_cipher_ccm(crypto);
+> > +     err =3D quic_crypto_payload_encrypt(crypto->tx_tfm[phase], skb, i=
+v, ccm);
+> > +     if (err)
+> > +             return err;
+> > +out:
+> > +     cha =3D quic_crypto_is_cipher_chacha(crypto);
+> > +     return quic_crypto_header_encrypt(crypto->tx_hp_tfm, skb, cha);
+> > +}
+>
+> This function calls quic_crypto_payload_encrypt(). Looking at that
+> function:
+>
+> > +/* AEAD Usage. */
+> > +static int quic_crypto_payload_encrypt(struct crypto_aead *tfm, struct=
+ sk_buff *skb,
+> > +                                    u8 *tx_iv, bool ccm)
+> > +{
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     u8 *iv, i, nonce[QUIC_IV_LEN];
+> > +     struct aead_request *req;
+> > +     struct sk_buff *trailer;
+> > +     struct scatterlist *sg;
+> > +     struct quichdr *hdr;
+> > +     u32 nsg, hlen, len;
+> > +     void *ctx;
+> > +     __be64 n;
+> > +     int err;
+> > +
+> > +     len =3D skb->len;
+> > +     err =3D skb_cow_data(skb, QUIC_TAG_LEN, &trailer);
+> > +     if (err < 0)
+> > +             return err;
+> > +     nsg =3D (u32)err;
+> > +     pskb_put(skb, trailer, QUIC_TAG_LEN);
+> > +     hdr =3D quic_hdr(skb);
+> > +     hdr->key =3D cb->key_phase;
+> > +
+> > +     ctx =3D quic_crypto_aead_mem_alloc(tfm, 0, &iv, &req, &sg, nsg);
+> > +     if (!ctx)
+> > +             return -ENOMEM;
+>
+> If the kzalloc(GFP_ATOMIC) inside quic_crypto_aead_mem_alloc() fails,
+> this returns -ENOMEM without rolling back the SKB modifications. The
+> SKB is now permanently enlarged by QUIC_TAG_LEN (16 bytes) with a
+> modified hdr->key.
+>
+> Compare with quic_crypto_payload_decrypt():
+>
+> > +static int quic_crypto_payload_decrypt(struct crypto_aead *tfm, struct=
+ sk_buff *skb,
+> > +                                    u8 *rx_iv, bool ccm)
+> > +{
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     u8 *iv, i, nonce[QUIC_IV_LEN];
+> > +     struct aead_request *req;
+> > +     int nsg, hlen, len, err;
+> > +     struct scatterlist *sg;
+> > +     void *ctx;
+> > +     __be64 n;
+> > +
+> > +     len =3D cb->length + cb->number_offset;
+> > +     hlen =3D cb->number_offset + cb->number_len;
+> > +     if (len - hlen < QUIC_TAG_LEN)
+> > +             return -EINVAL;
+> > +     nsg =3D 1; /* skb is already linearized in quic_packet_rcv(). */
+> > +     ctx =3D quic_crypto_aead_mem_alloc(tfm, 0, &iv, &req, &sg, nsg);
+> > +     if (!ctx)
+> > +             return -ENOMEM;
+> > +
+> > +     sg_init_table(sg, nsg);
+> > +     err =3D skb_to_sgvec(skb, sg, 0, len);
+>
+> In the decrypt path, quic_crypto_aead_mem_alloc() is called before any
+> SKB modifications. Should quic_crypto_payload_encrypt() do the same to
+> avoid leaving the SKB in a modified state if allocation fails?
+>
+This is not true.
 
-Huh, not sure how I missed nfs4_setlease...
+- firstly, on RX or Decrypt path, skb_cow_data() is called in
+quic_crypto_header_decrypt(), which is called before
+quic_crypto_payload_decrypt() in quic_crypto_decrypt(), so
+skb_cow_data() is called before mem_alloc for both places.
 
-> I'm not sure why this would cause lstat() to return -EINVAL.
+- secondly, even if the mem_alloc is failed, the skb will be dropped,
+no issue could be caused.
 
-Likewise, especially given nfs4_setlease
+> [ ... ]
+>
+> > +     /* Similar logic to quic_crypto_payload_encrypt(). */
+> > +     memcpy(nonce, rx_iv, QUIC_IV_LEN);
+> > +     n =3D cpu_to_be64(cb->number);
+> > +     for (i =3D 0; i < sizeof(n); i++)
+> > +             nonce[QUIC_IV_LEN - sizeof(n) + i] ^=3D ((u8 *)&n)[i];
+>
+> This isn't a bug, but there's duplicated logic between
+> quic_crypto_payload_encrypt() and quic_crypto_payload_decrypt(). The
+> AEAD nonce construction sequence (memcpy nonce from IV, XOR with be64
+> packet number, set CCM byte) appears in both functions.
+>
+> In quic_crypto_payload_encrypt():
+>
+> > +     hlen =3D cb->number_offset + cb->number_len;
+> > +     memcpy(nonce, tx_iv, QUIC_IV_LEN);
+> > +     n =3D cpu_to_be64(cb->number);
+> > +     for (i =3D 0; i < sizeof(n); i++)
+> > +             nonce[QUIC_IV_LEN - sizeof(n) + i] ^=3D ((u8 *)&n)[i];
+> > +
+> > +     /* For CCM based ciphers, first byte of IV is a constant. */
+> > +     iv[0] =3D TLS_AES_CCM_IV_B0_BYTE;
+> > +     memcpy(&iv[ccm], nonce, QUIC_IV_LEN);
+>
+> And in quic_crypto_payload_decrypt():
+>
+> > +     /* Similar logic to quic_crypto_payload_encrypt(). */
+> > +     memcpy(nonce, rx_iv, QUIC_IV_LEN);
+> > +     n =3D cpu_to_be64(cb->number);
+> > +     for (i =3D 0; i < sizeof(n); i++)
+> > +             nonce[QUIC_IV_LEN - sizeof(n) + i] ^=3D ((u8 *)&n)[i];
+> > +
+> > +     iv[0] =3D TLS_AES_CCM_IV_B0_BYTE;
+> > +     memcpy(&iv[ccm], nonce, QUIC_IV_LEN);
+>
+> The AEAD request teardown pattern (EINPROGRESS check, kfree_sensitive,
+> memzero_explicit) is also duplicated. Would a shared static helper for
+> nonce construction reduce the risk of the two copies diverging during
+> maintenance?
+>
+I will see what I can do to dedup a bit for this.
 
-> What's happening on the wire when this occurs?
-> 
-> I'll plan to take a look here soon either way.
-
-I'll have to revisit myself, been a bit.
-
-Will let you know.
-
-Thanks,
-Mike
+Thanks.
