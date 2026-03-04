@@ -1,95 +1,95 @@
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F6B39A04A
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Mar 2026 22:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B66376489
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Mar 2026 23:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772663536; cv=pass; b=XsbHPt4DYt4d4JO+giBUhwgChdDOyKdteaXq/vTXyaBBMGCQeEbOst1+SeIOt6BaMTVyYA56r0bi+cT9g4GXZyHHdYxj3R9Q5KKg6o8nGxNUDGk0vAVLmnWfrvgSl2QnAFgca2xNgfyaKX8FNcChS9pPp89Z9MjaHV8/nGQxuLo=
+	t=1772665410; cv=pass; b=KRye/Aj4Ibb5Eh3P8cod+ToenM1Y3GOHLYhTZ+sVKqsTdKnxz6xUpPgGfMbSWtb5ZfG96hVqseriVXyUI5InAqdr1UE/LkuaP4vY3upyTuBJZi6ioLKI/k4qQsfmVTmVhDuZ45z+a+7SkA2tY8JMZxvqTjt7V+PLsl+lgfxmuxo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772663536; c=relaxed/simple;
-	bh=KXu//3EBPLrBvO/MghuctSsCjd474Oji/fve+ps6wFU=;
+	s=arc-20240116; t=1772665410; c=relaxed/simple;
+	bh=2i+IHSwXdo2vJdP59dU99G2iRMYrlyhf0Di7pAHPdxk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RUcUdhDF9XkO84UvhqVzVvPTvPGikEuLTkEYQV7tzEGeaFESNkLYEsd1L8JsILP0eFfOv+n7yE3aAIvLTJ3ayVXS7nzNpU4VDq3WSYfu4/kAzo+1AUsE/Y05qtLwaO5yIGhJf3WtercGqlj8fEWtvha+dO3cWpTwkR2gGThp8+Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hn5q+uLu; arc=pass smtp.client-ip=209.85.222.41
+	 To:Cc:Content-Type; b=OSy0Xbq0AkOT3SfweZl+Kk6p8izZXDr2HPU4OU3bUcdoQVQUS8MIg4pty7JiWticUN3x7lS8mesJ2mbDN7SNdOm3/qvcELyBffT8ljQyiLliSUfZQaIkbkcnSKeCrBIO5i2OyAXH+RBCBQBzcinfi+gH+VT33Y0ws5ebc+bdqyQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cC7bgrvx; arc=pass smtp.client-ip=209.85.222.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hn5q+uLu"
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-94ace5d0e39so2199476241.2
-        for <linux-cifs@vger.kernel.org>; Wed, 04 Mar 2026 14:32:11 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772663531; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cC7bgrvx"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-94de63dea9aso4673920241.3
+        for <linux-cifs@vger.kernel.org>; Wed, 04 Mar 2026 15:03:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772665406; cv=none;
         d=google.com; s=arc-20240605;
-        b=NFU3qo5c524n9I030vyf1idtAz0P8ui5TVBY5bWk4yAtZUA4s8HgGY1aC+1S7xlFy4
-         hvO5ECnXwwlyFQretFYZ75HCSgLVE6mIVth/dC4TD59VE+2sPBpuIT1Imm0W75LeneFj
-         48tIZVgC8+VG0gVVqIfxluX/ga9CUSoVtBEp3b5T/fGt9t7frv4x2sxg7G87y5DQL0ZH
-         mK9+Miv/TiPdU0Xqx6UiLJSPEVZYZHdR+m8dSsTtMbKko7OKLTdddrDxsA5mz9up6fOJ
-         yVkqSd8obCk238brMTp+GE+ImdN6qYKhTxaBaytZq1qoAmpYj+RxiLzyxYZNW6nT/EKf
-         OASw==
+        b=CqN9qxk4BK2ci8HhqBzXvs+2tQVwdDm6uejhTiyH0BcP2gmqRznkGoeLbqYaeycE2V
+         5XcDIO/wbKg8T8SbPLP3MZlkI5TNVrxo5hMUKBDEBbyVMDYnS87k7orImXekUNWK9mZ7
+         XxvUJuGXfVgxW/ShRzk70389pWtbEUfPh7L5Eibwc3KHYeu8GF2KvDENIh5sBrOso6O/
+         1ed+Xyi5LHuBWiOU0Dm++MhECG6qo6wnDdjRxkOYLVOMVCo1RyGHXLSvjIKtQ+BDkcLu
+         Mn9s1K7IGjTPlHjwX+sW53JEXNN+TNMFF1AiLczVA+CQ3oA2jx1vI1PvbxZeBN4Vgf0U
+         H/kA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=z/QRphmRzy8FO2fkKgVz78bs8tUVjsFCxQ1wuKvg3pk=;
-        fh=zF0NxwEP/aFb403WlzZP6N97NDPBflyfzv/ex/ztnmI=;
-        b=c61Ql40j4Y2Hkoh1tbu6Z3/hYD5JQqm0s0FFX4qzLNHxJu/CEQyhru1j6CExdK82Ip
-         pU4DOAjz+sXmZ6alhl4Bony1hjBbzGNAQo5dILkHxVoDDbFiIO6Z1u7AlbO4wsRl2JQc
-         IR2SJ7N6LYAjjJOkXnzB7O9elmH7GklhosSX2Pazcqw8JOWKTAGLPFiKEoTFp9yNLcU2
-         Vv6ozTXSHmZBFnys30PXs+Ch2gS6ymY+bAdx6KCtvvUHlkSRoS2CzaSYwLVQpEZkxiQg
-         8Tv76ZAP6TRHXave/CS7q3jxvCWPRQMeqK0FFoZHi8kvBgP3ME0YsPxH9G6dC404B2ls
-         hBWg==;
+        bh=Ivkx6puhgdlm/jw1xcgfFyqPx3PkaCKD+eg0EyAqi2E=;
+        fh=/n1D/0TxWjsHNTsAeHPAbQ0u5yQpvUegPNh737U7EhE=;
+        b=kLVnU/5lNezd3aYq/4MOHD9zva8WnZl5z2n9PIpepOSB4PY+AAsoFDYHXmceIluL4E
+         mvEgvuW6btZ06aC0Offz8TMDwclnY/Bbsm3HOlg60dvUD6DSPxc7QDe/zooQqBaNjW8O
+         61L2V9kZMzwNSLkyI7QxcuGpVu6LKT4861Zbj2RRS3MiHK3YLEnM8VanYVLYzjZEMHUo
+         4c7moOK8eChiY9/cOsnsJMrDEqpbrXeEiAsfn1DkvAwCkr3cGeKW+kCE7KQdzeycj24i
+         KG+RMENMMWPrcrIWTZlbkmX3kRsPc1oMaw0K2jwhauvFmvWEv7ooyT2NFXKUcOan2QXg
+         5rBQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772663531; x=1773268331; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1772665406; x=1773270206; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=z/QRphmRzy8FO2fkKgVz78bs8tUVjsFCxQ1wuKvg3pk=;
-        b=hn5q+uLuYQJFI83/xK/Vuu128PMbAr3QfZZ9RqYskdHx245x8xq5+iWEkmBKjXVRTJ
-         WMgu7YsrRxEoaT04SPsiQAO4BNr4rw2qasTMDcuDvlB2lrrio59DXa9Zy42U8Qyo+sEg
-         9kybkTGGzEzY8rCnsToLHxesJ0/c/bY32aD0UTHti1nMghWOQX9UdqFsNrAoz+5G5kgd
-         5JLoXthawmt+qjd3YuC2927ikvctTSg03JTCLemU/R/6MBn2fcw8C/Ywy3q+kkZ4PCSt
-         tGLw6mtMxUMk87xaDhplsiyKya22DsSzpQOkvmtujdgqXWrHWaP83wzpJxjJxlwgXpcl
-         KPLw==
+        bh=Ivkx6puhgdlm/jw1xcgfFyqPx3PkaCKD+eg0EyAqi2E=;
+        b=cC7bgrvxkIsXlGlwT6cNLnNmWRB8elw0aW5/2nK3ozQ/1QTqWz5fQ6Q9r4BaBwCoji
+         trv6yvN8+je5RUmO4Iqxa5DsAZfnHovcxfHkeoOFOK/yVjVMZ1vZ3c8Qj09bhi7ycWk8
+         Zua+We+8NS8W5zjYIs7wqX+WaFahFzDSn8ltSU9uGbrKxO1FftCwNFQIgNnXrduVL/kU
+         gQEXZ6hXqB3YPDgUSCAoAKvtVpFMU3TNC6HXyaLDm0aHd4UTH75AfLfd7t31c8VAouq6
+         qVifOOYuXg3cqbBuWBXMBcQIlO7w1H8TewoQDfHan8k4R2qW28c16AW4TT5Wsl0MBNNO
+         x6lQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772663531; x=1773268331;
+        d=1e100.net; s=20230601; t=1772665406; x=1773270206;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=z/QRphmRzy8FO2fkKgVz78bs8tUVjsFCxQ1wuKvg3pk=;
-        b=oKc7x6mKC6INf4faG67r5sNiylW8xCqkWIzdQB5HouM+yYFDzPny+qCaFPnpAgQw4k
-         RuoSC/vJF8YcQfzkjkRkfBuZdkRMrjSpC0xL9YQ9thmEcdr5PlZAPtYAoZ3KsSHJS+Wz
-         kT03oJ6gjRiyZM2ht7Vi84c8hexsdLA03jTgjGQERFkRZ6qysSgI1z1UxK8CXVbhXkLa
-         r9gKkVIa26g3Nb9RrL4s++iNXAJoV9LA6dOwvftLUcGpti5rwAxqRzxfIL4zYz6WIIVf
-         d2IIGnHYqZkzZ6B4cOTOQ344Jyqhpoa4pMs5TceXwrJssdHaEb9iwmTgjFoIlW84/+A+
-         +3Rg==
-X-Forwarded-Encrypted: i=1; AJvYcCV6tekIiIPcICnZL/8PjnKBGGM89u/+y2GIdZa8314OWEKseYW7VNPd1EOChyOF/5A8X9QWCq5MMh3H@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXKXADMywVq/GMvT/SDpYONnX40nZLpbuZbv2fsFxk1ckCqtr8
-	5J+d/5OAsPfmo2Zy6hyZmXS3tDkB7ZqD/An2cefXbKDnO9REYHR6jfbRCIfPqUmrCVPe2ej5Oc1
-	Wb862510yZ8g3B7cRqRnORRzPrWF/QVw=
-X-Gm-Gg: ATEYQzzqcy2B69pX6mwM5RseJsYcskFr5S7wtA+W0cX+XgNOfzcLUjRZvsWM6R7EdRF
-	hB3nh/eusOcXt2bexbQswoHFK60Ff3hJcJl679gDRGvI4lBPJ4iXok3QZwn2Ob37x2jpPsi3mNo
-	8SI07iCF/9YhiD/v7c82gFYxE43ajt7SrEgDpAC5KmaFIQ/4J1bwzgB0r7nWibR01OzoxU7ZtM3
-	ezQJnUgBdKTQQtGJDegZx1M0Hd7v4fAA3hpZjVd1fZXVE/1PTNAMjt49mwOZQXXyAXZ0pPtBuKM
-	HJwWXzmRiz4HnD61hQn4tVkmwJgzhi7FUkDUvntEH84yBySGL4nepsz11y054FQRqts8XiUPkJB
-	zw3z19g==
-X-Received: by 2002:a05:6102:b0d:b0:5f8:e2c7:a3f2 with SMTP id
- ada2fe7eead31-5ffaa6f6c3bmr1576946137.0.1772663530592; Wed, 04 Mar 2026
- 14:32:10 -0800 (PST)
+        bh=Ivkx6puhgdlm/jw1xcgfFyqPx3PkaCKD+eg0EyAqi2E=;
+        b=TxQj5h0p+95/wzk1rP/+zcm9A5JcOI4NpTBZkSippH6/Spx1wHaWWwd61wMIKx1w/z
+         MKLEa75NqH7MY9wu10koswrucxDhifxKZoRdx044W0wD2K65i8/EzrJa/FmP2Lf5cxfo
+         HAShyY3upaQzaz5lnlX1zwi9VIN/NEgWRf3XCZRVOH7Z4sf7v6MCqCWthksbOYg/ie+I
+         1iUCR59HSufMX0bDuAbQJ828+mrdwpK59uzyaVqQIKBbbsLtxQ+CW2lstyKpFQKRYGAE
+         E5zovX8hQDsZc1UkeYTBZ94kJtY5Ci5hzYtnNrdyQOU6eFtC2hfrzNT/A9wishvVvXIa
+         A2Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCUjuNGv4tNmafMSuDc3lE9X+K/RcfR1+K9OBi++B6sIbpi4yOurRExrX9l5F/HGEkabDvMytpEzNc+S@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6/Gyh8F333rMOBHx2VqG4/7FdkSAFIVLEnpbVqbnfGRhGzpUH
+	xxz3ytvJ06cd8u/vJ4qJqnb8UG3ADV+Qa7u0MA15nt1XoK3RvFwYf+YqdY1H5t7aTHeErQeC04A
+	Bt6VmVNLGBk1GE97QTgW5CicjGxPHSlI=
+X-Gm-Gg: ATEYQzzzCKfyQyWMGFSBwuPhhJ12PGKhVuEh+Qh8spLDHItt3GKTlsDWMt+szF1F0x5
+	8Jsg5JUN8Hh536vQ2hCAzWl0rjSke33HGy54qAuYessLKn0Y8/K0vGGebuJ6R/TQmEW9DMbbHQ9
+	tUVTsQsitN0Xvm2mN4S7NmFlDjkUE2vvR8qNWVAiQy8UI50H9GH3tqJwIItAzu5xPgUXlvg6slr
+	QVLoCfu+7MeO6DaIt7aN5wJLxBP4NUtYJfsOQWEGmCWvuU9qc185uYEmj5m8Pe48EN4dU6vpx5w
+	i7+i3KBX80QGWX20V4EWtoIZrsSGKjTD0BFza53YR5rLkziY3bQoIjqFxMhLBJfxx5zPwbF5yxG
+	o3c7R9w==
+X-Received: by 2002:a05:6102:26d1:b0:5ee:a8c4:18d4 with SMTP id
+ ada2fe7eead31-5ffab04169amr1874568137.35.1772665406379; Wed, 04 Mar 2026
+ 15:03:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <3c6ae7299c2fff0fa689d4dcd43ef916e5697d65.1771986861.git.lucien.xin@gmail.com>
- <20260303083255.35354-1-pabeni@redhat.com>
-In-Reply-To: <20260303083255.35354-1-pabeni@redhat.com>
+References: <bffaab8d4727991c8dd46c8b57a08507545a25a4.1771986861.git.lucien.xin@gmail.com>
+ <20260303083324.35531-1-pabeni@redhat.com>
+In-Reply-To: <20260303083324.35531-1-pabeni@redhat.com>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 4 Mar 2026 17:31:57 -0500
-X-Gm-Features: AaiRm51Y186obU2AYuGIwk5fISUHhxMUkh7jtjQG4bgQBZwaKmERG0jYjFiCfpA
-Message-ID: <CADvbK_fHhrCh-5zPDY1sh16TEKhJTWhZcUS4-pw=49krocV3SA@mail.gmail.com>
-Subject: Re: [net-next,v10,12/15] quic: add crypto packet encryption and decryption
+Date: Wed, 4 Mar 2026 18:03:14 -0500
+X-Gm-Features: AaiRm53WpBr8gTUmyaCTW1p2ySTbZ_Gi0kG47wju22GuqYXLQHQ7psn2_WgPq2w
+Message-ID: <CADvbK_f96OxCWnP9UdKxYtJ9=3xY69_ScTrU=9AQF1iUrBp_Cg@mail.gmail.com>
+Subject: Re: [net-next,v10,13/15] quic: add timer management
 To: Paolo Abeni <pabeni@redhat.com>
 Cc: hepengtao@xiaomi.com, kuba@kernel.org, jlayton@kernel.org, metze@samba.org, 
 	davem@davemloft.net, kernel-tls-handshake@lists.linux.dev, horms@kernel.org, 
@@ -114,186 +114,284 @@ e:
 > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
 l.html
 > ---
-> quic: add crypto packet encryption and decryption
+> quic: add timer management
 >
-> This patch adds core support for packet-level encryption and decryption
-> using AEAD, including both payload protection and QUIC header protection.
-> It introduces helpers to encrypt and decrypt packets for secure QUIC
-> packet exchange and address validation.
+> This patch introduces 'quic_timer' to unify and manage the five main
+> timers used in QUIC: loss detection, delayed ACK, path validation,
+> PMTU probing, and pacing. These timers are critical for driving
+> retransmissions, connection liveness, and flow control.
 >
-> > diff --git a/net/quic/crypto.c b/net/quic/crypto.c
-> > index a9de418e604e..a84fd8d7bf93 100644
-> > --- a/net/quic/crypto.c
-> > +++ b/net/quic/crypto.c
->
-> [ ... ]
->
-> > @@ -231,6 +562,137 @@ static struct quic_cipher ciphers[QUIC_CIPHER_MAX=
- + 1 - QUIC_CIPHER_MIN] =3D {
+> > diff --git a/net/quic/Makefile b/net/quic/Makefile
+> > index 58bb18f7926d..2ccf01ad9e22 100644
+> > --- a/net/quic/Makefile
+> > +++ b/net/quic/Makefile
 >
 > [ ... ]
 >
-> > +/* Encrypts a QUIC packet before transmission.  This function performs=
- AEAD encryption of
-> > + * the packet payload and applies header protection. It handles key ph=
-ase tracking and key
-> > + * update timing.
+> > diff --git a/net/quic/socket.c b/net/quic/socket.c
+> > index 74e3e3939c61..93a7abefc226 100644
+> > --- a/net/quic/socket.c
+> > +++ b/net/quic/socket.c
+>
+> [ ... ]
+>
+> > diff --git a/net/quic/socket.h b/net/quic/socket.h
+> > index d7811391cc8b..c5654fdc06b5 100644
+> > --- a/net/quic/socket.h
+> > +++ b/net/quic/socket.h
+>
+> [ ... ]
+>
+> > diff --git a/net/quic/timer.c b/net/quic/timer.c
+> > new file mode 100644
+> > index 000000000000..6f957385a341
+> > --- /dev/null
+> > +++ b/net/quic/timer.c
+> > @@ -0,0 +1,196 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/* QUIC kernel implementation
+> > + * (C) Copyright Red Hat Corp. 2023
 > > + *
-> > + * Return: 0 on success, or a negative error code.
+> > + * This file is part of the QUIC kernel implementation
+> > + *
+> > + * Initialization/cleanup for QUIC protocol support.
+> > + *
+> > + * Written or modified by:
+> > + *    Xin Long <lucien.xin@gmail.com>
 > > + */
-> > +int quic_crypto_encrypt(struct quic_crypto *crypto, struct sk_buff *sk=
-b)
+> > +
+> > +#include "socket.h"
+>
+> [ ... ]
+>
+> > +static void quic_timer_sack_timeout(struct timer_list *t)
 > > +{
-> > +     u8 *iv, cha, ccm, phase =3D crypto->key_phase;
-> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
-> > +     int err;
+> > +     struct quic_sock *qs =3D container_of(t, struct quic_sock, timers=
+[QUIC_TIMER_SACK].t);
+> > +     struct sock *sk =3D &qs->inet.sk;
 > > +
-> > +     cb->key_phase =3D phase;
-> > +     iv =3D crypto->tx_iv[phase];
-> > +     /* Packet payload is already encrypted (e.g., resumed from async)=
-, proceed to header
-> > +      * protection only.
-> > +      */
-> > +     if (cb->resume)
+> > +     bh_lock_sock(sk);
+> > +     if (sock_owned_by_user(sk)) {
+> > +             if (!test_and_set_bit(QUIC_SACK_DEFERRED, &sk->sk_tsq_fla=
+gs))
+> > +                     sock_hold(sk);
 > > +             goto out;
+> > +     }
 > > +
-> > +     /* If a key update is pending and this is the first packet using =
-the new key, save the
-> > +      * current time. Later used to clear old keys after some time has=
- passed (see
-> > +      * quic_crypto_decrypt()).
-> > +      */
-> > +     if (crypto->key_pending && !crypto->key_update_send_time)
-> > +             crypto->key_update_send_time =3D quic_ktime_get_us();
-> > +
-> > +     ccm =3D quic_crypto_is_cipher_ccm(crypto);
-> > +     err =3D quic_crypto_payload_encrypt(crypto->tx_tfm[phase], skb, i=
-v, ccm);
-> > +     if (err)
-> > +             return err;
+> > +     quic_timer_sack_handler(sk);
 > > +out:
-> > +     cha =3D quic_crypto_is_cipher_chacha(crypto);
-> > +     return quic_crypto_header_encrypt(crypto->tx_hp_tfm, skb, cha);
+> > +     bh_unlock_sock(sk);
+> > +     sock_put(sk);
 > > +}
 >
-> This function calls quic_crypto_payload_encrypt(). Looking at that
-> function:
->
-> > +/* AEAD Usage. */
-> > +static int quic_crypto_payload_encrypt(struct crypto_aead *tfm, struct=
- sk_buff *skb,
-> > +                                    u8 *tx_iv, bool ccm)
-> > +{
-> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
-> > +     u8 *iv, i, nonce[QUIC_IV_LEN];
-> > +     struct aead_request *req;
-> > +     struct sk_buff *trailer;
-> > +     struct scatterlist *sg;
-> > +     struct quichdr *hdr;
-> > +     u32 nsg, hlen, len;
-> > +     void *ctx;
-> > +     __be64 n;
-> > +     int err;
-> > +
-> > +     len =3D skb->len;
-> > +     err =3D skb_cow_data(skb, QUIC_TAG_LEN, &trailer);
-> > +     if (err < 0)
-> > +             return err;
-> > +     nsg =3D (u32)err;
-> > +     pskb_put(skb, trailer, QUIC_TAG_LEN);
-> > +     hdr =3D quic_hdr(skb);
-> > +     hdr->key =3D cb->key_phase;
-> > +
-> > +     ctx =3D quic_crypto_aead_mem_alloc(tfm, 0, &iv, &req, &sg, nsg);
-> > +     if (!ctx)
-> > +             return -ENOMEM;
->
-> If the kzalloc(GFP_ATOMIC) inside quic_crypto_aead_mem_alloc() fails,
-> this returns -ENOMEM without rolling back the SKB modifications. The
-> SKB is now permanently enlarged by QUIC_TAG_LEN (16 bytes) with a
-> modified hdr->key.
->
-> Compare with quic_crypto_payload_decrypt():
->
-> > +static int quic_crypto_payload_decrypt(struct crypto_aead *tfm, struct=
- sk_buff *skb,
-> > +                                    u8 *rx_iv, bool ccm)
-> > +{
-> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
-> > +     u8 *iv, i, nonce[QUIC_IV_LEN];
-> > +     struct aead_request *req;
-> > +     int nsg, hlen, len, err;
-> > +     struct scatterlist *sg;
-> > +     void *ctx;
-> > +     __be64 n;
-> > +
-> > +     len =3D cb->length + cb->number_offset;
-> > +     hlen =3D cb->number_offset + cb->number_len;
-> > +     if (len - hlen < QUIC_TAG_LEN)
-> > +             return -EINVAL;
-> > +     nsg =3D 1; /* skb is already linearized in quic_packet_rcv(). */
-> > +     ctx =3D quic_crypto_aead_mem_alloc(tfm, 0, &iv, &req, &sg, nsg);
-> > +     if (!ctx)
-> > +             return -ENOMEM;
-> > +
-> > +     sg_init_table(sg, nsg);
-> > +     err =3D skb_to_sgvec(skb, sg, 0, len);
->
-> In the decrypt path, quic_crypto_aead_mem_alloc() is called before any
-> SKB modifications. Should quic_crypto_payload_encrypt() do the same to
-> avoid leaving the SKB in a modified state if allocation fails?
->
-This is not true.
-
-- firstly, on RX or Decrypt path, skb_cow_data() is called in
-quic_crypto_header_decrypt(), which is called before
-quic_crypto_payload_decrypt() in quic_crypto_decrypt(), so
-skb_cow_data() is called before mem_alloc for both places.
-
-- secondly, even if the mem_alloc is failed, the skb will be dropped,
-no issue could be caused.
-
 > [ ... ]
 >
-> > +     /* Similar logic to quic_crypto_payload_encrypt(). */
-> > +     memcpy(nonce, rx_iv, QUIC_IV_LEN);
-> > +     n =3D cpu_to_be64(cb->number);
-> > +     for (i =3D 0; i < sizeof(n); i++)
-> > +             nonce[QUIC_IV_LEN - sizeof(n) + i] ^=3D ((u8 *)&n)[i];
->
-> This isn't a bug, but there's duplicated logic between
-> quic_crypto_payload_encrypt() and quic_crypto_payload_decrypt(). The
-> AEAD nonce construction sequence (memcpy nonce from IV, XOR with be64
-> packet number, set CCM byte) appears in both functions.
->
-> In quic_crypto_payload_encrypt():
->
-> > +     hlen =3D cb->number_offset + cb->number_len;
-> > +     memcpy(nonce, tx_iv, QUIC_IV_LEN);
-> > +     n =3D cpu_to_be64(cb->number);
-> > +     for (i =3D 0; i < sizeof(n); i++)
-> > +             nonce[QUIC_IV_LEN - sizeof(n) + i] ^=3D ((u8 *)&n)[i];
+> > +static void quic_timer_loss_timeout(struct timer_list *t)
+> > +{
+> > +     struct quic_sock *qs =3D container_of(t, struct quic_sock, timers=
+[QUIC_TIMER_LOSS].t);
+> > +     struct sock *sk =3D &qs->inet.sk;
 > > +
-> > +     /* For CCM based ciphers, first byte of IV is a constant. */
-> > +     iv[0] =3D TLS_AES_CCM_IV_B0_BYTE;
-> > +     memcpy(&iv[ccm], nonce, QUIC_IV_LEN);
->
-> And in quic_crypto_payload_decrypt():
->
-> > +     /* Similar logic to quic_crypto_payload_encrypt(). */
-> > +     memcpy(nonce, rx_iv, QUIC_IV_LEN);
-> > +     n =3D cpu_to_be64(cb->number);
-> > +     for (i =3D 0; i < sizeof(n); i++)
-> > +             nonce[QUIC_IV_LEN - sizeof(n) + i] ^=3D ((u8 *)&n)[i];
+> > +     bh_lock_sock(sk);
+> > +     if (sock_owned_by_user(sk)) {
+> > +             if (!test_and_set_bit(QUIC_LOSS_DEFERRED, &sk->sk_tsq_fla=
+gs))
+> > +                     sock_hold(sk);
+> > +             goto out;
+> > +     }
 > > +
-> > +     iv[0] =3D TLS_AES_CCM_IV_B0_BYTE;
-> > +     memcpy(&iv[ccm], nonce, QUIC_IV_LEN);
+> > +     quic_timer_loss_handler(sk);
+> > +out:
+> > +     bh_unlock_sock(sk);
+> > +     sock_put(sk);
+> > +}
 >
-> The AEAD request teardown pattern (EINPROGRESS check, kfree_sensitive,
-> memzero_explicit) is also duplicated. Would a shared static helper for
-> nonce construction reduce the risk of the two copies diverging during
-> maintenance?
+> [ ... ]
 >
-I will see what I can do to dedup a bit for this.
+> > +static void quic_timer_path_timeout(struct timer_list *t)
+> > +{
+> > +     struct quic_sock *qs =3D container_of(t, struct quic_sock, timers=
+[QUIC_TIMER_PATH].t);
+> > +     struct sock *sk =3D &qs->inet.sk;
+> > +
+> > +     bh_lock_sock(sk);
+> > +     if (sock_owned_by_user(sk)) {
+> > +             if (!test_and_set_bit(QUIC_PATH_DEFERRED, &sk->sk_tsq_fla=
+gs))
+> > +                     sock_hold(sk);
+> > +             goto out;
+> > +     }
+> > +
+> > +     quic_timer_path_handler(sk);
+> > +out:
+> > +     bh_unlock_sock(sk);
+> > +     sock_put(sk);
+> > +}
+>
+> [ ... ]
+>
+> > +static void quic_timer_pmtu_timeout(struct timer_list *t)
+> > +{
+> > +     struct quic_sock *qs =3D container_of(t, struct quic_sock, timers=
+[QUIC_TIMER_PMTU].t);
+> > +     struct sock *sk =3D &qs->inet.sk;
+> > +
+> > +     bh_lock_sock(sk);
+> > +     if (sock_owned_by_user(sk)) {
+> > +             if (!test_and_set_bit(QUIC_PMTU_DEFERRED, &sk->sk_tsq_fla=
+gs))
+> > +                     sock_hold(sk);
+> > +             goto out;
+> > +     }
+> > +
+> > +     quic_timer_pmtu_handler(sk);
+> > +out:
+> > +     bh_unlock_sock(sk);
+> > +     sock_put(sk);
+> > +}
+>
+> This isn't a bug, but the four timer_list-based timeout callbacks
+> (quic_timer_sack_timeout, quic_timer_loss_timeout, quic_timer_path_timeou=
+t,
+> quic_timer_pmtu_timeout) are structurally identical.
+>
+> Each extracts the sock via container_of, takes bh_lock_sock, checks
+> sock_owned_by_user to conditionally defer via test_and_set_bit/sock_hold,
+> otherwise calls the handler directly, then bh_unlock_sock/sock_put. They
+> differ only in the timer index constant, the deferred bit name, and the
+> handler function.
+>
+> This pattern could be consolidated into a single parameterized timeout
+> callback using a data table that maps timer type to deferred bit and hand=
+ler
+> function pointer, reducing around 60 lines of near-duplicate code to
+> roughly 15 lines. The TCP subsystem uses a similar approach for some of i=
+ts
+> timer infrastructure.
+>
+> That said, this follows the existing per-timer-callback pattern used
+> elsewhere in the kernel networking stack (for example, tcp_write_timer,
+> tcp_delack_timer are also separate functions), so this is a minor style
+> observation rather than a defect.
+>
+This is a good one. May not add a data table, but a simple helper like this=
+:
+
+static void quic_timer_timeout(struct timer_list *t, int type, int defer,
+                               void (*handler)(struct sock *sk))
+{
+        struct quic_sock *qs =3D container_of(t, struct quic_sock,
+timers[type].t);
+        struct sock *sk =3D &qs->inet.sk;
+
+        bh_lock_sock(sk);
+        if (sock_owned_by_user(sk)) {
+                if (!test_and_set_bit(defer, &sk->sk_tsq_flags))
+                        sock_hold(sk);
+                goto out;
+        }
+
+        handler(sk);
+out:
+        bh_unlock_sock(sk);
+        sock_put(sk);
+}
+
+will reduce quite some dup code.
+
+> > +void quic_timer_reset(struct sock *sk, u8 type, u64 timeout)
+> > +{
+> > +     struct timer_list *t =3D quic_timer(sk, type);
+> > +
+> > +     if (timeout && !mod_timer(t, jiffies + usecs_to_jiffies(timeout))=
+)
+> > +             sock_hold(sk);
+> > +}
+>
+> Can this function handle QUIC_TIMER_PACE safely? It unconditionally casts
+> the result of quic_timer() to 'struct timer_list *' and calls mod_timer()=
+.
+>
+> Looking at the timer API in this patch:
+>
+> Both quic_timer_start() and quic_timer_stop() have explicit QUIC_TIMER_PA=
+CE
+> guards that dispatch to hrtimer APIs:
+>
+> quic_timer_start():
+>         if (type =3D=3D QUIC_TIMER_PACE) {
+>                 hr =3D quic_timer(sk, type);
+>                 if (!hrtimer_is_queued(hr)) {
+>                         hrtimer_start(hr, ns_to_ktime(timeout), ...);
+>                         sock_hold(sk);
+>                 }
+>                 return;
+>         }
+>
+> quic_timer_stop():
+>         if (type =3D=3D QUIC_TIMER_PACE) {
+>                 if (hrtimer_try_to_cancel(quic_timer(sk, type)) =3D=3D 1)
+>                         sock_put(sk);
+>                 return;
+>         }
+>
+> However, quic_timer_reset() does not have a similar guard. If a future
+> caller invokes quic_timer_reset(sk, QUIC_TIMER_PACE, timeout), mod_timer(=
+)
+> will operate on memory that is actually a 'struct hrtimer', potentially
+> causing memory corruption.
+>
+> Should quic_timer_reset() either add a QUIC_TIMER_PACE guard consistent w=
+ith
+> quic_timer_start()/quic_timer_stop(), or document that this function must
+> only be used with timer_list-based timers?
+>
+There will be no callers to quic_timer_reset(QUIC_TIMER_PACE), so no need
+to add a check for QUIC_TIMER_PACE, I will leave a comment there for this.
 
 Thanks.
+
+> > +void quic_timer_start(struct sock *sk, u8 type, u64 timeout)
+> > +{
+> > +     struct timer_list *t;
+> > +     struct hrtimer *hr;
+> > +
+> > +     if (type =3D=3D QUIC_TIMER_PACE) {
+> > +             hr =3D quic_timer(sk, type);
+> > +
+> > +             if (!hrtimer_is_queued(hr)) {
+> > +                     hrtimer_start(hr, ns_to_ktime(timeout), HRTIMER_M=
+ODE_ABS_PINNED_SOFT);
+> > +                     sock_hold(sk);
+> > +             }
+> > +             return;
+> > +     }
+> > +
+> > +     t =3D quic_timer(sk, type);
+> > +     if (timeout && !timer_pending(t)) {
+> > +             if (!mod_timer(t, jiffies + usecs_to_jiffies(timeout)))
+> > +                     sock_hold(sk);
+> > +     }
+> > +}
+> > +
+> > +void quic_timer_stop(struct sock *sk, u8 type)
+> > +{
+> > +     if (type =3D=3D QUIC_TIMER_PACE) {
+> > +             if (hrtimer_try_to_cancel(quic_timer(sk, type)) =3D=3D 1)
+> > +                     sock_put(sk);
+> > +             return;
+> > +     }
+> > +     if (timer_delete(quic_timer(sk, type)))
+> > +             sock_put(sk);
+> > +}
+>
+> [ ... ]
+>
+> > diff --git a/net/quic/timer.h b/net/quic/timer.h
+> > new file mode 100644
+> > index 000000000000..61b094325334
+> > --- /dev/null
+> > +++ b/net/quic/timer.h
+>
+> [ ... ]
+>
