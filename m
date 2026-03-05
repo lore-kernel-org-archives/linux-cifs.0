@@ -1,340 +1,230 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03870313558;
-	Thu,  5 Mar 2026 19:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772738753; cv=none; b=MjmNzA8Gb2jsI+P3kg+yHWe84q8oNi/8sMdoYjazF8sCSKeyXVtfwF3Rfy7yhd9ulpvGcMaOBEJpAPOqDMS4MsZlJEG0MZK2d5JCVtRcy3rKaPOKzDITsZCHHHDbDNUFsYgpRC1PtIJsdXKkpG1Qeau/zlqCAbD/78jBl/ObQtA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772738753; c=relaxed/simple;
-	bh=vmlzEK3fLdHi0cfmhsSQFqvNzFA4ibJrsdtaMQ6FsMM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Wmt+awwq8+LlfPBf2Lh62UCp7yegpDt8lt0N7VMIFMPoiTjGDYnBKZagaa+/fiMoveLJJykQIoC1JPzi+4GX/J5+zJKWaHEHILkQE+H5Fu/sPC79KaFgQrCaq6ZDs15XZzuQ6SI7TRu1X4KXwMsql4WGrAuVigJoYzSFJr3KxM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TGM2saNl; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B9D1A9B46
+	for <linux-cifs@vger.kernel.org>; Thu,  5 Mar 2026 20:13:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772741630; cv=pass; b=g+vX50bBPDgMinLM8cLK9ivUF76yTgciLg0KnBJD5VpDif4Mk45Fb+5FblQtBB680WB03JKbn4LaERBXjmLHsz+oz70Nt7NURR3WgVp/9h/VjA14ecOfr+h7GOCp0GpFlYNCbM3P+aC8C1HaVU7Kcpf0GZ1eKPf9sgrw0oR3a3g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772741630; c=relaxed/simple;
+	bh=2w8w6ygucBOEPYfpQb+prRs51LQ9xWMtsF6KXyA9J0s=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=Jy7PNkWKYXJVvk7ir/n4S6wzd/SXlmc88r8KZ7bqCN0FZWysLduG3HMR0+tZbfEV5MelqX7IndLfsDJC5P+sVCc59oIedtHq3TJXvtDs4uH3RX0w1sxAPxeMRIX/fCGToqv70UPqR8X4Hn3iMzn0qNCzSVE2IprkJ6rlpGpLgsQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Std0eyPf; arc=pass smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TGM2saNl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35D37C116C6;
-	Thu,  5 Mar 2026 19:25:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772738752;
-	bh=vmlzEK3fLdHi0cfmhsSQFqvNzFA4ibJrsdtaMQ6FsMM=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=TGM2saNldwviAIDLOQ1P8x7SOFo+tMXmvPb99Ysn3VNHwOFLT0Dhkqu45iWUuL7z3
-	 LyYZ7qS4ipT3j1fgXJruoVMe0lYMx2J113EB9Q7XnMqjXPyaKkftQdmBZZDxeK/try
-	 VucQb2bczVK5Sy8w3LwHGwLHaz4q3c5zROVLu1JLYdaPjrfO6jLrmxU9WuGDL0e1LI
-	 sHnQE0ur6k+hc/akW5Ahil4lbe5t0rsnVRm5eLw8o0eC57sRaPKJgWj6ayg0q4hDq0
-	 UIBUEOcDE/heTYNO07ncOYaV2Qsqr/pzwPBkNzbenDaZRszh71tzddVIzBoAx0CRXU
-	 b/biJfAV4c7KQ==
-Message-ID: <c21702a39cd751eaf0463e8c20e8e0a4b6f4d3e5.camel@kernel.org>
-Subject: Re: [PATCH 24/24] fs: remove simple_nosetlease()
-From: Jeff Layton <jlayton@kernel.org>
-To: Mike Snitzer <snitzer@kernel.org>
-Cc: Luis de Bethencourt <luisbg@kernel.org>, Salah Triki
- <salah.triki@gmail.com>,  Nicolas Pitre <nico@fluxnic.net>, Christoph
- Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Anders Larsen	
- <al@alarsen.net>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
- Brauner	 <brauner@kernel.org>, David Sterba <dsterba@suse.com>, Chris Mason
- <clm@fb.com>,  Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue
- Hu <zbestahu@gmail.com>, Jeffle Xu	 <jefflexu@linux.alibaba.com>, Sandeep
- Dhavale <dhavale@google.com>, Hongbo Li	 <lihongbo22@huawei.com>, Chunhai
- Guo <guochunhai@vivo.com>, Jan Kara	 <jack@suse.com>, Theodore Ts'o
- <tytso@mit.edu>, Andreas Dilger	 <adilger.kernel@dilger.ca>, Jaegeuk Kim
- <jaegeuk@kernel.org>, OGAWA Hirofumi	 <hirofumi@mail.parknet.co.jp>, David
- Woodhouse <dwmw2@infradead.org>,  Richard Weinberger	 <richard@nod.at>,
- Dave Kleikamp <shaggy@kernel.org>, Ryusuke Konishi	
- <konishi.ryusuke@gmail.com>, Viacheslav Dubeyko <slava@dubeyko.com>, 
- Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, Mark Fasheh
- <mark@fasheh.com>, Joel Becker	 <jlbec@evilplan.org>, Joseph Qi
- <joseph.qi@linux.alibaba.com>, Mike Marshall	 <hubcap@omnibond.com>, Martin
- Brandenburg <martin@omnibond.com>, Miklos Szeredi	 <miklos@szeredi.hu>,
- Amir Goldstein <amir73il@gmail.com>, Phillip Lougher	
- <phillip@squashfs.org.uk>, Carlos Maiolino <cem@kernel.org>, Hugh Dickins	
- <hughd@google.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, Andrew
- Morton	 <akpm@linux-foundation.org>, Namjae Jeon <linkinjeon@kernel.org>,
- Sungjong Seo	 <sj1557.seo@samsung.com>, Yuezhang Mo <yuezhang.mo@sony.com>,
- Chuck Lever	 <chuck.lever@oracle.com>, Alexander Aring
- <alex.aring@gmail.com>, Andreas Gruenbacher <agruenba@redhat.com>, Jonathan
- Corbet <corbet@lwn.net>, "Matthew Wilcox (Oracle)"	 <willy@infradead.org>,
- Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov
- <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, Christian
- Schoenebeck	 <linux_oss@crudebyte.com>, Xiubo Li <xiubli@redhat.com>, Ilya
- Dryomov	 <idryomov@gmail.com>, Trond Myklebust <trondmy@kernel.org>, Anna
- Schumaker	 <anna@kernel.org>, Steve French <sfrench@samba.org>, Paulo
- Alcantara	 <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N	 <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Bharath SM	 <bharathsm@microsoft.com>, Hans de Goede <hansg@kernel.org>, 
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
-	linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net, 
-	linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
- ocfs2-devel@lists.linux.dev, 	devel@lists.orangefs.org,
- linux-unionfs@vger.kernel.org, 	linux-xfs@vger.kernel.org,
- linux-mm@kvack.org, gfs2@lists.linux.dev, 	linux-doc@vger.kernel.org,
- v9fs@lists.linux.dev, ceph-devel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org
-Date: Thu, 05 Mar 2026 14:25:42 -0500
-In-Reply-To: <aaiyWlJelhHju741@kernel.org>
-References: <20260108-setlease-6-20-v1-0-ea4dec9b67fa@kernel.org>
-	 <20260108-setlease-6-20-v1-24-ea4dec9b67fa@kernel.org>
-	 <aZ84VRrRVyGEzSJn@kernel.org>
-	 <e07e9b893ca04ce6ead4790e72c7f285a7159070.camel@kernel.org>
-	 <aaiyWlJelhHju741@kernel.org>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Std0eyPf"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-50697d6a69cso42978481cf.2
+        for <linux-cifs@vger.kernel.org>; Thu, 05 Mar 2026 12:13:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772741628; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fP2XfjSjWtcxT/QQOlNGE3h6l+lH14B0LvLxAtyr0hnxoDuK4dc64h1P3nj7x3So5e
+         qSf+4Q+Fj3BH/z7BdYgyvC0X4fllWPU4G+IapWRnsnoqJrX0BWsagCkCX2NeLHyEv9hi
+         cxGgFOW+ScLcwSPA3FI1fQcd5vRrqu+vVX6acPxTAowyi5UYHSU8bx+JXt6EQqkDQYx0
+         8LMXSTL/fRVdksyXPEVVv/eJZbOfoedqRWeHK7G7CFm5EBx37H5k9VQXbwQBICd0opLz
+         VWpO3rkHbMb8bemAlSM8noE5N9bUROmpVxOnp6GXi2cP98SruQC8LVkLlUj7AAyNdp5d
+         h4vQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=e4l3OWuqtqDjCb+MMCiPpvpNV4Xzg2KcmNPWJmWsQkY=;
+        fh=6tY+Ovy/8DUqZG1+/Nk/+cuG4ArqKwAz485INxhH87g=;
+        b=QsWdkOIMLHkg+gzeu4cED7L9f/lRYw1W8S7ej8eV26NGJR6xr4/dCl8JUDCJWjlVJC
+         dy3o+rTtd79mgh/aV1vVwMAN/eZqU6BFeSSugD3iUHY1TyXJ0JQtX2vGcmKlWlhpblzE
+         T7zfAYZsT7fphnG7twvnEq7bU3rBUGIZe1jIbevG3AXq9nUCPmx5zuTXTKQ+duOKZaRj
+         S3Jt+MOKi+tgsZRMRbZViGNgEHAdvR+YqJLZS53YDnybrhba3Uq+VJ6LIoX1hAwBR+F8
+         4899x4xVOxrRqVlHgIhuqzuOBZda7A/ctiIJKDtYdNRua6WjHI9KIpNg67OEariNQL94
+         fqlQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772741628; x=1773346428; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=e4l3OWuqtqDjCb+MMCiPpvpNV4Xzg2KcmNPWJmWsQkY=;
+        b=Std0eyPfNIKSN4UdehCyHT1UeM1HvDqobpJaXlBJVKhgxk3Gakmo0pQS5QGJxOFc27
+         zRBkq8ML17O5O59Tas14jHn1/bDLfRkciP86vBNBvNWfsGpazhvrpQTs8S5rHmQ4EP9V
+         H2G/qcdhtxebSBqSTPWbAvUaRDINkbz+w+A7rovZBXMLX7z82N5Sn9Tc3zmTeCOx4BOF
+         RerKu9a6nFldtlAwkQIY/i3KwaQOQhzd2fcJQF4RqnsUwREJfXEv4DX/ce4vhBso8upj
+         49kMqvS+UP9bdrIdY3cl5t0DGybqn1pD6jaZkl4YC1NzNZYN+WW2VY7Vd9QTxU11pJXi
+         vp3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772741628; x=1773346428;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e4l3OWuqtqDjCb+MMCiPpvpNV4Xzg2KcmNPWJmWsQkY=;
+        b=wYJ+uDSzFqjrNXtmnG5wUpac9cYGw7ovdi+VI3p7l+/xJTnzxsqwD2/rLmVB5N4VlX
+         gqeJgHPUuNi8KhATFL8K8dcV2vlGHZrCx920Lyg25H+JTD6tr5Lr7eu20Gkquv7kTzxS
+         WoZ7vT3vc4VAbLXAS2LFroWk11Oe4ikPK/haUgKdVxk2cfWn70djLag7d+aYb3JxeVzw
+         bIXxZz9JIoBriqhANuhaLBqhRyJ4yPuMp/FgXN7ruT7lyqtlAE4eiDpwcR9lY48Ohlm5
+         35GDtzvzrOwR7iNKrTUPSu/3909OgAGI8kp6RrDTObGH2qDnw30tHyvZP0/y26jVkPxR
+         BeqQ==
+X-Gm-Message-State: AOJu0Yy84jVdGE4xXqXc4yx4ia2kOjXkIQc4jPfuPdSSS6WLozvF7qZ8
+	dvu7DSpK6eSqEvALyEvhsgjgi8G5P6rR8j+mHJ1pHyH2oy5Vi+pZEUJUVDcpJn+tTYwrRQZ4/bX
+	yaJpTdIMxtNc000xlyOsKGJPDMg3Q0ZSoHw==
+X-Gm-Gg: ATEYQzyf/NGes1jMn6FNfE6Io19hSKZzyJZn63BOFOR3wUyrj5FH8h8Umj8EaN+jXSc
+	AXGN+4/KymaDrar3VaCdVImUIeIIjdJowSA3Q/mbtTf1TTeAYf2xAkMSkXJBoUnH0oz93hU2/LK
+	yO/6zsBb25Tyf0JxqQlaMHIVIwwGkToJgrrk1K1OicqAyAePY/3YVvNeZh+vmk+X6jjyg2zBicW
+	K7lhp2O2uTE2TkJPnao8WtaeKFBYRQropSeIy3xGKbppd77JrWIHoWpQ1YdNh15KMLiC8MJFtVa
+	Z4xroQsN5LuKbFf+eP8pkpEnqAPEUCKSmITh9ib2W3yDI7D6u0lEEsK4LnemIVNn+SOxb3Cdq6P
+	KoBhih+NELSb1bCL8QRPAM+slx3FVBp4JzhmQS6NGe7wUtAJ3ZIMVVEBUY5LtU87/EsKr/GGqVH
+	X7wVISJXQ/D2xbOOVsyPwPdg==
+X-Received: by 2002:a05:622a:446:b0:506:a4f1:32a9 with SMTP id
+ d75a77b69052e-508f1d3c7bemr13020011cf.31.1772741628001; Thu, 05 Mar 2026
+ 12:13:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 5 Mar 2026 14:13:36 -0600
+X-Gm-Features: AaiRm51azFqjIhMX_qQbkNMKWcUw9fOPqE5x49xu_yyJNxSFoqwLVQxgNYlP4ZU
+Message-ID: <CAH2r5mtr8wc93sR-89HC6a4BzCWhAJSerd67ne5+gYksrUb4PA@mail.gmail.com>
+Subject: full xfstest scripts
+To: CIFS <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>
+Content-Type: multipart/mixed; boundary="000000000000047bd7064c4c9357"
 
-On Wed, 2026-03-04 at 17:29 -0500, Mike Snitzer wrote:
-> On Wed, Mar 04, 2026 at 11:59:32AM -0500, Jeff Layton wrote:
-> > On Wed, 2026-02-25 at 12:58 -0500, Mike Snitzer wrote:
-> > > On Thu, Jan 08, 2026 at 12:13:19PM -0500, Jeff Layton wrote:
-> > > > Setting ->setlease() to a NULL pointer now has the same effect as
-> > > > setting it to simple_nosetlease(). Remove all of the setlease
-> > > > file_operations that are set to simple_nosetlease, and the function
-> > > > itself.
-> > > >=20
-> > > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > > > ---
-> > > >  fs/9p/vfs_dir.c        |  2 --
-> > > >  fs/9p/vfs_file.c       |  2 --
-> > > >  fs/ceph/dir.c          |  2 --
-> > > >  fs/ceph/file.c         |  1 -
-> > > >  fs/fuse/dir.c          |  1 -
-> > > >  fs/gfs2/file.c         |  2 --
-> > > >  fs/libfs.c             | 18 ------------------
-> > > >  fs/nfs/dir.c           |  1 -
-> > > >  fs/nfs/file.c          |  1 -
-> > > >  fs/smb/client/cifsfs.c |  1 -
-> > > >  fs/vboxsf/dir.c        |  1 -
-> > > >  fs/vboxsf/file.c       |  1 -
-> > > >  include/linux/fs.h     |  1 -
-> > > >  13 files changed, 34 deletions(-)
-> > > >=20
-> > >=20
-> > > <snip>
-> > >=20
-> > > > diff --git a/fs/libfs.c b/fs/libfs.c
-> > > > index 697c6d5fc12786c036f0086886297fb5cd52ae00..f1860dff86f2703266b=
-eecf31e9d2667af7a9684 100644
-> > > > --- a/fs/libfs.c
-> > > > +++ b/fs/libfs.c
-> > > > @@ -1699,24 +1699,6 @@ struct inode *alloc_anon_inode(struct super_=
-block *s)
-> > > >  }
-> > > >  EXPORT_SYMBOL(alloc_anon_inode);
-> > > > =20
-> > > > -/**
-> > > > - * simple_nosetlease - generic helper for prohibiting leases
-> > > > - * @filp: file pointer
-> > > > - * @arg: type of lease to obtain
-> > > > - * @flp: new lease supplied for insertion
-> > > > - * @priv: private data for lm_setup operation
-> > > > - *
-> > > > - * Generic helper for filesystems that do not wish to allow leases=
- to be set.
-> > > > - * All arguments are ignored and it just returns -EINVAL.
-> > > > - */
-> > > > -int
-> > > > -simple_nosetlease(struct file *filp, int arg, struct file_lease **=
-flp,
-> > > > -		  void **priv)
-> > > > -{
-> > > > -	return -EINVAL;
-> > > > -}
-> > > > -EXPORT_SYMBOL(simple_nosetlease);
-> > > > -
-> > > >  /**
-> > > >   * simple_get_link - generic helper to get the target of "fast" sy=
-mlinks
-> > > >   * @dentry: not used here
-> > > > diff --git a/fs/nfs/dir.c b/fs/nfs/dir.c
-> > > > index 71df279febf797880ded19e45528c3df4cea2dde..23a78a742b619dea8b7=
-6ddf28f4f59a1c8a015e2 100644
-> > > > --- a/fs/nfs/dir.c
-> > > > +++ b/fs/nfs/dir.c
-> > > > @@ -66,7 +66,6 @@ const struct file_operations nfs_dir_operations =
-=3D {
-> > > >  	.open		=3D nfs_opendir,
-> > > >  	.release	=3D nfs_closedir,
-> > > >  	.fsync		=3D nfs_fsync_dir,
-> > > > -	.setlease	=3D simple_nosetlease,
-> > > >  };
-> > > > =20
-> > > >  const struct address_space_operations nfs_dir_aops =3D {
-> > > > diff --git a/fs/nfs/file.c b/fs/nfs/file.c
-> > > > index d020aab40c64ebda30d130b6acee1b9194621457..9d269561961825f8852=
-9551b0f0287920960ac62 100644
-> > > > --- a/fs/nfs/file.c
-> > > > +++ b/fs/nfs/file.c
-> > > > @@ -962,7 +962,6 @@ const struct file_operations nfs_file_operation=
-s =3D {
-> > > >  	.splice_read	=3D nfs_file_splice_read,
-> > > >  	.splice_write	=3D iter_file_splice_write,
-> > > >  	.check_flags	=3D nfs_check_flags,
-> > > > -	.setlease	=3D simple_nosetlease,
-> > > >  	.fop_flags	=3D FOP_DONTCACHE,
-> > > >  };
-> > > >  EXPORT_SYMBOL_GPL(nfs_file_operations);
-> > >=20
-> > > Hey Jeff,
-> > >=20
-> > > I've noticed an NFS reexport regression in v6.19 and now v7.0-rc1
-> > > (similar but different due to your series that requires opt-in via
-> > > .setlease).
-> > >=20
-> > > Bisect first pointed out this commit:
-> > > 10dcd5110678 nfs: properly disallow delegation requests on directorie=
-s
-> > >=20
-> > > And now with v7.0-rc1 its the fact that NFS doesn't provide .setlease
-> > > so lstat() on parent dir (of file that I touch) gets -EINVAL.
-> > >=20
-> > > So its a confluence of NFS's dir delegations and your setlease change=
-s.
-> > >=20
-> > > If I reexport NFSv4.2 filesystem in terms of NFSv4.1, the regression
-> > > is seen by doing (lstat reproducer that gemini spit out for me is
-> > > attached):
-> > >=20
-> > > $ touch /mnt/share41/test
-> > > $ strace ./lstat /mnt/share41
-> > > ...
-> > > lstat("/mnt/share41", 0x7ffec0d79920)   =3D -1 EINVAL (Invalid argume=
-nt)
-> > >=20
-> > > If I immediately re-run it works:
-> > > ...
-> > > lstat("/mnt/share41", {st_mode=3DS_IFDIR|0777, st_size=3D4096, ...}) =
-=3D 0
-> > >=20
-> > > I'm not sure what the proper fix is yet, but I feel like you've misse=
-d
-> > > that NFS itself can be (re)exported?
-> > >=20
-> > >=20
-> >=20
-> > My apologies. I missed seeing this last week.
-> >=20
-> > That's a very simple reproducer! That's very strange behavior,
-> > especially since NFS4 does provide a setlease operation:
-> >=20
-> > const struct file_operations nfs4_file_operations =3D {
-> > 	[...]
-> > 	.setlease       =3D nfs4_setlease,
-> > 	[...]
-> > };
->=20
-> Huh, not sure how I missed nfs4_setlease...
->=20
-> > I'm not sure why this would cause lstat() to return -EINVAL.
->=20
-> Likewise, especially given nfs4_setlease
->=20
-> > What's happening on the wire when this occurs?
-> >=20
-> > I'll plan to take a look here soon either way.
->=20
-> I'll have to revisit myself, been a bit.
->=20
-> Will let you know.
->=20
+--000000000000047bd7064c4c9357
+Content-Type: text/plain; charset="UTF-8"
 
-Thanks. I just tested your reproducer. I have a nfsv4.2 mount on one
-host that is reexported, and mounted the reexport on a different host
-with "-o vers=3D4.1".
+Attached are scripts to run all passing xfstests to Samba, and also
+similar script to run all xfstests which pass when mounted to ksmbd.
+As we fix bugs and add features to expand this list we can add
+additional tests to these, but also update them on wiki.samba.org
+and/or bharath's xfstest git repo.
 
-It seems to work for me. It's possible I don't have something set up
-the same way though:
+-- 
+Thanks,
 
-$ touch /mnt/scratch/test ; ./lstat /mnt/scratch/test
-Information for: /mnt/scratch/test
----------------------------
-File Size:              0 bytes
-Number of Links:        1
-File inode:             272
-File Type:              Regular File
+Steve
 
---=20
-Jeff Layton <jlayton@kernel.org>
+--000000000000047bd7064c4c9357
+Content-Type: application/x-shellscript; name="run-ksmbd-passing-tests.sh"
+Content-Disposition: attachment; filename="run-ksmbd-passing-tests.sh"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mmdwjv921>
+X-Attachment-Id: f_mmdwjv921
+
+Li9jaGVjayAtY2lmcyAtcyBwb3NpeCBjaWZzLzAwMSBnZW5lcmljLzAwMSBnZW5lcmljLzAwMiBn
+ZW5lcmljLzAwNSBnZW5lcmljLzAwNiBnZW5lcmljLzAwNyBnZW5lcmljLzAwOCBnZW5lcmljLzAx
+MCBnZW5lcmljLzAxMSBnZW5lcmljLzAxMiBnZW5lcmljLzAxMyBnZW5lcmljLzAxNCBnZW5lcmlj
+LzAxNiBnZW5lcmljLzAyMCBnZW5lcmljLzAyMSBnZW5lcmljLzAyMiBnZW5lcmljLzAyMyBnZW5l
+cmljLzAyNCBnZW5lcmljLzAyOCBnZW5lcmljLzAyOSBnZW5lcmljLzAzMCBnZW5lcmljLzAzMSBn
+ZW5lcmljLzAzMiBnZW5lcmljLzAzMyBnZW5lcmljLzAzNiBnZW5lcmljLzAzNyBnZW5lcmljLzA0
+MyBnZW5lcmljLzA0NCBnZW5lcmljLzA0NSBnZW5lcmljLzA0NiBnZW5lcmljLzA0NyBnZW5lcmlj
+LzA0OCBnZW5lcmljLzA0OSBnZW5lcmljLzA1MSBnZW5lcmljLzA2NCBnZW5lcmljLzA2OSBnZW5l
+cmljLzA3MCBnZW5lcmljLzA3MSBnZW5lcmljLzA3MiBnZW5lcmljLzA3NCBnZW5lcmljLzA3NSBn
+ZW5lcmljLzA4MCBnZW5lcmljLzA4NCBnZW5lcmljLzA4NiBnZW5lcmljLzA5MSBnZW5lcmljLzA5
+NSBnZW5lcmljLzA5OCBnZW5lcmljLzEwMCBnZW5lcmljLzEwMyBnZW5lcmljLzEwOSBnZW5lcmlj
+LzExMCBnZW5lcmljLzExMSBnZW5lcmljLzExMiBnZW5lcmljLzExMyBnZW5lcmljLzExNSBnZW5l
+cmljLzExNiBnZW5lcmljLzExNyBnZW5lcmljLzExOCBnZW5lcmljLzExOSBnZW5lcmljLzEyNCBn
+ZW5lcmljLzEyNSBnZW5lcmljLzEyNyBnZW5lcmljLzEyOSBnZW5lcmljLzEzMCBnZW5lcmljLzEz
+MiBnZW5lcmljLzEzMyBnZW5lcmljLzEzNCBnZW5lcmljLzEzNSBnZW5lcmljLzEzOCBnZW5lcmlj
+LzEzOSBnZW5lcmljLzE0MCBnZW5lcmljLzE0MSBnZW5lcmljLzE0MiBnZW5lcmljLzE0MyBnZW5l
+cmljLzE0NCBnZW5lcmljLzE0NSBnZW5lcmljLzE0NiBnZW5lcmljLzE0OCBnZW5lcmljLzE0OSBn
+ZW5lcmljLzE1MCBnZW5lcmljLzE1MSBnZW5lcmljLzE1MiBnZW5lcmljLzE1MyBnZW5lcmljLzE1
+NCBnZW5lcmljLzE1NSBnZW5lcmljLzE2OSBnZW5lcmljLzE3OCBnZW5lcmljLzE3OSBnZW5lcmlj
+LzE4MCBnZW5lcmljLzE4MSBnZW5lcmljLzE5OCBnZW5lcmljLzIwNyBnZW5lcmljLzIwOCBnZW5l
+cmljLzIwOSBnZW5lcmljLzIxMCBnZW5lcmljLzIxMiBnZW5lcmljLzIxNCBnZW5lcmljLzIxNSBn
+ZW5lcmljLzIyMSBnZW5lcmljLzIyNSBnZW5lcmljLzIyOCBnZW5lcmljLzIzNiBnZW5lcmljLzIz
+OSBnZW5lcmljLzI0MSBnZW5lcmljLzI0NSBnZW5lcmljLzI0NiBnZW5lcmljLzI0NyBnZW5lcmlj
+LzI0OCBnZW5lcmljLzI0OSBnZW5lcmljLzI1NSBnZW5lcmljLzI1NyBnZW5lcmljLzI1OCBnZW5l
+cmljLzI2MyBnZW5lcmljLzI4NSBnZW5lcmljLzMwOCBnZW5lcmljLzMwOSBnZW5lcmljLzMxMCBn
+ZW5lcmljLzMxMyBnZW5lcmljLzMxNSBnZW5lcmljLzMxNiBnZW5lcmljLzMyMyBnZW5lcmljLzMz
+NyBnZW5lcmljLzMzOSBnZW5lcmljLzM0MCBnZW5lcmljLzM0NCBnZW5lcmljLzM0NSBnZW5lcmlj
+LzM0NiBnZW5lcmljLzM0OSBnZW5lcmljLzM1MCBnZW5lcmljLzM1MSBnZW5lcmljLzM1NCBnZW5l
+cmljLzM2MCBnZW5lcmljLzM2MiBnZW5lcmljLzM2NCBnZW5lcmljLzM2NiBnZW5lcmljLzM3NyBn
+ZW5lcmljLzM3OCBnZW5lcmljLzM5MSBnZW5lcmljLzM5MyBnZW5lcmljLzM5NCBnZW5lcmljLzQw
+NiBnZW5lcmljLzQwNyBnZW5lcmljLzQxMiBnZW5lcmljLzQxNyBnZW5lcmljLzQyMCBnZW5lcmlj
+LzQyMiBnZW5lcmljLzQyOCBnZW5lcmljLzQzMCBnZW5lcmljLzQzMSBnZW5lcmljLzQzMiBnZW5l
+cmljLzQzMyBnZW5lcmljLzQzNiBnZW5lcmljLzQzNyBnZW5lcmljLzQzOCBnZW5lcmljLzQzOSBn
+ZW5lcmljLzQ0MyBnZW5lcmljLzQ0NSBnZW5lcmljLzQ0NiBnZW5lcmljLzQ0OCBnZW5lcmljLzQ1
+MSBnZW5lcmljLzQ1MiBnZW5lcmljLzQ2MCBnZW5lcmljLzQ2MSBnZW5lcmljLzQ2MyBnZW5lcmlj
+LzQ2NCBnZW5lcmljLzQ2NSBnZW5lcmljLzQ2OSBnZW5lcmljLzQ3MSBnZW5lcmljLzQ3NCBnZW5l
+cmljLzQ3NiBnZW5lcmljLzQ5MCBnZW5lcmljLzQ5MSBnZW5lcmljLzQ5OSBnZW5lcmljLzUwNCBn
+ZW5lcmljLzUyMyBnZW5lcmljLzUyNCBnZW5lcmljLzUyNSBnZW5lcmljLzUyOCBnZW5lcmljLzUz
+MiBnZW5lcmljLzUzMyBnZW5lcmljLzU1MSBnZW5lcmljLzU2NSBnZW5lcmljLzU2NyBnZW5lcmlj
+LzU2OCBnZW5lcmljLzU3MSBnZW5lcmljLzU4NiBnZW5lcmljLzU5MCBnZW5lcmljLzU5MSBnZW5l
+cmljLzU5OSBnZW5lcmljLzYwNCBnZW5lcmljLzYwOSBnZW5lcmljLzYxMCBnZW5lcmljLzYxMiBn
+ZW5lcmljLzYxNSBnZW5lcmljLzYxNiBnZW5lcmljLzYxNyBnZW5lcmljLzYxOCBnZW5lcmljLzYz
+MiBnZW5lcmljLzYzNyBnZW5lcmljLzYzOCBnZW5lcmljLzYzOSBnZW5lcmljLzY0MiBnZW5lcmlj
+LzY0NiBnZW5lcmljLzY0NyBnZW5lcmljLzY1MCBnZW5lcmljLzY3NiBnZW5lcmljLzY3OCBnZW5l
+cmljLzY5NCBnZW5lcmljLzcwMSBnZW5lcmljLzcwNiBnZW5lcmljLzcwNyBnZW5lcmljLzcwOCBn
+ZW5lcmljLzcyOCBnZW5lcmljLzcyOSBnZW5lcmljLzczNiBnZW5lcmljLzczNyBnZW5lcmljLzc0
+MiBnZW5lcmljLzc0OCBnZW5lcmljLzc1MCBnZW5lcmljLzc1MSBnZW5lcmljLzc1NSBnZW5lcmlj
+Lzc1OCBnZW5lcmljLzc1OSBnZW5lcmljLzc2MCBnZW5lcmljLzc2MSBnZW5lcmljLzc2Mwo=
+--000000000000047bd7064c4c9357
+Content-Type: application/x-shellscript; name="run-samba-passing-tests.sh"
+Content-Disposition: attachment; filename="run-samba-passing-tests.sh"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mmdwjv8p0>
+X-Attachment-Id: f_mmdwjv8p0
+
+Li9jaGVjayAtY2lmcyAtcyBwb3NpeCBjaWZzLzAwMSBnZW5lcmljLzAwMSBnZW5lcmljLzAwMiBn
+ZW5lcmljLzAwNSBnZW5lcmljLzAwNiBnZW5lcmljLzAwNyBnZW5lcmljLzAwOCBnZW5lcmljLzAx
+MCBnZW5lcmljLzAxMSBnZW5lcmljLzAxMiBnZW5lcmljLzAxMyBnZW5lcmljLzAxNCBnZW5lcmlj
+LzAxNiBnZW5lcmljLzAyMCBnZW5lcmljLzAyMSBnZW5lcmljLzAyMiBnZW5lcmljLzAyMyBnZW5l
+cmljLzAyNCBnZW5lcmljLzAyOCBnZW5lcmljLzAyOSBnZW5lcmljLzAzMCBnZW5lcmljLzAzMSBn
+ZW5lcmljLzAzMiBnZW5lcmljLzAzMyBnZW5lcmljLzAzNSBnZW5lcmljLzAzNiBnZW5lcmljLzAz
+NyBnZW5lcmljLzA0MyBnZW5lcmljLzA0NCBnZW5lcmljLzA0NSBnZW5lcmljLzA0NiBnZW5lcmlj
+LzA0NyBnZW5lcmljLzA0OCBnZW5lcmljLzA0OSBnZW5lcmljLzA1MSBnZW5lcmljLzA2NCBnZW5l
+cmljLzA2OCBnZW5lcmljLzA2OSBnZW5lcmljLzA3MCBnZW5lcmljLzA3MSBnZW5lcmljLzA3MiBn
+ZW5lcmljLzA3NCBnZW5lcmljLzA3NSBnZW5lcmljLzA4MCBnZW5lcmljLzA4NCBnZW5lcmljLzA4
+NiBnZW5lcmljLzA4OCBnZW5lcmljLzA4OSBnZW5lcmljLzA5MSBnZW5lcmljLzA5NSBnZW5lcmlj
+LzA5OCBnZW5lcmljLzEwMCBnZW5lcmljLzEwMyBnZW5lcmljLzEwOSBnZW5lcmljLzExMCBnZW5l
+cmljLzExMSBnZW5lcmljLzExMiBnZW5lcmljLzExMyBnZW5lcmljLzExNSBnZW5lcmljLzExNiBn
+ZW5lcmljLzExNyBnZW5lcmljLzExOCBnZW5lcmljLzExOSBnZW5lcmljLzEyNCBnZW5lcmljLzEy
+NSBnZW5lcmljLzEyNyBnZW5lcmljLzEyOSBnZW5lcmljLzEzMCBnZW5lcmljLzEzMiBnZW5lcmlj
+LzEzMyBnZW5lcmljLzEzNCBnZW5lcmljLzEzNSBnZW5lcmljLzEzOCBnZW5lcmljLzEzOSBnZW5l
+cmljLzE0MCBnZW5lcmljLzE0MSBnZW5lcmljLzE0MiBnZW5lcmljLzE0MyBnZW5lcmljLzE0NCBn
+ZW5lcmljLzE0NSBnZW5lcmljLzE0NiBnZW5lcmljLzE0NyBnZW5lcmljLzE0OCBnZW5lcmljLzE0
+OSBnZW5lcmljLzE1MCBnZW5lcmljLzE1MSBnZW5lcmljLzE1MiBnZW5lcmljLzE1MyBnZW5lcmlj
+LzE1NCBnZW5lcmljLzE1NSBnZW5lcmljLzE1NyBnZW5lcmljLzE2MSBnZW5lcmljLzE2NCBnZW5l
+cmljLzE2NSBnZW5lcmljLzE2NiBnZW5lcmljLzE2NyBnZW5lcmljLzE2OCBnZW5lcmljLzE2OSBn
+ZW5lcmljLzE3MCBnZW5lcmljLzE3NSBnZW5lcmljLzE3NiBnZW5lcmljLzE3OCBnZW5lcmljLzE3
+OSBnZW5lcmljLzE4MCBnZW5lcmljLzE4MSBnZW5lcmljLzE4MyBnZW5lcmljLzE4NCBnZW5lcmlj
+LzE4NSBnZW5lcmljLzE4NiBnZW5lcmljLzE4NyBnZW5lcmljLzE4OCBnZW5lcmljLzE4OSBnZW5l
+cmljLzE5MCBnZW5lcmljLzE5MSBnZW5lcmljLzE5NiBnZW5lcmljLzE5NyBnZW5lcmljLzE5OCBn
+ZW5lcmljLzIwMSBnZW5lcmljLzIwMiBnZW5lcmljLzIwMyBnZW5lcmljLzIwNyBnZW5lcmljLzIw
+OCBnZW5lcmljLzIwOSBnZW5lcmljLzIxMCBnZW5lcmljLzIxMiBnZW5lcmljLzIxNCBnZW5lcmlj
+LzIxNSBnZW5lcmljLzIyMSBnZW5lcmljLzIyNSBnZW5lcmljLzIyOCBnZW5lcmljLzIzNiBnZW5l
+cmljLzIzOSBnZW5lcmljLzI0MSBnZW5lcmljLzI0MiBnZW5lcmljLzI0MyBnZW5lcmljLzI0NSBn
+ZW5lcmljLzI0NiBnZW5lcmljLzI0NyBnZW5lcmljLzI0OCBnZW5lcmljLzI0OSBnZW5lcmljLzI1
+MyBnZW5lcmljLzI1NCBnZW5lcmljLzI1NSBnZW5lcmljLzI1NyBnZW5lcmljLzI1OCBnZW5lcmlj
+LzI1OSBnZW5lcmljLzI2MSBnZW5lcmljLzI2MiBnZW5lcmljLzI2MyBnZW5lcmljLzI4NCBnZW5l
+cmljLzI4NyBnZW5lcmljLzI4OSBnZW5lcmljLzI5MCBnZW5lcmljLzI5MSBnZW5lcmljLzI5MiBn
+ZW5lcmljLzI5NCBnZW5lcmljLzI5NiBnZW5lcmljLzMwMSBnZW5lcmljLzMwMiBnZW5lcmljLzMw
+NiBnZW5lcmljLzMwOCBnZW5lcmljLzMwOSBnZW5lcmljLzMxMCBnZW5lcmljLzMxMyBnZW5lcmlj
+LzMxNSBnZW5lcmljLzMxNiBnZW5lcmljLzMyMyBnZW5lcmljLzMzMCBnZW5lcmljLzMzMiBnZW5l
+cmljLzMzNyBnZW5lcmljLzMzOSBnZW5lcmljLzM0MCBnZW5lcmljLzM0NCBnZW5lcmljLzM0NSBn
+ZW5lcmljLzM0NiBnZW5lcmljLzM1MCBnZW5lcmljLzM1MSBnZW5lcmljLzM1MyBnZW5lcmljLzM1
+NCBnZW5lcmljLzM1OCBnZW5lcmljLzM1OSBnZW5lcmljLzM2MCBnZW5lcmljLzM2MiBnZW5lcmlj
+LzM2NCBnZW5lcmljLzM2NiBnZW5lcmljLzM3MyBnZW5lcmljLzM3NyBnZW5lcmljLzM5MCBnZW5l
+cmljLzM5MSBnZW5lcmljLzM5MyBnZW5lcmljLzM5NCBnZW5lcmljLzQwNiBnZW5lcmljLzQwNyBn
+ZW5lcmljLzQxMiBnZW5lcmljLzQxNSBnZW5lcmljLzQxNyBnZW5lcmljLzQyMCBnZW5lcmljLzQy
+MiBnZW5lcmljLzQyOCBnZW5lcmljLzQzMCBnZW5lcmljLzQzMSBnZW5lcmljLzQzMiBnZW5lcmlj
+LzQzMyBnZW5lcmljLzQzNCBnZW5lcmljLzQzNiBnZW5lcmljLzQzNyBnZW5lcmljLzQzOCBnZW5l
+cmljLzQzOSBnZW5lcmljLzQ0MyBnZW5lcmljLzQ0NSBnZW5lcmljLzQ0NiBnZW5lcmljLzQ0NyBn
+ZW5lcmljLzQ0OCBnZW5lcmljLzQ1MSBnZW5lcmljLzQ1MiBnZW5lcmljLzQ1OCBnZW5lcmljLzQ2
+MCBnZW5lcmljLzQ2MSBnZW5lcmljLzQ2MyBnZW5lcmljLzQ2NCBnZW5lcmljLzQ2NSBnZW5lcmlj
+LzQ2OSBnZW5lcmljLzQ3MSBnZW5lcmljLzQ3NCBnZW5lcmljLzQ3NiBnZW5lcmljLzQ5MSBnZW5l
+cmljLzQ5OSBnZW5lcmljLzUwNCBnZW5lcmljLzUxOCBnZW5lcmljLzUyMyBnZW5lcmljLzUyNCBn
+ZW5lcmljLzUyNSBnZW5lcmljLzUyOCBnZW5lcmljLzUzMiBnZW5lcmljLzUzMyBnZW5lcmljLzU0
+NCBnZW5lcmljLzU1MSBnZW5lcmljLzU2NCBnZW5lcmljLzU2NSBnZW5lcmljLzU2NyBnZW5lcmlj
+LzU2OCBnZW5lcmljLzU3MSBnZW5lcmljLzU4NiBnZW5lcmljLzU5MCBnZW5lcmljLzU5MSBnZW5l
+cmljLzU5OSBnZW5lcmljLzYwNCBnZW5lcmljLzYwOSBnZW5lcmljLzYxMCBnZW5lcmljLzYxMiBn
+ZW5lcmljLzYxNSBnZW5lcmljLzYxNiBnZW5lcmljLzYxNyBnZW5lcmljLzYxOCBnZW5lcmljLzYz
+MiBnZW5lcmljLzYzNCBnZW5lcmljLzYzNSBnZW5lcmljLzYzNyBnZW5lcmljLzYzOCBnZW5lcmlj
+LzYzOSBnZW5lcmljLzY0MiBnZW5lcmljLzY0NiBnZW5lcmljLzY0NyBnZW5lcmljLzY1MCBnZW5l
+cmljLzY1NyBnZW5lcmljLzY1OCBnZW5lcmljLzY1OSBnZW5lcmljLzY2MCBnZW5lcmljLzY2MyBn
+ZW5lcmljLzY2NCBnZW5lcmljLzY2NSBnZW5lcmljLzY3MCBnZW5lcmljLzY3MSBnZW5lcmljLzY3
+MiBnZW5lcmljLzY3NiBnZW5lcmljLzY3OCBnZW5lcmljLzY4MCBnZW5lcmljLzY5NCBnZW5lcmlj
+LzcwMSBnZW5lcmljLzcwNSBnZW5lcmljLzcwNiBnZW5lcmljLzcwNyBnZW5lcmljLzcwOCBnZW5l
+cmljLzcyOCBnZW5lcmljLzcyOSBnZW5lcmljLzczMiBnZW5lcmljLzczNiBnZW5lcmljLzczNyBn
+ZW5lcmljLzczOCBnZW5lcmljLzc0MiBnZW5lcmljLzc0OCBnZW5lcmljLzc0OSBnZW5lcmljLzc1
+MCBnZW5lcmljLzc1MSBnZW5lcmljLzc1NCBnZW5lcmljLzc1NSBnZW5lcmljLzc1OCBnZW5lcmlj
+Lzc1OSBnZW5lcmljLzc2MCBnZW5lcmljLzc2MSBnZW5lcmljLzc2Mwo=
+--000000000000047bd7064c4c9357--
