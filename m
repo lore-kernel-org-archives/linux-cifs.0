@@ -1,137 +1,155 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11A3366804
-	for <linux-cifs@vger.kernel.org>; Fri,  6 Mar 2026 19:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772825601; cv=none; b=emLpZjCFjqpGuNoYSBWhQajPwm5OJhDGfqIHKjHjhPsq0pJn/3CSO65rQY1BffOGeXAESbPkZAdrBvqmllk1VANB/Lw9V6WklB9kpPueb/Rao8viBph1ooZm2qJIiQm7Qbr/XfQw/txpQiEI8Zfw5vl4YeJ5oDqQ4iNFFLbF5C4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772825601; c=relaxed/simple;
-	bh=IROdmGyEAzVr2yFiikSwntP9m21zsnQy/XxqTLusAzE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EU39cIstqSJ3bJuSRu7z0AtuD5XDbFVlS5gqbk5peBgadwJZbXNEw/eO1ohaamVSHvFocPcqt+ql++xe6lhWRU0MBL5lTB5dQFnVtsSE4Puq0UxusmaPf8Tstfkr73hy8S7ledbipBMlCgxriG6voqotRKEpeaHQrrGAXZpYG+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=KA7pV4SS; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3103ED5AC
+	for <linux-cifs@vger.kernel.org>; Fri,  6 Mar 2026 22:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772834642; cv=pass; b=dN6HHvaMd1pcF3Q5GWS5LYVdXH3G4ACJmokROttKgd0pS+joyuv6vHeB7s99CXPFpYbMZgQi7fED5vf+nY3wz5IgKWhhRiZ3q+RjgsbwCWRkKZxwlRyNMe7zudC5jIwQgdnFuTEvE1n65h6bUmwi/1Cd0DyWK4RmJhYsLfzEY4k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772834642; c=relaxed/simple;
+	bh=cWW4PJgSBkjl8c6eE9Jenhh9SBcDu9UEl7wyyUD3XGA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=sWp/8hkMNyUj24CuA5BRxMjy3tKuNqTc3RlzQgvJ2paGBehDsHQBgjMChuFQ14Vm1Rl5g1HQ1Iz3LtWLY/ej+ve/STH04WsKcx0BynGjo/nem3FOLnez78Zkx9dorlZlUnNRONKm+EtyerVFN9PPV+BnsH9I93im1lCNmxbN4vs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZHPYGvX2; arc=pass smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="KA7pV4SS"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4852b81c73aso2941625e9.3
-        for <linux-cifs@vger.kernel.org>; Fri, 06 Mar 2026 11:33:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZHPYGvX2"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-89a0d53f3d1so49506546d6.3
+        for <linux-cifs@vger.kernel.org>; Fri, 06 Mar 2026 14:03:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772834639; cv=none;
+        d=google.com; s=arc-20240605;
+        b=b8O1a2VkVFowLzzygklHJPq6CEKvXc4VcEiAid8FszI0iLhfYQAG3ljj8YzkgN82/U
+         1oSE76BHbyBkT7HwR51u9Y1xn9o089Pydj1s61zkgsA7T6PEqizSzAvDnkWhe/ve7/9R
+         SrSKUt718CZSrfIbHqI5d64Q5gG2RjbhRgewZUfzBw9cZ76R2+txgCSFDN7uHZoTZz+q
+         Z0I+R+BXxesNPYe5iOeuPfc94hMtCo5XdsXrGiiNBrW9bwgio5O1GSU4YXPx0I5d/za2
+         yfVKHb74b3+cOzF4LRyqA46VbpHt68urteigH3qYF268v/crPI6sJUEUEzTNTmDQcId3
+         R9lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=aTchkLR/7Ez16Ej3ZaRCH8w+uoCbJY/5YvCfKaykM+c=;
+        fh=uiyiW1y8cXN/IqbiZK/vfdhM/ZeLw1nspk1VrAT2X2I=;
+        b=QDRE8cPXyR56/7vjMdwAZmkap0UmojsyhaaQx8RvlDl0x3IgLuIkn+DGTiAK17HMez
+         WL+7Ru3f6mPt2wQKhW++Dkqg8JLTYeGLHBlFrqnoi095hU1+SfQ3O+vdvLdSZKrOfZP8
+         lRgBYbfEv4PJAIe3O7blOgGDkDRLlYGK5xL68kvUm3no1RMSSRFwtCvdcD84+oYk4xPk
+         qYo7eqZmEp0CqjmhQ55c0JRb8D3kniclMP9EjyA4hE+5t7eFY52sOAvhZeWcFTD/4SsO
+         0sWlWzcfYOjtr5eWKpO81ceHn72aBO1DbuoXPmN7CjWfpqCLdIUnsX27U1izkSiRGtv3
+         EfHQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1772825598; x=1773430398; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MAHLJKAJtyM24CDiIlJtLVqFqt8qV70IncQ0oyS87N0=;
-        b=KA7pV4SS9DcWAFvGE59qAW/QNxeXo2ulD+xocap5/0Rh7gqVgyeJ34Asloou9iJV2G
-         pw1UcWNiTSKdaNKnS5j4hhLuBnBgjVZ4u0ZFu98IhB5rsp8xb84V7MpjEVSfBtFtgqVh
-         wfYHwLsaKVwKpxIDFLO0B5nMURHK2Vi+cVFLH3TzqlCUf0HMiGtazwsyxp+N5sDVr9Qa
-         pitk+5MC+QWQXv4ADqSaSdT7/LWh5N06DkzvtQvdWOEZR1PaBnC77d97qSU9/tdTxNyl
-         nDp1/blIcenZpxH6MTJivoGeMm5hb9kcZzNF+fYNog4wvLuwFf+26+pURdQGIcIH2otC
-         qVtg==
+        d=gmail.com; s=20230601; t=1772834639; x=1773439439; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=aTchkLR/7Ez16Ej3ZaRCH8w+uoCbJY/5YvCfKaykM+c=;
+        b=ZHPYGvX2Dq2N9ocDRtzc07njEoz5LW/5FSWLqqXDzD9Qy0Do3/fOvD0k72MSIloakU
+         8egtw5KyCKDUgtg0cxUJ8UbxMfHGZEBLcqS9ec0NoV3yOQ8J1/lTSUr5CpLGWrVQqv4n
+         Ydc4D/WjNewGNOdaQLq0zzPoK+W1qIzQTq/uPJyf0dG6D9br2yezRpE88QbAJdVtF5/+
+         HXtvJp4YIpxNjCfvyZSFGYDSbzK3aqLQzFENXHCY7ghCD45jAb3IiIP7fFYV0qJ7L4Vn
+         kvfzwMo7jJzk6cfV3tQOnHcotR3gcaM9b7N7DWxVHYMHoTamLJFZ4J1Jl4hPKnyfD71Y
+         I6vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772825598; x=1773430398;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MAHLJKAJtyM24CDiIlJtLVqFqt8qV70IncQ0oyS87N0=;
-        b=GUi2V8xIIBLSELP9THixiRtUlr85jwyxYCzvTL7+e8WNhtT+E/yFkpGRHq9JJd9ndN
-         gMOyo8Rq2ueYnusFNbciVNoN5EtBbLDZa7VC/ZWByck2+KWLg5xGpMze29F3NWJqI7RJ
-         zBRWgeidXDVEk5wWp0wZQlznIKfgb0cX1CIqrDZv3PUZl4sipGJT4Ug4YMj9X0Njg1js
-         n/9v1JTjk3QJk/xo4h/EvUVAEwGuKVl+7mZXoo6EOhQyfKYxM0zW5Gr/8vSuHiqY+b1O
-         Wmnbj5pkgIq5LrFgP8u9I3w/rTLBeEbhZV3c/DahgURqt5l0ZFhQwJcrrrmCOQpq/Pob
-         rYQw==
-X-Forwarded-Encrypted: i=1; AJvYcCXnraMfwG+5Sl/Mfc9oIYFa8kQjJ6i3/VrWn9yWvMg3KPYbwk0q1QX/+vtcG50UOy5FWcyqjtZK9TTf@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPKEK8YKd5Ffbej7xPj80zRz19MZE9C3/UdDjfVGLuIClslfLN
-	6V37Lge/IGuRtWxQaAkAWPfW6iXAQHU16fyHeIhWsJdgXxezfENmisBgIR2iVq2AeEA=
-X-Gm-Gg: ATEYQzyyFkZ6yN7+JowKwd1MD0DjW0HjiFnz307mRvRpkPUeNiuw4wzD9iK8if3XcpE
-	kj+rReXTyZ3NGGNo6E52t40wgxBegp5CMqAJmTpICTgYaWpTQfhOOdkI8PMLjsrThky1Imz5S7d
-	CXUbMqsgAHgcCejXXOBWP290JzE+cPX3FNJOQ9eRcvRnH8v1+ppxabExbLJYwsDHJKR/AmrXkNn
-	JBrKrj+ZmRu6Qv/HnJQZ0OyNMlSE/u4QvMcjGH67CtvAfu0E0OQy1gbIlSZ+xCsK134GSyJVa7A
-	ZwcQ7llwxp3BqxsxaVCSHNUVeyKsvLijty1hNc/EeWdQyNnZcBxKuKuqtMevvg6z3gCY93kbyEZ
-	6rGmFRCXnW9gs0Zx30yIKa4ZONZ76icg7IuZlyAdb5bT40lIjEU48VKipVWvcStslJhlg0S053w
-	1SGIyEdi1PqjCjD4hnl54U8RdtmrHuIdr2QGHObVszgiIMP2op01qx1iv9uVoW90N/Lg==
-X-Received: by 2002:a05:600c:3d90:b0:480:4d38:7abc with SMTP id 5b1f17b1804b1-485269304aamr51419315e9.11.1772825598302;
-        Fri, 06 Mar 2026 11:33:18 -0800 (PST)
-Received: from precision.tail0b5424.ts.net ([2804:7f0:6401:b8d7:ea6d:8ea1:ec5a:953d])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94e7b5581e5sm2512719241.12.2026.03.06.11.33.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 11:33:17 -0800 (PST)
-Date: Fri, 6 Mar 2026 16:33:13 -0300
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: smfrench@gmail.com, Thiago Becker <tbecker@redhat.com>, 
-	David Howells <dhowells@redhat.com>, linux-cifs@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] smb: client: fix oops due to uninitialised var in
- smb2_unlink()
-Message-ID: <r7ojhnxu3jkr42oczp2o5w3hp5bs24ft5yav6nnlcohsybqeuv@zjvwndvvxayc>
-References: <20260306005706.830672-1-pc@manguebit.org>
+        d=1e100.net; s=20230601; t=1772834639; x=1773439439;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aTchkLR/7Ez16Ej3ZaRCH8w+uoCbJY/5YvCfKaykM+c=;
+        b=fz4EhcViCp/BnDLDm6R37eAU4X3pxporDUjoGPqoBCX/ni9Np2MSn5adJZM/JtGfht
+         du3GP46y6WqEU4rjGtZujBFplIake1OS0my7yIz0J3QKD2r+tRNGVOhiHdgR0k+wnL8y
+         ZBRU8DabnqRSGNIHAqPIKqTrp9137S45EKXmqlVXg/1Puw0qTt0+daj53bT2HWJWCEVg
+         WxqMNfqMjX3Kr76LU6CeblEN3ZQ8nB8s4MjaXNaR7gZQBUWl5dwZy78KNjx2IOZcPnbK
+         3lycmDwZCn/MbSYMaFXkmZQcXZyoEmhgs0y6HkdDFxW1kFw3osNb1mcMoJ0i3akSmP42
+         79/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWSJYInVmlN67P87IUkvj9JwEspFqgJQWcLUNL4SBoMHUMWyWpT0diWOypc3WsKx++OQx4KlDg1YI+W@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5i8KBhQPyRY9kkNAupk7IUrgkOaq0p2v/AAOlciIr5SpPwTDy
+	JziVwXGX1kkeFeY3CgcB6OKTGg+3QJtqJu8S2rUisfYwI8RioTqYJMN9glIbB25ddquEyYiuW2x
+	QQtnwjAT3REPfe5GwHIwOxY8fn5hy/g6tUQOb
+X-Gm-Gg: ATEYQzxsdqCe/MAF37fZmk2JQk/R2nwd0xP8xdvkMc83XtvQ6TnLagel2jzsrMaAjVL
+	r/X41nkcG3lEsJAG5/bwuJ9s8BtuF7QVbM+75QAwTxYemhQb5L0lhINU+l5CatV8Wagn7v3EwyP
+	r09XRpwdoaNX6+nswc3HzjPb9QfrxDLunXTrwAntx0aqlOgYWt+tbSHb+v0U0EATwY8CiGvIazp
+	kMh8Y3HVTUR02XLJqUD2c+tUvseG5sjwudl002GuhrNLdmw5vSjY/vH9+m/KgZqZiv7KakVjMdk
+	MGWZ2mfSC3JIYL8dGC2tx7NIKBn8dvNHNZAlp52/AhryMCwbyMWQoCODf+l9l0GuDjTUAUGMhug
+	aVwn6DldKXv2LQ57AZ6DuLsQF3jPuOH2Isv4o04tqKDsuzfIa1AwsEycn3XLdBoEpNG7gIHCd0A
+	B5nAR2zUonV4eXz8qlXKnWWA==
+X-Received: by 2002:a05:6214:528d:b0:899:fd7c:d46a with SMTP id
+ 6a1803df08f44-89a30a5e418mr53248336d6.18.1772834638748; Fri, 06 Mar 2026
+ 14:03:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260306005706.830672-1-pc@manguebit.org>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 6 Mar 2026 16:03:46 -0600
+X-Gm-Features: AaiRm505G9jwArrYfMVkoWicLiaj3mVuxCkm6aRS6kG5iFp8FoWBBuB2UgI6q3Y
+Message-ID: <CAH2r5mu0T+Gcea5YKaAA7L6FfM5OMjEKenih6Sgk2W4EXrSpWw@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Reviewed-by: Henrique Carvalho <henrique.carvalho@suse.com>
+Please pull the following changes since commit
+11439c4635edd669ae435eec308f4ab8a0804808:
 
-We got a lot of those replay uninitialised bugs. Maybe we should prevent
-them by having a replay(func, cond) so we can take advantage of a clean
-stack. Opinions?
+  Linux 7.0-rc2 (2026-03-01 15:39:31 -0800)
 
-On Thu, Mar 05, 2026 at 09:57:06PM -0300, Paulo Alcantara wrote:
-> If SMB2_open_init() or SMB2_close_init() fails (e.g. reconnect), the
-> iovs set @rqst will be left uninitialised, hence calling
-> SMB2_open_free(), SMB2_close_free() or smb2_set_related() on them will
-> oops.
-> 
-> Fix this by initialising @close_iov and @open_iov before setting them
-> in @rqst.
-> 
-> Reported-by: Thiago Becker <tbecker@redhat.com>
-> Fixes: 1cf9f2a6a544 ("smb: client: handle unlink(2) of files open by different clients")
-> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: stable@vger.kernel.org
-> ---
->  fs/smb/client/smb2inode.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-> index 1c4663ed7e69..5280c5c869ad 100644
-> --- a/fs/smb/client/smb2inode.c
-> +++ b/fs/smb/client/smb2inode.c
-> @@ -1216,6 +1216,7 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
->  	memset(resp_buftype, 0, sizeof(resp_buftype));
->  	memset(rsp_iov, 0, sizeof(rsp_iov));
->  
-> +	memset(open_iov, 0, sizeof(open_iov));
->  	rqst[0].rq_iov = open_iov;
->  	rqst[0].rq_nvec = ARRAY_SIZE(open_iov);
->  
-> @@ -1240,14 +1241,15 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
->  	creq = rqst[0].rq_iov[0].iov_base;
->  	creq->ShareAccess = FILE_SHARE_DELETE_LE;
->  
-> +	memset(&close_iov, 0, sizeof(close_iov));
->  	rqst[1].rq_iov = &close_iov;
->  	rqst[1].rq_nvec = 1;
->  
->  	rc = SMB2_close_init(tcon, server, &rqst[1],
->  			     COMPOUND_FID, COMPOUND_FID, false);
-> +	if (rc)
-> +		goto err_free;
->  	smb2_set_related(&rqst[1]);
-> -	if (rc)
-> -		goto err_free;
->  
->  	if (retries) {
->  		/* Back-off before retry */
-> -- 
-> 2.53.0
-> 
-> 
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git v7.0-rc2-smb3-client-fixes
+
+for you to fetch changes up to 048efe129a297256d3c2088cf8d79515ff5ec864:
+
+  smb: client: fix oops due to uninitialised var in smb2_unlink()
+(2026-03-05 20:41:16 -0600)
+
+----------------------------------------------------------------
+Eight client fixes:
+- Fix potential oops on open failure
+- Fix unmount to better free deferred closes
+- Security fix
+- Two buffer allocation size fixes
+- Two minor cleanups
+- make SMB2 kunit tests a distinct module
+
+----------------------------------------------------------------
+ChenXiaoSong (1):
+      smb/client: make SMB2 maperror KUnit tests a separate module
+
+Eric Biggers (1):
+      smb: client: Compare MACs in constant time
+
+Paulo Alcantara (1):
+      smb: client: fix oops due to uninitialised var in smb2_unlink()
+
+Shyam Prasad N (1):
+      cifs: open files should not hold ref on superblock
+
+ZhangGuoDong (4):
+      smb: update some doc references
+      smb/client: fix buffer size for smb311_posix_qinfo in smb2_compound_op()
+      smb/client: fix buffer size for smb311_posix_qinfo in
+SMB311_posix_query_info()
+      smb/client: remove unused SMB311_posix_query_info()
+
+ fs/smb/client/Makefile            |  2 ++
+ fs/smb/client/cifsfs.c            |  7 +++++--
+ fs/smb/client/cifsproto.h         |  1 +
+ fs/smb/client/file.c              | 11 ----------
+ fs/smb/client/misc.c              | 42 +++++++++++++++++++++++++++++++++++++
+ fs/smb/client/smb1encrypt.c       |  3 ++-
+ fs/smb/client/smb2glob.h          | 12 +++++++++++
+ fs/smb/client/smb2inode.c         |  8 ++++---
+ fs/smb/client/smb2maperror.c      | 28 +++++++++++++------------
+ fs/smb/client/smb2maperror_test.c | 12 ++++++++---
+ fs/smb/client/smb2pdu.c           | 18 ----------------
+ fs/smb/client/smb2pdu.h           |  7 +++++--
+ fs/smb/client/smb2proto.h         |  3 ---
+ fs/smb/client/smb2transport.c     |  4 +++-
+ fs/smb/client/trace.h             |  2 ++
+ fs/smb/server/smb2pdu.h           |  5 ++++-
+ 16 files changed, 107 insertions(+), 58 deletions(-)
+
+-- 
+Thanks,
+
+Steve
