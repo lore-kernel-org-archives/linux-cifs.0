@@ -1,68 +1,82 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87ECE262FC0
-	for <linux-cifs@vger.kernel.org>; Sat,  7 Mar 2026 00:22:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772842929; cv=none; b=PNMJXciuIeKLnT6z1/U0TLuGDh3yzJNPnc+EiQS8UYenKu7uRjJxRLg15u2qF8FL+Ecs3K6c/lWUZbZVrl1S8SaYv0+KYxHFGrfKzZaGGmzB2slHdMoPHpQ8qe2wJZtLc0o+TtXFN8KkZj02MhpJZVcbF+SNQ0N/XYl/Q4P0PBE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772842929; c=relaxed/simple;
-	bh=3mFM2AbWMEYHxPCxyFWA+kZtk417krsotatj0UtSI/Q=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29362DC772
+	for <linux-cifs@vger.kernel.org>; Sat,  7 Mar 2026 01:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772847782; cv=pass; b=GB5NPyVfo9ZPtDEh6MhcQWHuvPhxKubXOEozPcMVF8uhNbeOqhkFCkHG+e1y41sMuEsz9O1IH4wbID+MI1xjwLJxzv5L/3ZDizoapiM1YPnyKsiqsqcLs3/AzLmVFElbm+6kyGMv0HL/Y+Mpd1325cZ/H84Siituhi3bwp4ewzs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772847782; c=relaxed/simple;
+	bh=piI8XkLa5GmJkJ3IYr3f0gkWdbwYl9QZ1DCNAO/8Qqk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UszX2gQ/uWA1GroqOK2Z8tTKA2XKHGCB9k/eKbM5wazpXH2vmRz0VNf9qEvgf/OxKGvl0QQVNJapa4cwqAJv9EDXWuX6iMdqKaETkX+kbySkS/VKWEW8PGBCLBW5cVU61RfoBL4BdessYutqUQ7v8CYKK1uOd3YOIoFPMzNM8e0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=IoKJZWHE; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	 To:Cc:Content-Type; b=VE4io7llWbLH0mN1qQU/cZT/3VaWESyi9ecE7Vw5VHL5NussY3YdI4NBpR+8Ras29jWPBlVjwpQr+mAShavOuoK4EM0TFJLHrDNRuZPIZPxJ3gXKuhZGGgQsYJ+9Q8pOFhEvZQc1pcATslxVjmaXW1PCv+Ixjc0SphXtUEIgJSc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ox7HshOM; arc=pass smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="IoKJZWHE"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-660b497acd1so5688607a12.0
-        for <linux-cifs@vger.kernel.org>; Fri, 06 Mar 2026 16:22:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ox7HshOM"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-899d6b7b073so104996946d6.2
+        for <linux-cifs@vger.kernel.org>; Fri, 06 Mar 2026 17:43:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772847780; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Lve4OWV5Oy5ysUDm7db+C7rZ7lDNO1Dk4SxFB5gvXPeJU1g4JF3nOptZTSeU6x1DEt
+         G6NVQhPMTm0FmflI4gpEd4bl5oCxesmHBxq+GySCGRrw/x6MCSMcAFjg7hSB3yb3WoKh
+         DGKbNuwBB+Bfgw0qWTLtIqC1aB+KVx+YnCW00+JaR7SCiOZYonT60IRwN0FXnXVuWJgX
+         YOFDx2yk339BEpb+ceDa79G0JkvPeruglgMpOl9MWqs+3Df9qiU2cs8di/fQJrjIiAeg
+         lk6rMi0ro+DdEitvdfgbq7o+4oHigAdU9Zv8ehkG47YckTBNIV3hrs7NSNIRF11RTnb0
+         fOeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ifY6u6TYDN7Q0UiM7TPk/HVpGA5GkE1iXJ64TlqqWlU=;
+        fh=t0mkbo3TV1btoecb5gorGA+BnVGNktDxvaOt3Ahbw6E=;
+        b=aGPuitZ9C98NPBKOM6GqNGbAqhBHRnfcGGq2uQ/04Rkx6Ju30t0T5z9yZdO+KZ2lAR
+         j7m/6YscGMSQfKKqP3nmgwmG7DzTo2vl2iIU0uEDPws0pPoPjG5E22xPhD1Paw6tFNNL
+         jMfxsVdMgzjRC0fvfb5lGQcvMgOaT0ZwR5V1/wCoPIOQbKuUVeDx4dC1lNsJnYIj6nKy
+         e0+Ug1Lmks4GFlOuKAPKiUrxyWV3DM0VGM67vENnTinxmsaunjCzdYRFM7Hhw43ya0JV
+         3XJw/kRJy8aLGPVTScM4DqZJ8NUiXKqA3qi3L7AFhAKzjyNsl/bgz4rEXOIAnQuEjPxW
+         xIbg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1772842926; x=1773447726; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FgXnr2cmhS5BhkvQnnC9Tz341LcLJyI6amhClJjD3Ms=;
-        b=IoKJZWHEZ69dN4RflMsw4BxGu71MKmD9Z8cE8Gd6Od+C28gIEd+el1+4SowB/QD3WF
-         oETV6NiJHWPCuVxPfoyRvNW8CpYd0aDo0r2hrq46vX7dljmx5E2jNoq3WwKAT6YRFDqN
-         pgfsGXWvyx7/49y4Q20O6XvU3lHGzmkCTFYSg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772842926; x=1773447726;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1772847780; x=1773452580; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FgXnr2cmhS5BhkvQnnC9Tz341LcLJyI6amhClJjD3Ms=;
-        b=T96qOgHi+g73U8ko2E0Gf7hVhwjOwdjustPzrGIRcSDh8KLvjURugbRpQIG/TNqNDe
-         2H0oIKH18K4afB1z8BaJakdAnSZRwTkhG8Xu4Cbzd6rO7o7Tk4rOrYAS2KFUxj7zBXh9
-         1XGUR5rkC4D6plaq1SscH+EMUbFy3UD8dhEen9HsReIKFn78z5NgiXJNK306g2Bs3ksB
-         01CLjiaTRz+y/MM2x/MtrnsITi3d0dZSI2XSGczkB2K/gaIxosJp4YIH9f3Yy3HhgdrR
-         RuMEbfvP6IsQgeyNOL9O2+lLoJ16U2Is9PuFBH+p4qDXUvoa6lyJ9LhCUKE+N9+GfULS
-         iX1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXLcIwkJGRqkGHtSOu0pGxOPT76nPpDLy1DPaUOB/F/OlkEGRSjXBhbdABRXs9POc1b/5otmGeQH/n2@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCA+L5G6vT9b538w6agGsC/dfmokMje44y6aZZncq39oa1RwwZ
-	KjauqDocGYBiXCYAahtaurNqUir13U8KvyTCMMX6BgmWCKsTwnHKR6Qfau0W3ByUxxuqopMFoo/
-	tuJMIlHE=
-X-Gm-Gg: ATEYQzy4J7CgYNv8ojqJF4071v+8jdHjzRNkYeN8aq9o8QcWDac10WdlTpU9KlCM7ll
-	xH3i0hsgUi6vAeDyuJaQ4ecu+BgWCOwxpqdHRnzGlCsgVrLwn/G9feL3lbHzru772gg3NiMta71
-	TD2SKL0FagwBTDtYUuk7fmi66HZvb7V9+YcB+9qD1lIOqAuHk4flYvM7WmoKeFE5JGp9UyekocH
-	RtkHsCebYisEo/RYjoXaUl6e2U6dxIc4fKayTkCCopD1IoSFlOPzh5QiS+SKIaKJb0epBrRVUcJ
-	NSTk+i3DHnv2iX2dz1rFNF1mFfo8w4L/WzaBvLGqyD2eB2DplHEgoR8LnMeqBnDjFS7CiO8Vfv1
-	eQ0OXmp0uVciLb3hBuE+2MhPgbvRQ+3fLMSmDoOsZFdxvn/gdOmbaGoQ8bq1ia8wEu7IldVp8b6
-	C3PNAMKiITbbCbi3bEApC+S7SFFtx6rBrw3dacOCpmu7FD9M+h9tZoDAO7NqJFCP06aXuJv84TV
-	bWjW0Npcrg=
-X-Received: by 2002:a05:6402:440b:b0:65c:354e:94f0 with SMTP id 4fb4d7f45d1cf-6619d467bf2mr2291566a12.8.1772842925831;
-        Fri, 06 Mar 2026 16:22:05 -0800 (PST)
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com. [209.85.218.44])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-661a4fd5e87sm891460a12.18.2026.03.06.16.22.05
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Mar 2026 16:22:05 -0800 (PST)
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b941bb3e23cso328268966b.0
-        for <linux-cifs@vger.kernel.org>; Fri, 06 Mar 2026 16:22:05 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXMicLDeFt+FQDIEG3AWGw64doYaxyhn8R6KUV51lKYHRVWHx12Jc2ApQCznZapJaWw/XOdX5ugczee@vger.kernel.org
-X-Received: by 2002:a17:907:6ea6:b0:b8f:f08a:4b80 with SMTP id
- a640c23a62f3a-b942da495bdmr180549166b.3.1772842925193; Fri, 06 Mar 2026
- 16:22:05 -0800 (PST)
+        bh=ifY6u6TYDN7Q0UiM7TPk/HVpGA5GkE1iXJ64TlqqWlU=;
+        b=Ox7HshOMG+PQ4KvJ6lGxWBH+y78AACCFcOHQpdoujLD75FjfA0tK2UFVwlJQsAgbUr
+         R5ob6TpdNY+YpQ4l7dbFdpCE6RKh/SkXQIzlQDO1KZ5T7wCPIZ6XQV8trbORJukmdplQ
+         fdDhvtrSo8dsKTw9bRghvrOqjVxvioJ7SSKNNoX6RfyocZ5d9b8JWgF6YtmWtOo7cpFE
+         xHN3KSVcQUF1+z+eu8Qxz5sXu0Qc9ytWqPGTxB4fIgtxb8HNpcVUV5QYRc0QAWuAZEkW
+         0WU803At6AepjAx8ehqldoBIUmLGa3hdziypPVnIz9jFS8KqYPo8kM7y6VHjLHlIHkOw
+         o8Vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772847780; x=1773452580;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ifY6u6TYDN7Q0UiM7TPk/HVpGA5GkE1iXJ64TlqqWlU=;
+        b=kj6fDN1T4UMJDPnWz07Xy1RrwjVHQOlpcE60Xkh/9fUXO5D3aVy0DXJquqWPTFhHWQ
+         2WY6ju3q6ezd0NpZkvfx1n0oFAeru5fUux2/hxXM+hdWthkuybidCRdha2sKB0a6N42Z
+         DOgrMkDGYvitW2W1NSd341R+iWpTOJ3GR1LKhhORI+RDdYHCvZhZ1VsJTnhjMrosCJ6Z
+         16mn28XlD1g1yVpY5JfkYlQuQfgeRS3IDJ7UxMYCqGARsLwZPeQwl2oGiMjnIXS8OU9y
+         dT1MQNuq6l75kXHQHuSPoCB8NBKRwJAqF9Ltz4M11Leo0KNDL1yxYmlV6W0qnqKf5zL7
+         VpOg==
+X-Forwarded-Encrypted: i=1; AJvYcCVL1JnPC2zMSL9LdEBn1y2O1mRI+DNUMHAe2KJ+lOZwgDHjI6/SKlszG0vGtaqWceD7JSwHTLXix9bR@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWCJPRLa+vc3JmE4V1ZTIHd+SRjCODmus5k99nuhGI9XnOXMgF
+	yVqkaeALgB1bRw08Z2UUzeExyAc41ziE2vSYlL0kOEaw//GrTKF8t5U4iTaFAhLWCB9m3DkOEbY
+	KEvG62kIeThwWSdkiTwjfLxV/ORsYKDo=
+X-Gm-Gg: ATEYQzz4iwJ21rasikTzHQ+L1zXgQjD8mxK63qG1xf3DaVor8o6TrRcxXWVIzYEzRVT
+	S0d0bzwsXpBZ3s9O9bl0lIy+Q/UKz0idVfO74P3IHrc2xyD6EeCu9ZDwpXzbQ+7IpWBNRK3pT1P
+	y7g53MwzX5hgg2XNqxwdvcgGqfhFYIi+dmDlw5k1fn73nYO73h70RFP9Beu3/jPZuXn6VT/nj0u
+	GCozt3PBjTmF7QMr+LoLYR3wEvqXfqMtawRF2lfg4hX2IjRB2bN1iO71bB0AD5aXXAlx+SuFemd
+	/B03jW3Y5rd9k977sND0zVseDI1YL11qKfXNfqRwdRHDTdLTtT3PaQzV2uIvJ7u6AbqrUYvOxuY
+	4vm8uTcBQ6lFSu7rUAhDJtsUrBKFzQgZuMAtN8AFqKqMYhm64REdDoYayL9WQODC0uwz5VZIkjM
+	7kQSCM8d/UMr9qSsudmbP6llJpruk6OWbZ
+X-Received: by 2002:a05:6214:5288:b0:89a:3c4:5161 with SMTP id
+ 6a1803df08f44-89a30afa2bamr63756306d6.59.1772847779493; Fri, 06 Mar 2026
+ 17:42:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -70,52 +84,56 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <CAH2r5mu0T+Gcea5YKaAA7L6FfM5OMjEKenih6Sgk2W4EXrSpWw@mail.gmail.com>
-In-Reply-To: <CAH2r5mu0T+Gcea5YKaAA7L6FfM5OMjEKenih6Sgk2W4EXrSpWw@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 6 Mar 2026 16:21:48 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wjXKY7uS6OBPuNMc8xsiHwyVCfbaEgCZGffooxr=XzOaw@mail.gmail.com>
-X-Gm-Features: AaiRm50rfrQcL36UpaTvN8C9SHh0jnK-H4V6doiwfOPHkDn27SRvFRj1uQ6if68
-Message-ID: <CAHk-=wjXKY7uS6OBPuNMc8xsiHwyVCfbaEgCZGffooxr=XzOaw@mail.gmail.com>
+ <CAHk-=wjXKY7uS6OBPuNMc8xsiHwyVCfbaEgCZGffooxr=XzOaw@mail.gmail.com>
+In-Reply-To: <CAHk-=wjXKY7uS6OBPuNMc8xsiHwyVCfbaEgCZGffooxr=XzOaw@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 6 Mar 2026 19:42:48 -0600
+X-Gm-Features: AaiRm520bUWFjEuWRMrNL3I2bEV8cDRgJWo7TuJyHxthqVYwaYPzdhCYWyYvSSk
+Message-ID: <CAH2r5mtNug117PPEiYpron8kiwieU5g0FbTq9a1ABa1BQkF+TQ@mail.gmail.com>
 Subject: Re: [GIT PULL] smb3 client fixes
-To: Steve French <smfrench@gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 6 Mar 2026 at 14:04, Steve French <smfrench@gmail.com> wrote:
+On Fri, Mar 6, 2026 at 6:22=E2=80=AFPM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> - Security fix
+> On Fri, 6 Mar 2026 at 14:04, Steve French <smfrench@gmail.com> wrote:
+> >
+> > - Security fix
+>
+> Bah. I had to look this up - I don't think it's an actual security
+> issue, just a (good) cleanup.
+>
+> Yes, yes, the old code did "memcmp" instead of "crypto_memneq". And
+> yes, it's in theory timing-sensitive.
+>
+> But the two compares were of size 8 and 16, and at least clang
+> generates a constant-time comparison for that anyway (I bet gcc does
+> too):
+>
+> This is the 16-byte case:
+>
+>         movq    (%rdi), %rax
+>         movq    8(%rdi), %rcx
+>         xorq    (%rsi), %rax
+>         xorq    8(%rsi), %rcx
+>         orq     %rax, %rcx
+>         je      ...
+>
+> and the 8-byte case is even more trivially constant-time.
+>
+> And I'm sure that you can get the compiler to generate garbage that is
+> timing-sensitive by enabling some debug options that make code quality
+> much worse, but my point is that as an explanation for the pull
+> request, that "security fix" was just not a great explanation
+> regardless.
 
-Bah. I had to look this up - I don't think it's an actual security
-issue, just a (good) cleanup.
+Point taken.
 
-Yes, yes, the old code did "memcmp" instead of "crypto_memneq". And
-yes, it's in theory timing-sensitive.
 
-But the two compares were of size 8 and 16, and at least clang
-generates a constant-time comparison for that anyway (I bet gcc does
-too):
+--=20
+Thanks,
 
-This is the 16-byte case:
-
-        movq    (%rdi), %rax
-        movq    8(%rdi), %rcx
-        xorq    (%rsi), %rax
-        xorq    8(%rsi), %rcx
-        orq     %rax, %rcx
-        je      ...
-
-and the 8-byte case is even more trivially constant-time.
-
-And I'm sure that you can get the compiler to generate garbage that is
-timing-sensitive by enabling some debug options that make code quality
-much worse, but my point is that as an explanation for the pull
-request, that "security fix" was just not a great explanation
-regardless.
-
-I'd argue that half of the other fixes were *more* relevant for
-security than this one. An oops is a bigger security issue than some
-purely theoretical timing attack that is almost certainly not
-practical even *if* that code had done the mindless byte-at-a-time
-comparison.
-
-              Linus
+Steve
