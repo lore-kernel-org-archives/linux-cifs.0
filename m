@@ -1,132 +1,121 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CAB33C52A
-	for <linux-cifs@vger.kernel.org>; Fri,  6 Mar 2026 23:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87ECE262FC0
+	for <linux-cifs@vger.kernel.org>; Sat,  7 Mar 2026 00:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772839846; cv=none; b=sMO2COKO9zHHE6+zlRb6bQBZMmfE9/GG0/OuKEhnqtaA2wgXN7mgaBsmb+rab40VavS7tyqxeJL0ABRPoL9pmMXu7VqyrBKQr/xtrGhTp1o+HoAYnQm+25tFrKhmn44QvtORo0jGYy3L0tzDv/LFv4M/5XMaJU13OWQjD0LOBHM=
+	t=1772842929; cv=none; b=PNMJXciuIeKLnT6z1/U0TLuGDh3yzJNPnc+EiQS8UYenKu7uRjJxRLg15u2qF8FL+Ecs3K6c/lWUZbZVrl1S8SaYv0+KYxHFGrfKzZaGGmzB2slHdMoPHpQ8qe2wJZtLc0o+TtXFN8KkZj02MhpJZVcbF+SNQ0N/XYl/Q4P0PBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772839846; c=relaxed/simple;
-	bh=g2NXQyKcvTUzzxIWbefo4ZJkJb/E7ahwbbcyXA7Sqz4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JLswhELGwlarin03LnEgn0acHM94pARZZsjDfBWEeyyEQt1RyXKiqJyMwZnl/m2I5gvz/Msyyl2bY2mtwXnoRSoaxj5D/4ynEWKAAxYuumorYJAlymA884gcAOKAX+YweR7Yo4KNRdo0iR5mGuhCm/0GEYGzhZkcYaDbNuX4zJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Qd3RIue6; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1772842929; c=relaxed/simple;
+	bh=3mFM2AbWMEYHxPCxyFWA+kZtk417krsotatj0UtSI/Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UszX2gQ/uWA1GroqOK2Z8tTKA2XKHGCB9k/eKbM5wazpXH2vmRz0VNf9qEvgf/OxKGvl0QQVNJapa4cwqAJv9EDXWuX6iMdqKaETkX+kbySkS/VKWEW8PGBCLBW5cVU61RfoBL4BdessYutqUQ7v8CYKK1uOd3YOIoFPMzNM8e0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=IoKJZWHE; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Qd3RIue6"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4837634de51so42573665e9.1
-        for <linux-cifs@vger.kernel.org>; Fri, 06 Mar 2026 15:30:44 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="IoKJZWHE"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-660b497acd1so5688607a12.0
+        for <linux-cifs@vger.kernel.org>; Fri, 06 Mar 2026 16:22:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1772839843; x=1773444643; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BG2LwhYHa/E+CLmX8eJAihUFzcQRK/Dhhh2JZys60+A=;
-        b=Qd3RIue6ijADrTOVAD0amnJNw7O/AZHTygWw+XDNp3t6I1s4PgeMruHgEke+K/4gcm
-         yJ6akBfrJS7WopRbUclblPauv8CJcF2JeeHRIDdywb0L1bZJFJU+2/AJ1pg+7xKHICbO
-         iFYrZ+1dJ9ldkCvZyUtlVe9LGdMbaqberCW6ypY7qrqDWVrh2hAgbVZXAo3fkaq0wHRt
-         BFXRZ9w37faxNosd6q+hJijyPoJGIqOfc73GuzOp7W8EG/xMJqRWLRKDYjeFAQMzfuFk
-         AYl9pIM3BcVQnMC13m7jz9RFVippvKSpZ6MAvJlKXtST8DYzzUsJnI0w6W6SQSJDhfUJ
-         A2fw==
+        d=linux-foundation.org; s=google; t=1772842926; x=1773447726; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=FgXnr2cmhS5BhkvQnnC9Tz341LcLJyI6amhClJjD3Ms=;
+        b=IoKJZWHEZ69dN4RflMsw4BxGu71MKmD9Z8cE8Gd6Od+C28gIEd+el1+4SowB/QD3WF
+         oETV6NiJHWPCuVxPfoyRvNW8CpYd0aDo0r2hrq46vX7dljmx5E2jNoq3WwKAT6YRFDqN
+         pgfsGXWvyx7/49y4Q20O6XvU3lHGzmkCTFYSg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772839843; x=1773444643;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BG2LwhYHa/E+CLmX8eJAihUFzcQRK/Dhhh2JZys60+A=;
-        b=AZN/c4D+o2MRVmwj8uHlVanv581IWpewqn3iugP46mHD1D4Lowk41/u0Qj/ZaHtfi4
-         43RS6/J2R0cZNpBILHCw1gymdiy/SluLSxapIPgL4VmNK2g/KL7n6DnpyiOChOs1woSW
-         9PHMk24Qw+7WCTBaaeFtFHBEYG/CeMkEQL3ov2N9W6h0q6CiWU1fdlrP6F04tlSaSxLk
-         1Hd2lkr5jDYQdmDoobF67WDMh+bBDbRNjhMads9GJQDtdfAYRZKgMrPnuASSYXU8Bpe+
-         F6J1Ms6aQyrK9pMEWe+nDfonVq2XK1HgdsCkaqlYaIgbP6kPyVY2w1GKWAJryEkd+Eru
-         V2FA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjeJwD8BxG2tSzRLeilF1V0x3DfA1ocRSDdPrtavsA66VOWbe4eskwGs4KDjJpxHFfLjs1jwLlUJ6R@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFyu87frNXuDv8jYXd26Zw+WOPfIc/KA757F58dayOBjxxxbqm
-	WlVpkmwqnh6PZLkmA8Yc74NaaeprEa7KFGUo0reNLnLKBn6MuHOQ8yqKjmMfAEDaG8k=
-X-Gm-Gg: ATEYQzxTpNC+fxxkENTGMaUI4XlPsvEfKP9zhoXQ2H6zyBzD+pPFK3kyPKT5w4DPcXc
-	Xt9em349i5BIHN9RaE9j8LsNOy64NXL4dFi/TwZSJFRoDnJOPmyxRWAf+x0as5d1X+FW2AfpTf/
-	9TpY5QOrdh1rs6HVTUMTzf9cLMY4Xkx21nZ3Jt/4RB9W72+V+Aioa+jIjyI5VJ0sr52KYIa68Ri
-	nhSIlhn1jRmGcO4xNADt7Epw9hc4pWeb7sKJv/sR1tQci/z/EkBOh9dmeruSEDh+Vz/5h4+exIy
-	3P9HZcfD5USJ1LhFnkOwNVEepksHTcOA+cWdOZQbmmzYSt24hHSQDBGgOc6/Xcef1Ap0qRFqtiX
-	QKIh4gBok0oBrAsqZ+76sf089pPXWx8WdLRFTvY97xX0iHlY4iYPNWyIYTJI5XYficvsH1VtJYY
-	PS3w1puqUTFyg9Em3iKHnkV26OzwfOFaCKgGd2NluHWsBMOyFp8dSxHnI=
-X-Received: by 2002:a05:600c:3b02:b0:485:2f4a:6ae6 with SMTP id 5b1f17b1804b1-4852f4a6de6mr1251565e9.6.1772839843310;
-        Fri, 06 Mar 2026 15:30:43 -0800 (PST)
-Received: from precision.tail0b5424.ts.net ([2804:7f0:6401:b8d7:ea6d:8ea1:ec5a:953d])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56b09b4bdb8sm3526365e0c.17.2026.03.06.15.30.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 15:30:42 -0800 (PST)
-Date: Fri, 6 Mar 2026 20:30:38 -0300
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: Steve French <smfrench@gmail.com>
-Cc: Shyam Prasad N <nspmangalore@gmail.com>, linux-cifs@vger.kernel.org, 
-	pc@manguebit.com, bharathsm@microsoft.com, dhowells@redhat.com, 
-	Shyam Prasad N <sprasad@microsoft.com>
-Subject: Re: [PATCH] cifs: implementation id context as negotiate context
-Message-ID: <ym7qxt7f46gy4vq7isufgbz3svsvo3zp7irrjmekjebepg4u5z@ruu3s3h7tlkh>
-References: <20260304122910.1612435-1-sprasad@microsoft.com>
- <CANT5p=rk44fGgUL_Swp1pbVUeE80GJS4hxF00U0X4_xUbb-7hw@mail.gmail.com>
- <4rrxsl6mx3lbpt32l4ly6psg3ni5nsfzgfiufzt4xecsbjh22o@z272atyrzzvh>
- <CAH2r5mt4mDP+o4FWcJLhiXxcnjou7jxzPzUv1RqvmJxb=OSh6A@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1772842926; x=1773447726;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FgXnr2cmhS5BhkvQnnC9Tz341LcLJyI6amhClJjD3Ms=;
+        b=T96qOgHi+g73U8ko2E0Gf7hVhwjOwdjustPzrGIRcSDh8KLvjURugbRpQIG/TNqNDe
+         2H0oIKH18K4afB1z8BaJakdAnSZRwTkhG8Xu4Cbzd6rO7o7Tk4rOrYAS2KFUxj7zBXh9
+         1XGUR5rkC4D6plaq1SscH+EMUbFy3UD8dhEen9HsReIKFn78z5NgiXJNK306g2Bs3ksB
+         01CLjiaTRz+y/MM2x/MtrnsITi3d0dZSI2XSGczkB2K/gaIxosJp4YIH9f3Yy3HhgdrR
+         RuMEbfvP6IsQgeyNOL9O2+lLoJ16U2Is9PuFBH+p4qDXUvoa6lyJ9LhCUKE+N9+GfULS
+         iX1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXLcIwkJGRqkGHtSOu0pGxOPT76nPpDLy1DPaUOB/F/OlkEGRSjXBhbdABRXs9POc1b/5otmGeQH/n2@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCA+L5G6vT9b538w6agGsC/dfmokMje44y6aZZncq39oa1RwwZ
+	KjauqDocGYBiXCYAahtaurNqUir13U8KvyTCMMX6BgmWCKsTwnHKR6Qfau0W3ByUxxuqopMFoo/
+	tuJMIlHE=
+X-Gm-Gg: ATEYQzy4J7CgYNv8ojqJF4071v+8jdHjzRNkYeN8aq9o8QcWDac10WdlTpU9KlCM7ll
+	xH3i0hsgUi6vAeDyuJaQ4ecu+BgWCOwxpqdHRnzGlCsgVrLwn/G9feL3lbHzru772gg3NiMta71
+	TD2SKL0FagwBTDtYUuk7fmi66HZvb7V9+YcB+9qD1lIOqAuHk4flYvM7WmoKeFE5JGp9UyekocH
+	RtkHsCebYisEo/RYjoXaUl6e2U6dxIc4fKayTkCCopD1IoSFlOPzh5QiS+SKIaKJb0epBrRVUcJ
+	NSTk+i3DHnv2iX2dz1rFNF1mFfo8w4L/WzaBvLGqyD2eB2DplHEgoR8LnMeqBnDjFS7CiO8Vfv1
+	eQ0OXmp0uVciLb3hBuE+2MhPgbvRQ+3fLMSmDoOsZFdxvn/gdOmbaGoQ8bq1ia8wEu7IldVp8b6
+	C3PNAMKiITbbCbi3bEApC+S7SFFtx6rBrw3dacOCpmu7FD9M+h9tZoDAO7NqJFCP06aXuJv84TV
+	bWjW0Npcrg=
+X-Received: by 2002:a05:6402:440b:b0:65c:354e:94f0 with SMTP id 4fb4d7f45d1cf-6619d467bf2mr2291566a12.8.1772842925831;
+        Fri, 06 Mar 2026 16:22:05 -0800 (PST)
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com. [209.85.218.44])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-661a4fd5e87sm891460a12.18.2026.03.06.16.22.05
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Mar 2026 16:22:05 -0800 (PST)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b941bb3e23cso328268966b.0
+        for <linux-cifs@vger.kernel.org>; Fri, 06 Mar 2026 16:22:05 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXMicLDeFt+FQDIEG3AWGw64doYaxyhn8R6KUV51lKYHRVWHx12Jc2ApQCznZapJaWw/XOdX5ugczee@vger.kernel.org
+X-Received: by 2002:a17:907:6ea6:b0:b8f:f08a:4b80 with SMTP id
+ a640c23a62f3a-b942da495bdmr180549166b.3.1772842925193; Fri, 06 Mar 2026
+ 16:22:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5mt4mDP+o4FWcJLhiXxcnjou7jxzPzUv1RqvmJxb=OSh6A@mail.gmail.com>
+References: <CAH2r5mu0T+Gcea5YKaAA7L6FfM5OMjEKenih6Sgk2W4EXrSpWw@mail.gmail.com>
+In-Reply-To: <CAH2r5mu0T+Gcea5YKaAA7L6FfM5OMjEKenih6Sgk2W4EXrSpWw@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 6 Mar 2026 16:21:48 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wjXKY7uS6OBPuNMc8xsiHwyVCfbaEgCZGffooxr=XzOaw@mail.gmail.com>
+X-Gm-Features: AaiRm50rfrQcL36UpaTvN8C9SHh0jnK-H4V6doiwfOPHkDn27SRvFRj1uQ6if68
+Message-ID: <CAHk-=wjXKY7uS6OBPuNMc8xsiHwyVCfbaEgCZGffooxr=XzOaw@mail.gmail.com>
+Subject: Re: [GIT PULL] smb3 client fixes
+To: Steve French <smfrench@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Mar 06, 2026 at 05:04:20PM -0600, Steve French wrote:
-> On Fri, Mar 6, 2026 at 4:45 PM Henrique Carvalho
-> <henrique.carvalho@suse.com> wrote:
-> >
-> > On Wed, Mar 04, 2026 at 06:04:05PM +0530, Shyam Prasad N wrote: > On Wed, Mar 4, 2026 at 5:59 PM <nspmangalore@gmail.com> wrote: From: Shyam Prasad N <sprasad@microsoft.com>
-> > >
-> > > A proof-of-concept based on this draft from Bharath.
-> > > Looking for comments on how to improve.
-> >
-> > Looks good.
-> >
-> > Just one minor thing for now. To me the cifs.ko module version doesn't
-> > say much as it seems to be not reliable (apologies if I'm mistaken).
-> 
-> It does get incremented every 10 weeks.
-> 
+On Fri, 6 Mar 2026 at 14:04, Steve French <smfrench@gmail.com> wrote:
+>
+> - Security fix
 
-Okay. I guess we've skipped sometimes.
+Bah. I had to look this up - I don't think it's an actual security
+issue, just a (good) cleanup.
 
-> > Also, the same version could have different implementations in different
-> > distributions. modinfo -F srcversion cifs is a better way to
-> > differentiate cifs versions but not to compare versions. So the solution
-> > is either remove this or bump it in every change using X.Y.Z.
-> 
-> We do bump the module version every kernel release, e.g. we are at
-> 2.59 in Linux 7.0 (7.0-rc2)
-> Would bump it when someone does a 'full backport' of most cifs fixes
-> to an earlier kernel.
-> 
-> > Further, have you thought about how the client can use this in its favor
-> > other than diagnosing/debugging a faulty server?
-> 
-> I thought this was for the reverse - so the server support team can
-> get metrics on whether the client is an old client with known bugs
-> 
-> > I think we need to be clear on what is allowed here, to me it seems
-> > quirks, workarounds and perf tuning? Maybe this can be used to improve
-> > interaction between linux client and linux server?
-> 
-> presumably primarily for customer support to be able to recognise
-> known client problems on clients accessing a server
-> 
+Yes, yes, the old code did "memcmp" instead of "crypto_memneq". And
+yes, it's in theory timing-sensitive.
 
-Yes, but also the server will be able to send back context as well,
-correct? This may allow more than bug triaging.
+But the two compares were of size 8 and 16, and at least clang
+generates a constant-time comparison for that anyway (I bet gcc does
+too):
 
--- 
-Henrique
-SUSE Labs
+This is the 16-byte case:
+
+        movq    (%rdi), %rax
+        movq    8(%rdi), %rcx
+        xorq    (%rsi), %rax
+        xorq    8(%rsi), %rcx
+        orq     %rax, %rcx
+        je      ...
+
+and the 8-byte case is even more trivially constant-time.
+
+And I'm sure that you can get the compiler to generate garbage that is
+timing-sensitive by enabling some debug options that make code quality
+much worse, but my point is that as an explanation for the pull
+request, that "security fix" was just not a great explanation
+regardless.
+
+I'd argue that half of the other fixes were *more* relevant for
+security than this one. An oops is a bigger security issue than some
+purely theoretical timing attack that is almost certainly not
+practical even *if* that code had done the mindless byte-at-a-time
+comparison.
+
+              Linus
