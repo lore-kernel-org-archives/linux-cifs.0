@@ -1,139 +1,91 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29362DC772
-	for <linux-cifs@vger.kernel.org>; Sat,  7 Mar 2026 01:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772847782; cv=pass; b=GB5NPyVfo9ZPtDEh6MhcQWHuvPhxKubXOEozPcMVF8uhNbeOqhkFCkHG+e1y41sMuEsz9O1IH4wbID+MI1xjwLJxzv5L/3ZDizoapiM1YPnyKsiqsqcLs3/AzLmVFElbm+6kyGMv0HL/Y+Mpd1325cZ/H84Siituhi3bwp4ewzs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772847782; c=relaxed/simple;
-	bh=piI8XkLa5GmJkJ3IYr3f0gkWdbwYl9QZ1DCNAO/8Qqk=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6ED1EA7F4
+	for <linux-cifs@vger.kernel.org>; Sat,  7 Mar 2026 02:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772852177; cv=none; b=dUEZKby+ssbrN0Gf55a+IHwYvONNMBqPwcuZAJqmzg0BTgCM6lEPDG5wGypsSYXa22mXO59k+d4HH+6kc1I0KlJKRH0oEn4YlHMwvn2w0ycwP5t6+dV4ENVVrXKtMm4NhJKfxIUGfwWN7jUjYHVxSY6F10023RoTXBooTHOi6Yk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772852177; c=relaxed/simple;
+	bh=uMoy5cv4M97zjZqTbC+Vg10/te9R4xuxVgJKyODEUSg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VE4io7llWbLH0mN1qQU/cZT/3VaWESyi9ecE7Vw5VHL5NussY3YdI4NBpR+8Ras29jWPBlVjwpQr+mAShavOuoK4EM0TFJLHrDNRuZPIZPxJ3gXKuhZGGgQsYJ+9Q8pOFhEvZQc1pcATslxVjmaXW1PCv+Ixjc0SphXtUEIgJSc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ox7HshOM; arc=pass smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=AVQbhdLPPvyE/0FnP/U62VdH+NMEKep8gBtfjWjBecS1zaPtQ/wuXDeJrpV6x0TZK+I7oW7AL13lIak+Rs5yofqNFz+bVF9sSIfTvtVI2uyaCO+5E/0tzSac1Atp0dJ+nubTudFBmhQmUg9M5ZUXfqs8uBVYMU7mP+j78HlmhBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WzkFx6Zm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ox7HshOM"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-899d6b7b073so104996946d6.2
-        for <linux-cifs@vger.kernel.org>; Fri, 06 Mar 2026 17:43:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772847780; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Lve4OWV5Oy5ysUDm7db+C7rZ7lDNO1Dk4SxFB5gvXPeJU1g4JF3nOptZTSeU6x1DEt
-         G6NVQhPMTm0FmflI4gpEd4bl5oCxesmHBxq+GySCGRrw/x6MCSMcAFjg7hSB3yb3WoKh
-         DGKbNuwBB+Bfgw0qWTLtIqC1aB+KVx+YnCW00+JaR7SCiOZYonT60IRwN0FXnXVuWJgX
-         YOFDx2yk339BEpb+ceDa79G0JkvPeruglgMpOl9MWqs+3Df9qiU2cs8di/fQJrjIiAeg
-         lk6rMi0ro+DdEitvdfgbq7o+4oHigAdU9Zv8ehkG47YckTBNIV3hrs7NSNIRF11RTnb0
-         fOeQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ifY6u6TYDN7Q0UiM7TPk/HVpGA5GkE1iXJ64TlqqWlU=;
-        fh=t0mkbo3TV1btoecb5gorGA+BnVGNktDxvaOt3Ahbw6E=;
-        b=aGPuitZ9C98NPBKOM6GqNGbAqhBHRnfcGGq2uQ/04Rkx6Ju30t0T5z9yZdO+KZ2lAR
-         j7m/6YscGMSQfKKqP3nmgwmG7DzTo2vl2iIU0uEDPws0pPoPjG5E22xPhD1Paw6tFNNL
-         jMfxsVdMgzjRC0fvfb5lGQcvMgOaT0ZwR5V1/wCoPIOQbKuUVeDx4dC1lNsJnYIj6nKy
-         e0+Ug1Lmks4GFlOuKAPKiUrxyWV3DM0VGM67vENnTinxmsaunjCzdYRFM7Hhw43ya0JV
-         3XJw/kRJy8aLGPVTScM4DqZJ8NUiXKqA3qi3L7AFhAKzjyNsl/bgz4rEXOIAnQuEjPxW
-         xIbg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772847780; x=1773452580; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ifY6u6TYDN7Q0UiM7TPk/HVpGA5GkE1iXJ64TlqqWlU=;
-        b=Ox7HshOMG+PQ4KvJ6lGxWBH+y78AACCFcOHQpdoujLD75FjfA0tK2UFVwlJQsAgbUr
-         R5ob6TpdNY+YpQ4l7dbFdpCE6RKh/SkXQIzlQDO1KZ5T7wCPIZ6XQV8trbORJukmdplQ
-         fdDhvtrSo8dsKTw9bRghvrOqjVxvioJ7SSKNNoX6RfyocZ5d9b8JWgF6YtmWtOo7cpFE
-         xHN3KSVcQUF1+z+eu8Qxz5sXu0Qc9ytWqPGTxB4fIgtxb8HNpcVUV5QYRc0QAWuAZEkW
-         0WU803At6AepjAx8ehqldoBIUmLGa3hdziypPVnIz9jFS8KqYPo8kM7y6VHjLHlIHkOw
-         o8Vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772847780; x=1773452580;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ifY6u6TYDN7Q0UiM7TPk/HVpGA5GkE1iXJ64TlqqWlU=;
-        b=kj6fDN1T4UMJDPnWz07Xy1RrwjVHQOlpcE60Xkh/9fUXO5D3aVy0DXJquqWPTFhHWQ
-         2WY6ju3q6ezd0NpZkvfx1n0oFAeru5fUux2/hxXM+hdWthkuybidCRdha2sKB0a6N42Z
-         DOgrMkDGYvitW2W1NSd341R+iWpTOJ3GR1LKhhORI+RDdYHCvZhZ1VsJTnhjMrosCJ6Z
-         16mn28XlD1g1yVpY5JfkYlQuQfgeRS3IDJ7UxMYCqGARsLwZPeQwl2oGiMjnIXS8OU9y
-         dT1MQNuq6l75kXHQHuSPoCB8NBKRwJAqF9Ltz4M11Leo0KNDL1yxYmlV6W0qnqKf5zL7
-         VpOg==
-X-Forwarded-Encrypted: i=1; AJvYcCVL1JnPC2zMSL9LdEBn1y2O1mRI+DNUMHAe2KJ+lOZwgDHjI6/SKlszG0vGtaqWceD7JSwHTLXix9bR@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWCJPRLa+vc3JmE4V1ZTIHd+SRjCODmus5k99nuhGI9XnOXMgF
-	yVqkaeALgB1bRw08Z2UUzeExyAc41ziE2vSYlL0kOEaw//GrTKF8t5U4iTaFAhLWCB9m3DkOEbY
-	KEvG62kIeThwWSdkiTwjfLxV/ORsYKDo=
-X-Gm-Gg: ATEYQzz4iwJ21rasikTzHQ+L1zXgQjD8mxK63qG1xf3DaVor8o6TrRcxXWVIzYEzRVT
-	S0d0bzwsXpBZ3s9O9bl0lIy+Q/UKz0idVfO74P3IHrc2xyD6EeCu9ZDwpXzbQ+7IpWBNRK3pT1P
-	y7g53MwzX5hgg2XNqxwdvcgGqfhFYIi+dmDlw5k1fn73nYO73h70RFP9Beu3/jPZuXn6VT/nj0u
-	GCozt3PBjTmF7QMr+LoLYR3wEvqXfqMtawRF2lfg4hX2IjRB2bN1iO71bB0AD5aXXAlx+SuFemd
-	/B03jW3Y5rd9k977sND0zVseDI1YL11qKfXNfqRwdRHDTdLTtT3PaQzV2uIvJ7u6AbqrUYvOxuY
-	4vm8uTcBQ6lFSu7rUAhDJtsUrBKFzQgZuMAtN8AFqKqMYhm64REdDoYayL9WQODC0uwz5VZIkjM
-	7kQSCM8d/UMr9qSsudmbP6llJpruk6OWbZ
-X-Received: by 2002:a05:6214:5288:b0:89a:3c4:5161 with SMTP id
- 6a1803df08f44-89a30afa2bamr63756306d6.59.1772847779493; Fri, 06 Mar 2026
- 17:42:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WzkFx6Zm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5D67C2BC9E
+	for <linux-cifs@vger.kernel.org>; Sat,  7 Mar 2026 02:56:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772852176;
+	bh=uMoy5cv4M97zjZqTbC+Vg10/te9R4xuxVgJKyODEUSg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=WzkFx6Zmj+v8Zq6bZXPrKSXM4wbEfqQYbFf+4WT6Kv5ENjhBjIwGnoBy9vhp9qCR8
+	 TOTJCzQ5ZKIA3s5eVILgIZg7hyF4tgOmj6FPO/b/u7O1qG6mIXGsV8vRuuKD/wr1Va
+	 8b718F2tqhf98KBExuTDZdS+k7RGpO//NvRYYCF5QTbINWEEhbHVPN/bXstqcDdkC0
+	 2fiunYaXm3fFV7eLVnIlncvz6OUWrIi3nFH81JMoe2drLthADVOAXSRtW5365AoHd1
+	 a5LwpCsLKYFmI9eldygYSfyOtzjXuGDUkIhOQV0qToFlw2KgClWafXlsTeQhh6+o9J
+	 svHx1kzIG7Yjg==
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-661cfb9f3aaso1156124a12.2
+        for <linux-cifs@vger.kernel.org>; Fri, 06 Mar 2026 18:56:16 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWCc3xeAudSX3vfHR/gSV4e7e4c7MjkJp16tsILK/+2c1b5k3/QwRqw+LCOMwJ+bfnw4J4Hks21c0O0@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdIkfgmCISIcvQFP3eb4gR0sbHuoGjoI/ilOCcIKIgCTyzOctA
+	/50V+D1jPGsLRoYA8QERPeMbB2kddRtOz6sGaKvKVoZ9PNcbi7oGw78X/jlTrwQXkoq/FHn10cY
+	04LYcKbUSgLE5MF7YQggrCnQzgJGkRpg=
+X-Received: by 2002:a17:907:7f87:b0:b8e:9d66:f5fb with SMTP id
+ a640c23a62f3a-b942d5dd2e7mr232731466b.0.1772852175267; Fri, 06 Mar 2026
+ 18:56:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5mu0T+Gcea5YKaAA7L6FfM5OMjEKenih6Sgk2W4EXrSpWw@mail.gmail.com>
- <CAHk-=wjXKY7uS6OBPuNMc8xsiHwyVCfbaEgCZGffooxr=XzOaw@mail.gmail.com>
-In-Reply-To: <CAHk-=wjXKY7uS6OBPuNMc8xsiHwyVCfbaEgCZGffooxr=XzOaw@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 6 Mar 2026 19:42:48 -0600
-X-Gm-Features: AaiRm520bUWFjEuWRMrNL3I2bEV8cDRgJWo7TuJyHxthqVYwaYPzdhCYWyYvSSk
-Message-ID: <CAH2r5mtNug117PPEiYpron8kiwieU5g0FbTq9a1ABa1BQkF+TQ@mail.gmail.com>
-Subject: Re: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+References: <20260306144415.3402532-1-arnd@kernel.org>
+In-Reply-To: <20260306144415.3402532-1-arnd@kernel.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 7 Mar 2026 11:56:02 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9qOhxSU9cWh007k0FFO10Z1QknqBw+s+4KWWkUqpJM1w@mail.gmail.com>
+X-Gm-Features: AaiRm50dj7Fc6fXjLGMHhU_B79lJGb4-mGjkBxtu87rjldnkHeZZ13JcB8Y_gzE
+Message-ID: <CAKYAXd9qOhxSU9cWh007k0FFO10Z1QknqBw+s+4KWWkUqpJM1w@mail.gmail.com>
+Subject: Re: [PATCH] smb: fix smbdirect link failure
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Steve French <sfrench@samba.org>, Stefan Metzmacher <metze@samba.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 6, 2026 at 6:22=E2=80=AFPM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
+On Fri, Mar 6, 2026 at 11:44=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wro=
+te:
 >
-> On Fri, 6 Mar 2026 at 14:04, Steve French <smfrench@gmail.com> wrote:
-> >
-> > - Security fix
+> From: Arnd Bergmann <arnd@arndb.de>
 >
-> Bah. I had to look this up - I don't think it's an actual security
-> issue, just a (good) cleanup.
+> When CONFIG_INFINIBAND is set to =3Dm, it is not possible to have SMBDIRE=
+CT
+> built-in, and it turns into a loadable module, but this does not prevent
+> CIFS and SMB_SERVER from being built-in, which in turn causes this
+> link error:
 >
-> Yes, yes, the old code did "memcmp" instead of "crypto_memneq". And
-> yes, it's in theory timing-sensitive.
+> ld.lld-22: error: undefined symbol: smbdirect_socket_release
+> >>> referenced by smbdirect.c:212 (fs/smb/client/smbdirect.c:212)
+> >>>               fs/smb/client/smbdirect.o:(smbd_destroy) in archive vml=
+inux.a
+> >>> referenced by smbdirect.c:212 (fs/smb/client/smbdirect.c:212)
+> >>>               fs/smb/client/smbdirect.o:(smbd_reconnect) in archive v=
+mlinux.a
+> >>> referenced by smbdirect.c:338 (fs/smb/client/smbdirect.c:338)
+> >>>               fs/smb/client/smbdirect.o:(smbd_get_connection) in arch=
+ive vmlinux.a
 >
-> But the two compares were of size 8 and 16, and at least clang
-> generates a constant-time comparison for that anyway (I bet gcc does
-> too):
+> Enforce the dependency at Kconfig level, so that the respective smpdirect
+> options are only offered if it's possible to link against the common
+> module and infiniband.
 >
-> This is the 16-byte case:
->
->         movq    (%rdi), %rax
->         movq    8(%rdi), %rcx
->         xorq    (%rsi), %rax
->         xorq    8(%rsi), %rcx
->         orq     %rax, %rcx
->         je      ...
->
-> and the 8-byte case is even more trivially constant-time.
->
-> And I'm sure that you can get the compiler to generate garbage that is
-> timing-sensitive by enabling some debug options that make code quality
-> much worse, but my point is that as an explanation for the pull
-> request, that "security fix" was just not a great explanation
-> regardless.
-
-Point taken.
-
-
---=20
-Thanks,
-
-Steve
+> Fixes: 28504d6ee127 ("smb: client: make use of smbdirect.ko")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks!
