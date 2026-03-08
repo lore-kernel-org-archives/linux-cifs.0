@@ -1,207 +1,156 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2FF1AA7A6
-	for <linux-cifs@vger.kernel.org>; Sun,  8 Mar 2026 03:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D27223DC9
+	for <linux-cifs@vger.kernel.org>; Sun,  8 Mar 2026 03:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772938928; cv=pass; b=ZYls+v747gOjOhfuUU8xjtu4pJ8B7pqLGBJb7OOsGMfepLSczKoDPuYoyhSiimqL6j62OGodgCj4yMPTGFrJJw5ivtUBxtKDSZsz0DT3bf8dNNiB/LhU8eRC1o0cLiHCnAtjJjsm+vRxJTc3ioyS08E76s+HhA7J8g+8y+Hpbgs=
+	t=1772939422; cv=pass; b=kwhUeEqPSycGVCeuhw6MwFrbGa/g88OdDEkz2NYRFD/urbb15s79omqiyg9Z/tHiNbejoZrflPHwNfnTQeXRZtW2Zd8s22uEqkLVuVgMrq/CkZoV78g5LTnY2Ui3QjXqvl2mi/XS5Z346o+Ml8Jsz2jJUZM/lr6SHnIn4Ui8+v4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772938928; c=relaxed/simple;
-	bh=na3CEXYe5VYNa04bxP+z3EvvHcJbLcb5PIkCbRIr368=;
+	s=arc-20240116; t=1772939422; c=relaxed/simple;
+	bh=FT554hZqAEX8a1kNiFaeC/MQYEtI4TCuMgiCj3Sg9JA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o7nKuldePkC3x5hvaiIIpwS/S2ZwmW37FxPaoORmmcNekn/4kDio0wh1tHDQQCiRmHNBEZWGP6RaFAyXH7zKpz7rK4QE4lzovJc4cCdkVRopgJrkGL4WstNstdJNabhTZ5dBIP/2KyUORvvGFUmlP5nKWGv06+Eumz3RHvboGmo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tn6/9Zo9; arc=pass smtp.client-ip=209.85.222.169
+	 To:Cc:Content-Type; b=Y7V0o3Da9cWropNfoALtdqW+VPv0oILJW35q1eU3XyVe4iKBnxYoGQNnUXxa4raaR78K4EuuW6qaY/uZPvDJSLo9Orbfa5+EQprUI8r0kggfZBC+53PZppp57WznINKR1QwVfH9KIKnM+0zptIoHhsRXqVv+92pz29pKl+XEQb4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GKZhgPMb; arc=pass smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tn6/9Zo9"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-8cd73c4a827so158615785a.3
-        for <linux-cifs@vger.kernel.org>; Sat, 07 Mar 2026 19:02:05 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772938925; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GKZhgPMb"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-899fc9853b7so95593316d6.2
+        for <linux-cifs@vger.kernel.org>; Sat, 07 Mar 2026 19:10:21 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772939420; cv=none;
         d=google.com; s=arc-20240605;
-        b=iXjfoTqa0aA/2FjJ6cBwZAiYshbwLm1yUGcCVap4bnaAvFPDByHqCjor0AwyUJBTDj
-         r3bMDP+AtYzGWtSLI3LRjijzy1nlH2xNInHiv/U8t/TApNbIDsHwmkrw4E6LFpEYl6wN
-         SnLck22AEi2bkGgm8yFl/kktMdplnJ3IJp7DFevdRTLpS1NyHT16MOGI+1/Tjbr/kgGc
-         nI010UCg8E7G9CpDJhdkTmdV3xOnRqisD/AvJ+r7ZlbBl6ilaHde/vOlQS4FHQjezltU
-         J8dYvIFWgaYUgZ4KRh2alqL4VpWSmDBZgwRBqDGvnEWqJm82TfY9+o27SaOBSEHYIxV1
-         0U2w==
+        b=AocCprJBZpFCyDrFzotwAxevkAqt2Eg7cskGaFW6jhhGbp/GofhEhK7wwpHUA2JOoT
+         yyDJwSb7+ZOog4AQwhkH+ZTOQxaLi8cOL2Fg4UJCeX4LrauMJ7LbdT18Og+6lQtpi61M
+         5V/2tnTwEd5HCtMNuf7Re53EFXLaxDrVWtE8lK+U/h1Agg3dMOQ6WRlGqNAYz+a5W3Uc
+         YwHE+HVbiuEovx5A0UFM15iVhnM9aOJc4/YFKnkcNfGH1ooM6IjBozJB7zswkaxhSxBt
+         5x7VjwbAOaOHL7aM5UbSvSOmKUBJ9lxZRTBSCI/NeWFW72em/Lq5TWi9jgqHIGEiRH0B
+         +xsg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=0b9UiayA3it40t9bJgAqpEj1p345wqtLgZz4wISOPp0=;
-        fh=6DHGntIA/OeC7xgEIYYPZ+0EoWsROSj7h6+Drt1ufXg=;
-        b=KCcVOAes3dX95h5PqVKqyDOQNAnAyVhKEEW2JE72iGn3j6wwQcCyuYo8d1Tduira5j
-         RPe8Oy+4VZDOENKYeytxMJdcaIdlWGlmTK+0aKw3FeERnbvXEr/LJcN1Dnw79YShMxSO
-         bGdyvfFwd43ZFWwCJ/RVuRL+GyKxDR6ViETF1nuc6kzNfftgvHYSbHUDOZ085BCGfbRP
-         DNBXMGv8q7aLI5BOuB4uackxBI1PJPX438lFhAj1V1t4uCzzU1EhwBKeqc7wWODKmFD/
-         7g40GAVKZsuPGcKPSWyxIugVym9HZXAzCiZKZXeX9TsCZM3d/IW5DsTg5i7Q10YaOUFd
-         Nx4w==;
+        bh=OgjnyeIHMSpKxPO9WM9wRfsRfZIs2A0n5sMLnaHjVxc=;
+        fh=zD4B4Pp6pMvoYa+KY7B7OBCQ3aY6+GjZ5ovJiSH2weQ=;
+        b=L4fqegKxgjJFvtNgHae1VH8zLeVj+1om+H4DV5wpHO8p+Q1rObjAbPX/P8EiRzN+3Y
+         VeMMGdXvZEGIbvafJcRCRN9ri8lGGN+8ZxgyoCwmp0Iwbe0TLVK8wHXSH3HMo10442+f
+         HfqkBlcyKrc0wocjlPJvX9OCA+8HLORyA4Ln0qf1l9p/D4w4ZMYXaxOXfeB9O6cpNyGq
+         SJ12ZD+KoN3NLhYhKbEoZ/oGPg0RWpHMQLUGWgQN6JDydjK/wc4dG/aAGReTV0BCFMn9
+         G48RbWST5qtIfRgHgxigUMl5cwYdXRp2OJWeXJ+v+IxUJEjC8Vpq8HMjtSuPRXtJCtLI
+         rLoQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772938925; x=1773543725; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1772939420; x=1773544220; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0b9UiayA3it40t9bJgAqpEj1p345wqtLgZz4wISOPp0=;
-        b=Tn6/9Zo9kXHFDWfxLSJdiSPSnXFsvSiYvrFLn+88CAQUn2xSkD+U5NqoB2K8juSlpo
-         cv4r9fJsJszwY4ed46YwKGYkkrjf6RpQSb371vL8goD7a6PPvzeQT0sNTD47TDbmjWkp
-         prbIjUS/1dIpUXq9cg5Pi3L0O+/2qBo1QdkPqJewtByIZ0HlWirhKwK+gYmjjEfPYnH8
-         Cty8YI+vgdI9atbiKXh6fRXreBlxmpgi5V+KmLMEC7amBDZf78I5QOpROCQ3MSngAwB1
-         qTdUCl2AjT2X+gLrpxFdSA2z/gqsztbgtDzT+fwYhKUYHkNIS71S85+HsLA4uD/xwLdv
-         ojMQ==
+        bh=OgjnyeIHMSpKxPO9WM9wRfsRfZIs2A0n5sMLnaHjVxc=;
+        b=GKZhgPMbsgA1F7ktD7DQ8SdC2EWLeIsWEI2X8o5LU9pwRwkr3ESecj1mlPVZA23kVO
+         CQBKYhVHSKuceCtPD615JTuqCExer9jvyZ6qu2PTrSwWAJ/ZwVwV1lIE4dMsil3SeQZf
+         40SuGfr2d8OtYrF4bgepSS9WVmgxihoXUNZZluHWL8iqQY30jCRvYJ43M4s0R6urHSNh
+         VhROTE11VvbjrI6jH+1E3T48dMtdBGP1IuLKTrSuNOFYICZFR6xF17YvD1qX7cmWigKK
+         OogiAub2OB5jnT0KUJOnUoQSzGfmG8NuzlEhBQlbqMWW8fBvzs+VYs2isM9OpJni6Sdb
+         x+AA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772938925; x=1773543725;
+        d=1e100.net; s=20230601; t=1772939420; x=1773544220;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=0b9UiayA3it40t9bJgAqpEj1p345wqtLgZz4wISOPp0=;
-        b=PashjSrRmXh7Nr/yK42f+Dh6DSscedG4K+du76Ak8CVkVAC61ZYiiErcXgYpsixlPo
-         8B6MilgdCACuBKyCNWrCS7Me4DXX/Y1neFtIdf0PKYYEbmuEnslG+ckSME9hxW0tfGm4
-         F/fVlVfhug56Nx8K6GPyb+nfesfTQcMFL35yF30MMVZt+25TSMGM3yBeU34NT8BJFT8D
-         UGCcttY0gkc5DsglvwAixxsF5UZoRTOzaWZUjJ/15XIDvDMtg24Qs9sedFZXHPXzp1Q9
-         WVoO8tbTgj4yKjNDIxqY1r+DdOp1pLiLoNotAFyiOWqo81O15o7WxkpGT+NQvvqDAc77
-         Rvyg==
-X-Forwarded-Encrypted: i=1; AJvYcCV5C4dTg/AodUh4qFwLZ25nvG/nBNyYw6u+0/qJUK5pt8N4CGhuBjhN3YGN5UZdvGB+PwT+fRiQF2dK@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZ6SimZOkgbAqXDcfJ9W7tKjby4EqjJgTgO+7Dc7lLlWkV+Wsp
-	vCzWhyfjE91Lcr0DiL/Te2w2EO1qqX0h6fNmBJoU/juHAw2e2yUk0FXt3Ds1IEpY865Z/aRd5mP
-	WfiDD7v1tsSHvgvPcY6CFm66m6kaIo3mKzQ==
-X-Gm-Gg: ATEYQzwKf7gKbOviaJc8wMrKedteXCtNIuaDs2GuQhKK/e4xUNys5RPvFmalqZHz9AE
-	s+w5cMh6d2ybKiPIRWlJBbfDyNmBCReBkTuyodNMlrsXlzuqRQXXNL26zAjYPWGbD6aZirkz1WO
-	1UMi2NahG476kmEH5abWDI3vvUmXrciSaAM6IP+T9S5yICEzl53Oix0TtIgNvC/uFxyZUNr9VP0
-	UVqUyPcEtmP0k5wwNUa6ABGj8S9GEZ+sGjgQtMK69ratzOlo/Y6qjDTVmuc5Jsgs4rJ7s/IMnPA
-	mp7BdsuZinX4OOVKfzPeqK/PcSoNqD9SxtAsmCuQSQYd3crm/210ISEQCzunBFxwtQrR9q5FOWW
-	2qbw0lFPLapjsHXoWWTPTbRlehYY0//zFbtZAuqWBA2SxqOTDFt1NPxJ528Sfbqgpv9Z/LNpy9n
-	+rI240wcCfRWnDbLh5CzCxhg==
-X-Received: by 2002:ad4:5e88:0:b0:89a:78c:7cf2 with SMTP id
- 6a1803df08f44-89a30a5ef7fmr107101396d6.20.1772938924803; Sat, 07 Mar 2026
- 19:02:04 -0800 (PST)
+        bh=OgjnyeIHMSpKxPO9WM9wRfsRfZIs2A0n5sMLnaHjVxc=;
+        b=qQ/s2DAmI+OTmme/GQAKOBRLgvqswcQRmbjzVoQDljINotlL2fPLVB3wgqnBhRAuFE
+         QJeon53i5C1w0rHssfnnrNGJdLZU5VOTYZiqyaq9d2WaPYSPADS71+SGHjkSOoO88cnB
+         S5gPFdgyTx6GWGRc9ISTD6PW169FvVem1hEBo8axswRfX9qMx7DAOOgc9J5RtVy17g1s
+         2zGaFczeFHMXdUxfyrvq44x4K4B/tEdB4Py+SsG09dF9QWBRAzxNNk9ImWZS6CXnAgMD
+         wYd1+AyEH7Iy6LuGdp8uhm5flo8QSaM2n1I7SnGY9+h7NxGf9uPBfCAyEMICvs/FThfO
+         6Twg==
+X-Forwarded-Encrypted: i=1; AJvYcCXkP05ZMomivXdqawsHx1gYwYxSIrCQ+mtUgxIo0pO/xAvV6b1KUN4IEGNedP/tM4OY0u/7aDafxfDm@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaylzzwK/nfn1z4SUMznga3z0nSXK3yNXtWSz9sStda0B+Zzhk
+	LAyuE9vmnVJwnfrzoVphjblaGjGn3UyqbL0GYR6L3Q0CXqqYo+SlrvRMGfWp2zYqBL9iBVur7eY
+	6Qzn6DjP7hpQHnerv4ls+PT+l4PuzFBI=
+X-Gm-Gg: ATEYQzzFSs9SgdrLoJnC7ECYDjRI8krFwjtLwrKxCKq1U9quUxfDbNMngNzW5wjkJDp
+	c2p0iVqCWNir1Wh+qN+10rVG/gmubWId1qta6q2n4EvuLcM0xmhQLIBUPK2ZfcGQsYD1xiGOV8b
+	cV6zFvqfdV/Jz86ilI0/eYC+mkAJDB5GA+3ks+Hhm0EFhle7FeGGRiEqgjP+wiKNrSg/k3E/ZdM
+	w5xC7LHmAxdCvcwi8c3Bmjo1TjQziOCjSHuAquBssjfgVYUCRp86ERWCc6DCrDlxZLp/xOdXPpi
+	Pn+vZ1ED552WwBlganjNPJj/m+QEM0ii24XI2pz+QolZNwXEtkhAyjV5ToDa1raMwe89Dpy+/is
+	v/h33u1Cw7cuW8FJYEWKcd4yMZaLC4XuiKHAQGtz46U7/1Q1n90cL5r7jifqLGS/WkUKcLhFU1G
+	Ym4ii9mFZVwONwn9GQQomn7wEARi7Yd+eW
+X-Received: by 2002:a05:6214:242a:b0:899:e621:eac8 with SMTP id
+ 6a1803df08f44-89a30ad1c83mr102051066d6.39.1772939420246; Sat, 07 Mar 2026
+ 19:10:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260307212016.1328931-1-pc@manguebit.org>
-In-Reply-To: <20260307212016.1328931-1-pc@manguebit.org>
+References: <20260306144415.3402532-1-arnd@kernel.org> <a3f513c1-a7ad-422b-8fd8-145b222f77e7@samba.org>
+In-Reply-To: <a3f513c1-a7ad-422b-8fd8-145b222f77e7@samba.org>
 From: Steve French <smfrench@gmail.com>
-Date: Sat, 7 Mar 2026 21:01:53 -0600
-X-Gm-Features: AaiRm50qYatmPyY4sLko0GYgd20OsgwVPIdVaiTS5dCt54-YGh5USYTNNkkjLMs
-Message-ID: <CAH2r5mtnfxaZdsu=9byknrk68LLnpzEM0x89k62_h9AkieqX=A@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix atomic open with O_DIRECT & O_SYNC
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>, Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, 
-	stable@vger.kernel.org
+Date: Sat, 7 Mar 2026 21:10:02 -0600
+X-Gm-Features: AaiRm52jmPl2rVUqNIVvceJ7sK2VDP5cs_yQY_38-2rrCEVZNv15gs8OCp__Il8
+Message-ID: <CAH2r5msdOcLdxPhihu5b3er4Dv=CxdOMHSCwsCrXzh2EHzsK6w@mail.gmail.com>
+Subject: Re: [PATCH] smb: fix smbdirect link failure
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Arnd Bergmann <arnd@kernel.org>, Steve French <sfrench@samba.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Paulo Alcantara <pc@manguebit.org>, Arnd Bergmann <arnd@arndb.de>, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org, Tom Talpey <tom@talpey.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Bharath SM <bharathsm@microsoft.com>, 
+	Ard Biesheuvel <ardb@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next pending additional review and testing
+added the acked-by and merged into ksmbd-for-next
 
-On Sat, Mar 7, 2026 at 3:20=E2=80=AFPM Paulo Alcantara <pc@manguebit.org> w=
-rote:
+On Fri, Mar 6, 2026 at 9:30=E2=80=AFAM Stefan Metzmacher via samba-technica=
+l
+<samba-technical@lists.samba.org> wrote:
 >
-> When user application requests O_DIRECT|O_SYNC along with O_CREAT on
-> open(2), CREATE_NO_BUFFER and CREATE_WRITE_THROUGH bits were missed in
-> CREATE request when performing an atomic open, thus leading to
-> potentially data integrity issues.
+> Hi Arnd,
 >
-> Fix this by setting those missing bits in CREATE request when
-> O_DIRECT|O_SYNC has been specified in cifs_do_create().
+> > When CONFIG_INFINIBAND is set to =3Dm, it is not possible to have SMBDI=
+RECT
+> > built-in, and it turns into a loadable module, but this does not preven=
+t
+> > CIFS and SMB_SERVER from being built-in, which in turn causes this
+> > link error:
+> >
+> > ld.lld-22: error: undefined symbol: smbdirect_socket_release
+> >>>> referenced by smbdirect.c:212 (fs/smb/client/smbdirect.c:212)
+> >>>>                fs/smb/client/smbdirect.o:(smbd_destroy) in archive v=
+mlinux.a
+> >>>> referenced by smbdirect.c:212 (fs/smb/client/smbdirect.c:212)
+> >>>>                fs/smb/client/smbdirect.o:(smbd_reconnect) in archive=
+ vmlinux.a
+> >>>> referenced by smbdirect.c:338 (fs/smb/client/smbdirect.c:338)
+> >>>>                fs/smb/client/smbdirect.o:(smbd_get_connection) in ar=
+chive vmlinux.a
+> >
+> > Enforce the dependency at Kconfig level, so that the respective smpdire=
+ct
+> > options are only offered if it's possible to link against the common
+> > module and infiniband.
+> >
+> > Fixes: 28504d6ee127 ("smb: client: make use of smbdirect.ko")
 >
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-> Reviewed-by: David Howells <dhowells@redhat.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: stable@vger.kernel.org
-> ---
->  fs/smb/client/cifsglob.h | 10 ++++++++++
->  fs/smb/client/dir.c      |  1 +
->  fs/smb/client/file.c     | 18 +++---------------
->  3 files changed, 14 insertions(+), 15 deletions(-)
+> Thanks for the fix!
 >
-> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> index 6f9b6c72962b..2f4470f9df58 100644
-> --- a/fs/smb/client/cifsglob.h
-> +++ b/fs/smb/client/cifsglob.h
-> @@ -2375,4 +2375,14 @@ static inline bool cifs_forced_shutdown(const stru=
-ct cifs_sb_info *sbi)
->         return cifs_sb_flags(sbi) & CIFS_MOUNT_SHUTDOWN;
->  }
+> Steve can you put that an top of ksmbd-for-next for the moment.
+> Then I'll squash the hunks in the correct patch and provide
+> a new branch, as the 2nd would have:
 >
-> +static inline int cifs_open_create_options(unsigned int oflags, int opts=
-)
-> +{
-> +       /* O_SYNC also has bit for O_DSYNC so following check picks up ei=
-ther */
-> +       if (oflags & O_SYNC)
-> +               opts |=3D CREATE_WRITE_THROUGH;
-> +       if (oflags & O_DIRECT)
-> +               opts |=3D CREATE_NO_BUFFER;
-> +       return opts;
-> +}
-> +
->  #endif /* _CIFS_GLOB_H */
-> diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-> index 953f1fee8cb8..4bc217e9a727 100644
-> --- a/fs/smb/client/dir.c
-> +++ b/fs/smb/client/dir.c
-> @@ -308,6 +308,7 @@ static int cifs_do_create(struct inode *inode, struct=
- dentry *direntry, unsigned
->                 goto out;
->         }
+> Fixes: 30807ad55601 ("smb: server: make use of smbdirect.ko")
 >
-> +       create_options |=3D cifs_open_create_options(oflags, create_optio=
-ns);
->         /*
->          * if we're not using unix extensions, see if we need to set
->          * ATTR_READONLY on the create call
-> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> index cffcf82c1b69..13dda87f7711 100644
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -584,15 +584,8 @@ static int cifs_nt_open(const char *full_path, struc=
-t inode *inode, struct cifs_
->   *********************************************************************/
+> But both hashes are unlikely be the ones landing upstream,
+> so as we do rebase anyway I'd squash them, but maybe
+> I'll have time for the rebase after -rc4.
 >
->         disposition =3D cifs_get_disposition(f_flags);
-> -
->         /* BB pass O_SYNC flag through on file attributes .. BB */
-> -
-> -       /* O_SYNC also has bit for O_DSYNC so following check picks up ei=
-ther */
-> -       if (f_flags & O_SYNC)
-> -               create_options |=3D CREATE_WRITE_THROUGH;
-> -
-> -       if (f_flags & O_DIRECT)
-> -               create_options |=3D CREATE_NO_BUFFER;
-> +       create_options |=3D cifs_open_create_options(f_flags, create_opti=
-ons);
+> So we should take it as is for now, but maybe without the
+> Fixes tag, but acked by me.
 >
->  retry_open:
->         oparms =3D (struct cifs_open_parms) {
-> @@ -1314,13 +1307,8 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool =
-can_flush)
->                 rdwr_for_fscache =3D 1;
->
->         desired_access =3D cifs_convert_flags(cfile->f_flags, rdwr_for_fs=
-cache);
-> -
-> -       /* O_SYNC also has bit for O_DSYNC so following check picks up ei=
-ther */
-> -       if (cfile->f_flags & O_SYNC)
-> -               create_options |=3D CREATE_WRITE_THROUGH;
-> -
-> -       if (cfile->f_flags & O_DIRECT)
-> -               create_options |=3D CREATE_NO_BUFFER;
-> +       create_options |=3D cifs_open_create_options(cfile->f_flags,
-> +                                                  create_options);
->
->         if (server->ops->get_lease_key)
->                 server->ops->get_lease_key(inode, &cfile->fid);
-> --
-> 2.53.0
+> Thanks!
+> metze
 >
 
 
