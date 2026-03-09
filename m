@@ -1,160 +1,185 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384A92BE7C6
-	for <linux-cifs@vger.kernel.org>; Mon,  9 Mar 2026 16:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F4B3D3016
+	for <linux-cifs@vger.kernel.org>; Mon,  9 Mar 2026 16:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773074999; cv=pass; b=rvgeliiuW7WW9PEDWrqDeTcMIuINxS1eo03L1IbBz1wVtgjJ0PTgq2v1UUd70TcNHzWxv+4ggzCY8t5B5VCOc67fwF56wSmUqvH8tqeJvPesUgQxMWtHZJEIS3phlQQ1ZdLt/8iRSw5n5B7NvVEJyEvfIgi1b843iJHTLNPCpSc=
+	t=1773075034; cv=pass; b=hpkV3jbE1xUgBiK/F0pS0Ajfu4YYAJko0FphqapJYq3TD1ww3/Ec8QRsu3TVaTdu6qblCT8qJdv8G+R0A/B2kymrcFxlHQxPGwx3LtlyCI7Uy8xLyq6rugz9ncXCOKwUleubD7Nb60JPTWT8ZPvMOPmoSE7Fuin6BJvqnF0nLqg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773074999; c=relaxed/simple;
-	bh=KAaPZbb0DZR9Gm52FjNA4Inv7exM2JbDH3cVjDEaakU=;
+	s=arc-20240116; t=1773075034; c=relaxed/simple;
+	bh=dElGlCWfTDUCaV3zjXVrwEshlrdMTwzM4Mn069fiLm0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N1XQIMG1aaMEoAgplrDKvq2g//ago52lofJuCm2PseJ1gXDAaSOd0bDwpHHMOYL0yiFwnQCAfNvxBWUTMHXFs+aU9QWcZYN6efPEgn7xx3Qli5JUl5id4EoelsIslpEfeo891GnF0Ly1ZKHBYr/WA/pfPDpPrpyHHHtXmgZSr90=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e8i9w6fM; arc=pass smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=Peu//1p6xu3KctojSddy9Iu7xTmegeglWqHR/aF6PYWD1ndUhLSBnYvvcx7cGSizgG5X6o0VXL4/UXX8xK65vtyxmG4AcbaGNCWzCazZP+LpnD82baIR332Be2s+hEsPkgcvJItslGHAgUYnof10VmxewvlgvWpI/zJDWidQ8Ik=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=J+Xuet5h; arc=pass smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e8i9w6fM"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-8cd77786e97so231298285a.3
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Mar 2026 09:49:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773074997; cv=none;
+	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="J+Xuet5h"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-59dcdf60427so6723181e87.3
+        for <linux-cifs@vger.kernel.org>; Mon, 09 Mar 2026 09:50:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773075031; cv=none;
         d=google.com; s=arc-20240605;
-        b=GgXD844Zf1++2OHhrXJol8KMCS1qHnF/hjYFsE4OO6IdFIltrpsJgWO6b5wvy/aWxz
-         mD7rEbquwos+5uxdfeN+7YqHHydESK0qtCSVVjocUaxe6+VR2vjmsHAJgxXLmMff7XXJ
-         PwLyAdaXcmL5QKpdW4Z2XdGygtLVzJ6a8jPUoIPjfeRfe0mE8hicX9oaF9J+x34nKn4c
-         reb+yN43eSOui0PwLHTc6gbDgBM+B9/5erHE02HRsM7SPohWyfTXoBTzCreyYg71r6v8
-         uay265rzKQVJEVU1A+dQz5WMeBK8ZsU2p+E+SwGupVUeDgE6EA1vc9vkr0IiBKSXHKZ4
-         mm4g==
+        b=HqhSvH5B7iDlrU0UOXc4dDBKMI88laT42WSlSsyzLntr9mIJ+c8H8YoDGjNI6yzOSu
+         FY84ncdrD4QP9uakJaA66AI50NUZ9pmY/z2XJ5R9GCdNLUcMlSQ0ZJQ9E29/SwGfoMnp
+         XaxY2L2VoFq1VjsmJh1xZT7Jq/v3va7qmgequzhugdlH23JwXGdRUMiXF0oPkMzaXjun
+         howBhOTQDkTTf3gPnsc5xBtCgDxoLBkwxn79+o2ktrQYnkg+8t5p+/2pRERDUgKOZbin
+         yqvQJ2Lj89AdXJXdlT07v+WOKRwxwccuqVcJKUeF+LNsp1kb0oRHMUCVEPPxKC1jMHs9
+         HRfg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=ezYVrHR1lgcWwO9n3xsdtR2MeYabbPAdyBaDkHGJ+Z0=;
-        fh=ofmnPgzyhLKWA0mfWOHl8ycIz1yxt50UP62Zys3kL0s=;
-        b=JeVrWQ8wwR2aNJEhoBKSi6+6xiLyh2h2gQnweXXWXZkX1VZ/mvcVT6oueL2DDWJFC5
-         S6/XO9Sc6bNeVAOUurWtTMiQeKKIz+/NsLc4E0Sytf0NL8tv/5uHvu18A0UhzovgDFGe
-         8/9at3TzoOkYLyYU7Kdx0ycNSCg29jzmCjGZdQ3YaDSeY0IQnqy92HoCsJ8VsqVjDz3P
-         V22G50NxBnfW2ic8Dz9EeIWwflgpS9OgMyDS4qlEJTGnhINj6OvEmp6jk709hbargqbF
-         yTni+9eBovCBBYMLtwbkn5Ajd6FPHtAqDTrMZuzTEYGeErjlRyKEzLmH4x3VORM0PFl9
-         nIwA==;
+        bh=1qXi97N/dEOi9sir8d8Z87lcT7PElOkZiITQbx2fwCc=;
+        fh=Ewq6SN53oHW8wYW1Q+0eeQTttVg6iZzjXlnEx3ArJzw=;
+        b=GX3bjxNB1nOLDezFeThkqDrr7bzVqe79O4TwY+xnWBS+bNIwEskN5+5ztZoeV0hkFz
+         60oUcVUpNRN2EX2alpMER5gJc/v/NAru16Y2bd2SsahzAjh6niJ18WzEzMjWaKai8AHk
+         EQrtGKty92G97d5BuL3M4ph3trn5SgIWfmhbkXqvlhfDDK3kY+H5JPWKOyxp7q0wd3OH
+         TzDk96defO76JT5GtcikdoZTdtX7GQzKHk+GXyvoaWywPhJ50wc0Z46LZglwz3/mAY3C
+         h3cpxUTHnd16MccbdUeTIJgizC0IkCo2q5FOpZ4AFovxPEjsTbdq7HzMyK5DaBSrDTuR
+         52gw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773074997; x=1773679797; darn=vger.kernel.org;
+        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1773075031; x=1773679831; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ezYVrHR1lgcWwO9n3xsdtR2MeYabbPAdyBaDkHGJ+Z0=;
-        b=e8i9w6fMF4QIzhv3ERPxJnOHdSDX30bsicBiXS1x7nPzm/Nxjm211pJb1cY+DiJp7k
-         /kQlgwSJzst7XyAmU+acGborBFlDC2wc2sXLn/KRTdN95WIqp4p2bzntBGF6A2gHAD+5
-         KR5Ky0cs0fjzPe5uEuOspEWNm+ZUtjycYSaErI7plcL71QzXQt+4wW2J7ol/wM5JpR0+
-         wSzC82IaSA6gNy3BOQnSL33CCQNINWJyTx/UxmkwcEXvWUWzULfUKYrTtoMXTO30KQdG
-         kyO/kXn6dhvvx3yn7iZAyyYSau/kWVkT5d6yJqKU1mx8X6GhNulohMgSE7iSIio2TSk+
-         TZ/w==
+        bh=1qXi97N/dEOi9sir8d8Z87lcT7PElOkZiITQbx2fwCc=;
+        b=J+Xuet5hbFlie89tCjUFjzDwucKsd4NfrnrH1IlxidGOt/z+KgeLuYLA/G1tJg9YeP
+         C1CoxioVNedpRpnH3i2g1e9rvaDLyL/wWFxrMS/dadrG87skwpJ9ll0VXP5/mb7t/tVB
+         3nTver45s6YBmiBWLR4SANFDP+bIXXTcsmJ6clYmeEH7meYralZNdoAd1IxF7O6aIkco
+         lCWgnoV4P4ikTR0XyXY+GmybQCrbR7LB3OkC8+7VNevH+4CSTtWk0BvwVojn5VB4UwmR
+         IhgPtrXLc4SezqZQwBlfIP/+nK2z8AMiJCr0cknaXTC3MvGuBMz8TIpTguJCHWhMt/xS
+         SObA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773074997; x=1773679797;
+        d=1e100.net; s=20230601; t=1773075031; x=1773679831;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ezYVrHR1lgcWwO9n3xsdtR2MeYabbPAdyBaDkHGJ+Z0=;
-        b=memYkRFNOHnz9DkZVo590986L59+mNt6zW3/nDcWZ8I4JJH1m0FoGFuQ/TAdZ/9X8x
-         b8IJi+DfsPsGc9+MGP95AASqlHJ3kVBGMuTwR9vtSkY/4R1LzenuEtQbaUpKp/DoONAd
-         Sf50NqL0DJEx63kIYq+7GtZo70kyI3YK5x4k8V4VKIHM2V9vUXhxofRYOHb7EBWD6Qdj
-         v1jec/RQDk0eDZVPCSkvT6MFt9AH7QlBrhWc8iXkFCN6wloXmqzhuuIBz+r85Gll9o1Z
-         GvqwmTykmE/pxGgQNsJf0u8iingYS18i9HOd/jT9bnMJv3TcVgL7ju5FMIrkNittyki+
-         znqg==
-X-Forwarded-Encrypted: i=1; AJvYcCWs4uKcuY/+RYUSkJNuLp/XPrpb5d8MVSoES+Wz6P/2wBcMxUi6ZaOtGeaozGri6ME0p12I5NQXz7f/@vger.kernel.org
-X-Gm-Message-State: AOJu0YwX+m0cxISsxwRiO7Wt2FzEXhjkxjKWaVfkm3FLwuorNRdABpTV
-	1+hhlMkQcSrZp4n8phfYHW4spR4cYrXJi6q9kMPHFI94M4tqBCnuP+hjgSOZJNY6DQCCQAbl5Bx
-	sLLDleCvPsjJ/RvRMFwpYy+t/Ci8iqxw=
-X-Gm-Gg: ATEYQzxgdGDclDVkrni4T1IvV8Gbg2GnLXmJYQPbr7+Fncj9njIGHYlKbP0vGR9xgIR
-	9P5a9G6r6Wq4UXGkbEvQbeFcwVgmIyWvL2vaHugUHUvisfUdNsjR+OdFznoqbWUFcqUSGki2Zkc
-	qHdTNnmlV6EgLcE3+rOd2iiOd96PVfngIn8RbY0K1RcR8HohrTQGUOE23Dg2HZLGXFJ0CObFl7w
-	0B/u7SZeWn/M7AIpTgad0B9Ys0qRz3so3LbL80HS7v7T1zHFsAsv39veH7eAsTTakX+nKKSVifv
-	3Mznj9xcr81OrjEmQuJbu2SdQClVdF17op/oEpfh/wjilKPSmVlBag8TmPERMXuPGR+RXVV2TXx
-	fcwibVjUDWXn2u8oGcUE6rh1K/2RVhk4NWWEM4gAHuxTA1e/it4I8emeL0zbRXpab0bwZ/pNXDy
-	NrUs9VC99lS2O1xrvKCNzd
-X-Received: by 2002:a0c:cdc1:0:b0:89a:ec6:102c with SMTP id
- 6a1803df08f44-89a30a348b0mr122617186d6.19.1773074997053; Mon, 09 Mar 2026
- 09:49:57 -0700 (PDT)
+        bh=1qXi97N/dEOi9sir8d8Z87lcT7PElOkZiITQbx2fwCc=;
+        b=bZTrZrBUtj1qmCDZoj5DK3L9hh92WPBGW05/KckJYKS+i27V22xYnekcaASHf4pvyu
+         abtditB7ZTATu/EUb10F+4l0iNjQ3UedYNQCw1wJFfzWueN3qh1GBA42FB18LHXfob6S
+         uyePM7XJDrM/1VvWzkVZiU1WVvFYqpEPOKbAeXDWee327AgDcLD85uqSKqDe2pN8RroS
+         txFb9lu9TTTuElt9WHOyuudggJM4Rmeux+8/ILR1ADLg/spbbJPj1+OYhT9ADkVCbWGk
+         foRqsP+YQvAUy4DXNeIdDB1J6k7jYCx8X3ctN+LKSbjVQNBVw6WOXyIWCARQbeN34IgJ
+         9M3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUlnBW9Ukv6T6qIugAGOndoAvVc21PW7HwcSaZBf2if6rFcFZdkt/3WWMI7bgK5jLG8CNDsuSHEhOai@vger.kernel.org
+X-Gm-Message-State: AOJu0YySXObgQZYbXKO5QvPzfGVDp9/nfEl86E9b3q6E/7qR951dtv3O
+	6ohaybYWVS3HCI2RVQj7xgOJGkQRv5y0Z8oxZt8GRZMdBvY8RWCMY0AR5LA9w7XPt5tCqrsdQso
+	XOKTfiAA/iL7ZMKPCKJYdeks+7gSBHdaFC2I55dVk
+X-Gm-Gg: ATEYQzyzdUUT6L1KpfbLbIxTjheOPlOUp3Ryt3ONETwrRWubUQ9ZAhiQ8vxHDlTS4Mw
+	oSBgM7cFNhHe3FGZZd3QRO+uttOvBHRVwLDjvxgU0aYE9GJnrYBj6ef+HFNozaUmHd8qMrdOzUv
+	OGdsa/LP5+l172efqAHiwOe37MBhB9q5oYthQb2ALpL3/cAUiJixPHgzyG8dOwgzVq3DzEybxid
+	wX4w+t8UwHcJlpi9NwpVxl46/tgfQmOI6+2JB518Qti+kXm1kmOoNn5/DkuoyIAOmNVGEkXpEdQ
+	7WaXwKDnw8TkgEA=
+X-Received: by 2002:a05:6512:33c9:b0:5a1:3d7f:8fbb with SMTP id
+ 2adb3069b0e04-5a13d7f930amr3518616e87.2.1773075030208; Mon, 09 Mar 2026
+ 09:50:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260309103049.22169-1-bharathsm@microsoft.com> <nvmbb2fbm2zkqyk4x254d33llskfldguygq5pfkedv36upems7@jcofwqya42t4>
-In-Reply-To: <nvmbb2fbm2zkqyk4x254d33llskfldguygq5pfkedv36upems7@jcofwqya42t4>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 9 Mar 2026 11:49:45 -0500
-X-Gm-Features: AaiRm53tLnbdLcEbou2BkAZ73WFR62nyhqqgct1D2L97UsGXrHnh4TsVioqBhIg
-Message-ID: <CAH2r5mtjTN1gs0sbZsKtRzRO6vRfYFPpZc-14EPfRSKPOoqbag@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix in-place encryption corruption in SMB2_write()
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: Bharath SM <bharathsm.hsk@gmail.com>, linux-cifs@vger.kernel.org, 
-	dhowells@redhat.com, sprasad@microsoft.com, pc@manguebit.com, 
-	ematsumiya@suse.de, bharathsm@microsoft.com, stable@vger.kernel.org
+References: <20260307140726.70219-1-dorjoychy111@gmail.com>
+ <20260307140726.70219-2-dorjoychy111@gmail.com> <CALCETrXVBA9uGEUdQPEZ2MVdxjLwwcWi5kzhOr1NdOWSSRaROw@mail.gmail.com>
+ <801cf2c42b80d486726ea0a3774e52abcb158100.camel@kernel.org>
+ <CALCETrVt7o+7JCMfTX3Vu9PANJJgR8hB5Z2THcXzam61kG9Gig@mail.gmail.com> <20260309-umsturz-herfallen-067eb2df7ec2@brauner>
+In-Reply-To: <20260309-umsturz-herfallen-067eb2df7ec2@brauner>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Mon, 9 Mar 2026 09:50:18 -0700
+X-Gm-Features: AaiRm50Rb5608a_d1ziKt7e3a5xZPZu4oB7F4zw8iu_Gm1KsPQukeeL-PdrpHz4
+Message-ID: <CALCETrWjb+V-zrMT412MtmgDCx9y8simJBQ7+45C9MtdiSMnuw@mail.gmail.com>
+Subject: Re: [PATCH v5 1/4] openat2: new OPENAT2_REGULAR flag support
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jeff Layton <jlayton@kernel.org>, Dorjoy Chowdhury <dorjoychy111@gmail.com>, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-api@vger.kernel.org, ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz, 
+	chuck.lever@oracle.com, alex.aring@gmail.com, arnd@arndb.de, 
+	adilger@dilger.ca, mjguzik@gmail.com, smfrench@gmail.com, 
+	richard.henderson@linaro.org, mattst88@gmail.com, linmag7@gmail.com, 
+	tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com, 
+	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com, 
+	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, 
+	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org, pc@manguebit.org, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+	bharathsm@microsoft.com, shuah@kernel.org, miklos@szeredi.hu, 
+	hansg@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next
-
-On Mon, Mar 9, 2026 at 10:52=E2=80=AFAM Henrique Carvalho
-<henrique.carvalho@suse.com> wrote:
+On Mon, Mar 9, 2026 at 1:58=E2=80=AFAM Christian Brauner <brauner@kernel.or=
+g> wrote:
 >
-> Acked-by: Henrique Carvalho <henrique.carvalho@suse.com>
+> On Sun, Mar 08, 2026 at 10:10:05AM -0700, Andy Lutomirski wrote:
+> > On Sun, Mar 8, 2026 at 4:40=E2=80=AFAM Jeff Layton <jlayton@kernel.org>=
+ wrote:
+> > >
+> > > On Sat, 2026-03-07 at 10:56 -0800, Andy Lutomirski wrote:
+> > > > On Sat, Mar 7, 2026 at 6:09=E2=80=AFAM Dorjoy Chowdhury <dorjoychy1=
+11@gmail.com> wrote:
+> > > > >
+> > > > > This flag indicates the path should be opened if it's a regular f=
+ile.
+> > > > > This is useful to write secure programs that want to avoid being
+> > > > > tricked into opening device nodes with special semantics while th=
+inking
+> > > > > they operate on regular files. This is a requested feature from t=
+he
+> > > > > uapi-group[1].
+> > > > >
+> > > >
+> > > > I think this needs a lot more clarification as to what "regular"
+> > > > means.  If it's literally
+> > > >
+> > > > > A corresponding error code EFTYPE has been introduced. For exampl=
+e, if
+> > > > > openat2 is called on path /dev/null with OPENAT2_REGULAR in the f=
+lag
+> > > > > param, it will return -EFTYPE. EFTYPE is already used in BSD syst=
+ems
+> > > > > like FreeBSD, macOS.
+> > > >
+> > > > I think this needs more clarification as to what "regular" means,
+> > > > since S_IFREG may not be sufficient.  The UAPI group page says:
+> > > >
+> > > > Use-Case: this would be very useful to write secure programs that w=
+ant
+> > > > to avoid being tricked into opening device nodes with special
+> > > > semantics while thinking they operate on regular files. This is
+> > > > particularly relevant as many device nodes (or even FIFOs) come wit=
+h
+> > > > blocking I/O (or even blocking open()!) by default, which is not
+> > > > expected from regular files backed by =E2=80=9Cfast=E2=80=9D disk I=
+/O. Consider
+> > > > implementation of a naive web browser which is pointed to
+> > > > file://dev/zero, not expecting an endless amount of data to read.
+> > > >
+> > > > What about procfs?  What about sysfs?  What about /proc/self/fd/17
+> > > > where that fd is a memfd?  What about files backed by non-"fast" di=
+sk
+> > > > I/O like something on a flaky USB stick or a network mount or FUSE?
+> > > >
+> > > > Are we concerned about blocking open?  (open blocks as a matter of
+> > > > course.)  Are we concerned about open having strange side effects?
+> > > > Are we concerned about write having strange side effects?  Are we
+> > > > concerned about cases where opening the file as root results in
+> > > > elevated privilege beyond merely gaining the ability to write to th=
+at
+> > > > specific path on an ordinary filesystem?
 >
-> On Mon, Mar 09, 2026 at 04:00:49PM +0530, Bharath SM wrote:
-> > SMB2_write() places write payload in iov[1..n] as part of rq_iov.
-> > smb3_init_transform_rq() pointer-shares rq_iov, so crypt_message()
-> > encrypts iov[1] in-place, replacing the original plaintext with
-> > ciphertext. On a replayable error, the retry sends the same iov[1]
-> > which now contains ciphertext instead of the original data,
-> > resulting in corruption.
-> >
-> > The corruption is most likely to be observed when connections are
-> > unstable, as reconnects trigger write retries that re-send the
-> > already-encrypted data.
-> >
-> > This affects SFU mknod, MF symlinks, etc. On kernels before
-> > 6.10 (prior to the netfs conversion), sync writes also used
-> > this path and were similarly affected. The async write path
-> > wasn't unaffected as it uses rq_iter which gets deep-copied.
-> >
-> > Fix by moving the write payload into rq_iter via iov_iter_kvec(),
-> > so smb3_init_transform_rq() deep-copies it before encryption.
-> >
-> > Cc: stable@vger.kernel.org #6.3+
-> > Signed-off-by: Bharath SM <bharathsm@microsoft.com>
-> > ---
-> >  fs/smb/client/smb2pdu.c | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> > index c43ca74e8704..5188218c25be 100644
-> > --- a/fs/smb/client/smb2pdu.c
-> > +++ b/fs/smb/client/smb2pdu.c
-> > @@ -5307,7 +5307,10 @@ SMB2_write(const unsigned int xid, struct cifs_i=
-o_parms *io_parms,
-> >
-> >       memset(&rqst, 0, sizeof(struct smb_rqst));
-> >       rqst.rq_iov =3D iov;
-> > -     rqst.rq_nvec =3D n_vec + 1;
-> > +     /* iov[0] is the SMB header; move payload to rq_iter for encrypti=
-on safety */
-> > +     rqst.rq_nvec =3D 1;
-> > +     iov_iter_kvec(&rqst.rq_iter, ITER_SOURCE, &iov[1], n_vec,
-> > +                   io_parms->length);
-> >
-> >       if (retries) {
-> >               /* Back-off before retry */
-> > --
-> > 2.48.1
-> >
+> I think this is opening up a barrage of question that I'm not sure are
+> all that useful. The ability to only open regular file isn't intended to
+> defend against hung FUSE or NFS servers or other random Linux
+> special-sauce murder-suicide file descriptor traps. For a lot of those
+> we have O_PATH which can easily function with the new extension. A lot
+> of the other special-sauce files (most anonymous inode fds) cannot even
+> be reopened via e.g., /proc.
 
+On the flip side, /proc itself can certainly be opened.  Should
+O_REGULAR be able to open the more magical /proc and /sys files?  Are
+there any that are problematic?
 
-
---=20
-Thanks,
-
-Steve
+--Andy
