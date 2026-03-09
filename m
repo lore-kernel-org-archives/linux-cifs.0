@@ -1,173 +1,156 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22003BD659
-	for <linux-cifs@vger.kernel.org>; Mon,  9 Mar 2026 17:18:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC7E2F4A16
+	for <linux-cifs@vger.kernel.org>; Mon,  9 Mar 2026 17:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773076739; cv=none; b=SuD4qXFMsYvLzLfmArAJ28N9drkyl59Sho+TZEgMRRVvmOD6JpoxInQbOoXHiZ9CLQ5WXFvBNs6grwVNo3TxoLCtcW36nuzad4vcyWwaS0Ca23ZPlWFmkoePzSU+spSkV704sm1eOKpJ7PFBFDSNvsdJFI6rFl3zyI8D3WWY/WY=
+	t=1773077753; cv=none; b=qyanqPQcJKDUCGTP40jPiy9bI1yaG1LjXnjlt46S+sn3ojFi+6C4oWPvUAxpChB4hx54h+PiZedJ9xurBg2IHDifQ8he9eEq/B/Z1f5ndsalwSTK7TNBsfjqdlB4IzypIjTQkal83SAiLLlMpjURZkRMrg+Aze9FoKAxjCf4dOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773076739; c=relaxed/simple;
-	bh=LXPNVRwLDXG7DMw6P813qP1/gF0eFehhSZzvYzJcUjc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z6Y/x9DuFw/ThsgGZ510req/Undkb9p+cSP1AzloA8PBSuNIHAxhkrvdurjy4BjGH70d9o8KyQ3wubH6JcWGBBIA9jOMvZXUaXSzVLpcWi2SudwhmppD0/U+Bi5wY8cwrAPXJRFabRJSC44Q8QFkhbtXeBz+FFxcEIa6CpVrC3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=N96n+U84; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1773077753; c=relaxed/simple;
+	bh=6978ve18JIiLcoNp2i2UaBIyW82v9g7vlV/iVyF6pnQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D8yAdVa3SGPpvX3ZaUHlrMcR4h8fTjgNMigTcddRjEYWBrsdzO6HTa3/rxJftXOUd+5/I03AbbDr9Lad7wtlkqOucU/AwzEAbWHe1jzi0tfADmxal6gHK1Izf+qzG8FkOZennFHrjkP+QxAsobK/IhbA+Xgclqp3oPuL53YfNcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=P3pt9KNm; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="N96n+U84"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso109254685e9.3
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Mar 2026 10:18:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1773076736; x=1773681536; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cptXPxAdAWXaSBoqhq6AwKwxFicTFTDFRJrNRG70crI=;
-        b=N96n+U849zivqSiLo+DHRXCIl/CDi5Jgsad2miJ2EXVLvLBvI5KggInqN3AVmvkweB
-         ZjgDHLP1uKI071LWz7W2ihvqgR8PnzcGjXm6iK8US+CwuqRX7G3fjTUdp1RFA9va+DT5
-         JyMtMjdvWGKcd1Yc32JeAkR+BBotZiISk7EGOIiuoB5Dff0+aWouhleq7w5R6+/3LIiM
-         0Au5JCFXRjwyKCrJ/W+LEbgq985N6LRgWIiF9RJ/o/cFNqsMFVG7HxpSecIlaS59wrvZ
-         A5jFA6KhZl8/kjIQs4bBXVvZeBW2L8tLcT0cFP5aRFoOdcPs3/jFoJs+yzUIzlvTKvgC
-         KYAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773076736; x=1773681536;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cptXPxAdAWXaSBoqhq6AwKwxFicTFTDFRJrNRG70crI=;
-        b=P5IF4oVwqJnSPdVldgpmPxJSeXTfSsR4VvR6adCBLHesrNylrO62gF5WnwR9OHHgt6
-         M9pz/a+P+L/nsnYKjMRkagwrP6T1Ef+d/plUtLZIIikRIc8QK37aE61rKHPclRyi2TkD
-         0WDHJC6b3s5vFgKivKzPdObuWZrQCtBFDSJlnGVy0bUzZULrX3Jg3XLUcdWMXxNZPdfc
-         KwbxJUWbzq87c/Sr1G1LchoqUcWw6tgHHIl/pe6Z8Pd7KhlsAj0fHLkhFBWppBXMTclY
-         nK+0FbpywDDJWlN9uuwphTYLY0WEplt4lttVpNRC7RmlXO1c1ycv3qzpsP2/HJLEFcp+
-         b1FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXnxeGheIl9UrnG8lgEY7xh3K/3nmEm2+e7JSgw7dSnDh2aIm6YH9U8wTlpaQ0xb9a+EWIrZSJzQ8Tl@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWripJxljsTfYxFJTWgYdV16pEzzenpT5ZmNkODEzyDRGyj/ym
-	Sy52e7jD9XI+MptKvfQAtp9caeVkTDrE4J6FuYCtKY8mJ38gfWloaitNZAO5tihfXPxN4wpBqga
-	gNBrj
-X-Gm-Gg: ATEYQzx76ylcadIfiwESJbeTGmWeTLeHCcWFKB2USQCeeFyZnj5K1jkENmD/9mAv6Zo
-	0WrlrYhtbOYLb8OZxfQI6eSdeq8iYHtCvtmL4ej6j/Dkfz2VMD9fk+Vh2hAXw2k1iLMOoFK5wXO
-	Yh/PjXERxWJfyWisWJMZDSKWyYWtF3XNGN/Ak/SppQJSkcEE7CCAcqWSZPZGJvv7YRTcnqTDcUG
-	p6nlnk1wW8QtqwJe0wlkNdEtZ95BU1ZLRccGhrx6fit10M+ZjygpGcTdY+ZLY8cadmpBdST3xox
-	S3UTy302awJVgElTCrI1T93BtuKoHEKQUCsiZNSjtXb7thG72prIu6HSEpxk2Ka6IbjHZtE3Glo
-	N34kRww4BDHFfTYv1qMWEfRlUbgd9d3k7p35x414MJGByzXFBwUhwIbup81OkbOHknYbYeFEB06
-	6cz+RYYCJqflZDoNXNicHPiDo6R6aElkXofn+A0CmPWinjqUMJlThHHhg=
-X-Received: by 2002:a05:600c:8708:b0:485:3c8f:e4c5 with SMTP id 5b1f17b1804b1-4853c8fe526mr44746275e9.17.1773076736115;
-        Mon, 09 Mar 2026 10:18:56 -0700 (PDT)
-Received: from precision.tail0b5424.ts.net ([2804:7f0:6402:5e5c:35f2:2762:2c6d:a7fe])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94e7b5208basm8541666241.9.2026.03.09.10.18.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2026 10:18:55 -0700 (PDT)
-Date: Mon, 9 Mar 2026 14:18:51 -0300
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: smfrench@gmail.com, David Howells <dhowells@redhat.com>, 
-	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] smb: client: fix atomic open with O_DIRECT & O_SYNC
-Message-ID: <nqw7sckluzinkdiqxcjx67tukzy5torrcniktahhqzyyjtzdkw@gjgrgc3xm37g>
-References: <20260307212016.1328931-1-pc@manguebit.org>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="P3pt9KNm"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=6978ve18JIiLcoNp2i2UaBIyW82v9g7vlV/iVyF6pnQ=; b=P3pt9KNmRy3aKdnjZJeC/wFe/e
+	8N9mTCGq014KQv8xL2+nqrchv6Q4IboSXh6FRlhyLc0tTtm4EC4H38jfVemeJXgZn+dOz+QYdeen1
+	Vwu3ZjkTloGnX2dgGRhNOh5gE5354h0VtpzFE8WP6x1ISfbu4ffT7A7NUsfLqSUreT8JvUx2ohXk0
+	jvqUxAuPJEyJIB9Xo/wfnXv1EuH4hBiATOVbXbGn9VGRcRZOxP3I5OkIQug7z9ohoWCWowiH1yEsW
+	5UaQJAPPvL9Q4Lp7qkc9Y6slEF7dPJpm7g6uEq437VGzjhZdE01JshWtiZBlafT/f2ovH3dIyxZy8
+	mp3zkV1oEKUNkn1OhLnG5TouusvuN9IyvgC2+l+vrE8RYtNoEu+7ZolmC4qhFayeYn5GfqxP75atV
+	bbp/p1bk3kDOkjqKLqSQxOfFNIB2ZELJsIhfKOpJiwSR0DPFOKdDdtd57uAkd5uyMGuTAnN1vgLI/
+	XLnZb7G2yEDtgeyyezotill9;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vzeWD-0000000B6ea-1tpn;
+	Mon, 09 Mar 2026 17:35:49 +0000
+Message-ID: <031b8f1e-bd28-42e3-bcde-9bf73fe59b63@samba.org>
+Date: Mon, 9 Mar 2026 18:35:48 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260307212016.1328931-1-pc@manguebit.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] cifs: implementation id context as negotiate context
+To: Shyam Prasad N <nspmangalore@gmail.com>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com,
+ bharathsm@microsoft.com, dhowells@redhat.com,
+ Shyam Prasad N <sprasad@microsoft.com>
+References: <20260304122910.1612435-1-sprasad@microsoft.com>
+ <aea738fc-e422-4671-9e0a-429988fe026a@samba.org>
+ <CANT5p=p3V0Ap3EmZuh1ZYvg+-SgjyH-ZMmsakCdbzMMSL3KwJw@mail.gmail.com>
+From: Ralph Boehme <slow@samba.org>
+Content-Language: en-US, de-DE
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
+In-Reply-To: <CANT5p=p3V0Ap3EmZuh1ZYvg+-SgjyH-ZMmsakCdbzMMSL3KwJw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------hn9IRhxjMESvfouzbtVUI0pI"
 
-Acked-by: Henrique Carvalho <henrique.carvalho@suse.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------hn9IRhxjMESvfouzbtVUI0pI
+Content-Type: multipart/mixed; boundary="------------klw9S0YcyIu1CvMp3iPwcaT0";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: Shyam Prasad N <nspmangalore@gmail.com>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com,
+ bharathsm@microsoft.com, dhowells@redhat.com,
+ Shyam Prasad N <sprasad@microsoft.com>
+Message-ID: <031b8f1e-bd28-42e3-bcde-9bf73fe59b63@samba.org>
+Subject: Re: [PATCH] cifs: implementation id context as negotiate context
+References: <20260304122910.1612435-1-sprasad@microsoft.com>
+ <aea738fc-e422-4671-9e0a-429988fe026a@samba.org>
+ <CANT5p=p3V0Ap3EmZuh1ZYvg+-SgjyH-ZMmsakCdbzMMSL3KwJw@mail.gmail.com>
+In-Reply-To: <CANT5p=p3V0Ap3EmZuh1ZYvg+-SgjyH-ZMmsakCdbzMMSL3KwJw@mail.gmail.com>
 
-On Sat, Mar 07, 2026 at 06:20:16PM -0300, Paulo Alcantara wrote:
-> When user application requests O_DIRECT|O_SYNC along with O_CREAT on
-> open(2), CREATE_NO_BUFFER and CREATE_WRITE_THROUGH bits were missed in
-> CREATE request when performing an atomic open, thus leading to
-> potentially data integrity issues.
-> 
-> Fix this by setting those missing bits in CREATE request when
-> O_DIRECT|O_SYNC has been specified in cifs_do_create().
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-> Reviewed-by: David Howells <dhowells@redhat.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: stable@vger.kernel.org
-> ---
->  fs/smb/client/cifsglob.h | 10 ++++++++++
->  fs/smb/client/dir.c      |  1 +
->  fs/smb/client/file.c     | 18 +++---------------
->  3 files changed, 14 insertions(+), 15 deletions(-)
-> 
-> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> index 6f9b6c72962b..2f4470f9df58 100644
-> --- a/fs/smb/client/cifsglob.h
-> +++ b/fs/smb/client/cifsglob.h
-> @@ -2375,4 +2375,14 @@ static inline bool cifs_forced_shutdown(const struct cifs_sb_info *sbi)
->  	return cifs_sb_flags(sbi) & CIFS_MOUNT_SHUTDOWN;
->  }
->  
-> +static inline int cifs_open_create_options(unsigned int oflags, int opts)
-> +{
-> +	/* O_SYNC also has bit for O_DSYNC so following check picks up either */
-> +	if (oflags & O_SYNC)
-> +		opts |= CREATE_WRITE_THROUGH;
-> +	if (oflags & O_DIRECT)
-> +		opts |= CREATE_NO_BUFFER;
-> +	return opts;
-> +}
-> +
->  #endif	/* _CIFS_GLOB_H */
-> diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-> index 953f1fee8cb8..4bc217e9a727 100644
-> --- a/fs/smb/client/dir.c
-> +++ b/fs/smb/client/dir.c
-> @@ -308,6 +308,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
->  		goto out;
->  	}
->  
-> +	create_options |= cifs_open_create_options(oflags, create_options);
->  	/*
->  	 * if we're not using unix extensions, see if we need to set
->  	 * ATTR_READONLY on the create call
-> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> index cffcf82c1b69..13dda87f7711 100644
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -584,15 +584,8 @@ static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_
->   *********************************************************************/
->  
->  	disposition = cifs_get_disposition(f_flags);
-> -
->  	/* BB pass O_SYNC flag through on file attributes .. BB */
-> -
-> -	/* O_SYNC also has bit for O_DSYNC so following check picks up either */
-> -	if (f_flags & O_SYNC)
-> -		create_options |= CREATE_WRITE_THROUGH;
-> -
-> -	if (f_flags & O_DIRECT)
-> -		create_options |= CREATE_NO_BUFFER;
-> +	create_options |= cifs_open_create_options(f_flags, create_options);
->  
->  retry_open:
->  	oparms = (struct cifs_open_parms) {
-> @@ -1314,13 +1307,8 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
->  		rdwr_for_fscache = 1;
->  
->  	desired_access = cifs_convert_flags(cfile->f_flags, rdwr_for_fscache);
-> -
-> -	/* O_SYNC also has bit for O_DSYNC so following check picks up either */
-> -	if (cfile->f_flags & O_SYNC)
-> -		create_options |= CREATE_WRITE_THROUGH;
-> -
-> -	if (cfile->f_flags & O_DIRECT)
-> -		create_options |= CREATE_NO_BUFFER;
-> +	create_options |= cifs_open_create_options(cfile->f_flags,
-> +						   create_options);
->  
->  	if (server->ops->get_lease_key)
->  		server->ops->get_lease_key(inode, &cfile->fid);
-> -- 
-> 2.53.0
-> 
-> 
+--------------klw9S0YcyIu1CvMp3iPwcaT0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
+
+SGkgU2h5YW0sDQoNCk9uIDMvOS8yNiA1OjM3IFBNLCBTaHlhbSBQcmFzYWQgTiB3cm90ZToN
+Cj4gVGhpcyBjYW4gYmUgdXNlZnVsIGZvciBzZXJ2ZXJzIGxpa2UgQXp1cmUgU01CIHNlcnZl
+cnMsIHdoZXJlIGl0IGlzIG5vdA0KPiBlYXN5IHRvIGV4cGxhaW4gY2xpZW50IHNpZGUgYmVo
+YXZpb3VyIHdpdGhvdXQga25vd2luZyB3aGF0IGV4YWN0DQo+IHZlcnNpb24gb2YgdGhlIGNv
+ZGUgaXMgcnVubmluZyBvbiB0aGUgY2xpZW50Lg0Kc28gaXQgaXMgcGxhbm5lZCB0aGF0IE1T
+IGlzIGdvaW5nIHRvIGltcGxlbWVudCB0aGlzIGluIHRoZWlyIHNlcnZlcnM/DQoNCkkgd2Fz
+IGtpbmQgb2YgYXNzdW1pbmcgdGhpcyB3aGljaCBtYWRlIG1lIHdvbmRlciB3aHkgaXMgdGhp
+cyBtYWRlIGFuIA0KY29tbXVuaXR5IGV4dGVuc2lvbiBpbnN0ZWFkIG9mIGEgcHJvdG9jb2wg
+ZmVhdHVyZSB3aWxsIGZ1bGwgTVMgYmFja2luZyANCmluY2x1ZGluZyBpbmNsdXNpb24gaW4g
+TVMtU01CMi4NCg0KVGhhbmtzIQ0KLXNsb3cNCg0K
+
+--------------klw9S0YcyIu1CvMp3iPwcaT0--
+
+--------------hn9IRhxjMESvfouzbtVUI0pI
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmmvBPQFAwAAAAAACgkQqh6bcSY5nka5
+KxAApDT0pqtGVbbH6DYKkusibspjaXN/d4IAwGV4LMFL6IoM15JCUiXr0YUa1saxQ/vfUxyMnX1i
+vwbR4HrH1MlcgfZWxz2yWXMkTtpoT8txttyjYrkhFWQggdUIkF9moe7/BAJRB7+kRUkNSciIq1iM
+rYu3Ouie1/yWQM14CvLkXW8qh+6FEg0PCyzaii/wcfiQmE3DJP5jJwQqBWJAtlQ38vOk/8bW+GUR
+l/PKITW5pQirvWM/iCj3YLLvNO4gQTkpkFRS7CzCNp7T7DTvIvT8VnrMPN+AMMpc03azwaHiBvFe
+vbfyPRPNrMtzaLxalXh65RbbhTJHy/6UkuTwFwWvWgZZNLHuAbZi+jNWPxWJksCVts/zclpBcjMr
+YhrxRTFN6IOMpBvYlOLbTdh14TLr9ZpvGcme+Q+LmvTwKN6Fe6OTfa2i+DceKqxej5ar8/hHckBz
+DDS/+qCXcv0bNie6vfiZcHbRkmmsQqoGEa9D/CRVc7KrPmt8Z0AUo2HJ90cDO7ChkkwqPMnz2i/7
+RzPbIfh92sH16wCYPRsqbXYG3Ubf92jZp9NlEMv3TyjajA4vOsxcHsJX+fIp7wTnUU93ebiLYjeY
+byR64KLpfryQhOSQ337MDwQ4UUacgSV3UDkvrqDFxcqT+uDXebA13Kzcv05ka04OV3GggeqfZnCM
+iGI=
+=4F5k
+-----END PGP SIGNATURE-----
+
+--------------hn9IRhxjMESvfouzbtVUI0pI--
