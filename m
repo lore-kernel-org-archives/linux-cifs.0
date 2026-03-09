@@ -1,263 +1,173 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69C53E3DB6
-	for <linux-cifs@vger.kernel.org>; Mon,  9 Mar 2026 16:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773073168; cv=none; b=Urofp4oWR2yDGKirpDi2ywl/uv/OtMPz8ZaugLuWEIy0t9AQJkwjviLWYKclnzHGD1IJ5N9RpCvBElkuJh+R981pHXQ/Mm7IIf7UtSlWxfSWgk2kg9UB+HgUAxiG6qh1NGVZ+Dj/NkzeDlqyR6BB+6BQME1mPHdXL/oGbbnBRyk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773073168; c=relaxed/simple;
-	bh=n9pTbXrdSQIHsKfaCwBi9b3GI23bg+H/lNxYzDFbLAk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kGL0ZTKIAP+pOnBHgOlGjkH5F84J0wX9Yori40xVHPaQFak5xQAp2H8KDyImJPkOpjJ1QeFPLML6rCWPtWTFmEi0eZSe1WYmeJMxuTWrEA+6jml+7UFdviSsWy6UNej/YdDF0RmGWGctXA6pVGWvZ/EWiRfvh87bRnYWN+3dT5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=e/jrw8oL; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4802730F7F2
+	for <linux-cifs@vger.kernel.org>; Mon,  9 Mar 2026 16:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773074062; cv=pass; b=kwnV/Ail/YLC0V7jKV87SbFSaGyoV3szJyuOilpRnxGPbITDSqjvTeZVTOK3qicwU1oRcFdYbR3HRXWOdvuRWpDFlsPl0pPaoRmOAElpdZVqxnfaw1JbcoqQcg2JPGtVlK1tyVG1Xo4915/72JMsqVbEKqzxS+98oOlQQxWrNB0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773074062; c=relaxed/simple;
+	bh=9coBkOo79EXBeNTnc1AKH81PaBwHi35k5oi7VBC2AKc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OrBAX8ljAiNtI19tZBGGAqADp+dsbXe+WOi4dn/9yhwHDAEO14Kex0AlRmPJ4VW0yFDDWM0sbMdQB3MNrPSCVK5eZB1i29CUrQF1cDp3yMtgIlVztV9FzHA5EiLEjz5nNxsnD6A8cqjii1+3T1dFZ1tCX6jB7mdPETQ2Af1NeY4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KOzG3AdR; arc=pass smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="e/jrw8oL"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=n9pTbXrdSQIHsKfaCwBi9b3GI23bg+H/lNxYzDFbLAk=; b=e/jrw8oLAXixrFb56oqpMX1BYG
-	Ipo+eAjE6/g8bZeBP1oDUl6bQDYR4rjbrmYm1q6KwPXoNKjc/ZHz0xAodCb7L3w9hmdlUqtFVvFWf
-	7yolkeJHQey9SoN78ggBAAZQLpEZ4rnjYQ7GQAJvQbuUcHKujuc5CCqg1bzKEpV7BXyDb34F8ebbH
-	y6NZ6XuF07/C/NFxRD8Kg940zZvl5Z7FET4yFOAoi44jKC9h/b1twaNHzTJYB7vrYOMa21Po2SaFK
-	lTAV3KlbTNwzHubt+ZjqCMuUuHcLUqVR4qDMBuGAR9HANcDJY9kizMS77yFgJCsJaZ0T98HGYyxuQ
-	vSfBBOPakwPy19nyCY3i8PFarCUX9Ngx4QrQgVsDBt/e1inoHP3ILZpiBLp+EZjdyrmfsKjAnkIlX
-	DRzTd8OkrwocGX0HpS7RgufTI7OdunF3ovhMZaE2KxbhJZupRcak2Hcv6/R1xVbGhCGueH2j0F17G
-	yYEJ/aTTdVj8CvHruetsuO5i;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vzdK9-0000000B5gj-1QWk;
-	Mon, 09 Mar 2026 16:19:17 +0000
-Message-ID: <aea738fc-e422-4671-9e0a-429988fe026a@samba.org>
-Date: Mon, 9 Mar 2026 17:19:16 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KOzG3AdR"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-660a7aa6e44so9398355a12.3
+        for <linux-cifs@vger.kernel.org>; Mon, 09 Mar 2026 09:34:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773074059; cv=none;
+        d=google.com; s=arc-20240605;
+        b=hVizp8cABDCGYrKVoyIrl5RfwfPb0bvMN9ndMalS9xFJAEQXFVSsaCzlMLkJwcwpRz
+         kn6UMK7DgSeUaD8cKOlq5tCIh0QygL2SOWIHvWE+jhcw2gAFObIg7M39GNXGq//xuP7E
+         CPR+3+FW1F+C0o7aRqYdm83nDYuXfLt9l7NUkPRFgKLAZUuHJEWjG2ik+ENaNEWYMjwJ
+         YOP2W/QvX4q0dQCXHHl97yEef8Nl6yPC9z7MDwWNaM5aysVwVx4cHg2XzaaEDf1m4nx9
+         68MdLU1+NhObCYRAx477gr3nlJ/+GrZxAH/gSGU544EK3Y/VklN0jwlT3HYSTZndeI6S
+         YYDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=oy9DX0trpu0pCizzkFBsWPboHR1XBmQKIKlmRUfC4lQ=;
+        fh=IgzW7Xi7yDyl8vCj07Hz+9x51W4O1b4UQK4fpYVK7dQ=;
+        b=OuErBtpFMyCm9a65blvb0cOt+DGqD+B5SbROTVIB66HA9OL4EszfYs7hTMqpNgjHF0
+         p3k1CMjpwH0e+6zGjd4oEh11AVGKuqFpo0ojxeTrgehJMY00Gvan8zfziptPldWku2iJ
+         AgYZgFqtb+7zmKFSWFLfzqW5a3lxK/toYeK+MOrYy6svmK4g0Jif7tuuaCNXke+JpvRh
+         HKNU7/KkqqBcO5GmMNBRKmgs6+bgJjdjcND+7JIyoo+hFqslmxauH0bfSDp+48VdPMWE
+         A7Vvi4itxLHDas4RcUwONxQbpgPmWmH66GsUfSJTqJQTFyYvg8dX6cl11/fQlodTvSo+
+         nkNw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773074059; x=1773678859; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oy9DX0trpu0pCizzkFBsWPboHR1XBmQKIKlmRUfC4lQ=;
+        b=KOzG3AdRP+0Y6DdKBtIj9Fw/m8xRmWpBdoGT2FHLaqSx8wP9KoijnIKFIcvi58LxjG
+         gVSGFw3i8oRPCzm7uDofGg8aUU5dVAeC0VKuNUuANVW1No3aQrFRW//1YA0E0cFQtElJ
+         KCZCeLlAXwksxA+gx6NsKSaZmOu6OXbRo3OPYB49THdack0bw2gUNqq4qZuf55tMTmik
+         6uod1Z6ORcBQH1AzjNOtbSGDU++IrktaP5MVdC1d6zPqe2JrSH7Yu3OUfuf0lwE8Bd6T
+         EeTfA74Hq0kUe98ZIq6Od7ZcrQcNShjyTaxcDye+MLHUwLrm84SWeCbEwsqIsMRnPleq
+         jFGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773074059; x=1773678859;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=oy9DX0trpu0pCizzkFBsWPboHR1XBmQKIKlmRUfC4lQ=;
+        b=e0jP6M5GhYyig47j03vJKJMq8HFSVehcXTYwyc3F365XFPjMaRuzvFOBYjMyAK9J8I
+         r1eJJvAX+WSJmleYO+Xde1DEf7rgexz8A4KysMXNA37dGVtkc/W0cDGoqxpHQZAS4wS2
+         7ZuwEIvSWnxGmWA1Bcexz4K9FOgR7C16blNBPZdFsL7Z8vcUN6cCB2/q5qsHLvl9sRjc
+         iRQpe1RVxaPusPSgQgtqwXoq6eKOo2Hrp9P01A0PihQR2cRDZVhknoi+7jN4RlRtWr/O
+         hg8alyvoosIAnKaAbS2PGrrzIV5lGL3xHLB0dUk+5PQMyuwkNf7b4FFIOs7Fuh71jhXg
+         8crA==
+X-Forwarded-Encrypted: i=1; AJvYcCXuguILQKhIvMZBE9PLVTqPbGb+Qj4H5DuwCQRTRXSn2dltvKY4dl0B5h8MYF6DRXIu8iQgHbz0+Mul@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDga8/DwY1pZJQz2h2NB3VvuL98cn1aHbWXl5tjZnHFpO4udXd
+	6zxS7I1/47wyNTEOIoibIUp9Cd3lQxtfFwyh82f1h20QnTnvFzCjibT9z9eIA5LjX5DQ5bgai3I
+	/V3ookZBavRqNN+0ysSzRqD4bJpev+EI=
+X-Gm-Gg: ATEYQzy5mgFL+fRzK1YkQ11CYaBYvKW5i1DkZ4mr88ioc2vOJCSq8TDWPR+97+8kV3r
+	Tbp0RZIvPqf/iEWl/apzlIoRROx1eA1CRpDUkWmyTFdvXrnO6EwZi3g+hLkJqzZFJcyJ/6wyVSL
+	6B4+d1wf5p44NWAGqjvKOx/z0aChAAX9jowPykjKQQzH3bz4sHTm1VEN073n1c0A2c05AP9hOzW
+	ci4wNccag9TXI6aCyXmUqns0PcPnHIV1jF63CfwU2AMp8b0PMMncGXlvLUbe0x+1+dtfCSP8Ywe
+	Q5cczA==
+X-Received: by 2002:a05:6402:358a:b0:660:f98d:228a with SMTP id
+ 4fb4d7f45d1cf-6619d5429a0mr5597450a12.24.1773074059331; Mon, 09 Mar 2026
+ 09:34:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] cifs: implementation id context as negotiate context
-To: nspmangalore@gmail.com, linux-cifs@vger.kernel.org, smfrench@gmail.com,
- pc@manguebit.com, bharathsm@microsoft.com, dhowells@redhat.com
-Cc: Shyam Prasad N <sprasad@microsoft.com>
 References: <20260304122910.1612435-1-sprasad@microsoft.com>
-From: Ralph Boehme <slow@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- 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
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <20260304122910.1612435-1-sprasad@microsoft.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------EZ0zhFsZ7IfaIg0adg5pFM0A"
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------EZ0zhFsZ7IfaIg0adg5pFM0A
-Content-Type: multipart/mixed; boundary="------------lY9mgN97efrR0nDr4eYIUgiB";
- protected-headers="v1"
-From: Ralph Boehme <slow@samba.org>
-To: nspmangalore@gmail.com, linux-cifs@vger.kernel.org, smfrench@gmail.com,
- pc@manguebit.com, bharathsm@microsoft.com, dhowells@redhat.com
-Cc: Shyam Prasad N <sprasad@microsoft.com>
-Message-ID: <aea738fc-e422-4671-9e0a-429988fe026a@samba.org>
+ <CANT5p=rk44fGgUL_Swp1pbVUeE80GJS4hxF00U0X4_xUbb-7hw@mail.gmail.com>
+ <4rrxsl6mx3lbpt32l4ly6psg3ni5nsfzgfiufzt4xecsbjh22o@z272atyrzzvh>
+ <CAH2r5mt4mDP+o4FWcJLhiXxcnjou7jxzPzUv1RqvmJxb=OSh6A@mail.gmail.com> <9ef8fa889e302e58846ca6d33957077f@manguebit.org>
+In-Reply-To: <9ef8fa889e302e58846ca6d33957077f@manguebit.org>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Mon, 9 Mar 2026 22:04:08 +0530
+X-Gm-Features: AaiRm51PK3LwydRfCJATxh2mUKD-V3fpJf2RbBCwI3PUSPYwh-Ui9uAKbF2q1Gs
+Message-ID: <CANT5p=rD_-Qxz+MgThps5D4icDsZhZ7Es3jr3FgdQuuxbmA5Bg@mail.gmail.com>
 Subject: Re: [PATCH] cifs: implementation id context as negotiate context
-References: <20260304122910.1612435-1-sprasad@microsoft.com>
-In-Reply-To: <20260304122910.1612435-1-sprasad@microsoft.com>
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: Steve French <smfrench@gmail.com>, Henrique Carvalho <henrique.carvalho@suse.com>, 
+	linux-cifs@vger.kernel.org, bharathsm@microsoft.com, dhowells@redhat.com, 
+	Shyam Prasad N <sprasad@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---------------lY9mgN97efrR0nDr4eYIUgiB
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+On Sat, Mar 7, 2026 at 4:49=E2=80=AFAM Paulo Alcantara <pc@manguebit.org> w=
+rote:
+>
+> Steve French <smfrench@gmail.com> writes:
+>
+> > On Fri, Mar 6, 2026 at 4:45=E2=80=AFPM Henrique Carvalho
+> > <henrique.carvalho@suse.com> wrote:
+> >>
+> >> On Wed, Mar 04, 2026 at 06:04:05PM +0530, Shyam Prasad N wrote: > On W=
+ed, Mar 4, 2026 at 5:59=E2=80=AFPM <nspmangalore@gmail.com> wrote: From: Sh=
+yam Prasad N <sprasad@microsoft.com>
+> >> >
+> >> > A proof-of-concept based on this draft from Bharath.
+> >> > Looking for comments on how to improve.
+> >>
+> >> Looks good.
+> >>
+> >> Just one minor thing for now. To me the cifs.ko module version doesn't
+> >> say much as it seems to be not reliable (apologies if I'm mistaken).
+> >
+> > It does get incremented every 10 weeks.
+> >
+> >> Also, the same version could have different implementations in differe=
+nt
+> >> distributions. modinfo -F srcversion cifs is a better way to
+> >> differentiate cifs versions but not to compare versions. So the soluti=
+on
+> >> is either remove this or bump it in every change using X.Y.Z.
+> >
+> > We do bump the module version every kernel release, e.g. we are at
+> > 2.59 in Linux 7.0 (7.0-rc2)
+> > Would bump it when someone does a 'full backport' of most cifs fixes
+> > to an earlier kernel.
+>
+> Who?
+>
+> >> Further, have you thought about how the client can use this in its fav=
+or
+> >> other than diagnosing/debugging a faulty server?
+> >
+> > I thought this was for the reverse - so the server support team can
+> > get metrics on whether the client is an old client with known bugs
+>
+> The client version is entirely pointless, especially for distribution
+> kernels.  The support team can't figure out by just looking at the
+> client version as the backports are what really matter in terms of a
+> distro kernel.  Most distro kernels don't even bother backporting those
+> commits that bump the client version, which makes it even more
+> inaccurate.
+>
+> >> I think we need to be clear on what is allowed here, to me it seems
+> >> quirks, workarounds and perf tuning? Maybe this can be used to improve
+> >> interaction between linux client and linux server?
+> >
+> > presumably primarily for customer support to be able to recognise
+> > known client problems on clients accessing a server
+>
+> Neither the client or kernel version will tell you _exactly_ where the
+> problem is in distro kernels.
 
-SGkhDQoNCkkgd29uZGVyIHdoaWNoIHNlcnZlcnMgYXJlIGV4cGVjdGVkIHRvIGJlIGltcGxl
-bWVudGluZyB0aGlzPyBJIHN1cHBvc2UgDQp0aGlzIHByb3RvY29sIGV4dGVuc2lvbiBpcyBu
-b3QgcHJvcG9zZWQgd2l0aG91dCBhIHNlcnZlciB2ZW5kb3IgDQppbnRlcmVzdGVkIGluIGFj
-dHVhbGx5IGltcGxlbWVudGluZyBpdCwgb3RoZXJ3aXNlIHRoZSB3aG9sZSBtZXRyaWNzIA0K
-c3RvcnkgZG9lc24ndCBtYWtlIHNlbnNlLg0KDQoqc2NyYXRjaGVzIGhlYWQqDQoNClRoYW5r
-cyENCi1zbG93DQoNCk9uIDMvNC8yNiAxOjI3IFBNLCBuc3BtYW5nYWxvcmVAZ21haWwuY29t
-IHdyb3RlOg0KPiBGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
-Pg0KPiANCj4gTVMtU01CMiBkb2VzIG5vdCBhbGxvdyBhbnkgZmllbGRzIGZvciB0aGUgY2xp
-ZW50IHRvIGNvbW11bmljYXRlDQo+IHRoZSBjbGllbnQgdmVyc2lvbiBkZXRhaWxzIHRvIHRo
-ZSBzZXJ2ZXIuIFRoaXMgY2hhbmdlIGlzIGENCj4gcHJvb2Ytb2YtY29uY2VwdCB0byBhZGQg
-Y2xpZW50IGRldGFpbHMgaW4gYSBuZXcgbmVnb3RpYXRlIGNvbnRleHQuDQo+IA0KPiBTaWdu
-ZWQtb2ZmLWJ5OiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29tPg0KPiAt
-LS0NCj4gICBmcy9zbWIvY2xpZW50L3NtYjJwZHUuYyB8IDc4ICsrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAgZnMvc21iL2NvbW1vbi9zbWIycGR1Lmgg
-fCAzMiArKysrKysrKysrKysrKysrKw0KPiAgIDIgZmlsZXMgY2hhbmdlZCwgMTEwIGluc2Vy
-dGlvbnMoKykNCj4gDQo+IGRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L3NtYjJwZHUuYyBi
-L2ZzL3NtYi9jbGllbnQvc21iMnBkdS5jDQo+IGluZGV4IGVmNjU1YWNmNjczZGYuLjljODlm
-NmI0YTY3MDkgMTAwNjQ0DQo+IC0tLSBhL2ZzL3NtYi9jbGllbnQvc21iMnBkdS5jDQo+ICsr
-KyBiL2ZzL3NtYi9jbGllbnQvc21iMnBkdS5jDQo+IEBAIC0yNCw2ICsyNCw3IEBADQo+ICAg
-I2luY2x1ZGUgPGxpbnV4L3BhZ2VtYXAuaD4NCj4gICAjaW5jbHVkZSA8bGludXgveGF0dHIu
-aD4NCj4gICAjaW5jbHVkZSA8bGludXgvbmV0ZnMuaD4NCj4gKyNpbmNsdWRlIDxsaW51eC91
-dHNuYW1lLmg+DQo+ICAgI2luY2x1ZGUgPHRyYWNlL2V2ZW50cy9uZXRmcy5oPg0KPiAgICNp
-bmNsdWRlICJjaWZzZ2xvYi5oIg0KPiAgICNpbmNsdWRlICJjaWZzcHJvdG8uaCINCj4gQEAg
-LTQ1LDYgKzQ2LDcgQEANCj4gICAjaW5jbHVkZSAiY2FjaGVkX2Rpci5oIg0KPiAgICNpbmNs
-dWRlICJjb21wcmVzcy5oIg0KPiAgICNpbmNsdWRlICJmc19jb250ZXh0LmgiDQo+ICsjaW5j
-bHVkZSAiY2lmc2ZzLmgiDQo+ICAgDQo+ICAgLyoNCj4gICAgKiAgVGhlIGZvbGxvd2luZyB0
-YWJsZSBkZWZpbmVzIHRoZSBleHBlY3RlZCAiU3RydWN0dXJlU2l6ZSIgb2YgU01CMiByZXF1
-ZXN0cw0KPiBAQCAtNzI0LDYgKzcyNiw3NSBAQCBidWlsZF9wb3NpeF9jdHh0KHN0cnVjdCBz
-bWIyX3Bvc2l4X25lZ19jb250ZXh0ICpwbmVnX2N0eHQpDQo+ICAgCXBuZWdfY3R4dC0+TmFt
-ZVsxNV0gPSAweDdDOw0KPiAgIH0NCj4gICANCj4gK3N0YXRpYyB1bnNpZ25lZCBpbnQNCj4g
-K2J1aWxkX2ltcGxlbWVudGF0aW9uX2lkX2N0eHQoc3RydWN0IHNtYjJfaW1wbGVtZW50YXRp
-b25faWRfY29udGV4dCAqcG5lZ19jdHh0KQ0KPiArew0KPiArCXN0cnVjdCBubHNfdGFibGUg
-KmNwID0gbG9hZF9ubHNfZGVmYXVsdCgpOw0KPiArCXN0cnVjdCBuZXdfdXRzbmFtZSAqdXRz
-ID0gdXRzbmFtZSgpOw0KPiArCWNvbnN0IGNoYXIgKmltcGxfZG9tYWluID0gImtlcm5lbC5v
-cmciOw0KPiArCWNvbnN0IGNoYXIgKmltcGxfbmFtZSA9ICJmcy9zbWIvY2xpZW50IjsNCj4g
-Kwljb25zdCBjaGFyICpvc19uYW1lID0gIkxpbnV4IjsNCj4gKwl1bnNpZ25lZCBpbnQgZGF0
-YV9sZW4gPSAwOw0KPiArCV9fdTggKmRhdGFfcHRyOw0KPiArCWludCBsZW47DQo+ICsNCj4g
-KwlwbmVnX2N0eHQtPkNvbnRleHRUeXBlID0gU01CMl9JTVBMRU1FTlRBVElPTl9JRF9DT05U
-RVhUX0lEOw0KPiArCWRhdGFfcHRyID0gcG5lZ19jdHh0LT5EYXRhOw0KPiArDQo+ICsJLyog
-SW1wbERvbWFpbiAqLw0KPiArCWxlbiA9IGNpZnNfc3RydG9VVEYxNigoX19sZTE2ICopZGF0
-YV9wdHIsIGltcGxfZG9tYWluLA0KPiArCQkJICAgICAgU01CMl9JTVBMX0lEX01BWF9ET01B
-SU5fTEVOLCBjcCk7DQo+ICsJcG5lZ19jdHh0LT5JbXBsRG9tYWluTGVuZ3RoID0gY3B1X3Rv
-X2xlMTYobGVuICogMik7DQo+ICsJZGF0YV9wdHIgKz0gbGVuICogMjsNCj4gKwlkYXRhX2xl
-biArPSBsZW4gKiAyOw0KPiArDQo+ICsJLyogSW1wbE5hbWUgKi8NCj4gKwlsZW4gPSBjaWZz
-X3N0cnRvVVRGMTYoKF9fbGUxNiAqKWRhdGFfcHRyLCBpbXBsX25hbWUsDQo+ICsJCQkgICAg
-ICBTTUIyX0lNUExfSURfTUFYX05BTUVfTEVOLCBjcCk7DQo+ICsJcG5lZ19jdHh0LT5JbXBs
-TmFtZUxlbmd0aCA9IGNwdV90b19sZTE2KGxlbiAqIDIpOw0KPiArCWRhdGFfcHRyICs9IGxl
-biAqIDI7DQo+ICsJZGF0YV9sZW4gKz0gbGVuICogMjsNCj4gKw0KPiArCS8qIEltcGxWZXJz
-aW9uIC0gQ0lGU19WRVJTSU9OIGZyb20gY2lmc2ZzLmggKi8NCj4gKwlsZW4gPSBjaWZzX3N0
-cnRvVVRGMTYoKF9fbGUxNiAqKWRhdGFfcHRyLCBDSUZTX1ZFUlNJT04sDQo+ICsJCQkgICAg
-ICBTTUIyX0lNUExfSURfTUFYX1ZFUlNJT05fTEVOLCBjcCk7DQo+ICsJcG5lZ19jdHh0LT5J
-bXBsVmVyc2lvbkxlbmd0aCA9IGNwdV90b19sZTE2KGxlbiAqIDIpOw0KPiArCWRhdGFfcHRy
-ICs9IGxlbiAqIDI7DQo+ICsJZGF0YV9sZW4gKz0gbGVuICogMjsNCj4gKw0KPiArCS8qIEhv
-c3ROYW1lIC0gZnJvbSB1dHNuYW1lKCktPm5vZGVuYW1lICovDQo+ICsJbGVuID0gY2lmc19z
-dHJ0b1VURjE2KChfX2xlMTYgKilkYXRhX3B0ciwgdXRzLT5ub2RlbmFtZSwNCj4gKwkJCSAg
-ICAgIFNNQjJfSU1QTF9JRF9NQVhfSE9TVE5BTUVfTEVOLCBjcCk7DQo+ICsJcG5lZ19jdHh0
-LT5Ib3N0TmFtZUxlbmd0aCA9IGNwdV90b19sZTE2KGxlbiAqIDIpOw0KPiArCWRhdGFfcHRy
-ICs9IGxlbiAqIDI7DQo+ICsJZGF0YV9sZW4gKz0gbGVuICogMjsNCj4gKw0KPiArCS8qIE9T
-TmFtZSAqLw0KPiArCWxlbiA9IGNpZnNfc3RydG9VVEYxNigoX19sZTE2ICopZGF0YV9wdHIs
-IG9zX25hbWUsDQo+ICsJCQkgICAgICBTTUIyX0lNUExfSURfTUFYX09TX05BTUVfTEVOLCBj
-cCk7DQo+ICsJcG5lZ19jdHh0LT5PU05hbWVMZW5ndGggPSBjcHVfdG9fbGUxNihsZW4gKiAy
-KTsNCj4gKwlkYXRhX3B0ciArPSBsZW4gKiAyOw0KPiArCWRhdGFfbGVuICs9IGxlbiAqIDI7
-DQo+ICsNCj4gKwkvKiBPU1ZlcnNpb24gLSBmcm9tIHV0c25hbWUoKS0+cmVsZWFzZSAqLw0K
-PiArCWxlbiA9IGNpZnNfc3RydG9VVEYxNigoX19sZTE2ICopZGF0YV9wdHIsIHV0cy0+cmVs
-ZWFzZSwNCj4gKwkJCSAgICAgIFNNQjJfSU1QTF9JRF9NQVhfT1NfVkVSU0lPTl9MRU4sIGNw
-KTsNCj4gKwlwbmVnX2N0eHQtPk9TVmVyc2lvbkxlbmd0aCA9IGNwdV90b19sZTE2KGxlbiAq
-IDIpOw0KPiArCWRhdGFfcHRyICs9IGxlbiAqIDI7DQo+ICsJZGF0YV9sZW4gKz0gbGVuICog
-MjsNCj4gKw0KPiArCS8qIEFyY2ggLSBmcm9tIHV0c25hbWUoKS0+bWFjaGluZSAqLw0KPiAr
-CWxlbiA9IGNpZnNfc3RydG9VVEYxNigoX19sZTE2ICopZGF0YV9wdHIsIHV0cy0+bWFjaGlu
-ZSwNCj4gKwkJCSAgICAgIFNNQjJfSU1QTF9JRF9NQVhfQVJDSF9MRU4sIGNwKTsNCj4gKwlw
-bmVnX2N0eHQtPkFyY2hMZW5ndGggPSBjcHVfdG9fbGUxNihsZW4gKiAyKTsNCj4gKwlkYXRh
-X2xlbiArPSBsZW4gKiAyOw0KPiArDQo+ICsJcG5lZ19jdHh0LT5SZXNlcnZlZDIgPSAwOw0K
-PiArCXBuZWdfY3R4dC0+RGF0YUxlbmd0aCA9IGNwdV90b19sZTE2KGRhdGFfbGVuICsgMTQp
-OyAvKiAxNCA9IDcgbGVuZ3RoIGZpZWxkcyAqIDIgYnl0ZXMgKi8NCj4gKwkvKiBDb250ZXh0
-IHNpemUgaXMgRGF0YUxlbmd0aCArIG1pbmltYWwgc21iMl9uZWdfY29udGV4dCwgYWxpZ25l
-ZCB0byA4ICovDQo+ICsJcmV0dXJuIEFMSUdOKGxlMTZfdG9fY3B1KHBuZWdfY3R4dC0+RGF0
-YUxlbmd0aCkgKyBzaXplb2Yoc3RydWN0IHNtYjJfbmVnX2NvbnRleHQpLCA4KTsNCj4gK30N
-Cj4gKw0KPiAgIHN0YXRpYyB2b2lkDQo+ICAgYXNzZW1ibGVfbmVnX2NvbnRleHRzKHN0cnVj
-dCBzbWIyX25lZ290aWF0ZV9yZXEgKnJlcSwNCj4gICAJCSAgICAgIHN0cnVjdCBUQ1BfU2Vy
-dmVyX0luZm8gKnNlcnZlciwgdW5zaWduZWQgaW50ICp0b3RhbF9sZW4pDQo+IEBAIC03OTcs
-NiArODY4LDEzIEBAIGFzc2VtYmxlX25lZ19jb250ZXh0cyhzdHJ1Y3Qgc21iMl9uZWdvdGlh
-dGVfcmVxICpyZXEsDQo+ICAgCQluZWdfY29udGV4dF9jb3VudCsrOw0KPiAgIAl9DQo+ICAg
-DQo+ICsJLyogQWRkIGltcGxlbWVudGF0aW9uIElEIGNvbnRleHQgKi8NCj4gKwljdHh0X2xl
-biA9IGJ1aWxkX2ltcGxlbWVudGF0aW9uX2lkX2N0eHQoKHN0cnVjdCBzbWIyX2ltcGxlbWVu
-dGF0aW9uX2lkX2NvbnRleHQgKikNCj4gKwkJCQlwbmVnX2N0eHQpOw0KPiArCSp0b3RhbF9s
-ZW4gKz0gY3R4dF9sZW47DQo+ICsJcG5lZ19jdHh0ICs9IGN0eHRfbGVuOw0KPiArCW5lZ19j
-b250ZXh0X2NvdW50Kys7DQo+ICsNCj4gICAJLyogY2hlY2sgZm9yIGFuZCBhZGQgdHJhbnNw
-b3J0X2NhcGFiaWxpdGllcyBhbmQgc2lnbmluZyBjYXBhYmlsaXRpZXMgKi8NCj4gICAJcmVx
-LT5OZWdvdGlhdGVDb250ZXh0Q291bnQgPSBjcHVfdG9fbGUxNihuZWdfY29udGV4dF9jb3Vu
-dCk7DQo+ICAgDQo+IGRpZmYgLS1naXQgYS9mcy9zbWIvY29tbW9uL3NtYjJwZHUuaCBiL2Zz
-L3NtYi9jb21tb24vc21iMnBkdS5oDQo+IGluZGV4IGU0ODJjODZjZWIwMGQuLjFhZDdiNTdj
-ZTI5NTIgMTAwNjQ0DQo+IC0tLSBhL2ZzL3NtYi9jb21tb24vc21iMnBkdS5oDQo+ICsrKyBi
-L2ZzL3NtYi9jb21tb24vc21iMnBkdS5oDQo+IEBAIC00NTcsNiArNDU3LDcgQEAgc3RydWN0
-IHNtYjJfdHJlZV9kaXNjb25uZWN0X3JzcCB7DQo+ICAgI2RlZmluZSBTTUIyX1RSQU5TUE9S
-VF9DQVBBQklMSVRJRVMJCWNwdV90b19sZTE2KDYpDQo+ICAgI2RlZmluZSBTTUIyX1JETUFf
-VFJBTlNGT1JNX0NBUEFCSUxJVElFUwljcHVfdG9fbGUxNig3KQ0KPiAgICNkZWZpbmUgU01C
-Ml9TSUdOSU5HX0NBUEFCSUxJVElFUwkJY3B1X3RvX2xlMTYoOCkNCj4gKyNkZWZpbmUgU01C
-Ml9JTVBMRU1FTlRBVElPTl9JRF9DT05URVhUX0lECWNwdV90b19sZTE2KDB4RjEwMCkNCj4g
-ICAjZGVmaW5lIFNNQjJfUE9TSVhfRVhURU5TSU9OU19BVkFJTEFCTEUJCWNwdV90b19sZTE2
-KDB4MTAwKQ0KPiAgIA0KPiAgIHN0cnVjdCBzbWIyX25lZ19jb250ZXh0IHsNCj4gQEAgLTU5
-Niw2ICs1OTcsMzcgQEAgc3RydWN0IHNtYjJfc2lnbmluZ19jYXBhYmlsaXRpZXMgew0KPiAg
-IAkvKiAgRm9sbG93ZWQgYnkgcGFkZGluZyB0byA4IGJ5dGUgYm91bmRhcnkgKHJlcXVpcmVk
-IGJ5IHNvbWUgc2VydmVycykgKi8NCj4gICB9IF9fcGFja2VkOw0KPiAgIA0KPiArLyoNCj4g
-KyAqIEZvciBpbXBsZW1lbnRhdGlvbiBJRCBjb250ZXh0IHNlZSBNUy1TTUIyIDIuMi4zLjEu
-OA0KPiArICogTWF4aW11bSBzdHJpbmcgbGVuZ3RocyBwZXIgc3BlY2lmaWNhdGlvbg0KPiAr
-ICovDQo+ICsjZGVmaW5lIFNNQjJfSU1QTF9JRF9NQVhfRE9NQUlOX0xFTgkxMjgNCj4gKyNk
-ZWZpbmUgU01CMl9JTVBMX0lEX01BWF9OQU1FX0xFTgkyNjANCj4gKyNkZWZpbmUgU01CMl9J
-TVBMX0lEX01BWF9WRVJTSU9OX0xFTgkyNjANCj4gKyNkZWZpbmUgU01CMl9JTVBMX0lEX01B
-WF9IT1NUTkFNRV9MRU4JNjQNCj4gKyNkZWZpbmUgU01CMl9JTVBMX0lEX01BWF9PU19OQU1F
-X0xFTgk2NA0KPiArI2RlZmluZSBTTUIyX0lNUExfSURfTUFYX09TX1ZFUlNJT05fTEVOCTY0
-DQo+ICsjZGVmaW5lIFNNQjJfSU1QTF9JRF9NQVhfQVJDSF9MRU4JNjQNCj4gKw0KPiArc3Ry
-dWN0IHNtYjJfaW1wbGVtZW50YXRpb25faWRfY29udGV4dCB7DQo+ICsJX19sZTE2CUNvbnRl
-eHRUeXBlOyAvKiA5ICovDQo+ICsJX19sZTE2CURhdGFMZW5ndGg7DQo+ICsJX19sZTMyCVJl
-c2VydmVkOw0KPiArCV9fbGUxNglJbXBsRG9tYWluTGVuZ3RoOw0KPiArCV9fbGUxNglJbXBs
-TmFtZUxlbmd0aDsNCj4gKwlfX2xlMTYJSW1wbFZlcnNpb25MZW5ndGg7DQo+ICsJX19sZTE2
-CUhvc3ROYW1lTGVuZ3RoOw0KPiArCV9fbGUxNglPU05hbWVMZW5ndGg7DQo+ICsJX19sZTE2
-CU9TVmVyc2lvbkxlbmd0aDsNCj4gKwlfX2xlMTYJQXJjaExlbmd0aDsNCj4gKwlfX2xlMTYJ
-UmVzZXJ2ZWQyOw0KPiArCS8qIEZvbGxvd2VkIGJ5IHZhcmlhYmxlIGxlbmd0aCBVVEYtMTYg
-c3RyaW5nczoNCj4gKwkgKiBJbXBsRG9tYWluLCBJbXBsTmFtZSwgSW1wbFZlcnNpb24sIEhv
-c3ROYW1lLA0KPiArCSAqIE9TTmFtZSwgT1NWZXJzaW9uLCBBcmNoDQo+ICsJICovDQo+ICsJ
-X191OAlEYXRhW107DQo+ICt9IF9fcGFja2VkOw0KPiArDQo+ICAgI2RlZmluZSBQT1NJWF9D
-VFhUX0RBVEFfTEVOCTE2DQo+ICAgc3RydWN0IHNtYjJfcG9zaXhfbmVnX2NvbnRleHQgew0K
-PiAgIAlfX2xlMTYJQ29udGV4dFR5cGU7IC8qIDB4MTAwICovDQoNCg==
+Hi Paulo / Henrique,
 
---------------lY9mgN97efrR0nDr4eYIUgiB--
+Good points.
+srcversion is probably something that can be unique for a specific
+version. But is there a common place where srcversion values are
+documented by distros today?
+If that is the case, perhaps that with the combination of the kernel
+version can tell us what cifs.ko the client machine is actually
+running.
 
---------------EZ0zhFsZ7IfaIg0adg5pFM0A
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmmu8wQFAwAAAAAACgkQqh6bcSY5nkbt
-mxAAt/qrhzbMG+Fc/c3ApbZBr/UQPvs4QUTKRajMu2ZtRd2h63R2phc7wA702GnAMYPo20LeStUA
-0GlNkbMVkLt9V9vRBB9K11ekMOuilTNx+nBwzPCmvdyXRkO7GZ+P5VGqO6Zwgl8XyZbPGemeFrmu
-y430N99BPfFNER84K/j/o8M/tA2jumop+D9yX8/sq5yoNn7VZnOCXKNT39ye65bH2jBzEUd+fTFW
-A0+v13gm7p6iq6yAgUuzFyj+uC9DU2Ot/Gf6MXuVZy9mSitjj1u/wlz2dw2DMNMWySjU8iKd9Ocj
-JynW35xWWrZNYvVTJDVD/zPqnOQrC5sjiDaMDwvgKmL2rCopnQqxyiuIfKw4bsnQxXeEmqJcXY+N
-W7mwisXn+B6Xgnj7BkiwOQCS3ab+G9rWNunGr6MURsE5uWrq9o0pFvu2ZZVQsh5sKnHSu8DVES8N
-GrOWlLpnE/lu/v3i+mwR9AA/BWJ5oAcs/4WXFkw5crueoCYVaHCqa1ukPuWY45ikP875CyU/XT8C
-rpxXwGCPrwS9nDnnofDAP0FiyFC9WgpRF50up5jPASd7ORFbNzq3vCbfP1UwLTCuN/3wJWyrk0PR
-iVIE3k4FdNDIjFVEXedPTZ+D29xxxzXrrpYuuyMzp2eA6BF/paBkCANjVebeiulpN91Spn/UsoHI
-LDg=
-=cmpX
------END PGP SIGNATURE-----
-
---------------EZ0zhFsZ7IfaIg0adg5pFM0A--
+--=20
+Regards,
+Shyam
