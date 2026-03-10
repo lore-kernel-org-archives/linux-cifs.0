@@ -1,38 +1,39 @@
 Received: from mail.avm.de (mail.avm.de [212.42.244.119])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28A844E051;
-	Tue, 10 Mar 2026 11:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C483421F15;
+	Tue, 10 Mar 2026 11:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773143746; cv=none; b=WWyvpeMFJ75BqE4zA4lN3+G6TCUzpi2YY2jdV72ueoNIzcCrMyAr9kvDosEGy9oWM/fTn5y/DgWgJXQEZr4JzAg4mdtJ3NYZviObIGvMfMwm+1r1IWXbzIi1VXTbCFgFBpJJiSxeS9Cg/4qDmgvkqBhzwdWw9ntStR5upyk0suM=
+	t=1773143739; cv=none; b=Sza9niqVn4HVD//A4/PvejWjQYCNYJkTK4bkSsGnehfu9mA6VplMQq8OwkvkETq+LJ7PzJm1Y2/we3ENb6sLwi/H+ljcoMr23o7J0Ygcs6QL5qUBtQ0CyusQS5Qq1PK62ysk6rLj1odQZKSM+MXtcbml7KCP1hN/q5U5zXoswL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773143746; c=relaxed/simple;
-	bh=wq/KSwJcA3hqLetMFo3dTHFYxjONcw4I7Ih9VV1gllk=;
+	s=arc-20240116; t=1773143739; c=relaxed/simple;
+	bh=pg0bcAlKCqGzZYxxvjTHT3BjuiImw/JCztrCxw0OaYk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MahbShlBw04MyryPJxMMmcCERd081e399hJxkybzFyz4SQv2egqYOlqoRWr2YGaOv3Q+Z6AJ2z9gPyzmEVFo58mEjcPgdIJBa5EgNmSWA1dov7pBszzdyfAeGkBDPU4EAjyHrMjfSjFCZNrN1Ggw/Sdn1CGGAKlQLT/XucbrQIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=lEAp/s1F; arc=none smtp.client-ip=212.42.244.119
+	 In-Reply-To:To:Cc; b=tRPIPguhL/iCSUJczUcg/gDAF4CAAnOpGq7S4U8Hm8rG/Tox9JkOUUnseYTD2L9TgaE8u5TsgM8OAQ5EX/yUVH3Ehxln13Pq5waMJ2AHdvelz/0CsSswXVbIgsPtI+oRmGHF5vRVEhlgRbt9GZ+S/CFhbrNhdlsjyuYW5mSZkng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=bIWX9HTo; arc=none smtp.client-ip=212.42.244.119
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="lEAp/s1F"
+	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="bIWX9HTo"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
-	t=1773143723; bh=wq/KSwJcA3hqLetMFo3dTHFYxjONcw4I7Ih9VV1gllk=;
+	t=1773143723; bh=pg0bcAlKCqGzZYxxvjTHT3BjuiImw/JCztrCxw0OaYk=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=lEAp/s1FGs3gh/G3BwLm92E1HCxjGWlqxsQSbz/j1CB+Vlb/y59DpH7suq9qWHqSS
-	 sYNh9xzFzAwYyP3SKrKt2sCrYh94W00YkOJHULlnCDrzYXE+bJd6oNQ88ujEwWl/IW
-	 WDyVvJrtHTQ4L2Ennx46mVzCXGqAvMhY+uWIILEA=
-Received: from [212.42.244.71] (helo=mail.avm.de)
+	b=bIWX9HTo18B4ZE3sIquR8sbft3qzxzntZILxo7B74pgnu0rbeOHxAC7dlzZUeUKhf
+	 HyziuuxI8v1FJdI0XETgMVlTILYL71/sVzADfcPBmDn0JPtGKUshimXXHFg01f3FBK
+	 jYVNQFVbnSBvARzQ5cTWzBurkew0k16ZhIWvNTOE=
+Received: from [2001:bf0:244:244::71] (helo=mail.avm.de)
 	by mail.avm.de with ESMTP (eXpurgate 4.55.2)
 	(envelope-from <phahn-oss@avm.de>)
-	id 69b006ab-2367-7f0000032729-7f0000019cd2-1
+	id 69b006aa-2367-7f0000032729-7f0000019cb8-1
 	for <multiple-recipients>; Tue, 10 Mar 2026 12:55:23 +0100
-Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [IPv6:2001:bf0:244:244::71])
 	by mail.avm.de (Postfix) with ESMTPS;
-	Tue, 10 Mar 2026 12:55:23 +0100 (CET)
+	Tue, 10 Mar 2026 12:55:22 +0100 (CET)
 From: Philipp Hahn <phahn-oss@avm.de>
-Date: Tue, 10 Mar 2026 12:48:30 +0100
-Subject: [PATCH 04/61] ext4: Prefer IS_ERR_OR_NULL over manual NULL check
+Date: Tue, 10 Mar 2026 12:48:27 +0100
+Subject: [PATCH 01/61] Coccinelle: Prefer IS_ERR_OR_NULL over manual NULL
+ check
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -41,7 +42,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260310-b4-is_err_or_null-v1-4-bd63b656022d@avm.de>
+Message-Id: <20260310-b4-is_err_or_null-v1-1-bd63b656022d@avm.de>
 References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
 In-Reply-To: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
 To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
@@ -71,95 +72,194 @@ To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
  sched-ext@lists.linux.dev, target-devel@vger.kernel.org, 
  tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, 
  Philipp Hahn <phahn-oss@avm.de>
-Cc: Theodore Ts'o <tytso@mit.edu>, 
- Andreas Dilger <adilger.kernel@dilger.ca>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2748; i=phahn-oss@avm.de;
- h=from:subject:message-id; bh=wq/KSwJcA3hqLetMFo3dTHFYxjONcw4I7Ih9VV1gllk=;
- b=owEBbQGS/pANAwAKATQtBlPRrKzbAcsmYgBpsAXjBVZQh0oHFoS6hdf46zx6cg9yKqCoM11bV
- 3iWUec0h4iJATMEAAEKAB0WIQQ5bPBtrWDUcDQCppg0LQZT0ays2wUCabAF4wAKCRA0LQZT0ays
- 29vPB/9f5lFIt+0FtFBJpiKbUGS7UgY9T4E/E6CJ5zu/RqCe6vd531NLZdsmBEosrdFBBXDX57H
- sd8LCXF/sp89Zga6l1XIWkSIeHW4dDtT/UJNpkUGlvpmR4wd6cIocUQ2SKJZm2I5Ny799jzRqsU
- 77XwGSzBy8rHgewt3q+d77K7620aLC+ceQfquSvw5IkT7R5aPt+VaJGvb/4d0wK060SD2e3AbrD
- KG5aPg5rty9abqBDIFiMe9sH7jc7Ssmy8RQOhQUuB/vX9zXXRZULMf0v4sI8el0Gl3lDI9uBnpn
- 7EXyqizDRxBWqqlsbAFrtlRuPcNXRB2sNpMKxVhp0my3RZH1
+Cc: Julia Lawall <Julia.Lawall@inria.fr>, 
+ Nicolas Palix <nicolas.palix@imag.fr>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3942; i=phahn-oss@avm.de;
+ h=from:subject:message-id; bh=pg0bcAlKCqGzZYxxvjTHT3BjuiImw/JCztrCxw0OaYk=;
+ b=owEBbQGS/pANAwAKATQtBlPRrKzbAcsmYgBpsAXSiE/1KQSdimAccvhjPksfwMRe29ZGV0WmQ
+ dc68UTm4wOJATMEAAEKAB0WIQQ5bPBtrWDUcDQCppg0LQZT0ays2wUCabAF0gAKCRA0LQZT0ays
+ 23P4B/sHBnCDcdVo4QHtyw/PgaWkSZpnGi/FADclDF/JNscwRsXCrFWzhKgn3xZ7GBKm9yEUANd
+ kHYMMKsDVZ5Sq7xOrshFMfBSWpA+0BsCM8pKaxoj2QHBKIDA4UgN93hm4YvutplfF9/q6gdQOqR
+ x0WpQkBc7InCLdKCwpXNhcL/HWVvBtzqT2nSOrbK1Rd5xcaVOko56aV82Fnst/bFUZLKttOBTCU
+ bLU0LprdbSKp+PN7eyMO37tBs3H4QuuQgnRmZxd8L6mNXEFIpj0UqSFvKNrDWZBtTjurbiwItHZ
+ +OYdOt4ryN9C08iNZEaNQULUxcRTzE4KumgPWWtIEShH9ICc
 X-Developer-Key: i=phahn-oss@avm.de; a=openpgp;
  fpr=58AF7C2E007CDBE62C59E078F50EFDCF8AD04B1A
-X-purgate-ID: 149429::1773143723-7D482E1F-03DD7EA2/0/0
+X-purgate-ID: 149429::1773143723-D8CB5E1F-6C1339D5/0/0
 X-purgate-type: clean
-X-purgate-size: 2750
+X-purgate-size: 3944
 X-purgate-Ad: Categorized by eleven eXpurgate (R) https://www.eleven.de
 X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
 X-purgate: clean
 
-Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
-check.
+Find and convert uses of IS_ERR() plus NULL check to IS_ERR_OR_NULL().
 
-Change generated with coccinelle.
+There are several cases where `!ptr && WARN_ON[_ONCE](IS_ERR(ptr))` is
+used:
+- arch/x86/kernel/callthunks.c:215 WARN_ON_ONCE
+- drivers/clk/clk.c:4561 WARN_ON_ONCE
+- drivers/interconnect/core.c:793 WARN_ON
+- drivers/reset/core.c:718 WARN_ON
+The change is not 100% semantical equivalent as the warning will now
+also happen when the pointer is NULL.
 
-To: "Theodore Ts'o" <tytso@mit.edu>
-To: Andreas Dilger <adilger.kernel@dilger.ca>
-Cc: linux-ext4@vger.kernel.org
+To: Julia Lawall <Julia.Lawall@inria.fr>
+To: Nicolas Palix <nicolas.palix@imag.fr>
+Cc: cocci@inria.fr
 Cc: linux-kernel@vger.kernel.org
+
+---
+drivers/clocksource/mips-gic-timer.c:283 looks suspicious: ret != clk,
+but Daniel Lezcano verified it as cottect.
+
+There are some cases where the checks are part of a larger expression:
+- mm/kmemleak.c:1095
+- mm/kmemleak.c:1155
+- mm/kmemleak.c:1173
+- mm/kmemleak.c:1290
+- mm/kmemleak.c:1328
+- mm/kmemleak.c:1241
+- mm/kmemleak.c:1310
+- mm/kmemleak.c:1258
+- net/netlink/af_netlink.c:2670
+Thanks to Julia Lawall for the help to also handle them.
+
 Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
 ---
- fs/ext4/fast_commit.c | 2 +-
- fs/ext4/mballoc.c     | 2 +-
- fs/ext4/namei.c       | 2 +-
- fs/ext4/symlink.c     | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ scripts/coccinelle/api/is_err_or_null.cocci | 125 ++++++++++++++++++++++++++++
+ 1 file changed, 125 insertions(+)
 
-diff --git a/fs/ext4/fast_commit.c b/fs/ext4/fast_commit.c
-index f575751f1cae430eead31afa4f7d03ade1099d4a..bc69ac1195acb823465e735572b8a21255d485f5 100644
---- a/fs/ext4/fast_commit.c
-+++ b/fs/ext4/fast_commit.c
-@@ -320,7 +320,7 @@ void ext4_fc_mark_ineligible(struct super_block *sb, int reason, handle_t *handl
- 	if (ext4_fc_disabled(sb))
- 		return;
- 
--	if (handle && !IS_ERR(handle))
-+	if (!IS_ERR_OR_NULL(handle))
- 		tid = handle->h_transaction->t_tid;
- 	else {
- 		read_lock(&sbi->s_journal->j_state_lock);
-diff --git a/fs/ext4/mballoc.c b/fs/ext4/mballoc.c
-index 20e9fdaf4301b61c9d54401ed95067db6b6b8173..d7f004817c1ff758e4e25f84b2c27238b7420f84 100644
---- a/fs/ext4/mballoc.c
-+++ b/fs/ext4/mballoc.c
-@@ -2870,7 +2870,7 @@ ext4_group_t ext4_mb_prefetch(struct super_block *sb, ext4_group_t group,
- 		    EXT4_MB_GRP_NEED_INIT(grp) &&
- 		    ext4_free_group_clusters(sb, gdp) > 0 ) {
- 			bh = ext4_read_block_bitmap_nowait(sb, group, true);
--			if (bh && !IS_ERR(bh)) {
-+			if (!IS_ERR_OR_NULL(bh)) {
- 				if (!buffer_uptodate(bh) && cnt)
- 					(*cnt)++;
- 				brelse(bh);
-diff --git a/fs/ext4/namei.c b/fs/ext4/namei.c
-index c4b5e252af0efbfcbaf83688a32d445327a74a02..4fdfc81f79028a588b3c1f912bff5e8a52cd9f13 100644
---- a/fs/ext4/namei.c
-+++ b/fs/ext4/namei.c
-@@ -723,7 +723,7 @@ struct stats dx_show_entries(struct dx_hash_info *hinfo, struct inode *dir,
- 		struct stats stats;
- 		printk("%s%3u:%03u hash %8x/%8x ",levels?"":"   ", i, block, hash, range);
- 		bh = ext4_bread(NULL,dir, block, 0);
--		if (!bh || IS_ERR(bh))
-+		if (IS_ERR_OR_NULL(bh))
- 			continue;
- 		stats = levels?
- 		   dx_show_entries(hinfo, dir, ((struct dx_node *) bh->b_data)->entries, levels - 1):
-diff --git a/fs/ext4/symlink.c b/fs/ext4/symlink.c
-index 645240cc0229fe4a2eda4499ae4a834fe3bd3a66..b612262719ede35d2612c5834d2bef7f18215516 100644
---- a/fs/ext4/symlink.c
-+++ b/fs/ext4/symlink.c
-@@ -92,7 +92,7 @@ static const char *ext4_get_link(struct dentry *dentry, struct inode *inode,
- 
- 	if (!dentry) {
- 		bh = ext4_getblk(NULL, inode, 0, EXT4_GET_BLOCKS_CACHED_NOWAIT);
--		if (IS_ERR(bh) || !bh)
-+		if (IS_ERR_OR_NULL(bh))
- 			return ERR_PTR(-ECHILD);
- 		if (!ext4_buffer_uptodate(bh)) {
- 			brelse(bh);
+diff --git a/scripts/coccinelle/api/is_err_or_null.cocci b/scripts/coccinelle/api/is_err_or_null.cocci
+new file mode 100644
+index 0000000000000000000000000000000000000000..7a430eadccd9f9f28b1711d67dd87a817a45bd52
+--- /dev/null
++++ b/scripts/coccinelle/api/is_err_or_null.cocci
+@@ -0,0 +1,125 @@
++// SPDX-License-Identifier: GPL-2.0-only
++///
++/// Use IF_ERR_OR_NULL() instead of IS_ERR() plus a check for (not) NULL
++///
++// Copyright: (C) 2026 Philipp Hahn, FRITZ! Technology GmbH.
++// Confidence: High
++// Options: --no-includes --include-headers
++// Keywords: IS_ERR, IS_ERR_OR_NULL
++
++virtual patch
++virtual report
++virtual org
++
++@p1 depends on patch@
++expression E;
++@@
++(
++-	E != NULL && !IS_ERR(E)
+++	!IS_ERR_OR_NULL(E)
++|
++-	E == NULL || IS_ERR(E)
+++	IS_ERR_OR_NULL(E)
++|
++-	!IS_ERR(E) && E != NULL
+++	!IS_ERR_OR_NULL(E)
++|
++-	IS_ERR(E) || E == NULL
+++	IS_ERR_OR_NULL(E)
++)
++
++@p2 depends on patch@
++expression E;
++@@
++(
++-	E == NULL || WARN_ON(IS_ERR(E))
+++	WARN_ON(IS_ERR_OR_NULL(E))
++|
++-	E == NULL || WARN_ON_ONCE(IS_ERR(E))
+++	WARN_ON_ONCE(IS_ERR_OR_NULL(E))
++)
++
++@p3 depends on patch@
++expression E,e1;
++@@
++(
++-	e1 && E != NULL && !IS_ERR(E)
+++	e1 && !IS_ERR_OR_NULL(E)
++|
++-	e1 || E == NULL || IS_ERR(E)
+++	e1 || IS_ERR_OR_NULL(E)
++|
++-	e1 && !IS_ERR(E) && E != NULL
+++	e1 && !IS_ERR_OR_NULL(E)
++|
++-	e1 || IS_ERR(E) || E == NULL
+++	e1 || IS_ERR_OR_NULL(E)
++)
++
++@r1 depends on report || org@
++expression E;
++position p;
++@@
++(
++ 	E != NULL && ... && !IS_ERR@p(E)
++|
++ 	E == NULL || ... || IS_ERR@p(E)
++|
++ 	!IS_ERR@p(E) && ... && E != NULL
++|
++ 	IS_ERR@p(E) || ... || E == NULL
++)
++
++@script:python depends on report@
++p << r1.p;
++@@
++coccilib.report.print_report(p[0], "opportunity for IS_ERR_OR_NULL()")
++
++@script:python depends on org@
++p << r1.p;
++@@
++coccilib.org.print_todo(p[0], "opportunity for IS_ERR_OR_NULL()")
++
++@p4 depends on patch@
++identifier I;
++expression E;
++@@
++(
++-	(I = E) != NULL && !IS_ERR(I)
+++	!IS_ERR_OR_NULL((I = E))
++|
++-	(I = E) == NULL || IS_ERR(I)
+++	IS_ERR_OR_NULL((I = E))
++)
++
++@r2 depends on report || org@
++identifier I;
++expression E;
++position p;
++@@
++(
++*	(I = E) != NULL && ... && !IS_ERR@p(I)
++|
++*	(I = E) == NULL || ... || IS_ERR@p(I)
++)
++
++@script:python depends on report@
++p << r2.p;
++@@
++coccilib.report.print_report(p[0], "opportunity for IS_ERR_OR_NULL()")
++
++@script:python depends on org@
++p << r2.p;
++@@
++coccilib.org.print_todo(p[0], "opportunity for IS_ERR_OR_NULL()")
++
++@p5 depends on patch disable unlikely @
++expression E;
++@@
++-\( likely \| unlikely \)(
++(
++ IS_ERR_OR_NULL(E)
++|
++ !IS_ERR_OR_NULL(E)
++)
++-)
 
 -- 
 2.43.0
