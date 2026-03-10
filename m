@@ -1,141 +1,106 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB366399368
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Mar 2026 12:54:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7BC42ED141
+	for <linux-cifs@vger.kernel.org>; Tue, 10 Mar 2026 13:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773147252; cv=none; b=XBnbfgOgcgp2hHeYZB9lu5h8F+9XMB8ryDG0v2t620Yl15gefeDwIc4oCiTtNe9kXUGUTvLpVfgTotcGuGd+LtaAFvNP6/NMp0R3d6vjO0MHolYx50/xx79Np+Sv2taPnNXbM5yu/FIbAsAEulKKumH2890SLlJt6AfEoyklJJg=
+	t=1773148231; cv=none; b=Xz6kYHNJjrSBlc4GsQpSWZ3A1wgvmJHzMROScNtm3+9eTBBYp310k7UFvjTWGyQotORVcOp6hm6IV5TZIWA1zdVEm5TY1YIMRbr/JPbaXxqTslykhMA7Rnm//WJUB6aYjDtci8nC5AonBcbC16tXM+kIICNgnTKkHsaPbJGmZUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773147252; c=relaxed/simple;
-	bh=TgoJchP8+G/BTHDKgmEWupOwORUqE0/FZPIUEYu9Z9g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=asfQ/K/ent1JbF/QutyLNIJLFI1Rzhz775m9ZJZbgaWcVPtV8KOaNfkkp9tzFWvKDl2H2CKdD4hahAk/2CW1O7lQEmm7nReHUVaVegm9iOzV+N94L+PiOIDhG0fQ1+QY32opExhQvfxMP3PzHukA4h96JAP56dXmHCqWtojgLWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0+cOK+VW; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0+cOK+VW"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2aeab6ff148so1415ad.1
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Mar 2026 05:54:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773147248; x=1773752048; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mm6hm+LHoMGo5Ew01sq1dP9YSITnoqIDxYFDqmtgvh0=;
-        b=0+cOK+VWVXA7uE31Sh5y2bmP9hRSr0LFsM2f3kDgfCZ6lyHaVbAytIQCv+2vF+eTEx
-         oUic6e9ZAVnZqnGzIPB8kHUyMA2zwpMw5U/9RUdKEhoG2/xX9/VKIHC9XNEBOVXeDKo9
-         mU/QEMBf02iFKn4H5erDKYU3pW/pqjbI7j+6ZcB0Qt9z/KGqBlkshVJTzzKx2oXtAxlL
-         E18h73O/s3dn+xBEwK308w7agQS5m2RYZzHNrLUdhfdZKeG/e+Dr27X21QpoIwd1KCAl
-         PxttLdZl6PZf2goM/cRw6Bbw12/00xnTFdgSr8ytAWjU88JMxI5kTd4reOjRdKpNjh+N
-         Ix/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773147248; x=1773752048;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mm6hm+LHoMGo5Ew01sq1dP9YSITnoqIDxYFDqmtgvh0=;
-        b=ie4tmgCDfmoXiwY6MXyo6D8GXdU26h3I90RKfaDmYRRTFjRGxsuSI0bMghz3ht3Qqz
-         QKXA0ND++6zTlFFQtlHU7h225DNGkUDAm4T7t7bJMCS4CTQB9cSgEpq9NGJNiWUPNeKi
-         OuHo+OClvCJaFqPCbkkQKyPwrBoJDjR8tGVufkdjGKzR3FCql8+pDoJomfcNXWgPv7vY
-         B//8KXO9A3MtfBqqfuDo/pmvB9SX6uLVxXwkT+SacR/M/8MmpOGuiqxh4E7TSB7ae8Ha
-         Q2wWBIqC8FE+l6m1+v4ssPnPv/PIR/wbEf5df+W5ZuZeOkvz9jMkLiEj6oA2N6lqFID4
-         jCgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVZd5YmIXBSzBP77PGS2epjLqdp3r8t+Dg86fZh3dyXLZw8Q8VB9Qe+E23qx080a9m7Y6eoJwwhOVHa@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwHlZ/BegpvMVj1wJYUcn42hpeYzaDUn51Ua4+u99PcQQlYZUM
-	zpgvtmA+Rl6SmA/aFdjPcQqcy2FAIYsqQXFJ2D4HWm4oItSmf2fnZfQ97JA/wogP2g==
-X-Gm-Gg: ATEYQzwt0aZ23m1Th+IOErazsm2bP69bNhfDPIY4bEpuuZVGhdhy7NHfKcNwbtZpwF1
-	qNFF9GA4Vo6EUDie6T9vVQj3FhmTMZzn9rHpfKNuLXV0GGeQsyaWjmNU//HECmty+amuv6Q+j51
-	H5u5/An3XkX9q0SsVbnoLmPZW0g2UjN5IW7QoseLYw4BMcvgP0XG2Kk0RRbwFyY8kiGu4dyBHDk
-	8hHicO9mhxyNl+A/vTllLNyDxXOyHBD9D3cFEp8p4SR+eQAskNe3v8a4hfzG3rVfR8CnMcaoZTE
-	MArNwZlUBXDP75OlISX5aiDHYzWWQeeVNEr+705LxM0dBPIrQ0apPTkfJSizeeRJLmUK932sVRj
-	Ht/o5hleOJknr9myoyYF7wL8h1JeJux9PTzFfvdP7a6x/GyEfZcaam5hg52rNk8DRLWBZcs55ph
-	oiXi+rsF8q/g81/Hd0IX6x70zNKwSt2Q83bAQ4lNbrKQ3K4vqRixdDo6ZEYQ==
-X-Received: by 2002:a17:902:ebd2:b0:2ae:45bb:bc4e with SMTP id d9443c01a7336-2aea30ebe48mr3008685ad.24.1773147247400;
-        Tue, 10 Mar 2026 05:54:07 -0700 (PDT)
-Received: from google.com (10.129.124.34.bc.googleusercontent.com. [34.124.129.10])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c739e0cb73dsm12445679a12.11.2026.03.10.05.53.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 05:54:06 -0700 (PDT)
-Date: Tue, 10 Mar 2026 12:53:54 +0000
-From: Pranjal Shrivastava <praan@google.com>
-To: Philipp Hahn <phahn-oss@avm.de>
-Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
-	bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
-	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
-	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
-	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-mm@kvack.org,
-	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
-	sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev,
-	Alex Williamson <alex@shazbot.org>
-Subject: Re: [PATCH 46/61] vfio: Prefer IS_ERR_OR_NULL over manual NULL check
-Message-ID: <abAUYvx6VEdSmInm@google.com>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <20260310-b4-is_err_or_null-v1-46-bd63b656022d@avm.de>
+	s=arc-20240116; t=1773148231; c=relaxed/simple;
+	bh=nq99Hm8RGFODKlJRyRIWUDAmpT8jCDWvM/qgmLJrpe4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fU9rU6Vw/93E90ikj3H3jjSDBxMx1GX9LDdTDuz3QE91K9u7Z0+7iCRxWZws0opKcX7+2yB4z/ry9OnULBoj4MR6+QDioI2Quay6/uB9X3NDHMCY6p6MhRJq0w+rJn1t8vxVbemiQjxM6Hin4t7iVpXZgDK4/H5H3gG3rYlMqgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fVZ3V1SR2zYQv7b
+	for <linux-cifs@vger.kernel.org>; Tue, 10 Mar 2026 21:09:42 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id F2B2A4056D
+	for <linux-cifs@vger.kernel.org>; Tue, 10 Mar 2026 21:10:27 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.87.132])
+	by APP4 (Coremail) with SMTP id gCh0CgDX_UhDGLBp8eGfAQ--.52452S4;
+	Tue, 10 Mar 2026 21:10:27 +0800 (CST)
+From: Ye Bin <yebin@huaweicloud.com>
+To: sfrench@samba.org,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	linux-cifs@vger.kernel.org,
+	tom@talpey.com,
+	bharathsm@microsoft.com
+Cc: samba-technical@lists.samba.org
+Subject: [PATCH] smb/client: only export symbol for 'smb2maperror-test' module
+Date: Tue, 10 Mar 2026 21:08:47 +0800
+Message-Id: <20260310130847.3157345-1-yebin@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260310-b4-is_err_or_null-v1-46-bd63b656022d@avm.de>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDX_UhDGLBp8eGfAQ--.52452S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kw4DuF1kJrW7WF48Jw13Jwb_yoW8AryDpF
+	y7t39FkF45ArWDu3y8Jay8XasIkrWUJ3W5t3WDWw1fJryDt34ayF18tasa9r1kuw4kWa48
+	CFyj93WayayxtFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI
+	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
+	6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6x
+	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY
+	1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IUbiF4tUUUUU==
+X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
 
-On Tue, Mar 10, 2026 at 12:49:12PM +0100, Philipp Hahn wrote:
-> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
-> check.
-> 
-> Change generated with coccinelle.
-> 
-> To: Alex Williamson <alex@shazbot.org>
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
-> ---
->  drivers/vfio/vfio_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 742477546b15d4dbaf9ebcfb2e67627db71521e0..d71922dfde5885967398deddec3e9e04b05adfec 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -923,7 +923,7 @@ vfio_ioctl_device_feature_mig_device_state(struct vfio_device *device,
->  
->  	/* Handle the VFIO_DEVICE_FEATURE_SET */
->  	filp = device->mig_ops->migration_set_state(device, mig.device_state);
-> -	if (IS_ERR(filp) || !filp)
-> +	if (IS_ERR_OR_NULL(filp))
->  		goto out_copy;
->  
->  	return vfio_ioct_mig_return_fd(filp, arg, &mig);
-> 
+From: Ye Bin <yebin10@huawei.com>
 
-Reviewed-by: Pranjal Shrivastava <praan@google.com>
+Only export smb2_get_err_map_test smb2_error_map_table_test and
+smb2_error_map_num symbol for 'smb2maperror-test' module.
 
-The cleanup alone looks fine, but I'm not sure if the maintainers would
-be happy about the tree-wide spam, since each patch might go through a
-different tree. I'd wait for Alex's preference/ack on that.
+Fixes: 7d0bf050a587 ("smb/client: make SMB2 maperror KUnit tests a separate module")
+Signed-off-by: Ye Bin <yebin10@huawei.com>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/client/smb2maperror.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-Thanks,
-Praan
+diff --git a/fs/smb/client/smb2maperror.c b/fs/smb/client/smb2maperror.c
+index f4cff44e2796..2b8782c4f684 100644
+--- a/fs/smb/client/smb2maperror.c
++++ b/fs/smb/client/smb2maperror.c
+@@ -109,6 +109,9 @@ int __init smb2_init_maperror(void)
+ }
+ 
+ #if IS_ENABLED(CONFIG_SMB_KUNIT_TESTS)
++#define EXPORT_SYMBOL_FOR_SMB_TEST(sym) \
++	EXPORT_SYMBOL_FOR_MODULES(sym, "smb2maperror_test")
++
+ /* Previous prototype for eliminating the build warning. */
+ const struct status_to_posix_error *smb2_get_err_map_test(__u32 smb2_status);
+ 
+@@ -116,11 +119,11 @@ const struct status_to_posix_error *smb2_get_err_map_test(__u32 smb2_status)
+ {
+ 	return smb2_get_err_map(smb2_status);
+ }
+-EXPORT_SYMBOL_GPL(smb2_get_err_map_test);
++EXPORT_SYMBOL_FOR_SMB_TEST(smb2_get_err_map_test);
+ 
+ const struct status_to_posix_error *smb2_error_map_table_test = smb2_error_map_table;
+-EXPORT_SYMBOL_GPL(smb2_error_map_table_test);
++EXPORT_SYMBOL_FOR_SMB_TEST(smb2_error_map_table_test);
+ 
+ unsigned int smb2_error_map_num = ARRAY_SIZE(smb2_error_map_table);
+-EXPORT_SYMBOL_GPL(smb2_error_map_num);
++EXPORT_SYMBOL_FOR_SMB_TEST(smb2_error_map_num);
+ #endif
+-- 
+2.34.1
+
