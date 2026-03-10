@@ -1,109 +1,157 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C97835AC23;
-	Tue, 10 Mar 2026 11:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689413876B0;
+	Tue, 10 Mar 2026 11:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773141157; cv=none; b=rZsAin//GW+5mMaARa5xryOrd4Q1Xyhm2Nzn+k5RlQqujJwRfiEff+rxS0EtOJbo21Y/8tvWhZDqiDFg2vtzG2ewuo77JlUuqpozYOmSy5kO1qosirEWs1unmP5CZGhSNkHziHqdLPOCVtCPGwMHKo3I6W7Pct2rPfNNl43kfes=
+	t=1773141858; cv=none; b=VeTUd4UCVxmrskyMzm87HzIkcQDWfwEELIyEPvzvjZ1z/CToxLjseW9v+5dVrxC0FspmgHKpOYBnGHonHhNYInGF6TpRY3/09ZBDNDsEQ+UforgiDsXIBUu7r+p5CxXdnNwcjB9NiEZ0c6dOD6zKDewFZT5C95Rk+QSbiaE9NP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773141157; c=relaxed/simple;
-	bh=LfJCWiUqfNZdYBdczrwmDuJRVR/cQbefE4NdKbJGua4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tNSPfE+KRreG6VYp+9XqcilZImwSpP1mtQbqnTWMqVstJ6K3wo3ocle/3rkL7Hpvl8lK0ebrS6N51KJ8MhX0C9p8eRn4b8Sh8rH9huB8271cGgylRTRn/kQK7orkXT8OD8ubzttwp9gbdkkhsVcrDEjCWOMJrcfP9A0f2+9EZQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FQAguBuh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773141858; c=relaxed/simple;
+	bh=xT53Ttf/NyogikS/gfdkFymB7LtDXRO0Yz6j+bwKsPU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aX1r5lG+WDjqGkk0Fwqqs1hScgJi2aitgJJMRJiBwd2iN1Yn+leS1n+Ocle9dUuoq/aZRRv8QyaTfSaIqHHb0GsFiE2JNGWQHzztFTZdLlqS7cLwTQq3n+LEpqNaqTZtmSs2KQ3Ebcwg2PJ00Bj8qnW5qMgigTuTWtOeqo/7388=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JkOoejQb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FQAguBuh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 641C6C2BC9E;
-	Tue, 10 Mar 2026 11:12:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JkOoejQb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8497BC19423;
+	Tue, 10 Mar 2026 11:24:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773141157;
-	bh=LfJCWiUqfNZdYBdczrwmDuJRVR/cQbefE4NdKbJGua4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FQAguBuhCx5gs94R9OBucbQEtLJjJfmsVNk9fgPm9LNPNdNttfYugq3J6+z6Qgs8y
-	 E1+WD3xSBYyIJOBPtydrzbsW5GSKNhPmCyot8ctXGp9SXDIHeZcLw16jjmK92beo+d
-	 KOzXlsKOK5sFI9K48MpVoE5Vwwiv4OsntmsE7BSt+/QiTWxqZdyn2w0rb4321mHpo2
-	 94qWhYE8iLp79laJS1ykqbqiGckKkp03lbXnZNo0Br9LIMpr1Q6kAYbY9RyRva3O+9
-	 FQ4O7JoPaLukLn+V8Dl2VxCEojKhOo9JHmy6+fSizE0H0addcFLsvuSaExWXit9/UP
-	 fVQCyq1dHGiZA==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	Thiago Becker <tbecker@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 6.19 159/311] smb: client: fix oops due to uninitialised var in smb2_unlink()
-Date: Tue, 10 Mar 2026 07:03:26 -0400
-Message-ID: <c8b0ad0cccd39352072f483ee6136fa74b299a4d.1773140655.git.sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1773140654.git.sashal@kernel.org>
-References: <cover.1773140654.git.sashal@kernel.org>
+	s=k20201202; t=1773141858;
+	bh=xT53Ttf/NyogikS/gfdkFymB7LtDXRO0Yz6j+bwKsPU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JkOoejQbIY5sFLhLxCkOVN4kxiKJQN7lTCbiqMhI2bPYZCWqCDH0QcPHkf9E94N1P
+	 jGKWxOZDnrBvfZwk3KlNfSPE8lrfyGUmy/E8KZRXnZ3WA2W+jaNVCXVB0fdXzl2Epk
+	 xdyGfd3tLRQx0V4K/FAplurzOKD4T7ZCDXJbb1/yW+bnAtN/DEPHfz+j7RrHKIT4et
+	 mst/xUtfedv4qkVcmjou7az+d7Do3wm3dxVhtCDP9L1/BM2ZP0qghkq/jyHg4SSkSp
+	 MiB5UsygHd+YPYVvodLr6rfXKh/5Fgbcu9NvSb0LZNXu/UpDt3L4jAOcvxUwz9rzo4
+	 xluXx/3QcCvGA==
+Date: Tue, 10 Mar 2026 12:24:05 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: Jeff Layton <jlayton@kernel.org>, 
+	Dorjoy Chowdhury <dorjoychy111@gmail.com>, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-api@vger.kernel.org, ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz, chuck.lever@oracle.com, 
+	alex.aring@gmail.com, arnd@arndb.de, adilger@dilger.ca, mjguzik@gmail.com, 
+	smfrench@gmail.com, richard.henderson@linaro.org, mattst88@gmail.com, 
+	linmag7@gmail.com, tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com, 
+	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com, 
+	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, trondmy@kernel.org, 
+	anna@kernel.org, sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, shuah@kernel.org, 
+	miklos@szeredi.hu, hansg@kernel.org
+Subject: Re: [PATCH v5 1/4] openat2: new OPENAT2_REGULAR flag support
+Message-ID: <20260310-ausdehnen-wahrnehmen-f9d9c6224799@brauner>
+References: <20260307140726.70219-1-dorjoychy111@gmail.com>
+ <20260307140726.70219-2-dorjoychy111@gmail.com>
+ <CALCETrXVBA9uGEUdQPEZ2MVdxjLwwcWi5kzhOr1NdOWSSRaROw@mail.gmail.com>
+ <801cf2c42b80d486726ea0a3774e52abcb158100.camel@kernel.org>
+ <CALCETrVt7o+7JCMfTX3Vu9PANJJgR8hB5Z2THcXzam61kG9Gig@mail.gmail.com>
+ <20260309-umsturz-herfallen-067eb2df7ec2@brauner>
+ <CALCETrWjb+V-zrMT412MtmgDCx9y8simJBQ7+45C9MtdiSMnuw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALCETrWjb+V-zrMT412MtmgDCx9y8simJBQ7+45C9MtdiSMnuw@mail.gmail.com>
 
-From: Paulo Alcantara <pc@manguebit.org>
+On Mon, Mar 09, 2026 at 09:50:18AM -0700, Andy Lutomirski wrote:
+> On Mon, Mar 9, 2026 at 1:58 AM Christian Brauner <brauner@kernel.org> wrote:
+> >
+> > On Sun, Mar 08, 2026 at 10:10:05AM -0700, Andy Lutomirski wrote:
+> > > On Sun, Mar 8, 2026 at 4:40 AM Jeff Layton <jlayton@kernel.org> wrote:
+> > > >
+> > > > On Sat, 2026-03-07 at 10:56 -0800, Andy Lutomirski wrote:
+> > > > > On Sat, Mar 7, 2026 at 6:09 AM Dorjoy Chowdhury <dorjoychy111@gmail.com> wrote:
+> > > > > >
+> > > > > > This flag indicates the path should be opened if it's a regular file.
+> > > > > > This is useful to write secure programs that want to avoid being
+> > > > > > tricked into opening device nodes with special semantics while thinking
+> > > > > > they operate on regular files. This is a requested feature from the
+> > > > > > uapi-group[1].
+> > > > > >
+> > > > >
+> > > > > I think this needs a lot more clarification as to what "regular"
+> > > > > means.  If it's literally
+> > > > >
+> > > > > > A corresponding error code EFTYPE has been introduced. For example, if
+> > > > > > openat2 is called on path /dev/null with OPENAT2_REGULAR in the flag
+> > > > > > param, it will return -EFTYPE. EFTYPE is already used in BSD systems
+> > > > > > like FreeBSD, macOS.
+> > > > >
+> > > > > I think this needs more clarification as to what "regular" means,
+> > > > > since S_IFREG may not be sufficient.  The UAPI group page says:
+> > > > >
+> > > > > Use-Case: this would be very useful to write secure programs that want
+> > > > > to avoid being tricked into opening device nodes with special
+> > > > > semantics while thinking they operate on regular files. This is
+> > > > > particularly relevant as many device nodes (or even FIFOs) come with
+> > > > > blocking I/O (or even blocking open()!) by default, which is not
+> > > > > expected from regular files backed by “fast” disk I/O. Consider
+> > > > > implementation of a naive web browser which is pointed to
+> > > > > file://dev/zero, not expecting an endless amount of data to read.
+> > > > >
+> > > > > What about procfs?  What about sysfs?  What about /proc/self/fd/17
+> > > > > where that fd is a memfd?  What about files backed by non-"fast" disk
+> > > > > I/O like something on a flaky USB stick or a network mount or FUSE?
+> > > > >
+> > > > > Are we concerned about blocking open?  (open blocks as a matter of
+> > > > > course.)  Are we concerned about open having strange side effects?
+> > > > > Are we concerned about write having strange side effects?  Are we
+> > > > > concerned about cases where opening the file as root results in
+> > > > > elevated privilege beyond merely gaining the ability to write to that
+> > > > > specific path on an ordinary filesystem?
+> >
+> > I think this is opening up a barrage of question that I'm not sure are
+> > all that useful. The ability to only open regular file isn't intended to
+> > defend against hung FUSE or NFS servers or other random Linux
+> > special-sauce murder-suicide file descriptor traps. For a lot of those
+> > we have O_PATH which can easily function with the new extension. A lot
+> > of the other special-sauce files (most anonymous inode fds) cannot even
+> > be reopened via e.g., /proc.
+> 
+> On the flip side, /proc itself can certainly be opened.  Should
+> O_REGULAR be able to open the more magical /proc and /sys files?  Are
+> there any that are problematic?
 
-commit 048efe129a297256d3c2088cf8d79515ff5ec864 upstream.
+If procfs job isn't to provide problematic files to userspace I'm not
+sure what it is. Joking aside, I think in general you are of course
+right that procfs is full of files that under a very strict
+interpretation of "regular file" should absolutely not count as a
+regular file. sysfs probably as well and let's ignore debugfs and
+tracefs and all the other magic filesystems or files.
 
-If SMB2_open_init() or SMB2_close_init() fails (e.g. reconnect), the
-iovs set @rqst will be left uninitialised, hence calling
-SMB2_open_free(), SMB2_close_free() or smb2_set_related() on them will
-oops.
+In general, Linux has been so loosey-goosey with "regular file" for such
+a long-time that making OPENAT2_REGULAR come up with some strict
+definition of "this is a regular file - no really, pinky-promise a
+regular one" - is just doomed to fail.
 
-Fix this by initialising @close_iov and @open_iov before setting them
-in @rqst.
+The other problem is that we cannot reasonably determine what odd file
+the user really wanted to defend against opening with OPENAT2_REGULAR.
+A caller may really want to open /proc/kmsg and just be sure that
+someone didn't overmount it with a fifo (systemd does that in containers
+iirc).
 
-Reported-by: Thiago Becker <tbecker@redhat.com>
-Fixes: 1cf9f2a6a544 ("smb: client: handle unlink(2) of files open by different clients")
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: stable@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/smb/client/smb2inode.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+My personal "hot take" is that adding an api built around a regular file
+with immediate irreversible side-effects for the caller on VFS
+syscall-based open [1] is a bug. Such broken semantics is what ioctl()s
+are for.
 
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index 2ded3246600c0..6b0420a5b52a7 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -1208,6 +1208,7 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
- 	memset(resp_buftype, 0, sizeof(resp_buftype));
- 	memset(rsp_iov, 0, sizeof(rsp_iov));
- 
-+	memset(open_iov, 0, sizeof(open_iov));
- 	rqst[0].rq_iov = open_iov;
- 	rqst[0].rq_nvec = ARRAY_SIZE(open_iov);
- 
-@@ -1232,14 +1233,15 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
- 	creq = rqst[0].rq_iov[0].iov_base;
- 	creq->ShareAccess = FILE_SHARE_DELETE_LE;
- 
-+	memset(&close_iov, 0, sizeof(close_iov));
- 	rqst[1].rq_iov = &close_iov;
- 	rqst[1].rq_nvec = 1;
- 
- 	rc = SMB2_close_init(tcon, server, &rqst[1],
- 			     COMPOUND_FID, COMPOUND_FID, false);
--	smb2_set_related(&rqst[1]);
- 	if (rc)
- 		goto err_free;
-+	smb2_set_related(&rqst[1]);
- 
- 	if (retries) {
- 		for (int i = 0; i < ARRAY_SIZE(rqst);  i++)
--- 
-2.51.0
+[1]: I mean specifically open(), openat2() etc. I'm excluding all
+     dedicated APIs that return file descriptors that cannot be reopened
+     via regular lookup.
 
+From my pov, what would help is if one had a flexible way to scope opens
+on e.g., filesystem. But imo, that is not policy the kernel can
+reasonably express at the syscall api layer - it would look fugly as
+hell and how many other knobs would we have to add to satisfy all needs.
+I think that is best left to an lsm hooking into security_file_open()
+which can maintain a map of files and filesystems to allow or deny - a
+bpf lsm can do this quite nicely.
