@@ -1,30 +1,38 @@
-Received: from mail.avm.de (mail.avm.de [212.42.244.94])
+Received: from mail.avm.de (mail.avm.de [212.42.244.119])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C34546AEF4;
-	Tue, 10 Mar 2026 11:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01DD4657F3;
+	Tue, 10 Mar 2026 11:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773143749; cv=none; b=XX3q4HtKkrEO5AWymTuzXeawo0NqlqYZ554Cyepap6nBLK5TCHKxFYbI8NAu17980KmTuhKYXjnZB8XkWd9g/tw7/kmZJVNWHUoz6MM69RK2SF2bsQ5FmZljqT3j7ocXU8U3OlfIxVpDygWRRuZ4Gt3oBfMKDR19EBZZSSgCzHc=
+	t=1773143749; cv=none; b=Ji7rN6OuGls7wCepF3QkMANhnMDUzvtmdfDigoFrw6H/zkiQpzTyv4f4vJTExNem5jILxgtHtA2HAHcQyo/QpB4AVWotK036Ag7W8zseNtFQluMLSPnz0BNzvjk6bN6La0RyGNeifBHJWQlnufVLpWuyl+t9uXcsX3FAm7IRdhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773143749; c=relaxed/simple;
-	bh=50ahf3Ovo2xs3bKtWfsEny3TDWNoY4zAg8ay7QEz3LI=;
+	bh=KX6X+DDiGt9UXTjcCHLPV6DtScldl/2cIRjPuvT9tTY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VsbwupFaTPkPgjgx8tJE/3s3wDYd0poXfD/j48SlCcdhvlsDz1BrzKA1R/YCnQ18XqQ87+OMDfuLSQMFyjrUa3r7oYGrVVTQGZGOWZ0Cv18MHY+qkbrPKGIZJaHN5rH0srGuKRH4ayBvpa/NZAFVmSL++Xf3HZuZVJbinyVhABE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; arc=none smtp.client-ip=212.42.244.94
+	 In-Reply-To:To:Cc; b=c7jps1l2eCVhPG1KU0jWmuky8a+VgTm1xgA7KXEhRKzyVZBAEU378A6xQp0aOF2K7Wtuu2oTlm1dFxoehmHsawBmYiv2cTI/1Hd/1/RQlvOuFTVbj3N6KLRwzroqEJpIsnpyRDLbJ5EE3oFiGVjzOnuzEA3nstdU6MbcQ28EIEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=ZioiLNZ6; arc=none smtp.client-ip=212.42.244.119
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
-Received: from [212.42.244.71] (helo=mail.avm.de)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="ZioiLNZ6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
+	t=1773143723; bh=KX6X+DDiGt9UXTjcCHLPV6DtScldl/2cIRjPuvT9tTY=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=ZioiLNZ6EfhKGMrW73+pjGIuwzOuvOKiSTcZ7wPJiCwebXNzeEOuXWZ+A1nFHvhW4
+	 kJcOoKZ0VhxgqpRswcks1O+/9tUDVhOk4k88nkZD85ItDoYcz2HVcAjttfrO5CwuLe
+	 NFoc05VLkE1QM4ORDb0Hi3i8FcBzsZqAPnJdPzxQ=
+Received: from [2001:bf0:244:244::71] (helo=mail.avm.de)
 	by mail.avm.de with ESMTP (eXpurgate 4.55.2)
 	(envelope-from <phahn-oss@avm.de>)
-	id 69b006ac-e21d-7f0000032729-7f000001d9c0-1
-	for <multiple-recipients>; Tue, 10 Mar 2026 12:55:24 +0100
-Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
+	id 69b006ab-2367-7f0000032729-7f0000019d06-1
+	for <multiple-recipients>; Tue, 10 Mar 2026 12:55:23 +0100
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [IPv6:2001:bf0:244:244::71])
 	by mail.avm.de (Postfix) with ESMTPS;
-	Tue, 10 Mar 2026 12:55:24 +0100 (CET)
+	Tue, 10 Mar 2026 12:55:23 +0100 (CET)
 From: Philipp Hahn <phahn-oss@avm.de>
-Date: Tue, 10 Mar 2026 12:48:37 +0100
-Subject: [PATCH 11/61] pstore: Prefer IS_ERR_OR_NULL over manual NULL check
+Date: Tue, 10 Mar 2026 12:48:32 +0100
+Subject: [PATCH 06/61] 9p: Prefer IS_ERR_OR_NULL over manual NULL check
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -33,7 +41,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260310-b4-is_err_or_null-v1-11-bd63b656022d@avm.de>
+Message-Id: <20260310-b4-is_err_or_null-v1-6-bd63b656022d@avm.de>
 References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
 In-Reply-To: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
 To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
@@ -63,22 +71,24 @@ To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
  sched-ext@lists.linux.dev, target-devel@vger.kernel.org, 
  tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, 
  Philipp Hahn <phahn-oss@avm.de>
-Cc: Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>, 
- "Guilherme G. Piccoli" <gpiccoli@igalia.com>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=958; i=phahn-oss@avm.de;
- h=from:subject:message-id; bh=50ahf3Ovo2xs3bKtWfsEny3TDWNoY4zAg8ay7QEz3LI=;
- b=owEBbQGS/pANAwAKATQtBlPRrKzbAcsmYgBpsAX7sQcV3VwS+mx5jK1HizkW2meRfNqVaBq2u
- sez6firU+2JATMEAAEKAB0WIQQ5bPBtrWDUcDQCppg0LQZT0ays2wUCabAF+wAKCRA0LQZT0ays
- 2xq8B/0SUo4r3rxVq9RsANPcVwQvjAVIq5IHS3vrGpufO9mdcUCVswBYAGcqVWlGUWYhZ9D5Afm
- wOzPQKPaAOE+fY5h8prRvYwP+dSX3nADwI8Y6unKqygPjUrnO+GjcQ97MVfA906q0I9/A6k6cjF
- jRX1r++tFvKvjX46AZyTpQKZC7YoNaBrH37lhDan3ZiZqsJrJDSI+f2JPLEkh5ffnrBrT1NRvPO
- /GMhxFHqkXWNux7Q6NSnWc5GTjmQY/JD/+/V9BILGVpDvPcV2orOeVbtK+hA0s3T4ekXooFahFe
- 5VVhIFMEZXUHZMw53adA+fpwHBkKMznHg4ePWJsQNeHf/dyM
+Cc: Eric Van Hensbergen <ericvh@kernel.org>, 
+ Latchesar Ionkov <lucho@ionkov.net>, 
+ Dominique Martinet <asmadeus@codewreck.org>, 
+ Christian Schoenebeck <linux_oss@crudebyte.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=932; i=phahn-oss@avm.de;
+ h=from:subject:message-id; bh=KX6X+DDiGt9UXTjcCHLPV6DtScldl/2cIRjPuvT9tTY=;
+ b=owEBbQGS/pANAwAKATQtBlPRrKzbAcsmYgBpsAXqJp0CDUjw9jEvsvX+a/KbvAdXeFk7KScmA
+ k1gbpU+8P+JATMEAAEKAB0WIQQ5bPBtrWDUcDQCppg0LQZT0ays2wUCabAF6gAKCRA0LQZT0ays
+ 29mrCACj+Vud6UtbAeAOyyVoHbFLvMA1jaglqqRGws0fgYsgwpzXFXvy2i2CmaAOIcTuq4UVTOl
+ 2Cp9O2MO0VDKHA4864zJOud8em6WQkYpTs1edDKjyZ8gpLnrkl+uUALuLIZHLcn32/PFl6USje2
+ 0rlhbB9Ue5RZDoT7EFzcp3mX899jCdSGzalbeWr5SPDgRQW0S9l7PbTpDgAvlvTr4+JT6Q76sJ+
+ Xum3jXXZ29Rm368akWgnu/SoCzltjqdTHnSYloTAliMoi8hFFj6gbktEQSHRbMEzLVXTgNcHq2l
+ 4mfiDZbzmkqs8S8e3yaP+Mk/R/tjrHLygop2cIGzqTfhnlfW
 X-Developer-Key: i=phahn-oss@avm.de; a=openpgp;
  fpr=58AF7C2E007CDBE62C59E078F50EFDCF8AD04B1A
-X-purgate-ID: 149429::1773143724-9167EF2F-D7D1D994/0/0
+X-purgate-ID: 149429::1773143723-77CF7E1F-303E842C/0/0
 X-purgate-type: clean
-X-purgate-size: 960
+X-purgate-size: 934
 X-purgate-Ad: Categorized by eleven eXpurgate (R) https://www.eleven.de
 X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
 X-purgate: clean
@@ -88,28 +98,30 @@ check.
 
 Change generated with coccinelle.
 
-To: Kees Cook <kees@kernel.org>
-To: Tony Luck <tony.luck@intel.com>
-To: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
+To: Eric Van Hensbergen <ericvh@kernel.org>
+To: Latchesar Ionkov <lucho@ionkov.net>
+To: Dominique Martinet <asmadeus@codewreck.org>
+To: Christian Schoenebeck <linux_oss@crudebyte.com>
+Cc: v9fs@lists.linux.dev
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
 ---
- fs/pstore/zone.c | 2 +-
+ fs/9p/fid.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/pstore/zone.c b/fs/pstore/zone.c
-index a3b003f9a3a079c482b673f57023ce88fc290dbf..dce8403ca18566cc4a7a853ccdc7e1c165666fcb 100644
---- a/fs/pstore/zone.c
-+++ b/fs/pstore/zone.c
-@@ -1226,7 +1226,7 @@ static struct pstore_zone **psz_init_zones(enum pstore_type_id type,
+diff --git a/fs/9p/fid.h b/fs/9p/fid.h
+index 0d6138bee2a3d1ab565ab2d210c0a3f3bf97e4e3..3bb7ef4380e972a2d9ab67eb4aab6cc5bfe2eea7 100644
+--- a/fs/9p/fid.h
++++ b/fs/9p/fid.h
+@@ -27,7 +27,7 @@ static inline struct p9_fid *v9fs_fid_clone(struct dentry *dentry)
+ 	struct p9_fid *fid, *nfid;
  
- 	for (i = 0; i < c; i++) {
- 		zone = psz_init_zone(type, off, record_size);
--		if (!zone || IS_ERR(zone)) {
-+		if (IS_ERR_OR_NULL(zone)) {
- 			pr_err("initialize zones %s failed\n", name);
- 			psz_free_zones(&zones, &i);
- 			return (void *)zone;
+ 	fid = v9fs_fid_lookup(dentry);
+-	if (!fid || IS_ERR(fid))
++	if (IS_ERR_OR_NULL(fid))
+ 		return fid;
+ 
+ 	nfid = clone_fid(fid);
 
 -- 
 2.43.0
