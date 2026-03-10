@@ -1,44 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3433803CD;
-	Tue, 10 Mar 2026 11:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D110387562;
+	Tue, 10 Mar 2026 11:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773142059; cv=none; b=P8LqQQwsMbj4lcSi7R9dQ73LNfXwQ2VyDVecY7D+SGjmLUhGsshYPw3RZNo98ZuyNvhlE9X988gLpvM25ufcHApx7bzYBkFiST7A1hIA3dyIoRIO2HfAmMTKRHHixfzBzUZlUCurP3igutqwjxDRqFSS+1EhCPfsmVFZOs6Iy9s=
+	t=1773142062; cv=none; b=EJVOQTNL2dV23rZrUiSwWG2TafGjtntTjSUKMaWMgcVNL1O0hbkfCvV2Qg3v+xa8Qg5H2ArtWybMLY8UxzzKzV4bnYxuMENWrVhCjkL0CRgH41vrX63fRd7AgUt609Ii9fE3ac+Q09fVXgZ3TZWEC5w76awUaQ9J6BWC+O7N+1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773142059; c=relaxed/simple;
-	bh=Ri0+cE6oSvCKr3b5/gAtcBM/kTYoPmJmCpTKMkt4+qQ=;
+	s=arc-20240116; t=1773142062; c=relaxed/simple;
+	bh=A1hCgKFnypW4LK2yCvcoAw4KxK75MGEbbJkD/m4TcoM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r9IoB7m0Q0GmpFehmtyS+zMhhjTp+Ada/+X8MR7MSWScsrNJix40cpUgA9BAuyQlK2dfOQAiKyqH3xru+WUDCEraR+6L8fcx4gwJJgqPCp4n5zWqFIgoz5LyKoYlmsPXHaombwJV2XqaL1XF98LYO+YMPRTO8XWnFqe3EZb0xjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R8EvHsdl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=oBasGEJAWDgE+lqlaxNx7yH1Z9cghzp2uPA/03Z7vV2LEpjYtIzdUnpKcAPBiA2BJTCESm4kfGuaRn2c0RkVvi73+tSUAZgvqn33Trz/P1GKshgM/BHx9KjAdnd2EvnR1088UoJJnEO5YDpBLnhg+1Ldh9ZZEeZFjRgAwPCF13s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZvRZBDZ+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8EvHsdl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B49D9C19423;
-	Tue, 10 Mar 2026 11:27:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZvRZBDZ+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1545C19423;
+	Tue, 10 Mar 2026 11:27:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773142059;
-	bh=Ri0+cE6oSvCKr3b5/gAtcBM/kTYoPmJmCpTKMkt4+qQ=;
+	s=k20201202; t=1773142061;
+	bh=A1hCgKFnypW4LK2yCvcoAw4KxK75MGEbbJkD/m4TcoM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=R8EvHsdlopEzgMTF9JTvvZxg5ElzeVeNW8mVs+XiOP5tJAamY+uErBHvNpq6lQfRi
-	 ffHEC+fMB2XWsbK5kCKSiHXKBuNBZGaBGkOWvPt4fOKZyE2V4LbL/sqgJDvq4s0W/b
-	 2tKptv9V3jrgB+0qJ9lR///SodbbwkMVSw2LwzhCTa33SSMjTsVmE+zmN78Ll0slFt
-	 elNF6mU7Ls1AgvCx6qbspQdpwDf5TKwE/uLEPVbe1u83tm+cRIwFhC56lgyz8jlpN5
-	 C6JP8UDKVboPE7AlEsI9KEFAaovv09094yf/hO/guE+BFeYL006ZDw4yTiUTcTAAPp
-	 X16QccONG48AA==
+	b=ZvRZBDZ+cf6vCtF2hIvL+hV3TJsZ2wseHS+3yLODDKuODmAClulAK6AxBg1gKHhtV
+	 acaouohG489gLNxrcHsZJrEC4z7uMJSeLwL2buIhn4BMhvhSws3/s+f9Fm83Cny4dR
+	 MFDLX1NJ4v89FR2XIxfFjl+Yb+QJEXYFzeqf2zRrfKv38e7XzKOyGHzDgEindQIWqO
+	 6U3OLzjqbjtZfix0wfpBFPcu+MaHq+zhQaHUQrECdb5Fl/5tMCS9qBFQS6Tp49x4BS
+	 DySpCGlANiOKmFB2kwIqxA9yGBJKXT7J1SdSV5yH4VtPum6OkHDyzrMf5Obm5Rv1E/
+	 zgdfgTyO6Nm6g==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
 Cc: Paulo Alcantara <pc@manguebit.org>,
-	Xiaoli Feng <xifeng@redhat.com>,
-	Enzo Matsumiya <ematsumiya@suse.de>,
+	Thiago Becker <tbecker@redhat.com>,
 	David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 6.18 185/314] smb: client: fix broken multichannel with krb5+signing
-Date: Tue, 10 Mar 2026 07:17:24 -0400
-Message-ID: <9f7fecaae0110f6d285ee00e1acdcf1c378974aa.1773141555.git.sashal@kernel.org>
+Subject: [PATCH 6.18 187/314] smb: client: fix oops due to uninitialised var in smb2_unlink()
+Date: Tue, 10 Mar 2026 07:17:26 -0400
+Message-ID: <64138396a360d21337687e5ed4267c66825e8585.1773141555.git.sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <cover.1773141554.git.sashal@kernel.org>
 References: <cover.1773141554.git.sashal@kernel.org>
@@ -54,33 +53,18 @@ Content-Transfer-Encoding: 8bit
 
 From: Paulo Alcantara <pc@manguebit.org>
 
-commit d9d1e319b39ea685ede59319002d567c159d23c3 upstream.
+commit 048efe129a297256d3c2088cf8d79515ff5ec864 upstream.
 
-When mounting a share with 'multichannel,max_channels=n,sec=krb5i',
-the client was duplicating signing key for all secondary channels,
-thus making the server fail all commands sent from secondary channels
-due to bad signatures.
+If SMB2_open_init() or SMB2_close_init() fails (e.g. reconnect), the
+iovs set @rqst will be left uninitialised, hence calling
+SMB2_open_free(), SMB2_close_free() or smb2_set_related() on them will
+oops.
 
-Every channel has its own signing key, so when establishing a new
-channel with krb5 auth, make sure to use the new session key as the
-derived key to generate channel's signing key in SMB2_auth_kerberos().
+Fix this by initialising @close_iov and @open_iov before setting them
+in @rqst.
 
-Repro:
-
-$ mount.cifs //srv/share /mnt -o multichannel,max_channels=4,sec=krb5i
-$ sleep 5
-$ umount /mnt
-$ dmesg
-  ...
-  CIFS: VFS: sign fail cmd 0x5 message id 0x2
-  CIFS: VFS: \\srv SMB signature verification returned error = -13
-  CIFS: VFS: sign fail cmd 0x5 message id 0x2
-  CIFS: VFS: \\srv SMB signature verification returned error = -13
-  CIFS: VFS: sign fail cmd 0x4 message id 0x2
-  CIFS: VFS: \\srv SMB signature verification returned error = -13
-
-Reported-by: Xiaoli Feng <xifeng@redhat.com>
-Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
+Reported-by: Thiago Becker <tbecker@redhat.com>
+Fixes: 1cf9f2a6a544 ("smb: client: handle unlink(2) of files open by different clients")
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 Cc: David Howells <dhowells@redhat.com>
 Cc: linux-cifs@vger.kernel.org
@@ -88,43 +72,38 @@ Cc: stable@vger.kernel.org
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/client/smb2pdu.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ fs/smb/client/smb2inode.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 1ef82408ecad6..58238e65c7edf 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -1650,19 +1650,17 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
- 	is_binding = (ses->ses_status == SES_GOOD);
- 	spin_unlock(&ses->ses_lock);
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index 69cb81fa0d3ab..5c25f25aa2efb 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -1205,6 +1205,7 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 	memset(resp_buftype, 0, sizeof(resp_buftype));
+ 	memset(rsp_iov, 0, sizeof(rsp_iov));
  
--	/* keep session key if binding */
--	if (!is_binding) {
--		kfree_sensitive(ses->auth_key.response);
--		ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
--						 GFP_KERNEL);
--		if (!ses->auth_key.response) {
--			cifs_dbg(VFS, "Kerberos can't allocate (%u bytes) memory\n",
--				 msg->sesskey_len);
--			rc = -ENOMEM;
--			goto out_put_spnego_key;
--		}
--		ses->auth_key.len = msg->sesskey_len;
-+	kfree_sensitive(ses->auth_key.response);
-+	ses->auth_key.response = kmemdup(msg->data,
-+					 msg->sesskey_len,
-+					 GFP_KERNEL);
-+	if (!ses->auth_key.response) {
-+		cifs_dbg(VFS, "%s: can't allocate (%u bytes) memory\n",
-+			 __func__, msg->sesskey_len);
-+		rc = -ENOMEM;
-+		goto out_put_spnego_key;
- 	}
-+	ses->auth_key.len = msg->sesskey_len;
++	memset(open_iov, 0, sizeof(open_iov));
+ 	rqst[0].rq_iov = open_iov;
+ 	rqst[0].rq_nvec = ARRAY_SIZE(open_iov);
  
- 	sess_data->iov[1].iov_base = msg->data + msg->sesskey_len;
- 	sess_data->iov[1].iov_len = msg->secblob_len;
+@@ -1229,14 +1230,15 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 	creq = rqst[0].rq_iov[0].iov_base;
+ 	creq->ShareAccess = FILE_SHARE_DELETE_LE;
+ 
++	memset(&close_iov, 0, sizeof(close_iov));
+ 	rqst[1].rq_iov = &close_iov;
+ 	rqst[1].rq_nvec = 1;
+ 
+ 	rc = SMB2_close_init(tcon, server, &rqst[1],
+ 			     COMPOUND_FID, COMPOUND_FID, false);
+-	smb2_set_related(&rqst[1]);
+ 	if (rc)
+ 		goto err_free;
++	smb2_set_related(&rqst[1]);
+ 
+ 	if (retries) {
+ 		for (int i = 0; i < ARRAY_SIZE(rqst);  i++)
 -- 
 2.51.0
 
