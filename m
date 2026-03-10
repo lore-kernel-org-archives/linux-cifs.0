@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27183542CF;
-	Tue, 10 Mar 2026 19:51:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A989C35A38A;
+	Tue, 10 Mar 2026 19:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773172264; cv=none; b=W4Cdz9q0IdlikkmXQ9iWpRa3QfQRpqiBCscmpBDHyDbPgvaDMr01oFgF04iNPdByHdvxGhrzVGWXl+SSdVxrveY7zvBqRhy60DyD3ryMrveysGrT3/jEGs8a+EX4A+vYFN7np8BOqlS68t/alBDxfiRpyFccEY7hPTPSNLVQ5LU=
+	t=1773172267; cv=none; b=tm7qxLAce8jYT3nPprQVRels9hx+kSU2dZisbm7/EBMAjelA0YhIuWVIrmUvsuE03cKPFj9HFnHQDTTO71h+ldDVExZevwc9Nm0AZLDBR+DrsaUfxqprtD75wClUcWU84qtwK90oZlQpwQAb9Be+4xwgJbSDza7ZaTWJ5jklLSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773172264; c=relaxed/simple;
-	bh=Ad47JaXsywSU6JBLYbdP676mE2ZoM/HobzD5EQN8XWc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pfx76IuO8vjyvpdd1hI+wHkkpvDLK8Ym29dY+T14UEVkW6PC0C1sO0M6/z6VGOJyS//63xKE256AjBdT25t3rKnUwyJezx9OuRjXLOiJ/nWMNA0Ef1JeX1a5O6bO/Qh2FN4296VcOHu2QRCsMWiP1poaB8XonO0+NCTlDt204wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rhBhcIny; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773172267; c=relaxed/simple;
+	bh=PHVqUmdZOJoCMt1Z2VcfyTE7sGV0SetRg8yMWp20OkI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kl2yJ86VU43C5WAiTPUUNjFQWZc/sn0a3zW4Oz/wSqJnPY/A8V6fTUGzzFGgsnWrgvYm4H5oJpkgEkt9ujaZeU1ZUX/HyAG0cyZKa8M0lbxUhLP/Rp15UCwOnh8GiLVg4vq51Ayaa9kA1fGFOJHNPgNCF/7knD3KcGR6w5ftH/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lvKQoaJw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rhBhcIny"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB2EEC19423;
-	Tue, 10 Mar 2026 19:51:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lvKQoaJw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD3F6C19423;
+	Tue, 10 Mar 2026 19:51:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773172263;
-	bh=Ad47JaXsywSU6JBLYbdP676mE2ZoM/HobzD5EQN8XWc=;
+	s=k20201202; t=1773172267;
+	bh=PHVqUmdZOJoCMt1Z2VcfyTE7sGV0SetRg8yMWp20OkI=;
 	h=From:To:Cc:Subject:Date:From;
-	b=rhBhcIny72YQS4nwBDnRFNpkRyNRkrynLzNBNd1XZ1w5DvPDFsZwc0RAMonGjfXaI
-	 a7RrOEL+HF6GJdLrdnJdyOey8+XZJUTtC7+43VneVLLIyQbXp5vWJFPN30iTW+uf8c
-	 1wkUL6fdTAKysXUe3B8vSXn1bkPYSWb7pUFlSiEsNY3c9gC0J73Dv0HYeocRvQz1eO
-	 YquToz2UTm50h3em5n1oOSnB5fcSdgDS6JZPcpX8NGL1czE8NjxUqFTIqKB9vzhsVC
-	 rxr65WcDZ+YvtyZpSJJiKyzh8ns0vLcnVoRtyzvq1mMBbMw9qm6/+7xY5YMFoUuWtY
-	 YWlrYi/HizebQ==
+	b=lvKQoaJwEl9VFCiAKvp5nfgXxOlSV+4li4sni0hylLks/6hWQT+dzpQ4YcaFrbcrA
+	 N/swEd0egd964vxTXBetj3krrhVOKGwzbiYoQhLIXEDEm9cPtvK+MuTCQKLqkbom7O
+	 35DOP5FkmM/tG/9iui7B51nUjrtF0qAGDTqhPSgPA2KPECY0vAa0lxfjmAmZNkwS03
+	 Jlavg8j0Xq9Zp5UZHTMEmBEIPT6kB1p+EB39zocwteLv0mjZ0AW/XVBGJ7YgKPPC7c
+	 4K5MQVwexNK9y5qWv38tB9kTYIHSdb74nRqPsMBfHO5U937CeXEcRqX2n3E7rtMyfE
+	 uazen/Gd1YriA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -32,9 +32,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>,
 	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.6] smb: client: Compare MACs in constant time
-Date: Tue, 10 Mar 2026 12:50:58 -0700
-Message-ID: <20260310195058.70682-1-ebiggers@kernel.org>
+Subject: [PATCH 6.1] smb: client: Compare MACs in constant time
+Date: Tue, 10 Mar 2026 12:51:03 -0700
+Message-ID: <20260310195103.70705-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -60,7 +60,7 @@ Signed-off-by: Steve French <stfrench@microsoft.com>
  2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
-index da3d003cb43db..3d6b663212335 100644
+index d3d4cf6321fd5..743098804edcc 100644
 --- a/fs/smb/client/cifsencrypt.c
 +++ b/fs/smb/client/cifsencrypt.c
 @@ -21,10 +21,11 @@
@@ -69,13 +69,13 @@ index da3d003cb43db..3d6b663212335 100644
  #include <linux/fips.h>
  #include "../common/arc4.h"
  #include <crypto/aead.h>
-+#include <crypto/utils.h>
++#include <crypto/algapi.h>
  
- /*
-  * Hash data from a BVEC-type iterator.
-  */
- static int cifs_shash_bvec(const struct iov_iter *iter, ssize_t maxsize,
-@@ -369,11 +370,11 @@ int cifs_verify_signature(struct smb_rqst *rqst,
+ int __cifs_calc_signature(struct smb_rqst *rqst,
+ 			struct TCP_Server_Info *server, char *signature,
+ 			struct shash_desc *shash)
+ {
+@@ -241,11 +242,11 @@ int cifs_verify_signature(struct smb_rqst *rqst,
  		return rc;
  
  /*	cifs_dump_mem("what we think it should be: ",
@@ -89,7 +89,7 @@ index da3d003cb43db..3d6b663212335 100644
  
  }
 diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index 99081e9d6283a..daf8ba2cd8a10 100644
+index 763cf946e8491..73d281abd265a 100644
 --- a/fs/smb/client/smb2transport.c
 +++ b/fs/smb/client/smb2transport.c
 @@ -17,10 +17,11 @@
@@ -98,13 +98,13 @@ index 99081e9d6283a..daf8ba2cd8a10 100644
  #include <linux/mempool.h>
  #include <linux/highmem.h>
  #include <crypto/aead.h>
-+#include <crypto/utils.h>
++#include <crypto/algapi.h>
  #include "cifsglob.h"
  #include "cifsproto.h"
  #include "smb2proto.h"
  #include "cifs_debug.h"
  #include "smb2status.h"
-@@ -730,11 +731,12 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+@@ -697,11 +698,12 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
  	rc = server->ops->calc_signature(rqst, server, true);
  
  	if (rc)
@@ -119,7 +119,7 @@ index 99081e9d6283a..daf8ba2cd8a10 100644
  	} else
  		return 0;
 
-base-commit: 4fc00fe35d46b4fc8dac2eb543a0e3d44bb15f47
+base-commit: f2ddafa93a259310ca47507153b7811ec54ab7fd
 -- 
 2.53.0
 
