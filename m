@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BCC397E78;
-	Tue, 10 Mar 2026 19:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93B93C060A;
+	Tue, 10 Mar 2026 19:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773172374; cv=none; b=BUROKu426H8mlU0YhBvRjFbm8oRQalW/oc6jyfmqCwRB1THzDv9/ddt2GvXCO8c35D3zfm+hyb5CYjouHxOd7MmklPQboz41DIiZDsYc+F+bYQKcr+Rmx1BeLliETgBAJMQLFcFpKKG9m3CsH09bJweKtwL1BETh2BRd3o/zvxI=
+	t=1773172376; cv=none; b=OAx8jn5aCDa+GAoTCEHPYa+PgJVISofeN56FWBAQuBLpg7sUpJRQp//9B63sNMi4xZbyy24CS2KXCNUy591CVpwgf65yh/sHt9Cio2eEb6hH0dRqmflUqyavQYjqpmsuO7DkGOJDPEzuCV3vzBI3S+npRMP+fa/fbVhCYQnruvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773172374; c=relaxed/simple;
-	bh=gEcQt7kI3jCVHAVlGSZt7rwDr5bcYt2UEfYoFXsMnIg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZollNjTEBLF1vwAVDLcLQ3pF/ZyWJh9eVcSDL0dN1XChcb+9qeDMNNgMHwUypq4LiVmOIOhs16y9LeuKryab0itlUBc7uqDnJuD8O5JbmOQsJfoSzT2tGYb9B6RLsYp7ReD2H6lA5wSNqBC3Esq7gZ8tBUDfDeOVoumLxvwIbAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pwx+09U5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773172376; c=relaxed/simple;
+	bh=khME16d+H0DEAV2zpYTok5ib8wH/YwlxS/FiTIEAWD4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ESETRYNE+u3jp8fCusTc3zB7cK24QRPfWvDV+RJrpTBUrzucbkFLHKKCsKHG+2q4F9mEXxzy/pCqCG+8mTtomr28JnccowjA6bVSI8zqw1W6mwZ9/BXFW+3Bwu3mZRBo4pTyf8yJviYHBprrUHK9xbOXgAatfoJIiFmrqSjQo6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0QFzv0v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pwx+09U5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 330C1C19423;
-	Tue, 10 Mar 2026 19:52:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0QFzv0v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D41ADC2BC87;
+	Tue, 10 Mar 2026 19:52:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773172373;
-	bh=gEcQt7kI3jCVHAVlGSZt7rwDr5bcYt2UEfYoFXsMnIg=;
+	s=k20201202; t=1773172376;
+	bh=khME16d+H0DEAV2zpYTok5ib8wH/YwlxS/FiTIEAWD4=;
 	h=From:To:Cc:Subject:Date:From;
-	b=pwx+09U5efNS/F8ix3h9GweHfuIxPcQMBNX78h4nGwtwDRpIJdsQ7/5k47kt9yySD
-	 AtqAAd7jYe2rSXxyS4PX2kZ8PvYN9qPTwItwLJQ5LZL4q5D534VzUvoGDnMB8jvkaK
-	 7AnGh4ixSEediXOP7SZtJbODG9fWfCD3OYGjw2FE0o/SU50TfRhX4cACCTCtsYa7wk
-	 KJCq/99ofGDK0Kx/P/1rOJFP38ZnmHreqPf7d7AwN16hP9dd7GZrdgmh5tcEgVn6jA
-	 cjeWUqDvf8AAXKYjzCclH9XFz9R7dpyhABlqdB6FiHwRon29bWMt/n1zeuY7KXGgBx
-	 DuUOwBhQNfKdQ==
+	b=l0QFzv0vuKpEcGmP2WR5dfqTMnhuMkwa7B7ix5D47tY1eQ7YekU1ZzCZTaImIGbD8
+	 xWLENRKOt+LZ0xx4tX5Wv9WI4/gJLIxOkFh1HQG3CIVRbpaRyKy0rxpA+iBaRR2vXl
+	 L8g8rnQ71n94AYeH+fYjJ+0QLxgZ0LSlhDVYR/Looco8PF26uNhZUoQeZyJBhJ8LaZ
+	 QO1Jqcz1aZf/QKIh1+BOE5sn/Uu98KZPUV+7Jlz9k7vYJaGE0igaiLZMSmr/WKGR8L
+	 8mzNp5TMayDRosyeNfYfYVN7esFnRM/gadqU16kJzqWpsuWjnmlyuFl3axxX+Varbm
+	 ZkhM5wv6ldHkw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -32,9 +32,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.12] ksmbd: Compare MACs in constant time
-Date: Tue, 10 Mar 2026 12:52:51 -0700
-Message-ID: <20260310195251.70880-1-ebiggers@kernel.org>
+Subject: [PATCH 6.6] ksmbd: Compare MACs in constant time
+Date: Tue, 10 Mar 2026 12:52:53 -0700
+Message-ID: <20260310195253.70903-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -77,7 +77,7 @@ index cabe6a843c6a0..da0187e76cf1c 100644
  	select CRYPTO_AEAD2
  	select CRYPTO_CCM
 diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index b3d121052408c..5d5a8166d3cc9 100644
+index f4b20b80af062..a2dfb981ce666 100644
 --- a/fs/smb/server/auth.c
 +++ b/fs/smb/server/auth.c
 @@ -11,10 +11,11 @@
@@ -107,7 +107,7 @@ index b3d121052408c..5d5a8166d3cc9 100644
  		ksmbd_release_crypto_ctx(ctx);
  	kfree(construct);
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index ac8248479cba2..44ccf1a0e1212 100644
+index da4d914c87ad2..6a128a3be61e7 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
 @@ -2,10 +2,11 @@
@@ -122,7 +122,7 @@ index ac8248479cba2..44ccf1a0e1212 100644
  #include <linux/syscalls.h>
  #include <linux/namei.h>
  #include <linux/statfs.h>
-@@ -8808,11 +8809,11 @@ int smb2_check_sign_req(struct ksmbd_work *work)
+@@ -8802,11 +8803,11 @@ int smb2_check_sign_req(struct ksmbd_work *work)
  
  	if (ksmbd_sign_smb2_pdu(work->conn, work->sess->sess_key, iov, 1,
  				signature))
@@ -135,7 +135,7 @@ index ac8248479cba2..44ccf1a0e1212 100644
  	}
  
  	return 1;
-@@ -8896,11 +8897,11 @@ int smb3_check_sign_req(struct ksmbd_work *work)
+@@ -8890,11 +8891,11 @@ int smb3_check_sign_req(struct ksmbd_work *work)
  	iov[0].iov_len = len;
  
  	if (ksmbd_sign_smb3_pdu(conn, signing_key, iov, 1, signature))
@@ -149,7 +149,7 @@ index ac8248479cba2..44ccf1a0e1212 100644
  
  	return 1;
 
-base-commit: 39b686f8d57d7506af7789e915fe7fd103b0fe57
+base-commit: 4fc00fe35d46b4fc8dac2eb543a0e3d44bb15f47
 -- 
 2.53.0
 
