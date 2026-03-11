@@ -1,201 +1,350 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8C8286D57
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 23:52:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9EC2C15B2
+	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 23:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773273127; cv=pass; b=EogZiCadWNi4AYJS89xr5p52UNOBTkhHiK66miikk2T2mfDi11lzT8Sgosl3s+zcqKfQmo9mOXDPU7aUT9VrWwRrEMM39NhtKUM6NnfHx3pVWmrZYZfqd91+8kb7QzD/9AXkd8m3aVVXn3ox7a/tWsnn1wxVCBDo9Ew5YdtvOFU=
+	t=1773273161; cv=pass; b=cLSkoK7ISzo8BxYIoAB8LQd4yVVQLsF+7yiPPvcVg2y7Jby+U/S443AAXhaRlQiZVXYgQejPQNpKO6Ghw79h0A2b1CWYI6dJ1Bhut7C1NK+lIuTFY4eyHP1FFF+CpH8I/pE3mSYdB2UW2jGurVVMRNSG5VUB32u/bMUqLPsKRU8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773273127; c=relaxed/simple;
-	bh=aIkffOjGqTfw8EYv0ooqwQA2XrSIDdmpDM/eDv2AoHk=;
+	s=arc-20240116; t=1773273161; c=relaxed/simple;
+	bh=wvApmMjNvGTbf0RjUgj5az72g5qkE1vUWinYsU1t8Q0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qn0bAcu9dKMHGEZau+fRZlJJlbVwsPc+hCU45Oa41/f94CKIDsIJcu8nRZMMAiCw+IusLVXkgFjUb0dpakIfDSlwHLMS0FSpGBuHPJK8VMh1a3kTdEtIntpp2dDsdXcsF1Ftle1jCg5Vz7JmSrGv6den/34fFkK9AcnQdK7NVug=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SOX1nlE7; arc=pass smtp.client-ip=209.85.219.50
+	 To:Cc:Content-Type; b=tjS91UVyX9P1IJZ0xc6BrkEROoZ8tqBi0W6/ZE4XpKmqa1Y8RVyaPh3zisc/C6+9RefL7G/IVcyyMLRhNx/jc0gbY7U3e8sJxL1Vm4tlv76QfgRXeZ7f+3/bjNJeNrNL+CJbKCIGBiKoEjhxSFdVGd/AgtU5gP7E+3cVlKjBXBk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OOHpuCr8; arc=pass smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SOX1nlE7"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-89a018cbbf8so20441836d6.0
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 16:52:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773273125; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOHpuCr8"
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-661d929219bso421050a12.0
+        for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 16:52:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773273158; cv=none;
         d=google.com; s=arc-20240605;
-        b=QUKndZLs5ZL4qH/93/fFBjQAchTbRX6vMcCqeo5GbfcX7TFXBrIGzIg96+KqMfWTCC
-         f0pX0yS9XxOzBve900yTj+fVl2Uz2D96lBrYqnOh++1mFtgxymQ5WUUq8fF/q0zNWahL
-         TCcsf3ShyktkTG+cmOiCxMRdN7Gm6DmJtsfeL3M/GCMDzPYbhb9jX1rGzUpC+Cmfnkjz
-         NmY202xhuTo+v780jNlpvTsYAj43CX5qMSP75zYtBDCXqbAe+eOdYdP8KugKTgVPyAvc
-         ASMSabA6fDvHo3lIBuRZZoBwi4hf+v0kZaZxKx0AIFQubsVegCyUzgVBqTz4tDH4OxTt
-         kdzQ==
+        b=FOBMRp9vYHKKJiOV78lJ7sAPGjylvAMLOL8yaG/pYB1YWysgtxv3AU1UAGxAMaZnCH
+         d+wStBgc3TK4pBkTWnfN7N3sj5hYjZ7PdkEVe9YgtBzv1o1qEvxmNPo96Q4+mNSp47IQ
+         cYaADbi5jpfbPfwMrSntyvyFG6DfMs/4lwpjF6JO/K3jnop6zIyQJKkPIhYI5NqYug98
+         jGl928YaDR6K05qi9r77jHITbhV7aknm0cbLPqaqxNzfJ11ZXLlmHPwPjv9GaIPrIZqj
+         h+j4C5djoKq+OXQj8+D/ZDmIUs5RHwCehT3mbkBJagLIWA01Rm5DZcXblv3i9iI8NlFD
+         MvlA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=aak02bl+tOxupaPAiu+YapXXnDf1p18gRXzhDpE7U48=;
-        fh=i7T/fe869XmcdGV6Q/8XPyeXiErX5esmf/V3ZtnCP30=;
-        b=AuTFxoBs1VaZU1+Jv2oBgbcUK4Ny63LllfMv0ryoUXacTJE7pFOjwxMwy5Ik7LEf6R
-         HyiqnMX+2I/8D6qNGgaRnuGNeFSo4mt+kWg7RVZHZ+mS+vzzUYnL8TBQQXr9Szl4Apig
-         Qqk4ub0Xy7/vcGrNNewgAobAD4MIFm2AyjsbFHkm68eNSYZcn1LLOq74L2dJPldq3IEu
-         cbp3jLJ/61065kKD/ZR2iRP5eiTyUz4VsudfZcwPqTAv55UHRiXfMbenFr1wn9/qlNIy
-         4rBAGYYm+GAhDWJP0nzPhOEWE9lRz+LdL+TJhMT4yadigTBFJ3G7I+5CFGfQ8Ek7dumI
-         3wcQ==;
+        bh=e5dnLulEEXraOPmn0u/FJsHnDizrkOXARS+I2TfqSmk=;
+        fh=YD8RB1ZMi0fCBIT6IAmw0lzBhTxzYAJJTje8jg8Zco4=;
+        b=CoGg6LPYLGarnAkM6jkeoFO+Phc1yaThItHlUGXVAfDha6/L6r0I+d+mAMPYjzkdzV
+         p6y5YWOcHlxozv0I5Pmu6bYSWg5ufBcWMUoc9AsTXe0dlS0iGbAMsTQvcz9PQ8ku7J5g
+         p2z1C9WmoFDFhWM05ZKH98IcQiX5pTeN5TNIM72hH+Inx+fpjdVU+xY2/Xq37DGiIJQw
+         gU1Oxp2Z4lVuuluKpIf9XwhvrUT/7CFgfcaUJXhmwG5ESbHXlMXQmY5dXj9wyPovm/FZ
+         SSubldyI5J/54aCIiB76z3oReO9vft6eRHdAmGCcVCtzG4FE0tIZxaW1QAhZyuJpklkl
+         dZJw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773273125; x=1773877925; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773273158; x=1773877958; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aak02bl+tOxupaPAiu+YapXXnDf1p18gRXzhDpE7U48=;
-        b=SOX1nlE7kL75LYKij7m7KC2G7WWBxuG6wUIQrhxHEk9+9iVB+VE9jjsVBJDGlB6PYn
-         X5NHPQ+DIjUQ1WJ2rhS2u1AxkqDO8riy/mXjafSo8hibc6gEUQlvXxqm5Msvf0H4zyMg
-         b1e0fBKDEEwFHOcxSTNjVF1KeDwOpBdgtRbMFv9E6CKFAJE1TmkCOkKp/zryEr7Gu1OH
-         KQZ1vGpARLOlHl4An7/sMKZlNzInIWDVv79r9QxgJNEINAie/gWTJ1/wlvFRrGpin80o
-         uWM/HFvYdXuUmxWwT2bGTS+QSqwQhqsfoSFxOBCzGxqfVolrAi8CFneDXWBDGYqm/hEF
-         t1BA==
+        bh=e5dnLulEEXraOPmn0u/FJsHnDizrkOXARS+I2TfqSmk=;
+        b=OOHpuCr83OKyecje3Sg/OQqh42gM6yAaBZmo3kyf5B/AumAdK1yHnHXse0LKL2b+hp
+         3VTHD+U2mA2YAgc+/t1d8Ae8Swnl8k9WtnhC+MPH/bYufYsGudRdh/uwjb7hGh7jzTwn
+         lDk37FRnsSq0aWeVyzyu375qGC+cxa2fGJOcWxrIkYEOFZEK1ESjEY8IvPVC2E67CQYJ
+         MqOFLXvzUdhoaU5tt4hiRF76E+2IUlILWvs7eRY+L/m0+9PDphIVbHS7J9stf7DzU55J
+         PrMC1bayQN6v6P0qgfE505HYLz62L//qdBOeeW5QYRxjhJOlmg1XhH1OPPzNkjPI1gNP
+         uqvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773273125; x=1773877925;
+        d=1e100.net; s=20230601; t=1773273158; x=1773877958;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=aak02bl+tOxupaPAiu+YapXXnDf1p18gRXzhDpE7U48=;
-        b=EoruHb8OZDqo2h103pFcqLWUNdXhU5dFSmUf5GP6lzK8/o23rirKz6A70hzoMGVfJ/
-         6ch6pmL+5ldn4FDykyDe7rhmslVRhnI7pw42H6poX8Yd52MoppfNY41kRIodTfh0ABss
-         VIsUPOTfSZXPhse2+9sokhKnAQf1H5g6IqPVWYi9qHjkyg1Vjt/t6nrfrxL0GblbmEnz
-         rUfG/vdriOXojC1aTGVswO35IaeYvN453BAH6ca4Fx7tajyS+0qWFj9X8g+rZQNRmnMQ
-         o2tIdYlEH4nrkX4PWEc3zQ0/EXB8yhF4p83cim/5kf9TsrHTZpD5xwH1YdzUrMg9UCcU
-         /OMA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJQxTr7P3AaZ5hkcPm8BaCyBojng5NUGESh6jGJW7yM2DOE4ElmZI5PUuZtkqnMUqGgqdQTf1TmMeS@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYraE7aOfKP1XYuMYRaYqAYUPvLAjk3eZYAuQVVUPsbe7ln6y9
-	Iypot5ojJHoCNwJypmk9K4ReSrw9bm7iseb/qQ3J4XHSuK+44CTk1ULZqS/vLg9ieOwjhy0TCkh
-	LKy5xVnDuv1Ob4odhgwaRna3pyV9vi5w=
-X-Gm-Gg: ATEYQzyqLF03OFVzOMNvMlWsX5iojfjm6yRqd524qqH2o2LlVIVrxlAxXtCxkB6KAOg
-	0VzwdH/j/8fTYcfsuWU6SBkdmxtZdXkfM/hhQEdEkU6MvR/CG+r7+O4KPfIRpMnakJvdBeH8oI6
-	nGN4Zwrx1rud0b7evrBMQxdyKTI6PLVqPbAaEjDjnW0zHBXStDhBug/rCVcPs0JaJRHuzFf5dDX
-	Yd1mlQ96Fb1CPdi0kTr0CT6+q0WRMNtEPWKCEZWjCvdiTvzy6mOyBrnx926ERprkJTON7ZZYr8W
-	bvfP/XOChPzH9d/xZFeHjcsUZyv0P3Yp/2/11qZJ9uLVuaJhp23etlmnGVrO1ZcDiUozL9Ikir/
-	mh1o6gira4FTHl56ItCwXRqPAkyRIQAXyPLPbvghP5bz5yrMV+AAeoypjhqN6ezlhIG+l2X75UW
-	DegVAnFZp7hch0c2gqgI0B
-X-Received: by 2002:a05:6214:19c9:b0:89a:77b:837e with SMTP id
- 6a1803df08f44-89a729d8f3emr26275396d6.6.1773273125385; Wed, 11 Mar 2026
- 16:52:05 -0700 (PDT)
+        bh=e5dnLulEEXraOPmn0u/FJsHnDizrkOXARS+I2TfqSmk=;
+        b=W1j7eH24TqGYTtvfKQo1stc/+twotCZoPPvPHxlLXeFAyt4XG82DqPs4W1rXi62lAf
+         zrfPygWuHXn9hKN/4ku1vupmvJ4DutH5DS55q/HSy2UzIomFNi2nIClm0E8alqnc4Sww
+         TFiobt42fPXz2Z5qqtbnaQafKS6DwW4RTyvnC1JY7WfifKvDSTau/ykFYZ/DTSYUGDmF
+         zEXhMK2LJxYWn3CY6FA1NeV56v0mJtKnFE4JfNE31WaCzh9RevvgXn+l7Ap+W438fBKI
+         tg1vRAdbwL6OtV8bVK6VPVyyV3VKO0HHaCWnteC3K7xVOnnbNsaga4vxoIeKtH8qYS3T
+         0IOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU/gY0YD1YEfBsqPe15WJiy8JW+hVJ/Z5OGrqxeQf/DMFcyuUFkP/GIkOXdEr0qywOEAxBhOcNiRWCu@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCI9/FggKN8/5OBYZm8zXStgvLra88Cm+dqKhnKyDiPg18fX8s
+	AoHoJzvgLRdnIwfJS7GbDRqfPjHwhech5//c0hqDs7CtvXIaYjH94PSQr4i+x9VE8iFfeMkH32L
+	i+YyaoE1a7/ibKmdmsUymiHI5DjOMwvY=
+X-Gm-Gg: ATEYQzwosaT8pffVeLmrN2UtA+bmAKLisq0Z6d6ffeDqkaGEivuQw7QUhy6C50V/XHy
+	TDxi91UN0Ad9lxf4UMDiH0pubN1dxmL+cHinM5ESuRq7gLlftj1Uk2WPjbOhUK2RpBA9xYNKrjU
+	HK+gHYU8QWM4AlehUvaKe1m9BSFnBnP5j7/yiqqkWxre7Gv7NeY2e5hsveE5Gj8W0NHT+ZqbpZV
+	/nX4znylug60eIIE7aM1+z/RhCCz9w4lGni3WHTqrd9q+1IuNiTURv8sYCCw/AYgO1In7cg9avU
+	LkDmMw==
+X-Received: by 2002:a05:6402:3554:b0:662:86a7:17a6 with SMTP id
+ 4fb4d7f45d1cf-663194d63a6mr2423833a12.8.1773273157775; Wed, 11 Mar 2026
+ 16:52:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260311231723.751558-1-henrique.carvalho@suse.com>
-In-Reply-To: <20260311231723.751558-1-henrique.carvalho@suse.com>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 11 Mar 2026 18:51:53 -0500
-X-Gm-Features: AaiRm52w23mPBC3G4ypnbWAzbkKeH8taEUOrvVOe6GbIGt5Bj-pX_iL9f9xwLwU
-Message-ID: <CAH2r5mtsdSJBZ=b5ABm=Gq4sfakb7ZXrx0N7AF0_1TTkVqn6Zg@mail.gmail.com>
-Subject: Re: [PATCH v3] smb: client: fix iface port assignment in parse_server_interfaces
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	ematsumiya@suse.de, linux-cifs@vger.kernel.org, stable@vger.kernel.org, 
-	"Dr. Thomas Orgis" <thomas.orgis@uni-hamburg.de>
+References: <20260304122910.1612435-1-sprasad@microsoft.com>
+ <aea738fc-e422-4671-9e0a-429988fe026a@samba.org> <CANT5p=p3V0Ap3EmZuh1ZYvg+-SgjyH-ZMmsakCdbzMMSL3KwJw@mail.gmail.com>
+ <e3gwcmglyhifzuugqzkez7v2gkqzcn73ial3xysfvpijf5d5gj@r5rqvx23qtgq>
+In-Reply-To: <e3gwcmglyhifzuugqzkez7v2gkqzcn73ial3xysfvpijf5d5gj@r5rqvx23qtgq>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Thu, 12 Mar 2026 05:22:26 +0530
+X-Gm-Features: AaiRm50f8CgWNJ9YuYmyhDfwxG2jJLr219g1wN80BNnwRFkzV8dOgovlHKOGbCM
+Message-ID: <CANT5p=qsOxpAAva6k9RQD3TGPku2TFQsS4bKbfZPNVs-RFWONQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: implementation id context as negotiate context
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: Ralph Boehme <slow@samba.org>, linux-cifs@vger.kernel.org, smfrench@gmail.com, 
+	pc@manguebit.com, bharathsm@microsoft.com, dhowells@redhat.com, 
+	Shyam Prasad N <sprasad@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-updated in cifs-2.6.git for-next
+On Mon, Mar 9, 2026 at 11:29=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.de>=
+ wrote:
+>
+> On 03/09, Shyam Prasad N wrote:
+> >On Mon, Mar 9, 2026 at 9:49=E2=80=AFPM Ralph Boehme <slow@samba.org> wro=
+te:
+> >>
+> >> Hi!
+> >>
+> >> I wonder which servers are expected to be implementing this? I suppose
+> >> this protocol extension is not proposed without a server vendor
+> >> interested in actually implementing it, otherwise the whole metrics
+> >> story doesn't make sense.
+> >
+> >Hi Ralph,
+> >
+> >This is supposed to give the server an idea of what version of cifs.ko
+> >the client is actually running.
+>
+> I agree with others on this point -- cifs.ko version is useless to match
+> to a particular behaviour or pinpoint a specific bug.
 
-On Wed, Mar 11, 2026 at 6:17=E2=80=AFPM Henrique Carvalho
-<henrique.carvalho@suse.com> wrote:
+Acked. Can you suggest an alternative field that will make the matching eas=
+ier?
+
 >
-> parse_server_interfaces() initializes interface socket addresses with
-> CIFS_PORT. When the mount uses a non-default port this overwrites the
-> configured destination port.
+> >This can be useful for servers like Azure SMB servers, where it is not
+> >easy to explain client side behaviour without knowing what exact
+> >version of the code is running on the client.
 >
-> Later, cifs_chan_update_iface() copies this sockaddr into server->dstaddr=
-,
-> causing reconnect attempts to use the wrong port after server interface
-> updates.
+> If the proposal is going to be bidirectional, it would be much better,
+> for cifs.ko, to have servers sending such information to clients
+> instead;  even when there's a problem on the server, it'll usually
+> reflect on the client (crashes, misbehaviour, etc).
 >
-> Use the existing port from server->dstaddr instead.
->
-> Cc: stable@vger.kernel.org
-> Fixes: fe856be475f7 ("CIFS: parse and store info on iface queries")
-> Tested-by: Dr. Thomas Orgis <thomas.orgis@uni-hamburg.de>
-> Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
-> Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
-> ---
-> v2 -> v3:
-> - add spin_lock around server->dstaddr access
-> v1 -> v2:
-> - read the port once from server->dstaddr before parsing iface entries
->   and considering *server* ss_family
-> - update the commit message to describe the fix more clearly
-> - adjust the Fixes tag to fe856be475f7 ("CIFS: parse and store info on if=
-ace queries"),
->   as the later commit only exposed the bug rather than introducing it
+> Also useful for cases where customers don't have direct/easy access to
+> their SMB infrastructure (e.g. external/3rd party hosting, or 1000s of
+> servers mixed with DFS and/or clusters).
+
+Good point. Let me rework the draft on this.
+
 >
 >
->  fs/smb/client/smb2ops.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
+> Cheers,
 >
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index 7f2d3459cbf9..612057318de2 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -628,6 +628,7 @@ parse_server_interfaces(struct network_interface_info=
-_ioctl_rsp *buf,
->         struct smb_sockaddr_in6 *p6;
->         struct cifs_server_iface *info =3D NULL, *iface =3D NULL, *niface=
- =3D NULL;
->         struct cifs_server_iface tmp_iface;
-> +       __be16 port;
->         ssize_t bytes_left;
->         size_t next =3D 0;
->         int nb_iface =3D 0;
-> @@ -662,6 +663,15 @@ parse_server_interfaces(struct network_interface_inf=
-o_ioctl_rsp *buf,
->                 goto out;
->         }
+> Enzo
 >
-> +       spin_lock(&ses->server->srv_lock);
-> +       if (ses->server->dstaddr.ss_family =3D=3D AF_INET)
-> +               port =3D ((struct sockaddr_in *)&ses->server->dstaddr)->s=
-in_port;
-> +       else if (ses->server->dstaddr.ss_family =3D=3D AF_INET6)
-> +               port =3D ((struct sockaddr_in6 *)&ses->server->dstaddr)->=
-sin6_port;
-> +       else
-> +               port =3D cpu_to_be16(CIFS_PORT);
-> +       spin_unlock(&ses->server->srv_lock);
-> +
->         while (bytes_left >=3D (ssize_t)sizeof(*p)) {
->                 memset(&tmp_iface, 0, sizeof(tmp_iface));
->                 /* default to 1Gbps when link speed is unset */
-> @@ -682,7 +692,7 @@ parse_server_interfaces(struct network_interface_info=
-_ioctl_rsp *buf,
->                         memcpy(&addr4->sin_addr, &p4->IPv4Address, 4);
->
->                         /* [MS-SMB2] 2.2.32.5.1.1 Clients MUST ignore the=
-se */
-> -                       addr4->sin_port =3D cpu_to_be16(CIFS_PORT);
-> +                       addr4->sin_port =3D port;
->
->                         cifs_dbg(FYI, "%s: ipv4 %pI4\n", __func__,
->                                  &addr4->sin_addr);
-> @@ -696,7 +706,7 @@ parse_server_interfaces(struct network_interface_info=
-_ioctl_rsp *buf,
->                         /* [MS-SMB2] 2.2.32.5.1.2 Clients MUST ignore the=
-se */
->                         addr6->sin6_flowinfo =3D 0;
->                         addr6->sin6_scope_id =3D 0;
-> -                       addr6->sin6_port =3D cpu_to_be16(CIFS_PORT);
-> +                       addr6->sin6_port =3D port;
->
->                         cifs_dbg(FYI, "%s: ipv6 %pI6\n", __func__,
->                                  &addr6->sin6_addr);
-> --
-> 2.53.0
->
->
+> >> *scratches head*
+> >>
+> >> Thanks!
+> >> -slow
+> >>
+> >> On 3/4/26 1:27 PM, nspmangalore@gmail.com wrote:
+> >> > From: Shyam Prasad N <sprasad@microsoft.com>
+> >> >
+> >> > MS-SMB2 does not allow any fields for the client to communicate
+> >> > the client version details to the server. This change is a
+> >> > proof-of-concept to add client details in a new negotiate context.
+> >> >
+> >> > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> >> > ---
+> >> >   fs/smb/client/smb2pdu.c | 78 +++++++++++++++++++++++++++++++++++++=
+++++
+> >> >   fs/smb/common/smb2pdu.h | 32 +++++++++++++++++
+> >> >   2 files changed, 110 insertions(+)
+> >> >
+> >> > diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> >> > index ef655acf673df..9c89f6b4a6709 100644
+> >> > --- a/fs/smb/client/smb2pdu.c
+> >> > +++ b/fs/smb/client/smb2pdu.c
+> >> > @@ -24,6 +24,7 @@
+> >> >   #include <linux/pagemap.h>
+> >> >   #include <linux/xattr.h>
+> >> >   #include <linux/netfs.h>
+> >> > +#include <linux/utsname.h>
+> >> >   #include <trace/events/netfs.h>
+> >> >   #include "cifsglob.h"
+> >> >   #include "cifsproto.h"
+> >> > @@ -45,6 +46,7 @@
+> >> >   #include "cached_dir.h"
+> >> >   #include "compress.h"
+> >> >   #include "fs_context.h"
+> >> > +#include "cifsfs.h"
+> >> >
+> >> >   /*
+> >> >    *  The following table defines the expected "StructureSize" of SM=
+B2 requests
+> >> > @@ -724,6 +726,75 @@ build_posix_ctxt(struct smb2_posix_neg_context =
+*pneg_ctxt)
+> >> >       pneg_ctxt->Name[15] =3D 0x7C;
+> >> >   }
+> >> >
+> >> > +static unsigned int
+> >> > +build_implementation_id_ctxt(struct smb2_implementation_id_context =
+*pneg_ctxt)
+> >> > +{
+> >> > +     struct nls_table *cp =3D load_nls_default();
+> >> > +     struct new_utsname *uts =3D utsname();
+> >> > +     const char *impl_domain =3D "kernel.org";
+> >> > +     const char *impl_name =3D "fs/smb/client";
+> >> > +     const char *os_name =3D "Linux";
+> >> > +     unsigned int data_len =3D 0;
+> >> > +     __u8 *data_ptr;
+> >> > +     int len;
+> >> > +
+> >> > +     pneg_ctxt->ContextType =3D SMB2_IMPLEMENTATION_ID_CONTEXT_ID;
+> >> > +     data_ptr =3D pneg_ctxt->Data;
+> >> > +
+> >> > +     /* ImplDomain */
+> >> > +     len =3D cifs_strtoUTF16((__le16 *)data_ptr, impl_domain,
+> >> > +                           SMB2_IMPL_ID_MAX_DOMAIN_LEN, cp);
+> >> > +     pneg_ctxt->ImplDomainLength =3D cpu_to_le16(len * 2);
+> >> > +     data_ptr +=3D len * 2;
+> >> > +     data_len +=3D len * 2;
+> >> > +
+> >> > +     /* ImplName */
+> >> > +     len =3D cifs_strtoUTF16((__le16 *)data_ptr, impl_name,
+> >> > +                           SMB2_IMPL_ID_MAX_NAME_LEN, cp);
+> >> > +     pneg_ctxt->ImplNameLength =3D cpu_to_le16(len * 2);
+> >> > +     data_ptr +=3D len * 2;
+> >> > +     data_len +=3D len * 2;
+> >> > +
+> >> > +     /* ImplVersion - CIFS_VERSION from cifsfs.h */
+> >> > +     len =3D cifs_strtoUTF16((__le16 *)data_ptr, CIFS_VERSION,
+> >> > +                           SMB2_IMPL_ID_MAX_VERSION_LEN, cp);
+> >> > +     pneg_ctxt->ImplVersionLength =3D cpu_to_le16(len * 2);
+> >> > +     data_ptr +=3D len * 2;
+> >> > +     data_len +=3D len * 2;
+> >> > +
+> >> > +     /* HostName - from utsname()->nodename */
+> >> > +     len =3D cifs_strtoUTF16((__le16 *)data_ptr, uts->nodename,
+> >> > +                           SMB2_IMPL_ID_MAX_HOSTNAME_LEN, cp);
+> >> > +     pneg_ctxt->HostNameLength =3D cpu_to_le16(len * 2);
+> >> > +     data_ptr +=3D len * 2;
+> >> > +     data_len +=3D len * 2;
+> >> > +
+> >> > +     /* OSName */
+> >> > +     len =3D cifs_strtoUTF16((__le16 *)data_ptr, os_name,
+> >> > +                           SMB2_IMPL_ID_MAX_OS_NAME_LEN, cp);
+> >> > +     pneg_ctxt->OSNameLength =3D cpu_to_le16(len * 2);
+> >> > +     data_ptr +=3D len * 2;
+> >> > +     data_len +=3D len * 2;
+> >> > +
+> >> > +     /* OSVersion - from utsname()->release */
+> >> > +     len =3D cifs_strtoUTF16((__le16 *)data_ptr, uts->release,
+> >> > +                           SMB2_IMPL_ID_MAX_OS_VERSION_LEN, cp);
+> >> > +     pneg_ctxt->OSVersionLength =3D cpu_to_le16(len * 2);
+> >> > +     data_ptr +=3D len * 2;
+> >> > +     data_len +=3D len * 2;
+> >> > +
+> >> > +     /* Arch - from utsname()->machine */
+> >> > +     len =3D cifs_strtoUTF16((__le16 *)data_ptr, uts->machine,
+> >> > +                           SMB2_IMPL_ID_MAX_ARCH_LEN, cp);
+> >> > +     pneg_ctxt->ArchLength =3D cpu_to_le16(len * 2);
+> >> > +     data_len +=3D len * 2;
+> >> > +
+> >> > +     pneg_ctxt->Reserved2 =3D 0;
+> >> > +     pneg_ctxt->DataLength =3D cpu_to_le16(data_len + 14); /* 14 =
+=3D 7 length fields * 2 bytes */
+> >> > +     /* Context size is DataLength + minimal smb2_neg_context, alig=
+ned to 8 */
+> >> > +     return ALIGN(le16_to_cpu(pneg_ctxt->DataLength) + sizeof(struc=
+t smb2_neg_context), 8);
+> >> > +}
+> >> > +
+> >> >   static void
+> >> >   assemble_neg_contexts(struct smb2_negotiate_req *req,
+> >> >                     struct TCP_Server_Info *server, unsigned int *to=
+tal_len)
+> >> > @@ -797,6 +868,13 @@ assemble_neg_contexts(struct smb2_negotiate_req=
+ *req,
+> >> >               neg_context_count++;
+> >> >       }
+> >> >
+> >> > +     /* Add implementation ID context */
+> >> > +     ctxt_len =3D build_implementation_id_ctxt((struct smb2_impleme=
+ntation_id_context *)
+> >> > +                             pneg_ctxt);
+> >> > +     *total_len +=3D ctxt_len;
+> >> > +     pneg_ctxt +=3D ctxt_len;
+> >> > +     neg_context_count++;
+> >> > +
+> >> >       /* check for and add transport_capabilities and signing capabi=
+lities */
+> >> >       req->NegotiateContextCount =3D cpu_to_le16(neg_context_count);
+> >> >
+> >> > diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+> >> > index e482c86ceb00d..1ad7b57ce2952 100644
+> >> > --- a/fs/smb/common/smb2pdu.h
+> >> > +++ b/fs/smb/common/smb2pdu.h
+> >> > @@ -457,6 +457,7 @@ struct smb2_tree_disconnect_rsp {
+> >> >   #define SMB2_TRANSPORT_CAPABILITIES         cpu_to_le16(6)
+> >> >   #define SMB2_RDMA_TRANSFORM_CAPABILITIES    cpu_to_le16(7)
+> >> >   #define SMB2_SIGNING_CAPABILITIES           cpu_to_le16(8)
+> >> > +#define SMB2_IMPLEMENTATION_ID_CONTEXT_ID    cpu_to_le16(0xF100)
+> >> >   #define SMB2_POSIX_EXTENSIONS_AVAILABLE             cpu_to_le16(0x=
+100)
+> >> >
+> >> >   struct smb2_neg_context {
+> >> > @@ -596,6 +597,37 @@ struct smb2_signing_capabilities {
+> >> >       /*  Followed by padding to 8 byte boundary (required by some s=
+ervers) */
+> >> >   } __packed;
+> >> >
+> >> > +/*
+> >> > + * For implementation ID context see MS-SMB2 2.2.3.1.8
+> >> > + * Maximum string lengths per specification
+> >> > + */
+> >> > +#define SMB2_IMPL_ID_MAX_DOMAIN_LEN  128
+> >> > +#define SMB2_IMPL_ID_MAX_NAME_LEN    260
+> >> > +#define SMB2_IMPL_ID_MAX_VERSION_LEN 260
+> >> > +#define SMB2_IMPL_ID_MAX_HOSTNAME_LEN        64
+> >> > +#define SMB2_IMPL_ID_MAX_OS_NAME_LEN 64
+> >> > +#define SMB2_IMPL_ID_MAX_OS_VERSION_LEN      64
+> >> > +#define SMB2_IMPL_ID_MAX_ARCH_LEN    64
+> >> > +
+> >> > +struct smb2_implementation_id_context {
+> >> > +     __le16  ContextType; /* 9 */
+> >> > +     __le16  DataLength;
+> >> > +     __le32  Reserved;
+> >> > +     __le16  ImplDomainLength;
+> >> > +     __le16  ImplNameLength;
+> >> > +     __le16  ImplVersionLength;
+> >> > +     __le16  HostNameLength;
+> >> > +     __le16  OSNameLength;
+> >> > +     __le16  OSVersionLength;
+> >> > +     __le16  ArchLength;
+> >> > +     __le16  Reserved2;
+> >> > +     /* Followed by variable length UTF-16 strings:
+> >> > +      * ImplDomain, ImplName, ImplVersion, HostName,
+> >> > +      * OSName, OSVersion, Arch
+> >> > +      */
+> >> > +     __u8    Data[];
+> >> > +} __packed;
+> >> > +
+> >> >   #define POSIX_CTXT_DATA_LEN 16
+> >> >   struct smb2_posix_neg_context {
+> >> >       __le16  ContextType; /* 0x100 */
+> >>
+> >
+> >
+> >--
+> >Regards,
+> >Shyam
+> >
+
 
 
 --=20
-Thanks,
-
-Steve
+Regards,
+Shyam
