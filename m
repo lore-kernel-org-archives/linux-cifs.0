@@ -1,154 +1,85 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D117635DA46
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 21:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 969E039DBF5;
+	Wed, 11 Mar 2026 23:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773263368; cv=none; b=mT6cQpH1fkFgaK0N0hi/YH7BcPcfTRNsTowczisxlLrvOQNm60eYKL48rQ0TLc71DNJ0k0q4bcjLVz2+7+mI13xUrPeMTW7NOeiN/rOcWoi5l75z9NAnRGjqxo9l10S1EsrkY6lp514qlN9BvGKDvjg6lVQnivmldGvAUryZvs8=
+	t=1773270226; cv=none; b=AkA2Gnlxmrw7n8wlICODGs3io7QO9Oh/YDy07WP09JF/KFh9g5IxYQ17wt6vWQVzPCB+iYEQu7P3mBvtqRc+n31lnQN5NVwKohchMiBQHqmgSZE6jhjwc4hv3UUzJs1InFDBm/aIiY3ylNEkhCwq8TX0CYHFVkpY9m+PERgjhT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773263368; c=relaxed/simple;
-	bh=QRC2zBceQZAw9NVBvIU644ZzsneR1w+YSjwrraWS+AQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b0U7Rn3oApaJln8+2nRmhKxmJ0ByW3OkfwOcTmjdIawPAHukZux0+8OJMJHWvvzr7VlEuMduZcNA9wkXkwQT3Fb1MGiWlu6HZHNLPwLi5ECYAv6wHT50gS0khbUpAjFd95HdClxc6O09kjhJqPmKU7q3IsM6LpfQz/DSpYS7lVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=eYnw2Gme; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1773270226; c=relaxed/simple;
+	bh=ATo3aRyKmYSXuSYD8x/NeBUp5LJcLKbzHVpozNXQJC0=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=riWYrESCcc9KNXqP13SZYyXzR58RrYMlS+b2xha5iOXuuIp+StTrVizqL6ketCeeYmMEMoyxUK8taVuLlBt+IYJOKFEOgMITJUBE5YxvJbFyx57ukqqJFBTg7MI8yXilCszhmCyW65ADzTthRqCB0cIhFeDkNxgzAb+Zf6dy7s0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=fail (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=WxcdvAR4 reason="signature verification failed"; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="eYnw2Gme"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-48529c325f0so2126035e9.0
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 14:09:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1773263365; x=1773868165; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UaaxnmPHTieCJFocp7VqZ1LoooxMAJJriEl5r9r2vlo=;
-        b=eYnw2GmenSzafT+VZhiiPjNLBAk66dlBBvdeEMzGDDbPW32tIku4tN9ogzvT0zAEww
-         kK5nywA32y0XHPhBTw1yB2+ClcxKB+Az+ypxRRgF3v2DsSzd6ka7CyxfH0fq/WqPonly
-         EpA0tfqZeaATbN7XTHQ/z8RfD157qtepS9tf7zrpryWmdpN1Nu5j7HqrUo0aRPdoDKUv
-         w7UxXNxEqoi3FOQyZvvV5iw3kChh/0NGhc3mhIenG4TmQVyq+5jGmdpaRSS3lUs0cET7
-         cn7EsnmmtVgFqbwt0dPTLClPkA3suoqEYedHJhMqioYp75j9sNA9zdGhfw1gUcOCnuSo
-         Z6kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773263365; x=1773868165;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UaaxnmPHTieCJFocp7VqZ1LoooxMAJJriEl5r9r2vlo=;
-        b=edvN8TqnzjJpuuo+FV4ffSlrmUS26vFrn6M2cP5Z2rJkZZdkx0nJPimHh2fm7ZOzfw
-         6rUE4lFhtCW5wuYYi8v6uPzK9EZU1o9BBlsCgzd4tEN7/WOGCs2tHaQII5lMNlGhasLf
-         jEPmUwPKOS9xD/WvY/HS8NfBU6UZC1okoi8QZ4hzzCsgw8o6cymWGSKxCeIX5PnZqwfR
-         pdlJKVSsM4IgF01TvZEJ432p4Q2XGSvUAwx5eV9cgVoPZ3TxqljVuiGH2BHS7Ilc2ZRV
-         QHKvY0L4zC72IDrOUwftrnh8vt4JQPG8QwR91YicMdSYagXG3eLATJb6O2Hs+G3vcuPq
-         Zhng==
-X-Forwarded-Encrypted: i=1; AJvYcCXNR+NBqBFB7Brtk8LPUN7Si0SmgitvEOgyR1K1PmxWc9kVVipBWE7YbCCw6H5Y9SJWh4xY7130+0Ev@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAZ9DPnFvRPFwIy8PQEzOzF4cHnert204xmFaL44iP7LcxFFG6
-	t1msu9kO33STz2+NZ1hkLdW8b5+59DjTr9S1F0ZVOnWLzUNgUvVp88tOZda73x1KjtU=
-X-Gm-Gg: ATEYQzxR9KibKup/i4FwWvpeDXJUNusfnwOnq00FehMXuqi6PrQVp81PrjPSufznQpy
-	G7oCJC345osUbtSpfYxwOi53+zmmfyY048LLpGYMGPpLVSeWOk9e1+vZtllCTWvXa1LZtBlDZfl
-	Py+9zKB/rFrUefnuLPAfJ/qyhKQCUdbCOxcZJ7dKD8TT7/M4n3muA0izPu1jiUnuwTtg6JLgzXc
-	wpOHtUbJe6L8tFCFb49ap8+/GehxI0+phdk++Pzb8U2XIwZBg/nxro0+UheRvuBZlJkD2NxfLlu
-	KB/ytEM529smttyv3ajoFP8+B06KUrAGYiYQ7lQPJVoD4l6jo6gnjhhsluQtglc6rAo/SLfHTtF
-	cbHri3HiYw1rmgTCxXDIpGaqfhNAXLt6FNvAmT5gMY4gtWD7xDjfB/rTtlQfNQnCcqvs/ml5EFt
-	X3+c5ohTWRC0ikaTJfMiDq8Wun6t9F7AZYz9D9U6Zlv3jkvJ1biKLxcvU=
-X-Received: by 2002:a05:600c:8b31:b0:485:3812:36da with SMTP id 5b1f17b1804b1-4854b0afc13mr69420255e9.9.1773263365105;
-        Wed, 11 Mar 2026 14:09:25 -0700 (PDT)
-Received: from precision.tail0b5424.ts.net ([2804:7f0:6402:b103:6a0a:3e1c:778a:5cc7])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2be8aa73ba6sm3896702eec.25.2026.03.11.14.09.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 14:09:24 -0700 (PDT)
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: sfrench@samba.org
-Cc: pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	ematsumiya@suse.de,
-	linux-cifs@vger.kernel.org,
-	stable@vger.kernel.org,
-	"Dr. Thomas Orgis" <thomas.orgis@uni-hamburg.de>
-Subject: [PATCH v2] smb: client: fix iface port assignment in parse_server_interfaces
-Date: Wed, 11 Mar 2026 18:09:15 -0300
-Message-ID: <20260311210915.735288-1-henrique.carvalho@suse.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="WxcdvAR4"
+Received: from monstersaurus.ideasonboard.com (cpc89244-aztw30-2-0-cust6594.18-1.cable.virginm.net [86.31.185.195])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id CD91E448;
+	Thu, 12 Mar 2026 00:02:28 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1773270149;
+	bh=ATo3aRyKmYSXuSYD8x/NeBUp5LJcLKbzHVpozNXQJC0=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=WxcdvAR4zphcUuTNTLXCbLGiiCOKCwemLRMbnRdmW3ARcBHAWQiYVeysDpnfCIDuk
+	 B8rMCjKjDjoWJdgj4Zp0scfHxrPnr5P3xl9hFANY/wyWKZBZYHzyf2qsFxVEe9S31Y
+	 m9r/HjFnopry9bsUUdk6/id/Q3d97jYK/FiMa+Qw=
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20260310-b4-is_err_or_null-v1-49-bd63b656022d@avm.de>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de> <20260310-b4-is_err_or_null-v1-49-bd63b656022d@avm.de>
+Subject: Re: [PATCH 49/61] media: Prefer IS_ERR_OR_NULL over manual NULL check
+From: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Cc: Shuah Khan <skhan@linuxfoundation.org>, Mauro Carvalho Chehab <mchehab@kernel.org>
+To: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org, linux-media@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org, linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, linux-phy@lists.infradead.org, lin
+ ux-pm@vger.kernel.org, linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org, netdev@vger.kernel.org, ntfs3@lists.linux.dev, samba-technical@lists.samba.org, sched-ext@lists.linux.dev, target-devel@vger.kernel.org, tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
+Date: Wed, 11 Mar 2026 23:03:33 +0000
+Message-ID: <177327021364.3167621.11851238159935183684@ping.linuxembedded.co.uk>
+User-Agent: alot/0.9.1
 
-parse_server_interfaces() initializes interface socket addresses with
-CIFS_PORT. When the mount uses a non-default port this overwrites the
-configured destination port.
+Quoting Philipp Hahn (2026-03-10 11:49:15)
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
+>=20
+> Change generated with coccinelle.
+>=20
+> To: Shuah Khan <skhan@linuxfoundation.org>
+> To: Kieran Bingham <kieran.bingham@ideasonboard.com>
+> To: Mauro Carvalho Chehab <mchehab@kernel.org>
+> Cc: linux-media@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+> ---
+>  drivers/media/test-drivers/vimc/vimc-streamer.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/media/test-drivers/vimc/vimc-streamer.c b/drivers/me=
+dia/test-drivers/vimc/vimc-streamer.c
+> index 15d863f97cbf96b7ca7fbf3d7b6b6ec39fcc8ae3..da5aca50bcb4990c06f28e5a8=
+83eb398606991e9 100644
+> --- a/drivers/media/test-drivers/vimc/vimc-streamer.c
+> +++ b/drivers/media/test-drivers/vimc/vimc-streamer.c
+> @@ -167,7 +167,7 @@ static int vimc_streamer_thread(void *data)
+>                 for (i =3D stream->pipe_size - 1; i >=3D 0; i--) {
+>                         frame =3D stream->ved_pipeline[i]->process_frame(
+>                                         stream->ved_pipeline[i], frame);
+> -                       if (!frame || IS_ERR(frame))
+> +                       if (IS_ERR_OR_NULL(frame))
 
-Later, cifs_chan_update_iface() copies this sockaddr into server->dstaddr,
-causing reconnect attempts to use the wrong port after server interface
-updates.
+Reviewed-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
 
-Use the existing port from server->dstaddr instead.
-
-Cc: stable@vger.kernel.org
-Fixes: fe856be475f7 ("CIFS: parse and store info on iface queries")
-Tested-by: Dr. Thomas Orgis <thomas.orgis@uni-hamburg.de>
-Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
-Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
----
-v2 -> v1:
-- read the port once from server->dstaddr before parsing iface entries
-  and considering *server* ss_family
-- update the commit message to describe the fix more clearly
-- adjust the Fixes tag to fe856be475f7 ("CIFS: parse and store info on iface queries"),
-  as the later commit only exposed the bug rather than introducing it
-
- fs/smb/client/smb2ops.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 7f2d3459cbf9..7a176088c877 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -628,6 +628,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 	struct smb_sockaddr_in6 *p6;
- 	struct cifs_server_iface *info = NULL, *iface = NULL, *niface = NULL;
- 	struct cifs_server_iface tmp_iface;
-+	__be16 port;
- 	ssize_t bytes_left;
- 	size_t next = 0;
- 	int nb_iface = 0;
-@@ -662,6 +663,13 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 		goto out;
- 	}
- 
-+	if (ses->server->dstaddr.ss_family == AF_INET)
-+		port = ((struct sockaddr_in *)&ses->server->dstaddr)->sin_port;
-+	else if (ses->server->dstaddr.ss_family == AF_INET6)
-+		port = ((struct sockaddr_in6 *)&ses->server->dstaddr)->sin6_port;
-+	else
-+		port = cpu_to_be16(CIFS_PORT);
-+
- 	while (bytes_left >= (ssize_t)sizeof(*p)) {
- 		memset(&tmp_iface, 0, sizeof(tmp_iface));
- 		/* default to 1Gbps when link speed is unset */
-@@ -682,7 +690,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 			memcpy(&addr4->sin_addr, &p4->IPv4Address, 4);
- 
- 			/* [MS-SMB2] 2.2.32.5.1.1 Clients MUST ignore these */
--			addr4->sin_port = cpu_to_be16(CIFS_PORT);
-+			addr4->sin_port = port;
- 
- 			cifs_dbg(FYI, "%s: ipv4 %pI4\n", __func__,
- 				 &addr4->sin_addr);
-@@ -696,7 +704,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 			/* [MS-SMB2] 2.2.32.5.1.2 Clients MUST ignore these */
- 			addr6->sin6_flowinfo = 0;
- 			addr6->sin6_scope_id = 0;
--			addr6->sin6_port = cpu_to_be16(CIFS_PORT);
-+			addr6->sin6_port = port;
- 
- 			cifs_dbg(FYI, "%s: ipv6 %pI6\n", __func__,
- 				 &addr6->sin6_addr);
--- 
-2.53.0
-
+>                                 break;
+>                 }
+>                 //wait for 60hz
+>=20
+> --=20
+> 2.43.0
+>
