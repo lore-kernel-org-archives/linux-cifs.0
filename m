@@ -1,143 +1,168 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFEF3DF007
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 16:09:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773245351; cv=none; b=IRkgzHXqESs4eZbsL+QDDGJc6QWbaEBweFh4yt/TanUf1mvold0VFXK3SSatJ6oN87s5vmM+bApleSXFFhNpJEqsUnQ7GrUCRKRDIqBe3tT/vIx+YjqGWMG9YRiMIuZOZxeKVm/vMUXwF5P8Hp4wpjIlhKmFd49ryh1bszK6KVM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773245351; c=relaxed/simple;
-	bh=8jYcDGodtpSwJhTwixQOKf3vIBHR6G9gy3RXw+RNRP8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tu27fK/O9GBh6Lw4B9FL0om0pSp/NCHpBD5ZjLwGD5EZQjeXepSCSofmWVXV5H91Z/6WKEsvZy2qu8gloJmUJ3gG1oiuKySUvG3i6nC3sKhwdB7POGl7dHXC42EVIGW77wzK6xkoRdwAtNSEvXcoY4AMGwF8A9KifPkD6pj0ezA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=SQx0nyZ9; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6E640DFCE
+	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 16:10:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773245422; cv=pass; b=fniYwEMKPSwmRFcnKro5VE3+PsS9hZIUVrYbYFtmBurtvMP+8E5il1Y0LYrRugY8wTpIDMqDXXY4br8K1v3oQq5zAQE9PmKqwE+qwn3CqGdopxlNo6ZT2U9uuqJ2NijrlutrkZ3BNHmWZ7K+yPT1Du4ksPr5b83+6QJmL9GZN0U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773245422; c=relaxed/simple;
+	bh=RINC3OxukObTWwNgLj8cUCMQfmLKMyUKoc5ifoxu7lY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n3i+/3tlXO7Vm1K9F8zhAhOSib9N87YGciM53Z6DnwO2AxC+Uqbqk8uyiOC6BB9O9FxbSuPv/CrzjRUd2vGihx1XIrHaFAd0m/Wv2TWylRTOEozaUMXu0a85RZKhZX9CuFVWwNvoc8+ucsMberGZOOp0y5QFI/qpON5AnWWHscA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=DQI1cRxa; arc=pass smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="SQx0nyZ9"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4853510b4f3so372395e9.0
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 09:09:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="DQI1cRxa"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5a140efd2d5so180416e87.2
+        for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 09:10:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773245418; cv=none;
+        d=google.com; s=arc-20240605;
+        b=PcxgN3ToLx/yrxL8OnXPtUmSu6tcKTFsdGEFcGZu0xh5khth7/pgXyDZfa0a2LgZTE
+         UF180l7iXI13GYtCFvAvCb+3nXWtetqzhpqH7e2iguiM1LxdiZjIDp5GiDzX54Ze3T+R
+         0Rmt/ktFAF1y+RD7XOz174U0r3jWQmUtf8XfkTc5T6VnH61j3fhi7bKisUWloVc+mZ8n
+         OF+0g5sDBP0+DUqKVAY4idEasg8HElpJ0Cmqh0WJh/0Ogf1eE2gnbfm/GB1w+NrqPtMr
+         06Xo2nfsJMOjdpNpqb3OrI1rRZAt2LZ2LOuY71SuRj0vjAgUAjyJA0Wq9oHZbLfdLgee
+         tOLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=zQf3bqKM0prJaYagyzgzwBy7UALOn5Wa6w4qvhYX8FU=;
+        fh=ESDRa2KshV9SDoP9kN7MZ8CZ838UUD4fbbCcRx51fGk=;
+        b=JivmGCVmpFdsVT6cdOASo4gKbZIl9qSu3JVXNhypimg5cQPaZY/WE4D1frV0KB6kRr
+         UNeaOoLvlebU7Mj41sLPffcN+WpsdpO0HO529hd4MZVmgb2PuoppnKAS+kjaqCXKm/Ff
+         I0qOjv9LwdPG1rwxRkYWuGbuYHldyOtgtFHj7lN6NWck4Zv4SifspyelCJdrxVAQ8dy3
+         YrXjuxBwD2Z/MVAh6OwcP/OjYgu7ZwFIjvv1DqFzerZ7FsIgr/wH1pj2PsU4pZ0Ri/ce
+         sx17mg9BEdHZcf5UR1BkYchKTsKivhgdNmjrThax8aD+7O5aaWHo3Yn3bQHJB5mbXdrN
+         uKPQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1773245344; x=1773850144; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7gVSVuZCY4DN/AOXDxmYSHDACnTa9Rrny+DZImbC8pA=;
-        b=SQx0nyZ9ApcSnLKUYIGoFFGVKTOnUPdX/xf3qAGS0wDHR9BgMWWFkelLdv5091S94q
-         HcjAk8kgytxwBtU0CqPwffzTb3abtXtYkJ+Z/m6nvaMCqbk6xhfYRitgdZ4ju69u+CYS
-         CL+oGTT6y1D7rD6q6pzWl2j1TIwKGFtIIzKL/asuLbIVbzq2H6mFUrTqF2IVRqPCL5vG
-         YJGjUBmFtMsjNo7JIPEVfQmSlQNWjCgL/HQBYqbtDUpdvIguSHYxSLbAlWhMaaGF/xZb
-         9M5CmPedneoAc9NfeTsL4jtb3eHSk3UiXqTftCUysb17wrCVy8GL68Q6QTlyunMtzYzK
-         G6WA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773245344; x=1773850144;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1773245418; x=1773850218; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7gVSVuZCY4DN/AOXDxmYSHDACnTa9Rrny+DZImbC8pA=;
-        b=Iit0M/dxG+UMtsueibEmrOMq1e/CnwS6Rs7UVxxoPNxkaKgAIKzq1vD34Dmv/u9VmZ
-         ezKU8DTdOOJm3+z0jgk33mRotQjR3tF7oo6ANFA35Ag9QTgK1q5hM2OzSRi+thX8ocEY
-         7hAnvxVG8iCMpNGjE4FjnUoObAYAyr/OKAkKWpmyTqVWfNYUMWr92ASS5y+xluc0DoJ6
-         O1TPlKciOJxfQafn1e7rtPYI/JpF6u5G3ZO/1aRk1nMeRzYGPdD3SJkf5ad9qGFCNXlE
-         Ao2jKcfFpUx5rIbBc8OkVfIT3zTaQuWvvwiWVsDhcorn32/XVadvMBDDCYWhHLY0scAI
-         x6Lg==
-X-Forwarded-Encrypted: i=1; AJvYcCWAzRGbWXuxJ9vb/JOoTbDVaeitdC5N7Co2uaPaeF22xsKFs0Uz2H4Shofnwl87+kH1wMl8yyhab/ad@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJNL/+yb9hJicVEhlSsWK9WBlrGWCld187aOjrgta9mP3CebHp
-	+cPog5T2YvqTzPJbmUAXeqUP6Nt5oWUrHYOpL5ZVY7Uypk7y2E8Kc5UyKHs+kGJdENk=
-X-Gm-Gg: ATEYQzyl8ZQssDUpfDpJszcmbSLF5nodxPwUuOcLM7+ksranFyoK/LV6WqFSgfxxVPd
-	oUHIwtAccd5lYf6Xb5cUfqqSP70/OXFRSTmSxnnm1LhhYGH/ePGT+j3/EvuOVmWfKZiIfRyDUMm
-	4d7esPS01He2h4nsjspI2qET7wFEsg5+TXQ6qspY6nq6TSvJ+/E8j2qihFc5tJo5RgfJ9N2AsW5
-	9cvp9wOA0g/rxUJAINsuNTMDaergob7a67pwRK6aNlMCiyh2tgbubBay3f14bFhTHXTjbcSFDUn
-	ZmnUyIJaij2orHcRLrGs9hFt8vpdElxB0YWZAbkgLx9FnQpdYKiodalFoRqYAKmTUqVtFL/NYyS
-	w9jUPS+hC9LB9NhsXbFQwjVMHsIwKXGnKAOOzH6MpXJgSSuXJw0BfZi7PXvOvPq1Tj/LhV5TI8c
-	5ACp2NA6iIwB+ZzDe53vmXgfymbPJOnc0iIUa63/AiqoK/xizl0VOJaAQ=
-X-Received: by 2002:a05:600c:8b45:b0:47e:e57d:404 with SMTP id 5b1f17b1804b1-4854b1008famr45351985e9.16.1773245344207;
-        Wed, 11 Mar 2026 09:09:04 -0700 (PDT)
-Received: from precision.tail0b5424.ts.net ([2804:7f0:6402:b103:6a0a:3e1c:778a:5cc7])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128e7cb558fsm4000846c88.10.2026.03.11.09.09.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 09:09:03 -0700 (PDT)
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: sfrench@samba.org
-Cc: pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	ematsumiya@suse.de,
-	linux-cifs@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] smb: client: preserve destination port when parsing server interfaces
-Date: Wed, 11 Mar 2026 13:08:56 -0300
-Message-ID: <20260311160856.635916-1-henrique.carvalho@suse.com>
-X-Mailer: git-send-email 2.52.0
+        bh=zQf3bqKM0prJaYagyzgzwBy7UALOn5Wa6w4qvhYX8FU=;
+        b=DQI1cRxaYaxsZCMcyoPsKK9oceAAMF2Z/4ka0wFpZB8+XmCfMpWDiiF7wWVvKTnenh
+         fLiq0/4041WV6SUN9UIAUOBG/CMSj6vFuAOInXJ4NveJurk01cGbF8fRy51alCQzW54O
+         UmWAXgDLBXidwZi/zen/FyMiT4+9QZH++ETKQNT+c0cTD2imeB9je4SnL8TKcC48glED
+         ooRh8mXUApVARqvWJDY7zkjpZo16/2+cEhSB1AU7m2IZ8+56OmAYPqCj9CJqISqpRtn0
+         +Gzbol7v857u1b5Km8cgfWLXwWaOdvanog3a0ycMGHtle6ytBjRh/50KWHHrh5a7Q75q
+         +ZMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773245418; x=1773850218;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=zQf3bqKM0prJaYagyzgzwBy7UALOn5Wa6w4qvhYX8FU=;
+        b=uI/E+8Sbxn7rRyTuTSz+rvF2W5vQrNmrfhUFJF3NFChmdTpfLiaotzNgpwaYXxHPFW
+         gVyJeWnXFMGD2XSBmh0IXbkrRiksoBJo7NJeOYvwmIVTYVaRpITk9/51qDBM+uskJk/O
+         2BcUxNprCm7J5eBMqjfebxWcLpTjxwRz9ePBTYUkdGd7/F98616QsNshdIfUieVHBbXQ
+         eYJNLzRtQfVH9xU2UUcHmzQs3Z40PWzjbuWkIIW6VdGOM1P9VgoxkUO9z157pr1iyNlU
+         vRh+uA3cz+qOKr/SNNUcgFQ84thvvPV33Nh4OUJZH7UOT77KrHPiTZu3/Je9q2xIjplp
+         xcww==
+X-Forwarded-Encrypted: i=1; AJvYcCUaJLnTSrhh5TCpWaqJC9IEW7eTk5vx8EtARUiIGdYHNWSjfAaLtqzURAO0lpqoB4ze26YbPgNcrZ5K@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrLJQglFSYL1AaKMT+S71d8HEdHHemBMFSzyE/Ck/zQfET171l
+	wyUKFvAPmmDIq7kC48bV6MEyjYOSOnvn2ftc0RIxK5GF0TI0QEIz9sqCPswqp8ZehYw/aiSlGw3
+	x/4zDmUVMP+GyZoS28NzwLyg6xaacsMyYHi2L29BA
+X-Gm-Gg: ATEYQzzOm7dTKTqqLUFKyXiUdE1B5oEL1L40z5/XmGN3LjgJaNzFEss2ipOze3fQkuG
+	/Ot4UYqwpl9hHd9OmqJPaoHvsbK7fu4cqP3S98MikdAGngd3s1ZhIZawLQdho/POKQN3ZEMUF5g
+	Ab7S8NFVQzNOxVJnB8fmSiM2PYaeQn8i7Ul84JGNZhvrRunjwLtUCU6cZFNT/TZV1N1GofRcqpC
+	hpu/vMUE+tQHfnwsNKmRWTaM3HpoU9sy09tmIX3UWxMxNRPFW5nXtPvxazoBFeEF5RhvvZsytnT
+	bXwg
+X-Received: by 2002:a05:6512:712:b0:5a1:4835:306f with SMTP id
+ 2adb3069b0e04-5a156baf0a8mr762062e87.19.1773245418128; Wed, 11 Mar 2026
+ 09:10:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260307140726.70219-1-dorjoychy111@gmail.com>
+ <20260307140726.70219-2-dorjoychy111@gmail.com> <CALCETrXVBA9uGEUdQPEZ2MVdxjLwwcWi5kzhOr1NdOWSSRaROw@mail.gmail.com>
+ <801cf2c42b80d486726ea0a3774e52abcb158100.camel@kernel.org>
+ <CALCETrVt7o+7JCMfTX3Vu9PANJJgR8hB5Z2THcXzam61kG9Gig@mail.gmail.com>
+ <20260309-umsturz-herfallen-067eb2df7ec2@brauner> <2026-03-11-regular-sore-census-shops-DqYcUT@cyphar.com>
+In-Reply-To: <2026-03-11-regular-sore-census-shops-DqYcUT@cyphar.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Wed, 11 Mar 2026 09:10:05 -0700
+X-Gm-Features: AaiRm51EXHFpn1BAVpxsTY5E2VQC7PD0Lwp6wdRjddj9MKMq4N9OfHTiuPJrR94
+Message-ID: <CALCETrVMF3VBr0cuEYOg-M_u+hX77Jfdujv3ZMtLGCzHgOcsGA@mail.gmail.com>
+Subject: Re: [PATCH v5 1/4] openat2: new OPENAT2_REGULAR flag support
+To: Aleksa Sarai <cyphar@cyphar.com>
+Cc: Christian Brauner <brauner@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
+	Dorjoy Chowdhury <dorjoychy111@gmail.com>, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, linux-nfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz, 
+	chuck.lever@oracle.com, alex.aring@gmail.com, arnd@arndb.de, 
+	adilger@dilger.ca, mjguzik@gmail.com, smfrench@gmail.com, 
+	richard.henderson@linaro.org, mattst88@gmail.com, linmag7@gmail.com, 
+	tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com, 
+	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com, 
+	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, 
+	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org, pc@manguebit.org, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+	bharathsm@microsoft.com, shuah@kernel.org, miklos@szeredi.hu, 
+	hansg@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-parse_server_interfaces() initializes interface socket addresses with
-CIFS_PORT. When the mount uses a non-default port this overwrites the
-configured destination port.
+On Tue, Mar 10, 2026 at 9:49=E2=80=AFPM Aleksa Sarai <cyphar@cyphar.com> wr=
+ote:
+>
+> On 2026-03-09, Christian Brauner <brauner@kernel.org> wrote:
+> > > > On Sat, 2026-03-07 at 10:56 -0800, Andy Lutomirski wrote:
+> > > > > I think this needs more clarification as to what "regular" means,
+> > > > > since S_IFREG may not be sufficient.  The UAPI group page says:
+> > > > >
+> > > > > Use-Case: this would be very useful to write secure programs that=
+ want
+> > > > > to avoid being tricked into opening device nodes with special
+> > > > > semantics while thinking they operate on regular files. This is
+> > > > > particularly relevant as many device nodes (or even FIFOs) come w=
+ith
+> > > > > blocking I/O (or even blocking open()!) by default, which is not
+> > > > > expected from regular files backed by =E2=80=9Cfast=E2=80=9D disk=
+ I/O. Consider
+> > > > > implementation of a naive web browser which is pointed to
+> > > > > file://dev/zero, not expecting an endless amount of data to read.
+> > > > >
+> > > > > What about procfs?  What about sysfs?  What about /proc/self/fd/1=
+7
+> > > > > where that fd is a memfd?  What about files backed by non-"fast" =
+disk
+> > > > > I/O like something on a flaky USB stick or a network mount or FUS=
+E?
+> > > > >
+> > > > > Are we concerned about blocking open?  (open blocks as a matter o=
+f
+> > > > > course.)  Are we concerned about open having strange side effects=
+?
+> > > > > Are we concerned about write having strange side effects?  Are we
+> > > > > concerned about cases where opening the file as root results in
+> > > > > elevated privilege beyond merely gaining the ability to write to =
+that
+> > > > > specific path on an ordinary filesystem?
+> >
+> > I think this is opening up a barrage of question that I'm not sure are
+> > all that useful. The ability to only open regular file isn't intended t=
+o
+> > defend against hung FUSE or NFS servers or other random Linux
+> > special-sauce murder-suicide file descriptor traps. For a lot of those
+> > we have O_PATH which can easily function with the new extension. A lot
+> > of the other special-sauce files (most anonymous inode fds) cannot even
+> > be reopened via e.g., /proc.
+>
+> Indeed, I see OPENAT2_REGULAR as a way of optimising the tedious checks
+> that userspace does using O_PATH+/proc/self/fd/$n re-opening when
+> dealing with regular files.
 
-Later, cifs_chan_update_iface() copies this sockaddr into server->dstaddr,
-causing reconnect attempts to use the wrong port after server interface
-updates.
+Can you give a brief decription or a link to what these checks are and
+what problem they solve?
 
-Use the existing port from server->dstaddr instead.
-
-Cc: stable@vger.kernel.org
-Fixes: c1846893991f ("cifs: update dstaddr whenever channel iface is updated")
-Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
----
- fs/smb/client/smb2ops.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 7f2d3459cbf9..d3cbfb3fdfc9 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -628,6 +628,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 	struct smb_sockaddr_in6 *p6;
- 	struct cifs_server_iface *info = NULL, *iface = NULL, *niface = NULL;
- 	struct cifs_server_iface tmp_iface;
-+	__be16 port;
- 	ssize_t bytes_left;
- 	size_t next = 0;
- 	int nb_iface = 0;
-@@ -676,18 +677,20 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 		 * conversion explicit in case either one changes.
- 		 */
- 		case INTERNETWORK:
-+			port = ((struct sockaddr_in *)&ses->server->dstaddr)->sin_port;
- 			addr4 = (struct sockaddr_in *)&tmp_iface.sockaddr;
- 			p4 = (struct smb_sockaddr_in *)p->Buffer;
- 			addr4->sin_family = AF_INET;
- 			memcpy(&addr4->sin_addr, &p4->IPv4Address, 4);
- 
- 			/* [MS-SMB2] 2.2.32.5.1.1 Clients MUST ignore these */
--			addr4->sin_port = cpu_to_be16(CIFS_PORT);
-+			addr4->sin_port = port;
- 
- 			cifs_dbg(FYI, "%s: ipv4 %pI4\n", __func__,
- 				 &addr4->sin_addr);
- 			break;
- 		case INTERNETWORKV6:
-+			port = ((struct sockaddr_in6 *)&ses->server->dstaddr)->sin6_port;
- 			addr6 =	(struct sockaddr_in6 *)&tmp_iface.sockaddr;
- 			p6 = (struct smb_sockaddr_in6 *)p->Buffer;
- 			addr6->sin6_family = AF_INET6;
-@@ -696,7 +699,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 			/* [MS-SMB2] 2.2.32.5.1.2 Clients MUST ignore these */
- 			addr6->sin6_flowinfo = 0;
- 			addr6->sin6_scope_id = 0;
--			addr6->sin6_port = cpu_to_be16(CIFS_PORT);
-+			addr6->sin6_port = port;
- 
- 			cifs_dbg(FYI, "%s: ipv6 %pI6\n", __func__,
- 				 &addr6->sin6_addr);
--- 
-2.52.0
-
+--Andy
