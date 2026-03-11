@@ -1,128 +1,260 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F762FDC3C
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 14:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568713B6340
+	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 14:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773238455; cv=none; b=O3b8NOhnfAKb3OqiPi2L73iWrPMeaoWkk41blAbn/XVrZOzO6ckio4G86ibuz1yhEgLDDgd011C7jradS5ycbUMmbahUs2LEYNTejs4L282M2IqHzfvmpS6huYt7mWgLjy2Wn//f4agiF2UlpWrSvBAQc44VU0JOhpc/IxpPfN8=
+	t=1773240066; cv=none; b=qmZoV3zVpW6voIJh4BBMtSiCZ9vZAz69WRB6PKtWMEItaIHKWfvPvMm8T9RHmUa/rBmz/+eiaUJjCUpsW98oL8foIwE8/MdlAYEmAm4LKgPybua3YPldzj0ezuftriBwc3t31HSOF8c4zspcOSZIuYtYksN0XhBtzWUIZ6yFvVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773238455; c=relaxed/simple;
-	bh=POUJjzeRhBIXfPGojdZfC417KH92loTKx1KmDpRcfoc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l+k1t82Mg3zMRnbeaIzg7e+V2VCtlN9VrBYuT3xV3CRvd/Lzv0Uw7EC9jBc+bA+d3wzyfkxsd1oS+hCVuylt7Vk/auKbGmjFiVZp3vchEwUZtmVq9QdTzNDfWaRYXZj854Nhmh+I+4K16h5KE7eqARdztRII2MZwf322rqEhBKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-66325f30570so986816a12.1
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 07:14:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773238452; x=1773843252;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wIz9Fr5w5J45ZN4rxwvT/0kjXMGfLP1VpB2aKPOax7k=;
-        b=kp3vgftDfvuAZlTeI5XXjy+lNUdpq+ZCh0L/On/4tKkbQPfsZl2VNESlyfQMIQgGWb
-         IMRoCXRiTas028zwlZThNFEVvR/eya49B83SrgKqNE9Uz7OdKFoPmfjPFTnQXX1YmYNR
-         XuNWRkUSxxIPqsS68bFOocW3Zb58v/jrw56we/mVkkjJ0R9RyNb2++P+8vwMARQgQn3X
-         YZ3VvDWUDJbVtlkHZ1J2lAlK+8Z7ep3omKhm970XDLKACJstThijcRKgqy4rd1/3+M6r
-         M6tE3jaR45cLuBrgwwn8kbSV6eAZtf2fUvV5X2k9SAOWBZuZgCXbiWCrhkXCAUSDrpRJ
-         JrIw==
-X-Forwarded-Encrypted: i=1; AJvYcCVU7PcAazYGqYzYhP5bCbJMWXPhK6YJQJhvaES6sqHmhLWlcWJrE+PWJtSrwQp2Ijrl5Tv5pGmrl9nk@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywtzbdw91EyIuSTFQNHTmohst2xoaofDhNAEFxiAdrEw9D5qEnk
-	9B/6fvL+EPFlnkH55x37urgjYjgnbuM3dLuD8zaHMz4IshEiHkkpCeh/1iSKn0bCmka9kQ==
-X-Gm-Gg: ATEYQzxKuy//lBgsWfg2+CyyJy9RCmcV+2HLmrOnm9CtmTOSoxFP8eiTRxFogEISzqb
-	svJeBt9DFK5y7fkpnbOil9ZoZh/Hzdu0qviLb1pNUy3yRelOCeLW6uY1jrDeMQm8EgQrY9DDbPb
-	+DK/eAB4DYR1NIxowVilfVMUqXzOsU3xg9XykqPAghviW3+0Ez3pe5LZGjA5DB/1CvPPkYkDEez
-	LiQVNtIKdc9n6rWlUGmx6xEbUChONoMnOpN6LBJtpkoaTbyKyNehLjyRh4R/2pMlbtWsnXnJ+GI
-	OxM5EbcuOEtpzPhi/ICA7fnWaQ0WE7iIk20hzLi92NHkflhNO7/XL0DbUzs8MgSwSzC+BRUK/Fu
-	2XA1g1hUXBGPpqjDy93GGaQw0I7gOjrfq+XjP6+7PilgncjVMNJliKVlTGTAP9i3Tsf2bZGcE3U
-	2+GXijeekkEpzv83tRgPOe01Ixh1uSO/b96O2VI61rMRAtp8v2mT6uwmET+fQh
-X-Received: by 2002:a05:6402:a2cf:10b0:649:19bf:bba1 with SMTP id 4fb4d7f45d1cf-662ba944685mr3094330a12.17.1773238452146;
-        Wed, 11 Mar 2026 07:14:12 -0700 (PDT)
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com. [209.85.208.51])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-663153216b6sm557726a12.23.2026.03.11.07.14.10
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Mar 2026 07:14:10 -0700 (PDT)
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-66174cf4549so2117497a12.0
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 07:14:10 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVox7oGvUjMN8FFwHRh5WAN1PxlGBKtqbnwXvuR42wruyuAQ0iz/8Bgf6bTEKf8sjH4Sp7fcjl8/AFb@vger.kernel.org
-X-Received: by 2002:a17:907:6d16:b0:b88:4f25:81da with SMTP id
- a640c23a62f3a-b97113ff0b9mr462021166b.0.1773237981235; Wed, 11 Mar 2026
- 07:06:21 -0700 (PDT)
+	s=arc-20240116; t=1773240066; c=relaxed/simple;
+	bh=rcVGCVd+4u8nKu+oWGEqzh8R7eweeTuR7vHBJAPPnXk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VSj7BFhibtYjDSAkxtDQdeC+ns0DwENt6RgdAVeKztMNSRH3sDLs56X1wB0+AFIeD/kR1Ij8ZdgjJSZTjdiTC78gfAHRZ3e31MHGhQ1UFdeqeQD25I32C78jsSORoEdj03W9Q9f6AUz7ouj01G1uJCkQ5eUGO6XbwZZhaD2Z5vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=Y0JtvZlc; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="Y0JtvZlc"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=WVtoeruvPvrFZg0wrQmWtQT912vvdc/LynjyKdaZqEI=; b=Y0JtvZlcUJ3G4rzWiZmpPFDvRD
+	QxETQRhAoIEl31PPMIo2RFEaId+LOrEld8DJ5oOTh7ARzrG9Lo6dTHAWukiMt2bLthkRahM057fyr
+	pbvRaIJltU0Ab3UQB0WeBNPOVJZQ7H6XLPuUPs6oIRjCvi3Zmo8RKJgNTf+yvO00YBAnZzzwPa/6x
+	2Yv0eueC+rl2d78MCpMcSw/Si2U/3MbH33jgKbNbIVf0aPhPoFD/KKWiHTvf5/jrFmbjQgEd3hkv0
+	X2O6uzx14U3KGfuyHLs2OTtQr7/BBniSMcDeo91OqM501gnQk/q17gio4gZc60+jk3J645TILzqlN
+	2eo3MXew==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
+	id 1w0Kk3-00000000i11-0wQH;
+	Wed, 11 Mar 2026 11:40:55 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: smfrench@gmail.com
+Cc: "Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	David Howells <dhowells@redhat.com>,
+	linux-cifs@vger.kernel.org
+Subject: [PATCH] smb: client: fix open handle lookup in cifs_open()
+Date: Wed, 11 Mar 2026 11:40:55 -0300
+Message-ID: <20260311144055.523527-1-pc@manguebit.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <20260310-b4-is_err_or_null-v1-15-bd63b656022d@avm.de> <20260310100750.303af303@gandalf.local.home>
- <20260311141332.b611237d36b61b2409e66cb3@kernel.org> <20260311100332.6a2ce4b1@gandalf.local.home>
-In-Reply-To: <20260311100332.6a2ce4b1@gandalf.local.home>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 11 Mar 2026 15:06:07 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdX4kRGLaKMzPuhS1Pmxh609eiqQW-cAS_jWBBbt-vE6SA@mail.gmail.com>
-X-Gm-Features: AaiRm53WEGMMLW4z34e7P-lM1qFvsCJGZ_o4JNL5NPWbhJPKmcqz6k9bJcyL--8
-Message-ID: <CAMuHMdX4kRGLaKMzPuhS1Pmxh609eiqQW-cAS_jWBBbt-vE6SA@mail.gmail.com>
-Subject: Re: [PATCH 15/61] trace: Prefer IS_ERR_OR_NULL over manual NULL check
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>, Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org, 
-	apparmor@lists.ubuntu.com, bpf@vger.kernel.org, ceph-devel@vger.kernel.org, 
-	cocci@inria.fr, dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
-	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
-	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, 
-	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-input@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org, 
-	linux-media@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org, 
-	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
-	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
-	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, ntfs3@lists.linux.dev, 
-	samba-technical@lists.samba.org, sched-ext@lists.linux.dev, 
-	target-devel@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
-	v9fs@lists.linux.dev, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Steven,
+When looking up open handles to be re-used in cifs_open(), calling
+cifs_get_{writable,readable}_path() is wrong as it will look up for
+the first matching open handle, and if @file->f_flags doesn't match,
+it will ignore the remaining open handles in
+cifsInodeInfo::openFileList that might potentially match
+@file->f_flags.
 
-On Wed, 11 Mar 2026 at 15:03, Steven Rostedt <rostedt@goodmis.org> wrote:
-> On Wed, 11 Mar 2026 14:13:32 +0900
-> Masami Hiramatsu (Google) <mhiramat@kernel.org> wrote:
->
-> > Hmm, now IS_ERR_OR_NULL() is an inline function, so it is safe.
-> > But if you want to use IS_ERR_OR_NULL() here, it will be better something like
-> >
-> > node = rhashtable_walk_next(&iter);
-> > while (!IS_ERR_OR_NULL(node)) {
-> >       fprobe_remove_node_in_module(mod, node, &alist);
-> >       node = rhashtable_walk_next(&iter);
-> > }
->
-> But now you need to have a duplicate code in order to acquire "node"
->
-> I think the patch just makes the code worse.
+For writable handles, fix this by calling __cifs_get_writable_file()
+directly with FIND_WR_OPEN_FLAGS, and for readable handles, call
+find_readable_file().
 
-Obviously we need a new for_each_*() helper hiding all the gory internals?
+With the patch, the following program ends up with two opens instead
+of three sent over the wire.
 
-Gr{oetje,eeting}s,
+```
+  #define _GNU_SOURCE
+  #include <unistd.h>
+  #include <string.h>
+  #include <fcntl.h>
 
-                        Geert
+  int main(int argc, char *argv[])
+  {
+          int fd;
 
+          fd = open("/mnt/1/foo", O_CREAT | O_WRONLY | O_TRUNC, 0664);
+          close(fd);
+          fd = open("/mnt/1/foo", O_DIRECT | O_WRONLY);
+          close(fd);
+          fd = open("/mnt/1/foo", O_WRONLY);
+          close(fd);
+          fd = open("/mnt/1/foo", O_DIRECT | O_WRONLY);
+          close(fd);
+          return 0;
+  }
+```
+
+```
+$ mount.cifs //srv/share /mnt/1 -o ...
+$ gcc test.c && ./a.out
+```
+
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Cc: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org
+---
+ fs/smb/client/cifsglob.h  |  1 +
+ fs/smb/client/cifsproto.h | 13 +++++--
+ fs/smb/client/file.c      | 75 ++++++++++++++++++++++++---------------
+ 3 files changed, 59 insertions(+), 30 deletions(-)
+
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index bb0fe4b60240..d56eeeb8f2b8 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1891,6 +1891,7 @@ enum cifs_writable_file_flags {
+ 	FIND_WR_FSUID_ONLY		= (1U << 0),
+ 	FIND_WR_WITH_DELETE		= (1U << 1),
+ 	FIND_WR_NO_PENDING_DELETE	= (1U << 2),
++	FIND_WR_OPEN_FLAGS		= (1U << 3),
+ };
+ 
+ #define   MID_FREE 0
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 800a7e418c32..683ba00297a3 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -138,8 +138,9 @@ void cifs_write_subrequest_terminated(struct cifs_io_subrequest *wdata,
+ 				      ssize_t result);
+ struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode,
+ 					int flags);
+-int cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, int flags,
+-			   struct cifsFileInfo **ret_file);
++int __cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
++			     int find_flags, unsigned int open_flags,
++			     struct cifsFileInfo **ret_file);
+ int cifs_get_writable_path(struct cifs_tcon *tcon, const char *name, int flags,
+ 			   struct cifsFileInfo **ret_file);
+ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
+@@ -596,4 +597,12 @@ static inline void cifs_sg_set_buf(struct sg_table *sgtable,
+ 	}
+ }
+ 
++static inline int cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
++					 int find_flags,
++					 struct cifsFileInfo **ret_file)
++{
++	find_flags &= ~FIND_WR_OPEN_FLAGS;
++	return __cifs_get_writable_file(cifs_inode, find_flags, 0, ret_file);
++}
++
+ #endif			/* _CIFSPROTO_H */
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 13dda87f7711..2e261c22c0f3 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -1061,32 +1061,26 @@ int cifs_open(struct inode *inode, struct file *file)
+ 
+ 	/* Get the cached handle as SMB2 close is deferred */
+ 	if (OPEN_FMODE(file->f_flags) & FMODE_WRITE) {
+-		rc = cifs_get_writable_path(tcon, full_path,
+-					    FIND_WR_FSUID_ONLY |
+-					    FIND_WR_NO_PENDING_DELETE,
+-					    &cfile);
++		rc = __cifs_get_writable_file(CIFS_I(inode),
++					      FIND_WR_FSUID_ONLY |
++					      FIND_WR_NO_PENDING_DELETE |
++					      FIND_WR_OPEN_FLAGS,
++					      file->f_flags, &cfile);
+ 	} else {
+-		rc = cifs_get_readable_path(tcon, full_path, &cfile);
++		cfile = find_readable_file(CIFS_I(inode), 0);
++		rc = cfile ? 0 : -ENOENT;
+ 	}
+ 	if (rc == 0) {
+-		unsigned int oflags = file->f_flags & ~(O_CREAT|O_EXCL|O_TRUNC);
+-		unsigned int cflags = cfile->f_flags & ~(O_CREAT|O_EXCL|O_TRUNC);
+-
+-		if (cifs_convert_flags(oflags, 0) == cifs_convert_flags(cflags, 0) &&
+-		    (oflags & (O_SYNC|O_DIRECT)) == (cflags & (O_SYNC|O_DIRECT))) {
+-			file->private_data = cfile;
+-			spin_lock(&CIFS_I(inode)->deferred_lock);
+-			cifs_del_deferred_close(cfile);
+-			spin_unlock(&CIFS_I(inode)->deferred_lock);
+-			goto use_cache;
+-		}
+-		_cifsFileInfo_put(cfile, true, false);
+-	} else {
+-		/* hard link on the defeered close file */
+-		rc = cifs_get_hardlink_path(tcon, inode, file);
+-		if (rc)
+-			cifs_close_deferred_file(CIFS_I(inode));
++		file->private_data = cfile;
++		spin_lock(&CIFS_I(inode)->deferred_lock);
++		cifs_del_deferred_close(cfile);
++		spin_unlock(&CIFS_I(inode)->deferred_lock);
++		goto use_cache;
+ 	}
++	/* hard link on the defeered close file */
++	rc = cifs_get_hardlink_path(tcon, inode, file);
++	if (rc)
++		cifs_close_deferred_file(CIFS_I(inode));
+ 
+ 	if (server->oplocks)
+ 		oplock = REQ_OPLOCK;
+@@ -2512,6 +2506,27 @@ void cifs_write_subrequest_terminated(struct cifs_io_subrequest *wdata, ssize_t
+ 	netfs_write_subrequest_terminated(&wdata->subreq, result);
+ }
+ 
++static bool open_flags_match(struct cifsInodeInfo *cinode,
++			     unsigned int oflags, unsigned int cflags)
++{
++	struct inode *inode = &cinode->netfs.inode;
++	int crw = 0, orw = 0;
++
++	oflags &= ~(O_CREAT | O_EXCL | O_TRUNC);
++	cflags &= ~(O_CREAT | O_EXCL | O_TRUNC);
++
++	if (cifs_fscache_enabled(inode)) {
++		if (OPEN_FMODE(cflags) & FMODE_WRITE)
++			crw = 1;
++		if (OPEN_FMODE(oflags) & FMODE_WRITE)
++			orw = 1;
++	}
++	if (cifs_convert_flags(oflags, orw) != cifs_convert_flags(cflags, crw))
++		return false;
++
++	return (oflags & (O_SYNC | O_DIRECT)) == (cflags & (O_SYNC | O_DIRECT));
++}
++
+ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
+ 					bool fsuid_only)
+ {
+@@ -2547,17 +2562,17 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
+ }
+ 
+ /* Return -EBADF if no handle is found and general rc otherwise */
+-int
+-cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, int flags,
+-		       struct cifsFileInfo **ret_file)
++int __cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
++			     int find_flags, unsigned int open_flags,
++			     struct cifsFileInfo **ret_file)
+ {
+ 	struct cifsFileInfo *open_file, *inv_file = NULL;
+ 	struct cifs_sb_info *cifs_sb;
+ 	bool any_available = false;
+ 	int rc = -EBADF;
+ 	unsigned int refind = 0;
+-	bool fsuid_only = flags & FIND_WR_FSUID_ONLY;
+-	bool with_delete = flags & FIND_WR_WITH_DELETE;
++	bool fsuid_only = find_flags & FIND_WR_FSUID_ONLY;
++	bool with_delete = find_flags & FIND_WR_WITH_DELETE;
+ 	*ret_file = NULL;
+ 
+ 	/*
+@@ -2591,9 +2606,13 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, int flags,
+ 			continue;
+ 		if (with_delete && !(open_file->fid.access & DELETE))
+ 			continue;
+-		if ((flags & FIND_WR_NO_PENDING_DELETE) &&
++		if ((find_flags & FIND_WR_NO_PENDING_DELETE) &&
+ 		    open_file->status_file_deleted)
+ 			continue;
++		if ((find_flags & FIND_WR_OPEN_FLAGS) &&
++		    !open_flags_match(cifs_inode, open_flags,
++				      open_file->f_flags))
++			continue;
+ 		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
+ 			if (!open_file->invalidHandle) {
+ 				/* found a good writable file */
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.53.0
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
