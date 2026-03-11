@@ -1,54 +1,70 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495EE3C6A40
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 09:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C61242D72
+	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 13:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773221546; cv=none; b=r3A+jr7M1dmxDT8g1uoVxFNgfxGhaBjXsjvacilj3BcyZzwORvfTtvKjYFUNV4Iy3JNQcH9GUF3znb9l+F0WMVKwXSlZ9Owut5CA7zZwTFl5kLWk6ISIHa9CZHWTkspowx9370Jj+s/kpd7WyOrSsNIru3yckSVg/sqoBfc61UM=
+	t=1773235321; cv=none; b=H8i1Onphb8jveuOXqvv1BObYHTLw7QVW9xoXHo2v2yZyhWnw3q9Sp+F8PznhBaznK9i5wZzmEG84TwPy13QuRZApLJeqT1/VsyMti6+5ikmEQEjW66NLmTYrokYHHoBMbpFa6+A7OzPFZlyn8FlANDCcQy0iCEpkFM2phAd8xx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773221546; c=relaxed/simple;
-	bh=JGYhPK256pxU9EiY8jbQSSjgozqR8V5kd9EUseD+GRo=;
+	s=arc-20240116; t=1773235321; c=relaxed/simple;
+	bh=bQRlE5OR+3/41N9B/xBGXfMeOTv3hgeQ2WrY6jcTpBY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lDPbIJX30/OfdLsE2BHzTX7jbYMiPXOpA5j6nZZN0URtgNrQnRggRxPparRQodJln6PKo0iETdOrUjfDMLAU6+mt52wlIj51GDRWbeyEWHKG6nftPOXTd1tMgwd1Ubeyd3mhnJ+hfZD/E/jaONTblzUxAJdIQu923r0pSmwOvoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HFhFoVNi; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HFhFoVNi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D687C2BCB6
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 09:32:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773221546;
-	bh=JGYhPK256pxU9EiY8jbQSSjgozqR8V5kd9EUseD+GRo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=HFhFoVNiTrG9LQIv0ppKNoD/HrLrqirjTX+9UZCfZCZR1ACy9KY8vzAF+UubsxXyb
-	 7A/AuxjB4pyfRVKpNo6VtwqDxAsV9i3OOu1suwbvFFD+dDURdR+fYaKC55vrGeQY9Q
-	 cSfgyMDf/Q66zJ3KWwfMvjGW3KxBKWlpZI+D0gyhlDHCmqkd60AvBaOv309nWmMVWV
-	 CYlN2OWwesW62EumkmGZjYKDzJerzMaIQkjARv2P34b/XlQnitMbZc1GQEBU1oFAvA
-	 btyT8hZcwwyybJD9LXcRDJBi0I3lkqqR8+lcx+5G7+1oP2ywnfC8KCi8970yZ/P/V5
-	 nMGE+UjgzzO6g==
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64ae222d87dso12762978d50.2
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 02:32:26 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUXGS+Orvxa9Vs1CvU4U+jLz86f+LFDzN7OSHDVmm93G8NUwq0/Oz/mLnOVIaTwqt6LMlTFz6nrtydI@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDYMPZn8FrErVtNRSgi5SVfnJpNX/mnKwZ3UJCEhHFp+Ylz7BP
-	6yBi2rZMbC7eRqMr34t7c0x1Ja838oHxtYyGe5RLZckMPS5ub3hBo6irajMkN6UQ21vXJEH5VOU
-	65FQvyUkRrAl84DnkaKpQ5isujBIVMD4=
-X-Received: by 2002:a05:690e:144d:b0:64c:e890:fbb9 with SMTP id
- 956f58d0204a3-64d656f696dmr1649157d50.20.1773221544775; Wed, 11 Mar 2026
- 02:32:24 -0700 (PDT)
+	 To:Cc:Content-Type; b=VFgvAjCgxgIt5rC282KfXVTB2ysKNKW0WshUkSaekw0MkEF5fgcIH999gequ6O/qUbaLpIOKWDd3eE6YpVhACltyVmeC6MVGLR8NYwzd3xsrMucGdKKcTAad84kuHdMGr+XQf2iB289U5wQt+wYbtOwrxy1oaY1zI5edmCxk1/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5675d609621so11791156e0c.2
+        for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 06:22:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773235320; x=1773840120;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=34DR94e/1PAvLLEaib58vFA4GW0m5SGe6jvxchEhMek=;
+        b=uB9BquRDLahBIbZvw1A+UKV34Hlr60e9hgV1JtLOVFgu53PiH4BsDNx7t/ii3LEzHa
+         QaykUuMNRyDDlL5j/OHkYA7WRDLiM+Rpqx5AR0FPUJTTs3h3EaLzBSkrQsgAarbr/fNv
+         dYVbOpZT7zEXRNpUsyDXzpbCMpFEBXq8FZhS221Z0DxFzFtBS6cX+Yw1JXJbZFLA9jjc
+         ieWhBwk4CUKrQJhuEPDUv18mT0qbVFfLefVwmnCkl2Cut6Ghmj9khIb6FQYxhqyo/RKX
+         piw/O+7Nsa40c2f5Ayd5bpvj9vjg5xhKXqreHErpIUgIS7AYkR/JMXg0QrWkAQAYHw4K
+         A1+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX6HWeuho/B9b+84ublEw2bs1/atXna8QLmu2qgqZPaqhmlT3IE8cnany+VoXatR6F0MtiLyYPS5quY@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVZnpXCzCvStJoPYhNhGXktHMSyWSdwnDaMUaKBZIZaWNiNL6G
+	pUVDg1Mp9xhxvpQGHMNZ2bhueKlNthH7r9CVwRznQULkluaKA4sE3J6+lgkCDB3lIsw=
+X-Gm-Gg: ATEYQzxrQMCur2HQd/nbGSkw6XVCrLP2+W1QfGWajagpZZLQNxh8E5+RFAPJMqmRS1R
+	tQNNrvNyiSVZJVLVmpRwh1/WW27HDYUrYrUAIuKYCZPf8E7l0ibq7WX1iQsP7gOA8IVIh1SH1D1
+	W9DLigVZhThne+cmFb7C3qaWPSl25/o6SSq5M2H34HudrOAHGBaMTobLaN/oPJH+t9w+/xF0Z06
+	ON21L+B5MuHCJZilXuYiaHKkvEK1zDFya7u3VJy6b+H0JHev8DdR0O4Snz/aQTXxClAX3LLLFg7
+	8A17Jr2QVf4nqnTat19eSIW/Sr6JZDgsyjDSWZao6fYYbhQALK/ObiU/hS9TnMOt/BQGuioPlTG
+	pmUhrzg6OYWwhdO3tEdY6yrsHJqnqCMRMFq0sX2PahCYj40OJRMrdRORGUuoliiOb3ONEGRCP4k
+	8/fyf1a6os1xWJsO4mtTG9xzAigl5n1WNdbmpiO4OpR1N4dmMlW9CAxfqcO5fi
+X-Received: by 2002:a05:6122:1d05:b0:55b:7494:177b with SMTP id 71dfb90a1353d-56b4752d806mr930759e0c.10.1773235319757;
+        Wed, 11 Mar 2026 06:21:59 -0700 (PDT)
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com. [209.85.222.45])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56b4645d11csm902071e0c.12.2026.03.11.06.21.59
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Mar 2026 06:21:59 -0700 (PDT)
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-94dd0f3c4b7so8222190241.1
+        for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 06:21:59 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVgKGQyaLzQhojSgoV75nWt1AArf+HeEFwIi4lJIOKyeaqihF+/KqHfM0Oap8JsGQCc4Lh//5z6aKQL@vger.kernel.org
+X-Received: by 2002:a05:6122:1d05:b0:55b:7494:177b with SMTP id
+ 71dfb90a1353d-56b4752d806mr922396e0c.10.1773234967338; Wed, 11 Mar 2026
+ 06:16:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de> <20260310-b4-is_err_or_null-v1-41-bd63b656022d@avm.de>
-In-Reply-To: <20260310-b4-is_err_or_null-v1-41-bd63b656022d@avm.de>
-From: Linus Walleij <linusw@kernel.org>
-Date: Wed, 11 Mar 2026 10:32:12 +0100
-X-Gmail-Original-Message-ID: <CAD++jLnDv00ErgVdQ4EBpKH9KMWrPD8ODrQ6m846zyQ=wNzCzQ@mail.gmail.com>
-X-Gm-Features: AaiRm52aI8z_G2E4qYaKWPEA43RhLektjwMDQXSLwHd-Xy_BYcin-6heFFY4jM4
-Message-ID: <CAD++jLnDv00ErgVdQ4EBpKH9KMWrPD8ODrQ6m846zyQ=wNzCzQ@mail.gmail.com>
-Subject: Re: [PATCH 41/61] pinctrl: Prefer IS_ERR_OR_NULL over manual NULL check
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de> <20260310-b4-is_err_or_null-v1-36-bd63b656022d@avm.de>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-36-bd63b656022d@avm.de>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 11 Mar 2026 14:15:56 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXQ8Q4jvkgFRJYhghz2BZRDC-9Mk6DbXxuaOc6C9DFHZQ@mail.gmail.com>
+X-Gm-Features: AaiRm52J84H77ROK64ZWWtJfaiCpnFeKyoSRmPbi-NC8CN6Ju1TJEFxJU9gZQQ8
+Message-ID: <CAMuHMdXQ8Q4jvkgFRJYhghz2BZRDC-9Mk6DbXxuaOc6C9DFHZQ@mail.gmail.com>
+Subject: Re: [PATCH 36/61] arch/sh: Prefer IS_ERR_OR_NULL over manual NULL check
 To: Philipp Hahn <phahn-oss@avm.de>
 Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
 	bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
@@ -74,24 +90,32 @@ Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
 	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, ntfs3@lists.linux.dev, 
 	samba-technical@lists.samba.org, sched-ext@lists.linux.dev, 
 	target-devel@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
-	v9fs@lists.linux.dev
+	v9fs@lists.linux.dev, Yoshinori Sato <ysato@users.sourceforge.jp>, 
+	Rich Felker <dalias@libc.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 10, 2026 at 12:55=E2=80=AFPM Philipp Hahn <phahn-oss@avm.de> wr=
-ote:
-
+On Tue, 10 Mar 2026 at 12:56, Philipp Hahn <phahn-oss@avm.de> wrote:
 > Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
 > check.
 >
 > Change generated with coccinelle.
 >
-> To: Linus Walleij <linusw@kernel.org>
-> Cc: linux-gpio@vger.kernel.org
+> To: Yoshinori Sato <ysato@users.sourceforge.jp>
+> To: Rich Felker <dalias@libc.org>
+> To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+> Cc: linux-sh@vger.kernel.org
 > Cc: linux-kernel@vger.kernel.org
 > Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
 
-Patch applied to the pinctrl tree as obviously correct.
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Yours,
-Linus Walleij
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
