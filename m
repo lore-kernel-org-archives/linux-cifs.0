@@ -1,212 +1,197 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5AB33C197
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 02:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773194792; cv=none; b=NBs1dUQChf7905OXBMDJ918UZbnEne0mNF13lFcsdwXvP4Sx8F3aocAetaUyb18TAcX404DtihrzCh+NlMxoKkjRpXK8rkeREY+TioB9lVksIHBd9dTp32G1ax30h6F+NY+I98i6CTmQHpYIQJqCktqK4E9amLghCRXdSM7SWX8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773194792; c=relaxed/simple;
-	bh=P1+ZQrw/a3+oxXwntvE4BjS3zMiSxriGuhAOi6EH3nU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uCwcIfN/qJD/IpVjx3JM/oMU/eppY8PqtqwSE+RvWBTzXFycAHOtHjgTKfnXYtDOE+zmF2qHPeiMdoHdmaTpfwXq+qJe7utegYNENYCBs70Eup7Ilh6nMZD6gcElSXs2vYgLedKnapRrqVOCv81/gvjQii8FDM33et6GFj93CcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=JZFdoL+V; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1661EDA0F
+	for <linux-cifs@vger.kernel.org>; Wed, 11 Mar 2026 02:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773194857; cv=pass; b=qn8vqPlrOLszPjKFbCLZZb5UtdKDDZNwNlrOBBjVr3kBrXDJrPzQ7KECUJHKsKe5BNiEC7NBGosD6+fdhPMPxi6JT6NTFz76F8n8sIylvR7ffHhsk3JwqWxjNyVZHcG+ksPdJyzup9zhFrckg5FUo6u/ZIpdgCwgtrYIBz7I/cU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773194857; c=relaxed/simple;
+	bh=8UJnLa/DDQ+b65RDSHa97nR/Rm6zetnRjswOkVb13wc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ujY48pyoYbcjWehK57wwmd/7DaptpUIUvKvGmm8frAVN6kh/ucMwUweoSvKxUZ5QxWjjKNDkVMcOUSnav5TVvHI8yq9JAGzSy1/psiq0UoWQ8tlzNGJcUBYthKw7MZllvS/Vt5uBOAy9s/xIxl5Rsvh2JSuaEacKdFfG5IYq9Jg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=SqpOgAb4; arc=pass smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="JZFdoL+V"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-439c5b40f60so6211576f8f.0
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Mar 2026 19:06:30 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SqpOgAb4"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5a13d1c6f25so4703789e87.3
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Mar 2026 19:07:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773194852; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OjSKsAw5iSA/vYJslqPNBNG5I8EJh6WoGkGlQY0N7Geeib/J6Rb/NRvGBYYp3Zr/OQ
+         3k5IThiTzAnByUHGkxYdkh0EtVBGAg+/8RCcHsrYt9GolcqHOwWf38x6lYnAI+UfARbj
+         gBvrBs1KJ1TfajcjlpTURCf6PEeabybIAtxGmcKpoD9TEJA6tU8ZAlrWolWWZIwoyIk1
+         ujcdu5wFLLFHOYYqFF0yKPCnBJI5OzBB3MD2SzIDaMYFKaSuvIbA2uS1fQ+AH+ztoLgl
+         urDscDZ487WuVD819fsPf7E3GRBoCPalflwMtuHF79E0ZTfMdXtYY5IhvIx2i1hndbps
+         JQUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=+zLBLQzKjcztDlxJqoLP6w+B6xnZmfHibV4jlBQCebA=;
+        fh=IttYCFQ4RYO+BGGllO8KegIihXO2sgRvvr63IdZvCgc=;
+        b=Z5I44t/bXbtsrJKEN19zICwFe15XQ9MxnV/tEsER48HT9DaD8cpmDKeOk2iYgEeJA6
+         mWbKTXy9wGvZMBmND18chZn/tth4Fj9tmg2X9fzBngaKHWhCSNXV57zjx832K9IS0hiG
+         NgyA0KoQ6gf6Zs2LCdkkIgT+/yQdpdyrtOehG5t0Bw0TM7FpKBOSbBD7KUYfJ+kUtRsA
+         vo6JOmN8Kqnhwhb6fLzbz7ZlRcfPFe3+xpNVDQyntTLX47/zAqEzQSximnxnBZL1ze2H
+         vuB3q44uyjRjcqu5gFf5+9blZVGKUAsXR8QPu3bgyf4QhIQbhGHM93gT8PDna1PcE0x0
+         qFeQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1773194789; x=1773799589; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YeasIl4NlVlSUO2J1WHrJ04QPxBi9mp/dFx8NjgnjNI=;
-        b=JZFdoL+Vzw8c9AOUjOyLJZhGgJuPJN3+xfi5pXlNgByhuvT2jrIq/nK5wUhuEh95UP
-         0mEqIHMcQS+8SqVC1K/Z2H9bBz/mHDaan9sEkjD/n/+KHLrOdyxv8hyg3hj+snvKGVfo
-         dnkC/sa0HFle9ntFHcYgqYGY3/cF0owqHjBJp4Ra3HJX0zMsR9aPn9kZQSo0u1SF1RdZ
-         DXaPMB2KxEDhwvCSGc9P+yppQkxDcDnIcM9qQ5w+xLZiPed4NAde1VumNl/UDMzhurrX
-         c/hVWN70nb7eMfT3le7BdkxvAUugL/fgHBActcXOYhE7LqntKq8hPkqPWhXQxr70eC5O
-         3ZHA==
+        d=chromium.org; s=google; t=1773194852; x=1773799652; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+zLBLQzKjcztDlxJqoLP6w+B6xnZmfHibV4jlBQCebA=;
+        b=SqpOgAb4CQOCp6QT1IhDiJXNOENCCAthmmQiQ2Xm1LqdH6AuNnr9pWEOxoaM6J2EHp
+         TaZvrNsWvEAAdeAh3rGZCGLrxzU767HUy57VJt43+079ae3+2kuAr2+JBVbU8T9+l/BT
+         vjjO+GANIyds0bGFgUhdgNG0FnF3NJi/nWQH4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773194789; x=1773799589;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YeasIl4NlVlSUO2J1WHrJ04QPxBi9mp/dFx8NjgnjNI=;
-        b=O6To9hGVe90KaR6Fnc8dYv/S9BevyAplphCgzRHN2f2ZbizziQEoSlo7F0u6NKnzg9
-         65iwvGi6AHIqbKZGgVo17wWiCmMFRMEZWLwHstWEjPqzjHvtsutu3GSC6J97mskIlVVu
-         BsAjiy/q/RDnDLUxUD11xcQ1PgjMXC1UJU9tzna/ReYX3bTPUy8ld3Wn3/qGYGZJj4qx
-         rGLYfkVRHoMRI3HIfayKyJzYsQ7Mxd9DLoN6mVlgtBgvYTqPTxpT9+gAKjPyHx1MePD9
-         YDdiUIqJcZxXHRe4HReg09mQjuqvlJfh4sgMEZd2qA7Pq1EMY08NPAkLGT0OnEwIk0rg
-         fuMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV9hEClLMJBXsnorql217KpQkILYgYSCfP3ae0J/AsTvsG2rDkUfIe3G29pc2bIt1xJLpRH/pqf3p0q@vger.kernel.org
-X-Gm-Message-State: AOJu0YybEvzu8tGP4M12VYDCwgvEFLIZH7DNf1cZTloiA0c9CxTan5qf
-	fIzaErQv8lNQkf+OLHTUar2nWj+uAcs2Lw+0BGPg9qqraP+LTbq25LovT4eqW6CLrt2sBXAZHD3
-	C5jw6
-X-Gm-Gg: ATEYQzzO0dyo51wkjNmesCTT5YM8xmhCVdsd30Ju07+YoFdml1j9EljDDH8O+sJ9e22
-	yJkKAk8EFFj0RjvfVsj7ssoF3P2310TVsRTW3j2H3y134P6Jj1Zavg/6vWIvqJSija9bhm+Arx3
-	WEjKXzvpDX4vMS1F2I4JYeznRyVB+sFIyAEhQ6LLf4Dz69A+NwzpH8kzVKP/54RRFclBtfMvKp1
-	4R9tsfGpa7EXc9LJzg4mF7qzM7neRrGpiFWOLzx4WtzEMzLgxClP61ZRT4WSItKP/IvlUz148sH
-	mZygIG1TsiKzT0jlGpaPl13d7YJydwDSEudw6YTPGVDfrjqev7OUcl6XX6w6VjAFCGr732CT35I
-	KQXKivHco8WA4GSTQe1XQHZDJ84nSKzOtkt6V35I1ASbHi0efyntpu3OSKruriFoIKF/74GTdPH
-	6WvF5WMIE7buOFpptXMIM7PlMysMtW8BRhjylyOFwiXL7jOiU898Jfg+g=
-X-Received: by 2002:a05:600c:a46:b0:485:3026:2b8b with SMTP id 5b1f17b1804b1-4854b12bfd2mr12821085e9.29.1773194789451;
-        Tue, 10 Mar 2026 19:06:29 -0700 (PDT)
-Received: from precision.tail0b5424.ts.net ([2804:7f0:6402:b103:6a0a:3e1c:778a:5cc7])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2be8aa7413esm728571eec.24.2026.03.10.19.06.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 19:06:28 -0700 (PDT)
-Date: Tue, 10 Mar 2026 23:06:24 -0300
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: "Dr. Thomas Orgis" <thomas.orgis@uni-hamburg.de>
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, 
-	regressions@lists.linux.dev, stable@vger.kernel.org
-Subject: Re: [REGRESSION] failure to reconnect on SMB server restart with
- custom TCP port (not 445): Host is down (at least since 6.6.95)
-Message-ID: <c66p7dr6vlujvnwczbnrmqx7monkdgdnm4rwewm76aibn7jza3@d3uik74dei72>
-References: <20260310235642.6d9798f4@plasteblaster>
+        d=1e100.net; s=20230601; t=1773194852; x=1773799652;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+zLBLQzKjcztDlxJqoLP6w+B6xnZmfHibV4jlBQCebA=;
+        b=PPnoIgGGDLMB+zhv9V4bMCdZFKmFIhsKx+6aTrxjPIPtKCXXfToz2J/wJ28CYzh0X8
+         djvHkMXxaGlcSiYR43Ms8Qp+2DjZFmU2fiDaJLmLJRWIgCn3nrhBtHP9+ylJm/O3XuiF
+         BlpFGH0penTXuEKUNidmcp+A8p516FTlng+/A+zICqthbN68p8TU2NrCeQAeT/430wNe
+         j8Jp1ZKIjdUFlucUuw/GuBycQIHxUvKHn5IyJfnWs7Ficzq11H3wu4RYnv9wXa4LoSn4
+         wAe+ACX24k4JLrdtQoqNgpWb9PRmRRwwCx+dDRpTobtcpWJsjBCC20ZGp5+hT6TLlMCI
+         TcAg==
+X-Forwarded-Encrypted: i=1; AJvYcCXNfWeuons6ME8ZUdyc44JrJchXpeF2k4w8qGiDpYmoqVCrXFQ5XSsLdseG3EMd2a1qhiunBldy4UKn@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb7Q/B1OE1h/vMhKHXeTTkgtRi0ocgzO7TwCtl+v/IgWgQ4YQu
+	7ILS617p34KlAUjuYBwQGsQoW1wXUTOLlGVR4c/xnOwSimMkwADtWRAioW8pdCA42uro8K75FKo
+	Dw5XFQsl0AtSpVC3C0nhSxhyYcGfSPVdCCcTahnAy
+X-Gm-Gg: ATEYQzybyDVQuLgq/Q/txccnRPu7I/3Pl4ddijNzZYvQuBPeU3LxIaNJ8Io3Mr9UIIC
+	fC8hFnXB6nlg3W4+55t6XRof4SePeOih7sinmkLfNeGPl42Yrq25erwudgj7j4JDcdH8QGWb4X0
+	+7GYUiJNwBWN7J8UdRaVSEapzN+nrk5gfdbOiDfUAHQhGGFiTtGCaSepPljRFprGmlQwmdRLMD1
+	ihkbo8toPSbTJxu/jWP/F02V8ryy0eBA7fqqgDmANxNrJuYv8RvjooHk63hlOgfJuUaYJ+jtXv5
+	LX3unq1Zng==
+X-Received: by 2002:ac2:4427:0:b0:5a1:3134:9bac with SMTP id
+ 2adb3069b0e04-5a156cbd1bbmr169453e87.28.1773194852284; Tue, 10 Mar 2026
+ 19:07:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="vyyfnoz5o32eea4w"
-Content-Disposition: inline
-In-Reply-To: <20260310235642.6d9798f4@plasteblaster>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de> <20260310-b4-is_err_or_null-v1-56-bd63b656022d@avm.de>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-56-bd63b656022d@avm.de>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Wed, 11 Mar 2026 11:07:21 +0900
+X-Gm-Features: AaiRm5028PWt8n-JnveiRgn8oYMksdR_-_nk4JOkvxMfplWs-GDr7RRk-OxICyw
+Message-ID: <CAGXv+5FQAVaJjqhv+Xq-ysOc4SHQn2mCNTgCAp8XocmWBWGGoA@mail.gmail.com>
+Subject: Re: [PATCH 56/61] clk: Prefer IS_ERR_OR_NULL over manual NULL check
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
+	bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
+	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
+	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org, 
+	linux-media@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
+	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
+	linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, ntfs3@lists.linux.dev, 
+	samba-technical@lists.samba.org, sched-ext@lists.linux.dev, 
+	target-devel@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
+	v9fs@lists.linux.dev, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Daniel Lezcano <daniel.lezcano@kernel.org>, 
+	Thomas Gleixner <tglx@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Mar 10, 2026 at 9:57=E2=80=AFPM Philipp Hahn <phahn-oss@avm.de> wro=
+te:
+>
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
+>
+> Semantich change: Previously the code only printed the warning on error,
+> but not when the pointer was NULL. Now the warning is printed in both
+> cases!
+>
+> Change found with coccinelle.
+>
+> To: Michael Turquette <mturquette@baylibre.com>
+> To: Stephen Boyd <sboyd@kernel.org>
+> To: Daniel Lezcano <daniel.lezcano@kernel.org>
+> To: Thomas Gleixner <tglx@kernel.org>
+> Cc: linux-clk@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+> ---
+>  drivers/clk/clk.c               | 4 ++--
+>  drivers/clocksource/timer-pxa.c | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/clk/clk.c b/drivers/clk/clk.c
+> index 47093cda9df32223c1120c3710261296027c4cd3..35146e3869a7dd93741d10b72=
+23d4488a9216ed1 100644
+> --- a/drivers/clk/clk.c
+> +++ b/drivers/clk/clk.c
+> @@ -4558,7 +4558,7 @@ void clk_unregister(struct clk *clk)
+>         unsigned long flags;
+>         const struct clk_ops *ops;
+>
+> -       if (!clk || WARN_ON_ONCE(IS_ERR(clk)))
+> +       if (WARN_ON_ONCE(IS_ERR_OR_NULL(clk)))
+>                 return;
+>
+>         clk_debug_unregister(clk->core);
+> @@ -4744,7 +4744,7 @@ void __clk_put(struct clk *clk)
+>  {
+>         struct module *owner;
+>
+> -       if (!clk || WARN_ON_ONCE(IS_ERR(clk)))
+> +       if (WARN_ON_ONCE(IS_ERR_OR_NULL(clk)))
+
+clk_get_optional() returns NULL if the clk isn't present.
+
+Drivers would just pass this to clk_put(). Your change here would cause
+this pattern to emit a very big warning.
+
+I don't think this change should be landed.
 
 
---vyyfnoz5o32eea4w
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+ChenYu
 
-On Tue, Mar 10, 2026 at 11:56:42PM +0100, Dr. Thomas Orgis wrote:
-> Dear Linux-CIFS maintainer(s),
-> 
-> I stumbled upon a regression in the Linux cifs/smb3 client when working
-> with a smbd using a non-standard port. I am not the first to note this, see
-> 
-> 	https://bbs.archlinux.org/viewtopic.php?id=306712
-> 
-> which is a report from mid last year, indicating the problem sometime
-> after Linux 6.6.72. It is a very simple issue, where details of the
-> kernel builds or mount setup don't seem to matter much: Older kernels
-> reconnect to a SMB server that was restarted (old processes killed and
-> replaced), newer kernels do not and just have a defunct mount.
-> 
-> I reproduced this in our HPC cluster environment with such smb.conf on
-> the server side
-> 
-> [global]
-> security = user
-> map to guest = Bad Password
-> server role = standalone server
-> smb ports = 1445
-> 
-> [public]
-> path = /some/path
-> guest ok = yes
-> read only = yes
-> 
-> and such a mount command on the client:
-> 
-> mount -t smb3 -o port=1445,user=guest,password=foo //server/public dir
-> 
-> When I kill and re-start smbd on the server, older client kernels
-> reconnect and continue to return listings and files from the share,
-> while newer kernels give this:
-> 
-
-My suspicion is that the regression was introduced by:
-
-    5713127da855 ("cifs: update dstaddr whenever channel iface is updated")
-
-That change causes parse_server_interfaces() -- should this be running
-without multichannel mount option? -- to overwrite the port stored in
-server->dstaddr with CIFS_PORT.
-
-The attached patch preserves the existing port from server->dstaddr.
-
-Note that I have not yet tested this patch or confirmed the regression
-with a bisect. If you can't, I will try to do that tomorrow.
-
--- 
-Henrique
-SUSE Labs
-
---vyyfnoz5o32eea4w
-Content-Type: text/x-patch; charset=us-ascii
-Content-Disposition: attachment; filename="patch.patch"
-
-From 1218840331eef3a6b523ad39e851a412f570b7d8 Mon Sep 17 00:00:00 2001
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-Date: Tue, 10 Mar 2026 22:52:52 -0300
-Subject: [PATCH] smb: client: preserve destination port when parsing server
- interfaces
-
-parse_server_interfaces() initializes interface socket addresses with
-CIFS_PORT. When the mount uses a non-default port this overwrites the
-configured destination port.
-
-Later, cifs_chan_update_iface() copies this sockaddr into server->dstaddr,
-causing reconnect attempts to use the wrong port after server interface
-updates.
-
-Use the existing port from server->dstaddr instead.
-
-Fixes: 5713127da855 ("cifs: update dstaddr whenever channel iface is updated")
-Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
----
- fs/smb/client/smb2ops.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 7f2d3459cbf9..d3cbfb3fdfc9 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -628,6 +628,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 	struct smb_sockaddr_in6 *p6;
- 	struct cifs_server_iface *info = NULL, *iface = NULL, *niface = NULL;
- 	struct cifs_server_iface tmp_iface;
-+	__be16 port;
- 	ssize_t bytes_left;
- 	size_t next = 0;
- 	int nb_iface = 0;
-@@ -676,18 +677,20 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 		 * conversion explicit in case either one changes.
- 		 */
- 		case INTERNETWORK:
-+			port = ((struct sockaddr_in *)&ses->server->dstaddr)->sin_port;
- 			addr4 = (struct sockaddr_in *)&tmp_iface.sockaddr;
- 			p4 = (struct smb_sockaddr_in *)p->Buffer;
- 			addr4->sin_family = AF_INET;
- 			memcpy(&addr4->sin_addr, &p4->IPv4Address, 4);
- 
- 			/* [MS-SMB2] 2.2.32.5.1.1 Clients MUST ignore these */
--			addr4->sin_port = cpu_to_be16(CIFS_PORT);
-+			addr4->sin_port = port;
- 
- 			cifs_dbg(FYI, "%s: ipv4 %pI4\n", __func__,
- 				 &addr4->sin_addr);
- 			break;
- 		case INTERNETWORKV6:
-+			port = ((struct sockaddr_in6 *)&ses->server->dstaddr)->sin6_port;
- 			addr6 =	(struct sockaddr_in6 *)&tmp_iface.sockaddr;
- 			p6 = (struct smb_sockaddr_in6 *)p->Buffer;
- 			addr6->sin6_family = AF_INET6;
-@@ -696,7 +699,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 			/* [MS-SMB2] 2.2.32.5.1.2 Clients MUST ignore these */
- 			addr6->sin6_flowinfo = 0;
- 			addr6->sin6_scope_id = 0;
--			addr6->sin6_port = cpu_to_be16(CIFS_PORT);
-+			addr6->sin6_port = port;
- 
- 			cifs_dbg(FYI, "%s: ipv6 %pI6\n", __func__,
- 				 &addr6->sin6_addr);
--- 
-2.52.0
-
-
---vyyfnoz5o32eea4w--
+>                 return;
+>
+>         clk_prepare_lock();
+> diff --git a/drivers/clocksource/timer-pxa.c b/drivers/clocksource/timer-=
+pxa.c
+> index 7ad0e5adb2ffac4125c34710fc67f4b45f30331d..f65fb0b7fc318b766227e5e7a=
+4c0fb08ba11c8f9 100644
+> --- a/drivers/clocksource/timer-pxa.c
+> +++ b/drivers/clocksource/timer-pxa.c
+> @@ -218,7 +218,7 @@ void __init pxa_timer_nodt_init(int irq, void __iomem=
+ *base)
+>
+>         timer_base =3D base;
+>         clk =3D clk_get(NULL, "OSTIMER0");
+> -       if (clk && !IS_ERR(clk)) {
+> +       if (!IS_ERR_OR_NULL(clk)) {
+>                 clk_prepare_enable(clk);
+>                 pxa_timer_common_init(irq, clk_get_rate(clk));
+>         } else {
+>
+> --
+> 2.43.0
+>
+>
