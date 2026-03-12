@@ -1,322 +1,206 @@
-Received: from flow-b6-smtp.messagingengine.com (flow-b6-smtp.messagingengine.com [202.12.124.141])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013044.outbound.protection.outlook.com [40.107.201.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1883B3B0AC3;
-	Thu, 12 Mar 2026 21:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.141
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773352730; cv=none; b=sRITVV3t4lyVcazicXpR1awjN2tuFhEHfkb5c11UVzL/t1lHgbQZI116EOrPFT3lxzoN8iWrunGLzZCNlHiL/CReHNIY88QeMnZXqXverrS8iFNylfmxSSfF4T4QQSzywkLyFwep45hzDEbyuIY4d0FFAmiFGmIcapJ/Yti2ME0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773352730; c=relaxed/simple;
-	bh=UmfJbnuU/Yo/a8QU+2YFRiWg5kbx4wC2VnpwUVdazVw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hDqY6QdrwaePmeIh0NSczvXxM0KAVlMcXAa4h9lgYz7SP8uH81BWR3+50508hO09CyXciFBcPEJxgjHcS8uleJwCtoh2yESNAyykPMY2930tPuLPHby7yDLCJ6Vl4HCqW8a5h4sjscobNfhW3y9giTUvvBmzP3s0Il7mWCSoGUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=blzcrDgL; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ixHPrpEO; arc=none smtp.client-ip=202.12.124.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D1A175A7C;
+	Thu, 12 Mar 2026 23:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773357446; cv=fail; b=QOHeZkOdcTfMMUNjtWTPM08GGlYP1LrtzhtOWfZvteXoZjs53JMOWSAApP6hJ5k65SX8REJTBwmhV6XuRmDPofQQCnNuhiKuLQaDI3AF42732scboJgQQ8r3wncfja3sRBYPRHiI7/FlDhXwk5iWHLIkKDBtWCDkjo3ow4BNAZE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773357446; c=relaxed/simple;
+	bh=x8fM8Byr79pBSOMAYW9KfhlRRARXE9dbCQ3t2WJEwyg=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=q1ewjvcotJHSfKbo93brqYfCt0Ubzs2ktnKlSs5ODhiuGPKdvmU2WlrK1hAXYDkl43Uw0wCERsV06zklAmH/FI9ZvbggorPLJTJV6//N2kISs2t2zgj2/Ak6TZbL/DVVsn/H+UNefGXf7F2Ve2Inc2vZ48tiLMceimU4CFiKng0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ON5f1mCS; arc=fail smtp.client-ip=40.107.201.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="blzcrDgL";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ixHPrpEO"
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailflow.stl.internal (Postfix) with ESMTP id 4DDDD1301B67;
-	Thu, 12 Mar 2026 17:58:46 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-10.internal (MEProxy); Thu, 12 Mar 2026 17:58:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:reply-to:subject:subject:to:to; s=fm1; t=1773352726;
-	 x=1773359926; bh=2wACx9EwCsU2MDL/6t9ARpFPHpQPm8JZgOjdNVtpbNE=; b=
-	blzcrDgLn4ZT1/j/qNPwj10MGyDDKhidDzBQXDLYeoY4Yltme0biw2IT9ktAbaOb
-	N7qFTQgNbIDpTUtHqfGoyMmpUnkIB5afxID4LfkxBWIe/3ZjfNoJeD8//kPAuxN+
-	gG7mt8T+9KsDqj6oOqhnO7tq1PyR3O3qlNuDj4XyU8/suvadyNcwIMrRH79WoZyr
-	oaxRL1ArA2O4uHcrh9ILrwXJWcm6ni4lXh4xLKgPm1bNw/98wN/aUlWXDActEM1M
-	44KhqBaswgoORV7MrH5Sl9r6bWdoAtxSBWWS8K5XiUC97v+bt+lYIP/MePsALlc1
-	0G9KqiqnN4hwv+H1715/Vw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1773352726; x=1773359926; bh=2
-	wACx9EwCsU2MDL/6t9ARpFPHpQPm8JZgOjdNVtpbNE=; b=ixHPrpEOU9DFEicZZ
-	zRVVExlYGJIKXL1t1vKaHDUivTDQpq17RVcDlcnpcX+oEEwR4o6fk1VFpaf7ELpu
-	qPcrp1pU+E9aBsRq6LqGRwEyfCxFOAG/eZBuveJEVZ604l67sEjztB/T1VzgaPNq
-	m1SQq5YT9ScU672gnZ9KQZAxk1dZBg6iIh/thQcnTYmFTZUE8fOl96euvWClr0Sk
-	Jw4UArEOMp9nx8kYqCM/xH1Gu6MmI3GoPxnw+0BPKXleygi8xEj4rpevltF2XXQx
-	AycZ8p2EmhSDx22kqIc0KRGYEOLQglNymJH4IFUMck56rrI6KAzuPWriwWjrqJO4
-	3dPjg==
-X-ME-Sender: <xms:FTezaVilNpfzTFwdXfDGmuvdmLmHH5wQOPmkXNJ2rwBPIIfOVLdr-w>
-    <xme:FTezaTuEQy7o4nKc7Uw8jH6cqeXroA21BQ5do5RN0lUZCS7cVMdxOqY0Gqbu5Tp_B
-    pnokX1bFr1SC1Y0W1BKG0kHSYQ0zHGoJ-i_qINfPDxpdL6D>
-X-ME-Received: <xmr:FTezacAuaSfVqafttgspciqVDgEqkYKP35xc15xq4Bo7N7mSd4IApwHhjkxDfh-qhQISzjgboRJQNF9L38ZWpkUBmY7P3ZmYnejxCdb7p5bg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkeejledvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofgjfhhrggfgsedtkeertdertddtnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epveevkeffudeuvefhieeghffgudektdelkeejiedtjedugfeukedvkeffvdefvddunecu
-    vehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
-    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohephedupdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
-    hrtghpthhtoheplhhinhhugidqgihfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopehlihhnuhigqdhunhhiohhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
-    hrtghpthhtoheplhhinhhugidqthhrrggtvgdqkhgvrhhnvghlsehvghgvrhdrkhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgv
-    lhdrohhrghdprhgtphhtthhopehlihhnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrh
-    hnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqvgigthegsehvghgvrhdrkhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqvghfihesvhhgvghrrdhkvghrnhgvlh
-    drohhrgh
-X-ME-Proxy: <xmx:FjezaeWEAYX9YAtQPeDZruDF03hEM0vgWm_YUy0QmeB_LgHmBFwkWA>
-    <xmx:FjezaSLbWaULXe565i-38R9rxAXNMxHpZtaCsRE2_7Lvyoo97n2wOw>
-    <xmx:FjezafUxgwg3aoUBFXslTVRlf8kcFgM_dAW-I4hB8-MgQ9UtNSzYpg>
-    <xmx:FjezaTQ6553DYdVPHGadz797tM8ymCQ09q3Sp6soEJBLNasY5B_i9g>
-    <xmx:FjezaQyh3FuH2EnjtUC4nYKGVY1x8wZ_XxVdm4U8WHJbuM5_OEVYGjTj>
-Feedback-ID: i9d664b8f:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 12 Mar 2026 17:58:32 -0400 (EDT)
-From: NeilBrown <neilb@ownmail.net>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,	Jan Kara <jack@suse.cz>,
-	Jeff Layton <jlayton@kernel.org>,	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,	Carlos Maiolino <cem@kernel.org>,
-	Miklos Szeredi <miklos@szeredi.hu>,	Amir Goldstein <amir73il@gmail.com>,
-	Jan Harkes <jaharkes@cs.cmu.edu>,	Hugh Dickins <hughd@google.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,	Steve French <sfrench@samba.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Yuezhang Mo <yuezhang.mo@sony.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Breno Leitao <leitao@debian.org>,	"Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,	Alex Markuze <amarkuze@redhat.com>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,	Tyler Hicks <code@tyhicks.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,	Jeremy Kerr <jk@ozlabs.org>,
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ON5f1mCS"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=J+N/PPVw9ovkVLrHTw05akAKhYs060WtV/dwfeW/844TnHB5mpiJK5TTkyz0NTBxoyDidkb6LwpvohcYgqqLA5IvZY49uUZ/myxYC32jA7t9QYuZ/JcoqaEuFWX/WPxduUiQ8FMHjsNFN4ZrsO6nPvzQ/B2XnaxSuDHBl70dQiWpPEZULIvf0T1/ej6zZwR0GWi63evV5OmUg5KRuVb6GHN5I757hivZYWKB3vAB1wR4YKFc7qF0RIpdWT60lG83wU1VLpB4ohJhqQLM+/YuYdBSr93lvMCq7n+CG9fMZ7yR0RlQ9gRxDQkqcaloDnT2eeZ3sbpE5bfVCyBmEY2Jqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=z1vPG6JafKZbJXr8M3YgsCzayv4FHyW6an8+dF+wIJk=;
+ b=ZKDJfR5SvtZ7UhiUwiz6VJO1rtdgsv8MX4YbsZzfih2d4cTuZJCiRRIbzN6uiuGFV9rpWLbNE7lAvK7CVJJHqoZCzjBmQLsMo9IrfbthSjpJEVMhuuN/Ub8e0fPuGo3WnLVS2ZsyuGqE7bRO2TfHyy0o1tgqmrVFh9/Glq6QqQUk/Y6QW+349S2BEdhBPzAIMcUlX9JTn1TmUlMXqI0tyR17Ujh2ziJ982fCeJB1AVeu2utBX7lT0yQND25b1WKka4qPpYAp4mXPG4RbRah842pNpSYPlKQBJbfQM/xyX45gVnV1H3nLDVZYSBpxJKM7MckYWdiktby679iIUOtL+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z1vPG6JafKZbJXr8M3YgsCzayv4FHyW6an8+dF+wIJk=;
+ b=ON5f1mCSzPQqdWRjNZDgLmuVD0AEwQL1FktpSumjZrY+56Be9EjdOkjcNuu/zB+eDZv1DAMpRfnNeJOEC7+yKGlL9rwXLrFw9Y6YITkFQmizIw57hPAA9eALixhY8xBLiow6nISUO+kBTmpiHQ3owhzMZ0nq+he/98IuBtb1fuYllj2HBIF6/DEThl70nPsN1nrIwdQWF9QfST4KNzSYnXGkPT73BE/YwwJbDyQlJnWscayk4vwmbBCgGjDuJ9VUXTLYnq0id+W85fwJGXbS7W7CLk/tXtd7B+mV59JfCa4MKRGJskyQFnU7PPO+tsbHEBBjGd5Gjrsx7g0+6JG00A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS0PR12MB8786.namprd12.prod.outlook.com (2603:10b6:8:149::17)
+ by SA1PR12MB8143.namprd12.prod.outlook.com (2603:10b6:806:333::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.3; Thu, 12 Mar
+ 2026 23:17:21 +0000
+Received: from DS0PR12MB8786.namprd12.prod.outlook.com
+ ([fe80::cd1a:bacf:6ab9:6f91]) by DS0PR12MB8786.namprd12.prod.outlook.com
+ ([fe80::cd1a:bacf:6ab9:6f91%2]) with mapi id 15.20.9723.004; Thu, 12 Mar 2026
+ 23:17:20 +0000
+From: Yury Norov <ynorov@nvidia.com>
+To: Yury Norov <yury.norov@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
 	Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-unionfs@vger.kernel.org,
-	coda@cs.cmu.edu,
-	linux-mm@kvack.org,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
+Cc: Yury Norov <ynorov@nvidia.com>,
 	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	ecryptfs@vger.kernel.org,
-	gfs2@lists.linux.dev,
-	linux-um@lists.infradead.org,
-	linux-efi@vger.kernel.org
-Subject: [PATCH 53/53] VFS: remove LOOKUP_SHARED
-Date: Fri, 13 Mar 2026 08:12:40 +1100
-Message-ID: <20260312214330.3885211-54-neilb@ownmail.net>
-X-Mailer: git-send-email 2.50.0.107.gf914562f5916.dirty
-In-Reply-To: <20260312214330.3885211-1-neilb@ownmail.net>
-References: <20260312214330.3885211-1-neilb@ownmail.net>
-Reply-To: NeilBrown <neil@brown.name>
+	kexec@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-spi@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	Alexander Graf <graf@amazon.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>
+Subject: [PATCH] lib: count_zeros: fix 32/64-bit inconsistency in count_trailing_zeros()
+Date: Thu, 12 Mar 2026 19:08:16 -0400
+Message-ID: <20260312230817.372878-1-ynorov@nvidia.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BL1PR13CA0427.namprd13.prod.outlook.com
+ (2603:10b6:208:2c3::12) To DS0PR12MB8786.namprd12.prod.outlook.com
+ (2603:10b6:8:149::17)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB8786:EE_|SA1PR12MB8143:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9502d587-1921-4eec-d653-08de808d82c7
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	bmIgEK6QpC6sNWu53l9LnjHkTE7bJgM6HrZrdw29cDWNrtJ7D6v/aqwaZn9xl1l31bfWbPPSn4IsC04NldASLyTG2U92F5RJURBzaZRK32hKWPOz4U6kWPnI6UCINgdSmdxV+5Fjx02JidmdN97OJxC7DtiEWblM8EkUt7A1j6dxWyK9Kc/1xR4iYJZBIQ9GJITrIYD0RxcRn3gBBKXL3AR8Pe6CMDbv3B12WMPuLxauvmnmbUVjs0HlW3RRC4QPd3/vmHtj1LdfZLNUbp5uDIjGkS6df1BdGwnkBYBXFxVMI+0H1nPXRB6F5MBThHOhGIdGBEwNrV7FUQk7zB7xK/RYRDLwFKPMuLiwjO555RLUDP13txwlM5bCKxuKWxUfm7ykwTmgwQHWQgrxEPZx+nBuT2vx6iAJqyfj32rUX7tZ0+PnJFCbgtnVqqPrluF4EHm5faKaxpCXHsJk+QlyyzSMfl2GJi50mgKWS0+I/A93/J7UG2jQblhrBE6Tc3NFfYhPlTeiI3Zm4bHbMn9hu12YJ0A4A+yrKSlez/OCbivpQzlsA/sw/zz0Pa8LcQ7x4NxXznpvwIlv3AaoMMe/8jFR5f6rgLxgb9U6Pg4e7SgHGl9/dyeGQVNXNEioUJUZcr8PzTqL4NrPNDTEh8bCbusz8uLdUwQFemNG3nO9u7R1jPjH2TK7fWT6HX/EdwpzQ+uQmuycZ7avSWNIKYvVXGf1RtA5hu9XDwP52R35Vik=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB8786.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?SxpYQIEJWjBDznn/77ns1x9muGJirF3jpktD9WkybCbZT1+q+K5i2R031QYk?=
+ =?us-ascii?Q?59YafLFA+/CCPT4mAd2XLuA0WHlIg9Vq8b35adbRYkiwiMAovRVzQNNuacR6?=
+ =?us-ascii?Q?u7PORcbOQtB6/Jl2vfkxlGA84wurA3251aT/T95bpjFrqbfkFxZwJGLrw1RH?=
+ =?us-ascii?Q?padBfyWbl+I1XiEqM4oXjDV7qbIXGJvZVxzO1oc4QgvAF/FgaRWcnrMNAi1i?=
+ =?us-ascii?Q?fbVwZG0cZumz/vF8WgAm5dJaSj5TUc+/LrJe+82M8bNrK0rFfUSINUk2cUsP?=
+ =?us-ascii?Q?D5xzdylK0qMtsIQs2BZKHjxljVvn7g4V2KLw+C6OFGFvXYKacx5Mzw94rtU1?=
+ =?us-ascii?Q?j5vTBrnUh4g8QV+G/1Q8kpWOtP1AFR7yo2p27mAKw87xsRnR9P4wHiFtpaag?=
+ =?us-ascii?Q?6wewhAVhEJ3ENh2B9FRuufWSjoGSPA3ieZYLS+XolgDeO+CZHEfQZqFKHAC3?=
+ =?us-ascii?Q?yJFQBRIofi5CadDpIqN++8isMCfkTfIi/2B+4pE7U7u45Swt/od/EWniIXl2?=
+ =?us-ascii?Q?E7avGU/gOtVqf/+BRNRjBOvIcKONZwilASF7Qq2fPM7XKKuZMwSsRY+Sjh11?=
+ =?us-ascii?Q?1LdEKlRDIHBsgZ/ciZyNPUpLP1YacKDTSn5BL0cr07mb9iGvfFgFu7J8rGzD?=
+ =?us-ascii?Q?ske9s6MvEAOwcB1kfg++2O13LvhkUDqUbx0dNmCh3I0ZmDYV2+Vl1DLy0h3z?=
+ =?us-ascii?Q?frwVpbOq/6VyDwqgMyrj0c3eURDOaOMSpT5PFlSweCXokBWqZLnHpyn3zt6s?=
+ =?us-ascii?Q?3FV7Xq0pvjfdi5JRoKKCeQzbEy3NvlZPqYyhI0AxQM+6wNW+p7b75YolZSfr?=
+ =?us-ascii?Q?Zt2FKIHpefN46N7Cswg+DhElTS3FEL/zBoYCoFDB3bffBwVllFb1meSVIhrJ?=
+ =?us-ascii?Q?E4cUp7JBl1h+I41GQSEIJe3U894YI7xrGCr29bNCDCQ5wX0ZXS5jRJrlU8uz?=
+ =?us-ascii?Q?0pSSe3JibPMZPdpt8oBBpZteoZlik4vaDjF9xfSAH7r+uJgIPdpAQpknxY3L?=
+ =?us-ascii?Q?5VgzJ16FxerWTIaaMdSUMJDxRRY6rFw+910NSyFBRrD+FNBZX0SOexFf6OhU?=
+ =?us-ascii?Q?NXyUbwnSb46o//nllokKsAOkbfaT/6c3NG+1qevxBQihYtwsCgRU4u1PE885?=
+ =?us-ascii?Q?xk9wdYPzNRMlr4FonRpefvRI1cvPXSKJ9fpy2JHsV4Uj7ZilU8VPj5LruJAo?=
+ =?us-ascii?Q?90/97kteiEwA+hFx8Y6tXGg/AVnYkn4KtCbwbQnqIw/8/nM9VQajy2ZCefma?=
+ =?us-ascii?Q?PY9nNOdj5gujncuJGea1uBw/TTnsw5pO3He+femo3WgST4gCWU0T4dBxxJV8?=
+ =?us-ascii?Q?M/26P/m73w95TGHYxI20gPBMGQeCrTITDz9eB7vOnK7N/7LQg+N1tE8+vl5a?=
+ =?us-ascii?Q?AXU7dPeMh5lEvNWfY+Z6xFKz7E4WMNWbkz3Ww/os4NSFmfXOsOUz0A6eR0SJ?=
+ =?us-ascii?Q?ZiLVF8/5o2IGFlZtbemdvLX29WlxyKLrnf53IIbcTFlzGuL9L310kZWv8az8?=
+ =?us-ascii?Q?zVSiOVCqJoHK3p2D8w0W3uophAM4EFi0lISLYkv+zKheCaPVq3VvMOu0adfW?=
+ =?us-ascii?Q?9TQf4yq2dUh2Ew31BZTfWKYdv8s4SMpQvqTExZDqm4CTQkK/OylwBslYKV9X?=
+ =?us-ascii?Q?YeFX/eupQitcqa7Gt8bi6yndVJjlMYd9yne/sLU2LuequTeT7fZVaK/hhOSu?=
+ =?us-ascii?Q?qY+K3m8ok8q+UqPHofx853seXWuBmMMHuTY+71JqrtJGCA/hUBE+FOlTKMjt?=
+ =?us-ascii?Q?VIABc6fuGg=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9502d587-1921-4eec-d653-08de808d82c7
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB8786.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2026 23:17:20.7802
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EaWLlEYUVNeJsrN79NtYBAANRP9m0Ae2qWsUXQz9qWVhdvyfH3T5M3HiZAsE5lqhCzPUfORYLfS/0WhK/9m9zQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8143
 
-From: NeilBrown <neil@brown.name>
+Based on 'sizeof(x) == 4' condition, in 32-bit case the function is wired
+to ffs(), while in 64-bit case to __ffs(). The difference is substantial:
+ffs(x) == __ffs(x) + 1. Also, ffs(0) == 0, while __ffs(0) is undefined.
 
-->lookup is now always called with a shared lock and LOOKUP_SHARED set,
-so we can discard that flag and remove the code for when it wasn't set.
+The 32-bit behaviour is inconsistent with the function description, so it
+needs to get fixed.
 
-Signed-off-by: NeilBrown <neil@brown.name>
+There are 9 individual users for the function in 6 different subsystems.
+Some arches and drivers are 64-bit only:
+ - arch/loongarch/kvm/intc/eiointc.c;
+ - drivers/hv/mshv_vtl_main.c;
+ - kernel/liveupdate/kexec_handover.c;
+
+The others are:
+ - ib_umem_find_best_pgsz(): as per comment, __ffs() should be correct;
+ - rzv2m_csi_reg_write_bit(): ARCH_RENESAS only, unclear;
+ - lz77_match_len(): CIFS_COMPRESSION only, unclear, experimental;
+
+None of them explicitly tweak their code for a word length, or x == 0.
+
+Requesting comments from the corresponding maintainers on how to proceed
+with this.
+
+The attached patch gets rid of 32-bit explicit support, so that both
+32- and 64-bit versions rely on __ffs().
+
+CC: "K. Y. Srinivasan" <kys@microsoft.com> (hyperv)
+CC: Haiyang Zhang <haiyangz@microsoft.com> (hyperv)
+CC: Jason Gunthorpe <jgg@ziepe.ca> (infiniband)
+CC: Leon Romanovsky <leon@kernel.org> (infiniband)
+CC: Mark Brown <broonie@kernel.org> (spi)
+CC: Steve French <sfrench@samba.org> (smb)
+CC: Alexander Graf <graf@amazon.com> (kexec)
+CC: Mike Rapoport <rppt@kernel.org> (kexec)
+CC: Pasha Tatashin <pasha.tatashin@soleen.com> (kexec)
+Signed-off-by: Yury Norov <ynorov@nvidia.com>
 ---
- fs/afs/dir.c           | 10 ++--------
- fs/dcache.c            | 13 +++----------
- fs/namei.c             | 10 +++++-----
- fs/xfs/xfs_iops.c      |  3 +--
- include/linux/dcache.h |  3 +--
- include/linux/namei.h  |  3 +--
- 6 files changed, 13 insertions(+), 29 deletions(-)
+ include/linux/count_zeros.h | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/fs/afs/dir.c b/fs/afs/dir.c
-index f259ca2da383..29e39aeaf654 100644
---- a/fs/afs/dir.c
-+++ b/fs/afs/dir.c
-@@ -938,10 +938,7 @@ static struct dentry *afs_lookup_atsys(struct inode *dir, struct dentry *dentry,
- 	/* Calling d_alloc_parallel() while holding parent locked is undesirable.
- 	 * We don't really need the lock any more.
- 	 */
--	if (flags & LOOKUP_SHARED)
--		inode_unlock_shared(dir);
--	else
--		inode_unlock(dir);
-+	inode_unlock_shared(dir);
- 	for (i = 0; i < subs->nr; i++) {
- 		name = subs->subs[i];
- 		len = dentry->d_name.len - 4 + strlen(name);
-@@ -966,10 +963,7 @@ static struct dentry *afs_lookup_atsys(struct inode *dir, struct dentry *dentry,
- 	 */
- 	ret = NULL;
- out_s:
--	if (flags & LOOKUP_SHARED)
--		inode_lock_shared(dir);
--	else
--		inode_lock_nested(dir, I_MUTEX_PARENT);
-+	inode_lock_shared(dir);
- 	afs_put_sysnames(subs);
- 	kfree(buf);
- out_p:
-diff --git a/fs/dcache.c b/fs/dcache.c
-index f573716d1a04..2d694e14bd22 100644
---- a/fs/dcache.c
-+++ b/fs/dcache.c
-@@ -2224,7 +2224,6 @@ EXPORT_SYMBOL(d_obtain_root);
-  * @dentry: the negative dentry that was passed to the parent's lookup func
-  * @inode:  the inode case-insensitive lookup has found
-  * @name:   the case-exact name to be associated with the returned dentry
-- * @bool:   %true if lookup was performed with LOOKUP_SHARED
-  *
-  * This is to avoid filling the dcache with case-insensitive names to the
-  * same inode, only the actual correct case is stored in the dcache for
-@@ -2237,7 +2236,7 @@ EXPORT_SYMBOL(d_obtain_root);
-  * the exact case, and return the spliced entry.
+diff --git a/include/linux/count_zeros.h b/include/linux/count_zeros.h
+index 4e5680327ece..5034a30b5c7c 100644
+--- a/include/linux/count_zeros.h
++++ b/include/linux/count_zeros.h
+@@ -10,6 +10,8 @@
+ 
+ #include <asm/bitops.h>
+ 
++#define COUNT_TRAILING_ZEROS_0 (-1)
++
+ /**
+  * count_leading_zeros - Count the number of zeros from the MSB back
+  * @x: The value
+@@ -40,12 +42,7 @@ static inline int count_leading_zeros(unsigned long x)
   */
- struct dentry *d_add_ci(struct dentry *dentry, struct inode *inode,
--			struct qstr *name, bool shared)
-+			struct qstr *name)
+ static inline int count_trailing_zeros(unsigned long x)
  {
- 	struct dentry *found, *res;
- 
-@@ -2257,19 +2256,13 @@ struct dentry *d_add_ci(struct dentry *dentry, struct inode *inode,
- 	 * d_in_lookup() (so ->d_parent is stable) and we are near the
- 	 * end ->lookup() and will shortly drop the lock anyway.
- 	 */
--	if (shared)
--		inode_unlock_shared(d_inode(dentry->d_parent));
+-#define COUNT_TRAILING_ZEROS_0 (-1)
+-
+-	if (sizeof(x) == 4)
+-		return ffs(x);
 -	else
--		inode_unlock(d_inode(dentry->d_parent));
-+	inode_unlock_shared(d_inode(dentry->d_parent));
- 	found = d_alloc_parallel(dentry->d_parent, name);
- 	if (IS_ERR(found) || !d_in_lookup(found)) {
- 		iput(inode);
- 		return found;
- 	}
--	if (shared)
--		inode_lock_shared(d_inode(dentry->d_parent));
--	else
--		inode_lock_nested(d_inode(dentry->d_parent), I_MUTEX_PARENT);
-+	inode_lock_shared(d_inode(dentry->d_parent));
- 	res = d_splice_alias(inode, found);
- 	if (res) {
- 		d_lookup_done(found);
-diff --git a/fs/namei.c b/fs/namei.c
-index 3d213070a515..9e2ac3077f72 100644
---- a/fs/namei.c
-+++ b/fs/namei.c
-@@ -1826,7 +1826,7 @@ static struct dentry *lookup_one_qstr(const struct qstr *name,
- 	if (unlikely(IS_DEADDIR(dir)))
- 		old = ERR_PTR(-ENOENT);
- 	else
--		old = dir->i_op->lookup(dir, dentry, flags | LOOKUP_SHARED);
-+		old = dir->i_op->lookup(dir, dentry, flags);
- 	inode_unlock_shared(dir);
- 	if (unlikely(old)) {
- 		d_lookup_done(dentry);
-@@ -1951,7 +1951,7 @@ static struct dentry *__lookup_slow(const struct qstr *name,
- 			old = ERR_PTR(-ENOENT);
- 		else
- 			old = inode->i_op->lookup(inode, dentry,
--						  flags | LOOKUP_SHARED);
-+						  flags);
- 		inode_unlock_shared(inode);
- 		d_lookup_done(dentry);
- 		if (unlikely(old)) {
-@@ -1966,14 +1966,14 @@ static noinline struct dentry *lookup_slow(const struct qstr *name,
- 				  struct dentry *dir,
- 				  unsigned int flags)
- {
--	return __lookup_slow(name, dir, flags | LOOKUP_SHARED, TASK_NORMAL);
-+	return __lookup_slow(name, dir, flags, TASK_NORMAL);
+-		return (x != 0) ? __ffs(x) : COUNT_TRAILING_ZEROS_0;
++	return (x != 0) ? __ffs(x) : COUNT_TRAILING_ZEROS_0;
  }
  
- static struct dentry *lookup_slow_killable(const struct qstr *name,
- 					   struct dentry *dir,
- 					   unsigned int flags)
- {
--	return __lookup_slow(name, dir, flags | LOOKUP_SHARED, TASK_KILLABLE);
-+	return __lookup_slow(name, dir, flags, TASK_KILLABLE);
- }
- 
- static inline int may_lookup(struct mnt_idmap *idmap,
-@@ -4513,7 +4513,7 @@ static struct dentry *lookup_open(struct nameidata *nd, struct file *file,
- 			res = ERR_PTR(-ENOENT);
- 		else
- 			res = dir_inode->i_op->lookup(dir_inode, dentry,
--						      nd->flags | LOOKUP_SHARED);
-+						      nd->flags);
- 		inode_unlock_shared(dir_inode);
- 		d_lookup_done(dentry);
- 		if (unlikely(res)) {
-diff --git a/fs/xfs/xfs_iops.c b/fs/xfs/xfs_iops.c
-index 2641061ba1db..cfd1cb42a29f 100644
---- a/fs/xfs/xfs_iops.c
-+++ b/fs/xfs/xfs_iops.c
-@@ -35,7 +35,6 @@
- #include <linux/security.h>
- #include <linux/iversion.h>
- #include <linux/fiemap.h>
--#include <linux/namei.h> // for LOOKUP_SHARED
- 
- /*
-  * Directories have different lock order w.r.t. mmap_lock compared to regular
-@@ -370,7 +369,7 @@ xfs_vn_ci_lookup(
- 	/* else case-insensitive match... */
- 	dname.name = ci_name.name;
- 	dname.len = ci_name.len;
--	dentry = d_add_ci(dentry, VFS_I(ip), &dname, !!(flags & LOOKUP_SHARED));
-+	dentry = d_add_ci(dentry, VFS_I(ip), &dname);
- 	kfree(ci_name.name);
- 	return dentry;
- }
-diff --git a/include/linux/dcache.h b/include/linux/dcache.h
-index eb1a59b6fca7..74607dbcb7f0 100644
---- a/include/linux/dcache.h
-+++ b/include/linux/dcache.h
-@@ -250,8 +250,7 @@ struct dentry *d_duplicate(struct dentry *dentry);
- /* weird procfs mess; *NOT* exported */
- extern struct dentry * d_splice_alias_ops(struct inode *, struct dentry *,
- 					  const struct dentry_operations *);
--extern struct dentry * d_add_ci(struct dentry *, struct inode *, struct qstr *,
--				bool);
-+extern struct dentry * d_add_ci(struct dentry *, struct inode *, struct qstr *);
- extern bool d_same_name(const struct dentry *dentry, const struct dentry *parent,
- 			const struct qstr *name);
- extern struct dentry *d_find_any_alias(struct inode *inode);
-diff --git a/include/linux/namei.h b/include/linux/namei.h
-index cb79e84c718d..643d862a7fda 100644
---- a/include/linux/namei.h
-+++ b/include/linux/namei.h
-@@ -37,9 +37,8 @@ enum {LAST_NORM, LAST_ROOT, LAST_DOT, LAST_DOTDOT};
- #define LOOKUP_CREATE		BIT(17)	/* ... in object creation */
- #define LOOKUP_EXCL		BIT(18)	/* ... in target must not exist */
- #define LOOKUP_RENAME_TARGET	BIT(19)	/* ... in destination of rename() */
--#define LOOKUP_SHARED		BIT(20) /* Parent lock is held shared */
- 
--/* 3 spare bits for intent */
-+/* 4 spare bits for intent */
- 
- /* Scoping flags for lookup. */
- #define LOOKUP_NO_SYMLINKS	BIT(24) /* No symlink crossing. */
+ #endif /* _LINUX_BITOPS_COUNT_ZEROS_H_ */
 -- 
-2.50.0.107.gf914562f5916.dirty
+2.43.0
 
