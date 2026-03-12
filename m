@@ -1,129 +1,180 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41A53C4540
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 12:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F493B6372
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 15:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773320257; cv=none; b=PHbaGL+gTmHXBUww4bAiwe4aVXY3zCUHu6PX4jsAXmTXOKhLvw1ml3WTcUJ8peEjTieNjQOJx/oRMfqVMqNYT8wPhy6JUR40VYs2vfJg3f2ZbrKAizOAoaL5T2qoQzRBdhO7slR1n4Dz2N4ek5MZl3vBZFxjlPYmsKgFw8O1dMk=
+	t=1773327793; cv=none; b=aX6cEEsjOznUOLT2g7I9rmCgtOL5mpP54vTNi4+TCsh0WI+aTzrUpHMqDuVvfU63vykh8M4yAPkxS0T/mjB7yYbpmS2ScY4uK5T1usJ+zBa+q21DcltmYrOwn7RiuXdOJVRLdgnsZMlCt/XxyftDRyJ58LNB2JpGwaH2nn/4KuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773320257; c=relaxed/simple;
-	bh=Rr1jkAP22lZkLvo3o90a9fRSWh9+kilNKtAarSScWFY=;
+	s=arc-20240116; t=1773327793; c=relaxed/simple;
+	bh=gLc30Z+9vOBzkAprgy+ZzWzCvuoZOmSPjY+GSFBC7K4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oJI5n+aVpjQyl0zTECMn/uIU6ubbfYsRMb82XyHZsooEhpwafpnPgxIkxdDVA5Y8wssuQTaS9lpwWvtgNNREuhlLr2mTtySVQdr6OHf4VFR5yeCIb683M56l7DxJ4QyFKaJ4cKA1Oa3gMX1QB9uHkZEp6YHulz7rUS+0ja6lkTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=fHqxjqGD; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	 Content-Type:Content-Disposition:In-Reply-To; b=SsADpAcR50lQL6ESSak918Dw+TsnwKJO+4Xjyclr1gvzyDQYqB2PqSA8Wu7Acwn2xBGXXOzNFbQuPdy56YEGYxwwYBfRmjQAIcmsSgZLQG8hz9fZIyrsuSckVrOw8QC4fUNTS57Y/iP/uxvWefzu7s1kWrgAbrP4AsCKtmdJJes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=flePT0fZ; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fHqxjqGD"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-506a6cf8242so8849471cf.1
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 05:57:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="flePT0fZ"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-38a3f6da741so8384431fa.1
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 08:03:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1773320252; x=1773925052; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
-        b=fHqxjqGD7mReR8MT2yBowt9MuNKPAKQc++mWcb4ZOttX6YldICO+OnnxWIQjO0C8L5
-         wjOw0Gg7MqV4U+G9pES+s6h1NtZIjaKrBXMW81hrLyc8SxWYHtvQK3FlTjqiyroZskXE
-         jYj0kUENL7Yhu5zg+0UQ91XYlYYlozX9U8uAqBEFaih0fSnDo8kprjTDRYJ58gzKRExo
-         MSUW+Q+e0P2WpZGotx0DuVRaUqq4vGsUUSX1YbPnOxmRUKlXFY/aNRmXMXDbAEfx0Lnn
-         e41FpuPSZjTSuTkWfTMW8e1MvewVXC2p6zLd4GrSZjvSKS4Q06nDQYaSimUW3qR5RhoY
-         JV6A==
+        d=suse.com; s=google; t=1773327790; x=1773932590; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=w3Z0IgmvA6IrttCl9VcQbxLY4PbNB0saZqQGQHabijM=;
+        b=flePT0fZwNRQZgW0P20rS0ZrbwqUg2FA3zQeyaNol8OO4Uc6VcGbF8CVpt2XenjcAS
+         i+OY7I79ylP8WvZPCEYZKgf/HiMOC2K/v49hAa3wr9C0kICVdAE3W39H5nSvRzKud8Ep
+         y54+2Pmf1Olbdd0IL4HRmvN9Zne7LfH2ZmcCDSYeD7lxadyIgcPsKxeTyC1CCjoFOoty
+         wjj5WYkG6voM3QO/sL+lOQ16VaIuW0peXqhZTxDaoPTCHRNl9WH2m18iZJVGa046WVnf
+         yqRFozLGSZrge0IrnMmPXMB6cRwl0hC6OfsZRpxT8B3N6brUHCmSYkUMTbcJo1xtXnGc
+         TcSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773320252; x=1773925052;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
-        b=TyIzsRsD0miw2XNiIERSYTxycrCAbD1V8OI9cwtn7INQzD4tZvcy+yO63a2erBzEqb
-         7HpIfbN/iGrUXjoECl5g+dnGbWl/WkzHfMiUyEZBDJKdsjwvXeDvF9hdz/O+fZaVGx0D
-         C7BDkDTzmBOSPOkY94DrI0Qfs1cpLZBuf6SFhChHT0rn/9znxldBACup9FKjgdbhnHbG
-         e7npOjK+x952TwBuVG30DSyJPVxIp04YSnyqysjERL1Fxq38qVTwPJrsTvBpboylNwz1
-         w2wiXEgfzn3JYK1/EdeB5uUR7SY7zl6f9i8XJLdRsjCR4VgA0o5gVRGlmEFSAtE5dQIZ
-         JCGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUGs6Zt2y0H8BqOm2+QqnilG85lKIrez63zd/JAcyAIf2VRvQIFUh20RRJlB+3SbSAC7IIL3y1+cABp@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8EJoeqXAbGwd0WaQ4tNclRKE1fTTnUbgKB9okTPC7DMnXj/7J
-	nMK0SIiB0OGKXFYlPjyXEklBMEmLsq6vsG6cFBDly9oUV62b5JsXIYWrTgJlZWgxs+Q=
-X-Gm-Gg: ATEYQzyi3zjlNu0/SF7jtQk3f8GO2FOqFNmIeogWq9RfOxYmJToYmWk1Z8Cgscu7EqW
-	L6n6tbkrlwBXCLYrIYGbEWIbR+QxwdCLBxk+cyM3e3bHoN9dy6suIMrP0DKO9YJIb2HS0XK0MNZ
-	ZmXJq76/Dlon/BRgddoL1wLtl2/LVtg5wadhrfNOSapJ85m5Qxwe+oOni/mlH8rA5eChQ59yH3p
-	i0fOYB7dgs1F8E2qA32xeJ1LZq0BAQ9PfsrtVm4BRpmXaJnjJVJgZIBXZmi9CKPcLmnxsIM9xo6
-	bb7nB8/QNqa8QxjRml0NeErmYtyOh1u+U/V9EpNKaycOxbZtIDt57LyC4iVPrBJXv9XI6v1a44I
-	xkU6lo3gBz6/uR6QrEOV6GpMQ+uDq2Z1rGEP75Brt9CDMEjCnD8Xbj5KYZtof+yQC0TFs3ji78v
-	sypYrlfU+n5xQv73sHo4Cw1X4LRuhRXPgyA0vt6smUi1qGJLrLPeNuZTqGEOPbVkamMGQI8OT3K
-	Cp5qxtK
-X-Received: by 2002:ac8:5d4d:0:b0:509:cbc:127b with SMTP id d75a77b69052e-5093a1bd58fmr77950521cf.60.1773320251710;
-        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65bd318fsm33341196d6.8.2026.03.12.05.57.30
+        d=1e100.net; s=20230601; t=1773327790; x=1773932590;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w3Z0IgmvA6IrttCl9VcQbxLY4PbNB0saZqQGQHabijM=;
+        b=OP/Od+ldXVTZ31WoyTm20O9C67UAzhFHrYcbR8TWTOAskN4b5f/YIfeY3m08IssGVW
+         g+xtXctchaXssPVhTU/5Ns+jTPe++PVMPAGJMd7GFgOXV9WShjl1SeiGzwQYgFmWWvMD
+         1/QYalaFw2PneAql7/TVFGQbJG3AdQdiybdgYxMlf5FEBYJ6q8KkoZQk9UBLqYIeZhAM
+         NlNH21vhcgzTlqnUig06yub6fz1Z1P2uO3tJZTaHGSnwlTZKJcQAvazqkyd3mIgN0Fm/
+         ExXJuAv9BouP41EB6aBuo9KVPEFuFdC/+EnKl6iRU3/F8NYbu003K64LhFzyT4NIYWKV
+         7HWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXBSdcUoPHkoB+GAImwLORdjQHZJmkTX/UB/PSuXkzzsEVm9dxOJCw8E3qKTAWw+QyGkNED7vUMLMVk@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/TtY/xp7mU7L3RRZG6w1PvcWN1jcOR4r+M7++mfMo+MZPveVB
+	AKFlRAaO+GfSZoEjKG8cqNlArJFH+ef02Lp8LHdPC341hAsOaoEtSwiduqbIQex4Tj4=
+X-Gm-Gg: ATEYQzyPT+afwzkagpntNJc8r2IYBIYDaozQIRgruWCBkXufnTDmh0/fvasUDWOZ1E+
+	PcxWmkBaH7utkx50lzlPGKr5um4ys2KVOxiFra596K26TyRTuis5GYZtB/3VQxQJRb2HgFBHY2S
+	EzVFS9U/BJhjCgR5nKFeFv2a1lepRyOqhmfcKfFoVc4LPJBa9ijyLorX+etAN3vdgtlNtFYpg9H
+	3rEZbegOzgieKW4HwYj6BL3tB0CyQ2nlB66ofpbNTaeMuBXl+CJ2ptnOsJ8UxVY+7oiWndDLCSH
+	B/rftfK3XXg+LtQ7ildYZaTqbr6IO+coK1oUc658MWt13uQrL1/ahIdkcKphS3Ng9n3VrtACwhf
+	atMMqwXtDDj7ViSmD3/eAoaTthNB/yDLkoosBIbec9uw5/gIh2Na0CDYW90wnWC31g/kZN7HPHX
+	UI1vYlfGcB2IGVjGEJjfEwHs/ulImUjuTTJR5WIKmJbtJKlOsdotGZc98=
+X-Received: by 2002:a05:651c:2102:b0:38a:45f8:6270 with SMTP id 38308e7fff4ca-38a67e1aa9cmr23403431fa.21.1773327787720;
+        Thu, 12 Mar 2026 08:03:07 -0700 (PDT)
+Received: from precision.tail0b5424.ts.net ([2804:7f0:6402:b103:6a0a:3e1c:778a:5cc7])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2be8aa7492dsm6507324eec.29.2026.03.12.08.03.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1w0fbW-00000006fKD-1POa;
-	Thu, 12 Mar 2026 09:57:30 -0300
-Date: Thu, 12 Mar 2026 09:57:30 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Kuan-Wei Chiu <visitorckw@gmail.com>
-Cc: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
-	apparmor@lists.ubuntu.com, bpf@vger.kernel.org,
-	ceph-devel@vger.kernel.org, cocci@inria.fr,
-	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
-	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
-	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-mm@kvack.org,
-	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
-	sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
-Subject: Re: [PATCH 00/61] treewide: Use IS_ERR_OR_NULL over manual NULL
- check - refactor
-Message-ID: <20260312125730.GI1469476@ziepe.ca>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <abBlpGKO842B3yl9@google.com>
+        Thu, 12 Mar 2026 08:03:06 -0700 (PDT)
+Date: Thu, 12 Mar 2026 12:03:01 -0300
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: Shyam Prasad N <nspmangalore@gmail.com>
+Cc: "Dr. Thomas Orgis" <thomas.orgis@uni-hamburg.de>, 
+	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, regressions@lists.linux.dev, 
+	stable@vger.kernel.org
+Subject: Re: [REGRESSION] failure to reconnect on SMB server restart with
+ custom TCP port (not 445): Host is down (at least since 6.6.95)
+Message-ID: <42utcrhajix2x3feckj7ap373osq65sgfz6ximnaj4rasszret@ymhf44ddz2wh>
+References: <20260310235642.6d9798f4@plasteblaster>
+ <c66p7dr6vlujvnwczbnrmqx7monkdgdnm4rwewm76aibn7jza3@d3uik74dei72>
+ <CANT5p=q2Lv4pSvEm5EWcM73b7NZsbt1kYEFJtjaAZRS6Gz_OjQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <abBlpGKO842B3yl9@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANT5p=q2Lv4pSvEm5EWcM73b7NZsbt1kYEFJtjaAZRS6Gz_OjQ@mail.gmail.com>
 
-On Wed, Mar 11, 2026 at 02:40:36AM +0800, Kuan-Wei Chiu wrote:
+On Thu, Mar 12, 2026 at 05:44:58AM +0530, Shyam Prasad N wrote:
+> On Wed, Mar 11, 2026 at 7:37 AM Henrique Carvalho
+> <henrique.carvalho@suse.com> wrote:
+> >
+> > On Tue, Mar 10, 2026 at 11:56:42PM +0100, Dr. Thomas Orgis wrote:
+> > > Dear Linux-CIFS maintainer(s),
+> > >
+> > > I stumbled upon a regression in the Linux cifs/smb3 client when working
+> > > with a smbd using a non-standard port. I am not the first to note this, see
+> > >
+> > >       https://bbs.archlinux.org/viewtopic.php?id=306712
+> > >
+> > > which is a report from mid last year, indicating the problem sometime
+> > > after Linux 6.6.72. It is a very simple issue, where details of the
+> > > kernel builds or mount setup don't seem to matter much: Older kernels
+> > > reconnect to a SMB server that was restarted (old processes killed and
+> > > replaced), newer kernels do not and just have a defunct mount.
+> > >
+> > > I reproduced this in our HPC cluster environment with such smb.conf on
+> > > the server side
+> > >
+> > > [global]
+> > > security = user
+> > > map to guest = Bad Password
+> > > server role = standalone server
+> > > smb ports = 1445
+> > >
+> > > [public]
+> > > path = /some/path
+> > > guest ok = yes
+> > > read only = yes
+> > >
+> > > and such a mount command on the client:
+> > >
+> > > mount -t smb3 -o port=1445,user=guest,password=foo //server/public dir
+> > >
+> > > When I kill and re-start smbd on the server, older client kernels
+> > > reconnect and continue to return listings and files from the share,
+> > > while newer kernels give this:
+> > >
+> >
+> > My suspicion is that the regression was introduced by:
+> >
+> >     5713127da855 ("cifs: update dstaddr whenever channel iface is updated")
+> >
+> > That change causes parse_server_interfaces() -- should this be running
+> > without multichannel mount option? -- to overwrite the port stored in
+> > server->dstaddr with CIFS_PORT.
+> >
+> > The attached patch preserves the existing port from server->dstaddr.
+> >
+> > Note that I have not yet tested this patch or confirmed the regression
+> > with a bisect. If you can't, I will try to do that tomorrow.
+> >
+> > --
+> > Henrique
+> > SUSE Labs
+> 
+> Hi Henrique,
+> 
+> AFAIK, the ignoring of port from the results was by design and part of
+> the original code back in 2018:
+> CIFS: parse and store info on iface queries
+> 
+> Also, the comment in the code just above says why this is so.
+> [MS-SMB2] 2.2.32.5.1.1 Clients MUST ignore these
+> 
+> I checked this section and it says:
+> Port (2 bytes): This field MUST NOT be used and MUST be reserved. The
+> server SHOULD set this field to zero, and the client MUST ignore it on
+> receipt.
+> 
+> Based on the conversations here, it looks like smbd ignores this.
+> 
+> I think the right fix would be to make sure that
+> cifs_chan_update_iface gets called only for secondary channels. That
+> way, it will not get called for single channel scenarios.
 
-> IMHO, the necessity of IS_ERR_OR_NULL() often highlights a confusing or
-> flawed API design. It usually implies that the caller is unsure whether
-> a failure results in an error pointer or a NULL pointer. 
+Sure, I read the comment in the code and the MS-SMB2 protocol. The
+protocol states that "client MUST ignore [Port] on receipt". Since we
+are not using p->Port, I don'se see how this is a protocol violation.
 
-+1
+We're using the port that was selected on mount and copied over to
+server->dstaddr, so that when server->dstaddr is overwridden,
+server->dstaddr keeps the user selected port.
 
-IS_ERR_OR_NULL() should always be looked on with suspicion. Very
-little should be returning some tri-state 'ERR' 'NULL' 'SUCCESS'
-pointer. What does the middle condition even mean? IS_ERR_OR_NULL()
-implies ERR and NULL are semanticly the same, so fix the things to
-always use ERR.
+Now, even if we only fix that for primary channels, the secondary
+channels will still get the wrong port when they are overwridden, no? So
+I don't see how that fixes the issue.
 
-If you want to improve things work to get rid of the NULL checks this
-script identifies. Remove ERR or NULL because only one can ever
-happen, or fix the source to consistently return ERR.
+Apologies if I'm missing something.
 
-Jason
+Best regards,
+
+-- 
+Henrique
+SUSE Labs
