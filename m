@@ -1,125 +1,129 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958CC3AD50A
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 19:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC632D0606;
+	Thu, 12 Mar 2026 20:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773345538; cv=none; b=CEq69F8VMImy2+JSKJaqiqrPytzyjGoG4P5HxDTZC7cRE1yitdNlLfeNxPOFLr05yDqj244VerPyb4c+O+gpRmxZ6LNyW5JpbSVI6Nxm+hajqrPx0Hj4SBtwbrYxj6A2t/Q6/h7H0NDx9Gwbbd4m5KP9ByAwDoiF1o+s2kgKg7w=
+	t=1773347054; cv=none; b=XPCCoZE4nQJklTw1GFcdEz1ZqB727TWnkUcPS24294boEVfQa2PJLnaPZGAm7INjAc8mMpR3LFB8M7tKEcRLakXw0fP0F6SzKzyZzLSywtgWFtATAZU7iv6R4hvBckNYvEyCTG1QRojU8fzZKdrvnM0Mtl0Jd/fLHVNqvvqU7SU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773345538; c=relaxed/simple;
-	bh=RY963B+uqTjMp7UVFZuiwEqIxn4cJaaQeDCKxuMpfzo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DYNc07YZHOpXv+ofc/BHtMeMbYRX4Rw7DagWNwxuQwRfpMCLU0pEbuoPiaiMNkkhs2xiauyLMsZTVMxnZ/EQUC9yKy9ce+68r25cbRv2CJ9ErrPYVEU6TpVZJlAzBhG1ZPSvXbDIlJ7uy5dol6I6t3DJp/nOIbsPLNxytbitiek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fGx99qZe; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1773347054; c=relaxed/simple;
+	bh=SscjTk3LQxSdnPox1C8Sn3u1Y5wlmvVO6nd6CpoOATk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UTfGzZe5/Hz9BgaMv4CAIWMsTDRlcCNxyFuBdC5Ub66hktkl5x8AHPjkvh0rcRt1SP7XjIQzTbhpoElzuX8+N4mQas7KzOnOZog0MKkb30Nds30vCQ+BjGTXwHZoPRDAPkiNUNSOhqowm8j0brqlGkd7FWBmBNdDuYU7UJw2dz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=egRjd/NM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fGx99qZe"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4853aec185aso12659765e9.1
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 12:58:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1773345535; x=1773950335; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MIAskK+ZNtzz1SwxyEcF/wj8vxB/luVLoRjKKyPZhTk=;
-        b=fGx99qZewKXukzKKfUidwe0vteY3e84Pf3rZQYtlGSMbg5QKXqr5U9rzXM3Lk61D7V
-         oh6y6i2n3FKatw1OtJ5HgZy9gsDyOiQXcJoRe0wy1dFc10GlwzJ9t41SF671R0TfOZLi
-         XWLdndrot2+bhXIOnSdxLww3ouJCNGEZ724IkwxP2LzKH7T97gNbIseYw0Jhxk6rllw/
-         XeM2ZEVFWvmC39qJK2d5wDALaATFLMujvgkxZd6OIfb9t9UWpd+Gq4qtNRi15rPp5204
-         cCyw3fWxQ+k9Wl5CAmrC+vxXWKaTm9Gm2MryJHddIzlBHKIQVg/WTZIn9wdd923apvMJ
-         s3tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773345535; x=1773950335;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MIAskK+ZNtzz1SwxyEcF/wj8vxB/luVLoRjKKyPZhTk=;
-        b=JYz75frtRwsm2zqSondvSZybgI3xyQbEWyfT3LsStZUJgE4XA9fnFdzAY4l3FbM4Uk
-         53KpNhtRnpEzVgK4y1f7qmapPVSVSj4qcN0B9od1VZzgsk8XZkYWnKAlFVTwzqCRlXaT
-         hMAZGDLahcY+WN/RiXPRw6zaxtygHbLyHKIQ3feG6yncXDbyOTl/BwXPp4PqdIJypRJr
-         kKEXpP98JzVMwOmrPIodniRLKB71kLlRt6T/0VwERYFIYDjbFt7DPJMxfeFR+MgumgyN
-         UJ/5Zig05xMWS6apg04udDvyGeXKMZk7FYgX3LHOZvEvNNuYi/uK1LzLp+Pbf1tXcP9O
-         pbpg==
-X-Gm-Message-State: AOJu0YziAn/IWKXmJbwTWkpuWODN6I+NrCjUKtDs/docVGevUMoFsbgC
-	s8nfGWjyg8AOlS1FqUKAwqSil/BRDTaQiTXrC8ee9rfa2GBOpdqRFVGOEo/nLyX7PZc=
-X-Gm-Gg: ATEYQzy7hshMYe+UAF6t3r9YHLQoRCM52eK7XiNyl8/J5SrzyuQ7Hy95sfbeMKcvBty
-	JRQWMoNH+IHUDyrfLLneYNbAFpVkwNtg/txUCh0sJZQOpK40UuwjImaHiIBJxvw7jYC0rnABzQL
-	EfUHmicv+hiT78f0Eh/acOmMQzQwGm0gMbVEn+jIx4ijpEPPiYMmo+QKcSiS2uo617/O/5b4IeB
-	w/p3rURvFq1jpQ1VTeL0lwvve+AO+GO8A7BQcsp7c3YOPZDLb0lTlS6xn1smf6Mnrvmx/WtGBb2
-	/Q1Ha72RbY+/NA+hjiEx1ts12zd+/pdMorGjrP/htWs63uo6foW8EpJZsMn7Ro6/uahZz7O9xjA
-	pgMQ4Gy2iBxZfgNV03hOwrSnGt/5MWXe/cyp5JAuoFpmFDWAXYZ2i55SuQzddCP1czKEU9MT6f3
-	JwS53xOIUr5ifeIn5VWXQOlBKH0eSHwiQ2AFqsiIH6ErjpnfEx3HZtUaA=
-X-Received: by 2002:a05:600c:c8d:b0:47e:e2ec:9947 with SMTP id 5b1f17b1804b1-4855671052dmr9527745e9.33.1773345534851;
-        Thu, 12 Mar 2026 12:58:54 -0700 (PDT)
-Received: from precision.tail0b5424.ts.net ([2804:7f0:6402:b103:6a0a:3e1c:778a:5cc7])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2be8aa96fdcsm7899078eec.30.2026.03.12.12.58.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 12:58:53 -0700 (PDT)
-Date: Thu, 12 Mar 2026 16:58:49 -0300
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: nspmangalore@gmail.com
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com, 
-	bharathsm@microsoft.com, dhowells@redhat.com, Shyam Prasad N <sprasad@microsoft.com>, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH] cifs: open files should not hold ref on superblock
-Message-ID: <u4s57pxvrttksfxe5evylucarfoyiv3ut32d45nvfafsgmxtog@72x2iew66wrt>
-References: <20260304124629.1616108-1-sprasad@microsoft.com>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="egRjd/NM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E908AC4CEF7;
+	Thu, 12 Mar 2026 20:24:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1773347054;
+	bh=SscjTk3LQxSdnPox1C8Sn3u1Y5wlmvVO6nd6CpoOATk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=egRjd/NM5r0zWdAc4ETzrQOiNPTEEXiJ2MpUBNS+ndZ3hmFWC2PKSecn+Bb7Mwa7s
+	 2PwriNslIRYgldIBkgoFBq1Sr+wnJY3eXbV084b3q71mdq9eFEXIiaKiWPqqI0/t0q
+	 7teP+olvJlzjhOJoHtXqCB5xdDoSWBU47DaUxjG4=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Xiaoli Feng <xifeng@redhat.com>,
+	Enzo Matsumiya <ematsumiya@suse.de>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	David Howells <dhowells@redhat.com>,
+	linux-cifs@vger.kernel.org,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH 6.12 158/265] smb: client: fix broken multichannel with krb5+signing
+Date: Thu, 12 Mar 2026 21:09:05 +0100
+Message-ID: <20260312201023.978879308@linuxfoundation.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260312201018.128816016@linuxfoundation.org>
+References: <20260312201018.128816016@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260304124629.1616108-1-sprasad@microsoft.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 04, 2026 at 06:15:53PM +0530, nspmangalore@gmail.com wrote:
-> From: Shyam Prasad N <sprasad@microsoft.com>
-> 
-> Today whenever we deal with a file, in addition to holding
-> a reference on the dentry, we also get a reference on the
-> superblock. This happens in two cases:
-> 1. when a new cinode is allocated
-> 2. when an oplock break is being processed
-> 
-> The reasoning for holding the superblock ref was to make sure
-> that when umount happens, if there are users of inodes and
-> dentries, it does not try to clean them up and wait for the
-> last ref to superblock to be dropped by last of such users.
-> 
-> But the side effect of doing that is that umount silently drops
-> a ref on the superblock and we could have deferred closes and
-> lease breaks still holding these refs.
-> 
-> Ideally, we should ensure that all of these users of inodes and
-> dentries are cleaned up at the time of umount, which is what this
-> code is doing.
-> 
-> This code change allows these code paths to use a ref on the
-> dentry (and hence the inode). That way, umount is
-> ensured to clean up SMB client resources when it's the last
-> ref on the superblock (For ex: when same objects are shared).
-> 
-> The code change also moves the call to close all the files in
-> deferred close list to the umount code path. It also waits for
-> oplock_break workers to be flushed before calling
-> kill_anon_super (which eventually frees up those objects).
-> 
-> Fixes: 24261fc23db9 ("cifs: delay super block destruction until all cifsFileInfo objects are gone")
-> Fixes: 705c79101ccf ("smb: client: fix use-after-free in cifs_oplock_break")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
+6.12-stable review patch.  If anyone has any objections, please let me know.
 
-Hi Shyam,
+------------------
 
-So the side effect of the previous code is that the umount hangs until
-all the files are closed?
+From: Paulo Alcantara <pc@manguebit.org>
 
-Thanks,
+commit d9d1e319b39ea685ede59319002d567c159d23c3 upstream.
 
--- 
-Henrique
-SUSE Labs
+When mounting a share with 'multichannel,max_channels=n,sec=krb5i',
+the client was duplicating signing key for all secondary channels,
+thus making the server fail all commands sent from secondary channels
+due to bad signatures.
+
+Every channel has its own signing key, so when establishing a new
+channel with krb5 auth, make sure to use the new session key as the
+derived key to generate channel's signing key in SMB2_auth_kerberos().
+
+Repro:
+
+$ mount.cifs //srv/share /mnt -o multichannel,max_channels=4,sec=krb5i
+$ sleep 5
+$ umount /mnt
+$ dmesg
+  ...
+  CIFS: VFS: sign fail cmd 0x5 message id 0x2
+  CIFS: VFS: \\srv SMB signature verification returned error = -13
+  CIFS: VFS: sign fail cmd 0x5 message id 0x2
+  CIFS: VFS: \\srv SMB signature verification returned error = -13
+  CIFS: VFS: sign fail cmd 0x4 message id 0x2
+  CIFS: VFS: \\srv SMB signature verification returned error = -13
+
+Reported-by: Xiaoli Feng <xifeng@redhat.com>
+Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Cc: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ fs/smb/client/smb2pdu.c |   22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
+
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -1666,19 +1666,17 @@ SMB2_auth_kerberos(struct SMB2_sess_data
+ 	is_binding = (ses->ses_status == SES_GOOD);
+ 	spin_unlock(&ses->ses_lock);
+ 
+-	/* keep session key if binding */
+-	if (!is_binding) {
+-		kfree_sensitive(ses->auth_key.response);
+-		ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
+-						 GFP_KERNEL);
+-		if (!ses->auth_key.response) {
+-			cifs_dbg(VFS, "Kerberos can't allocate (%u bytes) memory\n",
+-				 msg->sesskey_len);
+-			rc = -ENOMEM;
+-			goto out_put_spnego_key;
+-		}
+-		ses->auth_key.len = msg->sesskey_len;
++	kfree_sensitive(ses->auth_key.response);
++	ses->auth_key.response = kmemdup(msg->data,
++					 msg->sesskey_len,
++					 GFP_KERNEL);
++	if (!ses->auth_key.response) {
++		cifs_dbg(VFS, "%s: can't allocate (%u bytes) memory\n",
++			 __func__, msg->sesskey_len);
++		rc = -ENOMEM;
++		goto out_put_spnego_key;
+ 	}
++	ses->auth_key.len = msg->sesskey_len;
+ 
+ 	sess_data->iov[1].iov_base = msg->data + msg->sesskey_len;
+ 	sess_data->iov[1].iov_len = msg->secblob_len;
+
+
