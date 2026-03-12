@@ -1,125 +1,227 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3809B408258
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 23:52:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4106F408258
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 23:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773359526; cv=none; b=pviyL2SXdHTD3nYPLkB7Nj4v0OASpR7PWsf8xbHWnhylXyA+tcRPNjPQeY6PhDhdzI17a8rRFbusjXEAxat9QmRxph1VW4Xz5dSL6Ujz/BL2ubcVW2y7RHGAoEDNYCzw7x3sYxB7zbed+SFEebGMW7oEa9c8z275pSodzBBl7Qk=
+	t=1773359681; cv=none; b=GpxzyuzCpQ6RMt4dFMUwXdCpdIvYqMdsYjhg0U7WGAdS7quFwYhOiAGhgOQuWGU9qmbFZIpthsl/1E7+tK9q+qlsofpi184hf/pmjGJ8E/pUd8yjrviK75PGiBZS1aEMABwNVWDBMwmOaJIhd3ONnIdGmEamT0Fb2XKPKE5Q9AA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773359526; c=relaxed/simple;
-	bh=wOUC16WI4/reo5GvoZO5ESmt8rfD7PE3++Xf9novjKE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V7ihGKc3HPorv7pEagNqGWixG5k3kMfeFwQ5F6JMzWX4HXxDi9LEMuIaH2EsT6W32kvKm29j1KQL97zc/rIsF8352EO4LA/IWfEdRelDkb4nhu131WL3dBwtf4gB0Mj8alJhn+XsZcNq5mUutlVKAMOSCri0/oE62/mQPD0BUsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=URt82eR5; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1773359681; c=relaxed/simple;
+	bh=DlEs47g+0P4QzsWSD4V/FyGf/EgdMLa8LqEPSZOP0wI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aUWCQZNOvs/iP9jHd+RLALSubhZPz5NSgvH6/nLMeqJeBK6ew5sxy83xwfjXfSx2w+ff7boMzh6jcmVGncwNi0/6e7HT2pZORWthSnhbkOEQS3KmAV0QcrfCXoiP9fpKcqMZ09si6rk1ECdOHHLUA9S8hLTP5LqqMWZ5nFttcpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fk+HrQFz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GjeLT5PO; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nK3FApym; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6EDt9gxw; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="URt82eR5"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b96e579c0fcso272280166b.3
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 16:52:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1773359523; x=1773964323; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=pkgvHL0resGmXTqRBi16uC1NxLEncxIx9i+VLjGIXAo=;
-        b=URt82eR5065VogWweW8w2UD3ELKmxw9p6Drg2T+X8i+EggC+dEeoOyssl8gdzPrtN7
-         q+y6I7RbjDxz5bHWER1UFFF6UJ67qWNKdTxmGJQYmX6z/cL3iGUbnAvZq5VMxViTFUyk
-         WC+r1z9NDj7+x0GyW2+FjZqZ5rojb9fdzPbow=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773359523; x=1773964323;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pkgvHL0resGmXTqRBi16uC1NxLEncxIx9i+VLjGIXAo=;
-        b=YYzmq00C9/4cZYgsuy52jZWs64+3sPSYjwvQloKBM8AX574xRx2QcMmiahvcBcHEzt
-         6AWkS6NJvrAqp3glsQssEl8Rh4daOlZjWYBNvJVqAyLrML5OVWBudnMeR4TutUTmxlvb
-         tox/r9Wg84/c2AvuTDbLUydFPKWwgxv/R4qSvaYyQi0fm/DrXr01HojaSwv3hYjhg71y
-         1EyrtifP0uYwgXNRL3uzUbZ47yiL8gQcXrsLKX9o+6wt1KETliqdb2kWFUr1AYu/158Z
-         o0g8kPDtLuJ3U2W570QXjCKAhEnIWQ6r9zizpHwPT1jEkYy+feaPkju4dV7wZhobtYH9
-         54/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXZ7EEmau/sg3hy6GPMdCnrZjX8k0R9jQmSsKnp8Ir1f+LWq9LsiLjLrBGybX34xLGvW6sX6z3e5BwE@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5GgTMaqrx3QqYOalRP8OyT534Wz/xCxCdyY+oPmnFMlnRPBf/
-	h616We0/bVOgo7cz+eEC1Mg6iQzg0obEx4tiHqTwJ0p6uBgEHWQWmreM/YwAF47k1UIWwwzudXP
-	riacl7D0=
-X-Gm-Gg: ATEYQzxPPq8tU795uK0GNGSzg81VSujxK2bGnRH6BNwxflQaL/eMTOJPWNVGX2cg+Rm
-	FpDzJQcfYoA2keAopGndvqKztAY4m9JniyyRvRicmX5z8I5Jx1fg9PxqnNGDLb7K11dzDJLCGvo
-	WfAlZmdcHcfaFSF/PXdsGCyn/i+cKrpP1J9NvKGextTsNDbyIeM+CU49BclOedcSt2moSNIrKAz
-	Gw7SuHeoOQ3qXnf59UgS5X49/QLp79pRlAf099sin6I2D2XH8vsGlcKWdiKVXaZS/vmDCsd4Qt5
-	i2C7V11K162abS/6UurJMkqIh2N1h0gajDJYNRr7EFsTMqHCuOArlg/sGhYxQYApCOGnTA2t5q9
-	D3fHSD/jZ7QonBG5AOZkoFbSr/Q251sQJGFx6YZX14Tq1l/5rfqIXNpRaBCceWajkrJy4aAPzqW
-	yuustZsdHKW5HYcN0abMaGc9Q3yTBMmxvc6osG9aPXOBCljwObSaW+R9gT6fF8qvt3B4tDqMxM
-X-Received: by 2002:a17:907:3f03:b0:b8d:bf4d:7464 with SMTP id a640c23a62f3a-b97653919cbmr62215066b.39.1773359523444;
-        Thu, 12 Mar 2026 16:52:03 -0700 (PDT)
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com. [209.85.218.48])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b976cdb1ec6sm3210566b.33.2026.03.12.16.52.03
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Mar 2026 16:52:03 -0700 (PDT)
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b96f02b4329so272401166b.2
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 16:52:03 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCX1S41mvmRQYwH25ccVBP0L7RYG0N/RpRlQXMnzAz1CVhvEFsrrMY2cMebn3aYJKjto3dcx0TmAISYA@vger.kernel.org
-X-Received: by 2002:a17:907:c5c9:b0:b96:d802:8b41 with SMTP id
- a640c23a62f3a-b9764fd8722mr66207066b.15.1773359215961; Thu, 12 Mar 2026
- 16:46:55 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fk+HrQFz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GjeLT5PO";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nK3FApym";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6EDt9gxw"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id DBF7F4DE48;
+	Thu, 12 Mar 2026 23:54:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773359673; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bwmhrK1mTh+MLga869G8X7ffK5a55BOcYDLNgMLau3w=;
+	b=fk+HrQFzF538OaZee5zKteZcA0YzllQN4x1inGCAbXjNlo6QUNFUqNbGrCH5EeTJbbl1jk
+	FTvU17qIJfkQDV+ln6qt+1UPpVopM6PIvAMUtTOjZZJ3/a+RYpvPc0tmmUajk0tARslnmX
+	EHrtJDNB0KVkLkU4HiHWqk3laOWGWpA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773359673;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bwmhrK1mTh+MLga869G8X7ffK5a55BOcYDLNgMLau3w=;
+	b=GjeLT5POJ2ppQv2V8UcAch81RQWi73SsE94ZqWuISHtXbtVGKO30Qb71oigY1fJWtdCROD
+	hJQD5w9T4bPhNBAQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=nK3FApym;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=6EDt9gxw
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773359672; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bwmhrK1mTh+MLga869G8X7ffK5a55BOcYDLNgMLau3w=;
+	b=nK3FApym7tfNn1DYJAjxANwZrZkOi+7diHoNWII3ULI7GL59N/yI/X6ge92tRZaTNO+iDP
+	rbkiSLfVzTovlXnwx+sm2XdjW+milZHXwHV3OFqONrs/aDXtvH33MrKfrw0c8b1brwsruE
+	f+oOYH59XwjN26di3wGpoeV3fGBkJnk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773359672;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bwmhrK1mTh+MLga869G8X7ffK5a55BOcYDLNgMLau3w=;
+	b=6EDt9gxwjTnn8WVNa/iDDOJbUxG4c6IPQDPESQ58T74caGcpdtTs0tWldMb3C2Klzv+2cX
+	aUwaMbUSyMcQ9xBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5A3794022C;
+	Thu, 12 Mar 2026 23:54:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id QCh3CDhSs2lNPAAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Thu, 12 Mar 2026 23:54:32 +0000
+Date: Thu, 12 Mar 2026 20:54:29 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Yury Norov <ynorov@nvidia.com>
+Cc: Yury Norov <yury.norov@gmail.com>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, linux-kernel@vger.kernel.org, kexec@lists.infradead.org, 
+	linux-cifs@vger.kernel.org, linux-spi@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+	Mark Brown <broonie@kernel.org>, Steve French <sfrench@samba.org>, 
+	Alexander Graf <graf@amazon.com>, Mike Rapoport <rppt@kernel.org>, 
+	Pasha Tatashin <pasha.tatashin@soleen.com>
+Subject: Re: [PATCH] lib: count_zeros: fix 32/64-bit inconsistency in
+ count_trailing_zeros()
+Message-ID: <atnytehtvt6h6kp2ndxsa3x257usezp3bk5hp4ch7gf5w2zake@omihp5zbio3l>
+References: <20260312230817.372878-1-ynorov@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260312214330.3885211-1-neilb@ownmail.net>
-In-Reply-To: <20260312214330.3885211-1-neilb@ownmail.net>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 12 Mar 2026 16:46:39 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wh92deXvH5iXCo9mThXCBYt-jRcVu=z4kiH-f3+wZQOHA@mail.gmail.com>
-X-Gm-Features: AaiRm503fTaccEgKNbxF9h_dDHM9fUsSr52XJuxzTwCI0G9L03uDq8g5di1zchk
-Message-ID: <CAHk-=wh92deXvH5iXCo9mThXCBYt-jRcVu=z4kiH-f3+wZQOHA@mail.gmail.com>
-Subject: Re: [PATCH RFC 00/53] lift lookup out of exclive lock for dir ops
-To: NeilBrown <neil@brown.name>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Jeff Layton <jlayton@kernel.org>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Carlos Maiolino <cem@kernel.org>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Amir Goldstein <amir73il@gmail.com>, Jan Harkes <jaharkes@cs.cmu.edu>, 
-	Hugh Dickins <hughd@google.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	Steve French <sfrench@samba.org>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Sungjong Seo <sj1557.seo@samsung.com>, Yuezhang Mo <yuezhang.mo@sony.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Breno Leitao <leitao@debian.org>, "Theodore Ts'o" <tytso@mit.edu>, 
-	Andreas Dilger <adilger.kernel@dilger.ca>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Ilya Dryomov <idryomov@gmail.com>, 
-	Alex Markuze <amarkuze@redhat.com>, Viacheslav Dubeyko <slava@dubeyko.com>, Tyler Hicks <code@tyhicks.com>, 
-	Andreas Gruenbacher <agruenba@redhat.com>, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeremy Kerr <jk@ozlabs.org>, Ard Biesheuvel <ardb@kernel.org>, linux-fsdevel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	linux-unionfs@vger.kernel.org, coda@cs.cmu.edu, linux-mm@kvack.org, 
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
-	linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, ceph-devel@vger.kernel.org, 
-	ecryptfs@vger.kernel.org, gfs2@lists.linux.dev, linux-um@lists.infradead.org, 
-	linux-efi@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260312230817.372878-1-ynorov@nvidia.com>
+X-Spamd-Result: default: False [-2.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,linux.intel.com,rasmusvillemoes.dk,kernel.org,zx2c4.com,vger.kernel.org,lists.infradead.org,microsoft.com,ziepe.ca,samba.org,amazon.com,soleen.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -2.51
+X-Spam-Level: 
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: DBF7F4DE48
 
-On Thu, 12 Mar 2026 at 14:44, NeilBrown <neilb@ownmail.net> wrote:
+Hi Yury,
+
+On 03/12, Yury Norov wrote:
+>Based on 'sizeof(x) == 4' condition, in 32-bit case the function is wired
+>to ffs(), while in 64-bit case to __ffs(). The difference is substantial:
+>ffs(x) == __ffs(x) + 1. Also, ffs(0) == 0, while __ffs(0) is undefined.
 >
-> This patch set progresses my effort to improve concurrency of
-> directory operations and specifically to allow concurrent updates
-> in a given directory.
+>The 32-bit behaviour is inconsistent with the function description, so it
+>needs to get fixed.
+>
+>There are 9 individual users for the function in 6 different subsystems.
+>Some arches and drivers are 64-bit only:
+> - arch/loongarch/kvm/intc/eiointc.c;
+> - drivers/hv/mshv_vtl_main.c;
+> - kernel/liveupdate/kexec_handover.c;
+>
+>The others are:
+> - ib_umem_find_best_pgsz(): as per comment, __ffs() should be correct;
+> - rzv2m_csi_reg_write_bit(): ARCH_RENESAS only, unclear;
+> - lz77_match_len(): CIFS_COMPRESSION only, unclear, experimental;
+>
+>None of them explicitly tweak their code for a word length, or x == 0.
 
-I only got about half the patches, but the ones I did get didn't raise
-my hackles.
+Context for lz77_match_len() case:
 
-HOWEVER.
+	const u64 diff = lz77_read64(cur) ^ lz77_read64(wnd);
 
-This is very much a "absolutely requires ACKs from Al" series. Al?
+	if (!diff) {
+	...
+	}
 
-Also, because I only got about half the patches, and there's 53 of
-them total, I'd really like to see a git branch for something like
-this. It makes it easier to review for me, and I suspect it makes it
-easier for some of the test robots too.
+	cur += count_trailing_zeros(diff) >> 3;
 
-But again - this needs Al to look at it. Iirc he had some fundamental
-concern with the last version - hopefully now fixed, but ...
+So x == 0 is checked, however it does assume that
+sizeof(unsigned long) == sizeof(u64).  I'll have to fix it for when
+that's not the case (even with your patch in, as __ffs() casts x to
+unsigned long down the line).  Thanks for the heads up.
 
-                 Linus
+
+Cheers,
+
+Enzo
+
+>Requesting comments from the corresponding maintainers on how to proceed
+>with this.
+>
+>The attached patch gets rid of 32-bit explicit support, so that both
+>32- and 64-bit versions rely on __ffs().
+>
+>CC: "K. Y. Srinivasan" <kys@microsoft.com> (hyperv)
+>CC: Haiyang Zhang <haiyangz@microsoft.com> (hyperv)
+>CC: Jason Gunthorpe <jgg@ziepe.ca> (infiniband)
+>CC: Leon Romanovsky <leon@kernel.org> (infiniband)
+>CC: Mark Brown <broonie@kernel.org> (spi)
+>CC: Steve French <sfrench@samba.org> (smb)
+>CC: Alexander Graf <graf@amazon.com> (kexec)
+>CC: Mike Rapoport <rppt@kernel.org> (kexec)
+>CC: Pasha Tatashin <pasha.tatashin@soleen.com> (kexec)
+>Signed-off-by: Yury Norov <ynorov@nvidia.com>
+>---
+> include/linux/count_zeros.h | 9 +++------
+> 1 file changed, 3 insertions(+), 6 deletions(-)
+>
+>diff --git a/include/linux/count_zeros.h b/include/linux/count_zeros.h
+>index 4e5680327ece..5034a30b5c7c 100644
+>--- a/include/linux/count_zeros.h
+>+++ b/include/linux/count_zeros.h
+>@@ -10,6 +10,8 @@
+>
+> #include <asm/bitops.h>
+>
+>+#define COUNT_TRAILING_ZEROS_0 (-1)
+>+
+> /**
+>  * count_leading_zeros - Count the number of zeros from the MSB back
+>  * @x: The value
+>@@ -40,12 +42,7 @@ static inline int count_leading_zeros(unsigned long x)
+>  */
+> static inline int count_trailing_zeros(unsigned long x)
+> {
+>-#define COUNT_TRAILING_ZEROS_0 (-1)
+>-
+>-	if (sizeof(x) == 4)
+>-		return ffs(x);
+>-	else
+>-		return (x != 0) ? __ffs(x) : COUNT_TRAILING_ZEROS_0;
+>+	return (x != 0) ? __ffs(x) : COUNT_TRAILING_ZEROS_0;
+> }
+>
+> #endif /* _LINUX_BITOPS_COUNT_ZEROS_H_ */
+>-- 
+>2.43.0
+>
+>
