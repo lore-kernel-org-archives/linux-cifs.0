@@ -1,69 +1,68 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C23D312815
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 08:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250143B9D87
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 08:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773303360; cv=none; b=j5juReKKJxVSgGD4emBEyZHcj8CwBfEhEDKBqC0COq0hmD6S784d71Ov5dqz92d51cXVyBrUeFJuOYzqHVtdd+cFrS2ObFiuWl0QSopqOAIIHuIGbSrHixSMC7kjI5nDX7K9yRdQJnmn3XSM1pROR7qcOI3nMhogux2/gnzHQjA=
+	t=1773303431; cv=none; b=QxOXl8c+Q+pgechF+0nv9dp7lg640KhSLFmYgXJdgBcUpvqQF9B1cbBXgpyxCwUoGKWW+8BBSxmYm/utPKAKgSSk07YfTQ4CoCqkTD0a3mzKCj2G+QRL9ewzt9vPn9LYcBicyNM8LTGTH/KU3NHjauYArQqsuaqdsFc60pR0Sfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773303360; c=relaxed/simple;
-	bh=vPRwXSgKToWe7ZbZWILha/1I9fOeSIL7brpvArUKWj8=;
+	s=arc-20240116; t=1773303431; c=relaxed/simple;
+	bh=WJplAi4KG9uYyqvFevlWmWtjWi7HCStBnNm9xcF/QOg=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Bqlcx0sLBtcSrDHnme0uajy4ydPI9dQ/2yu0RdHG0GWlFuv7gIwxClgbRk1LI+pmpdHq8HgTyjlb9cpyKsr6WtPFRlNOQ5IWJFGoCjHRuG4f8o8YhY2hssEjXQ0J0iLCe0MA5km3uAP51KUwfecLRcjAQ9xSFilVDh17KcTAdUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O73/aWrV; arc=none smtp.client-ip=209.85.214.173
+	 Content-Disposition; b=rla3EisGJ+Yuqs/fmdwQ9n6sqCXjH7r+s5qjPeJl+o8q3DE4buAT9rEyjmTtG52mtRSiGWpR2DNpxZTQiDQaXiESmH9KgShov4Y5/D8cHI5LdHHXpASA4dZZv+c20w0gSCvM8CYpKrhvheeuMcI0yDgP3lCge9QUBg5m/wHSyb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kyGl2z0m; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O73/aWrV"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2ab232cc803so3991935ad.3
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 01:15:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kyGl2z0m"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2addb31945aso5905835ad.1
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 01:17:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773303358; x=1773908158; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773303428; x=1773908228; darn=vger.kernel.org;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=dP4aQ2sdTwJ0ubokowmZwHZnh1TBo4U9hgiIuxzoLTI=;
-        b=O73/aWrVO25dCU2NOtif0PZi2qxvUgqzBgJCQm3k/izOZUajlDZDqw1lIEV4X1Y1ue
-         rWn8J5kXQ/VViUhNKqCnTHVjtLYU1MXfm2VoE/BAX3GJ9stETbpxpw4HOcihzgYEnj7g
-         eC97LeTJ+aUKM7pboIoshvwucA9N2MEFYfyRg0fQ0abvHgXAqtn1w9YNdqT/AsHOFh1l
-         C5FUsS76fW1uXYpsVhYxGDfMlbgigaIU+L7jr7RawMLbVsSbD4IC9HU+/yDzNc9DyZzO
-         gX2FWfP7rFWVj55ukfgvcCm9OTa8CF4JrkJ3s7MIOwgNBA3khOU2OBlmVdkO2osJwiBM
-         Ftkw==
+        bh=bfUpwZBglKlstFFE5lgPkjKLgF2ZrP6Pd01HjFxEQcI=;
+        b=kyGl2z0mYXPcZNi/IhfHrQ2M6Zp+uZHgNWoC0AIwpzD2589Qs3oyqjUQv8mXIuPZYH
+         uJQMLfr0/dXfypVAEox13SOp2GhVljF6+jvka+BxX+Q/SrjEJ/h9NHNY4Hzfs/58xQUz
+         kU3NTj7n+DEsCetq521++qjFBFXFehtpNr525phIxM6E3kx+n+U7N10OBT6fAdabEsdk
+         Ox0D4QvCXrfLDtM6vm6iVjsuTkdZ2Y1ft3jpYuxhRpiBl+1GyjiP4edv5Uey+RNUtfml
+         TKItkGgOTc650cASOyOpBboxgYcUzpqAGAFNGyOzuYzyrEH6v1ivmaoqIZVlXJnEZHU6
+         g75A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773303358; x=1773908158;
+        d=1e100.net; s=20230601; t=1773303428; x=1773908228;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=dP4aQ2sdTwJ0ubokowmZwHZnh1TBo4U9hgiIuxzoLTI=;
-        b=KSK+uhp7cmqSJsFnWEn2/NZZYfVvmpfpzctarzVTFxSZuMMbkWOI5AnwEcbv/8zlPN
-         jZImWHFTdjGyytGebp4lBO1+CS/43r2qv9te/sBv2oLOGoL4FXQPrS23s3+JheTEJLjD
-         /N5pOrMSdFf3Wmpue41Psvzys6cpOdWCJRcOYOD566N6klMDI4nciXutKHWSc/eKtqvX
-         TApUBk2mf+DgKmYDusbiYyGSjfrp96tzFurzZ+4ux+HmIbZIiIt98Iv6d3FNImeFOVH4
-         8Z2amofYGLn+PZpyq0XPb3MkJmWhvX2cMgc7jWOoTBeiJRIyxdByBhIGK1/YPJMr5Aq2
-         a47Q==
-X-Gm-Message-State: AOJu0YxezOIFoX2Ug4gRgRQh8oEc/eXzaQLWLNI24ASpChA47pteFMQ6
-	OW0WTJ4eNGg49SJOL3xMQScKbE1143we2TDgKLjN8fynfsj+JgvV+mqZ
-X-Gm-Gg: ATEYQzzsjDnEGVXooxm9rlTT8jJqRV02qba/cJIy76sRb2f0+cNSbuS+lBTmapoOjxF
-	SUrojwaLJCBxWUgRUGaV6i73+pViRhDK8y4dpJXK4CDE3sbX2zGOmZm366GZS82RievFhtfUtPc
-	xRXvOBaQd61DVgBrGuUAzkn0yacHk5mXue736gNd+77/wwMt2n5anDobJur3t+KPic8+C+0xm26
-	BKgPjXrWv4WLTXjUQe6iw3oqij9luKp7rPSU3lF7LXD8gmBrMqo/Vop6gYy8uWCbbtIBOQMCYdn
-	vyOAJ/7a0FaoS4MXq4Shk42gY/p9phZ5Tkx8LKeBIghe7pgkYSlTNhFyx3KBikVe4Zu17WY76+5
-	CZ2Uli1xLwd8FFypqO23q/QV6dxkSfab7uaMJwvO7LfPCn8nldvqPkUwilpnwIzIKFGMEooAKAa
-	e7D/GZ944/Txer+cNgh5YqOZPr2uGa3irWBJX21uoPkA==
-X-Received: by 2002:a17:903:1a30:b0:2a4:8cd:c3cf with SMTP id d9443c01a7336-2aeae91d939mr56976675ad.49.1773303358303;
-        Thu, 12 Mar 2026 01:15:58 -0700 (PDT)
+        bh=bfUpwZBglKlstFFE5lgPkjKLgF2ZrP6Pd01HjFxEQcI=;
+        b=p6LlkDod4iZsz6TvtdSwZgABBIwFtC38AxAl6UawqSsBlWGGLDu6bpPr79Vc3u3qy1
+         K7ugL9tx/ftepSrV2xDXocFcpoYe4ls6ua7qc66LFS7Iy2GOrCHz3WM0FK5xwCnRK45n
+         6s0NQy8HNGUXeOAEoTIGCcCBtBs0T3IV1mgWI7AK0fqNPRzKO7bJGRuHs965mqF2Vtar
+         O7exiQk+gjx8SZx968DL3fPwLO0SZK+6j5R5hJSIhA0GgxHtfT+B9yiIEe2vP+IC4x7f
+         0yGCCkR2jKcZBxzKDcTpioHJbjZ2yhXzwXfx24YGFdolOEpYWFhjYUi3CCTtnK74f1fX
+         GrOA==
+X-Gm-Message-State: AOJu0YxqFhtPS76Fo2LEzMySXyL+KVxqcNZZs3uLufAIFPnP8nyPvu1b
+	n5mX+nebstKmWuvhTFkU58gVmlWU1435kmaT5oXHLaK/3+87/+6kKj0Q
+X-Gm-Gg: ATEYQzxrXWOxMNlOC+eSTzJXEEfvLnDuXLOVKAk8DpZHuWlMVPbC17huDA8Jmtc2JoA
+	BJbl276jCVE35MZMpD5RZjhxhVUj4NSb+fgXnEUOzByOKU1Mnl+NLPR+Uf069BmEpFZtiW2g19m
+	p+Yqfou+UoWesWTboBBldQGpJgjjKwPo0z8FCN5td/98TvObQX6dGIwfzNB5Hz3Xc+B4EijVx5E
+	s+ZbKhhoNQkQDjNxiSoDqnm5EGSkXSgtdKzWySLetsDy2eesdo07h7Il0CiM16yQQGL606iSVHF
+	xK9GO8XniVTVIV3DJbHCY5FZ1GIEYtiSdGYWDvsJ/DwU7C79Z2f9QK9RieVpoqx5KL0Xbpnr5Jo
+	EtWBw2HuXLWh99rkQpBwyZihoBUnE4R6CEqRmtXB2jbSDo+8SHhIWnplcL+P4h9oy8cWUT/XarL
+	va0O4G8yJzscmhy1WUYy9fR+kwN6+6bTHesrgMg5mOjg==
+X-Received: by 2002:a17:903:240d:b0:2ae:588a:f3e5 with SMTP id d9443c01a7336-2aeae85b2d8mr57083565ad.30.1773303428383;
+        Thu, 12 Mar 2026 01:17:08 -0700 (PDT)
 Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aec09e123dsm12941775ad.46.2026.03.12.01.15.54
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aeae246ff0sm70872715ad.27.2026.03.12.01.17.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 01:15:57 -0700 (PDT)
-Date: Thu, 12 Mar 2026 17:15:51 +0900
+        Thu, 12 Mar 2026 01:17:07 -0700 (PDT)
+Date: Thu, 12 Mar 2026 17:17:02 +0900
 From: Hyunwoo Kim <imv4bel@gmail.com>
 To: linkinjeon@kernel.org, smfrench@gmail.com, senozhatsky@chromium.org,
 	tom@talpey.com
 Cc: linux-cifs@vger.kernel.org, imv4bel@gmail.com
-Subject: [PATCH] ksmbd: fix use-after-free in durable v2 replay of active
- file handles
-Message-ID: <abJ2NzsiCzxyySzS@v4bel>
+Subject: [PATCH] ksmbd: fix use-after-free of share_conf in compound request
+Message-ID: <abJ2fk0KaQNeHgmp@v4bel>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -73,119 +72,126 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-parse_durable_handle_context() unconditionally assigns dh_info->fp->conn
-to the current connection when handling a DURABLE_REQ_V2 context with
-SMB2_FLAGS_REPLAY_OPERATION. ksmbd_lookup_fd_cguid() does not filter by
-fp->conn, so it returns file handles that are already actively connected.
-The unconditional overwrite replaces fp->conn, and when the overwriting
-connection is subsequently freed, __ksmbd_close_fd() dereferences the
-stale fp->conn via spin_lock(&fp->conn->llist_lock), causing a
-use-after-free.
+smb2_get_ksmbd_tcon() reuses work->tcon in compound requests without
+validating tcon->t_state. ksmbd_tree_conn_lookup() checks t_state ==
+TREE_CONNECTED on the initial lookup path, but the compound reuse path
+bypasses this check entirely.
+
+If a prior command in the compound (SMB2_TREE_DISCONNECT) sets t_state
+to TREE_DISCONNECTED and frees share_conf via ksmbd_share_config_put(),
+subsequent commands dereference the freed share_conf through
+work->tcon->share_conf.
 
 KASAN report:
 
-[    7.349357] ==================================================================
-[    7.349607] BUG: KASAN: slab-use-after-free in _raw_spin_lock+0x75/0xe0
-[    7.349811] Write of size 4 at addr ffff8881056ac18c by task kworker/1:2/108
-[    7.350010]
-[    7.350064] CPU: 1 UID: 0 PID: 108 Comm: kworker/1:2 Not tainted 7.0.0-rc3+ #58 PREEMPTLAZY
-[    7.350068] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[    7.350070] Workqueue: ksmbd-io handle_ksmbd_work
-[    7.350083] Call Trace:
-[    7.350087]  <TASK>
-[    7.350087]  dump_stack_lvl+0x64/0x80
-[    7.350094]  print_report+0xce/0x660
-[    7.350100]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[    7.350101]  ? __pfx___mod_timer+0x10/0x10
-[    7.350106]  ? _raw_spin_lock+0x75/0xe0
-[    7.350108]  kasan_report+0xce/0x100
-[    7.350109]  ? _raw_spin_lock+0x75/0xe0
-[    7.350114]  kasan_check_range+0x105/0x1b0
-[    7.350116]  _raw_spin_lock+0x75/0xe0
-[    7.350118]  ? __pfx__raw_spin_lock+0x10/0x10
-[    7.350119]  ? __call_rcu_common.constprop.0+0x25e/0x780
-[    7.350125]  ? close_id_del_oplock+0x2cc/0x4e0
-[    7.350128]  __ksmbd_close_fd+0x27f/0xaf0
-[    7.350131]  ksmbd_close_fd+0x135/0x1b0
-[    7.350133]  smb2_close+0xb19/0x15b0
-[    7.350142]  ? __pfx_smb2_close+0x10/0x10
-[    7.350143]  ? xas_load+0x18/0x270
-[    7.350146]  ? _raw_spin_lock+0x84/0xe0
-[    7.350148]  ? __pfx__raw_spin_lock+0x10/0x10
-[    7.350150]  ? _raw_spin_unlock+0xe/0x30
-[    7.350151]  ? ksmbd_smb2_check_message+0xeb2/0x24c0
-[    7.350153]  ? ksmbd_tree_conn_lookup+0xcd/0xf0
-[    7.350154]  handle_ksmbd_work+0x40f/0x1080
-[    7.350156]  process_one_work+0x5fa/0xef0
-[    7.350162]  ? assign_work+0x122/0x3e0
-[    7.350163]  worker_thread+0x54b/0xf70
-[    7.350165]  ? __pfx_worker_thread+0x10/0x10
-[    7.350166]  kthread+0x346/0x470
-[    7.350170]  ? recalc_sigpending+0x19b/0x230
-[    7.350176]  ? __pfx_kthread+0x10/0x10
-[    7.350178]  ret_from_fork+0x4fb/0x6c0
-[    7.350183]  ? __pfx_ret_from_fork+0x10/0x10
-[    7.350185]  ? __switch_to+0x36c/0xbe0
-[    7.350188]  ? __pfx_kthread+0x10/0x10
-[    7.350190]  ret_from_fork_asm+0x1a/0x30
-[    7.350197]  </TASK>
-[    7.350197]
-[    7.355160] Allocated by task 123:
-[    7.355261]  kasan_save_stack+0x33/0x60
-[    7.355373]  kasan_save_track+0x14/0x30
-[    7.355484]  __kasan_kmalloc+0x8f/0xa0
-[    7.355593]  ksmbd_conn_alloc+0x44/0x6d0
-[    7.355711]  ksmbd_kthread_fn+0x243/0xd70
-[    7.355839]  kthread+0x346/0x470
-[    7.355942]  ret_from_fork+0x4fb/0x6c0
-[    7.356051]  ret_from_fork_asm+0x1a/0x30
-[    7.356164]
-[    7.356214] Freed by task 134:
-[    7.356305]  kasan_save_stack+0x33/0x60
-[    7.356416]  kasan_save_track+0x14/0x30
-[    7.356527]  kasan_save_free_info+0x3b/0x60
-[    7.356646]  __kasan_slab_free+0x43/0x70
-[    7.356761]  kfree+0x1ca/0x430
-[    7.356862]  ksmbd_tcp_disconnect+0x59/0xe0
-[    7.356993]  ksmbd_conn_handler_loop+0x77e/0xd40
-[    7.357138]  kthread+0x346/0x470
-[    7.357240]  ret_from_fork+0x4fb/0x6c0
-[    7.357350]  ret_from_fork_asm+0x1a/0x30
-[    7.357463]
-[    7.357513] The buggy address belongs to the object at ffff8881056ac000
-[    7.357513]  which belongs to the cache kmalloc-1k of size 1024
-[    7.357857] The buggy address is located 396 bytes inside of
-[    7.357857]  freed 1024-byte region [ffff8881056ac000, ffff8881056ac400)
+[    4.144653] ==================================================================
+[    4.145059] BUG: KASAN: slab-use-after-free in smb2_write+0xc74/0xe70
+[    4.145415] Read of size 4 at addr ffff88810430c194 by task kworker/1:1/44
+[    4.145772]
+[    4.145867] CPU: 1 UID: 0 PID: 44 Comm: kworker/1:1 Not tainted 7.0.0-rc3+ #60 PREEMPTLAZY
+[    4.145871] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[    4.145875] Workqueue: ksmbd-io handle_ksmbd_work
+[    4.145888] Call Trace:
+[    4.145892]  <TASK>
+[    4.145894]  dump_stack_lvl+0x64/0x80
+[    4.145910]  print_report+0xce/0x660
+[    4.145919]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[    4.145928]  ? smb2_write+0xc74/0xe70
+[    4.145931]  kasan_report+0xce/0x100
+[    4.145934]  ? smb2_write+0xc74/0xe70
+[    4.145937]  smb2_write+0xc74/0xe70
+[    4.145939]  ? __pfx_smb2_write+0x10/0x10
+[    4.145942]  ? _raw_spin_unlock+0xe/0x30
+[    4.145945]  ? ksmbd_smb2_check_message+0xeb2/0x24c0
+[    4.145948]  ? smb2_tree_disconnect+0x31c/0x480
+[    4.145951]  handle_ksmbd_work+0x40f/0x1080
+[    4.145953]  process_one_work+0x5fa/0xef0
+[    4.145962]  ? assign_work+0x122/0x3e0
+[    4.145964]  worker_thread+0x54b/0xf70
+[    4.145967]  ? __pfx_worker_thread+0x10/0x10
+[    4.145970]  kthread+0x346/0x470
+[    4.145976]  ? recalc_sigpending+0x19b/0x230
+[    4.145980]  ? __pfx_kthread+0x10/0x10
+[    4.145984]  ret_from_fork+0x4fb/0x6c0
+[    4.145992]  ? __pfx_ret_from_fork+0x10/0x10
+[    4.145995]  ? __switch_to+0x36c/0xbe0
+[    4.145999]  ? __pfx_kthread+0x10/0x10
+[    4.146003]  ret_from_fork_asm+0x1a/0x30
+[    4.146013]  </TASK>
+[    4.146014]
+[    4.149858] Allocated by task 44:
+[    4.149953]  kasan_save_stack+0x33/0x60
+[    4.150061]  kasan_save_track+0x14/0x30
+[    4.150169]  __kasan_kmalloc+0x8f/0xa0
+[    4.150274]  ksmbd_share_config_get+0x1dd/0xdd0
+[    4.150401]  ksmbd_tree_conn_connect+0x7e/0x600
+[    4.150529]  smb2_tree_connect+0x2e6/0x1000
+[    4.150645]  handle_ksmbd_work+0x40f/0x1080
+[    4.150761]  process_one_work+0x5fa/0xef0
+[    4.150873]  worker_thread+0x54b/0xf70
+[    4.150978]  kthread+0x346/0x470
+[    4.151071]  ret_from_fork+0x4fb/0x6c0
+[    4.151176]  ret_from_fork_asm+0x1a/0x30
+[    4.151286]
+[    4.151332] Freed by task 44:
+[    4.151418]  kasan_save_stack+0x33/0x60
+[    4.151526]  kasan_save_track+0x14/0x30
+[    4.151634]  kasan_save_free_info+0x3b/0x60
+[    4.151751]  __kasan_slab_free+0x43/0x70
+[    4.151861]  kfree+0x1ca/0x430
+[    4.151952]  __ksmbd_tree_conn_disconnect+0xc8/0x190
+[    4.152088]  smb2_tree_disconnect+0x1cd/0x480
+[    4.152211]  handle_ksmbd_work+0x40f/0x1080
+[    4.152326]  process_one_work+0x5fa/0xef0
+[    4.152438]  worker_thread+0x54b/0xf70
+[    4.152545]  kthread+0x346/0x470
+[    4.152638]  ret_from_fork+0x4fb/0x6c0
+[    4.152743]  ret_from_fork_asm+0x1a/0x30
+[    4.152853]
+[    4.152900] The buggy address belongs to the object at ffff88810430c180
+[    4.152900]  which belongs to the cache kmalloc-96 of size 96
+[    4.153226] The buggy address is located 20 bytes inside of
+[    4.153226]  freed 96-byte region [ffff88810430c180, ffff88810430c1e0)
+[    4.153549]
+[    4.153596] The buggy address belongs to the physical page:
+[    4.153750] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff88810430ce80 pfn:0x10430c
+[    4.154000] flags: 0x100000000000200(workingset|node=0|zone=2)
+[    4.154160] page_type: f5(slab)
+[    4.154251] raw: 0100000000000200 ffff888100041280 ffff888100040110 ffff888100040110
+[    4.154461] raw: ffff88810430ce80 0000000800200009 00000000f5000000 0000000000000000
+[    4.154668] page dumped because: kasan: bad access detected
+[    4.154820]
+[    4.154866] Memory state around the buggy address:
+[    4.155002]  ffff88810430c080: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[    4.155196]  ffff88810430c100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[    4.155391] >ffff88810430c180: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+[    4.155587]                          ^
+[    4.155693]  ffff88810430c200: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[    4.155891]  ffff88810430c280: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[    4.156087] ==================================================================
 
-Fix by removing the unconditional fp->conn assignment and rejecting the
-replay when fp->conn is non-NULL. This is consistent with
-ksmbd_lookup_durable_fd(), which also rejects file handles with a
-non-NULL fp->conn. For disconnected file handles (fp->conn == NULL),
-ksmbd_reopen_durable_fd() handles setting fp->conn.
+Add the same t_state validation to the compound reuse path, consistent
+with ksmbd_tree_conn_lookup().
 
-Fixes: c8efcc786146 ("ksmbd: add support for durable handles v1/v2")
+Fixes: 5005bcb42191 ("ksmbd: validate session id and tree id in the compound request")
 Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 ---
- fs/smb/server/smb2pdu.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ fs/smb/server/smb2pdu.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 9f7ff7491e9a..e2b280c9fdd7 100644
+index 9f7ff7491e9a..bbd144558b7a 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -2828,7 +2828,11 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
- 						goto out;
- 					}
- 
--					dh_info->fp->conn = conn;
-+					if (dh_info->fp->conn) {
-+						ksmbd_put_durable_fd(dh_info->fp);
-+						err = -EBADF;
-+						goto out;
-+					}
- 					dh_info->reconnected = true;
- 					goto out;
- 				}
+@@ -126,6 +126,8 @@ int smb2_get_ksmbd_tcon(struct ksmbd_work *work)
+ 			pr_err("The first operation in the compound does not have tcon\n");
+ 			return -EINVAL;
+ 		}
++		if (work->tcon->t_state != TREE_CONNECTED)
++			return -ENOENT;
+ 		if (tree_id != UINT_MAX && work->tcon->id != tree_id) {
+ 			pr_err("tree id(%u) is different with id(%u) in first operation\n",
+ 					tree_id, work->tcon->id);
 -- 
 2.43.0
 
