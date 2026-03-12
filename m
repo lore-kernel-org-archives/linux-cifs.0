@@ -1,116 +1,221 @@
-Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5489238552A;
-	Thu, 12 Mar 2026 15:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773329562; cv=none; b=mqHb/DJurcag11SRnS5v0eXKw/B9KYnMFAy3k0LtOleIzyizQQIZGPykWB/Fmk1pYX0+BCwlxnWPlyFL0p4IAqK1AyjV+lTgP5B2vSizwLKg+5GL0Sd0YH7qCbTM9rqMlMY4753DXbwz9x4BcwiR/xWXOdqGvIlauCtTKbZdkZU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773329562; c=relaxed/simple;
-	bh=zTDNMMg/o0AbpOakTawLJV8HRHueJx9lUWpbuHSD3BU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=R5LzA8Ou2FAlfTxruBbGM6k/z0Mz4c/yMKAdYnzLlIPQhgSJuhcbKkZvN1DS4RRkPHUDvwVX2kkuu25gzXZl/1tiNKIgamJTw7JCYSn//2RRSauf0uGJeCv2B6mWEI1AOeDpowYKobPwyLnOI9ONcClsULIU0+ZMOVB4W4VRrAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=pcvJZxMl; arc=none smtp.client-ip=198.37.111.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65273BFE24
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 15:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773330046; cv=pass; b=eePvKYogZKVZcBvuWTJ90mGlxeRrjLiNUj3RTAN7gzJAOX0Ca1LPs7JVkgA6FuG36rTCcmtHM6IodvtGY/3JoIMaGsEFShKMp4rPoev1/bL3N4gHYMzSRxXen3rWyHD3QBmbAdBsDP7hUt3sxDJc6m9uoDvJT9ICVm9MuH1L93Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773330046; c=relaxed/simple;
+	bh=9U79XuSEDogMsEE6qxccDeqtvH3bBahfO34fvcv/Lvg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DBrTPpV7QsA/DD9sAXJhbSwKatJ2dwKPuZ1PbyWymz+j8Hk08FM0WLzZh5z7Xr5B+PI8bbZQa0Qegf9xVE2q0q1FqTIYTHYZJ+Rz43ooFb/il4MOh4IGON585jZYnVg86Wwgy6m/R+mE1GKb4KtuGTXQzx+R3X1M9ZPkMSXTti4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FLbRxazJ; arc=pass smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="pcvJZxMl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1773329560;
-	bh=zTDNMMg/o0AbpOakTawLJV8HRHueJx9lUWpbuHSD3BU=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=pcvJZxMlUnyDHCQWdoy7oBw4t3ApqjoLShbfu4EGfeRRF/0XvwrUC3nRWEDXXVQdM
-	 hMwbriKe/NL1VZ4m3mEc/Q/oxiEwEcX/NNUV+xlSHstrQ2AykR2/lPVz8ssLEFKVvD
-	 cNP4AXmMocQMY4pE83K1rY1dx5NyhQ9bJbZtUZWw=
-Received: from [IPv6:2601:5c4:4300:d341::a774] (unknown [IPv6:2601:5c4:4300:d341::a774])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 599341C02A4;
-	Thu, 12 Mar 2026 11:32:38 -0400 (EDT)
-Message-ID: <f5688b895eaebabae6545a0d9baf8f1404e8454e.camel@HansenPartnership.com>
-Subject: Re: [PATCH 00/61] treewide: Use IS_ERR_OR_NULL over manual NULL
- check - refactor
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>, Kuan-Wei Chiu <visitorckw@gmail.com>
-Cc: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org, 
- apparmor@lists.ubuntu.com, bpf@vger.kernel.org, ceph-devel@vger.kernel.org,
-  cocci@inria.fr, dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
-  gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
- intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
- kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org,  linux-bluetooth@vger.kernel.org,
- linux-btrfs@vger.kernel.org,  linux-cifs@vger.kernel.org,
- linux-clk@vger.kernel.org,  linux-erofs@lists.ozlabs.org,
- linux-ext4@vger.kernel.org,  linux-fsdevel@vger.kernel.org,
- linux-gpio@vger.kernel.org,  linux-hyperv@vger.kernel.org,
- linux-input@vger.kernel.org,  linux-kernel@vger.kernel.org,
- linux-leds@vger.kernel.org,  linux-media@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mm@kvack.org, 
- linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
- linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
- linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
- linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
- linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
- linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
- linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- ntfs3@lists.linux.dev,  samba-technical@lists.samba.org,
- sched-ext@lists.linux.dev,  target-devel@vger.kernel.org,
- tipc-discussion@lists.sourceforge.net,  v9fs@lists.linux.dev
-Date: Thu, 12 Mar 2026 11:32:37 -0400
-In-Reply-To: <20260312125730.GI1469476@ziepe.ca>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
-	 <abBlpGKO842B3yl9@google.com> <20260312125730.GI1469476@ziepe.ca>
-Autocrypt: addr=James.Bottomley@HansenPartnership.com;
- prefer-encrypt=mutual;
- keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FLbRxazJ"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-899e87b04d8so4516066d6.3
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 08:40:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773330043; cv=none;
+        d=google.com; s=arc-20240605;
+        b=A+Y0rtky0dYzCkmvwIjfSlAgk4ueI71BfGer3Qq0vvpEJiKW/HyHtf3w1Fl8w7SBwz
+         /vdJIx/IVlXVXyV7h0uSDzIPOz5488dwUdITHCVqcZLJfyNh086gPwLO/RQ5WrqYcDXT
+         i+lkvaxKXWq7Wlpy7iuz1Rwy5e7N0HwGsCu8lXeuHKemX7fMqdf6lyb2bnNRLRrh+8I6
+         H3UbUUsC8UDTQ3e+1GYLVkdqBGu4W3rK2ZnmLHO8VZwq3BL/0jiDwhLdcfDoitnCvbK1
+         +H4QhjmLrAf6B4lxkPUQ2sr9fUCGQAPgQyEt4A4sRiIsRUTadxjw91isOEu/lJfq7aHv
+         Z+cQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=pTMqddxceH06ae4/6PYanD/2oexQ8xHGkM95DOK/9Sw=;
+        fh=Z8/GLW+n7feKaNgSMtBQK+Vs/hbGKGLg+WAVK5RQxr0=;
+        b=IOgfwENOAcKILDerpeqa4G2DrehF7FMUebYOmj6PA+pIu/I1tSw0zuPhIHznaX08rG
+         /PigmuAAwZy6CpErrzbyJuxTEUBqR1aWRYoJ1i4QcpvKfZ63yDV0xZpAgbsYqcDo8cWy
+         xYlPJPMMdDweaQ9zve8CpERNLEODf8mEXiSqy2UmVeevVZgDjoWp9cuqkWMg6wlnh/Mp
+         RxyhH0CwTwABVo1BT8YV3FoXVNmvH5gsdP6xp84oYPyb3XyYxuLAfqsJ7Nd9m5rb1Ptk
+         eb8MJxMynGpS6ex05OoJjKBb/z1V7m4okWOB2ufpZfjh3Y6pIf5KEA+JG+9Wlqx3irJB
+         x6qA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773330043; x=1773934843; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pTMqddxceH06ae4/6PYanD/2oexQ8xHGkM95DOK/9Sw=;
+        b=FLbRxazJIzPZEV2sEZx9zrboFDwIn+alCWs5hskbczBtnRLe/otMlpIQowj+KltuzF
+         dwUgUcaKyd71ghZv2xyO826u6NaTDLhL6g692D9sn40GRpRbWf4wxY1u0PYC6r9Ik4Ry
+         PL4W/U1BRT4K9uf8AlbU3gXXgChiy81qi+81n+UZ4aDPM1gSsyaXSLC2SG7x89IQzJfM
+         nDhckLHdULcBqGfdsC2Gy7+vslG/RbVkPU+GYhAx8+NS7nbyur/Z+wukqB/lP87FQ1hH
+         xtYVq56q89qXqRAFw4xLuvrXf9l5XzAMxxcMAo5S3Cdi28+zM1w7WebovbE84O8OdspQ
+         NZ/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773330043; x=1773934843;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=pTMqddxceH06ae4/6PYanD/2oexQ8xHGkM95DOK/9Sw=;
+        b=iwHkdWf7Le8OYQxMFd4k1/bDxZfWdL0krvwjNHGFgfc8z1jAQIR/e2oLc8Pcm1lfJZ
+         9Hlqwb7b2NmhhdTHp1mBCipNqui7HO//jMAlRLcAgS99zwpB2ykH4tfQoft0bdkeIN/+
+         nVcrBeWwhHm+pWoi2Am6wo2y+NuIMPYDvh3cJX9Oe0N8XAg+MQm359TpFg49PB49H7Rz
+         fDdYJh8/naEKdBSPt5MnKjezmPFE927IesPOqtKvDCbNU6tD6akTj1lcv5IcWZ1xADU/
+         Ob0iWXxQcC8zIPDs1RMIW+uKV066AEKzdjhHMNJD1racbT6RbJ+8gejwzUtCVemUSMCD
+         o9vg==
+X-Forwarded-Encrypted: i=1; AJvYcCWGbqLnyexdg5tzE+sB0N1r58lZ9RZ7L/eGr1R2+kNrDeo+1dmQwVFRWSROTdkjKMryPT5LSCWolLt1@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrU6YyG2fo8suAWBFmHY99n0jPEVyRi5TnzeDnB9mnf+C36XGF
+	v9CxZ8NDL6AGyEbmPlcSd+bFR9kyQAUbAfmIeplR2fl14ta0iiMeJaSDpB/437g7U+gKgNey6M0
+	lHsmyjlUxOL42fzctKJEfM45HSKRNbskt5w==
+X-Gm-Gg: ATEYQzzhqWJO+8XlwiovhKWYasyEx6InsJqWC4l9kfLsCgDna9Fbdjaa8I/s9zDNNiP
+	r2P2PXoJDORt0Yn+V/qacG9vWc747GnVhMe3Mj+TllImzzqZDkPG7fcH/GiowqrLO328XA+LXp8
+	UOm+h1sVzK3Q/H5hrW2QfePS+7tMarvspJ0z08KSvjKffQvkrjKLrs2gjce5xSKwTpSmo1Jy5kp
+	Hi/7ZVxeQLdc/0Z1hwePasNxaSy52PygkDCnpKBZBTVNk0s4QskjpOZAd51HIwkjQI6U4OA0632
+	XtbO6kC5CyJYU1Kw/oeTt1tpKB7Arg6Ijy4U5alp3d9tMAcEvwJsTggTRY5Jkfivwfmr7K5aFEA
+	8oOP07AAZ3IsfeYVEAeIZWLNnKtOh/qSoNhGI+d2zju1pqoQNpLrppg/ZaXZ6UZZ6X3zdqp6Ft6
+	hnraI6kPoi5Hz0JX0CZMe4oQ==
+X-Received: by 2002:ad4:5ca2:0:b0:899:fd80:f79f with SMTP id
+ 6a1803df08f44-89a81dde5abmr2633836d6.23.1773330042750; Thu, 12 Mar 2026
+ 08:40:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260310235642.6d9798f4@plasteblaster> <c66p7dr6vlujvnwczbnrmqx7monkdgdnm4rwewm76aibn7jza3@d3uik74dei72>
+ <CANT5p=q2Lv4pSvEm5EWcM73b7NZsbt1kYEFJtjaAZRS6Gz_OjQ@mail.gmail.com> <42utcrhajix2x3feckj7ap373osq65sgfz6ximnaj4rasszret@ymhf44ddz2wh>
+In-Reply-To: <42utcrhajix2x3feckj7ap373osq65sgfz6ximnaj4rasszret@ymhf44ddz2wh>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 12 Mar 2026 10:40:30 -0500
+X-Gm-Features: AaiRm52ah7-n07dCG73FeRnFD_pUuk-pLBG0LIJHG-WBVhN-iBaM9Rrd33zCEk0
+Message-ID: <CAH2r5msUyFejEbDafcWzSf5oLE3pJCdreaQTm2dxbqfmGtqCRQ@mail.gmail.com>
+Subject: Re: [REGRESSION] failure to reconnect on SMB server restart with
+ custom TCP port (not 445): Host is down (at least since 6.6.95)
+To: Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: Shyam Prasad N <nspmangalore@gmail.com>, 
+	"Dr. Thomas Orgis" <thomas.orgis@uni-hamburg.de>, Steve French <sfrench@samba.org>, 
+	linux-cifs@vger.kernel.org, regressions@lists.linux.dev, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2026-03-12 at 09:57 -0300, Jason Gunthorpe wrote:
-> On Wed, Mar 11, 2026 at 02:40:36AM +0800, Kuan-Wei Chiu wrote:
->=20
-> > IMHO, the necessity of IS_ERR_OR_NULL() often highlights a
-> > confusing or flawed API design. It usually implies that the caller
-> > is unsure whether a failure results in an error pointer or a NULL
-> > pointer.=20
->=20
-> +1
->=20
-> IS_ERR_OR_NULL() should always be looked on with suspicion. Very
-> little should be returning some tri-state 'ERR' 'NULL' 'SUCCESS'
-> pointer. What does the middle condition even mean? IS_ERR_OR_NULL()
-> implies ERR and NULL are semanticly the same, so fix the things to
-> always use ERR.
+On Thu, Mar 12, 2026 at 10:10=E2=80=AFAM Henrique Carvalho
+<henrique.carvalho@suse.com> wrote:
+>
+> On Thu, Mar 12, 2026 at 05:44:58AM +0530, Shyam Prasad N wrote:
+> > On Wed, Mar 11, 2026 at 7:37=E2=80=AFAM Henrique Carvalho
+> > <henrique.carvalho@suse.com> wrote:
+> > >
+> > > On Tue, Mar 10, 2026 at 11:56:42PM +0100, Dr. Thomas Orgis wrote:
+> > > > Dear Linux-CIFS maintainer(s),
+> > > >
+> > > > I stumbled upon a regression in the Linux cifs/smb3 client when wor=
+king
+> > > > with a smbd using a non-standard port. I am not the first to note t=
+his, see
+> > > >
+> > > >       https://bbs.archlinux.org/viewtopic.php?id=3D306712
+> > > >
+> > > > which is a report from mid last year, indicating the problem someti=
+me
+> > > > after Linux 6.6.72. It is a very simple issue, where details of the
+> > > > kernel builds or mount setup don't seem to matter much: Older kerne=
+ls
+> > > > reconnect to a SMB server that was restarted (old processes killed =
+and
+> > > > replaced), newer kernels do not and just have a defunct mount.
+> > > >
+> > > > I reproduced this in our HPC cluster environment with such smb.conf=
+ on
+> > > > the server side
+> > > >
+> > > > [global]
+> > > > security =3D user
+> > > > map to guest =3D Bad Password
+> > > > server role =3D standalone server
+> > > > smb ports =3D 1445
+> > > >
+> > > > [public]
+> > > > path =3D /some/path
+> > > > guest ok =3D yes
+> > > > read only =3D yes
+> > > >
+> > > > and such a mount command on the client:
+> > > >
+> > > > mount -t smb3 -o port=3D1445,user=3Dguest,password=3Dfoo //server/p=
+ublic dir
+> > > >
+> > > > When I kill and re-start smbd on the server, older client kernels
+> > > > reconnect and continue to return listings and files from the share,
+> > > > while newer kernels give this:
+> > > >
+> > >
+> > > My suspicion is that the regression was introduced by:
+> > >
+> > >     5713127da855 ("cifs: update dstaddr whenever channel iface is upd=
+ated")
+> > >
+> > > That change causes parse_server_interfaces() -- should this be runnin=
+g
+> > > without multichannel mount option? -- to overwrite the port stored in
+> > > server->dstaddr with CIFS_PORT.
+> > >
+> > > The attached patch preserves the existing port from server->dstaddr.
+> > >
+> > > Note that I have not yet tested this patch or confirmed the regressio=
+n
+> > > with a bisect. If you can't, I will try to do that tomorrow.
+> > >
+> > > --
+> > > Henrique
+> > > SUSE Labs
+> >
+> > Hi Henrique,
+> >
+> > AFAIK, the ignoring of port from the results was by design and part of
+> > the original code back in 2018:
+> > CIFS: parse and store info on iface queries
+> >
+> > Also, the comment in the code just above says why this is so.
+> > [MS-SMB2] 2.2.32.5.1.1 Clients MUST ignore these
+> >
+> > I checked this section and it says:
+> > Port (2 bytes): This field MUST NOT be used and MUST be reserved. The
+> > server SHOULD set this field to zero, and the client MUST ignore it on
+> > receipt.
+> >
+> > Based on the conversations here, it looks like smbd ignores this.
+> >
+> > I think the right fix would be to make sure that
+> > cifs_chan_update_iface gets called only for secondary channels. That
+> > way, it will not get called for single channel scenarios.
+>
+> Sure, I read the comment in the code and the MS-SMB2 protocol. The
+> protocol states that "client MUST ignore [Port] on receipt". Since we
+> are not using p->Port, I don't see how this is a protocol violation.
 
-Not in any way supporting the original patch.  However, the pattern
-ERR, NULL, PTR is used extensively in the dentry code of filesystems.=20
-See the try_lookup..() set of functions in fs/namei.c
+Agree. Looks harmless
 
-The meaning is
+> We're using the port that was selected on mount and copied over to
+> server->dstaddr, so that when server->dstaddr is overwridden,
+> server->dstaddr keeps the user selected port.
+>
+> Now, even if we only fix that for primary channels, the secondary
+> channels will still get the wrong port when they are overwridden, no? So
+> I don't see how that fixes the issue.
+>
+> Apologies if I'm missing something.
+>
+> Best regards,
+>
+> --
+> Henrique
+> SUSE Labs
+>
 
-PTR - I found it
-NULL - It definitely doesn't exist
-ERR - something went wrong during the lookup.
 
-So I don't think you can blanket say this pattern is wrong.
+--=20
+Thanks,
 
-Regards,
-
-James
-
+Steve
