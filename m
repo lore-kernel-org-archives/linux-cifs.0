@@ -1,47 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from flow-b6-smtp.messagingengine.com (flow-b6-smtp.messagingengine.com [202.12.124.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC632D0606;
-	Thu, 12 Mar 2026 20:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB423F0768;
+	Thu, 12 Mar 2026 21:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773347054; cv=none; b=XPCCoZE4nQJklTw1GFcdEz1ZqB727TWnkUcPS24294boEVfQa2PJLnaPZGAm7INjAc8mMpR3LFB8M7tKEcRLakXw0fP0F6SzKzyZzLSywtgWFtATAZU7iv6R4hvBckNYvEyCTG1QRojU8fzZKdrvnM0Mtl0Jd/fLHVNqvvqU7SU=
+	t=1773351870; cv=none; b=T8gi5K2EdvGVk41BvXFahFM2GeGswx0/QHlUSlz7hFlqmeDksAySsw8gaKHOPXSnN6Gzkyu85rZAL9NegwwXfG44EQ6VNYjQSV7L73LjuMfCVZ90Y/PVQ70mOQn/pIVbybI3E+AlnTwZXVcIN1h1O+VONBWk45Bw4aQ0wh5lvis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773347054; c=relaxed/simple;
-	bh=SscjTk3LQxSdnPox1C8Sn3u1Y5wlmvVO6nd6CpoOATk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UTfGzZe5/Hz9BgaMv4CAIWMsTDRlcCNxyFuBdC5Ub66hktkl5x8AHPjkvh0rcRt1SP7XjIQzTbhpoElzuX8+N4mQas7KzOnOZog0MKkb30Nds30vCQ+BjGTXwHZoPRDAPkiNUNSOhqowm8j0brqlGkd7FWBmBNdDuYU7UJw2dz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=egRjd/NM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773351870; c=relaxed/simple;
+	bh=Dfk/v8M2XGUkYMjdT8IWZm5Z9z/SvJrEfRIjyScAHm4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dXgEs+3emdQ4KvGP7H1b8+17qdstyp0+MLHZe+0utR3IbVnkFjUkotitD3iQDNyH8mzg19d7bBznEtQ8I6IjFCf7LjsA8L/5gQlRa89U5/ACzWL1JB5PjflR2rrxU3RH1Q3GFsEtNGrJtnQy+cc1HkRKgSo9l4Z8rmfdtG1p1jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=HynKVXD7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=sD1IpxmF; arc=none smtp.client-ip=202.12.124.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="egRjd/NM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E908AC4CEF7;
-	Thu, 12 Mar 2026 20:24:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1773347054;
-	bh=SscjTk3LQxSdnPox1C8Sn3u1Y5wlmvVO6nd6CpoOATk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=egRjd/NM5r0zWdAc4ETzrQOiNPTEEXiJ2MpUBNS+ndZ3hmFWC2PKSecn+Bb7Mwa7s
-	 2PwriNslIRYgldIBkgoFBq1Sr+wnJY3eXbV084b3q71mdq9eFEXIiaKiWPqqI0/t0q
-	 7teP+olvJlzjhOJoHtXqCB5xdDoSWBU47DaUxjG4=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Xiaoli Feng <xifeng@redhat.com>,
-	Enzo Matsumiya <ematsumiya@suse.de>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="HynKVXD7";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="sD1IpxmF"
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailflow.stl.internal (Postfix) with ESMTP id 649AD1300FE6;
+	Thu, 12 Mar 2026 17:44:25 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Thu, 12 Mar 2026 17:44:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:reply-to:subject
+	:subject:to:to; s=fm1; t=1773351865; x=1773359065; bh=FHJsH8Kre5
+	d09x8tLYt2s8UM1ZjvIsbiC0DN+DyY4Wk=; b=HynKVXD7sGiagH9pyAhm4nEmbG
+	vnoLEKsMRIiSoa4G7euyElVNaPJlW0anEmEFcWVt480xGfw7ZBeWqyJHh/ktIp9H
+	PvZZACKxP9UOdtcmm83xJahGzP6ashogKl0QDSMPEPl70AAQ3icBB8PfEnzEFMRq
+	sX3yWNvxvY/eWlaObNEhjpO2PDvl14q8XwgFR80C8mJOcy9vmuKQRaNg5N7I0NBu
+	YzYQ2wP8zbtuE/A1y/UOTxlh7tZ0N66BfUwAQyR2N36DYGboFbAHY0UTwAvDGw1M
+	d6RYVJexiZ6tvhPF9XL+NJ38N7femUBleqpharU4wR7cs3N8FjN0xclTa88Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1773351865; x=1773359065; bh=FHJsH8Kre5d09x8tLYt2s8UM1Zjv
+	IsbiC0DN+DyY4Wk=; b=sD1IpxmFFBbUWLaj2WkVbBMNwpLBYky36Wu3DMHfzT0X
+	nYRW/ck1rxXdAMzJNXUejfFN/jOa+nMSve9JT7wFkvNE8kcvSIA6yoXL/zieN3xM
+	iZ+dMzyq43JMAdlzXgdWh8E1/CDLAWkabqAdcZh+T2TEs39XC5Dyt8plLkNXPMtI
+	Y+r2Dz3efkKqhCljIQwPhIv8XYGf4dd7RG0/DSMZfTI3O1ghah+7C1QcisTS9EWV
+	p5Ay6DlW7fs9l7Lbcemw1oXfwXFw+gQWGOzjp8GKsZTmGNsABOtouzH+861W6TOI
+	iR7R/iP6i1+Z6AxnjMg7KFFlVxvvm0hDCXBMXVB/MQ==
+X-ME-Sender: <xms:tjOzaYKtAlzNy0f_EhbkSUlhoa8KZMOzdeNH9009TcjkYG6tbvC7Aw>
+    <xme:tjOzab1mfdu_QmTDPbYrOK1x4qA-DPLvzT8zO8FZQfoiZZpM2Q7PewNcOWSFkbzBx
+    CSJqJJgR4xO9u5VcliHKe4FVdaI6_GR5jWwjPvhZ8TLoSIpYA>
+X-ME-Received: <xmr:tjOzaTyaQLH6LrWbZtAo1MENQavCeD4QUFklDYoSz_Wa54OtONiqLZpomwLKI-d-C--YgCofWm54r8ueiEOhXittozc2IECd2HHHlL6ixNjG>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkeejkeelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefufffkofhrggfgsedtkeertdertddtnecuhfhrohhmpefpvghilheurhho
+    fihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepge
+    etfeegtddtvdeigfegueevfeelleelgfejueefueektdelieeikeevtdelveelnecuvehl
+    uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsgesoh
+    ifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohephedupdhmohguvgepshhmthhpohhu
+    thdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpdhrtg
+    hpthhtoheplhhinhhugidqgihfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
+    thhopehlihhnuhigqdhunhhiohhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtoheplhhinhhugidqthhrrggtvgdqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtoheplhhinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehlihhnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtoheplhhinhhugidqvgigthegsehvghgvrhdrkhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtoheplhhinhhugidqvghfihesvhhgvghrrdhkvghrnhgvlhdroh
+    hrgh
+X-ME-Proxy: <xmx:tjOzaS1z3HXh4-ifJRBEJTkKAyUPCr8OJLgJiRXU1S3hJu4gX6A32Q>
+    <xmx:tjOzaU6VCxafI3qHQH8oosSQuqDVIy-CStyT6UaG1DYXnTDBEu-EpA>
+    <xmx:tjOzadctLaB3wfFUZXTX37T5TIQ88OOFc6eu00-UyziGYU-aaSZemw>
+    <xmx:tjOzaQYHqOUYatlEsE5TwG61VUO_YB38t6wNqngJFK5w5KsHFjx8_w>
+    <xmx:uTOzacGeKHU7F90aeYZNDwvYEnwYDWXkCfp88n2OwGQGooB6gIONyBVa>
+Feedback-ID: i9d664b8f:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 12 Mar 2026 17:44:08 -0400 (EDT)
+From: NeilBrown <neilb@ownmail.net>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,	Jan Kara <jack@suse.cz>,
+	Jeff Layton <jlayton@kernel.org>,	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,	Carlos Maiolino <cem@kernel.org>,
+	Miklos Szeredi <miklos@szeredi.hu>,	Amir Goldstein <amir73il@gmail.com>,
+	Jan Harkes <jaharkes@cs.cmu.edu>,	Hugh Dickins <hughd@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
 	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,	Steve French <sfrench@samba.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Sungjong Seo <sj1557.seo@samsung.com>,
+	Yuezhang Mo <yuezhang.mo@sony.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Breno Leitao <leitao@debian.org>,	"Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,	Alex Markuze <amarkuze@redhat.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>,	Tyler Hicks <code@tyhicks.com>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,	Jeremy Kerr <jk@ozlabs.org>,
+	Ard Biesheuvel <ardb@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-unionfs@vger.kernel.org,
+	coda@cs.cmu.edu,
+	linux-mm@kvack.org,
+	linux-afs@lists.infradead.org,
 	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.12 158/265] smb: client: fix broken multichannel with krb5+signing
-Date: Thu, 12 Mar 2026 21:09:05 +0100
-Message-ID: <20260312201023.978879308@linuxfoundation.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260312201018.128816016@linuxfoundation.org>
-References: <20260312201018.128816016@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	linux-ext4@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	ecryptfs@vger.kernel.org,
+	gfs2@lists.linux.dev,
+	linux-um@lists.infradead.org,
+	linux-efi@vger.kernel.org
+Subject: [PATCH RFC 00/53] lift lookup out of exclive lock for dir ops
+Date: Fri, 13 Mar 2026 08:11:47 +1100
+Message-ID: <20260312214330.3885211-1-neilb@ownmail.net>
+X-Mailer: git-send-email 2.50.0.107.gf914562f5916.dirty
+Reply-To: NeilBrown <neil@brown.name>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -50,80 +128,180 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+This patch set progresses my effort to improve concurrency of
+directory operations and specifically to allow concurrent updates
+in a given directory.
 
-------------------
+There are a bunch of VFS patches which introduce some new APIs and
+improve existing ones.  Then a bunch of per-filesystem changes which
+adjust to meet new needs, often using the new APIs, then a final bunch
+of VFS patches which discard some APIs that are no longer wanted, and
+one (the second last) which makes the big change.  Some of the fs
+patches don't depend on any preceeding patch and if maintainers wanted
+to take those early I certainly wouldn't object!  I've put a '*' next
+to patches which I think can be taken at any time.
 
-From: Paulo Alcantara <pc@manguebit.org>
+My longer term goal involves pushing the parent-directory locking down
+into filesystems (which can then discard it if it isn't needed) and using
+exclusive dentry locking in the VFS for all directory operations other
+than readdir - which by its nature needs shared locking and will
+continue to use the directory lock.
 
-commit d9d1e319b39ea685ede59319002d567c159d23c3 upstream.
+The VFS already has exclusive dentry locking for the limited case of
+lookup.  Newly created dentries (when created by d_alloc_parallel()) are
+exclusively locked using the DCACHE_PAR_LOOKUP bit.  They remain
+exclusive locked until they are hashed as negative or positive dentries,
+or they are discarded.
 
-When mounting a share with 'multichannel,max_channels=n,sec=krb5i',
-the client was duplicating signing key for all secondary channels,
-thus making the server fail all commands sent from secondary channels
-due to bad signatures.
+DCACHE_PAR_LOOKUP currently depends on a shared parent lock to exclude
+directory modifying operations.  This patch set removes this dependency
+so that d_alloc_parallel() can be called without locking and all
+directory modifying operations receive either a hashed dentry or an
+in-lookup dentry (they currently recieve either a hashed or unhashed,
+or sometimes in-lookup (atomic_open only)).
 
-Every channel has its own signing key, so when establishing a new
-channel with krb5 auth, make sure to use the new session key as the
-derived key to generate channel's signing key in SMB2_auth_kerberos().
+The cases where a filesystem can receive an in-lookup dentry are:
+ - lookup. Currently can receive in-lookup or unhashed.  After this patch set
+    it always receives in-lookup
+ - atomic_open.  Currently can receive in-lookup or hashed-negative.
+    This doesn't change with this patchset.
+ - rename. currently can receive hashed or unhashed.  After this patchset
+    can also receive in-lookup where previously it would receive unhashed.
+    This is only for the target of a rename over NFS.
+ - link, mknod, mkdir, symlink.  currently received hashed-negative except for
+    NFS which notices the implied exclusive create and skips the lookup so
+    the filesystem can received unhashed-negative for the operation.
 
-Repro:
+There are two particular needs to be addressed before we can use d_alloc_parallel()
+outside of the directory lock.
 
-$ mount.cifs //srv/share /mnt -o multichannel,max_channels=4,sec=krb5i
-$ sleep 5
-$ umount /mnt
-$ dmesg
-  ...
-  CIFS: VFS: sign fail cmd 0x5 message id 0x2
-  CIFS: VFS: \\srv SMB signature verification returned error = -13
-  CIFS: VFS: sign fail cmd 0x5 message id 0x2
-  CIFS: VFS: \\srv SMB signature verification returned error = -13
-  CIFS: VFS: sign fail cmd 0x4 message id 0x2
-  CIFS: VFS: \\srv SMB signature verification returned error = -13
+1/ d_alloc_parallel() effects a blocking lock so lock ordering is important.
+  If we are to take the directory lock *after* calling d_alloc_parallel() (and 
+  still holding an in-lookup dentry, as happens at least when ->atomic_open
+  is called) then we must never call d_alloc_parallel() while holding the
+  directory lock, even a shared lock.
+  This particularly affects readdir as several filesystems prime the dcache
+  with readdir results and so use d_alloc_parallel() in the ->iterate_shared
+  handler, which will now have deadlock potential.  To address this we
+  introduce d_alloc_noblock() which fails rather than blocking.
 
-Reported-by: Xiaoli Feng <xifeng@redhat.com>
-Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: stable@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/smb/client/smb2pdu.c |   22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
-
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -1666,19 +1666,17 @@ SMB2_auth_kerberos(struct SMB2_sess_data
- 	is_binding = (ses->ses_status == SES_GOOD);
- 	spin_unlock(&ses->ses_lock);
- 
--	/* keep session key if binding */
--	if (!is_binding) {
--		kfree_sensitive(ses->auth_key.response);
--		ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
--						 GFP_KERNEL);
--		if (!ses->auth_key.response) {
--			cifs_dbg(VFS, "Kerberos can't allocate (%u bytes) memory\n",
--				 msg->sesskey_len);
--			rc = -ENOMEM;
--			goto out_put_spnego_key;
--		}
--		ses->auth_key.len = msg->sesskey_len;
-+	kfree_sensitive(ses->auth_key.response);
-+	ses->auth_key.response = kmemdup(msg->data,
-+					 msg->sesskey_len,
-+					 GFP_KERNEL);
-+	if (!ses->auth_key.response) {
-+		cifs_dbg(VFS, "%s: can't allocate (%u bytes) memory\n",
-+			 __func__, msg->sesskey_len);
-+		rc = -ENOMEM;
-+		goto out_put_spnego_key;
- 	}
-+	ses->auth_key.len = msg->sesskey_len;
- 
- 	sess_data->iov[1].iov_base = msg->data + msg->sesskey_len;
- 	sess_data->iov[1].iov_len = msg->secblob_len;
+  A few other cases of potential lock inversion exist.  These are
+  addressed by dropping the directory lock when it is safe to do so
+  before calling d_alloc_parallel().  This requires the addtion of
+  LOOKUP_SHARED so that ->lookup knows how the parent is locked.  This
+  is ugly but is gone by the end of the series. After the locking is
+  rearranged in the second last patch, ->lookup is only ever called
+  with a shared lock.
 
 
+2/ As d_alloc_parallel() will be able to run without the directory lock,
+  holding that lock exclusively is not enough to protect some dcache
+  manipulations.  In particular, several filesystems d_drop() a dentry
+  and (possibly) re-hash it.  This will no longer be safe as
+  d_alloc_parallel() could run while the dentry was dropped, would find
+  that name doesn't exist in the dcache, and would create a new dentry
+  leading to two uncoordinated dentries with the same name.
+
+  It will still be safe to d_drop() a dentry after the operation has
+  completed, whether in success or failure.  But d_drop()ing before that
+  is best avoided.  An early d_drop() that isn't followed by a rehash is
+  not clearly problematic for a filesystem which still uses parent locking
+  (as all do at present) but is good to discourage that pattern now.
+
+  This is addressed, in part, by changing d_splice_alias() to be able to
+  instantiate any negative dentry, whether hashed, unhashed, or
+  in-lookup.  This removes the need for d_drop() in most cases.
+
+New APIs added are:
+
+ - d_alloc_noblock - see patch 05 for details
+ - d_duplicate - patch 06
+
+Removed APIs:
+
+ - d_alloc
+ - d_rehash
+ - d_add
+ - lookup_one
+ - lookup_noperm
+
+Changed APIs:
+
+ - d_alloc_paralle - no longer requires a waitqueue_head_t
+ - d_splice_alias - now works with in-lookup dentry
+ - d_alloc_name - now works with ->d_hash
+
+d_alloc_name() should be used with d_make_persistent().  These don't require
+VFS locking as the filesystem doesn't permit create/remove via VFS calls,
+and provides its own locking to avoid duplicate names.
+
+d_splice_alias() should *always* be used:
+  in ->lookup 
+  in ->iterate_shared for cache priming.
+  in ->atomic_open, possibly via a call to ->lookup
+  in ->mkdir unless d_instantiate_new() can be used.
+  in ->link ->symlink ->mknod if ->lookup skips LOOKUP_CREATE|LOOKUP_EXCL
+
+Thanks for reading this far!  I've been testing NFS but haven't tried
+anything else yet.  As well as the normal review of details I'd love to
+know if I've missed any important conseqeunces of the locking change.
+It is a big conceptual change and there could easily be surprising
+implications.
+
+Thanks,
+NeilBrown
+
+
+ [PATCH 01/53] VFS: fix various typos in documentation for
+ [PATCH 02/53] VFS: enhance d_splice_alias() to handle in-lookup
+ [PATCH 03/53] VFS: allow d_alloc_name() to be used with ->d_hash
+ [PATCH 04/53] VFS: use global wait-queue table for d_alloc_parallel()
+ [PATCH 05/53] VFS: introduce d_alloc_noblock()
+ [PATCH 06/53] VFS: add d_duplicate()
+ [PATCH 07/53] VFS: Add LOOKUP_SHARED flag.
+ [PATCH 08/53] VFS/xfs: drop parent lock across d_alloc_parallel() in
+*[PATCH 09/53] nfs: remove d_drop()/d_alloc_parallel() from
+ [PATCH 10/53] nfs: use d_splice_alias() in nfs_link()
+ [PATCH 11/53] nfs: don't d_drop() before d_splice_alias()
+ [PATCH 12/53] nfs: don't d_drop() before d_splice_alias() in
+ [PATCH 13/53] nfs: Use d_alloc_noblock() in nfs_prime_dcache()
+ [PATCH 14/53] nfs: use d_alloc_noblock() in silly-rename
+ [PATCH 15/53] nfs: use d_duplicate()
+*[PATCH 16/53] ovl: drop dir lock for lookups in impure readdir
+*[PATCH 17/53] coda: don't d_drop() early.
+ [PATCH 18/53] shmem: use d_duplicate()
+*[PATCH 19/53] afs: use d_time instead of d_fsdata
+*[PATCH 20/53] afs: don't unhash/rehash dentries during unlink/rename
+ [PATCH 21/53] afs: use d_splice_alias() in afs_vnode_new_inode()
+ [PATCH 22/53] afs: use d_alloc_nonblock in afs_sillyrename()
+ [PATCH 23/53] afs: lookup_atsys to drop and reclaim lock.
+ [PATCH 24/53] afs: use d_duplicate()
+*[PATCH 25/53] smb/client: use d_time to store a timestamp in dentry,
+*[PATCH 26/53] smb/client: don't unhashed and rehash to prevent new
+*[PATCH 27/53] smb/client: use d_splice_alias() in atomic_open
+ [PATCH 28/53] smb/client: Use d_alloc_noblock() in
+*[PATCH 29/53] exfat: simplify exfat_lookup()
+*[PATCH 30/53] configfs: remove d_add() calls before
+ [PATCH 31/53] configfs: stop using d_add().
+*[PATCH 32/53] ext4: move dcache modifying code out of __ext4_link()
+*[PATCH 33/53] ext4: use on-stack dentries in
+ [PATCH 34/53] tracefs: stop using d_add().
+ [PATCH 35/53] cephfs: stop using d_add().
+*[PATCH 36/53] cephfs: remove d_alloc from CEPH_MDS_OP_LOOKUPNAME
+ [PATCH 37/53] cephfs: Use d_alloc_noblock() in
+ [PATCH 38/53] cephfs: Don't d_drop() before d_splice_alias()
+ [PATCH 39/53] ecryptfs: stop using d_add().
+ [PATCH 40/53] gfs2: stop using d_add().
+ [PATCH 41/53] libfs: stop using d_add().
+ [PATCH 42/53] fuse: don't d_drop() before d_splice_alias()
+ [PATCH 43/53] fuse: Use d_alloc_noblock() in fuse_direntplus_link()
+ [PATCH 44/53] hostfs: don't d_drop() before d_splice_alias() in
+ [PATCH 45/53] efivarfs: use d_alloc_name()
+ [PATCH 46/53] Remove references to d_add() in documentation and
+ [PATCH 47/53] VFS: make d_alloc() local to VFS.
+ [PATCH 48/53] VFS: remove d_add()
+ [PATCH 49/53] VFS: remove d_rehash()
+ [PATCH 50/53] VFS: remove lookup_one() and lookup_noperm()
+ [PATCH 51/53] VFS: use d_alloc_parallel() in lookup_one_qstr_excl().
+ [PATCH 52/53] VFS: lift d_alloc_parallel above inode_lock
+ [PATCH 53/53] VFS: remove LOOKUP_SHARED
