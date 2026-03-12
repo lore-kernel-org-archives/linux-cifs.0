@@ -1,176 +1,129 @@
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA553B9DA5;
-	Thu, 12 Mar 2026 09:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41A53C4540
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 12:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773308298; cv=none; b=mYQ2MGCKJdaZsC3w9o14Jc63vPbjv66YGXOOgswutDFt2XM7bP8xG7P/Gcu+g4YsjYzQ92E28MBhOQ4PKcl7bb0rMV0zEqe17652F7nANTZVXUOT1MFr8PtIkPmq0N78QQvE5T535r5Bb5bxOopb5r+5yNxK+ix7DYHyHLJrpCk=
+	t=1773320257; cv=none; b=PHbaGL+gTmHXBUww4bAiwe4aVXY3zCUHu6PX4jsAXmTXOKhLvw1ml3WTcUJ8peEjTieNjQOJx/oRMfqVMqNYT8wPhy6JUR40VYs2vfJg3f2ZbrKAizOAoaL5T2qoQzRBdhO7slR1n4Dz2N4ek5MZl3vBZFxjlPYmsKgFw8O1dMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773308298; c=relaxed/simple;
-	bh=yFvK4TL7xsQGtUZ3aYppmkhAkjRmfVgtLz+/kUGSF4Y=;
+	s=arc-20240116; t=1773320257; c=relaxed/simple;
+	bh=Rr1jkAP22lZkLvo3o90a9fRSWh9+kilNKtAarSScWFY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CoTDjW+2b/6M+rLWtnoBASnq/C+QZInu9NhP/L7NamTOriDy0Bre16+Nhui4zTqJ1RopJkYeKmmbuidc+FsAUMyl2FxYQ/KVqNT5ApVLbzHm7XkGek6r765DToEWGwK3plP0PShagDFtS1JlRF5ZwoB3dF5QkpW44Yhc5LCdnTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyphar.com; spf=pass smtp.mailfrom=cyphar.com; dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b=nEv3gFay; arc=none smtp.client-ip=80.241.56.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyphar.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cyphar.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=oJI5n+aVpjQyl0zTECMn/uIU6ubbfYsRMb82XyHZsooEhpwafpnPgxIkxdDVA5Y8wssuQTaS9lpwWvtgNNREuhlLr2mTtySVQdr6OHf4VFR5yeCIb683M56l7DxJ4QyFKaJ4cKA1Oa3gMX1QB9uHkZEp6YHulz7rUS+0ja6lkTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=fHqxjqGD; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b="nEv3gFay"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4fWjGL4f51z9tQg;
-	Thu, 12 Mar 2026 10:38:02 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyphar.com; s=MBO0001;
-	t=1773308282;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T4nPgKWUxbLSsXAZ7xnpvCJoD9xpuvM/yonZzi7ZuXE=;
-	b=nEv3gFayAZ9w4Dp1cWiq1UcmZbr+AVxZWSDwTVJzyq2a7dTgA8EWt3TPcSPeAw3jej6OXW
-	Pcy6WVyRafrQdwLnMhWua8km15WTIsPP2Egxk8ctZ2kwiHp04CE+ci72MIAnUbB2X3uFr2
-	m9TbgCaTUcnFmJKSHe98mj5hqI3Qzay9DRe0Umfx2oh7eNC/jG4i1DJ1cS6QrP9wELYs37
-	/9UaaXlTa5JuDMVGuxNl72vYPCySNn0PNn4gl11j4ufYX2X3WGume6qmtDEr6kyiwR0x9C
-	cxiPW6KyqQRJuzfkOfZeC+MVhuRec3d3eJIEUNq8AGc2z7YeAIhaADmP9uHRBQ==
-Date: Thu, 12 Mar 2026 18:37:10 +0900
-From: Aleksa Sarai <cyphar@cyphar.com>
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: Christian Brauner <brauner@kernel.org>, 
-	Jeff Layton <jlayton@kernel.org>, Dorjoy Chowdhury <dorjoychy111@gmail.com>, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, v9fs@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	viro@zeniv.linux.org.uk, jack@suse.cz, chuck.lever@oracle.com, alex.aring@gmail.com, 
-	arnd@arndb.de, adilger@dilger.ca, mjguzik@gmail.com, smfrench@gmail.com, 
-	richard.henderson@linaro.org, mattst88@gmail.com, linmag7@gmail.com, tsbogend@alpha.franken.de, 
-	James.Bottomley@hansenpartnership.com, deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, 
-	idryomov@gmail.com, amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, 
-	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org, pc@manguebit.org, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	shuah@kernel.org, miklos@szeredi.hu, hansg@kernel.org
-Subject: Re: [PATCH v5 1/4] openat2: new OPENAT2_REGULAR flag support
-Message-ID: <2026-03-12-naughty-cyan-tower-bats-CiRzU7@cyphar.com>
-References: <20260307140726.70219-1-dorjoychy111@gmail.com>
- <20260307140726.70219-2-dorjoychy111@gmail.com>
- <CALCETrXVBA9uGEUdQPEZ2MVdxjLwwcWi5kzhOr1NdOWSSRaROw@mail.gmail.com>
- <801cf2c42b80d486726ea0a3774e52abcb158100.camel@kernel.org>
- <CALCETrVt7o+7JCMfTX3Vu9PANJJgR8hB5Z2THcXzam61kG9Gig@mail.gmail.com>
- <20260309-umsturz-herfallen-067eb2df7ec2@brauner>
- <2026-03-11-regular-sore-census-shops-DqYcUT@cyphar.com>
- <CALCETrVMF3VBr0cuEYOg-M_u+hX77Jfdujv3ZMtLGCzHgOcsGA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fHqxjqGD"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-506a6cf8242so8849471cf.1
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 05:57:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1773320252; x=1773925052; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
+        b=fHqxjqGD7mReR8MT2yBowt9MuNKPAKQc++mWcb4ZOttX6YldICO+OnnxWIQjO0C8L5
+         wjOw0Gg7MqV4U+G9pES+s6h1NtZIjaKrBXMW81hrLyc8SxWYHtvQK3FlTjqiyroZskXE
+         jYj0kUENL7Yhu5zg+0UQ91XYlYYlozX9U8uAqBEFaih0fSnDo8kprjTDRYJ58gzKRExo
+         MSUW+Q+e0P2WpZGotx0DuVRaUqq4vGsUUSX1YbPnOxmRUKlXFY/aNRmXMXDbAEfx0Lnn
+         e41FpuPSZjTSuTkWfTMW8e1MvewVXC2p6zLd4GrSZjvSKS4Q06nDQYaSimUW3qR5RhoY
+         JV6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773320252; x=1773925052;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
+        b=TyIzsRsD0miw2XNiIERSYTxycrCAbD1V8OI9cwtn7INQzD4tZvcy+yO63a2erBzEqb
+         7HpIfbN/iGrUXjoECl5g+dnGbWl/WkzHfMiUyEZBDJKdsjwvXeDvF9hdz/O+fZaVGx0D
+         C7BDkDTzmBOSPOkY94DrI0Qfs1cpLZBuf6SFhChHT0rn/9znxldBACup9FKjgdbhnHbG
+         e7npOjK+x952TwBuVG30DSyJPVxIp04YSnyqysjERL1Fxq38qVTwPJrsTvBpboylNwz1
+         w2wiXEgfzn3JYK1/EdeB5uUR7SY7zl6f9i8XJLdRsjCR4VgA0o5gVRGlmEFSAtE5dQIZ
+         JCGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGs6Zt2y0H8BqOm2+QqnilG85lKIrez63zd/JAcyAIf2VRvQIFUh20RRJlB+3SbSAC7IIL3y1+cABp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8EJoeqXAbGwd0WaQ4tNclRKE1fTTnUbgKB9okTPC7DMnXj/7J
+	nMK0SIiB0OGKXFYlPjyXEklBMEmLsq6vsG6cFBDly9oUV62b5JsXIYWrTgJlZWgxs+Q=
+X-Gm-Gg: ATEYQzyi3zjlNu0/SF7jtQk3f8GO2FOqFNmIeogWq9RfOxYmJToYmWk1Z8Cgscu7EqW
+	L6n6tbkrlwBXCLYrIYGbEWIbR+QxwdCLBxk+cyM3e3bHoN9dy6suIMrP0DKO9YJIb2HS0XK0MNZ
+	ZmXJq76/Dlon/BRgddoL1wLtl2/LVtg5wadhrfNOSapJ85m5Qxwe+oOni/mlH8rA5eChQ59yH3p
+	i0fOYB7dgs1F8E2qA32xeJ1LZq0BAQ9PfsrtVm4BRpmXaJnjJVJgZIBXZmi9CKPcLmnxsIM9xo6
+	bb7nB8/QNqa8QxjRml0NeErmYtyOh1u+U/V9EpNKaycOxbZtIDt57LyC4iVPrBJXv9XI6v1a44I
+	xkU6lo3gBz6/uR6QrEOV6GpMQ+uDq2Z1rGEP75Brt9CDMEjCnD8Xbj5KYZtof+yQC0TFs3ji78v
+	sypYrlfU+n5xQv73sHo4Cw1X4LRuhRXPgyA0vt6smUi1qGJLrLPeNuZTqGEOPbVkamMGQI8OT3K
+	Cp5qxtK
+X-Received: by 2002:ac8:5d4d:0:b0:509:cbc:127b with SMTP id d75a77b69052e-5093a1bd58fmr77950521cf.60.1773320251710;
+        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65bd318fsm33341196d6.8.2026.03.12.05.57.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1w0fbW-00000006fKD-1POa;
+	Thu, 12 Mar 2026 09:57:30 -0300
+Date: Thu, 12 Mar 2026 09:57:30 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Kuan-Wei Chiu <visitorckw@gmail.com>
+Cc: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
+	apparmor@lists.ubuntu.com, bpf@vger.kernel.org,
+	ceph-devel@vger.kernel.org, cocci@inria.fr,
+	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-mm@kvack.org,
+	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+	sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
+Subject: Re: [PATCH 00/61] treewide: Use IS_ERR_OR_NULL over manual NULL
+ check - refactor
+Message-ID: <20260312125730.GI1469476@ziepe.ca>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+ <abBlpGKO842B3yl9@google.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="i7hwymh2jbrl5osk"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALCETrVMF3VBr0cuEYOg-M_u+hX77Jfdujv3ZMtLGCzHgOcsGA@mail.gmail.com>
+In-Reply-To: <abBlpGKO842B3yl9@google.com>
 
+On Wed, Mar 11, 2026 at 02:40:36AM +0800, Kuan-Wei Chiu wrote:
 
---i7hwymh2jbrl5osk
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v5 1/4] openat2: new OPENAT2_REGULAR flag support
-MIME-Version: 1.0
+> IMHO, the necessity of IS_ERR_OR_NULL() often highlights a confusing or
+> flawed API design. It usually implies that the caller is unsure whether
+> a failure results in an error pointer or a NULL pointer. 
 
-On 2026-03-11, Andy Lutomirski <luto@amacapital.net> wrote:
-> On Tue, Mar 10, 2026 at 9:49=E2=80=AFPM Aleksa Sarai <cyphar@cyphar.com> =
-wrote:
-> >
-> > On 2026-03-09, Christian Brauner <brauner@kernel.org> wrote:
-> > > > > On Sat, 2026-03-07 at 10:56 -0800, Andy Lutomirski wrote:
-> > > > > > I think this needs more clarification as to what "regular" mean=
-s,
-> > > > > > since S_IFREG may not be sufficient.  The UAPI group page says:
-> > > > > >
-> > > > > > Use-Case: this would be very useful to write secure programs th=
-at want
-> > > > > > to avoid being tricked into opening device nodes with special
-> > > > > > semantics while thinking they operate on regular files. This is
-> > > > > > particularly relevant as many device nodes (or even FIFOs) come=
- with
-> > > > > > blocking I/O (or even blocking open()!) by default, which is not
-> > > > > > expected from regular files backed by =E2=80=9Cfast=E2=80=9D di=
-sk I/O. Consider
-> > > > > > implementation of a naive web browser which is pointed to
-> > > > > > file://dev/zero, not expecting an endless amount of data to rea=
-d.
-> > > > > >
-> > > > > > What about procfs?  What about sysfs?  What about /proc/self/fd=
-/17
-> > > > > > where that fd is a memfd?  What about files backed by non-"fast=
-" disk
-> > > > > > I/O like something on a flaky USB stick or a network mount or F=
-USE?
-> > > > > >
-> > > > > > Are we concerned about blocking open?  (open blocks as a matter=
- of
-> > > > > > course.)  Are we concerned about open having strange side effec=
-ts?
-> > > > > > Are we concerned about write having strange side effects?  Are =
-we
-> > > > > > concerned about cases where opening the file as root results in
-> > > > > > elevated privilege beyond merely gaining the ability to write t=
-o that
-> > > > > > specific path on an ordinary filesystem?
-> > >
-> > > I think this is opening up a barrage of question that I'm not sure are
-> > > all that useful. The ability to only open regular file isn't intended=
- to
-> > > defend against hung FUSE or NFS servers or other random Linux
-> > > special-sauce murder-suicide file descriptor traps. For a lot of those
-> > > we have O_PATH which can easily function with the new extension. A lot
-> > > of the other special-sauce files (most anonymous inode fds) cannot ev=
-en
-> > > be reopened via e.g., /proc.
-> >
-> > Indeed, I see OPENAT2_REGULAR as a way of optimising the tedious checks
-> > that userspace does using O_PATH+/proc/self/fd/$n re-opening when
-> > dealing with regular files.
->=20
-> Can you give a brief decription or a link to what these checks are and
-> what problem they solve?
++1
 
-There are a few variations, but in this particular case they are just
-doing fstat() and then checking whether the file is a regular file
-(i.e., S_IFREG) or not.
+IS_ERR_OR_NULL() should always be looked on with suspicion. Very
+little should be returning some tri-state 'ERR' 'NULL' 'SUCCESS'
+pointer. What does the middle condition even mean? IS_ERR_OR_NULL()
+implies ERR and NULL are semanticly the same, so fix the things to
+always use ERR.
 
-A container rootfs can contain arbitrary files (because container images
-are just tar archives, usually with no restrictions on inodes -- a fair
-few container runtimes assume that the devices cgroup is sufficient to
-protect against the container overwriting your rootfs). The S_IFREG
-check avoids an administrative process from being tricked into opening a
-block device or an endlessly-streaming FIFO -- if you also use
-RESOLVE_NO_XDEV you can also make sure that you don't land on procfs or
-sysfs by accident.
+If you want to improve things work to get rid of the NULL checks this
+script identifies. Remove ERR or NULL because only one can ever
+happen, or fix the source to consistently return ERR.
 
-I will say that in a previous version of this patchset I said that I
-would prefer this be done with an allow-bitmask of S_IFMT rather than a
-single O_REGULAR toggle -- this would allow for usecases such as "only
-open a regular file or directory" (inode_type_can_chattr() from systemd
-is a practical example of this kind of usage) or "anything except for
-block/char devices", but the definition of S_IFBLK (S_IFCHR|S_IFDIR)
-makes this a little too ugly. :/
-
---=20
-Aleksa Sarai
-https://www.cyphar.com/
-
---i7hwymh2jbrl5osk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iJEEABYKADkWIQS2TklVsp+j1GPyqQYol/rSt+lEbwUCabKJRRsUgAAAAAAEAA5t
-YW51MiwyLjUrMS4xMSwyLDIACgkQKJf60rfpRG+vawEA1WxGEhn5Rc+wid/VGVxs
-yznMgHiA2Xe1m0YMiUy78u4BAJfditiWc61238EqwnDAWlH4X0xzDBvmXWOUuex3
-vw0K
-=3QVZ
------END PGP SIGNATURE-----
-
---i7hwymh2jbrl5osk--
+Jason
