@@ -1,63 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6968D329C7B
-	for <linux-cifs@vger.kernel.org>; Fri, 13 Mar 2026 01:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501F72EA159;
+	Fri, 13 Mar 2026 03:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773366597; cv=none; b=TVdqEuhFXRJSrHZbtnAAT2GSqt7+YbSblOc4np9G+ekyAx2bCsL8lpXwQRIBvJD09gyHkn5J8OFTsktVwMapJLfT+KDql+6PaHS+yl+VCo6Hta3gtfQAb0eCsxLAkDc8D7XoBmy7ofB8S7CypK7I3glU2yrog/xcdwDULKpOwIQ=
+	t=1773373238; cv=none; b=Q67sFaVCoIdHT6dgxk6G9ZhcqArlq2sAao3rtqUia7qIeBJL6IdJQZksySzVOwS/7OPknYqGpYdkGCMi75YADpy9fWSpAE4W3BMTgGx+fp1PGfeXK3K04+7HL7QXeLQpRo1fB5zAwG0fBdfcyjJIOsRxhu8G5C8ALrVzFWR1taE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773366597; c=relaxed/simple;
-	bh=+PYPTaFu6q1gnew20OgpX9/Wgs422ul2Sws/v7jQIFY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f5VCqmsP8xZW3ADfoUe4BEDvngUGKQsGqdR1vQTuuoPWT6+oeAnfg81Lfua9zfEL3yyWE9EKDLcZj1cZlUBa/kL3WowYabFLiXn8D89uG45fffxU2EuGOY4Db+UjjiN9Obaw5AucVS0NsndtEWutDcxJLnibT/1B9xzeqTIKd10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M8ifcOaH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773373238; c=relaxed/simple;
+	bh=NggLR0I+UlR+c27hCToYTFR7gboM1SSAVr6TfrsU/6A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZIpX+9lxK1gNQqrvcrv5PUJjhIbuf5SQDzbKCDLwnFK27i59heqj9yXt/riHJvN+Bv9AZt2Feu4CBJgTX3pktMBiqvl4xY3e1We3kGEuMWcDjDhVpqhByrF4I2Uc1Frd3gHrledLrUvplUI0JkTAG3p3foBZCoScFTfu7ePQ+Q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=j09M3lJP; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M8ifcOaH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F30E6C2BCC9
-	for <linux-cifs@vger.kernel.org>; Fri, 13 Mar 2026 01:49:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773366597;
-	bh=+PYPTaFu6q1gnew20OgpX9/Wgs422ul2Sws/v7jQIFY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=M8ifcOaHQy57hlQs0dBf4/m7CvXQfdvSH3qm7pvHUzxhBujOoM/G1y9Lh1RTqAZzU
-	 koUiSrAx7tLqGwHpEmnFHjL1h7UcwKtjuyh/xeGnt/R2Z3mMSigCPjLB0CBCddpsma
-	 MRdZ/02uNgQqD73OZLyU59dXpgTvTa61kQzceg1yIJnlyT5CPPPewmyAKckiHYJQ+n
-	 ihSMO4o555BlaFaPX1e7S8VAOqazxI2UpXibiqooBFExecW4mDnBGK1kKD+JmPZkpI
-	 RRRPVsuKwI/70PjsuagBTjjWz7bxIJYPVY2YgDzRBcJruL5tDvO6G71mFKhtvYqRCK
-	 kED88uCL/TQBg==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b9434f706a2so214359666b.1
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 18:49:56 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWSCaW6vXN1dNZIxZFjq9mQkqZB58d4Iwvf08DT3zdKku4FNQPssfUImQs/wAuQ6ZWh1VB9YcxPuJmz@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDM8kaa2JfEkRpu5OPkBEF76nM4zG5Uh9apVDKZj2fXk25JL8a
-	r2j1B5RB013VMD/SXfmw48gmSaztGM2OoDRmrLi/hkTXRghZyKAvxeohfo33Af+6DUafN5078Qe
-	cQKBLLNRcVNAkpDh19agrg3lc0ODMz74=
-X-Received: by 2002:a17:906:d7df:b0:b96:d6cd:29e6 with SMTP id
- a640c23a62f3a-b97650145aemr72715466b.2.1773366595503; Thu, 12 Mar 2026
- 18:49:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="j09M3lJP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=kpxSdz/+UMvNKg0RMweyNkPP8eMewLSlykXzZYK04VA=; b=j09M3lJPrMyI+FHTpzctWDKtLd
+	6TLCa3PvFXg0WJyQfeppUcyDlH2uIPGWhzYw/3eHAOCkcoJYl0UogytAQC/pVjAcAe4nXTM0N2/QQ
+	gCorH/XMS+EX/EKV1q7UGTzahS6OQSaQ68xTnvYB7rokXYAlQwZYWS8HBIdx3rQk++dpFjwYRUnmA
+	/oJP1k5RzN3UQSTzyJjFOZ7yo1h6YQJGocYojNhMmycHRsLVx/mK6LIISXkbUiPMKuchL0E3kqvbB
+	WiDurUx5cMZstK40V0MRsf3SJdOSy1pcsQtPz1/YheaGSBPJdoaD+K+B3FFAmfXZSttc/cjx4qz+J
+	bWi8Aqqw==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
+	id 1w0tNz-00000000pLA-3ZMI;
+	Fri, 13 Mar 2026 00:40:27 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: smfrench@gmail.com
+Cc: Oscar Santos <ossantos@redhat.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	David Howells <dhowells@redhat.com>,
+	linux-cifs@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] smb: client: fix krb5 mount with username option
+Date: Fri, 13 Mar 2026 00:40:27 -0300
+Message-ID: <20260313034027.933719-1-pc@manguebit.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <abJ2fk0KaQNeHgmp@v4bel>
-In-Reply-To: <abJ2fk0KaQNeHgmp@v4bel>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 13 Mar 2026 10:49:43 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8JQo6wgt=c_65VmD3NwveXSCGRCUi+vkXG6YSjfHU6nw@mail.gmail.com>
-X-Gm-Features: AaiRm50-txnmwPNsTqAcTS7A2ch_MAxA6r-RKGh9spvGYAOC06jCoVu3lh7M0Qs
-Message-ID: <CAKYAXd8JQo6wgt=c_65VmD3NwveXSCGRCUi+vkXG6YSjfHU6nw@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix use-after-free of share_conf in compound request
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com, 
-	linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-> Add the same t_state validation to the compound reuse path, consistent
-> with ksmbd_tree_conn_lookup().
->
-> Fixes: 5005bcb42191 ("ksmbd: validate session id and tree id in the compound request")
-> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+Customer reported that some of their krb5 mounts were failing against
+a single server as the client was trying to mount the shares with
+wrong credentials.  It turned out the client was reusing SMB session
+from first mount to try mounting the other shares, even though a
+different username= option had been specified to the other mounts.
+
+By using username mount option along with sec=krb5 to search for
+principals from keytab is supported by cifs.upcall(8) since
+cifs-utils-4.8.  So fix this by matching username mount option in
+match_session() even with Kerberos.
+
+For example, the second mount below should fail with -ENOKEY as there
+is no 'foobar' principal in keytab (/etc/krb5.keytab).  The client
+ends up reusing SMB session from first mount to perform the second
+one, which is wrong.
+
+```
+$ ktutil
+ktutil:  add_entry -password -p testuser -k 1 -e aes256-cts
+Password for testuser@ZELDA.TEST:
+ktutil:  write_kt /etc/krb5.keytab
+ktutil:  quit
+$ klist -ke
+Keytab name: FILE:/etc/krb5.keytab
+KVNO Principal
+ ---- ----------------------------------------------------------------
+   1 testuser@ZELDA.TEST (aes256-cts-hmac-sha1-96)
+$ mount.cifs //w22-root2/scratch /mnt/1 -o sec=krb5,username=testuser
+$ mount.cifs //w22-root2/scratch /mnt/2 -o sec=krb5,username=foobar
+$ mount -t cifs | grep -Po 'username=\K\w+'
+testuser
+testuser
+```
+
+Reported-by: Oscar Santos <ossantos@redhat.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Cc: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: stable@vger.kernel.org
+---
+ fs/smb/client/connect.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 3bad2c5c523d..8573d5c5235b 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -1955,6 +1955,11 @@ static int match_session(struct cifs_ses *ses,
+ 	case Kerberos:
+ 		if (!uid_eq(ctx->cred_uid, ses->cred_uid))
+ 			return 0;
++		if (ctx->username &&
++		    (!ses->user_name ||
++		     strncmp(ses->user_name, ctx->username,
++			     CIFS_MAX_USERNAME_LEN)))
++			return 0;
+ 		break;
+ 	case NTLMv2:
+ 	case RawNTLMSSP:
+-- 
+2.53.0
+
