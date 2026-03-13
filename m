@@ -1,166 +1,141 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B79D3DCDBB
-	for <linux-cifs@vger.kernel.org>; Fri, 13 Mar 2026 19:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E8F398910
+	for <linux-cifs@vger.kernel.org>; Fri, 13 Mar 2026 20:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773429750; cv=none; b=k3fZmiwp05N29nUkaVlmMWnaEWOJsngfqW81px+leBbVyq7+wrIjVZbXXs0YPlCHj7FmC5E09Xom6ceDwFgyhrIINk1xLqQq45zuw6vDnyRjsbQoggs85cEQkyVWeICNS4UKofQG9Hx2JvNnP05NBH+1VQuSVm/wzaDSlLSkgMk=
+	t=1773433036; cv=none; b=jQF5B4Zml/AisNDocNWarliOIz9bKfjSh0ZMgB+IBsfKYW6lIgOIpRdzyrfYorTKKR+/zOZ1bY8AxWnUB0ggQjfBt5Glz4b+pWWaMeKw1/NScDwwjDnn18iX3yaJ30X7ZjQLmxoMjpxzYqrS98Q2fEWehUVIcqgpn1MYc+qxm9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773429750; c=relaxed/simple;
-	bh=pL/j9b13bFh0cZAZJhcCPZn1CaRo1RWOXdOwqzbKEsA=;
+	s=arc-20240116; t=1773433036; c=relaxed/simple;
+	bh=vbARsqc+d3uVyBmdOg0cXIP4bmMldMpQ98Q8O6fpLMg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cj39l/VW5OuIneLp9+IeUxYNHiViNs/LujV65uGKFfRPoq0BE05VAu9wuSfNhMUJ7N3RMdYFKY71s3yqmAxU203N2NpM23MK3xUUh94nCwOAzCjwZU+unVxSRb75ZjmUlqygPIhCRHPM0OufJaMeuO88y+7L53h4h55RdcHobx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=cwr9QvSb; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=K+U59XI2; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=cwr9QvSb; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=K+U59XI2; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZaDhElnv6tzOXVVaw0JP03zQKmMdo4MTzl7NAJRajwlFeHb9crcmCe4X8vqvdugOmrpH23TQhM4hGnnB6hz18bo3khZO16OtrrXobF/ej8V4rJpdT2cNJYSYNDTp8cIhxxhRgJ37t4f3QduZuB+9ujk0+GnplqrgsDbv0DtXM3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=BuQCbkPX; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="cwr9QvSb";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="K+U59XI2";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="cwr9QvSb";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="K+U59XI2"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B208C4D943;
-	Fri, 13 Mar 2026 19:22:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1773429744;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lEZDbFbdaiqtR0DORmYiMySif6us6CTI89GNtF8koIU=;
-	b=cwr9QvSbf3addifFtJFaEE3S5jwqDpZlb749Rs1kTiqHHQe0wIw+TMnTma/8mfA3QiWv+t
-	IZuKpLsIb+k3xwyZAXuL8F5GTiyGUJh1olDjZfpDExV1+UvdVwgZIIojOm6APRysjO8/lt
-	9WDXlxlJVmMpUXoO3id4LXjiv7t5UI0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1773429744;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lEZDbFbdaiqtR0DORmYiMySif6us6CTI89GNtF8koIU=;
-	b=K+U59XI2u6gqS+yANGWtG/Pii/V0SpIQQ7wMg6BtOp5KKFcWyvgFtoDkwX90d0NOWdybeR
-	Ua+tdtixGZm/opAA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1773429744;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lEZDbFbdaiqtR0DORmYiMySif6us6CTI89GNtF8koIU=;
-	b=cwr9QvSbf3addifFtJFaEE3S5jwqDpZlb749Rs1kTiqHHQe0wIw+TMnTma/8mfA3QiWv+t
-	IZuKpLsIb+k3xwyZAXuL8F5GTiyGUJh1olDjZfpDExV1+UvdVwgZIIojOm6APRysjO8/lt
-	9WDXlxlJVmMpUXoO3id4LXjiv7t5UI0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1773429744;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lEZDbFbdaiqtR0DORmYiMySif6us6CTI89GNtF8koIU=;
-	b=K+U59XI2u6gqS+yANGWtG/Pii/V0SpIQQ7wMg6BtOp5KKFcWyvgFtoDkwX90d0NOWdybeR
-	Ua+tdtixGZm/opAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6F14A406AC;
-	Fri, 13 Mar 2026 19:22:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 6cTyGvBjtGnfZAAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Fri, 13 Mar 2026 19:22:24 +0000
-Date: Fri, 13 Mar 2026 20:22:15 +0100
-From: David Sterba <dsterba@suse.cz>
-To: Philipp Hahn <phahn-oss@avm.de>
-Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
-	bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
-	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
-	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
-	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-mm@kvack.org,
-	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
-	sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev,
-	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>
-Subject: Re: [PATCH 02/61] btrfs: Prefer IS_ERR_OR_NULL over manual NULL check
-Message-ID: <20260313192215.GH5735@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <20260310-b4-is_err_or_null-v1-2-bd63b656022d@avm.de>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="BuQCbkPX"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-48374014a77so24964185e9.3
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Mar 2026 13:17:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1773433033; x=1774037833; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Q9gHGobWfNUu+5lsnewMjx+gKUC6WWoehDbrgRIwq2c=;
+        b=BuQCbkPXqi9AzsFTO9JdLA3zr6GF2X8rFkV07zXk9hQhqzQhd/2GSue+1MWWH4pTTx
+         MKYTqZs3ZONYNX5B5nSWsgORb8vtYZv76P/FbXzNbDpnol9Qg3U4GmpV6iwtP9Tb4KnS
+         C3eFPUBBasSru0/G/SnFv84MVW3K1H1atI0JX5nhJHv/F1FcFw5bL1OTBWifWrPS6Ert
+         Y5E9KNKLr+cBBgdTbIl/gjkL1VqEAaXi6M1ztzkAk3dkB0HXcSwekuy5so9LwZ29LY4M
+         RWfDWOw8lQKAo57axq5Uk9fXvUBQ5hdUXgY1PsX9L7l8fDdbT+UZZi05WwtZfZZ4hFyG
+         NHPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773433033; x=1774037833;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q9gHGobWfNUu+5lsnewMjx+gKUC6WWoehDbrgRIwq2c=;
+        b=kCkaZEZ+Ms4NgBcdoPlNumpM5QNAAPULnke9pQwB19a1iCwkhsMRfFZF9g9ZFdwEeI
+         gln3+kCfLNIhF5TOcjGObz0tLznF4hm+9jkwY3w39N7NQQ5MFl8cBly+A5owtp+09W5p
+         bbLZ2GbFuCe3LaQqtveea4Ay0lJmRE6ZrmDqATo05Qgncaak2fIlrgZL2L0nojrnjvGg
+         23Ht/jnTMytCHkESZUKwk8KE5YRfmUH4YYDcTvofeHIo2vm0+smeiePMA2S7B6yl701Z
+         X+2j4MHmsm/2na0SJxgt7VkrGI5Vd/7F7ir58+TkgJXfFWbNjHy2PcpqNiJuL9vSFc0B
+         yM3w==
+X-Gm-Message-State: AOJu0YwN7ZbS3vEAaP37fTXRQLmtXuxl34HpaKsL89SRPXuT+O6/nQHn
+	nCjoV7CmLQ09LJ4FgIdjke05VnWlHbAkwSA6eFxiRqCiyiOkNcKPomTTfE4vIywc0Cc=
+X-Gm-Gg: ATEYQzx8WfFJIpg35Lm2uCFzQ9v8BBSTO1VW+d1xGIfCZOAQK0DXi6FE+YZMmWT7Ymw
+	i+tQP2AWi4K6OoI37KsagJOeInB/79W/k73xiZcDVlKifEcQKFleut+BTbT+wtd9Evkp7A2K5/z
+	O5IMoIVtENOTgJ0c7eG3tG4mfjlyO0VZuUYKzCVLRNqOs67xmOohGiqI0mPnPIvwux1uSmnwrhP
+	mEuXTBzXbE3nHY8MHthwePyyuQkPGd28KQ3iGKQZKyQBadbqI0f0USQRZBMo3zY5LCk2Q7XyNZK
+	o+QsruTZvEmKA3hOC5MLil3PYiqmtLKDhrp7nvVjfgZ1fokX3ilYp9gEHVU4dRHis6jTbpi6iYP
+	SpJNtwI3jb2XeyeqizbxO1iWwe+E0KwoEeZfGPCR+8auYFjZj495MrajpJTdtd2SVTqNxrRM+Yw
+	5kXp7wOOCjtY5IXi4sdrZJn+Y7Gf3fnkXM/ROFJHwDZnged92fP14Ex82SHVhibgF8fw==
+X-Received: by 2002:a05:600c:354b:b0:483:2c98:4368 with SMTP id 5b1f17b1804b1-48556703401mr76665615e9.18.1773433032551;
+        Fri, 13 Mar 2026 13:17:12 -0700 (PDT)
+Received: from precision.tail0b5424.ts.net ([2804:7f0:6402:b103:6a0a:3e1c:778a:5cc7])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2beab3a1117sm4787248eec.3.2026.03.13.13.17.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Mar 2026 13:17:11 -0700 (PDT)
+Date: Fri, 13 Mar 2026 17:17:06 -0300
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: Shyam Prasad N <nspmangalore@gmail.com>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com, 
+	bharathsm@microsoft.com, dhowells@redhat.com, Shyam Prasad N <sprasad@microsoft.com>, 
+	stable@vger.kernel.org
+Subject: Re: [PATCH] cifs: open files should not hold ref on superblock
+Message-ID: <54dzktjc3vwt55dfj6wi4346la2my4fsg7wfyrtwm2apzvppip@xbi6evlur3kz>
+References: <20260304124629.1616108-1-sprasad@microsoft.com>
+ <u4s57pxvrttksfxe5evylucarfoyiv3ut32d45nvfafsgmxtog@72x2iew66wrt>
+ <CANT5p=rdme19zW8Dk7WuEXw68Jzdt2QsdfK-gRManJJgGWQByw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260310-b4-is_err_or_null-v1-2-bd63b656022d@avm.de>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Score: -2.50
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.50 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLk9qejt5hbtemdgupcccnrijf)];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCPT_COUNT_GT_50(0.00)[56];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:replyto,imap1.dmz-prg2.suse.org:helo];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[]
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANT5p=rdme19zW8Dk7WuEXw68Jzdt2QsdfK-gRManJJgGWQByw@mail.gmail.com>
 
-On Tue, Mar 10, 2026 at 12:48:28PM +0100, Philipp Hahn wrote:
-> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
-> check.
+On Fri, Mar 13, 2026 at 10:57:42AM +0530, Shyam Prasad N wrote:
+> On Fri, Mar 13, 2026 at 1:28 AM Henrique Carvalho
+> <henrique.carvalho@suse.com> wrote:
+> >
+> > On Wed, Mar 04, 2026 at 06:15:53PM +0530, nspmangalore@gmail.com wrote:
+> > > From: Shyam Prasad N <sprasad@microsoft.com>
+> > >
+> > > Today whenever we deal with a file, in addition to holding
+> > > a reference on the dentry, we also get a reference on the
+> > > superblock. This happens in two cases:
+> > > 1. when a new cinode is allocated
+> > > 2. when an oplock break is being processed
+> > >
+> > > The reasoning for holding the superblock ref was to make sure
+> > > that when umount happens, if there are users of inodes and
+> > > dentries, it does not try to clean them up and wait for the
+> > > last ref to superblock to be dropped by last of such users.
+> > >
+> > > But the side effect of doing that is that umount silently drops
+> > > a ref on the superblock and we could have deferred closes and
+> > > lease breaks still holding these refs.
+> > >
+> > > Ideally, we should ensure that all of these users of inodes and
+> > > dentries are cleaned up at the time of umount, which is what this
+> > > code is doing.
+> > >
+> > > This code change allows these code paths to use a ref on the
+> > > dentry (and hence the inode). That way, umount is
+> > > ensured to clean up SMB client resources when it's the last
+> > > ref on the superblock (For ex: when same objects are shared).
+> > >
+> > > The code change also moves the call to close all the files in
+> > > deferred close list to the umount code path. It also waits for
+> > > oplock_break workers to be flushed before calling
+> > > kill_anon_super (which eventually frees up those objects).
+> > >
+> > > Fixes: 24261fc23db9 ("cifs: delay super block destruction until all cifsFileInfo objects are gone")
+> > > Fixes: 705c79101ccf ("smb: client: fix use-after-free in cifs_oplock_break")
+> > > Cc: <stable@vger.kernel.org>
+> > > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> > > ---
+> >
+> > Hi Shyam,
+> >
+> > So the side effect of the previous code is that the umount hangs until
+> > all the files are closed?
 > 
-> IS_ERR_OR_NULL() already uses likely(!ptr) internally. checkpatch does
-> not like nesting it:
-> > WARNING: nested (un)?likely() calls, IS_ERR_OR_NULL already uses
-> > unlikely() internally
-> Remove the explicit use of likely().
-> 
-> Change generated with coccinelle.
-> 
-> To: Chris Mason <clm@fb.com>
-> To: David Sterba <dsterba@suse.com>
-> Cc: linux-btrfs@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+> Hi Henrique
+> Umount works. All it does is decrement refcount on sb.
+> When the last file is closed (or when the last cifs_oplock_break
+> processing completes) that's when cifs_kill_sb would get called.
+> Before that if there's another mount of the same share, it will reuse
+> the same session, tcon and open handles. As a result, an attempt to
+> delete files on the mount point may fail (which is one of first things
+> done by many xfstests).
+>
 
-Added to for-next, we seem to be using IS_ERR_OR_NULL() already in a
-few other places so this is makes sense for consistency. Thanks.
+Thank you for the explanation.
+
+I will wait for your v2.
