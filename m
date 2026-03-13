@@ -1,227 +1,171 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-b3-smtp.messagingengine.com (flow-b3-smtp.messagingengine.com [202.12.124.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4106F408258
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Mar 2026 23:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5962AD10;
+	Fri, 13 Mar 2026 00:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773359681; cv=none; b=GpxzyuzCpQ6RMt4dFMUwXdCpdIvYqMdsYjhg0U7WGAdS7quFwYhOiAGhgOQuWGU9qmbFZIpthsl/1E7+tK9q+qlsofpi184hf/pmjGJ8E/pUd8yjrviK75PGiBZS1aEMABwNVWDBMwmOaJIhd3ONnIdGmEamT0Fb2XKPKE5Q9AA=
+	t=1773360571; cv=none; b=I1DFiZ/OLj0KL9rLbsLgoJFkHMp/9lBHdDNOJBIrDYoiQhqD6/9L9b8pPjQkz171Gqgr1Qe+A3nGI5ND0VwSK/9EcdsHn3pytXPEj1+C11OfOmDu86LSGTDDWS68oxzaG2vPWsOai1QLJJ7zyfjpCv4na3rTzr9r15WrxCnu4a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773359681; c=relaxed/simple;
-	bh=DlEs47g+0P4QzsWSD4V/FyGf/EgdMLa8LqEPSZOP0wI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aUWCQZNOvs/iP9jHd+RLALSubhZPz5NSgvH6/nLMeqJeBK6ew5sxy83xwfjXfSx2w+ff7boMzh6jcmVGncwNi0/6e7HT2pZORWthSnhbkOEQS3KmAV0QcrfCXoiP9fpKcqMZ09si6rk1ECdOHHLUA9S8hLTP5LqqMWZ5nFttcpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fk+HrQFz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GjeLT5PO; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nK3FApym; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6EDt9gxw; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1773360571; c=relaxed/simple;
+	bh=5WyyyzalVTsOFqKBoq2Ui24NLNW5bx4BjtZMs2Kh5tw=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=dujyKcht/XrBAUYE9c9wFBCNQFpvY078J69alGAOV1wKYHx7FQ4F5bISt4nOaIF5V6UYz2EP0r7s0CGNcULsZZgS9pf0mrLKzMM6UMm2p4D1Gmayt3GdJyPsfrab58sJ47/DVA2O9ssBidZlLsri0YGYFelrKyB6wqp1wrc1OLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=nmFe2jtL; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=G5Cai4kt; arc=none smtp.client-ip=202.12.124.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fk+HrQFz";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GjeLT5PO";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nK3FApym";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6EDt9gxw"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id DBF7F4DE48;
-	Thu, 12 Mar 2026 23:54:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773359673; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bwmhrK1mTh+MLga869G8X7ffK5a55BOcYDLNgMLau3w=;
-	b=fk+HrQFzF538OaZee5zKteZcA0YzllQN4x1inGCAbXjNlo6QUNFUqNbGrCH5EeTJbbl1jk
-	FTvU17qIJfkQDV+ln6qt+1UPpVopM6PIvAMUtTOjZZJ3/a+RYpvPc0tmmUajk0tARslnmX
-	EHrtJDNB0KVkLkU4HiHWqk3laOWGWpA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773359673;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bwmhrK1mTh+MLga869G8X7ffK5a55BOcYDLNgMLau3w=;
-	b=GjeLT5POJ2ppQv2V8UcAch81RQWi73SsE94ZqWuISHtXbtVGKO30Qb71oigY1fJWtdCROD
-	hJQD5w9T4bPhNBAQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=nK3FApym;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=6EDt9gxw
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773359672; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bwmhrK1mTh+MLga869G8X7ffK5a55BOcYDLNgMLau3w=;
-	b=nK3FApym7tfNn1DYJAjxANwZrZkOi+7diHoNWII3ULI7GL59N/yI/X6ge92tRZaTNO+iDP
-	rbkiSLfVzTovlXnwx+sm2XdjW+milZHXwHV3OFqONrs/aDXtvH33MrKfrw0c8b1brwsruE
-	f+oOYH59XwjN26di3wGpoeV3fGBkJnk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773359672;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bwmhrK1mTh+MLga869G8X7ffK5a55BOcYDLNgMLau3w=;
-	b=6EDt9gxwjTnn8WVNa/iDDOJbUxG4c6IPQDPESQ58T74caGcpdtTs0tWldMb3C2Klzv+2cX
-	aUwaMbUSyMcQ9xBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5A3794022C;
-	Thu, 12 Mar 2026 23:54:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id QCh3CDhSs2lNPAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Thu, 12 Mar 2026 23:54:32 +0000
-Date: Thu, 12 Mar 2026 20:54:29 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Yury Norov <ynorov@nvidia.com>
-Cc: Yury Norov <yury.norov@gmail.com>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
-	Ard Biesheuvel <ardb@kernel.org>, linux-kernel@vger.kernel.org, kexec@lists.infradead.org, 
-	linux-cifs@vger.kernel.org, linux-spi@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Mark Brown <broonie@kernel.org>, Steve French <sfrench@samba.org>, 
-	Alexander Graf <graf@amazon.com>, Mike Rapoport <rppt@kernel.org>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>
-Subject: Re: [PATCH] lib: count_zeros: fix 32/64-bit inconsistency in
- count_trailing_zeros()
-Message-ID: <atnytehtvt6h6kp2ndxsa3x257usezp3bk5hp4ch7gf5w2zake@omihp5zbio3l>
-References: <20260312230817.372878-1-ynorov@nvidia.com>
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="nmFe2jtL";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G5Cai4kt"
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailflow.stl.internal (Postfix) with ESMTP id 453521300F4D;
+	Thu, 12 Mar 2026 20:09:25 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Thu, 12 Mar 2026 20:09:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm1; t=
+	1773360565; x=1773367765; bh=KgAiLbof0iO8cGF8i0bS3fRoWLrp1RkGsUr
+	3z87f+QY=; b=nmFe2jtLyLr+7u8+TDKRncwnQQgfmtMxU9rW2fcZXcAX5N/O+oK
+	mkTcvLt2tGqnfh0yQZ9VxfeJXHOmQK3xmRCh0WkZO8z+9EbGkHt1EK+1v9oEDQFk
+	yjK2H4B7GbHLcXZXF6XJNsP5Q5oExxA0/3HptDHC4Yo7bGMxV66pr3UW7B9oRSB4
+	vuiTbATRXYBbLXhvd6Op9YEKWgq8ir7OPi6JV+oRhKZvn8t8u83ENmYYrl/BoZV0
+	FrCRFffyXHlTGaGOZ5VUzpnpHtLR7Cp1SV1LfUlzqP/nSXhBI3LJq0G6aafkvcXQ
+	H921q+OqQ7yY81EaudsM9yPaG6U2Be50mTg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1773360565; x=
+	1773367765; bh=KgAiLbof0iO8cGF8i0bS3fRoWLrp1RkGsUr3z87f+QY=; b=G
+	5Cai4ktm8ZYp5XyzSdEJarMpSfeXDzWAL8MTxUvYBQ2hpUgY3TIWYBA9NiTzGeNa
+	5E83ul9G/GPuOexqHFwoNmE5Bf87gj016HXSgb9HA2ajcfY5cLlR/6Scnq1+bMSy
+	L/Puu8DC52gTGANh4qz45QluS+yFcFx8cBkqURrLJFH5bOAyWf/oR6Uo1r93DRwO
+	ChU+IBist6Pp1G8vs9yINCx1pw7Dl8SVJBTw/u/RobXjWABJlCOcI6SzK3FmMqVv
+	JWB6ykQWBhykIIJXXf4XNnPkhW+lXc0X5IwRHItIgUJymc4RMF52UynxsiryvgQn
+	Ohgl8jSg52zXQ1Ht0jvEQ==
+X-ME-Sender: <xms:slWzaeXV7qa1u6neLd6Q1-cVt0VMASr8cnqysAFQocSTAtEfKc0JvQ>
+    <xme:slWzaeSKlwNXuQd-ytFXXY0mVc_-Zjwa4_mmoEgCEIxrE6aOdvb3p8liU_ELdbDzk
+    UaaJ6Rv9sIirpntfCZ3ed2iOF6DIF4YVBR0WyA36tWvjzE7914>
+X-ME-Received: <xmr:slWzadcI0WZE_K5ZNf3p0KQMTKhUmZqGQsTQWME1TwSj7PSSkE9RCFBWyBYhQ55dSIow75rJ91K6-dY7EINULxs6lGnfRrWsj3AxXRa0e5UN>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkeekudekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurheptgfgggfhvfevufgjfhffkfhrsehtjeertddttdejnecuhfhrohhmpefpvghilheu
+    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epgfeikeetueehudeigfefkeekleegheehueeifffhieefvdegueetgfekuddukeevnecu
+    ffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehnvghilhgssehofihnmhgrihhlrdhnvghtpdhnsggp
+    rhgtphhtthhopeehuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepvhhirhhose
+    iivghnihhvrdhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehlihhnuhigqdigfhhs
+    sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidquhhnihhonh
+    hfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhtrhgr
+    tggvqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
+    hnuhigqdhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhu
+    gidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinh
+    hugidqfhhsuggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehl
+    ihhnuhigqdgvgihtgeesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
+    hnuhigqdgvfhhisehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:slWzaSzNnugwYNYtiVWYHc4qaDBmXyQ51PSSBJ1uiNVJapnS6gluPA>
+    <xmx:slWzaeEAu6gvMjez-LKBYzOhXf5W2TUuXYdFq9RYM3BZ9DviPSnwQA>
+    <xmx:slWzaW4NCFWB-i4WBv0KYxfPr8CoLpfQ8pVU8lId_PRL8FTgtUuCaQ>
+    <xmx:slWzaVHk7pykGSmnnTVs6z84wbljsuc816F1d1tD0LoUWms4qvgBoQ>
+    <xmx:tVWzaRho-xmNtiFafDRGXsj1bH7ybmYtyFLigxgHrazcCccpxnyLB6O->
+Feedback-ID: i9d664b8f:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 12 Mar 2026 20:09:09 -0400 (EDT)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260312230817.372878-1-ynorov@nvidia.com>
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,linux.intel.com,rasmusvillemoes.dk,kernel.org,zx2c4.com,vger.kernel.org,lists.infradead.org,microsoft.com,ziepe.ca,samba.org,amazon.com,soleen.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim]
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -2.51
-X-Spam-Level: 
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: DBF7F4DE48
+From: NeilBrown <neilb@ownmail.net>
+To: "Linus Torvalds" <torvalds@linux-foundation.org>
+Cc: "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
+ "Jeff Layton" <jlayton@kernel.org>,
+ "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>, "Carlos Maiolino" <cem@kernel.org>,
+ "Miklos Szeredi" <miklos@szeredi.hu>,
+ "Amir Goldstein" <amir73il@gmail.com>,
+ "Jan Harkes" <jaharkes@cs.cmu.edu>, "Hugh Dickins" <hughd@google.com>,
+ "Baolin Wang" <baolin.wang@linux.alibaba.com>,
+ "David Howells" <dhowells@redhat.com>,
+ "Marc Dionne" <marc.dionne@auristor.com>,
+ "Steve French" <sfrench@samba.org>,
+ "Namjae Jeon" <linkinjeon@kernel.org>,
+ "Sungjong Seo" <sj1557.seo@samsung.com>,
+ "Yuezhang Mo" <yuezhang.mo@sony.com>,
+ "Andreas Hindborg" <a.hindborg@kernel.org>,
+ "Breno Leitao" <leitao@debian.org>, "Theodore Ts'o" <tytso@mit.edu>,
+ "Andreas Dilger" <adilger.kernel@dilger.ca>,
+ "Steven Rostedt" <rostedt@goodmis.org>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Ilya Dryomov" <idryomov@gmail.com>,
+ "Alex Markuze" <amarkuze@redhat.com>,
+ "Viacheslav Dubeyko" <slava@dubeyko.com>,
+ "Tyler Hicks" <code@tyhicks.com>,
+ "Andreas Gruenbacher" <agruenba@redhat.com>,
+ "Richard Weinberger" <richard@nod.at>,
+ "Anton Ivanov" <anton.ivanov@cambridgegreys.com>,
+ "Johannes Berg" <johannes@sipsolutions.net>,
+ "Jeremy Kerr" <jk@ozlabs.org>, "Ard Biesheuvel" <ardb@kernel.org>,
+ linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+ coda@cs.cmu.edu, linux-mm@kvack.org, linux-afs@lists.infradead.org,
+ linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ ceph-devel@vger.kernel.org, ecryptfs@vger.kernel.org,
+ gfs2@lists.linux.dev, linux-um@lists.infradead.org,
+ linux-efi@vger.kernel.org
+Subject: Re: [PATCH RFC 00/53] lift lookup out of exclive lock for dir ops
+In-reply-to:
+ <CAHk-=wh92deXvH5iXCo9mThXCBYt-jRcVu=z4kiH-f3+wZQOHA@mail.gmail.com>
+References: <20260312214330.3885211-1-neilb@ownmail.net>,
+ <CAHk-=wh92deXvH5iXCo9mThXCBYt-jRcVu=z4kiH-f3+wZQOHA@mail.gmail.com>
+Date: Fri, 13 Mar 2026 11:09:04 +1100
+Message-id: <177336054496.5556.4842794610845842132@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-Hi Yury,
+On Fri, 13 Mar 2026, Linus Torvalds wrote:
+> On Thu, 12 Mar 2026 at 14:44, NeilBrown <neilb@ownmail.net> wrote:
+> >
+> > This patch set progresses my effort to improve concurrency of
+> > directory operations and specifically to allow concurrent updates
+> > in a given directory.
+> 
+> I only got about half the patches, but the ones I did get didn't raise
+> my hackles.
+> 
+> HOWEVER.
+> 
+> This is very much a "absolutely requires ACKs from Al" series. Al?
 
-On 03/12, Yury Norov wrote:
->Based on 'sizeof(x) == 4' condition, in 32-bit case the function is wired
->to ffs(), while in 64-bit case to __ffs(). The difference is substantial:
->ffs(x) == __ffs(x) + 1. Also, ffs(0) == 0, while __ffs(0) is undefined.
->
->The 32-bit behaviour is inconsistent with the function description, so it
->needs to get fixed.
->
->There are 9 individual users for the function in 6 different subsystems.
->Some arches and drivers are 64-bit only:
-> - arch/loongarch/kvm/intc/eiointc.c;
-> - drivers/hv/mshv_vtl_main.c;
-> - kernel/liveupdate/kexec_handover.c;
->
->The others are:
-> - ib_umem_find_best_pgsz(): as per comment, __ffs() should be correct;
-> - rzv2m_csi_reg_write_bit(): ARCH_RENESAS only, unclear;
-> - lz77_match_len(): CIFS_COMPRESSION only, unclear, experimental;
->
->None of them explicitly tweak their code for a word length, or x == 0.
+Yes, I'm looking forward to Al's thoughts
 
-Context for lz77_match_len() case:
+> 
+> Also, because I only got about half the patches, and there's 53 of
+> them total, I'd really like to see a git branch for something like
+> this. It makes it easier to review for me, and I suspect it makes it
+> easier for some of the test robots too.
 
-	const u64 diff = lz77_read64(cur) ^ lz77_read64(wnd);
+github.com/neilbrown/linux.git branch pdirops
 
-	if (!diff) {
-	...
-	}
+But if you have only time for one patch, 52/53 is the one to look at.
 
-	cur += count_trailing_zeros(diff) >> 3;
+Thanks,
+NeilBrown
 
-So x == 0 is checked, however it does assume that
-sizeof(unsigned long) == sizeof(u64).  I'll have to fix it for when
-that's not the case (even with your patch in, as __ffs() casts x to
-unsigned long down the line).  Thanks for the heads up.
+> 
+> But again - this needs Al to look at it. Iirc he had some fundamental
+> concern with the last version - hopefully now fixed, but ...
+> 
+>                  Linus
+> 
+> 
 
-
-Cheers,
-
-Enzo
-
->Requesting comments from the corresponding maintainers on how to proceed
->with this.
->
->The attached patch gets rid of 32-bit explicit support, so that both
->32- and 64-bit versions rely on __ffs().
->
->CC: "K. Y. Srinivasan" <kys@microsoft.com> (hyperv)
->CC: Haiyang Zhang <haiyangz@microsoft.com> (hyperv)
->CC: Jason Gunthorpe <jgg@ziepe.ca> (infiniband)
->CC: Leon Romanovsky <leon@kernel.org> (infiniband)
->CC: Mark Brown <broonie@kernel.org> (spi)
->CC: Steve French <sfrench@samba.org> (smb)
->CC: Alexander Graf <graf@amazon.com> (kexec)
->CC: Mike Rapoport <rppt@kernel.org> (kexec)
->CC: Pasha Tatashin <pasha.tatashin@soleen.com> (kexec)
->Signed-off-by: Yury Norov <ynorov@nvidia.com>
->---
-> include/linux/count_zeros.h | 9 +++------
-> 1 file changed, 3 insertions(+), 6 deletions(-)
->
->diff --git a/include/linux/count_zeros.h b/include/linux/count_zeros.h
->index 4e5680327ece..5034a30b5c7c 100644
->--- a/include/linux/count_zeros.h
->+++ b/include/linux/count_zeros.h
->@@ -10,6 +10,8 @@
->
-> #include <asm/bitops.h>
->
->+#define COUNT_TRAILING_ZEROS_0 (-1)
->+
-> /**
->  * count_leading_zeros - Count the number of zeros from the MSB back
->  * @x: The value
->@@ -40,12 +42,7 @@ static inline int count_leading_zeros(unsigned long x)
->  */
-> static inline int count_trailing_zeros(unsigned long x)
-> {
->-#define COUNT_TRAILING_ZEROS_0 (-1)
->-
->-	if (sizeof(x) == 4)
->-		return ffs(x);
->-	else
->-		return (x != 0) ? __ffs(x) : COUNT_TRAILING_ZEROS_0;
->+	return (x != 0) ? __ffs(x) : COUNT_TRAILING_ZEROS_0;
-> }
->
-> #endif /* _LINUX_BITOPS_COUNT_ZEROS_H_ */
->-- 
->2.43.0
->
->
