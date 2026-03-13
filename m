@@ -1,152 +1,192 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013015.outbound.protection.outlook.com [40.107.201.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820952FE074
-	for <linux-cifs@vger.kernel.org>; Fri, 13 Mar 2026 14:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0893241665;
+	Fri, 13 Mar 2026 16:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.15
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413847; cv=pass; b=rZiOB2zu8FbNXr4n3oZaiFBFhNo5QDaGWUo56rUWKU9u293hbiFxD2nFvK3N+kTGNDA3ySYT+3wWnIPybQKfBRawT/y6E8Bs8H9swj1RbdUC/85QtvVltGx9cXSyH08LTPIdumH34TksWxfdJWqMTF7vXiSTxYMR3Xwxs916kJ8=
+	t=1773419509; cv=fail; b=q+Hj/WyJXQnYqlgdaj6W/rch0Cr319B8cQrGtwuzy72gUdEOeTtS0LLgZY+PZnqyRgPFGIJ+h2KqWMpHyrY+j+YC7ZPiHocMbvEfkqiKv1vpBenAr04cynF/06V3+UjXj0QDh0SO5bQR1Pw10Tvn9TRtxYxSaJmfgeThwZLm1mc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413847; c=relaxed/simple;
-	bh=LvYdoLJ8+bW6M6PTSfL1FxjKH1AkjGnQVx0bTCexAX0=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=jwFUdr2D6XUWxHa1DPFHnoMckRyxOsJdq0WqacLt0FDhuAz74PzAB8kgs0Vzc/cCDdAX7E14JxzpoVTKsbPHOJLDfZ+T7f4VK/uIwRwoJrFPuGagHobp8W1QwE6DqfFicOimvRIRwpA7c+s0VW8Jt4xz+LRJcrqvoFmNXKYHnYs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kuop86Zd; arc=pass smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773419509; c=relaxed/simple;
+	bh=gQYhMqC0gbCrL8YQFTjFd+Ehcbx8GspxKug2AAEAkqI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=IYzVHKt1UmYsbk8why2AD4S5gfmzCuijbFeSargpx46FPZySsHvmAhDUccMC6C3NyWfO5BTvyK51uBozwL5aai1rPlcHffyH8DQeiq4mYbcyd5gDm3yXHdJRagf29md3yCAXzpms1jJmVpnSLDrEzxAp2H8sCIfz8+g5lRoXT8A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KI5bduDr; arc=fail smtp.client-ip=40.107.201.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kuop86Zd"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-89a09ef1e3aso30187406d6.0
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Mar 2026 07:57:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773413845; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QzsnF6UP+wo7XW3pYLE3mTmsXVAYmUQkpprEj+gHZ9vTJ+KfAoCYzdfzG14NiaP0KU
-         moRs1LTkx3oyCsHGZojnVszGJ7lN4DR5KSMoJtc2JLb+/Sai5BFw/m52iH561IslN1Gv
-         Y7s7Yof7t4tNUXOHrfHWWAu7CZVoSPuxLQhRCRXJH/ytYZSJ2qwF+1ZPHHO//4PmKBZz
-         C5gLe+JY5ypK1bC5Y228FGjqbncGYDAzLxLlNQ8tkLMCgfyuO6zqwbjSoMyNR+ARUDs/
-         ymBUKVZnVxbQVA/8RSzGQOGJrvk893p4us7pXkm+ZlKrdo+3BJ2XiRk13wtq2SxEwYUU
-         +fGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=44IBOsYW9LVz7zyXlVjGU+iD8KaO6YaGMyS4ONOsLYY=;
-        fh=HdCVYyNJSghe77PTE3f0vod0Typ15eQR+1RU9qnF/oI=;
-        b=Hb+DQTJrVHT9mYhStGiVGLxyowwlLMj8SU97KxYjvFeJ5J7SMUdqQhMW7fqPtDw8ib
-         bsC57wmqYYW9p+A/h/ustWeS5gHiBdUIPD6NSfxRnSE2oLdy4hnFzete6PqNt0Fq6dgL
-         htVTk/uK/48GV6s4TDL8wJ0bEly8hi4s8g72bVz/6u+Kx2F5wz3ToZfXbj6DWiHolFH3
-         MSRxaW6rauIeaeEAOE1XFybveuVzIBoSiowLkpBG4m84HfYYdYU0GZE/FtDKUPOOjsoS
-         9W4XFghqABau0pRK+merGeyvRoouHpdzf384WXsUBro5gy5XmkodgmTtBietMlL9pwRt
-         Ynjw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773413845; x=1774018645; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=44IBOsYW9LVz7zyXlVjGU+iD8KaO6YaGMyS4ONOsLYY=;
-        b=kuop86Zdx9aVoxgoFqLKiwFRz0/r8EcAmzR8kq6SoEfCYTjx/YtB6oq0/1ITWGWKe8
-         rvZQMRwfEFcH3TwmXdVOeacHdLscYGh27zYFiyz9uFz9bIxEZyQQdEBPNuF8bmwhoTp4
-         EMTgc1RaWkvDMDzj1bgVNGtpdlnFpSvgH/2eKEBMQ92/SGsTBdwAG8plgyjTXMNvN+v6
-         gcSVo2HafagUBoIQ78iM4z8IuNaCyT5LGwjKgvl8R1GuVPrWXCbl15PPULshmufsfkog
-         1VWnlqjUVsKWtO0VdnXqlH85Zn2pfHMBBNr/WOU7YKV2IXB1RAG3luv6vNqboF3EiUlM
-         KUzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773413845; x=1774018645;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=44IBOsYW9LVz7zyXlVjGU+iD8KaO6YaGMyS4ONOsLYY=;
-        b=Xj07M2wyK4w7xOC2V4T+n6HEeAocZRsvBzZy83+dLy9X92HK1UtS0KjU6MdjSMcg+A
-         niodsjiFL7fL5MgLe37jfbZb3LXHGjXTWZ9T5j6UDkdINEu0scvIZE1M9AMzErtBhqtQ
-         Hg1xq6fHS5w8oGBGyrVgcsfnjEe/c2CvZVLcIxwsEaNNApkJo5TYwrqj2y16tCOR3pti
-         EYipropQYlxrEgbf3/AiDOWEUOUisOS1pP7FwmbAxoHGFHssn2vtnYwDh+ZVPjkkUUBb
-         4AiM638Jq1pR3cu89ETsjnOyFk2bUeY/0iUyQjHNGbh4i06yFbv8HDYorqEOrKn/cjqT
-         O6oA==
-X-Forwarded-Encrypted: i=1; AJvYcCVpsQqG3NJAKMGGFKfMSkaKmg0nk9humv1teMAUUgRbC6Oick7giF9rTkkklg+S/w0bbSi0eFohcne3@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKmN4/ns+TnROrzgdMfDqOk/zdhiMTNcT3Yt01ZiNxai8rdMST
-	ANBstIzOaVx9QPorR3BQi3C464u8s1zSNDbce4sqSAFStGB7sbt68RruVfJuCNQxtaz/yiefbTz
-	YukF6eSZwZuepOklmbpjtVnn4GxdkP43RuEy0
-X-Gm-Gg: ATEYQzwPS/W5wVmzH8/nAuY6HSQ0L9aCp1U5bzyvCAfqtwaWugSt3WLQnVnucSMXdf8
-	zmiNQQ/u7crdf9h9v4LqjPNiTsDMcuq+y0tGlJB+jakdRNmegf0q/09oDsCsXzokDALkwAB2VLw
-	CW5/tLJqzItIwZxBAmwTx9CxnA/2WTDu4BhT1TgCDlSBBkTd/goR4zq3MyfLJ4hKJTOd/NhMbBp
-	wmqu/oM391nJ+/HhQOPtsgAYHzm8pJo3ydPmi30VpB8ouLzxFT06OH5u1zFqGDdRt6JiZtHQTmy
-	CmhywX1PSfhOzfu8sDG0d8hfdguQ8JAFRQxqTGRvmIAPwQzHbrYTEeTSh0iUOkGyOpUOl+A79w3
-	rSKBXodDAsMzEemOmjzrrFxea1N3xCIcfO6BbFy4ptYhp1iIFLoD9/kuARSqDt4bEN3Ztewo6rZ
-	smvuQ/b5f7mnxMAVMxynJMgA==
-X-Received: by 2002:a05:6214:2425:b0:89a:62c4:5dd3 with SMTP id
- 6a1803df08f44-89a81d5e830mr60542976d6.25.1773413845317; Fri, 13 Mar 2026
- 07:57:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KI5bduDr"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Z0x9PXhhHip4G9/IE8UoYZ5G8qGaNsetJLHiHKZyfWQr/U6IlXEaEXoLr5R0SE8EL9tONJP6soqcEb/ahiXTBDQbmFI2JNHVbkxVMZhuAawI6kbShX/+JIHljqG+0f7u/G46FKqDpfbJFfvelWa8sypbJjyQ/KPBu7kKDM2CpN8q6EDz/5hhWaa9h86ecAx//cQlH8iUY5g0NJ4/sm9YEFHxt7Y4L0y+pyXaOAsFO6cLvJx64JBesIeX9xoKaixkiHQpxXE9vnlyN3G9+fmZGrIsfFXqrfwiVNxu+SUa2r2yNEjBuogUCaDvk7ac6IEd5O0xa5kmKq9xWmTZCRCvBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YgLF48WkHE3CRVHlzZfppQaXr/J1pLt7MRdCBrePrGY=;
+ b=vA56JWiYp/+nOjdMoaqkTOw+gurNCO6x4ThstOBjTXWlPHSusO3z1jM7ngSnzGaO7C0LW5wCwOjYtbJlq2oQa1kga4Xgx4e3FK0I6eZoiIualX4qsmVvZ7h5C08I32EblZxmZAL+a/UY8DGS5DrlM6/n2T5i91vJOYizgDa6uKfDDgnzwfkuYtgymGa2p9rrS08rjRK7tn0e3guZo8XK+Qhh91AFjJ2mOQUNJ4YyNObFCZZlqAgk6GxMHn+YNt75u6LCctA2vCSjHRlpoeuquqT40oQ0XoDF5EPKbaBb2wOD0V0IZQ+W2iG5ic7Dh7gZCbm0h9Nsw8x6gcJkJO6Lvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YgLF48WkHE3CRVHlzZfppQaXr/J1pLt7MRdCBrePrGY=;
+ b=KI5bduDrWBujNIKE+3klT+XH2+0MHVKT4SP0smsVtYXI8Js9yNn/zX1f6AAxHK28//2S/iT7gSDqE4ecc/jaxfFaZ3cL5YJq+n3OMeUCGAhYlI7Lpyb5QeGXb22rR1jmA4RC09oYHfBWwufUJD+Vwu9n86S9l+P1HqWtAJiMB2owaQK6ZNrKbAR5YAS9zQ0AE0wP9Cucb1/KWT9WHIPY7fEzOTZYeXk6/1yvUAJMNjM6sHkVENN9J7AOEKvqLilFPRvMPpoVMy/hJXaR/D6NOh7Q2F7aKBMZ8Gg4Hoh5AOmpPkv9Vx1VbZ59K/JpW5q20XrjR9JJZK8I+u4cMJ07UQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH0PR12MB8800.namprd12.prod.outlook.com (2603:10b6:510:26f::12)
+ by LV2PR12MB5896.namprd12.prod.outlook.com (2603:10b6:408:172::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.8; Fri, 13 Mar
+ 2026 16:31:44 +0000
+Received: from PH0PR12MB8800.namprd12.prod.outlook.com
+ ([fe80::f79d:ddc5:2ad7:762d]) by PH0PR12MB8800.namprd12.prod.outlook.com
+ ([fe80::f79d:ddc5:2ad7:762d%4]) with mapi id 15.20.9723.006; Fri, 13 Mar 2026
+ 16:31:44 +0000
+Date: Fri, 13 Mar 2026 12:31:41 -0400
+From: Yury Norov <ynorov@nvidia.com>
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: Yury Norov <yury.norov@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-kernel@vger.kernel.org,
+	kexec@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-spi@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Mark Brown <broonie@kernel.org>, Steve French <sfrench@samba.org>,
+	Alexander Graf <graf@amazon.com>, Mike Rapoport <rppt@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>
+Subject: Re: [PATCH] lib: count_zeros: fix 32/64-bit inconsistency in
+ count_trailing_zeros()
+Message-ID: <abQ77W5WjR7np2BT@yury>
+References: <20260312230817.372878-1-ynorov@nvidia.com>
+ <atnytehtvt6h6kp2ndxsa3x257usezp3bk5hp4ch7gf5w2zake@omihp5zbio3l>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <atnytehtvt6h6kp2ndxsa3x257usezp3bk5hp4ch7gf5w2zake@omihp5zbio3l>
+X-ClientProxiedBy: BN0PR03CA0012.namprd03.prod.outlook.com
+ (2603:10b6:408:e6::17) To PH0PR12MB8800.namprd12.prod.outlook.com
+ (2603:10b6:510:26f::12)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 13 Mar 2026 09:57:12 -0500
-X-Gm-Features: AaiRm51mdqY8_RGwjonLlnRSc7xx663-EoZoYEuurlP1y_tAn1zksGOpdTTeZ38
-Message-ID: <CAH2r5mtRx_t2rraTyEmbyWMZk9_NTwuyHjC+oAkbFXz9AwxCvQ@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB8800:EE_|LV2PR12MB5896:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3974d806-0eed-49a2-02c0-08de811e0362
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|10070799003|366016|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	TGukriTe68miiacmtpoGHJTjz9LMofHNE8NUFKtu+hBdrnrcQqe7Cdbc6biJj/Tvte9u3JfHiCT5QYkNulHm1O+63ORq48mRIBzu17hFr3dfonHQWIAZYBkuYuBpDtxlneR3d3Dehfbi7F5ukLON0c5osYXEzjZfJzgRpVEhJAvZ1CxlSaTXlI/1np9YJCUBxFd8AOnnihc8S0Zf93KCvkFmshRt7ZVZhb1sk78Tm+FqhG7FYTgcycIYc8GSnvZsTyz4L79EYuucGj9dKzoW35jR43b4is1SRhG6ClTBMUMK2P+hfqJD+qZ93r1l5S2PdQ2UUZfcO2wpMaAKmAfOGdV6TT7P5P6OkUQP09RE/+piI7u1g2dLAFKdE7Mt1WGa5iOVPV8YbBLl9lu/lAzuB6I5em/EVLGk0yWo2u2U3vISkHqd0ysEHSs6m/l5ktyFLMLnTg4Gp3BvRyk64EGVdsPm7qdgor4oVFesW0lqzwpSOTmeYQgtzLOEVp0sm/vYp1PJzkhza8DsB1oJB0NzEwVvnkUMKeAkhlDcrJww7h3T6oN0+qsZCrWLGB2xd0+yOsjYTmvVeslPBt6fO07SXfpfh+E3+fyQ7nZPbJi4ZrIQqlABqqYIA6sNYMyvVX3A8Sgl1ceUh/3Q0Io7qnitEaHzC56nj9TPBQ6AjaWCmvIP2ltD9+2NTxAosJUVOVtBGC2mZuXP1XqXnHKX9BGcBjw9SS8g/sC45okOjshV7lk=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB8800.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(10070799003)(366016)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?kWAi05sFhfO7QtpRupWqTBotrRBkd4vybIOHyJ+9rrpGikvMJoEavcodxnJz?=
+ =?us-ascii?Q?lZGCTg5/AUN6dV0x7BBWlQBQPnYtjGWVWR258tA4tIvRPNPvnvgDQHC0Hid3?=
+ =?us-ascii?Q?tDp9srj6iM93g5Ij21u+oJBtGVsWrUHKu1VnVUG6r0PqloA39jPb7LwVp4qh?=
+ =?us-ascii?Q?01zRDBy+HpI637VXSaq9ySVoEZB6UfTZXzuWb4nes1Nnah9L92wKSUvyRJGd?=
+ =?us-ascii?Q?ynxWP9Z4jO718dza427qIDG6sNNGXjN3bH9icHR4FgGp8tvGEu6U3yGcQ5/K?=
+ =?us-ascii?Q?nGdwDKyJNCnvZrkxVyNaDRljvMGolGudriibUQ6GPBPNBwADZpcXmf+l45Zn?=
+ =?us-ascii?Q?1GiFSBMvwD28ZeQHX6/qSgDnAFc8r1MQdfyU1wfFKlnfy1edMjjkox2vguyC?=
+ =?us-ascii?Q?HHo3hNau5fo7Af3O5BHYwcvhgVM0C/eC63gXmQ6qVtNapehanGI4tS6/YiEd?=
+ =?us-ascii?Q?VHXAwNKjnh13im6F4dy8XouxM3DAyRFlJofZdZJS7Y5GoL7y/1QgvtyaFbhD?=
+ =?us-ascii?Q?TDJAUdwSVeDzSnyIUHgAnySylpw8ZqVyj0QJQfD4pbwj+S1sDshN8UoE6UM9?=
+ =?us-ascii?Q?X1yCH24u7SCZODqoQbvpyaskxozDD0noZ8UIctdiJs3XoGsiJZTEsg9se8o4?=
+ =?us-ascii?Q?9HPNdc+oatvRH5FSj/+cAEN0dPWNdkjYThQf5/F7AFD3DqxBiSqoPDYjZuUQ?=
+ =?us-ascii?Q?jt2ah5kgDA+KoPW5nWpkt/E8SS9b1FwfH+MtyyBxsTRLoZRpNfwgmeGGy5jc?=
+ =?us-ascii?Q?xlIrwuKQWZv6nTcBmdoLtmHbT8uTc4kySfn0aqfZ1RROR/EiLsQB3MZYX6sH?=
+ =?us-ascii?Q?VCQFlk3FX220hUrOF2ER0mvReLeX4wb8YiCKV9kfoj1+IxrEXeNwmq5Qi4+S?=
+ =?us-ascii?Q?fCdmsDcoaQMgmJUht44FOZAht3Ha2AkfGcZEtywBz9C+YwPlEzlVq6qqdmCc?=
+ =?us-ascii?Q?2vFndUDdSDl9M6l+AzmMUkCdNpliVtTrPyMHtcVuYhVVAUlfeFA4tIlV+L0Y?=
+ =?us-ascii?Q?DWUsHMpWVSnXke3C03IgnNcMI60VGR0t3PU10wByV6CdlIzAtapAdz/YblCE?=
+ =?us-ascii?Q?lcjz3+y8wZG/H/wr0DtG9qIv0VVhXAzsXlIM6jn2ea92eWoUggHta46W0j36?=
+ =?us-ascii?Q?pahlGrfZdkZVtuneFHwebG3SXIb1ZXvrSBo4lAWubR8qp89SnqBugT0wJewj?=
+ =?us-ascii?Q?QvpYAVJNz8X/B8REURN4VhuzfXUzJSSkTkn7Uz41Orh1pOuROJaXAlCm+rbD?=
+ =?us-ascii?Q?UprzA8xgYn2IkmnqT2DrdNG41u2+dW4BnOifrx8IeIeVvNGPP6FQyoLGxUVi?=
+ =?us-ascii?Q?bkP7q1SmSmhsEssdnYDSj/dbHzvtUuzgHix9okeb7+maj3zUEyDgFE4ydwGP?=
+ =?us-ascii?Q?9zhSqWmzew+PES/HANiz4VoWc4K1f+fJGE8op1Q8sKZ71qPPRdgMyZkiRoxN?=
+ =?us-ascii?Q?FIW0zcW2mmjokCZnDdmfL0l6SIFLGJDjQw+ru8MUeuaCjpd8UdUejsQ5Fvgb?=
+ =?us-ascii?Q?2r9bqZsxqvfCB343M6KgFozOFRVQWkOuj+EWwOYVQr5Hd0lkr2ABJdc4Y6H+?=
+ =?us-ascii?Q?qnbdtuxGxm8XCHvd9e+piXRfD5WE67kmLcMj6rCNMPFT8G7Ay2Cpl5ql0lFg?=
+ =?us-ascii?Q?xVg9i/Uoj7Qn7LvB7o3dBlLZEAH0naW46PseZRfM18+yyeBZ9rUtfqgEMRhn?=
+ =?us-ascii?Q?wfcgILUY2YE8KNmHjdVi4u/xBUNvy2aDbbpKXakMtaCjNSbOBKAxZwTBPU6Q?=
+ =?us-ascii?Q?N9V87tMZWTlGuw433lcTYvXxRVW9Ohlm/jewZYmKyZ//I4dQRsld?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3974d806-0eed-49a2-02c0-08de811e0362
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB8800.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2026 16:31:44.1027
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: id1r2na7q+sNlOu3kI/WYnuCxwm9+4hm3wVjAplEMN/kRsU+REAHsTCZcShB0wEyXreP0kq6m1w/NNyyTddPRQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5896
 
-Please pull the following changes since commit
-1f318b96cc84d7c2ab792fcc0bfd42a7ca890681:
+On Thu, Mar 12, 2026 at 08:54:29PM -0300, Enzo Matsumiya wrote:
+> Hi Yury,
+> 
+> On 03/12, Yury Norov wrote:
+> > Based on 'sizeof(x) == 4' condition, in 32-bit case the function is wired
+> > to ffs(), while in 64-bit case to __ffs(). The difference is substantial:
+> > ffs(x) == __ffs(x) + 1. Also, ffs(0) == 0, while __ffs(0) is undefined.
+> > 
+> > The 32-bit behaviour is inconsistent with the function description, so it
+> > needs to get fixed.
+> > 
+> > There are 9 individual users for the function in 6 different subsystems.
+> > Some arches and drivers are 64-bit only:
+> > - arch/loongarch/kvm/intc/eiointc.c;
+> > - drivers/hv/mshv_vtl_main.c;
+> > - kernel/liveupdate/kexec_handover.c;
+> > 
+> > The others are:
+> > - ib_umem_find_best_pgsz(): as per comment, __ffs() should be correct;
+> > - rzv2m_csi_reg_write_bit(): ARCH_RENESAS only, unclear;
+> > - lz77_match_len(): CIFS_COMPRESSION only, unclear, experimental;
+> > 
+> > None of them explicitly tweak their code for a word length, or x == 0.
+> 
+> Context for lz77_match_len() case:
+> 
+> 	const u64 diff = lz77_read64(cur) ^ lz77_read64(wnd);
+> 
+> 	if (!diff) {
+> 	...
+> 	}
+> 
+> 	cur += count_trailing_zeros(diff) >> 3;
+> 
+> So x == 0 is checked, however it does assume that
+> sizeof(unsigned long) == sizeof(u64).  I'll have to fix it for when
+> that's not the case (even with your patch in, as __ffs() casts x to
+> unsigned long down the line).  Thanks for the heads up.
+ 
+Yes, in your case you need __ffs64() (which doesn't exist). Or simply
+leverage bitmaps API:
 
-  Linux 7.0-rc3 (2026-03-08 16:56:54 -0700)
+        DECLARE_BITMAP(bitmap, 64);
 
-are available in the Git repository at:
+        ...
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.0-rc3-smb3-client-fixes
+        bitmap_from_u64(bitmap, diff);
+        cur += find_first_bit(bitmap, 64) >> 3;
+> 
+> Cheers,
+> 
+> Enzo
 
-for you to fetch changes up to e3beefd3af09f8e460ddaf39063d3d7664d7ab59:
+So, if you're not objecting to wire 32-bit count_trailing_zeros() to
+__ffs(), can you please send your ack?
 
-  cifs: make default value of retrans as zero (2026-03-11 18:46:42 -0500)
-
-----------------------------------------------------------------
-Seven client fixes
-- Fix reconnect when using non-default port
-- Fix default retransmission behavior
-- Fix open handle reuse in cifs_open
-- Fix export for smb2-mapperror-test
-- Fix potential corruption on write retry
-- Fix potentially uninitialized superblock flags
-- FIx missing O_DIRECT and O_SYNC flags on create
-----------------------------------------------------------------
-Arnd Bergmann (1):
-      smb: client: fix sbflags initialization
-
-Bharath SM (1):
-      smb: client: fix in-place encryption corruption in SMB2_write()
-
-Henrique Carvalho (1):
-      smb: client: fix iface port assignment in parse_server_interfaces
-
-Paulo Alcantara (2):
-      smb: client: fix atomic open with O_DIRECT & O_SYNC
-      smb: client: fix open handle lookup in cifs_open()
-
-Shyam Prasad N (1):
-      cifs: make default value of retrans as zero
-
-Ye Bin (1):
-      smb/client: only export symbol for 'smb2maperror-test' module
-
- fs/smb/client/cifsacl.c      |   2 +-
- fs/smb/client/cifsfs.c       |   2 +-
- fs/smb/client/cifsglob.h     |  23 ++++++--
- fs/smb/client/cifsproto.h    |  26 +++++++--
- fs/smb/client/dir.c          |   4 +-
- fs/smb/client/file.c         | 131 +++++++++++++++++++++++--------------------
- fs/smb/client/fs_context.c   |   2 +-
- fs/smb/client/inode.c        |   6 +-
- fs/smb/client/smb1ops.c      |   2 +-
- fs/smb/client/smb2inode.c    |  22 ++++----
- fs/smb/client/smb2maperror.c |   9 ++-
- fs/smb/client/smb2ops.c      |  18 ++++--
- fs/smb/client/smb2pdu.c      |   5 +-
- 13 files changed, 152 insertions(+), 100 deletions(-)
-
-
--- 
 Thanks,
-
-Steve
+Yury
