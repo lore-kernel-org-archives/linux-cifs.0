@@ -1,197 +1,106 @@
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896C33CFF51
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Mar 2026 17:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773681764; cv=pass; b=bvKT8d6H/2VtSlFcOd6AsBNjQrlQbjNyRIxPUJQt2jNghZhnZT6uV3xnD6WMUnFvpkZ9s5yjSIlL9NVz9Bxwn9VdulngdGkiggpOP5xp+oQWW1cnwTtsrKsWOoXd26XYl+xGuRvTtpBYVlYdwvjElAyJiFE8V50+e3NF+iHOqec=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773681764; c=relaxed/simple;
-	bh=38YIF2h9LQRciTDudLh6dbVHlCWQ+CVfx4lmwVgz+TQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r4emgaLSmLv2vraSTJnFMb8WQ4+EtDT3jLWM/O3IUNzYo5fyaSfX1S9/pXm+6NDrMB0fiEcvfvUgMNBYCSOnkb67O+U0/yiohD1PyIOpWd2VcKNOJNMBXrpHq2wBO8qDhd0wRnbxZsVzpAvo1OOY3CVif6XxYBJyfUKEHPQl4ok=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HcYmuPi0; arc=pass smtp.client-ip=209.85.217.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341FB326D45
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Mar 2026 17:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773681821; cv=none; b=cUjXiyW9NkdXiq+qslUoFOj25+0GeRPpC0Cbr09LUBUArscxqrdS/UVad2oHgQPkcSeMcFGbxL5OG/qAyOcEb0BZtos2aU8viOZaTSDHiipWWLbml4jgLFrdrhYS+Aws+G3Y6UdC40Zik66gGvTZJE07Gx1qLydgvowyHx+vgCg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773681821; c=relaxed/simple;
+	bh=XUMpQ+10FZHfgJfnOFqGeZ08vd90HbRW79j6d9PUQqY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jTQX/BVrDITkdSYXDW0aX1aTy4+Kzo0zThtcoBTnx6ygOFy2V5LBeeLwlDwB6grqJWnkkNW9D1ZcXksD4xPdCT42UNBF6eMZNVgTPnh9fTO4qBoGCuS1men8IK6YMXUCAQvyeVXnNQP5FzHnrgNqYMxp433oHBeqmVaTVpy8KXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Xvlxiznf; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HcYmuPi0"
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-5ffc879c1aeso3094637137.2
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Mar 2026 10:22:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773681761; cv=none;
-        d=google.com; s=arc-20240605;
-        b=M6lPMl/unsEIf+HY0ZhfAzF3RAN60QttL/B/vQhufMuL/kcu7iFYOWXeQs6/oPIAQw
-         fxRlkhy76fJhBUahe62HUy2j6dR/ztmnBjLHnXJA6hHqbqnAX7MpStUSlIl48JIAIA1C
-         QuniVJWpDwUKucjcYbQE14mnD+IJOMlJzPqjPafCRsvvw+cBTBMpE4By1U5CjOP9KPXZ
-         XarpXb5tibOKVOm+BHrQHc0d2cZ8tI1hzpgZfWiNjfk9cnfjG/xscHVNQzyKkJ51NyAw
-         jzKSA8Z0nIFPn0DaabRvDBBno6X9c2XfP/ytMrHaPDNXP3FcNC6/8TvA1/sbYkxImPMB
-         5A+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=y3DZPi773JGtMdvcTYXrz3SkUkUANIodCa33A4wwy7k=;
-        fh=oALa8KWKM9SzlYWEcpZHWxheJ4EPhufn1L5OU8xXkag=;
-        b=Pdc5Mf6FUwO9n3c8TmawC4Z6tl6GbipSsp0PXoxs2rWfsMXJ6NqgALJenYkssuSPgl
-         Gz2JScYkxJB3AG5UdlHgR23ebu3K8WSPfX4BkTiMBOkDBH2kwAXDegRS5xeDOtjr6MgX
-         Bg8yhrMkPnM4hze4f4vuSmCk8CCBiwi37LLU5LEM0OtH8+t41EzARdYMNV11IWPsUrHP
-         EDCJvy7FRYpBgKoB03T7w+shcSggjgYfRPW972e5nbjabWjUnK2z9uRjjlsqZNrkGlJm
-         Oj+6N8p6B0QCaWQvc7zgcsz2+hUfYw7jtbkXoy1IqpQkOe38NDOMl6lfGexT9Kowe2wz
-         SoRA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Xvlxiznf"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4855dbfc129so23840735e9.0
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Mar 2026 10:23:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773681761; x=1774286561; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y3DZPi773JGtMdvcTYXrz3SkUkUANIodCa33A4wwy7k=;
-        b=HcYmuPi0X/TZNmyRIOXExfvEHRzD0UyzV54M82kVNgBzzjKlBf7yjuyMETcJ7LusHX
-         pr4wvj5PTOWmQLvZr0/nXx+Tqv/O77n+pWvH7woRd/u8jnCj3F1WihYuOO50zXEfUlpo
-         P7srtkllUt2jcefTNJ+39OAhm63tB8Y/e4qItfYY80voDNkTai5h05geghQmFWiqCtW0
-         lVyCyVhRPKH0p+C+PHpz9DqJJzT9jJr1wPNN1sOcV1X3tMTRY7A+UE4Hvqm+O1+2s7m+
-         dinmKniZOJu9i7oMW+aLBtXr11vx6l/tDr23e4AjmBuEk2vF8T8I0ICnInpqLgKzBWYR
-         m2dA==
+        d=suse.com; s=google; t=1773681818; x=1774286618; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8b9XuRtDgXlhvc/ORfCs98sIv3e/g8y530Cpr28kNVA=;
+        b=XvlxiznfcMaQbVAYfj3rmk18tyGMrWJAmrQNcUh5RWdwHDQyKFBX6D27lc3J9IKViO
+         dWRvrhb3HPZOyN/qPmugTkXMcQlcN88z4hTDNBDylSl+jwfs8txzUmiy4i0uTIKJTyUz
+         gu9TDslsh/rSjQobhyliRjXbSgo42pFYeUtCDEZCFQzjHtl998qCkk3BbvW3auxjiV32
+         JQUSP8D8xxuzYKLyWNaWgy7JRMdAH3hF1/GrwnLx/DQ5u4m7lkv6NAsbKD4JotTzYmvA
+         UYeoG1y8K3Gkbb4s7oGa1cHUE4RoQWozwC6iN3lr0q8s5f7bXTittzLWYzwKL73Sj/tb
+         dUTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773681761; x=1774286561;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=y3DZPi773JGtMdvcTYXrz3SkUkUANIodCa33A4wwy7k=;
-        b=NhSnnma/lohmISENB7CCmlJ0MYGjYlcMaMxp+ZGEhGGSaRSPCChTjL19WUsIUAVYaP
-         ONubNV2G9/y3pligepojIUgpM5b+AAbqXWZm6UsnDQyVu42ooLbY4NgSNX7wuV7qYdV7
-         La5hPiZox4ruhcRLrjPt6oWXq0dpdxU9RlmQhtcA0m7mj9UFEUjyM2Pd2fBRO+NmvPEG
-         Dgu++WjAllvWAlMEjMhAIUjlIaZuKzaLEJQwaakXZba0EwlaNROqVIjy+PiHO3VYtfFm
-         5P2tKqQv92wuY3T3ZBSzIeDnqlFOTSplgIKRSLRlcCjwiJ7MYjDwb0adIaRxAlMvSQBc
-         Bu2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWLrb8s2Zn06nnJJ7JbGcGk+eli+SCZruip5nkFES5OQBbO/bfuUKXtNH7WSo1pM2qEpbHXLQIktDuD@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXx2E6F/6iUv1T+YMmrunCm751XKRQsXk9Hn4Z1PlWpdJ2APY/
-	ACCs11EVL5pvkvYCVQw58IKJ/rcx3QoR2vTa4iyFLFmjtUMhQpuZ97n3H0yUK52ImTNqXU3R8k4
-	hyCHlZdhv0HDk26mZq12ov1rZcG1kYhI=
-X-Gm-Gg: ATEYQzyszarqbwgSq1DVJjNt+2R6WDR2Qnmr2RinhadoN+wf/9raQUwDNWeNZ/jbBmF
-	PHqveMPMCd6Dr73E9KZsNtIAQiqOUeVHa0mVttn3YWrsWFAsFIB18NC7RV76rnc+7HzRzSwnbyp
-	hN4ty+Msw4rMYzBREJB/D8HdMaMMQhlMWQniyvniA4LsdgIdE8nDMt7GRuvlvMBvpVW7b3HEJjf
-	irHoVBdlW7Oly79wa/nts6cvIEW2zYQ9ois+p2q3XpQ4sffUS8wBsEuGoeypkLaGOibF/19mg4Z
-	LuLiFMzJia5XkIgq+IqduLJto5a/K6BRwMjh2IQCSrZ92Pg1pCvDY0M=
-X-Received: by 2002:a05:6102:32c4:b0:5e1:866c:4f8a with SMTP id
- ada2fe7eead31-6020e52dbbamr5788771137.20.1773681761421; Mon, 16 Mar 2026
- 10:22:41 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1773681818; x=1774286618;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8b9XuRtDgXlhvc/ORfCs98sIv3e/g8y530Cpr28kNVA=;
+        b=bxGMyJV9RkXQ8VCTGuXv1zq2ZFcoUlUNHdInAKYVyQdULgiSsFG9QARmcSwfNNbCbE
+         B75vM7qNkpmA5snk1tyWYGFAYKzyfJeMtvrhBwr+/n9I3wAoAYpEbkT2Hpd9qIPbYz4O
+         9Vl7QH456lYjPwph8WP+Qr1ZqPIjh8E5W9t1Dk1ZosEekM030qg4GK9k/r1OvuAaLBB4
+         +7uXnG7k5ZJ+jj5Xjr12TUUc8lxDXAB0qjEVF/UN3VL63kMA9RPZ2lXvSu59tQ5Nwff0
+         jjkU4MHCKOMcflrKFzjdgDLUIlk/Pff3qq0pxKx/0Rp84AwtrqcSLqbyfjXzyBFmdXwO
+         VIJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHPCuQSBthbrQciCBbktAWrMYLUHTGRwWSE0fn27jJjPhtTBrmFTjoxZgxuUQp07XEZE9LYgH0yPSj@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9cCwZxtrLcfpy/97g0gnsLR8IBKx6PrfNq5ZE8WlEPE156ijP
+	NhFW3OtTpido5ScLJoB0Yd5uYCDi/OJml+1gBHZlTYINn/JT7Ua19bNHAIh8mNYSWm3lo6sgROg
+	UHhnf
+X-Gm-Gg: ATEYQzy4LwTq4hGw1b6Fhss9SbVFTsXedfXIXZ5DxcKPoi10e3GW5auBpUkcJNle7MD
+	Yvtp2nyI46U4vzC+74OMk0OkFoeCG/5raqM0a1S6T8zJuyBQzx7JqfIjngPsXyPQo5QZDWkC1Z6
+	QVHIREA3uVi3z+vcsqKI66VAQp6IDeTuoXKJqr6G4ytm+cXh4Yj1iBEO3Si43aJhgwFx64y9Vqf
+	sizc5N7qTb1qyURGwuL82jYNGEVGVuUaywqhB5qkLlLB4m4uvCyFGThOob+mANFFWlE/1n/6tZO
+	3/jXrScEOC5k6Px83MDgs5bhLPC8857g3wtaQ3B1ZuCCaROM1uqkhzSnHEcpRDX/Ht6clRyyH6E
+	pcqjz1aK1X4S6C02S12PtiVIb7IUbxT4fYWAoZN3NwJxhHNDf5NdPK02w0aj2VVQd5S9miQsxSP
+	XVvx6C+tEpXjJFYq3XLxbPXosH0T5kHDxAYv7PZQ24K1A6uUotOemP2/0=
+X-Received: by 2002:a05:600c:4514:b0:483:78c5:d743 with SMTP id 5b1f17b1804b1-48556709e2cmr221416935e9.28.1773681818463;
+        Mon, 16 Mar 2026 10:23:38 -0700 (PDT)
+Received: from precision.tail0b5424.ts.net ([2804:7f0:6402:b103:6a0a:3e1c:778a:5cc7])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2beab3a0c34sm15142622eec.7.2026.03.16.10.23.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Mar 2026 10:23:37 -0700 (PDT)
+Date: Mon, 16 Mar 2026 14:23:32 -0300
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, thorsten.blum@linux.dev, pc@manguebit.org
+Subject: Re: stable: [PATCH] smb: client: Don't log plaintext credentials in
+ cifs_set_cifscreds
+Message-ID: <qy7umjmnkwhtmixp7giob2iqstrwr6crntuyakibcdpqhzo7ty@bgbcu3bntz5d>
+References: <eijo3pknvy4gl2xh23by7kjdxpoc27an3dqfmfttremp4xb53o@z2kq34l2onvy>
+ <2026031616-flashily-strung-a688@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260307140726.70219-1-dorjoychy111@gmail.com>
- <20260307140726.70219-2-dorjoychy111@gmail.com> <5fcc2a6e6d92dae0601c6b3b8faa8b2f83981afb.camel@kernel.org>
-In-Reply-To: <5fcc2a6e6d92dae0601c6b3b8faa8b2f83981afb.camel@kernel.org>
-From: Dorjoy Chowdhury <dorjoychy111@gmail.com>
-Date: Mon, 16 Mar 2026 23:22:29 +0600
-X-Gm-Features: AaiRm519sCKeQSwcsAIj83-gCCcOtyLCMrhp4On2ZfkD8pFyjWgcliN3tJw964Y
-Message-ID: <CAFfO_h5pyrTTwJ3swHNLT=ZyeTJG=eHw626bTqQqAh+GeN3PhA@mail.gmail.com>
-Subject: Re: [PATCH v5 1/4] openat2: new OPENAT2_REGULAR flag support
-To: Jeff Layton <jlayton@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-api@vger.kernel.org, ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, 
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, v9fs@lists.linux.dev, 
-	linux-kselftest@vger.kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	jack@suse.cz, chuck.lever@oracle.com, alex.aring@gmail.com, arnd@arndb.de, 
-	adilger@dilger.ca, mjguzik@gmail.com, smfrench@gmail.com, 
-	richard.henderson@linaro.org, mattst88@gmail.com, linmag7@gmail.com, 
-	tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com, 
-	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com, 
-	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, 
-	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org, pc@manguebit.org, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
-	bharathsm@microsoft.com, shuah@kernel.org, miklos@szeredi.hu, 
-	hansg@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2026031616-flashily-strung-a688@gregkh>
 
-On Mon, Mar 16, 2026 at 10:53=E2=80=AFPM Jeff Layton <jlayton@kernel.org> w=
-rote:
->
-> On Sat, 2026-03-07 at 20:06 +0600, Dorjoy Chowdhury wrote:
-> > This flag indicates the path should be opened if it's a regular file.
-> > This is useful to write secure programs that want to avoid being
-> > tricked into opening device nodes with special semantics while thinking
-> > they operate on regular files. This is a requested feature from the
-> > uapi-group[1].
-> >
-> > A corresponding error code EFTYPE has been introduced. For example, if
-> > openat2 is called on path /dev/null with OPENAT2_REGULAR in the flag
-> > param, it will return -EFTYPE. EFTYPE is already used in BSD systems
-> > like FreeBSD, macOS.
-> >
-> > When used in combination with O_CREAT, either the regular file is
-> > created, or if the path already exists, it is opened if it's a regular
-> > file. Otherwise, -EFTYPE is returned.
-> >
-> > When OPENAT2_REGULAR is combined with O_DIRECTORY, -EINVAL is returned
-> > as it doesn't make sense to open a path that is both a directory and a
-> > regular file.
-> >
-> > [1]: https://uapi-group.org/kernel-features/#ability-to-only-open-regul=
-ar-files
-> >
-> > Signed-off-by: Dorjoy Chowdhury <dorjoychy111@gmail.com>
-> > ---
-> >  arch/alpha/include/uapi/asm/errno.h        |  2 ++
-> >  arch/alpha/include/uapi/asm/fcntl.h        |  1 +
-> >  arch/mips/include/uapi/asm/errno.h         |  2 ++
-> >  arch/parisc/include/uapi/asm/errno.h       |  2 ++
-> >  arch/parisc/include/uapi/asm/fcntl.h       |  1 +
-> >  arch/sparc/include/uapi/asm/errno.h        |  2 ++
-> >  arch/sparc/include/uapi/asm/fcntl.h        |  1 +
-> >  fs/ceph/file.c                             |  4 ++++
-> >  fs/gfs2/inode.c                            |  6 ++++++
-> >  fs/namei.c                                 |  4 ++++
-> >  fs/nfs/dir.c                               |  4 ++++
-> >  fs/open.c                                  |  4 +++-
-> >  fs/smb/client/dir.c                        | 14 +++++++++++++-
-> >  include/linux/fcntl.h                      |  2 ++
-> >  include/uapi/asm-generic/errno.h           |  2 ++
-> >  include/uapi/asm-generic/fcntl.h           |  4 ++++
-> >  tools/arch/alpha/include/uapi/asm/errno.h  |  2 ++
-> >  tools/arch/mips/include/uapi/asm/errno.h   |  2 ++
-> >  tools/arch/parisc/include/uapi/asm/errno.h |  2 ++
-> >  tools/arch/sparc/include/uapi/asm/errno.h  |  2 ++
-> >  tools/include/uapi/asm-generic/errno.h     |  2 ++
-> >  21 files changed, 63 insertions(+), 2 deletions(-)
-> >
-> >
->
-> I pointed Claude at this patch and got this back. Both issues that it
-> found will need to be fixed:
->
->   Analysis Summary
->
->   Commit: 7e7fa2653ca57 - openat2: new OPENAT2_REGULAR flag support
->
->   This patch adds a new OPENAT2_REGULAR flag for openat2() that restricts=
- opens to regular files only, returning a new
->   EFTYPE errno for non-regular files. It adds filesystem-specific checks =
-in ceph, gfs2, nfs, and cifs atomic_open paths,
->   plus a VFS-level fallback in do_open().
->
->   Issues found:
->
->   1. OPENAT2_REGULAR leaks into f_flags - do_dentry_open() strips open-ti=
-me-only flags (O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC)
->   but does not strip OPENAT2_REGULAR. When a regular file is successfully=
- opened via openat2() with this flag, the bit
->   persists in file->f_flags and will be returned by fcntl(fd, F_GETFL).
->   2. BUILD_BUG_ON not updated - The compile-time guard checks upper_32_bi=
-ts(VALID_OPEN_FLAGS) but the code now accepts
->   VALID_OPENAT2_FLAGS. The guard should cover the expanded flag set.
->
+On Mon, Mar 16, 2026 at 04:53:02PM +0100, Greg KH wrote:
+> On Mon, Mar 16, 2026 at 12:49:00PM -0300, Henrique Carvalho wrote:
+> > Hi,
+> > 
+> > I believe the following commit may have been missed for the relevant
+> > stable branches.
+> > 
+> > 2f37dc436d4e ("smb: client: Don't log plaintext credentials in cifs_set_cifscreds")
+> > 
+> > Could you please consider backporting it?
+> 
+> I see it in the following released stable kernels:
+> 	6.12.77
+> 	6.18.17
+> 	6.19.7
+> 	7.0-rc2
+> 
+> And it is in the 6.1 and 6.6 queues for the next stable release for
+> them.
+> 
+> Do you not see the same?
+> 
 
-Good catches! I guess for issue 1 I need to modify the line in
-do_dentry_open implementation to
-f->f_flags &=3D ~(O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | OPENAT2_REGULAR);
-right?
-And for issue 2, I should change the VALID_OPEN_FLAGS to
-VALID_OPENAT2_FLAGS in both build_open_flags in fs/open.c and in
-fcntl_init in fs/fcntl.c, correct?
+Thank you! I only looked in 6.6.y, saw no emails from stable and assumed
+it had been missed. Apologies.
 
-Regards,
-Dorjoy
