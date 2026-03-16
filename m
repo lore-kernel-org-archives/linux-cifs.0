@@ -1,118 +1,188 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B44B3988EE;
-	Mon, 16 Mar 2026 13:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773667835; cv=none; b=dMmWbQcH9JXXE3dVUgMNW4DFLAhgCEZhhlhpCenx9HwWxkTmE1uTzwVMrvrtGunNs1VrPWP5rZM4lkGQSP7FsIOJODAJxpbrEmTA5eCCzSOxYC5y/ou/ovFowog2PpdEUnuaZZ3pNPDtvj+wqVD6PA4W2aQFgtQyVmbqVOi490o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773667835; c=relaxed/simple;
-	bh=12QmHVFW6kvGAsAEHlRgc6k9FaOX+eCOvB+1XSjB85g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bbj9i3OmX6tLHsLG9LsVUer8BMIseUV+cewr4p5b4W0GLlnwPuU7seL8aE/at0nXm72aSd8dJNxLetLzuHHuYyH1LmmKQGBoR67oCN6y9fm4gvzOaf7ZCgi6tFdE7Nt15YoWXaTLjQ3vkM5D8UeKzGqO7h9DPbsmd2QLdRgsNKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 357291477;
-	Mon, 16 Mar 2026 06:30:25 -0700 (PDT)
-Received: from [10.57.61.116] (unknown [10.57.61.116])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9D4953F778;
-	Mon, 16 Mar 2026 06:30:22 -0700 (PDT)
-Message-ID: <2c7466f5-d952-4356-9b55-9d2ebb3471f2@arm.com>
-Date: Mon, 16 Mar 2026 13:30:19 +0000
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9AD9460
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Mar 2026 14:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773672564; cv=pass; b=kKFN6h/mBsvY2ix0ilIYtlwBTywPQejfmNYigVS/pwDHcyLL3u59wMd+x2MeNz3QpMRfVY5eA5qRjrnC691cwFKHnAeo2J+XB1eq24xGlrw56f8UEHumVBfd66t/xVEgpo7q+u3tlXA2YckR1QOSPRjvAC0G/iJVqMab/iG5ORY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773672564; c=relaxed/simple;
+	bh=YheuHDIQ1bTx+2Yrws4P8yJydCNsZZdPGX5a4Tufyf8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F00aRIPJEytgLKG1EkECIFis3UbislmgFpfdoo0ILiPUn3ZQ7kRUIKcyGliiQvr9pN7GMhNe7bx2xq66isCe/TLQW996Wl5glE31djPTjpgFN7BKDpvenk0SmKDv7cZ/FrDgDSN7zw6lG2Ojb8z1I2FdtsS7oSXEQwxZYzRqwPE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IdPS+aDS; arc=pass smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IdPS+aDS"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5a1687f112bso1850690e87.1
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Mar 2026 07:49:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773672561; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dq+AOtLITXO5Z+q5XKkAmjbU6NTElKEqaJroOeNLzZxiFvKtHKwRqSLlznltm7/fJs
+         /k6f/nFTiwKuzEW8/uG3RGjOhLGF/yvtX8I6bQqf1Jj0cBA/kyrOT3Ou638FY+ZZKW/R
+         E/rCMr9Huk0ziMzzyVBCE0R1l3eFpAAhIuoAZABEWPcJnBY/T0MUu3GKtJhatMpk54iV
+         +kTOy78dUaftyB0NBeRt41zJ+mS97smeYBn9P6MopDbTwvXb0EIiyrNmbnjSksuEw0eg
+         KB44Xfw++ZVfUoYnnp6iLX5lMFAqRtbBY3QbMI8+IleVy/7BAQTK5zdbxHJ+TY5gOowF
+         jjxA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=YYj7CGaE8fwoH5/Jh9Pisug/+kQbkIzLGXVuMTPy9oE=;
+        fh=ni3teZXND+kJQhRlYsLH0W8mFOAMGXbXDbDp+D/FErQ=;
+        b=aigHUXWQhPh3+DgMxaKgPYfbyfPkisc+Jniro/L+Y+NgUyCdZkWpZjJdcSzLK8/JNU
+         1aLLy9nFtmqrdSp96VzVWW1S30eJaXpyktVTWzQAoV0wsbAhxTqUkpkzWm3usQP+ClCC
+         3SiThIB7GWIxht+VvnHuL3Pn5GBOj57ypFkIMU3Wrpv9n1rBzc8DCrBMUPnsMkMrpDIf
+         GFuP6JUrcpBV+qq1Z5nf1UhRkPeYPSuXjmdCNmZvP4EYgAna166K2WNIF0oKJ4YhyiNg
+         VXuo4i6Y9tA9zPsoB92Ewnhi6ZlPthUnwwQPx9yMYvEAj64aTWZG73LxdAST5pU1AOrk
+         Du0A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773672561; x=1774277361; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YYj7CGaE8fwoH5/Jh9Pisug/+kQbkIzLGXVuMTPy9oE=;
+        b=IdPS+aDS/6bzDgRQb1vfTdq3S234zU9LbGT5lkmBvDCvuU/1QO2rwca30CqYmDpGfb
+         sMwDv4Jn7J+j93EZAurIb/rjWNbyuVfyj4HGUpRH8s/ejPIKSLpgLTspeSAvLnQpPctK
+         KvpmSt48fTfoddn9zZQTFyqA4KWtA5ciDx/bE4fWSd1qzVeCgBIf5cG5yvXLavYfB/OP
+         2SPBfxkPQSFO3R6GxMQN/OwtsEN9WPbIFjnUZvlJ7vD9R9iNtHKhO9dhQkU0RzxltFp3
+         cMDhneUItQ0KKp5i3NN0OCx2u4o6lgsohQAS4ynNo+qJS6TDQamnjo+5xX9sUSjTviQQ
+         Gd3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773672561; x=1774277361;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YYj7CGaE8fwoH5/Jh9Pisug/+kQbkIzLGXVuMTPy9oE=;
+        b=SYMdAu+n3fnR9tf6QSag5AmHNsHs1A4IbdJw/w1FrkNX/okNRLwdWX32LO4LKJ35qq
+         RNYf2JN5AAp2xj+EcyWYDurqx3bjjyrllZZh12l4icOH7hTW8vwibMdumdf6I80sb9jD
+         BE9OXutzn+iS9UcI806o259iQLaxRcBt7OYwSJaQodSOe4WlJ+mlvdPdbYuFBA3UR7eG
+         Ls0nuJcQVuQ0IEKHC8T2gCFzkMkndjGA5s94KzZ1dgmWVFIlyuIrTdryhZHL0odXuAtA
+         ovpWDvxIrT/gNsaSgtmVfJ7O6LV/0Yn+kTuahm4+6krYH5WhT6WmDXKaMRbuK7q1h627
+         3HQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUBF7E3HzdPXIjFwgJ4nIIFG7BC0WdynkU3fEl0n6N/XZiSxG/v1o555qV+ViEusJVVaLPX8ksQ4/PQ@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZ7ACrKGo5y+eZd0JmlP+HjjFryqYk8He+oT3n05T1N1sGwzcF
+	IPfVelchrAm88/IpjL5qE8ay6r9m4ZGtBafUAGsbvXUhneAKkn6fCEZB/bgMtFhAuBk4Z189ckG
+	vku32VwD9jBYrY1eAnepBtXyUQBU8fbE=
+X-Gm-Gg: ATEYQzwNNhMI9r2/0MbhElCEvVi7JQFeA/faxn6gEi5VqnbDy4PXFdEjaJiTCOZ3tDJ
+	gqbNSYGRtWrOX8mTbM8epKdDQDObCylQJenetGYTGXLc+MBJumWNMaFd+GiZbM9iS5kt6FXaVfa
+	rRAJyw45s7R7iqVlI6BI0OMrMvw9oKyzsKJoUy3NkqKNEeGIagbVDs6DmmQx+FuvurGfpNo0Jde
+	WgT+ioLucSuFZlX9XkAJoEIGcZ6GLFg2Mv//Lx5DX9TIennYlx30Oq6pQACKkqNlw+FQ0MT/oI7
+	sLjqHXP+Nhu17jXn3jaPPBD+Ily+rI5z1EbZawgANB1/8z5HpHclTQt3iD2sHY7nBYzUd0WFe9d
+	Zpb00zapzAOUYwPzEGYMh35Rj6bAxuOlMvconoaTEj9etLn4xecOxPJ5mXTMziQ==
+X-Received: by 2002:a05:6512:3404:b0:5a1:4bd3:7b5 with SMTP id
+ 2adb3069b0e04-5a162b22421mr4609951e87.29.1773672560923; Mon, 16 Mar 2026
+ 07:49:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 50/61] iommu: Prefer IS_ERR_OR_NULL over manual NULL check
-To: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
- apparmor@lists.ubuntu.com, bpf@vger.kernel.org, ceph-devel@vger.kernel.org,
- cocci@inria.fr, dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
- gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
- intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
- linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mm@kvack.org,
- linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
- linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
- linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
- sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
- tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
-Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <20260310-b4-is_err_or_null-v1-50-bd63b656022d@avm.de>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20260310-b4-is_err_or_null-v1-50-bd63b656022d@avm.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <b3da51e2-5360-4931-a5ce-95de39cbb294@samba.org> <12936912-5c98-4599-9e6f-b454ad18d264@samba.org>
+In-Reply-To: <12936912-5c98-4599-9e6f-b454ad18d264@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 16 Mar 2026 09:49:07 -0500
+X-Gm-Features: AaiRm52wqT6K3rcNJF9Wk4BMkdZmsQyT1hQrLXHgW7ya_9j8OfUZgkqbnrayVvQ
+Message-ID: <CAH2r5mvkGKex_Z+VAZtuZbAEzHM+Ov3O=TH_K4K1_RXVg9iZLA@mail.gmail.com>
+Subject: Re: SMB3 POSIX, byterange locks and close behaviour
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Ralph Boehme <slow@samba.org>, Jeremy Allison <jra@samba.org>, 
+	Steven French <Steven.French@microsoft.com>, "vl@samba.org" <vl@samba.org>, 
+	CIFS <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2026-03-10 11:49 am, Philipp Hahn wrote:
-> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
-> check.
+On Mon, Mar 16, 2026 at 6:47=E2=80=AFAM Stefan Metzmacher via samba-technic=
+al
+<samba-technical@lists.samba.org> wrote:
+>
+> Hi Ralph,
+>
+> > while working on the part for byterange locks of the SMB3 POSIX spec, I=
+ noticed a problem in the protocol:
+> >
+> > Neither MS-SMB2+ nor the SMB3 POSIX ext has a way to send a client side=
+ identifier for the process (like the pid) to the server. That means when p=
+rocessing SMB2-CLOSE we
+> > have no way to correlate opens by the same vs different applications (p=
+ids) on the client.
+> >
+> > Suppose on the client this happens:
+> >
+> > 1. application A (pid=3DX on the client) opens fd1=3Dopen("file") and s=
+ets a brl
+> > 2. application A (pid=3DX on the client) opens another fd2=3Dopen("file=
+") and sets a compatible brl
+> > 3. application B (pid=3DY on the client) opens another fd3=3Dopen("file=
+") and sets a compatible brl
+> > 4. application A closes fd1
+> >
+> > According to POSIX rules we have to drop all brls on "file" when closin=
+g any fd on "file", but this can't be implemented on the server, as we have=
+ no way to tie opens from
+> > the same client side process together.
+> >
+> > It's also not possible to implement OFD locks in the protocol, same pro=
+blem.
+> >
+> > Using OFD locks in the backend on the server doesn't help.
+> >
+> > SMB1 had pidlow/pidhigh in the header and MS-FSA "2.1.5.8 Server Reques=
+ts a Byte-Range Lock" has:
+> >
+> > ---8<---
+> > The server provides:
+> >
+> > LockKey: A 32-bit unsigned integer containing an identifier for the loc=
+k being obtained by a specific process.
+> > ---8<---
+> >
+> > and this part of MS-CIFS "3.3.5.15 Receiving an SMB_COM_LOCK_BYTE_RANGE=
+ Request":
+> >
+> > ---8<---
+> > Locks prevent attempts to lock, read, or write the locked portion of th=
+e file by other clients or PIDs from the same client.
+> > ---8<---
+> >
+> > ...implies the SMB1 server passes the PID as LockKey to the FSA layer.
+> >
+> > SMB2+ doesn't have a PID nor has POSIX-SMB2 and I wonder if we need one=
+, at least for the lock/unlock SMB2 requests. SMB2_LOCK_ELEMENT has a 32bit=
+ reserved field which we
+> > could repurpose, but there'll be dragons, so we might need a different =
+way to extend the protocol.
+> >
+> > We also have a 32bit reserved in FilePosixInformation, that would fit t=
+he bill.
+> >
+> > Thoughts? Am I missing something?
+>
+> I think it's the job of the client to coordinate its local processes.
 
-AFAICS it doesn't look possible for the argument to be anything other 
-than valid at both callsites, so *both* conditions here seem in fact to 
-be entirely redundant.
+Yes. But it would be good to have a test case to repro this to make
+sure client does proper behavior.  In many cases the client will reuse
+the same open handle for multiple processes, but in cases where we
+have two handles open, it would be good to have a test case to repro
+this.
 
-> Change generated with coccinelle.
+> I guess the client can have just a single open to the server for local fd=
+1 and fd2,
+> but in the end it's a local problem on the client.
+>
+> I guess a Windows client has to solve similar problems with multiple
+> applications running.
+>
+> metze
+>
 
-Please use coccinelle responsibly. Mechanical changes are great for 
-scripted API updates, but for cleanup, whilst it's ideal for *finding* 
-areas of code that are worth looking at, the code then wants actually 
-looking at, in its whole context, because meaningful cleanup often goes 
-deeper than trivial replacement.
 
-In particular, anywhere IS_ERR_OR_NULL() is genuinely relevant is 
-usually a sign of bad interface design, so if you're looking at this 
-then you really should be looking first and foremost to remove any 
-checks that are already unnecessary, and for the remainder, to see if 
-the thing being checked can be improved to not mix the two different 
-styles. That would be constructive and (usually) welcome cleanup. Simply 
-churning a bunch of code with this ugly macro that's arguably less 
-readable than what it replaces, not so much.
-
+--=20
 Thanks,
-Robin.
 
-> To: Joerg Roedel <joro@8bytes.org>
-> To: Will Deacon <will@kernel.org>
-> To: Robin Murphy <robin.murphy@arm.com>
-> Cc: iommu@lists.linux.dev
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
-> ---
->   drivers/iommu/omap-iommu.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/iommu/omap-iommu.c b/drivers/iommu/omap-iommu.c
-> index 8231d7d6bb6a9202025643639a6b28e6faa84659..500a42b57a997696ff37c76f028a717ab71d01f9 100644
-> --- a/drivers/iommu/omap-iommu.c
-> +++ b/drivers/iommu/omap-iommu.c
-> @@ -881,7 +881,7 @@ static int omap_iommu_attach(struct omap_iommu *obj, u32 *iopgd)
->    **/
->   static void omap_iommu_detach(struct omap_iommu *obj)
->   {
-> -	if (!obj || IS_ERR(obj))
-> +	if (IS_ERR_OR_NULL(obj))
->   		return;
->   
->   	spin_lock(&obj->iommu_lock);
-> 
-
+Steve
