@@ -1,194 +1,160 @@
-Received: from mail.whitenite.de (mail.whitenite.de [37.120.171.202])
+Received: from flow-a3-smtp.messagingengine.com (flow-a3-smtp.messagingengine.com [103.168.172.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0596391838
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Mar 2026 20:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.120.171.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B41364E85;
+	Mon, 16 Mar 2026 22:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773692819; cv=none; b=THVS8cA38jJOIC1HfI/IZfe5Tia6i13fsQdWtxhxyaqjKxMSv6RHiwF8onPFu0/RLpqk9Rf6PC+IjMt2SyJVvcr/EIlt76RZrixzKlT4ct90UuItEZtGUe/fdOiBX7nmuYE9HgmmApt6qozqaurXSopOeBdceFSiuuDpgJ2bbhY=
+	t=1773699061; cv=none; b=X2HD+TcaXbBKqJwG3FOGvtGJ46b+9I3gceqYyzbiFh6CNe9xr5K5tYkgxy7/FPoH9bW5ibjyU1GRsjl45lwRwaFkYUlkIK460MM/W7tnIzi7BdP62SHY3AFNuzkzLwFRLz8crKfu/KWSHUHvsA941n8ETVzAIJYgBbCgkdzV/Y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773692819; c=relaxed/simple;
-	bh=SqyBhjRu90/3AeovOA5PMZSFhn4KMK/ySUsC7D+YHUY=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=QzHmj11eInhg/Yx+Sr5KmHjc4J7lKmfYwC8pLu2kVSteiX2hnSQ31ar58i/ndKpurrGJ41B+4/MNynFBJevSuCEGuIm6FoqY/D9Zk6zqqUBiKXLI5ZV6oEWQq5AlrOde2CPmS4PLYixYXA07BK4bkYYYz+9TG/jdoTYF1eRphY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=whitenite.de; spf=pass smtp.mailfrom=whitenite.de; dkim=pass (2048-bit key) header.d=whitenite.de header.i=@whitenite.de header.b=A5Buh7Y7; arc=none smtp.client-ip=37.120.171.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=whitenite.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=whitenite.de
+	s=arc-20240116; t=1773699061; c=relaxed/simple;
+	bh=bR3l1XBxxG0Br6WPViaTYx4jBj801ByLeboUNggNeu4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A38yHLwEglJnAk0B2QCy7stC9vMmro0enVPstLHcOoOWf+ISPC3fMoHAiOFXJpgQ+JEGYQrlTu0OIZqL9gIfg9EuELK7OlOHQThyqCuvdDItVMWZTKlH5lCT2EoHtG4zqNZ3haS7IZ2EcyWbx12HIJK/xKpWlKg0tgYFk4eMcz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=eyO5nsRG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=guCypQjf; arc=none smtp.client-ip=103.168.172.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=whitenite.de header.i=@whitenite.de header.b="A5Buh7Y7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=whitenite.de;
-	s=excisionRSA; t=1773692815;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tctLBZP9hKWPagalZr5JSxDIsCUCChpJRsFDnGUA9Uc=;
-	b=A5Buh7Y7ySUombOSX30x+jQM1tyJetr8/yYMN7GbAKEVbpSgLkUTQ0axRu9WKRgHNDszqN
-	bmZ1upl95c1s3wdAWiDRh8b9HQz3YuDOftckwyk0SXmJn5HUgX5BNvR2uD7wYzEJsOaKvy
-	kzRQv1bU6lY10iCpBDsSdoufflLCArOrq3ZOYN2IMfPwqiWAzlpmaraRIBAAG6e1ai0Ytr
-	d2FW2H2e7xnQbNwF8cHWd1Z5v27t2r8ydk2Asw5aodRfxBOV+yjsO74u/IxIgnXs6o76iJ
-	AKCfBXvrN+scZE5GJCJZIrqoSLvCuD3q6EpVXnsBPlKNH+32vvwc+LnYkZ3e6w==
-Received: 
-	by mail.whitenite.de (OpenSMTPD) with ESMTPSA id 8e98ed94 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO) auth=yes user=elias@whitenite.de
-	for <linux-cifs@vger.kernel.org>;
-	Mon, 16 Mar 2026 21:26:55 +0100 (CET)
-Message-ID: <103cbfdc-9dc5-49b9-b89c-9555a79e7ae0@whitenite.de>
-Date: Mon, 16 Mar 2026 21:26:54 +0100
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="eyO5nsRG";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="guCypQjf"
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailflow.phl.internal (Postfix) with ESMTP id 96E81138028E;
+	Mon, 16 Mar 2026 18:10:56 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Mon, 16 Mar 2026 18:10:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1773699056;
+	 x=1773706256; bh=pZj8f0JboyjKt94J8KB7OLIiCOoml43GOZ4w8rDpLPA=; b=
+	eyO5nsRGgscBaSPTlSrjx8D8qsmxFZTD+YBT90C8JLtkSU+JG9otBsGP68/aDjfq
+	Ip8/CY7pDqj8uLfl6tk9PaoCLmHFx9BmC+OLDsgQIKz5wruWwvglBIFTzX8Bgo1G
+	D7tyDhfcq/yYvbxAZYbPlVlov+W1BUQwVVZx34myYfSzzczy+o0TvO2AJR+dEy1d
+	h9Fy4zA0IHy3AyAu2lJw7cTPeRVsoH7Q9DZJUhPGVmEq8IZ5byXvr46eUf3RwYLV
+	Pd21rN+O2sxo21UD0KoApMpHYwnhY5vI1CKlHqs6nb1Q0ON5mjBcz18/WvPyI4M2
+	g7ed/wORmv3aHNEvlM9NEQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1773699056; x=
+	1773706256; bh=pZj8f0JboyjKt94J8KB7OLIiCOoml43GOZ4w8rDpLPA=; b=g
+	uCypQjfxr+Zi7JxdTC/p3wGQ4VV0q/Wv3rf4QuOSSvRwPZ4hwWoKXSQwRlJppx/A
+	eTD/kX8ytMBkqeeAHXi8QojGoDJPwhemKEl1A5BQyy+VTfQ0kjCklEhRU0D9TNU6
+	QzoouUhJdY7Fi24kVLMS4vkfF5Xif+sxcGuZ+ZH9bmNOAZhg/6jHFnuxjrIUYo4Y
+	sJAjmQ/c58h+MsTVokuL8c2t4xBbVGwnTgXIvKplEwnaY81NNzKXbPGa+zPU58N/
+	vwQ/zZfUYT5zYdyXfBWrfC5sZSkqzhpuD1WACxXIM/TD7Jh2N1ZXy8qS+O1DtSBY
+	h24uS6YuZ9c79L+rKNYRA==
+X-ME-Sender: <xms:73-4aYdtUUIQC679P0YPl8k6UZ10Tz8-qTD319yDZEtXusdBhZuXRA>
+    <xme:73-4aTUav9FvduIIOmc0jldmINr5W_MhUsWQFGzP1fBm1dpf8ggOxSMvCMHniLmCu
+    LbRPk360ujIo39hLA6fsP95YlnCLki5WcrUsiuRyEwh6NcxWlxF>
+X-ME-Received: <xmr:73-4aSY56rJyFtQwMFw-H9dfM29zbbMWxWkWrpi3kYaZ1kbqDyXdf5bHU5U>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvleelheegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhfogggtgfesthejre
+    dtredtvdenucfhrhhomheptehlvgigucghihhllhhirghmshhonhcuoegrlhgvgiesshhh
+    rgiisghothdrohhrgheqnecuggftrfgrthhtvghrnhepvdekfeejkedvudfhudfhteekud
+    fgudeiteetvdeukedvheetvdekgfdugeevueeunecuvehluhhsthgvrhfuihiivgeptden
+    ucfrrghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhgpdhnsg
+    gprhgtphhtthhopeehhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepphhhrghh
+    nhdqohhsshesrghvmhdruggvpdhrtghpthhtoheprghmugdqghhfgieslhhishhtshdrfh
+    hrvggvuggvshhkthhophdrohhrghdprhgtphhtthhopegrphhprghrmhhorheslhhishht
+    shdruhgsuhhnthhurdgtohhmpdhrtghpthhtohepsghpfhesvhhgvghrrdhkvghrnhgvlh
+    drohhrghdprhgtphhtthhopegtvghphhdquggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopegtohgttghisehinhhrihgrrdhfrhdprhgtphhtthhopegumh
+    dquggvvhgvlheslhhishhtshdrlhhinhhugidruggvvhdprhgtphhtthhopegurhhiqdgu
+    vghvvghlsehlihhsthhsrdhfrhgvvgguvghskhhtohhprdhorhhgpdhrtghpthhtohepgh
+    hfshdvsehlihhsthhsrdhlihhnuhigrdguvghv
+X-ME-Proxy: <xmx:73-4aQltNdDVIdEqvCmz7Mlt0qW50NA4CHgJQUMNlacMN4MGiVKHfA>
+    <xmx:73-4acHdFw15OLpR73_B1AdIXJMG-pYssiD_C0T2dj2N-8ux7fVHFg>
+    <xmx:73-4aU6P6J2BtdvPwSPzfrUNjz9-qYacHOOWBucSAMlha23fXDTcIg>
+    <xmx:73-4aaO5YEqAXlnOLRO88GZx1RbxPW8QtXAeqZQNaqmxlgOL7PgFkQ>
+    <xmx:8H-4abIvs_QYur641c9BpnDuFQ6ssCC-7-o-rPLEHWyRxStBDxJEr6SL>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 16 Mar 2026 18:10:52 -0400 (EDT)
+Date: Mon, 16 Mar 2026 16:10:50 -0600
+From: Alex Williamson <alex@shazbot.org>
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
+ bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
+ dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+ intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mm@kvack.org,
+ linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+ linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+ sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev,
+ alex@shazbot.org
+Subject: Re: [PATCH 46/61] vfio: Prefer IS_ERR_OR_NULL over manual NULL
+ check
+Message-ID: <20260316161050.01c82973@shazbot.org>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-46-bd63b656022d@avm.de>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+	<20260310-b4-is_err_or_null-v1-46-bd63b656022d@avm.de>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Elias <sec@whitenite.de>
-Subject: IPv6-only client loses connection after server disconnect
-To: linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Hey all,
+On Tue, 10 Mar 2026 12:49:12 +0100
+Philipp Hahn <phahn-oss@avm.de> wrote:
 
-on a client with IPv6-only connectivity, my share becomes unavailable when the server disconnects itself after 60 minutes idle. The client will then try to 
-reconnect over IPv4.
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
+> 
+> Change generated with coccinelle.
+> 
+> To: Alex Williamson <alex@shazbot.org>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+> ---
+>  drivers/vfio/vfio_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 742477546b15d4dbaf9ebcfb2e67627db71521e0..d71922dfde5885967398deddec3e9e04b05adfec 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -923,7 +923,7 @@ vfio_ioctl_device_feature_mig_device_state(struct vfio_device *device,
+>  
+>  	/* Handle the VFIO_DEVICE_FEATURE_SET */
+>  	filp = device->mig_ops->migration_set_state(device, mig.device_state);
+> -	if (IS_ERR(filp) || !filp)
+> +	if (IS_ERR_OR_NULL(filp))
+>  		goto out_copy;
+>  
+>  	return vfio_ioct_mig_return_fd(filp, arg, &mig);
+> 
 
-```
-# /etc/fstab
-//u559000-sub1.your-storagebox.de/u559000-sub1 /srv/smb/control/ cifs 
-iocharset=utf8,rw,seal,file_mode=0660,dir_mode=0770,uid=1052,gid=1052,mfsymlinks,credentials=/etc/cifs-creds-u559000-sub1.txt 0 0
-```
+As others have expressed in general, this doesn't seem to be cleaner
+and tends to mask that we consider IS_ERR() and NULL as separate cases
+in the goto.  This code looks like it could use some refactoring, and
+likely that refactoring should handle the IS_ERR() and NULL cases
+separately, but conflating them here is not an improvement.  Thanks,
 
- From what I could find out so far, it only happens on clients where `keyutils` package is installed (when `/sbin/key.dns_resolver` is available). On initial 
-mount the client connects via IPv6 as expected, in either case. The server has A- and AAAA-records.
-
-* With `keyutils` installed, as soon as the server has disconnected, the client will resolve the servers hostname via `dns_resolve_server_name_to_ip`, but this 
-will only return the DNS A-record, while the client can not reach IPv4 destinations. The share will hang and report "Host is down".
-* Without `keyutils` installed, as soon as the server has disconnected, the client fails to resolve the servers hostname, and it will just continue with a 
-`generic_ip_connect` to the initial IPv6 address. The share reconnects successfully.
-
-Is this expected? Is this a keyutils-specific issue?
-
-Client reconnect with `keyutils` installed:
-```
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: Received no data or error: 0
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: Mark tcp session as need reconnect
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: cifs_mark_tcp_ses_conns_for_reconnect: marking necessary sessions and tcons for reconnect
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/sess.c: Set reconnect bitmask for chan 0; now 0x1
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: cifs_mark_tcp_ses_conns_for_reconnect: channel connect bitmap: 0x1
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: tearing down socket
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: State: 0x3 Flags: 0x20
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: Post shutdown state: 0x3 Flags: 0x20
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: moving mids to private list
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: issuing mid callbacks
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/dns_resolve.c: dns_resolve_server_name_to_ip: probably server name is whole unc: \\u559000-sub1.your-storagebox.de
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/dns_resolve.c: dns_resolve_server_name_to_ip: resolved: u559000-sub1.your-storagebox.de to 203.0.113.195 expiry 0
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: __cifs_reconnect: reconn_set_ipaddr_from_hostname: rc=0
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: generic_ip_connect: connecting to 203.0.113.195:445
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: Socket created
-[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: sndbuf 16384 rcvbuf 131072 rcvtimeo 0x6d6
-[Mon Mar 16 11:08:46 2026] CIFS: fs/smb/client/connect.c: Error -113 connecting to server
-[Mon Mar 16 11:08:46 2026] CIFS: fs/smb/client/connect.c: __cifs_reconnect: reconnect error -113
-```
-
-Client reconnect without `keyutils` installed:
-```
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: Received no data or error: 0
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: Mark tcp session as need reconnect
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: cifs_mark_tcp_ses_conns_for_reconnect: marking necessary sessions and tcons for reconnect
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/sess.c: Set reconnect bitmask for chan 0; now 0x1
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: cifs_mark_tcp_ses_conns_for_reconnect: channel connect bitmap: 0x1
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: tearing down socket
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: State: 0x3 Flags: 0x20
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: Post shutdown state: 0x3 Flags: 0x20
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: moving mids to private list
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: issuing mid callbacks
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/dns_resolve.c: dns_resolve_server_name_to_ip: probably server name is whole unc: \\u559000-sub1.your-storagebox.de
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/dns_resolve.c: dns_resolve_server_name_to_ip: unable to resolve: u559000-sub1.your-storagebox.de
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: reconn_set_ipaddr_from_hostname: failed to resolve server part of u559000-sub1.your-storagebox.de to 
-IP: -2
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: __cifs_reconnect: reconn_set_ipaddr_from_hostname: rc=-2
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: generic_ip_connect: connecting to [2001:db8::1]:445
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: Socket created
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: sndbuf 16384 rcvbuf 131072 rcvtimeo 0x6d6
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/smb2ops.c: smb2_set_credits: set 1 credits
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/smb2ops.c: set credits to 1 due to smb2 reconnect
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/smb2pdu.c: Reconnecting tcons and channels
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/smb2pdu.c: sess reconnect mask: 0x1, tcon reconnect: 1
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/smb2pdu.c: Negotiate protocol
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/transport.c: wait_for_free_credits: remove 1 credits total=0
-[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/transport.c: Sending smb: smb_len=268
-```
-
-More system details: (SMB server is a Hetzner Storage Box)
-```
-# uname -r
-6.12.57+deb13-cloud-amd64
-
-# cat /etc/debian_version
-13.4
-
-# mount.cifs -V
-mount.cifs version: 7.4
-
-# dpkg -l | grep -E 'keyutils|cifs'
-ii  cifs-utils                              2:7.4-1                              amd64        Common Internet File System utilities
-rc  keyutils                                1.6.3-6                              amd64        Linux Key Management Utilities
-ii  libkeyutils1:amd64                      1.6.3-6                              amd64        Linux Key Management Utilities (library)
-
-# cat /proc/fs/cifs/DebugData
-Display Internal CIFS Data Structures for Debugging
----------------------------------------------------
-CIFS Version 2.51
-Features: DFS,FSCACHE,STATS2,DEBUG,ALLOW_INSECURE_LEGACY,CIFS_POSIX,UPCALL(SPNEGO),XATTR,ACL
-CIFSMaxBufSize: 16384
-Active VFS Requests: 0
-
-Servers:
-1) ConnectionId: 0x18 Hostname: u559000-sub1.your-storagebox.de
-ClientGUID: C24CEA2E-E952-0644-A6BA-FE1A3355486C
-Number of credits: 256,1,1 Dialect 0x311
-Server capabilities: 0x300047
-TCP status: 1 Instance: 4
-Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 Net namespace: 4026531840
-In Send: 0 In MaxReq Wait: 0
-Compression: no built-in support
-
-	Sessions:
-	1) Address: 2001:db8::1 Uses: 1 Capability: 0x300047	Session Status: 1
-	Security type: RawNTLMSSP  SessionId: 0x99045274 encrypted
-	User: 1052 Cred User: 0
-
-	Shares:
-	0) IPC: \\u559000-sub1.your-storagebox.de\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
-	PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0 encrypted
-	Share Capabilities: None	Share Flags: 0x8000
-	tid: 0xa12e332	Maximal Access: 0x1f00a9
-
-	1) \\u559000-sub1.your-storagebox.de\u559000-sub1 Mounts: 1 DevInfo: 0x20 Attributes: 0x1006f
-	PathComponentMax: 255 Status: 1 type: DISK Serial Number: 0x9b2ff988 encrypted
-	Share Capabilities: None Aligned, Partition Aligned,	Share Flags: 0x8000
-	tid: 0xf57a0175	Optimal sector size: 0x200	Maximal Access: 0x1f01ff
-
-
-	Server interfaces: 2	Last updated: 17723362 seconds ago
-	1)	Speed: 10Gbps
-		Capabilities: rss
-		IPv4: 203.0.113.195
-		Weight (cur,total): (0,1)
-		Allocated channels: 0
-
-	2)	Speed: 10Gbps
-		Capabilities: rss
-		IPv6: 2001:db8::1
-		Weight (cur,total): (1,1)
-		Allocated channels: 1
-		[CONNECTED]
-
-
-	MIDs:
---
-```
-
-Thank you for any help!
-
-Cheers,
-Elias
+Alex
