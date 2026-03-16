@@ -1,171 +1,194 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.whitenite.de (mail.whitenite.de [37.120.171.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D77B3DA5C5
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Mar 2026 18:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773685580; cv=pass; b=ZvNm5pVnL6FblBdYGC8JXH0SoYuy1GLr5qkVSd0cFByPF/+PYkgPA94Scas3vTT2j9kU6srfmrU0cIugQI8fphzzkEzbJJoqEbfX+5ycM9nKzmVa5xnW7Iy5/rRk3f9U/oUEK5RPtY/GT5XJbMxPfZ44zBqinH09Ev8XyYoB4YM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773685580; c=relaxed/simple;
-	bh=ODuNhgRZuf+DphxmAeK9W2ttr4M7Xg3l+26yw6FQlUs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OWckWpzV2wdx7HfJ+vHY8u7PVJkedtoNHPaz304/V3WRQWuMsLhpmEc9t+/ZJgksICZ0lQabKEoR+u6bu9X3FjPJRnbuKoWXYXHX4FwztsVAYBgFL/dEen3+AG1i/dyrW21Z53fRR29mHe/WRYmV34ouLRNknAHRkfLkwR5+8xU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eb8ho7fp; arc=pass smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0596391838
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Mar 2026 20:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.120.171.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773692819; cv=none; b=THVS8cA38jJOIC1HfI/IZfe5Tia6i13fsQdWtxhxyaqjKxMSv6RHiwF8onPFu0/RLpqk9Rf6PC+IjMt2SyJVvcr/EIlt76RZrixzKlT4ct90UuItEZtGUe/fdOiBX7nmuYE9HgmmApt6qozqaurXSopOeBdceFSiuuDpgJ2bbhY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773692819; c=relaxed/simple;
+	bh=SqyBhjRu90/3AeovOA5PMZSFhn4KMK/ySUsC7D+YHUY=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=QzHmj11eInhg/Yx+Sr5KmHjc4J7lKmfYwC8pLu2kVSteiX2hnSQ31ar58i/ndKpurrGJ41B+4/MNynFBJevSuCEGuIm6FoqY/D9Zk6zqqUBiKXLI5ZV6oEWQq5AlrOde2CPmS4PLYixYXA07BK4bkYYYz+9TG/jdoTYF1eRphY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=whitenite.de; spf=pass smtp.mailfrom=whitenite.de; dkim=pass (2048-bit key) header.d=whitenite.de header.i=@whitenite.de header.b=A5Buh7Y7; arc=none smtp.client-ip=37.120.171.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=whitenite.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=whitenite.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eb8ho7fp"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-79800183233so65387267b3.1
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Mar 2026 11:26:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773685573; cv=none;
-        d=google.com; s=arc-20240605;
-        b=RSiBvQyPkkdf7n5BcQZH6kmC7dX6phlcBTpdTomOrNPe/KnklNmJec3hQOmgNgWLuN
-         rh4GbKNXbpS+DBXFT7J4pjYTfYD9JP9RmJGjFN+6+esG2fUIrCuY0c3b/X7Q0klr8R0M
-         8sdzSfhWhnr4Cj3sm6/nWUai5QFHClPB77EU85wogeHx1k9TwbM7leWyKgkJK90/WlYF
-         Jbiu8gHBkEK1bkR11Cci1yM2lIY0gGAmRC5h19WKhATfHxZ5AepHEBJgA5EbODPXzES9
-         S83EI1rvq6aeh85PkVpvjFNR6R1tWkWFvw6ZGowR51BpKlqqBC3iIi+iQNeC73TSx9Qx
-         HiPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3kkpPvX9iiQRabDqcRFUBUlzbFZGaOhyaGyOhqlkCgw=;
-        fh=HtMMkX+9jLy36jVCaNidWlppEMMNJvujRJJ18mM1BN0=;
-        b=Vd9t1tIJ02AtaVNcRN7/TdLhFSOEaSTbm8jj36p9DPBqMnhuIjEmaEMGkczvBVNSkr
-         2r9E/GwS+bqn3+2wEawEj0ejsII47mds7M5VhfvxqxYn0iqa3JgtGiwObhvjEzIe1jRy
-         7omO44r5u3crp5eg2PZIkhUGlx8efq631EvaAA/e5p51keImDcfBtDPI7r1sNjxR5Snz
-         ACHC+DfdLAsP5QjzYwzyVxF0Bwhqsrcbj5WBvTc0VnQKL6QZwx8J0Uv632qPGfjcxBHH
-         FlB1VJunUFsvqyJXNOzGKYxixxrA6rzVPOvnUd+pFCCBQ3QzY0sN6rG+4L5bXRuzyY+8
-         vt/Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773685573; x=1774290373; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3kkpPvX9iiQRabDqcRFUBUlzbFZGaOhyaGyOhqlkCgw=;
-        b=eb8ho7fpiAzg5iccyn/x+a7GoFAwWxs9bcZfq1i6xtw7pWMV6BzJSeMtWybj74fQiS
-         zdKNO6eNir2HBrzL32QlwfziAlfMDZuRBI6ARrSgqxiRVmDyw6X2N1EKf6SRXBFMtLlV
-         jja6mVinICAR9kX+cGNnYbi3v8DQfMpk0bPbCpoqg77Zh8boajP/9YmfgEFrbSFNwCYa
-         mctG+l58XuZNz842eOvRcLfDWfeeMZYDWGYUWs8BQdqiK7VekRJ4S88vrVeNCC7H+dzv
-         cWCkc9o2ApQV/J/GQBLKWN4s56kRRuN6mpqpKeoEqa2W3v6cmY/qtL8L1myl212SwUbE
-         E4Iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773685573; x=1774290373;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3kkpPvX9iiQRabDqcRFUBUlzbFZGaOhyaGyOhqlkCgw=;
-        b=YrIfZdX6z9m6lzIka6OWIpPtAOSM6Y+S0gvnffsS3aZc2P/UUWYhVUbQOtam7DxmDr
-         VOwuUJD/dh7PD7VXHCtFEPkbjHVbErVpdMJlZ9SUfcCMN2Ae6/vc4h1gAeGOrOmOp7AH
-         9gsKiPc5eiDa8iKu/Zo25DDj9hXj5bn7fRVqNIitFQjdfQ5SZydRW83x4K1VyLEOLl9H
-         U8klrESokjj19Gog8iGNY6KiG3uqAJV0Xx3ElmdU456oJwPcxUF90XPe8IeUBewGz7So
-         ZzqSpEa5ZV9rpaJ+Cp21woR+Op/pAJ2Dkulzgk+cU2ELd5NZrn6+/CVRWDJbDSXf0v+y
-         cCDg==
-X-Gm-Message-State: AOJu0YwOuVe5XAx+6y4ttk3apoRHhOZ+6P1QtgPtoADTMvANrCnQjZJO
-	Asr08+liBIe5DNXnE3LZBx164otkue0MHuyJRxflwH2aXJEFkyXtdSnACftgcUSok/A7VmrlqfO
-	Q1U3BAxwvD+UB1I9kVmG9YOpCnR8Ny9s=
-X-Gm-Gg: ATEYQzzgxyEe51aTDtNyXzTNQ8I/ZJqJ96SbOv0V7xesa90bcIWpYngDDGw8qxiv9Yo
-	u5BJFW0y0+Qu7pL8ySLigOXjWGVA6TkDWs6O+2plPULx9qONHZ+RwXHUEPH2rPA4fgHssvHrAJI
-	LQcnbpyH/ZXmyj2Q3i1ezgZgm2la4Hy6CU5kqpC+TKwpcE2vUnu/HZ+G0H6u5X3eqbdgW7YrHHE
-	4dOU3EfShv030GMZI8PhgJXqg8LEtF46modva2J1a2pfSeTFEQRvG2ZAcuWXORN7swngstJiWmb
-	uIjuqZhBfCtOJ8P/+XJRtnDFLES4ieMNE+Rgc1M=
-X-Received: by 2002:a05:690c:398:b0:799:1913:1157 with SMTP id
- 00721157ae682-79a61843aaemr6579057b3.16.1773685572704; Mon, 16 Mar 2026
- 11:26:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=whitenite.de header.i=@whitenite.de header.b="A5Buh7Y7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=whitenite.de;
+	s=excisionRSA; t=1773692815;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tctLBZP9hKWPagalZr5JSxDIsCUCChpJRsFDnGUA9Uc=;
+	b=A5Buh7Y7ySUombOSX30x+jQM1tyJetr8/yYMN7GbAKEVbpSgLkUTQ0axRu9WKRgHNDszqN
+	bmZ1upl95c1s3wdAWiDRh8b9HQz3YuDOftckwyk0SXmJn5HUgX5BNvR2uD7wYzEJsOaKvy
+	kzRQv1bU6lY10iCpBDsSdoufflLCArOrq3ZOYN2IMfPwqiWAzlpmaraRIBAAG6e1ai0Ytr
+	d2FW2H2e7xnQbNwF8cHWd1Z5v27t2r8ydk2Asw5aodRfxBOV+yjsO74u/IxIgnXs6o76iJ
+	AKCfBXvrN+scZE5GJCJZIrqoSLvCuD3q6EpVXnsBPlKNH+32vvwc+LnYkZ3e6w==
+Received: 
+	by mail.whitenite.de (OpenSMTPD) with ESMTPSA id 8e98ed94 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO) auth=yes user=elias@whitenite.de
+	for <linux-cifs@vger.kernel.org>;
+	Mon, 16 Mar 2026 21:26:55 +0100 (CET)
+Message-ID: <103cbfdc-9dc5-49b9-b89c-9555a79e7ae0@whitenite.de>
+Date: Mon, 16 Mar 2026 21:26:54 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260304140452.1606662-1-bharathsm@microsoft.com> <2026030442-cleft-appealing-93ec@gregkh>
-In-Reply-To: <2026030442-cleft-appealing-93ec@gregkh>
-From: Bharath SM <bharathsm.hsk@gmail.com>
-Date: Mon, 16 Mar 2026 11:26:00 -0700
-X-Gm-Features: AaiRm52vkx1o4KUlFUplZY1SlPbCSAIAgITGANrDqlX316hTVt3Fp6-hQME48bQ
-Message-ID: <CAGypqWx543J5t2nYPOUEPS_WJT=w=n90NMq1Z-XgMUCa=e845Q@mail.gmail.com>
-Subject: Re: [PATCH 6.6.y] smb: client: fix page cache corruption from
- in-place encryption in SMB2_write
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, dhowells@redhat.com, 
-	sprasad@microsoft.com, pc@manguebit.com, ematsumiya@suse.de, 
-	henrique.carvalho@suse.com, bharathsm@microsoft.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Elias <sec@whitenite.de>
+Subject: IPv6-only client loses connection after server disconnect
+To: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 4, 2026 at 6:22=E2=80=AFAM Greg KH <gregkh@linuxfoundation.org>=
- wrote:
->
-> On Wed, Mar 04, 2026 at 07:34:52PM +0530, Bharath SM wrote:
-> > SMB2_write() passes data kvecs inline in rq_iov by setting
-> > rqst.rq_nvec =3D n_vec + 1. When SMB3 encryption is negotiated,
-> > smb3_init_transform_rq() -> crypt_message() encrypts data in the
-> > kvec buffers in-place.
-> >
-> > For synchronous writes through cifs_write(), the kvec buffers point
-> > directly into the page cache via kmap(). In-place encryption overwrites
-> > the page cache with ciphertext. If the send fails with a replayable
-> > error such as -EAGAIN (e.g., from a connection reset), SMB2_write()
-> > retries the write using the same iov[1] buffer. Since iov[1] now
-> > contains ciphertext from the first attempt, the retry encrypts and
-> > sends ciphertext-as-data to the server, resulting in data corruption.
-> >
-> > The corruption is most likely to be observed when connections are
-> > unstable, as reconnects trigger write retries that re-send the
-> > already-encrypted page cache data.
-> >
-> > The sync path can be reached during partial-page O_WRONLY writes when
-> > the page is not in cache (common for append workloads with repeated
-> > open/write/close patterns).
-> >
-> > The async write path (smb2_async_writev) is not affected because it
-> > passes data via rqst.rq_iter, which the encryption layer handles
-> > without modifying the source buffers.
-> >
-> > Fix by setting rq_nvec =3D 1 (header only) and moving data kvecs into
-> > rq_iter via iov_iter_kvec().
-> >
-> > Signed-off-by: Bharath SM <bharathsm@microsoft.com>
-> > Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
-> > Cc: stable@vger.kernel.org
-> > ---
-> >  fs/smb/client/smb2pdu.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> > index a8890ae21714..a88a19dec494 100644
-> > --- a/fs/smb/client/smb2pdu.c
-> > +++ b/fs/smb/client/smb2pdu.c
-> > @@ -5072,7 +5072,11 @@ SMB2_write(const unsigned int xid, struct cifs_i=
-o_parms *io_parms,
-> >
-> >       memset(&rqst, 0, sizeof(struct smb_rqst));
-> >       rqst.rq_iov =3D iov;
-> > -     rqst.rq_nvec =3D n_vec + 1;
-> > +     rqst.rq_nvec =3D 1;
-> > +     iov_iter_kvec(&rqst.rq_iter, ITER_SOURCE, &iov[1], n_vec,
-> > +                   io_parms->length);
-> > +     rqst.rq_iter_size =3D io_parms->length;
-> > +
-> >
-> >       if (retries)
-> >               smb2_set_replay(server, &rqst);
-> > --
-> > 2.45.4
-> >
->
-> <formletter>
->
-> This is not the correct way to submit patches for inclusion in the
-> stable kernel tree.  Please read:
->     https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.ht=
-ml
-> for how to do this properly.
+Hey all,
 
-Thanks Geg for your comments.I have submitted a modified patch to
-mainline with cc: stable@vger.kernel.org
-"smb: client: fix in-place encryption corruption in SMB2_write()"
-d78840a6a38d312dc1a51a65317bb67e46f0b929
-Please help adding this patch to stable kernels >=3D6.3.
+on a client with IPv6-only connectivity, my share becomes unavailable when the server disconnects itself after 60 minutes idle. The client will then try to 
+reconnect over IPv4.
+
+```
+# /etc/fstab
+//u559000-sub1.your-storagebox.de/u559000-sub1 /srv/smb/control/ cifs 
+iocharset=utf8,rw,seal,file_mode=0660,dir_mode=0770,uid=1052,gid=1052,mfsymlinks,credentials=/etc/cifs-creds-u559000-sub1.txt 0 0
+```
+
+ From what I could find out so far, it only happens on clients where `keyutils` package is installed (when `/sbin/key.dns_resolver` is available). On initial 
+mount the client connects via IPv6 as expected, in either case. The server has A- and AAAA-records.
+
+* With `keyutils` installed, as soon as the server has disconnected, the client will resolve the servers hostname via `dns_resolve_server_name_to_ip`, but this 
+will only return the DNS A-record, while the client can not reach IPv4 destinations. The share will hang and report "Host is down".
+* Without `keyutils` installed, as soon as the server has disconnected, the client fails to resolve the servers hostname, and it will just continue with a 
+`generic_ip_connect` to the initial IPv6 address. The share reconnects successfully.
+
+Is this expected? Is this a keyutils-specific issue?
+
+Client reconnect with `keyutils` installed:
+```
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: Received no data or error: 0
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: Mark tcp session as need reconnect
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: cifs_mark_tcp_ses_conns_for_reconnect: marking necessary sessions and tcons for reconnect
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/sess.c: Set reconnect bitmask for chan 0; now 0x1
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: cifs_mark_tcp_ses_conns_for_reconnect: channel connect bitmap: 0x1
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: tearing down socket
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: State: 0x3 Flags: 0x20
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: Post shutdown state: 0x3 Flags: 0x20
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: moving mids to private list
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: issuing mid callbacks
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/dns_resolve.c: dns_resolve_server_name_to_ip: probably server name is whole unc: \\u559000-sub1.your-storagebox.de
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/dns_resolve.c: dns_resolve_server_name_to_ip: resolved: u559000-sub1.your-storagebox.de to 203.0.113.195 expiry 0
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: __cifs_reconnect: reconn_set_ipaddr_from_hostname: rc=0
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: generic_ip_connect: connecting to 203.0.113.195:445
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: Socket created
+[Mon Mar 16 11:08:43 2026] CIFS: fs/smb/client/connect.c: sndbuf 16384 rcvbuf 131072 rcvtimeo 0x6d6
+[Mon Mar 16 11:08:46 2026] CIFS: fs/smb/client/connect.c: Error -113 connecting to server
+[Mon Mar 16 11:08:46 2026] CIFS: fs/smb/client/connect.c: __cifs_reconnect: reconnect error -113
+```
+
+Client reconnect without `keyutils` installed:
+```
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: Received no data or error: 0
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: Mark tcp session as need reconnect
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: cifs_mark_tcp_ses_conns_for_reconnect: marking necessary sessions and tcons for reconnect
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/sess.c: Set reconnect bitmask for chan 0; now 0x1
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: cifs_mark_tcp_ses_conns_for_reconnect: channel connect bitmap: 0x1
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: tearing down socket
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: State: 0x3 Flags: 0x20
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: Post shutdown state: 0x3 Flags: 0x20
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: moving mids to private list
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: cifs_abort_connection: issuing mid callbacks
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/dns_resolve.c: dns_resolve_server_name_to_ip: probably server name is whole unc: \\u559000-sub1.your-storagebox.de
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/dns_resolve.c: dns_resolve_server_name_to_ip: unable to resolve: u559000-sub1.your-storagebox.de
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: reconn_set_ipaddr_from_hostname: failed to resolve server part of u559000-sub1.your-storagebox.de to 
+IP: -2
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: __cifs_reconnect: reconn_set_ipaddr_from_hostname: rc=-2
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: generic_ip_connect: connecting to [2001:db8::1]:445
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: Socket created
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/connect.c: sndbuf 16384 rcvbuf 131072 rcvtimeo 0x6d6
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/smb2ops.c: smb2_set_credits: set 1 credits
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/smb2ops.c: set credits to 1 due to smb2 reconnect
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/smb2pdu.c: Reconnecting tcons and channels
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/smb2pdu.c: sess reconnect mask: 0x1, tcon reconnect: 1
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/smb2pdu.c: Negotiate protocol
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/transport.c: wait_for_free_credits: remove 1 credits total=0
+[Mon Mar 16 11:07:41 2026] CIFS: fs/smb/client/transport.c: Sending smb: smb_len=268
+```
+
+More system details: (SMB server is a Hetzner Storage Box)
+```
+# uname -r
+6.12.57+deb13-cloud-amd64
+
+# cat /etc/debian_version
+13.4
+
+# mount.cifs -V
+mount.cifs version: 7.4
+
+# dpkg -l | grep -E 'keyutils|cifs'
+ii  cifs-utils                              2:7.4-1                              amd64        Common Internet File System utilities
+rc  keyutils                                1.6.3-6                              amd64        Linux Key Management Utilities
+ii  libkeyutils1:amd64                      1.6.3-6                              amd64        Linux Key Management Utilities (library)
+
+# cat /proc/fs/cifs/DebugData
+Display Internal CIFS Data Structures for Debugging
+---------------------------------------------------
+CIFS Version 2.51
+Features: DFS,FSCACHE,STATS2,DEBUG,ALLOW_INSECURE_LEGACY,CIFS_POSIX,UPCALL(SPNEGO),XATTR,ACL
+CIFSMaxBufSize: 16384
+Active VFS Requests: 0
+
+Servers:
+1) ConnectionId: 0x18 Hostname: u559000-sub1.your-storagebox.de
+ClientGUID: C24CEA2E-E952-0644-A6BA-FE1A3355486C
+Number of credits: 256,1,1 Dialect 0x311
+Server capabilities: 0x300047
+TCP status: 1 Instance: 4
+Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 Net namespace: 4026531840
+In Send: 0 In MaxReq Wait: 0
+Compression: no built-in support
+
+	Sessions:
+	1) Address: 2001:db8::1 Uses: 1 Capability: 0x300047	Session Status: 1
+	Security type: RawNTLMSSP  SessionId: 0x99045274 encrypted
+	User: 1052 Cred User: 0
+
+	Shares:
+	0) IPC: \\u559000-sub1.your-storagebox.de\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
+	PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0 encrypted
+	Share Capabilities: None	Share Flags: 0x8000
+	tid: 0xa12e332	Maximal Access: 0x1f00a9
+
+	1) \\u559000-sub1.your-storagebox.de\u559000-sub1 Mounts: 1 DevInfo: 0x20 Attributes: 0x1006f
+	PathComponentMax: 255 Status: 1 type: DISK Serial Number: 0x9b2ff988 encrypted
+	Share Capabilities: None Aligned, Partition Aligned,	Share Flags: 0x8000
+	tid: 0xf57a0175	Optimal sector size: 0x200	Maximal Access: 0x1f01ff
+
+
+	Server interfaces: 2	Last updated: 17723362 seconds ago
+	1)	Speed: 10Gbps
+		Capabilities: rss
+		IPv4: 203.0.113.195
+		Weight (cur,total): (0,1)
+		Allocated channels: 0
+
+	2)	Speed: 10Gbps
+		Capabilities: rss
+		IPv6: 2001:db8::1
+		Weight (cur,total): (1,1)
+		Allocated channels: 1
+		[CONNECTED]
+
+
+	MIDs:
+--
+```
+
+Thank you for any help!
+
+Cheers,
+Elias
