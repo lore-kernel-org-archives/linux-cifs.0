@@ -1,38 +1,25 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C9F2BE655
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Mar 2026 11:46:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B44B3988EE;
+	Mon, 16 Mar 2026 13:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773661615; cv=none; b=jqB21QIypTJu4im2+OKDOTjYDfknkyCWKiHRt6SA7wy9t4lvnqfR3L7/egzCGDx3jbnAmhgisJ3AiVGjYBj6CqTOY0NU3VUcZ0FnyH6KNWsFApLQlz7yGNWKzK4TwzDVr6p2zdamUL10eO4BHVnIV8US114iXLW/wkc/2NFUDso=
+	t=1773667835; cv=none; b=dMmWbQcH9JXXE3dVUgMNW4DFLAhgCEZhhlhpCenx9HwWxkTmE1uTzwVMrvrtGunNs1VrPWP5rZM4lkGQSP7FsIOJODAJxpbrEmTA5eCCzSOxYC5y/ou/ovFowog2PpdEUnuaZZ3pNPDtvj+wqVD6PA4W2aQFgtQyVmbqVOi490o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773661615; c=relaxed/simple;
-	bh=580Av2UD2iN7mZA6NjpX3D45cn8/PmgkFJAzu4DQwXs=;
+	s=arc-20240116; t=1773667835; c=relaxed/simple;
+	bh=12QmHVFW6kvGAsAEHlRgc6k9FaOX+eCOvB+1XSjB85g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MbdnPx1MX6oADjX06TGra4N2A0GNoFtqa9MZGMqcMxWKcQNWGicpKULehjeWBaLyVYRx8OPm7jxuosMTtcsmwiBUIagu+35ZdFAEc545d6iPauG/XR3lWudci6qa9RvyXWshOlwVlavGcN2T4TRB5OnMPerph9pnQQkIgKmLBd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=N9m8bT8i; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="N9m8bT8i"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=3fd1/vY1K9Lky7rmWMMgfqTgcs0+ctkhoSkEpH1q+9E=; b=N9m8bT8iA1Iu86I589y6ti5vwY
-	knyRvP02/FOXFG+ouJLlcxSDSTUYCLsmMW4uT1U5gT/N3EwRf3S0RE3WVyN7ammOZfqDKtm66ykUG
-	76Urn3L1LJ6+BF0FhzPMrBeJSyIyK2FIehtE1Leyg0vnczPx0IC/l8t2hwlkwz+LRGct4iMvkW8Co
-	ZTmi0NqixkZxjXQO/m67YMjhEkMUYfKEEHN4Qm33FyILDipM4hO2VXmIq6Q3uCtZF8GnAQ+MWj9zu
-	j+gEH171i7MqGtsSwCDlJQ5yZIwcL2wHOzOJW0KSya7QK8S5iIT+0yj1Lv1JgqC7/YchkuiZJ2U/E
-	5KJLnztYobjpTPLMCNahISaGxB/RVZT1uOtJz4n3LtKMn7wp4Wt9csBEsx6+Z4UF/kyEf+/af741D
-	SjCxme6FspzIy1az8pxqVK03BqhEPzwaQXsm4mNb2VWLUv8+Ec8uheialxzlpO0QHZ2AustUe/3It
-	aze6smSBsQcd/xjgkU2E/KGg;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1w26PL-00000001TY2-0gco;
-	Mon, 16 Mar 2026 11:46:51 +0000
-Message-ID: <12936912-5c98-4599-9e6f-b454ad18d264@samba.org>
-Date: Mon, 16 Mar 2026 12:46:50 +0100
+	 In-Reply-To:Content-Type; b=Bbj9i3OmX6tLHsLG9LsVUer8BMIseUV+cewr4p5b4W0GLlnwPuU7seL8aE/at0nXm72aSd8dJNxLetLzuHHuYyH1LmmKQGBoR67oCN6y9fm4gvzOaf7ZCgi6tFdE7Nt15YoWXaTLjQ3vkM5D8UeKzGqO7h9DPbsmd2QLdRgsNKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 357291477;
+	Mon, 16 Mar 2026 06:30:25 -0700 (PDT)
+Received: from [10.57.61.116] (unknown [10.57.61.116])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9D4953F778;
+	Mon, 16 Mar 2026 06:30:22 -0700 (PDT)
+Message-ID: <2c7466f5-d952-4356-9b55-9d2ebb3471f2@arm.com>
+Date: Mon, 16 Mar 2026 13:30:19 +0000
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,68 +27,92 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: SMB3 POSIX, byterange locks and close behaviour
-To: Ralph Boehme <slow@samba.org>, Jeremy Allison <jra@samba.org>,
- Steven French <Steven.French@microsoft.com>, "vl@samba.org" <vl@samba.org>
-Cc: samba-technical <samba-technical@lists.samba.org>,
- CIFS <linux-cifs@vger.kernel.org>
-References: <b3da51e2-5360-4931-a5ce-95de39cbb294@samba.org>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <b3da51e2-5360-4931-a5ce-95de39cbb294@samba.org>
+Subject: Re: [PATCH 50/61] iommu: Prefer IS_ERR_OR_NULL over manual NULL check
+To: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
+ apparmor@lists.ubuntu.com, bpf@vger.kernel.org, ceph-devel@vger.kernel.org,
+ cocci@inria.fr, dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+ intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mm@kvack.org,
+ linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+ linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+ sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
+Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+ <20260310-b4-is_err_or_null-v1-50-bd63b656022d@avm.de>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20260310-b4-is_err_or_null-v1-50-bd63b656022d@avm.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Ralph,
+On 2026-03-10 11:49 am, Philipp Hahn wrote:
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
 
-> while working on the part for byterange locks of the SMB3 POSIX spec, I noticed a problem in the protocol:
-> 
-> Neither MS-SMB2+ nor the SMB3 POSIX ext has a way to send a client side identifier for the process (like the pid) to the server. That means when processing SMB2-CLOSE we 
-> have no way to correlate opens by the same vs different applications (pids) on the client.
-> 
-> Suppose on the client this happens:
-> 
-> 1. application A (pid=X on the client) opens fd1=open("file") and sets a brl
-> 2. application A (pid=X on the client) opens another fd2=open("file") and sets a compatible brl
-> 3. application B (pid=Y on the client) opens another fd3=open("file") and sets a compatible brl
-> 4. application A closes fd1
-> 
-> According to POSIX rules we have to drop all brls on "file" when closing any fd on "file", but this can't be implemented on the server, as we have no way to tie opens from 
-> the same client side process together.
-> 
-> It's also not possible to implement OFD locks in the protocol, same problem.
-> 
-> Using OFD locks in the backend on the server doesn't help.
-> 
-> SMB1 had pidlow/pidhigh in the header and MS-FSA "2.1.5.8 Server Requests a Byte-Range Lock" has:
-> 
-> ---8<---
-> The server provides:
-> 
-> LockKey: A 32-bit unsigned integer containing an identifier for the lock being obtained by a specific process.
-> ---8<---
-> 
-> and this part of MS-CIFS "3.3.5.15 Receiving an SMB_COM_LOCK_BYTE_RANGE Request":
-> 
-> ---8<---
-> Locks prevent attempts to lock, read, or write the locked portion of the file by other clients or PIDs from the same client.
-> ---8<---
-> 
-> ...implies the SMB1 server passes the PID as LockKey to the FSA layer.
-> 
-> SMB2+ doesn't have a PID nor has POSIX-SMB2 and I wonder if we need one, at least for the lock/unlock SMB2 requests. SMB2_LOCK_ELEMENT has a 32bit reserved field which we 
-> could repurpose, but there'll be dragons, so we might need a different way to extend the protocol.
-> 
-> We also have a 32bit reserved in FilePosixInformation, that would fit the bill.
-> 
-> Thoughts? Am I missing something?
+AFAICS it doesn't look possible for the argument to be anything other 
+than valid at both callsites, so *both* conditions here seem in fact to 
+be entirely redundant.
 
-I think it's the job of the client to coordinate its local processes.
+> Change generated with coccinelle.
 
-I guess the client can have just a single open to the server for local fd1 and fd2,
-but in the end it's a local problem on the client.
+Please use coccinelle responsibly. Mechanical changes are great for 
+scripted API updates, but for cleanup, whilst it's ideal for *finding* 
+areas of code that are worth looking at, the code then wants actually 
+looking at, in its whole context, because meaningful cleanup often goes 
+deeper than trivial replacement.
 
-I guess a Windows client has to solve similar problems with multiple
-applications running.
+In particular, anywhere IS_ERR_OR_NULL() is genuinely relevant is 
+usually a sign of bad interface design, so if you're looking at this 
+then you really should be looking first and foremost to remove any 
+checks that are already unnecessary, and for the remainder, to see if 
+the thing being checked can be improved to not mix the two different 
+styles. That would be constructive and (usually) welcome cleanup. Simply 
+churning a bunch of code with this ugly macro that's arguably less 
+readable than what it replaces, not so much.
 
-metze
+Thanks,
+Robin.
+
+> To: Joerg Roedel <joro@8bytes.org>
+> To: Will Deacon <will@kernel.org>
+> To: Robin Murphy <robin.murphy@arm.com>
+> Cc: iommu@lists.linux.dev
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+> ---
+>   drivers/iommu/omap-iommu.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/iommu/omap-iommu.c b/drivers/iommu/omap-iommu.c
+> index 8231d7d6bb6a9202025643639a6b28e6faa84659..500a42b57a997696ff37c76f028a717ab71d01f9 100644
+> --- a/drivers/iommu/omap-iommu.c
+> +++ b/drivers/iommu/omap-iommu.c
+> @@ -881,7 +881,7 @@ static int omap_iommu_attach(struct omap_iommu *obj, u32 *iopgd)
+>    **/
+>   static void omap_iommu_detach(struct omap_iommu *obj)
+>   {
+> -	if (!obj || IS_ERR(obj))
+> +	if (IS_ERR_OR_NULL(obj))
+>   		return;
+>   
+>   	spin_lock(&obj->iommu_lock);
+> 
+
