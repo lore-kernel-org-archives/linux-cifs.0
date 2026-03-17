@@ -1,38 +1,38 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E1235E955
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Mar 2026 10:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3158537C90F
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Mar 2026 10:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773744407; cv=none; b=EoWYFt4HkOYamg7m+hwCa3cwgECSGF+bPLEAKZs2rnQW7iURnjlfOej2pZ1X6uMq5Nzmzg+Wf1XrVEKgBJtn2yZ5rDuBhOpsSNrzcI9lyx8oKT0d02w5GSRQrVlVadGAT54mb8L6YmuhVjcyyPxTrYuRuVRoODWbfbIvUkVobj8=
+	t=1773744849; cv=none; b=Zp+3mcawfKWA4ST1qJ1pE8WBit3E7HHauFFUwp11m05OYLhEzVbkeNuCd6WaH9hypCeVMMaBO6b9UPGKyyVJLQaFixn3edtysdI8jRTWXsJEUhtSNx9DdPCYOcrNyrpUyvOEU+gK5oCyeKz/e8dj3t6+LrAhFP29CWGDrTAADbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773744407; c=relaxed/simple;
-	bh=QKGS3lq/z1skjNdCDgLywQTK2o4+/rewdIcDYZURbj4=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=WGbqTEXtzOw6KAzxapYPFaEqh5Q/HmA3mukvOlX6Ogm2Y9amHy9cCgAdLtJSBbF92CBNrRiO7rD7KfWVY3CFFgJMIy0xN8ZnpCbpJIekH5miosJyf0ixA4QbvxYIPjBN02CG5ZJfdER1rf3z2zhsl0S3LRUsTePWeyvquV3Y2bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=YLFwMPcH; arc=none smtp.client-ip=144.76.82.148
+	s=arc-20240116; t=1773744849; c=relaxed/simple;
+	bh=0s5cAzlUOVtm8msUiLSNyQgNEgHEtgHuOWriE+JTnoI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cyvkjlZfboOHVAR+w0Z4lpzZiA/2ZiQLsCq0N14tShOxFCN5VM+wr+uZQIGAE99Ij9OCrfTj2aOssR1WirHHOBv4NODGMyskbEar8zG/1Hrhj+E4xCDPyoz7zklzCg9SfJ5+0GCBAFbBlGgn36sAmG/TbJs8YZihS0VEC8EWPw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=A45kn5MM; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="YLFwMPcH"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="A45kn5MM"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Cc:To:From:Date:Message-ID;
-	bh=QKGS3lq/z1skjNdCDgLywQTK2o4+/rewdIcDYZURbj4=; b=YLFwMPcH9B/5nnv1UYG1S0nwIv
-	FIiaSLE9m0oiuwjV0C/3b9n3UacY87g115x4irNQC0u/1sgrr6ycizzQtfCqv1jA2QQDh2TvWxoLn
-	DSceS6UmSKD0cwDIdyxoSMvCfjBn+TduiHaS2f//ALWKZ4u74HOoZvxxNyzBsiRgzPW8w6KD5CvHh
-	HeeyNUQ/JqIWgsk4KFbe0eUu2dsO1uSGqJjlt06kMtuMZph18mJ+6gp4EWP9DnRIAqwujor4Pf1Za
-	gkMquafbn9Qo+VY6WGzPNHBvf0KJYOyTy2KF9Zoo8WVdwpLt6ZTs6S/tZejE+E2ajd1ECrPGdkFQ5
-	mZH0O5YJjg9H25Bbu6n5UG9oJqxkFa33r2m2lm8TF2OEmBPe9VC4YdbtezXkECcLPWPYRJwxWwvFV
-	gpJg9hAytEs1WJ648HLKb+4+jEPwWG9yuU61hKQh7237Ih6DgV4w0J1TMrKm5xz6YPw8OUmAWDdxl
-	ucy/r5SUzdYa+cIStVef9r1H;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=0s5cAzlUOVtm8msUiLSNyQgNEgHEtgHuOWriE+JTnoI=; b=A45kn5MMnPGyYhdwI7VFoORb75
+	4Kbo7Xfh5gBw+WCJ+leThcvT6GaVZEjfT91gfYi7+0/J6mnIgn1TiqlVTeEpnUrEiy+zc8CG/TN35
+	70T1uBRkGEsvbkUAH4lxYWfjS4ZU0IgnUrRGrddd7jmJ7gl9e0PcDWeVuzdeZVK52ArYyuStHj7gp
+	7hY6q/E543IAhIVOcgz/lceSZWmcf0bneBcF+wQZxVJVeJp1gfjV7Cav1Rh6g0esLWZ8mH8N4wZ7W
+	gA1au1+UhuYQUltRZBwGRJUAAyodvky7nG8L2WSFXTzhgqg17BLj3pPVGA2gFyE3+zBkmV3P/5wYn
+	vSDq7vJudqeNXXx8slA1gy5KttwQyq9ZN0qFUi4r3Hzjph9xvRtYPAs1cMMoFCg1pNQTrs+j9za4M
+	i3xeXO3tVQyMgpGQuZnZeFOnmGzpwHXX2W0VFtVyeG3v7rnHYUi1KvBmSHAFZ6RWEY5nD96S5E7v2
+	ihBhL6uPdrKaMZSG/NmxChvP;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1w2RwZ-00000001hYa-1mr4;
-	Tue, 17 Mar 2026 10:46:35 +0000
-Message-ID: <5f88504b-d1cb-4446-81fc-e526dd7a7c88@samba.org>
-Date: Tue, 17 Mar 2026 11:46:34 +0100
+	id 1w2S3p-00000001hfV-02Pc;
+	Tue, 17 Mar 2026 10:54:05 +0000
+Message-ID: <a868b5e3-a7e6-44ba-89e4-40912794f25a@samba.org>
+Date: Tue, 17 Mar 2026 11:54:04 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,14 +40,16 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Ralph Boehme <slow@samba.org>
 Subject: Re: SMB3 POSIX, byterange locks and close behaviour
-To: Stefan Metzmacher <metze@samba.org>, Jeremy Allison <jra@samba.org>,
- Steven French <Steven.French@microsoft.com>, "vl@samba.org" <vl@samba.org>
-Cc: samba-technical <samba-technical@lists.samba.org>,
- CIFS <linux-cifs@vger.kernel.org>
+To: Steve French <smfrench@gmail.com>, Stefan Metzmacher <metze@samba.org>
+Cc: Jeremy Allison <jra@samba.org>,
+ Steven French <Steven.French@microsoft.com>, "vl@samba.org" <vl@samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>
 References: <b3da51e2-5360-4931-a5ce-95de39cbb294@samba.org>
  <12936912-5c98-4599-9e6f-b454ad18d264@samba.org>
+ <CAH2r5mvkGKex_Z+VAZtuZbAEzHM+Ov3O=TH_K4K1_RXVg9iZLA@mail.gmail.com>
+From: Ralph Boehme <slow@samba.org>
 Content-Language: en-US, de-DE
 Autocrypt: addr=slow@samba.org; keydata=
  xsFNBFRbb/sBEADGFqSo7Ya3S00RsDWC7O4esYxuo+J5PapFMKvFNiYvpNEAoHnoJkzT6bCG
@@ -93,25 +95,27 @@ Autocrypt: addr=slow@samba.org; keydata=
  PgCGx2XZ0ICO1zdh1OafQXZcI0ZKA/+ZmMt7rFcf8cdjwJ3qRKtScUYhxq2N9wL3fQJNQPvK
  TXc80T2QVqV/yS3gZ4UmqYaBcMIoAyQWu8vbJnt6vCnf33g5sko3H8vbfpFW2TgesM6tyK1W
  rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <12936912-5c98-4599-9e6f-b454ad18d264@samba.org>
+In-Reply-To: <CAH2r5mvkGKex_Z+VAZtuZbAEzHM+Ov3O=TH_K4K1_RXVg9iZLA@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------6a8FKRQumllM9lA0Px7qfuul"
+ boundary="------------w8IWnXfCEUXysW3w8pI92lHU"
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------6a8FKRQumllM9lA0Px7qfuul
-Content-Type: multipart/mixed; boundary="------------5uo5LdgF4MPTS00KvZHLvr22";
+--------------w8IWnXfCEUXysW3w8pI92lHU
+Content-Type: multipart/mixed; boundary="------------G0JvZwgtTRxodCW5E3gU3OkR";
  protected-headers="v1"
 From: Ralph Boehme <slow@samba.org>
-To: Stefan Metzmacher <metze@samba.org>, Jeremy Allison <jra@samba.org>,
- Steven French <Steven.French@microsoft.com>, "vl@samba.org" <vl@samba.org>
-Cc: samba-technical <samba-technical@lists.samba.org>,
- CIFS <linux-cifs@vger.kernel.org>
-Message-ID: <5f88504b-d1cb-4446-81fc-e526dd7a7c88@samba.org>
+To: Steve French <smfrench@gmail.com>, Stefan Metzmacher <metze@samba.org>
+Cc: Jeremy Allison <jra@samba.org>,
+ Steven French <Steven.French@microsoft.com>, "vl@samba.org" <vl@samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>
+Message-ID: <a868b5e3-a7e6-44ba-89e4-40912794f25a@samba.org>
 Subject: Re: SMB3 POSIX, byterange locks and close behaviour
 References: <b3da51e2-5360-4931-a5ce-95de39cbb294@samba.org>
  <12936912-5c98-4599-9e6f-b454ad18d264@samba.org>
-In-Reply-To: <12936912-5c98-4599-9e6f-b454ad18d264@samba.org>
+ <CAH2r5mvkGKex_Z+VAZtuZbAEzHM+Ov3O=TH_K4K1_RXVg9iZLA@mail.gmail.com>
+In-Reply-To: <CAH2r5mvkGKex_Z+VAZtuZbAEzHM+Ov3O=TH_K4K1_RXVg9iZLA@mail.gmail.com>
 Autocrypt-Gossip: addr=jra@samba.org; keydata=
  xsDiBDxEcLsRBADMQzpWoVuu4oiq23q5AfZDbakENMP/8ZU+AnzqzGr70lIEJb2jfcudViUT
  97+RmXptlnDmE4/ILOf6w0udMlQ9Jpm+iqxbr35D/6qvFgrgE+PnNAPlKSlI2fyGuLhpv1QP
@@ -131,61 +135,56 @@ Autocrypt-Gossip: addr=jra@samba.org; keydata=
  3CTq9sJGBBgRAgAGBQI8RHC+AAoJEKXdeEnWwDasbeIAoL6+EsZKAYrZ2w22A6V67tRNGOIe
  AJ0cV9+pk/vqEgbv8ipKU4iniZclhg==
 
---------------5uo5LdgF4MPTS00KvZHLvr22
+--------------G0JvZwgtTRxodCW5E3gU3OkR
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: base64
 
-T24gMy8xNi8yNiAxMjo0NiBQTSwgU3RlZmFuIE1ldHptYWNoZXIgd3JvdGU6DQo+PiBUaG91
-Z2h0cz8gQW0gSSBtaXNzaW5nIHNvbWV0aGluZz8NCj4gDQo+IEkgdGhpbmsgaXQncyB0aGUg
-am9iIG9mIHRoZSBjbGllbnQgdG8gY29vcmRpbmF0ZSBpdHMgbG9jYWwgcHJvY2Vzc2VzLg0K
-DQpXZWxsLCBmb3IgV2luZG93cyB0byBXaW5kb3dzIHRoZXJlIGlzIGFjdHVhbGx5IG5vIHBy
-b2JsZW0gd2l0aCB0aGUgDQpsb2NraW5nIHNlbWFudGljcyBhbmQgbm8gbmVlZCB0byBjb29y
-ZGluYXRlLCBhcyBmb3IgV2luZG93cyB0aGUgc2ltcGxlIA0KcnVsZSBmcm9tIE1TLUZTQSAy
-LjEuNS41ICJTZXJ2ZXIgUmVxdWVzdHMgQ2xvc2luZyBhbiBPcGVuIiB3b3JrcyBqdXN0IGZp
-bmU6DQotLS04PC0tLQ0KQWxsIGVsZW1lbnRzIGZyb20gT3Blbi5TdHJlYW0uQnl0ZVJhbmdl
-TG9ja0xpc3Qgd2hlcmUgDQpCeXRlUmFuZ2VMb2NrLk93bmVyT3BlbiA9PSBPcGVuIE1VU1Qg
-YmUgcmVtb3ZlZC4NCi0tLTg8LS0tDQoNClRoZSBwcm9ibGVtIG9ubHkgZXhpc3RzIGlmIHdl
-IHdhbnRlZCB0byBoYXZlIFBPU0lYIGxvY2sgc2VtYW50aWNzIG92ZXIgU01CLg0KDQo+IEkg
-Z3Vlc3MgdGhlIGNsaWVudCBjYW4gaGF2ZSBqdXN0IGEgc2luZ2xlIG9wZW4gdG8gdGhlIHNl
-cnZlciBmb3IgbG9jYWwgDQo+IGZkMSBhbmQgZmQyLA0KPiBidXQgaW4gdGhlIGVuZCBpdCdz
-IGEgbG9jYWwgcHJvYmxlbSBvbiB0aGUgY2xpZW50Lg0KDQpKdXN0IGNoZWNrZWQgd2l0aCBh
-IHNpbXBsZSBwb3dlcnNoZWxsIHNjcmlwdCBmcm9tIGEgV2luZG93cyBjbGllbnQgZG9pbmcg
-DQp0d28gb3BlbnMgb24gdGhlIHNhbWUgZmlsZTogYm90aCBvcGVucyBhcmUgc2VudCB0byB0
-aGUgc2VydmVyLg0KDQpJdCdzIG5vdCBhIGNsaWVudCBwcm9ibGVtIGFzIFdpbmRvd3MgY2xp
-ZW50IGRvbid0IGhhdmUgYSBwcm9ibGVtLi4uDQoNCkFsc28sIHJldXNpbmcgb3BlbnMgbG9j
-YWxseSBvbiB0aGUgY2xpZW50IGlzIG9ubHkgcG9zc2libGUgZm9yIA0KY29tcGF0aWJsZSBv
-cGVucy4NCg0KPiBJIGd1ZXNzIGEgV2luZG93cyBjbGllbnQgaGFzIHRvIHNvbHZlIHNpbWls
-YXIgcHJvYmxlbXMgd2l0aCBtdWx0aXBsZQ0KPiBhcHBsaWNhdGlvbnMgcnVubmluZy4NCg0K
-Tm8sIHRoYXQncyB0aGUgcG9pbnQsIFdpbmRvd3MgbG9jayBqdXN0IGRvbid0IHN1ZmZlciBm
-cm9tIHRoZSBwcm9ibGVtLg0KDQpUaGlua2luZyBhIGJpdCBtb3JlIGFib3V0IE9GRCBsb2Nr
-czogSSdtIG5vdCBzdXJlIHdoeSBJIHdhcyB0aGlua2luZyANCnRoYXQgaXQgd291bGQgYWxz
-byBub3QgYmUgcG9zc2libGUgdG8gaW1wbGVtZW50IE9GRCBsb2NrcyBiZWhhdmlvdXIgb3Zl
-ciANCnB1cmUgU01CMiB3aXRob3V0IGV4dGVuc2lvbnMsIHdpdGggc29tZSBzZXJ2ZXIgb3Ig
-Y2xpZW50IHNpZGUgZXh0cmEgDQpoYW5kbGluZyBvZiBsb2NrIHR5cGUgY29udmVyc2lvbiwg
-c3BsaXR0aW5nLCBzaHJpbmtpbmcsIG9yIGNvYWxlc2NpbmcgDQp3aXRoIGFuIGV4aXN0aW5n
-IGxvY2suDQo=
+T24gMy8xNi8yNiAzOjQ5IFBNLCBTdGV2ZSBGcmVuY2ggd3JvdGU6DQo+Pj4gVGhvdWdodHM/
+IEFtIEkgbWlzc2luZyBzb21ldGhpbmc/DQo+Pg0KPj4gSSB0aGluayBpdCdzIHRoZSBqb2Ig
+b2YgdGhlIGNsaWVudCB0byBjb29yZGluYXRlIGl0cyBsb2NhbCBwcm9jZXNzZXMuDQo+IA0K
+PiBZZXMuDQoNCk5vLiA6KSBBcyBkZXNjcmliZWQgaW4gdGhlIG90aGVyIG1haWwgSSBqdXN0
+IHNlbmQ6IGZvciBXaW5kb3dzIHRoZXJlJ3MgDQpubyBwcm9ibGVtIGF0IGFsbCwgc28gV2lu
+ZG93cyBjbGllbnQgZG9lc24ndCBkbyBhbnkgImNvb3JkaW5hdGlvbiIuDQoNCkkgZ3Vlc3Mg
+YSBjbGllbnQgbWlnaHQgYmUgYWxsb3dlZCB0byAib3B0aW1pemUiIGJ5IHJlc3Vpbmcgb3Bl
+bnMsIGJ1dCANCnRoYXQncyBhIGRpZmZlcmVudCBzdG9yeS4gQXMgc29vbiBhcyB5b3UgaGF2
+ZSBpbmNvbXBhdGlibGUgb3BlbnMsIHNheSANCm9uZSByZWFkLW9ubHkgYW5kIGEgc2Vjb25k
+IHJlYWQtd3JpdGUsIHlvdSBjYW4ndCByZXVzZS4NCg0KPiBCdXQgaXQgd291bGQgYmUgZ29v
+ZCB0byBoYXZlIGEgdGVzdCBjYXNlIHRvIHJlcHJvIHRoaXMgdG8gbWFrZQ0KPiBzdXJlIGNs
+aWVudCBkb2VzIHByb3BlciBiZWhhdmlvci4gIEluIG1hbnkgY2FzZXMgdGhlIGNsaWVudCB3
+aWxsIHJldXNlDQo+IHRoZSBzYW1lIG9wZW4gaGFuZGxlIGZvciBtdWx0aXBsZSBwcm9jZXNz
+ZXMsIGJ1dCBpbiBjYXNlcyB3aGVyZSB3ZQ0KPiBoYXZlIHR3byBoYW5kbGVzIG9wZW4sIGl0
+IHdvdWxkIGJlIGdvb2QgdG8gaGF2ZSBhIHRlc3QgY2FzZSB0byByZXBybw0KPiB0aGlzLg0K
+DQpUZXN0Y2FzZToNCi0gY29ubmVjdCB0byBzZXJ2ZXIgd2l0aCBTTUIzIFBPU0lYDQotIDFz
+dCBvcGVuIHdpdGggT19SRE9OTFkNCi0gMm5kIG9wZW4gd2l0aCBPX1JEV1IgKHRvIGJ5cGFz
+cyBhbnkgcG9zc2libGUgY2xpZW50IHNpZGUgb3BlbiByZXVzZSkNCi0gcGxhY2Ugc2hhcmVk
+IGxvY2sgcmFuZ2UgWzAsMV0gb24gMXN0IG9wZW4NCi0gcGxhY2UgZXhjbHVzaXZlIGxvY2sg
+b24gcmFuZ2UgWzIsM10gb24gMm5kIG9wZW4NCi0gY2xvc2UgMXN0IGhhbmRsZSAoYWNjb3Jk
+aW5nIHRvIFBPU0lYIHRoaXMgc2hvdWxkIGRyb3AgYm90aCBsb2NrcykNCi0gcGxhY2UgZXhj
+bHVzaXZlIGxvY2sgb24gcmFuZ2UgWzAsM10gLT4gc2hvdWxkIHdvcmsNCg0KSSdtIGdvaW5n
+IHRvIGFkZCB0aGlzIGEgdGVzdCB0byB0aGUgU2FtYmEgdGVzdHN1aXRlLCBteSBleHBlY3Rh
+dGlvbiANCmJlaW5nIHRoYXQgaXQgd2lsbCBmYWlsLg0K
 
---------------5uo5LdgF4MPTS00KvZHLvr22--
+--------------G0JvZwgtTRxodCW5E3gU3OkR--
 
---------------6a8FKRQumllM9lA0Px7qfuul
+--------------w8IWnXfCEUXysW3w8pI92lHU
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmm5MQoFAwAAAAAACgkQqh6bcSY5nkae
-Ng/8Db8sO+0uT3f8RbdswUC5ENbYu29xT75QdRdx5/lnzbgTv6kiKobgu4LCvXBHiaS7k3GdQpWH
-FbMYcyF686itUxICad+3JNF0gIwJwcpp2wIgdaRDScwDM9W9RskZn7hH5bmIxDkbZi7RPZ5pqjPW
-t++ag9+YYnkBESgajKu/CK8L3hxs29/HkUshgG6yLIi13OXLAE4xEamxC+hkGNE+t/f5fkPT9TnX
-HBLWLsQtGYSxlKtsb5z/+UhUsRXTvvpFm0vWagAwS2bQG4XDwljM1WqL1PMFY/iFcafwi2nmVPf4
-PiY7QfgPEvpGnz+eZ6S4nQY/PXdg4cVMxIYG4Ae48GOQnm34iinI30XPqZjHl8BCu61GKx127Xdz
-0s5A2el8+J2mOlzKTi2aZBKvVVX++HDdfHpLjLmBU/6NZAAxrdxRFI9dOPQcdWKbUMRrIixhI9K4
-K38Wjztsmr0nEOpdnfMq7uKoTonZ2lfniBM2RNK3+1QCpE6hkZmuxlJZzWjPjen7V1ZoD5cUhjMN
-WY+h+Mn3HwNvHCf0w74sJN6s32QreuHimwU5TrdqHeiYcsCoIvOX8ZjZRQNVnHhJQfwEfCQgHvk3
-vGKBgJF7CCbd9JPZHu9iXvO/KFNXTH3MOm+P7+s0cVY2P6nSsUOGgwO3t4k47gcOkaZlva9jE6Ss
-+WY=
-=K3hg
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmm5MswFAwAAAAAACgkQqh6bcSY5nkZ6
+pxAAuU+OoxS895dV2vvoNoGKEXy0c8IJ1GFvc1w+5RNZC+nZkWqAPnUG8EnIzzSPVevBvWTY7BW3
+dyNXHnpL9RN/oHb4orETvL6Mk+RTN51m/szBIJJ6Zp+8gnSE05rb4bpdrxh1L9K+YK+tqTRSliPU
+NghH4qkJ9uTML3+uqdlY25A6GVl/MXMoEqjPOcth7ELjxPsF1y6gb5Nb4U6p5DODuV4M/eKdtIXq
+vgmbsdBNEeD4u8WReVKbyC3sppYuO/wTCmPf+HDl73Ibjrgkcrdwa5oC2h+bETGeJzvvhaB6l6tr
+MgfryO1IvhYnA55/MQShSUP5LwuyT1GruaMmUlj7KSfXeXuOj+ZrUBoAoP8v68Z/yDkxoAzNWErJ
+a0+c7qxCOdt6KWD9sq8DjICGa2rC915OwO/DHWRdWsg3ZfPg+lLCS0MFh5RAXX4/qswoiokWTVJi
+84+MJa5dD79GYb7drPxdqwo3rGobH9q1SZOP58pgC/DXlm6gDBV+nORLovyAgGASbG0z4lxs50rl
+V0lZna1fZLrLe11k3HEZqvECj6wm1Mgv823gY4CNpwwtm9VuuBpabYY7L56Wj/NaAGNRbvWP7CZD
+N8JKgiDO/q7gzZFZrVL22hwDqLwDnhrBEpkoAUeg0gk+ykqZM0jAmC0gMRLm0Nn81wL048Dg5qcb
+URI=
+=JBLl
 -----END PGP SIGNATURE-----
 
---------------6a8FKRQumllM9lA0Px7qfuul--
+--------------w8IWnXfCEUXysW3w8pI92lHU--
