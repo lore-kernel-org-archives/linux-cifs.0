@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D4329D26C;
-	Tue, 17 Mar 2026 17:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EB52D739D;
+	Tue, 17 Mar 2026 17:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773767040; cv=none; b=cWYEV+Ydu8bD0iLSBwcq3lV6CHOe6g6LbSSGVNsuCX3NNLDMQqmdWP92o+puGOG5eHxEHTsITpVP4NlrrH0WxSrPu4VqMAhVWWIuikxz7+2LhTF1HFWilwnfLJ1VBQa14o1/aGW+CxypgCVm4Hdd04IeLQy6wAraexCkgyBda7I=
+	t=1773768473; cv=none; b=FSoUG/+SL5KnPO0CAG+wJcr4DBPuJ2I+UpDn0Na+FA2G47nC2ZNm1jNrV+5vF2LZtAfoL7Y2qYgPilgvZLfVNjxW4mmYAFDaD55ksIytaMG4rr4leRRsRSXVIiA3Vh+zvx41Bu+oSejpj04Rs4lGmIfWFpI9K/mA5IMiuWXovaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773767040; c=relaxed/simple;
-	bh=FpdbZxCluD+KeMnkeK/dRWuH9GYMfMu8evtSHGhJe+I=;
+	s=arc-20240116; t=1773768473; c=relaxed/simple;
+	bh=Dy/Y9mGI74ppeMnFnT4oEzeXIOlALgkKDus/fiuuleY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zn3MfZJUP9te2ioDFQsm1idQjlAX1fskrP8NIgwpG6jIHDbWVvCmWhTz6syufoKyeXj3fe+/icPefSMNVFRWEDtOxHRIT8/RJ9B1x7f9MkW0+Hb3g/qN7U3ToN1b6UfMkJ7zWSVhAITpRurleHlb0NNH5ewyhnUNrlcA+pwK7s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=obQxks29; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=kqXaP7pw6vDffPxWBJi3m7OZ8iXR+KoG/aMdz8hzkavtPVN6T2G0G9H10geEjRjG4e+sc2SjsAzCRY9z3ERQ0t6/IwZJiy8L/ExKvoSI16ccSAeMDv8jQ6A3hHMOIe6/WlUrv6NbaUUcn69gAoBl5D0Wo/4GOw1/ER2EqNgcx6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ndszbEAR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="obQxks29"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B270C4CEF7;
-	Tue, 17 Mar 2026 17:04:00 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ndszbEAR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4472DC2BC86;
+	Tue, 17 Mar 2026 17:27:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1773767040;
-	bh=FpdbZxCluD+KeMnkeK/dRWuH9GYMfMu8evtSHGhJe+I=;
+	s=korg; t=1773768473;
+	bh=Dy/Y9mGI74ppeMnFnT4oEzeXIOlALgkKDus/fiuuleY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=obQxks29zPIAExVST5TIq87bD1+cRC4OILXNzGilKDk8h8hxJyEKtnE3qlnt5tWyu
-	 i5ILn5TPY+dkhrpA3Phfp7bZvVFlEw4EvOsz+pLch5vQz8d2IGTfrajXpmoaqn6G//
-	 npA4s1WisFVa4Sm8KybaY4kHO3ISo6TbSj/jZ24A=
+	b=ndszbEARsFSWcVrTRMtpZU7Jcqd8F+3aHPQI2dsoqdRNj+uENjeReIR8iA34p2wZX
+	 QnskyRXIx94/eKzFMG8e5fzf3yAlQYSubVtNNmWJoEsXC2PuynZpbqQNKQQwZJGI6C
+	 u2hdwvOkCNfVxqneIjuuMsnV/8WCtzUaOXjYHD8Q=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -33,12 +33,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Tom Talpey <tom@talpey.com>,
 	linux-cifs@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.19 338/378] smb: client: fix atomic open with O_DIRECT & O_SYNC
-Date: Tue, 17 Mar 2026 17:34:55 +0100
-Message-ID: <20260317163019.417166820@linuxfoundation.org>
+Subject: [PATCH 6.18 284/333] smb: client: fix atomic open with O_DIRECT & O_SYNC
+Date: Tue, 17 Mar 2026 17:35:13 +0100
+Message-ID: <20260317163009.922481556@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260317163006.959177102@linuxfoundation.org>
-References: <20260317163006.959177102@linuxfoundation.org>
+In-Reply-To: <20260317162959.345812316@linuxfoundation.org>
+References: <20260317162959.345812316@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -50,7 +50,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.19-stable review patch.  If anyone has any objections, please let me know.
+6.18-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -91,9 +91,9 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  #include "cifs_fs_sb.h"
  #include "cifsacl.h"
  #include <crypto/internal/hash.h>
-@@ -2313,4 +2314,14 @@ static inline void cifs_requeue_server_r
- 	queue_delayed_work(cifsiod_wq, &server->reconnect, delay * HZ);
- }
+@@ -2396,4 +2397,14 @@ static inline void mid_execute_callback(
+ 	 (le32_to_cpu((tcon)->fsAttrInfo.Attributes) & \
+ 	  FILE_SUPPORTS_REPARSE_POINTS))
  
 +static inline int cifs_open_create_options(unsigned int oflags, int opts)
 +{
@@ -118,7 +118,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	 * ATTR_READONLY on the create call
 --- a/fs/smb/client/file.c
 +++ b/fs/smb/client/file.c
-@@ -585,15 +585,8 @@ static int cifs_nt_open(const char *full
+@@ -584,15 +584,8 @@ static int cifs_nt_open(const char *full
   *********************************************************************/
  
  	disposition = cifs_get_disposition(f_flags);
@@ -135,7 +135,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  
  retry_open:
  	oparms = (struct cifs_open_parms) {
-@@ -1319,13 +1312,8 @@ cifs_reopen_file(struct cifsFileInfo *cf
+@@ -1318,13 +1311,8 @@ cifs_reopen_file(struct cifsFileInfo *cf
  		rdwr_for_fscache = 1;
  
  	desired_access = cifs_convert_flags(cfile->f_flags, rdwr_for_fscache);
