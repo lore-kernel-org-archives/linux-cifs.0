@@ -1,99 +1,102 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C566F3161AD
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Mar 2026 09:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD5E35CB7C;
+	Tue, 17 Mar 2026 09:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773738157; cv=none; b=KQ+oJiIJDXrRDYuN9Pf/Mw65kZDBETtpMQGRGgaykZ2zKX8OZey5SZToNyH/JN+zrypLt62sovaxPAU4JVwlOj8FgB2jA7TN2MvEj2+xLkdTKy/AMH5pp1DLpDRADridz5IMxBOvOLN5ardMjoIJ/411Loffve76+7YGUKZtrh8=
+	t=1773738857; cv=none; b=TeXRv+etojWGSqkWM5J3Zi+KIihLsMDtF+aHSlIeb3WNcY17xe2Ew97b/fVOleaqO1+4e6q5qYwGuDf0aq/V71LCRb22dSt+6Icr9eU348UlociuXgFZVv0jEh3ujTPpmI5HZVdnThQZlfeaOyUIH0k9wYyzC9gkXG3ZsS0hop4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773738157; c=relaxed/simple;
-	bh=yqTJ23dKSy6Nh/uIVMWFKumxKskfHqIYpyxcji9osxs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fCthGC5pg/NkolvW4NqUokeEIAQj7dEgMsUcHno6mcax+s2U1nQ/VHjNNccmu5++9/LNbUsLmuyn/JPqzJQwRmwBknIyw8h5oKm7co27vOPCknc5HOO/JfyNRCuJ8wxa2wyfDOh11I05ftk8ZjAcnqcVfeWWqAoqyQ1Nkkfj7FY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=MZsZKApG; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1773738857; c=relaxed/simple;
+	bh=VqaxHKKej1VPNV8dxEaXOdj9pYOUPcwOgCKCVcNAmMk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o+w9ywUJYisoJ+bQZEOhuvinjKlipVFntneZ8+CU+pfkXNMlpzRjn+ojEFMUT/3hbYyhoaAJwXAfVqs6/sSLVOfGKduiIrxZZ7rkzGbzb+mwkR0PLfVmdKoi4Vy1B8gu+4BfZZRUNyN7or2sMIoQ9Wd5+VeZMKZrYkc0PFrcj+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D2rc01gu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="MZsZKApG"
-Message-ID: <308acd9f-58d9-4519-aaa6-be96f140177d@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1773738142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZqUY9RnKKpOusO8pFUS3/6tqJB0ZpbCTtFL2PSpto4E=;
-	b=MZsZKApG/PvzuJAetbjZnAC3redAkZl/JYEl/TdCxjpmQrnTBZPp0pgHP0Ztz4RGblAWmT
-	uV1dWL1mfrt4wZ/vA+XdOHQZ4kldYGwkIvQGpha77Ao29EsesFI97LvG2W/K/dxmS+3E2r
-	U2Nh2wik3oDg+leXdzi5iY9oMgZ0iQN/rzrDrvoVlBb9G1UYDSDURzlkzhiOp8hV+kMGlN
-	WHAOlzsV6WeI/0jZ6crOVvFZj1FgAawrP74YeuqtKOt4NDcKsZXH4O/+69XJj06D5Ki2L/
-	p/JOoXagOAAeB9VwrLQnZlqcBQAwhn3iR2BJn1mI9Ev5mHM0ePuf5quWLv7wvg==
-Date: Tue, 17 Mar 2026 17:01:31 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D2rc01gu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C69EEC4CEF7;
+	Tue, 17 Mar 2026 09:14:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773738856;
+	bh=VqaxHKKej1VPNV8dxEaXOdj9pYOUPcwOgCKCVcNAmMk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=D2rc01guiw9Cpys9eOyvTfYMYhUXyqWFR22DiHTmUiGXY0YS9Z2+lIoJQzFsPuGYc
+	 6ssP+5IMaxl0RfuzBfH4ByEZVINpBQ2amGQu+pv3jPhUOjGgEHA6t/PNDhRPBH+kYd
+	 QheyiFU22YkTa24E3P/SZVbV8+zz+KPyqDx4Od6WnTYDcA6ZsLU+wka2TEZqle54iG
+	 V2Oa43NXgpUNu6F8Fap2EQVbCm17uGiW5pPfHjn/SORnHV4mHj5DTyT5HjHWzqfCoR
+	 EXxotjwvhj9jPx1jdoKv3QF6pn/kHi1GDuRFwb9E793qc14KYZv8aTVX6KzBXDJOp8
+	 w0Dy0QKxcnasQ==
+Date: Tue, 17 Mar 2026 11:14:11 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Yury Norov <ynorov@nvidia.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Yury Norov <yury.norov@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-kernel@vger.kernel.org,
+	kexec@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-spi@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Mark Brown <broonie@kernel.org>, Steve French <sfrench@samba.org>,
+	Alexander Graf <graf@amazon.com>, Mike Rapoport <rppt@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>
+Subject: Re: [PATCH] lib: count_zeros: fix 32/64-bit inconsistency in
+ count_trailing_zeros()
+Message-ID: <20260317091411.GQ61385@unreal>
+References: <20260312230817.372878-1-ynorov@nvidia.com>
+ <20260313171855.GA1744604@nvidia.com>
+ <abRUGVW6ZuGioa4Z@yury>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] ksmbd: fix memory leaks and NULL deref in smb2_lock()
-To: Werner Kasselman <werner@verivus.ai>, Namjae Jeon
- <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey
- <tom@talpey.com>, "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>
-References: <20260317080835.1947664-1-werner@verivus.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260317080835.1947664-1-werner@verivus.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abRUGVW6ZuGioa4Z@yury>
 
-Hi Werner,
+On Fri, Mar 13, 2026 at 02:14:49PM -0400, Yury Norov wrote:
+> On Fri, Mar 13, 2026 at 02:18:55PM -0300, Jason Gunthorpe wrote:
+> > On Thu, Mar 12, 2026 at 07:08:16PM -0400, Yury Norov wrote:
+> > > Based on 'sizeof(x) == 4' condition, in 32-bit case the function is wired
+> > > to ffs(), while in 64-bit case to __ffs(). The difference is substantial:
+> > > ffs(x) == __ffs(x) + 1. Also, ffs(0) == 0, while __ffs(0) is undefined.
+> > > 
+> > > The 32-bit behaviour is inconsistent with the function description, so it
+> > > needs to get fixed.
+> > > 
+> > > There are 9 individual users for the function in 6 different subsystems.
+> > > Some arches and drivers are 64-bit only:
+> > >  - arch/loongarch/kvm/intc/eiointc.c;
+> > >  - drivers/hv/mshv_vtl_main.c;
+> > >  - kernel/liveupdate/kexec_handover.c;
+> > > 
+> > > The others are:
+> > >  - ib_umem_find_best_pgsz(): as per comment, __ffs() should be correct;
+> > 
+> > So long as 32 bit works the same as 64 bit it is correct for ib
+> 
+> This is what the patch does, except that it doesn't account for the
+> word length. In you case, 'mask' is dma_addr_t, which is u32 or u64
+> depending ARCH_DMA_ADDR_T_64BIT.
+> 
+> This config is:
+> 
+>         config ARCH_DMA_ADDR_T_64BIT
+>                 def_bool 64BIT || PHYS_ADDR_T_64BIT
+> 
+> And PHYS_ADDR_T_64BIT is simply def_bool 64BIT. So, at least now
+> dma_addr_t simply follows unsigned long, and thus, the patch is
+> correct. But IDK what's the history behind this configurations.
+> 
+> Anyways, the patch aligns 32-bit count_trailing_zeros() with the
+> 64-bit one. If you OK with that, as you said, can you please send
+> an explicit ack?
 
-It might be better to move `locks_free_lock()` and `kfree()` to before 
-`if (!rc)` statement.
-
-```
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -7579,14 +7579,15 @@ int smb2_lock(struct ksmbd_work *work)
-                 rc = vfs_lock_file(filp, smb_lock->cmd, flock, NULL);
-  skip:
-                 if (smb_lock->flags & SMB2_LOCKFLAG_UNLOCK) {
-+                       locks_free_lock(flock);
-+                       kfree(smb_lock);
-                         if (!rc) {
-                                 ksmbd_debug(SMB, "File unlocked\n");
-                         } else if (rc == -ENOENT) {
-                                 rsp->hdr.Status = STATUS_NOT_LOCKED;
-+                               err = rc;
-                                 goto out;
-                         }
--                       locks_free_lock(flock);
--                       kfree(smb_lock);
-                 } else {
-                         if (rc == FILE_LOCK_DEFERRED) {
-                                 void **argv;
-```
+I can do that, 32 bits architectures are rarely used in the IB world.
 
 Thanks,
-ChenXiaoSong <chenxiaosong@kylinos.cn>
-
-On 3/17/26 16:08, Werner Kasselman wrote:
-> --- a/fs/smb/server/smb2pdu.c
-> +++ b/fs/smb/server/smb2pdu.c
-> @@ -7583,6 +7583,9 @@ int smb2_lock(struct ksmbd_work *work)
->   				ksmbd_debug(SMB, "File unlocked\n");
->   			} else if (rc == -ENOENT) {
->   				rsp->hdr.Status = STATUS_NOT_LOCKED;
-> +				locks_free_lock(flock);
-> +				kfree(smb_lock);
-> +				err = -ENOENT;
->   				goto out;
->   			}
->   			locks_free_lock(flock);
-
+Acked-by: Leon Romanovsky <leon@kernel.org>
