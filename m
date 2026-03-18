@@ -1,96 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1B022B584
-	for <linux-cifs@vger.kernel.org>; Wed, 18 Mar 2026 01:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075042264A8
+	for <linux-cifs@vger.kernel.org>; Wed, 18 Mar 2026 01:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773795991; cv=none; b=tgenklEBtuIFXvLu/H7YZf/bR6VnsTLCrVJHxXzWpp7Wc3ZJmTlejSj6mAwRGRJIeBjE/cWFxjlQegA03XJdpIquFOZek1q1YhO+BfpWlclgtnzi5kaBhtehxG3ZET12fMqo0esXMBcsyxiCeS/MJpXkdHV1b3H7c8YeLcteM18=
+	t=1773796054; cv=none; b=ZA2SYmE4Ss/SQ3YaL5HeLJpXMMQ6ffKM+ej0bivbeGIA/M7PfoY/WpQ1i1iyIBZOu1PKW8lm5yLyL0B3/i0dEbaZgBLM4fltIEmZ2wMiiSYU3Tpk3896/gTr0YJZrWVfbvKs8VJFHWJoJBHp8tjGY5jO4r1B8NS8MgbrZOt2drk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773795991; c=relaxed/simple;
-	bh=keebvrsQ3OBWSNrMfbTJBtQ11kyCtS7uTdhCEXjCWD4=;
+	s=arc-20240116; t=1773796054; c=relaxed/simple;
+	bh=5L2HrBeDgS3IjdtBDs5XNbBpQa3jsl53WayKF9yDnAE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UgfPkI/vJq1UV1mtz2Hi098FgNPfrG8C4QZ2creqe5rFNko2LrfwW/b1yXmZVdJwqtZz4HRRIi1hufhCgmr43PdMVkJ82CnO+tZo3EKPzgzxWfrDVHIJXlSUIrFcdtbRa0AgZVMI8Uffg+K034rPVl2fkHMQzveavuNvPVhBiVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oy+J0caO; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=Tsv/h3bdBxyoQ5LAjgAXr3Xi/BTTzxqx4xm5jwVH50Nefb0jKND6vbsHUtpjj/TMXB6IVE2Vakx7dpVSWFss2FeCKD9b7g7ca6MIHU74UvV5yH02h5aP6pyl3hVJrHdzmvAhimjsZfgwdmoTVsYO3aACU1RhFJf0223WxpYZdws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BCISaDPd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oy+J0caO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7E03C2BCB1
-	for <linux-cifs@vger.kernel.org>; Wed, 18 Mar 2026 01:06:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BCISaDPd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE1A5C19424
+	for <linux-cifs@vger.kernel.org>; Wed, 18 Mar 2026 01:07:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773795990;
-	bh=keebvrsQ3OBWSNrMfbTJBtQ11kyCtS7uTdhCEXjCWD4=;
+	s=k20201202; t=1773796053;
+	bh=5L2HrBeDgS3IjdtBDs5XNbBpQa3jsl53WayKF9yDnAE=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Oy+J0caOvEOJDSlc/H0HWRZclIPK+he2LpUtMxw+1CoDlJqwEsByJYBpgbcuYVZwz
-	 mwMWakKwhOTjh3TAOPlXrK23vxmkC+oC/TQoe4tHpK6kRhQzWCwFr18TgWlokttO02
-	 oZ/RutHQticxOvcqucRaOYt5jb8x87KpYb8vYUyJmZgOkEIFpVlDe1CLUxl+N6Gvk7
-	 wohbD6exL/qE9LQAwhIr7SmZP6dJd4meHLAMByJitgTPHLrjpgeqvkhrSkBgCfTrHH
-	 m4FgF9reEqtoctvKmPyUFarrkpI1iWso68QlqA+KQNtZp8QgFa/gjAcC3KW0yS6ZlO
-	 U53LOEfkVwzmA==
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-664f8bef4e7so4487125a12.3
-        for <linux-cifs@vger.kernel.org>; Tue, 17 Mar 2026 18:06:30 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVvjpTjekiWgLwFDyWhOeCcrTopW8sXqEpu/+zcF//8yQ4Euj4Mfzmt8t5zlRHl0W6wWW4oHzBxmXku@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMS+kVc4P7wJNLLJEkw+GdaDAljFdaDdti4fo/vgiazsZ/CnSF
-	+pWl1LDRVSNvOJZLUZ+crYeYtz/cO8850QZgQNmKabAcG93DHxFC0jfTpZoBsOi644mVTRGv5Vh
-	lnTde6gkzL4KL52Ly/2po64RmEQTpqc0=
-X-Received: by 2002:a05:6402:444c:b0:661:6cbc:2765 with SMTP id
- 4fb4d7f45d1cf-667b33dfa04mr659678a12.26.1773795989241; Tue, 17 Mar 2026
- 18:06:29 -0700 (PDT)
+	b=BCISaDPdwc99HnHhHQH7vwJeRFEw6VvmEWpqutaDnORjdsHWJdgh0QdMKRtZSMFwR
+	 7m8JyU7A/9x/nNmkiEMPsvnuAon9zHa/dxEwelkHQxjcstlhCy3NY0swXBAdtGd4Cv
+	 01unhrxdhsFNKiAdbvAqTrCtiTEfc3r1Mk3tchY3CnPBvcLOMi0iorVBifJtG0RURr
+	 QjrjS68vTkRch1V/9hqxw83INAhxkxp4YhTxuJthKRX4MslMdvA4zCPy6w/Mnwoljv
+	 f88zI0vj8h9jeKgDYu2boud9XIsAy3/Dfw/+FDaCLBjOci/Yd4Vr/18IwcsPkE7MJw
+	 vDEGoxoGhDMmw==
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-660a293515fso12096049a12.1
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Mar 2026 18:07:33 -0700 (PDT)
+X-Gm-Message-State: AOJu0YwLs4JJmNuD4Apm5kBaSfGZSgr6RkUPVs9BnxjlvOAAArmNrh6L
+	Wb5bkzMrCBXxeO739Fiue1a0j1kKRGHfZQtSKho1CwYmxgBrK0uM5KJD7zv5qORJxYbXdA221zY
+	ZmPKycTAaLtBBoCrD+QORPREsUgi5x8E=
+X-Received: by 2002:a05:6402:4301:b0:665:3438:2735 with SMTP id
+ 4fb4d7f45d1cf-667b1984daemr1060681a12.1.1773796052196; Tue, 17 Mar 2026
+ 18:07:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260317094653.2236624-1-werner@verivus.com>
-In-Reply-To: <20260317094653.2236624-1-werner@verivus.com>
+References: <20260317065253.1743552-1-werner@verivus.com>
+In-Reply-To: <20260317065253.1743552-1-werner@verivus.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 18 Mar 2026 10:06:17 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9ykVO+_xffR=SwWdCf+FScRWnfvRR6xTa9OWgwaXuXcQ@mail.gmail.com>
-X-Gm-Features: AaiRm52Qor9aySSdYVIj8poIP9tGiZ_BnVF2dCThZozx7hSRUxYFKi1EF2J7a1Y
-Message-ID: <CAKYAXd9ykVO+_xffR=SwWdCf+FScRWnfvRR6xTa9OWgwaXuXcQ@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: fix memory leaks and NULL deref in smb2_lock()
+Date: Wed, 18 Mar 2026 10:07:20 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-mw8ZJiRVkFWJgN1HPFVFj8QWgu69q0_GxYSSr8s+18w@mail.gmail.com>
+X-Gm-Features: AaiRm51sakxigjvUSE6xf1rgQc8fpNmQ4fFmlSQ6KG4IMvyu1xYPsvbPCKmli1A
+Message-ID: <CAKYAXd-mw8ZJiRVkFWJgN1HPFVFj8QWgu69q0_GxYSSr8s+18w@mail.gmail.com>
+Subject: Re: [PATCH v3] ksmbd: fix use-after-free and NULL deref in smb_grant_oplock()
 To: Werner Kasselman <werner@verivus.ai>
-Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
+Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, "smfrench@gmail.com" <smfrench@gmail.com>, 
+	"senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, ChenXiaoSong <chenxiaosong@kylinos.cn>
+	"chenxiaosong@chenxiaosong.com" <chenxiaosong@chenxiaosong.com>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 17, 2026 at 6:53=E2=80=AFPM Werner Kasselman <werner@verivus.ai=
+On Tue, Mar 17, 2026 at 3:53=E2=80=AFPM Werner Kasselman <werner@verivus.ai=
 > wrote:
 >
-> smb2_lock() has three error handling issues after list_del() detaches
-> smb_lock from lock_list at no_check_cl:
+> smb_grant_oplock() has two issues in the oplock publication sequence:
 >
-> 1) If vfs_lock_file() returns an unexpected error in the non-UNLOCK
->    path, goto out leaks smb_lock and its flock because the out:
->    handler only iterates lock_list and rollback_list, neither of
->    which contains the detached smb_lock.
+> 1) opinfo is linked into ci->m_op_list (via opinfo_add) before
+>    add_lease_global_list() is called.  If add_lease_global_list()
+>    fails (kmalloc returns NULL), the error path frees the opinfo
+>    via __free_opinfo() while it is still linked in ci->m_op_list.
+>    Concurrent m_op_list readers (opinfo_get_list, or direct iteration
+>    in smb_break_all_levII_oplock) dereference the freed node.
 >
-> 2) If vfs_lock_file() returns -ENOENT in the UNLOCK path, goto out
->    leaks smb_lock and flock for the same reason.  The error code
->    returned to the dispatcher is also stale.
+> 2) opinfo->o_fp is assigned after add_lease_global_list() publishes
+>    the opinfo on the global lease list.  A concurrent
+>    find_same_lease_key() can walk the lease list and dereference
+>    opinfo->o_fp->f_ci while o_fp is still NULL.
 >
-> 3) In the rollback path, smb_flock_init() can return NULL on
->    allocation failure.  The result is dereferenced unconditionally,
->    causing a kernel NULL pointer dereference.  Add a NULL check to
->    prevent the crash and clean up the bookkeeping; the VFS lock
->    itself cannot be rolled back without the allocation and will be
->    released at file or connection teardown.
+> Fix by restructuring the publication sequence to eliminate post-publish
+> failure:
 >
-> Fix cases 1 and 2 by hoisting the locks_free_lock()/kfree() to before
-> the if(!rc) check in the UNLOCK branch so all exit paths share one
-> free site, and by freeing smb_lock and flock before goto out in the
-> non-UNLOCK branch.  Propagate the correct error code in both cases.
-> Fix case 3 by wrapping the VFS unlock in an if(rlock) guard and adding
-> a NULL check for locks_free_lock(rlock) in the shared cleanup.
+> - Set opinfo->o_fp before any list publication (fixes NULL deref).
+> - Preallocate lease_table via alloc_lease_table() before opinfo_add()
+>   so add_lease_global_list() becomes infallible after publication.
+> - Keep the original m_op_list publication order (opinfo_add before
+>   lease list) so concurrent opens via same_client_has_lease() and
+>   opinfo_get_list() still see the in-flight grant.
+> - Use opinfo_put() instead of __free_opinfo() on err_out so that
+>   the RCU-deferred free path is used.
 >
-> Found via call-graph analysis using sqry.
+> This also requires splitting add_lease_global_list() to take a
+> preallocated lease_table and changing its return type from int to void,
+> since it can no longer fail.
 >
 > Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> Fixes: 1dfd062caa16 ("ksmbd: fix use-after-free by using call_rcu() for o=
+plock_info")
 > Cc: stable@vger.kernel.org
-> Suggested-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > Signed-off-by: Werner Kasselman <werner@verivus.com>
 Applied it to #ksmbd-for-next-next.
 Thanks!
