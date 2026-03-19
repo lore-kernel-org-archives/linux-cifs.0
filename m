@@ -1,194 +1,173 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0BD2AD00
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Mar 2026 03:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA2630EF95
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Mar 2026 14:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773891777; cv=none; b=RcmuH4ySN24Xijvr1/zpr151yUpb11IdhZULzuAWxzrLn6jVK/d+AANlCQPw7Lfito+QXVQxtuGH8dgpF4xyZBgaDUmut8/EYahYNW23W5igB28U40EuLqsokCE3ISRkAN4pSoGC5QrnHdez+QAMv9qDNEOJuFQLAT0Nv+BFT8k=
+	t=1773929636; cv=none; b=j5Gd3ykvNx4Le101zCIdW9SfcxuUJLEE5xTjVfW/h01+krb09/ZawvNFu1tJVxbcs5M/1fwY37L6Py/gh5kjTqL/1AtAxAkv0qvMquitAWcAw8GVIkoYmkKXGxQgGZWyYTxTl2RQVAByiqr5XZ9J1WNZoI8Wb7lTNcsqnFxvzIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773891777; c=relaxed/simple;
-	bh=P0aj2xGHyjZVjHhyQOj81jPuzIMbf1y1d7lPD5AsLas=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kWPQMBsgZ7SCEW07gsxuOwYcacWLNogqbfgCPoa730IjPqH27RaE+gw4OVg06SX+rOk6ndkFOub6ZHulHHOIYZ/o4NWPaa4X4scLYxLCkwAc6o1IshJ/r/UPoNORBh/+liybDOV5d3AbCNLD96RY8XYpV/PZOM0wSi1MjduA/pA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=vyWPgLYO; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1773929636; c=relaxed/simple;
+	bh=4zAon2/wL1xkF183JwLxXVvEK05OvlwLI29zwOFhq2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lKQdl5woSmL7s8tx/8sy0HBTpRaDsYwVaSFtL4PY9WlqnGdtcapyddJ4Li9NaoobOHE79mKmli2bFVh/N8ee8M8GDlSXaLPedC+ZZ257S4tutSkeqSN5E9CKzTIG2DbtZpiPEOyr2HkdFHmYMDX4wgD+gxvr0WaxJRKaX9UrvjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=qJFdgiFw; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=4jpB79yc; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=OrcSAEzL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=HXVk5/yP; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="vyWPgLYO"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=PEpGLLg/v6sgnqVGOrJR9Ae81fNokJdDazeO9D9jBlA=; b=vyWPgLYOCHmhQzq86zfUsoQy61
-	7vJobU48mFCJ0O8t08eqeyAADMWDSSydsiUJYXwdKlmn82oYmMBVBDTDkH4rwLNDHhp5fIHE3NHNc
-	JGb8w8amXLMNw9uNo6jjuFzKeAF1NzO53h3HBi0/juBZD43ewJshuiZn6y6wQ8EjqOsR7nmyXVj1e
-	v/qMN2Gp9RrNNpMtCECNEhUcFJ0jlFDQvDe1lRB1dTd5rGMF61F0SpsOCN/a4uaszvMoTeeQaVNIQ
-	uH8RjqL9zEPO12Ttrkd/rdeepSR+0tcvAQMvq30G5oH5pxJGHutR8XzVSTQq7kDeynedkbaT3Vmek
-	VCxs5glg==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
-	id 1w34Hc-00000001BIJ-2dH3;
-	Thu, 19 Mar 2026 00:42:52 -0300
-From: Paulo Alcantara <pc@manguebit.org>
-To: smfrench@gmail.com
-Cc: Shyam Prasad N <sprasad@microsoft.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH v2] smb: client: fix generic/694 due to wrong ->i_blocks
-Date: Thu, 19 Mar 2026 00:42:52 -0300
-Message-ID: <20260319034252.472217-1-pc@manguebit.org>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qJFdgiFw";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="4jpB79yc";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="OrcSAEzL";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="HXVk5/yP"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 233AB5BD4B;
+	Thu, 19 Mar 2026 14:13:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1773929632; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4fUFXPph0d+U/6GDmGbgLZ/FXBjYuxpYsgD69WTKZEc=;
+	b=qJFdgiFwZof840urwELAyJUPmqr5R5KSb1T4rwYuc7bb8XNbCm/kv+M5FkrKSBEOM1bZiu
+	/MGyuwm/OFnFKmJm/t/Uz/+GbEcAEAQCMtEWioCbgwKOh4DWZ0qNVZOg9g66xDY+m4U+fD
+	w9Xqoe30eNI+goFz62hSwZMzWorThdA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1773929632;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4fUFXPph0d+U/6GDmGbgLZ/FXBjYuxpYsgD69WTKZEc=;
+	b=4jpB79ycXSQsxOkgtV3HKUa6Dm/vQ/wRir8pmFsiYnB6qgK3LbPe12RtulXb4tol7/E3ij
+	faYPra8B4GTfZjDQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1773929631; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4fUFXPph0d+U/6GDmGbgLZ/FXBjYuxpYsgD69WTKZEc=;
+	b=OrcSAEzL/6c4UDB40dZmtUkHL2UKN/t418W/3/WLfRE3VUYtttdOTA1LBRs2LexriSZBXr
+	IUCLAcO9QxQoLCNXA0PSitgNb7BC5cuH9t+EXroQLbXGhfbC1mTChSWj64vc6V41FfYy8R
+	mio6pb/J12e+5TPnOnmBoDRex83ce1A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1773929631;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4fUFXPph0d+U/6GDmGbgLZ/FXBjYuxpYsgD69WTKZEc=;
+	b=HXVk5/yPJtxIjyky0dtujMNvVHE9KONXRU8D1O6wb4LBxoqwDaKPYOnkGEkCrYDJmYyVOA
+	klxEA++oJw6AsaAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 14B714273B;
+	Thu, 19 Mar 2026 14:13:51 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id TmUEBZ8EvGlPZwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 19 Mar 2026 14:13:51 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id C850FA0B32; Thu, 19 Mar 2026 15:13:46 +0100 (CET)
+Date: Thu, 19 Mar 2026 15:13:46 +0100
+From: Jan Kara <jack@suse.cz>
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
+	bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
+	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, gfs2@lists.linux.dev, 
+	intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-leds@vger.kernel.org, linux-media@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linux-mm@kvack.org, linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-pm@vger.kernel.org, linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, linux-sound@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, ntfs3@lists.linux.dev, 
+	samba-technical@lists.samba.org, sched-ext@lists.linux.dev, target-devel@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, Jan Kara <jack@suse.com>
+Subject: Re: [PATCH 12/61] quota: Prefer IS_ERR_OR_NULL over manual NULL check
+Message-ID: <ol2d7c5z7yfyuwo5tyfxurgqedruhr6bzmuv37bx5phhrmmoyh@4zjspbtexid3>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+ <20260310-b4-is_err_or_null-v1-12-bd63b656022d@avm.de>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260310-b4-is_err_or_null-v1-12-bd63b656022d@avm.de>
+X-Spam-Score: -2.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ARC_NA(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RLck44p98ib5bmd95s13xxw3gp)];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCPT_COUNT_GT_50(0.00)[55];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email]
+X-Spam-Flag: NO
 
-When updating ->i_size, make sure to always update ->i_blocks as well
-until we query new allocation size from the server.
+On Tue 10-03-26 12:48:38, Philipp Hahn wrote:
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
+> 
+> Change generated with coccinelle.
+> 
+> To: Jan Kara <jack@suse.com>
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
 
-generic/694 was failing because smb3_simple_falloc() was missing the
-update of ->i_blocks after calling cifs_setsize().  So, fix this by
-updating ->i_blocks directly in cifs_setsize(), so all places that
-call it doesn't need to worry about updating ->i_blocks later.
+Thanks for the patch but frankly I find the original variant clearer wrt
+what is going on. So I prefer to keep the code as is.
 
-Reported-by: Shyam Prasad N <sprasad@microsoft.com>
-Closes: https://lore.kernel.org/r/CANT5p=rqgRwaADB=b_PhJkqXjtfq3SFv41SSTXSVEHnuh871pA@mail.gmail.com
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
----
-v1 -> v2:
- - update ->i_blocks under spinlock in cifs_setsize()
- - fixed comment in CIFS_INO_BLOCKS()
- - removed obsolete comment in smb2_duplicate_extents()
+								Honza
 
- fs/smb/client/cifsglob.h |  6 ++++++
- fs/smb/client/file.c     |  1 -
- fs/smb/client/inode.c    | 21 ++++++---------------
- fs/smb/client/smb2ops.c  | 20 ++++----------------
- 4 files changed, 16 insertions(+), 32 deletions(-)
-
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 7877d327dbb0..bc8d002c3847 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -2386,4 +2386,10 @@ static inline int cifs_open_create_options(unsigned int oflags, int opts)
- 	return opts;
- }
- 
-+/*
-+ * The number of blocks is not related to (i_size / i_blksize), but instead
-+ * 512 byte (2**9) size is required for calculating num blocks.
-+ */
-+#define CIFS_INO_BLOCKS(size) ((512 - 1 + (size)) >> 9)
-+
- #endif	/* _CIFS_GLOB_H */
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 27f61fe7e4e2..a69e05f86d7e 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -993,7 +993,6 @@ static int cifs_do_truncate(const unsigned int xid, struct dentry *dentry)
- 		if (!rc) {
- 			netfs_resize_file(&cinode->netfs, 0, true);
- 			cifs_setsize(inode, 0);
--			inode->i_blocks = 0;
- 		}
- 	}
- 	if (cfile)
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 143fa2e665ed..888f9e35f14b 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -219,13 +219,7 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr,
- 	 */
- 	if (is_size_safe_to_change(cifs_i, fattr->cf_eof, from_readdir)) {
- 		i_size_write(inode, fattr->cf_eof);
--
--		/*
--		 * i_blocks is not related to (i_size / i_blksize),
--		 * but instead 512 byte (2**9) size is required for
--		 * calculating num blocks.
--		 */
--		inode->i_blocks = (512 - 1 + fattr->cf_bytes) >> 9;
-+		inode->i_blocks = CIFS_INO_BLOCKS(fattr->cf_bytes);
- 	}
- 
- 	if (S_ISLNK(fattr->cf_mode) && fattr->cf_symlink_target) {
-@@ -3015,6 +3009,11 @@ void cifs_setsize(struct inode *inode, loff_t offset)
- {
- 	spin_lock(&inode->i_lock);
- 	i_size_write(inode, offset);
-+	/*
-+	 * Until we can query the server for actual allocation size,
-+	 * this is best estimate we have for blocks allocated for a file.
-+	 */
-+	inode->i_blocks = CIFS_INO_BLOCKS(offset);
- 	spin_unlock(&inode->i_lock);
- 	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
- 	truncate_pagecache(inode, offset);
-@@ -3087,14 +3086,6 @@ int cifs_file_set_size(const unsigned int xid, struct dentry *dentry,
- 	if (rc == 0) {
- 		netfs_resize_file(&cifsInode->netfs, size, true);
- 		cifs_setsize(inode, size);
--		/*
--		 * i_blocks is not related to (i_size / i_blksize), but instead
--		 * 512 byte (2**9) size is required for calculating num blocks.
--		 * Until we can query the server for actual allocation size,
--		 * this is best estimate we have for blocks allocated for a file
--		 * Number of blocks must be rounded up so size 1 is not 0 blocks
--		 */
--		inode->i_blocks = (512 - 1 + size) >> 9;
- 	}
- 
- 	return rc;
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 98ac4e86bf99..509fcea28a42 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -1497,6 +1497,7 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
- {
- 	struct smb2_file_network_open_info file_inf;
- 	struct inode *inode;
-+	u64 asize;
- 	int rc;
- 
- 	rc = __SMB2_close(xid, tcon, cfile->fid.persistent_fid,
-@@ -1520,14 +1521,9 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
- 		inode_set_atime_to_ts(inode,
- 				      cifs_NTtimeToUnix(file_inf.LastAccessTime));
- 
--	/*
--	 * i_blocks is not related to (i_size / i_blksize),
--	 * but instead 512 byte (2**9) size is required for
--	 * calculating num blocks.
--	 */
--	if (le64_to_cpu(file_inf.AllocationSize) > 4096)
--		inode->i_blocks =
--			(512 - 1 + le64_to_cpu(file_inf.AllocationSize)) >> 9;
-+	asize = le64_to_cpu(file_inf.AllocationSize);
-+	if (asize > 4096)
-+		inode->i_blocks = CIFS_INO_BLOCKS(asize);
- 
- 	/* End of file and Attributes should not have to be updated on close */
- 	spin_unlock(&inode->i_lock);
-@@ -2204,14 +2200,6 @@ smb2_duplicate_extents(const unsigned int xid,
- 		rc = smb2_set_file_size(xid, tcon, trgtfile, dest_off + len, false);
- 		if (rc)
- 			goto duplicate_extents_out;
--
--		/*
--		 * Although also could set plausible allocation size (i_blocks)
--		 * here in addition to setting the file size, in reflink
--		 * it is likely that the target file is sparse. Its allocation
--		 * size will be queried on next revalidate, but it is important
--		 * to make sure that file's cached size is updated immediately
--		 */
- 		netfs_resize_file(netfs_inode(inode), dest_off + len, true);
- 		cifs_setsize(inode, dest_off + len);
- 	}
+> ---
+>  fs/quota/quota.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/quota/quota.c b/fs/quota/quota.c
+> index 33bacd70758007129e0375bab44d7431195ec441..2e09fc247d0cf45b9e83a4f8a0be7ea694c8c2a1 100644
+> --- a/fs/quota/quota.c
+> +++ b/fs/quota/quota.c
+> @@ -965,7 +965,7 @@ SYSCALL_DEFINE4(quotactl, unsigned int, cmd, const char __user *, special,
+>  	else
+>  		drop_super_exclusive(sb);
+>  out:
+> -	if (pathp && !IS_ERR(pathp))
+> +	if (!IS_ERR_OR_NULL(pathp))
+>  		path_put(pathp);
+>  	return ret;
+>  }
+> 
+> -- 
+> 2.43.0
+> 
 -- 
-2.53.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
