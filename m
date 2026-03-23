@@ -1,155 +1,69 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5F63B2FE6;
-	Mon, 23 Mar 2026 14:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B082F399352
+	for <linux-cifs@vger.kernel.org>; Mon, 23 Mar 2026 14:43:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774276886; cv=none; b=JLAOONABD7eRyFdkxJTbjrtrCaBoaOQp5jVNpU3EHCS9W28ektih6I0/CVjUpGe8GbljjFUlHkL4BRB64EFcOiRCM4rD8mdVzG1hX/kkeG9AJnVOIyuQA/DP49zeqI0lphfCEIr8Q65mZgxv+GyO9xZ0+Mbh5ciOqNyy0Cweqoo=
+	t=1774276994; cv=none; b=Lg3o9jo/lA+afrIYJYCeiyZY+m5JhnOjSrkgzd+jznEnV2S1p3toovesUGRC4JWUq21xSKHsv4KBfccYJwYaGDrlmKo08ndu01x2XtB9TAqqn7HApQ5gcYh27N+bxc3TzHBREy9B8rscs2RXrAhOMV0bKlAj+kP3hfjAyySqJ4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774276886; c=relaxed/simple;
-	bh=q+6h79+fnRSqIL+I7ZDJ74tjKWF7O6ydwFQINTbRyUA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SKrlOlB2JOcx6rm+XenZx4ntsmQYnknFpjxJ5IMAycVQFs2V7ocRwXbOjZIkhUbNtZmeXiccospleZ5f0F0TQ0NNQT4iFC61xMDMjDz68xFNasxMQb6P4rHVwdkLrBcNTQJZNynYQkKhVGssdqlrsNw21fEI+p5l9yxj/SM+tkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=yIkjFvRQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774276994; c=relaxed/simple;
+	bh=JxlE8tyZrvnfbFBO0MpUGY0nImU77DWkxB9O0J/TiTY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WH5iwwUm9sCt/YlDMAk2S/gWYkWbq4Vb3mvQtgmNdDrsX93vq9166PeaiKO6szqBjV6q9+ZptZEXbDNHOU3iBd0Hri1gYLHI0D7SOeW5cRUij9+75f6E8PgF76R4WV4aFeMq9KaGLIfn9NsxgC73lTotG6Sn7Tb+FZJkkhSHBRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GW62zH6j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="yIkjFvRQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91F14C4CEF7;
-	Mon, 23 Mar 2026 14:41:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1774276885;
-	bh=q+6h79+fnRSqIL+I7ZDJ74tjKWF7O6ydwFQINTbRyUA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=yIkjFvRQ/DIRVppidYmSkdoeDbkfiGhXShd5WDf7VDTVcbGieab+TO5/Ppvi6Kv2m
-	 Czod6tw3AXU5nVQLTH6gSbxD4ni86KnP6Yqiup7yska/2inAw7HPfYllCsi0Klcb5O
-	 RpFsKk3faG9vgvlMVuzrJ0aJfZd1leFtHZ1oSnKs=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	Henrique Carvalho <henrique.carvalho@suse.com>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.12 197/460] smb: client: fix atomic open with O_DIRECT & O_SYNC
-Date: Mon, 23 Mar 2026 14:43:13 +0100
-Message-ID: <20260323134531.385492098@linuxfoundation.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260323134526.647552166@linuxfoundation.org>
-References: <20260323134526.647552166@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GW62zH6j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E15CC2BC9E
+	for <linux-cifs@vger.kernel.org>; Mon, 23 Mar 2026 14:43:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774276994;
+	bh=JxlE8tyZrvnfbFBO0MpUGY0nImU77DWkxB9O0J/TiTY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=GW62zH6j3TfYSCWjR2VEDpFBOnjh6uHOzjLr52KLP8N1qc0Yq/keb4JpLlNx2mPLf
+	 AocYXrJ9JRpOVY302SFAP26KQXR5hLjjqgk3/wrgCPrxBcd92PUZwq2D+LcvLhnBlL
+	 LyETvh2jihzyLdPUJFRw8peqCivZbpDB6fLG2GOEV2+qUw5PPiW6fXqsjBY8QKuZ3B
+	 QNO0/Bz17I6nE1ieeLkLiUF9VuYeTi/z7s/9lOpFWQUTeWJB+D/0R6hyaCEbgeF9Cq
+	 egfV3vRlVcRa8S7wPYPOy7+2iog4190wwEvHWEOzegfHeHN3/M4vUYpMAlhaZypwfI
+	 FWGJXZ5+AM2Ww==
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-668e8df29b5so282171a12.2
+        for <linux-cifs@vger.kernel.org>; Mon, 23 Mar 2026 07:43:14 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUe9F2a9MO9SCMV116u55ps4wmo6U9IRnvBZpMAvf+oJRVAQu9AMT+OxsgX3/Awm2JreXowNwS8CgGo@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCvoJRroIpt43kpZXW9XOqSofopm9t5Nt9L89n/knZH3s3B5P3
+	YYzMwzUXgONOtQ8NRF35F6x3Io73ccVhMFbBmXTh3Nao2QaAcX9ONIkbct3VfGn+SbK/MU6gp+K
+	vWZI0B90iIQrlAXkKZK6180DKvbb0/Yc=
+X-Received: by 2002:a05:6402:5287:b0:668:58b6:505c with SMTP id
+ 4fb4d7f45d1cf-668c9b3b2famr8559139a12.30.1774276993063; Mon, 23 Mar 2026
+ 07:43:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <202603180118.ClDWNtId-lkp@intel.com> <b859bfa1-7844-4b23-91a4-bbd526ffc19b@samba.org>
+ <CAH2r5mvvjWtJza+9YrLYvneysyEQa5rENhTYiFTAwrE+KhOy8Q@mail.gmail.com>
+In-Reply-To: <CAH2r5mvvjWtJza+9YrLYvneysyEQa5rENhTYiFTAwrE+KhOy8Q@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Mon, 23 Mar 2026 23:43:00 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_yLYLD5SsRUZy8d6u7vknTPuN8Cbe11HJt0Eq6bLzBBw@mail.gmail.com>
+X-Gm-Features: AQROBzDEQtvFmOi3srkmFwcUQgteSrrJ0KUFogU3fX2lCQFsAO1qj222hHE8nqY
+Message-ID: <CAKYAXd_yLYLD5SsRUZy8d6u7vknTPuN8Cbe11HJt0Eq6bLzBBw@mail.gmail.com>
+Subject: Re: [samba-ksmbd:ksmbd-for-next-next 11/12] fs/smb/server/smb2pdu.c:5723:3:
+ warning: variable 'pntsd' is uninitialized when used here
+To: Steve French <smfrench@gmail.com>
+Cc: Stefan Metzmacher <metze@samba.org>, Asim Viladi Oglu Manizada <manizada@pm.me>, kernel test robot <lkp@intel.com>, 
+	llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, 
+	Steve French <stfrench@microsoft.com>, 
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
-
-------------------
-
-From: Paulo Alcantara <pc@manguebit.org>
-
-commit 4a7d2729dc99437dbb880a64c47828c0d191b308 upstream.
-
-When user application requests O_DIRECT|O_SYNC along with O_CREAT on
-open(2), CREATE_NO_BUFFER and CREATE_WRITE_THROUGH bits were missed in
-CREATE request when performing an atomic open, thus leading to
-potentially data integrity issues.
-
-Fix this by setting those missing bits in CREATE request when
-O_DIRECT|O_SYNC has been specified in cifs_do_create().
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Reviewed-by: David Howells <dhowells@redhat.com>
-Acked-by: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: stable@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/smb/client/cifsglob.h |   11 +++++++++++
- fs/smb/client/dir.c      |    1 +
- fs/smb/client/file.c     |   18 +++---------------
- 3 files changed, 15 insertions(+), 15 deletions(-)
-
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -20,6 +20,7 @@
- #include <linux/utsname.h>
- #include <linux/sched/mm.h>
- #include <linux/netfs.h>
-+#include <linux/fcntl.h>
- #include "cifs_fs_sb.h"
- #include "cifsacl.h"
- #include <crypto/internal/hash.h>
-@@ -2317,4 +2318,14 @@ static inline bool cifs_ses_exiting(stru
- 	return ret;
- }
- 
-+static inline int cifs_open_create_options(unsigned int oflags, int opts)
-+{
-+	/* O_SYNC also has bit for O_DSYNC so following check picks up either */
-+	if (oflags & O_SYNC)
-+		opts |= CREATE_WRITE_THROUGH;
-+	if (oflags & O_DIRECT)
-+		opts |= CREATE_NO_BUFFER;
-+	return opts;
-+}
-+
- #endif	/* _CIFS_GLOB_H */
---- a/fs/smb/client/dir.c
-+++ b/fs/smb/client/dir.c
-@@ -304,6 +304,7 @@ static int cifs_do_create(struct inode *
- 		goto out;
- 	}
- 
-+	create_options |= cifs_open_create_options(oflags, create_options);
- 	/*
- 	 * if we're not using unix extensions, see if we need to set
- 	 * ATTR_READONLY on the create call
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -570,15 +570,8 @@ static int cifs_nt_open(const char *full
-  *********************************************************************/
- 
- 	disposition = cifs_get_disposition(f_flags);
--
- 	/* BB pass O_SYNC flag through on file attributes .. BB */
--
--	/* O_SYNC also has bit for O_DSYNC so following check picks up either */
--	if (f_flags & O_SYNC)
--		create_options |= CREATE_WRITE_THROUGH;
--
--	if (f_flags & O_DIRECT)
--		create_options |= CREATE_NO_BUFFER;
-+	create_options |= cifs_open_create_options(f_flags, create_options);
- 
- retry_open:
- 	oparms = (struct cifs_open_parms) {
-@@ -1228,13 +1221,8 @@ cifs_reopen_file(struct cifsFileInfo *cf
- 		rdwr_for_fscache = 1;
- 
- 	desired_access = cifs_convert_flags(cfile->f_flags, rdwr_for_fscache);
--
--	/* O_SYNC also has bit for O_DSYNC so following check picks up either */
--	if (cfile->f_flags & O_SYNC)
--		create_options |= CREATE_WRITE_THROUGH;
--
--	if (cfile->f_flags & O_DIRECT)
--		create_options |= CREATE_NO_BUFFER;
-+	create_options |= cifs_open_create_options(cfile->f_flags,
-+						   create_options);
- 
- 	if (server->ops->get_lease_key)
- 		server->ops->get_lease_key(inode, &cfile->fid);
-
-
+On Mon, Mar 23, 2026 at 10:22=E2=80=AFPM Steve French <smfrench@gmail.com> =
+wrote:
+>
+> looks like a simple fix to initialize it to null at declaration, right?
+It seems this test was performed on an outdated version. The current
+ksmbd-for-next already includes the updated one, so we don't need to
+check it.
+Thanks.
