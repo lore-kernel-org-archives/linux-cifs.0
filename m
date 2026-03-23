@@ -1,119 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F501459FA;
-	Mon, 23 Mar 2026 14:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7C63B2FC2
+	for <linux-cifs@vger.kernel.org>; Mon, 23 Mar 2026 14:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774277098; cv=none; b=rTn2LRmx8+4C4QPKfEiwgW26WMG0J0/UL00kcS/R0V+isNk6EmjLxmZBmbuYKdxvrMyqOnJoV0fq07W3bCeVHiNDKaWuEwzLxNZb4BIYY9Kj76iCVLlu3PeEyYx3y8nXWL7novPAnJyWpW1HWJEFmJDudqTjntODdboay0zKTMw=
+	t=1774277552; cv=none; b=B2M6CQxGORGB6uGzgI7CdsuTBQNUSWr/rPa8S6mQ8MglFlvuCHRtWKw4hbed3qoBWPMlIYQ1mhmHwFlHnKuEM42iaT3CaJ/3eYOZyXLZ17AJfhee7aim66gyjGakp3xTJVzvIgAKnGaOoDrxdR3UM7GsmN4knhgYFl4uWvnqsFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774277098; c=relaxed/simple;
-	bh=uIxKRiC4dMjSYGXiguiT7HM7dG03RRwG0/Ybuk9+fg4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oHrgV4eGErOtJvCa4RZjxpVFMW0dpcYqHpesX8C6/UzsCPHB7Vo/Olb2+kKGzUy8F69aw0xjP/NDUOATgmp3WC+qgJ54R5kX4oqTGln8I848GN8aVl5A7eApWfhiMgVFo119//x4jVt3uAMZZqyUx3r3G/M8Kg69XDSRdnJrMqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=FvRiQlSK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774277552; c=relaxed/simple;
+	bh=KbfctE9xbMaq8z82UyfhfkaRlUugJsUcn7ei3aJP0ck=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cLAKmq4Aa4OmjQvOV5FyAMdCeS3dJ4db+um+rfFzrhJJZC1aG1yvT36Ni4V7rW4IypW4LVlsoQC/Q+F8Fym4tNq/KgIVPNyGSnqjp5xGTwS+2coOHpSDnN3YBxoqlBMjLo4u1+Wi59Bwiv05kBru1KPlHDzH3Tn2JoIn9tuS3sA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=idjAmKJn; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="FvRiQlSK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFB0CC4CEF7;
-	Mon, 23 Mar 2026 14:44:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1774277098;
-	bh=uIxKRiC4dMjSYGXiguiT7HM7dG03RRwG0/Ybuk9+fg4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FvRiQlSKx5xEt6Serodhm3crLMe6/lwBh5IB10jU9Mzk3X9IDJ2LydS2hCx67/Yqh
-	 WjFn4/sESCPEnYq65J6Z+jo1ir3fQkYIaVZD08HDnfiosfZVKRqEoYEBzn0miJMw3w
-	 p647b8M50GqYKSKX/PjWMLu2kyVjiI1X0kkFwsPo=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Oscar Santos <ossantos@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.12 319/460] smb: client: fix krb5 mount with username option
-Date: Mon, 23 Mar 2026 14:45:15 +0100
-Message-ID: <20260323134534.341460540@linuxfoundation.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260323134526.647552166@linuxfoundation.org>
-References: <20260323134526.647552166@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="idjAmKJn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=KbfctE9xbMaq8z82UyfhfkaRlUugJsUcn7ei3aJP0ck=; b=idjAmKJndQK6w0F9Fk3UKCTEXB
+	uD7ZpClad8U/fhD+e7TDHDNe7EQ8M1uyeUJdHjeLkZsnYqsWONaQIhQth/6swG0uHWkelubCBSWee
+	2y+b7Bk2gjaaBhIhh6BdfdnZoCbjj5GxrN+ZaTzyRsTkm1t9GapMCgb/fgVqgZTZzh/3BXCqIhc35
+	p2Lw03TXFWAdlw92Fph4+h0NBTGnMcNwikUDcHNME26WHTa9cHs0kTycJlD3b1pJm4mzPDdEWVrbf
+	L92hS2JrJM4LmNgh1NY7PC2dXRwqEuxSOhf7/6nNYiT2pwvTd9iB37HORc1B1hg1oWxtHw7+rJAJ8
+	EtMhqsToxc3TyFV2VQ18vKku2cCx0SN5++2iiqXddfwWBj0uTkYzEb/UJ8xUd+6ZFNZIj31iIL1+K
+	eFsHuOf4SmWfFR9TekWYT6BD512p/pxl8RVfHr/2Di5BJwb5amio86ZTU7V2OhPEQoQcbX7ljlB1u
+	RGh3ZtTW7YkgW89Sb5BIP+LO;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1w4gdn-000000036Ya-3TjC;
+	Mon, 23 Mar 2026 14:52:27 +0000
+Message-ID: <69c54f80-dff1-4c02-af97-08799fe59b94@samba.org>
+Date: Mon, 23 Mar 2026 15:52:27 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [samba-ksmbd:ksmbd-for-next-next 11/12]
+ fs/smb/server/smb2pdu.c:5723:3: warning: variable 'pntsd' is uninitialized
+ when used here
+To: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>
+Cc: Asim Viladi Oglu Manizada <manizada@pm.me>,
+ kernel test robot <lkp@intel.com>, llvm@lists.linux.dev,
+ oe-kbuild-all@lists.linux.dev, Steve French <stfrench@microsoft.com>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+References: <202603180118.ClDWNtId-lkp@intel.com>
+ <b859bfa1-7844-4b23-91a4-bbd526ffc19b@samba.org>
+ <CAH2r5mvvjWtJza+9YrLYvneysyEQa5rENhTYiFTAwrE+KhOy8Q@mail.gmail.com>
+ <CAKYAXd_yLYLD5SsRUZy8d6u7vknTPuN8Cbe11HJt0Eq6bLzBBw@mail.gmail.com>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <CAKYAXd_yLYLD5SsRUZy8d6u7vknTPuN8Cbe11HJt0Eq6bLzBBw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+Am 23.03.26 um 15:43 schrieb Namjae Jeon:
+> On Mon, Mar 23, 2026 at 10:22 PM Steve French <smfrench@gmail.com> wrote:
+>>
+>> looks like a simple fix to initialize it to null at declaration, right?
+> It seems this test was performed on an outdated version. The current
+> ksmbd-for-next already includes the updated one, so we don't need to
+> check it.
 
-------------------
+For it still happens with the current state:
 
-From: Paulo Alcantara <pc@manguebit.org>
+1ce4e48216b84385319da308f2262eb11ee7e459
+(smfrench-smb3-kernel/ksmbd-for-next) smb: smbdirect: fix inverted comparison operator in negotiation log message
 
-commit 12b4c5d98cd7ca46d5035a57bcd995df614c14e1 upstream.
+And there it's likely:
 
-Customer reported that some of their krb5 mounts were failing against
-a single server as the client was trying to mount the shares with
-wrong credentials.  It turned out the client was reusing SMB session
-from first mount to try mounting the other shares, even though a
-different username= option had been specified to the other mounts.
+6a0795e46296589d8eba6c194586e9e65974d73f
+ksmbd: fix OOB write in QUERY_INFO for compound requests
 
-By using username mount option along with sec=krb5 to search for
-principals from keytab is supported by cifs.upcall(8) since
-cifs-utils-4.8.  So fix this by matching username mount option in
-match_session() even with Kerberos.
+With setting it to NULL the smatch warning goes away.
 
-For example, the second mount below should fail with -ENOKEY as there
-is no 'foobar' principal in keytab (/etc/krb5.keytab).  The client
-ends up reusing SMB session from first mount to perform the second
-one, which is wrong.
-
-```
-$ ktutil
-ktutil:  add_entry -password -p testuser -k 1 -e aes256-cts
-Password for testuser@ZELDA.TEST:
-ktutil:  write_kt /etc/krb5.keytab
-ktutil:  quit
-$ klist -ke
-Keytab name: FILE:/etc/krb5.keytab
-KVNO Principal
- ---- ----------------------------------------------------------------
-   1 testuser@ZELDA.TEST (aes256-cts-hmac-sha1-96)
-$ mount.cifs //w22-root2/scratch /mnt/1 -o sec=krb5,username=testuser
-$ mount.cifs //w22-root2/scratch /mnt/2 -o sec=krb5,username=foobar
-$ mount -t cifs | grep -Po 'username=\K\w+'
-testuser
-testuser
-```
-
-Reported-by: Oscar Santos <ossantos@redhat.com>
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: stable@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/smb/client/connect.c |    4 ++++
- 1 file changed, 4 insertions(+)
-
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -1906,6 +1906,10 @@ static int match_session(struct cifs_ses
- 	case Kerberos:
- 		if (!uid_eq(ctx->cred_uid, ses->cred_uid))
- 			return 0;
-+		if (strncmp(ses->user_name ?: "",
-+			    ctx->username ?: "",
-+			    CIFS_MAX_USERNAME_LEN))
-+			return 0;
- 		break;
- 	case NTLMv2:
- 	case RawNTLMSSP:
-
-
+metze
