@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFD1366570;
-	Mon, 23 Mar 2026 13:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A14A3B0AF7;
+	Mon, 23 Mar 2026 14:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774273837; cv=none; b=ENZMWZEcAkz/14yxOytGTip5zAFPNdFBb0ab1g1KjlVLKFk4RXFUryyZy0QVNFGlW7JpaC/WozAfrY25fdm9ZQfCkKCOOl/yil9Mgs9LdRW9my8ULC9gmm2ft3devhTMPSdStE/vyq3A1bFcXzOrMjMX8u3I24qCRJMQn+XT81M=
+	t=1774274521; cv=none; b=m5vDLL6OMk8JMs0/YcTSG5qb1TRUxRt+6FECrO6++BvalHN0/UhIE+i3+T9bcdbQv1TWL0ynYF0OYmDb5AVLSJNGM9hMi7Th8LLTztlNhGzE9nCWqJIB+1glgz1KtJftZ5JtWnjcWbIVaXCARXuFTU5xWFScq/UCfHGqqHNCGIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774273837; c=relaxed/simple;
-	bh=fM/FHuzAeKcxyNS4YNrbL7z4FP7VvSIqlm4jjzDuLMs=;
+	s=arc-20240116; t=1774274521; c=relaxed/simple;
+	bh=4M4HPMVtqsCt4FMcp2oJ7Pv7Y0hE6P/KXHBqECp74SM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UARAh3+H4wEq07Nw3APjQ5xASrfNchORQ1avCdZp+db+dnjtmf5RFnNNLT2gHcpwQrVf9uHGWZ4sdujwKsdSHaCtOhGvHPl4W+qRvuFT0yGAOjxrtv9vcuU9PQYAMYWEzdNTVLsTw3vIl942PcXsqvRDWW5UMvXNAXPERtLmW+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=RsY0z5Gj; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=l7Amo3Yr40d6vVZLcTl7SIegq0AXQkp8pwtoIL4Mgb71CY/bu6mwM0Sg5z9tyPBuFNa6mn9omlhJN6/83n6fbek8M34aH0qTdtBTc3/BU7GxFjkZfTnXsjcj1R/H1zda2dxuTuK2DETRv8Apsm97B+U6Sn1dPN1gwXjtstz5rv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=nqtfuiCg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="RsY0z5Gj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77774C4CEF7;
-	Mon, 23 Mar 2026 13:50:36 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="nqtfuiCg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0C21C4CEF7;
+	Mon, 23 Mar 2026 14:02:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1774273836;
-	bh=fM/FHuzAeKcxyNS4YNrbL7z4FP7VvSIqlm4jjzDuLMs=;
+	s=korg; t=1774274521;
+	bh=4M4HPMVtqsCt4FMcp2oJ7Pv7Y0hE6P/KXHBqECp74SM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RsY0z5GjUGKFNyiU3PylY+KWh+TDNkObQX1UGa3e2drjF+hgnTqUl91ZtqYDmSbQY
-	 BY9SssAsvSTz6b1ZjaG/VaP7mhPb/1JCTjUObbGs9DNGtssHgxyJvLMQVxLyloP0j+
-	 5pGWdFeWxn6lV2uW9oYjY00x+LUeQ0bllGyCm0Xc=
+	b=nqtfuiCgbPTL+unztELtelzg+xnjrpeoh6UEscVOmK1GCwFGrp8ajJQb/xO/WLLqU
+	 AwgTCaobSgxgTup4M56sY1zpZrEW0bluwjBGt0lpgdZyLYwbDIYREQ9xWVaVCnxzzb
+	 ezXgnFxUrrHa5+w0ReBrkQ4/BUK+w+fwQIa3TzRI=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -32,12 +32,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.19 024/220] smb: client: fix krb5 mount with username option
-Date: Mon, 23 Mar 2026 14:43:21 +0100
-Message-ID: <20260323134505.345160349@linuxfoundation.org>
+Subject: [PATCH 6.18 023/212] smb: client: fix krb5 mount with username option
+Date: Mon, 23 Mar 2026 14:44:04 +0100
+Message-ID: <20260323134504.488442510@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260323134504.575022936@linuxfoundation.org>
-References: <20260323134504.575022936@linuxfoundation.org>
+In-Reply-To: <20260323134503.770111826@linuxfoundation.org>
+References: <20260323134503.770111826@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.19-stable review patch.  If anyone has any objections, please let me know.
+6.18-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -104,7 +104,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/fs/smb/client/connect.c
 +++ b/fs/smb/client/connect.c
-@@ -1952,6 +1952,10 @@ static int match_session(struct cifs_ses
+@@ -1954,6 +1954,10 @@ static int match_session(struct cifs_ses
  	case Kerberos:
  		if (!uid_eq(ctx->cred_uid, ses->cred_uid))
  			return 0;
