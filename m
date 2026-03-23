@@ -1,116 +1,100 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5832F28FF
-	for <linux-cifs@vger.kernel.org>; Mon, 23 Mar 2026 09:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79E21B983F;
+	Mon, 23 Mar 2026 13:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774256926; cv=none; b=pRHdZ8pluIT/xy+7XWmWfAlfnROCRq1t16+zERiofEeSQp4Hn6EZWUJgBaS1wWN8G7bC5ulR0Y3+Cmokh1//scMjU0aLOCaM8xnL4NrHZJuhdWoJOGBaMr4ML9SLlmu3ObuWmy79brmQlKt63QF1qaMCpalYILJH9hCqizAVfR8=
+	t=1774270931; cv=none; b=FFcpr271ArpeyAd16HWeU4Z+Uz3ltn2r/IjhtOjpmyVPT/BNCGF8vWY5gTSDxSWUO+jqzycHAXSloBLlB9raBvXPfcEliG43A5REh91YH95zpDZWDlum1z3kZD/zyX6u7RDribgbhD5XX0INiVnaJR6N+bpDe+u7xHvwjiO7mgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774256926; c=relaxed/simple;
-	bh=2q1v7HMKGNN4tMttPFFVVqzYRID9mWhOedrXWROXxdg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gxBCvWoISbKOyRIbCS5xm+xOr5ddfTJL1heNb21dZQLaPcbI5q6mW9WcubD6A/9v8Dqgkvl9sKirMfqvCniDjTbn8nc8aNAxvEgzLYODa+D1iOlfNaHL6OTDsKlIJI7+Yw+XeJZWM6GZsODcrxthKOqfIdyl0GnCjqPTbY8Iz24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: e11997b2269711f1a21c59e7364eecb8-20260323
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED
-	SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
-	CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
-	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.11,REQID:7f559bc3-1227-49b9-88e1-328c51209e80,IP:15,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-15
-X-CID-INFO: VERSION:1.3.11,REQID:7f559bc3-1227-49b9-88e1-328c51209e80,IP:15,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-15
-X-CID-META: VersionHash:89c9d04,CLOUDID:df98d1e882067e557fde354e737cef48,BulkI
-	D:260323170839666POMG2,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|898
-	,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil
-	,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: e11997b2269711f1a21c59e7364eecb8-20260323
-X-User: hehuiwen@kylinos.cn
-Received: from harry-wujie-series.. [(116.128.244.171)] by mailgw.kylinos.cn
-	(envelope-from <hehuiwen@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 546897551; Mon, 23 Mar 2026 17:08:38 +0800
-From: Huiwen He <hehuiwen@kylinos.cn>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	chenxiaosong@kylinos.cn
-Cc: linux-cifs@vger.kernel.org,
-	Huiwen He <hehuiwen@kylinos.cn>
-Subject: [PATCH] smb/client: ensure smb2_mapping_table rebuild on cmd changes
-Date: Mon, 23 Mar 2026 17:08:12 +0800
-Message-ID: <20260323090812.918663-1-hehuiwen@kylinos.cn>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1774270931; c=relaxed/simple;
+	bh=6/E9/MhBVS2AhC7OkD/9Lcjir86nfpvxA37exMYYIew=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X1pfFJqArO82CGW4oh3GQH9U9joH5djRFYlCccBlKve+ONlN9W7+FAgWUG3zRgF8VCwWBw21jBO2nm+ApQehsVBcKjYktojaWamUOKBEoIJHNfihCgj+fpemWFcxRMb9eVMjGLxzmIAPQ48bRl/OqJ8Zh1oH81POGrnWDG+YO3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=V3bBWxCA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=v462ggz/; arc=none smtp.client-ip=202.12.124.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="V3bBWxCA";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="v462ggz/"
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id 79BC61D001BA;
+	Mon, 23 Mar 2026 09:02:08 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Mon, 23 Mar 2026 09:02:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm1; t=1774270928; x=1774357328; bh=6/E9/MhBVS
+	2AhC7OkD/9Lcjir86nfpvxA37exMYYIew=; b=V3bBWxCA4f8iqYkbXExSk5r0A5
+	IZ38tWXdF7hMpIDyGoutCoBxqwuOQyD/js8Yf/tAytpX6mHBRQ3VFMK7wg5rv/+j
+	hIye/mDdaBWSESHqf6wiVoJW4FJNCo3Aax4NsqeAuCcuS70ESy2+uO5omDEE7AD9
+	RfZGj2XHpWI/F0Jda6hZMu7cvzz9B32mGLb132vNac77ihRh96eSmPNjX+nDVaSu
+	c7bEA6La4EXpUZTa8/0Fa+aY9SFNji3gOg7lrVwVV+iM+GZ8qkqgqR9SVasQOgtw
+	UG2MrTVdOT5gMBci/8syUC/74Zju3QIZVHMciwENMHXLoZJOmypfg8O9ZfIQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1774270928; x=1774357328; bh=6/E9/MhBVS2AhC7OkD/9Lcjir86nfpvxA37
+	exMYYIew=; b=v462ggz/ALoURPRbW/ZvmeZfG7rkUuWP/u/9UExiZtfa4YCMXtY
+	13sOgvlzSSvE0JJlbHaISYnxAdpbMEMaty9c8ZMx3lTbLDiAJtwMwgRr8Q8hkihg
+	RHnwoR3LfnAOgBft0QXlvEUSjX2TfGPi2453Iy1QEVedlDRAV7P5aYjzEUivRSI5
+	xtKiNF3WHW/W/Q1vxQq+Ibq5x7i905/e3DvLW14bH7/esfXreXgPtDPAffrusL80
+	eIalpmm/Vozh6WUkviq97NdarNwb1x0O1aW/6ekqGuMumfaaNmRikI7Gjgk5eNga
+	Ld/SQJsAXvkJY8z83hWPRFOfPGVKLeWB2zA==
+X-ME-Sender: <xms:zznBaY8rrMuZ_AonA5cRGX2nhbtmwoMAS37QRZ7CaWcBxxU-5xgQnA>
+    <xme:zznBaXycoFGRXnJGGR0S8Jdg5X4b3ZtIiU85BnyeQ3wdflhrYJ4g3nf4SZnQ-XC0e
+    axDee5ZbiGZMHW1uh4_r-fU-dFWDbb8sbzv02xjsRa7DPowjw>
+X-ME-Received: <xmr:zznBaVsqFOJs-PqUi8bxqJv_ok1ZoxteQEQtgfeNDVTnPGC-XXIT78U5gdEh>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefudekjeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
+    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepheegvdevvd
+    eljeeugfdtudduhfekledtiefhveejkeejuefhtdeufefhgfehkeetnecuvehluhhsthgv
+    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorghhrd
+    gtohhmpdhnsggprhgtphhtthhopedvtddpmhhouggvpehsmhhtphhouhhtpdhrtghpthht
+    ohepghhhrgguihdrrhgrhhhmvgestggrnhhonhhitggrlhdrtghomhdprhgtphhtthhope
+    hsthgrsghlvgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsfhhrvghn
+    tghhsehsrghmsggrrdhorhhgpdhrtghpthhtohepphgtsegtjhhrrdhniidprhgtphhtth
+    hopehlshgrhhhlsggvrhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepshhprhgrshgr
+    ugesmhhitghrohhsohhfthdrtghomhdprhgtphhtthhopehtohhmsehtrghlphgvhidrtg
+    homhdprhgtphhtthhopegrrghpthgvlhesshhushgvrdgtohhmpdhrtghpthhtoheplhhi
+    nhhugidqtghifhhssehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:zznBae1-liClJARwPuhICmD3-qFtJrDEEgVtR_vNv_hMXyqpndFWGQ>
+    <xmx:zznBaZ4GUx3bxv7O0yD_1Ra7V4hkM1rMEePWYvafeM3KSY3ZnDClGg>
+    <xmx:zznBaYN2xc9pUjCYc9IacA95d1HoxDRm7MmLEXVktmKWeBkLE-SKKw>
+    <xmx:zznBaVEsgFWJjmeSxM_ywu19F42OKailwfTGwrHFu2hLLv8yyro2Xg>
+    <xmx:0DnBabBQzA_jtcFRiElfEmw4d2uF1EsJaN0a0yE-vV_107ivUpxPV8O6>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 23 Mar 2026 09:02:07 -0400 (EDT)
+Date: Mon, 23 Mar 2026 14:01:46 +0100
+From: Greg KH <greg@kroah.com>
+To: Ghadi Elie Rahme <ghadi.rahme@canonical.com>
+Cc: stable@vger.kernel.org, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@cjr.nz>, Ronnie Sahlberg <lsahlber@redhat.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Aurelien Aptel <aaptel@suse.com>, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: Re: [PATCH v2 6.1.y] smb/dfs_cache: Fix NULL pointer dereference on
+ session connection failure
+Message-ID: <2026032339-irate-monsoon-76ce@gregkh>
+References: <20260319144929.455978-1-ghadi.rahme@canonical.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260319144929.455978-1-ghadi.rahme@canonical.com>
 
-The current rule for smb2_mapping_table.c uses `$(call cmd,...)`, which
-fails to track command line modifications in the Makefile (e.g., modifying
-the command to `perl -d` or `perl -w` for debug will not trigger a rebuild)
-and does not generate the required .cmd file for Kbuild.
+On Thu, Mar 19, 2026 at 04:49:29PM +0200, Ghadi Elie Rahme wrote:
+> [ Upstream commit 6916881f443f67f6893b504fa2171468c8aed915 ]
 
-Fix this by transitioning to the standard `$(call if_changed,...)` macro.
-This includes adding the `FORCE` prerequisite and appending the output
-file to the `targets` variable so Kbuild can track it properly.
-
-As a result, Kbuild now automatically handles the cleaning of the
-generated file, allowing us to safely drop the redundant `clean-files`
-assignment.
-
-Fixes: c527e13a7a66 ("cifs: Autogenerate SMB2 error mapping table")
-Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/client/Makefile | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/fs/smb/client/Makefile b/fs/smb/client/Makefile
-index 26b6105f04d1..1a6e1e1c9764 100644
---- a/fs/smb/client/Makefile
-+++ b/fs/smb/client/Makefile
-@@ -48,8 +48,8 @@ cifs-$(CONFIG_CIFS_COMPRESSION) += compress.o compress/lz77.o
- # Build the SMB2 error mapping table from smb2status.h
- #
- $(obj)/smb2_mapping_table.c: $(src)/../common/smb2status.h \
--			    $(src)/gen_smb2_mapping
--	$(call cmd,gen_smb2_mapping)
-+			     $(src)/gen_smb2_mapping FORCE
-+	$(call if_changed,gen_smb2_mapping)
- 
- $(obj)/smb2maperror.o: $(obj)/smb2_mapping_table.c
- 
-@@ -58,4 +58,5 @@ quiet_cmd_gen_smb2_mapping = GEN     $@
- 
- obj-$(CONFIG_SMB_KUNIT_TESTS) += smb2maperror_test.o
- 
--clean-files	+= smb2_mapping_table.c
-+# Let Kbuild handle tracking and cleaning
-+targets += smb2_mapping_table.c
--- 
-2.43.0
+Again, wrong git id :(
 
