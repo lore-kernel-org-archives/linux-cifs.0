@@ -1,80 +1,91 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0457F79CD;
-	Mon, 23 Mar 2026 23:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBB914884C;
+	Tue, 24 Mar 2026 01:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774306996; cv=none; b=LGFIkDMk+gq5+yIsIZXDCugMOWWFd81ehw8UdVwPtRRaZAKrQLzO2L81K8g5cklk05TxzR4CKEQxoZ0ZfQOG4tNKAzK2K9CVKwjn2DmS46qLQqxppd7e3dv/6IowSDzVokhDsyvw+Wrf2n8EtdWN4jTY6QjrCfdynaFB+g8vYZM=
+	t=1774314265; cv=none; b=LYhb6TlFEoJ/1OJkylKFqPeh5lAMiN9gf3vT3bDW6LWVVPxXeR/XKVr2gGl3Yv7BrZU145vB5JlGHxV7CDtryNFJ/JwThcrkN0a42v/0JI6TxDqrYJMWha/+qsvnGoqUhBefGOfhzfgwxwvslaM0ftdntFCNVzBgnpz4dPn19wI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774306996; c=relaxed/simple;
-	bh=o20pGIE6e3zMP2YgHnxdXSPeVmtTzxoaRe/pQHvnMPs=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=W9A3PgQGzGFK2xJpC3ke93mQoWpAf8lfXqUwS+wdzlnSmc87PjH0+6bFYE5iRyKU+879BEnGRN6+Oek1F1LzOMPh9u4js6+r2rOBIb9xAztoLeG9pROPkTAD54TaK9HA5tyiZX4G0lVrNSc+Lzsb9Po8m+cXTRTjbPRjGLPAQOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=z4y3i2gt; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1774314265; c=relaxed/simple;
+	bh=VCBWYnp25rctm2RL0ZGr6yuNE7P6effUaZZkJOEqG4g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ze6ak7qWx8ju/O5oLglZk/wrGd6T96D0LXMWR7ebKFuGovmFtxr5YTm/h3ERHm8/cUdFnCfPto/jy00kFgFU7nx7CoVBS2D2oKAkgP6G6wm2GE8+YCDFOysebAcLyp09wtvgGDFgeu0kN6av7Y4beeBpO/barMyA+cO2FA1/1Ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=EnaS0NnL; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="z4y3i2gt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=SNc5qjc11LF+yDAgvSiAjcDnxKafViW2CPS3X8enE4E=; b=z4y3i2gt++8VjcZHyiUuE0M57y
-	n788P0tl4uKOi3GRE7u1CPqGVgxFJ7e6maKoZ0IcG6+GHUXoTVWwiu3REBDW/9+l/amytRfu6l+LR
-	LEwsCDn73ixnYNXtXyM828t3HYWDAYlA/zl6pPf/h0L9ME7qN7UR/9raR7Kx2flg/3KoJpo6wxroU
-	KEU4fSkH4BiXjNyJ38A6FCKGUHISVn/jWjwJqSL5qX5FAA+MK9RWBSuaZOF4/6r5FeSu7fFLiW1VV
-	Ln7+BpDZx0qkl7rziWByEtCLU5w9pMPQ6mnHpLtWwohrLNLuuL7ZZM28gFubuQTgnApWbqhC1ESEQ
-	Ts/0VmBw==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
-	id 1w4o0q-00000001TOp-3alP;
-	Mon, 23 Mar 2026 19:44:44 -0300
-Message-ID: <63655684a778145167a549b4a6251ccf@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, David Howells
- <dhowells@redhat.com>, Matthew Wilcox <willy@infradead.org>, Christoph
- Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, Leon Romanovsky
- <leon@kernel.org>, Steve French <smfrench@gmail.com>
-Cc: Christian Brauner <christian@brauner.io>, netfs@lists.linux.dev,
- linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
- v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 17/17] netfs: Combine prepare and issue ops and grab
- the buffers on request
-In-Reply-To: <2d8ce118-2f7a-4b7f-8786-4581b29cb74e@chenxiaosong.com>
-References: <20260304140328.112636-1-dhowells@redhat.com>
- <20260304140328.112636-18-dhowells@redhat.com>
- <2d8ce118-2f7a-4b7f-8786-4581b29cb74e@chenxiaosong.com>
-Date: Mon, 23 Mar 2026 19:44:44 -0300
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="EnaS0NnL"
+Message-ID: <a1949f85-2e92-429e-83eb-91a7691b9a9b@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1774314251;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wYB7aOLuuY4WEpXNaPnEw3hBO7I/ba2yl9abrDSlF+4=;
+	b=EnaS0NnL5rSLKHG0i7K4ZsSpjkOYn7Ci9qQB0DaMsPs2Fx0culu8tggklKHwAehxV0IYiC
+	0A8fzr5POg+oSf6E9/PWj5de52Opn5QSxijYOtdOASXrIGzsFWF+tsa1ZHFuN8lCXap9sm
+	JIYPsxKGiU+fU/gaeP7rTX0/mcvxWRFM6tW4wM1KiZB9ephOwsB+POVQNNwzm8r/qWnT0n
+	Rbj5QPmi2EVj+Dm5GRglDmY2muoguEmESvdUqe+ltRm7DA/x4hwKlKxg9FWkluYx7XN8Sd
+	8Ozk6K+9ut95LIqTaeDQvyhqFvyW8RJSg2n36MfRcjXOAhybHNKggI2vkriBcA==
+Date: Tue, 24 Mar 2026 09:03:29 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: [RFC PATCH 17/17] netfs: Combine prepare and issue ops and grab
+ the buffers on request
+To: Paulo Alcantara <pc@manguebit.org>, David Howells <dhowells@redhat.com>,
+ Matthew Wilcox <willy@infradead.org>, Christoph Hellwig <hch@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>, Leon Romanovsky <leon@kernel.org>,
+ Steve French <smfrench@gmail.com>
+Cc: Christian Brauner <christian@brauner.io>, netfs@lists.linux.dev,
+ linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+ linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260304140328.112636-1-dhowells@redhat.com>
+ <20260304140328.112636-18-dhowells@redhat.com>
+ <2d8ce118-2f7a-4b7f-8786-4581b29cb74e@chenxiaosong.com>
+ <63655684a778145167a549b4a6251ccf@manguebit.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <63655684a778145167a549b4a6251ccf@manguebit.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com> writes:
+In netfs_writeback_single(), on the failure path, should we call 
+netfs_put_failed_request() instead of netfs_put_request()?
 
-> --- a/fs/netfs/direct_write.c
-> +++ b/fs/netfs/direct_write.c
-> @@ -161,8 +161,8 @@ static int netfs_unbuffered_write(struct 
-> netfs_io_request *wreq)
->                                          break;
->                                  }
->                                  netfs_put_subrequest(subreq, 
-> netfs_sreq_trace_put_failed);
-> -                               subreq = NULL;
->                                  ret = subreq->error;
-> +                               subreq = NULL;
->                                  goto failed;
+```
+--- a/fs/netfs/write_issue.c
++++ b/fs/netfs/write_issue.c
+@@ -1041,7 +1041,7 @@ int netfs_writeback_single(struct address_space 
+*mapping,
+         return ret;
 
-Thanks for the review.  The above is still broken as it wolud cause an
-UAF on @subreq as we're putting it with netfs_put_subrequest() and then
-dereferencing it afterwards.
+  cleanup_free:
+-       netfs_put_request(wreq, netfs_rreq_trace_put_return);
++       netfs_put_failed_request(wreq, netfs_rreq_trace_put_return);
+  couldnt_start:
+         mutex_unlock(&ictx->wb_lock);
+         _leave(" = %d", ret);
+```
 
-Besides, we could also get rid of 'subreq = NULL' as it is currently a
-no-op -- including in other places.
+Thanks,
+ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Let's wait for next patchset from Dave, though.
+On 3/24/26 06:44, Paulo Alcantara wrote:
+> Thanks for the review.  The above is still broken as it wolud cause an
+> UAF on @subreq as we're putting it with netfs_put_subrequest() and then
+> dereferencing it afterwards.
+> 
+> Besides, we could also get rid of 'subreq = NULL' as it is currently a
+> no-op -- including in other places.
+> 
+> Let's wait for next patchset from Dave, though.
+
