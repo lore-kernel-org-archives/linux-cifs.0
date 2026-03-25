@@ -1,142 +1,147 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C342313546
-	for <linux-cifs@vger.kernel.org>; Wed, 25 Mar 2026 06:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774420080; cv=pass; b=hZ653/vainm6zaujyRPq+sV04Z0SqJYYwpS5FELHBP4HagB1CSdm/tHp7ltZkMHvtTxxs/HHUUOCSoQjyGi+L3WeNCjgo5muEvxXPMGuhev2asU1hznWNDBiGQwRklhznjaS7RS0M+Wy1RbfOx/5vPdE34hMsGdClwCjSPW0scE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774420080; c=relaxed/simple;
-	bh=MJEoW7xmbsgf8ccUD0trvF3J+NKmwZJnCVsuFcirp8c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HAwdxDZzdO2tJad8PmknmSxLJjbIVQfpUxhz3EDBH/2AY7JhkqVLRIlWZ1qJnfM5DAY+1KLZ6Kb/eStWZtkzPrj5bUNems0q+ivJF7/UgGHZSdpt0jQz9eeASF3Kq+CeXpZPUlGM+v1T0dQ4FY3mBYPclwaMqFeakGkN/4hG3Kw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qcRjmzZV; arc=pass smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322513ACA4C
+	for <linux-cifs@vger.kernel.org>; Wed, 25 Mar 2026 13:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774444832; cv=none; b=DoWj14SoXFOQHvMRA48korVk/A723klCexXMviFgXB9R7cW3rGj6ox3H6MV3nK72+y2Zfe5+oKSxdXRNvGDvoe1njW/Gk45D7uVwhqxfffKD+LQISCMD2CtZzFvK1kxmmD3pCiNOnS1d4a09Tvz8quRqoApJ1DViFpBS1jCE5fw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774444832; c=relaxed/simple;
+	bh=LIm0vx3ezpT40Nt6WIr3Wl5X6hPiUESn2FAwHMH30d4=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=CVSO8PeU/BNiqFUSd7vtwrsALMlq3aL4Lgcl1H9st0QZM+a+yscfKNnSkLjPMbt8LGfTH3rkzwx1hMY+OzuYbkAppYlul9wSCfBqCM6mEuxdZ62cgTTCIxCiKYpowIMpHe2bnDc0SiXgecMJKCYLXgnGLy8hI9MhKANWL2J5zN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BJfcGREo; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qcRjmzZV"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-66a851e62c6so391630a12.1
-        for <linux-cifs@vger.kernel.org>; Tue, 24 Mar 2026 23:27:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774420078; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LdGOjBNeWeJHvlv7pCOuxkkDZ84/GKtvLVdOKwJn93Fn9wskHUdHAcVsgsmH4J51K6
-         Ad3GCuvOrRI47WhD5Auue3zISc3C1E63SzHug3rRDn9tr2jtL7vJ8gQMfchRWRoWHekZ
-         gIM7eI2uR6TSSDs+lddEtArI62SP8JHgKXBR6Xh7Rw9ad93OQCDTW5B0WnLj2YM4xGSX
-         unlflqdUQnJTW4dwzJP8IsjYDDt5hv499SnlRtCh7fmUMjTbZoIEmtq+ElK5jIgDxPu+
-         W0RpOOg2x8d7EwopBulgDX4BM2/6TBQcmDr5xcMP/JocIfTdHvfa28GYty26uQzoGGyQ
-         VhcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=M6McgGdWNeUSRU1+qLW5hhdwIQf8ldUK3zxn67ADOeA=;
-        fh=mjbHuUT6L+TcT4hRZ7xS3Tn3Y2zrzo+BC+wEuQ78IdM=;
-        b=AObf13CJ2lhREr3NUrzRXRz8Ql2hySYXmShkzjBCCoMlk6DSZMKiZxokRzfjMOhiNI
-         G+2bcIK1GI/eRFfuljT0O5oIwu+FupGQnbC+IE9aQ/JjSES/2AUfvdBxTWT6AXsYe8GW
-         Rufl4OvjklaW9+6oRxC6nFv4SMsa1q1u7MuiRJgSodZLiBexlVYcxS6OabjvNTwZvJZK
-         OXvX/wyuTR/F1StQpJZsMnGqCeZQ+xD+l20FPubXsMo2f+kE+2J5CgAwtmO3nAJfor6l
-         Ouo+wSt/djKhbZO+70eeZfKc55bem4NHEXlLrB6+3x+b80tm9MD9vK+C5b+DmRj8fp82
-         udGw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774420078; x=1775024878; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M6McgGdWNeUSRU1+qLW5hhdwIQf8ldUK3zxn67ADOeA=;
-        b=qcRjmzZV1DGcFvsPTbcfa9HCjv0r4ugdclPsDRWRWvlZQT7qf1p+lplFTvgVEE7JYH
-         ghKA71R28V7pI32M88GQAexaT+5EToaMyhs3jrDpmdhZJdy5oNt4hcf6TbInyX+zn1bN
-         fosEdPwf0aihSrBLCZQ/Je7R1C+w9EFEWIa9OO3AU5yFmZd6o6M+5VZUAnW6nNbDJTbx
-         rtpk5ob0uz2eZWMPWsMaQhzX0bjwR9pwQaHSqppigWg5UqqP+F9hHkSrOfEu+WKDPb52
-         iYIM1efsZ2KmFOlcBqhd0yt18/cpnVBcbAO6gCh6P7/kKk9J/f01gaakgw0vXZRpJgIi
-         jLvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774420078; x=1775024878;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=M6McgGdWNeUSRU1+qLW5hhdwIQf8ldUK3zxn67ADOeA=;
-        b=I+v+3IWhAuKaVnQ44rsvUJhxvhFDqHgGBFrlpsPPfQHqTM25atUbJ7WD+3Kh8lyJP9
-         OCiQjqhOLDy7PWoXpf3pGkMxFbfD0GksSsvE3vNRhrCbaPBeldT+DOxXikRukdYUR9w5
-         PH41cuRvsWXZqxHliGQ8AzcfOm1J/Xik2IMtuvXv/cBTl1Nu9kLmm8I5YEc54Ld1j5E5
-         0iAuYTsveG39L3vwJzmD+lMscnVv+rvPh0/6KejHRLTls5PiU3DbYchhHFErTPJJrBed
-         cmuIDk43Jdugpv3BuU7aCMjHg12JBswIT5fHg6btszQG+N5EbIZzZRhxY/gkj6pHNXgc
-         K1pw==
-X-Gm-Message-State: AOJu0Yw9QN1xmIpOVJpLpRui4Y35pWvSe73AVe7FRuQp/wsYUHIxYaHE
-	Jp1O3dw06jjiddsGPR9j1Qe4V0mSBYA3FyyDEhRY57pLPKIHQO3BXVADfyHhJ1vfpqo+Lv62rLc
-	B76187o43mW0wEk1OVoKX/W1/HIkw4fg=
-X-Gm-Gg: ATEYQzxX4lYPVAn4BgJm7tsNttCbM4+hX3FF7ORtSTSzybMWDD9M5nCo5dbcopwj5tJ
-	0+YDjOUfhJOZbpwISzGBloKsuLOuobMr1jGH1jdn4MJsj9FtHH0Ld1GiTEQHc5W2F+j0+4Isiyi
-	d1QzCehhiRx9kjlV+HlSMKnwJYYhMrPNS4zC/5snNkYQsC5puAp/+x2MXm8oE2E+GQ3KPGCXyuH
-	4/iiEEsTb2qNtc9w6soUdsU32IVZZEOI0Br1xfPVA5g8Y21L5SgPy1LNl1Wv9rRpR4v3C5zL1Cg
-	3/gJ4kUlvh/mpQ/4BBzZEb1gCoKACnLpCCZQ1xDJOYt9bfI3EHm5hYkscwh7R7iYKh4+oh1bO2t
-	SYHG3Eg==
-X-Received: by 2002:a05:6402:23d8:b0:669:67e7:9243 with SMTP id
- 4fb4d7f45d1cf-66a826ffd29mr1101261a12.25.1774420077624; Tue, 24 Mar 2026
- 23:27:57 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJfcGREo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774444830;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FcixgmRff6ycuFp7NQcqQL9Fn67FcAa60NmIbJumNdA=;
+	b=BJfcGREokRrega09OSz4Prm1qWiZ3my/4vtFxqHFLKKvqvr4JBiY/GLUVnVTKlcd1Bu1Eg
+	giNn9JU/RFneQDgVyG0++EmvNVmXS6RN2i7spJzbAg8uLSiv6j4eqpooLfN0BdbMF3Hgr1
+	lb17NW4xACEtalk8W3LPw0b9d0w/vno=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-60-Bmm2VqMrPdOG5cwt8fGRXA-1; Wed,
+ 25 Mar 2026 09:20:25 -0400
+X-MC-Unique: Bmm2VqMrPdOG5cwt8fGRXA-1
+X-Mimecast-MFC-AGG-ID: Bmm2VqMrPdOG5cwt8fGRXA_1774444824
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A164919146D6;
+	Wed, 25 Mar 2026 13:20:17 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.33.121])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0CC8230002DA;
+	Wed, 25 Mar 2026 13:20:15 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
+    linux-cifs@vger.kernel.org
+Subject: cifs_ses_add_channel() can race with itself
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260306063522.439782-1-rosenp@gmail.com> <CAKYAXd_1WEkL80a_fLR4g7+9ryZRZhNJXtKxQG0UJnifd-y9+Q@mail.gmail.com>
-In-Reply-To: <CAKYAXd_1WEkL80a_fLR4g7+9ryZRZhNJXtKxQG0UJnifd-y9+Q@mail.gmail.com>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Tue, 24 Mar 2026 23:27:46 -0700
-X-Gm-Features: AQROBzCvufYW1IFUKKi4L31QdLKirkufJMjtfLfrtOCbzA3A1hTK49N1Hmkm8UY
-Message-ID: <CAKxU2N8fFHOFSeCvmdPrcZcLrT7BP8+AAauz8e5LQ-8yedJ5+g@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: ipc: use kzalloc_flex and __counted_by
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, Kees Cook <kees@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:KERNEL HARDENING (not covered by other areas):Keyword:b__counted_by(_le|_be)?b" <linux-hardening@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <122436.1774444814.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Mar 2026 13:20:14 +0000
+Message-ID: <122437.1774444814@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tue, Mar 24, 2026 at 11:26=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.org=
-> wrote:
->
-> On Fri, Mar 6, 2026 at 3:35=E2=80=AFPM Rosen Penev <rosenp@gmail.com> wro=
-te:
-> >
-> > The former is just a nice macro and the latter allows runtime analysis
-> > of the allocation and its size.
-> >
-> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> > ---
-> >  fs/smb/server/transport_ipc.c | 5 ++---
-> >  1 file changed, 2 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ip=
-c.c
-> > index 2dbabe2d8005..f7aa427a06fe 100644
-> > --- a/fs/smb/server/transport_ipc.c
-> > +++ b/fs/smb/server/transport_ipc.c
-> > @@ -55,7 +55,7 @@ static bool ksmbd_ipc_validate_version(struct genl_in=
-fo *m)
-> >  struct ksmbd_ipc_msg {
-> >         unsigned int            type;
-> >         unsigned int            sz;
-> > -       unsigned char           payload[];
-> > +       unsigned char           payload[] __counted_by(sz);
-> >  };
-> >
-> >  struct ipc_msg_table_entry {
-> > @@ -242,9 +242,8 @@ static void ipc_update_last_active(void)
-> >  static struct ksmbd_ipc_msg *ipc_msg_alloc(size_t sz)
-> >  {
-> >         struct ksmbd_ipc_msg *msg;
-> > -       size_t msg_sz =3D sz + sizeof(struct ksmbd_ipc_msg);
-> >
-> > -       msg =3D kvzalloc(msg_sz, KSMBD_DEFAULT_GFP);
-> > +       msg =3D kvzalloc_flex(*msg, payload, sz, KSMBD_DEFAULT_GFP);
-> >         if (msg)
-> >                 msg->sz =3D sz;
-> We don't need to manually set msg->sz if the flexible array member is
-> properly annotated with __counted_by(sz) ?
-> kvmalloc_flex() automatically sets the counter via internal
-> __set_flex_counter().
-Needs GCC15.
+Hi Steve,
+
+Whilst running xfstests against cifs, I managed to encounter what I think =
+must
+be due to a race between cifs_ses_add_channel() and itself - presumably by
+concurrent mount type things that share a session.
+
+SO what I saw was this:
+
+    BUG: kernel NULL pointer dereference, address: 0000000000000358
+    ...
+    RIP: 0010:cifs_alloc_hash+0x5/0xd0
+    ...
+    RSP: 0018:ffff88814eb4bdb0 EFLAGS: 00010246
+    RAX: 0000000000000000 RBX: ffff888148804800 RCX: 0000000000000000
+    RDX: 0000000000000000 RSI: 0000000000000358 RDI: ffffffff82c66915
+    RBP: ffff88810ad52000 R08: 0000000000000000 R09: ffff88840fa1bea0
+    R10: 0000000000000006 R11: 00000000000002eb R12: ffff8881488048a0
+    R13: 000000000015681b R14: ffff888148786c00 R15: ffff888148804860
+    FS:  0000000000000000(0000) GS:ffff88848be03000(0000) knlGS:0000000000=
+000000
+    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    CR2: 0000000000000358 CR3: 0000000002e3a002 CR4: 00000000001706f0
+    Call Trace:
+     <TASK>
+     cifs_ses_add_channel+0x39b/0x530
+     cifs_try_adding_channels+0x201/0x2e0
+     mchan_mount_work_fn+0x1d/0x30
+     process_one_work+0x189/0x2b0
+     process_scheduled_works+0x3a/0x50
+     worker_thread+0x13b/0x1d0
+
+Now, the RIP location corresponds to the deref of *sdesc in cifs_alloc_has=
+h(),
+so sdesc (which is 0x358 in RSI) must be based on a NULL pointer.  Looking=
+ at
+cifs_ses_add_channel(), this corresponds to an inlined call to
+smb3_crypto_shash_allocate().  0x358 matches server->secmech.aes_cmac if
+server is NULL:
+
+	(gdb) p &((struct TCP_Server_Info *)0)->secmech.aes_cmac
+	$2 =3D (struct shash_desc **) 0x358
+
+Looking further at cifs_ses_add_channel(), that means chan->server must be
+NULL - but that would seem unlikely, given:
+
+	chan_server =3D cifs_get_tcp_session(ctx, ses->server);
+
+a few lines above:
+
+	rc =3D smb3_crypto_shash_allocate(chan->server);
+
+chan_server got checked for error, but not NULLness, though it doesn't loo=
+k
+like it could be NULL.
+
+However, I note that there's no locking that spans the two lines.  The fir=
+st
+happens under ses->chan_lock and the second under ses->session_mutex, but
+there's nothing to stop another cifs_ses_add_channel() jumping in in the
+meantime and zapping chan->server as there's a gap, be it ever so small, w=
+here
+no lock is held.
+
+Looking further up the stack, this is launched from mount into a workqueue=
+, so
+it's not necessarily inside of any of the mount locking either.  It would =
+seem
+that cifs_try_adding_channels() probably should use some locking, but does=
+ not
+seem to use anything authoritative.
+
+Now this is a lot of surmisation.  It's the only time I've seen this in a =
+lot
+of running xfstests and things on cifs, so it's not especially reproducibl=
+e,
+unfortunately.
+
+Let me know if you have a fix for this!
+
+Thanks,
+David
+
