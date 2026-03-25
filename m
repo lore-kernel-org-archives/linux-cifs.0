@@ -1,64 +1,64 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38AB2DECCB
-	for <linux-cifs@vger.kernel.org>; Wed, 25 Mar 2026 03:49:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625A72EA48F
+	for <linux-cifs@vger.kernel.org>; Wed, 25 Mar 2026 03:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774410575; cv=none; b=ilPE5pNH1JZEcP0OdG2MIrmVUkk+A1FGVIq2ixPmU+rwF5lkRsDOJdx0caFyyxkwMPcN8K/kvu+FNBG/pgCwfeUo8BvxN9VGXz9VLYOMS7pBAoyyynogv5JlHuc/BSmL6R20hyaP0rIdOadve7ervI5eNroWXkWX9wwXh/UPiLA=
+	t=1774410578; cv=none; b=iwzW1t7DI7yrt5+m3SNFNmVrIkkvRKSTzBsdIbUkc4/6hn+EuVnUxexQO4sjG0D7zKyfNuiKO2vK87DYNKsEAGz8NQVRcNALv3gGe1sY/aGomL/sh30ScVc5P07k4344cRSPto6H+XmsBv0+43rxLl1fhxvxz1FxopMLoQfISbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774410575; c=relaxed/simple;
-	bh=DdWhPYVYg1dXbF97aOhWSNizcOULbxASIIHAaNQOK1s=;
+	s=arc-20240116; t=1774410578; c=relaxed/simple;
+	bh=rhjbKjEvvRhLjKryPEE4IvivX2Rr4p7qqUaV4q7ntzk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p2/7C2u0CWsCEFT0aHvtOCSSZBUMTr0j/RxNMfkwpcGr0VztFqoJcjEpThIuCs/FxSKnea0DZdFzM9bbNwDuDT+IUZMOyoRQcq3Hwd5dzyMwTqdPD5rsaBy9uNfJcXqzwNubypkBnb7rUFvpjo2I+iBTHNA/CfJ0mYtPg87U+1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kHR4bipJ; arc=none smtp.client-ip=209.85.160.179
+	 MIME-Version; b=jXRrhcoluH9eyF3H8/bq63F/evSXgTfH2uzXZqEwR7VEl8JnaZy4S7RP1aXeM/Ab9w7pp2omss8EvsnW9OTRX6l1fQtR5NJ9SpvyxhiVrRYXMcQ2sPvi0owpz0jSzB58XCNmW1EGjHSiDo/sYyKCweIAbv1EnRHXxu5jhpBNzNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Il5mdhUd; arc=none smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kHR4bipJ"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-50b2b289925so50607411cf.2
-        for <linux-cifs@vger.kernel.org>; Tue, 24 Mar 2026 20:49:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Il5mdhUd"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5094ba0af1aso50792571cf.0
+        for <linux-cifs@vger.kernel.org>; Tue, 24 Mar 2026 20:49:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774410573; x=1775015373; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774410575; x=1775015375; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KJyg8aJcw9LFWPWD7TLzf+mCZGY5VJ1xgQFI8LxqUH4=;
-        b=kHR4bipJAXdwKcqKQLp60zeWR6bQosCQshHN8Hh1gxhWcT1YRaiY6AUl6v6SIJjdjA
-         Ldq2HKfDd1YEN6X9kR1VUQ/wY3UOFU2Or+8iRT8Ull1BImDoSZF8T3fwG+u+0hEl/xHR
-         K7UIBc5dp6WKH5C7uzf9TI4IaqfGaehjqQUP51zT0zJHBRRGckq7Hqq55VtaS7V1aDpu
-         oxq+Jm8m/KQtLWLSHnbbmStC3CoyImsl4HaV3XOFojCjaN3WWKUvETo8ZwI8kUR/P06y
-         4zR8R4gYuCZ0sMIYJsIw4vyH2sGUlZkOYaqjpQZlqY82O7urB+zWaxiri23U8IGN2arx
-         h3AA==
+        bh=z7ZQtwNLmizfYWqFpNcALcDTpPpUWApC0k3x2CAc1gk=;
+        b=Il5mdhUdCZe0+/CVM5w66B4/FU0LxvnLxu7jCKNLHOx3XjrNNHHHJFoa0dVl3ycow2
+         pgRUbtxqnb8JAf1sFg6uvyP8RPEaExMHdgefU11yVcFconXYtLjpqcn5t5CpJPHYSRDU
+         Ux6vpQBRgBNW4ZcmzWNgjFweJAQ1FwQ59/MXjPOKohAToUHUSOC4o/UK9fic5Z7Wrou/
+         gzylF0VqK/78//GkD0BPj2VBIDiYXb9UUkS7YyzF+XPlmQdSlmj77+HcOfesowiP3XiW
+         6FQf6j3/QFfvk2887Cdi7a9dlevjLfXesPlo0imxs21OX2jV7XjgZF+nobpyGKTvjYSr
+         bPmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774410573; x=1775015373;
+        d=1e100.net; s=20251104; t=1774410575; x=1775015375;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=KJyg8aJcw9LFWPWD7TLzf+mCZGY5VJ1xgQFI8LxqUH4=;
-        b=nzSV4EOqkg36pFnZbZodSs854Y6hrWphAsz4UwCxYbzPpNOQLUJ/dc2ReNYNTTLfqO
-         75AVUAjIwTkGibFc93QXFBrSKnyU0+sufaDYPKsWQrnieV+jFoieoJj8JYXJITtYAA+f
-         zRgmbWcmocmFD+kbU5h94vYxS2Qr3r+s+05v6RFH28WixJ36Nv6XB2y4ymZAGIZihen0
-         tuy/V7lfEaEFJu1Rz+S7KHW7IQffmkBTqAdxzRBnpnjE1hirHEtZwGnTkCAT1WGGtSUp
-         /GbaC7pslYzZwP/dBCu2aG0epQsKvJQTghOOPCaJSZ+9SPiaVHSgKIrtJ0Hg5kkYnDPK
-         kGzA==
-X-Forwarded-Encrypted: i=1; AJvYcCXK5S2Qj92ZkoYhOkbwywyCorXlFJKTuUUqgnAkQaCAtc2jp39qMewkfL1GwTIyFsSb51JdAUCeD4h3@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx09aJbMTV9yyxCw8Z1h5CNLqUQU7LYiG+Cu2wFPHd9o3cdQvXX
-	2SlavzQjObnzQApVc3+k/KYOYLhHnKQI+kVF53YmCM/EJ0m0cu10rZaH
-X-Gm-Gg: ATEYQzzGRJJHeVWhUCKL6w/0IhE9TZOPkLK7NQgovD3o1KD3SghhyzznjpScDXZYjlm
-	jZ9wp7DzZIeqEeGsgPPD0x5lor4MYauNjE2D4V3uKk2f4aSZqhdYwBRmdXBFo3fal9wtIWlqH+5
-	lEx41t+e/NRG42XBAlvMVDXlnzdkp7Qi57/gxMYw9BFlGZkeyoAfs8Fnr2mcbdVi6rdIv8GqKZb
-	ssgTcLO+54y904EU93qXZZTKuWQn1ZDZnM6US++tHBTLLWOX89FtLQkmJZnkDBL9y1snn3Ah31t
-	5m3K8S2hL6HHS12o0sRBNAqY3SYWOPIlrMbKBY0JXF2wweNGoQHvgmbcdSW0ECzfm6ZWoZjX7wR
-	I549msWsgHlnqAc0f9DUElWnyIIxS7M3kjoFCSv5HPK2nPVvCE6RLxlpObJ6ERDFXedlvJyIshA
-	8Hb5yCnfRSRPLYxVtiVgqjZr90QhGMFmosi+9ippZ3BtFi5G4kzhTD2MKuRoT6A8IiqREODkR2w
-	7LjBUC8CS+XefjorsCYBmS55UfWXJDQYDOjREXevuKrXA7mMR6lqyhqfQpeZrIxtcbB6MGH1/v7
-X-Received: by 2002:a05:622a:1997:b0:509:18f4:6dba with SMTP id d75a77b69052e-50b80e72436mr32169601cf.62.1774410572600;
-        Tue, 24 Mar 2026 20:49:32 -0700 (PDT)
+        bh=z7ZQtwNLmizfYWqFpNcALcDTpPpUWApC0k3x2CAc1gk=;
+        b=XiINjxdAPD+vYRz6f7vHw8ShU+inO3+NeE+etwKQ/Dn3w0dzbTfOYmdMd2ttVDqaMd
+         x6jHTUO1ERYH0HMKK/nHjRiiWl0efcVGc0Rl0rOlLgBvHSLEwL+JkD+BExlLgYfvolUm
+         3mPsfCfbO0hEwVVszO1ryFSEtN3F/rbU/Cg/ZZ/iCHoyc+7vMq7b+SPi7u2ZbKDJIg1R
+         TRVOX7wkKX4oqMNKX6MgIosezx4mgLqLttS/asBVTbDYdY1+3VcT6gNC0NCrcca9G4oQ
+         esV2fHjU7fXEmt2qJp3np0WPShtQZwmMYDHtMW/BQu7ltmXT8shUGgQs+rCNppHADfM7
+         QE8A==
+X-Forwarded-Encrypted: i=1; AJvYcCWR/4oe2WSqIMpGgqk8DUCy34Th53/KUgCCDJGW57is0FoVSNwN9LD5zGh6qbkxawaDoTLMwQNTOy9K@vger.kernel.org
+X-Gm-Message-State: AOJu0YxD6ODJdusWFMvkQgG+J0IXG+ttg3cEGhrHbsX3/5SGk0wH2XxN
+	CfuRzVd1ZGJHFxYRS8JRsMJhU/KzxMvjZZiJcjvkjSKz3sKmLmBeM0k1
+X-Gm-Gg: ATEYQzysRn+t8lrp2KN+Fl2EFZyUQG1ZVBeCjGj42RgKuP4vNuBNVkGCgYgaYy8d31Q
+	papNioNne70Zbu1+IIVG57+YcUmjrzvO9HJoXsgDxlG03iW6jLr8KGdi2a3F2QoQJ2mTc1LN6Zp
+	l/8tzWK4JFTGYT+/OM4oNAgvkSh5FG3XgtX/EGQ2xpg7RerpOda6OTfK2I3+pYVIbqFjBGq/Ay7
+	Gj0w+xPP4V7w+CM/zt9CccsJfm84wHMnRkslhKTURuWJrcezxL1NzN2Vwp734klDm7+AoqlBm2J
+	EMwmWG3OEqKW+DY2AXPtnM9EMsNC6IExvxRvcH7og7dRvqJDoIAotpjY8DZ8rtagXYwDqQdIzoK
+	ChWuEH8rqkSGVnj/p2Ob1dgasDSApmOQ17MgppPHEnbLOZy4Jke/kFpwjGTOUK6UZ/onPpl/XIg
+	ttd4iw2HqTKEg2TTHlYkSfyj2Mi+8qtRaXj7+HOrpDp8mi4Q/hBNlUqjPLDxKMK3SByIcwJOa/T
+	+pkkJET7tyqjxVFpXTGGr0uqfmmGRV3GGpx/LMMSwJe9I3IeO4lVZ/Dbd+p0fOVng==
+X-Received: by 2002:a05:622a:164a:b0:509:4e1e:1b9a with SMTP id d75a77b69052e-50b80e45eb4mr29919321cf.54.1774410575084;
+        Tue, 24 Mar 2026 20:49:35 -0700 (PDT)
 Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b36cb2e29sm150093001cf.1.2026.03.24.20.49.29
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b36cb2e29sm150093001cf.1.2026.03.24.20.49.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 20:49:31 -0700 (PDT)
+        Tue, 24 Mar 2026 20:49:34 -0700 (PDT)
 From: Xin Long <lucien.xin@gmail.com>
 To: network dev <netdev@vger.kernel.org>,
 	quic@lists.linux.dev
@@ -95,9 +95,9 @@ Cc: davem@davemloft.net,
 	Daniel Stenberg <daniel@haxx.se>,
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
 	"Marc E . Fiuczynski" <marc@fiuczynski.com>
-Subject: [PATCH net-next v11 04/15] quic: provide family ops for address and protocol
-Date: Tue, 24 Mar 2026 23:47:09 -0400
-Message-ID: <6778c304d0e4c0de3880e8770cea20d5cf2eed1e.1774410440.git.lucien.xin@gmail.com>
+Subject: [PATCH net-next v11 05/15] quic: provide quic.h header files for kernel and userspace
+Date: Tue, 24 Mar 2026 23:47:10 -0400
+Message-ID: <734e985f1b35aa9e5c1631a6cd3bf0e760dd7699.1774410440.git.lucien.xin@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <cover.1774410440.git.lucien.xin@gmail.com>
 References: <cover.1774410440.git.lucien.xin@gmail.com>
@@ -109,491 +109,93 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce QUIC address and protocol family operations to handle IPv4/IPv6
-specifics consistently, similar to SCTP. The new quic_family.{c,h} provide
-helpers for routing, skb transmit handling, address parsing and comparison
-and UDP socket config initializing etc.
+This commit adds quic.h to include/uapi/linux, providing the necessary
+definitions for the QUIC socket API. Exporting this header allows both
+user space applications and kernel subsystems to access QUIC-related
+control messages, socket options, and event/notification interfaces.
 
-This consolidates protocol-family logic and enables cleaner dual-stack
-support in the QUIC socket implementation.
+Since kernel_get/setsockopt() is no longer available to kernel consumers,
+a corresponding internal header, include/linux/quic.h, is added. This
+exposes quic_do_get/setsockopt() to handle QUIC socket options directly
+for kernel subsystems.
 
+Detailed descriptions of these structures are available in [1], and will
+be also provided when adding corresponding socket interfaces in the
+later patches.
+
+[1] https://datatracker.ietf.org/doc/html/draft-lxin-quic-socket-apis
+
+Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Signed-off-by: Thomas Dreibholz <dreibh@simula.no>
 Signed-off-by: Xin Long <lucien.xin@gmail.com>
 Acked-by: Paolo Abeni <pabeni@redhat.com>
 ---
 v2:
-  - Add more checks for addrs in .get_user_addr() and .get_pref_addr().
-  - Consider sk_bound_dev_if in .udp_conf_init() and .flow_route() to
-    support vrf.
-v3:
-  - Remove quic_addr_family/proto_ops abstraction; use if statements to
-    reduce indirect call overhead (suggested by Paolo).
-  - quic_v6_set_sk_addr(): add quic_v6_copy_sk_addr() helper to avoid
-    duplicate code (noted by Paolo).
-  - quic_v4_flow_route(): use flowi4_dscp per latest net-next changes.
+  - Fix a kernel API description warning, found by Jakub.
+  - Replace uintN_t with __uN, capitalize _UAPI_LINUX_QUIC_H, and
+    assign explicit values for QUIC_TRANSPORT_ERROR_ enum in UAPI
+    quic.h, suggested by David Howells.
 v4:
-  - Remove unnecessary _fl variable from flow_route() functions (noted
-    by Paolo).
-  - Fix coding style of ?: operator (noted by Paolo).
+  - Use MSG_QUIC_ prefix for MSG_* flags to avoid conflicts with other
+    protocols, such as MSG_NOTIFICATION in SCTP (reported by Thomas).
+  - Remove QUIC_CONG_ALG_CUBIC; only NEW RENO congestion control is
+    supported in this version.
 v5:
-  - Remove several unused functions from this patch series (suggested by Paolo):
-    * quic_seq_dump_addr()
-    * quic_get_msg_ecn()
-    * quic_get_user_addr()
-    * quic_get_pref_addr()
-    * quic_set_pref_addr()
-    * quic_set_sk_addr()
-    * quic_set_sk_ecn()
-  - Replace the sa->v4/v6.sin_family checks with quic_v4/v6_is_any_addr()
-    in quic_v4/v6_flow_route() (suggested by Paolo).
-  - Introduce quic_v4_match_v6_addr() to simplify family-mismatch checks
-    between sk and addr in quic_v6_cmp_sk_addr() (notied by Paolo).
+  - Add include/linux/quic.h and include/uapi/linux/quic.h to the
+    QUIC PROTOCOL entry in MAINTAINERS.
 v6:
-  - Use udp_hdr(skb) to access UDP header in quic_v4/6_get_msg_addrs(), as
-    transport_header is no longer reset for QUIC.
+  - Fix the copy/pasted the uAPI path for SCTP to the QUIC entry (noted
+    by Jakub).
+v7:
+  - Expose quic_do_get/setsockopt() instead of quic_kernel_get/setsockopt()
+    (suggested by Paolo).
 v10:
-  - Fix argument types passed to ip6_dst_store() in quic_v6_flow_route().
+  - Fix typo: 'extented' -> 'extended' (noted by AI review).
+  - Add comment for inclusion of sys/socket.h in uapi quic.h.
+  - Add uses-libc += linux/quic.h in usr/include/Makefile to fix the new
+    build error.
+  - Delete config from struct quic_sock, its members will be split into
+    other subcomponents in the future patches.
+  - Add explicit reserved fields to multiple structs to account for
+    implicit padding and ensure UAPI stability.
+  - Expand reserved fields in struct transport_param and config, handshake
+    and stream_info to allow future extensions without breaking the UAPI.
 v11:
   - Set maximum line length to 80 characters.
-  - Change return type of quic_is_any_addr() to bool.
-  - Call local_bh_disable() in quic_lower_xmit() because
-    udp(6)_tunnel_xmit_skb() requires a non-preemptible context.
-  - Return a negative errno (-EINVAL) instead of 1 in
-    quic_v4/v6_get_mtu_info().
+  - Drop trailing reserved fields in structs and rely on
+    copy_struct_to/from_user() for extensibility; keep reserved fields
+    in the middle to indicate memory holes.
 ---
- net/quic/Makefile   |   2 +-
- net/quic/family.c   | 402 ++++++++++++++++++++++++++++++++++++++++++++
- net/quic/family.h   |  39 +++++
- net/quic/protocol.c |   2 +-
- net/quic/socket.c   |   6 +-
- net/quic/socket.h   |   1 +
- 6 files changed, 448 insertions(+), 4 deletions(-)
- create mode 100644 net/quic/family.c
- create mode 100644 net/quic/family.h
+ MAINTAINERS               |   2 +
+ include/linux/quic.h      |  22 ++++
+ include/uapi/linux/quic.h | 237 ++++++++++++++++++++++++++++++++++++++
+ net/quic/socket.c         |  36 +++++-
+ net/quic/socket.h         |   1 +
+ usr/include/Makefile      |   1 +
+ 6 files changed, 295 insertions(+), 4 deletions(-)
+ create mode 100644 include/linux/quic.h
+ create mode 100644 include/uapi/linux/quic.h
 
-diff --git a/net/quic/Makefile b/net/quic/Makefile
-index e0067272de7d..13bf4a4e5442 100644
---- a/net/quic/Makefile
-+++ b/net/quic/Makefile
-@@ -5,4 +5,4 @@
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 532030036a8c..271ddf760eb4 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -21901,6 +21901,8 @@ M:	Xin Long <lucien.xin@gmail.com>
+ L:	quic@lists.linux.dev
+ S:	Maintained
+ W:	https://github.com/lxin/quic
++F:	include/linux/quic.h
++F:	include/uapi/linux/quic.h
+ F:	net/quic/
  
- obj-$(CONFIG_IP_QUIC) += quic.o
- 
--quic-y := common.o protocol.o socket.o
-+quic-y := common.o family.o protocol.o socket.o
-diff --git a/net/quic/family.c b/net/quic/family.c
+ RADEON and AMDGPU DRM DRIVERS
+diff --git a/include/linux/quic.h b/include/linux/quic.h
 new file mode 100644
-index 000000000000..c16fffb35d9e
+index 000000000000..4e43d20c9c11
 --- /dev/null
-+++ b/net/quic/family.c
-@@ -0,0 +1,402 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* QUIC kernel implementation
-+ * (C) Copyright Red Hat Corp. 2023
-+ *
-+ * This file is part of the QUIC kernel implementation
-+ *
-+ * Initialization/cleanup for QUIC protocol support.
-+ *
-+ * Written or modified by:
-+ *    Xin Long <lucien.xin@gmail.com>
-+ */
-+
-+#include <net/inet_common.h>
-+#include <net/udp_tunnel.h>
-+#include <linux/icmp.h>
-+
-+#include "common.h"
-+#include "family.h"
-+
-+static bool quic_v4_is_any_addr(union quic_addr *addr)
-+{
-+	return addr->v4.sin_addr.s_addr == htonl(INADDR_ANY);
-+}
-+
-+static bool quic_v6_is_any_addr(union quic_addr *addr)
-+{
-+	return ipv6_addr_any(&addr->v6.sin6_addr);
-+}
-+
-+static void quic_v4_udp_conf_init(struct sock *sk, struct udp_port_cfg *conf,
-+				  union quic_addr *a)
-+{
-+	conf->family = AF_INET;
-+	conf->local_ip.s_addr = a->v4.sin_addr.s_addr;
-+	conf->local_udp_port = a->v4.sin_port;
-+	conf->use_udp6_rx_checksums = true;
-+	conf->bind_ifindex = sk->sk_bound_dev_if;
-+}
-+
-+static void quic_v6_udp_conf_init(struct sock *sk, struct udp_port_cfg *conf,
-+				  union quic_addr *a)
-+{
-+	conf->family = AF_INET6;
-+	conf->local_ip6 = a->v6.sin6_addr;
-+	conf->local_udp_port = a->v6.sin6_port;
-+	conf->use_udp6_rx_checksums = true;
-+	conf->ipv6_v6only = ipv6_only_sock(sk);
-+	conf->bind_ifindex = sk->sk_bound_dev_if;
-+}
-+
-+static int quic_v4_flow_route(struct sock *sk, union quic_addr *da,
-+			      union quic_addr *sa, struct flowi *fl)
-+{
-+	struct flowi4 *fl4;
-+	struct rtable *rt;
-+
-+	if (__sk_dst_check(sk, 0))
-+		return 1;
-+
-+	memset(fl, 0x00, sizeof(*fl));
-+	fl4 = &fl->u.ip4;
-+	fl4->saddr = sa->v4.sin_addr.s_addr;
-+	fl4->fl4_sport = sa->v4.sin_port;
-+	fl4->daddr = da->v4.sin_addr.s_addr;
-+	fl4->fl4_dport = da->v4.sin_port;
-+	fl4->flowi4_proto = IPPROTO_UDP;
-+	fl4->flowi4_oif = sk->sk_bound_dev_if;
-+
-+	fl4->flowi4_scope = ip_sock_rt_scope(sk);
-+	fl4->flowi4_dscp = inet_sk_dscp(inet_sk(sk));
-+
-+	rt = ip_route_output_key(sock_net(sk), fl4);
-+	if (IS_ERR(rt))
-+		return PTR_ERR(rt);
-+
-+	if (quic_v4_is_any_addr(sa)) {
-+		sa->v4.sin_family = AF_INET;
-+		sa->v4.sin_addr.s_addr = fl4->saddr;
-+	}
-+	sk_setup_caps(sk, &rt->dst);
-+	return 0;
-+}
-+
-+static int quic_v6_flow_route(struct sock *sk, union quic_addr *da,
-+			      union quic_addr *sa, struct flowi *fl)
-+{
-+	struct ipv6_pinfo *np = inet6_sk(sk);
-+	struct ip6_flowlabel *flowlabel;
-+	struct dst_entry *dst;
-+	struct flowi6 *fl6;
-+
-+	if (__sk_dst_check(sk, np->dst_cookie))
-+		return 1;
-+
-+	memset(fl, 0x00, sizeof(*fl));
-+	fl6 = &fl->u.ip6;
-+	fl6->saddr = sa->v6.sin6_addr;
-+	fl6->fl6_sport = sa->v6.sin6_port;
-+	fl6->daddr = da->v6.sin6_addr;
-+	fl6->fl6_dport = da->v6.sin6_port;
-+	fl6->flowi6_proto = IPPROTO_UDP;
-+	fl6->flowi6_oif = sk->sk_bound_dev_if;
-+
-+	if (inet6_test_bit(SNDFLOW, sk)) {
-+		fl6->flowlabel = (da->v6.sin6_flowinfo & IPV6_FLOWINFO_MASK);
-+		if (fl6->flowlabel & IPV6_FLOWLABEL_MASK) {
-+			flowlabel = fl6_sock_lookup(sk, fl6->flowlabel);
-+			if (IS_ERR(flowlabel))
-+				return -EINVAL;
-+			fl6_sock_release(flowlabel);
-+		}
-+	}
-+
-+	dst = ip6_dst_lookup_flow(sock_net(sk), sk, fl6, NULL);
-+	if (IS_ERR(dst))
-+		return PTR_ERR(dst);
-+
-+	if (quic_v6_is_any_addr(sa)) {
-+		sa->v6.sin6_family = AF_INET6;
-+		sa->v6.sin6_addr = fl6->saddr;
-+	}
-+	ip6_dst_store(sk, dst, false, false);
-+	return 0;
-+}
-+
-+static void quic_v4_lower_xmit(struct sock *sk, struct sk_buff *skb,
-+			       struct flowi *fl)
-+{
-+	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
-+	u8 tos = (inet_sk(sk)->tos | cb->ecn), ttl;
-+	struct flowi4 *fl4 = &fl->u.ip4;
-+	struct dst_entry *dst;
-+	__be16 df = 0;
-+
-+	pr_debug("%s: skb: %p, len: %d, num: %llu, %pI4:%d -> %pI4:%d\n",
-+		 __func__, skb, skb->len, cb->number, &fl4->saddr,
-+		 ntohs(fl4->fl4_sport), &fl4->daddr, ntohs(fl4->fl4_dport));
-+
-+	dst = sk_dst_get(sk);
-+	if (!dst) {
-+		kfree_skb(skb);
-+		return;
-+	}
-+	if (ip_dont_fragment(sk, dst) && !skb->ignore_df)
-+		df = htons(IP_DF);
-+
-+	ttl = (u8)ip4_dst_hoplimit(dst);
-+	udp_tunnel_xmit_skb((struct rtable *)dst, sk, skb, fl4->saddr,
-+			    fl4->daddr, tos, ttl, df, fl4->fl4_sport,
-+			    fl4->fl4_dport, false, false, 0);
-+}
-+
-+static void quic_v6_lower_xmit(struct sock *sk, struct sk_buff *skb,
-+			       struct flowi *fl)
-+{
-+	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
-+	u8 tc = (inet6_sk(sk)->tclass | cb->ecn), ttl;
-+	struct flowi6 *fl6 = &fl->u.ip6;
-+	struct dst_entry *dst;
-+	__be32 label;
-+
-+	pr_debug("%s: skb: %p, len: %d, num: %llu, %pI6c:%d -> %pI6c:%d\n",
-+		 __func__, skb, skb->len, cb->number, &fl6->saddr,
-+		 ntohs(fl6->fl6_sport), &fl6->daddr, ntohs(fl6->fl6_dport));
-+
-+	dst = sk_dst_get(sk);
-+	if (!dst) {
-+		kfree_skb(skb);
-+		return;
-+	}
-+
-+	ttl = (u8)ip6_dst_hoplimit(dst);
-+	label = ip6_make_flowlabel(sock_net(sk), skb, fl6->flowlabel, true,
-+				   fl6);
-+	udp_tunnel6_xmit_skb(dst, sk, skb, NULL, &fl6->saddr, &fl6->daddr, tc,
-+			     ttl, label, fl6->fl6_sport, fl6->fl6_dport, false,
-+			     0);
-+}
-+
-+static void quic_v4_get_msg_addrs(struct sk_buff *skb, union quic_addr *da,
-+				  union quic_addr *sa)
-+{
-+	struct udphdr *uh = udp_hdr(skb);
-+
-+	sa->v4.sin_family = AF_INET;
-+	sa->v4.sin_port = uh->source;
-+	sa->v4.sin_addr.s_addr = ip_hdr(skb)->saddr;
-+
-+	da->v4.sin_family = AF_INET;
-+	da->v4.sin_port = uh->dest;
-+	da->v4.sin_addr.s_addr = ip_hdr(skb)->daddr;
-+}
-+
-+static void quic_v6_get_msg_addrs(struct sk_buff *skb, union quic_addr *da,
-+				  union quic_addr *sa)
-+{
-+	struct udphdr *uh = udp_hdr(skb);
-+
-+	sa->v6.sin6_family = AF_INET6;
-+	sa->v6.sin6_port = uh->source;
-+	sa->v6.sin6_addr = ipv6_hdr(skb)->saddr;
-+
-+	da->v6.sin6_family = AF_INET6;
-+	da->v6.sin6_port = uh->dest;
-+	da->v6.sin6_addr = ipv6_hdr(skb)->daddr;
-+}
-+
-+static int quic_v4_get_mtu_info(struct sk_buff *skb, u32 *info)
-+{
-+	struct icmphdr *hdr;
-+
-+	hdr = (struct icmphdr *)(skb_network_header(skb) -
-+	      sizeof(struct icmphdr));
-+	if (hdr->type == ICMP_DEST_UNREACH && hdr->code == ICMP_FRAG_NEEDED) {
-+		*info = ntohs(hdr->un.frag.mtu);
-+		return 0;
-+	}
-+
-+	/* Defer other types' processing to UDP error handler. */
-+	return -EINVAL;
-+}
-+
-+static int quic_v6_get_mtu_info(struct sk_buff *skb, u32 *info)
-+{
-+	struct icmp6hdr *hdr;
-+
-+	hdr = (struct icmp6hdr *)(skb_network_header(skb) -
-+	      sizeof(struct icmp6hdr));
-+	if (hdr->icmp6_type == ICMPV6_PKT_TOOBIG) {
-+		*info = ntohl(hdr->icmp6_mtu);
-+		return 0;
-+	}
-+
-+	/* Defer other types' processing to UDP error handler. */
-+	return -EINVAL;
-+}
-+
-+static bool quic_v4_cmp_sk_addr(struct sock *sk, union quic_addr *a,
-+				union quic_addr *addr)
-+{
-+	if (a->v4.sin_port != addr->v4.sin_port)
-+		return false;
-+	if (a->v4.sin_family != addr->v4.sin_family)
-+		return false;
-+	if (a->v4.sin_addr.s_addr == htonl(INADDR_ANY) ||
-+	    addr->v4.sin_addr.s_addr == htonl(INADDR_ANY))
-+		return true;
-+	return a->v4.sin_addr.s_addr == addr->v4.sin_addr.s_addr;
-+}
-+
-+static bool quic_v4_match_v6_addr(union quic_addr *a4, union quic_addr *a6)
-+{
-+	if (ipv6_addr_any(&a6->v6.sin6_addr))
-+		return true;
-+	if (ipv6_addr_v4mapped(&a6->v6.sin6_addr) &&
-+	    a6->v6.sin6_addr.s6_addr32[3] == a4->v4.sin_addr.s_addr)
-+		return true;
-+	return false;
-+}
-+
-+static bool quic_v6_cmp_sk_addr(struct sock *sk, union quic_addr *a,
-+				union quic_addr *addr)
-+{
-+	if (a->v4.sin_port != addr->v4.sin_port)
-+		return false;
-+
-+	if (a->sa.sa_family == AF_INET && addr->sa.sa_family == AF_INET) {
-+		if (a->v4.sin_addr.s_addr == htonl(INADDR_ANY) ||
-+		    addr->v4.sin_addr.s_addr == htonl(INADDR_ANY))
-+			return true;
-+		return a->v4.sin_addr.s_addr == addr->v4.sin_addr.s_addr;
-+	}
-+
-+	if (a->sa.sa_family != addr->sa.sa_family) {
-+		if (ipv6_only_sock(sk))
-+			return false;
-+		if (a->sa.sa_family == AF_INET)
-+			return quic_v4_match_v6_addr(a, addr);
-+		return quic_v4_match_v6_addr(addr, a);
-+	}
-+
-+	if (ipv6_addr_any(&a->v6.sin6_addr) ||
-+	    ipv6_addr_any(&addr->v6.sin6_addr))
-+		return true;
-+	return ipv6_addr_equal(&a->v6.sin6_addr, &addr->v6.sin6_addr);
-+}
-+
-+static int quic_v4_get_sk_addr(struct socket *sock, struct sockaddr *uaddr,
-+			       int peer)
-+{
-+	return inet_getname(sock, uaddr, peer);
-+}
-+
-+static int quic_v6_get_sk_addr(struct socket *sock, struct sockaddr *uaddr,
-+			       int peer)
-+{
-+	union quic_addr *a = quic_addr(uaddr);
-+	int ret;
-+
-+	ret = inet6_getname(sock, uaddr, peer);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (a->sa.sa_family == AF_INET6 &&
-+	    ipv6_addr_v4mapped(&a->v6.sin6_addr)) {
-+		a->v4.sin_family = AF_INET;
-+		a->v4.sin_port = a->v6.sin6_port;
-+		a->v4.sin_addr.s_addr = a->v6.sin6_addr.s6_addr32[3];
-+	}
-+
-+	if (a->sa.sa_family == AF_INET) {
-+		memset(a->v4.sin_zero, 0, sizeof(a->v4.sin_zero));
-+		return sizeof(struct sockaddr_in);
-+	}
-+	return sizeof(struct sockaddr_in6);
-+}
-+
-+#define quic_af_ipv4(a)		((a)->sa.sa_family == AF_INET)
-+
-+u32 quic_encap_len(union quic_addr *a)
-+{
-+	return (quic_af_ipv4(a) ? sizeof(struct iphdr) :
-+				  sizeof(struct ipv6hdr)) +
-+	       sizeof(struct udphdr);
-+}
-+
-+bool quic_is_any_addr(union quic_addr *a)
-+{
-+	return quic_af_ipv4(a) ? quic_v4_is_any_addr(a) :
-+				 quic_v6_is_any_addr(a);
-+}
-+
-+void quic_udp_conf_init(struct sock *sk, struct udp_port_cfg *conf,
-+			union quic_addr *a)
-+{
-+	quic_af_ipv4(a) ? quic_v4_udp_conf_init(sk, conf, a) :
-+			  quic_v6_udp_conf_init(sk, conf, a);
-+}
-+
-+int quic_flow_route(struct sock *sk, union quic_addr *da, union quic_addr *sa,
-+		    struct flowi *fl)
-+{
-+	return quic_af_ipv4(da) ? quic_v4_flow_route(sk, da, sa, fl) :
-+				  quic_v6_flow_route(sk, da, sa, fl);
-+}
-+
-+void quic_lower_xmit(struct sock *sk, struct sk_buff *skb, union quic_addr *da,
-+		     struct flowi *fl)
-+{
-+	local_bh_disable();
-+	quic_af_ipv4(da) ? quic_v4_lower_xmit(sk, skb, fl) :
-+			   quic_v6_lower_xmit(sk, skb, fl);
-+	local_bh_enable();
-+}
-+
-+#define quic_skb_ipv4(skb)	(ip_hdr(skb)->version == 4)
-+
-+void quic_get_msg_addrs(struct sk_buff *skb, union quic_addr *da,
-+			union quic_addr *sa)
-+{
-+	memset(sa, 0, sizeof(*sa));
-+	memset(da, 0, sizeof(*da));
-+	quic_skb_ipv4(skb) ? quic_v4_get_msg_addrs(skb, da, sa) :
-+			     quic_v6_get_msg_addrs(skb, da, sa);
-+}
-+
-+int quic_get_mtu_info(struct sk_buff *skb, u32 *info)
-+{
-+	return quic_skb_ipv4(skb) ? quic_v4_get_mtu_info(skb, info) :
-+				    quic_v6_get_mtu_info(skb, info);
-+}
-+
-+#define quic_pf_ipv4(sk)	((sk)->sk_family == PF_INET)
-+
-+bool quic_cmp_sk_addr(struct sock *sk, union quic_addr *a,
-+		      union quic_addr *addr)
-+{
-+	return quic_pf_ipv4(sk) ? quic_v4_cmp_sk_addr(sk, a, addr) :
-+				  quic_v6_cmp_sk_addr(sk, a, addr);
-+}
-+
-+int quic_get_sk_addr(struct socket *sock, struct sockaddr *a, bool peer)
-+{
-+	return quic_pf_ipv4(sock->sk) ? quic_v4_get_sk_addr(sock, a, peer) :
-+					quic_v6_get_sk_addr(sock, a, peer);
-+}
-+
-+int quic_common_setsockopt(struct sock *sk, int level, int optname,
-+			   sockptr_t optval, unsigned int optlen)
-+{
-+	return quic_pf_ipv4(sk) ?
-+	       ip_setsockopt(sk, level, optname, optval, optlen) :
-+	       ipv6_setsockopt(sk, level, optname, optval, optlen);
-+}
-+
-+int quic_common_getsockopt(struct sock *sk, int level, int optname,
-+			   char __user *optval, int __user *optlen)
-+{
-+	return quic_pf_ipv4(sk) ?
-+	       ip_getsockopt(sk, level, optname, optval, optlen) :
-+	       ipv6_getsockopt(sk, level, optname, optval, optlen);
-+}
-diff --git a/net/quic/family.h b/net/quic/family.h
-new file mode 100644
-index 000000000000..a68356c1ffb5
---- /dev/null
-+++ b/net/quic/family.h
-@@ -0,0 +1,39 @@
++++ b/include/linux/quic.h
+@@ -0,0 +1,22 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/* QUIC kernel implementation
 + * (C) Copyright Red Hat Corp. 2023
@@ -604,84 +206,345 @@ index 000000000000..a68356c1ffb5
 + *    Xin Long <lucien.xin@gmail.com>
 + */
 +
-+#define QUIC_PORT_LEN		2
-+#define QUIC_ADDR4_LEN		4
-+#define QUIC_ADDR6_LEN		16
++#ifndef _LINUX_QUIC_H
++#define _LINUX_QUIC_H
 +
-+#define QUIC_PREF_ADDR_LEN \
-+	(QUIC_ADDR4_LEN + QUIC_PORT_LEN + QUIC_ADDR6_LEN + QUIC_PORT_LEN)
++#include <linux/sockptr.h>
++#include <uapi/linux/quic.h>
 +
-+bool quic_is_any_addr(union quic_addr *a);
-+u32 quic_encap_len(union quic_addr *a);
++int quic_do_setsockopt(struct sock *sk, int optname, sockptr_t optval,
++		       unsigned int optlen);
++int quic_do_getsockopt(struct sock *sk, int optname, sockptr_t optval,
++		       sockptr_t optlen);
 +
-+void quic_lower_xmit(struct sock *sk, struct sk_buff *skb, union quic_addr *da,
-+		     struct flowi *fl);
-+int quic_flow_route(struct sock *sk, union quic_addr *da, union quic_addr *sa,
-+		    struct flowi *fl);
-+void quic_udp_conf_init(struct sock *sk, struct udp_port_cfg *conf,
-+			union quic_addr *a);
++#endif
+diff --git a/include/uapi/linux/quic.h b/include/uapi/linux/quic.h
+new file mode 100644
+index 000000000000..92a0336b9b89
+--- /dev/null
++++ b/include/uapi/linux/quic.h
+@@ -0,0 +1,237 @@
++/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
++/* QUIC kernel implementation
++ * (C) Copyright Red Hat Corp. 2023
++ *
++ * This file is part of the QUIC kernel implementation
++ *
++ * Written or modified by:
++ *    Xin Long <lucien.xin@gmail.com>
++ */
 +
-+void quic_get_msg_addrs(struct sk_buff *skb, union quic_addr *da,
-+			union quic_addr *sa);
-+int quic_get_mtu_info(struct sk_buff *skb, u32 *info);
++#ifndef _UAPI_LINUX_QUIC_H
++#define _UAPI_LINUX_QUIC_H
 +
-+bool quic_cmp_sk_addr(struct sock *sk, union quic_addr *a,
-+		      union quic_addr *addr);
-+int quic_get_sk_addr(struct socket *sock, struct sockaddr *a, bool peer);
++#include <linux/types.h>
++#ifdef __KERNEL__
++#include <linux/socket.h>
++#else
++#include <sys/socket.h> /* for MSG_* flags */
++#endif
 +
-+int quic_common_setsockopt(struct sock *sk, int level, int optname,
-+			   sockptr_t optval, unsigned int optlen);
-+int quic_common_getsockopt(struct sock *sk, int level, int optname,
-+			   char __user *optval, int __user *optlen);
-diff --git a/net/quic/protocol.c b/net/quic/protocol.c
-index 807e2a228ba8..c247f00f7ddc 100644
---- a/net/quic/protocol.c
-+++ b/net/quic/protocol.c
-@@ -47,7 +47,7 @@ static int quic_inet_listen(struct socket *sock, int backlog)
- static int quic_inet_getname(struct socket *sock, struct sockaddr *uaddr,
- 			     int peer)
- {
--	return -EOPNOTSUPP;
-+	return quic_get_sk_addr(sock, uaddr, peer);
- }
- 
- static __poll_t quic_inet_poll(struct file *file, struct socket *sock,
++/* NOTE: Structure descriptions are specified in:
++ * https://datatracker.ietf.org/doc/html/draft-lxin-quic-socket-apis
++ */
++
++/* Send or Receive Options APIs */
++enum quic_cmsg_type {
++	QUIC_STREAM_INFO,
++	QUIC_HANDSHAKE_INFO,
++};
++
++#define QUIC_STREAM_TYPE_SERVER_MASK	0x01
++#define QUIC_STREAM_TYPE_UNI_MASK	0x02
++#define QUIC_STREAM_TYPE_MASK		0x03
++
++enum quic_msg_flags {
++	/* flags for stream_flags */
++	MSG_QUIC_STREAM_NEW		= MSG_SYN,
++	MSG_QUIC_STREAM_FIN		= MSG_FIN,
++	MSG_QUIC_STREAM_UNI		= MSG_CONFIRM,
++	MSG_QUIC_STREAM_DONTWAIT	= MSG_WAITFORONE,
++	MSG_QUIC_STREAM_SNDBLOCK	= MSG_ERRQUEUE,
++
++	/* extended flags for msg_flags */
++	MSG_QUIC_DATAGRAM		= MSG_RST,
++	MSG_QUIC_NOTIFICATION		= MSG_MORE,
++};
++
++enum quic_crypto_level {
++	QUIC_CRYPTO_APP,
++	QUIC_CRYPTO_INITIAL,
++	QUIC_CRYPTO_HANDSHAKE,
++	QUIC_CRYPTO_EARLY,
++	QUIC_CRYPTO_MAX,
++};
++
++struct quic_handshake_info {
++	__u8	crypto_level;
++};
++
++struct quic_stream_info {
++	__s64	stream_id;
++	__u32	stream_flags;
++};
++
++/* Socket Options APIs */
++#define QUIC_SOCKOPT_EVENT				0
++#define QUIC_SOCKOPT_STREAM_OPEN			1
++#define QUIC_SOCKOPT_STREAM_RESET			2
++#define QUIC_SOCKOPT_STREAM_STOP_SENDING		3
++#define QUIC_SOCKOPT_CONNECTION_ID			4
++#define QUIC_SOCKOPT_CONNECTION_CLOSE			5
++#define QUIC_SOCKOPT_CONNECTION_MIGRATION		6
++#define QUIC_SOCKOPT_KEY_UPDATE				7
++#define QUIC_SOCKOPT_TRANSPORT_PARAM			8
++#define QUIC_SOCKOPT_CONFIG				9
++#define QUIC_SOCKOPT_TOKEN				10
++#define QUIC_SOCKOPT_ALPN				11
++#define QUIC_SOCKOPT_SESSION_TICKET			12
++#define QUIC_SOCKOPT_CRYPTO_SECRET			13
++#define QUIC_SOCKOPT_TRANSPORT_PARAM_EXT		14
++
++#define QUIC_VERSION_V1			0x1
++#define QUIC_VERSION_V2			0x6b3343cf
++
++struct quic_transport_param {
++	__u8	remote;
++	__u8	disable_active_migration;
++	__u8	grease_quic_bit;
++	__u8	stateless_reset;
++	__u8	disable_1rtt_encryption;
++	__u8	disable_compatible_version;
++	__u8	active_connection_id_limit;
++	__u8	ack_delay_exponent;
++	__u16	max_datagram_frame_size;
++	__u16	max_udp_payload_size;
++	__u32	max_idle_timeout;
++	__u32	max_ack_delay;
++	__u16	max_streams_bidi;
++	__u16	max_streams_uni;
++	__u64	max_data;
++	__u64	max_stream_data_bidi_local;
++	__u64	max_stream_data_bidi_remote;
++	__u64	max_stream_data_uni;
++};
++
++struct quic_config {
++	__u32	version;
++	__u32	plpmtud_probe_interval;
++	__u32	initial_smoothed_rtt;
++	__u32	payload_cipher_type;
++	__u8	congestion_control_algo;
++	__u8	validate_peer_address;
++	__u8	stream_data_nodelay;
++	__u8	receive_session_ticket;
++	__u8	certificate_request;
++};
++
++struct quic_crypto_secret {
++	__u8	send;  /* send or recv */
++	__u8	level; /* crypto level */
++	__u16	reserved;
++	__u32	type; /* TLS_CIPHER_* */
++#define QUIC_CRYPTO_SECRET_BUFFER_SIZE 48
++	__u8	secret[QUIC_CRYPTO_SECRET_BUFFER_SIZE];
++};
++
++enum quic_cong_algo {
++	QUIC_CONG_ALG_RENO,
++	QUIC_CONG_ALG_MAX,
++};
++
++struct quic_errinfo {
++	__s64	stream_id;
++	__u32	errcode;
++};
++
++struct quic_connection_id_info {
++	__u8	dest;
++	__u8	reserved[3];
++	__u32	active;
++	__u32	prior_to;
++};
++
++struct quic_event_option {
++	__u8	type;
++	__u8	on;
++};
++
++/* Event APIs */
++enum quic_event_type {
++	QUIC_EVENT_NONE,
++	QUIC_EVENT_STREAM_UPDATE,
++	QUIC_EVENT_STREAM_MAX_DATA,
++	QUIC_EVENT_STREAM_MAX_STREAM,
++	QUIC_EVENT_CONNECTION_ID,
++	QUIC_EVENT_CONNECTION_CLOSE,
++	QUIC_EVENT_CONNECTION_MIGRATION,
++	QUIC_EVENT_KEY_UPDATE,
++	QUIC_EVENT_NEW_TOKEN,
++	QUIC_EVENT_NEW_SESSION_TICKET,
++	QUIC_EVENT_MAX,
++};
++
++enum {
++	QUIC_STREAM_SEND_STATE_READY,
++	QUIC_STREAM_SEND_STATE_SEND,
++	QUIC_STREAM_SEND_STATE_SENT,
++	QUIC_STREAM_SEND_STATE_RECVD,
++	QUIC_STREAM_SEND_STATE_RESET_SENT,
++	QUIC_STREAM_SEND_STATE_RESET_RECVD,
++
++	QUIC_STREAM_RECV_STATE_RECV,
++	QUIC_STREAM_RECV_STATE_SIZE_KNOWN,
++	QUIC_STREAM_RECV_STATE_RECVD,
++	QUIC_STREAM_RECV_STATE_READ,
++	QUIC_STREAM_RECV_STATE_RESET_RECVD,
++	QUIC_STREAM_RECV_STATE_RESET_READ,
++};
++
++struct quic_stream_update {
++	__s64	id;
++	__u8	state;
++	__u8	reserved[3];
++	__u32	errcode;
++	__u64	finalsz;
++};
++
++struct quic_stream_max_data {
++	__s64	id;
++	__u64	max_data;
++};
++
++struct quic_connection_close {
++	__u32	errcode;
++	__u8	frame;
++	__u8	reserved[3];
++	__u8	phrase[];
++};
++
++union quic_event {
++	struct quic_stream_update	update;
++	struct quic_stream_max_data	max_data;
++	struct quic_connection_close	close;
++	struct quic_connection_id_info	info;
++	__u64	max_stream;
++	__u8	local_migration;
++	__u8	key_update_phase;
++};
++
++enum {
++	QUIC_TRANSPORT_ERROR_NONE			= 0x00,
++	QUIC_TRANSPORT_ERROR_INTERNAL			= 0x01,
++	QUIC_TRANSPORT_ERROR_CONNECTION_REFUSED		= 0x02,
++	QUIC_TRANSPORT_ERROR_FLOW_CONTROL		= 0x03,
++	QUIC_TRANSPORT_ERROR_STREAM_LIMIT		= 0x04,
++	QUIC_TRANSPORT_ERROR_STREAM_STATE		= 0x05,
++	QUIC_TRANSPORT_ERROR_FINAL_SIZE			= 0x06,
++	QUIC_TRANSPORT_ERROR_FRAME_ENCODING		= 0x07,
++	QUIC_TRANSPORT_ERROR_TRANSPORT_PARAM		= 0x08,
++	QUIC_TRANSPORT_ERROR_CONNECTION_ID_LIMIT	= 0x09,
++	QUIC_TRANSPORT_ERROR_PROTOCOL_VIOLATION		= 0x0a,
++	QUIC_TRANSPORT_ERROR_INVALID_TOKEN		= 0x0b,
++	QUIC_TRANSPORT_ERROR_APPLICATION		= 0x0c,
++	QUIC_TRANSPORT_ERROR_CRYPTO_BUF_EXCEEDED	= 0x0d,
++	QUIC_TRANSPORT_ERROR_KEY_UPDATE			= 0x0e,
++	QUIC_TRANSPORT_ERROR_AEAD_LIMIT_REACHED		= 0x0f,
++	QUIC_TRANSPORT_ERROR_NO_VIABLE_PATH		= 0x10,
++
++	/* The cryptographic handshake failed. A range of 256 values is reserved
++	 * for carrying error codes specific to the cryptographic handshake that
++	 * is used. Codes for errors occurring when TLS is used for the
++	 * cryptographic handshake are described in Section 4.8 of [QUIC-TLS].
++	 */
++	QUIC_TRANSPORT_ERROR_CRYPTO			= 0x0100,
++};
++
++#endif /* _UAPI_LINUX_QUIC_H */
 diff --git a/net/quic/socket.c b/net/quic/socket.c
-index 6a742fe57df1..f1181215ebbf 100644
+index f1181215ebbf..8dc2cb7628db 100644
 --- a/net/quic/socket.c
 +++ b/net/quic/socket.c
-@@ -117,7 +117,8 @@ static int quic_setsockopt(struct sock *sk, int level, int optname,
- 			   sockptr_t optval, unsigned int optlen)
- {
- 	if (level != SOL_QUIC)
--		return -EOPNOTSUPP;
-+		return quic_common_setsockopt(sk, level, optname, optval,
-+					      optlen);
+@@ -107,11 +107,25 @@ static void quic_close(struct sock *sk, long timeout)
+ 	sk_common_release(sk);
+ }
  
+-static int quic_do_setsockopt(struct sock *sk, int optname, sockptr_t optval,
+-			      unsigned int optlen)
++/**
++ * quic_do_setsockopt - set a QUIC socket option
++ * @sk: socket to configure
++ * @optname: option name (QUIC-level)
++ * @optval: user buffer containing the option value
++ * @optlen: size of the option value
++ *
++ * Sets a QUIC socket option on a given socket.
++ *
++ * Return:
++ * - On success, 0 is returned.
++ * - On error, a negative error value is returned.
++ */
++int quic_do_setsockopt(struct sock *sk, int optname, sockptr_t optval,
++		       unsigned int optlen)
+ {
+ 	return -EOPNOTSUPP;
+ }
++EXPORT_SYMBOL_GPL(quic_do_setsockopt);
+ 
+ static int quic_setsockopt(struct sock *sk, int level, int optname,
+ 			   sockptr_t optval, unsigned int optlen)
+@@ -123,11 +137,25 @@ static int quic_setsockopt(struct sock *sk, int level, int optname,
  	return quic_do_setsockopt(sk, optname, optval, optlen);
  }
-@@ -132,7 +133,8 @@ static int quic_getsockopt(struct sock *sk, int level, int optname,
- 			   char __user *optval, int __user *optlen)
- {
- 	if (level != SOL_QUIC)
--		return -EOPNOTSUPP;
-+		return quic_common_getsockopt(sk, level, optname, optval,
-+					      optlen);
  
- 	return quic_do_getsockopt(sk, optname, USER_SOCKPTR(optval),
- 				  USER_SOCKPTR(optlen));
+-static int quic_do_getsockopt(struct sock *sk, int optname, sockptr_t optval,
+-			      sockptr_t optlen)
++/**
++ * quic_do_getsockopt - get a QUIC socket option
++ * @sk: socket to query
++ * @optname: option name (QUIC-level)
++ * @optval: user buffer to receive the option value
++ * @optlen: pointer to buffer size; updated with actual size on return
++ *
++ * Gets a QUIC socket option from a given socket.
++ *
++ * Return:
++ * - On success, 0 is returned.
++ * - On error, a negative error value is returned.
++ */
++int quic_do_getsockopt(struct sock *sk, int optname, sockptr_t optval,
++		       sockptr_t optlen)
+ {
+ 	return -EOPNOTSUPP;
+ }
++EXPORT_SYMBOL_GPL(quic_do_getsockopt);
+ 
+ static int quic_getsockopt(struct sock *sk, int level, int optname,
+ 			   char __user *optval, int __user *optlen)
 diff --git a/net/quic/socket.h b/net/quic/socket.h
-index 9a2f4b851676..0aa642e3b0ae 100644
+index 0aa642e3b0ae..61df0c5867be 100644
 --- a/net/quic/socket.h
 +++ b/net/quic/socket.h
-@@ -11,6 +11,7 @@
+@@ -9,6 +9,7 @@
+  */
+ 
  #include <net/udp_tunnel.h>
++#include <linux/quic.h>
  
  #include "common.h"
-+#include "family.h"
- 
- #include "protocol.h"
- 
+ #include "family.h"
+diff --git a/usr/include/Makefile b/usr/include/Makefile
+index 6d86a53c6f0a..a0442e4d77da 100644
+--- a/usr/include/Makefile
++++ b/usr/include/Makefile
+@@ -120,6 +120,7 @@ uses-libc += linux/netfilter_ipv4.h
+ uses-libc += linux/netfilter_ipv4/ip_tables.h
+ uses-libc += linux/netfilter_ipv6.h
+ uses-libc += linux/netfilter_ipv6/ip6_tables.h
++uses-libc += linux/quic.h
+ uses-libc += linux/route.h
+ uses-libc += linux/shm.h
+ uses-libc += linux/soundcard.h
 -- 
 2.47.1
 
