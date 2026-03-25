@@ -1,586 +1,533 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25E33EF653;
-	Tue, 24 Mar 2026 11:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A664C1428F4
+	for <linux-cifs@vger.kernel.org>; Wed, 25 Mar 2026 03:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774351184; cv=none; b=X7mHEH6uZbyA6/szmnaVYr12NX3Vb26UWMz5WHuWeZFT9GYEoCrxJPCKq55WXNYC3hAaenQ/zcFY2OP6NzbC0fLboDnM7TPauz0cmLOeNdUiUxLU9hYfW7KyVFrqxje23R/xi0JQZiwCvAjqG1lmxlixRDCwEulJFErRO5dulVQ=
+	t=1774410564; cv=none; b=j5bYAB17iQ66NaSJG82L1Y3oH4mptuYgOfHPI5tjCKc+uLF6TZlXIVi24zmlpYT8SeGiEDYElMJfdPvjBnn+bBzJMMEuiqzJ0tSkZNh1xKXD+jDCXZjdWGaM+qFl7XcHQ+++vonbB6VrIBfl6gM2iMbDCT1VAP65sbzA1KJFLx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774351184; c=relaxed/simple;
-	bh=sO8/p+vp5dBZICG3fa9qAY/MlcLAQY1FaD4KpkPlWJk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CX1I4/+OlVudhnIkZ8QG3ZFGp3zCC/KQxw+UlBApnltSjenJCA+l/oLmbO1uCXrR122wGQPkskqkZ1z6NJVN17ebDu6E4unpCA+i0YzbOxsEZmbDEW4yU11D/v0lpR9ckJq/xhl6yufiZZJia3+h5SDakPyFPW9IWFX0LySLjmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sG2A/TMV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774410564; c=relaxed/simple;
+	bh=eXwq1fBKdPa2hwmYsy5RYWHmgsc6FmApgo1Afs6qxTM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rzfWn1nlymk9C/+zPIrmFfl5VPlVvpq//tkX2sfGqLYElf+QUTeaq2SH+Ev+RihsCIvr4aq44WfpxvbnXWS2sUfYwLv6cp8K14ZvlOv6x9R89ef+p3+darPwIEiMhvr8kfwk3U7Lh+9kLLpYr7pedxLINqvGCidFYNzlp/hiuD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P6+uhUSW; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sG2A/TMV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36B69C19424;
-	Tue, 24 Mar 2026 11:19:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774351184;
-	bh=sO8/p+vp5dBZICG3fa9qAY/MlcLAQY1FaD4KpkPlWJk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sG2A/TMVjVITkylIxU1z42+dk/AJya0yDmDeETBuylbRi9GNbtDNhPdz1Lk00b2G9
-	 YtH30B8uF9zzg4ErDYcKXApyIqvrswXF2q2zWUgvGoEBWBUA29DW57PKd/WhyKv6ET
-	 0jMOICUYRtFf7Vz5vP7PMSLiS2R2q5psLRpi63xlfPCdjtQI9ZiDJat3Y2vxP0mAsb
-	 hbSH6u+Cdc2pAcy2OVaGjQ3XW7EKEkNQoiTbMGHAjsi5FVOvWa1XSlZEsy3zU6NGTv
-	 2khqWFtb5CWQ2yIsP+1TDaQAC1+3m7gA2k96kwVBVXrlxl8Acq/iGhJ470jGLTIGvO
-	 R1UYr+ADEfhSQ==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	David Howells <dhowells@redhat.com>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P6+uhUSW"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-50b2d6f9d00so53650541cf.2
+        for <linux-cifs@vger.kernel.org>; Tue, 24 Mar 2026 20:49:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774410561; x=1775015361; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=F/qt/YnFNs8jU2lYt2U9vke2ZAkaGHfw4oS5sOaADeI=;
+        b=P6+uhUSWT02acyzEkJTQ0XrSNhFrXQ9gpt6QCpJCMeGJB4UanEyugqzKsKv8TsXX1N
+         AjCW9hpHWhC6k4F+HEpo1i8TXkLj2SzlVdAFeKa6V4tjsEGeU43AHOTfuxYSgNj7vfBr
+         5Tf16I9jdEzgSgqim/ksqlCZcxdBRadmjRreCGjcB/qAhKC6dv3dDu6zFvfSBVAlsOjl
+         h4mkipHGaxAwVQ+8GpmbOibDgyiuwodIqPX0aHdpMYc+WtACo7y1pdC7wI5LO1jtGVZF
+         QSFNLYjz/s2nC6WdEGHjNb2c4kUVAJAc4YJ7rArZnITeLrHEEs8pFhbQxRw1GeJ3OB4f
+         Bxhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774410561; x=1775015361;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F/qt/YnFNs8jU2lYt2U9vke2ZAkaGHfw4oS5sOaADeI=;
+        b=QjBeQKjod0rKpJhBzOhi5lii9ShrqIhf672q/R9d4skbZiYa7xgeWF+WnfqosIBDcx
+         U/GGst5F51fX6c00Yn9fObY7UbQPiI3M4t6judGetQB+9qns+kXJA/eMf9AquBFjocvC
+         xx41LgSQMLRM0LGobwhn34Af4SICVW51YZ1F7m2m0BMitPKn0pnmolCP8JF0GicdfqFw
+         UjrtN+tz9xNDj6shYmp/sae50JWVu5lm0tQ0N/LNXEI05t66Hdq8JLNiZKT9HdMM1F+j
+         +zeHgioexCNSWE+Xo63hSOzkEbaVBhVwO/tKbcvd/DJd+znIvMSo7l/uQFGQS0SeVWeR
+         vn4g==
+X-Forwarded-Encrypted: i=1; AJvYcCWZUBE2u31yorf9eX42xEN3ZAB/AUotycejtXmzoCEze7HMkVV7HnKIfM5pKJxvDmNoGSxFBs9v/pxc@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1PHjAs9VgqdKkjM4oGb+2rdUKK2qaHqjA7f8vDpCNJ4sFvzBg
+	yneGWzDkVjKVFNfefCisCTlzUB97a/q/RNGw7E/IgrFEcDZipWhnTBz0
+X-Gm-Gg: ATEYQzyugrOiwR+lGKKbw779lFjh5QVr78vI1sRAsPC8NEWax/7aPMz1MBU0eJdZHni
+	Vjn/rK3Gfmi6S2jLIx/VLpMX1OENVZ5tc1a5gZ+D4eUkpJq41Q7o+YNRvTeKdrpjb2Ad+vEU2ei
+	3xRC44L8ANjZ7saxAl8G9/3Q39OpOzaSo1xHLw0aY/z73RLYiagKjdukZAKX8HTItRi6QzYYAYW
+	LlgJ91iviF2x7Skluj3Uu6fh2H8VZMefzjY9335pv/OwQv4cjRzImfMOLbMadaO+4LukhzJ08gy
+	3K0/5B/Koq9a/NZJXTqD//DVv1aSmSs9mfzA2T2tibgzx2F/uSoNbTxClPql945YcBrvh5nMpOu
+	KWn79HesFbOgDvwnpFJnnwZ20kG41WO9rsFdeV8TmNmFtbzast4aSzBOSZP7d9Wy/Vy+0ELZVPn
+	auOj2bhC4qAhaYHSL1JJaw6lUHiOI+zNFBkd0CqTF8ck5HQ6/d1RTGaeZV4pbQNMN/yuLNuVbJ6
+	xAiK24ttE4E7mZ1xvyltM9Ch+BtoLwCgI9b/W8XaESGeeyNfzKueNgNM2+NvUsbHQ==
+X-Received: by 2002:a05:622a:905:b0:509:2053:ab5a with SMTP id d75a77b69052e-50b80e6717dmr28801071cf.57.1774410561224;
+        Tue, 24 Mar 2026 20:49:21 -0700 (PDT)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b36cb2e29sm150093001cf.1.2026.03.24.20.49.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2026 20:49:20 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	quic@lists.linux.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Metzmacher <metze@samba.org>,
+	Moritz Buhl <mbuhl@openbsd.org>,
+	Tyler Fanelli <tfanelli@redhat.com>,
+	Pengtao He <hepengtao@xiaomi.com>,
+	Thomas Dreibholz <dreibh@simula.no>,
 	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-6.18] smb: client: fix generic/694 due to wrong ->i_blocks
-Date: Tue, 24 Mar 2026 07:19:17 -0400
-Message-ID: <20260324111931.3257972-8-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260324111931.3257972-1-sashal@kernel.org>
-References: <20260324111931.3257972-1-sashal@kernel.org>
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Tom Talpey <tom@talpey.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Steve Dickson <steved@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Alexander Aring <aahringo@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	John Ericson <mail@johnericson.me>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Jason Baron <jbaron@akamai.com>,
+	illiliti <illiliti@protonmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Daniel Stenberg <daniel@haxx.se>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	"Marc E . Fiuczynski" <marc@fiuczynski.com>
+Subject: [PATCH net-next v11 00/15] net: introduce QUIC infrastructure and core subcomponents
+Date: Tue, 24 Mar 2026 23:47:05 -0400
+Message-ID: <cover.1774410440.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.19.9
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Paulo Alcantara <pc@manguebit.org>
-
-[ Upstream commit 23b5df09c27aec13962b30d32a4167ebdd043f8e ]
-
-When updating ->i_size, make sure to always update ->i_blocks as well
-until we query new allocation size from the server.
-
-generic/694 was failing because smb3_simple_falloc() was missing the
-update of ->i_blocks after calling cifs_setsize().  So, fix this by
-updating ->i_blocks directly in cifs_setsize(), so all places that
-call it doesn't need to worry about updating ->i_blocks later.
-
-Reported-by: Shyam Prasad N <sprasad@microsoft.com>
-Closes: https://lore.kernel.org/r/CANT5p=rqgRwaADB=b_PhJkqXjtfq3SFv41SSTXSVEHnuh871pA@mail.gmail.com
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-Now I have enough information for a comprehensive analysis.
-
----
-
-## PHASE 1: COMMIT MESSAGE FORENSICS
-
-### Step 1.1: PARSE THE SUBJECT LINE
-Record: [subsystem: smb: client] [action verb: fix] [Fixes xfstests
-generic/694 test failure due to incorrect i_blocks reporting]
-
-### Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
-- **Reported-by:** Shyam Prasad N <sprasad@microsoft.com> — Microsoft
-  SMB developer; this is a real, reproducible bug
-- **Closes:** link to lore.kernel.org bug report email
-- **Signed-off-by:** Paulo Alcantara (Red Hat) — CIFS subsystem co-
-  maintainer
-- **Cc:** David Howells (netfs maintainer), linux-cifs@vger.kernel.org
-- **Signed-off-by:** Steve French — CIFS maintainer (committed the
-  patch)
-- No Fixes: tag, no Cc: stable tag (expected for commits under review)
-
-Record: Reported by a Microsoft SMB developer (Shyam Prasad N). Fixed by
-CIFS co-maintainer Paulo Alcantara. Committed by CIFS maintainer Steve
-French. Original bug report CC'd stable@vger.kernel.org.
-
-### Step 1.3: ANALYZE THE COMMIT BODY TEXT
-The commit explains: When `->i_size` is updated, `->i_blocks` must also
-be updated to reflect a consistent estimate of allocated blocks until
-the server provides actual allocation sizes. `smb3_simple_falloc()` was
-calling `cifs_setsize()` without updating `i_blocks`, causing xfstests
-`generic/694` to fail (stat() returning wrong block count).
-
-The fix moves the i_blocks update into `cifs_setsize()` itself, so ALL
-callers (not just some) keep i_blocks consistent.
-
-Record: [Bug: stat() returns wrong i_blocks after file size changes via
-fallocate/truncate] [Symptom: xfstests generic/694 failure] [Root cause:
-missing i_blocks update in cifs_setsize(), callers inconsistently
-handled it]
-
-### Step 1.4: DETECT HIDDEN BUG FIXES
-This is explicitly labeled as a fix and clearly is one. No hidden nature
-here.
-
-Record: [Explicitly a bug fix]
-
----
-
-## PHASE 2: DIFF ANALYSIS — LINE BY LINE
-
-### Step 2.1: INVENTORY THE CHANGES
-| File | Changes |
-|------|---------|
-| fs/smb/client/cifsglob.h | +6 (new `CIFS_INO_BLOCKS` macro) |
-| fs/smb/client/file.c | -1 (remove redundant `inode->i_blocks = 0` from
-`cifs_do_truncate`) |
-| fs/smb/client/inode.c | +5/-13 (centralize i_blocks into
-`cifs_setsize()`, use macro in `cifs_fattr_to_inode`) |
-| fs/smb/client/smb2ops.c | +5/-24 (use macro in `smb2_close_getattr`,
-remove redundant updates in `cifs_file_set_size` and
-`smb2_duplicate_extents`) |
-
-Net: +16/-32 = -16 lines. The fix reduces total code by consolidating
-duplicated logic.
-
-Functions modified: `cifs_fattr_to_inode()`, `cifs_do_truncate()`,
-`cifs_setsize()`, `cifs_file_set_size()`, `smb2_close_getattr()`,
-`smb2_duplicate_extents()`
-
-Record: [4 files, net -16 lines] [Scope: single-subsystem consolidation
-fix]
-
-### Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
-1. **cifsglob.h**: Adds `CIFS_INO_BLOCKS(size)` =
-   `DIV_ROUND_UP_ULL((u64)(size), 512)` — standardizes the block count
-   calculation
-2. **cifs_setsize()**: Now sets `inode->i_blocks =
-   CIFS_INO_BLOCKS(offset)` inside the spinlock, alongside
-   `i_size_write()`
-3. **cifs_do_truncate()**: Removes now-redundant `inode->i_blocks = 0`
-   after `cifs_setsize(inode, 0)` (cifs_setsize now handles it)
-4. **cifs_file_set_size()**: Removes duplicate i_blocks calculation
-   after `cifs_setsize()` call
-5. **smb2_close_getattr()**: Uses `CIFS_INO_BLOCKS()` macro instead of
-   manual calculation
-6. **smb2_duplicate_extents()**: Removes comment about needing to set
-   i_blocks — cifs_setsize now handles it
-7. **cifs_fattr_to_inode()**: Uses `CIFS_INO_BLOCKS()` macro, cleaner
-   comment
-
-Record: [Before: i_blocks updated inconsistently in some callers,
-missing in others (smb3_simple_falloc)] [After: i_blocks always updated
-when i_size changes via cifs_setsize()]
-
-### Step 2.3: IDENTIFY THE BUG MECHANISM
-Category: **Logic/correctness fix** — missing metadata update in a
-central function, causing inconsistent stat() results.
-
-The bug: `cifs_setsize()` updated `i_size` but not `i_blocks`. Some
-callers (like `cifs_file_set_size/cifs_setattr_nounix`) manually updated
-`i_blocks` afterward, but other callers (like `smb3_simple_falloc`,
-`smb2_duplicate_extents`) did NOT. This meant fallocate operations left
-stale `i_blocks` values.
-
-Record: [Missing i_blocks update in cifs_setsize(); inconsistently
-handled by callers; smb3_simple_falloc was the concrete failure path]
-
-### Step 2.4: ASSESS THE FIX QUALITY
-- **Obviously correct?** YES — moving i_blocks into cifs_setsize() under
-  the existing spinlock is the right approach
-- **Minimal/surgical?** YES — consolidates duplicated code while fixing
-  the bug
-- **Regression risk?** Very low — the only semantic change is that
-  `i_blocks` is now also set in paths that previously missed it. For
-  paths that already set it, there's a harmless double-set
-  (cifs_fattr_to_inode uses server-provided `cf_bytes` which may differ
-  from `offset`-based estimate, and its update comes from a different
-  code path)
-- **Note:** `CIFS_INO_BLOCKS` uses `DIV_ROUND_UP_ULL` which is
-  equivalent to `(512 - 1 + size) >> 9` but cleaner
-
-Record: [Fix is obviously correct, minimal, low regression risk]
-
----
-
-## PHASE 3: GIT HISTORY INVESTIGATION
-
-### Step 3.1: BLAME THE CHANGED LINES
-The `cifs_setsize()` function was introduced by Steve French in 2007
-(commit 3677db10a635a3). The i_blocks patterns in `cifs_fattr_to_inode`
-have been present since at least v3.x. The bug has existed since
-`smb3_simple_falloc` was added.
-
-Record: [Core function from 2007; i_blocks bug exists since
-smb3_simple_falloc was introduced]
-
-### Step 3.2: FOLLOW THE FIXES: TAG
-No Fixes: tag present (expected).
-
-### Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES
-Recent related commits by Paulo Alcantara include several SMB client
-fixes in the same 6.19 timeframe:
-- `110fee6b9bb58` — refactored cifs_setattr into cifs_file_set_size (Oct
-  2025)
-- `dba9f997c9d9a` — fixed race with fallocate and AIO+DIO
-- `57ce9f7793b71` — fixed missing timestamp updates after ftruncate
-
-The current commit depends on `110fee6b9bb58` for the
-`cifs_file_set_size()` function and `cifs_do_truncate()` function in
-file.c.
-
-Record: [Depends on 110fee6b9bb58 for
-cifs_file_set_size/cifs_do_truncate code structure. The conceptual fix
-(adding i_blocks to cifs_setsize) is standalone.]
-
-### Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS
-Paulo Alcantara is the CIFS/SMB client co-maintainer at Red Hat. He's
-the most active contributor to this subsystem. High trust in the fix.
-
-Record: [Author is subsystem co-maintainer]
-
-### Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS
-The `cifs_file_set_size()` function that this commit modifies was
-introduced by `110fee6b9bb58` (v6.19/7.0 era). This function doesn't
-exist in v6.12 or earlier. However, the equivalent code
-(`cifs_setattr_nounix()`) exists in v6.12 and has the same bug pattern
-(i_blocks updated after cifs_setsize, not inside it).
-
-The `cifs_do_truncate()` function in file.c was also
-introduced/refactored by `110fee6b9bb58`.
-
-Record: [Direct apply requires 110fee6b9bb58; for older stable trees
-(6.12, 6.6, 6.1), the patch needs adaptation but the core fix applies]
-
----
-
-## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+Introduction
+============
+
+The QUIC protocol, defined in RFC 9000, is a secure, multiplexed transport
+built on top of UDP. It enables low-latency connection establishment,
+stream-based communication with flow control, and supports connection
+migration across network paths, while ensuring confidentiality, integrity,
+and availability.
+
+This implementation introduces QUIC support in Linux Kernel, offering
+several key advantages:
+
+- In-Kernel QUIC Support for Subsystems: Enables kernel subsystems
+  such as SMB and NFS to operate over QUIC with minimal changes. Once the
+  handshake is complete via the net/handshake APIs, data exchange proceeds
+  over standard in-kernel transport interfaces.
+
+- Standard Socket API Semantics: Implements core socket operations
+  (listen(), accept(), connect(), sendmsg(), recvmsg(), close(),
+  getsockopt(), setsockopt(), getsockname(), and getpeername()),
+  allowing user space to interact with QUIC sockets in a familiar,
+  POSIX-compliant way.
+
+- ALPN-Based Connection Dispatching: Supports in-kernel ALPN
+  (Application-Layer Protocol Negotiation) routing, allowing demultiplexing
+  of QUIC connections across different user-space processes based
+  on the ALPN identifiers.
+
+- Performance Enhancements: Handles all control messages in-kernel
+  to reduce syscall overhead, incorporates zero-copy mechanisms such as
+  sendfile() to minimize data movement, and is also structured to support
+  future crypto hardware offloads.
+
+This implementation offers fundamental support for the following RFCs:
+
+- RFC9000 - QUIC: A UDP-Based Multiplexed and Secure Transport
+- RFC9001 - Using TLS to Secure QUIC
+- RFC9002 - QUIC Loss Detection and Congestion Control
+- RFC9221 - An Unreliable Datagram Extension to QUIC
+- RFC9287 - Greasing the QUIC Bit
+- RFC9368 - Compatible Version Negotiation for QUIC
+- RFC9369 - QUIC Version 2
+
+The socket APIs for QUIC follow the RFC draft [1]:
+
+- The Sockets API Extensions for In-kernel QUIC Implementations
+
+Implementation
+==============
+
+The central design is to implement QUIC within the kernel while delegating
+the handshake to userspace.
+
+Only the processing and creation of raw TLS Handshake Messages are handled
+in userspace, facilitated by a TLS library like GnuTLS. These messages are
+exchanged between kernel and userspace via sendmsg() and recvmsg(), with
+cryptographic details conveyed through control messages (cmsg).
+
+The entire QUIC protocol, aside from the TLS Handshake Messages processing
+and creation, is managed in the kernel. Rather than using an Upper Layer
+Protocol (ULP) layer, this implementation establishes a socket of type
+IPPROTO_QUIC (similar to IPPROTO_MPTCP), operating over UDP tunnels.
+
+For kernel consumers, they can initiate a handshake request from the kernel
+to userspace using the existing net/handshake netlink. The userspace
+component, such as tlshd service [2], then manages the processing
+of the QUIC handshake request.
+
+- Handshake Architecture:
+
+  ┌──────┐  ┌──────┐
+  │ APP1 │  │ APP2 │ ...
+  └──────┘  └──────┘
+  ┌──────────────────────────────────────────┐
+  │     {quic_client/server_handshake()}     │<─────────────┐
+  └──────────────────────────────────────────┘       ┌─────────────┐
+   {send/recvmsg()}      {set/getsockopt()}          │    tlshd    │
+   [CMSG handshake_info] [SOCKOPT_CRYPTO_SECRET]     └─────────────┘
+                         [SOCKOPT_TRANSPORT_PARAM_EXT]    │   ^
+                │ ^                  │ ^                  │   │
+  Userspace     │ │                  │ │                  │   │
+  ──────────────│─│──────────────────│─│──────────────────│───│───────
+  Kernel        │ │                  │ │                  │   │
+                v │                  v │                  v   │
+  ┌──────────────────┬───────────────────────┐       ┌─────────────┐
+  │ protocol, timer, │ socket (IPPROTO_QUIC) │<──┐   │ handshake   │
+  │                  ├───────────────────────┤   │   │netlink APIs │
+  │ common, family,  │ outqueue  |  inqueue  │   │   └─────────────┘
+  │                  ├───────────────────────┤   │      │       │
+  │ stream, connid,  │         frame         │   │   ┌─────┐ ┌─────┐
+  │                  ├───────────────────────┤   │   │     │ │     │
+  │ path, pnspace,   │         packet        │   │───│ SMB │ │ NFS │...
+  │                  ├───────────────────────┤   │   │     │ │     │
+  │ cong, crypto     │       UDP tunnels     │   │   └─────┘ └─────┘
+  └──────────────────┴───────────────────────┘   └──────┴───────┘
+
+- User Data Architecture:
+
+  ┌──────┐  ┌──────┐
+  │ APP1 │  │ APP2 │ ...
+  └──────┘  └──────┘
+   {send/recvmsg()}   {set/getsockopt()}              {recvmsg()}
+   [CMSG stream_info] [SOCKOPT_KEY_UPDATE]            [EVENT conn update]
+                      [SOCKOPT_CONNECTION_MIGRATION]  [EVENT stream update]
+                      [SOCKOPT_STREAM_OPEN/RESET/STOP]
+                │ ^               │ ^                     ^
+  Userspace     │ │               │ │                     │
+  ──────────────│─│───────────────│─│─────────────────────│───────────
+  Kernel        │ │               │ │                     │
+                v │               v │  ┌──────────────────┘
+  ┌──────────────────┬───────────────────────┐
+  │ protocol, timer, │ socket (IPPROTO_QUIC) │<──┐{kernel_send/recvmsg()}
+  │                  ├───────────────────────┤   │{kernel_set/getsockopt()}
+  │ common, family,  │ outqueue  |  inqueue  │   │{kernel_recvmsg()}
+  │                  ├───────────────────────┤   │
+  │ stream, connid,  │         frame         │   │   ┌─────┐ ┌─────┐
+  │                  ├───────────────────────┤   │   │     │ │     │
+  │ path, pnspace,   │         packet        │   │───│ SMB │ │ NFS │...
+  │                  ├───────────────────────┤   │   │     │ │     │
+  │ cong, crypto     │       UDP tunnels     │   │   └─────┘ └─────┘
+  └──────────────────┴───────────────────────┘   └──────┴───────┘
+
+Interface
+=========
+
+This implementation supports a mapping of QUIC into sockets APIs. Similar
+to TCP and SCTP, a typical Server and Client use the following system call
+sequence to communicate:
+
+    Client                             Server
+  ──────────────────────────────────────────────────────────────────────
+  sockfd = socket(IPPROTO_QUIC)      listenfd = socket(IPPROTO_QUIC)
+  bind(sockfd)                       bind(listenfd)
+                                     listen(listenfd)
+  connect(sockfd)
+  quic_client_handshake(sockfd)
+                                     sockfd = accept(listenfd)
+                                     quic_server_handshake(sockfd, cert)
 
-### Step 4.1: LORE DISCUSSION
-The patch was submitted as v1 on 2026-03-19, updated to v2 the same day
-(v2 moved i_blocks under spinlock, improved comments). No NAKs or
-objections found. No explicit stable nomination by reviewers on-list,
-but the original bug report by Shyam CC'd stable@vger.kernel.org.
-
-Record: [v2 submitted, clean discussion, no objections, merged into
-7.0-rc5]
-
-### Step 4.2: BUG REPORT
-Shyam Prasad N (Microsoft SMB developer) discovered the issue while
-running xfstests generic/694 test. The test preallocates/writes a file,
-syncs, stats for allocated blocks, unmount/remount, and stats again.
-Without this fix, stat() reports 0 blocks. Steve French acknowledged:
-"That sounds an important bug to fix."
-
-Record: [Reproducible via standard xfstests; acknowledged as important
-by maintainer]
-
-### Step 4.3-4.4: RELATED PATCHES AND STABLE HISTORY
-Part of a 3-fix pull request to Linus for 7.0-rc5. No prior stable
-discussion about this specific issue found.
-
-Record: [Standalone fix, not dependent on the other patches in the pull
-request]
-
----
-
-## PHASE 5: CODE SEMANTIC ANALYSIS
-
-### Step 5.1-5.2: KEY FUNCTIONS AND CALLERS
-`cifs_setsize()` is called from 4 places:
-1. `cifs_do_truncate()` (file.c:1000) — truncation path
-2. `cifs_file_set_size()` (inode.c:3083) — setattr/truncate path
-3. `smb2_duplicate_extents()` (smb2ops.c:2209) — reflink/clone path
-4. `smb3_simple_falloc()` (smb2ops.c:3676) — fallocate extending path
-
-Before this fix, only #1 and #2 updated i_blocks after calling
-cifs_setsize(). #3 and #4 did NOT — these are the bug paths.
-
-Record: [4 callers; 2 had missing i_blocks update; all are user-
-reachable via truncate/fallocate/reflink syscalls]
-
-### Step 5.3-5.5: CALL CHAIN AND SIMILAR PATTERNS
-The buggy paths are reachable from:
-- `fallocate(2)` syscall → `smb3_fallocate()` → `smb3_simple_falloc()` →
-  `cifs_setsize()` — i_blocks NOT updated (BUG)
-- `ioctl(FICLONERANGE)` → `smb2_duplicate_extents()` → `cifs_setsize()`
-  — i_blocks NOT updated (BUG)
-
-Both are standard user operations on SMB-mounted filesystems.
-
-Record: [Bug reachable from userspace via fallocate and reflink;
-standard filesystem operations]
-
----
-
-## PHASE 6: CROSS-REFERENCING AND STABLE TREE ANALYSIS
-
-### Step 6.1: DOES THE BUGGY CODE EXIST IN STABLE TREES?
-Verified: In v6.6 and v6.12, `smb3_simple_falloc()` calls
-`cifs_setsize()` without updating `i_blocks`. The bug exists in ALL
-active stable trees.
-
-### Step 6.2: BACKPORT COMPLICATIONS
-The patch won't apply cleanly to v6.12 or earlier because:
-- `cifs_file_set_size()` doesn't exist (was `cifs_setattr_nounix()`)
-- `cifs_do_truncate()` doesn't exist in file.c
-- Some context lines differ
-
-However, the core fix (adding i_blocks to cifs_setsize + introducing the
-macro) is straightforward to adapt.
-
-Record: [Needs rework for v6.12 and earlier; core concept portable]
-
-### Step 6.3: NO RELATED FIXES ALREADY IN STABLE
-No prior fix for this specific issue found in any stable tree.
-
----
-
-## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
-
-### Step 7.1: SUBSYSTEM CRITICALITY
-SMB/CIFS client (fs/smb/client/) — IMPORTANT. Used by millions of Linux
-systems for network file sharing with Windows/Samba servers. Enterprise,
-NAS, and developer environments.
-
-Record: [Subsystem: CIFS/SMB client] [Criticality: IMPORTANT — widely
-used filesystem]
-
-### Step 7.2: SUBSYSTEM ACTIVITY
-Very actively maintained — 20+ commits in recent history, active
-bugfixing by Paulo Alcantara and others.
-
----
-
-## PHASE 8: IMPACT AND RISK ASSESSMENT
-
-### Step 8.1: WHO IS AFFECTED
-All SMB/CIFS client users who use fallocate, reflink, or check file
-block counts. Affects any mount using SMB2/3.
-
-### Step 8.2: TRIGGER CONDITIONS
-- fallocate(2) on SMB-mounted file that extends the file
-- Any stat(2) after such operation → reports wrong i_blocks
-- Common usage: tools that check disk usage (du, df), xfstests, backup
-  software
-
-Record: [Common trigger conditions; any user of fallocate on SMB mounts]
-
-### Step 8.3: FAILURE MODE SEVERITY
-- **No crash, no data corruption, no security issue**
-- Incorrect metadata: stat() returns wrong block count
-- Can mislead disk usage tools and cause test failures
-- Severity: **MEDIUM** — data correctness issue in file metadata
-
-Record: [Severity: MEDIUM — incorrect stat metadata, not
-crash/corruption]
-
-### Step 8.4: RISK-BENEFIT RATIO
-- **Benefit:** Fixes incorrect file metadata for all SMB users using
-  fallocate; fixes xfstests generic/694
-- **Risk:** Very low — consolidates existing code, net code reduction,
-  well-contained within single subsystem
-- **Ratio:** Favorable — low risk, medium-high benefit
-
----
-
-## PHASE 9: FINAL SYNTHESIS
-
-### Step 9.1: COMPILE THE EVIDENCE
-
-**FOR backporting:**
-- Fixes a real, reproducible bug (xfstests generic/694 failure)
-- Fixes incorrect stat() results for all SMB fallocate users
-- Reported by Microsoft SMB developer, acknowledged as important by
-  maintainer
-- Fix by subsystem co-maintainer
-- Small scope (-16 net lines), well-contained
-- Consolidates duplicated code (reduces maintenance burden)
-- Bug exists in all active stable trees
-- Original bug report CC'd stable@vger.kernel.org
-
-**AGAINST backporting:**
-- Severity is MEDIUM, not CRITICAL (incorrect metadata, not
-  crash/corruption)
-- Needs rework for older stable trees (dependency on 110fee6b9bb58)
-- Touches 4 files across the subsystem
-
-### Step 9.2: STABLE RULES CHECKLIST
-1. Obviously correct and tested? **YES** — fix is clearly correct,
-   tested via xfstests
-2. Fixes a real bug? **YES** — wrong i_blocks in stat()
-3. Important issue? **YES (MEDIUM)** — data correctness for a widely
-   used filesystem
-4. Small and contained? **YES** — net -16 lines, single subsystem
-5. No new features? **YES** — no new features
-6. Can apply to stable? **Needs adaptation** for older trees
-
-### Step 9.3: CHECK FOR EXCEPTION CATEGORIES
-Not an exception category — standard bug fix.
-
-### Step 9.4: DECISION
-The fix addresses a real, reproducible bug in the SMB client that causes
-incorrect stat() results. It's small, well-contained, written by the
-subsystem co-maintainer, and reduces code duplication. The original bug
-reporter CC'd stable. While it needs adaptation for older trees, the
-conceptual fix is straightforward.
-
----
-
-## Verification
-
-- [Phase 1] Parsed tags: Reported-by Shyam Prasad N (Microsoft), Closes:
-  lore link, SOB Paulo Alcantara (CIFS co-maintainer), committed by
-  Steve French (CIFS maintainer)
-- [Phase 2] Diff analysis: 4 files, +16/-32 lines, centralizes i_blocks
-  update into cifs_setsize(), introduces CIFS_INO_BLOCKS macro
-- [Phase 3] git blame: cifs_setsize() from 2007 (3677db10a635a3);
-  i_blocks bug since smb3_simple_falloc was added
-- [Phase 3] git log: confirmed 110fee6b9bb58 refactored cifs_setattr
-  into cifs_file_set_size (dependency)
-- [Phase 3] git log author: Paulo Alcantara is the most active CIFS
-  contributor, subsystem co-maintainer
-- [Phase 4] Lore research: v2 patch, merged without objections into
-  7.0-rc5; Steve French called it "an important bug to fix"
-- [Phase 5] Callers of cifs_setsize: 4 call sites verified
-  (cifs_do_truncate, cifs_file_set_size, smb2_duplicate_extents,
-  smb3_simple_falloc)
-- [Phase 5] Verified smb3_simple_falloc (line 3676) and
-  smb2_duplicate_extents (line 2209) were missing i_blocks updates
-- [Phase 6] Verified v6.6 and v6.12 contain the same bug pattern
-  (smb3_simple_falloc calls cifs_setsize without i_blocks update)
-- [Phase 6] Patch needs adaptation for v6.12 and earlier
-  (cifs_file_set_size doesn't exist)
-- [Phase 8] Impact: all SMB users using fallocate; trigger is common;
-  severity MEDIUM (metadata correctness)
-
-**YES**
-
- fs/smb/client/cifsglob.h |  6 ++++++
- fs/smb/client/file.c     |  1 -
- fs/smb/client/inode.c    | 21 ++++++---------------
- fs/smb/client/smb2ops.c  | 20 ++++----------------
- 4 files changed, 16 insertions(+), 32 deletions(-)
-
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 0c3d2bbef938e..474d7b2aa2ef5 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -2324,4 +2324,10 @@ static inline int cifs_open_create_options(unsigned int oflags, int opts)
- 	return opts;
- }
- 
-+/*
-+ * The number of blocks is not related to (i_size / i_blksize), but instead
-+ * 512 byte (2**9) size is required for calculating num blocks.
-+ */
-+#define CIFS_INO_BLOCKS(size) DIV_ROUND_UP_ULL((u64)(size), 512)
-+
- #endif	/* _CIFS_GLOB_H */
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 89dab96292de1..59478d819ad0c 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -998,7 +998,6 @@ static int cifs_do_truncate(const unsigned int xid, struct dentry *dentry)
- 		if (!rc) {
- 			netfs_resize_file(&cinode->netfs, 0, true);
- 			cifs_setsize(inode, 0);
--			inode->i_blocks = 0;
- 		}
- 	}
- 	if (cfile)
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index f9ee95953fa4a..c5d89ddc87c00 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -219,13 +219,7 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr,
- 	 */
- 	if (is_size_safe_to_change(cifs_i, fattr->cf_eof, from_readdir)) {
- 		i_size_write(inode, fattr->cf_eof);
--
--		/*
--		 * i_blocks is not related to (i_size / i_blksize),
--		 * but instead 512 byte (2**9) size is required for
--		 * calculating num blocks.
--		 */
--		inode->i_blocks = (512 - 1 + fattr->cf_bytes) >> 9;
-+		inode->i_blocks = CIFS_INO_BLOCKS(fattr->cf_bytes);
- 	}
- 
- 	if (S_ISLNK(fattr->cf_mode) && fattr->cf_symlink_target) {
-@@ -3009,6 +3003,11 @@ void cifs_setsize(struct inode *inode, loff_t offset)
- {
- 	spin_lock(&inode->i_lock);
- 	i_size_write(inode, offset);
-+	/*
-+	 * Until we can query the server for actual allocation size,
-+	 * this is best estimate we have for blocks allocated for a file.
-+	 */
-+	inode->i_blocks = CIFS_INO_BLOCKS(offset);
- 	spin_unlock(&inode->i_lock);
- 	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
- 	truncate_pagecache(inode, offset);
-@@ -3081,14 +3080,6 @@ int cifs_file_set_size(const unsigned int xid, struct dentry *dentry,
- 	if (rc == 0) {
- 		netfs_resize_file(&cifsInode->netfs, size, true);
- 		cifs_setsize(inode, size);
--		/*
--		 * i_blocks is not related to (i_size / i_blksize), but instead
--		 * 512 byte (2**9) size is required for calculating num blocks.
--		 * Until we can query the server for actual allocation size,
--		 * this is best estimate we have for blocks allocated for a file
--		 * Number of blocks must be rounded up so size 1 is not 0 blocks
--		 */
--		inode->i_blocks = (512 - 1 + size) >> 9;
- 	}
- 
- 	return rc;
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 9bfd3711030b4..067e313283291 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -1493,6 +1493,7 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
- {
- 	struct smb2_file_network_open_info file_inf;
- 	struct inode *inode;
-+	u64 asize;
- 	int rc;
- 
- 	rc = __SMB2_close(xid, tcon, cfile->fid.persistent_fid,
-@@ -1516,14 +1517,9 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
- 		inode_set_atime_to_ts(inode,
- 				      cifs_NTtimeToUnix(file_inf.LastAccessTime));
- 
--	/*
--	 * i_blocks is not related to (i_size / i_blksize),
--	 * but instead 512 byte (2**9) size is required for
--	 * calculating num blocks.
--	 */
--	if (le64_to_cpu(file_inf.AllocationSize) > 4096)
--		inode->i_blocks =
--			(512 - 1 + le64_to_cpu(file_inf.AllocationSize)) >> 9;
-+	asize = le64_to_cpu(file_inf.AllocationSize);
-+	if (asize > 4096)
-+		inode->i_blocks = CIFS_INO_BLOCKS(asize);
- 
- 	/* End of file and Attributes should not have to be updated on close */
- 	spin_unlock(&inode->i_lock);
-@@ -2197,14 +2193,6 @@ smb2_duplicate_extents(const unsigned int xid,
- 		rc = smb2_set_file_size(xid, tcon, trgtfile, dest_off + len, false);
- 		if (rc)
- 			goto duplicate_extents_out;
--
--		/*
--		 * Although also could set plausible allocation size (i_blocks)
--		 * here in addition to setting the file size, in reflink
--		 * it is likely that the target file is sparse. Its allocation
--		 * size will be queried on next revalidate, but it is important
--		 * to make sure that file's cached size is updated immediately
--		 */
- 		netfs_resize_file(netfs_inode(inode), dest_off + len, true);
- 		cifs_setsize(inode, dest_off + len);
- 	}
+  sendmsg(sockfd)                    recvmsg(sockfd)
+  close(sockfd)                      close(sockfd)
+                                     close(listenfd)
+
+Please note that quic_client_handshake() and quic_server_handshake()
+functions are currently sourced from libquic [3]. These functions are
+responsible for receiving and processing the raw TLS handshake messages
+until the completion of the handshake process.
+
+For utilization by kernel consumers, it is essential to have tlshd
+service [2] installed and running in userspace. This service receives
+and manages kernel handshake requests for kernel sockets. In the kernel,
+the APIs closely resemble those used in userspace:
+
+    Client                             Server
+  ────────────────────────────────────────────────────────────────────────
+  __sock_create(IPPROTO_QUIC, &sock)  __sock_create(IPPROTO_QUIC, &sock)
+  kernel_bind(sock)                   kernel_bind(sock)
+                                      kernel_listen(sock)
+  kernel_connect(sock)
+  tls_client_hello_x509(args:{sock})
+                                      kernel_accept(sock, &newsock)
+                                      tls_server_hello_x509(args:{newsock})
+
+  kernel_sendmsg(sock)                kernel_recvmsg(newsock)
+  sock_release(sock)                  sock_release(newsock)
+                                      sock_release(sock)
+
+Please be aware that tls_client_hello_x509() and tls_server_hello_x509()
+are APIs from net/handshake/. They are used to dispatch the handshake
+request to the userspace tlshd service and subsequently block until the
+handshake process is completed.
+
+Use Cases
+=========
+
+- Samba
+
+  Stefan Metzmacher has integrated Linux QUIC into Samba for both client
+  and server roles [4].
+
+- tlshd
+
+  The tlshd daemon [2] facilitates Linux QUIC handshake requests from
+  kernel sockets. This is essential for enabling protocols like SMB
+  and NFS over QUIC.
+
+- curl
+
+  Linux QUIC is being integrated into curl [5] for HTTP/3. Example usage:
+
+  # curl --http3-only https://nghttp2.org:4433/
+  # curl --http3-only https://www.google.com/
+  # curl --http3-only https://facebook.com/
+  # curl --http3-only https://outlook.office.com/
+  # curl --http3-only https://cloudflare-quic.com/
+
+- httpd-portable
+
+  Moritz Buhl has deployed an HTTP/3 server over Linux QUIC [6] that is
+  accessible via Firefox and curl:
+
+  https://d.moritzbuhl.de/pub
+
+- NetPerfMeter
+
+  The latest NetPerfMeter release supports Linux QUIC and can be used to
+  run performance evaluations [10].
+
+Test Coverage
+=============
+
+The Coverage (gcov) of Functional and Interop Tests:
+
+https://d.moritzbuhl.de/lcov
+
+- Functional Tests
+
+  The libquic self-tests (make check) pass on all major architectures:
+  x86_64, i386, s390x, aarch64, ppc64le.
+
+- Interop tests
+
+  Interoperability was validated using the QUIC Interop Runner [7] against
+  all major userland QUIC stacks. Results are available at:
+
+  https://d.moritzbuhl.de/
+
+- Fuzzing via Syzkaller
+
+  Syzkaller has been running kernel fuzzing with QUIC for weeks using
+  tests/syzkaller/ in libquic [3].
+
+- Performance Testing
+
+  Performance was benchmarked using iperf [8] over a 100G NIC using
+  various MTUs and packet sizes:
+
+  - QUIC vs. kTLS:
+
+    UNIT        size:1024      size:4096      size:16384     size:65536
+    Gbits/sec   QUIC | kTLS    QUIC | kTLS    QUIC | kTLS    QUIC | kTLS
+    ────────────────────────────────────────────────────────────────────
+    mtu:1500    2.27 | 3.26    3.02 | 6.97    3.36 | 9.74    3.48 | 10.8
+    ────────────────────────────────────────────────────────────────────
+    mtu:9000    3.66 | 3.72    5.87 | 8.92    7.03 | 11.2    8.04 | 11.4
+
+  - QUIC(disable_1rtt_encryption) vs. TCP:
+
+    UNIT        size:1024      size:4096      size:16384     size:65536
+    Gbits/sec   QUIC | TCP     QUIC | TCP     QUIC | TCP     QUIC | TCP
+    ────────────────────────────────────────────────────────────────────
+    mtu:1500    3.09 | 4.59    4.46 | 14.2    5.07 | 21.3    5.18 | 23.9
+    ────────────────────────────────────────────────────────────────────
+    mtu:9000    4.60 | 4.65    8.41 | 14.0    11.3 | 28.9    13.5 | 39.2
+
+
+  The performance gap between QUIC and kTLS may be attributed to:
+
+  - The absence of Generic Segmentation Offload (GSO) for QUIC.
+  - An additional data copy on the transmission (TX) path.
+  - Extra encryption required for header protection in QUIC.
+  - A longer header length for the stream data in QUIC.
+
+Patches
+=======
+
+Note: This implementation is organized into five parts and submitted across
+two patchsets for review. This patchset includes Parts 1–2, while Parts 3–5
+will be submitted in a subsequent patchset. For complete series, see [9].
+
+1. Infrastructure (2):
+
+  net: define IPPROTO_QUIC and SOL_QUIC constants
+  net: build socket infrastructure for QUIC protocol
+
+2. Subcomponents (13):
+
+  quic: provide common utilities and data structures
+  quic: provide family ops for address and protocol
+  quic: provide quic.h header files for kernel and userspace
+  quic: add stream management
+  quic: add connection id management
+  quic: add path management
+  quic: add congestion control
+  quic: add packet number space
+  quic: add crypto key derivation and installation
+  quic: add crypto packet encryption and decryption
+  quic: add timer management
+  quic: add packet builder base
+  quic: add packet parser base
+
+3. Data Processing (8):
+
+  quic: add frame encoder and decoder base
+  quic: implement outqueue transmission and flow control
+  quic: implement outqueue sack and retransmission
+  quic: implement inqueue receiving and flow control
+  quic: implement frame creation functions
+  quic: implement frame processing functions
+  quic: implement packet creation functions
+  quic: implement packet processing functions
+
+4. Socket APIs (6):
+
+  quic: support bind/listen/connect/accept/close()
+  quic: support sendmsg() and recvmsg()
+  quic: support socket options related to interaction after handshake
+  quic: support socket options related to settings prior to handshake
+  quic: support socket options related to setup during handshake
+  quic: support socket ioctls and socket dump via procfs
+
+5. Documentation and Selftests (3):
+
+  Documentation: describe QUIC protocol interface in quic.rst
+  quic: create sample test using handshake APIs for kernel consumers
+  selftests: net: add tests for QUIC protocol
+
+Notice: The QUIC module is currently labeled as "EXPERIMENTAL".
+
+All contributors are recognized in the respective patches with the tag of
+'Signed-off-by:'. Special thanks to Moritz Buhl and Stefan Metzmacher whose
+practical use cases and insightful feedback have been instrumental in
+shaping the design and advancing the development.
+
+References
+==========
+
+[1]  https://datatracker.ietf.org/doc/html/draft-lxin-quic-socket-apis
+[2]  https://github.com/oracle/ktls-utils
+[3]  https://github.com/lxin/quic
+[4]  https://gitlab.com/samba-team/samba/-/merge_requests/4019
+[5]  https://github.com/moritzbuhl/curl/tree/linux_curl
+[6]  https://github.com/moritzbuhl/httpd-portable
+[7]  https://github.com/quic-interop/quic-interop-runner
+[8]  https://github.com/lxin/iperf
+[9]  https://github.com/lxin/net-next/commits/quic/
+[10] https://www.nntb.no/~dreibh/netperfmeter/
+
+Changes in v2-v11: See individual patch changelogs for details.
+
+Xin Long (15):
+  net: define IPPROTO_QUIC and SOL_QUIC constants
+  net: build socket infrastructure for QUIC protocol
+  quic: provide common utilities and data structures
+  quic: provide family ops for address and protocol
+  quic: provide quic.h header files for kernel and userspace
+  quic: add stream management
+  quic: add connection id management
+  quic: add path management
+  quic: add congestion control
+  quic: add packet number space
+  quic: add crypto key derivation and installation
+  quic: add crypto packet encryption and decryption
+  quic: add timer management
+  quic: add packet builder base
+  quic: add packet parser base
+
+ Documentation/networking/ip-sysctl.rst |   39 +
+ MAINTAINERS                            |    9 +
+ include/linux/quic.h                   |   22 +
+ include/linux/socket.h                 |    1 +
+ include/uapi/linux/in.h                |    2 +
+ include/uapi/linux/quic.h              |  237 +++++
+ net/Kconfig                            |    1 +
+ net/Makefile                           |    1 +
+ net/quic/Kconfig                       |   36 +
+ net/quic/Makefile                      |    9 +
+ net/quic/common.c                      |  564 +++++++++++
+ net/quic/common.h                      |  212 +++++
+ net/quic/cong.c                        |  314 ++++++
+ net/quic/cong.h                        |  129 +++
+ net/quic/connid.c                      |  249 +++++
+ net/quic/connid.h                      |  182 ++++
+ net/quic/crypto.c                      | 1204 ++++++++++++++++++++++++
+ net/quic/crypto.h                      |   92 ++
+ net/quic/family.c                      |  402 ++++++++
+ net/quic/family.h                      |   39 +
+ net/quic/packet.c                      |  873 +++++++++++++++++
+ net/quic/packet.h                      |  125 +++
+ net/quic/path.c                        |  560 +++++++++++
+ net/quic/path.h                        |  186 ++++
+ net/quic/pnspace.c                     |  250 +++++
+ net/quic/pnspace.h                     |  157 +++
+ net/quic/protocol.c                    |  418 ++++++++
+ net/quic/protocol.h                    |   63 ++
+ net/quic/socket.c                      |  456 +++++++++
+ net/quic/socket.h                      |  209 ++++
+ net/quic/stream.c                      |  444 +++++++++
+ net/quic/stream.h                      |  133 +++
+ net/quic/timer.c                       |  165 ++++
+ net/quic/timer.h                       |   47 +
+ usr/include/Makefile                   |    1 +
+ 35 files changed, 7831 insertions(+)
+ create mode 100644 include/linux/quic.h
+ create mode 100644 include/uapi/linux/quic.h
+ create mode 100644 net/quic/Kconfig
+ create mode 100644 net/quic/Makefile
+ create mode 100644 net/quic/common.c
+ create mode 100644 net/quic/common.h
+ create mode 100644 net/quic/cong.c
+ create mode 100644 net/quic/cong.h
+ create mode 100644 net/quic/connid.c
+ create mode 100644 net/quic/connid.h
+ create mode 100644 net/quic/crypto.c
+ create mode 100644 net/quic/crypto.h
+ create mode 100644 net/quic/family.c
+ create mode 100644 net/quic/family.h
+ create mode 100644 net/quic/packet.c
+ create mode 100644 net/quic/packet.h
+ create mode 100644 net/quic/path.c
+ create mode 100644 net/quic/path.h
+ create mode 100644 net/quic/pnspace.c
+ create mode 100644 net/quic/pnspace.h
+ create mode 100644 net/quic/protocol.c
+ create mode 100644 net/quic/protocol.h
+ create mode 100644 net/quic/socket.c
+ create mode 100644 net/quic/socket.h
+ create mode 100644 net/quic/stream.c
+ create mode 100644 net/quic/stream.h
+ create mode 100644 net/quic/timer.c
+ create mode 100644 net/quic/timer.h
+
 -- 
-2.51.0
+2.47.1
 
