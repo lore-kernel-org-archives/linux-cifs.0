@@ -1,101 +1,282 @@
-Received: from mail-24425.protonmail.ch (mail-24425.protonmail.ch [109.224.244.25])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4616B76025
-	for <linux-cifs@vger.kernel.org>; Sun, 29 Mar 2026 02:03:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37A430CDAE;
+	Sun, 29 Mar 2026 10:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774749834; cv=none; b=nLV/ugUgEBBtsAlt74ytWHBV6fnS20whP/sg2CKeqR2TnkUWc7xH4/vQxfQgZm4Wsjl5g5LzMPeLBVwH3R50bIUeCCa/2sTh2DzBzYHOJ5W5xdrNwuW4KS7rXQSykP+MKDDesX/gj1ML4cK2EuCbG91opbUDaXZ8PoAOQGq1PY0=
+	t=1774780792; cv=none; b=YrMHkc16uhVmIueGWQl7MVtaVJ6QNim9/zvrdDeu364Kf9WfgybRYihWGTg/BGRwmkdTd3gegAk92HAwFI5S+9nJoY6qFkXzflD3Kpvq8URqjM/77rdMYTvfeKGUFp7Mc5sLwOStbpz2/1QOUUkjywb+HHt7PE+zEaaOpcHMmlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774749834; c=relaxed/simple;
-	bh=MPpX+1V6sVnrbYjFzZoWq8S2QJs+13VLPXX8jUTZTI0=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=TN/rXZTymtfyeMqvknbbce+iMDm9scFAduisZnA+MmYEbiNDDfDYIFBxOeuXFq57GpOVAF8uGm3uvPvYGEQVVQJhlr6bzGSBiVTt1hci3/w45NbUlSy+J2mEqEuhJpFWwA9NWWH+yovvYCm0P3QngUZyI85SIYY+eZZZ015ohzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=ERsfArzz; arc=none smtp.client-ip=109.224.244.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1774780792; c=relaxed/simple;
+	bh=BJkPnJCO8ABpdlvl78QTURZEAzWWbIlz6G8H5tRn6gQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vou2FIBzRsW6dP5pf0NOaI8K/nw7vwa8CIbfDCCqQB7K7RoXnep03xYfr4QC4Y2vGaA7amLoXQ8dqfCz0LjvG2LlEOkyeE3h0r1JJnNC+5EoIBPo9hjkhFCxc29HByLpoMlPjQw0Ydod+zNtZF5OBhKL3xcGo7RD1b3k9aZ58C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=LSA/p24b; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ERsfArzz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1774749821; x=1775009021;
-	bh=jw7+sfd+qB0vbVbLoMklzSKEktx9W18DbP2b4yckE6w=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=ERsfArzzV92+H7OtUJKXH+gRSGPlsbzrQR3grewV/1WUKEyLS786ALUKRgeCj0Txn
-	 Bm//TJRydyyh5x5wxQuCm2LeYdGIELt+B3JpTxRVPfhsNB+XQ2cLE/TykTaYPUjA/x
-	 jgpXTRSb+curNe1+wqvrICF/FFuPX9Ej7a0+BxFxElQZPbiRBT94CsHrfFucUBWS5A
-	 doINANtiS0NFsFFfs16wLZeW62ewxZ8GZ7dC6m2x0S9XK2yFFg0zloV54SIYLf4Qw2
-	 30JHO9oR11C1hVa3KZVIfev7jEUz65BpHQszrymWutLvlZjZ9z2ToKq4EWmnBcseRB
-	 hAaSip7uu0Bww==
-Date: Sun, 29 Mar 2026 02:03:38 +0000
-To: "sfrench@samba.org" <sfrench@samba.org>
-From: FredTheDude <FredTheDude@proton.me>
-Cc: "pc@manguebit.org" <pc@manguebit.org>, "ronniesahlberg@gmail.com" <ronniesahlberg@gmail.com>, "sprasad@microsoft.com" <sprasad@microsoft.com>, "tom@talpey.com" <tom@talpey.com>, "bharathsm@microsoft.com" <bharathsm@microsoft.com>, "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH] fs/smb/client: add verbose error logging for UNC parsing
-Message-ID: <2__2tXx9Hngg7rDwgOdZVY8FFBkjQGk_0TviV3dVWkoCa9CZznTtxHJsVvgg9U0lyXUo-_6KKPTPFZTIGTLo9YfQczBj2CxTZypXB2ydr7c=@proton.me>
-Feedback-ID: 151443565:user:proton
-X-Pm-Message-ID: e1b80ed98d432ae410aefef9a25b1ff45a792b96
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="LSA/p24b"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=35kKxUVBYro2SeM6ocrFn0qXSAY7oP/wMRsnYfWK9ak=; b=LSA/p24bex3iCNjrbr2Y3gClIg
+	smlF06ao/O1GVSiKS7XeUE24ZKDRYRwvOOzGM8uoA5rnb22Onyz1P8NBz9nGSfD/g3jS2nNqaPe9A
+	DGfj2L8iJCkYb47IpNE4El3HuTyRODDTi7K13OlSPJmD+8WCXL9ubiVLHtkKyqwAhiGKCY/rT3gLP
+	2ICJJjnfxuJHHMduL5P1My7iVnuIgv1lZlGkVlKfapfkpCpAIQITV7o3CLnmmKwomXJpbpwZ0Xa4x
+	StLcOYfQf7Yqnu+iARwQNmAcqiu8lYmHl/YikLgN3Lw+b4KbTM5WgoIStacBJ8UP4wo2toCUHDLe4
+	+OKQRehRm9bUN9Xcg761+3HHfNTWuPPjmKqrJ+qMOT5roAzTNNAztSCEL1wM32TKxr3iPjmNiGwno
+	nvpVS8TIGe+8LcHASXL1CLVANYD93DcMII9vVSIha9G1usEaQwj8z3U50VDUeR2omGhj2An0CsqxF
+	Q3NFYFpj5ztkVfHsH2utDuUE;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1w6nYZ-00000004jEZ-0gHh;
+	Sun, 29 Mar 2026 10:39:47 +0000
+Message-ID: <3f19c05a-d8aa-4ce5-8bcf-b51a1f110cb5@samba.org>
+Date: Sun, 29 Mar 2026 12:39:46 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 19/26] cifs: Remove support for ITER_KVEC/BVEC/FOLIOQ from
+ smb_extract_iter_to_rdma()
+To: David Howells <dhowells@redhat.com>,
+ Christian Brauner <christian@brauner.io>,
+ Matthew Wilcox <willy@infradead.org>, Christoph Hellwig <hch@infradead.org>
+Cc: Paulo Alcantara <pc@manguebit.com>, Jens Axboe <axboe@kernel.dk>,
+ Leon Romanovsky <leon@kernel.org>, Steve French <sfrench@samba.org>,
+ ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+ Marc Dionne <marc.dionne@auristor.com>,
+ Eric Van Hensbergen <ericvh@kernel.org>,
+ Dominique Martinet <asmadeus@codewreck.org>,
+ Ilya Dryomov <idryomov@gmail.com>, Trond Myklebust <trondmy@kernel.org>,
+ netfs@lists.linux.dev, linux-afs@lists.infradead.org,
+ linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>
+References: <20260326104544.509518-1-dhowells@redhat.com>
+ <20260326104544.509518-20-dhowells@redhat.com>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <20260326104544.509518-20-dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add cifs_dbg(VFS, ...) statements to smb3_parse_devname() to provide
-explicit feedback when parsing fails. Currently, the function returns
--EINVAL silently, making it difficult to debug mount failures caused
-by malformed paths or missing share names.
+Hi David,
 
-Signed-off-by: Fredric Cover <FredTheDude@proton.me>
----
+in ksmbd-for-next smbdirect_map_sges_from_iter is also called
+in the server from smb_direct_writev() =>
+smbdirect_connection_send_iter() =>
+smbdirect_connection_send_single_iter()
 
-If I made any stupid mistakes, please be patient with me.
-C is not my best language, and this is my first patch, and I am just a high=
- school freshman. Thanks!
----
- fs/smb/client/fs_context.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+So we still need ITER_KVEC.
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index a4a7c7eee..03c112f4d 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -658,13 +658,17 @@ smb3_parse_devname(const char *devname, struct smb3_f=
-s_context *ctx)
+Thanks!
+metze
 
-        /* make sure we have a valid UNC double delimiter prefix */
-        len =3D strspn(devname, delims);
--       if (len !=3D 2)
-+       if (len !=3D 2) {
-+               cifs_dbg(VFS, "UNC: path must begin with // or \\\\\n");
-                return -EINVAL;
-+       }
+Am 26.03.26 um 11:45 schrieb David Howells:
+> netfslib now only presents an bvecq queue and an associated ITER_BVECQ
+> iterator to the filesystem, so it isn't going to see ITER_KVEC, ITER_BVEC
+> or ITER_FOLIOQ iterators.  So remove that code.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <sfrench@samba.org>
+> cc: Paulo Alcantara <pc@manguebit.org>
+> cc: Shyam Prasad N <sprasad@microsoft.com>
+> cc: Tom Talpey <tom@talpey.com>
+> cc: linux-cifs@vger.kernel.org
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+>   fs/smb/client/smbdirect.c | 165 --------------------------------------
+>   1 file changed, 165 deletions(-)
+> 
+> diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+> index f8a6be83db98..d9e026d5e9f9 100644
+> --- a/fs/smb/client/smbdirect.c
+> +++ b/fs/smb/client/smbdirect.c
+> @@ -3142,162 +3142,6 @@ static bool smb_set_sge(struct smb_extract_to_rdma *rdma,
+>   	return true;
+>   }
+>   
+> -/*
+> - * Extract page fragments from a BVEC-class iterator and add them to an RDMA
+> - * element list.  The pages are not pinned.
+> - */
+> -static ssize_t smb_extract_bvec_to_rdma(struct iov_iter *iter,
+> -					struct smb_extract_to_rdma *rdma,
+> -					ssize_t maxsize)
+> -{
+> -	const struct bio_vec *bv = iter->bvec;
+> -	unsigned long start = iter->iov_offset;
+> -	unsigned int i;
+> -	ssize_t ret = 0;
+> -
+> -	for (i = 0; i < iter->nr_segs; i++) {
+> -		size_t off, len;
+> -
+> -		len = bv[i].bv_len;
+> -		if (start >= len) {
+> -			start -= len;
+> -			continue;
+> -		}
+> -
+> -		len = min_t(size_t, maxsize, len - start);
+> -		off = bv[i].bv_offset + start;
+> -
+> -		if (!smb_set_sge(rdma, bv[i].bv_page, off, len))
+> -			return -EIO;
+> -
+> -		ret += len;
+> -		maxsize -= len;
+> -		if (rdma->nr_sge >= rdma->max_sge || maxsize <= 0)
+> -			break;
+> -		start = 0;
+> -	}
+> -
+> -	if (ret > 0)
+> -		iov_iter_advance(iter, ret);
+> -	return ret;
+> -}
+> -
+> -/*
+> - * Extract fragments from a KVEC-class iterator and add them to an RDMA list.
+> - * This can deal with vmalloc'd buffers as well as kmalloc'd or static buffers.
+> - * The pages are not pinned.
+> - */
+> -static ssize_t smb_extract_kvec_to_rdma(struct iov_iter *iter,
+> -					struct smb_extract_to_rdma *rdma,
+> -					ssize_t maxsize)
+> -{
+> -	const struct kvec *kv = iter->kvec;
+> -	unsigned long start = iter->iov_offset;
+> -	unsigned int i;
+> -	ssize_t ret = 0;
+> -
+> -	for (i = 0; i < iter->nr_segs; i++) {
+> -		struct page *page;
+> -		unsigned long kaddr;
+> -		size_t off, len, seg;
+> -
+> -		len = kv[i].iov_len;
+> -		if (start >= len) {
+> -			start -= len;
+> -			continue;
+> -		}
+> -
+> -		kaddr = (unsigned long)kv[i].iov_base + start;
+> -		off = kaddr & ~PAGE_MASK;
+> -		len = min_t(size_t, maxsize, len - start);
+> -		kaddr &= PAGE_MASK;
+> -
+> -		maxsize -= len;
+> -		do {
+> -			seg = min_t(size_t, len, PAGE_SIZE - off);
+> -
+> -			if (is_vmalloc_or_module_addr((void *)kaddr))
+> -				page = vmalloc_to_page((void *)kaddr);
+> -			else
+> -				page = virt_to_page((void *)kaddr);
+> -
+> -			if (!smb_set_sge(rdma, page, off, seg))
+> -				return -EIO;
+> -
+> -			ret += seg;
+> -			len -= seg;
+> -			kaddr += PAGE_SIZE;
+> -			off = 0;
+> -		} while (len > 0 && rdma->nr_sge < rdma->max_sge);
+> -
+> -		if (rdma->nr_sge >= rdma->max_sge || maxsize <= 0)
+> -			break;
+> -		start = 0;
+> -	}
+> -
+> -	if (ret > 0)
+> -		iov_iter_advance(iter, ret);
+> -	return ret;
+> -}
+> -
+> -/*
+> - * Extract folio fragments from a FOLIOQ-class iterator and add them to an RDMA
+> - * list.  The folios are not pinned.
+> - */
+> -static ssize_t smb_extract_folioq_to_rdma(struct iov_iter *iter,
+> -					  struct smb_extract_to_rdma *rdma,
+> -					  ssize_t maxsize)
+> -{
+> -	const struct folio_queue *folioq = iter->folioq;
+> -	unsigned int slot = iter->folioq_slot;
+> -	ssize_t ret = 0;
+> -	size_t offset = iter->iov_offset;
+> -
+> -	BUG_ON(!folioq);
+> -
+> -	if (slot >= folioq_nr_slots(folioq)) {
+> -		folioq = folioq->next;
+> -		if (WARN_ON_ONCE(!folioq))
+> -			return -EIO;
+> -		slot = 0;
+> -	}
+> -
+> -	do {
+> -		struct folio *folio = folioq_folio(folioq, slot);
+> -		size_t fsize = folioq_folio_size(folioq, slot);
+> -
+> -		if (offset < fsize) {
+> -			size_t part = umin(maxsize, fsize - offset);
+> -
+> -			if (!smb_set_sge(rdma, folio_page(folio, 0), offset, part))
+> -				return -EIO;
+> -
+> -			offset += part;
+> -			ret += part;
+> -			maxsize -= part;
+> -		}
+> -
+> -		if (offset >= fsize) {
+> -			offset = 0;
+> -			slot++;
+> -			if (slot >= folioq_nr_slots(folioq)) {
+> -				if (!folioq->next) {
+> -					WARN_ON_ONCE(ret < iter->count);
+> -					break;
+> -				}
+> -				folioq = folioq->next;
+> -				slot = 0;
+> -			}
+> -		}
+> -	} while (rdma->nr_sge < rdma->max_sge && maxsize > 0);
+> -
+> -	iter->folioq = folioq;
+> -	iter->folioq_slot = slot;
+> -	iter->iov_offset = offset;
+> -	iter->count -= ret;
+> -	return ret;
+> -}
+> -
+>   /*
+>    * Extract memory fragments from a BVECQ-class iterator and add them to an RDMA
+>    * list.  The folios are not pinned.
+> @@ -3373,15 +3217,6 @@ static ssize_t smb_extract_iter_to_rdma(struct iov_iter *iter, size_t len,
+>   	int before = rdma->nr_sge;
+>   
+>   	switch (iov_iter_type(iter)) {
+> -	case ITER_BVEC:
+> -		ret = smb_extract_bvec_to_rdma(iter, rdma, len);
+> -		break;
+> -	case ITER_KVEC:
+> -		ret = smb_extract_kvec_to_rdma(iter, rdma, len);
+> -		break;
+> -	case ITER_FOLIOQ:
+> -		ret = smb_extract_folioq_to_rdma(iter, rdma, len);
+> -		break;
+>   	case ITER_BVECQ:
+>   		ret = smb_extract_bvecq_to_rdma(iter, rdma, len);
+>   		break;
+> 
 
-        /* find delimiter between host and sharename */
-        pos =3D strpbrk(devname + 2, delims);
--       if (!pos)
-+       if (!pos) {
-+               cifs_dbg(VFS, "UNC: missing delimiter between hostname and =
-share name\n");
-                return -EINVAL;
-+       }
-
-        /* record the server hostname */
-        kfree(ctx->server_hostname);
-@@ -677,8 +681,10 @@ smb3_parse_devname(const char *devname, struct smb3_fs=
-_context *ctx)
-
-        /* now go until next delimiter or end of string */
-        len =3D strcspn(pos, delims);
--       if (!len)
-+       if (!len) {
-+               cifs_dbg(VFS, "UNC: missing share name\n");
-                return -EINVAL;
-+       }
-
-        /* move "pos" up to delimiter or NULL */
-        pos +=3D len;
---
-2.43.0
