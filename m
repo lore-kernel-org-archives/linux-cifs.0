@@ -1,92 +1,98 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9259EDDA9;
-	Sun, 29 Mar 2026 11:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513D13A1A28
+	for <linux-cifs@vger.kernel.org>; Mon, 30 Mar 2026 10:50:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774782475; cv=none; b=T3+5g99/dVZnsu4i7xqVEYspXhAyAPGVWvhn3TQhZbD1N80M0j9JpxzP/pr1IJsr7meV8WWeLOiGWEZWiyl1iHTG+6SQsYpvguDPbpmtjqEMlfyC3PXsAzy8dwXyOcbnODbn2uv9l0SXqwg+3QF6+fNM5XuMTWdXTIjmmNkib3A=
+	t=1774867803; cv=none; b=WVin2So7Kr4b3VEoKavOxcqF/Drczz4tGj/A/PrIVjmvBfLtqNPlnVQLJxB01beAgA4fyeLImJGEe00+qwBL15Dcgb+FYEIeU4grVwi2Z+gNp5VEFGZ6Hf6Fpcnsm5Ohc1wRh/0kMSCrfxapjtD2k/oeH6jvvBFDJCPW6DwNMDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774782475; c=relaxed/simple;
-	bh=yjjxpqvd+a/rjA5MTzXYdAhwfxQxaGwCW/0Eq+6+umE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jZTBTCxnafYCRhLFUB+XL9WYgtpjHUXin2Sxg2mrNNeh1H8Mc3rhfojdRX+7zAnMhDSU6XKAXp9weIqSZ4qRHBdN6g5bYhT5E6AjUiqwWC61qwfNvFaUWyffIUop1SKiPZa9tsB6rDH88imAMuiPQm2V0cqnpsLEdXeneV2dey8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=PiLEQZm5; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1774867803; c=relaxed/simple;
+	bh=O5rjj0AsnkbLRLrZU050r9pTFp4OgaTs2V8lxweiJpQ=;
+	h=In-Reply-To:References:To:Cc:Subject:MIME-Version:Content-Type:
+	 From:Date:Message-ID; b=YeuEdJJatcypHKMQScWhvUjAr7osGvlzEf6doHGvyFfpOqNP7nA4sPIZvhR6l3NjWCUNJg+sKfrISWrTf6PgOtqsf9VWsoqVk0+97msTAf18zfQEzvRcCPYOr44C2ZROb2Ll4enHCe7pq+RYuxSpS+dBo0m473lB+7fEbEqM3kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b2IJxvJW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="PiLEQZm5"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=RxhU2zRFQJPwn1alKxvt3d1j41p1m0pswRCOYSeSKwk=; b=PiLEQZm5mqvScAjS2ran7A93NN
-	tT+0hqNaO3AKSp38VFjDOyr4QqHf3f/PF+otaCe3CHPlw3os32ci3djrk1cBqD0QoXt3Cj1l3rWbk
-	2VhlGnA/OnYQzduAxvCOfFunZuYi887tOwzpuwaxAD9U9qBTuBgFZr9ZBYQ4RVf2EcjrlTt68tjxI
-	VzJjMsBP5bIXQc+7FkCMtUMPXo5BJ4eIfdkXMudiMTr6OOw0Dly9xZUQ2WPBzDhEmlB/xpOMCn81K
-	ViLZrp89MjoXaFWcEnmY3wJkRyOAvQKCa3yzwF3BbuaNm2s1thT9Nk+ilOoR6VnbMT1qlPoKnUxgR
-	uGk35xQTni/lUJofQir41P6/cB4pTAu3aBDEt3aSmXyUo1tAFqygU5UQpOfuDYGildw2qghrqeKQP
-	jbs24HACeelMd0x7/+0rocvMjfOtLuEbguusbVq73SMM/S1GHueZTkRaFsaMkZsBtKr272mpMP1lc
-	b9lye8A4/GwbzG9YVkIUg9qx;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1w6nzj-00000004jUw-0RdL;
-	Sun, 29 Mar 2026 11:07:51 +0000
-Message-ID: <52ad0aa6-d8dd-4ba1-adf2-f79128df9d90@samba.org>
-Date: Sun, 29 Mar 2026 13:07:50 +0200
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b2IJxvJW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774867801;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lOQZbvZuSo6Y8bQBNAYlaEet3lfPqVfW+sXL8vzvXhA=;
+	b=b2IJxvJWBvsXSbyERMjuutsmuMCtHm2OQokXV1ZeHjwf1UWobMPN/6ZaAUR3DyxhUQApxg
+	+Wn6dWXGuqNQKSHhrRIHwoUL/DqfG3vN/2rf7jfQcb+4Er4Lq21vo6bQRn8VADWXI7Lrab
+	VUq5OJDT34na5rOgeWN3OnhFkmBKfRg=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-426-JLNIgM7fPXu4cdrMLHIQ5w-1; Mon,
+ 30 Mar 2026 06:49:58 -0400
+X-MC-Unique: JLNIgM7fPXu4cdrMLHIQ5w-1
+X-Mimecast-MFC-AGG-ID: JLNIgM7fPXu4cdrMLHIQ5w_1774867795
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B30281944F11;
+	Mon, 30 Mar 2026 10:49:53 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.35.245])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 543211955D84;
+	Mon, 30 Mar 2026 10:49:44 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+In-Reply-To: <52ad0aa6-d8dd-4ba1-adf2-f79128df9d90@samba.org>
+References: <52ad0aa6-d8dd-4ba1-adf2-f79128df9d90@samba.org> <20260326104544.509518-1-dhowells@redhat.com>
+To: Stefan Metzmacher <metze@samba.org>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Matthew Wilcox <willy@infradead.org>,
+    Christoph Hellwig <hch@infradead.org>,
+    Steve French <smfrench@gmail.com>,
+    Namjae Jeon <linkinjeon@kernel.org>,
+    Paulo Alcantara <pc@manguebit.com>, Jens Axboe <axboe@kernel.dk>,
+    Leon Romanovsky <leon@kernel.org>, Steve French <sfrench@samba.org>,
+    ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Trond Myklebust <trondmy@kernel.org>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/26] netfs: Keep track of folios in a segmented bio_vec[] chain
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/26] netfs: Keep track of folios in a segmented
- bio_vec[] chain
-To: David Howells <dhowells@redhat.com>,
- Christian Brauner <christian@brauner.io>,
- Matthew Wilcox <willy@infradead.org>, Christoph Hellwig <hch@infradead.org>,
- Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>
-Cc: Paulo Alcantara <pc@manguebit.com>, Jens Axboe <axboe@kernel.dk>,
- Leon Romanovsky <leon@kernel.org>, Steve French <sfrench@samba.org>,
- ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
- Marc Dionne <marc.dionne@auristor.com>,
- Eric Van Hensbergen <ericvh@kernel.org>,
- Dominique Martinet <asmadeus@codewreck.org>,
- Ilya Dryomov <idryomov@gmail.com>, Trond Myklebust <trondmy@kernel.org>,
- netfs@lists.linux.dev, linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260326104544.509518-1-dhowells@redhat.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20260326104544.509518-1-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1005366.1774861048.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+From: David Howells <dhowells@redhat.com>
+Date: Mon, 30 Mar 2026 11:49:41 +0100
+Message-ID: <1180465.1774867781@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Am 26.03.26 um 11:45 schrieb David Howells:
-> Hi Christian,
-> 
-> Could you add these patches to the VFS tree for next?
+Stefan Metzmacher <metze@samba.org> wrote:
 
-As this conflicts with ksmbd-for-next (and that's
-a branch that's typically rebased every few days)
-I'm wondering what that best way is to resolve that
-problem.
+> Another possible way would be to skip this for now
+> cifs: Remove support for ITER_KVEC/BVEC/FOLIOQ from smb_extract_iter_to_=
+rdma()
+> and I rebase my changes on top of Davids patches assuming they
+> will be stable commits (at least up to
+> cifs: Support ITER_BVECQ in smb_extract_iter_to_rdma())
 
-Maybe we should have a fixed non rebased branch for the
-smbdirect.ko patches in ksmbd-for-next, so that David
-can rebase on that.
+I could certainly split my removal patch.  I want to remove FOLIOQ support=
+,
+but I can leave KVEC and/or BVEC if they're still needed.
 
-Or should Steve put this also into ksmbd-for-next?
+David
 
-Another possible way would be to skip this for now
-cifs: Remove support for ITER_KVEC/BVEC/FOLIOQ from smb_extract_iter_to_rdma()
-and I rebase my changes on top of Davids patches assuming they
-will be stable commits (at least up to
-cifs: Support ITER_BVECQ in smb_extract_iter_to_rdma())
-
-Any ideas?
-
-metze
