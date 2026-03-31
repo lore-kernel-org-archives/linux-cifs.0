@@ -1,93 +1,70 @@
-Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D843DF003;
-	Tue, 31 Mar 2026 08:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59E2401A22
+	for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 17:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774945664; cv=none; b=bMuSJWeJ8g+6Kts48RrpJzBTSQHxpEwUxRIhyFgup4NGth5n6UAQiGCD/oviLk4Exop91LKITHLHKbxI0tRE8liTGfz7Ue255BqVdX82qNwNeai15JvWJviSSnzlPE3iEEhisB1vTUNNK9HdPtcpv5FGQru63aHzE582eN06l/w=
+	t=1774979063; cv=none; b=UWRu0tNQDEPsynjxz77tJh9cFtOg9yWsGqSS/1deuL1hKe7mPor3ZP6QuySsqM1ADQlfO+QT9UwrGhs2aKCjyFmu+XZt9TErTdS+2goCNXhPsFi6C6Oxk1tJlckT3fVnRzjX3vxlfMEh7kRpNq0ADnHQwGt+ckK4GEf4MzhHuJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774945664; c=relaxed/simple;
-	bh=Yx1Xll+DsQnpK2EeA64/CzyBUEm1aXMFc+DIWQjRQjg=;
+	s=arc-20240116; t=1774979063; c=relaxed/simple;
+	bh=oZd3hPK9L/0mL/z9u7Qet+0p4vFG6xvJVtBKgJRh1SA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P/QPHhHtUHvfYwZOcg8jMqVxu8znBOKRLKdeHSQiZEIMTE+7RSW7q4bF/xOGnZMMbON0opgz2hKkYalSP60KobXjFx9pnymT2r1n5lRkA6nT7WG3GcHAA1/6t5m0eqqFdjngb0Agjx5kSAOWqc69X/mFefEJmWzTBaOkneBAvLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=Ph+VFMKM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NuB4IJ5D; arc=none smtp.client-ip=103.168.172.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=YaGB4ilSjbo3R46vAsHevsKoRHYtpAAXKUHcAXtKTJ0yNaJNyR1dcq6zUW27nqrKb1dhIhh5wDs/EDISB6gRZpdXEVTi+NgzdX4OeKcEUYeZAecSHM8b5HLwrr8FmOtuZVVee+V1GoKq63oDJEdKQlWxd5IkKMK2vzF+TQ2gIkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=KWBLHyFq; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="Ph+VFMKM";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NuB4IJ5D"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 82429EC022C;
-	Tue, 31 Mar 2026 04:27:41 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Tue, 31 Mar 2026 04:27:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1774945661; x=1775032061; bh=c9Qkm02a5w
-	q082IfjuzHjs6ovjvxof7MtSCn6YRQST4=; b=Ph+VFMKMAXTaagkKOfQt6LOc88
-	yW1xEbxyA4OJSVyzbVE3G6tlwapGK+kVDEF5/IMsQpwmhrretPkh9Z48vmnRnjql
-	DkC72IROTcpr+o21Qg97aCo/OM1td+jqR3EZNpeHjxyzIUvKxtli8hWjtUz/943u
-	BvGuOpq0v/Cy2v+yWhycjsAgZfbPZN0wMoqSdpmoSRstklGAdZiYYcNQx0A2HKbR
-	pg3b0LZAaLtyiG5CaY7Xim7F+1kmvgrKaEoakoKbld9Gj5LvbFc7X7MnfRLg3I+2
-	jE4/0PdYnXMj77lOUUVeVZOVCBtt4udCZ8dpuQtvg4DSPaIDiXI3kVAxiMbw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1774945661; x=1775032061; bh=c9Qkm02a5wq082IfjuzHjs6ovjvxof7MtSC
-	n6YRQST4=; b=NuB4IJ5DEhGHPdidAkkluxRjQNz25rkjd+oLUPGfgngZSthWSF9
-	nHD4ByVw+5+s4vJi3WPMk5eu2Ing6otcUsNuXBCf0Mu8uBCJvqKxbgQWpii1wFH2
-	Jv60f8UdvlOSan3ArasgJHOSSLXwTIw6XkKWp2cSOBhzwGqacf5idGR5/HJRVqnV
-	k0a79slXlRELMTN64FElLsf3MlA9Szlrnoi+ds3ssNnTl5NEc+uVpCfX65LHwina
-	/KGQJgAtGkX9fG4eaALFL1NwwB/3sfJ1i761ttWl3dJcTUUgGuVNqkBx3GHc+z9o
-	TgMFpq42iQKRRKJjQfiSpqbeBq2KnmIgLeQ==
-X-ME-Sender: <xms:fYXLadUeXhiOLtQw2KQyqGIgR07FlSRWDQY4P9AqmdDeipLcP08a-Q>
-    <xme:fYXLaUoVftJzncRJjqfQHJkSkFMJEyeEF1EqxBQQoW5EL6KU0YEvN1Epo8G2QOrae
-    mvPGOXS413RZJaBzAmh0aSP_a5woXsK90mkHy8JBeFLZ_AgkA>
-X-ME-Received: <xmr:fYXLaRGu0bxH7jKcZMl2JK5dTkKgAYbJkZcyI10z3JxVrPh7ACIETLEL3oI_a-1Y-NrrPVXygeG0xJIqtBA0EfzYGluNPkflu1ajj8UvPQ8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefgedugedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
-    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepgeehueehgf
-    dtledutdelkeefgeejteegieekheefudeiffdvudeffeelvedttddvnecuffhomhgrihhn
-    pehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomhdpnhgspghrtghpthhtohepvddt
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehghhgrughirdhrrghhmhgvsegtrg
-    hnohhnihgtrghlrdgtohhmpdhrtghpthhtohepshhtrggslhgvsehvghgvrhdrkhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtohepshhfrhgvnhgthhesshgrmhgsrgdrohhrghdprhgtph
-    htthhopehptgestghjrhdrnhiipdhrtghpthhtoheplhhsrghhlhgsvghrsehrvgguhhgr
-    thdrtghomhdprhgtphhtthhopehsphhrrghsrggusehmihgtrhhoshhofhhtrdgtohhmpd
-    hrtghpthhtohepthhomhesthgrlhhpvgihrdgtohhmpdhrtghpthhtoheprggrphhtvghl
-    sehsuhhsvgdrtghomhdprhgtphhtthhopehlihhnuhigqdgtihhfshesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:fYXLaWsXZcct0UDUC8VOT9v26x8tehz4pz4LJDvGTogrmIvD2PZa8g>
-    <xmx:fYXLaUQoc5i5zuFSwk75FsuV587PEo_K6KntQPUcVKk8FxCwv84vmw>
-    <xmx:fYXLaTHuthN9b-LorOIjQxcO7SaCReFBb4dhwbXijjzEHscVtsGWUg>
-    <xmx:fYXLaWd1Pm3wnczhMBAtQQW_JCSbeK01HGB4Ns1R1MIkKsBNl2w_uQ>
-    <xmx:fYXLaS3TgabrFuQlWCi6Ts01DRYgZMByI0tHyPuWxLkgL_qR5beDU-dh>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 31 Mar 2026 04:27:40 -0400 (EDT)
-Date: Tue, 31 Mar 2026 10:27:38 +0200
-From: Greg KH <greg@kroah.com>
-To: Ghadi Rahme <ghadi.rahme@canonical.com>
-Cc: stable@vger.kernel.org, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@cjr.nz>, Ronnie Sahlberg <lsahlber@redhat.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Aurelien Aptel <aaptel@suse.com>, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: Re: [PATCH v2 6.1.y] smb/dfs_cache: Fix NULL pointer dereference on
- session connection failure
-Message-ID: <2026033136-refining-ladybug-08b0@gregkh>
-References: <20260319144929.455978-1-ghadi.rahme@canonical.com>
- <2026032339-irate-monsoon-76ce@gregkh>
- <a7c5ecb2-d46c-4061-a70a-c7b149db56f2@canonical.com>
- <2026033140-endearing-handcraft-b66a@gregkh>
- <0dcbb073-4745-479a-8d55-bdb0a3fe55e8@canonical.com>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="KWBLHyFq"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-486fc4725f0so1459535e9.1
+        for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 10:44:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1774979058; x=1775583858; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mKzfVYqCgbOQnSriQplParufelLcSKqa365dNwu6KE4=;
+        b=KWBLHyFq1o0TS9rsIBly+Tz4e5t6RyWrpOAqHkZQblgKTp3hGWv89hzQ33mjTcgdyg
+         pbmRD/cZLF4U5dKhDx4onD1fw0s3bwchNjQqKxJ1mrsL4S5SzTsFiP/tUlXUYmH/ScyP
+         OfXFbEDyNV1SLy3yAfZeO4DG4MChTQ268hkpf8Lpqo/huRvOQgnkJeZ8x5Vjd8cuDhc+
+         rwqveon+CgNZgFfO6eyOdSNjgnf0ZawF9SHvgYMsBSnkSmSfn48b8jNqZPX3WQq0QKig
+         T761cyOrYSCWJ6D7OMmuONfk/6X3PQ2RHJo3gH02nRcGOg5q1n9DtB73HTBjMffAKY0w
+         67Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774979058; x=1775583858;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mKzfVYqCgbOQnSriQplParufelLcSKqa365dNwu6KE4=;
+        b=WjzL2r0ZqeFZzzwNn9GXZ5/l7i8CiFjBacAl4QTrBLxsR7He82luWA5UitxD95JImI
+         i+0LhFcQtoGiHlhT/jXf+ihRDCKYBmQXcPCsAEQRttt5Rplz4Yw/l1D1i3sygyoFC+rC
+         Av/ueIyil6DXkUGqxwzUsdrzIM5KTPNtO590K9QiQRtBgewjaQ4g9IrYOcF+KM6C1s3E
+         vKFGsWGvCqbpGb29rczmeHW8PfblTrywb5d1DSYZs+7FkJAkfWUg3S+3f1HkaURf5uPd
+         RRTAmnUqlThdouZ+lKq9JRjHQkaURyJU1qDoGdQvB9AILdcBuYvnIcEgkFxAKjl4IgC7
+         FIVg==
+X-Gm-Message-State: AOJu0YzNueqtqRbp/6ITr24P5HRonpeGa8GXdB/Rb3lH118YIEiihhfa
+	4jof3p8EqEU8mZeFltp+vvqrPpnVpyGr25JZHFcMjo+c6UqjiVii/JUw9mCFdhGz4w5kliOF53m
+	TXfqgKrc=
+X-Gm-Gg: ATEYQzxsRgEqdSYypaXMeKgkL2+tB22SzeBSyC80oaaWx3PGDw252k6deKuCpOEs03e
+	OSwp+nEjlt3H12tXAz2xanlQQwlEg/E2ILwPAFOVklOsZ402LOBQaXZ8y6LOunFbo2TNCDjnCQ+
+	JFQ0jHNKhRvZ6PZm4rXlZzGVukPtelZJZIO4HHsmUsDmDR0kU2rtx+gmpkk/0C40MMQJMEQJbuB
+	9xN1AqbDBciJynfG27Xq8NBYj3oc6f+TRZrXWupOkJFaT5LKd54Xhpk8pz7Ky7jvZSJkUrQVbBe
+	Qos4xpFmqKKBfvNAj6dR8nIPz6xTsR2pqD/CpRp8zvz94fH28TLywm26CopbdDnywwWV4G56Bi5
+	lbgljD2hEdBOphZQ4gEZLOh9m7MQ1QWtdXuRlVInEEGlHhMFi+9vwRjJ3cxNjKPq3Bp+1gUD5gl
+	liI/AzhXW7FS/ZTgeFsVH73Ioi+44YMAAs6YxkQewZISSeoZuqGvCrcj4=
+X-Received: by 2002:a05:600c:300b:b0:486:fcc7:6811 with SMTP id 5b1f17b1804b1-488783d24aemr49172815e9.10.1774979058252;
+        Tue, 31 Mar 2026 10:44:18 -0700 (PDT)
+Received: from precision.tail0b5424.ts.net ([2804:7f0:6400:80bf:5df9:f3dc:e523:9865])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56d58893d37sm14086712e0c.3.2026.03.31.10.44.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2026 10:44:17 -0700 (PDT)
+Date: Tue, 31 Mar 2026 14:44:12 -0300
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: David Disseldorp <ddiss@suse.de>
+Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
+	Bruno Bierbaumer <bruno@bierbaumer.net>
+Subject: Re: [PATCH] mount.cifs: fix buffer overrun in set_password
+Message-ID: <gbcm4vg7zuypkhcec2hrb6mpxh5nallpyp33s2wbwlzbwzvbpj@aeg3rweqrmyu>
+References: <20260331000911.16062-1-ddiss@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -96,35 +73,47 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0dcbb073-4745-479a-8d55-bdb0a3fe55e8@canonical.com>
+In-Reply-To: <20260331000911.16062-1-ddiss@suse.de>
 
-On Tue, Mar 31, 2026 at 10:54:08AM +0300, Ghadi Rahme wrote:
-> > Then why not backport the specific changes that caused newer kernels to
-> not be affected?
-> 
-> Based on the documentation [1] for submitting patches to stable, the patch
-> cannot be over 100 lines long with context.
-> 
-> The upstream patch exceeds this limit by a lot and cherry picking the
-> specific changes from it that remove this function is not feasible without
-> causing the driver to break. In other words the removal of
-> "find_ipc_from_server_path" is dependent on this refactor.
-> 
-> > Backport the same changes?
-> 
-> I can go ahead with this solution, given I get the green light to ignore the
-> 100 line rule.
-> 
-> [1] https://www.kernel.org/doc/html/v4.11/process/stable-kernel-rules.html#
+Reviewed-by: Henrique Carvalho <henrique.carvalho@suse.com>
 
-We take "large" backports from mainline all the time, as long as the
-maintainers for the subsystem are ok with it.  to take one-off patches
-is usually much harder as the change itself is almost always "wrong",
-and then future changes are even harder to backport.
-
-So I recommend working with the maintainers here please and see what
-they want to do, if anything.
-
-thanks,
-
-greg k-h
+On Tue, Mar 31, 2026 at 11:09:11AM +1100, David Disseldorp wrote:
+> The existing (j > pass_length) check is insufficient to avoid dst buffer
+> overrun into the start of the adjacent struct parsed_mount_info field.
+> Check for overrun before writing to dst, and account for comma-expansion
+> and null-termination.
+> 
+> Bug: https://bugzilla.samba.org/show_bug.cgi?id=16044
+> 
+> Reported-by: Bruno Bierbaumer <bruno@bierbaumer.net>
+> Signed-off-by: David Disseldorp <ddiss@suse.de>
+> ---
+>  mount.cifs.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 1923913..d41ca6a 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -350,13 +350,13 @@ set_password(struct parsed_mount_info *parsed_info, const char *src,
+>  	unsigned int i = 0, j = 0;
+>  
+>  	while (src[i]) {
+> -		if (src[i] == ',')
+> -			dst[j++] = ',';
+> -		dst[j++] = src[i++];
+> -		if (j > pass_length) {
+> +		if (j + 2 >= pass_length) {
+>  			fprintf(stderr, "Converted password too long!\n");
+>  			return EX_USAGE;
+>  		}
+> +		if (src[i] == ',')
+> +			dst[j++] = ',';
+> +		dst[j++] = src[i++];
+>  	}
+>  	dst[j] = '\0';
+>  	if (is_pass2)
+> -- 
+> 2.51.0
+> 
+> 
