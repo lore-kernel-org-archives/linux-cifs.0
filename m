@@ -1,76 +1,47 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C45D31AF2D
-	for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 01:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30EC3370EA
+	for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 01:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774920334; cv=none; b=K6DBQi8UGQ4HCC+KZD7tlzmQ3wlnbz/Q+/PE3wyOiPYx0NKpbtevzmbxD5dcxopfa80P/n1cVnEj7CeNCC9CIdlfkvy26zmtpkmp5JzQg/tOxnnNi3qUKVsfF84PCyx/dFHYipG9kXTRL5OEy7qH7OCiVX/AfbYxWO4fxSnmqyM=
+	t=1774920337; cv=none; b=WRa3YU4Axr4OporhSOaNEpt7FBJxAvV/wpBxpplnVdsa5IQPObFZGjk0U3ZurrFzToX3MeG3rCgivgLMMap828JKxfjIglpk7xPiTE+1n3Oc08sfMhoKpNmy5PqsxF5jZSPjHebPKc3HmnVu+YLy6e33owejKxSbyk1dYNtgS1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774920334; c=relaxed/simple;
-	bh=kzpZhI+Ncv0/e42qPalL8ozoiLD7ewzW3TpRaQDhhoE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r4Xgslw8LIWBrp0cKGeE5c+suO9iuRiuLVGdUclPiLFhUY89koR3x7cRKjC5tEkw7rfECYnCH7eBgGhXGfSGdNWIh7Z4eS/da07B+DW8yvsTRuDzGN44g+lBIU/rZ5awwvo8Kk03OwL2DZ5fSeNA3+r9kcWvKFqmlgkcdmMMJmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kdTUIOUB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=2fb9Rhe9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kdTUIOUB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=2fb9Rhe9; arc=none smtp.client-ip=195.135.223.131
+	s=arc-20240116; t=1774920337; c=relaxed/simple;
+	bh=xvOs+VuI8lodnsrKPZcKRQyPjhUmdZtf0Tzh/Asj+Ms=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LQ6BSZDq78Z6Yp3jhheZAeth78BVdDby6aby5ZL8h7Cs+1E9XQW/8qqa9SQ547BR8Ecyi/waIWbeeSb0y9Z12LQqNd52wKqEPbRRX/oVv1+fjq3LJLCF4KkrfzRvRa9Jkf8vlYFEz/HSMrzY4DMELl0wwECe7nptNA+tk8LUeWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kdTUIOUB";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="2fb9Rhe9";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kdTUIOUB";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="2fb9Rhe9"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id CAF615BE52;
-	Tue, 31 Mar 2026 01:25:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774920331; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=IWIelUY2BJnOxBiRWb8fmYCCjnCrJwlxzVPbuC9V8MU=;
-	b=kdTUIOUB7Rl1QLjpvhMLCP0G6ei8LAjvSGhLdKb2pHtofzqc0sMuuWCS5rJWNA6yKUtWas
-	pubKX+Hr75lPbkXMddveLPnLRsiiSIwlFDPYBzDUf0x0QlMFUY8FpMyop6veuYVE0mvymO
-	FyMYCHg3fjf1T57Rmjvsm9XEQhlsXA8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774920331;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=IWIelUY2BJnOxBiRWb8fmYCCjnCrJwlxzVPbuC9V8MU=;
-	b=2fb9Rhe9IFLtmFxygNZUcXymb+6uil38p8QP76iyWi2UyeoRBrENkgH2mVTqisruYpBUnS
-	5azsXAkC0B7SE3Cg==
-Authentication-Results: smtp-out2.suse.de;
+	by smtp-out1.suse.de (Postfix) with ESMTPS id EB63E4D5B8;
+	Tue, 31 Mar 2026 01:25:33 +0000 (UTC)
+Authentication-Results: smtp-out1.suse.de;
 	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774920331; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=IWIelUY2BJnOxBiRWb8fmYCCjnCrJwlxzVPbuC9V8MU=;
-	b=kdTUIOUB7Rl1QLjpvhMLCP0G6ei8LAjvSGhLdKb2pHtofzqc0sMuuWCS5rJWNA6yKUtWas
-	pubKX+Hr75lPbkXMddveLPnLRsiiSIwlFDPYBzDUf0x0QlMFUY8FpMyop6veuYVE0mvymO
-	FyMYCHg3fjf1T57Rmjvsm9XEQhlsXA8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774920331;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=IWIelUY2BJnOxBiRWb8fmYCCjnCrJwlxzVPbuC9V8MU=;
-	b=2fb9Rhe9IFLtmFxygNZUcXymb+6uil38p8QP76iyWi2UyeoRBrENkgH2mVTqisruYpBUnS
-	5azsXAkC0B7SE3Cg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 88C014A0A2;
-	Tue, 31 Mar 2026 01:25:30 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 67A974A0A2;
+	Tue, 31 Mar 2026 01:25:32 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id il9SD4oiy2mpbgAAD6G6ig
-	(envelope-from <ddiss@suse.de>); Tue, 31 Mar 2026 01:25:30 +0000
+	id aJ4aB4wiy2mpbgAAD6G6ig
+	(envelope-from <ddiss@suse.de>); Tue, 31 Mar 2026 01:25:32 +0000
 From: David Disseldorp <ddiss@suse.de>
 To: linux-cifs@vger.kernel.org
-Cc: Steve French <smfrench@gmail.com>
-Subject: [PATCH 0/3] mount.cifs: minor buflen tracking cleanups
-Date: Tue, 31 Mar 2026 11:37:50 +1100
-Message-ID: <20260331012508.17410-1-ddiss@suse.de>
+Cc: Steve French <smfrench@gmail.com>,
+	David Disseldorp <ddiss@suse.de>
+Subject: [PATCH 1/3] build_assert: add ccan build_assert.h header
+Date: Tue, 31 Mar 2026 11:37:51 +1100
+Message-ID: <20260331012508.17410-2-ddiss@suse.de>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260331012508.17410-1-ddiss@suse.de>
+References: <20260331012508.17410-1-ddiss@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -78,43 +49,77 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_HAS_DN(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	REPLY(-4.00)[]
+X-Rspamd-Queue-Id: EB63E4D5B8
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Action: no action
 X-Spam-Flag: NO
+X-Spam-Score: -4.00
+X-Spam-Level: 
 
-These changes are minor cleanups to go atop the bugfix
-"mount.cifs: fix buffer overrun in set_password"
-https://lore.kernel.org/linux-cifs/20260331000911.16062-1-ddiss@suse.de/T/#u
+Obtained from https://github.com/rustyrussell/ccan with HEAD
+050dc66dc2de3d8b150817c6bba648f74b12cccf .
+build_assert.h is licensed CC0 (Public domain).
 
-David Disseldorp (3):
-      build_assert: add ccan build_assert.h header
-      mount.cifs: adjust get_password_from_file() buf size
-      mount.cifs: remove runtime pass_length calculation
-
+Signed-off-by: David Disseldorp <ddiss@suse.de>
+---
  build_assert.h | 40 ++++++++++++++++++++++++++++++++++++++++
- mount.cifs.c   | 18 ++++++++----------
- 2 files changed, 48 insertions(+), 10 deletions(-)
+ 1 file changed, 40 insertions(+)
  create mode 100644 build_assert.h
+
+diff --git a/build_assert.h b/build_assert.h
+new file mode 100644
+index 0000000..b9ecd84
+--- /dev/null
++++ b/build_assert.h
+@@ -0,0 +1,40 @@
++/* CC0 (Public domain) - see LICENSE file for details */
++#ifndef CCAN_BUILD_ASSERT_H
++#define CCAN_BUILD_ASSERT_H
++
++/**
++ * BUILD_ASSERT - assert a build-time dependency.
++ * @cond: the compile-time condition which must be true.
++ *
++ * Your compile will fail if the condition isn't true, or can't be evaluated
++ * by the compiler.  This can only be used within a function.
++ *
++ * Example:
++ *	#include <stddef.h>
++ *	...
++ *	static char *foo_to_char(struct foo *foo)
++ *	{
++ *		// This code needs string to be at start of foo.
++ *		BUILD_ASSERT(offsetof(struct foo, string) == 0);
++ *		return (char *)foo;
++ *	}
++ */
++#define BUILD_ASSERT(cond) \
++	do { (void) sizeof(char [1 - 2*!(cond)]); } while(0)
++
++/**
++ * BUILD_ASSERT_OR_ZERO - assert a build-time dependency, as an expression.
++ * @cond: the compile-time condition which must be true.
++ *
++ * Your compile will fail if the condition isn't true, or can't be evaluated
++ * by the compiler.  This can be used in an expression: its value is "0".
++ *
++ * Example:
++ *	#define foo_to_char(foo)					\
++ *		 ((char *)(foo)						\
++ *		  + BUILD_ASSERT_OR_ZERO(offsetof(struct foo, string) == 0))
++ */
++#define BUILD_ASSERT_OR_ZERO(cond) \
++	(sizeof(char [1 - 2*!(cond)]) - 1)
++
++#endif /* CCAN_BUILD_ASSERT_H */
+-- 
+2.51.0
 
