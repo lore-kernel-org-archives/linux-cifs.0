@@ -1,123 +1,130 @@
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E618382F39
-	for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 07:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D843DF003;
+	Tue, 31 Mar 2026 08:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774943655; cv=none; b=TobxMbVr+HfZiJkWqCnezbETGk8omoeTBb0x1IGjc++kHLV13/t0sLj/5ha+TJPg1EVigGUfRiGqfU9ymyzciwhwg9TtpY/z+uZYYbBnUcjSYEJWBKQMyaMRA/p5szwc77qP5Eb7UJ2+wy7Pw65nfEcbFHccwXXpYTm0AgAuF8k=
+	t=1774945664; cv=none; b=bMuSJWeJ8g+6Kts48RrpJzBTSQHxpEwUxRIhyFgup4NGth5n6UAQiGCD/oviLk4Exop91LKITHLHKbxI0tRE8liTGfz7Ue255BqVdX82qNwNeai15JvWJviSSnzlPE3iEEhisB1vTUNNK9HdPtcpv5FGQru63aHzE582eN06l/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774943655; c=relaxed/simple;
-	bh=lmze7BYV5hp4Y6sIOaGFbKHwUOMEax7foVnYPnmvQbo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LWRsxgSp6FukN0ZforYTvcJqS3qhgLsGUS/H0WHt9xc4Mlen9LMjwqen1Yry+9RMYSAc1VHg11M4z7i+I7Yqg9uq+JITDIax2RRATRF7EO9Cck6dCDlnRYUDnQ+zbtpyh1JxReBxQ+GPFmPJa7WYnRYaya6jhiH13WoJRvuOJOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=DUiRy3Q9; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1774945664; c=relaxed/simple;
+	bh=Yx1Xll+DsQnpK2EeA64/CzyBUEm1aXMFc+DIWQjRQjg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P/QPHhHtUHvfYwZOcg8jMqVxu8znBOKRLKdeHSQiZEIMTE+7RSW7q4bF/xOGnZMMbON0opgz2hKkYalSP60KobXjFx9pnymT2r1n5lRkA6nT7WG3GcHAA1/6t5m0eqqFdjngb0Agjx5kSAOWqc69X/mFefEJmWzTBaOkneBAvLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=Ph+VFMKM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NuB4IJ5D; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="DUiRy3Q9"
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id D0F7E3F2C9
-	for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 07:54:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1774943651;
-	bh=IGd98WxReXhKmS3gVZc2py42NhhB81jPPYvyJnFKCbU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type;
-	b=DUiRy3Q9unGA4Zd4oN+0ElhApSSgPCyC45dDzLnYKapfZL40ud72ITVDe9a+RHfJG
-	 lhEkafrwhixQb0WdOaDpKJnDClnIiAa5Fzi4NhCvUthGVCIHAcQu/dAAwXAtrfHkhv
-	 x/rjQgRfUAsNdEsTFAlIIYe5g+dNlsOOs9GhJLMI/hBJOeYkUjpJ5y7Ext5KgkVf4I
-	 RwhuXmX2dV/GGXerYE7K0yPiWzgfHgtkxqIQxoHlV+CnQGVHu4KuJrRZ112tO75tHE
-	 fGjD1sKXDvV+ws+YgVPugWdiPqRCuGEvhW2nkrfIjVVqCVXxL9Qicr2d2sOGISL8Fj
-	 U5qrZNz66pHLN0OEKX75sOukFPKdXP46VVdMCJyEv6OB+gGsl6mnzteMlQqfBfhWbS
-	 kG5ZIID0C0VDOo4Yl5GZ4oDsgZwJu4s3H+2KDzJSHIW38vG2N5IBF6SpSDD4RHaaO0
-	 osltoVKJJH+wxdn9y4lm4LAU73XD9cIFtXN11VsIVB13a2D6QYyRNUfSbia8DvC6Ou
-	 wCeeWbflg247Xf0T9tvOokFHIXBFXKsH/PLNpy9+f9ppSYIRYJ5QTOsq5Ir4qKTwXZ
-	 f+x+SN38PfIQJnk9RIGjZTGa2pa1VFfLaAhHd+TSRVimphH3jUk+uSdQigpTp3hrfX
-	 BrHtEiZOBGmDIt+cP3O+SF+M=
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-486fa07f2bbso32322575e9.2
-        for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 00:54:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774943651; x=1775548451;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IGd98WxReXhKmS3gVZc2py42NhhB81jPPYvyJnFKCbU=;
-        b=SoycxoxNjmzPOq//kpVEWnYNllNEHm/APNRFgJdZCwxT09PsISVNCh7Ndo7tLsLYur
-         SkxtUMV595W9prLifRkfG14IE58tAoERzplKkuzesfBvecOhuFuL/W3fFNjxQKndZI21
-         2g6zxWo95KGw3zZwvk3UEL3vxdiS3OxUAVfQYd8tiDI8mMwRNlJGpjDPB9FNU1SyY93Y
-         4TcwT09s+w9a8WGm6NzPJoJdFzh3EDUOnE/argOP886mob+gGRZztTA3mx4wsWEOA3bS
-         FbANRfgzy3SYFd4nJSNLDsbRGi+Q1uNLAG4+P4YcvY+wSkVceVxxXdEAASy4dYtI8QP4
-         94yA==
-X-Forwarded-Encrypted: i=1; AJvYcCVUbhOjr5TFHO0NCrC8T0DhUbLchsG+60Os51za+edQnEwEpiE2h/gSsfghyvgZBVenCr45nmI+6xcH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyuh6f9OtyQSk8o5f/pusIxQ4YKoLPGttQG8IGFCRoUb3NWBa3G
-	rbjUh/i9L3ge3rpjqDtcKJO5utbYFLKMXHIr5HAoM7f90kqEfmH35/zQpLg6rnWqaI/obesymiM
-	3sI6mc+Uv7HJFeWqfop5LlOWZ0Y35ZJv5d6gdF12reke2Uu5ORkrPq0gdaqxVyVfYgIWJTAKOcZ
-	lEjFI=
-X-Gm-Gg: ATEYQzyKNdbswsUVPFp74QBQDR8XIz6quW9tQLbKHS0QgmCDp3Pd+cW7U6jyZ06ujOJ
-	JIZt/bSUCU6Kyl/dRvfC64xmJDhFKmXS77TDat5HhvReAD8I4HkFBYc2wKf6A9KHYw96CdZc9lU
-	Tk5cxyXIXeMw1GQ0SJ4UpH6cmEQUkYq45oUkTeboTmE1eynv7Y6WXjSJ1qYjWYn7DJdOIf73FDP
-	xW2jLscXdpahGwjqLnZawnu3sOuddJ8BSpdTBLBA0RDuqaUhCYNOW7GYJNuvTk20anq7vkoE6I1
-	drnHByGi899YThjWqUcW6Dr2KwsschUDM2x2aL6nW2atSeGr8QVRCaJNrD4dlMDWnCyZxvIi04C
-	FoRLo6BmsNnAerLoB5N2zUkzDZvkcThuTjP/g
-X-Received: by 2002:a05:600c:3504:b0:485:3e20:4013 with SMTP id 5b1f17b1804b1-48727f0b109mr228374415e9.28.1774943651258;
-        Tue, 31 Mar 2026 00:54:11 -0700 (PDT)
-X-Received: by 2002:a05:600c:3504:b0:485:3e20:4013 with SMTP id 5b1f17b1804b1-48727f0b109mr228374125e9.28.1774943650831;
-        Tue, 31 Mar 2026 00:54:10 -0700 (PDT)
-Received: from [192.168.1.126] ([213.204.117.164])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887c883b96sm9903485e9.17.2026.03.31.00.54.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Mar 2026 00:54:10 -0700 (PDT)
-Message-ID: <0dcbb073-4745-479a-8d55-bdb0a3fe55e8@canonical.com>
-Date: Tue, 31 Mar 2026 10:54:08 +0300
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="Ph+VFMKM";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NuB4IJ5D"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id 82429EC022C;
+	Tue, 31 Mar 2026 04:27:41 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Tue, 31 Mar 2026 04:27:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1774945661; x=1775032061; bh=c9Qkm02a5w
+	q082IfjuzHjs6ovjvxof7MtSCn6YRQST4=; b=Ph+VFMKMAXTaagkKOfQt6LOc88
+	yW1xEbxyA4OJSVyzbVE3G6tlwapGK+kVDEF5/IMsQpwmhrretPkh9Z48vmnRnjql
+	DkC72IROTcpr+o21Qg97aCo/OM1td+jqR3EZNpeHjxyzIUvKxtli8hWjtUz/943u
+	BvGuOpq0v/Cy2v+yWhycjsAgZfbPZN0wMoqSdpmoSRstklGAdZiYYcNQx0A2HKbR
+	pg3b0LZAaLtyiG5CaY7Xim7F+1kmvgrKaEoakoKbld9Gj5LvbFc7X7MnfRLg3I+2
+	jE4/0PdYnXMj77lOUUVeVZOVCBtt4udCZ8dpuQtvg4DSPaIDiXI3kVAxiMbw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1774945661; x=1775032061; bh=c9Qkm02a5wq082IfjuzHjs6ovjvxof7MtSC
+	n6YRQST4=; b=NuB4IJ5DEhGHPdidAkkluxRjQNz25rkjd+oLUPGfgngZSthWSF9
+	nHD4ByVw+5+s4vJi3WPMk5eu2Ing6otcUsNuXBCf0Mu8uBCJvqKxbgQWpii1wFH2
+	Jv60f8UdvlOSan3ArasgJHOSSLXwTIw6XkKWp2cSOBhzwGqacf5idGR5/HJRVqnV
+	k0a79slXlRELMTN64FElLsf3MlA9Szlrnoi+ds3ssNnTl5NEc+uVpCfX65LHwina
+	/KGQJgAtGkX9fG4eaALFL1NwwB/3sfJ1i761ttWl3dJcTUUgGuVNqkBx3GHc+z9o
+	TgMFpq42iQKRRKJjQfiSpqbeBq2KnmIgLeQ==
+X-ME-Sender: <xms:fYXLadUeXhiOLtQw2KQyqGIgR07FlSRWDQY4P9AqmdDeipLcP08a-Q>
+    <xme:fYXLaUoVftJzncRJjqfQHJkSkFMJEyeEF1EqxBQQoW5EL6KU0YEvN1Epo8G2QOrae
+    mvPGOXS413RZJaBzAmh0aSP_a5woXsK90mkHy8JBeFLZ_AgkA>
+X-ME-Received: <xmr:fYXLaRGu0bxH7jKcZMl2JK5dTkKgAYbJkZcyI10z3JxVrPh7ACIETLEL3oI_a-1Y-NrrPVXygeG0xJIqtBA0EfzYGluNPkflu1ajj8UvPQ8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefgedugedtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
+    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepgeehueehgf
+    dtledutdelkeefgeejteegieekheefudeiffdvudeffeelvedttddvnecuffhomhgrihhn
+    pehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomhdpnhgspghrtghpthhtohepvddt
+    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehghhgrughirdhrrghhmhgvsegtrg
+    hnohhnihgtrghlrdgtohhmpdhrtghpthhtohepshhtrggslhgvsehvghgvrhdrkhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtohepshhfrhgvnhgthhesshgrmhgsrgdrohhrghdprhgtph
+    htthhopehptgestghjrhdrnhiipdhrtghpthhtoheplhhsrghhlhgsvghrsehrvgguhhgr
+    thdrtghomhdprhgtphhtthhopehsphhrrghsrggusehmihgtrhhoshhofhhtrdgtohhmpd
+    hrtghpthhtohepthhomhesthgrlhhpvgihrdgtohhmpdhrtghpthhtoheprggrphhtvghl
+    sehsuhhsvgdrtghomhdprhgtphhtthhopehlihhnuhigqdgtihhfshesvhhgvghrrdhkvg
+    hrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:fYXLaWsXZcct0UDUC8VOT9v26x8tehz4pz4LJDvGTogrmIvD2PZa8g>
+    <xmx:fYXLaUQoc5i5zuFSwk75FsuV587PEo_K6KntQPUcVKk8FxCwv84vmw>
+    <xmx:fYXLaTHuthN9b-LorOIjQxcO7SaCReFBb4dhwbXijjzEHscVtsGWUg>
+    <xmx:fYXLaWd1Pm3wnczhMBAtQQW_JCSbeK01HGB4Ns1R1MIkKsBNl2w_uQ>
+    <xmx:fYXLaS3TgabrFuQlWCi6Ts01DRYgZMByI0tHyPuWxLkgL_qR5beDU-dh>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 31 Mar 2026 04:27:40 -0400 (EDT)
+Date: Tue, 31 Mar 2026 10:27:38 +0200
+From: Greg KH <greg@kroah.com>
+To: Ghadi Rahme <ghadi.rahme@canonical.com>
+Cc: stable@vger.kernel.org, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@cjr.nz>, Ronnie Sahlberg <lsahlber@redhat.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Aurelien Aptel <aaptel@suse.com>, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: Re: [PATCH v2 6.1.y] smb/dfs_cache: Fix NULL pointer dereference on
+ session connection failure
+Message-ID: <2026033136-refining-ladybug-08b0@gregkh>
+References: <20260319144929.455978-1-ghadi.rahme@canonical.com>
+ <2026032339-irate-monsoon-76ce@gregkh>
+ <a7c5ecb2-d46c-4061-a70a-c7b149db56f2@canonical.com>
+ <2026033140-endearing-handcraft-b66a@gregkh>
+ <0dcbb073-4745-479a-8d55-bdb0a3fe55e8@canonical.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6.1.y] smb/dfs_cache: Fix NULL pointer dereference on
- session connection failure
-To: Greg KH <greg@kroah.com>
-Cc: stable@vger.kernel.org, Steve French <sfrench@samba.org>,
- Paulo Alcantara <pc@cjr.nz>, Ronnie Sahlberg <lsahlber@redhat.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Aurelien Aptel <aaptel@suse.com>, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org
-References: <20260319144929.455978-1-ghadi.rahme@canonical.com>
- <2026032339-irate-monsoon-76ce@gregkh>
- <a7c5ecb2-d46c-4061-a70a-c7b149db56f2@canonical.com>
- <2026033140-endearing-handcraft-b66a@gregkh>
-Content-Language: en-US
-From: Ghadi Rahme <ghadi.rahme@canonical.com>
-In-Reply-To: <2026033140-endearing-handcraft-b66a@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0dcbb073-4745-479a-8d55-bdb0a3fe55e8@canonical.com>
 
- > Then why not backport the specific changes that caused newer kernels 
-to not be affected?
+On Tue, Mar 31, 2026 at 10:54:08AM +0300, Ghadi Rahme wrote:
+> > Then why not backport the specific changes that caused newer kernels to
+> not be affected?
+> 
+> Based on the documentation [1] for submitting patches to stable, the patch
+> cannot be over 100 lines long with context.
+> 
+> The upstream patch exceeds this limit by a lot and cherry picking the
+> specific changes from it that remove this function is not feasible without
+> causing the driver to break. In other words the removal of
+> "find_ipc_from_server_path" is dependent on this refactor.
+> 
+> > Backport the same changes?
+> 
+> I can go ahead with this solution, given I get the green light to ignore the
+> 100 line rule.
+> 
+> [1] https://www.kernel.org/doc/html/v4.11/process/stable-kernel-rules.html#
 
-Based on the documentation [1] for submitting patches to stable, the 
-patch cannot be over 100 lines long with context.
+We take "large" backports from mainline all the time, as long as the
+maintainers for the subsystem are ok with it.  to take one-off patches
+is usually much harder as the change itself is almost always "wrong",
+and then future changes are even harder to backport.
 
-The upstream patch exceeds this limit by a lot and cherry picking the 
-specific changes from it that remove this function is not feasible 
-without causing the driver to break. In other words the removal of 
-"find_ipc_from_server_path" is dependent on this refactor.
+So I recommend working with the maintainers here please and see what
+they want to do, if anything.
 
- > Backport the same changes?
+thanks,
 
-I can go ahead with this solution, given I get the green light to ignore 
-the 100 line rule.
-
-[1] https://www.kernel.org/doc/html/v4.11/process/stable-kernel-rules.html#
-
-Regards,
-
-Ghadi
-
+greg k-h
