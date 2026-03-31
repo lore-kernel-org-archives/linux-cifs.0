@@ -1,119 +1,123 @@
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0527129E10F;
-	Tue, 31 Mar 2026 07:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E618382F39
+	for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 07:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774941026; cv=none; b=ZtnFhQVDR0ZXffcoNxRvnwCaxSIgTQqY2PfPDkHtwjWyMMosppQ+jhccQ14YNa9P1jPfuaxxqyBz5ysvygIrlFM0gJV8IraBfxgBL6pbwcQOAj7rPubkICKeRKD52Gi85YNUYhr7ITjSfyUXvGObDffB6zBR9VstJ2M0A+vOba4=
+	t=1774943655; cv=none; b=TobxMbVr+HfZiJkWqCnezbETGk8omoeTBb0x1IGjc++kHLV13/t0sLj/5ha+TJPg1EVigGUfRiGqfU9ymyzciwhwg9TtpY/z+uZYYbBnUcjSYEJWBKQMyaMRA/p5szwc77qP5Eb7UJ2+wy7Pw65nfEcbFHccwXXpYTm0AgAuF8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774941026; c=relaxed/simple;
-	bh=ec/xlGvb/OQavUWdxQ0dAivWFuVfBigJZln3uRdMZbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JIfbw9kO0OzKdw+Y1/V+Q2QEhL0jokUBrkrx/RAY0Wh9ZpDpIAYxJ9lXKMnmLHa5nM21jEIB8HTZFbM0sjldBofeDgbXoLtZAHO/5LFf6uSfBmbVZzcyfZc1tZ8NsiDgLSPtslsRP4pRsCJIBGpz8Zezm8NE1EJqbzY8aXFTMis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=n2yKjeH8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mg152J8z; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+	s=arc-20240116; t=1774943655; c=relaxed/simple;
+	bh=lmze7BYV5hp4Y6sIOaGFbKHwUOMEax7foVnYPnmvQbo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LWRsxgSp6FukN0ZforYTvcJqS3qhgLsGUS/H0WHt9xc4Mlen9LMjwqen1Yry+9RMYSAc1VHg11M4z7i+I7Yqg9uq+JITDIax2RRATRF7EO9Cck6dCDlnRYUDnQ+zbtpyh1JxReBxQ+GPFmPJa7WYnRYaya6jhiH13WoJRvuOJOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=DUiRy3Q9; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="n2yKjeH8";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mg152J8z"
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 2A43A1400076;
-	Tue, 31 Mar 2026 03:10:24 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Tue, 31 Mar 2026 03:10:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1774941024; x=1775027424; bh=esmbZsKpw1
-	HVHjembzXJErEZAoM9KmGX7HNGrJiFJW4=; b=n2yKjeH8mgs0W9ryngcdQs5zZz
-	MqczXGk7P8txtrJleotI329rVGgZAyjXVaNzqfU7mBzH+07opmm0Z6L0oHoVQc12
-	fjKt7bTlaH8cVBw9eSEPavJHdfev+hOAfVOdbOCLnCXSjraM7JrmPWM2aESBoOvV
-	pBmDK84fx9BtAfOn/pdouHmDdOedhbfW6l2hHI6Di/5AcljkVjztSVpA8lsC5ruf
-	f8a7Gs2Tok+aryjPSXwpEpYZBofplXtSB9kvfxl/gYJe2BQO9nuhPVm66EUKlSLD
-	CMVmQOTA8DiE8qLNmSp5KxOEhuN57nYQbZzRN9ydg0hMeNrDWMk6hluxk/9A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1774941024; x=1775027424; bh=esmbZsKpw1HVHjembzXJErEZAoM9KmGX7HN
-	GrJiFJW4=; b=mg152J8z0Qf64andBA0qR3mSHVEbMcr28NGIQIYltVgumXaJqm3
-	c8KQTR9W6M5xNmC2FfC7KS85Syb4npIlMRDthxXS5nRzAty/RN3i0M0Mj5G10JZh
-	gJ1WN9UpumXVYSRyLfSB0fOX3TR655O3RRaB4r/ZVNsjrafccI350K0HqZ52oERQ
-	WdDJjgbLkXscknm4Tba/eYHCzzgoO8MBvwe8uEN9YOMv2Dck2uUHFg/vO4eHRl2c
-	ypXXgBN+jN1nJqsOFt1tTYbT/xeTaAmVNOq1Et5rt5L/B3+I2nKs3m+gpivnXwil
-	Gm2S1itJPjdw7gXwlQsEC6VsK1/fRwBI9HQ==
-X-ME-Sender: <xms:X3PLad8Lo1WwDGqIwq2EoP6bQKBDKnuloNuUIt110T5A-KaS3-uLuw>
-    <xme:X3PLaYz-BQffwmhuXGq3ClbpH-5BLB_w59oS75FPsjGut-0DIqZvo2gbXPVBs8Vco
-    cgWf1MnQzIIPhH-BFoxQLx9An-l_Bv2udQiKHDUH_bWPfcU>
-X-ME-Received: <xmr:X3PLaStLGXtM-szUQIpez0ROckJnX5atIXS2bK62N2eKM0oPYL1dhkZPgJFxwyCcoKhgbjnEm2MkL0RLdhVIu16DzA8trnqOCpG_NI9LcCA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefgeduvdegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
-    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepheegvdevvd
-    eljeeugfdtudduhfekledtiefhveejkeejuefhtdeufefhgfehkeetnecuvehluhhsthgv
-    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorghhrd
-    gtohhmpdhnsggprhgtphhtthhopedvtddpmhhouggvpehsmhhtphhouhhtpdhrtghpthht
-    ohepghhhrgguihdrrhgrhhhmvgestggrnhhonhhitggrlhdrtghomhdprhgtphhtthhope
-    hsthgrsghlvgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsfhhrvghn
-    tghhsehsrghmsggrrdhorhhgpdhrtghpthhtohepphgtsegtjhhrrdhniidprhgtphhtth
-    hopehlshgrhhhlsggvrhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepshhprhgrshgr
-    ugesmhhitghrohhsohhfthdrtghomhdprhgtphhtthhopehtohhmsehtrghlphgvhidrtg
-    homhdprhgtphhtthhopegrrghpthgvlhesshhushgvrdgtohhmpdhrtghpthhtoheplhhi
-    nhhugidqtghifhhssehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:X3PLaX1XAIMH2y07iW6W3DF2alnY2veLO6Yyp698bzyCGwFUp6KvJA>
-    <xmx:X3PLae6btaGtLatzSFE-UFAmp1H5SLF3jWUA1PIqoo0cwOEmX1RVaQ>
-    <xmx:X3PLaZPppMXW_AkyJm8v6e568SYZWLiw3kyYRp2uz2JEfJL35oBuvQ>
-    <xmx:X3PLaSGKxLnbNBvcPrHrfzoe2zF8rBEvlfdE_XUaTGtO93dy92KCzA>
-    <xmx:YHPLaYdYmvrpmhll_AsinPv1xMU6rrGopTbwK0aaYiS6JwKhu6oGigbs>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 31 Mar 2026 03:10:22 -0400 (EDT)
-Date: Tue, 31 Mar 2026 09:10:20 +0200
-From: Greg KH <greg@kroah.com>
-To: Ghadi Rahme <ghadi.rahme@canonical.com>
-Cc: stable@vger.kernel.org, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@cjr.nz>, Ronnie Sahlberg <lsahlber@redhat.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Aurelien Aptel <aaptel@suse.com>, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: Re: [PATCH v2 6.1.y] smb/dfs_cache: Fix NULL pointer dereference on
- session connection failure
-Message-ID: <2026033140-endearing-handcraft-b66a@gregkh>
-References: <20260319144929.455978-1-ghadi.rahme@canonical.com>
- <2026032339-irate-monsoon-76ce@gregkh>
- <a7c5ecb2-d46c-4061-a70a-c7b149db56f2@canonical.com>
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="DUiRy3Q9"
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id D0F7E3F2C9
+	for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 07:54:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1774943651;
+	bh=IGd98WxReXhKmS3gVZc2py42NhhB81jPPYvyJnFKCbU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type;
+	b=DUiRy3Q9unGA4Zd4oN+0ElhApSSgPCyC45dDzLnYKapfZL40ud72ITVDe9a+RHfJG
+	 lhEkafrwhixQb0WdOaDpKJnDClnIiAa5Fzi4NhCvUthGVCIHAcQu/dAAwXAtrfHkhv
+	 x/rjQgRfUAsNdEsTFAlIIYe5g+dNlsOOs9GhJLMI/hBJOeYkUjpJ5y7Ext5KgkVf4I
+	 RwhuXmX2dV/GGXerYE7K0yPiWzgfHgtkxqIQxoHlV+CnQGVHu4KuJrRZ112tO75tHE
+	 fGjD1sKXDvV+ws+YgVPugWdiPqRCuGEvhW2nkrfIjVVqCVXxL9Qicr2d2sOGISL8Fj
+	 U5qrZNz66pHLN0OEKX75sOukFPKdXP46VVdMCJyEv6OB+gGsl6mnzteMlQqfBfhWbS
+	 kG5ZIID0C0VDOo4Yl5GZ4oDsgZwJu4s3H+2KDzJSHIW38vG2N5IBF6SpSDD4RHaaO0
+	 osltoVKJJH+wxdn9y4lm4LAU73XD9cIFtXN11VsIVB13a2D6QYyRNUfSbia8DvC6Ou
+	 wCeeWbflg247Xf0T9tvOokFHIXBFXKsH/PLNpy9+f9ppSYIRYJ5QTOsq5Ir4qKTwXZ
+	 f+x+SN38PfIQJnk9RIGjZTGa2pa1VFfLaAhHd+TSRVimphH3jUk+uSdQigpTp3hrfX
+	 BrHtEiZOBGmDIt+cP3O+SF+M=
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-486fa07f2bbso32322575e9.2
+        for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 00:54:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774943651; x=1775548451;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IGd98WxReXhKmS3gVZc2py42NhhB81jPPYvyJnFKCbU=;
+        b=SoycxoxNjmzPOq//kpVEWnYNllNEHm/APNRFgJdZCwxT09PsISVNCh7Ndo7tLsLYur
+         SkxtUMV595W9prLifRkfG14IE58tAoERzplKkuzesfBvecOhuFuL/W3fFNjxQKndZI21
+         2g6zxWo95KGw3zZwvk3UEL3vxdiS3OxUAVfQYd8tiDI8mMwRNlJGpjDPB9FNU1SyY93Y
+         4TcwT09s+w9a8WGm6NzPJoJdFzh3EDUOnE/argOP886mob+gGRZztTA3mx4wsWEOA3bS
+         FbANRfgzy3SYFd4nJSNLDsbRGi+Q1uNLAG4+P4YcvY+wSkVceVxxXdEAASy4dYtI8QP4
+         94yA==
+X-Forwarded-Encrypted: i=1; AJvYcCVUbhOjr5TFHO0NCrC8T0DhUbLchsG+60Os51za+edQnEwEpiE2h/gSsfghyvgZBVenCr45nmI+6xcH@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyuh6f9OtyQSk8o5f/pusIxQ4YKoLPGttQG8IGFCRoUb3NWBa3G
+	rbjUh/i9L3ge3rpjqDtcKJO5utbYFLKMXHIr5HAoM7f90kqEfmH35/zQpLg6rnWqaI/obesymiM
+	3sI6mc+Uv7HJFeWqfop5LlOWZ0Y35ZJv5d6gdF12reke2Uu5ORkrPq0gdaqxVyVfYgIWJTAKOcZ
+	lEjFI=
+X-Gm-Gg: ATEYQzyKNdbswsUVPFp74QBQDR8XIz6quW9tQLbKHS0QgmCDp3Pd+cW7U6jyZ06ujOJ
+	JIZt/bSUCU6Kyl/dRvfC64xmJDhFKmXS77TDat5HhvReAD8I4HkFBYc2wKf6A9KHYw96CdZc9lU
+	Tk5cxyXIXeMw1GQ0SJ4UpH6cmEQUkYq45oUkTeboTmE1eynv7Y6WXjSJ1qYjWYn7DJdOIf73FDP
+	xW2jLscXdpahGwjqLnZawnu3sOuddJ8BSpdTBLBA0RDuqaUhCYNOW7GYJNuvTk20anq7vkoE6I1
+	drnHByGi899YThjWqUcW6Dr2KwsschUDM2x2aL6nW2atSeGr8QVRCaJNrD4dlMDWnCyZxvIi04C
+	FoRLo6BmsNnAerLoB5N2zUkzDZvkcThuTjP/g
+X-Received: by 2002:a05:600c:3504:b0:485:3e20:4013 with SMTP id 5b1f17b1804b1-48727f0b109mr228374415e9.28.1774943651258;
+        Tue, 31 Mar 2026 00:54:11 -0700 (PDT)
+X-Received: by 2002:a05:600c:3504:b0:485:3e20:4013 with SMTP id 5b1f17b1804b1-48727f0b109mr228374125e9.28.1774943650831;
+        Tue, 31 Mar 2026 00:54:10 -0700 (PDT)
+Received: from [192.168.1.126] ([213.204.117.164])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887c883b96sm9903485e9.17.2026.03.31.00.54.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Mar 2026 00:54:10 -0700 (PDT)
+Message-ID: <0dcbb073-4745-479a-8d55-bdb0a3fe55e8@canonical.com>
+Date: Tue, 31 Mar 2026 10:54:08 +0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a7c5ecb2-d46c-4061-a70a-c7b149db56f2@canonical.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6.1.y] smb/dfs_cache: Fix NULL pointer dereference on
+ session connection failure
+To: Greg KH <greg@kroah.com>
+Cc: stable@vger.kernel.org, Steve French <sfrench@samba.org>,
+ Paulo Alcantara <pc@cjr.nz>, Ronnie Sahlberg <lsahlber@redhat.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Aurelien Aptel <aaptel@suse.com>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org
+References: <20260319144929.455978-1-ghadi.rahme@canonical.com>
+ <2026032339-irate-monsoon-76ce@gregkh>
+ <a7c5ecb2-d46c-4061-a70a-c7b149db56f2@canonical.com>
+ <2026033140-endearing-handcraft-b66a@gregkh>
+Content-Language: en-US
+From: Ghadi Rahme <ghadi.rahme@canonical.com>
+In-Reply-To: <2026033140-endearing-handcraft-b66a@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 31, 2026 at 09:59:01AM +0300, Ghadi Rahme wrote:
-> > Again, wrong git id :(
-> 
-> Thank you for reviewing this.
-> 
-> There is not direct fix to this issue upstream however upstream is no longer
-> affected by this issue.
+ > Then why not backport the specific changes that caused newer kernels 
+to not be affected?
 
-Then why not backport the specific changes that caused newer kernels to
-not be affected?
+Based on the documentation [1] for submitting patches to stable, the 
+patch cannot be over 100 lines long with context.
 
-> The commit ID I referenced is the commit that indirectly resolved this issue
-> by completely refactoring the code which led to the removal of the function
-> I patched.
-> 
-> Is there a better way I can convey this in a V3 maybe?
+The upstream patch exceeds this limit by a lot and cherry picking the 
+specific changes from it that remove this function is not feasible 
+without causing the driver to break. In other words the removal of 
+"find_ipc_from_server_path" is dependent on this refactor.
 
-Backport the same changes?
+ > Backport the same changes?
 
-thanks,
+I can go ahead with this solution, given I get the green light to ignore 
+the 100 line rule.
 
-greg k-h
+[1] https://www.kernel.org/doc/html/v4.11/process/stable-kernel-rules.html#
+
+Regards,
+
+Ghadi
+
