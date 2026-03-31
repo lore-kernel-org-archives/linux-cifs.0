@@ -1,186 +1,112 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAFB3242A4
-	for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 01:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060A52C0323
+	for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 06:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774920349; cv=none; b=ZedUfYT3tX1MrMJxI3h3oz5D6K8ZhHM/SMFP7jRrPRe5q2Jv7ZElt0GftvV/sbf43oxcj7y1AOaZw5p9MLMzUhynTlJske0oZFJPTt6aeX9pjPG4ACDe9QVGTbksgwBc/7BGhdWVxPvc8mW3MfMdus5Lx6CLdvMJxtfEs9zlttE=
+	t=1774940355; cv=none; b=N7pbMRgUa4dO4hIFXfnu6WwYG2EL3cttC5PiuRHRM+47xc3QFhFlvktg1j52rYhfiGVWDxpmixhxoimF5syMbsSKwEvuhl6oy7sOOebJrL8UUCT5J20LtrfkIj98cpemFCQy4z/N+f9cjrk0YMZYpNxBNRhaBh71qjU9Lhh9QqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774920349; c=relaxed/simple;
-	bh=jgEcLYP4Brg5vgVfJ3TKRi2QxgNPg8QApWRhtjw2bec=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J9f6YfvywfGi4RJncOljhWWs0QWBqIIJxh0RX9x9pUO+0O1EyMVJ5c65CdqKkDZIbFZWf+s/Va+b2S2/gUlD1+ba/MIWclkR8lrhdOhWaiePkaVjwZafyxkOepw0DbyGaC0PviGQVhL3t8FkYihPHiaql4/ByveUHynPKVeB1UY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=t/BWHn3P; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=zYZdv7xi; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=t/BWHn3P; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=zYZdv7xi; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1774940355; c=relaxed/simple;
+	bh=57+hKfIZPpFepszkAZlPP1iv8WhctUR63y3BAVDRmBA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DEtHvac2H0v4L/6ymxiwlPy3qou8bRGsX2wuU8EpX8IFjkOUfHblKwPH1LLYR0QBkrDxYO7c6d6hMU2PmXtjrv4K3Blr/yLosrBsjKXT6Tq8Iv7s44d+8DKDjA4ZOaXzumVLW6DPLkNoySlmftBP8xOEDw3B/KnOK7bCnwLDP7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=fi5ca9Jq; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="t/BWHn3P";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="zYZdv7xi";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="t/BWHn3P";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="zYZdv7xi"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="fi5ca9Jq"
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 7CCC74D538;
-	Tue, 31 Mar 2026 01:25:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774920338; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aUGJDaIHBSudwJeNXs9l7MlISSCK517Lrj/5Qy5O+78=;
-	b=t/BWHn3PyzSxQMwZ1+r16RU3k0xdsGF1/+NFZtEqtvaCYh8iKod/jVEX4a1w3oqfLXZ2+T
-	nnsXgeOHQahOCC3V2WUKwqH1ptk2kzAVT/VBQ3Dm7Wj8VosjXlavfscnNz4Y1Lxy+RinOz
-	WVijqbEN8RsBEnMSKIMRtILL42fk7v0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774920338;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aUGJDaIHBSudwJeNXs9l7MlISSCK517Lrj/5Qy5O+78=;
-	b=zYZdv7xirxGY7CxIg5z/Eye5My5QPN2HDJcSXl0W+ClyQ7PMclhaR/sqz0UeuP/Km8T4aU
-	DyNjbMiBO5yEnfBw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1774920338; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aUGJDaIHBSudwJeNXs9l7MlISSCK517Lrj/5Qy5O+78=;
-	b=t/BWHn3PyzSxQMwZ1+r16RU3k0xdsGF1/+NFZtEqtvaCYh8iKod/jVEX4a1w3oqfLXZ2+T
-	nnsXgeOHQahOCC3V2WUKwqH1ptk2kzAVT/VBQ3Dm7Wj8VosjXlavfscnNz4Y1Lxy+RinOz
-	WVijqbEN8RsBEnMSKIMRtILL42fk7v0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1774920338;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aUGJDaIHBSudwJeNXs9l7MlISSCK517Lrj/5Qy5O+78=;
-	b=zYZdv7xirxGY7CxIg5z/Eye5My5QPN2HDJcSXl0W+ClyQ7PMclhaR/sqz0UeuP/Km8T4aU
-	DyNjbMiBO5yEnfBw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A4C114A0A2;
-	Tue, 31 Mar 2026 01:25:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +PgqFpAiy2mpbgAAD6G6ig
-	(envelope-from <ddiss@suse.de>); Tue, 31 Mar 2026 01:25:36 +0000
-From: David Disseldorp <ddiss@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: Steve French <smfrench@gmail.com>,
-	David Disseldorp <ddiss@suse.de>,
-	Meetakshi Setiya <msetiya@microsoft.com>
-Subject: [PATCH 3/3] mount.cifs: remove runtime pass_length calculation
-Date: Tue, 31 Mar 2026 11:37:53 +1100
-Message-ID: <20260331012508.17410-4-ddiss@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260331012508.17410-1-ddiss@suse.de>
-References: <20260331012508.17410-1-ddiss@suse.de>
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 6A1663F29C
+	for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 06:59:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1774940345;
+	bh=iEC5MJ8obDg2CLco5IwokHmKBCd99zm6WFzGzuqDmRI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type;
+	b=fi5ca9JqxFj91dEuwtXp8gX9vbtKmz3IvpWsxJJsJJaAWO9CLLqR9Uej0Y32fDitI
+	 0BDaNnIB4sbQ+P2KcwBu/vovw0IE8DF1gg78zEipyqhLusxtnJjstJ6AedmOHE/geF
+	 jYcCWoRP8vY4/7hEwQvRSbiiWnzrNg0O/KbZPtvv8NHF2ARfA4VQer8B9wNX9kab6B
+	 jBqaFYs4cOw3mkSjPWO+9rzSCUYqqjhqMqAqM85Z3Q+9isCcQGaCCUQxid7l16svWH
+	 VDgOCA9578//+VAZZ8tQZdYwxbL8BU3pgfMMocJurq8tx+GGXTtTYJzGWaiYAnclnB
+	 k0rOAwjBqJX90+qn3Nt/HZjXOURxTd7yIL8d86JJZ51FnvEq2+sV0Q8cxnjXuLB2hg
+	 U+wQ6Ge5dppTeX9Pa4GNzgiqicGTou3yxMvgmk6WRBxKX1yK5jkExcpWWqv5VvF5PT
+	 VhWDIBDblAokyPjkOXu2sJrg+tlMVVtIufHDZDQcxWTpQv/lo2mDsnw7UNd4re6vQK
+	 sZahz/v9a5DF1FSy4OiH3d/DuWoka7xCJ+l+2gclwTgiyXEN2EG1fHtOMU5+Nu6XCJ
+	 6lwzbXQiUL/3hyhLrWS4nTywsXAcXq7MJv8W0se6dupQB3Xt7S0xStKybDDFmKiEWG
+	 k5/FRDpAqc8zRD8NOy8IJKyc=
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-43cfbe041b2so1356335f8f.1
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Mar 2026 23:59:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774940345; x=1775545145;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iEC5MJ8obDg2CLco5IwokHmKBCd99zm6WFzGzuqDmRI=;
+        b=eRQdaXVDgddDxDyF6NKIW4PbzU5zjgHF2Gfs9R8cYAhmhRn7QF8dOlSL3K+lMhe621
+         FhNokbDtqXRQOZqAbfVeW5gF+TSZdcKqvcXuVbHh0qvXfrrRlBvXfRVRGAGmHg9XYyL5
+         mDwV6S5EXFptv5hrkAObMisfNl51Iv6MB2FnW3g3K2pNfzZkVi2kKbnYN0FESKCA2tdR
+         5heb8hiH/7+NX8NH9sy4elqfQ/YeYfV8VFReWVTow/3OW3dcTqTLAbk4+zCELKgXXHeT
+         2qkszk0+cNuMyHP2nClpVHFX5R/gpjnm+/5tGdLVmeDjlJ01yTzhuG2l4UMzjp/oaXYt
+         T1Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCWu990Z8ErP4H9scZYoj23Sr7VOYLJCPIvl10M9P2foL8PDrg682XMUJsN7BxFEnsdxmk8oTsu7lyu7@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq6OxInwBq4WAkc+a8z96RsIrJlLfzNMpH2aR+gRHjipQJxJCx
+	4l31eszd+9Z2CQeD3EimeFaoJ4VnNnYjVvlQqt0d6cLreXbPNSYSdR+O+ZTYKbkWRTviQ+xosO8
+	zvfdY8TbQLV3dTYvBMaj325VpbGMFcgaL1WtAwjl1ucpumahFkbx02b3ro24qi1lAc3DOQU6Ngk
+	CxobY=
+X-Gm-Gg: ATEYQzzxFNrH5Apjz40DZlPF0QYJ/IXn84qVEtO9HGqV2qdDsuAgl/dQ/Kl4ydg+raw
+	z1+sW8dK1nyujLb0qi3efD9Oyc/nVr1AfXaij53PILFShSekAOrAf9DsPcJwzjRftPjmfDkQ6Nn
+	UNofsUP5DLf18pxknepFs9FXJvJsq5afZlU7gKNJK9ZASaRPfYygs1tmML6ka4wvmE8Q4bs+D12
+	bsofh/iWxSHtyJCTV8U9Hm7voQ/mQhgCFrBsRfYboMApNKmDLZafJtntxKdYEkQ2P2SMVMJFVlV
+	dIIpbjy8142mcrFpOkbdzw5z0liy4qi1WqgK6kFoE4lstaDM6lTmoFLg0ll/BgSFUFKalhGvG7t
+	GICJfE7Tb8UjaxPnfJNaHPm7lRvvPHBiJZSmt
+X-Received: by 2002:a05:600c:a408:b0:47e:e59c:67c5 with SMTP id 5b1f17b1804b1-488783820d1mr28492295e9.8.1774940344880;
+        Mon, 30 Mar 2026 23:59:04 -0700 (PDT)
+X-Received: by 2002:a05:600c:a408:b0:47e:e59c:67c5 with SMTP id 5b1f17b1804b1-488783820d1mr28491995e9.8.1774940344507;
+        Mon, 30 Mar 2026 23:59:04 -0700 (PDT)
+Received: from [192.168.1.126] ([213.204.117.164])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887c760320sm12494915e9.3.2026.03.30.23.59.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Mar 2026 23:59:03 -0700 (PDT)
+Message-ID: <a7c5ecb2-d46c-4061-a70a-c7b149db56f2@canonical.com>
+Date: Tue, 31 Mar 2026 09:59:01 +0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -6.80
-X-Spam-Level: 
-X-Spamd-Result: default: False [-6.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_COUNT_TWO(0.00)[2];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,suse.de,microsoft.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email];
-	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6.1.y] smb/dfs_cache: Fix NULL pointer dereference on
+ session connection failure
+To: Greg KH <greg@kroah.com>
+Cc: stable@vger.kernel.org, Steve French <sfrench@samba.org>,
+ Paulo Alcantara <pc@cjr.nz>, Ronnie Sahlberg <lsahlber@redhat.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Aurelien Aptel <aaptel@suse.com>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org
+References: <20260319144929.455978-1-ghadi.rahme@canonical.com>
+ <2026032339-irate-monsoon-76ce@gregkh>
+Content-Language: en-US
+From: Ghadi Rahme <ghadi.rahme@canonical.com>
+In-Reply-To: <2026032339-irate-monsoon-76ce@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The parsed_mount_info.password and parsed_mount_info.password2 arrays
-are both the same length, so drop version-specific length calculations
-and use a build-time assertion to avoid future breakage.
+ > Again, wrong git id :(
 
-Cc: Meetakshi Setiya <msetiya@microsoft.com>
-Signed-off-by: David Disseldorp <ddiss@suse.de>
----
- mount.cifs.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+Thank you for reviewing this.
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 945196f..836a060 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -63,6 +63,7 @@
- #include "mount.h"
- #include "util.h"
- #include "resolve_host.h"
-+#include "build_assert.h"
- 
- #ifndef MS_MOVE 
- #define MS_MOVE 8192 
-@@ -343,14 +344,12 @@ set_password(struct parsed_mount_info *parsed_info, const char *src,
- {
- 	int is_pass2 = which_pass == OPT_PASS2 || which_pass == CRED_PASS2;
- 
--	char *dst = is_pass2 ?
--				parsed_info->password2 : parsed_info->password;
--	unsigned int pass_length = is_pass2 ?
--					  sizeof(parsed_info->password2) : sizeof(parsed_info->password);
-+	char *dst = is_pass2 ? parsed_info->password2 : parsed_info->password;
- 	unsigned int i = 0, j = 0;
-+	BUILD_ASSERT(sizeof(parsed_info->password) == sizeof(parsed_info->password2));
- 
- 	while (src[i]) {
--		if (j + 2 >= pass_length) {
-+		if (j + 2 >= sizeof(parsed_info->password)) {
- 			fprintf(stderr, "Converted password too long!\n");
- 			return EX_USAGE;
- 		}
-@@ -362,7 +361,8 @@ set_password(struct parsed_mount_info *parsed_info, const char *src,
- 	if (is_pass2)
- 		parsed_info->got_password2 = 1;
- 	else
--	parsed_info->got_password = 1;
-+		parsed_info->got_password = 1;
-+
- 	return 0;
- }
- 
-@@ -681,10 +681,8 @@ get_password_from_file(int file_descript, char *filename,
- 			   const int which_pass)
- {
- 	int rc = 0;
--	int is_pass2 = which_pass == OPT_PASS2;
--	unsigned int pass_length = is_pass2 ?
--					  sizeof(parsed_info->password2) : sizeof(parsed_info->password);
--	char buf[pass_length];
-+	char buf[sizeof(parsed_info->password)];
-+	BUILD_ASSERT(sizeof(parsed_info->password) == sizeof(parsed_info->password2));
- 
- 	if (filename != NULL) {
- 		rc = toggle_dac_capability(0, 1);
--- 
-2.51.0
+There is not direct fix to this issue upstream however upstream is no 
+longer affected by this issue.
+
+The commit ID I referenced is the commit that indirectly resolved this 
+issue by completely refactoring the code which led to the removal of the 
+function I patched.
+
+Is there a better way I can convey this in a V3 maybe?
 
