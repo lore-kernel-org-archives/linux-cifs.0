@@ -1,32 +1,32 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC95738756F
-	for <linux-cifs@vger.kernel.org>; Wed,  1 Apr 2026 07:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFCE7388E4F
+	for <linux-cifs@vger.kernel.org>; Wed,  1 Apr 2026 07:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775028629; cv=none; b=tRVQEClWGNmFC00cT8uEWJ7AqjX++B1EyRioyIXez6g+lDXHKtFGHGRpnNSk6k4nBUrKD+4khgn89ZiOCWm5maPCBVgk6KQwSMJxrmQ1h/hbnA+fk9i7cXk4j5Ht3MljPhKqAALTLLLc6fMuVJsldd8XcbYT8F7FtSG9rWEbD9U=
+	t=1775028631; cv=none; b=ezdpxViN+WDLkiSVPArpgzG9VXlCKDQENmHbRngLgw1whP4TXIFx5aK7cl+cKwVJV4VLAmUR5u6mwDeVvjUZCTEdPg6CG3LCTcQEjhOIUwd+DkuAj9AZtWlNzPiiEAgPQHDf3FrKYOhQMSLHf92TDMhBX76cs8xXo2amhIMna5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775028629; c=relaxed/simple;
-	bh=QvDfzAc7NFQQJJjTHZYMYjBdO2stHNu7TsOgKrD1JBM=;
+	s=arc-20240116; t=1775028631; c=relaxed/simple;
+	bh=KNPh33sV1s6PizCIJxKAX0dD+G8gbZhveryHllBpWAs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PivmCBlvHiRvLOEM4R2Zv5uej+PH8vY3qjqv+M8qf6xjV1VPcyASoxBvTDDF4cOFah2Lov5RjjshvefYP5Um66gFtw/7pjWSWo7/6zyI/qrCFcREPDF59I4J8G0hdC2idQDyRAHoD/0MyyERXmwvt/Ki/0Ffb+/lxGhSWn/5d7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LL3y9LDr; arc=none smtp.client-ip=91.218.175.185
+	 MIME-Version; b=Qc9fTdv12oUlQz4USOB+rR3xDd+32Lfo2dXR6ZcqnErHVhVYFhNrIjVbb7PoGK0NT3vsQCjVs+qKZATbIg/KWw1gG8wPmvMcTSVK6EbWacA9wj0MZDdinuS3Nz4Lkftmf5TFsSwd8FuGq+43+KkjiXWWLSwwOnThhQitjmg4RfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GfMRMR9C; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LL3y9LDr"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GfMRMR9C"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775028623;
+	t=1775028626;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cHElsj2gzMnMhm0MV1GxW+2sjYXg6e+9ZhsGJfxKG8U=;
-	b=LL3y9LDrKcNM1H2dCqzmw63upQZQoGEKEIX5+3JwqVfzpeeNJQ1fEj5fvgBRqr2ELcA60K
-	ESXmWLPZocdeaWHR0vtcgIH5fLywkVtQH5krEkhr3uv4dYHp/kTSIBfL9/nG8TbuVfAZNM
-	w0PmOaiaPuuao9oyckVtWWbqyyAA+hc=
+	bh=k49jlhlVUwtzcfctMLVsS2T629w7HuEgoZDI+aLVEzQ=;
+	b=GfMRMR9Ct1J1j6q6amty/Bdf1BOzkTh4g7AHydhDoPQIHCxatMqQxg7XWrSgfPgPkSVKzx
+	meF60OiXs2praALIelvKXtMhb3riPXC1lonjvgBwfkrcgGn2YG0UPSMvuPXCxG7dfRjmz9
+	vKM5lu3SdVN1JoKtJ2XZ3vA80r23994=
 From: huiwen.he@linux.dev
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -42,9 +42,9 @@ To: smfrench@gmail.com,
 	tangyouling@kylinos.cn
 Cc: linux-cifs@vger.kernel.org,
 	Huiwen He <hehuiwen@kylinos.cn>
-Subject: [PATCH v2 01/12] smb/client: annotate nterr.h with DOS error codes
-Date: Wed,  1 Apr 2026 07:29:01 +0000
-Message-ID: <20260401072912.355072-2-huiwen.he@linux.dev>
+Subject: [PATCH v2 02/12] smb/client: autogenerate SMB1 NT status to DOS error mapping
+Date: Wed,  1 Apr 2026 07:29:02 +0000
+Message-ID: <20260401072912.355072-3-huiwen.he@linux.dev>
 In-Reply-To: <20260401072912.355072-1-huiwen.he@linux.dev>
 References: <20260401072912.355072-1-huiwen.he@linux.dev>
 Precedence: bulk
@@ -58,1191 +58,753 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-Add comments to NT_STATUS definitions in nterr.h indicating the
-corresponding DOS error class and code.
+Introduce `gen_smb1_mapping` script to autogenerate the NT status to
+DOS error mapping table for SMB1. This script parses nterr.h to
+generate smb1_mapping_table.c, which is then directly included as
+the content of the ntstatus_to_dos_map[] array at compile time.
 
-To ensure formatting consistency and facilitate automated processing,
-existing human-readable comments in nterr.h were first moved to the
-line preceding the #define statements.
-
-This provides the source data for generating sorted mapping tables,
-allowing the implementation of binary search for faster error mapping
-lookups in later commits.
-
-The mapping data is extracted from the existing manual
-ntstatus_to_dos_map[] array in smb1maperror.c using the following
-python script:
-
-	#!/usr/bin/env python3
-	import re
-	import os
-
-	MAP_FILE = "fs/smb/client/smb1maperror.c"
-	NTERR_FILE = "fs/smb/client/nterr.h"
-
-	def move_comments(file_path):
-	    """
-	    Moves existing inline comments (/* ... */ or // ...) to
-	    the preceding line to ensure formatting consistency.
-	    """
-	    if not os.path.exists(file_path):
-		return
-	    with open(file_path, "r") as f:
-		lines = f.readlines()
-	    new_lines = []
-	    # Match #define statements with inline comments
-	    re_str = r'^(\s*#define\s+[A-Za-z0-9_]+\s+.*?)\s*(/\*.*?\*/|//.*)$'
-	    pattern = re.compile(re_str)
-	    for line in lines:
-		match = pattern.match(line.rstrip())
-		if match:
-		    define_part, comment_part = match.groups()
-		    indent = " " * (len(line) - len(line.lstrip()))
-		    # Move old comment to previous line
-		    new_lines.append(indent + comment_part + "\n")
-		    # Keep the define part
-		    new_lines.append(define_part.rstrip() + "\n")
-		else:
-		    new_lines.append(line)
-	    with open(file_path, "w") as f:
-		f.writelines(new_lines)
-
-	def annotate_nterr():
-	    """
-	    Extracts DOS error mappings from smb1maperror.c and appends them
-	    as comments to NT_STATUS defines in nterr.h, ensuring proper alignment.
-	    """
-	    mapping = {}
-	    if not os.path.exists(MAP_FILE) or not os.path.exists(NTERR_FILE):
-		return
-
-	    # Extract mappings from the source mapping table
-	    with open(MAP_FILE, "r") as f:
-		content = f.read()
-		# Find entries like { 0x01, ERRgeneral, NT_STATUS_UNSUCCESSFUL }
-		map_re = (
-		    r'\{\s*([A-Z0-9_]+)\s*,\s*([A-Z-a-z0-9_]+)\s*,\s*'
-		    r'(NT_STATUS_[A-Za-z0-9_]+)'
-		)
-		matches = re.findall(map_re, content)
-		for m in matches:
-		    mapping[m[2]] = (m[0], m[1])
-
-	    with open(NTERR_FILE, "r") as f:
-		lines = f.readlines()
-
-	    new_lines = []
-	    for line in lines:
-		stripped = line.strip()
-		if stripped.startswith("#define NT_STATUS_"):
-		    # Remove any existing // comments before re-annotating
-		    base_line = re.sub(r'\s*//.*$', '', line.rstrip())
-		    parts = base_line.split()
-		    if len(parts) >= 2:
-			name = parts[1]
-			# Append comment, ensuring proper alignment
-			if name == "NT_STATUS_OK":
-			    line = f"{base_line}\t// SUCCESS, 0\n"
-			elif name in mapping:
-			    d_class, d_code = mapping[name]
-			    line = f"{base_line}\t// {d_class}, {d_code}\n"
-			else:
-			    line = f"{base_line}\t// ERRHRD, ERRgeneral\n"
-		new_lines.append(line)
-
-	    with open(NTERR_FILE, "w") as f:
-		f.writelines(new_lines)
-
-	if __name__ == "__main__":
-	    # Step 1: Clean existing inline comments and move them to separate lines
-	    move_comments(NTERR_FILE)
-	    # Step 2: Annotate with DOS codes, ensuring proper comment alignment
-	    annotate_nterr()
-	    print("Successfully processed nterr.h with comments aligned.")
+The generated array is numerically sorted during the build process to
+ensure a consistent structure, providing the necessary groundwork for
+future introduction of binary search lookups.
 
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/nterr.h | 1067 +++++++++++++++++++++--------------------
- 1 file changed, 534 insertions(+), 533 deletions(-)
+ fs/smb/client/.gitignore       |   1 +
+ fs/smb/client/Makefile         |  17 +-
+ fs/smb/client/gen_smb1_mapping |  84 +++++
+ fs/smb/client/nterr.h          |   4 +
+ fs/smb/client/smb1maperror.c   | 564 +--------------------------------
+ 5 files changed, 115 insertions(+), 555 deletions(-)
+ create mode 100644 fs/smb/client/gen_smb1_mapping
 
+diff --git a/fs/smb/client/.gitignore b/fs/smb/client/.gitignore
+index 8a6e04ab62b9..d5ea5ac6015d 100644
+--- a/fs/smb/client/.gitignore
++++ b/fs/smb/client/.gitignore
+@@ -1 +1,2 @@
++smb1_mapping_table.c
+ smb2_mapping_table.c
+diff --git a/fs/smb/client/Makefile b/fs/smb/client/Makefile
+index 1a6e1e1c9764..949232d2c687 100644
+--- a/fs/smb/client/Makefile
++++ b/fs/smb/client/Makefile
+@@ -44,6 +44,21 @@ cifs-$(CONFIG_CIFS_ALLOW_INSECURE_LEGACY) += \
+ 
+ cifs-$(CONFIG_CIFS_COMPRESSION) += compress.o compress/lz77.o
+ 
++ifneq ($(CONFIG_CIFS_ALLOW_INSECURE_LEGACY),)
++#
++# Build the SMB1 error mapping tables from nterr.h
++#
++smb1-gen-y := smb1_mapping_table.c
++
++$(obj)/smb1_mapping_table.c: $(src)/nterr.h $(src)/gen_smb1_mapping FORCE
++	$(call if_changed,gen_smb1_mapping)
++
++$(obj)/smb1maperror.o: $(addprefix $(obj)/, $(smb1-gen-y))
++
++quiet_cmd_gen_smb1_mapping = GEN     $@
++      cmd_gen_smb1_mapping = perl $(src)/gen_smb1_mapping $< $@
++endif
++
+ #
+ # Build the SMB2 error mapping table from smb2status.h
+ #
+@@ -59,4 +74,4 @@ quiet_cmd_gen_smb2_mapping = GEN     $@
+ obj-$(CONFIG_SMB_KUNIT_TESTS) += smb2maperror_test.o
+ 
+ # Let Kbuild handle tracking and cleaning
+-targets += smb2_mapping_table.c
++targets += smb2_mapping_table.c $(smb1-gen-y)
+diff --git a/fs/smb/client/gen_smb1_mapping b/fs/smb/client/gen_smb1_mapping
+new file mode 100644
+index 000000000000..52ea4fdccbcd
+--- /dev/null
++++ b/fs/smb/client/gen_smb1_mapping
+@@ -0,0 +1,84 @@
++#!/usr/bin/perl -w
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++# Script to generate SMB1 error mapping tables.
++#
++# Copyright (C) 2026 KylinSoft Co., Ltd. All rights reserved.
++# Author(s): Huiwen He <hehuiwen@kylinos.cn>
++#            ChenXiaoSong <chenxiaosong@kylinos.cn>
++#
++use strict;
++
++if ($#ARGV != 1) {
++	print STDERR "Usage: $0 <in-file> <out-file>\n";
++	exit(2);
++}
++
++# Parse input parameters and extract filenames
++my $in_file  = $ARGV[0];
++my $out_file = $ARGV[1];
++my $input_name  = (split m|/|, $in_file)[-1];
++my $script_name = (split m|/|, $0)[-1];
++my @list     = ();
++my %seen     = ();
++
++# Parse annotated entries from the input file
++open(my $in, "<", $in_file) or die "Cannot open $in_file: $!";
++if ($in_file =~ /nterr\.h$/) {
++	while (<$in>) {
++		# Match #define NT_STATUS_... followed by // CLASS, CODE
++		my $re = qr{^\s*#define\s+(NT_STATUS_[A-Za-z0-9_]+)\s+(.+?)\s*} .
++			 qr{(?://\s*|/\*\s*)([A-Za-z0-9_]+)\s*,\s*([A-Za-z0-9_]+)};
++
++		if (/$re/) {
++			my ($name, $val_str, $class, $code) = ($1, $2, $3, $4);
++
++			# Skip duplicate macro names
++			next if $seen{$name}++;
++
++			# Clean up value string (remove parens, spaces)
++			$val_str =~ s/[\s\(\)]//g;
++			my $val = 0;
++			foreach my $part (split(/\|/, $val_str)) {
++				$val |= hex($part);
++			}
++			push @list, { val => $val, name => $name, class => $class, code => $code };
++		}
++	}
++}
++close($in);
++
++# Fail if no entries were found to avoid broken builds
++die "Error: No mapping entries found in $in_file\n" unless @list;
++
++# Sort entries numerically by value
++@list = sort { $a->{val} <=> $b->{val} } @list;
++
++# Generate the C mapping table output file
++open(my $out, ">", $out_file) or die "Cannot open $out_file: $!";
++print $out "/* Autogenerated from $input_name by $script_name */\n\n";
++
++if ($in_file =~ /nterr\.h$/) {
++	# Generate NT status -> DOS error mapping file smb1_mapping_table.c
++
++	my $count = scalar @list;
++	my $full_names = "";
++
++	for (my $i = 0; $i < $count; $i++) {
++		my $e = $list[$i];
++		my $val = $e->{val};
++
++		$full_names .= $e->{name};
++
++		# Merge synonyms
++		if ($i < $count - 1 && $list[$i + 1]->{val} == $val) {
++			$full_names .= " or ";
++			next;
++		}
++
++		printf $out "\t{ %s, %s, 0x%08x, \"%s\" },\n", $e->{class}, $e->{code}, $val, $full_names;
++
++		$full_names = "";
++	}
++}
++close($out);
 diff --git a/fs/smb/client/nterr.h b/fs/smb/client/nterr.h
-index 9a4a450c6571..2045a66e55fd 100644
+index 2045a66e55fd..e0da354b8229 100644
 --- a/fs/smb/client/nterr.h
 +++ b/fs/smb/client/nterr.h
-@@ -32,538 +32,539 @@ extern const struct nt_err_code_struct nt_errs[];
+@@ -30,6 +30,10 @@ extern const struct nt_err_code_struct nt_errs[];
+ /*
+  * NTSTATUS Values extracted using a loop in smbclient then printing a netmon
   * sniff to a file.
++ *
++ * The comment at the end of each definition indicates `dos_class`
++ * and `dos_code` fields of the `ntstatus_to_dos_map` array; it is
++ * used to generate the `smb1_mapping_table.c` file.
   */
  
--#define NT_STATUS_OK                   0x0000
--#define NT_STATUS_PENDING              0x0103
--#define NT_STATUS_MORE_ENTRIES         0x0105
--#define NT_STATUS_SOME_NOT_MAPPED      0x0107
--#define NT_STATUS_NOTIFY_ENUM_DIR      0x010c
--#define NT_STATUS_BUFFER_OVERFLOW  0x80000005
--#define NT_STATUS_NO_MORE_ENTRIES  0x8000001a
--#define NT_STATUS_MEDIA_CHANGED    0x8000001c
--#define NT_STATUS_END_OF_MEDIA     0x8000001e
--#define NT_STATUS_MEDIA_CHECK      0x80000020
--#define NT_STATUS_NO_DATA_DETECTED 0x80000022
--#define NT_STATUS_STOPPED_ON_SYMLINK 0x8000002d
--#define NT_STATUS_DEVICE_REQUIRES_CLEANING 0x80000288
--#define NT_STATUS_DEVICE_DOOR_OPEN 0x80000289
--#define NT_STATUS_UNSUCCESSFUL (0xC0000000 | 0x0001)
--#define NT_STATUS_NOT_IMPLEMENTED (0xC0000000 | 0x0002)
--#define NT_STATUS_INVALID_INFO_CLASS (0xC0000000 | 0x0003)
--#define NT_STATUS_INFO_LENGTH_MISMATCH (0xC0000000 | 0x0004)
--#define NT_STATUS_ACCESS_VIOLATION (0xC0000000 | 0x0005)
--#define NT_STATUS_IN_PAGE_ERROR (0xC0000000 | 0x0006)
--#define NT_STATUS_PAGEFILE_QUOTA (0xC0000000 | 0x0007)
--#define NT_STATUS_INVALID_HANDLE (0xC0000000 | 0x0008)
--#define NT_STATUS_BAD_INITIAL_STACK (0xC0000000 | 0x0009)
--#define NT_STATUS_BAD_INITIAL_PC (0xC0000000 | 0x000a)
--#define NT_STATUS_INVALID_CID (0xC0000000 | 0x000b)
--#define NT_STATUS_TIMER_NOT_CANCELED (0xC0000000 | 0x000c)
--#define NT_STATUS_INVALID_PARAMETER (0xC0000000 | 0x000d)
--#define NT_STATUS_NO_SUCH_DEVICE (0xC0000000 | 0x000e)
--#define NT_STATUS_NO_SUCH_FILE (0xC0000000 | 0x000f)
--#define NT_STATUS_INVALID_DEVICE_REQUEST (0xC0000000 | 0x0010)
--#define NT_STATUS_END_OF_FILE (0xC0000000 | 0x0011)
--#define NT_STATUS_WRONG_VOLUME (0xC0000000 | 0x0012)
--#define NT_STATUS_NO_MEDIA_IN_DEVICE (0xC0000000 | 0x0013)
--#define NT_STATUS_UNRECOGNIZED_MEDIA (0xC0000000 | 0x0014)
--#define NT_STATUS_NONEXISTENT_SECTOR (0xC0000000 | 0x0015)
--#define NT_STATUS_MORE_PROCESSING_REQUIRED (0xC0000000 | 0x0016)
--#define NT_STATUS_NO_MEMORY (0xC0000000 | 0x0017)
--#define NT_STATUS_CONFLICTING_ADDRESSES (0xC0000000 | 0x0018)
--#define NT_STATUS_NOT_MAPPED_VIEW (0xC0000000 | 0x0019)
--#define NT_STATUS_UNABLE_TO_FREE_VM (0xC0000000 | 0x001a)
--#define NT_STATUS_UNABLE_TO_DELETE_SECTION (0xC0000000 | 0x001b)
--#define NT_STATUS_INVALID_SYSTEM_SERVICE (0xC0000000 | 0x001c)
--#define NT_STATUS_ILLEGAL_INSTRUCTION (0xC0000000 | 0x001d)
--#define NT_STATUS_INVALID_LOCK_SEQUENCE (0xC0000000 | 0x001e)
--#define NT_STATUS_INVALID_VIEW_SIZE (0xC0000000 | 0x001f)
--#define NT_STATUS_INVALID_FILE_FOR_SECTION (0xC0000000 | 0x0020)
--#define NT_STATUS_ALREADY_COMMITTED (0xC0000000 | 0x0021)
--#define NT_STATUS_ACCESS_DENIED (0xC0000000 | 0x0022)
--#define NT_STATUS_BUFFER_TOO_SMALL (0xC0000000 | 0x0023)
--#define NT_STATUS_OBJECT_TYPE_MISMATCH (0xC0000000 | 0x0024)
--#define NT_STATUS_NONCONTINUABLE_EXCEPTION (0xC0000000 | 0x0025)
--#define NT_STATUS_INVALID_DISPOSITION (0xC0000000 | 0x0026)
--#define NT_STATUS_UNWIND (0xC0000000 | 0x0027)
--#define NT_STATUS_BAD_STACK (0xC0000000 | 0x0028)
--#define NT_STATUS_INVALID_UNWIND_TARGET (0xC0000000 | 0x0029)
--#define NT_STATUS_NOT_LOCKED (0xC0000000 | 0x002a)
--#define NT_STATUS_PARITY_ERROR (0xC0000000 | 0x002b)
--#define NT_STATUS_UNABLE_TO_DECOMMIT_VM (0xC0000000 | 0x002c)
--#define NT_STATUS_NOT_COMMITTED (0xC0000000 | 0x002d)
--#define NT_STATUS_INVALID_PORT_ATTRIBUTES (0xC0000000 | 0x002e)
--#define NT_STATUS_PORT_MESSAGE_TOO_LONG (0xC0000000 | 0x002f)
--#define NT_STATUS_INVALID_PARAMETER_MIX (0xC0000000 | 0x0030)
--#define NT_STATUS_INVALID_QUOTA_LOWER (0xC0000000 | 0x0031)
--#define NT_STATUS_DISK_CORRUPT_ERROR (0xC0000000 | 0x0032)
--#define NT_STATUS_OBJECT_NAME_INVALID (0xC0000000 | 0x0033)
--#define NT_STATUS_OBJECT_NAME_NOT_FOUND (0xC0000000 | 0x0034)
--#define NT_STATUS_OBJECT_NAME_COLLISION (0xC0000000 | 0x0035)
--#define NT_STATUS_HANDLE_NOT_WAITABLE (0xC0000000 | 0x0036)
--#define NT_STATUS_PORT_DISCONNECTED (0xC0000000 | 0x0037)
--#define NT_STATUS_DEVICE_ALREADY_ATTACHED (0xC0000000 | 0x0038)
--#define NT_STATUS_OBJECT_PATH_INVALID (0xC0000000 | 0x0039)
--#define NT_STATUS_OBJECT_PATH_NOT_FOUND (0xC0000000 | 0x003a)
--#define NT_STATUS_OBJECT_PATH_SYNTAX_BAD (0xC0000000 | 0x003b)
--#define NT_STATUS_DATA_OVERRUN (0xC0000000 | 0x003c)
--#define NT_STATUS_DATA_LATE_ERROR (0xC0000000 | 0x003d)
--#define NT_STATUS_DATA_ERROR (0xC0000000 | 0x003e)
--#define NT_STATUS_CRC_ERROR (0xC0000000 | 0x003f)
--#define NT_STATUS_SECTION_TOO_BIG (0xC0000000 | 0x0040)
--#define NT_STATUS_PORT_CONNECTION_REFUSED (0xC0000000 | 0x0041)
--#define NT_STATUS_INVALID_PORT_HANDLE (0xC0000000 | 0x0042)
--#define NT_STATUS_SHARING_VIOLATION (0xC0000000 | 0x0043)
--#define NT_STATUS_QUOTA_EXCEEDED (0xC0000000 | 0x0044)
--#define NT_STATUS_INVALID_PAGE_PROTECTION (0xC0000000 | 0x0045)
--#define NT_STATUS_MUTANT_NOT_OWNED (0xC0000000 | 0x0046)
--#define NT_STATUS_SEMAPHORE_LIMIT_EXCEEDED (0xC0000000 | 0x0047)
--#define NT_STATUS_PORT_ALREADY_SET (0xC0000000 | 0x0048)
--#define NT_STATUS_SECTION_NOT_IMAGE (0xC0000000 | 0x0049)
--#define NT_STATUS_SUSPEND_COUNT_EXCEEDED (0xC0000000 | 0x004a)
--#define NT_STATUS_THREAD_IS_TERMINATING (0xC0000000 | 0x004b)
--#define NT_STATUS_BAD_WORKING_SET_LIMIT (0xC0000000 | 0x004c)
--#define NT_STATUS_INCOMPATIBLE_FILE_MAP (0xC0000000 | 0x004d)
--#define NT_STATUS_SECTION_PROTECTION (0xC0000000 | 0x004e)
--#define NT_STATUS_EAS_NOT_SUPPORTED (0xC0000000 | 0x004f)
--#define NT_STATUS_EA_TOO_LARGE (0xC0000000 | 0x0050)
--#define NT_STATUS_NONEXISTENT_EA_ENTRY (0xC0000000 | 0x0051)
--#define NT_STATUS_NO_EAS_ON_FILE (0xC0000000 | 0x0052)
--#define NT_STATUS_EA_CORRUPT_ERROR (0xC0000000 | 0x0053)
--#define NT_STATUS_FILE_LOCK_CONFLICT (0xC0000000 | 0x0054)
--#define NT_STATUS_LOCK_NOT_GRANTED (0xC0000000 | 0x0055)
--#define NT_STATUS_DELETE_PENDING (0xC0000000 | 0x0056)
--#define NT_STATUS_CTL_FILE_NOT_SUPPORTED (0xC0000000 | 0x0057)
--#define NT_STATUS_UNKNOWN_REVISION (0xC0000000 | 0x0058)
--#define NT_STATUS_REVISION_MISMATCH (0xC0000000 | 0x0059)
--#define NT_STATUS_INVALID_OWNER (0xC0000000 | 0x005a)
--#define NT_STATUS_INVALID_PRIMARY_GROUP (0xC0000000 | 0x005b)
--#define NT_STATUS_NO_IMPERSONATION_TOKEN (0xC0000000 | 0x005c)
--#define NT_STATUS_CANT_DISABLE_MANDATORY (0xC0000000 | 0x005d)
--#define NT_STATUS_NO_LOGON_SERVERS (0xC0000000 | 0x005e)
--#define NT_STATUS_NO_SUCH_LOGON_SESSION (0xC0000000 | 0x005f)
--#define NT_STATUS_NO_SUCH_PRIVILEGE (0xC0000000 | 0x0060)
--#define NT_STATUS_PRIVILEGE_NOT_HELD (0xC0000000 | 0x0061)
--#define NT_STATUS_INVALID_ACCOUNT_NAME (0xC0000000 | 0x0062)
--#define NT_STATUS_USER_EXISTS (0xC0000000 | 0x0063)
--#define NT_STATUS_NO_SUCH_USER (0xC0000000 | 0x0064)
--#define NT_STATUS_GROUP_EXISTS (0xC0000000 | 0x0065)
--#define NT_STATUS_NO_SUCH_GROUP (0xC0000000 | 0x0066)
--#define NT_STATUS_MEMBER_IN_GROUP (0xC0000000 | 0x0067)
--#define NT_STATUS_MEMBER_NOT_IN_GROUP (0xC0000000 | 0x0068)
--#define NT_STATUS_LAST_ADMIN (0xC0000000 | 0x0069)
--#define NT_STATUS_WRONG_PASSWORD (0xC0000000 | 0x006a)
--#define NT_STATUS_ILL_FORMED_PASSWORD (0xC0000000 | 0x006b)
--#define NT_STATUS_PASSWORD_RESTRICTION (0xC0000000 | 0x006c)
--#define NT_STATUS_LOGON_FAILURE (0xC0000000 | 0x006d)
--#define NT_STATUS_ACCOUNT_RESTRICTION (0xC0000000 | 0x006e)
--#define NT_STATUS_INVALID_LOGON_HOURS (0xC0000000 | 0x006f)
--#define NT_STATUS_INVALID_WORKSTATION (0xC0000000 | 0x0070)
--#define NT_STATUS_PASSWORD_EXPIRED (0xC0000000 | 0x0071)
--#define NT_STATUS_ACCOUNT_DISABLED (0xC0000000 | 0x0072)
--#define NT_STATUS_NONE_MAPPED (0xC0000000 | 0x0073)
--#define NT_STATUS_TOO_MANY_LUIDS_REQUESTED (0xC0000000 | 0x0074)
--#define NT_STATUS_LUIDS_EXHAUSTED (0xC0000000 | 0x0075)
--#define NT_STATUS_INVALID_SUB_AUTHORITY (0xC0000000 | 0x0076)
--#define NT_STATUS_INVALID_ACL (0xC0000000 | 0x0077)
--#define NT_STATUS_INVALID_SID (0xC0000000 | 0x0078)
--#define NT_STATUS_INVALID_SECURITY_DESCR (0xC0000000 | 0x0079)
--#define NT_STATUS_PROCEDURE_NOT_FOUND (0xC0000000 | 0x007a)
--#define NT_STATUS_INVALID_IMAGE_FORMAT (0xC0000000 | 0x007b)
--#define NT_STATUS_NO_TOKEN (0xC0000000 | 0x007c)
--#define NT_STATUS_BAD_INHERITANCE_ACL (0xC0000000 | 0x007d)
--#define NT_STATUS_RANGE_NOT_LOCKED (0xC0000000 | 0x007e)
--#define NT_STATUS_DISK_FULL (0xC0000000 | 0x007f)
--#define NT_STATUS_SERVER_DISABLED (0xC0000000 | 0x0080)
--#define NT_STATUS_SERVER_NOT_DISABLED (0xC0000000 | 0x0081)
--#define NT_STATUS_TOO_MANY_GUIDS_REQUESTED (0xC0000000 | 0x0082)
--#define NT_STATUS_GUIDS_EXHAUSTED (0xC0000000 | 0x0083)
--#define NT_STATUS_INVALID_ID_AUTHORITY (0xC0000000 | 0x0084)
--#define NT_STATUS_AGENTS_EXHAUSTED (0xC0000000 | 0x0085)
--#define NT_STATUS_INVALID_VOLUME_LABEL (0xC0000000 | 0x0086)
--#define NT_STATUS_SECTION_NOT_EXTENDED (0xC0000000 | 0x0087)
--#define NT_STATUS_NOT_MAPPED_DATA (0xC0000000 | 0x0088)
--#define NT_STATUS_RESOURCE_DATA_NOT_FOUND (0xC0000000 | 0x0089)
--#define NT_STATUS_RESOURCE_TYPE_NOT_FOUND (0xC0000000 | 0x008a)
--#define NT_STATUS_RESOURCE_NAME_NOT_FOUND (0xC0000000 | 0x008b)
--#define NT_STATUS_ARRAY_BOUNDS_EXCEEDED (0xC0000000 | 0x008c)
--#define NT_STATUS_FLOAT_DENORMAL_OPERAND (0xC0000000 | 0x008d)
--#define NT_STATUS_FLOAT_DIVIDE_BY_ZERO (0xC0000000 | 0x008e)
--#define NT_STATUS_FLOAT_INEXACT_RESULT (0xC0000000 | 0x008f)
--#define NT_STATUS_FLOAT_INVALID_OPERATION (0xC0000000 | 0x0090)
--#define NT_STATUS_FLOAT_OVERFLOW (0xC0000000 | 0x0091)
--#define NT_STATUS_FLOAT_STACK_CHECK (0xC0000000 | 0x0092)
--#define NT_STATUS_FLOAT_UNDERFLOW (0xC0000000 | 0x0093)
--#define NT_STATUS_INTEGER_DIVIDE_BY_ZERO (0xC0000000 | 0x0094)
--#define NT_STATUS_INTEGER_OVERFLOW (0xC0000000 | 0x0095)
--#define NT_STATUS_PRIVILEGED_INSTRUCTION (0xC0000000 | 0x0096)
--#define NT_STATUS_TOO_MANY_PAGING_FILES (0xC0000000 | 0x0097)
--#define NT_STATUS_FILE_INVALID (0xC0000000 | 0x0098)
--#define NT_STATUS_ALLOTTED_SPACE_EXCEEDED (0xC0000000 | 0x0099)
--#define NT_STATUS_INSUFFICIENT_RESOURCES (0xC0000000 | 0x009a)
--#define NT_STATUS_DFS_EXIT_PATH_FOUND (0xC0000000 | 0x009b)
--#define NT_STATUS_DEVICE_DATA_ERROR (0xC0000000 | 0x009c)
--#define NT_STATUS_DEVICE_NOT_CONNECTED (0xC0000000 | 0x009d)
--#define NT_STATUS_DEVICE_POWER_FAILURE (0xC0000000 | 0x009e)
--#define NT_STATUS_FREE_VM_NOT_AT_BASE (0xC0000000 | 0x009f)
--#define NT_STATUS_MEMORY_NOT_ALLOCATED (0xC0000000 | 0x00a0)
--#define NT_STATUS_WORKING_SET_QUOTA (0xC0000000 | 0x00a1)
--#define NT_STATUS_MEDIA_WRITE_PROTECTED (0xC0000000 | 0x00a2)
--#define NT_STATUS_DEVICE_NOT_READY (0xC0000000 | 0x00a3)
--#define NT_STATUS_INVALID_GROUP_ATTRIBUTES (0xC0000000 | 0x00a4)
--#define NT_STATUS_BAD_IMPERSONATION_LEVEL (0xC0000000 | 0x00a5)
--#define NT_STATUS_CANT_OPEN_ANONYMOUS (0xC0000000 | 0x00a6)
--#define NT_STATUS_BAD_VALIDATION_CLASS (0xC0000000 | 0x00a7)
--#define NT_STATUS_BAD_TOKEN_TYPE (0xC0000000 | 0x00a8)
--#define NT_STATUS_BAD_MASTER_BOOT_RECORD (0xC0000000 | 0x00a9)
--#define NT_STATUS_INSTRUCTION_MISALIGNMENT (0xC0000000 | 0x00aa)
--#define NT_STATUS_INSTANCE_NOT_AVAILABLE (0xC0000000 | 0x00ab)
--#define NT_STATUS_PIPE_NOT_AVAILABLE (0xC0000000 | 0x00ac)
--#define NT_STATUS_INVALID_PIPE_STATE (0xC0000000 | 0x00ad)
--#define NT_STATUS_PIPE_BUSY (0xC0000000 | 0x00ae)
--#define NT_STATUS_ILLEGAL_FUNCTION (0xC0000000 | 0x00af)
--#define NT_STATUS_PIPE_DISCONNECTED (0xC0000000 | 0x00b0)
--#define NT_STATUS_PIPE_CLOSING (0xC0000000 | 0x00b1)
--#define NT_STATUS_PIPE_CONNECTED (0xC0000000 | 0x00b2)
--#define NT_STATUS_PIPE_LISTENING (0xC0000000 | 0x00b3)
--#define NT_STATUS_INVALID_READ_MODE (0xC0000000 | 0x00b4)
--#define NT_STATUS_IO_TIMEOUT (0xC0000000 | 0x00b5)
--#define NT_STATUS_FILE_FORCED_CLOSED (0xC0000000 | 0x00b6)
--#define NT_STATUS_PROFILING_NOT_STARTED (0xC0000000 | 0x00b7)
--#define NT_STATUS_PROFILING_NOT_STOPPED (0xC0000000 | 0x00b8)
--#define NT_STATUS_COULD_NOT_INTERPRET (0xC0000000 | 0x00b9)
--#define NT_STATUS_FILE_IS_A_DIRECTORY (0xC0000000 | 0x00ba)
--#define NT_STATUS_NOT_SUPPORTED (0xC0000000 | 0x00bb)
--#define NT_STATUS_REMOTE_NOT_LISTENING (0xC0000000 | 0x00bc)
--#define NT_STATUS_DUPLICATE_NAME (0xC0000000 | 0x00bd)
--#define NT_STATUS_BAD_NETWORK_PATH (0xC0000000 | 0x00be)
--#define NT_STATUS_NETWORK_BUSY (0xC0000000 | 0x00bf)
--#define NT_STATUS_DEVICE_DOES_NOT_EXIST (0xC0000000 | 0x00c0)
--#define NT_STATUS_TOO_MANY_COMMANDS (0xC0000000 | 0x00c1)
--#define NT_STATUS_ADAPTER_HARDWARE_ERROR (0xC0000000 | 0x00c2)
--#define NT_STATUS_INVALID_NETWORK_RESPONSE (0xC0000000 | 0x00c3)
--#define NT_STATUS_UNEXPECTED_NETWORK_ERROR (0xC0000000 | 0x00c4)
--#define NT_STATUS_BAD_REMOTE_ADAPTER (0xC0000000 | 0x00c5)
--#define NT_STATUS_PRINT_QUEUE_FULL (0xC0000000 | 0x00c6)
--#define NT_STATUS_NO_SPOOL_SPACE (0xC0000000 | 0x00c7)
--#define NT_STATUS_PRINT_CANCELLED (0xC0000000 | 0x00c8)
--#define NT_STATUS_NETWORK_NAME_DELETED (0xC0000000 | 0x00c9)
--#define NT_STATUS_NETWORK_ACCESS_DENIED (0xC0000000 | 0x00ca)
--#define NT_STATUS_BAD_DEVICE_TYPE (0xC0000000 | 0x00cb)
--#define NT_STATUS_BAD_NETWORK_NAME (0xC0000000 | 0x00cc)
--#define NT_STATUS_TOO_MANY_NAMES (0xC0000000 | 0x00cd)
--#define NT_STATUS_TOO_MANY_SESSIONS (0xC0000000 | 0x00ce)
--#define NT_STATUS_SHARING_PAUSED (0xC0000000 | 0x00cf)
--#define NT_STATUS_REQUEST_NOT_ACCEPTED (0xC0000000 | 0x00d0)
--#define NT_STATUS_REDIRECTOR_PAUSED (0xC0000000 | 0x00d1)
--#define NT_STATUS_NET_WRITE_FAULT (0xC0000000 | 0x00d2)
--#define NT_STATUS_PROFILING_AT_LIMIT (0xC0000000 | 0x00d3)
--#define NT_STATUS_NOT_SAME_DEVICE (0xC0000000 | 0x00d4)
--#define NT_STATUS_FILE_RENAMED (0xC0000000 | 0x00d5)
--#define NT_STATUS_VIRTUAL_CIRCUIT_CLOSED (0xC0000000 | 0x00d6)
--#define NT_STATUS_NO_SECURITY_ON_OBJECT (0xC0000000 | 0x00d7)
--#define NT_STATUS_CANT_WAIT (0xC0000000 | 0x00d8)
--#define NT_STATUS_PIPE_EMPTY (0xC0000000 | 0x00d9)
--#define NT_STATUS_CANT_ACCESS_DOMAIN_INFO (0xC0000000 | 0x00da)
--#define NT_STATUS_CANT_TERMINATE_SELF (0xC0000000 | 0x00db)
--#define NT_STATUS_INVALID_SERVER_STATE (0xC0000000 | 0x00dc)
--#define NT_STATUS_INVALID_DOMAIN_STATE (0xC0000000 | 0x00dd)
--#define NT_STATUS_INVALID_DOMAIN_ROLE (0xC0000000 | 0x00de)
--#define NT_STATUS_NO_SUCH_DOMAIN (0xC0000000 | 0x00df)
--#define NT_STATUS_DOMAIN_EXISTS (0xC0000000 | 0x00e0)
--#define NT_STATUS_DOMAIN_LIMIT_EXCEEDED (0xC0000000 | 0x00e1)
--#define NT_STATUS_OPLOCK_NOT_GRANTED (0xC0000000 | 0x00e2)
--#define NT_STATUS_INVALID_OPLOCK_PROTOCOL (0xC0000000 | 0x00e3)
--#define NT_STATUS_INTERNAL_DB_CORRUPTION (0xC0000000 | 0x00e4)
--#define NT_STATUS_INTERNAL_ERROR (0xC0000000 | 0x00e5)
--#define NT_STATUS_GENERIC_NOT_MAPPED (0xC0000000 | 0x00e6)
--#define NT_STATUS_BAD_DESCRIPTOR_FORMAT (0xC0000000 | 0x00e7)
--#define NT_STATUS_INVALID_USER_BUFFER (0xC0000000 | 0x00e8)
--#define NT_STATUS_UNEXPECTED_IO_ERROR (0xC0000000 | 0x00e9)
--#define NT_STATUS_UNEXPECTED_MM_CREATE_ERR (0xC0000000 | 0x00ea)
--#define NT_STATUS_UNEXPECTED_MM_MAP_ERROR (0xC0000000 | 0x00eb)
--#define NT_STATUS_UNEXPECTED_MM_EXTEND_ERR (0xC0000000 | 0x00ec)
--#define NT_STATUS_NOT_LOGON_PROCESS (0xC0000000 | 0x00ed)
--#define NT_STATUS_LOGON_SESSION_EXISTS (0xC0000000 | 0x00ee)
--#define NT_STATUS_INVALID_PARAMETER_1 (0xC0000000 | 0x00ef)
--#define NT_STATUS_INVALID_PARAMETER_2 (0xC0000000 | 0x00f0)
--#define NT_STATUS_INVALID_PARAMETER_3 (0xC0000000 | 0x00f1)
--#define NT_STATUS_INVALID_PARAMETER_4 (0xC0000000 | 0x00f2)
--#define NT_STATUS_INVALID_PARAMETER_5 (0xC0000000 | 0x00f3)
--#define NT_STATUS_INVALID_PARAMETER_6 (0xC0000000 | 0x00f4)
--#define NT_STATUS_INVALID_PARAMETER_7 (0xC0000000 | 0x00f5)
--#define NT_STATUS_INVALID_PARAMETER_8 (0xC0000000 | 0x00f6)
--#define NT_STATUS_INVALID_PARAMETER_9 (0xC0000000 | 0x00f7)
--#define NT_STATUS_INVALID_PARAMETER_10 (0xC0000000 | 0x00f8)
--#define NT_STATUS_INVALID_PARAMETER_11 (0xC0000000 | 0x00f9)
--#define NT_STATUS_INVALID_PARAMETER_12 (0xC0000000 | 0x00fa)
--#define NT_STATUS_REDIRECTOR_NOT_STARTED (0xC0000000 | 0x00fb)
--#define NT_STATUS_REDIRECTOR_STARTED (0xC0000000 | 0x00fc)
--#define NT_STATUS_STACK_OVERFLOW (0xC0000000 | 0x00fd)
--#define NT_STATUS_NO_SUCH_PACKAGE (0xC0000000 | 0x00fe)
--#define NT_STATUS_BAD_FUNCTION_TABLE (0xC0000000 | 0x00ff)
--#define NT_STATUS_VARIABLE_NOT_FOUND (0xC0000000 | 0x0100)
--#define NT_STATUS_DIRECTORY_NOT_EMPTY (0xC0000000 | 0x0101)
--#define NT_STATUS_FILE_CORRUPT_ERROR (0xC0000000 | 0x0102)
--#define NT_STATUS_NOT_A_DIRECTORY (0xC0000000 | 0x0103)
--#define NT_STATUS_BAD_LOGON_SESSION_STATE (0xC0000000 | 0x0104)
--#define NT_STATUS_LOGON_SESSION_COLLISION (0xC0000000 | 0x0105)
--#define NT_STATUS_NAME_TOO_LONG (0xC0000000 | 0x0106)
--#define NT_STATUS_FILES_OPEN (0xC0000000 | 0x0107)
--#define NT_STATUS_CONNECTION_IN_USE (0xC0000000 | 0x0108)
--#define NT_STATUS_MESSAGE_NOT_FOUND (0xC0000000 | 0x0109)
--#define NT_STATUS_PROCESS_IS_TERMINATING (0xC0000000 | 0x010a)
--#define NT_STATUS_INVALID_LOGON_TYPE (0xC0000000 | 0x010b)
--#define NT_STATUS_NO_GUID_TRANSLATION (0xC0000000 | 0x010c)
--#define NT_STATUS_CANNOT_IMPERSONATE (0xC0000000 | 0x010d)
--#define NT_STATUS_IMAGE_ALREADY_LOADED (0xC0000000 | 0x010e)
--#define NT_STATUS_ABIOS_NOT_PRESENT (0xC0000000 | 0x010f)
--#define NT_STATUS_ABIOS_LID_NOT_EXIST (0xC0000000 | 0x0110)
--#define NT_STATUS_ABIOS_LID_ALREADY_OWNED (0xC0000000 | 0x0111)
--#define NT_STATUS_ABIOS_NOT_LID_OWNER (0xC0000000 | 0x0112)
--#define NT_STATUS_ABIOS_INVALID_COMMAND (0xC0000000 | 0x0113)
--#define NT_STATUS_ABIOS_INVALID_LID (0xC0000000 | 0x0114)
--#define NT_STATUS_ABIOS_SELECTOR_NOT_AVAILABLE (0xC0000000 | 0x0115)
--#define NT_STATUS_ABIOS_INVALID_SELECTOR (0xC0000000 | 0x0116)
--#define NT_STATUS_NO_LDT (0xC0000000 | 0x0117)
--#define NT_STATUS_INVALID_LDT_SIZE (0xC0000000 | 0x0118)
--#define NT_STATUS_INVALID_LDT_OFFSET (0xC0000000 | 0x0119)
--#define NT_STATUS_INVALID_LDT_DESCRIPTOR (0xC0000000 | 0x011a)
--#define NT_STATUS_INVALID_IMAGE_NE_FORMAT (0xC0000000 | 0x011b)
--#define NT_STATUS_RXACT_INVALID_STATE (0xC0000000 | 0x011c)
--#define NT_STATUS_RXACT_COMMIT_FAILURE (0xC0000000 | 0x011d)
--#define NT_STATUS_MAPPED_FILE_SIZE_ZERO (0xC0000000 | 0x011e)
--#define NT_STATUS_TOO_MANY_OPENED_FILES (0xC0000000 | 0x011f)
--#define NT_STATUS_CANCELLED (0xC0000000 | 0x0120)
--#define NT_STATUS_CANNOT_DELETE (0xC0000000 | 0x0121)
--#define NT_STATUS_INVALID_COMPUTER_NAME (0xC0000000 | 0x0122)
--#define NT_STATUS_FILE_DELETED (0xC0000000 | 0x0123)
--#define NT_STATUS_SPECIAL_ACCOUNT (0xC0000000 | 0x0124)
--#define NT_STATUS_SPECIAL_GROUP (0xC0000000 | 0x0125)
--#define NT_STATUS_SPECIAL_USER (0xC0000000 | 0x0126)
--#define NT_STATUS_MEMBERS_PRIMARY_GROUP (0xC0000000 | 0x0127)
--#define NT_STATUS_FILE_CLOSED (0xC0000000 | 0x0128)
--#define NT_STATUS_TOO_MANY_THREADS (0xC0000000 | 0x0129)
--#define NT_STATUS_THREAD_NOT_IN_PROCESS (0xC0000000 | 0x012a)
--#define NT_STATUS_TOKEN_ALREADY_IN_USE (0xC0000000 | 0x012b)
--#define NT_STATUS_PAGEFILE_QUOTA_EXCEEDED (0xC0000000 | 0x012c)
--#define NT_STATUS_COMMITMENT_LIMIT (0xC0000000 | 0x012d)
--#define NT_STATUS_INVALID_IMAGE_LE_FORMAT (0xC0000000 | 0x012e)
--#define NT_STATUS_INVALID_IMAGE_NOT_MZ (0xC0000000 | 0x012f)
--#define NT_STATUS_INVALID_IMAGE_PROTECT (0xC0000000 | 0x0130)
--#define NT_STATUS_INVALID_IMAGE_WIN_16 (0xC0000000 | 0x0131)
--#define NT_STATUS_LOGON_SERVER_CONFLICT (0xC0000000 | 0x0132)
--#define NT_STATUS_TIME_DIFFERENCE_AT_DC (0xC0000000 | 0x0133)
--#define NT_STATUS_SYNCHRONIZATION_REQUIRED (0xC0000000 | 0x0134)
--#define NT_STATUS_DLL_NOT_FOUND (0xC0000000 | 0x0135)
--#define NT_STATUS_OPEN_FAILED (0xC0000000 | 0x0136)
--#define NT_STATUS_IO_PRIVILEGE_FAILED (0xC0000000 | 0x0137)
--#define NT_STATUS_ORDINAL_NOT_FOUND (0xC0000000 | 0x0138)
--#define NT_STATUS_ENTRYPOINT_NOT_FOUND (0xC0000000 | 0x0139)
--#define NT_STATUS_CONTROL_C_EXIT (0xC0000000 | 0x013a)
--#define NT_STATUS_LOCAL_DISCONNECT (0xC0000000 | 0x013b)
--#define NT_STATUS_REMOTE_DISCONNECT (0xC0000000 | 0x013c)
--#define NT_STATUS_REMOTE_RESOURCES (0xC0000000 | 0x013d)
--#define NT_STATUS_LINK_FAILED (0xC0000000 | 0x013e)
--#define NT_STATUS_LINK_TIMEOUT (0xC0000000 | 0x013f)
--#define NT_STATUS_INVALID_CONNECTION (0xC0000000 | 0x0140)
--#define NT_STATUS_INVALID_ADDRESS (0xC0000000 | 0x0141)
--#define NT_STATUS_DLL_INIT_FAILED (0xC0000000 | 0x0142)
--#define NT_STATUS_MISSING_SYSTEMFILE (0xC0000000 | 0x0143)
--#define NT_STATUS_UNHANDLED_EXCEPTION (0xC0000000 | 0x0144)
--#define NT_STATUS_APP_INIT_FAILURE (0xC0000000 | 0x0145)
--#define NT_STATUS_PAGEFILE_CREATE_FAILED (0xC0000000 | 0x0146)
--#define NT_STATUS_NO_PAGEFILE (0xC0000000 | 0x0147)
--#define NT_STATUS_INVALID_LEVEL (0xC0000000 | 0x0148)
--#define NT_STATUS_WRONG_PASSWORD_CORE (0xC0000000 | 0x0149)
--#define NT_STATUS_ILLEGAL_FLOAT_CONTEXT (0xC0000000 | 0x014a)
--#define NT_STATUS_PIPE_BROKEN (0xC0000000 | 0x014b)
--#define NT_STATUS_REGISTRY_CORRUPT (0xC0000000 | 0x014c)
--#define NT_STATUS_REGISTRY_IO_FAILED (0xC0000000 | 0x014d)
--#define NT_STATUS_NO_EVENT_PAIR (0xC0000000 | 0x014e)
--#define NT_STATUS_UNRECOGNIZED_VOLUME (0xC0000000 | 0x014f)
--#define NT_STATUS_SERIAL_NO_DEVICE_INITED (0xC0000000 | 0x0150)
--#define NT_STATUS_NO_SUCH_ALIAS (0xC0000000 | 0x0151)
--#define NT_STATUS_MEMBER_NOT_IN_ALIAS (0xC0000000 | 0x0152)
--#define NT_STATUS_MEMBER_IN_ALIAS (0xC0000000 | 0x0153)
--#define NT_STATUS_ALIAS_EXISTS (0xC0000000 | 0x0154)
--#define NT_STATUS_LOGON_NOT_GRANTED (0xC0000000 | 0x0155)
--#define NT_STATUS_TOO_MANY_SECRETS (0xC0000000 | 0x0156)
--#define NT_STATUS_SECRET_TOO_LONG (0xC0000000 | 0x0157)
--#define NT_STATUS_INTERNAL_DB_ERROR (0xC0000000 | 0x0158)
--#define NT_STATUS_FULLSCREEN_MODE (0xC0000000 | 0x0159)
--#define NT_STATUS_TOO_MANY_CONTEXT_IDS (0xC0000000 | 0x015a)
--#define NT_STATUS_LOGON_TYPE_NOT_GRANTED (0xC0000000 | 0x015b)
--#define NT_STATUS_NOT_REGISTRY_FILE (0xC0000000 | 0x015c)
--#define NT_STATUS_NT_CROSS_ENCRYPTION_REQUIRED (0xC0000000 | 0x015d)
--#define NT_STATUS_DOMAIN_CTRLR_CONFIG_ERROR (0xC0000000 | 0x015e)
--#define NT_STATUS_FT_MISSING_MEMBER (0xC0000000 | 0x015f)
--#define NT_STATUS_ILL_FORMED_SERVICE_ENTRY (0xC0000000 | 0x0160)
--#define NT_STATUS_ILLEGAL_CHARACTER (0xC0000000 | 0x0161)
--#define NT_STATUS_UNMAPPABLE_CHARACTER (0xC0000000 | 0x0162)
--#define NT_STATUS_UNDEFINED_CHARACTER (0xC0000000 | 0x0163)
--#define NT_STATUS_FLOPPY_VOLUME (0xC0000000 | 0x0164)
--#define NT_STATUS_FLOPPY_ID_MARK_NOT_FOUND (0xC0000000 | 0x0165)
--#define NT_STATUS_FLOPPY_WRONG_CYLINDER (0xC0000000 | 0x0166)
--#define NT_STATUS_FLOPPY_UNKNOWN_ERROR (0xC0000000 | 0x0167)
--#define NT_STATUS_FLOPPY_BAD_REGISTERS (0xC0000000 | 0x0168)
--#define NT_STATUS_DISK_RECALIBRATE_FAILED (0xC0000000 | 0x0169)
--#define NT_STATUS_DISK_OPERATION_FAILED (0xC0000000 | 0x016a)
--#define NT_STATUS_DISK_RESET_FAILED (0xC0000000 | 0x016b)
--#define NT_STATUS_SHARED_IRQ_BUSY (0xC0000000 | 0x016c)
--#define NT_STATUS_FT_ORPHANING (0xC0000000 | 0x016d)
--#define NT_STATUS_BIOS_FAILED_TO_CONNECT_INTERRUPT (0xC0000000 | 0x016e)
--#define NT_STATUS_PARTITION_FAILURE (0xC0000000 | 0x0172)
--#define NT_STATUS_INVALID_BLOCK_LENGTH (0xC0000000 | 0x0173)
--#define NT_STATUS_DEVICE_NOT_PARTITIONED (0xC0000000 | 0x0174)
--#define NT_STATUS_UNABLE_TO_LOCK_MEDIA (0xC0000000 | 0x0175)
--#define NT_STATUS_UNABLE_TO_UNLOAD_MEDIA (0xC0000000 | 0x0176)
--#define NT_STATUS_EOM_OVERFLOW (0xC0000000 | 0x0177)
--#define NT_STATUS_NO_MEDIA (0xC0000000 | 0x0178)
--#define NT_STATUS_NO_SUCH_MEMBER (0xC0000000 | 0x017a)
--#define NT_STATUS_INVALID_MEMBER (0xC0000000 | 0x017b)
--#define NT_STATUS_KEY_DELETED (0xC0000000 | 0x017c)
--#define NT_STATUS_NO_LOG_SPACE (0xC0000000 | 0x017d)
--#define NT_STATUS_TOO_MANY_SIDS (0xC0000000 | 0x017e)
--#define NT_STATUS_LM_CROSS_ENCRYPTION_REQUIRED (0xC0000000 | 0x017f)
--#define NT_STATUS_KEY_HAS_CHILDREN (0xC0000000 | 0x0180)
--#define NT_STATUS_CHILD_MUST_BE_VOLATILE (0xC0000000 | 0x0181)
--#define NT_STATUS_DEVICE_CONFIGURATION_ERROR (0xC0000000 | 0x0182)
--#define NT_STATUS_DRIVER_INTERNAL_ERROR (0xC0000000 | 0x0183)
--#define NT_STATUS_INVALID_DEVICE_STATE (0xC0000000 | 0x0184)
--#define NT_STATUS_IO_DEVICE_ERROR (0xC0000000 | 0x0185)
--#define NT_STATUS_DEVICE_PROTOCOL_ERROR (0xC0000000 | 0x0186)
--#define NT_STATUS_BACKUP_CONTROLLER (0xC0000000 | 0x0187)
--#define NT_STATUS_LOG_FILE_FULL (0xC0000000 | 0x0188)
--#define NT_STATUS_TOO_LATE (0xC0000000 | 0x0189)
--#define NT_STATUS_NO_TRUST_LSA_SECRET (0xC0000000 | 0x018a)
--#define NT_STATUS_NO_TRUST_SAM_ACCOUNT (0xC0000000 | 0x018b)
--#define NT_STATUS_TRUSTED_DOMAIN_FAILURE (0xC0000000 | 0x018c)
--#define NT_STATUS_TRUSTED_RELATIONSHIP_FAILURE (0xC0000000 | 0x018d)
--#define NT_STATUS_EVENTLOG_FILE_CORRUPT (0xC0000000 | 0x018e)
--#define NT_STATUS_EVENTLOG_CANT_START (0xC0000000 | 0x018f)
--#define NT_STATUS_TRUST_FAILURE (0xC0000000 | 0x0190)
--#define NT_STATUS_MUTANT_LIMIT_EXCEEDED (0xC0000000 | 0x0191)
--#define NT_STATUS_NETLOGON_NOT_STARTED (0xC0000000 | 0x0192)
--#define NT_STATUS_ACCOUNT_EXPIRED (0xC0000000 | 0x0193)
--#define NT_STATUS_POSSIBLE_DEADLOCK (0xC0000000 | 0x0194)
--#define NT_STATUS_NETWORK_CREDENTIAL_CONFLICT (0xC0000000 | 0x0195)
--#define NT_STATUS_REMOTE_SESSION_LIMIT (0xC0000000 | 0x0196)
--#define NT_STATUS_EVENTLOG_FILE_CHANGED (0xC0000000 | 0x0197)
--#define NT_STATUS_NOLOGON_INTERDOMAIN_TRUST_ACCOUNT (0xC0000000 | 0x0198)
--#define NT_STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT (0xC0000000 | 0x0199)
--#define NT_STATUS_NOLOGON_SERVER_TRUST_ACCOUNT (0xC0000000 | 0x019a)
--#define NT_STATUS_DOMAIN_TRUST_INCONSISTENT (0xC0000000 | 0x019b)
--#define NT_STATUS_FS_DRIVER_REQUIRED (0xC0000000 | 0x019c)
--#define NT_STATUS_INVALID_LOCK_RANGE (0xC0000000 | 0x01a1)
--#define NT_STATUS_NO_USER_SESSION_KEY (0xC0000000 | 0x0202)
--#define NT_STATUS_USER_SESSION_DELETED (0xC0000000 | 0x0203)
--#define NT_STATUS_RESOURCE_LANG_NOT_FOUND (0xC0000000 | 0x0204)
--#define NT_STATUS_INSUFF_SERVER_RESOURCES (0xC0000000 | 0x0205)
--#define NT_STATUS_INVALID_BUFFER_SIZE (0xC0000000 | 0x0206)
--#define NT_STATUS_INVALID_ADDRESS_COMPONENT (0xC0000000 | 0x0207)
--#define NT_STATUS_INVALID_ADDRESS_WILDCARD (0xC0000000 | 0x0208)
--#define NT_STATUS_TOO_MANY_ADDRESSES (0xC0000000 | 0x0209)
--#define NT_STATUS_ADDRESS_ALREADY_EXISTS (0xC0000000 | 0x020a)
--#define NT_STATUS_ADDRESS_CLOSED (0xC0000000 | 0x020b)
--#define NT_STATUS_CONNECTION_DISCONNECTED (0xC0000000 | 0x020c)
--#define NT_STATUS_CONNECTION_RESET (0xC0000000 | 0x020d)
--#define NT_STATUS_TOO_MANY_NODES (0xC0000000 | 0x020e)
--#define NT_STATUS_TRANSACTION_ABORTED (0xC0000000 | 0x020f)
--#define NT_STATUS_TRANSACTION_TIMED_OUT (0xC0000000 | 0x0210)
--#define NT_STATUS_TRANSACTION_NO_RELEASE (0xC0000000 | 0x0211)
--#define NT_STATUS_TRANSACTION_NO_MATCH (0xC0000000 | 0x0212)
--#define NT_STATUS_TRANSACTION_RESPONDED (0xC0000000 | 0x0213)
--#define NT_STATUS_TRANSACTION_INVALID_ID (0xC0000000 | 0x0214)
--#define NT_STATUS_TRANSACTION_INVALID_TYPE (0xC0000000 | 0x0215)
--#define NT_STATUS_NOT_SERVER_SESSION (0xC0000000 | 0x0216)
--#define NT_STATUS_NOT_CLIENT_SESSION (0xC0000000 | 0x0217)
--#define NT_STATUS_CANNOT_LOAD_REGISTRY_FILE (0xC0000000 | 0x0218)
--#define NT_STATUS_DEBUG_ATTACH_FAILED (0xC0000000 | 0x0219)
--#define NT_STATUS_SYSTEM_PROCESS_TERMINATED (0xC0000000 | 0x021a)
--#define NT_STATUS_DATA_NOT_ACCEPTED (0xC0000000 | 0x021b)
--#define NT_STATUS_NO_BROWSER_SERVERS_FOUND (0xC0000000 | 0x021c)
--#define NT_STATUS_VDM_HARD_ERROR (0xC0000000 | 0x021d)
--#define NT_STATUS_DRIVER_CANCEL_TIMEOUT (0xC0000000 | 0x021e)
--#define NT_STATUS_REPLY_MESSAGE_MISMATCH (0xC0000000 | 0x021f)
--#define NT_STATUS_MAPPED_ALIGNMENT (0xC0000000 | 0x0220)
--#define NT_STATUS_IMAGE_CHECKSUM_MISMATCH (0xC0000000 | 0x0221)
--#define NT_STATUS_LOST_WRITEBEHIND_DATA (0xC0000000 | 0x0222)
--#define NT_STATUS_CLIENT_SERVER_PARAMETERS_INVALID (0xC0000000 | 0x0223)
--#define NT_STATUS_PASSWORD_MUST_CHANGE (0xC0000000 | 0x0224)
--#define NT_STATUS_NOT_FOUND (0xC0000000 | 0x0225)
--#define NT_STATUS_NOT_TINY_STREAM (0xC0000000 | 0x0226)
--#define NT_STATUS_RECOVERY_FAILURE (0xC0000000 | 0x0227)
--#define NT_STATUS_STACK_OVERFLOW_READ (0xC0000000 | 0x0228)
--#define NT_STATUS_FAIL_CHECK (0xC0000000 | 0x0229)
--#define NT_STATUS_DUPLICATE_OBJECTID (0xC0000000 | 0x022a)
--#define NT_STATUS_OBJECTID_EXISTS (0xC0000000 | 0x022b)
--#define NT_STATUS_CONVERT_TO_LARGE (0xC0000000 | 0x022c)
--#define NT_STATUS_RETRY (0xC0000000 | 0x022d)
--#define NT_STATUS_FOUND_OUT_OF_SCOPE (0xC0000000 | 0x022e)
--#define NT_STATUS_ALLOCATE_BUCKET (0xC0000000 | 0x022f)
--#define NT_STATUS_PROPSET_NOT_FOUND (0xC0000000 | 0x0230)
--#define NT_STATUS_MARSHALL_OVERFLOW (0xC0000000 | 0x0231)
--#define NT_STATUS_INVALID_VARIANT (0xC0000000 | 0x0232)
--#define NT_STATUS_DOMAIN_CONTROLLER_NOT_FOUND (0xC0000000 | 0x0233)
--#define NT_STATUS_ACCOUNT_LOCKED_OUT (0xC0000000 | 0x0234)
--#define NT_STATUS_HANDLE_NOT_CLOSABLE (0xC0000000 | 0x0235)
--#define NT_STATUS_CONNECTION_REFUSED (0xC0000000 | 0x0236)
--#define NT_STATUS_GRACEFUL_DISCONNECT (0xC0000000 | 0x0237)
--#define NT_STATUS_ADDRESS_ALREADY_ASSOCIATED (0xC0000000 | 0x0238)
--#define NT_STATUS_ADDRESS_NOT_ASSOCIATED (0xC0000000 | 0x0239)
--#define NT_STATUS_CONNECTION_INVALID (0xC0000000 | 0x023a)
--#define NT_STATUS_CONNECTION_ACTIVE (0xC0000000 | 0x023b)
--#define NT_STATUS_NETWORK_UNREACHABLE (0xC0000000 | 0x023c)
--#define NT_STATUS_HOST_UNREACHABLE (0xC0000000 | 0x023d)
--#define NT_STATUS_PROTOCOL_UNREACHABLE (0xC0000000 | 0x023e)
--#define NT_STATUS_PORT_UNREACHABLE (0xC0000000 | 0x023f)
--#define NT_STATUS_REQUEST_ABORTED (0xC0000000 | 0x0240)
--#define NT_STATUS_CONNECTION_ABORTED (0xC0000000 | 0x0241)
--#define NT_STATUS_BAD_COMPRESSION_BUFFER (0xC0000000 | 0x0242)
--#define NT_STATUS_USER_MAPPED_FILE (0xC0000000 | 0x0243)
--#define NT_STATUS_AUDIT_FAILED (0xC0000000 | 0x0244)
--#define NT_STATUS_TIMER_RESOLUTION_NOT_SET (0xC0000000 | 0x0245)
--#define NT_STATUS_CONNECTION_COUNT_LIMIT (0xC0000000 | 0x0246)
--#define NT_STATUS_LOGIN_TIME_RESTRICTION (0xC0000000 | 0x0247)
--#define NT_STATUS_LOGIN_WKSTA_RESTRICTION (0xC0000000 | 0x0248)
--#define NT_STATUS_IMAGE_MP_UP_MISMATCH (0xC0000000 | 0x0249)
--#define NT_STATUS_INSUFFICIENT_LOGON_INFO (0xC0000000 | 0x0250)
--#define NT_STATUS_BAD_DLL_ENTRYPOINT (0xC0000000 | 0x0251)
--#define NT_STATUS_BAD_SERVICE_ENTRYPOINT (0xC0000000 | 0x0252)
--#define NT_STATUS_LPC_REPLY_LOST (0xC0000000 | 0x0253)
--#define NT_STATUS_IP_ADDRESS_CONFLICT1 (0xC0000000 | 0x0254)
--#define NT_STATUS_IP_ADDRESS_CONFLICT2 (0xC0000000 | 0x0255)
--#define NT_STATUS_REGISTRY_QUOTA_LIMIT (0xC0000000 | 0x0256)
--#define NT_STATUS_PATH_NOT_COVERED (0xC0000000 | 0x0257)
--#define NT_STATUS_NO_CALLBACK_ACTIVE (0xC0000000 | 0x0258)
--#define NT_STATUS_LICENSE_QUOTA_EXCEEDED (0xC0000000 | 0x0259)
--#define NT_STATUS_PWD_TOO_SHORT (0xC0000000 | 0x025a)
--#define NT_STATUS_PWD_TOO_RECENT (0xC0000000 | 0x025b)
--#define NT_STATUS_PWD_HISTORY_CONFLICT (0xC0000000 | 0x025c)
--#define NT_STATUS_PLUGPLAY_NO_DEVICE (0xC0000000 | 0x025e)
--#define NT_STATUS_UNSUPPORTED_COMPRESSION (0xC0000000 | 0x025f)
--#define NT_STATUS_INVALID_HW_PROFILE (0xC0000000 | 0x0260)
--#define NT_STATUS_INVALID_PLUGPLAY_DEVICE_PATH (0xC0000000 | 0x0261)
--#define NT_STATUS_DRIVER_ORDINAL_NOT_FOUND (0xC0000000 | 0x0262)
--#define NT_STATUS_DRIVER_ENTRYPOINT_NOT_FOUND (0xC0000000 | 0x0263)
--#define NT_STATUS_RESOURCE_NOT_OWNED (0xC0000000 | 0x0264)
--#define NT_STATUS_TOO_MANY_LINKS (0xC0000000 | 0x0265)
--#define NT_STATUS_QUOTA_LIST_INCONSISTENT (0xC0000000 | 0x0266)
--#define NT_STATUS_FILE_IS_OFFLINE (0xC0000000 | 0x0267)
--#define NT_STATUS_VOLUME_DISMOUNTED (0xC0000000 | 0x026e)
--#define NT_STATUS_NOT_A_REPARSE_POINT (0xC0000000 | 0x0275)
--#define NT_STATUS_DIRECTORY_IS_A_REPARSE_POINT (0xC0000000 | 0x0281)
--#define NT_STATUS_ENCRYPTION_FAILED (0xC0000000 | 0x028a)
--#define NT_STATUS_DECRYPTION_FAILED (0xC0000000 | 0x028b)
--#define NT_STATUS_RANGE_NOT_FOUND (0xC0000000 | 0x028c)
--#define NT_STATUS_NO_RECOVERY_POLICY (0xC0000000 | 0x028d)
--#define NT_STATUS_NO_EFS (0xC0000000 | 0x028e)
--#define NT_STATUS_WRONG_EFS (0xC0000000 | 0x028f)
--#define NT_STATUS_NO_USER_KEYS (0xC0000000 | 0x0290)
--#define NT_STATUS_VOLUME_NOT_UPGRADED (0xC0000000 | 0x029c)
--#define NT_STATUS_NETWORK_SESSION_EXPIRED  (0xC0000000 | 0x035c)
--#define NT_STATUS_NO_SUCH_JOB (0xC0000000 | 0xEDE)	/* scheduler */
--#define NT_STATUS_NO_PREAUTH_INTEGRITY_HASH_OVERLAP (0xC0000000 | 0x5D0000)
--#define NT_STATUS_OS2_INVALID_LEVEL 0x007c0001
-+#define NT_STATUS_OK                   0x0000	// SUCCESS, 0
-+#define NT_STATUS_PENDING              0x0103	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MORE_ENTRIES         0x0105	// ERRHRD, ERRgeneral
-+#define NT_STATUS_SOME_NOT_MAPPED      0x0107	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NOTIFY_ENUM_DIR      0x010c	// ERRSRV, ERR_NOTIFY_ENUM_DIR
-+#define NT_STATUS_BUFFER_OVERFLOW  0x80000005	// ERRDOS, ERRmoredata
-+#define NT_STATUS_NO_MORE_ENTRIES  0x8000001a	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MEDIA_CHANGED    0x8000001c	// ERRHRD, ERRgeneral
-+#define NT_STATUS_END_OF_MEDIA     0x8000001e	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MEDIA_CHECK      0x80000020	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_DATA_DETECTED 0x80000022	// ERRHRD, ERRgeneral
-+#define NT_STATUS_STOPPED_ON_SYMLINK 0x8000002d	// ERRDOS, ERRsymlink
-+#define NT_STATUS_DEVICE_REQUIRES_CLEANING 0x80000288	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DEVICE_DOOR_OPEN 0x80000289	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNSUCCESSFUL (0xC0000000 | 0x0001)	// ERRDOS, ERRgeneral
-+#define NT_STATUS_NOT_IMPLEMENTED (0xC0000000 | 0x0002)	// ERRDOS, ERRbadfunc
-+#define NT_STATUS_INVALID_INFO_CLASS (0xC0000000 | 0x0003)	// ERRDOS, ERRbadpipe
-+#define NT_STATUS_INFO_LENGTH_MISMATCH (0xC0000000 | 0x0004)	// ERRDOS, 24
-+#define NT_STATUS_ACCESS_VIOLATION (0xC0000000 | 0x0005)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_IN_PAGE_ERROR (0xC0000000 | 0x0006)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PAGEFILE_QUOTA (0xC0000000 | 0x0007)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_HANDLE (0xC0000000 | 0x0008)	// ERRDOS, ERRbadfid
-+#define NT_STATUS_BAD_INITIAL_STACK (0xC0000000 | 0x0009)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_INITIAL_PC (0xC0000000 | 0x000a)	// ERRDOS, 193
-+#define NT_STATUS_INVALID_CID (0xC0000000 | 0x000b)	// ERRDOS, 87
-+#define NT_STATUS_TIMER_NOT_CANCELED (0xC0000000 | 0x000c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_PARAMETER (0xC0000000 | 0x000d)	// ERRDOS, 87
-+#define NT_STATUS_NO_SUCH_DEVICE (0xC0000000 | 0x000e)	// ERRDOS, ERRbadfile
-+#define NT_STATUS_NO_SUCH_FILE (0xC0000000 | 0x000f)	// ERRDOS, ERRbadfile
-+#define NT_STATUS_INVALID_DEVICE_REQUEST (0xC0000000 | 0x0010)	// ERRDOS, ERRbadfunc
-+#define NT_STATUS_END_OF_FILE (0xC0000000 | 0x0011)	// ERRDOS, 38
-+#define NT_STATUS_WRONG_VOLUME (0xC0000000 | 0x0012)	// ERRDOS, 34
-+#define NT_STATUS_NO_MEDIA_IN_DEVICE (0xC0000000 | 0x0013)	// ERRDOS, 21
-+#define NT_STATUS_UNRECOGNIZED_MEDIA (0xC0000000 | 0x0014)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NONEXISTENT_SECTOR (0xC0000000 | 0x0015)	// ERRDOS, 27
-+#define NT_STATUS_MORE_PROCESSING_REQUIRED (0xC0000000 | 0x0016)	// ERRDOS, ERRmoredata
-+#define NT_STATUS_NO_MEMORY (0xC0000000 | 0x0017)	// ERRDOS, ERRnomem
-+#define NT_STATUS_CONFLICTING_ADDRESSES (0xC0000000 | 0x0018)	// ERRDOS, 487
-+#define NT_STATUS_NOT_MAPPED_VIEW (0xC0000000 | 0x0019)	// ERRDOS, 487
-+#define NT_STATUS_UNABLE_TO_FREE_VM (0xC0000000 | 0x001a)	// ERRDOS, 87
-+#define NT_STATUS_UNABLE_TO_DELETE_SECTION (0xC0000000 | 0x001b)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_SYSTEM_SERVICE (0xC0000000 | 0x001c)	// ERRDOS, 2142
-+#define NT_STATUS_ILLEGAL_INSTRUCTION (0xC0000000 | 0x001d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_LOCK_SEQUENCE (0xC0000000 | 0x001e)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_INVALID_VIEW_SIZE (0xC0000000 | 0x001f)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_INVALID_FILE_FOR_SECTION (0xC0000000 | 0x0020)	// ERRDOS, 193
-+#define NT_STATUS_ALREADY_COMMITTED (0xC0000000 | 0x0021)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_ACCESS_DENIED (0xC0000000 | 0x0022)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_BUFFER_TOO_SMALL (0xC0000000 | 0x0023)	// ERRDOS, 111
-+#define NT_STATUS_OBJECT_TYPE_MISMATCH (0xC0000000 | 0x0024)	// ERRDOS, ERRbadfid
-+#define NT_STATUS_NONCONTINUABLE_EXCEPTION (0xC0000000 | 0x0025)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_DISPOSITION (0xC0000000 | 0x0026)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNWIND (0xC0000000 | 0x0027)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_STACK (0xC0000000 | 0x0028)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_UNWIND_TARGET (0xC0000000 | 0x0029)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NOT_LOCKED (0xC0000000 | 0x002a)	// ERRDOS, 158
-+#define NT_STATUS_PARITY_ERROR (0xC0000000 | 0x002b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNABLE_TO_DECOMMIT_VM (0xC0000000 | 0x002c)	// ERRDOS, 487
-+#define NT_STATUS_NOT_COMMITTED (0xC0000000 | 0x002d)	// ERRDOS, 487
-+#define NT_STATUS_INVALID_PORT_ATTRIBUTES (0xC0000000 | 0x002e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PORT_MESSAGE_TOO_LONG (0xC0000000 | 0x002f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_PARAMETER_MIX (0xC0000000 | 0x0030)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_QUOTA_LOWER (0xC0000000 | 0x0031)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DISK_CORRUPT_ERROR (0xC0000000 | 0x0032)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_OBJECT_NAME_INVALID (0xC0000000 | 0x0033)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_OBJECT_NAME_NOT_FOUND (0xC0000000 | 0x0034)	// ERRDOS, ERRbadfile
-+#define NT_STATUS_OBJECT_NAME_COLLISION (0xC0000000 | 0x0035)	// ERRDOS, ERRalreadyexists
-+#define NT_STATUS_HANDLE_NOT_WAITABLE (0xC0000000 | 0x0036)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PORT_DISCONNECTED (0xC0000000 | 0x0037)	// ERRDOS, ERRbadfid
-+#define NT_STATUS_DEVICE_ALREADY_ATTACHED (0xC0000000 | 0x0038)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_OBJECT_PATH_INVALID (0xC0000000 | 0x0039)	// ERRDOS, 161
-+#define NT_STATUS_OBJECT_PATH_NOT_FOUND (0xC0000000 | 0x003a)	// ERRDOS, ERRbadpath
-+#define NT_STATUS_OBJECT_PATH_SYNTAX_BAD (0xC0000000 | 0x003b)	// ERRDOS, 161
-+#define NT_STATUS_DATA_OVERRUN (0xC0000000 | 0x003c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DATA_LATE_ERROR (0xC0000000 | 0x003d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DATA_ERROR (0xC0000000 | 0x003e)	// ERRDOS, 23
-+#define NT_STATUS_CRC_ERROR (0xC0000000 | 0x003f)	// ERRDOS, 23
-+#define NT_STATUS_SECTION_TOO_BIG (0xC0000000 | 0x0040)	// ERRDOS, ERRnomem
-+#define NT_STATUS_PORT_CONNECTION_REFUSED (0xC0000000 | 0x0041)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_INVALID_PORT_HANDLE (0xC0000000 | 0x0042)	// ERRDOS, ERRbadfid
-+#define NT_STATUS_SHARING_VIOLATION (0xC0000000 | 0x0043)	// ERRDOS, ERRbadshare
-+#define NT_STATUS_QUOTA_EXCEEDED (0xC0000000 | 0x0044)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_PAGE_PROTECTION (0xC0000000 | 0x0045)	// ERRDOS, 87
-+#define NT_STATUS_MUTANT_NOT_OWNED (0xC0000000 | 0x0046)	// ERRDOS, 288
-+#define NT_STATUS_SEMAPHORE_LIMIT_EXCEEDED (0xC0000000 | 0x0047)	// ERRDOS, 298
-+#define NT_STATUS_PORT_ALREADY_SET (0xC0000000 | 0x0048)	// ERRDOS, 87
-+#define NT_STATUS_SECTION_NOT_IMAGE (0xC0000000 | 0x0049)	// ERRDOS, 87
-+#define NT_STATUS_SUSPEND_COUNT_EXCEEDED (0xC0000000 | 0x004a)	// ERRDOS, 156
-+#define NT_STATUS_THREAD_IS_TERMINATING (0xC0000000 | 0x004b)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_BAD_WORKING_SET_LIMIT (0xC0000000 | 0x004c)	// ERRDOS, 87
-+#define NT_STATUS_INCOMPATIBLE_FILE_MAP (0xC0000000 | 0x004d)	// ERRDOS, 87
-+#define NT_STATUS_SECTION_PROTECTION (0xC0000000 | 0x004e)	// ERRDOS, 87
-+#define NT_STATUS_EAS_NOT_SUPPORTED (0xC0000000 | 0x004f)	// ERRDOS, ERReasnotsupported
-+#define NT_STATUS_EA_TOO_LARGE (0xC0000000 | 0x0050)	// ERRDOS, 255
-+#define NT_STATUS_NONEXISTENT_EA_ENTRY (0xC0000000 | 0x0051)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_EAS_ON_FILE (0xC0000000 | 0x0052)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_EA_CORRUPT_ERROR (0xC0000000 | 0x0053)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FILE_LOCK_CONFLICT (0xC0000000 | 0x0054)	// ERRDOS, ERRlock
-+#define NT_STATUS_LOCK_NOT_GRANTED (0xC0000000 | 0x0055)	// ERRDOS, ERRlock
-+#define NT_STATUS_DELETE_PENDING (0xC0000000 | 0x0056)	// ERRDOS, ERRbadfile
-+#define NT_STATUS_CTL_FILE_NOT_SUPPORTED (0xC0000000 | 0x0057)	// ERRDOS, ERRunsup
-+#define NT_STATUS_UNKNOWN_REVISION (0xC0000000 | 0x0058)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_REVISION_MISMATCH (0xC0000000 | 0x0059)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_OWNER (0xC0000000 | 0x005a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_PRIMARY_GROUP (0xC0000000 | 0x005b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_IMPERSONATION_TOKEN (0xC0000000 | 0x005c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CANT_DISABLE_MANDATORY (0xC0000000 | 0x005d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_LOGON_SERVERS (0xC0000000 | 0x005e)	// ERRDOS, 2215
-+#define NT_STATUS_NO_SUCH_LOGON_SESSION (0xC0000000 | 0x005f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_SUCH_PRIVILEGE (0xC0000000 | 0x0060)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PRIVILEGE_NOT_HELD (0xC0000000 | 0x0061)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_INVALID_ACCOUNT_NAME (0xC0000000 | 0x0062)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_USER_EXISTS (0xC0000000 | 0x0063)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_SUCH_USER (0xC0000000 | 0x0064)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_GROUP_EXISTS (0xC0000000 | 0x0065)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_SUCH_GROUP (0xC0000000 | 0x0066)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MEMBER_IN_GROUP (0xC0000000 | 0x0067)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MEMBER_NOT_IN_GROUP (0xC0000000 | 0x0068)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LAST_ADMIN (0xC0000000 | 0x0069)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_WRONG_PASSWORD (0xC0000000 | 0x006a)	// ERRSRV, ERRbadpw
-+#define NT_STATUS_ILL_FORMED_PASSWORD (0xC0000000 | 0x006b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PASSWORD_RESTRICTION (0xC0000000 | 0x006c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LOGON_FAILURE (0xC0000000 | 0x006d)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_ACCOUNT_RESTRICTION (0xC0000000 | 0x006e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_LOGON_HOURS (0xC0000000 | 0x006f)	// ERRSRV, ERRbadLogonTime
-+#define NT_STATUS_INVALID_WORKSTATION (0xC0000000 | 0x0070)	// ERRSRV, ERRbadclient
-+#define NT_STATUS_PASSWORD_EXPIRED (0xC0000000 | 0x0071)	// ERRSRV, ERRpasswordExpired
-+#define NT_STATUS_ACCOUNT_DISABLED (0xC0000000 | 0x0072)	// ERRSRV, ERRaccountexpired
-+#define NT_STATUS_NONE_MAPPED (0xC0000000 | 0x0073)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TOO_MANY_LUIDS_REQUESTED (0xC0000000 | 0x0074)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LUIDS_EXHAUSTED (0xC0000000 | 0x0075)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_SUB_AUTHORITY (0xC0000000 | 0x0076)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_ACL (0xC0000000 | 0x0077)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_SID (0xC0000000 | 0x0078)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_SECURITY_DESCR (0xC0000000 | 0x0079)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PROCEDURE_NOT_FOUND (0xC0000000 | 0x007a)	// ERRDOS, 127
-+#define NT_STATUS_INVALID_IMAGE_FORMAT (0xC0000000 | 0x007b)	// ERRDOS, 193
-+#define NT_STATUS_NO_TOKEN (0xC0000000 | 0x007c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_INHERITANCE_ACL (0xC0000000 | 0x007d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_RANGE_NOT_LOCKED (0xC0000000 | 0x007e)	// ERRDOS, 158
-+#define NT_STATUS_DISK_FULL (0xC0000000 | 0x007f)	// ERRDOS, 112
-+#define NT_STATUS_SERVER_DISABLED (0xC0000000 | 0x0080)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_SERVER_NOT_DISABLED (0xC0000000 | 0x0081)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TOO_MANY_GUIDS_REQUESTED (0xC0000000 | 0x0082)	// ERRDOS, 68
-+#define NT_STATUS_GUIDS_EXHAUSTED (0xC0000000 | 0x0083)	// ERRDOS, 259
-+#define NT_STATUS_INVALID_ID_AUTHORITY (0xC0000000 | 0x0084)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_AGENTS_EXHAUSTED (0xC0000000 | 0x0085)	// ERRDOS, 259
-+#define NT_STATUS_INVALID_VOLUME_LABEL (0xC0000000 | 0x0086)	// ERRDOS, 154
-+#define NT_STATUS_SECTION_NOT_EXTENDED (0xC0000000 | 0x0087)	// ERRDOS, 14
-+#define NT_STATUS_NOT_MAPPED_DATA (0xC0000000 | 0x0088)	// ERRDOS, 487
-+#define NT_STATUS_RESOURCE_DATA_NOT_FOUND (0xC0000000 | 0x0089)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_RESOURCE_TYPE_NOT_FOUND (0xC0000000 | 0x008a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_RESOURCE_NAME_NOT_FOUND (0xC0000000 | 0x008b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ARRAY_BOUNDS_EXCEEDED (0xC0000000 | 0x008c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOAT_DENORMAL_OPERAND (0xC0000000 | 0x008d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOAT_DIVIDE_BY_ZERO (0xC0000000 | 0x008e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOAT_INEXACT_RESULT (0xC0000000 | 0x008f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOAT_INVALID_OPERATION (0xC0000000 | 0x0090)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOAT_OVERFLOW (0xC0000000 | 0x0091)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOAT_STACK_CHECK (0xC0000000 | 0x0092)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOAT_UNDERFLOW (0xC0000000 | 0x0093)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INTEGER_DIVIDE_BY_ZERO (0xC0000000 | 0x0094)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INTEGER_OVERFLOW (0xC0000000 | 0x0095)	// ERRDOS, 534
-+#define NT_STATUS_PRIVILEGED_INSTRUCTION (0xC0000000 | 0x0096)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TOO_MANY_PAGING_FILES (0xC0000000 | 0x0097)	// ERRDOS, ERRnomem
-+#define NT_STATUS_FILE_INVALID (0xC0000000 | 0x0098)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ALLOTTED_SPACE_EXCEEDED (0xC0000000 | 0x0099)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INSUFFICIENT_RESOURCES (0xC0000000 | 0x009a)	// ERRDOS, ERRnoresource
-+#define NT_STATUS_DFS_EXIT_PATH_FOUND (0xC0000000 | 0x009b)	// ERRDOS, ERRbadpath
-+#define NT_STATUS_DEVICE_DATA_ERROR (0xC0000000 | 0x009c)	// ERRDOS, 23
-+#define NT_STATUS_DEVICE_NOT_CONNECTED (0xC0000000 | 0x009d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DEVICE_POWER_FAILURE (0xC0000000 | 0x009e)	// ERRDOS, 21
-+#define NT_STATUS_FREE_VM_NOT_AT_BASE (0xC0000000 | 0x009f)	// ERRDOS, 487
-+#define NT_STATUS_MEMORY_NOT_ALLOCATED (0xC0000000 | 0x00a0)	// ERRDOS, 487
-+#define NT_STATUS_WORKING_SET_QUOTA (0xC0000000 | 0x00a1)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MEDIA_WRITE_PROTECTED (0xC0000000 | 0x00a2)	// ERRDOS, 19
-+#define NT_STATUS_DEVICE_NOT_READY (0xC0000000 | 0x00a3)	// ERRDOS, 21
-+#define NT_STATUS_INVALID_GROUP_ATTRIBUTES (0xC0000000 | 0x00a4)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_IMPERSONATION_LEVEL (0xC0000000 | 0x00a5)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CANT_OPEN_ANONYMOUS (0xC0000000 | 0x00a6)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_VALIDATION_CLASS (0xC0000000 | 0x00a7)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_TOKEN_TYPE (0xC0000000 | 0x00a8)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_MASTER_BOOT_RECORD (0xC0000000 | 0x00a9)	// ERRDOS, 87
-+#define NT_STATUS_INSTRUCTION_MISALIGNMENT (0xC0000000 | 0x00aa)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INSTANCE_NOT_AVAILABLE (0xC0000000 | 0x00ab)	// ERRDOS, ERRpipebusy
-+#define NT_STATUS_PIPE_NOT_AVAILABLE (0xC0000000 | 0x00ac)	// ERRDOS, ERRpipebusy
-+#define NT_STATUS_INVALID_PIPE_STATE (0xC0000000 | 0x00ad)	// ERRDOS, ERRbadpipe
-+#define NT_STATUS_PIPE_BUSY (0xC0000000 | 0x00ae)	// ERRDOS, ERRpipebusy
-+#define NT_STATUS_ILLEGAL_FUNCTION (0xC0000000 | 0x00af)	// ERRDOS, ERRbadfunc
-+#define NT_STATUS_PIPE_DISCONNECTED (0xC0000000 | 0x00b0)	// ERRDOS, ERRnotconnected
-+#define NT_STATUS_PIPE_CLOSING (0xC0000000 | 0x00b1)	// ERRDOS, ERRpipeclosing
-+#define NT_STATUS_PIPE_CONNECTED (0xC0000000 | 0x00b2)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PIPE_LISTENING (0xC0000000 | 0x00b3)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_READ_MODE (0xC0000000 | 0x00b4)	// ERRDOS, ERRbadpipe
-+#define NT_STATUS_IO_TIMEOUT (0xC0000000 | 0x00b5)	// ERRDOS, 121
-+#define NT_STATUS_FILE_FORCED_CLOSED (0xC0000000 | 0x00b6)	// ERRDOS, 38
-+#define NT_STATUS_PROFILING_NOT_STARTED (0xC0000000 | 0x00b7)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PROFILING_NOT_STOPPED (0xC0000000 | 0x00b8)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_COULD_NOT_INTERPRET (0xC0000000 | 0x00b9)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FILE_IS_A_DIRECTORY (0xC0000000 | 0x00ba)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_NOT_SUPPORTED (0xC0000000 | 0x00bb)	// ERRDOS, ERRunsup
-+#define NT_STATUS_REMOTE_NOT_LISTENING (0xC0000000 | 0x00bc)	// ERRDOS, 51
-+#define NT_STATUS_DUPLICATE_NAME (0xC0000000 | 0x00bd)	// ERRDOS, 52
-+#define NT_STATUS_BAD_NETWORK_PATH (0xC0000000 | 0x00be)	// ERRDOS, 53
-+#define NT_STATUS_NETWORK_BUSY (0xC0000000 | 0x00bf)	// ERRDOS, 54
-+#define NT_STATUS_DEVICE_DOES_NOT_EXIST (0xC0000000 | 0x00c0)	// ERRDOS, 55
-+#define NT_STATUS_TOO_MANY_COMMANDS (0xC0000000 | 0x00c1)	// ERRDOS, 56
-+#define NT_STATUS_ADAPTER_HARDWARE_ERROR (0xC0000000 | 0x00c2)	// ERRDOS, 57
-+#define NT_STATUS_INVALID_NETWORK_RESPONSE (0xC0000000 | 0x00c3)	// ERRDOS, 58
-+#define NT_STATUS_UNEXPECTED_NETWORK_ERROR (0xC0000000 | 0x00c4)	// ERRDOS, 59
-+#define NT_STATUS_BAD_REMOTE_ADAPTER (0xC0000000 | 0x00c5)	// ERRDOS, 60
-+#define NT_STATUS_PRINT_QUEUE_FULL (0xC0000000 | 0x00c6)	// ERRDOS, 61
-+#define NT_STATUS_NO_SPOOL_SPACE (0xC0000000 | 0x00c7)	// ERRDOS, 62
-+#define NT_STATUS_PRINT_CANCELLED (0xC0000000 | 0x00c8)	// ERRDOS, 63
-+#define NT_STATUS_NETWORK_NAME_DELETED (0xC0000000 | 0x00c9)	// ERRDOS, 64
-+#define NT_STATUS_NETWORK_ACCESS_DENIED (0xC0000000 | 0x00ca)	// ERRDOS, 65
-+#define NT_STATUS_BAD_DEVICE_TYPE (0xC0000000 | 0x00cb)	// ERRDOS, 66
-+#define NT_STATUS_BAD_NETWORK_NAME (0xC0000000 | 0x00cc)	// ERRDOS, ERRnosuchshare
-+#define NT_STATUS_TOO_MANY_NAMES (0xC0000000 | 0x00cd)	// ERRDOS, 68
-+#define NT_STATUS_TOO_MANY_SESSIONS (0xC0000000 | 0x00ce)	// ERRDOS, 69
-+#define NT_STATUS_SHARING_PAUSED (0xC0000000 | 0x00cf)	// ERRDOS, 70
-+#define NT_STATUS_REQUEST_NOT_ACCEPTED (0xC0000000 | 0x00d0)	// ERRDOS, 71
-+#define NT_STATUS_REDIRECTOR_PAUSED (0xC0000000 | 0x00d1)	// ERRDOS, 72
-+#define NT_STATUS_NET_WRITE_FAULT (0xC0000000 | 0x00d2)	// ERRDOS, 88
-+#define NT_STATUS_PROFILING_AT_LIMIT (0xC0000000 | 0x00d3)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NOT_SAME_DEVICE (0xC0000000 | 0x00d4)	// ERRDOS, ERRdiffdevice
-+#define NT_STATUS_FILE_RENAMED (0xC0000000 | 0x00d5)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_VIRTUAL_CIRCUIT_CLOSED (0xC0000000 | 0x00d6)	// ERRDOS, 240
-+#define NT_STATUS_NO_SECURITY_ON_OBJECT (0xC0000000 | 0x00d7)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CANT_WAIT (0xC0000000 | 0x00d8)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PIPE_EMPTY (0xC0000000 | 0x00d9)	// ERRDOS, ERRpipeclosing
-+#define NT_STATUS_CANT_ACCESS_DOMAIN_INFO (0xC0000000 | 0x00da)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CANT_TERMINATE_SELF (0xC0000000 | 0x00db)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_SERVER_STATE (0xC0000000 | 0x00dc)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_DOMAIN_STATE (0xC0000000 | 0x00dd)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_DOMAIN_ROLE (0xC0000000 | 0x00de)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_SUCH_DOMAIN (0xC0000000 | 0x00df)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DOMAIN_EXISTS (0xC0000000 | 0x00e0)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DOMAIN_LIMIT_EXCEEDED (0xC0000000 | 0x00e1)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_OPLOCK_NOT_GRANTED (0xC0000000 | 0x00e2)	// ERRDOS, 300
-+#define NT_STATUS_INVALID_OPLOCK_PROTOCOL (0xC0000000 | 0x00e3)	// ERRDOS, 301
-+#define NT_STATUS_INTERNAL_DB_CORRUPTION (0xC0000000 | 0x00e4)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INTERNAL_ERROR (0xC0000000 | 0x00e5)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_GENERIC_NOT_MAPPED (0xC0000000 | 0x00e6)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_DESCRIPTOR_FORMAT (0xC0000000 | 0x00e7)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_USER_BUFFER (0xC0000000 | 0x00e8)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNEXPECTED_IO_ERROR (0xC0000000 | 0x00e9)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNEXPECTED_MM_CREATE_ERR (0xC0000000 | 0x00ea)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNEXPECTED_MM_MAP_ERROR (0xC0000000 | 0x00eb)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNEXPECTED_MM_EXTEND_ERR (0xC0000000 | 0x00ec)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NOT_LOGON_PROCESS (0xC0000000 | 0x00ed)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LOGON_SESSION_EXISTS (0xC0000000 | 0x00ee)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_PARAMETER_1 (0xC0000000 | 0x00ef)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_PARAMETER_2 (0xC0000000 | 0x00f0)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_PARAMETER_3 (0xC0000000 | 0x00f1)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_PARAMETER_4 (0xC0000000 | 0x00f2)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_PARAMETER_5 (0xC0000000 | 0x00f3)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_PARAMETER_6 (0xC0000000 | 0x00f4)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_PARAMETER_7 (0xC0000000 | 0x00f5)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_PARAMETER_8 (0xC0000000 | 0x00f6)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_PARAMETER_9 (0xC0000000 | 0x00f7)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_PARAMETER_10 (0xC0000000 | 0x00f8)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_PARAMETER_11 (0xC0000000 | 0x00f9)	// ERRDOS, 87
-+#define NT_STATUS_INVALID_PARAMETER_12 (0xC0000000 | 0x00fa)	// ERRDOS, 87
-+#define NT_STATUS_REDIRECTOR_NOT_STARTED (0xC0000000 | 0x00fb)	// ERRDOS, ERRbadpath
-+#define NT_STATUS_REDIRECTOR_STARTED (0xC0000000 | 0x00fc)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_STACK_OVERFLOW (0xC0000000 | 0x00fd)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_SUCH_PACKAGE (0xC0000000 | 0x00fe)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_FUNCTION_TABLE (0xC0000000 | 0x00ff)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_VARIABLE_NOT_FOUND (0xC0000000 | 0x0100)	// ERRDOS, 203
-+#define NT_STATUS_DIRECTORY_NOT_EMPTY (0xC0000000 | 0x0101)	// ERRDOS, 145
-+#define NT_STATUS_FILE_CORRUPT_ERROR (0xC0000000 | 0x0102)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NOT_A_DIRECTORY (0xC0000000 | 0x0103)	// ERRDOS, 267
-+#define NT_STATUS_BAD_LOGON_SESSION_STATE (0xC0000000 | 0x0104)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LOGON_SESSION_COLLISION (0xC0000000 | 0x0105)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NAME_TOO_LONG (0xC0000000 | 0x0106)	// ERRDOS, 206
-+#define NT_STATUS_FILES_OPEN (0xC0000000 | 0x0107)	// ERRDOS, 2401
-+#define NT_STATUS_CONNECTION_IN_USE (0xC0000000 | 0x0108)	// ERRDOS, 2404
-+#define NT_STATUS_MESSAGE_NOT_FOUND (0xC0000000 | 0x0109)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PROCESS_IS_TERMINATING (0xC0000000 | 0x010a)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_INVALID_LOGON_TYPE (0xC0000000 | 0x010b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_GUID_TRANSLATION (0xC0000000 | 0x010c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CANNOT_IMPERSONATE (0xC0000000 | 0x010d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_IMAGE_ALREADY_LOADED (0xC0000000 | 0x010e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ABIOS_NOT_PRESENT (0xC0000000 | 0x010f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ABIOS_LID_NOT_EXIST (0xC0000000 | 0x0110)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ABIOS_LID_ALREADY_OWNED (0xC0000000 | 0x0111)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ABIOS_NOT_LID_OWNER (0xC0000000 | 0x0112)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ABIOS_INVALID_COMMAND (0xC0000000 | 0x0113)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ABIOS_INVALID_LID (0xC0000000 | 0x0114)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ABIOS_SELECTOR_NOT_AVAILABLE (0xC0000000 | 0x0115)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ABIOS_INVALID_SELECTOR (0xC0000000 | 0x0116)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_LDT (0xC0000000 | 0x0117)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_LDT_SIZE (0xC0000000 | 0x0118)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_LDT_OFFSET (0xC0000000 | 0x0119)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_LDT_DESCRIPTOR (0xC0000000 | 0x011a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_IMAGE_NE_FORMAT (0xC0000000 | 0x011b)	// ERRDOS, 193
-+#define NT_STATUS_RXACT_INVALID_STATE (0xC0000000 | 0x011c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_RXACT_COMMIT_FAILURE (0xC0000000 | 0x011d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MAPPED_FILE_SIZE_ZERO (0xC0000000 | 0x011e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TOO_MANY_OPENED_FILES (0xC0000000 | 0x011f)	// ERRDOS, ERRnofids
-+#define NT_STATUS_CANCELLED (0xC0000000 | 0x0120)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CANNOT_DELETE (0xC0000000 | 0x0121)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_INVALID_COMPUTER_NAME (0xC0000000 | 0x0122)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FILE_DELETED (0xC0000000 | 0x0123)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_SPECIAL_ACCOUNT (0xC0000000 | 0x0124)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_SPECIAL_GROUP (0xC0000000 | 0x0125)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_SPECIAL_USER (0xC0000000 | 0x0126)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MEMBERS_PRIMARY_GROUP (0xC0000000 | 0x0127)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FILE_CLOSED (0xC0000000 | 0x0128)	// ERRDOS, ERRbadfid
-+#define NT_STATUS_TOO_MANY_THREADS (0xC0000000 | 0x0129)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_THREAD_NOT_IN_PROCESS (0xC0000000 | 0x012a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TOKEN_ALREADY_IN_USE (0xC0000000 | 0x012b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PAGEFILE_QUOTA_EXCEEDED (0xC0000000 | 0x012c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_COMMITMENT_LIMIT (0xC0000000 | 0x012d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_IMAGE_LE_FORMAT (0xC0000000 | 0x012e)	// ERRDOS, 193
-+#define NT_STATUS_INVALID_IMAGE_NOT_MZ (0xC0000000 | 0x012f)	// ERRDOS, 193
-+#define NT_STATUS_INVALID_IMAGE_PROTECT (0xC0000000 | 0x0130)	// ERRDOS, 193
-+#define NT_STATUS_INVALID_IMAGE_WIN_16 (0xC0000000 | 0x0131)	// ERRDOS, 193
-+#define NT_STATUS_LOGON_SERVER_CONFLICT (0xC0000000 | 0x0132)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TIME_DIFFERENCE_AT_DC (0xC0000000 | 0x0133)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_SYNCHRONIZATION_REQUIRED (0xC0000000 | 0x0134)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DLL_NOT_FOUND (0xC0000000 | 0x0135)	// ERRDOS, 126
-+#define NT_STATUS_OPEN_FAILED (0xC0000000 | 0x0136)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_IO_PRIVILEGE_FAILED (0xC0000000 | 0x0137)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ORDINAL_NOT_FOUND (0xC0000000 | 0x0138)	// ERRDOS, 182
-+#define NT_STATUS_ENTRYPOINT_NOT_FOUND (0xC0000000 | 0x0139)	// ERRDOS, 127
-+#define NT_STATUS_CONTROL_C_EXIT (0xC0000000 | 0x013a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LOCAL_DISCONNECT (0xC0000000 | 0x013b)	// ERRDOS, 64
-+#define NT_STATUS_REMOTE_DISCONNECT (0xC0000000 | 0x013c)	// ERRDOS, 64
-+#define NT_STATUS_REMOTE_RESOURCES (0xC0000000 | 0x013d)	// ERRDOS, 51
-+#define NT_STATUS_LINK_FAILED (0xC0000000 | 0x013e)	// ERRDOS, 59
-+#define NT_STATUS_LINK_TIMEOUT (0xC0000000 | 0x013f)	// ERRDOS, 59
-+#define NT_STATUS_INVALID_CONNECTION (0xC0000000 | 0x0140)	// ERRDOS, 59
-+#define NT_STATUS_INVALID_ADDRESS (0xC0000000 | 0x0141)	// ERRDOS, 59
-+#define NT_STATUS_DLL_INIT_FAILED (0xC0000000 | 0x0142)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MISSING_SYSTEMFILE (0xC0000000 | 0x0143)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNHANDLED_EXCEPTION (0xC0000000 | 0x0144)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_APP_INIT_FAILURE (0xC0000000 | 0x0145)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PAGEFILE_CREATE_FAILED (0xC0000000 | 0x0146)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_PAGEFILE (0xC0000000 | 0x0147)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_LEVEL (0xC0000000 | 0x0148)	// ERRDOS, 124
-+#define NT_STATUS_WRONG_PASSWORD_CORE (0xC0000000 | 0x0149)	// ERRDOS, 86
-+#define NT_STATUS_ILLEGAL_FLOAT_CONTEXT (0xC0000000 | 0x014a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PIPE_BROKEN (0xC0000000 | 0x014b)	// ERRDOS, 109
-+#define NT_STATUS_REGISTRY_CORRUPT (0xC0000000 | 0x014c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_REGISTRY_IO_FAILED (0xC0000000 | 0x014d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_EVENT_PAIR (0xC0000000 | 0x014e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNRECOGNIZED_VOLUME (0xC0000000 | 0x014f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_SERIAL_NO_DEVICE_INITED (0xC0000000 | 0x0150)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_SUCH_ALIAS (0xC0000000 | 0x0151)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MEMBER_NOT_IN_ALIAS (0xC0000000 | 0x0152)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MEMBER_IN_ALIAS (0xC0000000 | 0x0153)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ALIAS_EXISTS (0xC0000000 | 0x0154)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LOGON_NOT_GRANTED (0xC0000000 | 0x0155)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TOO_MANY_SECRETS (0xC0000000 | 0x0156)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_SECRET_TOO_LONG (0xC0000000 | 0x0157)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INTERNAL_DB_ERROR (0xC0000000 | 0x0158)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FULLSCREEN_MODE (0xC0000000 | 0x0159)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TOO_MANY_CONTEXT_IDS (0xC0000000 | 0x015a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LOGON_TYPE_NOT_GRANTED (0xC0000000 | 0x015b)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_NOT_REGISTRY_FILE (0xC0000000 | 0x015c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NT_CROSS_ENCRYPTION_REQUIRED (0xC0000000 | 0x015d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DOMAIN_CTRLR_CONFIG_ERROR (0xC0000000 | 0x015e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FT_MISSING_MEMBER (0xC0000000 | 0x015f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ILL_FORMED_SERVICE_ENTRY (0xC0000000 | 0x0160)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ILLEGAL_CHARACTER (0xC0000000 | 0x0161)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNMAPPABLE_CHARACTER (0xC0000000 | 0x0162)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNDEFINED_CHARACTER (0xC0000000 | 0x0163)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOPPY_VOLUME (0xC0000000 | 0x0164)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOPPY_ID_MARK_NOT_FOUND (0xC0000000 | 0x0165)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOPPY_WRONG_CYLINDER (0xC0000000 | 0x0166)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOPPY_UNKNOWN_ERROR (0xC0000000 | 0x0167)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FLOPPY_BAD_REGISTERS (0xC0000000 | 0x0168)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DISK_RECALIBRATE_FAILED (0xC0000000 | 0x0169)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DISK_OPERATION_FAILED (0xC0000000 | 0x016a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DISK_RESET_FAILED (0xC0000000 | 0x016b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_SHARED_IRQ_BUSY (0xC0000000 | 0x016c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FT_ORPHANING (0xC0000000 | 0x016d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BIOS_FAILED_TO_CONNECT_INTERRUPT (0xC0000000 | 0x016e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PARTITION_FAILURE (0xC0000000 | 0x0172)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_BLOCK_LENGTH (0xC0000000 | 0x0173)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DEVICE_NOT_PARTITIONED (0xC0000000 | 0x0174)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNABLE_TO_LOCK_MEDIA (0xC0000000 | 0x0175)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNABLE_TO_UNLOAD_MEDIA (0xC0000000 | 0x0176)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_EOM_OVERFLOW (0xC0000000 | 0x0177)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_MEDIA (0xC0000000 | 0x0178)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_SUCH_MEMBER (0xC0000000 | 0x017a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_MEMBER (0xC0000000 | 0x017b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_KEY_DELETED (0xC0000000 | 0x017c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_LOG_SPACE (0xC0000000 | 0x017d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TOO_MANY_SIDS (0xC0000000 | 0x017e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LM_CROSS_ENCRYPTION_REQUIRED (0xC0000000 | 0x017f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_KEY_HAS_CHILDREN (0xC0000000 | 0x0180)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CHILD_MUST_BE_VOLATILE (0xC0000000 | 0x0181)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DEVICE_CONFIGURATION_ERROR (0xC0000000 | 0x0182)	// ERRDOS, 87
-+#define NT_STATUS_DRIVER_INTERNAL_ERROR (0xC0000000 | 0x0183)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_DEVICE_STATE (0xC0000000 | 0x0184)	// ERRDOS, 22
-+#define NT_STATUS_IO_DEVICE_ERROR (0xC0000000 | 0x0185)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DEVICE_PROTOCOL_ERROR (0xC0000000 | 0x0186)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BACKUP_CONTROLLER (0xC0000000 | 0x0187)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LOG_FILE_FULL (0xC0000000 | 0x0188)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TOO_LATE (0xC0000000 | 0x0189)	// ERRDOS, 19
-+#define NT_STATUS_NO_TRUST_LSA_SECRET (0xC0000000 | 0x018a)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_NO_TRUST_SAM_ACCOUNT (0xC0000000 | 0x018b)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_TRUSTED_DOMAIN_FAILURE (0xC0000000 | 0x018c)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_TRUSTED_RELATIONSHIP_FAILURE (0xC0000000 | 0x018d)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_EVENTLOG_FILE_CORRUPT (0xC0000000 | 0x018e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_EVENTLOG_CANT_START (0xC0000000 | 0x018f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TRUST_FAILURE (0xC0000000 | 0x0190)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_MUTANT_LIMIT_EXCEEDED (0xC0000000 | 0x0191)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NETLOGON_NOT_STARTED (0xC0000000 | 0x0192)	// ERRDOS, ERRnetlogonNotStarted
-+#define NT_STATUS_ACCOUNT_EXPIRED (0xC0000000 | 0x0193)	// ERRSRV, ERRaccountexpired
-+#define NT_STATUS_POSSIBLE_DEADLOCK (0xC0000000 | 0x0194)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NETWORK_CREDENTIAL_CONFLICT (0xC0000000 | 0x0195)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_REMOTE_SESSION_LIMIT (0xC0000000 | 0x0196)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_EVENTLOG_FILE_CHANGED (0xC0000000 | 0x0197)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NOLOGON_INTERDOMAIN_TRUST_ACCOUNT (0xC0000000 | 0x0198)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT (0xC0000000 | 0x0199)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_NOLOGON_SERVER_TRUST_ACCOUNT (0xC0000000 | 0x019a)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_DOMAIN_TRUST_INCONSISTENT (0xC0000000 | 0x019b)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_FS_DRIVER_REQUIRED (0xC0000000 | 0x019c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_LOCK_RANGE (0xC0000000 | 0x01a1)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_USER_SESSION_KEY (0xC0000000 | 0x0202)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_USER_SESSION_DELETED (0xC0000000 | 0x0203)	// ERRDOS, 59
-+#define NT_STATUS_RESOURCE_LANG_NOT_FOUND (0xC0000000 | 0x0204)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INSUFF_SERVER_RESOURCES (0xC0000000 | 0x0205)	// ERRDOS, ERRnoresource
-+#define NT_STATUS_INVALID_BUFFER_SIZE (0xC0000000 | 0x0206)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_ADDRESS_COMPONENT (0xC0000000 | 0x0207)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_ADDRESS_WILDCARD (0xC0000000 | 0x0208)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TOO_MANY_ADDRESSES (0xC0000000 | 0x0209)	// ERRDOS, 68
-+#define NT_STATUS_ADDRESS_ALREADY_EXISTS (0xC0000000 | 0x020a)	// ERRDOS, 52
-+#define NT_STATUS_ADDRESS_CLOSED (0xC0000000 | 0x020b)	// ERRDOS, 64
-+#define NT_STATUS_CONNECTION_DISCONNECTED (0xC0000000 | 0x020c)	// ERRDOS, 64
-+#define NT_STATUS_CONNECTION_RESET (0xC0000000 | 0x020d)	// ERRDOS, 64
-+#define NT_STATUS_TOO_MANY_NODES (0xC0000000 | 0x020e)	// ERRDOS, 68
-+#define NT_STATUS_TRANSACTION_ABORTED (0xC0000000 | 0x020f)	// ERRDOS, 59
-+#define NT_STATUS_TRANSACTION_TIMED_OUT (0xC0000000 | 0x0210)	// ERRDOS, 59
-+#define NT_STATUS_TRANSACTION_NO_RELEASE (0xC0000000 | 0x0211)	// ERRDOS, 59
-+#define NT_STATUS_TRANSACTION_NO_MATCH (0xC0000000 | 0x0212)	// ERRDOS, 59
-+#define NT_STATUS_TRANSACTION_RESPONDED (0xC0000000 | 0x0213)	// ERRDOS, 59
-+#define NT_STATUS_TRANSACTION_INVALID_ID (0xC0000000 | 0x0214)	// ERRDOS, 59
-+#define NT_STATUS_TRANSACTION_INVALID_TYPE (0xC0000000 | 0x0215)	// ERRDOS, 59
-+#define NT_STATUS_NOT_SERVER_SESSION (0xC0000000 | 0x0216)	// ERRDOS, ERRunsup
-+#define NT_STATUS_NOT_CLIENT_SESSION (0xC0000000 | 0x0217)	// ERRDOS, ERRunsup
-+#define NT_STATUS_CANNOT_LOAD_REGISTRY_FILE (0xC0000000 | 0x0218)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DEBUG_ATTACH_FAILED (0xC0000000 | 0x0219)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_SYSTEM_PROCESS_TERMINATED (0xC0000000 | 0x021a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DATA_NOT_ACCEPTED (0xC0000000 | 0x021b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_BROWSER_SERVERS_FOUND (0xC0000000 | 0x021c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_VDM_HARD_ERROR (0xC0000000 | 0x021d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DRIVER_CANCEL_TIMEOUT (0xC0000000 | 0x021e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_REPLY_MESSAGE_MISMATCH (0xC0000000 | 0x021f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MAPPED_ALIGNMENT (0xC0000000 | 0x0220)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_IMAGE_CHECKSUM_MISMATCH (0xC0000000 | 0x0221)	// ERRDOS, 193
-+#define NT_STATUS_LOST_WRITEBEHIND_DATA (0xC0000000 | 0x0222)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CLIENT_SERVER_PARAMETERS_INVALID (0xC0000000 | 0x0223)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PASSWORD_MUST_CHANGE (0xC0000000 | 0x0224)	// ERRSRV, ERRpasswordExpired
-+#define NT_STATUS_NOT_FOUND (0xC0000000 | 0x0225)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NOT_TINY_STREAM (0xC0000000 | 0x0226)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_RECOVERY_FAILURE (0xC0000000 | 0x0227)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_STACK_OVERFLOW_READ (0xC0000000 | 0x0228)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FAIL_CHECK (0xC0000000 | 0x0229)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DUPLICATE_OBJECTID (0xC0000000 | 0x022a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_OBJECTID_EXISTS (0xC0000000 | 0x022b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CONVERT_TO_LARGE (0xC0000000 | 0x022c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_RETRY (0xC0000000 | 0x022d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FOUND_OUT_OF_SCOPE (0xC0000000 | 0x022e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ALLOCATE_BUCKET (0xC0000000 | 0x022f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PROPSET_NOT_FOUND (0xC0000000 | 0x0230)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_MARSHALL_OVERFLOW (0xC0000000 | 0x0231)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_VARIANT (0xC0000000 | 0x0232)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DOMAIN_CONTROLLER_NOT_FOUND (0xC0000000 | 0x0233)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ACCOUNT_LOCKED_OUT (0xC0000000 | 0x0234)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_HANDLE_NOT_CLOSABLE (0xC0000000 | 0x0235)	// ERRDOS, ERRbadfid
-+#define NT_STATUS_CONNECTION_REFUSED (0xC0000000 | 0x0236)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_GRACEFUL_DISCONNECT (0xC0000000 | 0x0237)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ADDRESS_ALREADY_ASSOCIATED (0xC0000000 | 0x0238)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_ADDRESS_NOT_ASSOCIATED (0xC0000000 | 0x0239)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CONNECTION_INVALID (0xC0000000 | 0x023a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CONNECTION_ACTIVE (0xC0000000 | 0x023b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NETWORK_UNREACHABLE (0xC0000000 | 0x023c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_HOST_UNREACHABLE (0xC0000000 | 0x023d)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PROTOCOL_UNREACHABLE (0xC0000000 | 0x023e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PORT_UNREACHABLE (0xC0000000 | 0x023f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_REQUEST_ABORTED (0xC0000000 | 0x0240)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CONNECTION_ABORTED (0xC0000000 | 0x0241)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_COMPRESSION_BUFFER (0xC0000000 | 0x0242)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_USER_MAPPED_FILE (0xC0000000 | 0x0243)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_AUDIT_FAILED (0xC0000000 | 0x0244)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_TIMER_RESOLUTION_NOT_SET (0xC0000000 | 0x0245)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_CONNECTION_COUNT_LIMIT (0xC0000000 | 0x0246)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LOGIN_TIME_RESTRICTION (0xC0000000 | 0x0247)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LOGIN_WKSTA_RESTRICTION (0xC0000000 | 0x0248)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_IMAGE_MP_UP_MISMATCH (0xC0000000 | 0x0249)	// ERRDOS, 193
-+#define NT_STATUS_INSUFFICIENT_LOGON_INFO (0xC0000000 | 0x0250)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_DLL_ENTRYPOINT (0xC0000000 | 0x0251)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_BAD_SERVICE_ENTRYPOINT (0xC0000000 | 0x0252)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LPC_REPLY_LOST (0xC0000000 | 0x0253)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_IP_ADDRESS_CONFLICT1 (0xC0000000 | 0x0254)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_IP_ADDRESS_CONFLICT2 (0xC0000000 | 0x0255)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_REGISTRY_QUOTA_LIMIT (0xC0000000 | 0x0256)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PATH_NOT_COVERED (0xC0000000 | 0x0257)	// ERRSRV, 3
-+#define NT_STATUS_NO_CALLBACK_ACTIVE (0xC0000000 | 0x0258)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_LICENSE_QUOTA_EXCEEDED (0xC0000000 | 0x0259)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PWD_TOO_SHORT (0xC0000000 | 0x025a)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PWD_TOO_RECENT (0xC0000000 | 0x025b)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PWD_HISTORY_CONFLICT (0xC0000000 | 0x025c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_PLUGPLAY_NO_DEVICE (0xC0000000 | 0x025e)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_UNSUPPORTED_COMPRESSION (0xC0000000 | 0x025f)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_HW_PROFILE (0xC0000000 | 0x0260)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_INVALID_PLUGPLAY_DEVICE_PATH (0xC0000000 | 0x0261)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DRIVER_ORDINAL_NOT_FOUND (0xC0000000 | 0x0262)	// ERRDOS, 182
-+#define NT_STATUS_DRIVER_ENTRYPOINT_NOT_FOUND (0xC0000000 | 0x0263)	// ERRDOS, 127
-+#define NT_STATUS_RESOURCE_NOT_OWNED (0xC0000000 | 0x0264)	// ERRDOS, 288
-+#define NT_STATUS_TOO_MANY_LINKS (0xC0000000 | 0x0265)	// ERRDOS, ErrTooManyLinks
-+#define NT_STATUS_QUOTA_LIST_INCONSISTENT (0xC0000000 | 0x0266)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_FILE_IS_OFFLINE (0xC0000000 | 0x0267)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_VOLUME_DISMOUNTED (0xC0000000 | 0x026e)	// ERRDOS, 21
-+#define NT_STATUS_NOT_A_REPARSE_POINT (0xC0000000 | 0x0275)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_DIRECTORY_IS_A_REPARSE_POINT (0xC0000000 | 0x0281)	// ERRDOS, 161
-+#define NT_STATUS_ENCRYPTION_FAILED (0xC0000000 | 0x028a)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_DECRYPTION_FAILED (0xC0000000 | 0x028b)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_RANGE_NOT_FOUND (0xC0000000 | 0x028c)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_RECOVERY_POLICY (0xC0000000 | 0x028d)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_NO_EFS (0xC0000000 | 0x028e)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_WRONG_EFS (0xC0000000 | 0x028f)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_NO_USER_KEYS (0xC0000000 | 0x0290)	// ERRDOS, ERRnoaccess
-+#define NT_STATUS_VOLUME_NOT_UPGRADED (0xC0000000 | 0x029c)	// ERRDOS, ERRbadfunc
-+#define NT_STATUS_NETWORK_SESSION_EXPIRED  (0xC0000000 | 0x035c)	// ERRHRD, ERRgeneral
-+/* scheduler */
-+#define NT_STATUS_NO_SUCH_JOB (0xC0000000 | 0xEDE)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_NO_PREAUTH_INTEGRITY_HASH_OVERLAP (0xC0000000 | 0x5D0000)	// ERRHRD, ERRgeneral
-+#define NT_STATUS_OS2_INVALID_LEVEL 0x007c0001	// ERRDOS, ERRunknownlevel
+ #define NT_STATUS_OK                   0x0000	// SUCCESS, 0
+diff --git a/fs/smb/client/smb1maperror.c b/fs/smb/client/smb1maperror.c
+index e1964fd2b85e..7228ca5a2ac8 100644
+--- a/fs/smb/client/smb1maperror.c
++++ b/fs/smb/client/smb1maperror.c
+@@ -110,555 +110,14 @@ static const struct {
+ 	__u8 dos_class;
+ 	__u16 dos_code;
+ 	__u32 ntstatus;
++	const char *nt_errstr;
+ } ntstatus_to_dos_map[] = {
+-	{
+-	ERRSRV, ERR_NOTIFY_ENUM_DIR, NT_STATUS_NOTIFY_ENUM_DIR}, {
+-	ERRDOS, ERRmoredata, NT_STATUS_BUFFER_OVERFLOW}, {
+-	ERRDOS, ERRmoredata, NT_STATUS_MORE_PROCESSING_REQUIRED}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_PRIVILEGE_NOT_HELD}, {
+-	ERRDOS, ERRgeneral, NT_STATUS_UNSUCCESSFUL}, {
+-	ERRDOS, ERRbadfunc, NT_STATUS_NOT_IMPLEMENTED}, {
+-	ERRDOS, ERRbadpipe, NT_STATUS_INVALID_INFO_CLASS}, {
+-	ERRDOS, 24, NT_STATUS_INFO_LENGTH_MISMATCH}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ACCESS_VIOLATION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_IN_PAGE_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PAGEFILE_QUOTA}, {
+-	ERRDOS, ERRbadfid, NT_STATUS_INVALID_HANDLE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_INITIAL_STACK}, {
+-	ERRDOS, 193, NT_STATUS_BAD_INITIAL_PC}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_CID}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_TIMER_NOT_CANCELED}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER}, {
+-	ERRDOS, ERRbadfile, NT_STATUS_NO_SUCH_DEVICE}, {
+-	ERRDOS, ERRbadfile, NT_STATUS_NO_SUCH_FILE}, {
+-	ERRDOS, ERRbadfunc, NT_STATUS_INVALID_DEVICE_REQUEST}, {
+-	ERRDOS, 38, NT_STATUS_END_OF_FILE}, {
+-	ERRDOS, 34, NT_STATUS_WRONG_VOLUME}, {
+-	ERRDOS, 21, NT_STATUS_NO_MEDIA_IN_DEVICE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNRECOGNIZED_MEDIA}, {
+-	ERRDOS, 27, NT_STATUS_NONEXISTENT_SECTOR},
+-/*	{ This NT error code was 'sqashed'
+-	 from NT_STATUS_MORE_PROCESSING_REQUIRED to NT_STATUS_OK
+-	 during the session setup } */
+-	{
+-	ERRDOS, ERRnomem, NT_STATUS_NO_MEMORY}, {
+-	ERRDOS, 487, NT_STATUS_CONFLICTING_ADDRESSES}, {
+-	ERRDOS, 487, NT_STATUS_NOT_MAPPED_VIEW}, {
+-	ERRDOS, 87, NT_STATUS_UNABLE_TO_FREE_VM}, {
+-	ERRDOS, 87, NT_STATUS_UNABLE_TO_DELETE_SECTION}, {
+-	ERRDOS, 2142, NT_STATUS_INVALID_SYSTEM_SERVICE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ILLEGAL_INSTRUCTION}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_INVALID_LOCK_SEQUENCE}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_INVALID_VIEW_SIZE}, {
+-	ERRDOS, 193, NT_STATUS_INVALID_FILE_FOR_SECTION}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_ALREADY_COMMITTED},
+-/*	{ This NT error code was 'sqashed'
+-	 from NT_STATUS_ACCESS_DENIED to NT_STATUS_TRUSTED_RELATIONSHIP_FAILURE
+-	 during the session setup }   */
+-	{
+-	ERRDOS, ERRnoaccess, NT_STATUS_ACCESS_DENIED}, {
+-	ERRDOS, 111, NT_STATUS_BUFFER_TOO_SMALL}, {
+-	ERRDOS, ERRbadfid, NT_STATUS_OBJECT_TYPE_MISMATCH}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NONCONTINUABLE_EXCEPTION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_DISPOSITION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNWIND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_STACK}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_UNWIND_TARGET}, {
+-	ERRDOS, 158, NT_STATUS_NOT_LOCKED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PARITY_ERROR}, {
+-	ERRDOS, 487, NT_STATUS_UNABLE_TO_DECOMMIT_VM}, {
+-	ERRDOS, 487, NT_STATUS_NOT_COMMITTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_PORT_ATTRIBUTES}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PORT_MESSAGE_TOO_LONG}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_MIX}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_QUOTA_LOWER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DISK_CORRUPT_ERROR}, {
+-	 /* mapping changed since shell does lookup on * expects FileNotFound */
+-	ERRDOS, ERRbadfile, NT_STATUS_OBJECT_NAME_INVALID}, {
+-	ERRDOS, ERRbadfile, NT_STATUS_OBJECT_NAME_NOT_FOUND}, {
+-	ERRDOS, ERRalreadyexists, NT_STATUS_OBJECT_NAME_COLLISION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_HANDLE_NOT_WAITABLE}, {
+-	ERRDOS, ERRbadfid, NT_STATUS_PORT_DISCONNECTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DEVICE_ALREADY_ATTACHED}, {
+-	ERRDOS, 161, NT_STATUS_OBJECT_PATH_INVALID}, {
+-	ERRDOS, ERRbadpath, NT_STATUS_OBJECT_PATH_NOT_FOUND}, {
+-	ERRDOS, 161, NT_STATUS_OBJECT_PATH_SYNTAX_BAD}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DATA_OVERRUN}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DATA_LATE_ERROR}, {
+-	ERRDOS, 23, NT_STATUS_DATA_ERROR}, {
+-	ERRDOS, 23, NT_STATUS_CRC_ERROR}, {
+-	ERRDOS, ERRnomem, NT_STATUS_SECTION_TOO_BIG}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_PORT_CONNECTION_REFUSED}, {
+-	ERRDOS, ERRbadfid, NT_STATUS_INVALID_PORT_HANDLE}, {
+-	ERRDOS, ERRbadshare, NT_STATUS_SHARING_VIOLATION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_QUOTA_EXCEEDED}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PAGE_PROTECTION}, {
+-	ERRDOS, 288, NT_STATUS_MUTANT_NOT_OWNED}, {
+-	ERRDOS, 298, NT_STATUS_SEMAPHORE_LIMIT_EXCEEDED}, {
+-	ERRDOS, 87, NT_STATUS_PORT_ALREADY_SET}, {
+-	ERRDOS, 87, NT_STATUS_SECTION_NOT_IMAGE}, {
+-	ERRDOS, 156, NT_STATUS_SUSPEND_COUNT_EXCEEDED}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_THREAD_IS_TERMINATING}, {
+-	ERRDOS, 87, NT_STATUS_BAD_WORKING_SET_LIMIT}, {
+-	ERRDOS, 87, NT_STATUS_INCOMPATIBLE_FILE_MAP}, {
+-	ERRDOS, 87, NT_STATUS_SECTION_PROTECTION}, {
+-	ERRDOS, ERReasnotsupported, NT_STATUS_EAS_NOT_SUPPORTED}, {
+-	ERRDOS, 255, NT_STATUS_EA_TOO_LARGE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NONEXISTENT_EA_ENTRY}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_EAS_ON_FILE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_EA_CORRUPT_ERROR}, {
+-	ERRDOS, ERRlock, NT_STATUS_FILE_LOCK_CONFLICT}, {
+-	ERRDOS, ERRlock, NT_STATUS_LOCK_NOT_GRANTED}, {
+-	ERRDOS, ERRbadfile, NT_STATUS_DELETE_PENDING}, {
+-	ERRDOS, ERRunsup, NT_STATUS_CTL_FILE_NOT_SUPPORTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNKNOWN_REVISION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_REVISION_MISMATCH}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_OWNER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_PRIMARY_GROUP}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_IMPERSONATION_TOKEN}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CANT_DISABLE_MANDATORY}, {
+-	ERRDOS, 2215, NT_STATUS_NO_LOGON_SERVERS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_SUCH_LOGON_SESSION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_SUCH_PRIVILEGE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_ACCOUNT_NAME}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_USER_EXISTS},
+-/*	{ This NT error code was 'sqashed'
+-	 from NT_STATUS_NO_SUCH_USER to NT_STATUS_LOGON_FAILURE
+-	 during the session setup } */
+-	{
+-	ERRDOS, ERRnoaccess, NT_STATUS_NO_SUCH_USER}, { /* could map to 2238 */
+-	ERRHRD, ERRgeneral, NT_STATUS_GROUP_EXISTS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_SUCH_GROUP}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_MEMBER_IN_GROUP}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_MEMBER_NOT_IN_GROUP}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LAST_ADMIN},
+-/*	{ This NT error code was 'sqashed'
+-	 from NT_STATUS_WRONG_PASSWORD to NT_STATUS_LOGON_FAILURE
+-	 during the session setup } */
+-	{
+-	ERRSRV, ERRbadpw, NT_STATUS_WRONG_PASSWORD}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ILL_FORMED_PASSWORD}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PASSWORD_RESTRICTION}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_LOGON_FAILURE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ACCOUNT_RESTRICTION}, {
+-	ERRSRV, ERRbadLogonTime, NT_STATUS_INVALID_LOGON_HOURS}, {
+-	ERRSRV, ERRbadclient, NT_STATUS_INVALID_WORKSTATION}, {
+-	ERRSRV, ERRpasswordExpired, NT_STATUS_PASSWORD_EXPIRED}, {
+-	ERRSRV, ERRaccountexpired, NT_STATUS_ACCOUNT_DISABLED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NONE_MAPPED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_TOO_MANY_LUIDS_REQUESTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LUIDS_EXHAUSTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_SUB_AUTHORITY}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_ACL}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_SID}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_SECURITY_DESCR}, {
+-	ERRDOS, 127, NT_STATUS_PROCEDURE_NOT_FOUND}, {
+-	ERRDOS, 193, NT_STATUS_INVALID_IMAGE_FORMAT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_TOKEN}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_INHERITANCE_ACL}, {
+-	ERRDOS, 158, NT_STATUS_RANGE_NOT_LOCKED}, {
+-	ERRDOS, 112, NT_STATUS_DISK_FULL}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_SERVER_DISABLED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_SERVER_NOT_DISABLED}, {
+-	ERRDOS, 68, NT_STATUS_TOO_MANY_GUIDS_REQUESTED}, {
+-	ERRDOS, 259, NT_STATUS_GUIDS_EXHAUSTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_ID_AUTHORITY}, {
+-	ERRDOS, 259, NT_STATUS_AGENTS_EXHAUSTED}, {
+-	ERRDOS, 154, NT_STATUS_INVALID_VOLUME_LABEL}, {
+-	ERRDOS, 14, NT_STATUS_SECTION_NOT_EXTENDED}, {
+-	ERRDOS, 487, NT_STATUS_NOT_MAPPED_DATA}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_RESOURCE_DATA_NOT_FOUND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_RESOURCE_TYPE_NOT_FOUND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_RESOURCE_NAME_NOT_FOUND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ARRAY_BOUNDS_EXCEEDED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOAT_DENORMAL_OPERAND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOAT_DIVIDE_BY_ZERO}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOAT_INEXACT_RESULT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOAT_INVALID_OPERATION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOAT_OVERFLOW}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOAT_STACK_CHECK}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOAT_UNDERFLOW}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INTEGER_DIVIDE_BY_ZERO}, {
+-	ERRDOS, 534, NT_STATUS_INTEGER_OVERFLOW}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PRIVILEGED_INSTRUCTION}, {
+-	ERRDOS, ERRnomem, NT_STATUS_TOO_MANY_PAGING_FILES}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FILE_INVALID}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ALLOTTED_SPACE_EXCEEDED},
+-/*	{ This NT error code was 'sqashed'
+-	 from NT_STATUS_INSUFFICIENT_RESOURCES to
+-	 NT_STATUS_INSUFF_SERVER_RESOURCES during the session setup } */
+-	{
+-	ERRDOS, ERRnoresource, NT_STATUS_INSUFFICIENT_RESOURCES}, {
+-	ERRDOS, ERRbadpath, NT_STATUS_DFS_EXIT_PATH_FOUND}, {
+-	ERRDOS, 23, NT_STATUS_DEVICE_DATA_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DEVICE_NOT_CONNECTED}, {
+-	ERRDOS, 21, NT_STATUS_DEVICE_POWER_FAILURE}, {
+-	ERRDOS, 487, NT_STATUS_FREE_VM_NOT_AT_BASE}, {
+-	ERRDOS, 487, NT_STATUS_MEMORY_NOT_ALLOCATED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_WORKING_SET_QUOTA}, {
+-	ERRDOS, 19, NT_STATUS_MEDIA_WRITE_PROTECTED}, {
+-	ERRDOS, 21, NT_STATUS_DEVICE_NOT_READY}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_GROUP_ATTRIBUTES}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_IMPERSONATION_LEVEL}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CANT_OPEN_ANONYMOUS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_VALIDATION_CLASS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_TOKEN_TYPE}, {
+-	ERRDOS, 87, NT_STATUS_BAD_MASTER_BOOT_RECORD}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INSTRUCTION_MISALIGNMENT}, {
+-	ERRDOS, ERRpipebusy, NT_STATUS_INSTANCE_NOT_AVAILABLE}, {
+-	ERRDOS, ERRpipebusy, NT_STATUS_PIPE_NOT_AVAILABLE}, {
+-	ERRDOS, ERRbadpipe, NT_STATUS_INVALID_PIPE_STATE}, {
+-	ERRDOS, ERRpipebusy, NT_STATUS_PIPE_BUSY}, {
+-	ERRDOS, ERRbadfunc, NT_STATUS_ILLEGAL_FUNCTION}, {
+-	ERRDOS, ERRnotconnected, NT_STATUS_PIPE_DISCONNECTED}, {
+-	ERRDOS, ERRpipeclosing, NT_STATUS_PIPE_CLOSING}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PIPE_CONNECTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PIPE_LISTENING}, {
+-	ERRDOS, ERRbadpipe, NT_STATUS_INVALID_READ_MODE}, {
+-	ERRDOS, 121, NT_STATUS_IO_TIMEOUT}, {
+-	ERRDOS, 38, NT_STATUS_FILE_FORCED_CLOSED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PROFILING_NOT_STARTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PROFILING_NOT_STOPPED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_COULD_NOT_INTERPRET}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_FILE_IS_A_DIRECTORY}, {
+-	ERRDOS, ERRunsup, NT_STATUS_NOT_SUPPORTED}, {
+-	ERRDOS, 51, NT_STATUS_REMOTE_NOT_LISTENING}, {
+-	ERRDOS, 52, NT_STATUS_DUPLICATE_NAME}, {
+-	ERRDOS, 53, NT_STATUS_BAD_NETWORK_PATH}, {
+-	ERRDOS, 54, NT_STATUS_NETWORK_BUSY}, {
+-	ERRDOS, 55, NT_STATUS_DEVICE_DOES_NOT_EXIST}, {
+-	ERRDOS, 56, NT_STATUS_TOO_MANY_COMMANDS}, {
+-	ERRDOS, 57, NT_STATUS_ADAPTER_HARDWARE_ERROR}, {
+-	ERRDOS, 58, NT_STATUS_INVALID_NETWORK_RESPONSE}, {
+-	ERRDOS, 59, NT_STATUS_UNEXPECTED_NETWORK_ERROR}, {
+-	ERRDOS, 60, NT_STATUS_BAD_REMOTE_ADAPTER}, {
+-	ERRDOS, 61, NT_STATUS_PRINT_QUEUE_FULL}, {
+-	ERRDOS, 62, NT_STATUS_NO_SPOOL_SPACE}, {
+-	ERRDOS, 63, NT_STATUS_PRINT_CANCELLED}, {
+-	ERRDOS, 64, NT_STATUS_NETWORK_NAME_DELETED}, {
+-	ERRDOS, 65, NT_STATUS_NETWORK_ACCESS_DENIED}, {
+-	ERRDOS, 66, NT_STATUS_BAD_DEVICE_TYPE}, {
+-	ERRDOS, ERRnosuchshare, NT_STATUS_BAD_NETWORK_NAME}, {
+-	ERRDOS, 68, NT_STATUS_TOO_MANY_NAMES}, {
+-	ERRDOS, 69, NT_STATUS_TOO_MANY_SESSIONS}, {
+-	ERRDOS, 70, NT_STATUS_SHARING_PAUSED}, {
+-	ERRDOS, 71, NT_STATUS_REQUEST_NOT_ACCEPTED}, {
+-	ERRDOS, 72, NT_STATUS_REDIRECTOR_PAUSED}, {
+-	ERRDOS, 88, NT_STATUS_NET_WRITE_FAULT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PROFILING_AT_LIMIT}, {
+-	ERRDOS, ERRdiffdevice, NT_STATUS_NOT_SAME_DEVICE}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_FILE_RENAMED}, {
+-	ERRDOS, 240, NT_STATUS_VIRTUAL_CIRCUIT_CLOSED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_SECURITY_ON_OBJECT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CANT_WAIT}, {
+-	ERRDOS, ERRpipeclosing, NT_STATUS_PIPE_EMPTY}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CANT_ACCESS_DOMAIN_INFO}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CANT_TERMINATE_SELF}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_SERVER_STATE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_DOMAIN_STATE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_DOMAIN_ROLE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_SUCH_DOMAIN}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DOMAIN_EXISTS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DOMAIN_LIMIT_EXCEEDED}, {
+-	ERRDOS, 300, NT_STATUS_OPLOCK_NOT_GRANTED}, {
+-	ERRDOS, 301, NT_STATUS_INVALID_OPLOCK_PROTOCOL}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INTERNAL_DB_CORRUPTION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INTERNAL_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_GENERIC_NOT_MAPPED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_DESCRIPTOR_FORMAT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_USER_BUFFER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNEXPECTED_IO_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNEXPECTED_MM_CREATE_ERR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNEXPECTED_MM_MAP_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNEXPECTED_MM_EXTEND_ERR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NOT_LOGON_PROCESS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LOGON_SESSION_EXISTS}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_1}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_2}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_3}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_4}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_5}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_6}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_7}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_8}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_9}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_10}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_11}, {
+-	ERRDOS, 87, NT_STATUS_INVALID_PARAMETER_12}, {
+-	ERRDOS, ERRbadpath, NT_STATUS_REDIRECTOR_NOT_STARTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_REDIRECTOR_STARTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_STACK_OVERFLOW}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_SUCH_PACKAGE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_FUNCTION_TABLE}, {
+-	ERRDOS, 203, NT_STATUS_VARIABLE_NOT_FOUND}, {
+-	ERRDOS, 145, NT_STATUS_DIRECTORY_NOT_EMPTY}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FILE_CORRUPT_ERROR}, {
+-	ERRDOS, 267, NT_STATUS_NOT_A_DIRECTORY}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_LOGON_SESSION_STATE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LOGON_SESSION_COLLISION}, {
+-	ERRDOS, 206, NT_STATUS_NAME_TOO_LONG}, {
+-	ERRDOS, 2401, NT_STATUS_FILES_OPEN}, {
+-	ERRDOS, 2404, NT_STATUS_CONNECTION_IN_USE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_MESSAGE_NOT_FOUND}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_PROCESS_IS_TERMINATING}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_LOGON_TYPE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_GUID_TRANSLATION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CANNOT_IMPERSONATE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_IMAGE_ALREADY_LOADED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ABIOS_NOT_PRESENT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ABIOS_LID_NOT_EXIST}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ABIOS_LID_ALREADY_OWNED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ABIOS_NOT_LID_OWNER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ABIOS_INVALID_COMMAND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ABIOS_INVALID_LID}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ABIOS_SELECTOR_NOT_AVAILABLE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ABIOS_INVALID_SELECTOR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_LDT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_LDT_SIZE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_LDT_OFFSET}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_LDT_DESCRIPTOR}, {
+-	ERRDOS, 193, NT_STATUS_INVALID_IMAGE_NE_FORMAT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_RXACT_INVALID_STATE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_RXACT_COMMIT_FAILURE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_MAPPED_FILE_SIZE_ZERO}, {
+-	ERRDOS, ERRnofids, NT_STATUS_TOO_MANY_OPENED_FILES}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CANCELLED}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_CANNOT_DELETE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_COMPUTER_NAME}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_FILE_DELETED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_SPECIAL_ACCOUNT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_SPECIAL_GROUP}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_SPECIAL_USER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_MEMBERS_PRIMARY_GROUP}, {
+-	ERRDOS, ERRbadfid, NT_STATUS_FILE_CLOSED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_TOO_MANY_THREADS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_THREAD_NOT_IN_PROCESS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_TOKEN_ALREADY_IN_USE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PAGEFILE_QUOTA_EXCEEDED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_COMMITMENT_LIMIT}, {
+-	ERRDOS, 193, NT_STATUS_INVALID_IMAGE_LE_FORMAT}, {
+-	ERRDOS, 193, NT_STATUS_INVALID_IMAGE_NOT_MZ}, {
+-	ERRDOS, 193, NT_STATUS_INVALID_IMAGE_PROTECT}, {
+-	ERRDOS, 193, NT_STATUS_INVALID_IMAGE_WIN_16}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LOGON_SERVER_CONFLICT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_TIME_DIFFERENCE_AT_DC}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_SYNCHRONIZATION_REQUIRED}, {
+-	ERRDOS, 126, NT_STATUS_DLL_NOT_FOUND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_OPEN_FAILED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_IO_PRIVILEGE_FAILED}, {
+-	ERRDOS, 182, NT_STATUS_ORDINAL_NOT_FOUND}, {
+-	ERRDOS, 127, NT_STATUS_ENTRYPOINT_NOT_FOUND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CONTROL_C_EXIT}, {
+-	ERRDOS, 64, NT_STATUS_LOCAL_DISCONNECT}, {
+-	ERRDOS, 64, NT_STATUS_REMOTE_DISCONNECT}, {
+-	ERRDOS, 51, NT_STATUS_REMOTE_RESOURCES}, {
+-	ERRDOS, 59, NT_STATUS_LINK_FAILED}, {
+-	ERRDOS, 59, NT_STATUS_LINK_TIMEOUT}, {
+-	ERRDOS, 59, NT_STATUS_INVALID_CONNECTION}, {
+-	ERRDOS, 59, NT_STATUS_INVALID_ADDRESS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DLL_INIT_FAILED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_MISSING_SYSTEMFILE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNHANDLED_EXCEPTION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_APP_INIT_FAILURE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PAGEFILE_CREATE_FAILED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_PAGEFILE}, {
+-	ERRDOS, 124, NT_STATUS_INVALID_LEVEL}, {
+-	ERRDOS, 86, NT_STATUS_WRONG_PASSWORD_CORE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ILLEGAL_FLOAT_CONTEXT}, {
+-	ERRDOS, 109, NT_STATUS_PIPE_BROKEN}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_REGISTRY_CORRUPT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_REGISTRY_IO_FAILED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_EVENT_PAIR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNRECOGNIZED_VOLUME}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_SERIAL_NO_DEVICE_INITED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_SUCH_ALIAS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_MEMBER_NOT_IN_ALIAS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_MEMBER_IN_ALIAS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ALIAS_EXISTS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LOGON_NOT_GRANTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_TOO_MANY_SECRETS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_SECRET_TOO_LONG}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INTERNAL_DB_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FULLSCREEN_MODE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_TOO_MANY_CONTEXT_IDS}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_LOGON_TYPE_NOT_GRANTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NOT_REGISTRY_FILE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NT_CROSS_ENCRYPTION_REQUIRED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DOMAIN_CTRLR_CONFIG_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FT_MISSING_MEMBER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ILL_FORMED_SERVICE_ENTRY}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ILLEGAL_CHARACTER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNMAPPABLE_CHARACTER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNDEFINED_CHARACTER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOPPY_VOLUME}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOPPY_ID_MARK_NOT_FOUND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOPPY_WRONG_CYLINDER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOPPY_UNKNOWN_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FLOPPY_BAD_REGISTERS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DISK_RECALIBRATE_FAILED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DISK_OPERATION_FAILED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DISK_RESET_FAILED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_SHARED_IRQ_BUSY}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FT_ORPHANING}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BIOS_FAILED_TO_CONNECT_INTERRUPT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PARTITION_FAILURE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_BLOCK_LENGTH}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DEVICE_NOT_PARTITIONED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNABLE_TO_LOCK_MEDIA}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNABLE_TO_UNLOAD_MEDIA}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_EOM_OVERFLOW}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_MEDIA}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_SUCH_MEMBER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_MEMBER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_KEY_DELETED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_LOG_SPACE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_TOO_MANY_SIDS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LM_CROSS_ENCRYPTION_REQUIRED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_KEY_HAS_CHILDREN}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CHILD_MUST_BE_VOLATILE}, {
+-	ERRDOS, 87, NT_STATUS_DEVICE_CONFIGURATION_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DRIVER_INTERNAL_ERROR}, {
+-	ERRDOS, 22, NT_STATUS_INVALID_DEVICE_STATE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_IO_DEVICE_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DEVICE_PROTOCOL_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BACKUP_CONTROLLER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LOG_FILE_FULL}, {
+-	ERRDOS, 19, NT_STATUS_TOO_LATE}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_NO_TRUST_LSA_SECRET},
+-/*	{ This NT error code was 'sqashed'
+-	 from NT_STATUS_NO_TRUST_SAM_ACCOUNT to
+-	 NT_STATUS_TRUSTED_RELATIONSHIP_FAILURE during the session setup } */
+-	{
+-	ERRDOS, ERRnoaccess, NT_STATUS_NO_TRUST_SAM_ACCOUNT}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_TRUSTED_DOMAIN_FAILURE}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_TRUSTED_RELATIONSHIP_FAILURE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_EVENTLOG_FILE_CORRUPT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_EVENTLOG_CANT_START}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_TRUST_FAILURE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_MUTANT_LIMIT_EXCEEDED}, {
+-	ERRDOS, ERRnetlogonNotStarted, NT_STATUS_NETLOGON_NOT_STARTED}, {
+-	ERRSRV, ERRaccountexpired, NT_STATUS_ACCOUNT_EXPIRED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_POSSIBLE_DEADLOCK}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NETWORK_CREDENTIAL_CONFLICT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_REMOTE_SESSION_LIMIT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_EVENTLOG_FILE_CHANGED}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_NOLOGON_INTERDOMAIN_TRUST_ACCOUNT}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_NOLOGON_SERVER_TRUST_ACCOUNT},
+-/*	{ This NT error code was 'sqashed'
+-	 from NT_STATUS_DOMAIN_TRUST_INCONSISTENT to NT_STATUS_LOGON_FAILURE
+-	 during the session setup }  */
+-	{
+-	ERRDOS, ERRnoaccess, NT_STATUS_DOMAIN_TRUST_INCONSISTENT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FS_DRIVER_REQUIRED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_USER_SESSION_KEY}, {
+-	ERRDOS, 59, NT_STATUS_USER_SESSION_DELETED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_RESOURCE_LANG_NOT_FOUND}, {
+-	ERRDOS, ERRnoresource, NT_STATUS_INSUFF_SERVER_RESOURCES}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_BUFFER_SIZE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_ADDRESS_COMPONENT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_ADDRESS_WILDCARD}, {
+-	ERRDOS, 68, NT_STATUS_TOO_MANY_ADDRESSES}, {
+-	ERRDOS, 52, NT_STATUS_ADDRESS_ALREADY_EXISTS}, {
+-	ERRDOS, 64, NT_STATUS_ADDRESS_CLOSED}, {
+-	ERRDOS, 64, NT_STATUS_CONNECTION_DISCONNECTED}, {
+-	ERRDOS, 64, NT_STATUS_CONNECTION_RESET}, {
+-	ERRDOS, 68, NT_STATUS_TOO_MANY_NODES}, {
+-	ERRDOS, 59, NT_STATUS_TRANSACTION_ABORTED}, {
+-	ERRDOS, 59, NT_STATUS_TRANSACTION_TIMED_OUT}, {
+-	ERRDOS, 59, NT_STATUS_TRANSACTION_NO_RELEASE}, {
+-	ERRDOS, 59, NT_STATUS_TRANSACTION_NO_MATCH}, {
+-	ERRDOS, 59, NT_STATUS_TRANSACTION_RESPONDED}, {
+-	ERRDOS, 59, NT_STATUS_TRANSACTION_INVALID_ID}, {
+-	ERRDOS, 59, NT_STATUS_TRANSACTION_INVALID_TYPE}, {
+-	ERRDOS, ERRunsup, NT_STATUS_NOT_SERVER_SESSION}, {
+-	ERRDOS, ERRunsup, NT_STATUS_NOT_CLIENT_SESSION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CANNOT_LOAD_REGISTRY_FILE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DEBUG_ATTACH_FAILED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_SYSTEM_PROCESS_TERMINATED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DATA_NOT_ACCEPTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_BROWSER_SERVERS_FOUND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_VDM_HARD_ERROR}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DRIVER_CANCEL_TIMEOUT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_REPLY_MESSAGE_MISMATCH}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_MAPPED_ALIGNMENT}, {
+-	ERRDOS, 193, NT_STATUS_IMAGE_CHECKSUM_MISMATCH}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LOST_WRITEBEHIND_DATA}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CLIENT_SERVER_PARAMETERS_INVALID}, {
+-	ERRSRV, ERRpasswordExpired, NT_STATUS_PASSWORD_MUST_CHANGE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NOT_FOUND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NOT_TINY_STREAM}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_RECOVERY_FAILURE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_STACK_OVERFLOW_READ}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FAIL_CHECK}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DUPLICATE_OBJECTID}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_OBJECTID_EXISTS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CONVERT_TO_LARGE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_RETRY}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FOUND_OUT_OF_SCOPE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ALLOCATE_BUCKET}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PROPSET_NOT_FOUND}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_MARSHALL_OVERFLOW}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_VARIANT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_DOMAIN_CONTROLLER_NOT_FOUND}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_ACCOUNT_LOCKED_OUT}, {
+-	ERRDOS, ERRbadfid, NT_STATUS_HANDLE_NOT_CLOSABLE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CONNECTION_REFUSED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_GRACEFUL_DISCONNECT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ADDRESS_ALREADY_ASSOCIATED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_ADDRESS_NOT_ASSOCIATED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CONNECTION_INVALID}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CONNECTION_ACTIVE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NETWORK_UNREACHABLE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_HOST_UNREACHABLE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PROTOCOL_UNREACHABLE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PORT_UNREACHABLE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_REQUEST_ABORTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CONNECTION_ABORTED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_COMPRESSION_BUFFER}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_USER_MAPPED_FILE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_AUDIT_FAILED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_TIMER_RESOLUTION_NOT_SET}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_CONNECTION_COUNT_LIMIT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LOGIN_TIME_RESTRICTION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LOGIN_WKSTA_RESTRICTION}, {
+-	ERRDOS, 193, NT_STATUS_IMAGE_MP_UP_MISMATCH}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INSUFFICIENT_LOGON_INFO}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_DLL_ENTRYPOINT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_BAD_SERVICE_ENTRYPOINT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LPC_REPLY_LOST}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_IP_ADDRESS_CONFLICT1}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_IP_ADDRESS_CONFLICT2}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_REGISTRY_QUOTA_LIMIT}, {
+-	ERRSRV, 3, NT_STATUS_PATH_NOT_COVERED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_NO_CALLBACK_ACTIVE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_LICENSE_QUOTA_EXCEEDED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PWD_TOO_SHORT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PWD_TOO_RECENT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PWD_HISTORY_CONFLICT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_PLUGPLAY_NO_DEVICE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_UNSUPPORTED_COMPRESSION}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_HW_PROFILE}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_INVALID_PLUGPLAY_DEVICE_PATH}, {
+-	ERRDOS, 182, NT_STATUS_DRIVER_ORDINAL_NOT_FOUND}, {
+-	ERRDOS, 127, NT_STATUS_DRIVER_ENTRYPOINT_NOT_FOUND}, {
+-	ERRDOS, 288, NT_STATUS_RESOURCE_NOT_OWNED}, {
+-	ERRDOS, ErrTooManyLinks, NT_STATUS_TOO_MANY_LINKS}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_QUOTA_LIST_INCONSISTENT}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_FILE_IS_OFFLINE}, {
+-	ERRDOS, 21, NT_STATUS_VOLUME_DISMOUNTED}, {
+-	ERRDOS, 161, NT_STATUS_DIRECTORY_IS_A_REPARSE_POINT}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_ENCRYPTION_FAILED}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_DECRYPTION_FAILED}, {
+-	ERRHRD, ERRgeneral, NT_STATUS_RANGE_NOT_FOUND}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_NO_RECOVERY_POLICY}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_NO_EFS}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_WRONG_EFS}, {
+-	ERRDOS, ERRnoaccess, NT_STATUS_NO_USER_KEYS}, {
+-	ERRDOS, ERRbadfunc, NT_STATUS_VOLUME_NOT_UPGRADED}, {
+-	ERRDOS, ERRsymlink, NT_STATUS_STOPPED_ON_SYMLINK}, {
+-	ERRDOS, ERRunknownlevel, NT_STATUS_OS2_INVALID_LEVEL}, {
+-	0, 0, 0 }
++/*
++ * Automatically generated by the `gen_smb1_mapping` script,
++ * sorted by NT status code (ascending).
++ */
++#include "smb1_mapping_table.c"
++	{0, 0, 0, NULL}
+ };
  
- #endif				/* _NTERR_H */
+ /*****************************************************************************
+@@ -685,12 +144,9 @@ static void
+ ntstatus_to_dos(__u32 ntstatus, __u8 *eclass, __u16 *ecode)
+ {
+ 	int i;
+-	if (ntstatus == 0) {
+-		*eclass = 0;
+-		*ecode = 0;
+-		return;
+-	}
+-	for (i = 0; ntstatus_to_dos_map[i].ntstatus; i++) {
++
++	/* Check nt_errstr to allow mapping of NT_STATUS_OK (0) */
++	for (i = 0; ntstatus_to_dos_map[i].nt_errstr; i++) {
+ 		if (ntstatus == ntstatus_to_dos_map[i].ntstatus) {
+ 			*eclass = ntstatus_to_dos_map[i].dos_class;
+ 			*ecode = ntstatus_to_dos_map[i].dos_code;
 -- 
 2.52.0
 
