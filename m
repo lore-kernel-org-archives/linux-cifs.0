@@ -1,32 +1,32 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F3B3988FA
-	for <linux-cifs@vger.kernel.org>; Wed,  1 Apr 2026 07:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F21B398914
+	for <linux-cifs@vger.kernel.org>; Wed,  1 Apr 2026 07:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775028654; cv=none; b=M5bVZZ92dG8itAaZhV46wKjqwik3BKx3vKCbIp1Jw7ileLzXk23kDnPzuP/XwCVv7nuiu1cH2Tl6DB5c3SVpb3qlpE2/U9sfYx0oGe+AUnDOHaQ40eTaC/pQQQIEtZo59TGcdRF/PUNI5jtVIHtD/u/f5/y7svGrc1m3Xd9CPoQ=
+	t=1775028656; cv=none; b=Nec2gC6jAVnizpls29h5PJg9LwBp9D91QWzK+wBJe6+i5ZUE8vTCQCYHaS7wjhWxPj4iuXMvLLL4C2zNjZWuMdCUMbkHA5k+aTraE4FNc9SVAS14NUuOPxnhCRZWJz9EZWmuYB7iqxkdkvLxSNfx44gu771QW0ROWODFa2tSxrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775028654; c=relaxed/simple;
-	bh=bLYgPgxoM0Ku9melY2KY4DmV+z+6iNRmEmTzqNNlQjM=;
+	s=arc-20240116; t=1775028656; c=relaxed/simple;
+	bh=BJutzYGmJ2JWTnzVClttQX9AVJucl2tQO0EE56xioDA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TJDGXOWJKALJlIhyrE5oDy7NLph7hpBlv+KLjIGX4rgJf0kexlkR3J1vfrxOUNMkmJavRy6KNvUlq5R32sgLHUlSfvF+XGlOH/p4hky+YTAv4QwtrdVu2jH6WzOMtENNoTeHVNhZuBAb9O8wC4KdwsLnzSAe7FUbVhwz+arWFgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UwypDknB; arc=none smtp.client-ip=91.218.175.180
+	 MIME-Version; b=Xsv3P0or3MiaPk9vz3KI21dSasJE4r53u+4jZxFE/836YGJVk/zIyI1OzyB+2j5YRIN9x8OhEBg2CjMI+790CT6pAqR5Tg61Sh0pE25v5hiayQoHAhl/mV+hEaLR6I51YhKqL+wq6SgXM+eMBcwSOfGVszKsD+hPTeXm9ijCjmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gwsyF6kA; arc=none smtp.client-ip=91.218.175.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UwypDknB"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gwsyF6kA"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775028650;
+	t=1775028653;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=AQd6gyemc8+zFy61sB3sFsbLgE3vIuKauaKBXjpp6sI=;
-	b=UwypDknBAChSpqfxM1a15rTztTmgVvQ3yzo9UahMwn6U8pq8wRveFEXjLGSFesbKuOlD+L
-	QyAQzrjGzASRkFlsThUfGz0RK2SBrXtYHFUZE63CSs6/LmjcRGQRZsB/mhvW57vpDitVrb
-	g9ArvFL8o3NEpLI0eEE2WmKQhv15AoQ=
+	bh=tJTSBrLiux3616BPNl9Dzbj7QN+xl8NvOsbdwp1LrIc=;
+	b=gwsyF6kAZwYZcim1LXTsxob++d6TaPPY1VckLjaY/oW1uv5MmknK7MdvUfXMw2diJm5G4B
+	sy19GOJQ/k6dYC3epCOLkwUZWmMdd4z6Cic4vdxvyPYCVcK4gKbdh9IhDm8VVScGol/SYn
+	3hNrVStgQTdID2gNDSWpythAXepaEDY=
 From: huiwen.he@linux.dev
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -40,11 +40,10 @@ To: smfrench@gmail.com,
 	chenxiaosong@kylinos.cn,
 	chenxiaosong@chenxiaosong.com,
 	tangyouling@kylinos.cn
-Cc: linux-cifs@vger.kernel.org,
-	Huiwen He <hehuiwen@kylinos.cn>
-Subject: [PATCH v2 10/12] smb/client: use binary search for SMB1 DOS/SRV error mapping
-Date: Wed,  1 Apr 2026 07:29:10 +0000
-Message-ID: <20260401072912.355072-11-huiwen.he@linux.dev>
+Cc: linux-cifs@vger.kernel.org
+Subject: [PATCH v2 11/12] smb/client: check if SMB1 DOS/SRV error mapping arrays are sorted
+Date: Wed,  1 Apr 2026 07:29:11 +0000
+Message-ID: <20260401072912.355072-12-huiwen.he@linux.dev>
 In-Reply-To: <20260401072912.355072-1-huiwen.he@linux.dev>
 References: <20260401072912.355072-1-huiwen.he@linux.dev>
 Precedence: bulk
@@ -56,148 +55,48 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: Huiwen He <hehuiwen@kylinos.cn>
+From: Youling Tang <tangyouling@kylinos.cn>
 
-Currently, map_smb_to_linux_error() uses linear searches for both
-mapping_table_ERRDOS[] and mapping_table_ERRSRV[].
+Although the arrays are sorted at build time, verify the ordering again
+when cifs.ko is loaded to avoid potential regressions introduced by
+future script changes.
 
-Refactor this by introducing a helper function smb1_map_to_posix() that
-implements binary search(as the tables are sorted). This improves lookup
-performance and reduces code duplication.
-
-Also remove the sentinel entries from the mapping tables as they are no
-longer needed with ARRAY_SIZE().
-
-Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+Signed-off-by: Youling Tang <tangyouling@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smb1maperror.c | 67 ++++++++++++++++++++----------------
- 1 file changed, 37 insertions(+), 30 deletions(-)
+ fs/smb/client/smb1maperror.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/fs/smb/client/smb1maperror.c b/fs/smb/client/smb1maperror.c
-index bed579afc37b..3074c60301ad 100644
+index 3074c60301ad..e8f559754178 100644
 --- a/fs/smb/client/smb1maperror.c
 +++ b/fs/smb/client/smb1maperror.c
-@@ -9,6 +9,7 @@
-  *   Copyright (C) Luke Kenneth Casson Leighton 1997-2001.
-  */
+@@ -219,6 +219,10 @@ static int __array ## _is_sorted(void)					\
  
-+#include <linux/bsearch.h>
- #include "cifsproto.h"
- #include "smb1proto.h"
- #include "smberr.h"
-@@ -20,13 +21,24 @@ struct smb_to_posix_error {
- 	int posix_code;
- };
+ /* ntstatus_to_dos_map_is_sorted */
+ DEFINE_CHECK_SORT_FUNC(ntstatus_to_dos_map, ntstatus);
++/* mapping_table_ERRDOS_is_sorted */
++DEFINE_CHECK_SORT_FUNC(mapping_table_ERRDOS, smb_err);
++/* mapping_table_ERRSRV_is_sorted */
++DEFINE_CHECK_SORT_FUNC(mapping_table_ERRSRV, smb_err);
  
-+static __always_inline int smb1_posix_error_cmp(const void *_key, const void *_pivot)
-+{
-+	__u16 key = *(__u16 *)_key;
-+	const struct smb_to_posix_error *pivot = _pivot;
+ int __init smb1_init_maperror(void)
+ {
+@@ -228,6 +232,14 @@ int __init smb1_init_maperror(void)
+ 	if (rc)
+ 		return rc;
+ 
++	rc = mapping_table_ERRDOS_is_sorted();
++	if (rc)
++		return rc;
 +
-+	if (key < pivot->smb_err)
-+		return -1;
-+	if (key > pivot->smb_err)
-+		return 1;
-+	return 0;
-+}
++	rc = mapping_table_ERRSRV_is_sorted();
++	if (rc)
++		return rc;
 +
- static const struct smb_to_posix_error mapping_table_ERRDOS[] = {
- /*
-  * Automatically generated by the `gen_smb1_mapping` script,
-  * sorted by DOS error code (ascending).
-  */
- #include "smb1_err_dos_map.c"
--	{0, 0}
- };
- 
- static const struct smb_to_posix_error mapping_table_ERRSRV[] = {
-@@ -35,7 +47,6 @@ static const struct smb_to_posix_error mapping_table_ERRSRV[] = {
-  * sorted by SRV error code (ascending).
-  */
- #include "smb1_err_srv_map.c"
--	{0, 0}
- };
- 
- /*****************************************************************************
-@@ -72,14 +83,32 @@ search_ntstatus_to_dos_map(__u32 ntstatus)
- 				ntstatus_to_dos_cmp);
+ 	return rc;
  }
  
-+static const struct smb_to_posix_error *
-+search_mapping_table_ERRDOS(__u16 smb_err)
-+{
-+	return __inline_bsearch(&smb_err, mapping_table_ERRDOS,
-+				ARRAY_SIZE(mapping_table_ERRDOS),
-+				sizeof(struct smb_to_posix_error),
-+				smb1_posix_error_cmp);
-+}
-+
-+static const struct smb_to_posix_error *
-+search_mapping_table_ERRSRV(__u16 smb_err)
-+{
-+	return __inline_bsearch(&smb_err, mapping_table_ERRSRV,
-+				ARRAY_SIZE(mapping_table_ERRSRV),
-+				sizeof(struct smb_to_posix_error),
-+				smb1_posix_error_cmp);
-+}
-+
- int
- map_smb_to_linux_error(char *buf, bool logErr)
- {
- 	struct smb_hdr *smb = (struct smb_hdr *)buf;
--	unsigned int i;
- 	int rc = -EIO;	/* if transport error smb error may not be set */
- 	__u8 smberrclass;
- 	__u16 smberrcode;
-+	const struct smb_to_posix_error *err_map = NULL;
- 
- 	/* BB if NT Status codes - map NT BB */
- 
-@@ -112,38 +141,16 @@ map_smb_to_linux_error(char *buf, bool logErr)
- 
- 	/* old style errors */
- 
--	/* DOS class smb error codes - map DOS */
- 	if (smberrclass == ERRDOS) {
-+		/* DOS class smb error codes - map DOS */
- 		/* 1 byte field no need to byte reverse */
--		for (i = 0;
--		     i <
--		     sizeof(mapping_table_ERRDOS) /
--		     sizeof(struct smb_to_posix_error); i++) {
--			if (mapping_table_ERRDOS[i].smb_err == 0)
--				break;
--			else if (mapping_table_ERRDOS[i].smb_err ==
--								smberrcode) {
--				rc = mapping_table_ERRDOS[i].posix_code;
--				break;
--			}
--			/* else try next error mapping one to see if match */
--		}
-+		err_map = search_mapping_table_ERRDOS(smberrcode);
- 	} else if (smberrclass == ERRSRV) {
- 		/* server class of error codes */
--		for (i = 0;
--		     i <
--		     sizeof(mapping_table_ERRSRV) /
--		     sizeof(struct smb_to_posix_error); i++) {
--			if (mapping_table_ERRSRV[i].smb_err == 0)
--				break;
--			else if (mapping_table_ERRSRV[i].smb_err ==
--								smberrcode) {
--				rc = mapping_table_ERRSRV[i].posix_code;
--				break;
--			}
--			/* else try next error mapping to see if match */
--		}
-+		err_map = search_mapping_table_ERRSRV(smberrcode);
- 	}
-+	if (err_map)
-+		rc = err_map->posix_code;
- 	/* else ERRHRD class errors or junk  - return EIO */
- 
- 	/* special cases for NT status codes which cannot be translated to DOS codes */
 -- 
 2.52.0
 
