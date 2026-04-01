@@ -1,32 +1,32 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2714A3939B6
-	for <linux-cifs@vger.kernel.org>; Wed,  1 Apr 2026 07:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A08A391846
+	for <linux-cifs@vger.kernel.org>; Wed,  1 Apr 2026 07:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775028648; cv=none; b=HcYosnzla3tNkl3jPWJq8LNkFq88fMlHcaZMs3wxMV0BzYaGas6eD/Lg3XZ2WIZCNAWjFKdvXvwoWmxXttild5m1gqZkHq7d6cbhFqT9K74vIeDRM3snjhpZvulgC5rLVFT83cZnDJ5M2nR3O+sXdaEp5+vUA+nS9/ngtOGLytQ=
+	t=1775028650; cv=none; b=UW3hUKVIMEa0JZHvt3cg4hWLVEYtVaiZhw2zQzdQQWqgB8WdFEdekPmPnWUA2ZLkhQj272a4sdKkTjt34eDfJPRRF+tvdCqR0dnbNdxU6ia43kbLS+mg2CUpGDf2WQzMZ8RhMePqmXAqneOUr9QyeQIuAQHM+VUZKAeo7+Q7dcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775028648; c=relaxed/simple;
-	bh=Av+kCMgmJKm1l5YSQ2/wlCBRsu+vKUaaKoFPPljprKg=;
+	s=arc-20240116; t=1775028650; c=relaxed/simple;
+	bh=xSOe+JewmnPFOSctjnNFy4BnCEeeasVzRxI8dTTX6CE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IuuNOqH5YPDqY6zG52/Av/xjAClox1rKU7Jg9nRZZ1VbH1kQucwhiPiHFzWKc4GcX4HX9x0Oswz+NzMBuhET66EVt8ibinvnN0y7RHRrSx4pw/Oxi/jdaeLP8jatGR4z8zSFeTttK+nR1WP2wCmPHYWsYKRfq2MsgLNjha8JGDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=P6+sJo6l; arc=none smtp.client-ip=91.218.175.185
+	 MIME-Version; b=jcuSMsrwRUnYXDtGP77FpXAh7GTnN3yjZ7r7MVI7nT2KHpREzcHjzr9RF26crTyrhG6QES6zIKo53UgAKuvna4/xps3n3GI/ScN2LnuTb9EugmWac6pi6MNTuL2PD90u3BqXMu14tojN+IZL5Qr3sqvDgTpmSfatj0n2zShuTXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HZT2/nUk; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="P6+sJo6l"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HZT2/nUk"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775028644;
+	t=1775028647;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Zt/EyGB58I/0MClPQKm2XMSdIrJsLfIw5LENoccuS9Y=;
-	b=P6+sJo6lkmi6UavHXZun9evHDj79CmojQn/zfR42yZ2PeaCpb35JI/Q9zt0TbpNOIEZlX0
-	vWnsT+P3Yu2/avK8UCHSUvsRp1Vsq7Gpl+kIhkivnzB8+D8EqN5ppIfG2k6Pcnl/0LDghi
-	yMK2Z+7bajYVjytLJbdzJ+2UkJgMZ80=
+	bh=cVVaEgzTXrfPR0ajrjHi80OSpSlNLx/inE6YDoc2LFA=;
+	b=HZT2/nUk4qpSfhjrWSAteFeFHI67tmc67bO5I+O+nGCKH2oNdrBbSVXpqDnxZZjTCyGzM/
+	4x9RU4PuLDTHXx7Ly1tlPrdNfWxO2qH1/ODgHvU2ijI55wjfNn7sy/xtvsxqzUwYD6zQUz
+	RgZiXQWGXgmSIcZg+rd4WLS1wrnlf28=
 From: huiwen.he@linux.dev
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -42,9 +42,9 @@ To: smfrench@gmail.com,
 	tangyouling@kylinos.cn
 Cc: linux-cifs@vger.kernel.org,
 	Huiwen He <hehuiwen@kylinos.cn>
-Subject: [PATCH v2 08/12] smb/client: annotate smberr.h with POSIX error codes
-Date: Wed,  1 Apr 2026 07:29:08 +0000
-Message-ID: <20260401072912.355072-9-huiwen.he@linux.dev>
+Subject: [PATCH v2 09/12] smb/client: autogenerate SMB1 DOS/SRV to POSIX error mapping
+Date: Wed,  1 Apr 2026 07:29:09 +0000
+Message-ID: <20260401072912.355072-10-huiwen.he@linux.dev>
 In-Reply-To: <20260401072912.355072-1-huiwen.he@linux.dev>
 References: <20260401072912.355072-1-huiwen.he@linux.dev>
 Precedence: bulk
@@ -58,571 +58,240 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-Annotate SMB1 error definitions in smberr.h with their corresponding
-POSIX error codes.
+Extend the `gen_smb1_mapping` script to support generating sorted POSIX
+error mapping tables for both ERRDOS and ERRSRV classes at compile time.
 
-To facilitate automated processing and ensure consistent formatting,
-existing inline comments (/* ... */) in smberr.h were first moved to
-the lines preceding the #define statements.
+The script parses annotations from smberr.h to generate smb1_err_dos_map.c
+and smb1_err_srv_map.c, which are included as the contents of the arrays
+mapping_table_ERRDOS[] and mapping_table_ERRSRV[], respectively.
 
-This provides the source data for generating sorted mapping tables,
-allowing the implementation of binary search for faster error mapping
-lookups in later commits.
-
-The annotations were performed based on the manual
-mapping_table_ERRDOS[] and mapping_table_ERRSRV[] arrays in
-smb1maperror.c using the following python script:
-
-	#!/usr/bin/env python3
-	import re
-	import os
-
-	MAP_FILE = "fs/smb/client/smb1maperror.c"
-	SMBERR_FILE = "fs/smb/client/smberr.h"
-
-	def get_mappings():
-	    mappings = {}
-	    if not os.path.exists(MAP_FILE):
-		return mappings
-	    with open(MAP_FILE, "r") as f:
-		content = f.read()
-	    for table in ["mapping_table_ERRDOS", "mapping_table_ERRSRV"]:
-		pattern = (
-		    rf'static const struct smb_to_posix_error {table}\[\] = '
-		    r'\{([\s\S]+?)\};'
-		)
-		match = re.search(pattern, content)
-		if match:
-		    entry_pattern = (
-			r'\{\s*([A-Za-z0-9_]+)\s*,\s*'
-			r'(-[A-Z0-9_]+)\s*\}'
-		    )
-		    entries = re.findall(entry_pattern, match.group(1))
-		    for name, posix in entries:
-			if name != "0":
-			    mappings[name] = posix
-	    return mappings
-
-	def format_comment(comment_lines):
-	    """
-	    Formats comment lines to comply with Linux kernel coding style.
-	    Single-line comments remain on one line.
-	    Multi-line comments use the standard block format.
-	    """
-	    raw_text = []
-	    for line in comment_lines:
-		line = line.strip()
-		if line.startswith('/*'):
-		    line = line[2:]
-		if line.endswith('*/'):
-		    line = line[:-2]
-		line = line.lstrip(' *').strip()
-		if line:
-		    raw_text.append(line)
-
-	    if not raw_text:
-		return []
-
-	    # If it's a single line of text, keep it simple
-	    if len(raw_text) == 1:
-		return [f"/* {raw_text[0]} */"]
-
-	    # Multi-line: Standard Kernel Block Comment Format
-	    formatted = ["/*"]
-	    for text in raw_text:
-		formatted.append(f" * {text}")
-	    formatted.append(" */")
-	    return formatted
-
-	def fix_content(content, mappings):
-	    lines = content.splitlines()
-	    new_lines, i = [], 0
-	    while i < len(lines):
-		line = lines[i]
-		# Match #define with inline comment
-		define_re = (
-		    r'^(\s*#define\s+([A-Za-z0-9_]+)\s+'
-		    r'[^\s/]+)\s*/\*'
-		)
-		match = re.match(define_re, line)
-		if match:
-		    prefix, name = match.group(1), match.group(2)
-
-		    # Extract full comment block
-		    comment_block = [line[line.find('/*'):].strip()]
-		    if '*/' not in line:
-			while i + 1 < len(lines):
-			    i += 1
-			    comment_block.append(lines[i].strip())
-			    if '*/' in lines[i]:
-				break
-
-		    # Format and add comment
-		    new_lines.extend(format_comment(comment_block))
-
-		    # Add define with tab-separated POSIX code
-		    new_define = prefix.rstrip()
-		    if name in mappings:
-			new_define += '\t// ' + mappings[name]
-		    new_lines.append(new_define)
-		else:
-		    no_comment_re = (
-			r'^(\s*#define\s+([A-Za-z0-9_]+)\s+'
-			r'[^\s/]+)\s*$'
-		    )
-		    match_no_comment = re.match(no_comment_re, line)
-		    if match_no_comment:
-			prefix = match_no_comment.group(1)
-			name = match_no_comment.group(2)
-			new_define = prefix.rstrip()
-			if name in mappings:
-			    new_define += '\t// ' + mappings[name]
-			new_lines.append(new_define)
-		    else:
-			new_lines.append(line)
-		i += 1
-	    return '\n'.join(new_lines)
-
-	if __name__ == "__main__":
-	    m = get_mappings()
-	    if os.path.exists(SMBERR_FILE):
-		with open(SMBERR_FILE, "r") as f:
-		    content = f.read()
-		fixed = fix_content(content, m)
-		with open(SMBERR_FILE, "w") as f:
-		    f.write(fixed + '\n')
-		print(f"Successfully processed {SMBERR_FILE}")
+This ensures that the mapping logic remains synchronized with the source
+headers and prepares for faster error lookups using binary search in the
+future.
 
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smberr.h | 398 ++++++++++++++++++++++++++---------------
- 1 file changed, 256 insertions(+), 142 deletions(-)
+ fs/smb/client/.gitignore       |  2 +
+ fs/smb/client/Makefile         |  9 +++-
+ fs/smb/client/gen_smb1_mapping | 25 ++++++++++
+ fs/smb/client/smb1maperror.c   | 85 ++++------------------------------
+ fs/smb/client/smberr.h         | 12 ++++-
+ 5 files changed, 54 insertions(+), 79 deletions(-)
 
+diff --git a/fs/smb/client/.gitignore b/fs/smb/client/.gitignore
+index d5ea5ac6015d..66e6e2ade0bd 100644
+--- a/fs/smb/client/.gitignore
++++ b/fs/smb/client/.gitignore
+@@ -1,2 +1,4 @@
+ smb1_mapping_table.c
++smb1_err_dos_map.c
++smb1_err_srv_map.c
+ smb2_mapping_table.c
+diff --git a/fs/smb/client/Makefile b/fs/smb/client/Makefile
+index 220a97c8a488..6e83b5204699 100644
+--- a/fs/smb/client/Makefile
++++ b/fs/smb/client/Makefile
+@@ -46,13 +46,18 @@ cifs-$(CONFIG_CIFS_COMPRESSION) += compress.o compress/lz77.o
+ 
+ ifneq ($(CONFIG_CIFS_ALLOW_INSECURE_LEGACY),)
+ #
+-# Build the SMB1 error mapping tables from nterr.h
++# Build the SMB1 error mapping tables from nterr.h and smberr.h
+ #
+-smb1-gen-y := smb1_mapping_table.c
++smb1-gen-y := smb1_mapping_table.c \
++	      smb1_err_dos_map.c \
++	      smb1_err_srv_map.c
+ 
+ $(obj)/smb1_mapping_table.c: $(src)/nterr.h $(src)/gen_smb1_mapping FORCE
+ 	$(call if_changed,gen_smb1_mapping)
+ 
++$(obj)/smb1_err_%.c: $(src)/smberr.h $(src)/gen_smb1_mapping FORCE
++	$(call if_changed,gen_smb1_mapping)
++
+ $(obj)/smb1maperror.o: $(addprefix $(obj)/, $(smb1-gen-y))
+ 
+ quiet_cmd_gen_smb1_mapping = GEN     $@
+diff --git a/fs/smb/client/gen_smb1_mapping b/fs/smb/client/gen_smb1_mapping
+index 52ea4fdccbcd..51a77e745bfa 100644
+--- a/fs/smb/client/gen_smb1_mapping
++++ b/fs/smb/client/gen_smb1_mapping
+@@ -21,6 +21,7 @@ my $input_name  = (split m|/|, $in_file)[-1];
+ my $script_name = (split m|/|, $0)[-1];
+ my @list     = ();
+ my %seen     = ();
++my $current_class = "";
+ 
+ # Parse annotated entries from the input file
+ open(my $in, "<", $in_file) or die "Cannot open $in_file: $!";
+@@ -45,6 +46,20 @@ if ($in_file =~ /nterr\.h$/) {
+ 			push @list, { val => $val, name => $name, class => $class, code => $code };
+ 		}
+ 	}
++} elsif ($in_file =~ /smberr\.h$/) {
++	while (<$in>) {
++		# Detect current error class from header comments (ERRDOS or ERRSRV)
++		if (/generated with the (\w+) error class/) {
++			$current_class = $1;
++		}
++
++		# Match #define ERR... <value> // -POSIX_ERR
++		if (/^\s*#define\s+(ERR[A-Za-z0-9_]+)\s+([0-9a-fA-FxX]+)\s*\/\/\s*(-[A-Z0-9_]+)/) {
++			my ($name, $val_str, $error) = ($1, $2, $3);
++			my $val = ($val_str =~ /^0x/i) ? hex($val_str) : $val_str;
++			push @list, { val => $val, name => $name, error => $error, class => $current_class };
++		}
++	}
+ }
+ close($in);
+ 
+@@ -80,5 +95,15 @@ if ($in_file =~ /nterr\.h$/) {
+ 
+ 		$full_names = "";
+ 	}
++} elsif ($in_file =~ /smberr\.h$/) {
++	# Generate SMB1 error -> POSIX error mapping file smb1_err_dos_map.c and smb1_err_srv_map.c
++
++	# Filtered by dos/srv
++	my $filter = ($out_file =~ /dos/) ? "ERRDOS" : ($out_file =~ /srv/ ? "ERRSRV" : "");
++	foreach my $e (@list) {
++		if (!$filter || $e->{class} eq $filter) {
++			printf $out "\t{%s, %s},\n", $e->{name}, $e->{error};
++		}
++	}
+ }
+ close($out);
+diff --git a/fs/smb/client/smb1maperror.c b/fs/smb/client/smb1maperror.c
+index 499cacfeba6d..bed579afc37b 100644
+--- a/fs/smb/client/smb1maperror.c
++++ b/fs/smb/client/smb1maperror.c
+@@ -21,85 +21,20 @@ struct smb_to_posix_error {
+ };
+ 
+ static const struct smb_to_posix_error mapping_table_ERRDOS[] = {
+-	{ERRbadfunc, -EINVAL},
+-	{ERRbadfile, -ENOENT},
+-	{ERRbadpath, -ENOTDIR},
+-	{ERRnofids, -EMFILE},
+-	{ERRnoaccess, -EACCES},
+-	{ERRbadfid, -EBADF},
+-	{ERRbadmcb, -EIO},
+-	{ERRnomem, -EREMOTEIO},
+-	{ERRbadmem, -EFAULT},
+-	{ERRbadenv, -EFAULT},
+-	{ERRbadformat, -EINVAL},
+-	{ERRbadaccess, -EACCES},
+-	{ERRbaddata, -EIO},
+-	{ERRbaddrive, -ENXIO},
+-	{ERRremcd, -EACCES},
+-	{ERRdiffdevice, -EXDEV},
+-	{ERRnofiles, -ENOENT},
+-	{ERRwriteprot, -EROFS},
+-	{ERRbadshare, -EBUSY},
+-	{ERRlock, -EACCES},
+-	{ERRunsup, -EINVAL},
+-	{ERRnosuchshare, -ENXIO},
+-	{ERRfilexists, -EEXIST},
+-	{ERRinvparm, -EINVAL},
+-	{ERRdiskfull, -ENOSPC},
+-	{ERRinvname, -ENOENT},
+-	{ERRunknownlevel, -EOPNOTSUPP},
+-	{ERRdirnotempty, -ENOTEMPTY},
+-	{ERRnotlocked, -ENOLCK},
+-	{ERRcancelviolation, -ENOLCK},
+-	{ERRalreadyexists, -EEXIST},
+-	{ERRmoredata, -EOVERFLOW},
+-	{ERReasnotsupported, -EOPNOTSUPP},
+-	{ErrQuota, -EDQUOT},
+-	{ErrNotALink, -ENOLINK},
+-	{ERRnetlogonNotStarted, -ENOPROTOOPT},
+-	{ERRsymlink, -EOPNOTSUPP},
+-	{ErrTooManyLinks, -EMLINK},
++/*
++ * Automatically generated by the `gen_smb1_mapping` script,
++ * sorted by DOS error code (ascending).
++ */
++#include "smb1_err_dos_map.c"
+ 	{0, 0}
+ };
+ 
+ static const struct smb_to_posix_error mapping_table_ERRSRV[] = {
+-	{ERRerror, -EIO},
+-	{ERRbadpw, -EACCES},  /* was EPERM */
+-	{ERRbadtype, -EREMOTE},
+-	{ERRaccess, -EACCES},
+-	{ERRinvtid, -ENXIO},
+-	{ERRinvnetname, -ENXIO},
+-	{ERRinvdevice, -ENXIO},
+-	{ERRqfull, -ENOSPC},
+-	{ERRqtoobig, -ENOSPC},
+-	{ERRqeof, -EIO},
+-	{ERRinvpfid, -EBADF},
+-	{ERRsmbcmd, -EBADRQC},
+-	{ERRsrverror, -EIO},
+-	{ERRbadBID, -EIO},
+-	{ERRfilespecs, -EINVAL},
+-	{ERRbadLink, -EIO},
+-	{ERRbadpermits, -EINVAL},
+-	{ERRbadPID, -ESRCH},
+-	{ERRsetattrmode, -EINVAL},
+-	{ERRpaused, -EHOSTDOWN},
+-	{ERRmsgoff, -EHOSTDOWN},
+-	{ERRnoroom, -ENOSPC},
+-	{ERRrmuns, -EUSERS},
+-	{ERRtimeout, -ETIME},
+-	{ERRnoresource, -EREMOTEIO},
+-	{ERRtoomanyuids, -EUSERS},
+-	{ERRbaduid, -EACCES},
+-	{ERRusempx, -EIO},
+-	{ERRusestd, -EIO},
+-	{ERR_NOTIFY_ENUM_DIR, -ENOBUFS},
+-	{ERRnoSuchUser, -EACCES},
+-	{ERRaccountexpired, -EKEYEXPIRED},
+-	{ERRbadclient, -EACCES},
+-	{ERRbadLogonTime, -EACCES},
+-	{ERRpasswordExpired, -EKEYEXPIRED},
+-
+-	{ERRnosupport, -EINVAL},
++/*
++ * Automatically generated by the `gen_smb1_mapping` script,
++ * sorted by SRV error code (ascending).
++ */
++#include "smb1_err_srv_map.c"
+ 	{0, 0}
+ };
+ 
 diff --git a/fs/smb/client/smberr.h b/fs/smb/client/smberr.h
-index 6fb63f9e9a95..a848b6ad987a 100644
+index a848b6ad987a..98074c64587d 100644
 --- a/fs/smb/client/smberr.h
 +++ b/fs/smb/client/smberr.h
-@@ -9,11 +9,16 @@
-  *
-  */
+@@ -24,7 +24,11 @@
  
--#define SUCCESS	0x00	/* The request was successful. */
--#define ERRDOS	0x01	/* Error is from the core DOS operating system set */
--#define ERRSRV	0x02	/* Error is generated by the file server daemon */
--#define ERRHRD	0x03	/* Error is a hardware error. */
--#define ERRCMD	0xFF	/* Command was not in the "SMB" format. */
-+/* The request was successful. */
-+#define SUCCESS	0x00
-+/* Error is from the core DOS operating system set */
-+#define ERRDOS	0x01
-+/* Error is generated by the file server daemon */
-+#define ERRSRV	0x02
-+/* Error is a hardware error. */
-+#define ERRHRD	0x03
-+/* Command was not in the "SMB" format. */
-+#define ERRCMD	0xFF
+ /*#define SUCCESS	0	The request was successful. */
  
- /* The following error codes may be generated with the SUCCESS error class.*/
+-/* The following error codes may be generated with the ERRDOS error class.*/
++/*
++ * The following error codes may be generated with the ERRDOS error class.
++ * The comment at the end of each definition indicates the POSIX error
++ * code; it is used to generate the `mapping_table_ERRDOS` array.
++ */
  
-@@ -21,151 +26,260 @@
+ /*
+  * Invalid function. The server did not
+@@ -161,7 +165,11 @@
+ #define ERRsymlink              0xFFFD	// -EOPNOTSUPP
+ #define ErrTooManyLinks         0xFFFE	// -EMLINK
  
- /* The following error codes may be generated with the ERRDOS error class.*/
+-/* Following error codes may be generated with the ERRSRV error class.*/
++/*
++ * The following error codes may be generated with the ERRSRV error class.
++ * The comment at the end of each definition indicates the POSIX error
++ * code; it is used to generate the `mapping_table_ERRSRV` array.
++ */
  
--#define ERRbadfunc		1	/* Invalid function. The server did not
--					   recognize or could not perform a
--					   system call generated by the server,
--					   e.g., set the DIRECTORY attribute on
--					   a data file, invalid seek mode. */
--#define ERRbadfile		2	/* File not found. The last component
--					   of a file's pathname could not be
--					   found. */
--#define ERRbadpath		3	/* Directory invalid. A directory
--					   component in a pathname could not be
--					   found. */
--#define ERRnofids		4	/* Too many open files. The server has
--					   no file handles available. */
--#define ERRnoaccess		5	/* Access denied, the client's context
--					   does not permit the requested
--					   function. This includes the
--					   following conditions: invalid rename
--					   command, write to Fid open for read
--					   only, read on Fid open for write
--					   only, attempt to delete a non-empty
--					   directory */
--#define ERRbadfid		6	/* Invalid file handle. The file handle
--					   specified was not recognized by the
--					   server. */
--#define ERRbadmcb		7	/* Memory control blocks destroyed. */
--#define ERRnomem		8	/* Insufficient server memory to
--					   perform the requested function. */
--#define ERRbadmem		9	/* Invalid memory block address. */
--#define ERRbadenv		10	/* Invalid environment. */
--#define ERRbadformat		11	/* Invalid format. */
--#define ERRbadaccess		12	/* Invalid open mode. */
--#define ERRbaddata		13	/* Invalid data (generated only by
--					   IOCTL calls within the server). */
--#define ERRbaddrive		15	/* Invalid drive specified. */
--#define ERRremcd		16	/* A Delete Directory request attempted
--					   to remove the server's current
--					   directory. */
--#define ERRdiffdevice		17	/* Not same device (e.g., a cross
--					   volume rename was attempted */
--#define ERRnofiles		18	/* A File Search command can find no
--					   more files matching the specified
--					   criteria. */
--#define ERRwriteprot		19	/* media is write protected */
-+/*
-+ * Invalid function. The server did not
-+ * recognize or could not perform a
-+ * system call generated by the server,
-+ * e.g., set the DIRECTORY attribute on
-+ * a data file, invalid seek mode.
-+ */
-+#define ERRbadfunc		1	// -EINVAL
-+/*
-+ * File not found. The last component
-+ * of a file's pathname could not be
-+ * found.
-+ */
-+#define ERRbadfile		2	// -ENOENT
-+/*
-+ * Directory invalid. A directory
-+ * component in a pathname could not be
-+ * found.
-+ */
-+#define ERRbadpath		3	// -ENOTDIR
-+/*
-+ * Too many open files. The server has
-+ * no file handles available.
-+ */
-+#define ERRnofids		4	// -EMFILE
-+/*
-+ * Access denied, the client's context
-+ * does not permit the requested
-+ * function. This includes the
-+ * following conditions: invalid rename
-+ * command, write to Fid open for read
-+ * only, read on Fid open for write
-+ * only, attempt to delete a non-empty
-+ * directory
-+ */
-+#define ERRnoaccess		5	// -EACCES
-+/*
-+ * Invalid file handle. The file handle
-+ * specified was not recognized by the
-+ * server.
-+ */
-+#define ERRbadfid		6	// -EBADF
-+/* Memory control blocks destroyed. */
-+#define ERRbadmcb		7	// -EIO
-+/*
-+ * Insufficient server memory to
-+ * perform the requested function.
-+ */
-+#define ERRnomem		8	// -EREMOTEIO
-+/* Invalid memory block address. */
-+#define ERRbadmem		9	// -EFAULT
-+/* Invalid environment. */
-+#define ERRbadenv		10	// -EFAULT
-+/* Invalid format. */
-+#define ERRbadformat		11	// -EINVAL
-+/* Invalid open mode. */
-+#define ERRbadaccess		12	// -EACCES
-+/*
-+ * Invalid data (generated only by
-+ * IOCTL calls within the server).
-+ */
-+#define ERRbaddata		13	// -EIO
-+/* Invalid drive specified. */
-+#define ERRbaddrive		15	// -ENXIO
-+/*
-+ * A Delete Directory request attempted
-+ * to remove the server's current
-+ * directory.
-+ */
-+#define ERRremcd		16	// -EACCES
-+/*
-+ * Not same device (e.g., a cross
-+ * volume rename was attempted
-+ */
-+#define ERRdiffdevice		17	// -EXDEV
-+/*
-+ * A File Search command can find no
-+ * more files matching the specified
-+ * criteria.
-+ */
-+#define ERRnofiles		18	// -ENOENT
-+/* media is write protected */
-+#define ERRwriteprot		19	// -EROFS
- #define ERRgeneral		31
--#define ERRbadshare		32	/* The sharing mode specified for an
--					   Open conflicts with existing FIDs on
--					   the file. */
--#define ERRlock			33	/* A Lock request conflicted with an
--					   existing lock or specified an
--					   invalid mode, or an Unlock requested
--					   attempted to remove a lock held by
--					   another process. */
--#define ERRunsup		50
--#define ERRnosuchshare		67
--#define ERRfilexists		80	/* The file named in the request
--					   already exists. */
--#define ERRinvparm		87
--#define ERRdiskfull		112
--#define ERRinvname		123
--#define ERRunknownlevel		124
--#define ERRdirnotempty		145
--#define ERRnotlocked		158
--#define ERRcancelviolation	173
--#define ERRalreadyexists	183
-+/*
-+ * The sharing mode specified for an
-+ * Open conflicts with existing FIDs on
-+ * the file.
-+ */
-+#define ERRbadshare		32	// -EBUSY
-+/*
-+ * A Lock request conflicted with an
-+ * existing lock or specified an
-+ * invalid mode, or an Unlock requested
-+ * attempted to remove a lock held by
-+ * another process.
-+ */
-+#define ERRlock			33	// -EACCES
-+#define ERRunsup		50	// -EINVAL
-+#define ERRnosuchshare		67	// -ENXIO
-+/*
-+ * The file named in the request
-+ * already exists.
-+ */
-+#define ERRfilexists		80	// -EEXIST
-+#define ERRinvparm		87	// -EINVAL
-+#define ERRdiskfull		112	// -ENOSPC
-+#define ERRinvname		123	// -ENOENT
-+#define ERRunknownlevel		124	// -EOPNOTSUPP
-+#define ERRdirnotempty		145	// -ENOTEMPTY
-+#define ERRnotlocked		158	// -ENOLCK
-+#define ERRcancelviolation	173	// -ENOLCK
-+#define ERRalreadyexists	183	// -EEXIST
- #define ERRbadpipe		230
- #define ERRpipebusy		231
- #define ERRpipeclosing		232
- #define ERRnotconnected		233
--#define ERRmoredata		234
--#define ERReasnotsupported	282
--#define ErrQuota		0x200	/* The operation would cause a quota
--					   limit to be exceeded. */
--#define ErrNotALink		0x201	/* A link operation was performed on a
--					   pathname that was not a link. */
-+#define ERRmoredata		234	// -EOVERFLOW
-+#define ERReasnotsupported	282	// -EOPNOTSUPP
-+/*
-+ * The operation would cause a quota
-+ * limit to be exceeded.
-+ */
-+#define ErrQuota		0x200	// -EDQUOT
-+/*
-+ * A link operation was performed on a
-+ * pathname that was not a link.
-+ */
-+#define ErrNotALink		0x201	// -ENOLINK
- 
- /* Below errors are used internally (do not come over the wire) for passthrough
-    from STATUS codes to POSIX only  */
--#define ERRsymlink              0xFFFD
--#define ErrTooManyLinks         0xFFFE
-+#define ERRsymlink              0xFFFD	// -EOPNOTSUPP
-+#define ErrTooManyLinks         0xFFFE	// -EMLINK
- 
- /* Following error codes may be generated with the ERRSRV error class.*/
- 
--#define ERRerror		1	/* Non-specific error code. It is
--					   returned under the following
--					   conditions: resource other than disk
--					   space exhausted (e.g. TIDs), first
--					   SMB command was not negotiate,
--					   multiple negotiates attempted, and
--					   internal server error. */
--#define ERRbadpw		2	/* Bad password - name/password pair in
--					   a TreeConnect or Session Setup are
--					   invalid. */
--#define ERRbadtype		3	/* used for indicating DFS referral
--					   needed */
--#define ERRaccess		4	/* The client does not have the
--					   necessary access rights within the
--					   specified context for requested
--					   function. */
--#define ERRinvtid		5	/* The Tid specified in a command was
--					   invalid. */
--#define ERRinvnetname		6	/* Invalid network name in tree
--					   connect. */
--#define ERRinvdevice		7	/* Invalid device - printer request
--					   made to non-printer connection or
--					   non-printer request made to printer
--					   connection. */
--#define ERRqfull		49	/* Print queue full (files) -- returned
--					   by open print file. */
--#define ERRqtoobig		50	/* Print queue full -- no space. */
--#define ERRqeof			51	/* EOF on print queue dump */
--#define ERRinvpfid		52	/* Invalid print file FID. */
--#define ERRsmbcmd		64	/* The server did not recognize the
--					   command received. */
--#define ERRsrverror		65	/* The server encountered an internal
--					   error, e.g., system file
--					   unavailable. */
--#define ERRbadBID		66	/* (obsolete) */
--#define ERRfilespecs		67	/* The Fid and pathname parameters
--					   contained an invalid combination of
--					   values. */
--#define ERRbadLink		68	/* (obsolete) */
--#define ERRbadpermits		69	/* The access permissions specified for
--					   a file or directory are not a valid
--					   combination. */
--#define ERRbadPID		70
--#define ERRsetattrmode		71	/* attribute (mode) is invalid */
--#define ERRpaused		81	/* Server is paused */
--#define ERRmsgoff		82	/* reserved - messaging off */
--#define ERRnoroom		83	/* reserved - no room for message */
--#define ERRrmuns		87	/* reserved - too many remote names */
--#define ERRtimeout		88	/* operation timed out */
--#define ERRnoresource		89	/* No resources available for request
--					   */
--#define ERRtoomanyuids		90	/* Too many UIDs active on this session
--					   */
--#define ERRbaduid		91	/* The UID is not known as a valid user
--					   */
--#define ERRusempx		250	/* temporarily unable to use raw */
--#define ERRusestd		251	/* temporarily unable to use either raw
--					   or mpx */
--#define ERR_NOTIFY_ENUM_DIR	1024
--#define ERRnoSuchUser		2238	/* user account does not exist */
--#define ERRaccountexpired	2239
--#define ERRbadclient		2240	/* can not logon from this client */
--#define ERRbadLogonTime		2241	/* logon hours do not allow this */
--#define ERRpasswordExpired	2242
--#define ERRnetlogonNotStarted	2455
--#define ERRnosupport		0xFFFF
-+/*
-+ * Non-specific error code. It is
-+ * returned under the following
-+ * conditions: resource other than disk
-+ * space exhausted (e.g. TIDs), first
-+ * SMB command was not negotiate,
-+ * multiple negotiates attempted, and
-+ * internal server error.
-+ */
-+#define ERRerror		1	// -EIO
-+/*
-+ * Bad password - name/password pair in
-+ * a TreeConnect or Session Setup are
-+ * invalid.
-+ */
-+#define ERRbadpw		2	// -EACCES
-+/*
-+ * used for indicating DFS referral
-+ * needed
-+ */
-+#define ERRbadtype		3	// -EREMOTE
-+/*
-+ * The client does not have the
-+ * necessary access rights within the
-+ * specified context for requested
-+ * function.
-+ */
-+#define ERRaccess		4	// -EACCES
-+/*
-+ * The Tid specified in a command was
-+ * invalid.
-+ */
-+#define ERRinvtid		5	// -ENXIO
-+/*
-+ * Invalid network name in tree
-+ * connect.
-+ */
-+#define ERRinvnetname		6	// -ENXIO
-+/*
-+ * Invalid device - printer request
-+ * made to non-printer connection or
-+ * non-printer request made to printer
-+ * connection.
-+ */
-+#define ERRinvdevice		7	// -ENXIO
-+/*
-+ * Print queue full (files) -- returned
-+ * by open print file.
-+ */
-+#define ERRqfull		49	// -ENOSPC
-+/* Print queue full -- no space. */
-+#define ERRqtoobig		50	// -ENOSPC
-+/* EOF on print queue dump */
-+#define ERRqeof			51	// -EIO
-+/* Invalid print file FID. */
-+#define ERRinvpfid		52	// -EBADF
-+/*
-+ * The server did not recognize the
-+ * command received.
-+ */
-+#define ERRsmbcmd		64	// -EBADRQC
-+/*
-+ * The server encountered an internal
-+ * error, e.g., system file
-+ * unavailable.
-+ */
-+#define ERRsrverror		65	// -EIO
-+/* (obsolete) */
-+#define ERRbadBID		66	// -EIO
-+/*
-+ * The Fid and pathname parameters
-+ * contained an invalid combination of
-+ * values.
-+ */
-+#define ERRfilespecs		67	// -EINVAL
-+/* (obsolete) */
-+#define ERRbadLink		68	// -EIO
-+/*
-+ * The access permissions specified for
-+ * a file or directory are not a valid
-+ * combination.
-+ */
-+#define ERRbadpermits		69	// -EINVAL
-+#define ERRbadPID		70	// -ESRCH
-+/* attribute (mode) is invalid */
-+#define ERRsetattrmode		71	// -EINVAL
-+/* Server is paused */
-+#define ERRpaused		81	// -EHOSTDOWN
-+/* reserved - messaging off */
-+#define ERRmsgoff		82	// -EHOSTDOWN
-+/* reserved - no room for message */
-+#define ERRnoroom		83	// -ENOSPC
-+/* reserved - too many remote names */
-+#define ERRrmuns		87	// -EUSERS
-+/* operation timed out */
-+#define ERRtimeout		88	// -ETIME
-+/* No resources available for request */
-+#define ERRnoresource		89	// -EREMOTEIO
-+/* Too many UIDs active on this session */
-+#define ERRtoomanyuids		90	// -EUSERS
-+/* The UID is not known as a valid user */
-+#define ERRbaduid		91	// -EACCES
-+/* temporarily unable to use raw */
-+#define ERRusempx		250	// -EIO
-+/*
-+ * temporarily unable to use either raw
-+ * or mpx
-+ */
-+#define ERRusestd		251	// -EIO
-+#define ERR_NOTIFY_ENUM_DIR	1024	// -ENOBUFS
-+/* user account does not exist */
-+#define ERRnoSuchUser		2238	// -EACCES
-+#define ERRaccountexpired	2239	// -EKEYEXPIRED
-+/* can not logon from this client */
-+#define ERRbadclient		2240	// -EACCES
-+/* logon hours do not allow this */
-+#define ERRbadLogonTime		2241	// -EACCES
-+#define ERRpasswordExpired	2242	// -EKEYEXPIRED
-+#define ERRnetlogonNotStarted	2455	// -ENOPROTOOPT
-+#define ERRnosupport		0xFFFF	// -EINVAL
+ /*
+  * Non-specific error code. It is
 -- 
 2.52.0
 
