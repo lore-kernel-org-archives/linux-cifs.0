@@ -1,173 +1,129 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4354262A6
-	for <linux-cifs@vger.kernel.org>; Wed,  1 Apr 2026 02:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F327728690
+	for <linux-cifs@vger.kernel.org>; Wed,  1 Apr 2026 02:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.178
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775009009; cv=pass; b=s6AtG07ajeS0I4mBzum/MW9MeCCz82voqhGMTySzOGE8gh3I39TkIM05GTs5fadpu3JQinQSSG1f5X25/G8dhXUQmItjJmRwksxzNZozVEquQnC9/yhtx8y8IraIJ1F4rmQ88qBg3kmaOHFGPHk2MPNteXKQiyhwKBucij4C2Us=
+	t=1775009654; cv=pass; b=Temyl6BJ4v6wEe7UJS/jEJlRvjjDVWsXZafBdjCGFdA5ZMcSur8NvvxbYxfIrH3CYMr8ZuHVxMTCg6qlrfcGf6t9eUWNL13CuBI8siowDMf+5Oo/A86uktNMB9GN13wB4y9H7ioLv0aBKGguiGtdjtTwQpjUAmensmcuEVap+zk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775009009; c=relaxed/simple;
-	bh=bkq4RJvRpdOkYigdy1BNCZbiY0QSPiawTZRFjMzYhLc=;
+	s=arc-20240116; t=1775009654; c=relaxed/simple;
+	bh=p2+7Bu+ZeRVjzsfnR5hiOqqix18FZJbHmV2+4pPGsn4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rge1hTnvAa2fyrNFGTB5aXt0XUezvwuxUMqIk6JMQITUImOy/bIdFr3pCE72tv8DGR7bQvixwhDuugSGRbJjQ2/oDCzsQitChoIv3sKgb8xkEcPhWSC0mBRo/0ii/u82adHJh/hU1CN3HUC+MGxRRWaWiLSd2MTb+zSt9GHoizU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e4DEfysm; arc=pass smtp.client-ip=209.85.219.43
+	 To:Cc:Content-Type; b=rGUUZjKFrtcvpyp7NGJY3vykvJjE6hYaafEVL8ncTLJ91KkiSnsmmh5K+GTpHWPpNYMqWsodxT3tqSQ4ChC2TPu5avtDDsdNflM9cfKRDk4dMPAjV3Kt+xbdrOhp4r99x1uO86oJwCpJ90P0gkUTssRIF6cgtj2Dpz4VEXI7Ro0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=czPEUTN4; arc=pass smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e4DEfysm"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8a05c388b27so33387276d6.3
-        for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 19:03:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775009007; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="czPEUTN4"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8cfc795ca97so575122185a.0
+        for <linux-cifs@vger.kernel.org>; Tue, 31 Mar 2026 19:14:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775009652; cv=none;
         d=google.com; s=arc-20240605;
-        b=EnKzd9IgZIg3aKFnJ345zrrfIVW3eEfUGXOICh6Infj+BCJQIKb8uxUiRaE6DBzubt
-         pWvJY/uUlYBhpmL2yUrWQ+Db1J8JyKiAz9S3lX/gwa3mlrDELusGxSn7yxyMD4+MwBIr
-         4zDeAqLggN7G8KLU5C0DIm/rcKsGtms+GCdTrgwR38T5NWImI6oUQigXYfJTISASoFK0
-         j2VtmbnVBpHt1lM6EpRnyRx32tdmWAETsapnHn9a43CHA8wA47vgfDTd/FiQki1T65ze
-         6/Kt658LRsFiW+ID+gLaXIMa+1TCvu6P1ZN38/SfKFxvf3vYfeXkkinlYJidPJUZrFyL
-         E0mQ==
+        b=jLeVJhzsPXEWCyQh60/IKkxM5dayz6e1ioL6XsJFXr5TF6LLbzy2SZ1kiG5h9VO0p+
+         zJdaQHLGeWjZwAESefRPwy0rjozHK3TLD9wSFpGVnIHyNesRbovgiM+J2s5vkj280QxF
+         OG5EjmwaCaj1bM9jK3LJHqhul1fpuT8rMRQGOeaEkdCQDWXWfWX99vwnXsgLZwJBpNFm
+         xVnoDsr8bVewRfK0F54Y64rfDDBVTBEZGH4HVJEmkra/3LRfYPB6qK3yfeio1NhrRccQ
+         kL+NsKhp34xA7JrMUtJAZdEA6kAo614cN6hXHNjQ6hlB05/eZY76Pxi/nlHKjyCsPkTo
+         yYaA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=wba8BQ5iBpRLr0k7eoQQztZkAbyDnpsTrBKn6QloPdk=;
-        fh=vRNBWFAgmJneg5/L0xNXSNEPpclt8jjSgYn2oPgQ700=;
-        b=Xy+THJIbD0f91uGnGQ1vPxexyiG8MGm6ys6rnJH60kP00/jSip7RtBzAz59IGgJdZU
-         GhNvawTZztuMVUIJXky3lKvTyXtj2j8shZlPWgZEQCPRMBPU48Rx4Q3CMypBsHQilH+8
-         y3JHjQaAQr7H8PCrA5U+TVrf4rfwmkjajg0fhWZDtwPY0Nobi/CiR4gNu7m/8k+sScta
-         Gzr9PNkpTpPOkXz9HGS2M90L5kHF4FqxmB/KLE+07MAMieGHkhT5EFUIh2FyiC1y/rWB
-         Npg1YENeL9y0f25yB+j/Mq0csCAPDnhv7AwC2bv8X+f+GB2KKEE97anUknWxaN/LXjfH
-         qSWg==;
+        bh=gVGh0l3jazLsBUiDX0ySZLc+Xs/vb/rMl4hzAjL5dIA=;
+        fh=SQ/8XEAGvwe3MRhbnuLeeI2LL6uozSUaDGXVXkm/KyE=;
+        b=KB0pkMObuAeaJjU1+9rtppvgdyspu3vxEVzpzXlIuC+OaxF2V6AGcPj4yJytrYkf9u
+         KcH9ACdVsp42uLREtlioMs7Ab8XtsWbFndE8iNOZDwL/0IgYwQ4o8KuzconIoVuohq5y
+         06BbU5zU+fGllB1Cyz/F6YCUVqYlG/SVNA6ZgaCq4nrRJS7mMBn3XtB7PFxP2Lt4eG8z
+         PBFqqeVEA4r04Hb/26R76MCYDBrIPEStNH+w52D89DWT+FaxI1WAG1YJrWRcWr734gf4
+         al6apIs1q7QfmI+/TDWM+OJVhciG/xn25EeQGlCHGesyyOAYfwXb8AZ6Eq59D5vHV+zN
+         TFrQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775009007; x=1775613807; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775009652; x=1775614452; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wba8BQ5iBpRLr0k7eoQQztZkAbyDnpsTrBKn6QloPdk=;
-        b=e4DEfysm+P+tRlknWSR0Ay8AJrrhxBSmTfN7muoh2fSRPSmKYHGLlVppZMAyi7E5Hc
-         btWR992xBhprqxPLQbgDGx8vPijSjK1xisByqIMkAqf4RwzVKk4EeFpl+tZ26gWZLm60
-         PzE7Nsuufr+d5pMeHgF5uJ32G7fsKmPpLid9hRyKlqs/SjiBRpLKL5l+6/IXwRb4mOH+
-         3mvLPLO1a3KR+VpjQ6LkKo2cTv6UQAvPVFqihoP40aqtDQHvmmlU49GAYjbjfNQZJzG9
-         mu9gsmHVLBUvvuDzGNfLAMZHYxuycGJ3ugLYDwkmHSlQj27yp9UEGbHyi8dGfglR7Gx9
-         aAPA==
+        bh=gVGh0l3jazLsBUiDX0ySZLc+Xs/vb/rMl4hzAjL5dIA=;
+        b=czPEUTN4zb+51Q7e19JvovB7qhHlOzK0kfrS7px7KYRMSvrcBbas2mufa7W2ni1CCi
+         tLBUlmGJBMEVjf12ct5GYHYXQSw4KoF20QHtdEd42OS+kWwLnDWXvos1ZwSM5FtmIRu5
+         3pKIEI5DXFhuFL1kI0EBDDXfv6sDQ9fLyP8Fh1KcMCxMWIPUURMyns3BnDDzD91dixyn
+         TpJzyOyXFXzQ3OYXWmhquXawZk2Oh6rLrENMKqqZT78zBq0M7Ol3GcWPc8ODBPuJMAqW
+         AU88rQbvndlbMcbu0ou4YuUN5s2u7+CpYX6Z4LAiiS9Sp4odvIHvleKtoMkT1ANypYZB
+         ncFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775009007; x=1775613807;
+        d=1e100.net; s=20251104; t=1775009652; x=1775614452;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=wba8BQ5iBpRLr0k7eoQQztZkAbyDnpsTrBKn6QloPdk=;
-        b=l/vaizgDUBCOM65R92SCcXzJQe7Q9k/pFLuehS+D0T3IYUQoay4zwocPWRo1Y3VS0N
-         xhS1SPGgXDWTp+XwNVcIuhV4KC9FX7h7b2MWuLO8gpfBEl3SV5Jc6I7U6pofTY3i/+TW
-         YbbtLknEmQ8xgk2bQFucaObEPiUgGQvobpXEVZWzUd6NNv39ivBc4bi/pBzjmng2Eefm
-         RAXUmkmkk8grB/lkqykfohToPEKwt7U4Hi3Sav8YMsMcinXW/CLZ8Q/CHz2h1htm85M3
-         APdQqISUNC9LeYV/YJn/KXWtFGM93T80jxNI9d+fCtmj8B4i1E9bKiMKFUBndPIvQtY4
-         hKHw==
-X-Gm-Message-State: AOJu0YxBNgHNsGQJIiDbQTVm3a5pNLFV0EX29d8SeVTmOQ7uGhxSuXCN
-	tDv20lh/0sHWQ3ArmVDrVYKrfRDLB/m5YKo1ZVM+mzcrFN3yPc6C84GTjEwu9kGdU7+RiHz+16j
-	u57Llzo5x0sp66dfzDAC0zIWBUrx3xxU=
-X-Gm-Gg: ATEYQzzKuhYCBY4led4WWa2UPWidfw2+KbTx6CdIIOA2avzM+EYpZZlfUBpvWSdBQTo
-	U0biWpf3w/iLq1Eo6uLL88Js+JmGWYzgcyO3pTXccI/PMeV/Ic08zzDdHPx4Z5y3xUj+6y39X05
-	Q0U4dtMC572ohi24IuvjF5bGPtyCNUtbjOS00ZelCEdnxAdS5NgGCW646gwBHf9bk2b2IPAeGBB
-	apHdfL6hEwbGpdhYrxPLH8el4q7T5x3i8zODBybBZncTkMdottbgEfURHBvfbh0RhBH2m2zJoJJ
-	S3HmZBmF0cu9msNzRfb3HpAH29vthq0lHhQEfoPPEdsamv01XDVjEgrfH6CnTiwd4Qo0ZzQi5Ij
-	ncJ3yBwS5apJrurGxnM5vOFs3eC5xcp3J1G/ZhiOOr+iXiKpIPShma6YFMqVfQIUb2bnMq7/Ze0
-	XkrVfeMmRxmr5SGYQ0mBKw
-X-Received: by 2002:ad4:5bec:0:b0:899:fc48:4e68 with SMTP id
- 6a1803df08f44-8a436f15162mr27021716d6.4.1775009006728; Tue, 31 Mar 2026
- 19:03:26 -0700 (PDT)
+        bh=gVGh0l3jazLsBUiDX0ySZLc+Xs/vb/rMl4hzAjL5dIA=;
+        b=SHwMPYtmvte/NN/I234/PDK7VBeswVvH7jK4skhXP2b6tBTEC0j7ucnInrGRVkBCSB
+         p47Y4HM8WgqtZqhpIXD8KYs0DDwrkoahnL5GNMZMtzcbvydimMzkz2X5NrDq+Pb5ACuU
+         3hIqQve69WigHy/WrlYz+Iyg4pfqH88BXsrpTM/C4tLBK9Z+c+HaS8Js/JAdbt60WIbG
+         VyRpOAxhCuynHOnQ6n/7l9gRdhcHLENlT2r12/5Q9KKD0k/EBmCbZ97ga18y1ZTh50qu
+         YgJGCzncmcCwk8i4HZD3J9xNeZ0keBPnlKzXBycVjyC+8GSUmAxsI3/bvJRUdTFuOSo1
+         MYUA==
+X-Forwarded-Encrypted: i=1; AJvYcCXo5FP3YSGrdcVYFc0e4S5tt99+aByXVjNog02BaqtyGSg4H13HIOHZztezSM0DYutwdRVzIXOJIHud@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1xGL80HR3Qg1ouTaGEAbR9HYfXq4FqmAI0EYSgmknuh82K7lw
+	Na9Fp9zwg2fcLweJigTxaSxMhVG/r/nLudJUoHOViLYBgd6FFsIhQDAgbHJAEtPDBNtNI91c/4k
+	MqFkxjvoGfbr/NxtSskd3mrOYsbsZ0ko=
+X-Gm-Gg: ATEYQzwXywghj/3b08zw1PFgLCcKQt1/cEl1juFjGTRIcwLHyLJK7Z1DQr9tvQmMddD
+	nnqCiVriDnkxS4SLsanWUqv5v3gXqPD3K4V1i3Eq5GuC2UZ2RP47Uy+zymGof8fEtMcCguRucIB
+	uTFadI3gcGR72K2iHscPnHRnNav00QHZI8NteMSa6zRrHHaCNYa3UCsA63zCY3t1+S1yqWVJ+9g
+	ZB1xbb+j78PWiFSsKTUIkID7k8Po9U6xkvZ1K692S20IyMC0wSdIdeimsnIkvxBo1+U0Zu+tia4
+	sEJXg5KOaVfhkGj3wxM14g5r6jTN8znrHPQKVZJ1mqtd7gijXbPL7J1uKOgU1aDiZo+cENW7/yR
+	EHfrdMqoua7UznGDcX+sqQj7xd+o+G/9kd7W2ITAIWLWKg1hpynhfm3JwXCg42Ld6Vfz0IX8Lv7
+	79hihNkPAEuFy9zp8dhqOg
+X-Received: by 2002:a05:620a:2686:b0:8d1:a75e:2f8c with SMTP id
+ af79cd13be357-8d1b5bcd79bmr324980585a.53.1775009651744; Tue, 31 Mar 2026
+ 19:14:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260331000911.16062-1-ddiss@suse.de> <CAH2r5mu56K0Ew8XHaVEsGK9KgxHv34WN5EkXTKUvFtxydFp9zQ@mail.gmail.com>
- <20260401115824.447004b8.ddiss@suse.de>
-In-Reply-To: <20260401115824.447004b8.ddiss@suse.de>
+References: <20260331012508.17410-1-ddiss@suse.de> <rt2s32lnxvi7rfhmoqpvujls3shmbumor4imura7ryvaqizbcf@qc74gdiyr74k>
+In-Reply-To: <rt2s32lnxvi7rfhmoqpvujls3shmbumor4imura7ryvaqizbcf@qc74gdiyr74k>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 31 Mar 2026 21:03:15 -0500
-X-Gm-Features: AQROBzAb8JEvLX-PRxa8sW63ZEGKDOXr5_cV5b-YJRUodLKr0jgKP_zV8bRahj8
-Message-ID: <CAH2r5mvzMVcjiRsK353Q0JNAN6E2pW+qe5XnQbOs8+PGpbe50w@mail.gmail.com>
-Subject: Re: [PATCH] mount.cifs: fix buffer overrun in set_password
-To: David Disseldorp <ddiss@suse.de>
-Cc: linux-cifs@vger.kernel.org, Bruno Bierbaumer <bruno@bierbaumer.net>
+Date: Tue, 31 Mar 2026 21:14:00 -0500
+X-Gm-Features: AQROBzC9EYkiMNYc0LCVlUqmTIA4TFz4tPo9ncy9SlTqwimevi5KhASw9rOUphs
+Message-ID: <CAH2r5mu+a=39irbGViiXmOuFz4R6PrWQTOm4jUOHbwdmhNQeHg@mail.gmail.com>
+Subject: Re: [PATCH 0/3] mount.cifs: minor buflen tracking cleanups
+To: Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: David Disseldorp <ddiss@suse.de>, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Good catch.  Fixed the RB tag
+Added the RB and merged into git.samba.org/data/git/cifs-utils.git and
+https://github.com/smfrench/smb3-utils for-next
 
-On Tue, Mar 31, 2026 at 7:58=E2=80=AFPM David Disseldorp <ddiss@suse.de> wr=
-ote:
+On Tue, Mar 31, 2026 at 1:06=E2=80=AFPM Henrique Carvalho
+<henrique.carvalho@suse.com> wrote:
 >
-> On Tue, 31 Mar 2026 18:56:05 -0500, Steve French wrote:
+> Reviewed-by: Henrique Carvalho <henrique.carvalho@suse.com>
 >
-> > added RB from Henrique and updated
-> > git.samba.org/data/git/cifs-utils.git and
-> > https://github.com/smfrench/smb3-utils for-next
->
-> Thanks Steve. FWIW, the reviewed-by tag has an incorrect email address:
->   Reviewed-by: Henrique Carvalho <[2]henrique.carvalho@suse.com>
-> Should be
->   Reviewed-by: Henrique Carvalho <henrique.carvalho@suse.com>
->
-> I'll close the corresponding PR at
-> https://github.com/smfrench/smb3-utils/pull/16
->
-> Cheers, David
->
-> > On Mon, Mar 30, 2026 at 7:10=E2=80=AFPM David Disseldorp <ddiss@suse.de=
-> wrote:
-> > >
-> > > The existing (j > pass_length) check is insufficient to avoid dst buf=
-fer
-> > > overrun into the start of the adjacent struct parsed_mount_info field=
-.
-> > > Check for overrun before writing to dst, and account for comma-expans=
-ion
-> > > and null-termination.
-> > >
-> > > Bug: https://bugzilla.samba.org/show_bug.cgi?id=3D16044
-> > >
-> > > Reported-by: Bruno Bierbaumer <bruno@bierbaumer.net>
-> > > Signed-off-by: David Disseldorp <ddiss@suse.de>
-> > > ---
-> > >  mount.cifs.c | 8 ++++----
-> > >  1 file changed, 4 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/mount.cifs.c b/mount.cifs.c
-> > > index 1923913..d41ca6a 100644
-> > > --- a/mount.cifs.c
-> > > +++ b/mount.cifs.c
-> > > @@ -350,13 +350,13 @@ set_password(struct parsed_mount_info *parsed_i=
-nfo, const char *src,
-> > >         unsigned int i =3D 0, j =3D 0;
-> > >
-> > >         while (src[i]) {
-> > > -               if (src[i] =3D=3D ',')
-> > > -                       dst[j++] =3D ',';
-> > > -               dst[j++] =3D src[i++];
-> > > -               if (j > pass_length) {
-> > > +               if (j + 2 >=3D pass_length) {
-> > >                         fprintf(stderr, "Converted password too long!=
-\n");
-> > >                         return EX_USAGE;
-> > >                 }
-> > > +               if (src[i] =3D=3D ',')
-> > > +                       dst[j++] =3D ',';
-> > > +               dst[j++] =3D src[i++];
-> > >         }
-> > >         dst[j] =3D '\0';
-> > >         if (is_pass2)
-> > > --
-> > > 2.51.0
-> > >
+> On Tue, Mar 31, 2026 at 11:37:50AM +1100, David Disseldorp wrote:
+> > These changes are minor cleanups to go atop the bugfix
+> > "mount.cifs: fix buffer overrun in set_password"
+> > https://lore.kernel.org/linux-cifs/20260331000911.16062-1-ddiss@suse.de=
+/T/#u
+> >
+> > David Disseldorp (3):
+> >       build_assert: add ccan build_assert.h header
+> >       mount.cifs: adjust get_password_from_file() buf size
+> >       mount.cifs: remove runtime pass_length calculation
+> >
+> >  build_assert.h | 40 ++++++++++++++++++++++++++++++++++++++++
+> >  mount.cifs.c   | 18 ++++++++----------
+> >  2 files changed, 48 insertions(+), 10 deletions(-)
+> >  create mode 100644 build_assert.h
 > >
 > >
->
 
 
---=20
+
+--
 Thanks,
 
 Steve
