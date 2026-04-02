@@ -1,131 +1,129 @@
-Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4283BBA15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2ED3C1418
 	for <linux-cifs@vger.kernel.org>; Thu,  2 Apr 2026 08:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775119163; cv=none; b=UDpurBA3h3BAIEYGcxarZkQrx8l8mVyElEbi1iF9eKxIOu1Hubd/FuUQ51pepUxLB8ap5i1z4Ubs6RQpIFD+0glyOI7sDk8SVE9XBfd/fNOcDSr0HbyR21ib2wiX9JPUzKiQgljfiiTZnifQ/+vsxU0rmdAKppwA5KVelT+8RvY=
+	t=1775119166; cv=none; b=QS5GyBPzYc70ePv1OTQr4zFen+NV2MnV7F5tpyFBVRawXBRQ0JPxE8dHov9DTHCEnUL8qS8g6lq6iImR6glJtOEtII745k6iMdKhz1htNmwX4MLZOSbqYqc8G0ilIXH8nbYc/9HXkCldlh8SP0IjQqrhB2ph7cnSr/zA+rbUMLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775119163; c=relaxed/simple;
-	bh=cwiMGb+QvJPPbyOUbTGVlCDSVPPTs9vIaN+NXNJAVn8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hKpTHaLnaFSWazZEkN6uQ/oPoEMvi4oCUB7MoP7ug3FcV6X89FxukkSF/PGLrmqBc76DqliMYyh85cpU10UCfnbk35PqmP0OaLOYzn5hjhgq3ncOIYII06iFxdSmvl6BR0U0BQ4uwub92QJMJVUT57EIvUaQayhD/SToWC/dcq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K/FgGiS+; arc=none smtp.client-ip=74.125.82.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1775119166; c=relaxed/simple;
+	bh=jeqPbCJFq6E4/uAZmZs1vzk0bbhVf9kD1rh5mmSVlps=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rOxc86DdhxI2ejLtTz8Vxve6sUSO6RQ9r0XZg/xcyGDnzbKoT+/1AD6PtLnRGDanC3OFMRbK6Mmry8niRmoc5tsbEOkP6/QCK+BGtFsvj5ltW6/r82pAN8qU6AsdG0tLaC9NC70kV9GgvLeoG2hqyNPfbZrOEoAa6CJl12yqTuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=JXaTk9jA; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K/FgGiS+"
-Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-126ea4e9694so2025145c88.1
-        for <linux-cifs@vger.kernel.org>; Thu, 02 Apr 2026 01:39:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775119161; x=1775723961; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7eITVDgwa5tEdf7gs96GHN8iyQzNKskoC8moYtKLcKc=;
-        b=K/FgGiS+3PI2cFIE2N+jYPaP3BbsprXkLelxACmeih+ZJPGr6NWju/f1916TjbFFkf
-         hZe/o0+7Mi9Nh8LR39DkgNxuql0TvOgBtyNcn1eupfqiLol1ElVgjyYZR+Z8PlS4FUBE
-         7jRTE9z5OvIAyBmxLHB9M+3u5Q/wfYaqkcEvbBY70NJPMbUDyALNBmj/2rjWlr9+XU9s
-         oEZt77sdmJCjDlY3137MMUZLABPhV1KibPuvqW/3dyFG6aQuDsPk7Ocbx2P6e6QcOYNw
-         d+JugzOrlkOzt5+fw89gpYcKlXSuZDxFsSJX/CTvk7oDCSVYAXzPlMbzdiN6cfqaiK3N
-         292g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775119161; x=1775723961;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7eITVDgwa5tEdf7gs96GHN8iyQzNKskoC8moYtKLcKc=;
-        b=tRFfn/2Q/y5ebjN4g90pLOrrjsCfNcxmpDap1XpZMvi4z7bieu75jh30kNlNP4hUwl
-         5kT4mYb3dRFQeg0NvVBbvQz2gbTobTgBC9d6gVbrzaIVOxgtvPzLh1lLeHPQoqlxYUFR
-         9LvtJQmONMmLflMt/Vdnyv7/c8RFMOAuWu2pFUICnX7Py1yQyKjjVhsbhSatMCLdMnOW
-         B7lpa4NXSmu+4p8XWoQNs5eu8OYDqaQUHtCMgIPLcfpKcaIwOz5XdWSixN52yYoKtYVK
-         7Zi7jhSz5ehwSuO29P2302neT2rniQOMYV3m+h4W52nXiFeZmfHRbBzTEVPUciAHkk/z
-         dVmQ==
-X-Gm-Message-State: AOJu0YzsxLnziUZwn1cwj0raOTcyAJ3NGoNqRwJdx4VR0ysKzRnfGcNC
-	gxQsf/lr8I0KCvSGpOYveGN2fdZMLGQgsPFJDND1PjwJvqHWUgCgU0BD
-X-Gm-Gg: ATEYQzy3qFtowAUeqyEtZphaKNAUb3loylUIIwPROEQD6Los456nx1n/jOvHbtkE6Tj
-	Ira07lkUiUnTb4nQGSoWCbsV/2ZosSfosrz8j/4uENc5XJmRkuuFG4G5rSCXZzsYRfLmKoE5/ak
-	ymABzbNiSuxGsxRnSY33Rm74FSNJKDfZnbFt+QS1kHWY/ZUouG4RyO4crNyZTPlLUc4fyDh75Jf
-	+W5o3sS5jRy/OQoIUFY7YZjQgSPzeDw28rP/pzz9rDzHK8RPmQ0BhoHscb2wS5is+BkohmurbF1
-	krSXFPnx09m3G9oxC7LROAedhY/ZOA9p3rcsGuqX4I70NnEkEbqlGAAthR64j/mqthraMKSSSM8
-	oSG/UUtYJedALDN95PGW7zxgChVPLs6iL0Y3ZtxkMREmVG6s++AKrMIDGrRF9mcFk6pe1yS8uZB
-	0Am/IfueKgrCXxU0RYKWACZ2PJ2/LUuGA4nVnlp58uvQ+OvZ0Sk/eY0wJoYg==
-X-Received: by 2002:a05:7022:f8e:b0:119:e56b:957c with SMTP id a92af1059eb24-12bee613f8cmr1450943c88.1.1775119161057;
-        Thu, 02 Apr 2026 01:39:21 -0700 (PDT)
-Received: from ubuntu22-base.lan (104.194.93.216.16clouds.com. [104.194.93.216])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12bedd4e4e3sm1716646c88.1.2026.04.02.01.39.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 01:39:20 -0700 (PDT)
-From: munan Huang <munanevil@gmail.com>
-To: linkinjeon@kernel.org,
-	smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	munan Huang <munanevil@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: fix use-after-free in __ksmbd_close_fd() lock cleanup
-Date: Thu,  2 Apr 2026 08:39:12 +0000
-Message-Id: <20260402083912.457676-1-munanevil@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="JXaTk9jA"
+Message-ID: <3e974a68-628d-48da-9f1b-6feb02bc2a97@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1775119160;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4u0f0Yyy1YsqRBmgdOsjnJVlBZKOA9OXxW8TfnAXZhA=;
+	b=JXaTk9jAHg/cU5pX66jr92IQ2w5CqFfnzD3nOuOs2uX3tGuNM31rFKhANFDeG42r3VxROA
+	gPtmyOYshhnhBI2camseRgDC3AbBUSD2u1HP4ljbipjTY36qSKYpX7Sdmuwt5M9eVPTG0P
+	KpRbFXWUN1z0XjwSPW4sAT8SL+Pf5+NOvt3aXGteyBvTnFV0+SsCeHYz885TixcZCQhy7e
+	5Bb+i89Fs6anRCaDBizT8JE+6IPUyr4QVvM8SnYNu/TAj6bEx7a8GoWK+eqwEWgS7yJ6LX
+	IoyDYLXunoPvzKGefcnJEKtdySnEBU6fAN0357ptk3XnBTZ8QoEGIakKNCFw9A==
+Date: Thu, 2 Apr 2026 16:38:28 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 00/12] smb: improve search speed of SMB1 maperror
+To: huiwen.he@linux.dev, smfrench@gmail.com, linkinjeon@kernel.org,
+ pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+ tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
+ dhowells@redhat.com, chenxiaosong@kylinos.cn, tangyouling@kylinos.cn
+Cc: linux-cifs@vger.kernel.org, Huiwen He <hehuiwen@kylinos.cn>
+References: <20260401072912.355072-1-huiwen.he@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260401072912.355072-1-huiwen.he@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-In __ksmbd_close_fd(), when cleaning up byte-range locks on a durable
-file handle closed by the scavenger, the lock cleanup loop
-unconditionally dereferences fp->conn->llist_lock to remove each lock
-from the connection's list:
+Hi Huiwen and Youling,
 
-  list_for_each_entry_safe(smb_lock, tmp_lock, &fp->lock_list, flist) {
-      spin_lock(&fp->conn->llist_lock);
-      list_del(&smb_lock->clist);
-      spin_unlock(&fp->conn->llist_lock);
-  }
+I wrote some additional temporary test cases (not intended to be merged):
+https://chenxiaosong.com/en/smb1maperror-test.html
 
-However, when a client disconnects without SMB2 LOGOFF, ksmbd preserves
-durable file handles via session_fd_check(), which sets fp->conn to
-NULL and arms the durable scavenger timeout, but does not detach the
-byte-range locks from the dying connection's lock list.
+These test cases copy the three arrays from before the patchset and 
+compare them with those after the patchset. The test cases failed, 
+please fix them.
 
-When the scavenger timeout expires, ksmbd_durable_scavenger() calls
-__ksmbd_close_fd(NULL, fp). At this point fp->conn is NULL and the
-original connection object has already been freed by ksmbd_conn_free(),
-so it would cause a use-after-free or NULL pointer dereference.
+Thanks,
+ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Fix by checking fp->conn for NULL before accessing fp->conn->llist_lock
-in the lock cleanup loop. 
-
-Fixes: c8efcc786146 ("ksmbd: add support for durable handles v1/v2")
-Cc: stable@vger.kernel.org
-Signed-off-by: munan Huang <munanevil@gmail.com>
----
- fs/smb/server/vfs_cache.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index 168f2dd7e200..772a84d95fe3 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -463,9 +463,11 @@ static void __ksmbd_close_fd(struct ksmbd_file_table *ft, struct ksmbd_file *fp)
- 	 * there are not accesses to fp->lock_list.
- 	 */
- 	list_for_each_entry_safe(smb_lock, tmp_lock, &fp->lock_list, flist) {
--		spin_lock(&fp->conn->llist_lock);
--		list_del(&smb_lock->clist);
--		spin_unlock(&fp->conn->llist_lock);
-+		if (fp->conn) {
-+			spin_lock(&fp->conn->llist_lock);
-+			list_del(&smb_lock->clist);
-+			spin_unlock(&fp->conn->llist_lock);
-+		}
- 
- 		list_del(&smb_lock->flist);
- 		locks_free_lock(smb_lock->fl);
--- 
-2.34.1
+On 4/1/26 15:29, huiwen.he@linux.dev wrote:
+> From: Huiwen He <hehuiwen@kylinos.cn>
+> 
+> v1->v2:
+>    - Sort arrays at build time
+>    - Merge nt_errs to ntstatus_to_dos_map
+>    - Check if arrays are sorted in smb1_init_maperror()
+> 
+> v1: https://lore.kernel.org/linux-cifs/20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev/
+> 
+> When searching for the last element, the comparison counts are shown in the table below:
+> 
+> +--------------------+--------+--------+
+> |                    |Before  |After   |
+> |                    |Patchset|Patchset|
+> +--------------------+--------+--------+
+> | ntstatus_to_dos_map|   533  |    9    |
+> +--------------------+--------+--------+
+> |mapping_table_ERRDOS|    34  |    5   |
+> +--------------------+--------+--------+
+> |mapping_table_ERRSRV|    37  |    5   |
+> +--------------------+--------+--------+
+> 
+> The following patches from v1 have already been merged into the mainline:
+>    - a71a4aab4834 smb/client: add parentheses to NT error code definitions containing bitwise OR operator
+>    - a9adafd40165 smb/client: add 4 NT error code definitions
+>    - 98def4eb0244 smb/server: remove unused nterr.h
+>    - 9f99caa8950a smb/client: fix NT_STATUS_UNABLE_TO_FREE_VM value
+>    - b2b50fca34da smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value
+>    - a1237c203f17 smb/client: fix NT_STATUS_NO_DATA_DETECTED value
+> 
+> Huiwen He (8):
+>    smb/client: annotate nterr.h with DOS error codes
+>    smb/client: autogenerate SMB1 NT status to DOS error mapping
+>    smb/client: replace nt_errs with ntstatus_to_dos_map
+>    smb/client: refactor ntstatus_to_dos() to return mapping entry
+>    smb/client: use binary search for NT status to DOS mapping
+>    smb/client: annotate smberr.h with POSIX error codes
+>    smb/client: autogenerate SMB1 DOS/SRV to POSIX error mapping
+>    smb/client: use binary search for SMB1 DOS/SRV error mapping
+> 
+> Youling Tang (4):
+>    smb/client: check if ntstatus_to_dos_map is sorted
+>    smb/client: introduce KUnit test to check ntstatus_to_dos_map search
+>    smb/client: check if SMB1 DOS/SRV error mapping arrays are sorted
+>    smb/client: introduce KUnit tests to check DOS/SRV err mapping search
+> 
+>   fs/smb/client/.gitignore          |    3 +
+>   fs/smb/client/Kconfig             |   11 +
+>   fs/smb/client/Makefile            |   25 +-
+>   fs/smb/client/cifsfs.c            |    6 +
+>   fs/smb/client/gen_smb1_mapping    |  109 +++
+>   fs/smb/client/nterr.c             |  704 -------------------
+>   fs/smb/client/nterr.h             | 1082 +++++++++++++++--------------
+>   fs/smb/client/smb1maperror.c      |  873 +++++------------------
+>   fs/smb/client/smb1maperror_test.c |   83 +++
+>   fs/smb/client/smb1proto.h         |    9 +
+>   fs/smb/client/smberr.h            |  415 +++++++----
+>   11 files changed, 1232 insertions(+), 2088 deletions(-)
+>   create mode 100644 fs/smb/client/gen_smb1_mapping
+>   delete mode 100644 fs/smb/client/nterr.c
+>   create mode 100644 fs/smb/client/smb1maperror_test.c
+> 
 
