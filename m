@@ -1,73 +1,76 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADA93BED5C
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Apr 2026 11:06:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52163BED19
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Apr 2026 11:07:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775128024; cv=none; b=SYGiZOgRJkLYw2AKfZZ12+rNREfSVxCFACsWXJrn3elQwMpz0U5i/5PKN+eqy893l6dBi0h20OYGziC6cbIYC0tiBbUfQOPx8/48tmeWz+rVLZHjmT2B6yqQbH+rqEUNNi/87Vmcu4wEY0+IlUePGfKKup2vFfbul+QP42Jv3+M=
+	t=1775128029; cv=none; b=MrVOJf4TfcEOfuKiIb7+/gAnEkhkPmVWsgzcW5Yi0y5UojfjhsfbxEEtg/qcLTunSHGq+S0sqlcL5fAyMQ673fevWzVtWLgItE2g+gxIp2jrbaIucT/DXL6xUujaD5RO5AuuKvlF7KXUkmu6IQLkdKQMdKgEWhf520KJ8p6IZdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775128024; c=relaxed/simple;
-	bh=3RRxKFIktcDCw568ZsPXt3vVTDC9PEFREaT4G8posPU=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=Xh4FTXoODMFcj2RLVCe124Tz9T2fLsmn4D6FwaUZILc7O7ZKnQ1V0x7Z44S3c6gZXEz1TbK0pz2TGB0oCxhLaT+w8LjzAhOZRY/Dqod0TjzHp0WL15vJ9Wr9t7givDk7rGFWRV3EmyQQfpcqI/6swFMDOYihRLhQceC9OnRJJ+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fQV4SxHT; arc=none smtp.client-ip=209.85.216.47
+	s=arc-20240116; t=1775128029; c=relaxed/simple;
+	bh=Bvqo9k+uWe79hD+EUzdQrkh/Lqm87qTJgqtYKXT+ZqI=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=npC2nsQweYWrc6ZBEnNx4SiHjLlpVWDdG909F3uk7MxStt027CDT/PVQ+/cISHPLU2gqTcxHlZOMci5Iz4DDyjhjQOyghtvQJbrnIBUaDuJw/rC83RI7g9M7P2oiqtdD4Vnwyq4GdO4LKgFXv0wnzjkEaa/rVAbd0xnzMn9rdkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iiyazaFx; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fQV4SxHT"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-358e3cc5e7eso368841a91.0
-        for <linux-cifs@vger.kernel.org>; Thu, 02 Apr 2026 04:06:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iiyazaFx"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-82cebbdbdccso359526b3a.1
+        for <linux-cifs@vger.kernel.org>; Thu, 02 Apr 2026 04:07:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775128018; x=1775732818; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775128025; x=1775732825; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:subject:cc:to:from
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tmCtaWGrJzPHLTJbmGTfU/PViFD3usZzQK2tZkfcZnk=;
-        b=fQV4SxHTqEsNQM4o0N5lZcVSCDV76dystMJopw/2o++1lLj6pHlNRrrhfS1yeQ5hz+
-         9i8J5S+/V//ow7rCM+9ZyOEMxIgIvI3Xx3QaNm2r4y7yC1u2ywYR0E8gIoQ6+Mu7hNPB
-         rv8dvlMiHb9yya6HZxdDuw1zTnXv+FmEt2tetF8Jx72OypJ7UNTSrPP2F3saZBB30CYE
-         uu2ZCN1U7afn1paRwkhiWb+hRH76tOiAW+ajnO9e2x/nUO0Hwe7xQ7UxGCtiQ0IGgeWQ
-         tTcpzDF3hQ0hSQapQ1k8u2lcu4udBokMLaXI34UIH8mEmtGhFtwNEZnWkDLeAfSc6Tsb
-         BaOg==
+        bh=FqVUaOxIIQGdvZuHr4y8df1rC/Cd4m3EejmoyV3YomM=;
+        b=iiyazaFxpKSBDXhh14DdZVTWTb9m1BsvngjygqGk/lehXOR0wXltSz3VnbGzHFRSnV
+         YKO7WqSBZbO7ofiSGAZ5tePUlroyBsUhscn+RJZrfG0aLrsbEEi5uRoBss6g7OxlmJTL
+         PxxrEpjvr3WZnj9acSQlA7jvoV5GeGpHgCdWofpLuxMj2wLn8VW146TU3Zfi8l0uLZug
+         SgB/IbqV53BDN9M7aRW9YqezB3EFqZzO5gxS6OFbMZsgLWulGp2ISuLVO7gWud0zfxhd
+         ytzBd5Zf2sMkIW9Zx1STKBe0t0PS42aCO+BA5w0PKWGVxGQVO4bWJxcnU2bs6NSwJgBE
+         6kyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775128018; x=1775732818;
+        d=1e100.net; s=20251104; t=1775128025; x=1775732825;
         h=content-transfer-encoding:mime-version:date:subject:cc:to:from
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tmCtaWGrJzPHLTJbmGTfU/PViFD3usZzQK2tZkfcZnk=;
-        b=KVd5+M+LSugFw+JMDqrzXylkna9kzIwkDzwu2ID3YaKHOmfUGJWgEcGn0nuu8Ps+rp
-         X+X4luUIDgHqqQet/N8zYgMajxLm7O+4KVUlY4nqL8xN06wM3md8oLTDijPFn8v1usHH
-         x57t8Ls/uQRz0YXrenmg9tsn96XRpxIRQmZhHST1NzbhQwyyTE3gVSQVBY+74qllboyv
-         Rei6ynJQDaDDcwzjsk29wuFVox8er8prMxqX1q9o2O7FW9/EP4/7m4Br8Wmu4rtZClsB
-         1iTy9DFnF1XsWsSl1CZkcYQuIppwKHBLNaWrerYxogrAxUijT5H0RdozXiimxvCHCbM9
-         +pug==
-X-Gm-Message-State: AOJu0YyIqZGTEf+iyxJly4BNeO5/tx/0bom195FZgGc4XLGlpuejnIt5
-	Ytsqb5KmolmMESfNpb0PQMACv6c1I28hReyvr25x2nVDp918Zrd1wOlkXOJfrNLYmyWXhQ==
-X-Gm-Gg: AeBDietfzocDwnKuwoPjoXoYqW69zdP3mlJrhX8nmOGRA0lnXx+UgV5ufQq61z5nKFH
-	Q0l+siwkiaeyprgWAe5YXlgTvfn95ulsGTRtItIJ8Q202t39kx4Uylt8N4rXG9yeANdLsyQh8yP
-	mtt07WckSdTA+s1Q2RNP1tvEmKDyKnXM5/PU9ECVzeEPw/Oxr1HN3pcebsI8eOGOuDDe8gF5RmT
-	QAlB4/ZzFWg8ls31mwf2FQ/AXu3ujBm+0wu2ffYgxNMxk4rRKQ5sx+ONsZaK3B3DQtPxqv49utB
-	2bc4GqT/sZAklLY3olJwai0kbsZoJSgHNBCZhWV1DhbJWZ9YmlwIuD42tUeBj2g8piqBrFMcnlA
-	N5va0LzptF+7N03RK5mJkeg2k+/CJ9azPfe2dYpUkFWuEzazGmLm3T5lcCsTn0dv8OcSrTsvMMS
-	Jl2kOWW3coGxzwWDTQCzs=
-X-Received: by 2002:a17:90b:1d0b:b0:35b:e5ce:73bb with SMTP id 98e67ed59e1d1-35dc6ea6d23mr6219862a91.1.1775128018296;
-        Thu, 02 Apr 2026 04:06:58 -0700 (PDT)
+        bh=FqVUaOxIIQGdvZuHr4y8df1rC/Cd4m3EejmoyV3YomM=;
+        b=CqoyCDbgXkKPrwq+cUjUDht9M+kzE8dexCnoSup4f3tkgawwJZg7DZf9Wns6WMak0P
+         hsNHHDx68hrp/Ef15kxfpgmemGHTQUMY2hnW0Q2+Wx4+9/s5UguuBn3wf0jzC1LjDSnc
+         9hi2MCyBnYIfVDyOjUI0Xd9EVKgFfpsMh0StyAhCtMTVqk3E5HbrTJ5BSU6CJVqB8oKu
+         UbJxpTWTcibJw9YYOqOfBhpz+FeioOdSZv1BK93df3IXp0dCdNzI+2KFF9VIqHxrf43l
+         i1IKqZ16n27Xw57xsgQxk7y50mcqly4NDxh7p5v7Z99ghqIBM+praa+eQS22h/WU8b0H
+         9ikQ==
+X-Gm-Message-State: AOJu0YxAu/7ZrAiLxcIV9EYwV7UlP2gCaas0BqceK61XYFssrQPHxfr2
+	7lThQA75rlYGLf6T43G+eO0kNSU6fDnYg5MBHhTrvZpa3ySSk2bbXhFd
+X-Gm-Gg: ATEYQzwG5dF2+aSmcEu1n7qZtG1XBR0pt5UIx6q3XC2I5tWpmfKIBya/FkggToLIiSq
+	sMsHaRIgPfkwW6geuJl8M5zjmgRGWPmt/yf6p8T74RWOiPvJ781dUtdPSHGW52G4MfJhNQ0323q
+	TxwC/yThHmWuXwm5UpHfjcS2LbI8eC+CF1Vk3jtn0TnY28hVL2axsdriWmn1C39KU/c31/YsQf7
+	FurXTSrjwsjbDPOg6ExAk/lZgmI+af8u8tTumoKQGTN933XDoE5BjUhQu/4o25Y+6oc4N36vtU8
+	2UckPGW4HwK2yyrbdLQ2NyvHdqSsevhctacYdFWgrZ3eG9BDwvfGhM5AT/EPJ0q8N31riFM8m54
+	Gy22tBktXchrJD0Xx2iu3il89Nuk9zTdgCV4ETGZakfx3S1kg0z2zXkWTanFI3os1e/W3IbgXXS
+	YWJlp4YJRZO8EgYrGZXjk=
+X-Received: by 2002:a05:6a00:2d02:b0:82c:9c4e:66ca with SMTP id d2e1a72fcca58-82d00209118mr2082347b3a.2.1775128024851;
+        Thu, 02 Apr 2026 04:07:04 -0700 (PDT)
 Received: from localhost ([137.132.22.254])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dbe93661fsm8008060a91.11.2026.04.02.04.06.57
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c68273sm3716913b3a.41.2026.04.02.04.07.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 04:06:58 -0700 (PDT)
-Message-ID: <69ce4dd2.170a0220.23bcc5.dd88@mx.google.com>
+        Thu, 02 Apr 2026 04:07:04 -0700 (PDT)
+Message-ID: <69ce4dd8.050a0220.11816b.80c8@mx.google.com>
 From: ven0mfuzzer <ven0mkernelfuzzer@gmail.com>
 To: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
         Tom Talpey <tom@talpey.com>,
         Paulo Alcantara <pc@manguebit.org>,
         Steve French <sfrench@samba.org>,
+        David Howells <dhowells@redhat.com>,
         Bharath SM <bharathsm@microsoft.com>,
         Shyam Prasad N <sprasad@microsoft.com>
 Cc: linux-cifs@vger.kernel.org,
         linux-kernel@vger.kernel.org,
-        samba-technical@lists.samba.org
-Subject: [BUG] Linux Kernel CIFS Client SMB2_open_free KFENCE Double-Free
-Date: Thu, 02 Apr 2026 19:06:56 +0800
+        samba-technical@lists.samba.org,
+        netfs@lists.linux.dev,
+        linux-fsdevel@vger.kernel.org
+Subject: [BUG] Linux Kernel CIFS Client Circular Locking: wb_lock vs lock_sem
+Date: Thu, 02 Apr 2026 19:07:02 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -78,39 +81,39 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Mailer: KernelStackFuzz send_email.sh
 
-Linux Kernel CIFS Client SMB2_open_free KFENCE Double-Free
+Linux Kernel CIFS Client Circular Locking: wb_lock vs lock_sem
 
   1. Vulnerability Title
 
-Linux Kernel CIFS Client SMB2 Compound Request KFENCE-Confirmed Double-Free Vulnerability (ksmbd)
+Linux Kernel CIFS Client wb_lock / lock_sem Circular Locking Deadlock During Writeback
 
   2. High-Level Overview
 
-This report describes the same double-free vulnerability in the Linux kernel CIFS client as crash_001 (KASAN detection), now independently confirmed by KFENCE (Kernel Electric-Fence). When the CIFS client sends a compound `CREATE + CLOSE` request (e.g., via `smb2_unlink()`), a malicious server or MITM can return `STATUS_IO_TIMEOUT` in the CREATE response, causing a retry loop. On the error-path of the retry, `SMB2_open_free()` is called a second time on an already-freed `cifs_small_rq` mempool object (448 bytes), producing a double-free.
-
-The KFENCE detection provides additional forensic detail over the KASAN report in crash_001: precise timestamps, exact object lifetime (27.5 seconds), exact slab cache name (`cifs_small_rq`), and confirmation that both frees are issued by the same task — ruling out any race condition. This is a deterministic, single-threaded double-free.
+A circular locking dependency exists in the Linux kernel CIFS client between `&ctx->wb_lock` (netfs writeback lock) and `&cifsi->lock_sem` (CIFS inode lock semaphore). When a `close()` operation triggers writeback and calls `cifs_reopen_file()` while holding `wb_lock`, it attempts to acquire `lock_sem`. Simultaneously, a concurrent `write()` path holds `lock_sem` and attempts to acquire `wb_lock` via `netfs_begin_writethrough()`. This AB-BA lock ordering conflict produces a potential deadlock. The deadlock is triggered by MITM-induced connection disruption during active writeback, causing the CIFS client to call `cifs_reopen_file()` in the writeback path where it should not need to reconnect.
 
 This vulnerability was discovered using ven0mfuzzer, our custom-designed MITM-based network filesystem fuzzer developed by our team. Following the common syzkaller practice, we submit the kernel crash trace as the primary reproduction artifact.
 
   3. Affected Product and Version Information
 
 Product: Linux Kernel (upstream mainline)
-Affected Component: `fs/smb/client/smb2inode.c` — `smb2_unlink()` (line 1186)
+Affected Component: `fs/smb/client/file.c` — `cifs_reopen_file()` (acquires `lock_sem`)
 Supporting Components:
-- `fs/smb/client/smb2pdu.c` — `SMB2_open_free()` does not null freed pointer (line 3244)
+- `fs/netfs/writeback.c` — `netfs_writepages()` (acquires `wb_lock`)
+- `fs/netfs/write_issue.c` — `netfs_begin_writethrough()` (acquires `wb_lock`)
+- `fs/smb/client/file.c` — `cifs_strict_writev()`, `cifs_get_writable_file()`
 
   Tested Versions (confirmed vulnerable)
 - Linux kernel 6.19.0 (mainline, commit `44331bd6a610`, gcc 11.4.0, built 2026-02-13)
 - Linux kernel 6.12.74 (LTS, used in Google kernelCTF COS target)
 
   Affected Version Range
-All kernels from approximately 6.0 through 6.19 (current mainline at time of report) with SMB2 compound replay support are believed affected.
+All kernels with netfs-based CIFS writeback (approximately 6.8 through 6.19) are believed affected.
 
   Affected Distributions and Products
 
  |  Vendor / Product  |  Notes  | 
  | --- | --- | 
- |  Red Hat Enterprise Linux (RHEL 9.x)  |  Ships kernels >= 5.14 with backported SMB2 compound replay  | 
+ |  Red Hat Enterprise Linux (RHEL 9.x)  |  Ships kernels >= 5.14 with backported netfs/CIFS  | 
  |  Ubuntu (22.04 LTS, 24.04 LTS)  |  HWE kernels 6.x include vulnerable code  | 
  |  SUSE Linux Enterprise Server (SLES 15 SP5+)  |  Kernel 6.x based  | 
  |  Debian (Bookworm, Trixie)  |  Kernels 6.1+  | 
@@ -122,167 +125,196 @@ All kernels from approximately 6.0 through 6.19 (current mainline at time of rep
 
   4.a. Detailed Description
 
-This is the same root cause as crash_001: `smb2_unlink()` calls `SMB2_open_free()` twice on the same stack-local `open_iov` array pointer. The first free occurs during normal cleanup after `compound_send_recv()` returns `-EAGAIN` (due to `STATUS_IO_TIMEOUT`). The retry loop (`goto again`) reuses the same `open_iov` array without clearing it. If `SMB2_open_init()` fails on the second iteration (due to reconnect state), the `err_free` label calls `SMB2_open_free()` again on the stale pointer.
+The deadlock arises from two conflicting lock acquisition orders:
 
-The KFENCE report captures all three critical events:
+Path 1 (close → writeback → reopen):
+`close()` → `cifs_flush()` → `netfs_writepages()` [acquires wb_lock] → `cifs_begin_writeback()` → `cifs_get_writable_file()` → `cifs_reopen_file()` [tries lock_sem] — blocked if another thread holds `lock_sem`.
 
-1. Allocation at `smb2_unlink+0x470` — `SMB2_open_init` allocates the CREATE request buffer
-2. First free at `smb2_unlink+0x5db` — normal cleanup after `compound_send_recv` (line 1263)
-3. Invalid second free at `smb2_unlink+0x81c` — `err_free` label (line 1289)
+Path 2 (write → writethrough):
+`write()` → `cifs_strict_writev()` [acquires lock_sem implicitly] → `netfs_perform_write()` → `netfs_begin_writethrough()` [tries wb_lock] — blocked if Path 1 holds `wb_lock`.
+
+When MITM-corrupted SMB2 responses cause connection disruption, `cifs_reopen_file()` is called in the writeback path (which already holds `wb_lock`). This creates the circular dependency.
 
   4.b. Code Flow
 
 ---
-smb2_unlink()                    [fs/smb/client/smb2inode.c:1186]
-  again:
-    SMB2_open_init()             ← allocates cifs_small_rq object (448B)
-    compound_send_recv()         ← server returns STATUS_IO_TIMEOUT → -EAGAIN
-    SMB2_open_free(&rqst[0])    ← FIRST FREE (line 1263), does NOT null open_iov[0]
-    goto again
-  again:
-    memset(rqst, 0, ...)         ← clears rqst[] but NOT open_iov[] (stale pointer!)
-    SMB2_open_init()             ← fails (connection being reconnected) → rc != 0
-    goto err_free
-  err_free:
-    SMB2_open_free(&rqst[0])    ← SECOND FREE of already-freed buffer!
+  CPU0 (dd/855, close path)           CPU1 (write path)
+  ----                                ----
+  close() → cifs_flush()
+    → netfs_writepages()
+      lock(&ctx->wb_lock)             cifs_strict_writev()
+                                        lock(&cifsi->lock_sem)
+    → cifs_begin_writeback()
+      → cifs_get_writable_file()        → netfs_perform_write()
+        → cifs_reopen_file()              → netfs_begin_writethrough()
+          rlock(&cifsi->lock_sem)           lock(&ctx->wb_lock)
+          ^^^ BLOCKED                       ^^^ BLOCKED
+                     DEADLOCK 
 ---
 
-  4.c. KFENCE Crash Trace
+  4.c. Crash Trace
 
 This vulnerability was discovered by ven0mfuzzer. The following kernel trace is submitted following syzkaller's common practice of providing the raw crash trace as the primary reproduction evidence:
 
 ---
-: VFS: Signing Key   d8 d6 c0 c2 b7 56 41 83 e9 d7 b5 fd 2c df 47 62
-[ 1087.254230] CIFS: VFS: ServerIn Key  5b 78 90 2a f0 90 67 84 da 43 e8 f1 a8 43 eb 91
-[ 1087.254673] CIFS: VFS: ServerOut Key 93 3a 5d ae db 4a 4b fb 24 4b c5 b8 f9 e3 47 29
-[ 1087.258673] CIFS: VFS: \\10.0.0.2\fuzzshare validate protocol negotiate failed: -22
-[ 1087.259195] CIFS: VFS: \\10.0.0.2\fuzzshare reconnect tcon failed rc = -5
-[ 1087.259715] ==================================================================
-[ 1087.260125] BUG: KFENCE: invalid free in mempool_free+0xde/0x130
-[ 1087.260125] 
-[ 1087.260556] Invalid free of 0xffff8881f5cc4e40 (in kfence-#97):
-[ 1087.260893]  mempool_free+0xde/0x130
-[ 1087.261124]  cifs_small_buf_release+0x41/0x70
-[ 1087.261392]  SMB2_open_free+0x78/0x1b0
-[ 1087.261631]  smb2_unlink+0x81c/0x8d0
-[ 1087.261870]  __cifs_unlink+0x830/0x1890
-[ 1087.262134]  vfs_unlink+0x2f0/0xbd0
-[ 1087.262369]  filename_unlinkat+0x345/0x6d0
-[ 1087.262628]  __x64_sys_unlinkat+0xc4/0x130
-[ 1087.262886]  do_syscall_64+0x111/0x690
-[ 1087.263125]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[ 1087.263427] 
-[ 1087.263531] kfence-#97: 0xffff8881f5cc4e40-0xffff8881f5cc4fff, size=448, cache=cifs_small_rq
-[ 1087.263531] 
-[ 1087.264219] allocated by task 1881 on cpu 0 at 1059.756104s (27.508113s ago):
-[ 1087.264648]  mempool_alloc_noprof+0x18a/0x2c0
-[ 1087.264919]  cifs_small_buf_get+0x36/0x80
-[ 1087.265210]  __smb2_plain_req_init+0x4b/0x1140
-[ 1087.265487]  SMB2_open_init+0x1ae/0x37f0
-[ 1087.265735]  smb2_unlink+0x470/0x8d0
-[ 1087.265974]  __cifs_unlink+0x830/0x1890
-[ 1087.266226]  vfs_unlink+0x2f0/0xbd0
-[ 1087.266460]  filename_unlinkat+0x345/0x6d0
-[ 1087.266717]  __x64_sys_unlinkat+0xc4/0x130
-[ 1087.266975]  do_syscall_64+0x111/0x690
-[ 1087.267214]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[ 1087.267514] 
-[ 1087.267618] freed by task 1881 on cpu 0 at 1087.241106s (0.026511s ago):
-[ 1087.268109]  mempool_free+0xde/0x130
-[ 1087.268352]  cifs_small_buf_release+0x41/0x70
-[ 1087.268620]  SMB2_open_free+0x78/0x1b0
-[ 1087.268858]  smb2_unlink+0x5db/0x8d0
-[ 1087.269091]  __cifs_unlink+0x830/0x1890
-[ 1087.269293]  vfs_unlink+0x2f0/0xbd0
-[ 1087.269481]  filename_unlinkat+0x345/0x6d0
-[ 1087.269687]  __x64_sys_unlinkat+0xc4/0x130
-[ 1087.269895]  do_syscall_64+0x111/0x690
-[ 1087.270086]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[ 1087.270327] 
-[ 1087.270417] CPU: 0 UID: 0 PID: 1881 Comm: rm Tainted: G    B               6.19.0-g44331bd6a610-dirty #5 PREEMPT(lazy) 
-[ 1087.270900] Tainted: [B]=BAD_PAGE
-[ 1087.271061] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-[ 1087.271561] ==================================================================
-[ 1087.723901] CIFS: VFS: \\10.0.0.2 RFC 1002 unknown response type 0x8
-[ 1087.739764] CIFS: VFS: \\10.0.0.2\IPC$ validate protocol negotiate failed: -11
-[ 1087.740391] CIFS: VFS: \\10.0.0.2\IPC$ reconnect tcon failed rc = -5
-[ 1087.746271] CIFS: VFS: generate_smb3signingkey: dumping generated AES session keys
-[ 1087.746842] CIFS: VFS: Session Id    02 00 00 00 00 00 00 00
-[ 1087.747238] CIFS: VFS: Cipher type   1
-[ 1087.747464] CIFS: VFS: Session Key   71 85 72 ad 7c b4 da e7 cf dc c0 ae 3a 07 98 19
-[ 1087.747888] CIFS: VFS: Signing Key   88 3f d1 03 8b 13 17 97 88 be 52 23 9b 8d a9 ed
-[ 1087.748463] CIFS: VFS: ServerIn Key  0e 28 bd af 95 9d 5d e4 34 0a d5 de a6 9a 74 0d
-[ 1087.749077] CIFS: VFS: ServerOut Key ba a1 76 7c c0 b9 32 db 27 09 85 1a e7 7d cf 65
-[ 1087.754602] CIFS: VFS: \\10.0.0.2\fuzzshare validate protocol negotiate failed: -13
-[ 1087.755289] CIFS: VFS: \\10.0.0.2\fuzzshare reconnect tcon failed rc = -5
-[ 1087.758970] CIFS: VFS: smb2_get_data_area_len: invalid data area (off=10608 len=24)
-[ 1087.759770] CIFS: VFS: \\10.0.0.2\fuzzshare Malformed ioctl resp: len 24 offset 10608
-[ 1087.760271] CIFS: VFS: \\10.0.0.2\fuzzshare validate protocol negotiate failed: -5
-[ 1087.760742] CIFS: VFS: \\10.0.0.2\fuzzshare reconnect tcon failed rc = -5
-[ 1087.764494] CIFS: VFS: \\10.0.0.2\fuzzshare validate protocol negotiate failed: -22
-[ 1087.765178] CIFS: VFS: \\10.0.0.2\fuzzshare reconnect tcon failed rc = -5
-[ 1088.197368] CIFS: VFS: Bad protocol string signature header 420053fe
-[ 1088.198145] CIFS: VFS: Bad SMB detected. The Mid=16
-[ 1088.198652] 00000000: 420053fe 00010040 00000000 000a0005  .S.B@...........
-[ 1088.199364] 00000010: 00000001 00000000 00000010 00000000  ................
-[ 1088.200070] 00000020: 00000776 00000004 00000002 00000002  v...............
-[ 1088.459625] CIFS: VFS: \\10.0.0.2 RFC 1002 unknown response type 0x42
-[ 1089.503269] CIFS: VFS: generate_smb3signingkey: dumping generated AES session keys
-[ 1089.503705] CIFS: VFS: Session Id    02 00 00 00 00 00 00 00
-[ 1089.504013] CIFS: VFS: Cipher type   1
-[ 1089.504229] CIFS: VFS: Session Key   d6 56 c8 0b 7a 8f 2c 81 4a 9a 16 b8 ef a6 df 50
-[ 1089.504575] CIFS: VFS: Signing Key   b6 36 17 ad 2f 1d d5 d6 21 0a 98 37 50 9a 31 08
-[ 1089.504914] CIFS: VFS: ServerIn Key  b6 c4 17 a9 16 ed 60 72 14 1b 64 6b d5 20 5f f2
-[ 1089.505485] CIFS: VFS: ServerOut Key e1 8c 7f af 9e 04 ed 2c 67 47 63 68 e4 eb 9e 2b
-[ 1089.718373] CIFS: VFS: \\10.0.0.2\fuzzshare validate protocol negotiate failed: -22
-[ 1089.719252] CIFS: VFS: \\10.0.0.2\fuzzshare reconnect tcon failed rc = -5
-[ 1090.142104] CIFS: VFS: \\10.0.0.2\fuzzshare validate protocol negotiate failed: -5
-[ 1090.142986] CIFS: VFS: \\10.0.0.2\fuzzshare reconnect tcon failed rc = -5
-[ 1090.353639] CIFS: VFS: \\10.0.0.2\fuzzshare validate protocol negotiate failed: -22
-[ 1090.354254] CIFS: VFS: \\10.0.0.2\fuzzshare reconnect tcon failed rc = -5
-[ 1091.057267] CIFS: VFS: \\10.0.0.2\IPC$ validate protocol negotiate failed: -22
-[ 1091.058141] CIFS: VFS: \\10.0.0.2\IPC$ reconnect tcon failed rc = -5
+[  599.752057] 
+[  599.752318] ======================================================
+[  599.752885] WARNING: possible circular locking dependency detected
+[  599.753401] 6.19.0-g44331bd6a610-dirty #5 Not tainted
+[  599.753757] ------------------------------------------------------
+[  599.754139] dd/855 is trying to acquire lock:
+[  599.754424] ffff888112e5f790 (&cifsi->lock_sem){++++}-{4:4}, at: cifs_reopen_file+0x14aa/0x1e00
+[  599.755109] 
+[  599.755109] but task is already holding lock:
+[  599.755500] ffff888112e5f6c0 (&ctx->wb_lock){+.+.}-{4:4}, at: netfs_writepages+0xba/0xb20
+[  599.756130] 
+[  599.756130] which lock already depends on the new lock.
+[  599.756130] 
+[  599.756633] 
+[  599.756633] the existing dependency chain (in reverse order) is:
+[  599.757090] 
+[  599.757090] -> #1 (&ctx->wb_lock){+.+.}-{4:4}:
+[  599.757496]        lock_acquire+0x150/0x2c0
+[  599.757807]        __mutex_lock+0x19f/0x2330
+[  599.758128]        netfs_begin_writethrough+0x64/0x340
+[  599.758478]        netfs_perform_write+0x13a1/0x2150
+[  599.758833]        netfs_buffered_write_iter_locked+0x1d0/0x240
+[  599.759220]        cifs_strict_writev+0x996/0xe20
+[  599.759545]        vfs_write+0x6bc/0x1200
+[  599.759835]        ksys_write+0x12a/0x250
+[  599.760107]        do_syscall_64+0x111/0x690
+[  599.760419]        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[  599.760776] 
+[  599.760776] -> #0 (&cifsi->lock_sem){++++}-{4:4}:
+[  599.761114]        check_prev_add+0xeb/0xd00
+[  599.761348]        __lock_acquire+0x1641/0x2260
+[  599.761593]        lock_acquire+0x150/0x2c0
+[  599.761819]        down_read+0x9b/0x450
+[  599.762033]        cifs_reopen_file+0x14aa/0x1e00
+[  599.762287]        cifs_get_writable_file+0x57a/0xa30
+[  599.762562]        cifs_begin_writeback+0x49/0xf0
+[  599.762818]        netfs_writepages+0x4eb/0xb20
+[  599.763070]        do_writepages+0x26a/0x5c0
+[  599.763319]        filemap_writeback+0x1fc/0x290
+[  599.763575]        filemap_write_and_wait_range+0xa6/0x130
+[  599.763874]        cifs_flush+0xb8/0x2d0
+[  599.764094]        filp_flush+0x128/0x1d0
+[  599.764324]        __x64_sys_close+0x7f/0x120
+[  599.764569]        do_syscall_64+0x111/0x690
+[  599.764804]        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[  599.765092] 
+[  599.765092] other info that might help us debug this:
+[  599.765092] 
+[  599.765477]  Possible unsafe locking scenario:
+[  599.765477] 
+[  599.765767]        CPU0                    CPU1
+[  599.766007]        ----                    ----
+[  599.766234]   lock(&ctx->wb_lock);
+[  599.766426]                                lock(&cifsi->lock_sem);
+[  599.766741]                                lock(&ctx->wb_lock);
+[  599.767046]   rlock(&cifsi->lock_sem);
+[  599.767251] 
+[  599.767251]   DEADLOCK 
+[  599.767251] 
+[  599.767541] 1 lock held by dd/855:
+[  599.767724]  #0: ffff888112e5f6c0 (&ctx->wb_lock){+.+.}-{4:4}, at: netfs_writepages+0xba/0xb20
+[  599.768201] 
+[  599.768201] stack backtrace:
+[  599.768451] CPU: 0 UID: 0 PID: 855 Comm: dd Not tainted 6.19.0-g44331bd6a610-dirty #5 PREEMPT(lazy) 
+[  599.768475] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+[  599.768494] Call Trace:
+[  599.768509]  <TASK>
+[  599.768518]  dump_stack_lvl+0xc6/0x120
+[  599.768545]  print_circular_bug+0x2d1/0x400
+[  599.768569]  check_noncircular+0x146/0x160
+[  599.768594]  check_prev_add+0xeb/0xd00
+[  599.768617]  __lock_acquire+0x1641/0x2260
+[  599.768647]  lock_acquire+0x150/0x2c0
+[  599.768669]  ? cifs_reopen_file+0x14aa/0x1e00
+[  599.768694]  ? __pfx___might_resched+0x10/0x10
+[  599.768722]  ? dentry_path_raw+0xcd/0x120
+[  599.768756]  down_read+0x9b/0x450
+[  599.768780]  ? cifs_reopen_file+0x14aa/0x1e00
+[  599.768803]  ? __pfx_down_read+0x10/0x10
+[  599.768826]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  599.768852]  ? __build_path_from_dentry_optional_prefix+0x423/0x620
+[  599.768880]  cifs_reopen_file+0x14aa/0x1e00
+[  599.768908]  ? __pfx_smb2_get_lease_key+0x10/0x10
+[  599.768941]  ? __pfx_cifs_reopen_file+0x10/0x10
+[  599.768969]  ? cifs_get_writable_file+0x570/0xa30
+[  599.768996]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  599.769020]  ? lock_release+0xc7/0x270
+[  599.769044]  cifs_get_writable_file+0x57a/0xa30
+[  599.769072]  ? iov_iter_folio_queue+0x31/0x1f0
+[  599.769117]  cifs_begin_writeback+0x49/0xf0
+[  599.769145]  netfs_writepages+0x4eb/0xb20
+[  599.769175]  ? __pfx_netfs_writepages+0x10/0x10
+[  599.769204]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  599.769228]  ? kasan_save_stack+0x42/0x60
+[  599.769263]  ? kasan_save_stack+0x33/0x60
+[  599.769290]  ? kasan_record_aux_stack+0xa7/0xc0
+[  599.769314]  ? __call_rcu_common.constprop.0+0x71/0xb00
+[  599.769345]  ? __fput+0x68d/0xb70
+[  599.769371]  ? fput_close_sync+0x118/0x240
+[  599.769399]  ? __x64_sys_close+0x8b/0x120
+[  599.769429]  ? __pfx_netfs_writepages+0x10/0x10
+[  599.769459]  do_writepages+0x26a/0x5c0
+[  599.769486]  ? __pfx_do_writepages+0x10/0x10
+[  599.769512]  filemap_writeback+0x1fc/0x290
+[  599.769541]  ? __pfx_filemap_writeback+0x10/0x10
+[  599.769582]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  599.769607]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  599.769630]  ? lock_is_held_type+0x8f/0x100
+[  599.769651]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  599.769677]  filemap_write_and_wait_range+0xa6/0x130
+[  599.769713]  cifs_flush+0xb8/0x2d0
+[  599.769740]  ? __pfx_cifs_flush+0x10/0x10
+[  599.769767]  filp_flush+0x128/0x1d0
+[  599.769789]  __x64_sys_close+0x7f/0x120
+[  599.769819]  do_syscall_64+0x111/0x690
+[  599.769845]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[  599.769866] RIP: 0033:0x7f2a653e59e0
+[  599.769882] Code: 0d 00 00 00 eb b2 e8 0f f8 01 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 80 3d 01 2c 0e 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
+[  599.769902] RSP: 002b:00007fff1b0d2738 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
+[  599.769922] RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007f2a653e59e0
+[  599.769935] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000001
+[  599.769947] RBP: 00007f2a652ea6c0 R08: 001c504f75800000 R09: 00007f2a654d4000
+[  599.769961] R10: 00007f2a653064f0 R11: 0000000000000202 R12: 0000000000000000
+[  599.769974] R13: 0000000000000000 R14: 0000000000000008 R15: 0000000000000008
+[  599.769993]  </TASK>
+[  599.855370] CIFS: VFS: \\10.0.0.2 SMB response too long (134217728 bytes)
+[  600.866435] CIFS: VFS: generate_smb3signingkey: dumping generated AES session keys
+[  600.867038] CIFS: VFS: Session Id    01 00 00 00 00 00 00 00
+[  600.867488] CIFS: VFS: Cipher type   1
+[  600.867783] CIFS: VFS: Session Key   60 f3 79 68 76 95 29 2f dd 55 e3 70 3c dc 60 b9
+[  600.868472] CIFS: VFS: Signing Key   9f cb c1 31 b8 79 0e ae a2 ac 10 0c e1 8b f9 fe
+[  600.869030] CIFS: VFS: ServerIn Key  65 cf ab 4d ce ba 97 26 88 6e f8 42 2e 8a 06 e9
+[  600.869605] CIFS: VFS: ServerOut Key a0 30 bd 69 e2 e7 ef 34 6a a1 ae a3 95 f7 dd 8f
+[  600.897704] dd (850) used greatest stack depth: 20312 bytes left
+[  601.137178] CIFS: VFS: \\10.0.0.2 RFC 1002 unknown response type 0x5
+[  601.141560] CIFS: VFS: \\10.0.0.2\IPC$ reconnect tcon failed rc = -11
+[  601.151852] CIFS: VFS: generate_smb3signingkey: dumping generated AES session keys
+[  601.152430] CIFS: VFS: Session Id    01 00 00 00 00 00 00 00
+[  601.152802] CIFS: VFS: Cipher type   1
+[  601.153054] CIFS: VFS: Session Key   b7 e4 09 8f f5 15 be c6 26 eb 47 b4 eb 81 ba 54
+[  601.153645] CIFS: VFS: Signing Key   3d cb ba 59 5d 85 1d 38 4f 68 e3 a0 36 f9 9d 7c
+[  601.154133] CIFS: VFS: ServerIn Key  af 0f b2 27 b8 df ff ca 23 48 fe 21 73 ca ab e1
+[  601.154628] CIFS: VFS: ServerOut Key 3a bc c1 4b 06 ee ce 01 e0 a3 05 db d7 30 d5 91
+[  601.254390] cat (865) used greatest stack depth: 20144 bytes left
 
 ---
 
-Key forensic facts from KFENCE:
-- Object size: 448 bytes, cache `cifs_small_rq`
-- Object lifetime: 27.5 seconds (alloc at 1059.756s, first free at 1087.241s)
-- Time between frees: 0.027 seconds (deterministic, single-threaded)
-- Both frees from same task (PID 1881, `rm`) — no race condition involved
+  4.d. Suggested Fix
 
-  4.d. Relationship to crash_001
-
-crash_001 detected the same double-free via KASAN. This KFENCE detection (crash_008) is an independent confirmation of the same root cause with additional forensic data. Together they provide overwhelming evidence that the bug is real, deterministic, and affecting both KASAN and KFENCE instrumentation paths.
-
-  4.e. Suggested Fix
-
-Null out the pointer in `SMB2_open_free()` after releasing the buffer:
-
----
-void SMB2_open_free(struct smb_rqst *rqst)
-{
-    int i;
-    if (rqst && rqst->rq_iov) {
-        cifs_small_buf_release(rqst->rq_iov[0].iov_base);
-+       rqst->rq_iov[0].iov_base = NULL;
-        for (i = 1; i < rqst->rq_nvec; i++)
-            if (rqst->rq_iov[i].iov_base != smb2_padding)
-                kfree(rqst->rq_iov[i].iov_base);
-+       rqst->rq_nvec = 0;
-    }
-}
----
-
-Alternatively, add `memset(open_iov, 0, sizeof(open_iov))` at the `again` label in `smb2_unlink()`.
+Drop `wb_lock` before calling `cifs_reopen_file()` in the writeback path, or restructure `cifs_begin_writeback()` so that file reopening does not occur while `wb_lock` is held. Alternatively, the `cifs_get_writable_file()` function should use `down_read_trylock()` on `lock_sem` when called from the writeback path and return an error if the lock cannot be acquired, allowing the caller to retry later.
 
   5. Discovery Method and Reproduction
 
   5.a. Discovery
 
-This vulnerability was discovered using ven0mfuzzer, a custom-designed MITM-based network filesystem fuzzer developed by our team. The fuzzer operates by positioning an AF_PACKET/TCP transparent proxy between a Linux kernel filesystem client (VM-A) and its server (VM-B), then mutating network protocol messages in-flight. We designed ven0mfuzzer specifically for this class of network filesystem vulnerabilities.
+This vulnerability was discovered using ven0mfuzzer, a custom-designed MITM-based network filesystem fuzzer developed by our team. The fuzzer operates by positioning an AF_PACKET/TCP transparent proxy between a Linux kernel filesystem client (VM-A) and its server (VM-B), then mutating network protocol messages in-flight.
 
-Following the common syzkaller practice, we submit the kernel crash trace as the primary reproduction artifact. The trace above was captured with KFENCE enabled on kernel 6.19.0.
+Following the common syzkaller practice, we submit the kernel crash trace as the primary reproduction artifact. The trace above was captured with LOCKDEP enabled on kernel 6.19.0.
 
   5.b. Reproduction Setup
 
@@ -290,7 +322,7 @@ Following the common syzkaller practice, we submit the kernel crash trace as the
 VM-A (CIFS client) ──SMB2──► Host:44446 (MITM proxy) ──TCP──► Host:44445 ──hostfwd──► VM-B:445 (ksmbd)
 ---
 
-Trigger condition: Any `unlink` operation on a CIFS mount while the MITM injects `STATUS_IO_TIMEOUT` (`0xC00000B5`) in CREATE responses followed by a forced reconnect.
+Trigger condition: Concurrent `close()` (triggering writeback flush) and `write()` operations on the same CIFS-mounted file while the MITM proxy corrupts SMB2 responses to force a reconnection in the writeback path.
 
 ---
 Reported-by: ven0mfuzzer <ven0mkernelfuzzer@gmail.com>
