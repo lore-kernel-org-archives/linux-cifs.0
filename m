@@ -1,70 +1,80 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-vs1-f65.google.com (mail-vs1-f65.google.com [209.85.217.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997823BE160
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Apr 2026 11:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322B93A4F27
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Apr 2026 13:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775128045; cv=none; b=TcvtklunX5ypaRU3gPGEOxqlEu6IA/scMgKUVJWqzREENAe+cnSUm44k+nrSSWG8cTRvyxMl8UKb5aTfL8vBtzvodFpxF/KV9UIhtrcG1Vcvo+LF+EgXtSpDjJsN1JfASeSHR1SSR2oqLczzoHPFp/NFCPwRGdA/zSCHY5/T7nw=
+	t=1775135184; cv=none; b=CQ3Qi637oEddtj6SvXbBOczv2d++KpQ6S406tthDyaN/B+sxBa/6z84wd0cj7Odh8zll+AvoDsu7k4U8oFWLShyqYr6ASdY0xJs4GdXfnViZaCGKmuaQSle+ce/eSMR9dIqtvknBEyenUOXvTI0i7S50FcnPkTydgjcBon3FDmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775128045; c=relaxed/simple;
-	bh=/EAm8QHHZtYrAIP+97mH3AdvvNbUbtZFUv3U52G/8r4=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=X+0oqJyc+aqjNt5rzPBwba7C9Ug1cuvXFfEVlY8SOBpcrrHRBD94Kc6X7rEzj7CfzcRdQZd3UEE8TcIynvnIbjXXOi4CKK4XwBnkNiICBi1RIIUjSttG7pGzdCGqqqu4yNG5lu1zO7Zj0BI7geD0Nh3PZ8Vpstgk+abBiV6oAQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mQdanHiw; arc=none smtp.client-ip=209.85.210.179
+	s=arc-20240116; t=1775135184; c=relaxed/simple;
+	bh=ik7uUTib9+LCz0UAAdU8wVthAJCsJQ9Tt8iu7WwCWkA=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=ANU7H1IySFMoHZ6dFBAVXLokgQrZd6fMw8zi+HizZnoa/LgzkWbegfWdMaVYMREzcLzn62A70TsSDiyxqzh2UKKGR0eCPotqxp4ElFfbKH2IxgGceOuOE9x0HTxs36MRJDYHjvHfj9TVcfX/APrwxWC8XhWP14KjxwtT5ShGIe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bfUOkdby; arc=none smtp.client-ip=209.85.217.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mQdanHiw"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-827270d50d4so697963b3a.3
-        for <linux-cifs@vger.kernel.org>; Thu, 02 Apr 2026 04:07:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bfUOkdby"
+Received: by mail-vs1-f65.google.com with SMTP id ada2fe7eead31-5ffdd9a6155so1844137137.1
+        for <linux-cifs@vger.kernel.org>; Thu, 02 Apr 2026 06:06:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775128042; x=1775732842; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775135177; x=1775739977; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:subject:cc:to:from
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3h3GW1rO9GTli/mxZGzKkIJ+7XNO9TdzOOFz8ZN3mAU=;
-        b=mQdanHiwXJ8kIfnAfdF9CMtLtRKRuTjOadOy0Z6SaTrbqINlVT2JpmstTPEUSbxlOq
-         U2DdxbUoBkxtAyOSPLWiRJ+BmzzOUdUFuP+NHed1LCnh4OkATsPz1EmX1WmFNqlklVWD
-         4m+LtFYNhRuaf0dSuO9yCgS0u3S04bK4EGeh2v1/XLpFGtj/iPhDjzkfyhqXAtijq7I9
-         vKZZh3wrCg2lvIdvG7TtMVjlBq1H9vlpDI+m6/oaPwpYOQ2COHmOTV04ekX+2p2gNXMd
-         mlPiXxcCWahICABPoFeEcPutAey/zBrUJe5sNYS5gYXPCz9V+4txj0sBKkQHLlq8+eE1
-         Rwow==
+        bh=f10hXx8Ya/o2nsVJSMU9jz32XKIcCmbLZ6lBcgyEWlM=;
+        b=bfUOkdbym1vG20v5T1ObL72no8Cp1A9rP6pG/4c8bkIXUVJAZfGgzbv0pchaExI68v
+         epxMwJZt1o301ehqj1oj4Nr2KicS7a6r+dg23jy0d849qhsUU0OcfM/AevqSqvKMNHbh
+         8CMV5QWty2n7RtiB1y6k76ZmvjdCHj74nvF/2/H2w+lMkgtHubw9SWyq2tol6E8WQC0B
+         Cup5/mZg+RMi926Q9RprEMcJws1Gq652s08V5kjAutBmBkL2QrccJZt6JizkKg1gZMAe
+         rNLEBuD+jEG4WEWV3ctwoEC+09T//qwjN16R6z8R3bf6OOrDUm7QXC+XwDMc1ZP9UYoo
+         FYyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775128042; x=1775732842;
+        d=1e100.net; s=20251104; t=1775135177; x=1775739977;
         h=content-transfer-encoding:mime-version:date:subject:cc:to:from
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3h3GW1rO9GTli/mxZGzKkIJ+7XNO9TdzOOFz8ZN3mAU=;
-        b=E4p4c5LdRpZrTZXxBkCLTQwnMwFBYQHt1/kNxS8qUsvFy+wJIeHtHrnVx+flYi8Z1/
-         uqjdlvAA2XU89Cl5E5kJxXh6jrsxHn75PbBeL3ymbOYOnDDYYsrPD1029D20IgU0w3k+
-         6maGe2pognbyqrG2ZzXvalqxvOc9OFfT0YDJGicq8puPn2g1MKQKF598vTZz7bNAAX6x
-         pC0j1ODhI9mgHdjof13shHf3zz3fSnjxjwx5p2q4dycwkaUNjNy2/YkFJJmKEjdNGv/g
-         RgQ/A6Rb7Q4ntRwuP2DEDewejNn2UFwyQEzd2zySnW/iGdQQFP71iamvxptPz7j4gXXC
-         59+A==
-X-Gm-Message-State: AOJu0YzdM1IW7GM0IFPP2dxI3IZXMr48H6NE+7GHSk6c04LA/qLJhivw
-	bgLur9LSHdTppBT4FCBQKjDGdhKHD/ZFyTfvyRXh1vxTpAMMCURhS83r
-X-Gm-Gg: ATEYQzy2dA3ia1GUXp1Xhs3j8S/JAiNhGyD9x8q3Vn7lTw5IuF/0TKFvYjVSjVh/gRh
-	y+NP5TcOanb7iyiZxhZuopiE+tngulonlCe7pnYcjsR79yuv7lYcqUpDFQBhZx/fIMcsuseO5nj
-	nEODUQmN7/VPVu/jy/Mf1fHGhvub8BxyUQJAG3CQefy4V/TBrVyOHw2/XqHIfqOK3/4juibnS7r
-	0VdR5+2KLvaBMN3kD4bDtcX8mz4Zr6zr6oaoRezha/sLX7GzrT5stuw6b/M2iOhZ8C1NBR2HETY
-	BlJiDHC0ltXtOQd5gm5ioP2pKn5ki15QFyBCUxflN0nRlPg33fEkkIwqYQp8NTFKETxce8vDF+0
-	vMCuajsfrN+np1OUwSCEdNRw99zgUY1NbyRpgH2XJr3Uj2IMdoghE0m9AgOAxR4aUZ/iQwARY7v
-	/J/L33J5S0yvSX1dTmq2jyOy49s+L50g==
-X-Received: by 2002:a05:6a00:4086:b0:82c:dc17:2918 with SMTP id d2e1a72fcca58-82ce88e077emr7711673b3a.13.1775128041497;
-        Thu, 02 Apr 2026 04:07:21 -0700 (PDT)
+        bh=f10hXx8Ya/o2nsVJSMU9jz32XKIcCmbLZ6lBcgyEWlM=;
+        b=pOySg2l3NhOI3KTLe5cZRI4h/CK81aGNJixKjypUCnsSGNJzr5ACC2uoNpK9cUVa0F
+         wVJ+O7HPT2n0zwygCxpE3mAIBTfte8Dgb5/RRPA0smnzdag/KJt2o36ID1zxBkev6Oab
+         PLz069F+RbCeYnej42Ki9+b8FT8K2XvFsoOIN1B7Fn7ES26Ki7Fit+XqxY8qG2Wq/ZT2
+         a1d5A5/mWy7jebXlH00ct7E53s7jyVyejSWTRelHsia2Jf8hXiTZuXyXBPEq3/nP6uwv
+         smOZPjBgmxUt//rBCqF0bj0dzQw0oBemQofPpw1FKDpk07P+XEtKAhSpTEULsmTKbS23
+         Sfsw==
+X-Gm-Message-State: AOJu0YwFUzPy1z/TZ4WuDwWzx7Bmm2eN205O/HnduxMWntpAmHinj72B
+	naIu0KEaPIoqiNKSrL2HU0bQrVw2lY+1novbD73b2CgZ6MIKLQl+4W+KmbZORYWcC9ZmbHFP
+X-Gm-Gg: ATEYQzzVCMXIGJh0m8bm1Eg3U51HS59a7M3Ed1N+ndNurcvPmJDe+KtISqSWGn9i1WI
+	f0KLOHoYzCgM+e8XcsbQqYZU6V9A4ddP/JwXCB/fWA/ohiY9ZlnHytCFetsOnx6i47Y4slutqPV
+	hGKldh/zOE2NKcbIa/ad3Cyu81XhsX0MbWfg68DtIxzfVZ9pMptxUuf07yVfSSsY1VQTBXswwWe
+	Mgki7Kd+ujjyn3q21UvAiXlwP7hf2IqIMThnBEcmnYJbsugdjEpZehVJTPikQMwExpJeWHzH5A/
+	IP3uJkgeiLqhuvlq8jqeA7ekmdzAp0bl3bEr04W3YcSL7NDgLuIJXg5baO0jAJ8vw1HU2z0EpE4
+	6PTUKK7+O1+dhfZgktqmeGFRHnu1yxdaQLXrzXf+BX2qX6CYZZntjBr3HhEmLH0EfSoP1FLoZSU
+	ha4Hgu5mORP5K+woNqxHs=
+X-Received: by 2002:a17:90b:1f85:b0:359:8957:7285 with SMTP id 98e67ed59e1d1-35dd67257bbmr1602746a91.3.1775128030888;
+        Thu, 02 Apr 2026 04:07:10 -0700 (PDT)
 Received: from localhost ([137.132.22.254])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9b3baffsm2826534b3a.14.2026.04.02.04.07.20
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dd35364edsm2447388a91.0.2026.04.02.04.07.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 04:07:21 -0700 (PDT)
-Message-ID: <69ce4de9.050a0220.83ffb.1587@mx.google.com>
+        Thu, 02 Apr 2026 04:07:10 -0700 (PDT)
+Message-ID: <69ce4dde.170a0220.39732d.82c2@mx.google.com>
 From: ven0mfuzzer <ven0mkernelfuzzer@gmail.com>
 To: Namjae Jeon <linkinjeon@kernel.org>,
         Tom Talpey <tom@talpey.com>,
+        Jakub Kicinski <kuba@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <smfrench@gmail.com>
+        Eric Dumazet <edumazet@google.com>,
+        Kuniyuki Iwashima <kuniyu@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Steve French <smfrench@gmail.com>,
+        Neal Cardwell <ncardwell@google.com>,
+        Simon Horman <horms@kernel.org>,
+        Willem de Bruijn <willemb@google.com>,
+        David Ahern <dsahern@kernel.org>
 Cc: linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [BUG] Linux Kernel ksmbd Circular Locking Dependency: Oplock Break vs Session Teardown
-Date: Thu, 02 Apr 2026 19:07:18 +0800
+        linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [BUG] Linux Kernel ksmbd Multiple Memory Leaks in Session Handling
+Date: Thu, 02 Apr 2026 19:07:09 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -75,33 +85,34 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Mailer: KernelStackFuzz send_email.sh
 
-Linux Kernel ksmbd Circular Locking Dependency: Oplock Break vs Session Teardown
+Linux Kernel ksmbd Multiple Memory Leaks in Session Handling
 
   1. Vulnerability Title
 
-Linux Kernel ksmbd Server srv_mutex / session_lock / m_lock Circular Locking Deadlock Vulnerability
+Linux Kernel ksmbd Server Multiple Kernel Memory Leak Vulnerability in Session Setup/Teardown
 
   2. High-Level Overview
 
-A circular locking dependency exists in the Linux kernel ksmbd (in-kernel SMB server) between the oplock break notification path and the session teardown path. When `smb2_set_info` triggers an oplock break while holding `ci->m_lock`, the notification path attempts to acquire `conn->srv_mutex` via `ksmbd_conn_write()`. Simultaneously, if another thread is tearing down a session, it holds `srv_mutex` and attempts to acquire `session_lock` and then `m_lock` through `ksmbd_session_destroy()`. This produces a 3-level lock chain deadlock: `&conn->srv_mutex → &conn->session_lock → &ci->m_lock`. When the deadlock occurs, ksmbd worker threads enter D-state (uninterruptible sleep) and cannot be killed, rendering the SMB server completely unresponsive.
+Seven distinct kernel memory leaks exist in the ksmbd (in-kernel SMB server) session handling paths. During SMB session setup and teardown, multiple kernel objects — including socket inodes (1344 bytes), LSM security blobs (120 and 32 bytes), TCP connection structures (3264 bytes), ksmbd connection contexts (64 and 16 bytes), and network skb buffers (240 bytes) — are allocated but never freed. These leaks accumulate over time with repeated session establishment, allowing a remote attacker to exhaust kernel memory by repeatedly connecting and disconnecting SMB sessions. This constitutes a denial-of-service vulnerability.
 
 This vulnerability was discovered using ven0mfuzzer, our custom-designed MITM-based network filesystem fuzzer developed by our team. Following the common syzkaller practice, we submit the kernel crash trace as the primary reproduction artifact.
 
   3. Affected Product and Version Information
 
 Product: Linux Kernel (upstream mainline)
-Affected Component: `fs/smb/server/oplock.c` — `smb_break_all_levII_oplock()`, `oplock_break()`
+Affected Component: `fs/smb/server/` — ksmbd session setup/teardown, connection handling
 Supporting Components:
-- `fs/smb/server/connection.c` — `ksmbd_conn_write()` (acquires `srv_mutex`)
-- `fs/smb/server/mgmt/user_session.c` — `ksmbd_session_destroy()` (acquires `m_lock` under `session_lock`)
-- `fs/smb/server/smb2pdu.c` — `smb2_set_info()`, `smb2_sess_setup()`
+- `fs/smb/server/transport_tcp.c` — `ksmbd_kthread_fn()`, `ksmbd_tcp_readv()`
+- `fs/smb/server/connection.c` — connection context allocation
+- `net/socket.c` — `sock_alloc_inode()`, `kernel_accept()`
+- `net/ipv4/tcp_minisocks.c` — `tcp_create_openreq_child()`
 
   Tested Versions (confirmed vulnerable)
 - Linux kernel 6.19.0 (mainline, commit `44331bd6a610`, gcc 11.4.0, built 2026-02-13)
 - Linux kernel 6.12.74 (LTS, used in Google kernelCTF COS target)
 
   Affected Version Range
-All kernels with ksmbd oplock support (approximately 5.15 through 6.19) are believed affected.
+All kernels with ksmbd support (approximately 5.15 through 6.19) are believed affected.
 
   Affected Distributions and Products
 
@@ -119,161 +130,124 @@ All kernels with ksmbd oplock support (approximately 5.15 through 6.19) are beli
 
   4.a. Detailed Description
 
-The deadlock involves three locks forming a circular chain:
+The kmemleak detector identified 7 unreferenced kernel objects allocated during ksmbd session handling that are never freed. These leaks occur across multiple subsystems involved in SMB connection management:
 
-1. Path A (oplock break): `smb2_set_info()` → `smb_break_all_levII_oplock()` acquires `ci->m_lock` (read lock), then calls `oplock_break()` → `__smb2_oplock_break_noti()` → `ksmbd_conn_write()` which attempts to acquire `conn->srv_mutex`.
+1. Socket inode (1344 bytes): Allocated by `sock_alloc_inode()` during `kernel_accept()` in `ksmbd_kthread_fn()`. The accepted socket's inode is not properly released when the connection is torn down.
 
-2. Path B (session teardown): `ksmbd_conn_handler_loop()` → `ksmbd_sessions_deregister()` holds `srv_mutex`, acquires `session_lock`, then calls `ksmbd_session_destroy()` → `__close_file_table_ids()` which attempts to acquire `ci->m_lock` (write lock).
+2. LSM security blob (120 bytes): Allocated by `security_inode_alloc()` during inode initialization for the socket. Leaked because the parent inode is leaked.
 
-3. Path C (session setup): `smb2_sess_setup()` → `ksmbd_session_lookup()` acquires `session_lock` under the context where `srv_mutex` is implicitly ordered first.
+3. TCP connection structure (3264 bytes): Allocated by `sk_prot_alloc()` during `tcp_create_openreq_child()` when accepting a new TCP connection. The TCP socket is not properly closed on session teardown.
 
-The resulting chain `srv_mutex → session_lock → m_lock` conflicts with Path A's `m_lock → srv_mutex` ordering.
+4. LSM security blob for socket (32 bytes): Allocated by `security_sk_alloc()` for the cloned TCP socket. Leaked with the parent TCP structure.
+
+5. ksmbd connection context (64 bytes): Allocated by `ksmbd_kthread_fn()` for per-connection state. Not freed when the connection handler exits abnormally.
+
+6. ksmbd TCP read buffer (16 bytes): Allocated by `ksmbd_tcp_readv()` for receiving SMB messages. Not freed when read is interrupted.
+
+7. SKB buffer (240 bytes): Allocated by `build_skb()` in the virtio-net receive path for incoming SMB packets. Orphaned when the associated socket is leaked.
 
   4.b. Code Flow
 
 ---
-Path A (oplock break — holds m_lock, wants srv_mutex):
-  smb2_set_info+0x2506/0x30e0
-    → smb_break_all_levII_oplock+0x12a/0x940  [acquires ci->m_lock]
-      → oplock_break+0xda9/0x15d0
-        → __smb2_oplock_break_noti+0x8ac/0xba0
-          → ksmbd_conn_write+0x100/0x400       [wants srv_mutex] ← BLOCKED
+ksmbd_kthread_fn()                    [fs/smb/server/transport_tcp.c]
+  → kernel_accept()                   ← allocates socket inode (1344B) + security blob (120B)
+    → sock_alloc() → alloc_inode()
+    → security_inode_alloc()
 
-Path B (session teardown — holds srv_mutex, wants m_lock):
-  ksmbd_conn_handler_loop+0xaf1/0xfd0
-    → ksmbd_server_terminate_conn
-      → ksmbd_sessions_deregister+0x41d/0x750  [holds srv_mutex]
-        → ksmbd_session_destroy+0x105/0x3e0
-          → ksmbd_destroy_file_table+0x4a/0xe0
-            → __close_file_table_ids+0x1ad/0x430 [wants ci->m_lock] ← BLOCKED
+TCP SYN_RECV → ESTABLISHED:
+  → tcp_create_openreq_child()        ← allocates TCP sock (3264B) + security blob (32B)
+    → sk_prot_alloc() → sk_clone()
+    → security_sk_alloc()
 
-  Deadlock scenario:
-        CPU0                           CPU1
-        ----                           ----
-   rlock(&ci->m_lock)
-                                  lock(&conn->session_lock)
-                                  lock(&ci->m_lock)         ← waits CPU0
-   lock(&conn->srv_mutex)                                   ← waits CPU1
-                        DEADLOCK 
+ksmbd_kthread_fn() continued:
+  → kmalloc (64B)                     ← ksmbd connection context
+
+ksmbd_conn_handler_loop():
+  → ksmbd_tcp_readv()
+    → kmalloc (16B)                   ← TCP read buffer
+
+[on session teardown — objects NOT freed due to missing cleanup]
 ---
 
   4.c. Crash Trace
 
-This vulnerability was discovered by ven0mfuzzer. The following kernel trace is submitted following syzkaller's common practice of providing the raw crash trace as the primary reproduction evidence:
+This vulnerability was discovered by ven0mfuzzer. The following kmemleak output is submitted following syzkaller's common practice of providing the raw kernel trace as the primary reproduction evidence:
 
 ---
+unreferenced object 0xffff88810af3d180 (size 1344):
+  comm "ksmbd-eth0", pid 328, jiffies 4294901355
+  backtrace (crc 1a26ccb4):
+    kmem_cache_alloc_lru_noprof+0x3ed/0x5f0
+    sock_alloc_inode+0x25/0x1c0
+    alloc_inode+0x64/0x240
+    sock_alloc+0x40/0x280
+    sock_create_lite+0x82/0x120
+    kernel_accept+0x16b/0x380
+    ksmbd_kthread_fn+0xee/0xf30
 
-[  752.089825] ======================================================
-[  752.090256] WARNING: possible circular locking dependency detected
-[  752.090682] 6.19.0-g44331bd6a610-dirty #5 Not tainted
-[  752.091032] ------------------------------------------------------
-[  752.091449] kworker/1:4/516 is trying to acquire lock:
-[  752.091808] ffff88810c75d088 (&conn->srv_mutex){+.+.}-{4:4}, at: ksmbd_conn_write+0x100/0x400
-[  752.093014] 
-               but task is already holding lock:
-[  752.093423] ffff8881040d7770 (&ci->m_lock){++++}-{4:4}, at: smb_break_all_levII_oplock+0x12a/0x940
-[  752.094161] 
-               which lock already depends on the new lock.
+unreferenced object 0xffff888107243bd0 (size 120):
+  comm "ksmbd-eth0", pid 328, jiffies 4294901355
+  backtrace (crc 6bd3e180):
+    kmem_cache_alloc_noprof+0x3ed/0x5f0
+    security_inode_alloc+0x3b/0x140
+    inode_init_always_gfp+0xbf9/0xf20
+    alloc_inode+0x86/0x240
+    sock_alloc+0x40/0x280
+    sock_create_lite+0x82/0x120
+    kernel_accept+0x16b/0x380
+    ksmbd_kthread_fn+0xee/0xf30
 
-[  752.094692] 
-               the existing dependency chain (in reverse order) is:
-[  752.095168] 
-               -> #2 (&ci->m_lock){++++}-{4:4}:
-[  752.095617]        lock_acquire+0x150/0x2c0
-[  752.095965]        down_write+0x92/0x1f0
-[  752.096331]        __close_file_table_ids+0x1ad/0x430
-[  752.096738]        ksmbd_destroy_file_table+0x4a/0xe0
-[  752.097099]        ksmbd_session_destroy+0x105/0x3e0
-[  752.097462]        ksmbd_sessions_deregister+0x41d/0x750
-[  752.097848]        ksmbd_server_terminate_conn+0x15/0x30
-[  752.099598]        ksmbd_conn_handler_loop+0xaf1/0xfd0
-[  752.099993]        kthread+0x378/0x490
-[  752.101482]        ret_from_fork+0x676/0xac0
-[  752.101839]        ret_from_fork_asm+0x1a/0x30
-[  752.102205] 
-               -> #1 (&conn->session_lock){++++}-{4:4}:
-[  752.103665]        lock_acquire+0x150/0x2c0
-[  752.103987]        down_read+0x9b/0x450
-[  752.105340]        ksmbd_session_lookup+0x22/0xd0
-[  752.105673]        smb2_sess_setup+0x5aa/0x5fb0
-[  752.106002]        handle_ksmbd_work+0x4f5/0x1330
-[  752.107434]        process_one_work+0x962/0x1a40
-[  752.107815]        worker_thread+0x6ce/0xf10
-[  752.108139]        kthread+0x378/0x490
-[  752.109498]        ret_from_fork+0x676/0xac0
-[  752.109830]        ret_from_fork_asm+0x1a/0x30
-[  752.110184] 
-               -> #0 (&conn->srv_mutex){+.+.}-{4:4}:
-[  752.111706]        check_prev_add+0xeb/0xd00
-[  752.112033]        __lock_acquire+0x1641/0x2260
-[  752.113628]        lock_acquire+0x150/0x2c0
-[  752.113927]        __mutex_lock+0x19f/0x2330
-[  752.114234]        ksmbd_conn_write+0x100/0x400
-[  752.115610]        __smb2_oplock_break_noti+0x8ac/0xba0
-[  752.115973]        oplock_break+0xda9/0x15d0
-[  752.117436]        smb_break_all_levII_oplock+0x6a7/0x940
-[  752.117817]        smb2_set_info+0x2506/0x30e0
-[  752.118137]        handle_ksmbd_work+0x4f5/0x1330
-[  752.119513]        process_one_work+0x962/0x1a40
-[  752.119858]        worker_thread+0x6ce/0xf10
-[  752.120165]        kthread+0x378/0x490
-[  752.121519]        ret_from_fork+0x676/0xac0
-[  752.121858]        ret_from_fork_asm+0x1a/0x30
-[  752.122207] 
-               other info that might help us debug this:
+unreferenced object 0xffff88810fbfa980 (size 3264):
+  comm "softirq", pid 0, jiffies 4294902189
+  backtrace (crc c2de1a0c):
+    kmem_cache_alloc_noprof+0x3ed/0x5f0
+    sk_prot_alloc+0x60/0x2a0
+    sk_clone+0x79/0x14f0
+    inet_csk_clone_lock+0x2f/0x760
+    tcp_create_openreq_child+0x34/0x26a0
+    tcp_v4_syn_recv_sock+0x115/0x10e0
 
-[  752.123816] Chain exists of:
-                 &conn->srv_mutex --> &conn->session_lock --> &ci->m_lock
+unreferenced object 0xffff888108c514a0 (size 32):
+  comm "softirq", pid 0, jiffies 4294902189
+  backtrace (crc ea16adaf):
+    __kmalloc_noprof+0x4eb/0x760
+    lsm_blob_alloc+0x68/0x90
+    security_sk_alloc+0x2f/0xd0
+    sk_prot_alloc+0xfb/0x2a0
+    sk_clone+0x79/0x14f0
 
-[  752.125669]  Possible unsafe locking scenario:
+unreferenced object 0xffff88810fd0b540 (size 64):
+  comm "ksmbd-eth0", pid 328, jiffies 4294902189
+  backtrace (crc f2da5eae):
+    __kmalloc_cache_noprof+0x411/0x610
+    ksmbd_kthread_fn+0x288/0xf30
 
-[  752.126072]        CPU0                    CPU1
-[  752.127582]        ----                    ----
-[  752.127902]   rlock(&ci->m_lock);
-[  752.128169]                                lock(&conn->session_lock);
-[  752.129665]                                lock(&ci->m_lock);
-[  752.130163]   lock(&conn->srv_mutex);
-[  752.131488] 
-                 DEADLOCK 
+unreferenced object 0xffff8881063426f0 (size 16):
+  comm "ksmbd:::ffff:10", pid 434, jiffies 4294902190
+  backtrace (crc 9e6ee6c8):
+    __kmalloc_cache_noprof+0x411/0x610
+    ksmbd_tcp_readv.constprop.0+0x16d/0x700
+    ksmbd_tcp_read+0x88/0xc0
+    ksmbd_conn_handler_loop+0x5dd/0xfd0
 
-[  752.131871] 3 locks held by kworker/1:4/516:
-[  752.132201]  #0: ffff88810374b348 ((wq_completion)ksmbd-io){+.+.}-{0:0}, at: process_one_work+0x11d8/0x1a40
-[  752.134010]  #1: ffffc900014ffd00 ((work_completion)(&work->work)){+.+.}-{0:0}, at: process_one_work+0x8d8/0x1a40
-[  752.135801]  #2: ffff8881040d7770 (&ci->m_lock){++++}-{4:4}, at: smb_break_all_levII_oplock+0x12a/0x940
-[  752.137653] 
-               stack backtrace:
-[  752.138015] CPU: 1 UID: 0 PID: 516 Comm: kworker/1:4 Not tainted 6.19.0-g44331bd6a610-dirty #5 PREEMPT(lazy) 
-[  752.138052] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-[  752.138079] Workqueue: ksmbd-io handle_ksmbd_work
-[  752.138122] Call Trace:
-[  752.138149]  <TASK>
-[  752.138164]  dump_stack_lvl+0xc6/0x120
-[  752.138203]  print_circular_bug+0x2d1/0x400
-[  752.138238]  check_noncircular+0x146/0x160
-[  752.139318]  ? __unwind_start+0x496/0x800
-[  752.139383]  check_prev_add+0xeb/0xd00
-[  752.139416]  __lock_acquire+0x1641/0x2260
-[  752.139449]  ? _raw_spin_unlock_irqrestore+0x3f/0x50
-[  752.139503]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  752.139546]  lock_acquire+0x150/0x2c0
-[  752.139576]  ? ksmbd_conn_write+0x100/0x400
-[  752.139620]  ? __pfx___might_resched+0x10/0x10
-[  752.234307]  ? oplock_break+0xda9/0x15d0
-[  752.234349]  ? smb_break_all_levII_oplock+0x6a7/0x940
-[  752.234391]  ? smb2_set_info+0x2506/0x30e0
-[  752.234430]  __mutex_lock+0x19f/0x2330
-[  752.234475]  ? ksmbd_conn_write+0x100/0x400
-[  752.234525]  ? ksmbd_conn_write+0x100/0x400
-[  752.234573]  ? __pfx___mutex_lock+0x10/0x10
+unreferenced object 0xffff88810fa94200 (size 240):
+  comm "softirq", pid 0, jiffies 4294902419
+  backtrace (crc 4367e44b):
+    kmem_cache_alloc_noprof+0x3ed/0x5f0
+    build_skb+0x46/0x370
+    page_to_skb+0x5df/0xb30
+    receive_buf+0xa3e/0x4940
+    virtnet_poll+0xfb6/0x1750
 ---
+
+Total leaked per session: approximately 5,080 bytes (1344 + 120 + 3264 + 32 + 64 + 16 + 240). An attacker establishing and tearing down sessions repeatedly can exhaust kernel memory.
 
   4.d. Suggested Fix
 
-The root cause is that `smb_break_all_levII_oplock()` calls `ksmbd_conn_write()` while holding `ci->m_lock`. The recommended fix is to make oplock break notifications asynchronous — queue the write to a workqueue instead of calling `ksmbd_conn_write()` directly within the oplock break path. This decouples the lock ordering and eliminates the circular dependency.
-
-Alternative approaches:
-1. Drop `ci->m_lock` before calling `ksmbd_conn_write()` in the oplock break path
-2. Use a separate mutex for oplock break writes that does not conflict with the session teardown ordering
+The ksmbd session teardown path (`ksmbd_sessions_deregister` / `ksmbd_conn_handler_loop` exit) must properly release all allocated resources:
+1. Close the accepted socket via `sock_release()` to free the socket inode and associated LSM blobs
+2. Properly tear down the cloned TCP socket
+3. Free the ksmbd connection context and read buffers on all exit paths, including error/abort paths
 
   5. Discovery Method and Reproduction
 
@@ -281,7 +255,7 @@ Alternative approaches:
 
 This vulnerability was discovered using ven0mfuzzer, a custom-designed MITM-based network filesystem fuzzer developed by our team. The fuzzer operates by positioning an AF_PACKET/TCP transparent proxy between a Linux kernel filesystem client (VM-A) and its server (VM-B), then mutating network protocol messages in-flight.
 
-Following the common syzkaller practice, we submit the kernel crash trace as the primary reproduction artifact. The trace above was captured with LOCKDEP (CONFIG_PROVE_LOCKING) enabled on kernel 6.19.0.
+Following the common syzkaller practice, we submit the kernel kmemleak output as the primary reproduction artifact. The output above was captured with CONFIG_DEBUG_KMEMLEAK enabled on kernel 6.19.0.
 
   5.b. Reproduction Setup
 
@@ -289,10 +263,7 @@ Following the common syzkaller practice, we submit the kernel crash trace as the
 VM-A (CIFS client) ──SMB2──► Host:44446 (MITM proxy) ──TCP──► Host:44445 ──hostfwd──► VM-B:445 (ksmbd)
 ---
 
-Trigger conditions:
-- Multiple concurrent SMB sessions with open files on the same inode
-- One session performs truncate/set_info (triggers oplock break)
-- Another connection is simultaneously setting up or tearing down
+Trigger condition: Repeated SMB session establishment and teardown, especially when the MITM proxy disrupts the session setup handshake, forcing abnormal teardown paths.
 
 ---
 Reported-by: ven0mfuzzer <ven0mkernelfuzzer@gmail.com>
