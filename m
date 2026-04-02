@@ -1,32 +1,32 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1527F3ECBDD
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Apr 2026 14:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625153ED12F
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Apr 2026 14:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775139599; cv=none; b=iXmzpABSVUrnYgWB1oCbzxNEkWI0VsukPlEjvP/BpSdDiKwsFandbwAtsMTT85SlKHusZZjM6ejn0vcwjFSShDNrVAcn1ZuTV47D2KZLW6PHenQPPlYVsr/wtIuubrgMCD8HKDpoxzxf0KC5ZP+RhJM+ojHyV5V40Q3FlWC+ni4=
+	t=1775139600; cv=none; b=Qhnd0w0wiMcS0tCBxJmBUdujx6PLWjmzKnyPuf8pUp9RChSAMzFD1ACklmFQuO2/zcNYIvVZneVy99KMnVjFbhd6Ay9fKLm+LM8te7ZBocAN+XtqzZ6U1rLwThmeM7aUnNBuHM/4gmADBlTjtsoTynS87WthfTmt59mxv45C6FI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775139599; c=relaxed/simple;
-	bh=oecBMrrXzvYW2yJECRvMj2NetT6ctELjdS/D2FGgPuU=;
+	s=arc-20240116; t=1775139600; c=relaxed/simple;
+	bh=3tP42LjgrF0p2ZaHe/0PXqjz7/XNenqLyogjG7CIvVk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TTIQ9jWEc6kUWA8imQFA5dI/wriU8FoYbfMS9FRbw5baSBjfnlo4ARROhD0Hhk8xGL2DNVQ4y9V6CtjyCvXGbSN/6nPe4PP7MPTCSBSM0ZaIqzd/XHKkM3TrdV2ICXXhQPe8YlAWbqRH29TkdF7q3AFFIG+y8ALNNeKMedVpeCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s9d2Cz2Y; arc=none smtp.client-ip=91.218.175.184
+	 MIME-Version; b=p8gKzD7gW6uLk51+QXHygvGklAjGGatE9w5XLZCs2gJfSFliQCK5f97+tMWmYhwQ2ktEprFX/2mb6aSGgIk2saU2oggXyHY/qAA/T53YFGnY1Y9qvVKo1C5emf/YwVrtfUxgLPVjEfHJ9npxFVGiPRDGni/GypcX+IXhxFitfiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=L6UiKHbK; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s9d2Cz2Y"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="L6UiKHbK"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775139593;
+	t=1775139596;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6IlUzCa85GYyyzHpAhPEcf7kpIRojhkT+HSS61meg9s=;
-	b=s9d2Cz2YVLWuGjTeh2t+QVWv6FRSDZFcJI24grWdKhlGk/Dj9Notg4Mzb1tk5sdx9NmHPd
-	1qiNpHFW4ZYj4pYmHyEI8Y0tm/nZKBHBek0bhCSzu48ie6C/uT5CSKlOO4xQeiCuIR0gxJ
-	tzcKxc2UGjKBPEKDGuZV58vS34olGn4=
+	bh=t94Wo4HhNZzETgKd72+S5Nz9NnDhV4hrHd2UwIgu19k=;
+	b=L6UiKHbKsjhlBqlSPZcVwukZGspVxuOc+AS7joOHTVdSHWiw8yLAHlCHA8gCKjmt2+IV+i
+	B0n/YaOHdnadmHROU/+IST7EVJ2tXePsVMJEw6C1hlNRwG8rUYlLtyLNnSiO7zTJ5U0AMN
+	YNhumiGYMzSDCLn+eZmcAmpo+eY0bZo=
 From: huiwen.he@linux.dev
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -36,9 +36,9 @@ To: smfrench@gmail.com,
 	tangyouling@kylinos.cn
 Cc: linux-cifs@vger.kernel.org,
 	Huiwen He <hehuiwen@kylinos.cn>
-Subject: [PATCH v3 04/13] smb/client: refactor ntstatus_to_dos() to return mapping entry
-Date: Thu,  2 Apr 2026 14:18:30 +0000
-Message-ID: <20260402141839.461257-5-huiwen.he@linux.dev>
+Subject: [PATCH v3 05/13] smb/client: use binary search for NT status to DOS mapping
+Date: Thu,  2 Apr 2026 14:18:31 +0000
+Message-ID: <20260402141839.461257-6-huiwen.he@linux.dev>
 In-Reply-To: <20260402141839.461257-1-huiwen.he@linux.dev>
 References: <20260402141839.461257-1-huiwen.he@linux.dev>
 Precedence: bulk
@@ -52,97 +52,78 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-Refactor ntstatus_to_dos() to return a pointer to the mapping entry
-instead of using output parameters. This allows callers to access all
-fields of the entry directly.
+The ntstatus_to_dos_map[] table is sorted now. Replace the linear search
+with binary search to improve lookup performance.
 
-In map_smb_to_linux_error(), integrate the printing logic directly
-to avoid redundant lookups previously performed by cifs_print_status(),
-which is now removed.
+Also remove the sentinel entry as it is no longer needed with ARRAY_SIZE().
 
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smb1maperror.c | 51 ++++++++++++++----------------------
- 1 file changed, 19 insertions(+), 32 deletions(-)
+ fs/smb/client/smb1maperror.c | 32 +++++++++++++++++++-------------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
 
 diff --git a/fs/smb/client/smb1maperror.c b/fs/smb/client/smb1maperror.c
-index 53313b39d1de..c906f233ac64 100644
+index c906f233ac64..fb985d2fc0d9 100644
 --- a/fs/smb/client/smb1maperror.c
 +++ b/fs/smb/client/smb1maperror.c
-@@ -116,41 +116,19 @@ static const struct ntstatus_to_dos_err ntstatus_to_dos_map[] = {
- 	{0, 0, 0, NULL}
+@@ -106,6 +106,19 @@ static const struct smb_to_posix_error mapping_table_ERRSRV[] = {
+ /*****************************************************************************
+  *convert a NT status code to a dos class/code
+  *****************************************************************************/
++
++static __always_inline int ntstatus_to_dos_cmp(const void *_key, const void *_pivot)
++{
++	__u32 key = *(__u32 *)_key;
++	const struct ntstatus_to_dos_err *pivot = _pivot;
++
++	if (key < pivot->ntstatus)
++		return -1;
++	if (key > pivot->ntstatus)
++		return 1;
++	return 0;
++}
++
+ /* NT status -> dos error map */
+ static const struct ntstatus_to_dos_err ntstatus_to_dos_map[] = {
+ /*
+@@ -113,22 +126,15 @@ static const struct ntstatus_to_dos_err ntstatus_to_dos_map[] = {
+  * sorted by NT status code (ascending).
+  */
+ #include "smb1_mapping_table.c"
+-	{0, 0, 0, NULL}
  };
  
--/*****************************************************************************
-- Print an error message from the status code
-- *****************************************************************************/
--static void
--cifs_print_status(__u32 status_code)
--{
--	int idx = 0;
--
--	while (ntstatus_to_dos_map[idx].nt_errstr) {
--		if (ntstatus_to_dos_map[idx].ntstatus == status_code) {
--			pr_notice("Status code returned 0x%08x %s\n",
--				  status_code, ntstatus_to_dos_map[idx].nt_errstr);
--			return;
--		}
--		idx++;
--	}
--	return;
--}
--
--
--static void
--ntstatus_to_dos(__u32 ntstatus, __u8 *eclass, __u16 *ecode)
-+static const struct ntstatus_to_dos_err *
-+ntstatus_to_dos(__u32 ntstatus)
+ static const struct ntstatus_to_dos_err *
+-ntstatus_to_dos(__u32 ntstatus)
++search_ntstatus_to_dos_map(__u32 ntstatus)
  {
- 	int i;
- 
- 	/* Check nt_errstr to allow mapping of NT_STATUS_OK (0) */
- 	for (i = 0; ntstatus_to_dos_map[i].nt_errstr; i++) {
- 		if (ntstatus == ntstatus_to_dos_map[i].ntstatus) {
--			*eclass = ntstatus_to_dos_map[i].dos_class;
--			*ecode = ntstatus_to_dos_map[i].dos_code;
--			return;
-+			return &ntstatus_to_dos_map[i];
- 		}
- 	}
--	*eclass = ERRHRD;
--	*ecode = ERRgeneral;
-+
-+	return NULL;
+-	int i;
+-
+-	/* Check nt_errstr to allow mapping of NT_STATUS_OK (0) */
+-	for (i = 0; ntstatus_to_dos_map[i].nt_errstr; i++) {
+-		if (ntstatus == ntstatus_to_dos_map[i].ntstatus) {
+-			return &ntstatus_to_dos_map[i];
+-		}
+-	}
+-
+-	return NULL;
++	return __inline_bsearch(&ntstatus, ntstatus_to_dos_map,
++				ARRAY_SIZE(ntstatus_to_dos_map),
++				sizeof(struct ntstatus_to_dos_err),
++				ntstatus_to_dos_cmp);
  }
  
  int
-@@ -172,11 +150,20 @@ map_smb_to_linux_error(char *buf, bool logErr)
+@@ -150,7 +156,7 @@ map_smb_to_linux_error(char *buf, bool logErr)
  		/* translate the newer STATUS codes to old style SMB errors
  		 * and then to POSIX errors */
  		__u32 err = le32_to_cpu(smb->Status.CifsError);
--		if (logErr && (err != (NT_STATUS_MORE_PROCESSING_REQUIRED)))
--			cifs_print_status(err);
--		else if (cifsFYI & CIFS_RC)
--			cifs_print_status(err);
--		ntstatus_to_dos(err, &smberrclass, &smberrcode);
-+		const struct ntstatus_to_dos_err *map = ntstatus_to_dos(err);
-+
-+		if (map) {
-+			if ((logErr && err != NT_STATUS_MORE_PROCESSING_REQUIRED) ||
-+			    (cifsFYI & CIFS_RC))
-+				pr_notice("Status code returned 0x%08x %s\n",
-+					  map->ntstatus, map->nt_errstr);
-+
-+			smberrclass = map->dos_class;
-+			smberrcode = map->dos_code;
-+		} else {
-+			smberrclass = ERRHRD;
-+			smberrcode = ERRgeneral;
-+		}
- 	} else {
- 		smberrclass = smb->Status.DosError.ErrorClass;
- 		smberrcode = le16_to_cpu(smb->Status.DosError.Error);
+-		const struct ntstatus_to_dos_err *map = ntstatus_to_dos(err);
++		const struct ntstatus_to_dos_err *map = search_ntstatus_to_dos_map(err);
+ 
+ 		if (map) {
+ 			if ((logErr && err != NT_STATUS_MORE_PROCESSING_REQUIRED) ||
 -- 
 2.53.0
 
