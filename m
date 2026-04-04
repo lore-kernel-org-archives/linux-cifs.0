@@ -1,167 +1,102 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1297F3161A3;
-	Sat,  4 Apr 2026 15:54:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344F1137923;
+	Sat,  4 Apr 2026 19:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775318053; cv=none; b=g39PeefWY4Rry4Zq6KE9B6upjnqwIyfnwk8VksGEZj9Eapb0JGaKtAbsUiMmOYogNpvxHzj3RFYj7hHULLXAcmQ/7T41BbBGpOscmezSY9KiPPXP1C4vTy5uq79GRKGAihyq3h7ghU6OFoxH9z3Mp5m2TWKaIVzqbS+Ftj4tBL8=
+	t=1775331864; cv=none; b=u6u1W4xQklI6z2lGDg560VkNIyUm2yPefjZqX9KPWG0+Sju2P/tYG24NorJcsZu91QA1+oPpIts8aghkTE8UDqFIpsKtqON2WQc3brs+fZXl/91LLGcawHLdg4bLDq2dSdNOBP088QrKzm6BByaVHCuoqDtUcaN/zqq0w2x9qdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775318053; c=relaxed/simple;
-	bh=8BK50+dRMNkh4TT6hDFswobA0zj3IlH5WGy47YmWIGQ=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=gUSgmZSmc32NeAH0hozOGk34tHnhLklA/3CvwArHbBU8yYpbgYPLy3c+fsIsrqZou4KIVM8mimlEOt7MWu7pv2IyL59vg0p85zLeWBabE4oOXpHQFcdjuHZg4Zczb0U5xCbkcjPf75aJe2wgFwoZKeycajyF9gvqapc9xcFuy8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=788YQQ9T; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1775331864; c=relaxed/simple;
+	bh=m2A5Yy4h38l28Ps/ZrrBwv9IT49CQmsgL2an3SFnHTk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f1K/fX1vC50rmc3mfF/fK79jbCcbY/GtychOcj47LOD9ZY4YpCQ2YZ9cYSHOCAAhFnRJaDxegR4/NDuAlGDEs9uDHO/CHuJ6Ht1+fjew0+WB+ZTJDxmL6GYDiEAQOvQxinmdgmRdpgz3IXo9T/1q7tb03vdNnPvrG6taQEiA5uU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JIQdg8um; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="788YQQ9T"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=c5mWJ6JIbiSfyx302lhvpmJS92T0V8lNlKDF4pTcoOI=; b=788YQQ9TpEzsvA1lfTbPRbPvP2
-	CCqGBOgdBSkazXO+sEoSAQk/z8iyCQ8NCA24QXk1R+JrP0xWPeDy+DQ41D8syfiQhJ6l3ZhcPgWrO
-	3cd5OqOoBsu+9Xl2YFGaad0+cUlz5F8Z4YyDJtNMLEeoHazRq0GxH53SoWR812RKoRrUWlzaBAVNt
-	omBnvas8RPBovDqBKZ+CxalhwfLJ3Fz7xstKLyTJz3v+xVP+nQYUMz2sC+OE1fWOsNfNyK2jWWb4U
-	dsId77MKeksmNBm9hw1HWC2hrrUio2pfknsKENtseih+9vZt5iFHfV9KEat7ez/h57CcRc3TCZopc
-	wIbm2UbQ==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
-	id 1w93Jy-00000002D6F-14AK;
-	Sat, 04 Apr 2026 12:54:02 -0300
-Message-ID: <dfd6f45153b8d5de4b9fd8b5755607f5@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: brauner@kernel.org, smfrench@gmail.com, David Howells
- <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org,
- linux-cifs@vger.kernel.org
-Subject: Re: [RFC PATCH] smb: client: add support for O_TMPFILE
-In-Reply-To: <20260404015253.GP3836593@ZenIV>
-References: <20260401011153.1757515-1-pc@manguebit.org>
- <20260404015253.GP3836593@ZenIV>
-Date: Sat, 04 Apr 2026 12:54:02 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JIQdg8um"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 670C6C19421;
+	Sat,  4 Apr 2026 19:44:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775331863;
+	bh=m2A5Yy4h38l28Ps/ZrrBwv9IT49CQmsgL2an3SFnHTk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JIQdg8umcnQlwISS4DvXHi/wH6tuHU7aivaPznHQWFzjz8Fimf0r2dOo/kh1H3Prd
+	 DNXN8quF1e6CDBQ2LF5KHK84ecVwisgPnVIjcapCUZzgk4r8OfQB2WMusFu94VvPpQ
+	 eKRvUM0HEOBky+baMDkCrp4b0hXaJtT1hSINDE5mdyqsbo3QuM1isLh4pQTbFnBU+e
+	 oyZEE6tgsbSURPDWs1+Zezb/FwAb7c2osbEm4WT00MeqLuK2W8eFBBKI7+fIEFFQvG
+	 cJudpplgGtWBmjF92NK2VKaLh1qnhBbT1PXTotyVI7zJ7q0/T1tEz/3P6S/24w5fjL
+	 yja+nyP2ZSEbg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-cifs@vger.kernel.org,
+	Steve French <sfrench@samba.org>
+Cc: Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] smb: client: Remove unnecessary selection of CRYPTO_ECB
+Date: Sat,  4 Apr 2026 12:42:10 -0700
+Message-ID: <20260404194210.20876-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Al Viro <viro@zeniv.linux.org.uk> writes:
+Since the SMB client never uses any ecb(...) algorithm from the
+crypto_skcipher API, selecting CRYPTO_ECB is unnecessary.
 
-> On Tue, Mar 31, 2026 at 10:11:53PM -0300, Paulo Alcantara wrote:
->
->>  	d_drop(direntry);
->> -	d_add(direntry, newinode);
->> -
->> +	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
->> +	if (oflags & O_TMPFILE) {
->> +		set_nlink(newinode, 0);
->> +		mark_inode_dirty(newinode);
->> +		d_instantiate(direntry, newinode);
->> +	} else {
->> +		d_add(direntry, newinode);
->> +	}
->
-> What d_unhashed(dentry) is going to be when we arrive to that thing
-> with O_TMPFILE?
+Specifically, it has been unnecessary since commit 06deeec77a5a ("cifs:
+Fix smbencrypt() to stop pointing a scatterlist at the stack") in 2016.
 
-It's called with an unhashed negative dentry.  Do you see any problems
-with it?
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
 
->> +static void cifs_d_mark_tmpfile(struct file *file,
->> +				const unsigned char *name,
->> +				size_t namelen)
->> +{
->> +	struct dentry *dentry = file->f_path.dentry;
->> +
->> +	BUG_ON(dentry->d_name.name != dentry->d_shortname.string ||
->> +	       !hlist_unhashed(&dentry->d_u.d_alias) ||
->> +	       !d_unlinked(dentry) ||
->> +	       namelen > DNAME_INLINE_LEN - 1);
->> +	spin_lock(&dentry->d_parent->d_lock);
->> +	spin_lock_nested(&dentry->d_lock, DENTRY_D_LOCK_NESTED);
->> +	dentry->__d_name.len = sprintf(dentry->d_shortname.string, "%.*s",
->> +				       (int)namelen, name);
->
-> That's one hell of an odd way to spell that...  What's wrong with using union
-> shortname_store for an argument?  Just memchr() for '\0' to verify it's there
-> and use the result to calculate the length and plain assignment to d_shortname
-> for copying...
->
-> And in any case, that !hlist_unhashed(....) in there is d_really_is_positive().
+This patch is targeting the smb client tree.
 
-I was thinking more along these lines (e.g. add a new VFS helper and
-then call it in CIFS, as you suggested earlier)
+ fs/smb/client/Kconfig  | 1 -
+ fs/smb/client/cifsfs.c | 1 -
+ 2 files changed, 2 deletions(-)
 
-    diff --git a/fs/dcache.c b/fs/dcache.c
-    index 7ba1801d8132..c20a9c9e921c 100644
-    --- a/fs/dcache.c
-    +++ b/fs/dcache.c
-    @@ -3196,6 +3196,25 @@ void d_mark_tmpfile(struct file *file, struct inode *inode)
-     }
-     EXPORT_SYMBOL(d_mark_tmpfile);
-     
-    +void d_mark_tmpfile_name(struct file *file, const struct qstr *name)
-    +{
-    +       struct dentry *dentry = file->f_path.dentry;
-    +       char *dname = dentry->d_shortname.string;
-    +
-    +       BUG_ON(dname_external(dentry) ||
-    +              d_really_is_positive(dentry) ||
-    +              !d_unlinked(dentry) ||
-    +              name->len > DNAME_INLINE_LEN - 1);
-    +       spin_lock(&dentry->d_parent->d_lock);
-    +       spin_lock_nested(&dentry->d_lock, DENTRY_D_LOCK_NESTED);
-    +       dentry->__d_name.len = name->len;
-    +       memcpy(dname, name->name, name->len);
-    +       dname[name->len] = '\0';
-    +       spin_unlock(&dentry->d_lock);
-    +       spin_unlock(&dentry->d_parent->d_lock);
-    +}
-    +EXPORT_SYMBOL(d_mark_tmpfile_name);
-    +
-     void d_tmpfile(struct file *file, struct inode *inode)
-     {
-            struct dentry *dentry = file->f_path.dentry;
-    diff --git a/include/linux/dcache.h b/include/linux/dcache.h
-    index 898c60d21c92..f60819dcfebd 100644
-    --- a/include/linux/dcache.h
-    +++ b/include/linux/dcache.h
-    @@ -264,6 +264,7 @@ extern void d_invalidate(struct dentry *);
-     extern struct dentry * d_make_root(struct inode *);
-     
-     extern void d_mark_tmpfile(struct file *, struct inode *);
-    +void d_mark_tmpfile_name(struct file *file, const struct qstr *name);
-     extern void d_tmpfile(struct file *, struct inode *);
-     
-     extern struct dentry *d_find_alias(struct inode *);
+diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
+index 6d7e178e202db..63831242fddfb 100644
+--- a/fs/smb/client/Kconfig
++++ b/fs/smb/client/Kconfig
+@@ -7,11 +7,10 @@ config CIFS
+ 	select CRYPTO
+ 	select CRYPTO_CMAC
+ 	select CRYPTO_AEAD2
+ 	select CRYPTO_CCM
+ 	select CRYPTO_GCM
+-	select CRYPTO_ECB
+ 	select CRYPTO_AES
+ 	select CRYPTO_LIB_ARC4
+ 	select CRYPTO_LIB_MD5
+ 	select CRYPTO_LIB_SHA256
+ 	select CRYPTO_LIB_SHA512
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 0541706c36c52..2025739f070ac 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -2156,11 +2156,10 @@ MODULE_AUTHOR("Steve French");
+ MODULE_LICENSE("GPL");	/* combination of LGPL + GPL source behaves as GPL */
+ MODULE_DESCRIPTION
+ 	("VFS to access SMB3 servers e.g. Samba, Macs, Azure and Windows (and "
+ 	"also older servers complying with the SNIA CIFS Specification)");
+ MODULE_VERSION(CIFS_VERSION);
+-MODULE_SOFTDEP("ecb");
+ MODULE_SOFTDEP("nls");
+ MODULE_SOFTDEP("aes");
+ MODULE_SOFTDEP("cmac");
+ MODULE_SOFTDEP("aead2");
+ MODULE_SOFTDEP("ccm");
 
-Looks good?
+base-commit: 2febe6e6ee6e34c7754eff3c4d81aa7b0dcb7979
+-- 
+2.53.0
 
->> +static int set_tmpfile_name(struct file *file)
->> +{
->> +	struct dentry *dentry = file->f_path.dentry;
->> +	unsigned char name[CIFS_TMPNAME_LEN + 1];
->> +	struct dentry *sdentry = NULL;
->> +
->> +	do {
->> +		dput(sdentry);
->> +		scnprintf(name, sizeof(name),
->> +			  CIFS_TMPNAME_PREFIX "%0*x",
->> +			  CIFS_TMPNAME_COUNTER_LEN,
->> +			  atomic_inc_return(&cifs_tmpcounter));
->> +		sdentry = lookup_noperm_unlocked(&QSTR(name), dentry->d_parent);
->> +		if (IS_ERR(sdentry))
->> +			return -EBUSY;
->> +	} while (!d_is_negative(sdentry));
->> +	dput(sdentry);
->
-> That looks racy.  Checking it doesn't exist at the moment is fine, but what if
-> it's created right after that lookup?  You are not holding any locks, so even
-> the same-client race (with plain create()) is possible...
-
-Yeah, that's definitely a TOCTOU race.  I should've looped over
-cifs_do_create() instead to make sure that the tmpfile is created in the
-server, by using a sane retry counter.
