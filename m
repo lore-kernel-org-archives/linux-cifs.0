@@ -1,41 +1,45 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2C723C39A;
-	Sat,  4 Apr 2026 19:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B47381B01;
+	Sun,  5 Apr 2026 21:18:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775331923; cv=none; b=LnT/fc1uOs+4FU2vaRiJfw/5TnvKbudTPLLtAuBLXtmgPkteilODw1bToDu8lWlmym6qId19s5cM7cFPUahsoAFx8BFlPGu+RZMCUrWS+rSjfPH6r8Xh0nOp/Vca3kNzfSkQHlmsruwNg4tN7Av2f4vKjl/mHtmhqu8sHnRQUSc=
+	t=1775423911; cv=none; b=sjTYQe9zMpE3DCnS3VUaF9jg/4DJmP0QHWz3y+oBI1DqUj5NmmYuN2nWhzBCMZ8ce46I9VYddqO3G1DpDEslv7o3usYS3A4pYOIycKZ1oU6fdQCzAaMRkXlSDZ4Q1PFlWQg1h7PKy18JBdVzMHdFB7Ug2KuabXd71OE8JTfegT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775331923; c=relaxed/simple;
-	bh=7JSG5D3JGF+7GTzodGjPk3bDws1pIPBcqi4HIsjesSY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FPichcIuXQdfL2KJjr7/YRfKlKC+gK1Ka9d9gpIGsmcMI94tue46PgxXADpWQQCOahCjfWTN5cmyL7kfhRgHaBhWGfc/8GvZZwu2w53aC2lpnswFY9j9f8VF+VzMYfAcMh9bXGITkd8Bk7D6sFNRSS6xrL9AM1cUpJ1X1FevxKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eF+YrLnj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775423911; c=relaxed/simple;
+	bh=De9P1RCqPoG2wXGPrLaoafgTnqQFr7Gy4Q0m4jXzjKc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LG7xdu7dTWltoQ8uE71R87zxvXXwo8GBFkyXvQXRpUA6DhkAil4lQVI5qyutaE0kDNytiHrhcp4Md3M/b0LMRsoEoPHOZOamLYnKMDWJ1SJ3YjNhSLTcO0Rl6yjH8ppAd5TfEyLn5DpyzXmNUOeoy8dwFValvyIfzWwi2lJ4hCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=B0i01b8q; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eF+YrLnj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7F91C19421;
-	Sat,  4 Apr 2026 19:45:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775331923;
-	bh=7JSG5D3JGF+7GTzodGjPk3bDws1pIPBcqi4HIsjesSY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=eF+YrLnj1+a0diqXTUPtLiR429KJqMbhfSTKTOAvlEa+dCmqw0KKEsk5AtydU3swI
-	 B2C4bU2pQtnOtqezNUD1ML7A4sWJxuLLPKpnfnao7lmO+4YXdO061d81OJMpcPV0re
-	 166xMJsSExkMLj/47bUWxu4uhNhmnIAWqoAYoQHipvbHl+J8LnN5/8FiuxpgVDsRIH
-	 Q/GsRMYZobgDoCd7Agsrqw4tjITnAWsUPaMJ90gcvM0iBmz67+e6lRzK5e11H0jNUE
-	 hiP3Vw62ax9+s1eoiiH59wyb10H3qGkVJank3GG64qr9khXYXTp8arpaIrCt/pmJEz
-	 9lvbpR7sMR1Qw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-cifs@vger.kernel.org,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-kernel@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] ksmbd: Remove unnecessary selection of CRYPTO_ECB
-Date: Sat,  4 Apr 2026 12:43:38 -0700
-Message-ID: <20260404194338.21168-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="B0i01b8q"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=R3hAMltGZXZBXMekdnU4F6nV3F8FNNgjvNrI3g9yUq0=; b=B0i01b8qY098hF/cM3fCuthraz
+	Ix/GjrEIY1vFBNafHYIn8CJG2aTtIcAk7RzFb+79fuNVZTOBd+ynQeKiqCXHQ5B1Gu0S3wyKFdGs+
+	tdjjISnTVtQqTqtnKThaIWamgUTi/njGFmgxKCkGw3gvzjGBhjuPHPSbl/q5M4i4ucWGmkDEa01CA
+	a75+aNGPxjOWEyIW9WL+UHaQU8OCPuGNL/uCOhEIh9OQltcDD86w2qPkMm665nzBqgq6/wmN2sgiH
+	dzrGvk88hmtMMdo7YeveWi+p+0iIW3o/eM9FsLS4EFeVDRq1mS+LSFX7l/iWECbv5WDzjyOV2CR5h
+	P2Y7jSMg==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
+	id 1w9UrL-00000002GBi-2cBL;
+	Sun, 05 Apr 2026 18:18:19 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: viro@zeniv.linux.org.uk,
+	smfrench@gmail.com
+Cc: "Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	David Howells <dhowells@redhat.com>,
+	linux-fsdevel@vger.kernel.org,
+	linux-cifs@vger.kernel.org
+Subject: [PATCH 1/2] vfs: introduce d_mark_tmpfile_name()
+Date: Sun,  5 Apr 2026 18:18:18 -0300
+Message-ID: <20260405211819.1251369-1-pc@manguebit.org>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -45,75 +49,64 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since the SMB server never uses any ecb(...) algorithm from the
-crypto_skcipher API, selecting CRYPTO_ECB is unnecessary.
+CIFS requires O_TMPFILE dentries to have names of newly created
+delete-on-close files in the server so it can build full pathnames
+from the root of the share when performing operations on them.
 
-Remove it along with the unused CRYPTO_BLK_* constants.
-
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Suggested-by: Al Viro <viro@zeniv.linux.org.uk>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: David Howells <dhowells@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: linux-cifs@vger.kernel.org
 ---
+ fs/dcache.c            | 19 +++++++++++++++++++
+ include/linux/dcache.h |  1 +
+ 2 files changed, 20 insertions(+)
 
-This patch is targeting the ksmbd tree.
-
- fs/smb/server/Kconfig      | 1 -
- fs/smb/server/crypto_ctx.h | 5 -----
- fs/smb/server/server.c     | 1 -
- 3 files changed, 7 deletions(-)
-
-diff --git a/fs/smb/server/Kconfig b/fs/smb/server/Kconfig
-index 5c77c5552ed8a..37387410e5bb3 100644
---- a/fs/smb/server/Kconfig
-+++ b/fs/smb/server/Kconfig
-@@ -5,11 +5,10 @@ config SMB_SERVER
- 	depends on FILE_LOCKING
- 	select NLS
- 	select NLS_UTF8
- 	select NLS_UCS2_UTILS
- 	select CRYPTO
--	select CRYPTO_ECB
- 	select CRYPTO_LIB_ARC4
- 	select CRYPTO_LIB_DES
- 	select CRYPTO_LIB_MD5
- 	select CRYPTO_LIB_SHA256
- 	select CRYPTO_LIB_SHA512
-diff --git a/fs/smb/server/crypto_ctx.h b/fs/smb/server/crypto_ctx.h
-index b9476ed520ae4..27fd553d10aab 100644
---- a/fs/smb/server/crypto_ctx.h
-+++ b/fs/smb/server/crypto_ctx.h
-@@ -18,15 +18,10 @@ enum {
- 	CRYPTO_AEAD_AES_GCM = 16,
- 	CRYPTO_AEAD_AES_CCM,
- 	CRYPTO_AEAD_MAX,
- };
- 
--enum {
--	CRYPTO_BLK_ECBDES	= 32,
--	CRYPTO_BLK_MAX,
--};
--
- struct ksmbd_crypto_ctx {
- 	struct list_head		list;
- 
- 	struct shash_desc		*desc[CRYPTO_SHASH_MAX];
- 	struct crypto_aead		*ccmaes[CRYPTO_AEAD_MAX];
-diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-index 422d9d9782859..d8893079abdb5 100644
---- a/fs/smb/server/server.c
-+++ b/fs/smb/server/server.c
-@@ -627,11 +627,10 @@ static void __exit ksmbd_server_exit(void)
+diff --git a/fs/dcache.c b/fs/dcache.c
+index 7ba1801d8132..c20a9c9e921c 100644
+--- a/fs/dcache.c
++++ b/fs/dcache.c
+@@ -3196,6 +3196,25 @@ void d_mark_tmpfile(struct file *file, struct inode *inode)
  }
+ EXPORT_SYMBOL(d_mark_tmpfile);
  
- MODULE_AUTHOR("Namjae Jeon <linkinjeon@kernel.org>");
- MODULE_DESCRIPTION("Linux kernel CIFS/SMB SERVER");
- MODULE_LICENSE("GPL");
--MODULE_SOFTDEP("pre: ecb");
- MODULE_SOFTDEP("pre: nls");
- MODULE_SOFTDEP("pre: aes");
- MODULE_SOFTDEP("pre: cmac");
- MODULE_SOFTDEP("pre: aead2");
- MODULE_SOFTDEP("pre: ccm");
-
-base-commit: 2febe6e6ee6e34c7754eff3c4d81aa7b0dcb7979
++void d_mark_tmpfile_name(struct file *file, const struct qstr *name)
++{
++	struct dentry *dentry = file->f_path.dentry;
++	char *dname = dentry->d_shortname.string;
++
++	BUG_ON(dname_external(dentry) ||
++	       d_really_is_positive(dentry) ||
++	       !d_unlinked(dentry) ||
++	       name->len > DNAME_INLINE_LEN - 1);
++	spin_lock(&dentry->d_parent->d_lock);
++	spin_lock_nested(&dentry->d_lock, DENTRY_D_LOCK_NESTED);
++	dentry->__d_name.len = name->len;
++	memcpy(dname, name->name, name->len);
++	dname[name->len] = '\0';
++	spin_unlock(&dentry->d_lock);
++	spin_unlock(&dentry->d_parent->d_lock);
++}
++EXPORT_SYMBOL(d_mark_tmpfile_name);
++
+ void d_tmpfile(struct file *file, struct inode *inode)
+ {
+ 	struct dentry *dentry = file->f_path.dentry;
+diff --git a/include/linux/dcache.h b/include/linux/dcache.h
+index 898c60d21c92..f60819dcfebd 100644
+--- a/include/linux/dcache.h
++++ b/include/linux/dcache.h
+@@ -264,6 +264,7 @@ extern void d_invalidate(struct dentry *);
+ extern struct dentry * d_make_root(struct inode *);
+ 
+ extern void d_mark_tmpfile(struct file *, struct inode *);
++void d_mark_tmpfile_name(struct file *file, const struct qstr *name);
+ extern void d_tmpfile(struct file *, struct inode *);
+ 
+ extern struct dentry *d_find_alias(struct inode *);
 -- 
 2.53.0
 
