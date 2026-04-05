@@ -1,103 +1,67 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F2433F8A3;
-	Sun,  5 Apr 2026 23:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B461B3845AD
+	for <linux-cifs@vger.kernel.org>; Sun,  5 Apr 2026 23:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775431726; cv=none; b=ekSUAypvoXagasKFRjhgB/RToKsNGiC+Vn00IL6KonmW9VFHJKHfUEwHaU+c0uenPYND+wseCTNLmuKdpvYDnf+VDhbH5QqCAJGNfHd1iDov6auJzLs1F2c1fFswrk6UKxWs8WcspXYR5BK63SwfoGVd2CTC4JC9PrUgHpLjYi0=
+	t=1775432321; cv=none; b=EZA66nlN2h4rlOhnoGpSH5zueL8Jjl9YhOtv1ge6TmrKnspgSZlJl0NyN70V1orQ446jApevR05x4vHh7mnHaU5MX0p2zEhD7KKr5Q1K1kCz4h3KRt2Jdql4TeqMVmWZbEnh4elDMPLaLqYXDo4vJYL+dEVXUeKqd3YzyI5Pv+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775431726; c=relaxed/simple;
-	bh=u8cVb4wU1yq68havVuiF0o8l9PzF/vN+DMfVKEO5GOs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F9RsvDbeboHIZVyJtCgJlUTGGOI7NCSSexB/f+pPBhSH1g8nl3Hu5qrjCSHfPaUe2IKcSbHSsZllF26LyAEdCNsWqTFFCcvrpifeU0cyJ4B+abE1+9OO+wt1aZ06/I6KHmN3uI46xC969dQnua7q3Q9AG7omiIcWzBZc0tmzWtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=gOtfBH6e; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	s=arc-20240116; t=1775432321; c=relaxed/simple;
+	bh=OiiZAqzOAl3qlf5frR9Cwy7Ma7vOH8OBuml2KDp07Ts=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qw1UHXYOsGT8Rq5OUZJdsAtrvoJZUFPQ43kPt2fmgfjcXqAPlT6uzZctEPP2+YHzb2o9Ti0J2koTKRvZuE0nQv6Re/j6xNVScz26agprFSpDVPbmsngF122+66ppYUFecsXV1+D5g5lmQ6+vc9GGc7glvEeUJO83hnbFr69vrSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Id9AasEl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="gOtfBH6e"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=S6dL0DMlTr7pWinIvY0E9M0o6ErcEOcOmnsEnXhkEoY=; b=gOtfBH6ehak6y8ecVZ6XnaL6T0
-	94Bc651XDuWUdTr9YHIMfzDwT97Bav6isqm12D7kAQ/PM965qTNTZeTahaZKDDRwZm5RZI53IDVCa
-	xCu87SzSSMz2rkWrDPcGHjO0hx/Wqv/BecY2CwX/XCjE+S2VZ1K/QuafR9avTKmHQtq1JLmztY9K1
-	ozBbjn4DCu+BG+LSlue/1cvKS4dCcVF+C5fYQlfKVZfyz0NoGyG9ZFV6GoESaGVoiVcMz1LTLmWCB
-	qlkeJ2cnFO0vb9wC5rwnIepwz9oe65/DjU9l0RcztsrPLrsRUcTdPdAqnHh6mFB8H6+qhRQSdZgVA
-	D26NiXwQ==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1w9Wx5-0000000Di4i-041w;
-	Sun, 05 Apr 2026 23:32:23 +0000
-Date: Mon, 6 Apr 2026 00:32:22 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: smfrench@gmail.com, David Howells <dhowells@redhat.com>,
-	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	Neil Brown <neil@brown.name>
-Subject: Re: [PATCH 2/2] smb: client: add support for O_TMPFILE
-Message-ID: <20260405233222.GW3836593@ZenIV>
-References: <20260405211819.1251369-1-pc@manguebit.org>
- <20260405211819.1251369-2-pc@manguebit.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Id9AasEl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BC93C19425
+	for <linux-cifs@vger.kernel.org>; Sun,  5 Apr 2026 23:38:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775432321;
+	bh=OiiZAqzOAl3qlf5frR9Cwy7Ma7vOH8OBuml2KDp07Ts=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Id9AasElOAu6+YO69j2fGDK9l5HKddSNT74r89C749DMULrOVu4g7OX8PkRvMCxLl
+	 59Fh6PYIeSDNeJB82Qau2KTn0uCNDBPooLBxbuTvD05NhgIkiunbZLIeuOLQy3jnIh
+	 Nc65eOszod7u5Om6GLKCpeVOFE5zTA+9spMDTGNNMvlsY8vPaIUCAdAb4AAc/HdAJI
+	 78BYRxENd/7NWQYfio0Y9fB73cf8n0t2dmfgsh+LSlUqDQUyX5R3phtqQUqBsMKTS+
+	 h7h+i0VuqJSGXZapOLedjaXFezM8bPbr2xBvqKdlqHPvznYugBVDIZxfFBOIcR4S4b
+	 UlyiDF7NQxjpw==
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-66c304dbfd2so2532522a12.0
+        for <linux-cifs@vger.kernel.org>; Sun, 05 Apr 2026 16:38:41 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzOjIOpJTJfPC7wbdSRT6hVhUq1UJCxjA7fWeMLVfcp9R8j/U0X
+	CORXcegqXltQZ4Waw9aNvWlm6ieDo/ZJHWV9lR4S8LCGJ6q78fCJlimuUDomg1z2kAqa3whprHH
+	svw7e2Lfo1avKcR0T+Ba3EDKD7Rx54Q0=
+X-Received: by 2002:a05:6402:510f:b0:66d:d429:5852 with SMTP id
+ 4fb4d7f45d1cf-66e3e0e68a5mr4234837a12.3.1775432319947; Sun, 05 Apr 2026
+ 16:38:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260405211819.1251369-2-pc@manguebit.org>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+References: <20260404194338.21168-1-ebiggers@kernel.org>
+In-Reply-To: <20260404194338.21168-1-ebiggers@kernel.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Mon, 6 Apr 2026 08:38:28 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-pHhwzBzOG7SzmQRiw8LBPfQAqRCFEtv4nMWR855X0cQ@mail.gmail.com>
+X-Gm-Features: AQROBzA53Ciex-J7pnoegmGNK3iVzv3t8oqC-OzlPsGr1MCjheD2I1iENB0_vzM
+Message-ID: <CAKYAXd-pHhwzBzOG7SzmQRiw8LBPfQAqRCFEtv4nMWR855X0cQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: Remove unnecessary selection of CRYPTO_ECB
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Apr 05, 2026 at 06:18:19PM -0300, Paulo Alcantara wrote:
-
-> @@ -436,17 +457,13 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
->  		goto out_err;
->  	}
->  
-> -	if (newinode)
-> -		if (S_ISDIR(newinode->i_mode)) {
-> -			rc = -EISDIR;
-> -			goto out_err;
-> -		}
-> +	if (newinode && S_ISDIR(newinode->i_mode)) {
-> +		rc = -EISDIR;
-> +		goto out_err;
-> +	}
->  
->  	d_drop(direntry);
-> -	d_add(direntry, newinode);
-
-> +		rc = __cifs_do_create(dir, direntry, full_path, xid,
-> +				      tlink, oflags, mode, oplock,
-> +				      fid, buf, &inode);
-> +		if (!rc)
-> +			d_add(direntry, inode);
-
-
-> +		rc = __cifs_do_create(dir, dentry, path, xid, tlink,
-> +				      file->f_flags, mode, &oplock,
-> +				      &fid, NULL, &inode);
-> +		if (!rc) {
-> +			set_nlink(inode, 0);
-> +			mark_inode_dirty(inode);
-> +			d_mark_tmpfile_name(file, &QSTR_LEN(name, size - 1));
-> +			d_instantiate(dentry, inode);
-
-I really don't like this "not sure what the state is, d_drop() to
-get it unhashed" pattern, _especially_ when d_drop() and d_add() or
-d_instantiate() get separated.
-
-Note, BTW, this d_add() call site is one of the two in the entire kernel
-that are neither d_splice_alias() in disguise nor pass NULL as inode.
-The other one is nfs_link(), where we also have this kind of "d_drop()
-first, then use d_add()" pattern.
-
-Folks, what state can dentry be in cifs_do_create()?  I'd rather see
-that sorted out, not obfuscated even more.
-
-FWIW, that's a major headache for Neil's stuff around directory locking
-changes - any place where we play with unhash-and-rehash needs separate
-analysis.  d_drop() is not something to be used lightly; it obfuscates the
-dentry state and we'll need to translate those to the new locking scheme.
+On Sun, Apr 5, 2026 at 4:45=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> w=
+rote:
+>
+> Since the SMB server never uses any ecb(...) algorithm from the
+> crypto_skcipher API, selecting CRYPTO_ECB is unnecessary.
+>
+> Remove it along with the unused CRYPTO_BLK_* constants.
+>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Applied it to #ksmbd-for-next-next.
+Thanks!
