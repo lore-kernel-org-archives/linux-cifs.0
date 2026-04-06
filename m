@@ -1,112 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2588530146C;
-	Mon,  6 Apr 2026 11:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F8035893;
+	Mon,  6 Apr 2026 13:46:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775473599; cv=none; b=qru8F2h8oVO7Kqn5nAuKTmRCGGaBUysjleXDFco0zabcQyiQ83JYsTAcZ8YR0SruB9SSug8uw9XEa94t29yPUXs7a6gS3YWuF/jVmHH791X0W80pdV4sZ4X8IPs/xwVloo6lf9pa6WAdjTSfMq6aTxrMwcYGBU7wotfQEk5iLwg=
+	t=1775483218; cv=none; b=Psnaj/DXoVg5lT6j0EYPWKmw3z0iworPo9FREepkSo3suFWcup4sLzv4sOeTAE5w2Va9m+4Ypjcqmm1+C67e+z7E+MmtavcQBIKsM+UcfcYPtdaqO3eVc5BHVHRgJjAcQLv/nxBQA0sSv+iJYVJ0uFpJZ5cemH3RoSBj6uaxjyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775473599; c=relaxed/simple;
-	bh=na5IVXsQyHZvUf7OCqXlMrqvQYAiJujxOib0idx4bLc=;
+	s=arc-20240116; t=1775483218; c=relaxed/simple;
+	bh=3aTYSApV0Q+/AB73UF0VuMJRhyBvMMPWQbyZsbikUzE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AMi/ZKqhvaZNhobwpvk4Fve2uydEWGtI+r6bNGbJIeUx8CuNa3QN6F9IU8AtwEbFEuo4JEg16AyPq1IgCi3NCKWn4hs1nQQrAEYJqfZrns9wup712uVyU0n1D26+pu93+/CTZxYHIcwuFox+LE95NIadkw7j5yxkZ8CFQbf1jCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOon6fDx; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=QPpMDT/14L/vYNbYVqcVHngJClKZOCgd+CLm8AYLiLCBiGbfDsDmfSkMzZVhwUjelqbNC2AvNmkurXjF6o8Vn2qv/byz3uTb20LBvRtR1YvJbjTVZVQlhl+8JJeVwTpf1GXUztdpBI/efg8SHzke4k3oEJWquRsgfH4l7Sg6SD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=aRFdxqj1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOon6fDx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8CDEC4CEF7;
-	Mon,  6 Apr 2026 11:06:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775473598;
-	bh=na5IVXsQyHZvUf7OCqXlMrqvQYAiJujxOib0idx4bLc=;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="aRFdxqj1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F090C4CEF7;
+	Mon,  6 Apr 2026 13:46:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1775483217;
+	bh=3aTYSApV0Q+/AB73UF0VuMJRhyBvMMPWQbyZsbikUzE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oOon6fDxxUl7swTlnAAar6ehLQSivctcp6J//OnHKZKptd7A0ikO/AicGpH0Ohz20
-	 tK20q8PxZ+njQuoWzPu7ti7UhnOaEFP8xBHRwg//UGLa1AKrHqYv4RgPgJqvIhIGOm
-	 y5Z7dTsWpp4P7l+84eWfCW6nf5pQ1tiUGyzalEPdG2QCoSqde/wVd1y2XnP3EukoAd
-	 8RD1fPTY2VjgX97xosTMP3D75WnTtHFnYULuXeLnWlnU8/LwTiDgywYCjVNgRneqCB
-	 Zf1KWHYB4I3eC3faBZfAGOdJQAFXDmaiec8MDOAZEZbuRnahvHU7FVprcXuCGWESFn
-	 mRRnXGTRVtLDA==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Fredric Cover <FredTheDude@proton.me>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-5.15] fs/smb/client: fix out-of-bounds read in cifs_sanitize_prepath
-Date: Mon,  6 Apr 2026 07:05:42 -0400
-Message-ID: <20260406110553.3783076-8-sashal@kernel.org>
+	b=aRFdxqj1jsl4oMpIbGzwJXEa82SyXNtzPHLXhQ5ms9bE72fW66xJBYXcuHVqEUPN+
+	 H7Rz0Oe9n7tBigLBWUNykYHVN1V3NkflHPGP5ofSEsBWNV8NLFMYDH7EzVMe9NBCBB
+	 ugYjeaFcKS4MB9ovtvAOjlhLRuOl/dlO8keCptuA=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: linux-cifs@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	stable <stable@kernel.org>
+Subject: [PATCH 1/3] ksmbd: validate EaNameLength in smb2_get_ea()
+Date: Mon,  6 Apr 2026 15:46:46 +0200
+Message-ID: <2026040646-backlit-overlord-2d46@gregkh>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260406110553.3783076-1-sashal@kernel.org>
-References: <20260406110553.3783076-1-sashal@kernel.org>
+In-Reply-To: <2026040644-brussels-dab-6f99@gregkh>
+References: <2026040644-brussels-dab-6f99@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.19.11
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1594; i=gregkh@linuxfoundation.org; h=from:subject:message-id; bh=3aTYSApV0Q+/AB73UF0VuMJRhyBvMMPWQbyZsbikUzE=; b=owGbwMvMwCRo6H6F97bub03G02pJDJmXd7odeK/KvMc7v+LY2r/NG3mu/U/xqtC9pVnwe+fMX ma5rvspHbEsDIJMDLJiiixftvEc3V9xSNHL0PY0zBxWJpAhDFycAjCR7j6GeTrf1oo8s76+37ns W7SFx1pX1qnGcxgWzNiblFL4eJVpjDxrbVaBjOS549GbAA==
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
 Content-Transfer-Encoding: 8bit
 
-From: Fredric Cover <FredTheDude@proton.me>
+smb2_get_ea() reads ea_req->EaNameLength from the client request and
+passes it directly to strncmp() as the comparison length without
+verifying that the length of the name really is the size of the input
+buffer recieved.
 
-[ Upstream commit 78ec5bf2f589ec7fd8f169394bfeca541b077317 ]
+Fix this up by properly checking the size of the name based on the value
+recieved and the overall size of the request, to prevent a later
+strncmp() call to use the length as a "trusted" size of the buffer.
+Without this check, uninitialized heap values might be slowly leaked to
+the client.
 
-When cifs_sanitize_prepath is called with an empty string or a string
-containing only delimiters (e.g., "/"), the current logic attempts to
-check *(cursor2 - 1) before cursor2 has advanced. This results in an
-out-of-bounds read.
-
-This patch adds an early exit check after stripping prepended
-delimiters. If no path content remains, the function returns NULL.
-
-The bug was identified via manual audit and verified using a
-standalone test case compiled with AddressSanitizer, which
-triggered a SEGV on affected inputs.
-
-Signed-off-by: Fredric Cover <FredTheDude@proton.me>
-Reviewed-by: Henrique Carvalho <[2]henrique.carvalho@suse.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: stable <stable@kernel.org>
+Assisted-by: gregkh_clanker_t1000
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
+ fs/smb/server/smb2pdu.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-LLM Generated explanations, may be completely bogus:
-
-The background agent confirmed my findings: the commit `78ec5bf2f589e`
-was authored March 30, 2026, reviewed and committed by Steve French the
-next day, merged via `v7.0-rc6-smb3-client-fix`. Lore was inaccessible
-due to Anubis bot protection. No controversy found in the git record.
-
-My analysis and decision stand as written above. This is a clear, small,
-obviously correct fix for an out-of-bounds read in a widely-used
-filesystem (SMB/CIFS), present since v5.16, with very low regression
-risk.
-
-**YES**
-
- fs/smb/client/fs_context.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index e0d2cd78c82f1..e61bb6ac1d111 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -589,6 +589,10 @@ char *cifs_sanitize_prepath(char *prepath, gfp_t gfp)
- 	while (IS_DELIM(*cursor1))
- 		cursor1++;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 8e4cfdc0ba02..6f658dc20758 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -4716,6 +4716,11 @@ static int smb2_get_ea(struct ksmbd_work *work, struct ksmbd_file *fp,
  
-+	/* exit in case of only delimiters */
-+	if (!*cursor1)
-+		return NULL;
+ 		ea_req = (struct smb2_ea_info_req *)((char *)req +
+ 						     le16_to_cpu(req->InputBufferOffset));
 +
- 	/* copy the first letter */
- 	*cursor2 = *cursor1;
- 
++		if (le32_to_cpu(req->InputBufferLength) <
++		    offsetof(struct smb2_ea_info_req, name) +
++		    ea_req->EaNameLength)
++			return -EINVAL;
+ 	} else {
+ 		/* need to send all EAs, if no specific EA is requested*/
+ 		if (le32_to_cpu(req->Flags) & SL_RETURN_SINGLE_ENTRY)
 -- 
 2.53.0
 
