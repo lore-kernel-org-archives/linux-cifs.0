@@ -1,27 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A131F239E80;
-	Mon,  6 Apr 2026 13:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110F0224B15;
+	Mon,  6 Apr 2026 13:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775483221; cv=none; b=AaCXwDAyHkttI14iHnlqCQMAik6SiuWqDrw34trbSZkI7x/slKtrJUi2E8aMVZE8MDx8ij+NkaZ+pMT7mCU6d0n/YUKPMHOQ0bDdVwz+iPZ3RINVhWWGYHhGTpJuCmzIjBHwy/50AmQh64secFsdRAgyOnDsTc80+2s0IR9/Plo=
+	t=1775483226; cv=none; b=JIS3CDo93lQmRBnaQzC1xYcTiHH1eD+iBX809cL4BsIlTAp5/pgTZuLsds2oWCblwA6Rf/8gqfr3AospiLLwChM1NI2LNi4DWX+9gybrs34NY44gw2SGc3pZ8urMODZKhIchzqFM/PN9AdjFjCr43iRkjVAaYbjq2Z6V8ZxDegs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775483221; c=relaxed/simple;
-	bh=3a3ms7S6HXSTmecMy+J7sYm3lCwUvO3MKPcbzv4lHAs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CBqz0Jx/SjI7xpGvDB93eSUz9qa01pPb+mobr7cVf1lSgjdADmoJ3MCt0+r8C+gKZWqUVfpca+ZHqJeIhllMI8QAkl2noZ3VpqE5Nzm6CEy4H6eCJUAhk4qTz/NkuqRCzhbv7dvlgTqNGvXbNUC7MxbmrvBTCbxChwm+y2F63Ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=SCMPJdAg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775483226; c=relaxed/simple;
+	bh=6quP6INyONpIyrEnc1WgDudBTHdciV3E8oow+ilwgE8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=l8n3Ma5SYJOhnJPXDa3C31Ou+qkDZZ7dRhkN8RyC1AFdDrUW3EHE3QLHDLY8TG4PIIs0Myow/woZAgjNITFrKRb2heTlw6x4xZWCf6JMneVFOqchSjShm4Wch1qQIzhXorwlY7kyM9kfJgq0DYOdyk1xXcz4alQzN7wouM93rIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=19JfWLx9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="SCMPJdAg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBF36C2BC9E;
-	Mon,  6 Apr 2026 13:47:00 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="19JfWLx9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43857C4CEF7;
+	Mon,  6 Apr 2026 13:47:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1775483221;
-	bh=3a3ms7S6HXSTmecMy+J7sYm3lCwUvO3MKPcbzv4lHAs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=SCMPJdAgwiIj/j9mtZm9scYEhQQ4VMC51HjDZo13edY5jvw1HXqCrLvctk0g6k3uw
-	 2RRJhrtWZpsJ+xhz7yFT+uyBgeRbGA4HDlKUlZDLWULZwMHiNyVkEaljg3oQ/kv1Cz
-	 svRiKDrXMD+9rfL5j+YP1aisc9SHRnXe7dyoar70=
+	s=korg; t=1775483225;
+	bh=6quP6INyONpIyrEnc1WgDudBTHdciV3E8oow+ilwgE8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=19JfWLx9V+n/p9bBkif3m0PzGMSyBIVyCDeEkkdaLTE9yg5N/IS7qFHcTf4eOjkp/
+	 GjBgD8BDEFDF7K1QscjILfNxYJuWfm/6NJgj10N2tFNNYZXYpmoZmAuPgRPvdwqDJ7
+	 sx636ATNio6YGWtJRZm81SMfD09RahbK0qUqlsvg=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: linux-cifs@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -29,44 +30,65 @@ Cc: linux-kernel@vger.kernel.org,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>
-Subject: [PATCH 0/3] ksmbd: some potential bugfixes
-Date: Mon,  6 Apr 2026 15:46:45 +0200
-Message-ID: <2026040644-brussels-dab-6f99@gregkh>
+	Tom Talpey <tom@talpey.com>,
+	stable <stable@kernel.org>
+Subject: [PATCH 2/3] ksmbd: require 3 sub-authorities before reading sub_auth[2]
+Date: Mon,  6 Apr 2026 15:46:47 +0200
+Message-ID: <2026040646-helium-unedited-245a@gregkh>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <2026040644-brussels-dab-6f99@gregkh>
+References: <2026040644-brussels-dab-6f99@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=888; i=gregkh@linuxfoundation.org; h=from:subject:message-id; bh=3a3ms7S6HXSTmecMy+J7sYm3lCwUvO3MKPcbzv4lHAs=; b=owGbwMvMwCRo6H6F97bub03G02pJDJmXd7qUb+u5vXbmBHaLSE2VDmbzf3svxQh/yTx8011cU 3eZfNmqjlgWBkEmBlkxRZYv23iO7q84pOhlaHsaZg4rE8gQBi5OAZgIpy3Dgq6V+03Srl1sW5by V1hfjjF6e8BuboYFl7V6j9Wal/f7rYqYqpWeJXwwVIMfAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1719; i=gregkh@linuxfoundation.org; h=from:subject:message-id; bh=6quP6INyONpIyrEnc1WgDudBTHdciV3E8oow+ilwgE8=; b=owGbwMvMwCRo6H6F97bub03G02pJDJmXd7o1Sp17sDHlVOAuRY2HBxZd+LbpzZsfT1IUmPp+T 3k+pXNGdUcsC4MgE4OsmCLLl208R/dXHFL0MrQ9DTOHlQlkCAMXpwBM5NpdhgVn/6WGmbd8nBfj u/zZhJzmk89fTsxgmCupWbHT0W4Xo+qi50svnt2xy2Xu11wA
 X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
 Content-Transfer-Encoding: 8bit
 
-I spent the time exercising some new fuzzing tools on the ksmbd and smb
-code purely because it's something that is simple to set up and test
-locally with virtual machines, and in doing so, potentially found some
-minor problems for when you have an "untrusted" client.
+parse_dacl() compares each ACE SID against sid_unix_NFS_mode and on
+match reads sid.sub_auth[2] as the file mode.  If sid_unix_NFS_mode is
+the prefix S-1-5-88-3 with num_subauth = 2 then compare_sids() compares
+only min(num_subauth, 2) sub-authorities so a client SID with
+num_subauth = 2 and sub_auth = {88, 3} will match.
 
-Here's some fixes for what I happened to notice.  They pass my very
-limited testing here, but please don't trust them at all and verify that
-I'm not just making this all up before accepting them.
+If num_subauth = 2 and the ACE is placed at the very end of the security
+descriptor, sub_auth[2] will be  4 bytes past end_of_acl.  The
+out-of-band bytes will then be masked to the low 9 bits and applied as
+the file's POSIX mode, probably not something that is good to have
+happen.
 
-thanks!
+Fix this up by forcing the SID to actually carry a third sub-authority
+before reading it at all.
 
-greg k-h
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: stable <stable@kernel.org>
+Assisted-by: gregkh_clanker_t1000
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ fs/smb/server/smbacl.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Greg Kroah-Hartman (3):
-  ksmbd: validate EaNameLength in smb2_get_ea()
-  ksmbd: require 3 sub-authorities before reading sub_auth[2]
-  ksmbd: fix mechToken leak when SPNEGO decode fails after token alloc
-
- fs/smb/server/connection.c | 1 +
- fs/smb/server/smb2pdu.c    | 7 ++++++-
- fs/smb/server/smbacl.c     | 3 ++-
- 3 files changed, 9 insertions(+), 2 deletions(-)
-
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index c30d01877c41..061a305bf9c8 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -451,7 +451,8 @@ static void parse_dacl(struct mnt_idmap *idmap,
+ 		ppace[i]->access_req =
+ 			smb_map_generic_desired_access(ppace[i]->access_req);
+ 
+-		if (!(compare_sids(&ppace[i]->sid, &sid_unix_NFS_mode))) {
++		if (ppace[i]->sid.num_subauth >= 3 &&
++		    !(compare_sids(&ppace[i]->sid, &sid_unix_NFS_mode))) {
+ 			fattr->cf_mode =
+ 				le32_to_cpu(ppace[i]->sid.sub_auth[2]);
+ 			break;
 -- 
 2.53.0
 
