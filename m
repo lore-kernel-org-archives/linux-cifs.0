@@ -1,70 +1,112 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1E61A9F82;
-	Mon,  6 Apr 2026 03:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2588530146C;
+	Mon,  6 Apr 2026 11:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775445805; cv=none; b=O/uzqk26MTs+51dUXHATsQUyF9JOTifla66+2Rp6UFcOguiMwnhmhl7rzC/PEWnqJCQTz/hJAvcP6h/Aa3qs0u2dSqVNlzR6BlvdRKo15TMc+CD4Xa3lUPh8RP6BrNNQizcdW/an6RBttgYMVihX3GMubmTOIS58t7q+rUOVDiU=
+	t=1775473599; cv=none; b=qru8F2h8oVO7Kqn5nAuKTmRCGGaBUysjleXDFco0zabcQyiQ83JYsTAcZ8YR0SruB9SSug8uw9XEa94t29yPUXs7a6gS3YWuF/jVmHH791X0W80pdV4sZ4X8IPs/xwVloo6lf9pa6WAdjTSfMq6aTxrMwcYGBU7wotfQEk5iLwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775445805; c=relaxed/simple;
-	bh=lfpB8W9eRgk5AGGJA9+bX9XD4zEiWuJmxAULDW/Vxd4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d8hlGvCfqBPuavamlsKfnbNb7psUDsCjJD33RoGH5C6TO7V6AMSxMST8CLkPvvqjWNfi9XfU7LWY/ajEPfwgyb2AxLpvOXpAOBj0I5CcqKPyQpwlCQ9sYrFB+V1c+pcY9LHGfYfQnQhgKh0uJMrR035Et74SyXk6B3TzFIvwxDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JZSNg5iT; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1775473599; c=relaxed/simple;
+	bh=na5IVXsQyHZvUf7OCqXlMrqvQYAiJujxOib0idx4bLc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AMi/ZKqhvaZNhobwpvk4Fve2uydEWGtI+r6bNGbJIeUx8CuNa3QN6F9IU8AtwEbFEuo4JEg16AyPq1IgCi3NCKWn4hs1nQQrAEYJqfZrns9wup712uVyU0n1D26+pu93+/CTZxYHIcwuFox+LE95NIadkw7j5yxkZ8CFQbf1jCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOon6fDx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JZSNg5iT"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=vCSph1mZhlXtBaThNHBA6xnqnwg4ekiSnwqbANoAqpk=; b=JZSNg5iTHnAzfjToJ/3tKS/EWj
-	H/Y3GKQHfHsA/o1vES+ZCY8jwGYn8r4jhOszX+CMvxjjAAhLvZJe0yeui0xYIzbhB+KzCEWbE4Lmr
-	xW/AgGfMTAY5GCTeRuJWHt0yPAWZ2h6wCIIqozqNGa4DcIdgz2szMrFppR9W31anSANet2ja3Vx0b
-	Xqo8WddsjfbmZqY8jlfUHjVxFN8TTecpTJS5kniQIAeNVW8kP3XgANkV0EX/NQ8adnLzVQQ2PZ6Ml
-	QnEJlWkQdLxbvdytgXRhZQYPBxCdFb7QS9JTIUY68TEmdHb/NA6Vprz19U83JXiRnE0nNaA6jyFCq
-	gBFkw7qQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w9aYZ-00000000kkx-2b5R;
-	Mon, 06 Apr 2026 03:23:19 +0000
-Date: Mon, 6 Apr 2026 04:23:19 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: viro@zeniv.linux.org.uk, smfrench@gmail.com,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	David Howells <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org,
-	linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 1/2] vfs: introduce d_mark_tmpfile_name()
-Message-ID: <adMnJ_FJ13NJ23Mv@casper.infradead.org>
-References: <20260405211819.1251369-1-pc@manguebit.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOon6fDx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8CDEC4CEF7;
+	Mon,  6 Apr 2026 11:06:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775473598;
+	bh=na5IVXsQyHZvUf7OCqXlMrqvQYAiJujxOib0idx4bLc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=oOon6fDxxUl7swTlnAAar6ehLQSivctcp6J//OnHKZKptd7A0ikO/AicGpH0Ohz20
+	 tK20q8PxZ+njQuoWzPu7ti7UhnOaEFP8xBHRwg//UGLa1AKrHqYv4RgPgJqvIhIGOm
+	 y5Z7dTsWpp4P7l+84eWfCW6nf5pQ1tiUGyzalEPdG2QCoSqde/wVd1y2XnP3EukoAd
+	 8RD1fPTY2VjgX97xosTMP3D75WnTtHFnYULuXeLnWlnU8/LwTiDgywYCjVNgRneqCB
+	 Zf1KWHYB4I3eC3faBZfAGOdJQAFXDmaiec8MDOAZEZbuRnahvHU7FVprcXuCGWESFn
+	 mRRnXGTRVtLDA==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Fredric Cover <FredTheDude@proton.me>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	sfrench@samba.org,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.19-5.15] fs/smb/client: fix out-of-bounds read in cifs_sanitize_prepath
+Date: Mon,  6 Apr 2026 07:05:42 -0400
+Message-ID: <20260406110553.3783076-8-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260406110553.3783076-1-sashal@kernel.org>
+References: <20260406110553.3783076-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260405211819.1251369-1-pc@manguebit.org>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.19.11
+Content-Transfer-Encoding: 8bit
 
-On Sun, Apr 05, 2026 at 06:18:18PM -0300, Paulo Alcantara wrote:
-> +void d_mark_tmpfile_name(struct file *file, const struct qstr *name)
-> +{
-> +	struct dentry *dentry = file->f_path.dentry;
-> +	char *dname = dentry->d_shortname.string;
-> +
-> +	BUG_ON(dname_external(dentry) ||
-> +	       d_really_is_positive(dentry) ||
-> +	       !d_unlinked(dentry) ||
-> +	       name->len > DNAME_INLINE_LEN - 1);
+From: Fredric Cover <FredTheDude@proton.me>
 
-We tend to prefer each of these to be written out separately.  ie:
+[ Upstream commit 78ec5bf2f589ec7fd8f169394bfeca541b077317 ]
 
-	BUG_ON(dname_external(dentry));
-	BUG_ON(d_really_is_positive(dentry));
-...
+When cifs_sanitize_prepath is called with an empty string or a string
+containing only delimiters (e.g., "/"), the current logic attempts to
+check *(cursor2 - 1) before cursor2 has advanced. This results in an
+out-of-bounds read.
 
-That way if one triggers, we know which condition is violated.
+This patch adds an early exit check after stripping prepended
+delimiters. If no path content remains, the function returns NULL.
+
+The bug was identified via manual audit and verified using a
+standalone test case compiled with AddressSanitizer, which
+triggered a SEGV on affected inputs.
+
+Signed-off-by: Fredric Cover <FredTheDude@proton.me>
+Reviewed-by: Henrique Carvalho <[2]henrique.carvalho@suse.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+The background agent confirmed my findings: the commit `78ec5bf2f589e`
+was authored March 30, 2026, reviewed and committed by Steve French the
+next day, merged via `v7.0-rc6-smb3-client-fix`. Lore was inaccessible
+due to Anubis bot protection. No controversy found in the git record.
+
+My analysis and decision stand as written above. This is a clear, small,
+obviously correct fix for an out-of-bounds read in a widely-used
+filesystem (SMB/CIFS), present since v5.16, with very low regression
+risk.
+
+**YES**
+
+ fs/smb/client/fs_context.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index e0d2cd78c82f1..e61bb6ac1d111 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -589,6 +589,10 @@ char *cifs_sanitize_prepath(char *prepath, gfp_t gfp)
+ 	while (IS_DELIM(*cursor1))
+ 		cursor1++;
+ 
++	/* exit in case of only delimiters */
++	if (!*cursor1)
++		return NULL;
++
+ 	/* copy the first letter */
+ 	*cursor2 = *cursor1;
+ 
+-- 
+2.53.0
 
