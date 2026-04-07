@@ -1,73 +1,79 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F61B8248B;
-	Tue,  7 Apr 2026 01:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B67A13FEE
+	for <linux-cifs@vger.kernel.org>; Tue,  7 Apr 2026 01:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775525376; cv=none; b=SJoFS1gLMBO+fDhP9FvOpQGkbaJdsXvWQeAQnAF7SnFHNFaxnAnnI2esDv5sBisNKVd15HAZ68jpVcGDFLS6sfd+dLExPRPo6tzySYEAzN+K0AXjhnmH3CeSat7VdPIoDhNI4f8Z9vMqWBiPEuyrUD78pphbNBkSWSGc/QN7FAE=
+	t=1775526678; cv=none; b=srpVOmmDTzhje+QlKjKtTepbKDfzPF+ptQuzcSjj2kK5w19nYJVTcVcnfzQsE2X8ZmZu9ZngEOr1ihVukQpurixeJvA+ffST9etK1tmpBp+zY+61i5bCwNqOQoXMU10FnTfzbZQqwArzxXsyMl+ICgTuNtnyjCXLGEhAcM4KVGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775525376; c=relaxed/simple;
-	bh=cXGAOe/cSvpl6gbzhpXqBdgMjk18kXMhLFGKDezwWro=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=jB3BkL00QSO7lcRebTVIXouVhfdb4S0a2W+74IHIunjzj/oNWrmz1ps1UzDHfgTn/aVmU+wo/hsX7880e8TbV3Wu3mQPupYgu16Go4ymuhq3+ujziobKbbkczKfIE+nGl5Ck4bNwasjYBqasSmfFWAvI6znYUWn7mOf6eqmdRXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=0WveTjJi; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1775526678; c=relaxed/simple;
+	bh=zWzmT8CBO4zABVSiQW+XiXd77WgdRDrTcjC//EO7VCQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qxKM6s503DOzvLg5zsPOig7dUiG70noz4U9y/Z4II6lEkxv5wPPGScobZi+8DlRlgv3ir9PP9L6ww98H1wtRWUqnnLsC2uizNw6Eh43xJrReiJ6CC76fF9Mn2i2b+JQutjbs+Nwx6QU3OVMizR++Zuu0tBYLmr6gZ34JUN3W28E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UdOfQyjB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="0WveTjJi"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=nLkE6c5xKeBeFQpBfK1arqqr/URIoqGg+GeMjpqgSLQ=; b=0WveTjJiIqRAlC+gSY5EeBa3xY
-	Gh25nz0GrlRg/2WC/oBTqcaAg/Sc94eff2ECZXDOz5H/GezJejKSbLZpcFvJa8w3q+1upFirH2E7I
-	OFxJ+ulgQoBo5zqbGrQvLJTPd3WkUi3cqiiFn5i2hjH2RdTu7M4Jp69LvJYm0piahok4w7keaD2TD
-	XFY2OmlU7Kwnnsmnp0U302iO5BxCNea5DhAmIMv/SkxEVu7ttnKicHU+kY4CDVeBy8+BijmLxavV5
-	LeikYFb21BDtiguukGAz+tpGadaGONbUYObiHq/Ikjrnt7QHMU44yWoWMBrH5FqYdIkHUXIQJxw8n
-	bRnLKO5w==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
-	id 1w9vFz-00000002K3A-04ec;
-	Mon, 06 Apr 2026 22:29:31 -0300
-Message-ID: <c5416c58c6fd882500e80f4b30c05c6b@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: viro@zeniv.linux.org.uk, smfrench@gmail.com, Christian Brauner
- <brauner@kernel.org>, Jan Kara <jack@suse.cz>, David Howells
- <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org,
- linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 1/2] vfs: introduce d_mark_tmpfile_name()
-In-Reply-To: <adMnJ_FJ13NJ23Mv@casper.infradead.org>
-References: <20260405211819.1251369-1-pc@manguebit.org>
- <adMnJ_FJ13NJ23Mv@casper.infradead.org>
-Date: Mon, 06 Apr 2026 22:29:30 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UdOfQyjB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FB2EC19421
+	for <linux-cifs@vger.kernel.org>; Tue,  7 Apr 2026 01:51:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775526678;
+	bh=zWzmT8CBO4zABVSiQW+XiXd77WgdRDrTcjC//EO7VCQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=UdOfQyjB6OdeA4wdq2KIDKRDqp9SfWaI2RN2+hByOaph/zHUIdVWyCxrkATs/ChtD
+	 gdy7dX+xRFyt8NwuPJy7J0LyCf+xJKNR15e2FwLiaIdkstCc94o94phKehTX60DDMQ
+	 DFjmeTSV0M0Wj7BWnb586UkomoXklX8wVN2fRBni/iu7n7DzUbDtV+34lRqQUmXqjX
+	 Fep53msAwVsykVqTQXuV4+xlTUWLuwRy1M8r941f85nzBfp62lRsU8LjQxNYIQcXlm
+	 0CaOa3y9f7EteutEzT7hVjK84l+1kX+sQLKxmE0Tq5FnJ/mlvC7nc7LggFmgbGfrni
+	 5PyQJ2KRTwS5w==
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-66c304dbfd2so4110884a12.0
+        for <linux-cifs@vger.kernel.org>; Mon, 06 Apr 2026 18:51:18 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yz8n3XzMgBNVmZ3QWTU41rI3qK2OvPswOF3yYuHr/jDu6ufv6/w
+	0UwQTz9Z4FjN8+7TJHisnfUT9Xw1uWUvbY1g+XuGe7+n7RpS+I8tt2jDvBcPPmKQrJE8glHDFbo
+	nHX9dCHvks2KNmo9zR4QIpdEs5S20bFI=
+X-Received: by 2002:a05:6402:a202:20b0:66f:60cf:38c7 with SMTP id
+ 4fb4d7f45d1cf-66f60cf3a17mr212633a12.17.1775526676914; Mon, 06 Apr 2026
+ 18:51:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <2026040644-brussels-dab-6f99@gregkh>
+In-Reply-To: <2026040644-brussels-dab-6f99@gregkh>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 7 Apr 2026 10:51:03 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_6_d_Ws0DTe0m5xE2M+fCkCY-bAW6C4kZoaNqZQ616Gw@mail.gmail.com>
+X-Gm-Features: AQROBzDH8OmVQhpkHkXDY4NC2A1FSseJbWFvj0Yd0iubz3CkvgDUfGEEcXmX1lk
+Message-ID: <CAKYAXd_6_d_Ws0DTe0m5xE2M+fCkCY-bAW6C4kZoaNqZQ616Gw@mail.gmail.com>
+Subject: Re: [PATCH 0/3] ksmbd: some potential bugfixes
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Matthew Wilcox <willy@infradead.org> writes:
-
-> On Sun, Apr 05, 2026 at 06:18:18PM -0300, Paulo Alcantara wrote:
->> +void d_mark_tmpfile_name(struct file *file, const struct qstr *name)
->> +{
->> +	struct dentry *dentry = file->f_path.dentry;
->> +	char *dname = dentry->d_shortname.string;
->> +
->> +	BUG_ON(dname_external(dentry) ||
->> +	       d_really_is_positive(dentry) ||
->> +	       !d_unlinked(dentry) ||
->> +	       name->len > DNAME_INLINE_LEN - 1);
+On Mon, Apr 6, 2026 at 10:47=E2=80=AFPM Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
 >
-> We tend to prefer each of these to be written out separately.  ie:
+> I spent the time exercising some new fuzzing tools on the ksmbd and smb
+> code purely because it's something that is simple to set up and test
+> locally with virtual machines, and in doing so, potentially found some
+> minor problems for when you have an "untrusted" client.
 >
-> 	BUG_ON(dname_external(dentry));
-> 	BUG_ON(d_really_is_positive(dentry));
-> ...
+> Here's some fixes for what I happened to notice.  They pass my very
+> limited testing here, but please don't trust them at all and verify that
+> I'm not just making this all up before accepting them.
 >
-> That way if one triggers, we know which condition is violated.
-
-Makes sense, thanks.  Will fix it in v2.
+> thanks!
+>
+> greg k-h
+>
+> Greg Kroah-Hartman (3):
+>   ksmbd: validate EaNameLength in smb2_get_ea()
+>   ksmbd: require 3 sub-authorities before reading sub_auth[2]
+>   ksmbd: fix mechToken leak when SPNEGO decode fails after token alloc
+Applied them to #ksmbd-for-next-next.
+Thanks for the patches!
