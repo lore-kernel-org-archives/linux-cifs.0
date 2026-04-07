@@ -1,86 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE123AF648
-	for <linux-cifs@vger.kernel.org>; Tue,  7 Apr 2026 11:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08042DF701
+	for <linux-cifs@vger.kernel.org>; Tue,  7 Apr 2026 14:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775563114; cv=none; b=CdjyuW4h1wv+aO9ayJHrNTN9J/TONkS3Y/clu5+jiL9J0UCF56EugIdYvAcig41uyOpESIaNl92Sg/q9fETpDcKaPqAzJtEq9XzzNpk/zC8iMkazIb9vwT8h1+rdoFVKOKS1V2SgnKDXGKsnrHK5NkPb/TdszcLgOEW1IE0wh8E=
+	t=1775573243; cv=none; b=dpJ9Vqyp+vLu28IcbcvwKknozHETLDwFgGUVGzkAgX2CUFXh4eYuqUt9gdcndquXqs327jxdTaOaphDUb40sqCbqjpyKu7mAGyenoy1HauDYb2dVo5TfN6hFsALqGrkGaZtNuxiC0z7nRcFRoDunT/aQY3PJkV8Mkiy1J6UCXHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775563114; c=relaxed/simple;
-	bh=Wuo13rVo8Hfoq5ak0pjtFWAS+k16mCQJvnaOn57WTQQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oZ2VGPcQHRKVP37esDq9se32YcNfYZjY0s1vFAanXTetXtqmZSUr3YL7AySpQF3H+HshyS3seqGhEaEcCoQwMIokJ9oq2EYY6HdcCMG0iJXYpeTDtg+aKo9PY1eVm9q6p5lNq2RVi3U5ebXTg20USzrw3ONlFY17k5GDVdAmraQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c0DNsmTK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775573243; c=relaxed/simple;
+	bh=401OQXpYjNnWktwNdBMgREdJD0/+Gbeba6l8Xw9Z9U4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Rlg/pNCfkWJ295yAsctntRbkwm0DFiSCZ7+9Mfmy8zai0iQ/Xs8i5kMZ6ffpgXHhtsvHuXCm1c7+XHoIspgETxFFkrqLle1mPQ9T9DwpSFwmUDSvAkOz5XOKikdjKwSye5WXHS9Xi5ZM75ffAN4Z28ZtWc00fr6/WQWwEiI5CHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=f8vuBLeI; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c0DNsmTK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC423C19421
-	for <linux-cifs@vger.kernel.org>; Tue,  7 Apr 2026 11:58:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775563113;
-	bh=Wuo13rVo8Hfoq5ak0pjtFWAS+k16mCQJvnaOn57WTQQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=c0DNsmTKF3x/5EhmLZzeOgP060BoGPIAL8Srr9MwDpsxzdX74EYGVO64LHccO3Gzx
-	 Xz57ic4cNfuS4S4DxtY44W/1B2R1JbiTaeeLNrPCoYkkFcpFNF5uE2VAtTqeM+e5ml
-	 Ql+dx3xgti3gPNJsp9Gj6eS71WUdGjkjJqkxI+qY6i4k5OKEhdRWyPmhbu65k0qtb0
-	 S80k/HDK5PdUZptMq7Z3MdHw/xFgzbj7twXusK5ZS9+cIVmFxNfKfZexIflooHNbJu
-	 V9ZHDa2T2Tnph+ZV1PIi5azmGef1wGRMCyb1/lvPEagiGjzojUfudY6cngRaHuOpdC
-	 E06xqvSBBU8lQ==
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b9bff57cb62so798437666b.2
-        for <linux-cifs@vger.kernel.org>; Tue, 07 Apr 2026 04:58:33 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWOMuITHyl8t4owXFZSjGgM3/oR5HOBf+xz5m8+jV9Xfa6IecpjybjnXwUuiNdWQi+7CXCEQspTnJ1k@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGAf+9pCi8g2/B9jnNX7yI9hrunaE2TJ+68cEsVSlFP3+a5ZE9
-	1Wn9XT8ye7H8VMB3WC8wPpanNrhD870qiCHPs3/rlQ5H5k4zXHjqSMrPCCNURLJjCpYEuVtI9jE
-	0w0AibEBIZQG9USNcM4YYlY4QxbC8Zag=
-X-Received: by 2002:a17:907:2d26:b0:b97:6147:def1 with SMTP id
- a640c23a62f3a-b9c679aca0amr741753866b.33.1775563112415; Tue, 07 Apr 2026
- 04:58:32 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="f8vuBLeI"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=+aLr7Jx308i7RKbvPfKZkDhfRRWRdiVJAQVB/WEBH/Y=; b=f8vuBLeIMFZJV9t0YK4w949DVB
+	i5fsBRexWiTqu50pMDoIU/7I6BvfKmckdDv6D0eL2lLrqQMIRVf3h/5+UDHqAOkAY6kGa5Aws+tvo
+	nbhYkViNA3KNI6r7mIx74Q6Bmj0T5kPbt2t0tDXdtEaNr6xsJF9EYMFto9HamO3GsCVpWbeTnpYWh
+	GxLr/hnrQVYY+xxOQ0zzzvfoSwvF1n6S2/e9Xk9FVSvsS5NElKloH1KwaOZfg2XqZaqD2b58WrXXX
+	gaeWgIbXaT36rGIUc7fOKd/TJhxeFNKKC+WK1U0T11s/85LJzrQfn8IuUWZE88hSBnwHb4p2qNbp7
+	BDey3cWYdlYXsvaq8eFZO2g7LPlAlXL6vxf/emwfTsp8AOBYF6QlnNe0VbS4F1ncIx48ysYfWr/cr
+	19ihPZlqPEwBX4CrtySv2KPl2yZnZUH1Bc0kjPjRYoGvyAK2K5H+AYkh/etefsoNeCSOHr2QhRnji
+	Aaria67Wat1iZasbMj3WlcWA;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wA7i0-00000007WP3-3PUm;
+	Tue, 07 Apr 2026 14:47:16 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Henrique Carvalho <henrique.carvalho@suse.com>
+Subject: [PATCH 2/8] smb: smbdirect: fix copyright header of smbdirect.h
+Date: Tue,  7 Apr 2026 16:46:28 +0200
+Message-ID: <6fc5a7bedca85319de2327e2631aa50ad3d5ab2f.1775571957.git.metze@samba.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1775571957.git.metze@samba.org>
+References: <cover.1775571957.git.metze@samba.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260407023112.51220-1-joshuaklinesmith@gmail.com>
-In-Reply-To: <20260407023112.51220-1-joshuaklinesmith@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 7 Apr 2026 20:58:20 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_sg7DjjARDz-UZCbotDqzJDm3b6VyK5OLrnYCC4kBY-g@mail.gmail.com>
-X-Gm-Features: AQROBzD_OkjnxcUqPRS7gu4qUzg0DhlVCFXCvGpmbtAs0v4uFAv9GQlnYrz8AQQ
-Message-ID: <CAKYAXd_sg7DjjARDz-UZCbotDqzJDm3b6VyK5OLrnYCC4kBY-g@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix use-after-free from async crypto on Qualcomm
- crypto engine
-To: Joshua Klinesmith <joshuaklinesmith@gmail.com>
-Cc: samba-technical@lists.samba.org, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 7, 2026 at 11:31=E2=80=AFAM Joshua Klinesmith
-<joshuaklinesmith@gmail.com> wrote:
->
-> ksmbd_crypt_message() sets a NULL completion callback on AEAD requests
-> and does not handle the -EINPROGRESS return code from async hardware
-> crypto engines like the Qualcomm Crypto Engine (QCE). When QCE returns
-> -EINPROGRESS, ksmbd treats it as an error and immediately frees the
-> request while the hardware DMA operation is still in flight. The DMA
-> completion callback then dereferences freed memory, causing a NULL
-> pointer crash:
->
->   pc : qce_skcipher_done+0x24/0x174
->   lr : vchan_complete+0x230/0x27c
->   ...
->   el1h_64_irq+0x68/0x6c
->   ksmbd_free_work_struct+0x20/0x118 [ksmbd]
->   ksmbd_exit_file_cache+0x694/0xa4c [ksmbd]
->
-> Use the standard crypto_wait_req() pattern with crypto_req_done() as
-> the completion callback, matching the approach used by the SMB client
-> in fs/smb/client/smb2ops.c. This properly handles both synchronous
-> engines (immediate return) and async engines (-EINPROGRESS followed
-> by callback notification).
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Link: https://github.com/openwrt/openwrt/issues/21822
-> Signed-off-by: Joshua Klinesmith <joshuaklinesmith@gmail.com>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+Everything in smbdirect.h was taken from my out of
+tree prototype.
+
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: David Howells <dhowells@redhat.com>
+Cc: Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+---
+ fs/smb/common/smbdirect/smbdirect.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/fs/smb/common/smbdirect/smbdirect.h b/fs/smb/common/smbdirect/smbdirect.h
+index 8fbffe3eb845..bbab5f7f7cc9 100644
+--- a/fs/smb/common/smbdirect/smbdirect.h
++++ b/fs/smb/common/smbdirect/smbdirect.h
+@@ -1,7 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+- *   Copyright (C) 2017, Microsoft Corporation.
+- *   Copyright (C) 2018, LG Electronics.
++ *   Copyright (C) 2025 Stefan Metzmacher
+  */
+ 
+ #ifndef __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_H__
+-- 
+2.43.0
+
