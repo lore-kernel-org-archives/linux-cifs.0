@@ -1,48 +1,47 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76BA36495E;
-	Wed,  8 Apr 2026 06:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB0B34DB6C;
+	Wed,  8 Apr 2026 06:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775630428; cv=none; b=dDO7u03NUdFMQCPyceyjHDtGI+6dnAXyneQjtj2HWvkNj3OcEeShB3btGtPwXj3xjKgdtszpVFXtX6Ty57oZ1BJHaAp5IzMEqtyIgVFI1QB4XU0f9zTj4WWW+DqhiljY8aMXKdhyW6bVDMZakn6sXCsR5SuyOmLYgjoipw4WXLI=
+	t=1775631220; cv=none; b=MN+ubvIeCQDiXAodRNRIqksTSAS96FdLysF5xBpjCWO0JBs7fkBigtEL3idEAvsBnmXpJ7OkLNDW2IcldlYl3jSUCY4JQcPzuF+oGvCulXuquRBypVCyfs6QvpaxF0bsL1cj2RYAkTF2ZumRDet2nbq/8lWnG3/BP+eNDMhbrd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775630428; c=relaxed/simple;
-	bh=DZr/CyiL0tBakOiW+bpiDccVL3DKrCbola+AqUVIKWM=;
+	s=arc-20240116; t=1775631220; c=relaxed/simple;
+	bh=B6TadXJ7UkxaXY92qgXpVgRFisxJ4YU8D9qXTvn/c/0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Aw+/HwDbKEPuhMD12zvrJsUQ2Iwb/otfUa0axZnC8zFOG28WV6h/sQBJrxyuTSgHcsk3CZ1Lj7IPrky0lnI56OJAxxhChuZsuDJpkPTWKR4lxAnnKE4VpdBbQZWQtbvqVxIvnvpKBa7Rrw1PVRg5RFZE3m4yjQ7BvykCSALHkx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=FeHoV0z5; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=X1NW0jBctZefG3o7dz745pCOxbrUDF92b0/QNXQhGN1pKIk8OqVy29bcpsp/Fg/9ad246tgYS2OIYd7SIBtxCDeiza663sqaHz0OMyJ8jhwVturhmv85aWR8VVj3gSJZPQieO1S9HZYjLd4O2CyiHp0/UJNIFfoE6BcOXzQbg68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=vdGEH80V; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="FeHoV0z5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C75A2C19424;
-	Wed,  8 Apr 2026 06:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1775630428;
-	bh=DZr/CyiL0tBakOiW+bpiDccVL3DKrCbola+AqUVIKWM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FeHoV0z52X3UhIEEeJHa7ZUwS42Udn4WyW57/pzPC+O9V42puHr9idD5eLcyQfPz0
-	 dcEwbZN8is8HvoqyLqgIXNQlej9KIHnJsjAUCP68ZF+6H0m2hsmGLGFOK3W/ct2Mms
-	 MTocVZK6EbOAKJQ2DvUDG4/YID17dQCTg13VQVxU=
-Date: Wed, 8 Apr 2026 08:40:25 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	samba-technical@lists.samba.org, stable <stable@kernel.org>
-Subject: Re: [PATCH 1/2] smb: client: fix off-by-8 bounds check in
- check_wsl_eas()
-Message-ID: <2026040846-winner-juniper-096c@gregkh>
-References: <2026040635-banking-unsoiled-3250@gregkh>
- <2026040636-unsigned-jackal-e239@gregkh>
- <d998240c-aca9-420d-9dbd-f5ba24af19e0@chenxiaosong.com>
- <2026040822-shortly-chump-8518@gregkh>
- <68bc86cc-1c57-4734-9c75-14c9de80bd71@chenxiaosong.com>
- <2026040833-espresso-triangle-425d@gregkh>
- <c7c0fcc2-ebdb-4ba0-9c64-fadbd57137fd@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="vdGEH80V"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=0ay1Bld+PT+7+bY0dPSDuSI2gP78QPmzwdoU1hZaceU=; b=vdGEH80VxB3KPuXj5MizBLUczb
+	eixp0eD0iFGpwxetWR2hwUy0MXDat7ql8ClsCqiQF2jrBBjoaWi20VN9hwclKYuzdE54vtRANwLL6
+	KyO2mUPqdjS8qWIkjTkZ2sQgKj0+x1ICUSijzLE+jC7EzJPCEqf7jbWQbz3rWGbU6VYmIKWlDS11b
+	GlWGECjZg3ssJq2rBJcX/MdK3YnuOSKxxM3iPet5bIwyIifbVl8UbuUmlYAYBgWzGm9ZLb8hNHdMF
+	84hRnmg3GfZxs+8LNkmChnyVaRHgLXQEqLPlCPwFrcqDSQsCWFJYsbmOaVsLY1GEktd4+gOLUszT7
+	ZrCHj/Jg==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wAMql-0000000H5JI-2Lct;
+	Wed, 08 Apr 2026 06:57:19 +0000
+Date: Wed, 8 Apr 2026 07:57:19 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: NeilBrown <neil@brown.name>, smfrench@gmail.com,
+	David Howells <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org,
+	linux-cifs@vger.kernel.org
+Subject: Re: [PATCH 2/2] smb: client: add support for O_TMPFILE
+Message-ID: <20260408065719.GF3836593@ZenIV>
+References: <20260405211819.1251369-1-pc@manguebit.org>
+ <20260405211819.1251369-2-pc@manguebit.org>
+ <20260405233222.GW3836593@ZenIV>
+ <177543319568.1474915.17445767081272255066@noble.neil.brown.name>
+ <98c9845554e2e6a79965d68ba8ae722b@manguebit.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,20 +50,37 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c7c0fcc2-ebdb-4ba0-9c64-fadbd57137fd@chenxiaosong.com>
+In-Reply-To: <98c9845554e2e6a79965d68ba8ae722b@manguebit.org>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Wed, Apr 08, 2026 at 02:19:48PM +0800, ChenXiaoSong wrote:
-> Could you send v2 with this check added?
+On Mon, Apr 06, 2026 at 10:28:51PM -0300, Paulo Alcantara wrote:
 
-Looks like this was already accepted, and the additional check would be
-just that, an additional check :)
+> IIUC, this is what we currently have
+> 
+> * cifs_atomic_open()
+> 
+>   init state: in-lookup or hashed-negative
+>   [d_drop() + d_add()]
+>   end state: hashed-positive
+> 
+> * cifs_tmpfile()
+> 
+>   init state: unhashed-negative
+>   [d_drop() + d_instantiate()]
+>   end state: unhashed-positive
+> 
+> * cifs_create()
+> 
+>   init state: hashed-negative
+>   [d_drop() + d_add()]
+>   end state: hashed-positive
 
-> I am currently reviewing another patch. Perhaps you could wait until I have
-> finished reviewing it.
+IDGI.  Why shouldn't cifs_create() simply do d_instantiate() instead
+of that dance, ditto for cifs_tmpfile()?
 
-I have no problem waiting, but as you found this one, I want to give you
-proper credit for the find/fix.
+The only case where you want to change the hashed status is in-lookup
+O_CREAT ->atomic_open().  And there it's not d_drop()+d_add() - it's
+d_splice_alias().
 
-thanks,
-
-greg k-h
+I'd lift that d_drop() out of cifs_do_create() into the callers and
+get rid of it, along with d_add()...
