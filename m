@@ -1,226 +1,272 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44E62DEA75
-	for <linux-cifs@vger.kernel.org>; Wed,  8 Apr 2026 11:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EEE3BC66B
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Apr 2026 12:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775649532; cv=none; b=TABfcGLdERqOdKUHTjtdcowGnGgboJj54r+HoJ5rJ/VLqM77mGSdzMzWqmOQ4UFh41T0tkNW5NyERLnYAHiMrkOubQKXFHoFdxVrDpFEOcKUhBBwtMEWRHBurRKiz5VUpDyS7ffMN+erBH2kWVfuNEOYYGG5cF6xqb5ybWyk0Go=
+	t=1775649812; cv=none; b=C8wIz8t40HAz2zp4ylYZxK5PMuYBcqMItFcUCDZBG3nuL3D1omIiq4E+HGK8xOHVe7KlAfa1UVGONEddXe3oqQ46+MEhD8RqAqDeCj2xHcIfy0saGjKgfeZgAl9evNlsP4xW0Nh02RpqeXq8LsIwXixyEacVRe5omsRAhkwJY80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775649532; c=relaxed/simple;
-	bh=aAn0Os1N590Ftuam2ZAHDH6gc3gnX/ziCaudC7L0Htg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KZ7jg3S2d1O384Uu2DdESfRUP+pHGgVydR/fLIZbKxkK/gBwjFyhai02sPZP52W/TbclZKEF1qosra9hK/5aOryn5lVNEFLrajthszgThFEJSV/gN0ivyjZhWrWYDtly/GEPJvb3Mn7I5Sabn0DEfGrEYQPb+t4KHhJXz5XySoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=2n2s2jgp; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1775649812; c=relaxed/simple;
+	bh=y9RwxmBOMd3npB3/5hdXTJ5GglA58NutFKXpuspU+0M=;
+	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=i5msvLvYGVAzzCzzjxoEzfnzK2cNQhsGuPRrSIX6OUyT4cyeEYX+mwRP088UAMcXidT0WATR1/b1wuQ1rBxRbbfqY6Xcc9FjZvZl76f3ez2GyFCCPeca3wS6xd5VyglD3ISuny7/ItN1bZnmkdWDES5qJmt3/N68YNBK5MtGuwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=dKXxD7Om; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="2n2s2jgp"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=+NMDacEd7QGB4H33ox7SaCdPpnu9a1iUT/u7dXT9CIU=; b=2n2s2jgp8QehULpZCPj+lSP8pZ
-	57uz2hKoiGWDbKDK0GHXRg3E0cxQyz//ZkHgP4Pbc1rOWHlHOShlOx6DRxFB98lyjDMWb25wDd6NJ
-	52GpkZu+lyRieJBfV2D0ZLF1qr3BUFodM+p26JoZE5Y8Xey06fP8ReH0j526jJ9l1g7F7EoWUmvo1
-	2gJ0uVzhjyBmOjhKVqevIBZISTMYhZZPIZ9WRwN8jD9ehFPTwHlJ0th6Hq5bny30DpKKaM2UjY4fU
-	T0kRyjQQSLMVNVmvBdd691pweEY8m/Nim+vqslbF8h3WWg9NladdpQkMi9rCAuCzx8KVoKq7g3TO4
-	gUJdfIsJU8YJ/PU4oPObEILdZVyQOHnCjv+49MHbqj3FK4b25pWBy2iaxRDkgcGRoWpK8ckDO48+M
-	beBiAOvBwHOu0rCRDeCug9BvZDxlvK7pija27mOlp/KSD8FdShPLACqgmMzPYE2czeWpwskn9qjmK
-	F4Qt4NIv+P8hFyaNYv+ibS5C;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wARYW-00000007qGH-0QM6;
-	Wed, 08 Apr 2026 11:58:48 +0000
-Message-ID: <38cfe7f7-f2a1-4544-a61e-2f3efd0d71c6@samba.org>
-Date: Wed, 8 Apr 2026 13:58:47 +0200
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="dKXxD7Om"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4887ca8e529so6984885e9.0
+        for <linux-cifs@vger.kernel.org>; Wed, 08 Apr 2026 05:03:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1775649809; x=1776254609; darn=vger.kernel.org;
+        h=mime-version:user-agent:date:to:reply-to:from:subject:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZlG5zP5RKqqr4prsIAup3I7vOSW+npAoYDt6MYANBYI=;
+        b=dKXxD7Om1TZYO+DzCbcC337ofuDDXvWgOfzygL36jQ7LX7KWB84xcWGeDn1Tau1JDh
+         qREkc7LTEA9yp92xxHCz3ciLWvqOKPl2l9EpDIQr58P3uJd6TcNUhfgMMsVFlkARgKoW
+         fVTiI3FP/40ewy0JXDlVszMY244dNzj5sQhw/7QOh/3bGesUBsbB8I0c09MlhLlMAMmp
+         JI2cva+NogDYUBRMKdGg2aSIXgPlqQ9wAAHcUNn34kB9+FrnuhSvhd6t6VamGznuO2D6
+         kczRoYV+MyxGul9iGHFeB9NP1CAxmQ4auKA13aOSNqAT+n6Eoh9MBiQ/pavrLfVjoted
+         SLHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775649809; x=1776254609;
+        h=mime-version:user-agent:date:to:reply-to:from:subject:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZlG5zP5RKqqr4prsIAup3I7vOSW+npAoYDt6MYANBYI=;
+        b=kG15q5NAbCHkK7Am5jRAv44QAAS1WSxz7WrmFrh/27gh1QtVEilwZ/EVJgxnf41HzC
+         8Met4vvAwKYBx+J6NW6ATPorHpmyliyaJB95Svna3+YErLzdLiE+3dhUZeBSMsi5XJWE
+         9W0Kfo47pHmU5/AgcdTCLaN9KkLIBTI9SWRTWmsCY9b7qz9PEqgARC1BorSlex7y+aYa
+         bZfdg/V3YssrKqil+XPN1oU7I5KPNBtnBwJ3IzE5nsw2DvJRNaQpCemTZvnx8mjTCRP0
+         xepb3xH4tDjZPYuM1VFIDiC1kroOl8/ZvnLaDzR5gw9OHjmIbkLPkuhUdhTLT25GgAzS
+         FigQ==
+X-Gm-Message-State: AOJu0YwWakDThrfWlqULVWHPrpehFPQR7rz2ISuYIeVzWVfvYNgLeeok
+	1QUgHS9QZl3j19rokgG2Iwj+4tQAP9AYP0nfBnH0kqe7mDGOHubOxr1mbBU8Fl+vmHWV1Ge9C4k
+	qj/9l0DI=
+X-Gm-Gg: AeBDiet5phX90qQm/1qB2cP3uMsLMHuoxKIIT5nzu7WYYsK/ee8zK7VguW0j/b94qId
+	yW3QeMz4H59QRChFnmSwOlBTW/+HrLVmVMND+hLpQA0/GKKJbOOFOEl5FLuXbCflBzyNAHUEjSR
+	Ap1IGYUZFmDyfP61mikOmNa45N96w/+lSBLlD6FY3jaVCtWi07Rh4or7C7tdJ8rwMcPkztW3kFE
+	YT5IgPB+VXR/lC4jAElJ2PE5wfsGQ4YyMPuxkjTsONXd7AAOXEBHMZST0nnQWip/GQFrPnmK4dS
+	iRizWsw4WnM8Z5brS7S/NS5RMAHdtdnSzZpqtZHyi5eXxbgxVrSDYuYkJXWDwxLdgrWZyIdpA2e
+	wXQVKKx+gqjrh+wxW/1fuDqZF6JMQ84D5rnkIxaL0okSkma205wg05UWkSTD9J5lGLdd0nRzRQZ
+	0kqzD8m4y/gNPrg4qLf4Y1znPEGw==
+X-Received: by 2002:a05:600c:3f14:b0:488:c6e9:1e0c with SMTP id 5b1f17b1804b1-488c6e91fe0mr27543515e9.5.1775649808396;
+        Wed, 08 Apr 2026 05:03:28 -0700 (PDT)
+Received: from [192.168.1.101] ([193.125.66.200])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488c524f3a7sm28212675e9.0.2026.04.08.05.03.27
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2026 05:03:27 -0700 (PDT)
+Message-ID: <4d96fd377f12876438f33a09d4342edc6151ec28.camel@suse.com>
+Subject: PATCH: cifs.upcall: Retry krb5 TGS request with uppercase service
+ name
+From: Samuel Cabrero <scabrero@suse.com>
+Reply-To: scabrero@suse.com
+To: linux-cifs@vger.kernel.org
+Date: Wed, 08 Apr 2026 14:03:27 +0200
+Content-Type: multipart/mixed; boundary="=-IIa7DT3vIcDc/4Imjgt4"
+User-Agent: Evolution 3.58.3 
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [SECURITY] SMB Direct: double-free of send_io on ib_post_send
- failure in batch flush path
-To: Ruikai Peng <ruikai@pwno.io>, linkinjeon@kernel.org, sfrench@samba.org,
- senozhatsky@chromium.org, tom@talpey.com
-Cc: security@kernel.org, pc@manguebit.org, linux-cifs@vger.kernel.org
-References: <CAFD3drNOSJ05y3A+jNXSDxW-2w09KHQ0DivhxQ_pcc7immVVOQ@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAFD3drNOSJ05y3A+jNXSDxW-2w09KHQ0DivhxQ_pcc7immVVOQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Hi Ruikai,
+--=-IIa7DT3vIcDc/4Imjgt4
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-thanks for the report I'll have a deeper look.
+This patch allows to mount Azure Files shares using KRB5 authentication
+provided by Entra KDC for native Entra accounts, like:
 
-metze
+   auser@tw:~> sudo mount -v -t cifs \
+       //astorageaccount.file.core.windows.net/share1 /mnt/azfiles/ \
+       -osec=3Dkrb5,cruid=3Dauser,username=3Dauser
 
-> The send batching logic introduced in the v7.0 merge window has a
-> double-free of mempool-backed send message objects when ib_post_send()
-> fails during a batch flush. The bug affects both the client
-> (fs/smb/client/smbdirect.c) and server (fs/smb/server/transport_rdma.c)
-> SMB Direct implementations. It is present on current upstream HEAD
-> (v7.0-rc7+).
-> 
-> The batch flush helpers (smbd_send_batch_flush and
-> smb_direct_flush_send_list) take ownership of the batched send
-> messages and free them on ib_post_send() failure:
-> 
->    fs/smb/server/transport_rdma.c, smb_direct_flush_send_list():
-> 
->      ret = smb_direct_post_send(sc, &first->wr);
->      if (ret) {
->          list_for_each_entry_safe(sibling, ...) {
->              smb_direct_free_sendmsg(sc, sibling);
->          }
->          smb_direct_free_sendmsg(sc, last);
->      }
-> 
-> However, the callers (smb_direct_post_send_data and
-> smbd_post_send_iter) have a generic error path that frees the same
-> message unconditionally:
-> 
->    fs/smb/server/transport_rdma.c, smb_direct_post_send_data():
-> 
->      ret = smb_direct_flush_send_list(sc, send_ctx, true);
->      if (ret)
->          goto err;
->      ...
->    err:
->      smb_direct_free_sendmsg(sc, msg);
-> 
-> This double-free occurs specifically when using the stack-allocated
-> local batch for single-message sends, since in that case the caller
-> immediately flushes and then falls through to the same err label.
-> 
-> The same pattern exists on the client side:
-> 
->    fs/smb/client/smbdirect.c, smbd_post_send_iter():
-> 
->      rc = smbd_send_batch_flush(sc, batch, true);
->      if (!rc)
->          return 0;
->      ...
->    err_dma:
->      smbd_free_send_io(request);
-> 
-> A remote peer can trigger ib_post_send() failures by tearing down the
-> RDMA connection or forcing the QP into an error state during active
-> sending. This results in:
-> 
->    - Kernel heap double-free of mempool-backed send_io objects
->    - Use-after-free from subsequent RDMA completion processing
->    - Potential memory corruption
-> 
-> This requires an SMB Direct (RDMA) configuration and an attacker
-> capable of disrupting the RDMA connection.
-> 
-> I reproduced this deterministically using paired QEMU guests with
-> RXE soft-RDMA, a ksmbd share mounted over SMB Direct, and a
-> kretprobe-based fault injection module that forces
-> smb_direct_post_send() to return -EIO. KASAN reports a double-free
-> in mempool_free_slab and follow-on slab-use-after-free splats.
-> 
-> The first splat is a use-after-free when the caller's error path
-> touches the object that the flush helper already freed:
-> 
->    [   14.352449] BUG: KASAN: slab-use-after-free in
-> smb_direct_free_sendmsg+0x31f/0x380
->    [   14.352449] Read of size 8 at addr ffff888009dc72f8 by task kworker/1:0H/25
->    [   14.352449]
->    [   14.352449] CPU: 1 UID: 0 PID: 25 Comm: kworker/1:0H Tainted: G
->          O        7.0.0-rc7-00059-g3036cd0d3328 #10 PREEMPT(lazy)
->    [   14.352449] Workqueue: ksmbd-smb_direct-wq smb_direct_send_immediate_work
->    [   14.352449] Call Trace:
->    [   14.352449]  <TASK>
->    [   14.352449]  dump_stack_lvl+0x5f/0x80
->    [   14.352449]  print_report+0xd1/0x640
->    [   14.352449]  kasan_report+0xe5/0x120
->    [   14.352449]  smb_direct_free_sendmsg+0x31f/0x380
->    [   14.352449]  smb_direct_post_send_data+0xf77/0x2cf0
->    [   14.352449]  smb_direct_send_immediate_work+0x55/0x70
->    [   14.352449]  process_one_work+0x635/0x10a0
->    [   14.352449]  worker_thread+0x45b/0xc90
->    [   14.352449]  kthread+0x2d7/0x3c0
->    [   14.352449]  ret_from_fork+0x39f/0x5d0
->    [   14.352449]  </TASK>
->    [   14.352449]
->    [   14.352449] Allocated by task 25:
->    [   14.352449]  kmem_cache_alloc_noprof+0x109/0x380
->    [   14.352449]  mempool_alloc_slab+0x14/0x20
->    [   14.352449]  mempool_alloc_noprof+0x127/0x210
->    [   14.352449]  smb_direct_post_send_data+0x308/0x2cf0
->    [   14.352449]  smb_direct_send_immediate_work+0x55/0x70
->    [   14.352449]
->    [   14.352449] Freed by task 25:
->    [   14.352449]  kmem_cache_free+0xb5/0x3b0
->    [   14.352449]  mempool_free_slab+0x16/0x20
->    [   14.352449]  mempool_free+0xbe/0x110
->    [   14.352449]  smb_direct_free_sendmsg+0xa0/0x380
->    [   14.352449]  smb_direct_flush_send_list+0x411/0x660      <--
-> first free here
->    [   14.352449]  smb_direct_post_send_data+0x1abb/0x2cf0
->    [   14.352449]  smb_direct_send_immediate_work+0x55/0x70
->    [   14.352449]
->    [   14.352449] The buggy address belongs to the object at ffff888009dc7280
->    [   14.352449]  which belongs to the cache
-> smbdirect_send_io_pool_(____ptrval____) of size 208
-> 
-> This is immediately followed by the explicit double-free when the
-> caller attempts to return the same object to the mempool:
-> 
->    [   14.382870] BUG: KASAN: double-free in mempool_free_slab+0x16/0x20
->    [   14.382949] Free of addr ffff888009dc7280 by task kworker/1:0H/25
->    [   14.383097]
->    [   14.383097] CPU: 1 UID: 0 PID: 25 Comm: kworker/1:0H Tainted: G
->   B      O        7.0.0-rc7-00059-g3036cd0d3328 #10 PREEMPT(lazy)
->    [   14.383143] Workqueue: ksmbd-smb_direct-wq smb_direct_send_immediate_work
->    [   14.383171] Call Trace:
->    [   14.383181]  <TASK>
->    [   14.383192]  dump_stack_lvl+0x5f/0x80
->    [   14.383211]  print_report+0xd1/0x640
->    [   14.383278]  kasan_report_invalid_free+0xa4/0xd0
->    [   14.383387]  check_slab_allocation+0xe2/0x110
->    [   14.383387]  __kasan_slab_pre_free+0xd/0x20
->    [   14.383387]  kmem_cache_free+0x90/0x3b0
->    [   14.383387]  mempool_free_slab+0x16/0x20
->    [   14.383387]  mempool_free+0xbe/0x110
->    [   14.383387]  smb_direct_free_sendmsg+0xa0/0x380           <--
-> second free here
->    [   14.383387]  smb_direct_post_send_data+0xf77/0x2cf0       <--
-> caller err path
->    [   14.383387]  smb_direct_send_immediate_work+0x55/0x70
->    [   14.383387]  process_one_work+0x635/0x10a0
->    [   14.383387]  worker_thread+0x45b/0xc90
->    [   14.383387]  kthread+0x2d7/0x3c0
->    [   14.383387]  ret_from_fork+0x39f/0x5d0
->    [   14.383387]  </TASK>
->    [   14.383387]
->    [   14.383387] Allocated by task 25:
->    [   14.383387]  kmem_cache_alloc_noprof+0x109/0x380
->    [   14.383387]  mempool_alloc_slab+0x14/0x20
->    [   14.383387]  mempool_alloc_noprof+0x127/0x210
->    [   14.383387]  smb_direct_post_send_data+0x308/0x2cf0
->    [   14.383387]  smb_direct_send_immediate_work+0x55/0x70
->    [   14.383387]
->    [   14.383387] Freed by task 25:
->    [   14.383387]  kmem_cache_free+0xb5/0x3b0
->    [   14.383387]  mempool_free_slab+0x16/0x20
->    [   14.383387]  mempool_free+0xbe/0x110
->    [   14.383387]  smb_direct_free_sendmsg+0xa0/0x380
->    [   14.383387]  smb_direct_flush_send_list+0x411/0x660       <--
-> flush freed it
->    [   14.383387]  smb_direct_post_send_data+0x1abb/0x2cf0
->    [   14.383387]  smb_direct_send_immediate_work+0x55/0x70
-> 
-> The "Freed by" stacks confirm the first free comes from
-> smb_direct_flush_send_list() and the second from the caller
-> smb_direct_post_send_data() at a different offset (+0xf77 vs +0x1abb),
-> matching the two distinct free sites described above.
-> 
-> Best,
-> - Ruikai Peng
 
+After logging in with Himmelblau there will be a TGT in the user's
+credential cache:
+
+   auser@tw:~> klist
+   Ticket cache: KEYRING:persistent:1333365971:1333365971
+   Default principal:
+   auser\@adomain.onmicrosoft.com@KERBEROS.MICROSOFTONLINE.COM
+  =20
+   Valid starting     Expires            Service principal
+   08/04/26 13:29:52  08/04/26 23:29:52=20
+   krbtgt/KERBEROS.MICROSOFTONLINE.COM@KERBEROS.MICROSOFTONLINE.COM
+   	renew until 15/04/26 13:29:52
+
+
+But when trying to mount the Azure Files share it will fail because the
+Entra KDC always issues CIFS service tickets with uppercase 'CIFS'
+service name even when the request is for lowercase 'cifs', causing the
+TGS response validation to fail.
+
+This patch retries the TGS exchange with uppercase CIFS service name so
+the service ticket is accepted and then used to mount the share.
+
+   auser@tw:~> klist
+   Ticket cache: KEYRING:persistent:1333365971:1333365971
+   Default principal:
+   auser\@adomain.onmicrosoft.com@KERBEROS.MICROSOFTONLINE.COM
+  =20
+   Valid starting     Expires            Service principal
+   08/04/26 13:30:06  08/04/26 14:30:06=20
+   CIFS/astorageaccount.file.core.windows.net@KERBEROS.MICROSOFTONLINE.COM
+   08/04/26 13:29:52  08/04/26 23:29:52=20
+   krbtgt/KERBEROS.MICROSOFTONLINE.COM@KERBEROS.MICROSOFTONLINE.COM
+   	renew until 15/04/26 13:29:52
+
+--=-IIa7DT3vIcDc/4Imjgt4
+Content-Disposition: attachment;
+	filename*0=0001-cifs.upcall-Retry-krb5-TGS-request-with-uppercase-se.pat;
+	filename*1=ch
+Content-Transfer-Encoding: base64
+Content-Type: text/x-patch;
+	name="0001-cifs.upcall-Retry-krb5-TGS-request-with-uppercase-se.patch";
+	charset="UTF-8"
+
+RnJvbSBhNjBhYzU1MzJjY2Y5MGZmODQyMmIzMGM2NjhlZDE0ZDdmMTc5MWZkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTYW11ZWwgQ2FicmVybyA8c2NhYnJlcm9Ac3VzZS5jb20+CkRh
+dGU6IE1vbiwgMzAgTWFyIDIwMjYgMTI6MzU6NDcgKzAyMDAKU3ViamVjdDogW1BBVENIXSBjaWZz
+LnVwY2FsbDogUmV0cnkga3JiNSBUR1MgcmVxdWVzdCB3aXRoIHVwcGVyY2FzZSBzZXJ2aWNlCiBu
+YW1lCgpUaGUgRW50cmEgS0RDIGZvciBBenVyZSBmaWxlcyBhbHdheXMgcmVxdWlyZXMgS1JCNV9O
+VF9TUlZfSFNUIG5hbWUKdHlwZSBpbiB0aGUgVEdTIHJlcXVlc3QgYW5kIGl0IGlzc3VlcyBzZXJ2
+aWNlIHRpY2tldHMgd2l0aCB1cHBlcmNhc2UKJ0NJRlMnIHNlcnZpY2UgbmFtZSBldmVuIHdoZW4g
+dGhlIHJlcXVlc3QgaXMgZm9yIGxvd2VyY2FzZSAnY2lmcycKc2VydmljZSBuYW1lLiBUaGlzIGNh
+dXNlcyBhIFRHUyByZXNwb25zZSB2YWxpZGF0aW9uIGVycm9yLgoKU2lnbmVkLW9mZi1ieTogU2Ft
+dWVsIENhYnJlcm8gPHNjYWJyZXJvQHN1c2UuY29tPgotLS0KIGNpZnMudXBjYWxsLmMgfCAxNjYg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0KIDEgZmls
+ZSBjaGFuZ2VkLCA5OSBpbnNlcnRpb25zKCspLCA2NyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQg
+YS9jaWZzLnVwY2FsbC5jIGIvY2lmcy51cGNhbGwuYwppbmRleCA2OWUyN2EzLi45M2U3NWM4IDEw
+MDY0NAotLS0gYS9jaWZzLnVwY2FsbC5jCisrKyBiL2NpZnMudXBjYWxsLmMKQEAgLTYzMSw3ICs2
+MzEsMTMgQEAgaWNma19jbGVhbnVwOgogCWdvdG8gb3V0OwogfQogCi0jZGVmaW5lIENJRlNfU0VS
+VklDRV9OQU1FICJjaWZzIgorc3RhdGljIHN0cnVjdCBjaWZzX3NlcnZpY2VfbmFtZSB7CisJY29u
+c3QgY2hhciAqbmFtZTsKKwlpbnQgdHlwZTsKK30gY2lmc19zZXJ2aWNlX25hbWVzW10gPSB7CisJ
+eyAiY2lmcyIsIEtSQjVfTlRfVU5LTk9XTiB9LAorCXsgIkNJRlMiLCBLUkI1X05UX1NSVl9IU1Qg
+fSwKK307CiAKIHN0YXRpYyBrcmI1X2Vycm9yX2NvZGUgY2hlY2tfc2VydmljZV90aWNrZXRfZXhp
+c3RzKGtyYjVfY2NhY2hlIGNjYWNoZSwKIAkJCQkJCSAgIGNvbnN0IGNoYXIgKmhvc3RuYW1lKQpA
+QCAtNjM5LDYgKzY0NSw4IEBAIHN0YXRpYyBrcmI1X2Vycm9yX2NvZGUgY2hlY2tfc2VydmljZV90
+aWNrZXRfZXhpc3RzKGtyYjVfY2NhY2hlIGNjYWNoZSwKIAlrcmI1X2NyZWRzIG1jcmVkcywgb3V0
+X2NyZWRzOwogCWNvbnN0IGNoYXIgKmVycm1zZzsKIAlrcmI1X2Vycm9yX2NvZGUgcmM7CisJc2l6
+ZV90IGNvdW50ID0gc2l6ZW9mKGNpZnNfc2VydmljZV9uYW1lcykgLyBzaXplb2Yoc3RydWN0IGNp
+ZnNfc2VydmljZV9uYW1lKTsKKwlzaXplX3QgaSA9IDA7CiAKIAltZW1zZXQoJm1jcmVkcywgMCwg
+c2l6ZW9mKG1jcmVkcykpOwogCkBAIC02NTEsMzIgKzY1OSw0MCBAQCBzdGF0aWMga3JiNV9lcnJv
+cl9jb2RlIGNoZWNrX3NlcnZpY2VfdGlja2V0X2V4aXN0cyhrcmI1X2NjYWNoZSBjY2FjaGUsCiAJ
+CXJldHVybiByYzsKIAl9CiAKLQlyYyA9IGtyYjVfc25hbWVfdG9fcHJpbmNpcGFsKGNvbnRleHQs
+IGhvc3RuYW1lLCBDSUZTX1NFUlZJQ0VfTkFNRSwKLQkJCUtSQjVfTlRfVU5LTk9XTiwgJm1jcmVk
+cy5zZXJ2ZXIpOwotCWlmIChyYykgewotCQllcnJtc2cgPSBrcmI1X2dldF9lcnJvcl9tZXNzYWdl
+KGNvbnRleHQsIHJjKTsKLQkJc3lzbG9nKExPR19ERUJVRywgIiVzOiB1bmFibGUgdG8gY29udmVy
+dCBzZXJ2aWNlIG5hbWUgKCVzKSB0byBwcmluY2lwYWw6ICVzIiwKLQkJICAgICAgIF9fZnVuY19f
+LCBob3N0bmFtZSwgZXJybXNnKTsKLQkJa3JiNV9mcmVlX2Vycm9yX21lc3NhZ2UoY29udGV4dCwg
+ZXJybXNnKTsKLQkJa3JiNV9mcmVlX3ByaW5jaXBhbChjb250ZXh0LCBtY3JlZHMuY2xpZW50KTsK
+LQkJcmV0dXJuIHJjOwotCX0KLQotCXJjID0ga3JiNV90aW1lb2ZkYXkoY29udGV4dCwgJm1jcmVk
+cy50aW1lcy5lbmR0aW1lKTsKLQlpZiAocmMpIHsKLQkJZXJybXNnID0ga3JiNV9nZXRfZXJyb3Jf
+bWVzc2FnZShjb250ZXh0LCByYyk7Ci0JCXN5c2xvZyhMT0dfREVCVUcsICIlczogdW5hYmxlIHRv
+IGdldCB0aW1lOiAlcyIsIF9fZnVuY19fLCBlcnJtc2cpOwotCQlrcmI1X2ZyZWVfZXJyb3JfbWVz
+c2FnZShjb250ZXh0LCBlcnJtc2cpOwotCQlnb3RvIG91dF9mcmVlX3ByaW5jaXBhbDsKLQl9CisJ
+Zm9yIChpID0gMDsgaSA8IGNvdW50OyBpKyspIHsKKwkJcmMgPSBrcmI1X3NuYW1lX3RvX3ByaW5j
+aXBhbChjb250ZXh0LCBob3N0bmFtZSwKKwkJCQljaWZzX3NlcnZpY2VfbmFtZXNbaV0ubmFtZSwK
+KwkJCQljaWZzX3NlcnZpY2VfbmFtZXNbaV0udHlwZSwgJm1jcmVkcy5zZXJ2ZXIpOworCQlpZiAo
+cmMpIHsKKwkJCWVycm1zZyA9IGtyYjVfZ2V0X2Vycm9yX21lc3NhZ2UoY29udGV4dCwgcmMpOwor
+CQkJc3lzbG9nKExPR19ERUJVRywKKwkJCQkiJXM6IHVuYWJsZSB0byBjb252ZXJ0IHNlcnZpY2Ug
+bmFtZSAoJXMpIHRvICIKKwkJCQkicHJpbmNpcGFsOiAlcyIsCisJCQkJX19mdW5jX18sIGhvc3Ru
+YW1lLCBlcnJtc2cpOworCQkJa3JiNV9mcmVlX2Vycm9yX21lc3NhZ2UoY29udGV4dCwgZXJybXNn
+KTsKKwkJCWdvdG8gb3V0X2ZyZWVfcHJpbmNpcGFsOworCQl9CiAKLQlyYyA9IGtyYjVfY2NfcmV0
+cmlldmVfY3JlZChjb250ZXh0LCBjY2FjaGUsIEtSQjVfVENfTUFUQ0hfVElNRVMsICZtY3JlZHMs
+ICZvdXRfY3JlZHMpOworCQlyYyA9IGtyYjVfdGltZW9mZGF5KGNvbnRleHQsICZtY3JlZHMudGlt
+ZXMuZW5kdGltZSk7CisJCWlmIChyYykgeworCQkJZXJybXNnID0ga3JiNV9nZXRfZXJyb3JfbWVz
+c2FnZShjb250ZXh0LCByYyk7CisJCQlzeXNsb2coTE9HX0RFQlVHLCAiJXM6IHVuYWJsZSB0byBn
+ZXQgdGltZTogJXMiLAorCQkJCV9fZnVuY19fLCBlcnJtc2cpOworCQkJa3JiNV9mcmVlX2Vycm9y
+X21lc3NhZ2UoY29udGV4dCwgZXJybXNnKTsKKwkJCWtyYjVfZnJlZV9wcmluY2lwYWwoY29udGV4
+dCwgbWNyZWRzLnNlcnZlcik7CisJCQlnb3RvIG91dF9mcmVlX3ByaW5jaXBhbDsKKwkJfQogCi0J
+aWYgKCFyYykKLQkJa3JiNV9mcmVlX2NyZWRfY29udGVudHMoY29udGV4dCwgJm91dF9jcmVkcyk7
+CisJCXJjID0ga3JiNV9jY19yZXRyaWV2ZV9jcmVkKGNvbnRleHQsIGNjYWNoZSwgS1JCNV9UQ19N
+QVRDSF9USU1FUywKKwkJCQkJICAgJm1jcmVkcywgJm91dF9jcmVkcyk7CisJCWtyYjVfZnJlZV9w
+cmluY2lwYWwoY29udGV4dCwgbWNyZWRzLnNlcnZlcik7CisJCWlmICghcmMpIHsKKwkJCWtyYjVf
+ZnJlZV9jcmVkX2NvbnRlbnRzKGNvbnRleHQsICZvdXRfY3JlZHMpOworCQkJYnJlYWs7CisJCX0K
+Kwl9CiAKIG91dF9mcmVlX3ByaW5jaXBhbDoKLQlrcmI1X2ZyZWVfcHJpbmNpcGFsKGNvbnRleHQs
+IG1jcmVkcy5zZXJ2ZXIpOwogCWtyYjVfZnJlZV9wcmluY2lwYWwoY29udGV4dCwgbWNyZWRzLmNs
+aWVudCk7CiAKIAlyZXR1cm4gcmM7CkBAIC02OTQsNiArNzEwLDkgQEAgY2lmc19rcmI1X2dldF9y
+ZXEoY29uc3QgY2hhciAqaG9zdCwga3JiNV9jY2FjaGUgY2NhY2hlLAogI2lmIGRlZmluZWQoSEFW
+RV9LUkI1X0FVVEhfQ09OX1NFVEFERFJTKSAmJiBkZWZpbmVkKEhBVkVfS1JCNV9BVVRIX0NPTl9T
+RVRfUkVRX0NLU1VNVFlQRSkKIAlzdGF0aWMgY2hhciBnc3NfY2tzdW1bMjRdID0geyAweDEwLCAw
+eDAwLCAvKiAuLi4gKi99OwogI2VuZGlmCisJc2l6ZV90IGNvdW50ID0gc2l6ZW9mKGNpZnNfc2Vy
+dmljZV9uYW1lcykgLyBzaXplb2Yoc3RydWN0IGNpZnNfc2VydmljZV9uYW1lKTsKKwlzaXplX3Qg
+aSA9IDA7CisKIAltZW1zZXQoJmluX2NyZWRzLCAwLCBzaXplb2YoaW5fY3JlZHMpKTsKIAogCXJl
+dCA9IGtyYjVfY2NfZ2V0X3ByaW5jaXBhbChjb250ZXh0LCBjY2FjaGUsICZpbl9jcmVkcy5jbGll
+bnQpOwpAQCAtNzAzLDE2ICs3MjIsMjEgQEAgY2lmc19rcmI1X2dldF9yZXEoY29uc3QgY2hhciAq
+aG9zdCwga3JiNV9jY2FjaGUgY2NhY2hlLAogCQlyZXR1cm4gcmV0OwogCX0KIAotCXJldCA9IGty
+YjVfc25hbWVfdG9fcHJpbmNpcGFsKGNvbnRleHQsIGhvc3QsIENJRlNfU0VSVklDRV9OQU1FLAot
+CQkJCQlLUkI1X05UX1VOS05PV04sICZpbl9jcmVkcy5zZXJ2ZXIpOwotCWlmIChyZXQpIHsKLQkJ
+c3lzbG9nKExPR19ERUJVRywgIiVzOiB1bmFibGUgdG8gY29udmVydCBzbmFtZSB0byBwcmluYyAo
+JXMpLiIsCi0JCSAgICAgICBfX2Z1bmNfXywgaG9zdCk7Ci0JCWdvdG8gb3V0X2ZyZWVfcHJpbmNp
+cGFsOwotCX0KKwlmb3IgKGkgPSAwOyBpIDwgY291bnQ7IGkrKykgeworCQlyZXQgPSBrcmI1X3Nu
+YW1lX3RvX3ByaW5jaXBhbChjb250ZXh0LCBob3N0LCBjaWZzX3NlcnZpY2VfbmFtZXNbaV0ubmFt
+ZSwKKwkJCQljaWZzX3NlcnZpY2VfbmFtZXNbaV0udHlwZSwgJmluX2NyZWRzLnNlcnZlcik7CisJ
+CWlmIChyZXQpIHsKKwkJCXN5c2xvZyhMT0dfREVCVUcsICIlczogdW5hYmxlIHRvIGNvbnZlcnQg
+c25hbWUgdG8gcHJpbmMgKCVzKS4iLAorCQkJICAgICAgIF9fZnVuY19fLCBob3N0KTsKKwkJCWdv
+dG8gb3V0X2ZyZWVfcHJpbmNpcGFsOworCQl9CiAKLQlyZXQgPSBrcmI1X2dldF9jcmVkZW50aWFs
+cyhjb250ZXh0LCAwLCBjY2FjaGUsICZpbl9jcmVkcywgJm91dF9jcmVkcyk7Ci0Ja3JiNV9mcmVl
+X3ByaW5jaXBhbChjb250ZXh0LCBpbl9jcmVkcy5zZXJ2ZXIpOworCQlyZXQgPSBrcmI1X2dldF9j
+cmVkZW50aWFscyhjb250ZXh0LCAwLCBjY2FjaGUsICZpbl9jcmVkcywgJm91dF9jcmVkcyk7CisJ
+CWtyYjVfZnJlZV9wcmluY2lwYWwoY29udGV4dCwgaW5fY3JlZHMuc2VydmVyKTsKKwkJaWYgKCFy
+ZXQpIHsKKwkJCWJyZWFrOworCQl9CisJfQogCWlmIChyZXQpIHsKIAkJc3lzbG9nKExPR19ERUJV
+RywgIiVzOiB1bmFibGUgdG8gZ2V0IGNyZWRlbnRpYWxzIGZvciAlcyIsCiAJCSAgICAgICBfX2Z1
+bmNfXywgaG9zdCk7CkBAIC04MzQsNDQgKzg1OCw1MiBAQCBjaWZzX2dzc19nZXRfcmVxKGNvbnN0
+IGNoYXIgKmhvc3QsIERBVEFfQkxPQiAqbWVjaHRva2VuLCBEQVRBX0JMT0IgKnNlc3Nfa2V5KQog
+CWdzc19idWZmZXJfZGVzYyBvdXRwdXRfdG9rZW47CiAJZ3NzX2tyYjVfbHVjaWRfY29udGV4dF92
+MV90ICpsdWNpZF9jdHggPSBOVUxMOwogCWdzc19rcmI1X2x1Y2lkX2tleV90ICprZXkgPSBOVUxM
+OworCXNpemVfdCBjb3VudCA9IHNpemVvZihjaWZzX3NlcnZpY2VfbmFtZXMpIC8gc2l6ZW9mKHN0
+cnVjdCBjaWZzX3NlcnZpY2VfbmFtZSk7CisJc2l6ZV90IGk7CisKKwlmb3IgKGkgPSAwOyBpIDwg
+Y291bnQ7IGkrKykgeworCQlzaXplX3Qgc2VydmljZV9uYW1lX2xlbiA9IHN0cmxlbihjaWZzX3Nl
+cnZpY2VfbmFtZXNbaV0ubmFtZSkgKworCQkJMSAvKiBAICovICsgc3RybGVuKGhvc3QpICsgMTsK
+KwkJY2hhciAqc2VydmljZV9uYW1lID0gbWFsbG9jKHNlcnZpY2VfbmFtZV9sZW4pOworCQlpZiAo
+IXNlcnZpY2VfbmFtZSkgeworCQkJc3lzbG9nKExPR19ERUJVRywgIm91dCBvZiBtZW1vcnkgYWxs
+b2NhdGluZyBzZXJ2aWNlIG5hbWUiKTsKKwkJCW1hal9zdGF0ID0gR1NTX1NfRkFJTFVSRTsKKwkJ
+CWdvdG8gb3V0OworCQl9CiAKLQlzaXplX3Qgc2VydmljZV9uYW1lX2xlbiA9IHNpemVvZihDSUZT
+X1NFUlZJQ0VfTkFNRSkgKyAxIC8qIEAgKi8gKwotCQlzdHJsZW4oaG9zdCkgKyAxOwotCWNoYXIg
+KnNlcnZpY2VfbmFtZSA9IG1hbGxvYyhzZXJ2aWNlX25hbWVfbGVuKTsKLQlpZiAoIXNlcnZpY2Vf
+bmFtZSkgewotCQlzeXNsb2coTE9HX0RFQlVHLCAib3V0IG9mIG1lbW9yeSBhbGxvY2F0aW5nIHNl
+cnZpY2UgbmFtZSIpOwotCQltYWpfc3RhdCA9IEdTU19TX0ZBSUxVUkU7Ci0JCWdvdG8gb3V0Owot
+CX0KLQotCXNucHJpbnRmKHNlcnZpY2VfbmFtZSwgc2VydmljZV9uYW1lX2xlbiwgIiVzQCVzIiwg
+Q0lGU19TRVJWSUNFX05BTUUsCi0JCSBob3N0KTsKLQlnc3NfYnVmZmVyX2Rlc2MgdGFyZ2V0X25h
+bWVfYnVmOwotCXRhcmdldF9uYW1lX2J1Zi52YWx1ZSA9IHNlcnZpY2VfbmFtZTsKLQl0YXJnZXRf
+bmFtZV9idWYubGVuZ3RoID0gc2VydmljZV9uYW1lX2xlbjsKKwkJc25wcmludGYoc2VydmljZV9u
+YW1lLCBzZXJ2aWNlX25hbWVfbGVuLCAiJXNAJXMiLAorCQkJIGNpZnNfc2VydmljZV9uYW1lc1tp
+XS5uYW1lLCBob3N0KTsKKwkJZ3NzX2J1ZmZlcl9kZXNjIHRhcmdldF9uYW1lX2J1ZjsKKwkJdGFy
+Z2V0X25hbWVfYnVmLnZhbHVlID0gc2VydmljZV9uYW1lOworCQl0YXJnZXRfbmFtZV9idWYubGVu
+Z3RoID0gc2VydmljZV9uYW1lX2xlbjsKKworCQltYWpfc3RhdCA9IGdzc19pbXBvcnRfbmFtZSgm
+bWluX3N0YXQsICZ0YXJnZXRfbmFtZV9idWYsCisJCQkJR1NTX0NfTlRfSE9TVEJBU0VEX1NFUlZJ
+Q0UsICZ0YXJnZXRfbmFtZSk7CisJCWZyZWUoc2VydmljZV9uYW1lKTsKKwkJaWYgKEdTU19FUlJP
+UihtYWpfc3RhdCkpIHsKKwkJCWNpZnNfZ3NzX2Rpc3BsYXlfc3RhdHVzKCJnc3NfaW1wb3J0X25h
+bWUiLCBtYWpfc3RhdCwgbWluX3N0YXQpOworCQkJZ290byBvdXQ7CisJCX0KIAotCW1hal9zdGF0
+ID0gZ3NzX2ltcG9ydF9uYW1lKCZtaW5fc3RhdCwgJnRhcmdldF9uYW1lX2J1ZiwKLQkJCUdTU19D
+X05UX0hPU1RCQVNFRF9TRVJWSUNFLCAmdGFyZ2V0X25hbWUpOwotCWZyZWUoc2VydmljZV9uYW1l
+KTsKLQlpZiAoR1NTX0VSUk9SKG1hal9zdGF0KSkgewotCQljaWZzX2dzc19kaXNwbGF5X3N0YXR1
+cygiZ3NzX2ltcG9ydF9uYW1lIiwgbWFqX3N0YXQsIG1pbl9zdGF0KTsKLQkJZ290byBvdXQ7CisJ
+CW1hal9zdGF0ID0gZ3NzX2luaXRfc2VjX2NvbnRleHQoJm1pbl9zdGF0LAorCQkJCUdTU19DX05P
+X0NSRURFTlRJQUwsIC8qIGNsYWltYW50X2NyZWRfaGFuZGxlICovCisJCQkJJmN0eCwKKwkJCQl0
+YXJnZXRfbmFtZSwKKwkJCQlkaXNjYXJkX2NvbnN0KGdzc19tZWNoX2tyYjUpLCAvKiBmb3JjZSBr
+cmI1ICovCisJCQkJMCwgLyogZmxhZ3MgKi8KKwkJCQkwLCAvKiB0aW1lX3JlcSAqLworCQkJCUdT
+U19DX05PX0NIQU5ORUxfQklORElOR1MsIC8qIGlucHV0X2NoYW5fYmluZGluZ3MgKi8KKwkJCQlH
+U1NfQ19OT19CVUZGRVIsCisJCQkJTlVMTCwgLyogYWN0dWFsIG1lY2ggdHlwZSAqLworCQkJCSZv
+dXRwdXRfdG9rZW4sCisJCQkJTlVMTCwgLyogcmV0X2ZsYWdzICovCisJCQkJTlVMTCk7IC8qIHRp
+bWVfcmVjICovCisKKwkJaWYgKG1hal9zdGF0ID09IEdTU19TX0NPTVBMRVRFIHx8IG1hal9zdGF0
+ID09IEdTU19TX0NPTlRJTlVFX05FRURFRCkgeworCQkJYnJlYWs7CisJCX0KKwkJKHZvaWQpIGdz
+c19yZWxlYXNlX25hbWUoJm1pbl9zdGF0LCAmdGFyZ2V0X25hbWUpOwogCX0KLQotCW1hal9zdGF0
+ID0gZ3NzX2luaXRfc2VjX2NvbnRleHQoJm1pbl9zdGF0LAotCQkJR1NTX0NfTk9fQ1JFREVOVElB
+TCwgLyogY2xhaW1hbnRfY3JlZF9oYW5kbGUgKi8KLQkJCSZjdHgsCi0JCQl0YXJnZXRfbmFtZSwK
+LQkJCWRpc2NhcmRfY29uc3QoZ3NzX21lY2hfa3JiNSksIC8qIGZvcmNlIGtyYjUgKi8KLQkJCTAs
+IC8qIGZsYWdzICovCi0JCQkwLCAvKiB0aW1lX3JlcSAqLwotCQkJR1NTX0NfTk9fQ0hBTk5FTF9C
+SU5ESU5HUywgLyogaW5wdXRfY2hhbl9iaW5kaW5ncyAqLwotCQkJR1NTX0NfTk9fQlVGRkVSLAot
+CQkJTlVMTCwgLyogYWN0dWFsIG1lY2ggdHlwZSAqLwotCQkJJm91dHB1dF90b2tlbiwKLQkJCU5V
+TEwsIC8qIHJldF9mbGFncyAqLwotCQkJTlVMTCk7IC8qIHRpbWVfcmVjICovCi0KIAlpZiAobWFq
+X3N0YXQgIT0gR1NTX1NfQ09NUExFVEUgJiYKIAkJbWFqX3N0YXQgIT0gR1NTX1NfQ09OVElOVUVf
+TkVFREVEKSB7CiAJCWNpZnNfZ3NzX2Rpc3BsYXlfc3RhdHVzKCJpbml0X3NlY19jb250ZXh0Iiwg
+bWFqX3N0YXQsIG1pbl9zdGF0KTsKLS0gCjIuNTMuMAoK
+
+
+--=-IIa7DT3vIcDc/4Imjgt4--
