@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D293D47AC;
-	Wed,  8 Apr 2026 18:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1EE3D9037;
+	Wed,  8 Apr 2026 18:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775672875; cv=none; b=eMDlg2frlpnYpyjLxrIqlfMXWoJwA//CYBb3UBuFaVJh2Hs+Tc23IZf6nCIHQX6xzxBUvFFRPzZZuNzAmZDcNyDNGakzQqvw3+Ez5+l40UXwl6YHtb2Iw77MqmjpZ03yq5Qclh8DEf4gZYcPuRPhJw0OpDF03qzElT2VNKoXY9U=
+	t=1775674252; cv=none; b=XxWb75IMX3NgCYDwhX3orsNzaLJWgK92AkhGNFMm3kVp49qI0F9HslZDgZ+riM5nifrT9igp4EvuYzQlhFH8Msb9BhWjX2yMtK2vVLsObldJT6gcgbMwjkdF1kJsmQI5i+UMh12zsvSWZoKlvKRUVnh2fS0v3T1m9YhZwaiQqsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775672875; c=relaxed/simple;
-	bh=YfNFWGpkVAB+goc81Ij5h4rbkQhANCDrdj5qu8I9LQg=;
+	s=arc-20240116; t=1775674252; c=relaxed/simple;
+	bh=swwTAzCqDGHdHSGaDAz7weA9l3Mb3iWNwGEvg7QAZ4k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d/+6HQyOl6rlNoraYSFGVM+GGSZSczwQ3gT5QJOKa6IkZjnRtVOatvsBymzbFmB6JbXVJGHBG8nv4xbo1irUz+uYDpdeTuK34c4P2k0FgG/2Y8b6gglqZiuTKFrpl9wOVv1Ai+Jh+UClWzY4ArTZl2bn4N6cQIbE6klaIxBoi8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=1JpsuxFS; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=rXryzE3oPWgXihoodSEBKMpeUmTcPzoBhlNGna1RnPGYsTmGtW+FbwqHQnfkTvMkTppeN+onH+I/fw28OWuXt59E+zex3DHiSVmcCskZodSKKXv5h7SeVSM0CWwegbcrrvnktGQfvNFf1ku9r3vNzMfZQX3HHaNHXDCM+Nj4cPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=l5qy1bM8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="1JpsuxFS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45E59C19421;
-	Wed,  8 Apr 2026 18:27:55 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="l5qy1bM8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 058E5C19425;
+	Wed,  8 Apr 2026 18:50:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1775672875;
-	bh=YfNFWGpkVAB+goc81Ij5h4rbkQhANCDrdj5qu8I9LQg=;
+	s=korg; t=1775674252;
+	bh=swwTAzCqDGHdHSGaDAz7weA9l3Mb3iWNwGEvg7QAZ4k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=1JpsuxFSn+PeizKkSDxmDtTefZfOIDiKbHJSNAEFE0nR/Qx93/mWgXCUJioyVrXZq
-	 78aolc+Bk4Y6d4ebntOwRxoor8JS25d075Bsdeb/UXWy3o3C6NSg95n+SC4PTSL+Bu
-	 P2J5MM6BV1QTfQ8m7Qz9+k1yepBh9/s+WpvpzrtU=
+	b=l5qy1bM82ekKnVTGCFJWW/9giFGiKrKxzCYD5Q1WBWpWZyHSSHbfcy92VuWmWtS/m
+	 p4WDRPUY5DT7Eu78LvtsYBNQIJ+SSxAwlk+vcQacXaTmwePLreXu3lemAwD1StCsL9
+	 xIahSeJvqWuaeyOWjndIZkEAoX/6tHks6d+en2h4=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -33,12 +33,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-cifs@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.18 015/277] smb: client: fix generic/694 due to wrong ->i_blocks
-Date: Wed,  8 Apr 2026 20:00:00 +0200
-Message-ID: <20260408175934.417864389@linuxfoundation.org>
+Subject: [PATCH 6.19 025/311] smb: client: fix generic/694 due to wrong ->i_blocks
+Date: Wed,  8 Apr 2026 20:00:25 +0200
+Message-ID: <20260408175940.352885002@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260408175933.836769063@linuxfoundation.org>
-References: <20260408175933.836769063@linuxfoundation.org>
+In-Reply-To: <20260408175939.393281918@linuxfoundation.org>
+References: <20260408175939.393281918@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -50,7 +50,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.18-stable review patch.  If anyone has any objections, please let me know.
+6.19-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -81,10 +81,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  4 files changed, 16 insertions(+), 32 deletions(-)
 
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index b82663f609ed9..3059fcf12ed13 100644
+index 0c3d2bbef938e..474d7b2aa2ef5 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -2407,4 +2407,10 @@ static inline int cifs_open_create_options(unsigned int oflags, int opts)
+@@ -2324,4 +2324,10 @@ static inline int cifs_open_create_options(unsigned int oflags, int opts)
  	return opts;
  }
  
@@ -96,10 +96,10 @@ index b82663f609ed9..3059fcf12ed13 100644
 +
  #endif	/* _CIFS_GLOB_H */
 diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index dfeb609d90e22..f0e7a8f69e8b8 100644
+index c27a38843aa64..9d703a2474509 100644
 --- a/fs/smb/client/file.c
 +++ b/fs/smb/client/file.c
-@@ -993,7 +993,6 @@ static int cifs_do_truncate(const unsigned int xid, struct dentry *dentry)
+@@ -994,7 +994,6 @@ static int cifs_do_truncate(const unsigned int xid, struct dentry *dentry)
  		if (!rc) {
  			netfs_resize_file(&cinode->netfs, 0, true);
  			cifs_setsize(inode, 0);
@@ -108,10 +108,10 @@ index dfeb609d90e22..f0e7a8f69e8b8 100644
  	}
  	if (cfile)
 diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index cac355364e43c..7cd718dd7cb70 100644
+index f9ee95953fa4a..c5d89ddc87c00 100644
 --- a/fs/smb/client/inode.c
 +++ b/fs/smb/client/inode.c
-@@ -218,13 +218,7 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr,
+@@ -219,13 +219,7 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr,
  	 */
  	if (is_size_safe_to_change(cifs_i, fattr->cf_eof, from_readdir)) {
  		i_size_write(inode, fattr->cf_eof);
@@ -126,7 +126,7 @@ index cac355364e43c..7cd718dd7cb70 100644
  	}
  
  	if (S_ISLNK(fattr->cf_mode) && fattr->cf_symlink_target) {
-@@ -3008,6 +3002,11 @@ void cifs_setsize(struct inode *inode, loff_t offset)
+@@ -3009,6 +3003,11 @@ void cifs_setsize(struct inode *inode, loff_t offset)
  {
  	spin_lock(&inode->i_lock);
  	i_size_write(inode, offset);
@@ -138,7 +138,7 @@ index cac355364e43c..7cd718dd7cb70 100644
  	spin_unlock(&inode->i_lock);
  	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
  	truncate_pagecache(inode, offset);
-@@ -3080,14 +3079,6 @@ int cifs_file_set_size(const unsigned int xid, struct dentry *dentry,
+@@ -3081,14 +3080,6 @@ int cifs_file_set_size(const unsigned int xid, struct dentry *dentry,
  	if (rc == 0) {
  		netfs_resize_file(&cifsInode->netfs, size, true);
  		cifs_setsize(inode, size);
@@ -154,10 +154,10 @@ index cac355364e43c..7cd718dd7cb70 100644
  
  	return rc;
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 502b5cb05bc3e..478fa4bddb454 100644
+index 9bfd3711030b4..067e313283291 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -1492,6 +1492,7 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
+@@ -1493,6 +1493,7 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
  {
  	struct smb2_file_network_open_info file_inf;
  	struct inode *inode;
@@ -165,7 +165,7 @@ index 502b5cb05bc3e..478fa4bddb454 100644
  	int rc;
  
  	rc = __SMB2_close(xid, tcon, cfile->fid.persistent_fid,
-@@ -1515,14 +1516,9 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
+@@ -1516,14 +1517,9 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
  		inode_set_atime_to_ts(inode,
  				      cifs_NTtimeToUnix(file_inf.LastAccessTime));
  
@@ -183,7 +183,7 @@ index 502b5cb05bc3e..478fa4bddb454 100644
  
  	/* End of file and Attributes should not have to be updated on close */
  	spin_unlock(&inode->i_lock);
-@@ -2183,14 +2179,6 @@ smb2_duplicate_extents(const unsigned int xid,
+@@ -2197,14 +2193,6 @@ smb2_duplicate_extents(const unsigned int xid,
  		rc = smb2_set_file_size(xid, tcon, trgtfile, dest_off + len, false);
  		if (rc)
  			goto duplicate_extents_out;
