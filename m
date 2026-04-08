@@ -1,190 +1,259 @@
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF17623EABC;
-	Wed,  8 Apr 2026 09:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775641175; cv=none; b=LA/p9uHNJTA/BsPG1YRZs0Vt4M3G9b3Vy6areDdFbkOsdud8iVDfF1vc+Y61RPwfnNOFegUrHpGlOZt0yZU2ydCnhZLY5sP316ACAH1hzkN9y9sDy3rI8Gh+bwj/crGFUS38fdBCo0O82Tj/JLlOEuVRxqh6rDDQ1x/7Xls31mw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775641175; c=relaxed/simple;
-	bh=Gb1Xrqu+8dtdfVKpK50SdS/TSSqAO94bBFu2WIbxl0Q=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=YU8JwICKuyImISx+IWAS+JD/a8ZC53WWL4KCcieuu2DnzWNk364/MnsPgKlisl4gG26XBcmpvMj61IcQyhaJm19kZADAbZTLsonSsCeksP5Uw5AqqCuDew0SHWEDwl/WX7EYundicjfWMETqBFARp3If1cJyu2+mIm7fXzBLoYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn; spf=pass smtp.mailfrom=stu.pku.edu.cn; dkim=pass (1024-bit key) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.b=GXsqupK7; arc=none smtp.client-ip=45.254.49.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B3B3815DF
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Apr 2026 11:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775647781; cv=pass; b=CbarsU1T9CoAQuq8xLtVI+7YnCOFEcBTIc0rP+ilTO3o3Xq+m3Qn8HTC4w8FZfvYsj4XRcyfIBHT1x+AbY0Fl0Cfy3QKYUndELDgCK6fUxvw3VUQurpypWnz0njL3de0txgkMC4332+rNkUrqI+OuFwav1hTgPyM1yu8GaZLdBY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775647781; c=relaxed/simple;
+	bh=u88/aNKm6cCsmocJ8ciVIgp+3eroE8CYTmBTMb8daow=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=odTAyZffJhP/v+NBfLsJSaN0blw14LMVhnnvvJOxVMUkLXmI5cnXkAznjA1/ym8ZG9dFoE4K2yl3MSgb6izJBNQh2MgbV6Hw1i5ars6kTsL80uEFwriYJbTjthdGj1YQXzvH/SqGR5DFh1ODE7UWoicRBaDGejx8GxFB7MQZHyI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pwno.io; spf=pass smtp.mailfrom=pwno.io; dkim=pass (2048-bit key) header.d=pwno-io.20251104.gappssmtp.com header.i=@pwno-io.20251104.gappssmtp.com header.b=uponOBjs; arc=pass smtp.client-ip=74.125.82.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pwno.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pwno.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.b="GXsqupK7"
-Received: from smtpclient.apple (unknown [58.206.232.189])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 39f15eb4b;
-	Wed, 8 Apr 2026 17:39:20 +0800 (GMT+08:00)
-Content-Type: text/plain;
-	charset=us-ascii
+	dkim=pass (2048-bit key) header.d=pwno-io.20251104.gappssmtp.com header.i=@pwno-io.20251104.gappssmtp.com header.b="uponOBjs"
+Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-2d323567f11so237951eec.1
+        for <linux-cifs@vger.kernel.org>; Wed, 08 Apr 2026 04:29:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775647778; cv=none;
+        d=google.com; s=arc-20240605;
+        b=UhOsmd+towDuxv46OcRbW/0MiLvSe1Jcs7fQ0nezEnUb7mhxPRkMTfw4o+yXSv3IkW
+         8k+iRCYbaN3MGwdrDq3LAYj7JA4GmmdhUkpq1mdnZr20hPLnEur5od1uFH8XBSyBfoa+
+         w7pXczszvuxgorr9dVWj3M7V8AzVm1c6gQSoqWZTAttFJUBfSpKFv1QLQ6tARiT82s43
+         wh6mUdepFVyyrfqLgCVpVvQBpfJAriKZs5TJhCHyLT1PfhL9uqICpgwuGAmYDEnvZ/b5
+         oFqMtrNMBDtbw56ldqfvxnubE15L3up3J/4uhb6A6EK7RgbCFartmyu/tV/hnm0kN+sa
+         wMqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=epukYx8jBt/8xiheyPplCLvOzPZBhamJoHaHp38LDiU=;
+        fh=ivZ9q7hDDUKR5VZ3Kv9XtT3eBLowoczdn0Ru4dV+oQI=;
+        b=YC52iol4gvE8kIEI7t4LwrQTKnNPOQxDbfqEEZqc+gGQcH0igUSSgmoEurgkLLSHTB
+         4LZUyj13UwAKnqtA7fWi605AhBVcr+hvwjR/IbVAckKrm/hKYvFZD/VGFDpfsfyRyrCi
+         mS+Z8Cvggq/IbG2TG24YZvYS0lKAi9tUPzSKgdZ3PO240hci937+5LP0AbAnt06AaXKE
+         ir85pSy47a+r1bWj0kK4Y0Ht1r1NnSZMes3ANPiRv6Yxx8P9DqD158P3peQkQmIWIo0v
+         7HCVvsqqga3Pb9+DCitduFngcmJbMgstSFtxdoG6gmteU4KRsdBAsqgYLQBuRWZTzxlm
+         gH1A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pwno-io.20251104.gappssmtp.com; s=20251104; t=1775647778; x=1776252578; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=epukYx8jBt/8xiheyPplCLvOzPZBhamJoHaHp38LDiU=;
+        b=uponOBjshbldY3p01AOQfN31tqzya3E6rKNnNOlT+8rTS9Ce8wHEguBUioIhkh1AkT
+         YWAyWz68haf09HAfmRyZJkxZPtMAkiSVT84woTzqeEe4lAISi5Ts1TsuIJ+99JlGQUG8
+         dCSu+dHE9F+CUoREYltVbXRjHTE+G/e0GGks1wIRD4NBzACWzkogoL8Pib6c/T1TLAE4
+         n8fOpAqCOHYbW3Qg2qH5kk1hWs2/6N0Qra0cmJUXHF/JIbcPKNVcdYFiTL5kYo+cx8Iw
+         URaBWh83P2VMQ+3ygwbdU19S3Kgv0Ko1XKtNKpDhkBqr4+1RyrWTEX7ia2kZ5BCZMJTl
+         uTeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775647778; x=1776252578;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=epukYx8jBt/8xiheyPplCLvOzPZBhamJoHaHp38LDiU=;
+        b=pWgKtJcynONqYChipx6F0CyKBn02KeuCpZo+CicaDoSdkIo9hPBiWLtB0t7SZ8r7Hk
+         lQfGN/5DHPygntdy8jV7z3+MnEAmqLrs9mcS7DqtxelYnu16CHvyK+4dP6q6kyJtrHkf
+         sSUCk37+cR7IjmDrjIuqPp2x3HcVD3/8bizY8BWPWTHkwwTZQ2U5yPezYzgINMgji9GJ
+         woOOYUm2MfSGu0o094bS9nh5/HyEB+2fmPmmEDh6XQUBqaxezjNUCh8vhk2h50kYHfJZ
+         NdM8Lett57euTgBpqalKuCQBupmjdjIvce1o0CaCAXhHYKaXhyWUt4Sad1/LDJJAbIU2
+         Uv+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU6c3MkK26W0d7OQmbz9l61xRfwiJnwRDiVzzLFRCyvI/CPqV1YxHHc5lgx26xVewnd2GtwMcwy35tI@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyk0V8zm5RqCmgKytYrvled/dH6mEabLUCsykk0ujaGu38Dnz/F
+	JDTLmptqXl1HxjEitFKpfc/+Dgz5oje2xdovU3KxFdjaI8SONQmsjrKU4e96k2miLs9TcR9ZubZ
+	gJ9P4efkGVbkbBUPTPfKc9knzo50cmJXH8GUo2ytlb6coqSzIRwIeeMYQSz55puzJ
+X-Gm-Gg: AeBDiet/mfsSkXg1Jsy+UyKuwaxG6sWhsNX6yGS4vnvpb4/YQhjm3qLb3trab0aPPiL
+	gkF0PnMliMi5eecXSPU9z4PmNWQ6Flb0BOH4u8KetJ2CMvDqFQY+yiP2GkPFej5UwXAYXmV8a6l
+	yoiG/MjSrJ8wVe4j3eERrXDrZ/GVHe83IBaRoBR7ixdTrqD1TZIDQQWHeghclNioDHlwVbqjQGp
+	FsVvQbIx+XyyMdARSmMea7VEC6O/eD/qxGcstd+wDBEnddv+Y8vLfsM3jOM2It5sAkKzzF2WohI
+	+xHFMWgkTTETlR2uH0YQR1VGnLQpxMxS4W+J/sNXLb6LwxclFlMoSgBT0M95XOcKgw/n9xGsiDX
+	2FXFrtxUXORISMg8iy5ETQW8=
+X-Received: by 2002:a05:7300:a287:b0:2c7:6218:9830 with SMTP id
+ 5a478bee46e88-2cbfb4acafamr9255933eec.11.1775647778127; Wed, 08 Apr 2026
+ 04:29:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.500.181\))
-Subject: Re: [PATCH 1/2] smb: client: fix off-by-8 bounds check in
- check_wsl_eas()
-From: Yuanfu Xie <yuanfuxie@stu.pku.edu.cn>
-In-Reply-To: <2026040636-unsigned-jackal-e239@gregkh>
-Date: Wed, 8 Apr 2026 17:39:09 +0800
-Cc: linux-cifs@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Steve French <sfrench@samba.org>,
- Paulo Alcantara <pc@manguebit.org>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N <sprasad@microsoft.com>,
- Tom Talpey <tom@talpey.com>,
- Bharath SM <bharathsm@microsoft.com>,
- samba-technical@lists.samba.org,
- stable <stable@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <1F39D765-2631-40EB-9B1A-131B5753599A@stu.pku.edu.cn>
-References: <2026040635-banking-unsoiled-3250@gregkh>
- <2026040636-unsigned-jackal-e239@gregkh>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-X-Mailer: Apple Mail (2.3864.500.181)
-X-HM-Tid: 0a9d6c75e9d103a1kunm5a3f7b8137c0f
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZSRofVh0eHRpJTBgfTk4ZTVYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlOQ1VJS01VSUhJVUpDQllXWRYaDxIVHRRZQVlPS0hVSktISk5MTlVKS0tVSk
-	JLS1kG
-DKIM-Signature: a=rsa-sha256;
-	b=GXsqupK7a0b2A/VSDyK1MDTRIg4W9KC2eY3eoW+UlxC1qdG2ZRED6RrzzNuD4QB6wsp+LwVBKH19lJwfHd5bVCCkMTlPjpULAY+GHwkrnUFMlahO0+ueYsamoIJY8Xmi27mn8abHBL0pAWq53jCBSljKpWX00zp1uhaCSkRqatw=; s=default; c=relaxed/relaxed; d=stu.pku.edu.cn; v=1;
-	bh=RY0WK+afdMqPqSsi6g+9H/saDXURk1JzxJogWSYhZCY=;
-	h=date:mime-version:subject:message-id:from;
+MIME-Version: 1.0
+From: Ruikai Peng <ruikai@pwno.io>
+Date: Wed, 8 Apr 2026 07:29:26 -0400
+X-Gm-Features: AQROBzBiS4q0TEjpdbnzycPNLon-oL1wDyq_hVDiO_7YwhfhX_jbuMGHSJOR9bY
+Message-ID: <CAFD3drNOSJ05y3A+jNXSDxW-2w09KHQ0DivhxQ_pcc7immVVOQ@mail.gmail.com>
+Subject: [SECURITY] SMB Direct: double-free of send_io on ib_post_send failure
+ in batch flush path
+To: linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org, 
+	tom@talpey.com
+Cc: security@kernel.org, metze@samba.org, pc@manguebit.org, 
+	linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-[PATCH] smb: client: add bounds checks when iterating SMB1 WSL EAs
+Hi,
 
-Add boundary and overflow checks when traversing extended attribute (EA)
-entries for SMB1 WSL reparse points in cifs_query_path_info(), to =
-prevent
-out-of-bounds memory accesses from malformed next_entry_offset values.
+The send batching logic introduced in the v7.0 merge window has a
+double-free of mempool-backed send message objects when ib_post_send()
+fails during a batch flush. The bug affects both the client
+(fs/smb/client/smbdirect.c) and server (fs/smb/server/transport_rdma.c)
+SMB Direct implementations. It is present on current upstream HEAD
+(v7.0-rc7+).
 
-This is necessary because SMB1 WSL EA iteration does not currently have
-any explicit bounds checking, unlike SMB2 path which has =
-check_wsl_eas().
-The new checks ensure the current EA pointer plus its size does not
-exceed the end of the EA buffer during iteration and before parsing.
+The batch flush helpers (smbd_send_batch_flush and
+smb_direct_flush_send_list) take ownership of the batched send
+messages and free them on ib_post_send() failure:
 
-Signed-off-by: YuanfuXie <yuanfuxie@stu.pku.edu.cn>
----
- fs/smb/client/smb1ops.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+  fs/smb/server/transport_rdma.c, smb_direct_flush_send_list():
 
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index 9694117050a6..940bae49b2cc 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -645,13 +645,17 @@ static int cifs_query_path_info(const unsigned int =
-xid,
- 	if (!rc && data->reparse_point) {
- 		struct smb2_file_full_ea_info *ea;
- 		u32 next =3D 0;
-+		u8 *eas_end =3D data->wsl.eas + data->wsl.eas_len;
-=20
- 		ea =3D (struct smb2_file_full_ea_info *)data->wsl.eas;
- 		do {
- 			ea =3D (void *)((u8 *)ea + next);
-+			if ((u8 *)ea + sizeof(*ea) > eas_end)
-+				break;
- 			next =3D le32_to_cpu(ea->next_entry_offset);
- 		} while (next);
--		if (le16_to_cpu(ea->ea_value_length)) {
-+		if ((u8 *)ea + sizeof(*ea) <=3D eas_end &&
-+		    le16_to_cpu(ea->ea_value_length)) {
- 			ea->next_entry_offset =3D =
-cpu_to_le32(ALIGN(sizeof(*ea) +
- 						ea->ea_name_length + 1 +
- 						=
-le16_to_cpu(ea->ea_value_length), 4));
-@@ -691,13 +695,17 @@ static int cifs_query_path_info(const unsigned int =
-xid,
- 	if (!rc && data->reparse_point) {
- 		struct smb2_file_full_ea_info *ea;
- 		u32 next =3D 0;
-+		u8 *eas_end =3D data->wsl.eas + data->wsl.eas_len;
-=20
- 		ea =3D (struct smb2_file_full_ea_info *)data->wsl.eas;
- 		do {
- 			ea =3D (void *)((u8 *)ea + next);
-+			if ((u8 *)ea + sizeof(*ea) > eas_end)
-+				break;
- 			next =3D le32_to_cpu(ea->next_entry_offset);
- 		} while (next);
--		if (le16_to_cpu(ea->ea_value_length)) {
-+		if ((u8 *)ea + sizeof(*ea) <=3D eas_end &&
-+		    le16_to_cpu(ea->ea_value_length)) {
- 			ea->next_entry_offset =3D =
-cpu_to_le32(ALIGN(sizeof(*ea) +
- 						ea->ea_name_length + 1 +
- 						=
-le16_to_cpu(ea->ea_value_length), 4));
---=20
-2.43.0
+    ret = smb_direct_post_send(sc, &first->wr);
+    if (ret) {
+        list_for_each_entry_safe(sibling, ...) {
+            smb_direct_free_sendmsg(sc, sibling);
+        }
+        smb_direct_free_sendmsg(sc, last);
+    }
 
-> On Apr 6, 2026, at 21:49, Greg Kroah-Hartman =
-<gregkh@linuxfoundation.org> wrote:
->=20
-> The bounds check uses (u8 *)ea + nlen + 1 + vlen as the end of the EA
-> name and value, but ea_data sits at offset sizeof(struct
-> smb2_file_full_ea_info) =3D 8 from ea, not at offset 0.  The strncmp()
-> later reads ea->ea_data[0..nlen-1] and the value bytes follow at
-> ea_data[nlen+1..nlen+vlen], so the actual end is ea->ea_data + nlen + =
-1
-> + vlen.  Isn't pointer math fun?
->=20
-> The earlier check (u8 *)ea > end - sizeof(*ea) only guarantees the
-> 8-byte header is in bounds, but since the last EA is placed within 8
-> bytes of the end of the response, the name and value bytes are read =
-past
-> the end of iov.
->=20
-> Fix this mess all up by using ea->ea_data as the base for the bounds
-> check.
->=20
-> An "untrusted" server can use this to leak up to 8 bytes of kernel =
-heap
-> into the EA name comparison and influence which WSL xattr the data is
-> interpreted as.
->=20
-> Cc: Steve French <sfrench@samba.org>
-> Cc: Paulo Alcantara <pc@manguebit.org>
-> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> Cc: Shyam Prasad N <sprasad@microsoft.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: Bharath SM <bharathsm@microsoft.com>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: samba-technical@lists.samba.org
-> Cc: stable <stable@kernel.org>
-> Assisted-by: gregkh_clanker_t1000
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> ---
-> fs/smb/client/smb2inode.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-> index 364bdcff9c9d..fe1c9d776580 100644
-> --- a/fs/smb/client/smb2inode.c
-> +++ b/fs/smb/client/smb2inode.c
-> @@ -128,7 +128,7 @@ static int check_wsl_eas(struct kvec *rsp_iov)
-> 		nlen =3D ea->ea_name_length;
-> 		vlen =3D le16_to_cpu(ea->ea_value_length);
-> 		if (nlen !=3D SMB2_WSL_XATTR_NAME_LEN ||
-> -		    (u8 *)ea + nlen + 1 + vlen > end)
-> +		    (u8 *)ea->ea_data + nlen + 1 + vlen > end)
-> 			return -EINVAL;
->=20
-> 		switch (vlen) {
-> --=20
-> 2.53.0
->=20
->=20
->=20
->=20
+However, the callers (smb_direct_post_send_data and
+smbd_post_send_iter) have a generic error path that frees the same
+message unconditionally:
 
+  fs/smb/server/transport_rdma.c, smb_direct_post_send_data():
+
+    ret = smb_direct_flush_send_list(sc, send_ctx, true);
+    if (ret)
+        goto err;
+    ...
+  err:
+    smb_direct_free_sendmsg(sc, msg);
+
+This double-free occurs specifically when using the stack-allocated
+local batch for single-message sends, since in that case the caller
+immediately flushes and then falls through to the same err label.
+
+The same pattern exists on the client side:
+
+  fs/smb/client/smbdirect.c, smbd_post_send_iter():
+
+    rc = smbd_send_batch_flush(sc, batch, true);
+    if (!rc)
+        return 0;
+    ...
+  err_dma:
+    smbd_free_send_io(request);
+
+A remote peer can trigger ib_post_send() failures by tearing down the
+RDMA connection or forcing the QP into an error state during active
+sending. This results in:
+
+  - Kernel heap double-free of mempool-backed send_io objects
+  - Use-after-free from subsequent RDMA completion processing
+  - Potential memory corruption
+
+This requires an SMB Direct (RDMA) configuration and an attacker
+capable of disrupting the RDMA connection.
+
+I reproduced this deterministically using paired QEMU guests with
+RXE soft-RDMA, a ksmbd share mounted over SMB Direct, and a
+kretprobe-based fault injection module that forces
+smb_direct_post_send() to return -EIO. KASAN reports a double-free
+in mempool_free_slab and follow-on slab-use-after-free splats.
+
+The first splat is a use-after-free when the caller's error path
+touches the object that the flush helper already freed:
+
+  [   14.352449] BUG: KASAN: slab-use-after-free in
+smb_direct_free_sendmsg+0x31f/0x380
+  [   14.352449] Read of size 8 at addr ffff888009dc72f8 by task kworker/1:0H/25
+  [   14.352449]
+  [   14.352449] CPU: 1 UID: 0 PID: 25 Comm: kworker/1:0H Tainted: G
+        O        7.0.0-rc7-00059-g3036cd0d3328 #10 PREEMPT(lazy)
+  [   14.352449] Workqueue: ksmbd-smb_direct-wq smb_direct_send_immediate_work
+  [   14.352449] Call Trace:
+  [   14.352449]  <TASK>
+  [   14.352449]  dump_stack_lvl+0x5f/0x80
+  [   14.352449]  print_report+0xd1/0x640
+  [   14.352449]  kasan_report+0xe5/0x120
+  [   14.352449]  smb_direct_free_sendmsg+0x31f/0x380
+  [   14.352449]  smb_direct_post_send_data+0xf77/0x2cf0
+  [   14.352449]  smb_direct_send_immediate_work+0x55/0x70
+  [   14.352449]  process_one_work+0x635/0x10a0
+  [   14.352449]  worker_thread+0x45b/0xc90
+  [   14.352449]  kthread+0x2d7/0x3c0
+  [   14.352449]  ret_from_fork+0x39f/0x5d0
+  [   14.352449]  </TASK>
+  [   14.352449]
+  [   14.352449] Allocated by task 25:
+  [   14.352449]  kmem_cache_alloc_noprof+0x109/0x380
+  [   14.352449]  mempool_alloc_slab+0x14/0x20
+  [   14.352449]  mempool_alloc_noprof+0x127/0x210
+  [   14.352449]  smb_direct_post_send_data+0x308/0x2cf0
+  [   14.352449]  smb_direct_send_immediate_work+0x55/0x70
+  [   14.352449]
+  [   14.352449] Freed by task 25:
+  [   14.352449]  kmem_cache_free+0xb5/0x3b0
+  [   14.352449]  mempool_free_slab+0x16/0x20
+  [   14.352449]  mempool_free+0xbe/0x110
+  [   14.352449]  smb_direct_free_sendmsg+0xa0/0x380
+  [   14.352449]  smb_direct_flush_send_list+0x411/0x660      <--
+first free here
+  [   14.352449]  smb_direct_post_send_data+0x1abb/0x2cf0
+  [   14.352449]  smb_direct_send_immediate_work+0x55/0x70
+  [   14.352449]
+  [   14.352449] The buggy address belongs to the object at ffff888009dc7280
+  [   14.352449]  which belongs to the cache
+smbdirect_send_io_pool_(____ptrval____) of size 208
+
+This is immediately followed by the explicit double-free when the
+caller attempts to return the same object to the mempool:
+
+  [   14.382870] BUG: KASAN: double-free in mempool_free_slab+0x16/0x20
+  [   14.382949] Free of addr ffff888009dc7280 by task kworker/1:0H/25
+  [   14.383097]
+  [   14.383097] CPU: 1 UID: 0 PID: 25 Comm: kworker/1:0H Tainted: G
+ B      O        7.0.0-rc7-00059-g3036cd0d3328 #10 PREEMPT(lazy)
+  [   14.383143] Workqueue: ksmbd-smb_direct-wq smb_direct_send_immediate_work
+  [   14.383171] Call Trace:
+  [   14.383181]  <TASK>
+  [   14.383192]  dump_stack_lvl+0x5f/0x80
+  [   14.383211]  print_report+0xd1/0x640
+  [   14.383278]  kasan_report_invalid_free+0xa4/0xd0
+  [   14.383387]  check_slab_allocation+0xe2/0x110
+  [   14.383387]  __kasan_slab_pre_free+0xd/0x20
+  [   14.383387]  kmem_cache_free+0x90/0x3b0
+  [   14.383387]  mempool_free_slab+0x16/0x20
+  [   14.383387]  mempool_free+0xbe/0x110
+  [   14.383387]  smb_direct_free_sendmsg+0xa0/0x380           <--
+second free here
+  [   14.383387]  smb_direct_post_send_data+0xf77/0x2cf0       <--
+caller err path
+  [   14.383387]  smb_direct_send_immediate_work+0x55/0x70
+  [   14.383387]  process_one_work+0x635/0x10a0
+  [   14.383387]  worker_thread+0x45b/0xc90
+  [   14.383387]  kthread+0x2d7/0x3c0
+  [   14.383387]  ret_from_fork+0x39f/0x5d0
+  [   14.383387]  </TASK>
+  [   14.383387]
+  [   14.383387] Allocated by task 25:
+  [   14.383387]  kmem_cache_alloc_noprof+0x109/0x380
+  [   14.383387]  mempool_alloc_slab+0x14/0x20
+  [   14.383387]  mempool_alloc_noprof+0x127/0x210
+  [   14.383387]  smb_direct_post_send_data+0x308/0x2cf0
+  [   14.383387]  smb_direct_send_immediate_work+0x55/0x70
+  [   14.383387]
+  [   14.383387] Freed by task 25:
+  [   14.383387]  kmem_cache_free+0xb5/0x3b0
+  [   14.383387]  mempool_free_slab+0x16/0x20
+  [   14.383387]  mempool_free+0xbe/0x110
+  [   14.383387]  smb_direct_free_sendmsg+0xa0/0x380
+  [   14.383387]  smb_direct_flush_send_list+0x411/0x660       <--
+flush freed it
+  [   14.383387]  smb_direct_post_send_data+0x1abb/0x2cf0
+  [   14.383387]  smb_direct_send_immediate_work+0x55/0x70
+
+The "Freed by" stacks confirm the first free comes from
+smb_direct_flush_send_list() and the second from the caller
+smb_direct_post_send_data() at a different offset (+0xf77 vs +0x1abb),
+matching the two distinct free sites described above.
+
+Best,
+- Ruikai Peng
