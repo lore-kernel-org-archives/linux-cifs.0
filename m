@@ -1,64 +1,64 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189A03BAD92
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Apr 2026 09:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF18140DFD8
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Apr 2026 10:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775728802; cv=none; b=azNgk/PNdqgWAu7oipTouCA1j3zB4IIJ03rHNb9EiZTyV6og4zGwSmc/VLH+dws0EYTsbRBXhO4sA2+4KD/JDMLMmagPAqdKyMUuBPjE2F25WmzT5Yv2q/BZNYaJWRIarVFVr19gVpK5W45gHrL9nKvaRUtqiwLlJyMlkPG4NiI=
+	t=1775728807; cv=none; b=qy8YtyT+NO78E8jIhXSEhw2106FjnHMGPUr6z16QYq5m+x7Q3tJpuYvqQKbAqx2txHe3ADzvWJ4ySlAv3S3kmqIZBiYz+bRKrNp9mrxV/GWE8JW+8K3Bggu2UScDMzSR+8AlK/5jzv+QRapgqtVTX34xx9tXD4mQC3eEdJ6Mn8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775728802; c=relaxed/simple;
-	bh=xbioMmi4wWbrPSlpG4HbYgE8Rb3DQIUxwj11/DTkU3I=;
+	s=arc-20240116; t=1775728807; c=relaxed/simple;
+	bh=FJvQA8MuAcOh6TW2OKa4PlnjZIpQv+MvTWNJtTa0wb4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MotpLK1ypHJyCgM2e3K2On9X9AQ0lG0tBEQhfwaZzCrgR2k8fH0kX4OLaBniJ2SoUXdYXK2rAXAm6zfADyQYuG1dZpXbyQdRuHPuDhf9DeLccGGhpJYI/a+qS6xlHK3gnTn/uNXuASKDw52LH8tubG516ieAhP4ljhUGyInjgfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hacRuYEE; arc=none smtp.client-ip=209.85.210.176
+	 MIME-Version; b=nFDR93RvOMIdtzkFUod9OucVm4Skb6Ux+3WqmM4u+ujCIIM1uR603jcXmGuPXzQc5tnoV6kJ8j5ed1a1gv3Zk2nPjegYEHGOV34HeEFlw9Y3QQ+0ycDWn35qcn+0QtOh66tad4oyCclM/ZZkR42GrYtMSVCo5PfWIPN/gXbTQso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BHxpXfMb; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hacRuYEE"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-82cebbdab08so602225b3a.2
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Apr 2026 02:59:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BHxpXfMb"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-82cf96ca071so372211b3a.1
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Apr 2026 03:00:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775728796; x=1776333596; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775728800; x=1776333600; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FlkZH1SuQrwakRTOg6E2zmugoAOuiELmZsl+WpaQ39M=;
-        b=hacRuYEEBY3eUdxTjB6VYFEqZfmK1fhWRZ7yKcWC4IsEoagaRjiTWuEevNgFuuY3hk
-         60ZzZKLgw8yPsTRo82QVxAHtcwwGU3I78P9DJmmWVSULIckzXEtOfU1eiRrm1mFvQLV4
-         shFpegoVH2WkeNck7o6gzaZeRSUWAOcnipIcTQZ53raSmjTpir7BeE4Sz+8y4mDc3Q1B
-         91lxJwxB0WQyrDKNBdoAF48vwUP2ORo38ZZITgpozNFVC6akipgtQFEQq/uLz8wxJXD/
-         12W3/8FQQ/LsorjkeZDkR9w20TujIb0Kz2I7jg+Nhx3TraRWysVhVVJvpB2EXAWMecDR
-         Bu9A==
+        bh=mDxowHKiU8yEvUkG0ExyLUfpwERX0ltYh/rUSG2zFlo=;
+        b=BHxpXfMbgFU1vPFnrRihFA6mXShnKpZ0lloYAp8CYOPBOwTmQw6hG6emZyNEB1cXC5
+         hJ4Ar3rtAh0MtEDxs4Nv3E7sXpuP14IXRPJHHfkdz9Y58xDzOU/0rowz7YiXltAFp7WJ
+         8G7XPN3rucZ9cX2kxJaA6GrW99AXresKnqlj3jswZM2L3U9ZKDqfiDk/r+z7dPfVHFht
+         TXbORxUI3eCHIvxiF5uxEHNO9RWB/FyNVx/wWPAkndB89rATfk49eSI04ZjuxEpcAkro
+         a7LMoOlFKcntYnQUOTqQmJvHs+KkgQ//7XWIOSPcb2DGYBmaHCLDV80w4W9vhCa81MZQ
+         +gxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775728796; x=1776333596;
+        d=1e100.net; s=20251104; t=1775728800; x=1776333600;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=FlkZH1SuQrwakRTOg6E2zmugoAOuiELmZsl+WpaQ39M=;
-        b=VeCSCNA+BSOArGp0mKeprI5MPdbvOsBukfXytmCaAgMQWq7pX8UM+7GY+1CoCtOHg+
-         bdippR6iT+dTciWF6suPed6ICDECVvhh3rLDeehlU2RdwfVSM7aOldpDjf+6UGdgySjX
-         NoyyatP7R8CEV/MMXQZqb5GgXqiSi6bJClcRYc1xbFQ2+Z1n9qFeIUtdr8ilmFnDSbSG
-         t77r++m6hITbleGgIAWYWGqjylDMZukVqwz3dVwGefVnfOHOn0ikqsuoz7Tt2329pU/C
-         i0RTo1W2ciERr6XWo3iNMTAl/1zcx7ptq+nnhawUSeZNt/5Glkg8uwf/3uPM7cM05quQ
-         OhOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXs1yT9MxR5XF4K0XKy+53WD+UiQvxFxhsu8rKEmbFQKhH/yez2FFSD4OiSrQ+QuwFe0cEu2laWqLRL@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4qCTCavT9w/dx1qlgMnZoKzq/Iu/yeQM63LEWAdj/TtOq1tsR
-	7DRAhWcWXz5CdFOdVId5DUgbqZrYxlyINcjK/kasJ246fjuSf2GcECD1
-X-Gm-Gg: AeBDies7V6k5VWXdTodbCYyfFEq+jjswhH9RrhKHOA8CrsLNRztPAF6vqQGBBNKosac
-	Yn8UoDKTWcyObabQPVthb/2qT7AjzZ0p0UWllGpyBHgb1NMk4t7Aj8AzGLR9EvdO098wcaIqye6
-	6mfOMvnAA7PgbRcXK9idczeV8Ld0T03VuGfDKz3gg5Ke9ScTtO2LhXJtt2+QTkZMXI0CrMe5aRP
-	D70qaF7F/0cJGgbZQ1xAhfjm3UorXjEQ+eKz7z0Yn9Na5VOYpBl2Kd7i9VScbsrhQsDc1HW9An4
-	5EvIbCDQS0HHGQHpHGcL9iHOSCuXBOpXQkOhxk2q6j0nx2oqpuuTT2lGGqvfTFERpo9Rp0UcDIH
-	xKGKHn98ZSgXaJQ/4Bckteg1f+9SyeUVLOjjEUziHTtkeAw8fgug5K04zBz82e2la2xaa3C+QLb
-	tFPoDpOnB6WgzzxO9zXaUJ5dWUbRDF3q9SCHI40wNJyXYF2jAtD2FmqnO94DowhmsiAH9kL4a3k
-	wknoB/JE4xXjB+LSD48nUE=
-X-Received: by 2002:a05:6a00:c86:b0:82c:d92f:3b64 with SMTP id d2e1a72fcca58-82dd89c526amr3132952b3a.14.1775728796314;
-        Thu, 09 Apr 2026 02:59:56 -0700 (PDT)
+        bh=mDxowHKiU8yEvUkG0ExyLUfpwERX0ltYh/rUSG2zFlo=;
+        b=hgL/+JjRiR55Xm2TRFy2KWuk3oxxEyPrnTeZQvbRCcfePAU5gNMBloGQ71ouTgqMR/
+         eLQyZqZKApcnyG2+qQJodPCf9NuXyJ6lvyVnfB0fMLCJ006N+9j0D0PJXXQRhq8212by
+         2wdundgC3FxdOHS9HxahpS+ZWWzAK6gpRveqatbsB7Gs8kKEQ4bgrp2x1KqIfJRpYq8a
+         XMIViYX2MR+IyatcqZxlOFDwvjBR5h3zmChFzXZD72LrragcDOkLr+kgPTXhoxPKJzWT
+         BzuqOLdxJ3QUCAgWMQ8kwAkI2t3+6TGnR6i+TFDpnrzKGk5AdTH+YhtAj02n3k61ti4n
+         IECg==
+X-Forwarded-Encrypted: i=1; AJvYcCWQTZFvov9JOYqDDbvd6eUGLvKWJiXBTmrXUxsWJj9hB/Dwb3nRp5tF76D8jqkU+CWztw8EE4v8AOLj@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQXgug6BDx5xbu4e+XUHWEa6fbB0cr31jQ/gY1ShVvA3sNt0cX
+	UZr6xpqQKAApHzSuFZasa6gpWtbj0lUxYc+NSL2fAWC8wuBo2pY6VUXV
+X-Gm-Gg: AeBDieuD1LQVDlwNMdb62L9sD3iUvmB1brnn39t55iPFchgRstRhkRYrEIOqFx/nKnm
+	uik3qjldMsnszJx4bfZl/In1gVLrnWRyTQIG4M/9s1qFtx0bV8/i1Aeb5AEkLOogoLpBqIfcV/+
+	8a40W42TTcOrcHsDxB5meYShyINf0WMkYbvevzyuykePtDMKtWF37l6nqYS0SaWI5Bf42Zn7Bun
+	+pYPSSZBANPHuMELXDZEcZBNEQTlUdhYqIUTPeWI2+kc+g75oinDVOqSRg0OxQ635i0oW8jNceE
+	pMCL2PDjgqFx7otLtbimABFEyKIC+oBr2mfdaA40jw0RxDFKqRl1JrkPjY0ONABDlBv1QWFBdNc
+	8tBTAysP0mpfBwpEjbTyfsDqllImXCS1arfxMawd9Lu4SxndQdCQO4cGn8unLMQ67EnthrN1UIq
+	3Po6y7Y6UuXFmTMhQ6B8CMq90pYofoY92/+ujd08NtLapB7dqlmMac62yN0tbpyMdX1sSdghJEL
+	ko4viMmSGIRuGCTrqEgVTlkExaLkxyuzg==
+X-Received: by 2002:a05:6a00:1acb:b0:82c:d9d0:f482 with SMTP id d2e1a72fcca58-82dd8ad4a09mr2845776b3a.46.1775728800090;
+        Thu, 09 Apr 2026 03:00:00 -0700 (PDT)
 Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c6b80dsm29113671b3a.42.2026.04.09.02.59.52
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c6b80dsm29113671b3a.42.2026.04.09.02.59.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2026 02:59:55 -0700 (PDT)
+        Thu, 09 Apr 2026 02:59:59 -0700 (PDT)
 From: rajasimandalos@gmail.com
 To: sfrench@samba.org,
 	linux-cifs@vger.kernel.org
@@ -71,9 +71,9 @@ Cc: pc@manguebit.org,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org,
 	Rajasi Mandal <rajasimandal@microsoft.com>
-Subject: [PATCH 3/9] smb: client: sync tcon-level options on remount
-Date: Thu,  9 Apr 2026 09:59:20 +0000
-Message-ID: <20260409095926.905020-3-rajasimandalos@gmail.com>
+Subject: [PATCH 4/9] smb: client: sync retrans on remount
+Date: Thu,  9 Apr 2026 09:59:21 +0000
+Message-ID: <20260409095926.905020-4-rajasimandalos@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260409095926.905020-1-rajasimandalos@gmail.com>
 References: <20260409095926.905020-1-rajasimandalos@gmail.com>
@@ -87,71 +87,58 @@ Content-Transfer-Encoding: 8bit
 
 From: Rajasi Mandal <rajasimandal@microsoft.com>
 
-Several mount options are stored on each cifs_tcon at mount time but
-smb3_reconfigure() only updates cifs_sb->ctx. A remount that changes
-any of these options silently has no effect because the runtime code
-reads from the tcon fields, not from the superblock context.
+The retrans mount option controls how many times the client retries
+sending a request before giving up.  Although remount already stored
+the new value in cifs_sb->ctx, it was never propagated to
+server->retrans, so the running connection kept using the old count.
 
-The affected options and their tcon fields are:
-  retry           -> tcon->retry
-  max_cached_dirs -> tcon->max_cached_dirs
+Introduce smb3_sync_server_opts() to push ctx options that live on
+TCP_Server_Info into the live server struct after a successful
+remount.  For now it handles retrans; subsequent patches will extend
+it to other server-level knobs.
 
-Add smb3_sync_tcon_opts() which walks the tlink_tree under
-tlink_tree_lock and propagates these values from ctx to every tcon
-under tc_lock. Call it from smb3_reconfigure() after the context has
-been updated.
+The assignment is guarded (if ctx->retrans) so that a bare
+'mount -o remount' (which re-parses /proc/mounts and gets
+retrans=0 because cifs_show_options does not print it) does not
+accidentally reset the value to zero.
 
 Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
 ---
- fs/smb/client/fs_context.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ fs/smb/client/fs_context.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index e1bf7bad5be6..90e83f07c870 100644
+index 90e83f07c870..31b82f8f7ead 100644
 --- a/fs/smb/client/fs_context.c
 +++ b/fs/smb/client/fs_context.c
-@@ -1307,6 +1307,35 @@ static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channe
- 	spin_unlock(&ses->chan_lock);
+@@ -1336,6 +1336,21 @@ static void smb3_sync_tcon_opts(struct cifs_sb_info *cifs_sb,
+ 	spin_unlock(&cifs_sb->tlink_tree_lock);
  }
  
 +/*
-+ * Synchronize tcon options that are derived from ctx across all tcons
-+ * associated with this superblock.  These fields are consulted at runtime
-+ * (reconnect, I/O, unlink/rmdir) so remount needs to update the live
-+ * tcons in addition to cifs_sb->ctx.
++ * Synchronize server-level options that are stored on TCP_Server_Info
++ * at mount time.  These fields are consulted at runtime (retry logic)
++ * so remount needs to update the live server struct in addition to
++ * cifs_sb->ctx.
 + */
-+static void smb3_sync_tcon_opts(struct cifs_sb_info *cifs_sb,
-+				struct smb3_fs_context *ctx)
++static void smb3_sync_server_opts(struct cifs_sb_info *cifs_sb)
 +{
-+	struct rb_node *node;
++	struct TCP_Server_Info *server = cifs_sb_master_tcon(cifs_sb)->ses->server;
++	struct smb3_fs_context *ctx = cifs_sb->ctx;
 +
-+	spin_lock(&cifs_sb->tlink_tree_lock);
-+	for (node = rb_first(&cifs_sb->tlink_tree); node; node = rb_next(node)) {
-+		struct tcon_link *tlink;
-+		struct cifs_tcon *tcon;
-+
-+		tlink = rb_entry(node, struct tcon_link, tl_rbnode);
-+		tcon = tlink_tcon(tlink);
-+		if (IS_ERR_OR_NULL(tcon))
-+			continue;
-+
-+		spin_lock(&tcon->tc_lock);
-+		tcon->retry = ctx->retry;
-+		tcon->max_cached_dirs = ctx->max_cached_dirs;
-+		spin_unlock(&tcon->tc_lock);
-+	}
-+	spin_unlock(&cifs_sb->tlink_tree_lock);
++	if (ctx->retrans)
++		server->retrans = ctx->retrans;
 +}
 +
  static int smb3_reconfigure(struct fs_context *fc)
  {
  	struct smb3_fs_context *ctx = smb3_fc2context(fc);
-@@ -1444,6 +1473,8 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	if (!rc)
- 		rc = dfs_cache_remount_fs(cifs_sb);
+@@ -1475,6 +1490,8 @@ static int smb3_reconfigure(struct fs_context *fc)
  #endif
+ 	if (!rc)
+ 		smb3_sync_tcon_opts(cifs_sb, cifs_sb->ctx);
 +	if (!rc)
-+		smb3_sync_tcon_opts(cifs_sb, cifs_sb->ctx);
++		smb3_sync_server_opts(cifs_sb);
  
  	return rc;
  }
