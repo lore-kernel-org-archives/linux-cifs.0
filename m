@@ -1,64 +1,64 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 796C63BE17B
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Apr 2026 10:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B863BFE40
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Apr 2026 10:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775728817; cv=none; b=YPBIQeifEHN177jgVRtobsm+fsYoGRPuBMbFudJ/th9fnFTTDX1qzT34oFf7rsDeABFLniUr7OlR2ia0QuTc3FHIakhkKC3x0gG/8ohjVu622AwqsjYkAUkUIupTRkGOxyEgQCN2xmgaGyx5McF05EKfj+xPVmtaUpWlsvfFtKE=
+	t=1775728824; cv=none; b=ffroLwf3sHtqUmqZ2uqQ5ine9At1b/TPz3YnmD0jb9h20EJs+Z5detQegcL6+zrdv+vMM/tpJbkwqrlrgoJR/H0uhHv880o2gdJhY+rHTcPnqD8/aj670MeMnB7ITmHazOoM1Oh+Rl0k4Vj+spjgBWjiZSl3tILKp4RsfTkRgL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775728817; c=relaxed/simple;
-	bh=iVLJ2lod5R2JDz1cIrkKG1CXH3xzWLlnArZjx/SFbJQ=;
+	s=arc-20240116; t=1775728824; c=relaxed/simple;
+	bh=bF5qUQUvVDWxl8XF8/5sb4KcQcJun4x9Cxt/2bnKeEE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AvF9XFokcrXT9CXZDY35S3DfpUPbFO8uCk1iRX9j80zLyN/yeU8RayCOq0z7/p1M90bfSIv3NPQ7AyyapJEytz6TSFgvbBZOEQAzlvD6LDZS8BtGbUbV/VA/lvVF9gnK0jz1S/woor5+pu0YstWK3kd55yYvsFbVWe0udFPhIqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WExFgz4b; arc=none smtp.client-ip=209.85.215.181
+	 MIME-Version; b=fQVnWAsTwkU02Ht20xODNubzYvsIIuVWbswC6yv8W67d46GN7+aKOj9ImId0v4ZZ0cLyzmNOLTa80o4uj9H5vzpSf2kTy4lqnr07DJ1VZ5ebK/d8dWgHlNDtM56Z0KouMXxluZKIT3AHCj+RewGlPvFWtJS45H2zLRnOAq31aWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ScXkflTG; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WExFgz4b"
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-c742723c863so470697a12.0
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Apr 2026 03:00:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ScXkflTG"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82cd5c07f93so384489b3a.1
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Apr 2026 03:00:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775728813; x=1776333613; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775728820; x=1776333620; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jz4zNE+M7pi3tWDtuAf/A5LJVd6SnwS9PUa/d+0Kxas=;
-        b=WExFgz4beBDbnFehO9Tk/QAZeYV+VhHf032DcQA5wNSvYjQl2Pp5lMICgGDcy3S2HN
-         XWVb6u6/PTXySiUli+T7Fgqm4qnzJ3YRtlBFSbDs7CM2ebDVBW+uWE6RaACm9DDkEfL0
-         KWmVpyLzbkxK/XOPNjQuhBtXRgsUvfp5VwNjKv3PbloHDYaEBUcANsFk/nApuzMIb49n
-         vWXkCE02Fr9SLETyroyuVTuQe4IwrO2B6wmIHuPKv6qc/HdJxVswr+j4k9Sikl+SFDhD
-         rMsKrb4ZM4YzG4xbjYZh0UnxgiqTdgDpx9jdSYkqQyQSWs0w2suOaKkGzIQXAQGkoGaC
-         EY0A==
+        bh=QObthFmA74FR9S5RNg1UaQnHWYJmGmu2RCoe8nfhtXo=;
+        b=ScXkflTGFXmHSAniyVhyje+RkF+y4EVFRi8sJdk+OGM/VrgX8Sq+hbvXkna923Qqjn
+         LIoMw7Ngx17JFlynT1SFM6i6F1wL1JHaiBkMBwbDTX1I2WrfDzbzM+bxTYYgXFMdlXeu
+         HU13JZiDnP5ZuZVn+6Q+2mX/Gq+Qxy5uEV1LnjDtoYbs3vZMx+C6ysZpcaIV6AP1VL8K
+         z3l6Lof5lUzltgbyKbaAqJEHWUarwqQFA/SphSme9RK1DfEHO+1d4D+R2kClEZMJayd+
+         LE+dp8ls6VGX9y7fr7KYKesCHhw9ea3y6VK2oAnDZFPj9PQc6fbzzrvtPRZA+C7SWOsy
+         QYMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775728813; x=1776333613;
+        d=1e100.net; s=20251104; t=1775728820; x=1776333620;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=jz4zNE+M7pi3tWDtuAf/A5LJVd6SnwS9PUa/d+0Kxas=;
-        b=p0t9p2l2HiY6bYcKuhw5RYfxXsrGXhsW8JKVJPjRSkxR/25BcP39lZDo6VXvcMTqNl
-         Gbn+iI5XwEwGUFpmYh3zt7faAIPrL83YgeU8ZCko1oXnkdU/VJHeRA2EGuwEMO67j5p1
-         hwiZwYuom+HdnIbL+Q4VnNZV2KIb9Czr9VhHu5U8C+19JxVrbqZuemqf3WaqmS7dC/pE
-         1lf9X0rkqipnqa/6jCGu6MVuDHVVuQCDOoaaJ+MOQssEVMKSJE+gr7XBkAMh8LIlsbZU
-         rt65cwzcoLkv/F7VhjVa9Oek6I7mzoPSPfVZGmR1N0q/VMZwg7+20wGejTp96I5VK9xA
-         8fug==
-X-Forwarded-Encrypted: i=1; AJvYcCWQfJjCX++QPYW6r+BEsrAHigBvDvVSzu9qSa3EJE2JDXisxcBqAlKlknu4+e5pMPPVxUpsXivH6f3B@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5eXZ+xKlZhXGSc5oIYIOHvqiYQm0mv0JVnnhLD9LNhDkLWApC
-	c5Y4sJPq7v6BpyV5Bfb96B6vBr7U67799PMNz8Kv9vpA/pke6XO2+0wR
-X-Gm-Gg: AeBDieukIrk++XOmriv1Z7E1dobXNplKyBhEHmmJKvaIqD6GeHpft1Zkc7z7+5JXeyx
-	RX3UsFlSA15WPAi5St2cKMCJvyPgJng+TUUwfYF1nEaXWsAdVUkTjuGuUK8uy5h77CK/6rxXjZs
-	UGwv+90mjTlmM+X8BNwqmKFLQTCTVkGR88jrtF5b5bDiVI2XRg69VEwkXb+ilWjWsmLXlC7t5Oh
-	st1VLxMI4qyGvKRNtibSmFa2qDMY7P75hQ5aicTFxybblB6GdlpYm+aPEbYkq2lp1jmf7XBrfvL
-	SjFAA5+k/dANqte3cn7DIXonCQ7ZVnxQ0bHxmjSY4aNaKmeG1vyyjuUODLiqxfNFrA2XET1T7R/
-	IBZ7Y+h4zQZ6QSIQOrsXRzQPzTXte5zHgsIjWnl0ZpUStg4CcrRr09Ym5UGCJA/1pQTHbXlxaSl
-	NUyOSsfNEKqzHO9A/8I/sXqO8NPEMs91JfLHEYk0bE1wsjk/pX9t+/L4OmaujruTMDNOdrBYDKK
-	kkTT3T7i0zRp3JBEUmJncE=
-X-Received: by 2002:a05:6a00:bc0b:b0:829:af4a:5ebc with SMTP id d2e1a72fcca58-82d0da284c1mr24255682b3a.7.1775728808218;
-        Thu, 09 Apr 2026 03:00:08 -0700 (PDT)
+        bh=QObthFmA74FR9S5RNg1UaQnHWYJmGmu2RCoe8nfhtXo=;
+        b=SIxBJW4vUhli8X4DpbYtYMdS9IBoSI9hkrgWkJc2VWoFG5cRSvjhpU69b7dBA37ysL
+         Yt6t+M0CF/JchSy5uiZw9CfDaOyXRHvsokVD31bdMas0RPWDHI63iLCdrwsYNmJ9pmaf
+         m/rhXaWb96Ag99u6+6KtssLJ8A8TiBcziT9DvDzA2LqBSemnMfStnSnooZUgdz+jH1gz
+         pyOAjkh/8UBptNJq2nBTtc86JuwzVGEBM2KoA00ZnAq72WVQlZRCBC357Hy+netRY9yI
+         ublBstoFX1NDC5GKfk0LddNbVcDzBPshAooy5UJjRmsKwr7SQlOCWzueOw2lYOaWDN3D
+         H87A==
+X-Forwarded-Encrypted: i=1; AJvYcCUJPhj4AbEDHC+oQK27L5Ed89A87dRw7VDX9wentdvf4oteDwjOqObhDr5r6izXSlw4DOeUBogpdsqj@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPGpzULvqD5QgbVhm/3k72prt2yoMRFGmA/pThbnaS48hyeFcA
+	Zx1rWGlrB4LV2/4mMmK9Y12sLoEwm1Ntwq97FXfoJje8PhtqHrzUlIdh
+X-Gm-Gg: AeBDieuW0Yf78bynRa5Nd3t1kXzMCb8Vfhf2kC/2blgb95G/RbvuJNEs/b7bH+lDTAq
+	or8V4idP7d93xxKBxc4M+epWwJxRd9t8HAx9NlrCQAi5DFpkliMSwoFALheUxXvOm/Gsb1I5wF5
+	evAuolYHFUXtrRNd2q4hW9Kys5dRJoReVAs5keHcbPNIDmECry+BuSVI66HEbrHR25toBaqMhSQ
+	LgOsVrXS16m/BKN9sdUXOVOMLNj4Af4RYz3pivJ58nXFaqwSPa/j3Un8fZ8mjZG3gC9omAzynEW
+	IHuyI7/pg5OCnjvbtHnofTlAiPHBiVfbxLmpFGwNxF/honpIpjGeofFG9Oy7vRgCGpf2SUZM2I/
+	up9qxQLucxfSy7V1bW+4BF3KoXQ/hwMtTWB6kDuEhfF1dp7BAaIwkwgL8vxTIbkNJMMQiOabw4p
+	RJEiDExVpfEyY3ICi0N/3MDz1/R9h9fx7FgjK5UGHbGNb85rdsObFxy6oYJiU9MayLycoMPPd/+
+	hMK+eBd5n0GKT3D3bp/f3Y=
+X-Received: by 2002:a05:6a00:1da1:b0:82c:db43:969b with SMTP id d2e1a72fcca58-82d0da8c12bmr23623633b3a.22.1775728820504;
+        Thu, 09 Apr 2026 03:00:20 -0700 (PDT)
 Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c6b80dsm29113671b3a.42.2026.04.09.03.00.04
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c6b80dsm29113671b3a.42.2026.04.09.03.00.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2026 03:00:07 -0700 (PDT)
+        Thu, 09 Apr 2026 03:00:19 -0700 (PDT)
 From: rajasimandalos@gmail.com
 To: sfrench@samba.org,
 	linux-cifs@vger.kernel.org
@@ -71,9 +71,9 @@ Cc: pc@manguebit.org,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org,
 	Rajasi Mandal <rajasimandal@microsoft.com>
-Subject: [PATCH 6/9] smb: client: allow nolease option to be reconfigured on remount
-Date: Thu,  9 Apr 2026 09:59:23 +0000
-Message-ID: <20260409095926.905020-6-rajasimandalos@gmail.com>
+Subject: [PATCH 9/9] smb: client: apply rasize on remount
+Date: Thu,  9 Apr 2026 09:59:26 +0000
+Message-ID: <20260409095926.905020-9-rajasimandalos@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260409095926.905020-1-rajasimandalos@gmail.com>
 References: <20260409095926.905020-1-rajasimandalos@gmail.com>
@@ -87,53 +87,36 @@ Content-Transfer-Encoding: 8bit
 
 From: Rajasi Mandal <rajasimandal@microsoft.com>
 
-The nolease mount option (tcon->no_lease) controls whether the client
-requests oplocks/leases from the server during SMB2 opens.  Previously,
-changing this option via remount was silently accepted but had no effect
-because the value was never synced from the updated ctx to the live tcon.
+rasize is accepted during remount parsing but sb->s_bdi->ra_pages is
+only set in cifs_read_super() at mount time. A remount with a new
+rasize value silently has no effect on the readahead window.
 
-Add no_lease to smb3_sync_tcon_opts() so the flag is propagated to all
-tcons on remount, matching the pattern used by retry, nodelete, and
-max_cached_dirs.
-
-When switching to nolease, also close all deferred file handles via
-cifs_close_all_deferred_files(). Deferred handles retain their
-original lease from the previous open; without closing them, a
-subsequent open would reuse the cached handle and inherit the stale
-lease, preventing nolease from taking effect.
-
-Both transitions are safe:
- - lease -> nolease: deferred handles are force-closed, and future
-   opens get OPLOCK_LEVEL_NONE.
- - nolease -> lease: future opens will request leases; existing
-   uncached files remain uncached until reopened.
-
-On reconnect, cifs_reopen_file() reads the current tcon->no_lease and
-the server grants (or not) accordingly, so the per-inode cache state
-is naturally updated.
+Update ra_pages in smb3_reconfigure() after the context has been
+duplicated, using the same logic as cifs_read_super(): if rasize is
+set, use it directly; otherwise fall back to 2 * rsize.
 
 Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
 ---
- fs/smb/client/fs_context.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ fs/smb/client/fs_context.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 5f0637035172..ce4842e778c4 100644
+index d804e5da578e..bba642442ae3 100644
 --- a/fs/smb/client/fs_context.c
 +++ b/fs/smb/client/fs_context.c
-@@ -1330,8 +1330,12 @@ static void smb3_sync_tcon_opts(struct cifs_sb_info *cifs_sb,
- 
- 		spin_lock(&tcon->tc_lock);
- 		tcon->retry = ctx->retry;
-+		tcon->no_lease = ctx->no_lease;
- 		tcon->max_cached_dirs = ctx->max_cached_dirs;
- 		spin_unlock(&tcon->tc_lock);
+@@ -1504,6 +1504,12 @@ static int smb3_reconfigure(struct fs_context *fc)
+ 	smb3_cleanup_fs_context_contents(cifs_sb->ctx);
+ 	rc = smb3_fs_context_dup(cifs_sb->ctx, ctx);
+ 	smb3_update_mnt_flags(cifs_sb);
 +
-+		if (ctx->no_lease)
-+			cifs_close_all_deferred_files(tcon);
- 	}
- 	spin_unlock(&cifs_sb->tlink_tree_lock);
- }
++	if (cifs_sb->ctx->rasize)
++		root->d_sb->s_bdi->ra_pages = cifs_sb->ctx->rasize / PAGE_SIZE;
++	else
++		root->d_sb->s_bdi->ra_pages = 2 * (cifs_sb->ctx->rsize / PAGE_SIZE);
++
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ 	if (!rc)
+ 		rc = dfs_cache_remount_fs(cifs_sb);
 -- 
 2.43.0
 
