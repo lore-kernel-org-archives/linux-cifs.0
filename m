@@ -1,64 +1,64 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594393B9DAD
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Apr 2026 10:00:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B323BED7F
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Apr 2026 10:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775728809; cv=none; b=CllaizTaDeulmi6dsrr9XtTDKZW+Y3vW8GgvnLcEsaOHUCplsTqTt9LN2GIEWTyA69JDynVoUwbcarMvFs/ngNMIBaATaGhxk7UrmK3sBeWmB3WtD0xn80J1/mkmbWama/t2rNdiIBLE9UOdhyPLqWXEPJ5zYKvNnEq3qIyj7b8=
+	t=1775728816; cv=none; b=DwpK2+pBxk5rdgUdRFW2rngYzxR0urWYRChJpXuaazAK0ql7yn6T458pw9eEE3YNHojnAOjrilLSPyELpKxb0fGmj82LmMQSV07kmweq0May579LMsQcfBhomFL8FgIJEJr5jYI//eRQ4y34olDt9OZO5IQVVvGpCLMUMAsPBSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775728809; c=relaxed/simple;
-	bh=RVmOzj+VrRfnJZI8/LY4J0FhhyKspM50b7uZjuZlr1c=;
+	s=arc-20240116; t=1775728816; c=relaxed/simple;
+	bh=jLDGH2xbdkICao3AAOemRCpEXMamhhYa4U4t1QlA53w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cIZeK25zANwCGGXVFrPtZUFu+CJ/mB24rPAhxj+0i70WKU6J2cT4mNEa6JZRHobp8s4O73ccADlcc4bOM5KRjvCrSZ+YrwgUURBLXpNKc4H9uzOF+cEw9Qc77GeA/xJvzYZyH4zHH87PTipLwDwxNM/UdYSRRRIlRHUgVLkz/sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rN3QFEG4; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version:Content-Type; b=Eif+XH645wF7IMEAJx2Z7iUCsp3tQ4T1aqF+d+G/dw6d+XonEJlNkzpFNzbjHxJnw2CvurRVyQaRZafoVLLXRfN/dFE/VtIa0uKvq5vMwzxaGWyu+zpbl5xrNi1gVEp6vbSnMNstnEstKmAcuaBDd6s8aviRhLQWfpvrkE6bOqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kpWw4ljk; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rN3QFEG4"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-82c70e4654eso356368b3a.2
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Apr 2026 03:00:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpWw4ljk"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-82cd98be655so516801b3a.0
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Apr 2026 03:00:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775728804; x=1776333604; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775728812; x=1776333612; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lUAeJTrTvdEpdggBCNQjpDx1YpSTeG9FOV5VC3SOnkY=;
-        b=rN3QFEG4eYZh+zlk3/1x5iNESXaS+LlNzbdC3GjUyODqM+fqaF1liqMAagaUujxry/
-         NaiYRlLAPQjLhnH9vkzRKqLfSmNCQ9WLYnec74PlSUG3vcMWHxhvA2jeF8ORKAObDRqS
-         /lrvK8Wvqtdg5lqBexbJ9z0GOyOvGgf2+mwbjn08SZN1RJPEu5aIAAd6uamILByHGu+p
-         ONtr9wqEJFfv/iiXCSGeck6oiEejPnLgz5GA2Qd6z7Im6EvnoY76FXn5+4uPx+0hY8T2
-         JDQU25dn+W29kC5piZxmu7v7ZxhlSIdC5UAG1I/wzyTZrv1frGx5Owtpf0N/dn55DTN7
-         5ABA==
+        bh=cOqI9jBMlEFSepIEKpFv4Fn8Y0sEbCOesb+bDrPgbcc=;
+        b=kpWw4ljkw0sLT63co6djpUBucoczAv7eDyfFhsFjRqZFtvQ07Q0TK+r/5HKR1Y7Qgv
+         9g9CiZEqp5wtvDUcohlwBmM4T1iSgi1AmfYRxWzbiTeUdpK3kRnswSgYCu0MPCsv0Daj
+         UFxfQEG7MhWFD8URb6QjL/h5UwTfYdLiXEJHG7xGFLWruMgmVAQPCmPDOiVBDPkAVHFF
+         srXijc80EC6qB247d/QPOO3/9VRhkuk3AlpepBGKFTtcbclzIR3wP/Gf2FxTh5FYzGTu
+         FzfhvcbC1Xc8aPytUGG4U3+uQXhNrxOU+nHKPSHWWxgpgL11RGz8t/w5WgJpMVoBad5D
+         RzCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775728804; x=1776333604;
+        d=1e100.net; s=20251104; t=1775728812; x=1776333612;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=lUAeJTrTvdEpdggBCNQjpDx1YpSTeG9FOV5VC3SOnkY=;
-        b=ICg7Z6nfuxh/T3vcNP5JElq6BBqY0qW5ksRvlzRuGHPfKeIhjcMtMfjCuGoAUs1Fr2
-         ZtbMXuB4ckk/U+lFK31cjnig9oAdt+So/5gfkxndBqKfI0H/XwSFAIkvW9fGUzih6oLd
-         7LvX13/kbekNySdPuIWZsBg8j7ReUx5StjFMVXn9w78AJg0XxCjFClnSPfOlhzPo8Ova
-         cJ0WyWcaE1GOWAGT+wiLauceyy89A8TU99IDRw50gJ4T08UjmWT0iko8xxxwBQqB5Wmn
-         SfVO88WO5WH8y51natYAQOmNI8uA1qtL35f0O3uHX0xiuQT8tTaajX+99J7yd4pufWoK
-         8dwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUq+jNiLy6j+Jdk3VBjxPeT2p4ZY5IxqA19loejf26LyejarJwOnHX2S113tXJyr0xs5aXG1Wi/Q8a8@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHq7PKsqVZI+szGS5WbYI83q148wpxigrFpY6pGUCVtClTXcXv
-	ZL+6IYNVrA9Jl+fWvLPA09o3madmkBeJBdm+iri4s8GOpx/bMtn2o+CU
-X-Gm-Gg: AeBDieuiFJ3g7PxC7kAiamEDtAZI3PA6d/nurLJ6FpAYsNl7snQTMebnQe4Tgr80DOD
-	DhnSD+O0uqpt4A83YYkjxWE8B4JCy4dxVcBTTtCZXitnQwWaaxgBOCPEbz9MkG9nzvKhOwbvGdX
-	651LzPiX0yB796AA8UYxybW27Fmrh6kgi3Xj8t60sbSvDGxeEk6MiPbw28QjO2C4+hpnyZJpfrm
-	ZexsAT93INdCZ1iLWRB0fsWKa/q7Nf/6bklBwZzt2qORVT/FsWmSdk9DYz+iJ77lrytG2IGHjJb
-	llJJtCYFZXrdkXW1j/B6HnE9ypuwDhIeGuIqqYUO5xbohTHZYFn1qT/fWP+g0i0gMRlruSyTbD9
-	jhqu6Ifx0tDffrNT6E4VdZF2OvHnuU6ciAaTpPSvx4EwkxjodoJMM4g8L/Fb97cgPkozYTnQ9tb
-	B3jkKsTM1H5Rb1L4r7v7SBG3D83n+is5EUaI48a2QRkYho61JL+qVsUHFKgRUqMrSIsl9PQ8SEJ
-	ta2sNdt0446wPR/IT0a1wI=
-X-Received: by 2002:a05:6a00:f93:b0:82c:6f07:299f with SMTP id d2e1a72fcca58-82d0da834c7mr23176308b3a.14.1775728803985;
-        Thu, 09 Apr 2026 03:00:03 -0700 (PDT)
+        bh=cOqI9jBMlEFSepIEKpFv4Fn8Y0sEbCOesb+bDrPgbcc=;
+        b=inshoA0kUDyWgfT5x416DOstePfU3LfaBolGO6tLQJfSygfAaJDtMmXav19knVYowY
+         3AxTnzg+81Vt1z6vJ26qqOrxMZ1kjCpnyA/UBTECshcHEwefXs5vzMunDxHNsUUtdqyj
+         lUNyxm7WwUuR6GCfoAVkrMTDkucueRh0MLHrALKpNtP6vsGedShhziQX0Oiq6/tUHSUs
+         3iBF04h5VzE+smzOf4ZJPt+bUe49jqKCuj4prJfKrYvr0/noO02kUNaLZT7KLLkSDd44
+         rXQWD6KbOBrzIEyUY5MsM2hH8xU7V+PmuZitFIV9zhkQA1+tW8rEcoSDopAewgpJG60P
+         e8rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVlIJbPOoYBlDHH3hMrIzr+2d4QpZ7DXVQoP1eLQ3Foi0jR6+5azAkuBUQqDPIft38s2LS4Ia/gvG1O@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyt9ZbCuKzqF1m8BvQLn0f+/WMz+Il4cPAORI6jQKLkuTDf0RxT
+	sRZaZUxBzmvbo9faFZ3PvzxykuCyCW6TKSUda5+cqcll9z/cG2PPUHrV
+X-Gm-Gg: AeBDievudyaHZyVg3Ki3kfECBh4P/1GUuC9pcMsKULLdfFjVDN/Skk64E/ilt4XnM+z
+	y0Oe2CTCCfOCFqG1EiZRhNKq8R9A10ikCyXIMA6UNwk3RyGWGkJ9Ty+wp4IWpb2b9P3nibjA1D7
+	xyzo2yxEe1d/IDtWCE1zNWOt0bMBNaRokOw0mxqPCOLitU0aXw/6fVA+gHmJ9GM5cXGxfBrCPJZ
+	IDWVogJFOOafkjIf/NRiRjLepinfP2YVBpxwuomjM5oX+WiisEwy8qxo9FQQATUds0H7HNJp+6L
+	MxuVmH2wZgxbmcmYbXPvbb8K1yiPsgqfknBfbGyT+UdsuX5TgcgcOaqTuhRXkKlgouHA1mb/oJU
+	ZjdT64lLIUEqUNVfXN+nnaIyXs5TKrDX+ytPGrPJSkdLgD2sajA2RzxMrMeJ8t9wB4OjC6prFY7
+	iMKfBSEHu4PKfdU2RNVWrnzHLppCH5xZMISTHJUG/kIhv58XGj778gLVS6ZcJpQV9YgdoCDLsv8
+	vGqsPZO8hl6l2F6g+K5e+A=
+X-Received: by 2002:a05:6a00:13a3:b0:824:adf4:5a2f with SMTP id d2e1a72fcca58-82d0dbb96fdmr24441118b3a.43.1775728812252;
+        Thu, 09 Apr 2026 03:00:12 -0700 (PDT)
 Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c6b80dsm29113671b3a.42.2026.04.09.03.00.00
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c6b80dsm29113671b3a.42.2026.04.09.03.00.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2026 03:00:03 -0700 (PDT)
+        Thu, 09 Apr 2026 03:00:11 -0700 (PDT)
 From: rajasimandalos@gmail.com
 To: sfrench@samba.org,
 	linux-cifs@vger.kernel.org
@@ -71,9 +71,9 @@ Cc: pc@manguebit.org,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org,
 	Rajasi Mandal <rajasimandal@microsoft.com>
-Subject: [PATCH 5/9] smb: client: sync echo_interval on remount
-Date: Thu,  9 Apr 2026 09:59:22 +0000
-Message-ID: <20260409095926.905020-5-rajasimandalos@gmail.com>
+Subject: [PATCH 7/9] smb: client: block cache=ro and cache=singleclient on remount
+Date: Thu,  9 Apr 2026 09:59:24 +0000
+Message-ID: <20260409095926.905020-7-rajasimandalos@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260409095926.905020-1-rajasimandalos@gmail.com>
 References: <20260409095926.905020-1-rajasimandalos@gmail.com>
@@ -83,57 +83,51 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Rajasi Mandal <rajasimandal@microsoft.com>
 
-Add echo_interval handling to smb3_sync_server_opts() so that
-changing echo_interval via remount actually takes effect on the
-running connection.
+cache=ro and cache=singleclient are mount-time environment declarations
+where the admin promises that the share is read-only or exclusively
+accessed.  The client bypasses server-based coherency (oplocks/leases)
+and caches aggressively based on this promise.
 
-The server echo worker fires every server->echo_interval jiffies,
-but that field was never updated from cifs_sb->ctx on remount.
-Convert the user-supplied seconds value to jiffies and reschedule
-the echo worker with mod_delayed_work() so the new interval is
-picked up immediately.
+These modes were intentionally excluded from smb3_update_mnt_flags()
+when it was introduced in commit 2d39f50c2b15 ("cifs: move update of
+flags into a separate function") — only cache=strict, cache=none and
+cache=loose were made reconfigurable.  However, remount currently
+silently accepts cache=ro and cache=singleclient without actually
+applying them, which is confusing.
 
-The assignment is guarded (if ctx->echo_interval) so that an
-explicit echo_interval=0 does not accidentally reset the interval.
+Add explicit checks in smb3_verify_reconfigure_ctx() to reject
+attempts to change these options during remount with a clear error
+message.
 
 Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
 ---
- fs/smb/client/fs_context.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ fs/smb/client/fs_context.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 31b82f8f7ead..5f0637035172 100644
+index ce4842e778c4..2be72733ef2e 100644
 --- a/fs/smb/client/fs_context.c
 +++ b/fs/smb/client/fs_context.c
-@@ -1338,9 +1338,9 @@ static void smb3_sync_tcon_opts(struct cifs_sb_info *cifs_sb,
- 
- /*
-  * Synchronize server-level options that are stored on TCP_Server_Info
-- * at mount time.  These fields are consulted at runtime (retry logic)
-- * so remount needs to update the live server struct in addition to
-- * cifs_sb->ctx.
-+ * at mount time.  These fields are consulted at runtime (echo work,
-+ * retry logic) so remount needs to update the live server struct in
-+ * addition to cifs_sb->ctx.
-  */
- static void smb3_sync_server_opts(struct cifs_sb_info *cifs_sb)
- {
-@@ -1349,6 +1349,11 @@ static void smb3_sync_server_opts(struct cifs_sb_info *cifs_sb)
- 
- 	if (ctx->retrans)
- 		server->retrans = ctx->retrans;
-+	if (ctx->echo_interval) {
-+		server->echo_interval = ctx->echo_interval * HZ;
-+		mod_delayed_work(cifsiod_wq, &server->echo,
-+				 server->echo_interval);
+@@ -1180,6 +1180,14 @@ static int smb3_verify_reconfigure_ctx(struct fs_context *fc,
+ 		cifs_errorf(fc, "can not change rdma during remount\n");
+ 		return -EINVAL;
+ 	}
++	if (new_ctx->cache_ro != old_ctx->cache_ro) {
++		cifs_errorf(fc, "can not change cache=ro during remount\n");
++		return -EINVAL;
 +	}
- }
++	if (new_ctx->cache_rw != old_ctx->cache_rw) {
++		cifs_errorf(fc, "can not change cache=singleclient during remount\n");
++		return -EINVAL;
++	}
  
- static int smb3_reconfigure(struct fs_context *fc)
+ 	return 0;
+ }
 -- 
 2.43.0
 
