@@ -1,64 +1,64 @@
 Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADC3388E40
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Apr 2026 09:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189A03BAD92
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Apr 2026 09:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775728798; cv=none; b=Ex/KFwctRsijO+01g+b5kY8dLDGUnrhkfQYV3PnpxzWxy+UX/nDeIslCyOilV6wQlI4bcPy/ocKhPuCE6FBG5hyTi/WKuoATqPo8qWepS3SVpEVBQW3ORPAn2m2shPNwqJU/vhypPs3uuHPtu6j4DumwymJtJT5O/NRYp+gm2oI=
+	t=1775728802; cv=none; b=azNgk/PNdqgWAu7oipTouCA1j3zB4IIJ03rHNb9EiZTyV6og4zGwSmc/VLH+dws0EYTsbRBXhO4sA2+4KD/JDMLMmagPAqdKyMUuBPjE2F25WmzT5Yv2q/BZNYaJWRIarVFVr19gVpK5W45gHrL9nKvaRUtqiwLlJyMlkPG4NiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775728798; c=relaxed/simple;
-	bh=vvd0M/Mz+711aOsS601VbRuhF4hK7peQspPb9+5ynKI=;
+	s=arc-20240116; t=1775728802; c=relaxed/simple;
+	bh=xbioMmi4wWbrPSlpG4HbYgE8Rb3DQIUxwj11/DTkU3I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rSl4nffGrBMQhQJRz/xUoq/eFUrc3PgN+u5Slaa/RI93jvEi7S5Qd/+8iVjaNsyB8R+XgNG65P++PgIpkbQ/R8njxtWalCsvQIE0rqyH/x3Syh8vhlSyftAOGz9lYHfRH5llgAHcIAGxliIUoCnbNEQ2HcOdIkoirSEJut+53LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HcdRBy64; arc=none smtp.client-ip=209.85.210.176
+	 MIME-Version; b=MotpLK1ypHJyCgM2e3K2On9X9AQ0lG0tBEQhfwaZzCrgR2k8fH0kX4OLaBniJ2SoUXdYXK2rAXAm6zfADyQYuG1dZpXbyQdRuHPuDhf9DeLccGGhpJYI/a+qS6xlHK3gnTn/uNXuASKDw52LH8tubG516ieAhP4ljhUGyInjgfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hacRuYEE; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HcdRBy64"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-82c68339cf0so419489b3a.0
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Apr 2026 02:59:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hacRuYEE"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-82cebbdab08so602225b3a.2
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Apr 2026 02:59:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775728792; x=1776333592; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775728796; x=1776333596; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j08sVRHBiUq1wf14pHnVtUsNqT84yk77IOh7rJh2w3I=;
-        b=HcdRBy64vSqlU7VzToytyGQBUuK3bluU39PiHOnZ0P4Kn2bS2Sii7Z7vNfODqa/e4K
-         yDx83w2QzSqu0iRL/3eb5cgFZTv8o4pjeWoMPQdmtXhmNF6sW+dbrvrFdX2sJHMlPKFE
-         LUlmKA0ppwWeNOzyONme7e8Rm12oIv7XpRor8SaFefrWfNFYjLwya76ZLxdejqoLVZxH
-         y9Ge5DmKY93WdjyIUns6aDuDfFlWQjzKLDwN03jcJpKrZWeHRrlibuRwxIoMFZr+kV9m
-         1An/F1JJq6aaUqCbcSGQTXThD0R0wyovLudzv/9yF+UjD/5So18oZS0SSkxVSZgEPUk2
-         WprA==
+        bh=FlkZH1SuQrwakRTOg6E2zmugoAOuiELmZsl+WpaQ39M=;
+        b=hacRuYEEBY3eUdxTjB6VYFEqZfmK1fhWRZ7yKcWC4IsEoagaRjiTWuEevNgFuuY3hk
+         60ZzZKLgw8yPsTRo82QVxAHtcwwGU3I78P9DJmmWVSULIckzXEtOfU1eiRrm1mFvQLV4
+         shFpegoVH2WkeNck7o6gzaZeRSUWAOcnipIcTQZ53raSmjTpir7BeE4Sz+8y4mDc3Q1B
+         91lxJwxB0WQyrDKNBdoAF48vwUP2ORo38ZZITgpozNFVC6akipgtQFEQq/uLz8wxJXD/
+         12W3/8FQQ/LsorjkeZDkR9w20TujIb0Kz2I7jg+Nhx3TraRWysVhVVJvpB2EXAWMecDR
+         Bu9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775728792; x=1776333592;
+        d=1e100.net; s=20251104; t=1775728796; x=1776333596;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=j08sVRHBiUq1wf14pHnVtUsNqT84yk77IOh7rJh2w3I=;
-        b=fGwmR98Y5NfwUeidjiEwVsFajt+frwcy80kAARjrHG6jaQ/7JmQT25F4h10E318xuN
-         cEuhUwaQfoxUaIg747c5XM8Dw/oA7YLoURyNJo3f7awVGx98uRYgcj3m63wgiGKRbGkJ
-         Rh3kN9bj4F1yCRuXy/tI1UTwB8gN5DzQyuT56ov8AEY3UneVO5L/ZW3j0EvvAe0ORPFK
-         CvW10V88LMkS4MG94+WM57B9kZlMQOaCVQ1Qi0SGQGi8EbXqwEdGjWJgpYxpqXka1A5O
-         D1nwljuhf2nUdLEV0CPVTsA53q41ecVQSDVRvoSEsT/nKkW7pwxA5Rxjj3ugylSwBhWv
-         9BUg==
-X-Forwarded-Encrypted: i=1; AJvYcCWVMb5rdAL1Z9AWGTucdTlGjCCz7NV8YTMP8Hj9j+T020py9uqXCI1g/LWIUH91VZRqKTMa7x67jnpv@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0q1kfs198z8Uit6RvjKK7bLQND5LdMnDQE8onl+UD05iInASi
-	K13tsVcRBJwbJCRSW3ahCJQWiftui1GhzMrheafM20gkj14kjQRx8yAo
-X-Gm-Gg: AeBDiev481CS6DwI3CV5QTgnOuRVDnOVRax86ing56ldqoiz2gGU5xww4YRyUzr80r2
-	lUmuNxcdOQ5SSeyEGSmeaTIwezpDmX7gy5tpojXr2Sy1e+rS+APVN/CaHz7DoEleznU/CFMPSIQ
-	zYQPH4QHwi3+eIrMlgVIhJCxcaHFWClXsmuKg7NKBrSr4Z37VqnI8X+x16aWTQWE/2E90CPCNOj
-	MgPX3MafRIlA1TphdIrsHm8Znr8i42iphwfBuL+mcE3Evkv7O3FoQ7uIt78L5m2RuWyQaSuSmXc
-	r2GRJkioV97YqqhL47u+grbsy7O71Wq5EXnvb6oZU1nApsLBSxEBa4UJAxnsiXWVyJJ6S0oocXG
-	hZjTqKJyfYq+o0Yhg0/0gBW2YYR8jYKkQrcyYNvS45sF3OBwo/DVa0olQCyf2DsNlR412gdEjqJ
-	iC7YH+bUeBQkoF/995Gcqr7mfXFTXhVp71yO0uHb+PRF1iauRS9BbXbemtbFh/Y62GgXRRMtnr8
-	9e6Tz7LrLyQSiQmf2q6Ku08zhbmkII9FA==
-X-Received: by 2002:a05:6a00:f86:b0:81f:5acb:55fc with SMTP id d2e1a72fcca58-82dd8ab8823mr2419175b3a.10.1775728792393;
-        Thu, 09 Apr 2026 02:59:52 -0700 (PDT)
+        bh=FlkZH1SuQrwakRTOg6E2zmugoAOuiELmZsl+WpaQ39M=;
+        b=VeCSCNA+BSOArGp0mKeprI5MPdbvOsBukfXytmCaAgMQWq7pX8UM+7GY+1CoCtOHg+
+         bdippR6iT+dTciWF6suPed6ICDECVvhh3rLDeehlU2RdwfVSM7aOldpDjf+6UGdgySjX
+         NoyyatP7R8CEV/MMXQZqb5GgXqiSi6bJClcRYc1xbFQ2+Z1n9qFeIUtdr8ilmFnDSbSG
+         t77r++m6hITbleGgIAWYWGqjylDMZukVqwz3dVwGefVnfOHOn0ikqsuoz7Tt2329pU/C
+         i0RTo1W2ciERr6XWo3iNMTAl/1zcx7ptq+nnhawUSeZNt/5Glkg8uwf/3uPM7cM05quQ
+         OhOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXs1yT9MxR5XF4K0XKy+53WD+UiQvxFxhsu8rKEmbFQKhH/yez2FFSD4OiSrQ+QuwFe0cEu2laWqLRL@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4qCTCavT9w/dx1qlgMnZoKzq/Iu/yeQM63LEWAdj/TtOq1tsR
+	7DRAhWcWXz5CdFOdVId5DUgbqZrYxlyINcjK/kasJ246fjuSf2GcECD1
+X-Gm-Gg: AeBDies7V6k5VWXdTodbCYyfFEq+jjswhH9RrhKHOA8CrsLNRztPAF6vqQGBBNKosac
+	Yn8UoDKTWcyObabQPVthb/2qT7AjzZ0p0UWllGpyBHgb1NMk4t7Aj8AzGLR9EvdO098wcaIqye6
+	6mfOMvnAA7PgbRcXK9idczeV8Ld0T03VuGfDKz3gg5Ke9ScTtO2LhXJtt2+QTkZMXI0CrMe5aRP
+	D70qaF7F/0cJGgbZQ1xAhfjm3UorXjEQ+eKz7z0Yn9Na5VOYpBl2Kd7i9VScbsrhQsDc1HW9An4
+	5EvIbCDQS0HHGQHpHGcL9iHOSCuXBOpXQkOhxk2q6j0nx2oqpuuTT2lGGqvfTFERpo9Rp0UcDIH
+	xKGKHn98ZSgXaJQ/4Bckteg1f+9SyeUVLOjjEUziHTtkeAw8fgug5K04zBz82e2la2xaa3C+QLb
+	tFPoDpOnB6WgzzxO9zXaUJ5dWUbRDF3q9SCHI40wNJyXYF2jAtD2FmqnO94DowhmsiAH9kL4a3k
+	wknoB/JE4xXjB+LSD48nUE=
+X-Received: by 2002:a05:6a00:c86:b0:82c:d92f:3b64 with SMTP id d2e1a72fcca58-82dd89c526amr3132952b3a.14.1775728796314;
+        Thu, 09 Apr 2026 02:59:56 -0700 (PDT)
 Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c6b80dsm29113671b3a.42.2026.04.09.02.59.48
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c6b80dsm29113671b3a.42.2026.04.09.02.59.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2026 02:59:51 -0700 (PDT)
+        Thu, 09 Apr 2026 02:59:55 -0700 (PDT)
 From: rajasimandalos@gmail.com
 To: sfrench@samba.org,
 	linux-cifs@vger.kernel.org
@@ -71,9 +71,9 @@ Cc: pc@manguebit.org,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org,
 	Rajasi Mandal <rajasimandal@microsoft.com>
-Subject: [PATCH 2/9] smb: client: allow both 'lease' and 'nolease' mount options
-Date: Thu,  9 Apr 2026 09:59:19 +0000
-Message-ID: <20260409095926.905020-2-rajasimandalos@gmail.com>
+Subject: [PATCH 3/9] smb: client: sync tcon-level options on remount
+Date: Thu,  9 Apr 2026 09:59:20 +0000
+Message-ID: <20260409095926.905020-3-rajasimandalos@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260409095926.905020-1-rajasimandalos@gmail.com>
 References: <20260409095926.905020-1-rajasimandalos@gmail.com>
@@ -87,63 +87,74 @@ Content-Transfer-Encoding: 8bit
 
 From: Rajasi Mandal <rajasimandal@microsoft.com>
 
-Change the nolease mount option from fsparam_flag() to fsparam_flag_no()
-so that both 'lease' and 'nolease' are accepted as valid mount options.
+Several mount options are stored on each cifs_tcon at mount time but
+smb3_reconfigure() only updates cifs_sb->ctx. A remount that changes
+any of these options silently has no effect because the runtime code
+reads from the tcon fields, not from the superblock context.
 
-Previously, only 'nolease' was recognized. Passing 'lease' would fail
-with an unknown parameter error (or be silently ignored with 'sloppy').
+The affected options and their tcon fields are:
+  retry           -> tcon->retry
+  max_cached_dirs -> tcon->max_cached_dirs
 
-With this change:
-  - 'nolease' disables lease requests (same behavior as before)
-  - 'lease' explicitly enables lease requests
-
-This also renames the enum value from Opt_nolease to Opt_lease and uses
-result.negated to set ctx->no_lease, which is the standard pattern used
-by other flag_no options in the cifs mount option parser.
+Add smb3_sync_tcon_opts() which walks the tlink_tree under
+tlink_tree_lock and propagates these values from ctx to every tcon
+under tc_lock. Call it from smb3_reconfigure() after the context has
+been updated.
 
 Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
 ---
- fs/smb/client/fs_context.c | 6 +++---
- fs/smb/client/fs_context.h | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ fs/smb/client/fs_context.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 0f6c1eb8e274..e1bf7bad5be6 100644
+index e1bf7bad5be6..90e83f07c870 100644
 --- a/fs/smb/client/fs_context.c
 +++ b/fs/smb/client/fs_context.c
-@@ -80,7 +80,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
- 	fsparam_flag_no("forcegid", Opt_forcegid),
- 	fsparam_flag("noblocksend", Opt_noblocksend),
- 	fsparam_flag("noautotune", Opt_noautotune),
--	fsparam_flag("nolease", Opt_nolease),
-+	fsparam_flag_no("lease", Opt_lease),
- 	fsparam_flag_no("hard", Opt_hard),
- 	fsparam_flag_no("soft", Opt_soft),
- 	fsparam_flag_no("perm", Opt_perm),
-@@ -1572,8 +1572,8 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 	case Opt_noautotune:
- 		ctx->noautotune = 1;
- 		break;
--	case Opt_nolease:
--		ctx->no_lease = 1;
-+	case Opt_lease:
-+		ctx->no_lease = result.negated;
- 		break;
- 	case Opt_nosparse:
- 		ctx->no_sparse = 1;
-diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-index 0b64fcb5d302..a80a5caff23c 100644
---- a/fs/smb/client/fs_context.h
-+++ b/fs/smb/client/fs_context.h
-@@ -102,7 +102,7 @@ enum cifs_param {
- 	Opt_forcegid,
- 	Opt_noblocksend,
- 	Opt_noautotune,
--	Opt_nolease,
-+	Opt_lease,
- 	Opt_nosparse,
- 	Opt_hard,
- 	Opt_soft,
+@@ -1307,6 +1307,35 @@ static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channe
+ 	spin_unlock(&ses->chan_lock);
+ }
+ 
++/*
++ * Synchronize tcon options that are derived from ctx across all tcons
++ * associated with this superblock.  These fields are consulted at runtime
++ * (reconnect, I/O, unlink/rmdir) so remount needs to update the live
++ * tcons in addition to cifs_sb->ctx.
++ */
++static void smb3_sync_tcon_opts(struct cifs_sb_info *cifs_sb,
++				struct smb3_fs_context *ctx)
++{
++	struct rb_node *node;
++
++	spin_lock(&cifs_sb->tlink_tree_lock);
++	for (node = rb_first(&cifs_sb->tlink_tree); node; node = rb_next(node)) {
++		struct tcon_link *tlink;
++		struct cifs_tcon *tcon;
++
++		tlink = rb_entry(node, struct tcon_link, tl_rbnode);
++		tcon = tlink_tcon(tlink);
++		if (IS_ERR_OR_NULL(tcon))
++			continue;
++
++		spin_lock(&tcon->tc_lock);
++		tcon->retry = ctx->retry;
++		tcon->max_cached_dirs = ctx->max_cached_dirs;
++		spin_unlock(&tcon->tc_lock);
++	}
++	spin_unlock(&cifs_sb->tlink_tree_lock);
++}
++
+ static int smb3_reconfigure(struct fs_context *fc)
+ {
+ 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
+@@ -1444,6 +1473,8 @@ static int smb3_reconfigure(struct fs_context *fc)
+ 	if (!rc)
+ 		rc = dfs_cache_remount_fs(cifs_sb);
+ #endif
++	if (!rc)
++		smb3_sync_tcon_opts(cifs_sb, cifs_sb->ctx);
+ 
+ 	return rc;
+ }
 -- 
 2.43.0
 
