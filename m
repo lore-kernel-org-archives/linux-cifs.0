@@ -1,117 +1,79 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7D033E377
-	for <linux-cifs@vger.kernel.org>; Fri, 10 Apr 2026 20:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59F939A806
+	for <linux-cifs@vger.kernel.org>; Fri, 10 Apr 2026 20:30:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775851895; cv=none; b=EHVUldJ4klRcNe2a2Gv4hG5YWrFwKpi2lXVG9ZmzzR/BJZFmpqFe//+3BlF23NStbUZvtLUz/df1MUCt7RYtH1tiqvz+dtoNBbQVNZsR12qkKdrdTm9um5EYFTUCCAmO5XMigY3UD8xq2AA1uYj6jdGKFvos8W/UpfAX3O9bfsM=
+	t=1775853045; cv=none; b=XppXV6r9INpyjHZ3lCZaqadG11WsEgcSWu+a2hbIinhaUunbZMMecLIboJO3SeOu3pu6PfnQDrPircoLAZydc1v3NIbXPNTsHEGiWec1eewTancJMdY3HUvuduw9r/Z9gvrP5NGSEdeCtd89i3mqHTSY8ldOfnsHTqiyYZS/w90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775851895; c=relaxed/simple;
-	bh=7V2deim1shwDSds3+C73OGkq6RqsGtKoF6QwJLSFylo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mTd6dAruDYBHoTMX7WZEdUUgzOYtPWoQOKs6J9kS2wkn9M/0GCju1iLYyoaVRzEIXuc0220fdz2YLHxQZcMO8bB50mtVLu4DvIzdEs9NemkUN2/79xjL+lApc1gvCuw+GmaPAiSFgeQAqi5soVRGosNLkiB3+2eOiAn7/zy7lqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=qZ6P/3Bf; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1775853045; c=relaxed/simple;
+	bh=ibPpFG+JWegHejWrQmbnNB9IckCZmAtGVHIgsFZLFPw=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=fx3VHx4XPkfAvcoEjt/Br2QPPpk1csROfU+53ofd9Ry42qHEfF4tUjCSMU2fnMwcEm7Hdi2MGp69RZpoY+quU9XC+Tsfqb/Z/FeVI/X5sa5EYKn55pgWFBgQVryJLiWh8PB1FSsTfo6oMa/+LSCmmrfujqA0qcYSNQ7GvzmguqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=O9cxclr0; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="qZ6P/3Bf"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=0/gbFaWlJTvuMgwmQatvgm0QB9NiBlBeSMyg5NxSF+Y=; b=qZ6P/3BfeI+JIVxI1ruB6CcRsh
-	6p/FxHlGxHJNA1ahXmCvToC5xm7RnqIHBidfPDewsN5fwBJqU0fbfjf/MRNbHDgshJQXmNWbJZbKj
-	y6uQnJpYnqBjYteFj4CMHKpI/EW0r29A6mCAH/ba3FYZXIMPzT8QS/WkhDRSPZK3OQBrEWON4ouO2
-	7+AlsVcT1R5t7HBTfyex9KDL7PS1fgGnFUN7YDFL9HEZdJY5Vk2VaWjlbrKHtrwQV2kiaI8ihnQxA
-	eXngrKEpozDYrPqIUrUOfrczaKsbFmZC6lUjDZ8EbPSd5KtkThnYeREXgKnj6B2XGvOWH0d0z7yrx
-	5MIF/XJCRHHTYa1n4WI7cv+ZMjaNqMm3khdoUrfiwTd9KHHJ3o1IkZrwxOEYyjUoMAeA1dCCf79Rz
-	vjbE7dP0IIOHgcCDsfmW99J+EhIFpKm7wPhwDmhwr7Yt4+oQ/t21sKZ2xOEvqqRReyPrRnMxHEmwi
-	s142Ir0AYDL74vNI9wRH/+Lw;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wBICL-00000000IJD-2D0g;
-	Fri, 10 Apr 2026 20:11:25 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: metze@samba.org,
-	Ruikai Peng <ruikai@pwno.io>,
-	stable@kernel.org,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	security@kernel.org
-Subject: [PATCH 1/2] smb: client: avoid double-free in smbd_free_send_io() after smbd_send_batch_flush()
-Date: Fri, 10 Apr 2026 22:11:00 +0200
-Message-ID: <63d48102cf16da1bae51f8e37419dd7a5223462c.1775838249.git.metze@samba.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="O9cxclr0"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=YrkZNPjJ2sw7nJ4CS7UCQHOPesbuNnoXfqSX/LlpfAk=; b=O9cxclr0NnK9a7Iejbros6fmxm
+	0T6ePKdlp5kvdsp8kyM2tsKRFgyW2cIMhPkVw18YJ18Q3jR/iJtxv08F81DZTFxoLc9kqKV9QVKsV
+	CSqpY5zTdTgpbtzr1PxTUWG/N+C8jmqCtngo/70Htp0j4NbJmduhiy0JpI6oR72x5W7hyE2PWOAL7
+	J5niyPFLSLgTdTkih4ELvOWaRQSwmf7VAZF1dIXHyexurBubMGbVU1NPno5Y21cSELDx97bMRP8bD
+	vW/92hXFDlAKY1rqaX6xrEhgkZf2RonKwx6FdHgnE/FQW9eWl9/jdsdAoyn7eWu8AeXxnghT+J1iH
+	HSk6AsaA==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
+	id 1wBIUq-00000002a1G-0JTe;
+	Fri, 10 Apr 2026 17:30:32 -0300
+Message-ID: <6eec11ccb0a36ab828a99efd45354a92@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Stefan Metzmacher <metze@samba.org>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org
+Cc: metze@samba.org, Namjae Jeon <linkinjeon@kernel.org>, Steve French
+ <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>, Ruikai Peng
+ <ruikai@pwno.io>, Sergey Senozhatsky <senozhatsky@chromium.org>,
+ security@kernel.org
+Subject: Re: [PATCH 0/2] SMB Direct: double-free of send_io on ib_post_send
+ failure in batch flush path
 In-Reply-To: <cover.1775838249.git.metze@samba.org>
 References: <cover.1775838249.git.metze@samba.org>
+Date: Fri, 10 Apr 2026 17:30:31 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-smbd_send_batch_flush() already calls smbd_free_send_io(),
-so we should not call it again after smbd_post_send()
-moved it to the batch list.
+Stefan Metzmacher <metze@samba.org> writes:
 
-Reported-by: Ruikai Peng <ruikai@pwno.io>
-Closes: https://lore.kernel.org/linux-cifs/CAFD3drNOSJ05y3A+jNXSDxW-2w09KHQ0DivhxQ_pcc7immVVOQ@mail.gmail.com/
-Fixes: 21538121efe6 ("smb: client: make use of smbdirect_socket.send_io.bcredits")
-Cc: stable@kernel.org
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Ruikai Peng <ruikai@pwno.io>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Paulo Alcantara <pc@manguebit.org>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Cc: security@kernel.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Tested-by: Ruikai Peng <ruikai@pwno.io>
----
- fs/smb/client/smbdirect.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> here are the real patches for the changes already tested by
+> Ruikai Peng for the double-free problem reported, see:
+> https://lore.kernel.org/linux-cifs/CAFD3drNOSJ05y3A+jNXSDxW-2w09KHQ0DivhxQ_pcc7immVVOQ@mail.gmail.com/
+>
+> I prepared a branch that can replace ksmbd-for-next.
+> The 2 changes are rebased below the smbdirect.ko changes,
+> I resolved the conflicts and made sure the problem is also solved in
+> the new common code. This in for-7.1/smbdirect-ko-20260410-v12
+> at commit: 274b415378bbd0cf6fde1a719e264cee2eefc06f
+> git fetch https://git.samba.org/metze/linux/wip.git for-7.1/smbdirect-ko-20260410-v12
+> https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/for-7.1/smbdirect-ko-20260410-v12
+> I made sure each commit compiles fine...
+>
+>
+> Stefan Metzmacher (2):
+>   smb: client: avoid double-free in smbd_free_send_io() after
+>     smbd_send_batch_flush()
+>   smb: server: avoid double-free in smb_direct_free_sendmsg after
+>     smb_direct_flush_send_list()
+>
+>  fs/smb/client/smbdirect.c      | 8 ++++++++
+>  fs/smb/server/transport_rdma.c | 8 +++++++-
+>  2 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index c79304012b08..461658105013 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -1551,17 +1551,25 @@ static int smbd_post_send_iter(struct smbdirect_socket *sc,
- 
- 	rc = smbd_post_send(sc, batch, request);
- 	if (!rc) {
-+		/*
-+		 * From here request is moved to batch
-+		 * and we should not free it explicitly.
-+		 */
-+
- 		if (batch != &_batch)
- 			return 0;
- 
- 		rc = smbd_send_batch_flush(sc, batch, true);
- 		if (!rc)
- 			return 0;
-+
-+		goto err_flush;
- 	}
- 
- err_dma:
- 	smbd_free_send_io(request);
- 
-+err_flush:
- err_alloc:
- 	atomic_inc(&sc->send_io.credits.count);
- 	wake_up(&sc->send_io.credits.wait_queue);
--- 
-2.43.0
-
+Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
