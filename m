@@ -1,94 +1,87 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737233DB64C
-	for <linux-cifs@vger.kernel.org>; Fri, 10 Apr 2026 15:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D47B3D5227
+	for <linux-cifs@vger.kernel.org>; Fri, 10 Apr 2026 15:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775834429; cv=none; b=L6bUMJ0g+3yDfyvNCQ+aQxxfN9yETYMVjYu3Ra9LlUckFJUpeMjA0EVCNauGOLAHLsrJiyyeoaXzXtQ3OVNEUZMQhPHz20cugYEZLbjJGcKdGl7N/j2rujKBCajz3ufW93smkhC+Gjh+5wkYSL5WLpuWaMcxusjazQx3QQPCYOs=
+	t=1775836490; cv=none; b=U7cDlgQoBSz6lK4X4rP0b+Tyunpmx0FgOnPYU7fWT6e9BxhhFz3EzM3zU2G61BxfGALCUfFlP0z+Y93fTrFKYPnA/wsZqIur30rxWWJwv77MaVHurUgeHIp+ZdT/Bq7d5ewMYu/ZMsdb7KAC4YFbvs/QP88QkIlfbW+Aq9JBctU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775834429; c=relaxed/simple;
-	bh=2PJcapuxUWWHQgHKuYh+AB0Bg9+uWPE8WWtuj/kl/pY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pocVWh7P89rBA9wrKMzcJhsnSJgqOx2lS+hx79VojTrqVf+Ia5/x0RY0tYOJc+va8fmiimt8a+bOS9p8pLx4y1tmj5JuJt3GB6OFzzoxq3Y0c5RUReR7Is6Ja6vs5zBC6wCgLiriAxwf4USTsaB9wJl1YFYS8CkGZ8Uyj0Hk+/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=VM9pR3FU; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+	s=arc-20240116; t=1775836490; c=relaxed/simple;
+	bh=OZIU1Y4MomQJ987vOntp31KLQkBAsOAm9LHhp43YceM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WYMt36p8GhGJUAI8nNcKAHH+OzStDzNVk/dQvtHwNna9KlMbAD1YKxA6vn9UstaBsykiZprRpTciXNPiwUbn/R9TVmNi7rEtZrcHbmgTtBGhDbHEWQbkBYSldmKTqo1bXZG2TdO0Vfsc+bCJ3ysCwgWLutqphIcG3mJYy67Xw7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=KAec9rYt; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="VM9pR3FU"
-Received: from trampoline.thunk.org (pool-173-48-116-90.bstnma.fios.verizon.net [173.48.116.90])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 63AFIonm015842
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Apr 2026 11:18:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1775834338; bh=eTlXD+fEi5OyNbu4TxRTwpDmEzFd2ThBwniicSqJG9M=;
-	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=VM9pR3FUqiyu4dGQLYjxtn5fwtIzfU7ySZMp0abbH18xV6/gDABRi9uB743lXz8hh
-	 DLg+D58JGiw6cmfTe96qrNZsfI1LrX8CH4Z4SZsryjUI4LnJNSYnME68kmTAWN0bac
-	 +APmObxjmRctPfSGmHJbriSXfrkN55pWYIbiVRfu2y0ECqpOPHSJun6K+BHM+LkVI2
-	 DM7T+QYmlRWbU/sqPlO03FdXluf2F9iRmmuiDmCsbPLwL4U9izV2zs90P/AyWnNi7/
-	 WJE2W3FtW9KojAgen2wKI5w3YJJGh4CS8IuF5T47bMgUta6WPQzUW9F7QaunmIRgXz
-	 enYXQQPwNnobw==
-Received: by trampoline.thunk.org (Postfix, from userid 15806)
-	id 0D7462E00E1; Fri, 10 Apr 2026 11:18:48 -0400 (EDT)
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
-        bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
-        dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
-        gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
-        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
-        linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-        linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
-        sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev,
-        Philipp Hahn <phahn-oss@avm.de>
-Cc: "Theodore Ts'o" <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>
-Subject: Re: [PATCH 04/61] ext4: Prefer IS_ERR_OR_NULL over manual NULL check
-Date: Fri, 10 Apr 2026 11:18:40 -0400
-Message-ID: <177583430870.2758959.6171961359325912353.b4-ty@b4>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260310-b4-is_err_or_null-v1-4-bd63b656022d@avm.de>
-References: <20260310-b4-is_err_or_null-v1-4-bd63b656022d@avm.de>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="KAec9rYt"
+Message-ID: <f2beb294-1fa3-4370-906b-570616fc4b88@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1775836475;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B/CYxOQShb69JYEG7bBkVnYHOenjCGBPWYX4lmGZu/Q=;
+	b=KAec9rYtn0T5NQRogDzWXkTnv+9DK4YF+6MUJpCJk4lYSHMilfZaxSiBbMH08SfVvDe+Va
+	Tt3ZUPD0OWcWwWmT8FerTmXro5OvecSbdDQ1JJSi2MSyn4ibmXDn9u7E64j4mvNcxFM0mk
+	2EqVBea62G7vNyqwjtKWDaCX5qPUc+VHE8PXzpA+alF5idKVGDBG/OCDAvUXYCW6egcGPF
+	JGGbm+54kAMwmTdLeoRpkaa1Pjv3MDJc8VphRgL00h8Tl+1jIOkQdUi7tP646Jw8jbWV4p
+	+Skci2YGzTptS1y2LZHTWRkQkfp6q/up15HdCBCs5FXI1Ur/c8NhdycvhY0+eQ==
+Date: Fri, 10 Apr 2026 23:53:43 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] smb: client: add missing MODULE_DESCRIPTION() to
+ smb1maperror_test
+To: Venkat Rao Bagalkote <venkat88@linux.ibm.com>, sfrench@samba.org,
+ pc@manguebit.org
+Cc: skb99@linux.ibm.com, maddy@linux.ibm.com, linux-cifs@vger.kernel.org,
+ linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260410150247.93178-2-venkat88@linux.ibm.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260410150247.93178-2-venkat88@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
+Looks good to me. Feel free to add:
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-On Tue, 10 Mar 2026 12:48:30 +0100, Philipp Hahn wrote:
-> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
-> check.
+On 4/10/26 23:02, Venkat Rao Bagalkote wrote:
+> On the latest linux-next following modpost warning is reported:
 > 
-> Change generated with coccinelle.
+>    WARNING: modpost: missing MODULE_DESCRIPTION() in
+>    fs/smb/client/smb1maperror_test.o
+> 
+> Add MODULE_DESCRIPTION() to the test module to fix the warning.
+> 
+> Signed-off-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+> ---
+> Changes in v3:
+> - Update MODULE_DESCRIPTION as suggested in review
+> 
+>   fs/smb/client/smb1maperror_test.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/fs/smb/client/smb1maperror_test.c b/fs/smb/client/smb1maperror_test.c
+> index 820c0dd3bcce..2caaf11228ef 100644
+> --- a/fs/smb/client/smb1maperror_test.c
+> +++ b/fs/smb/client/smb1maperror_test.c
+> @@ -74,3 +74,4 @@ static struct kunit_suite maperror_suite = {
+>   kunit_test_suite(maperror_suite);
+>   
+>   MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("KUnit tests of SMB1 maperror");
 
-Applied, thanks!
-
-[04/61] ext4: Prefer IS_ERR_OR_NULL over manual NULL check
-        commit: 1d749e110277ce4103f27bd60d6181e52c0cc1e3
-
-Best regards,
 -- 
-Theodore Ts'o <tytso@mit.edu>
+ChenXiaoSong <chenxiaosong@kylinos.cn>
+Chinese Homepage: chenxiaosong.com
+English Homepage: chenxiaosong.com/en
+
