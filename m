@@ -1,115 +1,152 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DE93B2FF3
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 11:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776080125; cv=none; b=MAtj6rk2dFTv+0eD9sOo6ED3rw6TCHwpMoNqBKY169l6IJkq2+CJr7d3qjp4WLCst4Y5m0r/PrGQI/J2LtIl+F7d231r8LS9F8GZEyBkygNgjhFEwsDucujkT221snY4/rihTmXXKDKOUkGfCdq4z4ONKkxn73NKHX/n7cixpRY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776080125; c=relaxed/simple;
-	bh=NkCG5dNKR/7tGXgar7zGy+QPPRGsKbzTG4E+VZxW6kM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a/ZeYDbFYcYVXOkRLfUAvLKxb92ZtE5Fxz4T6h38i/iRFOiIyJlKJHB9iafePZhxN4eTSSFl0ri6qoMps36Uso6svsqhri8smXB+WXBF0sfAsMKhuzHC2zor5EdJ/k9YlNlN1dpeSbo/UW15PoJPDmzn0SnHrXbwjH8yv+II5Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=I/fYNAoU; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8423B3CA4A8
+	for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 13:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776086999; cv=pass; b=jdOb/rD4iBDZMRYkUvxilCTKsNNZHacBlRtiRlbVmVp+4bDMKcrHAf3sgdBKhkxwaP1Giau08JpTu0AfKKXAhQbn8dbrMDr5wGypzJKTAFwwHCC2o0Z8kZMathcplKRXVgmHqMv6GyBHuuag2IswyyFQmJ68vnMuPb5U69jAOVE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776086999; c=relaxed/simple;
+	bh=g0CAVjZHZKt0+X1c8km9qbv7eZV24rgR+3dLCKEEfPE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gwQT0hhxqeqa6eqgPT7i/nbY7tJn20+Jf0mIxbrG9E5iKP+FiLKfTEQ9jOO4MLAysGbQkiAa8NrpQWSqggUZD4GWHOv3ayWphrYDgrcGmzut6otBpGioF+M/tpij326QMO4ahaHjj4NJ4J+nUP12rqBeSQkRis8yLfTYCW9P/fc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LLNX+CRA; arc=pass smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="I/fYNAoU"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-482f454be5bso45806825e9.0
-        for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 04:35:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LLNX+CRA"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-8a58057d7baso48422966d6.1
+        for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 06:29:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776086997; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Rc//TTkODVqW9NVlouj1PGUGehcfNLYmsXqeGJirCF5JUTA4uLHlZSi6I5YosLkwFc
+         kMvHGW70jHbyxLWrN7+o7YbRv6jjPaTvloPjbB/Plk33i4R76rKUm1fCZ+cEq3LwTPBP
+         Os43misLbYFRVyxSVaVVho91DYWp//EDe/QIpFC8OA9gi2Y1lnhL1a+SJDFEn8BtBuTC
+         /a6npnrnkHdrMbceys6RWMIJR4RKj+s2RQa5ly7Zci2OfITR+H93wHh7ICrUJWodh1RY
+         c2Onqlt1K6mN6ACGnOiBl0LjJvO+/wFppcLg9PtmCojkeQDUfKCa7VlnrOaqIudFhN4y
+         XFTw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Qt2r1TaV663knZA9RDtX++CGJ4T04oYta/wYOgVpjMM=;
+        fh=32o+Z0pZ9yfOrvi7M40VdOzzOOBPR1qbHH1hJuJCErk=;
+        b=G5/lHFs8zLZVn8BcGKHRYzkRiaixZ5TlmjMDsLEEUsbtQE3TWbdAs3YbBXeQnIOa+0
+         bKm3vYVc9ghhUNoy5a7zvbJwJoh20n/kCIq38bjfdYsN2z2AXH+EWUowWRpq+i8c7NFP
+         hpVOPRHW0wUheJWNTZ3yLUL0dgCW0/hzUnDZNi53X4ukt6QQ8RHyCn9ZCj2bs7RvsnBc
+         3SPP94P2HJAjAHjtD6FxyGANfDkWUbhiGdmIinBFk5AsTXJ54I0AcEp/H6EtRdE4/MnQ
+         otlQa4TYRM5wdBOA9dQSqgClh1i54tVZgUhhOScxWnXzeU/ypVXLcbgtRwiOCAhjaJMz
+         b6ew==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1776080122; x=1776684922; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4lt6lkZuAvrUzCTFC1yOHD1wDn40gr5BAHBhSXGovSE=;
-        b=I/fYNAoUu+SIetY210TSK2rVyW1q+WfXLRx3GChIlpzKSnjJ2oPDEBHbiPECvoUy3t
-         H9Ml6HdWbQP56sim1n6azEQ6+M2LDrRgmV3hRf60iBLav9n/cbXCuWEyEreIYyQDMkPX
-         D0Nh7urgW/UaK2xGMLspocFjEeo1U7717B6cEFGAPDgw5cn3PxB4IsBcpVYRPrcuFAmQ
-         SnHh+LI4/s31Lc55ImBUZC744N3F3l1C4W3OOfvJ4nBQSxNvoXexA++eaOsUZTv6e72Q
-         EYoum5DieZ7URBASJv0l6zKjYgVmESBDWhbWadA1fjSR5C0Yiy0ai0Z+Vnh8QGPHpvai
-         cz7Q==
+        d=gmail.com; s=20251104; t=1776086997; x=1776691797; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qt2r1TaV663knZA9RDtX++CGJ4T04oYta/wYOgVpjMM=;
+        b=LLNX+CRAlCwfclVxoKDPxmIyZzZ4gICRXtj9lqJ9zv9vdvPPGkeQ4pfSIXNQPPs2NP
+         5STw6giaJNWio2muWUWyzmqZGQoKVemgxCCYDej5tSaA5TtmLy60VDy5C+9nkZet0nnz
+         EI4N23hHfP1Pvicy9yxtciINghqxIYmVYHJJPuVnUUvJcO+6/GfsjDSMuVvg3Km7SScO
+         yJ7fzIIcnAYFScDSZ7yZiKuGvzTJ3ayQG4nsVF5EuMZMAxJCXpfhesIOk4pqeT/dXpJT
+         SN4MYCJySTmEDpK1hS0FdhplEwlpece8S9rNwU6SYEwPBdGAfTyZU3xP0A3vF26xM12w
+         iT1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776080122; x=1776684922;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4lt6lkZuAvrUzCTFC1yOHD1wDn40gr5BAHBhSXGovSE=;
-        b=r2ncUa2pFW9bnD9z6/3eaNmiM28ycjjwWPnBQgoJh9oH/WwH6mkwSKJJuK9CAI1P1I
-         B4zwI+iho/j+YeEHq0YyANuvp0Y3UEXt2QT5BjqTSPlbePo7OUwVBmJKlS6OG+t+jtuT
-         7L2RqRHUtlkNm8dbmb/pNiA16qPgFqEryPnsfp01WDIpSArh4r+zSoh1zBFq8BQ0+Ewk
-         J3zHXbpE5s/Krv8hQfVPVttJxMsPt2dv4pvKCHgA3EFRrCveqCV53tFEIKV331Mn/xj7
-         0eodB9i+A36sOju2J+vK6DtmgZpwnVTDLOXj6Q7pMcB/bZtXYwqXi2pS7mn/THxLcbJW
-         Zyig==
-X-Forwarded-Encrypted: i=1; AFNElJ9D9OB75pnUG8H83zCPHXTrircUxQ3eTENOkPCbn8eOFIN2YMyHAN+WfyJJENbqo2OX2M7sztVaBt23@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWK1uNPryLiXI1bFhlNHeja4Q4jfJbkzdMfBsBnfZCp3ETc9rj
-	p+6GGM8BYD9UBAkaTYuCL6k/UzH9qcAuTDpeGAHsaPaFKDIJqdN+nZJ4+SHnwN+w+CU=
-X-Gm-Gg: AeBDieuoYLYZuprSsLxNJCTEeo7/Ry4f6YDLNCksCFZm/Y9ZSPn5W2GSj5yoddmfxLa
-	pd/tJ+cJyIaVXmMvNv8QJHB6MIec/pVr3xgQkx2zhdYz3AfwfkKbtnE4JR9rt3XZQ2RTCBSnVEX
-	SfLLMCDSJ8vLY3FoOHZlfqQsPzRnx8a9nqZJcSH7Fg3HVb0qgdODKqeLp236kk5zfA9YRIAVM+f
-	H+FTT28mv7XDnL6d5KUmGH5DOeOBDaBMEG0vA03MGQG5PM0DErQfLJ1zuNf7z2UpSY7/0kq2EgC
-	JIqVI5ud80gY+F7Ky+fgV4+mjR8KNRXRmEk4Ktd5rwSrsUjNw8lZOm2D88bgxjJ0t2N1B4GYZ+m
-	JyauvShmsFR2YHyN47ZgODkIIlNxbX4jLFVIwzy2wMlGftEO1pL663E0yxPwBTIPALTGJOXL9jV
-	eYUrmsBYy0kRLTxJC/YGwZAssupvJ5AXU=
-X-Received: by 2002:a7b:cd05:0:b0:488:a9c3:44a3 with SMTP id 5b1f17b1804b1-488cd4f463dmr164345755e9.2.1776080122044;
-        Mon, 13 Apr 2026 04:35:22 -0700 (PDT)
-Received: from precision ([2804:7f0:6401:5290:433e:afae:f475:c9f7])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d55faa586bsm18631266eec.11.2026.04.13.04.35.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Apr 2026 04:35:21 -0700 (PDT)
-Date: Mon, 13 Apr 2026 08:35:15 -0300
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: Shyam Prasad N <nspmangalore@gmail.com>, 
-	"Dr. Thomas Orgis" <thomas.orgis@uni-hamburg.de>, Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, 
-	regressions@lists.linux.dev, stable@vger.kernel.org
-Subject: Re: [REGRESSION] failure to reconnect on SMB server restart with
- custom TCP port (not 445): Host is down (at least since 6.6.95)
-Message-ID: <xsj62z4aad54cseq4ug2cpj3x3tqjucjxkgv2c45lihhc54l5r@wjmkrz3q4r5m>
-References: <20260310235642.6d9798f4@plasteblaster>
- <c66p7dr6vlujvnwczbnrmqx7monkdgdnm4rwewm76aibn7jza3@d3uik74dei72>
- <CANT5p=q2Lv4pSvEm5EWcM73b7NZsbt1kYEFJtjaAZRS6Gz_OjQ@mail.gmail.com>
- <42utcrhajix2x3feckj7ap373osq65sgfz6ximnaj4rasszret@ymhf44ddz2wh>
- <e21c9e47-36e2-4f15-a7a5-af239a0abb89@leemhuis.info>
+        d=1e100.net; s=20251104; t=1776086997; x=1776691797;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Qt2r1TaV663knZA9RDtX++CGJ4T04oYta/wYOgVpjMM=;
+        b=CBtH7yLDwJmXpUwvrsz/6TQX3lag9FIw4W7ptpkOa5HBIXvNcKX/MzrL0X67ykkHBj
+         Dx9TaF01oD3bRTjDLugQa1hLRM7jjr42mMt+xxArFPjNQaYMh7mshomYHAOcCVPovm1Z
+         telQuI2Qm477Y3HY2US3pJQVN9YsDU63e+izEpnC2V279UlcHATtgJNRg+P5INah3OQN
+         hOflaH8uijQRxRpNTVXyIKBZQm1Rp7TfpMMJ0ucTDivynyrV5QDXSyHOhSVpCFM017X2
+         dyBF+rRNPXwgwh8MzULeZg0DuK7cl63j2M2L03lUzfrca95DVDFw9UC+HJbLjy5tPNaD
+         76ZQ==
+X-Forwarded-Encrypted: i=1; AFNElJ90PLBQGlCAw3nY7PdHj29lN4OGOB/GQ73QQhoiRXAxSQL/0y70D6OVQ8n9hubV5cihv1NJ9xTLfeuq@vger.kernel.org
+X-Gm-Message-State: AOJu0YwomYgyaFfhwmf35k0yIgIomx9JxHJsNpVLZna+EiFfF9dHhPGP
+	aQ67L9d8S2hph+kO1SUAEqv52DrZGgxfefwVAG9hlXzawMl6UOgDAUfRcJ7rcswAIlaRxntkU9W
+	fRPsgxC0AmYmUpd3bDy5ju2WOtskjIz4=
+X-Gm-Gg: AeBDiesr9HVid2Z+bA12X2cQicOk9ibJAJXTWxfQrCAr4DoMyCUTixh/RVviu5ksSx4
+	YyZ1mHN8QEbiwNEAitoBhGJxxvgXuSeHBbZ1k2mD8jJjh9KPuCAJWVNa4MKJO5Ri0TQnGwqan70
+	lAb0o+puXuFeAb57VymlF5UjjGV2A/sUt3PlJnJdW4sJx1wt+10L+kfqJW9/KIMBfXdvC81/9F0
+	/RL3zsAxqd9iSsoqqdu4v1AU6AiIWPmmggWtPaBMO76MtMh0h2yDjGidW5r6pqloOg89ufJ42xw
+	YO29vg==
+X-Received: by 2002:a05:6214:4602:b0:8ac:74d7:dd17 with SMTP id
+ 6a1803df08f44-8ac862f1d3dmr206027766d6.50.1776086997355; Mon, 13 Apr 2026
+ 06:29:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e21c9e47-36e2-4f15-a7a5-af239a0abb89@leemhuis.info>
+References: <20260409095926.905020-1-rajasimandalos@gmail.com> <20260409095926.905020-9-rajasimandalos@gmail.com>
+In-Reply-To: <20260409095926.905020-9-rajasimandalos@gmail.com>
+From: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+Date: Mon, 13 Apr 2026 06:29:46 -0700
+X-Gm-Features: AQROBzCeE6jrulhnepsXQX_7tRjmDcNV5WQAOG8kWBHLKSDBR3FNxO2-EPpUZa4
+Message-ID: <CAFTVevXf-sV8Z15Qyb=LtcjDRy64R6pyMwFVtpytqXpOmbR4Qw@mail.gmail.com>
+Subject: Re: [PATCH 9/9] smb: client: apply rasize on remount
+To: rajasimandalos@gmail.com
+Cc: sfrench@samba.org, linux-cifs@vger.kernel.org, pc@manguebit.org, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+	metze@samba.org, bharathsm@microsoft.com, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org, Rajasi Mandal <rajasimandal@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 13, 2026 at 01:16:03PM +0200, Thorsten Leemhuis wrote:
-> On 3/12/26 16:03, Henrique Carvalho wrote:
-> >
-> > Sure, I read the comment in the code and the MS-SMB2 protocol. The
-> > protocol states that "client MUST ignore [Port] on receipt". Since we
-> > are not using p->Port, I don'se see how this is a protocol violation.
-> > 
-> > We're using the port that was selected on mount and copied over to
-> > server->dstaddr, so that when server->dstaddr is overwridden,
-> > server->dstaddr keeps the user selected port.
-> > 
-> > Now, even if we only fix that for primary channels, the secondary
-> > channels will still get the wrong port when they are overwridden, no? So
-> > I don't see how that fixes the issue.
-> > 
-> > Apologies if I'm missing something.
-> 
-> Lo! What happened to this? I saw that Henrique posted "smb: client:
-> preserve destination port when parsing server interfaces" a month ago at
-> https://lore.kernel.org/all/20260311160856.635916-1-henrique.carvalho@suse.com/
-> which looks like a fix[1] for this regression, but unless I'm missing
+Hi Rajasi,
 
-That patch was updated. PATCH v3 was the one that made to the tree.
+Before syncing the contexts, you should check if rasize has been
+passed during remount at all. Else, we run the risk of overwriting
+cifs_sb->ctx->rasize to 0 (the default value).
+Please check how rsize and wsize handle this (a few lines above):
 
-See commit d4c7210d2f3ea481a6481f03040a64d9077a6172 ("smb: client: fix
-iface port assignment in parse_server_interfaces").
+/* if rsize or wsize not passed in on remount, use previous values */
+ctx->rsize =3D rsize ? CIFS_ALIGN_RSIZE(fc, rsize) : cifs_sb->ctx->rsize;
+ctx->wsize =3D wsize ? CIFS_ALIGN_WSIZE(fc, wsize) : cifs_sb->ctx->wsize;
 
-Best,
+Thanks
+Meetakshi
 
--- 
-Henrique
-SUSE Labs
+On Thu, Apr 9, 2026 at 3:08=E2=80=AFAM <rajasimandalos@gmail.com> wrote:
+>
+> From: Rajasi Mandal <rajasimandal@microsoft.com>
+>
+> rasize is accepted during remount parsing but sb->s_bdi->ra_pages is
+> only set in cifs_read_super() at mount time. A remount with a new
+> rasize value silently has no effect on the readahead window.
+>
+> Update ra_pages in smb3_reconfigure() after the context has been
+> duplicated, using the same logic as cifs_read_super(): if rasize is
+> set, use it directly; otherwise fall back to 2 * rsize.
+>
+> Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
+> ---
+>  fs/smb/client/fs_context.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+> index d804e5da578e..bba642442ae3 100644
+> --- a/fs/smb/client/fs_context.c
+> +++ b/fs/smb/client/fs_context.c
+> @@ -1504,6 +1504,12 @@ static int smb3_reconfigure(struct fs_context *fc)
+>         smb3_cleanup_fs_context_contents(cifs_sb->ctx);
+>         rc =3D smb3_fs_context_dup(cifs_sb->ctx, ctx);
+>         smb3_update_mnt_flags(cifs_sb);
+> +
+> +       if (cifs_sb->ctx->rasize)
+> +               root->d_sb->s_bdi->ra_pages =3D cifs_sb->ctx->rasize / PA=
+GE_SIZE;
+> +       else
+> +               root->d_sb->s_bdi->ra_pages =3D 2 * (cifs_sb->ctx->rsize =
+/ PAGE_SIZE);
+> +
+>  #ifdef CONFIG_CIFS_DFS_UPCALL
+>         if (!rc)
+>                 rc =3D dfs_cache_remount_fs(cifs_sb);
+> --
+> 2.43.0
+>
+>
