@@ -1,62 +1,63 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533CA3B6BE8
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 19:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F0D37EFFA
+	for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 19:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776107483; cv=none; b=pazH79GaMGW77WmsLrCKfQvflVE+1u3fNVJou1cRalfP4H83b+XNyFTYObUfJckPd4reG6zUxqUTPduLEbpfA6Y8FpJ4QcotL2BGg2MDeu6GPlIrpwnxbQ3Hoyl8dRYqD/T4ztr3Q8AUV7DXoz0GGwxvrQ4vpDdABcUn0+hyEXw=
+	t=1776107502; cv=none; b=TZumbtxv6FeRT+aRLsRNopOodrGpmAXNFN51efekOjHaTJtrwUZG6LTm0if5ltq7sxqDmmPTN7laAOyyN7X7Zf/j17USTbCBHQfX2xjXl8j/Ux/OrJ/12LBHwPkhCo04LY5xQU+i/1xI6N3Tk7yjNVbvT9gwwe9vS6UdgsiJ9+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776107483; c=relaxed/simple;
-	bh=E2hjxYStm3aD6IMH0x56H1eA9O7MIAYApbvv/cTbWNs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bTNHMnUIvS1XuYT8dSC3joY1i4sLBCfsukO3Qb7AgNYp0R+qnI332Dpgp6y3J8VVH2Pxq8j6bKaGq4S8fR5phrRGZRheWaxjlfVEhN35Y4jOJDbKIfCkjicHMlhZO8NL5cTxpF/nxKljy/mjWUD3a76W/x4Y69yq/GfCMaiVxqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=OUXumIF8; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1776107502; c=relaxed/simple;
+	bh=f9oCGipDy6RcLee8mwGZHQR7Mqjd2U38RG0Ya7eHqI0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=a2TxeVnl6IBIQGHU2a47TZ+LWBVr7nQCc5toUu6Kl0Na3PkF8VICftmtAxw7X27ml7rjkvlGqIaHpxMXb1myYLOW/UOfgR5f+8P7QAnpxZNZyvXO3urc9pLU+ThbXTpEcsQsu2dv8SrB1ytYQjcO151z5h/jRxaKWH1rStx7+AI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=J3yExkq/; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="OUXumIF8"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488afb0427eso59687455e9.1
-        for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 12:11:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="J3yExkq/"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-488ad135063so46111525e9.0
+        for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 12:11:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1776107481; x=1776712281; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fXWGSvkFU16FgOFRkCaaPZi61w++nh88NCvP7Zfs+t0=;
-        b=OUXumIF8AX3lCnvtPOWN1pLHMorUFBkYKEcjLV69DTQNZDtECiiWfMJ6MRk3VLpqYE
-         0ojH3vi4S6K7VUX4R3B8rwKUQQs4HMuHUvp9Em6QRI4SO0zth1JEmdTUhsU60XZgVW7f
-         ZVRD5HNHreH+NKT9pfq2kKnIrUylru0MCIi3tZfOuyhL3GFK3glTZfxh2Qtl3GLv/wfK
-         7qfTX6Fh7/6vXCDAf/0Xaz1G1KDmAjnhN6AMsTDJWe43PXOo/C5NDU5XG//sgV5NxCwj
-         EV1jiOPWDAywFgskNDhDJDmarPU9N3Eef0Mfe1YME4LMPRMa0yNurpow/Hv4B7PgEF9H
-         A8Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776107481; x=1776712281;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=suse.com; s=google; t=1776107500; x=1776712300; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fXWGSvkFU16FgOFRkCaaPZi61w++nh88NCvP7Zfs+t0=;
-        b=Ltu6vlavJRmCfymR47CuvKf60Y9b0dLxUf7oa6jOrDzPTmqTpbeVR1ljgy2nhZNpZF
-         tFkDf3DsEEHd1akIIHCykyXOWGGTiHM0JSimZ785WL2moXzikPYiTQsB5LeKWPlIxaSw
-         5rSOmoGgv3mOBe+2/q5aQMbUV1C2d9KDvpDczRU5p9spAvx4zbO8SXRW/qShX1WuWWjN
-         /xAqhC0pEld90tlEOrVuZCe5n/zmBlrA5rktbPQB6u1MEujtngY7wSzokavli4Gkmr56
-         3b4u7EJN9opcM5wIWu4vm4HNAnzd7hCs+M8oqcLcNVJXiNmrUZd6SxRqZFiWKzrNDyAj
-         QPnw==
-X-Forwarded-Encrypted: i=1; AFNElJ98pryrZgGO+JDPjTvcQy7wKxGh6H01AtBo5hpDKfbCqpqvIS27gR9+7JRC9fp3ZnZ5xWJjhIytKf9I@vger.kernel.org
-X-Gm-Message-State: AOJu0YyokaggVbZQ+NiTb0x+LI72nCx0VMHHkAXUjHj4pgE0SczBFM4S
-	rAgcYnhuh37B/74FQjrrrRID1UDYiVxVIk7FGeDTHKayvzEbTSzBRALoDCucIiLmPk70A4hvVNP
-	h35MwzkY=
-X-Gm-Gg: AeBDiev574L/EFm3Vxy047IbgTpuDOL4ltCcNPbUVW31Qy3/Gdy3q6GWjrSYqUlbpAk
-	sOEwyJJDecMkVxWlOURk1fd/M+jlPAo8X5GyVYYxjgBwe5chqrhknZZIZug4rOKTtsIlRqhi7LQ
-	V1YjYNW9iY3ZLiLytg9TREuIpmJOXt98o4gb3P3Bt61OAzXXgAxIWbWwiSmwTGo+zwGD2kKiTFR
-	c40xGu7SAHn6+pwiNOC5OEcU4/gqpy5T2icEBA6IL/AOkK9d7IrFzo65SLGi96RqROUXHDK/JZv
-	z8qGLoVMTcjlrrekTZh27eber/7reXHe9+xsAAKphzZyGQoFkuFLd/pStcW9HEZQFkQNDC6n+8n
-	sq1+vPFPVmqXG9o4vF5dC17KNsaGJsxpoN6NzT2f5DZs7VHMtLoI9MaojIEVkdj/KxUtR/4B+NR
-	vy7fNTCNouWFb74iM0GyDqg1+y7bdL3eg=
-X-Received: by 2002:a05:600c:3f0d:b0:485:40fd:8390 with SMTP id 5b1f17b1804b1-488d68769f9mr181491475e9.26.1776107480576;
-        Mon, 13 Apr 2026 12:11:20 -0700 (PDT)
+        bh=3nCfqvin2GADlXqoFK8yPp3FrJJtNV6XYhevnyEsvuc=;
+        b=J3yExkq/eUdMKl/tyHfOCOOcCpVY0AhMLrU1K6qAW8AoQfiUMsHzAaBMD7aaJpWqMA
+         5b2lMpJvSZ2iEGqAcgDM6KcHFXr9EJClp7rzJ6VACq+YKep3p++aF00kaqg/NZj3t600
+         UD+b3J+J2rpEqtGO8Jg/b7e7f11UjTxK9rNLBZbYvscr14t2eEzrLWMvM09qSn8NZaqJ
+         Cffy4MVAqm4ENslu71GGnEscMZqdnDr6ACHqHFyj1XuKmIjiJNzuqqZsJHCBLg3sgVRe
+         mcXDgadBqisFy1zM1B2v0OxQ8B43rjQNWCsGJ8jlpZzql0BKJ8pUpUSclL7YfCaNq3rl
+         WkZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776107500; x=1776712300;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3nCfqvin2GADlXqoFK8yPp3FrJJtNV6XYhevnyEsvuc=;
+        b=b7R8fGlGUxEHkLPlQFkjeJJ36eGyuzrZpP7sQXQhDtFGSFY5+RW+x9F99/b0IEJn5M
+         86ttFhR8Rj4wCluuXHLeD5bMA0GZaUxb7zka2/Ko42iEThKlxRdfU6ni24L4DsYasnYb
+         BB0z7BJrbFiJihBrCjW3U5Wr8U6wcXUBkaO+yVHc0ylYG1d/Nqm+MJcRInr9Pye82skI
+         S8tF2qhv8dCqf99LyZmR/JRDElYjmxxwPpVtoLAk7m8Q6081GmEy57Ah3KmnnLC/LQjV
+         oSRZ9NezbmNMNjobZq7BCJy5YENEQpAVAd1a4LXha3K1+simugItL7eOe9RZdWeJoOQG
+         NKMg==
+X-Forwarded-Encrypted: i=1; AFNElJ/Cu/su9qwyUhk8IhVTnzxDKP8KSEDlhAw0OgJJrv430GmLhJYXP2UlEb/3yquAFCpQXEP2YGg1wA2G@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBA64AQ1B26x03QD7z+edBSXnngreWb/e/fpFd7lKRAcVJfsBx
+	nS7SpoqcQ05wO7xgfRiWadIskQpFUvT8HmcOzCtnzGz4JeU/RrvgTtCS11bYPbiCB2Y=
+X-Gm-Gg: AeBDievcu24bMYcXT6j5xYPYdnH1pMrjLGBlZIUFdU1y+MsSXhvW0t3gJCZeigUo8B0
+	X/YWAVem66DrpCBY46Rj3oXkCpnnXgFu8y+JmuJTBYXPiHXsYzPRWocAg9F1VJURa/nnytqFiwA
+	b4A04g1qnpnMawGv0swxrGnio4mavqQjpqqOQosiQ/v6JwapwXvyRdqCuICflHkZJUtsRnmfuPT
+	5uhNAvhvhi7Ta6VUS/gIUKD0imzT8ZNmy9ESirZNFy0DiMLsMRIfqKk4IJxEnwpDGw4znhO8sD9
+	t1nfvKAOpflRddzQ+Ci6UlUqMMlBCo9GkGaCKeH5l0lXGlChJVcJPomHARajC+6pJCI9RNutLnv
+	upwyD3kOHS4rN1bQI31hEOH9TBBSgmkJwC1uUo9lJ+sqd37nEIoqh8khXcTC2Ws4oecxGm31XtL
+	j10sMqf2L+ONSbz8VjOSMlQX5Qa13u2+fTGBvt46J0Ig==
+X-Received: by 2002:a05:600c:8b27:b0:488:af7f:775f with SMTP id 5b1f17b1804b1-488d68766c7mr185272365e9.18.1776107499704;
+        Mon, 13 Apr 2026 12:11:39 -0700 (PDT)
 Received: from precision ([2804:7f0:6401:5290:433e:afae:f475:c9f7])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d55f5c6afdsm17508032eec.4.2026.04.13.12.11.16
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d55f5c6afdsm17508032eec.4.2026.04.13.12.11.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Apr 2026 12:11:19 -0700 (PDT)
+        Mon, 13 Apr 2026 12:11:38 -0700 (PDT)
 From: Henrique Carvalho <henrique.carvalho@suse.com>
 To: sfrench@samba.org
 Cc: pc@manguebit.org,
@@ -67,10 +68,12 @@ Cc: pc@manguebit.org,
 	ematsumiya@suse.de,
 	linux-cifs@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH 1/2] smb: client: serialize channel scaling path
-Date: Mon, 13 Apr 2026 16:11:09 -0300
-Message-ID: <20260413191110.1508848-1-henrique.carvalho@suse.com>
+Subject: [PATCH 2/2] smb: client: pass correct from_reconnect to cifs_put_tcp_session()
+Date: Mon, 13 Apr 2026 16:11:10 -0300
+Message-ID: <20260413191110.1508848-2-henrique.carvalho@suse.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260413191110.1508848-1-henrique.carvalho@suse.com>
+References: <20260413191110.1508848-1-henrique.carvalho@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -79,155 +82,74 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Channel scaling serialization was coded at several call sites with plain
-flag values in ses->flags, which duplicated the same bookkeeping in
-reconnect and remount paths, and was missing in the mount path.
+cifs_decrease_secondary_channels() tore down removed channels with
+from_reconnect=false, even when the shrink was triggered from reconnect
+context, which could synchronously wait on reconnect work and break the
+reconnect-side teardown path.
 
-Move the CIFS_SES_FLAG_SCALE_CHANNELS acquisition and release inside
-smb3_update_ses_channels(), and convert the session flags to bit indices
-and their operations to bitops.
+Pass down the from_reconnect argument to cifs_put_tcp_session() so
+reconnect-driven channel removal uses the same non-blocking teardown
+semantics as the rest of the reconnect path.
 
-Make smb3_update_ses_channels return -EBUSY if there is already an
-ongoing channel scaling operation.
+This is a minor fix. I believe this bug cannot be triggered in the
+current state of cifs.
 
-Fixes: 556bb341f9f2e ("smb: client: introduce multichannel async work during mount")
+Fixes: ee1d21794e55 ("cifs: handle when server stops supporting multichannel")
 Cc: stable@vger.kernel.org
 Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 ---
- fs/smb/client/cifsglob.h   |  6 +++---
- fs/smb/client/fs_context.c | 15 ---------------
- fs/smb/client/smb2pdu.c    | 24 ++++++++----------------
- 3 files changed, 11 insertions(+), 34 deletions(-)
+ fs/smb/client/cifsproto.h | 1 +
+ fs/smb/client/sess.c      | 4 ++--
+ fs/smb/client/smb2pdu.c   | 2 +-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 709e96e07791..7b1323927711 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1049,8 +1049,8 @@ struct cifs_chan {
- 	__u8 signkey[SMB3_SIGN_KEY_SIZE];
- };
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 884bfa1cf0b4..b00b2e070ada 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -374,6 +374,7 @@ bool cifs_chan_needs_reconnect(struct cifs_ses *ses,
+ bool cifs_chan_is_iface_active(struct cifs_ses *ses,
+ 			       struct TCP_Server_Info *server);
+ void cifs_decrease_secondary_channels(struct cifs_ses *ses,
++				      bool from_reconnect,
+ 				      bool disable_mchan);
+ void cifs_chan_update_iface(struct cifs_ses *ses,
+ 			    struct TCP_Server_Info *server);
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index 698bd27119ae..47bb566c8731 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -273,7 +273,7 @@ int cifs_try_adding_channels(struct cifs_ses *ses)
+  * Otherwise, it disables all but the primary channel.
+  */
+ void
+-cifs_decrease_secondary_channels(struct cifs_ses *ses, bool disable_mchan)
++cifs_decrease_secondary_channels(struct cifs_ses *ses, bool from_reconnect, bool disable_mchan)
+ {
+ 	int i, chan_count;
+ 	struct TCP_Server_Info *server;
+@@ -319,7 +319,7 @@ cifs_decrease_secondary_channels(struct cifs_ses *ses, bool disable_mchan)
+ 				server->terminate = true;
+ 				cifs_signal_cifsd_for_reconnect(server, false);
+ 			}
+-			cifs_put_tcp_session(server, false);
++			cifs_put_tcp_session(server, from_reconnect);
+ 		}
  
--#define CIFS_SES_FLAG_SCALE_CHANNELS (0x1)
--#define CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES (0x2)
-+#define CIFS_SES_FLAG_SCALE_CHANNELS 0
-+#define CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES 1
- 
- /*
-  * Session structure.  One of these for each uid session with a particular host
-@@ -1089,7 +1089,7 @@ struct cifs_ses {
- 	bool domainAuto:1;
- 	bool expired_pwd;  /* track if access denied or expired pwd so can know if need to update */
- 	int unicode;
--	unsigned int flags;
-+	unsigned long flags;
- 	__u16 session_flags;
- 	__u8 smb3signingkey[SMB3_SIGN_KEY_SIZE];
- 	__u8 smb3encryptionkey[SMB3_ENC_DEC_KEY_SIZE];
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index a46764c24710..e0e13c22e159 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1166,27 +1166,12 @@ static int smb3_reconfigure(struct fs_context *fc)
- 
- 		/* Synchronize ses->chan_max with the new mount context */
- 		smb3_sync_ses_chan_max(ses, ctx->max_channels);
--		/* Now update the session's channels to match the new configuration */
--		/* Prevent concurrent scaling operations */
--		spin_lock(&ses->ses_lock);
--		if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
--			spin_unlock(&ses->ses_lock);
--			mutex_unlock(&ses->session_mutex);
--			return -EINVAL;
--		}
--		ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
--		spin_unlock(&ses->ses_lock);
- 
- 		mutex_unlock(&ses->session_mutex);
- 
- 		rc = smb3_update_ses_channels(ses, ses->server,
- 					       false /* from_reconnect */,
- 					       false /* disable_mchan */);
--
--		/* Clear scaling flag after operation */
--		spin_lock(&ses->ses_lock);
--		ses->flags &= ~CIFS_SES_FLAG_SCALE_CHANNELS;
--		spin_unlock(&ses->ses_lock);
- 	} else {
- 		mutex_unlock(&ses->session_mutex);
- 	}
+ 		spin_lock(&ses->chan_lock);
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 5188218c25be..2eb13b2665a4 100644
+index 2eb13b2665a4..cf7b74a2b9b0 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -228,6 +228,10 @@ int smb3_update_ses_channels(struct cifs_ses *ses, struct TCP_Server_Info *serve
- 			bool from_reconnect, bool disable_mchan)
- {
- 	int rc = 0;
-+
-+	if (test_and_set_bit(CIFS_SES_FLAG_SCALE_CHANNELS, &ses->flags))
-+		return -EBUSY;
-+
- 	/*
- 	 * Manage session channels based on current count vs max:
- 	 * - If disable requested, skip or disable the channel
-@@ -243,6 +247,7 @@ int smb3_update_ses_channels(struct cifs_ses *ses, struct TCP_Server_Info *serve
- 			rc = cifs_chan_skip_or_disable(ses, server, from_reconnect, disable_mchan);
+@@ -206,7 +206,7 @@ cifs_chan_skip_or_disable(struct cifs_ses *ses,
+ 		return -EHOSTDOWN;
  	}
  
-+	clear_bit(CIFS_SES_FLAG_SCALE_CHANNELS, &ses->flags);
- 	return rc;
+-	cifs_decrease_secondary_channels(ses, disable_mchan);
++	cifs_decrease_secondary_channels(ses, from_reconnect, disable_mchan);
+ 
+ 	return 0;
  }
- 
-@@ -432,15 +437,6 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 		goto out;
- 	}
- 
--	spin_lock(&ses->ses_lock);
--	if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
--		spin_unlock(&ses->ses_lock);
--		mutex_unlock(&ses->session_mutex);
--		goto skip_add_channels;
--	}
--	ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
--	spin_unlock(&ses->ses_lock);
--
- 	if (!rc &&
- 	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL) &&
- 	    server->ops->query_server_interfaces) {
-@@ -450,11 +446,11 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 		 * is in progress. This will be used to avoid calling
- 		 * smb2_reconnect recursively.
- 		 */
--		ses->flags |= CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES;
-+		set_bit(CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES, &ses->flags);
- 		xid = get_xid();
- 		rc = server->ops->query_server_interfaces(xid, tcon, false);
- 		free_xid(xid);
--		ses->flags &= ~CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES;
-+		clear_bit(CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES, &ses->flags);
- 
- 		if (!tcon->ipc && !tcon->dummy)
- 			queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
-@@ -492,10 +488,6 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	}
- 
- skip_add_channels:
--	spin_lock(&ses->ses_lock);
--	ses->flags &= ~CIFS_SES_FLAG_SCALE_CHANNELS;
--	spin_unlock(&ses->ses_lock);
--
- 	if (smb2_command != SMB2_INTERNAL_CMD)
- 		cifs_queue_server_reconn(server);
- 
-@@ -609,7 +601,7 @@ static int smb2_ioctl_req_init(u32 opcode, struct cifs_tcon *tcon,
- 	 */
- 	if (opcode == FSCTL_VALIDATE_NEGOTIATE_INFO ||
- 	    (opcode == FSCTL_QUERY_NETWORK_INTERFACE_INFO &&
--	     (tcon->ses->flags & CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES)))
-+	     test_bit(CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES, &tcon->ses->flags)))
- 		return __smb2_plain_req_init(SMB2_IOCTL, tcon, server,
- 					     request_buf, total_len);
- 
 -- 
 2.53.0
 
