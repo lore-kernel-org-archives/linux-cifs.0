@@ -1,94 +1,76 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912541A3166
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 19:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533CA3B6BE8
+	for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 19:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776107299; cv=none; b=clRKeajo1HYKyDFzLvbB0IG9JXTDGNy8GwJCF1ombyWsGNWhdRl9E9HsbnKNvAVLAaSMkD81trIGI8RfbTEr5s5Eb5YeS2vo3yda3qqehoeb5hfRTJ2x3nCwZOM/DeR3LSAk9Vr80epx3PocYm50VilpBDUULyDV3F4E8aolQwM=
+	t=1776107483; cv=none; b=pazH79GaMGW77WmsLrCKfQvflVE+1u3fNVJou1cRalfP4H83b+XNyFTYObUfJckPd4reG6zUxqUTPduLEbpfA6Y8FpJ4QcotL2BGg2MDeu6GPlIrpwnxbQ3Hoyl8dRYqD/T4ztr3Q8AUV7DXoz0GGwxvrQ4vpDdABcUn0+hyEXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776107299; c=relaxed/simple;
-	bh=dlaX8MnrFI35YUNAuoemOBrbgxuU+rRc9OKW9U44tAE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aFnzWgvIYhamu3I+ttSrPkl6BLLrCIKuxjdwXI8ualnaKUWxmVw3L6BC5lZXJEO3MIfFwddVPN1rsiyQczoQPp2e0Uu1pWtcqxpyLzTH1lCSR2KmwJOxvoSujC1LBfiByzXhfiCcpKpjD0wt5A7Vaqa9H41pLdXGzkpDODMkhII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=g7M3BHrd; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=B0b8vIER; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=g7M3BHrd; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=B0b8vIER; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1776107483; c=relaxed/simple;
+	bh=E2hjxYStm3aD6IMH0x56H1eA9O7MIAYApbvv/cTbWNs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bTNHMnUIvS1XuYT8dSC3joY1i4sLBCfsukO3Qb7AgNYp0R+qnI332Dpgp6y3J8VVH2Pxq8j6bKaGq4S8fR5phrRGZRheWaxjlfVEhN35Y4jOJDbKIfCkjicHMlhZO8NL5cTxpF/nxKljy/mjWUD3a76W/x4Y69yq/GfCMaiVxqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=OUXumIF8; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="g7M3BHrd";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="B0b8vIER";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="g7M3BHrd";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="B0b8vIER"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id CFD3E5BDB1;
-	Mon, 13 Apr 2026 19:08:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776107292; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xttXmAaurVdwurMF9HUVNAG1SNwl+0Fa4fXhYY+62+w=;
-	b=g7M3BHrdvjLEm9FPldAMddCW+k6m0Enyc3xOcH7/JVPVPRSve5geI1sF6a9MVQ75EHGnHQ
-	V3+6+3pef8ZooFrY3/ZOx6hpHjHuG7bmRZ+HjZrZNUWtwinVLc6THbKpdE/i+6i2F37TPn
-	1vlrbVgSMwbyyuKCOVDrQmI6AvUTgEM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776107292;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xttXmAaurVdwurMF9HUVNAG1SNwl+0Fa4fXhYY+62+w=;
-	b=B0b8vIERWYfyA2OY4OswPjxDXZWUFgLWceO7hVALQK2EWj3tGemSeynfrOHxxqJ6q6qeKB
-	Xw8qn770jemwudBQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=g7M3BHrd;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=B0b8vIER
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776107292; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xttXmAaurVdwurMF9HUVNAG1SNwl+0Fa4fXhYY+62+w=;
-	b=g7M3BHrdvjLEm9FPldAMddCW+k6m0Enyc3xOcH7/JVPVPRSve5geI1sF6a9MVQ75EHGnHQ
-	V3+6+3pef8ZooFrY3/ZOx6hpHjHuG7bmRZ+HjZrZNUWtwinVLc6THbKpdE/i+6i2F37TPn
-	1vlrbVgSMwbyyuKCOVDrQmI6AvUTgEM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776107292;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xttXmAaurVdwurMF9HUVNAG1SNwl+0Fa4fXhYY+62+w=;
-	b=B0b8vIERWYfyA2OY4OswPjxDXZWUFgLWceO7hVALQK2EWj3tGemSeynfrOHxxqJ6q6qeKB
-	Xw8qn770jemwudBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5D9774B03B;
-	Mon, 13 Apr 2026 19:08:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Z4aUCRw/3WnHEAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 13 Apr 2026 19:08:12 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	pc@manguebit.com,
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="OUXumIF8"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488afb0427eso59687455e9.1
+        for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 12:11:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1776107481; x=1776712281; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fXWGSvkFU16FgOFRkCaaPZi61w++nh88NCvP7Zfs+t0=;
+        b=OUXumIF8AX3lCnvtPOWN1pLHMorUFBkYKEcjLV69DTQNZDtECiiWfMJ6MRk3VLpqYE
+         0ojH3vi4S6K7VUX4R3B8rwKUQQs4HMuHUvp9Em6QRI4SO0zth1JEmdTUhsU60XZgVW7f
+         ZVRD5HNHreH+NKT9pfq2kKnIrUylru0MCIi3tZfOuyhL3GFK3glTZfxh2Qtl3GLv/wfK
+         7qfTX6Fh7/6vXCDAf/0Xaz1G1KDmAjnhN6AMsTDJWe43PXOo/C5NDU5XG//sgV5NxCwj
+         EV1jiOPWDAywFgskNDhDJDmarPU9N3Eef0Mfe1YME4LMPRMa0yNurpow/Hv4B7PgEF9H
+         A8Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776107481; x=1776712281;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fXWGSvkFU16FgOFRkCaaPZi61w++nh88NCvP7Zfs+t0=;
+        b=Ltu6vlavJRmCfymR47CuvKf60Y9b0dLxUf7oa6jOrDzPTmqTpbeVR1ljgy2nhZNpZF
+         tFkDf3DsEEHd1akIIHCykyXOWGGTiHM0JSimZ785WL2moXzikPYiTQsB5LeKWPlIxaSw
+         5rSOmoGgv3mOBe+2/q5aQMbUV1C2d9KDvpDczRU5p9spAvx4zbO8SXRW/qShX1WuWWjN
+         /xAqhC0pEld90tlEOrVuZCe5n/zmBlrA5rktbPQB6u1MEujtngY7wSzokavli4Gkmr56
+         3b4u7EJN9opcM5wIWu4vm4HNAnzd7hCs+M8oqcLcNVJXiNmrUZd6SxRqZFiWKzrNDyAj
+         QPnw==
+X-Forwarded-Encrypted: i=1; AFNElJ98pryrZgGO+JDPjTvcQy7wKxGh6H01AtBo5hpDKfbCqpqvIS27gR9+7JRC9fp3ZnZ5xWJjhIytKf9I@vger.kernel.org
+X-Gm-Message-State: AOJu0YyokaggVbZQ+NiTb0x+LI72nCx0VMHHkAXUjHj4pgE0SczBFM4S
+	rAgcYnhuh37B/74FQjrrrRID1UDYiVxVIk7FGeDTHKayvzEbTSzBRALoDCucIiLmPk70A4hvVNP
+	h35MwzkY=
+X-Gm-Gg: AeBDiev574L/EFm3Vxy047IbgTpuDOL4ltCcNPbUVW31Qy3/Gdy3q6GWjrSYqUlbpAk
+	sOEwyJJDecMkVxWlOURk1fd/M+jlPAo8X5GyVYYxjgBwe5chqrhknZZIZug4rOKTtsIlRqhi7LQ
+	V1YjYNW9iY3ZLiLytg9TREuIpmJOXt98o4gb3P3Bt61OAzXXgAxIWbWwiSmwTGo+zwGD2kKiTFR
+	c40xGu7SAHn6+pwiNOC5OEcU4/gqpy5T2icEBA6IL/AOkK9d7IrFzo65SLGi96RqROUXHDK/JZv
+	z8qGLoVMTcjlrrekTZh27eber/7reXHe9+xsAAKphzZyGQoFkuFLd/pStcW9HEZQFkQNDC6n+8n
+	sq1+vPFPVmqXG9o4vF5dC17KNsaGJsxpoN6NzT2f5DZs7VHMtLoI9MaojIEVkdj/KxUtR/4B+NR
+	vy7fNTCNouWFb74iM0GyDqg1+y7bdL3eg=
+X-Received: by 2002:a05:600c:3f0d:b0:485:40fd:8390 with SMTP id 5b1f17b1804b1-488d68769f9mr181491475e9.26.1776107480576;
+        Mon, 13 Apr 2026 12:11:20 -0700 (PDT)
+Received: from precision ([2804:7f0:6401:5290:433e:afae:f475:c9f7])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d55f5c6afdsm17508032eec.4.2026.04.13.12.11.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Apr 2026 12:11:19 -0700 (PDT)
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: sfrench@samba.org
+Cc: pc@manguebit.org,
 	ronniesahlberg@gmail.com,
 	sprasad@microsoft.com,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
-	henrique.carvalho@suse.com
-Subject: [PATCH 8/8] smb: common: add SMB3_COMPRESS_MAX_ALGS
-Date: Mon, 13 Apr 2026 16:07:13 -0300
-Message-ID: <20260413190713.283939-8-ematsumiya@suse.de>
+	ematsumiya@suse.de,
+	linux-cifs@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH 1/2] smb: client: serialize channel scaling path
+Date: Mon, 13 Apr 2026 16:11:09 -0300
+Message-ID: <20260413191110.1508848-1-henrique.carvalho@suse.com>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260413190713.283939-1-ematsumiya@suse.de>
-References: <20260413190713.283939-1-ematsumiya@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -96,58 +78,156 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Queue-Id: CFD3E5BDB1
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
 
-Set it to number of currently defined algorithms (6 as of now).
+Channel scaling serialization was coded at several call sites with plain
+flag values in ses->flags, which duplicated the same bookkeeping in
+reconnect and remount paths, and was missing in the mount path.
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+Move the CIFS_SES_FLAG_SCALE_CHANNELS acquisition and release inside
+smb3_update_ses_channels(), and convert the session flags to bit indices
+and their operations to bitops.
+
+Make smb3_update_ses_channels return -EBUSY if there is already an
+ongoing channel scaling operation.
+
+Fixes: 556bb341f9f2e ("smb: client: introduce multichannel async work during mount")
+Cc: stable@vger.kernel.org
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 ---
- fs/smb/common/smb2pdu.h | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/smb/client/cifsglob.h   |  6 +++---
+ fs/smb/client/fs_context.c | 15 ---------------
+ fs/smb/client/smb2pdu.c    | 24 ++++++++----------------
+ 3 files changed, 11 insertions(+), 34 deletions(-)
 
-diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index e482c86ceb00..cda71964ed01 100644
---- a/fs/smb/common/smb2pdu.h
-+++ b/fs/smb/common/smb2pdu.h
-@@ -510,6 +510,8 @@ struct smb2_encryption_neg_context {
- /* Pattern scanning algorithm See MS-SMB2 3.1.4.4.1 */
- #define SMB3_COMPRESS_PATTERN	cpu_to_le16(0x0004) /* Pattern_V1 */
- #define SMB3_COMPRESS_LZ4	cpu_to_le16(0x0005)
-+/* Account for NONE for easier array indexing */
-+#define SMB3_COMPRESS_MAX_ALGS	6
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 709e96e07791..7b1323927711 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1049,8 +1049,8 @@ struct cifs_chan {
+ 	__u8 signkey[SMB3_SIGN_KEY_SIZE];
+ };
  
- /* Compression Flags */
- #define SMB2_COMPRESSION_CAPABILITIES_FLAG_NONE		cpu_to_le32(0x00000000)
+-#define CIFS_SES_FLAG_SCALE_CHANNELS (0x1)
+-#define CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES (0x2)
++#define CIFS_SES_FLAG_SCALE_CHANNELS 0
++#define CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES 1
+ 
+ /*
+  * Session structure.  One of these for each uid session with a particular host
+@@ -1089,7 +1089,7 @@ struct cifs_ses {
+ 	bool domainAuto:1;
+ 	bool expired_pwd;  /* track if access denied or expired pwd so can know if need to update */
+ 	int unicode;
+-	unsigned int flags;
++	unsigned long flags;
+ 	__u16 session_flags;
+ 	__u8 smb3signingkey[SMB3_SIGN_KEY_SIZE];
+ 	__u8 smb3encryptionkey[SMB3_ENC_DEC_KEY_SIZE];
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index a46764c24710..e0e13c22e159 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -1166,27 +1166,12 @@ static int smb3_reconfigure(struct fs_context *fc)
+ 
+ 		/* Synchronize ses->chan_max with the new mount context */
+ 		smb3_sync_ses_chan_max(ses, ctx->max_channels);
+-		/* Now update the session's channels to match the new configuration */
+-		/* Prevent concurrent scaling operations */
+-		spin_lock(&ses->ses_lock);
+-		if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
+-			spin_unlock(&ses->ses_lock);
+-			mutex_unlock(&ses->session_mutex);
+-			return -EINVAL;
+-		}
+-		ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
+-		spin_unlock(&ses->ses_lock);
+ 
+ 		mutex_unlock(&ses->session_mutex);
+ 
+ 		rc = smb3_update_ses_channels(ses, ses->server,
+ 					       false /* from_reconnect */,
+ 					       false /* disable_mchan */);
+-
+-		/* Clear scaling flag after operation */
+-		spin_lock(&ses->ses_lock);
+-		ses->flags &= ~CIFS_SES_FLAG_SCALE_CHANNELS;
+-		spin_unlock(&ses->ses_lock);
+ 	} else {
+ 		mutex_unlock(&ses->session_mutex);
+ 	}
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 5188218c25be..2eb13b2665a4 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -228,6 +228,10 @@ int smb3_update_ses_channels(struct cifs_ses *ses, struct TCP_Server_Info *serve
+ 			bool from_reconnect, bool disable_mchan)
+ {
+ 	int rc = 0;
++
++	if (test_and_set_bit(CIFS_SES_FLAG_SCALE_CHANNELS, &ses->flags))
++		return -EBUSY;
++
+ 	/*
+ 	 * Manage session channels based on current count vs max:
+ 	 * - If disable requested, skip or disable the channel
+@@ -243,6 +247,7 @@ int smb3_update_ses_channels(struct cifs_ses *ses, struct TCP_Server_Info *serve
+ 			rc = cifs_chan_skip_or_disable(ses, server, from_reconnect, disable_mchan);
+ 	}
+ 
++	clear_bit(CIFS_SES_FLAG_SCALE_CHANNELS, &ses->flags);
+ 	return rc;
+ }
+ 
+@@ -432,15 +437,6 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		goto out;
+ 	}
+ 
+-	spin_lock(&ses->ses_lock);
+-	if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
+-		spin_unlock(&ses->ses_lock);
+-		mutex_unlock(&ses->session_mutex);
+-		goto skip_add_channels;
+-	}
+-	ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
+-	spin_unlock(&ses->ses_lock);
+-
+ 	if (!rc &&
+ 	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL) &&
+ 	    server->ops->query_server_interfaces) {
+@@ -450,11 +446,11 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		 * is in progress. This will be used to avoid calling
+ 		 * smb2_reconnect recursively.
+ 		 */
+-		ses->flags |= CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES;
++		set_bit(CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES, &ses->flags);
+ 		xid = get_xid();
+ 		rc = server->ops->query_server_interfaces(xid, tcon, false);
+ 		free_xid(xid);
+-		ses->flags &= ~CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES;
++		clear_bit(CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES, &ses->flags);
+ 
+ 		if (!tcon->ipc && !tcon->dummy)
+ 			queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
+@@ -492,10 +488,6 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	}
+ 
+ skip_add_channels:
+-	spin_lock(&ses->ses_lock);
+-	ses->flags &= ~CIFS_SES_FLAG_SCALE_CHANNELS;
+-	spin_unlock(&ses->ses_lock);
+-
+ 	if (smb2_command != SMB2_INTERNAL_CMD)
+ 		cifs_queue_server_reconn(server);
+ 
+@@ -609,7 +601,7 @@ static int smb2_ioctl_req_init(u32 opcode, struct cifs_tcon *tcon,
+ 	 */
+ 	if (opcode == FSCTL_VALIDATE_NEGOTIATE_INFO ||
+ 	    (opcode == FSCTL_QUERY_NETWORK_INTERFACE_INFO &&
+-	     (tcon->ses->flags & CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES)))
++	     test_bit(CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES, &tcon->ses->flags)))
+ 		return __smb2_plain_req_init(SMB2_IOCTL, tcon, server,
+ 					     request_buf, total_len);
+ 
 -- 
 2.53.0
 
