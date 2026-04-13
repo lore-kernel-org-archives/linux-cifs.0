@@ -1,122 +1,104 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.162])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCEB53AC0DC
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 09:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518AA3BD237;
+	Mon, 13 Apr 2026 11:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.162
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776070804; cv=none; b=if4cIgg+Xle0q7mUHITCVxJdth0b6CXq9+3n/wjlp/mBp10IgqyK0aqk2jAUV5/3ePLHGF51AgQf9q7QxOr6xa3bLVSGNuEhQttuVTQGzNZN3affsc4EQRuC1+X/bkcKOv6osRVCI6QmlbUDokCMsvdnU9jX83PTj+aVjSP4rD8=
+	t=1776079525; cv=none; b=MwzzZiW+U/FWeprNyU5/TlwY5kbc09ivs5v+H2E/BI5a/qPpSC5V+TByDkCehriD3kZ6dj8R1brN/z/H2WrsDaye9YM8VJJVNxon3imxMWxuztMaQagJ1Lhomted5q8mMr/f+fHk1LY7kzx3n41zIM79xQ6Fyzf22cwbVX+spbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776070804; c=relaxed/simple;
-	bh=4mzML9+7ImtcwlYZY6CyYI203HbmZJ7jqaHEyl+MrIQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A8j/qEevjqPTTMs6av3ag3GIaErJFGplKDXhAEXSxXFFZY2ocMcfvUA32kkz0iaxVhqVuFYRVDHyaOl9KTmcbU5G5OTOKvGasxSLeynDhvDJPkfoOhx+9FKV3s1TE//ZyWc5p4vi8tFy39CDtpav/zumkEc+2aGFJ/gh1n9EEhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZIdAzjIr; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776079525; c=relaxed/simple;
+	bh=sBsy7wiURkqL+0vpLzA9Y4+lOXzxczT1/17y/eMNeeg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h2NUATqh260RYMoR5ybcL//e1fEMaaYbQvmIeWAkrJD7xPbYBgovyzxd9Z/PMsT0z6mwXu2FV5KYNecPcADgx8lDDUXa90B3twqaGyYSel/4//Bij56BFZB+lrxd4Mx1405cjsIetymZB9AV/ZXecYBldaoB/c1BN+hAHYpjyOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=Nu0Z2fK2; arc=none smtp.client-ip=188.68.63.162
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZIdAzjIr"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2b2494440f3so13843645ad.2
-        for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 02:00:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776070802; x=1776675602; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4QuZI8wnRGhW1JqAONcbEsHyBYLDeETAby1pSr6OKFM=;
-        b=ZIdAzjIro00fIoiRfaJkkHZ59ftU128ap+lDAJQMgMLLpDIH0cFqae0DGj33ij7727
-         KpiexLxpE+9SbKl0RXtlsYulrwIbihZKg7+Wx07mR/RvjsQzJVhEPNZuah87UWDoV/uj
-         zyYFBonQm6z9KiKq5AZUDhSIsx6mdfBy1MI125ITDpwyC/gd5Sr56ebAtoC2PDiYtx14
-         wKbON6WrNNUxQkjVnl3dV4sh5YxSoePH7vnchl5atg3MKngHg08DDlGey/aNHTovCOio
-         rcB39td3ALHNzg6gBvjdXTGI1OenfYQ8lnJ4oBq8X62Y17LmV8N4DRDlUYkD5ASec08F
-         Bjdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776070802; x=1776675602;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4QuZI8wnRGhW1JqAONcbEsHyBYLDeETAby1pSr6OKFM=;
-        b=Yqo74p/wSlsqT0wzylVWjY1tKzvLGqmTk8aId3A1NOwS1UYaeqtu05DKiZNc0UguPB
-         bHwYO0HMcqXdLeS3PEyzYVeJnYEZBGFWdEg/3VlFIeZTkFjfRDeaVB2/L/s5S+TKubOf
-         uu4Q2BI9dG8cWacbCifthujWqU+TGFBTnVcqZMT1botoChefsu4pXcRLBcEq4cqr+kg3
-         GJFNQdgRrCNq0SxFaxlS07U9VXZ8pRWcDt4PfUrtnb6moOhoOk9f/n1vE0FhHMbjrdO5
-         4hsFU9yFMIXGT9d2K2tieOsjqlyMV1LWyjPpfIozzGSb32DrnvInLxBI5rdT5GxlccRp
-         CjxA==
-X-Gm-Message-State: AOJu0YxIDczuc7q7P8qq3qRu1hBJ1OaF/zRuODflWAOOMQGxwLwPqZV0
-	uYqSEghxgrG4rinEHw2vUBf7eFeLa5zS69g/qEp8Ad8Zj6XEvhUJ1+nKkxdZFg==
-X-Gm-Gg: AeBDies8r8VjmJZaGclZWsXq4TJp2BlA4WlrnrjiHZ0aZn8FNm0vHQm6KEkqt1HiZCG
-	03Th3y64MN6atm1Yq2S+n8AvyYaTzL1mME/DCytRrbLsPTkDgOmo78El0Mn27/NE3UfQQy4PYSI
-	ezxh3F3+o5eu78EA5SgodBBWWc1kxMr82athqI2712X9e6K6/P/xDvg3D0qWiUnHoGxvRbGXXlN
-	RuXaSAIZzVJd7s0oYReBJCvWmezj96fgtY6JDqtwrMrqxrbh/NEv6MJphhXZDzNk9hLTFxsGaZe
-	iKxP2CxC01VbUOJ7p71FKx8l3YtICquRGDQhrUm4x08olPgvExU0mx7z5D8iyCIWAzSX6XGp8ue
-	hxzRqCgk10oP8yhYIhqlHWgFHZ1oSvhT3hjwxiddtAvdHFEh5XP0w7kESXc2GUO3UkxJWQvlh8p
-	sPAly48Q58iOj0dLcuyRRjDKhGT5AD4+lLuB5IG8b251Ou46XS8ienS/1TZIj9GZpT
-X-Received: by 2002:a17:903:1c1:b0:2b2:42da:25cc with SMTP id d9443c01a7336-2b2d5938b87mr123612545ad.1.1776070802050;
-        Mon, 13 Apr 2026 02:00:02 -0700 (PDT)
-Received: from gmail.com (69-172-89-235.static.imsbiz.com. [69.172.89.235])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2d4ddb742sm111717455ad.27.2026.04.13.02.00.00
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 13 Apr 2026 02:00:01 -0700 (PDT)
-From: Dudu Lu <phx0fer@gmail.com>
-To: linux-cifs@vger.kernel.org
-Cc: sfrench@samba.org,
-	Dudu Lu <phx0fer@gmail.com>
-Subject: [PATCH] smb: client: Fix integer underflow in receive_encrypted_read()
-Date: Mon, 13 Apr 2026 16:59:57 +0800
-Message-Id: <20260413085957.77355-1-phx0fer@gmail.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-145)
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="Nu0Z2fK2"
+Received: from mors-relay-8201.netcup.net (localhost [127.0.0.1])
+	by mors-relay-8201.netcup.net (Postfix) with ESMTPS id 4fvPwk3wXpz44RF;
+	Mon, 13 Apr 2026 13:16:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1776078966;
+	bh=sBsy7wiURkqL+0vpLzA9Y4+lOXzxczT1/17y/eMNeeg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Nu0Z2fK2qdcLAra+sPdOu3GnffrczwsWk2/6Ws8yzq/WG0B8868SWtjgb2qjMBquN
+	 Gijdw29i5boobMXtZCXobaXET/14kj5Q3M6AGc0NrSucWh43rR6jU3h3oRYZT6LSSV
+	 a2zAvLS+lZMp3/fQrtYdhCIlauR2jeeGxe/Smq0C1ueTYL/P+cVU+c/idqhhhKD7+6
+	 fqpSGoVp1NRsOYzUwE8cpktmTRRQx4UReYL2e17F/9NTE0/t5dK/k954hI/byOwmXP
+	 7URR5jEuWDxFA0nxDQfovWoFo+Bq9orEoDpeOcfAXLTk9qNlqGj5RYO5S6vFqAWtmy
+	 L62Xx/7onYOfg==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-8201.netcup.net (Postfix) with ESMTPS id 4fvPwk39y5z44NQ;
+	Mon, 13 Apr 2026 13:16:06 +0200 (CEST)
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4fvPwj5GqSz8sgW;
+	Mon, 13 Apr 2026 13:16:05 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id ED1D6632D3;
+	Mon, 13 Apr 2026 13:16:04 +0200 (CEST)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <e21c9e47-36e2-4f15-a7a5-af239a0abb89@leemhuis.info>
+Date: Mon, 13 Apr 2026 13:16:03 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] failure to reconnect on SMB server restart with
+ custom TCP port (not 445): Host is down (at least since 6.6.95)
+To: Henrique Carvalho <henrique.carvalho@suse.com>,
+ Shyam Prasad N <nspmangalore@gmail.com>
+Cc: "Dr. Thomas Orgis" <thomas.orgis@uni-hamburg.de>,
+ Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+ regressions@lists.linux.dev, stable@vger.kernel.org
+References: <20260310235642.6d9798f4@plasteblaster>
+ <c66p7dr6vlujvnwczbnrmqx7monkdgdnm4rwewm76aibn7jza3@d3uik74dei72>
+ <CANT5p=q2Lv4pSvEm5EWcM73b7NZsbt1kYEFJtjaAZRS6Gz_OjQ@mail.gmail.com>
+ <42utcrhajix2x3feckj7ap373osq65sgfz6ximnaj4rasszret@ymhf44ddz2wh>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: <42utcrhajix2x3feckj7ap373osq65sgfz6ximnaj4rasszret@ymhf44ddz2wh>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: <177607896533.133677.5958693862348892053@mxe9fb.netcup.net>
+X-Rspamd-Server: rspamd-worker-8404
+X-Rspamd-Queue-Id: ED1D6632D3
+X-NC-CID: p2st6aj6lJATH9pglzrLnOICtj3C/5s4Klt+kHiVVKr+zXdjuRc=
 
-In receive_encrypted_read(), the length of data to read from the socket
-is computed as:
+On 3/12/26 16:03, Henrique Carvalho wrote:
+>
+> Sure, I read the comment in the code and the MS-SMB2 protocol. The
+> protocol states that "client MUST ignore [Port] on receipt". Since we
+> are not using p->Port, I don'se see how this is a protocol violation.
+> 
+> We're using the port that was selected on mount and copied over to
+> server->dstaddr, so that when server->dstaddr is overwridden,
+> server->dstaddr keeps the user selected port.
+> 
+> Now, even if we only fix that for primary channels, the secondary
+> channels will still get the wrong port when they are overwridden, no? So
+> I don't see how that fixes the issue.
+> 
+> Apologies if I'm missing something.
 
-  len = le32_to_cpu(tr_hdr->OriginalMessageSize) -
-        server->vals->read_rsp_size;
+Lo! What happened to this? I saw that Henrique posted "smb: client:
+preserve destination port when parsing server interfaces" a month ago at
+https://lore.kernel.org/all/20260311160856.635916-1-henrique.carvalho@suse.com/
+which looks like a fix[1] for this regression, but unless I'm missing
+something (which very well might be the case) it still is waiting for
+review, as I can't see it in -next.
 
-OriginalMessageSize comes from the server's transform header and is
-untrusted. If a malicious server sends a value smaller than
-read_rsp_size (sizeof(struct smb2_read_rsp), ~80 bytes), the unsigned
-subtraction wraps to a very large value (~4GB). This value is then
-passed to netfs_alloc_folioq_buffer() and cifs_read_iter_from_socket(),
-causing either:
-  - A massive allocation attempt that fails with -ENOMEM (DoS)
-  - Under extreme memory pressure, potential heap corruption
+Ciao, Thorsten
 
-The existing validation in smb3_receive_transform() only checks
-that pdu_length >= orig_len + sizeof(transform_hdr), which does
-not prevent orig_len from being smaller than read_rsp_size.
-
-Fix this by adding a check that OriginalMessageSize is at least
-read_rsp_size before the subtraction.
-
-Signed-off-by: Dudu Lu <phx0fer@gmail.com>
----
- fs/smb/client/smb2ops.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 509fcea28a42..ca90f96052d4 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -4943,6 +4943,14 @@ receive_encrypted_read(struct TCP_Server_Info *server, struct mid_q_entry **mid,
- 		goto free_dw;
- 	server->total_read += rc;
- 
-+	if (le32_to_cpu(tr_hdr->OriginalMessageSize) <
-+	    server->vals->read_rsp_size) {
-+		cifs_server_dbg(VFS, "OriginalMessageSize %u too small for read response (%u)\n",
-+			le32_to_cpu(tr_hdr->OriginalMessageSize),
-+			server->vals->read_rsp_size);
-+		rc = -EINVAL;
-+		goto free_dw;
-+	}
- 	len = le32_to_cpu(tr_hdr->OriginalMessageSize) -
- 		server->vals->read_rsp_size;
- 	dw->len = len;
--- 
-2.39.3 (Apple Git-145)
-
+[1] not totally sure, lacks a reported-by and link or closes tag
+pointing to the report. A stable tag would also be great to ensure the
+fix is backported.
