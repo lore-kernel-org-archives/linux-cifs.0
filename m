@@ -1,79 +1,78 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2B236165E
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 19:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C070C327C08
+	for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 19:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776107261; cv=none; b=P3SUnRnxzllqSAzSyi7r1Tqi1/oUxoUCHQhLDWynmeG3LTKz9/1YCHF1Rs7ZjulYvxdO6JricJsHGct8y57HJy9Yzn9fuKbfjkxYDqTpECnHh6IXWE14TvG2zB6GW5hmPW1/vZZA2X2JRZH5rbvNNqdkGKfDF/2KLosJCppWBiI=
+	t=1776107264; cv=none; b=oAQNOCaDOFhFzpYVmaz6riDlIqK5Y/iybY4HhobM6eDfH/m/pNs9fiF8FBl1B+XI+Syja/5PdEo4n6Nrqkl0wyOfk+bhBL12HqhhoWGvOmd97PTqSS0NMq0t/aY55HBbjaWxyCgJzoow0936EmMMYdwOg4ZWZOVy1eEEiO4Q6yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776107261; c=relaxed/simple;
-	bh=KubO8D+iefzWr1kpBREH6U+jDK2uj4RHXgwRfFx9T7E=;
+	s=arc-20240116; t=1776107264; c=relaxed/simple;
+	bh=3Xowdv2BvhLZ717GW43TwB1ow9mGeQa7xbjYK/8rGW8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E00N46TjeYbB9EhP2EjQBaHunWvKEDedbmhdJR/6IY3pK+UBLUM3uXSgf1g9dPEiRMq5BVx5sjBajg/lSx1M5o3Fe+Rx02xYOTOYHAAQDo0rY2C2woCZ4sB5E4tuUgA6l8Sx72ydiIoXv+klWg2nIlS/Oewmpa/Eg0oIsrfJw/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GQkgQViX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Z+IztFmU; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GQkgQViX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Z+IztFmU; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=DClguklqqCxRyiq8M+NzvXWjnu1l7QcrW2Vrd8ZurgjkExqOxS8pR/luDwJtT0ZyEYQGLUpqqJe8yoQd1GaGcpAl3qMquCyDXZG9bI7eoSi9Br99ePGEkdQZ0Jbzwa6GTXoLrjMtJiLDx3HZxtZccbzYuGi1bhyU25pMAq5S5Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xT+rrlcj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=98VuPZTr; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xT+rrlcj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=98VuPZTr; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GQkgQViX";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Z+IztFmU";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GQkgQViX";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Z+IztFmU"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xT+rrlcj";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="98VuPZTr";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xT+rrlcj";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="98VuPZTr"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id F020C5BD94;
-	Mon, 13 Apr 2026 19:07:37 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 146886A8B7;
+	Mon, 13 Apr 2026 19:07:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776107258; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1776107261; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vepmT7bQh8HLcs0gykVzJI3rzGeEsWuJk1inXskEvJA=;
-	b=GQkgQViXP8kxNX00bCbWjhKiUZlo6mPPci3cjj9APpNtEwhXXSXWfGnBlUHeE0Pj7jGFdH
-	L6WM5plnhgbmJGGqOZJqArPNLdDr07vYAlmGQh61aD3OtyYwNiiBvr18Ak5E9lOz0Hm/Gp
-	6wPlNoEAgpjYZiwIwTCUTYyc1awM42Y=
+	bh=zMF5k9xlh64JtzVfTCCTVu0y6xLgrEG2XWvMV8dxisc=;
+	b=xT+rrlcjKT8OyBHNrvL8rbKS9xW8Zkda9be+Jlb7VgZQmeoYptlExF06WNh7wQVoL7PsLM
+	9gunUGnszmmOya5TjS+us6lUAvwCMzUtdJ5B5cEqJ857OYKhwZDC6Gpl+XIzPhXikzYfm9
+	Fj67uuPa41y7eZ0Y0uMN8b5HtyRauEk=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776107258;
+	s=susede2_ed25519; t=1776107261;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vepmT7bQh8HLcs0gykVzJI3rzGeEsWuJk1inXskEvJA=;
-	b=Z+IztFmUR2Z/VJgEjCA62bw7t/2qR6sZ+BmrPnXcSdp4tx4auN22zphMxZFBXAaDP09N7d
-	fBrFqTHNO76//LCw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=GQkgQViX;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Z+IztFmU
+	bh=zMF5k9xlh64JtzVfTCCTVu0y6xLgrEG2XWvMV8dxisc=;
+	b=98VuPZTr8ryuBPNbsSW//adWi4rErbiqydCk0SjGa2+vrj6Uefq+FE9ImNDAl/or6Cu5hi
+	lmIiEmd8jeCpnGBg==
+Authentication-Results: smtp-out1.suse.de;
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776107258; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1776107261; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vepmT7bQh8HLcs0gykVzJI3rzGeEsWuJk1inXskEvJA=;
-	b=GQkgQViXP8kxNX00bCbWjhKiUZlo6mPPci3cjj9APpNtEwhXXSXWfGnBlUHeE0Pj7jGFdH
-	L6WM5plnhgbmJGGqOZJqArPNLdDr07vYAlmGQh61aD3OtyYwNiiBvr18Ak5E9lOz0Hm/Gp
-	6wPlNoEAgpjYZiwIwTCUTYyc1awM42Y=
+	bh=zMF5k9xlh64JtzVfTCCTVu0y6xLgrEG2XWvMV8dxisc=;
+	b=xT+rrlcjKT8OyBHNrvL8rbKS9xW8Zkda9be+Jlb7VgZQmeoYptlExF06WNh7wQVoL7PsLM
+	9gunUGnszmmOya5TjS+us6lUAvwCMzUtdJ5B5cEqJ857OYKhwZDC6Gpl+XIzPhXikzYfm9
+	Fj67uuPa41y7eZ0Y0uMN8b5HtyRauEk=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776107258;
+	s=susede2_ed25519; t=1776107261;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vepmT7bQh8HLcs0gykVzJI3rzGeEsWuJk1inXskEvJA=;
-	b=Z+IztFmUR2Z/VJgEjCA62bw7t/2qR6sZ+BmrPnXcSdp4tx4auN22zphMxZFBXAaDP09N7d
-	fBrFqTHNO76//LCw==
+	bh=zMF5k9xlh64JtzVfTCCTVu0y6xLgrEG2XWvMV8dxisc=;
+	b=98VuPZTr8ryuBPNbsSW//adWi4rErbiqydCk0SjGa2+vrj6Uefq+FE9ImNDAl/or6Cu5hi
+	lmIiEmd8jeCpnGBg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7A6BE4B038;
-	Mon, 13 Apr 2026 19:07:37 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 93C8F4B038;
+	Mon, 13 Apr 2026 19:07:40 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id MzYtEPk+3WkiEAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 13 Apr 2026 19:07:37 +0000
+	id jwPOFvw+3WknEAAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 13 Apr 2026 19:07:40 +0000
 From: Enzo Matsumiya <ematsumiya@suse.de>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -83,9 +82,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
 	henrique.carvalho@suse.com
-Subject: [PATCH 2/8] smb: client: compress: fix bad encoding on last LZ77 flag
-Date: Mon, 13 Apr 2026 16:07:07 -0300
-Message-ID: <20260413190713.283939-2-ematsumiya@suse.de>
+Subject: [PATCH 3/8] smb: client: compress: fix counting in LZ77 match finding
+Date: Mon, 13 Apr 2026 16:07:08 -0300
+Message-ID: <20260413190713.283939-3-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260413190713.283939-1-ematsumiya@suse.de>
 References: <20260413190713.283939-1-ematsumiya@suse.de>
@@ -96,61 +95,96 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	ARC_NA(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	DKIM_TRACE(0.00)[suse.de:+];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Rspamd-Queue-Id: F020C5BD94
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
+X-Spam-Score: -2.80
 X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
+	ARC_NA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Spam-Flag: NO
 
-End-of-stream flag could lead to UB because of int promotion
-(overwriting signed bit).
+- lz77_match_len() increments @cur before checking for equality,
+  leading to off-by-one match len in some cases.
 
-Fix it by changing operand from '1' to '1UL'.
+  Fix by moving pointers increment to inside the loop.
+  Also rename @wnd arg to @match (more accurate name).
+- both lz77_match_len() and lz77_compress() checked for
+  "buf + step < end" when the correct is "<=" for such cases.
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- fs/smb/client/compress/lz77.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/smb/client/compress/lz77.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
 diff --git a/fs/smb/client/compress/lz77.c b/fs/smb/client/compress/lz77.c
-index 16c7d8f3ef17..c1e7fada6e61 100644
+index c1e7fada6e61..61cdf1c14612 100644
 --- a/fs/smb/client/compress/lz77.c
 +++ b/fs/smb/client/compress/lz77.c
-@@ -216,7 +216,7 @@ noinline int lz77_compress(const void *src, u32 slen, void *dst, u32 *dlen)
- 	}
+@@ -48,17 +48,17 @@ static __always_inline void lz77_write32(u32 *ptr, u32 v)
+ 	put_unaligned_le32(v, ptr);
+ }
  
- 	flag <<= (32 - flag_count);
--	flag |= (1 << (32 - flag_count)) - 1;
-+	flag |= (1UL << (32 - flag_count)) - 1;
- 	lz77_write32(flag_pos, flag);
+-static __always_inline u32 lz77_match_len(const void *wnd, const void *cur, const void *end)
++static __always_inline u32 lz77_match_len(const void *match, const void *cur, const void *end)
+ {
+ 	const void *start = cur;
+ 	u64 diff;
  
- 	*dlen = dstp - dst;
+ 	/* Safe for a do/while because otherwise we wouldn't reach here from the main loop. */
+ 	do {
+-		diff = lz77_read64(cur) ^ lz77_read64(wnd);
++		diff = lz77_read64(cur) ^ lz77_read64(match);
+ 		if (!diff) {
+ 			cur += LZ77_STEP_SIZE;
+-			wnd += LZ77_STEP_SIZE;
++			match += LZ77_STEP_SIZE;
+ 
+ 			continue;
+ 		}
+@@ -67,10 +67,13 @@ static __always_inline u32 lz77_match_len(const void *wnd, const void *cur, cons
+ 		cur += count_trailing_zeros(diff) >> 3;
+ 
+ 		return (cur - start);
+-	} while (likely(cur + LZ77_STEP_SIZE < end));
++	} while (likely(cur + LZ77_STEP_SIZE <= end));
+ 
+-	while (cur < end && lz77_read8(cur++) == lz77_read8(wnd++))
+-		;
++	/* Fallback to byte-by-byte comparison for last <8 bytes. */
++	while (cur < end && lz77_read8(cur) == lz77_read8(match)) {
++		cur++;
++		match++;
++	}
+ 
+ 	return (cur - start);
+ }
+@@ -195,7 +198,7 @@ noinline int lz77_compress(const void *src, u32 slen, void *dst, u32 *dlen)
+ 			flag_pos = dstp;
+ 			dstp += 4;
+ 		}
+-	} while (likely(srcp + LZ77_STEP_SIZE < end));
++	} while (likely(srcp + LZ77_STEP_SIZE <= end));
+ 
+ 	while (srcp < end) {
+ 		u32 c = umin(end - srcp, 32 - flag_count);
 -- 
 2.53.0
 
