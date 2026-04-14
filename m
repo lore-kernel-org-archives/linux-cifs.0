@@ -1,158 +1,236 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5443E9594
-	for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 15:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776179491; cv=pass; b=p9CeitQKxmhM+GEWPUp+FYYWaEuiFF+7lL1iO1PI5vxwVRkd6/jfvv9KFAWGTgGQL6Jgge/uKuE6v4AY0Eq+oJLeHsjAQGNGneRVuCwXDxVJhvB6lNthSSQO8Evit2lhZvqKC5vfmG8uEmVK/Zs3x5YOjkhvXq2UmwQmcEKVGeI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776179491; c=relaxed/simple;
-	bh=EUV2Y8t2ofLmWHno5itkusuIaaU6Q8lOo/IzO2NA69M=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=T3NFR/C+fmvrN2NIsCgLfFxvEnY2/y4VUjwfaOO/HDB5S5imNib3JuzoJ+Yeuk8O2bt6idXmi1Y8cg64Bh1xRK+wURUqKUBrlrQEd9H7eZqZMGvrt6rZEOIt6Dq1uBJcHGzBQDH9ydvkLAga3vj43NrquBAsm0XBxyg7zkMMyVc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mKh94+bs; arc=pass smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262511DFFD
+	for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 16:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776183493; cv=none; b=B18dRKQ3k2saxKH89DmOTfCbjxf1ytlCl3675Z6c7ny5eU4xx833U4zRykVg4eduyfzpRqnHJ+82UO0XG+6t1cXypauHJOsuwmKRFQpGOA/6LIQ+Fr40JB76fiRdW2ebCqhN5U5RGxjUfOo9QDwljaB/D3ytfeO2B5cnAOt0qmQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776183493; c=relaxed/simple;
+	bh=nVJ+EzzCzMonFjaNwYvhzGXta/u8E0ZomWSlFMYf7zI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Pa4bW0uP2R6fu2SVLpwLUqE2vGi6hgjMzwI/CNrvn2FQ9e74I+6mRGYpZMpzdft4fBOUFauyp5G1kAahpi3oe0stjBUaWAVDInBM3rIGB7rgqNxPCTFm1TzLbKK6fjws8Koqb8XdERjZhTj0Zv4d6cGay5bXZ3r2cN8Nr+kGbr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A4bTi5Yy; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mKh94+bs"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-89f1e767f92so45826096d6.2
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 08:11:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776179489; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LR5PM85I2MzfS2dDpINVt6rRNl9/CNCt4nSzN9QhRmK+E/Sw9Rsgy+sL+JdBtuSejy
-         2hOeM2EuHhbhM66uKbYjDyvYpufxTLfZOf5yf3/u0RxkKlbU2Id3FMUtRX3n+KxdZ875
-         HETf5kEEJL7OqJYnDEbtsPR1s4A8Tvpwncqm44GBdwZP1K2HSzXPikeL+P4z+wNsjD9Y
-         QYKKY3btQGlRWeKVtR7fPMl4jshM9l8RHvR+zZqj/dR27At677Ulb6w92YvRrSW+DAO/
-         t7ZMXshFsAJuAqropnyMUgvjDwmp/e5M3i7ocYc0zpcu808kQrgmGQVzQMzYj+nFYoOb
-         IKzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=A1ajaM+/PnY/fU7hrvyz0d97ujY4aWU6AnpQt8m7U4Y=;
-        fh=tWoD56v9lZXV68C4JTYPGibInU1bVIcDz+RLhwxXIsI=;
-        b=ggkrPXB6dX7NIoHm0fNlyNjd39Z0ScV8VETQ2TyzFYWRvedIvWRsxf2GBf9TroB9xJ
-         svVo5T10HJyg3p+aOFiUYcOfvQXAsMe9T8PzkDrGBtOQvll1oDIAS9SBrWUI4/zctn4C
-         3Cua4TKRfhceZBoJHp4CGtCisYTg2vFt1eRoU3s2BtEGHMKr5jkSaqXk4Z+k6R4S0ryl
-         rDN3f2RqRKaqusAd7GeJ5StdzP+ihsPFlBkummHCBoCuw3gMPcv9E2HS2hivnNvXLnFf
-         x5YggXqwUsLuYBOlc6SBdCnWdm/nfa4Yq7sf0AonxtEJeR3fvihfsptc6pg6EHYsARaw
-         bwzA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A4bTi5Yy"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82f37c09352so1712539b3a.0
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 09:18:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776179489; x=1776784289; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=A1ajaM+/PnY/fU7hrvyz0d97ujY4aWU6AnpQt8m7U4Y=;
-        b=mKh94+bs5eXxgSuvtv5uOZepf12AcbGCjciBwwhx8bwLcbwm6ier2X0nZS2Zgsl+yS
-         c3JY8neOsTSckpAn69hudUiFDYps0o8je05NS2M7UP6n45d/y4Gbr77MRIPcfYSyoyq6
-         vspakuYTbZmp7pmWdC0JCH9rmy/boseGsybQZjqWwOkCtdrot713l4FLOwvaAdU4CkFy
-         8PP8OwcDK4XCrwGxwn1m8wd/arOKatTO0va1gxImXwwuHvMNX9SQIrodJUum/F7avaZn
-         0zoCr7J5IINqrPfoT8FTa0UjiUwD1MEkKxgzK5MJJXp+E5yZbcpmq8QfvEDrakQmzOFe
-         HVaA==
+        d=gmail.com; s=20251104; t=1776183491; x=1776788291; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TUnElORk1CylRbeSfxzFXUT14s2LHPojbvEYU1HbPrQ=;
+        b=A4bTi5YyxKWtlxNzuN8D1lInbZBPl5+akwGQ8dvQqx8jbpBLcqQnYOq3i0iV4/I+1v
+         NjJx4ymmt5ZhXBR9FfXejVR3Fs6u/Q1QU8ErcIKur3SYjLGz+HreCVVAOoIZl0As4cGG
+         nGg9KBayp7yYAL5dwiXKIjNnyL7cRy/IftjcE65mro88dUjuSU3kmORMwZ7MMdq/6uVZ
+         0Xge33UYV0ptF62KLm28A5bxNJioWXS24Y2ILI1IrpWd3scE646yx/w51WuZ8ToQ7Me7
+         qJU3ARIHB7CnJjpJjmhwtl6yl/snZLbVGvQ16RBgo6xeKQcKChTFB1eyBI+ZnVlRhh+i
+         Kdrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776179489; x=1776784289;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A1ajaM+/PnY/fU7hrvyz0d97ujY4aWU6AnpQt8m7U4Y=;
-        b=eqtVxXDBcd3943p4n6piN3uI6iAKLLOGBY7FB4y/wZVgDwrBnl9qTEUOJQ6ryvAB2Q
-         3liei9vGyNMHhZSQlyLlXHXbtTI/IIWOjCInWh9r0XGI45ktBRfQBmh0VlbBaZ+hz5jU
-         yYhfPYrqcH/Wue3yYKCMkGiNjq9wG4fjXxmLGMRVfrA6tR9aOdIHVa5wOlGs92NgAWJK
-         3uGgBkJ54/cLaTeUxhah2gUMrQFmHO4XRfyI3TErrjmwojtzUD7EwIj18SM+h0k3zmEH
-         An/w9k2dLU/IB8B+FyWDerjXcWK6w/YR4clQZADTSaFpNqYQ1BGdjzQtu3W/vpRqVALK
-         Vn4g==
-X-Forwarded-Encrypted: i=1; AFNElJ8s5Q5AL9Gj4jP2l4plx1rNogBC5kKtljpXD8IpPV7EPTg1Au4lyTBMajtvH4tWi2L1Fa21Tid1z037@vger.kernel.org
-X-Gm-Message-State: AOJu0YxN9wx2qIhrRqZ0BZ2wSoaQTnkyceYQocxdcB+3nWwLZjabFn2u
-	isgVEsMxzJfm7gS5Bu+F0dYMWX8PSUNaJg7R9hlrtheppfHpYGqrdePZJ3M9w/gAoLW+fCaPSA6
-	Is//Uuf5QrXbEhQ/BWh2xO48f4N5hMRbX/vEo
-X-Gm-Gg: AeBDievV4WW1YJW5S1M2pTXK7tyih+LMPpUrAXnsbLsBbzGSbsgjOhBrfjwdK9oSINw
-	e0CGroYYckNzyFOg2Mm6VIitu/v9lON8Q0yS0RBDNGVlcZmCVsu1EonTD5oIOsJaP5KT05EZT13
-	d40GtC3Zi2+cHwycQb5nMVyJpO8ofO1595odBdo25oGUPxgNnZw7fKKTOf7qyyXORLCPuapAjY8
-	gPqeffsKhiJJTGa7FS7YbqsVjcjM4w9q+TbzU/tyRRB+MsKGVgJhgh4grlKzkgLdG8GcOhz6tdd
-	8S6DWuFulIviXbR9mreGz9LgXFzfoEFxfScbE5mhNLzbxbMxZne6FDej6ZsVxUEnuIpssa/ArY5
-	dpB7FdB9XmZP0E5X/Vjm0oSG5Vq18F7AMrP3fgGU0bIyGqyu0yXi3mVRMuk/IQdrzUXqaCfAXJK
-	Gub10uOLDP3+P+TDWN0BqOcwfXv4Z2LMfx
-X-Received: by 2002:a05:6214:500b:b0:8ae:5f29:effc with SMTP id
- 6a1803df08f44-8ae5f29f37emr37980346d6.54.1776179488780; Tue, 14 Apr 2026
- 08:11:28 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776183491; x=1776788291;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TUnElORk1CylRbeSfxzFXUT14s2LHPojbvEYU1HbPrQ=;
+        b=VXBIwOLh3mh0ojVbH1ndx7b9E34MW47f3tZi4SGils636g/mMtcPLjJm0aLBEOBSMX
+         07TnXedJuMWa2Buo1JDpDnWxE02uULITurCJ9IJ8HW2Zmwo/9SF7DIZ0pZ6cDU3zZShr
+         zLa5ntT+ZYg84+3j4UiNCg0yUkB+3bl7gP/hR0sGmhIHW/Xi2rOExyT42Yz67ljJK01d
+         QxPWkIuYj4aZxf2FOGnENwqZ7PKJBa1c4qP9mSTlacSDQ/GFMEbRbI1AnrW7cmLWpGpJ
+         hLgEvqQyNsf++UXHiAiKrLgMZZLTMnEqUQ+0XILpEw6NvswnjwC/soBeUaGlyqRsardo
+         QIZA==
+X-Gm-Message-State: AOJu0YysiG2MdOUTy2dItPZ8cg3AvRig+jneUZq8Idmmuan8AtQbCB8d
+	Kf5f+0FG/1syQ/wbJHFXz7plZfFjS64SWE+iOQbAqUeQQXGGDtRPWJuPqHjtrygC
+X-Gm-Gg: AeBDievJScx6K56UNOGyOlmbJYDaWHGYL1FEi3yDxEgbA6Gq8kiW/EZfkWk91nWm1Z+
+	CHc1vBZ6/vsE6tkX13CfcJ3DmDwGS3+adJTiUOdt0Ydxr1aTs5TNcj8pTcOwo4V8+I4JOpNWuQp
+	f+ySEXkfLdBnwjQ5Y6uP7lIdbRYuE+acS+r2JUnRK4epXqRiQOohofatkdG/FOdcX+04KWTUQnI
+	01nE5vC4/CLhyR7/RboXOCVVntkaUtCSsSlahhfhOVEUgaduFguCtHoV2bjm4kzW5HIhImBpqtD
+	+VJZgvFSVr3hK1koCDyJhZk3QIcRcj6bU9/dB2bfQVNvZB675+EXRyBaJCUByNv+5vMCbQ1H1dV
+	gicDlAUB7XQ8iwV0NByFGMAPCAEjh8stG0Bk1+d4O78NB17xIGWmGVuL8pdStxa7aHROJpk3zCh
+	a8eA8KypRLFibjfxVPfaoY6ErV4bDRWDKwsAVXnQeNQHG6VqEXxf/UXXtObjwC7g==
+X-Received: by 2002:a05:6a00:1250:b0:82f:3017:6157 with SMTP id d2e1a72fcca58-82f3017684fmr8797709b3a.7.1776183490923;
+        Tue, 14 Apr 2026 09:18:10 -0700 (PDT)
+Received: from bharathsm-Virtual-Machine.. ([167.220.110.101])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-82f0c30ee59sm15298585b3a.1.2026.04.14.09.18.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Apr 2026 09:18:10 -0700 (PDT)
+From: Bharath SM <bharathsm.hsk@gmail.com>
+X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
+To: linux-cifs@vger.kernel.org,
+	smfrench@gmail.com,
+	sprasad@microsoft.com,
+	pc@manguebit.com,
+	ematsumiya@suse.de,
+	henrique.carvalho@suse.com,
+	bharathsm@microsoft.com
+Subject: [PATCH 1/4] smb: client: add tracepoints for lock operations
+Date: Tue, 14 Apr 2026 21:48:02 +0530
+Message-ID: <20260414161805.233686-1-bharathsm@microsoft.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 14 Apr 2026 10:11:11 -0500
-X-Gm-Features: AQROBzBzXQFcfbrPjPOKmUK0Gvc29I8_N9GT5RGdooO7YRFSlobvu4ndN8EqCuc
-Message-ID: <CAH2r5mtZvz3OW5V_H8Q+mxvY5xeaNb4JVhCxz9ZsUj1FiEGXkA@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Please pull the following changes since commit
-028ef9c96e96197026887c0f092424679298aae8:
+Add tracepoints when lock operations are sent to the
+server with details including lock offset, length, and flags.
 
-  Linux 7.0 (2026-04-12 13:48:06 -0700)
+smb3_lock_enter: before sending lock request
+smb3_lock_done: lock acquired successfully
+smb3_lock_err: lock request failed
+smb3_lock_cached: lock granted from local cache (no server roundtrip)
 
-are available in the Git repository at:
+Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+---
+ fs/smb/client/file.c    | 10 +++++--
+ fs/smb/client/smb2pdu.c | 15 ++++++++++-
+ fs/smb/client/trace.h   | 58 ++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 79 insertions(+), 4 deletions(-)
 
-  git://git.samba.org/ksmbd.git tags/v7.1-rc-part1-ksmbd-srv-fixes
-
-for you to fetch changes up to 2de35d992ba1e4017ec21cde06a85ca7fca94810:
-
-  smb: smbdirect: add some logging to
-SMBDIRECT_CHECK_STATUS_{WARN,DISCONNECT}() (2026-04-12 18:07:55 -0500)
-
-----------------------------------------------------------------
-Sixteen ksmbd server fixes
-- two smbdirect double free fixes
-- Add some smbdirect logging
-- Minor cleanup in crypto, and smbdirect and in IPC handling
-- Minor cleanup to move header info to common FSCC code
-- Fix crypt message use after free
-- Fix memory leak in session setup
-- Fix for DACL parsing
-- FIx EA name length validation
-- Reconnect fix
-- Fix use after free in close
-
-I will send the larger set of smbdirect restructuring
-and cleanup changesets later this week.
-----------------------------------------------------------------
-Eric Biggers (1):
-      ksmbd: Remove unnecessary selection of CRYPTO_ECB
-
-Greg Kroah-Hartman (3):
-      ksmbd: validate EaNameLength in smb2_get_ea()
-      ksmbd: require 3 sub-authorities before reading sub_auth[2]
-      ksmbd: fix mechToken leak when SPNEGO decode fails after token alloc
-
-Joshua Klinesmith (1):
-      ksmbd: fix use-after-free from async crypto on Qualcomm crypto engine
-
-Namjae Jeon (2):
-      ksmbd: fix use-after-free in __ksmbd_close_fd() via durable scavenger
-      ksmbd: validate owner of durable handle on reconnect
-
-Rosen Penev (1):
-      ksmbd: ipc: use kzalloc_flex and __counted_by
-
-Stefan Metzmacher (5):
-      smb: client: avoid double-free in smbd_free_send_io() after
-smbd_send_batch_flush()
-      smb: server: avoid double-free in smb_direct_free_sendmsg after
-smb_direct_flush_send_list()
-      smb: smbdirect: let smbdirect.h include #include <linux/types.h>
-      smb: smbdirect: introduce smbdirect_socket.logging infrastructure
-      smb: smbdirect: add some logging to
-SMBDIRECT_CHECK_STATUS_{WARN,DISCONNECT}()
-
-ZhangGuoDong (3):
-      smb: move some definitions from common/smb2pdu.h into common/fscc.h
-      smb: move file_basic_info into common/fscc.h
-      smb: move filesystem_vol_info into common/fscc.h
-
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 5d5b49468aff..66a678a0e89f 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -1712,7 +1712,7 @@ cifs_lock_add(struct cifsFileInfo *cfile, struct cifsLockInfo *lock)
+  */
+ static int
+ cifs_lock_add_if(struct cifsFileInfo *cfile, struct cifsLockInfo *lock,
+-		 bool wait)
++		 bool wait, unsigned int xid)
+ {
+ 	struct cifsLockInfo *conf_lock;
+ 	struct cifsInodeInfo *cinode = CIFS_I(d_inode(cfile->dentry));
+@@ -1727,7 +1727,13 @@ cifs_lock_add_if(struct cifsFileInfo *cfile, struct cifsLockInfo *lock,
+ 					lock->type, lock->flags, &conf_lock,
+ 					CIFS_LOCK_OP);
+ 	if (!exist && cinode->can_cache_brlcks) {
++		struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
++
+ 		list_add_tail(&lock->llist, &cfile->llist->locks);
++		trace_smb3_lock_cached(xid, cfile->fid.persistent_fid,
++				       tcon->tid, tcon->ses->Suid,
++				       lock->offset, lock->length,
++				       lock->type, 1, 0);
+ 		up_write(&cinode->lock_sem);
+ 		return rc;
+ 	}
+@@ -2342,7 +2348,7 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
+ 		if (!lock)
+ 			return -ENOMEM;
+ 
+-		rc = cifs_lock_add_if(cfile, lock, wait_flag);
++		rc = cifs_lock_add_if(cfile, lock, wait_flag, xid);
+ 		if (rc < 0) {
+ 			kfree(lock);
+ 			return rc;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 5188218c25be..61bae531959a 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -6277,6 +6277,11 @@ smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
+ 		smb2_set_replay(server, &rqst);
+ 	}
+ 
++	trace_smb3_lock_enter(xid, persist_fid, tcon->tid, tcon->ses->Suid,
++			      le64_to_cpu(buf[0].Offset),
++			      le64_to_cpu(buf[0].Length),
++			      le32_to_cpu(buf[0].Flags), num_lock, 0);
++
+ 	rc = cifs_send_recv(xid, tcon->ses, server,
+ 			    &rqst, &resp_buf_type, flags,
+ 			    &rsp_iov);
+@@ -6285,7 +6290,15 @@ smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
+ 		cifs_dbg(FYI, "Send error in smb2_lockv = %d\n", rc);
+ 		cifs_stats_fail_inc(tcon, SMB2_LOCK_HE);
+ 		trace_smb3_lock_err(xid, persist_fid, tcon->tid,
+-				    tcon->ses->Suid, rc);
++				    tcon->ses->Suid,
++				    le64_to_cpu(buf[0].Offset),
++				    le64_to_cpu(buf[0].Length),
++				    le32_to_cpu(buf[0].Flags), num_lock, rc);
++	} else {
++		trace_smb3_lock_done(xid, persist_fid, tcon->tid, tcon->ses->Suid,
++				     le64_to_cpu(buf[0].Offset),
++				     le64_to_cpu(buf[0].Length),
++				     le32_to_cpu(buf[0].Flags), num_lock, 0);
+ 	}
+ 
+ 	if (is_replayable_error(rc) &&
+diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
+index acfbb63086ea..242c9da0283e 100644
+--- a/fs/smb/client/trace.h
++++ b/fs/smb/client/trace.h
+@@ -670,9 +670,65 @@ DEFINE_EVENT(smb3_fd_err_class, smb3_##name,    \
+ 	TP_ARGS(xid, fid, tid, sesid, rc))
+ 
+ DEFINE_SMB3_FD_ERR_EVENT(flush_err);
+-DEFINE_SMB3_FD_ERR_EVENT(lock_err);
+ DEFINE_SMB3_FD_ERR_EVENT(close_err);
+ 
++DECLARE_EVENT_CLASS(smb3_lock_class,
++	TP_PROTO(unsigned int xid,
++		__u64	fid,
++		__u32	tid,
++		__u64	sesid,
++		__u64	offset,
++		__u64	len,
++		__u32	flags,
++		__u32	num_lock,
++		int	rc),
++	TP_ARGS(xid, fid, tid, sesid, offset, len, flags, num_lock, rc),
++	TP_STRUCT__entry(
++		__field(unsigned int, xid)
++		__field(__u64, fid)
++		__field(__u32, tid)
++		__field(__u64, sesid)
++		__field(__u64, offset)
++		__field(__u64, len)
++		__field(__u32, flags)
++		__field(__u32, num_lock)
++		__field(int, rc)
++	),
++	TP_fast_assign(
++		__entry->xid = xid;
++		__entry->fid = fid;
++		__entry->tid = tid;
++		__entry->sesid = sesid;
++		__entry->offset = offset;
++		__entry->len = len;
++		__entry->flags = flags;
++		__entry->num_lock = num_lock;
++		__entry->rc = rc;
++	),
++	TP_printk("xid=%u sid=0x%llx tid=0x%x fid=0x%llx offset=0x%llx len=0x%llx flags=0x%x num_lock=%u rc=%d",
++		__entry->xid, __entry->sesid, __entry->tid, __entry->fid,
++		__entry->offset, __entry->len, __entry->flags, __entry->num_lock,
++		__entry->rc)
++)
++
++#define DEFINE_SMB3_LOCK_EVENT(name)          \
++DEFINE_EVENT(smb3_lock_class, smb3_##name,    \
++	TP_PROTO(unsigned int xid,		\
++		__u64	fid,			\
++		__u32	tid,			\
++		__u64	sesid,			\
++		__u64	offset,			\
++		__u64	len,			\
++		__u32	flags,			\
++		__u32	num_lock,		\
++		int	rc),			\
++	TP_ARGS(xid, fid, tid, sesid, offset, len, flags, num_lock, rc))
++
++DEFINE_SMB3_LOCK_EVENT(lock_enter);
++DEFINE_SMB3_LOCK_EVENT(lock_done);
++DEFINE_SMB3_LOCK_EVENT(lock_err);
++DEFINE_SMB3_LOCK_EVENT(lock_cached);
++
+ /*
+  * For handle based query/set info calls
+  */
 -- 
-Thanks,
+2.48.1
 
-Steve
