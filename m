@@ -1,108 +1,57 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5683D1A239A
-	for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 01:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776129772; cv=pass; b=lA+gp87uzmkQjt1wIFSl4HTIAuIkVrMPYoWKavFbLhjz+zT2+jtAlCxEszKBiSisTMWX8nAYWBKdbu48uvp1zAeoOdUqYCqvftj6qEjpvRs1XCoSh02I9ozJnnNC+mnPocgIlblKpsOE56xS5Q1E3g580Ktp92ouGVh+Swj+UOs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776129772; c=relaxed/simple;
-	bh=CQIsGPD0F5nasdz+E3tZ0A0oo1YwfIwrZwXTzoz9w6Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j+6Kw4QEG9Y7rLMnZp78oGdjn4hNcAUes5MNY+BTs9sms5l3Qf8S4BQE2e17GAEYjjZvVPOIoNJPw/A0sW3xiIb5hFGsBRgqodJJ0Z+1u6WDkcOELEmudwNci7jD/zfeG1LKvCu1G55Y+0j0Pp6U9W2DL6M/4cPHEIkHK1nQ3uU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IMMqKalA; arc=pass smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31AB30FF31;
+	Tue, 14 Apr 2026 03:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776136419; cv=none; b=FPOpcRl0u5CtAkT7VmRkHY/DHjnZmfBVV/kTy6D9OcCGZwQeYBvfJvesF7KGfSKUHptOP5yn6qos2G4/XnPWSisq1Izf80Ts+67b2T1QbBSCvnBtUzpXrEbGKCMoRiH0pOkpRVDnuS4M/RUhCHQ7Qit5Dn6UYqpHCPje3QaawH8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776136419; c=relaxed/simple;
+	bh=akOyNyISt6Rkx9V99cfwF1E10fplo7tgj4K9G7X7PJ0=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=ZMnba+r9+dOHmf+CyJ8QvEvvmg7BEZ4NxmwemmiuIoja7v7F8HWwRgToP5fyOa32Fkzcxs4SsAGf+6Mf7hpbDPZVXPzxkoGED7hlev3TpvdPOjhSYZc7iYNMHNMU5+/paXPBobjTH/ncH5TzcZ73Q25HiDPY+jZjwhmySZe1vPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=t8eAVXMu; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IMMqKalA"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8a3342d301aso51872146d6.2
-        for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2026 18:22:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776129769; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ktawSZ+s2RNLBch3z+iFHz58ecu0Oh4gs9Pn5xQmR1vlu16g2zG5dlZCQbwCP59kAb
-         2h4Y3t4vWKkSwD79BxH0CS2W0Eq/BPrf0XM6iWWyuID/VOI/Bv4w7u/A92CyBonhEEz6
-         IlRK5R6GKvmJ0Wwo/QihfGTlD3M1w4tV4bbIfwMj0sKzDJz5ssBcDdL725zcHWl7E9Sb
-         ga/ODPZcTz9koFs7OAFOlkf7TxF8exLdHRDnBWhGn5Q5Mfkqjh/RGqRqlmlKxojUANN+
-         F2T3Du0/eH0oH5gyauKRbFORkpEDJ2c1Jc81GbMlQDRY+Ot4dVlLfAeF8exTdcQyiBN/
-         g1vQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=GY2ZAij4OBI53HOLjtZsYU0pIOYhrrDKlFmX1b1tBFQ=;
-        fh=Ukg9gSPtoM9OuhG0Hpe7njPtUQUNsyetasbRqb/aMj0=;
-        b=DEYQt32bNKdjT2SPmc37WfFB05daj9aW9ti9ZlRlzZk5y0j9+t3wsajX6ZTqJVB+AM
-         glT9/dZZoO8ZcPNPDKpUISMA55zLVtayDT78TBOpsA8Q2hDNbV6n9iRe100Krj2Y3gx4
-         v/MBYJ3FwM3Wk6iikByb8Vbtq5FKWrMUJocaxTWhmHy/RhsWAc5J3tzshOsRoIuyi7YL
-         xU/2sjPGjcKTbZtz8JFKIheGfAK+JwNmASwssNVSI2zmPa5ZjkJ6MCOhUcR+sCGaTdnx
-         vSPW1L+aoBeoa4fORNrquVydLp3IV6vJ/GwOUD0DsuCOdNiS7FLLlRsAQOm7UWEJkuLA
-         A8kg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776129769; x=1776734569; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GY2ZAij4OBI53HOLjtZsYU0pIOYhrrDKlFmX1b1tBFQ=;
-        b=IMMqKalAznzj2Qwk/4Cg+x28soDlWHpYqe7jngYaUW2NkkYFNt151YoctEHd3kCYQ/
-         oqksL6nW0l7CuQYp3G2miYyr5aWP/ZwGXLlxT28d5nxseuci3Rf39TqDuI8GslgqeLTt
-         MmZDHKKTM8vEROiJfptDxADr5i6v6dHpj1T7OVFB2PuVk4AzVqyWZ+Si97XHw47QPQyQ
-         /9ZBQjCO4FtOSk8cZrPI4ojqk9PLcQl8WcZFwQdAqjnsnyqJsPh8Ca88qmzrXR2A1Ivh
-         Rubvb7sx0UO0K9o94NJiZrw/q8TrAs8VUrcCPlMZ+yN7MX/zrygOyrrpGWpvTLilKsbw
-         RBgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776129769; x=1776734569;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GY2ZAij4OBI53HOLjtZsYU0pIOYhrrDKlFmX1b1tBFQ=;
-        b=XdXnK/W37gRJSbkUJ7Zn9X5KnZXW2CfrSuNGB/9Hl54gxoLAwi7Wq2WWDNVYyM3B6v
-         wSWnLeHJQvFZUtQYuG0M2uVJ296yZPwu+QXyH6Haz0l0GD0ERHiSnnK5tyTbMEMyf5/G
-         7WFatpRSqyWYBfq4Y2wNmG6VuDRzu1wkl2c5n7NVSo6eEzg/FPYa20h0kCrZEBC8zOh9
-         YUddGmsLUD4SWW9aZuDT8bqUHhBvuWCkgx+cVgCPnfB8wyq+OjG411Tz+B751tsV5FoZ
-         fPWWl/3tX0xk0dHu22DrdKk0MZPD3N5QJmrMc4h9sKaqu5LSA4emLaFsM+LhO9rvgye/
-         Z0uQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/MDHt/UP976KnUFuYqcpAa5+osPkAhMgqtcs1fRGj/GsGR7qdmch++3N5YX4OWyn3ZvvwVI2dPNtom@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbiNozoeXvsCU0gScHu4EC1bgtaFZOAncKZ1SkbFwf8AZXUJ9i
-	QhNUr2N8W+169dfLdHHUV0bEG0uzskIsT7AZJpYN4GqDDtYk0LOxvBc6Rosax/gnn8flKsYpXt9
-	pFW3dpTnkR+Yjtwf0/Hz8fgA+Cx+3LrhgXw==
-X-Gm-Gg: AeBDievT1W9z4VJVbjeQTtffWTJ8wPDLGP92iH3z9nHp+0zlCI4y/B/H3mIoTvfQe7X
-	+A+zxJPPUQGU8j4Br59iHHkxpmLwS6G1uJdun1Rcy6vUsu+u0b9ilwlIQ8aLHWpluKsx7IGurSR
-	ttNSKeQGw6CUagbqkEaF3bhAMOYWw76f1arleHDYZ/QmG05ztz7v6ttZDiqgKTzDp4eQRBQeYgK
-	zglTMsbAYTmzKVOIqI6QoRNNOYcu9H+S6uYUWIZK8SQMijhaaxVfQHBKo+xoqY1rqlZ3TygItC2
-	8A+hybrFW6rCLTYHUXNDawnZFf14eGy4lwW1K96mGddTyZUYYXLeCiknylQLTP6lSM81Edt/OyN
-	3Wfm61x505v9PKKNFNIEbzmucYZJsFQDjWWPP+iqErp7lQFBvUz6HMlNI5PWsN/NMd8aMx8YjYI
-	xledYimjHdFZN3dKVPy0l5l3z0vpo4bTE7
-X-Received: by 2002:a05:6214:4b04:b0:8a7:e3fd:4d8f with SMTP id
- 6a1803df08f44-8ac86156698mr286548056d6.8.1776129769328; Mon, 13 Apr 2026
- 18:22:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="t8eAVXMu"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=3rR0D0UvNAXit50J7295ttnGV9xG3zEcvphJRyM6oiw=; b=t8eAVXMuSQfnAhqd4fI+PxiPxq
+	ky/Lv4IX88sUpCqmuMUr4dZHq7HcTFvRr4hKgpwA+pYh0jHrXz5Qp6jhKeZKdBbNX2FbtT3JCJEz4
+	qs0CnhoODzd+JnYB0x9XOPdEvYFhUB0yZlVIqAxFC3nv+vLcKA8LfS8yAvyXGHj3HvT10hw1PGknB
+	zlo2jIN8CJW9I7gs55yKX0YxXD6B2wHCYDAH5q74puhqcZs8yKumIziu3ddYIekBPcCIane7Mlmv8
+	EalYXLqfdrbaAdacutJekOBiBzziXL1Hyj2JERxM1fPwTTQda8Qkn2CPFaKDj+70pV7/fovx4cUsM
+	ukW4Vfmg==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
+	id 1wCUDR-000000007ld-1OaE;
+	Tue, 14 Apr 2026 00:13:29 -0300
+Message-ID: <ab9457074b5852e73e84f0209bb58279@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>, Steve French
+ <smfrench@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [GIT PULL] smb3 client fixes
+In-Reply-To: <CAHk-=wgerpUKCDhdzKH0FEdLyfhj3doc9t+kO9Yb6rSsTp7hdQ@mail.gmail.com>
+References: <CAH2r5muW_D8eDN0iN7kzFV0km+QBVZn087+AGHTeSHm0E-KqYw@mail.gmail.com>
+ <CAHk-=wgerpUKCDhdzKH0FEdLyfhj3doc9t+kO9Yb6rSsTp7hdQ@mail.gmail.com>
+Date: Tue, 14 Apr 2026 00:13:27 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5muW_D8eDN0iN7kzFV0km+QBVZn087+AGHTeSHm0E-KqYw@mail.gmail.com>
- <CAHk-=wgerpUKCDhdzKH0FEdLyfhj3doc9t+kO9Yb6rSsTp7hdQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wgerpUKCDhdzKH0FEdLyfhj3doc9t+kO9Yb6rSsTp7hdQ@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 13 Apr 2026 20:22:37 -0500
-X-Gm-Features: AQROBzC2TPcpNf1UHJPTeZeP5jzozf8of9Bk_cIpC8Ea9PViQuJ1cccfPV0yAFU
-Message-ID: <CAH2r5mv04gWxkFLztfpro=AdySb2mXv_gafawXVaSa7VO+t+vQ@mail.gmail.com>
-Subject: Re: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>, Paulo Alcantara <pc@manguebit.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Mon, Apr 13, 2026 at 7:28=E2=80=AFPM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
+Linus Torvalds <torvalds@linux-foundation.org> writes:
+
 > On Mon, 13 Apr 2026 at 15:06, Steve French <smfrench@gmail.com> wrote:
-> >
-> >   git://git.samba.org/sfrench/cifs-2.6.git tags/v7.1-rc1-part1-smb3-cli=
-ent-fixes
+>>
+>>   git://git.samba.org/sfrench/cifs-2.6.git tags/v7.1-rc1-part1-smb3-client-fixes
 >
 > I've pulled this, but then looking at the dcache changes I noted the
 > big forest of BUG_ON() which really isn't valid. Error handling is a
@@ -114,7 +63,7 @@ ent-fixes
 >
 > You have this:
 >
->         size_t size =3D CIFS_TMPNAME_LEN + 1;
+>         size_t size = CIFS_TMPNAME_LEN + 1;
 >
 > fifty lines earlier, and then you do
 >
@@ -140,7 +89,7 @@ ent-fixes
 > I don't even understand why you use a variable for an insane constant.
 > The code *could* have done something like this:
 >
->         namelen =3D scnprintf(name, size,
+>         namelen = scnprintf(name, size,
 >                           CIFS_TMPNAME_PREFIX "%0*x",
 >                           CIFS_TMPNAME_COUNTER_LEN,
 >                           atomic_inc_return(&cifs_tmpcounter));
@@ -149,12 +98,164 @@ ent-fixes
 > like that really doesn't - not without at least a big comment on how
 > those random things are interrelated.
 >
-> So this is in my tree now, but I expect it to be cleaned up and made sens=
-ible.
+> So this is in my tree now, but I expect it to be cleaned up and made sensible.
 
-Will do or will have Paulo do.
+ACK.
 
---=20
-Thanks,
+Do the below changes look any better?  I wasn't sure what exact error
+values to return from d_mark_tmpfile_name(), hopefully it's fine.
 
-Steve
+diff --git a/fs/dcache.c b/fs/dcache.c
+index df11bbba0342..151f83f0a0e5 100644
+--- a/fs/dcache.c
++++ b/fs/dcache.c
+@@ -3196,15 +3196,20 @@ void d_mark_tmpfile(struct file *file, struct inode *inode)
+ }
+ EXPORT_SYMBOL(d_mark_tmpfile);
+ 
+-void d_mark_tmpfile_name(struct file *file, const struct qstr *name)
++int d_mark_tmpfile_name(struct file *file, const struct qstr *name)
+ {
+ 	struct dentry *dentry = file->f_path.dentry;
+ 	char *dname = dentry->d_shortname.string;
+ 
+-	BUG_ON(dname_external(dentry));
+-	BUG_ON(d_really_is_positive(dentry));
+-	BUG_ON(!d_unlinked(dentry));
+-	BUG_ON(name->len > DNAME_INLINE_LEN - 1);
++	if (WARN_ON_ONCE(dname_external(dentry)))
++		return -EINVAL;
++	if (WARN_ON_ONCE(d_really_is_positive(dentry)))
++		return -EINVAL;
++	if (WARN_ON_ONCE(!d_unlinked(dentry)))
++		return -EINVAL;
++	if (WARN_ON_ONCE(name->len > DNAME_INLINE_LEN - 1))
++		return -ENAMETOOLONG;
++
+ 	spin_lock(&dentry->d_parent->d_lock);
+ 	spin_lock_nested(&dentry->d_lock, DENTRY_D_LOCK_NESTED);
+ 	dentry->__d_name.len = name->len;
+@@ -3212,6 +3217,7 @@ void d_mark_tmpfile_name(struct file *file, const struct qstr *name)
+ 	dname[name->len] = '\0';
+ 	spin_unlock(&dentry->d_lock);
+ 	spin_unlock(&dentry->d_parent->d_lock);
++	return 0;
+ }
+ EXPORT_SYMBOL(d_mark_tmpfile_name);
+ 
+diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
+index 18f9f93a01b4..804b57595ab8 100644
+--- a/fs/smb/client/cifsfs.h
++++ b/fs/smb/client/cifsfs.h
+@@ -10,6 +10,7 @@
+ #define _CIFSFS_H
+ 
+ #include <linux/hash.h>
++#include <linux/dcache.h>
+ 
+ #define ROOT_I 2
+ 
+@@ -149,17 +150,8 @@ struct dentry *cifs_smb3_do_mount(struct file_system_type *fs_type, int flags,
+ 
+ char *cifs_silly_fullpath(struct dentry *dentry);
+ 
+-#define CIFS_TMPNAME_PREFIX        ".__smbfile_tmp"
+-#define CIFS_TMPNAME_PREFIX_LEN    ((int)sizeof(CIFS_TMPNAME_PREFIX) - 1)
+-#define CIFS_TMPNAME_COUNTER_LEN   ((int)sizeof(cifs_tmpcounter) * 2)
+-#define CIFS_TMPNAME_LEN \
+-	(CIFS_TMPNAME_PREFIX_LEN + CIFS_TMPNAME_COUNTER_LEN)
+-
+-#define CIFS_SILLYNAME_PREFIX	    ".__smbfile_silly"
+-#define CIFS_SILLYNAME_PREFIX_LEN  ((int)sizeof(CIFS_SILLYNAME_PREFIX) - 1)
+-#define CIFS_SILLYNAME_COUNTER_LEN ((int)sizeof(cifs_sillycounter) * 2)
+-#define CIFS_SILLYNAME_LEN \
+-	(CIFS_SILLYNAME_PREFIX_LEN + CIFS_SILLYNAME_COUNTER_LEN)
++#define CIFS_TMPNAME_LEN	(DNAME_INLINE_LEN - 1)
++#define CIFS_SILLYNAME_LEN	(DNAME_INLINE_LEN - 1)
+ 
+ #ifdef CONFIG_CIFS_NFSD_EXPORT
+ extern const struct export_operations cifs_export_ops;
+diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
+index 6ea1ae7f7a46..2abe76a7cec0 100644
+--- a/fs/smb/client/dir.c
++++ b/fs/smb/client/dir.c
+@@ -1056,9 +1056,9 @@ int cifs_tmpfile(struct mnt_idmap *idmap, struct inode *dir,
+ {
+ 	struct dentry *dentry = file->f_path.dentry;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(dir);
++	size_t namesize = CIFS_TMPNAME_LEN + 1;
+ 	char *path __free(kfree) = NULL, *name;
+ 	unsigned int oflags = file->f_flags;
+-	size_t size = CIFS_TMPNAME_LEN + 1;
+ 	int retries = 0, max_retries = 16;
+ 	struct TCP_Server_Info *server;
+ 	struct cifs_pending_open open;
+@@ -1070,6 +1070,7 @@ int cifs_tmpfile(struct mnt_idmap *idmap, struct inode *dir,
+ 	struct inode *inode;
+ 	unsigned int xid;
+ 	__u32 oplock;
++	int namelen;
+ 	int rc;
+ 
+ 	if (unlikely(cifs_forced_shutdown(cifs_sb)))
+@@ -1093,7 +1094,7 @@ int cifs_tmpfile(struct mnt_idmap *idmap, struct inode *dir,
+ 		server->ops->new_lease_key(&fid);
+ 	cifs_add_pending_open(&fid, tlink, &open);
+ 
+-	path = alloc_parent_path(dentry, size - 1);
++	path = alloc_parent_path(dentry, namesize - 1);
+ 	if (IS_ERR(path)) {
+ 		cifs_del_pending_open(&open);
+ 		rc = PTR_ERR(path);
+@@ -1103,16 +1104,21 @@ int cifs_tmpfile(struct mnt_idmap *idmap, struct inode *dir,
+ 
+ 	name = path + strlen(path);
+ 	do {
+-		scnprintf(name, size,
+-			  CIFS_TMPNAME_PREFIX "%0*x",
+-			  CIFS_TMPNAME_COUNTER_LEN,
+-			  atomic_inc_return(&cifs_tmpcounter));
++		/* Append tmpfile name to @path */
++		namelen = scnprintf(name, namesize, ".__smbfile_tmp%0*x",
++				    (int)sizeof(cifs_tmpcounter) * 2,
++				    atomic_inc_return(&cifs_tmpcounter));
+ 		rc = __cifs_do_create(dir, dentry, path, xid, tlink, oflags,
+ 				      mode, &oplock, &fid, NULL, &inode);
+ 		if (!rc) {
++			rc = d_mark_tmpfile_name(file, &QSTR_LEN(name, namelen));
++			if (rc) {
++				rc = -EISDIR;
++				iput(inode);
++				goto err_open;
++			}
+ 			set_nlink(inode, 0);
+ 			mark_inode_dirty(inode);
+-			d_mark_tmpfile_name(file, &QSTR_LEN(name, size - 1));
+ 			d_instantiate(dentry, inode);
+ 			break;
+ 		}
+@@ -1168,9 +1174,8 @@ char *cifs_silly_fullpath(struct dentry *dentry)
+ 
+ 	do {
+ 		dput(sdentry);
+-		scnprintf(name, namesize,
+-			  CIFS_SILLYNAME_PREFIX "%0*x",
+-			  CIFS_SILLYNAME_COUNTER_LEN,
++		scnprintf(name, namesize, ".__smbfile_silly%0*x",
++			  (int)sizeof(cifs_sillycounter) * 2,
+ 			  atomic_inc_return(&cifs_sillycounter));
+ 		sdentry = lookup_noperm(&QSTR(name), dentry->d_parent);
+ 		if (IS_ERR(sdentry))
+diff --git a/include/linux/dcache.h b/include/linux/dcache.h
+index f60819dcfebd..c5bd5a74baba 100644
+--- a/include/linux/dcache.h
++++ b/include/linux/dcache.h
+@@ -264,7 +264,7 @@ extern void d_invalidate(struct dentry *);
+ extern struct dentry * d_make_root(struct inode *);
+ 
+ extern void d_mark_tmpfile(struct file *, struct inode *);
+-void d_mark_tmpfile_name(struct file *file, const struct qstr *name);
++int d_mark_tmpfile_name(struct file *file, const struct qstr *name);
+ extern void d_tmpfile(struct file *, struct inode *);
+ 
+ extern struct dentry *d_find_alias(struct inode *);
