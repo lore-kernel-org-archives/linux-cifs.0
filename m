@@ -1,62 +1,62 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F96314B73
-	for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 16:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9584C3E5ECA
+	for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 16:18:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776183493; cv=none; b=aTXvWYO07ZrjnBvTgU4ToXhgyI5Mo5DOs/LOkAG8tEWquRAHOVrJ9Ndd4V5m+2RQM+V8yB5pw27AcrziNSnHRp77mpNNb2eYC4h2oGi+r9OSTvmS8ggeYPVgJLHNr5z+goD3ZA6F8gEPtVUCXWkPjC0xD/R2wDvtugHUPkVrb1E=
+	t=1776183508; cv=none; b=RODNblSXukWEJiKWDaS/odoQDx32zTHIlFO/Tc2t5GxTxNHzMz1PsGPDUQAMdunxxBIGoJPKDabT4bbdYOOFWEpmfWrtURAG9Iufeo9Eci7W30ztmcl9aO7JbvgC0dGMEj+hKbP7eHNKibkVoJGjYycsJGGm2J73KhlcyS8Ibpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776183493; c=relaxed/simple;
-	bh=1cKR59a8LFv+m3+/Saa1ocskqgMkiRtSNSU9mYzf3EM=;
+	s=arc-20240116; t=1776183508; c=relaxed/simple;
+	bh=nibqdMYmBb7tAORp3Xmg66Zl4jf3OkES70n3H/pw9Ko=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kTnYghgjwiDmiD78qiGXLc1GRJsjF7CQFMSRc1dbCEwSC/G/OeNGOH14FoQIsP02oy4s8U6kMV4348MZWF3V0BAM8SFp0SNzesCQsT9DwPHR+vR6WZfW9mmA5FqiQTKnrgfNUKaTgtah/1xBuq1o7MfF2mN2sbnpKMjoGhuskBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UB5+LK21; arc=none smtp.client-ip=209.85.210.178
+	 MIME-Version; b=L8OcYJsWA6I+ieXdO6ftdovCDYSmWGFRLLHCd4vcRM8jy3DiWGs5I8SoGyt35A8qxuL/M5u1nd6x3YCRsh0KLyQf5BShNNP2nhkGmQvcWfsbHTLvk0U10sFFlnT8Rrml08K0DqZAK6Q6bZCs4yiQ8L4gxDR5fBA0Xh4bTuKCRuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pRUoNADS; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UB5+LK21"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-82cebbdab08so4259805b3a.2
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 09:18:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pRUoNADS"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82c70e4654eso2516498b3a.2
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 09:18:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776183492; x=1776788292; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776183505; x=1776788305; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=K71PSMfpHRlyFWoQ4+uuYsY2JS8Ju9wHEZODt3x5U6w=;
-        b=UB5+LK21KjBziOHq4y3rnEfESoUOG4Svln/EoY6DAnXM1+mf60aivuaOuWG8/dQRVZ
-         sAVSse1aQ7bPK8rVLUu9t7sE0Hpbk3WlHOPwdPnWQSp7uUBTgswJk27xwueLTdqWzCtZ
-         Kprzd6L+uVOFNT/Y0AH6OG7v2+tkVHjsIoNx3MwW4eH4hJdQ/mqTULt1q7i8MGo8fz/q
-         9C11o5igLzFRydWuYliM5EZMD1TadureTlpDjSvMKjX5JXXcTQgbUkg8sL2BLTXhJkzw
-         eYqS58skz/MPruEadaqwv7hI9AmPWkeULjvrsDVN6/MGuaZ8pgY7aO6k6aUnrwgi2r+I
-         EeSA==
+        bh=3FEZZFLdFMDiBVXrPIj+L0y1hVnxidBgedh/d+dmu28=;
+        b=pRUoNADSLhr0/lUBTpV8LwuvffdytY0w6O7bCB/wVWOBz37l2hJZQFSf/JDOeDtVvJ
+         WMEEExFTp1KkoqmmS16wDHPExDPOj/paLFQQ+f87blRpdvhWGT8Nup3Tz3cKq2B08IDm
+         qnkzhQTPQPGcZ2FQlB5+q9IIkDis9l3Vz64+GvCTHYxlHES/QYfj+J6zsZU0JJhIzbiZ
+         bLCn16PYZFJixXkcrhpU1lJ4aPGf9j+8vf9ppwIbY3SsiDgJdVEq3r9YiE42O9tlh1aj
+         dN6kcGa62vt0nKnh+hP/UlhO8slfuZWVxB4kz0ewMT9CjkSMY5bl69fDJg1Syn2m3/E1
+         d1tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776183492; x=1776788292;
+        d=1e100.net; s=20251104; t=1776183505; x=1776788305;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=K71PSMfpHRlyFWoQ4+uuYsY2JS8Ju9wHEZODt3x5U6w=;
-        b=ZR6JYD3tYFiFgtcN2YeSlzQO4I+7AjfqeDcBfI6edk5KpnUg9IsWysie9TJTmsClx1
-         BL3Wc/nrkwUGo6v6S/yIxF6B+8sehDDYCo2FF2JgZ3zxRGAcVXZLU2capiu5BWyH6tuW
-         65UQVlaegfMPbEfmi6SfO5RGqcsW/tY25XZgAiBemXqSW62Kln6GRepITMBbBd8raN21
-         EXSGdvXCH0A+vqUgrdEmIQtMhvie3jA1+vM8YeEPwsLvD1FOQp1cN8HhFF8TBHv4iqfG
-         BwqGtCDPZR6NPIo+G5Gja7BzxvgIHsa4d2ZWILlu/JKkqtACqtTI5RO3JP6w0cx8mHGb
-         kpAw==
-X-Gm-Message-State: AOJu0Yyyc60EbswRZ1ON/GPYhDhvdeHDhcLHGFUVx+ESW7xOHZi/O19m
-	5ZR8BM18kNfpit+/8kedPz+DUwM5m1bKtUSxPvJGl/+pGemSIHGWXhJ478F/l8A6
-X-Gm-Gg: AeBDieshLnOvfCr54bx+dFeQpx3mDBGqtJMJT1o+3oyYr2eT9KPBrDB7PR3LeZszLu5
-	7Agrzs40rU9/VMP78Q3Dtjj5iCCInmvmE5uLz6niwma+ojEoyb69SlC/S5nk3p0ktUMXOkr4WvZ
-	YPxXSJW+N4Cym7rNJKZq/ofncRzykQAk80LICnG7sIibfnLITFj+mDGkOGslfkpPtSXfNxxD7Kh
-	X68H4bQyQd2A6dTcNFu9aFgnkQN+jFd98Tr/atTVwF0ibezN1C/6fPn/xdl3V4jy3uokwFAkjRh
-	wGUI1YwiaKncZ9z8R06c13G2AxrHDkmwG65GjvX+RvKIpdGBE1/OKDczARIoCgEZSMTpR016QY6
-	TYGYWsmw0e5WH7UAY57kE7teOfcG+XAlZtadFcxoXHz48CKvFcTdcZqg9c+w5O5TtEuQ2LS9PoF
-	tbRO+6DMcwnV/y2iLVR5h4s2GvpuMjalK5HUQ8h7fe9YdNy/SNbuuVL1c32L/Spg==
-X-Received: by 2002:a05:6a00:2ea2:b0:82a:8865:6fe6 with SMTP id d2e1a72fcca58-82f0c2a7417mr19702739b3a.28.1776183491641;
-        Tue, 14 Apr 2026 09:18:11 -0700 (PDT)
+        bh=3FEZZFLdFMDiBVXrPIj+L0y1hVnxidBgedh/d+dmu28=;
+        b=UqPLI45u/HrpfCgaj3NFiBAbAFIxDmE7hFrsJ3RoNCnKGgeYz9NhNrMiA9eT/qxass
+         9Epr1nSpy2syLCGvMOvwIyCjDj4N71c6mlc66JuKrzqkwydzn1WBkLn2FnEMiWb7JEOg
+         g7+HhjQopB/fsigptcnyGJbthQFzdhv8/yurQHIDiolzdfQqeX+hvK2GusooO42iEwno
+         YR+m61DE8AaTW3QGSK+jIn3iyc1zuUphYrxd8Hm3tqGJ3bKfLsjEsvoPBssySK3D4dM7
+         KRql1LfXrWurYcbJFXfr9ny8bmspsEr7H1jryXSFFAu00wVPmvatX0b0qHIUbY+N+XY2
+         Flmw==
+X-Gm-Message-State: AOJu0Yx6EKP/GnTugZcVugfLgHIicN2fi2RZLJumMpPKpV6Jr/uUX2iC
+	ZREwhr8XKH47HYuDq5YDpnb3JzPB7x4XWSz2+18m7QyMaFXnecnJFC+cLQLOLU5L
+X-Gm-Gg: AeBDiesFXV3k8wHxNqhKxgNejfZF7zCLdIm41dM0EYJ+yW8aQLO5hZvtmPBkpc8Q1JL
+	BH5++oLrArMm9wDVxMrCInK7AQ9+3HN66SoqJpGnXg3R4fsdYKQvRhagq9xEmE43zPW6uif4ol8
+	loQZ8qbhAFKW2N0jbvY2k4EeiTOwbFPvON+cORRdAFkuCEL09wGZ9wms67yae/hT4NnStgtbmAZ
+	BfzV8+QuS8KhHGR7NRbOsHVW/Xci4qKsiGpbnDIZEYKGiEOvJuRak13DcV7Y5mliMgATb8Kt6NL
+	fa9FGJmkdHFxpiUhmfjHdNy03kTHbkCp8YKEg6YLc0TzmMorIwXvGkWiEHyvciRhdn8UCPWpN4R
+	noqn96a2ri6IkfhX8BIozq+ihfxhrlNsFQ42x6F17+KX2FRCJnoUdvIOYYl/UXk8xr0ulrM/JwB
+	oLEKTpBJjtmhtelYSdaixmwILcD3zPBVarRIpn3Y1aC/WO1yjDeMWbSPy4quxHeA==
+X-Received: by 2002:a05:6a00:6904:b0:82f:1369:7272 with SMTP id d2e1a72fcca58-82f136995f4mr11170122b3a.19.1776183504975;
+        Tue, 14 Apr 2026 09:18:24 -0700 (PDT)
 Received: from bharathsm-Virtual-Machine.. ([167.220.110.101])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-82f0c30ee59sm15298585b3a.1.2026.04.14.09.18.11
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-82f0c30ee59sm15298585b3a.1.2026.04.14.09.18.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 09:18:11 -0700 (PDT)
+        Tue, 14 Apr 2026 09:18:24 -0700 (PDT)
 From: Bharath SM <bharathsm.hsk@gmail.com>
 X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
 To: linux-cifs@vger.kernel.org,
@@ -66,9 +66,9 @@ To: linux-cifs@vger.kernel.org,
 	ematsumiya@suse.de,
 	henrique.carvalho@suse.com,
 	bharathsm@microsoft.com
-Subject: [PATCH 2/4] smb: client: add tracepoint for local lock conflicts
-Date: Tue, 14 Apr 2026 21:48:03 +0530
-Message-ID: <20260414161805.233686-2-bharathsm@microsoft.com>
+Subject: [PATCH 3/4] smb: client: add oplock level to smb3_open_done tracepoint
+Date: Tue, 14 Apr 2026 21:48:04 +0530
+Message-ID: <20260414161805.233686-3-bharathsm@microsoft.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20260414161805.233686-1-bharathsm@microsoft.com>
 References: <20260414161805.233686-1-bharathsm@microsoft.com>
@@ -80,81 +80,102 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add smb3_lock_conflict tracepoint that fires when a byte-range
-lock request conflicts with an existing cached lock. This helps
-debug lock contention issues when locks are cached locally due
-to oplocks/leases.
-
-The trace includes both the requested and conflicting lock details:
-- Requested: offset, length, type
-- Conflicting: offset, length, type, pid (lock holder)
+Add an oplock field to the smb3_open_done_class trace event to
+show the granted oplock/lease level. Move the trace_smb3_open_done
+call after smb2_parse_contexts() so the oplock value reflects
+the parsed lease state (R/W/H flags).
 
 Signed-off-by: Bharath SM <bharathsm@microsoft.com>
 ---
- fs/smb/client/file.c  |  3 +++
- fs/smb/client/trace.h | 35 +++++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+ fs/smb/client/smb2pdu.c | 10 ++++++----
+ fs/smb/client/trace.h   | 16 ++++++++++------
+ 2 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 66a678a0e89f..4662592801b0 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -1631,6 +1631,9 @@ cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
- 			continue;
- 		if (conf_lock)
- 			*conf_lock = li;
-+		trace_smb3_lock_conflict(cfile->fid.persistent_fid,
-+					 offset, length, type,
-+					 li->offset, li->length, li->type, li->pid);
- 		return true;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 61bae531959a..96140f6d30b5 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -3044,7 +3044,8 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
  	}
- 	return false;
+ 
+ 	trace_smb3_posix_mkdir_done(xid, rsp->PersistentFileId, tcon->tid, ses->Suid,
+-				    CREATE_NOT_FILE, FILE_WRITE_ATTRIBUTES);
++				    CREATE_NOT_FILE, FILE_WRITE_ATTRIBUTES,
++				    rsp->OplockLevel);
+ 
+ 	SMB2_close(xid, tcon, rsp->PersistentFileId, rsp->VolatileFileId);
+ 
+@@ -3321,9 +3322,6 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 		goto creat_exit;
+ 	} else if (rsp == NULL) /* unlikely to happen, but safer to check */
+ 		goto creat_exit;
+-	else
+-		trace_smb3_open_done(xid, rsp->PersistentFileId, tcon->tid, ses->Suid,
+-				     oparms->create_options, oparms->desired_access);
+ 
+ 	atomic_inc(&tcon->num_remote_opens);
+ 	oparms->fid->persistent_fid = rsp->PersistentFileId;
+@@ -3348,6 +3346,10 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 
+ 	rc = smb2_parse_contexts(server, &rsp_iov, &oparms->fid->epoch,
+ 				 oparms->fid->lease_key, oplock, buf, posix);
++
++	trace_smb3_open_done(xid, rsp->PersistentFileId, tcon->tid, ses->Suid,
++			     oparms->create_options, oparms->desired_access,
++			     *oplock);
+ creat_exit:
+ 	SMB2_open_free(&rqst);
+ 	free_rsp_buf(resp_buftype, rsp);
 diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index 242c9da0283e..cb5ce1316eba 100644
+index cb5ce1316eba..57abf5fca26c 100644
 --- a/fs/smb/client/trace.h
 +++ b/fs/smb/client/trace.h
-@@ -729,6 +729,41 @@ DEFINE_SMB3_LOCK_EVENT(lock_done);
- DEFINE_SMB3_LOCK_EVENT(lock_err);
- DEFINE_SMB3_LOCK_EVENT(lock_cached);
+@@ -1321,8 +1321,9 @@ DECLARE_EVENT_CLASS(smb3_open_done_class,
+ 		__u32	tid,
+ 		__u64	sesid,
+ 		int	create_options,
+-		int	desired_access),
+-	TP_ARGS(xid, fid, tid, sesid, create_options, desired_access),
++		int	desired_access,
++		__u8	oplock),
++	TP_ARGS(xid, fid, tid, sesid, create_options, desired_access, oplock),
+ 	TP_STRUCT__entry(
+ 		__field(unsigned int, xid)
+ 		__field(__u64, fid)
+@@ -1330,6 +1331,7 @@ DECLARE_EVENT_CLASS(smb3_open_done_class,
+ 		__field(__u64, sesid)
+ 		__field(int, create_options)
+ 		__field(int, desired_access)
++		__field(__u8, oplock)
+ 	),
+ 	TP_fast_assign(
+ 		__entry->xid = xid;
+@@ -1338,10 +1340,11 @@ DECLARE_EVENT_CLASS(smb3_open_done_class,
+ 		__entry->sesid = sesid;
+ 		__entry->create_options = create_options;
+ 		__entry->desired_access = desired_access;
++		__entry->oplock = oplock;
+ 	),
+-	TP_printk("xid=%u sid=0x%llx tid=0x%x fid=0x%llx cr_opts=0x%x des_access=0x%x",
++	TP_printk("xid=%u sid=0x%llx tid=0x%x fid=0x%llx cr_opts=0x%x des_access=0x%x oplock=0x%x",
+ 		__entry->xid, __entry->sesid, __entry->tid, __entry->fid,
+-		__entry->create_options, __entry->desired_access)
++		__entry->create_options, __entry->desired_access, __entry->oplock)
+ )
  
-+TRACE_EVENT(smb3_lock_conflict,
-+	TP_PROTO(__u64 fid,
-+		__u64 req_offset,
-+		__u64 req_len,
-+		__u8 req_type,
-+		__u64 conf_offset,
-+		__u64 conf_len,
-+		__u16 conf_type,
-+		__u32 conf_pid),
-+	TP_ARGS(fid, req_offset, req_len, req_type, conf_offset, conf_len, conf_type, conf_pid),
-+	TP_STRUCT__entry(
-+		__field(__u64, fid)
-+		__field(__u64, req_offset)
-+		__field(__u64, req_len)
-+		__field(__u8, req_type)
-+		__field(__u64, conf_offset)
-+		__field(__u64, conf_len)
-+		__field(__u16, conf_type)
-+		__field(__u32, conf_pid)
-+	),
-+	TP_fast_assign(
-+		__entry->fid = fid;
-+		__entry->req_offset = req_offset;
-+		__entry->req_len = req_len;
-+		__entry->req_type = req_type;
-+		__entry->conf_offset = conf_offset;
-+		__entry->conf_len = conf_len;
-+		__entry->conf_type = conf_type;
-+		__entry->conf_pid = conf_pid;
-+	),
-+	TP_printk("fid=0x%llx req=[0x%llx:0x%llx] type=0x%x conflicts with [0x%llx:0x%llx] type=0x%x pid=%u",
-+		__entry->fid, __entry->req_offset, __entry->req_len, __entry->req_type,
-+		__entry->conf_offset, __entry->conf_len, __entry->conf_type, __entry->conf_pid)
-+);
-+
- /*
-  * For handle based query/set info calls
-  */
+ #define DEFINE_SMB3_OPEN_DONE_EVENT(name)        \
+@@ -1351,8 +1354,9 @@ DEFINE_EVENT(smb3_open_done_class, smb3_##name,  \
+ 		__u32	tid,			\
+ 		__u64	sesid,			\
+ 		int	create_options,		\
+-		int	desired_access),	\
+-	TP_ARGS(xid, fid, tid, sesid, create_options, desired_access))
++		int	desired_access,		\
++		__u8	oplock),		\
++	TP_ARGS(xid, fid, tid, sesid, create_options, desired_access, oplock))
+ 
+ DEFINE_SMB3_OPEN_DONE_EVENT(open_done);
+ DEFINE_SMB3_OPEN_DONE_EVENT(posix_mkdir_done);
 -- 
 2.48.1
 
