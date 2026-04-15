@@ -1,171 +1,92 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DBD32AABD
-	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 11:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1B53B389E
+	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 13:54:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776253843; cv=none; b=Fr7gGCahTNxSAkzYjXfN7qN/UXbBeg+8h6ObijuHYXUydt4n3XIPUwPSDc/3V7sz1pHR9NdQiVyaGhlL3ZlOLeF1zkiiDM6L4TYFtvfRI53BCurT7g3ET7Lf5/2hKroCypOhbI5iK2W5t8uqOuOyK1bb1a5MG1PLoH0/9CvYGQc=
+	t=1776261298; cv=none; b=N1NRPoLj2jRYlhSwMsZtBvzjMIczjMdYkajGEORCyRP2sOQvNRnFGXylyjN+VfBcO8VS3Pz/AcTzJCEgv6YjGpXmEbxgOq/SxVRhj/U7qTzyCUlL5xTtGo1Vy1Z8eKIKDodHuykiu7nIqVK5YKD3HlMmO7hCah+sWbvF4NYEPeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776253843; c=relaxed/simple;
-	bh=mUwAMAovOgb92nsIM1r3PWuaBRbK2s3Qe3chtxmTnYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=txnILZMm+NfRTzpsQA8mZxNtbU54RWpYKvn088rqG9evAUb7zisodLR5jMwIrHjLEv0xXP5wzWsq3K9BXPJ+1+yf8oVImLT8yi+S22Joe0B7f/NfDyLEQyTVg1P/c7mDCBjGOhPl6vzahpvRsNJVYAM796U/StUL2A1IacFfpqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rq4y1pmA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qUX+wXbJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rq4y1pmA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qUX+wXbJ; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1776261298; c=relaxed/simple;
+	bh=RIKahspqXMQwf0ggm73qvj5D3+prlXvV6tlUXnSiv0w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YXfTIjCtfAKmZw8KOqAHZ9FCV4mxvEwpzyAuUoERBhirv07uZG2iCrkexjGj4UESpKs5mYqpOlI3K+95b+q5+GXvLYWEIxbSrgFUz7E6k9B1lSxPZltQE/jlLHBq5ZChSADvDHms1LoxSwkqHq8BovENQj9P8Q8XEGDiVupw6f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=b+wD3C7K; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rq4y1pmA";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qUX+wXbJ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rq4y1pmA";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qUX+wXbJ"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id D2E495BD23;
-	Wed, 15 Apr 2026 11:50:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776253840; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y/cFEYEDFGm3FgmMyMQYDFi2Uz6ERCGXKrccZY1RQek=;
-	b=rq4y1pmASKAxq+l750nLj61OjfliszDT3CwRhLJc3nYWw84r4ZDFVISuA3/HTviRtZ7qmK
-	DZOQRyp721PS+s2SqAVSHibMCdAv24u32Ab8jcxZq8LoYE3SFxj4KJI/h3APc64DMZJQA2
-	2s2hKBGm584K65P0AsQdi5R7FDpJDn0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776253840;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y/cFEYEDFGm3FgmMyMQYDFi2Uz6ERCGXKrccZY1RQek=;
-	b=qUX+wXbJPvPEVx4FToJqlWBYMVrXXSzVLnGTtzcU/DR2PFa7xcvUvJbXQ5k6tgz3XLnqNw
-	DvvlV/0V4y+j5TAw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776253840; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y/cFEYEDFGm3FgmMyMQYDFi2Uz6ERCGXKrccZY1RQek=;
-	b=rq4y1pmASKAxq+l750nLj61OjfliszDT3CwRhLJc3nYWw84r4ZDFVISuA3/HTviRtZ7qmK
-	DZOQRyp721PS+s2SqAVSHibMCdAv24u32Ab8jcxZq8LoYE3SFxj4KJI/h3APc64DMZJQA2
-	2s2hKBGm584K65P0AsQdi5R7FDpJDn0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776253840;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y/cFEYEDFGm3FgmMyMQYDFi2Uz6ERCGXKrccZY1RQek=;
-	b=qUX+wXbJPvPEVx4FToJqlWBYMVrXXSzVLnGTtzcU/DR2PFa7xcvUvJbXQ5k6tgz3XLnqNw
-	DvvlV/0V4y+j5TAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5D2464B9BF;
-	Wed, 15 Apr 2026 11:50:40 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 8bIJCZB732n2AgAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Wed, 15 Apr 2026 11:50:40 +0000
-Date: Wed, 15 Apr 2026 08:50:37 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Dudu Lu <phx0fer@gmail.com>
-Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v2] smb: client: fix integer underflow in
- receive_encrypted_read()
-Message-ID: <mbrdhvinfbr53a5k7ybmeahzezkboundsgqk4ohdyaz2m3xyu4@64oxh33do2bv>
-References: <20260415102424.65161-1-phx0fer@gmail.com>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="b+wD3C7K"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=w7p/hmCdxvnIxE/R2pd74gXUlSlUkc7LG92dY4f0OxE=; b=b+wD3C7K3hcfXayEnIkZDoguZa
+	uXoIxBYqC+6B/IQdwvVryJYdvKB18Jn/RB1J2tTKADOpL+99zO217jNYdPFeyN7e9oGtLC/iBNAW3
+	bhwBtgrjO6/o4ZXCrSPeHoz2A8H/wUqdTILM7X27QuwAqwHodWz2hHaaueT1MePXtlz2j4XyRcZ4M
+	GRKvyR7IAV5S4XmSu/075fV9oV9efnSAoPXbuGfJn6lqpp/jGR+NAVGTLl/7xnDfSEmSVAcSGyLLy
+	u0cUsOM8TkVa2l9Md+NvbMhaNp6aE8gNFS0kwbZwm3VUb5bbrQdSzJN1AQ4joY5GKlLhqMscUAMe8
+	UmWkcHA9NMFkn3Kt1C3hKwvBpiiCF1NCRPu0EpcfUnjJGpbxVdFoHH76dlmXvipXhKsoFJ4kRU9lD
+	T2Za0BKAXvWbAVeJ9Lu2H7BpLe6dgYGLRPGSkG4twp0EIv83Mx5gLWDPPnnwAXOXCimTKCMaURjBs
+	28WEhK2DOQApyn6H9VYS39Rl;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wD0hd-00000001VJ6-0vNx;
+	Wed, 15 Apr 2026 13:54:49 +0000
+Message-ID: <7f3a633a-2992-45fe-8a97-43d217953d84@samba.org>
+Date: Wed, 15 Apr 2026 15:54:48 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260415102424.65161-1-phx0fer@gmail.com>
-X-Spam-Score: -3.80
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FREEMAIL_TO(0.00)[gmail.com];
-	ARC_NA(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] MAINTAINERS: change git.samba.org to https
+To: Steve French <smfrench@gmail.com>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ Namjae Jeon <linkinjeon@kernel.org>
+References: <20251128134951.2331836-1-metze@samba.org>
+ <CAH2r5msBaRVPNkaMy0iQKPq9COR+p5+UUNf-B-Fh6=v7zKNRnQ@mail.gmail.com>
+ <7ff0bc80-f94c-4cc9-b85a-0ddc1393c9a1@samba.org>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <7ff0bc80-f94c-4cc9-b85a-0ddc1393c9a1@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 04/15, Dudu Lu wrote:
->In receive_encrypted_read(), the length of data to read from the socket
->is computed as:
->
->  len = le32_to_cpu(tr_hdr->OriginalMessageSize) -
->        server->vals->read_rsp_size;
->
->OriginalMessageSize comes from the server's transform header and is
->untrusted. If a malicious server sends a value smaller than
->read_rsp_size, the unsigned subtraction wraps to a very large value
->(~4GB). This value is then passed to netfs_alloc_folioq_buffer() and
->cifs_read_iter_from_socket(), causing either a massive allocation
->attempt that fails with -ENOMEM (DoS), or under extreme memory
->pressure, potential heap corruption.
->
->Fix by adding a check that OriginalMessageSize is at least
->read_rsp_size before the subtraction. On failure, jump to
->discard_data to drain the remaining PDU from the socket, preventing
->desync of subsequent reads on the connection.
->
->Signed-off-by: Dudu Lu <phx0fer@gmail.com>
->---
-> fs/smb/client/smb2ops.c | 8 ++++++++
-> 1 file changed, 8 insertions(+)
->
->diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
->index 509fcea28a42..a2105f4b54db 100644
->--- a/fs/smb/client/smb2ops.c
->+++ b/fs/smb/client/smb2ops.c
->@@ -4943,6 +4943,14 @@ receive_encrypted_read(struct TCP_Server_Info *server, struct mid_q_entry **mid,
-> 		goto free_dw;
-> 	server->total_read += rc;
->
->+	if (le32_to_cpu(tr_hdr->OriginalMessageSize) <
->+	    server->vals->read_rsp_size) {
->+		cifs_server_dbg(VFS, "OriginalMessageSize %u too small for read response (%zu)\n",
->+			le32_to_cpu(tr_hdr->OriginalMessageSize),
->+			server->vals->read_rsp_size);
->+		rc = -EINVAL;
->+		goto discard_data;
->+	}
+Am 28.11.25 um 19:00 schrieb Stefan Metzmacher via samba-technical:
+> Am 28.11.25 um 18:48 schrieb Steve French:
+>> On Fri, Nov 28, 2025 at 7:49 AM Stefan Metzmacher <metze@samba.org> wrote:
+>>>
+>>> This is the preferred way to access the server.
+>>
+>> Are you sure that is the preferred way?  75% of the entries in
+>> MAINTAINERS use "git git://" not "git http://" but ... I did notice
+>> that for all github and gitlab ones they use "git http://"
+> 
+> It seems a lot of them were created long time ago.
+> 
+>> But maybe for samba.org there is an advantage to https?!
+> 
+> Yes, the admins of git.samba.org prefer that clients use https://
+> instead of git://
+> 
+> I also checked what linux-net uses and it also uses https most of the time:
+> 
+> $ git lo -187 linux-next/master  | grep 'Merge branch .*\/\/'| grep https | wc -l
+> 178
+> $ git lo -187 linux-next/master  | grep 'Merge branch .*\/\/'| grep -v https | cut -d ' ' -f2-
+> Merge branch 'main' of git://git.infradead.org/users/willy/xarray.git
+> Merge branch 'master' of git://www.linux-watchdog.org/linux-watchdog-next.git
+> Merge branch 'master' of git://git.code.sf.net/p/tomoyo/tomoyo.git
+> Merge branch 'next' of git://linuxtv.org/media-ci/media-pending.git
+> Merge branch 'docs-next' of git://git.lwn.net/linux.git
+> Merge branch 'master' of git://git.kernel.org/pub/scm/virt/kvm/kvm.git
 
-You could replace it with:
+can you submit this during the current merge window?
 
-	if (check_sub_overflow(le32_to_cpu(tr_hdr->OriginalMessageSize),
-			       server->vals->read_rsp_size, &len) {
-		...
-	}
+Here's the commit again:
+https://lore.kernel.org/linux-cifs/20251128134951.2331836-1-metze@samba.org/
 
-for subtraction + check in one shot.
+Thanks!
+metze
 
-Patch is ok nonetheless.
-
-
-Cheers,
-
-Enzo
