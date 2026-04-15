@@ -1,87 +1,104 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F13D1E5207
-	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 04:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41633313E3F
+	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 04:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776227509; cv=none; b=mVBkXtvfUBeLayigZntY96W/+m0/39lKIBlC0xeqvZ5fz9IR9oCsv29mxnfzvQHCfeVhwRBVaUzyGLgwhT6z8DlAlnSt3ffL0Vi+WpdZ+2nOvHN4wrmKv2ZffQghLgxw1HsoU+xyGK4dtZEAMc+CYI2WMMYNkNTZM9sVAxOZcVo=
+	t=1776229178; cv=none; b=kITKRIVX7gkL1zctYIbcFAO1DqDSlrJePdmuKeoTW9lOque1HFW+h+OMU7OqGTNbokhXx8rELGa6bdzDmUXYTxUTqVnrp7JYheTvmgtN7LSMRVsez+38lcFkfrH626HGwTB30T/AkGWbg0uFcLaM6cSpheoL9ONsVjOITWGDoLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776227509; c=relaxed/simple;
-	bh=NVd9v9s8jT3l9T5KQpB/av/FH682cJCjX0WUmhnM4D4=;
+	s=arc-20240116; t=1776229178; c=relaxed/simple;
+	bh=nm74J6zMW7Jm24cYJPZnGzZskMzr49BNL48S2Dz7OXc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DhzHeTLdMbWkj7R1F5TcRpptzVfoj0Lw3WJu525oTnSK5oI81+zQkMjEFiPKTre4uZ9BLEfIuVUmS7CxxccBB/GEHttyUOi5GYcnBLg8g8RB53N1RLXzRpak6uPceOQX0GDp6oe52uewagyZ9jQMf/N4L4rVZhyDSk7nxTBcQGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PfYTki7P; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=OOGhJdpnnL70ZWicxTnSKT+14Fw2NEJBstCTtLciJZx5sLgxV6raoYH9eo4yY9y9ILZkPXbwzM/GnbgevNGyATsJsLRICIiSpf6HySMDN8Toh9frYJC3/OSGFVVS42cjKFXLuT8HMnzkmNi8JLEvKL4g2DyPP+C8rdRt7GlByn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i40I64Xd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PfYTki7P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18BB6C4AF09
-	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 04:31:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i40I64Xd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D477DC2BCB5
+	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 04:59:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776227509;
-	bh=NVd9v9s8jT3l9T5KQpB/av/FH682cJCjX0WUmhnM4D4=;
+	s=k20201202; t=1776229177;
+	bh=nm74J6zMW7Jm24cYJPZnGzZskMzr49BNL48S2Dz7OXc=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=PfYTki7PPLAxf1RZyN2A+eZzXq5Qb8LRo7DTr3aZ8kJELBs3XWTI6EjR7gDGvMouK
-	 3PZ97IKjz1UZ840LbZl1l8fhzNdh0NVGC1GcKOE0l2MKAnOhOepogODAxBtqLuZYoL
-	 yfGGnhHWb57QYBgHAlrqjWhWv1sS3Nn+cMtPCQ7aOMbbMTl2605d0C0TXn9lTWhg8B
-	 KXYvmDFbUA9ulOBs1OjCCTYIzw3UlNB5IXkSuExIEPOdI6Hk+er8SboPfSOaeGU45s
-	 uCjLLQ/oZo836RlxayGncvi3SsGSfOaTplTYlCry1epU2CgT7FsCAbFxxfUxKjloUV
-	 LFIZNkJFjb4LA==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-67251e91bc8so93821a12.1
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 21:31:49 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxR201OE081fP8z4mt2xJCHdfsdZNtG6Z/l4VHHCp2t/oThMQlJ
-	aT0YUVvhEKESGWkEH0zajUiqgzCaP1mJZah50WwXcgqMYcU0pFM5RyLhbACEk5H5Zr18zws589d
-	qpPhZzpXhWSFEhvaQsie9I5lw48Jre4k=
-X-Received: by 2002:a17:907:7f9f:b0:b98:654:d9eb with SMTP id
- a640c23a62f3a-b9d46264c9cmr1092114466b.22.1776227507586; Tue, 14 Apr 2026
- 21:31:47 -0700 (PDT)
+	b=i40I64XdybPx2VnbwIcKE/AXUZKk79yVUL+eCwDIRJzk8Vd+Aq37IaRsRSJV1ADa2
+	 dmuHvGDgI4bc4UqW9XoSDMixl+nL+OfbpdW1Sr8UPA+9Yin8J4HmoKH1Y4HPyW7vE1
+	 35Bawtz5kx/cBzTWU36KK3t2lcYrF8lOuBQzXRsM6+uZoZngau++IjVckg6j/NNwDK
+	 cjRdbkRBtKLvIHfQjiVwyGZIkslJYJo2W4vspLZS3+KDas/wmRPDeOE3OCBAk+kQbN
+	 NZpUSltLgsJVZFA+kDNXNc7NglABLMjE/06eSEyk0QO+ynC7QDdMZOXXJY1uTxRGHr
+	 YB6iR7hKKLM1g==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b9c04152730so939386266b.0
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 21:59:37 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzjC9o4wA3Lh76ThHNV42VaDS+q6Qj3YMlPZoJbztNjUKehhgSq
+	HKTxgEj+xOXezL52MNevoVo3S2eBfDDFRah+IEyCZ4W380y/si+ArdEVdfKn3/HUCCsY/c3yeK6
+	P2KmoMDf0huefa5Dt4wy/6k+64cGyrPI=
+X-Received: by 2002:a17:907:3f9c:b0:b9d:ee01:6bbf with SMTP id
+ a640c23a62f3a-b9dee016bdcmr620159166b.49.1776229176393; Tue, 14 Apr 2026
+ 21:59:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260414191533.1467353-1-michael.bommarito@gmail.com>
- <20260414191533.1467353-3-michael.bommarito@gmail.com> <CAKYAXd-pXiJy4S05C_s6sqz6FtnCeCh6Q2c4B7tPuHseA94mkQ@mail.gmail.com>
- <20260415023531.2659989-1-michael.bommarito@gmail.com>
-In-Reply-To: <20260415023531.2659989-1-michael.bommarito@gmail.com>
+References: <20260414225438.2210243-1-michael.bommarito@gmail.com>
+In-Reply-To: <20260414225438.2210243-1-michael.bommarito@gmail.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 15 Apr 2026 13:31:34 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8B78Gde_7+Ph0cSL998k4qqs_okB0jky0m5h8i25_AGQ@mail.gmail.com>
-X-Gm-Features: AQROBzCrk-7V7-V-wpd68dsUjlrrrYyEbWlnp6E7AbFp-N-nxdzfyMQMqteAERw
-Message-ID: <CAKYAXd8B78Gde_7+Ph0cSL998k4qqs_okB0jky0m5h8i25_AGQ@mail.gmail.com>
-Subject: Re: [PATCH 2/3] ksmbd: reject negative ngroups in ksmbd_alloc_user()
+Date: Wed, 15 Apr 2026 13:59:23 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_HjR=jTt7C9R3RZOSsD-C-OXG3xKv8aB7D5AsG+DeUjA@mail.gmail.com>
+X-Gm-Features: AQROBzCSrNjyDBMPlhMEzBU4ImLJbaM4RLke-JPomqQAkZOzl8IEUCMKZIhSMgQ
+Message-ID: <CAKYAXd_HjR=jTt7C9R3RZOSsD-C-OXG3xKv8aB7D5AsG+DeUjA@mail.gmail.com>
+Subject: Re: [PATCH] smb: server: fix active_num_conn leak on transport
+ allocation failure
 To: Michael Bommarito <michael.bommarito@gmail.com>
 Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, stable@vger.kernel.org
+	Henrique Carvalho <henrique.carvalho@suse.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 15, 2026 at 11:35=E2=80=AFAM Michael Bommarito
+On Wed, Apr 15, 2026 at 7:54=E2=80=AFAM Michael Bommarito
 <michael.bommarito@gmail.com> wrote:
 >
-> On Wed, Apr 15, 2026 at 11:05:45AM +0900, Namjae Jeon wrote:
-> > With the previous patch ("ksmbd: cap response sizes in
-> > ipc_validate_msg()"), negative ngroups is now rejected early in IPC
-> > validation.
-> > However, ksmbd_alloc_user() still needs an explicit negative check ?
+> Commit 77ffbcac4e56 ("smb: server: fix leak of active_num_conn in
+> ksmbd_tcp_new_connection()") addressed the kthread_run() failure
+> path.  The earlier alloc_transport() =3D=3D NULL path in the same
+> function has the same leak, is reachable pre-authentication via any
+> TCP connect to port 445, and was empirically reproduced on UML
+> (ARCH=3Dum, v7.0-rc7): a small number of forced allocation failures
+> were sufficient to put ksmbd into a state where every subsequent
+> connection attempt was rejected for the remainder of the boot.
 >
-> Yup, good point.  I originally wrote the tests and fixes independently
-> and missed the overlap, so if you accept the cap in patch 1, then we
-> can skip it.
+> ksmbd_kthread_fn() increments active_num_conn before calling
+> ksmbd_tcp_new_connection() and discards the return value, so when
+> alloc_transport() returns NULL the socket is released and -ENOMEM
+> returned without decrementing the counter.  Each such failure
+> permanently consumes one slot from the max_connections pool; once
+> cumulative failures reach the cap, atomic_inc_return() hits the
+> threshold on every subsequent accept and every new connection is
+> rejected.  The counter is only reset by module reload.
 >
-> Two Qs:
+> An unauthenticated remote attacker can drive the server toward the
+> memory pressure that makes alloc_transport() fail by holding open
+> connections with large RFC1002 lengths up to MAX_STREAM_PROT_LEN
+> (0x00FFFFFF); natural transient allocation failures on a loaded
+> host produce the same drift more slowly.
 >
-> 1. Should I add a comment in case someone refactors the flow to
-> emphasize that a check would be needed here if not covered earlier?
-Yes, since ipc_validate_msg() now checks ngroups early, the same check
-in ksmbd_alloc_user() has become redundant. So please remove the
-ngroup check from ksmbd_alloc_user(). And we can also move pr_err
-message to ipc_validate_msg() so that the error is reported earlier.
+> Mirror the existing rollback pattern in ksmbd_kthread_fn(): on the
+> alloc_transport() failure path, decrement active_num_conn gated on
+> server_conf.max_connections.
 >
-> 2. Do you want me to fold this into 1/3 above?
-Please fold this change into patch 1/3.
-
-Thanks.
+> Repro details: with the patch reverted, forced alloc_transport()
+> NULL returns leaked counter slots and subsequent connection
+> attempts -- including legitimate connects issued after the
+> forced-fail window had closed -- were all rejected with "Limit the
+> maximum number of connections".  With this patch applied, the same
+> connect sequence produces no rejections and the counter cycles
+> cleanly between zero and one on every accept.
 >
-> Thanks,
-> Mike
+> Fixes: 0d0d4680db22 ("ksmbd: add max connections parameter")
+> Cc: stable@vger.kernel.org
+> Assisted-by: Claude:claude-opus-4-6
+> Assisted-by: Codex:gpt-5-4
+> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+Applied it to #ksmbd-for-next-next.
+Thanks!
