@@ -1,141 +1,139 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228BE3793C1
-	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 11:16:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2B2378D8E
+	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 11:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776251785; cv=none; b=laKeKSrgOSbmaRsCFQI/bRMzVHwyPZ7wKrAsmZljBj5FoMLOV2+LmB3k4dkSuSomXi9pihUdwFBc5PYSM/Rrla+Rft8oa5wFH49sy5WRT2nAVuyY+rq8wO0Zl6xienx6GunrmDMDJt1QTZ7CGX9FZAHCt3PbxcOwOR4sPALVarA=
+	t=1776252321; cv=none; b=qRwbyqRVtpD5gczKAhzQukjy1iFM2MkAODpls57T0dQomw5KoWZwcIxDgit/t2Lj08XTx90+rvfnAciL18S6lUwU8ATQ9zb8rbvDEV0qArZ/ALE5sfmeP0WnRrUI4HmFKhyhCGp7j3/XQxZrpB8h+3z++sRfimlQU9pgNLoNEe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776251785; c=relaxed/simple;
-	bh=QvFkj94XYGJ047tpd5sGgOMH/mLcggwIb+6fRq6t5o4=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=aNnetK0V7cMVMBWNCuDehUoVmOuxT3ITKCeS7Vxa+jjx3vXZmL5muOL0OPOgeIR0fQCVlTzda20m0FtyucODBf1KyPAcljdYDbltv7f21hCU5cxkUNDMs473B8pFzbzxGjgTZ8c8OnmwPot7Q0MUbwqhx2s1SgK89LO4Hf4k4tU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BeFL/R0f; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1776252321; c=relaxed/simple;
+	bh=VQsTM+mzGxb1tEMnoq0cXierV1ZHH1kctt8ri+qeVbU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=APi6VQpaEn94FRqFEHkXLCMNlJvSR+k3Rt7ZOub/hCVMxwH3BMOTMh68BpcwWKZ9YiKyuG6Db0Ei0rkFnswPp0KqgoKJdLHrv6IjVmeAuwEWxzBbeO6octreysEllgSFwS5HMj86g9onB5/Bl3gt7Opvu/vlxB/l1VZQYhkRkQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZdKI6y89; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BeFL/R0f"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776251783;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3dqApsnM+P4o09la4I1Tw9Wr5v2SnstRKsAAQ27vRWE=;
-	b=BeFL/R0fUR92eacC0DWZWUZRu75I3o3/0tk7K9R2Mn987Nmj+pmsWQpTgwdCXv4uf2uWys
-	0opQHeCjI507g465j+/ZjcrmF49UaHkwz0B1AlaGhRwomAiToJDMK68BsSAvFm1WRsQChj
-	gL7Pwb29YDaQ0Z9TChgAvqqFe3D9Ubg=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-530-N87LYPymM8CIPtI7ZtY8Gw-1; Wed,
- 15 Apr 2026 07:16:19 -0400
-X-MC-Unique: N87LYPymM8CIPtI7ZtY8Gw-1
-X-Mimecast-MFC-AGG-ID: N87LYPymM8CIPtI7ZtY8Gw_1776251777
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D4C8B180057D;
-	Wed, 15 Apr 2026 11:16:16 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.34.160])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 62656180047F;
-	Wed, 15 Apr 2026 11:16:12 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>
-Cc: David Howells <dhowells@redhat.com>,
-    Paulo Alcantara <pc@manguebit.org>, netfs@lists.linux.dev,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH] netfs: Fix early put of sink folio in netfs_read_gaps()
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZdKI6y89"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-506a6cf8242so50631161cf.1
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 04:25:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776252319; x=1776857119; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BJ6fVrO3ohxiKYcaHCxp2wzI9fHSCKIoqnFp5q+kMYA=;
+        b=ZdKI6y89qzlqk+Fsg6F2qBDMkDLoq5M2jjacPi4sGcCKblCMHTRdt4+emp0uvuTCae
+         MKWEY5iI3TMS48uBDiAdJH8UkKxMJRW29361TJL6BEKrXY9BvrUcPa7NSBhPxvexgWlb
+         EmMpTIYoHudPdz4YLkxx1oDIQ0Iyq5BDhAMjEr73RaqD/5apnqRJIrDGlfqstFE3149X
+         bapskrxzkZkl9idiA3fg4Oon0lWZ/py6ymFxhZTkwBpZv3/Rls1OcxXpJt443DS7Bg9k
+         nama5G8ouKPOCjCLM8ZrklHycDSw1IPxizxc0wrQoYX5ycTmMKxO4rWF/Ah1kHriNViT
+         2BoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776252319; x=1776857119;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BJ6fVrO3ohxiKYcaHCxp2wzI9fHSCKIoqnFp5q+kMYA=;
+        b=T1BS2atMnbffgGP9Bs8SHrkuFed2W0NrwR3VLDm1lFK9gCCE4PhTVyVcX1yNgsX3bl
+         cpmBA/4UrVzgmKuNkvgvP3XDvyooY1396wbVZjrHNK803UPeDvpIPPE07JDX19UMhwHG
+         2WYlYc9feaKVFRMBKCN76HDv5svehY0LGeISw114yYbXThxzAcQHvWQ0qVGrpnKAmHhi
+         3B0vacxbZUccb5+UbhJWDsUoQNrfPKxpoFEkYJONlAqjn48Hdk787oePRac0+jpDirg2
+         UfZ7iJn8WadCrLPhmKjUCWrLJvL/m684ctGhr2fe0yI6AJ+AxALfTXMcBdrxf4nXZcUZ
+         GMGg==
+X-Gm-Message-State: AOJu0YwoiywhGNAvgMGMij2MrdMfvUB/kTRu5G5h5EaZYaHOf2a6mvKT
+	TDyub7CYJtmC7gSOxbufjPjfAzibvSyVj8+m+mzFLbpgG+XbG+qUhJj0/Qqedw==
+X-Gm-Gg: AeBDiesIKwou1WLXiFDPjP6x66uvnOIzof3xYrlaT/Z2gg4OnwSv5ohBtiMGs9uGcKE
+	Ag4A+8g+vWb6Cm5IIB8ZUoLFUWjmhQ92fiye7HrcvaVd904ip9yw2zuDH56w7vgXrkO1JNu7NO7
+	7B7/tZc7nz7MTKeCzQ2gDCqsuEDynxDPXupdPv3PbNDFpgUQ82AUNAuMdv3wPNZu+PNr03aqXXr
+	myBEPG6zaPwHeWqxRtJNtcJEfCDTrg9dNcir6LBtMmCp8ftXycBspaee/41+IbU0FJEaVIS3DGB
+	s6RtO6u4iIPiLzX5fxtqqs6puBAbf7wnWyu6Gxela2YiHvVcHiqA5TzF37cBKz+ISpjsT4NuGy1
+	r0awD4AFC/3Z+OIx/+wHQrYnJu5dzMm++Ij99xklxSG3CJ5uAdTwH9q75XEe2CRxEwLmgbXozyd
+	FmE1h5EplZ+kmFGCJsgXKD1b6rdmOjUC+yClxtrYfT5vKWpDJrbXtK0r0ghsFrLBlkZ/EAz2XqS
+	7TMzklD1UZwOwIR+1S0PQJeilFu9coK4gn9q4esV3FcqW9BWGTp9g==
+X-Received: by 2002:ac8:7d11:0:b0:509:35d1:ca37 with SMTP id d75a77b69052e-50dd5aeef70mr330727511cf.16.1776252318729;
+        Wed, 15 Apr 2026 04:25:18 -0700 (PDT)
+Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50e1af9dc5fsm10621191cf.16.2026.04.15.04.25.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Apr 2026 04:25:17 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: linux-cifs@vger.kernel.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2 0/2] ksmbd: harden ipc_validate_msg() and smb_check_perm_dacl()
+Date: Wed, 15 Apr 2026 07:24:59 -0400
+Message-ID: <20260415112501.116426-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260414191533.1467353-1-michael.bommarito@gmail.com>
+References: <20260414191533.1467353-1-michael.bommarito@gmail.com> <CAKYAXd9EBFBcy9bJ3=sJiYVYHAYjKYqOqD53UCJ8zWKXF0sAeg@mail.gmail.com> <CAKYAXd8B78Gde_7+Ph0cSL998k4qqs_okB0jky0m5h8i25_AGQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <261127.1776251770.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Apr 2026 12:16:10 +0100
-Message-ID: <261128.1776251770@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Transfer-Encoding: 8bit
 
-Fix netfs_read_gaps() to release the sink page it uses after waiting for
-the request to complete.  The way the sink page is used is that an
-ITER_BVEC-class iterator is created that has the gaps from the target foli=
-o
-at either end, but has the sink page tiled over the middle so that a singl=
-e
-read op can fill in both gaps.
+Two ksmbd hardening patches, respun from v1 [PATCH 0/3] per Namjae's
+review.
 
-The bug was found by KASAN detecting a UAF on the generic/075 xfstest in
-the cifsd kernel thread that handles reception of data from the TCP socket=
-:
+Patch 1 folds v1 1/3 and 2/3 into a single response-side validation
+change in ipc_validate_msg().
 
- BUG: KASAN: use-after-free in _copy_to_iter+0x48a/0xa20
- Write of size 885 at addr ffff888107f92000 by task cifsd/1285
- CPU: 2 UID: 0 PID: 1285 Comm: cifsd Not tainted 7.0.0 #6 PREEMPT(lazy)
- Call Trace:
-  dump_stack_lvl+0x5d/0x80
-  print_report+0x17f/0x4f1
-  kasan_report+0x100/0x1e0
-  kasan_check_range+0x10f/0x1e0
-  __asan_memcpy+0x3c/0x60
-  _copy_to_iter+0x48a/0xa20
-  __skb_datagram_iter+0x2c9/0x430
-  skb_copy_datagram_iter+0x6e/0x160
-  tcp_recvmsg_locked+0xce0/0x1130
-  tcp_recvmsg+0xeb/0x300
-  inet_recvmsg+0xcf/0x3a0
-  sock_recvmsg+0xea/0x100
-  cifs_readv_from_socket+0x3a6/0x4d0 [cifs]
-  cifs_read_iter_from_socket+0xdd/0x130 [cifs]
-  cifs_readv_receive+0xaad/0xb10 [cifs]
-  cifs_demultiplex_thread+0x1148/0x1740 [cifs]
-  kthread+0x1cf/0x210
+Patch 2 is v1 3/3 unchanged (minimum ACE size in
+smb_check_perm_dacl()).  Please let me know if there's anything
+on this 2/2 you want to think through or change.
 
-Fixes: ee4cdf7ba857 ("netfs: Speed up buffered reading")
-Reported-by: Steve French <sfrench@samba.org>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/buffered_read.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Changes since v1
+----------------
 
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index c23173a061e8..dc50690fdd44 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -459,9 +459,6 @@ static int netfs_read_gaps(struct file *file, struct f=
-olio *folio)
- =
+v1 -> v2:
 
- 	netfs_read_to_pagecache(rreq, NULL);
- =
+  - 1/3 + 2/3 folded into a single patch (1/2) per Namjae.
+  - Dropped the hard KSMBD_IPC_MAX_PAYLOAD (4096) cap on
+    RPC_REQUEST and SHARE_CONFIG_REQUEST response paths.  A 4096
+    cap would regress NetShareEnumAll and other NDR enumerations
+    on servers with many shares -- userspace ksmbd-tools grows
+    the response buffer in 4096-byte chunks via g_try_realloc().
+    Use check_add_overflow() instead so functional payload size
+    is unconstrained but msg_sz cannot wrap unsigned int.
+    [Namjae]
+  - LOGIN_REQUEST_EXT keeps the [0, NGROUPS_MAX] bound (POSIX
+    semantic limit, not an IPC transport cap).  Moved the
+    pr_err() into ipc_validate_msg() so the error is reported
+    at the IPC boundary. [Namjae]
+  - Removed the now-redundant ngroups check and pr_err() from
+    ksmbd_alloc_user() in mgmt/user_config.c.  Both call sites
+    (ksmbd_login_user and the SPNEGO path in auth.c) reach
+    ksmbd_alloc_user() through ksmbd_ipc_login_request_ext(),
+    which now rejects negative ngroups at the IPC gate. [Namjae]
+  - SPNEGO_AUTHEN_REQUEST left untouched: session_key_len and
+    spnego_blob_len are both __u16 so their sum cannot wrap the
+    unsigned int msg_sz. [Namjae ack]
+  - 2/2 (smb_check_perm_dacl minimum ACE size) unchanged from
+    v1 3/3 -- no review yet.
 
--	if (sink)
--		folio_put(sink);
--
- 	ret =3D netfs_wait_for_read(rreq);
- 	if (ret >=3D 0) {
- 		folio_detach_private(folio);
-@@ -471,6 +468,9 @@ static int netfs_read_gaps(struct file *file, struct f=
-olio *folio)
- 		flush_dcache_folio(folio);
- 		folio_mark_uptodate(folio);
- 	}
-+
-+	if (sink)
-+		folio_put(sink);
- 	folio_unlock(folio);
- 	netfs_put_request(rreq, netfs_rreq_trace_put_return);
- 	return ret < 0 ? ret : 0;
+Threading
+---------
+
+Sent --in-reply-to v1 [PATCH 0/3] cover
+(Message-ID 20260414191533.1467353-1-michael.bommarito@gmail.com)
+so v2 lives under the v1 thread.
+
+Michael Bommarito (2):
+  ksmbd: validate response sizes in ipc_validate_msg()
+  ksmbd: require minimum ACE size in smb_check_perm_dacl()
+
+ fs/smb/server/mgmt/user_config.c |  6 ------
+ fs/smb/server/smbacl.c           | 17 +++++++++++++----
+ fs/smb/server/transport_ipc.c    | 16 +++++++++++++---
+ 3 files changed, 26 insertions(+), 13 deletions(-)
+
+--
+2.53.0
 
