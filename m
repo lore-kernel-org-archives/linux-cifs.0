@@ -1,96 +1,152 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2D53ED128;
-	Wed, 15 Apr 2026 16:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776272158; cv=none; b=I8xQpZiOR6mUt5aTR/6ORHolT4xJ1n+SAXudms5MiU9T+OPCvuT8mVQKAlRdNW32MqvR7udtNz7lv0sGeT6m4CUNtiVVLO+eH+O/OB3AS40EPxtTUUYKhjpF47XZ9oUX+7jqTkBZPeu9beUr3q/jaAFQO/tSU8T/7TAuP00XoG0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776272158; c=relaxed/simple;
-	bh=3zdXh2dalBTKnUssNKrWJ6LbV+aO+DH6lNBP0AFCs8Q=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=OXUhDCkNCPvmx9CdO3Na8xtWbbSpE/61sl134fbQzCzgbyERaTFKHc7DbZsj8sXublTfG8hrokJs6roS4+RCwKxJ1/RQGgYRAiyiD2aJjZIcUG5Sg6v626+qOQh8iDeTSpdeq7KdjtAk12NtNxt8R8BCGBsZFDpymX/s4UVKbbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=fkn9Czsk; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9DD3822B2
+	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 22:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776293964; cv=pass; b=N2wIyyowta28mHcvaT9O/vf3YddYSMssBs6g68MTn486K/2epbHcRbNvC1CoZS+ggDe90bqSrt7ZBD78xSS3ExkmoZPyvrfOhly1R6NMJRjGWMWUb7NWTm00+J+csseXT1fIfU7ORamNVpJMjSNGJnXYUlaCCPbhFEaTixseKjw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776293964; c=relaxed/simple;
+	bh=CygN2f4QaWObr2X1WIoE5DQ26V0vCKqZgk1vy/h5/+Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qUWneoGz5N9Qbdlcl3J7fiUAj+ZK7+/ZMpnusU/bxHc1o1IgDASCt88Gt901CD9gb19ZfgNN8sCcQ9lLhhT+AwxwAZ5ZnIoBj1lNvbqrgHvAbzCgmngqHNLaSdmiKFZ17tlyrHlaCFEd6aeiLHJxj2UFDK9HWmSngtdDozCecRo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ONT5uBcX; arc=pass smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="fkn9Czsk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=G0wxnBD19pxGllyq/0BhmejPLNCG8kCLWDn3dt7AqoM=; b=fkn9Czsk2ZH8Z1eJ/BOFUprGgJ
-	yHBzJKBeMIgd1M7DXqNXTjQdfFiD09lkxQhjyiJ4T217VB1TY6QfxIrUJGAS43sj88Z9+GBxHpzYV
-	BWQDvIuZEiOXGp5fJT6D02R1Qqsx3jaRhvXPoKLAo3OMcvNGGMJhjmB/m8yceNvoXcMWnCrXQ2Zr5
-	GLEiiNNTx9WDd/qmRVRkxj2//UOGcGRlxfIP/faLEhv/CPHvZtUT8xjnUXcwCaPHax5/tFF70Sjyl
-	VPObTljCkHhmYBGnd+U3ei/UFhiMSARHG33EuRBoO+RWo6XGbVebCgkhtdVaEiuQzoOWETbO7IW7L
-	eGWfNcdg==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
-	id 1wD3Wd-00000000E9c-1YgW;
-	Wed, 15 Apr 2026 13:55:39 -0300
-Message-ID: <2feeb396883d9223862e036b76092a1f@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: David Howells <dhowells@redhat.com>, Christian Brauner
- <christian@brauner.io>
-Cc: David Howells <dhowells@redhat.com>, netfs@lists.linux.dev,
- linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
- ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH] netfs: Fix early put of sink folio in netfs_read_gaps()
-In-Reply-To: <261128.1776251770@warthog.procyon.org.uk>
-References: <261128.1776251770@warthog.procyon.org.uk>
-Date: Wed, 15 Apr 2026 13:55:37 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ONT5uBcX"
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8acb7f2586bso32517386d6.1
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 15:59:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776293962; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fbW0dkzjXv6UNtytFL87MrEh+tAVLWmMrqj2x4W45iVH0p7aWwMGeX5oLeuzu+bRB3
+         4jIbgoyrOVGZDyI/ZlnOlU34vhd5z1DRA4BIUkCEr09FG0RPrcaDf2GxXm2uj1kIeto9
+         mamek+OgdiiuL3oCw6ZzhqoFw9/AFNeHx2FXmxXqNDAWRBHlkd+7ct6v/Hepx3tgB2Cm
+         5HIKESHyHaUspOfxJuWZOFagqa0UCGtGEkCIi8l189QJpIzmZJx4pmVsyfp1vHR6pDJH
+         vVpWH1+C03USZL7IJjmTjZEnlkstM6TpR/9M8sQQb9xDIOYs6gvmRGdLtoK/DToor87a
+         oYcg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=g6FdDfKfhtKAEbngKgmRPj3/CQxzIPFS7vgMVzn1Knk=;
+        fh=zoi0Qv/T53HraNCmheItLAuLxQTW5fNSOOKitD8GhHc=;
+        b=BXdH/gqnXKnJ3Zj/sayHR/93sG6wFH0RLciGmM025UOnlGkic0gWwShbqCLm1UhPVS
+         3XHzk8tSlf3syhPlST1eG2yByaaRnJ3j64xK9O0Agapav6ktQFTtd1+v3mSNHRSi3ly8
+         GcBBhyxX4KguD9Qwb0vwH81Mgn3jkdC4M8Otp+EX1BQy3ZA2JSt4z0dui2nntVvO+KT3
+         KRVzIQ4GyzkqwWPTNKFg+yJ4wU1DQZSWSKqA0IrcTYDPEowTg0Bh7jxS8nqx6Ut05aZY
+         vEYUpva/Adods9JA1ysPtnD+k1s6ExnU6Ed7yzGLdMaCAwZarORlIQLsc21+QzvdTVE6
+         OzRQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776293962; x=1776898762; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g6FdDfKfhtKAEbngKgmRPj3/CQxzIPFS7vgMVzn1Knk=;
+        b=ONT5uBcXkUPplBLjUlX7v5WhGXhhay1lYvsXUBruoy0xYB3WMfjcaj6P46lDVmrriy
+         Q9c1RAiEjagVVrVg6y9VlfKYe1DHTF4UpG9AkiCqncL0CLYB9iuCJu4guxnexZHE9X98
+         c6SUStFmneIbYy+WWW8lR+wONZu27PNW7wnwY6trWl2IyFdBn9IbulVXXnhUpXBsgsst
+         yK9+9blvmUJm5/sN1YgjluBVRkQyw9ppHAP6/asm76oBr++i3eOVnsane2FMlgAii/YT
+         sgSrKbOWzi9z1/PwSEmjbmy5CfcWemVLRtow7VH6rQKL/6dW98bByG4HJgQyCtZkwxQI
+         uPeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776293962; x=1776898762;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=g6FdDfKfhtKAEbngKgmRPj3/CQxzIPFS7vgMVzn1Knk=;
+        b=Mljn+3hz+yAuNYrvWahH3cd96WCKKYJ/+Izg4T6mn3md4B9RFxJqLrctPiLnINWmyw
+         fwUPCuLwDZbmK3Jf0bvFpB/WFcHFOON27i481XpBaLOaxg0wNu1SrTcXZ6L35n+rALdr
+         OtWTHIzDIuABhBb8AZASLYgiRylTeJJ8cbdBMiwfgwlUV6/FGnxtyvnH6Ab5HxiLlcVn
+         izz/X+xHj3Vc+MWWyae9oPaDbVl1lDLz3gUwAKSB1JmtRHY7zyJmamgmyhO/29ExxNWZ
+         irpUaBodGrB2SZDKy340Oxz2MSvSOZ+J2rTGxSw2PgmCrFksFVxbyUfMKHZdwTE1W2FY
+         FJ3Q==
+X-Gm-Message-State: AOJu0YxjJu8H0KKnymiaM8dJYljHpp8LCg83FWDc7vSolmrAmDrSFlBB
+	Ot/pifo2qnt1/d1EfMiw1CCvnUSdl5WOazZUom1BemTc/gHLuq3l2CIpE2UeQYZVM+rBDpDtVxZ
+	lZvA/buz5s5774Fn225KOIwsT2LmIT8ZHiQ==
+X-Gm-Gg: AeBDietrlEEtIBcwgDmdypiFT5adXrd0XfusULCCctko3AulbYZkEVrJJsHpbqfRXyu
+	m/41lKJeiMwZvI37Le99BageKPjqgGFriN2yCrgD8800mbIR+Qc+JrhGn5U62uXj87I6XtoxKfh
+	sQ8t19UZMBLp6wqkcFnPtjxnSzPShYpIPCDCtVUyc0yU0BXJvxVWkvDz9eUvxK57LR5XDYiZUTx
+	eyDBzbGSQSrC/mKyGPpE5SinhnPNEVsaKotsWK5QB+88uJrYV8d4jykaUlT0kKwPengqJXO74vV
+	b19i0SWMBmX7D1l1EHePN7/WN9bPfwh6a7EXLgg+dtDQ155UR/r/ZtCITkVd/ZozMphBq8jRARz
+	d6KHA8by9m4MSzaRRHn+qYxCkf1oSmipYaRgZNNpT3DHt3uha7GgqwH73mIF6eQedcq3PBwpoQw
+	PwmW4vvrZNCyhTgiIXawYWeWp53ecATeKi
+X-Received: by 2002:a05:6214:5086:b0:8ac:ab69:3e64 with SMTP id
+ 6a1803df08f44-8acab69424cmr236918166d6.16.1776293961770; Wed, 15 Apr 2026
+ 15:59:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20251128134951.2331836-1-metze@samba.org> <CAH2r5msBaRVPNkaMy0iQKPq9COR+p5+UUNf-B-Fh6=v7zKNRnQ@mail.gmail.com>
+ <7ff0bc80-f94c-4cc9-b85a-0ddc1393c9a1@samba.org> <7f3a633a-2992-45fe-8a97-43d217953d84@samba.org>
+In-Reply-To: <7f3a633a-2992-45fe-8a97-43d217953d84@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 15 Apr 2026 17:59:10 -0500
+X-Gm-Features: AQROBzAtJrsT4pJVWZWjumYRw_hcoiqj5sf6mCDUCHcutgwHMVM7HiPcFHn_37I
+Message-ID: <CAH2r5msb1PxQ66fpBMZOa0cbpL1CFC45D_+xLEfwEM0QrgijFA@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: change git.samba.org to https
+To: Stefan Metzmacher <metze@samba.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-David Howells <dhowells@redhat.com> writes:
+merged into cifs-2.6.git for-next
 
-> Fix netfs_read_gaps() to release the sink page it uses after waiting for
-> the request to complete.  The way the sink page is used is that an
-> ITER_BVEC-class iterator is created that has the gaps from the target folio
-> at either end, but has the sink page tiled over the middle so that a single
-> read op can fill in both gaps.
+On Wed, Apr 15, 2026 at 8:54=E2=80=AFAM Stefan Metzmacher <metze@samba.org>=
+ wrote:
 >
-> The bug was found by KASAN detecting a UAF on the generic/075 xfstest in
-> the cifsd kernel thread that handles reception of data from the TCP socket:
+> Am 28.11.25 um 19:00 schrieb Stefan Metzmacher via samba-technical:
+> > Am 28.11.25 um 18:48 schrieb Steve French:
+> >> On Fri, Nov 28, 2025 at 7:49=E2=80=AFAM Stefan Metzmacher <metze@samba=
+.org> wrote:
+> >>>
+> >>> This is the preferred way to access the server.
+> >>
+> >> Are you sure that is the preferred way?  75% of the entries in
+> >> MAINTAINERS use "git git://" not "git http://" but ... I did notice
+> >> that for all github and gitlab ones they use "git http://"
+> >
+> > It seems a lot of them were created long time ago.
+> >
+> >> But maybe for samba.org there is an advantage to https?!
+> >
+> > Yes, the admins of git.samba.org prefer that clients use https://
+> > instead of git://
+> >
+> > I also checked what linux-net uses and it also uses https most of the t=
+ime:
+> >
+> > $ git lo -187 linux-next/master  | grep 'Merge branch .*\/\/'| grep htt=
+ps | wc -l
+> > 178
+> > $ git lo -187 linux-next/master  | grep 'Merge branch .*\/\/'| grep -v =
+https | cut -d ' ' -f2-
+> > Merge branch 'main' of git://git.infradead.org/users/willy/xarray.git
+> > Merge branch 'master' of git://www.linux-watchdog.org/linux-watchdog-ne=
+xt.git
+> > Merge branch 'master' of git://git.code.sf.net/p/tomoyo/tomoyo.git
+> > Merge branch 'next' of git://linuxtv.org/media-ci/media-pending.git
+> > Merge branch 'docs-next' of git://git.lwn.net/linux.git
+> > Merge branch 'master' of git://git.kernel.org/pub/scm/virt/kvm/kvm.git
 >
->  BUG: KASAN: use-after-free in _copy_to_iter+0x48a/0xa20
->  Write of size 885 at addr ffff888107f92000 by task cifsd/1285
->  CPU: 2 UID: 0 PID: 1285 Comm: cifsd Not tainted 7.0.0 #6 PREEMPT(lazy)
->  Call Trace:
->   dump_stack_lvl+0x5d/0x80
->   print_report+0x17f/0x4f1
->   kasan_report+0x100/0x1e0
->   kasan_check_range+0x10f/0x1e0
->   __asan_memcpy+0x3c/0x60
->   _copy_to_iter+0x48a/0xa20
->   __skb_datagram_iter+0x2c9/0x430
->   skb_copy_datagram_iter+0x6e/0x160
->   tcp_recvmsg_locked+0xce0/0x1130
->   tcp_recvmsg+0xeb/0x300
->   inet_recvmsg+0xcf/0x3a0
->   sock_recvmsg+0xea/0x100
->   cifs_readv_from_socket+0x3a6/0x4d0 [cifs]
->   cifs_read_iter_from_socket+0xdd/0x130 [cifs]
->   cifs_readv_receive+0xaad/0xb10 [cifs]
->   cifs_demultiplex_thread+0x1148/0x1740 [cifs]
->   kthread+0x1cf/0x210
+> can you submit this during the current merge window?
 >
-> Fixes: ee4cdf7ba857 ("netfs: Speed up buffered reading")
-> Reported-by: Steve French <sfrench@samba.org>
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Paulo Alcantara <pc@manguebit.org>
-> cc: Matthew Wilcox <willy@infradead.org>
-> cc: netfs@lists.linux.dev
-> cc: linux-fsdevel@vger.kernel.org
-> ---
->  fs/netfs/buffered_read.c |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> Here's the commit again:
+> https://lore.kernel.org/linux-cifs/20251128134951.2331836-1-metze@samba.o=
+rg/
+>
+> Thanks!
+> metze
+>
 
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+
+--=20
+Thanks,
+
+Steve
