@@ -1,100 +1,87 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5BC1E5207
-	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 02:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9FA3242CF
+	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 04:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776220539; cv=none; b=o9sTX0IlPu4gCBvgnJCi6O60nS4XdkM/gA73Z/z4cs619LfCsDA5f2VuzG8opM9ehxj13C344QVGXSU/DNyZiReVvHeM2U6RLJswOyGWYF/TG+8PmanCHfjFEQTJ0BT8UEdm7sZE4O0IgAcNmFtGulX4wrNN+CCdkb4kTMPcgr8=
+	t=1776226934; cv=none; b=cAAc6XgtqUcR7BZr/RgP0yWg/2by15n5DYnPuYd2nXepqh/bkFK/3JxT0ceh5nvIL9nEbXqr2HcocXLmiA5ikHjzw6U2w5Q0qQBGJ7NB/5Mq2e8O446omBGL6Tb0X3jGyZirfmlgqJsF2GvYE0ljkh2s+ijEQQxsaxpt8Q8OhVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776220539; c=relaxed/simple;
-	bh=N7nd/B1pYZ752n6f4YzwrOygZLD87ZZMTZQ8yqMGFMU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PRBYG8DUh6E91TjBIdAIhpq20luV052N8n8E/MNWwIOdONp8ULFCaZM1/rZ0l5JxEiFcOki0PTAs5BomXV/0SHtbYyaXENJN9Pw3KxAyS+P9Giwd6DUljDbLHW9CDBd7pyyCB2E+Jl9foT49HsUdDbY55WY+gRhoITrCVRAQnPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QxQFlZoR; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776226934; c=relaxed/simple;
+	bh=GUf5PKrIKfvd7WbyO0ssoN/5lZB9VybElqF957DkXPU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Uef1BUzTdBVzHJaTc3LyqX8+ILid7cGeOKHmWHuTKZNLN+6cdM8rO/Zt6cy1Ydn1reghrZM+nAvk3xdibBz02vzpeANbTKsJWO1pPx9iloyV8oyAISHQQNeYnTA496/9L70EpAFgMkFHr1F6d6TEBRm+LJAloGhSkCSB8Xg1Lmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lkD+DT8a; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QxQFlZoR"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-50b3488fb31so78364061cf.1
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 19:35:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776220537; x=1776825337; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mxRyy2kZK3WlZTfAxVXCb9nX2k5y4s491rvePkeOc2c=;
-        b=QxQFlZoRzLOGo7XEGFiTuu3ynPzC/dTjnOrTVpiFA3rXz6E+98yyKs2KbcjcKKs0/h
-         9VVZsEQRpI/t1hUX416raV4knVLK4qEPTZ55ME0QWU1iTcJmLS/sG8OtzCn3mdhl1gtw
-         XGf+GVRFcUfa47a81CtpgUUcy5xhBI+Adi8Z7G+s2cQnFbOzVji2JUY54Lw5y93mtoL2
-         iQVkkzY6z0JDEXyoAb3DlFgoSeKJTwZHU7MmFAhnsL9eSSYRzQ5JCcoRALACdx7c01PY
-         60syfQudK0MXpnYoqCJC0XoJ+RyQqkI5mdbARMCINmPx1wjBO7lJHxmHp97byldGUpvD
-         +Wcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776220537; x=1776825337;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mxRyy2kZK3WlZTfAxVXCb9nX2k5y4s491rvePkeOc2c=;
-        b=AYUTe03UA10/81aPw8NLEIY/4kC+D2mkvG4bLkbNjDEC4IGYcivGwXVcJz34R4Xgx2
-         FCXbK6u/T9qDnhYpvq2zfSEmbk7/nLaDnMT4j97cprtXau9TgQwpB+1GkAc0gJH6QpCR
-         LvS6hmA/t2QAhzkgD8xX9XJ3wa7RzihaHzCbRmTtkJ8Lkws8Chh1WogjhM97SPwWqF/U
-         htxb1+H5o3BZCAHrhUJ3KDpZKGuh0AxKZUnWVMWzLcyzyvryjEwxu+ZF7aROq88XaNVj
-         Wv8bfCH2l6KuGHUTAwNkSZ5eR39Nuu2d9fQeriLGFt5uhKTxJ7ADvulcoLT2I1mnqvFq
-         Scag==
-X-Gm-Message-State: AOJu0Yy833lS2R0TnL1ytGw7blyGxBSBctthsJeqFcyN4rMCEVmaRtZ/
-	2C8DmLCIkalcEOnw8q2uUquAnCl1BY38zTdernCOg7f2OhVJoFuh/itM
-X-Gm-Gg: AeBDievsSVSeqN1OKZcKzHhHY5+mYg1LXGaC/6zHN/ZqB8ivCp38zgRY7fvXmaa2IuV
-	EM2RdF7FCqSq3dppsU3PYL4mL0+GQkjo15+nCueMFf0orYUGxHEyXrc3LiIo77CfZKC9fI3g8B4
-	/TESZj24U9MT4h/f5gulh5Ho2Qme54gi5k7JdXHM+2dqI1ThTKScJSmthDbFdi7q9h4Jp93AMYj
-	jZT8DchCzUH/R5OmmFnbZcU9jqeMMcBwPt0qvy4DAeI9GE9iPlrTxkCFIwPWeOmMAHQLrovNJrF
-	MUhDd/g4snz+YP/yE6CFkIdiLBCkJR9Zz6njLK4W1K8/smhi7Xh7BGRUU1LrSmrkG4d1CPKR5Oz
-	szC9gJ+MRemu3lJkv3KgSp1fq1RORARumoaKqI2wZhzqpFdHil5OjT29JLaBtW2/oYj72kzRaqf
-	dHQHFE9gyvd/x6qE5VQdQ/UGZtw9yQjWa52kzCTRC1uZ20TjecEooTFNz7v0Sjd4j54Ll+7ACJW
-	QxTlfvcu7fD+HVCNPB9SstWOjacUjDGqs7ayrw8ZQ==
-X-Received: by 2002:ac8:7c4e:0:b0:50d:5b0e:1ff2 with SMTP id d75a77b69052e-50dd6bb6139mr240699491cf.22.1776220537078;
-        Tue, 14 Apr 2026 19:35:37 -0700 (PDT)
-Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50e1afdd385sm3024161cf.25.2026.04.14.19.35.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 19:35:36 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org,
-	Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 2/3] ksmbd: reject negative ngroups in ksmbd_alloc_user()
-Date: Tue, 14 Apr 2026 22:35:31 -0400
-Message-ID: <20260415023531.2659989-1-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <CAKYAXd-pXiJy4S05C_s6sqz6FtnCeCh6Q2c4B7tPuHseA94mkQ@mail.gmail.com>
-References: <20260414191533.1467353-1-michael.bommarito@gmail.com> <20260414191533.1467353-3-michael.bommarito@gmail.com> <CAKYAXd-pXiJy4S05C_s6sqz6FtnCeCh6Q2c4B7tPuHseA94mkQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lkD+DT8a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D3FAC19424
+	for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 04:22:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776226934;
+	bh=GUf5PKrIKfvd7WbyO0ssoN/5lZB9VybElqF957DkXPU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=lkD+DT8ao6jpaNNDifeMZ5ZGVPZBPVMD2/nCDFw3JFjABC2p4/I1dmM+aeDs42Qui
+	 AwvY5N9j9tg2mNXxylKaFZSEfVbFp1bpW8hG40YRsN9Sxb0x5btnylwOkwgGxW5jRJ
+	 1mG18pjFLZdc9j3XJ3ylGxANYjmP8vVeQkjGl1gfTB1O/W6B0INYp4aE+2kmUBnEDr
+	 s40mzCXN+9F+zvXS7ymQjydP4XhPIpRlwwGavCtoe271h1/RxuPNXTyFxOmBV6aKGN
+	 TwdIjCSpeoYuwZ21per2NC2eqvHugoFsWPS9rWqJc31DH7jFl3VE8xe0vsEOrWcfhU
+	 +JL6p6Cmdz5ZA==
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6708cc2d6f6so7606152a12.0
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Apr 2026 21:22:14 -0700 (PDT)
+X-Gm-Message-State: AOJu0YwYWwaa2Vsz/9lZW+qvsQgd3/IPOlLYDc+n9ymrWvrb2gnZBy+O
+	vIk8avx5lPu+TfUq0dXG4FDKkiBA36uuwV3vcn/n0Y00Mu+6Vfyugna1PXa+symiPB/+jdcfKOe
+	hCMnvqereo7r2OfDfVJEaGzCf5TmRxB0=
+X-Received: by 2002:a05:6402:518f:b0:671:4f9c:f664 with SMTP id
+ 4fb4d7f45d1cf-6714f9cf751mr5750069a12.27.1776226932741; Tue, 14 Apr 2026
+ 21:22:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260414191533.1467353-1-michael.bommarito@gmail.com>
+ <20260414191533.1467353-2-michael.bommarito@gmail.com> <CAKYAXd-zwPuES8PdV+XQjuQUemVKejayqY_0aYS=88uZ=FG9+w@mail.gmail.com>
+ <20260415023510.2659606-1-michael.bommarito@gmail.com>
+In-Reply-To: <20260415023510.2659606-1-michael.bommarito@gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 15 Apr 2026 13:22:00 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9EBFBcy9bJ3=sJiYVYHAYjKYqOqD53UCJ8zWKXF0sAeg@mail.gmail.com>
+X-Gm-Features: AQROBzDnH204ozHkVxvQouLdZlt6lGsvRUy8zmBUdbe3nfoM3E9c6j6xUR5QtpA
+Message-ID: <CAKYAXd9EBFBcy9bJ3=sJiYVYHAYjKYqOqD53UCJ8zWKXF0sAeg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] ksmbd: cap response sizes in ipc_validate_msg()
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 15, 2026 at 11:05:45AM +0900, Namjae Jeon wrote:
-> With the previous patch ("ksmbd: cap response sizes in
-> ipc_validate_msg()"), negative ngroups is now rejected early in IPC
-> validation.
-> However, ksmbd_alloc_user() still needs an explicit negative check ?
-
-Yup, good point.  I originally wrote the tests and fixes independently
-and missed the overlap, so if you accept the cap in patch 1, then we
-can skip it.
-
-Two Qs:
-
-1. Should I add a comment in case someone refactors the flow to
-emphasize that a check would be needed here if not covered earlier?
-
-2. Do you want me to fold this into 1/3 above?
-
-Thanks,
-Mike
+On Wed, Apr 15, 2026 at 11:35=E2=80=AFAM Michael Bommarito
+<michael.bommarito@gmail.com> wrote:
+>
+> On Wed, Apr 15, 2026 at 11:00:58AM +0900, Namjae Jeon wrote:
+> > However, on the userspace side (ksmbd-tools/mountd/rpc.c), the DCE/RPC
+> > response builder (try_realloc_payload() and ndr_write_bytes())
+> > dynamically grows the payload by 4096 bytes using g_try_realloc() when
+> > preparing responses for calls such as NetShareEnumAll, etc..
+> > This can cause share enumeration failures on servers with many shares.
+>
+> OK, thanks for explaining.  Sorry for missing that context.  If you
+> are OK with it, I will send a v2 that drops the cap on RPC_REQUEST
+> and SHARE_CONFIG_REQUEST and uses check_add_overflow() to just
+> prevent msg_sz from wrapping.  The [0, NGROUPS_MAX] bound stays on
+> LOGIN_REQUEST_EXT.
+OK, sounds good.
+>
+> > You don't add the check for KSMBD_EVENT_SPNEGO_AUTHEN_REQUEST case.
+> > We don't need to check resp->session_key_len and resp->spnego_blob_len?
+>
+> They're both __u16 so the sum can't wrap the unsigned int msg_sz,
+> which is why I skipped them.  Happy to add check_add_overflow() there
+> too for symmetry and clarity in case anyone refactors.  Just let me
+> know which you prefer.
+Ah, Okay, no need to add the check for this if so.
+Thanks.
+>
+> Thanks,
+> Mike
