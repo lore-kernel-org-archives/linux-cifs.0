@@ -1,75 +1,72 @@
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896A913B293
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 19:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BAE439A80E
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 20:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776368064; cv=none; b=FFFQ/CBg0+aXtcOTPCIHB+uMLW0z0NeE+7X4FMMBqjBEo3oFOtTHFitzffZLa1ldDbxHP17Zf+pU9Au44gli39365AfNvtIQ+dFQ+8kOkc/MWp9nJUZbKkirxyUQEw2gYt7+BiYhQ1fFjlFBpSeobBzMXp/GJI/aCfOHiyy0000=
+	t=1776369907; cv=none; b=nVRVjTyBK6kz5hFRxat71jYJdgjoYTMDLiZO2jAc3ldmQwFUX6m7lK3fkzsN7dJQlfWaQlADD1sw4WSjJExpVWGeGTsOa7Haf4tJf0DWTu+GoAy2EnWKRL9nkFL0Wyxv0iBwX5URbeH8AJr9R6x5Hskhqhbabnu0EURZvkxn3q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776368064; c=relaxed/simple;
-	bh=RFC3QVim0arIk7Lv3+cfW3gLQfc41MwZTxdP0bP0ces=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rbnmFpnVbG0+CLXtPxZfpNgx2qkyt4wbFJlLi/T/mGgPvMbx4lktAYPBfVIsYXLJ4qTBSu7fNsVTB8kTqtm8cwqTMlQB9XR7LTSIuqhLJpBCWq/+cQx6JKyuQvZwANQyBNO/emE+XlUUGzXQjj/YEL33WZMatdQWSFtgcj8LJwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IluCM8BE; arc=none smtp.client-ip=209.85.128.174
+	s=arc-20240116; t=1776369907; c=relaxed/simple;
+	bh=A4WGfbNBFS+TdPdlv/yvtGkWO3BanuhGpctzicatogg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h6V8aZS5N+GF5JvMy6g+Eb7dDwwdAosp5nZcegXooRJjDpLUqxPK/fhbKYXjhsFId0lYezp3bDW4GYy+GqsvjCMD53EJkz3wxACOj96uBYCu64ohecZWOEhwTcrVZc9R6TMkBSTBiPMG2o+jcQmSBmP+igbSnaz75813TF+My5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eLNWkov4; arc=none smtp.client-ip=209.85.128.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IluCM8BE"
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-7b6ae2ea4a1so35958407b3.2
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 12:34:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eLNWkov4"
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7b186dfc1d0so17608057b3.1
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 13:05:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776368062; x=1776972862; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776369899; x=1776974699; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pDgrzdmqtoSKjkQ3Rpvi5tSh9COrIxr3KsgGxPSv/G4=;
-        b=IluCM8BE6qXvwb/XaHTy0ZndDb8hI3MN/AXSVSzL1aW1CWpSKx6nJQq2P2bzSwQLgg
-         xiLog1LrAMWDKcmo3SDbeUhd7nOVaREjRih8rYnWluVb1hXx6ADqpC9DLyPo8pBTDtxw
-         b/kG1oIHIUxgeum6GK9nR3fQl28ivhGWQHcT/SveKHt1VWvG9QNY/WkMzE/jcqqzD0IT
-         fbXen9ybJzTa5S54A2BuKQLp69R1eOBtOJ5VYC+iLtE1p0LE0uRrNLbWkxZJyrJYdDpm
-         FIIYEmTRffJHM9xrP6hw+CwymuFGIT8Mud2ml6gHpBKsFYtoWXRHMt+fLtZfjXlEJJAw
-         upTw==
+        bh=AiiYXSwG5ruRWxUExLzY5qAI02mOLD9DcmFtQKqN3Hw=;
+        b=eLNWkov4H05Og4pWFrsxQ/DAKPjhjqj2CgcKZRmNGVUU5niWTO80IsxxqsYkj+Y5sx
+         0r6VpOl+pSbybxQDaBs3A+VplPsPGC+iBd8qfwgxMB/4697t51Q6EjQ46+957Vvezw3e
+         uPzYjQYpnOJ3/VOS6cPVNDz3+LHdsrdqBqBOsfJx5FvbdB1ccGsZIV+uWEVByebV3tAi
+         I8HXuclvegWdSHJR+3Mruhz45IJnaKGiu8glT0dtMVfrpq8Sj+VVFKQNS4RuXpajlYxD
+         6kMrWk9a3e1Wx3jhzI4UijZRHFlglc3j7TKEb//m2R+aaB87jqJIJIiLi/hNCKutikPx
+         xnSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776368062; x=1776972862;
+        d=1e100.net; s=20251104; t=1776369899; x=1776974699;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pDgrzdmqtoSKjkQ3Rpvi5tSh9COrIxr3KsgGxPSv/G4=;
-        b=MJ0vJd5TxM+nEdQEqq6A34+1fgdR+es2+Zx515U9UWiOSTFs3cDwukHZEQifVDensX
-         FhIEItT1A71X6VNNh9QOb1/OHnBTrFqUA4zB6QKsCWTxedXNObvDaANc3fFr3MCfW0lv
-         RDd6P1uMZn8OrjdL+L/rMfZAEuVY4rVB1a8UiUmY+IneRe/EOyL+2uP42Uxk0z1JdEJj
-         X7+umb8Ldg/Hiw1VVM+HALdpxoE/7AL9lDkQaw/QL2kh5WzaG2S7F5oAM2+w6o8pgEJA
-         ju8H0EnlHO/dq8MDFRDD+CygtnSKuPwroev9AI04h5j6o4WxHgSnHHAtBz1f6O3S0z3m
-         D1SA==
-X-Forwarded-Encrypted: i=1; AFNElJ9VC7zvqRlbkvccBA4ABuz8wzGzS0YAsJBEUJBotwQMpbMJMt91OmLPQ0GNrvN1wj/yJzIW29tylrJ2@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5MIYC6xK4adBCd0KRG0YB/IdfaU7SPPxyGufIEsxmyxUG7LCa
-	Y6bPzas0K0lqa4AeySzCwOAWIk3Nbv6VJGEP0jQs7anHBgMmf1BRBzswKSrvNVDp
-X-Gm-Gg: AeBDieuihbYVDVByvmYe5HSIj7JF3E/VVQbSJVEepvppksi2H6hA6yfFfseOFkU4fFC
-	KzmxJX36/Jp+gPtu6kPFzUTuBNnMUE389ZL0O6WPQ+YfkPnQRq4+Vmch018BICkS2edpzqZXgGJ
-	mww34pBWUv1/ncCvsEINwEapCStrFEChKN4Z4DdTE3Zp8w6CPYFJLzAI4wAOEo2wgF+02+LmsRY
-	qpnro6ExM3ZphLdNmpBXg6vtncQOp47VuMIQhNSRDYhhWDsp4nBXjHuH1n0yX0szzeABvD9iGhn
-	naknxDX3uaUXPwRzW6IqP5ek0G/mIhgDSCHjZyP9tSy9oKWW6IKK3rKI5FO/ClzSL+IJc81snCP
-	TK3vraLpb568dgKdYhwk/Fr7SzSOyy6dhcTnVzoR5NugiPCzCt3UWGlVL9bK1yRUnm0OcluL2ZF
-	5corUGXiRqOcK2LpY3JTyKuPfc3lClkPY7JMFmEU8PklRe/HEwMluRJGK6Cx2oRSZCFuNtaDH80
-	GZR+ioHJQFcsCUx/WNM56cu66Fe3nRvzEsPL0J5tmAFIgBqtZiqvQ==
-X-Received: by 2002:a05:690c:86:b0:7b7:c69f:22fc with SMTP id 00721157ae682-7b9e19ec401mr4952117b3.10.1776368062426;
-        Thu, 16 Apr 2026 12:34:22 -0700 (PDT)
+        bh=AiiYXSwG5ruRWxUExLzY5qAI02mOLD9DcmFtQKqN3Hw=;
+        b=tDMaTK9419rer6wdJVvKVow3LnlRtH2dhCx28c0YRBuimNjFXdtLdnWQffLNRfHRHV
+         P6xgH7xsGfHgFAb984muK8RVwvkuWS/QNfcb+gmcoRBhce1eefun0CGoZKBoPfofQSgx
+         H4hLa80lTEs13xMNRfr3h1ckVh00gfC/63XiYH5qAF5mR94WzVZ1RL/56JVdzPa+TqLo
+         4mY8hyPz3Cge1CUqLipBBcFNcxNptvpr8NvcX5BHJpH2TyJxUr78rPZGxFwmyNBuEyOz
+         wJJtzMYjhofySrOJxRcbVXSAy26/I6ZE6SfOIrUPBdp4SniAka+0uXaBxRiUM933yFrW
+         hsMA==
+X-Forwarded-Encrypted: i=1; AFNElJ96LbMvRcLJXBq9Z5ezSZX3po6LrMlUKvrgxo9KHCU7MKdnokZzyud/wQM+8EbehKPhDCduAqpYInrb@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWC4a/NErliPdCRXT6xL5+u/s6EdxCsQcp8k2YG6S1qC5vJrq9
+	rtGx5DyKVVHBvTYIJpheo7HHwgZVE92Er18l33OSXnOFnv02AJ6OUQ7Q
+X-Gm-Gg: AeBDiestdHhTDgeCJjLN4bvoePxp2rI9D34x2kNmrQfTPwDhF1AjouXqKFVbVQN5zdd
+	2Yze6Z894bCNOTaTQmVhXxLYNycvjTkT+kY9wQrj8eGhoOwz6o92TadTJcRRb1yIhjIp8CRF0QL
+	EJ7VvQgnrrH1YINH9BGwV3lSsE2u1CXfT1kaKLR40t+rtadCakko09rQKRJoNQ+XCT+O6n8Rpk/
+	6Hu1AlZVXl5BNXFf71NFKUSUCTzNbw7IkJ4GwvOf4LDPiN4TQ0BJZMurz+V7J2Zda0pE93p4ja3
+	oyGnSVpXuSFaFGND7oo2PvxQlGGqscaz1RhijiUgCfeECCKx3/GKVde7DWuoE+i69vNJnAVxSiP
+	wC/cWnuJwJfxw5hFanU4hbiYjftwD5vgXSIIiDSmjwomvzS30ZOwac3Y5zg56WV98pfZ6qSymoe
+	ekzmH1nUjPimNqlRr8TIIRzLHUZMnjB7PXYFu61jMOPbZmXpnx1oI4AVJEy3bSKKT8ViDvFMrsD
+	xG3FsV9mN1uXtHikhZXb6O+6CsdTI/9+mSq6WInRkH6h7wZ5V5lPU3NKsC0d1is
+X-Received: by 2002:a05:690c:86:b0:7b0:3180:e827 with SMTP id 00721157ae682-7b9d8195b11mr5990557b3.22.1776369899204;
+        Thu, 16 Apr 2026 13:04:59 -0700 (PDT)
 Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ae6cda9277sm42594576d6.41.2026.04.16.12.34.21
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e640504254sm208810585a.28.2026.04.16.13.04.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 12:34:21 -0700 (PDT)
+        Thu, 16 Apr 2026 13:04:58 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Steve French <sfrench@samba.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
 	linux-cifs@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
 	stable@vger.kernel.org
-Subject: [PATCH] smb: client: fix OOB reads from server-supplied dacloffset in cifsacl
-Date: Thu, 16 Apr 2026 15:33:25 -0400
-Message-ID: <20260416193325.2950619-1-michael.bommarito@gmail.com>
+Subject: [PATCH] ksmbd: validate num_aces and harden ACE walk in smb_inherit_dacl()
+Date: Thu, 16 Apr 2026 16:04:39 -0400
+Message-ID: <20260416200439.2987930-1-michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -79,88 +76,120 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi again! Sorry for the piecemeal sends as I work through triaging
-all of my personal "clanker" pipeline results.
+Another one on the smbd side this time. smb_inherit_dacl() trusts
+the on-disk num_aces value from the parent directory's DACL xattr
+and uses it to size a heap allocation:
 
-Here is another malicious server issue, this time in two call sites
-in fs/smb/client/cifsacl.c.  We compute a DACL pointer from a
-server-supplied dacloffset and then read struct smb_acl fields 
-(dacl_ptr->size, dacl_ptr->num_aces) without first checking that the
-8-byte struct header fits within the security descriptor buffer.
+  aces_base = kmalloc(sizeof(struct smb_ace) * num_aces * 2, ...);
 
-1. build_sec_desc() -- chmod path:
+num_aces is a u16 read from le16_to_cpu(parent_pdacl->num_aces)
+without checking that it is consistent with the declared pdacl_size.
+An authenticated client that can set a crafted DACL on a parent
+directory can declare num_aces = 65535 while providing minimal actual
+ACE data.  This causes a ~2.6 MB allocation (not kzalloc, so
+uninitialized) that the subsequent loop only partially populates, and
+may also overflow the three-way size_t multiply on 32-bit kernels.
 
-    dacl_ptr = (struct smb_acl *)((char *)pntsd + dacloffset);
-    if (end_of_acl < (char *)dacl_ptr + le16_to_cpu(dacl_ptr->size))
+Additionally, the ACE walk loop uses the weaker
+offsetof(struct smb_ace, access_req) minimum size check rather than
+the minimum valid on-wire ACE size, and does not reject ACEs whose
+declared size is below the minimum.
 
-2. id_mode_to_cifs_acl() -- chown path:
+Reproduced the ACE walk OOB under UML + KASAN by constructing a
+12-byte DACL (smb_acl(8) + 4-byte undersized ACE with size=4,
+num_aces=1).  The old 4-byte guard passes, then reading
+ace->access_req at offset 4 within the ACE triggers:
 
-    dacl_ptr = (struct smb_acl *)((char *)pntsd + dacloffset);
-    ...
-    le16_to_cpu(dacl_ptr->num_aces) * sizeof(struct smb_ace);
-    le16_to_cpu(dacl_ptr->size);
+  BUG: KASAN: slab-out-of-bounds in kcifs3_test_inherit_dacl_old
+  Read of size 4 at addr ... by task mount.nfs4/220
 
-In both cases, if dacloffset places dacl_ptr at or past end_of_acl,
-the le16_to_cpu() dereferences are OOB heap reads.
+Confirmed clean exit without splat after patch applied: the new
+16-byte minimum (offsetof(smb_ace, sid) + CIFS_SID_BASE_SIZE)
+rejects the undersized ACE before any field read.
 
-Reproduced under UML + KASAN by constructing a 20-byte smb_ntsd
-(sizeof(struct smb_ntsd)) with dacloffset = 20, placing dacl_ptr at
-the exact end of the allocation.  The le16_to_cpu(dacl_ptr->size)
-read triggers:
+Fix by:
 
-  BUG: KASAN: slab-out-of-bounds in kcifs2_test_build_sec_desc_old
-  Read of size 2 at addr ... by task mount.nfs4/220
+  1. Validating num_aces against pdacl_size using the same formula
+     applied in parse_dacl() by commit 1b8b67f3c5e5169535e2
+     ("ksmbd: fix incorrect validation for num_aces field of
+     smb_acl").
 
-Confirmed -EINVAL without splat after patch applied.
+  2. Replacing the raw kmalloc(sizeof * num_aces * 2) with
+     kmalloc_array(num_aces * 2, sizeof(...)) for overflow-safe
+     allocation.
 
-parse_dacl() already handles this correctly with a two-step check that
-validates the struct header fits before reading the size field:
+  3. Tightening the per-ACE loop guard to require the minimum valid
+     ACE size (offsetof(smb_ace, sid) + CIFS_SID_BASE_SIZE) and
+     rejecting under-sized ACEs, matching the hardening in
+     smb_check_perm_dacl() and parse_dacl().
 
-    if (end_of_acl < (char *)pdacl + sizeof(struct smb_acl) ||
-        end_of_acl < (char *)pdacl + le16_to_cpu(pdacl->size))
+Let me know if you want 2/2 instead of this single patch.
 
-Apply the same pattern to both sites.  This is the client-side
-counterpart of commit beff0bc9d69b ("ksmbd: fix overflow in dacloffset
-bounds check") which fixed the identical class of issue on the server
-side.
-
-Fixes: bc3e9dd9d104 ("cifs: Change SIDs in ACEs while transferring file ownership.")
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
 Cc: stable@vger.kernel.org
 Assisted-by: Claude:claude-opus-4-6
 Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 ---
- fs/smb/client/cifsacl.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ fs/smb/server/smbacl.c | 29 ++++++++++++++++++++++++-----
+ 1 file changed, 24 insertions(+), 5 deletions(-)
 
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index c920039d733c..115990467dfa 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -1293,7 +1293,8 @@ static int build_sec_desc(struct smb_ntsd *pntsd, struct smb_ntsd *pnntsd,
- 	dacloffset = le32_to_cpu(pntsd->dacloffset);
- 	if (dacloffset) {
- 		dacl_ptr = (struct smb_acl *)((char *)pntsd + dacloffset);
--		if (end_of_acl < (char *)dacl_ptr + le16_to_cpu(dacl_ptr->size)) {
-+		if (end_of_acl < (char *)dacl_ptr + sizeof(struct smb_acl) ||
-+		    end_of_acl < (char *)dacl_ptr + le16_to_cpu(dacl_ptr->size)) {
- 			cifs_dbg(VFS, "Server returned illegal ACL size\n");
- 			return -EINVAL;
- 		}
-@@ -1662,6 +1663,14 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 *pnmode,
- 		dacloffset = le32_to_cpu(pntsd->dacloffset);
- 		if (dacloffset) {
- 			dacl_ptr = (struct smb_acl *)((char *)pntsd + dacloffset);
-+			if ((char *)pntsd + secdesclen <
-+			    (char *)dacl_ptr + sizeof(struct smb_acl)) {
-+				cifs_dbg(VFS, "Server returned illegal dacloffset\n");
-+				rc = -EINVAL;
-+				kfree(pntsd);
-+				cifs_put_tlink(tlink);
-+				return rc;
-+			}
- 			if (mode_from_sid)
- 				nsecdesclen +=
- 					le16_to_cpu(dacl_ptr->num_aces) * sizeof(struct smb_ace);
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index d5943256c071..fc4fcd48d6c9 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -1105,8 +1105,25 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
+ 		goto free_parent_pntsd;
+ 	}
+ 
+-	aces_base = kmalloc(sizeof(struct smb_ace) * num_aces * 2,
+-			    KSMBD_DEFAULT_GFP);
++	aces_size = pdacl_size - sizeof(struct smb_acl);
++
++	/*
++	 * Validate num_aces against the DACL payload before allocating.
++	 * Each ACE must be at least as large as its fixed-size header
++	 * (up to the SID base), so num_aces cannot exceed the payload
++	 * divided by the minimum ACE size.  This mirrors the check in
++	 * parse_dacl() added by commit 1b8b67f3c5e5 ("ksmbd: fix
++	 * incorrect validation for num_aces field of smb_acl").
++	 */
++	if (num_aces > aces_size / (offsetof(struct smb_ace, sid) +
++				    offsetof(struct smb_sid, sub_auth) +
++				    sizeof(__le16))) {
++		rc = -EINVAL;
++		goto free_parent_pntsd;
++	}
++
++	aces_base = kmalloc_array(num_aces * 2, sizeof(struct smb_ace),
++				  KSMBD_DEFAULT_GFP);
+ 	if (!aces_base) {
+ 		rc = -ENOMEM;
+ 		goto free_parent_pntsd;
+@@ -1115,7 +1132,6 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
+ 	aces = (struct smb_ace *)aces_base;
+ 	parent_aces = (struct smb_ace *)((char *)parent_pdacl +
+ 			sizeof(struct smb_acl));
+-	aces_size = acl_len - sizeof(struct smb_acl);
+ 
+ 	if (pntsd_type & DACL_AUTO_INHERITED)
+ 		inherited_flags = INHERITED_ACE;
+@@ -1123,11 +1139,14 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
+ 	for (i = 0; i < num_aces; i++) {
+ 		int pace_size;
+ 
+-		if (offsetof(struct smb_ace, access_req) > aces_size)
++		if (aces_size < offsetof(struct smb_ace, sid) +
++		    CIFS_SID_BASE_SIZE)
+ 			break;
+ 
+ 		pace_size = le16_to_cpu(parent_aces->size);
+-		if (pace_size > aces_size)
++		if (pace_size > aces_size ||
++		    pace_size < offsetof(struct smb_ace, sid) +
++				CIFS_SID_BASE_SIZE)
+ 			break;
+ 
+ 		aces_size -= pace_size;
 -- 
 2.53.0
 
