@@ -1,166 +1,178 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A13221256C;
-	Thu, 16 Apr 2026 12:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776342653; cv=none; b=BpLC0ibD52CUIy8KbC86N76NvLCW4umShQAcsp44UP6OODHNvLoy0MFi06L6nmNEy6QenxEV0PmCTY0VyLeG9krY1YUEXPYr2ab9KgqSmCtA6FVdLulH6sklAE09duHc311isI68hsXqE4wWz6E+d497/buXWYQhyf5u2mYc8mQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776342653; c=relaxed/simple;
-	bh=0+upWZt1SQSfIz6OgmfLK1joGZgudnQ2lP+Bv+7s1DM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uY5j+eRGJwaUdgIOC2wLp7JJWLC8KQMerzLOZh5DMvxrB6t2JpmbgQo4UGJl3ZxmdQG9NKK0xe399S40n2RHiyoBpEp85ydqeSaOEqsvaCTpw1iILu6o9zQb2ZHR7YZXH1zQFt28BRMIAOSMt8WojY9cLwve3nXYQDHjoMWxcpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aREs4pY9; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98A539D6EA
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 12:31:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776342695; cv=pass; b=OFcb4Uzp6dJ5goVqR/yZCdrddZazIvNLSmZhdn7GUhEOnupcGl6GELmVfjdWVnYyMiPh57q+weP1QHnl29KHbMZC4NVk0LyOehpgEC+9cLET1KtmFkE06od7joznvTRt19xGjs4Nv+lyhHYyHOmS/hOdTUPS+Y+0PKiAkcg3NwY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776342695; c=relaxed/simple;
+	bh=1foxb2XbhwoaiqgWKnSMylvJvOALw7VOGS+0GSZBLy4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rAZLgxJ88JKv+0YDpKdO4eomxNcv1Jm53Y5ckiV43yn9t8rWvJsC2YPKUGrlgLNolgKV+4KEhAZa3HpjVyQ/pUAi8tGmK1NTw3oO/8ABOlXkte27QWDjXNzscLt3/3/Hq9usr1hMpf1paImLwUXjANQJ+JJZUgMbvxMBrERewYA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n1vjq4+T; arc=pass smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aREs4pY9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB8D2C2BCAF;
-	Thu, 16 Apr 2026 12:30:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776342653;
-	bh=0+upWZt1SQSfIz6OgmfLK1joGZgudnQ2lP+Bv+7s1DM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aREs4pY9AFWiyPis1yCUHi655kH6F2cmateO3OS3vwiWh4XGstegazkXh9fTeJRQW
-	 F7PNlGo+5uv4JS1ghUA7GmLt/nGdKTIiz0N3eNo0k9qdgxnlZ6UVo1xvuY/jm0Jsgz
-	 6OXZlHvLM95FlzgQqthFFGhbIejPY5s4jQOos8SHiaMv+4GNWDNJ4NBjKmastJKLl9
-	 B+kLcT7cwceOa9aKNihg3CZG+65E3BtgCcBvAVf5SIS4E47zAqVB8uUKfjkayyutdK
-	 0Jj6v6r/4toyxe6BrveBQ3dEYq/LaiTL2nhXiDsBmOQK54Y4zcD7qDew9ISAzQHpha
-	 d9g1fsIICa3fA==
-Message-ID: <1fba96bd-124d-431d-8de8-78688c248600@kernel.org>
-Date: Thu, 16 Apr 2026 14:30:37 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n1vjq4+T"
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-794719afcd4so86157757b3.1
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 05:31:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776342693; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VFsYf1x9Aa5BKDa0nARhtkEO1bhMnjrIxF+8hwzkSuQ/vlGdcBHMi6t0p9zTZoTue5
+         IB9XTsUOWrdiDkCn9tZr4D0vVi8O4KboFgHQO16HTyCyOPZBJ7GA6DCV5+1HGbBQ4CFv
+         3Q+jknwib9/wBkdkivJQrXv1/u63x81N96TUy3pRUJ9HUdqZjvGecsINGiMN1Cl+J8jd
+         WgVoiTPBOXdQ2t9+JsiZC4ub3vSb6R2EFVEucKC4NwoQrAbOu8K6HLD8GFiOW61NoGZR
+         kyZmtKC1Fxqrx9X+wCOFc+5+7+2C8fgGl9fkH6xdLPmBKYojkPWPNe/cz7UqMu7+k+ve
+         q6gw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=yp6YdSs5n62rLAXnXK4Ph/XrzamVhhUR8LZ+qIJe3bU=;
+        fh=BW0R8rsxojpAvGnZwO/vR7iBMTvIVSq4EkQsxnbf8MQ=;
+        b=IZxUN4h2Ul/dPNMbVda3XILU/2zWqh+iK8FiN4q2IfG4D/W9VYEvmtsea61u0rP4wR
+         2L6VMbJH63SLc0H2mrjN10vgLNKcm84jzdzEwqwJFPJCQMZjFYozREo3tQi2a+7XMOc9
+         Z0rK4Y0qjkbWpCcoA0dZroOfWyiaOJ/fg5M2QlvpMffAuqQsLQ4nLS+NmekJchGUor9f
+         jbuLRtnv7MMe1UOxfLeMNBz8BEq5iH4UMthjcJaZQ+yWVISN4pFSUCDCz0Z+4s9Ygdpg
+         ipfKOVj7g5KhoTZH/xk+lJUTDDfvjsi+haeD9nj/71tqDGECXTqMRMoWVavDLiGYcbmY
+         hVZg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776342693; x=1776947493; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yp6YdSs5n62rLAXnXK4Ph/XrzamVhhUR8LZ+qIJe3bU=;
+        b=n1vjq4+TiNs7OdQgXfOQzBbcL/wHj4op0ugOTl3NLmdvHzUU75FzB8w9js5XCoDMNJ
+         F9zKHQJ6dJTMqvUKeOO0IdrCHvmLsEjzHAnLwcyhWz+AcSaEpxlXVlbPi4JSAQCvzaO0
+         bhAyZKPvgMrg0d98wR/9ViYSvKbVfT9JhZcTNlepN5XttnGKCfjj4oKECje9Xb50mZNo
+         /Nurvapd+RDXz206b4PsYLSMifk9QcExHGsEixsfZ+vb4CCQr+ygXKLi9FKpvdQwrCTC
+         ISo1G4YK7e2Fs/unfrKovYZa+j5FpZfkJRDtlZU1BpBGkUtPaaC61MguuU7zNJH2+Iu3
+         1s/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776342693; x=1776947493;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yp6YdSs5n62rLAXnXK4Ph/XrzamVhhUR8LZ+qIJe3bU=;
+        b=R0K8ZRoklg/TyIwPV036RTLPwrE5rsmAVfzFiQ3hocZomaAxfJ7/oq/GmZgij6xBXZ
+         0d5eGA+PItyMnvltZjn6rMhq57w1L25gMzp29OC1c0sSBioVFviwoYAHRRvH/eY8ezaU
+         xA1z82HT8s5fF1x3xKpqbMLgS+MbsGrHZdHQ6YvIIV3ykdoWFygLcp4dynkzC0JMNqdM
+         N9iGfYuf1KLGfQHOyW7UQVLqFBVdGNGBXxem7Vv0r/M1PmpUtLGKs3rlfqmiKG2Jxdl6
+         wnhRbM9HdgQ4iiNRDG8j+SzFMa03j4d2EbNiNXH8bxw3EUKQqc5GGn6IflPYRMwJXFGr
+         XKlw==
+X-Forwarded-Encrypted: i=1; AFNElJ8KIly7cPNvJzpMAqjuMrHNNARHNhq6XxH4WESWzL6D9AkR5hgjkpHv3aovegYYGvGU/Ybr7UaY+qiK@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXGSz1HrGaqnk6W7aiIEQnqjMjHzK8+dIUTeyK/e3gAkvIweu+
+	7IDw6/lMhA3hoHe4YihIcdcgWqnXse1gvzJ43unU403QsZG/9ZLCpeGnY7pyB91ceaNclelsVYB
+	S21pnFvwk/dWWDXXG0fl1DERqdJaB6TI=
+X-Gm-Gg: AeBDiet3837kz8bVC/degvqo4iQgqAttnGjDN574ghw+/W50kaK+2H3DBrkH98qeV5o
+	sQFxqrTiljAepzjXudwBHk2m04DqOfEkvc+/GD3joLX62QmjW1riYiZcmag4cfYTuRWETWy3hPt
+	UggHn5EyaKEP35WIdiX8saXH7pNAWpDI0YGsjJ5Ad0m0C0JtMj/TUFz21ks0Q+5tMhsKpne1hfx
+	71P7y3NbYgiwMQXogVpNorxocVnlRbdfbqe+9ZWxn0GptANBSZY50oJ9gQSoB2I2bft7xKpgQgM
+	NxszuTgZOwAx7GA=
+X-Received: by 2002:a05:690c:85:b0:7b4:6f40:635 with SMTP id
+ 00721157ae682-7b46f400c77mr141541987b3.16.1776342692805; Thu, 16 Apr 2026
+ 05:31:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/61] Coccinelle: Prefer IS_ERR_OR_NULL over manual NULL
- check
-To: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
- apparmor@lists.ubuntu.com, bpf@vger.kernel.org, ceph-devel@vger.kernel.org,
- cocci@inria.fr, dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
- gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
- intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
- linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mm@kvack.org,
- linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
- linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
- linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
- sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
- tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
-Cc: Julia Lawall <Julia.Lawall@inria.fr>,
- Nicolas Palix <nicolas.palix@imag.fr>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <20260310-b4-is_err_or_null-v1-1-bd63b656022d@avm.de>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260310-b4-is_err_or_null-v1-1-bd63b656022d@avm.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260129140948.621754-1-plambri@redhat.com> <CAH2r5mvgd9W4QJ603uv9UAQ6R=ASnORea532o8Ok7kjhJvEh4A@mail.gmail.com>
+In-Reply-To: <CAH2r5mvgd9W4QJ603uv9UAQ6R=ASnORea532o8Ok7kjhJvEh4A@mail.gmail.com>
+From: Bharath SM <bharathsm.hsk@gmail.com>
+Date: Thu, 16 Apr 2026 12:31:21 +0000
+X-Gm-Features: AQROBzCm_obqq7kWpQBYNw479ojC8g-TOPkBYhX2sX85Kv-5crrm2sVT3eT06tU
+Message-ID: <CAGypqWx=051_KjZrfhXJfKVKjRDszkAXNz4fRfvv3S74g+BF=w@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] cifs.upcall: add option to enable debug logs
+To: Steve French <smfrench@gmail.com>
+Cc: Pierguido Lambri <plambri@redhat.com>, 
+	Linux CIFS Mailing list <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/03/2026 12:48, Philipp Hahn wrote:
-> Find and convert uses of IS_ERR() plus NULL check to IS_ERR_OR_NULL().
-> 
-> There are several cases where `!ptr && WARN_ON[_ONCE](IS_ERR(ptr))` is
-> used:
-> - arch/x86/kernel/callthunks.c:215 WARN_ON_ONCE
-> - drivers/clk/clk.c:4561 WARN_ON_ONCE
-> - drivers/interconnect/core.c:793 WARN_ON
-> - drivers/reset/core.c:718 WARN_ON
-> The change is not 100% semantical equivalent as the warning will now
-> also happen when the pointer is NULL.
-> 
-> To: Julia Lawall <Julia.Lawall@inria.fr>
-> To: Nicolas Palix <nicolas.palix@imag.fr>
-> Cc: cocci@inria.fr
-> Cc: linux-kernel@vger.kernel.org
-> 
-> ---
-> drivers/clocksource/mips-gic-timer.c:283 looks suspicious: ret != clk,
-> but Daniel Lezcano verified it as cottect.
-> 
-> There are some cases where the checks are part of a larger expression:
-> - mm/kmemleak.c:1095
-> - mm/kmemleak.c:1155
-> - mm/kmemleak.c:1173
-> - mm/kmemleak.c:1290
-> - mm/kmemleak.c:1328
-> - mm/kmemleak.c:1241
-> - mm/kmemleak.c:1310
-> - mm/kmemleak.c:1258
-> - net/netlink/af_netlink.c:2670
-> Thanks to Julia Lawall for the help to also handle them.
-> 
-> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
-> ---
->  scripts/coccinelle/api/is_err_or_null.cocci | 125 ++++++++++++++++++++++++++++
->  1 file changed, 125 insertions(+)
-> 
+On Mon, Apr 13, 2026 at 7:23=E2=80=AFAM Steve French <smfrench@gmail.com> w=
+rote:
+>
+> merged the three patches into cifs-utils for-next
+>
+> On Thu, Jan 29, 2026 at 8:09=E2=80=AFAM Pierguido Lambri <plambri@redhat.=
+com> wrote:
+> >
+> > cifs.upcall uses two levels of logs, DEBUG and ERR.
+> > However, when using systemd, these logs will always be recorded.
+> > When the system does a lot of upcalls, the journal could be filled
+> > with debug logs, which may not be useful at that time.
+> > Added then a new option '-d' to enable debug logs only when needed.
+> > This will set a logmask up to LOG_DEBUG instead of the default
+> > of LOG_ERR, thus reducing the amount of logs when no debug is needed.
+> >
+> > Signed-off-by: Pierguido Lambri <plambri@redhat.com>
+> > Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+> > ---
+> >  cifs.upcall.c | 12 ++++++++++--
+> >  1 file changed, 10 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/cifs.upcall.c b/cifs.upcall.c
+> > index 69e27a3..9c2843d 100644
+> > --- a/cifs.upcall.c
+> > +++ b/cifs.upcall.c
+> > @@ -1356,7 +1356,7 @@ lowercase_string(char *c)
+> >
+> >  static void usage(void)
+> >  {
+> > -       fprintf(stderr, "Usage: %s [ -K /path/to/keytab] [-k /path/to/k=
+rb5.conf] [-E] [-t] [-v] [-l] [-e nsecs] key_serial\n", prog);
+> > +       fprintf(stderr, "Usage: %s [ -K /path/to/keytab] [-k /path/to/k=
+rb5.conf] [-d] [-E] [-t] [-v] [-l] [-e nsecs] key_serial\n", prog);
+> >  }
+> >
+> >  static const struct option long_options[] =3D {
+> > @@ -1379,6 +1379,7 @@ int main(const int argc, char *const argv[])
+> >         size_t datalen;
+> >         long rc =3D 1;
+> >         int c;
+> > +       int mask;
+> >         bool try_dns =3D false, legacy_uid =3D false , env_probe =3D tr=
+ue;
+> >         char *buf;
+> >         char hostbuf[NI_MAXHOST], *host;
+> > @@ -1395,12 +1396,19 @@ int main(const int argc, char *const argv[])
+> >         hostbuf[0] =3D '\0';
+> >
+> >         openlog(prog, 0, LOG_DAEMON);
+> > +       mask =3D LOG_UPTO(LOG_ERR);
+> > +       setlogmask(mask);
+> >
+> > -       while ((c =3D getopt_long(argc, argv, "cEk:K:ltve:", long_optio=
+ns, NULL)) !=3D -1) {
+> > +       while ((c =3D getopt_long(argc, argv, "cdEk:K:ltve:", long_opti=
+ons, NULL)) !=3D -1) {
+> >                 switch (c) {
+> >                 case 'c':
+> >                         /* legacy option -- skip it */
+> >                         break;
+> > +               case 'd':
+> > +                       /* enable debug logs */
+> > +                       mask =3D LOG_UPTO(LOG_DEBUG);
+> > +                       setlogmask(mask);
+> > +                       break;
 
-Neither this, nor try from 2011, nor any future try should be accepted,
-because it creates impression IS_ERR_OR_NULL is somehow okay. No, it is
-not okay, it is a discouraged pattern leading to less readable and
-maintainable code. We should not have therefore any tools suggesting
-usage of IS_ERR_OR_NULL, because people will be converting poor code
-into that, instead of fixing that poor code.
+I agree that journal can get very verbose when cifs makes many upcalls.
+Looks like logging behavior is similar across other cifs-utils
+programs like cifs-idmap.
 
-Best regards,
-Krzysztof
+If we need debug logs from customer devices, asking them to manually modify
+cifs.spnego.conf with -d could be error-prone.
+
+Should we consider a standardized way to enable debug logging across all
+cifs-utils components and also with per binary basis to ensure
+consistent behavior
+and reduce misconfig?
+One idea could be something like having /etc/cifs-utils/debug file to confi=
+gure
+debug level for cifs-utils and also additionally for per binary level.
+Thoughts.?
