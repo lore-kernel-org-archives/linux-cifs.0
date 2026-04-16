@@ -1,172 +1,114 @@
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B930379EF6
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 15:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776352939; cv=pass; b=oU3LPv9sd44usznVGGxARSO1lb+BLAsqg/x5fJ16PdOLEo6qJ17mIVhs34/cndTnsGJIewJgr2D2QjfNGkvqAolFZ+ganWYH/q4rErQPtxq7JToXr+Ixu8QhHbn/27A93Io9wrLppoyZrXKxEyl6UHdM1vtJBATSC8bnnxAO+1M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776352939; c=relaxed/simple;
-	bh=d8h0wpCxAz5qr8QgJAWyo5NPmRw20h5MEF24J15IyVI=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29AA323B632
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 15:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776353880; cv=none; b=K0VyJIskqfd8tDTXuGJsja5EwNKUV4QzE9NmnugLR876qJBWZSRvizS2CmJFNjC1Z31uEx7Rwmnxs1YhUqZRL57xP2rpPfvCdxwVy62rlMaUFRlbEa5CmcMSJtu2easaWn15RuKY02y1J0R7l8Nd5xzLu7BHeuiIqhkYV0W826I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776353880; c=relaxed/simple;
+	bh=AC0no222pyuJabhY/h0SqDNjDmabcz86F7hXkNC0Uc4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nppMNHPk41dyNGTamniaRxswWpT3KVxfcSmXFTSdUwotd7nlusiDB10NsgXwwVbsMvCD5lDVN9QaynCoZATJfPlIKxzBAPfHuSA6HI6mi0icejiW0y5YrSycTayXVdMTecllR6Heuba+ZPtmkSh4QDrEpocbtOohnaApVRVIQ10=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g4lVbpH3; arc=pass smtp.client-ip=209.85.217.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=qQ9rSZxLi7ynZifjUH0HiuImlZCm/5GAnVzD6wHT6Hc++6vlx1v7gEfJqaHnzmnkBmdZ5vAeI8ggizc0UB8wr5W7YTS4h90dRk7Bbrlb3zmOiajQ87scl1d4gT8wfv9iv5WcT9XgmDUmptNub0viK0s/DQ7H9JQwIpM/fKS5pZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=SF4yUZYG; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g4lVbpH3"
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-610e2e8f57dso1356377137.0
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 08:22:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776352935; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PRq2sE36Q1NfTEvJU9HZRotdUl5jz+sqjLnIl4HrBzOurr8MDu7bXr742985/HQ4C7
-         wIsDScc1ovpjc+IUy4Uq5/f8LXijj/I2Us2FHtqy+79pT6aYtfYxlOEAH3gQxPUsT/6F
-         N8643EaX3HN2dfrPZCQXwQb6VBR5jXZ/uV3nFgRZpkJK+mfdVf7qxa2KdmhSJCQfO4TK
-         8rnj7a9mYFOYbdyhhssfOyB0LvMADVxVkFEMaaBuercaBS2zFEVRWYtrB/8gpxynEWkM
-         aVv0ayisawc3d5Lh0mxao5EDcopv9HTeaFOz4+MkDjyF5mnJxhMQTaX/j430bfxvOwkv
-         nZCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ZrzbbPcScOB3YiJODipm6pYCq1GabErqB6lK+E1UuOI=;
-        fh=zF6jUCMyLOsDgT7918kQjyYpBEapyq8RlhvzHxg+Ses=;
-        b=SJ9BMg3KEAFXkvU6Brhm5Mb+dhbCtd1yK6M4c07jlqkAYFlb+2fiVKKII3wbfrMO/+
-         rYgjus+MM+yUdaJn+ReDkUVewV2wlArpxUd3FUu2LHJnI8N4xrIAwPaj7ANf61GTAySp
-         bmKjjts7/WZNZByC+d+iyt4GrRkRbBk2995E1fbnEdGFQ6rKHDDQcS5B1odUNMIN7xcl
-         v4ngtxlnMlbDl/lixj0+u8JXylVPNpPYEyURYsq+fGHG9l7qMSNlq6B5xvHfA58FMoPI
-         7ndNs+sKG1lFipCuWT4KozmW/68BJkXiFg0nl3/N2s+PlWn6hOImTEOi+kel56jHZks0
-         nfvw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="SF4yUZYG"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6729c6f0ca7so608771a12.0
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 08:37:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776352935; x=1776957735; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZrzbbPcScOB3YiJODipm6pYCq1GabErqB6lK+E1UuOI=;
-        b=g4lVbpH3NYuTwHK4zof4cI1R5F3IIOc7rqMOk/MWHpRmevLzRVb+qRlTlkjItjBIHx
-         c7M0jhqWfaQ2vMdmdCGZvAPwF+odTZ9kyd6p7sv+kuJPT06vFRz8sGzxEE+RDZyrNUPi
-         T43wkAslMCjJ0svGA08kUb5Gbx/3985K1GhQDZgh/+pTKuxWXmHDa0LxQ7N8Y6D+AdMV
-         pK9JcsBfafPuXYE4xQ1M0Bsj7zmPTRKj8Oqs1QY2itp7CaL3brWr7nECH3oyQEx2Fb50
-         mvvGzjXFjjCeXabKEm078u3WnFCD8fkfLKek/kSJSKQGUKyNJa4mEQC63tdpwccNytZ5
-         6URQ==
+        d=linux-foundation.org; s=google; t=1776353877; x=1776958677; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=L9c3Exw/YRvoMVTnE3/VHAjwHw40F1AdnWP9lcAfExw=;
+        b=SF4yUZYGf8+ztOLo/w7SESoqk6iWoh9JXzajew0HSDTK01FGdipQFvz1oBt1+keNKN
+         4uJuOMlJZG+x4Gdl41ZrYMMymQni1kMFKuPFZs4Gg/FhoMnUCwvCNZJv5TPUEUkBYtWl
+         DezoUnILA2Oz6DODH0Ke6q2XxO+9TG1ZaHu34=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776352935; x=1776957735;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZrzbbPcScOB3YiJODipm6pYCq1GabErqB6lK+E1UuOI=;
-        b=QTYkYYm/efBY1sX8hQYtdfQhImXYjRsyOGb+8mkA9j5QF4TxK9pNlH3OWbWi/Pwbwo
-         /cLPta8/FCh3/92tG3Ex/j+U1Ahruuy70hyviQDU/dpkc94oFhDDN+ZRoGd3g7D8bF8m
-         JU8srONV+kSIT9uYmufNBemR8Kf1T4MWiE22hc5E+KH0tsoHBSabHkzpkmKOEnLZ7Skj
-         mub4NNqkHruSvUWyRmCZdb4T8rWXfqXT32IZVAqeTz4LkJGS8MQU2e05RMVbqq8ryl/L
-         dYjdCGCcY8rYmkzcyGKHMFGgaKrr+I/yDBnQBsshZ3UlOXMhr1/X3j4XoSROd7tidGW5
-         sN2A==
-X-Forwarded-Encrypted: i=1; AFNElJ/o9dKaFCqyT2fI6cpAxrqwDjkOTOYsR/Ss2bwmo5G4gmfdzTZ8uwf4y6c5IOkKbCV7D2TvVXFU0qog@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZZVjYMTnWtd5HGEhR8U0PBuNIrTn+nco0KIC/OuNQHWcX0BYd
-	jco6yeehIFUXhmfFJ2YEmSRaLOrRpqmDFwIbndWBohT4BAjkzdQf+AUjqC0hUkX4TGE1iTZKT3n
-	mjZ7yN71BBxMrPhC59AnCt/tb/ohOuI8=
-X-Gm-Gg: AeBDiev4in/bGfcbFgAL2YWX3CfNgeTPLiBE1/7mGHSr8xu05AkImVyshPdidqJEZnX
-	OlnkwtOtvvhZmJ5wfPD6kUiqyzZGqG6oqR5fQ3E+mOmk91y/NWi2Yo56mZb0NUNKWltZ7TBCOFX
-	GxSeEdZWacEDd5AT569yDW43z50wdE/6LYdnWRx4K23HPlgUFK/1p0ss7V6H5udnYnoJmGjCC4n
-	BoQ13NxltbopaEDIhGBN+tYuCnHVZDJKygXP/rUvvlyc6eDJE3syxZtgFmWEbL7Q9lsIu6hy8ft
-	Ajns/XC1x6MnrFoDTP8SFK5OMLNEExJMHcWAfRBbSA==
-X-Received: by 2002:a05:6102:4194:b0:610:48e8:8c4a with SMTP id
- ada2fe7eead31-61048e896d0mr7561251137.24.1776352934841; Thu, 16 Apr 2026
- 08:22:14 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776353877; x=1776958677;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L9c3Exw/YRvoMVTnE3/VHAjwHw40F1AdnWP9lcAfExw=;
+        b=gnk2qSUpOQ/mc3vH6OkVYAJ+5tloKwB4Hokj+mO7TyrO5fwDluJnFjwXWHyndpA1br
+         LTqUmAhRcCit9Km7Tzp1gwb9g60EMHjwzhS8xqLZjDQz3SbYsJxYucbnwR6o1/Oh4LyS
+         wsyQImNHzo6SqcKOXpA/tCgfnSnbxDnU1WFoa+B5VTn21YUN224iE4chNibAcGdfNo7D
+         d99bK7vg9IpFBoosKX20XD+cqziiUVk1w5spG7Rrn/Su57P3peaSTW9mdpoUb3fyeIjs
+         /IKj2iVfYnpYyW01m/4F8vbdlgAY5L9RvMCJjXxzdSiSj4dy05QEsNNkrFOxEHqxvXMa
+         +KCA==
+X-Forwarded-Encrypted: i=1; AFNElJ92+4SP2hObb4kbBTpErkx6FBtNsw678+WrWEs4FBqL4Tr9VJxwxWeXGChrPhkPFhjfU/CXm8kFSvGz@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqDV6mvyp8FUhpEIYhEfMZZzR9mRXDOAb7OFaKxQ4Q+ce96/g1
+	nAAe56gyHWzi11xGjRE5XHNU0lab8u3WmX7DjYgldtyd5/Ff6QEH0DOkYLn/NalQdgT87i2E7we
+	hgnxhF2gX3g==
+X-Gm-Gg: AeBDietGNr04BBue+TvEV4m+tUQ4zAE1gBavJ0EewAZSmik7izPcDto2OQo93kB69Pe
+	aMQDZELoXTKN9520t1Iwl/YYHL+n7Muv0JBAedFqP2Z3kdZyYflCFTQHE/JA3jZIBkh2u+kFs2p
+	LDAOFd4xi1bdIvLOjO/ihbwkwdp6x4Axbfpo7zhUQOAWEqUzkigBQVRwqgGNElE3oeIvQHuU0BS
+	HITENwchOJwUUzXjOIbQ/aFQMPSovwHzZ6wzIRq7hNFeb2E9xvugVL+HW3FtQ4NJtLzISxYjQ33
+	svNyQRuSx945OvvETQnfKLBi24rLSJ/ccsFZRLoheTUL/epmfFk2fiZcmsb0vTG6C3mJX7hi/Y1
+	P/9hCy06gnh9gg2UEecGfgccZtFAasH8U43c7QE11f3YFayLoMn4mZG9nOXnqsn1+CoI5Jnq04c
+	SofT+4qAfL6KMfwDSO/TKa510NvaVBT8IAbSkc2XAIrL4YbpMDahUxqyUpBTzW6HKcNNsFPHxS
+X-Received: by 2002:a17:907:3c85:b0:b9c:fe2c:3a57 with SMTP id a640c23a62f3a-b9d7249608amr1496652966b.20.1776353877337;
+        Thu, 16 Apr 2026 08:37:57 -0700 (PDT)
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com. [209.85.218.51])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ba173b2383asm178892166b.21.2026.04.16.08.37.56
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Apr 2026 08:37:57 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b9c280322e0so1005877766b.0
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 08:37:56 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+c/ZpqcHg1JD5/USqDVyqc5e+3Q3PBb84N2JdSPlqRc5Y3LiIq/zfBkwhmylNblY8+1y+7MPDHoMSY@vger.kernel.org
+X-Received: by 2002:a17:907:94d5:b0:b97:1d24:c004 with SMTP id
+ a640c23a62f3a-b9d724960f5mr1682161066b.21.1776353876373; Thu, 16 Apr 2026
+ 08:37:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260328172314.45807-1-dorjoychy111@gmail.com> <20260416-abgraben-seeweg-a44ce660957f@brauner>
-In-Reply-To: <20260416-abgraben-seeweg-a44ce660957f@brauner>
-From: Dorjoy Chowdhury <dorjoychy111@gmail.com>
-Date: Thu, 16 Apr 2026 21:22:03 +0600
-X-Gm-Features: AQROBzDwlhonUu0OdB2GZDkt71Qp2GPutRABZHn8dYTEqH0ntcAPsZO_it5641c
-Message-ID: <CAFfO_h5mORm0OuK-d4thzBWWySmyvLSVeVa7phZc4Df-8D=1Cg@mail.gmail.com>
-Subject: Re: [PATCH v6 0/4] OPENAT2_REGULAR flag support for openat2
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-api@vger.kernel.org, ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, 
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, v9fs@lists.linux.dev, 
-	linux-kselftest@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz, 
-	jlayton@kernel.org, chuck.lever@oracle.com, alex.aring@gmail.com, 
-	arnd@arndb.de, adilger@dilger.ca, mjguzik@gmail.com, smfrench@gmail.com, 
-	richard.henderson@linaro.org, mattst88@gmail.com, linmag7@gmail.com, 
-	tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com, 
-	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com, 
-	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, 
-	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org, pc@manguebit.org, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
-	bharathsm@microsoft.com, shuah@kernel.org, miklos@szeredi.hu, 
-	hansg@kernel.org
+References: <CAH2r5mu2+PGJER79PJpPVCysoEEgCsyuzuCKCD9LzZSHQnhOSQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mu2+PGJER79PJpPVCysoEEgCsyuzuCKCD9LzZSHQnhOSQ@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 16 Apr 2026 08:37:39 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whmue3PVi88K0UZLZO0at22QhQZ-yu+qO2TOKyZpGqecw@mail.gmail.com>
+X-Gm-Features: AQROBzDZwpbP92e8M4X6-Wb_4mgUEYXroEGJpD6ABQEgGSBF7AgHjs7GIA3JYcA
+Message-ID: <CAHk-=whmue3PVi88K0UZLZO0at22QhQZ-yu+qO2TOKyZpGqecw@mail.gmail.com>
+Subject: Re: [GIT PULL] smbdirect ksmbd and cifs changes
+To: Steve French <smfrench@gmail.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 16, 2026 at 7:07=E2=80=AFPM Christian Brauner <brauner@kernel.o=
-rg> wrote:
+On Thu, 16 Apr 2026 at 08:04, Steve French <smfrench@gmail.com> wrote:
 >
-> On Sat, 28 Mar 2026 23:22:21 +0600, Dorjoy Chowdhury wrote:
-> > I came upon this "Ability to only open regular files" uapi feature sugg=
-estion
-> > from https://uapi-group.org/kernel-features/#ability-to-only-open-regul=
-ar-files
-> > and thought it would be something I could do as a first patch and get t=
-o
-> > know the kernel code a bit better.
-> >
-> > The following filesystems have been tested by building and booting the =
-kernel
-> > x86 bzImage in a Fedora 43 VM in QEMU. I have tested with OPENAT2_REGUL=
-AR that
-> > regular files can be successfully opened and non-regular files (directo=
-ry, fifo etc)
-> > return -EFTYPE.
-> > - btrfs
-> > - NFS (loopback)
-> > - SMB (loopback)
-> >
-> > [...]
->
-> - I've added an explanation why OPENAT2_REGULAR is only needed for some
->   ->atomic_open() implementers but not others. What I don't like is that
->   we need all that custom handling in there but it's managable.
->
-> - I dropped the topmost style conversions. They really don't belong
->   there and if we switch to something better we should use (1 << <nr>).
->
-> - I split the EFTYPE errno introduction into a separate patch.
->
-> ---
+> Move smbdirect server and client code to common
 
-Thanks for fixing up and picking this one up!
+Pulled.
 
->
-> Applied to the vfs-7.2.openat.regular branch of the vfs/vfs.git tree.
-> Patches in the vfs-7.2.openat.regular branch should appear in linux-next =
-soon.
->
+I did want to ask why you ended up with that very odd directory
+structure? Not that it's a problem - I don't expect that I'll ever end
+up doing a lot of pathname autocompletion in this all - but it just
+looks so strangely convoluted...
 
-I don't see a vfs-7.2.openat.regular branch in vfs/vfs.git tree in
-git.kernel.org.  Maybe this hasn't been pushed yet?
+Just to pick on the biggest file in there ("it's not fat, it just has
+thicc code") that also has the longest name:
 
-> Please report any outstanding bugs that were missed during review in a
-> new review to the original patch series allowing us to drop it.
->
-> It's encouraged to provide Acked-bys and Reviewed-bys even though the
-> patch has now been applied. If possible patch trailers will be updated.
->
-> Note that commit hashes shown below are subject to change due to rebase,
-> trailer updates or similar. If in doubt, please check the listed branch.
->
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-> branch: master
->
+   fs/smb/common/smbdirect/smbdirect_connection.c
 
-I guess you wanted to mean vfs-7.2.openat.regular here?
+why the redundant and complicated naming? The *point* of a directory
+structure is to structure your directory contents so that you don't
+need to name your files odd ways..
 
-Regards,
-Dorjoy
+And yes, it's "common" code, but it's a big subsystem of its own, and
+got its own subdirectory anyway and it all could just have been
+
+   fs/smb/smbdirect/connection.c
+
+which would seem to be the much more straightforward and obvious pathname...
+
+Again - it's not like I'll ever really care, but it just looked so
+_odd_ to me in the diffstat with all the redundant pathnames...
+
+               Linus
