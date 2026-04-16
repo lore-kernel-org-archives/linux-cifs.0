@@ -1,112 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BAC4C97
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 00:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F3D19539F
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 00:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776298042; cv=none; b=An1Cj7+u9h1egnawWdf3l2X9bjYdjgJ2UdRw/i6CQk7kcMc8W/NSCfW3I4+OeZOsf9pKoFYiUoGhlFZoYavDa0axdwDI2Q7OGzrTIUdQxE0vR/nWrX5tTaUj/7c2eXm8vi+js27r/EYKTP2y6tojsRW9QmmfYiNV7FUT7M3E0Dg=
+	t=1776299146; cv=none; b=SSHLR/iNEV+i4E7dSdf/DuQxS5cYaIYxfZlaD7hqXdLmaPIriVvg4SyKc8dSRCxfYx5Swiw5fS8OXJAV2cexGt3DYulOoaBjQseMD72e8O+aO0cwRMnOyjDNHbjz5wcAXi91uAB6htjtBktE5A/ciL8Fp8lfhJSyDSm+XD8D9eU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776298042; c=relaxed/simple;
-	bh=YkxaWzvJMru1xnxMSm63UBq1tAGZwkpBtHh5sNsugcE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DetoeGbQS7aJsPYmOCRR8go0Iihg0f9Khg5iBlvh7DMhozft+OBqdkWopBTUxQru2MrGBTPCxZa/qFYkqYjheLGl/M4lknAL7M1fJd4Nvpux1wZSN8Wt5FCHuVZ9BmaGmGzvdsqS1zRku7sz9A3KW+YkqB9EflQ2B3wQqaGxMd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oMfkHeLj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776299146; c=relaxed/simple;
+	bh=AXyNXjDfVtCE0ZrJX0GJ8x2yqOZGd7+QRmcScIvKqZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UrxKejv19RyzXoeXr2zR1jEnbvHvofyzZRwIuSc4hQA2R47B0b8Z217oASSG7jiiNkNJmHilTGOfRTiCsHmZFAWxM35NKIViJ0U9dYrWGEybV7xTtrP04fmZSL6wh3T46hGbNmghMhOpXtt5lYLBIz5bfgM0Gdm9YzBil2dnDMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=f+UuA9+c; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oMfkHeLj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1EC7C4AF09
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 00:07:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776298041;
-	bh=YkxaWzvJMru1xnxMSm63UBq1tAGZwkpBtHh5sNsugcE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=oMfkHeLjaKZStv7ocmCOc4jNLsah98slNzydNS7OKjD2w6MMmiydZFaSq2UMNQ97X
-	 rnDE2gaM3XUUJLpHoxm/RmqL9i85bBq5gZCAMKZh5Q9e2fwyURv7KNTcd2n+aOeJcN
-	 7Kkd7U4a4gHqKpSBHQGet/T3au7XLsGt5z3Jy9YkNAsmwQ77pTV3i9SwJB6K1wEfJs
-	 IX6eDMsoUIWDAuLHbEDHvjpcndci3riTli/JTB5GaNV+Ar03VpHOY2aPaMzR2atsy+
-	 u/imOr9+gzOfypUsG63CM2tvjfhsS2Pxek+r/hXdF5cfTzbdqXE+2EbGMz7p1RzlRK
-	 hLbFw7BqfT/nQ==
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b9c6f1d1282so995966066b.3
-        for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 17:07:21 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yw9dzUPZlUdwhooT7JDKS4j/Wv2TNqk+EX7QOKib7ymxl3GMBx9
-	SnpBuu+TFvQmf4aj6w27khy6b8n5omU1JI32fvaWlxr3rd4vEYFhcxTbFS+Jz4hlfN7xyuwZRHS
-	+5it0/oGTJq5Zd9H7O0YIwq3M4PwzddI=
-X-Received: by 2002:a17:906:f59a:b0:b9b:7bf8:800b with SMTP id
- a640c23a62f3a-b9d729bd0cbmr1402936366b.40.1776298040451; Wed, 15 Apr 2026
- 17:07:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="f+UuA9+c"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4887ca8e529so718985e9.0
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Apr 2026 17:25:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1776299144; x=1776903944; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AXyNXjDfVtCE0ZrJX0GJ8x2yqOZGd7+QRmcScIvKqZI=;
+        b=f+UuA9+c0xT+BHjeYoCfkIMu3defE5bzqQgNgayWkEJZ034Y7uKMKXw/wYmB0tQj5f
+         Q/p0pBK63nCtlV1o0MrVzUZ9gis7HEcopv+TiKA7lDMwbcRSuYJLCIxGmT+o9qaz4mtm
+         z4YnN+DG34KKEasOnX/Iv8COGepeP1DyILPNM/EDgbM9l/uqqsWQYehnCuDLsBuAKrhE
+         ZafwX3FWgMTrOjtU1p1Mslhv42vebdtaKm0OWSS+rnMwqwAT+az4EF6ghljSOhX6nDSL
+         akJVnmz697ub7ZkRfDqwSWnXOXM22BPc3zhFV3CnmUvvQk837dWLCnfdUQnWisD+RSNW
+         TGaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776299144; x=1776903944;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AXyNXjDfVtCE0ZrJX0GJ8x2yqOZGd7+QRmcScIvKqZI=;
+        b=Tp0ntUQ562zWVyrLNJGDfIKtRtYZ5aQ2vXS3mqzIhc2ZfaLiwGWxFhtNBSXtr4uKEG
+         tpZhK7ssaoe358kDhxxuT6a/mgNQIH9CgseWlasib/M+zspz7UapTpN055JSmup1m+9H
+         YQuV1rHxRhxP8tjW01WE6etrJxSOfCZ69EF2esFJ4KhmMHXNOAoXJQ48vtCXoSEj/pxE
+         DsDSNk9VJK66EdwJrsRq9bpkLkgFwx+yMLyDG6B7DUmKrki5J/CFyTz8r7W+ZbyoB23K
+         vgHgpic1NdjkEGKPMhrMEP8sIFUXXXPGPhH/X50FmxDviKAQgYR/dCl2htDuzy63ichY
+         VfUQ==
+X-Gm-Message-State: AOJu0YzrHbylXXgyyMxtAu/Ax32YFV8AMMs8qqYPCCfLigZkreUdiyr3
+	SIuU6Bmw2Yot9Zxo/jz9M+Be7Lu1fe2PXq7pliNWjF2Zh8dlRhelpK/nQIlj4seL9YI=
+X-Gm-Gg: AeBDietCEw9QQskg/2ybaWR48vg31caG7DqNxZVptbKW+qa3JZhgfkVlhiPGTJjydng
+	G4Hoed05rPbsqThEj2i3sYhr2TC9Q088BGLjc5zvRwi0sPARUQ3Q0y4v7VbGDGbFFs0gRe8AtnN
+	HPTeyc8z2WXREPJ9b6y+GGkyyLAj8BNmI6WJLstxFTY9N9cBXAiwir8rC03SIAOev3izsQmDOMs
+	fZEwy4l0Z6dxDJ8aRnnkvAUxoYBii3U2PJi7R5KksHUJiIeEg7KjnnAVGbhzwG1AcHiO/xA8ZLt
+	KvGwrxjMOXRXoYCvea73cEuxnZRuimhiasQ91FyH8afxvN8fVrGWjP16lIYN3DkR8Rt6i0L5uyy
+	GY2KEknopoU+IgiO3CDMu/yhH0CmdPDp2liG1YVnTdG0EUJ2kuftGsiT0sZeMJqrFji+vYCODYx
+	8k+sW5i3HRMSFTGYpamKd5COJl4q5vz0yvwU88ggs1ww==
+X-Received: by 2002:a05:600c:a101:b0:488:9ec1:4976 with SMTP id 5b1f17b1804b1-488f45c6406mr15939765e9.8.1776299143583;
+        Wed, 15 Apr 2026 17:25:43 -0700 (PDT)
+Received: from precision ([2804:7f0:6401:5290:433e:afae:f475:c9f7])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12c5e62b9d1sm4019937c88.5.2026.04.15.17.25.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Apr 2026 17:25:42 -0700 (PDT)
+Date: Wed, 15 Apr 2026 21:25:36 -0300
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: Werner Kasselman <werner@verivus.ai>
+Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
+	"sfrench@samba.org" <sfrench@samba.org>, "pc@manguebit.org" <pc@manguebit.org>, 
+	"ronniesahlberg@gmail.com" <ronniesahlberg@gmail.com>, "sprasad@microsoft.com" <sprasad@microsoft.com>, 
+	"tom@talpey.com" <tom@talpey.com>, "bharathsm@microsoft.com" <bharathsm@microsoft.com>, 
+	"samba-technical@lists.samba.org" <samba-technical@lists.samba.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH] smb: client: fix OOB read in symlink error response
+ parsing
+Message-ID: <adk3zcdqpl34l4ggvady2dbkb74gzxmhilolvchvhbmeubekix@q2u4fk73bzpv>
+References: <20260414115040.552945-1-werner@verivus.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAKYAXd9EBFBcy9bJ3=sJiYVYHAYjKYqOqD53UCJ8zWKXF0sAeg@mail.gmail.com>
- <CAKYAXd8B78Gde_7+Ph0cSL998k4qqs_okB0jky0m5h8i25_AGQ@mail.gmail.com>
- <20260414191533.1467353-1-michael.bommarito@gmail.com> <20260415112501.116426-1-michael.bommarito@gmail.com>
-In-Reply-To: <20260415112501.116426-1-michael.bommarito@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 16 Apr 2026 09:07:07 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9C5Ghw9NHcJomwrbvGaEjc-WGwzB+=6fPVCR2EYCweNg@mail.gmail.com>
-X-Gm-Features: AQROBzAg4IonF_u2vmWKtAI_rhmQs1lEgdJWEvNMP8IfK0k0FzFdwBq3OkWm8c0
-Message-ID: <CAKYAXd9C5Ghw9NHcJomwrbvGaEjc-WGwzB+=6fPVCR2EYCweNg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] ksmbd: harden ipc_validate_msg() and smb_check_perm_dacl()
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260414115040.552945-1-werner@verivus.com>
 
-On Wed, Apr 15, 2026 at 8:25=E2=80=AFPM Michael Bommarito
-<michael.bommarito@gmail.com> wrote:
->
-> Two ksmbd hardening patches, respun from v1 [PATCH 0/3] per Namjae's
-> review.
->
-> Patch 1 folds v1 1/3 and 2/3 into a single response-side validation
-> change in ipc_validate_msg().
->
-> Patch 2 is v1 3/3 unchanged (minimum ACE size in
-> smb_check_perm_dacl()).  Please let me know if there's anything
-> on this 2/2 you want to think through or change.
->
-> Changes since v1
-> ----------------
->
-> v1 -> v2:
->
->   - 1/3 + 2/3 folded into a single patch (1/2) per Namjae.
->   - Dropped the hard KSMBD_IPC_MAX_PAYLOAD (4096) cap on
->     RPC_REQUEST and SHARE_CONFIG_REQUEST response paths.  A 4096
->     cap would regress NetShareEnumAll and other NDR enumerations
->     on servers with many shares -- userspace ksmbd-tools grows
->     the response buffer in 4096-byte chunks via g_try_realloc().
->     Use check_add_overflow() instead so functional payload size
->     is unconstrained but msg_sz cannot wrap unsigned int.
->     [Namjae]
->   - LOGIN_REQUEST_EXT keeps the [0, NGROUPS_MAX] bound (POSIX
->     semantic limit, not an IPC transport cap).  Moved the
->     pr_err() into ipc_validate_msg() so the error is reported
->     at the IPC boundary. [Namjae]
->   - Removed the now-redundant ngroups check and pr_err() from
->     ksmbd_alloc_user() in mgmt/user_config.c.  Both call sites
->     (ksmbd_login_user and the SPNEGO path in auth.c) reach
->     ksmbd_alloc_user() through ksmbd_ipc_login_request_ext(),
->     which now rejects negative ngroups at the IPC gate. [Namjae]
->   - SPNEGO_AUTHEN_REQUEST left untouched: session_key_len and
->     spnego_blob_len are both __u16 so their sum cannot wrap the
->     unsigned int msg_sz. [Namjae ack]
->   - 2/2 (smb_check_perm_dacl minimum ACE size) unchanged from
->     v1 3/3 -- no review yet.
->
-> Threading
-> ---------
->
-> Sent --in-reply-to v1 [PATCH 0/3] cover
-> (Message-ID 20260414191533.1467353-1-michael.bommarito@gmail.com)
-> so v2 lives under the v1 thread.
->
-> Michael Bommarito (2):
->   ksmbd: validate response sizes in ipc_validate_msg()
->   ksmbd: require minimum ACE size in smb_check_perm_dacl()
-Applied them to #ksmbd-for-next-next.
-Thanks!
+Isn't all this fixed by this patch?
+
+https://lore.kernel.org/linux-cifs/2026040636-icy-constable-9e17@gregkh/
