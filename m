@@ -1,123 +1,109 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53519373C04
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 21:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CCF35BDB2
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 21:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776374265; cv=none; b=eTxg5KiCSZdDUtNLgQQ3qmqMs9yq6o9j1zalwGaA0AAgNMm4M/xJxg0Rq8Ei/1qcEdxSepTAWBbKcNjtlSWJdDQwj8hAHm105QVgWfMFtyME56hGbDgvf1W0VIJmzDy2nouwEG7/wuf5uFIVIjcFPYEuUJM+0nVCePmGqsgqtZE=
+	t=1776375397; cv=none; b=fNhVubtombck8ZLM7N9xQGdjP/U0zUyBMn1qIpFPwSzqpgiX/6/AdXOptFSYqD5u+v1/CNvCraUf02QsLF1wCtrkWzhiKj0WHJLm5PAHBATBARnWBAHzai7yl872/PQYFCiKsL9qmEtbxocswqgIRVNfK5e98xh+u2Az3c4WmHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776374265; c=relaxed/simple;
-	bh=ygvlKmBj9cpYvhipO2GVwDfNG6msc7IzLgEFKCeFaeI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PfiQTW1pvOn2V2bt7jMlMO0+MLnYxwzZEE/7EHgva5tz0OEO1YNuq7u9dNTT0nISrRyuCHbQUEpRrRz/9dVnop0Y8ixdeVe7vWvCeAN0ntgKuSPHdLfYUAUoH8VAvcH8dygTjs47VgPdGRbo/cMotFb1DIkOzCiTJzoR4oFBuZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q70FK54Y; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776375397; c=relaxed/simple;
+	bh=jKmGfrTxgv5Nzlz5bG0/V1+paVSZPlZlHvQ4Koh/BtY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=TCuRjLavNtfhZ3bpNG3e09B5urcbJImbWt1gCCZcTm23Lxf8JgCCMUTyFr9ikQAIO+nsd3bgvrdGXryZgRwb3511wR5RriSa8fvny4cBZqvLBi3KBhus4/gayVYf3WtFBlrchOVvDLkW7RXD1XVxSiV8cqTJnL9skixM6O5qctg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=mVbaoHD6; arc=none smtp.client-ip=195.121.94.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q70FK54Y"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-8296e257735so4622b3a.1
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 14:17:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="mVbaoHD6"
+X-KPN-MessageId: 55b4a78a-39dc-11f1-89e1-00505699b430
+Received: from mta.kpnmail.nl (unknown [10.31.161.189])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 55b4a78a-39dc-11f1-89e1-00505699b430;
+	Thu, 16 Apr 2026 23:36:31 +0200 (CEST)
+Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.190])
+	by mta.kpnmail.nl (Halon) with ESMTP
+	id 55b55afc-39dc-11f1-b5d0-0050569981f5;
+	Thu, 16 Apr 2026 23:36:31 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776374264; x=1776979064; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ird1RbhcLmo1n1pSfDlmYxFmBRF3j4BNyuXGOX68NCU=;
-        b=q70FK54YViXIXpJuaikoZYxg2xKb2W0PEU3gTf7E9f4UcF2I+nBTCHkJVIwmznLZvz
-         k9qKpgYN2rfZMb/eowl0luvVUNeFc3c2wv/YGpFx/IGPEH93MTo/gRgklJUZ4RWuiMEG
-         OT4I1BufWDpQEX/kT7CA9+i3sjHtoHtI61YOFgtdWuDkgni4JM+pOhY3ntAqCop2uoSA
-         Hp9FIie8sVxBWE6ACoXxeBIL5H/5CTypV4ULIfKdTWtbooKcRxidYxZuGE0B0O6+mcpG
-         I2ze6Pa4Ckpvx+b8FY9il9Z+Cd6xOdmLAd1oPguVwwaXJD0+PJM3kdV36ShlPxDkY7Jv
-         mHBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776374264; x=1776979064;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ird1RbhcLmo1n1pSfDlmYxFmBRF3j4BNyuXGOX68NCU=;
-        b=SxGRSViOLIHQIT1tM85kl7HARVyTcgbz+L8tOlgO+qr7uwK7gLMxp8GwYhQZN2Dsct
-         QuZWwJyWYmyy5HqQ94giDUGrXy1FdFgIwEJZiHCCia9W+ffXRa8Q8//2icbXZllthlap
-         kIvlR/b2gHfFvYzl8O7bveFKAsMZagHAZ0x6Ze3wyEksPJ4AGhJthVpSZQKHj9TUAJF6
-         Eijh/MvBTzW5yk3vLQzGfCpl4F0aQfnM4JER8s6Nw4qF4guhg9TbqdmVzXm3x43D/LIh
-         XP9aCwnz+8mS+K9ZHiqH4BLme2+ItJMjc76wDIg1f6LnTjkgSPkQUFPI0vz2rn1Xl6zM
-         UBoA==
-X-Forwarded-Encrypted: i=1; AFNElJ9BqUSD65Q7lawF6IwH8B/zrTnOK9E9MGzv3UJg8LhL7Y7+3apYV1ks6Dr4loSIV67XXWuf0/isONJH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzcef0byuVQW3JbrMPdYzwpvl2KDLKMEdoTTBkd1cHX6+V0ABFC
-	G5HKvldYtSyK342Vmjj2Y8Swws2qUONpLMt21QQER1e31iUqHkzCIhui
-X-Gm-Gg: AeBDievMXs616/Jf5yRIEzoJNULh0YO1WlEt+bRaRg32J091og2frTAT+UvTcl9gAA5
-	7KxcZDVTTydt/RfhM8WGVDpWqueEb5rZQ4Zkq+VjY+kbZcvg27+lMsmGqa5huJSSq/E5RGYx6AN
-	ZBm9sDJ2nDoc+D5TuVrKQGJf4Gvcu9U4CZF/Cb4eSG+uyTQbEmcbKfRYQsfiMv0lC31n+kRuo/f
-	x/5Y1KenQwKA9vWVVSaCFPXQswuXoNl6up2CSt9F+QqTs2v0D87WctTVTZr4zI2ruI48jXip54I
-	LbCp+VvUsVoW57G4bMcqna2oTwzCZFv2OLbt1WvG7cA9hkssb+MCdUC7pljBL1i6LYC9ULW54yy
-	OzFo3dFh7+hspy2fN32rBfEsQHoHbSnFddO9E4jMFs5+ANAC2JjanrPTcEXIAo5+5P1NVAQnJGD
-	otxyAz2Zafatmnvn4xBrkXbN2eD9o=
-X-Received: by 2002:a05:6a00:1994:b0:82c:24a9:d5e5 with SMTP id d2e1a72fcca58-82f88563412mr472762b3a.2.1776374263639;
-        Thu, 16 Apr 2026 14:17:43 -0700 (PDT)
-Received: from ser8.. ([221.156.231.192])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f674140d3sm6134414b3a.44.2026.04.16.14.17.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 14:17:43 -0700 (PDT)
-From: DaeMyung Kang <charsyam@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	DaeMyung Kang <charsyam@gmail.com>
-Subject: [PATCH] smb: server: fix max_connections off-by-one in tcp accept path
-Date: Fri, 17 Apr 2026 06:17:35 +0900
-Message-ID: <20260416211735.3558718-1-charsyam@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:mime-version:subject:message-id:to:from:date;
+	bh=A0ZJnX7li7I6jRx+BpBjuz1TE53b3BpzgUYmmyhPmRQ=;
+	b=mVbaoHD6W3jBI/UR7fZd3Uc0n+R+d0DLz3ZSMxUxJsvb4EITVIFQkms9MZL3Db9BAVLS2o8cv/dTX
+	 /5ZSDNuwqcKbl9jWqEZJLZXzVC7tZQGTVAv8mXA6NqsVs3hgV1B6CWvZrgtedjx9vkg7PP0TlAgI/t
+	 Z51GHR+tgWMurXSkBtEO3yRDNnBdJju5yn1ENwMmI56ScwZICAhLHRPNqF9ohiZPG5o4riAYEd3Jgj
+	 S0bBHoQHG7rF5RcFRoyXEL9DbphtH/AwPBVqeERfrO87unuNMKdmp0TKLrXvWzCqqCqXyy80gwB894
+	 ajuAqtQ+aQj78lhLARGjaT+dGSCt4Yw==
+X-KPN-MID: 33|7vi6wAcTxLhnlcXV5bPS/elamfhtfRWYm/UV0z2B4o2PwwULSy0l0rmaam6eAl2
+ 1cwMwFHYd61Bx4F4EKfpDODrGcPs8rxAikHNnXDUzW5s=
+X-CMASSUN: 33|3/aJ3D2OCmHajC0ZevX+EDdRCOA+SKZCNjgTYgI7wSgzIfzE+LI8baffU3Xbeyv
+ Ny3c4duY5SQnT/0aED7RZFA==
+X-KPN-VerifiedSender: Yes
+Received: from cpxoxapps-mh02 (cpxoxapps-mh02.personalcloud.so.kpn.org [10.128.135.208])
+	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
+	id 55a756fa-39dc-11f1-b8d7-005056995d6c;
+	Thu, 16 Apr 2026 23:36:31 +0200 (CEST)
+Date: Thu, 16 Apr 2026 23:36:31 +0200 (CEST)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Dorjoy Chowdhury <dorjoychy111@gmail.com>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
+	ceph-devel@vger.kernel.org, gfs2@lists.linux.dev,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, jlayton@kernel.org,
+	chuck.lever@oracle.com, alex.aring@gmail.com, arnd@arndb.de,
+	adilger@dilger.ca, mjguzik@gmail.com, smfrench@gmail.com,
+	richard.henderson@linaro.org, mattst88@gmail.com, linmag7@gmail.com,
+	tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com,
+	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com,
+	idryomov@gmail.com, amarkuze@redhat.com, slava@dubeyko.com,
+	agruenba@redhat.com, trondmy@kernel.org, anna@kernel.org,
+	sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com,
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
+	shuah@kernel.org, miklos@szeredi.hu, hansg@kernel.org,
+	Aleksa Sarai <cyphar@cyphar.com>
+Message-ID: <850388882.378351.1776375391778@kpc.webmail.kpnmail.nl>
+In-Reply-To: <20260416-aufbau-sorgenfrei-cfa87c9ddc11@brauner>
+References: <20260328172314.45807-1-dorjoychy111@gmail.com>
+ <20260328172314.45807-2-dorjoychy111@gmail.com>
+ <aeDpIgfDaIKEaBcL@lt-jori.localdomain>
+ <CAFfO_h6pkyX=uN5uoXda6toTtT6KsahfBNBLom9i21HdZ7JOmQ@mail.gmail.com>
+ <1714293523.333222.1776351806025@kpc.webmail.kpnmail.nl>
+ <20260416-aufbau-sorgenfrei-cfa87c9ddc11@brauner>
+Subject: Re: [PATCH v6 1/4] openat2: new OPENAT2_REGULAR flag support
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
 
-The global max_connections check in ksmbd's TCP accept path counts
-the newly accepted connection with atomic_inc_return(), but then
-rejects the connection when the result is greater than or equal to
-server_conf.max_connections.
 
-That makes the effective limit one smaller than configured. For
-example:
+> Op 16-04-2026 17:15 CEST schreef Christian Brauner <brauner@kernel.org>:
+> 
+>  
+> On Thu, Apr 16, 2026 at 05:03:26PM +0200, Jori Koolstra wrote:
+> > 
+> > If I recall correctly, Aleksa has suggested we might also want to add
+> > O_EMPTYPATH to openat() instead of only allowing this for openat2().
+> > I am waiting to see what Christian thinks of this.
+> 
+> We can do that, yes. For O_EMPTYPATH that is workable.
 
-- max_connections=1 rejects the first connection
-- max_connections=2 allows only one connection
+All right, then I'll update the patch this weekend.
 
-The per-IP limit in the same function uses <= correctly because it
-counts only pre-existing connections. The global limit instead checks
-the post-increment total, so it should reject only when that total
-exceeds the configured maximum.
+> 
+> I don't mind too much if we leave OPENAT2_REGUALR in the 32-bit flag
+> space. It'll silently be ignored but the flag name should give it away.
 
-Fix this by changing the comparison from >= to >, so exactly
-max_connections simultaneous connections are allowed and the next one
-is rejected. This matches the documented meaning of max_connections
-in fs/smb/server/ksmbd_netlink.h as the "Number of maximum simultaneous
-connections".
+I would also prefer to have the bits separated. Although it is unlikely
+that we will add so many O_* that we will ever run out of space, it just
+seems cleaner, and at no cost. But it's not too important.
 
-Fixes: 0d0d4680db22 ("ksmbd: add max connections parameter")
-Cc: stable@vger.kernel.org
-Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
----
- fs/smb/server/transport_tcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index 7e29b06820e2..5e85341698c7 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -279,7 +279,7 @@ static int ksmbd_kthread_fn(void *p)
- 
- skip_max_ip_conns_limit:
- 		if (server_conf.max_connections &&
--		    atomic_inc_return(&active_num_conn) >= server_conf.max_connections) {
-+		    atomic_inc_return(&active_num_conn) > server_conf.max_connections) {
- 			pr_info_ratelimited("Limit the maximum number of connections(%u)\n",
- 					    atomic_read(&active_num_conn));
- 			atomic_dec(&active_num_conn);
--- 
-2.43.0
+Thanks,
+Jori.
