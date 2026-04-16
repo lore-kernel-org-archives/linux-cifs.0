@@ -1,97 +1,105 @@
-Received: from hua.moonlit-rail.com (hua.moonlit-rail.com [45.79.167.250])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620B4370D62;
-	Thu, 16 Apr 2026 21:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.167.250
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2A837474E
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 21:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776375758; cv=none; b=fkJBr9BwuHyc6aooB1WXGItWf2qIejx9+LpqoM+bPEymLCFFnUXTJBWQkbM0kOBDL8WybHjjkyBQNb40lHNw3VLSdgmkthe6lKOEmpMh4tSNVYB6WWO0w6BXnQOtKEZ1OUqRK4NMSkRmL8C50a6nf1QudKS0MFm1bHzJykln/rg=
+	t=1776375766; cv=none; b=SIwRewFjYGoz8P+1LkSKmlZj/o+7IXP04KVLfw5I0HvtAg24sSu/CkaZpOJ/JVHLYy83ii/KwObzJCOgs7z4+CEKk5RZ3beFPv7A8US0p4rn1vG2UV8yliaOWzTvfjK/PGZBcXi0FAiViXvUoyIFhCVkfD3sX87RPlclk5kq9zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776375758; c=relaxed/simple;
-	bh=8ZTNO1FIA7YOlkxSgXCdxibwhJmKVA5PieZRYFqTWWs=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=Yp490wmbozNXcmMpcxg3lWNK8uVRmehH3rxaZaBn2VnAFzsfS5MMZBefvKw2iBGM1nOx6DhaU0zN/Bg77QNQw4okXxbix5WAVs7DQFDXiFf2qcerxB4ckMt/CPK7VvF+qo2Nf6Y5ZxlCfNKPYceXDYlNp0uRCW8pjspnD3y+PUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=moonlit-rail.com; spf=pass smtp.mailfrom=moonlit-rail.com; dkim=pass (2048-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b=kg8QDjJq; dkim=permerror (0-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b=+/G+Z5MT; arc=none smtp.client-ip=45.79.167.250
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=moonlit-rail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=moonlit-rail.com
+	s=arc-20240116; t=1776375766; c=relaxed/simple;
+	bh=IwAI1eaHkbzl2q25/fu93jl9Wz9VGjZ9ldalur0MsOw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=LaFsVhyyKUxCX01xb0UIprpvHjEodOcZzav47zZxdO/4YGWCWoD78jy5XAJ058OVRZt7jRZ4IarWdUwxx5TVZ92CUr3VakCagx+cl0Y8OWjVStjkDYF7liYMA9C8pKuH5cCCzl8A5F6GWWz1dDQWf3QJNrO+03sfX/SOKoWiBng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=MUYIXaJy; arc=none smtp.client-ip=195.121.94.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="kg8QDjJq";
-	dkim=permerror (0-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="+/G+Z5MT"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=moonlit-rail.com; s=rsa2021a; h=Content-Transfer-Encoding:Content-Type:Cc:
-	To:Subject:From:MIME-Version:Date:Message-ID:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cNiOcISIHeVG9w9HEQ01o2E0KoJv3AfP0afSQV8c+G0=; t=1776374431; x=1778966431; 
-	b=kg8QDjJqGtIIKEdyxly8onhJAnGWnhHoXy0YtKfsnOWPxfx8kodqgu0p83kwlwMegC6tWL6fUWh
-	H7EP2OztGCCOeQQkpUiK2pCQPXRBLtjnDdZSlFEEUoiBieonipgCpBnxL6l0fBPaa4QWUDL+J6RhJ
-	kiMFmlJ/7h4DAnKuEF24jLQHSxo6WsDNLWYDM1Cv45isG/4g7QXLgPNN2jLHx/XaCdx/wjQk9JdOa
-	IeFcuZvDbsR6XClaICGpLCf9A/Y8wL/Xe5tN4TOrD+/aFZ7sEJxzhIwmgjJhULUlRFB/s3M9ONaAx
-	YVICDOo1+r1CpeJRPIJOujXZ4vsff2dUQPVQ==;
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=moonlit-rail.com; s=edd2021a; h=Content-Transfer-Encoding:Content-Type:Cc:
-	To:Subject:From:MIME-Version:Date:Message-ID:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cNiOcISIHeVG9w9HEQ01o2E0KoJv3AfP0afSQV8c+G0=; t=1776374431; x=1778966431; 
-	b=+/G+Z5MTrC7+a6N/PsaZ06VZlAjqhJSCHtvgCwNbS30u9hLCydQ/gSQq54BvFI0jjtyCVD8m3uA
-	Jl3BXi9+OBg==;
-Message-ID: <f758f4ff-4d54-4244-931d-38f469c3ff14@moonlit-rail.com>
-Date: Thu, 16 Apr 2026 17:20:30 -0400
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="MUYIXaJy"
+X-KPN-MessageId: 32e0422c-39dd-11f1-8ff3-005056999439
+Received: from mta.kpnmail.nl (unknown [10.31.161.188])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 32e0422c-39dd-11f1-8ff3-005056999439;
+	Thu, 16 Apr 2026 23:42:42 +0200 (CEST)
+Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.189])
+	by mta.kpnmail.nl (Halon) with ESMTP
+	id 32e07e84-39dd-11f1-80f0-00505699693e;
+	Thu, 16 Apr 2026 23:42:42 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:mime-version:subject:message-id:to:from:date;
+	bh=FAFUNkukKmRTaQDP/ma8ntJhtsdj1vX5Rro9/2jNENo=;
+	b=MUYIXaJyQI/z3eS8we80k6cReqZOrGcNyJH+eOsM0PptZLrLaRasoV7obwF6je4Oo1F2Q53g1dTaC
+	 IqUymC6DxzUPabRDzcTQxVCljJljWBkrMoSqBMJL+mujYUqHhSNcOaF+OlB+O2yQFWLbNkbwkM62Zj
+	 QTFjvEiZvQSp9l9vCH5z1nOjxZEzUkv8SgpuJrFLYZVB8+8Amvb8f8a7CHidJFr9KB/0c/jl2Ro+YJ
+	 3EAFYuqHM0s2N/vB0gIaxS+hlOwiX48TqlzjMMe7LhmYtAcQfa4fDPkuGVhYzQgAYbekHDwRYfhrmB
+	 F5Mm/8EXhFl5j2TfObuqEdb6zzgWXLg==
+X-KPN-MID: 33|cxvwz6XIh+mQ5m5d80I6DfGs94zM1K2dlrRj5bchq6IoGGsUJF3RLVRm5g9uaXO
+ 0Y2LlUpPPKVH+u9Ml0x0eZDNcQV0BtHa3qhSktN2o5wg=
+X-CMASSUN: 33|g5BgIBUMSqbIpNgwKf2oxyuAmj7HBGNP8+CYku9NjRFoxoUsKfnp9wSbpLST/jO
+ DqmCC/FRLwMqigt+cG6u52A==
+X-KPN-VerifiedSender: Yes
+Received: from cpxoxapps-mh02 (cpxoxapps-mh02.personalcloud.so.kpn.org [10.128.135.208])
+	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
+	id 32d2c916-39dd-11f1-94b1-00505699eff2;
+	Thu, 16 Apr 2026 23:42:42 +0200 (CEST)
+Date: Thu, 16 Apr 2026 23:42:42 +0200 (CEST)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: Aleksa Sarai <cyphar@cyphar.com>,
+	Dorjoy Chowdhury <dorjoychy111@gmail.com>, brauner@kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-api@vger.kernel.org, ceph-devel@vger.kernel.org,
+	gfs2@lists.linux.dev, linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org, v9fs@lists.linux.dev,
+	linux-kselftest@vger.kernel.org, viro@zeniv.linux.org.uk,
+	jack@suse.cz, jlayton@kernel.org, chuck.lever@oracle.com,
+	alex.aring@gmail.com, arnd@arndb.de, adilger@dilger.ca,
+	mjguzik@gmail.com, smfrench@gmail.com, richard.henderson@linaro.org,
+	mattst88@gmail.com, linmag7@gmail.com, tsbogend@alpha.franken.de,
+	James.Bottomley@hansenpartnership.com, deller@gmx.de,
+	davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com,
+	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com,
+	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org,
+	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+	tom@talpey.com, bharathsm@microsoft.com, shuah@kernel.org,
+	miklos@szeredi.hu, hansg@kernel.org
+Message-ID: <2059025134.378522.1776375762839@kpc.webmail.kpnmail.nl>
+In-Reply-To: <2026-04-16-upstate-capable-deacon-petals-0l25lH@cyphar.com>
+References: <20260328172314.45807-1-dorjoychy111@gmail.com>
+ <20260328172314.45807-2-dorjoychy111@gmail.com>
+ <aeDpIgfDaIKEaBcL@lt-jori.localdomain>
+ <CAFfO_h6pkyX=uN5uoXda6toTtT6KsahfBNBLom9i21HdZ7JOmQ@mail.gmail.com>
+ <2026-04-16-upstate-capable-deacon-petals-0l25lH@cyphar.com>
+Subject: Re: [PATCH v6 1/4] openat2: new OPENAT2_REGULAR flag support
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
-Subject: [REGRESSION] in Linux 7.0: empty CIFS mount point with vers=1.0
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc: Paulo Alcantara <pc@manguebit.org>,
- Linux Cifs <linux-cifs@vger.kernel.org>
-Content-Language: en-US, en-GB
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
 
-A bit late to the party, sorry, I should have reported this in 7.0-rcX.
 
-When mounting a CIFS share with vers=1.0, the mount "succeeds" (is added 
-to /proc/mounts) but the mountpoint is completely empty.  Even "." and 
-".." are missing.  Blindly accessing a known file results in "no such 
-file or directory".
-
-Kernels 6.19 and below are not affected.  Using vers=2.0 or vers=3.1.1 
-(etc) works fine, but "UNIX File Extensions" is still necessary for my 
-workload.  (While "posix" extensions in vers=3.1.1 against Samba Stable 
-is getting better, it's not there yet, details on request.)
-
-Example:
-     # ls -al /mnt/tmp
-     Total 8
-     drwxr-xr-x  2 root root 4096 Sep 25  2006 ./
-     drwxr-xr-x 12 root root 4096 Apr 11 03:32 ../
-     ----------  1 root root    0 Dec 22  2018 filesystem.not.mounted
-     # mount -t cifs -o vers=1.0,cred=.creds //Server/Share /mnt/tmp
-     # ls -al /mnt/tmp
-     Total 0
-     #
-
-If Greg KH were reading this, I just know he'd say,
-"can you bisect?"  :-)  OK, the winner of the bisect is:
-
-> 4fc3a433c13944ee5766ec5b9bf6f1eb4d29b880 is the first bad commit
-> commit 4fc3a433c13944ee5766ec5b9bf6f1eb4d29b880
-> Author: Paulo Alcantara <pc@manguebit.org>
-> Date:   Mon Feb 23 13:34:35 2026 -0300
+> Op 16-04-2026 17:15 CEST schreef Aleksa Sarai <cyphar@cyphar.com>:
 > 
->     smb: client: use atomic_t for mnt_cifs_flags
->     
->     Use atomic_t for cifs_sb_info::mnt_cifs_flags as it's currently
->     accessed locklessly and may be changed concurrently in mount/remount
->     and reconnect paths.
+> 
+> Oh, I didn't notice that this wasn't mentioned here, we had a separate
+> discussion about it in a thread with Jori and I must've assumed we
+> discussed it in both. (My brain is also really not wired up to read
+> large octal values easily.)
+> 
+> While it is hard to add new O_* flags (hence OPENAT2_REGULAR), it's not
+> /impossible/ (Jori has a patch for OPENAT2_EMPTY_PATH that is safe to
+> add to O_* flags because of some fun historical coincidences).
 
-I added Paulo to the CC's.
+But it would change userspace, at least in theory, right? If anyone for
+some reason decided to set whatever the bit will be for O_EMPTYPATH
+in a call to openat(), and pass an empty string, relying on this to fail,
+that will no longer be the case. But that is just really silly. Or are you
+hinting on something else?
 
-Kris
+Thanks,
+Jori.
