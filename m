@@ -1,265 +1,140 @@
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F12586331
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 15:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776351814; cv=pass; b=RrctWW1NALMA2hSg0bUPfrgYTrvaMVt80UwMDr8MUWtyNKgBGTRoZ1NtJGmZybZ7evX5SoAnC5hs7PzWUWFN1oP5IkHJUu+DpVsawWzpUhqUADV8FtA/o0qqWLdg/i2VK6+wt+P95p4ml5P7tVMz5OuJMVqtKcR1TU/fg7ER+Aw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776351814; c=relaxed/simple;
-	bh=hZyhWcT9tvtnZJUNZ7xsg+zStBv5S5R1OxDf7D4WQs4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T27Nv9cdBYd2qrBqxmH+OEGyrQIXwp/WcGFhv8YiCfcgSFWAa/su8fQpVLpD3cZSmBvTakY2Jfn8r4jLsp7Xz1cwrPGSRkDGpzynuAy7mLbFX8xrRAx7qkiIiLT0xGBL9lZEZiBKJDV/NQQwOs2NqtJVEB+MI48K8IKQFK1pjf0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IRUQeUKZ; arc=pass smtp.client-ip=74.125.224.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB66834C826
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 15:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.183
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776351818; cv=none; b=QiUvC4hbkgfee+7mpYlu4tJhrPV6RpeZ7+PkkKnMMSDYfJvLkwYgIlxFJjdOC1kioGVx3jwA+CEhO363qry1cEo+aU7jQ0koQ6cjuMpW1bmdwLI6p9H982V8J37q+4gicMQwxmAPO8ilH7xXFRj96c++tzs4b0Yj8IiHGQqFu6E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776351818; c=relaxed/simple;
+	bh=+mNJcrO6vmQsCpcnjmzq4O6ycexv38y/zgLqmb6G7RE=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=dW+IRFZ4Iw53BIkHu79OC12dAGnfJKNgZA0bxAUKWFy/aHtZJ0WAfoG11FGj3FGfY6li4D4gXJ5hHxts3fjHWrUlH63R83zFPFUEMarDqUJlcSL37WWF2FTiMqGC+hWg3K79nTaRlMTwtMWimzvj7WH6UPaOGorMkk1WVy9T1M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=AR89u9J7; arc=none smtp.client-ip=195.121.94.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IRUQeUKZ"
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-64937edbc9eso7195829d50.2
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 08:03:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776351812; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ZhQN2/8uINiYZmtQCJ+3jE3OcagBkpctHHKyW3cAPskAY+ak29QD0EZ3L/Qk2o0R7X
-         +9vozfLh0kFjP8vDsx1BEpMf31/B0buPlwWJXxkuRpD9WUhQ22Wq8znWSVi2fyGGW2nw
-         JK1Gg30VjxBXsZjfeMcJyWKmo4RFO2fBwZEVYC2hjbDDAI0BOZOzll8CUXBkAxKVceYi
-         h0Ou15z3ORMSC3qe2IZTOKnI/zg2bF01e4kE/K9rTghiptqmVqieDnprVVIh4dLhRkMr
-         OAUFsMWaW5NmZKZyBl2DCU3S12555+SFnDNn9cagIioGF4yPyX+k2+irFuaZ+thJGjKS
-         9ZgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1zSYVnFv7uz0zbvmx0pm+7ReHBA2roaOku3B1DGvVcc=;
-        fh=lkGDxTMleeT1C6iampEzcCozXL6yyr6nXHnX4y1MWrU=;
-        b=dfrtxakCKv5vBx97SmOmFZA9mhuJrs0KgWbgEqmVDNSoPAIHWobbELTJiL6wiJWGoc
-         OIJpoW1wcIP0gFjw42MwrVAu0ibmseSZe/K9JP9OeQm33zYW3ydZ0lx4h1p2ocv52KXe
-         0bIozHh5sz+STZkARS/cI+lEQejxL2TrbmjuYdWevxlXFDb9eHCnXEtDQThRft7iZ7q2
-         OnO1Wd0G+hL9u2dhWNSS6zfl0dLpFZLG7pu35aUXl35OI4xdkMetay3R/vIIFJoVzz9/
-         GasK7fuhLfB9GxQm1vzk5QTKneRhos6AA8E/PgORVkdz31onzgLIJazf46y25Zi/L+AM
-         uoCQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="AR89u9J7"
+X-KPN-MessageId: 6b7bd890-39a5-11f1-bea8-005056992ed3
+Received: from mta.kpnmail.nl (unknown [10.31.161.188])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 6b7bd890-39a5-11f1-bea8-005056992ed3;
+	Thu, 16 Apr 2026 17:03:26 +0200 (CEST)
+Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.190])
+	by mta.kpnmail.nl (Halon) with ESMTP
+	id 6b82696d-39a5-11f1-80f0-00505699693e;
+	Thu, 16 Apr 2026 17:03:26 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776351812; x=1776956612; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1zSYVnFv7uz0zbvmx0pm+7ReHBA2roaOku3B1DGvVcc=;
-        b=IRUQeUKZ9d0AO8KAGIi0GaCCe7Ksz36W3PS24Hd2SQG1sExSb437y1C0lcNaK9D9kz
-         t9jwrNnuLov6AGwZwReUivFHFenYWdi5a4sVhVbJjUQ9OXrxtSGM29nw9Ln+HsxgApwH
-         sH2GIF4LbwBEclWz/pQAX8oOgq1fJGVMft0+f/1cAkP2Vl8UV5W5O1JsRGyPwum5fkx+
-         zr9Zc5+xv56Cj2LOPn39gcRzYXJJbilz3Td7UpkocWwQGExuSPvNX14s0GpQtCViSKf0
-         MKx2uQJ/8u59AOm+5Wt23OA/aM/K9tevQk9s11Gbhu/grDOxnLYkB4wTw3BdfkeeLgc4
-         Ir4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776351812; x=1776956612;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1zSYVnFv7uz0zbvmx0pm+7ReHBA2roaOku3B1DGvVcc=;
-        b=RYU5M2arjLETQtaHQWDBvmLBIMAQTOFuFfSgiwmcziecYE4TJF/BTvblcP3Jw8ec+0
-         gaHtms2C1xWCmvPZMlUCBsgLbe7kPtaa/Pd+JHgEN+hz+5o9U1oCIrTHedl0iowsE6Ms
-         Q4HhLwgBFige7KoVPRCD+Szqe4/CftTqkhmfSQSqzM2rlvcCXuadAFWrexF8bXkMV4g5
-         hI7kvh5XU5hhsEVsQt/Q55XtvzKzcwZi9U80ULEhCP05bFIsm6DVVKGPsTp2v4BrJQbr
-         WlZS0nPKxq2Yft28nDZDivAb0PRu3FBZxmdMYjtbbNLio5CqkfPRO73GBwfp0o//9XTO
-         fFkQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8UR0cs8QWnnV4JPZ6EOpr25Ovyiu4RDisttCbEiQjswKCGU59zk9OpRdJNw79UIfkmhUe9upxBREk7@vger.kernel.org
-X-Gm-Message-State: AOJu0YybUsAUfmibkD0XAATV4Nt130RVzuksDwyUBLkSLylOYV25CUUG
-	DwBDvmV6lJbcegN8c1IwKSnHeO1M1++EAXXhk6i1OFYdG2WDGSk7cijGO2WaPpZGhrAnb6iQG2t
-	l2qSO4Fof7WLCqBMsjYhLFcP2qULol14=
-X-Gm-Gg: AeBDieutgC/iMO44o6sAz/CiIQ+iROP2LbCJO2eC1whhRWSZl1fUwrABz9dvnJN1Ehv
-	gPugVmVf+Po6wZTHSvVA5lh8X+EP1eplHfJ+PQZvVPovMOb9CLu+Jo67wGbt/DzY/qRAzs6CIZx
-	csCsy+Tfx9eeSwQyUXTVuWXODLIq+CTelCwHRXBmRFOkNwBpIKdKfhV0PvIVX1SOilSdTS+ePcu
-	+RRx7m5mgohcpFkxfz3oxEM4U+/VxGWzDq/oS6sLRmTWGTrLPDqVHJmBjzPYwzHYurES4ItuxpZ
-	Q8n8e/AWCJnd2hg=
-X-Received: by 2002:a05:690e:4092:b0:652:fcd5:a30c with SMTP id
- 956f58d0204a3-652fcd5a9f5mr2293646d50.60.1776351811608; Thu, 16 Apr 2026
- 08:03:31 -0700 (PDT)
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:mime-version:subject:message-id:to:from:date;
+	bh=j+uVJmBOGkgDS0z3tsIW2Ds+Jzpa4897P/UEqyiLhFs=;
+	b=AR89u9J7Q6mqG/hdbsQT2sdW9o1iuPP93DpDyFbGxCpI8vKlFahRNTFIbjscMVjFR8PKSfsN7ftXN
+	 bV10BEqMu8dk5oSpGlfMj/M5NRspo5adBrbynfN18ijy8cBDdMLID783d5SK5mrRCErXO2WIXpN0u5
+	 qn01fYYFgcS5hkACWjXBMLgU8GhQk8LrutwYI5afGyE6PzKK4xida/auLEO0WUum7NOaUhOs/b7Wj0
+	 0k8l/qjYbkisJhXxwKUG00MIJQ8Bf1J4A9i75cPelvUsoOmBCEIDO2Z5GNwm/SQ64amwN0MymFfhRk
+	 8NeLDn9xlKhTen185TDM9M2QqNxUIXA==
+X-KPN-MID: 33|wJ0GzT1sPbVlbBcoabM91bC41dVb/Ga4nsWJ/EpxFrhuIQycwUMK4bxZuP5XZ3x
+ VOH9Gqe9wYt2+6vh4IzPTWcvdtVyILU3eLs2zqmoVg7U=
+X-CMASSUN: 33|ARgsuoLPyhASVApF6ob+ciCM+w5WX+1LWil0n1t+A21zqXv47hSkcgkJ4f9g4f4
+ rzBYBTDsNbq5Yl5TdU4Qq0w==
+X-KPN-VerifiedSender: Yes
+Received: from cpxoxapps-mh08 (cpxoxapps-mh08.personalcloud.so.kpn.org [10.128.135.214])
+	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
+	id 6b72fd5c-39a5-11f1-b8d7-005056995d6c;
+	Thu, 16 Apr 2026 17:03:26 +0200 (CEST)
+Date: Thu, 16 Apr 2026 17:03:26 +0200 (CEST)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: Dorjoy Chowdhury <dorjoychy111@gmail.com>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
+	ceph-devel@vger.kernel.org, gfs2@lists.linux.dev,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz,
+	jlayton@kernel.org, chuck.lever@oracle.com, alex.aring@gmail.com,
+	arnd@arndb.de, adilger@dilger.ca, mjguzik@gmail.com,
+	smfrench@gmail.com, richard.henderson@linaro.org, mattst88@gmail.com,
+	linmag7@gmail.com, tsbogend@alpha.franken.de,
+	James.Bottomley@hansenpartnership.com, deller@gmx.de,
+	davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com,
+	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com,
+	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org,
+	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+	tom@talpey.com, bharathsm@microsoft.com, shuah@kernel.org,
+	miklos@szeredi.hu, hansg@kernel.org,
+	Aleksa Sarai <cyphar@cyphar.com>
+Message-ID: <1714293523.333222.1776351806025@kpc.webmail.kpnmail.nl>
+In-Reply-To: <CAFfO_h6pkyX=uN5uoXda6toTtT6KsahfBNBLom9i21HdZ7JOmQ@mail.gmail.com>
+References: <20260328172314.45807-1-dorjoychy111@gmail.com>
+ <20260328172314.45807-2-dorjoychy111@gmail.com>
+ <aeDpIgfDaIKEaBcL@lt-jori.localdomain>
+ <CAFfO_h6pkyX=uN5uoXda6toTtT6KsahfBNBLom9i21HdZ7JOmQ@mail.gmail.com>
+Subject: Re: [PATCH v6 1/4] openat2: new OPENAT2_REGULAR flag support
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260409161538.3618-1-s.piyush1024@gmail.com>
-In-Reply-To: <20260409161538.3618-1-s.piyush1024@gmail.com>
-From: Bharath SM <bharathsm.hsk@gmail.com>
-Date: Thu, 16 Apr 2026 15:03:19 +0000
-X-Gm-Features: AQROBzClApj5L-yPN_mlNE2ZfvlUN8iDtL-Chc3BE-PVWf11tq3vtw1jkwNvS5k
-Message-ID: <CAGypqWzW6YPfB2Z9nARHVj=qv8h6bcxShxxM=T1ceG9654ky8A@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: use FullSessionKey for AES-256 encryption
- key derivation
-To: s.piyush1024@gmail.com
-Cc: sfrench@samba.org, linux-cifs@vger.kernel.org, sprasad@microsoft.com, 
-	bharathsm@microsoft.com, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Priority: 3
+Importance: Normal
 
-On Thu, Apr 9, 2026 at 9:16=E2=80=AFAM <s.piyush1024@gmail.com> wrote:
->
-> From: Piyush Sachdeva <psachdeva@microsoft.com>
->
-> When Kerberos authentication is used with AES-256 encryption (AES-256-CCM
-> or AES-256-GCM), the SMB3 encryption and decryption keys must be derived
-> using the full session key (Session.FullSessionKey) rather than just the
-> first 16 bytes (Session.SessionKey).
->
-> Per MS-SMB2 section 3.2.5.3.1, when Connection.Dialect is "3.1.1" and
-> Connection.CipherId is AES-256-CCM or AES-256-GCM, Session.FullSessionKey
-> must be set to the full cryptographic key from the GSS authentication
-> context. The encryption and decryption key derivation (SMBC2SCipherKey,
-> SMBS2CCipherKey) must use this FullSessionKey as the KDF input. The
-> signing key derivation continues to use Session.SessionKey (first 16
-> bytes) in all cases.
->
-> Previously, generate_key() hardcoded SMB2_NTLMV2_SESSKEY_SIZE (16) as the
-> HMAC-SHA256 key input length for all derivations. When Kerberos with
-> AES-256 provides a 32-byte session key, the KDF for encryption/decryption
-> was using only the first 16 bytes, producing keys that did not match the
-> server's, causing mount failures with sec=3Dkrb5 and require_gcm_256=3D1.
->
-> Add a `full_key_size` parameter to generate_key() and pass the appropriat=
-e
-> size from generate_smb3signingkey():
->  - Signing: always SMB2_NTLMV2_SESSKEY_SIZE (16 bytes)
->  - Encryption/Decryption: ses->auth_key.len when AES-256, otherwise 16
->
-> Also fix cifs_dump_full_key() to report the actual session key length for
-> AES-256 instead of hardcoded CIFS_SESS_KEY_SIZE, so that userspace tools
-> like Wireshark receive the correct key for decryption.
->
-> Signed-off-by: Piyush Sachdeva <psachdeva@microsoft.com>
-> Signed-off-by: Piyush Sachdeva <s.piyush1024@gmail.com>
-> ---
->  fs/smb/client/ioctl.c         |  2 +-
->  fs/smb/client/smb2transport.c | 32 +++++++++++++++++++++++++-------
->  2 files changed, 26 insertions(+), 8 deletions(-)
->
-> diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
-> index 9afab3237e54..17408bb8ab65 100644
-> --- a/fs/smb/client/ioctl.c
-> +++ b/fs/smb/client/ioctl.c
-> @@ -296,7 +296,7 @@ static int cifs_dump_full_key(struct cifs_tcon *tcon,=
- struct smb3_full_key_debug
->                 break;
->         case SMB2_ENCRYPTION_AES256_CCM:
->         case SMB2_ENCRYPTION_AES256_GCM:
-> -               out.session_key_length =3D CIFS_SESS_KEY_SIZE;
-> +               out.session_key_length =3D ses->auth_key.len;
->                 out.server_in_key_length =3D out.server_out_key_length =
-=3D SMB3_GCM256_CRYPTKEY_SIZE;
->                 break;
->         default:
-> diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.=
-c
-> index 81be2b226e26..57e515774b97 100644
-> --- a/fs/smb/client/smb2transport.c
-> +++ b/fs/smb/client/smb2transport.c
-> @@ -259,7 +259,8 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP=
-_Server_Info *server,
->  }
->
->  static int generate_key(struct cifs_ses *ses, struct kvec label,
-> -                       struct kvec context, __u8 *key, unsigned int key_=
-size)
-> +                       struct kvec context, __u8 *key, unsigned int key_=
-size,
-> +                       unsigned int full_key_size)
->  {
->         unsigned char zero =3D 0x0;
->         __u8 i[4] =3D {0, 0, 0, 1};
-> @@ -280,7 +281,7 @@ static int generate_key(struct cifs_ses *ses, struct =
-kvec label,
->         }
->
->         hmac_sha256_init_usingrawkey(&hmac_ctx, ses->auth_key.response,
-> -                                    SMB2_NTLMV2_SESSKEY_SIZE);
-> +                                    full_key_size);
->         hmac_sha256_update(&hmac_ctx, i, 4);
->         hmac_sha256_update(&hmac_ctx, label.iov_base, label.iov_len);
->         hmac_sha256_update(&hmac_ctx, &zero, 1);
-> @@ -315,6 +316,7 @@ generate_smb3signingkey(struct cifs_ses *ses,
->                         const struct derivation_triplet *ptriplet)
->  {
->         int rc;
-> +       unsigned int full_key_size;
->         bool is_binding =3D false;
->         int chan_index =3D 0;
->
-> @@ -344,18 +346,32 @@ generate_smb3signingkey(struct cifs_ses *ses,
->          * master connection signing key stored in the session
->          */
->
-> +       /*
-> +        * Per MS-SMB2 3.2.5.3.1, signing key always uses Session.Session=
-Key
-> +        * (first 16 bytes). Encryption/decryption keys use
-> +        * Session.FullSessionKey when dialect is 3.1.1 and cipher is
-> +        * AES-256-CCM or AES-256-GCM, otherwise Session.SessionKey.
-> +        */
-If this change is specific to 3.1.1 should we check for version as
-this looks like a common function for SMB 3.?
 
->         if (is_binding) {
->                 rc =3D generate_key(ses, ptriplet->signing.label,
->                                   ptriplet->signing.context,
->                                   ses->chans[chan_index].signkey,
-> -                                 SMB3_SIGN_KEY_SIZE);
-> +                                 SMB3_SIGN_KEY_SIZE,
-> +                                 SMB2_NTLMV2_SESSKEY_SIZE);
->                 if (rc)
->                         return rc;
->         } else {
-> +               if (server->cipher_type =3D=3D SMB2_ENCRYPTION_AES256_CCM=
- ||
-> +                   server->cipher_type =3D=3D SMB2_ENCRYPTION_AES256_GCM=
-)
-> +                       full_key_size =3D ses->auth_key.len;
-Should we validate the length passed by user space and make sure it is
-within limits.?
+> Op 16-04-2026 16:21 CEST schreef Dorjoy Chowdhury <dorjoychy111@gmail.com=
+>:
+>=20
+> =20
+> On Thu, Apr 16, 2026 at 7:52=E2=80=AFPM Jori Koolstra <jkoolstra@xs4all.n=
+l> wrote:
+> >
+> > On Sat, Mar 28, 2026 at 11:22:22PM +0600, Dorjoy Chowdhury wrote:
+> > > diff --git a/arch/alpha/include/uapi/asm/fcntl.h b/arch/alpha/include=
+/uapi/asm/fcntl.h
+> > > index 50bdc8e8a271..fe488bf7c18e 100644
+> > > --- a/arch/alpha/include/uapi/asm/fcntl.h
+> > > +++ b/arch/alpha/include/uapi/asm/fcntl.h
+> > > @@ -34,6 +34,7 @@
+> > >
+> > >  #define O_PATH               040000000
+> > >  #define __O_TMPFILE  0100000000
+> > > +#define OPENAT2_REGULAR      0200000000
+> > >
+> >
+> > I don't quite understand why we are adding OPENAT2_REGULAR inside the
+> > O_* flag range. Wasn't this supposed to be only supported for openat2()=
+?
+> > If so, I don't see the need to waste an O_* flag bit. But maybe I am
+> > missing something.
+> >
+>=20
+> Yes, OPENAT2_REGULAR is only supported for openat2. I am not sure if I
+> got a specific review to not add OPENAT2_REGULAR in the O_* flag 32
+> bit range. But as far as I understand, for the old open system calls
+> we can't easily add new O_* flags as the older codepaths don't strip
+> off unknown bits which openat2 does. It's not easy to add new O_*
+> flags for the old open system calls since that could break userspace
+> programs.
 
-> +               else
-> +                       full_key_size =3D SMB2_NTLMV2_SESSKEY_SIZE;
-Should we move the above assignment down ? As this change is
-needed only for encryption and decryption and not for signing.
+If I recall correctly, Aleksa has suggested we might also want to add
+O_EMPTYPATH to openat() instead of only allowing this for openat2().
+I am waiting to see what Christian thinks of this.
 
->                 rc =3D generate_key(ses, ptriplet->signing.label,
->                                   ptriplet->signing.context,
->                                   ses->smb3signingkey,
-> -                                 SMB3_SIGN_KEY_SIZE);
-> +                                 SMB3_SIGN_KEY_SIZE,
-> +                                 SMB2_NTLMV2_SESSKEY_SIZE);
->                 if (rc)
->                         return rc;
->
-> @@ -368,13 +384,15 @@ generate_smb3signingkey(struct cifs_ses *ses,
->                 rc =3D generate_key(ses, ptriplet->encryption.label,
->                                   ptriplet->encryption.context,
->                                   ses->smb3encryptionkey,
-> -                                 SMB3_ENC_DEC_KEY_SIZE);
-> +                                 SMB3_ENC_DEC_KEY_SIZE,
-> +                                 full_key_size);
->                 if (rc)
->                         return rc;
->                 rc =3D generate_key(ses, ptriplet->decryption.label,
->                                   ptriplet->decryption.context,
->                                   ses->smb3decryptionkey,
-> -                                 SMB3_ENC_DEC_KEY_SIZE);
-> +                                 SMB3_ENC_DEC_KEY_SIZE,
-> +                                 full_key_size);
->                 if (rc)
->                         return rc;
->         }
-> @@ -389,7 +407,7 @@ generate_smb3signingkey(struct cifs_ses *ses,
->                         &ses->Suid);
->         cifs_dbg(VFS, "Cipher type   %d\n", server->cipher_type);
->         cifs_dbg(VFS, "Session Key   %*ph\n",
-> -                SMB2_NTLMV2_SESSKEY_SIZE, ses->auth_key.response);
-> +                ses->auth_key.len, ses->auth_key.response);
->         cifs_dbg(VFS, "Signing Key   %*ph\n",
->                  SMB3_SIGN_KEY_SIZE, ses->smb3signingkey);
->         if ((server->cipher_type =3D=3D SMB2_ENCRYPTION_AES256_CCM) ||
-> --
+I guess in that case it is relatively harmless to change UAPI
+behavior because openat() with an empty path never works; so it
+would be silly if there are userspace programs that make
+this call, which always fails and does nothing, and somehow rely on
+that.
 
-Other than the above comments, Patch looks good to me.
+> So I guess it's okay to add OPENAT2_REGULAR in the 32 bits
+> range anyway? (Also lots of code paths take 32bit flags param right
+> now and those would need changing to take uint64_t instead but this is
+> of course not a reason to not add the new flag outside of the 32
+> bits).
+>=20
+> Regards,
+> Dorjoy
+
+Thanks,
+Jori.
