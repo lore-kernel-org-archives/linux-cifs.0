@@ -1,105 +1,89 @@
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.185])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2A837474E
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 21:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E6D1EEA3C;
+	Thu, 16 Apr 2026 22:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776375766; cv=none; b=SIwRewFjYGoz8P+1LkSKmlZj/o+7IXP04KVLfw5I0HvtAg24sSu/CkaZpOJ/JVHLYy83ii/KwObzJCOgs7z4+CEKk5RZ3beFPv7A8US0p4rn1vG2UV8yliaOWzTvfjK/PGZBcXi0FAiViXvUoyIFhCVkfD3sX87RPlclk5kq9zk=
+	t=1776379171; cv=none; b=Z6M6OeVIex0O9+0GbvS9g5s5LSTiKJTzjLV+0pyBdIu5J3ZfG6J6jil/90il+Zld4mzjqfaBrHTCwNHXfWerLrUZFb/BtSt2+2jB2iUJ0OhSCCfINJR3ucMb10TLnXNKDD3/uc4WduXTrtmD8VzjwTh2OHgOdA3Av92tHfISG6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776375766; c=relaxed/simple;
-	bh=IwAI1eaHkbzl2q25/fu93jl9Wz9VGjZ9ldalur0MsOw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=LaFsVhyyKUxCX01xb0UIprpvHjEodOcZzav47zZxdO/4YGWCWoD78jy5XAJ058OVRZt7jRZ4IarWdUwxx5TVZ92CUr3VakCagx+cl0Y8OWjVStjkDYF7liYMA9C8pKuH5cCCzl8A5F6GWWz1dDQWf3QJNrO+03sfX/SOKoWiBng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=MUYIXaJy; arc=none smtp.client-ip=195.121.94.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
+	s=arc-20240116; t=1776379171; c=relaxed/simple;
+	bh=M6MEtYZgwyBUvY0DzYJj79BbhVpDuuKR5yZPKef031U=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=q75rwwdzdCl0zq2fiZv/sRZHX8uqJL7o/EqeKu8m1Juvlx6TBCgcFKQ5v7Y2G+ZKWBeRt6AeQo6i1Q3SkRcd1RzYkhfwJPujCcUIi0uckJvSKUN4u46d/zEgFw2ewrBZMTaSB2smOSEAcyWry6WNG4b/ZetPRVDCPtt/LYirchA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=E40E2nvg; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="MUYIXaJy"
-X-KPN-MessageId: 32e0422c-39dd-11f1-8ff3-005056999439
-Received: from mta.kpnmail.nl (unknown [10.31.161.188])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id 32e0422c-39dd-11f1-8ff3-005056999439;
-	Thu, 16 Apr 2026 23:42:42 +0200 (CEST)
-Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.189])
-	by mta.kpnmail.nl (Halon) with ESMTP
-	id 32e07e84-39dd-11f1-80f0-00505699693e;
-	Thu, 16 Apr 2026 23:42:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=xs4all.nl; s=xs4all01;
-	h=content-type:mime-version:subject:message-id:to:from:date;
-	bh=FAFUNkukKmRTaQDP/ma8ntJhtsdj1vX5Rro9/2jNENo=;
-	b=MUYIXaJyQI/z3eS8we80k6cReqZOrGcNyJH+eOsM0PptZLrLaRasoV7obwF6je4Oo1F2Q53g1dTaC
-	 IqUymC6DxzUPabRDzcTQxVCljJljWBkrMoSqBMJL+mujYUqHhSNcOaF+OlB+O2yQFWLbNkbwkM62Zj
-	 QTFjvEiZvQSp9l9vCH5z1nOjxZEzUkv8SgpuJrFLYZVB8+8Amvb8f8a7CHidJFr9KB/0c/jl2Ro+YJ
-	 3EAFYuqHM0s2N/vB0gIaxS+hlOwiX48TqlzjMMe7LhmYtAcQfa4fDPkuGVhYzQgAYbekHDwRYfhrmB
-	 F5Mm/8EXhFl5j2TfObuqEdb6zzgWXLg==
-X-KPN-MID: 33|cxvwz6XIh+mQ5m5d80I6DfGs94zM1K2dlrRj5bchq6IoGGsUJF3RLVRm5g9uaXO
- 0Y2LlUpPPKVH+u9Ml0x0eZDNcQV0BtHa3qhSktN2o5wg=
-X-CMASSUN: 33|g5BgIBUMSqbIpNgwKf2oxyuAmj7HBGNP8+CYku9NjRFoxoUsKfnp9wSbpLST/jO
- DqmCC/FRLwMqigt+cG6u52A==
-X-KPN-VerifiedSender: Yes
-Received: from cpxoxapps-mh02 (cpxoxapps-mh02.personalcloud.so.kpn.org [10.128.135.208])
-	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
-	id 32d2c916-39dd-11f1-94b1-00505699eff2;
-	Thu, 16 Apr 2026 23:42:42 +0200 (CEST)
-Date: Thu, 16 Apr 2026 23:42:42 +0200 (CEST)
-From: Jori Koolstra <jkoolstra@xs4all.nl>
-To: Aleksa Sarai <cyphar@cyphar.com>,
-	Dorjoy Chowdhury <dorjoychy111@gmail.com>, brauner@kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-api@vger.kernel.org, ceph-devel@vger.kernel.org,
-	gfs2@lists.linux.dev, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org, v9fs@lists.linux.dev,
-	linux-kselftest@vger.kernel.org, viro@zeniv.linux.org.uk,
-	jack@suse.cz, jlayton@kernel.org, chuck.lever@oracle.com,
-	alex.aring@gmail.com, arnd@arndb.de, adilger@dilger.ca,
-	mjguzik@gmail.com, smfrench@gmail.com, richard.henderson@linaro.org,
-	mattst88@gmail.com, linmag7@gmail.com, tsbogend@alpha.franken.de,
-	James.Bottomley@hansenpartnership.com, deller@gmx.de,
-	davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com,
-	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com,
-	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org,
-	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
-	tom@talpey.com, bharathsm@microsoft.com, shuah@kernel.org,
-	miklos@szeredi.hu, hansg@kernel.org
-Message-ID: <2059025134.378522.1776375762839@kpc.webmail.kpnmail.nl>
-In-Reply-To: <2026-04-16-upstate-capable-deacon-petals-0l25lH@cyphar.com>
-References: <20260328172314.45807-1-dorjoychy111@gmail.com>
- <20260328172314.45807-2-dorjoychy111@gmail.com>
- <aeDpIgfDaIKEaBcL@lt-jori.localdomain>
- <CAFfO_h6pkyX=uN5uoXda6toTtT6KsahfBNBLom9i21HdZ7JOmQ@mail.gmail.com>
- <2026-04-16-upstate-capable-deacon-petals-0l25lH@cyphar.com>
-Subject: Re: [PATCH v6 1/4] openat2: new OPENAT2_REGULAR flag support
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="E40E2nvg"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=c5E3+2kIXLzzP6I5UWQUKTou9IfvDQG4/ARPk5KjOyc=; b=E40E2nvgWxBnHl3S9IA4G6jSxn
+	rMDH2KGgotCa/cR+OakYhb5eGuPgAwFCy1Bot/QkdUKkG6+RXmuZxKI3wfSRnUg9/5vNwH/2J3YHw
+	Uk4Sr9jhSQ2ifLSF1szXsNmWAmNJbj4GNmZ046C/LyT5bdHIDyetdn6c5KvVk4l+TToZP4P+cXNfY
+	85AJiiTNzNIyg51Z8c/iDnzUckdo5aeJyIwKLgUGwOIoQBgWCEEnT8EH+UrkhVREbSINX9PMczDZu
+	w7IrYep8IuLlog4NJnXfO1nwLwJilq82iCBYhrwrLJi/P7wu9Nx6svNp9k+3XbDodqXixZYP7ta8t
+	eH9moWXQ==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
+	id 1wDVMk-00000000IrL-2ATX;
+	Thu, 16 Apr 2026 19:39:18 -0300
+Message-ID: <9271841dd415d9d0b42ab91c575a1f91@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>, Linux Kernel
+ Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Cifs <linux-cifs@vger.kernel.org>
+Subject: Re: [REGRESSION] in Linux 7.0: empty CIFS mount point with vers=1.0
+In-Reply-To: <f758f4ff-4d54-4244-931d-38f469c3ff14@moonlit-rail.com>
+References: <f758f4ff-4d54-4244-931d-38f469c3ff14@moonlit-rail.com>
+Date: Thu, 16 Apr 2026 19:39:17 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
+Content-Type: text/plain
 
+"Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com> writes:
 
-> Op 16-04-2026 17:15 CEST schreef Aleksa Sarai <cyphar@cyphar.com>:
-> 
-> 
-> Oh, I didn't notice that this wasn't mentioned here, we had a separate
-> discussion about it in a thread with Jori and I must've assumed we
-> discussed it in both. (My brain is also really not wired up to read
-> large octal values easily.)
-> 
-> While it is hard to add new O_* flags (hence OPENAT2_REGULAR), it's not
-> /impossible/ (Jori has a patch for OPENAT2_EMPTY_PATH that is safe to
-> add to O_* flags because of some fun historical coincidences).
+> A bit late to the party, sorry, I should have reported this in 7.0-rcX.
+>
+> When mounting a CIFS share with vers=1.0, the mount "succeeds" (is added 
+> to /proc/mounts) but the mountpoint is completely empty.  Even "." and 
+> ".." are missing.  Blindly accessing a known file results in "no such 
+> file or directory".
 
-But it would change userspace, at least in theory, right? If anyone for
-some reason decided to set whatever the bit will be for O_EMPTYPATH
-in a call to openat(), and pass an empty string, relying on this to fail,
-that will no longer be the case. But that is just really silly. Or are you
-hinting on something else?
+Thanks for the report.
 
-Thanks,
-Jori.
+Does the following fix your issue
+
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 69b38f0ccf2b..7a4249628ac4 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -3628,6 +3628,7 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
+ 		sbflags |= CIFS_MOUNT_POSIX_PATHS;
+ 		sbflags &= ~(CIFS_MOUNT_MAP_SFM_CHR |
+ 			     CIFS_MOUNT_MAP_SPECIAL_CHR);
++		atomic_set(&cifs_sb->mnt_cifs_flags, sbflags);
+ 	}
+ 
+ #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+@@ -3652,6 +3653,7 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
+ 		tcon->unix_ext = 0; /* server does not support them */
+ 
+ 	/* do not care if a following call succeed - informational */
++	sbflags = cifs_sb_flags(cifs_sb);
+ 	if (!tcon->pipe && server->ops->qfs_tcon) {
+ 		server->ops->qfs_tcon(mnt_ctx->xid, tcon, cifs_sb);
+ 		if (sbflags & CIFS_MOUNT_RO_CACHE) {
+@@ -3675,7 +3677,6 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
+ 
+ out:
+ 	mnt_ctx->tcon = tcon;
+-	atomic_set(&cifs_sb->mnt_cifs_flags, sbflags);
+ 	return rc;
+ }
+ 
