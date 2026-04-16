@@ -1,141 +1,166 @@
-Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC41C17A30A
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 17:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776359764; cv=pass; b=jedf049nIse2lRl+UNaWSuFkeN1aFrQEOJsMcootqPq1vZCVYbLtTB/H8haXY59Cc4Qtx+VCMKK+SLrpYuspoHBZD6ZIiIw5lONLKJ1lVvUn6R4nd7zfJ5ZIcWJwUEOf0Oni9AxfQofYWA5t8HUdz5fVoiCoJR5jtsyqDR6Yrys=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776359764; c=relaxed/simple;
-	bh=FzF4ZhMLdVZnFet8xN7Ujdzt5ELQlFxo7r5apwDCaLs=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=boQkRi+T/Pvb8Cc9cM0ExIwxQPHqyAVqByu7QxKjv6LwOmn54zPjCamx/q0l0X+za6WFSvZ1IkYyHfq6f2n6FRt+Y1KsLFMSyIUVwfSxO/C24Ymgg+7fPt1c/JGwCuEInEQZ4jYd0egMPr5D52L9hP/pu+hU1MDajt7FqEdznOQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qCGJgYyi; arc=pass smtp.client-ip=209.85.217.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896A913B293
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 19:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776368064; cv=none; b=FFFQ/CBg0+aXtcOTPCIHB+uMLW0z0NeE+7X4FMMBqjBEo3oFOtTHFitzffZLa1ldDbxHP17Zf+pU9Au44gli39365AfNvtIQ+dFQ+8kOkc/MWp9nJUZbKkirxyUQEw2gYt7+BiYhQ1fFjlFBpSeobBzMXp/GJI/aCfOHiyy0000=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776368064; c=relaxed/simple;
+	bh=RFC3QVim0arIk7Lv3+cfW3gLQfc41MwZTxdP0bP0ces=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rbnmFpnVbG0+CLXtPxZfpNgx2qkyt4wbFJlLi/T/mGgPvMbx4lktAYPBfVIsYXLJ4qTBSu7fNsVTB8kTqtm8cwqTMlQB9XR7LTSIuqhLJpBCWq/+cQx6JKyuQvZwANQyBNO/emE+XlUUGzXQjj/YEL33WZMatdQWSFtgcj8LJwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IluCM8BE; arc=none smtp.client-ip=209.85.128.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qCGJgYyi"
-Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-605def5b80cso2671428137.2
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 10:16:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776359761; cv=none;
-        d=google.com; s=arc-20240605;
-        b=aRDXrirsGSKKF5d+IagIUDCAmUDHeHlYNv1xXWNazQzh65iYtre8+HxSEcoUEbGNbI
-         1gEpfnQJEiE08jFS+kjBDWUqMRCO4RHHGKm5j0IFuJs7c1HhG4BU952CEWT8Jmj38H9o
-         EySjgWi+1RaecXudufi9FLVLgRyyV/h4K5XT9iUWXy7z4aXxw1UbvvtzLrIkSDWfUvRn
-         +UvICrDQD1KkBZvZg9tu90gUc8lF+F/kOXXmZAMpGOi/FQVkfmgYXwMqGiXRb6HYMSOe
-         aAg55Gm7zS9BmIs/u/s7pkqELnMWFYyfSWlhMf+rx2oWMcX8vvwOWiQ9iF40jxb1aE+y
-         U+og==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=tVejSxVKhi3u8DUGgWWeRmYhJQumRCLQdE17It3ejNU=;
-        fh=tcnSsbh3FTBNjzxmLesZKhBvWNi4D6kCKRNA2xyM3oc=;
-        b=EN9hHDSo3NFqYii/Q2grra6+FyawXkehSJjmc+iukjINfqxOaGBwK5S1CTL/pxzruj
-         7sACX37ZVeqDQ0y3ZcZlqb70jBBUUPcl0H9cjmwqgR6rGTTt0KFCSm1LuFBV+QHUAFrO
-         Uqu+777eM62ArQX2MkvHluAmnQsUAOKI/wYYmpOgIPdZt0aKjT98b750CiB96Izu+XGx
-         uet3mBGUAYUWSbNKBUFDuWV9BAk6tsV6pKegjenqr++D4PiBeyo8tHY+/smBBm3FygO8
-         wbgY+g6rtXH6gxT9pPcYooCMn+WSrX88T2rlpg0NJlHMIVmOCmKOc7rbe6fW/KibBkts
-         WrCg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IluCM8BE"
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-7b6ae2ea4a1so35958407b3.2
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 12:34:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776359761; x=1776964561; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tVejSxVKhi3u8DUGgWWeRmYhJQumRCLQdE17It3ejNU=;
-        b=qCGJgYyiVC80DjIR5JjwTmUpd0Pxbd/5/MS5PdzSQ+PpYdK2id7zNni8dz7l+DEK+A
-         0Rs5hhWiFmdAK2JQQPQDjZsXBB2r+6kC5su0Q5lwUfsNs2lP/F8Gpl9vmV+47kzbNjBR
-         GEazJfPHinqLsYAXN/6rnCEssvcHCV6qKY4tRD7IYe6f5wb6On/BFxTjtUdlHyqkoOsT
-         pJsNWJabBTOwjJFW3NGHGCMCFhdZI5dbObguDvI/lbRcuz9guBwTL2zM7t6vYpvhg0Ns
-         /jiV691CbN/BHNnjLhixMC57SF6pzdewcXgUX1blRaCD0rJG5tsLLvzefua4zIGYNhnA
-         tXhA==
+        d=gmail.com; s=20251104; t=1776368062; x=1776972862; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pDgrzdmqtoSKjkQ3Rpvi5tSh9COrIxr3KsgGxPSv/G4=;
+        b=IluCM8BE6qXvwb/XaHTy0ZndDb8hI3MN/AXSVSzL1aW1CWpSKx6nJQq2P2bzSwQLgg
+         xiLog1LrAMWDKcmo3SDbeUhd7nOVaREjRih8rYnWluVb1hXx6ADqpC9DLyPo8pBTDtxw
+         b/kG1oIHIUxgeum6GK9nR3fQl28ivhGWQHcT/SveKHt1VWvG9QNY/WkMzE/jcqqzD0IT
+         fbXen9ybJzTa5S54A2BuKQLp69R1eOBtOJ5VYC+iLtE1p0LE0uRrNLbWkxZJyrJYdDpm
+         FIIYEmTRffJHM9xrP6hw+CwymuFGIT8Mud2ml6gHpBKsFYtoWXRHMt+fLtZfjXlEJJAw
+         upTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776359761; x=1776964561;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tVejSxVKhi3u8DUGgWWeRmYhJQumRCLQdE17It3ejNU=;
-        b=ey1uOq/0zE6lzhU5fAAQ/+tpOylNj/qhGJa2NWcviD7TGHoSG0pWZ9TohZ2NqSdjjE
-         M5H60wAMyUiHnwXrQHL6ICoeFQShfUhFLkEsAOordWy0b2KrAuqjwLayN9+jMqoAxppz
-         SxJ37Dl0EMIERqbt/Nk+g6ykf0Unm0WY6o5igYJGeTNYYoHn7a0ajA+DBgtGtS/8Inoe
-         2nlJ+CxpW9hsA7b550qu5dSw62B2lwE3eKMpK3u4xlrZJvINIB7DOOb5QmM8MY0NAfAF
-         ztNDcbnycjfS9fY5tNFrXTWiqPSUcuj+YLsVgGkkk0nbhI3w8dQO5RsdS+sitL598pz9
-         JfrQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8IIJH+YwmXSnfssrNSWFBtJABS/TocnXAsJ5yyIAXGb7dSWKYSastw1ceXMK/w7MOBUxZ3HCqRPw09@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxj0/i+e/uFU0coRL/XroDlrk8u95s/saJ05d28t+BfVr9oxrmn
-	yD52wqOE9HxZxFn2fzS9mMbpWzxwncvcKluN7Fv500k5lWmoudrILDmxiDnuogWk81Tn415cUjH
-	CPGa39vyTxUKhe9Z1Dg45KFuIL/L+hkg=
-X-Gm-Gg: AeBDiesnODOFWC0gkvGE7om7o9HGnRj+IESBUDzmWiX4Ji4hYWXSDiEBzK16Z2+t93i
-	QzzSIt0Awa2u5pfh1krpeFk0PoB5UI5kJyuH+G/h+WvpFVc669uery81SXAdIVp3/1Fl7HcEweO
-	hkjKyTEXgpyM+dWRc1yYPvc1NJPjJrA/VM65/Fvb3h2lvTsA5QLKjR7fSvcnW80ogtlnEqFfTDN
-	+TpUjAYEfQKk0/fP02jia91egMuq8PwVgzXpRqOqHJyfkMFSUIdr5mA5dEcZgAFU++jw8C1Pc/U
-	tpgtf7hB0MF/c5ZZ8KA1gxyvrmd1dvVpzQrZ2fI0LHuhzIz+9cAElszEPMkpyQJI9+Izin0OXN9
-	qLwAHipn3lBxuWMUt4C6GMlZhOjJZfGcM7RLTcU9aKiCP2jVZTpcbjnAROE/PPylYzY81+AewFc
-	cwa/+5g7MCgvXYV96HHNBezKjKNAALROuR
-X-Received: by 2002:a05:6102:4589:b0:5ff:efdc:e225 with SMTP id
- ada2fe7eead31-609fe7a6af5mr14188877137.3.1776359760644; Thu, 16 Apr 2026
- 10:16:00 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776368062; x=1776972862;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pDgrzdmqtoSKjkQ3Rpvi5tSh9COrIxr3KsgGxPSv/G4=;
+        b=MJ0vJd5TxM+nEdQEqq6A34+1fgdR+es2+Zx515U9UWiOSTFs3cDwukHZEQifVDensX
+         FhIEItT1A71X6VNNh9QOb1/OHnBTrFqUA4zB6QKsCWTxedXNObvDaANc3fFr3MCfW0lv
+         RDd6P1uMZn8OrjdL+L/rMfZAEuVY4rVB1a8UiUmY+IneRe/EOyL+2uP42Uxk0z1JdEJj
+         X7+umb8Ldg/Hiw1VVM+HALdpxoE/7AL9lDkQaw/QL2kh5WzaG2S7F5oAM2+w6o8pgEJA
+         ju8H0EnlHO/dq8MDFRDD+CygtnSKuPwroev9AI04h5j6o4WxHgSnHHAtBz1f6O3S0z3m
+         D1SA==
+X-Forwarded-Encrypted: i=1; AFNElJ9VC7zvqRlbkvccBA4ABuz8wzGzS0YAsJBEUJBotwQMpbMJMt91OmLPQ0GNrvN1wj/yJzIW29tylrJ2@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5MIYC6xK4adBCd0KRG0YB/IdfaU7SPPxyGufIEsxmyxUG7LCa
+	Y6bPzas0K0lqa4AeySzCwOAWIk3Nbv6VJGEP0jQs7anHBgMmf1BRBzswKSrvNVDp
+X-Gm-Gg: AeBDieuihbYVDVByvmYe5HSIj7JF3E/VVQbSJVEepvppksi2H6hA6yfFfseOFkU4fFC
+	KzmxJX36/Jp+gPtu6kPFzUTuBNnMUE389ZL0O6WPQ+YfkPnQRq4+Vmch018BICkS2edpzqZXgGJ
+	mww34pBWUv1/ncCvsEINwEapCStrFEChKN4Z4DdTE3Zp8w6CPYFJLzAI4wAOEo2wgF+02+LmsRY
+	qpnro6ExM3ZphLdNmpBXg6vtncQOp47VuMIQhNSRDYhhWDsp4nBXjHuH1n0yX0szzeABvD9iGhn
+	naknxDX3uaUXPwRzW6IqP5ek0G/mIhgDSCHjZyP9tSy9oKWW6IKK3rKI5FO/ClzSL+IJc81snCP
+	TK3vraLpb568dgKdYhwk/Fr7SzSOyy6dhcTnVzoR5NugiPCzCt3UWGlVL9bK1yRUnm0OcluL2ZF
+	5corUGXiRqOcK2LpY3JTyKuPfc3lClkPY7JMFmEU8PklRe/HEwMluRJGK6Cx2oRSZCFuNtaDH80
+	GZR+ioHJQFcsCUx/WNM56cu66Fe3nRvzEsPL0J5tmAFIgBqtZiqvQ==
+X-Received: by 2002:a05:690c:86:b0:7b7:c69f:22fc with SMTP id 00721157ae682-7b9e19ec401mr4952117b3.10.1776368062426;
+        Thu, 16 Apr 2026 12:34:22 -0700 (PDT)
+Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ae6cda9277sm42594576d6.41.2026.04.16.12.34.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2026 12:34:21 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Steve French <sfrench@samba.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	linux-cifs@vger.kernel.org
+Cc: Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] smb: client: fix OOB reads from server-supplied dacloffset in cifsacl
+Date: Thu, 16 Apr 2026 15:33:25 -0400
+Message-ID: <20260416193325.2950619-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 16 Apr 2026 12:15:49 -0500
-X-Gm-Features: AQROBzCHeeivzmpcVvSAPghwqF_p5p8CWOLC4VBxaoyaZj-oWjV2LHhRannbxEw
-Message-ID: <CAH2r5mtbfUNKWr4E=yeUgYQhBF=OikCAtxwhJGgUJmr3g0Q1jA@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Please pull the following changes since commit
-81dc1e4d32b064ac47abc60b0acbf49b66a34d52:
+Hi again! Sorry for the piecemeal sends as I work through triaging
+all of my personal "clanker" pipeline results.
 
-  Merge tag 'v7.1-rc1-part1-smb3-client-fixes' of
-git://git.samba.org/sfrench/cifs-2.6 (2026-04-13 17:09:00 -0700)
+Here is another malicious server issue, this time in two call sites
+in fs/smb/client/cifsacl.c.  We compute a DACL pointer from a
+server-supplied dacloffset and then read struct smb_acl fields 
+(dacl_ptr->size, dacl_ptr->num_aces) without first checking that the
+8-byte struct header fits within the security descriptor buffer.
 
-are available in the Git repository at:
+1. build_sec_desc() -- chmod path:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.1-rc1-part2-smb3-client-fixes
+    dacl_ptr = (struct smb_acl *)((char *)pntsd + dacloffset);
+    if (end_of_acl < (char *)dacl_ptr + le16_to_cpu(dacl_ptr->size))
 
-for you to fetch changes up to c09fb907a2822864b7da866461fb33f10713b4ed:
+2. id_mode_to_cifs_acl() -- chown path:
 
-  MAINTAINERS: change git.samba.org to https (2026-04-15 17:56:23 -0500)
+    dacl_ptr = (struct smb_acl *)((char *)pntsd + dacloffset);
+    ...
+    le16_to_cpu(dacl_ptr->num_aces) * sizeof(struct smb_ace);
+    le16_to_cpu(dacl_ptr->size);
 
-----------------------------------------------------------------
-Six smb3 client fixes
-- Fix integer underflow in encrypted read
-- Four debug patches, adding a few tracepoints
-- Minor update to MAINTAINERS file (preferred server URL for cifs)
-- Remove the BUG_ON() calls in d_mark_tmpfile_name
-----------------------------------------------------------------
-Bharath SM (4):
-      smb: client: add tracepoints for lock operations
-      smb: client: add tracepoint for local lock conflicts
-      smb: client: add oplock level to smb3_open_done tracepoint
-      smb: client: add tracepoints for deferred handle caching
+In both cases, if dacloffset places dacl_ptr at or past end_of_acl,
+the le16_to_cpu() dereferences are OOB heap reads.
 
-Dudu Lu (1):
-      smb: client: fix integer underflow in receive_encrypted_read()
+Reproduced under UML + KASAN by constructing a 20-byte smb_ntsd
+(sizeof(struct smb_ntsd)) with dacloffset = 20, placing dacl_ptr at
+the exact end of the allocation.  The le16_to_cpu(dacl_ptr->size)
+read triggers:
 
-Paulo Alcantara (1):
-      vfs: get rid of BUG_ON() in d_mark_tmpfile_name()
+  BUG: KASAN: slab-out-of-bounds in kcifs2_test_build_sec_desc_old
+  Read of size 2 at addr ... by task mount.nfs4/220
 
-Stefan Metzmacher (1):
-      MAINTAINERS: change git.samba.org to https
+Confirmed -EINVAL without splat after patch applied.
 
- MAINTAINERS             |   4 +-
- fs/dcache.c             |  14 +++--
- fs/smb/client/cifsfs.h  |  17 ++---
- fs/smb/client/dir.c     |  25 +++++---
- fs/smb/client/file.c    |  21 ++++++-
- fs/smb/client/smb2ops.c |   8 +++
- fs/smb/client/smb2pdu.c |  25 ++++++--
- fs/smb/client/trace.h   | 160 +++++++++++++++++++++++++++++++++++++++++++++---
- include/linux/dcache.h  |   2 +-
- 9 files changed, 233 insertions(+), 43 deletions(-)
+parse_dacl() already handles this correctly with a two-step check that
+validates the struct header fits before reading the size field:
 
---
-Thanks,
+    if (end_of_acl < (char *)pdacl + sizeof(struct smb_acl) ||
+        end_of_acl < (char *)pdacl + le16_to_cpu(pdacl->size))
 
-Steve
+Apply the same pattern to both sites.  This is the client-side
+counterpart of commit beff0bc9d69b ("ksmbd: fix overflow in dacloffset
+bounds check") which fixed the identical class of issue on the server
+side.
+
+Fixes: bc3e9dd9d104 ("cifs: Change SIDs in ACEs while transferring file ownership.")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-opus-4-6
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
+ fs/smb/client/cifsacl.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
+index c920039d733c..115990467dfa 100644
+--- a/fs/smb/client/cifsacl.c
++++ b/fs/smb/client/cifsacl.c
+@@ -1293,7 +1293,8 @@ static int build_sec_desc(struct smb_ntsd *pntsd, struct smb_ntsd *pnntsd,
+ 	dacloffset = le32_to_cpu(pntsd->dacloffset);
+ 	if (dacloffset) {
+ 		dacl_ptr = (struct smb_acl *)((char *)pntsd + dacloffset);
+-		if (end_of_acl < (char *)dacl_ptr + le16_to_cpu(dacl_ptr->size)) {
++		if (end_of_acl < (char *)dacl_ptr + sizeof(struct smb_acl) ||
++		    end_of_acl < (char *)dacl_ptr + le16_to_cpu(dacl_ptr->size)) {
+ 			cifs_dbg(VFS, "Server returned illegal ACL size\n");
+ 			return -EINVAL;
+ 		}
+@@ -1662,6 +1663,14 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 *pnmode,
+ 		dacloffset = le32_to_cpu(pntsd->dacloffset);
+ 		if (dacloffset) {
+ 			dacl_ptr = (struct smb_acl *)((char *)pntsd + dacloffset);
++			if ((char *)pntsd + secdesclen <
++			    (char *)dacl_ptr + sizeof(struct smb_acl)) {
++				cifs_dbg(VFS, "Server returned illegal dacloffset\n");
++				rc = -EINVAL;
++				kfree(pntsd);
++				cifs_put_tlink(tlink);
++				return rc;
++			}
+ 			if (mode_from_sid)
+ 				nsecdesclen +=
+ 					le16_to_cpu(dacl_ptr->num_aces) * sizeof(struct smb_ace);
+-- 
+2.53.0
+
