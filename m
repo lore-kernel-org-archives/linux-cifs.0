@@ -1,183 +1,216 @@
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9072235F18B
-	for <linux-cifs@vger.kernel.org>; Fri, 17 Apr 2026 17:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4884130DED1
+	for <linux-cifs@vger.kernel.org>; Fri, 17 Apr 2026 18:46:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776446693; cv=none; b=JbMV/CvBMb+I/sUtDGsq4R5vE8l/SrKQReOXud1Bc0dZwj++T5lnMrbIOHuBtlvbUVHhyxObkprqWMBL7I+i1xEUnNpWeKtAobTzedwmIUq023AsK2wViJRkgwIB4Cj6V0WFD2/scZJr++MFByM+L8Q4K9oTfqOQQdic963Hgac=
+	t=1776451579; cv=none; b=nvDTtO/X6YTA1Vdmx37Mbmjy+lKNoKZrZvmINm1JMbTPLz8fGVKBLuLEM4x3jpDy0xUrjdV3BppRLn/2w8HOA0TYhHY+/6MnhVPqnrBwc712J0SL6j42L4hDGLTnIvYqn+iYbCFAWrswnt/yzj/954DXei8ZQJvifXSsLEvxvbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776446693; c=relaxed/simple;
-	bh=oDnZaa51m7FuZjaXLRYECa1UTadvUBScxVzdjFO5VD4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=VdiITATQ9/hiGdDxMZxdzlbs9Fi5zhDo4yAl4Dh0LUO5VsRo1j3dges6tn3qdOz93//NPzIzaidKKmIxJJ9dHP5fDxUSqu+RiMJs3NtGRmIj5cJaA2uOgQWHPdfeuCOqDSzCCkFeseUxvrIIdwkGKp30GTSWzGGXjVIDw+gu48w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=NPAqDYsS; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1776451579; c=relaxed/simple;
+	bh=qPmRyp0y7PzlYMI7mL0qWLI7uB0ZnmAn0J9PDgiv6ro=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ObTL1oqS2kZfYZC6lzxG/3mE95fW5oQL5X42vDoKwyoaHwpr1roDvNgFrZrvV2XorWcwCTbLPVej8VttFcGlGR/uWEgOC7iwH7nu8cxFRLypZtO71+PfGpUEH4iB1isv9tCeLhfiWhhMXmDZOD8rJD41o17nSGL/Sss5eerAGAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FSYI0g4n; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="NPAqDYsS"
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 8D2A53F921
-	for <linux-cifs@vger.kernel.org>; Fri, 17 Apr 2026 17:24:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1776446680;
-	bh=VIeyA7PnV56DO91CYewm6P++vhCdev9nXK5swi33LHc=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type;
-	b=NPAqDYsSkZwtiiY23Rf0UBUUbfbehSa0F3oTybRGn/lKiAnbFghv7D/mwA30DheD/
-	 Ht/aVq0BmmKxnV1vj9wLPQrwwIwhQDRZAiH7IX/apXJtY2zshf/UmQc6H7LUtlGHXB
-	 oojhiFD+GpXkJve9MEl0r1I2qNQdmHkpgz3nhEyqV9KC/7zaStybKSskrM+5KISBlq
-	 9CHtvep3gMYuktw0dmw8R7BhY6QDngrJS0pHGi7s5WQes+zPWTLWuBeZRk6NIhqQR0
-	 BBEIfK6X0KtsUz8+mvVyq5zRAWK5VuzKTBsBcDoCzneITs5g2vsM/W1CFB4bK0ZL8n
-	 2NXh7squU8vGdkFfzbzD2o2aw9Luvwe/X2MZeShbEGSOgUAIw+IJN4bjdZjFoLW5mt
-	 5DuwuxPDa20MHB1iuj2HFV7bmzpNloFuLL+5QkZ3FwLZUJ/NGSUBeXwU31wS5AaWsw
-	 dVtgyxJFYRYlzSLkf1NSuY6o0JUWd7AKZcWdM6bteHOwBvOn1I3eQ6UA60J4GcNLOJ
-	 Oaa/MeVXnRKY/POMbcuWaS0EBtvLABVYaEpjPQ3iQmG0xnhrEcS4sGZQg5aO1gcXwZ
-	 o7rBgzZWG4dalz4Y6jqPFRI7JMRfVMx4HNvgSWOIUIaOD1i1JLg14hgMHb1bdHz24G
-	 SA9MDIhT9tw1G2mFcy7hlxz4=
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48378df3469so6309605e9.1
-        for <linux-cifs@vger.kernel.org>; Fri, 17 Apr 2026 10:24:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FSYI0g4n"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-506251815a3so8897091cf.0
+        for <linux-cifs@vger.kernel.org>; Fri, 17 Apr 2026 11:46:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776451577; x=1777056377; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wnB324ImcM1acsbVZKl+4DrPTQ21/FeCKs/oLsdwvJ8=;
+        b=FSYI0g4nETrAvo1zQfhGxZ/e+vLE49iiY157/HXbniljyznYXELmem32kWx35zqhV4
+         q7dug+ELSu7DDqRhkouvQj1Mz6LqsTafgfr0UFpw0iEm43/ntfAaRPgTTtiPoypYzipk
+         +HJEaiZGHJH43vmkHbyvEiJ/k6XKRq3VfLl6ka1GfcUkRtPUgrSrG5AwiazeeHtVFdv4
+         8vPD+VkPq4knffgujr/9/utlFuy3K5CBXofhVTtcrJ9p3WY1fFgut8kSlEHxuBsnnLiw
+         m15sKuZ6OhIvOMknRFDB3sXaly1AbjpaJS+xk4phRQ1Ey8Vh8pxMv1EBcl+K1jJD9Hac
+         gDkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776446680; x=1777051480;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VIeyA7PnV56DO91CYewm6P++vhCdev9nXK5swi33LHc=;
-        b=FD4siYBY93pMWqP/JmvZINFSsLAU1qNFasSevLXJHyfNdVLSJ1usBXlL6UmqicujfZ
-         4a0WV6TUAhWnJTJQMSZZEjhCWVN1Z7wxa3upu0jBSRe4b/O9ODzMsJA1eEyTSXa0bB2y
-         JOn4xwx67l+o3Utd+amJBv4vEPKORgrNAFKZeR9+Ovyzq5QlN+DhxrdjtHxJgnwPXuE8
-         ewO8vmUf8TSNnP0lUIY+CIc0TclKr/ttfsDklLOTpbo/0OrSHVc8m4lH1y9KVN22VJ7O
-         NHWH7L1EwRb2rmFeh9tyFVoJUBAxJTPuZ/U8YUV1RjKIcqBgzzFg3ROLpftHTYjyf5Oc
-         RM8Q==
-X-Gm-Message-State: AOJu0YwpoLaJrAc6QveN2t565Oze4I69fYDyoKhrl9iXFYthjr0Y7DYE
-	D4PmlT3Cgt9wGBRcE0g6LHnPS90DcBWBrYmqCnbgXH7h8SNmAMOtKq22Jj6KN+xG/WoSVPjEZuF
-	QXyw1A95+hi8awxottspD+uHNItBf3ITUzUPNTGYX40aREZYYvVIc2kBk+STOj3858WeBioTdTM
-	koEatdbknW/HojkQ==
-X-Gm-Gg: AeBDieuxSEkGXajakgZwG85uJXduuN/SXOWFTkHlbsAf3DhA0hMccN1Zme6nzO1k7h6
-	PqB1NqGU7UAVK98lEpUrvp/U4u6QmneCkHDtFNQm6+wSh2ARURtY+VFoGA22xg3AZopQwzl8lx/
-	kkXjNEG2/LluLoB+E8kEol8dNVixHptF/PegM4BFhKsqdBzRDKeDzvl0ExzAmjWvbU2///BO0Kp
-	fmDwovVOtRY/bZlNrg7P4GoukrFF0PgWMWPiDFjgw58tQSphLWgn15WSg0pBONLQIXep/XkKZ1q
-	X8olsEa6aKyEr1enLXE2hTiazO2x839fbrExUkcy7QrKSKyVRwFb4i4UaY2ho22Qgkj/4OyAf6L
-	GUUTg5/v7jGVHWte/KwbQOWBpRUtS9bTsZAN0jVe6hmcRiUM=
-X-Received: by 2002:a05:600c:c112:b0:486:fe83:861c with SMTP id 5b1f17b1804b1-488fb896910mr44528535e9.7.1776446679617;
-        Fri, 17 Apr 2026 10:24:39 -0700 (PDT)
-X-Received: by 2002:a05:600c:c112:b0:486:fe83:861c with SMTP id 5b1f17b1804b1-488fb896910mr44528125e9.7.1776446679180;
-        Fri, 17 Apr 2026 10:24:39 -0700 (PDT)
-Received: from [192.168.1.126] ([213.204.117.164])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc1070bfsm60376675e9.7.2026.04.17.10.24.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Apr 2026 10:24:38 -0700 (PDT)
-Message-ID: <119442fa-7630-482f-ad0a-83c7f61f8786@canonical.com>
-Date: Fri, 17 Apr 2026 20:24:37 +0300
+        d=1e100.net; s=20251104; t=1776451577; x=1777056377;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=wnB324ImcM1acsbVZKl+4DrPTQ21/FeCKs/oLsdwvJ8=;
+        b=QiQghniwoTvXUtTRzLWf0Wl2G4SKfdsg7vZNaU9opW9BpyPtzh2f9fgZs7mtmQEnBq
+         gSQJRpH93eDLg/JC04H3i6Tuc3piafGDQb1gkYHYnt0K68D64unC5Rcb/donVC8EyAIC
+         4EpcR7SFbqVpScP6ePWpAwZvRcQpAZFRNArMDUKyhJMR7jJOBoWneu2nyhb+pWGLO2YV
+         +wOGH/9vVJMrKz9Tt5Po0DjnRSeCaiOqJ0Yttv2BDs7iNra7qFd3/Ow4rPnW6sjyUQrj
+         VDU+N2Lm5R2ADNMNuTInM59WJVnugEVkQ68t/s3noFvjqjH/37MfXwftKxVy6wh/7w9O
+         2uBQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/uX4CIXc2VqbQoqiT6H9+NqS3b1wLGQXrm2nJ1zYY3sA5hciSgiu1L1+VkWI5Sp+Qyy/JpTkR0Q2gE@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaP+7pM0dvAL8QJuQOSzN4QQUJOD4Ol/uf91ioLdta1oOeilc4
+	TIb7l+OVxGB7HBNylfokuSF7ijjQ747NEJxXHt/Mw/z0O4l3FXlguKRDzfJVDoRb
+X-Gm-Gg: AeBDieslhcdoI7ZLbJou3auV1guT4U6IeckyZZChPs7kgX+RcB33uChTCbDMvVEqbo0
+	mYFNJe9t+Oz6nk6DUr+4c5r901WTLSWrJw0M8oURLf6/84t6nWQRqte9QtCzNw/zFXWLTdYv+vq
+	jUiIS3ILvz8vwKkjON3+TuYRK8QSTbX2pfCwvZ5vYMj3A2mQrMwvknUgISW5SB5WmdzJr0a1K2+
+	GvosZDkxTldQOX71WdxPk9uUwj5s05RLIuUg17aLafwPbliEBeNw/jo8XyGnjMuK+y0xSDFPKYW
+	syZyPF8BtKREB+v6FznJnxHiFMZPWyMzi7R2ohqZbNnoWAwklhLzbevrLs0Y4IjwePK3+vygKtU
+	QDeSbP+uFNtI+xKEeTP4UxmjME8k/bglPZnbeOll32+QvtAV7pykYE/L0ZCC2engQQWtELp1zPw
+	ULhVsVPCSUv13ypFSkl3dJe/y0l2suKQRQtM83wYTkY701oC4wKkujtvz3YauWDOtR+o0xdES4c
+	HuBXWYaXvpa/xy85xlMW9vkX1RnQ68I2BeyM6CVWvwUzV2iJI9pjA==
+X-Received: by 2002:a05:622a:2615:b0:50d:8792:b6d1 with SMTP id d75a77b69052e-50e36c122efmr55258341cf.38.1776451577116;
+        Fri, 17 Apr 2026 11:46:17 -0700 (PDT)
+Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50e39449e36sm22631771cf.21.2026.04.17.11.46.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Apr 2026 11:46:16 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	linux-cifs@vger.kernel.org
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	Hyunchul Lee <hyc.lee@gmail.com>,
+	Ronnie Sahlberg <lsahlber@redhat.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] ksmbd: validate num_aces and harden ACE walk in smb_inherit_dacl()
+Date: Fri, 17 Apr 2026 14:45:57 -0400
+Message-ID: <20260417184557.1138554-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260416200439.2987930-1-michael.bommarito@gmail.com>
+References: <20260416200439.2987930-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: linux-cifs@vger.kernel.org
-Cc: Steve French <sfrench@samba.org>
-From: Ghadi Rahme <ghadi.rahme@canonical.com>
-Subject: RFC: kernel NULL pointer dereference affecting stable
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-There is a kernel NULL pointer dereference affecting kernel 6.1 lts and 
-5.15 lts. The bug happens in `find_ipc_from_server_path` when strcmp is 
-called with `(*ses)->tcon_ipc` equal to NULL. This state can happen and 
-has been observed to happen when the client disconnects from the server 
-at the right time. Below is the stack trace:
+smb_inherit_dacl() trusts the on-disk num_aces value from the parent
+directory's DACL xattr and uses it to size a heap allocation:
 
-  BUG: kernel NULL pointer dereference, address: 0000000000000050
-  #PF: supervisor read access in kernel mode
-  #PF: error_code(0x0000) - not-present page
-  PGD 1013dc64067 P4D 10125f65067 PUD 10125f64067 PMD 0
-  Oops: 0000 [#1] SMP NOPTI
-  CPU: 80 PID: 3913754 Comm: kworker/u256:1 Kdump: loaded Not tainted 
-5.15.0-143-generic #153-Ubuntu
-  Hardware name: Dell Inc. PowerEdge R760/09XV41, BIOS 2.3.5 09/10/2024
-  Workqueue: cifs-dfscache refresh_cache_worker [cifs]
-  RIP: 0010:strcasecmp+0x19/0x50
-  Code: 01 84 c9 75 f1 c3 cc cc cc cc 0f 1f 80 00 00 00 00 49 89 f9 31 
-ff 41 0f b6 04 39 0f b6 c8 89 c2 83 c2 20 f6 81 e0 39 89 85  01 <0f> b6 
-0c 3e 0f b6 d2 0f 45 c2 89 ca 44 0f b6 c1 83 c2 20 41 f6 80
-  RSP: 0018:ff4043e68aadb900 EFLAGS: 00010246
-  RAX: 000000000000005c RBX: ff4043e68aadbc68 RCX: 000000000000005c
-  RDX: 000000000000007c RSI: 0000000000000050 RDI: 0000000000000000
-  RBP: ff4043e68aadb990 R08: 0000000000000064 R09: ff4043e68aadb91f
-  R10: 0000000000000012 R11: 0000000000000000 R12: ff210c171f193c00
-  R13: 0000000000000009 R14: 0000000000000008 R15: ff210d1d3f19a7c0
-  FS:  0000000000000000(0000) GS:ff210d127fc00000(0000) 
-knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 0000000000000050 CR3: 0000011f2cc38005 CR4: 0000000000771ee0
-  PKRU: 55555554
-  Call Trace:
-  <TASK>
-  ? find_ipc_from_server_path+0xd9/0x110 [cifs]
-  refresh_cache+0xf1/0x470 [cifs]
-  ? in4_pton+0x7a/0x160
-  ? kfree+0x1f7/0x250
-  ? target_share_equal+0x198/0x210 [cifs]
-  ? __refresh_tcon.isra.0+0x242/0x670 [cifs]
-  ? kfree+0x1f7/0x250
-  ? __refresh_tcon.isra.0+0x242/0x670 [cifs]
-  ? cifs_put_tcon.part.0+0x39/0x220 [cifs]
-  ? cifs_put_tcon+0x1c/0x30 [cifs]
-  ? refresh_mounts+0x147/0x210 [cifs]
-  refresh_cache_worker+0x1ac/0x300 [cifs]
-  ? lock_timer_base+0x3b/0xd0
-  process_one_work+0x228/0x3d0
-  worker_thread+0x53/0x420
-  ? process_one_work+0x3d0/0x3d0
-  kthread+0x127/0x150
-  ? set_kthread_struct+0x50/0x50
-  ret_from_fork+0x1f/0x30
-  </TASK>
+  aces_base = kmalloc(sizeof(struct smb_ace) * num_aces * 2, ...);
 
-The bug has been indirectly fixed upstream in commit 
-6916881f443f67f6893b504fa2171468c8aed915 which remove 
-`find_ipc_from_server_path`.
+num_aces is a u16 read from le16_to_cpu(parent_pdacl->num_aces)
+without checking that it is consistent with the declared pdacl_size.
+An authenticated client whose parent directory's security.NTACL is
+tampered (e.g. via offline xattr corruption or a concurrent path that
+bypasses parse_dacl()) can present num_aces = 65535 with minimal
+actual ACE data.  This causes a ~8 MB allocation (not kzalloc, so
+uninitialized) that the subsequent loop only partially populates, and
+may also overflow the three-way size_t multiply on 32-bit kernels.
 
-Backporting the upstream commit to 6.1 and 5.15 stable seems risky since 
-it does not cleanly apply and requires extra commits to apply correctly.
+Additionally, the ACE walk loop uses the weaker
+offsetof(struct smb_ace, access_req) minimum size check rather than
+the minimum valid on-wire ACE size, and does not reject ACEs whose
+declared size is below the minimum.
 
-Do the maintainers believe that going though and backporting this commit 
-with any extra needed commits to 5.15 and 6.1 LTS is the correct way 
-forward here?
+Reproduced on UML + KASAN + LOCKDEP against the real ksmbd code path.
+A legitimate mount.cifs client creates a parent directory over SMB
+(ksmbd writes a valid security.NTACL xattr), then the NTACL blob on
+the backing filesystem is rewritten to set num_aces = 0xFFFF while
+keeping the posix_acl_hash bytes intact so ksmbd_vfs_get_sd_xattr()'s
+hash check still passes.  A subsequent SMB2 CREATE of a child under
+that parent drives smb2_open() into smb_inherit_dacl() (share has
+"vfs objects = acl_xattr" set), which fails the page allocator:
 
-I have already tested two solutions. The first one doesn't fully resolve 
-the issue however it is simple, safe and massively narrow down the 
-probability of the BUG occurring. The second is a bit more risky but 
-fully resolves the issue and I achieved it by adding a few spinlocks.
+  WARNING: mm/page_alloc.c:5226 at __alloc_frozen_pages_noprof+0x46c/0x9c0
+  Workqueue: ksmbd-io handle_ksmbd_work
+   __alloc_frozen_pages_noprof+0x46c/0x9c0
+   ___kmalloc_large_node+0x68/0x130
+   __kmalloc_large_node_noprof+0x24/0x70
+   __kmalloc_noprof+0x4c9/0x690
+   smb_inherit_dacl+0x394/0x2430
+   smb2_open+0x595d/0xabe0
+   handle_ksmbd_work+0x3d3/0x1140
 
-I am not a fan of option 2 since I found a commit that directly dealt 
-with a lock contention bug in CIFS by splitting one spin lock into many, 
-and I would like not to add extra pressure on the spinlock in 5.15.
+With the patch applied the added guard rejects the tampered value
+with -EINVAL before any large allocation runs, smb2_open() falls back
+to smb2_create_sd_buffer(), and the child is created with a default
+SD.  No warning, no splat.
 
-It was tested for days with no issues, however there is always a chance 
-that it might introduce deadlocks. The deviation from upstream would 
-also be greater with such a patch.
+Fix by:
 
-For Option 1 I had send a patch to stable 6.1 [1] and 5.15 [2], which 
-was rejected due to deviating from upstream (See email thread of [2]).
+  1. Validating num_aces against pdacl_size using the same formula
+     applied in parse_dacl().
 
-So I guess my question for the maintainers is, is it worth the risk to 
-backport commit 6916881f443f67f6893b504fa2171468c8aed915 to 6.1 and 5.15 
-LTS with any needed extra commits with it, try again with option 1, or 
-is the regression potential not worth fixing it in the LTS kernels?
+  2. Replacing the raw kmalloc(sizeof * num_aces * 2) with
+     kmalloc_array(num_aces * 2, sizeof(...)) for overflow-safe
+     allocation.
 
-I was asked in [3] to coordinate this with CIFS maintainers.
+  3. Tightening the per-ACE loop guard to require the minimum valid
+     ACE size (offsetof(smb_ace, sid) + CIFS_SID_BASE_SIZE) and
+     rejecting under-sized ACEs, matching the hardening in
+     smb_check_perm_dacl() and parse_dacl().
 
-Thank you in advance.
+v1 -> v2:
+  - Replace the synthetic test-module splat in the changelog with a
+    real-path UML + KASAN reproduction driven through mount.cifs and
+    SMB2 CREATE; Namjae flagged the kcifs3_test_inherit_dacl_old name
+    in v1 since it does not exist in ksmbd.
+  - Drop the commit-hash citation from the code comment per Namjae's
+    review; keep the parse_dacl() pointer.
 
-[1] 
-https://lore.kernel.org/stable/20260319144929.455978-1-ghadi.rahme@canonical.com/
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-opus-4-6
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
+ fs/smb/server/smbacl.c | 28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
 
-[2] 
-https://lore.kernel.org/stable/20260319144325.438788-1-ghadi.rahme@canonical.com/
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index d5943256c071..4a341c1f6630 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -1105,8 +1105,24 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
+ 		goto free_parent_pntsd;
+ 	}
+ 
+-	aces_base = kmalloc(sizeof(struct smb_ace) * num_aces * 2,
+-			    KSMBD_DEFAULT_GFP);
++	aces_size = pdacl_size - sizeof(struct smb_acl);
++
++	/*
++	 * Validate num_aces against the DACL payload before allocating.
++	 * Each ACE must be at least as large as its fixed-size header
++	 * (up to the SID base), so num_aces cannot exceed the payload
++	 * divided by the minimum ACE size.  This mirrors the existing
++	 * check in parse_dacl().
++	 */
++	if (num_aces > aces_size / (offsetof(struct smb_ace, sid) +
++				    offsetof(struct smb_sid, sub_auth) +
++				    sizeof(__le16))) {
++		rc = -EINVAL;
++		goto free_parent_pntsd;
++	}
++
++	aces_base = kmalloc_array(num_aces * 2, sizeof(struct smb_ace),
++				  KSMBD_DEFAULT_GFP);
+ 	if (!aces_base) {
+ 		rc = -ENOMEM;
+ 		goto free_parent_pntsd;
+@@ -1115,7 +1131,6 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
+ 	aces = (struct smb_ace *)aces_base;
+ 	parent_aces = (struct smb_ace *)((char *)parent_pdacl +
+ 			sizeof(struct smb_acl));
+-	aces_size = acl_len - sizeof(struct smb_acl);
+ 
+ 	if (pntsd_type & DACL_AUTO_INHERITED)
+ 		inherited_flags = INHERITED_ACE;
+@@ -1123,11 +1138,14 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
+ 	for (i = 0; i < num_aces; i++) {
+ 		int pace_size;
+ 
+-		if (offsetof(struct smb_ace, access_req) > aces_size)
++		if (aces_size < offsetof(struct smb_ace, sid) +
++		    CIFS_SID_BASE_SIZE)
+ 			break;
+ 
+ 		pace_size = le16_to_cpu(parent_aces->size);
+-		if (pace_size > aces_size)
++		if (pace_size > aces_size ||
++		    pace_size < offsetof(struct smb_ace, sid) +
++				CIFS_SID_BASE_SIZE)
+ 			break;
+ 
+ 		aces_size -= pace_size;
+-- 
+2.53.0
 
-[3] https://lore.kernel.org/stable/2026033136-refining-ladybug-08b0@gregkh/
