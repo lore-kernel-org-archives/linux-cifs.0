@@ -1,88 +1,164 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCD9382284
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 23:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3AA940DFC0;
+	Fri, 17 Apr 2026 00:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776382618; cv=none; b=tHWkXkG/XtdLva2ey7wCO+jreH5moRIY+AlCCfZ41FwMipwG3v/p2axgxesuuIDtOZMXBUSem9hsbl+l+9yjIxVb6+dKt173WJoGEnXWqIWYp43ygPV0Jxn+AQKwEiQxAHtmVlhcZafpMSfmgJY7NbmzGCKomkAe5RiuZeFl7DQ=
+	t=1776384959; cv=none; b=Wqi2qzs/fI20veFg6JDkH8WN8AnPkyzIc9rxqP6s72su7lwiOlapCTnkF4fnJDyW1r5No+Qg0ZJygJKxVLmLXjuo+r2JjEy6RKbhtvjzHEP7VHg9kWy6vld3VShYw1IN3YXyuLlxFEhN3w4AH5BVVZkF+eOUcrSRxGTL8aqkHoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776382618; c=relaxed/simple;
-	bh=Ia4Z1gW6inXqBnNjZ5tfjmiMCPXDFFfczDlGe0Y3rA4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H722NOZgnboxsH1ngHmh9wY82WY0+7iWAPBLn5EfeLHv7cveCr5TZo1SsmNvCKNXMbPJLnzWJdVz79rFv169dazJRAbfHWKmrzN8IlP2m62NepnzNvo6oHypERPhr9EsmjFtcB2+K29Egl71ecrD7ScZ9By9GG0lZIMAl1KIlUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHSY6H4H; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776384959; c=relaxed/simple;
+	bh=GaLR26YMKHEpPTz6l7m9Ngr/Gvcz/0LL5V+80n4wqj0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RZWQfSow4h0tzbnZWKR1NRDfiHhwumLhuXewiUgLcDnpZ8ejv5V2e92HVq0/nnJT3lGqVfBSzHSxsWaNEGpNQ+0YhcdHA9XE7/y5txuYCVHT/+yUVh1V7J72H541PvZRcKdr3FDPKGzaxGT7g4QkXB2uq2deLei96BgUa3U7jMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=lMvcKvYX; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHSY6H4H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCB3EC2BCAF
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 23:36:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776382617;
-	bh=Ia4Z1gW6inXqBnNjZ5tfjmiMCPXDFFfczDlGe0Y3rA4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=nHSY6H4HzrjG1B7ncgE10nhlBQ7WknRrHPKmbUNXlcwrnhGRl5eVmTSHviyuJXp8k
-	 /G+r62TmWTB0kXX+HVImcHx1VusvuKkQjUrKW58VayWTwUGBOKGc4uwzodgJsqA7wf
-	 LI/WAQ8QejwDcnGhm6duFABlx4t89+R3CJtbq8PSOJTJEsE4QSDvConlxbRu7JAD6B
-	 Xq+MNiG/6yTPLX8Kfm4j4pwHOLUfFVpqLPsygAl7Jp6Nkr3QkP7LQlHNUjDJ4TeI9V
-	 KSs46Xda+FSfm7ENDBrbKt/VbnqaNPuTO3x8YjIe77otNHZHtEVj/bq7l7QJgnFGgu
-	 IB7INjhGlrZ/w==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-672bd8d2400so108402a12.1
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Apr 2026 16:36:57 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ/JdE8vpPNpi1KgsrqwhnQln1/krbhHS5VlQupxbS8JBdXatBVOtebRr+LloDh3VQpc5dfkGk6Evi46@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFM950PYZIQibTj4LVn2kl4LFCPeZ4LraAm/iagw0pjugqh9mh
-	K/KeSzQHLeWjHX+wsWUQw0DPzaZ2tG6PGXv1w5YKLOs4cXkCNlk5Pyo6Um+f1JWjyaSl+z4ofh2
-	iBX4ZAuuLpiQYXs0+vgoLiCQo341BXAo=
-X-Received: by 2002:a05:6402:24cd:b0:66b:aa56:ee5c with SMTP id
- 4fb4d7f45d1cf-672bffd3a22mr237465a12.28.1776382616452; Thu, 16 Apr 2026
- 16:36:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="lMvcKvYX"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=aRybrhZ3O2xQQ8KQ99MAu6C0wcCHqBdT1DKsr4ddO7E=; b=lMvcKvYXGVVqqbm/AES0fGaD2E
+	B3/rc9We9KQOO4aM7grwrUZxgdpbyhU06XhTQKc5QSnXRGCSqHYHUy1i3inp9M/q16lhfQD2vCZ8y
+	HTBE9lDzxFmrQTQcfi18TjPe9K4i6qGQHV9sXEpiGFMDJLeGkV4i3Cc3Bj9G+I6Wcj/BZPYOrDcDW
+	68UrVid4KVS+v6u44El6kWafKgW2YM/fccURp0BZQcAw87gmBBqqkSlR2bzNXzydXpbt7HGZ4R2wD
+	CzAnCDWFdBrPqz4pHovflblnqIs4MTkB/+YuXLoFUEKSJRI84ORxyh+FzRgAJTI9Af7BhwqYipwNB
+	pAjldcFw==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
+	id 1wDWsC-00000000J7g-1R9N;
+	Thu, 16 Apr 2026 21:15:52 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: Steve French <smfrench@gmail.com>
+Cc: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	David Howells <dhowells@redhat.com>,
+	linux-cifs@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] smb: client: fix dir separator in SMB1 UNIX mounts
+Date: Thu, 16 Apr 2026 21:15:50 -0300
+Message-ID: <20260417001550.1301260-1-pc@manguebit.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260416211735.3558718-1-charsyam@gmail.com>
-In-Reply-To: <20260416211735.3558718-1-charsyam@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 17 Apr 2026 08:36:44 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-P=E+bc+3W4DffU4SRtBDysJ+0yhmsxX7LvNB_8vR=sQ@mail.gmail.com>
-X-Gm-Features: AQROBzB66y9CrUgy1WHZWYxRh_RXy7Qc-7PMcqfpOvkbqt64rMF7nxAIdWWdei4
-Message-ID: <CAKYAXd-P=E+bc+3W4DffU4SRtBDysJ+0yhmsxX7LvNB_8vR=sQ@mail.gmail.com>
-Subject: Re: [PATCH] smb: server: fix max_connections off-by-one in tcp accept path
-To: DaeMyung Kang <charsyam@gmail.com>
-Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 17, 2026 at 6:17=E2=80=AFAM DaeMyung Kang <charsyam@gmail.com> =
-wrote:
->
-> The global max_connections check in ksmbd's TCP accept path counts
-> the newly accepted connection with atomic_inc_return(), but then
-> rejects the connection when the result is greater than or equal to
-> server_conf.max_connections.
->
-> That makes the effective limit one smaller than configured. For
-> example:
->
-> - max_connections=3D1 rejects the first connection
-> - max_connections=3D2 allows only one connection
->
-> The per-IP limit in the same function uses <=3D correctly because it
-> counts only pre-existing connections. The global limit instead checks
-> the post-increment total, so it should reject only when that total
-> exceeds the configured maximum.
->
-> Fix this by changing the comparison from >=3D to >, so exactly
-> max_connections simultaneous connections are allowed and the next one
-> is rejected. This matches the documented meaning of max_connections
-> in fs/smb/server/ksmbd_netlink.h as the "Number of maximum simultaneous
-> connections".
->
-> Fixes: 0d0d4680db22 ("ksmbd: add max connections parameter")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+When calling cifs_mount_get_tcon() with SMB1 UNIX mounts,
+@cifs_sb->mnt_cifs_flags needs to be read or updated only after
+calling reset_cifs_unix_caps(), otherwise it might end up with missing
+CIFS_MOUNT_POSIXACL and CIFS_MOUNT_POSIX_PATHS bits.
+
+This fixes the wrong dir separator used in paths caused by the missing
+CIFS_MOUNT_POSIX_PATHS bit in cifs_sb_info::mnt_cifs_flags.
+
+Reported-by: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
+Closes: https://lore.kernel.org/r/f758f4ff-4d54-4244-931d-38f469c3ff14@moonlit-rail.com
+Fixes: 4fc3a433c139 ("smb: client: use atomic_t for mnt_cifs_flags")
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Cc: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: stable@vger.kernel.org
+---
+ fs/smb/client/connect.c | 10 +++++-----
+ fs/smb/client/smb1ops.c | 19 ++++++++-----------
+ 2 files changed, 13 insertions(+), 16 deletions(-)
+
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 69b38f0ccf2b..e9eeb9f8a561 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -3610,7 +3610,6 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
+ 	server = mnt_ctx->server;
+ 	ctx = mnt_ctx->fs_ctx;
+ 	cifs_sb = mnt_ctx->cifs_sb;
+-	sbflags = cifs_sb_flags(cifs_sb);
+ 
+ 	/* search for existing tcon to this server share */
+ 	tcon = cifs_get_tcon(mnt_ctx->ses, ctx);
+@@ -3625,9 +3624,10 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
+ 	 * path (i.e., do not remap / and \ and do not map any special characters)
+ 	 */
+ 	if (tcon->posix_extensions) {
+-		sbflags |= CIFS_MOUNT_POSIX_PATHS;
+-		sbflags &= ~(CIFS_MOUNT_MAP_SFM_CHR |
+-			     CIFS_MOUNT_MAP_SPECIAL_CHR);
++		atomic_or(CIFS_MOUNT_POSIX_PATHS, &cifs_sb->mnt_cifs_flags);
++		atomic_andnot(CIFS_MOUNT_MAP_SFM_CHR |
++			      CIFS_MOUNT_MAP_SPECIAL_CHR,
++			      &cifs_sb->mnt_cifs_flags);
+ 	}
+ 
+ #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+@@ -3651,6 +3651,7 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
+ #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+ 		tcon->unix_ext = 0; /* server does not support them */
+ 
++	sbflags = cifs_sb_flags(cifs_sb);
+ 	/* do not care if a following call succeed - informational */
+ 	if (!tcon->pipe && server->ops->qfs_tcon) {
+ 		server->ops->qfs_tcon(mnt_ctx->xid, tcon, cifs_sb);
+@@ -3675,7 +3676,6 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
+ 
+ out:
+ 	mnt_ctx->tcon = tcon;
+-	atomic_set(&cifs_sb->mnt_cifs_flags, sbflags);
+ 	return rc;
+ }
+ 
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+index 9694117050a6..e198e3dda917 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -49,7 +49,6 @@ void reset_cifs_unix_caps(unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	if (!CIFSSMBQFSUnixInfo(xid, tcon)) {
+ 		__u64 cap = le64_to_cpu(tcon->fsUnixInfo.Capability);
+-		unsigned int sbflags;
+ 
+ 		cifs_dbg(FYI, "unix caps which server supports %lld\n", cap);
+ 		/*
+@@ -76,29 +75,27 @@ void reset_cifs_unix_caps(unsigned int xid, struct cifs_tcon *tcon,
+ 		if (cap & CIFS_UNIX_TRANSPORT_ENCRYPTION_MANDATORY_CAP)
+ 			cifs_dbg(VFS, "per-share encryption not supported yet\n");
+ 
+-		if (cifs_sb)
+-			sbflags = cifs_sb_flags(cifs_sb);
+-
+ 		cap &= CIFS_UNIX_CAP_MASK;
+ 		if (ctx && ctx->no_psx_acl)
+ 			cap &= ~CIFS_UNIX_POSIX_ACL_CAP;
+ 		else if (CIFS_UNIX_POSIX_ACL_CAP & cap) {
+ 			cifs_dbg(FYI, "negotiated posix acl support\n");
+-			if (cifs_sb)
+-				sbflags |= CIFS_MOUNT_POSIXACL;
++			if (cifs_sb) {
++				atomic_or(CIFS_MOUNT_POSIXACL,
++					  &cifs_sb->mnt_cifs_flags);
++			}
+ 		}
+ 
+ 		if (ctx && ctx->posix_paths == 0)
+ 			cap &= ~CIFS_UNIX_POSIX_PATHNAMES_CAP;
+ 		else if (cap & CIFS_UNIX_POSIX_PATHNAMES_CAP) {
+ 			cifs_dbg(FYI, "negotiate posix pathnames\n");
+-			if (cifs_sb)
+-				sbflags |= CIFS_MOUNT_POSIX_PATHS;
++			if (cifs_sb) {
++				atomic_or(CIFS_MOUNT_POSIX_PATHS,
++					  &cifs_sb->mnt_cifs_flags);
++			}
+ 		}
+ 
+-		if (cifs_sb)
+-			atomic_set(&cifs_sb->mnt_cifs_flags, sbflags);
+-
+ 		cifs_dbg(FYI, "Negotiate caps 0x%x\n", (int)cap);
+ #ifdef CONFIG_CIFS_DEBUG2
+ 		if (cap & CIFS_UNIX_FCNTL_CAP)
+-- 
+2.53.0
+
