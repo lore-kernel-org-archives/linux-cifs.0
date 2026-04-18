@@ -1,133 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD431B78F3
-	for <linux-cifs@vger.kernel.org>; Sat, 18 Apr 2026 06:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D0E199385
+	for <linux-cifs@vger.kernel.org>; Sat, 18 Apr 2026 15:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776493700; cv=none; b=XFWqB0bJZnNFW6PGGZjuEEiEIr67wcW9ts2tJKlQXrzUaV5GVqzzk/1dw5ImYFxNHo1jUGbLpmgbFlsh0JsRBSxTHnYDIWTT47rG8Flj96RnLdMKrxnJEF4ZFUj257CubxmeqkUw3LhO2Nv5uPCyWkOSUVaRYOV6vQRLxHI6GUc=
+	t=1776527150; cv=none; b=QE0DS4DirIm9/hRzpceFR28B718O5TNhTO5ZMyFIw0u1lt6qKo+QwgOIM2456235KqmIpg+P3/XZbxqI7IUFl3LuB8kmKWy8R4rtCB5t8DPPJIz0LMfIQo2ntwt2ICUCpDzumw7fjnSGnDfkBEF55uSCZ0dlp7dTcVdNK+dq88A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776493700; c=relaxed/simple;
-	bh=OKKixADUa7Qf6rDznlLGRF7ZfXVBuUqdH9SbW6P5uA8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n7K6Kfxn2aYdMw93YtsrCAbkHhAks5Bml9w4qrirqSyCvCC3mp5JzO9jylz59CTIlmqXM/3DSkFerWBerM9FcndQeHYaUuSVuuPiuXGPOUpTQUjO9ESros9mQhDOmPvX1OrZpysIpcnDn+oqa3y8cfjrq95Ja23V/uK4IxHHwhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kJhtncX6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776527150; c=relaxed/simple;
+	bh=sX27uXV1JVZhbIDBUsq4KYLX5oQryToCfrgcG5bZcQA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tm0jXzGXu21mVGCO+OFa38lMdGz06Lfn17Oiauta5vLPeK7qZ33kWmNFbutRWvzahwd9gAJeh+EJlRIf7sGfndgAwIA9qfGazBam2RfFsHXpSYzw0r7CwVKrx1bJH6vmTFOWM7xRuCAKULD7hk3m8RxqV1WjyyandCL0mllJMLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f9cbbP1T; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kJhtncX6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70ABDC4AF0C
-	for <linux-cifs@vger.kernel.org>; Sat, 18 Apr 2026 06:28:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776493700;
-	bh=OKKixADUa7Qf6rDznlLGRF7ZfXVBuUqdH9SbW6P5uA8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=kJhtncX6vJAa9PCdqesPeHRLM5VMsy61rrXYaj4M4Y5zbbDzNgDW8BooY8YDwdu56
-	 Gqq/Vz7KwEMtJzmz0O276eTjtQBTomA0iEZyRS6LWt+Hg89TgM2LMT1GHdcA8QyMn6
-	 Rr7kGWQZpzZSNYwDKzp/pqZl5VW8pOle3rZ5f7cIxcLVJn+W8YyuZI2gL2XkQp8Gep
-	 gHaSD7+aDglEgK/7r7ufxIusnyTZeASAYfPBy7Epa5ONZLXj9/SaoLayTEFM+IxBwD
-	 rAws1UK5+FwYZN9GnInmNQpor20ZkxRPMnF7PV58vyFiW4Gmz8CE8KoTJbrk4xOgTF
-	 my9gW0DoLSiWQ==
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6634bb959a2so1916487a12.1
-        for <linux-cifs@vger.kernel.org>; Fri, 17 Apr 2026 23:28:20 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9xlUc7dJmraHNwoq+b0QAb546MHpm7Pq+Spb1nKc/MBFLbA8/uMBvNZpDdgfRTe9rxLZNpmpCm/m46@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfE48HqONFkLeFuy3oI2YhjZGNBlNE82CgzDFye2c0YIg8c9xC
-	GLEhUZCfj+en3aRcQuHqnkmwlBoEcLc5cetJDCdCIZdKc9co+AOSavYe73HYNtKQftsw6/7slVA
-	iWJ6wOi4WZMhS1v+FKz3TQwTP8sa1Oco=
-X-Received: by 2002:a05:6402:90a:b0:66e:aade:e2e3 with SMTP id
- 4fb4d7f45d1cf-672bfdde7b4mr2966711a12.27.1776493698960; Fri, 17 Apr 2026
- 23:28:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f9cbbP1T"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2ad21f437eeso10769375ad.0
+        for <linux-cifs@vger.kernel.org>; Sat, 18 Apr 2026 08:45:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776527149; x=1777131949; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nixch5XpAUlwvDbeIvi1QyFB/G5nvIJ1ufdy7DtrBwY=;
+        b=f9cbbP1T75icNfJrimxW+GIoKVb1jXxem9FGOKm6xkpo4FfzHnZgPtq4zsdeNmPQYT
+         lO1B53OA6zXcrSi8WvKrVxigq29GT5kQsTC7S0g9dqGH72pNBtHVazr8lOhO4Udkcmfh
+         gZMQrK+QMEkAkJRfOyLSyIsJI5BQbcuGjRDJg45M3YJQcdW5Pejz4YcOHMJc4MJ/DXKt
+         Tp/0zyZ8IXr5uNKdx9OofIY5gmqAyAApHp/ymAiM0Moqib70oc9wgsYFQSSMMn9njyUM
+         Kuu4gsWTkAWEk5gcYghtknTFwhvqQYiuocxUClg8bcZbcfHqigUvRPs10VWDucMUDQwC
+         +A1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776527149; x=1777131949;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nixch5XpAUlwvDbeIvi1QyFB/G5nvIJ1ufdy7DtrBwY=;
+        b=dgz1kTHi1kFYVRwGWscFgdohoWzUMIS2DDmzb6w4tDEA9270SSZ9eg9FiLHknl8No5
+         yRTtS+xgUFAMzt6wGsRwL0foWGCim/4oRO+AEwhSriwl0cBH7PkSgK63J84E9JjfLmUB
+         QyjqNtBQuBTeKHqPeFZdeMjSPyijFqxVDiLuVKdSMmOFhycNZEJ4cQ3o/4gyAYxyWSBf
+         lx2gjCBqVTQ6GvuOWnWWiceaPLAPkz/ohQgD8damzfp1vNdMVQnrHAt/DNnGAcXB/Rdo
+         Sc/j/xTA6B/OoAlbOAIOeTHDOrvVpBct6hlMG3ugdANIQhfHiJDuDusIpyW59LwwSuWP
+         vGcw==
+X-Forwarded-Encrypted: i=1; AFNElJ++tRGi99Pk3JxhZ3A6oK7wtyNQWRglT45v/vn3Qez6L4rRpuy9Rk6Gw5Bp1SBxp0RfW1iXhDBR/cqY@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGyD2SMFqo6N45xG0U8U1/zhzzFFTqky9qDuvUSCkOEF8Uawr8
+	AI56me8C+9/c6br3rA7tazvzaLEZ2kwrrhgu7+/q0pMR+akl1J6y2cWG
+X-Gm-Gg: AeBDietXE7pk1IvCMt/KFfxjdatvU7YGFFZio9amgs4DlJqZzlM078rhGtFi8nQuMxf
+	nSo6rW8NsCd1PS3AgeJFnyfON/TN98Mg+0wUnyHiyrGoFgtPCcWgWe9I/utUSKaZwYcsnZDf0tk
+	hlPLkr5TEos2sS6i1zFVQLKzKMExG9UyJCBuMSY6ZsziL/PyUnSZ1e4glTYjBgahRtfJCN/GDoL
+	g9uyxHHqKpJc+68ax5dQnQIQr9KjTllQQyZfa76Rq4XFQcbW9JZU0NmXav05AwCLvH2TJ/gClPM
+	kKKhGbsRjyeb55GRVWmdKI0VwOLrZe/0UMmXMZEIPMTvJMRHj54/iwE5RdHm478kpMaiSMIJzb/
+	LvABxY1Q55Ep5eqOBO+bRJjQEGJY6rFUiGg1dK5djk34kuAG+JMgkJTjK2/ducDyp/I+T1O7GGa
+	YNqizlWHUl+KzQVm8VL53wNCH7iLJiWCaK+wtD6UVBV9ipYwHGYbuoXcCOAj02cFk=
+X-Received: by 2002:a17:903:1aac:b0:2b2:54db:3e93 with SMTP id d9443c01a7336-2b5f9ecb056mr57628515ad.23.1776527148805;
+        Sat, 18 Apr 2026 08:45:48 -0700 (PDT)
+Received: from localhost.localdomain ([205.254.163.141])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5fab4cc47sm54703385ad.82.2026.04.18.08.45.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 Apr 2026 08:45:48 -0700 (PDT)
+From: Akif Sait <akif.sait111@gmail.com>
+To: linkinjeon@kernel.org,
+	smfrench@gmail.com
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	linux-cifs@vger.kernel.org,
+	Akif Sait <akif.sait111@gmail.com>
+Subject: [PATCH] ksmbd: fix O(N^2) DoS in smb2_lock via unbounded LockCount
+Date: Sat, 18 Apr 2026 21:15:05 +0530
+Message-ID: <20260418154505.84684-1-akif.sait111@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260416200439.2987930-1-michael.bommarito@gmail.com> <20260417184557.1138554-1-michael.bommarito@gmail.com>
-In-Reply-To: <20260417184557.1138554-1-michael.bommarito@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 18 Apr 2026 15:28:06 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-C358TaLXHAMdfEn8FBNjjfN1ONq3tuDSAyguzc2qEjg@mail.gmail.com>
-X-Gm-Features: AQROBzD3WcGqkyfD9s3HibPWpNoDBmgBkHVuGv04v9w7DgczlUEFgZ5QZ1DlAPQ
-Message-ID: <CAKYAXd-C358TaLXHAMdfEn8FBNjjfN1ONq3tuDSAyguzc2qEjg@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: validate num_aces and harden ACE walk in smb_inherit_dacl()
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	Hyunchul Lee <hyc.lee@gmail.com>, Ronnie Sahlberg <lsahlber@redhat.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Apr 18, 2026 at 3:46=E2=80=AFAM Michael Bommarito
-<michael.bommarito@gmail.com> wrote:
->
-> smb_inherit_dacl() trusts the on-disk num_aces value from the parent
-> directory's DACL xattr and uses it to size a heap allocation:
->
->   aces_base =3D kmalloc(sizeof(struct smb_ace) * num_aces * 2, ...);
->
-> num_aces is a u16 read from le16_to_cpu(parent_pdacl->num_aces)
-> without checking that it is consistent with the declared pdacl_size.
-> An authenticated client whose parent directory's security.NTACL is
-> tampered (e.g. via offline xattr corruption or a concurrent path that
-> bypasses parse_dacl()) can present num_aces =3D 65535 with minimal
-> actual ACE data.  This causes a ~8 MB allocation (not kzalloc, so
-> uninitialized) that the subsequent loop only partially populates, and
-> may also overflow the three-way size_t multiply on 32-bit kernels.
->
-> Additionally, the ACE walk loop uses the weaker
-> offsetof(struct smb_ace, access_req) minimum size check rather than
-> the minimum valid on-wire ACE size, and does not reject ACEs whose
-> declared size is below the minimum.
->
-> Reproduced on UML + KASAN + LOCKDEP against the real ksmbd code path.
-> A legitimate mount.cifs client creates a parent directory over SMB
-> (ksmbd writes a valid security.NTACL xattr), then the NTACL blob on
-> the backing filesystem is rewritten to set num_aces =3D 0xFFFF while
-> keeping the posix_acl_hash bytes intact so ksmbd_vfs_get_sd_xattr()'s
-> hash check still passes.  A subsequent SMB2 CREATE of a child under
-> that parent drives smb2_open() into smb_inherit_dacl() (share has
-> "vfs objects =3D acl_xattr" set), which fails the page allocator:
->
->   WARNING: mm/page_alloc.c:5226 at __alloc_frozen_pages_noprof+0x46c/0x9c=
-0
->   Workqueue: ksmbd-io handle_ksmbd_work
->    __alloc_frozen_pages_noprof+0x46c/0x9c0
->    ___kmalloc_large_node+0x68/0x130
->    __kmalloc_large_node_noprof+0x24/0x70
->    __kmalloc_noprof+0x4c9/0x690
->    smb_inherit_dacl+0x394/0x2430
->    smb2_open+0x595d/0xabe0
->    handle_ksmbd_work+0x3d3/0x1140
->
-> With the patch applied the added guard rejects the tampered value
-> with -EINVAL before any large allocation runs, smb2_open() falls back
-> to smb2_create_sd_buffer(), and the child is created with a default
-> SD.  No warning, no splat.
->
-> Fix by:
->
->   1. Validating num_aces against pdacl_size using the same formula
->      applied in parse_dacl().
->
->   2. Replacing the raw kmalloc(sizeof * num_aces * 2) with
->      kmalloc_array(num_aces * 2, sizeof(...)) for overflow-safe
->      allocation.
->
->   3. Tightening the per-ACE loop guard to require the minimum valid
->      ACE size (offsetof(smb_ace, sid) + CIFS_SID_BASE_SIZE) and
->      rejecting under-sized ACEs, matching the hardening in
->      smb_check_perm_dacl() and parse_dacl().
->
-> v1 -> v2:
->   - Replace the synthetic test-module splat in the changelog with a
->     real-path UML + KASAN reproduction driven through mount.cifs and
->     SMB2 CREATE; Namjae flagged the kcifs3_test_inherit_dacl_old name
->     in v1 since it does not exist in ksmbd.
->   - Drop the commit-hash citation from the code comment per Namjae's
->     review; keep the parse_dacl() pointer.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Cc: stable@vger.kernel.org
-> Assisted-by: Claude:claude-opus-4-6
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+smb2_lock() performs O(N^2) conflict detection with no cap on LockCount.
+Cap lock_count at 64 to prevent CPU exhaustion from a single request.
+
+Signed-off-by: Akif Sait <akif.sait111@gmail.com>
+---
+Hi Namjae, Steve,
+
+smb2_lock processes LockCount lock elements using a nested loop where
+each element checks all previous elements for conflicts. With no cap on
+LockCount a single authenticated request with LockCount=65535 results in
+roughly 2.1 billion iterations inside a ksmbd worker thread, pinning the
+CPU completely. A few concurrent requests hang the host entirely.
+
+Cap lock_count at 64. The MS-SMB2 spec defines Open.LockSequenceArray
+as exactly 64 entries so 64 is the intended ceiling. No real workload
+comes close to this in a single request.
+
+Let me know if you need more info or a reproducer.
+
+Thanks,
+Akif
+
+
+ fs/smb/server/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index ee32e61b6d3c..012f0c3585a0 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -7492,7 +7492,7 @@ int smb2_lock(struct ksmbd_work *work)
+ 	lock_ele = req->locks;
+ 
+ 	ksmbd_debug(SMB, "lock count is %d\n", lock_count);
+-	if (!lock_count) {
++	if (!lock_count || lock_count > 64) {
+ 		err = -EINVAL;
+ 		goto out2;
+ 	}
+-- 
+2.53.0
+
