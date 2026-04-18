@@ -1,128 +1,89 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1DFF389470
-	for <linux-cifs@vger.kernel.org>; Fri, 17 Apr 2026 19:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDD71FDE31
+	for <linux-cifs@vger.kernel.org>; Sat, 18 Apr 2026 06:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776454404; cv=none; b=EoJcN7I5q71ISy5hFg1vPkLH0WGKLKi4r8exNWk9TcQQg3jERg7TE43HQFagovTIyHNkHKsxI90rZKON0zyShS/WLBXt2Hk2BotsCM2PofqgmBwG4og+ChhT2Ri1Shqr5LULtrlaA6vbadB8R5VhKdNvrCcGNI2vC5MFL+iURcI=
+	t=1776493645; cv=none; b=kcWvMUUV9ggvgzDvRpqV275Api+GRDNlVkJcelCwrzbOyBXTPBwhtEmdRYTxbo7SnAPTvZ6QNUWQtGnrG+08pHCCdFz1J9ipguf/CbS87tEUWuc/a8iVME/98C28RiAeoW7dzvGRb639N3+x4A2jjYc0Ar2DXFXNGivIszgTXoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776454404; c=relaxed/simple;
-	bh=wSouMAxbC4qBTG56Li1QJbGu7+b7Rn1l0WqH5ApVDw4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sOd/90WQ5iB06ftpB6KE0KDD0dF81h+/w7cxNcJCJl55WqdwQ2FtRK7rmwwFZc/JLgXhC9q9wWIdP/BXCEX9scnlYIqh39fsj871QADgmD15Mmpog3w6m07ZoK1ARyxJ96inrXYiZyyi9maumfwsdpRJUFufaUEjQguI922spxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zfwpzdvd; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776493645; c=relaxed/simple;
+	bh=5TM9w5ZWH4mYmyD0uBCL9WRquWjldbq36QbHPeMcFyI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fIDjChQytalE7wA1Zf+Fb58EdciG8ns1W1yiUuOVzq9gn7k2sa5+ixAclXFOXRnjYC5Db+GHlnbtnvbFNqcW7ZqAWbOyYxvNWG6I6c0YeijQc6H3YmsKQrRVpOFu097zwzRJqqQj4J4NAGnf0tRW/KTc2rZrvNzrjBtqYDVlFbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=utPl4PdP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zfwpzdvd"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43cfd1f9fd1so660512f8f.3
-        for <linux-cifs@vger.kernel.org>; Fri, 17 Apr 2026 12:33:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776454399; x=1777059199; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kQ0cthg0w4P6S7KugYGvtLaxhgxAoG60Ed2oJXFQlJE=;
-        b=Zfwpzdvdgew6YVKkzjQU10DXoYj8onpvnXmHUf9zsPbNCD59dL0gSkbUO1EZA6PnKo
-         WiZe864Tz9ApWMdKvIIXx1UniqinnJPZWN/rNWm9jm4CpQB7Tpx+KQvfTNoykE2Bm00H
-         1icNTvekACYfOrozraQSvZ6RcBRjQHNFqcbpN1GoklQr05pfG2WE0nmjpRjOJwr/4JJz
-         v9Jgr1JK/BlH6jeBxPcpCgy2VOWGlJ31e9vxKxnQbXzG32i8GwJdojA/LOEfQGQZwgTh
-         uh8BvvFU4IpFvfP6Dl8f2skhZMF8bess0QIfAu4CVF5PJfoth/zZ9WTBqZ0F8nPS6mkl
-         NLfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776454399; x=1777059199;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kQ0cthg0w4P6S7KugYGvtLaxhgxAoG60Ed2oJXFQlJE=;
-        b=Faw5cZCOpoLlK6ajmIEIZl+ZSQ8QO4wbmqnH203xn2DM0HhMVy6lD8QAM9PpbOjaav
-         d150prMH1EBINJ9k1r5W6mPyLcRCgAqG7zVjTtU1Z5Zd9cWmZVJCABf0fM5gckFfq/RP
-         xsVQUhWSIU4TzdLb2yUhG0Hq06SXgrXC6eL1zEs89gQP5RvySkJJuAWb9M/PMTSkhikZ
-         IFhrSxLB9kOmEmMU/lp3Isxr14uNpcWsTY1aVmOSQGCvxUGdZu0JInoKVwH1gnfbb9f/
-         RbQSeQUGIZMME4FRYN2IszKupFUCi14MixKbzwDRuPQR4QYNWcqpZ0giqalzLohPcayG
-         1ssw==
-X-Forwarded-Encrypted: i=1; AFNElJ+Jtapv+1M7zR3kegZxpeM2hok9jfzcudTxOkScmoQdZOyiOm0FRjH2jmWMdT1lcchb0CYicrQkUwvF@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk93e4mQH4O6rMnax7qHn9JM0JVPTqzay1mIGBiFFhzTfSI+3n
-	sBBN5pe8HJmTxJ1xUUM4rMnKL2SYXmMTtvpA+JXrI2ZqG2nIqyKEY5oJm4Xbc+Y=
-X-Gm-Gg: AeBDiesiEAOeDNaguDYn+1Pls0Y/Jzsqg5r0hISpsRMCfncSidTATm5ekxSlhbDMKJX
-	hF2tFY1JaotxCgiSlVQtMo7edN9EHudREBnhb1RI8cFLG+WRbpZ10n3zLiall05OwCIxkdcBr54
-	sGJit/Wcibpyx84nvKO2MxFxiVfos0GdIWzebXyXCcQ7G6HvGYwoEVgSp/LK+EK8FETrqOPtrRP
-	4ExZcVmVoiODT1RaagzVh4ybMOsmCcPow03FFVWQnKZhXqT8aQm5sKXDREZWVwTnL25MunZqRiR
-	yQ2ux4IyvaktxGbFDp3VpSl9ezh7mMZU7VJTH+z87NeSBjK19B8UejWl/9ZDjkulLDeA22hRQci
-	lTezhzQTwpjVC3ymBeCLmmTPH6xWEWkTM3BMZMionCb1YZQqghBTJcP4nFJaW3fiBvcUm3GibYy
-	TxcElwLbfaJgpIggc9
-X-Received: by 2002:a05:6000:1446:b0:43d:73d4:b2f with SMTP id ffacd0b85a97d-43fe3e11634mr6425771f8f.39.1776454399246;
-        Fri, 17 Apr 2026 12:33:19 -0700 (PDT)
-Received: from debian.. ([2001:41d0:303:db6b::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e4daf2sm6341754f8f.33.2026.04.17.12.33.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Apr 2026 12:33:18 -0700 (PDT)
-From: Tristan Madani <tristmd@gmail.com>
-X-Google-Original-From: Tristan Madani <tristan@talencesecurity.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	stable@vger.kernel.org,
-	Tristan Madani <tristan@talencesecurity.com>
-Subject: [PATCH v2] ksmbd: fix out-of-bounds write in smb2_get_ea() EA alignment
-Date: Fri, 17 Apr 2026 19:33:17 +0000
-Message-ID: <20260417193317.315698-1-tristan@talencesecurity.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260417192036.268452-1-tristan@talencesecurity.com>
-References: <20260417192036.268452-1-tristan@talencesecurity.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utPl4PdP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4924BC2BCB9
+	for <linux-cifs@vger.kernel.org>; Sat, 18 Apr 2026 06:27:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776493645;
+	bh=5TM9w5ZWH4mYmyD0uBCL9WRquWjldbq36QbHPeMcFyI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=utPl4PdPPXAbRHhiZgQ+1s6dAjpaRUjdqkzdbu2nyNaWMvrjchONZfbYq4/K8HgjG
+	 sWxF2Mx+clYEKv6vBEXt+LEr9SXwLUAyK9ylVu2cPCM1V924Q4OD4u2sSjc2A4U8IZ
+	 SI8+75/4saRjO3eJI9KGO3MyvjGB+Vxct7Zj1JOXl8lCcWob5kCmfh0NXH4k27DfCv
+	 aCq1O1hUuvDGaFHOuuTjaRUnnX6U2PRyN57cmCnA6yobr+ET9TRv3k/xSDZMiirW2g
+	 a2peTGr7iF5afRSMEPmOqlnu/BBNQbLEHLxEihPf2CNgNbYX2RHrBX88MUHLXlalkW
+	 m52QLpAUVtfHw==
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6714f678bdaso2368834a12.3
+        for <linux-cifs@vger.kernel.org>; Fri, 17 Apr 2026 23:27:25 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ/Kfp6H0EHuAujx7B0OPDBDTGZ3+dNPkgWdS0kldBdmOMlsuhHqBc36lZgBLM8vFYSyJMgr0+3PPZ1M@vger.kernel.org
+X-Gm-Message-State: AOJu0YyILvoDnfJoBikmfrMKQhBows/QFspzbEp3rbIahkx9J2w6fG2A
+	JSG05v1lD1n3RO15tQYTQqpD85sEmlC2BmNGyrjlsVawdYbuZt8BxjGRMbypkPHW4PDA5a+SWeP
+	uoB5cMTZ8pv9PyZSa4vGLuHbeFpQMrfQ=
+X-Received: by 2002:aa7:d388:0:b0:670:7c64:c24d with SMTP id
+ 4fb4d7f45d1cf-672bfd86d7bmr1860043a12.6.1776493643764; Fri, 17 Apr 2026
+ 23:27:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260417192036.268452-1-tristan@talencesecurity.com> <20260417193317.315698-1-tristan@talencesecurity.com>
+In-Reply-To: <20260417193317.315698-1-tristan@talencesecurity.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 18 Apr 2026 15:27:11 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-v03Tq_qjnDz-e3N8_S+rwxxnp5nucTriQ0DQLXHbRtg@mail.gmail.com>
+X-Gm-Features: AQROBzAYErow6xVrOZcyiMd-RnTYn03NP56HDBzGDq16YhGLX9m2x2YPRuGaUZQ
+Message-ID: <CAKYAXd-v03Tq_qjnDz-e3N8_S+rwxxnp5nucTriQ0DQLXHbRtg@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: fix out-of-bounds write in smb2_get_ea() EA alignment
+To: Tristan Madani <tristmd@gmail.com>
+Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, stable@vger.kernel.org, 
+	Tristan Madani <tristan@talencesecurity.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-smb2_get_ea() applies 4-byte alignment padding via memset() after
-writing each EA entry. The bounds check on buf_free_len is performed
-before the value memcpy, but the alignment memset fires unconditionally
-afterward with no check on remaining space.
-
-When the EA value exactly fills the remaining buffer (buf_free_len == 0
-after value subtraction), the alignment memset writes 1-3 NUL bytes
-past the buf_free_len boundary. In compound requests where the response
-buffer is shared across commands, the first command (e.g., READ) can
-consume most of the buffer, leaving a tight remainder for the QUERY_INFO
-EA response. The alignment memset then overwrites past the physical
-kvmalloc allocation into adjacent kernel heap memory.
-
-Add a bounds check before the alignment memset to ensure buf_free_len
-can accommodate the padding bytes.
-
-This is the same bug pattern fixed by commit beef2634f81f ("ksmbd: fix
-potencial OOB in get_file_all_info() for compound requests") and
-commit fda9522ed6af ("ksmbd: fix OOB write in QUERY_INFO for compound
-requests"), both of which added bounds checks before unconditional
-writes in QUERY_INFO response handlers.
-
-Cc: stable@vger.kernel.org
-Fixes: e2b76ab8b5c9 ("ksmbd: add support for read compound")
-Signed-off-by: Tristan Madani <tristan@talencesecurity.com>
----
- fs/smb/server/smb2pdu.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index ee32e61b6d3c7..407173d2175af 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -4821,6 +4821,8 @@ static int smb2_get_ea(struct ksmbd_work *work, struct ksmbd_file *fp,
- 		/* align next xattr entry at 4 byte bundary */
- 		alignment_bytes = ((next_offset + 3) & ~3) - next_offset;
- 		if (alignment_bytes) {
-+			if (buf_free_len < alignment_bytes)
-+				break;
- 			memset(ptr, '\0', alignment_bytes);
- 			ptr += alignment_bytes;
- 			next_offset += alignment_bytes;
--- 
-2.47.3
-
+On Sat, Apr 18, 2026 at 4:33=E2=80=AFAM Tristan Madani <tristmd@gmail.com> =
+wrote:
+>
+> smb2_get_ea() applies 4-byte alignment padding via memset() after
+> writing each EA entry. The bounds check on buf_free_len is performed
+> before the value memcpy, but the alignment memset fires unconditionally
+> afterward with no check on remaining space.
+>
+> When the EA value exactly fills the remaining buffer (buf_free_len =3D=3D=
+ 0
+> after value subtraction), the alignment memset writes 1-3 NUL bytes
+> past the buf_free_len boundary. In compound requests where the response
+> buffer is shared across commands, the first command (e.g., READ) can
+> consume most of the buffer, leaving a tight remainder for the QUERY_INFO
+> EA response. The alignment memset then overwrites past the physical
+> kvmalloc allocation into adjacent kernel heap memory.
+>
+> Add a bounds check before the alignment memset to ensure buf_free_len
+> can accommodate the padding bytes.
+>
+> This is the same bug pattern fixed by commit beef2634f81f ("ksmbd: fix
+> potencial OOB in get_file_all_info() for compound requests") and
+> commit fda9522ed6af ("ksmbd: fix OOB write in QUERY_INFO for compound
+> requests"), both of which added bounds checks before unconditional
+> writes in QUERY_INFO response handlers.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: e2b76ab8b5c9 ("ksmbd: add support for read compound")
+> Signed-off-by: Tristan Madani <tristan@talencesecurity.com>
+Applied it to #ksmbd-for-next-next.
+Thanks!
