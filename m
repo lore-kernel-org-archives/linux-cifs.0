@@ -1,166 +1,94 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D7222541C
-	for <linux-cifs@vger.kernel.org>; Sun, 19 Apr 2026 01:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776562615; cv=pass; b=G8lEBTLf1V4+NtXQzb64i6f96rVOC3nrpAOI4x8jwmqfd1hFKC52tum/Kj8GNTGdH8T2YdtDKMWKVdGuHyY9X3q/4v8IpmxCJDjyRip/z6QZNIATMnF9LtjZbz9ZAfWl996OZKHu0pQrCpkfAExnRi9K+JvVuPqowYAQ2TK7fTY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776562615; c=relaxed/simple;
-	bh=SIuzGJEOyfdQbVHrkN9auEfohxql8b/XIH1Ni0aYNGo=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AD73783D4
+	for <linux-cifs@vger.kernel.org>; Sun, 19 Apr 2026 07:29:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776583792; cv=none; b=Bg8rsXjN8n3GCao5yIMLctaYbuhrzEvAn74SFR35rdRUGg4t86eAmQFBFFI/6wzrf38+64QCIp7V8BJrapIdPkmXTs+l1rSNUkKeZH9RW597KUCt99Vp1ze4KfO64siRrw5LxauqgmudP7xP+Zxly/cz4X1dTuqOAhSJ/O82F00=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776583792; c=relaxed/simple;
+	bh=QJqUE+KIWv01jPr0qaOhAYIMdk3vkM2VjM9uMykgIa8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fb6weles58MHt0R5h1hAaQmraHz/K0t8e4l50S4dECfKPcvArw4QGs8vOVHPdw08CPxLVg2S0UV/2TyOkJfYEXxK48WBE1iLsl478nyLW8ulSG4RknGQW9CtABwgm9cs5pKnVa0mUjESt22fqxZhXn6R4EU6qgJP9Dr3S7lolx4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=etdYbYDR; arc=pass smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=Pd7lFPI+57RYo2KQS9DuOfXV3PUFR01MbAf+0+7A9hbehBmJdzeTLkB2w8Y7Cv0Dh4IMrmLKZFoVQ3av+WWKgXuJVxaNKyuiujg2Hp53cTfdlHAJAWq2Mn/nmNM0Tzv0sZSi+MRxQFv9UFNWfJy5hG8r2hD1riwIpLrvqo0dh5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nlkF91Sc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="etdYbYDR"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-506a7bbe9d0so16374711cf.0
-        for <linux-cifs@vger.kernel.org>; Sat, 18 Apr 2026 18:36:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776562612; cv=none;
-        d=google.com; s=arc-20240605;
-        b=WvEuz6t67RFJKih1Yy7CkRbnNvFV4ZtgbPetzfaDaxISlJe9aD6VaBg2hFL0JGY3pK
-         BKoQoUpG0yIT+41nJj/xhMXpb+vUXAaRnt8aSE3w04kIxn0WfO11TFzyJu0NuA9NpQ5a
-         UJfH7FSgRwCJ1dghA1yvJFhzXBxOB8fQnK2B/kkLoDcDfTjj/Ik9tl03WHXaxYY1TjPW
-         /ajY6L7LVQzO7z/X1iXCsNdAU8txLzHmJ8ffpbmJBvQo9/yhPAZC2kJ5X3+Oz69REFc+
-         mfjQbR90+TgxBL6F9/6tOlkOuRqE2Sa0szNg70XHPdIo4oRqD0BhTQQTygjheMaNeAv9
-         6BFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=8azCiZa6V4YdsfYQY+Iy8S7RLv+cv/K0CnDSyjduQcs=;
-        fh=l4ThzsJjA/Nwhh97MRajyPCgWfVr8GIfKizMmBsb890=;
-        b=X7+ED+Bhu37TMJSjr95jcn37jDbjqj7wcmKDE2bkaOvzjS3/M9qLWtxMf+qhJ4bDHx
-         +KP1kCOXF2eT97IRlItmrH3KlcGXmiXT/5YFzwmqbFPHmZBMATqhaS6qgVa+4mCyCYHM
-         J9pmfWaaNZtK6ypwSojxAmwZmc3hKfclU44LvASl487IOp+gEPIY9sEJb5tElzx72Gn4
-         5ChQg1CBH0Ree/geHkHT9Aq1tRHXmS3T5EzRAYeoED4ka/ciIWDznfm1rNAlqZ3s8T3/
-         hTuhnrXIKpF+wNQuLEJ4kJHacJxS+2k4hrrTM/lalTJ/EA2DnfMAeO4KfuKzejPWTDip
-         Rc7g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776562612; x=1777167412; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8azCiZa6V4YdsfYQY+Iy8S7RLv+cv/K0CnDSyjduQcs=;
-        b=etdYbYDRX1im72blh0xBhg8GPKvbYNqT+oGPIbsTa13vy3aB7hiWcEWCgmHQn1u4WB
-         k31CXU6X3S2pbga6g89zBNZiCXxM7KPUC41lpasQIcVfOVYL8Pb5R70NMAjZh7+QV31t
-         Mu/xhq1ewkerh3KzI3TP7z4er/++73tKqady7Kch+jcA1N2tV79aqmwQ+2nFBmg1I7Fe
-         Cj9EFf0XVrAutsmbKzUDU2/0BF866alu5BM1Lb4mJ42PzMYbeRG774jbXuGFPNosZVnF
-         AbzJZg6wZnpx49PFkV2mZPoMX+8M5fKT0RVRIyYI6Oy6qxfQMG0Nx22UkdflgLiJHCMH
-         7VyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776562612; x=1777167412;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8azCiZa6V4YdsfYQY+Iy8S7RLv+cv/K0CnDSyjduQcs=;
-        b=fqs5wyKvMl4at+SixZVNdowBQvyi6BKBsrGCrKqhW9//EZl+oAclkMmiSAJzfk3/a6
-         4qyDhSicmbnBTtWMJ7c/3W/sqb5E5mNYHOGBYZN2obqe21F8aTY+svQxcvmM36NUgBJE
-         67G6VpV5BnwKUG+gvLTXgkiqSEO6/fQDOkXnIB2fpPwJL6LfWrojDrrDOl8mgAz2baqU
-         OyrX/H8FY0FNjo+0n9K7VQZyili+A3pznDe67GbpJOCAHBOMhJMHp7bI+1m8HuBmAoy6
-         AxQkV5T47MmmKqBLPNkHPDLndxqEwbtcV343Pe8PS+WFbCoRiEs0wJLd5Kv8sU5LNtWb
-         2mGA==
-X-Gm-Message-State: AOJu0YzzV9ZD6VeQK65jMxDuY5bVCtpVi2R6dYdH96A04F3C2c2Sb3wG
-	EDZvGJD+Nw8B5Kid6T9sUCaqRwbrsAAH3qUHi8t9g9YYI4Nvfr/ypLiIvzs/w7F2AzE0+3RjPKr
-	UlMT+np37q5qWdjOIsSYJ/OCFu3qFhxE=
-X-Gm-Gg: AeBDiesF3+HxOqtxjeiyK3a+gtz/3nC8a9MZJMOt/5pGWzBS2jccmj5R9ENt7rlB8fa
-	kqv5+VLmS9ulhd60cGF+4aiD/hw6gUJJfRNFOx7NGqrHT3WPoTSNAojt/aLMPMqD6PxfAOzpniR
-	lrxaf6CqO/9w9+X1JXP2/rR1Najre6/HBSza3+cue0w+22NS0M/PYlzbr9xJ2RTQ8IvhLwBQO4O
-	Oy95AQ2lG1NejHQBWGNMT0yHY8MgaZLAbWAeAorFlQ24opPsdsn1xuhrIB0HhO8/GbVmLD4ibIA
-	Q7yEoTx5s69G8RyTrihQoBH9riOknNMi1inx6LQmnH9UKk8sAj4Pws7ML8Wf84hkvdqaN5w/CCs
-	Q6Q6hfZcVr6a+mzkPR/C5cg8MOFZW/4waigPorfsMRtb4H+1+smoWVzeWJzT67xepqdsHApOT1P
-	57DH+00iKz0MXFIk/+tYVurUn0po9zBK2g
-X-Received: by 2002:ac8:5807:0:b0:50d:7504:b719 with SMTP id
- d75a77b69052e-50e36ee7aefmr137108941cf.52.1776562611630; Sat, 18 Apr 2026
- 18:36:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nlkF91Sc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B40F0C2BCB8
+	for <linux-cifs@vger.kernel.org>; Sun, 19 Apr 2026 07:29:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776583791;
+	bh=QJqUE+KIWv01jPr0qaOhAYIMdk3vkM2VjM9uMykgIa8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=nlkF91ScFrhpJeWmo1aO+q9hRzmgOcNKxtcqnRMBVcf9SjhY9uEGOy0rXV/+addoR
+	 39Zn9iZBa0yim4uCArlyeqAtJIoKPYE0b5MWFHpVrf68eDBztMYO7Jf7/ZMjFQSTF1
+	 FUfB1Zr+NGRCkq54I/unG5GC2ACKao4OFLTVSOgzLtmrIlbo6OLhjPRPd14N7HNdnf
+	 Eag/SWD1qUrqi7ck1AzlIhiwxMv75FB/zbo/gCucQBggWMxQ7njYlD2nCsUo4K9Mfy
+	 7AXCir9HquZyqrmaUaXwSQtC17FO3Q6qAZkkLG64i4klgiPyIEkM/ibh3YSztGNyEB
+	 9mt7dEfYqFcCg==
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-672c23aa064so3718008a12.2
+        for <linux-cifs@vger.kernel.org>; Sun, 19 Apr 2026 00:29:51 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+HjQvwtaFKtposhuVLDw0iqvrDIeqavHR4uUw3WvAM3kQ4zi4JtYlh46pY9mmDYJU6lAIK9WOp1cYp@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcA00cBRHgZpqnjq2IEVAsbyC75qJY9FWdPMLShIHQLF9t/GRk
+	gPEiQ7KnqIUKzqzEu1z0GznWXcEI39lCFCDRnwOyGMj/819x47o6ftDjr/Xa60WyqeW7iMJDVNK
+	UU+uVaAr9DEqfjD9QololMxvCPTTRCcg=
+X-Received: by 2002:a05:6402:a54e:10b0:669:cc03:334a with SMTP id
+ 4fb4d7f45d1cf-672bfd9db0dmr3075102a12.11.1776583790183; Sun, 19 Apr 2026
+ 00:29:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260418221311.67583-1-ebiggers@kernel.org>
-In-Reply-To: <20260418221311.67583-1-ebiggers@kernel.org>
-From: Steve French <smfrench@gmail.com>
-Date: Sat, 18 Apr 2026 20:36:39 -0500
-X-Gm-Features: AQROBzCK7srreg0o2SXwUbTa33baOj43xTQYmO1CQ0YZRMqB_en4VoZsbvby9rI
-Message-ID: <CAH2r5mu-zJa_N_NJERuOrAbS4RnKsaMTroZs6Nxdtd9CNGo-_w@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] smb: client: Use AES-CMAC library
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>, 
-	linux-crypto@vger.kernel.org, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
-	Bharath SM <bharathsm@microsoft.com>
+References: <20260418172844.1333378-1-charsyam@gmail.com> <20260418172844.1333378-3-charsyam@gmail.com>
+In-Reply-To: <20260418172844.1333378-3-charsyam@gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sun, 19 Apr 2026 16:29:37 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_0-qXXktu0EBmLWATqthSXetVvQ2EzpgBnsOkq1bU=wQ@mail.gmail.com>
+X-Gm-Features: AQROBzAOKLjcpFyO0NiqvNftv3mmS9SxvjLG3WX0f-Iq4zWubKruu_tv2He3XbY
+Message-ID: <CAKYAXd_0-qXXktu0EBmLWATqthSXetVvQ2EzpgBnsOkq1bU=wQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] ksmbd: reset rcount per connection in ksmbd_conn_wait_idle_sess_id()
+To: DaeMyung Kang <charsyam@gmail.com>
+Cc: smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, Henrique Carvalho <henrique.carvalho@suse.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next pending additional testing and review
-
-On Sat, Apr 18, 2026 at 5:13=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
+On Sun, Apr 19, 2026 at 2:30=E2=80=AFAM DaeMyung Kang <charsyam@gmail.com> =
 wrote:
 >
-> This series updates the SMB client to use the AES-CMAC library functions
-> that were recently added, instead of a "cmac(aes)" crypto_shash.  As
-> usual, this simplifies the code considerably and is much more efficient.
+> rcount is intended to be connection-specific: 2 for curr_conn, 1 for
+> every other connection sharing the same session.  However, it is
+> initialised only once before the hash iteration and is never reset.
+> After the loop visits curr_conn, later sibling connections are also
+> checked against rcount =3D=3D 2, so a sibling with req_running =3D=3D 1 i=
+s
+> incorrectly treated as idle.  This makes the outcome depend on the
+> hash iteration order: whether a given sibling is checked against the
+> loose (< 2) or the strict (< 1) threshold is decided by whether it
+> happens to be visited before or after curr_conn.
 >
-> These patches were originally sent as patches 8-11 of the series
-> https://lore.kernel.org/r/20260218213501.136844-1-ebiggers@kernel.org/
-> The only change from that version was adding tags and rebasing.
-> I also added some microbenchmark results below.
+> The function's contract is "wait until every connection sharing this
+> session is idle" so that destroy_previous_session() can safely tear
+> the session down.  The latched rcount violates that contract and
+> reopens the teardown race window the wait logic was meant to close:
+> destroy_previous_session() may proceed before sibling channels have
+> actually quiesced, overlapping session teardown with in-flight work
+> on those connections.
 >
-> This is intended to be taken through the smb tree, either 7.1 or 7.2
-> depending on maintainer preference.
+> Recompute rcount inside the loop so each connection is compared
+> against its own threshold regardless of iteration order.
 >
-> A few microbenchmarks that demonstrate improved performance:
+> This is a code-inspection fix for an iteration-order-dependent logic
+> error; a targeted reproducer would require SMB3 multichannel with
+> in-flight work on a sibling channel landing after curr_conn in hash
+> order, which is not something that can be triggered reliably.
 >
->  - Total cycles spent in generate_key() during SMB3 mount
->    decreased from 20640 to 10780 (3 calls total).
->
->  - Total cycles spent in smb3_calc_signature() during SMB3 mount
->    decreased from 177620 to 73180 (32 calls & 4255 bytes total).
->
->  - Total cycles spent in smb3_calc_signature() while writing 10MB file
->    decreased from 27551180 to 26628360 (10 calls & 10001392 bytes total)
->
->  - Total cycles spent in smb3_calc_signature() while reading 10MB file
->    decreased from 28390900 to 27879340 (14 calls & 10001781 bytes total)
->
-> Note that my "before" numbers were taken from current mainline which has
-> my changes that made the "cmac(aes)" crypto_shash a bit faster as well.
-> So the speedup vs v7.0 is actually even greater.
->
-> Eric Biggers (4):
->   smb: client: Use AES-CMAC library for SMB3 signature calculation
->   smb: client: Remove obsolete cmac(aes) allocation
->   smb: client: Make generate_key() return void
->   smb: client: Drop 'allocate_crypto' arg from smb*_calc_signature()
->
->  fs/smb/client/Kconfig         |   2 +-
->  fs/smb/client/cifs_unicode.c  |   1 +
->  fs/smb/client/cifsencrypt.c   |  62 ++++++-------------
->  fs/smb/client/cifsfs.c        |   1 -
->  fs/smb/client/cifsglob.h      |   7 +--
->  fs/smb/client/cifsproto.h     |   3 -
->  fs/smb/client/misc.c          |  57 -----------------
->  fs/smb/client/sess.c          |  11 ----
->  fs/smb/client/smb2proto.h     |   1 -
->  fs/smb/client/smb2transport.c | 113 +++++++++-------------------------
->  10 files changed, 53 insertions(+), 205 deletions(-)
->
->
-> base-commit: 8541d8f725c673db3bd741947f27974358b2e163
-> --
-> 2.53.0
->
->
-
-
---=20
-Thanks,
-
-Steve
+> Fixes: 76e98a158b20 ("ksmbd: fix race condition between destroy_previous_=
+session() and smb2 operations()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
+Applied it to #ksmbd-for-next-next.
+Thanks!
