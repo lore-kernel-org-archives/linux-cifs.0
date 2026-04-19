@@ -1,63 +1,48 @@
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.186])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7796DCE1
-	for <linux-cifs@vger.kernel.org>; Sun, 19 Apr 2026 16:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6972C26C3BD
+	for <linux-cifs@vger.kernel.org>; Sun, 19 Apr 2026 19:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776615407; cv=none; b=grlsf5eGKIwy34IJ2A38XNTcblARsK1Q/GRVuBwFM2QjKgt6KSR0ZhTijuVYyfuVZMO9ochOvgiz/w6KJWuX0U0B6eEMMwRLoUOxw3TRZzQJrGu1Wc/n0VC0Kvbhm8Mnk6zcgFkmuCH1MEAhhA91hBSauBT85TlXvPph+NZbZM8=
+	t=1776626468; cv=none; b=m0Szozgg7xMvjayQAf6Q0wMUagAVztNhgvF8HqWNtNSXX9IGjaYpwBW4tEB9TshosULE552CDrr+q+ozK+9Ua719jOMVulzBCTrF9/tcEQMDNgBKmihV4qADXvOjbfLBRJiPo3KvTloTLWiXyiULuxRyU/fMqrcLlJpvitF7/Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776615407; c=relaxed/simple;
-	bh=+fySva1/0STurilohwVEd0xk9CXKnmouisbr5rNdygg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WtOMIBJ+ukqkpsdJTTYgxha67dD1d/5cM95kSUNutjmTViN7jPROGFmwebOZBWRh2FaP5AKtmJGozq26W9bi2BO+MDeoWX1yAmI+Hb856wTMCt0xYTHjrNA991N+Y2CP/wk0kvv8Icqni+yFkamIsAPdtP0gOKTg1JrKpyWaP2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=KTn6pVPn; arc=none smtp.client-ip=195.121.94.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
+	s=arc-20240116; t=1776626468; c=relaxed/simple;
+	bh=BPl7ADuNz7/gW/pd0zDxbcxpiGfp8YXTzEBUvCbIbsM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tlXYU95Ybb9vsfarfN9MxGs41ggCyOrUHU1nBDbaPzc/v38DiILqTiWd3RQi3BUqSVHNUNqCXROWzICQMUBk0HT9PVr++6JPmnS1SuAaw+1muPtEcDEyVr7gx+yfsP6wgUlxX4td0sXd9KAxlJO+C/GlVhq0QU6mTB2UwiEn8c4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=VORilKVH; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="KTn6pVPn"
-X-KPN-MessageId: 277ac91a-3c0b-11f1-89e1-00505699b430
-Received: from smtp.kpnmail.nl (unknown [10.31.155.5])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id 277ac91a-3c0b-11f1-89e1-00505699b430;
-	Sun, 19 Apr 2026 18:16:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=xs4all.nl; s=xs4all01;
-	h=mime-version:message-id:date:subject:to:from;
-	bh=AO9yyyXYcUIlzcELFTB/fVBRpc9JQiMi43pJ8vFzZiU=;
-	b=KTn6pVPnZ251NzqZgwLwdeEPXoUDzjB6vnENk3DsFSc3CxUjr7dUxd17FwY8mwXWwUPZtZjhfcyhC
-	 8DeXFdoAWNs1g9hNgJfpEvtoByzmyJcZ2vBT53UHALK8HQvdGJ6/9mmrYnDlKinCaS+uktdBaIX9pX
-	 YxYg9O+HY+0lo6n0vSl/ecpnF+RPSJrMjwGmTs7no8dPGLSs9/VJFBEsfuPAqrt2a5P8G3qOpyhOTj
-	 n4dH6A7itxBxrbpnCc1je/ijOfG6Do2D6zW2gYkkcZrA7OF3GS+Z/7HLI2uEcE4BmfebadbKJrDPnh
-	 qIv5FoiE7rhAtQKlcBTTfQrIMIQH0jw==
-X-KPN-MID: 33|tZXO9JTZuUtD3R+qDXFGH1CPeJCm/ImX797uB4uuzTfnDuq3hfei3VFbpm3c/nl
- wEtvUAltwkiGt78XU070r0WeaYjPDyAkU2JNjrWjDdTs=
-X-KPN-VerifiedSender: Yes
-X-CMASSUN: 33|ywTOZkHkiTvDH1K1Xfj0XCSYHd5E0S8PG97C6LQzxxAu3u638FQ8QdWNfROOc5q
- 0oCWqyMWhvIEX6LR8jQXwkA==
-Received: from daedalus.home (unknown [178.227.25.188])
-	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id 245c0bbb-3c0b-11f1-8d42-00505699b758;
-	Sun, 19 Apr 2026 18:16:42 +0200 (CEST)
-From: Jori Koolstra <jkoolstra@xs4all.nl>
-To: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	Namjae Jeon <linkinjeon@kernel.org>,
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="VORilKVH"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=vCaVSS2sema6KjUMGL5frMyotatJdO4QufmlJruy170=; b=VORilKVHDvhRxo5gnYxKRPPjYE
+	DjNC3cQ0vhszupkd/dwgtsO1xYFcPH4ODZ8GSxiZny8bfsE5gXCPnhmlIqUdcHqI00M7jw+Q92EfL
+	CwkzeNV19ZmGthGKuQb6S5wIeS+EfPmaSqNp8umi+xXUQVRU/x4Rl6cv75Hf+n4uQKCGg/hfC8mD3
+	i4U8OED03bUeX//ifUaikLd3fKfLWOdRBiXqI5G1JZ5ru8D+OQGZMoIZ3kt1bhFHF0n/+3u2zI7O/
+	36yMegWCV9O6uPGH1KGWhM2Gm35+MwumcgdPhIg6WCBca9qBrH82Jw85D1JQyyC0UyM84XiBdB7bK
+	8jEZn3IqnXahyeDrPEp7DTvotWDwJZvEtRA+hZiY7eJPth/0wT/dylYbpVdP9L1SO4bKyycEJzz4m
+	JygAJs3qb7HMWYTiW3DztdI1fpHOcMmd4KRBlVfC0yRa7FBH0Hdt0yXeDJilSoq+z6IiUkRb46FE3
+	NquF5Wd04+lHfAwXj4BVyezM;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wEXhQ-00000002WTc-1qVU;
+	Sun, 19 Apr 2026 19:20:56 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
 	Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>
-Cc: Jori Koolstra <jkoolstra@xs4all.nl>,
-	NeilBrown <neil@brown.name>,
-	Amir Goldstein <amir73il@gmail.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Mateusz Guzik <mjguzik@gmail.com>,
-	linux-fsdevel@vger.kernel.org (open list:FILESYSTEMS (VFS and infrastructure)),
-	linux-kernel@vger.kernel.org (open list),
-	linux-cifs@vger.kernel.org (open list:KERNEL SMB3 SERVER (KSMBD))
-Subject: [PATCH v2] vfs: replace ints with enum component_type for LAST_XXX
-Date: Sun, 19 Apr 2026 18:16:16 +0200
-Message-ID: <20260419161620.564854-1-jkoolstra@xs4all.nl>
-X-Mailer: git-send-email 2.53.0
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH] smb: smbdirect: move fs/smb/common/smbdirect/ to fs/smb/smbdirect/
+Date: Sun, 19 Apr 2026 21:20:18 +0200
+Message-ID: <20260419192018.3046449-1-metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -66,200 +51,462 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Several functions in namei.c take an "int *type" parameter, such as
-filename_parentat(). To know what values this can take you have to find
-the anonymous struct that defines the LAST_XXX values. I would argue
-that the readability of the code is improved by making this an explicit
-type.
+This also removes the smbdirect_ prefix from the files.
 
-Signed-off-by: Jori Koolstra <jkoolstra@xs4all.nl>
-Reviewed-by: Jan Kara <jack@suse.cz>
-
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Link: https://lore.kernel.org/linux-cifs/CAHk-=whmue3PVi88K0UZLZO0at22QhQZ-yu+qO2TOKyZpGqecw@mail.gmail.com/
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
+ MAINTAINERS                                    |  2 +-
+ fs/smb/Kconfig                                 |  2 +-
+ fs/smb/Makefile                                |  1 +
+ fs/smb/client/Kconfig                          |  2 +-
+ fs/smb/client/smbdirect.c                      |  2 +-
+ fs/smb/client/smbdirect.h                      |  2 +-
+ fs/smb/common/Makefile                         |  1 -
+ fs/smb/common/smbdirect/Makefile               | 18 ------------------
+ fs/smb/server/Kconfig                          |  2 +-
+ fs/smb/server/transport_rdma.c                 |  2 +-
+ fs/smb/server/transport_rdma.h                 |  2 +-
+ fs/smb/{common => }/smbdirect/Kconfig          |  2 +-
+ fs/smb/smbdirect/Makefile                      | 18 ++++++++++++++++++
+ .../smbdirect_accept.c => smbdirect/accept.c}  |  4 ++--
+ .../connect.c}                                 |  4 ++--
+ .../connection.c}                              |  2 +-
+ .../smbdirect_debug.c => smbdirect/debug.c}    |  2 +-
+ .../devices.c}                                 |  2 +-
+ .../internal.h}                                |  6 +++---
+ .../smbdirect_listen.c => smbdirect/listen.c}  |  2 +-
+ .../smbdirect_main.c => smbdirect/main.c}      |  2 +-
+ .../smbdirect_mr.c => smbdirect/mr.c}          |  2 +-
+ .../smbdirect_pdu.h => smbdirect/pdu.h}        |  0
+ .../smbdirect_public.h => smbdirect/public.h}  |  0
+ .../smbdirect_rw.c => smbdirect/rw.c}          |  2 +-
+ fs/smb/{common => }/smbdirect/smbdirect.h      |  0
+ .../smbdirect_socket.c => smbdirect/socket.c}  |  2 +-
+ .../smbdirect_socket.h => smbdirect/socket.h}  |  0
+ 28 files changed, 43 insertions(+), 43 deletions(-)
+ delete mode 100644 fs/smb/common/smbdirect/Makefile
+ rename fs/smb/{common => }/smbdirect/Kconfig (86%)
+ create mode 100644 fs/smb/smbdirect/Makefile
+ rename fs/smb/{common/smbdirect/smbdirect_accept.c => smbdirect/accept.c} (99%)
+ rename fs/smb/{common/smbdirect/smbdirect_connect.c => smbdirect/connect.c} (99%)
+ rename fs/smb/{common/smbdirect/smbdirect_connection.c => smbdirect/connection.c} (99%)
+ rename fs/smb/{common/smbdirect/smbdirect_debug.c => smbdirect/debug.c} (98%)
+ rename fs/smb/{common/smbdirect/smbdirect_devices.c => smbdirect/devices.c} (99%)
+ rename fs/smb/{common/smbdirect/smbdirect_internal.h => smbdirect/internal.h} (98%)
+ rename fs/smb/{common/smbdirect/smbdirect_listen.c => smbdirect/listen.c} (99%)
+ rename fs/smb/{common/smbdirect/smbdirect_main.c => smbdirect/main.c} (99%)
+ rename fs/smb/{common/smbdirect/smbdirect_mr.c => smbdirect/mr.c} (99%)
+ rename fs/smb/{common/smbdirect/smbdirect_pdu.h => smbdirect/pdu.h} (100%)
+ rename fs/smb/{common/smbdirect/smbdirect_public.h => smbdirect/public.h} (100%)
+ rename fs/smb/{common/smbdirect/smbdirect_rw.c => smbdirect/rw.c} (99%)
+ rename fs/smb/{common => }/smbdirect/smbdirect.h (100%)
+ rename fs/smb/{common/smbdirect/smbdirect_socket.c => smbdirect/socket.c} (99%)
+ rename fs/smb/{common/smbdirect/smbdirect_socket.h => smbdirect/socket.h} (100%)
 
-v2: move back to LAST_XXX and change int to component_type in
-fs/smb/server/vfs.c.
-
----
- fs/namei.c            | 41 ++++++++++++++++++++++-------------------
- fs/smb/server/vfs.c   |  5 +++--
- include/linux/namei.h |  4 ++--
- 3 files changed, 27 insertions(+), 23 deletions(-)
-
-diff --git a/fs/namei.c b/fs/namei.c
-index 9e5500dad14f..a880454a6415 100644
---- a/fs/namei.c
-+++ b/fs/namei.c
-@@ -721,15 +721,15 @@ EXPORT_SYMBOL(path_put);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 13f49378b157..ea24891eca5f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -24613,7 +24613,7 @@ L:	linux-cifs@vger.kernel.org
+ L:	samba-technical@lists.samba.org (moderated for non-subscribers)
+ S:	Maintained
+ F:	fs/smb/client/smbdirect.*
+-F:	fs/smb/common/smbdirect/
++F:	fs/smb/smbdirect/
+ F:	fs/smb/server/transport_rdma.*
  
- #define EMBEDDED_LEVELS 2
- struct nameidata {
--	struct path	path;
--	struct qstr	last;
--	struct path	root;
--	struct inode	*inode; /* path.dentry.d_inode */
--	unsigned int	flags, state;
--	unsigned	seq, next_seq, m_seq, r_seq;
--	int		last_type;
--	unsigned	depth;
--	int		total_link_count;
-+	struct path		path;
-+	struct qstr		last;
-+	struct path		root;
-+	struct inode		*inode; /* path.dentry.d_inode */
-+	unsigned int		flags, state;
-+	unsigned		seq, next_seq, m_seq, r_seq;
-+	enum component_type	last_type;
-+	unsigned		depth;
-+	int			total_link_count;
- 	struct saved {
- 		struct path link;
- 		struct delayed_call done;
-@@ -2221,7 +2221,7 @@ static struct dentry *follow_dotdot(struct nameidata *nd)
- 	return dget(nd->path.dentry);
- }
+ SMC91x ETHERNET DRIVER
+diff --git a/fs/smb/Kconfig b/fs/smb/Kconfig
+index b4b2cfdc2a6b..e549e189ee6a 100644
+--- a/fs/smb/Kconfig
++++ b/fs/smb/Kconfig
+@@ -4,7 +4,7 @@
  
--static const char *handle_dots(struct nameidata *nd, int type)
-+static const char *handle_dots(struct nameidata *nd, enum component_type type)
- {
- 	if (type == LAST_DOTDOT) {
- 		const char *error = NULL;
-@@ -2869,7 +2869,7 @@ static int path_parentat(struct nameidata *nd, unsigned flags,
- /* Note: this does not consume "name" */
- static int __filename_parentat(int dfd, struct filename *name,
- 			       unsigned int flags, struct path *parent,
--			       struct qstr *last, int *type,
-+			       struct qstr *last, enum component_type *type,
- 			       const struct path *root)
- {
- 	int retval;
-@@ -2894,7 +2894,7 @@ static int __filename_parentat(int dfd, struct filename *name,
+ source "fs/smb/client/Kconfig"
+ source "fs/smb/server/Kconfig"
+-source "fs/smb/common/smbdirect/Kconfig"
++source "fs/smb/smbdirect/Kconfig"
  
- static int filename_parentat(int dfd, struct filename *name,
- 			     unsigned int flags, struct path *parent,
--			     struct qstr *last, int *type)
-+			     struct qstr *last, enum component_type *type)
- {
- 	return __filename_parentat(dfd, name, flags, parent, last, type, NULL);
- }
-@@ -2963,7 +2963,8 @@ static struct dentry *__start_removing_path(int dfd, struct filename *name,
- 	struct path parent_path __free(path_put) = {};
- 	struct dentry *d;
- 	struct qstr last;
--	int type, error;
-+	enum component_type type;
-+	int error;
+ config SMBFS
+ 	tristate
+diff --git a/fs/smb/Makefile b/fs/smb/Makefile
+index 9a1bf59a1a65..353b1c2eefc4 100644
+--- a/fs/smb/Makefile
++++ b/fs/smb/Makefile
+@@ -1,5 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
  
- 	error = filename_parentat(dfd, name, 0, &parent_path, &last, &type);
- 	if (error)
-@@ -3009,7 +3010,8 @@ struct dentry *kern_path_parent(const char *name, struct path *path)
- 	CLASS(filename_kernel, filename)(name);
- 	struct dentry *d;
- 	struct qstr last;
--	int type, error;
-+	enum component_type type;
-+	int error;
+ obj-$(CONFIG_SMBFS)		+= common/
++obj-$(CONFIG_SMBDIRECT)		+= smbdirect/
+ obj-$(CONFIG_CIFS)		+= client/
+ obj-$(CONFIG_SMB_SERVER)	+= server/
+diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
+index 63831242fddf..fed621910876 100644
+--- a/fs/smb/client/Kconfig
++++ b/fs/smb/client/Kconfig
+@@ -182,7 +182,7 @@ config CIFS_SMB_DIRECT
+ 	bool "SMB Direct support"
+ 	depends on CIFS && INFINIBAND && INFINIBAND_ADDR_TRANS
+ 	depends on CIFS=m || INFINIBAND=y
+-	select SMB_COMMON_SMBDIRECT
++	select SMBDIRECT
+ 	help
+ 	  Enables SMB Direct support for SMB 3.0, 3.02 and 3.1.1.
+ 	  SMB Direct allows transferring SMB packets over RDMA. If unsure,
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 9e67adcdc7d3..75f9f91a7ec9 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -9,7 +9,7 @@
+ #include "cifs_debug.h"
+ #include "cifsproto.h"
+ #include "smb2proto.h"
+-#include "../common/smbdirect/smbdirect_public.h"
++#include "../smbdirect/public.h"
  
- 	error = filename_parentat(AT_FDCWD, filename, 0, &parent_path, &last, &type);
- 	if (error)
-@@ -3057,7 +3059,7 @@ EXPORT_SYMBOL(kern_path);
-  * @root: pointer to struct path of the base directory
+ /* Port numbers for SMBD transport */
+ #define SMB_PORT	445
+diff --git a/fs/smb/client/smbdirect.h b/fs/smb/client/smbdirect.h
+index 0017d5b2de44..287ac849213d 100644
+--- a/fs/smb/client/smbdirect.h
++++ b/fs/smb/client/smbdirect.h
+@@ -12,7 +12,7 @@
+ 
+ #include "cifsglob.h"
+ 
+-#include "../common/smbdirect/smbdirect.h"
++#include "../smbdirect/smbdirect.h"
+ 
+ extern int rdma_readwrite_threshold;
+ extern int smbd_max_frmr_depth;
+diff --git a/fs/smb/common/Makefile b/fs/smb/common/Makefile
+index e6ee65c31b5d..9e0730a385fb 100644
+--- a/fs/smb/common/Makefile
++++ b/fs/smb/common/Makefile
+@@ -4,4 +4,3 @@
+ #
+ 
+ obj-$(CONFIG_SMBFS) += cifs_md4.o
+-obj-$(CONFIG_SMB_COMMON_SMBDIRECT) += smbdirect/
+diff --git a/fs/smb/common/smbdirect/Makefile b/fs/smb/common/smbdirect/Makefile
+deleted file mode 100644
+index 423f533e1002..000000000000
+--- a/fs/smb/common/smbdirect/Makefile
++++ /dev/null
+@@ -1,18 +0,0 @@
+-# SPDX-License-Identifier: GPL-2.0-or-later
+-#
+-# Makefile for smbdirect support
+-#
+-
+-obj-$(CONFIG_SMB_COMMON_SMBDIRECT) += smbdirect.o
+-
+-smbdirect-y := \
+-	smbdirect_socket.o	\
+-	smbdirect_connection.o	\
+-	smbdirect_mr.o		\
+-	smbdirect_rw.o		\
+-	smbdirect_debug.o	\
+-	smbdirect_connect.o	\
+-	smbdirect_listen.o	\
+-	smbdirect_accept.o	\
+-	smbdirect_devices.o	\
+-	smbdirect_main.o
+diff --git a/fs/smb/server/Kconfig b/fs/smb/server/Kconfig
+index 37387410e5bb..8f15c5fd6d88 100644
+--- a/fs/smb/server/Kconfig
++++ b/fs/smb/server/Kconfig
+@@ -49,7 +49,7 @@ config SMB_SERVER_SMBDIRECT
+ 	bool "Support for SMB Direct protocol"
+ 	depends on SMB_SERVER && INFINIBAND && INFINIBAND_ADDR_TRANS
+ 	depends on SMB_SERVER=m || INFINIBAND=y
+-	select SMB_COMMON_SMBDIRECT
++	select SMBDIRECT
+ 	default n
+ 
+ 	help
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index 706a2c897948..a8242c00096f 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -18,7 +18,7 @@
+ #include "smb_common.h"
+ #include "../common/smb2status.h"
+ #include "transport_rdma.h"
+-#include "../common/smbdirect/smbdirect_public.h"
++#include "../smbdirect/public.h"
+ 
+ 
+ #define SMB_DIRECT_PORT_IWARP		5445
+diff --git a/fs/smb/server/transport_rdma.h b/fs/smb/server/transport_rdma.h
+index 05352dc47f95..bde3d88aecc7 100644
+--- a/fs/smb/server/transport_rdma.h
++++ b/fs/smb/server/transport_rdma.h
+@@ -25,6 +25,6 @@ static inline void init_smbd_max_io_size(unsigned int sz) { }
+ static inline unsigned int get_smbd_max_read_write_size(struct ksmbd_transport *kt) { return 0; }
+ #endif
+ 
+-#include "../common/smbdirect/smbdirect.h"
++#include "../smbdirect/smbdirect.h"
+ 
+ #endif /* __KSMBD_TRANSPORT_RDMA_H__ */
+diff --git a/fs/smb/common/smbdirect/Kconfig b/fs/smb/smbdirect/Kconfig
+similarity index 86%
+rename from fs/smb/common/smbdirect/Kconfig
+rename to fs/smb/smbdirect/Kconfig
+index a46a2e6ec87a..2bf1b3350f7d 100644
+--- a/fs/smb/common/smbdirect/Kconfig
++++ b/fs/smb/smbdirect/Kconfig
+@@ -2,7 +2,7 @@
+ #
+ # smbdirect configuration
+ 
+-config SMB_COMMON_SMBDIRECT
++config SMBDIRECT
+ 	def_tristate n
+ 	depends on INFINIBAND && INFINIBAND_ADDR_TRANS
+ 	depends on m || INFINIBAND=y
+diff --git a/fs/smb/smbdirect/Makefile b/fs/smb/smbdirect/Makefile
+new file mode 100644
+index 000000000000..80d6025984d1
+--- /dev/null
++++ b/fs/smb/smbdirect/Makefile
+@@ -0,0 +1,18 @@
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++# Makefile for smbdirect support
++#
++
++obj-$(CONFIG_SMBDIRECT) += smbdirect.o
++
++smbdirect-y := \
++	socket.o	\
++	connection.o	\
++	mr.o		\
++	rw.o		\
++	debug.o		\
++	connect.o	\
++	listen.o	\
++	accept.o	\
++	devices.o	\
++	main.o
+diff --git a/fs/smb/common/smbdirect/smbdirect_accept.c b/fs/smb/smbdirect/accept.c
+similarity index 99%
+rename from fs/smb/common/smbdirect/smbdirect_accept.c
+rename to fs/smb/smbdirect/accept.c
+index d6d5e6a3f5de..704b271af3a8 100644
+--- a/fs/smb/common/smbdirect/smbdirect_accept.c
++++ b/fs/smb/smbdirect/accept.c
+@@ -5,9 +5,9 @@
+  *   Copyright (c) 2025, Stefan Metzmacher
   */
- int vfs_path_parent_lookup(struct filename *filename, unsigned int flags,
--			   struct path *parent, struct qstr *last, int *type,
-+			   struct path *parent, struct qstr *last, enum component_type *type,
- 			   const struct path *root)
+ 
+-#include "smbdirect_internal.h"
++#include "internal.h"
+ #include <net/sock.h>
+-#include "../../common/smb2status.h"
++#include "../common/smb2status.h"
+ 
+ static int smbdirect_accept_rdma_event_handler(struct rdma_cm_id *id,
+ 					       struct rdma_cm_event *event);
+diff --git a/fs/smb/common/smbdirect/smbdirect_connect.c b/fs/smb/smbdirect/connect.c
+similarity index 99%
+rename from fs/smb/common/smbdirect/smbdirect_connect.c
+rename to fs/smb/smbdirect/connect.c
+index 2b54f79dba43..8addee43a381 100644
+--- a/fs/smb/common/smbdirect/smbdirect_connect.c
++++ b/fs/smb/smbdirect/connect.c
+@@ -3,8 +3,8 @@
+  *   Copyright (c) 2012,2016,2017,2025 Stefan Metzmacher
+  */
+ 
+-#include "smbdirect_internal.h"
+-#include "../../common/smb2status.h"
++#include "internal.h"
++#include "../common/smb2status.h"
+ 
+ static int smbdirect_connect_setup_connection(struct smbdirect_socket *sc);
+ static int smbdirect_connect_resolve_addr(struct smbdirect_socket *sc,
+diff --git a/fs/smb/common/smbdirect/smbdirect_connection.c b/fs/smb/smbdirect/connection.c
+similarity index 99%
+rename from fs/smb/common/smbdirect/smbdirect_connection.c
+rename to fs/smb/smbdirect/connection.c
+index 7e4921b9538c..822366718d45 100644
+--- a/fs/smb/common/smbdirect/smbdirect_connection.c
++++ b/fs/smb/smbdirect/connection.c
+@@ -4,7 +4,7 @@
+  *   Copyright (c) 2025, Stefan Metzmacher
+  */
+ 
+-#include "smbdirect_internal.h"
++#include "internal.h"
+ #include <linux/folio_queue.h>
+ 
+ struct smbdirect_map_sges {
+diff --git a/fs/smb/common/smbdirect/smbdirect_debug.c b/fs/smb/smbdirect/debug.c
+similarity index 98%
+rename from fs/smb/common/smbdirect/smbdirect_debug.c
+rename to fs/smb/smbdirect/debug.c
+index d8664fd7f71a..a66a19d4a463 100644
+--- a/fs/smb/common/smbdirect/smbdirect_debug.c
++++ b/fs/smb/smbdirect/debug.c
+@@ -4,7 +4,7 @@
+  *   Copyright (c) 2025, Stefan Metzmacher
+  */
+ 
+-#include "smbdirect_internal.h"
++#include "internal.h"
+ #include <linux/seq_file.h>
+ 
+ void smbdirect_connection_legacy_debug_proc_show(struct smbdirect_socket *sc,
+diff --git a/fs/smb/common/smbdirect/smbdirect_devices.c b/fs/smb/smbdirect/devices.c
+similarity index 99%
+rename from fs/smb/common/smbdirect/smbdirect_devices.c
+rename to fs/smb/smbdirect/devices.c
+index aaab99e9c045..44962f221c35 100644
+--- a/fs/smb/common/smbdirect/smbdirect_devices.c
++++ b/fs/smb/smbdirect/devices.c
+@@ -5,7 +5,7 @@
+  *   Copyright (c) 2025 Stefan Metzmacher
+  */
+ 
+-#include "smbdirect_internal.h"
++#include "internal.h"
+ 
+ static u8 smbdirect_ib_device_rdma_capable_node_type(struct ib_device *ib_dev)
  {
- 	return  __filename_parentat(AT_FDCWD, filename, flags, parent, last,
-@@ -4903,7 +4905,7 @@ static struct dentry *filename_create(int dfd, struct filename *name,
- 	bool want_dir = lookup_flags & LOOKUP_DIRECTORY;
- 	unsigned int reval_flag = lookup_flags & LOOKUP_REVAL;
- 	unsigned int create_flags = LOOKUP_CREATE | LOOKUP_EXCL;
--	int type;
-+	enum component_type type;
- 	int error;
+diff --git a/fs/smb/common/smbdirect/smbdirect_internal.h b/fs/smb/smbdirect/internal.h
+similarity index 98%
+rename from fs/smb/common/smbdirect/smbdirect_internal.h
+rename to fs/smb/smbdirect/internal.h
+index 30a1b8643657..2d5acf2c21bc 100644
+--- a/fs/smb/common/smbdirect/smbdirect_internal.h
++++ b/fs/smb/smbdirect/internal.h
+@@ -9,8 +9,8 @@
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
  
- 	error = filename_parentat(dfd, name, reval_flag, path, &last, &type);
-@@ -5365,7 +5367,7 @@ int filename_rmdir(int dfd, struct filename *name)
- 	struct dentry *dentry;
- 	struct path path;
- 	struct qstr last;
--	int type;
-+	enum component_type type;
- 	unsigned int lookup_flags = 0;
- 	struct delegated_inode delegated_inode = { };
- retry:
-@@ -5383,6 +5385,7 @@ int filename_rmdir(int dfd, struct filename *name)
- 	case LAST_ROOT:
- 		error = -EBUSY;
- 		goto exit2;
-+	case LAST_NORM: ; // OK
- 	}
+ #include "smbdirect.h"
+-#include "smbdirect_pdu.h"
+-#include "smbdirect_public.h"
++#include "pdu.h"
++#include "public.h"
  
- 	error = mnt_want_write(path.mnt);
-@@ -5507,7 +5510,7 @@ int filename_unlinkat(int dfd, struct filename *name)
- 	struct dentry *dentry;
- 	struct path path;
- 	struct qstr last;
--	int type;
-+	enum component_type type;
- 	struct inode *inode;
- 	struct delegated_inode delegated_inode = { };
- 	unsigned int lookup_flags = 0;
-@@ -6074,7 +6077,7 @@ int filename_renameat2(int olddfd, struct filename *from,
- 	struct renamedata rd;
- 	struct path old_path, new_path;
- 	struct qstr old_last, new_last;
--	int old_type, new_type;
-+	enum component_type old_type, new_type;
- 	struct delegated_inode delegated_inode = { };
- 	unsigned int lookup_flags = 0;
- 	bool should_retry = false;
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index d08973b288e5..b12d481f5ba9 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -56,7 +56,8 @@ static int ksmbd_vfs_path_lookup(struct ksmbd_share_config *share_conf,
- {
- 	struct qstr last;
- 	const struct path *root_share_path = &share_conf->vfs_path;
--	int err, type;
-+	int err;
-+	enum component_type type;
- 	struct dentry *d;
+ #include <linux/mutex.h>
  
- 	if (pathname[0] == '\0') {
-@@ -668,7 +669,7 @@ int ksmbd_vfs_rename(struct ksmbd_work *work, const struct path *old_path,
- 	struct renamedata rd;
- 	struct ksmbd_share_config *share_conf = work->tcon->share_conf;
- 	struct ksmbd_file *parent_fp;
--	int new_type;
-+	enum component_type new_type;
- 	int err, lookup_flags = LOOKUP_NO_SYMLINKS;
+@@ -34,7 +34,7 @@ struct smbdirect_module_state {
  
- 	if (ksmbd_override_fsids(work))
-diff --git a/include/linux/namei.h b/include/linux/namei.h
-index 58600cf234bc..fa3ae87762b7 100644
---- a/include/linux/namei.h
-+++ b/include/linux/namei.h
-@@ -16,7 +16,7 @@ enum { MAX_NESTED_LINKS = 8 };
+ extern struct smbdirect_module_state smbdirect_globals;
+ 
+-#include "smbdirect_socket.h"
++#include "socket.h"
+ 
+ struct smbdirect_device {
+ 	struct list_head list;
+diff --git a/fs/smb/common/smbdirect/smbdirect_listen.c b/fs/smb/smbdirect/listen.c
+similarity index 99%
+rename from fs/smb/common/smbdirect/smbdirect_listen.c
+rename to fs/smb/smbdirect/listen.c
+index 05c7902e7020..143a7618d95f 100644
+--- a/fs/smb/common/smbdirect/smbdirect_listen.c
++++ b/fs/smb/smbdirect/listen.c
+@@ -5,7 +5,7 @@
+  *   Copyright (c) 2025, Stefan Metzmacher
+  */
+ 
+-#include "smbdirect_internal.h"
++#include "internal.h"
+ 
+ static int smbdirect_listen_rdma_event_handler(struct rdma_cm_id *id,
+ 					       struct rdma_cm_event *event);
+diff --git a/fs/smb/common/smbdirect/smbdirect_main.c b/fs/smb/smbdirect/main.c
+similarity index 99%
+rename from fs/smb/common/smbdirect/smbdirect_main.c
+rename to fs/smb/smbdirect/main.c
+index fe6e8d93c34c..606732fefb69 100644
+--- a/fs/smb/common/smbdirect/smbdirect_main.c
++++ b/fs/smb/smbdirect/main.c
+@@ -3,7 +3,7 @@
+  *   Copyright (c) 2025, Stefan Metzmacher
+  */
+ 
+-#include "smbdirect_internal.h"
++#include "internal.h"
+ #include <linux/module.h>
+ 
+ struct smbdirect_module_state smbdirect_globals = {
+diff --git a/fs/smb/common/smbdirect/smbdirect_mr.c b/fs/smb/smbdirect/mr.c
+similarity index 99%
+rename from fs/smb/common/smbdirect/smbdirect_mr.c
+rename to fs/smb/smbdirect/mr.c
+index fa9be8089925..5228e699cd5d 100644
+--- a/fs/smb/common/smbdirect/smbdirect_mr.c
++++ b/fs/smb/smbdirect/mr.c
+@@ -4,7 +4,7 @@
+  *   Copyright (c) 2025, Stefan Metzmacher
+  */
+ 
+-#include "smbdirect_internal.h"
++#include "internal.h"
+ 
  /*
-  * Type of the last component on LOOKUP_PARENT
+  * Allocate MRs used for RDMA read/write
+diff --git a/fs/smb/common/smbdirect/smbdirect_pdu.h b/fs/smb/smbdirect/pdu.h
+similarity index 100%
+rename from fs/smb/common/smbdirect/smbdirect_pdu.h
+rename to fs/smb/smbdirect/pdu.h
+diff --git a/fs/smb/common/smbdirect/smbdirect_public.h b/fs/smb/smbdirect/public.h
+similarity index 100%
+rename from fs/smb/common/smbdirect/smbdirect_public.h
+rename to fs/smb/smbdirect/public.h
+diff --git a/fs/smb/common/smbdirect/smbdirect_rw.c b/fs/smb/smbdirect/rw.c
+similarity index 99%
+rename from fs/smb/common/smbdirect/smbdirect_rw.c
+rename to fs/smb/smbdirect/rw.c
+index 3b2eb8c48efc..c2f46b17731e 100644
+--- a/fs/smb/common/smbdirect/smbdirect_rw.c
++++ b/fs/smb/smbdirect/rw.c
+@@ -5,7 +5,7 @@
+  *   Copyright (c) 2025, Stefan Metzmacher
   */
--enum {LAST_NORM, LAST_ROOT, LAST_DOT, LAST_DOTDOT};
-+enum component_type {LAST_NORM, LAST_ROOT, LAST_DOT, LAST_DOTDOT};
  
- /* pathwalk mode */
- #define LOOKUP_FOLLOW		BIT(0)	/* follow links at the end */
-@@ -70,7 +70,7 @@ static inline void end_removing_path(const struct path *path , struct dentry *de
- 	end_creating_path(path, dentry);
- }
- int vfs_path_parent_lookup(struct filename *filename, unsigned int flags,
--			   struct path *parent, struct qstr *last, int *type,
-+			   struct path *parent, struct qstr *last, enum component_type *type,
- 			   const struct path *root);
- int vfs_path_lookup(struct dentry *, struct vfsmount *, const char *,
- 		    unsigned int, struct path *);
+-#include "smbdirect_internal.h"
++#include "internal.h"
+ 
+ static int smbdirect_connection_wait_for_rw_credits(struct smbdirect_socket *sc,
+ 						    int credits)
+diff --git a/fs/smb/common/smbdirect/smbdirect.h b/fs/smb/smbdirect/smbdirect.h
+similarity index 100%
+rename from fs/smb/common/smbdirect/smbdirect.h
+rename to fs/smb/smbdirect/smbdirect.h
+diff --git a/fs/smb/common/smbdirect/smbdirect_socket.c b/fs/smb/smbdirect/socket.c
+similarity index 99%
+rename from fs/smb/common/smbdirect/smbdirect_socket.c
+rename to fs/smb/smbdirect/socket.c
+index 9153e1dbf53d..1b4ab01b745e 100644
+--- a/fs/smb/common/smbdirect/smbdirect_socket.c
++++ b/fs/smb/smbdirect/socket.c
+@@ -4,7 +4,7 @@
+  *   Copyright (c) 2025, Stefan Metzmacher
+  */
+ 
+-#include "smbdirect_internal.h"
++#include "internal.h"
+ 
+ bool smbdirect_frwr_is_supported(const struct ib_device_attr *attrs)
+ {
+diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/smbdirect/socket.h
+similarity index 100%
+rename from fs/smb/common/smbdirect/smbdirect_socket.h
+rename to fs/smb/smbdirect/socket.h
 -- 
-2.53.0
+2.43.0
 
