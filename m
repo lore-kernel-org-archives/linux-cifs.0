@@ -1,77 +1,63 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A8C33D4EC
-	for <linux-cifs@vger.kernel.org>; Sun, 19 Apr 2026 11:03:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7796DCE1
+	for <linux-cifs@vger.kernel.org>; Sun, 19 Apr 2026 16:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776596588; cv=none; b=eFien8Sv5AvwkKUOgoFJEt/XbI7Gtf1Hx72zrZr6pU+cZCaIrG3acHhrBpbRHaEYiAviCHmpboPeNQH/MphQNrrT69hHA/DVMS/M2MzsO0/a1Pm4EOl83ITGr+er1Ftw6beFcaDCduZ5QSOXlHhdXaO/IBnzq7tE2SKzfbiCJ/4=
+	t=1776615407; cv=none; b=grlsf5eGKIwy34IJ2A38XNTcblARsK1Q/GRVuBwFM2QjKgt6KSR0ZhTijuVYyfuVZMO9ochOvgiz/w6KJWuX0U0B6eEMMwRLoUOxw3TRZzQJrGu1Wc/n0VC0Kvbhm8Mnk6zcgFkmuCH1MEAhhA91hBSauBT85TlXvPph+NZbZM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776596588; c=relaxed/simple;
-	bh=VyK4kxf1xc0HknGrvHpp7IfOxieIEAAxS73/8cca4bQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BVDg/r1K+BkXPSEx2Jz+wRZgUH3Ap208tLr8BT3PI6/k/PrRWA6S+L8mQAi1H0i38JESoi0eqxsIPeqaf/qy1F2QlFs0nQS/Ek/Ic0US6+1FDaNxNFlVNRl2++O/wongsrgprnKndPCznOdg1X9XbdsVo+4HnoHkz7KbZDI/+4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JpLeJ91x; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776615407; c=relaxed/simple;
+	bh=+fySva1/0STurilohwVEd0xk9CXKnmouisbr5rNdygg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WtOMIBJ+ukqkpsdJTTYgxha67dD1d/5cM95kSUNutjmTViN7jPROGFmwebOZBWRh2FaP5AKtmJGozq26W9bi2BO+MDeoWX1yAmI+Hb856wTMCt0xYTHjrNA991N+Y2CP/wk0kvv8Icqni+yFkamIsAPdtP0gOKTg1JrKpyWaP2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=KTn6pVPn; arc=none smtp.client-ip=195.121.94.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JpLeJ91x"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-358dff8447cso375132a91.0
-        for <linux-cifs@vger.kernel.org>; Sun, 19 Apr 2026 04:03:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="KTn6pVPn"
+X-KPN-MessageId: 277ac91a-3c0b-11f1-89e1-00505699b430
+Received: from smtp.kpnmail.nl (unknown [10.31.155.5])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 277ac91a-3c0b-11f1-89e1-00505699b430;
+	Sun, 19 Apr 2026 18:16:42 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776596586; x=1777201386; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9DyStktkJgiHhlYyQA1PqDFemYtpoFBPyefLrK+uytk=;
-        b=JpLeJ91xQvRPNzdxliKy0sKpi6YBzMjAUzWtL8AtBlA1ck/npt444vhx3Y/Fmp3VpO
-         2J0fQiSVXGQART1V02JV6S5jZF/3eDuFW0N3jMEGLjTijq28zmpHe0efuA9I/NdTg1yv
-         p0ldn2KfR53nWmWLKNx3ZI+BzTkl8rYyAe300qou7UsEtzDAC25Swj1xuuMinES72IYs
-         61T2KJXXzV6KWv30o1+KFShjoYtG2nAEmBfOMv8ze5yM1c4ixwl3MtXDItAEbQkir1GQ
-         65QfXPVazFYloKYotjgov4OiCDVgU3x4ZQG8Y8ZvLMy27Us52ps0TBlFrqt90Besuc6/
-         Wslw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776596586; x=1777201386;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9DyStktkJgiHhlYyQA1PqDFemYtpoFBPyefLrK+uytk=;
-        b=BMK/1kZUGQ4Bm8R+ZVFKPIlx4e0A2VJuR5gnSS/zRxsmTfBOxzuxG/anyAclhxhnAC
-         W3EINKjskAbjO7tTnPMXy+vNXaHWvEc211K8kP7R7Rb/M1gFgsNpfb7wZTzGeMFg+GxI
-         UOOPBuS12cYBo+KBaCZ5chMq9dwIVYIsepPQretS/xboCDLD9JiPIaxJdnIjxXzKSZ62
-         pBm4oinQyZCQoNcqK6Y0Xi5ZfbRfpq4d0EE6BtoKk/TmAirL8MY28LjX3glUoWJndKi+
-         wwNUWCie4mzHtOAvC21qwpxHMY+ameHGBvs/82vF7dQkgxCcZvMj6caFqAYZ4qXGdLE3
-         0X5Q==
-X-Forwarded-Encrypted: i=1; AFNElJ+eeEYQ4/PNREszqsPnUbPkLkqS0Iuy86OvnlXv4F+ViHTVsPEJjd4aq/PkmKDAHZrRRs+A1HHZ1Omz@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKptISjZ1+bwaQkT5g2mEZW426UbIy12BYKlBkPQ8Yz6PYZxiQ
-	E0ciW9fybIJ9dUl+vJZBteIs3Tpwb6IB0PZnWGU6CnjTahoDw6JMI91L
-X-Gm-Gg: AeBDiesF/tvZIXQi4kS3HmWWOthK9L9VIdcg4Rw/kskNxquITjqO0XksVjOzC7Z+9mB
-	B5O5QRigMazxhicjtpGSQLtqfUnd4XZSO9CQKG+HLcwIfeVWYYWhVyCHNl0Hy1tR/TTsPaSeWpy
-	cCFcX9TCH2tK40ft7+KpoUypoLaZgeRlqGTR2/OwiyLVcgJCmLA+eCAdGi9IB9dGwwesTeBuqpK
-	qROILIzRvj9Xy+cb9v38IYczyA4znRdiKMQSxZexMYz00z4MnovSE7fpEgkq7/B8jLBMTz65j/Z
-	Cbdv4JzqhUSH1vfDyqb6z+e3DQhzq7zb8ZxYWdPDsEpcOGPxS7JU32M8GX2rszHwj1V+nkL17kG
-	t3yFakU9CNB7z6P6T3KhvriRAh4X3gNN+Vi9/qD3Pdeem1webcpfk48d3PS/uKm7hxWnxbSIXZR
-	CCB63RTTpHFZS/v74nnlN4IeoEhzM=
-X-Received: by 2002:a17:90b:4ccf:b0:35f:bd83:38c2 with SMTP id 98e67ed59e1d1-361403a686cmr5421740a91.1.1776596586452;
-        Sun, 19 Apr 2026 04:03:06 -0700 (PDT)
-Received: from ser8.. ([221.156.231.192])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c797703059fsm5527972a12.24.2026.04.19.04.03.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Apr 2026 04:03:06 -0700 (PDT)
-From: DaeMyung Kang <charsyam@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Steve French <smfrench@gmail.com>,
+	d=xs4all.nl; s=xs4all01;
+	h=mime-version:message-id:date:subject:to:from;
+	bh=AO9yyyXYcUIlzcELFTB/fVBRpc9JQiMi43pJ8vFzZiU=;
+	b=KTn6pVPnZ251NzqZgwLwdeEPXoUDzjB6vnENk3DsFSc3CxUjr7dUxd17FwY8mwXWwUPZtZjhfcyhC
+	 8DeXFdoAWNs1g9hNgJfpEvtoByzmyJcZ2vBT53UHALK8HQvdGJ6/9mmrYnDlKinCaS+uktdBaIX9pX
+	 YxYg9O+HY+0lo6n0vSl/ecpnF+RPSJrMjwGmTs7no8dPGLSs9/VJFBEsfuPAqrt2a5P8G3qOpyhOTj
+	 n4dH6A7itxBxrbpnCc1je/ijOfG6Do2D6zW2gYkkcZrA7OF3GS+Z/7HLI2uEcE4BmfebadbKJrDPnh
+	 qIv5FoiE7rhAtQKlcBTTfQrIMIQH0jw==
+X-KPN-MID: 33|tZXO9JTZuUtD3R+qDXFGH1CPeJCm/ImX797uB4uuzTfnDuq3hfei3VFbpm3c/nl
+ wEtvUAltwkiGt78XU070r0WeaYjPDyAkU2JNjrWjDdTs=
+X-KPN-VerifiedSender: Yes
+X-CMASSUN: 33|ywTOZkHkiTvDH1K1Xfj0XCSYHd5E0S8PG97C6LQzxxAu3u638FQ8QdWNfROOc5q
+ 0oCWqyMWhvIEX6LR8jQXwkA==
+Received: from daedalus.home (unknown [178.227.25.188])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id 245c0bbb-3c0b-11f1-8d42-00505699b758;
+	Sun, 19 Apr 2026 18:16:42 +0200 (CEST)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	DaeMyung Kang <charsyam@gmail.com>
-Subject: [PATCH 2/2] ksmbd: destroy async_ida in ksmbd_conn_free()
-Date: Sun, 19 Apr 2026 20:02:55 +0900
-Message-ID: <20260419110255.2477785-3-charsyam@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260419110255.2477785-1-charsyam@gmail.com>
-References: <20260419110255.2477785-1-charsyam@gmail.com>
+	Tom Talpey <tom@talpey.com>
+Cc: Jori Koolstra <jkoolstra@xs4all.nl>,
+	NeilBrown <neil@brown.name>,
+	Amir Goldstein <amir73il@gmail.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Mateusz Guzik <mjguzik@gmail.com>,
+	linux-fsdevel@vger.kernel.org (open list:FILESYSTEMS (VFS and infrastructure)),
+	linux-kernel@vger.kernel.org (open list),
+	linux-cifs@vger.kernel.org (open list:KERNEL SMB3 SERVER (KSMBD))
+Subject: [PATCH v2] vfs: replace ints with enum component_type for LAST_XXX
+Date: Sun, 19 Apr 2026 18:16:16 +0200
+Message-ID: <20260419161620.564854-1-jkoolstra@xs4all.nl>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -80,45 +66,200 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When per-connection async_ida was converted from a dynamically
-allocated ksmbd_ida to an embedded struct ida, ksmbd_ida_free() was
-removed from the connection teardown path but no matching
-ida_destroy() was added.  The connection is therefore freed with the
-IDA's backing xarray still intact.
+Several functions in namei.c take an "int *type" parameter, such as
+filename_parentat(). To know what values this can take you have to find
+the anonymous struct that defines the LAST_XXX values. I would argue
+that the readability of the code is improved by making this an explicit
+type.
 
-The kernel IDA API expects ida_init() and ida_destroy() to be paired
-over an object's lifetime, so add the missing cleanup before the
-connection is freed.
+Signed-off-by: Jori Koolstra <jkoolstra@xs4all.nl>
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-No leak has been observed in testing; this is a pairing fix to match
-the IDA lifetime rules, not a response to a reproduced regression.
-
-Fixes: d40012a83f87 ("cifsd: declare ida statically")
-Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
 ---
- fs/smb/server/connection.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index a4110c6cce37..8bbfe27387e3 100644
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -98,6 +98,15 @@ void ksmbd_conn_free(struct ksmbd_conn *conn)
- 	kfree(conn->preauth_info);
- 	kfree(conn->mechToken);
- 	if (atomic_dec_and_test(&conn->refcnt)) {
-+		/*
-+		 * async_ida is embedded in struct ksmbd_conn, so pair
-+		 * ida_destroy() with the final kfree() rather than with
-+		 * the unconditional field teardown above.  This keeps
-+		 * the IDA valid for the entire lifetime of the struct,
-+		 * even while other refcount holders (oplock / vfs
-+		 * durable handles) still reference the connection.
-+		 */
-+		ida_destroy(&conn->async_ida);
- 		conn->transport->ops->free_transport(conn->transport);
- 		kfree(conn);
+v2: move back to LAST_XXX and change int to component_type in
+fs/smb/server/vfs.c.
+
+---
+ fs/namei.c            | 41 ++++++++++++++++++++++-------------------
+ fs/smb/server/vfs.c   |  5 +++--
+ include/linux/namei.h |  4 ++--
+ 3 files changed, 27 insertions(+), 23 deletions(-)
+
+diff --git a/fs/namei.c b/fs/namei.c
+index 9e5500dad14f..a880454a6415 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -721,15 +721,15 @@ EXPORT_SYMBOL(path_put);
+ 
+ #define EMBEDDED_LEVELS 2
+ struct nameidata {
+-	struct path	path;
+-	struct qstr	last;
+-	struct path	root;
+-	struct inode	*inode; /* path.dentry.d_inode */
+-	unsigned int	flags, state;
+-	unsigned	seq, next_seq, m_seq, r_seq;
+-	int		last_type;
+-	unsigned	depth;
+-	int		total_link_count;
++	struct path		path;
++	struct qstr		last;
++	struct path		root;
++	struct inode		*inode; /* path.dentry.d_inode */
++	unsigned int		flags, state;
++	unsigned		seq, next_seq, m_seq, r_seq;
++	enum component_type	last_type;
++	unsigned		depth;
++	int			total_link_count;
+ 	struct saved {
+ 		struct path link;
+ 		struct delayed_call done;
+@@ -2221,7 +2221,7 @@ static struct dentry *follow_dotdot(struct nameidata *nd)
+ 	return dget(nd->path.dentry);
+ }
+ 
+-static const char *handle_dots(struct nameidata *nd, int type)
++static const char *handle_dots(struct nameidata *nd, enum component_type type)
+ {
+ 	if (type == LAST_DOTDOT) {
+ 		const char *error = NULL;
+@@ -2869,7 +2869,7 @@ static int path_parentat(struct nameidata *nd, unsigned flags,
+ /* Note: this does not consume "name" */
+ static int __filename_parentat(int dfd, struct filename *name,
+ 			       unsigned int flags, struct path *parent,
+-			       struct qstr *last, int *type,
++			       struct qstr *last, enum component_type *type,
+ 			       const struct path *root)
+ {
+ 	int retval;
+@@ -2894,7 +2894,7 @@ static int __filename_parentat(int dfd, struct filename *name,
+ 
+ static int filename_parentat(int dfd, struct filename *name,
+ 			     unsigned int flags, struct path *parent,
+-			     struct qstr *last, int *type)
++			     struct qstr *last, enum component_type *type)
+ {
+ 	return __filename_parentat(dfd, name, flags, parent, last, type, NULL);
+ }
+@@ -2963,7 +2963,8 @@ static struct dentry *__start_removing_path(int dfd, struct filename *name,
+ 	struct path parent_path __free(path_put) = {};
+ 	struct dentry *d;
+ 	struct qstr last;
+-	int type, error;
++	enum component_type type;
++	int error;
+ 
+ 	error = filename_parentat(dfd, name, 0, &parent_path, &last, &type);
+ 	if (error)
+@@ -3009,7 +3010,8 @@ struct dentry *kern_path_parent(const char *name, struct path *path)
+ 	CLASS(filename_kernel, filename)(name);
+ 	struct dentry *d;
+ 	struct qstr last;
+-	int type, error;
++	enum component_type type;
++	int error;
+ 
+ 	error = filename_parentat(AT_FDCWD, filename, 0, &parent_path, &last, &type);
+ 	if (error)
+@@ -3057,7 +3059,7 @@ EXPORT_SYMBOL(kern_path);
+  * @root: pointer to struct path of the base directory
+  */
+ int vfs_path_parent_lookup(struct filename *filename, unsigned int flags,
+-			   struct path *parent, struct qstr *last, int *type,
++			   struct path *parent, struct qstr *last, enum component_type *type,
+ 			   const struct path *root)
+ {
+ 	return  __filename_parentat(AT_FDCWD, filename, flags, parent, last,
+@@ -4903,7 +4905,7 @@ static struct dentry *filename_create(int dfd, struct filename *name,
+ 	bool want_dir = lookup_flags & LOOKUP_DIRECTORY;
+ 	unsigned int reval_flag = lookup_flags & LOOKUP_REVAL;
+ 	unsigned int create_flags = LOOKUP_CREATE | LOOKUP_EXCL;
+-	int type;
++	enum component_type type;
+ 	int error;
+ 
+ 	error = filename_parentat(dfd, name, reval_flag, path, &last, &type);
+@@ -5365,7 +5367,7 @@ int filename_rmdir(int dfd, struct filename *name)
+ 	struct dentry *dentry;
+ 	struct path path;
+ 	struct qstr last;
+-	int type;
++	enum component_type type;
+ 	unsigned int lookup_flags = 0;
+ 	struct delegated_inode delegated_inode = { };
+ retry:
+@@ -5383,6 +5385,7 @@ int filename_rmdir(int dfd, struct filename *name)
+ 	case LAST_ROOT:
+ 		error = -EBUSY;
+ 		goto exit2;
++	case LAST_NORM: ; // OK
  	}
+ 
+ 	error = mnt_want_write(path.mnt);
+@@ -5507,7 +5510,7 @@ int filename_unlinkat(int dfd, struct filename *name)
+ 	struct dentry *dentry;
+ 	struct path path;
+ 	struct qstr last;
+-	int type;
++	enum component_type type;
+ 	struct inode *inode;
+ 	struct delegated_inode delegated_inode = { };
+ 	unsigned int lookup_flags = 0;
+@@ -6074,7 +6077,7 @@ int filename_renameat2(int olddfd, struct filename *from,
+ 	struct renamedata rd;
+ 	struct path old_path, new_path;
+ 	struct qstr old_last, new_last;
+-	int old_type, new_type;
++	enum component_type old_type, new_type;
+ 	struct delegated_inode delegated_inode = { };
+ 	unsigned int lookup_flags = 0;
+ 	bool should_retry = false;
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index d08973b288e5..b12d481f5ba9 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -56,7 +56,8 @@ static int ksmbd_vfs_path_lookup(struct ksmbd_share_config *share_conf,
+ {
+ 	struct qstr last;
+ 	const struct path *root_share_path = &share_conf->vfs_path;
+-	int err, type;
++	int err;
++	enum component_type type;
+ 	struct dentry *d;
+ 
+ 	if (pathname[0] == '\0') {
+@@ -668,7 +669,7 @@ int ksmbd_vfs_rename(struct ksmbd_work *work, const struct path *old_path,
+ 	struct renamedata rd;
+ 	struct ksmbd_share_config *share_conf = work->tcon->share_conf;
+ 	struct ksmbd_file *parent_fp;
+-	int new_type;
++	enum component_type new_type;
+ 	int err, lookup_flags = LOOKUP_NO_SYMLINKS;
+ 
+ 	if (ksmbd_override_fsids(work))
+diff --git a/include/linux/namei.h b/include/linux/namei.h
+index 58600cf234bc..fa3ae87762b7 100644
+--- a/include/linux/namei.h
++++ b/include/linux/namei.h
+@@ -16,7 +16,7 @@ enum { MAX_NESTED_LINKS = 8 };
+ /*
+  * Type of the last component on LOOKUP_PARENT
+  */
+-enum {LAST_NORM, LAST_ROOT, LAST_DOT, LAST_DOTDOT};
++enum component_type {LAST_NORM, LAST_ROOT, LAST_DOT, LAST_DOTDOT};
+ 
+ /* pathwalk mode */
+ #define LOOKUP_FOLLOW		BIT(0)	/* follow links at the end */
+@@ -70,7 +70,7 @@ static inline void end_removing_path(const struct path *path , struct dentry *de
+ 	end_creating_path(path, dentry);
+ }
+ int vfs_path_parent_lookup(struct filename *filename, unsigned int flags,
+-			   struct path *parent, struct qstr *last, int *type,
++			   struct path *parent, struct qstr *last, enum component_type *type,
+ 			   const struct path *root);
+ int vfs_path_lookup(struct dentry *, struct vfsmount *, const char *,
+ 		    unsigned int, struct path *);
 -- 
-2.43.0
+2.53.0
 
