@@ -1,133 +1,162 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3417F13D503
-	for <linux-cifs@vger.kernel.org>; Sun, 19 Apr 2026 01:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D7222541C
+	for <linux-cifs@vger.kernel.org>; Sun, 19 Apr 2026 01:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776562542; cv=pass; b=PNvx3ounD+v8D3AtXS7yApao0VUKPVsuyLELuB/uTZqSBYlKL6iweI6c5qUBGLEMktd1P+U9DC+I8uDnTwQ/MWHm4aFulzLvh6FSmN0+VerRiAWvejuEzcCskkJrNGfMUM3GdENNe1gzqcfWM65UnJCDRt6ILgyntjDVpR4NXc0=
+	t=1776562615; cv=pass; b=G8lEBTLf1V4+NtXQzb64i6f96rVOC3nrpAOI4x8jwmqfd1hFKC52tum/Kj8GNTGdH8T2YdtDKMWKVdGuHyY9X3q/4v8IpmxCJDjyRip/z6QZNIATMnF9LtjZbz9ZAfWl996OZKHu0pQrCpkfAExnRi9K+JvVuPqowYAQ2TK7fTY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776562542; c=relaxed/simple;
-	bh=lcvIlPsdDcCuLZWc5L72DnCt7HcsGssFjaoId6Fn1Kg=;
+	s=arc-20240116; t=1776562615; c=relaxed/simple;
+	bh=SIuzGJEOyfdQbVHrkN9auEfohxql8b/XIH1Ni0aYNGo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BWTn5VN7GFRnFLrsuZeJHQo0DN/kzPySESDRoMDdkLBR0DcIuSm3hHmd0A9y12hQCBV+CElR3zSXbAb5mcYom3M3ZdReWFyz7cQfOgh8DeDdg1NW++vEyshaPGaYWOKD6w/d8AunpGPuN6n4dRNBiWkUx24cS4UffiX4Et1qkRA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ElNK8775; arc=pass smtp.client-ip=209.85.219.50
+	 To:Cc:Content-Type; b=fb6weles58MHt0R5h1hAaQmraHz/K0t8e4l50S4dECfKPcvArw4QGs8vOVHPdw08CPxLVg2S0UV/2TyOkJfYEXxK48WBE1iLsl478nyLW8ulSG4RknGQW9CtABwgm9cs5pKnVa0mUjESt22fqxZhXn6R4EU6qgJP9Dr3S7lolx4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=etdYbYDR; arc=pass smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ElNK8775"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8acb09ddbf6so29996586d6.2
-        for <linux-cifs@vger.kernel.org>; Sat, 18 Apr 2026 18:35:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776562540; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="etdYbYDR"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-506a7bbe9d0so16374711cf.0
+        for <linux-cifs@vger.kernel.org>; Sat, 18 Apr 2026 18:36:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776562612; cv=none;
         d=google.com; s=arc-20240605;
-        b=R+Fi0eybBCh/OJAgcd2dPRWBoiiAPacW1Jp3cTRvJYl7q3e6pYvU8e8iFjzUYmsBA1
-         GgBnw0saUAJ1UBTJAxAu5duZxxYwQ6ofFHYPVnfuk0j6h1ThXVZi6ehUK+YsBZWeM8+P
-         ztBw15iHdqTlfHUhgmCrFyLJ8c6I+U+ixOJZrJWXjsK7qFDmp8WIrQyotUF6q9OEW702
-         2/Le+0oy1T3IB5piBMwSigNoGB9ZLJJZLwzuurd6HaR2TqQd4sf5DaucICcGUApVf42E
-         FgUhHQbWRIOGaVmQNer8rU2/RO1T7t+IhX8jUoXIGp4MnPcYRCJV9A5KitaCf+Ymy6Hd
-         5pFw==
+        b=WvEuz6t67RFJKih1Yy7CkRbnNvFV4ZtgbPetzfaDaxISlJe9aD6VaBg2hFL0JGY3pK
+         BKoQoUpG0yIT+41nJj/xhMXpb+vUXAaRnt8aSE3w04kIxn0WfO11TFzyJu0NuA9NpQ5a
+         UJfH7FSgRwCJ1dghA1yvJFhzXBxOB8fQnK2B/kkLoDcDfTjj/Ik9tl03WHXaxYY1TjPW
+         /ajY6L7LVQzO7z/X1iXCsNdAU8txLzHmJ8ffpbmJBvQo9/yhPAZC2kJ5X3+Oz69REFc+
+         mfjQbR90+TgxBL6F9/6tOlkOuRqE2Sa0szNg70XHPdIo4oRqD0BhTQQTygjheMaNeAv9
+         6BFw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=JzFn1DdpqAIgX9exE4IN6lU5puwoTwb7tv/UGHT/WFw=;
-        fh=ifo8ct5CYa+Yz0DKbCP++JDsJFnUFyyZGythcxLZy8g=;
-        b=P5VdgolgaYRRqxNw2QIG0oygQnwtbv/t0rNeW4wuGR4fom0pDMFkGdC3hyPBWEKyqY
-         9w2wUcNxSLhlvShRETjaTy9+yUzl0DOUskMZySJNCxufmqtxq/bk18WuAYls9FDOW59l
-         Jh+L82V91HfBp+xBFcSJza1c1OlHQt0EbDFMcK3xxfbPPshlKzfrM+a13l+eci+EZa1O
-         O2anx2cLqQCEldCesgl1jqUGehsN+HM12+jsY5yG+IGu29c1UBCx06eUCfp/sHvBbL/a
-         2yb3zFADK2jnnq/muEe4G68BWhwCTlOmQsX/Pm/Dwpa11AYRXDtud2b7N8VFOLvXFgGa
-         HdRw==;
+        bh=8azCiZa6V4YdsfYQY+Iy8S7RLv+cv/K0CnDSyjduQcs=;
+        fh=l4ThzsJjA/Nwhh97MRajyPCgWfVr8GIfKizMmBsb890=;
+        b=X7+ED+Bhu37TMJSjr95jcn37jDbjqj7wcmKDE2bkaOvzjS3/M9qLWtxMf+qhJ4bDHx
+         +KP1kCOXF2eT97IRlItmrH3KlcGXmiXT/5YFzwmqbFPHmZBMATqhaS6qgVa+4mCyCYHM
+         J9pmfWaaNZtK6ypwSojxAmwZmc3hKfclU44LvASl487IOp+gEPIY9sEJb5tElzx72Gn4
+         5ChQg1CBH0Ree/geHkHT9Aq1tRHXmS3T5EzRAYeoED4ka/ciIWDznfm1rNAlqZ3s8T3/
+         hTuhnrXIKpF+wNQuLEJ4kJHacJxS+2k4hrrTM/lalTJ/EA2DnfMAeO4KfuKzejPWTDip
+         Rc7g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776562540; x=1777167340; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776562612; x=1777167412; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JzFn1DdpqAIgX9exE4IN6lU5puwoTwb7tv/UGHT/WFw=;
-        b=ElNK8775+vE1GayVmOhQPKdfukX/B2ghToMheh3GPFaYHe53yoge+X5bpKxmVTFf5i
-         R/OFF2vQdjATjX+XWJbhE/CIECsftzmLLiHKeaIhoAF8YDV8U/uMF7T89P0dWe2eGMDm
-         OXqaPPAXksjcuj6J2yBxAtFOHxvu1tgbttShWL5eiUDUsh9u4GoN5ioyO2Ckq5i56ZvJ
-         XdetULMUVjmZNs8lXadfVNtV2Qjq4kAgqj2BTHEnyrU4F2iAYPrdyxOROpK6fp+6odig
-         oxIf1uIc2sUhf/cji1rD0GgwnXQjokcqvgsFOKn6qw9Kl2FGs5dgCzeSOWwL9eK5PAhI
-         oZzg==
+        bh=8azCiZa6V4YdsfYQY+Iy8S7RLv+cv/K0CnDSyjduQcs=;
+        b=etdYbYDRX1im72blh0xBhg8GPKvbYNqT+oGPIbsTa13vy3aB7hiWcEWCgmHQn1u4WB
+         k31CXU6X3S2pbga6g89zBNZiCXxM7KPUC41lpasQIcVfOVYL8Pb5R70NMAjZh7+QV31t
+         Mu/xhq1ewkerh3KzI3TP7z4er/++73tKqady7Kch+jcA1N2tV79aqmwQ+2nFBmg1I7Fe
+         Cj9EFf0XVrAutsmbKzUDU2/0BF866alu5BM1Lb4mJ42PzMYbeRG774jbXuGFPNosZVnF
+         AbzJZg6wZnpx49PFkV2mZPoMX+8M5fKT0RVRIyYI6Oy6qxfQMG0Nx22UkdflgLiJHCMH
+         7VyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776562540; x=1777167340;
+        d=1e100.net; s=20251104; t=1776562612; x=1777167412;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=JzFn1DdpqAIgX9exE4IN6lU5puwoTwb7tv/UGHT/WFw=;
-        b=FK7ulHBcozIfhEl0oZkUmVn2k1gx7gWt42p1jkr4N9OdVBEHaa9xjqJIOBPz+ZP8Q+
-         z5iTVrjiAPp6EISIdjfJPm0WwVmmdvjqas6l0bFJ/OsYkIRRcvvneDllhPivOOCpmpit
-         q4NU3fA62o6WJreqHq+doGhk6phBBt9BpIzFVH4gXnklKT/jZzXJ2mstH4tEhpQ7bE12
-         hESVvkYblGtWEmYeCCGBJP9tBbLmBgS3eCPEuG5ulOPhmsjda3XZRPem4VIJtxM498nz
-         mASlBIQbRqbsqcyvFHmcJuFXGAK7QhCNPaIr15Ac2ZNP2OkBMpHcxfPmnRhNElSk1d1Y
-         wB/w==
-X-Gm-Message-State: AOJu0YzQhUgTLRJYwp0V5/NvyGf3KWw/rUUZBI4JcU3YnlE/QHg9zOID
-	T3XT6bcFH2nTwY626IlKdiJ6KDLFO7G0DsSqeBp9zNc4n+ViCgC2dIZrr5J8vDhLL/AodFRu1Mn
-	nP0vyYDsz9VLxDPjuG1gjQJbTpeCygXU=
-X-Gm-Gg: AeBDieu20joXC8lhPD9cmPa3PDrEbF2j1FAgkL2W4O0o84gGyZ4I/BjPkyqxZw8sLfD
-	ONJUesN5TXqCnGEbYomAE5NcKSor3bRKWAP2xsMJVBNVzF9m7CmpE2C1qZqFMUQcWMlWZDOhNqH
-	Qa56C6QZy3bNMa9O5B4XkwvHOVekPSz0MVnwNDSL4i3oItSOtc/zxtYqmGoK9EcDxd5tgk1ozPl
-	F9ghMXwamgswQltXvNxrqZkwUwkHqL60SRplk6Aj+A2shNSTOqpXFF0JmFHZ22fP4hI59ultFNq
-	dzk8czMIds1MjbTOPTDmVyoGrLxK3brzs1PZ560chEtPaSdL86b8QHXGVb3UpkkGULssVn9CpWM
-	gQ/ZdIOFxlodynUiAjCMCmDORhOElVOsxcsUXaigf/0rTaObJ//U7qC57aCo5+Dx5v7Nomq5o7Q
-	gigFEpKnNSoTpO7TNmLf21qzqeM8h3g99Q
-X-Received: by 2002:a05:622a:5c1b:b0:509:211e:3624 with SMTP id
- d75a77b69052e-50e36823dd8mr150373111cf.4.1776562540198; Sat, 18 Apr 2026
- 18:35:40 -0700 (PDT)
+        bh=8azCiZa6V4YdsfYQY+Iy8S7RLv+cv/K0CnDSyjduQcs=;
+        b=fqs5wyKvMl4at+SixZVNdowBQvyi6BKBsrGCrKqhW9//EZl+oAclkMmiSAJzfk3/a6
+         4qyDhSicmbnBTtWMJ7c/3W/sqb5E5mNYHOGBYZN2obqe21F8aTY+svQxcvmM36NUgBJE
+         67G6VpV5BnwKUG+gvLTXgkiqSEO6/fQDOkXnIB2fpPwJL6LfWrojDrrDOl8mgAz2baqU
+         OyrX/H8FY0FNjo+0n9K7VQZyili+A3pznDe67GbpJOCAHBOMhJMHp7bI+1m8HuBmAoy6
+         AxQkV5T47MmmKqBLPNkHPDLndxqEwbtcV343Pe8PS+WFbCoRiEs0wJLd5Kv8sU5LNtWb
+         2mGA==
+X-Gm-Message-State: AOJu0YzzV9ZD6VeQK65jMxDuY5bVCtpVi2R6dYdH96A04F3C2c2Sb3wG
+	EDZvGJD+Nw8B5Kid6T9sUCaqRwbrsAAH3qUHi8t9g9YYI4Nvfr/ypLiIvzs/w7F2AzE0+3RjPKr
+	UlMT+np37q5qWdjOIsSYJ/OCFu3qFhxE=
+X-Gm-Gg: AeBDiesF3+HxOqtxjeiyK3a+gtz/3nC8a9MZJMOt/5pGWzBS2jccmj5R9ENt7rlB8fa
+	kqv5+VLmS9ulhd60cGF+4aiD/hw6gUJJfRNFOx7NGqrHT3WPoTSNAojt/aLMPMqD6PxfAOzpniR
+	lrxaf6CqO/9w9+X1JXP2/rR1Najre6/HBSza3+cue0w+22NS0M/PYlzbr9xJ2RTQ8IvhLwBQO4O
+	Oy95AQ2lG1NejHQBWGNMT0yHY8MgaZLAbWAeAorFlQ24opPsdsn1xuhrIB0HhO8/GbVmLD4ibIA
+	Q7yEoTx5s69G8RyTrihQoBH9riOknNMi1inx6LQmnH9UKk8sAj4Pws7ML8Wf84hkvdqaN5w/CCs
+	Q6Q6hfZcVr6a+mzkPR/C5cg8MOFZW/4waigPorfsMRtb4H+1+smoWVzeWJzT67xepqdsHApOT1P
+	57DH+00iKz0MXFIk/+tYVurUn0po9zBK2g
+X-Received: by 2002:ac8:5807:0:b0:50d:7504:b719 with SMTP id
+ d75a77b69052e-50e36ee7aefmr137108941cf.52.1776562611630; Sat, 18 Apr 2026
+ 18:36:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260413190713.283939-1-ematsumiya@suse.de> <20260413190713.283939-2-ematsumiya@suse.de>
-In-Reply-To: <20260413190713.283939-2-ematsumiya@suse.de>
+References: <20260418221311.67583-1-ebiggers@kernel.org>
+In-Reply-To: <20260418221311.67583-1-ebiggers@kernel.org>
 From: Steve French <smfrench@gmail.com>
-Date: Sat, 18 Apr 2026 20:35:28 -0500
-X-Gm-Features: AQROBzCh3ngMuytDfslPqCPObOzGbcADmlfRZo-czjwEzV_sXYcHxWz2NCLWtAI
-Message-ID: <CAH2r5mt1_wE_9A_rJa=Z85kkg-KTZ4BEvMiM-b7c+Yaa5SjBaA@mail.gmail.com>
-Subject: Re: [PATCH 2/8] smb: client: compress: fix bad encoding on last LZ77 flag
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	henrique.carvalho@suse.com
+Date: Sat, 18 Apr 2026 20:36:39 -0500
+X-Gm-Features: AQROBzCK7srreg0o2SXwUbTa33baOj43xTQYmO1CQ0YZRMqB_en4VoZsbvby9rI
+Message-ID: <CAH2r5mu-zJa_N_NJERuOrAbS4RnKsaMTroZs6Nxdtd9CNGo-_w@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] smb: client: Use AES-CMAC library
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>, 
+	linux-crypto@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next
+merged into cifs-2.6.git for-next pending additional testing and review
 
-On Mon, Apr 13, 2026 at 2:07=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.de>=
- wrote:
+On Sat, Apr 18, 2026 at 5:13=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
+wrote:
 >
-> End-of-stream flag could lead to UB because of int promotion
-> (overwriting signed bit).
+> This series updates the SMB client to use the AES-CMAC library functions
+> that were recently added, instead of a "cmac(aes)" crypto_shash.  As
+> usual, this simplifies the code considerably and is much more efficient.
 >
-> Fix it by changing operand from '1' to '1UL'.
+> These patches were originally sent as patches 8-11 of the series
+> https://lore.kernel.org/r/20260218213501.136844-1-ebiggers@kernel.org/
+> The only change from that version was adding tags and rebasing.
+> I also added some microbenchmark results below.
 >
-> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-> ---
->  fs/smb/client/compress/lz77.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> This is intended to be taken through the smb tree, either 7.1 or 7.2
+> depending on maintainer preference.
 >
-> diff --git a/fs/smb/client/compress/lz77.c b/fs/smb/client/compress/lz77.=
-c
-> index 16c7d8f3ef17..c1e7fada6e61 100644
-> --- a/fs/smb/client/compress/lz77.c
-> +++ b/fs/smb/client/compress/lz77.c
-> @@ -216,7 +216,7 @@ noinline int lz77_compress(const void *src, u32 slen,=
- void *dst, u32 *dlen)
->         }
+> A few microbenchmarks that demonstrate improved performance:
 >
->         flag <<=3D (32 - flag_count);
-> -       flag |=3D (1 << (32 - flag_count)) - 1;
-> +       flag |=3D (1UL << (32 - flag_count)) - 1;
->         lz77_write32(flag_pos, flag);
+>  - Total cycles spent in generate_key() during SMB3 mount
+>    decreased from 20640 to 10780 (3 calls total).
 >
->         *dlen =3D dstp - dst;
+>  - Total cycles spent in smb3_calc_signature() during SMB3 mount
+>    decreased from 177620 to 73180 (32 calls & 4255 bytes total).
+>
+>  - Total cycles spent in smb3_calc_signature() while writing 10MB file
+>    decreased from 27551180 to 26628360 (10 calls & 10001392 bytes total)
+>
+>  - Total cycles spent in smb3_calc_signature() while reading 10MB file
+>    decreased from 28390900 to 27879340 (14 calls & 10001781 bytes total)
+>
+> Note that my "before" numbers were taken from current mainline which has
+> my changes that made the "cmac(aes)" crypto_shash a bit faster as well.
+> So the speedup vs v7.0 is actually even greater.
+>
+> Eric Biggers (4):
+>   smb: client: Use AES-CMAC library for SMB3 signature calculation
+>   smb: client: Remove obsolete cmac(aes) allocation
+>   smb: client: Make generate_key() return void
+>   smb: client: Drop 'allocate_crypto' arg from smb*_calc_signature()
+>
+>  fs/smb/client/Kconfig         |   2 +-
+>  fs/smb/client/cifs_unicode.c  |   1 +
+>  fs/smb/client/cifsencrypt.c   |  62 ++++++-------------
+>  fs/smb/client/cifsfs.c        |   1 -
+>  fs/smb/client/cifsglob.h      |   7 +--
+>  fs/smb/client/cifsproto.h     |   3 -
+>  fs/smb/client/misc.c          |  57 -----------------
+>  fs/smb/client/sess.c          |  11 ----
+>  fs/smb/client/smb2proto.h     |   1 -
+>  fs/smb/client/smb2transport.c | 113 +++++++++-------------------------
+>  10 files changed, 53 insertions(+), 205 deletions(-)
+>
+>
+> base-commit: 8541d8f725c673db3bd741947f27974358b2e163
 > --
 > 2.53.0
+>
 >
 
 
