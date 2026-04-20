@@ -1,50 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF17C33A9FE;
-	Mon, 20 Apr 2026 15:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6AC2FD1B3;
+	Mon, 20 Apr 2026 15:53:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776699857; cv=none; b=pbFfnmug3/clhZ7Yq45I23BHpG9sEQ1zmJBeAvchgJBdYz+SryUo2QoLZfnBhR8QP0M/SjM8eqRxay+FrI+w3M2pgSncfCef/ozWgjrXI7hOuMxd3nlNTMlXgBNNtbUl7WpxIeijia+4kmFd6n6WoKjnImHydDi5Ikr7Ulzg1M0=
+	t=1776700394; cv=none; b=uiCUn1LwR3I0vDyrdv85xgeEtZz9GmdDCpaTDiVH/lZRbCJT77t+L6qEklD4u7DDMPSAOJ8lKwt16N38b2vCPZgU5tkHmf/q5tF6rCvWfBzdG0INa1C0X31Uzl23GxKaK4FED6kNyIUG13CuG94pATQrfiC1BGX9lmgkE14v/xI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776699857; c=relaxed/simple;
-	bh=LYTCiJf6qmLJkGVTnGHAKZBzm29nm5z8atWCuRnlyMg=;
+	s=arc-20240116; t=1776700394; c=relaxed/simple;
+	bh=ZFx+/6vyT9oO57nqY+rdh1WFRhVnjGOuSWjHUCnrJ3o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=unn/92uppLrXm8nrbToC4clACCP7haGmSNTLV5YhOxLa3ODVzVnWE9A+zZBEBDgto7G4ARwaHtD0EqXSnPgYK7qwiffuiq0HJpbOtNVRGvjlHUPKvom930z/yr9WF610lk1Hbenw7go4xSdV0Nl1ZoeLmINPCysKrXY/n9OirYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=fptz5j59; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=IZ3KRAAC/9dux6eflFrtzuSCH3308Tf9j2BrzidPVHybdWFlv+rCWIHZxRok8UXklRyQt4hZM5J5GEZOvqETbC0m1o7OQNl/VsLTJpG6Drb1OiwdWhRPtJ0Pc5p7VKscQ9ZAxVxr5vwLBmynz7NuAw7Aub1L4GfsEnWClYapZeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=nLpuQThr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fptz5j59"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A926C19425;
-	Mon, 20 Apr 2026 15:44:17 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="nLpuQThr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43E15C19425;
+	Mon, 20 Apr 2026 15:53:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1776699857;
-	bh=LYTCiJf6qmLJkGVTnGHAKZBzm29nm5z8atWCuRnlyMg=;
+	s=korg; t=1776700394;
+	bh=ZFx+/6vyT9oO57nqY+rdh1WFRhVnjGOuSWjHUCnrJ3o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fptz5j59Ehb+XYjctgBeiQwpSOliVTB4CrbKrwYSPJatsMzXE++5ILFE1+crVsV9u
-	 j8Sj1l+yaWz6NEFOibKXkw+7/69oTqpmY1AgVOaIzoMQt5kzxYNKGTGUYgAiu9Ovy+
-	 WYrhAHu84YVi60gmqj+0320wvPFop+tqk5BM3AZk=
+	b=nLpuQThrTXAVG92391D7KUgzPJnfyjGrJW6+N5zQPnPIa4ScsOiGgMPVC2PUaCE7U
+	 ri0Y3vhhwXB0O3m8peMkbNLzwgCCYFi1A2sIjPVL+e5dzfOXVVqBcNc09WHLZXOHIV
+	 TxfMSmYY0DRnnmLIRctgYY4yuWZxtU+kqrgr6LC4=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	Ruikai Peng <ruikai@pwno.io>,
-	stable@kernel.org,
-	Steve French <smfrench@gmail.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
 	Tom Talpey <tom@talpey.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Bharath SM <bharathsm@microsoft.com>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
-	security@kernel.org,
-	Stefan Metzmacher <metze@samba.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
+	stable <stable@kernel.org>,
 	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 7.0 24/76] smb: server: avoid double-free in smb_direct_free_sendmsg after smb_direct_flush_send_list()
-Date: Mon, 20 Apr 2026 17:41:35 +0200
-Message-ID: <20260420153911.703560229@linuxfoundation.org>
+Subject: [PATCH 6.19 156/220] smb: client: fix off-by-8 bounds check in check_wsl_eas()
+Date: Mon, 20 Apr 2026 17:41:37 +0200
+Message-ID: <20260420153939.644361730@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260420153910.810034134@linuxfoundation.org>
-References: <20260420153910.810034134@linuxfoundation.org>
+In-Reply-To: <20260420153934.013228280@linuxfoundation.org>
+References: <20260420153934.013228280@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -56,63 +53,59 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-7.0-stable review patch.  If anyone has any objections, please let me know.
+6.19-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
-From: Stefan Metzmacher <metze@samba.org>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-commit 84ff995ae826aa6bbcc6c7b9ea569ff67c021d72 upstream.
+commit 3d8b9d06bd3ac4c6846f5498800b0f5f8062e53b upstream.
 
-smb_direct_flush_send_list() already calls smb_direct_free_sendmsg(),
-so we should not call it again after post_sendmsg()
-moved it to the batch list.
+The bounds check uses (u8 *)ea + nlen + 1 + vlen as the end of the EA
+name and value, but ea_data sits at offset sizeof(struct
+smb2_file_full_ea_info) = 8 from ea, not at offset 0.  The strncmp()
+later reads ea->ea_data[0..nlen-1] and the value bytes follow at
+ea_data[nlen+1..nlen+vlen], so the actual end is ea->ea_data + nlen + 1
++ vlen.  Isn't pointer math fun?
 
-Reported-by: Ruikai Peng <ruikai@pwno.io>
-Closes: https://lore.kernel.org/linux-cifs/CAFD3drNOSJ05y3A+jNXSDxW-2w09KHQ0DivhxQ_pcc7immVVOQ@mail.gmail.com/
-Fixes: 34abd408c8ba ("smb: server: make use of smbdirect_socket.send_io.bcredits")
-Cc: stable@kernel.org
-Cc: Steve French <smfrench@gmail.com>
+The earlier check (u8 *)ea > end - sizeof(*ea) only guarantees the
+8-byte header is in bounds, but since the last EA is placed within 8
+bytes of the end of the response, the name and value bytes are read past
+the end of iov.
+
+Fix this mess all up by using ea->ea_data as the base for the bounds
+check.
+
+An "untrusted" server can use this to leak up to 8 bytes of kernel heap
+into the EA name comparison and influence which WSL xattr the data is
+interpreted as.
+
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>
 Cc: Tom Talpey <tom@talpey.com>
-Cc: Ruikai Peng <ruikai@pwno.io>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Bharath SM <bharathsm@microsoft.com>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
-Cc: security@kernel.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Tested-by: Ruikai Peng <ruikai@pwno.io>
+Cc: stable <stable@kernel.org>
+Assisted-by: gregkh_clanker_t1000
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/server/transport_rdma.c |    8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ fs/smb/client/smb2inode.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -1588,15 +1588,21 @@ static int smb_direct_post_send_data(str
- 	if (ret)
- 		goto err;
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -128,7 +128,7 @@ static int check_wsl_eas(struct kvec *rs
+ 		nlen = ea->ea_name_length;
+ 		vlen = le16_to_cpu(ea->ea_value_length);
+ 		if (nlen != SMB2_WSL_XATTR_NAME_LEN ||
+-		    (u8 *)ea + nlen + 1 + vlen > end)
++		    (u8 *)ea->ea_data + nlen + 1 + vlen > end)
+ 			return -EINVAL;
  
-+	/*
-+	 * From here msg is moved to send_ctx
-+	 * and we should not free it explicitly.
-+	 */
-+
- 	if (send_ctx == &_send_ctx) {
- 		ret = smb_direct_flush_send_list(sc, send_ctx, true);
- 		if (ret)
--			goto err;
-+			goto flush_failed;
- 	}
- 
- 	return 0;
- err:
- 	smb_direct_free_sendmsg(sc, msg);
-+flush_failed:
- header_failed:
- 	atomic_inc(&sc->send_io.credits.count);
- credit_failed:
+ 		switch (vlen) {
 
 
