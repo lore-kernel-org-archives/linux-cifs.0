@@ -1,44 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1DA34216C;
-	Mon, 20 Apr 2026 16:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9278D341AD6;
+	Mon, 20 Apr 2026 16:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776701422; cv=none; b=NyjFYudA267g+smJEe8s/VdZBrYZ6i9zc1XX/Xksze+KNIyfmDNl/wj/kgDCed1IC1W0VMCvn8J4FBbSz9fW8JoqZ8SNvX+43CN7JVX9Zp+A9v8NcHxuJUOKYcXJbQYm12ZzT0QVhtjOhPlmmCY4ZSr9T22nViEiAV2myEPRXb0=
+	t=1776701424; cv=none; b=LAAVu+5o3o6Jo5O9QUwcuoF8AIa7uk14t25xUR4HF7eKQ3uv6twfqiJFfxXBJLkDaeiKXCNsl4yTmoZ/UWGF78beqAexx/V27rt5fRt0ARAhSU6xmq8K8kqtCApafZcpJihsFOhccuCFnPU+Fuqj1Y3OSqGhRMPJL+1gF8NvBiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776701422; c=relaxed/simple;
-	bh=zRjqlA3FUqwtDjU1flQlzv/f0TlTFLAFyfYAwfsZg7A=;
+	s=arc-20240116; t=1776701424; c=relaxed/simple;
+	bh=RfIgBfWFfR04b0QyiGIAjdVceRlCx2Dz0B4J7Czz0RQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VKAYXSIkNR4ZQyzkt1KZoRXjXUzwYDvVuGIhCoiLqu4Jg18/kWDqBDU7G8p3fJbgPEzuBDEpBFeiEzjb0yObrHZ5dOoI9zX7v006eXW+QChgOMaCUB7BMWoBZsBFQXSf/yxqEtQfQUqdsYuZ9qwxsPKgGZdWZG3Uzc6fUatXwME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=xOORXfko; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=NZq7nqBIxe9XDrU8QxEwKL+l7N5wsF+wIBi+7LTuebk8gHxOOYLvQXYWilue4leVCFCxC9d6wnHxVviWdzBA3MC1F+jjuce2jB7e9jWFxWM8qX9aDkxxQloFu3qZ1jZhDJdT+0vpZPRuVX8WulDEaqyi9O0h5Gls6K6MIr/Dw1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=kSA2wYpU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="xOORXfko"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 984D8C19425;
-	Mon, 20 Apr 2026 16:10:21 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="kSA2wYpU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 298F4C19425;
+	Mon, 20 Apr 2026 16:10:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1776701421;
-	bh=zRjqlA3FUqwtDjU1flQlzv/f0TlTFLAFyfYAwfsZg7A=;
+	s=korg; t=1776701424;
+	bh=RfIgBfWFfR04b0QyiGIAjdVceRlCx2Dz0B4J7Czz0RQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=xOORXfkopuZrY3tmh9ckxcZ64Vg52TO4V1L+acjcdi4dwRSoMbJT7zP0yLfdHi0ul
-	 XpOStppuaPFrxZiG7+Qz4/db/ff3qsoko98dt8VAUzaEbq00DN4Q5XtbuWkhQ+oToU
-	 9A5kF0PJ0YIgrhGpNavkT4SH3uFcSDVxIVcMhEQE=
+	b=kSA2wYpUQAx0VberUHc+grjcLwcNYBMCF4pXCi43TYnV/6BaldOOdqc+wBsZFBPaA
+	 1O3TKzk4ug8gjIc/4bb63lcPO9FWZMC9EUGFFQXd6dn1OEwe6ijTUs3Z1bx8DxNDbu
+	 5u0gANPkRZNOK8F+uIcWFvze++LzDfvOO23JHuL4=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	stable <stable@kernel.org>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	stable@kernel.org,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.12 107/162] smb: client: fix off-by-8 bounds check in check_wsl_eas()
-Date: Mon, 20 Apr 2026 17:42:19 +0200
-Message-ID: <20260420153930.916061173@linuxfoundation.org>
+Subject: [PATCH 6.12 108/162] ksmbd: validate EaNameLength in smb2_get_ea()
+Date: Mon, 20 Apr 2026 17:42:20 +0200
+Message-ID: <20260420153930.953107782@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420153927.006696811@linuxfoundation.org>
 References: <20260420153927.006696811@linuxfoundation.org>
@@ -59,53 +57,47 @@ Content-Transfer-Encoding: 8bit
 
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-commit 3d8b9d06bd3ac4c6846f5498800b0f5f8062e53b upstream.
+commit 66751841212c2cc196577453c37f7774ff363f02 upstream.
 
-The bounds check uses (u8 *)ea + nlen + 1 + vlen as the end of the EA
-name and value, but ea_data sits at offset sizeof(struct
-smb2_file_full_ea_info) = 8 from ea, not at offset 0.  The strncmp()
-later reads ea->ea_data[0..nlen-1] and the value bytes follow at
-ea_data[nlen+1..nlen+vlen], so the actual end is ea->ea_data + nlen + 1
-+ vlen.  Isn't pointer math fun?
+smb2_get_ea() reads ea_req->EaNameLength from the client request and
+passes it directly to strncmp() as the comparison length without
+verifying that the length of the name really is the size of the input
+buffer received.
 
-The earlier check (u8 *)ea > end - sizeof(*ea) only guarantees the
-8-byte header is in bounds, but since the last EA is placed within 8
-bytes of the end of the response, the name and value bytes are read past
-the end of iov.
+Fix this up by properly checking the size of the name based on the value
+received and the overall size of the request, to prevent a later
+strncmp() call to use the length as a "trusted" size of the buffer.
+Without this check, uninitialized heap values might be slowly leaked to
+the client.
 
-Fix this mess all up by using ea->ea_data as the base for the bounds
-check.
-
-An "untrusted" server can use this to leak up to 8 bytes of kernel heap
-into the EA name comparison and influence which WSL xattr the data is
-interpreted as.
-
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Shyam Prasad N <sprasad@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: Tom Talpey <tom@talpey.com>
-Cc: Bharath SM <bharathsm@microsoft.com>
 Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Cc: stable <stable@kernel.org>
+Cc: <stable@kernel.org>
 Assisted-by: gregkh_clanker_t1000
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/client/smb2inode.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/smb/server/smb2pdu.c |    5 +++++
+ 1 file changed, 5 insertions(+)
 
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -125,7 +125,7 @@ static int check_wsl_eas(struct kvec *rs
- 		nlen = ea->ea_name_length;
- 		vlen = le16_to_cpu(ea->ea_value_length);
- 		if (nlen != SMB2_WSL_XATTR_NAME_LEN ||
--		    (u8 *)ea + nlen + 1 + vlen > end)
-+		    (u8 *)ea->ea_data + nlen + 1 + vlen > end)
- 			return -EINVAL;
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -4728,6 +4728,11 @@ static int smb2_get_ea(struct ksmbd_work
  
- 		switch (vlen) {
+ 		ea_req = (struct smb2_ea_info_req *)((char *)req +
+ 						     le16_to_cpu(req->InputBufferOffset));
++
++		if (le32_to_cpu(req->InputBufferLength) <
++		    offsetof(struct smb2_ea_info_req, name) +
++		    ea_req->EaNameLength)
++			return -EINVAL;
+ 	} else {
+ 		/* need to send all EAs, if no specific EA is requested*/
+ 		if (le32_to_cpu(req->Flags) & SL_RETURN_SINGLE_ENTRY)
 
 
