@@ -1,119 +1,170 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9582DCBE3
-	for <linux-cifs@vger.kernel.org>; Mon, 20 Apr 2026 13:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776693067; cv=none; b=hcND5Ct9zuJlRweHeWN/pKPfzn2JsRHEy67GgxeBI2dk2yaV2P0q5tsc5vdQLWWOAxyOG/spYZWk/Yis3s0ikvQHmLq+aFJvAvG5xSdhiNhFec1uTM7H4L3inE+1TqGmqvVoavHG/hHymLdrjBr/gv4rd0ROTVOMQy49ABPZm0Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776693067; c=relaxed/simple;
-	bh=vmZvs6UHY7QD3B9MWYRhLwssp9+U49BA9oDYPNJlnbQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WQZqf/y/WfPqj7sZjLdzmBJirRiStFhivmg2xYAVXwIDklSgDTzhuBGSW5VUG2UHLwGr/zb9F8XTa061DadG1t1SKMgX1CvKwrBIHVJJ5WRRwplpdF9jaExeKZrPQckplMDSfw83nD/ZHltpWIK3rlQtwEIxDQKzOaCFKZL3I2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eX1CBI0I; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F9D3A3E93
+	for <linux-cifs@vger.kernel.org>; Mon, 20 Apr 2026 14:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776695497; cv=pass; b=sWfJaOAOySt0s3igXjZuG3hA8haf+VzdQNe6koWMxicv8/DeC0+t9Uz0piWD8CnHUYfl0mXPGlWBlPV8jMl2yE/a7YrJ+vSjZpG146/SEJaSaA8KXB94EcPd/enTJfHbpQhhDSMr93SUeQiS+EaL9OGCZjmfpufj2sp1lewDO58=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776695497; c=relaxed/simple;
+	bh=kqPRzU1r8Upp5TYgefpiWZ9RVnkrVKI+N7GY819VmUg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B8i1xGHOebwQrYeqmw70WBZPPJkLICnCBMAqQbytu7uSj7Z/yPfr7nqdGrqEZ5Dl7/boYC0WaEddAm+pwphr8+8mdpJmHV9F64ki41uwWIzNmdL7gKp1InKPALQvcPurpRZJ7C5Qv8qFEqXw3MkvYT9c6oMQD6GFltr4Z+yeq60=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EhQanICp; arc=pass smtp.client-ip=209.85.221.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eX1CBI0I"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8dfb9139008so199174785a.1
-        for <linux-cifs@vger.kernel.org>; Mon, 20 Apr 2026 06:51:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EhQanICp"
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-56efdc96b05so2030209e0c.1
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Apr 2026 07:31:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776695494; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iVAMRF61wIIl7+taYdehJ9mvu8tc8W9gD8lQY2gvhG5B1YVstxl+rujPduNs85/5fb
+         ZkpsDI7dBlqR8eeEBNwuxlACuJgu2TtcVoUIFrjEEHxX70XQnl64zFKtZhsYbWGubgUx
+         iPXhS7+bPBUO4+TP7xF9Ez9RCxyNIaW4/ouv+3PPrL/e2PWG6/IuwGo2sica+oDObuJ7
+         Ccynlk5FRbVa2/iXD38l57avLy7Epjmnvx6MeF6Gz1w9QuTedZGbX0aRD+eSsbXg1ZSZ
+         RjnDfIGxqflJKP02uFsCd3gt9mtUzQTi+VgjQGVBV/LvGYxsC+SIatNgiN0XsO8HLMAX
+         dDew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=4O8Xd8WCONGvKBMRsNl+HFLA/9jUjeJYvKk/a3SZv7Q=;
+        fh=/K5aaURpUYHGQII7tVGcSsbDGVCmjrHYCegMc8u+CDc=;
+        b=FwnJfWZJcOLlxd86/Xl+HI9JidXkDpjQJdpVG6N+UMr36oUOXAFigJOW/Jxm/8mz4i
+         advbTdTK5dXok1LPsfaMspScBbJ4QUWn7nwEIP/BI2YvDCtej9MSSxR546v4eRA+Kxqz
+         XjbH4ghQjqJ0raoH7QhDal5FhYX/z4B/lMVYfvaCZNmx+nmfZbibslUiOfvKUZdsWY21
+         rXMTrw3T5UN10LlgZrTZ7c/sag41Xn82NA9fJiv56grqcQU6jq56r4C+h/dnkKshQ0NF
+         QlYnXYH7trLJfpVY3gn/zi7koUEghrsg/orw52a3+iL8ctKhirAD/a09pdu4NrvJeD70
+         ToUw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776693062; x=1777297862; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2CQQpu+pTCuIRdY5y4O2DIzGNhbLx1QOGGuLTzhze6c=;
-        b=eX1CBI0ISZbv2Dtqx9JEmkmhtO9WaeFmWzGJxfDY58gGclDPTjLddsg7dijrhcFXk3
-         8tikwhZAkUd9yivwOGS4nIrbrPlVeeTGyt/QJ96yEgr2rNgWwVmR6Eg/svqHb0XY8eee
-         j/erY13lySWTYWbaCnMMrA/QnmOV9zEkqEYFVXgvl/uXL3B05RgaFYiKDv0MCuenp0ZR
-         ig5Dr2pmSIRFGnff1TeBnfbk28J5SdUTENMRYPW3kQY+UlPA98EdVDdf4FauSpOxG2o6
-         yy5ycx8LcPKoGDCGjfqCR1naZ9Iew6mwU7H9zVCG7VyQiOcXlo9D55lcHE73dtJQnGbZ
-         LEbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776693062; x=1777297862;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776695494; x=1777300294; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2CQQpu+pTCuIRdY5y4O2DIzGNhbLx1QOGGuLTzhze6c=;
-        b=N5okDjLkHeFh4NFFTDjxXBwvHBYyAx2qEtOgOum+0Td92uElfDTMP3678fpxjwATTd
-         JDEwaHrnv81Wtmy2urLgMoYy14Akn2DKDEXRUFJGE06dfZEOUDsUe82HQkKg48xBjGdl
-         PPksTPnGnJNvO28f44XX9ZTgJxe5LxV/8jEPlQ5Cl5oAM85NyngU8/ibyrwZrThs3Q8h
-         PPNyS5epy3fVRW8cp9hBBiFUbGcGotc6JJoKGmpuirQoF684JVH/ZhXT+1c99KOdsi1w
-         ZbGnTthJcGpzQg7mgpnBTIJSBV4YqGDrGvCuJt+6QMIPukgRR+DCpt8mbHHT47tyWGOb
-         fNZQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+J/y4ttVzcodlBGMeJZsn7PpfXYXd1jN35iislKKKO4sAV9j5h3qMri7UDz1yp/9mXgT8b2lwc5rVz@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2hWClKRVJBsaDpwvcfL1WV86phn+Jr+afrq/v6uwguhdSGvwU
-	6/0ARWuMWfbrJt41h/b0Ntilnqa57y5oP1BujNUF7zGJqXfNQjct9JwvzG3HzT9v
-X-Gm-Gg: AeBDieukPuhKuYRtLRsjiaZbL9GfUp+clF+4gw3bH5Md1H1Vwx9itPPFaSIux8ET7BG
-	daXVTbo9tDtsY3m+9Xpm/t5H11vaNNUtgTUxA19yaNzgL5EqH7RscMDr6h2mAwfRwStNXfLgtXX
-	KtuE6JmgOisaXCsW7KFneEg+3z0bdzCQgiJm66tsRWqSx9ByLLfKS/aFiRPPTzyIk7XZfAxsHVE
-	hUlIm60W/G+OC5e5KoY2l3J4FyLj/FVytrRe3k3nR74sG+Q46SdEcBSKJgZ+mBQCtxj1H3/PmZe
-	HD+iOkeeRxHfhcMnn34oLpK8ORRv4gcgrXO/8GRovcKEm2vAMUeRA/LxHQxgulGYnNtVmWzVwCT
-	VB3JrusMWdXlIx9ft/Cj6UOinm1FwjIkN9Ee8X89fE3XogXddaTvetp3xFT5KnnyZz3w8uoKsbx
-	enTT28LpfFUc83RcArqm3vbKwaTldG4fELScqE0I3LuaalTCZPBxCbLwu55rw4hzC+8R5zNbGE7
-	gp0LNuRWZf8P4kOB1lTbNgJ3SCCABHieLK65XnN+w==
-X-Received: by 2002:a05:620a:370e:b0:8cf:d953:b4f1 with SMTP id af79cd13be357-8e78f72ffd4mr1870500885a.1.1776693061842;
-        Mon, 20 Apr 2026 06:51:01 -0700 (PDT)
-Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e7d69abee3sm790342385a.17.2026.04.20.06.51.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2026 06:51:01 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Steve French <sfrench@samba.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	linux-cifs@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] smb: client: require a full NFS mode SID before reading mode bits
-Date: Mon, 20 Apr 2026 09:50:58 -0400
-Message-ID: <20260420135058.469990-1-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        bh=4O8Xd8WCONGvKBMRsNl+HFLA/9jUjeJYvKk/a3SZv7Q=;
+        b=EhQanICpPv6wEMAT2QVDm8MgxITvcGEAYHe1m42iLSyMQj1Y0WareKAEFrCkR4fDyS
+         SPGbqqTXwePHWW8p/f+2UlF/X2ihrUtbg8fbhtFxe6Qkqi2/QsyMkbJOzqro8eqXQAMl
+         WcTOuWJXsUbOkZXsn0mFPAAJhM+mIGkIVvCxhoXQub2kbpvG2XE+6iWz+07ORoIJhtIs
+         ClD0K9/EMLGHnjeD7QhTdYd1UAPBisbBisjidOI06FRByUtkXvWoSYx8MVyVgkzYR17D
+         5S+1XoMelyZ02D7ZT3mCabthO4VIPjJuimT5uUTlee+2Q1h9TgB0nS+/3YwCJhdIarG8
+         Pp/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776695494; x=1777300294;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4O8Xd8WCONGvKBMRsNl+HFLA/9jUjeJYvKk/a3SZv7Q=;
+        b=PaeMOEH7KMSPrvuDVwaSbREKhOwhO73sWEPHYhwlbnVwXE+Rz08fdI8M0U1K8vo/rO
+         aSsSC7MosP0+f9F1h3CmkvDD3wyab++F4jKToe28VDgNrA2ho3Xt/jMLrfEaqt6VvrEl
+         DmBz4HeYL792MWVlcE8ogokvQfjuqRQPXnjn0zTY16p0Oyu6jzzMaXZ14DphYprFVb+d
+         smdic4C5Cx4BkItOvY8K7NF0h3SMAICbNoRb87YyVJOjByU6RpZGHyW8HmRbBbhDUf6Y
+         T9YfEJYLcNInh5CkztDxhoYe6iVLVfvw88malJcjtUnB5eeTY74vylfURYiI0IvU7xM5
+         TDzg==
+X-Forwarded-Encrypted: i=1; AFNElJ+/sMZLsABpJbT2sSMe56jODV2MMYIPVYr7khcQCQqzTTRQORkSunvQjhdbZS+EKJhMV7HyJU9hxzwa@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDTDi+atJ0G7KWSQdbv4taDqI+NAGKOu2fLtLjfGXQd7v92qPn
+	5mLa2GhCL4WcuoE6bIlMkYkC8PW5b+Uap5698WoXpyBNihHhVSkBe85Aq6kliy+/CMZ7pD9O/6T
+	YsesHsryfloboNOZabMHXUhNFmQopXxw=
+X-Gm-Gg: AeBDiev1PNRlZZ8hzsdNVeKIygZ8Edr7flKq6Q0v3w+iRp43H7IAQrALqoHg+Uajffj
+	WowjY8rAZQLy5i+bXVD5nuZI46sr8g9AjFCTJXwa7vwoXIOHaBjK1UfpHPQY4j+0Tzcp6cXRJRN
+	uyBUZTg7rFe8MDpcNyiGo0WaS6j4kM2GrqQQ7SvTVBuHyArEd5RF8JFMQEey+vbXcXJD4ezIvH7
+	uOM88SjwVD616T1Jlmj/Pl7JRumnCYXn/C6xqGS9UuQT4BU+qBy3lkMluow+GMcVKAmd7Uch3zX
+	4tKtWA23iXuIRxFXhAUbXrI6cx8tx9Kb+Wq5/RUiVKK8C1k76onr
+X-Received: by 2002:a05:6122:4d12:b0:56f:9512:145 with SMTP id
+ 71dfb90a1353d-56fa5a39aa7mr6593038e0c.13.1776695494119; Mon, 20 Apr 2026
+ 07:31:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260328172314.45807-1-dorjoychy111@gmail.com>
+ <20260416-abgraben-seeweg-a44ce660957f@brauner> <CAFfO_h5mORm0OuK-d4thzBWWySmyvLSVeVa7phZc4Df-8D=1Cg@mail.gmail.com>
+ <20260420-laufen-einzeln-4cf4bb364a5d@brauner>
+In-Reply-To: <20260420-laufen-einzeln-4cf4bb364a5d@brauner>
+From: Dorjoy Chowdhury <dorjoychy111@gmail.com>
+Date: Mon, 20 Apr 2026 20:31:23 +0600
+X-Gm-Features: AQROBzDP8Lx2bqkiL-O80tZkD0rFOUG8sjvNKKIkhcPgFqdc6FHkIJDo6D1Xn7k
+Message-ID: <CAFfO_h5FH36eqYuuoYy2eVRXGytmQHLfz5p7fLi+3wHmQN9MnA@mail.gmail.com>
+Subject: Re: [PATCH v6 0/4] OPENAT2_REGULAR flag support for openat2
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-api@vger.kernel.org, ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz, 
+	jlayton@kernel.org, chuck.lever@oracle.com, alex.aring@gmail.com, 
+	arnd@arndb.de, adilger@dilger.ca, mjguzik@gmail.com, smfrench@gmail.com, 
+	richard.henderson@linaro.org, mattst88@gmail.com, linmag7@gmail.com, 
+	tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com, 
+	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com, 
+	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, 
+	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org, pc@manguebit.org, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+	bharathsm@microsoft.com, shuah@kernel.org, miklos@szeredi.hu, 
+	hansg@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-parse_dacl() treats an ACE SID matching sid_unix_NFS_mode as an NFS
-mode SID and reads sid.sub_auth[2] to recover the mode bits.
+On Mon, Apr 20, 2026 at 7:20=E2=80=AFPM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+>
+> On Thu, Apr 16, 2026 at 09:22:03PM +0600, Dorjoy Chowdhury wrote:
+> > On Thu, Apr 16, 2026 at 7:07=E2=80=AFPM Christian Brauner <brauner@kern=
+el.org> wrote:
+> > >
+> > > On Sat, 28 Mar 2026 23:22:21 +0600, Dorjoy Chowdhury wrote:
+> > > > I came upon this "Ability to only open regular files" uapi feature =
+suggestion
+> > > > from https://uapi-group.org/kernel-features/#ability-to-only-open-r=
+egular-files
+> > > > and thought it would be something I could do as a first patch and g=
+et to
+> > > > know the kernel code a bit better.
+> > > >
+> > > > The following filesystems have been tested by building and booting =
+the kernel
+> > > > x86 bzImage in a Fedora 43 VM in QEMU. I have tested with OPENAT2_R=
+EGULAR that
+> > > > regular files can be successfully opened and non-regular files (dir=
+ectory, fifo etc)
+> > > > return -EFTYPE.
+> > > > - btrfs
+> > > > - NFS (loopback)
+> > > > - SMB (loopback)
+> > > >
+> > > > [...]
+> > >
+> > > - I've added an explanation why OPENAT2_REGULAR is only needed for so=
+me
+> > >   ->atomic_open() implementers but not others. What I don't like is t=
+hat
+> > >   we need all that custom handling in there but it's managable.
+> > >
+> > > - I dropped the topmost style conversions. They really don't belong
+> > >   there and if we switch to something better we should use (1 << <nr>=
+).
+> > >
+> > > - I split the EFTYPE errno introduction into a separate patch.
+> > >
+> > > ---
+> >
+> > Thanks for fixing up and picking this one up!
+> >
+> > >
+> > > Applied to the vfs-7.2.openat.regular branch of the vfs/vfs.git tree.
+> > > Patches in the vfs-7.2.openat.regular branch should appear in linux-n=
+ext soon.
+> > >
+> >
+> > I don't see a vfs-7.2.openat.regular branch in vfs/vfs.git tree in
+> > git.kernel.org.  Maybe this hasn't been pushed yet?
+>
+> Nothing will get pushed prior to -rc1 which is due this Sunday.
 
-That assumes the ACE carries three subauthorities, but compare_sids()
-only compares min(a, b) subauthorities.  A malicious server can return
-an ACE with num_subauth = 2 and sub_auth[] = {88, 3}, which still
-matches sid_unix_NFS_mode and then drives the sub_auth[2] read four
-bytes past the end of the ACE.
+Understood. Thanks!
 
-Require num_subauth >= 3 before treating the ACE as an NFS mode SID.
-This keeps the fix local to the special-SID mode path without changing
-compare_sids() semantics for the rest of cifsacl.
-
-Fixes: e2f8fbfb8d09 ("cifs: get mode bits from special sid on stat")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-6
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
----
- fs/smb/client/cifsacl.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index c920039d733c..a62c8a733779 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -831,6 +831,7 @@ static void parse_dacl(struct smb_acl *pdacl, char *end_of_acl,
- 			dump_ace(ppace[i], end_of_acl);
- #endif
- 			if (mode_from_special_sid &&
-+			    ppace[i]->sid.num_subauth >= 3 &&
- 			    (compare_sids(&(ppace[i]->sid),
- 					  &sid_unix_NFS_mode) == 0)) {
- 				/*
--- 
-2.53.0
-
+Regards,
+Dorjoy
