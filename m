@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9278D341AD6;
-	Mon, 20 Apr 2026 16:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26AEF341AD6;
+	Mon, 20 Apr 2026 16:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776701424; cv=none; b=LAAVu+5o3o6Jo5O9QUwcuoF8AIa7uk14t25xUR4HF7eKQ3uv6twfqiJFfxXBJLkDaeiKXCNsl4yTmoZ/UWGF78beqAexx/V27rt5fRt0ARAhSU6xmq8K8kqtCApafZcpJihsFOhccuCFnPU+Fuqj1Y3OSqGhRMPJL+1gF8NvBiY=
+	t=1776701427; cv=none; b=exvWoj/IPJZqmoHzldRsxFfxFQa0JIEY2UhWAxw8vMzSgmTM81aDeC3Zog1Ci8XF2VJkYyOgEfG6uU4e+sHqkB31+ft30Cgo+K4A/uwCGmjYfVWoSGw+Fgxo/SBgovrL89PJ5Qr3qlMLhY/UmNTdYkbkb5HG484J4iP21G+VXRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776701424; c=relaxed/simple;
-	bh=RfIgBfWFfR04b0QyiGIAjdVceRlCx2Dz0B4J7Czz0RQ=;
+	s=arc-20240116; t=1776701427; c=relaxed/simple;
+	bh=RNnAuQNREJcy625ynVc87gEqux/ehzI6zeQfWPYAZFA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NZq7nqBIxe9XDrU8QxEwKL+l7N5wsF+wIBi+7LTuebk8gHxOOYLvQXYWilue4leVCFCxC9d6wnHxVviWdzBA3MC1F+jjuce2jB7e9jWFxWM8qX9aDkxxQloFu3qZ1jZhDJdT+0vpZPRuVX8WulDEaqyi9O0h5Gls6K6MIr/Dw1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=kSA2wYpU; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=bWQZgznFDd21ni9NB4GFfFtjpI1N1a3uKrKsjRprtdERn6WjTgUB88C/XBc9FaPbSOXjOWUqbJKEgBkEt+YdhDq3BAdBUzK4PfoM0VjFP0rUcDjNLOvbxDj854jotivt14OSSXU5pTpDloABkS6tKz7cbey959vHIWpducN/uAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=W4p/2ZHp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="kSA2wYpU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 298F4C19425;
-	Mon, 20 Apr 2026 16:10:24 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="W4p/2ZHp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0CE6C19425;
+	Mon, 20 Apr 2026 16:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1776701424;
-	bh=RfIgBfWFfR04b0QyiGIAjdVceRlCx2Dz0B4J7Czz0RQ=;
+	s=korg; t=1776701427;
+	bh=RNnAuQNREJcy625ynVc87gEqux/ehzI6zeQfWPYAZFA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kSA2wYpUQAx0VberUHc+grjcLwcNYBMCF4pXCi43TYnV/6BaldOOdqc+wBsZFBPaA
-	 1O3TKzk4ug8gjIc/4bb63lcPO9FWZMC9EUGFFQXd6dn1OEwe6ijTUs3Z1bx8DxNDbu
-	 5u0gANPkRZNOK8F+uIcWFvze++LzDfvOO23JHuL4=
+	b=W4p/2ZHpq/9K75/oIOOh8zT8SBwqU94mRQnwARLOnySA4wg6tINWMECJRASFtWM4T
+	 pSg0Cetaluuh4j8CSQwKnNOqg2/h+JnTx0UTHn792jzIWLuCaDkPpQGOzIFEp9i4Qc
+	 7LGU8csxLWQPJAUEaVr2OQiIGIKFcPtNDNBJuzPQ=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -34,9 +34,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-cifs@vger.kernel.org,
 	stable@kernel.org,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.12 108/162] ksmbd: validate EaNameLength in smb2_get_ea()
-Date: Mon, 20 Apr 2026 17:42:20 +0200
-Message-ID: <20260420153930.953107782@linuxfoundation.org>
+Subject: [PATCH 6.12 109/162] ksmbd: require 3 sub-authorities before reading sub_auth[2]
+Date: Mon, 20 Apr 2026 17:42:21 +0200
+Message-ID: <20260420153930.989438476@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420153927.006696811@linuxfoundation.org>
 References: <20260420153927.006696811@linuxfoundation.org>
@@ -57,18 +57,22 @@ Content-Transfer-Encoding: 8bit
 
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-commit 66751841212c2cc196577453c37f7774ff363f02 upstream.
+commit 53370cf9090777774e07fd9a8ebce67c6cc333ab upstream.
 
-smb2_get_ea() reads ea_req->EaNameLength from the client request and
-passes it directly to strncmp() as the comparison length without
-verifying that the length of the name really is the size of the input
-buffer received.
+parse_dacl() compares each ACE SID against sid_unix_NFS_mode and on
+match reads sid.sub_auth[2] as the file mode.  If sid_unix_NFS_mode is
+the prefix S-1-5-88-3 with num_subauth = 2 then compare_sids() compares
+only min(num_subauth, 2) sub-authorities so a client SID with
+num_subauth = 2 and sub_auth = {88, 3} will match.
 
-Fix this up by properly checking the size of the name based on the value
-received and the overall size of the request, to prevent a later
-strncmp() call to use the length as a "trusted" size of the buffer.
-Without this check, uninitialized heap values might be slowly leaked to
-the client.
+If num_subauth = 2 and the ACE is placed at the very end of the security
+descriptor, sub_auth[2] will be  4 bytes past end_of_acl.  The
+out-of-band bytes will then be masked to the low 9 bits and applied as
+the file's POSIX mode, probably not something that is good to have
+happen.
+
+Fix this up by forcing the SID to actually carry a third sub-authority
+before reading it at all.
 
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
@@ -82,22 +86,20 @@ Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/server/smb2pdu.c |    5 +++++
- 1 file changed, 5 insertions(+)
+ fs/smb/server/smbacl.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -4728,6 +4728,11 @@ static int smb2_get_ea(struct ksmbd_work
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -451,7 +451,8 @@ static void parse_dacl(struct mnt_idmap
+ 		ppace[i]->access_req =
+ 			smb_map_generic_desired_access(ppace[i]->access_req);
  
- 		ea_req = (struct smb2_ea_info_req *)((char *)req +
- 						     le16_to_cpu(req->InputBufferOffset));
-+
-+		if (le32_to_cpu(req->InputBufferLength) <
-+		    offsetof(struct smb2_ea_info_req, name) +
-+		    ea_req->EaNameLength)
-+			return -EINVAL;
- 	} else {
- 		/* need to send all EAs, if no specific EA is requested*/
- 		if (le32_to_cpu(req->Flags) & SL_RETURN_SINGLE_ENTRY)
+-		if (!(compare_sids(&ppace[i]->sid, &sid_unix_NFS_mode))) {
++		if (ppace[i]->sid.num_subauth >= 3 &&
++		    !(compare_sids(&ppace[i]->sid, &sid_unix_NFS_mode))) {
+ 			fattr->cf_mode =
+ 				le32_to_cpu(ppace[i]->sid.sub_auth[2]);
+ 			break;
 
 
