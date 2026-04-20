@@ -1,42 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C089F3368B2;
-	Mon, 20 Apr 2026 15:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167A33382DC;
+	Mon, 20 Apr 2026 15:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776699852; cv=none; b=cIudbdmJGMw048oqthEAzZHB6Hq6dQtizPBKkkiTFXo2EhgymObe8QkE4JWLb6fVyDU6oiZmBdQ8U9a1MhEJ9Qfktkn416JmOhrhW6npB8g6M3c3q0+8lOti7M1DCj3IHnTpMdwIqe9VFObiTIHsj3nWd9IEuY8ao2e5D7lHEKg=
+	t=1776699855; cv=none; b=B08aURjMczGsjQgNb2ncggbjNSIcbRrvBoh5PAueywZ9ILG4auTMHOJl9Jn89PBuG37istGMm6Q+9460xEC6q3k5kBfzNgB03ZgheQC3KKOiE8ye/TTTyic5Pu52dl386fII4nN2I82k26YfaRmwDztq/tfnbDYab6sUTOSCrM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776699852; c=relaxed/simple;
-	bh=fS1xS9ik7zKqqfE2hoFyI9cB8bdnDOJPfW3oDvL6VcI=;
+	s=arc-20240116; t=1776699855; c=relaxed/simple;
+	bh=Vk2kKzquFB/Qm4cTL+3E64XGU5EoWCQmeG+FMHAt9zw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=btq5EMF3dTzZz64SVmOxUyMBN2TAd+xK9uPllovxw7Ng8dsEY0/88xgm/k4cUhR+C4Cpqze6QM+Xe1B8sVS3KPdwD8jEAqgewvlKukjNItQaxeJkdtLN8jZ8gERh6YUP5D1KlhOpGptRTVwKYuXZMmlO/b8lBIdAMUvuIMkZCaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=fDvH+dON; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=A47UbFdJFRcjIH3ab7GyY3LA3X+kzJkGJPQ03YTNrUtWYFxMT31i/OUNKBe7fjjw0e6I47fRM2f5xbIGVwU00SCaLJyOVb81QddQetD3aaZu44MUyEFyyL/yhSMHz4aA2F5PnFE1zVUZ/rCLFFTwVJ7GIq9Cja3Hp6S+24dwVhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=hLZNLI6m; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fDvH+dON"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 164BFC19425;
-	Mon, 20 Apr 2026 15:44:11 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="hLZNLI6m"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7837AC19425;
+	Mon, 20 Apr 2026 15:44:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1776699852;
-	bh=fS1xS9ik7zKqqfE2hoFyI9cB8bdnDOJPfW3oDvL6VcI=;
+	s=korg; t=1776699855;
+	bh=Vk2kKzquFB/Qm4cTL+3E64XGU5EoWCQmeG+FMHAt9zw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fDvH+dON1KmwELWR1HxXpIzEyZ6M9QsoHKEkEwSByKX2jHpg3a/NYgIFpkottMc0V
-	 0D67Q7JR7CutyY841Ls/igTuBTA6OXZTuzvrcp2q+qMSKUTjv0ug70MS4cyYjHFdTY
-	 03ax2nvyN4ENuQwVTdkNPNu9YKNDT/jH94uUUvMA=
+	b=hLZNLI6mTS8vImQCGH0JqULw8AC0ln0iWVF71wEHSpXD7ZYpYHlZzdkSAHM2OGrfK
+	 /boMuYMOiGvGK/1QUcs3q9VlNU9uyUzIPcgc1bsNUknjLLiv3LWqBbPgVzNWZCT1t+
+	 2r1nTUKdDhT7qfBfZgH3byFfkrgpaBYuFdtYxT1E=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
+	Ruikai Peng <ruikai@pwno.io>,
 	stable@kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	security@kernel.org,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 7.0 22/76] ksmbd: fix mechToken leak when SPNEGO decode fails after token alloc
-Date: Mon, 20 Apr 2026 17:41:33 +0200
-Message-ID: <20260420153911.631791586@linuxfoundation.org>
+Subject: [PATCH 7.0 23/76] smb: client: avoid double-free in smbd_free_send_io() after smbd_send_batch_flush()
+Date: Mon, 20 Apr 2026 17:41:34 +0200
+Message-ID: <20260420153911.667528794@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420153910.810034134@linuxfoundation.org>
 References: <20260420153910.810034134@linuxfoundation.org>
@@ -55,74 +61,63 @@ Content-Transfer-Encoding: 8bit
 
 ------------------
 
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: Stefan Metzmacher <metze@samba.org>
 
-commit ad0057fb91218914d6c98268718ceb9d59b388e1 upstream.
+commit 27b7c3e916218b5eb2ee350211140e961bfc49be upstream.
 
-The kernel ASN.1 BER decoder calls action callbacks incrementally as it
-walks the input.  When ksmbd_decode_negTokenInit() reaches the mechToken
-[2] OCTET STRING element, ksmbd_neg_token_alloc() allocates
-conn->mechToken immediately via kmemdup_nul().  If a later element in
-the same blob is malformed, then the decoder will return nonzero after
-the allocation is already live.  This could happen if mechListMIC [3]
-overrunse the enclosing SEQUENCE.
+smbd_send_batch_flush() already calls smbd_free_send_io(),
+so we should not call it again after smbd_post_send()
+moved it to the batch list.
 
-decode_negotiation_token() then sets conn->use_spnego = false because
-both the negTokenInit and negTokenTarg grammars failed.  The cleanup at
-the bottom of smb2_sess_setup() is gated on use_spnego:
-
-	if (conn->use_spnego && conn->mechToken) {
-		kfree(conn->mechToken);
-		conn->mechToken = NULL;
-	}
-
-so the kfree is skipped, causing the mechToken to never be freed.
-
-This codepath is reachable pre-authentication, so untrusted clients can
-cause slow memory leaks on a server without even being properly
-authenticated.
-
-Fix this up by not checking check for use_spnego, as it's not required,
-so the memory will always be properly freed.  At the same time, always
-free the memory in ksmbd_conn_free() incase some other failure path
-forgot to free it.
-
-Cc: Namjae Jeon <linkinjeon@kernel.org>
+Reported-by: Ruikai Peng <ruikai@pwno.io>
+Closes: https://lore.kernel.org/linux-cifs/CAFD3drNOSJ05y3A+jNXSDxW-2w09KHQ0DivhxQ_pcc7immVVOQ@mail.gmail.com/
+Fixes: 21538121efe6 ("smb: client: make use of smbdirect_socket.send_io.bcredits")
+Cc: stable@kernel.org
 Cc: Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Ruikai Peng <ruikai@pwno.io>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: linux-cifs@vger.kernel.org
-Cc: <stable@kernel.org>
-Assisted-by: gregkh_clanker_t1000
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: samba-technical@lists.samba.org
+Cc: security@kernel.org
+Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Tested-by: Ruikai Peng <ruikai@pwno.io>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/server/connection.c |    1 +
- fs/smb/server/smb2pdu.c    |    2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ fs/smb/client/smbdirect.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -96,6 +96,7 @@ void ksmbd_conn_free(struct ksmbd_conn *
- 	xa_destroy(&conn->sessions);
- 	kvfree(conn->request_buf);
- 	kfree(conn->preauth_info);
-+	kfree(conn->mechToken);
- 	if (atomic_dec_and_test(&conn->refcnt)) {
- 		conn->transport->ops->free_transport(conn->transport);
- 		kfree(conn);
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -1915,7 +1915,7 @@ out_err:
- 	else if (rc)
- 		rsp->hdr.Status = STATUS_LOGON_FAILURE;
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -1551,17 +1551,25 @@ static int smbd_post_send_iter(struct sm
  
--	if (conn->use_spnego && conn->mechToken) {
-+	if (conn->mechToken) {
- 		kfree(conn->mechToken);
- 		conn->mechToken = NULL;
+ 	rc = smbd_post_send(sc, batch, request);
+ 	if (!rc) {
++		/*
++		 * From here request is moved to batch
++		 * and we should not free it explicitly.
++		 */
++
+ 		if (batch != &_batch)
+ 			return 0;
+ 
+ 		rc = smbd_send_batch_flush(sc, batch, true);
+ 		if (!rc)
+ 			return 0;
++
++		goto err_flush;
  	}
+ 
+ err_dma:
+ 	smbd_free_send_io(request);
+ 
++err_flush:
+ err_alloc:
+ 	atomic_inc(&sc->send_io.credits.count);
+ 	wake_up(&sc->send_io.credits.wait_queue);
 
 
