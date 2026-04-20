@@ -1,48 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1F233F5A9;
-	Mon, 20 Apr 2026 16:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3EF239D6D5
+	for <linux-cifs@vger.kernel.org>; Mon, 20 Apr 2026 17:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776701429; cv=none; b=lagEQ/MfSW3usHZWms1xARoMu4IRig3xrduFtxzyqXFfUkSKBeIVyAHzVzo9PDNFb+Dz3P/Sad7yYccZt4SBJArzDTs56PqQO8efls8c7A7KQN02vzwwfOn6L0zcr9MJ/W7ZyFUpgP5jAqA1Qdw7Z/i6NoPaO3Tpa84sBZ8LI0w=
+	t=1776707495; cv=none; b=qArQ1pHRR050V4TLSUPGatj5kXhIXH5ZJCUwZfDCBXWbWq470QZI7fYtB5Wf1BNwTEtr0Do0hkJ9SG0/guHGD+vbLE6e64OeLhVvUXLhv4mFuMSBuc5ZVbK+/XT6Eih0EYvuOakyttHEnTEFbTYl0bMnkRlt/NGXl6qNblkgxig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776701429; c=relaxed/simple;
-	bh=B0xknbStO549k1VP3VlMj9q0eHnq2JDjcyk74mNx9Co=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RlIJ6SO6hhxMGGYroL4/CWz6PHkiOT5klTzozrHVdptcKeU/KRQS8+KmfSRMUWDZBZCVzJZwqpcXy2PGRQjVXIjdngdsPm+Zv7I0Q2++iKayuQGKQIgzxh13kQoK54gfAcAi6PsjVFTrEs+t0sGBCzSh1FwYW6JWQk2rhRWQYB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=p7YKR8Kk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776707495; c=relaxed/simple;
+	bh=uam3YtKNdr+siwieCKD8+jNVlZSofiVOKYEtdaCJ0Jc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NX+L5bGNs2u3pyZg24gbul8+N22nfQgWoGVbscYpa3QG4TdCaCQJDK335Rzm+L0DR/uiRFUitBlZenC0N7Sgajq1Ttj5/kSvVYJpUkUwnRVHYY+xriokjCuo3kLhtC2Oe/y6fT8lxhYazXBVhmzyQBedBUAQ1n1kiSo+WSqRins=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fAq8XLwG; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="p7YKR8Kk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44F34C19425;
-	Mon, 20 Apr 2026 16:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1776701429;
-	bh=B0xknbStO549k1VP3VlMj9q0eHnq2JDjcyk74mNx9Co=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=p7YKR8KkDg3Sjp2Ps039U9nDliTnz7u7FY2p3bLh1fjC4z0iYY9ohM4RBhvo6cYeH
-	 SPHddzeZYs0kYn0m67Aph7UJxMX6JGmNQw4KbRi80L+n7cuwKFO445u7NE4eJkb7VP
-	 ir7aDh2gdo1SCTEupYzXSuIT1Hjfu8Z/xOffxYt8=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAq8XLwG"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-823be54d49cso393876b3a.3
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Apr 2026 10:51:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776707494; x=1777312294; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xv8YKf2c4/2CV26eV/yRwUDY1hw9RhAfAYIys2Ru/sM=;
+        b=fAq8XLwGzdXaQqDAu4KgdRdU09jTgK8NBLFzeX/WW88wErAnRcaJKqEL7i5+kPuYoH
+         IvTGN/45WNBP6kk1Xhbzs1F8byafoTnYqA4FdcJi+kpafl5GT/kLpAVSv/9zx3dPUwOl
+         4ksuCprbklA/I74R2/LdhxJzc/rmz478h3LwiU/O0OpU8VVavz0YiR8Gm3pjfmeJPLXa
+         AEY3vG7Y3l1B/zP/wZhWiOOvsJ4AAo8Fs2Y/Ss5X77o+ZkvrbcckOJP3SdQpu2gk4Th+
+         y0j2eiKMlCK85S116M9579K3bYA/RIGcjLsV2WntasSZc1dXLISogHbymDwI3u6eKgCj
+         Wicg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776707494; x=1777312294;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Xv8YKf2c4/2CV26eV/yRwUDY1hw9RhAfAYIys2Ru/sM=;
+        b=UkzplVxB3+zCL2V8Pw0QYyLV6qoKZ6ekbb75GibYNHBxKJuVtY6cnfDG3x0DpRSEzk
+         IrmalMvMaq/uEiKpBMDoIjHDb47FPOB2u7KoU9v23PDOtI9ZonwAsCVuAmmDy9oWti6G
+         3PHJ1fXIYqa83LzGVvnpGB42rl3rYau9wijKpEnlL8xTkba/dkkcpWbgYr8I265ADxwX
+         zMX5qFAx9eY9RZ2ekzGsdjtn5Qstj4QtI38DlfTi4HPVfMyJLMJNdr1KFfPb5vjCeVCN
+         kIePuYT1nIITkStyYDUG7umEFxhH4LokY63n50r30pLhizGfyNt0IVN1qI7d1p7W1WH6
+         KgxA==
+X-Forwarded-Encrypted: i=1; AFNElJ/LZt1FAjKj/7LG99ywmVTLhx5c2ssjGCdQH/hoeNzlrenvVz17sJXLhY01YyB0muZUdHPBhuAJs/+O@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHOG2L7rnYX1S0EKARF2K8isbN+86DGbRkd42aCytthtvjgVcw
+	p7/tQwzyVidq+r7w5IipP149nDTo7ffMiSQunBJbJfPZBwZCYfsxijf3
+X-Gm-Gg: AeBDieuFJk5aK7ZiPHhhAbEmFWrWb68eZY9pVQlEPSXoGpsx5VfoXdIPnTY5SuaD31Y
+	PJp7yXzPhvyRrtZjr6v/Eo/XdEwKfXZA6IWjChLt82y7HBCkNrzbR/3/Y6l4bNl6OyunoIzQrru
+	ViFb+a1XjFxd0duOOnzoA1CqgMYi2G06ZMeuMOw0WsSQjIQsn8AO93yeRGx0Tb616Ofr7fbPS+r
+	dFoj2np0Zd/jKjmwudt9rLwm5gP5l3DYvFF1uopfvcSqm/4weyoLiWvr5k1R6pYd7uvSjaziJ+H
+	4AoSUrNITEj7PyDB7XcPEPhm4JgFX474zFJjpxvhw3gbDrkEa2174SCHmqQnePNVVCcaWOilb5u
+	QYqx+GJ/OObFcYWrZ5f38ie7Za/OxxqUMF2q/N6Apm/zl2nqGHfNX492tYSe3d5wte2CUcmb0r2
+	IWCkyyHV3a319zY4wIgEYRKpMU4UQ=
+X-Received: by 2002:a05:6a00:2d03:b0:82f:6a82:4231 with SMTP id d2e1a72fcca58-82f8c85475fmr7428020b3a.1.1776707493907;
+        Mon, 20 Apr 2026 10:51:33 -0700 (PDT)
+Received: from ser8.. ([221.156.231.192])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f97eb5ce8sm9299074b3a.61.2026.04.20.10.51.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Apr 2026 10:51:33 -0700 (PDT)
+From: DaeMyung Kang <charsyam@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Tom Talpey <tom@talpey.com>,
 	linux-cifs@vger.kernel.org,
-	stable@kernel.org,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.12 110/162] ksmbd: fix mechToken leak when SPNEGO decode fails after token alloc
-Date: Mon, 20 Apr 2026 17:42:22 +0200
-Message-ID: <20260420153931.025296062@linuxfoundation.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260420153927.006696811@linuxfoundation.org>
-References: <20260420153927.006696811@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	linux-kernel@vger.kernel.org,
+	DaeMyung Kang <charsyam@gmail.com>
+Subject: [PATCH 2/2] ksmbd: fix CreateOptions sanitization clobbering the whole field
+Date: Tue, 21 Apr 2026 02:51:25 +0900
+Message-ID: <20260420175125.3341090-1-charsyam@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,78 +76,49 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+smb2_open() attempts to clear conflicting CreateOptions bits
+(FILE_SEQUENTIAL_ONLY_LE together with FILE_RANDOM_ACCESS_LE, and
+FILE_NO_COMPRESSION_LE on a directory open), but uses a plain
+assignment of the bitwise negation of the target flag:
 
-------------------
+	req->CreateOptions = ~(FILE_SEQUENTIAL_ONLY_LE);
+	req->CreateOptions = ~(FILE_NO_COMPRESSION_LE);
 
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+This replaces the entire field with 0xFFFFFFFB / 0xFFFFFFEF rather
+than clearing a single bit. With the SEQUENTIAL/RANDOM case, the
+next check for FILE_OPEN_BY_FILE_ID_LE | CREATE_TREE_CONNECTION |
+FILE_RESERVE_OPFILTER_LE then trivially matches and a legitimate
+request is rejected with -EOPNOTSUPP. With the NO_COMPRESSION case,
+every downstream test (FILE_DELETE_ON_CLOSE, etc.) operates on a
+corrupted CreateOptions value.
 
-commit ad0057fb91218914d6c98268718ceb9d59b388e1 upstream.
-
-The kernel ASN.1 BER decoder calls action callbacks incrementally as it
-walks the input.  When ksmbd_decode_negTokenInit() reaches the mechToken
-[2] OCTET STRING element, ksmbd_neg_token_alloc() allocates
-conn->mechToken immediately via kmemdup_nul().  If a later element in
-the same blob is malformed, then the decoder will return nonzero after
-the allocation is already live.  This could happen if mechListMIC [3]
-overrunse the enclosing SEQUENCE.
-
-decode_negotiation_token() then sets conn->use_spnego = false because
-both the negTokenInit and negTokenTarg grammars failed.  The cleanup at
-the bottom of smb2_sess_setup() is gated on use_spnego:
-
-	if (conn->use_spnego && conn->mechToken) {
-		kfree(conn->mechToken);
-		conn->mechToken = NULL;
-	}
-
-so the kfree is skipped, causing the mechToken to never be freed.
-
-This codepath is reachable pre-authentication, so untrusted clients can
-cause slow memory leaks on a server without even being properly
-authenticated.
-
-Fix this up by not checking check for use_spnego, as it's not required,
-so the memory will always be properly freed.  At the same time, always
-free the memory in ksmbd_conn_free() incase some other failure path
-forgot to free it.
-
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: <stable@kernel.org>
-Assisted-by: gregkh_clanker_t1000
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Use &= ~FLAG to clear only the intended bit in both places.
 ---
- fs/smb/server/connection.c |    1 +
- fs/smb/server/smb2pdu.c    |    2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ fs/smb/server/smb2pdu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -39,6 +39,7 @@ void ksmbd_conn_free(struct ksmbd_conn *
- 	xa_destroy(&conn->sessions);
- 	kvfree(conn->request_buf);
- 	kfree(conn->preauth_info);
-+	kfree(conn->mechToken);
- 	if (atomic_dec_and_test(&conn->refcnt)) {
- 		conn->transport->ops->free_transport(conn->transport);
- 		kfree(conn);
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 6a60f97baa60..38d3bc66912d 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -1921,7 +1921,7 @@ out_err:
- 	else if (rc)
- 		rsp->hdr.Status = STATUS_LOGON_FAILURE;
+@@ -3063,7 +3063,7 @@ int smb2_open(struct ksmbd_work *work)
+ 	} else {
+ 		if (req->CreateOptions & FILE_SEQUENTIAL_ONLY_LE &&
+ 		    req->CreateOptions & FILE_RANDOM_ACCESS_LE)
+-			req->CreateOptions = ~(FILE_SEQUENTIAL_ONLY_LE);
++			req->CreateOptions &= ~FILE_SEQUENTIAL_ONLY_LE;
  
--	if (conn->use_spnego && conn->mechToken) {
-+	if (conn->mechToken) {
- 		kfree(conn->mechToken);
- 		conn->mechToken = NULL;
+ 		if (req->CreateOptions &
+ 		    (FILE_OPEN_BY_FILE_ID_LE | CREATE_TREE_CONNECTION |
+@@ -3077,7 +3077,7 @@ int smb2_open(struct ksmbd_work *work)
+ 				rc = -EINVAL;
+ 				goto err_out2;
+ 			} else if (req->CreateOptions & FILE_NO_COMPRESSION_LE) {
+-				req->CreateOptions = ~(FILE_NO_COMPRESSION_LE);
++				req->CreateOptions &= ~FILE_NO_COMPRESSION_LE;
+ 			}
+ 		}
  	}
-
+-- 
+2.43.0
 
