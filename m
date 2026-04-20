@@ -1,44 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FA32FD1B3;
-	Mon, 20 Apr 2026 15:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC846331A78;
+	Mon, 20 Apr 2026 15:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776700397; cv=none; b=hdYxnHSCOxvWsvriH6QEVw981WhNUt2FuU2TuQewrzq4iOiG2bNEMz4pRANzV8XFIHOgGDcG6UiodT+FMVM31dAtXFE6Iwab3lQAo7tvbJWTUeSEh+PjIlAhi+2qcRvcPVQo7vMjo6Zsd57vSQXUgQmQWnIbn2Gw0F69PTZaBZ0=
+	t=1776700399; cv=none; b=bawy+7wc+ipVu0OWhQCpYXk40Z6wh/E0O8XNbSNPYtgF8PbmbbBTF6bKch/366yOiGO5AGw+jLr8NxnnOIuuxcLkan5u5CpvRBO7fAmD17iiAESHlb/Vo5NzvAlZL4dzgcG57HWLXDSz9SrcrOlVnMsQP/CdmY8ZFhRQdeqeIZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776700397; c=relaxed/simple;
-	bh=0PnLtfcrXRIacLLkvzUgE9f5JWRnUiwevPJCdePcPUA=;
+	s=arc-20240116; t=1776700399; c=relaxed/simple;
+	bh=x39GDkHcmHPimkenSRbNN6UBuHy6N73oEspqX7F37NI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jdhTDXx7UjXtxIvKoMJWy+dOUT/c7rHV7tSFQV105oi/TaZFoA/PB77SOoBBh9LS6t6tdkBG7T9nRmV9c3vL+62tbGj6d7xezwJNAZ6j0CC4EyfGWk+Mhdrvqacyj9TyrdGI/hC/xe5aOp7i3LyHHvH6YnwTnnrxbAKAU5OsYhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=KIFGuAef; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Gnr1cLyh6fN1DGe3Dwv6wYDgG0Wt67ld4NfUY+LE4PCk7lAMob2SPbGjXb4a6NmgmDUi7TujmUb8pZo+kLoZVZXia0BsAcJ6FScfSowzAWDtOSTcyBiLaotGemZFIcVRFF94nLCmU6xsSfxvMTOhEuXeeqlLsv/lijMC7p2lFHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=niAnYraS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="KIFGuAef"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC771C19425;
-	Mon, 20 Apr 2026 15:53:16 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="niAnYraS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63802C19425;
+	Mon, 20 Apr 2026 15:53:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1776700397;
-	bh=0PnLtfcrXRIacLLkvzUgE9f5JWRnUiwevPJCdePcPUA=;
+	s=korg; t=1776700399;
+	bh=x39GDkHcmHPimkenSRbNN6UBuHy6N73oEspqX7F37NI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KIFGuAef1Wn9Hl4iVcEO/GSwzOgULQ5PIisnxr83/6ynAhv8wScumMdGeybuv/X1m
-	 pZRMmtKAToDLHullZsQQVTUUuj2x/Rgdg9EDPy/NRmfegWskAHP5hK8nysYU9lnITe
-	 faS9mgOjV1rujJ1/w3Ua/qE/iAqfMzbF8hZLcccU=
+	b=niAnYraSt91+2VMyW9GmZyoWJdPUNRWrlQfpE8wc9q3a4w8Ml7vlKiMZ9JzWcldMm
+	 K6PdkEkNPTVUy18PqULskUF71vx00JioNp4HwvsLTLXfAxVT5OTyw/1nvTM4lANOWG
+	 GqjtlBvzdzwSKbolaRqhcCwsdngtERFL3IXV5TBM=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	stable <stable@kernel.org>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	stable@kernel.org,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.19 157/220] smb: client: fix OOB reads parsing symlink error response
-Date: Mon, 20 Apr 2026 17:41:38 +0200
-Message-ID: <20260420153939.680614294@linuxfoundation.org>
+Subject: [PATCH 6.19 158/220] ksmbd: validate EaNameLength in smb2_get_ea()
+Date: Mon, 20 Apr 2026 17:41:39 +0200
+Message-ID: <20260420153939.716968248@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420153934.013228280@linuxfoundation.org>
 References: <20260420153934.013228280@linuxfoundation.org>
@@ -59,113 +57,47 @@ Content-Transfer-Encoding: 8bit
 
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-commit 3df690bba28edec865cf7190be10708ad0ddd67e upstream.
+commit 66751841212c2cc196577453c37f7774ff363f02 upstream.
 
-When a CREATE returns STATUS_STOPPED_ON_SYMLINK, smb2_check_message()
-returns success without any length validation, leaving the symlink
-parsers as the only defense against an untrusted server.
+smb2_get_ea() reads ea_req->EaNameLength from the client request and
+passes it directly to strncmp() as the comparison length without
+verifying that the length of the name really is the size of the input
+buffer received.
 
-symlink_data() walks SMB 3.1.1 error contexts with the loop test "p <
-end", but reads p->ErrorId at offset 4 and p->ErrorDataLength at offset
-0.  When the server-controlled ErrorDataLength advances p to within 1-7
-bytes of end, the next iteration will read past it.  When the matching
-context is found, sym->SymLinkErrorTag is read at offset 4 from
-p->ErrorContextData with no check that the symlink header itself fits.
+Fix this up by properly checking the size of the name based on the value
+received and the overall size of the request, to prevent a later
+strncmp() call to use the length as a "trusted" size of the buffer.
+Without this check, uninitialized heap values might be slowly leaked to
+the client.
 
-smb2_parse_symlink_response() then bounds-checks the substitute name
-using SMB2_SYMLINK_STRUCT_SIZE as the offset of PathBuffer from
-iov_base.  That value is computed as sizeof(smb2_err_rsp) +
-sizeof(smb2_symlink_err_rsp), which is correct only when
-ErrorContextCount == 0.
-
-With at least one error context the symlink data sits 8 bytes deeper,
-and each skipped non-matching context shifts it further by 8 +
-ALIGN(ErrorDataLength, 8).  The check is too short, allowing the
-substitute name read to run past iov_len.  The out-of-bound heap bytes
-are UTF-16-decoded into the symlink target and returned to userspace via
-readlink(2).
-
-Fix this all up by making the loops test require the full context header
-to fit, rejecting sym if its header runs past end, and bound the
-substitute name against the actual position of sym->PathBuffer rather
-than a fixed offset.
-
-Because sub_offs and sub_len are 16bits, the pointer math will not
-overflow here with the new greater-than.
-
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Shyam Prasad N <sprasad@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: Tom Talpey <tom@talpey.com>
-Cc: Bharath SM <bharathsm@microsoft.com>
 Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Cc: stable <stable@kernel.org>
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Cc: <stable@kernel.org>
 Assisted-by: gregkh_clanker_t1000
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/client/smb2file.c |   20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+ fs/smb/server/smb2pdu.c |    5 +++++
+ 1 file changed, 5 insertions(+)
 
---- a/fs/smb/client/smb2file.c
-+++ b/fs/smb/client/smb2file.c
-@@ -27,10 +27,11 @@ static struct smb2_symlink_err_rsp *syml
- {
- 	struct smb2_err_rsp *err = iov->iov_base;
- 	struct smb2_symlink_err_rsp *sym = ERR_PTR(-EINVAL);
-+	u8 *end = (u8 *)err + iov->iov_len;
- 	u32 len;
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -4715,6 +4715,11 @@ static int smb2_get_ea(struct ksmbd_work
  
- 	if (err->ErrorContextCount) {
--		struct smb2_error_context_rsp *p, *end;
-+		struct smb2_error_context_rsp *p;
- 
- 		len = (u32)err->ErrorContextCount * (offsetof(struct smb2_error_context_rsp,
- 							      ErrorContextData) +
-@@ -39,8 +40,7 @@ static struct smb2_symlink_err_rsp *syml
- 			return ERR_PTR(-EINVAL);
- 
- 		p = (struct smb2_error_context_rsp *)err->ErrorData;
--		end = (struct smb2_error_context_rsp *)((u8 *)err + iov->iov_len);
--		do {
-+		while ((u8 *)p + sizeof(*p) <= end) {
- 			if (le32_to_cpu(p->ErrorId) == SMB2_ERROR_ID_DEFAULT) {
- 				sym = (struct smb2_symlink_err_rsp *)p->ErrorContextData;
- 				break;
-@@ -50,14 +50,16 @@ static struct smb2_symlink_err_rsp *syml
- 
- 			len = ALIGN(le32_to_cpu(p->ErrorDataLength), 8);
- 			p = (struct smb2_error_context_rsp *)(p->ErrorContextData + len);
--		} while (p < end);
-+		}
- 	} else if (le32_to_cpu(err->ByteCount) >= sizeof(*sym) &&
- 		   iov->iov_len >= SMB2_SYMLINK_STRUCT_SIZE) {
- 		sym = (struct smb2_symlink_err_rsp *)err->ErrorData;
- 	}
- 
--	if (!IS_ERR(sym) && (le32_to_cpu(sym->SymLinkErrorTag) != SYMLINK_ERROR_TAG ||
--			     le32_to_cpu(sym->ReparseTag) != IO_REPARSE_TAG_SYMLINK))
-+	if (!IS_ERR(sym) &&
-+	    ((u8 *)sym + sizeof(*sym) > end ||
-+	     le32_to_cpu(sym->SymLinkErrorTag) != SYMLINK_ERROR_TAG ||
-+	     le32_to_cpu(sym->ReparseTag) != IO_REPARSE_TAG_SYMLINK))
- 		sym = ERR_PTR(-EINVAL);
- 
- 	return sym;
-@@ -128,8 +130,10 @@ int smb2_parse_symlink_response(struct c
- 	print_len = le16_to_cpu(sym->PrintNameLength);
- 	print_offs = le16_to_cpu(sym->PrintNameOffset);
- 
--	if (iov->iov_len < SMB2_SYMLINK_STRUCT_SIZE + sub_offs + sub_len ||
--	    iov->iov_len < SMB2_SYMLINK_STRUCT_SIZE + print_offs + print_len)
-+	if ((char *)sym->PathBuffer + sub_offs + sub_len >
-+		(char *)iov->iov_base + iov->iov_len ||
-+	    (char *)sym->PathBuffer + print_offs + print_len >
-+		(char *)iov->iov_base + iov->iov_len)
- 		return -EINVAL;
- 
- 	return smb2_parse_native_symlink(path,
+ 		ea_req = (struct smb2_ea_info_req *)((char *)req +
+ 						     le16_to_cpu(req->InputBufferOffset));
++
++		if (le32_to_cpu(req->InputBufferLength) <
++		    offsetof(struct smb2_ea_info_req, name) +
++		    ea_req->EaNameLength)
++			return -EINVAL;
+ 	} else {
+ 		/* need to send all EAs, if no specific EA is requested*/
+ 		if (le32_to_cpu(req->Flags) & SL_RETURN_SINGLE_ENTRY)
 
 
