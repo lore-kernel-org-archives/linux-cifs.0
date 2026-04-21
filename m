@@ -1,102 +1,374 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0321B4F09;
-	Tue, 21 Apr 2026 11:56:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058553D331E
+	for <linux-cifs@vger.kernel.org>; Tue, 21 Apr 2026 12:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776772601; cv=none; b=ikV4GcrYzGkWRIjQd15ch6qBJdgh8FBzLR9CWLrONUreVsigodMORZ983O1EzlowlyoaxjgrBKOWEjxWl1yFEfsGW93bs99oRFKy0+MVxRqkxQ6hgkVBvxUtXfb6e1tKMzGhd8fvw2/x+eis8iPyiY0aQrirXiiYr/NFuDb/tnE=
+	t=1776775169; cv=none; b=LKMpLsYCViZq1LSFZ9WL2waqUnTdztGUbDv0T82lcC5Sk4E2Ma1xi0NJxVags+d/vv1s9/GCsAZfIAAxLIOIV2cSH9sMPMvzevFjh65OHx/x30jum8bFVGU/Tl41adOQl8cWdvNGoA+DESYAt6pl055Jt+tNjYzWmAs6VpeWYpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776772601; c=relaxed/simple;
-	bh=MNJPO7cGXFv8GlOOyNtbzfLCDQRkPcX6aOvPd5gkUcU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gJkXPGEwe7OvU7NSrZpJo4yNj8h1wDRIjvOfo+V3a9WlG+NOgAFZPvV4lY/SE/dafXBDvf7RFz53qoYwpNzZR39+Z/foS9Kfts2s334oukXrwBheIKU/kL0R7LCaqEh7gnMgnPT9YdMuFXG3rcz79+bEh8MDDUtMsUL4tSKVrjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fGlM0WG0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776775169; c=relaxed/simple;
+	bh=FvJNOGU7MsDYoheWkBb97ajGZ9xre/oYxy1tshjVmbY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O+RaRqU31KMFcneywvMPw5gIsLHbTA5W0myOuxF/EXToPJnvzBu5GLEXAegn6FOjvE3lapTSkyMqkzHtB7LO9v/mvT5As8/ZMz1GRaLHM/225+H+pOseSzIqSXXbf3FSsg5NFEBXQIR4RRejPL71M/3tGITF5QIEEgWp8EXAmMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=PQQv364u; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=v53PWA4W; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=PQQv364u; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=v53PWA4W; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fGlM0WG0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98459C2BCB0;
-	Tue, 21 Apr 2026 11:56:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776772600;
-	bh=MNJPO7cGXFv8GlOOyNtbzfLCDQRkPcX6aOvPd5gkUcU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fGlM0WG0IV1Y2AfP8OIhIwO55cOroMm7l6xyg00zRkIx1i1ezI2am9p1um0kY6ln6
-	 jBjVBuv3bGOm0XWAkq9s9Su3N47zXkTPCsGTqpcT2LqVZYUsJSTmb1C44tEkTE3PRp
-	 6Pf4QW1sknOFR1OgRp0LtRlsvX2OahM1OQfBFBVVh1/1OAoW7FB0sK7OrdIWCtutJr
-	 eQIZVNMJCXNBk6Ja5duuH7UHZ8HmL56Vs12bp2goPj6MWwmWQupMVaIvJW5qq/yiNw
-	 MqFJLKsa+EjwKUbkpadlIqkkfHifbteYaEEJh9UIv3ZerehHtcaDWxOnss78HDP4GU
-	 dGYRde56ItGuQ==
-From: Christian Brauner <brauner@kernel.org>
-To: Christian Brauner <brauner@kernel.org>,
-	David Howells <dhowells@redhat.com>
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 00/11] netfs: Further miscellaneous fixes
-Date: Tue, 21 Apr 2026 13:56:32 +0200
-Message-ID: <20260421-matschen-esskultur-6ff56a239132@brauner>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260420083705.1009074-1-dhowells@redhat.com>
-References: <20260420083705.1009074-1-dhowells@redhat.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="PQQv364u";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="v53PWA4W";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="PQQv364u";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="v53PWA4W"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id A48245BE05;
+	Tue, 21 Apr 2026 12:39:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1776775160; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=1qkTUVyVBLSrMYm3CtYmpvyhe/WleMKOiSQdzfUBphc=;
+	b=PQQv364u5l41rqaTE0dlo/4wOr+BbsQQp+p6h2XzMm2LAhNXq2yiTEGJrvB5H7jZ/NSY8w
+	jq+FgtladKsvKF+xUWGz/3fpNrcdYFClGj4cYoIFQ5eBZ1gsN2To8HmaJof034GRkWhAtk
+	UTfH2m6GZx1H0sXkpo+EFVouqG2skK0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1776775160;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=1qkTUVyVBLSrMYm3CtYmpvyhe/WleMKOiSQdzfUBphc=;
+	b=v53PWA4WuBaxREQbWMsLIrefHoQSuXhJLQ5GPgy1Ov7YbiYR9kSKOx0Y8Tp1AtkvmYWcJF
+	mWd8Kw5jmeX5A5BA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=PQQv364u;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=v53PWA4W
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1776775160; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=1qkTUVyVBLSrMYm3CtYmpvyhe/WleMKOiSQdzfUBphc=;
+	b=PQQv364u5l41rqaTE0dlo/4wOr+BbsQQp+p6h2XzMm2LAhNXq2yiTEGJrvB5H7jZ/NSY8w
+	jq+FgtladKsvKF+xUWGz/3fpNrcdYFClGj4cYoIFQ5eBZ1gsN2To8HmaJof034GRkWhAtk
+	UTfH2m6GZx1H0sXkpo+EFVouqG2skK0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1776775160;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=1qkTUVyVBLSrMYm3CtYmpvyhe/WleMKOiSQdzfUBphc=;
+	b=v53PWA4WuBaxREQbWMsLIrefHoQSuXhJLQ5GPgy1Ov7YbiYR9kSKOx0Y8Tp1AtkvmYWcJF
+	mWd8Kw5jmeX5A5BA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8FDC6593AF;
+	Tue, 21 Apr 2026 12:39:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 3a+/Ifhv52k9XQAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Tue, 21 Apr 2026 12:39:20 +0000
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: linux-cifs@vger.kernel.org
+Cc: smfrench@gmail.com,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	henrique.carvalho@suse.com
+Subject: [PATCH] smb: client: fix (remove) drop_dir_cache module parameter
+Date: Tue, 21 Apr 2026 14:05:24 -0300
+Message-ID: <20260421170524.266984-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2421; i=brauner@kernel.org; h=from:subject:message-id; bh=MNJPO7cGXFv8GlOOyNtbzfLCDQRkPcX6aOvPd5gkUcU=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQ+T/20TeLYXq2kFW/eXImKej8/Od+73EpPMMXl9LUfL HfmMuqEdpSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAEykXYWRYcXuI2cnZlt6/Fwm byR6Oe3gHLbala8+eF7mjJdb0LR9azcjw6ymo2KzpvOcaGtsWR9+/uTPoN8Tdu56VZehasC6iv9 XMwsA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
+X-Spamd-Bar: /
+X-Rspamd-Queue-Id: A48245BE05
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: 0.99
+X-Spam-Level: 
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [0.99 / 50.00];
+	DATE_IN_FUTURE(4.00)[4];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCVD_TLS_ALL(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
 
-On Mon, 20 Apr 2026 09:36:51 +0100, David Howells wrote:
-> Here are some more miscellaneous fixes for netfslib, found by Sashiko.dev's
-> AI review[1] in response to the previous miscellaneous fix posting[2], plus
-> a repeat of another patch you haven't picked up yet:
-> 
->  (1) Fix an early put of the sink page used in netfs_read_gaps(), before
->      the request has completed.
-> 
-> [...]
+Being a module parameter, it's possible to do:
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+  # modprobe cifs drop_dir_cache=1
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+Which will lead to a crash, because cifs_tcp_ses_list hasn't been
+initialized yet:
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+  [  168.242624] BUG: kernel NULL pointer dereference, address: 0000000000000010
+  [  168.242952] #PF: supervisor read access in kernel mode
+  [  168.243175] #PF: error_code(0x0000) - not-present page
+  [  168.243394] PGD 0 P4D 0
+  [  168.243524] Oops: Oops: 0000 [#1] SMP NOPTI
+  [  168.243703] CPU: 2 UID: 0 PID: 1105 Comm: modprobe Not tainted 7.0.0-lku #5 PREEMPT(lazy)
+  [  168.244054] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.17.0-2-g4f253b9b-prebuilt.qemu.org 04/01/2014
+  [  168.244557] RIP: 0010:cifs_param_set_drop_dir_cache+0x7c/0x100 [cifs]
+  ...
+  [  168.248785] Call Trace:
+  [  168.248915]  <TASK>
+  [  168.249023]  parse_args+0x285/0x3a0
+  [  168.249204]  ? __pfx_unknown_module_param_cb+0x10/0x10
+  [  168.249448]  load_module+0x192b/0x1bb0
+  [  168.249637]  ? __pfx_unknown_module_param_cb+0x10/0x10
+  [  168.249882]  ? kernel_read_file+0x27d/0x2b0
+  [  168.250088]  init_module_from_file+0xce/0xf0
+  [  168.250291]  idempotent_init_module+0xfb/0x2f0
+  [  168.250496]  __x64_sys_finit_module+0x5a/0xa0
+  [  168.250694]  do_syscall_64+0xe0/0x5a0
+  [  168.250863]  ? exc_page_fault+0x65/0x160
+  [  168.251050]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  [  168.251284] RIP: 0033:0x7fcaa12b774d
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+Instead of fixing this with some kind of "is module initialized"
+approach, this patch instead moves that functionality to procfs,
+setting a write op for the existing open_dirs entry, where
+writing a 0 to it will drop the cached directory entries.
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
+Also make it available only when CONFIG_CIFS_DEBUG2=y.
 
-[01/11] netfs: Fix early put of sink folio in netfs_read_gaps()
-        https://git.kernel.org/vfs/vfs/c/9d17365ee50d
-[02/11] netfs: Fix leak of request in netfs_write_begin() error handling
-        https://git.kernel.org/vfs/vfs/c/453f1cc34a8f
-[03/11] netfs: Fix potential UAF in netfs_unlock_abandoned_read_pages()
-        https://git.kernel.org/vfs/vfs/c/b712de212717
-[04/11] netfs: Fix potential uninitialised var in netfs_extract_user_iter()
-        https://git.kernel.org/vfs/vfs/c/3a6ca6bbb857
-[05/11] netfs: Fix partial invalidation of streaming-write folio
-        https://git.kernel.org/vfs/vfs/c/6fe333abf07d
-[06/11] netfs: Fix the trace displayed for the total overwrite of a streamed write
-        https://git.kernel.org/vfs/vfs/c/b7a4cdd022c4
-[07/11] netfs: Fix folio->private handling in netfs_perform_write()
-        https://git.kernel.org/vfs/vfs/c/49f3b040e222
-[08/11] netfs: Fix group handling in netfs_read_gaps()
-        https://git.kernel.org/vfs/vfs/c/ab763d6514d4
-[09/11] netfs: Fix potential for tearing in ->remote_i_size and ->zero_point
-        https://git.kernel.org/vfs/vfs/c/756f72b6d8db
-[10/11] netfs: Fix comment about write-streaming avoidance
-        https://git.kernel.org/vfs/vfs/c/f81dc0987b3c
-[11/11] netfs: Fix netfs_read_folio() to wait on writeback
-        https://git.kernel.org/vfs/vfs/c/c721f7b7992c
+A small change needed now is to not call flush_delayed_work()
+on invalidate_all_cached_dirs() when called from procfs (can't sleep in
+that context).
+So add a @sync arg to invalidate_all_cached_dirs() to control when to
+flush the delayed works.
+
+Fixes: dde6667fa3c8 ("smb: client: add drop_dir_cache module parameter to invalidate cached dirents")
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ fs/smb/client/cached_dir.c |  5 ++--
+ fs/smb/client/cached_dir.h |  2 +-
+ fs/smb/client/cifs_debug.c | 59 ++++++++++++++++++++++++++++++++++++--
+ fs/smb/client/cifsfs.c     | 37 ------------------------
+ fs/smb/client/file.c       |  2 +-
+ fs/smb/client/smb2pdu.c    |  2 +-
+ 6 files changed, 62 insertions(+), 45 deletions(-)
+
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 04bb95091f49..02791ec3c5a1 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -593,7 +593,7 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
+  * Invalidate all cached dirs when a TCON has been reset
+  * due to a session loss.
+  */
+-void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
++void invalidate_all_cached_dirs(struct cifs_tcon *tcon, bool sync)
+ {
+ 	struct cached_fids *cfids = tcon->cfids;
+ 	struct cached_fid *cfid, *q;
+@@ -625,7 +625,8 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
+ 
+ 	/* run laundromat unconditionally now as there might have been previously queued work */
+ 	mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
+-	flush_delayed_work(&cfids->laundromat_work);
++	if (sync)
++		flush_delayed_work(&cfids->laundromat_work);
+ }
+ 
+ static void
+diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
+index 19d5592512e4..fc756836da95 100644
+--- a/fs/smb/client/cached_dir.h
++++ b/fs/smb/client/cached_dir.h
+@@ -90,7 +90,7 @@ void close_cached_dir(struct cached_fid *cfid);
+ void drop_cached_dir_by_name(const unsigned int xid, struct cifs_tcon *tcon,
+ 			     const char *name, struct cifs_sb_info *cifs_sb);
+ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb);
+-void invalidate_all_cached_dirs(struct cifs_tcon *tcon);
++void invalidate_all_cached_dirs(struct cifs_tcon *tcon, bool sync);
+ bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16]);
+ 
+ #endif			/* _CACHED_DIR_H */
+diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+index 0691d2a3e04b..0c90eba9278d 100644
+--- a/fs/smb/client/cifs_debug.c
++++ b/fs/smb/client/cifs_debug.c
+@@ -306,6 +306,9 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
+ 	LIST_HEAD(entry);
+ 
+ 	seq_puts(m, "# Version:1\n");
++#ifdef CONFIG_CIFS_DEBUG2
++	seq_puts(m, "# Write 0 to this file to drop all cached directory entries\n");
++#endif /* CONFIG_CIFS_DEBUG2 */
+ 	seq_puts(m, "# Format:\n");
+ 	seq_puts(m, "# <tree id> <sess id> <persistent fid> <lease-key> <path>\n");
+ 
+@@ -353,6 +356,54 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_CIFS_DEBUG2
++static int cifs_debug_dirs_proc_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, cifs_debug_dirs_proc_show, NULL);
++}
++
++/* Drop all cached directory entries across all CIFS mounts. */
++static ssize_t cifs_debug_dirs_proc_write(struct file *file, const char __user *buffer,
++					  size_t count, loff_t *ppos)
++{
++	int rc, v;
++
++	if (!IS_ENABLED(CONFIG_CIFS_DEBUG2))
++		return -EOPNOTSUPP;
++
++	rc = kstrtoint_from_user(buffer, count, 10, &v);
++	if (rc)
++		return rc;
++
++	if (v == 0) {
++		struct TCP_Server_Info *server;
++		struct cifs_ses *ses;
++		struct cifs_tcon *tcon;
++
++		spin_lock(&cifs_tcp_ses_lock);
++		list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
++			list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
++				if (cifs_ses_exiting(ses))
++					continue;
++				list_for_each_entry(tcon, &ses->tcon_list, tcon_list)
++					invalidate_all_cached_dirs(tcon, false);
++			}
++		}
++		spin_unlock(&cifs_tcp_ses_lock);
++	}
++
++	return count;
++}
++
++static const struct proc_ops cifs_debug_dirs_proc_ops = {
++	.proc_open	= cifs_debug_dirs_proc_open,
++	.proc_read	= seq_read,
++	.proc_lseek	= seq_lseek,
++	.proc_release	= single_release,
++	.proc_write	= cifs_debug_dirs_proc_write,
++};
++#endif /* CONFIG_CIFS_DEBUG2 */
++
+ static __always_inline const char *compression_alg_str(__le16 alg)
+ {
+ 	switch (alg) {
+@@ -885,9 +936,11 @@ cifs_proc_init(void)
+ 	proc_create_single("open_files", 0400, proc_fs_cifs,
+ 			cifs_debug_files_proc_show);
+ 
+-	proc_create_single("open_dirs", 0400, proc_fs_cifs,
+-			cifs_debug_dirs_proc_show);
+-
++#ifdef CONFIG_CIFS_DEBUG2
++	proc_create("open_dirs", 0644, proc_fs_cifs, &cifs_debug_dirs_proc_ops);
++#else /* CONFIG_CIFS_DEBUG2 */
++	proc_create_single("open_dirs", 0400, proc_fs_cifs, cifs_debug_dirs_proc_show);
++#endif /* !CONFIG_CIFS_DEBUG2 */
+ 	proc_create("Stats", 0644, proc_fs_cifs, &cifs_stats_proc_ops);
+ 	proc_create("cifsFYI", 0644, proc_fs_cifs, &cifsFYI_proc_ops);
+ 	proc_create("traceSMB", 0644, proc_fs_cifs, &traceSMB_proc_ops);
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 081fc1f9447d..9f76b0347fa9 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -127,43 +127,6 @@ atomic64_t cifs_dircache_bytes_used = ATOMIC64_INIT(0);
+ atomic_t cifs_sillycounter;
+ atomic_t cifs_tmpcounter;
+ 
+-/*
+- * Write-only module parameter to drop all cached directory entries across
+- * all CIFS mounts. Echo a non-zero value to trigger.
+- */
+-static void cifs_drop_all_dir_caches(void)
+-{
+-	struct TCP_Server_Info *server;
+-	struct cifs_ses *ses;
+-	struct cifs_tcon *tcon;
+-
+-	spin_lock(&cifs_tcp_ses_lock);
+-	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
+-		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
+-			if (cifs_ses_exiting(ses))
+-				continue;
+-			list_for_each_entry(tcon, &ses->tcon_list, tcon_list)
+-				invalidate_all_cached_dirs(tcon);
+-		}
+-	}
+-	spin_unlock(&cifs_tcp_ses_lock);
+-}
+-
+-static int cifs_param_set_drop_dir_cache(const char *val, const struct kernel_param *kp)
+-{
+-	bool bv;
+-	int rc = kstrtobool(val, &bv);
+-
+-	if (rc)
+-		return rc;
+-	if (bv)
+-		cifs_drop_all_dir_caches();
+-	return 0;
+-}
+-
+-module_param_call(drop_dir_cache, cifs_param_set_drop_dir_cache, NULL, NULL, 0200);
+-MODULE_PARM_DESC(drop_dir_cache, "Write 1 to drop all cached directory entries across all CIFS mounts");
+-
+ #ifdef CONFIG_CIFS_STATS2
+ unsigned int slow_rsp_threshold = 1;
+ module_param(slow_rsp_threshold, uint, 0644);
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index f743f058667f..664a2c223089 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -393,7 +393,7 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
+ 	}
+ 	spin_unlock(&tcon->open_file_lock);
+ 
+-	invalidate_all_cached_dirs(tcon);
++	invalidate_all_cached_dirs(tcon, true);
+ 	spin_lock(&tcon->tc_lock);
+ 	if (tcon->status == TID_IN_FILES_INVALIDATE)
+ 		tcon->status = TID_NEED_TCON;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index cd8b49722149..cb61051f9af3 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -2257,7 +2257,7 @@ SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
+ 	}
+ 	spin_unlock(&ses->chan_lock);
+ 
+-	invalidate_all_cached_dirs(tcon);
++	invalidate_all_cached_dirs(tcon, true);
+ 
+ 	rc = smb2_plain_req_init(SMB2_TREE_DISCONNECT, tcon, server,
+ 				 (void **) &req,
+-- 
+2.53.0
+
