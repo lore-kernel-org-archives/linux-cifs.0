@@ -1,146 +1,129 @@
-Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDDDD3D75D3
-	for <linux-cifs@vger.kernel.org>; Tue, 21 Apr 2026 15:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776785204; cv=pass; b=Ovy1NOqBUnW3ZXQ1A7XsRUtSWdTbL//mqzv/dI3scMIQi/JHBMpApYEJmDPivUSgSWSNwO696/i0SbwSX9h8WZhdQFFtA4//gwJf/6JJ9peHQVRg/SqQWFQOUMIoWUpe8fbFfw7337SzGbirJSex+HnPZoP+lSdiHOZssNJChD0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776785204; c=relaxed/simple;
-	bh=yPHRahqtUOMV/Hb4WJF5/YBWLujURcb0PRjmy2lESXI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Epz/i2t/VAOIAeL4yzMB4TFPSDw5fBMVmK4aBBzR7pQ9uNi3EwBv+eiv2p+HBc+GAegmUruN8x5IQd1KJjAmuxO1NP5loCiOgIQ77dOmjXySIKElvZgbrtoOFtOA8TmMIUuIpCbfR1mcbeKp1fAgs37sYGEZkwUDkPhH+WfwgjA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AL8sndUb; arc=pass smtp.client-ip=74.125.224.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDDB28980F
+	for <linux-cifs@vger.kernel.org>; Tue, 21 Apr 2026 19:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776798391; cv=none; b=K3K01A5SDf4fCJjd/njVrepNTxw4jBPLmSeK2w8/2xhooVvuC5ol7LPEPi+cetRmAtUOMuan/qpt4pH7bKVqJqKEACmX51MlJY0IJf1Tp27Ihm3pc2pGuZqDqbQzN858te57Reznp2EhMYWEqooK0ip79ClS4971wXqpkonYQhY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776798391; c=relaxed/simple;
+	bh=VvTm4cAHZbuncy6sm/7K/bscL5eZ8MCtsCeeBZunYnE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=agQAuSCIgJ1QgSN7Am2PTO5/Fj03+ERROR1teNVV8zyCDi4e13jmei7Q9o1Vwjt6sb2OMoRYtdVaPDvmeHlE34crbnWvbqJy6+KdZ04LKMbwl8VSvCvvtgYLfErcSmveLYFW7C0zE1RH9zele9TZf6Pzt3SoUq+Pid5k2e2fYXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freebox.fr; spf=pass smtp.mailfrom=freebox.fr; dkim=pass (2048-bit key) header.d=freebox-fr.20251104.gappssmtp.com header.i=@freebox-fr.20251104.gappssmtp.com header.b=Vn+e0FCp; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freebox.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freebox.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AL8sndUb"
-Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-651c366f7efso4691293d50.1
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Apr 2026 08:26:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776785202; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Z2SZO1otEhYRMJBZYaqNkFTatwDz9ABPS4WvbQSXEdK442SuBzkV6DYluYVATO+h2P
-         9mJyVUEaLdQU3hdIXyWLNdgHO0/kuc4xNdlwsI7Ni5jTlSzfkcHPJLxUBMOJDfSzkOCI
-         FjtORUBpdf5R1fGZrz5AWMtKAD1o3lrbK71tYo23BkVqJ/3aAN7hqFTTqX2Eo0/qlKvY
-         KdSpxNR2AmDqeuGHl3QsJOIRkn3th8ztvV89p/+YT/wFTSPEOBr9ao90QIWG9sNzYajw
-         DUZmeXjLlzi5mzrCxEtucBkYNOYgYMjnRiM8XAV4Ulz6rJVb8iIEVx/CYAEbkKbkb+8B
-         2AsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=gq4JGCjbD0peb76RqIvyQzPZR38TXeWbvqiNZavVYoE=;
-        fh=6l+b+8TgNjskIbEdKAy7jNhDycv+isEey1OBJZGhKP0=;
-        b=gGIsM4+9xFVEvJW7qXoHK/gYX4VPTwT5l8smXbZUr9LpM7Fyg4c/+dQPLeSDSYRZ5T
-         HGXojnNt6Crb6jaexbhjFf6/kkCAcVag4UNseZPuzhMqw2+c1elu3kr/GSfSXWDgOkk1
-         +uoFqA2bfXppFBnjYHJRBK6JXlxvv6n8G+HtA+XMPf/wSw6BSKL5umHGS85xjzGtY9Wg
-         /7IVYN4Nhx2io/N6wWgVPMQYnFOHI7IhHd0nbhyN0/ZNzF5jGm6d6CjUlnsAQygids8U
-         4K3I9GybrepXyIol2Qtpeckn7HZKljQ0SbYxrnZbJMqRSXygiUOP9ETje8ywtBcQz+fg
-         XHaQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=freebox-fr.20251104.gappssmtp.com header.i=@freebox-fr.20251104.gappssmtp.com header.b="Vn+e0FCp"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so62259055e9.2
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Apr 2026 12:06:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776785202; x=1777390002; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gq4JGCjbD0peb76RqIvyQzPZR38TXeWbvqiNZavVYoE=;
-        b=AL8sndUbEqJnN4LtUsy2isXmtUjPFDsLa5TuM8Gors5ID7DiX+UGK9uQcVAQOLc5+L
-         onW/sFTq0TQrFXRlGmisbruq7iwSUxVmW0azZ5JE1vrXHpTklGCpBqRSDFEW8LoFV/Wg
-         nM9uFV30p9KCt1FYXLm4bXS+26lhUMjvEM2SNmvJNwwsc3w4HM+bFhPx9vCb3IPSyLhR
-         We5pwxSPKgsaFxeYgprlJ2RKLMSxJvZMSyZSqJ65E2qNv7C4vdHVkOR0j+ckK61zqCgn
-         B6jAE125sP8UneibGwCr/NezMLtVBUyrGe4hCEa46IH15Pc9ktqG5WQmFlxiCzS3wGj4
-         cEgQ==
+        d=freebox-fr.20251104.gappssmtp.com; s=20251104; t=1776798387; x=1777403187; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=O0jF6nh/pkH+f9VD7h6qIt/vH27AY04GwziRDF2Gm8Q=;
+        b=Vn+e0FCpFZBANCD6IcAQarWQ+9J0ZTP/RGrDUH/9mLphwz7mLd/9vAo0UQwqrhWtBB
+         hOOPN9mzLTsAXmVOSM6X6Pk/Glb2Dc4j74rqoHAGFv1tv9KkuHHXRDEnfZPmonOng2Z8
+         EdBiQDj8caPtR/oTfw41nh5GuAtYMdh1PypVD73J38evcvl58+J5BlwqmV8zEszldCyn
+         GffXVG6JRD0rQEKWMFB0iQkuy132Z4OaCHlnhEp+zmSqAjFCxZCFgn/46pctkKR0U6cK
+         H+N1WeEFNIDm9MvG3WJRalOJ4qK35i+5Fq0UpJaJm6bWslv9qZtz4YdFAGpU7RHTbDsK
+         802Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776785202; x=1777390002;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gq4JGCjbD0peb76RqIvyQzPZR38TXeWbvqiNZavVYoE=;
-        b=WQFD99M+7P5SCVUYYDqw/ykrgRQSsBL3UdNIF5vw+sGlpj/AUXYqkMeY9KHfPDLrB3
-         oj4gPbbv4vcHo7FglIXoEE9fn/8m4WU6ucCWii41cAQdHYo6nWncmwvn6WKgZ9eGeW1k
-         uhxnXcAu1NaCWWsUFlfBwp8L/jfOf8RuKQkKX1dcEUzZfxvWbS1EmEHIAapBFTpOogZt
-         0Wai8/uJZFtm9ILr+hI7uWb8m6SaNNpH7+xmu27V97p/U1R5oJLm2NutOlM48lrMnQ78
-         YyNgMs/YGBBUuFChznXYPIYYu7c1yfQLT4bvCjpMYFCPKy4FvJTBAnqiXrdeBuS/jpFP
-         HgPA==
-X-Gm-Message-State: AOJu0Yy1DKSZc2YWmv3WcWHGgXZIGvtkwBrLE/zNelXHMlJpiOoEgnVU
-	ag1miMC67v41uzWtd4bnJxEt6xrHupG7EEBrcHn93amltSNLyQRJ5U7K+otxPKWbNTczp5L6wot
-	fx6VJ6Q3MxH/eTYsMcmQKnBmvcFOd0+8=
-X-Gm-Gg: AeBDietT71ljV0/BMLEEssEPRpdLZBgy2WsGnmPiZmQgVnZ1DSIhmgxCGKIHQuLL0/1
-	w9UaHFBUa/HIiVMoD98uGVVwGvd10EUsVnnqHeiPWAoRFatXGbW8Bspcn6O4/H1kKFlFmG9ANw+
-	b47gsjQMAx+7q6bm2sof/ZuMDBFLTRfN2xX7yTO6vHNFnXpl++S0rH/Y+JSLBdFuLlYk28LBr7N
-	vN600L0GeORocH09pEavatR51QMfDsZKHNcOdnZMfDHzxNa0BPoSq5GBjkj0fMZMyOaU0wYzFGn
-	DDO+aVtmQBfYSKc+aXlhP3k2GDUIQ6WcQ2Lis8eJWQgN4BEisw==
-X-Received: by 2002:a05:690e:1688:b0:651:bcd7:709e with SMTP id
- 956f58d0204a3-65310a71a81mr16767427d50.46.1776785201788; Tue, 21 Apr 2026
- 08:26:41 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776798387; x=1777403187;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O0jF6nh/pkH+f9VD7h6qIt/vH27AY04GwziRDF2Gm8Q=;
+        b=juoU+OU3UWxt2mTPclFN/SR92bhTHMsuubTy6rUpsQkZ/A/D5fEtqt1Xq2c8IVk6nI
+         UBgulQmRpqRA29H/uenbCEy1enSpTELb49ujhmDuDeav92td/bIQjL+Ru6Dmsy0WojrN
+         Bo9u/cXtlcjN5nppg0GS1qbFIbiIz5n5G57YWvgobMz4wMtxccWb9+AR8GfMsEqLZ0q5
+         kImSChXbrhpDRwougl32TqViQT7pwivZhnc8UVC6BNiQjL0dx+4XEmFgZiKwyW1pXrwB
+         oYNg5jXDD6cgNAiEvkDsEbCBRvUDGAuz8hW391DZj5OabFm3X/Cs/i5tV5L/t//x/Sb/
+         YQQg==
+X-Gm-Message-State: AOJu0YwGjZmy/zIXSF3NNAMAfrdgfi3HMZTy7Tpl8d3QhSG/7F6k9Mte
+	7x9jIyKWDvqsBW7Ef2ZqWlgE2RsMto9az+2RgDdl1dPMR6KDdqa6hxdPVWO/LlrkcOMywwPL5lj
+	ZT2RV
+X-Gm-Gg: AeBDies9f5dzg7mGiNqOSe5cA+EZbZ8BMEpwVUwK3KHxpMCogOCeD6eTlkzwvRtDigT
+	5LtfXWf6z60M6Sy6LLfPdQ2qvbII5wVQlmD+zelxuUSiaQ2/VujICeka8kli212C3YC0Up7f00R
+	xKcVPhGrUku3ATeDWlxfUkWpbUWTvttW0+Ng20Y7/asyjtlhUPQzm3bM6Okq1qcmxeSrohR9HSe
+	AyvodWYDGw3Kms5DhHEIC/n0paWwOMEQPnWx47hX4O5KC+QneAIzEnPFYZQmkBaVZQv4lxSPxF6
+	FcfCpP3e5yhPoB8FfyFYnXoRKWbnmLTvoSVjTBaMX8TchaN/4NoqvG+Ezt0WEUhFzb1vmNbr4DA
+	xZYY9Wi3dn3t3KxM3bl0fVyqWaVX3CD09x+viStFuGXar8g3lBiMlLqywVgcSkI/FsfT8ZkRxgR
+	aRl3pIdpqMOW//yZDEUCr16JVw6T6Os+v7Pu/hDL0gMSsBX25nxb8iiCH6xWjx6Gtf5gIauujp4
+	kXy500t65Uk5PqMbtyZLQDgz2dDAjS5c45JwSIgv2zBWWAOIuJYZAM=
+X-Received: by 2002:a05:600c:6297:b0:486:d76c:fa57 with SMTP id 5b1f17b1804b1-488fb77155dmr262140515e9.17.1776798386621;
+        Tue, 21 Apr 2026 12:06:26 -0700 (PDT)
+Received: from odysseia.iliad.local (freebox.vlq16.iliad.fr. [213.36.7.13])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4899dc95920sm43485325e9.6.2026.04.21.12.06.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 12:06:26 -0700 (PDT)
+From: Marios Makassikis <mmakassikis@freebox.fr>
+To: linux-cifs@vger.kernel.org,
+	linkinjeon@kernel.org
+Cc: smfrench@gmail.com,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	Marios Makassikis <mmakassikis@freebox.fr>
+Subject: [PATCH] fs: smb: server: stop sending fake security descriptors
+Date: Tue, 21 Apr 2026 21:06:19 +0200
+Message-ID: <20260421190619.1396589-1-mmakassikis@freebox.fr>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260421063955.99164-1-sprasad@microsoft.com> <20260421063955.99164-2-sprasad@microsoft.com>
-In-Reply-To: <20260421063955.99164-2-sprasad@microsoft.com>
-From: Bharath SM <bharathsm.hsk@gmail.com>
-Date: Tue, 21 Apr 2026 08:26:30 -0700
-X-Gm-Features: AQROBzCohKFBLFtob7mlCVxxtoiPObLo3LCBJqTRkUUEkaO51_Su7hdh5BVHQMc
-Message-ID: <CAGypqWzrOmR6rUimbBJa9qJ-=+KJFzccMjere9dX=KwWeDFe+A@mail.gmail.com>
-Subject: Re: [PATCH v2 2/7] cifs: abort open_cached_dir if we don't request leases
-To: nspmangalore@gmail.com
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.org, 
-	bharathsm@microsoft.com, dhowells@redhat.com, henrique.carvalho@suse.com, 
-	ematsumiya@suse.de, Shyam Prasad N <sprasad@microsoft.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 20, 2026 at 11:40=E2=80=AFPM <nspmangalore@gmail.com> wrote:
->
-> From: Shyam Prasad N <sprasad@microsoft.com>
->
-> It is possible that SMB2_open_init may not set lease context based
-> on the requested oplock level. This can happen when leases have been
-> temporarily or permanently disabled. When this happens, we will have
-> open_cached_dir making an open without lease context and the response
-> will anyway be rejected by open_cached_dir (thereby forcing a close to
-> discard this open). That's unnecessary two round-trips to the server.
->
-> This change adds a check before making the open request to the server
-> to make sure that SMB2_open_init did add the expected lease context
-> to the open in open_cached_dir.
->
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/smb/client/cached_dir.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-> index 04bb95091f498..e9917e5204b00 100644
-> --- a/fs/smb/client/cached_dir.c
-> +++ b/fs/smb/client/cached_dir.c
-> @@ -286,6 +286,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tc=
-on *tcon,
->                             &rqst[0], &oplock, &oparms, utf16_path);
->         if (rc)
->                 goto oshr_free;
-> +
-> +       if (oplock !=3D SMB2_OPLOCK_LEVEL_II) {
-> +               rc =3D -EINVAL;
-> +               cifs_dbg(FYI, "unexpected oplock level %d for cached dire=
-ctory\n", oplock);
-Should we reword the log from "'unexpected' oplock level for cached
-directory" to something like
-lease not available for cached dir.? Considering  the client itself
-might be disabling oplock temporarily.
-"unexpected" might look misleading.
+in smb2_get_info_sec, a dummy security descriptor (SD) is returned if
+the requested information is not supported.
 
-> +               goto oshr_free;
-> +       }
-> +
->         smb2_set_next_command(tcon, &rqst[0]);
->
->         memset(&qi_iov, 0, sizeof(qi_iov));
+the code is currently wrong, as DACL_PROTECTED is set in the type field,
+but there is no DACL is present.
 
-Other than the above minor comment, Changes look good to me.
-Reviewed-by: Bharath SM <bharathsm@microsoft.com>
+instead of faking a security, report a STATUS_NOT_SUPPORTED error.
+
+this seems to fix a "Error 0x80090006: Invalid Signature" on file
+transfers with Windows 11 clients (25H2, build 26200.8246).
+
+capturing traffic shows that the client is sending a GET_INFO/SEC_INFO
+request, with the additional_info field set to 0x20
+(ATTRIBUTE_SECURITY_INFORMATION). Returning an empty SD
+(with only SELF_RELATIVE set) does not fix the error.
+
+Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+---
+ fs/smb/server/smb2pdu.c | 16 ++--------------
+ 1 file changed, 2 insertions(+), 14 deletions(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index ee32e61b6d3c..6622efdd55e3 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -5745,20 +5745,8 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
+ 		ksmbd_debug(SMB, "Unsupported addition info: 0x%x)\n",
+ 		       addition_info);
+ 
+-		pntsd = kzalloc(ALIGN(sizeof(struct smb_ntsd), 8),
+-				KSMBD_DEFAULT_GFP);
+-		if (!pntsd)
+-			return -ENOMEM;
+-
+-		pntsd->revision = cpu_to_le16(1);
+-		pntsd->type = cpu_to_le16(SELF_RELATIVE | DACL_PROTECTED);
+-		pntsd->osidoffset = 0;
+-		pntsd->gsidoffset = 0;
+-		pntsd->sacloffset = 0;
+-		pntsd->dacloffset = 0;
+-
+-		secdesclen = sizeof(struct smb_ntsd);
+-		goto iov_pin;
++		rsp->hdr.Status = STATUS_NOT_SUPPORTED;
++		return -EINVAL;
+ 	}
+ 
+ 	if (work->next_smb2_rcv_hdr_off) {
+-- 
+2.51.1
+
