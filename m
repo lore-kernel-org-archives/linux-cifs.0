@@ -1,381 +1,118 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B827372B32
-	for <linux-cifs@vger.kernel.org>; Wed, 22 Apr 2026 07:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66233B6C15;
+	Wed, 22 Apr 2026 08:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776843121; cv=none; b=EqspVtyDl/x4oatYEeS2se63lc6KqDm9TMI1ttqIOkbztIY1H+mOMIMjdyAI0k9yL7H/axQzqL3yWB6foKwcUW5nM6HldXbM+5R6DM8Z3tkeJt8kxW9rqgCBuaFuAkqIWTnoSlewhruFs3mOKVfcoG37FhhhOml2YfhZqkIFc+s=
+	t=1776845815; cv=none; b=pF5dxfYHXOJKaLWjk6sPxhjwvTAoxU1MEM4tkQzn72m6chcUvEHH8kpr2SZx3g7af5cuK4d7yqLU/F75SFJLPIQDiwp7ps/lsUHKmBVYbGd+mDNBIWTroQ70c8t0UON89XqG4lou1d1btXcgqp9O7L49fAUxvsIL+8wVwb74uFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776843121; c=relaxed/simple;
-	bh=hxK0M4N2qAj+7AW3MohMnIUO5Jg09iBVanV0Qsb8qFk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IH8KM8kGyvb8W+Swv+P33BZ/d4q5O2h3lbeBO7evB1yrKU+mwi1fCnoAUxLnkUAafoiMaJTRUXfDGSYXn0suqEIR/Bmu0Eg5uKcAIqfxYOa2eqg5BavBOrJwD2m9iCGFj32AN81lYEHP2zzFWP/GiKptHllPNqjercxzNFDE7PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=MjRtaWGu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qhMJ9V+j; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=MjRtaWGu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qhMJ9V+j; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1776845815; c=relaxed/simple;
+	bh=k4p4LMgdJtO5cU5zDgCARGfX+/nRYgRKxs5+A+3xGg8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sGa9126QBso6iPaxi+T2MUcfYUC2LwdB9cdFuKrlYEOz+UFixf3MXI4rBe19g825EVvbOn2YOriZXrkGRs4K/VCnwAsKE5qnS8mdLG7LsDdudjuZu9r84YyzYhGNOhpK8ZdPrO4/f48e78LKIjAAadbM1wuhd6E4I1gXUT9JyOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=eMoQjmjv; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="MjRtaWGu";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qhMJ9V+j";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="MjRtaWGu";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qhMJ9V+j"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 268F06A81A;
-	Wed, 22 Apr 2026 07:31:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776843117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=y5qrZRSPKIUFeMfxEBYgbo29b9A90EeEraynZKsTtZk=;
-	b=MjRtaWGu5FkSbk4PIWrbfuR4XaNUywLYcIVzvxRci/C1vxlx/5RoBcMvsB+v/2qShq96Ly
-	2U9LPMEg36F2pyF7P5z3lZj9zFHWjZ38ncPJq/AZRSjHk71YnR+6XVAhbcUUM1jNvN+aiJ
-	3OKQD2obdjPLivIG2m6R/HuNSUADP3w=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776843117;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=y5qrZRSPKIUFeMfxEBYgbo29b9A90EeEraynZKsTtZk=;
-	b=qhMJ9V+jRW9Tm1fTZQLrTTCh/zkgrO2MYOMvW/nuJ5gdE9GiBUPdZRwum5U1Gs5XO0bLpK
-	CdcsPwL9oFSs87Dg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=MjRtaWGu;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=qhMJ9V+j
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776843117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=y5qrZRSPKIUFeMfxEBYgbo29b9A90EeEraynZKsTtZk=;
-	b=MjRtaWGu5FkSbk4PIWrbfuR4XaNUywLYcIVzvxRci/C1vxlx/5RoBcMvsB+v/2qShq96Ly
-	2U9LPMEg36F2pyF7P5z3lZj9zFHWjZ38ncPJq/AZRSjHk71YnR+6XVAhbcUUM1jNvN+aiJ
-	3OKQD2obdjPLivIG2m6R/HuNSUADP3w=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776843117;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=y5qrZRSPKIUFeMfxEBYgbo29b9A90EeEraynZKsTtZk=;
-	b=qhMJ9V+jRW9Tm1fTZQLrTTCh/zkgrO2MYOMvW/nuJ5gdE9GiBUPdZRwum5U1Gs5XO0bLpK
-	CdcsPwL9oFSs87Dg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1057D593AF;
-	Wed, 22 Apr 2026 07:31:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 23ctAm156GmDQwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Wed, 22 Apr 2026 07:31:57 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	henrique.carvalho@suse.com
-Subject: [PATCH v3] smb: client: fix (remove) drop_dir_cache module parameter
-Date: Wed, 22 Apr 2026 09:31:49 +0200
-Message-ID: <20260422073149.275831-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="eMoQjmjv"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=dK9i7Cr5XO7g/+h3dQazZvCkWlC6rfLQehRve6OwtbY=; b=eMoQjmjvNKb97qy4zA7NuFMhoa
+	WvwgIkm+1ACHg41AAiBShiSyw2t7weJwYYBN+dzUZITHldr+TO/u2BeC7XPAuQumbzHj3eYuKcM1B
+	ICUrFUK23Pp+nd7QS9MaDquZIDU571Ai/dD5+eSVtAFCu3XJzt8nZehTKMWWYqorThbl22D5RLZjc
+	7mRzwFE9PBN7NtUVYXV8ZtcAweeAqgn6/4yLs88p1z17iXPmq4dD9cyBT9Zj2YUFTUm4tbwHDJfMk
+	1GKg6kfby3dB3s6z7TA+n7zVaiTFnDSTF381Pmrd/WurCdpdoT0MhJVB7tBbX0FIPvagogIqC+cZm
+	raembxRqRpJj2J88iZLv1P0Yr14l4tXOVQQb4vd5EPvPHqq28KtmFbjTBXFX+tXE8XbFoeX4AIkek
+	Ahn27LYEDKpH+4yqYMiI3kE4pEXo+WA4OyOWEEDcLw/HtCkoYdsV6W7RhJbmWkAdjGGivPOl2gPtB
+	HcRqMy46JFNzjYocvS1iHjl5;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wFSlG-00000003ERj-3ZDU;
+	Wed, 22 Apr 2026 08:16:43 +0000
+Message-ID: <9cb0901c-18c5-4858-941c-3b37ee112af9@samba.org>
+Date: Wed, 22 Apr 2026 10:16:41 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ARC_NA(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 268F06A81A
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] smb: smbdirect: move fs/smb/common/smbdirect/ to
+ fs/smb/smbdirect/
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-cifs@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, samba-technical@lists.samba.org,
+ Tom Talpey <tom@talpey.com>, Steve French <smfrench@gmail.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Namjae Jeon <linkinjeon@kernel.org>
+References: <20260419192018.3046449-1-metze@samba.org>
+ <aehrPuY60VMcYGU8@infradead.org>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <aehrPuY60VMcYGU8@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Being a module parameter, it's possible to do:
+Hi Christoph,
 
-  # modprobe cifs drop_dir_cache=1
+>> diff --git a/fs/smb/Makefile b/fs/smb/Makefile
+>> index 9a1bf59a1a65..353b1c2eefc4 100644
+>> --- a/fs/smb/Makefile
+>> +++ b/fs/smb/Makefile
+>> @@ -1,5 +1,6 @@
+>>   # SPDX-License-Identifier: GPL-2.0
+>>   
+>>   obj-$(CONFIG_SMBFS)		+= common/
+>> +obj-$(CONFIG_SMBDIRECT)		+= smbdirect/
+> 
+> Why is this not in net/smbdirect/ or driver/infiniband/ulp/smdirect?
 
-Which will lead to a crash, because cifs_tcp_ses_list hasn't been
-initialized yet:
+Yes, I also thought about net/smbdirect.
 
-  [  168.242624] BUG: kernel NULL pointer dereference, address: 0000000000000010
-  [  168.242952] #PF: supervisor read access in kernel mode
-  [  168.243175] #PF: error_code(0x0000) - not-present page
-  [  168.243394] PGD 0 P4D 0
-  [  168.243524] Oops: Oops: 0000 [#1] SMP NOPTI
-  [  168.243703] CPU: 2 UID: 0 PID: 1105 Comm: modprobe Not tainted 7.0.0-lku #5 PREEMPT(lazy)
-  [  168.244054] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.17.0-2-g4f253b9b-prebuilt.qemu.org 04/01/2014
-  [  168.244557] RIP: 0010:cifs_param_set_drop_dir_cache+0x7c/0x100 [cifs]
-  ...
-  [  168.248785] Call Trace:
-  [  168.248915]  <TASK>
-  [  168.249023]  parse_args+0x285/0x3a0
-  [  168.249204]  ? __pfx_unknown_module_param_cb+0x10/0x10
-  [  168.249448]  load_module+0x192b/0x1bb0
-  [  168.249637]  ? __pfx_unknown_module_param_cb+0x10/0x10
-  [  168.249882]  ? kernel_read_file+0x27d/0x2b0
-  [  168.250088]  init_module_from_file+0xce/0xf0
-  [  168.250291]  idempotent_init_module+0xfb/0x2f0
-  [  168.250496]  __x64_sys_finit_module+0x5a/0xa0
-  [  168.250694]  do_syscall_64+0xe0/0x5a0
-  [  168.250863]  ? exc_page_fault+0x65/0x160
-  [  168.251050]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-  [  168.251284] RIP: 0033:0x7fcaa12b774d
+As IPPROTO_SMBDIRECT or PF_SMBDIRECT will be the next step,
+see the open discussion here:
+https://lore.kernel.org/linux-cifs/cover.1775571957.git.metze@samba.org/
+(I'll follow with that discussion soon)
 
-Instead of fixing this with some kind of "is module initialized"
-approach, this patch instead moves that functionality to procfs,
-setting a write op for the existing open_dirs entry, where
-writing a 0 to it will drop the cached directory entries.
+I was just unsure about the consequences, e.g. would
+the maintainer/pull request flow have to change in that case?
+Or would Steve be able to take the changes via his trees?
+Any I also didn't want to offend anybody, so I just took
+what Linus proposed.
 
-Also make it available only when CONFIG_CIFS_DEBUG=y.
+Using driver/infiniband/ulp/smdirect would also work,
+if everybody prefer that.
 
-A small change needed now is to not call flush_delayed_work()
-on invalidate_all_cached_dirs() when called from procfs (can't sleep in
-that context).
-So add a @sync arg to invalidate_all_cached_dirs() to control when to
-flush the delayed works.
+> As far as I can tell there is zero file system logic in this code.
+> 
+>> -#include "../common/smbdirect/smbdirect_public.h"
+>> +#include "../smbdirect/public.h"
+> 
+> And all these relative includes suggest you really want a
+> include/linux/smdirect/ instead.
 
-Fixes: dde6667fa3c8 ("smb: client: add drop_dir_cache module parameter to invalidate cached dirents")
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
-v3:
-- missing change from CONFIG_CIFS_DEBUG2 to DEBUG
-- change open_dirs entry perms from 0644 to 0600 (when DEBUG=y) to
-  keep similar when DEBUG=n (0400)
+Yes, that's my also my goal in the next steps.
 
-v2:
-- change to depend on CONFIG_CIFS_DEBUG instead of DEBUG2 (as per
-  Bharath's request)
-- remove redundant !IS_ENABLED(CONFIG_CIFS_DEBUG2) check from
-  cifs_debug_dirs_proc_write() (already wrapped in ifdef)
+> While we're at it: __SMBDIRECT_EXPORT_SYMBOL__ is really odd.
+> One thing is the __ pre- and postfix that make it look weird.
 
+Yes, the __SMBDIRECT_EXPORT_SYMBOL__ was mainly a temporary
+thing, now it's useless and I'll remove it.
 
- fs/smb/client/cached_dir.c |  5 ++--
- fs/smb/client/cached_dir.h |  2 +-
- fs/smb/client/cifs_debug.c | 56 ++++++++++++++++++++++++++++++++++++--
- fs/smb/client/cifsfs.c     | 37 -------------------------
- fs/smb/client/file.c       |  2 +-
- fs/smb/client/smb2pdu.c    |  2 +-
- 6 files changed, 59 insertions(+), 45 deletions(-)
+> The other is that EXPORT_SYMBOL_FOR_MODULES is for very specific
+> symbols that really should not exported.  What this warrants instead
+> is a normal EXPORT_SYMBOL_NS_GPL.
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 04bb95091f49..02791ec3c5a1 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -593,7 +593,7 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
-  * Invalidate all cached dirs when a TCON has been reset
-  * due to a session loss.
-  */
--void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
-+void invalidate_all_cached_dirs(struct cifs_tcon *tcon, bool sync)
- {
- 	struct cached_fids *cfids = tcon->cfids;
- 	struct cached_fid *cfid, *q;
-@@ -625,7 +625,8 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
- 
- 	/* run laundromat unconditionally now as there might have been previously queued work */
- 	mod_delayed_work(cfid_put_wq, &cfids->laundromat_work, 0);
--	flush_delayed_work(&cfids->laundromat_work);
-+	if (sync)
-+		flush_delayed_work(&cfids->laundromat_work);
- }
- 
- static void
-diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index 19d5592512e4..fc756836da95 100644
---- a/fs/smb/client/cached_dir.h
-+++ b/fs/smb/client/cached_dir.h
-@@ -90,7 +90,7 @@ void close_cached_dir(struct cached_fid *cfid);
- void drop_cached_dir_by_name(const unsigned int xid, struct cifs_tcon *tcon,
- 			     const char *name, struct cifs_sb_info *cifs_sb);
- void close_all_cached_dirs(struct cifs_sb_info *cifs_sb);
--void invalidate_all_cached_dirs(struct cifs_tcon *tcon);
-+void invalidate_all_cached_dirs(struct cifs_tcon *tcon, bool sync);
- bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16]);
- 
- #endif			/* _CACHED_DIR_H */
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index 0691d2a3e04b..4ed4f55a0bb7 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -306,6 +306,9 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
- 	LIST_HEAD(entry);
- 
- 	seq_puts(m, "# Version:1\n");
-+#ifdef CONFIG_CIFS_DEBUG
-+	seq_puts(m, "# Write 0 to this file to drop all cached directory entries\n");
-+#endif /* CONFIG_CIFS_DEBUG */
- 	seq_puts(m, "# Format:\n");
- 	seq_puts(m, "# <tree id> <sess id> <persistent fid> <lease-key> <path>\n");
- 
-@@ -353,6 +356,51 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
- 	return 0;
- }
- 
-+#ifdef CONFIG_CIFS_DEBUG
-+static int cifs_debug_dirs_proc_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, cifs_debug_dirs_proc_show, NULL);
-+}
-+
-+/* Drop all cached directory entries across all CIFS mounts. */
-+static ssize_t cifs_debug_dirs_proc_write(struct file *file, const char __user *buffer,
-+					  size_t count, loff_t *ppos)
-+{
-+	int rc, v;
-+
-+	rc = kstrtoint_from_user(buffer, count, 10, &v);
-+	if (rc)
-+		return rc;
-+
-+	if (v == 0) {
-+		struct TCP_Server_Info *server;
-+		struct cifs_ses *ses;
-+		struct cifs_tcon *tcon;
-+
-+		spin_lock(&cifs_tcp_ses_lock);
-+		list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
-+			list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+				if (cifs_ses_exiting(ses))
-+					continue;
-+				list_for_each_entry(tcon, &ses->tcon_list, tcon_list)
-+					invalidate_all_cached_dirs(tcon, false);
-+			}
-+		}
-+		spin_unlock(&cifs_tcp_ses_lock);
-+	}
-+
-+	return count;
-+}
-+
-+static const struct proc_ops cifs_debug_dirs_proc_ops = {
-+	.proc_open	= cifs_debug_dirs_proc_open,
-+	.proc_read	= seq_read,
-+	.proc_lseek	= seq_lseek,
-+	.proc_release	= single_release,
-+	.proc_write	= cifs_debug_dirs_proc_write,
-+};
-+#endif /* CONFIG_CIFS_DEBUG */
-+
- static __always_inline const char *compression_alg_str(__le16 alg)
- {
- 	switch (alg) {
-@@ -885,9 +933,11 @@ cifs_proc_init(void)
- 	proc_create_single("open_files", 0400, proc_fs_cifs,
- 			cifs_debug_files_proc_show);
- 
--	proc_create_single("open_dirs", 0400, proc_fs_cifs,
--			cifs_debug_dirs_proc_show);
--
-+#ifdef CONFIG_CIFS_DEBUG
-+	proc_create("open_dirs", 0600, proc_fs_cifs, &cifs_debug_dirs_proc_ops);
-+#else /* CONFIG_CIFS_DEBUG */
-+	proc_create_single("open_dirs", 0400, proc_fs_cifs, cifs_debug_dirs_proc_show);
-+#endif /* !CONFIG_CIFS_DEBUG */
- 	proc_create("Stats", 0644, proc_fs_cifs, &cifs_stats_proc_ops);
- 	proc_create("cifsFYI", 0644, proc_fs_cifs, &cifsFYI_proc_ops);
- 	proc_create("traceSMB", 0644, proc_fs_cifs, &traceSMB_proc_ops);
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 081fc1f9447d..9f76b0347fa9 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -127,43 +127,6 @@ atomic64_t cifs_dircache_bytes_used = ATOMIC64_INIT(0);
- atomic_t cifs_sillycounter;
- atomic_t cifs_tmpcounter;
- 
--/*
-- * Write-only module parameter to drop all cached directory entries across
-- * all CIFS mounts. Echo a non-zero value to trigger.
-- */
--static void cifs_drop_all_dir_caches(void)
--{
--	struct TCP_Server_Info *server;
--	struct cifs_ses *ses;
--	struct cifs_tcon *tcon;
--
--	spin_lock(&cifs_tcp_ses_lock);
--	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
--		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
--			if (cifs_ses_exiting(ses))
--				continue;
--			list_for_each_entry(tcon, &ses->tcon_list, tcon_list)
--				invalidate_all_cached_dirs(tcon);
--		}
--	}
--	spin_unlock(&cifs_tcp_ses_lock);
--}
--
--static int cifs_param_set_drop_dir_cache(const char *val, const struct kernel_param *kp)
--{
--	bool bv;
--	int rc = kstrtobool(val, &bv);
--
--	if (rc)
--		return rc;
--	if (bv)
--		cifs_drop_all_dir_caches();
--	return 0;
--}
--
--module_param_call(drop_dir_cache, cifs_param_set_drop_dir_cache, NULL, NULL, 0200);
--MODULE_PARM_DESC(drop_dir_cache, "Write 1 to drop all cached directory entries across all CIFS mounts");
--
- #ifdef CONFIG_CIFS_STATS2
- unsigned int slow_rsp_threshold = 1;
- module_param(slow_rsp_threshold, uint, 0644);
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index f743f058667f..664a2c223089 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -393,7 +393,7 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
- 	}
- 	spin_unlock(&tcon->open_file_lock);
- 
--	invalidate_all_cached_dirs(tcon);
-+	invalidate_all_cached_dirs(tcon, true);
- 	spin_lock(&tcon->tc_lock);
- 	if (tcon->status == TID_IN_FILES_INVALIDATE)
- 		tcon->status = TID_NEED_TCON;
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index cd8b49722149..cb61051f9af3 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -2257,7 +2257,7 @@ SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
- 	}
- 	spin_unlock(&ses->chan_lock);
- 
--	invalidate_all_cached_dirs(tcon);
-+	invalidate_all_cached_dirs(tcon, true);
- 
- 	rc = smb2_plain_req_init(SMB2_TREE_DISCONNECT, tcon, server,
- 				 (void **) &req,
--- 
-2.53.0
+I want the exported functions be minimal, as most of
+of should go via the socket layer instead.
 
+If EXPORT_SYMBOL_NS_GPL(func, "smbdirect") is better than
+EXPORT_SYMBOL_FOR_MODULES() I can change that.
+
+It means cifs.ko and ksmbd.ko would need MODULE_IMPORT_NS("smbdirect"), correct?
+
+Thanks!
+metze
