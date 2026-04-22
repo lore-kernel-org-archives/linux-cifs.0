@@ -1,171 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546162BE026;
-	Wed, 22 Apr 2026 23:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12EB33B96B
+	for <linux-cifs@vger.kernel.org>; Wed, 22 Apr 2026 23:46:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776901104; cv=none; b=fIAYGfjGQA21/RPJ1h5GjciAq/MOuenwNG2lEA+EsmzKnukCzZq7hG1VwFtX8TJdgt+kE9WKtPRoTr0nj1mRo2KhgKg0g8pMhZkK/uHmZX6GMDvFgvh9OSdsB+/tV9zxajmRWl1aTnl8H0D4V7JN70qiRb6HUSbQbVCtRr5Vhvs=
+	t=1776901617; cv=none; b=Q7yU+toKUaxhGJzkc8R4MOqDvNXq2zNPOq1dsFnmbHE47kATuqcGa9xNTmcW9RlWy7/vKdr1Hh55LSermatUdTpW9DiC73f63/bizC3LykWUB326zkJdO4B3rt4POsAw4iXghM/WI7bsE3SpEf21/SIvAi4t+ymWL1unaou2TIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776901104; c=relaxed/simple;
-	bh=cA0ZR5J/e3BV4LxJ7qZBjOuZwp2IQKJzAscafkI55UU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iUArHdIYHab4ipN0JXC30b9hEJ5+9VicoFMxtL1sPP2smJuZpXVeO15gmTk6/3Z3NyTe4McsHuBUGfCKlYfPOdLRLbeGwzo/Rjlbs/z38pxdIyLKnQKiFdezb3dO60bg7zvfv1Jmrv7Vsh5Chyq6nrfXy0UzJHTi9uNbxDKUyhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ezVtpBVv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776901617; c=relaxed/simple;
+	bh=wYAfT8KDTE+ECW5vGCHEkwg7zZHuqkLNTHP+XfHzM/A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eXRf+DuzCpiWT3FbwWG7v/xPeEBW4fO1seHDPef/u8TIlcJnOg5Sf/IJeoQ6weH/n9hFrui4hkeO1zQLfjJVZ+Y23HXvlwc2vtFwFcBMlaE6GXb3qRYylW1Y8bNJvCQxJeHXk6/XWrAgmD7+dRv9O7+0Ah2r5RKuy9NMRBtWcuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=odX78xgD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ezVtpBVv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E08E0C19425;
-	Wed, 22 Apr 2026 23:38:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="odX78xgD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BBE1C4AF09
+	for <linux-cifs@vger.kernel.org>; Wed, 22 Apr 2026 23:46:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776901104;
-	bh=cA0ZR5J/e3BV4LxJ7qZBjOuZwp2IQKJzAscafkI55UU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ezVtpBVv1QMF6X9CFXadmDeGdwQ+lK71l5/X2+S0Y2NUH1w14TuTXFtm/J/iaIcGu
-	 EF5cAl6y2Vhv2hCcnNmgTxoIo1dwdxhPtlWq9cNpo4IM7RZ2+h76UMiOie6HmtapIl
-	 3HKX1mi1BY4P8U98ZIxqrv59ejKNYkgTyRrlkaaWeC8M9hf5SVq1yqT4N6R3WlgVa8
-	 1paua8ccPeMwKAurOHnqmV/AyxV0VYYPv23r0lnFDZt5eaLdWsIOFVXsa14SrCwQZ0
-	 MiM3BzfGaTinld59+KmN1n63TEaa1cSBjrbe1rwlsaABMnGhsmWaRILzz9nOn98xNq
-	 hFG3JN3FV+7SQ==
-Date: Wed, 22 Apr 2026 16:38:23 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Chuck Lever <cel@kernel.org>
-Cc: Al Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-api@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, hirofumi@mail.parknet.co.jp,
-	linkinjeon@kernel.org, sj1557.seo@samsung.com, yuezhang.mo@sony.com,
-	almaz.alexandrovich@paragon-software.com, slava@dubeyko.com,
-	glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu,
-	adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org,
-	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
-	trondmy@kernel.org, anna@kernel.org, jaegeuk@kernel.org,
-	chao@kernel.org, hansg@kernel.org, senozhatsky@chromium.org,
-	Chuck Lever <chuck.lever@oracle.com>
-Subject: Re: [PATCH v9 01/17] fs: Move file_kattr initialization to callers
-Message-ID: <20260422233823.GA3778109@frogsfrogsfrogs>
-References: <20260422-case-sensitivity-v9-0-be023cc070e2@oracle.com>
- <20260422-case-sensitivity-v9-1-be023cc070e2@oracle.com>
+	s=k20201202; t=1776901617;
+	bh=wYAfT8KDTE+ECW5vGCHEkwg7zZHuqkLNTHP+XfHzM/A=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=odX78xgDKYGhl4WlXE2un5h+XBNikrs4vd+4UAog2MhTnQ6CuECm1oAXkagH2mx8V
+	 0IpCgdJaFTv8IUGcxO1DPdvyGXo5nJe1gIWXut3BtIFfBqxobAjdlz9p4mHozcAu+I
+	 T62OeWbTlwg5AIMKbzyR2LVptXv+JvSbUGFFPbm/EDB/KjRorpnyVM8nuwful7RXA9
+	 hGEWQRHfSBr8wPUAruSRribk/rGkhgm+Bi4Sb+BOyeeZArL/BNbwtlctpvmxXbtdzi
+	 jJFEC4IKTtgVpXepfR6R/41vwkl95NxcA9gIy2Vn1B1Y22ktPQmzqfKsnqAzsyoNLl
+	 eqzfwr2NjoL9Q==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b9c745e18a0so1013385166b.1
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Apr 2026 16:46:57 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzRKFeB1KaPMZJYnWTIHYT9f4TyJtga17McJ6oIpM7H7yDktwag
+	RGNjmzADTNxX3jMxtj8z6z0jt+JAlGa8NbZCnMjGeYlLFeQs5ZeIKtrv6M+VP6dLeRjSwmdCpmT
+	uvPTotNy7KpOQAWrvXydbgRO9cKd8A6o=
+X-Received: by 2002:a17:906:c150:b0:b9c:617b:4a36 with SMTP id
+ a640c23a62f3a-ba421debe01mr1113324366b.21.1776901615795; Wed, 22 Apr 2026
+ 16:46:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260422-case-sensitivity-v9-1-be023cc070e2@oracle.com>
+References: <20260419192018.3046449-1-metze@samba.org>
+In-Reply-To: <20260419192018.3046449-1-metze@samba.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 23 Apr 2026 08:46:43 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd97h9EgR=3=oan=OSxZzKUnqZG_Ss1fM9tA-+dgE_+q+w@mail.gmail.com>
+X-Gm-Features: AQROBzByHLyJtD5ZN4UyVvs8qtWAogUhrU8gJkb15HWObgOd_1VMiQyAqaMCGcY
+Message-ID: <CAKYAXd97h9EgR=3=oan=OSxZzKUnqZG_Ss1fM9tA-+dgE_+q+w@mail.gmail.com>
+Subject: Re: [PATCH] smb: smbdirect: move fs/smb/common/smbdirect/ to fs/smb/smbdirect/
+To: Stefan Metzmacher <metze@samba.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Steve French <smfrench@gmail.com>, 
+	Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 22, 2026 at 07:29:55PM -0400, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
-> 
-> fileattr_fill_xflags() and fileattr_fill_flags() memset the
-> entire file_kattr struct before populating select fields, so
-> callers cannot pre-set fields in fa->fsx_xflags without having
-> their values clobbered. Darrick Wong noted that a function
-> named "fill_xflags" touching more than xflags forces callers
-> to know implementation details beyond its apparent scope.
-> 
-> Drop the memset from both fill functions and initialize at the
-> entry points instead: ioctl_setflags(), ioctl_fssetxattr(),
-> the file_setattr() syscall, and xfs_ioc_fsgetxattra() now
-> declare fa with an aggregate initializer. ioctl_getflags(),
-> ioctl_fsgetxattr(), and the file_getattr() syscall already
-> aggregate-initialize fa to pass flags_valid/fsx_valid hints
-> into vfs_fileattr_get().
-> 
-> Subsequent patches rely on this so that ->fileattr_get()
-> handlers can set case-sensitivity flags (FS_XFLAG_CASEFOLD,
-> FS_XFLAG_CASENONPRESERVING) in fa->fsx_xflags before the fill
-> functions run.
-> 
-> Suggested-by: Darrick J. Wong <djwong@kernel.org>
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+On Mon, Apr 20, 2026 at 4:21=E2=80=AFAM Stefan Metzmacher <metze@samba.org>=
+ wrote:
+>
+> This also removes the smbdirect_ prefix from the files.
+>
+> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> Link: https://lore.kernel.org/linux-cifs/CAHk-=3Dwhmue3PVi88K0UZLZO0at22Q=
+hQZ-yu+qO2TOKyZpGqecw@mail.gmail.com/
+> Cc: Steve French <smfrench@gmail.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: Long Li <longli@microsoft.com>
+> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> Cc: linux-cifs@vger.kernel.org
+> Cc: samba-technical@lists.samba.org
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+I also prefer to leave it in fs/smb, and I completely agree with
+Linus's opinion.
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 
-Heh, I never did review this one so 
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
-
---D
-
-> ---
->  fs/file_attr.c     | 12 ++++--------
->  fs/xfs/xfs_ioctl.c |  2 +-
->  2 files changed, 5 insertions(+), 9 deletions(-)
-> 
-> diff --git a/fs/file_attr.c b/fs/file_attr.c
-> index da983e105d70..f429da66a317 100644
-> --- a/fs/file_attr.c
-> +++ b/fs/file_attr.c
-> @@ -15,12 +15,10 @@
->   * @fa:		fileattr pointer
->   * @xflags:	FS_XFLAG_* flags
->   *
-> - * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).  All
-> - * other fields are zeroed.
-> + * Set ->fsx_xflags, ->fsx_valid and ->flags (translated xflags).
->   */
->  void fileattr_fill_xflags(struct file_kattr *fa, u32 xflags)
->  {
-> -	memset(fa, 0, sizeof(*fa));
->  	fa->fsx_valid = true;
->  	fa->fsx_xflags = xflags;
->  	if (fa->fsx_xflags & FS_XFLAG_IMMUTABLE)
-> @@ -48,11 +46,9 @@ EXPORT_SYMBOL(fileattr_fill_xflags);
->   * @flags:	FS_*_FL flags
->   *
->   * Set ->flags, ->flags_valid and ->fsx_xflags (translated flags).
-> - * All other fields are zeroed.
->   */
->  void fileattr_fill_flags(struct file_kattr *fa, u32 flags)
->  {
-> -	memset(fa, 0, sizeof(*fa));
->  	fa->flags_valid = true;
->  	fa->flags = flags;
->  	if (fa->flags & FS_SYNC_FL)
-> @@ -325,7 +321,7 @@ int ioctl_setflags(struct file *file, unsigned int __user *argp)
->  {
->  	struct mnt_idmap *idmap = file_mnt_idmap(file);
->  	struct dentry *dentry = file->f_path.dentry;
-> -	struct file_kattr fa;
-> +	struct file_kattr fa = {};
->  	unsigned int flags;
->  	int err;
->  
-> @@ -357,7 +353,7 @@ int ioctl_fssetxattr(struct file *file, void __user *argp)
->  {
->  	struct mnt_idmap *idmap = file_mnt_idmap(file);
->  	struct dentry *dentry = file->f_path.dentry;
-> -	struct file_kattr fa;
-> +	struct file_kattr fa = {};
->  	int err;
->  
->  	err = copy_fsxattr_from_user(&fa, argp);
-> @@ -431,7 +427,7 @@ SYSCALL_DEFINE5(file_setattr, int, dfd, const char __user *, filename,
->  	struct path filepath __free(path_put) = {};
->  	unsigned int lookup_flags = 0;
->  	struct file_attr fattr;
-> -	struct file_kattr fa;
-> +	struct file_kattr fa = {};
->  	int error;
->  
->  	BUILD_BUG_ON(sizeof(struct file_attr) < FILE_ATTR_SIZE_VER0);
-> diff --git a/fs/xfs/xfs_ioctl.c b/fs/xfs/xfs_ioctl.c
-> index 46e234863644..ed9b4846c05f 100644
-> --- a/fs/xfs/xfs_ioctl.c
-> +++ b/fs/xfs/xfs_ioctl.c
-> @@ -517,7 +517,7 @@ xfs_ioc_fsgetxattra(
->  	xfs_inode_t		*ip,
->  	void			__user *arg)
->  {
-> -	struct file_kattr	fa;
-> +	struct file_kattr	fa = {};
->  
->  	xfs_ilock(ip, XFS_ILOCK_SHARED);
->  	xfs_fill_fsxattr(ip, XFS_ATTR_FORK, &fa);
-> 
-> -- 
-> 2.53.0
-> 
-> 
+Thanks!
