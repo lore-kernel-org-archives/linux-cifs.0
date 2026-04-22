@@ -1,118 +1,173 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66233B6C15;
-	Wed, 22 Apr 2026 08:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776845815; cv=none; b=pF5dxfYHXOJKaLWjk6sPxhjwvTAoxU1MEM4tkQzn72m6chcUvEHH8kpr2SZx3g7af5cuK4d7yqLU/F75SFJLPIQDiwp7ps/lsUHKmBVYbGd+mDNBIWTroQ70c8t0UON89XqG4lou1d1btXcgqp9O7L49fAUxvsIL+8wVwb74uFI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776845815; c=relaxed/simple;
-	bh=k4p4LMgdJtO5cU5zDgCARGfX+/nRYgRKxs5+A+3xGg8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sGa9126QBso6iPaxi+T2MUcfYUC2LwdB9cdFuKrlYEOz+UFixf3MXI4rBe19g825EVvbOn2YOriZXrkGRs4K/VCnwAsKE5qnS8mdLG7LsDdudjuZu9r84YyzYhGNOhpK8ZdPrO4/f48e78LKIjAAadbM1wuhd6E4I1gXUT9JyOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=eMoQjmjv; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07323306D2A
+	for <linux-cifs@vger.kernel.org>; Wed, 22 Apr 2026 08:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776847014; cv=pass; b=JIVb1YRKUog0n9EFsICEvkGxmx4nHxZbjRmnR6/CeGcWmXjIcanTUcG8dnlmF9jzHS3mwRW6Yw/Xagw/R/8E7/frUofOHfn8BiWGEZA8H752GRVcPOihkJeB8YANpA7ws99+M4lUHbrIt1g3UPz+eW8GtcyiR/dbklGIQVUhhjg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776847014; c=relaxed/simple;
+	bh=Ux0jHj6JhqB9OLstvAhPbVdy+wBTQatJ71oj1iH1Y6s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J6gP4XYcW82BelJkBshEdejMG6oCsKFrmZpRQq87XFzXhGoO+pn6itOuNAWYJNFaEOJYO3QSwoBjQyPp9YEMBKm/8Z6I0zH5rUdONgbtAM/fjvwA1knC2DjyVxtvRRuTvQXL68fzM5ZhGtuBJSt24uVjpJ6OJaG7ZcORVT2n+9c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jJbrxe7Y; arc=pass smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="eMoQjmjv"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=dK9i7Cr5XO7g/+h3dQazZvCkWlC6rfLQehRve6OwtbY=; b=eMoQjmjvNKb97qy4zA7NuFMhoa
-	WvwgIkm+1ACHg41AAiBShiSyw2t7weJwYYBN+dzUZITHldr+TO/u2BeC7XPAuQumbzHj3eYuKcM1B
-	ICUrFUK23Pp+nd7QS9MaDquZIDU571Ai/dD5+eSVtAFCu3XJzt8nZehTKMWWYqorThbl22D5RLZjc
-	7mRzwFE9PBN7NtUVYXV8ZtcAweeAqgn6/4yLs88p1z17iXPmq4dD9cyBT9Zj2YUFTUm4tbwHDJfMk
-	1GKg6kfby3dB3s6z7TA+n7zVaiTFnDSTF381Pmrd/WurCdpdoT0MhJVB7tBbX0FIPvagogIqC+cZm
-	raembxRqRpJj2J88iZLv1P0Yr14l4tXOVQQb4vd5EPvPHqq28KtmFbjTBXFX+tXE8XbFoeX4AIkek
-	Ahn27LYEDKpH+4yqYMiI3kE4pEXo+WA4OyOWEEDcLw/HtCkoYdsV6W7RhJbmWkAdjGGivPOl2gPtB
-	HcRqMy46JFNzjYocvS1iHjl5;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wFSlG-00000003ERj-3ZDU;
-	Wed, 22 Apr 2026 08:16:43 +0000
-Message-ID: <9cb0901c-18c5-4858-941c-3b37ee112af9@samba.org>
-Date: Wed, 22 Apr 2026 10:16:41 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jJbrxe7Y"
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-65005a8840dso4454208d50.0
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Apr 2026 01:36:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776847012; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VUotWT+tHmnbK/detLGAzpsPqdVviUOpXQX+gREzhQgvp6DJmqAzRgNmnz6BGKfk1i
+         wiRwp+Ex6T/WrIffTKa3/NluJKrBhaVvh7D+6FTBG2FRdPY9ckmLJ/JEThR7+SZfP7IR
+         E72krG3aFXFZva8xtjVXYFLbrR7sOxEWW7d2+ZaGiQRIJme5rQrVVan9Vwod41841bWg
+         xPV4c7wNPUqxeZ6bXKktBhtxiX0cR4vu9tgLlzwKzUCIyOXfJuprEPXUHhcNyx25pHQy
+         xigKRb+YYmjZd/RDfq2NMtA5w9NNY59xawxGFNr/daCRXucuZw+cdITHwobnQ0TyrxoK
+         tJ1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ZVtvcXMMK8avyypVb8iKfolU2FhGMion8XNm98EJOwI=;
+        fh=a5JLd7s8eVDu3CYXLm4Hv3VAHboxO6sYVNMcQn627Zc=;
+        b=II4VSfeTrOFXQz/9sNzz1sYPIghL0j8s5ncmuRC2Zh1JkBVoEkAIT3mGZwAhsxlNYt
+         WBXtteo0wtrVsCoatEyAnAiZ3MJhOpW+JZ7nJEZhrMxAAyc+moe3Td+LnvU/cGQuuijv
+         tYCk2AIw+h2L7Oa6nXSgwYOURBBbMf3OvepBuCabHDbZ7TmY+DslYQ6P3eQCwrhlNNtg
+         vMuwVgp8T7aY0XvqaU7EEG/Qs8VNrZrXFAtMIw8CmWxa+eYssRpAL/p4fXjYOo5YPSq0
+         9kl8YQPip2ohREgIl/hLKzAu7RN1o27jLvqAXFyeZg1bfJrMzCvn55mdtcqJDAs25J0l
+         wTng==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776847012; x=1777451812; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZVtvcXMMK8avyypVb8iKfolU2FhGMion8XNm98EJOwI=;
+        b=jJbrxe7YxI9MEb+KIWqWVshsGZaHBlMiFFqHPoBx4O3KQHI1ZpFs9mPpc4rYHGds73
+         oI4pLA/deNYDvoz3CMtKI8ApXp0QOs39jaDSu0b3WpXcBClRA8KUXc+1w2UMR5MFxl+a
+         SHtizFgW9aMZ8ERp9mESAnZegmx/moCqsJU9ltRVlegQw4jtg7WYIcnyHnfWRBo0YbNO
+         n7HPgFN85quXSTfp40yqT9/HR6ryWskuUT1RcKUrgHiveYIfOgaXxYwaikaCqC6+zsD1
+         d41qE4zWJpZEvVkLygAZhASxCxYXigMj0FAI4bqVuQA4ymGERlxaQ9J6jrW8I4xKGiqD
+         Q8Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776847012; x=1777451812;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZVtvcXMMK8avyypVb8iKfolU2FhGMion8XNm98EJOwI=;
+        b=TcKbaLHau6d+aq8kLk04rH14g/PJkvYAwEnTKY9b4UpNkNrITcK+2AZ6y3rTdgRQu4
+         dcTGWKcXwotlP3fMEbJx4DHcPoDEZwGIEJBJutD0jEf6cbbpjmSqBid9+6l0dIAhX4Ih
+         2bHJxO1X+m2DLe5tkFTp5ZWYlLcPX5NKk7dNNHtNsfbm5KSdVKbHFmYwoc16Srrfc8ro
+         lVNH5cTZVNrrpPvXpFmQM4kB/zgUjE3xBoj2NwgzYaAe0VTAp0O8Obz9+jHiM+MJ5LGu
+         lVvTLMyDJ47soHQw6Q4nVuifGrfH+HvP/h+4Y335DetIFWXMSQkrKYKgvBWn+P1qWXps
+         sMxA==
+X-Forwarded-Encrypted: i=1; AFNElJ8jUPVdqvg0W0j3nEy5wDVSkx9CKIfiBUBJ9sbmSt/ZEE0wYPaq86iGJMz6Z5K5HbkbjXvKALJB2wBd@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUR8aMyofecQr9gMj7TZ41+dVtR6/Y3B5E5MLS054/Gsuy1sUm
+	3SpLW8yV3u3CV9sZaMLt1Pr3gHtnAkqgxOlFTJpRRQpi3iT3ckPnMuzU2ADUumaIr60XJkPIQdz
+	vriqoFpVoToPqzE1eKweybOSojvyWuKQ=
+X-Gm-Gg: AeBDieu6jRU6EjGNPfLnLXSP7x5aG74TrLQh7sTFli+yclhccEKt+yInz6N+RXiC8Ty
+	oivuhzbjM+AEKRKjSsnInM2F9M+Rdmn9VEw2RUpN84ANzImJJsgZs41FlPxtJJE1CPwBjc+WAiX
+	5wDvD9FAKiq56l8JvDEFCxWSLeGPlMZtNHrNYgt9i4aV8CN3XSu7+NPtae36xvngM8DrzYXDbGN
+	mdLQKxKgngCXwEWdufKZ42aV1xaYxTlXfSSVjeZv1MiCy4lXX9cLMAHjf1G8hWuPzQpWapknaV/
+	4fxXNFp3QtjwUArXy0yLDJz8R/sVYYMzEWcJObiOUxqya3t42btGg3Is1IaV
+X-Received: by 2002:a05:690e:2584:b0:64a:d7e3:cf7c with SMTP id
+ 956f58d0204a3-653107fef43mr15634933d50.13.1776847011899; Wed, 22 Apr 2026
+ 01:36:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] smb: smbdirect: move fs/smb/common/smbdirect/ to
- fs/smb/smbdirect/
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-cifs@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, samba-technical@lists.samba.org,
- Tom Talpey <tom@talpey.com>, Steve French <smfrench@gmail.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Namjae Jeon <linkinjeon@kernel.org>
-References: <20260419192018.3046449-1-metze@samba.org>
- <aehrPuY60VMcYGU8@infradead.org>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <aehrPuY60VMcYGU8@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260409095926.905020-6-rajasimandalos@gmail.com> <20260422050613.1136327-1-rajasimandalos@gmail.com>
+In-Reply-To: <20260422050613.1136327-1-rajasimandalos@gmail.com>
+From: Bharath SM <bharathsm.hsk@gmail.com>
+Date: Wed, 22 Apr 2026 01:36:39 -0700
+X-Gm-Features: AQROBzB1J1xlyQ4A2gmxrGoYaQW6x9KtQCcCA6aM3iPA77Fw2gthNAmaI-PmcHs
+Message-ID: <CAGypqWz-rThJ3SaeJECy9mG3e+CCmozkns5k3UyatdVuXSonjw@mail.gmail.com>
+Subject: Re: [PATCH v2] smb: client: allow nolease option to be reconfigured
+ on remount
+To: rajasimandalos@gmail.com
+Cc: sfrench@samba.org, linux-cifs@vger.kernel.org, 
+	Rajasi Mandal <rajasimandal@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Christoph,
+On Tue, Apr 21, 2026 at 10:06=E2=80=AFPM <rajasimandalos@gmail.com> wrote:
+>
+> From: Rajasi Mandal <rajasimandal@microsoft.com>
+>
+> tcon->no_lease controls whether the client requests leases from the
+> server.  Changing nolease via remount is silently accepted but has
+> no effect because the value is never propagated to the live tcon.
+>
+> Add no_lease to smb3_sync_tcon_opts() so the flag is propagated to
+> every tcon on remount.
+>
+> When switching to nolease, close all deferred file handles via
+> cifs_close_all_deferred_files_sb() outside the tlink_tree_lock,
+> since closing deferred handles can sleep.  Deferred handles retain
+> active leases from before the switch; without closing them, those
+> files continue using lease-based caching despite nolease being set.
+>
+> Both transitions are safe:
+>  - lease -> nolease: deferred handles are closed, future opens
+>    get OPLOCK_LEVEL_NONE.
+>  - nolease -> lease: future opens request leases normally.
+>
+> Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
+> ---
+>  fs/smb/client/fs_context.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+> index 45173f287f00..fb59b45c7f66 100644
+> --- a/fs/smb/client/fs_context.c
+> +++ b/fs/smb/client/fs_context.c
+> @@ -1317,6 +1317,7 @@ static void smb3_sync_tcon_opts(struct cifs_sb_info=
+ *cifs_sb,
+>
+>                 spin_lock(&tcon->tc_lock);
+>                 tcon->retry =3D ctx->retry;
+> +               tcon->no_lease =3D ctx->no_lease;
+>                 /*
+>                  * Note: this updates the limit for new cached dir opens
+>                  * but does not resize or evict existing cached dirents.
+> @@ -1325,6 +1326,14 @@ static void smb3_sync_tcon_opts(struct cifs_sb_inf=
+o *cifs_sb,
+>                 spin_unlock(&tcon->tc_lock);
+>         }
+>         spin_unlock(&cifs_sb->tlink_tree_lock);
+> +
+> +       /*
+> +        * When switching to nolease, close all deferred file handles.
+> +        * cifs_close_all_deferred_files_sb() handles its own locking
+> +        * and must be called outside tlink_tree_lock since it can sleep.
+> +        */
+> +       if (ctx->no_lease)
+> +               cifs_close_all_deferred_files_sb(cifs_sb);
+>  }
+Similar to deferred files, I think we probably need to invalidate the
+cached directory
+entries when we remount with 'nolease' considering 'nolease' is a
+superset mount option
+and should affect all types of leases.
 
->> diff --git a/fs/smb/Makefile b/fs/smb/Makefile
->> index 9a1bf59a1a65..353b1c2eefc4 100644
->> --- a/fs/smb/Makefile
->> +++ b/fs/smb/Makefile
->> @@ -1,5 +1,6 @@
->>   # SPDX-License-Identifier: GPL-2.0
->>   
->>   obj-$(CONFIG_SMBFS)		+= common/
->> +obj-$(CONFIG_SMBDIRECT)		+= smbdirect/
-> 
-> Why is this not in net/smbdirect/ or driver/infiniband/ulp/smdirect?
+One additional case to consider: if an application already has a file
+open with an RWH
+lease acquired before the remount, that handle may continue to hold
+its lease and benefit
+from caching until the server sends a lease break or the application
+closes the handle.
+Is that correct.?
+I think nolease remount only affects new opens; it cannot
+retroactively revoke leases on
+existing active file handles. It may be worth documenting and/or
+comment this behavior,
+so it's clear that lease->nolease takes effect gradually as old
+handles are closed rather than
+instantaneously across all files & handles.
 
-Yes, I also thought about net/smbdirect.
-
-As IPPROTO_SMBDIRECT or PF_SMBDIRECT will be the next step,
-see the open discussion here:
-https://lore.kernel.org/linux-cifs/cover.1775571957.git.metze@samba.org/
-(I'll follow with that discussion soon)
-
-I was just unsure about the consequences, e.g. would
-the maintainer/pull request flow have to change in that case?
-Or would Steve be able to take the changes via his trees?
-Any I also didn't want to offend anybody, so I just took
-what Linus proposed.
-
-Using driver/infiniband/ulp/smdirect would also work,
-if everybody prefer that.
-
-> As far as I can tell there is zero file system logic in this code.
-> 
->> -#include "../common/smbdirect/smbdirect_public.h"
->> +#include "../smbdirect/public.h"
-> 
-> And all these relative includes suggest you really want a
-> include/linux/smdirect/ instead.
-
-Yes, that's my also my goal in the next steps.
-
-> While we're at it: __SMBDIRECT_EXPORT_SYMBOL__ is really odd.
-> One thing is the __ pre- and postfix that make it look weird.
-
-Yes, the __SMBDIRECT_EXPORT_SYMBOL__ was mainly a temporary
-thing, now it's useless and I'll remove it.
-
-> The other is that EXPORT_SYMBOL_FOR_MODULES is for very specific
-> symbols that really should not exported.  What this warrants instead
-> is a normal EXPORT_SYMBOL_NS_GPL.
-
-I want the exported functions be minimal, as most of
-of should go via the socket layer instead.
-
-If EXPORT_SYMBOL_NS_GPL(func, "smbdirect") is better than
-EXPORT_SYMBOL_FOR_MODULES() I can change that.
-
-It means cifs.ko and ksmbd.ko would need MODULE_IMPORT_NS("smbdirect"), correct?
-
-Thanks!
-metze
+Other than these comments, change looks good to me.
