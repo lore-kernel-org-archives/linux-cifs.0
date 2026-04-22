@@ -1,173 +1,108 @@
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07323306D2A
-	for <linux-cifs@vger.kernel.org>; Wed, 22 Apr 2026 08:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776847014; cv=pass; b=JIVb1YRKUog0n9EFsICEvkGxmx4nHxZbjRmnR6/CeGcWmXjIcanTUcG8dnlmF9jzHS3mwRW6Yw/Xagw/R/8E7/frUofOHfn8BiWGEZA8H752GRVcPOihkJeB8YANpA7ws99+M4lUHbrIt1g3UPz+eW8GtcyiR/dbklGIQVUhhjg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776847014; c=relaxed/simple;
-	bh=Ux0jHj6JhqB9OLstvAhPbVdy+wBTQatJ71oj1iH1Y6s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J6gP4XYcW82BelJkBshEdejMG6oCsKFrmZpRQq87XFzXhGoO+pn6itOuNAWYJNFaEOJYO3QSwoBjQyPp9YEMBKm/8Z6I0zH5rUdONgbtAM/fjvwA1knC2DjyVxtvRRuTvQXL68fzM5ZhGtuBJSt24uVjpJ6OJaG7ZcORVT2n+9c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jJbrxe7Y; arc=pass smtp.client-ip=74.125.224.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A443C13E2
+	for <linux-cifs@vger.kernel.org>; Wed, 22 Apr 2026 10:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776854991; cv=none; b=eZVUF575/Mml5yX5AuvVCYDriMJhcpg5vuX44612iw4pN//Wb2cStSqSl8Kf2TJ0buabsZZ1XAxV9pmvBjHiX0MqzAKEwNplroc2MVQqN5MGMIVlMWaf1G0hQ6BaQC+Hd9fMCLPMCQoGaJvLMgbzsoNCPG2VCG84GP9zMo9Oycs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776854991; c=relaxed/simple;
+	bh=vlgiSEfORgkql2UA0Sg6MobmjNDmnhEkC2HKKZhBBCI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ks/PTsSoqTP/QDixXGvbupqQskvMg1L4DkKBJsWKP37ZfnqIyxIM5EtIwnD1MhUwPA+JjHEjs4oL8ospno+Io37+jzjpcObJSQnPzigscmAgcy0lP2BG+5H66m+HM13ASvO9xJjSbuMxiIhTT9VV9POqMniSZeCsEqbXOmFSvio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freebox.fr; spf=pass smtp.mailfrom=freebox.fr; dkim=pass (2048-bit key) header.d=freebox-fr.20251104.gappssmtp.com header.i=@freebox-fr.20251104.gappssmtp.com header.b=VfTPc5ni; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freebox.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freebox.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jJbrxe7Y"
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-65005a8840dso4454208d50.0
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Apr 2026 01:36:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776847012; cv=none;
-        d=google.com; s=arc-20240605;
-        b=VUotWT+tHmnbK/detLGAzpsPqdVviUOpXQX+gREzhQgvp6DJmqAzRgNmnz6BGKfk1i
-         wiRwp+Ex6T/WrIffTKa3/NluJKrBhaVvh7D+6FTBG2FRdPY9ckmLJ/JEThR7+SZfP7IR
-         E72krG3aFXFZva8xtjVXYFLbrR7sOxEWW7d2+ZaGiQRIJme5rQrVVan9Vwod41841bWg
-         xPV4c7wNPUqxeZ6bXKktBhtxiX0cR4vu9tgLlzwKzUCIyOXfJuprEPXUHhcNyx25pHQy
-         xigKRb+YYmjZd/RDfq2NMtA5w9NNY59xawxGFNr/daCRXucuZw+cdITHwobnQ0TyrxoK
-         tJ1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ZVtvcXMMK8avyypVb8iKfolU2FhGMion8XNm98EJOwI=;
-        fh=a5JLd7s8eVDu3CYXLm4Hv3VAHboxO6sYVNMcQn627Zc=;
-        b=II4VSfeTrOFXQz/9sNzz1sYPIghL0j8s5ncmuRC2Zh1JkBVoEkAIT3mGZwAhsxlNYt
-         WBXtteo0wtrVsCoatEyAnAiZ3MJhOpW+JZ7nJEZhrMxAAyc+moe3Td+LnvU/cGQuuijv
-         tYCk2AIw+h2L7Oa6nXSgwYOURBBbMf3OvepBuCabHDbZ7TmY+DslYQ6P3eQCwrhlNNtg
-         vMuwVgp8T7aY0XvqaU7EEG/Qs8VNrZrXFAtMIw8CmWxa+eYssRpAL/p4fXjYOo5YPSq0
-         9kl8YQPip2ohREgIl/hLKzAu7RN1o27jLvqAXFyeZg1bfJrMzCvn55mdtcqJDAs25J0l
-         wTng==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=freebox-fr.20251104.gappssmtp.com header.i=@freebox-fr.20251104.gappssmtp.com header.b="VfTPc5ni"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-48334ee0aeaso54633225e9.1
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Apr 2026 03:49:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776847012; x=1777451812; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZVtvcXMMK8avyypVb8iKfolU2FhGMion8XNm98EJOwI=;
-        b=jJbrxe7YxI9MEb+KIWqWVshsGZaHBlMiFFqHPoBx4O3KQHI1ZpFs9mPpc4rYHGds73
-         oI4pLA/deNYDvoz3CMtKI8ApXp0QOs39jaDSu0b3WpXcBClRA8KUXc+1w2UMR5MFxl+a
-         SHtizFgW9aMZ8ERp9mESAnZegmx/moCqsJU9ltRVlegQw4jtg7WYIcnyHnfWRBo0YbNO
-         n7HPgFN85quXSTfp40yqT9/HR6ryWskuUT1RcKUrgHiveYIfOgaXxYwaikaCqC6+zsD1
-         d41qE4zWJpZEvVkLygAZhASxCxYXigMj0FAI4bqVuQA4ymGERlxaQ9J6jrW8I4xKGiqD
-         Q8Fg==
+        d=freebox-fr.20251104.gappssmtp.com; s=20251104; t=1776854987; x=1777459787; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xKMCEhO2nnV4Zt7oDc/aEFo4lI6O5EgQJeaAOAvTaT8=;
+        b=VfTPc5ni8g0bJTv/37q9DeoaewEQARxA/gjbtNXDP8vvs2f8uX1ggheMLHyi7aEUS8
+         44yDI3vw3fKS9uVdl/Az6BEfA8SL0mGtjvK7HNsGRf8aJuvawGfsi0iVpB1tvEmU/x6Z
+         ZujMDxJs7O+5DysCnZGErXylftIpxHjCgt6azQ0sTs2FyQcyHPLXQhCqDskFHz+M51F/
+         9QuIgcNZlUGzzJQIS8WpMCq9V6/qrtTRqAmEPF7fnv46NvFXt9WSBVxuEOIoSHMZCcyT
+         NauwIwiEV4l052C80cMtTfj0N7Rlu5s189a5G/bLukLIzUF8qB36k/mngqNxVOS6Aksh
+         qx6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776847012; x=1777451812;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZVtvcXMMK8avyypVb8iKfolU2FhGMion8XNm98EJOwI=;
-        b=TcKbaLHau6d+aq8kLk04rH14g/PJkvYAwEnTKY9b4UpNkNrITcK+2AZ6y3rTdgRQu4
-         dcTGWKcXwotlP3fMEbJx4DHcPoDEZwGIEJBJutD0jEf6cbbpjmSqBid9+6l0dIAhX4Ih
-         2bHJxO1X+m2DLe5tkFTp5ZWYlLcPX5NKk7dNNHtNsfbm5KSdVKbHFmYwoc16Srrfc8ro
-         lVNH5cTZVNrrpPvXpFmQM4kB/zgUjE3xBoj2NwgzYaAe0VTAp0O8Obz9+jHiM+MJ5LGu
-         lVvTLMyDJ47soHQw6Q4nVuifGrfH+HvP/h+4Y335DetIFWXMSQkrKYKgvBWn+P1qWXps
-         sMxA==
-X-Forwarded-Encrypted: i=1; AFNElJ8jUPVdqvg0W0j3nEy5wDVSkx9CKIfiBUBJ9sbmSt/ZEE0wYPaq86iGJMz6Z5K5HbkbjXvKALJB2wBd@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUR8aMyofecQr9gMj7TZ41+dVtR6/Y3B5E5MLS054/Gsuy1sUm
-	3SpLW8yV3u3CV9sZaMLt1Pr3gHtnAkqgxOlFTJpRRQpi3iT3ckPnMuzU2ADUumaIr60XJkPIQdz
-	vriqoFpVoToPqzE1eKweybOSojvyWuKQ=
-X-Gm-Gg: AeBDieu6jRU6EjGNPfLnLXSP7x5aG74TrLQh7sTFli+yclhccEKt+yInz6N+RXiC8Ty
-	oivuhzbjM+AEKRKjSsnInM2F9M+Rdmn9VEw2RUpN84ANzImJJsgZs41FlPxtJJE1CPwBjc+WAiX
-	5wDvD9FAKiq56l8JvDEFCxWSLeGPlMZtNHrNYgt9i4aV8CN3XSu7+NPtae36xvngM8DrzYXDbGN
-	mdLQKxKgngCXwEWdufKZ42aV1xaYxTlXfSSVjeZv1MiCy4lXX9cLMAHjf1G8hWuPzQpWapknaV/
-	4fxXNFp3QtjwUArXy0yLDJz8R/sVYYMzEWcJObiOUxqya3t42btGg3Is1IaV
-X-Received: by 2002:a05:690e:2584:b0:64a:d7e3:cf7c with SMTP id
- 956f58d0204a3-653107fef43mr15634933d50.13.1776847011899; Wed, 22 Apr 2026
- 01:36:51 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776854987; x=1777459787;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xKMCEhO2nnV4Zt7oDc/aEFo4lI6O5EgQJeaAOAvTaT8=;
+        b=QH21RXBE87r/4ml5w3RRYWDpAvJAGZA8mj61TUoRnTL3XfVqUoVI2LIAc4nReMfBuU
+         UmPV3frpe31M5skYOuK3vZzJZ/Kex2eA2phfGp8W5IQO6H4Kk+zL3ZYy25W7/gARICQJ
+         2sqhR3Uv/a8Muzl1jr6fkK4iE4pjQI81yHS3eyR9NxaEZtfUAFbFK3W+Oa8bwN9wtUvB
+         x77n4CGuk/uq7kqqyG+9uNQFznu92nvEsXp4q7+iCIIoGltDln1/5izeTOvjETLm4fEC
+         LpKcElqXCuNhApSJqPTVFB6++GUAIEi1jG758WH9/iLtEDdrdKUTlHMBjPGZ+sgc0XMZ
+         P29Q==
+X-Gm-Message-State: AOJu0YwGzTZkXU3RkO4Y/wofu8DynTLoSYkti1dZ6d3XlN8oPt0Kwf3b
+	sfBCi8vql5DDO/bwlay2fxSWXMSFG9CdH+A/z6yQ/WXjR2ZCzdzCtVGHIaPAymfc3bEvPJDSk9a
+	i2Ie915E=
+X-Gm-Gg: AeBDiesDzXm/8QOrPRwq+Quh6zKcZyFE8to9rAIT/XgJEOMaUFk2edsq1yGxnrzN2vE
+	yvOEPGKIksTZ+UxzGTtZHK93IkqOmWr8A3xAHb18xXg/i6cP1Hrnb7fb90sGB5f6P2w/CIqcmMl
+	oLpcDCnwbJdMlweTdJfVyxn0dPC3oIhuXL+f/CkIn8NAkEHsvtVsv0Jycs1pqIvGzOQWz+KfrHq
+	QqINIYEb75rL3mD96ZD9wPQlwndgjb9uCtg6grJaxhm0erqPMnPhxMxe/ebZcSv03VtTLCw84AJ
+	1bMywXh+CAHO8RSToPA8ArBubDNiPFHTzgjlV0M7GAEmfNA9j9s8uaoxYwEo+DeYDK2gES5vfxz
+	DNkb0iOm9RBBNI6d/CxKS9ZeEaTXKDSr3n6nbVL8WKnJvLYn7rI6ckSu/XD2qGxPMClfxayxwMS
+	2wFr8n8V/VlH6QjlZFl11CGtg+cXzPkudi+QTkYWDCR+NlEDYrQdFPcvzWZI0dikVr1+BlOgF1U
+	OFNpgaFCzgvHL9Y+T/sTnqu/FafM4SASVf8sFRPpNg5czGz3dT9avY=
+X-Received: by 2002:a05:600c:c082:b0:488:b043:5efd with SMTP id 5b1f17b1804b1-488fb75f7a6mr240468285e9.13.1776854986793;
+        Wed, 22 Apr 2026 03:49:46 -0700 (PDT)
+Received: from odysseia.iliad.local (freebox.vlq16.iliad.fr. [213.36.7.13])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb135asm49131895f8f.6.2026.04.22.03.49.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Apr 2026 03:49:46 -0700 (PDT)
+From: Marios Makassikis <mmakassikis@freebox.fr>
+To: linux-cifs@vger.kernel.org,
+	linkinjeon@kernel.org
+Cc: smfrench@gmail.com,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	Marios Makassikis <mmakassikis@freebox.fr>
+Subject: [PATCH] fs: smb: server: handle readdir_info_level_struct_sz() error
+Date: Wed, 22 Apr 2026 12:49:00 +0200
+Message-ID: <20260422104859.2599422-2-mmakassikis@freebox.fr>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260409095926.905020-6-rajasimandalos@gmail.com> <20260422050613.1136327-1-rajasimandalos@gmail.com>
-In-Reply-To: <20260422050613.1136327-1-rajasimandalos@gmail.com>
-From: Bharath SM <bharathsm.hsk@gmail.com>
-Date: Wed, 22 Apr 2026 01:36:39 -0700
-X-Gm-Features: AQROBzB1J1xlyQ4A2gmxrGoYaQW6x9KtQCcCA6aM3iPA77Fw2gthNAmaI-PmcHs
-Message-ID: <CAGypqWz-rThJ3SaeJECy9mG3e+CCmozkns5k3UyatdVuXSonjw@mail.gmail.com>
-Subject: Re: [PATCH v2] smb: client: allow nolease option to be reconfigured
- on remount
-To: rajasimandalos@gmail.com
-Cc: sfrench@samba.org, linux-cifs@vger.kernel.org, 
-	Rajasi Mandal <rajasimandal@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 21, 2026 at 10:06=E2=80=AFPM <rajasimandalos@gmail.com> wrote:
->
-> From: Rajasi Mandal <rajasimandal@microsoft.com>
->
-> tcon->no_lease controls whether the client requests leases from the
-> server.  Changing nolease via remount is silently accepted but has
-> no effect because the value is never propagated to the live tcon.
->
-> Add no_lease to smb3_sync_tcon_opts() so the flag is propagated to
-> every tcon on remount.
->
-> When switching to nolease, close all deferred file handles via
-> cifs_close_all_deferred_files_sb() outside the tlink_tree_lock,
-> since closing deferred handles can sleep.  Deferred handles retain
-> active leases from before the switch; without closing them, those
-> files continue using lease-based caching despite nolease being set.
->
-> Both transitions are safe:
->  - lease -> nolease: deferred handles are closed, future opens
->    get OPLOCK_LEVEL_NONE.
->  - nolease -> lease: future opens request leases normally.
->
-> Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
-> ---
->  fs/smb/client/fs_context.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index 45173f287f00..fb59b45c7f66 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -1317,6 +1317,7 @@ static void smb3_sync_tcon_opts(struct cifs_sb_info=
- *cifs_sb,
->
->                 spin_lock(&tcon->tc_lock);
->                 tcon->retry =3D ctx->retry;
-> +               tcon->no_lease =3D ctx->no_lease;
->                 /*
->                  * Note: this updates the limit for new cached dir opens
->                  * but does not resize or evict existing cached dirents.
-> @@ -1325,6 +1326,14 @@ static void smb3_sync_tcon_opts(struct cifs_sb_inf=
-o *cifs_sb,
->                 spin_unlock(&tcon->tc_lock);
->         }
->         spin_unlock(&cifs_sb->tlink_tree_lock);
-> +
-> +       /*
-> +        * When switching to nolease, close all deferred file handles.
-> +        * cifs_close_all_deferred_files_sb() handles its own locking
-> +        * and must be called outside tlink_tree_lock since it can sleep.
-> +        */
-> +       if (ctx->no_lease)
-> +               cifs_close_all_deferred_files_sb(cifs_sb);
->  }
-Similar to deferred files, I think we probably need to invalidate the
-cached directory
-entries when we remount with 'nolease' considering 'nolease' is a
-superset mount option
-and should affect all types of leases.
+early exit in smb2_populate_readdir_entry() if the requested info_level
+is unknown.
 
-One additional case to consider: if an application already has a file
-open with an RWH
-lease acquired before the remount, that handle may continue to hold
-its lease and benefit
-from caching until the server sends a lease break or the application
-closes the handle.
-Is that correct.?
-I think nolease remount only affects new opens; it cannot
-retroactively revoke leases on
-existing active file handles. It may be worth documenting and/or
-comment this behavior,
-so it's clear that lease->nolease takes effect gradually as old
-handles are closed rather than
-instantaneously across all files & handles.
+Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+---
+ fs/smb/server/smb2pdu.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Other than these comments, change looks good to me.
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 6622efdd55e3..07782f7205dc 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -3947,7 +3947,13 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
+ 		goto free_conv_name;
+ 	}
+ 
+-	struct_sz = readdir_info_level_struct_sz(info_level) + conv_len;
++	struct_sz = readdir_info_level_struct_sz(info_level);
++	if (struct_sz == -EOPNOTSUPP) {
++		rc = -EINVAL;
++		goto free_conv_name;
++	}
++
++	struct_sz += conv_len;
+ 	next_entry_offset = ALIGN(struct_sz, KSMBD_DIR_INFO_ALIGNMENT);
+ 	d_info->last_entry_off_align = next_entry_offset - struct_sz;
+ 
+-- 
+2.51.1
+
