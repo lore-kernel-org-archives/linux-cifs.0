@@ -1,82 +1,146 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B322868A9;
-	Thu, 23 Apr 2026 05:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729452D3ED2
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Apr 2026 06:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776923578; cv=none; b=GHw09UVK1a22UzD505X24hbJzzz4Pw9CnTq1FlhPwwCLiD1ikzgFR69kIQo6VnA0tXpHF9CspV+O0hZZXVZdxyKpyhVxEfLUNnsFniQXfkuT16vY2uxzx1bf6p3ayruZEtCCG1dXPORIkMMFityZoQbEze5HBr2XNoE6GTsMXCs=
+	t=1776924037; cv=none; b=AffZcG9wbCVN0wokGvxd4VgQee8WQXGO5j+imWnD2KlM2XpV6IN/jV3MevPWVOrbrWvHAKRsfir4mXxYP41NGo2XJIeqoGTn/2Z/6Pr5gE0/W88hBesP9Ko8inol39Kl4uQI4SFaNblQFYHqNfuSLLseDjSWhhwejPTL22yhQUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776923578; c=relaxed/simple;
-	bh=IzCwPU5c6Gq1BGhh1bSpdiyTomucNDB4qIjOeZl0cpQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nJ4u6wPibtEhfoWDBWaiZjbnsoECYQ617yYyzpO/AoY/j/S0Ky6MYkTNyDWkY8Zv+i/4FD3j3+2jiBnB3uG4i9tDWSrfhX4ceOPbj2KYCWDSrmSjIhggDdxDlPYdNqeVhy1F5AJRJXeTiPpOG1LV7JAUj196cOwW5ttvLhw0SUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=oqW5LJG9; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1776924037; c=relaxed/simple;
+	bh=Y7S0I53Mg4DYEFQeNIyERr6A6rh3rgmI4+Ci2lA9AwU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TdZrGaMEAPmJyFRllua62h75WQEgl8c48rF+KlA9gdwOxbDPtu2nlfxOlCRm/hekxi07cz9uq+opKO7aoQWDJe19HlnSw/OnzJ8U8j2jEHj082GHRgGJ6m6Lgosd7WmQO+pgobE3E0nPSvBYqBHLEwi6oFgNvuyrDAbjtlUO2tA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YoFohIOE; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oqW5LJG9"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=9rvPFEC2MVsXs7hPa8zHFKo530p+I6oXYlmvjIl2f6c=; b=oqW5LJG9fBwRuI/xBRFobENbPC
-	E2uvZY4hTPcJzshqHMNSCNbAq1dXR74jh5AhK6rjwJQopAwWdBcjljK/TRLi4yKxlGuQUND23+U8U
-	w5Zkbj04KaIgmIEimRnmZGsrkmc9AMWznDHn4iFp/gJ+S7Wu9MyD79MuzxqNJa8IhFk2I4Y9/iTJ5
-	AUSWR3mcrOicr1F20MyexfpWI0aRj2+sdb+t1QJtkJxTvNn7Uub/5MGetU1EoNeTpgEUYEx53Lf4R
-	5ndHsoHJi23cbvWDVNz5n8B0GgeU76CG/iM63b2QSXHz+1hzOM3mbKOjt0jsx3G9XerWvX2ydjtku
-	rEQfaDWw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wFmze-0000000B5Fr-2IF8;
-	Thu, 23 Apr 2026 05:52:54 +0000
-Date: Wed, 22 Apr 2026 22:52:54 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-cifs@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	samba-technical@lists.samba.org, Tom Talpey <tom@talpey.com>,
-	Steve French <smfrench@gmail.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Alex Markuze <amarkuze@redhat.com>,
-	Viacheslav Dubeyko <slava@dubeyko.com>, ceph-devel@vger.kernel.org,
-	Jeff Layton <jlayton@kernel.org>, linux-nfs@vger.kernel.org
-Subject: Re: [PATCH] smb: smbdirect: move fs/smb/common/smbdirect/ to
- fs/smb/smbdirect/
-Message-ID: <aemztk8jTqgfKu4y@infradead.org>
-References: <20260419192018.3046449-1-metze@samba.org>
- <aehrPuY60VMcYGU8@infradead.org>
- <9cb0901c-18c5-4858-941c-3b37ee112af9@samba.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YoFohIOE"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776924032;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=E4OPrLawMRVjhlxBvyuqSTW8+MhzcHg8GcecN28dJmE=;
+	b=YoFohIOEB4NFHLZkkPRc9cgVrsKK0/Z7GLcLFTiDXZ+Pu3Ty5D4RVvG+Zvt3zasWsn0F+g
+	fmCu2MKtAGGSl+c5ntpuXQpo08t+ud//diJ1Dxx8Uq6uGm8jsCwj/0wsjLIqyKGz/SFTJW
+	mcFkl+MjHvQtXJLtAwFVe0mneXZsO/M=
+From: Youling Tang <youling.tang@linux.dev>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	chenxiaosong@chenxiaosong.com,
+	gregkh@linuxfoundation.org
+Cc: linux-cifs@vger.kernel.org,
+	youling.tang@linux.dev,
+	Youling Tang <tangyouling@kylinos.cn>,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH] smb/client: fix unaligned reads in wsl_to_fattr()
+Date: Thu, 23 Apr 2026 13:59:15 +0800
+Message-ID: <20260423055915.695024-1-youling.tang@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9cb0901c-18c5-4858-941c-3b37ee112af9@samba.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Apr 22, 2026 at 10:16:41AM +0200, Stefan Metzmacher wrote:
-> > Why is this not in net/smbdirect/ or driver/infiniband/ulp/smdirect?
-> 
-> Yes, I also thought about net/smbdirect.
-> 
-> As IPPROTO_SMBDIRECT or PF_SMBDIRECT will be the next step,
-> see the open discussion here:
-> https://lore.kernel.org/linux-cifs/cover.1775571957.git.metze@samba.org/
-> (I'll follow with that discussion soon)
+From: Youling Tang <tangyouling@kylinos.cn>
 
-Seems like it is the right fit then.
+See MS-FSCC 2.4.16. When multiple FILE_FULL_EA_INFORMATION data elements
+are present in the buffer, each MUST be aligned on a 4-byte boundary.
 
-> I was just unsure about the consequences, e.g. would
-> the maintainer/pull request flow have to change in that case?
-> Or would Steve be able to take the changes via his trees?
-> Any I also didn't want to offend anybody, so I just took
-> what Linus proposed.
+When parsing WSL extended attributes, the code derives the value pointer
+at an offset of 7 (SMB2_WSL_XATTR_NAME_LEN + 1) from ea_data, the value
+sits at an unaligned offset.
 
-You might want to ask the sunrpc or ceph maintainers as they have a
-similar split.
+We should use get_unaligned_le32() or get_unaligned_le64() to get
+unaligned values.
 
+Link: https://lore.kernel.org/linux-cifs/77013349-ff89-4593-985d-520d967d2638@chenxiaosong.com/
+Signed-off-by: Youling Tang <tangyouling@kylinos.cn>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/client/reparse.c | 6 +++---
+ fs/smb/client/reparse.h | 6 +++---
+ fs/smb/client/smb2pdu.h | 1 +
+ 3 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+index cd1e1eaee67a..eebce954c5ce 100644
+--- a/fs/smb/client/reparse.c
++++ b/fs/smb/client/reparse.c
+@@ -1160,7 +1160,7 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
+ 
+ 		name = ea->ea_data;
+ 		nlen = ea->ea_name_length;
+-		v = (void *)((u8 *)ea->ea_data + ea->ea_name_length + 1);
++		v = (void *)((u8 *)name + nlen + 1);
+ 
+ 		if (!strncmp(name, SMB2_WSL_XATTR_UID, nlen))
+ 			fattr->cf_uid = wsl_make_kuid(cifs_sb, v);
+@@ -1168,9 +1168,9 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
+ 			fattr->cf_gid = wsl_make_kgid(cifs_sb, v);
+ 		else if (!strncmp(name, SMB2_WSL_XATTR_MODE, nlen)) {
+ 			/* File type in reparse point tag and in xattr mode must match. */
+-			if (S_DT(fattr->cf_mode) != S_DT(le32_to_cpu(*(__le32 *)v)))
++			if (S_DT(fattr->cf_mode) != S_DT(get_unaligned_le32(v)))
+ 				return false;
+-			fattr->cf_mode = (umode_t)le32_to_cpu(*(__le32 *)v);
++			fattr->cf_mode = (umode_t)get_unaligned_le32(v);
+ 		} else if (!strncmp(name, SMB2_WSL_XATTR_DEV, nlen)) {
+ 			fattr->cf_rdev = reparse_mkdev(v);
+ 			have_xattr_dev = true;
+diff --git a/fs/smb/client/reparse.h b/fs/smb/client/reparse.h
+index 0164dc47bdfd..653213a6b7e8 100644
+--- a/fs/smb/client/reparse.h
++++ b/fs/smb/client/reparse.h
+@@ -23,7 +23,7 @@
+ 
+ static inline dev_t reparse_mkdev(void *ptr)
+ {
+-	u64 v = le64_to_cpu(*(__le64 *)ptr);
++	u64 v = get_unaligned_le64(ptr);
+ 
+ 	return MKDEV(v & 0xffffffff, v >> 32);
+ }
+@@ -31,7 +31,7 @@ static inline dev_t reparse_mkdev(void *ptr)
+ static inline kuid_t wsl_make_kuid(struct cifs_sb_info *cifs_sb,
+ 				   void *ptr)
+ {
+-	u32 uid = le32_to_cpu(*(__le32 *)ptr);
++	u32 uid = get_unaligned_le32(ptr);
+ 
+ 	if (cifs_sb_flags(cifs_sb) & CIFS_MOUNT_OVERR_UID)
+ 		return cifs_sb->ctx->linux_uid;
+@@ -41,7 +41,7 @@ static inline kuid_t wsl_make_kuid(struct cifs_sb_info *cifs_sb,
+ static inline kgid_t wsl_make_kgid(struct cifs_sb_info *cifs_sb,
+ 				   void *ptr)
+ {
+-	u32 gid = le32_to_cpu(*(__le32 *)ptr);
++	u32 gid = get_unaligned_le32(ptr);
+ 
+ 	if (cifs_sb_flags(cifs_sb) & CIFS_MOUNT_OVERR_GID)
+ 		return cifs_sb->ctx->linux_gid;
+diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
+index 30d70097fe2f..6744606dab6c 100644
+--- a/fs/smb/client/smb2pdu.h
++++ b/fs/smb/client/smb2pdu.h
+@@ -211,6 +211,7 @@ struct compress_ioctl {
+  *	BB consider moving to a different header
+  */
+ 
++/* See MS-FSCC 2.4.16 */
+ struct smb2_file_full_ea_info { /* encoding of response for level 15 */
+ 	__le32 next_entry_offset;
+ 	__u8   flags;
+-- 
+2.53.0
