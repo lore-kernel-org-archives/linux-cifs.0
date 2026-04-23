@@ -1,109 +1,149 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2523A34887E
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Apr 2026 17:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776963711; cv=pass; b=ijuvhyc7ifHN+YIvRL/Tbk+wu1izt0u7IRUEhUpPgiYDMo/ujW+mJUEpYSv3N5gR1OKXW1RspAABG3fpARRwjgXlw6ECUjC4J/vUtq0hbi+Rjd2e5AaZeSuTZ8gMQOUbTymLkIuYKxMyZNyYWaAZHb730yYEgmuT8xr5QvbEYKQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776963711; c=relaxed/simple;
-	bh=TOn7OaufpVFnTCngKERiD7517EOajGuL0SqpRc86qfg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=Ec3w0+gVHMev0kGZlCEfP0BQPcnznwfGGPMD6D63VI60CrDkkclSj7WV3jXSXkcjXCLykhy9q0VWJDKy1PXurKVB7Q+tRZYmvASc8Vf1uOtHIJbUn1ZoR69X/zEZsD4t3bTBqEiFZkMIgx61uUc/PAl7ZfX2fqOtR4fK8vanFxg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PdF1PzMo; arc=pass smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF503033DF;
+	Thu, 23 Apr 2026 17:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776966204; cv=none; b=Hk/ZDMDuck4rLZ8EyDvWsNSKfDGcoKacG+crEpwIrkC9L1JURBaSVwL2E4HIBysKiQRjUWJU8AVUi9bz8AXUfCH7EKS+5UKp55DHunbg3zqNg8fgcgrWzZQt4OE+AOfvmwO8tZ5XWW4HK2mTsDbP8tUTyWPwcxOdRYLHR11iwv8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776966204; c=relaxed/simple;
+	bh=vkq7YgCeDD1Bfr9M3vrmSOO1AM3+7u/K8BLnBhaW26s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ag9H+bq1dHdyVjeKpzI3JBXSo1ObfWm0HM58OMUbUfp30GYImZtwoRYLI6a2TWy9v3CnsjxSev+d6wd/cCEltPxjCUx8IJGLkqlDdR6aiU1zArqI528sJfdiTKfMB0AGmyLRKSkLXYqCDPgkCZ6+gwR9CHXGuZlwqH7NiTsL2j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=F7keYk36; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PdF1PzMo"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b9e00649769so994861766b.3
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Apr 2026 10:01:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776963708; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NcZb6TUQIG9pGI1JwzHA+V/0+xMWfziqoIVwFwtx4rS61NC0F3MefoM2A+BghJ+tKc
-         joWGS2gk9pnzPRliZwULPumXR//VXrREetUoYqX2uOspB+5bECjHvfG59Bq7qCZz7nhi
-         XY28HpayhTSIOidDeeGp9xnw+1t+uHlLna9EGo+AxcpaEgvhChyGtZiyLWDyl38nSesC
-         sqllPukJEimer4bV6RxTEP8NmAg9/9f7aNoglaKPyrOW2SdwkS9DVP25D/JUfCVaa5K7
-         lqRS4jhcrVj+9hS2XrMNdKesRnTFEbE+8VHN/ZV+Ne61vVnKsBrDpKFCiNy9jqxReMww
-         G8og==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=MR7Evo27Fb9n4uesCJvxrzmJyEK/vZpzgb8CmAsEAsY=;
-        fh=/pAZmUPPgIMAwG+zuGCQcRUg3kDmYj/wellIzry2yRI=;
-        b=C0wWCalJisBH27VIcTPgWEz2Hw+tulqGJ7rmN5UsC+H0Hl9Ulv0yeJyv0IlCROSChM
-         359tMqmfCvMZmZ16tqcrIkiOA8DZcT4w7eoIpvUuU8St1Ibm3mib+fvIa2JJ19WBPm/z
-         utdJFgM+vZzOtKNHocl45g5nrtQLkhOT0IaK1YVcjVSdtlc9tXLMBe2HJ117lWxpOBAd
-         3p9VQkqLZzMFSrQcNb8007L/NkyNOehbWRZs2ql6MbR61IPh2iki6ho9OxvUAx4/pHIs
-         23hke9FDUNiaa6pwYQ1nIV8t2BW7H/E3BOANO7p2uEVbLxmWC1IhorGRv6Tz6ivTDCj1
-         xlmg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776963708; x=1777568508; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MR7Evo27Fb9n4uesCJvxrzmJyEK/vZpzgb8CmAsEAsY=;
-        b=PdF1PzMohNRn0isPMagJx9rrY/oepjF5joKh5Zol1v/7Yubwk47gLSdZK0Czm6GULO
-         pLOn93YoBenCX+K400L9WTJ53d+HxTuc2zm630KfpLiFwYOMezczStPEksFaCE1z6aPO
-         GSuvd0fJn7TY+bBUZBpFtRejchDJ3gRmkd8Gnsg+r3bVQIMQ3Wqt7WXENsUD8fLck773
-         85AWE9chzIs/auTrxMNobZEYiWW+7jy9Tm+sjp3d7LyCr2FSYzJtXATEdG1iFBqlX4O/
-         gE06LdyvSzfexIcQqrIw98lxjq1LHNVsO4bWGfVjfEvuhmQ5LYdLUoy8fgFJg1tuF7/3
-         bWZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776963708; x=1777568508;
-        h=to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MR7Evo27Fb9n4uesCJvxrzmJyEK/vZpzgb8CmAsEAsY=;
-        b=qNpBOf5bsuE65cgmrAkqZFPWPRmYf0Dss9IxIGYyLmueC0HOGdw5PurAXGD6e5Utap
-         4XfapHA/zSXsvcvPgNvWf84cYCP+ogRrmu7baspndIuDBe1dW1862j7OM7Aa962zryB0
-         CZ1+kbAM5UWi0ONgbamz2nWE1Diygj4kLNTCSMprFhbVAJFcn0epgn5zf7M0yWnw9dGJ
-         RGqTHBhRprV5D6XBPmFM0Yl6u32KfHzEn8SWjoGcRhPd+ALxxjOOBRFlcszTET9faDdH
-         cju4g3umsbcCxCRRywoWCJkBMUvAP77vZZL7vvZGGBuxLV28miqK3n26I5Poa52gz4PX
-         jHrQ==
-X-Forwarded-Encrypted: i=1; AFNElJ96nXi4LPG6TRV+fLvmADLRQICGD8sWi9OqeISVz5t5BIUtptxqc2YAMA7GE74pKbL4UCOnjr+0il5n@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywi4sUeHChUgOEjaI95hwSpcew1RaqIqUkMhw4RSabiDKwcy8Nz
-	6aM5CU6XwOBeft9H5tCOLB4iK4vkixL0hXMBAkk9AsXpM19n3xHNvCKXDB1aBSLr265SfSMrTIt
-	71wNbd+El7viM2fNVk/EBxC3WcHoTpHc1ZQ==
-X-Gm-Gg: AeBDiet9SM1YTfk5Xdx3Ch2gGp5PmgvuoTk3CnyxcD8+y99+qzRx/DQquH4gRoW6pM3
-	PVsTA3z1f4A6PKSV3OaFLJ4T0hvpjrcB94O3ABZ9R3tu9JExfBw7JAFNx/tDHcIwX86Kankt+5s
-	j07qckol9dLfGqH00VKh+oytBaX+BJkpzEwnwNgFh17sNmW8ddkL5KwYRkkHUfrEWwrLnj4C1vg
-	XsJsRz5YJYsSPHi2w1nrCanuDEXn2PUmslYBSzDw44KSIb6zkU8rE6Edp3Fm6ARBNz1jfBtN3Bj
-	PPWCUat3jpSBg3oZ
-X-Received: by 2002:a17:907:da7:b0:ba6:4e0f:e396 with SMTP id
- a640c23a62f3a-ba64e0fe8fdmr1021131966b.12.1776963708142; Thu, 23 Apr 2026
- 10:01:48 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="F7keYk36"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:To:Date:Message-ID:CC;
+	bh=vkq7YgCeDD1Bfr9M3vrmSOO1AM3+7u/K8BLnBhaW26s=; b=F7keYk369OjmEaXd1AxVnHYYbJ
+	cKUd5WB5yhCfsznQ8+W8MWmysFXK2/CECapJZLy4duVOShmjLl6OCzfP0GQGsxe413GUnwh7KcUNr
+	HrwrAtb4ibDFmLaRyFtrlbdXa2+TNjXDBMYSfdkFo8SdEAnIZ1ZK4pdhdVKPbuOAhgZCWlFN333sU
+	ukBqOjHcn11a72EEsAH2Qr8eNUWihhFN9QwRU6YtZzXGeDYF3rlrSHrBdUXkLQZipPqwN4ZRPOkeG
+	taYuqdcAbhBjKW6CqatBIfuHKtD4ZSl7u0nIw3Fz2/xRqJsf1Ldr3Ld8WPjHK1hRGg6taM2QJdqP6
+	sAMxlONoDOHTL+Uq07Ye94F2bitaPalqz1P9jgJc+gzvb2nagcUO7qOAO7AvVp+jvjZ+tyLn/5dVy
+	RUKrVb2oON+dNRcbfe5OmnZuwi8EpzjUg2UBo7zIx1YVzU5gY1amlrPp1bu5BkLk4XCLEuoTjdGFz
+	5tlERVmRq0rt/D/QtN4IIEzA;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wFy53-00000003cgH-44oa;
+	Thu, 23 Apr 2026 17:43:14 +0000
+Message-ID: <438478a7-c965-4a2a-9c4a-84b5f77d6dbe@samba.org>
+Date: Thu, 23 Apr 2026 19:43:13 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Thu, 23 Apr 2026 22:31:37 +0530
-X-Gm-Features: AQROBzAXKGkL4wCrc7a7jqx_RwqEbMziZZLN-r7g3-kQL0OMGl7pH-QpRiQgpWw
-Message-ID: <CANT5p=oV8kcE6hXPoUVQAYGaiz+2OERoSRLAS6X+q9KJ_8w8YQ@mail.gmail.com>
-Subject: "Intent" of VFS lookups
-To: linux-fsdevel <linux-fsdevel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: "Intent" of VFS lookups
+To: Shyam Prasad N <nspmangalore@gmail.com>,
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ CIFS <linux-cifs@vger.kernel.org>, linux-nfs@vger.kernel.org
+References: <CANT5p=oV8kcE6hXPoUVQAYGaiz+2OERoSRLAS6X+q9KJ_8w8YQ@mail.gmail.com>
+From: Ralph Boehme <slow@samba.org>
+Content-Language: en-US, de-DE
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
+In-Reply-To: <CANT5p=oV8kcE6hXPoUVQAYGaiz+2OERoSRLAS6X+q9KJ_8w8YQ@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------diU7aiJiSXkEUIabePlVv9Sy"
 
-Hi all,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------diU7aiJiSXkEUIabePlVv9Sy
+Content-Type: multipart/mixed; boundary="------------CF5AvGltTlGTEaELMcV6HInJ";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: Shyam Prasad N <nspmangalore@gmail.com>,
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ CIFS <linux-cifs@vger.kernel.org>, linux-nfs@vger.kernel.org
+Message-ID: <438478a7-c965-4a2a-9c4a-84b5f77d6dbe@samba.org>
+Subject: Re: "Intent" of VFS lookups
+References: <CANT5p=oV8kcE6hXPoUVQAYGaiz+2OERoSRLAS6X+q9KJ_8w8YQ@mail.gmail.com>
+In-Reply-To: <CANT5p=oV8kcE6hXPoUVQAYGaiz+2OERoSRLAS6X+q9KJ_8w8YQ@mail.gmail.com>
 
-Wanted to understand if this is a problem for other filesystems or if
-it is specific to SMB protocol?
-SMB2+ protocol mandate that open call specifies if the file being
-opened is a directory or not (regular file).
+--------------CF5AvGltTlGTEaELMcV6HInJ
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-This means that during the VFS lookup callback, fs/smb/client needs to
-first try open as one type, check the return status and then possibly
-do the open as the other type.
+T24gNC8yMy8yNiA3OjAxIFBNLCBTaHlhbSBQcmFzYWQgTiB3cm90ZToNCj4gV2FudGVkIHRv
+IHVuZGVyc3RhbmQgaWYgdGhpcyBpcyBhIHByb2JsZW0gZm9yIG90aGVyIGZpbGVzeXN0ZW1z
+IG9yIGlmDQo+IGl0IGlzIHNwZWNpZmljIHRvIFNNQiBwcm90b2NvbD8NCj4gU01CMisgcHJv
+dG9jb2wgbWFuZGF0ZSB0aGF0IG9wZW4gY2FsbCBzcGVjaWZpZXMgaWYgdGhlIGZpbGUgYmVp
+bmcNCj4gb3BlbmVkIGlzIGEgZGlyZWN0b3J5IG9yIG5vdCAocmVndWxhciBmaWxlKS4NCnN1
+cmU/IEZyb20gbWVtb3J5ICh0aG91Z2ggdGhlIGxvZ2ljIGhhcyBhbHdheXMga2luZCBvZiBl
+c2NhcGVkIG1lKSBpZiANCnlvdSBuZWl0aGVyIHNwZWNpZnkgRklMRV9ESVJFQ1RPUllfRklM
+RSBub3IgRklMRV9OT05fRElSRUNUT1JZX0ZJTEUgdGhlIA0Kc2VydmVyIGlzIHN1cHBvc2Vk
+IHRvIG9wZW4gdGhlIG9iamVjdCByZWdhcmRsZXNzIG9mIHRoZSB0eXBlLg0K
 
-From SMB client POV, it would have been good to know from VFS lookup
-callback if the current dentry is intended to be a leaf or not. This
-would enable the SMB client to decide which type of open to make
-first.
+--------------CF5AvGltTlGTEaELMcV6HInJ--
 
-Or if there is a clever hack that I'm missing here, I'm open to ideas.
+--------------diU7aiJiSXkEUIabePlVv9Sy
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
--- 
-Regards,
-Shyam
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmnqWjEFAwAAAAAACgkQqh6bcSY5nkbV
+3w//SJ3gtpbUX8Xn3DvIzvWF3DrIIe4Wvk6EDP8NMB9EvVgoAlaZXqtnaJkGS5Uohw+gTHcaae8R
+mgiHTh549i6B9hDxRvnCtzV7l4jN5jFHesN/+g9HzCU/mM7VZfZxPyRf832SGUAJa6iQBfzImk38
+OX4TngF3ekzeRshVwj24GWydnkz1DM4moRUBHxJwSBQ5zMFVTZHfWT3u1p2JrDI/MaVmZLlYmxjX
+Vh07X/KxiuVtws0o0nYtSj/cTtdz/2Sep+BbyPcsDPniFh+76bvjNq6Q2vdtQmJSvMBobzRQ/gj0
+Am1Dc6FKTSc98bVKuIE3f4VNxCLesM7Dro7lrJvWS6Bw2ZesOdLpTPy6eeIGeADIPOi/IpOSIHTG
+TLDZTMH6z2K+kb6vST31kGBodQ4vOzUDLhI7XAEaMUT9oSyPnYDiDhZtGr3LJ6uU+9urzICW6Osr
+p6FqbG2OpDk5a06EZfcQZzqkF4vfdPElFblnHPyigx/pb+BDqWmPEYGBAqJDPE1c5TEgc7CzwWL4
+m5F9o2w92OJHyf/7Kmu2QyB+qaDow56dLpAVKozWEjcqa/u45Z+QL+PwvU6iMKuPMB5jYvHSNSfV
+/0eU7u3BjuI4hndfm23s8LovCY4iF12STw1R5ad8lSHA4VkP0PBnUhgAx/RJgO9PHKkmVjdca6Sc
+bjA=
+=BsdN
+-----END PGP SIGNATURE-----
+
+--------------diU7aiJiSXkEUIabePlVv9Sy--
