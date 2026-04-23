@@ -1,151 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247FD3F23B2;
-	Thu, 23 Apr 2026 13:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B00194C96;
+	Thu, 23 Apr 2026 14:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776949985; cv=none; b=C+AqvCgPwi4EZl6fQuoOgjd7ZdiKjQgAu33AtrFJMxPaZoD57XrtISu1L0R5YwZs511X4oi/V2cLsJMPI1eVM4dMvYSYpy0GPZo39CekHcZgU+HMffMRg9WLCyGLHn7V5OXEM87KTafQ0GRfk6VoAH8NGTiV7H4DhCkw98W9vhw=
+	t=1776952973; cv=none; b=kU9CKLi0M93oLCR6HKf70K97j6zSy2eciwPZ7NhI+WZqeKaS4jcrYwMsBPGiyzuhdxfSrckWqGrX73blvuPz8Q2cqHWkv7GQPpfdgkCfjvA7y8MClG5fc+b7O8fGk+53Znnit8k4Cu9GXCpo4cUD/GsJqmoj5YtSURi7ByUvZSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776949985; c=relaxed/simple;
-	bh=UNo7HHcDIV7JWpD0f7CVGZkCuGE2I4nW5HuPOm8dnXs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EFoGM9q1ptcXGfOh4X/vMEoz05ayRRr/DyvTud6r2CAsxn7rxwTWaQFqhelx4hCjtXx3SBtIEbIVgGfs7CS6bNyVBr0y0QtAA8y1APHLmYfWD9TXLpuBnQEcZ6DE6gVOztHksYCHndBOndjvf8Ki/CdHC7e4EkGzKbasPZ6/UO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K4OLhQiL; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K4OLhQiL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6F73C4AF0B;
-	Thu, 23 Apr 2026 13:13:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776949984;
-	bh=UNo7HHcDIV7JWpD0f7CVGZkCuGE2I4nW5HuPOm8dnXs=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=K4OLhQiL5q2gmBR6fMg7OQc8/AgWzGgE7c8lWakCv7FgQPstzhyPNpp5NVg8rSH5t
-	 mboZro4Y4RDogKy4pwOYTTBKrM1nSl9+T/ayjwK5XjqPBicW7it5FJsOONHrR9vTxJ
-	 Em4nM8x6k2v7UjnhrFFcU6nGFe5bpzMFO9Yv2iH5Dpjv9OQ0eAYvP12zCL5VShV54s
-	 MD1CiSWkCn5D5uE2yRw158f+KjfNGR6ZDQrcaMl9StikZc7kMsAlmk6gXyZp6scNMI
-	 iFwiMOsMVpSckv3ECa8Psgpi8yqngU7TcH0G6Y1+SeQ/6d/A1XCfyYIuIAkh/plDrG
-	 RKm2aYHMHvm+A==
-From: Chuck Lever <cel@kernel.org>
-Date: Thu, 23 Apr 2026 09:12:20 -0400
-Subject: [PATCH v10 17/17] ksmbd: Report filesystem case sensitivity via
- FS_ATTRIBUTE_INFORMATION
+	s=arc-20240116; t=1776952973; c=relaxed/simple;
+	bh=N6ElxsER6+0Y62WC5jN8bk+IWLyIvM7A0v5OKiLyzKE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qWRPcmMcChtKlKCC6pIDZnD6KjMlqwUs4snF4oV8EJ5wgi3MjhYtOmw6JICCFnCsJXklTxnNdV2dfBxd8/iF0e6P5NBqUNp0CbIwn1CsXrc4ABgR69N7G12OoyutGpSCUOwhT/AE4fMyhinUPV2B8+lq4gbYjffvJCBeFtBJMXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=193.43.8.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: from altlinux.malta.altlinux.ru (obninsk.basealt.ru [217.15.195.17])
+	(Authenticated sender: kovalevvv)
+	by air.basealt.ru (Postfix) with ESMTPSA id 86D1A233A4;
+	Thu, 23 Apr 2026 17:02:45 +0300 (MSK)
+From: Vasiliy Kovalev <kovalev@altlinux.org>
+To: stable@vger.kernel.org
+Cc: Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	lvc-project@linuxtesting.org,
+	kovalev@altlinux.org
+Subject: [PATCH v2 5.10.y] cifs: Fix connections leak when tlink setup failed
+Date: Thu, 23 Apr 2026 17:02:45 +0300
+Message-Id: <20260423140245.195039-1-kovalev@altlinux.org>
+X-Mailer: git-send-email 2.33.8
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260423-case-sensitivity-v10-17-c385d674a6cf@oracle.com>
-References: <20260423-case-sensitivity-v10-0-c385d674a6cf@oracle.com>
-In-Reply-To: <20260423-case-sensitivity-v10-0-c385d674a6cf@oracle.com>
-To: Al Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org, 
- linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
- linux-nfs@vger.kernel.org, linux-api@vger.kernel.org, 
- linux-f2fs-devel@lists.sourceforge.net, hirofumi@mail.parknet.co.jp, 
- linkinjeon@kernel.org, sj1557.seo@samsung.com, yuezhang.mo@sony.com, 
- almaz.alexandrovich@paragon-software.com, slava@dubeyko.com, 
- glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu, 
- adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org, 
- pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
- trondmy@kernel.org, anna@kernel.org, jaegeuk@kernel.org, chao@kernel.org, 
- hansg@kernel.org, senozhatsky@chromium.org, 
- Chuck Lever <chuck.lever@oracle.com>
-X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2582;
- i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=/M15phZsxO4dYF/kfeaMD4laDtLmxamo65xsRXL/kkg=;
- b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBp6hq0lrMRP/taRhAjVj2Nj34LkMZtiUQ1WGFUj
- 5GhhBTIsAWJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCaeoatAAKCRAzarMzb2Z/
- l7+iD/9RTr4hntMPxhl7UX1Xa9+pHwyzL17Hm9T+TA6M+p7usu+ddsGl6douosfJVOewO3FyoUV
- kUkhZBoIos+DHr5mWvcU/p0Bmt6IvhCdDIg7EkUJHbOUd+a821W9CDt9NGNwLdWnHU7rJATocLP
- 1IGEUvEUEm12ihgZPtNYLLOGf99q7H8f3fkR0RtAxSKaP3KkPkYO5IDkZJlqKdShfxbwU/l0IRD
- 3yb59efObNpfct0TPF9BY3UR/YAGA97NsvtptvyitXjtb65xeeFKZVJN7GyAGSkvQ8YFAxiYYLt
- SshlPCE3GLBxxGmAQBgkH56S67IiXI1kxMrddESmsTOExvc0rzaVvm97m9wYoLvy+dmt+12UBJ4
- WUGXgh41TFpWIt1+RYtZ/WBboC0B5IhkSou7z6IlksVYl5G8q/9fUAoQBM79v0B0bNbzWXWfq0a
- WjPFYvD3qovj8sX7CcfPXlXnNU0L40gt+MNRbNGtZjppbWixbTv77TAGbn51rxVQnTfulBLoDpF
- 4+VqzzCzM1XTKJCPYOETZ/yhXvjZZtNa5BQVaerGOMBIaCOC7yop2xyTiBOoMevYEA+qaoZzGqz
- 9+XTxfknXthMElnBLQC5JLn6zz/IHiwZx5awniQHRHH18z8MiIXnIbCjfrj92Owq7tSiKzrCsNU
- V1E030k7effzOsA==
-X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
- fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
+Content-Transfer-Encoding: 8bit
 
-From: Chuck Lever <chuck.lever@oracle.com>
+From: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
 
-FS_ATTRIBUTE_INFORMATION responses have always reported
-FILE_CASE_SENSITIVE_SEARCH and FILE_CASE_PRESERVED_NAMES
-unconditionally. Case-insensitive filesystems like exFAT, and
-casefolded directories on ext4 or f2fs, have no way to signal
-their actual semantics to SMB clients.
+commit 1dcdf5f5b2137185cbdd5385f29949ab3da4f00c upstream.
 
-Now that filesystems expose case behavior through ->fileattr_get,
-query it via vfs_fileattr_get() and translate the FS_XFLAG_CASEFOLD
-and FS_XFLAG_CASENONPRESERVING flags into the corresponding SMB
-attributes. Filesystems without ->fileattr_get continue reporting
-default POSIX behavior (case-sensitive, case-preserving).
+If the tlink setup failed, lost to put the connections, then
+the module refcnt leak since the cifsd kthread not exit.
 
-SMB's FS_ATTRIBUTE_INFORMATION reports per-share attributes from
-the share root, not per-file. Shares mixing casefold and
-non-casefold directories report the root directory's behavior.
+Also leak the fscache info, and for next mount with fsc, it will
+print the follow errors:
+  CIFS: Cache volume key already in use (cifs,127.0.0.1:445,TEST)
 
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+Let's check the result of tlink setup, and do some cleanup.
+
+Fixes: 56c762eb9bee ("cifs: Refactor out cifs_mount()")
+Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+[ kovalev: bp to fix CVE-2022-49822; adapted to use direct xid/ses/tcon
+  variables instead of mnt_ctx struct fields due to the older kernel not
+  having the corresponding cifs_mount() refactoring (see upstream commit
+  c88f7dcd6d64); additionally NULL out mntdata after dfs_cache_add_vol()
+  transfers its ownership to vol_list, otherwise the new error path from
+  mount_setup_tlink() failure would double-free it via kfree(mntdata) in
+  the error: label ]
+Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
 ---
- fs/smb/server/smb2pdu.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+v2: address mntdata double-free flagged by sashiko-bot review [1].
+  - NULL out mntdata after dfs_cache_add_vol() in the DFS branch of
+    cifs_mount(); otherwise the new goto error from mount_setup_tlink()
+    failure hits kfree(mntdata) in the error: label while the pointer
+    is already owned by vol_list (vi->mntdata set in dfs_cache_add_vol).
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index ee32e61b6d3c..05245562bcb8 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -14,6 +14,7 @@
- #include <linux/falloc.h>
- #include <linux/mount.h>
- #include <linux/filelock.h>
-+#include <linux/fileattr.h>
+  The second concern raised by sashiko-bot (UAF on
+  cifs_sb->origin_fullpath via cifs_kill_sb()) does not apply to 5.10.y:
+  cifs_smb3_do_mount() handles cifs_mount() failure via the out_free
+  label, which kfree()s cifs_sb directly without calling cifs_umount(),
+  so the kfree(cifs_sb->origin_fullpath) in the error: label is the
+  only release on this path and must stay.
+
+  [1] https://sashiko.dev/#/patchset/20260421132612.38517-1-kovalev%40altlinux.org
+
+v1: https://lore.kernel.org/all/20260421132612.38517-1-kovalev@altlinux.org/
+
+ fs/cifs/connect.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 769c7759601d..3ce86a88fad4 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -4770,6 +4770,8 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
+ 	rc = dfs_cache_add_vol(mntdata, vol, cifs_sb->origin_fullpath);
+ 	if (rc)
+ 		goto error;
++	/* mntdata is now owned by vol_list */
++	mntdata = NULL;
+ 	/*
+ 	 * After reconnecting to a different server, unique ids won't
+ 	 * match anymore, so we disable serverino. This prevents
+@@ -4786,9 +4788,13 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
+ 	vol->prepath = NULL;
  
- #include "glob.h"
- #include "smbfsctl.h"
-@@ -5541,16 +5542,28 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
- 	case FS_ATTRIBUTE_INFORMATION:
- 	{
- 		FILE_SYSTEM_ATTRIBUTE_INFO *info;
-+		struct file_kattr fa = {};
- 		size_t sz;
-+		u32 attrs;
-+		int err;
- 
- 		info = (FILE_SYSTEM_ATTRIBUTE_INFO *)rsp->Buffer;
--		info->Attributes = cpu_to_le32(FILE_SUPPORTS_OBJECT_IDS |
--					       FILE_PERSISTENT_ACLS |
--					       FILE_UNICODE_ON_DISK |
--					       FILE_CASE_PRESERVED_NAMES |
--					       FILE_CASE_SENSITIVE_SEARCH |
--					       FILE_SUPPORTS_BLOCK_REFCOUNTING);
-+		attrs = FILE_SUPPORTS_OBJECT_IDS |
-+			FILE_PERSISTENT_ACLS |
-+			FILE_UNICODE_ON_DISK |
-+			FILE_SUPPORTS_BLOCK_REFCOUNTING;
- 
-+		err = vfs_fileattr_get(path.dentry, &fa);
-+		if (err && err != -ENOIOCTLCMD && err != -ENOTTY) {
-+			path_put(&path);
-+			return err;
-+		}
-+		if (!(fa.fsx_xflags & FS_XFLAG_CASEFOLD))
-+			attrs |= FILE_CASE_SENSITIVE_SEARCH;
-+		if (!(fa.fsx_xflags & FS_XFLAG_CASENONPRESERVING))
-+			attrs |= FILE_CASE_PRESERVED_NAMES;
+ out:
+-	free_xid(xid);
+ 	cifs_try_adding_channels(ses);
+-	return mount_setup_tlink(cifs_sb, ses, tcon);
++	rc = mount_setup_tlink(cifs_sb, ses, tcon);
++	if (rc)
++		goto error;
 +
-+		info->Attributes = cpu_to_le32(attrs);
- 		info->Attributes |= cpu_to_le32(server_conf.share_fake_fscaps);
++	free_xid(xid);
++	return rc;
  
- 		if (test_share_config_flag(work->tcon->share_conf,
-
+ error:
+ 	kfree(ref_path);
+@@ -4820,9 +4826,12 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
+ 			goto error;
+ 	}
+ 
+-	free_xid(xid);
++	rc = mount_setup_tlink(cifs_sb, ses, tcon);
++	if (rc)
++		goto error;
+ 
+-	return mount_setup_tlink(cifs_sb, ses, tcon);
++	free_xid(xid);
++	return rc;
+ 
+ error:
+ 	mount_put_conns(cifs_sb, xid, server, ses, tcon);
 -- 
-2.53.0
+2.50.1
 
