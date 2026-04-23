@@ -1,171 +1,214 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D402BE053
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Apr 2026 19:32:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1607B34BA5A
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Apr 2026 21:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776972777; cv=pass; b=ra1xl2DcbA++oed2bJJq6X1Uj/u7JJIROffc1SSdc5MjppQP6IF3+htxAxtAIKwBAE2frMCZ0ZvBbHt1eIbPlMCx9lrh/lDzQG0JE8DTvhf2NE8cm404Lg9aCYLXD7n1GTEF7xy53DHca464jwIhYtrM+xaNO7qBfAYLyZ+dUY4=
+	t=1776978191; cv=pass; b=gb8jmFtlO71mR/m+okQoD73/nzLs2BlCpv52zJu85Li83dOGU8q0Le0y1rrO+B3A3GTe/myTWa9R7HHkW5cM0AUlX/2rQFtZn1N1EUhfy2E1o43keoBw1BWUji2/SHDJ0blLi1K499aq3EbPU8fRoCH4x6lTL3yLkpsqZodrbqE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776972777; c=relaxed/simple;
-	bh=aEFAo3XX2LQdfz6rxnqvFA4LNZw/qvDkbY4GYqOBFm8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=m9vF0AAd5fyr5aUCCNMqjHHFJ+6ZJTz8cAfHUbOS+cY8jmWwFc5sVxyTTNW3/qEmwPLJLgGvr23hFgbx92w7ohG8TvZU5Jm03iTu+5rYRXRHKBtyFNuRn6LURmbzRpQlVBrJQvdTirPWKKU71Ro4uCuOvXy42BPQIzQRz9Rc878=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hxj2i97V; arc=pass smtp.client-ip=209.85.160.172
+	s=arc-20240116; t=1776978191; c=relaxed/simple;
+	bh=xhEH603J8v85yHWTGq8ZnN7Uus4HM3riSO2QoNgy+fs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MfbrZT47ZvPN9hvTbUyLuBFYyZh3Ev8C1qj1AhK8nVe1MwMZkAQBHZ7+94C5Kfe2tiZXYTT9Yl4Q95mg0hH59sfmQVEECZIkwIth1VPKlIF2UzGk2znGSEK7xI8WVCsKjH8wsk3N2qzSkE+UuwcOLoYmykmMUSqCNQd5o0lEBrA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rDvAu1SN; arc=pass smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hxj2i97V"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-50d876329bbso81974281cf.2
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Apr 2026 12:32:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776972775; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rDvAu1SN"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8acb7f2586bso74626636d6.1
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Apr 2026 14:03:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776978188; cv=none;
         d=google.com; s=arc-20240605;
-        b=U1uydyYdOsazbQ375/a6EvV5ZTXvaltqiYE1AF1kBRx/wJBh5jA+xzoJOrsh95UoY4
-         6+vfi27boDgv+VkwW34ljd4Wlss4r7JL+HgkwshwIsEpMjyNseOX6MB4w0cGC+SvivTK
-         qs7Oi/O/FC1OgXp92CqSK+ZcVzOjGlaO5+C9yk4EpbY2sZfCufkYEajd1aQIhux0R5pk
-         5yQwc+vw7txcLxW2yOBhCts54OYQPHBkeu2BJhkQf/Y5Xy1tDqJ8cugKS8DnBIcU+qX9
-         TdElTUthHdZGYNOzOjFK4E8rCQQQzlGTC9WBi5tg0Z4cDQoltVWKzB4uMhc7MfWOqpGo
-         GYjw==
+        b=dUO8t0+0GgNvbWXdKwOaZhqQk+KlariZAP8IrKrt2nYw1y1TkSGl233DEdliKW7to0
+         ZFqf/cyPniV87/T44VUybdWfdEYG7dIgTsYS6KbADs/ynva+ih1DPNp/im3X897pKPGP
+         uJjY0g7QlecFxLSsLzM/ih3mzZNLq5Pwb2BM4NuXWxoivnCSCXmRZ8RTR+v6nz5b7LAw
+         NPW7rt1l31gabSGwIwRempp1Hdj0a87pe0Nnxg9RTttBQl1Udw3VibWSosDh+cZ4wJSd
+         sXQPjHfBo9nIXvUOdS4d1cabkTrG0Y+epThP1ANHBU+bilJzmw6LeEqyjg7zo40epg0y
+         w7Fw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=uK/sAOqHIiUW7kshUNqYVt5Q7vYo+A3VBdEQZoARV84=;
-        fh=/Ht5gIEV0iWL3HQlSbQNJCHboO1we9RUsOhPdL2nMRI=;
-        b=eltnjeMcG9A9SsmT1Zis+HQq9lEbVUpPHH7PNnjyWYkmxT/wSE7U9qaPNvj62eJDpL
-         pqKkqIKjfGgbs+vWyxBmUFrVJBgoDW+Yh0luDPNvXPLH0HXpwTUncrlStiO/ym02oPy0
-         9cP5UJxI/gGYwTHObwpBFycXWH1lfRY53xbo5S4xWxS9Y7JrP9RIYuwLEwn+DUz4ab/v
-         tXs8iA/Z2+P1sGcZpEDP41XmZf8R+T66EOm6toJ7sudUoclEqXTU9PImfHikrDC/qBvA
-         0soDEprcVPmm8YJUvyReaMkTTBW/jp3M3T/0e8Ku/jV8SwCyfBOFSl+vzxhMQH80Kmlc
-         PYTw==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=PB9D2kfgkJFOe3p8pXvyrrOYHUrSUtT15eUJWPkJgQk=;
+        fh=CVx+ncaNKCiPm2zcnoziVehPm9UrtAQNg+ymCkdgz5E=;
+        b=fWGp2wvC2zDlDTHvZQQZ1XDiVORa6vt71b+oZMRibIXoE/9zwJ6Ji4cVoF19a2ucqF
+         vEzH9XTfF+SyXkB8PYusqOhykqJqHbL52JqDYhEPt5+RTvQW0snpho8mbzEPcTANIIr6
+         Fl+HKz4gSLlNhOt9EpOXu3symkrYK1gfkpX7/8NyKgkIoStRQlu/C2Fi4vReGbn2dQfR
+         igjt95CFyIW1IkT/35qQAlxKwGNyHnD7S5zIf2VxfaB8aEZzjzRH+NPd77VMwTksg/dQ
+         p8CqsvlEntNNsA56NqJX8fgdRk8wSgzOh4txMeQLcm4Er07YOYOIf8dERRz3fe1NMs2e
+         7thQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776972775; x=1777577575; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uK/sAOqHIiUW7kshUNqYVt5Q7vYo+A3VBdEQZoARV84=;
-        b=hxj2i97V2Os5kVu4WS4JbqWt1j6DCeITXniLsOLyFPthJQXi558Ae8k8CJzTM8L9+6
-         2qRg8oDuFc2S6qXqk/W7icwz3IiPuuk7IjYlr4oyvYlyWVcyQ1ri91L5TjBLSEgH0Dc9
-         SWtsi6RNEEXutg1WgvdiAb/trc23+RpXtvpnXJmYyHmBu6lye5+ptSw6JKDnlazh9OCh
-         woL+lSAASP00mDO0tNoGN6MK858qG5Snhk47UtCzzoeRm4cFfE+e6+B0xxqUhRRt1RXO
-         x76nbF+45vahkq/2H9siHM7WOAkoFIZsLuVkquT5dEwV4kclOC7PJ/oupH57jTBg1Sd4
-         VWjw==
+        d=gmail.com; s=20251104; t=1776978188; x=1777582988; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PB9D2kfgkJFOe3p8pXvyrrOYHUrSUtT15eUJWPkJgQk=;
+        b=rDvAu1SNNCNFOtPGGZA1Ilm0Le5RC3HqJ0wXokdqmzOLVNi8lHw7GMMZu9w9TKLwL2
+         97WG5/8zvZHB8yvJKvWest8upLdKisDZ7H05Ka5/vdYNhsrnM3D9ri/hCBGJJWSYMJ6A
+         4aV5pN8ZpW+OvUAVyQXtCxyz+lKlPQ3JSP3K8P+ESur67eGHrRIzYUzsXwVHkCd6yj2/
+         ctzXdJjsBXDJTbKbibVy0FNHQzCBCqmL0wFBtBXUGYA9rjTxlgcuc+yyfB6WixhGhej1
+         k1hqtskE52BY3YNgHMeEYZ4kRq1QB4GqeTj/Zh+a80rccrsXdmSCnU6wEvXr81Y4Mp/o
+         /xVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776972775; x=1777577575;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uK/sAOqHIiUW7kshUNqYVt5Q7vYo+A3VBdEQZoARV84=;
-        b=Kq0wjhdC396CB6Yen6kVdPEttIXeWelWaOFEBv2uuPCVECDvj+VGHJJUGzRsVacl4J
-         UpDOJQVqyGwaz5fFUESyhqYen5OJbnpFCxHqUpsWh1JhsYqmjiQgpHJfil7CTO7Kfw+Z
-         bgd+Rd8JGgmgLxXgTq7nXs9hSmKriW5Rm8PXUTD6J4qoR7ErMwACIJZNa0AacZ/+RscX
-         PG0DrwIrXOzNsy5v7k8ULGckfjssJlmDnbjcdobfsVRfNIvmL4HFrv7s3+CQyqPNsKes
-         L3McDGOgO11dTsFfwcFXUvnrWrnhIAfbHHB547CtUV8KX6V+qD8L1ukiFDKdzRfH6JBc
-         4hrQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+ziwBR7P75evyaVzF5ccbu3Gs+IwAe6xOzcXGGce/Rd5+tWb8TuvxmMHIaHyU1tGZJQiVhtK66mqFD@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz13alJenPiQkdXq4BBKNE6eoPHIi6YFrFyLBFLknac0YH9RZqn
-	S8yZY9sO4AUjtDKWp4fSJGRFUKyPiEgnQo0fAN0kMiwz/X6PQTNXQXNm3qVmP6sQ3XQ7jTQdSCJ
-	QpkSxlMResc4CibtfOLetxZB7zenIiwSX+pjq
-X-Gm-Gg: AeBDieuOzfrPjRagjd+qNU3liZFBEiDYlXjp6EG/ykA0am6xRZzpiUPyxsFX7Lcfz8h
-	Ohb5WgrPoT4+UhNe0i6FgymKED2YZs3hTbJCJ3a9Mimq/zXWvQNg78NVmfPSblAkIu0oPyFao4c
-	ofr5syQ/rlmsRaCg8+rbtW+t8O6NpU95bI+DsmTv+zpdVyTpX0F8eoVL0cEjV9KPM7CoBPkXnj9
-	RE9Wyur9VizzAhCjmK8dGWH2WQxL8VT39O5Jft2rt7sMzf99RlXrUbl4CVU19J2ZtX1qxCamFg5
-	NFgKiY3rLoT5FwN92M42MZrkY/zUVpivnyecWhCdPLaJxMIGYlFC8fDhLQDxjeiPDsaUwHyUqfH
-	FDIgAVloXOVzgtiDHAyzidkK1jvvQU7HgB13CVXb+tHsDrfRbFuFDjYYeWbwwIfZ4em8DnRdehy
-	d/ViZxqPHkmseQy8ViVQX42QfhLgHXZxj8
-X-Received: by 2002:a05:622a:a951:b0:50e:5a1d:8422 with SMTP id
- d75a77b69052e-50e5a1d85bbmr223471911cf.28.1776972775396; Thu, 23 Apr 2026
- 12:32:55 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776978188; x=1777582988;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PB9D2kfgkJFOe3p8pXvyrrOYHUrSUtT15eUJWPkJgQk=;
+        b=bj+lTqf0tF1UBryxlP3BktpOIqU08uRYAOey6qgrTFLsyFTRZwxxy2uszZwiKDvx6U
+         ttDWz90y4NhTAay6zGF+KBAvABux36MLxfNCZBag1MT3j4vraijB83nz46e6rJIkbNn+
+         ecw2y6kHpi9QDQFoAKz0kScMzXGMls0YTs8ln104PSLfqYVGnmFAd/T5Bxm53k2AlZcI
+         pUsftJZGCUfAn4DhljyQOw9JQGlih5oaJ9r1ulG/v2LkWy9b7WSTRgMPCzAq7hEIylYL
+         aPldXiy9XSk/rIQU9LYc58DVFdLJ4rIeOaubWK4pBFo9BzdA3ZJeqBTJF55vUctLS4G+
+         UO1g==
+X-Forwarded-Encrypted: i=1; AFNElJ+wfmx4PVKBJEvzFVnnWlZqaBTPtc/AmRyeuFkrzNJxR/q5My88Yr5L/AE7FjXUAWMhTqZHKS/twGRJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaZbpHPbYJ/yDOeU10fD42LlYsxUwe44UqRmsQYvXeaY9Q+4bf
+	ycEcl44mfj4KkAccroO6pFIExV4vOIi87ia+/pS9lAsJ6F7hEYsReBVHVpCA41OgA1pKXNWuBJb
+	+t1oWxIYUBtJCgUa22sfjuFzhJvcyOQI=
+X-Gm-Gg: AeBDieuuLJiNxYqCZiCrYNoL5rTwfopVgwNiPBt2xkxUa+u7n8UdxQbNUP2N0XPJ3xl
+	RrnwlsZyQZf+Opf2h8JttWtloVmCgo52rAQYpAd1vM1gOfRjm/RTOqTwp6dxV+IaFalj75hoT7s
+	bqPvYjk13m49opxifLcmuUzusioCHVM+NyxoxmNBe66CyN9zqUeORJouYo6qSvjflFSJjupgeid
+	YDvn6EHXgU/vGUjl3OVefSP5e76MvVjfexGwyaH/zToo64MmkvVGIhVd7ui8qkQZJ8EfWY2iLpG
+	+2ld2Ic9s6Gu9SN1ml+5oBAvlGKy2o6JgvkNQHEDAm5fVo98EYGLes/44Jm8PRKao1yxdy6IOAr
+	Y8msZzxepFf7jiTX9DosrGIMgvsb/sObYuS921ftwld6o+gO4hGdhza61Ht3NoGh8o2SMgQuhd/
+	xkbv4GyceI+nvJxcEYD+Cek6OEHl2kWAU=
+X-Received: by 2002:ad4:5d65:0:b0:8ae:6282:df2e with SMTP id
+ 6a1803df08f44-8b02822456emr461252066d6.44.1776978187970; Thu, 23 Apr 2026
+ 14:03:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260423-case-sensitivity-v10-0-c385d674a6cf@oracle.com> <20260423-case-sensitivity-v10-10-c385d674a6cf@oracle.com>
+In-Reply-To: <20260423-case-sensitivity-v10-10-c385d674a6cf@oracle.com>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 23 Apr 2026 14:32:42 -0500
-X-Gm-Features: AQROBzDpPT4n-HYT2gsmxXX4EEsZXaqmqd-LKlp4R8WgTMRQDfcxxfou2-Wrtro
-Message-ID: <CAH2r5msLsRyRyu0q68y8hWMMO9Yq_-yA73Q0=owSY2hbx77BJg@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Date: Thu, 23 Apr 2026 16:02:56 -0500
+X-Gm-Features: AQROBzDF43-id-Qgk6rRbL0HPyUPTg1w8GYo4-J0uBb2d6IfD5ElWAtE-TtbFxA
+Message-ID: <CAH2r5mu1Wg_9tZCjei-xF357UjKR+h6jQr9zey39v59rx9quZQ@mail.gmail.com>
+Subject: Re: [PATCH v10 10/17] cifs: Implement fileattr_get for case sensitivity
+To: Chuck Lever <cel@kernel.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, linux-api@vger.kernel.org, 
+	linux-f2fs-devel@lists.sourceforge.net, hirofumi@mail.parknet.co.jp, 
+	linkinjeon@kernel.org, sj1557.seo@samsung.com, yuezhang.mo@sony.com, 
+	almaz.alexandrovich@paragon-software.com, slava@dubeyko.com, 
+	glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu, 
+	adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org, pc@manguebit.org, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, trondmy@kernel.org, 
+	anna@kernel.org, jaegeuk@kernel.org, chao@kernel.org, hansg@kernel.org, 
+	senozhatsky@chromium.org, Chuck Lever <chuck.lever@oracle.com>, 
+	Steve French <stfrench@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please pull the following changes since commit
-0b2f2b1fc0c61e602a6babf580b91f895b0ea80a:
+Should this also be checking if the SMB3.1.1 Linux Extensions or SMB
+POSIX Extensions are negotiated (ie the server supports case
+sensitivity)?
 
-  Merge tag 'v7.1-rc1-part2-smb3-client-fixes' of
-git://git.samba.org/sfrench/cifs-2.6 (2026-04-16 19:14:55 -0700)
+On Thu, Apr 23, 2026 at 8:20=E2=80=AFAM Chuck Lever <cel@kernel.org> wrote:
+>
+> From: Chuck Lever <chuck.lever@oracle.com>
+>
+> Upper layers such as NFSD need a way to query whether a filesystem
+> handles filenames in a case-sensitive manner. Report CIFS/SMB case
+> handling behavior via the FS_XFLAG_CASEFOLD flag.
+>
+> CIFS servers (typically Windows or Samba) are usually case-insensitive
+> but case-preserving, meaning they ignore case during lookups but store
+> filenames exactly as provided.
+>
+> The implementation reports case sensitivity based on the nocase mount
+> option, which reflects whether the client expects the server to perform
+> case-insensitive comparisons. When nocase is set, the mount is reported
+> as case-insensitive.
+>
+> The callback is registered in all three inode_operations structures
+> (directory, file, and symlink) to ensure consistent reporting across
+> all inode types.
+>
+> Acked-by: Steve French <stfrench@microsoft.com>
+> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+> ---
+>  fs/smb/client/cifsfs.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+>
+> diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+> index 2025739f070a..9b70ffa3e01d 100644
+> --- a/fs/smb/client/cifsfs.c
+> +++ b/fs/smb/client/cifsfs.c
+> @@ -30,6 +30,7 @@
+>  #include <linux/xattr.h>
+>  #include <linux/mm.h>
+>  #include <linux/key-type.h>
+> +#include <linux/fileattr.h>
+>  #include <uapi/linux/magic.h>
+>  #include <net/ipv6.h>
+>  #include "cifsfs.h"
+> @@ -1199,6 +1200,22 @@ struct file_system_type smb3_fs_type =3D {
+>  MODULE_ALIAS_FS("smb3");
+>  MODULE_ALIAS("smb3");
+>
+> +static int cifs_fileattr_get(struct dentry *dentry, struct file_kattr *f=
+a)
+> +{
+> +       struct cifs_sb_info *cifs_sb =3D CIFS_SB(dentry->d_sb);
+> +       struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
+> +
+> +       /*
+> +        * The nocase mount option installs case-insensitive dentry
+> +        * operations on this superblock. SMB preserves case on the
+> +        * wire and at rest, so the mount matches FS_XFLAG_CASEFOLD
+> +        * semantics: case-folded lookup, verbatim storage.
+> +        */
+> +       if (tcon->nocase)
+> +               fa->fsx_xflags |=3D FS_XFLAG_CASEFOLD;
+> +       return 0;
+> +}
+> +
+>  const struct inode_operations cifs_dir_inode_ops =3D {
+>         .create =3D cifs_create,
+>         .atomic_open =3D cifs_atomic_open,
+> @@ -1217,6 +1234,7 @@ const struct inode_operations cifs_dir_inode_ops =
+=3D {
+>         .listxattr =3D cifs_listxattr,
+>         .get_acl =3D cifs_get_acl,
+>         .set_acl =3D cifs_set_acl,
+> +       .fileattr_get =3D cifs_fileattr_get,
+>  };
+>
+>  const struct inode_operations cifs_file_inode_ops =3D {
+> @@ -1227,6 +1245,7 @@ const struct inode_operations cifs_file_inode_ops =
+=3D {
+>         .fiemap =3D cifs_fiemap,
+>         .get_acl =3D cifs_get_acl,
+>         .set_acl =3D cifs_set_acl,
+> +       .fileattr_get =3D cifs_fileattr_get,
+>  };
+>
+>  const char *cifs_get_link(struct dentry *dentry, struct inode *inode,
+> @@ -1261,6 +1280,7 @@ const struct inode_operations cifs_symlink_inode_op=
+s =3D {
+>         .setattr =3D cifs_setattr,
+>         .permission =3D cifs_permission,
+>         .listxattr =3D cifs_listxattr,
+> +       .fileattr_get =3D cifs_fileattr_get,
+>  };
+>
+>  /*
+>
+> --
+> 2.53.0
+>
+>
 
-are available in the Git repository at:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.1-rc1-part3-smb3-client-fixes
-
-for you to fetch changes up to a83307f34e0bd9b0e595b1074dc8fbcc1b7f3172:
-
-  smb: client: Drop 'allocate_crypto' arg from smb*_calc_signature()
-(2026-04-22 09:56:16 -0500)
-
-----------------------------------------------------------------
-Eighteen smb3 client fixes
-- Four bug fixes: OOB read in ioctl query info, 3 ACL fixes
-- SMB1 Unix extensions mount fix
-- Four crypto improvements: move to AES-CMAC library, simpler and faster
-- Remove drop_dir_cache to avoid potential crash, and move to /procfs
-- Seven SMB3.1.1 compression fixes
-----------------------------------------------------------------
-Enzo Matsumiya (8):
-      smb: client: compress: fix bad encoding on last LZ77 flag
-      smb: client: fix (remove) drop_dir_cache module parameter
-      smb: client: compress: fix buffer overrun in lz77_compress()
-      smb: client: compress: fix counting in LZ77 match finding
-      smb: client: compress: increase LZ77_MATCH_MAX_DIST
-      smb: client: compress: LZ77 optimizations
-      smb: client: compress: add code docs to lz77.c
-      smb: common: add SMB3_COMPRESS_MAX_ALGS
-
-Eric Biggers (4):
-      smb: client: Use AES-CMAC library for SMB3 signature calculation
-      smb: client: Remove obsolete cmac(aes) allocation
-      smb: client: Make generate_key() return void
-      smb: client: Drop 'allocate_crypto' arg from smb*_calc_signature()
-
-Michael Bommarito (4):
-      smb: client: fix OOB read in smb2_ioctl_query_info QUERY_INFO path
-      smb: client: validate the whole DACL before rewriting it in cifsacl
-      smb: client: require a full NFS mode SID before reading mode bits
-      smb: client: scope end_of_dacl to CIFS_DEBUG2 use in parse_dacl
-
-Paulo Alcantara (1):
-      smb: client: fix dir separator in SMB1 UNIX mounts
-
-Steve French (1):
-      cifs: update internal module version number
-
- fs/smb/client/Kconfig         |   2 +-
- fs/smb/client/cached_dir.c    |   5 +-
- fs/smb/client/cached_dir.h    |   2 +-
- fs/smb/client/cifs_debug.c    |  56 ++++++++-
- fs/smb/client/cifs_unicode.c  |   1 +
- fs/smb/client/cifsacl.c       | 115 +++++++++++++-----
- fs/smb/client/cifsencrypt.c   |  62 +++-------
- fs/smb/client/cifsfs.c        |  38 ------
- fs/smb/client/cifsfs.h        |   4 +-
- fs/smb/client/cifsglob.h      |   7 +-
- fs/smb/client/cifsproto.h     |   3 -
- fs/smb/client/compress.c      |   6 +-
- fs/smb/client/compress/lz77.c | 274 ++++++++++++++++++++++++++++--------------
- fs/smb/client/compress/lz77.h |  32 ++++-
- fs/smb/client/connect.c       |  10 +-
- fs/smb/client/file.c          |   2 +-
- fs/smb/client/misc.c          |  57 ---------
- fs/smb/client/sess.c          |  11 --
- fs/smb/client/smb1ops.c       |  19 ++-
- fs/smb/client/smb2ops.c       |   6 +
- fs/smb/client/smb2pdu.c       |   2 +-
- fs/smb/client/smb2proto.h     |   1 -
- fs/smb/client/smb2transport.c | 113 +++++------------
- fs/smb/common/smb2pdu.h       |   2 +
- 24 files changed, 438 insertions(+), 392 deletions(-)
-
--- 
+--=20
 Thanks,
 
 Steve
