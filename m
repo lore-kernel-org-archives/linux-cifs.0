@@ -1,38 +1,53 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF503033DF;
-	Thu, 23 Apr 2026 17:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8955F155C97
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Apr 2026 18:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776966204; cv=none; b=Hk/ZDMDuck4rLZ8EyDvWsNSKfDGcoKacG+crEpwIrkC9L1JURBaSVwL2E4HIBysKiQRjUWJU8AVUi9bz8AXUfCH7EKS+5UKp55DHunbg3zqNg8fgcgrWzZQt4OE+AOfvmwO8tZ5XWW4HK2mTsDbP8tUTyWPwcxOdRYLHR11iwv8=
+	t=1776968595; cv=none; b=frEwrF/jvZ1o6HP/t66Ozrsjg6BlMu4nfNlkpCfWQw+SA5P3t9CHGHu9Ru0d2UE7VPTKhuGqxtFZkYnX+F4cwNdQqnxAubf9zHWZYg0VS+lms0cGmPy/mPbAEhUnThjvQ+JvAzXkTsj2EabWuseE0hjjuk67xlYKFp8SZLEBT9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776966204; c=relaxed/simple;
-	bh=vkq7YgCeDD1Bfr9M3vrmSOO1AM3+7u/K8BLnBhaW26s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ag9H+bq1dHdyVjeKpzI3JBXSo1ObfWm0HM58OMUbUfp30GYImZtwoRYLI6a2TWy9v3CnsjxSev+d6wd/cCEltPxjCUx8IJGLkqlDdR6aiU1zArqI528sJfdiTKfMB0AGmyLRKSkLXYqCDPgkCZ6+gwR9CHXGuZlwqH7NiTsL2j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=F7keYk36; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="F7keYk36"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:To:Date:Message-ID:CC;
-	bh=vkq7YgCeDD1Bfr9M3vrmSOO1AM3+7u/K8BLnBhaW26s=; b=F7keYk369OjmEaXd1AxVnHYYbJ
-	cKUd5WB5yhCfsznQ8+W8MWmysFXK2/CECapJZLy4duVOShmjLl6OCzfP0GQGsxe413GUnwh7KcUNr
-	HrwrAtb4ibDFmLaRyFtrlbdXa2+TNjXDBMYSfdkFo8SdEAnIZ1ZK4pdhdVKPbuOAhgZCWlFN333sU
-	ukBqOjHcn11a72EEsAH2Qr8eNUWihhFN9QwRU6YtZzXGeDYF3rlrSHrBdUXkLQZipPqwN4ZRPOkeG
-	taYuqdcAbhBjKW6CqatBIfuHKtD4ZSl7u0nIw3Fz2/xRqJsf1Ldr3Ld8WPjHK1hRGg6taM2QJdqP6
-	sAMxlONoDOHTL+Uq07Ye94F2bitaPalqz1P9jgJc+gzvb2nagcUO7qOAO7AvVp+jvjZ+tyLn/5dVy
-	RUKrVb2oON+dNRcbfe5OmnZuwi8EpzjUg2UBo7zIx1YVzU5gY1amlrPp1bu5BkLk4XCLEuoTjdGFz
-	5tlERVmRq0rt/D/QtN4IIEzA;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wFy53-00000003cgH-44oa;
-	Thu, 23 Apr 2026 17:43:14 +0000
-Message-ID: <438478a7-c965-4a2a-9c4a-84b5f77d6dbe@samba.org>
-Date: Thu, 23 Apr 2026 19:43:13 +0200
+	s=arc-20240116; t=1776968595; c=relaxed/simple;
+	bh=qDlcsTSS0i/a6koK1dHpA3wrhMr3nawQZ2fGug/ix58=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kRDYhHhi9IHuZmG/KRZYjTapwbmECxGeOt6xVY2q2VevB1Ckh5wz/QfadFFAkWDxE5/89RAzRARnV/Pd5ewO36cdS1uBDFWPcpQddHzT7/VKZf+df8bd+syADcRaFRYwdKFIUEMnier0xJ5+lAL+ilseQ7HyTNZuwJvWX7jI0KQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=purplesyringa.moe; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=purplesyringa.moe
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5a3af1b7549so8791734e87.1
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Apr 2026 11:23:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776968593; x=1777573393;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LBMP/ZPFjPbIZz2B5VSFwTj55rODg4vXIuq33RZC83g=;
+        b=SPlq7FycQ2otVlfVMddr4u/cYf/avq4bIdOabY4BUySJHYAAg3HI71I/lC9V17o3cF
+         MC3VKKjG8pGB85mdnEgEFJzKmRXRsZGUnMJzbMbwOA3YVj1zuf4JxZjhfI50yCrIT/ki
+         3y74soGyz0CeWnj1h8XlEK3sqN53wJw9rIt6NdFul3gr8+Vq5W+A/mI+tZQwGxonXzGe
+         Siwg5zJGIh4xbkX1NM6UcL+oUXQApOfCkmO6AaCLaNNgD0bB/5cB5eMpTCW24DIzjjm5
+         OXquxId8ssSdYmsFURg6mQTSpiz6Bww1Uny4wBtlyxVCxMJbXL3QyUSRH7L+PSQdZO2t
+         vXng==
+X-Forwarded-Encrypted: i=1; AFNElJ820MlSbNCe+jQqe1u5sCx1I2CJKo4rHSH1rbPnwjvBBCr8/+EBHjb3Z1w1n2h4Gd28AIOQ4gZKddiF@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJoL8a+VnDRkbBqWLSUr1PXIliFLe/e+LUbEplpOBMwY2Qw1VT
+	RTCxGXVnaaJMbGJO2ReMM6/lhdNcjv2ByGfmAOmHfP55Kkw9zrQIHdg7
+X-Gm-Gg: AeBDievuuVDqv8KjiijqCELrwDL+hYb7yT4dwAiH5kbU82j2eEX8iPi2CNfbtjOb7jc
+	2vsOmTWMKnrcQEvVLIDsgpZzPtgftpcyry22DpjAlFD/mrudE4Dq2Tzc8RBFsSX/Yv1VxhX1oR7
+	l3YH5EgWlB8zkPY5QJKU/7o82dWG50H0F3USzE+PIoLdSo7+3xO6UTaQqRDZX0XPmpjUjs4xDub
+	fky3bCiw54awSXeMrCDuK+tqxDYufS3VN7VJuHiZdtsUawiZYt5c5OBwcwt9axUkZQsD3HwxU4i
+	Ekz7HfOCbts5Fty4AKBVIXQnaqe2tH5cf+B5KlGKMyjr7JrNMdenb+qI11BXnrJMFytZY0U+okv
+	MxzB26FkHC7fusRC092gqTW23Ktlve4g1qr+KJfn4GP0rbCrgtBeZnGIK9QVT9Rv+yvNy1Ox6fR
+	O3rv7ODMW1sdZxtw08cxkEK0N1XWigCNVUnnNTxIlBbql+KRIe8q8UVDTT6/WuhjzEDdbSCvguY
+	aKr0CuDEsOuXFRkpno44bvwNx/m
+X-Received: by 2002:a05:6512:3ca8:b0:5a4:10b5:6246 with SMTP id 2adb3069b0e04-5a4172cb407mr8920305e87.3.1776968592559;
+        Thu, 23 Apr 2026 11:23:12 -0700 (PDT)
+Received: from [192.168.1.8] (95-24-8-205.broadband.corbina.ru. [95.24.8.205])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a4187ebfd6sm5300694e87.78.2026.04.23.11.23.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Apr 2026 11:23:12 -0700 (PDT)
+Message-ID: <12dda998-0e1e-419b-bac1-0863c02659d3@purplesyringa.moe>
+Date: Thu, 23 Apr 2026 21:23:11 +0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,110 +55,27 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: "Intent" of VFS lookups
-To: Shyam Prasad N <nspmangalore@gmail.com>,
- linux-fsdevel <linux-fsdevel@vger.kernel.org>,
- CIFS <linux-cifs@vger.kernel.org>, linux-nfs@vger.kernel.org
-References: <CANT5p=oV8kcE6hXPoUVQAYGaiz+2OERoSRLAS6X+q9KJ_8w8YQ@mail.gmail.com>
-From: Ralph Boehme <slow@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- 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
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <CANT5p=oV8kcE6hXPoUVQAYGaiz+2OERoSRLAS6X+q9KJ_8w8YQ@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------diU7aiJiSXkEUIabePlVv9Sy"
+Subject: Re: [PATCH v2 2/2] smb: client: add support for O_TMPFILE
+To: Paulo Alcantara <pc@manguebit.org>, viro@zeniv.linux.org.uk,
+ smfrench@gmail.com
+Cc: David Howells <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org,
+ linux-cifs@vger.kernel.org
+References: <20260407195810.993862-1-pc@manguebit.org>
+ <20260407195810.993862-2-pc@manguebit.org>
+Content-Language: en-US
+From: Alisa Sireneva <me@purplesyringa.moe>
+In-Reply-To: <20260407195810.993862-2-pc@manguebit.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------diU7aiJiSXkEUIabePlVv9Sy
-Content-Type: multipart/mixed; boundary="------------CF5AvGltTlGTEaELMcV6HInJ";
- protected-headers="v1"
-From: Ralph Boehme <slow@samba.org>
-To: Shyam Prasad N <nspmangalore@gmail.com>,
- linux-fsdevel <linux-fsdevel@vger.kernel.org>,
- CIFS <linux-cifs@vger.kernel.org>, linux-nfs@vger.kernel.org
-Message-ID: <438478a7-c965-4a2a-9c4a-84b5f77d6dbe@samba.org>
-Subject: Re: "Intent" of VFS lookups
-References: <CANT5p=oV8kcE6hXPoUVQAYGaiz+2OERoSRLAS6X+q9KJ_8w8YQ@mail.gmail.com>
-In-Reply-To: <CANT5p=oV8kcE6hXPoUVQAYGaiz+2OERoSRLAS6X+q9KJ_8w8YQ@mail.gmail.com>
+On 4/7/26 22:58, Paulo Alcantara wrote:
+> +	if (oflags & O_TMPFILE)
+> +		opts |= CREATE_DELETE_ON_CLOSE;
 
---------------CF5AvGltTlGTEaELMcV6HInJ
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-
-T24gNC8yMy8yNiA3OjAxIFBNLCBTaHlhbSBQcmFzYWQgTiB3cm90ZToNCj4gV2FudGVkIHRv
-IHVuZGVyc3RhbmQgaWYgdGhpcyBpcyBhIHByb2JsZW0gZm9yIG90aGVyIGZpbGVzeXN0ZW1z
-IG9yIGlmDQo+IGl0IGlzIHNwZWNpZmljIHRvIFNNQiBwcm90b2NvbD8NCj4gU01CMisgcHJv
-dG9jb2wgbWFuZGF0ZSB0aGF0IG9wZW4gY2FsbCBzcGVjaWZpZXMgaWYgdGhlIGZpbGUgYmVp
-bmcNCj4gb3BlbmVkIGlzIGEgZGlyZWN0b3J5IG9yIG5vdCAocmVndWxhciBmaWxlKS4NCnN1
-cmU/IEZyb20gbWVtb3J5ICh0aG91Z2ggdGhlIGxvZ2ljIGhhcyBhbHdheXMga2luZCBvZiBl
-c2NhcGVkIG1lKSBpZiANCnlvdSBuZWl0aGVyIHNwZWNpZnkgRklMRV9ESVJFQ1RPUllfRklM
-RSBub3IgRklMRV9OT05fRElSRUNUT1JZX0ZJTEUgdGhlIA0Kc2VydmVyIGlzIHN1cHBvc2Vk
-IHRvIG9wZW4gdGhlIG9iamVjdCByZWdhcmRsZXNzIG9mIHRoZSB0eXBlLg0K
-
---------------CF5AvGltTlGTEaELMcV6HInJ--
-
---------------diU7aiJiSXkEUIabePlVv9Sy
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmnqWjEFAwAAAAAACgkQqh6bcSY5nkbV
-3w//SJ3gtpbUX8Xn3DvIzvWF3DrIIe4Wvk6EDP8NMB9EvVgoAlaZXqtnaJkGS5Uohw+gTHcaae8R
-mgiHTh549i6B9hDxRvnCtzV7l4jN5jFHesN/+g9HzCU/mM7VZfZxPyRf832SGUAJa6iQBfzImk38
-OX4TngF3ekzeRshVwj24GWydnkz1DM4moRUBHxJwSBQ5zMFVTZHfWT3u1p2JrDI/MaVmZLlYmxjX
-Vh07X/KxiuVtws0o0nYtSj/cTtdz/2Sep+BbyPcsDPniFh+76bvjNq6Q2vdtQmJSvMBobzRQ/gj0
-Am1Dc6FKTSc98bVKuIE3f4VNxCLesM7Dro7lrJvWS6Bw2ZesOdLpTPy6eeIGeADIPOi/IpOSIHTG
-TLDZTMH6z2K+kb6vST31kGBodQ4vOzUDLhI7XAEaMUT9oSyPnYDiDhZtGr3LJ6uU+9urzICW6Osr
-p6FqbG2OpDk5a06EZfcQZzqkF4vfdPElFblnHPyigx/pb+BDqWmPEYGBAqJDPE1c5TEgc7CzwWL4
-m5F9o2w92OJHyf/7Kmu2QyB+qaDow56dLpAVKozWEjcqa/u45Z+QL+PwvU6iMKuPMB5jYvHSNSfV
-/0eU7u3BjuI4hndfm23s8LovCY4iF12STw1R5ad8lSHA4VkP0PBnUhgAx/RJgO9PHKkmVjdca6Sc
-bjA=
-=BsdN
------END PGP SIGNATURE-----
-
---------------diU7aiJiSXkEUIabePlVv9Sy--
+Shouldn't this (and other similar places) have used __O_TMPFILE instead
+of O_TMPFILE? O_TMPFILE is defined as `__O_TMPFILE | O_DIRECTORY`, so
+`if (oflags & O_TMPFILE)` includes `oflags = O_DIRECTORY`. I don't know
+my way around the kernel well, so I can't tell if this code path is
+actually reachable under this condition, but the kernel uses __O_TMPFILE
+for this purpose everywhere else, so it's inconsistent at best and may
+be a bug at worst.
