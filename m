@@ -1,130 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAC02727E2;
-	Thu, 23 Apr 2026 01:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B322868A9;
+	Thu, 23 Apr 2026 05:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776908170; cv=none; b=kH8qpT1Q7Gkv75g+oQFDnEoFUyJBjjEblGmmg1qPMgEzQtOXf2DLyxpKN6Oq5uiNCRtYsqwyYIinOO+v7qvnbcixJs0bKvumnDuGFHCSVtVcbkp1DxmYAoMP2bjZatVCmZ/soFXZrHy4ivqgRt8f2SVZJBn6f33D/onva9+IIdk=
+	t=1776923578; cv=none; b=GHw09UVK1a22UzD505X24hbJzzz4Pw9CnTq1FlhPwwCLiD1ikzgFR69kIQo6VnA0tXpHF9CspV+O0hZZXVZdxyKpyhVxEfLUNnsFniQXfkuT16vY2uxzx1bf6p3ayruZEtCCG1dXPORIkMMFityZoQbEze5HBr2XNoE6GTsMXCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776908170; c=relaxed/simple;
-	bh=fisfLRUPF2gQeK8/tjab1CMLN7z38y0h7QBe3fR1FGk=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=IslLa3IA2x4kekBBeAd5TWe1lf8V6phrT3vdCfJ64ocvRO+/H1xgyBNtU+RUMDJFln7KHrdZ4lJAKrEFMbZix6S+ItmCOpKQ5pf79oAdR5is9ruKtLSPjovRFj/QigbPJQAdmC9w2XdYup7wENRZgXJUJyfNfPVwxvSZekpF2DI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uLB/V9Vx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776923578; c=relaxed/simple;
+	bh=IzCwPU5c6Gq1BGhh1bSpdiyTomucNDB4qIjOeZl0cpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nJ4u6wPibtEhfoWDBWaiZjbnsoECYQ617yYyzpO/AoY/j/S0Ky6MYkTNyDWkY8Zv+i/4FD3j3+2jiBnB3uG4i9tDWSrfhX4ceOPbj2KYCWDSrmSjIhggDdxDlPYdNqeVhy1F5AJRJXeTiPpOG1LV7JAUj196cOwW5ttvLhw0SUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=oqW5LJG9; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uLB/V9Vx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80077C4AF09;
-	Thu, 23 Apr 2026 01:36:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776908170;
-	bh=fisfLRUPF2gQeK8/tjab1CMLN7z38y0h7QBe3fR1FGk=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=uLB/V9Vxth7g4vShFYvcL/mCTim0wfkAAkzRXOhJ3wDvANYCoRIde/8hvh+dG2QJF
-	 /jGC5YH+IR1TrhTJMzoW/ahCEIQqaIvTvOPOVyLT70ckze0ciCzKkRw9Ey6At5urbo
-	 OAy3FEXO7SjoCK+NI2hD22Uy6THb29cgHttSndmUTWS8jiMA17j06gmzCo/Nl+ikAq
-	 5rmJQKSDoXL0ZQ2hE/NnPbmXVr13Fg0WP7qJx/b11Odz6Jt4+TmF0qBMY7YVJk9X+w
-	 gqJHVlktyUP9gP84U0fdhV8hz9D1VlQczWS/xG/9G35iAySWuSucdKbee96dDB+uzs
-	 /XI/Yu8+CoQTw==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 5F59AF4006A;
-	Wed, 22 Apr 2026 21:36:08 -0400 (EDT)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Wed, 22 Apr 2026 21:36:08 -0400
-X-ME-Sender: <xms:iHfpaeo4VthmNtZ5zqVLjiXC2cn8tWHGEMdzLK0PkfHerQzKuwGL8w>
-    <xme:iHfpaXdLH9MSdgJtkPwHUqYJVv1n_uNz8FaJj5-5PuPzSv6NNKdKbBoPzaTwYk9Lb
-    c1xxpWMr8HwIBjxxcs-GZB4qopZ4Kv9XLZdh_pdji3Ur2a-_bOMJJc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeiheekgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthhqredtredtjeenucfhrhhomhepfdevhhhutghk
-    ucfnvghvvghrfdcuoegtvghlsehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvghrnh
-    epgffhgeeutdeiieevuefgvedtjeefudekvefggefguefgtefgledtteeuleelleetnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheptghhuhgtkh
-    hlvghvvghrodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieefgeelleel
-    heelqdefvdelkeeggedvfedqtggvlheppehkvghrnhgvlhdrohhrghesfhgrshhtmhgrih
-    hlrdgtohhmpdhnsggprhgtphhtthhopeeffedpmhhouggvpehsmhhtphhouhhtpdhrtghp
-    thhtohepshgvnhhoiihhrghtshhkhiestghhrhhomhhiuhhmrdhorhhgpdhrtghpthhtoh
-    eprgguihhlghgvrhdrkhgvrhhnvghlseguihhlghgvrhdrtggrpdhrtghpthhtohepshhl
-    rghvrgesughusggvhihkohdrtghomhdprhgtphhtthhopehrohhnnhhivghsrghhlhgsvg
-    hrghesghhmrghilhdrtghomhdprhgtphhtthhopehsmhhfrhgvnhgthhesghhmrghilhdr
-    tghomhdprhgtphhtthhopegrnhhnrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepsg
-    hrrghunhgvrheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheptggvmheskhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtoheptghhrghosehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:iHfpaR735JLTmlXf6PZaw09JvM2INK1_wFF6Sofysyc5cHAzrptIUA>
-    <xmx:iHfpaR3Ct_L9JXA3_3D08tOGJwAeJitT7nP5_Yj2u3ZipmZ8_WhTyA>
-    <xmx:iHfpacp_YaFAr7nSWwX0ZxI4Obx-0-j3X9gZ32hL5RJuIURnLf2EVg>
-    <xmx:iHfpaXVoO2mIU-wKylIYQImIQNtl2kj4f7yCmO3vyFuPWUpTFhRI7w>
-    <xmx:iHfpaRcA71LEAscdJdF6cGc-t3Q_4jPF-jb1PwNWd4SjcOeP35Uy-bpw>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 2894B780070; Wed, 22 Apr 2026 21:36:08 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oqW5LJG9"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=9rvPFEC2MVsXs7hPa8zHFKo530p+I6oXYlmvjIl2f6c=; b=oqW5LJG9fBwRuI/xBRFobENbPC
+	E2uvZY4hTPcJzshqHMNSCNbAq1dXR74jh5AhK6rjwJQopAwWdBcjljK/TRLi4yKxlGuQUND23+U8U
+	w5Zkbj04KaIgmIEimRnmZGsrkmc9AMWznDHn4iFp/gJ+S7Wu9MyD79MuzxqNJa8IhFk2I4Y9/iTJ5
+	AUSWR3mcrOicr1F20MyexfpWI0aRj2+sdb+t1QJtkJxTvNn7Uub/5MGetU1EoNeTpgEUYEx53Lf4R
+	5ndHsoHJi23cbvWDVNz5n8B0GgeU76CG/iM63b2QSXHz+1hzOM3mbKOjt0jsx3G9XerWvX2ydjtku
+	rEQfaDWw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1wFmze-0000000B5Fr-2IF8;
+	Thu, 23 Apr 2026 05:52:54 +0000
+Date: Wed, 22 Apr 2026 22:52:54 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-cifs@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	samba-technical@lists.samba.org, Tom Talpey <tom@talpey.com>,
+	Steve French <smfrench@gmail.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Alex Markuze <amarkuze@redhat.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>, ceph-devel@vger.kernel.org,
+	Jeff Layton <jlayton@kernel.org>, linux-nfs@vger.kernel.org
+Subject: Re: [PATCH] smb: smbdirect: move fs/smb/common/smbdirect/ to
+ fs/smb/smbdirect/
+Message-ID: <aemztk8jTqgfKu4y@infradead.org>
+References: <20260419192018.3046449-1-metze@samba.org>
+ <aehrPuY60VMcYGU8@infradead.org>
+ <9cb0901c-18c5-4858-941c-3b37ee112af9@samba.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 22 Apr 2026 21:35:47 -0400
-From: "Chuck Lever" <cel@kernel.org>
-To: "Steve French" <smfrench@gmail.com>
-Cc: "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
- linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-api@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net,
- "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>,
- "Namjae Jeon" <linkinjeon@kernel.org>,
- "Sungjong Seo" <sj1557.seo@samsung.com>,
- "Yuezhang Mo" <yuezhang.mo@sony.com>,
- almaz.alexandrovich@paragon-software.com,
- "Viacheslav Dubeyko" <slava@dubeyko.com>,
- "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
- frank.li@vivo.com, "Theodore Tso" <tytso@mit.edu>,
- adilger.kernel@dilger.ca, "Carlos Maiolino" <cem@kernel.org>,
- "Steve French" <sfrench@samba.org>, "Paulo Alcantara" <pc@manguebit.org>,
- "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
- "Shyam Prasad N" <sprasad@microsoft.com>,
- "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "Jaegeuk Kim" <jaegeuk@kernel.org>,
- "Chao Yu" <chao@kernel.org>, "Hans de Goede" <hansg@kernel.org>,
- senozhatsky@chromium.org, "Chuck Lever" <chuck.lever@oracle.com>
-Message-Id: <c41111fd-2473-4fdd-8e1e-285b9e24e631@app.fastmail.com>
-In-Reply-To: 
- <CAH2r5muvUVY8FD6ZM+ARecM8evjejB15n0Ea9Z=GGn=i5aKFNA@mail.gmail.com>
-References: <20260422-case-sensitivity-v9-0-be023cc070e2@oracle.com>
- <20260422-case-sensitivity-v9-10-be023cc070e2@oracle.com>
- <CAH2r5muvUVY8FD6ZM+ARecM8evjejB15n0Ea9Z=GGn=i5aKFNA@mail.gmail.com>
-Subject: Re: [PATCH v9 10/17] cifs: Implement fileattr_get for case sensitivity
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9cb0901c-18c5-4858-941c-3b37ee112af9@samba.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+On Wed, Apr 22, 2026 at 10:16:41AM +0200, Stefan Metzmacher wrote:
+> > Why is this not in net/smbdirect/ or driver/infiniband/ulp/smdirect?
+> 
+> Yes, I also thought about net/smbdirect.
+> 
+> As IPPROTO_SMBDIRECT or PF_SMBDIRECT will be the next step,
+> see the open discussion here:
+> https://lore.kernel.org/linux-cifs/cover.1775571957.git.metze@samba.org/
+> (I'll follow with that discussion soon)
 
-On Wed, Apr 22, 2026, at 8:59 PM, Steve French wrote:
-> Acked-by: Steve French <stfrench@microsoft.com>
->
-> Do you know which xfstests this would enable?  IIRC a few of them
-> depend on the fs supporting fileattr_get
+Seems like it is the right fit then.
 
-Thanks for the Ack.
+> I was just unsure about the consequences, e.g. would
+> the maintainer/pull request flow have to change in that case?
+> Or would Steve be able to take the changes via his trees?
+> Any I also didn't want to offend anybody, so I just took
+> what Linus proposed.
 
-I checked the current xfstests tree and couldn=E2=80=99t find a test tha=
-t flips
-from notrun to run on cifs just from adding ->fileattr_get. generic/556
-is the existing case-folding test, but _has_casefold_kernel_support in
-common/casefold hard-codes ext4/f2fs/tmpfs. Enabling it on cifs would
-need a new mechanism in common/casefold plus a mount-option-driven
-variant (the cifs reporting keys off nocase, not a per-inode flag), so
-that's a separate piece of work.
+You might want to ask the sunrpc or ceph maintainers as they have a
+similar split.
 
-The practical effect on the existing suite is that fsstress's getattr_f
-now returns success instead of ENOTTY on cifs, which quiets some noise
-but doesn't gate any test. To actually exercise the new FS_XFLAG_CASEFOLD
-reporting I think a new test (or a generalization of generic/556) would
-have to be written.
-
-
---=20
-Chuck Lever
