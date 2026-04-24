@@ -1,166 +1,203 @@
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11023109.outbound.protection.outlook.com [40.107.201.109])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9216819A288;
-	Fri, 24 Apr 2026 13:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.109
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB77230B53C
+	for <linux-cifs@vger.kernel.org>; Fri, 24 Apr 2026 20:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777038068; cv=fail; b=kQVMWX1H1vVjKES54mFzNQch/qoH0xeY9ojr5oVN7Ddf+BJTVg8C9Fe6um5W0Jpw0yFQmNMDZy/SsZ+vlCWF+W5bfyO3gOATuFGveyPcctieKD7sD8nN07gElIeeLIlikXE/VNVSa7N+z1dV9TeOJk6zHqwmc/s9jJGZVKTybCI=
+	t=1777063080; cv=pass; b=jeV6m/y2LozS2srf86xynhqE2j2b1Gcwzr3yH8BS17STDB+XAAJRrP3lTqVjNIKAb5lzarVoPrKvfCpDFce2sAEkmYYqGS4z20pC6uSJn/6/R2wBAabhsOJ9f2RdU5xWmqTJVRJu0pnXJ/jb18dF6bMBJ9UG5y1fTTq0nNer5oU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777038068; c=relaxed/simple;
-	bh=5TKTtGucEuy1kfK34Ed9TTy2BadII89sBzVilUr8WyE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RYO+UMQT8xBb3T+7ZWG6QPLAOEl6Q744vp3jknb3r8X9bruY1lcQSK49UB2EDRoEstq7mjWySinATQxWPJC8FYLaqTgE8HHivEslU9Qq1mTlnpBmMVepybH5XLMyhcFbVTNlmC7Ppx6El+fBI1AttYMUWLGRIRR95hmtxkONp9E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com; spf=pass smtp.mailfrom=talpey.com; arc=fail smtp.client-ip=40.107.201.109
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DcnQfCkiw2DQWxbOhmYMDzTokXtgdhF8Nt8/sb5lgOCu5UomojV4XhZHIgKvhVs5isGdjM96AEBToUMJi/ttUVCwCZEuuZjXQWWwUvLbzgHLvh4TkDKFkgClH+hsY9SAKtk5iaCCSBb4Eo+Q+Wq0nJzCtImdpVG+bM0QbKFDXP8jFsYaQTkgL5T2obhQxonG1SHBDwXb2dl5rphhF+4wWZOIW3FlxMPVk1qnkSkKj2Dj7UhQTgFuuHNnr3UVlXx7zeZA2SoNZ2JagzLAoKHyQ8VHwUiwWgVr9K8jx7Yz3RczYs5phym5nrWkmmQAmu6wXSX0+hCEXu5Vz0uCtTH0Mg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=neoSVMDXw3f2dtrBsFsm/v++HDlmtoue1uMtOVD+1b0=;
- b=HjW/x5DRgd5Z/b5lqoAYt1OeCKKf/1KgwoPxd5B49jAWtZQyXPcv/I4e1OuNBEwucLIrYx7E+IzvV83QYaeH80CaExbaJ/mbaZ8LKedtsULwX+RNwZ8wx/SAjzPQmWXrN/DrtQVuQTfzSmKSug+kQ9fIr8fzbbf6o91zH9zKz3dEU+u7HGgX1LYhyTdww+5d6KiJ5RIZ7dH0WzU/qn54rYAKDr0q+7+4a4kS/RAbql0BUkjp7MKm8ncWaC81iihxXVU8VSebVGEkA/4QXZKp1tdVANfE2KTmp+qDz+bT6I/zua42SiuL2RuW7MW1/0ZlGFfZbz6wAoj6u0iEkwo3Pg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from MW4PR01MB6338.prod.exchangelabs.com (2603:10b6:303:7b::15) by
- SJ0PR01MB6320.prod.exchangelabs.com (2603:10b6:a03:291::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9846.22; Fri, 24 Apr 2026 13:41:04 +0000
-Received: from MW4PR01MB6338.prod.exchangelabs.com
- ([fe80::e7ad:d8fa:59db:4761]) by MW4PR01MB6338.prod.exchangelabs.com
- ([fe80::e7ad:d8fa:59db:4761%6]) with mapi id 15.20.9846.021; Fri, 24 Apr 2026
- 13:41:03 +0000
-Message-ID: <e248f3de-bbaf-48e3-9e86-0beb9a789556@talpey.com>
-Date: Fri, 24 Apr 2026 09:41:03 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: "Intent" of VFS lookups
-To: Shyam Prasad N <nspmangalore@gmail.com>, Ralph Boehme <slow@samba.org>
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>,
- CIFS <linux-cifs@vger.kernel.org>, linux-nfs@vger.kernel.org
-References: <CANT5p=oV8kcE6hXPoUVQAYGaiz+2OERoSRLAS6X+q9KJ_8w8YQ@mail.gmail.com>
- <438478a7-c965-4a2a-9c4a-84b5f77d6dbe@samba.org>
- <CANT5p=ortwT7ensa+kKoCa=wMnGETpqaQuBnhDWMSNu82KsqFg@mail.gmail.com>
-Content-Language: en-US
-From: Tom Talpey <tom@talpey.com>
-In-Reply-To: <CANT5p=ortwT7ensa+kKoCa=wMnGETpqaQuBnhDWMSNu82KsqFg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MN2PR06CA0002.namprd06.prod.outlook.com
- (2603:10b6:208:23d::7) To MW4PR01MB6338.prod.exchangelabs.com
- (2603:10b6:303:7b::15)
+	s=arc-20240116; t=1777063080; c=relaxed/simple;
+	bh=WEi1IyVTSJSMWo3lSvBJY7SPqfqbMiDWeId+3hTeMbo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=G0FQWQwQE4Pwvp/mPszTslUDxYuzKnwA8FOm1NvXtRkp200Y+RJ24nmX4y2dFXn3s/HMajOozRRS1SUX8BCCCC1I5sy/rJmC1gRTyoXP4Ze2smiA6UEevNJQNmnksbh44dqYUkafr758JgMtv1U/fvZWBvZQdjExL/SbMF8kkc0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KYeGbIhD; arc=pass smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KYeGbIhD"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-89fc349b5ceso117202456d6.3
+        for <linux-cifs@vger.kernel.org>; Fri, 24 Apr 2026 13:37:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777063078; cv=none;
+        d=google.com; s=arc-20240605;
+        b=O3NC5SvSu21yQedU0+cH4ep6HKZmaldD4vhywRLWeoM9/rLJy0EcKIK3dYXGCk98Cp
+         mAWmjeS1R7SYeJQ3WxXBOlZMQ1OBzVQwO9D1uWTqpz7vMPvSwJeJFMdS244I3OCctzS0
+         daH5A1HyUxhqP7HRrtnxyGNPpUnMfXNxTWEOgE74mN46LGjXtUeEp/pdNAP4mhc4ruOk
+         b8bdwTfOb0Ew2Cx0gteHzUIvvZL5qmLfCmIWAPFnV0YwiM+jYfJS7asG2GXMT4wkk/5o
+         QfI+JfBEnDPWc5oqhUfCfpdVcAT4HjdAuVcQgHElUY1SrG/0Kpj35WMDEpUmGzyovkR8
+         azBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=xr13CaE/4HKRaTP0rlQj5Re8CRzk22i2iP2P86qR84I=;
+        fh=oqvqryoj0hTQIMkchDbtvb54Y1JuyVVDfLtiX0FTFu4=;
+        b=eNEo8jbSy17Hh87wViyyQkoQtChtTPt8rI2HsehRjBNsZyGIIU6daSo9+6R+ppR4++
+         GYhlvGFwU++OlnBcv8Y6kNSiMxpdNDnb2/uwvZ3FWsckf/HvN+93g4BXqNenXIbtf0Mw
+         wXQQNDDoal3SM/vsRhMyxDmncYrRbpuq9+CrWrDWBNg5IM8oq9Mn6iksopFTjPbX1GhW
+         xY4NtPL/+/ZetF4xlx0B2zLemwQX4CqZX/4mg5glqmYq5qIxraxMpvmw9vPJVUYUNCs6
+         WIuHMsznTs6vgJVdE59/QBkOYsAVZO9EAXVxEdgz1zE+GZK4Hl5FDcozcx1AgYZnfyE+
+         AuvQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777063078; x=1777667878; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xr13CaE/4HKRaTP0rlQj5Re8CRzk22i2iP2P86qR84I=;
+        b=KYeGbIhDMbDQEFscqH+1K6J70NxAoTtj1Wwhj/6XICBVYaGpl2c+8DLnRgiwnta4SZ
+         kTiIptrb/ZpZcgIwhS5L+ptAmpbxuIKTtVGQTuU/tjWIOLuu2+R/M9rQ8nvj1sV1bNQj
+         JpI5MUr7MQufh3EpA4xDPcnRh6sxUybAQOBeNrfpkvpLiINBN/GM1Kh4BwWWuLul/exi
+         wAMvAvH07ybrMoumpgPwJHacLOKhEqmHcvqcQBX1dNv9nAsoZ8oqdX4NPX2mzNR+sGps
+         /ejVT9xrKTZGlnYMBkemBWnkKIxJR7GvYUQhKGWHe7/J7y0OQxPbHNNm71EMT2wSyxcx
+         6cHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777063078; x=1777667878;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xr13CaE/4HKRaTP0rlQj5Re8CRzk22i2iP2P86qR84I=;
+        b=B9CX/7ZX9+/RW1USoJac5TtskWtT0kvHAEMnXJwiVytxq0J7vrfctR/r/QDO4iaG3r
+         bSPVTISrk/6LuuowfvjcK3hmJ9K/Gp4IviATV+i4JRzg/9OWU4XUmMLdPGpqrmOMLERo
+         Xdy2GJl0sHWtHdTM+fYpaZGz4JLaRzPPLGH6FbvH5vKYPgAlkWs/YE8ap2FUbKxlZvqb
+         lXuU8TtrttYhuan2zZml5dqcEwXF81P/heMKcOOaS6+xp7doYZm1dDiEOb3JkwNIKBvX
+         35j8dpz3M1UxzrtYd6yFSbDWOIDcK34NNUST0hjtD309q3BZQk+HTJZ8xOS6lRQA64RA
+         fd3Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+R/Xt98Vc6RGFBx9inUUR7c1WD+9wh9QeP4Mn43syi8uQ2nrXo+EcQamHoPybjpFdhZ9XcWO6IzepG@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEsXvynK6hp2MgXnUoqXPdbZJXpgzWnES3HnlKpx7QyGojpFGo
+	YkNEIhHSG/hSxA04J32MmKiigTNpdUdKUAMLL7CVPwAI7UHzPQbpXnZzBtRCMskPo0EteyhxKlJ
+	7SxkDdA6brMRa1+8eW64NvtzIYXA0YZw=
+X-Gm-Gg: AeBDieucuoNcbfYBh29G1FgUP3ZS/B8adXqz000yaLBPqpXT1jAKTzy92eWjk4z0ZQn
+	cA+DTBB0ZomD3eJ2hVKqJ7ZD0OC1Q6lDx7XNaf6HfUEAVVofaD+rkp1qQaZiOYdFclMHHl0HrdV
+	oa1ntcUE6q2GrKDTUFx4uW/UsTMqRja7G7W9Un5LHv3U9xhBipC3up+yjUO3p3el2JINhKgnWFT
+	KQedFy4X8UXIT0J9mk49wMKps2Kd+8/54rcC8SxaAcOQWB8n+mfgQeCbFjaTH8/Q0yi3KAbfXqx
+	eMDCZfFPHui/jZSO5/0b2Z2tCY5QKOP0E6NZnlE5WlRJv8biFU1MgAv6gQCa99BYgv23HZI8dt4
+	ELn9FEpBf7RNDfISC/1dWwom/gN2G3yFiQVwloBtuJJqm/EPqAW3RTjrUm3bpRfF/ixktw5f/Mc
+	jwYpXrBEcelEH3e8hI2AH3b37bp1WttAJ1
+X-Received: by 2002:a05:6214:588e:b0:8b0:2017:958e with SMTP id
+ 6a1803df08f44-8b02800cb6bmr520436036d6.13.1777063077708; Fri, 24 Apr 2026
+ 13:37:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR01MB6338:EE_|SJ0PR01MB6320:EE_
-X-MS-Office365-Filtering-Correlation-Id: aa3d3577-ff41-47af-df86-08dea2072122
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|366016|1800799024|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	X528O3kCcwDXBbtn6RGvtxoqsFYTkG/wU/aeFDt8ro7p4Pr278Vw8N4oVon8l0wq/9KIScbmIPsTeZRs+yWAKx3buJdwxOrvvf5tmTuk01aXFw76IDGABI6eFBi9uSx7Ygy2igF0ZbU+F6TNv4b54bbqYDX67V+N1D2A2/XqUdE5v8XWXRLJ5+d8cuUs9JokWDfBZg1Rim85gJT7jjW7+PWhWLO1PJiuUzUJUmHAtEUUbE8RYD3GibHyNNgPuWYiCdZ6drXhMEAtiAqgBebUx/A/nCeDZU6QYIKIXtz/TgyTNjPz4m38VJ9OSyCeJqhjk2vEVJhzsudJ0C6sLtZDkn8tLFYjn7XT/Jha367jzeKx45KsAQYJWmxAMI3Dl5yev/rbcDPxT0/siXS6RSobkIDB/rvGBd3mkiW/OYF5v1XVBPIMkI6tRkLwHRa5agbOcSnNoD2T/LdFS2a4eurZwC9pHdyVe4xpggDflvZQQCZJaNHMxQ3mdTkuofLhGmbaFAtBfoxYnZrrvPZivls/7VhmBz8it0oiYoEjxvR4StQWKBYEDFGyAFoW8Bd4JMKaUwqw6CelCrK5BVtrRvzjM1n5waj7+rm4QSxAa5hRTLkurIU80/t8OW9eaWoWmaiAG2bS+BBq03bLS11HczxbbOFpdYdEWuf1lWk3yu4WtEYy3wF5UGlwea73ARoPuTBvDkPEsEHVoGN9kMZFjeIiNwTHc/WQspLpNT5uyOQcycQ=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR01MB6338.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bzc0QS9VV1RYbjR1MVYydEI2cUF2dU5aa1A2ZmEwcFptYytmU09Na2ZmZTRj?=
- =?utf-8?B?VWtlSTBNV0c3RUhnbjRJSUlBL0NCZHV3a2U4UExmN1pPMTlDZ3lOZnEzR1dy?=
- =?utf-8?B?ZkdTaHF5NWhiVnFxL1lpWnR1aDZwL0Rpa1FLbkpwSXZaYS8ydUVleEwvRk9V?=
- =?utf-8?B?SEJ5VzJDbGFBZjBEYlZ4VkM4bVR1QjJzQ1Q0cFhWMjRvTTRFaDhvMU9wR0lZ?=
- =?utf-8?B?NlE0N05UdnhKVVFVRk9nWW04M1Z3N3FKUEtJM3RPUVdIVWVQbERWRzQxdDdh?=
- =?utf-8?B?SXNDU1BTMkljL3N5em16NzA0T2lJL2xHMGNHN3RDcHBGb0NFazFQTnNndVEz?=
- =?utf-8?B?dFBxbWNkeUg0VVNZNTgyWnAxd3NEUDlMdk1Qb3d5RmtiS2YrTG5KdGY5QlIz?=
- =?utf-8?B?ZS83cGhaMktrWmdIbkVDMVZQbTV3TGhCdktyRFRpRk5qa0FJRHRBU245OUg3?=
- =?utf-8?B?M2tSaGJsNkFqQ0NvRzdvcUVDNytXZmU5dnJ2MU8zek01UlYvSlV4eFdJbzRY?=
- =?utf-8?B?MWJHZGdPRklxZGEyYjB2MWY2MVdWeHd4V3I4c2dLQkxrdTJjNU5yN3ZJU1g0?=
- =?utf-8?B?c2FtRWh1ZnBNTDZvdU1vNGxtbFlDV1VUdEFQYmhjRE5jaUY4akVJOFZyUnFY?=
- =?utf-8?B?eSs3WjlIN253djU0SEVoMnpPbE44SThDMWpoaHlXeld0VW1iTGI4RHIwdlZk?=
- =?utf-8?B?cXExS3R4SVBGSndDNW5laE41ejJqRUxsYlQyazdoTVF0UlJxTTFFRVNoeDhQ?=
- =?utf-8?B?NHlaR1JLdGQ5TXdiZkwvUCtVVGtsSm5mcUVXdFlqOUZBSG80akJLcGJPakd2?=
- =?utf-8?B?anJRZVU5bkd6SjgrN2JCTUd0aDVpU1FKenhVam9VUk9kdzlBVk5TY01GQlpG?=
- =?utf-8?B?SVdWSDdjVXF5U1dLV1FyZzBXSVorSThDUVltTEp6eXYyclVhNE0zdEhqVTFD?=
- =?utf-8?B?cTQ4bSszejJucEUyM29zNUh0UEpUZExXamZaamdjOHZON3dhc0U1WTVhWjNC?=
- =?utf-8?B?dzNZNjBSZ3RUWmYrSXhaSjF3ZjY2SHdVZmdWNzZPWlBUUVpBTERmNjJyNlJi?=
- =?utf-8?B?aVN1Z0dwSk1HMXZNK01PckdmMmNiZ3hkQzE5M1ZYNE9HaW9lendaTTQyVHJI?=
- =?utf-8?B?VWdXd0hORW5PaXFraHFReUVBenVYUTVMNEs2a01mL1BndDZnZ2tzdC9UdFU0?=
- =?utf-8?B?TkdXWU1qa1FuQlpZOWxxVWJyZGp5VkhZNVY1Z0lQaVVJamd0QWNsTDlQMmJR?=
- =?utf-8?B?djg0YnM4OEZ2cndxTVJ5QkRYcDlTRmlnRmc3d241S093Y0ZmVXhxb3crUEtk?=
- =?utf-8?B?aWJQYXpwMmM0dFdRLzBUcHBvbzg1TU9UNkMxNit3S3o0U2l2RzdDeHNiNEdX?=
- =?utf-8?B?bVVPQlEzaWdDYkcxczZCczZhT09BRlcvVURrb0R1aXVoOVF5R3FJSUFHMjZh?=
- =?utf-8?B?MVRwMmdvSWlrS0E3WFZRVWhnMUVvV0ZTNlk0ejdjNHJTVW1VWXZBOWgvV2JY?=
- =?utf-8?B?OUhHUXQ3Z2NtaUFHdVZCZUl4TFJVcWk1SG5nLzA5Yy9CUXY2R1phc0dDNWE3?=
- =?utf-8?B?NENFbE9Wa25Fa1dtb1lKb1NNUEtXeUp2dlZ0UEl0Q00wZmx2c0VuWWRYUUlK?=
- =?utf-8?B?U3RRd1MwWVcxbjl1Zjlac0Zuajk0bWtyT0pjb1Y1WWlvV3VSWFk2YVB5ZXZI?=
- =?utf-8?B?RlZ4N1FQUC9GMGl3L3hVTUtkOWp5cXA1YUI3M2xTbk9NM2tta0hlbGhnSTJm?=
- =?utf-8?B?cXVocHhOam50dnVmalNXV2gyVHV4VXgvUWRkUVJrdHk3TEJHNFFZMVcvR0JO?=
- =?utf-8?B?QnBvN2lJUXYzc2gvV3BWU3daTUUwMHpaNHloL2FLVFVzMVRLM3VhQ1NuSVZS?=
- =?utf-8?B?NGpvNTQ2d2FjSSs1RUoyVFV3UzdwYXptRVlQU1RKelhSVWQ3MXhmS1VMWlBF?=
- =?utf-8?B?SGN1LzVseEZ1MVFqVWxVMGJoZmFUazFnVk11NmNPai82eDIycnNLdHBBTzN1?=
- =?utf-8?B?MU5CaHMyT2dXWWFicjJ3TVJPMzdxN3RucUhjbHpUMTlhWFRXbU1LWTg0M1RV?=
- =?utf-8?B?TkNsY0wzN0JjSmN6VDM2YWhvcG55NjB0RktoWlpVN2lBVjhLb0dHd1RoRDhU?=
- =?utf-8?B?RVVpdmcraHdPcVJzYWwxNTdGazlaNTEwNmpXNi9sdWVubW11SjV4ZlJnNHBC?=
- =?utf-8?B?cW04YjZTOStMZ3Fjc0lORi8xTHJpamRTSEFlZ2NUVkFPckpXUmVNd25BcjZ0?=
- =?utf-8?B?YXc4L0tjYmlLbWkrcFNHS012ZllVRUd0NThOM0VPK081SFAwdTkvY2MxUHEr?=
- =?utf-8?Q?kUOgSEPUQToyVz5J0L?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa3d3577-ff41-47af-df86-08dea2072122
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR01MB6338.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2026 13:41:03.9610
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JzwZuik0Iy42NbmW1dM0FQqI4F9ZoaieIs1kYdF4XIrQJSyOrkYm+9kwNOxuUa4u
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR01MB6320
+References: <20260423-case-sensitivity-v10-0-c385d674a6cf@oracle.com> <20260423-case-sensitivity-v10-10-c385d674a6cf@oracle.com>
+In-Reply-To: <20260423-case-sensitivity-v10-10-c385d674a6cf@oracle.com>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 24 Apr 2026 15:37:45 -0500
+X-Gm-Features: AQROBzB-0lTRy0XdRF_00F7qjWcYsiEfyHM_qgbK7lfREUt6QweFIgrUE_8q7ec
+Message-ID: <CAH2r5mtiF8TsYvDF=wY=GMZWzKvswymbj5fqKk-TPQHAKhb+hQ@mail.gmail.com>
+Subject: Re: [PATCH v10 10/17] cifs: Implement fileattr_get for case sensitivity
+To: Chuck Lever <cel@kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/24/2026 9:20 AM, Shyam Prasad N wrote:
-> On Thu, Apr 23, 2026 at 11:13 PM Ralph Boehme <slow@samba.org> wrote:
->>
->> On 4/23/26 7:01 PM, Shyam Prasad N wrote:
->>> Wanted to understand if this is a problem for other filesystems or if
->>> it is specific to SMB protocol?
->>> SMB2+ protocol mandate that open call specifies if the file being
->>> opened is a directory or not (regular file).
->> sure? From memory (though the logic has always kind of escaped me) if
->> you neither specify FILE_DIRECTORY_FILE nor FILE_NON_DIRECTORY_FILE the
->> server is supposed to open the object regardless of the type.
-> 
-> Hi Ralph,
-> 
-> That's interesting. The spec does not seem to define this. Perhaps purposely?
-> Will try and prototype a change to verify.
+Looking at other flags that fileattr_fill_flags() can set would it
+make sense to set
+FS_IMMUTABLE_FL and FS_APPEND_FL based on the smb ACL in the same new
+function cifs_fileattr_get()?
+What about about  FS_NOATIME_FL?
 
-This would be filesystem behavior and therefore it would be in MS-FSA,
-not in the SMB2/3 protocol.
+On Thu, Apr 23, 2026 at 8:20=E2=80=AFAM Chuck Lever <cel@kernel.org> wrote:
+>
+> From: Chuck Lever <chuck.lever@oracle.com>
+>
+> Upper layers such as NFSD need a way to query whether a filesystem
+> handles filenames in a case-sensitive manner. Report CIFS/SMB case
+> handling behavior via the FS_XFLAG_CASEFOLD flag.
+>
+> CIFS servers (typically Windows or Samba) are usually case-insensitive
+> but case-preserving, meaning they ignore case during lookups but store
+> filenames exactly as provided.
+>
+> The implementation reports case sensitivity based on the nocase mount
+> option, which reflects whether the client expects the server to perform
+> case-insensitive comparisons. When nocase is set, the mount is reported
+> as case-insensitive.
+>
+> The callback is registered in all three inode_operations structures
+> (directory, file, and symlink) to ensure consistent reporting across
+> all inode types.
+>
+> Acked-by: Steve French <stfrench@microsoft.com>
+> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+> ---
+>  fs/smb/client/cifsfs.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+>
+> diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+> index 2025739f070a..9b70ffa3e01d 100644
+> --- a/fs/smb/client/cifsfs.c
+> +++ b/fs/smb/client/cifsfs.c
+> @@ -30,6 +30,7 @@
+>  #include <linux/xattr.h>
+>  #include <linux/mm.h>
+>  #include <linux/key-type.h>
+> +#include <linux/fileattr.h>
+>  #include <uapi/linux/magic.h>
+>  #include <net/ipv6.h>
+>  #include "cifsfs.h"
+> @@ -1199,6 +1200,22 @@ struct file_system_type smb3_fs_type =3D {
+>  MODULE_ALIAS_FS("smb3");
+>  MODULE_ALIAS("smb3");
+>
+> +static int cifs_fileattr_get(struct dentry *dentry, struct file_kattr *f=
+a)
+> +{
+> +       struct cifs_sb_info *cifs_sb =3D CIFS_SB(dentry->d_sb);
+> +       struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
+> +
+> +       /*
+> +        * The nocase mount option installs case-insensitive dentry
+> +        * operations on this superblock. SMB preserves case on the
+> +        * wire and at rest, so the mount matches FS_XFLAG_CASEFOLD
+> +        * semantics: case-folded lookup, verbatim storage.
+> +        */
+> +       if (tcon->nocase)
+> +               fa->fsx_xflags |=3D FS_XFLAG_CASEFOLD;
+> +       return 0;
+> +}
+> +
+>  const struct inode_operations cifs_dir_inode_ops =3D {
+>         .create =3D cifs_create,
+>         .atomic_open =3D cifs_atomic_open,
+> @@ -1217,6 +1234,7 @@ const struct inode_operations cifs_dir_inode_ops =
+=3D {
+>         .listxattr =3D cifs_listxattr,
+>         .get_acl =3D cifs_get_acl,
+>         .set_acl =3D cifs_set_acl,
+> +       .fileattr_get =3D cifs_fileattr_get,
+>  };
+>
+>  const struct inode_operations cifs_file_inode_ops =3D {
+> @@ -1227,6 +1245,7 @@ const struct inode_operations cifs_file_inode_ops =
+=3D {
+>         .fiemap =3D cifs_fiemap,
+>         .get_acl =3D cifs_get_acl,
+>         .set_acl =3D cifs_set_acl,
+> +       .fileattr_get =3D cifs_fileattr_get,
+>  };
+>
+>  const char *cifs_get_link(struct dentry *dentry, struct inode *inode,
+> @@ -1261,6 +1280,7 @@ const struct inode_operations cifs_symlink_inode_op=
+s =3D {
+>         .setattr =3D cifs_setattr,
+>         .permission =3D cifs_permission,
+>         .listxattr =3D cifs_listxattr,
+> +       .fileattr_get =3D cifs_fileattr_get,
+>  };
+>
+>  /*
+>
+> --
+> 2.53.0
+>
+>
 
-MS-FSA does indeed specify that in certain conditions, an open must
-succeed on a directory even if both DIRECTORY_FILE and NON_DIRECTORY_FILE
-are false (page 60 section 2.1.5.1):
 
-  If CreateOptions.FILE_DIRECTORY_FILE is TRUE then StreamTypeToOpen =
-DirectoryStream.
- Else if StreamTypeNameToOpen is "$INDEX_ALLOCATION" then 
-StreamTypeToOpen =
-DirectoryStream.
- Else if CreateOptions.FILE_NON_DIRECTORY_FILE is FALSE, 
-StreamNameToOpen is
-empty, StreamTypeNameToOpen is empty, Open.File is not NULL, and 
-Open.File.FileType is
-DirectoryFile then StreamTypeToOpen = DirectoryStream.
- Else StreamTypeToOpen = DataStream
+--=20
+Thanks,
 
-There are a bunch of other cases involving trailing separators, etc.
-
-MS-FSA is, of course, not the only filesystem type which can be
-exported by SMB.
-
-Tom.
+Steve
