@@ -1,118 +1,171 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC74A36164B
-	for <linux-cifs@vger.kernel.org>; Fri, 24 Apr 2026 13:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777036856; cv=pass; b=BoaPrYKBOU5XAgZI4NoNVUEdLBr1AWTnO5nLl/7gzwmIROb1GFtoMQESFJXeXW5y/3jFxcWtdEkmyQIM9Mot4MNKsrc5YB6GLgg9CzWEHqZOKuKEW7n7Ybv+j8GWQhp+67QTuCW0VFOgOejpUIov5bpBk3sYefTP8O88hl2oFvE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777036856; c=relaxed/simple;
-	bh=ASS3cGIUH/I1kiBf/Dy1WJ4mFG1Z1t92cIyj895Uf5Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FwnvsuHsGMM8L/dbyMwk4QFqAOiTBqM7N1VQ4wDbJ626gzW/LAUnVZADyLi7Y3nvGgGCUh/VD5v+tefdDdpO3VtXhSHvfuwhEIWn1kld207toLZNvE36uF6G2FDEUp5fxeVblsqBHfNXuTgDPrKCAtJx9ZX7kSde0nXtrDR/2YM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G3G0GFTL; arc=pass smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E55E19A288;
+	Fri, 24 Apr 2026 13:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777037554; cv=none; b=Pry3jmW2qbndLfXkZhpOLa+lC31rDMyKeVfEWvy/cvoQjGgPulq9ZXhSRpa0+B3rdeEPCu1Ui/2SXM6PqxMX7XD+egWlp03FCki5SmHyUkVkVXZXaHZdgQl1/FLv3MyCjmBpwzYP0gV2/Y4wQV7uWfZRkYSpOmUxLe2SqOq+4U4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777037554; c=relaxed/simple;
+	bh=LGG/041ZELxwyWk2X2Jw7rQ9sLZN7rA+qjLbrZUnTwU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=oa9FaBSJ/UcgzYAqyDSW6+PGnlkfnfZC6eib5WSEArGF2D46aGPdHWCV/2H1U4x+atMap6RKu47g/h9WvLalDiiMDVeIqdD8P7L46wPO19bvAC3BMvtTfFNHJeZNx80Hb+jlt6bokJXiD6riQceQqQEtEaGdDwoImxyMql99t5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=fM5OCurn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3G0GFTL"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b9c01854477so286569566b.0
-        for <linux-cifs@vger.kernel.org>; Fri, 24 Apr 2026 06:20:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777036853; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Fe7UPqGimnIlNl3rVHosxs2VP4Zi9lsT/uD+zHcmVim4GBUU5uaHYclV4UTy95gvbx
-         jakHfEpB1upJmjbT0020ovUVwerrstEgK6fWDMRFH5TRbHjAzbjh4xgCoLVV+YJHd0Rh
-         YFiAS/FYv7eRJkR4nocKgHKdLu9xcYCFNQEGmxfskJdNf33mHoXJXu7syfitx9YLH09o
-         I6UH8bTwL9x6EkMujrEHmdw7Ca+8OBS3xAaO8XmxSFrqJbpTWxJEmMUrYP0HCWPdKMog
-         B4kyvgBhtnpa2Kxn637Z/V/MYNjtO+1xz0gPkjbl4DOTifRm0xNbbpnTV/ux8pEWI3qL
-         votA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ASS3cGIUH/I1kiBf/Dy1WJ4mFG1Z1t92cIyj895Uf5Y=;
-        fh=aukQmxF5n6BaSZqtxsT6mgkOwheMEaR/cjO+Su6Ahiw=;
-        b=GDhHDYYiGs8p4FZ3Lw/i5H0nlo0soqqsVvVkshtDbb/nfJSqTlRe0jZQxhy37Ks0uT
-         cWZukSrKDZJVr4ArDX4uFSn8ROv3vMu7Tie7Dlu80LKa2wElUhwe4RuG4+O3Qh8lqirI
-         ZmK8Ot6atW+XCutHOwfM3XF6jRbRUf8Uvee24vZ1GiDQZWXnkAHw5eZICKx5/FW/RiYh
-         PajBL7PHLQz/RwqbvT6mgtzNaJwzWkJssFNlUX2kwIg9Bhy9OaCM2bSKkleCm2timsKO
-         Srj6M8rB+3+vSmSVI2pzovur1ozB6J/C5aVt6mZAaUWI2J/cuFlFUT56L6CKBJTCebW+
-         ZWuw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777036853; x=1777641653; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ASS3cGIUH/I1kiBf/Dy1WJ4mFG1Z1t92cIyj895Uf5Y=;
-        b=G3G0GFTL8u6BieWBwXnTVyAyWJiob4JW74lnONgl+e4w4W4lKn/RmQsIK+x/VI4jf6
-         NflDdA9V7x2/E2VOhTJCyxMY2IlDLxXYpn5tWoNRP4mCQgmI76SyDsvGSy2aIe4oGum9
-         CyvKTJ8cfXbhRVNWtmQYkBX8SCACLg1Q6FzvCAFmHimbNIJPGNmFExiWQRhmRelE9p/d
-         zvMFrunzBsepClEnkPIlDR0+FrxO+PcLHFhiIpLaC4blZZErZmfQyFQy0K/Wk1Zop/87
-         Bkj52UvHHwffn+oHTSkNfRracpkSIuzoS80cM+VHPK47b3nW7MCCHWIJacyaVmgo3u9f
-         6qCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777036853; x=1777641653;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ASS3cGIUH/I1kiBf/Dy1WJ4mFG1Z1t92cIyj895Uf5Y=;
-        b=q7OvUHaXaQf7I7APEn6gEzeBK4oqkWHr1HKGOs+VI9KzqUmVjPH2PgvpYtuLucGzMg
-         aH95HjzzHkQC5fk2eUp4082VhbnGe9A3vGnjgxywk+/lGhlMEvr2I/zDLsmwlNs8xHGg
-         B5SExpMRye0sl/kLjEBC13QhT6wooWOMZRTzuuvzcb9N9uBlStamH3g7V43GKKQdbeDq
-         u1KvGTa4GaFb9uJu8lCsq/VeaJAhpGhj44WXhxVi0jyRde7GxzlK4LIghxqWaV6APjIx
-         gJx87k33wpTPxpvNrg73FMiY1JhxWAC2vkXdCALqbNXUe4CVL2IMgT3Zupq5cFN/t9e4
-         mcvQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9zKJ+EcTPgM9MlQdoNtvy83x/8wmxYmOK4xeQAPl1Dtrm321O5zYkqtbloRiEHGUzWF6WtSyYNvfgp@vger.kernel.org
-X-Gm-Message-State: AOJu0YywQKCZ3sUHHabq37Kuz1jV5PFJpeSEcDa4YDAXExvBjmrx3tPh
-	Q/3G2jjjXxz30wSqZjRXxLvmoJt55s2HQWBOFD5S5iDtKFta6RGFGUpyK1d+/DkAtZxxIIPQX1U
-	wsz2+qOtQe8R5EYnchhizpJ30iTVQe6A=
-X-Gm-Gg: AeBDietOBpC3PqR+vh412nQIDw7fWZXuwaFaWXPb+soGyzCW3jj8X2w/kkt1klvcYL6
-	XXiY2u9C7V0ssMY9Fa3cPQgwOERkXsqmI9mGzNrJUTd35QGxZ+wprtk6mgece2qjHubRLoTA5u0
-	8kfC9oCzWXLg88E/UBgFj+/ajyDigqTmW6c6AbakSTZdmQ+qNWZDcodP743Mizi6J414as3Lr5I
-	ukqOyziayscMdtMe7OuVvd35KJSnNK1x5OcBMQcdklsvzj1D85S/ZcoKQPbOKZCLpFB9tFgFU2N
-	NsY2nUlxRdcnDQUh
-X-Received: by 2002:a17:907:c1e:b0:bad:d21f:904d with SMTP id
- a640c23a62f3a-badd21f9640mr134660466b.31.1777036851676; Fri, 24 Apr 2026
- 06:20:51 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fM5OCurn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB0ADC19425;
+	Fri, 24 Apr 2026 13:32:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1777037554;
+	bh=LGG/041ZELxwyWk2X2Jw7rQ9sLZN7rA+qjLbrZUnTwU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=fM5OCurny2u2tbQsYK29HdJginQDJl10bhmgDC2GWS+1PXO7TBdBu8QYZ+Pw7FaeJ
+	 OyUi6y55hHh0L4ua6QFabgB4zuCljCx4H1zKIvPOkOUMWvz5zzXZFE6Yd+evf23BJM
+	 pIzw/DIh18ZR9RO9y0V/ofGGsxt+qx8ftsY+KJ9M=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	"Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	David Howells <dhowells@redhat.com>,
+	linux-cifs@vger.kernel.org,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH 7.0 22/42] smb: client: fix dir separator in SMB1 UNIX mounts
+Date: Fri, 24 Apr 2026 15:30:47 +0200
+Message-ID: <20260424132425.073615531@linuxfoundation.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260424132420.410310336@linuxfoundation.org>
+References: <20260424132420.410310336@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANT5p=oV8kcE6hXPoUVQAYGaiz+2OERoSRLAS6X+q9KJ_8w8YQ@mail.gmail.com>
- <438478a7-c965-4a2a-9c4a-84b5f77d6dbe@samba.org>
-In-Reply-To: <438478a7-c965-4a2a-9c4a-84b5f77d6dbe@samba.org>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Fri, 24 Apr 2026 18:50:40 +0530
-X-Gm-Features: AQROBzAWgiHMPutXPKosmS70CLbZfFyKsRjxdv-KyVf-hd6DFXM_DKprRPT5BlM
-Message-ID: <CANT5p=ortwT7ensa+kKoCa=wMnGETpqaQuBnhDWMSNu82KsqFg@mail.gmail.com>
-Subject: Re: "Intent" of VFS lookups
-To: Ralph Boehme <slow@samba.org>
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 23, 2026 at 11:13=E2=80=AFPM Ralph Boehme <slow@samba.org> wrot=
-e:
->
-> On 4/23/26 7:01 PM, Shyam Prasad N wrote:
-> > Wanted to understand if this is a problem for other filesystems or if
-> > it is specific to SMB protocol?
-> > SMB2+ protocol mandate that open call specifies if the file being
-> > opened is a directory or not (regular file).
-> sure? From memory (though the logic has always kind of escaped me) if
-> you neither specify FILE_DIRECTORY_FILE nor FILE_NON_DIRECTORY_FILE the
-> server is supposed to open the object regardless of the type.
+7.0-stable review patch.  If anyone has any objections, please let me know.
 
-Hi Ralph,
+------------------
 
-That's interesting. The spec does not seem to define this. Perhaps purposel=
-y?
-Will try and prototype a change to verify.
+From: Paulo Alcantara <pc@manguebit.org>
 
---=20
-Regards,
-Shyam
+commit c4d3fc5844d685441befd0caaab648321013cdfd upstream.
+
+When calling cifs_mount_get_tcon() with SMB1 UNIX mounts,
+@cifs_sb->mnt_cifs_flags needs to be read or updated only after
+calling reset_cifs_unix_caps(), otherwise it might end up with missing
+CIFS_MOUNT_POSIXACL and CIFS_MOUNT_POSIX_PATHS bits.
+
+This fixes the wrong dir separator used in paths caused by the missing
+CIFS_MOUNT_POSIX_PATHS bit in cifs_sb_info::mnt_cifs_flags.
+
+Reported-by: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
+Closes: https://lore.kernel.org/r/f758f4ff-4d54-4244-931d-38f469c3ff14@moonlit-rail.com
+Fixes: 4fc3a433c139 ("smb: client: use atomic_t for mnt_cifs_flags")
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Cc: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ fs/smb/client/connect.c |   10 +++++-----
+ fs/smb/client/smb1ops.c |   19 ++++++++-----------
+ 2 files changed, 13 insertions(+), 16 deletions(-)
+
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -3610,7 +3610,6 @@ int cifs_mount_get_tcon(struct cifs_moun
+ 	server = mnt_ctx->server;
+ 	ctx = mnt_ctx->fs_ctx;
+ 	cifs_sb = mnt_ctx->cifs_sb;
+-	sbflags = cifs_sb_flags(cifs_sb);
+ 
+ 	/* search for existing tcon to this server share */
+ 	tcon = cifs_get_tcon(mnt_ctx->ses, ctx);
+@@ -3625,9 +3624,10 @@ int cifs_mount_get_tcon(struct cifs_moun
+ 	 * path (i.e., do not remap / and \ and do not map any special characters)
+ 	 */
+ 	if (tcon->posix_extensions) {
+-		sbflags |= CIFS_MOUNT_POSIX_PATHS;
+-		sbflags &= ~(CIFS_MOUNT_MAP_SFM_CHR |
+-			     CIFS_MOUNT_MAP_SPECIAL_CHR);
++		atomic_or(CIFS_MOUNT_POSIX_PATHS, &cifs_sb->mnt_cifs_flags);
++		atomic_andnot(CIFS_MOUNT_MAP_SFM_CHR |
++			      CIFS_MOUNT_MAP_SPECIAL_CHR,
++			      &cifs_sb->mnt_cifs_flags);
+ 	}
+ 
+ #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+@@ -3651,6 +3651,7 @@ int cifs_mount_get_tcon(struct cifs_moun
+ #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+ 		tcon->unix_ext = 0; /* server does not support them */
+ 
++	sbflags = cifs_sb_flags(cifs_sb);
+ 	/* do not care if a following call succeed - informational */
+ 	if (!tcon->pipe && server->ops->qfs_tcon) {
+ 		server->ops->qfs_tcon(mnt_ctx->xid, tcon, cifs_sb);
+@@ -3675,7 +3676,6 @@ int cifs_mount_get_tcon(struct cifs_moun
+ 
+ out:
+ 	mnt_ctx->tcon = tcon;
+-	atomic_set(&cifs_sb->mnt_cifs_flags, sbflags);
+ 	return rc;
+ }
+ 
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -49,7 +49,6 @@ void reset_cifs_unix_caps(unsigned int x
+ 
+ 	if (!CIFSSMBQFSUnixInfo(xid, tcon)) {
+ 		__u64 cap = le64_to_cpu(tcon->fsUnixInfo.Capability);
+-		unsigned int sbflags;
+ 
+ 		cifs_dbg(FYI, "unix caps which server supports %lld\n", cap);
+ 		/*
+@@ -76,29 +75,27 @@ void reset_cifs_unix_caps(unsigned int x
+ 		if (cap & CIFS_UNIX_TRANSPORT_ENCRYPTION_MANDATORY_CAP)
+ 			cifs_dbg(VFS, "per-share encryption not supported yet\n");
+ 
+-		if (cifs_sb)
+-			sbflags = cifs_sb_flags(cifs_sb);
+-
+ 		cap &= CIFS_UNIX_CAP_MASK;
+ 		if (ctx && ctx->no_psx_acl)
+ 			cap &= ~CIFS_UNIX_POSIX_ACL_CAP;
+ 		else if (CIFS_UNIX_POSIX_ACL_CAP & cap) {
+ 			cifs_dbg(FYI, "negotiated posix acl support\n");
+-			if (cifs_sb)
+-				sbflags |= CIFS_MOUNT_POSIXACL;
++			if (cifs_sb) {
++				atomic_or(CIFS_MOUNT_POSIXACL,
++					  &cifs_sb->mnt_cifs_flags);
++			}
+ 		}
+ 
+ 		if (ctx && ctx->posix_paths == 0)
+ 			cap &= ~CIFS_UNIX_POSIX_PATHNAMES_CAP;
+ 		else if (cap & CIFS_UNIX_POSIX_PATHNAMES_CAP) {
+ 			cifs_dbg(FYI, "negotiate posix pathnames\n");
+-			if (cifs_sb)
+-				sbflags |= CIFS_MOUNT_POSIX_PATHS;
++			if (cifs_sb) {
++				atomic_or(CIFS_MOUNT_POSIX_PATHS,
++					  &cifs_sb->mnt_cifs_flags);
++			}
+ 		}
+ 
+-		if (cifs_sb)
+-			atomic_set(&cifs_sb->mnt_cifs_flags, sbflags);
+-
+ 		cifs_dbg(FYI, "Negotiate caps 0x%x\n", (int)cap);
+ #ifdef CONFIG_CIFS_DEBUG2
+ 		if (cap & CIFS_UNIX_FCNTL_CAP)
+
+
