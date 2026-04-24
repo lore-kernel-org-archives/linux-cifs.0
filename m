@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB1D179A3;
-	Fri, 24 Apr 2026 13:37:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78FA19A288;
+	Fri, 24 Apr 2026 13:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777037870; cv=none; b=PdMgqyktIgLKxS/uBsE2UJ7vc4kOtcBh0cr6YAOWIT1iUKmi8XSBWDpwOrufgXxbxlLrCLqe8JipByp7wPi5NUnktAiRDC9JNgkfoqZDj0n7qjQUPHqUNfe7jcYXG+9xhXiT8iBQ+KE3Vo0oW2hY6U5q4HWpcNSkOPum3bn+E5Q=
+	t=1777037929; cv=none; b=lxlqlymdK3TD2jsYLvlN8xfWXAFKV/MIVi8WujQFMHh4xiMvCwz361yLE+zQibl3SDwQ9BZ4HUbpzMTccahH+R+dFh11us7cnIPykfGJTHGe/CMEWO1uPAgfEiT8z/c44ar2sX26NzPd6Ja0/CTHxnl+iMyobvezuimSKuj9fEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777037870; c=relaxed/simple;
-	bh=w/OFTXUJilIgJcRaNDr644fBhgBZRYR//M3uJji6EnI=;
+	s=arc-20240116; t=1777037929; c=relaxed/simple;
+	bh=Ua/ALm9A9GarjXHckxsD8hTsLUda4YJSltnLyhejMeM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KF6yl6kDBdGP6g69woPiIZfNrnu5BEcOKnj67ADQVdcQ005uagLNqAWkA145REd8hJ9x4q1AQ3WyidMabyRn7NxkDhaEnXpfZoTwRWOibV84lPoTKslEYmCV/8Qsyu7XAWLOVApLb7qoAElTyXhAKE8vb541zN6BKU1TdxO4tSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Uv2fRNSX; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=f/8Cc7n6SFtFLHXO97XRN8lBpGVvsyN1RSBwG2XXy5xrZPT6Ctsc7lDZUrgQIkQ1mTVFahgEcn3eOxjKxVysiUuVxAaQqaTv+Q2sez27GuuoZ+QmHvpVb3QALLQGpkQJanJ7nl5mNtaDB5f5vx3xqX+Zcys/nO2TZXFBitGAJv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ej7M6EPE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Uv2fRNSX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8FA3C19425;
-	Fri, 24 Apr 2026 13:37:49 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ej7M6EPE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C0B2C19425;
+	Fri, 24 Apr 2026 13:38:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1777037870;
-	bh=w/OFTXUJilIgJcRaNDr644fBhgBZRYR//M3uJji6EnI=;
+	s=korg; t=1777037929;
+	bh=Ua/ALm9A9GarjXHckxsD8hTsLUda4YJSltnLyhejMeM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Uv2fRNSXfCftczu+J0TDZ9loACvOhKp9ak6qROylONamYolqvu24HmcMYrlJdgC48
-	 RAmO/umABhzj2WsSxRf3WYDIrAPsaEmpfdioyY8EJlBdf+TRhAz0yftShrKGjw6Ugm
-	 jrwtWQOln6VTfSsQvfdY8+Wjsg2r3LAzJi0PFu0M=
+	b=ej7M6EPEI2UAkbLRjGGEztaW0XJNkN4uCgVqWH8+F+oahyl3Dnk558ZOkBSW0YlRQ
+	 Lhgxktl4ulWmdRnpkj4gQa8yC4q42TQ+DdP1sPym3W1II99YYmw2CHrM/XtFWFQyyf
+	 1upIyoLGx2UZ31GAD0Y8TnMAfTFfARQXKqW62me0=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -34,9 +34,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-cifs@vger.kernel.org,
 	stable@kernel.org,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.6 084/166] ksmbd: fix mechToken leak when SPNEGO decode fails after token alloc
-Date: Fri, 24 Apr 2026 15:29:58 +0200
-Message-ID: <20260424132550.343994907@linuxfoundation.org>
+Subject: [PATCH 6.6 082/166] ksmbd: validate EaNameLength in smb2_get_ea()
+Date: Fri, 24 Apr 2026 15:29:56 +0200
+Message-ID: <20260424132549.980479730@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260424132532.812258529@linuxfoundation.org>
 References: <20260424132532.812258529@linuxfoundation.org>
@@ -57,35 +57,18 @@ Content-Transfer-Encoding: 8bit
 
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-commit ad0057fb91218914d6c98268718ceb9d59b388e1 upstream.
+commit 66751841212c2cc196577453c37f7774ff363f02 upstream.
 
-The kernel ASN.1 BER decoder calls action callbacks incrementally as it
-walks the input.  When ksmbd_decode_negTokenInit() reaches the mechToken
-[2] OCTET STRING element, ksmbd_neg_token_alloc() allocates
-conn->mechToken immediately via kmemdup_nul().  If a later element in
-the same blob is malformed, then the decoder will return nonzero after
-the allocation is already live.  This could happen if mechListMIC [3]
-overrunse the enclosing SEQUENCE.
+smb2_get_ea() reads ea_req->EaNameLength from the client request and
+passes it directly to strncmp() as the comparison length without
+verifying that the length of the name really is the size of the input
+buffer received.
 
-decode_negotiation_token() then sets conn->use_spnego = false because
-both the negTokenInit and negTokenTarg grammars failed.  The cleanup at
-the bottom of smb2_sess_setup() is gated on use_spnego:
-
-	if (conn->use_spnego && conn->mechToken) {
-		kfree(conn->mechToken);
-		conn->mechToken = NULL;
-	}
-
-so the kfree is skipped, causing the mechToken to never be freed.
-
-This codepath is reachable pre-authentication, so untrusted clients can
-cause slow memory leaks on a server without even being properly
-authenticated.
-
-Fix this up by not checking check for use_spnego, as it's not required,
-so the memory will always be properly freed.  At the same time, always
-free the memory in ksmbd_conn_free() incase some other failure path
-forgot to free it.
+Fix this up by properly checking the size of the name based on the value
+received and the overall size of the request, to prevent a later
+strncmp() call to use the length as a "trusted" size of the buffer.
+Without this check, uninitialized heap values might be slowly leaked to
+the client.
 
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
@@ -99,30 +82,22 @@ Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/server/connection.c |    1 +
- fs/smb/server/smb2pdu.c    |    2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ fs/smb/server/smb2pdu.c |    5 +++++
+ 1 file changed, 5 insertions(+)
 
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -39,6 +39,7 @@ void ksmbd_conn_free(struct ksmbd_conn *
- 	xa_destroy(&conn->sessions);
- 	kvfree(conn->request_buf);
- 	kfree(conn->preauth_info);
-+	kfree(conn->mechToken);
- 	if (atomic_dec_and_test(&conn->refcnt)) {
- 		conn->transport->ops->free_transport(conn->transport);
- 		kfree(conn);
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -1901,7 +1901,7 @@ out_err:
- 	else if (rc)
- 		rsp->hdr.Status = STATUS_LOGON_FAILURE;
+@@ -4702,6 +4702,11 @@ static int smb2_get_ea(struct ksmbd_work
  
--	if (conn->use_spnego && conn->mechToken) {
-+	if (conn->mechToken) {
- 		kfree(conn->mechToken);
- 		conn->mechToken = NULL;
- 	}
+ 		ea_req = (struct smb2_ea_info_req *)((char *)req +
+ 						     le16_to_cpu(req->InputBufferOffset));
++
++		if (le32_to_cpu(req->InputBufferLength) <
++		    offsetof(struct smb2_ea_info_req, name) +
++		    ea_req->EaNameLength)
++			return -EINVAL;
+ 	} else {
+ 		/* need to send all EAs, if no specific EA is requested*/
+ 		if (le32_to_cpu(req->Flags) & SL_RETURN_SINGLE_ENTRY)
 
 
