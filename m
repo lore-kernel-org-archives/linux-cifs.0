@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD6619A288;
-	Fri, 24 Apr 2026 13:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB1D179A3;
+	Fri, 24 Apr 2026 13:37:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777037842; cv=none; b=IfwLtI3xdZb6SV36jm2r+d06V1bdYFdpqKEEK/FdcIsnk3pXqo/xBIUeasvSSHfWYJXQA7dqpYR7FIABEE6NPBPc3czII2a9+qRIUqoaEtk1vjONH+5ahzOo8+XOi7o3aZDM8WbvUXM4i8ZfDCz2ucfdyBPOm4++9nNGxqB7NR4=
+	t=1777037870; cv=none; b=PdMgqyktIgLKxS/uBsE2UJ7vc4kOtcBh0cr6YAOWIT1iUKmi8XSBWDpwOrufgXxbxlLrCLqe8JipByp7wPi5NUnktAiRDC9JNgkfoqZDj0n7qjQUPHqUNfe7jcYXG+9xhXiT8iBQ+KE3Vo0oW2hY6U5q4HWpcNSkOPum3bn+E5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777037842; c=relaxed/simple;
-	bh=rqmVwOEas/cQ6fdD3E9gSlZJu6Jh+l8JtAA+c7lEyAo=;
+	s=arc-20240116; t=1777037870; c=relaxed/simple;
+	bh=w/OFTXUJilIgJcRaNDr644fBhgBZRYR//M3uJji6EnI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eZXMVQyMS2OAazN28+xcjaklmRq3tbGH0iWeFATM4sEIi9Nl/6SGNmgzqv3C5OKNU6SbqoafaoWpC5YHXmB+eo29+nmLZSkt9ZGtJGnC8gxFGuWvCE14yupB0s6hLhura8FCQb4jKSwJDYQer0LeP5vND2vZzveCviYpP2KsNUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=a/njlZk2; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=KF6yl6kDBdGP6g69woPiIZfNrnu5BEcOKnj67ADQVdcQ005uagLNqAWkA145REd8hJ9x4q1AQ3WyidMabyRn7NxkDhaEnXpfZoTwRWOibV84lPoTKslEYmCV/8Qsyu7XAWLOVApLb7qoAElTyXhAKE8vb541zN6BKU1TdxO4tSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Uv2fRNSX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="a/njlZk2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80EB3C19425;
-	Fri, 24 Apr 2026 13:37:21 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Uv2fRNSX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8FA3C19425;
+	Fri, 24 Apr 2026 13:37:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1777037841;
-	bh=rqmVwOEas/cQ6fdD3E9gSlZJu6Jh+l8JtAA+c7lEyAo=;
+	s=korg; t=1777037870;
+	bh=w/OFTXUJilIgJcRaNDr644fBhgBZRYR//M3uJji6EnI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=a/njlZk2y56YnxydJ0GDsfYXwD5X0ah9KMHBhnAQV2x4XFuhGprQHVLB28jU5+eEJ
-	 zuHiZ1pp4bXNv9YdgYOPcPLqE43m34cbEFMdt0nOI9T7Pn5emsCczbE2K0z1FLFu5O
-	 itf1lv7migT7HxVWR02mP7Bv/xOP61xATe6wmGd0=
+	b=Uv2fRNSXfCftczu+J0TDZ9loACvOhKp9ak6qROylONamYolqvu24HmcMYrlJdgC48
+	 RAmO/umABhzj2WsSxRf3WYDIrAPsaEmpfdioyY8EJlBdf+TRhAz0yftShrKGjw6Ugm
+	 jrwtWQOln6VTfSsQvfdY8+Wjsg2r3LAzJi0PFu0M=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -34,9 +34,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-cifs@vger.kernel.org,
 	stable@kernel.org,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.6 083/166] ksmbd: require 3 sub-authorities before reading sub_auth[2]
-Date: Fri, 24 Apr 2026 15:29:57 +0200
-Message-ID: <20260424132550.195699606@linuxfoundation.org>
+Subject: [PATCH 6.6 084/166] ksmbd: fix mechToken leak when SPNEGO decode fails after token alloc
+Date: Fri, 24 Apr 2026 15:29:58 +0200
+Message-ID: <20260424132550.343994907@linuxfoundation.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260424132532.812258529@linuxfoundation.org>
 References: <20260424132532.812258529@linuxfoundation.org>
@@ -57,22 +57,35 @@ Content-Transfer-Encoding: 8bit
 
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-commit 53370cf9090777774e07fd9a8ebce67c6cc333ab upstream.
+commit ad0057fb91218914d6c98268718ceb9d59b388e1 upstream.
 
-parse_dacl() compares each ACE SID against sid_unix_NFS_mode and on
-match reads sid.sub_auth[2] as the file mode.  If sid_unix_NFS_mode is
-the prefix S-1-5-88-3 with num_subauth = 2 then compare_sids() compares
-only min(num_subauth, 2) sub-authorities so a client SID with
-num_subauth = 2 and sub_auth = {88, 3} will match.
+The kernel ASN.1 BER decoder calls action callbacks incrementally as it
+walks the input.  When ksmbd_decode_negTokenInit() reaches the mechToken
+[2] OCTET STRING element, ksmbd_neg_token_alloc() allocates
+conn->mechToken immediately via kmemdup_nul().  If a later element in
+the same blob is malformed, then the decoder will return nonzero after
+the allocation is already live.  This could happen if mechListMIC [3]
+overrunse the enclosing SEQUENCE.
 
-If num_subauth = 2 and the ACE is placed at the very end of the security
-descriptor, sub_auth[2] will be  4 bytes past end_of_acl.  The
-out-of-band bytes will then be masked to the low 9 bits and applied as
-the file's POSIX mode, probably not something that is good to have
-happen.
+decode_negotiation_token() then sets conn->use_spnego = false because
+both the negTokenInit and negTokenTarg grammars failed.  The cleanup at
+the bottom of smb2_sess_setup() is gated on use_spnego:
 
-Fix this up by forcing the SID to actually carry a third sub-authority
-before reading it at all.
+	if (conn->use_spnego && conn->mechToken) {
+		kfree(conn->mechToken);
+		conn->mechToken = NULL;
+	}
+
+so the kfree is skipped, causing the mechToken to never be freed.
+
+This codepath is reachable pre-authentication, so untrusted clients can
+cause slow memory leaks on a server without even being properly
+authenticated.
+
+Fix this up by not checking check for use_spnego, as it's not required,
+so the memory will always be properly freed.  At the same time, always
+free the memory in ksmbd_conn_free() incase some other failure path
+forgot to free it.
 
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
@@ -86,20 +99,30 @@ Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/server/smbacl.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ fs/smb/server/connection.c |    1 +
+ fs/smb/server/smb2pdu.c    |    2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -451,7 +451,8 @@ static void parse_dacl(struct mnt_idmap
- 		ppace[i]->access_req =
- 			smb_map_generic_desired_access(ppace[i]->access_req);
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -39,6 +39,7 @@ void ksmbd_conn_free(struct ksmbd_conn *
+ 	xa_destroy(&conn->sessions);
+ 	kvfree(conn->request_buf);
+ 	kfree(conn->preauth_info);
++	kfree(conn->mechToken);
+ 	if (atomic_dec_and_test(&conn->refcnt)) {
+ 		conn->transport->ops->free_transport(conn->transport);
+ 		kfree(conn);
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -1901,7 +1901,7 @@ out_err:
+ 	else if (rc)
+ 		rsp->hdr.Status = STATUS_LOGON_FAILURE;
  
--		if (!(compare_sids(&ppace[i]->sid, &sid_unix_NFS_mode))) {
-+		if (ppace[i]->sid.num_subauth >= 3 &&
-+		    !(compare_sids(&ppace[i]->sid, &sid_unix_NFS_mode))) {
- 			fattr->cf_mode =
- 				le32_to_cpu(ppace[i]->sid.sub_auth[2]);
- 			break;
+-	if (conn->use_spnego && conn->mechToken) {
++	if (conn->mechToken) {
+ 		kfree(conn->mechToken);
+ 		conn->mechToken = NULL;
+ 	}
 
 
