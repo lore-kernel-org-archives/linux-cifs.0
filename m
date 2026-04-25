@@ -1,45 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D0535BDD5
-	for <linux-cifs@vger.kernel.org>; Sat, 25 Apr 2026 12:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F05342C98
+	for <linux-cifs@vger.kernel.org>; Sat, 25 Apr 2026 12:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777121681; cv=none; b=L4bjfsy2kO0T5UcqwgB4zZU8WnrbTHZYXHrpH91EkNgAswEkjLm3eQOi73O2ZLOyODwn5AIp7jjOUMMy15sMuJAq7CpBt8mPrPNqkERJWSYFRWuu1K/gA6/b5iFUOWRAY624rorQBaUCtoMhoBF0Lyikaoj/jJvOM+W657CxrXY=
+	t=1777121684; cv=none; b=YurxJ53KjsL2EuVO0xP2bXy6CxCY/DV4Qka90Czfdm0tYPeNWtZ0s+CKWi+fSHHcBv46hUKmBGkbMA6pKCayOXBJeCmHvWj0qBVjUwfOCd63x1sjlcRE0aIhZBTXkH1WLujwQ+dlDZ9XUAtb3hGpTjgzNP7dkL4l4e6a9Axkh2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777121681; c=relaxed/simple;
-	bh=RRQ0IXdttCveiiHSEJbAsHURjxw1HDI3FgodXfjDv7Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AAfOoEwJOpoK07PjleLBGVnXr9uS6tlM/D/UJDaZzXVA+yg34EaLC6hP5RWbdMLpbTRSt2+8HMU9846d3cML7zFtc6VC1yi/LCJRfFbmwa63o13SuuxtcS3FVb5YozYM0Ea7RM9iRoZ7z14eg7pkvaLUTBeXFrpDkJCdlmtkEbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DDCHbm+P; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1777121684; c=relaxed/simple;
+	bh=jHTxaTaZGygBbwMAsYP1jcz8k+z+CAbQ19xmh0tlMm8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cLp8CYnJCylGmjMhrx31xKnBFjx7im7kKSUhJRn9wtoXD4sAntkw8m/7xfKWQa2peJo2yBZKRKN0SzE31+qjNKKcpMQnb744of0DjCtLl+5rnPNH4UT61uZzhROxskKcyGo5CmQWOo1aqU1AV1H2zt83Onm/4uW5hjgHLzTa8Oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=glStIDlt; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DDCHbm+P"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="glStIDlt"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777121678;
+	s=mimecast20190719; t=1777121681;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=pVwB7OIP/Kn8ajofvoCHRiXa+pRDIyAY5VS4PTcDuJ8=;
-	b=DDCHbm+P+so2YAJn4nYgwVrieIQyQ0tSOvRTCsLgOmV7OokW1pJ/FOTE0g1Ota6GIN+JQd
-	/hyHPqCjdgUFF3iEaR6ZSGCtxI+YXmv6lDGm4zMGWR22ZgcBNDNJXeVM+AZ5K38LBD6rUH
-	7Kpc6fO7x94//LD7gsBCxKOqbVWV8OM=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G0NmuAx3PiUN6BJtlmodYQ+isOeyDP/eeo+rfiF8kLs=;
+	b=glStIDltIywGCHcoprZavCN54+QbP0uB+VJH6mUG9GEhhcRPwZefvBCs2thN1RH2EKMHa0
+	2VAklruZjxED/Rz6+SA93x6dU9+O1FpSwgo5ZesX8DaDfx8Qslrp+YhLLDxLQgBP/uL9Nx
+	zZQlJNPonmKagUWq0BSufsJcHDlpb1g=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-74-jZgm73z_OD-3sDHpzV6hkQ-1; Sat,
- 25 Apr 2026 08:54:35 -0400
-X-MC-Unique: jZgm73z_OD-3sDHpzV6hkQ-1
-X-Mimecast-MFC-AGG-ID: jZgm73z_OD-3sDHpzV6hkQ_1777121674
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-669-Zo-X7jzfMKSVoei6JjCLcg-1; Sat,
+ 25 Apr 2026 08:54:40 -0400
+X-MC-Unique: Zo-X7jzfMKSVoei6JjCLcg-1
+X-Mimecast-MFC-AGG-ID: Zo-X7jzfMKSVoei6JjCLcg_1777121679
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7F40E195608B;
-	Sat, 25 Apr 2026 12:54:33 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 80BFE180034F;
+	Sat, 25 Apr 2026 12:54:38 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.48.17])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6307819560AB;
-	Sat, 25 Apr 2026 12:54:29 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3981E19560AB;
+	Sat, 25 Apr 2026 12:54:34 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>
 Cc: David Howells <dhowells@redhat.com>,
@@ -49,10 +51,13 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org,
 	ceph-devel@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 00/19] netfs: Miscellaneous fixes
-Date: Sat, 25 Apr 2026 13:54:04 +0100
-Message-ID: <20260425125426.3855807-1-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org,
+	Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+Subject: [PATCH v3 01/19] netfs: fix VM_BUG_ON_FOLIO() issue in netfs_write_begin() call
+Date: Sat, 25 Apr 2026 13:54:05 +0100
+Message-ID: <20260425125426.3855807-2-dhowells@redhat.com>
+In-Reply-To: <20260425125426.3855807-1-dhowells@redhat.com>
+References: <20260425125426.3855807-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -62,159 +67,160 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Christian,
+From: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
 
-Here are the outstanding miscellaneous fixes for netfslib gathered together
-and with some fixes-to-fixes folded down and one rearrangement.  Various
-Sashiko review comments[1][2] are addressed:
+The multiple runs of generic/013 test-case is capable
+to reproduce a kernel BUG at mm/filemap.c:1504 with
+probability of 30%.
 
- (1) Fix triggering of a VM_BUG_ON_FOLIO() in netfs_write_begin().
+while true; do
+  sudo ./check generic/013
+done
 
- (2) Fix error handling in netfs_extract_user_iter().
+[ 9849.452376] page: refcount:3 mapcount:0 mapping:00000000e58ff252 index:0x10781 pfn:0x1c322
+[ 9849.452412] memcg:ffff8881a1915800
+[ 9849.452417] aops:ceph_aops ino:1000058db9e dentry name(?):"f9XXXXXX"
+[ 9849.452432] flags: 0x17ffffc0000000(node=0|zone=2|lastcpupid=0x1fffff)
+[ 9849.452441] raw: 0017ffffc0000000 0000000000000000 dead000000000122 ffff88816110d248
+[ 9849.452445] raw: 0000000000010781 0000000000000000 00000003ffffffff ffff8881a1915800
+[ 9849.452447] page dumped because: VM_BUG_ON_FOLIO(!folio_test_locked(folio))
+[ 9849.452474] ------------[ cut here ]------------
+[ 9849.452476] kernel BUG at mm/filemap.c:1504!
+[ 9849.478635] Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
+[ 9849.481772] CPU: 2 UID: 0 PID: 84223 Comm: fsstress Not tainted 7.0.0-rc1+ #18 PREEMPT(full)
+[ 9849.482881] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-9.fc43 06/1
+0/2025
+[ 9849.484539] RIP: 0010:folio_unlock+0x85/0xa0
+[ 9849.485076] Code: 89 df 31 f6 e8 1c f3 ff ff 48 8b 5d f8 c9 31 c0 31 d2 31 f6 31 ff c3 cc
+cc cc cc 48 c7 c6 80 6c d9 a7 48 89 df e8 4b b3 10 00 <0f> 0b 48 89 df e8 21 e6 2c 00 eb 9d 0f 1f 40 00 66 66 2e 0f 1f 84
+[ 9849.493818] RSP: 0018:ffff8881bb8076b0 EFLAGS: 00010246
+[ 9849.495740] RAX: 0000000000000000 RBX: ffffea00070c8980 RCX: 0000000000000000
+[ 9849.498678] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+[ 9849.500559] RBP: ffff8881bb8076b8 R08: 0000000000000000 R09: 0000000000000000
+[ 9849.501097] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000010782000
+[ 9849.502108] R13: ffff8881935de738 R14: ffff88816110d010 R15: 0000000000001000
+[ 9849.502516] FS:  00007e36cbe94740(0000) GS:ffff88824a899000(0000) knlGS:0000000000000000
+[ 9849.502996] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 9849.503810] CR2: 000000c0002b0000 CR3: 000000011bbf6004 CR4: 0000000000772ef0
+[ 9849.504459] PKRU: 55555554
+[ 9849.504626] Call Trace:
+[ 9849.505242]  <TASK>
+[ 9849.505379]  netfs_write_begin+0x7c8/0x10a0
+[ 9849.505877]  ? __kasan_check_read+0x11/0x20
+[ 9849.506384]  ? __pfx_netfs_write_begin+0x10/0x10
+[ 9849.507178]  ceph_write_begin+0x8c/0x1c0
+[ 9849.507934]  generic_perform_write+0x391/0x8f0
+[ 9849.508503]  ? __pfx_generic_perform_write+0x10/0x10
+[ 9849.509062]  ? file_update_time_flags+0x19a/0x4b0
+[ 9849.509581]  ? ceph_get_caps+0x63/0xf0
+[ 9849.510259]  ? ceph_get_caps+0x63/0xf0
+[ 9849.510530]  ceph_write_iter+0xe79/0x1ae0
+[ 9849.511282]  ? __pfx_ceph_write_iter+0x10/0x10
+[ 9849.511839]  ? lock_acquire+0x1ad/0x310
+[ 9849.512334]  ? ksys_write+0xf9/0x230
+[ 9849.512582]  ? lock_is_held_type+0xaa/0x140
+[ 9849.513128]  vfs_write+0x512/0x1110
+[ 9849.513634]  ? __fget_files+0x33/0x350
+[ 9849.513893]  ? __pfx_vfs_write+0x10/0x10
+[ 9849.514143]  ? mutex_lock_nested+0x1b/0x30
+[ 9849.514394]  ksys_write+0xf9/0x230
+[ 9849.514621]  ? __pfx_ksys_write+0x10/0x10
+[ 9849.514887]  ? do_syscall_64+0x25e/0x1520
+[ 9849.515122]  ? __kasan_check_read+0x11/0x20
+[ 9849.515366]  ? trace_hardirqs_on_prepare+0x178/0x1c0
+[ 9849.515655]  __x64_sys_write+0x72/0xd0
+[ 9849.515885]  ? trace_hardirqs_on+0x24/0x1c0
+[ 9849.516130]  x64_sys_call+0x22f/0x2390
+[ 9849.516341]  do_syscall_64+0x12b/0x1520
+[ 9849.516545]  ? do_syscall_64+0x27c/0x1520
+[ 9849.516783]  ? do_syscall_64+0x27c/0x1520
+[ 9849.517003]  ? lock_release+0x318/0x480
+[ 9849.517220]  ? __x64_sys_io_getevents+0x143/0x2d0
+[ 9849.517479]  ? percpu_ref_put_many.constprop.0+0x8f/0x210
+[ 9849.517779]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[ 9849.518073]  ? do_syscall_64+0x25e/0x1520
+[ 9849.518291]  ? __kasan_check_read+0x11/0x20
+[ 9849.518519]  ? trace_hardirqs_on_prepare+0x178/0x1c0
+[ 9849.518799]  ? do_syscall_64+0x27c/0x1520
+[ 9849.519024]  ? local_clock_noinstr+0xf/0x120
+[ 9849.519262]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[ 9849.519544]  ? do_syscall_64+0x25e/0x1520
+[ 9849.519781]  ? __kasan_check_read+0x11/0x20
+[ 9849.520008]  ? trace_hardirqs_on_prepare+0x178/0x1c0
+[ 9849.520273]  ? do_syscall_64+0x27c/0x1520
+[ 9849.520491]  ? trace_hardirqs_on_prepare+0x178/0x1c0
+[ 9849.520767]  ? irqentry_exit+0x10c/0x6c0
+[ 9849.520984]  ? trace_hardirqs_off+0x86/0x1b0
+[ 9849.521224]  ? exc_page_fault+0xab/0x130
+[ 9849.521472]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[ 9849.521766] RIP: 0033:0x7e36cbd14907
+[ 9849.521989] Code: 10 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+[ 9849.523057] RSP: 002b:00007ffff2d2a968 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+[ 9849.523484] RAX: ffffffffffffffda RBX: 000000000000e549 RCX: 00007e36cbd14907
+[ 9849.523885] RDX: 000000000000e549 RSI: 00005bd797ec6370 RDI: 0000000000000004
+[ 9849.524277] RBP: 0000000000000004 R08: 0000000000000047 R09: 00005bd797ec6370
+[ 9849.524652] R10: 0000000000000078 R11: 0000000000000246 R12: 0000000000000049
+[ 9849.525062] R13: 0000000010781a37 R14: 00005bd797ec6370 R15: 0000000000000000
+[ 9849.525447]  </TASK>
+[ 9849.525574] Modules linked in: intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel joydev kvm irqbypass ghash_clmulni_intel aesni_intel input_leds rapl mac_hid psmouse vga16fb serio_raw vgastate floppy i2c_piix4 bochs qemu_fw_cfg i2c_smbus pata_acpi sch_fq_codel rbd msr parport_pc ppdev lp parport efi_pstore
+[ 9849.529150] ---[ end trace 0000000000000000 ]---
+[ 9849.529502] RIP: 0010:folio_unlock+0x85/0xa0
+[ 9849.530813] Code: 89 df 31 f6 e8 1c f3 ff ff 48 8b 5d f8 c9 31 c0 31 d2 31 f6 31 ff c3 cc cc cc cc 48 c7 c6 80 6c d9 a7 48 89 df e8 4b b3 10 00 <0f> 0b 48 89 df e8 21 e6 2c 00 eb 9d 0f 1f 40 00 66 66 2e 0f 1f 84
+[ 9849.534986] RSP: 0018:ffff8881bb8076b0 EFLAGS: 00010246
+[ 9849.536198] RAX: 0000000000000000 RBX: ffffea00070c8980 RCX: 0000000000000000
+[ 9849.537718] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+[ 9849.539321] RBP: ffff8881bb8076b8 R08: 0000000000000000 R09: 0000000000000000
+[ 9849.540862] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000010782000
+[ 9849.542438] R13: ffff8881935de738 R14: ffff88816110d010 R15: 0000000000001000
+[ 9849.543996] FS:  00007e36cbe94740(0000) GS:ffff88824b899000(0000) knlGS:0000000000000000
+[ 9849.545854] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 9849.547092] CR2: 00007e36cb3ff000 CR3: 000000011bbf6006 CR4: 0000000000772ef0
+[ 9849.548679] PKRU: 55555554
 
- (3) Fix netfs_invalidate_folio() to clear the folio dirty bit if all dirty
-     data removed.
+The race sequence:
+1. Read completes -> netfs_read_collection() runs
+2. netfs_wake_rreq_flag(rreq, NETFS_RREQ_IN_PROGRESS, ...)
+3. netfs_wait_for_read() returns -EFAULT to netfs_write_begin()
+4. The netfs_unlock_abandoned_read_pages() unlocks the folio
+5. netfs_write_begin() calls folio_unlock(folio) -> VM_BUG_ON_FOLIO()
 
- (4) Defer the emission of trace_netfs_folio() in netfs_perform_write().
-     This allows the next patch to emit the correct traces.
+The key reason of the issue that netfs_unlock_abandoned_read_pages()
+doesn't check the flag NETFS_RREQ_NO_UNLOCK_FOLIO and executes
+folio_unlock() unconditionally. This patch implements in
+netfs_unlock_abandoned_read_pages() logic similar to
+netfs_unlock_read_folio().
 
- (5) Fix the handling of a partially failed copy (ie. EFAULT) into a
-     streaming write folio.  Also remove the netfs_folio if a streaming
-     write folio is entirely overwritten.
+Fixes: ee4cdf7ba857 ("netfs: Speed up buffered reading")
+Signed-off-by: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+cc: Ceph Development <ceph-devel@vger.kernel.org>
+---
+ fs/netfs/read_retry.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
- (6) Fix netfs_read_gaps() to remove the netfs_folio from a filled folio.
-
- (7) Fix the calculation of zero_point in netfs_release_folio() to limit it
-     to ->remote_i_size, not ->i_size.
-
- (8) Fix netfs_perform_write() to not disable streaming writes when writing
-     to an fd that's open O_RDWR.
-
- (9) Fix an early put of the sink page used in netfs_read_gaps(), before
-     the request has completed.
-
-(10) Fix request leak in netfs_write_begin() error handling.
-
-(11) Fix a potential UAF in netfs_unlock_abandoned_read_pages() due to
-     trying to check index of each folio we're abandoning to see if that
-     folio is actually owned by the caller (in which case, we're not
-     actually allowed to dereference it).
-
-(12) Fix a potentially uninitialised error value in
-     netfs_extract_user_iter().
-
-(13) Fix incorrect adjustment of dirty region when partially invalidating a
-     streaming write folio.
-
-(14) Fix the handling of folio->private in netfs_perform_write() and the
-     attached netfs_folio and/or group when a streaming write folio is
-     modified.
-
-(15) Fix the potential for 64-bit tearing on a 32-bit machine when reading
-     netfs_inode->remote_i_size and ->zero_point by using much the same
-     mechanism as is used for ->i_size.
-
-(16) Fix netfs_read_folio() to wait on writeback first (it holds the folio
-     lock) otherwise we aren't allowed to look at the netfs_folio struct as
-     that could be modified at any time by the writeback collector.
-
-(17) Fix read and write result collection to use barriering correctly to
-     access a request's subrequest lists without taking a lock.
-
-     This adds list_add_tail_release() and list_first_entry_acquire() to
-     appropriate incorporate barriering into some list functions.
-
-(18) Fix afs_get_link() to take the vnode->validate_lock around
-     afs_read_single() to prevent a race with another caller of
-     afs_get_link() also trying to read the symlink content.
-
-(19) Fix the RCU handling of symlinks in RCU pathwalk.  The problems were
-     that afs_get_link() didn't use proper RCU pointer dereferencing and
-     that AFS symlinks can be updated remotely, potentially causing the
-     buffer memory to be changed.
-
-These are applied on top of your vfs.fixes branch.
-
-The patches can also be found here:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-fixes
-
-Thanks,
-David
-
-[1] https://sashiko.dev/#/patchset/20260414082004.3756080-1-dhowells%40redhat.com
-[2] https://sashiko.dev/#/patchset/20260326104544.509518-1-dhowells%40redhat.com
-
-Changes
-=======
-ver #3)
-- Rebase on linus/master.
-- Consolidate the various sets of fixes for reposting.
-- Fold down fixes-to-fixes.
-- Move the tracing change in netfs_perform_write() down to below the patch
-  it primarily affects.
-
-base-commit: 27d128c1cff64c3b8012cc56dd5a1391bb4f1821
-
-David Howells (17):
-  netfs: Fix netfs_invalidate_folio() to clear dirty bit if all changes
-    gone
-  netfs: Defer the emission of trace_netfs_folio()
-  netfs: Fix streaming write being overwritten
-  netfs: Fix read-gaps to remove netfs_folio from filled folio
-  netfs: Fix zeropoint update where i_size > remote_i_size
-  netfs: Fix write streaming disablement if fd open O_RDWR
-  netfs: Fix early put of sink folio in netfs_read_gaps()
-  netfs: Fix leak of request in netfs_write_begin() error handling
-  netfs: Fix potential UAF in netfs_unlock_abandoned_read_pages()
-  netfs: Fix potential uninitialised var in netfs_extract_user_iter()
-  netfs: Fix partial invalidation of streaming-write folio
-  netfs: Fix folio->private handling in netfs_perform_write()
-  netfs: Fix potential for tearing in ->remote_i_size and ->zero_point
-  netfs: Fix netfs_read_folio() to wait on writeback
-  netfs: Fix missing barriers when accessing stream->subrequests
-    locklessly
-  afs: Fix afs_get_link() to take validate_lock around afs_read_single()
-  afs: Fix RCU handling of symlinks in RCU pathwalk
-
-Paulo Alcantara (1):
-  netfs: fix error handling in netfs_extract_user_iter()
-
-Viacheslav Dubeyko (1):
-  netfs: fix VM_BUG_ON_FOLIO() issue in netfs_write_begin() call
-
- fs/9p/vfs_inode.c            |   2 +-
- fs/9p/vfs_inode_dotl.c       |   4 +-
- fs/afs/Makefile              |   1 +
- fs/afs/dir.c                 |  33 +++-
- fs/afs/fsclient.c            |   4 +-
- fs/afs/inode.c               | 104 +-----------
- fs/afs/internal.h            |  35 +++-
- fs/afs/symlink.c             | 242 ++++++++++++++++++++++++++++
- fs/afs/write.c               |   2 +-
- fs/afs/yfsclient.c           |   4 +-
- fs/netfs/buffered_read.c     |  39 +++--
- fs/netfs/buffered_write.c    | 111 ++++++++-----
- fs/netfs/direct_read.c       |  15 +-
- fs/netfs/direct_write.c      |   4 +-
- fs/netfs/internal.h          |   3 +
- fs/netfs/iterator.c          |  15 +-
- fs/netfs/misc.c              |  21 ++-
- fs/netfs/read_collect.c      |   6 +-
- fs/netfs/read_retry.c        |  11 +-
- fs/netfs/read_single.c       |  12 +-
- fs/netfs/write_collect.c     |   7 +-
- fs/netfs/write_issue.c       |   3 +-
- fs/smb/client/cifsfs.c       |  24 +--
- fs/smb/client/cifssmb.c      |   2 +-
- fs/smb/client/file.c         |   9 +-
- fs/smb/client/inode.c        |   9 +-
- fs/smb/client/readdir.c      |   3 +-
- fs/smb/client/smb2ops.c      |  16 +-
- fs/smb/client/smb2pdu.c      |   2 +-
- include/linux/list.h         |  37 +++++
- include/linux/netfs.h        | 298 +++++++++++++++++++++++++++++++++--
- include/trace/events/netfs.h |   8 +
- 32 files changed, 826 insertions(+), 260 deletions(-)
- create mode 100644 fs/afs/symlink.c
+diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
+index cca9ac43c077..68fc869513ef 100644
+--- a/fs/netfs/read_retry.c
++++ b/fs/netfs/read_retry.c
+@@ -288,8 +288,15 @@ void netfs_unlock_abandoned_read_pages(struct netfs_io_request *rreq)
+ 			struct folio *folio = folioq_folio(p, slot);
+ 
+ 			if (folio && !folioq_is_marked2(p, slot)) {
+-				trace_netfs_folio(folio, netfs_folio_trace_abandon);
+-				folio_unlock(folio);
++				if (folio->index == rreq->no_unlock_folio &&
++				    test_bit(NETFS_RREQ_NO_UNLOCK_FOLIO,
++					     &rreq->flags)) {
++					_debug("no unlock");
++				} else {
++					trace_netfs_folio(folio,
++						netfs_folio_trace_abandon);
++					folio_unlock(folio);
++				}
+ 			}
+ 		}
+ 	}
 
