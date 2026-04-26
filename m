@@ -1,60 +1,184 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DD8384242
-	for <linux-cifs@vger.kernel.org>; Sat, 25 Apr 2026 23:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB49225403
+	for <linux-cifs@vger.kernel.org>; Sun, 26 Apr 2026 11:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777158138; cv=none; b=lWRqiSEcp6RIF7nIycr8JjbOu6/wwhPiWOVO8uUi0xPQ40o60Y73x8qtCcJOUUqyoFEW8FynL8TGt6QpiTQlC35KUFNo8557fAlP1hdExxmlryzq5Ubxob/z8kYOqos7eZfWghUNtktxfkiBUxRsoQ/KQQG5E8KXNRILSG6EvSU=
+	t=1777203606; cv=none; b=BgWWkSwePaCBvezxNSGE9T9CNd5B+O/0LtnGKEQArucCXjYG+6UM/j0HTRcKQnAql2+zeXs3mJEzi1dZVa8iE+2PAABfuZEpMQKlXycLVrCEBqwKK4W6NeHhckG6PCzPxZizD3A3Cad2ue4zh1E04njLXZrgfDdj0NbZ4ABFIS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777158138; c=relaxed/simple;
-	bh=lgAscZeGJEajWb71MvQbKXc3Yrehk0mCapJuqOJ7b+A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bDx88V9VuU9FY3RE2VDxAXJBXS2tqigh9vNPpFk+JZYfu2LQDcmmmi6Q79osLLFaEei4WqjsUHB221v39bU5eLz2LiVhy2fgnAYNQnr+uI68NbrJtOnMUebwu9P7ucmwn/vgHnf2eCIIKs9LNKrFoH15MiKaOEP/kTyWyjuVlF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=VnTc4KLH; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1777203606; c=relaxed/simple;
+	bh=uUSWvtReHSlFTIbCuzSEBV2iRHYiwBnsryAviXJOa88=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H/ye5sustyQui2v2Wf4yMSlfNCw91cfs7pylAX9fr+kTqz9tuMgg/7RtDqlPhqab52kVBdzKzOgvsvRpnybSHL3CxlUaaqPifXBxDjKRU3omim9DKqFmEioKPjhk9N34IYoOax8/XCZD4qtStkyp4V7rMa6KzSriAJQx6urcV0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tN0zX9my; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rQsn9D3n; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tN0zX9my; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rQsn9D3n; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="VnTc4KLH"
-Message-ID: <5af92cc7-9767-41a7-8791-ee87687e6df3@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1777158130;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1nWeSSW4zE1n0Zzv3OlprkdpOlEx9r50j2O2xYOVRqk=;
-	b=VnTc4KLH7yoQTCa16k+93DtpfTl77CY8CtXiWVJNZ0R+MVP9PKUrLx2J0juZP2uk8QLwwU
-	k+Rpy04m+x+1P4wvy4WM08qov10+Uf67EDE2BlRTJDMMEBQ229HPXcGKa+cVcsyEt338bM
-	rO5zHhElY1XUiTmnnkgqdq/VWewyKREk3+HOzdSmrN/W5Wy4/7HFCyU0/D9Ak+w76q+ljz
-	Rlu69YQfKP09xTfvYX5F0EUzy6zuE1brtQ+5h0NBuVjA1tFWUR36h+BsZrpPQsvZv38+CB
-	K9AtkBSX1r38pQZbdKK79Uw7rOb4JvUoyLVyvI+MJvvdAKNYr/M44hz7KBmfeA==
-Date: Sun, 26 Apr 2026 07:01:53 +0800
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tN0zX9my";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rQsn9D3n";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tN0zX9my";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rQsn9D3n"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 8EBB65BD1F;
+	Sun, 26 Apr 2026 11:40:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1777203603; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=k7CUfRvC2GQWVFD5dgWSAr1t4h4XzQuC/Gopo1bQkaY=;
+	b=tN0zX9myvyJDu4FF1C5TytJTK1AwB4LTElk395KN+x/We8hVR+0AKGg/1xi4NsP7THOEQf
+	CW1OXyetzz9m1vK+oYJadWocHcuLAoNfvhcqOA4kg7Q9yiJT1tB9mROyovf4AakafkFa5D
+	RQfpGRJFfZLP2vOjKtUnkzGPQKHxQiE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1777203603;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=k7CUfRvC2GQWVFD5dgWSAr1t4h4XzQuC/Gopo1bQkaY=;
+	b=rQsn9D3nJJcJXLzty0AdkVmvMP7DwktBdYIIEwnjiyIwcOAmARKHwbH4W+hfRYupcHRLTu
+	dVK9265JCAxiS+BQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=tN0zX9my;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=rQsn9D3n
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1777203603; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=k7CUfRvC2GQWVFD5dgWSAr1t4h4XzQuC/Gopo1bQkaY=;
+	b=tN0zX9myvyJDu4FF1C5TytJTK1AwB4LTElk395KN+x/We8hVR+0AKGg/1xi4NsP7THOEQf
+	CW1OXyetzz9m1vK+oYJadWocHcuLAoNfvhcqOA4kg7Q9yiJT1tB9mROyovf4AakafkFa5D
+	RQfpGRJFfZLP2vOjKtUnkzGPQKHxQiE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1777203603;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=k7CUfRvC2GQWVFD5dgWSAr1t4h4XzQuC/Gopo1bQkaY=;
+	b=rQsn9D3nJJcJXLzty0AdkVmvMP7DwktBdYIIEwnjiyIwcOAmARKHwbH4W+hfRYupcHRLTu
+	dVK9265JCAxiS+BQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B2FCA593B0;
+	Sun, 26 Apr 2026 11:40:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id +CHwGJH57Wm0ewAAD6G6ig
+	(envelope-from <ddiss@suse.de>); Sun, 26 Apr 2026 11:40:01 +0000
+From: David Disseldorp <ddiss@suse.de>
+To: linux-cifs@vger.kernel.org
+Cc: Steve French <smfrench@gmail.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	David Disseldorp <ddiss@suse.de>
+Subject: [PATCH] smb/client: remove unused smb3_parse_opt()
+Date: Sun, 26 Apr 2026 21:39:37 +1000
+Message-ID: <20260426113937.30818-1-ddiss@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] smb/client: fix unaligned reads in wsl_to_fattr()
-To: Steve French <smfrench@gmail.com>, Youling Tang <youling.tang@linux.dev>
-Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- senozhatsky@chromium.org, dhowells@redhat.com,
- chenxiaosong@chenxiaosong.com, gregkh@linuxfoundation.org,
- linux-cifs@vger.kernel.org, Youling Tang <tangyouling@kylinos.cn>
-References: <20260423055915.695024-1-youling.tang@linux.dev>
- <CAH2r5muDQM93tWbEtjbYsUVjnQcERKhCHjwmJJmjcA54ZxUS6A@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <CAH2r5muDQM93tWbEtjbYsUVjnQcERKhCHjwmJJmjcA54ZxUS6A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	URIBL_BLOCKED(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.org,suse.de];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 8EBB65BD1F
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
 
-Some older architectures require strict alignment, we will set up 
-virtual machine environments for testing.
+Commit abdb1742a3123 ("cifs: get rid of mount options string parsing")
+removed the last caller.
 
-On 2026/4/25 05:41, Steve French wrote:
-> Were you able to reproduce this bug with a test?
+Signed-off-by: David Disseldorp <ddiss@suse.de>
+---
+ fs/smb/client/cifsproto.h  |  1 -
+ fs/smb/client/fs_context.c | 31 -------------------------------
+ 2 files changed, 32 deletions(-)
+
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 884bfa1cf0b42..b7cd67b64a833 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -89,7 +89,6 @@ int cifs_handle_standard(struct TCP_Server_Info *server,
+ 			 struct mid_q_entry *mid);
+ char *smb3_fs_context_fullpath(const struct smb3_fs_context *ctx, char dirsep);
+ int smb3_parse_devname(const char *devname, struct smb3_fs_context *ctx);
+-int smb3_parse_opt(const char *options, const char *key, char **val);
+ int cifs_ipaddr_cmp(struct sockaddr *srcaddr, struct sockaddr *rhs);
+ bool cifs_match_ipaddr(struct sockaddr *srcaddr, struct sockaddr *rhs);
+ int cifs_discard_remaining_data(struct TCP_Server_Info *server);
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index a46764c247107..6433eb2093dce 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -536,37 +536,6 @@ cifs_parse_smb_version(struct fs_context *fc, char *value, struct smb3_fs_contex
+ 	return 0;
+ }
+ 
+-int smb3_parse_opt(const char *options, const char *key, char **val)
+-{
+-	int rc = -ENOENT;
+-	char *opts, *orig, *p;
+-
+-	orig = opts = kstrdup(options, GFP_KERNEL);
+-	if (!opts)
+-		return -ENOMEM;
+-
+-	while ((p = strsep(&opts, ","))) {
+-		char *nval;
+-
+-		if (!*p)
+-			continue;
+-		if (strncasecmp(p, key, strlen(key)))
+-			continue;
+-		nval = strchr(p, '=');
+-		if (nval) {
+-			if (nval == p)
+-				continue;
+-			*nval++ = 0;
+-			*val = kstrdup(nval, GFP_KERNEL);
+-			rc = !*val ? -ENOMEM : 0;
+-			goto out;
+-		}
+-	}
+-out:
+-	kfree(orig);
+-	return rc;
+-}
+-
+ /*
+  * Remove duplicate path delimiters. Windows is supposed to do that
+  * but there are some bugs that prevent rename from working if there are
+-- 
+2.51.0
+
