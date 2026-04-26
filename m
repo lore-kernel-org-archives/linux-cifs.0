@@ -1,177 +1,162 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10FA36606E
-	for <linux-cifs@vger.kernel.org>; Sun, 26 Apr 2026 14:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777215564; cv=pass; b=M2TwRlwl+p6vGrSnoUTkEdvFGoCRuInUJSSO/1x46HtR/pmGyoGmkuUETlpGRAZWmJxJu1ZQAVfDUrvhZXduUFqC2zjU2STWpTThRsut1Rz18YahrHQApR9+chtBRbstgSTu1681KILDrQHwssEdXfKuH3Rc9tKnz9BZaeFWv9k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777215564; c=relaxed/simple;
-	bh=FyclejuoWn+ZBtJ70nHrI/yW4N8y/zuPq8g0XnPXNik=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574CF30FF26
+	for <linux-cifs@vger.kernel.org>; Sun, 26 Apr 2026 23:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777245641; cv=none; b=TcCQzQrmn280p8Jgk6PLfCmN8DnTrtrnBmFe3XKnbtTZ+pO0pW48g023e9kILiITg26odTzlLTdrZC2cjQFNbBYLYhNzFL9L9ZDpDca0rN2sI3wW/yEFKwxs4JNkgQ5PnP1UWuNX7W2E1mlwsdZTXWstsOE1IMkJpMDFxWRR57Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777245641; c=relaxed/simple;
+	bh=nvGVeBtfYsUcgVw17JBTnGRVww7D39S5R1eek3HADJ8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 Cc:Content-Type; b=KxJJndqWjChyE8fWUJXYGP8aP6ZbhZdPgpILleDCZvW38okt+ZQ5yMT01E6PyMpqHCgoFxyyf3RA349CjCpOIn22JfFLNHn/tUIW8BtThNJk5pNZjgR+Eb28GL09gEMKglyGLsd3UnS4Qu615nhIJnn8ApbwAsKZaWBtxJa/AfU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JSPoYPSG; arc=pass smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=q/+JdBZ+tNA6a198rHHql9YuWvQhTWgdaggSMY7Sp5KpytqAiUBYMeFNpaL41wBwYHYos08YLaRNETzC+c9ijCs42Agio65Mr+0sX72/CS2HRceH5tfkrywO+61YVgA8Q6trMumD2uzuKFcxDBreuiN++S4xEPhGCyq0B5DHlwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dojPkt8C; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSPoYPSG"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8a3342d301aso92816656d6.2
-        for <linux-cifs@vger.kernel.org>; Sun, 26 Apr 2026 07:59:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777215561; cv=none;
-        d=google.com; s=arc-20240605;
-        b=R+5r/5RZxKV0SXNsJiWuyjsWxeHC6N4kalN7P8yFLFhOzWRK7XnheeeGMUY3g6hY0j
-         jhsxEefe/rA01ULKUBkPfwPMknK6Ax4hUeAMZGuNxuoyGhUuv3dm79AFwyq6glIW8FbW
-         M6Idmfs241LdRIdlLvwW5386su5yTBkqmU2wDPoWWGIMDBuzqPmH5nNwMzhlWkc2CKGj
-         qkDI03CWfSKFtyPTNcrD6dpCGn+sSlUijJp2IP3JxU0OM//JkrPuL/qRvXCfUwbQt5e0
-         ZgVc6eH6rz5afTUpRF4HZYCPj80heHDj7/ryV1beJ/kYS7la70619WwVpHFBe72UuVuC
-         p2dQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=zF0mSkpCTd9gf0y2Vh/4eRYgli1GbY5jW0zYMELFAZU=;
-        fh=GydoE0dVrH5U3riezLVKMH3u3AyK4m1H8UYvAkR9/9Y=;
-        b=XI96Jm6U9U/Y1Ym+OnKT1w8qxeORyDIa7LE6Q9FVkmoxtP4axuElixg+6i8bI7vAVt
-         pFyQLZG7+ZhXY9LwDYt3N8fzpKEzhsb3Wit9aFubmhQAbbQfKDM5euBhSrVZ+0yPqzBi
-         DcM2bEP9PglIlzEC2wv571AvK2l91VDm9SYq5/23i8kvB53y25evfXMMzMfdjTozKqsI
-         6lPyEbVpMTKWvR8ccCJCeDBRdDyH04AibGPidKvNBets+pL5cw3xqFKVPLxB5NlBl+ix
-         6zVpTBtQBUgF6XpIQ236sL1p+qwwtLtcCTF+WaEuH0OGPC1JtHtQ0zzenUooGQYewWcf
-         ecKg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777215561; x=1777820361; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zF0mSkpCTd9gf0y2Vh/4eRYgli1GbY5jW0zYMELFAZU=;
-        b=JSPoYPSGsc0JYGdvpPFVtsVOdCiGgdc9w394x9mS8iT7NhIqqBJqgPaMKEGohPcQY5
-         a3vHcKQJQxHLPaaEODrARQlflEMteyWeYXeO3MsdO+9ei0SqQW+qCfDM88/Xuv5B1rin
-         kU1SOiXTjP4+kYZd1UDDSy0m3Czmy1wgzLcxEv4HOiFLRjltze8fKSR1oPAZgV5RO4XI
-         XfHvj90qDfbpul3cknEHV64LYQihwHkW1hpolB4Mk/iO45LmBak0aftSkOZkb9P7MCan
-         mn1d4Q8+EOM7vusMNHc+YVdBlej89esq+diW7uV0gHrnRrYLjcPz86BwCr+Lb7e4ZqZ9
-         I8zQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777215561; x=1777820361;
-        h=content-transfer-encoding:cc:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zF0mSkpCTd9gf0y2Vh/4eRYgli1GbY5jW0zYMELFAZU=;
-        b=ioArYaijMB4WPwUcgNmhKICqI/5XGgoGONcUNvsjjmehms19C3zwfi6VMaGLUJfkdO
-         MexX1ciw+lBRNxCJbclDiSH5/75O4nXBXBtFwTUAs1gNUpa9zFdTy1k+rSeswwBm3b1Y
-         QHF/JiwVOAJRpBwxI8nk/sJNXqdde7crD8Smr/uyq8qgy9trFjoNrpIacY4ICsofRgGD
-         PADktB9dN+SQldPj0fmWHqBJRoK0c9OkO6eR1kvHT/cY1kaaq9AL0bMPVkTWocMZ6sue
-         tPm3Ju3edf9z3+xhNm4di3l1uyOn9LjiQmfLK1fuwH02AjtpjcTOCQyaHAIRayX7iDVl
-         bkJg==
-X-Gm-Message-State: AOJu0YxbTEZ9YFdtVCdBt2TdFpsgujtksIlz2Y54q/45fWvPYBsrJZBP
-	YjoOMc9fWNu7sMzqdfLjufjY+/LJ5rcisqRoAWecxjkqBKrFhiQpjllvu72elgU8mUR+MVA19dj
-	IQo/GPK59pC2VFQnCB4/I/iMh63mJ7AKlYA==
-X-Gm-Gg: AeBDiev+s0w/pRBx4B2ihlbS5zxm+4c6lVzjiq5/mWcer4V4H79gUg51nt5LQIXD6xM
-	LAjJx3mb2jHaTuhxH3RZoD7PPtyzTZhokcKYkwBQo0nskQ2CtfyA4OhY/EiRvyfphQxkRrwo/jb
-	UQMKT5lIQUPEI/jprOfcUraGLzEKxtY/wC3porI79l9fm5i2eLa98MTy6zZJ98+iUFkm5bUl6f6
-	uc9nts2VHZSpzHEQ7iOzU7u5CqFVDcdF+qbrx7VIMDbhWpM93G9sGkPeIYQxSHpNAkZ0JfvACGQ
-	B3q58FZahlzZNs3nT+BWxaopb3JKEWbDSmLeJJTWkqNtAzv0FinzfvCMyNgx/lbLQj656E4CKet
-	/XPCIxngAOrOVVSdeBCHSvOBh3LUvygIN8u/qrDT7OkYMIjvNhLMw07WcZXC/TfE1b+aMbORDxr
-	Obd+MuQsniXt0v+cnui0Op7P3tpGhBy90=
-X-Received: by 2002:a0c:e008:0:b0:8ac:8cbb:49bd with SMTP id
- 6a1803df08f44-8b028114e9bmr592609036d6.38.1777215561570; Sun, 26 Apr 2026
- 07:59:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dojPkt8C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22989C2BCC4
+	for <linux-cifs@vger.kernel.org>; Sun, 26 Apr 2026 23:20:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777245641;
+	bh=nvGVeBtfYsUcgVw17JBTnGRVww7D39S5R1eek3HADJ8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=dojPkt8CccGGCftE76eUDF5rtRdW/sXPJ9GxN6mYTcJWGPWM2ShT0o/v5vzQu2G1r
+	 Xk4Y6z/esheZirjq152283SSiJGeyp39vubIWfCVl3iR3EwkLGok8y4jhsZPgCHrP8
+	 ZxiK6bxjbGEIpQgjcFvA//I3lz0kYRFoQQMuRJAsKomQtxQytOW9wOy572c88Yk1oV
+	 wyfIQfy4+84sRZiS7xXl896cBYtSbwwslNL146olbwNlxkkaZ9MMih3d5TVX1JYeNJ
+	 CNDQFoj0mPqo3gCynVX2Ds0XFOV/nmynsF8Zl0+7KETnKKvRTi1C5DF0pdkthiyWV2
+	 0dy3pJxOMW1yw==
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b8d7f22d405so1618039066b.0
+        for <linux-cifs@vger.kernel.org>; Sun, 26 Apr 2026 16:20:41 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ/2RPGjXN9sPzXGjIASu2fdGPDaKbBIyEelMF3G8baQHBYkGkuGIUIsIzRPHwbcGja0qIRag0WV+0qV@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvmhmumyzclFq6yX5FdciBimD0QuQVbER/wmfo0NVMGV0d537k
+	yObPHy1gPPGAkDvVJC4gsSIjQA/RqJbD3zvmhTHVwgnPQcn8SbAX3Zg81YcDaSlCLjP4mZ3O7NY
+	aXmESd9zDfgkMAz8M7CoAEStjE67kkdI=
+X-Received: by 2002:a17:907:9349:b0:ba9:aeaa:fd01 with SMTP id
+ a640c23a62f3a-ba9aeab051cmr1285294366b.43.1777245639618; Sun, 26 Apr 2026
+ 16:20:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260426113937.30818-1-ddiss@suse.de>
-In-Reply-To: <20260426113937.30818-1-ddiss@suse.de>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 26 Apr 2026 09:59:10 -0500
-X-Gm-Features: AVHnY4In-YCUMovybsGDnc6igsUH1JOaZJREkKU7lgEcnJzuPFUKw0h3-QvHlIQ
-Message-ID: <CAH2r5mtu3CR+YLc+AzUW4Q00dZcumxKGCjHJZoj76yweakW5ig@mail.gmail.com>
-Subject: Re: [PATCH] smb/client: remove unused smb3_parse_opt()
-Cc: linux-cifs@vger.kernel.org
+References: <20260425093829.4004785-1-charsyam@gmail.com> <20260425093829.4004785-2-charsyam@gmail.com>
+In-Reply-To: <20260425093829.4004785-2-charsyam@gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Mon, 27 Apr 2026 08:20:27 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_oxKjy=j0BVZEz9+1Fy6KjqawONNkZYgR4hnJxfOsuDA@mail.gmail.com>
+X-Gm-Features: AVHnY4Ixj8jolHA9kxXW5RMLvJ7mOQ0Qe2E80ooXjLu56fQkkSYnsrf2e3HvAFA
+Message-ID: <CAKYAXd_oxKjy=j0BVZEz9+1Fy6KjqawONNkZYgR4hnJxfOsuDA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] ksmbd: rewrite stop_sessions() with restartable iteration
+To: DaeMyung Kang <charsyam@gmail.com>
+Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, Hyunchul Lee <hyc.lee@gmail.com>, 
+	Ronnie Sahlberg <lsahlber@redhat.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next
-
-
-On Sun, Apr 26, 2026 at 6:40=E2=80=AFAM David Disseldorp <ddiss@suse.de> wr=
-ote:
+On Sat, Apr 25, 2026 at 6:38=E2=80=AFPM DaeMyung Kang <charsyam@gmail.com> =
+wrote:
 >
-> Commit abdb1742a3123 ("cifs: get rid of mount options string parsing")
-> removed the last caller.
+> stop_sessions() walks conn_list with hash_for_each() and, for every
+> entry, drops conn_list_lock across the transport ->shutdown() call
+> before re-acquiring the read lock to continue the loop.  The hash
+> walk relies on cross-iteration state (the current bucket and the
+> hlist position), which is not preserved across unlock/relock: if
+> another thread performs a list mutation during the unlocked window,
+> the ongoing iteration becomes unreliable and can re-visit
+> connections that have already been handled or skip connections that
+> have not.  The outer `if (!hash_empty(conn_list)) goto again;` retry
+> masks the symptom in the common case but does not address the
+> unsafe iteration itself.
 >
-> Signed-off-by: David Disseldorp <ddiss@suse.de>
-> ---
->  fs/smb/client/cifsproto.h  |  1 -
->  fs/smb/client/fs_context.c | 31 -------------------------------
->  2 files changed, 32 deletions(-)
+> Reframe the loop so it never relies on iterator state across
+> unlock/relock.  Under conn_list_lock held for read, pick the first
+> connection whose ->shutdown() has not yet been issued by this path,
+> pin it by taking an extra reference, record that fact on the
+> connection and mark it EXITING while still inside the locked walk,
+> then drop the lock.  Then call ->shutdown() outside the lock, drop
+> the pin (freeing the connection if the handler already released its
+> reference), and restart from the top.
 >
-> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> index 884bfa1cf0b42..b7cd67b64a833 100644
-> --- a/fs/smb/client/cifsproto.h
-> +++ b/fs/smb/client/cifsproto.h
-> @@ -89,7 +89,6 @@ int cifs_handle_standard(struct TCP_Server_Info *server=
-,
->                          struct mid_q_entry *mid);
->  char *smb3_fs_context_fullpath(const struct smb3_fs_context *ctx, char d=
-irsep);
->  int smb3_parse_devname(const char *devname, struct smb3_fs_context *ctx)=
-;
-> -int smb3_parse_opt(const char *options, const char *key, char **val);
->  int cifs_ipaddr_cmp(struct sockaddr *srcaddr, struct sockaddr *rhs);
->  bool cifs_match_ipaddr(struct sockaddr *srcaddr, struct sockaddr *rhs);
->  int cifs_discard_remaining_data(struct TCP_Server_Info *server);
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index a46764c247107..6433eb2093dce 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -536,37 +536,6 @@ cifs_parse_smb_version(struct fs_context *fc, char *=
-value, struct smb3_fs_contex
->         return 0;
->  }
+> Use a new per-connection flag, conn->stop_called, as the "shutdown
+> issued from stop_sessions()" marker rather than reusing the status
+> state.  ksmbd_conn_set_exiting() is also invoked by
+> ksmbd_sessions_deregister() on sibling channels of a multichannel
+> session without issuing a transport shutdown, so treating
+> KSMBD_SESS_EXITING as "already handled here" would skip connections
+> that still need shutdown() to wake their handler out of recv(),
+> leaving the outer retry waiting indefinitely for the hash to drain.
+> stop_sessions() is serialised by init_lock in
+> ksmbd_conn_transport_destroy(), so writing stop_called under the
+> read lock has no other writer.
 >
-> -int smb3_parse_opt(const char *options, const char *key, char **val)
-> -{
-> -       int rc =3D -ENOENT;
-> -       char *opts, *orig, *p;
-> -
-> -       orig =3D opts =3D kstrdup(options, GFP_KERNEL);
-> -       if (!opts)
-> -               return -ENOMEM;
-> -
-> -       while ((p =3D strsep(&opts, ","))) {
-> -               char *nval;
-> -
-> -               if (!*p)
-> -                       continue;
-> -               if (strncasecmp(p, key, strlen(key)))
-> -                       continue;
-> -               nval =3D strchr(p, '=3D');
-> -               if (nval) {
-> -                       if (nval =3D=3D p)
-> -                               continue;
-> -                       *nval++ =3D 0;
-> -                       *val =3D kstrdup(nval, GFP_KERNEL);
-> -                       rc =3D !*val ? -ENOMEM : 0;
-> -                       goto out;
-> -               }
-> -       }
-> -out:
-> -       kfree(orig);
-> -       return rc;
-> -}
-> -
->  /*
->   * Remove duplicate path delimiters. Windows is supposed to do that
->   * but there are some bugs that prevent rename from working if there are
-> --
-> 2.51.0
+> Set EXITING inside the locked walk so the selection, the stop_called
+> marker, and the status transition all happen together, and guard
+> against regressing a connection that has already advanced to
+> KSMBD_SESS_RELEASING on its own (for example, if the handler exited
+> its receive loop for an unrelated reason between teardown steps).
 >
-
-
---=20
-Thanks,
-
-Steve
+> When the pin drop is the last put, release the transport and pair
+> ida_destroy(&target->async_ida) with the ida_init() done in
+> ksmbd_conn_alloc(), so stop_sessions() retiring a connection on its
+> own does not leak the xarray backing of the embedded async_ida.
+>
+> The outer retry with msleep() is kept to wait for handler threads to
+> reach ksmbd_conn_free() and drain the hash.
+>
+> Observed with an instrumented build that logs one line per visit and
+> widens the unlocked window before ->shutdown() by 200 ms, under
+> five concurrent cifs mounts (nosharesock, one connection each):
+>
+>   * Current code: the same connection address is revisited many
+>     times during a single stop_sessions() call and ->shutdown() is
+>     invoked well beyond the number of live connections before the
+>     hash finally drains.
+>
+>   * Rewritten code: each live connection produces exactly one
+>     ->shutdown() call; the function returns as soon as the hash is
+>     empty.
+>
+> Functional teardown via `ksmbd.control --shutdown` with the same
+> five mounts completes cleanly on the rewritten path.
+>
+> Performance is observably unchanged.  Tearing down N concurrent
+> nosharesock cifs connections with `ksmbd.control --shutdown` +
+> `rmmod ksmbd` takes essentially the same wall time before and after
+> the rewrite:
+>
+>     N        before        after
+>     10       4.93s         5.34s
+>     30       7.34s         7.03s
+>     50       7.31s         7.01s     (3-run avg: 7.04s vs 7.25s)
+>    100       6.98s         6.78s
+>    200       6.77s         6.89s
+>
+> and the number of ->shutdown() calls equals the number of live
+> connections on both paths when the race is not widened.  The
+> teardown is dominated by the msleep(100)-based outer retry waiting
+> for handler threads to run ksmbd_conn_free(), not by the iteration
+> itself; the restartable loop's worst-case O(N^2) visit cost is in
+> the microseconds even at N=3D200 and sits far below the msleep(100)
+> granularity.
+>
+> Applied alone on top of ksmbd-for-next-next, this patch does not
+> introduce a new leak site.  Under the same reproducer (10x
+> concurrent-holders + ss -K + ksmbd.control --shutdown + rmmod), the
+> tree still shows the pre-existing per-connection transport leak
+> count that arises when the last refcount drop lands in one of
+> ksmbd_conn_r_count_dec(), __free_opinfo() or session_fd_check() -
+> all of which end with a bare kfree() today.  kmemleak backtraces
+> for the unreferenced objects point into the TCP accept path
+> (sk_clone -> inet_csk_clone_lock, sock_alloc_inode) and none
+> involve stop_sessions().  Plugging those bare-kfree sites is the
+> responsibility of the follow-up patch.
+>
+> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
+Applied it to #ksmbd-for-next-next.
+Thanks!
