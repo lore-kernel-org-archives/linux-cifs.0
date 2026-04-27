@@ -1,169 +1,115 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46ABA39B959
-	for <linux-cifs@vger.kernel.org>; Mon, 27 Apr 2026 12:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777291341; cv=pass; b=aQVBfXKUS8Dz2Wv1scGjF3ZDXCm0DVKpLn+4IdFP6Ra/DbrBYXsmi0yScjRFjCzqSiT931BCK+eSp22XG5+qDGrxK0QrQrIIAdXJBKQg8p4KcuUIcWNaNp4wdBkeQ/CJEEMdM1ER8uHbRw3DKPTO5LksY6LIxvunoJi5NdY9UY0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777291341; c=relaxed/simple;
-	bh=f7oNU5FaDQl+Nkbi/6/Ivnlhsv7ogl5Ysmt1I3aNaRg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eBCDJEAMBmEEag6ABr4SvCIdWH3oxxxb/lLHiH/UQg9WrDZFr02h8m4uy73EOtkkwN5LyqcZ7Nxwtrmphv7/nEk9rk5g8KHRZ2NWdkH8dcU4cYCU82mq7dUHDjIQIr1/QfE+waLj5250UdilXWR/kxE2rLYSmfN5fcdWC8V1TJw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L1Qji05Y; arc=pass smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F286B3CAE68
+	for <linux-cifs@vger.kernel.org>; Mon, 27 Apr 2026 13:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777296487; cv=none; b=ZhOYujqKqoMSS5DI/AK2dmWZMiX3U7THQJ504Y0lOEzmREHGgcQTMERcd56xl4fb8YFbCCHSv4eQxA3QIzFu4NQfgqTQdFew88S4+/7aiCWTulgFipn8X+BWwzGxDdnxmJ8EGPz3ewLnHQISOudPOzppnv/BR/GS82L1yrhKwPA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777296487; c=relaxed/simple;
+	bh=bl50Ep5/p8ND33Uem3F9a2mCUjhFig1ZZdRelrFhzvs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=rH6+b+pRRc6bjp+QSyB/8464VgyaEMGQKwrD8ontDmDviSjmP576Va9JJT3LX3UD/Psr7L79X8foAPRB5jF+suoECnQJ9bKVVyx09WNnKw5Cl14BFd3ZndHno7xVkoA03XlI5kbSRQGYoj/Wcwe4Vi29PggkzvMxpNE7MMe+Cy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QqBloQlG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1Qji05Y"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-67893fba9c3so7820586a12.2
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Apr 2026 05:02:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777291339; cv=none;
-        d=google.com; s=arc-20240605;
-        b=KqIBDl6jReuhBMHLubW26HgRejvC/x6HVozpN8D4d8vUuxawhijJ0CvMIiraPZz2xJ
-         y/uxeG6VbOP+NZ/6ZWvT5KthT65KPCCJ8dZvTrs7Nk8ox5JAOOtfksc5NC6G5HIvW3Fz
-         df0+mTN7qUhJ6Db8akVNhu4+cycQz3h4lYYngB3K0OHvrSDza2dVog1rbwUltDHX0C7B
-         W5hnNvG/0izzrIIdpapbRwvaNGYaP/O4Nh4OClHkl1KFAsBB36R3/78ad9+qYNrrTLsi
-         D6RU2W/f2SC1mGt3E0Ijm37xBqHywf6VvMehXjhIR/m/1XhiPC2KQlf591kcHxUrjD6K
-         SmMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=bSw1aMO32TuHJYbNOmDfdqPOAHdqlsV6G0A1b+WUvMY=;
-        fh=4oQIyvumlZBsyb90Glk6lrvy2BumXX/vaMEbkefBi6E=;
-        b=dCSikrVnYTkw9rZfqE/7Z4EqJkdW6TfjD6UR+DVFDjTBPWMPEsc3Pge2RxVxVDW9Oc
-         iLqoemxi7ARoOkdLsNkAyOHQNjjJOnaAqSKVjacHDpr6CMRtPJWNLH5U9LobxDM/EuBi
-         opcpPQ9B2whrsxKL40MIQFQDYrUHT3orKhi0BX3p5MID+hvgGPMt34F2+ASKYysFXZVN
-         9FQqvjSspl2WAvR2WgFZOIQmkELdPgEbGT/S7HEplqIiNxJ9LyGved7PoZTOXzpTW4+Z
-         4JDAcwPA5nzE/gv9r79vo3JKbBU1JqfZGOv2PE2MjXazIX/yZQIPtnthYbrHa/UzdxCI
-         R7xg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777291339; x=1777896139; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bSw1aMO32TuHJYbNOmDfdqPOAHdqlsV6G0A1b+WUvMY=;
-        b=L1Qji05YBSR2Px1RPMh0Qij8MMdumsVHV5YhEmf2miBD194l4h2f4Z7suJgFn1jtUi
-         nzfd7Qh5/RECtOiX7nuAY1uhhuzoTTrXeMLpEZrhbXjht25kKCDiiIthtTp3DVHH5Nqx
-         eMrNP697teAtC8Hv70hpPCgecgtZdpvh2VsT5utyY5amkOAKY+Yw0YFGZ/BKhJ1O6/Lw
-         qfJ3koSwuyZNC3NIanPJvHA7FAEzxMODU8ZsjqoAInWEwJvYyPQ2vbfnqaO+SOYsAp7/
-         a/kbMqdC5MiCHNxJE+BLEO8y0jN6NVDA5IEUYIDJmJJouMA+qdoOSNLNGUIDhH2IoA7V
-         DMfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777291339; x=1777896139;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bSw1aMO32TuHJYbNOmDfdqPOAHdqlsV6G0A1b+WUvMY=;
-        b=GtL3ZgKLCiTwMR/+UHGxD+ARmm+n/o3+Q3aUVptlKjFaSBGk+HiGkpprzumAFvo60N
-         vLs40xC4xHFPR3zjdBw9CCEQV3qw2PWnu3GnvPlnuD65XgADffEgSZL+e7Fbt0GYlTXl
-         NFnnQmqpvjWGxAd2088duez1gAK1mO1QkkfbfU10Dlfc7SqvOiBAzmDStu0i/1pu0Xgq
-         /6z4tL0ulPGlXwgDIp8hmXnh4gtX5Yi+LofpuYtxuCQW9Yy9DfKFhnXWgoD0LtWpXknl
-         +uvP+v3WccIWnJEfQU5ZIiRngzk8WAFcNDvsQ1axIavsbrM7E18fdmb1XpBOspfPfJU6
-         nSaA==
-X-Forwarded-Encrypted: i=1; AFNElJ8xFPhqdga490eFyVzSFzHEv3XKsn5QHW9X4hoUN4Xk3oRqDdi2uMofQV/hnEdi3VeX+A3Prvr5ZWF9@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywm17RnZxxXdg++pWK0RtKTnZDEupRa5myLXwbtVG+ruDS5m7DE
-	hboPROL06RM8TvL2AfdwPOMX/emvRpq6BJXg3kvgCsHfYez3KM2i447cpJfrP3VSrSERIxenKng
-	qU8NEYsNecFADwMdmNQD7XxCZP66p0pY=
-X-Gm-Gg: AeBDiev/vosJRKvhsoF6Yr91M0Aqn111/q5bGQs+jIqI80g+LCodaiKYdum8CjlVw6p
-	2KgGcNaiFTwY0p7tB/W4voN0NMDKrkbAnCoQNlHEC+HOJ3y9v+jxgx+hAhpz8JbEa5SWBcwUdWJ
-	qa6uQ8cwTKEGpCgD8bnt5M6VfN6eO//Q+JdYLdYzRJJ4yrgEdkM0/Yt0/Bvun2kWqlfHBtc9YTz
-	fEDPNogtnqdQaBr3colUOVPDrNbqKpDWUCH3/ffrLJFUJljDhZt7QVe7ivWnNNaYmEfvOmZdbMF
-	x5a7KVSqZcn08y7BabxaY/3rktsU
-X-Received: by 2002:a05:6402:c46:b0:670:d548:da79 with SMTP id
- 4fb4d7f45d1cf-672bfd87175mr18491070a12.3.1777291337998; Mon, 27 Apr 2026
- 05:02:17 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QqBloQlG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777296483;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eB5Kgu6P3tnZXGszhQUVKu+SbjuqgQqzL2PHunRJg4s=;
+	b=QqBloQlGpJ6KLCpPQzKgCKgOItHzH+PB6ArejMrHLxYOJH0YbsLBG0oaDu9iLh+XQ1fupx
+	K5ZRtlEu4ypcUTgqurmMJg3EFTr6q6EYtAq7ERffMn91xPumXucQusKtWDSk5UCBJWQNNj
+	6LGQbYVhKG9mFU2sFPHw/imCFUm747A=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-358-xvuMkHvJNe-8r8RECjYy7g-1; Mon,
+ 27 Apr 2026 09:27:59 -0400
+X-MC-Unique: xvuMkHvJNe-8r8RECjYy7g-1
+X-Mimecast-MFC-AGG-ID: xvuMkHvJNe-8r8RECjYy7g_1777296475
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 66EE318002C6;
+	Mon, 27 Apr 2026 13:27:53 +0000 (UTC)
+Received: from fweimer-oldenburg.csb.redhat.com (unknown [10.44.48.4])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5C3B3180047F;
+	Mon, 27 Apr 2026 13:27:40 +0000 (UTC)
+From: Florian Weimer <fweimer@redhat.com>
+To: Dorjoy Chowdhury <dorjoychy111@gmail.com>
+Cc: linux-fsdevel@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-api@vger.kernel.org,  ceph-devel@vger.kernel.org,
+  gfs2@lists.linux.dev,  linux-nfs@vger.kernel.org,
+  linux-cifs@vger.kernel.org,  v9fs@lists.linux.dev,
+  linux-kselftest@vger.kernel.org,  viro@zeniv.linux.org.uk,
+  brauner@kernel.org,  jack@suse.cz,  jlayton@kernel.org,
+  chuck.lever@oracle.com,  alex.aring@gmail.com,  arnd@arndb.de,
+  adilger@dilger.ca,  mjguzik@gmail.com,  smfrench@gmail.com,
+  richard.henderson@linaro.org,  mattst88@gmail.com,  linmag7@gmail.com,
+  tsbogend@alpha.franken.de,  James.Bottomley@HansenPartnership.com,
+  deller@gmx.de,  davem@davemloft.net,  andreas@gaisler.com,
+  idryomov@gmail.com,  amarkuze@redhat.com,  slava@dubeyko.com,
+  agruenba@redhat.com,  trondmy@kernel.org,  anna@kernel.org,
+  sfrench@samba.org,  pc@manguebit.org,  ronniesahlberg@gmail.com,
+  sprasad@microsoft.com,  tom@talpey.com,  bharathsm@microsoft.com,
+  shuah@kernel.org,  miklos@szeredi.hu,  hansg@kernel.org
+Subject: Re: [PATCH v6 1/4] openat2: new OPENAT2_REGULAR flag support
+In-Reply-To: <20260328172314.45807-2-dorjoychy111@gmail.com> (Dorjoy
+	Chowdhury's message of "Sat, 28 Mar 2026 23:22:22 +0600")
+References: <20260328172314.45807-1-dorjoychy111@gmail.com>
+	<20260328172314.45807-2-dorjoychy111@gmail.com>
+Date: Mon, 27 Apr 2026 15:27:37 +0200
+Message-ID: <lhuzf2oy1me.fsf@oldenburg.str.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260424-case-sensitivity-v11-0-de5619beddaf@oracle.com>
- <20260424-case-sensitivity-v11-12-de5619beddaf@oracle.com> <isfgwmd5hxjfn7dj7p54yzlhumx2hrkt3zw7fscs2ywm57g3hu@co27drpx24lq>
-In-Reply-To: <isfgwmd5hxjfn7dj7p54yzlhumx2hrkt3zw7fscs2ywm57g3hu@co27drpx24lq>
-From: Lionel Cons <lionelcons1972@gmail.com>
-Date: Mon, 27 Apr 2026 14:02:00 +0200
-X-Gm-Features: AVHnY4JzeOH_kK3jDOjK2FxeQTqZ9zkWJjZAaa-9jIyvUG0bleb4vaJ230stvGc
-Message-ID: <CAPJSo4WmRu_64TxBsaimWOqz3VAU0TZ1H-_hw36HSqzQULm39w@mail.gmail.com>
-Subject: Re: [PATCH v11 12/15] isofs: Implement fileattr_get for case sensitivity
-To: Jan Kara <jack@suse.cz>
-Cc: Chuck Lever <cel@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org, 
-	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-api@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
-	hirofumi@mail.parknet.co.jp, linkinjeon@kernel.org, sj1557.seo@samsung.com, 
-	yuezhang.mo@sony.com, almaz.alexandrovich@paragon-software.com, 
-	slava@dubeyko.com, glaubitz@physik.fu-berlin.de, frank.li@vivo.com, 
-	tytso@mit.edu, adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org, 
-	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
-	trondmy@kernel.org, anna@kernel.org, jaegeuk@kernel.org, chao@kernel.org, 
-	hansg@kernel.org, senozhatsky@chromium.org, 
-	Chuck Lever <chuck.lever@oracle.com>, Roland Mainz <roland.mainz@nrubsig.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Mon, 27 Apr 2026 at 12:47, Jan Kara <jack@suse.cz> wrote:
->
-> On Fri 24-04-26 21:53:14, Chuck Lever wrote:
-> > From: Chuck Lever <chuck.lever@oracle.com>
-> >
-> > Upper layers such as NFSD need a way to query whether a
-> > filesystem handles filenames in a case-sensitive manner so
-> > they can provide correct semantics to remote clients. Without
-> > this information, NFS exports of ISO 9660 filesystems cannot
-> > advertise their filename case behavior.
-> >
-> > Implement isofs_fileattr_get() to report ISO 9660 case handling
-> > behavior via the FS_XFLAG_CASEFOLD flag. The 'check=r' (relaxed)
-> > mount option enables case-insensitive lookups, and this setting
-> > determines the value reported. By default, Joliet extensions
-> > operate in relaxed mode while plain ISO 9660 uses strict
-> > (case-sensitive) mode. All ISO 9660 variants are case-preserving,
-> > meaning filenames are stored exactly as they appear on the disc.
-> >
-> > Case handling is a superblock-wide property, so the callback
-> > must report the same value for every inode type. Regular files
-> > previously had no inode_operations; introduce
-> > isofs_file_inode_operations to carry the callback. Symlinks
-> > previously shared page_symlink_inode_operations; introduce
-> > isofs_symlink_inode_operations, which wires page_get_link
-> > alongside the callback, so that fileattr queries on a symlink
-> > reach the isofs implementation instead of returning
-> > -ENOIOCTLCMD. The flag is set in both fa->fsx_xflags and
-> > fa->flags so FS_IOC_FSGETXATTR and FS_IOC_GETFLAGS agree.
-> >
-> > Reviewed-by: Jan Kara <jack@suse.cz>
-> > Reviewed-by: Roland Mainz <roland.mainz@nrubsig.org>
-> > Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
->
-> ...
->
-> > @@ -281,6 +293,18 @@ const struct file_operations isofs_dir_operations =
-> >  const struct inode_operations isofs_dir_inode_operations =
-> >  {
-> >       .lookup = isofs_lookup,
-> > +     .fileattr_get = isofs_fileattr_get,
-> > +};
-> > +
-> > +const struct inode_operations isofs_file_inode_operations =
-> > +{
-> > +     .fileattr_get = isofs_fileattr_get,
-> > +};
-> > +
-> > +const struct inode_operations isofs_symlink_inode_operations =
-> > +{
-> > +     .get_link = page_get_link,
-> > +     .fileattr_get = isofs_fileattr_get,
-> >  };
->
-> Hum, I thought casefolding is a directory attribute. At least I don't see
-> a big point in reporting it for regular files or symlinks (and then why not
-> report it for device nodes or named pipes?). So why did you decide for this
-> change?
+* Dorjoy Chowdhury:
 
-Where do you see this being a per-directory attribute in
-https://web.archive.org/web/20170404043745/http://www.ymi.com/ymi/sites/default/files/pdf/Rockridge.pdf
+> diff --git a/include/uapi/asm-generic/errno.h b/include/uapi/asm-generic/=
+errno.h
+> index 92e7ae493ee3..bd78e69e0a43 100644
+> --- a/include/uapi/asm-generic/errno.h
+> +++ b/include/uapi/asm-generic/errno.h
+> @@ -122,4 +122,6 @@
+>=20=20
+>  #define EHWPOISON	133	/* Memory page has hardware error */
+>=20=20
+> +#define EFTYPE		134	/* Wrong file type for the intended operation */
+> +
+>  #endif
 
-Lionel
+This is what POSIX says about EFTYPE, in the Rationale for System
+Interfaces:
+
+=E2=80=9C
+[EFTYPE]
+    This error code was proposed in earlier proposals as "Inappropriate
+    operation for file type", meaning that the operation requested is
+    not appropriate for the file specified in the function call. This
+    code was proposed, although the same idea was covered by [ENOTTY],
+    because the connotations of the name would be misleading. It was
+    pointed out that the fcntl() function uses the error code [EINVAL]
+    for this notion, and hence all instances of [EFTYPE] were changed to
+    this code.
+=E2=80=9D
+
+So I'm not sure if reusing this name is a good idea.
+
+Thanks,
+Florian
+
