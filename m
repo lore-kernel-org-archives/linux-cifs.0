@@ -1,45 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759D734572F
-	for <linux-cifs@vger.kernel.org>; Mon, 27 Apr 2026 15:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4823469FC
+	for <linux-cifs@vger.kernel.org>; Mon, 27 Apr 2026 15:46:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777304812; cv=none; b=MT133JvpdfuEXQCLTxT5yF5dEy8bFTM74Q2z3ABVUv9Q7YvoW2gnIOJpCitf/y50313iH0E/Xp0JqFRrFXlQWM4blK3QeHyLSu4E8QfD4Nrd0dJUs3SEzQimIQ3daYaTKM2wScEiRVmIcp0vmJFEQXkE4BT0+EvnqzCCbfcJASY=
+	t=1777304816; cv=none; b=Dc5MopIEU+K5ejIn/+FkxEEvV4cD/zZI440urTGs2Jft6pNsmok4nC6ioljpg2oanCuvjgVH0oo/HXqaRQ4o7PjevSmbjeEOwhL6uEDHp3IDW0vJNAbpqWbRxmzVBktNFp1JdYIDP0KBZQQ7cTAl3WIq1+RZo2FpfQ5OFFxkC2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777304812; c=relaxed/simple;
-	bh=9mtHwprel4YUhVJ/yNA5gZtNbxzGa/mm5aEiFdM6BP0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aUdUGueFSgpp1TTxoMMlZuFOUPToUNWrB2gYM2hZOE0+kDMudyZkWe8XfSCEANNxj0CMZEDYZzaml5nk2f1zqeU8uD+x1f4vD913lbonprVECQdL2Bf6vUwXviIB+AOkCZxKBCNr00kMQB39troxGMJz5xfRfjsQzUK4EKafZdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aQomZLyj; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1777304816; c=relaxed/simple;
+	bh=MBV+gcvxIoEEQ+AAmirehOHfdTWrL3EvsI56zQBg4Ak=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FlOgp1SDXdvKy1N9Wujpr8wAfpGr8EwvU0stubvqcv+9NoM1J6xQX6ZutiKGOxKcvEsqYBTb+oA05HGc7Vajup8bH7oUdwzX/O0f5Rv7FfiUQ2T1Kvbxo/rgl2hjBXayPxloaI2F5nsZcJhIypDpAz2jXWulnKJ3p0mVDGvYSDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XZiNVdrr; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aQomZLyj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZiNVdrr"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777304809;
+	s=mimecast20190719; t=1777304814;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=H5+gLZpTVBHNcHgnFm3F1qgIg3WyEfh1s/qCYiLgz64=;
-	b=aQomZLyjYTi1dpqxLhMIfrgDadx2eRGhUPlL1ihvgwJ/p3awnrwRfc1eFn7pRy6EqZMKSj
-	EJ0o7G9wuWU47R0a9PhV79RdioTzWODlnOxNm9DX7sjFJqyJzkRseT6wV4Ep6X25FIBn3g
-	ptcckBYjtBzQcZBdBgpVgdL77TsQ/Bw=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u9RMsSgh/DXZPAvKktBs27mDcdJgglZsfz7/ceNESHA=;
+	b=XZiNVdrrz7uQ/PxIIyTQ/E/X/XlAaPQXE9E53gqWVXDVRchGzpQVg9yKFEtYFezlwkDTav
+	eYkT00WXb6KjjQ1p85Bbm7uBtfd/h3Z5iMLN4tvEbVYNIbTgea6t8X95pP9GvEcAuWJJjx
+	ZXVj6PI8cppYtjFJDK4E44it2zosE2s=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-671-BU3e3v0bNtKNnF-Q7vCkYg-1; Mon,
- 27 Apr 2026 11:46:46 -0400
-X-MC-Unique: BU3e3v0bNtKNnF-Q7vCkYg-1
-X-Mimecast-MFC-AGG-ID: BU3e3v0bNtKNnF-Q7vCkYg_1777304805
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-121-2k7FS481MReU8Yefq02IXA-1; Mon,
+ 27 Apr 2026 11:46:51 -0400
+X-MC-Unique: 2k7FS481MReU8Yefq02IXA-1
+X-Mimecast-MFC-AGG-ID: 2k7FS481MReU8Yefq02IXA_1777304809
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3E4F21800451;
-	Mon, 27 Apr 2026 15:46:45 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 90C2918002C0;
+	Mon, 27 Apr 2026 15:46:49 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.32.126])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 85DCA3000C20;
-	Mon, 27 Apr 2026 15:46:42 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DD1CF1800446;
+	Mon, 27 Apr 2026 15:46:46 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>
 Cc: David Howells <dhowells@redhat.com>,
@@ -50,9 +52,11 @@ Cc: David Howells <dhowells@redhat.com>,
 	ceph-devel@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 00/22] netfs: Miscellaneous fixes
-Date: Mon, 27 Apr 2026 16:46:15 +0100
-Message-ID: <20260427154639.180684-1-dhowells@redhat.com>
+Subject: [PATCH v4 01/22] netfs: Fix cancellation of a DIO and single read subrequests
+Date: Mon, 27 Apr 2026 16:46:16 +0100
+Message-ID: <20260427154639.180684-2-dhowells@redhat.com>
+In-Reply-To: <20260427154639.180684-1-dhowells@redhat.com>
+References: <20260427154639.180684-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -60,183 +64,221 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hi Christian,
+When the preparation of a new subrequest for a read fails, if the
+subrequest has already been added to the stream->subrequests list, it can't
+simply be put and abandoned as the collector may see it.  Also, if it
+hasn't been queued yet, it has two outstanding refs that both need to be
+put.  Both DIO read and single-read dispatch fail at this; further, both
+differ in the order they do things to the way buffered read works.
 
-Here are the outstanding miscellaneous fixes for netfslib gathered together
-and with some fixes-to-fixes folded down and one rearrangement.  Various
-Sashiko review comments[1][2][3] are addressed:
+Fix cancellation of both DIO-read and single-read subrequests that failed
+preparation by the following steps:
 
- (1) Fix subrequest cancellation cleanup in DIO read and single-read.
+ (1) Harmonise all three reads (buffered, dio, single) to queue the subreq
+     before prepping it.
 
- (2) Fix read and write result collection to use barriering correctly to
-     access a request's subrequest lists without taking a lock.
+ (2) Make all three call netfs_queue_read() to do the queuing.
 
-     This adds list_add_tail_release() and list_first_entry_acquire() to
-     appropriate incorporate barriering into some list functions.
+ (3) Set NETFS_RREQ_ALL_QUEUED independently of the queuing as we don't
+     know the length of the subreq at this point.
 
- (3) Fix missing locking around retry adding new subrequests.
+ (4) In all cases, set the error and NETFS_SREQ_FAILED flag on the subreq
+     and then call netfs_read_subreq_terminated() to deal with it.  This
+     will pass responsibility off to the collector for dealing with it.
 
- (4) Fix netfs_read_to_pagecache() to pause on subrequest I/O failure.
+Fixes: e2d46f2ec332 ("netfs: Change the read result collector to only use one work item")
+Closes: https://sashiko.dev/#/patchset/20260425125426.3855807-1-dhowells%40redhat.com
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Paulo Alcantara <pc@manguebit.org>
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/netfs/buffered_read.c | 26 +++++++++++---------------
+ fs/netfs/direct_read.c   | 19 ++++---------------
+ fs/netfs/internal.h      |  2 ++
+ fs/netfs/read_single.c   | 20 ++++++++------------
+ 4 files changed, 25 insertions(+), 42 deletions(-)
 
- (5) Fix the potential for 64-bit tearing on a 32-bit machine when reading
-     netfs_inode->remote_i_size and ->zero_point by using much the same
-     mechanism as is used for ->i_size.
-
- (6) Fix the calculation of zero_point in netfs_release_folio() to limit it
-     to ->remote_i_size, not ->i_size.
-
- (7) Fix triggering of a VM_BUG_ON_FOLIO() in netfs_write_begin().
-
- (8) Fix error handling in netfs_extract_user_iter().
-
- (9) Fix netfs_invalidate_folio() to clear the folio dirty bit if all dirty
-     data removed.
-
-(10) Defer the emission of trace_netfs_folio() in netfs_perform_write().
-     This allows the next patch to emit the correct traces.
-
-(11) Fix the handling of a partially failed copy (ie. EFAULT) into a
-     streaming write folio.  Also remove the netfs_folio if a streaming
-     write folio is entirely overwritten.
-
-(12) Fix netfs_read_gaps() to remove the netfs_folio from a filled folio.
-
-(13) Fix netfs_perform_write() to not disable streaming writes when writing
-     to an fd that's open O_RDWR.
-
-(14) Fix an early put of the sink page used in netfs_read_gaps(), before
-     the request has completed.
-
-(15) Fix request leak in netfs_write_begin() error handling.
-
-(16) Fix a potential UAF in netfs_unlock_abandoned_read_pages() due to
-     trying to check index of each folio we're abandoning to see if that
-     folio is actually owned by the caller (in which case, we're not
-     actually allowed to dereference it).
-
-(17) Fix a potentially uninitialised error value in
-     netfs_extract_user_iter().
-
-(18) Fix incorrect adjustment of dirty region when partially invalidating a
-     streaming write folio.
-
-(19) Fix the handling of folio->private in netfs_perform_write() and the
-     attached netfs_folio and/or group when a streaming write folio is
-     modified.
-
-(20) Fix netfs_read_folio() to wait on writeback first (it holds the folio
-     lock) otherwise we aren't allowed to look at the netfs_folio struct as
-     that could be modified at any time by the writeback collector.
-
-(21) Fix write skipping in dir/symlink writepages.
-
-(22) Fix the locking used by afs_get_link().
-
-The patches can also be found here:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-fixes
-
-Thanks,
-David
-
-[1] https://sashiko.dev/#/patchset/20260414082004.3756080-1-dhowells%40redhat.com
-[2] https://sashiko.dev/#/patchset/20260326104544.509518-1-dhowells%40redhat.com
-[3] https://sashiko.dev/#/patchset/20260425125426.3855807-1-dhowells%40redhat.com
-
-Changes
-=======
-ver #4)
-- Rebase on v7.0-rc1
-- Fix latest set of Sashiko issues[3].
-  - Move the ->subrequests barriering patch up front as it modifies
-    linux/list.h.
-  - Split that barriering patch and make the first patch to harmonise the
-    order of adding a read subreq to the queue, for buffered, dio and
-    single reads and to fix cancellation on prep failure.  The second patch
-    then fixes the barriering.
-  - Lock ->subrequests in retry when adding in extra subreqs.
-  - Use a spinlock as well when modifying ->zero_point with a seq lock.
-  - Atomically check and change ->zero_point when bumping it up.
-  - Merged the two patches sorting out the locking in afs symlink handling,
-    then fixed a number of issues in them.
-- Added a patch to make afs dir and symlink writepages skip if the
-  validate_lock is held and WB_SYNC_NONE is set.
-
-ver #3)
-- Rebase on linus/master.
-- Consolidate the various sets of fixes for reposting.
-- Fold down fixes-to-fixes.
-- Move the tracing change in netfs_perform_write() down to below the patch
-  it primarily affects.
-
-base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
-
-David Howells (20):
-  netfs: Fix cancellation of a DIO and single read subrequests
-  netfs: Fix missing barriers when accessing stream->subrequests
-    locklessly
-  netfs: Fix missing locking around retry adding new subreqs
-  netfs: Fix netfs_read_to_pagecache() to pause on subreq failure
-  netfs: Fix potential for tearing in ->remote_i_size and ->zero_point
-  netfs: Fix zeropoint update where i_size > remote_i_size
-  netfs: Fix netfs_invalidate_folio() to clear dirty bit if all changes
-    gone
-  netfs: Defer the emission of trace_netfs_folio()
-  netfs: Fix streaming write being overwritten
-  netfs: Fix read-gaps to remove netfs_folio from filled folio
-  netfs: Fix write streaming disablement if fd open O_RDWR
-  netfs: Fix early put of sink folio in netfs_read_gaps()
-  netfs: Fix leak of request in netfs_write_begin() error handling
-  netfs: Fix potential UAF in netfs_unlock_abandoned_read_pages()
-  netfs: Fix potential uninitialised var in netfs_extract_user_iter()
-  netfs: Fix partial invalidation of streaming-write folio
-  netfs: Fix folio->private handling in netfs_perform_write()
-  netfs: Fix netfs_read_folio() to wait on writeback
-  netfs, afs: Fix write skipping in dir/link writepages
-  afs: Fix the locking used by afs_get_link()
-
-Paulo Alcantara (1):
-  netfs: fix error handling in netfs_extract_user_iter()
-
-Viacheslav Dubeyko (1):
-  netfs: fix VM_BUG_ON_FOLIO() issue in netfs_write_begin() call
-
- fs/9p/vfs_inode.c            |   2 +-
- fs/9p/vfs_inode_dotl.c       |   4 +-
- fs/afs/Makefile              |   1 +
- fs/afs/dir.c                 |  76 ++++----
- fs/afs/fsclient.c            |   4 +-
- fs/afs/inode.c               | 104 +----------
- fs/afs/internal.h            |  34 +++-
- fs/afs/symlink.c             | 267 +++++++++++++++++++++++++++++
- fs/afs/validation.c          |   8 +-
- fs/afs/write.c               |   2 +-
- fs/afs/yfsclient.c           |   4 +-
- fs/netfs/buffered_read.c     |  64 ++++---
- fs/netfs/buffered_write.c    | 147 ++++++++++------
- fs/netfs/direct_read.c       |  19 +-
- fs/netfs/direct_write.c      |   4 +-
- fs/netfs/internal.h          |   2 +
- fs/netfs/iterator.c          |  15 +-
- fs/netfs/misc.c              |  21 ++-
- fs/netfs/read_collect.c      |   6 +-
- fs/netfs/read_retry.c        |  13 +-
- fs/netfs/read_single.c       |  20 +--
- fs/netfs/write_collect.c     |   7 +-
- fs/netfs/write_issue.c       |   8 +-
- fs/netfs/write_retry.c       |   2 +
- fs/smb/client/cifsfs.c       |  28 +--
- fs/smb/client/cifssmb.c      |   2 +-
- fs/smb/client/file.c         |   9 +-
- fs/smb/client/inode.c        |   9 +-
- fs/smb/client/readdir.c      |   3 +-
- fs/smb/client/smb2ops.c      |  16 +-
- fs/smb/client/smb2pdu.c      |   2 +-
- include/linux/list.h         |  37 ++++
- include/linux/netfs.h        | 324 +++++++++++++++++++++++++++++++++--
- include/trace/events/netfs.h |   8 +
- 34 files changed, 949 insertions(+), 323 deletions(-)
- create mode 100644 fs/afs/symlink.c
+diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
+index a8c0d86118c5..2c51c55a9b15 100644
+--- a/fs/netfs/buffered_read.c
++++ b/fs/netfs/buffered_read.c
+@@ -156,9 +156,8 @@ static void netfs_read_cache_to_pagecache(struct netfs_io_request *rreq,
+ 			netfs_cache_read_terminated, subreq);
+ }
+ 
+-static void netfs_queue_read(struct netfs_io_request *rreq,
+-			     struct netfs_io_subrequest *subreq,
+-			     bool last_subreq)
++void netfs_queue_read(struct netfs_io_request *rreq,
++		      struct netfs_io_subrequest *subreq)
+ {
+ 	struct netfs_io_stream *stream = &rreq->io_streams[0];
+ 
+@@ -178,11 +177,6 @@ static void netfs_queue_read(struct netfs_io_request *rreq,
+ 		}
+ 	}
+ 
+-	if (last_subreq) {
+-		smp_wmb(); /* Write lists before ALL_QUEUED. */
+-		set_bit(NETFS_RREQ_ALL_QUEUED, &rreq->flags);
+-	}
+-
+ 	spin_unlock(&rreq->lock);
+ }
+ 
+@@ -233,6 +227,8 @@ static void netfs_read_to_pagecache(struct netfs_io_request *rreq,
+ 		subreq->start	= start;
+ 		subreq->len	= size;
+ 
++		netfs_queue_read(rreq, subreq);
++
+ 		source = netfs_cache_prepare_read(rreq, subreq, rreq->i_size);
+ 		subreq->source = source;
+ 		if (source == NETFS_DOWNLOAD_FROM_SERVER) {
+@@ -262,11 +258,8 @@ static void netfs_read_to_pagecache(struct netfs_io_request *rreq,
+ 				ret = rreq->netfs_ops->prepare_read(subreq);
+ 				if (ret < 0) {
+ 					subreq->error = ret;
+-					/* Not queued - release both refs. */
+-					netfs_put_subrequest(subreq,
+-							     netfs_sreq_trace_put_cancel);
+-					netfs_put_subrequest(subreq,
+-							     netfs_sreq_trace_put_cancel);
++					__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
++					netfs_read_subreq_terminated(subreq);
+ 					break;
+ 				}
+ 				trace_netfs_sreq(subreq, netfs_sreq_trace_prepare);
+@@ -302,10 +295,13 @@ static void netfs_read_to_pagecache(struct netfs_io_request *rreq,
+ 			netfs_put_subrequest(subreq, netfs_sreq_trace_put_cancel);
+ 			break;
+ 		}
+-		size -= slice;
+ 		start += slice;
++		size -= slice;
++		if (size <= 0) {
++			smp_wmb(); /* Write lists before ALL_QUEUED. */
++			set_bit(NETFS_RREQ_ALL_QUEUED, &rreq->flags);
++		}
+ 
+-		netfs_queue_read(rreq, subreq, size <= 0);
+ 		netfs_issue_read(rreq, subreq);
+ 		cond_resched();
+ 	} while (size > 0);
+diff --git a/fs/netfs/direct_read.c b/fs/netfs/direct_read.c
+index f72e6da88cca..4fd5cfa690cf 100644
+--- a/fs/netfs/direct_read.c
++++ b/fs/netfs/direct_read.c
+@@ -47,7 +47,6 @@ static void netfs_prepare_dio_read_iterator(struct netfs_io_subrequest *subreq)
+  */
+ static int netfs_dispatch_unbuffered_reads(struct netfs_io_request *rreq)
+ {
+-	struct netfs_io_stream *stream = &rreq->io_streams[0];
+ 	unsigned long long start = rreq->start;
+ 	ssize_t size = rreq->len;
+ 	int ret = 0;
+@@ -66,25 +65,15 @@ static int netfs_dispatch_unbuffered_reads(struct netfs_io_request *rreq)
+ 		subreq->start	= start;
+ 		subreq->len	= size;
+ 
+-		__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
+-
+-		spin_lock(&rreq->lock);
+-		list_add_tail(&subreq->rreq_link, &stream->subrequests);
+-		if (list_is_first(&subreq->rreq_link, &stream->subrequests)) {
+-			if (!stream->active) {
+-				stream->collected_to = subreq->start;
+-				/* Store list pointers before active flag */
+-				smp_store_release(&stream->active, true);
+-			}
+-		}
+-		trace_netfs_sreq(subreq, netfs_sreq_trace_added);
+-		spin_unlock(&rreq->lock);
++		netfs_queue_read(rreq, subreq);
+ 
+ 		netfs_stat(&netfs_n_rh_download);
+ 		if (rreq->netfs_ops->prepare_read) {
+ 			ret = rreq->netfs_ops->prepare_read(subreq);
+ 			if (ret < 0) {
+-				netfs_put_subrequest(subreq, netfs_sreq_trace_put_cancel);
++				__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
++				subreq->error = ret;
++				netfs_read_subreq_terminated(subreq);
+ 				break;
+ 			}
+ 		}
+diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
+index d436e20d3418..24fefa1b179d 100644
+--- a/fs/netfs/internal.h
++++ b/fs/netfs/internal.h
+@@ -23,6 +23,8 @@
+ /*
+  * buffered_read.c
+  */
++void netfs_queue_read(struct netfs_io_request *rreq,
++		      struct netfs_io_subrequest *subreq);
+ void netfs_cache_read_terminated(void *priv, ssize_t transferred_or_error);
+ int netfs_prefetch_for_write(struct file *file, struct folio *folio,
+ 			     size_t offset, size_t len);
+diff --git a/fs/netfs/read_single.c b/fs/netfs/read_single.c
+index d0e23bc42445..432c7456a1b6 100644
+--- a/fs/netfs/read_single.c
++++ b/fs/netfs/read_single.c
+@@ -89,7 +89,6 @@ static void netfs_single_read_cache(struct netfs_io_request *rreq,
+  */
+ static int netfs_single_dispatch_read(struct netfs_io_request *rreq)
+ {
+-	struct netfs_io_stream *stream = &rreq->io_streams[0];
+ 	struct netfs_io_subrequest *subreq;
+ 	int ret = 0;
+ 
+@@ -102,14 +101,7 @@ static int netfs_single_dispatch_read(struct netfs_io_request *rreq)
+ 	subreq->len	= rreq->len;
+ 	subreq->io_iter	= rreq->buffer.iter;
+ 
+-	__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
+-
+-	spin_lock(&rreq->lock);
+-	list_add_tail(&subreq->rreq_link, &stream->subrequests);
+-	trace_netfs_sreq(subreq, netfs_sreq_trace_added);
+-	/* Store list pointers before active flag */
+-	smp_store_release(&stream->active, true);
+-	spin_unlock(&rreq->lock);
++	netfs_queue_read(rreq, subreq);
+ 
+ 	netfs_single_cache_prepare_read(rreq, subreq);
+ 	switch (subreq->source) {
+@@ -121,10 +113,14 @@ static int netfs_single_dispatch_read(struct netfs_io_request *rreq)
+ 				goto cancel;
+ 		}
+ 
++		smp_wmb(); /* Write lists before ALL_QUEUED. */
++		set_bit(NETFS_RREQ_ALL_QUEUED, &rreq->flags);
+ 		rreq->netfs_ops->issue_read(subreq);
+ 		rreq->submitted += subreq->len;
+ 		break;
+ 	case NETFS_READ_FROM_CACHE:
++		smp_wmb(); /* Write lists before ALL_QUEUED. */
++		set_bit(NETFS_RREQ_ALL_QUEUED, &rreq->flags);
+ 		trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
+ 		netfs_single_read_cache(rreq, subreq);
+ 		rreq->submitted += subreq->len;
+@@ -137,11 +133,11 @@ static int netfs_single_dispatch_read(struct netfs_io_request *rreq)
+ 		break;
+ 	}
+ 
+-	smp_wmb(); /* Write lists before ALL_QUEUED. */
+-	set_bit(NETFS_RREQ_ALL_QUEUED, &rreq->flags);
+ 	return ret;
+ cancel:
+-	netfs_put_subrequest(subreq, netfs_sreq_trace_put_cancel);
++	__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
++	subreq->error = ret;
++	netfs_read_subreq_terminated(subreq);
+ 	return ret;
+ }
+ 
 
