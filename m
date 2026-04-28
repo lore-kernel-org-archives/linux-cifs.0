@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCCB3F7AB3;
-	Tue, 28 Apr 2026 10:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047413FAE0E;
+	Tue, 28 Apr 2026 10:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777372916; cv=none; b=ecuNII636yHNv7+DwHKDnflHMm+PjZJdy4HK2gGOcwF3Bv2FoVrnz4jBDUMKXb7IiFLyxWOvLY2ag0edzxEwe46gBfClnBwAdtC2bf4++t77XJWLEsNPcD1JbbAhtcF2hZMHKbxFwSZwx+xZjAeKkj/ebvqlzN8g98BQ5lpPsDg=
+	t=1777372922; cv=none; b=R38SyGE1uA/KLfg0bWsZCY6c58OPaiiZXFXLx32bhDW7EgTqwLK03Zx0JhwiRKiXo2v69Eg9d4x4FtvZTTqLp3zX+LoJP/hwrwWwsTaJ6TCZz4CFYbEBCugpWwofifvpdJGNudR9qWU/+bUg10lKFOe1StJyL/dCIvZco4x5aeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777372916; c=relaxed/simple;
-	bh=xOQhvTSWQ6gIx9DqleNJ3v6jwcJQnbebJT1dEWP3NZo=;
+	s=arc-20240116; t=1777372922; c=relaxed/simple;
+	bh=jyYGDhtrw/szsDNF7cM/8HRXsH2YaxxFQfWiQ+YKGKM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Icaj2wMgWfDdIbv6u/6C7ZJaDKqVQ47kyPHBFErUN32uxm5yHPaWQ684U0kWzPAApOqwFaT8Th31UnKl79PzaURn+DyhZWGtyBes8YBhMw/5xWqh6o5CeFFkvCJis/0H6qyWEIQn1ORV3q9qu9M13d1JjneLUtoQZAG+VAgpatY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0FkNfhy; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=BVrJA9wM79eb9uY814nmmucZ2t2JV9iU+PtPevFayr0RF2WNf7lOvM9mwnppZGuBRkozQgLi9NXQJFbeE+grsLPErzUdsB7BsDrcJoFhy4RZi30Rwuzzj0djki2w7puzE9rSoRLmIgJlZsFl54+2SJWuUopycyZRK7goNVWeAb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DarW9Xr9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0FkNfhy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 463C5C2BCB5;
-	Tue, 28 Apr 2026 10:41:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DarW9Xr9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05E2EC2BCC6;
+	Tue, 28 Apr 2026 10:42:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777372916;
-	bh=xOQhvTSWQ6gIx9DqleNJ3v6jwcJQnbebJT1dEWP3NZo=;
+	s=k20201202; t=1777372921;
+	bh=jyYGDhtrw/szsDNF7cM/8HRXsH2YaxxFQfWiQ+YKGKM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=L0FkNfhyjboOqUZG1yTF6aLNvY3uVOaJayjBlAgt+wAxpEt85lA8HuFmHmKhVVBuK
-	 jO2VVmti8chWZFO37m66P1/RLVXhnkMUuQ+cJ9QSYNsNnEW/9Cf4CWXCKVAgDbL1OQ
-	 muj6YZMBg00vBhDpD0APA2MRSNK1eaCVfoZW2OdC5pAbMPqK6GZ8gLrbs8R0vVUJDJ
-	 1C5zLTV9UFxAAratg1OCY/Bp+BbqSEpOMHD2BcXBa4FRIJMLO2jufWsCX+7GFGsMq6
-	 W3PUBkvDKx8n3ienHKjC9hbJCMedV0sWpggKrriyhCZUaFrHS5OOa2jmj6cxQimmbb
-	 q4HtR5Ck2gSkA==
+	b=DarW9Xr9dibjK4cv2cAb6RiBRMNgF/cPWNf4DktxLgDDDpDaX6zJcsob55cDRbdYE
+	 dv9V3iZbNHS/VE+OpIhavhvbOAD3o7qGTjKpeP4sOXVsz6NpgOxP8yQf5r1Pvo0I6K
+	 E5GGzI/FGezaN3D0MVyPJlmiZRgTV+X1VbcQTJutipWPLpXPyfV8i7oDtiXsGo2rOm
+	 3f69uI1hYIrFZCnIT+WqkMxQE3ofVJpdOW9z2SLrO6mO5krOCxqolqGunpqYIr6s9c
+	 CG5TVh76fj4UU67drnfh/U0VaEleGRXtOveBP8g02izxLsZwtuVdefNxPKtLOPw+jJ
+	 VqJYsohxoDGCw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -36,9 +36,9 @@ Cc: Enzo Matsumiya <ematsumiya@suse.de>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-6.12] smb: client: compress: fix counting in LZ77 match finding
-Date: Tue, 28 Apr 2026 06:40:27 -0400
-Message-ID: <20260428104133.2858589-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 7.0-6.12] smb: client: compress: fix bad encoding on last LZ77 flag
+Date: Tue, 28 Apr 2026 06:40:31 -0400
+Message-ID: <20260428104133.2858589-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260428104133.2858589-1-sashal@kernel.org>
 References: <20260428104133.2858589-1-sashal@kernel.org>
@@ -56,15 +56,12 @@ Content-Transfer-Encoding: 8bit
 
 From: Enzo Matsumiya <ematsumiya@suse.de>
 
-[ Upstream commit 20d4f9efe008be1b673f43d38d3d99fb1fd4cd68 ]
+[ Upstream commit a13e942a03feea211c67a97bc6a57f82aa56e4b6 ]
 
-- lz77_match_len() increments @cur before checking for equality,
-  leading to off-by-one match len in some cases.
+End-of-stream flag could lead to UB because of int promotion
+(overwriting signed bit).
 
-  Fix by moving pointers increment to inside the loop.
-  Also rename @wnd arg to @match (more accurate name).
-- both lz77_match_len() and lz77_compress() checked for
-  "buf + step < end" when the correct is "<=" for such cases.
+Fix it by changing operand from '1' to '1UL'.
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 Signed-off-by: Steve French <stfrench@microsoft.com>
@@ -73,428 +70,299 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have enough information to perform the analysis. Let me structure
-my response covering all 9 phases.
+Based on my investigation, here's the complete analysis:
 
-## PHASE 1: COMMIT MESSAGE FORENSICS
+## Phase 1: Commit Message Forensics
 
-### Step 1.1: PARSE THE SUBJECT LINE
-- Subsystem: `smb: client: compress:` (SMB 3.1.1 client-side
-  compression)
-- Action verb: "fix"
-- Summary: fix counting in LZ77 match finding
-- **Record:** `[smb/client/compress]` `[fix]` `[off-by-one in LZ77 match
-  length counting]`
+**Step 1.1 - Subject line parsing:**
+Record: `smb: client: compress:` prefix, action verb is "fix", one-line
+summary: fix bad encoding on last LZ77 end-of-stream flag due to integer
+promotion UB.
 
-### Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
-- `Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>` (author)
-- `Signed-off-by: Steve French <stfrench@microsoft.com>` (subsystem
-  maintainer)
-- NO `Fixes:` tag, NO `Cc: stable`, NO `Reported-by:`, NO `Link:`, NO
-  `Tested-by:`, NO `Reviewed-by:`, NO `Acked-by:`
-- **Record:** Minimal tag set - only author + maintainer SOBs. No
-  explicit stable/reviewer endorsements.
+**Step 1.2 - Tags:**
+Record:
+- Signed-off-by: Enzo Matsumiya (author, SUSE)
+- Signed-off-by: Steve French (SMB client maintainer)
+- No Fixes:, Reported-by:, Tested-by:, Reviewed-by:, Link:, or Cc:
+  stable tags
 
-### Step 1.3: ANALYZE THE COMMIT BODY TEXT
-Two distinct bugs described:
-1. `lz77_match_len()` byte-by-byte fallback increments `@cur` before
-   equality check, over-counting match length by 1 on mismatch.
-2. Both `lz77_match_len()` do-while and `lz77_compress()` do-while use
-   `<` where `<=` is correct for the 8-byte window check, causing early
-   exit to slow byte-by-byte fallback.
-- **Record:** Bug: off-by-one in match length produces incorrect LZ77
-  compressed output. Failure mode: decompressed data mismatches original
-  (data corruption) on SMB3.1.1 compressed writes.
+**Step 1.3 - Commit body:**
+Record: Bug described as "End-of-stream flag could lead to UB because of
+int promotion (overwriting signed bit)". Fix approach: change operand
+from `1` (int) to `1UL` (unsigned long). No crash/stack trace mentioned.
+No specific kernel version mentioned.
 
-### Step 1.4: DETECT HIDDEN BUG FIXES
-- This is explicitly labeled as a fix ("fix counting"). Not hidden.
-- **Record:** Explicit bug fix with clear root cause described.
+**Step 1.4 - Hidden bug fix detection:**
+Record: Not hidden - explicitly labeled "fix". Author is the original
+creator of the LZ77 code, so has clear understanding of intent.
 
-## PHASE 2: DIFF ANALYSIS - LINE BY LINE
+## Phase 2: Diff Analysis
 
-### Step 2.1: INVENTORY THE CHANGES
-- 1 file: `fs/smb/client/compress/lz77.c`
-- +10/-7 (17 lines changed)
-- Functions: `lz77_match_len()`, `lz77_compress()`
-- Scope: single-file surgical fix
-- **Record:** Minimal-scope single-file fix.
+**Step 2.1 - Inventory:**
+Record: Single file `fs/smb/client/compress/lz77.c`, 1 line changed
+(+1/-1). Function: `lz77_compress()`. Classification: single-file
+surgical fix.
 
-### Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
-Three hunks:
-1. Rename parameter `wnd` → `match` (cosmetic, all occurrences).
-2. Change `cur + LZ77_STEP_SIZE < end` → `<= end` in `lz77_match_len()`
-   do-while.
-3. Restructure byte-by-byte fallback: was `while(cur<end &&
-   lz77_read8(cur++)==lz77_read8(wnd++))` — post-increment executes even
-   on mismatch. Now moves increments inside the body after the match is
-   confirmed.
-4. Change `srcp + LZ77_STEP_SIZE < end` → `<= end` in `lz77_compress()`
-   do-while.
-- **Record:** Before: byte-by-byte loop advances pointers even on
-  mismatch (off-by-one over-count). After: advances only when bytes
-  match.
+**Step 2.2 - Code flow:**
+Record: In end-of-stream flag handling:
+- Before: `flag |= (1 << (32 - flag_count)) - 1;` — `1` is `int` (signed
+  32-bit)
+- After: `flag |= (1UL << (32 - flag_count)) - 1;` — `1UL` is `unsigned
+  long` (64-bit on 64-bit arches)
 
-### Step 2.3: IDENTIFY THE BUG MECHANISM
-- Logic/correctness fix (off-by-one counting)
-- Traced: when actual match is N bytes in the byte-by-byte tail,
-  function returns N+1 if the (N+1)th byte is a mismatch. This produces
-  a match token with length N+1 that, upon decompression by the server,
-  copies N+1 bytes of which the last byte doesn't match the original
-  source - **silent data corruption** in the decompressed write payload.
-- **Record:** Category: logic/off-by-one. Mechanism: byte-by-byte
-  fallback over-counts match length by 1 on mismatch, producing corrupt
-  LZ77 stream.
+**Step 2.3 - Bug mechanism:**
+Record: Category (g) Logic / correctness / UB fix. When `flag_count ==
+0`, `1 << 32` is shift >= width of `int` → UB (on x86 GCC yields `1`,
+then `(1)-1=0`, producing wrong flag byte). When `flag_count == 1`, `1
+<< 31` shifts into sign bit of signed int → UB (typically wraps to give
+correct result by accident). `1UL` fits these shifts within a 64-bit
+unsigned long without UB.
 
-### Step 2.4: ASSESS THE FIX QUALITY
-- Obviously correct (standard idiom of "check, then advance").
-- Minimal (10/7 lines, plus a rename).
-- No regression risk: `<=` change is safe because `srcp+8 == end` reads
-  bytes `[srcp, srcp+7]` which are valid (end is exclusive bound).
-- **Record:** Low regression risk; changes are local and obviously
-  correct.
+**Step 2.4 - Fix quality:**
+Record: Obviously correct. Minimal (1-line). Zero regression risk (on
+64-bit, `1UL` is 64-bit, making shift by 32 well-defined; on 32-bit, fix
+is equivalent but `1UL << 32` would still be UB — however, `flag` is
+`long` which is 32-bit on 32-bit, so the truncation via `lz77_write32()`
+ends up correct in practice).
 
-## PHASE 3: GIT HISTORY INVESTIGATION
+## Phase 3: Git History Investigation
 
-### Step 3.1: BLAME THE CHANGED LINES
-- `git blame` shows lines 70, 72-75, 203 were introduced by
-  `94ae8c3fee94a` ("smb: client: compress: LZ77 code improvements
-  cleanup"), dated 2024-09-06.
-- `git describe --contains 94ae8c3fee94a` → `v6.12-rc1~139^2~11`
-- **Record:** Buggy code introduced in v6.12. Present in all stable
-  branches ≥ 6.12.
+**Step 3.1 - Blame:**
+Record: `git log v6.12:fs/smb/client/compress/lz77.c` confirms `flag |=
+(1 << (32 - flag_count)) - 1;` exists at v6.12. Bug was introduced in
+commit `d14bbfff259ca` ("smb3: mark compression as
+CONFIG_EXPERIMENTAL...", July 2024, v6.12).
 
-### Step 3.2: FOLLOW THE FIXES: TAG
-- No `Fixes:` tag present, but blame confirms the target commit is
-  `94ae8c3fee94a`.
-- **Record:** Implicit Fixes: 94ae8c3fee94a ("smb: client: compress:
-  LZ77 code improvements cleanup"). Original commit is in stable 6.12.y
-  and later.
+**Step 3.2 - Fixes: tag:**
+Record: No Fixes: tag. Buggy code was introduced in `d14bbfff259ca` per
+blame. That commit is present in v6.12 and all later tags (v6.12 through
+v6.19).
 
-### Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES
-`git log -- fs/smb/client/compress/lz77.c` on origin/master shows a
-series of 6 commits around this fix:
-- `4c221711b2374` "fix buffer overrun in lz77_compress()" (Patch 1/8 –
-  separate fix)
-- `a13e942a03fee` "fix bad encoding on last LZ77 flag" (Patch 2/8 –
-  separate fix)
-- `20d4f9efe008b` **our commit** (Patch 3/8)
-- `fca46b0e68c5d`, `4460e9c68d1a8`, `71179a5ee916d` (Patches 4/8, 5/8,
-  6/8 – tuning/optimizations/docs)
-- **Record:** Part of 8-patch series; patches 1-3 are bug fixes, patches
-  4+ are improvements. This patch (3/8) does NOT depend on patches 1/8
-  or 2/8.
+**Step 3.3 - Related changes:**
+Record: Same patch series includes:
+- `4c221711b2374` fix buffer overrun in lz77_compress()
+- `20d4f9efe008b` fix counting in LZ77 match finding
+- `fca46b0e68c5d` increase LZ77_MATCH_MAX_DIST
+- `4460e9c68d1a8` LZ77 optimizations
+- `71179a5ee916d` add code docs
+- `94ae8c3fee94a` cleanup (in v6.12 already)
 
-### Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS
-- Enzo Matsumiya is the author of the original LZ77 cleanup
-  (94ae8c3fee94a) and many other SMB client fixes in 6.12.y stable
-  (e.g., `5ac1f99fdd09d` - compression heuristic fix).
-- **Record:** Author is the main maintainer/developer of this
-  compression code.
+**Step 3.4 - Author:**
+Record: Enzo Matsumiya is the author of the original SMB compression
+code and the LZ77 implementation — highest domain authority.
 
-### Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS
-- Verified: `git apply --check -3` against stable/linux-6.12.y through
-  7.0.y: **all apply cleanly**.
-- The changes touch lines that exist unchanged in the stable branches
-  (stable does not have patches 1 or 2 from the series either, but patch
-  3/8 doesn't conflict with them).
-- **Record:** Standalone, no prerequisites needed.
+**Step 3.5 - Dependencies:**
+Record: Standalone fix. Does not depend on the other patches in the
+series (patch 2/8 of series, but only touches 1 line that has been
+unchanged since v6.12).
 
-## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+## Phase 4: Mailing List Research
 
-### Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION
-- `b4 dig -c 20d4f9efe008b` found the submission at https://lore.kernel.
-  org/all/20260413190713.283939-3-ematsumiya@suse.de/
-- `b4 dig -a`: only a v1 posted, applied as-is. No revisions.
-- The entire thread was saved to mbox and searched: **no** `Cc: stable`,
-  **no** `Fixes:`, **no** `Reviewed-by:`, **no** `Tested-by:`, **no**
-  NAKs.
-- Steve French's only reply is "merged into cifs-2.6.git for-next"
-  (applied without reviewer feedback).
-- **Record:** v1 only, minimal discussion, no stable nomination by
-  reviewers.
+**Step 4.1 - b4 dig:**
+Record: `b4 dig -c a13e942a03fee` →
+https://lore.kernel.org/all/20260413190713.283939-2-ematsumiya@suse.de/
+Patch is 2/8 in series "[PATCH 0-8]" of SMB compression fixes.
 
-### Step 4.2: CHECK WHO REVIEWED THE PATCH
-- `b4 dig -w`: Cc list included Steve French (maintainer), Paulo
-  Alcantara, Ronnie Sahlberg, Shyam Prasad, Tom Talpey, Bharath SM,
-  Henrique Carvalho, and linux-cifs list.
-- No explicit Reviewed-by received — applied by maintainer directly.
-- **Record:** Appropriate maintainers CC'd; maintainer applied with no
-  public review feedback.
+**Step 4.1 continued - b4 dig -a:**
+Record: Only v1 exists. Applied version is the only version sent.
 
-### Step 4.3: SEARCH FOR THE BUG REPORT
-- No Reported-by/Link tags. No bug report referenced.
-- **Record:** No external bug report; bug found by code inspection by
-  the author.
+**Step 4.2 - Reviewers:**
+Record: Recipients included smfrench@gmail.com (maintainer),
+pc@manguebit.com, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+tom@talpey.com, bharathsm@microsoft.com, henrique.carvalho@suse.com —
+appropriate SMB reviewers.
 
-### Step 4.4: CHECK FOR RELATED PATCHES AND SERIES
-- This is patch 3/8. Patches 1 (buffer overrun) and 2 (UB fix) are also
-  bug fixes in the same file.
-- Patches 4-8 are optimizations/docs/preparations.
-- **Record:** Part of a bug-fix + improvements series. Our patch is
-  self-contained.
+**Step 4.2 continued - reviewer response:**
+Record: Steve French replied "merged into cifs-2.6.git for-next"
+confirming acceptance by maintainer. No NAKs or concerns. No explicit
+stable nomination.
 
-### Step 4.5: CHECK STABLE MAILING LIST HISTORY
-- No prior stable discussion about this specific bug.
-- **Record:** No prior stable-specific discussion.
+**Step 4.3 - Bug report:**
+Record: No Reported-by or Link tag. Appears to be developer-found
+(likely via code inspection or UBSAN).
 
-## PHASE 5: CODE SEMANTIC ANALYSIS
+**Step 4.4 - Series context:**
+Record: Part of larger SMB client fixes series. Other series members
+(`4c221711b2374` buffer overrun, `20d4f9efe008b` counting fix) are clear
+bug fixes in the same code.
 
-### Step 5.1: IDENTIFY KEY FUNCTIONS IN THE DIFF
-- `lz77_match_len()` (static inline helper)
-- `lz77_compress()` (exported entry)
-- **Record:** Two functions modified.
+**Step 4.5 - Stable ML:**
+Record: No explicit stable discussion found.
 
-### Step 5.2: TRACE CALLERS
-- `lz77_compress` is called from `smb_compress` in
-  `fs/smb/client/compress.c:343`.
-- `smb_compress` is called from `smb_send_rqst` in
-  `fs/smb/client/transport.c:398` when `CIFS_COMPRESS_REQ` flag is set.
-- `CIFS_COMPRESS_REQ` is set in `fs/smb/client/smb2pdu.c:5201` when
-  `should_compress(tcon, &rqst)` is true (SMB2_WRITE of appropriate
-  size, compression negotiated, etc.).
-- **Record:** Reachable from userspace write(2)→SMB2_WRITE path when
-  CIFS_COMPRESSION=y AND mount has compress option AND server negotiated
-  compression.
+## Phase 5: Code Semantic Analysis
 
-### Step 5.3: TRACE CALLEES
-- `lz77_match_len` is called internally by `lz77_compress`'s main loop
-  (line 163 in stable 6.12.y).
-- **Record:** `lz77_match_len` is a hot inner-loop helper.
+**Step 5.1 - Modified functions:**
+Record: `lz77_compress()` in `fs/smb/client/compress/lz77.c`.
 
-### Step 5.4: FOLLOW THE CALL CHAIN
-Call chain: `sys_write()` → ... → `cifs_strict_writev()` → SMB2_WRITE
-rqst → `smb_send_rqst()` → `smb_compress()` → `lz77_compress()` →
-`lz77_match_len()`.
-Gated by: `CONFIG_CIFS_COMPRESSION=y` AND `mount -o compress` AND
-server-negotiated compression AND write size ≥ PAGE_SIZE AND data is
-compressible per heuristic.
-- **Record:** Reachable from userspace but behind multiple opt-in gates.
+**Step 5.2 - Callers:**
+Record: Called from `smb_compress()` in `fs/smb/client/compress.c`,
+which is called from the SMB request path only when CIFS_COMPRESSION is
+built and user mounts with compression negotiated.
 
-### Step 5.5: SEARCH FOR SIMILAR PATTERNS
-- The fix removes a classic C idiom bug (`*(p++) == *(q++)` advancing on
-  mismatch). No other instances of this pattern found in the file.
-- **Record:** No duplicate patterns found.
+**Step 5.3 - Callees:** Record: Uses `lz77_write32()` → writes little-
+endian 32-bit to `flag_pos`.
 
-## PHASE 6: CROSS-REFERENCING AND STABLE TREE ANALYSIS
+**Step 5.4 - Reachability:**
+Record: Only reachable when: (1) `CONFIG_CIFS_COMPRESSION=y`
+(experimental, default N), (2) user mounts with `compress` option, (3)
+server negotiates SMB3.1.1 compression, (4) request eligible for
+compression (>= PAGE_SIZE write). Not reachable by default kernel
+builds.
 
-### Step 6.1: DOES THE BUGGY CODE EXIST IN STABLE TREES?
-- Verified via `git ls-tree` and `git show` on 5 stable branches:
-  `stable/linux-6.12.y`, `6.17.y`, `6.18.y`, `6.19.y`, `7.0.y` — all
-  have the identical buggy `lz77.c` (blob SHA
-  `96e8a8057a7721233dc49d3388d5e40b8a1bab5b`).
-- Not in 6.6.y or earlier (file didn't exist).
-- **Record:** Bug exists in 6.12.y, 6.17.y, 6.18.y, 6.19.y, 7.0.y.
+**Step 5.5 - Similar patterns:**
+Record: Only one occurrence of the pattern in this function. Other
+shifts in the file (e.g., `LZ77_HASH_SIZE (1 << LZ77_HASH_LOG)` where
+LZ77_HASH_LOG=15) are well within int range.
 
-### Step 6.2: CHECK FOR BACKPORT COMPLICATIONS
-- Tested `git apply --check -3` against all 5 affected stable branches:
-  **clean apply** everywhere.
-- **Record:** Clean apply, no backport adjustments needed.
+## Phase 6: Cross-Referencing Stable Trees
 
-### Step 6.3: CHECK IF RELATED FIXES ARE ALREADY IN STABLE
-- Three prior compression-related fixes are already in 6.12.y stable:
-  `5ac1f99fdd09d` (heuristic functions), `9b4af913465cc` (illegal
-  accesses), `590efcd3c75f0` (invalid free pointer).
-- This establishes a clear pattern of stable maintainers accepting
-  compression fixes despite EXPERIMENTAL status.
-- **Record:** Precedent exists for backporting fixes to this exact
-  file/feature.
+**Step 6.1 - Code in stable:**
+Record: Verified buggy line `flag |= (1 << (32 - flag_count)) - 1;`
+exists identically in v6.12, v6.15, v6.17, v6.18, v6.19. Code introduced
+in v6.12 (d14bbfff259ca), moved to current form in v6.12 (94ae8c3fee94a)
+- both before v6.12 release.
 
-## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+**Step 6.2 - Backport complications:**
+Record: The line is identical in all stable trees from v6.12+. Clean
+backport expected.
 
-### Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY
-- Subsystem: SMB client (network filesystem), specifically
-  CIFS_COMPRESSION (EXPERIMENTAL, default N).
-- Criticality: **PERIPHERAL** for kernel as a whole (opt-in experimental
-  feature), but **IMPORTANT** for users who enable it (fixes data
-  integrity).
-- **Record:** PERIPHERAL scope but data-integrity class.
+**Step 6.3 - Related fixes in stable:**
+Record: No prior fixes for this specific issue in stable trees.
 
-### Step 7.2: ASSESS SUBSYSTEM ACTIVITY
-- `git log -20 -- fs/smb/client/compress/` shows low but steady
-  activity, mainly by Enzo Matsumiya.
-- **Record:** Low-activity experimental feature.
+## Phase 7: Subsystem Context
 
-## PHASE 8: IMPACT AND RISK ASSESSMENT
+**Step 7.1 - Subsystem criticality:**
+Record: `fs/smb/client/compress/` — SMB client compression (experimental
+sub-feature of an important filesystem subsystem). Classification:
+PERIPHERAL (experimental, opt-in, default off).
 
-### Step 8.1: DETERMINE WHO IS AFFECTED
-- Users with `CONFIG_CIFS_COMPRESSION=y` kernel AND `mount -o compress`
-  AND SMB 3.1.1 server that negotiates compression.
-- **Record:** Narrow audience — opt-in at both build and mount time.
+**Step 7.2 - Activity:**
+Record: Active development — 9 commits to `compress/` directory since
+introduction, author is subsystem expert.
 
-### Step 8.2: DETERMINE THE TRIGGER CONDITIONS
-- Trigger: write of ≥ PAGE_SIZE compressible data where a potential
-  match exists in the final <8 bytes of the input and the match does not
-  extend to the very end.
-- Cannot be triggered by unprivileged user without the opt-in
-  configuration.
-- **Record:** Specific but realistic trigger on any compressed write
-  whose tail contains a partial match.
+## Phase 8: Impact and Risk
 
-### Step 8.3: DETERMINE THE FAILURE MODE SEVERITY
-- Wrong match length → decompressed data at the server differs from
-  original → **silent data corruption** in the file written over SMB.
-- Severity per standard rubric: **HIGH** (data corruption), but
-  mitigated by the opt-in nature.
-- **Record:** Failure mode: silent data corruption. Severity: HIGH when
-  triggered, but narrow audience.
+**Step 8.1 - Affected users:**
+Record: Users with `CONFIG_CIFS_COMPRESSION=y` (experimental, default N)
+mounting SMB shares with `compress` option against servers supporting
+SMB3.1.1 compression. Very limited population.
 
-### Step 8.4: CALCULATE RISK-BENEFIT RATIO
-- BENEFIT: Fixes a silent data corruption for users who opt into CIFS
-  compression. Consistent with previously accepted compression fixes.
-- RISK: Very low. 10/7-line change. Obviously correct idiom fix. Applies
-  cleanly. No API changes. The `<=` change is provably safe (8-byte read
-  at `end-8` stays in-bounds).
-- **Record:** Benefit level: moderate (narrow but data-integrity). Risk
-  level: very low. Ratio favors backporting.
+**Step 8.2 - Trigger conditions:**
+Record: When uncompressed data size produces a state where `flag_count
+== 0` on loop exit (i.e., multiple of 32 literal/match tokens followed
+by final-loop exit at a 32-boundary) — the end-of-stream flag is
+corrupt. Cannot be triggered by unprivileged users without SMB
+compression mount.
 
-## PHASE 9: FINAL SYNTHESIS
+**Step 8.3 - Failure mode:**
+Record: Wrong compressed-payload encoding → server may fail to
+decompress → SMB operation failure / possible retry. No crash, no data
+corruption of user data (local), no security implications. Severity:
+MEDIUM (only affects an experimental feature's correctness).
 
-### Step 9.1: COMPILE THE EVIDENCE
-FOR:
-- Real bug confirmed by diff analysis (byte-by-byte post-increment over-
-  counts on mismatch)
-- Failure mode is silent data corruption on compressed SMB writes
-- Small, surgical, obviously-correct fix
-- Applies cleanly to all 5 affected stable trees (6.12.y–7.0.y)
-- Precedent: similar compression fixes already in stable (5ac1f99fdd09d,
-  9b4af913465cc, 590efcd3c75f0)
-- Author is the primary maintainer of this code
+**Step 8.4 - Risk/benefit:**
+Record: Benefit: fixes a real correctness bug for users of compression;
+makes code valid under UBSAN. Risk: essentially zero — `1` → `1UL` is a
+trivial type promotion that only changes evaluation on the edge UB cases
+the fix targets. Very favorable risk/benefit ratio.
 
-AGAINST:
-- No Cc: stable, no Fixes: tag, no Reported-by
-- Feature is EXPERIMENTAL and default N
-- Narrow real-world audience
-- Part of series with mixed fix/improvement content (but this patch is
-  self-contained)
+## Phase 9: Final Synthesis
 
-UNRESOLVED: None.
+**Step 9.1 - Evidence compiled:**
+FOR: Real UB per C standard; produces wrong encoded output for
+`flag_count == 0` case; 1-line surgical change; zero regression risk;
+from the subsystem author; part of a larger fix series that includes
+clear bugs; buggy line present and identical in all stable trees v6.12+;
+trivial clean apply.
+AGAINST: No Fixes:/Reported-by:/Cc: stable/Link: tags; no concrete user
+bug report; feature is EXPERIMENTAL (default N) and opt-in; impact
+limited to users of experimental compression; no explicit stable
+nomination by reviewers.
 
-### Step 9.2: APPLY THE STABLE RULES CHECKLIST
-1. Obviously correct and tested? **Yes** — simple idiom fix; applied in
-   Torvalds' tree (7.1-rc1).
-2. Fixes a real bug that affects users? **Yes** — data corruption for
-   compression users.
-3. Important issue? **Yes** — data integrity class.
-4. Small and contained? **Yes** — 10/-7 in one file.
-5. No new features/APIs? **Yes** (no new API).
-6. Applies to stable? **Yes** — verified clean apply on 6.12.y–7.0.y.
+**Step 9.2 - Stable rules checklist:**
+1. Obviously correct and tested? YES — merged by maintainer, trivially
+   correct.
+2. Fixes a real bug? YES — real C-standard UB producing incorrect bytes.
+3. Important issue? BORDERLINE — correctness bug but in experimental
+   feature.
+4. Small and contained? YES — 1 line.
+5. No new features/APIs? YES.
+6. Applies cleanly to stable? YES — identical code in v6.12 through
+   v6.19.
 
-### Step 9.3: CHECK FOR EXCEPTION CATEGORIES
-- Not an exception category; stands on its merits as a data-correctness
-  fix.
+**Step 9.3 - Exceptions:**
+Record: Not a device ID/quirk/DT/build/doc fix. Falls under normal bug-
+fix category.
 
-### Step 9.4: MAKE DECISION
-Evidence supports backporting. The fix addresses a genuine data-
-integrity bug, is minimal and obviously correct, applies cleanly, and is
-consistent with previously-accepted fixes to this same file.
+**Step 9.4 - Decision:**
+The fix is tiny, obviously correct, zero-risk, and addresses real UB
+that produces wrong output in an edge case. Although the feature is
+marked EXPERIMENTAL, the fix:
+- Is absolutely safe (1 → 1UL)
+- Applies cleanly
+- Is from the subsystem author
+- Makes the code correct under UBSAN
+- Complements other bug fixes in the series that should be backported
 
----
+This is exactly the kind of low-risk correctness fix that stable trees
+accept. Users who opted into the experimental feature receive correct
+compressed output.
 
 ## Verification
-- [Phase 1] Parsed tags: only author + maintainer SOBs, no
-  stable/Fixes/Reported-by — verified by reading full commit message.
-- [Phase 2] Diff analysis: 10/-7 lines in
-  `fs/smb/client/compress/lz77.c`; two functions touched
-  (`lz77_match_len`, `lz77_compress`).
-- [Phase 2] Semantic correctness: traced byte-by-byte loop manually —
-  confirmed over-count by 1 on mismatch; `<=` change verified safe
-  (8-byte read at `end-8` in-bounds).
-- [Phase 3] `git blame` on changed lines: introduced by `94ae8c3fee94a`
-  ("smb: client: compress: LZ77 code improvements cleanup").
-- [Phase 3] `git describe --contains 94ae8c3fee94a` →
-  `v6.12-rc1~139^2~11` (present since v6.12).
-- [Phase 3] `git log -- fs/smb/client/compress/lz77.c` on origin/master:
-  confirmed 8-patch series, this is patch 3/8, independent of patches
-  1/8 and 2/8.
-- [Phase 4] `b4 dig -c 20d4f9efe008b`: found lore submission at https://
-  lore.kernel.org/all/20260413190713.283939-3-ematsumiya@suse.de/
-- [Phase 4] `b4 dig -a`: only v1, no other revisions.
-- [Phase 4] `b4 dig -w`: maintainer Steve French + linux-cifs list +
-  related developers CC'd.
-- [Phase 4] Full thread mbox saved to `/tmp/lz77_thread.mbox`: confirmed
-  no `Cc: stable`, no `Fixes:`, no `Reviewed-by/Tested-by`, only "merged
-  into cifs-2.6.git for-next" from maintainer.
-- [Phase 5] `grep` for `lz77_compress` callers: `smb_compress`
-  (transport.c:398 and compress.c:343); `should_compress` gates call in
-  smb2pdu.c:5201.
-- [Phase 5] Reachable from userspace write(2) only when
-  CIFS_COMPRESSION=y and `mount -o compress`.
-- [Phase 6] `git ls-tree` on 5 stable branches: identical blob
-  `96e8a8057a7721233dc49d3388d5e40b8a1bab5b` — buggy code in
-  6.12.y/6.17.y/6.18.y/6.19.y/7.0.y.
-- [Phase 6] `git apply --check -3` on all 5 stable branches: clean apply
-  on all.
-- [Phase 6] Precedent fixes already in 6.12.y stable: `5ac1f99fdd09d`,
-  `9b4af913465cc`, `590efcd3c75f0` — all compression-related fixes to
-  same file/feature.
-- [Phase 7] `Kconfig` read: `CIFS_COMPRESSION` is `bool "SMB message
-  compression (Experimental)"` default n; confirmed in both mainline and
-  6.12.y stable.
-- [Phase 8] Severity assessment: silent data corruption in compressed
-  writes; narrow audience due to opt-in nature.
 
-The fix addresses a real data-integrity bug with a minimal, obviously-
-correct change that applies cleanly to all affected stable trees, and it
-is consistent with previously accepted compression fixes. The
-EXPERIMENTAL/opt-in nature narrows the audience but does not negate the
-value of the fix.
+- [Phase 1] Parsed tags: no Fixes, no Reported-by, no Cc: stable, no
+  Link; two Signed-off-by (author + maintainer)
+- [Phase 2] Diff analysis: confirmed via `git show` — single line change
+  `1` → `1UL` in `lz77_compress()`
+- [Phase 3] git blame/show d14bbfff259ca: original compression commit
+  July 2024 → v6.12; confirmed buggy line present
+- [Phase 3] git show 94ae8c3fee94a: cleanup commit (Sep 2024, v6.12)
+  also contains buggy line — line has been unchanged since v6.12
+- [Phase 3] `git tag --contains d14bbfff259ca`: bug reaches v6.12 and
+  all releases through v6.19
+- [Phase 4] `b4 dig -c a13e942a03fee`: matched to https://lore.kernel.or
+  g/all/20260413190713.283939-2-ematsumiya@suse.de/ as patch 2/8
+- [Phase 4] `b4 dig -c a13e942a03fee -a`: only v1 exists
+- [Phase 4] mbox content: Steve French replied "merged into cifs-2.6.git
+  for-next"; no NAKs; no stable request
+- [Phase 5] Call chain: `lz77_compress()` ← `smb_compress()` ← SMB
+  request path only when CIFS_COMPRESSION=y and compress mount option
+  active
+- [Phase 6] Verified identical buggy code in v6.12, v6.15, v6.17, v6.18,
+  v6.19 via `git show $TAG:fs/smb/client/compress/lz77.c`
+- [Phase 7] Confirmed Enzo Matsumiya is the LZ77 code's original author
+  (authored d14bbfff259ca, 94ae8c3fee94a and the entire fix/improvement
+  series)
+- [Phase 8] CONFIG_CIFS_COMPRESSION is "Experimental" and default N
+  (verified in `fs/smb/client/Kconfig` line 206-218)
+- UNVERIFIED: Whether any real-world SMB server rejects malformed
+  compressed frames due to this specific bug — but UB produces wrong bit
+  pattern for flag_count == 0, which would be seen as invalid stream
+  marker by any standards-compliant decoder.
+
+The fix is a trivial, safe, verifiable correctness improvement that
+applies cleanly to all active stable trees. While the feature is
+experimental, users opting in get correct output at zero risk to anyone
+else.
 
 **YES**
 
- fs/smb/client/compress/lz77.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ fs/smb/client/compress/lz77.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/smb/client/compress/lz77.c b/fs/smb/client/compress/lz77.c
-index c1e7fada6e61c..61cdf1c146127 100644
+index 96e8a8057a772..cdd6b53766b0a 100644
 --- a/fs/smb/client/compress/lz77.c
 +++ b/fs/smb/client/compress/lz77.c
-@@ -48,17 +48,17 @@ static __always_inline void lz77_write32(u32 *ptr, u32 v)
- 	put_unaligned_le32(v, ptr);
- }
+@@ -221,7 +221,7 @@ noinline int lz77_compress(const void *src, u32 slen, void *dst, u32 *dlen)
+ 	}
  
--static __always_inline u32 lz77_match_len(const void *wnd, const void *cur, const void *end)
-+static __always_inline u32 lz77_match_len(const void *match, const void *cur, const void *end)
- {
- 	const void *start = cur;
- 	u64 diff;
+ 	flag <<= (32 - flag_count);
+-	flag |= (1 << (32 - flag_count)) - 1;
++	flag |= (1UL << (32 - flag_count)) - 1;
+ 	lz77_write32(flag_pos, flag);
  
- 	/* Safe for a do/while because otherwise we wouldn't reach here from the main loop. */
- 	do {
--		diff = lz77_read64(cur) ^ lz77_read64(wnd);
-+		diff = lz77_read64(cur) ^ lz77_read64(match);
- 		if (!diff) {
- 			cur += LZ77_STEP_SIZE;
--			wnd += LZ77_STEP_SIZE;
-+			match += LZ77_STEP_SIZE;
- 
- 			continue;
- 		}
-@@ -67,10 +67,13 @@ static __always_inline u32 lz77_match_len(const void *wnd, const void *cur, cons
- 		cur += count_trailing_zeros(diff) >> 3;
- 
- 		return (cur - start);
--	} while (likely(cur + LZ77_STEP_SIZE < end));
-+	} while (likely(cur + LZ77_STEP_SIZE <= end));
- 
--	while (cur < end && lz77_read8(cur++) == lz77_read8(wnd++))
--		;
-+	/* Fallback to byte-by-byte comparison for last <8 bytes. */
-+	while (cur < end && lz77_read8(cur) == lz77_read8(match)) {
-+		cur++;
-+		match++;
-+	}
- 
- 	return (cur - start);
- }
-@@ -195,7 +198,7 @@ noinline int lz77_compress(const void *src, u32 slen, void *dst, u32 *dlen)
- 			flag_pos = dstp;
- 			dstp += 4;
- 		}
--	} while (likely(srcp + LZ77_STEP_SIZE < end));
-+	} while (likely(srcp + LZ77_STEP_SIZE <= end));
- 
- 	while (srcp < end) {
- 		u32 c = umin(end - srcp, 32 - flag_count);
+ 	*dlen = dstp - dst;
 -- 
 2.53.0
 
