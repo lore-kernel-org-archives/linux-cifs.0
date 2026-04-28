@@ -1,81 +1,74 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2ECE3AEF4A
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 15:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E2A3C945A
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 15:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777391769; cv=none; b=sIM+oXW55IxCiPPCeRWG8UTMi3RrNPh7BD6quPbp3jM2Yk/Vm9hHlnqus2MUi1HK08vE8TdCuP2DrZJZQ1k/x8HpjBRhfDkxaZRN9xVM7DmxIZAUMgg5Kb1GDGp+C+Rr1RRJpk8llV3HuMAH3/tB+VgRcPD/3fUv088VzVrzHhw=
+	t=1777391890; cv=none; b=GRquKXBkA+Qp2sdE0Qz6n5Nlww2imjD6KFz6TNHY7HDDrlGMqCZk2RzzozU3Hb3XqcVbJytvf7BL0z6GE/GGxzP1eAUTYFIO9fNmCooEVR/TdDMT8apKvguqC5/WfnOW9KstBhmZz6cqRVqor7AR2qA0E4BTBMVErXHbBkarzrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777391769; c=relaxed/simple;
-	bh=QvtrNXioYetBI3140PAmV31Sf7hvItugtvKoEJcK3kY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P0huSMWI8barGKF7v2nti2l6RvzAvsLM3kHycqYf+0nyRmawOCDTA7LiRRqXJfCmQgSdxgDHMYUN6AeFuMQgXPDFhjAZ6o1dlm5NIvvwqDCmRfWsnCsKenF3us5GHIqlSqW/AuojXZtkjJh1esKhKN9ILf71yEn5fhGqWALvz8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ZvrEAViY; arc=none smtp.client-ip=209.85.128.54
+	s=arc-20240116; t=1777391890; c=relaxed/simple;
+	bh=mc8duuf18vGiKek7T/0raBsUgBqkfZdV+R5o90VA56k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VNg2vVkMKgx36bNSE/M6F5VkmDAgfLeujbqxzmIQxLdIe8Li8Guq4A47OcM+9ZDOEIb4kvPPlWTJqcBNQ8uO4gLmmdpR1rENP72RiQhHAHYPrZod7gE3KKUq73Yea0vsrgImZDembijZrfi//URSk59Ze39oppUFMpHeCT3pglI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=PyC0KR36; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ZvrEAViY"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4891c00e7aeso89221015e9.2
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 08:56:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="PyC0KR36"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso122444195e9.2
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 08:58:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1777391766; x=1777996566; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=44YlO/FFyQwPPBPg8EGdlogjBUMKNqCqptz/a4tBBBA=;
-        b=ZvrEAViY7MapZAH6eFfDyffSnPt8m4dfGmLA2v2QLQTOfbDLtlsyPb0Y+Viq4GvBDa
-         Gnh5ZZhUOUwxwuRQPN0/KQda67jPyZ9T856rocjLiUoT3LiKjM0of77YB3KbVVbPXVoS
-         eTuP+FaWVqmo+geVMm7RA+vjXX+07k2sGz2dM9RYfEWueNye7p61Ni48UcJXdMAGkrg9
-         QyrKQvhEdwHBfAX1+/7atJGBc64MrAzZTLntDnAdM/IbQw6q0JWlnX1f3ZCXLbxNPqZA
-         EdMip0Qs7/mzWyq6Ga9fiQv+xCD3YNI9bcDlH8aqWyORVFwBydKGp4QKA3AGf421Y1qZ
-         Qw8w==
+        d=suse.com; s=google; t=1777391886; x=1777996686; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XEWRVYzyIgG3Bi1Pa1Vh5S1rEgoz2yBSa2G8ehlgCSM=;
+        b=PyC0KR36lb83Z988LHxI+6DqVlkw3aBJpHEpv3DHkwtJ2ybrxtQthtqkg9GvNDskoC
+         Ehd6veECdnm5tEti0WKZytw8D81jFBUGRggpJbyStwUwPcFMQMFuLiaIZeEjJIJFO0RZ
+         EhRQIB5q3YqBqOPctmO6sk3og1bu5MwFMuXn8INZT4sdTh0iWfmVLBY8jt6AHIFrnkdo
+         uh+EsgKnZFn/FmfDEnm46afjbSC98PfcBRYvHbAUOHXsIVvxxC90K0qkbEjBHcGZtubg
+         WDcITBLOOjOAq0jgvtJmgBopcLDQpVdlrRwvVh+qmKUsK0sTucxMEhb4IHjFjyMAEGPO
+         Otpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777391766; x=1777996566;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=44YlO/FFyQwPPBPg8EGdlogjBUMKNqCqptz/a4tBBBA=;
-        b=hyGMIs+eQwMHsZXeSrMPqiW7iScflwF23kIPNIMhyjAlWCjA34YxcsxXz9tb9O5ZX6
-         vzLLyPIcAi6c4D2OtWYeyxSBvmcqoIVvL2N2L0heP7BWjA+PzPBAsW0Rk9wPn2eTPGAP
-         sujP8kN7QMc6sBjP4PVs94jRhbq0Xq7GlmhZps+F23zPiCAPklWtmBJ+3cO2Jbc56l/o
-         TzT4nv6LDbnnJM28nZMoOOHbYjC/qRVliUXTwcHTTugsOczEqoo02eEUsAMnKrLhtq25
-         l4raljaj3xUaYAe+vF7XPxW/7+Wzb7zo9iFWnZ1eB/CZHWnEqFwlSOgoWL3w78kjOrAe
-         qU+g==
-X-Gm-Message-State: AOJu0YxXqStNbPc0KWVf0J5snPkyV9S9DRb3ZqXxpEjMPwZ61d0rtHEu
-	fglNMvxvzPBi9PNPovVHSPBiomf2WzhlY00EHp8RO0/rgUVxf8nH3WOF7YvjU2HbXko5sMLKzq9
-	nGSnptool+Q==
-X-Gm-Gg: AeBDievlcTC5IvaFmZo9XY1P+DTOiR1Dteo0AswTFEWabIpOulDEk8ggpBzjboi+1cx
-	x8TYqAI3F0W2eR98QQE8TySgPHlonMr1ddZmPrxnMWYr5EL/2dYOedgRbEMAkP42y4F+obxzgGu
-	5kSBCwEZTVsOcnRRGZwTseGgBzs22VO5+YemqJbD5KZ7liJs6O5JxAjKFv8EO1Dsv4ZOFmeDCgo
-	HiV0/7tBQCpcuGpZ60lDwToxwWQPS8EI2JFtCIef46RM0odAanWECAq5iS9mka4itrjL5iP9Enr
-	3f2NYp2AMN0lFzdvr3qHcy4ujutzWV1sItUCgIZAkzgjehBQ9TQKYLeZoLVLJKkYqYkuhcUxL6a
-	RlusPuihYOyWint16GNziMiPTY82xvPVtxFWcLX2+F/+YgNNIEdpj7RXX+RLt31f7SrYsYX/4Ap
-	rl4vCFvMlhQJpbnrxVwP6l9+h7Jfx2hLn/FlcEbPER9ikw
-X-Received: by 2002:a05:600c:8582:b0:485:3abe:ab86 with SMTP id 5b1f17b1804b1-48a77af3ddamr41059845e9.4.1777391765758;
-        Tue, 28 Apr 2026 08:56:05 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777391886; x=1777996686;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XEWRVYzyIgG3Bi1Pa1Vh5S1rEgoz2yBSa2G8ehlgCSM=;
+        b=mvozUZvsuNikejZJKD/WPOCFDWPKC9xDEg3ckmrAYm1Xe3MuemE5LvjZIzELjYGowZ
+         5aY6pJNCWMRowrc8h1CBgH8Izkl2GLH0L3JGFKvbI+7Eb/weXJ6Jki36iHC7Fvt1z856
+         e06zK4pO6eyF+UskqszD+3z8HGCB+QQwqh9FrUevuRpBADNC8QMmqOOQdKrTUvKU40+x
+         nXse4/Bp3bn4gdDGA4ZufzVwWm0V3b8RQISd5l7T/5ehdydjh0eohtpoWaHlMd4cJ9B5
+         eD3vDJTGMy+maxocMwbNl9AcYOCpDefEm3XK44mBShyaNXwSHqte2wB1X9tdRfhniZO9
+         V3AA==
+X-Gm-Message-State: AOJu0Yy9JOmtsREVdOgzrlvafTEVsjVnhRWE9DJB8eF3UlXP+Ep72YAU
+	erpngFt/xezBDO2VlA7cM7eFiEvvae6EZyuA1EyuIvInk+dCTV7Cp9KbVfXr1dY/TleYKCDxvkh
+	QvQJcszP3fg==
+X-Gm-Gg: AeBDiet86DOo6FgM0WrmoqkjXno6o4vkEIKfY81pDlPqzi+sJa9nlfJ/XdJMIPyGTt2
+	sJtaJ+EJhGAvb64+gDVcjtl8DM1V53woqbEqtChgIBp9GyFoP7kU5CA0OGsBdIH8X+Dq7YsJv08
+	KB1LrO5F23xPi6HEY+HVRTirv1S+2pDMLadxasPiSAwtfU8KzmTcOtqFt4GM5ago7C01OXrQ1O4
+	3xxeRLK0M59oi06sN8m1Nc/5SrLE+jc+BUSkdZ7XHbBaTOcdv5lwgyvDcU46eq7nVG7FpHAWMsI
+	WJvqfu+7VnexhrzM13lGaCVQLHcg7uLSLok4EyIMLsEj78G7y1mgMnpHNFWHXPkXRQsWaPUdZuG
+	Z65IWBqlmgW/yLrtUD7dwH45LCN+pvG10+O3uyASUwFy6CWpiyBcpu6XMdbQh1dxQfZUdcsUXXb
+	IGnXhYi7JUoW/YXBMhZeOLW3XdsFimJgP1mJKknMugs+LR
+X-Received: by 2002:a05:600c:4f92:b0:489:1ff1:74df with SMTP id 5b1f17b1804b1-48a77ae5430mr57089135e9.1.1777391885753;
+        Tue, 28 Apr 2026 08:58:05 -0700 (PDT)
 Received: from precision ([2a01:4b00:c007:bb00:be9d:a3c4:18b1:4a25])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a775f56fcsm23475685e9.25.2026.04.28.08.56.04
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a7b560a84sm3409255e9.4.2026.04.28.08.58.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 08:56:05 -0700 (PDT)
+        Tue, 28 Apr 2026 08:58:05 -0700 (PDT)
 From: Henrique Carvalho <henrique.carvalho@suse.com>
 To: linux-cifs@vger.kernel.org
-Cc: sfrench@samba.org,
-	linkinjeon@kernel.org,
+Cc: linkinjeon@kernel.org,
+	sfrench@samba.org,
 	metze@samba.org,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
+	senozhatsky@chromium.org,
 	tom@talpey.com,
-	bharathsm@microsoft.com,
 	ematsumiya@suse.de,
 	Henrique Carvalho <henrique.carvalho@suse.com>
-Subject: [PATCH v2 04/11] smb: client: add QUIC mount and transport setup
-Date: Tue, 28 Apr 2026 12:55:42 -0300
-Message-ID: <20260428155542.226234-5-henrique.carvalho@suse.com>
+Subject: [PATCH v2 05/11] smb: server: split interface management from TCP in preparation for QUIC
+Date: Tue, 28 Apr 2026 12:57:54 -0300
+Message-ID: <20260428155759.226368-1-henrique.carvalho@suse.com>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260428155542.226234-1-henrique.carvalho@suse.com>
-References: <20260428155542.226234-1-henrique.carvalho@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -84,594 +77,680 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce new mount options used to drive SMB over QUIC: `quic` and
-`mtls`. Introduce per-server state needed to drive the QUIC transport.
-Introduce transport functions for smb quic tls handshake setup and
-initial quic transport setup. Include SMB2_TRANSPORT_CAPABILITIES
-negotiate context for QUIC.
+Move active_num_conn out of transport_tcp.c and define it in
+connection.c.
+
+Move the transport-agnostic bits out into a new interface.c /
+interface.h, network-interface bookkeeping, the iface_list, the
+netdevice notifier, alloc/find/set helpers, and the per-iface forker
+kthread plumbing.
+
+Make the necessary changes to transport_tcp.c, without functional change
+for the TCP path; this is purely a layering rearrangement to make room
+for additional transports.
 
 Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 ---
- fs/smb/client/cifsglob.h   |  19 +++-
- fs/smb/client/connect.c    | 184 +++++++++++++++++++++++++++++++++++--
- fs/smb/client/fs_context.c |  37 ++++++++
- fs/smb/client/fs_context.h |   4 +
- fs/smb/client/smb2pdu.c    |  27 ++++++
- fs/smb/client/transport.c  |  40 ++++----
- 6 files changed, 284 insertions(+), 27 deletions(-)
+ fs/smb/server/Makefile        |   2 +-
+ fs/smb/server/connection.c    |   9 +-
+ fs/smb/server/connection.h    |   1 +
+ fs/smb/server/interface.c     | 196 ++++++++++++++++++++++++++++++
+ fs/smb/server/interface.h     |  34 ++++++
+ fs/smb/server/transport_ipc.c |   2 +-
+ fs/smb/server/transport_tcp.c | 223 ++++------------------------------
+ fs/smb/server/transport_tcp.h |   7 +-
+ 8 files changed, 265 insertions(+), 209 deletions(-)
+ create mode 100644 fs/smb/server/interface.c
+ create mode 100644 fs/smb/server/interface.h
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 58be72377c7d..f56d3732bfa8 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -35,6 +35,7 @@
- #define CIFS_PORT 445
- #define RFC1001_PORT 139
- #define SMBD_IWARP_PORT 5445
-+#define SMB_QUIC_PORT 443
+diff --git a/fs/smb/server/Makefile b/fs/smb/server/Makefile
+index 6407ba6b9340..7bd6501bfdc9 100644
+--- a/fs/smb/server/Makefile
++++ b/fs/smb/server/Makefile
+@@ -8,7 +8,7 @@ ksmbd-y :=	unicode.o auth.o vfs.o vfs_cache.o server.o ndr.o \
+ 		misc.o oplock.o connection.o ksmbd_work.o crypto_ctx.o \
+ 		mgmt/ksmbd_ida.o mgmt/user_config.o mgmt/share_config.o \
+ 		mgmt/tree_connect.o mgmt/user_session.o smb_common.o \
+-		transport_tcp.o transport_ipc.o smbacl.o smb2pdu.o \
++		interface.o transport_tcp.o transport_ipc.o smbacl.o smb2pdu.o \
+ 		smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
+ 		ksmbd_spnego_negtokentarg.asn1.o asn1.o
  
- /*
-  * The sizes of various internal tables and strings
-@@ -759,8 +760,10 @@ struct TCP_Server_Info {
- 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
- 	bool	sec_iakerb;		/* supports pass-through auth for Kerberos (krb5 proxy) */
- 	bool	large_buf;		/* is current buffer large? */
--	int	ipproto; /* IPPROTO_TCP or IPOROTO_SMBDIRECT */
-+	int	ipproto; /* IPPROTO_TCP, IPOROTO_SMBDIRECT or IPPROTO_QUIC */
- #define cifs_rdma_enabled(__server)	((__server)->ipproto == IPPROTO_SMBDIRECT)
-+	/* point to the SMBD connection if RDMA is used instead of socket */
-+	struct smbd_connection *smbd_conn;
- 	struct delayed_work	echo; /* echo ping workqueue job */
- 	char	*smallbuf;	/* pointer to current "small" buffer */
- 	char	*bigbuf;	/* pointer to current "big" buffer */
-@@ -832,6 +835,14 @@ struct TCP_Server_Info {
- 	char *leaf_fullpath;
- 	bool dfs_conn:1;
- 	char dns_dom[CIFS_MAX_DOMAINNAME_LEN + 1];
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index 31392d245c30..7465b364c35c 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -12,6 +12,7 @@
+ #include "smb_common.h"
+ #include "mgmt/ksmbd_ida.h"
+ #include "connection.h"
++#include "interface.h"
+ #include "transport_tcp.h"
+ #include "transport_rdma.h"
+ #include "misc.h"
+@@ -79,6 +80,8 @@ static int create_proc_clients(void) { return 0; }
+ static void delete_proc_clients(void) {}
+ #endif
+ 
++atomic_t active_num_conn = ATOMIC_INIT(0);
 +
-+	struct {
-+		bool need_smb_seal; /* if unset, smb encryption is disabled over QUIC
-+				     * transport, and QUIC security (i.e. TLS 1.3) is
-+				     * the one used
-+				     */
-+		bool mtls;
-+	} quic_conn;
- };
+ /**
+  * ksmbd_conn_free() - free resources of the connection instance
+  *
+@@ -512,9 +515,9 @@ int ksmbd_conn_transport_init(void)
+ 	int ret;
  
- static inline bool is_smb1(const struct TCP_Server_Info *server)
-@@ -855,6 +866,12 @@ static inline void cifs_server_unlock(struct TCP_Server_Info *server)
- 	memalloc_nofs_restore(nofs_flag);
- }
+ 	mutex_lock(&init_lock);
+-	ret = ksmbd_tcp_init();
++	ret = ksmbd_interface_init();
+ 	if (ret) {
+-		pr_err("Failed to init TCP subsystem: %d\n", ret);
++		pr_err("Failed to init interface: %d\n", ret);
+ 		goto out;
+ 	}
  
-+static inline bool
-+cifs_quic_enabled(struct TCP_Server_Info *server)
+@@ -558,7 +561,7 @@ void ksmbd_conn_transport_destroy(void)
+ {
+ 	delete_proc_clients();
+ 	mutex_lock(&init_lock);
+-	ksmbd_tcp_destroy();
++	ksmbd_interface_destroy();
+ 	ksmbd_rdma_stop_listening();
+ 	stop_sessions();
+ 	mutex_unlock(&init_lock);
+diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
+index ae21a1bd4c70..b060baf5f688 100644
+--- a/fs/smb/server/connection.h
++++ b/fs/smb/server/connection.h
+@@ -157,6 +157,7 @@ struct ksmbd_transport {
+ #define CONN_HASH_BITS	12
+ extern DECLARE_HASHTABLE(conn_list, CONN_HASH_BITS);
+ extern struct rw_semaphore conn_list_lock;
++extern atomic_t active_num_conn;
+ 
+ bool ksmbd_conn_alive(struct ksmbd_conn *conn);
+ void ksmbd_conn_wait_idle(struct ksmbd_conn *conn);
+diff --git a/fs/smb/server/interface.c b/fs/smb/server/interface.c
+new file mode 100644
+index 000000000000..a5e59a420639
+--- /dev/null
++++ b/fs/smb/server/interface.c
+@@ -0,0 +1,196 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
++ *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
++ */
++
++#include <linux/freezer.h>
++
++#include "smb_common.h"
++#include "server.h"
++#include "auth.h"
++#include "connection.h"
++#include "transport_tcp.h"
++#include "interface.h"
++
++static LIST_HEAD(iface_list);
++static int bind_additional_ifaces;
++
++static struct interface *alloc_iface(char *ifname)
 +{
-+	return server->ipproto == IPPROTO_QUIC;
++	struct interface *iface;
++
++	if (!ifname)
++		return NULL;
++
++	iface = kzalloc_obj(struct interface, KSMBD_DEFAULT_GFP);
++	if (!iface) {
++		kfree(ifname);
++		return NULL;
++	}
++
++	iface->name = ifname;
++	iface->state = IFACE_STATE_DOWN;
++	list_add(&iface->entry, &iface_list);
++	return iface;
 +}
 +
- struct cifs_credits {
- 	unsigned int value;
- 	unsigned int instance;
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 33d619007905..bfe949b14db2 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -25,11 +25,14 @@
- #include <linux/namei.h>
- #include <linux/uuid.h>
- #include <linux/uaccess.h>
-+#include <linux/quic.h>
- #include <asm/processor.h>
- #include <linux/inet.h>
- #include <linux/module.h>
- #include <keys/user-type.h>
- #include <net/ipv6.h>
-+#include <net/handshake.h>
-+#include <keys/asymmetric-type.h>
- #include <linux/parser.h>
- #include <linux/bvec.h>
- #include "cifsglob.h"
-@@ -70,7 +73,11 @@ static void mchan_mount_work_fn(struct work_struct *work);
- 
- static void smb_sock_release(struct TCP_Server_Info *server)
- {
--	sock_release(server->ssocket);
-+	/* ->ssocket will be released by fput() */
-+	if (cifs_quic_enabled(server) && server->ssocket->file)
-+		fput(server->ssocket->file);
-+	else if (server->ssocket)
-+		sock_release(server->ssocket);
- 	server->ssocket = NULL;
- }
- 
-@@ -1643,6 +1650,9 @@ static int match_server(struct TCP_Server_Info *server,
- 	if (cifs_rdma_enabled(server) != ctx->rdma)
- 		return 0;
- 
-+	if (cifs_quic_enabled(server) != ctx->quic)
++/**
++ * ksmbd_interface_run_kthread() - start a per-interface forker thread
++ * @iface:	pointer to struct interface
++ * @kthread_fn:	thread routine to run
++ * @suf:	suffix to append to the thread name (e.g. "tcp")
++ *
++ * Return:	the started task_struct, or ERR_PTR on failure.
++ */
++struct task_struct *ksmbd_interface_run_kthread(struct interface *iface,
++						int (*kthread_fn)(void *), const char *suf)
++{
++	struct task_struct *kthread;
++
++	kthread = kthread_run(kthread_fn, (void *)iface, "ksmbd-%s-%s", iface->name, suf);
++	return kthread;
++}
++
++void ksmbd_interface_stop_kthread(struct task_struct *kthread)
++{
++	int ret;
++
++	if (!kthread)
++		return;
++
++	ret = kthread_stop(kthread);
++	if (ret)
++		pr_err("failed to stop forker thread\n");
++}
++
++static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
++			      void *ptr)
++{
++	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
++	struct interface *iface;
++	int ret;
++
++	switch (event) {
++	case NETDEV_UP:
++		if (netif_is_bridge_port(netdev))
++			return NOTIFY_OK;
++
++		iface = ksmbd_find_netdev_name_iface_list(netdev->name);
++		if (iface && iface->state == IFACE_STATE_DOWN) {
++			ksmbd_debug(CONN, "netdev-up event: netdev(%s) is going up\n",
++					iface->name);
++
++			if (!iface->net)
++				iface->net = get_net(dev_net(netdev));
++
++			ret = ksmbd_tcp_create_socket(iface);
++			if (ret)
++				break;
++		}
++		if (!iface && bind_additional_ifaces) {
++			iface = alloc_iface(kstrdup(netdev->name, KSMBD_DEFAULT_GFP));
++			if (!iface)
++				return NOTIFY_OK;
++
++			ksmbd_debug(CONN, "netdev-up event: netdev(%s) is going up\n",
++				    iface->name);
++
++			iface->net = get_net(dev_net(netdev));
++
++			ret = ksmbd_tcp_create_socket(iface);
++			if (ret)
++				break;
++		}
++		break;
++	case NETDEV_DOWN:
++		iface = ksmbd_find_netdev_name_iface_list(netdev->name);
++		if (iface && iface->state == IFACE_STATE_CONFIGURED) {
++			ksmbd_debug(CONN, "netdev-down event: netdev(%s) is going down\n",
++					iface->name);
++
++			if (iface->ksmbd_tcp_socket)
++				kernel_sock_shutdown(iface->ksmbd_tcp_socket, SHUT_RDWR);
++
++			if (iface->ksmbd_tcp_kthread)
++				ksmbd_interface_stop_kthread(iface->ksmbd_tcp_kthread);
++
++			if (iface->ksmbd_tcp_socket)
++				sock_release(iface->ksmbd_tcp_socket);
++
++			iface->ksmbd_tcp_kthread = NULL;
++			iface->ksmbd_tcp_socket = NULL;
++
++			put_net(iface->net);
++			iface->net = NULL;
++
++			iface->state = IFACE_STATE_DOWN;
++			break;
++		}
++		break;
++	}
++
++	return NOTIFY_DONE;
++}
++
++static struct notifier_block ksmbd_netdev_notifier = {
++	.notifier_call = ksmbd_netdev_event,
++};
++
++int ksmbd_interface_init(void)
++{
++	register_netdevice_notifier(&ksmbd_netdev_notifier);
++
++	return 0;
++}
++
++
++void ksmbd_interface_destroy(void)
++{
++	struct interface *iface, *tmp;
++
++	unregister_netdevice_notifier(&ksmbd_netdev_notifier);
++
++	list_for_each_entry_safe(iface, tmp, &iface_list, entry) {
++		list_del(&iface->entry);
++		kfree(iface->name);
++		kfree(iface);
++	}
++}
++
++struct interface *
++ksmbd_find_netdev_name_iface_list(char *netdev_name)
++{
++	struct interface *iface;
++
++	list_for_each_entry(iface, &iface_list, entry)
++		if (!strcmp(iface->name, netdev_name))
++			return iface;
++	return NULL;
++}
++
++int ksmbd_set_interfaces(char *ifc_list, int ifc_list_sz)
++{
++	int sz = 0;
++
++	if (!ifc_list_sz) {
++		bind_additional_ifaces = 1;
 +		return 0;
-+
- 	if (server->ignore_signature != ctx->ignore_signature)
- 		return 0;
- 
-@@ -1784,7 +1794,10 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 	tcp_ses->tcp_nodelay = ctx->sockopt_tcp_nodelay;
- 	if (ctx->rdma)
- 		tcp_ses->ipproto = IPPROTO_SMBDIRECT;
--	else
-+	else if (ctx->quic) {
-+		tcp_ses->ipproto = IPPROTO_QUIC;
-+		tcp_ses->quic_conn.mtls = ctx->mtls;
-+	} else
- 		tcp_ses->ipproto = IPPROTO_TCP;
- 
- 	tcp_ses->in_flight = 0;
-@@ -3304,6 +3317,145 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
- 	return 0;
- }
- 
-+static void
-+smb_tls_handshake_done(void *data, int status, key_serial_t peerid)
-+{
-+	struct smb_tls *smb_tls = (struct smb_tls *)data;
-+
-+	smb_tls->status = status;
-+	smb_tls->peerid = peerid;
-+
-+	complete(&smb_tls->handshake_done);
-+}
-+
-+static inline struct smb_tls *
-+smb_tls_init(struct TCP_Server_Info *server)
-+{
-+	struct smb_tls *tls;
-+
-+	tls = kzalloc_obj(*tls, GFP_KERNEL);
-+	if (!tls)
-+		return ERR_PTR(-ENOMEM);
-+
-+	tls->status = 0;
-+
-+	tls->args.ta_sock = server->ssocket;
-+	tls->args.ta_done = smb_tls_handshake_done;
-+	tls->args.ta_data = tls;
-+	tls->args.ta_peername = kstrdup(server->hostname, GFP_KERNEL); /* do I need kstrdup ? */
-+	tls->args.ta_timeout_ms = SMB_TLS_TIMEOUT_MS;
-+	tls->args.ta_keyring = TLS_NO_KEYRING;
-+
-+	init_completion(&tls->handshake_done);
-+
-+	return tls;
-+}
-+
-+static void smb_tls_free(struct smb_tls **tls)
-+{
-+	kfree((*tls)->args.ta_peername);
-+	kfree_sensitive(*tls);
-+	*tls = NULL;
-+}
-+
-+static inline void
-+smb_tls_debug(int rc)
-+{
-+	switch (rc) {
-+	case 0:
-+		cifs_dbg(VFS, "smb tls: Handshake successful");
-+		return;
-+	case -ERESTARTSYS:
-+		cifs_dbg(VFS, "smb tls: Handshake interrupted");
-+		return;
-+	case -ETIMEDOUT:
-+		cifs_dbg(VFS, "smb tls: Handshake timed out");
-+		return;
-+	case -EINVAL:
-+		cifs_dbg(VFS, "smb tls: Consumer provided an invalid argument");
-+		return;
-+	case -ENOKEY:
-+		cifs_dbg(VFS, "smb tls: Missing authentication material");
-+		return;
-+	case -EIO:
-+		cifs_dbg(VFS, "smb tls: An unexpected fault occurred");
-+		return;
-+	default:
-+		cifs_dbg(VFS, "smb tls: Error: %d", -rc);
-+		return;
 +	}
++
++	while (ifc_list_sz > 0) {
++		if (!alloc_iface(kstrdup(ifc_list, KSMBD_DEFAULT_GFP)))
++			return -ENOMEM;
++
++		sz = strlen(ifc_list);
++		if (!sz)
++			break;
++
++		ifc_list += sz + 1;
++		ifc_list_sz -= (sz + 1);
++	}
++
++	bind_additional_ifaces = 0;
++
++	return 0;
 +}
+diff --git a/fs/smb/server/interface.h b/fs/smb/server/interface.h
+new file mode 100644
+index 000000000000..7e35645076a9
+--- /dev/null
++++ b/fs/smb/server/interface.h
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
++ *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
++ *
++ */
 +
-+static int
-+smb_tls_handshake(struct TCP_Server_Info *server)
-+{
-+	int rc;
-+	struct smb_tls *tls;
++#ifndef __KSMBD_INTERFACE_H__
++#define __KSMBD_INTERFACE_H__
 +
-+	cifs_dbg(FYI, "smb tls: starting TLS handshake");
++#include <linux/freezer.h>
 +
-+	tls = smb_tls_init(server);
-+	if (IS_ERR(tls))
-+		return PTR_ERR(tls);
++#define IFACE_STATE_DOWN		BIT(0)
++#define IFACE_STATE_CONFIGURED		BIT(1)
 +
-+	if (server->quic_conn.mtls)
-+		rc = tls_client_hello_x509(&tls->args, GFP_KERNEL);
-+	else
-+		rc = tls_client_hello_anon(&tls->args, GFP_KERNEL);
++struct interface {
++	struct task_struct	*ksmbd_tcp_kthread;
++	struct socket		*ksmbd_tcp_socket;
++	struct list_head	entry;
++	char			*name;
++	int			state;
++	struct net		*net;
++};
 +
-+	if (rc < 0)
-+		goto free;
++int ksmbd_interface_init(void);
++void ksmbd_interface_destroy(void);
++int ksmbd_set_interfaces(char *ifc_list, int ifc_list_sz);
++struct interface *ksmbd_find_netdev_name_iface_list(char *netdev_name);
++struct task_struct *ksmbd_interface_run_kthread(struct interface *iface,
++						int (*kthread_fn)(void *),
++						const char *suf);
++void ksmbd_interface_stop_kthread(struct task_struct *kthread);
 +
-+	rc = wait_for_completion_interruptible(&tls->handshake_done);
-+	if (rc < 0)
-+		tls_handshake_cancel(server->ssocket->sk);
-+	else
-+		rc = tls->status;
-+
-+free:
-+	smb_tls_free(&tls);
-+
-+	smb_tls_debug(rc);
-+
-+	return rc;
-+}
-+
-+static int
-+smb_quic_tls(struct TCP_Server_Info *server)
-+{
-+	int rc;
-+	size_t sinfolen;
-+	struct quic_stream_info sinfo;
-+	struct socket *socket = server->ssocket;
-+
-+	rc = smb_tls_handshake(server);
-+	if (rc < 0)
-+		return rc;
-+
-+	/* open a new stream after handshake, default to stream id == 0 */
-+	sinfo.stream_id = -1;
-+	sinfolen = sizeof(sinfo);
-+	rc = quic_do_getsockopt(socket->sk, QUIC_SOCKOPT_STREAM_OPEN,
-+				KERNEL_SOCKPTR(&sinfo), KERNEL_SOCKPTR(&sinfolen));
-+
-+	return rc;
-+}
-+
-+static int
-+smb_quic_prepare_socket(struct TCP_Server_Info *server)
-+{
-+	int flags = 0;
-+	struct file *filp;
-+	struct socket *socket = server->ssocket;
-+
-+	filp = sock_alloc_file(socket, flags, NULL);
-+	if (IS_ERR(filp))
-+		return PTR_ERR(filp);
-+
-+	return quic_do_setsockopt(socket->sk, QUIC_SOCKOPT_ALPN,
-+				  KERNEL_SOCKPTR("smb"), 3);
-+}
-+
- static inline const char *
- get_protocol_name(struct TCP_Server_Info *server)
- {
-@@ -3350,8 +3502,6 @@ generic_ip_connect(struct TCP_Server_Info *server)
- 			 __func__, pname, &ipv4->sin_addr, ntohs(sport));
- 	}
- 
--	smb_sock_release(server);
++#endif /* _KSMBD_INTERFACE_H */
+diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
+index 2dbabe2d8005..6ccfb1cf8ed7 100644
+--- a/fs/smb/server/transport_ipc.c
++++ b/fs/smb/server/transport_ipc.c
+@@ -348,7 +348,7 @@ static int ipc_server_config_on_startup(struct ksmbd_startup_request *req)
+ 	ret |= ksmbd_set_server_string(req->server_string);
+ 	ret |= ksmbd_set_work_group(req->work_group);
+ 	server_conf.bind_interfaces_only = req->bind_interfaces_only;
+-	ret |= ksmbd_tcp_set_interfaces(KSMBD_STARTUP_CONFIG_INTERFACES(req),
++	ret |= ksmbd_set_interfaces(KSMBD_STARTUP_CONFIG_INTERFACES(req),
+ 					req->ifc_list_sz);
+ out:
+ 	if (ret) {
+diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
+index 7e29b06820e2..37f4238f72f5 100644
+--- a/fs/smb/server/transport_tcp.c
++++ b/fs/smb/server/transport_tcp.c
+@@ -11,23 +11,7 @@
+ #include "auth.h"
+ #include "connection.h"
+ #include "transport_tcp.h"
 -
- 	{
- 		struct net *net = cifs_net_ns(server);
- 		struct sock *sk;
-@@ -3380,8 +3530,8 @@ generic_ip_connect(struct TCP_Server_Info *server)
+-#define IFACE_STATE_DOWN		BIT(0)
+-#define IFACE_STATE_CONFIGURED		BIT(1)
+-
+-static atomic_t active_num_conn;
+-
+-struct interface {
+-	struct task_struct	*ksmbd_kthread;
+-	struct socket		*ksmbd_socket;
+-	struct list_head	entry;
+-	char			*name;
+-	int			state;
+-};
+-
+-static LIST_HEAD(iface_list);
+-
+-static int bind_additional_ifaces;
++#include "interface.h"
  
- 	rc = bind_socket(server);
- 	if (rc < 0) {
--		cifs_dbg(FYI, "Error %d bind_socket() %s\n", rc, pname);
--		goto close_socket;
-+		cifs_dbg(VFS, "Error %d bind_socket() %s\n", rc, pname);
-+		return rc;
- 	}
+ struct tcp_transport {
+ 	struct ksmbd_transport		transport;
+@@ -38,8 +22,6 @@ struct tcp_transport {
  
- 	/*
-@@ -3406,10 +3556,16 @@ generic_ip_connect(struct TCP_Server_Info *server)
- 	if (cifs_rdma_enabled(server)) {
- 		rc = smbd_prepare_socket(server, ntohs(sport));
- 		if (rc < 0) {
--			cifs_dbg(FYI, "Error %d from smbd_prepare_socket(port=%u)\n",
-+			cifs_dbg(VFS, "Error %d from smbd_prepare_socket(port=%u)\n",
- 				 rc, ntohs(sport));
- 			goto close_socket;
- 		}
-+	} else if (cifs_quic_enabled(server)) {
-+		rc = smb_quic_prepare_socket(server);
-+		if (rc < 0) {
-+			cifs_dbg(VFS, "Error %d from smb_quic_prepare_socket()\n", rc);
-+			goto close_socket;
-+		}
- 	}
+ static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops;
  
- 	cifs_dbg(FYI, "sndbuf %d rcvbuf %d rcvtimeo 0x%lx\n",
-@@ -3426,9 +3582,18 @@ generic_ip_connect(struct TCP_Server_Info *server)
- 	if (server->noblockcnt && rc == -EINPROGRESS)
- 		rc = 0;
- 	if (rc < 0) {
--		cifs_dbg(FYI, "Error %d connecting with %s to server\n", rc, pname);
-+		cifs_dbg(VFS, "Error %d connecting with %s to server\n", rc, pname);
- 		goto close_socket;
- 	}
-+
-+	if (cifs_quic_enabled(server)) {
-+		rc = smb_quic_tls(server);
-+		if (rc < 0) {
-+			cifs_dbg(VFS, "Error %d from smb_quic_tls()\n", rc);
-+			goto close_socket;
-+		}
-+	}
-+
- 	trace_smb3_connect_done(server->hostname, server->conn_id, &server->dstaddr);
+-static void tcp_stop_kthread(struct task_struct *kthread);
+-static struct interface *alloc_iface(char *ifname);
+ static void ksmbd_tcp_disconnect(struct ksmbd_transport *t);
  
- 	/*
-@@ -3467,6 +3632,9 @@ ip_connect(struct TCP_Server_Info *server)
- 	if (cifs_rdma_enabled(server)) {
- 		port1 = SMBD_IWARP_PORT;
- 		port2 = CIFS_PORT;
-+	} else if (cifs_quic_enabled(server)) {
-+		port1 = SMB_QUIC_PORT;
-+		port2 = 0;
- 	}
+ #define KSMBD_TRANS(t)	(&(t)->transport)
+@@ -214,7 +196,7 @@ static int ksmbd_tcp_new_connection(struct socket *client_sk)
+  *
+  * Return:	0 on success, error number otherwise
+  */
+-static int ksmbd_kthread_fn(void *p)
++static int tcp_kthread_fn(void *p)
+ {
+ 	struct socket *client_sk = NULL;
+ 	struct interface *iface = (struct interface *)p;
+@@ -223,10 +205,9 @@ static int ksmbd_kthread_fn(void *p)
+ 	unsigned int max_ip_conns;
  
- 	if (server->dstaddr.ss_family == AF_INET6)
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 54090739535f..067058c39619 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -127,6 +127,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
- 	fsparam_flag("nosparse", Opt_nosparse),
- 	fsparam_flag("domainauto", Opt_domainauto),
- 	fsparam_flag("rdma", Opt_rdma),
-+	fsparam_flag("quic", Opt_quic),
- 	fsparam_flag("modesid", Opt_modesid),
- 	fsparam_flag("modefromsid", Opt_modesid),
- 	fsparam_flag("rootfs", Opt_rootfs),
-@@ -135,6 +136,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
- 	fsparam_flag_no("nativesocket", Opt_nativesocket),
- 	fsparam_flag_no("unicode", Opt_unicode),
- 	fsparam_flag_no("nbsessinit", Opt_nbsessinit),
-+	fsparam_flag("mtls", Opt_mtls),
- 
- 	/* Mount options which take uid or gid */
- 	fsparam_uid("backupuid", Opt_backupuid),
-@@ -840,6 +842,30 @@ static int smb3_fs_context_validate(struct fs_context *fc)
- 		return -EOPNOTSUPP;
- 	}
- 
-+	if (ctx->rdma && ctx->quic) {
-+		pr_warn_once("SMB Direct and QUIC transport are mutually exclusive. Default to rdma\n");
-+		ctx->quic = false;
-+	}
-+
-+	if (ctx->quic && !ctx->got_version) {
-+		pr_warn_once("No dialect specified on mount, but 'quic' implies a minimum dialect of SMB3.1.1. Default has changed to SMB3.1.1\n");
-+		ctx->ops = &smb311_operations;
-+		ctx->vals = &smb311_values;
-+		ctx->got_version = true;
-+	}
-+
-+	if (ctx->quic) {
-+		if (!IS_ENABLED(CONFIG_IP_QUIC)) {
-+			cifs_errorf(fc, "SMB over QUIC requires CONFIG_IP_QUIC to be enabled\n");
-+			return -EOPNOTSUPP;
-+		}
-+	}
-+
-+	if (ctx->quic && ctx->vals->protocol_id < SMB311_PROT_ID) {
-+		cifs_errorf(fc, "SMB over QUIC requires Version >=3.1.1\n");
-+		return -EOPNOTSUPP;
-+	}
-+
- #ifndef CONFIG_KEYS
- 	/* Muliuser mounts require CONFIG_KEYS support */
- 	if (ctx->multiuser) {
-@@ -1011,6 +1037,10 @@ static int smb3_verify_reconfigure_ctx(struct fs_context *fc,
- 		cifs_errorf(fc, "can not change nbsessinit during remount\n");
- 		return -EINVAL;
- 	}
-+	if (new_ctx->quic != old_ctx->quic) {
-+		cifs_errorf(fc, "can not change quic transport during remount\n");
-+		return -EINVAL;
-+	}
- 
+ 	while (!kthread_should_stop()) {
+-		if (!iface->ksmbd_socket) {
++		if (!iface->ksmbd_tcp_socket)
+ 			break;
+-		}
+-		ret = kernel_accept(iface->ksmbd_socket, &client_sk, 0);
++		ret = kernel_accept(iface->ksmbd_tcp_socket, &client_sk, 0);
+ 		if (ret == -EINVAL)
+ 			break;
+ 		if (ret)
+@@ -298,32 +279,6 @@ static int ksmbd_kthread_fn(void *p)
  	return 0;
  }
-@@ -1871,6 +1901,9 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 	case Opt_rdma:
- 		ctx->rdma = true;
- 		break;
-+	case Opt_quic:
-+		ctx->quic = true;
-+		break;
- 	case Opt_reparse:
- 		if (parse_reparse_flavor(fc, param->string, ctx))
- 			goto cifs_parse_mount_err;
-@@ -1896,7 +1929,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 		ctx->symlinkroot = param->string;
- 		param->string = NULL;
- 		break;
-+	case Opt_mtls:
-+		ctx->mtls = true;
-+		break;
- 	}
-+
- 	/* case Opt_ignore: - is ignored as expected ... */
  
- 	if (ctx->multiuser && ctx->upcall_target == UPTARGET_MOUNT) {
-diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-index 0b64fcb5d302..e9b85c1c1937 100644
---- a/fs/smb/client/fs_context.h
-+++ b/fs/smb/client/fs_context.h
-@@ -143,6 +143,7 @@ enum cifs_param {
- 	Opt_tcp_nodelay,
- 	Opt_domainauto,
- 	Opt_rdma,
-+	Opt_quic,
- 	Opt_modesid,
- 	Opt_rootfs,
- 	Opt_multichannel,
-@@ -199,6 +200,7 @@ enum cifs_param {
- 	Opt_nativesocket,
- 	Opt_symlink,
- 	Opt_symlinkroot,
-+	Opt_mtls,
- 
- 	/* Mount options to be ignored */
- 	Opt_ignore,
-@@ -293,6 +295,8 @@ struct smb3_fs_context {
- 	bool resilient:1; /* noresilient not required since not fored for CA */
- 	bool domainauto:1;
- 	bool rdma:1;
-+	bool quic:1;
-+	bool mtls:1;
- 	bool multichannel:1;
- 	bool multichannel_specified:1; /* true if user specified multichannel or nomultichannel */
- 	bool max_channels_specified:1; /* true if user specified max_channels */
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index bac88a612d5d..848f9137f01d 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -732,6 +732,16 @@ build_posix_ctxt(struct smb2_posix_neg_context *pneg_ctxt)
- 	return smb2_neg_context_len(pneg_ctxt);
- }
- 
-+static unsigned int
-+build_transport_ctxt(struct smb2_transport_capabilities_context *pneg_ctxt)
-+{
-+	pneg_ctxt->ContextType = SMB2_TRANSPORT_CAPABILITIES;
-+	pneg_ctxt->DataLength = cpu_to_le16(sizeof(struct smb2_transport_capabilities_context) -
-+					    sizeof(struct smb2_neg_context));
-+	pneg_ctxt->Flags = cpu_to_le32(SMB2_ACCEPT_TRANSPORT_LEVEL_SECURITY);
-+	return smb2_neg_context_len(pneg_ctxt);
-+}
-+
- struct neg_ctx {
- 	char *pos;
- 	unsigned int len;
-@@ -801,6 +811,11 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
- 	if (enable_negotiate_signing)
- 		add_context(&nc, build_signing_ctxt((struct smb2_signing_capabilities *)nc.pos));
- 
-+	if (cifs_quic_enabled(server) && server->quic_conn.need_smb_seal)
-+		add_context(&nc,
-+			    build_transport_ctxt(
-+				    (struct smb2_transport_capabilities_context *)nc.pos));
-+
- 	/* check for and add transport_capabilities and signing capabilities */
- 	req->NegotiateContextCount = cpu_to_le16(nc.cnt);
- 
-@@ -945,6 +960,15 @@ static void decode_signing_ctx(struct TCP_Server_Info *server,
- 		     server->signing_algorithm);
- }
- 
-+static void
-+decode_transport_ctx(struct TCP_Server_Info *server,
-+		     struct smb2_transport_capabilities_context *pctxt)
-+{
-+	if (pctxt->Flags == cpu_to_le32(SMB2_ACCEPT_TRANSPORT_LEVEL_SECURITY))
-+		server->quic_conn.need_smb_seal = false;
-+	else
-+		server->quic_conn.need_smb_seal = true;
-+}
- 
- static int smb311_decode_neg_context(struct smb2_negotiate_rsp *rsp,
- 				     struct TCP_Server_Info *server,
-@@ -997,6 +1021,9 @@ static int smb311_decode_neg_context(struct smb2_negotiate_rsp *rsp,
- 		else if (pctx->ContextType == SMB2_SIGNING_CAPABILITIES)
- 			decode_signing_ctx(server,
- 				(struct smb2_signing_capabilities *)pctx);
-+		else if (pctx->ContextType == SMB2_TRANSPORT_CAPABILITIES)
-+			decode_transport_ctx(server,
-+				(struct smb2_transport_capabilities_context *)pctx);
- 		else
- 			cifs_server_dbg(VFS, "unknown negcontext of type %d ignored\n",
- 				le16_to_cpu(pctx->ContextType));
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index e64becee928f..46a67c7eba54 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -23,6 +23,7 @@
- #include <linux/sched/signal.h>
- #include <linux/task_io_accounting_ops.h>
- #include <linux/task_work.h>
-+#include <linux/quic.h>
- #include "cifsglob.h"
- #include "cifsproto.h"
- #include "cifs_debug.h"
-@@ -148,10 +149,12 @@ smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
- 
- 	*sent = 0;
- 
--	if (server->noblocksnd)
--		smb_msg->msg_flags = MSG_DONTWAIT + MSG_NOSIGNAL;
--	else
--		smb_msg->msg_flags = MSG_NOSIGNAL;
-+	if (cifs_quic_enabled(server)) {
-+		if (server->noblocksnd)
-+			smb_msg->msg_flags = MSG_DONTWAIT + MSG_NOSIGNAL;
-+		else
-+			smb_msg->msg_flags = MSG_NOSIGNAL;
-+	}
- 
- 	while (msg_data_left(smb_msg)) {
- 		/*
-@@ -270,7 +273,8 @@ int __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
- 
- 	rc = 0;
- 	/* cork the socket */
--	tcp_sock_set_cork(ssocket->sk, true);
-+	if (!cifs_quic_enabled(server))
-+		tcp_sock_set_cork(ssocket->sk, true);
- 
- 	for (j = 0; j < num_rqst; j++)
- 		send_length += smb_rqst_len(server, &rqst[j]);
-@@ -287,19 +291,17 @@ int __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
- 	sigprocmask(SIG_BLOCK, &mask, &oldmask);
- 
- 	/* Generate a rfc1002 marker */
--	{
--		struct kvec hiov = {
--			.iov_base = &rfc1002_marker,
--			.iov_len  = 4
--		};
--		iov_iter_kvec(&smb_msg.msg_iter, ITER_SOURCE, &hiov, 1, 4);
--		rc = smb_send_kvec(server, &smb_msg, &sent);
--		if (rc < 0)
--			goto unmask;
-+	struct kvec hiov = {
-+		.iov_base = &rfc1002_marker,
-+		.iov_len  = 4
-+	};
-+	iov_iter_kvec(&smb_msg.msg_iter, ITER_SOURCE, &hiov, 1, 4);
-+	rc = smb_send_kvec(server, &smb_msg, &sent);
-+	if (rc < 0)
-+		goto unmask;
- 
--		total_len += sent;
--		send_length += 4;
+-/**
+- * ksmbd_tcp_run_kthread() - start forker thread
+- * @iface: pointer to struct interface
+- *
+- * start forker thread(ksmbd/0) at module init time to listen
+- * on port 445 for new SMB connection requests. It creates per connection
+- * server threads(ksmbd/x)
+- *
+- * Return:	0 on success or error number
+- */
+-static int ksmbd_tcp_run_kthread(struct interface *iface)
+-{
+-	int rc;
+-	struct task_struct *kthread;
+-
+-	kthread = kthread_run(ksmbd_kthread_fn, (void *)iface, "ksmbd-%s",
+-			      iface->name);
+-	if (IS_ERR(kthread)) {
+-		rc = PTR_ERR(kthread);
+-		return rc;
 -	}
-+	total_len += sent;
-+	send_length += 4;
+-	iface->ksmbd_kthread = kthread;
+-
+-	return 0;
+-}
+-
+ /**
+  * ksmbd_tcp_readv() - read data from socket in given iovec
+  * @t:			TCP transport instance
+@@ -432,7 +387,7 @@ static void ksmbd_tcp_disconnect(struct ksmbd_transport *t)
+ 		atomic_dec(&active_num_conn);
+ }
  
- 	cifs_dbg(FYI, "Sending smb: smb_len=%u\n", send_length);
+-static void tcp_destroy_socket(struct socket *ksmbd_socket)
++void ksmbd_tcp_destroy_socket(struct socket *ksmbd_socket)
+ {
+ 	int ret;
  
-@@ -350,7 +352,9 @@ int __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+@@ -451,21 +406,22 @@ static void tcp_destroy_socket(struct socket *ksmbd_socket)
+  *
+  * Return:	0 on success, error number otherwise
+  */
+-static int create_socket(struct interface *iface)
++int ksmbd_tcp_create_socket(struct interface *iface)
+ {
+ 	int ret;
+ 	struct sockaddr_in6 sin6;
+ 	struct sockaddr_in sin;
+ 	struct socket *ksmbd_socket;
++	struct task_struct *kthread;
+ 	bool ipv4 = false;
+ 
+-	ret = sock_create_kern(current->nsproxy->net_ns, PF_INET6, SOCK_STREAM,
+-			IPPROTO_TCP, &ksmbd_socket);
++	ret = sock_create_kern(iface->net, PF_INET6, SOCK_STREAM,
++			       IPPROTO_TCP, &ksmbd_socket);
+ 	if (ret) {
+ 		if (ret != -EAFNOSUPPORT)
+ 			pr_err("Can't create socket for ipv6, fallback to ipv4: %d\n", ret);
+-		ret = sock_create_kern(current->nsproxy->net_ns, PF_INET,
+-				SOCK_STREAM, IPPROTO_TCP, &ksmbd_socket);
++		ret = sock_create_kern(iface->net, PF_INET, SOCK_STREAM,
++				       IPPROTO_TCP, &ksmbd_socket);
+ 		if (ret) {
+ 			pr_err("Can't create socket for ipv4: %d\n", ret);
+ 			goto out_clear;
+@@ -515,165 +471,28 @@ static int create_socket(struct interface *iface)
+ 		goto out_error;
  	}
  
- 	/* uncork it */
--	tcp_sock_set_cork(ssocket->sk, false);
+-	iface->ksmbd_socket = ksmbd_socket;
+-	ret = ksmbd_tcp_run_kthread(iface);
+-	if (ret) {
++	iface->ksmbd_tcp_socket = ksmbd_socket;
 +
-+	if (!cifs_quic_enabled(server))
-+		tcp_sock_set_cork(ssocket->sk, false);
++	kthread = ksmbd_interface_run_kthread(iface, tcp_kthread_fn, "tcp");
++	if (IS_ERR(kthread)) {
+ 		pr_err("Can't start ksmbd main kthread: %d\n", ret);
++		ret = PTR_ERR(kthread);
+ 		goto out_error;
+ 	}
++
++	iface->ksmbd_tcp_kthread = kthread;
+ 	iface->state = IFACE_STATE_CONFIGURED;
  
- 	if ((total_len > 0) && (total_len != send_length)) {
- 		cifs_dbg(FYI, "partial send (wanted=%u sent=%zu): terminating session\n",
+ 	return 0;
+ 
+ out_error:
+-	tcp_destroy_socket(ksmbd_socket);
++	ksmbd_tcp_destroy_socket(ksmbd_socket);
+ out_clear:
+-	iface->ksmbd_socket = NULL;
++	iface->ksmbd_tcp_socket = NULL;
++	iface->ksmbd_tcp_kthread = NULL;
+ 	return ret;
+ }
+ 
+-struct interface *ksmbd_find_netdev_name_iface_list(char *netdev_name)
+-{
+-	struct interface *iface;
+-
+-	list_for_each_entry(iface, &iface_list, entry)
+-		if (!strcmp(iface->name, netdev_name))
+-			return iface;
+-	return NULL;
+-}
+-
+-static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
+-			      void *ptr)
+-{
+-	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
+-	struct interface *iface;
+-	int ret;
+-
+-	switch (event) {
+-	case NETDEV_UP:
+-		if (netif_is_bridge_port(netdev))
+-			return NOTIFY_OK;
+-
+-		iface = ksmbd_find_netdev_name_iface_list(netdev->name);
+-		if (iface && iface->state == IFACE_STATE_DOWN) {
+-			ksmbd_debug(CONN, "netdev-up event: netdev(%s) is going up\n",
+-					iface->name);
+-			ret = create_socket(iface);
+-			if (ret)
+-				return NOTIFY_OK;
+-		}
+-		if (!iface && bind_additional_ifaces) {
+-			iface = alloc_iface(kstrdup(netdev->name, KSMBD_DEFAULT_GFP));
+-			if (!iface)
+-				return NOTIFY_OK;
+-			ksmbd_debug(CONN, "netdev-up event: netdev(%s) is going up\n",
+-				    iface->name);
+-			ret = create_socket(iface);
+-			if (ret)
+-				break;
+-		}
+-		break;
+-	case NETDEV_DOWN:
+-		iface = ksmbd_find_netdev_name_iface_list(netdev->name);
+-		if (iface && iface->state == IFACE_STATE_CONFIGURED) {
+-			ksmbd_debug(CONN, "netdev-down event: netdev(%s) is going down\n",
+-					iface->name);
+-			kernel_sock_shutdown(iface->ksmbd_socket, SHUT_RDWR);
+-			tcp_stop_kthread(iface->ksmbd_kthread);
+-			iface->ksmbd_kthread = NULL;
+-			sock_release(iface->ksmbd_socket);
+-			iface->ksmbd_socket = NULL;
+-
+-			iface->state = IFACE_STATE_DOWN;
+-			break;
+-		}
+-		break;
+-	}
+-
+-	return NOTIFY_DONE;
+-}
+-
+-static struct notifier_block ksmbd_netdev_notifier = {
+-	.notifier_call = ksmbd_netdev_event,
+-};
+-
+-int ksmbd_tcp_init(void)
+-{
+-	register_netdevice_notifier(&ksmbd_netdev_notifier);
+-
+-	return 0;
+-}
+-
+-static void tcp_stop_kthread(struct task_struct *kthread)
+-{
+-	int ret;
+-
+-	if (!kthread)
+-		return;
+-
+-	ret = kthread_stop(kthread);
+-	if (ret)
+-		pr_err("failed to stop forker thread\n");
+-}
+-
+-void ksmbd_tcp_destroy(void)
+-{
+-	struct interface *iface, *tmp;
+-
+-	unregister_netdevice_notifier(&ksmbd_netdev_notifier);
+-
+-	list_for_each_entry_safe(iface, tmp, &iface_list, entry) {
+-		list_del(&iface->entry);
+-		kfree(iface->name);
+-		kfree(iface);
+-	}
+-}
+-
+-static struct interface *alloc_iface(char *ifname)
+-{
+-	struct interface *iface;
+-
+-	if (!ifname)
+-		return NULL;
+-
+-	iface = kzalloc_obj(struct interface, KSMBD_DEFAULT_GFP);
+-	if (!iface) {
+-		kfree(ifname);
+-		return NULL;
+-	}
+-
+-	iface->name = ifname;
+-	iface->state = IFACE_STATE_DOWN;
+-	list_add(&iface->entry, &iface_list);
+-	return iface;
+-}
+-
+-int ksmbd_tcp_set_interfaces(char *ifc_list, int ifc_list_sz)
+-{
+-	int sz = 0;
+-
+-	if (!ifc_list_sz) {
+-		bind_additional_ifaces = 1;
+-		return 0;
+-	}
+-
+-	while (ifc_list_sz > 0) {
+-		if (!alloc_iface(kstrdup(ifc_list, KSMBD_DEFAULT_GFP)))
+-			return -ENOMEM;
+-
+-		sz = strlen(ifc_list);
+-		if (!sz)
+-			break;
+-
+-		ifc_list += sz + 1;
+-		ifc_list_sz -= (sz + 1);
+-	}
+-
+-	bind_additional_ifaces = 0;
+-
+-	return 0;
+-}
+-
+ static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops = {
+ 	.read		= ksmbd_tcp_read,
+ 	.writev		= ksmbd_tcp_writev,
+diff --git a/fs/smb/server/transport_tcp.h b/fs/smb/server/transport_tcp.h
+index 1e51675ee1b2..d122e4b69d65 100644
+--- a/fs/smb/server/transport_tcp.h
++++ b/fs/smb/server/transport_tcp.h
+@@ -6,10 +6,13 @@
+ #ifndef __KSMBD_TRANSPORT_TCP_H__
+ #define __KSMBD_TRANSPORT_TCP_H__
+ 
+-int ksmbd_tcp_set_interfaces(char *ifc_list, int ifc_list_sz);
+-struct interface *ksmbd_find_netdev_name_iface_list(char *netdev_name);
++#include "interface.h"
++
+ void ksmbd_free_transport(struct ksmbd_transport *kt);
+ int ksmbd_tcp_init(void);
+ void ksmbd_tcp_destroy(void);
++int ksmbd_tcp_create_socket(struct interface *iface);
++void ksmbd_tcp_stop_kthread(struct task_struct *kthread);
++void ksmbd_tcp_destroy_socket(struct socket *ksmbd_socket);
+ 
+ #endif /* __KSMBD_TRANSPORT_TCP_H__ */
 -- 
 2.53.0
 
