@@ -1,61 +1,63 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E2A3C945A
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 15:58:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B9C44B695
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 15:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777391890; cv=none; b=GRquKXBkA+Qp2sdE0Qz6n5Nlww2imjD6KFz6TNHY7HDDrlGMqCZk2RzzozU3Hb3XqcVbJytvf7BL0z6GE/GGxzP1eAUTYFIO9fNmCooEVR/TdDMT8apKvguqC5/WfnOW9KstBhmZz6cqRVqor7AR2qA0E4BTBMVErXHbBkarzrE=
+	t=1777391891; cv=none; b=lxao9h3YKgRv/PlIzc73l9Nz+HSP5l5XH0AcxZqSNj1LpMNWTVcxPndiMfAr3yevPeofn7cC72FVQALR8McJ9UoVp7/RNdW44CO/eWGsCO6REx3UBHaBNgLvOViS0fHwXPdeTMgiR5i1kOn95iKDIb4bWHkSeqSoY2rqsYd4l/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777391890; c=relaxed/simple;
-	bh=mc8duuf18vGiKek7T/0raBsUgBqkfZdV+R5o90VA56k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VNg2vVkMKgx36bNSE/M6F5VkmDAgfLeujbqxzmIQxLdIe8Li8Guq4A47OcM+9ZDOEIb4kvPPlWTJqcBNQ8uO4gLmmdpR1rENP72RiQhHAHYPrZod7gE3KKUq73Yea0vsrgImZDembijZrfi//URSk59Ze39oppUFMpHeCT3pglI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=PyC0KR36; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1777391891; c=relaxed/simple;
+	bh=jAOuX9dpwzMx7Akp2cQbJrd5q2Lz2mSKiMfiFBm7Qz4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AYzHvf8wU+1z2fgIJuG/HYYo+ubjoRW8zRawVqOcI/TcSiBDpfqB5pl7Qw7ePrJPoE5ev5CDTtYP/8kNJ8GvjUEL7VmGktkCzfijEqvQoj0/xiuux2nZ4sVurFuPb9fr2WEGo057MeOYlwebUZBAqovDwXzvw1M+b2iYTWSNLzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=DZy0Az63; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="PyC0KR36"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso122444195e9.2
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 08:58:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="DZy0Az63"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-488af96f6b2so153206485e9.0
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 08:58:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1777391886; x=1777996686; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XEWRVYzyIgG3Bi1Pa1Vh5S1rEgoz2yBSa2G8ehlgCSM=;
-        b=PyC0KR36lb83Z988LHxI+6DqVlkw3aBJpHEpv3DHkwtJ2ybrxtQthtqkg9GvNDskoC
-         Ehd6veECdnm5tEti0WKZytw8D81jFBUGRggpJbyStwUwPcFMQMFuLiaIZeEjJIJFO0RZ
-         EhRQIB5q3YqBqOPctmO6sk3og1bu5MwFMuXn8INZT4sdTh0iWfmVLBY8jt6AHIFrnkdo
-         uh+EsgKnZFn/FmfDEnm46afjbSC98PfcBRYvHbAUOHXsIVvxxC90K0qkbEjBHcGZtubg
-         WDcITBLOOjOAq0jgvtJmgBopcLDQpVdlrRwvVh+qmKUsK0sTucxMEhb4IHjFjyMAEGPO
-         Otpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777391886; x=1777996686;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=suse.com; s=google; t=1777391888; x=1777996688; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XEWRVYzyIgG3Bi1Pa1Vh5S1rEgoz2yBSa2G8ehlgCSM=;
-        b=mvozUZvsuNikejZJKD/WPOCFDWPKC9xDEg3ckmrAYm1Xe3MuemE5LvjZIzELjYGowZ
-         5aY6pJNCWMRowrc8h1CBgH8Izkl2GLH0L3JGFKvbI+7Eb/weXJ6Jki36iHC7Fvt1z856
-         e06zK4pO6eyF+UskqszD+3z8HGCB+QQwqh9FrUevuRpBADNC8QMmqOOQdKrTUvKU40+x
-         nXse4/Bp3bn4gdDGA4ZufzVwWm0V3b8RQISd5l7T/5ehdydjh0eohtpoWaHlMd4cJ9B5
-         eD3vDJTGMy+maxocMwbNl9AcYOCpDefEm3XK44mBShyaNXwSHqte2wB1X9tdRfhniZO9
-         V3AA==
-X-Gm-Message-State: AOJu0Yy9JOmtsREVdOgzrlvafTEVsjVnhRWE9DJB8eF3UlXP+Ep72YAU
-	erpngFt/xezBDO2VlA7cM7eFiEvvae6EZyuA1EyuIvInk+dCTV7Cp9KbVfXr1dY/TleYKCDxvkh
-	QvQJcszP3fg==
-X-Gm-Gg: AeBDiet86DOo6FgM0WrmoqkjXno6o4vkEIKfY81pDlPqzi+sJa9nlfJ/XdJMIPyGTt2
-	sJtaJ+EJhGAvb64+gDVcjtl8DM1V53woqbEqtChgIBp9GyFoP7kU5CA0OGsBdIH8X+Dq7YsJv08
-	KB1LrO5F23xPi6HEY+HVRTirv1S+2pDMLadxasPiSAwtfU8KzmTcOtqFt4GM5ago7C01OXrQ1O4
-	3xxeRLK0M59oi06sN8m1Nc/5SrLE+jc+BUSkdZ7XHbBaTOcdv5lwgyvDcU46eq7nVG7FpHAWMsI
-	WJvqfu+7VnexhrzM13lGaCVQLHcg7uLSLok4EyIMLsEj78G7y1mgMnpHNFWHXPkXRQsWaPUdZuG
-	Z65IWBqlmgW/yLrtUD7dwH45LCN+pvG10+O3uyASUwFy6CWpiyBcpu6XMdbQh1dxQfZUdcsUXXb
-	IGnXhYi7JUoW/YXBMhZeOLW3XdsFimJgP1mJKknMugs+LR
-X-Received: by 2002:a05:600c:4f92:b0:489:1ff1:74df with SMTP id 5b1f17b1804b1-48a77ae5430mr57089135e9.1.1777391885753;
-        Tue, 28 Apr 2026 08:58:05 -0700 (PDT)
+        bh=eXSup0OYn4CuueYI1U5YMs8zAmzWfq3Ux8UxQSH2V6w=;
+        b=DZy0Az63YBvMTVFHjEyW7KJQXUIa1pN7naJPthDzeRXZCOdNuIzlbLNm7/Oi435qKr
+         C1INBZJD06v/eOa/jjMqPdDpW1MhIxRnnlRTWqHnx63qoTiNETw3MXUmwMWo+nxyfESG
+         l3Uegi2KVeu+GqLQw8em/i/AHjhYxUHdiBIveLtj1rhgNleBrsniDRebSXMIijU8b+Fm
+         yNtcKZs/zJuoUrvDp87MVFpv3VCESqIqV4Dv5rR0v1sZty+Lgfv8coEKxd2fKzrNPWNZ
+         iqdc6BbVdViBtVcfkZUGMSIlCQAzLJX6mrdyZu72XSkRpwBHXdRqr+MY08kAQ7M13i+J
+         Iryw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777391888; x=1777996688;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=eXSup0OYn4CuueYI1U5YMs8zAmzWfq3Ux8UxQSH2V6w=;
+        b=BHMGkoCkUL8w/AK4TTBTpAMI9Xgfhf+r/VlJR+tCRAMUKPP+rXhDPcoR4PcIqGec6P
+         u1jbQMAN6LdfiDWUtO3st7IlZxjZh3C/M1mnlUyBAcM/xbK79lIeBY0YK0w7HwymjqWG
+         0L5cO58kGMbF2q3955apEGnyJwMr/nPhJjpoJDjsHPdA2jkXSoUZ74fIltJyOCWyMpE3
+         pC3pM4e3NdGaYIoKcejePIwRj40qZROlXk7NIyKUO8l5TVZFAbOHbKD3viKlGWyTJdNL
+         PnbbZG+vrCqdba5b1vtpmondleAUThlh966x8uSkldOa2/7pIOdYvUJVXhXdiqpjn9Go
+         TpZQ==
+X-Gm-Message-State: AOJu0Yx6ShklNVPavUQba3yCuTC/foc/HeKZPAfPq85nUWQlS9J+clPc
+	egOWpqAsj7zQYfKWo3bYUPyjBRVykzl4nT4TRRbzzNzUct/zZdoMPi8aIRQrYXp+pOUtW2YLqdc
+	8xwuJokjW2w==
+X-Gm-Gg: AeBDievrpHG7p3iCHjmCtww9JdC+7bXeMlFFyMlGpn5+lVj9omnNNt4DPUpg7w2Ut8x
+	Z8SPdNd3gmBFBuR1y6JOaLRVcoQKeWSgJ1u7FJI6z0Lrul+iTNCEqDLGX8/P3Taj2k90HHnmn0t
+	4zUBNGcWdRRNtpnww94m/F9lS1y0RZSNYu7CZFxZVQ/kVBdT+ygOE0UfwV17qC9HaLRxncGEjcL
+	06p7tzfXnlrZZe0qIxTfPJg3BOnhV8fut7Bso1+MZc24x1tG97F7ivCl+RSIqI2Tlz5cU2td44w
+	7lM3AEMe3KR/moPZn39aIWlyEWVeSCqDK8pc3VIHXRzD8YaRxalJTTNPMl3UPtY8khoyYreOv9J
+	VlidKAMP5P0utXLgzBgDlUdPsjEiKIHs/jmru2nopn1ioq0/BbEjl6ixOQqEEY1fGiXTJBtW9vp
+	ahfXoiNukKXQvS8D56hRUWrg8nKa1l6ZGE/vO8Zs2brYi9
+X-Received: by 2002:a05:600c:1c1b:b0:483:2c98:4368 with SMTP id 5b1f17b1804b1-48a77b0a516mr57355225e9.18.1777391887837;
+        Tue, 28 Apr 2026 08:58:07 -0700 (PDT)
 Received: from precision ([2a01:4b00:c007:bb00:be9d:a3c4:18b1:4a25])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a7b560a84sm3409255e9.4.2026.04.28.08.58.05
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a7b560a84sm3409255e9.4.2026.04.28.08.58.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 08:58:05 -0700 (PDT)
+        Tue, 28 Apr 2026 08:58:07 -0700 (PDT)
 From: Henrique Carvalho <henrique.carvalho@suse.com>
 To: linux-cifs@vger.kernel.org
 Cc: linkinjeon@kernel.org,
@@ -65,10 +67,12 @@ Cc: linkinjeon@kernel.org,
 	tom@talpey.com,
 	ematsumiya@suse.de,
 	Henrique Carvalho <henrique.carvalho@suse.com>
-Subject: [PATCH v2 05/11] smb: server: split interface management from TCP in preparation for QUIC
-Date: Tue, 28 Apr 2026 12:57:54 -0300
-Message-ID: <20260428155759.226368-1-henrique.carvalho@suse.com>
+Subject: [PATCH v2 06/11] smb: server: add shared transport helpers in preparation for QUIC
+Date: Tue, 28 Apr 2026 12:57:55 -0300
+Message-ID: <20260428155759.226368-2-henrique.carvalho@suse.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260428155759.226368-1-henrique.carvalho@suse.com>
+References: <20260428155759.226368-1-henrique.carvalho@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -77,680 +81,473 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move active_num_conn out of transport_tcp.c and define it in
-connection.c.
-
-Move the transport-agnostic bits out into a new interface.c /
-interface.h, network-interface bookkeeping, the iface_list, the
-netdevice notifier, alloc/find/set helpers, and the per-iface forker
-kthread plumbing.
-
-Make the necessary changes to transport_tcp.c, without functional change
-for the TCP path; this is purely a layering rearrangement to make room
-for additional transports.
+Move the generic transport functions out of the TCP transport code into
+a shared transport layer. This keeps the common socket setup and checks,
+accepted-connection initialization, and receive helpers in one place
+instead of open-coding them in the individual transport implementation.
 
 Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 ---
- fs/smb/server/Makefile        |   2 +-
- fs/smb/server/connection.c    |   9 +-
- fs/smb/server/connection.h    |   1 +
- fs/smb/server/interface.c     | 196 ++++++++++++++++++++++++++++++
- fs/smb/server/interface.h     |  34 ++++++
- fs/smb/server/transport_ipc.c |   2 +-
- fs/smb/server/transport_tcp.c | 223 ++++------------------------------
- fs/smb/server/transport_tcp.h |   7 +-
- 8 files changed, 265 insertions(+), 209 deletions(-)
- create mode 100644 fs/smb/server/interface.c
- create mode 100644 fs/smb/server/interface.h
+ fs/smb/server/Makefile        |   3 +-
+ fs/smb/server/connection.c    |   1 +
+ fs/smb/server/connection.h    |   5 -
+ fs/smb/server/transport.c     | 344 ++++++++++++++++++++++++++++++++++
+ fs/smb/server/transport.h     |  40 ++++
+ fs/smb/server/transport_tcp.c |   1 +
+ 6 files changed, 388 insertions(+), 6 deletions(-)
+ create mode 100644 fs/smb/server/transport.c
+ create mode 100644 fs/smb/server/transport.h
 
 diff --git a/fs/smb/server/Makefile b/fs/smb/server/Makefile
-index 6407ba6b9340..7bd6501bfdc9 100644
+index 7bd6501bfdc9..89a9955f607d 100644
 --- a/fs/smb/server/Makefile
 +++ b/fs/smb/server/Makefile
-@@ -8,7 +8,7 @@ ksmbd-y :=	unicode.o auth.o vfs.o vfs_cache.o server.o ndr.o \
+@@ -8,7 +8,8 @@ ksmbd-y :=	unicode.o auth.o vfs.o vfs_cache.o server.o ndr.o \
  		misc.o oplock.o connection.o ksmbd_work.o crypto_ctx.o \
  		mgmt/ksmbd_ida.o mgmt/user_config.o mgmt/share_config.o \
  		mgmt/tree_connect.o mgmt/user_session.o smb_common.o \
--		transport_tcp.o transport_ipc.o smbacl.o smb2pdu.o \
-+		interface.o transport_tcp.o transport_ipc.o smbacl.o smb2pdu.o \
+-		interface.o transport_tcp.o transport_ipc.o smbacl.o smb2pdu.o \
++		transport.o transport_tcp.o transport_ipc.o interface.o \
++		smbacl.o smb2pdu.o \
  		smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
  		ksmbd_spnego_negtokentarg.asn1.o asn1.o
  
 diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index 31392d245c30..7465b364c35c 100644
+index 7465b364c35c..07bbf4eb7b05 100644
 --- a/fs/smb/server/connection.c
 +++ b/fs/smb/server/connection.c
-@@ -12,6 +12,7 @@
- #include "smb_common.h"
+@@ -13,6 +13,7 @@
  #include "mgmt/ksmbd_ida.h"
  #include "connection.h"
-+#include "interface.h"
+ #include "interface.h"
++#include "transport.h"
  #include "transport_tcp.h"
  #include "transport_rdma.h"
  #include "misc.h"
-@@ -79,6 +80,8 @@ static int create_proc_clients(void) { return 0; }
- static void delete_proc_clients(void) {}
- #endif
- 
-+atomic_t active_num_conn = ATOMIC_INIT(0);
-+
- /**
-  * ksmbd_conn_free() - free resources of the connection instance
-  *
-@@ -512,9 +515,9 @@ int ksmbd_conn_transport_init(void)
- 	int ret;
- 
- 	mutex_lock(&init_lock);
--	ret = ksmbd_tcp_init();
-+	ret = ksmbd_interface_init();
- 	if (ret) {
--		pr_err("Failed to init TCP subsystem: %d\n", ret);
-+		pr_err("Failed to init interface: %d\n", ret);
- 		goto out;
- 	}
- 
-@@ -558,7 +561,7 @@ void ksmbd_conn_transport_destroy(void)
- {
- 	delete_proc_clients();
- 	mutex_lock(&init_lock);
--	ksmbd_tcp_destroy();
-+	ksmbd_interface_destroy();
- 	ksmbd_rdma_stop_listening();
- 	stop_sessions();
- 	mutex_unlock(&init_lock);
 diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
-index ae21a1bd4c70..b060baf5f688 100644
+index b060baf5f688..0e87283a9ddb 100644
 --- a/fs/smb/server/connection.h
 +++ b/fs/smb/server/connection.h
-@@ -157,6 +157,7 @@ struct ksmbd_transport {
- #define CONN_HASH_BITS	12
- extern DECLARE_HASHTABLE(conn_list, CONN_HASH_BITS);
- extern struct rw_semaphore conn_list_lock;
-+extern atomic_t active_num_conn;
+@@ -145,11 +145,6 @@ struct ksmbd_transport_ops {
+ 	void (*free_transport)(struct ksmbd_transport *kt);
+ };
  
- bool ksmbd_conn_alive(struct ksmbd_conn *conn);
- void ksmbd_conn_wait_idle(struct ksmbd_conn *conn);
-diff --git a/fs/smb/server/interface.c b/fs/smb/server/interface.c
+-struct ksmbd_transport {
+-	struct ksmbd_conn			*conn;
+-	const struct ksmbd_transport_ops	*ops;
+-};
+-
+ #define KSMBD_TCP_RECV_TIMEOUT	(7 * HZ)
+ #define KSMBD_TCP_SEND_TIMEOUT	(5 * HZ)
+ #define KSMBD_TCP_PEER_SOCKADDR(c)	((struct sockaddr *)&((c)->peer_addr))
+diff --git a/fs/smb/server/transport.c b/fs/smb/server/transport.c
 new file mode 100644
-index 000000000000..a5e59a420639
+index 000000000000..0a99fb821e02
 --- /dev/null
-+++ b/fs/smb/server/interface.c
-@@ -0,0 +1,196 @@
++++ b/fs/smb/server/transport.c
+@@ -0,0 +1,344 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
-+ *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
-+ */
 +
 +#include <linux/freezer.h>
 +
-+#include "smb_common.h"
 +#include "server.h"
-+#include "auth.h"
++#include "glob.h"
 +#include "connection.h"
-+#include "transport_tcp.h"
 +#include "interface.h"
++#include "transport.h"
 +
-+static LIST_HEAD(iface_list);
-+static int bind_additional_ifaces;
-+
-+static struct interface *alloc_iface(char *ifname)
++/*
++ * ksmbd_transport_iovec - get iovec for reading from socket
++ * @t:		ksmbd transport struct
++ * @nr_segs:	number of iov segments needed for reading
++ *
++ * Return:	return existing or newly allocate iovec
++ */
++struct kvec *ksmbd_transport_iovec(struct ksmbd_transport *t,
++				   unsigned int nr_segs)
 +{
-+	struct interface *iface;
++	struct kvec *new_iov;
 +
-+	if (!ifname)
-+		return NULL;
++	if (t->io.iov && nr_segs <= t->io.nr_iov)
++		return t->io.iov;
 +
-+	iface = kzalloc_obj(struct interface, KSMBD_DEFAULT_GFP);
-+	if (!iface) {
-+		kfree(ifname);
-+		return NULL;
++	/* not big enough -- allocate a new one and release the old */
++	new_iov = kmalloc_array(nr_segs, sizeof(*new_iov), KSMBD_DEFAULT_GFP);
++	if (new_iov) {
++		kfree(t->io.iov);
++		t->io.iov = new_iov;
++		t->io.nr_iov = nr_segs;
++	}
++	return new_iov;
++}
++
++int ksmbd_transport_alloc_conn(struct ksmbd_transport *t,
++			       struct socket *client_sk)
++{
++	struct task_struct *handler;
++	struct ksmbd_conn *conn;
++
++	conn = ksmbd_conn_alloc();
++	if (!conn)
++		return -ENOMEM;
++
++	conn->transport = t;
++	t->conn = conn;
++
++#if IS_ENABLED(CONFIG_IPV6)
++	if (client_sk->sk->sk_family == AF_INET6) {
++		memcpy(&conn->inet6_addr, &client_sk->sk->sk_v6_daddr, 16);
++		conn->inet_hash = ipv6_addr_hash(&client_sk->sk->sk_v6_daddr);
++	} else {
++		conn->inet_addr = inet_sk(client_sk->sk)->inet_daddr;
++		conn->inet_hash = ipv4_addr_hash(inet_sk(client_sk->sk)->inet_daddr);
++	}
++#else
++	conn->inet_addr = inet_sk(client_sk->sk)->inet_daddr;
++	conn->inet_hash = ipv4_addr_hash(inet_sk(client_sk->sk)->inet_daddr);
++#endif
++	down_write(&conn_list_lock);
++	hash_add(conn_list, &conn->hlist, conn->inet_hash);
++	up_write(&conn_list_lock);
++
++#if IS_ENABLED(CONFIG_IPV6)
++	if (client_sk->sk->sk_family == AF_INET6)
++		handler = kthread_run(ksmbd_conn_handler_loop,
++				      conn, "ksmbd:%pI6c",
++				      &conn->inet6_addr);
++	else
++		handler = kthread_run(ksmbd_conn_handler_loop,
++				      conn, "ksmbd:%pI4",
++				      &conn->inet_addr);
++#else
++	handler = kthread_run(ksmbd_conn_handler_loop,
++			      conn, "ksmbd:%pI4",
++			      &conn->inet_addr);
++#endif
++	if (IS_ERR(handler)) {
++		pr_err("cannot start conn thread\n");
++		return PTR_ERR(handler);
 +	}
 +
-+	iface->name = ifname;
-+	iface->state = IFACE_STATE_DOWN;
-+	list_add(&iface->entry, &iface_list);
-+	return iface;
++	return 0;
 +}
 +
 +/**
-+ * ksmbd_interface_run_kthread() - start a per-interface forker thread
-+ * @iface:	pointer to struct interface
-+ * @kthread_fn:	thread routine to run
-+ * @suf:	suffix to append to the thread name (e.g. "tcp")
++ * kvec_array_init() - initialize a IO vector segment
++ * @new:	IO vector to be initialized
++ * @iov:	base IO vector
++ * @nr_segs:	number of segments in base iov
++ * @bytes:	total iovec length so far for read
 + *
-+ * Return:	the started task_struct, or ERR_PTR on failure.
++ * Return:	Number of IO segments
 + */
-+struct task_struct *ksmbd_interface_run_kthread(struct interface *iface,
-+						int (*kthread_fn)(void *), const char *suf)
++static unsigned int kvec_array_init(struct kvec *new, struct kvec *iov,
++				    unsigned int nr_segs, size_t bytes)
 +{
-+	struct task_struct *kthread;
++	size_t base = 0;
 +
-+	kthread = kthread_run(kthread_fn, (void *)iface, "ksmbd-%s-%s", iface->name, suf);
-+	return kthread;
++	while (bytes || !iov->iov_len) {
++		int copy = min(bytes, iov->iov_len);
++
++		bytes -= copy;
++		base += copy;
++		if (iov->iov_len == base) {
++			iov++;
++			nr_segs--;
++			base = 0;
++		}
++	}
++
++	memcpy(new, iov, sizeof(*iov) * nr_segs);
++	new->iov_base += base;
++	new->iov_len -= base;
++	return nr_segs;
 +}
 +
-+void ksmbd_interface_stop_kthread(struct task_struct *kthread)
++/**
++ * ksmbd_readv() - read data from socket in given iovec
++ * @t:			ksmbd transport instance
++ * @sock:		socket to read from
++ * @iov_orig:		base IO vector
++ * @nr_segs:		number of segments in base iov
++ * @to_read:		number of bytes to read from socket
++ * @max_retries:	maximum retry count
++ *
++ * Return:	on success return number of bytes read from socket,
++ *		otherwise return error number
++ */
++int ksmbd_readv(struct ksmbd_transport *t, struct socket *sock,
++		struct kvec *iov_orig, unsigned int nr_segs,
++		unsigned int to_read, int max_retries)
++{
++	int length = 0;
++	int total_read;
++	unsigned int segs;
++	struct msghdr ksmbd_msg;
++	struct kvec *iov;
++	struct ksmbd_conn *conn = t->conn;
++
++	iov = ksmbd_transport_iovec(t, nr_segs);
++	if (!iov)
++		return -ENOMEM;
++
++	ksmbd_msg.msg_control = NULL;
++	ksmbd_msg.msg_controllen = 0;
++
++	for (total_read = 0; to_read; total_read += length, to_read -= length) {
++		try_to_freeze();
++
++		if (!ksmbd_conn_alive(conn)) {
++			total_read = -ESHUTDOWN;
++			break;
++		}
++		segs = kvec_array_init(iov, iov_orig, nr_segs, total_read);
++
++		length = kernel_recvmsg(sock, &ksmbd_msg,
++					iov, segs, to_read, 0);
++
++		if (length == -EINTR) {
++			total_read = -ESHUTDOWN;
++			break;
++		} else if (ksmbd_conn_need_reconnect(conn)) {
++			total_read = -EAGAIN;
++			break;
++		} else if (length == -ERESTARTSYS || length == -EAGAIN) {
++			/*
++			 * If max_retries is negative, Allow unlimited
++			 * retries to keep connection with inactive sessions.
++			 */
++			if (max_retries == 0) {
++				total_read = length;
++				break;
++			} else if (max_retries > 0) {
++				max_retries--;
++			}
++
++			usleep_range(1000, 2000);
++			length = 0;
++			continue;
++		} else if (length <= 0) {
++			total_read = length;
++			break;
++		}
++	}
++	return total_read;
++}
++
++struct socket *ksmbd_create_socket(struct interface *iface, int sock_type,
++				   int ipproto, int port)
++{
++	int ret;
++	struct sockaddr_in6 sin6;
++	struct sockaddr_in sin;
++	struct socket *ksmbd_socket;
++	bool ipv4 = false;
++
++	ret = sock_create_kern(iface->net, PF_INET6, sock_type,
++			       ipproto, &ksmbd_socket);
++	if (ret) {
++		if (ret != -EAFNOSUPPORT)
++			pr_err("Can't create socket for ipv6, fallback to ipv4: %d\n", ret);
++		ret = sock_create_kern(iface->net, PF_INET, sock_type,
++				       ipproto, &ksmbd_socket);
++		if (ret) {
++			pr_err("Can't create socket for ipv4: %d\n", ret);
++			return ERR_PTR(ret);
++		}
++
++		sin.sin_family = PF_INET;
++		sin.sin_addr.s_addr = htonl(INADDR_ANY);
++		sin.sin_port = htons(port);
++		ipv4 = true;
++	} else {
++		sin6.sin6_family = PF_INET6;
++		sin6.sin6_addr = in6addr_any;
++		sin6.sin6_port = htons(port);
++
++		lock_sock(ksmbd_socket->sk);
++		ksmbd_socket->sk->sk_ipv6only = false;
++		release_sock(ksmbd_socket->sk);
++	}
++
++	ret = sock_setsockopt(ksmbd_socket,
++			      SOL_SOCKET,
++			      SO_BINDTODEVICE,
++			      KERNEL_SOCKPTR(iface->name),
++			      strlen(iface->name));
++	if (ret != -ENODEV && ret < 0) {
++		pr_err("Failed to set SO_BINDTODEVICE: %d\n", ret);
++		goto out_error;
++	}
++
++	if (ipv4)
++		ret = kernel_bind(ksmbd_socket, (struct sockaddr_unsized *)&sin,
++				  sizeof(sin));
++	else
++		ret = kernel_bind(ksmbd_socket, (struct sockaddr_unsized *)&sin6,
++				  sizeof(sin6));
++	if (ret) {
++		pr_err("Failed to bind socket: %d\n", ret);
++		goto out_error;
++	}
++
++	ret = kernel_listen(ksmbd_socket, KSMBD_SOCKET_BACKLOG);
++	if (ret) {
++		pr_err("Port listen() error: %d\n", ret);
++		goto out_error;
++	}
++
++	return ksmbd_socket;
++
++out_error:
++	ksmbd_destroy_socket(ksmbd_socket);
++	return ERR_PTR(ret);
++}
++
++void ksmbd_destroy_socket(struct socket *ksmbd_socket)
 +{
 +	int ret;
 +
-+	if (!kthread)
++	if (!ksmbd_socket)
 +		return;
 +
-+	ret = kthread_stop(kthread);
++	ret = kernel_sock_shutdown(ksmbd_socket, SHUT_RDWR);
 +	if (ret)
-+		pr_err("failed to stop forker thread\n");
++		pr_err("Failed to shutdown socket: %d\n", ret);
++	sock_release(ksmbd_socket);
 +}
 +
-+static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
-+			      void *ptr)
-+{
-+	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
-+	struct interface *iface;
-+	int ret;
-+
-+	switch (event) {
-+	case NETDEV_UP:
-+		if (netif_is_bridge_port(netdev))
-+			return NOTIFY_OK;
-+
-+		iface = ksmbd_find_netdev_name_iface_list(netdev->name);
-+		if (iface && iface->state == IFACE_STATE_DOWN) {
-+			ksmbd_debug(CONN, "netdev-up event: netdev(%s) is going up\n",
-+					iface->name);
-+
-+			if (!iface->net)
-+				iface->net = get_net(dev_net(netdev));
-+
-+			ret = ksmbd_tcp_create_socket(iface);
-+			if (ret)
-+				break;
-+		}
-+		if (!iface && bind_additional_ifaces) {
-+			iface = alloc_iface(kstrdup(netdev->name, KSMBD_DEFAULT_GFP));
-+			if (!iface)
-+				return NOTIFY_OK;
-+
-+			ksmbd_debug(CONN, "netdev-up event: netdev(%s) is going up\n",
-+				    iface->name);
-+
-+			iface->net = get_net(dev_net(netdev));
-+
-+			ret = ksmbd_tcp_create_socket(iface);
-+			if (ret)
-+				break;
-+		}
-+		break;
-+	case NETDEV_DOWN:
-+		iface = ksmbd_find_netdev_name_iface_list(netdev->name);
-+		if (iface && iface->state == IFACE_STATE_CONFIGURED) {
-+			ksmbd_debug(CONN, "netdev-down event: netdev(%s) is going down\n",
-+					iface->name);
-+
-+			if (iface->ksmbd_tcp_socket)
-+				kernel_sock_shutdown(iface->ksmbd_tcp_socket, SHUT_RDWR);
-+
-+			if (iface->ksmbd_tcp_kthread)
-+				ksmbd_interface_stop_kthread(iface->ksmbd_tcp_kthread);
-+
-+			if (iface->ksmbd_tcp_socket)
-+				sock_release(iface->ksmbd_tcp_socket);
-+
-+			iface->ksmbd_tcp_kthread = NULL;
-+			iface->ksmbd_tcp_socket = NULL;
-+
-+			put_net(iface->net);
-+			iface->net = NULL;
-+
-+			iface->state = IFACE_STATE_DOWN;
-+			break;
-+		}
-+		break;
-+	}
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block ksmbd_netdev_notifier = {
-+	.notifier_call = ksmbd_netdev_event,
-+};
-+
-+int ksmbd_interface_init(void)
-+{
-+	register_netdevice_notifier(&ksmbd_netdev_notifier);
-+
-+	return 0;
-+}
-+
-+
-+void ksmbd_interface_destroy(void)
-+{
-+	struct interface *iface, *tmp;
-+
-+	unregister_netdevice_notifier(&ksmbd_netdev_notifier);
-+
-+	list_for_each_entry_safe(iface, tmp, &iface_list, entry) {
-+		list_del(&iface->entry);
-+		kfree(iface->name);
-+		kfree(iface);
-+	}
-+}
-+
-+struct interface *
-+ksmbd_find_netdev_name_iface_list(char *netdev_name)
-+{
-+	struct interface *iface;
-+
-+	list_for_each_entry(iface, &iface_list, entry)
-+		if (!strcmp(iface->name, netdev_name))
-+			return iface;
-+	return NULL;
-+}
-+
-+int ksmbd_set_interfaces(char *ifc_list, int ifc_list_sz)
-+{
-+	int sz = 0;
-+
-+	if (!ifc_list_sz) {
-+		bind_additional_ifaces = 1;
-+		return 0;
-+	}
-+
-+	while (ifc_list_sz > 0) {
-+		if (!alloc_iface(kstrdup(ifc_list, KSMBD_DEFAULT_GFP)))
-+			return -ENOMEM;
-+
-+		sz = strlen(ifc_list);
-+		if (!sz)
-+			break;
-+
-+		ifc_list += sz + 1;
-+		ifc_list_sz -= (sz + 1);
-+	}
-+
-+	bind_additional_ifaces = 0;
-+
-+	return 0;
-+}
-diff --git a/fs/smb/server/interface.h b/fs/smb/server/interface.h
-new file mode 100644
-index 000000000000..7e35645076a9
---- /dev/null
-+++ b/fs/smb/server/interface.h
-@@ -0,0 +1,34 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
-+ *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
++/**
++ * ksmbd_check_max_ip_conns() - reject when per-IP connection cap reached
++ * @client_sk:	freshly accepted client socket
 + *
++ * Return:	0 if a new connection from this peer is allowed, -EAGAIN
++ *		when server_conf.max_ip_connections has been reached.
++ */
++int ksmbd_check_max_ip_conns(struct socket *client_sk)
++{
++	struct ksmbd_conn *conn;
++	unsigned int max_ip_conns = 0;
++	int inet_hash;
++	int ret = 0;
++
++	if (!server_conf.max_ip_connections)
++		return 0;
++
++#if IS_ENABLED(CONFIG_IPV6)
++	if (client_sk->sk->sk_family == AF_INET6)
++		inet_hash = ipv6_addr_hash(&client_sk->sk->sk_v6_daddr);
++	else
++		inet_hash = ipv4_addr_hash(inet_sk(client_sk->sk)->inet_daddr);
++#else
++	inet_hash = ipv4_addr_hash(inet_sk(client_sk->sk)->inet_daddr);
++#endif
++
++	down_read(&conn_list_lock);
++	hash_for_each_possible(conn_list, conn, hlist, inet_hash) {
++#if IS_ENABLED(CONFIG_IPV6)
++		if (client_sk->sk->sk_family == AF_INET6) {
++			if (memcmp(&client_sk->sk->sk_v6_daddr,
++				   &conn->inet6_addr, 16) == 0)
++				max_ip_conns++;
++		} else if (inet_sk(client_sk->sk)->inet_daddr ==
++			   conn->inet_addr)
++			max_ip_conns++;
++#else
++		if (inet_sk(client_sk->sk)->inet_daddr == conn->inet_addr)
++			max_ip_conns++;
++#endif
++		if (server_conf.max_ip_connections <= max_ip_conns) {
++			pr_info_ratelimited("Maximum IP connections exceeded (%u/%u)\n",
++					    max_ip_conns,
++					    server_conf.max_ip_connections);
++			ret = -EAGAIN;
++			break;
++		}
++	}
++	up_read(&conn_list_lock);
++	return ret;
++}
++
++/**
++ * ksmbd_check_max_conns() - reserve a slot under the global connection cap
++ *
++ * On success the global counter is incremented; the caller is responsible for
++ * decrementing it on disconnect.
++ *
++ * Return:	0 if allowed, -EAGAIN if server_conf.max_connections reached.
++ */
++int ksmbd_check_max_conns(void)
++{
++	if (!server_conf.max_connections)
++		return 0;
++
++	if (atomic_inc_return(&active_num_conn) >= server_conf.max_connections) {
++		pr_info_ratelimited("Limit the maximum number of connections(%u)\n",
++				    atomic_read(&active_num_conn));
++		atomic_dec(&active_num_conn);
++		return -EAGAIN;
++	}
++	return 0;
++}
+diff --git a/fs/smb/server/transport.h b/fs/smb/server/transport.h
+new file mode 100644
+index 000000000000..6b2fb4f9005c
+--- /dev/null
++++ b/fs/smb/server/transport.h
+@@ -0,0 +1,40 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *   Copyright (C) 2026, SUSE LLC
++ *
++ *   Author: Henrique Carvalho <henrique.carvalho@suse.com>
 + */
 +
-+#ifndef __KSMBD_INTERFACE_H__
-+#define __KSMBD_INTERFACE_H__
++#ifndef __KSMBD_TRANSPORT_H__
++#define __KSMBD_TRANSPORT_H__
 +
-+#include <linux/freezer.h>
++#include <net/sock.h>
 +
-+#define IFACE_STATE_DOWN		BIT(0)
-+#define IFACE_STATE_CONFIGURED		BIT(1)
++#include "connection.h"
++#include "interface.h"
 +
-+struct interface {
-+	struct task_struct	*ksmbd_tcp_kthread;
-+	struct socket		*ksmbd_tcp_socket;
-+	struct list_head	entry;
-+	char			*name;
-+	int			state;
-+	struct net		*net;
++struct ksmbd_transport {
++	struct ksmbd_conn			*conn;
++	const struct ksmbd_transport_ops	*ops;
++	struct {
++		struct kvec			*iov;
++		unsigned int			nr_iov;
++	} io;
 +};
 +
-+int ksmbd_interface_init(void);
-+void ksmbd_interface_destroy(void);
-+int ksmbd_set_interfaces(char *ifc_list, int ifc_list_sz);
-+struct interface *ksmbd_find_netdev_name_iface_list(char *netdev_name);
-+struct task_struct *ksmbd_interface_run_kthread(struct interface *iface,
-+						int (*kthread_fn)(void *),
-+						const char *suf);
-+void ksmbd_interface_stop_kthread(struct task_struct *kthread);
++#define KSMBD_TRANS(t)	(&(t)->transport)
 +
-+#endif /* _KSMBD_INTERFACE_H */
-diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
-index 2dbabe2d8005..6ccfb1cf8ed7 100644
---- a/fs/smb/server/transport_ipc.c
-+++ b/fs/smb/server/transport_ipc.c
-@@ -348,7 +348,7 @@ static int ipc_server_config_on_startup(struct ksmbd_startup_request *req)
- 	ret |= ksmbd_set_server_string(req->server_string);
- 	ret |= ksmbd_set_work_group(req->work_group);
- 	server_conf.bind_interfaces_only = req->bind_interfaces_only;
--	ret |= ksmbd_tcp_set_interfaces(KSMBD_STARTUP_CONFIG_INTERFACES(req),
-+	ret |= ksmbd_set_interfaces(KSMBD_STARTUP_CONFIG_INTERFACES(req),
- 					req->ifc_list_sz);
- out:
- 	if (ret) {
++struct kvec *ksmbd_transport_iovec(struct ksmbd_transport *t,
++				   unsigned int nr_segs);
++int ksmbd_transport_alloc_conn(struct ksmbd_transport *t,
++			       struct socket *client_sk);
++int ksmbd_readv(struct ksmbd_transport *t, struct socket *sock,
++		struct kvec *iov_orig, unsigned int nr_segs,
++		unsigned int to_read, int max_retries);
++struct socket *ksmbd_create_socket(struct interface *iface, int sock_type,
++				   int ipproto, int port);
++void ksmbd_destroy_socket(struct socket *ksmbd_socket);
++int ksmbd_check_max_ip_conns(struct socket *client_sk);
++int ksmbd_check_max_conns(void);
++
++#endif /* __KSMBD_TRANSPORT_H__ */
 diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index 7e29b06820e2..37f4238f72f5 100644
+index 37f4238f72f5..07123ebcf8fd 100644
 --- a/fs/smb/server/transport_tcp.c
 +++ b/fs/smb/server/transport_tcp.c
-@@ -11,23 +11,7 @@
+@@ -10,6 +10,7 @@
+ #include "server.h"
  #include "auth.h"
  #include "connection.h"
++#include "transport.h"
  #include "transport_tcp.h"
--
--#define IFACE_STATE_DOWN		BIT(0)
--#define IFACE_STATE_CONFIGURED		BIT(1)
--
--static atomic_t active_num_conn;
--
--struct interface {
--	struct task_struct	*ksmbd_kthread;
--	struct socket		*ksmbd_socket;
--	struct list_head	entry;
--	char			*name;
--	int			state;
--};
--
--static LIST_HEAD(iface_list);
--
--static int bind_additional_ifaces;
-+#include "interface.h"
+ #include "interface.h"
  
- struct tcp_transport {
- 	struct ksmbd_transport		transport;
-@@ -38,8 +22,6 @@ struct tcp_transport {
- 
- static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops;
- 
--static void tcp_stop_kthread(struct task_struct *kthread);
--static struct interface *alloc_iface(char *ifname);
- static void ksmbd_tcp_disconnect(struct ksmbd_transport *t);
- 
- #define KSMBD_TRANS(t)	(&(t)->transport)
-@@ -214,7 +196,7 @@ static int ksmbd_tcp_new_connection(struct socket *client_sk)
-  *
-  * Return:	0 on success, error number otherwise
-  */
--static int ksmbd_kthread_fn(void *p)
-+static int tcp_kthread_fn(void *p)
- {
- 	struct socket *client_sk = NULL;
- 	struct interface *iface = (struct interface *)p;
-@@ -223,10 +205,9 @@ static int ksmbd_kthread_fn(void *p)
- 	unsigned int max_ip_conns;
- 
- 	while (!kthread_should_stop()) {
--		if (!iface->ksmbd_socket) {
-+		if (!iface->ksmbd_tcp_socket)
- 			break;
--		}
--		ret = kernel_accept(iface->ksmbd_socket, &client_sk, 0);
-+		ret = kernel_accept(iface->ksmbd_tcp_socket, &client_sk, 0);
- 		if (ret == -EINVAL)
- 			break;
- 		if (ret)
-@@ -298,32 +279,6 @@ static int ksmbd_kthread_fn(void *p)
- 	return 0;
- }
- 
--/**
-- * ksmbd_tcp_run_kthread() - start forker thread
-- * @iface: pointer to struct interface
-- *
-- * start forker thread(ksmbd/0) at module init time to listen
-- * on port 445 for new SMB connection requests. It creates per connection
-- * server threads(ksmbd/x)
-- *
-- * Return:	0 on success or error number
-- */
--static int ksmbd_tcp_run_kthread(struct interface *iface)
--{
--	int rc;
--	struct task_struct *kthread;
--
--	kthread = kthread_run(ksmbd_kthread_fn, (void *)iface, "ksmbd-%s",
--			      iface->name);
--	if (IS_ERR(kthread)) {
--		rc = PTR_ERR(kthread);
--		return rc;
--	}
--	iface->ksmbd_kthread = kthread;
--
--	return 0;
--}
--
- /**
-  * ksmbd_tcp_readv() - read data from socket in given iovec
-  * @t:			TCP transport instance
-@@ -432,7 +387,7 @@ static void ksmbd_tcp_disconnect(struct ksmbd_transport *t)
- 		atomic_dec(&active_num_conn);
- }
- 
--static void tcp_destroy_socket(struct socket *ksmbd_socket)
-+void ksmbd_tcp_destroy_socket(struct socket *ksmbd_socket)
- {
- 	int ret;
- 
-@@ -451,21 +406,22 @@ static void tcp_destroy_socket(struct socket *ksmbd_socket)
-  *
-  * Return:	0 on success, error number otherwise
-  */
--static int create_socket(struct interface *iface)
-+int ksmbd_tcp_create_socket(struct interface *iface)
- {
- 	int ret;
- 	struct sockaddr_in6 sin6;
- 	struct sockaddr_in sin;
- 	struct socket *ksmbd_socket;
-+	struct task_struct *kthread;
- 	bool ipv4 = false;
- 
--	ret = sock_create_kern(current->nsproxy->net_ns, PF_INET6, SOCK_STREAM,
--			IPPROTO_TCP, &ksmbd_socket);
-+	ret = sock_create_kern(iface->net, PF_INET6, SOCK_STREAM,
-+			       IPPROTO_TCP, &ksmbd_socket);
- 	if (ret) {
- 		if (ret != -EAFNOSUPPORT)
- 			pr_err("Can't create socket for ipv6, fallback to ipv4: %d\n", ret);
--		ret = sock_create_kern(current->nsproxy->net_ns, PF_INET,
--				SOCK_STREAM, IPPROTO_TCP, &ksmbd_socket);
-+		ret = sock_create_kern(iface->net, PF_INET, SOCK_STREAM,
-+				       IPPROTO_TCP, &ksmbd_socket);
- 		if (ret) {
- 			pr_err("Can't create socket for ipv4: %d\n", ret);
- 			goto out_clear;
-@@ -515,165 +471,28 @@ static int create_socket(struct interface *iface)
- 		goto out_error;
- 	}
- 
--	iface->ksmbd_socket = ksmbd_socket;
--	ret = ksmbd_tcp_run_kthread(iface);
--	if (ret) {
-+	iface->ksmbd_tcp_socket = ksmbd_socket;
-+
-+	kthread = ksmbd_interface_run_kthread(iface, tcp_kthread_fn, "tcp");
-+	if (IS_ERR(kthread)) {
- 		pr_err("Can't start ksmbd main kthread: %d\n", ret);
-+		ret = PTR_ERR(kthread);
- 		goto out_error;
- 	}
-+
-+	iface->ksmbd_tcp_kthread = kthread;
- 	iface->state = IFACE_STATE_CONFIGURED;
- 
- 	return 0;
- 
- out_error:
--	tcp_destroy_socket(ksmbd_socket);
-+	ksmbd_tcp_destroy_socket(ksmbd_socket);
- out_clear:
--	iface->ksmbd_socket = NULL;
-+	iface->ksmbd_tcp_socket = NULL;
-+	iface->ksmbd_tcp_kthread = NULL;
- 	return ret;
- }
- 
--struct interface *ksmbd_find_netdev_name_iface_list(char *netdev_name)
--{
--	struct interface *iface;
--
--	list_for_each_entry(iface, &iface_list, entry)
--		if (!strcmp(iface->name, netdev_name))
--			return iface;
--	return NULL;
--}
--
--static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
--			      void *ptr)
--{
--	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
--	struct interface *iface;
--	int ret;
--
--	switch (event) {
--	case NETDEV_UP:
--		if (netif_is_bridge_port(netdev))
--			return NOTIFY_OK;
--
--		iface = ksmbd_find_netdev_name_iface_list(netdev->name);
--		if (iface && iface->state == IFACE_STATE_DOWN) {
--			ksmbd_debug(CONN, "netdev-up event: netdev(%s) is going up\n",
--					iface->name);
--			ret = create_socket(iface);
--			if (ret)
--				return NOTIFY_OK;
--		}
--		if (!iface && bind_additional_ifaces) {
--			iface = alloc_iface(kstrdup(netdev->name, KSMBD_DEFAULT_GFP));
--			if (!iface)
--				return NOTIFY_OK;
--			ksmbd_debug(CONN, "netdev-up event: netdev(%s) is going up\n",
--				    iface->name);
--			ret = create_socket(iface);
--			if (ret)
--				break;
--		}
--		break;
--	case NETDEV_DOWN:
--		iface = ksmbd_find_netdev_name_iface_list(netdev->name);
--		if (iface && iface->state == IFACE_STATE_CONFIGURED) {
--			ksmbd_debug(CONN, "netdev-down event: netdev(%s) is going down\n",
--					iface->name);
--			kernel_sock_shutdown(iface->ksmbd_socket, SHUT_RDWR);
--			tcp_stop_kthread(iface->ksmbd_kthread);
--			iface->ksmbd_kthread = NULL;
--			sock_release(iface->ksmbd_socket);
--			iface->ksmbd_socket = NULL;
--
--			iface->state = IFACE_STATE_DOWN;
--			break;
--		}
--		break;
--	}
--
--	return NOTIFY_DONE;
--}
--
--static struct notifier_block ksmbd_netdev_notifier = {
--	.notifier_call = ksmbd_netdev_event,
--};
--
--int ksmbd_tcp_init(void)
--{
--	register_netdevice_notifier(&ksmbd_netdev_notifier);
--
--	return 0;
--}
--
--static void tcp_stop_kthread(struct task_struct *kthread)
--{
--	int ret;
--
--	if (!kthread)
--		return;
--
--	ret = kthread_stop(kthread);
--	if (ret)
--		pr_err("failed to stop forker thread\n");
--}
--
--void ksmbd_tcp_destroy(void)
--{
--	struct interface *iface, *tmp;
--
--	unregister_netdevice_notifier(&ksmbd_netdev_notifier);
--
--	list_for_each_entry_safe(iface, tmp, &iface_list, entry) {
--		list_del(&iface->entry);
--		kfree(iface->name);
--		kfree(iface);
--	}
--}
--
--static struct interface *alloc_iface(char *ifname)
--{
--	struct interface *iface;
--
--	if (!ifname)
--		return NULL;
--
--	iface = kzalloc_obj(struct interface, KSMBD_DEFAULT_GFP);
--	if (!iface) {
--		kfree(ifname);
--		return NULL;
--	}
--
--	iface->name = ifname;
--	iface->state = IFACE_STATE_DOWN;
--	list_add(&iface->entry, &iface_list);
--	return iface;
--}
--
--int ksmbd_tcp_set_interfaces(char *ifc_list, int ifc_list_sz)
--{
--	int sz = 0;
--
--	if (!ifc_list_sz) {
--		bind_additional_ifaces = 1;
--		return 0;
--	}
--
--	while (ifc_list_sz > 0) {
--		if (!alloc_iface(kstrdup(ifc_list, KSMBD_DEFAULT_GFP)))
--			return -ENOMEM;
--
--		sz = strlen(ifc_list);
--		if (!sz)
--			break;
--
--		ifc_list += sz + 1;
--		ifc_list_sz -= (sz + 1);
--	}
--
--	bind_additional_ifaces = 0;
--
--	return 0;
--}
--
- static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops = {
- 	.read		= ksmbd_tcp_read,
- 	.writev		= ksmbd_tcp_writev,
-diff --git a/fs/smb/server/transport_tcp.h b/fs/smb/server/transport_tcp.h
-index 1e51675ee1b2..d122e4b69d65 100644
---- a/fs/smb/server/transport_tcp.h
-+++ b/fs/smb/server/transport_tcp.h
-@@ -6,10 +6,13 @@
- #ifndef __KSMBD_TRANSPORT_TCP_H__
- #define __KSMBD_TRANSPORT_TCP_H__
- 
--int ksmbd_tcp_set_interfaces(char *ifc_list, int ifc_list_sz);
--struct interface *ksmbd_find_netdev_name_iface_list(char *netdev_name);
-+#include "interface.h"
-+
- void ksmbd_free_transport(struct ksmbd_transport *kt);
- int ksmbd_tcp_init(void);
- void ksmbd_tcp_destroy(void);
-+int ksmbd_tcp_create_socket(struct interface *iface);
-+void ksmbd_tcp_stop_kthread(struct task_struct *kthread);
-+void ksmbd_tcp_destroy_socket(struct socket *ksmbd_socket);
- 
- #endif /* __KSMBD_TRANSPORT_TCP_H__ */
 -- 
 2.53.0
 
