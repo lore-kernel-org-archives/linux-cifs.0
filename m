@@ -1,63 +1,63 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C879E441036
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 14:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D0644A711
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 14:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777385349; cv=none; b=iSOLd1PIIGAHpOugIRm5w7NJdjv4fqbbeh9ndxg9LQL/cil1citeKsa2dq6NzMm4WlLAIuFDETjXpAliWxkojQdch6TH2qqQoIXBo4F8NLQ/JzHSHhIWkVyYILHv+e78Xrmdex1bAMAG/JYEsxLLvWu+etjIhC0xczQ45uwOoJ8=
+	t=1777385353; cv=none; b=XHn/bMTbWaXVlRslw67vIloV86XfAjWoNgYHWOistfL6U2Kh37j8MU9PlTple+sqeSCTV+tgovzBPWQggcXkD9Lvx3Bn3+j3T+ptlZdEuu5TInfCoPUlDp3+CHPCp07tTRLvEhzSkfNRooY2KoHBDeTMq3t6WLoJju1i0BiuMwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777385349; c=relaxed/simple;
-	bh=7Y75CJc2/d6aHB2cQnB6UNXLLb91D24toWSFpWWyhQc=;
+	s=arc-20240116; t=1777385353; c=relaxed/simple;
+	bh=4wj41cHrtYbOpRGT0t7PtOWHzkpMgKUVap56UoFLJIQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d+g6XroKHYA4ukS1FkIK5sKtE8EqAF0UM4eUEm3ASDHt2MTCCG113xne9O8wKgqAwSPR0zo7sUxelf1flq9iZErAGqeBjdeiQL+aHVeRu48DIT0bocqrRErKgi3T4Mg1xOCa4KeBbsid3WkeTZhFXqR96q0qbo2nc16wEUHvdfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jFUrSbDg; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=T/ICu6zIQAtMIX9fjO2nvsX9dXBMnN1LeV3Mdl97IYA4Tn9eCOXn1CPphOR3IhCzex8IU3tz8nVGagzOKdjbSujn+RPKkflr2LvzM77A1TPK9rxv/xvdBLYvJ7jW1rN8a+wgZAhttrcgcc3hsiHwKH+Qt349ypGqQmKUwMdC6mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A+mQ76Ep; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jFUrSbDg"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-823be54d49cso856970b3a.3
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 07:09:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A+mQ76Ep"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-35d99c906d5so1772409a91.1
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 07:09:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777385347; x=1777990147; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777385352; x=1777990152; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xlWHHqWJasISzgKRTEELiwHwHgmZ46NRjOQ3vo3IPy4=;
-        b=jFUrSbDg/4oC2PkH4sl2GhXb7QY8/XCc0gAnSxpwC1ofvASx9wclP7c9dbcJ1w1goR
-         zle6Uj5MGCAdyJZgOp+RUjObCE0EcJ6VHzHNhUbjw3nVnsA1UVVhiYlmVdhveF2G5bon
-         cVVj8he/FVRD58nl+xOaGKJg/niRl7gsNpxaxH+g1nY8uxcqJ12l+118jIc/qZQC0sTG
-         3KBXWZOEl1HAj7akx3uXT8+lxUrfOXP9Uq7KfQ7s9Ou6z1g0n+uGjoi3FynXCTiL1+oF
-         gw8SYTxM5a4BwCtgRPg8FPjiqPQHGYQng79zzJlWyWC+cQ3OmCOpEp7yiTi/wOkrPZEI
-         +iHA==
+        bh=tkJ08U6yZCRDKix+9y0PgVL7KcnbudlGjXHmuDGf9BQ=;
+        b=A+mQ76EpoWEDPhZKKZtmBBKkp7SYakv6ALWIRj7PjT47LMCg8HAUXlsI0GS4lMswP1
+         GwthRNhxoxBJY2qo1dBdKh+QjHBp9gZ4Idp2G7lPur2S+XiUWENRogy/AiIOhI2JBcIi
+         ERC08CX9acZ0XJ2n8yMJPhtOSI2/coKfsyJfTWJjPz84Xro5HxcIkljdaftpOni3UdcG
+         4omAK4542NKx/uYnj/p9Kkoll7OsRk0xEJzsLi/A/kPSATu1/kx2nu2WZ7dGhdt6CBhs
+         3uuwvwyCIr1lfPo217VOmi1E3NB6/kf9tMEnRcziVqPkVxH8FvRIZClhH6GhblYgjWnY
+         oJeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777385347; x=1777990147;
+        d=1e100.net; s=20251104; t=1777385352; x=1777990152;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=xlWHHqWJasISzgKRTEELiwHwHgmZ46NRjOQ3vo3IPy4=;
-        b=S6ZxOTjZ8ALnoTeSbfeB5S75+6r7C/tRVU0Ycp1S/uD/oIGVY2DWjLUbmuVZjr7AmO
-         Frb6TkMXEtSeBX2oTg7cgmvkDeWtLeSfWyWIsu9YbeBPpVjgnioyjeMg/wy/Nk1v2bX9
-         uOFvHTKUIDpc8A7/jn7HiYQ2+L+LOj18S30TWUyTNYMaL8+UnZzVytLfkfvFf0oXYG3f
-         CNNT/PSb/HPPRYhIi7kRlBf5HMKCjNc0nOQ14WHWsH/KMERq1tBuNqQkqezVjSyNV45R
-         gTGdD8+kVeiGL0GGuymBlzEmmKJf1SgBVK+KMIJcPpMfA8+MUfmq+77vstlsBMU3KE8x
-         P+Zg==
-X-Forwarded-Encrypted: i=1; AFNElJ+/2WRnPUguH0Rgovie9nbgSsjLhQ+EG/9GHnlmNAS6cKp2Jwlu5+jpaLi6Qv8hfOB64zfw5fCQEtkE@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIWKDMunLTPJHJmRMCGrn0YiN8nXrWJf0jSpT7wT10qHLLH0O9
-	weye1/v3coPw4y3ATcHUKUteQh8F1wAgZv9EpPBt/kZC2E14XSsDJaHD
-X-Gm-Gg: AeBDievZHEWYYj3nizbExvvyjoABNjX8t1pAL1HtkFDYn/uOR9N5cR5KJ11x85n2Uun
-	W2gJWDnLT9mJfOeFo5V9KSc4RhvVWkluGpAIKQRXmYRa2GfYv8vvcYijbcn+1I4TJqtHuLk5Js5
-	fL8b0rX1S8tIf4wBGm0rhISfumkBxJit1YcesIQDI46325pdWyFkeSKCbIvMO5qbb2enle4uQYC
-	TmEoW29zAb2FKNG+qlN/qbnsghTSyhr9aMag1fiFlGpVKm8b2WpfvPdD36VVz8fyx44Y0RaJOrY
-	XJwH3zgrp4AUQngomI4GdlBStpCbybW/n9iXhQwOJlppucc7S1pOV1+ewgaJejwFXABf5R0ry0i
-	Y8V63BAwenTDDcwtsEkJ+GLXU32mP06GxWH9XtSVG9p1mWmw4aE99n+WUivP4UnyUOMJsuhUjFn
-	EkAEsRw0KuUMsXJpm5UIXNa5MgVrE=
-X-Received: by 2002:a05:6a21:10e:b0:3a2:c72c:745d with SMTP id adf61e73a8af0-3a398db06e1mr2710162637.4.1777385346798;
-        Tue, 28 Apr 2026 07:09:06 -0700 (PDT)
+        bh=tkJ08U6yZCRDKix+9y0PgVL7KcnbudlGjXHmuDGf9BQ=;
+        b=USbF5/i1agroOcug7DKqkHmfKhvdNdOKt94DKs2ZhgejnIMVfaUIDTIiJbQ7JqLMO2
+         TJSm+QlwV5S7Kk9y6SokZ5nyso/1d9CNqggBa9u940fbp+Oopw0kUiErVjC1j4uHj2bv
+         rquo9ulIFiWE2XqVcFErclyklGIaxAknAu5Y2Qot7JumWjYtwjVFT/1xEFxACuvlLi0B
+         yIaDSyH4kSqMIsTyiVbYZKFH1IfkA3o6rp2W8NNM5jJsSOtMgy1joSYXnWvl/aVyd/Mz
+         ru0TW/d9d7omxOWRnb9LP03TlgXbuHrK75oqAjdwrofLt96xC+MJdZgzaJtftL2SzjNd
+         4FCA==
+X-Forwarded-Encrypted: i=1; AFNElJ9EqLRglXbdlwRplR8Gj5SvvxqXZLcmrbUdjF04DBhk2I5O6hwiiUK/sYVqEbYrYXoN10Dj1bPZC5+l@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpAydHZIyJc7AFmmgSoK98abs3BjA0NUAJ8WqPYD9sXwUZurdB
+	dOgV122CjJM0Tuo1aJfnmGOEHPqAPZ0BQMNxcNmxHEBOLOcFW3KeMTxQ
+X-Gm-Gg: AeBDietc7UOvtS7cTVkLa54nnvr7rTEnzxjSuH1BJTCwjjAUb+umEr+xPOMlK0OSqhb
+	aPIGcuGjQcTuwRNlGV2w2UOx2NWQ4niCLcAf7VI54RF2vt+EYFo+fTWBAp/RNOyEI5IJMGuMXfB
+	vVr84BzIDCKms5cUYP5cDh5D702uScB0cX92PfeLGYMKoc8q/jwXqDJb0NU30YGZxGNLpoDq01g
+	5GQlPDH1MRY+mNL15pYmQkk+5NWF6MMPKcLEUzqnmVsCFRNKiPlePdGrnbUckC6b5mzbWC5gpUa
+	FfanjWmiZyw4FeKmcDa+gxu8CxkRowy9nwp/g0+DaoMuN8j6a2itQ7m1vT3tO7ZfOZ/u1oAmn2r
+	bZLWH3oVbMp9JxO92V6aU+jq/OuNB8K31zEgN/odykISdPTaMxy9cHJ1CY815OoLj/8AATu1ZUa
+	3wr2c0E3nmWNnN7lo48ZaEMUBMcvk=
+X-Received: by 2002:a05:6a21:104:b0:3a2:d3c3:39a9 with SMTP id adf61e73a8af0-3a39889bc54mr2419585637.0.1777385351601;
+        Tue, 28 Apr 2026 07:09:11 -0700 (PDT)
 Received: from ser8.. ([221.156.231.192])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7fcade0f56sm2190526a12.21.2026.04.28.07.09.05
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7fcade0f56sm2190526a12.21.2026.04.28.07.09.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 07:09:06 -0700 (PDT)
+        Tue, 28 Apr 2026 07:09:11 -0700 (PDT)
 From: DaeMyung Kang <charsyam@gmail.com>
 To: Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -68,9 +68,9 @@ Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	DaeMyung Kang <charsyam@gmail.com>
-Subject: [PATCH v2 2/3] ksmbd: harden file lifetime during session teardown
-Date: Tue, 28 Apr 2026 23:08:55 +0900
-Message-ID: <20260428140856.941847-3-charsyam@gmail.com>
+Subject: [PATCH v2 3/3] ksmbd: close durable scavenger races against m_fp_list lookups
+Date: Tue, 28 Apr 2026 23:08:56 +0900
+Message-ID: <20260428140856.941847-4-charsyam@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260428140856.941847-1-charsyam@gmail.com>
 References: <20260428140856.941847-1-charsyam@gmail.com>
@@ -82,390 +82,249 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-__close_file_table_ids() is the per-session teardown that closes every
-fp belonging to a session (or to one tree connect on that session) by
-walking the session's volatile-id idr.  The current loop has three
-related problems on busy or racing workloads:
+ksmbd_durable_scavenger() has two related races against any walker
+that iterates f_ci->m_fp_list, including ksmbd_lookup_fd_inode()
+(used by ksmbd_vfs_rename) and the share-mode checks in
+fs/smb/server/smb_common.c.
 
-  * Sleeping under ft->lock.  The session-teardown skip callback,
-    session_fd_check(), already sleeps in ksmbd_vfs_copy_durable_owner()
-    -> kstrdup(GFP_KERNEL) and down_write(&fp->f_ci->m_lock) (a
-    rw_semaphore).  Running the callback inside write_lock(&ft->lock)
-    trips CONFIG_DEBUG_ATOMIC_SLEEP / CONFIG_PROVE_LOCKING on a
-    durable-fd workload.
+(1) fp->node list-head reuse.  Durable-preserved handles can remain
+linked on f_ci->m_fp_list after session teardown so share-mode checks
+still see them while the handle is reconnectable.  The scavenger
+collected expired handles by adding fp->node to a local
+scavenger_list after removing them from the global durable idr.
+Because fp->node is the same list_head used by m_fp_list,
+list_add(&fp->node, &scavenger_list) overwrites the m_fp_list links
+and corrupts both lists.  CONFIG_DEBUG_LIST can report this on the
+share-mode walk path.
 
-  * Refcount accounting blind to f_state.  The unconditional
-    atomic_dec_and_test(&fp->refcount) does not distinguish
-    FP_INITED (idr-owned reference still intact) from FP_CLOSED (an
-    earlier ksmbd_close_fd() already consumed the idr-owned reference
-    while leaving fp in the idr because a holder kept refcount
-    non-zero).  When the latter races with teardown the same path
-    over-decrements into a holder reference and ksmbd_fd_put() later
-    UAFs that holder.
+(2) Refcount race against m_fp_list walkers.  The scavenger qualifies
+an expired durable handle with atomic_read(&fp->refcount) > 1 and
+fp->conn under global_ft.lock, removes fp from global_ft, then drops
+global_ft.lock before unlinking fp from m_fp_list and freeing it.
+During that gap fp is still linked on m_fp_list with f_state ==
+FP_INITED.  ksmbd_lookup_fd_inode() under m_lock read calls
+ksmbd_fp_get() (atomic_inc_not_zero on refcount that is still 1) and
+takes a live reference; the scavenger then unlinks and frees fp
+while the holder owns a reference, leading to UAF on the holder's
+subsequent ksmbd_fd_put() and on any field reads performed by a
+concurrent share-mode walker that iterates m_fp_list without taking
+ksmbd_fp_get() (smb_check_perm_dleases-like paths).
 
-  * FP_NEW window.  Between __open_id() publishing fp into the
-    session idr and ksmbd_update_fstate(..., FP_INITED) committing the
-    transition at the end of smb2_open(), an fp is in FP_NEW and an
-    intervening teardown that takes a transient reference and
-    unpublishes the volatile id leaves the original idr-owned
-    reference orphaned -- the opener is unaware that fp has been
-    unpublished, returns success to the client, and the fp leaks at
-    refcount = 1.
+Fix both:
 
-Refactor __close_file_table_ids() to take a transient reference on fp
-and unpublish fp from the session idr *under ft->lock* before calling
-skip() outside the lock.  A transient ref protects lifetime but not
-concurrent field mutation, so the idr_remove() is what keeps
-__ksmbd_lookup_fd() through this session's idr from granting a new
-ksmbd_fp_get() reference to an fp whose fp->conn / fp->tcon /
-fp->volatile_id / op->conn / lock_list links are about to be rewritten
-by session_fd_check().  Durable reconnect is unaffected because it
-reaches fp through the global durable table (ksmbd_lookup_durable_fd
--> global_ft).
+  * Stop reusing fp->node as a scavenger-private list node.  Remove
+    one expired handle from global_ft under global_ft.lock, take an
+    explicit transient reference, drop the lock, unlink fp->node
+    from m_fp_list under f_ci->m_lock, then drop both the durable
+    lifetime and transient references with atomic_sub_and_test(2,
+    &fp->refcount).  If the scavenger is the last putter the close
+    runs there; otherwise an in-flight holder that already raced
+    through the m_fp_list lookup owns the final close via its
+    ksmbd_fd_put() path.  The one-at-a-time disposal can rescan the
+    durable idr when multiple handles expire in the same pass, but
+    durable scavenging is a background expiration path and the final
+    full scan recomputes min_timeout before the next wait.
 
-Decide n_to_drop together with any FP_INITED -> FP_CLOSED transition
-under ft->lock so teardown and ksmbd_close_fd() never both consume the
-idr-owned reference.  See ksmbd_mark_fp_closed() for the per-state
-accounting.  For the FP_NEW path to be safe, the opener has to learn
-that fp was unpublished: ksmbd_update_fstate() now returns -ENOENT
-when an FP_NEW -> FP_INITED transition finds f_state already advanced
-or the volatile id cleared (both committed by teardown under
-ft->lock); smb2_open() propagates that as STATUS_OBJECT_NAME_INVALID
-and drops the original reference via ksmbd_fd_put().
+  * Clear fp->persistent_id inside __ksmbd_remove_durable_fd() right
+    after idr_remove(), so a delayed final close from a holder that
+    snatched fp does not re-issue idr_remove() on a persistent id
+    that idr_alloc_cyclic() in ksmbd_open_durable_fd() may have
+    already handed out to a brand-new durable handle.
 
-The list removal cannot be left for a deferred final putter because
-fp->volatile_id has already been cleared and __ksmbd_remove_fd() will
-intentionally skip both idr_remove() and list_del_init().  Move the
-m_fp_list unlink in __ksmbd_remove_fd() above the volatile-id check so
-that an FP_NEW fp that happened to be added to m_fp_list (smb2_open()
-adds fp->node before ksmbd_update_fstate() runs) is still cleaned up
-on the deferred putter path; list_del_init() on an empty node is a
-no-op and remains safe for fps that were never added.
+  * Bypass the per-conn open_files_count decrement in
+    __put_fd_final() when fp is detached from any session table
+    (fp->conn cleared by session_fd_check() at durable preserve --
+    paired with the volatile_id clear at unpublish, so checking
+    fp->conn alone is sufficient).  The walker that owns the final
+    close runs from an unrelated work->conn whose
+    stats.open_files_count never tracked this durable fp; without
+    this guard the holder would underflow that unrelated counter.
 
-Add a defensive guard in session_fd_check() that refuses non-FP_INITED
-fps so that even if a teardown reaches an FP_NEW fp it falls into the
-close branch (where the n_to_drop = 1 accounting keeps the opener's
-reference alive) instead of the durable-preserve branch (which mutates
-fp->conn / fp->tcon).
+The two races are folded into one patch because patch (1) alone
+cleans up the corrupted list but leaves a deterministic UAF window
+for m_fp_list walkers that the transient-reference and
+persistent_id discipline in (2) close; bisecting onto an
+intermediate state would land on a UAF that pre-patch chaos merely
+made less reproducible.
 
-Validation on a debug kernel additionally built with CONFIG_DEBUG_LIST
-and CONFIG_DEBUG_OBJECTS_WORK used a same-session two-tcon workload
-(open/write storm on one tcon, 50 tree disconnects on the other) and
-reported no list-corruption, work_struct ODEBUG, sleep-in-atomic,
-lockdep or kmemleak reports.  Reverting only the
-__close_file_table_ids() hunk while keeping a forced-is_reconnectable()
-harness produced the expected sleep-in-atomic at vfs_cache.c:1095,
-confirming the ft->lock-out-of-sleepable-skip discipline.
+Validation:
+  * CONFIG_DEBUG_LIST coverage for the list_head reuse path.
+  * KASAN-enabled direct SMB2 durable-handle coverage that exercised
+    ksmbd_durable_scavenger() and non-NULL ksmbd_lookup_fd_inode()
+    returns while durable handles expired under concurrent rename
+    lookups, with no KASAN, UAF, list-corruption, ODEBUG, or WARNING
+    reports.
+  * checkpatch --strict
+  * make -j$(nproc) M=fs/smb/server
 
-KASAN-enabled direct SMB2 coverage with durable handles enabled
-exercised ksmbd_close_tree_conn_fds(), ksmbd_close_session_fds(),
-the FP_NEW failure path, tree_conn_fd_check(), and a non-zero
-session_fd_check() durable-preserve return.  This produced no KASAN,
-DEBUG_LIST, ODEBUG, or WARNING reports.
-
-Fixes: f44158485826 ("cifsd: add file operations")
+Fixes: d484d621d40f ("ksmbd: add durable scavenger timer")
 Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
 ---
- fs/smb/server/smb2pdu.c   |   6 +-
- fs/smb/server/vfs_cache.c | 179 +++++++++++++++++++++++++++++++++-----
- fs/smb/server/vfs_cache.h |   4 +-
- 3 files changed, 164 insertions(+), 25 deletions(-)
+ fs/smb/server/vfs_cache.c | 102 ++++++++++++++++++++++++++++----------
+ 1 file changed, 76 insertions(+), 26 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 21825a69c29a..c1240ca14253 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3767,8 +3767,10 @@ int smb2_open(struct ksmbd_work *work)
- 
- err_out2:
- 	if (!rc) {
--		ksmbd_update_fstate(&work->sess->file_table, fp, FP_INITED);
--		rc = ksmbd_iov_pin_rsp(work, (void *)rsp, iov_len);
-+		rc = ksmbd_update_fstate(&work->sess->file_table, fp,
-+					 FP_INITED);
-+		if (!rc)
-+			rc = ksmbd_iov_pin_rsp(work, (void *)rsp, iov_len);
- 	}
- 	if (rc) {
- 		if (rc == -EINVAL)
 diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index 4a18107937cc..dc4037ef1834 100644
+index dc4037ef1834..354c4d8a1cfb 100644
 --- a/fs/smb/server/vfs_cache.c
 +++ b/fs/smb/server/vfs_cache.c
-@@ -431,13 +431,13 @@ static void ksmbd_remove_durable_fd(struct ksmbd_file *fp)
- 
- static void __ksmbd_remove_fd(struct ksmbd_file_table *ft, struct ksmbd_file *fp)
- {
--	if (!has_file_id(fp->volatile_id))
--		return;
--
- 	down_write(&fp->f_ci->m_lock);
- 	list_del_init(&fp->node);
- 	up_write(&fp->f_ci->m_lock);
- 
-+	if (!has_file_id(fp->volatile_id))
-+		return;
-+
- 	write_lock(&ft->lock);
- 	idr_remove(ft->idr, fp->volatile_id);
- 	write_unlock(&ft->lock);
-@@ -798,15 +798,58 @@ struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp)
- 	return ERR_PTR(ret);
- }
- 
--void ksmbd_update_fstate(struct ksmbd_file_table *ft, struct ksmbd_file *fp,
--			 unsigned int state)
-+/**
-+ * ksmbd_update_fstate() - update an fp state under the file-table lock
-+ * @ft: file table that publishes @fp's volatile id
-+ * @fp: file pointer to update
-+ * @state: new state
-+ *
-+ * Return: 0 on success.  The FP_NEW -> FP_INITED transition is special:
-+ * -ENOENT if teardown already unpublished @fp by advancing the state or
-+ * clearing the volatile id.  Other state updates preserve the historical
-+ * fire-and-forget behavior.
-+ */
-+int ksmbd_update_fstate(struct ksmbd_file_table *ft, struct ksmbd_file *fp,
-+			unsigned int state)
- {
-+	int ret;
-+
- 	if (!fp)
--		return;
-+		return -ENOENT;
- 
- 	write_lock(&ft->lock);
--	fp->f_state = state;
-+	if (state == FP_INITED &&
-+	    (fp->f_state != FP_NEW || !has_file_id(fp->volatile_id))) {
-+		ret = -ENOENT;
-+	} else {
-+		fp->f_state = state;
-+		ret = 0;
-+	}
- 	write_unlock(&ft->lock);
-+
-+	return ret;
-+}
-+
-+/*
-+ * ksmbd_mark_fp_closed() - mark fp closed under ft->lock and return how many
-+ * refs the teardown path owns.
-+ *
-+ * FP_INITED has a normal idr-owned reference, so teardown owns both that
-+ * reference and the transient lookup reference.  FP_NEW is still owned by the
-+ * in-flight opener/reopener, which will drop the original reference after
-+ * ksmbd_update_fstate(..., FP_INITED) observes the cleared volatile id.
-+ * FP_CLOSED on entry means an earlier ksmbd_close_fd() already consumed the
-+ * idr-owned ref.
-+ */
-+static int ksmbd_mark_fp_closed(struct ksmbd_file *fp)
-+{
-+	if (fp->f_state == FP_INITED) {
-+		set_close_state_blocked_works(fp);
-+		fp->f_state = FP_CLOSED;
-+		return 2;
-+	}
-+
-+	return 1;
- }
- 
- static int
-@@ -814,7 +857,8 @@ __close_file_table_ids(struct ksmbd_session *sess,
- 		       struct ksmbd_tree_connect *tcon,
- 		       bool (*skip)(struct ksmbd_tree_connect *tcon,
- 				    struct ksmbd_file *fp,
--				    struct ksmbd_user *user))
-+				    struct ksmbd_user *user),
-+		       bool skip_preserves_fp)
- {
- 	struct ksmbd_file_table *ft = &sess->file_table;
- 	struct ksmbd_file *fp;
-@@ -822,32 +866,120 @@ __close_file_table_ids(struct ksmbd_session *sess,
- 	int num = 0;
- 
- 	while (1) {
-+		int n_to_drop;
-+
- 		write_lock(&ft->lock);
- 		fp = idr_get_next(ft->idr, &id);
- 		if (!fp) {
- 			write_unlock(&ft->lock);
- 			break;
- 		}
--
--		if (skip(tcon, fp, sess->user) ||
--		    !atomic_dec_and_test(&fp->refcount)) {
-+		if (!atomic_inc_not_zero(&fp->refcount)) {
- 			id++;
- 			write_unlock(&ft->lock);
- 			continue;
- 		}
- 
--		set_close_state_blocked_works(fp);
--		idr_remove(ft->idr, fp->volatile_id);
--		fp->volatile_id = KSMBD_NO_FID;
--		write_unlock(&ft->lock);
-+		if (skip_preserves_fp) {
-+			/*
-+			 * Session teardown: skip() is session_fd_check(),
-+			 * which may sleep and mutates fp->conn / fp->tcon /
-+			 * fp->volatile_id when it chooses to preserve fp
-+			 * for durable reconnect.  Unpublish fp from the
-+			 * session idr here, under ft->lock, so that
-+			 * __ksmbd_lookup_fd() through this session cannot
-+			 * grant a new ksmbd_fp_get() reference to an fp
-+			 * whose fields are about to be rewritten outside
-+			 * the lock.  Durable reconnect still reaches fp via
-+			 * global_ft.
-+			 */
-+			idr_remove(ft->idr, id);
-+			fp->volatile_id = KSMBD_NO_FID;
-+			write_unlock(&ft->lock);
-+
-+			if (skip(tcon, fp, sess->user)) {
-+				/*
-+				 * session_fd_check() has converted fp to
-+				 * durable-preserve state and cleared its
-+				 * per-conn fields.  fp is already unpublished
-+				 * above; the original idr-owned ref keeps it
-+				 * alive for the durable scavenger.  Drop only
-+				 * the transient ref.  atomic_dec() is safe --
-+				 * atomic_inc_not_zero() succeeded on a
-+				 * positive value and we added one more, so
-+				 * refcount cannot be zero here.
-+				 */
-+				atomic_dec(&fp->refcount);
-+				id++;
-+				continue;
-+			}
-+
-+			/*
-+			 * Keep the close-state decision under the same lock
-+			 * observed by ksmbd_update_fstate(), which is how an
-+			 * in-flight FP_NEW opener learns that teardown has
-+			 * cleared its volatile id.
-+			 */
-+			write_lock(&ft->lock);
-+			n_to_drop = ksmbd_mark_fp_closed(fp);
-+			write_unlock(&ft->lock);
-+		} else {
-+			/*
-+			 * Tree teardown: skip() is tree_conn_fd_check(), a
-+			 * cheap pointer compare that doesn't sleep and has
-+			 * no side effects, so keep the skip decision plus
-+			 * the unpublish-and-mark-closed sequence atomic
-+			 * under ft->lock.  fps belonging to other tree
-+			 * connects (skip() == true) stay fully published in
-+			 * the session idr with no lock window.
-+			 */
-+			if (skip(tcon, fp, sess->user)) {
-+				atomic_dec(&fp->refcount);
-+				write_unlock(&ft->lock);
-+				id++;
-+				continue;
-+			}
-+			idr_remove(ft->idr, id);
-+			fp->volatile_id = KSMBD_NO_FID;
-+			n_to_drop = ksmbd_mark_fp_closed(fp);
-+			write_unlock(&ft->lock);
-+		}
- 
-+		/*
-+		 * fp->volatile_id is already cleared to prevent stale idr
-+		 * removal from a deferred final close.  Remove fp from
-+		 * m_fp_list here because __ksmbd_remove_fd() will skip the
-+		 * list unlink when volatile_id is KSMBD_NO_FID.
-+		 */
- 		down_write(&fp->f_ci->m_lock);
- 		list_del_init(&fp->node);
- 		up_write(&fp->f_ci->m_lock);
- 
--		__ksmbd_close_fd(ft, fp);
--
--		num++;
-+		/*
-+		 * Drop the references this iteration owns:
-+		 *
-+		 *   n_to_drop == 2: we observed FP_INITED and committed
-+		 *     the FP_CLOSED transition ourselves, so we own the
-+		 *     transient (+1) and the still-intact idr-owned ref.
-+		 *
-+		 *   n_to_drop == 1: either a prior ksmbd_close_fd()
-+		 *     already consumed the idr-owned ref, or fp was still
-+		 *     FP_NEW and the in-flight opener/reopener must keep
-+		 *     the original reference until ksmbd_update_fstate()
-+		 *     observes the cleared volatile id.
-+		 *
-+		 * If we end up as the final putter, finalize fp and
-+		 * account the open_files_count decrement via the caller's
-+		 * atomic_sub(num, ...).  Otherwise the remaining user's
-+		 * ksmbd_fd_put() reaches __put_fd_final(), which does its
-+		 * own atomic_dec(&open_files_count), so we must not count
-+		 * this fp here -- doing so would double-decrement the
-+		 * connection-wide counter.
-+		 */
-+		if (atomic_sub_and_test(n_to_drop, &fp->refcount)) {
-+			__ksmbd_close_fd(NULL, fp);
-+			num++;
-+		}
- 		id++;
- 	}
- 
-@@ -1082,6 +1214,9 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
- 	if (!is_reconnectable(fp))
- 		return false;
- 
-+	if (fp->f_state != FP_INITED)
-+		return false;
-+
- 	if (WARN_ON_ONCE(!fp->conn))
- 		return false;
- 
-@@ -1127,7 +1262,8 @@ void ksmbd_close_tree_conn_fds(struct ksmbd_work *work)
- {
- 	int num = __close_file_table_ids(work->sess,
- 					 work->tcon,
--					 tree_conn_fd_check);
-+					 tree_conn_fd_check,
-+					 false);
- 
- 	atomic_sub(num, &work->conn->stats.open_files_count);
- }
-@@ -1136,7 +1272,8 @@ void ksmbd_close_session_fds(struct ksmbd_work *work)
- {
- 	int num = __close_file_table_ids(work->sess,
- 					 work->tcon,
--					 session_fd_check);
-+					 session_fd_check,
-+					 true);
- 
- 	atomic_sub(num, &work->conn->stats.open_files_count);
- }
-@@ -1268,7 +1405,7 @@ void ksmbd_destroy_file_table(struct ksmbd_session *sess)
- 	if (!ft->idr)
+@@ -418,6 +418,14 @@ static void __ksmbd_remove_durable_fd(struct ksmbd_file *fp)
  		return;
  
--	__close_file_table_ids(sess, NULL, session_fd_check);
-+	__close_file_table_ids(sess, NULL, session_fd_check, true);
- 	idr_destroy(ft->idr);
- 	kfree(ft->idr);
- 	ft->idr = NULL;
-diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-index 866f32c10d4d..e6871266a94b 100644
---- a/fs/smb/server/vfs_cache.h
-+++ b/fs/smb/server/vfs_cache.h
-@@ -172,8 +172,8 @@ int ksmbd_close_inode_fds(struct ksmbd_work *work, struct inode *inode);
- int ksmbd_init_global_file_table(void);
- void ksmbd_free_global_file_table(void);
- void ksmbd_set_fd_limit(unsigned long limit);
--void ksmbd_update_fstate(struct ksmbd_file_table *ft, struct ksmbd_file *fp,
--			 unsigned int state);
-+int ksmbd_update_fstate(struct ksmbd_file_table *ft, struct ksmbd_file *fp,
-+			unsigned int state);
- bool ksmbd_vfs_compare_durable_owner(struct ksmbd_file *fp,
- 		struct ksmbd_user *user);
+ 	idr_remove(global_ft.idr, fp->persistent_id);
++	/*
++	 * Clear persistent_id so a later __ksmbd_close_fd() that runs from a
++	 * delayed putter (e.g. when a concurrent ksmbd_lookup_fd_inode()
++	 * walker held the final reference) does not re-issue idr_remove() on
++	 * an id that idr_alloc_cyclic() may have already handed out to a new
++	 * durable handle.
++	 */
++	fp->persistent_id = KSMBD_NO_FID;
+ }
  
+ static void ksmbd_remove_durable_fd(struct ksmbd_file *fp)
+@@ -521,6 +529,20 @@ static struct ksmbd_file *__ksmbd_lookup_fd(struct ksmbd_file_table *ft,
+ 
+ static void __put_fd_final(struct ksmbd_work *work, struct ksmbd_file *fp)
+ {
++	/*
++	 * Detached durable fp -- session_fd_check() cleared fp->conn at
++	 * preserve, so this fp is no longer tracked by any conn's
++	 * stats.open_files_count.  This happens when
++	 * ksmbd_scavenger_dispose_dh() hands the final close off to an
++	 * m_fp_list walker (e.g. ksmbd_lookup_fd_inode()) whose work->conn
++	 * is unrelated to the conn that originally opened the handle; close
++	 * via the NULL-ft path so we do not underflow that unrelated
++	 * counter.
++	 */
++	if (!fp->conn) {
++		__ksmbd_close_fd(NULL, fp);
++		return;
++	}
+ 	__ksmbd_close_fd(&work->sess->file_table, fp);
+ 	atomic_dec(&work->conn->stats.open_files_count);
+ }
+@@ -1033,24 +1055,37 @@ static bool ksmbd_durable_scavenger_alive(void)
+ 	return true;
+ }
+ 
+-static void ksmbd_scavenger_dispose_dh(struct list_head *head)
++static void ksmbd_scavenger_dispose_dh(struct ksmbd_file *fp)
+ {
+-	while (!list_empty(head)) {
+-		struct ksmbd_file *fp;
++	/*
++	 * Durable-preserved fp can remain linked on f_ci->m_fp_list for
++	 * share-mode checks.  Unlink it before final close; fp->node is not
++	 * available as a scavenger-private list node because re-adding it to
++	 * another list corrupts m_fp_list.
++	 */
++	down_write(&fp->f_ci->m_lock);
++	list_del_init(&fp->node);
++	up_write(&fp->f_ci->m_lock);
+ 
+-		fp = list_first_entry(head, struct ksmbd_file, node);
+-		list_del_init(&fp->node);
++	/*
++	 * Drop both the durable lifetime reference and the transient reference
++	 * taken by the scavenger under global_ft.lock.  If a concurrent
++	 * ksmbd_lookup_fd_inode() (or any other m_fp_list walker) snatched fp
++	 * before the unlink above, that holder owns the final close via
++	 * ksmbd_fd_put() -> __ksmbd_close_fd().  Otherwise the scavenger is
++	 * the last putter and finalises fp here.
++	 */
++	if (atomic_sub_and_test(2, &fp->refcount))
+ 		__ksmbd_close_fd(NULL, fp);
+-	}
+ }
+ 
+ static int ksmbd_durable_scavenger(void *dummy)
+ {
+ 	struct ksmbd_file *fp = NULL;
++	struct ksmbd_file *expired_fp;
+ 	unsigned int id;
+ 	unsigned int min_timeout = 1;
+ 	bool found_fp_timeout;
+-	LIST_HEAD(scavenger_list);
+ 	unsigned long remaining_jiffies;
+ 
+ 	__module_get(THIS_MODULE);
+@@ -1060,8 +1095,6 @@ static int ksmbd_durable_scavenger(void *dummy)
+ 		if (try_to_freeze())
+ 			continue;
+ 
+-		found_fp_timeout = false;
+-
+ 		remaining_jiffies = wait_event_timeout(dh_wq,
+ 				   ksmbd_durable_scavenger_alive() == false,
+ 				   __msecs_to_jiffies(min_timeout));
+@@ -1070,23 +1103,39 @@ static int ksmbd_durable_scavenger(void *dummy)
+ 		else
+ 			min_timeout = DURABLE_HANDLE_MAX_TIMEOUT;
+ 
+-		write_lock(&global_ft.lock);
+-		idr_for_each_entry(global_ft.idr, fp, id) {
+-			if (!fp->durable_timeout)
+-				continue;
++		do {
++			expired_fp = NULL;
++			found_fp_timeout = false;
+ 
+-			if (atomic_read(&fp->refcount) > 1 ||
+-			    fp->conn)
+-				continue;
+-
+-			found_fp_timeout = true;
+-			if (fp->durable_scavenger_timeout <=
+-			    jiffies_to_msecs(jiffies)) {
+-				__ksmbd_remove_durable_fd(fp);
+-				list_add(&fp->node, &scavenger_list);
+-			} else {
++			write_lock(&global_ft.lock);
++			idr_for_each_entry(global_ft.idr, fp, id) {
+ 				unsigned long durable_timeout;
+ 
++				if (!fp->durable_timeout)
++					continue;
++
++				if (atomic_read(&fp->refcount) > 1 ||
++				    fp->conn)
++					continue;
++
++				found_fp_timeout = true;
++				if (fp->durable_scavenger_timeout <=
++				    jiffies_to_msecs(jiffies)) {
++					__ksmbd_remove_durable_fd(fp);
++					/*
++					 * Take a transient reference so fp
++					 * cannot be freed by an in-flight
++					 * ksmbd_lookup_fd_inode() that found
++					 * it through f_ci->m_fp_list while we
++					 * drop global_ft.lock and reach the
++					 * m_fp_list unlink in
++					 * ksmbd_scavenger_dispose_dh().
++					 */
++					atomic_inc(&fp->refcount);
++					expired_fp = fp;
++					break;
++				}
++
+ 				durable_timeout =
+ 					fp->durable_scavenger_timeout -
+ 						jiffies_to_msecs(jiffies);
+@@ -1094,10 +1143,11 @@ static int ksmbd_durable_scavenger(void *dummy)
+ 				if (min_timeout > durable_timeout)
+ 					min_timeout = durable_timeout;
+ 			}
+-		}
+-		write_unlock(&global_ft.lock);
++			write_unlock(&global_ft.lock);
+ 
+-		ksmbd_scavenger_dispose_dh(&scavenger_list);
++			if (expired_fp)
++				ksmbd_scavenger_dispose_dh(expired_fp);
++		} while (expired_fp);
+ 
+ 		if (found_fp_timeout == false)
+ 			break;
 -- 
 2.43.0
