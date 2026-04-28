@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B078A47F2E5
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 13:19:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E5047F2EF
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 13:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777382378; cv=none; b=A/naOxcmboHvyGrSuk/k/JzTuJU04OEIqdKPnsF3yCsMDfO84v8cUk7pvBx/dJ46/AUvnS9YJCKrBZ+X2FxAhNBE62G2ph/zN1WjDcrBtnp/dRvjkHyrpjYi/+02l+HUhBF84KbNtw58+BsjFO4UFsYog5uniju/5yl41O557cw=
+	t=1777382379; cv=none; b=fMzl6kuh2o/msCHlAGvqiEclb/IvmS33ky3Ed8/qFWtBU7zReDT9pPcZSlnpgZxrdXzqcn8edrW7vAkPjwPVgJi4cTHPD0gDsPVcdjLBGlpjgPmq6ai72ZvK8z0ybnMF9ukJvS29HmXv53SQ0EPJahVjea+aBV4TLis+7xq3meA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777382378; c=relaxed/simple;
-	bh=JmXP+QXfysKowXIq/+dNx74WhS6n5x7XmBRvcwsYGOE=;
+	s=arc-20240116; t=1777382379; c=relaxed/simple;
+	bh=S62t+upgojIYhz1p6dALu+kyrentByS35lQhzLSLXbY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EA+G6c1H45sSaOXr/pbFn8TsE7tH4LYDg/iaW0msxoEkG/0sdONa2yKHDJHJZlLiiemLnAKrEqVJuWK89ODOVGIsHsml4w0ypaW/8LeXCfelAvtoxFGRvPbSeLLIVHCGhlrhknneY/+UD7CmBuWsn+8rOfw36zD8PH+Inex6Pho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GN9m28G4; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=pjqfhLc399ZNfByQ8bTOJIBuVsqbYZxRXJD8Tu6PW/pAm+56CP58lJ1cJzemE/ZrpR4OWEv22MBM5JcPRFQ7Te5QSGFONfBqgwXL8b/9xKwy5swtjAWwsMwkPyRF66CZzv3YCNarWQDDHpCCIs9M4vVpXbtXF4NJvS/Wi4FU6AU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R9BjICwN; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GN9m28G4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R9BjICwN"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777382375;
+	s=mimecast20190719; t=1777382376;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NVdup9Yb9JycCAuf4DYfAvqCMMZy27DYqgj2TZFqU1c=;
-	b=GN9m28G4aDW9usE76rExurM2wPdL82uUkq+Rd0jZHj9xy38HO7pDHkE3EwE1PubNSD+13T
-	CqfhXOBpvNoMQ6mEggPu1I4B9V6lTFUyE9A5/kNO+USBlU5gymRR4MqpmBaZAcBG8Au1uH
-	ugsU5xNQ7oAhpQij6nf81nR2A43fx90=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=0M8NeyGOtxqcK9n3lFvZBV03uT/fzw4I/4MxBJJ99Zo=;
+	b=R9BjICwN7EDHqruxrfnsXDKB4B9EuNlNwSdO00OdSM/wP14bLkDOi6veueRad6uSN9tjBK
+	RJbIYjDwK6OEx+Qp5fFC7CLzFJDmzbwlnIVwjEdB5HKihBLmLGnZ+xSU5S76LFLWZCYrSM
+	v/QrVmYq5w+fFy/YjfOxBFrygXaJQv4=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-652-MMscdLOhOGKsXqAJlrHUMw-1; Tue,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-74-ZSty4BcUOtSXjU4EqNIxmg-1; Tue,
  28 Apr 2026 09:19:31 -0400
-X-MC-Unique: MMscdLOhOGKsXqAJlrHUMw-1
-X-Mimecast-MFC-AGG-ID: MMscdLOhOGKsXqAJlrHUMw_1777382369
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+X-MC-Unique: ZSty4BcUOtSXjU4EqNIxmg-1
+X-Mimecast-MFC-AGG-ID: ZSty4BcUOtSXjU4EqNIxmg_1777382369
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A1A041955E9C;
-	Tue, 28 Apr 2026 13:19:29 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A213118080B3;
+	Tue, 28 Apr 2026 13:18:42 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.32.126])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A608B180047F;
-	Tue, 28 Apr 2026 13:19:26 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7747E1800370;
+	Tue, 28 Apr 2026 13:18:39 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>
 Cc: David Howells <dhowells@redhat.com>,
@@ -52,10 +52,11 @@ Cc: David Howells <dhowells@redhat.com>,
 	ceph-devel@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH v5 18/24] netfs: Fix leak of request in netfs_write_begin() error handling
-Date: Tue, 28 Apr 2026 14:17:48 +0100
-Message-ID: <20260428131756.922303-19-dhowells@redhat.com>
+	Xiaoli Feng <xifeng@redhat.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v5 08/24] netfs: fix error handling in netfs_extract_user_iter()
+Date: Tue, 28 Apr 2026 14:17:38 +0100
+Message-ID: <20260428131756.922303-9-dhowells@redhat.com>
 In-Reply-To: <20260428131756.922303-1-dhowells@redhat.com>
 References: <20260428131756.922303-1-dhowells@redhat.com>
 Precedence: bulk
@@ -65,35 +66,65 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Fix netfs_write_begin() to not leak our ref on the request in the event
-that we get an error from netfs_wait_for_read().
+From: Paulo Alcantara <pc@manguebit.org>
 
-Fixes: 4090b31422a6 ("netfs: Add a function to consolidate beginning a read")
-Closes: https://sashiko.dev/#/patchset/20260414082004.3756080-1-dhowells%40redhat.com
+In netfs_extract_user_iter(), if iov_iter_extract_pages() failed to
+extract user pages, bail out on -ENOMEM, otherwise return the error
+code only if @npages == 0, allowing short DIO reads and writes to be
+issued.
+
+This fixes mmapstress02 from LTP tests against CIFS.
+
+Fixes: 85dd2c8ff368 ("netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator")
+Reported-by: Xiaoli Feng <xifeng@redhat.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
+Cc: netfs@lists.linux.dev
+Cc: stable@vger.kernel.org
+Cc: linux-cifs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org
 ---
- fs/netfs/buffered_read.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/netfs/iterator.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index 18c8e00626c9..db279124d450 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -687,9 +687,9 @@ int netfs_write_begin(struct netfs_inode *ctx,
+diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
+index 154a14bb2d7f..adca78747f23 100644
+--- a/fs/netfs/iterator.c
++++ b/fs/netfs/iterator.c
+@@ -22,7 +22,7 @@
+  *
+  * Extract the page fragments from the given amount of the source iterator and
+  * build up a second iterator that refers to all of those bits.  This allows
+- * the original iterator to disposed of.
++ * the original iterator to be disposed of.
+  *
+  * @extraction_flags can have ITER_ALLOW_P2PDMA set to request peer-to-peer DMA be
+  * allowed on the pages extracted.
+@@ -67,8 +67,8 @@ ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
+ 		ret = iov_iter_extract_pages(orig, &pages, count,
+ 					     max_pages - npages, extraction_flags,
+ 					     &offset);
+-		if (ret < 0) {
+-			pr_err("Couldn't get user pages (rc=%zd)\n", ret);
++		if (unlikely(ret <= 0)) {
++			ret = ret ?: -EIO;
+ 			break;
+ 		}
  
- 	netfs_read_to_pagecache(rreq, NULL);
- 	ret = netfs_wait_for_read(rreq);
-+	netfs_put_request(rreq, netfs_rreq_trace_put_return);
- 	if (ret < 0)
- 		goto error;
--	netfs_put_request(rreq, netfs_rreq_trace_put_return);
+@@ -97,6 +97,13 @@ ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
+ 		npages += cur_npages;
+ 	}
  
- have_folio:
- 	ret = folio_wait_private_2_killable(folio);
++	if (ret < 0 && (ret == -ENOMEM || npages == 0)) {
++		for (i = 0; i < npages; i++)
++			unpin_user_page(bv[i].bv_page);
++		kvfree(bv);
++		return ret;
++	}
++
+ 	iov_iter_bvec(new, orig->data_source, bv, npages, orig_len - count);
+ 	return npages;
+ }
 
