@@ -1,124 +1,153 @@
-Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DBD175A86
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 02:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777344740; cv=none; b=NEHvfhJugPWZoUCdKIiRSjlpG1ZHe6dNrJAJyO5aecb6oI/wrFfaVWGlofCe5EW5lEv3/KD6RF4ItsaA2i3uFyikKdwytB44SBZ3bL5gvVgq3hE4jiYQTva30GycTXuTzaTeZ+FKJHw4KRNk4Dz6OB74Wns29vT/mutoTDPbaaU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777344740; c=relaxed/simple;
-	bh=TkoPdIVnEDDcQkPQIK1u6AA2DgP5kx9+S9MtA08CmZY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NFEeqgsCI1zoEYli3YenX/upoLHm8xUZHwGjbRXRrh5cxbUruGXKGDUTZrM6ZXA5AOCjIQ4Cp3Lp8GswEesHm4JpP5OKzpDZHAHJ+ac/gXreI7/UJU64Jfyd7r+vzBY2kcKuNlORp3aBMZqPgyZ3Bvfni03P26S3ptWAruv9D94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tIHGAWKO; arc=none smtp.client-ip=74.125.82.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE951A6810
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 08:04:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777363503; cv=pass; b=TakkEjn7WI5MFNwpccSJIE9ZHdi6NxIL0UhJegNO/PeAKhHAmBapWmEz7+7k/xYf8ABhqoC7cMWFBpcwmN/VOEzm2vQRUy0+9kyOMfKAfvyXu5KCBq0eqKg95g+2Llw/FVKANJozBRqkDONmVxoiDvKaCQWdXwn3DVtsqXkkZqE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777363503; c=relaxed/simple;
+	bh=kwa6s3JDmHiTLz0D4zpUr1j3ZrWQNGMSGgpLUP1LMCY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nsJHx0JMRfL8O9oEcCvL73vcph5x6V2pHsUqJKqIEIx7ZRxNcFl+JRlrcCDjzS4kegCyPTC8G/Lvd3ffSS5UxRGd6xJQxnyW5TtNh5DLBFZIDcp2P3qRVMB0dxOHpcSFo9ijd1EtXpFsXq9y/JQEMYvRK4DN2/wY39xmWfMoinY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freebox.fr; spf=pass smtp.mailfrom=freebox.fr; dkim=pass (2048-bit key) header.d=freebox-fr.20251104.gappssmtp.com header.i=@freebox-fr.20251104.gappssmtp.com header.b=SQ8uiayk; arc=pass smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freebox.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freebox.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tIHGAWKO"
-Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-12ddbe104ccso1090906c88.0
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Apr 2026 19:52:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=freebox-fr.20251104.gappssmtp.com header.i=@freebox-fr.20251104.gappssmtp.com header.b="SQ8uiayk"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-67179ed133dso12406972a12.2
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 01:04:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777363498; cv=none;
+        d=google.com; s=arc-20240605;
+        b=X/g3dfmDJGJoSBv/MZGtdCCSWPr4KCx6rvVXqNl+A6b3vP/dOLnhaCsJZ9uZigvwZP
+         ilpSC3dCVswZQAEQpxocNvAsrWpYBHUg4F62iRuoEgT2jH4VH79BoEMLRx2Ck5Y6Tqfs
+         WoYgNMx/Tqs24DByJGNRhYSna79dfqW3o6Uv1qnCBYvjbZRLZ31t5dM15kRuIQdW5goI
+         pocVcc6ldTIWNKdYVfFZ/RJUcBO5MMxRPNbJjMOCKOGxFL7Y6H8YLKqrZtmHDTC83JUN
+         7qz6L4CYWE6tryC4jzewqq1JGqWBTeaa6/qjtTOJdJPAe0HuCZ4YveDzTfhyq0f0KO35
+         +kag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=xyIKbgPQW7MYQpY08/aWtgtkkBlyRsuw1c4aOkuRo94=;
+        fh=jgynuBj/ovdTveTAZ03Npsfas79cIcS9fW0rUSH5YgY=;
+        b=SrKvcBjyfjpGKEtsKaKU5N1ybcT7cOW9SEn0KxPm3+A2crF4HDCePuG91ZWx+CM6z0
+         XKm1Q0nHDKdKbIQzGpLrmKV0k/bKAUGbPlSbJ/SzG53cgD0cdNQ6cEud01x6nTZtvOdg
+         rihxBbqo1kBfD6xb2xuNNtPc2HdMqTUlxz/Fg/JynpthuKYyHnWl5oezi10atpBLyO3Y
+         J1PgzCSWP22oCB0/nSlBDJpWSvv6ccPfdJbgNb/7TYkc8f8evLdwZblkLw5Vlc3Fkbns
+         h+Z5B0FFeBH/JfZYE2sOX1FGEMZA/WMF9X5wrMhEotE8i45U0Cx8NQYtYFheLRI0mA04
+         hMbg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777344738; x=1777949538; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=a8Nhk45wzO3zlFt88EGGS6yZ3Zatdszo/GvXIEznylg=;
-        b=tIHGAWKO69bmUBlcVuZ9ibWlVt9fv12KA46fvx0WfMitONXTEBr5dK4ioRvTQwURoS
-         bdwqgGD4lrT6Ct8VPgvFp8qOJd3OBVk9P51LV2iZpaufh4v5zsl5VdhAGc/pJLHEtj7J
-         f1qkEwVLNtUo7+UaoZC0y5bTQp8mCRjpFkigR0JKCPBSGI2EbvRY/myGstH68oqm+Ub5
-         nYD7SWv0RLpeM5kPc6Rivie8ayRSO+DDgTskQVYZRSYK0A7urXOT0UIiU9J8zfljrK91
-         qDnAerWk0EckTjFRXPB0GfXLONzYL/3W2hJ0EHTu0v33meZg4rvpto1enmT6bXuTPU5Z
-         6ihA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777344738; x=1777949538;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=freebox-fr.20251104.gappssmtp.com; s=20251104; t=1777363498; x=1777968298; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=a8Nhk45wzO3zlFt88EGGS6yZ3Zatdszo/GvXIEznylg=;
-        b=UADFZX+paQINGdcq700cN/6hFXQZ04WVzvKW8KwLpGrd0jn43/5/VOrmlwjSXqDljr
-         rS/jnQJepeDYgmTbvtdmUwWsD5PaWXCZ1h/4bWhzk92EoQQGFSJFqYGrc1lcJYixzRe/
-         NFgEva+9paTu2fZYgBsxvKohnSD1N/XHB//HFNHmVFh8/9WnhxIEfV6FUezuskNQEuz2
-         UXEgENFc4BfKfqBOuZt5g0lder+zVT+H+37AIoJGjwQAe8kZ2nSoL9WmcwBMqRm325xk
-         pq7bPMQClktd0lPkKj4S4hY1R1Qq1fWBc5bqBSgrSXWk/Y7XIXc+DJMUFc3BdqsK74QL
-         Rumg==
-X-Gm-Message-State: AOJu0YzRwjswBdEqA0M4frKToEoTeLwXmj7Lo4zNB+YiMgYp/wIcHowM
-	si30fw9doCo1rkAPHDClQvA1tiq6gqQxXlnnYHCpIixloNbRiebZ3O7p
-X-Gm-Gg: AeBDies48CwFqZkg/W0oFVhrzRU+6PB+ODxhAXS8zgErNS+Tpx7oWnpwQXTXFTzSkHO
-	D2q0iibAH23MBkW38lxFv0xxz7fz6CoI1dPLxbyckK+Yoyf9wL2Jp0+9t0hXo53oELthv2qc6oT
-	LFlYUZjeyookqj7Fp/hqYEdb2c1N3fQZrh5ct0VatgiD7J4y53O0cQeOwoHNDCtEUxfOe/ufwik
-	5UFgcz7FWZJRz+WC2/c81JLTVNWz4vuK7Me4yt9/9L8OJAAC17Uv7gYDEEzkNYchahnfXSCXIoX
-	XUz14ED4xidEenIx8D42gMbRGhHUCj5XlolapwBudUTrBljiT0HIgwztvVFNdLvJI71XMZoYksC
-	9JmY/wQt5MgL7aQYgooaYoWfTTPIqD8vH1mD6AedRJS5poy9864G5/RfbVBi/rATUIKMDfdPyV6
-	TTpXnFsO4Z6GJLOQ3aaxohlWqm+A2tnoFNrAZxss2R+RR6m1A9/hVKKHWhrbHUqnXKez6v/4xD3
-	NzF46VFjEWAR1HBw5eHzg==
-X-Received: by 2002:a05:7022:eacd:b0:12c:2cf8:2f30 with SMTP id a92af1059eb24-12ddd9614a5mr665176c88.15.1777344738072;
-        Mon, 27 Apr 2026 19:52:18 -0700 (PDT)
-Received: from FredPC.wirelessinternet (mobile-166-176-187-202.mycingular.net. [166.176.187.202])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12ddd9a63a7sm1210664c88.11.2026.04.27.19.52.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2026 19:52:17 -0700 (PDT)
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
-X-Google-Original-From: Fredric Cover <FredTheDude@proton.me>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fredric Cover <fredric.cover.lkernel@gmail.com>
-Subject: [PATCH RFC] smb: client: fix NULL pointer dereference in smb2_compound_op
-Date: Mon, 27 Apr 2026 19:51:10 -0700
-Message-ID: <20260428025110.38825-1-FredTheDude@proton.me>
-X-Mailer: git-send-email 2.43.0
+        bh=xyIKbgPQW7MYQpY08/aWtgtkkBlyRsuw1c4aOkuRo94=;
+        b=SQ8uiaykaTv6soQx2oXO47htjowYVoa7a2KtRB25dczD6In1DdLL7ykviHUumAKGoF
+         VdmudKeSwb0Bz8QfuaIpU18NVNELB6gO2b0J9i6pP+27DBbxp4kZOs8fsuK4EMsOMN0I
+         pFWNjqVlhrMPb5ar6tWQ0A3CJl5C0HfAPHl/O7s+Zut01XJZ7nC2YYomyU2x5fL9dR1o
+         PWFuyQDyup3Dz3VQziLeDxfj03AInr5/noDzkLo/9gx6j81hCnawXGIiLSJq+2w1bq95
+         YewlMVTsHQzTOzipDKrb9Ftw8fbaxanu5ka1H5T6oBqOHat0bbod9N9rrL6+zo6fzX++
+         WXnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777363498; x=1777968298;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xyIKbgPQW7MYQpY08/aWtgtkkBlyRsuw1c4aOkuRo94=;
+        b=rWfM7KkoDruIYsYXK52a11W79QwVOiUGdTemofJy9ABev3Y3lWkOqIgEUE44l5LP+7
+         xVKF8gWw3vch3gnB/y97YGhZ6vxB8h8ia9RawCNW/oDqMRJevY/1ESeBixcBGDYvxuk9
+         TBYpf8UXccprgB5WTIU4cL0I+IWNU80//gwU1SMV0yzL2bEql2/YjcKb6adeoB77TUvj
+         TeEJj1JHw5HUaM9DFpEdCVkvCrCJSUBGOx/VeNB/D/j80/DppH3OU3hHU+m1+Kzd9eOB
+         +qzXKLEpPXrHUQKxSVQLRH+7rlalQR1xvuI4JXmWAJctCf86nOi8iWUdtCOGDLcmRt0u
+         kWjg==
+X-Gm-Message-State: AOJu0Yw6yQ2WehuYoVNxQrk074KixneQK+miTQZhpB4TCZDknlPSqiQW
+	Iah/I4pc5MeNuYKC/AgvG1DVnMcdz5dmrjrFKNP/kqmo2+fSsC1MaJZ3RDMXufezyi1OQW93fy0
+	nx1o4Pyb4Gs+v2H9caeveevOMbM136KArfgXAbjC5LA==
+X-Gm-Gg: AeBDievWQR28IrQ4WptVbFXI9Wff0i3bcVCA35qovdbPnx2v/VLdLGHvIyPbZjmKPO6
+	mSRuH98N6vLu62fQbpY+xVAoHdOaIC2x3Z6jbRqb1TD2va3T5FzauHfinr+qWjTXYYW8qdu0/jQ
+	3yVNhNOgHcNyXLCrAFckSjLGMrGuC4hChkBOlqONJf7bOJEtQ5lvATa2WuQv/QjSgBJnyMgWL65
+	Go4XNJZ3DxNNmWpO5mi3xvhXiNm2YU+CBQ3itwUY4WsFVefApf+KkTeSDhktGrjqDxryiW3OIMx
+	Eyxhkj77daXmkVczj4Sq3p2YKWaFBxByE2uOXd/UMMHSf7NSxPNVtu2iWHjZH6+3dW3A8L5tsRO
+	D
+X-Received: by 2002:a05:6402:5107:b0:670:8add:2b8d with SMTP id
+ 4fb4d7f45d1cf-679bb09f095mr1013793a12.24.1777363498000; Tue, 28 Apr 2026
+ 01:04:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260422105010.2600337-2-mmakassikis@freebox.fr> <CAKYAXd_FRpqjTcxbBsLcZATT9GmGmVF-g8JkF_9dwretGA0rpA@mail.gmail.com>
+In-Reply-To: <CAKYAXd_FRpqjTcxbBsLcZATT9GmGmVF-g8JkF_9dwretGA0rpA@mail.gmail.com>
+From: Marios Makassikis <mmakassikis@freebox.fr>
+Date: Tue, 28 Apr 2026 10:04:46 +0200
+X-Gm-Features: AVHnY4I3B2WmQYnme1ZgtgFOGQo9H6HnAOAw-z2Xio7La-V37C1iZbVMkAEsF4w
+Message-ID: <CAF6XXKXD-dKoQV2AP+7WYc6CKJWqsC0MYYqJyncoD20YXdx0vA@mail.gmail.com>
+Subject: Re: [PATCH] fs: smb: server: zero buffer before filling file entry
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, tom@talpey.com, 
+	senozhatsky@chromium.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+On Thu, Apr 23, 2026 at 2:29=E2=80=AFAM Namjae Jeon <linkinjeon@kernel.org>=
+ wrote:
+>
+> On Wed, Apr 22, 2026 at 7:50=E2=80=AFPM Marios Makassikis
+> <mmakassikis@freebox.fr> wrote:
+> >
+> > this ensures there is no stale data in padding area between entries
+> > when processing SMB2_QUERY_DIRECTORY request.
+> >
+> > Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+> > ---
+> >  fs/smb/server/smb2pdu.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+> > index 07782f7205dc..b55bef96d94b 100644
+> > --- a/fs/smb/server/smb2pdu.c
+> > +++ b/fs/smb/server/smb2pdu.c
+> > @@ -3962,6 +3962,7 @@ static int smb2_populate_readdir_entry(struct ksm=
+bd_conn *conn, int info_level,
+> >                 rc =3D -ENOSPC;
+> >                 goto free_conv_name;
+> >         }
+> > +       memset(d_info->wptr, 0, next_entry_offset);
+> The response buffer is allocated with kvzalloc(). Could it be a
+> duplicate initialization?
+> Thanks!
 
-When a valid cfile is passed to smb2_compound_op, the code uses a
-goto to jump to the 'after_open' label. This bypasses the
-initialization of rqst[0] by SMB2_open_init().
+Hello,
 
-However, the 'finished' cleanup block unconditionally attempts to
-call SMB2_open_free() on rqst[0]. If SMB2_open_init() was skipped,
-rqst[0].rq_iov is NULL, leading to a NULL pointer dereference.
+I sent this patch because I was seeing parts of filenames in the padding ar=
+ea,
+while investigating a different issue.
 
-Check for a valid rq_iov before attempting to free the request
-to prevent the crash in handle-reuse scenarios.
+the call flow is:
+  smb2_query_dir()
+    iterate_dir()
+      __query_dir()
+        reserve_populate_dentry()
+    process_query_dir_entries()
+        smb2_populate_readdir_entry()
 
-Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
----
-I am new to writing code for the Linux kernel.
-Please be patient with me and feel free to point out any
-obvious mistakes I made. 
-I tested this patch in a user-space skeleton clone using ASan.
-I only have access to a shallow clone and cannot find the 
-original commit for the 'Fixes:' line.
----
- fs/smb/client/smb2inode.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+reserve_populate_dentry() uses rsp->Buffer as a scratchbuffer to store
+the filename. Then, this information is picked up in process_query_dir_entr=
+ies()
+when calling dentry_name().
 
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index c6dd282fc..aed96eeba 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -552,7 +552,13 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 
- finished:
- 	num_rqst = 0;
--	SMB2_open_free(&rqst[num_rqst++]);
-+	/*
-+	 * If cfile was passed, the open was skipped; check rq_iov
-+	 * to ensure we don't try to dereference a NULL pointer.
-+	 */
-+	if (rqst[num_rqst].rq_iov)
-+		SMB2_open_free(&rqst[num_rqst]);
-+	num_rqst++;
- 	if (rc == -EREMCHG) {
- 		pr_warn_once("server share %s deleted\n", tcon->tree_name);
- 		tcon->need_reconnect = true;
--- 
-2.43.0
+You can reproduce the issue by listing a directory with a few dozen files.
+Wireshark does not include the padding in the decoded fields, so you
+have to look
+at the hex dump.
 
+I have no idea if clients may error if the padding area contains garbage,
+but I'd rather not find out the hard way.
+
+--
+Marios
