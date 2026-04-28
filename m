@@ -1,63 +1,63 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B0829D291
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 15:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E273D6CD8
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 15:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777391909; cv=none; b=gZ/T2Vbl2qvkwaB5Di1PnWTJeohE3wffq2vfkUDOh+9D+n4SID2HprV0sn0Ee3hMyE/n7P3uIqkYvJFiNgXSXxCNhzFyrIa8w6STFsf9Z3+TG2hmKu3UtPUdLFc6SyipYOKTOirIipbOZSFuS38nL9QLdiDBx7ETLT8HLTfjxSQ=
+	t=1777391916; cv=none; b=Nn/5p6P8X4j2yBxwrM9S1o9EakNVGUbzwmwM40ABCDiLXK6eBz6OiHtVbGGNLvKQqaTIfzz51ltokuvnHTvIaQRazTI9Ty51iFb8ud+KycN+m+ny/BX80Yuh0BOHFTAaxR+CbhGFisKJje+nsvmcEcdujfL/wHoLnExZTbwFTuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777391909; c=relaxed/simple;
-	bh=7jajndUaHxnO7mBKOUKcC+hvpwMvV7Fyx+SUs+EJDy0=;
+	s=arc-20240116; t=1777391916; c=relaxed/simple;
+	bh=KPDUAM/B7dwjOMD8wuZQR8c8CPU0KWccASaAffXaxAc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rpp88b/fQhJZ2AyIejDtSO46HQP6eZ486VgkF58CBa2HnvFsSf0u7RRskDzeI9L9wwjncBUwRCXhXcqTvMT8A9EN8z38djrUKTc2kG2P7o1Op8dx96qaqLip5ZbB9kg+ZdYiBHrhgWUUh1+g5CmXwnZqV9QY8COf4gzhQmNlIto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=HHBKjo59; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version; b=H6lGSb6fNKld6pAhkFFvJi2MI+8+TZpS8BYy2nelgWKxt2Xiej6MHxSc3VkxKPiEN7EVjf2y5s7idTgZMqYupZ2fsL4Ex5P/7GdKC+YKs8A0yfkfeAEvn9z4z0jPi09INUsYo6vaRFx+6Sjkk4zBVbLIBWaXnJnxZA8VaXri7+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=MgpbytK9; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="HHBKjo59"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-488b3f8fa2bso118528845e9.1
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 08:58:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="MgpbytK9"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4891c0620bcso80134005e9.1
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 08:58:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1777391905; x=1777996705; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1777391913; x=1777996713; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=12Q+vhefEhwDztzLby3rXl6SFVTsFUNMgjupbc4MgPQ=;
-        b=HHBKjo59fvasaTw9daZ1iglQtW3D+o/+d4WY+oafldScWoxUSZQ1VQoeWBfAFvG+2o
-         3bHWkAkBQseZ3SoSR9H0EehXlWojbtGkT0jM560+43VVMykjoz9ZOLKH42KR77tg8oCH
-         xCs3lrCW3ZW4TVmAoW5XE6vAnJiExvZZpk5ETOiHTkLMNzG+HdE/WW9ZmVZgSUK/lbiu
-         ak7VL+xh5AqXE/oD0Xe8jOz/bI9Jo+kH9FHmyx3eAgYTp9l8pYsE+qlNadAIGXPNbjPN
-         9XOaz7y4vLjlG6kQBjc2c4HIqhZgbD9mmwBLGWpn7SAwTDpqvCXM1hg2w8yRzdvXsE/c
-         +ONA==
+        bh=7Ld0FBcSpGP2eiiSXkF6apkU8lf6UUEovJRC91J2+Aw=;
+        b=MgpbytK9nPMK5H4eN6vT09Nx317hJYQGTm/9OfXmDSN88hfy+J6H9Jg3CN1GFdqfFw
+         HZ1po3zOYSaQGP8ryKxTCPlLjtqD6TyXgJGEwUAnpaQdZNzlh67PKdXHpiEaxR8cS2pL
+         FfQYi6M5rdfY/qxkxl5ePtzejfKY4bed9lzje8bUozQ11kRBRGyDOIOqLAg9nbqbd5tA
+         lqJ0iDutRZEWVlzSujJx0/wKKTwlJuIQgsFl0oFPRPlv7EQoC+2m/ecnQUDH8vUzvz65
+         JT6P6NH92l9PPhShdbrrFWmEKIAEwrlVq9k7XsFv1G+3jC3bsJs+cC0vRSBnlwduItyJ
+         WdlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777391905; x=1777996705;
+        d=1e100.net; s=20251104; t=1777391913; x=1777996713;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=12Q+vhefEhwDztzLby3rXl6SFVTsFUNMgjupbc4MgPQ=;
-        b=AYJ1hbULeV6jGICovcRNz3GAdBmx7E1V7I3hW7fQcD3l6W0QJqmqYp/egVxEd62WsF
-         KgnJYgZiKkwuAceEJDEeXEyccL0LqAlJJNa5ACc3CZXYZHzNThOV5GDIvBj421iwFytZ
-         3V7hiyYipH6mzlFUxmCXq5H62SnA6qLTxICfthaZg6PDZx4gq1xrNIshBoOBDJE8PsTR
-         hqNpI+V3ezK12u2VLuEVyDzV3AU54CFu7pof5ydj+m8u029CJKoZbZugOHEpFdlwdzuT
-         HzMIeeYHpOqfbUHwqKGxV2HspPOh3SxN7yRVS3eOgO45mf9vXRnsBkMxyM7n1xknh69U
-         8EOA==
-X-Gm-Message-State: AOJu0YxZzm4juNF/d7UQiT6e4YbisXp6t5E+VfCDUxVty1I1nahss1D/
-	p56Da0dzdO8vQY9K3bNCvWUvzOl6cG7VkUk5otcBN705fpmM9Me2myBJZlmNL8iQLFZWQqWcSyO
-	Ynap5XY7h4w==
-X-Gm-Gg: AeBDiesUJqvItQPIcgKlPsLEWRI4PpyYpCJY5Yvvai9bKmGYLMneLeSll8qfPEDaXul
-	6gmmMmhcWhXyymbU9xPPF2G/V+vl34C7jD9CFcb92qm0SQ9qezPhA3FHRQjZtr2a0DRDwWOFwYb
-	XMUPnoBCnpL5hxHH/LbDWAvEZXraGd6kkM1//WWuX9iOJ6N7oPDVZyiwWm4CJ2SqHLLdEQwVRhW
-	qtP1d+HPjbPSEtOvYy76FJf2a4P1pVm5GmGf1jdNLz2gEGOvnwv9NI/uU2RLZPLpXXdbpYYPF9B
-	KWLVavawN7ZIwmnyneuLaJygGlhEaN74qP7k6GZGzk385KYbZCXasF66YSvlvtiErwUYuKJ4u1v
-	JeLv1bfSMSg8b0Q3vTev2Da08fKSmSLdnF7Qm5V4+35tg3MtiNiBaCk+89tP6phbhdEeKJAk6Oq
-	Hu1Iid1HZnBHJrLbE0oYvVBZWiXlMIcIol70/67SH11B3e
-X-Received: by 2002:a05:600c:4797:b0:48a:761:5816 with SMTP id 5b1f17b1804b1-48a78a2f7dfmr31718375e9.8.1777391905476;
-        Tue, 28 Apr 2026 08:58:25 -0700 (PDT)
+        bh=7Ld0FBcSpGP2eiiSXkF6apkU8lf6UUEovJRC91J2+Aw=;
+        b=TSPAGtaXlZDF2uKtN6UK1W0w4mZiyVm2oVIJjaGVURl/p4HLp4GP7nxQqEolmXqm2+
+         dVE2Ayu1bfZ4jNJMD4QYyoO0j8/2o3Fiy7XP2n1pHygPuNALrIwqUdBRG+BSgEWHq6km
+         3hw3uHGFnmboUt6nAWviiaQ18rSt9vazaJBIAsB3Q9TDdE+nzr6DOxBfFQLNOH84GMig
+         KADv3y2Mf9X/eN8rYCgd+GB8C4ilrTq6cTPc3KqGu7uIzx1K2eT747K86bbLlLXTXvl6
+         dLFed8TkB1ji3Um1U+EPZa4gv7qyMNylsgfcb/ngj+CA3gIJAQ6/cuPLpDELJWSmU9L8
+         Im2A==
+X-Gm-Message-State: AOJu0YwSTY/7dnqv6eOAmbTEfvnVls4j3+o1j4fsno2d4YJ8LAde9CHw
+	wm/K2NpMxmcR61w4CCk1OjCxbPmUWplGfevE9ZjlZu5b4rD/U/5ZMRt40M62xsNSBvO4sUG5BGZ
+	jg42/iVKZ0Q==
+X-Gm-Gg: AeBDiet+J/N950jCrisXGn1oA161lWReMMuhVAsqkHR/6aXhSHGBHyCSIP7utWq6e47
+	xJKDQJDTUbRxjFVwZ9XLtEQrMomyzXMCLL2gddNZD/7K8F5UyGqPIvHwxsAmBxcw8t9CnyuCrid
+	cg9CBa27tPQz3VLUrD5kYLj+7usDDXzgODto4Y3jNge4AYSZne39kvY0uT4ZTCwvvo46bo6BuB/
+	b6qGv1860EZY1lB8zruAAeXHIFqoFPWu7Vhq4mJUHfBoPn/n/eBS1Q2MX92y54IT9GFqhdgGXyE
+	woP0Cb468rRfXOQweVH7zIt5tZAGlsMkIv7C00n7sClO1FIZTe+Evot8VqpvXONaUIiwFIi/3cm
+	WdvhKNam6lW1xBVAg7nmh3QIgSla9ftV0mblb9btW3d4f/mNiuVjMVwbBUmnAVlr/FFLrjgU2xM
+	bCBrctMPi9axeN1SBYS6Xn3YG05YbNqLu+SkQS2Ck67bGH
+X-Received: by 2002:a05:600c:3d90:b0:488:b239:77ec with SMTP id 5b1f17b1804b1-48a77b1781cmr62293975e9.17.1777391912061;
+        Tue, 28 Apr 2026 08:58:32 -0700 (PDT)
 Received: from precision ([2a01:4b00:c007:bb00:be9d:a3c4:18b1:4a25])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a7b560a84sm3409255e9.4.2026.04.28.08.58.25
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a7b560a84sm3409255e9.4.2026.04.28.08.58.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 08:58:25 -0700 (PDT)
+        Tue, 28 Apr 2026 08:58:31 -0700 (PDT)
 From: Henrique Carvalho <henrique.carvalho@suse.com>
 To: linux-cifs@vger.kernel.org
 Cc: linkinjeon@kernel.org,
@@ -67,9 +67,9 @@ Cc: linkinjeon@kernel.org,
 	tom@talpey.com,
 	ematsumiya@suse.de,
 	Henrique Carvalho <henrique.carvalho@suse.com>
-Subject: [PATCH v2 09/11] smb: server: refactor TCP transport definitions
-Date: Tue, 28 Apr 2026 12:57:58 -0300
-Message-ID: <20260428155759.226368-5-henrique.carvalho@suse.com>
+Subject: [PATCH v2 10/11] smb: server: track TCP and QUIC listener state independently
+Date: Tue, 28 Apr 2026 12:57:59 -0300
+Message-ID: <20260428155759.226368-6-henrique.carvalho@suse.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260428155759.226368-1-henrique.carvalho@suse.com>
 References: <20260428155759.226368-1-henrique.carvalho@suse.com>
@@ -81,58 +81,203 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move the TCP timeout definitions into transport_tcp.h and rename the
-peer address accessor in connection.h to a transport-neutral name.
+An interface can host both TCP and QUIC listeners, so a single
+configured/down state is no longer precise enough once QUIC support is
+added (e.g. a TCP listener may already be up when QUIC setup fails).
+
+Turn iface->state into a transport bitmask and track TCP and QUIC
+listener bring-up independently. This lets NETDEV_UP retry only the
+missing transport and lets NETDEV_DOWN tear down only the listeners that
+were actually started.
 
 Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 ---
- fs/smb/server/connection.h        | 4 +---
- fs/smb/server/mgmt/tree_connect.c | 2 +-
- fs/smb/server/transport_tcp.h     | 3 +++
- 3 files changed, 5 insertions(+), 4 deletions(-)
+ fs/smb/server/interface.c      | 61 ++++++++++++++++++++++------------
+ fs/smb/server/interface.h      |  6 ++--
+ fs/smb/server/transport_quic.c |  2 +-
+ fs/smb/server/transport_tcp.c  |  2 +-
+ 4 files changed, 45 insertions(+), 26 deletions(-)
 
-diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
-index 0e87283a9ddb..f874bbdd4b34 100644
---- a/fs/smb/server/connection.h
-+++ b/fs/smb/server/connection.h
-@@ -145,9 +145,7 @@ struct ksmbd_transport_ops {
- 	void (*free_transport)(struct ksmbd_transport *kt);
- };
+diff --git a/fs/smb/server/interface.c b/fs/smb/server/interface.c
+index 25b8e7f44059..272c4aaad347 100644
+--- a/fs/smb/server/interface.c
++++ b/fs/smb/server/interface.c
+@@ -17,6 +17,11 @@
+ static LIST_HEAD(iface_list);
+ static int bind_additional_ifaces;
  
--#define KSMBD_TCP_RECV_TIMEOUT	(7 * HZ)
--#define KSMBD_TCP_SEND_TIMEOUT	(5 * HZ)
--#define KSMBD_TCP_PEER_SOCKADDR(c)	((struct sockaddr *)&((c)->peer_addr))
-+#define KSMBD_PEER_SOCKADDR(c)	((struct sockaddr *)&((c)->peer_addr))
- 
- #define CONN_HASH_BITS	12
- extern DECLARE_HASHTABLE(conn_list, CONN_HASH_BITS);
-diff --git a/fs/smb/server/mgmt/tree_connect.c b/fs/smb/server/mgmt/tree_connect.c
-index a72d7e42a6c2..7704d8554591 100644
---- a/fs/smb/server/mgmt/tree_connect.c
-+++ b/fs/smb/server/mgmt/tree_connect.c
-@@ -44,7 +44,7 @@ ksmbd_tree_conn_connect(struct ksmbd_work *work, const char *share_name)
- 		goto out_error;
++static inline bool ksmbd_iface_transport_up(const struct interface *iface)
++{
++	return iface->state != 0;
++}
++
+ static struct interface *alloc_iface(char *ifname)
+ {
+ 	struct interface *iface;
+@@ -31,7 +36,7 @@ static struct interface *alloc_iface(char *ifname)
  	}
  
--	peer_addr = KSMBD_TCP_PEER_SOCKADDR(conn);
-+	peer_addr = KSMBD_PEER_SOCKADDR(conn);
- 	resp = ksmbd_ipc_tree_connect_request(sess,
- 					      sc,
- 					      tree_conn,
-diff --git a/fs/smb/server/transport_tcp.h b/fs/smb/server/transport_tcp.h
-index d122e4b69d65..ef5ba9affc3f 100644
---- a/fs/smb/server/transport_tcp.h
-+++ b/fs/smb/server/transport_tcp.h
-@@ -8,6 +8,9 @@
+ 	iface->name = ifname;
+-	iface->state = IFACE_STATE_DOWN;
++	iface->state = 0;
+ 	list_add(&iface->entry, &iface_list);
+ 	return iface;
+ }
+@@ -80,20 +85,30 @@ static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
+ 			return NOTIFY_OK;
  
- #include "interface.h"
+ 		iface = ksmbd_find_netdev_name_iface_list(netdev->name);
+-		if (iface && iface->state == IFACE_STATE_DOWN) {
++		if (iface) {
+ 			ksmbd_debug(CONN, "netdev-up event: netdev(%s) is going up\n",
+ 					iface->name);
  
-+#define KSMBD_TCP_RECV_TIMEOUT	(7 * HZ)
-+#define KSMBD_TCP_SEND_TIMEOUT	(5 * HZ)
+ 			if (!iface->net)
+ 				iface->net = get_net(dev_net(netdev));
+ 
+-			ret = ksmbd_tcp_create_socket(iface);
+-			if (ret)
+-				break;
+-
+-			ret = ksmbd_quic_create_socket(iface);
+-			if (ret)
+-				break;
++			if (!(iface->state & IFACE_STATE_TCP_UP)) {
++				ret = ksmbd_tcp_create_socket(iface);
++				if (ret && !ksmbd_iface_transport_up(iface)) {
++					put_net(iface->net);
++					iface->net = NULL;
++					break;
++				}
++			}
 +
- void ksmbd_free_transport(struct ksmbd_transport *kt);
- int ksmbd_tcp_init(void);
- void ksmbd_tcp_destroy(void);
++			if (!(iface->state & IFACE_STATE_QUIC_UP)) {
++				ret = ksmbd_quic_create_socket(iface);
++				if (ret && !ksmbd_iface_transport_up(iface)) {
++					put_net(iface->net);
++					iface->net = NULL;
++					break;
++				}
++			}
+ 		}
+ 		if (!iface && bind_additional_ifaces) {
+ 			iface = alloc_iface(kstrdup(netdev->name, KSMBD_DEFAULT_GFP));
+@@ -106,44 +121,49 @@ static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
+ 			iface->net = get_net(dev_net(netdev));
+ 
+ 			ret = ksmbd_tcp_create_socket(iface);
+-			if (ret)
++			if (ret && !ksmbd_iface_transport_up(iface)) {
++				put_net(iface->net);
++				iface->net = NULL;
+ 				break;
++			}
+ 
+ 			ret = ksmbd_quic_create_socket(iface);
+-			if (ret)
++			if (ret && !ksmbd_iface_transport_up(iface)) {
++				put_net(iface->net);
++				iface->net = NULL;
+ 				break;
++			}
+ 		}
+ 		break;
+ 	case NETDEV_DOWN:
+ 		iface = ksmbd_find_netdev_name_iface_list(netdev->name);
+-		if (iface && iface->state == IFACE_STATE_CONFIGURED) {
++		if (iface && ksmbd_iface_transport_up(iface)) {
+ 			ksmbd_debug(CONN, "netdev-down event: netdev(%s) is going down\n",
+ 					iface->name);
+ 
+-			if (iface->ksmbd_tcp_socket)
++			if (iface->state & IFACE_STATE_TCP_UP)
+ 				kernel_sock_shutdown(iface->ksmbd_tcp_socket, SHUT_RDWR);
+-			if (iface->ksmbd_quic_socket)
++			if (iface->state & IFACE_STATE_QUIC_UP)
+ 				kernel_sock_shutdown(iface->ksmbd_quic_socket, SHUT_RDWR);
+ 
+-			if (iface->ksmbd_tcp_kthread)
++			if (iface->state & IFACE_STATE_TCP_UP)
+ 				ksmbd_interface_stop_kthread(iface->ksmbd_tcp_kthread);
+-			if (iface->ksmbd_quic_kthread)
++			if (iface->state & IFACE_STATE_QUIC_UP)
+ 				ksmbd_interface_stop_kthread(iface->ksmbd_quic_kthread);
+ 
+-			if (iface->ksmbd_tcp_socket)
++			if (iface->state & IFACE_STATE_TCP_UP)
+ 				sock_release(iface->ksmbd_tcp_socket);
+-			if (iface->ksmbd_quic_socket)
++			if (iface->state & IFACE_STATE_QUIC_UP)
+ 				sock_release(iface->ksmbd_quic_socket);
+ 
+ 			iface->ksmbd_tcp_kthread = NULL;
+ 			iface->ksmbd_quic_kthread = NULL;
+ 			iface->ksmbd_tcp_socket = NULL;
+ 			iface->ksmbd_quic_socket = NULL;
++			iface->state = 0;
+ 
+ 			put_net(iface->net);
+ 			iface->net = NULL;
+-
+-			iface->state = IFACE_STATE_DOWN;
+ 			break;
+ 		}
+ 		break;
+@@ -213,4 +233,3 @@ int ksmbd_set_interfaces(char *ifc_list, int ifc_list_sz)
+ 
+ 	return 0;
+ }
+-
+diff --git a/fs/smb/server/interface.h b/fs/smb/server/interface.h
+index 94ffb73fd635..d99b1f3c8bc0 100644
+--- a/fs/smb/server/interface.h
++++ b/fs/smb/server/interface.h
+@@ -10,8 +10,8 @@
+ 
+ #include <linux/freezer.h>
+ 
+-#define IFACE_STATE_DOWN		BIT(0)
+-#define IFACE_STATE_CONFIGURED		BIT(1)
++#define IFACE_STATE_TCP_UP		BIT(0)
++#define IFACE_STATE_QUIC_UP		BIT(1)
+ 
+ struct interface {
+ 	struct task_struct	*ksmbd_tcp_kthread;
+@@ -20,7 +20,7 @@ struct interface {
+ 	struct socket		*ksmbd_quic_socket;
+ 	struct list_head	entry;
+ 	char			*name;
+-	int			state;
++	unsigned int		state;
+ 	struct net		*net;
+ };
+ 
+diff --git a/fs/smb/server/transport_quic.c b/fs/smb/server/transport_quic.c
+index 84067225c1d3..da089b655e6c 100644
+--- a/fs/smb/server/transport_quic.c
++++ b/fs/smb/server/transport_quic.c
+@@ -314,7 +314,7 @@ int ksmbd_quic_create_socket(struct interface *iface)
+ 
+ 	iface->ksmbd_quic_socket  = ksmbd_socket;
+ 	iface->ksmbd_quic_kthread = kthread;
+-	iface->state = IFACE_STATE_CONFIGURED;
++	iface->state |= IFACE_STATE_QUIC_UP;
+ #endif /* CONFIG_IP_QUIC */
+ 	return 0;
+ }
+diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
+index 1496f0336af6..81bf6996a6f7 100644
+--- a/fs/smb/server/transport_tcp.c
++++ b/fs/smb/server/transport_tcp.c
+@@ -208,7 +208,7 @@ int ksmbd_tcp_create_socket(struct interface *iface)
+ 	}
+ 
+ 	iface->ksmbd_tcp_kthread = kthread;
+-	iface->state = IFACE_STATE_CONFIGURED;
++	iface->state |= IFACE_STATE_TCP_UP;
+ 
+ 	return 0;
+ 
 -- 
 2.53.0
 
