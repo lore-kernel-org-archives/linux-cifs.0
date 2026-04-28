@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047413FAE0E;
-	Tue, 28 Apr 2026 10:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD5F3F1665;
+	Tue, 28 Apr 2026 10:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777372922; cv=none; b=R38SyGE1uA/KLfg0bWsZCY6c58OPaiiZXFXLx32bhDW7EgTqwLK03Zx0JhwiRKiXo2v69Eg9d4x4FtvZTTqLp3zX+LoJP/hwrwWwsTaJ6TCZz4CFYbEBCugpWwofifvpdJGNudR9qWU/+bUg10lKFOe1StJyL/dCIvZco4x5aeM=
+	t=1777372947; cv=none; b=NJV6T/Btl4XtPrpF+UYs17ppIj/VHAAJozexCaamcdoiNj1KtkBOHEUkHay/zQ58txC1l6wnDJFK5+vZKXdl2h8g/1rSwfptZ2/fpzFKykScIL8HYWbyjGZj/Gvg/ffQ+SYtuTGPVNdISpVeZKKIKqL1os8eJdLG9H0cK4zQc4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777372922; c=relaxed/simple;
-	bh=jyYGDhtrw/szsDNF7cM/8HRXsH2YaxxFQfWiQ+YKGKM=;
+	s=arc-20240116; t=1777372947; c=relaxed/simple;
+	bh=MvsYJAw/ycvumPUKI6XJQ4whW6JyJykHMPTpKlTFua0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BVrJA9wM79eb9uY814nmmucZ2t2JV9iU+PtPevFayr0RF2WNf7lOvM9mwnppZGuBRkozQgLi9NXQJFbeE+grsLPErzUdsB7BsDrcJoFhy4RZi30Rwuzzj0djki2w7puzE9rSoRLmIgJlZsFl54+2SJWuUopycyZRK7goNVWeAb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DarW9Xr9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=UDC4UZrWFHarF3lKs9Z0YX7H36O/CdhJoilyyt87ejiWptproZa7a5nAmvpwxOBBHZlD5HmtHITq9fz7rgeN/HT5F4Jfpjnqh5PpNo8uHOGoeRdn4wYfVtUp1auuI+gfnMKowdDvGovkp/Plrs5Gm1WyMuKxuSTGjJSOdcs5uT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l2xQPy+C; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DarW9Xr9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05E2EC2BCC6;
-	Tue, 28 Apr 2026 10:42:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l2xQPy+C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93EACC2BCB7;
+	Tue, 28 Apr 2026 10:42:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777372921;
-	bh=jyYGDhtrw/szsDNF7cM/8HRXsH2YaxxFQfWiQ+YKGKM=;
+	s=k20201202; t=1777372947;
+	bh=MvsYJAw/ycvumPUKI6XJQ4whW6JyJykHMPTpKlTFua0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DarW9Xr9dibjK4cv2cAb6RiBRMNgF/cPWNf4DktxLgDDDpDaX6zJcsob55cDRbdYE
-	 dv9V3iZbNHS/VE+OpIhavhvbOAD3o7qGTjKpeP4sOXVsz6NpgOxP8yQf5r1Pvo0I6K
-	 E5GGzI/FGezaN3D0MVyPJlmiZRgTV+X1VbcQTJutipWPLpXPyfV8i7oDtiXsGo2rOm
-	 3f69uI1hYIrFZCnIT+WqkMxQE3ofVJpdOW9z2SLrO6mO5krOCxqolqGunpqYIr6s9c
-	 CG5TVh76fj4UU67drnfh/U0VaEleGRXtOveBP8g02izxLsZwtuVdefNxPKtLOPw+jJ
-	 VqJYsohxoDGCw==
+	b=l2xQPy+ClLQXDQNXQt6nLVLH5cLdTUWTMacLTWoK3vxGFCL/KSxo+L0J6/CQtXqs8
+	 x9brAHlmK/IXRDr452NsD5xb+MNyDOikfTfB2QAC4o+LF3fKHTbqyJK8rtBy5KO3IO
+	 zFrae+sPN7KWzIzldhcZfyHswaUtUgLaHw3yEB7fTLhprJkBDgYncUAMXcAl9vC46B
+	 xcocrY55WwXrBR7J1SQZn6ik1rHv0RxXRMqRKgG2AslrFlDsOXk0KV0TdKr+6QjY1V
+	 hKSKr1dQQdHbd+t4OgpapYtqlr4ZVNWlfx2ZEhqVOww44X2srUH6kH69ZmATVIV9cl
+	 onIeonYZ1pVkQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Enzo Matsumiya <ematsumiya@suse.de>,
+Cc: Akif Sait <akif.sait111@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-6.12] smb: client: compress: fix bad encoding on last LZ77 flag
-Date: Tue, 28 Apr 2026 06:40:31 -0400
-Message-ID: <20260428104133.2858589-20-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 7.0-5.15] ksmbd: fix O(N^2) DoS in smb2_lock via unbounded LockCount
+Date: Tue, 28 Apr 2026 06:40:49 -0400
+Message-ID: <20260428104133.2858589-38-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260428104133.2858589-1-sashal@kernel.org>
 References: <20260428104133.2858589-1-sashal@kernel.org>
@@ -54,315 +54,292 @@ X-stable-base: Linux 7.0.2
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Enzo Matsumiya <ematsumiya@suse.de>
+From: Akif Sait <akif.sait111@gmail.com>
 
-[ Upstream commit a13e942a03feea211c67a97bc6a57f82aa56e4b6 ]
+[ Upstream commit bd0a1ca52b6da64b1a163f103b28b488b20497fe ]
 
-End-of-stream flag could lead to UB because of int promotion
-(overwriting signed bit).
+smb2_lock() performs O(N^2) conflict detection with no cap on LockCount.
+Cap lock_count at 64 to prevent CPU exhaustion from a single request.
 
-Fix it by changing operand from '1' to '1UL'.
-
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+Signed-off-by: Akif Sait <akif.sait111@gmail.com>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Based on my investigation, here's the complete analysis:
+Based on my analysis, here is my complete walkthrough:
 
-## Phase 1: Commit Message Forensics
+## PHASE 1: COMMIT MESSAGE FORENSICS
 
-**Step 1.1 - Subject line parsing:**
-Record: `smb: client: compress:` prefix, action verb is "fix", one-line
-summary: fix bad encoding on last LZ77 end-of-stream flag due to integer
-promotion UB.
+**Step 1.1: Subject line parse**
+Record: `[ksmbd:] [fix]` O(N^2) DoS in smb2_lock via unbounded LockCount
+- claims to fix a denial-of-service vulnerability.
 
-**Step 1.2 - Tags:**
+**Step 1.2: Parse tags**
 Record:
-- Signed-off-by: Enzo Matsumiya (author, SUSE)
-- Signed-off-by: Steve French (SMB client maintainer)
-- No Fixes:, Reported-by:, Tested-by:, Reviewed-by:, Link:, or Cc:
-  stable tags
+- Signed-off-by: Akif Sait <akif.sait111@gmail.com> (author)
+- Acked-by: Namjae Jeon <linkinjeon@kernel.org> (**ksmbd maintainer**)
+- Signed-off-by: Steve French <stfrench@microsoft.com> (**maintainer who
+  pulled it via samba tree**)
+- No Fixes: tag (expected for manual review), no Cc: stable (expected)
 
-**Step 1.3 - Commit body:**
-Record: Bug described as "End-of-stream flag could lead to UB because of
-int promotion (overwriting signed bit)". Fix approach: change operand
-from `1` (int) to `1UL` (unsigned long). No crash/stack trace mentioned.
-No specific kernel version mentioned.
+**Step 1.3: Commit body analysis**
+Record: Describes O(N^2) conflict detection with uncapped LockCount.
+Attack: authenticated client sends LockCount=65535 -> ~2.1 billion
+iterations pinning CPU. A few concurrent requests hang the host.
+Justifies cap at 64 per MS-SMB2 spec's Open.LockSequenceArray size.
 
-**Step 1.4 - Hidden bug fix detection:**
-Record: Not hidden - explicitly labeled "fix". Author is the original
-creator of the LZ77 code, so has clear understanding of intent.
+**Step 1.4: Hidden bug fix detection**
+Record: Explicitly labeled "fix" and "DoS" - not hidden; clearly a
+security fix.
 
-## Phase 2: Diff Analysis
+## PHASE 2: DIFF ANALYSIS
 
-**Step 2.1 - Inventory:**
-Record: Single file `fs/smb/client/compress/lz77.c`, 1 line changed
-(+1/-1). Function: `lz77_compress()`. Classification: single-file
-surgical fix.
+**Step 2.1: Inventory**
+Record: 1 file (`fs/smb/server/smb2pdu.c`), ~7 lines added (1 functional
+line + 5-line comment + structural whitespace), 1 line removed. Single
+surgical fix in `smb2_lock()`.
 
-**Step 2.2 - Code flow:**
-Record: In end-of-stream flag handling:
-- Before: `flag |= (1 << (32 - flag_count)) - 1;` — `1` is `int` (signed
-  32-bit)
-- After: `flag |= (1UL << (32 - flag_count)) - 1;` — `1UL` is `unsigned
-  long` (64-bit on 64-bit arches)
+**Step 2.2: Code flow change**
+Record: Before: `if (!lock_count)` rejected only zero. After: `if
+(!lock_count || lock_count > 64)` rejects zero AND values >64 with
+`-EINVAL` before any work is done.
 
-**Step 2.3 - Bug mechanism:**
-Record: Category (g) Logic / correctness / UB fix. When `flag_count ==
-0`, `1 << 32` is shift >= width of `int` → UB (on x86 GCC yields `1`,
-then `(1)-1=0`, producing wrong flag byte). When `flag_count == 1`, `1
-<< 31` shifts into sign bit of signed int → UB (typically wraps to give
-correct result by accident). `1UL` fits these shifts within a 64-bit
-unsigned long without UB.
+**Step 2.3: Bug mechanism**
+Record: DoS / resource-exhaustion / algorithmic complexity attack. `for
+(i = 0; i < lock_count; i++)` with nested `list_for_each_entry(cmp_lock,
+&lock_list, llist)` = O(N²). LockCount is u16 (max 65535), giving
+~2.1×10⁹ inner-loop iterations plus N smb_flock_init allocations per
+request. Fix: bound input parameter.
 
-**Step 2.4 - Fix quality:**
-Record: Obviously correct. Minimal (1-line). Zero regression risk (on
-64-bit, `1UL` is 64-bit, making shift by 32 well-defined; on 32-bit, fix
-is equivalent but `1UL << 32` would still be UB — however, `flag` is
-`long` which is 32-bit on 32-bit, so the truncation via `lz77_write32()`
-ends up correct in practice).
+**Step 2.4: Fix quality**
+Record: Obviously correct, minimal, cannot introduce regression for
+legitimate workloads (MS-SMB2 spec ceiling is 64), no lock/memory/API
+changes.
 
-## Phase 3: Git History Investigation
+## PHASE 3: GIT HISTORY INVESTIGATION
 
-**Step 3.1 - Blame:**
-Record: `git log v6.12:fs/smb/client/compress/lz77.c` confirms `flag |=
-(1 << (32 - flag_count)) - 1;` exists at v6.12. Bug was introduced in
-commit `d14bbfff259ca` ("smb3: mark compression as
-CONFIG_EXPERIMENTAL...", July 2024, v6.12).
+**Step 3.1: Blame**
+Record: The vulnerable `if (!lock_count)` pattern has existed since
+ksmbd was first merged into the kernel in v5.15 (commit that added
+`fs/cifsd/smb2pdu.c` then moved to `fs/ksmbd/`, then to `fs/smb/server/`
+in v6.3). Confirmed identical pattern in v5.15, v6.1, v6.6, v6.12, v7.0.
 
-**Step 3.2 - Fixes: tag:**
-Record: No Fixes: tag. Buggy code was introduced in `d14bbfff259ca` per
-blame. That commit is present in v6.12 and all later tags (v6.12 through
-v6.19).
+**Step 3.2: Fixes: tag follow**
+Record: No Fixes: tag provided. Bug is original to ksmbd (v5.15).
 
-**Step 3.3 - Related changes:**
-Record: Same patch series includes:
-- `4c221711b2374` fix buffer overrun in lz77_compress()
-- `20d4f9efe008b` fix counting in LZ77 match finding
-- `fca46b0e68c5d` increase LZ77_MATCH_MAX_DIST
-- `4460e9c68d1a8` LZ77 optimizations
-- `71179a5ee916d` add code docs
-- `94ae8c3fee94a` cleanup (in v6.12 already)
+**Step 3.3: File history**
+Record: Prior related fixes to smb2_lock: `309b44ed68449` (memory
+leaks/NULL deref), `e26e2d2e15daf` (bug on trap), `84d2d1641b71d` (UAF),
+`8f1752723019d` (memory leak), `75ac9a3dd65f7` (race). Our fix is
+independent and standalone.
 
-**Step 3.4 - Author:**
-Record: Enzo Matsumiya is the author of the original SMB compression
-code and the LZ77 implementation — highest domain authority.
+**Step 3.4: Author**
+Record: Akif Sait is a contributor (not maintainer); patch was Acked-by
+ksmbd maintainer Namjae Jeon and signed off by CIFS/samba maintainer
+Steve French.
 
-**Step 3.5 - Dependencies:**
-Record: Standalone fix. Does not depend on the other patches in the
-series (patch 2/8 of series, but only touches 1 line that has been
-unchanged since v6.12).
+**Step 3.5: Dependencies**
+Record: None. The fix applies to unchanged `le16_to_cpu(req->LockCount)`
+code that exists identically across all stable trees.
 
-## Phase 4: Mailing List Research
+## PHASE 4: MAILING LIST RESEARCH
 
-**Step 4.1 - b4 dig:**
-Record: `b4 dig -c a13e942a03fee` →
-https://lore.kernel.org/all/20260413190713.283939-2-ematsumiya@suse.de/
-Patch is 2/8 in series "[PATCH 0-8]" of SMB compression fixes.
+**Step 4.1: Find discussion**
+Record: Original submission https://yhbt.net/lore/linux-
+cifs/?q=ksmbd+unbounded+LockCount - posted 2026-04-18 15:45 UTC by Akif
+Sait. Cover note explicitly states "a single authenticated request with
+LockCount=65535 results in roughly 2.1 billion iterations inside a ksmbd
+worker thread, pinning the CPU completely. A few concurrent requests
+hang the host entirely." Applied by Namjae Jeon to #ksmbd-for-next-next
+on 2026-04-20.
 
-**Step 4.1 continued - b4 dig -a:**
-Record: Only v1 exists. Applied version is the only version sent.
+**Step 4.2: Reviewers**
+Record: To: Namjae Jeon (maintainer), Steve French (CIFS maintainer).
+Cc: senozhatsky, tom, linux-cifs - correct mailing lists and
+maintainers.
 
-**Step 4.2 - Reviewers:**
-Record: Recipients included smfrench@gmail.com (maintainer),
-pc@manguebit.com, ronniesahlberg@gmail.com, sprasad@microsoft.com,
-tom@talpey.com, bharathsm@microsoft.com, henrique.carvalho@suse.com —
-appropriate SMB reviewers.
+**Step 4.3: Bug report**
+Record: No public bug report; the submitter found it via code
+inspection, explaining the trigger and providing a reproducer offer.
 
-**Step 4.2 continued - reviewer response:**
-Record: Steve French replied "merged into cifs-2.6.git for-next"
-confirming acceptance by maintainer. No NAKs or concerns. No explicit
-stable nomination.
+**Step 4.4: Related patches**
+Record: Not part of a series; standalone patch.
 
-**Step 4.3 - Bug report:**
-Record: No Reported-by or Link tag. Appears to be developer-found
-(likely via code inspection or UBSAN).
+**Step 4.5: Stable list**
+Record: Included in Steve French's "GIT PULL ksmbd server fixes"
+(2026-04-23), explicitly described as "cap maximum lock count to avoid
+potential denial of service."
 
-**Step 4.4 - Series context:**
-Record: Part of larger SMB client fixes series. Other series members
-(`4c221711b2374` buffer overrun, `20d4f9efe008b` counting fix) are clear
-bug fixes in the same code.
+## PHASE 5: CODE SEMANTIC ANALYSIS
 
-**Step 4.5 - Stable ML:**
-Record: No explicit stable discussion found.
+**Step 5.1: Key functions**
+Record: `smb2_lock()` in fs/smb/server/smb2pdu.c.
 
-## Phase 5: Code Semantic Analysis
+**Step 5.2: Callers**
+Record: `smb2_lock()` is the SMB2_LOCK_HE handler in the command
+dispatch table (`fs/smb/server/smb2ops.c:191`). Reachable from any SMB2
+LOCK request from any authenticated client with a valid file handle.
 
-**Step 5.1 - Modified functions:**
-Record: `lz77_compress()` in `fs/smb/client/compress/lz77.c`.
+**Step 5.3: Callees**
+Record: `smb_flock_init()` (memory alloc), `smb2_set_flock_flags()`,
+`smb2_lock_init()` (memory alloc), `list_for_each_entry()` (the O(N²)
+loop).
 
-**Step 5.2 - Callers:**
-Record: Called from `smb_compress()` in `fs/smb/client/compress.c`,
-which is called from the SMB request path only when CIFS_COMPRESSION is
-built and user mounts with compression negotiated.
+**Step 5.4: Reachability**
+Record: SMB2 LOCK handlers are reachable by any authenticated SMB client
+after they open a file. This is a network-reachable CPU DoS.
 
-**Step 5.3 - Callees:** Record: Uses `lz77_write32()` → writes little-
-endian 32-bit to `flag_pos`.
+**Step 5.5: Similar patterns**
+Record: Smb2misc.c already validates `lock_count * sizeof(struct
+smb2_lock_element) <= MAX_STREAM_PROT_LEN (16MB)`, but that still allows
+65535 (u16 max) locks, so the size check does not mitigate the O(N²) CPU
+attack.
 
-**Step 5.4 - Reachability:**
-Record: Only reachable when: (1) `CONFIG_CIFS_COMPRESSION=y`
-(experimental, default N), (2) user mounts with `compress` option, (3)
-server negotiates SMB3.1.1 compression, (4) request eligible for
-compression (>= PAGE_SIZE write). Not reachable by default kernel
-builds.
+## PHASE 6: STABLE TREE ANALYSIS
 
-**Step 5.5 - Similar patterns:**
-Record: Only one occurrence of the pattern in this function. Other
-shifts in the file (e.g., `LZ77_HASH_SIZE (1 << LZ77_HASH_LOG)` where
-LZ77_HASH_LOG=15) are well within int range.
+**Step 6.1: Vulnerable code in stable**
+Record: Confirmed present in v5.15.203, v6.1.169, v6.6.135, v6.12.83,
+v7.0.1 - every active stable tree that contains ksmbd.
 
-## Phase 6: Cross-Referencing Stable Trees
+**Step 6.2: Backport complications**
+Record: In 5.15 the file is `fs/ksmbd/smb2pdu.c`; in 6.1+ it's
+`fs/smb/server/smb2pdu.c`. The surrounding code (the `if (!lock_count)`
+block) is identical in all versions - patch applies cleanly with at most
+a path adjustment for 5.15.
 
-**Step 6.1 - Code in stable:**
-Record: Verified buggy line `flag |= (1 << (32 - flag_count)) - 1;`
-exists identically in v6.12, v6.15, v6.17, v6.18, v6.19. Code introduced
-in v6.12 (d14bbfff259ca), moved to current form in v6.12 (94ae8c3fee94a)
-- both before v6.12 release.
+**Step 6.3: Related stable fixes**
+Record: Prior smb2_lock fixes already went to stable (e.g.
+309b44ed68449, 84d2d1641b71d). None address the O(N²) issue.
 
-**Step 6.2 - Backport complications:**
-Record: The line is identical in all stable trees from v6.12+. Clean
-backport expected.
+## PHASE 7: SUBSYSTEM CONTEXT
 
-**Step 6.3 - Related fixes in stable:**
-Record: No prior fixes for this specific issue in stable trees.
+**Step 7.1: Subsystem**
+Record: fs/smb/server/ (ksmbd) - in-kernel SMB3 server, network-exposed
+on TCP/445. IMPORTANT criticality (anyone running ksmbd server is
+exposed).
 
-## Phase 7: Subsystem Context
+**Step 7.2: Activity**
+Record: Active subsystem with regular security fixes; this fix is part
+of a broader security hardening cycle (per 2026-04-23 pull request).
 
-**Step 7.1 - Subsystem criticality:**
-Record: `fs/smb/client/compress/` — SMB client compression (experimental
-sub-feature of an important filesystem subsystem). Classification:
-PERIPHERAL (experimental, opt-in, default off).
+## PHASE 8: IMPACT AND RISK
 
-**Step 7.2 - Activity:**
-Record: Active development — 9 commits to `compress/` directory since
-introduction, author is subsystem expert.
+**Step 8.1: Affected users**
+Record: All systems running ksmbd (config-dependent - requires
+CONFIG_SMB_SERVER=y and active share). Any SMB client with valid
+credentials + any opened file can trigger.
 
-## Phase 8: Impact and Risk
+**Step 8.2: Trigger**
+Record: Single authenticated SMB2 LOCK request with LockCount=65535.
+Easily crafted; attacker needs SMB credentials (guest accounts would
+qualify on permissive shares).
 
-**Step 8.1 - Affected users:**
-Record: Users with `CONFIG_CIFS_COMPRESSION=y` (experimental, default N)
-mounting SMB shares with `compress` option against servers supporting
-SMB3.1.1 compression. Very limited population.
+**Step 8.3: Failure severity**
+Record: CPU exhaustion / worker thread hang / service DoS - **HIGH
+severity** (service unavailability from network). Not data
+corruption/UAF, but a reliable, cheap DoS against network-exposed
+service.
 
-**Step 8.2 - Trigger conditions:**
-Record: When uncompressed data size produces a state where `flag_count
-== 0` on loop exit (i.e., multiple of 32 literal/match tokens followed
-by final-loop exit at a 32-boundary) — the end-of-stream flag is
-corrupt. Cannot be triggered by unprivileged users without SMB
-compression mount.
+**Step 8.4: Benefit vs risk**
+Record: Benefit = HIGH (closes a cheap DoS vector in network service).
+Risk = VERY LOW (1 functional line, spec-backed cap, legitimate clients
+don't exceed this). Excellent benefit/risk ratio.
 
-**Step 8.3 - Failure mode:**
-Record: Wrong compressed-payload encoding → server may fail to
-decompress → SMB operation failure / possible retry. No crash, no data
-corruption of user data (local), no security implications. Severity:
-MEDIUM (only affects an experimental feature's correctness).
+## PHASE 9: SYNTHESIS
 
-**Step 8.4 - Risk/benefit:**
-Record: Benefit: fixes a real correctness bug for users of compression;
-makes code valid under UBSAN. Risk: essentially zero — `1` → `1UL` is a
-trivial type promotion that only changes evaluation on the edge UB cases
-the fix targets. Very favorable risk/benefit ratio.
+**Step 9.1: Evidence**
+- FOR: Network-reachable DoS; trivial surgical fix; Acked by maintainer;
+  applies to all stable trees; vulnerability present since v5.15;
+  explicit maintainer description as "denial of service" fix; spec-
+  justified cap.
+- AGAINST: Requires authentication (but many deployments allow guest);
+  no CVE assigned yet.
 
-## Phase 9: Final Synthesis
+**Step 9.2: Stable rules**
+1. Obviously correct & tested: YES (Acked-by maintainer, spec-justified
+   cap)
+2. Fixes a real bug: YES (authenticated DoS of network service)
+3. Important issue: YES (security/availability)
+4. Small & contained: YES (1 functional line + comment)
+5. No new features: YES
+6. Applies cleanly: YES (identical context in all stable trees)
 
-**Step 9.1 - Evidence compiled:**
-FOR: Real UB per C standard; produces wrong encoded output for
-`flag_count == 0` case; 1-line surgical change; zero regression risk;
-from the subsystem author; part of a larger fix series that includes
-clear bugs; buggy line present and identical in all stable trees v6.12+;
-trivial clean apply.
-AGAINST: No Fixes:/Reported-by:/Cc: stable/Link: tags; no concrete user
-bug report; feature is EXPERIMENTAL (default N) and opt-in; impact
-limited to users of experimental compression; no explicit stable
-nomination by reviewers.
+**Step 9.3: Exception categories**
+N/A - this is a straightforward bug/security fix.
 
-**Step 9.2 - Stable rules checklist:**
-1. Obviously correct and tested? YES — merged by maintainer, trivially
-   correct.
-2. Fixes a real bug? YES — real C-standard UB producing incorrect bytes.
-3. Important issue? BORDERLINE — correctness bug but in experimental
-   feature.
-4. Small and contained? YES — 1 line.
-5. No new features/APIs? YES.
-6. Applies cleanly to stable? YES — identical code in v6.12 through
-   v6.19.
-
-**Step 9.3 - Exceptions:**
-Record: Not a device ID/quirk/DT/build/doc fix. Falls under normal bug-
-fix category.
-
-**Step 9.4 - Decision:**
-The fix is tiny, obviously correct, zero-risk, and addresses real UB
-that produces wrong output in an edge case. Although the feature is
-marked EXPERIMENTAL, the fix:
-- Is absolutely safe (1 → 1UL)
-- Applies cleanly
-- Is from the subsystem author
-- Makes the code correct under UBSAN
-- Complements other bug fixes in the series that should be backported
-
-This is exactly the kind of low-risk correctness fix that stable trees
-accept. Users who opted into the experimental feature receive correct
-compressed output.
+**Step 9.4: Decision**
+Strong YES. A one-line cap that kills a trivially-triggerable O(N²)
+network DoS in an in-kernel SMB server, acked by the maintainer, applies
+cleanly to every stable tree that has ksmbd.
 
 ## Verification
 
-- [Phase 1] Parsed tags: no Fixes, no Reported-by, no Cc: stable, no
-  Link; two Signed-off-by (author + maintainer)
-- [Phase 2] Diff analysis: confirmed via `git show` — single line change
-  `1` → `1UL` in `lz77_compress()`
-- [Phase 3] git blame/show d14bbfff259ca: original compression commit
-  July 2024 → v6.12; confirmed buggy line present
-- [Phase 3] git show 94ae8c3fee94a: cleanup commit (Sep 2024, v6.12)
-  also contains buggy line — line has been unchanged since v6.12
-- [Phase 3] `git tag --contains d14bbfff259ca`: bug reaches v6.12 and
-  all releases through v6.19
-- [Phase 4] `b4 dig -c a13e942a03fee`: matched to https://lore.kernel.or
-  g/all/20260413190713.283939-2-ematsumiya@suse.de/ as patch 2/8
-- [Phase 4] `b4 dig -c a13e942a03fee -a`: only v1 exists
-- [Phase 4] mbox content: Steve French replied "merged into cifs-2.6.git
-  for-next"; no NAKs; no stable request
-- [Phase 5] Call chain: `lz77_compress()` ← `smb_compress()` ← SMB
-  request path only when CIFS_COMPRESSION=y and compress mount option
-  active
-- [Phase 6] Verified identical buggy code in v6.12, v6.15, v6.17, v6.18,
-  v6.19 via `git show $TAG:fs/smb/client/compress/lz77.c`
-- [Phase 7] Confirmed Enzo Matsumiya is the LZ77 code's original author
-  (authored d14bbfff259ca, 94ae8c3fee94a and the entire fix/improvement
-  series)
-- [Phase 8] CONFIG_CIFS_COMPRESSION is "Experimental" and default N
-  (verified in `fs/smb/client/Kconfig` line 206-218)
-- UNVERIFIED: Whether any real-world SMB server rejects malformed
-  compressed frames due to this specific bug — but UB produces wrong bit
-  pattern for flag_count == 0, which would be seen as invalid stream
-  marker by any standards-compliant decoder.
+- [Phase 1] Parsed tags: Acked-by Namjae Jeon (ksmbd maintainer,
+  verified via MAINTAINERS file for fs/smb/server/), Signed-off-by Steve
+  French (CIFS/samba maintainer).
+- [Phase 2] Diff analysis confirmed via Read: only functional change is
+  adding `|| lock_count > 64` to an existing `if` at line 7494 in
+  current tree; rest is a 5-line comment.
+- [Phase 3] git log `fs/smb/server/smb2pdu.c`, git show
+  v5.15/v6.1/v6.6/v6.12/v7.0 for the smb2_lock function - confirmed
+  identical `if (!lock_count)` pattern in every stable tree.
+- [Phase 3] Verified the nested O(N²) `list_for_each_entry(cmp_lock,
+  &lock_list, llist)` inside `for (i = 0; i < lock_count; i++)` is
+  present in v5.15 through v7.0.
+- [Phase 4] WebFetch https://yhbt.net/lore/linux-
+  cifs/?q=ksmbd+unbounded+LockCount - found the patch submission and
+  Namjae Jeon's "Applied it to #ksmbd-for-next-next" reply.
+- [Phase 4] WebFetch Steve French's [GIT PULL] ksmbd server fixes on
+  2026-04-23 containing the commit, describing it as "cap maximum lock
+  count to avoid potential denial of service".
+- [Phase 4] b4 dig -c <hash> not usable because the commit is not in the
+  local repo (it is a candidate from a future/incoming pull request).
+- [Phase 5] Grep for `smb2_lock` - confirmed dispatched via
+  `smb2ops.c:191` as SMB2_LOCK_HE command handler.
+- [Phase 5] Read fs/smb/server/smb2misc.c lines 168-197 confirmed
+  LockCount is sanity-checked against buffer size (16MB) but not against
+  u16 range, so 65535 locks pass validation.
+- [Phase 6] git log stable branches confirmed the vulnerable pattern
+  exists in 5.15.203, 6.1.169, 6.6.135, 6.12.83, 7.0.1.
+- [Phase 8] struct smb2_lock_element size (8+8+4+4=24 bytes) verified
+  via fs/smb/common/smb2pdu.h - max buffer-bounded LockCount exceeds
+  65535, so u16 max is reachable.
+- UNVERIFIED: No CVE has been assigned (not verifiable from available
+  data); not needed for decision.
+- UNVERIFIED: Exact perf impact in seconds per 65535-lock request
+  (commit message claims ~2.1 billion iterations; verified arithmetic
+  65535*65536/2 ≈ 2.15×10⁹ matches).
 
-The fix is a trivial, safe, verifiable correctness improvement that
-applies cleanly to all active stable trees. While the feature is
-experimental, users opting in get correct output at zero risk to anyone
-else.
+This is a classic stable-candidate fix: small, obvious, maintainer-
+acked, closes a cheap network-triggerable DoS against ksmbd that has
+been exploitable since v5.15.
 
 **YES**
 
- fs/smb/client/compress/lz77.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/smb/server/smb2pdu.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/compress/lz77.c b/fs/smb/client/compress/lz77.c
-index 96e8a8057a772..cdd6b53766b0a 100644
---- a/fs/smb/client/compress/lz77.c
-+++ b/fs/smb/client/compress/lz77.c
-@@ -221,7 +221,7 @@ noinline int lz77_compress(const void *src, u32 slen, void *dst, u32 *dlen)
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index ad5559d48975b..660dfefeba8e7 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -7473,7 +7473,12 @@ int smb2_lock(struct ksmbd_work *work)
+ 	lock_ele = req->locks;
+ 
+ 	ksmbd_debug(SMB, "lock count is %d\n", lock_count);
+-	if (!lock_count) {
++	/*
++	 * Cap lock_count at 64. The MS-SMB2 spec defines Open.LockSequenceArray
++	 * as exactly 64 entries so 64 is the intended ceiling. No real workload
++	 * comes close to this in a single request.
++	 */
++	if (!lock_count || lock_count > 64) {
+ 		err = -EINVAL;
+ 		goto out2;
  	}
- 
- 	flag <<= (32 - flag_count);
--	flag |= (1 << (32 - flag_count)) - 1;
-+	flag |= (1UL << (32 - flag_count)) - 1;
- 	lz77_write32(flag_pos, flag);
- 
- 	*dlen = dstp - dst;
 -- 
 2.53.0
 
