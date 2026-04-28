@@ -1,63 +1,63 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8E13C3448
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 15:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B803C3BF3
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 15:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777391207; cv=none; b=PD/Fq3KrXGkHak9GpItmT9+fS6f+4O5VDR7/SQXjW2pcsNSeamN8H0tzC4BC1nmMOqO4OovQizSbKbTAqLnch/sF/93l1jrOmXIl3uStAtEXHP6Ijx7goiUcBFVQNUaPdJR+ywIQ4lX1L/4SzF2Zs3pbQhwPXplWNmXaAb2Of50=
+	t=1777391215; cv=none; b=qWzsD3PV/F8ZNcQUqPd8ZOdIRRNKbednugKsLivWmcRBB7a6SD3M2+q1eEatDHb/vM2c72vDfy1ig6Ex7WFkJGPSyZ+x6sZ7CcZwfLDcOPCdQG+n/gTDsI9K/VPyTHC3OCG8+nQSP9gjBnOg/eRMDo3ZiFRF08UYFqewAMBC8YI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777391207; c=relaxed/simple;
-	bh=lQ5DpuALbgTsXOKgwn74AyoacGYenQNBVH9tON40P7o=;
+	s=arc-20240116; t=1777391215; c=relaxed/simple;
+	bh=2DiCheTPcsUxqeXUgGMUKQ6AKOFGY0LGdU9YabS+w7k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WRH5iSHVZy15htkHO62XgeSXNpjuxc6MBY47kb4ukviZXIs1/3LYQgkmkb0fHMMJrOwlP4KiRFMiq+4nbqRkkT7g+CUUoCVhLO69YgLUD0+4Lwun4vmuUyTyD35N+q/moXG57Zc5cW492VtCrhX3IMvthSnJdiLCoFdrGsbY3EU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Y3XDAm+V; arc=none smtp.client-ip=209.85.221.47
+	 MIME-Version; b=LBpPg7V4jlhALZ+hRBpzfgXRP0uUwsSb3nQD9BKFjgGv7BMXfeqVIoFl+NaJ9lvMJnxP9CantAVjUCA9wCn4G9NPXSHVe6miV/RP5/BCWEeUkAYXtVRILaESuzx2lmyZsNK0E9g+jp1cuTZJareqk5XQAsRrC2WA2aqW6C/096U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=NH+I9IM7; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Y3XDAm+V"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43cfd1f9fd1so7257769f8f.3
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 08:46:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="NH+I9IM7"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-43d77f6092eso8107093f8f.2
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 08:46:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1777391204; x=1777996004; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1777391211; x=1777996011; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ycsCVSVbXnO73EBGsa9NkUp/8I4UNQARemQ6U5oYXqA=;
-        b=Y3XDAm+VTfoxQSQwp7E4Xki9wvYBDUKcIAKv/BhPyPSiX4oW0zsJnF6gufYeTRP8zn
-         1EvrF7+N/JllJOXB3TijXnlRPmHOLy83x+vDlZEoHiWdMqSO5T4RHdkrF9FxIPS1AnJi
-         C8vkAaOSA7w/xXbmy0YQtWEnm1/P2qB/v0YztpdmldX3crKJglMMflxG02aRy41j7I2M
-         4O17XoPc9c7bYy6LDN+ymvyv4eMaYy75C92fGGqjQrPv7Fb/lT7uVn6CIHOhqqeINhbM
-         dIUjPejjGeQ826K6Ia65NCnPu0FkSKOhxZkjdaT1R5qxCSYdD16xdKPC7TDBt6igQ+m+
-         +F0Q==
+        bh=XZJsQEUrX44rAyCg1faVBNcmLKBSPLK+aWneKpC1/A4=;
+        b=NH+I9IM7RilflMKdM9os2Hrw4OvjujVub/8Q34dONI7WrQkXKNeXlY752KJS/E96Y1
+         tteSsnzesnD/fpI7iq+6EzNfUOupnbfvA+J0ymTmuEvdfrJ+KHMepvzE2Sl9u6ajWzeL
+         Kmn66HKBGCiWoKkI+xcJMx74KO1ppZwFpD8MhWei7WfkMJOFSVdbaWLD6+M5b4OIm8aL
+         Zx/mfTdbu7SHT0wDH8xiX5e5QsbsUA9IvOOy5SYr0zJeqDFM73clc93+XSOLiuK28PIq
+         zxmqgXdrrxDrGgLeTqz84nicna6zlVjrmnLhT1sAwWBoojiJuXTU+nV6UKfinB74LaLn
+         HULA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777391204; x=1777996004;
+        d=1e100.net; s=20251104; t=1777391211; x=1777996011;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ycsCVSVbXnO73EBGsa9NkUp/8I4UNQARemQ6U5oYXqA=;
-        b=O3zW9QnVsCxrVnLBLjts5Bn4I1WroeP76F1g2eIW05eaJT6b6316WAor8DpXbB09tg
-         3JL38POqyotBiu/9T1W+157vABBI8Vk0NEQn5p9geeWw7D2nyNcUHH1ElxfWpevMraiJ
-         ATVwQW1ZccX+GC9FS8IXWXyY3wT+7wbmhacJEcsGz3bGvp0P9Ur2GVdrVUE3KW34WfZz
-         UNMDW0SfBa1p/QsJCgsJHlVKLhr911TQ0TnRBgqgQSsUl9Ano2F8vHVcdeVRxUojnv8h
-         CQgJhH5hpPKBayTHytpsAbz0nf+myhgXdyOfF12P0gPqvxioudc5XHcg0/HiCQtbx3VZ
-         bUPw==
-X-Gm-Message-State: AOJu0Yww9SoY2OfquTzq5TvQLhBcQZvHBP4zymMCeMw9BbBvS8dZin6o
-	L7R3IoxPkXWLGrnh7ubFvsNUaLZqyb0qBjiGLmSHuPftBYE0zCQEfA4fFT04W9PGiVK3Z11HILJ
-	05nKz/YWo+w==
-X-Gm-Gg: AeBDietOYjhKgdRd4qrZ1ggik7+Pc9WZC+C5wL81TfR58hW7LI1MLqtJ6QPABzccmXH
-	/3c2+j/21M3Md46AeI8G0gBIRkQjtanyCopxDMOEL2+ggpy1VzpBBFHBykCGjZx4mfuEhaDtVPS
-	eJZ/+miU0W5qtVJ/EZNOq5nH/PsBiB0hZZHdZo1VHpGe23thv8X29ZQGORq53fO2hFAWZULhRLa
-	Yf62dgDdaAo4ecAzGshpZzKqFj9L9Qvt9ZTjoQbDvWo/lTg8DtJ7kxZ4wu2WbjrlO555/WMDZ5a
-	XAYJ9W8g9EXPDFfi7j4ZBBG8b3r/VGmmvSzuCfpWpzdto5yRv8EQYct19YOz3Jj9YeHCahXcDSp
-	5nyNqonldXhWaZ6bdo5VEmWh0B2dxr4Jo/l7Ktbfo8vTLLXiecMxwBRcBB6V2z6Xl8CoS6VaLu8
-	3RKGHkLKlR/N7y9/+W/Hz2WTed4/QwRyx+KHlKP1lYo5D2
-X-Received: by 2002:a05:6000:1787:b0:43d:1c7a:8b5b with SMTP id ffacd0b85a97d-4464b2ace42mr6887767f8f.40.1777391203694;
-        Tue, 28 Apr 2026 08:46:43 -0700 (PDT)
+        bh=XZJsQEUrX44rAyCg1faVBNcmLKBSPLK+aWneKpC1/A4=;
+        b=bZmuYYN8WJ0l3wzQmZukfGfpSnps5y+33S/IeL+VORt7J71OClzhJFN+V7RfR2utpQ
+         OPrSFI3zS8GnEiC1uzsVrrk5AVsm8ntdjsoHgsETtmEPaIEhCT2c5Hu01lD4KiMBnSg1
+         LrBjx8HAjYQA1dmxW7XVGqeb1hb1yCDZHOFfW1TxIltfATrLrXLzIzWh8g0ilZu2k5L5
+         t0wyAwpJbbtXcyAa1TErh0r8uhI9Rfrc1YVE6dBOhDLqQHVtPMeFlUDHt0SCF19jAs0Y
+         SAeJuEgCMn7Ge5yx966ExQnGbcMraQQBvTCPL/LFSfoHW/wD3v9fVLZwdOFjEZciM81K
+         QGGQ==
+X-Gm-Message-State: AOJu0Yw+sh3OVpcbmVHlZAo67PRbHdZr8ie4f4wDeSmCNASI0ugETKlR
+	+r9ENMheHlfy756Gi4lOL/bigc/WmdpLQ/OOYX+Ut2O2nDq83k9yZ52ba7HP7foOl09VWJOAHf0
+	JMSx6I/kKMA==
+X-Gm-Gg: AeBDietm3dpi/xBMY/AZ/NT1uz1Uj5raHna15LEKesJdX2M7fzjf2bFfGK7I96arr6y
+	dk735sFa0PzvJfOHR8VxZUoklVoY7UjIGliAaWLXdPztOasE05F95WIDnfgvHGDXEB4fwpNgZfR
+	YMyRvnlb8yGuwq5m4R/cGotQQd64xFCktvtVsjN6EzuZaBUc8Xs8N66K7xcE1REI4JTa2vTel5n
+	u9E1tdG6oqX/XvsIcpkbtp/YnA+6/FIq3RxXCm43wj+z3Wilc8xDy31SOKGAezgJRkLoztpRy/T
+	qsrAkG7tzuGkjdM2ZzZzEcANO/rE9A9rXXTWaN3SyEAtPgv+aDU65R+wRDbuP69XkoCDOm8hRrz
+	8w5j7JAYl4PhS51HbZnCsA9QQ+6P6sCgLMtM2bh2igx3mLNM4Pf269Cmo50bovp3IFnlM5fZyK1
+	+LjpeOQOEi03CUD9Q2PeG37OBT+rnl7fgm0anblY0LnRTx
+X-Received: by 2002:a05:6000:2f88:b0:43d:77a8:3baf with SMTP id ffacd0b85a97d-4464b1b8620mr6854069f8f.32.1777391210850;
+        Tue, 28 Apr 2026 08:46:50 -0700 (PDT)
 Received: from precision ([2a01:4b00:c007:bb00:be9d:a3c4:18b1:4a25])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4463d4fa52bsm7725384f8f.15.2026.04.28.08.46.43
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4463d4fa52bsm7725384f8f.15.2026.04.28.08.46.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 08:46:43 -0700 (PDT)
+        Tue, 28 Apr 2026 08:46:50 -0700 (PDT)
 From: Henrique Carvalho <henrique.carvalho@suse.com>
 To: linux-cifs@vger.kernel.org
 Cc: sfrench@samba.org,
@@ -70,9 +70,9 @@ Cc: sfrench@samba.org,
 	bharathsm@microsoft.com,
 	ematsumiya@suse.de,
 	Henrique Carvalho <henrique.carvalho@suse.com>
-Subject: [PATCH 02/11] smb: client: refactor negotiate context assembly
-Date: Tue, 28 Apr 2026 12:46:00 -0300
-Message-ID: <20260428154604.222551-5-henrique.carvalho@suse.com>
+Subject: [PATCH 03/11] smb: client: add QUIC mount and transport setup
+Date: Tue, 28 Apr 2026 12:46:01 -0300
+Message-ID: <20260428154604.222551-6-henrique.carvalho@suse.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260428154604.222551-1-henrique.carvalho@suse.com>
 References: <20260428154604.222551-1-henrique.carvalho@suse.com>
@@ -84,219 +84,584 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce struct neg_ctx, smb2_neg_context_len() and add_context() to
-handle alignment, pointer advancement, and counter increment in one
-place, eliminating repetitive code.
-
-Also fix missing ALIGN() for posix negotiate context.
+Introduce new mount options used to drive SMB over QUIC: `quic` and
+`mtls`. Introduce per-server state needed to drive the QUIC transport.
+Introduce transport functions for smb quic tls handshake setup and
+initial quic transport setup. Include SMB2_TRANSPORT_CAPABILITIES
+negotiate context for QUIC.
 
 Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 ---
- fs/smb/client/smb2pdu.c | 106 +++++++++++++++++++++-------------------
- 1 file changed, 56 insertions(+), 50 deletions(-)
+ fs/smb/client/cifsglob.h   |  19 +++-
+ fs/smb/client/connect.c    | 184 +++++++++++++++++++++++++++++++++++--
+ fs/smb/client/fs_context.c |  27 ++++++
+ fs/smb/client/fs_context.h |   4 +
+ fs/smb/client/smb2pdu.c    |  27 ++++++
+ fs/smb/client/transport.c  |  40 ++++----
+ 6 files changed, 274 insertions(+), 27 deletions(-)
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index cddb1ae04e83..bac88a612d5d 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -618,7 +618,15 @@ static int smb2_ioctl_req_init(u32 opcode, struct cifs_tcon *tcon,
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 58be72377c7d..f56d3732bfa8 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -35,6 +35,7 @@
+ #define CIFS_PORT 445
+ #define RFC1001_PORT 139
+ #define SMBD_IWARP_PORT 5445
++#define SMB_QUIC_PORT 443
  
- /* For explanation of negotiate contexts see MS-SMB2 section 2.2.3.1 */
+ /*
+  * The sizes of various internal tables and strings
+@@ -759,8 +760,10 @@ struct TCP_Server_Info {
+ 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
+ 	bool	sec_iakerb;		/* supports pass-through auth for Kerberos (krb5 proxy) */
+ 	bool	large_buf;		/* is current buffer large? */
+-	int	ipproto; /* IPPROTO_TCP or IPOROTO_SMBDIRECT */
++	int	ipproto; /* IPPROTO_TCP, IPOROTO_SMBDIRECT or IPPROTO_QUIC */
+ #define cifs_rdma_enabled(__server)	((__server)->ipproto == IPPROTO_SMBDIRECT)
++	/* point to the SMBD connection if RDMA is used instead of socket */
++	struct smbd_connection *smbd_conn;
+ 	struct delayed_work	echo; /* echo ping workqueue job */
+ 	char	*smallbuf;	/* pointer to current "small" buffer */
+ 	char	*bigbuf;	/* pointer to current "big" buffer */
+@@ -832,6 +835,14 @@ struct TCP_Server_Info {
+ 	char *leaf_fullpath;
+ 	bool dfs_conn:1;
+ 	char dns_dom[CIFS_MAX_DOMAINNAME_LEN + 1];
++
++	struct {
++		bool need_smb_seal; /* if unset, smb encryption is disabled over QUIC
++				     * transport, and QUIC security (i.e. TLS 1.3) is
++				     * the one used
++				     */
++		bool mtls;
++	} quic_conn;
+ };
  
--static void
-+static inline unsigned int
-+smb2_neg_context_len(const void *p)
+ static inline bool is_smb1(const struct TCP_Server_Info *server)
+@@ -855,6 +866,12 @@ static inline void cifs_server_unlock(struct TCP_Server_Info *server)
+ 	memalloc_nofs_restore(nofs_flag);
+ }
+ 
++static inline bool
++cifs_quic_enabled(struct TCP_Server_Info *server)
 +{
-+	const struct smb2_neg_context *ctx = p;
-+
-+	return sizeof(*ctx) + le16_to_cpu(ctx->DataLength);
++	return server->ipproto == IPPROTO_QUIC;
 +}
 +
-+static unsigned int
- build_preauth_ctxt(struct smb2_preauth_neg_context *pneg_ctxt)
+ struct cifs_credits {
+ 	unsigned int value;
+ 	unsigned int instance;
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 33d619007905..bfe949b14db2 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -25,11 +25,14 @@
+ #include <linux/namei.h>
+ #include <linux/uuid.h>
+ #include <linux/uaccess.h>
++#include <linux/quic.h>
+ #include <asm/processor.h>
+ #include <linux/inet.h>
+ #include <linux/module.h>
+ #include <keys/user-type.h>
+ #include <net/ipv6.h>
++#include <net/handshake.h>
++#include <keys/asymmetric-type.h>
+ #include <linux/parser.h>
+ #include <linux/bvec.h>
+ #include "cifsglob.h"
+@@ -70,7 +73,11 @@ static void mchan_mount_work_fn(struct work_struct *work);
+ 
+ static void smb_sock_release(struct TCP_Server_Info *server)
  {
- 	pneg_ctxt->ContextType = SMB2_PREAUTH_INTEGRITY_CAPABILITIES;
-@@ -627,9 +635,10 @@ build_preauth_ctxt(struct smb2_preauth_neg_context *pneg_ctxt)
- 	pneg_ctxt->SaltLength = cpu_to_le16(SMB311_SALT_SIZE);
- 	get_random_bytes(pneg_ctxt->Salt, SMB311_SALT_SIZE);
- 	pneg_ctxt->HashAlgorithms = SMB2_PREAUTH_INTEGRITY_SHA512;
-+	return smb2_neg_context_len(pneg_ctxt);
+-	sock_release(server->ssocket);
++	/* ->ssocket will be released by fput() */
++	if (cifs_quic_enabled(server) && server->ssocket->file)
++		fput(server->ssocket->file);
++	else if (server->ssocket)
++		sock_release(server->ssocket);
+ 	server->ssocket = NULL;
  }
  
--static void
-+static unsigned int
- build_compression_ctxt(struct smb2_compression_capabilities_context *pneg_ctxt)
- {
- 	pneg_ctxt->ContextType = SMB2_COMPRESSION_CAPABILITIES;
-@@ -640,13 +649,13 @@ build_compression_ctxt(struct smb2_compression_capabilities_context *pneg_ctxt)
- 	pneg_ctxt->CompressionAlgorithms[0] = SMB3_COMPRESS_LZ77;
- 	pneg_ctxt->CompressionAlgorithms[1] = SMB3_COMPRESS_LZ77_HUFF;
- 	pneg_ctxt->CompressionAlgorithms[2] = SMB3_COMPRESS_LZNT1;
-+	return smb2_neg_context_len(pneg_ctxt);
- }
+@@ -1643,6 +1650,9 @@ static int match_server(struct TCP_Server_Info *server,
+ 	if (cifs_rdma_enabled(server) != ctx->rdma)
+ 		return 0;
  
- static unsigned int
- build_signing_ctxt(struct smb2_signing_capabilities *pneg_ctxt)
- {
--	unsigned int ctxt_len = sizeof(struct smb2_signing_capabilities);
--	unsigned short num_algs = 1; /* number of signing algorithms sent */
-+	const unsigned short num_algs = 1; /* number of signing algorithms sent */
- 
- 	pneg_ctxt->ContextType = SMB2_SIGNING_CAPABILITIES;
- 	/*
-@@ -658,13 +667,11 @@ build_signing_ctxt(struct smb2_signing_capabilities *pneg_ctxt)
- 	pneg_ctxt->SigningAlgorithmCount = cpu_to_le16(num_algs);
- 	pneg_ctxt->SigningAlgorithms[0] = cpu_to_le16(SIGNING_ALG_AES_CMAC);
- 
--	ctxt_len += sizeof(__le16) * num_algs;
--	ctxt_len = ALIGN(ctxt_len, 8);
--	return ctxt_len;
-+	return smb2_neg_context_len(pneg_ctxt);
- 	/* TBD add SIGNING_ALG_AES_GMAC and/or SIGNING_ALG_HMAC_SHA256 */
- }
- 
--static void
-+static unsigned int
- build_encrypt_ctxt(struct smb2_encryption_neg_context *pneg_ctxt)
- {
- 	pneg_ctxt->ContextType = SMB2_ENCRYPTION_CAPABILITIES;
-@@ -684,6 +691,7 @@ build_encrypt_ctxt(struct smb2_encryption_neg_context *pneg_ctxt)
- 		pneg_ctxt->Ciphers[0] = SMB2_ENCRYPTION_AES128_GCM;
- 		pneg_ctxt->Ciphers[1] = SMB2_ENCRYPTION_AES128_CCM;
- 	}
-+	return smb2_neg_context_len(pneg_ctxt);
- }
- 
- static unsigned int
-@@ -695,11 +703,11 @@ build_netname_ctxt(struct smb2_netname_neg_context *pneg_ctxt, char *hostname)
- 
- 	/* copy up to max of first 100 bytes of server name to NetName field */
- 	pneg_ctxt->DataLength = cpu_to_le16(2 * cifs_strtoUTF16(pneg_ctxt->NetName, hostname, 100, cp));
--	/* context size is DataLength + minimal smb2_neg_context */
--	return ALIGN(le16_to_cpu(pneg_ctxt->DataLength) + sizeof(struct smb2_neg_context), 8);
++	if (cifs_quic_enabled(server) != ctx->quic)
++		return 0;
 +
-+	return smb2_neg_context_len(pneg_ctxt);
+ 	if (server->ignore_signature != ctx->ignore_signature)
+ 		return 0;
+ 
+@@ -1784,7 +1794,10 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
+ 	tcp_ses->tcp_nodelay = ctx->sockopt_tcp_nodelay;
+ 	if (ctx->rdma)
+ 		tcp_ses->ipproto = IPPROTO_SMBDIRECT;
+-	else
++	else if (ctx->quic) {
++		tcp_ses->ipproto = IPPROTO_QUIC;
++		tcp_ses->quic_conn.mtls = ctx->mtls;
++	} else
+ 		tcp_ses->ipproto = IPPROTO_TCP;
+ 
+ 	tcp_ses->in_flight = 0;
+@@ -3304,6 +3317,145 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
+ 	return 0;
  }
  
--static void
-+static unsigned int
- build_posix_ctxt(struct smb2_posix_neg_context *pneg_ctxt)
- {
- 	pneg_ctxt->ContextType = SMB2_POSIX_EXTENSIONS_AVAILABLE;
-@@ -721,15 +729,31 @@ build_posix_ctxt(struct smb2_posix_neg_context *pneg_ctxt)
- 	pneg_ctxt->Name[13] = 0x8B;
- 	pneg_ctxt->Name[14] = 0xCD;
- 	pneg_ctxt->Name[15] = 0x7C;
-+	return smb2_neg_context_len(pneg_ctxt);
++static void
++smb_tls_handshake_done(void *data, int status, key_serial_t peerid)
++{
++	struct smb_tls *smb_tls = (struct smb_tls *)data;
++
++	smb_tls->status = status;
++	smb_tls->peerid = peerid;
++
++	complete(&smb_tls->handshake_done);
 +}
 +
-+struct neg_ctx {
-+	char *pos;
-+	unsigned int len;
-+	unsigned int cnt;
-+};
++static inline struct smb_tls *
++smb_tls_init(struct TCP_Server_Info *server)
++{
++	struct smb_tls *tls;
++
++	tls = kzalloc_obj(*tls, GFP_KERNEL);
++	if (!tls)
++		return ERR_PTR(-ENOMEM);
++
++	tls->status = 0;
++
++	tls->args.ta_sock = server->ssocket;
++	tls->args.ta_done = smb_tls_handshake_done;
++	tls->args.ta_data = tls;
++	tls->args.ta_peername = kstrdup(server->hostname, GFP_KERNEL); /* do I need kstrdup ? */
++	tls->args.ta_timeout_ms = SMB_TLS_TIMEOUT_MS;
++	tls->args.ta_keyring = TLS_NO_KEYRING;
++
++	init_completion(&tls->handshake_done);
++
++	return tls;
++}
++
++static void smb_tls_free(struct smb_tls **tls)
++{
++	kfree((*tls)->args.ta_peername);
++	kfree_sensitive(*tls);
++	*tls = NULL;
++}
 +
 +static inline void
-+add_context(struct neg_ctx *nc, unsigned int ctx_len)
++smb_tls_debug(int rc)
 +{
-+	unsigned int aligned_len = ALIGN(ctx_len, 8);
++	switch (rc) {
++	case 0:
++		cifs_dbg(VFS, "smb tls: Handshake successful");
++		return;
++	case -ERESTARTSYS:
++		cifs_dbg(VFS, "smb tls: Handshake interrupted");
++		return;
++	case -ETIMEDOUT:
++		cifs_dbg(VFS, "smb tls: Handshake timed out");
++		return;
++	case -EINVAL:
++		cifs_dbg(VFS, "smb tls: Consumer provided an invalid argument");
++		return;
++	case -ENOKEY:
++		cifs_dbg(VFS, "smb tls: Missing authentication material");
++		return;
++	case -EIO:
++		cifs_dbg(VFS, "smb tls: An unexpected fault occurred");
++		return;
++	default:
++		cifs_dbg(VFS, "smb tls: Error: %d", -rc);
++		return;
++	}
++}
 +
-+	nc->pos += aligned_len;
-+	nc->len += aligned_len;
-+	nc->cnt++;
- }
- 
- static void
- assemble_neg_contexts(struct smb2_negotiate_req *req,
- 		      struct TCP_Server_Info *server, unsigned int *total_len)
++static int
++smb_tls_handshake(struct TCP_Server_Info *server)
++{
++	int rc;
++	struct smb_tls *tls;
++
++	cifs_dbg(FYI, "smb tls: starting TLS handshake");
++
++	tls = smb_tls_init(server);
++	if (IS_ERR(tls))
++		return PTR_ERR(tls);
++
++	if (server->quic_conn.mtls)
++		rc = tls_client_hello_x509(&tls->args, GFP_KERNEL);
++	else
++		rc = tls_client_hello_anon(&tls->args, GFP_KERNEL);
++
++	if (rc < 0)
++		goto free;
++
++	rc = wait_for_completion_interruptible(&tls->handshake_done);
++	if (rc < 0)
++		tls_handshake_cancel(server->ssocket->sk);
++	else
++		rc = tls->status;
++
++free:
++	smb_tls_free(&tls);
++
++	smb_tls_debug(rc);
++
++	return rc;
++}
++
++static int
++smb_quic_tls(struct TCP_Server_Info *server)
++{
++	int rc;
++	size_t sinfolen;
++	struct quic_stream_info sinfo;
++	struct socket *socket = server->ssocket;
++
++	rc = smb_tls_handshake(server);
++	if (rc < 0)
++		return rc;
++
++	/* open a new stream after handshake, default to stream id == 0 */
++	sinfo.stream_id = -1;
++	sinfolen = sizeof(sinfo);
++	rc = quic_do_getsockopt(socket->sk, QUIC_SOCKOPT_STREAM_OPEN,
++				KERNEL_SOCKPTR(&sinfo), KERNEL_SOCKPTR(&sinfolen));
++
++	return rc;
++}
++
++static int
++smb_quic_prepare_socket(struct TCP_Server_Info *server)
++{
++	int flags = 0;
++	struct file *filp;
++	struct socket *socket = server->ssocket;
++
++	filp = sock_alloc_file(socket, flags, NULL);
++	if (IS_ERR(filp))
++		return PTR_ERR(filp);
++
++	return quic_do_setsockopt(socket->sk, QUIC_SOCKOPT_ALPN,
++				  KERNEL_SOCKPTR("smb"), 3);
++}
++
+ static inline const char *
+ get_protocol_name(struct TCP_Server_Info *server)
  {
--	unsigned int ctxt_len, neg_context_count;
-+	struct neg_ctx nc;
- 	struct TCP_Server_Info *pserver;
--	char *pneg_ctxt;
- 	char *hostname;
+@@ -3350,8 +3502,6 @@ generic_ip_connect(struct TCP_Server_Info *server)
+ 			 __func__, pname, &ipv4->sin_addr, ntohs(sport));
+ 	}
  
- 	if (*total_len > 200) {
-@@ -744,18 +768,15 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
- 	 */
- 	*total_len = ALIGN(*total_len, 8);
+-	smb_sock_release(server);
+-
+ 	{
+ 		struct net *net = cifs_net_ns(server);
+ 		struct sock *sk;
+@@ -3380,8 +3530,8 @@ generic_ip_connect(struct TCP_Server_Info *server)
  
--	pneg_ctxt = (*total_len) + (char *)req;
- 	req->NegotiateContextOffset = cpu_to_le32(*total_len);
- 
--	build_preauth_ctxt((struct smb2_preauth_neg_context *)pneg_ctxt);
--	ctxt_len = ALIGN(sizeof(struct smb2_preauth_neg_context), 8);
--	*total_len += ctxt_len;
--	pneg_ctxt += ctxt_len;
-+	nc.pos = (*total_len) + (char *)req;
-+	nc.len = *total_len;
-+	nc.cnt = 0;
-+
-+	add_context(&nc, build_preauth_ctxt((struct smb2_preauth_neg_context *)nc.pos));
- 
--	build_encrypt_ctxt((struct smb2_encryption_neg_context *)pneg_ctxt);
--	ctxt_len = ALIGN(sizeof(struct smb2_encryption_neg_context), 8);
--	*total_len += ctxt_len;
--	pneg_ctxt += ctxt_len;
-+	add_context(&nc, build_encrypt_ctxt((struct smb2_encryption_neg_context *)nc.pos));
+ 	rc = bind_socket(server);
+ 	if (rc < 0) {
+-		cifs_dbg(FYI, "Error %d bind_socket() %s\n", rc, pname);
+-		goto close_socket;
++		cifs_dbg(VFS, "Error %d bind_socket() %s\n", rc, pname);
++		return rc;
+ 	}
  
  	/*
- 	 * secondary channels don't have the hostname field populated
-@@ -764,41 +785,26 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
- 	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
- 	cifs_server_lock(pserver);
- 	hostname = pserver->hostname;
--	if (hostname && (hostname[0] != 0)) {
--		ctxt_len = build_netname_ctxt((struct smb2_netname_neg_context *)pneg_ctxt,
--					      hostname);
--		*total_len += ctxt_len;
--		pneg_ctxt += ctxt_len;
--		neg_context_count = 3;
--	} else
--		neg_context_count = 2;
-+	if (hostname && (hostname[0] != 0))
-+		add_context(&nc,
-+			    build_netname_ctxt((struct smb2_netname_neg_context *)nc.pos,
-+					       hostname));
- 	cifs_server_unlock(pserver);
+@@ -3406,10 +3556,16 @@ generic_ip_connect(struct TCP_Server_Info *server)
+ 	if (cifs_rdma_enabled(server)) {
+ 		rc = smbd_prepare_socket(server, ntohs(sport));
+ 		if (rc < 0) {
+-			cifs_dbg(FYI, "Error %d from smbd_prepare_socket(port=%u)\n",
++			cifs_dbg(VFS, "Error %d from smbd_prepare_socket(port=%u)\n",
+ 				 rc, ntohs(sport));
+ 			goto close_socket;
+ 		}
++	} else if (cifs_quic_enabled(server)) {
++		rc = smb_quic_prepare_socket(server);
++		if (rc < 0) {
++			cifs_dbg(VFS, "Error %d from smb_quic_prepare_socket()\n", rc);
++			goto close_socket;
++		}
+ 	}
  
--	build_posix_ctxt((struct smb2_posix_neg_context *)pneg_ctxt);
--	*total_len += sizeof(struct smb2_posix_neg_context);
--	pneg_ctxt += sizeof(struct smb2_posix_neg_context);
--	neg_context_count++;
-+	add_context(&nc, build_posix_ctxt((struct smb2_posix_neg_context *)nc.pos));
+ 	cifs_dbg(FYI, "sndbuf %d rcvbuf %d rcvtimeo 0x%lx\n",
+@@ -3426,9 +3582,18 @@ generic_ip_connect(struct TCP_Server_Info *server)
+ 	if (server->noblockcnt && rc == -EINPROGRESS)
+ 		rc = 0;
+ 	if (rc < 0) {
+-		cifs_dbg(FYI, "Error %d connecting with %s to server\n", rc, pname);
++		cifs_dbg(VFS, "Error %d connecting with %s to server\n", rc, pname);
+ 		goto close_socket;
+ 	}
++
++	if (cifs_quic_enabled(server)) {
++		rc = smb_quic_tls(server);
++		if (rc < 0) {
++			cifs_dbg(VFS, "Error %d from smb_quic_tls()\n", rc);
++			goto close_socket;
++		}
++	}
++
+ 	trace_smb3_connect_done(server->hostname, server->conn_id, &server->dstaddr);
  
--	if (server->compression.requested) {
--		build_compression_ctxt((struct smb2_compression_capabilities_context *)
--				pneg_ctxt);
--		ctxt_len = ALIGN(sizeof(struct smb2_compression_capabilities_context), 8);
--		*total_len += ctxt_len;
--		pneg_ctxt += ctxt_len;
--		neg_context_count++;
--	}
-+	if (server->compression.requested)
-+		add_context(&nc,
-+			    build_compression_ctxt(
-+				    (struct smb2_compression_capabilities_context *)nc.pos));
+ 	/*
+@@ -3467,6 +3632,9 @@ ip_connect(struct TCP_Server_Info *server)
+ 	if (cifs_rdma_enabled(server)) {
+ 		port1 = SMBD_IWARP_PORT;
+ 		port2 = CIFS_PORT;
++	} else if (cifs_quic_enabled(server)) {
++		port1 = SMB_QUIC_PORT;
++		port2 = 0;
+ 	}
  
--	if (enable_negotiate_signing) {
--		ctxt_len = build_signing_ctxt((struct smb2_signing_capabilities *)
--				pneg_ctxt);
--		*total_len += ctxt_len;
--		pneg_ctxt += ctxt_len;
--		neg_context_count++;
--	}
-+	if (enable_negotiate_signing)
-+		add_context(&nc, build_signing_ctxt((struct smb2_signing_capabilities *)nc.pos));
+ 	if (server->dstaddr.ss_family == AF_INET6)
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index 54090739535f..3a0c66cf3c2c 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -127,6 +127,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
+ 	fsparam_flag("nosparse", Opt_nosparse),
+ 	fsparam_flag("domainauto", Opt_domainauto),
+ 	fsparam_flag("rdma", Opt_rdma),
++	fsparam_flag("quic", Opt_quic),
+ 	fsparam_flag("modesid", Opt_modesid),
+ 	fsparam_flag("modefromsid", Opt_modesid),
+ 	fsparam_flag("rootfs", Opt_rootfs),
+@@ -135,6 +136,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
+ 	fsparam_flag_no("nativesocket", Opt_nativesocket),
+ 	fsparam_flag_no("unicode", Opt_unicode),
+ 	fsparam_flag_no("nbsessinit", Opt_nbsessinit),
++	fsparam_flag("mtls", Opt_mtls),
  
- 	/* check for and add transport_capabilities and signing capabilities */
--	req->NegotiateContextCount = cpu_to_le16(neg_context_count);
-+	req->NegotiateContextCount = cpu_to_le16(nc.cnt);
+ 	/* Mount options which take uid or gid */
+ 	fsparam_uid("backupuid", Opt_backupuid),
+@@ -840,6 +842,19 @@ static int smb3_fs_context_validate(struct fs_context *fc)
+ 		return -EOPNOTSUPP;
+ 	}
  
-+	*total_len = nc.len;
++	if (ctx->rdma && ctx->quic) {
++		cifs_errorf(fc, "SMB Direct and QUIC transport are mutually exclusive\n");
++		return -EOPNOTSUPP;
++	}
++
++	if (ctx->quic) {
++		pr_err("%x", ctx->vals->protocol_id);
++		if (ctx->vals->protocol_id < SMB311_PROT_ID) {
++			cifs_errorf(fc, "SMB over QUIC requires Version >=3.1.1\n");
++			return -EOPNOTSUPP;
++		}
++	}
++
+ #ifndef CONFIG_KEYS
+ 	/* Muliuser mounts require CONFIG_KEYS support */
+ 	if (ctx->multiuser) {
+@@ -1011,6 +1026,7 @@ static int smb3_verify_reconfigure_ctx(struct fs_context *fc,
+ 		cifs_errorf(fc, "can not change nbsessinit during remount\n");
+ 		return -EINVAL;
+ 	}
++	/* XXX(QUIC): support remount ? */
+ 
+ 	return 0;
+ }
+@@ -1871,6 +1887,13 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 	case Opt_rdma:
+ 		ctx->rdma = true;
+ 		break;
++	case Opt_quic:
++#if !IS_ENABLED(CONFIG_IP_QUIC)
++		cifs_dbg(VFS, "CONFIG_IP_QUIC is not enabled\n");
++		goto cifs_parse_mount_err;
++#endif
++		ctx->quic = true;
++		break;
+ 	case Opt_reparse:
+ 		if (parse_reparse_flavor(fc, param->string, ctx))
+ 			goto cifs_parse_mount_err;
+@@ -1896,7 +1919,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		ctx->symlinkroot = param->string;
+ 		param->string = NULL;
+ 		break;
++	case Opt_mtls:
++		ctx->mtls = true;
++		break;
+ 	}
++
+ 	/* case Opt_ignore: - is ignored as expected ... */
+ 
+ 	if (ctx->multiuser && ctx->upcall_target == UPTARGET_MOUNT) {
+diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
+index 0b64fcb5d302..e9b85c1c1937 100644
+--- a/fs/smb/client/fs_context.h
++++ b/fs/smb/client/fs_context.h
+@@ -143,6 +143,7 @@ enum cifs_param {
+ 	Opt_tcp_nodelay,
+ 	Opt_domainauto,
+ 	Opt_rdma,
++	Opt_quic,
+ 	Opt_modesid,
+ 	Opt_rootfs,
+ 	Opt_multichannel,
+@@ -199,6 +200,7 @@ enum cifs_param {
+ 	Opt_nativesocket,
+ 	Opt_symlink,
+ 	Opt_symlinkroot,
++	Opt_mtls,
+ 
+ 	/* Mount options to be ignored */
+ 	Opt_ignore,
+@@ -293,6 +295,8 @@ struct smb3_fs_context {
+ 	bool resilient:1; /* noresilient not required since not fored for CA */
+ 	bool domainauto:1;
+ 	bool rdma:1;
++	bool quic:1;
++	bool mtls:1;
+ 	bool multichannel:1;
+ 	bool multichannel_specified:1; /* true if user specified multichannel or nomultichannel */
+ 	bool max_channels_specified:1; /* true if user specified max_channels */
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index bac88a612d5d..848f9137f01d 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -732,6 +732,16 @@ build_posix_ctxt(struct smb2_posix_neg_context *pneg_ctxt)
+ 	return smb2_neg_context_len(pneg_ctxt);
  }
  
- /* If invalid preauth context warn but use what we requested, SHA-512 */
++static unsigned int
++build_transport_ctxt(struct smb2_transport_capabilities_context *pneg_ctxt)
++{
++	pneg_ctxt->ContextType = SMB2_TRANSPORT_CAPABILITIES;
++	pneg_ctxt->DataLength = cpu_to_le16(sizeof(struct smb2_transport_capabilities_context) -
++					    sizeof(struct smb2_neg_context));
++	pneg_ctxt->Flags = cpu_to_le32(SMB2_ACCEPT_TRANSPORT_LEVEL_SECURITY);
++	return smb2_neg_context_len(pneg_ctxt);
++}
++
+ struct neg_ctx {
+ 	char *pos;
+ 	unsigned int len;
+@@ -801,6 +811,11 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
+ 	if (enable_negotiate_signing)
+ 		add_context(&nc, build_signing_ctxt((struct smb2_signing_capabilities *)nc.pos));
+ 
++	if (cifs_quic_enabled(server) && server->quic_conn.need_smb_seal)
++		add_context(&nc,
++			    build_transport_ctxt(
++				    (struct smb2_transport_capabilities_context *)nc.pos));
++
+ 	/* check for and add transport_capabilities and signing capabilities */
+ 	req->NegotiateContextCount = cpu_to_le16(nc.cnt);
+ 
+@@ -945,6 +960,15 @@ static void decode_signing_ctx(struct TCP_Server_Info *server,
+ 		     server->signing_algorithm);
+ }
+ 
++static void
++decode_transport_ctx(struct TCP_Server_Info *server,
++		     struct smb2_transport_capabilities_context *pctxt)
++{
++	if (pctxt->Flags == cpu_to_le32(SMB2_ACCEPT_TRANSPORT_LEVEL_SECURITY))
++		server->quic_conn.need_smb_seal = false;
++	else
++		server->quic_conn.need_smb_seal = true;
++}
+ 
+ static int smb311_decode_neg_context(struct smb2_negotiate_rsp *rsp,
+ 				     struct TCP_Server_Info *server,
+@@ -997,6 +1021,9 @@ static int smb311_decode_neg_context(struct smb2_negotiate_rsp *rsp,
+ 		else if (pctx->ContextType == SMB2_SIGNING_CAPABILITIES)
+ 			decode_signing_ctx(server,
+ 				(struct smb2_signing_capabilities *)pctx);
++		else if (pctx->ContextType == SMB2_TRANSPORT_CAPABILITIES)
++			decode_transport_ctx(server,
++				(struct smb2_transport_capabilities_context *)pctx);
+ 		else
+ 			cifs_server_dbg(VFS, "unknown negcontext of type %d ignored\n",
+ 				le16_to_cpu(pctx->ContextType));
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index e64becee928f..46a67c7eba54 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -23,6 +23,7 @@
+ #include <linux/sched/signal.h>
+ #include <linux/task_io_accounting_ops.h>
+ #include <linux/task_work.h>
++#include <linux/quic.h>
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
+@@ -148,10 +149,12 @@ smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
+ 
+ 	*sent = 0;
+ 
+-	if (server->noblocksnd)
+-		smb_msg->msg_flags = MSG_DONTWAIT + MSG_NOSIGNAL;
+-	else
+-		smb_msg->msg_flags = MSG_NOSIGNAL;
++	if (cifs_quic_enabled(server)) {
++		if (server->noblocksnd)
++			smb_msg->msg_flags = MSG_DONTWAIT + MSG_NOSIGNAL;
++		else
++			smb_msg->msg_flags = MSG_NOSIGNAL;
++	}
+ 
+ 	while (msg_data_left(smb_msg)) {
+ 		/*
+@@ -270,7 +273,8 @@ int __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+ 
+ 	rc = 0;
+ 	/* cork the socket */
+-	tcp_sock_set_cork(ssocket->sk, true);
++	if (!cifs_quic_enabled(server))
++		tcp_sock_set_cork(ssocket->sk, true);
+ 
+ 	for (j = 0; j < num_rqst; j++)
+ 		send_length += smb_rqst_len(server, &rqst[j]);
+@@ -287,19 +291,17 @@ int __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+ 	sigprocmask(SIG_BLOCK, &mask, &oldmask);
+ 
+ 	/* Generate a rfc1002 marker */
+-	{
+-		struct kvec hiov = {
+-			.iov_base = &rfc1002_marker,
+-			.iov_len  = 4
+-		};
+-		iov_iter_kvec(&smb_msg.msg_iter, ITER_SOURCE, &hiov, 1, 4);
+-		rc = smb_send_kvec(server, &smb_msg, &sent);
+-		if (rc < 0)
+-			goto unmask;
++	struct kvec hiov = {
++		.iov_base = &rfc1002_marker,
++		.iov_len  = 4
++	};
++	iov_iter_kvec(&smb_msg.msg_iter, ITER_SOURCE, &hiov, 1, 4);
++	rc = smb_send_kvec(server, &smb_msg, &sent);
++	if (rc < 0)
++		goto unmask;
+ 
+-		total_len += sent;
+-		send_length += 4;
+-	}
++	total_len += sent;
++	send_length += 4;
+ 
+ 	cifs_dbg(FYI, "Sending smb: smb_len=%u\n", send_length);
+ 
+@@ -350,7 +352,9 @@ int __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+ 	}
+ 
+ 	/* uncork it */
+-	tcp_sock_set_cork(ssocket->sk, false);
++
++	if (!cifs_quic_enabled(server))
++		tcp_sock_set_cork(ssocket->sk, false);
+ 
+ 	if ((total_len > 0) && (total_len != send_length)) {
+ 		cifs_dbg(FYI, "partial send (wanted=%u sent=%zu): terminating session\n",
 -- 
 2.53.0
 
