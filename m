@@ -1,62 +1,63 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE99F44BCB6
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 16:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B71944BC9F
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 16:08:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777392505; cv=none; b=uQhzxxh74BRZowIILzVdXWnmeK+2lLG454WpmYPuXwuM+Cz9LPYVIj0/WPzQD6uBTVdksT+BB8uob6fb/UMKa3gYuV4E2fpRX0Wd55Uxu935HEZbS9LrDqlwv+qv0hcb8U3eYU69yJqWMqIFpNLQmrXEUROj4hek6keoUxW4z2g=
+	t=1777392506; cv=none; b=OsBjdCG1yxfYtMoKrw1ROQjry50RwBFG5wiLFT4xHXq7ZOb/ZS7uqoQPEey4DgYiwYeHeXdQiA7IOnroO7Eve+aS9Su+TnWLtAirEegFRPePzf57VScvtoIooR/MPgeXQ/NLMHkg1qdUbjqjA1pk9JXa1TLvPXG8HBraG1uKRno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777392505; c=relaxed/simple;
-	bh=7fs/qpQj7CViKJpl1xKhLVHakBiwsBbgCOkyBzjRtuo=;
+	s=arc-20240116; t=1777392506; c=relaxed/simple;
+	bh=6dnBavsoUPGKOpuSr3/LGHdvQnNq/ldgLGdG45nUMLY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mjb97F8UTuD8LwZWHb1fsKVE7eBb37En3iL7GdvFkXIeoGlGr/kg2Dg+PvuSTURsVYC5+SFr7Ez/ZrZVDNclO7kGeaH7YgUMGv0Cvh4+Zmkatngw38SIYYrzf+DQZMohvss3U36RQmFyHs5J8aqIShQpIlPy8CrMjwzHoRL5ylg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eCX1iSm/; arc=none smtp.client-ip=209.85.214.179
+	 MIME-Version; b=BnzW+MTC5L/qO+zr2sVoC/2RaJc4ZoCTkmmKPzIKhj2YP7JjAdT2uAcgAgIEW66GpSk91bIIaZC6kaafjHpCkFf7+hW+iYJyYeo4sheI7AskUtGjUcJEogU0dBf+5cT54VmAlNaWAANLllK7lZosrdQnRJpCRO1BGtdww6VXovw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CddK1cPc; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eCX1iSm/"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2ad4d639db3so57673455ad.0
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 09:08:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CddK1cPc"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-c648bc907ebso7595817a12.3
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 09:08:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777392503; x=1777997303; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777392504; x=1777997304; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4CeNnh5BjM1nRomeWQoA26EkMPBAyik+6iryoO/A02Y=;
-        b=eCX1iSm/pNtiEfgE/MKPgZzTZnDcB3VNGGmF/WbS5VynoPcoWs+AK4DR3QvJAPiBhP
-         Y0tDlZkNLpzCqHjzxThoDdiEhN6tBZHUmaaq0+Y5gDTra0f0YwNJAWRtP5CUbkRthVkl
-         FlKg5NCkoHZYVacHf11whpJlN7JPYDQzhA4QzbWumaIAM7JybmgtQZE3v0RKst0qb1Eh
-         +rKizQD61nx3uH8trBior4tDC10xn1JP2vi/teSc0G4t3GcOwEKXCPu+I1wBOU0z2bXS
-         +dvEQMa5cHAHuBtZxseeuaQZc9Fph64CC+1EaVyX5d7hJV7+1m9fKiJR95INp/5oQbYj
-         tJjA==
+        bh=GjSkteazy2KtXict54lW3Ei5YfQmOP5DNfNIY6d4raw=;
+        b=CddK1cPcPBfm8VLvNKewOQ96UgbknP7D5Ap2LQPgPqNyLmFaNlKOEVHvo8Uib5Sju4
+         C4wsey4IIGcnCY8yMO80sDBG54rOHolBgyir+n5jIeBCrT9yStww3mqKnLcespcks56e
+         anV8yZzJUeAXK9yVL4yGY+JqefKPcq6J1i9FNcNmxMLXIcB79tLZ80LuCJ2RofyuY4Qw
+         HkcwcXFN3lJyaYUCunNOFcoAH1agv9HnCyalUW8pdiJUwuwe0UjlYq96kL8YfqurNoEa
+         eNni+4z/L4biLJZA0sPg+cboL0oFmejgw6pPurgiv4Oz94/2nvY155M8fRI/OP0BK0p6
+         objw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777392503; x=1777997303;
+        d=1e100.net; s=20251104; t=1777392504; x=1777997304;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=4CeNnh5BjM1nRomeWQoA26EkMPBAyik+6iryoO/A02Y=;
-        b=sRrzGMYv9z6UyzgFAybFg5zS7zKJ4jUy2k+0B9hWwM8VZ7hitAQuloxnmthiPtgpOg
-         EATaC6HtIl0ZwNrgelX5gLivw9qVy/ajSij8HgOuIPWb2YGVeKPPReNG7EWD4GS2kLQ8
-         AuiL2doWEfNi2+3IKqvRwaVSdb/jEW6Hx84bGSIwfMl2cvT1ZxZa6P3Wl2clVebyFXgI
-         9wda/03JyRZ4m3MGOYcRjqdq0FFZPWkMmpj0D0ByxiQQ+dh/X6UdEi0kPiwftOWDSggE
-         0apzdvODpEOCbgciHzBg772ZuI1LUID6KDbjrTwgIrgYYltUng+tZPWaIPkYSBFrc84Q
-         Y0ew==
-X-Gm-Message-State: AOJu0YyKkJC1x2/HsemwWDiQhiNGu4FH/6zQse+6WPVrN2Dt/6XDDQA9
-	Kb/ydK4jvyr1C4R/4n5u/CQfkF3lEmd5VPdip1CWC3zkfiqzm1GbU57ktLqTc53S
-X-Gm-Gg: AeBDieu4vdvt4A6VDDa0UvsHBzjDD78s4DX0mVhpCfIoAWAlpiyAbrM8dbmJXkq4AHC
-	+8M2FL9S0KQX4o9z5QpcOmvHUVkS0DuBrt8mvEMB54d9zBzwaMbHs0Cf03qnkIgSG16BQH3mB5j
-	1UkNOGiP63KRheMWUvAFBbONMga7/6OL4HKWVvzJ5N38mKzokeeCJ8zAQRk/8qg0LqcZN/XZZAW
-	qmd2PaqxkZWuog8s0fkUwwd2OJowGz8jQhlOOQWbrRCwa/1fDqtfalRDL7EPgTdxtBcMgJ7hFbx
-	00QSHZnRnc7hl7IrK7gaDk+Q8a1gNUXrO40z+IRT6OxK4rcXGgKmisK9zQ+K24moATXaBZhqFXA
-	LhiCXkMEcFSFY56f1kSancq23im7pbuKu3kORKhvBKdf0YSyfHE7KWQHmer/ic7/B1FD4wWlJLN
-	eEyCi2chomtKSbIUK4wrrvQeUPK9cx8MVtvNUEb3KeeP947q49IN0FM6jhEZCGs9cO
-X-Received: by 2002:a17:902:c412:b0:2b0:5cb4:d89d with SMTP id d9443c01a7336-2b97c499589mr39140425ad.29.1777392502782;
-        Tue, 28 Apr 2026 09:08:22 -0700 (PDT)
+        bh=GjSkteazy2KtXict54lW3Ei5YfQmOP5DNfNIY6d4raw=;
+        b=LFPAWob91YyZLfYf5+ethx8jmlR1VT1BS2YRt+aER9dXj/5UXXWuBP4tUWLzOQ2kGs
+         PE1MEDSAmM3f2xEkHVocNlhFa2Go6OciW6Fdh/DiudSxRiUoSIS4GTGvCxPiiAYHRhFr
+         QpoEppSPVxEBIn2eQUG2dx7uPxkR6zb4s9TXWcf5uJYJnWzXLdYGt9WNDLv1027ntdWk
+         aJTHmAgbPleGcgULAzsGF15C+hQ/u9d3ei4DSZH0d7yaBMMSTDjoJ741qRXlEbbI1JOT
+         y0a7UheqZOBtjPCrrrRlmOeuw0iFFAmGyJ7iU9tNlAdidd0fatVPjCxvXzhW43quybgI
+         Tthw==
+X-Gm-Message-State: AOJu0YzN34wqkvozTWh2/OmR6RmlQiU/jQxzIB+qxD/tRPHdHTZklN1A
+	13tsSW3oA6fcBYkqu6nvLhhcUcTnVHgsjH/xXcc2iaAJxhbT1ZUy9ZQ+eEiJJYPQ
+X-Gm-Gg: AeBDietibQ941B2Ex36UwzL0AQp42ab28zfh9R2D2NHEn55qFYBLqyavpJIHqQqPT4w
+	U8MC/rzxUwKphuOy5ZbQyxnI4f8tuv6BKDypFCZw/yCiPMlDFwQ1MbSRrFM95AMdpSLyoJTXJO4
+	rQWPkQhRiaOebt0dOELUVE/Sm3oRha7Wj5F7fLDmL7c9yyfL8ojkdf3QiwoGNlfzteCQDWlxvFD
+	YAJFGwUoIFHid3on8jDc57YTPgufT5TCUoZzEaPBb+A0nfHwMgfSdb5HlI3jX5iSFOp2hf6jyKh
+	ING4Ms18BgnpkhWKsdebPiQmzh0mYEIUdbJ/mF2ZQVYVscenBKmP+mhK5Y5x2xHZCi2hPV7airx
+	eC7QrDlyFLicXhQ2OLffhWJyAzTH0+Ht5iRiNGgMI8dKJCf6z9DJLwhKuzzfSETlVX9kTzwD9Lw
+	cWC+sboyjyn8FJvs9NAVFezzlPQuE/SeRMaXUKyMCNLhrxC1PCRdsPhq++VMCb36V/lxDSHGAIg
+	nM=
+X-Received: by 2002:a17:903:1205:b0:2b2:4eec:9806 with SMTP id d9443c01a7336-2b97c406d7fmr37341115ad.8.1777392503799;
+        Tue, 28 Apr 2026 09:08:23 -0700 (PDT)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.216])
         by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b97ac7894csm30864465ad.50.2026.04.28.09.08.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 09:08:22 -0700 (PDT)
+        Tue, 28 Apr 2026 09:08:23 -0700 (PDT)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -67,9 +68,9 @@ To: linux-cifs@vger.kernel.org,
 	henrique.carvalho@suse.com,
 	ematsumiya@suse.de
 Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH v3 04/19] cifs: define variable sized buffer for querydir responses
-Date: Tue, 28 Apr 2026 21:37:49 +0530
-Message-ID: <20260428160804.281745-4-sprasad@microsoft.com>
+Subject: [PATCH v3 05/19] cifs: optimize readdir for small directories
+Date: Tue, 28 Apr 2026 21:37:50 +0530
+Message-ID: <20260428160804.281745-5-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260428160804.281745-1-sprasad@microsoft.com>
 References: <20260428160804.281745-1-sprasad@microsoft.com>
@@ -83,104 +84,332 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-QueryDirectory responses today are stored in one of two fixed
-sized buffers: smallbuf (448 bytes) or bigbuf (16KB). These are
-borrowed from server struct and are not sufficient for large-sized
-query dir operations.
+For small directories (where the entire directory contents could be
+read in a single QueryDir request), we currently do an extra
+round-trip just to get a STATUS_NO_MORE_FILES back from the server.
 
-With this change we will now define a new buffer type specifically
-for cifs_search_info to hold variable sized responses. These will
-be allocated by kmalloc and freed by kfree.
+This change avoids doing that by adding another QueryDir to the first
+compound to the server for readdir. i.e. first request to readdir
+will correspond to a compound of (OPEN+QD1+QD2). QD2 will request
+for a smaller size (in anticipation of STATUS_NO_MORE_FILES).
 
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/cifsglob.h |  2 ++
- fs/smb/client/file.c     |  2 ++
- fs/smb/client/readdir.c  |  2 ++
- fs/smb/client/smb2pdu.c  | 14 +++++++++++---
- 4 files changed, 17 insertions(+), 3 deletions(-)
+ fs/smb/client/smb2ops.c   | 156 ++++++++++++++++++++++++++++++++++----
+ fs/smb/client/smb2pdu.c   |  19 +++--
+ fs/smb/client/smb2pdu.h   |  11 +++
+ fs/smb/client/smb2proto.h |   3 +-
+ 4 files changed, 168 insertions(+), 21 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 709e96e077916..8d089ba08e3e5 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1394,6 +1394,7 @@ struct cifs_search_info {
- 	bool emptyDir:1;
- 	bool unicode:1;
- 	bool smallBuf:1; /* so we know which buf_release function to call */
-+	bool is_dynamic_buf:1; /* dynamically allocated buffer - can be variable size */
- };
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index a9d68e5fcea91..f075330f88598 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -2450,18 +2450,21 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     struct cifs_search_info *srch_inf)
+ {
+ 	__le16 *utf16_path;
+-	struct smb_rqst rqst[2];
+-	struct kvec rsp_iov[2];
+-	int resp_buftype[2];
++	struct smb_rqst rqst[3];
++	struct kvec rsp_iov[3];
++	int resp_buftype[3];
+ 	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
+-	struct kvec qd_iov[SMB2_QUERY_DIRECTORY_IOV_SIZE];
++	struct kvec qd_iov[SMB2_QUERY_DIRECTORY_IOV_SIZE + 1]; /* +1 for padding */
++	struct kvec qd2_iov[SMB2_QUERY_DIRECTORY_IOV_SIZE + 1]; /* +1 for padding */
+ 	int rc, flags = 0;
+ 	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+ 	struct cifs_open_parms oparms;
+ 	struct smb2_query_directory_rsp *qd_rsp = NULL;
++	struct smb2_query_directory_rsp *qd2_rsp = NULL;
+ 	struct smb2_create_rsp *op_rsp = NULL;
+ 	struct TCP_Server_Info *server;
+ 	int retries = 0, cur_sleep = 0;
++	unsigned int compound_resp_bufsize;
  
- #define ACL_NO_MODE	((umode_t)(-1))
-@@ -1907,6 +1908,7 @@ enum cifs_find_flags {
- #define   CIFS_NO_BUFFER        0    /* Response buffer not returned */
- #define   CIFS_SMALL_BUFFER     1
- #define   CIFS_LARGE_BUFFER     2
-+#define   CIFS_DYNAMIC_BUFFER   3    /* Dynamically allocated buffer */
- #define   CIFS_IOVEC            4    /* array of response buffers */
+ replay_again:
+ 	/* reinitialize for possible replay */
+@@ -2476,8 +2479,15 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if (smb3_encryption_required(tcon))
+ 		flags |= CIFS_TRANSFORM_REQ;
  
- /* Type of Request to SendReceive2 */
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index a69e05f86d7e2..6a1419d59ed5a 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -1546,6 +1546,8 @@ int cifs_closedir(struct inode *inode, struct file *file)
- 		cfile->srch_inf.ntwrk_buf_start = NULL;
- 		if (cfile->srch_inf.smallBuf)
- 			cifs_small_buf_release(buf);
-+		else if (cfile->srch_inf.is_dynamic_buf)
-+			kfree(buf);
- 		else
- 			cifs_buf_release(buf);
++	/*
++	 * Clamp compound Create+QD1+QD2 response sizing to a response size
++	 * for suited for one credit even if CIFSMaxBufSize is tuned larger
++	 */
++	compound_resp_bufsize = min_t(unsigned int, CIFSMaxBufSize,
++				      SMB2_MAX_BUFFER_SIZE);
++
+ 	memset(rqst, 0, sizeof(rqst));
+-	resp_buftype[0] = resp_buftype[1] = CIFS_NO_BUFFER;
++	resp_buftype[0] = resp_buftype[1] = resp_buftype[2] = CIFS_NO_BUFFER;
+ 	memset(rsp_iov, 0, sizeof(rsp_iov));
+ 
+ 	/* Open */
+@@ -2501,7 +2511,7 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 		goto qdf_free;
+ 	smb2_set_next_command(tcon, &rqst[0]);
+ 
+-	/* Query directory */
++	/* First Query directory */
+ 	srch_inf->entries_in_buffer = 0;
+ 	srch_inf->index_of_last_entry = 2;
+ 
+@@ -2512,11 +2522,27 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rc = SMB2_query_directory_init(xid, tcon, server,
+ 				       &rqst[1],
+ 				       COMPOUND_FID, COMPOUND_FID,
+-				       0, srch_inf->info_level);
++				       0, srch_inf->info_level,
++				       SMB2_QD1_OUTPUT_SIZE(compound_resp_bufsize));
+ 	if (rc)
+ 		goto qdf_free;
+ 
+ 	smb2_set_related(&rqst[1]);
++	smb2_set_next_command(tcon, &rqst[1]);
++
++	/* Second Query directory - minimal size to check if more data exists */
++	memset(&qd2_iov, 0, sizeof(qd2_iov));
++	rqst[2].rq_iov = qd2_iov;
++	rqst[2].rq_nvec = SMB2_QUERY_DIRECTORY_IOV_SIZE;
++
++	rc = SMB2_query_directory_init(xid, tcon, server,
++				       &rqst[2],
++				       COMPOUND_FID, COMPOUND_FID,
++				       0, srch_inf->info_level, SMB2_QD2_RESPONSE_SIZE);
++	if (rc)
++		goto qdf_free;
++
++	smb2_set_related(&rqst[2]);
+ 
+ 	if (retries) {
+ 		/* Back-off before retry */
+@@ -2524,10 +2550,11 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 			msleep(cur_sleep);
+ 		smb2_set_replay(server, &rqst[0]);
+ 		smb2_set_replay(server, &rqst[1]);
++		smb2_set_replay(server, &rqst[2]);
  	}
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index be22bbc4a65a0..b50efd9b9e1d2 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -732,6 +732,8 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
- 			if (cfile->srch_inf.smallBuf)
- 				cifs_small_buf_release(cfile->srch_inf.
- 						ntwrk_buf_start);
-+			else if (cfile->srch_inf.is_dynamic_buf)
-+				kfree(cfile->srch_inf.ntwrk_buf_start);
- 			else
- 				cifs_buf_release(cfile->srch_inf.
- 						ntwrk_buf_start);
+ 
+ 	rc = compound_send_recv(xid, tcon->ses, server,
+-				flags, 2, rqst,
++				flags, 3, rqst,
+ 				resp_buftype, rsp_iov);
+ 
+ 	/* If the open failed there is nothing to do */
+@@ -2559,14 +2586,111 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 		goto qdf_free;
+ 	}
+ 
+-	rc = smb2_parse_query_directory(tcon, &rsp_iov[1], resp_buftype[1],
+-					srch_inf);
+-	if (rc) {
+-		trace_smb3_query_dir_err(xid, fid->persistent_fid, tcon->tid,
+-			tcon->ses->Suid, 0, 0, rc);
+-		goto qdf_free;
++	qd2_rsp = (struct smb2_query_directory_rsp *)rsp_iov[2].iov_base;
++
++	/*
++	 * If QD2 has data, combine QD1 and QD2 responses before parsing.
++	 * The server cursor advances past both responses, so we can't discard QD2.
++	 */
++	if (qd2_rsp && qd2_rsp->hdr.Status == STATUS_SUCCESS &&
++	    le32_to_cpu(qd2_rsp->OutputBufferLength) > 0) {
++		char *combined_buf;
++		size_t qd1_data_len, qd2_data_len, combined_len;
++		u16 qd1_offset, qd2_offset;
++		struct smb2_query_directory_rsp *combined_rsp;
++		struct kvec combined_iov;
++		FILE_DIRECTORY_INFO *last_entry_in_qd1;
++		char *qd1_entries_start, *qd2_entries_start;
++		unsigned int next_offset;
++
++		qd1_offset = le16_to_cpu(qd_rsp->OutputBufferOffset);
++		qd2_offset = le16_to_cpu(qd2_rsp->OutputBufferOffset);
++		qd1_data_len = le32_to_cpu(qd_rsp->OutputBufferLength);
++		qd2_data_len = le32_to_cpu(qd2_rsp->OutputBufferLength);
++
++		/* Allocate buffer for: QD1 header + QD1 data + QD2 data */
++		combined_len = qd1_offset + qd1_data_len + qd2_data_len;
++		combined_buf = kmalloc(combined_len, GFP_KERNEL);
++		if (!combined_buf) {
++			rc = -ENOMEM;
++			goto qdf_free;
++		}
++
++		/* Copy QD1 header and data */
++		memcpy(combined_buf, qd_rsp, qd1_offset + qd1_data_len);
++
++		/* Append QD2 data (directory entries only, not the header) */
++		memcpy(combined_buf + qd1_offset + qd1_data_len,
++		       (char *)qd2_rsp + qd2_offset, qd2_data_len);
++
++		/* Update OutputBufferLength to reflect combined data */
++		combined_rsp = (struct smb2_query_directory_rsp *)combined_buf;
++		combined_rsp->OutputBufferLength = cpu_to_le32(qd1_data_len + qd2_data_len);
++
++		/*
++		 * Chain QD1 and QD2 entries: find the last entry in QD1 and update
++		 * its NextEntryOffset to point to the first entry in QD2.
++		 */
++		if (qd1_data_len > 0) {
++			qd1_entries_start = combined_buf + qd1_offset;
++			qd2_entries_start = combined_buf + qd1_offset + qd1_data_len;
++			last_entry_in_qd1 = (FILE_DIRECTORY_INFO *)qd1_entries_start;
++
++			/* Walk QD1 entries to find the last one with bounds checking */
++			while (1) {
++				char *end_of_qd1 = qd1_entries_start + qd1_data_len;
++
++				next_offset = le32_to_cpu(last_entry_in_qd1->NextEntryOffset);
++				if (next_offset == 0)
++					break;  /* Found last entry */
++
++				/* Bounds check before advancing */
++				if ((char *)last_entry_in_qd1 + next_offset >= end_of_qd1) {
++					cifs_dbg(VFS, "query_dir_first: invalid NextEntryOffset in QD1\n");
++					kfree(combined_buf);
++					rc = -EIO;
++					goto qdf_free;
++				}
++
++				last_entry_in_qd1 = (FILE_DIRECTORY_INFO *)((char *)last_entry_in_qd1 + next_offset);
++			}
++
++			/* Chain last QD1 entry to first QD2 entry */
++			last_entry_in_qd1->NextEntryOffset = cpu_to_le32(qd2_entries_start - (char *)last_entry_in_qd1);
++		}
++
++		/* Parse the combined buffer */
++		combined_iov.iov_base = combined_buf;
++		combined_iov.iov_len = combined_len;
++		rc = smb2_parse_query_directory(tcon, &combined_iov, CIFS_DYNAMIC_BUFFER,
++						srch_inf);
++		if (rc) {
++			kfree(combined_buf);
++			trace_smb3_query_dir_err(xid, fid->persistent_fid, tcon->tid,
++						 tcon->ses->Suid, 0, 0, rc);
++			goto qdf_free;
++		}
++		/* Ownership of combined_buf transferred to srch_inf->ntwrk_buf_start */
++		srch_inf->endOfSearch = false;
++		cifs_dbg(FYI, "query_dir_first: combined QD1 and QD2, %d entries\n",
++			 srch_inf->entries_in_buffer);
++	} else {
++		/* No data in QD2, just parse QD1 */
++		rc = smb2_parse_query_directory(tcon, &rsp_iov[1], resp_buftype[1],
++						srch_inf);
++		if (rc) {
++			trace_smb3_query_dir_err(xid, fid->persistent_fid, tcon->tid,
++						 tcon->ses->Suid, 0, 0, rc);
++			goto qdf_free;
++		}
++		resp_buftype[1] = CIFS_NO_BUFFER;
++
++		/* Check if QD2 indicates end of directory */
++		if (qd2_rsp && qd2_rsp->hdr.Status == STATUS_NO_MORE_FILES) {
++			srch_inf->endOfSearch = true;
++			cifs_dbg(FYI, "query_dir_first: small directory, all entries read\n");
++		}
+ 	}
+-	resp_buftype[1] = CIFS_NO_BUFFER;
+ 
+ 	trace_smb3_query_dir_done(xid, fid->persistent_fid, tcon->tid,
+ 			tcon->ses->Suid, 0, srch_inf->entries_in_buffer);
+@@ -2575,8 +2699,10 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 	kfree(utf16_path);
+ 	SMB2_open_free(&rqst[0]);
+ 	SMB2_query_directory_free(&rqst[1]);
++	SMB2_query_directory_free(&rqst[2]);
+ 	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
+ 	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
++	free_rsp_buf(resp_buftype[2], rsp_iov[2].iov_base);
+ 
+ 	if (is_replayable_error(rc) &&
+ 	    smb2_should_replay(tcon, &retries, &cur_sleep))
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 5188218c25be4..49dca84b169e6 100644
+index 49dca84b169e6..2d55246d2851b 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -5625,6 +5625,8 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
- 	if (srch_inf->ntwrk_buf_start) {
- 		if (srch_inf->smallBuf)
- 			cifs_small_buf_release(srch_inf->ntwrk_buf_start);
-+		else if (srch_inf->is_dynamic_buf)
-+			kfree(srch_inf->ntwrk_buf_start);
- 		else
- 			cifs_buf_release(srch_inf->ntwrk_buf_start);
- 	}
-@@ -5644,12 +5646,18 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
- 	cifs_dbg(FYI, "num entries %d last_index %lld srch start %p srch end %p\n",
- 		 srch_inf->entries_in_buffer, srch_inf->index_of_last_entry,
- 		 srch_inf->srch_entries_start, srch_inf->last_entry);
--	if (resp_buftype == CIFS_LARGE_BUFFER)
-+	if (resp_buftype == CIFS_LARGE_BUFFER) {
- 		srch_inf->smallBuf = false;
--	else if (resp_buftype == CIFS_SMALL_BUFFER)
-+		srch_inf->is_dynamic_buf = false;
-+	} else if (resp_buftype == CIFS_SMALL_BUFFER) {
- 		srch_inf->smallBuf = true;
--	else
-+		srch_inf->is_dynamic_buf = false;
-+	} else if (resp_buftype == CIFS_DYNAMIC_BUFFER) {
-+		srch_inf->smallBuf = false;
-+		srch_inf->is_dynamic_buf = true;
-+	} else {
- 		cifs_tcon_dbg(VFS, "Invalid search buffer type\n");
-+	}
+@@ -5504,18 +5504,27 @@ int SMB2_query_directory_init(const unsigned int xid,
+ 			      struct TCP_Server_Info *server,
+ 			      struct smb_rqst *rqst,
+ 			      u64 persistent_fid, u64 volatile_fid,
+-			      int index, int info_level)
++			      int index, int info_level,
++			      unsigned int output_size)
+ {
+ 	struct smb2_query_directory_req *req;
+ 	unsigned char *bufptr;
+ 	__le16 asteriks = cpu_to_le16('*');
+-	unsigned int output_size = CIFSMaxBufSize -
+-		MAX_SMB2_CREATE_RESPONSE_SIZE -
+-		MAX_SMB2_CLOSE_RESPONSE_SIZE;
+ 	unsigned int total_len;
+ 	struct kvec *iov = rqst->rq_iov;
+ 	int len, rc;
  
- 	return 0;
- }
++	/*
++	 * Use provided output_size, or default to CIFSMaxBufSize calculation.
++	 * The default is for standalone QueryDir (smb2_query_dir_next).
++	 * For compounds, the caller should pass explicit output_size.
++	 */
++	if (output_size == 0) {
++		output_size = CIFSMaxBufSize -
++			MAX_SMB2_CREATE_RESPONSE_SIZE -
++			MAX_SMB2_CLOSE_RESPONSE_SIZE;
++	}
++
+ 	rc = smb2_plain_req_init(SMB2_QUERY_DIRECTORY, tcon, server,
+ 				 (void **) &req, &total_len);
+ 	if (rc)
+@@ -5697,7 +5706,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rc = SMB2_query_directory_init(xid, tcon, server,
+ 				       &rqst, persistent_fid,
+ 				       volatile_fid, index,
+-				       srch_inf->info_level);
++				       srch_inf->info_level, 0);
+ 	if (rc)
+ 		goto qdir_exit;
+ 
+diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
+index 30d70097fe2fa..7b7a864520c68 100644
+--- a/fs/smb/client/smb2pdu.h
++++ b/fs/smb/client/smb2pdu.h
+@@ -129,6 +129,17 @@ struct share_redirect_error_context_rsp {
+  */
+ #define MAX_SMB2_CREATE_RESPONSE_SIZE 880
+ 
++/* Size of the minimal QueryDir response for checking if more data exists */
++#define SMB2_QD2_RESPONSE_SIZE 4096
++
++/*
++ * Output buffer size for first QueryDir in Create+QD1+QD2 compound.
++ * Accounts for shared buffer space needed for all three responses.
++ */
++#define SMB2_QD1_OUTPUT_SIZE(bufsize) \
++	((bufsize) - MAX_SMB2_CREATE_RESPONSE_SIZE - \
++	 sizeof(struct smb2_hdr) - SMB2_QD2_RESPONSE_SIZE)
++
+ #define SMB2_LEASE_READ_CACHING_HE	0x01
+ #define SMB2_LEASE_HANDLE_CACHING_HE	0x02
+ #define SMB2_LEASE_WRITE_CACHING_HE	0x04
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index 230bb1e9f4e19..9de7d2fe8d466 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -194,7 +194,8 @@ int SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ int SMB2_query_directory_init(const unsigned int xid, struct cifs_tcon *tcon,
+ 			      struct TCP_Server_Info *server,
+ 			      struct smb_rqst *rqst, u64 persistent_fid,
+-			      u64 volatile_fid, int index, int info_level);
++			      u64 volatile_fid, int index, int info_level,
++			      unsigned int output_size);
+ void SMB2_query_directory_free(struct smb_rqst *rqst);
+ int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
+ 		 u64 persistent_fid, u64 volatile_fid, u32 pid,
 -- 
 2.43.0
 
