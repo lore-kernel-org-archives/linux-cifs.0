@@ -1,61 +1,63 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CBC2EDD62
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 15:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9ADB35A384
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 15:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777391753; cv=none; b=G2HrkLUOdss99AVpDYqGjXyCJCb4oCFiDF+mEWxqEBSK9vAIfI7cvKRPBPJMRnuQxpxdfMQZ3AAgWN3QcbogsaQfx40PW/kbL3tNHDnmgpWGHk90jBFz6ZV35wXEzB7iHshuj4NQ8up/C/T5WpZp2HZfZvoDnAeDSuUyrAJpuSM=
+	t=1777391761; cv=none; b=HlX3nPAaYHENAandpeK6ZD5AqO6sNH/nBqxo/6YgHTjUmduyKrukyYKtTa1sWGs1ALvXwmYhwx4mgbO3oKdyCFVdL41LugojZgOfgdcuf+Vc9VuJyT78iOZz9vJaXxhsFw2xFU7C4211BiMYTF8q9Nl3Qx8mv3W+kbOEc9OVNuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777391753; c=relaxed/simple;
-	bh=n0BQfxQVbZ+HUT/SKFdr6DJY0aUqo6UQMG5FhqOIK7Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tfzADUCh2e1jJByJzs56FCZmZKITpNNY7qBsh0D6RDFtVVIqhhozq59wgT1FU1IP4kriC4rVnt4iO5A/5XTgElObV/+e2+XqPh7O3IlMUtqi2zdJq6ncaq8Z/xEEaPvF7F5T7h+EvBAb9Phd4+XpkRKamofo0JlGoxJVUMRMRHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=HklPJ3fv; arc=none smtp.client-ip=209.85.128.43
+	s=arc-20240116; t=1777391761; c=relaxed/simple;
+	bh=o9AxzB6iTIxvV3zczxNnobMq6mUvwYWWzYA0xI/jRJc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ck2C3m8w6NCw2S+qhmpOkHB9/Jh6MuV66e0m1k0M8X3hAOv9kMMCcE09HUUlZeTCbKagNNcruvmvfVVjqsz6NJcEN3NwdXmlXpl7b/YjldDnfykAXhoOT6AQnjgmvG/Jbq6TgpUGbToNSSB0T4Hi/Yi1bBWl9rHRNbeA+CTf4oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Y3kmdTXR; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="HklPJ3fv"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-488a8ca4aadso160709725e9.3
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 08:55:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Y3kmdTXR"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso107646305e9.3
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Apr 2026 08:55:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1777391750; x=1777996550; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=abklTRLGHL23wDOsvqEZ5hRcvaVhgj6AyTo/Z7WVkRs=;
-        b=HklPJ3fvEUKPMIz6l8NooW1MXVQKRDf7D7huS5jLePLUr8rTqnXsLjIEa3NKxZJUry
-         zgOlSG4WckSVYuZ7rUwJZfOR6IEAqHAs8qyoWFBztDKSrBCcNbFeUKIothlcTjBwOZ2X
-         jXT28o9A1whyail9Fq0gKrD2O1mAEY0LEXuf4u1SYv42Vg2RWfgJFW1QcSfsp6MC+Fy8
-         RCxwim6/nYomISrHNtNybVq0xvsQEiYzbA0J5JibSD+EHzZyhXO8EhZurKpd7/vZ1g5Z
-         aLl+707kXMgOO2loVVhkSTy4FS5HnP2O0PVOySfA/CvZ6OrlUZ082R05ziwblq2uwn8I
-         uXxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777391750; x=1777996550;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=suse.com; s=google; t=1777391758; x=1777996558; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=abklTRLGHL23wDOsvqEZ5hRcvaVhgj6AyTo/Z7WVkRs=;
-        b=n8HxxI/RpAZmiyiPxkD/0GCRJKglALmBGUqYifF0PWEElxho0MAC/A6dsR/i9FEBJs
-         yNgEKxU28FqPR6ziWtT21mD6gHChCqVYTN1amxQqxwFYLOjIBhO7zjkY0zJsz04XhiJw
-         gBiHpUgdsynRjYCE6i6x824KauU99xR6S62Fl/Z9tXyNukd3aFovS2I+rblwwl7uRpWH
-         Rs/z/6xD4dEEju8X9d8R5X3ZoxnqVwOiPtki+Nkx/4aId3p9XDCkXV4u1GQLmIZPckNw
-         HATM23+SbYSwKCRhoFc/jACwhMIZw94kULzKR8V4rPiXrS6uyxWWBIXV5i68a2Mn8b+g
-         /ttA==
-X-Gm-Message-State: AOJu0Yzlf8LYYBuenn1UdDRE3gGjOtSf68iWU5DaQ58Yzypv3KeLzOvk
-	IlQf4giTq2JXE6uFBVydOmFHdLnf6RerSVgHy2ozAA49DklegRvZlV8arIi4jWXkAMVz9CBOWDO
-	EzpFta1hx5A==
-X-Gm-Gg: AeBDievrW0YstvgutISQ7Ivf2Jl205fMK/fvuIFgap+6QL3uJB2cH+jBYuYLytqZaum
-	t70MoGSeBVo6xTFsFfa6ZWGVuVIpnoGry//s/SUxvcGnOXujSIrIteg/1o7k2XNSYQ6kFl11A6f
-	g7vU7B78rPGCkN+Uhbup5TLHQtFOXd/2hpgj+S+doR1dBdTuQkons5fHkMuWM6ixUyUrtPaD0HT
-	zdRLO837K9D9fT1BprktSrHVD1L1NBQWtYQuYfNCyxCd5n7rzxY+z7r8YC7VPvJ2NMt1qHRp3Nj
-	acJVWqnWGwLGgA0Dxe45zucfvUTcSlaMG5FHRU1Sb/NoECX4hB1dlp+IYBzT0cDVzDukkq+6+fI
-	fnvaxI2j//CQfGS++ry4tvePrpZr5QLe0tYXoGVStHmDwKpxUfdD4s9eavB0H53xNvimns728Gm
-	Nyy3irmyzjKJxyiUZMeaAf4HNIjt91/VdEaANiqtf+lNd0
-X-Received: by 2002:a05:600c:c101:b0:489:1d23:4524 with SMTP id 5b1f17b1804b1-48a7b512650mr2886575e9.5.1777391749841;
-        Tue, 28 Apr 2026 08:55:49 -0700 (PDT)
+        bh=HaDqba+Z9YUDbJcQeyPUHQc2cEFoh6ewPsWR4yOwgNI=;
+        b=Y3kmdTXRWvhZo/uEnjuw9CS1lYvLVxiXO336zVicZBJIsYpzaWqCfAW2WhMeEd/y3J
+         RqE9rOCzpV3xpxmpZiG0zX14m0VVk/MAfWHu1O2YH/27p9e8ls3lFwi4GABfYPSJhIB4
+         Wjd40u/PPw2cXTwzTDcIfVLcmdiWMv/gXpoGlwdTNukXi0CaRbL45+as/5ApYM9S7x38
+         Szl/5W47kdXupxZYpXNsdrj4/1chfy9qBMaMidzbtmiebml2HnGbcAsnqjKgILwB6LVH
+         FmmEemy8bjCct9ed1ElcRuj5wweOmeqyWACymaOxSHiSVup1GW8BgDdpj1/C5TIetGNZ
+         FXsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777391758; x=1777996558;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HaDqba+Z9YUDbJcQeyPUHQc2cEFoh6ewPsWR4yOwgNI=;
+        b=nGto9tQIae7HdVUpZTmwr7w+FZK0aoQA16Xl0SO8OR2T4/5uf+3YESbUl1r0K7UxIy
+         V2vM4/XFETL5WQOyFu+DPqIIuwlwvvje8AHoGWSL8jfJgSI77qVg77xZegrae0DrCfvU
+         0F7rqV5eJQq7LW/HFYN8G1Tp2wTEmTuboS9e2Nv1jwIQpGeQ31hmwKIMaKpyBbcfSn9P
+         HNZICafW59jIfv0ziVX85Jj4KgKBslXyZf3+D2qkFhwAZSczWuXXqej6gIA9IwmZNC9A
+         +MLYLEGkj/wgnQuQlpWAKDDBKAOWw/zkRqc107IlOAwRxe8yEHRLa5PcsotKunjZrEDe
+         POIQ==
+X-Gm-Message-State: AOJu0Yymy5XZbAWUhDaCwWM36HghlPtDSngDovx7gPDUCpfjygePRJSB
+	LQLnJAW2wultUw4nXnydOUuppy/XkDPdA+Gh3nww30BeGDxJBJQ3Fyldgi+Ux8TyjOOAC9W82ez
+	8pgLGVvwP6w==
+X-Gm-Gg: AeBDiesWhtzQCcKLgN3Prgyx05PdXo69wsjilxxLukD9+lje3MSbcMwSN7WElu2ysGk
+	bG7Ws1EQuxpYvCHtp0xoFwk236lR+MzGtcHxyhElu0W1LGjDEYRsphFMsitU0eKSYm6ZZa1kdq7
+	iZ49QNo9k/Zwb0fD5vvlONpbeCZZtBQ+o/gK3/q7sjff3we66hxNwTeRqysLMxPo9YPVcEFk8y+
+	ERXTrjE4Z1I/lQ704H9pUS5BzyhMHQE9PaXz8A6WEzk77EjrSKfJOsfD/UYkic218Ktvw3kIMR5
+	Grg4pkYE3GXazwyLeTM11SK3jNfmVCMUECSUGjJP2PiAnH5yh2kQSCuRvECl2FftO1010ceYrDh
+	0LZr5HFxXTrDYxz29xxusGcBkbPfTXDPka5uIpp4F/O8dsmczJ+HCn+XvjFJh4K8/lfkLNcBcqR
+	zGyRJsS5WwpZpdBgn7qwZ4SAC4gl2dYc+JQ1hD5zwH/CKx
+X-Received: by 2002:a05:600c:c091:b0:48a:58ae:9938 with SMTP id 5b1f17b1804b1-48a77b19957mr42724765e9.19.1777391757646;
+        Tue, 28 Apr 2026 08:55:57 -0700 (PDT)
 Received: from precision ([2a01:4b00:c007:bb00:be9d:a3c4:18b1:4a25])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a775f56fcsm23475685e9.25.2026.04.28.08.55.49
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a775f56fcsm23475685e9.25.2026.04.28.08.55.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 08:55:49 -0700 (PDT)
+        Tue, 28 Apr 2026 08:55:57 -0700 (PDT)
 From: Henrique Carvalho <henrique.carvalho@suse.com>
 To: linux-cifs@vger.kernel.org
 Cc: sfrench@samba.org,
@@ -68,10 +70,12 @@ Cc: sfrench@samba.org,
 	bharathsm@microsoft.com,
 	ematsumiya@suse.de,
 	Henrique Carvalho <henrique.carvalho@suse.com>
-Subject: [PATCH v2 00/11] smb: implement SMB over QUIC
-Date: Tue, 28 Apr 2026 12:55:38 -0300
-Message-ID: <20260428155542.226234-1-henrique.carvalho@suse.com>
+Subject: [PATCH v2 01/11] smb: common: add smb_tls struct shared by client and server
+Date: Tue, 28 Apr 2026 12:55:39 -0300
+Message-ID: <20260428155542.226234-2-henrique.carvalho@suse.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260428155542.226234-1-henrique.carvalho@suse.com>
+References: <20260428155542.226234-1-henrique.carvalho@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -80,68 +84,52 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Both the SMB client (mount path) and ksmbd server (accept path) need
+to drive a TLS handshake over their accepted/connected QUIC socket
+via the kernel handshake API.
 
-This series introduces SMB over QUIC for cifs.ko and ksmbd.ko.
+Pull the small bit of state shared between the two callers - the
+completion, status and peerid populated by the handshake callback,
+and the tls_handshake_args structure passed to
+tls_{client,server}_hello_x509() - into one common header in
+fs/smb/common/smbglob.h.
 
-I'm sending this early for review as this work was rebased on top of
-metze's recent transport and smbdirect changes -- at least some of it,
-as well as on top of lxin's QUIC branch, and depends on these branches
-being merged upstream.
+Define SMB_TLS_TIMEOUT_MS (3000) here as well so client and server
+agree on the handshake timeout.
 
-The branch for this series is available at:
-https://gitlab.com/hacr/linux/-/tree/smb-quic-v1
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+---
+ fs/smb/common/smbglob.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Changes in v2: nothing, I just sent the patches in wrong order in v1.
-
-Henrique Carvalho (11):
-  smb: common: add smb_tls struct shared by client and server
-  smb: client: refactor negotiate context assembly
-  smb: client: prepare connect path for QUIC transport
-  smb: client: add QUIC mount and transport setup
-  smb: server: split interface management from TCP in preparation for
-    QUIC
-  smb: server: add shared transport helpers in preparation for QUIC
-  smb: server: reuse common transport helpers in TCP transport
-  smb: server: add QUIC transport support
-  smb: server: refactor TCP transport definitions
-  smb: server: track TCP and QUIC listener state independently
-  docs: smb: document SMB3 over QUIC setup for cifs.ko and ksmbd.ko
-
- Documentation/filesystems/smb/index.rst |   1 +
- Documentation/filesystems/smb/ksmbd.rst |   2 +-
- Documentation/filesystems/smb/quic.rst  | 332 +++++++++++++++
- fs/smb/client/cifsglob.h                |  19 +-
- fs/smb/client/connect.c                 | 234 ++++++++++-
- fs/smb/client/fs_context.c              |  37 ++
- fs/smb/client/fs_context.h              |   4 +
- fs/smb/client/smb2pdu.c                 | 133 +++---
- fs/smb/client/transport.c               |  40 +-
- fs/smb/common/smbglob.h                 |  12 +
- fs/smb/server/Makefile                  |   3 +-
- fs/smb/server/connection.c              |  11 +-
- fs/smb/server/connection.h              |  10 +-
- fs/smb/server/interface.c               | 235 +++++++++++
- fs/smb/server/interface.h               |  36 ++
- fs/smb/server/mgmt/tree_connect.c       |   2 +-
- fs/smb/server/server.h                  |   1 +
- fs/smb/server/smb2pdu.c                 |   1 +
- fs/smb/server/transport.c               | 344 ++++++++++++++++
- fs/smb/server/transport.h               |  40 ++
- fs/smb/server/transport_ipc.c           |   3 +-
- fs/smb/server/transport_quic.c          | 327 +++++++++++++++
- fs/smb/server/transport_quic.h          |  20 +
- fs/smb/server/transport_tcp.c           | 526 ++----------------------
- fs/smb/server/transport_tcp.h           |  10 +-
- 25 files changed, 1785 insertions(+), 598 deletions(-)
- create mode 100644 Documentation/filesystems/smb/quic.rst
- create mode 100644 fs/smb/server/interface.c
- create mode 100644 fs/smb/server/interface.h
- create mode 100644 fs/smb/server/transport.c
- create mode 100644 fs/smb/server/transport.h
- create mode 100644 fs/smb/server/transport_quic.c
- create mode 100644 fs/smb/server/transport_quic.h
-
+diff --git a/fs/smb/common/smbglob.h b/fs/smb/common/smbglob.h
+index 4e33d91cdc9d..a08d804af0ed 100644
+--- a/fs/smb/common/smbglob.h
++++ b/fs/smb/common/smbglob.h
+@@ -11,6 +11,9 @@
+ #ifndef _COMMON_SMB_GLOB_H
+ #define _COMMON_SMB_GLOB_H
+ 
++#include <net/sock.h>
++#include <net/handshake.h>
++
+ struct smb_version_values {
+ 	char		*version_string;
+ 	__u16		protocol_id;
+@@ -66,4 +69,13 @@ static inline void inc_rfc1001_len(void *buf, int count)
+ 
+ #define MAX_CIFS_SMALL_BUFFER_SIZE 448 /* big enough for most */
+ 
++struct smb_tls {
++	struct completion handshake_done;
++	int status;
++	key_serial_t peerid;
++	struct tls_handshake_args args;
++};
++
++#define SMB_TLS_TIMEOUT_MS 3000
++
+ #endif	/* _COMMON_SMB_GLOB_H */
 -- 
 2.53.0
 
