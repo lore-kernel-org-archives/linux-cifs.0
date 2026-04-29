@@ -1,406 +1,135 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605B140243E
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 13:43:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777470240; cv=none; b=DG3A8TWz8llVrVntA5QPp0A6gHi5mQ4PsN9PomrFAOwg8f/7uMLjcdjFMjYXESdw96XVXrWbi61mNqlMzepqalE+pZshI55xE//DobC7rWW462/r9virxiMTn4Z8Bgv18rNGNnx6bURJhmAcyDuW3Olomtm2wX8y//9zBYnNAag=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777470240; c=relaxed/simple;
-	bh=43nHlSffDBj0VZcGJdABQnWLjhJTuvwzUBxOIgp/Zcg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b8xnD07S1R6JgDwaH+p5wsgy0M6qvbZffRnsKQsClSbb+Uhwp41NUu94yO6d6b65rdFOtzYiX5kf1OS9x0sTKdAYdRxtZnCMv7FprBOZE5MWgukKSkxPuXdiDd+uEwKV8BNCoIyeTYXj+Ggz591utT7sZ0d71yUPPsxO+ypMsl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=4FZKKTsq; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DAF382F01
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 16:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777478436; cv=pass; b=gwFO5nJA5TpBxSywy3t4bhYT2BrYULc5R2Tv/OpeVNK0YSUV0i9qSWle4rl+88h2yaRtg+jB/VCfNr92CKqYuhq1ylZMoF+ViRf1CpKry07xTxnIXOdea9JlJH25VB1fD+hv4elcHzs8Td8Kd7Td7wT1H4WfcL3reOCrLS0dU+8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777478436; c=relaxed/simple;
+	bh=ClqcxKRaL4dnan+V5xnQ+K7P63qzxV+3NchBCJmJLEQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U27L2GsiePk9Kvr+Fl4omWOPjicRd/xVOq7IQ0cCR12XRUezPsypMqLZIx621Appu7syvpyc5vPhqfWfqCfdu6C0d+OzNSgIlNWpOhk3F4OEqaD7p/lyNjdG8ocycbw6bXPPwUB81Zwhi5aHfpgJWks9R0NfKT3z26he2NiGPFM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X4n9hw2U; arc=pass smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="4FZKKTsq"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=84dniJZ51MKX+Cn41tpKuh6iwfhWxHS65xtmHI/s+tM=; b=4FZKKTsqMX+knQmChuzYbUWAxz
-	lAdUUmRkvIxo3yqeECpTYxts62aY1s6Oi5qxH3aDB+fHQkkJXPvxhCvLTLD853g8PEN5NrRroht+m
-	ldtCPu/o7S1lejhvVnYpgbK2F8IE9Q8Do1/cATnddgC7UnmzI4DZFdGy2NJlU5ZuJfUP9c5KLZykg
-	lzvppR3mS/f0YxLFZHCJQJlPK5wCOaBAKLGNcWMIe30tIdXDMNMYyPF8jzY1DgPgh662V0hl+hYjS
-	ptl0O2wqXpOUCreKDv00ngf42UW7wNwhHTGt+4HL7ml7gRjiUXX7VmiAbc7lYGKd/lZgo9wHkATwA
-	/5U0G4BkO++yBMA3IPe8AobG6lyAVx0orbsUcp9ysnWla6xQalCtZcgcd8KyqGj9E2ZDdBtp5CRm4
-	0n80DCM0dQo6Nri6GzmTl1+d3eEwQrVHTQBJiPxj2t/+pfAcrMY8KaGzmf+L4d2pVWjn1qJ305XRR
-	24kX60qKkAy4/6EIJ0U46QQg;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wI5Cg-000000050Xb-0hTh;
-	Wed, 29 Apr 2026 13:43:50 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: metze@samba.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 1/2] smb: smbdirect: make use of DEFAULT_SYMBOL_NAMESPACE and EXPORT_SYMBOL_GPL
-Date: Wed, 29 Apr 2026 15:43:35 +0200
-Message-ID: <4c459d366679d0c83fae4fffa5f6c04e84f6be1d.1777463800.git.metze@samba.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1777463800.git.metze@samba.org>
-References: <cover.1777463800.git.metze@samba.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X4n9hw2U"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8f0a87e23daso814779485a.1
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 09:00:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777478434; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JIBv0Y6ys+dppbaQkusyPDP4mtT1NhTaLXX9tcwO18vgdXP9RqO50NyFtBTn0KljFu
+         JAY918KnQTVt3PnBM89zo0kT9cBnEjesDKogDGSUGDBHlrocuqeEzBkmrZGVvKMz5Y6j
+         FJkn7PrefZEb/bz15Qz6NoJb9SIbWttsrNuCx8rUig2On3i4ax92L+j9dRbyP8LruMWQ
+         9ExPdZ5qLIZnjmyCZbgkDVjFfPSuSMSAt1slMp6fAWXRndI4SfvncktLGoJoJmJVCHf+
+         +r0VDz9DA6o3bBOcSX/zANERA12WGPh+CwIUrDfBNFn9vezig4KSh+A/MQQscTolgb+M
+         chFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ClqcxKRaL4dnan+V5xnQ+K7P63qzxV+3NchBCJmJLEQ=;
+        fh=FRnV+WHfzXR7Ysl/f5dtC/8AeBVj7J4+6QS7n234kgs=;
+        b=MPJ/7h1Ln+VRnPbc5fQ7dnwzUhAVtQx/QT+NJng64mz23xwZ6hJ1G4ZTyUwdIIigyv
+         qFbmokKhqaU+Dp3VRKX9cepMivYkO92Z+4bv7Z05t1elWT51EU5PXfDPaIQ/fXDf4G6S
+         dmrsNg+0gT+EJemIgyLHg+UP/dWEyK7oY8YWoVrZLfxyCJlmp7+dB+Zy5PglBZdE5Jdv
+         RDkJ5jQQq4yIOQqqi/J+J+SSBHDCaWOj3UayB9U4cZ0VaH4Nw+KDAjfuzIlsmS2W9qZP
+         8k5WrgDqBjT2rGJcrD5/hf6V8lkr4gs9RFK9xZSd1webqrLHGvrJJ7B3FRBe8PRQGXhr
+         hIWw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777478434; x=1778083234; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ClqcxKRaL4dnan+V5xnQ+K7P63qzxV+3NchBCJmJLEQ=;
+        b=X4n9hw2U8g+F0NsSeL7V6bElsfVaRDDYkLTMHJlPuUy4Sis+iFtpTIegyXWaaapz1/
+         rlR40JeJoHgV68cUtK0CxQIMV2bivfdPKFqx4ZRV83o4BO3Fy8LOzpIWXyhSt6z/exGl
+         XuqgnU6gXxtruL7ut+LmtSkn8XAoNrmWiK5Ymms2VGQfZ6vjCpopPXxrrDtmAbMaIuju
+         1PAa74m3OzD0THLC1CUyVHygCgB7TSqle9CKXGrJLDPW7k4iJTNAS2tWgCzmTvhGCenv
+         bgF9U7n/dbtKFy2u+yNpCmhTsxml7usdURVNPDIktYfK9oXt5lblxP0iTY1xcp/TnioG
+         6Q/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777478434; x=1778083234;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ClqcxKRaL4dnan+V5xnQ+K7P63qzxV+3NchBCJmJLEQ=;
+        b=HfbHDf5Z6sBMtrygqN30siga6uv4EJTlW0l4NdBRpHEofCtIR95a75ztr7q54lxdEP
+         7KBhq5xiypgEuvt3/mVdNukjtGnFcHYw/1P6RT7+J7twT8LAkGydBLj9/EwYd0HnJfsX
+         AIvwTw89t8ZTfO86zAYlxRlmAUDtOHvdmCuWQ+wUA0B0Mofesfvf1M4+zQNDLa+UDdCA
+         ZrXQXNwwifPb4Hv1uYG5L0JtNKo58PswLBt32hlVsz1PHUj5J6salPjYn7igF5V5igYy
+         XxqpgSkj215Kmtu6Ak3uLhr40FjbzZYsFU5n0zF5BJLf5mHh2kWBEfXFS6BA2UaUO/bQ
+         ieJA==
+X-Forwarded-Encrypted: i=1; AFNElJ9LF87re0qI2VMDEEllhCyr9kYSV9DxSvFzEt1z9KrQpPN4lPw9y53a0ON9znR2CpT0vTSxx3VIx39L@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwYakDSv99E0nhOlrzr3wDtIO/kaC0Nf/kn8Ky4VSuAnk8ZigE
+	xquKERyOCPcvNaLdV7dU6ZpkMazV7UOqdr9tsMH7wWULHWqwiwUc+EfPGmNBjeeJ2V4GHfGuvQl
+	0zq1ZFBMlC9qt27S4PVOqsqTKdByb5yw=
+X-Gm-Gg: AeBDieu/x0eyy5tllQlXUiThJzkajygMYdymSCOjqT4SMINVLeu52zDxP9CPuStIn33
+	IfJhJZ6y351v0snxzdjh3oqDZJAX9vQRJI4dMKWpP6I0cjMVUyfiOiNv+Kovw1EyXoyd49hq6cW
+	3B1anEV+FxHWw+tnsA7CcvFJGBUUwu/cOKWp/S7wa7k4tq50XHnx2FYYdVyqrDxSQ37WpB3eCvw
+	tXQV1+DF39MB36lwdfzL76Com131AU6UcdYfHtCwUiIoIykBKfaPC0isbaP63zJJ7Y6KiE4yIvn
+	bW50eYeZaMdHooEW9wcGgKQO0ZiDd5gj3sL7R5IVwZURZQICiLXIglqPJoApDTTpxuxOrIDtuwz
+	RLErDGYzJcdkRNdrx8sqLKld1SNZVaw4PNYiJRgVLDv+2dEfWEuBPNpX74HiSCx4UOtX4hPs=
+X-Received: by 2002:a05:6214:c62:b0:89c:a2ad:33a0 with SMTP id
+ 6a1803df08f44-8b3faf92dfamr3522326d6.45.1777478427727; Wed, 29 Apr 2026
+ 09:00:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <85118db1.AWEAAJaZP3EAAAAAAAAABAMtJJUAAYKKIjQAAAAAAC-ZZgBp8da6@mailjet.com>
+ <CAKYAXd-Ci4ReATdeoSr1Y++JfF1qF3i-QnbX+Qa2NDnGho2aBw@mail.gmail.com>
+In-Reply-To: <CAKYAXd-Ci4ReATdeoSr1Y++JfF1qF3i-QnbX+Qa2NDnGho2aBw@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 29 Apr 2026 11:00:16 -0500
+X-Gm-Features: AVHnY4LflfW3xyEZ5eiiB7Zxl1DZbOLhyICb6eb8JMp3MIWJ8qXtJnlL0ec9mJo
+Message-ID: <CAH2r5mviS10YWwYxUF27D6tKsXuEc=SMt0J7XC2_Eztezm-tjg@mail.gmail.com>
+Subject: Re: [PATCH v2] smb: smbdirect: fix MR registration for coalesced SG lists
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Yi Kuo <yi@yikuo.dev>, metze@samba.org, tom@talpey.com, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This is a better solution than
-EXPORT_SYMBOL_FOR_MODULES(__sym, "cifs,ksmbd") as it makes
-it possible to rebuild smbdirect.ko against a
-running kernel and then load the existing cifs.ko and ksmbd.ko
-from the running kernel.
+merged into ksmbd-for-next
 
-Suggested-by: Christoph Hellwig <hch@infradead.org>
-Link: https://lore.kernel.org/linux-cifs/aehrPuY60VMcYGU8@infradead.org/
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
----
- fs/smb/client/smbdirect.c      |  2 ++
- fs/smb/server/transport_rdma.c |  2 ++
- fs/smb/smbdirect/accept.c      |  2 +-
- fs/smb/smbdirect/connect.c     |  4 ++--
- fs/smb/smbdirect/connection.c  | 16 ++++++++--------
- fs/smb/smbdirect/debug.c       |  2 +-
- fs/smb/smbdirect/devices.c     |  2 +-
- fs/smb/smbdirect/internal.h    |  1 +
- fs/smb/smbdirect/listen.c      |  2 +-
- fs/smb/smbdirect/mr.c          |  6 +++---
- fs/smb/smbdirect/public.h      |  2 --
- fs/smb/smbdirect/rw.c          |  2 +-
- fs/smb/smbdirect/socket.c      | 20 ++++++++++----------
- 13 files changed, 33 insertions(+), 30 deletions(-)
+On Wed, Apr 29, 2026 at 5:17=E2=80=AFAM Namjae Jeon <linkinjeon@kernel.org>=
+ wrote:
+>
+> On Wed, Apr 29, 2026 at 7:00=E2=80=AFPM Yi Kuo <yi@yikuo.dev> wrote:
+> >
+> > ib_dma_map_sg() modifies the provided scatterlist and returns the
+> > number of mapped entries, which can be fewer than the requested
+> > mr->sgt.nents if the DMA controller coalesces contiguous memory
+> > segments. Passing the original, uncoalesced count to ib_map_mr_sg()
+> > causes memory registration failures if coalescing actually occurs.
+> >
+> > Capture the actual mapped count returned by ib_dma_map_sg() and pass it
+> > to ib_map_mr_sg() to ensure correct MR registration.
+> >
+> > Also update the ib_dma_map_sg() error logging to drop the error
+> > pointer formatting, since the return value is an integer count
+> > rather than an error code.
+> >
+> > Ensure a proper error code (-EIO) is assigned when DMA mapping or
+> > MR registration fails.
+> >
+> > Fixes: de5ef8ec3c46 ("smb: smbdirect: introduce smbdirect_mr.c with cli=
+ent mr code")
+> > Closes: https://bugzilla.kernel.org/show_bug.cgi?id=3D221408
+> > Signed-off-by: Yi Kuo <yi@yikuo.dev>
+> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+> Thanks!
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 75f9f91a7ec9..b9826185de18 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -558,3 +558,5 @@ void smbd_debug_proc_show(struct TCP_Server_Info *server, struct seq_file *m)
- 						    server->rdma_readwrite_threshold,
- 						    m);
- }
-+
-+MODULE_IMPORT_NS("SMBDIRECT");
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index a8242c00096f..346c051e31f5 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -540,3 +540,5 @@ static const struct ksmbd_transport_ops ksmbd_smb_direct_transport_ops = {
- 	.rdma_write	= smb_direct_rdma_write,
- 	.free_transport = smb_direct_free_transport,
- };
-+
-+MODULE_IMPORT_NS("SMBDIRECT");
-diff --git a/fs/smb/smbdirect/accept.c b/fs/smb/smbdirect/accept.c
-index 704b271af3a8..529740005838 100644
---- a/fs/smb/smbdirect/accept.c
-+++ b/fs/smb/smbdirect/accept.c
-@@ -854,4 +854,4 @@ struct smbdirect_socket *smbdirect_socket_accept(struct smbdirect_socket *lsc,
- 
- 	return nsc;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_accept);
-+EXPORT_SYMBOL_GPL(smbdirect_socket_accept);
-diff --git a/fs/smb/smbdirect/connect.c b/fs/smb/smbdirect/connect.c
-index 8addee43a381..cd726b399afe 100644
---- a/fs/smb/smbdirect/connect.c
-+++ b/fs/smb/smbdirect/connect.c
-@@ -60,7 +60,7 @@ int smbdirect_connect(struct smbdirect_socket *sc, const struct sockaddr *dst)
- 	 */
- 	return 0;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connect);
-+EXPORT_SYMBOL_GPL(smbdirect_connect);
- 
- static int smbdirect_connect_setup_connection(struct smbdirect_socket *sc)
- {
-@@ -922,4 +922,4 @@ int smbdirect_connect_sync(struct smbdirect_socket *sc,
- 
- 	return 0;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connect_sync);
-+EXPORT_SYMBOL_GPL(smbdirect_connect_sync);
-diff --git a/fs/smb/smbdirect/connection.c b/fs/smb/smbdirect/connection.c
-index 8f5676158537..8adf58097534 100644
---- a/fs/smb/smbdirect/connection.c
-+++ b/fs/smb/smbdirect/connection.c
-@@ -706,7 +706,7 @@ bool smbdirect_connection_is_connected(struct smbdirect_socket *sc)
- 		return false;
- 	return true;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_is_connected);
-+EXPORT_SYMBOL_GPL(smbdirect_connection_is_connected);
- 
- int smbdirect_connection_wait_for_connected(struct smbdirect_socket *sc)
- {
-@@ -779,7 +779,7 @@ int smbdirect_connection_wait_for_connected(struct smbdirect_socket *sc)
- 
- 	return 0;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_wait_for_connected);
-+EXPORT_SYMBOL_GPL(smbdirect_connection_wait_for_connected);
- 
- void smbdirect_connection_idle_timer_work(struct work_struct *work)
- {
-@@ -958,7 +958,7 @@ int smbdirect_connection_send_batch_flush(struct smbdirect_socket *sc,
- 
- 	return ret;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_send_batch_flush);
-+EXPORT_SYMBOL_GPL(smbdirect_connection_send_batch_flush);
- 
- struct smbdirect_send_batch *
- smbdirect_init_send_batch_storage(struct smbdirect_send_batch_storage *storage,
-@@ -976,7 +976,7 @@ smbdirect_init_send_batch_storage(struct smbdirect_send_batch_storage *storage,
- 
- 	return batch;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_init_send_batch_storage);
-+EXPORT_SYMBOL_GPL(smbdirect_init_send_batch_storage);
- 
- static int smbdirect_connection_wait_for_send_bcredit(struct smbdirect_socket *sc,
- 						      struct smbdirect_send_batch *batch)
-@@ -1263,7 +1263,7 @@ int smbdirect_connection_send_single_iter(struct smbdirect_socket *sc,
- bcredit_failed:
- 	return ret;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_send_single_iter);
-+EXPORT_SYMBOL_GPL(smbdirect_connection_send_single_iter);
- 
- int smbdirect_connection_send_wait_zero_pending(struct smbdirect_socket *sc)
- {
-@@ -1288,7 +1288,7 @@ int smbdirect_connection_send_wait_zero_pending(struct smbdirect_socket *sc)
- 
- 	return 0;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_send_wait_zero_pending);
-+EXPORT_SYMBOL_GPL(smbdirect_connection_send_wait_zero_pending);
- 
- int smbdirect_connection_send_iter(struct smbdirect_socket *sc,
- 				   struct iov_iter *iter,
-@@ -1373,7 +1373,7 @@ int smbdirect_connection_send_iter(struct smbdirect_socket *sc,
- 
- 	return total_count;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_send_iter);
-+EXPORT_SYMBOL_GPL(smbdirect_connection_send_iter);
- 
- static void smbdirect_connection_send_io_done(struct ib_cq *cq, struct ib_wc *wc)
- {
-@@ -1937,7 +1937,7 @@ int smbdirect_connection_recvmsg(struct smbdirect_socket *sc,
- 
- 	goto again;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_recvmsg);
-+EXPORT_SYMBOL_GPL(smbdirect_connection_recvmsg);
- 
- static bool smbdirect_map_sges_single_page(struct smbdirect_map_sges *state,
- 					   struct page *page, size_t off, size_t len)
-diff --git a/fs/smb/smbdirect/debug.c b/fs/smb/smbdirect/debug.c
-index a66a19d4a463..05ba7c8d165e 100644
---- a/fs/smb/smbdirect/debug.c
-+++ b/fs/smb/smbdirect/debug.c
-@@ -85,4 +85,4 @@ void smbdirect_connection_legacy_debug_proc_show(struct smbdirect_socket *sc,
- 		   atomic_read(&sc->mr_io.ready.count),
- 		   atomic_read(&sc->mr_io.used.count));
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_legacy_debug_proc_show);
-+EXPORT_SYMBOL_GPL(smbdirect_connection_legacy_debug_proc_show);
-diff --git a/fs/smb/smbdirect/devices.c b/fs/smb/smbdirect/devices.c
-index 44962f221c35..7adacbdfe12e 100644
---- a/fs/smb/smbdirect/devices.c
-+++ b/fs/smb/smbdirect/devices.c
-@@ -238,7 +238,7 @@ u8 smbdirect_netdev_rdma_capable_node_type(struct net_device *netdev)
- 
- 	return RDMA_NODE_UNSPECIFIED;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_netdev_rdma_capable_node_type);
-+EXPORT_SYMBOL_GPL(smbdirect_netdev_rdma_capable_node_type);
- 
- __init int smbdirect_devices_init(void)
- {
-diff --git a/fs/smb/smbdirect/internal.h b/fs/smb/smbdirect/internal.h
-index 2d5acf2c21bc..82529b41708b 100644
---- a/fs/smb/smbdirect/internal.h
-+++ b/fs/smb/smbdirect/internal.h
-@@ -6,6 +6,7 @@
- #ifndef __FS_SMB_COMMON_SMBDIRECT_INTERNAL_H__
- #define __FS_SMB_COMMON_SMBDIRECT_INTERNAL_H__
- 
-+#define DEFAULT_SYMBOL_NAMESPACE "SMBDIRECT"
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
- #include "smbdirect.h"
-diff --git a/fs/smb/smbdirect/listen.c b/fs/smb/smbdirect/listen.c
-index 143a7618d95f..2f78bcaedbf8 100644
---- a/fs/smb/smbdirect/listen.c
-+++ b/fs/smb/smbdirect/listen.c
-@@ -90,7 +90,7 @@ int smbdirect_socket_listen(struct smbdirect_socket *sc, int backlog)
- 	 */
- 	return 0;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_listen);
-+EXPORT_SYMBOL_GPL(smbdirect_socket_listen);
- 
- static int smbdirect_new_rdma_event_handler(struct rdma_cm_id *new_id,
- 					    struct rdma_cm_event *event)
-diff --git a/fs/smb/smbdirect/mr.c b/fs/smb/smbdirect/mr.c
-index 5a428ff1b369..15c6363a2f97 100644
---- a/fs/smb/smbdirect/mr.c
-+++ b/fs/smb/smbdirect/mr.c
-@@ -383,7 +383,7 @@ smbdirect_connection_register_mr_io(struct smbdirect_socket *sc,
- 		mutex_unlock(&mr->mutex);
- 	return NULL;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_register_mr_io);
-+EXPORT_SYMBOL_GPL(smbdirect_connection_register_mr_io);
- 
- void smbdirect_mr_io_fill_buffer_descriptor(struct smbdirect_mr_io *mr,
- 					    struct smbdirect_buffer_descriptor_v1 *v1)
-@@ -400,7 +400,7 @@ void smbdirect_mr_io_fill_buffer_descriptor(struct smbdirect_mr_io *mr,
- 	}
- 	mutex_unlock(&mr->mutex);
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_mr_io_fill_buffer_descriptor);
-+EXPORT_SYMBOL_GPL(smbdirect_mr_io_fill_buffer_descriptor);
- 
- /*
-  * Deregister a MR after I/O is done
-@@ -493,4 +493,4 @@ void smbdirect_connection_deregister_mr_io(struct smbdirect_mr_io *mr)
- 	if (!kref_put(&mr->kref, smbdirect_mr_io_free_locked))
- 		mutex_unlock(&mr->mutex);
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_deregister_mr_io);
-+EXPORT_SYMBOL_GPL(smbdirect_connection_deregister_mr_io);
-diff --git a/fs/smb/smbdirect/public.h b/fs/smb/smbdirect/public.h
-index 50088155e7c3..d4fb36e65254 100644
---- a/fs/smb/smbdirect/public.h
-+++ b/fs/smb/smbdirect/public.h
-@@ -13,8 +13,6 @@ struct smbdirect_socket;
- struct smbdirect_send_batch;
- struct smbdirect_mr_io;
- 
--#define __SMBDIRECT_EXPORT_SYMBOL__(__sym) EXPORT_SYMBOL_FOR_MODULES(__sym, "cifs,ksmbd")
--
- #include <rdma/rw.h>
- 
- u8 smbdirect_netdev_rdma_capable_node_type(struct net_device *netdev);
-diff --git a/fs/smb/smbdirect/rw.c b/fs/smb/smbdirect/rw.c
-index c2f46b17731e..6fe38042cfb9 100644
---- a/fs/smb/smbdirect/rw.c
-+++ b/fs/smb/smbdirect/rw.c
-@@ -252,4 +252,4 @@ int smbdirect_connection_rdma_xmit(struct smbdirect_socket *sc,
- 	kfree(msg);
- 	goto out;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_connection_rdma_xmit);
-+EXPORT_SYMBOL_GPL(smbdirect_connection_rdma_xmit);
-diff --git a/fs/smb/smbdirect/socket.c b/fs/smb/smbdirect/socket.c
-index 1b4ab01b745e..39cca7219c4d 100644
---- a/fs/smb/smbdirect/socket.c
-+++ b/fs/smb/smbdirect/socket.c
-@@ -20,7 +20,7 @@ bool smbdirect_frwr_is_supported(const struct ib_device_attr *attrs)
- 		return false;
- 	return true;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_frwr_is_supported);
-+EXPORT_SYMBOL_GPL(smbdirect_frwr_is_supported);
- 
- static void smbdirect_socket_cleanup_work(struct work_struct *work);
- 
-@@ -107,7 +107,7 @@ int smbdirect_socket_create_kern(struct net *net, struct smbdirect_socket **_sc)
- alloc_failed:
- 	return ret;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_create_kern);
-+EXPORT_SYMBOL_GPL(smbdirect_socket_create_kern);
- 
- int smbdirect_socket_init_accepting(struct rdma_cm_id *id, struct smbdirect_socket *sc)
- {
-@@ -148,7 +148,7 @@ int smbdirect_socket_create_accepting(struct rdma_cm_id *id, struct smbdirect_so
- alloc_failed:
- 	return ret;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_create_accepting);
-+EXPORT_SYMBOL_GPL(smbdirect_socket_create_accepting);
- 
- int smbdirect_socket_set_initial_parameters(struct smbdirect_socket *sc,
- 					    const struct smbdirect_socket_parameters *sp)
-@@ -189,14 +189,14 @@ int smbdirect_socket_set_initial_parameters(struct smbdirect_socket *sc,
- 
- 	return 0;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_set_initial_parameters);
-+EXPORT_SYMBOL_GPL(smbdirect_socket_set_initial_parameters);
- 
- const struct smbdirect_socket_parameters *
- smbdirect_socket_get_current_parameters(struct smbdirect_socket *sc)
- {
- 	return &sc->parameters;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_get_current_parameters);
-+EXPORT_SYMBOL_GPL(smbdirect_socket_get_current_parameters);
- 
- int smbdirect_socket_set_kernel_settings(struct smbdirect_socket *sc,
- 					 enum ib_poll_context poll_ctx,
-@@ -220,7 +220,7 @@ int smbdirect_socket_set_kernel_settings(struct smbdirect_socket *sc,
- 
- 	return 0;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_set_kernel_settings);
-+EXPORT_SYMBOL_GPL(smbdirect_socket_set_kernel_settings);
- 
- void smbdirect_socket_set_logging(struct smbdirect_socket *sc,
- 				  void *private_ptr,
-@@ -240,7 +240,7 @@ void smbdirect_socket_set_logging(struct smbdirect_socket *sc,
- 	sc->logging.needed = needed;
- 	sc->logging.vaprintf = vaprintf;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_set_logging);
-+EXPORT_SYMBOL_GPL(smbdirect_socket_set_logging);
- 
- static void smbdirect_socket_wake_up_all(struct smbdirect_socket *sc)
- {
-@@ -663,13 +663,13 @@ int smbdirect_socket_bind(struct smbdirect_socket *sc, struct sockaddr *addr)
- 
- 	return 0;
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_bind);
-+EXPORT_SYMBOL_GPL(smbdirect_socket_bind);
- 
- void smbdirect_socket_shutdown(struct smbdirect_socket *sc)
- {
- 	smbdirect_socket_schedule_cleanup_lvl(sc, SMBDIRECT_LOG_INFO, -ESHUTDOWN);
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_shutdown);
-+EXPORT_SYMBOL_GPL(smbdirect_socket_shutdown);
- 
- static void smbdirect_socket_release_disconnect(struct kref *kref)
- {
-@@ -712,7 +712,7 @@ void smbdirect_socket_release(struct smbdirect_socket *sc)
- 	 */
- 	kref_put(&sc->refs.destroy, smbdirect_socket_release_destroy);
- }
--__SMBDIRECT_EXPORT_SYMBOL__(smbdirect_socket_release);
-+EXPORT_SYMBOL_GPL(smbdirect_socket_release);
- 
- int smbdirect_socket_wait_for_credits(struct smbdirect_socket *sc,
- 				      enum smbdirect_socket_status expected_status,
--- 
-2.43.0
 
+
+--=20
+Thanks,
+
+Steve
