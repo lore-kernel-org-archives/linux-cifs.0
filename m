@@ -1,136 +1,79 @@
-Received: from o4.p38.mailjet.com (o4.p38.mailjet.com [185.250.237.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C161DFDE
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 10:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.250.237.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E141030B529;
+	Wed, 29 Apr 2026 10:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777456831; cv=none; b=e8+zZtxhgzRHV5cttk0rwn38mAN3gk3bg2QgxyXbWkkJ1Ab7+MTzAaThg7d3yy64HQHkjMyOiuwFaaEE6NF9iQcRCvLyNCiVGx2gPc/h+a7nx16QEda0qzJKlGFLSapltCXW/YjsSbkVsRKEI+ZY6Rg/s7wEqdBIJg3jOBML52w=
+	t=1777456952; cv=none; b=AKAxOeAvFja/Jmsj2gm8xY9W71ip31gMxgE9bhdmX/xDc4mJntPMRi9u1ASQUfk6lTBatclMdvrc20l/Omd9QPoh3dtclibNQM4uaIcM1N89LCd//+7/sWj7GbOFAIhIWwhIaJG+h5KzOTXwWOFNnfAnJHq3IAyFAB/etF1jdyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777456831; c=relaxed/simple;
-	bh=vxjuH98lz95r5OFYrZlc34xqxhXWg4UjUYUzzX5mptw=;
-	h=Message-Id:MIME-Version:From:To:Subject:Date:Cc; b=hDL62aq8Efm6yjVpB5GB2+yHMmQOuBxB0BTJ/SohMxybBaBnC3Q8mnFJ4iYzIDsE4/xS0yhR1/TO8ygm1DZtwUin4VxdCkH0j+FCa/9/D/ugECJDsGJjaGBFPpfj+6zOVF/c6ye3v6hAgsd0paciUKXGderUBU9nnJxn7SvzWBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yikuo.dev; spf=pass smtp.mailfrom=a3119462.bnc3.mailjet.com; dkim=pass (2048-bit key) header.d=yikuo.dev header.i=yi@yikuo.dev header.b=gMrUbgBP; arc=none smtp.client-ip=185.250.237.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yikuo.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a3119462.bnc3.mailjet.com
+	s=arc-20240116; t=1777456952; c=relaxed/simple;
+	bh=5YxoJVw44KcgxBvVmsrpnvEKT6/I3k3MSEPJNDbF2po=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sJXxFN4FDr6O2T1mJnRQk25I/e786Kq75ggfi9p/HYjOoNEl2+eUx2SwuABTBRmThMRbuHmV8aHSZ2OKgYVsEfGymoPf9qIKDXEv/GBn8m5lawp7uNTChv98lERR/aUUJQSitqaDkzDEDwQaeyPWsTVVkY9kQ9q4KSQaAVc/IEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=JRFiHFj3; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yikuo.dev header.i=yi@yikuo.dev header.b="gMrUbgBP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; q=dns/txt;
-  d=yikuo.dev; i=yi@yikuo.dev; s=mailjet; t=1777456827; x=1777464027;
-  h=Message-Id: MIME-Version: From: To: Subject: Date:
-   List-Unsubscribe: List-Unsubscribe-Post: Cc: Feedback-Id:
-   X-CSA-Complaints: X-MJ-Mid: X-MJ-SMTPGUID:
-   X-REPORT-ABUSE-TO: Content-Transfer-Encoding: To: From:
-   Sender: Subject: Date;
-  bh=R6D6QMuIFoaRvx2O2b0MppS8qCJC9ITDHlDI6jdA3+w=;
-  b=gMrUbgBPEbGeIea45WzGVAYc0OYeorBWwDzJJK6RFUOHIO/gW8DUYz+UP
- /tQ5FPc9E9o1YPzHvIpurHlziP9amI3qNJsX7Kw51zWg/5HlY5tcy+B1gi9b
- HaX35Dx5Eo4ifroBmv3T2ALq1w6n6zqeB3wYORKQDE1D4gADvoUAv6xwIniL
- 7EWdVtdLUhxErrmoDgzRw9v+sE6e136T8sYItVmJbomxwZJcT5HseYX7pmP6
- fDL4Um8jCdJQen7CYlXPaX5JDS14XBhTmvVubvRokFXpO2UJXJytNfCSmv3f
- JtGRemP1tE0xcDPsVH3LkhIjj0ddcfHTvwt0T6mEfPcLQ==
-Message-Id: <3b7c8ef4.AUYAAJeLWk8AAAAAAAAABAMtJJMAAYKKIjQAAAAAAC-ZZgBp8da6@mailjet.com>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="JRFiHFj3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=et6/844maY07PTlAUxa16aWNjywP2dUE1B0QsoENJXE=; b=JRFiHFj38HyueftVID3uiVuy3F
+	1NuuHKe0PgmjEgAsok8icjbtTIPwKLZ+TXULWIG7M1tKsrJskkI4NK0+TQPYsHmX9bcByNHZGgWs+
+	QjB+awnY15BRvwKK3BN1wldo/MyFBdeZ+L/btRNQazOBcwmYGI7zLzpP6nzbCDNvRo/5Q6If0rfhX
+	fp4w9o++U0rkKkFCpyMWGdxmF6KX3cOBsgh7j206CR9prglktXxDzfHhM92IG5TXUZptMz2wryT0Y
+	fgCV5SqNwFIULiUEGdDYktnmYgydQz8VqyFyO2NGL8zACoodiMjACc0jkZjAfmQka1TzqqqmxCEVi
+	Hh1ol5yKwPqlrzJ0T+J+2grLnSAAOmS2Cwrmooiy9xEjTQGZsw/S9mk/3VKObC1HZpQ4vQAEfGsHb
+	aDM/y6OYQW9sv6FhH8i8H/DajXisCGFgWEQeVVfJfxvRUmW/rRvX/q7qD82Gezj7EKZWW3q7MToeK
+	xvhp/BApLl0DMqRBpHJRUCum;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wI1kS-00000004xya-1o8N;
+	Wed, 29 Apr 2026 10:02:28 +0000
+Message-ID: <60857c4e-0d72-40d9-ad72-c2132a19c6ea@samba.org>
+Date: Wed, 29 Apr 2026 12:02:27 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Yi Kuo <yi@yikuo.dev>
-To: smfrench@gmail.com, linkinjeon@kernel.org
-Subject: [PATCH v2] smb: smbdirect: fix MR registration for coalesced SG
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] smb: smbdirect: fix MR registration for coalesced SG
  lists
-Date: Wed, 29 Apr 2026 18:00:11 +0800
-List-Unsubscribe-Post: List-Unsubscribe=One-Click
-Cc: metze@samba.org, tom@talpey.com, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, Yi Kuo
-	<yi@yikuo.dev>
-Feedback-Id: 42.3119462.2858555:MJ
-X-CSA-Complaints: csa-complaints@eco.de
-X-MJ-Mid:
-	AUYAAJeLWk8AAAAAAAAABAMtJJMAAYKKIjQAAAAAAC-ZZgBp8da6rX6_3ItuSmeTpgv5zbMWAwArnjs
-X-MJ-SMTPGUID: 4535d1d9-c888-4a3f-91d4-e9f99aa9a4d7
-X-REPORT-ABUSE-TO: Message sent by Mailjet please report to
-	abuse@mailjet.com with a copy of the message
-Content-Transfer-Encoding: quoted-printable
+To: Yi Kuo <yi@yikuo.dev>, smfrench@gmail.com, linkinjeon@kernel.org
+Cc: tom@talpey.com, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+References: <5b221fc2.AXEAAJjZnuQAAAAAAAAABAMtJJkAAYKKIjQAAAAAAC-ZZgBp8da7@mailjet.com>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <5b221fc2.AXEAAJjZnuQAAAAAAAAABAMtJJkAAYKKIjQAAAAAAC-ZZgBp8da7@mailjet.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-ib_dma_map_sg() modifies the provided scatterlist and returns the
-number of mapped entries, which can be fewer than the requested
-mr->sgt.nents if the DMA controller coalesces contiguous memory
-segments. Passing the original, uncoalesced count to ib_map_mr_sg()
-causes memory registration failures if coalescing actually occurs.
+Am 29.04.26 um 12:00 schrieb Yi Kuo:
+> ib_dma_map_sg() modifies the provided scatterlist and returns the
+> number of mapped entries, which can be fewer than the requested
+> mr->sgt.nents if the DMA controller coalesces contiguous memory
+> segments. Passing the original, uncoalesced count to ib_map_mr_sg()
+> causes memory registration failures if coalescing actually occurs.
+> 
+> Capture the actual mapped count returned by ib_dma_map_sg() and pass it
+> to ib_map_mr_sg() to ensure correct MR registration.
+> 
+> Also update the ib_dma_map_sg() error logging to drop the error
+> pointer formatting, since the return value is an integer count
+> rather than an error code.
+> 
+> Ensure a proper error code (-EIO) is assigned when DMA mapping or
+> MR registration fails.
+> 
+> Fixes: de5ef8ec3c46 ("smb: smbdirect: introduce smbdirect_mr.c with client mr code")
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=221408
+> Signed-off-by: Yi Kuo <yi@yikuo.dev>
 
-Capture the actual mapped count returned by ib_dma_map_sg() and pass it
-to ib_map_mr_sg() to ensure correct MR registration.
+Reviewed-by: Stefan Metzmacher <metze@samba.org>
 
-Also update the ib_dma_map_sg() error logging to drop the error
-pointer formatting, since the return value is an integer count
-rather than an error code.
-
-Ensure a proper error code (-EIO) is assigned when DMA mapping or
-MR registration fails.
-
-Fixes: de5ef8ec3c46 ("smb: smbdirect: introduce smbdirect_mr.c with client =
-mr code")
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=3D221408
-Signed-off-by: Yi Kuo <yi@yikuo.dev>
----
-v2:
-- Add proper -EIO error assignment on mapping/registration failures.
-- Add Fixes and Closes tags.
-
- fs/smb/smbdirect/mr.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
-
-diff --git a/fs/smb/smbdirect/mr.c b/fs/smb/smbdirect/mr.c
-index 5228e699cd5d..5a428ff1b369 100644
---- a/fs/smb/smbdirect/mr.c
-+++ b/fs/smb/smbdirect/mr.c
-@@ -269,7 +269,7 @@ smbdirect_connection_register_mr_io(struct smbdirect_so=
-cket *sc,
- {
- 	const struct smbdirect_socket_parameters *sp =3D &sc->parameters;
- 	struct smbdirect_mr_io *mr;
--	int ret, num_pages;
-+	int ret, num_pages, num_mapped;
- 	struct ib_reg_wr *reg_wr;
-=20
- 	num_pages =3D iov_iter_npages(iter, sp->max_frmr_depth + 1);
-@@ -300,19 +300,22 @@ smbdirect_connection_register_mr_io(struct smbdirect_=
-socket *sc,
- 		num_pages, iov_iter_count(iter), sp->max_frmr_depth);
- 	smbdirect_iter_to_sgt(iter, &mr->sgt, sp->max_frmr_depth);
-=20
--	ret =3D ib_dma_map_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->dir);
--	if (!ret) {
-+	num_mapped =3D ib_dma_map_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->=
-dir);
-+	if (!num_mapped) {
- 		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
--			"ib_dma_map_sg num_pages=3D%u dir=3D%x ret=3D%d (%1pe)\n",
--			num_pages, mr->dir, ret, SMBDIRECT_DEBUG_ERR_PTR(ret));
-+			"ib_dma_map_sg num_pages=3D%u dir=3D%x num_mapped=3D%d\n",
-+			num_pages, mr->dir, num_mapped);
-+		ret =3D -EIO;
- 		goto dma_map_error;
- 	}
-=20
--	ret =3D ib_map_mr_sg(mr->mr, mr->sgt.sgl, mr->sgt.nents, NULL, PAGE_SIZE)=
-;
--	if (ret !=3D mr->sgt.nents) {
-+	ret =3D ib_map_mr_sg(mr->mr, mr->sgt.sgl, num_mapped, NULL, PAGE_SIZE);
-+	if (ret !=3D num_mapped) {
- 		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
--			"ib_map_mr_sg failed ret =3D %d nents =3D %u\n",
--			ret, mr->sgt.nents);
-+			"ib_map_mr_sg failed ret =3D %d num_mapped =3D %u\n",
-+			ret, num_mapped);
-+		if (ret >=3D 0)
-+			ret =3D -EIO;
- 		goto map_mr_error;
- 	}
-=20
---=20
-2.54.0
-
-=
+Thanks!
+metze
