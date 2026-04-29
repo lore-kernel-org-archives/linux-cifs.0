@@ -1,138 +1,136 @@
-Received: from cse.ust.hk (cssvr7.cse.ust.hk [143.89.41.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from o4.p38.mailjet.com (o4.p38.mailjet.com [185.250.237.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FADA3B8BD1;
-	Wed, 29 Apr 2026 09:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=143.89.41.157
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777453468; cv=pass; b=W3R4oVBL0a2+IASDlzpnLaqglcX1K97DkaEkEkhkDANxXXk3XR0wnzRzRDnpZIrVYymCF6lRS9OLUTX/UPWV1l7ix2Iw/vtAZD1vePTKWx8427389Fz2FnAttklTxI34jfC/lvm4dkS4YH4C69zS8lyd8ziwLn1TB/H74A6MlN8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777453468; c=relaxed/simple;
-	bh=iKrkcM9Z3p2ijasIv53wNOlemWi42Epaovpsf5JvyiQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iTQF2zTzBV4BSNjfmm0JwCxuVgD72HuCToBweSRzn0mUfEPEzwJe9mtyS6+GI0D/BxXlMZZEAe3pQ2ik56vYPBet9b7iBiocBsgGuyPsC2RWgCwZr6dFuWYt0mYBYOgrMZM9IyTpGJPdn4MfriRy5sXSLbkba9V4BVyibWqHnyc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.ust.hk; spf=pass smtp.mailfrom=cse.ust.hk; dkim=pass (1024-bit key) header.d=cse.ust.hk header.i=@cse.ust.hk header.b=whNLnPTH; arc=pass smtp.client-ip=143.89.41.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.ust.hk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.ust.hk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C161DFDE
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 10:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.250.237.4
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777456831; cv=none; b=e8+zZtxhgzRHV5cttk0rwn38mAN3gk3bg2QgxyXbWkkJ1Ab7+MTzAaThg7d3yy64HQHkjMyOiuwFaaEE6NF9iQcRCvLyNCiVGx2gPc/h+a7nx16QEda0qzJKlGFLSapltCXW/YjsSbkVsRKEI+ZY6Rg/s7wEqdBIJg3jOBML52w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777456831; c=relaxed/simple;
+	bh=vxjuH98lz95r5OFYrZlc34xqxhXWg4UjUYUzzX5mptw=;
+	h=Message-Id:MIME-Version:From:To:Subject:Date:Cc; b=hDL62aq8Efm6yjVpB5GB2+yHMmQOuBxB0BTJ/SohMxybBaBnC3Q8mnFJ4iYzIDsE4/xS0yhR1/TO8ygm1DZtwUin4VxdCkH0j+FCa/9/D/ugECJDsGJjaGBFPpfj+6zOVF/c6ye3v6hAgsd0paciUKXGderUBU9nnJxn7SvzWBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yikuo.dev; spf=pass smtp.mailfrom=a3119462.bnc3.mailjet.com; dkim=pass (2048-bit key) header.d=yikuo.dev header.i=yi@yikuo.dev header.b=gMrUbgBP; arc=none smtp.client-ip=185.250.237.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yikuo.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a3119462.bnc3.mailjet.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cse.ust.hk header.i=@cse.ust.hk header.b="whNLnPTH"
-ARC-Seal: i=1; d=cse.ust.hk; s=arccse; a=rsa-sha256; cv=none; t=1777453448;
-	b=Nj8daFpt928C6rzNeFMQpbJcj+NDWYlogqWRX/I2xl+efh9RrEFWeMy+2LoV92QJt/vX
-	 w+SvRNkEIVvLMRf1fbWzH175fXsrIOM5trg5Sv88/RWFMIl2oHOPY3pS+kJs/C/K7Fu9O
-	 GaInDYSeYjDJ8qmJu09r3HeaiwR6AdfCbA=
-ARC-Message-Signature: i=1; d=cse.ust.hk; s=arccse; a=rsa-sha256;
-	c=relaxed/relaxed; t=1777453448;
-	h=DKIM-Signature:Date:From:To:Subject:Message-ID:MIME-Version;
-	bh=dIR0y+9u5dRbumJlLK2vjotk4Gly3R5STWOQTyyknzE=;
-	b=JiMQ+yve2YxCaUnVl0IrxLiv3gNEEecQH2H3aoz3CVrAwa+URVOzmbSLaeiSyczbdrER
-	 xe0TjI33hl0a3M14kvn423WxuJq4bYFR1Rkz/h/4KVeQgvC2oLQocjuRGdJFfASZnlkzF
-	 XjaumsJ+GLzM0yai/BDO7ighWNm1XVf8y4=
-ARC-Authentication-Results: i=1; cse.ust.hk; arc=none smtp.remote-ip=143.89.191.45
-Received: from chcpu16 (191host045.mobilenet.cse.ust.hk [143.89.191.45])
-	(authenticated bits=0)
-	by cse.ust.hk (8.18.1/8.12.5) with ESMTPSA id 63T93pkr3612389
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 29 Apr 2026 17:04:08 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cse.ust.hk;
-	s=cseusthk; t=1777453448;
-	bh=dIR0y+9u5dRbumJlLK2vjotk4Gly3R5STWOQTyyknzE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=whNLnPTHh+qnfxkqQJL6RIC0AYVkUcJtZ7SAq819hIu2DnDstz47UNuzuNdr7oX5x
-	 ffAL2I25oRnaOb0MOk2O1X9SKPj/t3oZcPd0RsCUqq1OpVYEHp3IgaUFPWtn2QcsJr
-	 MdVO/u4qba4/OYJMBL0uifh+y8AIVCK7NeuGkgFc=
-Date: Wed, 29 Apr 2026 17:03:46 +0800
-From: Shuhao Fu <sfual@cse.ust.hk>
-To: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
-        linux-cifs@vger.kernel.org
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ksmbd: fail share config requests when path allocation
- fails
-Message-ID: <20260429090346.GA3329611@chcpu16>
-References: <20260429085956.GA3326432@chcpu16>
+	dkim=pass (2048-bit key) header.d=yikuo.dev header.i=yi@yikuo.dev header.b="gMrUbgBP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; q=dns/txt;
+  d=yikuo.dev; i=yi@yikuo.dev; s=mailjet; t=1777456827; x=1777464027;
+  h=Message-Id: MIME-Version: From: To: Subject: Date:
+   List-Unsubscribe: List-Unsubscribe-Post: Cc: Feedback-Id:
+   X-CSA-Complaints: X-MJ-Mid: X-MJ-SMTPGUID:
+   X-REPORT-ABUSE-TO: Content-Transfer-Encoding: To: From:
+   Sender: Subject: Date;
+  bh=R6D6QMuIFoaRvx2O2b0MppS8qCJC9ITDHlDI6jdA3+w=;
+  b=gMrUbgBPEbGeIea45WzGVAYc0OYeorBWwDzJJK6RFUOHIO/gW8DUYz+UP
+ /tQ5FPc9E9o1YPzHvIpurHlziP9amI3qNJsX7Kw51zWg/5HlY5tcy+B1gi9b
+ HaX35Dx5Eo4ifroBmv3T2ALq1w6n6zqeB3wYORKQDE1D4gADvoUAv6xwIniL
+ 7EWdVtdLUhxErrmoDgzRw9v+sE6e136T8sYItVmJbomxwZJcT5HseYX7pmP6
+ fDL4Um8jCdJQen7CYlXPaX5JDS14XBhTmvVubvRokFXpO2UJXJytNfCSmv3f
+ JtGRemP1tE0xcDPsVH3LkhIjj0ddcfHTvwt0T6mEfPcLQ==
+Message-Id: <3b7c8ef4.AUYAAJeLWk8AAAAAAAAABAMtJJMAAYKKIjQAAAAAAC-ZZgBp8da6@mailjet.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260429085956.GA3326432@chcpu16>
-X-Env-From: sfual
+From: Yi Kuo <yi@yikuo.dev>
+To: smfrench@gmail.com, linkinjeon@kernel.org
+Subject: [PATCH v2] smb: smbdirect: fix MR registration for coalesced SG
+ lists
+Date: Wed, 29 Apr 2026 18:00:11 +0800
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+Cc: metze@samba.org, tom@talpey.com, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, Yi Kuo
+	<yi@yikuo.dev>
+Feedback-Id: 42.3119462.2858555:MJ
+X-CSA-Complaints: csa-complaints@eco.de
+X-MJ-Mid:
+	AUYAAJeLWk8AAAAAAAAABAMtJJMAAYKKIjQAAAAAAC-ZZgBp8da6rX6_3ItuSmeTpgv5zbMWAwArnjs
+X-MJ-SMTPGUID: 4535d1d9-c888-4a3f-91d4-e9f99aa9a4d7
+X-REPORT-ABUSE-TO: Message sent by Mailjet please report to
+	abuse@mailjet.com with a copy of the message
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+ib_dma_map_sg() modifies the provided scatterlist and returns the
+number of mapped entries, which can be fewer than the requested
+mr->sgt.nents if the DMA controller coalesces contiguous memory
+segments. Passing the original, uncoalesced count to ib_map_mr_sg()
+causes memory registration failures if coalescing actually occurs.
 
-I did a live repro on a current mainline tree to confirm that the
-published NULL share path is not just an internal invariant break and can
-fault a normal ksmbd request path.
+Capture the actual mapped count returned by ib_dma_map_sg() and pass it
+to ib_map_mr_sg() to ensure correct MR registration.
 
-The reproducer forced only the share path duplication failure that
-produces the published NULL path state. No consumer-side ksmbd path was
-modified.
+Also update the ib_dma_map_sg() error logging to drop the error
+pointer formatting, since the return value is an integer count
+rather than an error code.
 
-Repro setup:
+Ensure a proper error code (-EIO) is assigned when DMA mapping or
+MR registration fails.
 
-1. Start from mainline with CONFIG_SMB_SERVER=y and CONFIG_CIFS=y.
-2. Add a narrow temporary trigger in share_config_request() so that only
-   one test share forces the path duplication step to fail, leaving
-   share->path as NULL while still allowing the share to be published.
-   No consumer-side ksmbd path was modified.
-3. Boot that kernel under QEMU/KVM with a custom initramfs.
-4. In the guest, run a tiny userspace generic-netlink responder that:
-   - sends KSMBD_EVENT_STARTING_UP
-   - answers login requests as guest
-   - answers share config requests for the test share with a valid
-     export path
-   - answers tree connect requests as writable guest
-5. From the same guest, mount that test share over loopback with:
+Fixes: de5ef8ec3c46 ("smb: smbdirect: introduce smbdirect_mr.c with client =
+mr code")
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=3D221408
+Signed-off-by: Yi Kuo <yi@yikuo.dev>
+---
+v2:
+- Add proper -EIO error assignment on mapping/registration failures.
+- Add Fixes and Closes tags.
 
-   mount -t cifs //<guest-ip>/<test-share> /mnt/cifs \
-     -o guest,vers=3.1.1,port=445,uid=0,gid=0
+ fs/smb/smbdirect/mr.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-That mount attempt hit the expected fault path. The clean serial log
-showed:
+diff --git a/fs/smb/smbdirect/mr.c b/fs/smb/smbdirect/mr.c
+index 5228e699cd5d..5a428ff1b369 100644
+--- a/fs/smb/smbdirect/mr.c
++++ b/fs/smb/smbdirect/mr.c
+@@ -269,7 +269,7 @@ smbdirect_connection_register_mr_io(struct smbdirect_so=
+cket *sc,
+ {
+ 	const struct smbdirect_socket_parameters *sp =3D &sc->parameters;
+ 	struct smbdirect_mr_io *mr;
+-	int ret, num_pages;
++	int ret, num_pages, num_mapped;
+ 	struct ib_reg_wr *reg_wr;
+=20
+ 	num_pages =3D iov_iter_npages(iter, sp->max_frmr_depth + 1);
+@@ -300,19 +300,22 @@ smbdirect_connection_register_mr_io(struct smbdirect_=
+socket *sc,
+ 		num_pages, iov_iter_count(iter), sp->max_frmr_depth);
+ 	smbdirect_iter_to_sgt(iter, &mr->sgt, sp->max_frmr_depth);
+=20
+-	ret =3D ib_dma_map_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->dir);
+-	if (!ret) {
++	num_mapped =3D ib_dma_map_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->=
+dir);
++	if (!num_mapped) {
+ 		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
+-			"ib_dma_map_sg num_pages=3D%u dir=3D%x ret=3D%d (%1pe)\n",
+-			num_pages, mr->dir, ret, SMBDIRECT_DEBUG_ERR_PTR(ret));
++			"ib_dma_map_sg num_pages=3D%u dir=3D%x num_mapped=3D%d\n",
++			num_pages, mr->dir, num_mapped);
++		ret =3D -EIO;
+ 		goto dma_map_error;
+ 	}
+=20
+-	ret =3D ib_map_mr_sg(mr->mr, mr->sgt.sgl, mr->sgt.nents, NULL, PAGE_SIZE)=
+;
+-	if (ret !=3D mr->sgt.nents) {
++	ret =3D ib_map_mr_sg(mr->mr, mr->sgt.sgl, num_mapped, NULL, PAGE_SIZE);
++	if (ret !=3D num_mapped) {
+ 		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
+-			"ib_map_mr_sg failed ret =3D %d nents =3D %u\n",
+-			ret, mr->sgt.nents);
++			"ib_map_mr_sg failed ret =3D %d num_mapped =3D %u\n",
++			ret, num_mapped);
++		if (ret >=3D 0)
++			ret =3D -EIO;
+ 		goto map_mr_error;
+ 	}
+=20
+--=20
+2.54.0
 
-  [   21.045838] CIFS: Attempting to mount //<guest-ip>/<test-share>
-  [   21.052302] BUG: kernel NULL pointer dereference, address: 0000000000000000
-  [   21.062798] RIP: 0010:strlen+0xb/0x20
-  [   21.077290]  do_getname_kernel+0x12/0xf0
-  [   21.077707]  __ksmbd_vfs_kern_path+0x89/0x390
-  [   21.078648]  smb2_open+0xa03/0x20b0
-
-This matches the expected downstream flow:
-
-- tree connect stores the published share in tree_conn->share_conf
-- a share-root SMB2 create builds an empty pathname in smb2_open()
-- ksmbd_vfs_path_lookup() interprets that as "use the share root" and
-  substitutes tree_conn->share_conf->path
-- the broken published share has tree_conn->share_conf->path == NULL
-- that NULL pathname reaches do_getname_kernel()/strlen()
-
-I also did a second run with the guest netlink responder logging directly
-to the serial console. That log was noisy because the userspace prints
-interleaved with the kernel Oops, but it still showed the login request
-and the tree connect for the test share immediately around the crash.
-
-I can provide more detail, including the temporary repro pieces and the
-serial logs, if useful.
-
-Thanks,
-Shuhao
-
-On Wed, Apr 29, 2026 at 05:00:13PM +0800, Shuhao Fu wrote:
-> Non-pipe shares must have a duplicated backing path before they can be
-> published. share_config_request() currently calls kstrndup() for that
-> path, but if the allocation fails it leaves ret unchanged. If veto list
-> parsing succeeds and share->name exists, the partially built share is
-> still inserted into the global share table with share->path left NULL.
-> 
-> A later share-root SMB2 create uses tree_conn->share_conf->path as the
-> lookup root. If the share was published with path == NULL, that request
-> passes a NULL pathname into do_getname_kernel()/strlen() and can crash
-> the ksmbd worker.
-> 
-> Set ret = -ENOMEM when path duplication fails so the incomplete share is
-> destroyed before publication.
-> 
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+=
