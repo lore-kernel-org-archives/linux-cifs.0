@@ -1,95 +1,79 @@
-Received: from embla.dev.snart.me (embla.dev.snart.me [54.252.183.203])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A1F26A0D5;
-	Wed, 29 Apr 2026 22:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.252.183.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B0643C055
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 22:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777500017; cv=none; b=TkXSbGTEP3Q96Eem73vwl8DHpgNmrDUJJCIq0al6DYbT/hmhsBm/S7wM6XUBeAppMYVsNBlYM0GFKsqoC+iM2WZ9AjuoyHGXMk0BpStIB5kuMUbpEXBsj1EAogr5+fm683NetL128jBeDYZUJSlKlNCMLOxpZFazaYynVvNiNv4=
+	t=1777501023; cv=none; b=cl1vYVq6/eK38GGgpIvZzYOSSs+0JRbxtCu3JaR1am/CU4dH8qCHPMW2uMObOfXzMhVXz1Ei0PGu74aheaFMsKYnWEh87h+UcETFv6svSAjQpxsmJNk4Mtg6HaHvQz1cZdaD8+DEGai5XnQ/Hh23iq2JyBApHfOxqun17hvGmN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777500017; c=relaxed/simple;
-	bh=Q+hGRNt4Qu8Kg28XQ4VG6Co93Cs9xCHkhw8gVF9vba8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ijO6EVkaXfDm4eWzVyAbBhx8hz2A2E7j37JeETC94bIXLQPEH6yHeiQOgnbvVdiaRiXkM9x2jqjdaKsBJky+8+L5ZDhB58F605IgYZa+7CLHGDcs33MxQj2XFqbUlP5gYBdyHkVcnGS18+SAm8yJbH9QcW0sYI/Igp6FDCmDM5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=dev.snart.me; spf=pass smtp.mailfrom=dev.snart.me; arc=none smtp.client-ip=54.252.183.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=dev.snart.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.snart.me
-Received: from embla.dev.snart.me (localhost [IPv6:::1])
-	by embla.dev.snart.me (Postfix) with ESMTP id A21F41D459;
-	Wed, 29 Apr 2026 22:00:08 +0000 (UTC)
-Received: from [192.168.1.18] ([182.226.25.243])
-	by embla.dev.snart.me with ESMTPSA
-	id nLFlEmh/8mm4swUA8KYfjw
-	(envelope-from <dxdt@dev.snart.me>); Wed, 29 Apr 2026 22:00:08 +0000
-Message-ID: <3d3d6e22-b8a7-4f32-8046-697e45ec6c04@dev.snart.me>
-Date: Thu, 30 Apr 2026 07:00:04 +0900
+	s=arc-20240116; t=1777501023; c=relaxed/simple;
+	bh=U6wVEZglexU3hyekIkrWlMsg6wkVdutkVyGUKW0SSr0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nWrGAxaeuywbWrCf+eNqxw19QUIaKM0SfS3LiC4ImYnF3y/xLDl8TF0QTSjKQ6sCdVIV/klreWzwnV1tS2rje0ZN78Hb/+G9XVOowSpDPEW+4IbI8MCk8UVWCvNiq9e9Q+Z/FvTx+qVeDTDTrLavl24yFBEfjodl/hboXb/sKTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bjw9CWNz; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bjw9CWNz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C949CC2BCB3
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 22:17:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777501020;
+	bh=U6wVEZglexU3hyekIkrWlMsg6wkVdutkVyGUKW0SSr0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=bjw9CWNzstIrYsH1D06Y1fLzf9uOP0d6e48pSyHh57YxcPFZ4LZAzA0w5msfoyu86
+	 28YGLjXhvs00+2vT2g8zTPqzgEqy4wfUn4h+GKp2pMGVZJMFguyc+7MvoP0taosxuQ
+	 RYkCmCm+PKJ4KZwfXHrJUJQ9VUeKgBm9vPrKm75RNGYFw6vb9sggJDWKETzRhYglTB
+	 RrZNYtwTyDkcEE62Sg0obDLpy4ktoqiHFqKhZNGI7OD4mHFjxDZWLOM3hPJZUJ0KD1
+	 Uwqi0OgQ3FkxfFbVx7d5JQtBLUGeUW4ENq5sbmIe6PvgTi9ZXfNb2xiw3+8UquhxXs
+	 bLcVRSjF48Rnw==
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-671c24f23b1so388868a12.0
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 15:17:00 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yz5WIg71G+3qp1xYVoirJzXuyCFk/Mwwer27PnZyuRPDu4e/n3+
+	QZPafVoCkag0j+1yuQErbzj8a8Bz0pXg1QzUNRLEv0GEL//2YkfNbFIeuAGulDlYusTQHInfrls
+	SYH4aIbIT9X2mtZz8LA0pjRz18/uhcQ4=
+X-Received: by 2002:a05:6402:4290:b0:679:ba3a:b17d with SMTP id
+ 4fb4d7f45d1cf-67b5d848965mr63960a12.14.1777501019455; Wed, 29 Apr 2026
+ 15:16:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 04/15] exfat: Implement fileattr_get for case
- sensitivity
-To: Chuck Lever <cel@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-api@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, hirofumi@mail.parknet.co.jp,
- linkinjeon@kernel.org, sj1557.seo@samsung.com, yuezhang.mo@sony.com,
- almaz.alexandrovich@paragon-software.com, slava@dubeyko.com,
- glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu,
- adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org,
- pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- trondmy@kernel.org, anna@kernel.org, jaegeuk@kernel.org, chao@kernel.org,
- hansg@kernel.org, senozhatsky@chromium.org,
- Chuck Lever <chuck.lever@oracle.com>, Roland Mainz <roland.mainz@nrubsig.org>
-References: <20260429-case-sensitivity-v12-0-8057123bebe0@oracle.com>
- <20260429-case-sensitivity-v12-4-8057123bebe0@oracle.com>
-From: David Timber <dxdt@dev.snart.me>
-Content-Language: en-US, ko
-Autocrypt: addr=dxdt@dev.snart.me; keydata=
- xjMEYmJg1hYJKwYBBAHaRw8BAQdAf5E+ri1XLtjqYbZdHOyc8oS+1/XJ5bSlbx5WHXmVBZzN
- IERhdmlkIFRpbWJlciA8ZHhkdEBkZXYuc25hcnQubWU+wpQEExYKADwWIQQn/Jn96EMUaIoF
- X+T/ldyyrZpWaAUCYmJg1gIbAwULCQgHAgMiAgEGFQoJCAsCBBYCAwECHgcCF4AACgkQ/5Xc
- sq2aVmjJZwD8COjPlUwccrlRvbNQ6f87DWchtYO0o8W2DNRM3RLps0EA/jEhIbRV6AsyC8jr
- 30Ut3aJ3/mO/6G4sLj7OvkEEBH0MzjgEYmJg1hIKKwYBBAGXVQEFAQEHQFpgtIgaByv9lIEY
- EmpavMO0pYjtu7TMJynwdnGYkN9LAwEIB8J4BBgWCgAgFiEEJ/yZ/ehDFGiKBV/k/5Xcsq2a
- VmgFAmJiYNYCGwwACgkQ/5Xcsq2aVmhFCwEA0kM9VyYB4bLCM7+SuXUUH+5Ec99Nj4RXxFad
- Key9GuwA/2BZK6bNyrLSfEk2JDRoskqf7OIL0wa6JOD5SrBnMe8E
-In-Reply-To: <20260429-case-sensitivity-v12-4-8057123bebe0@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <cover.1777463800.git.metze@samba.org>
+In-Reply-To: <cover.1777463800.git.metze@samba.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 30 Apr 2026 07:16:46 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8DpU46d9Vnw8GFoazK1UmbgpTWUckomV_JLFJQOroCng@mail.gmail.com>
+X-Gm-Features: AVHnY4IrTHzB3kjZ9J2I-I23PXkRkN7JfER773XowhMAqo4krDuAQt0SN57s6K0
+Message-ID: <CAKYAXd8DpU46d9Vnw8GFoazK1UmbgpTWUckomV_JLFJQOroCng@mail.gmail.com>
+Subject: Re: [PATCH 0/2] smb: smbdirect: symbol export and header cleanups
+To: Stefan Metzmacher <metze@samba.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>, 
+	Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/30/26 03:07, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
+On Wed, Apr 29, 2026 at 10:43=E2=80=AFPM Stefan Metzmacher <metze@samba.org=
+> wrote:
 >
-> Report exFAT's case sensitivity behavior via the FS_XFLAG_CASEFOLD
-> flag. exFAT is always case-insensitive (using an upcase table for
-> comparison) and always preserves case at rest.
-Not necessarily "always".
-
-Link: https://github.com/exfatprogs/exfatprogs/issues/313
-
-The specs(SD spec part 2 and MS spec) leave it up to the formatter
-implementation on how the volume should behave. The observed behaviour
-is that it is quite flexible: you can pretty much use any artitrary
-up-case table to make an exFAT volume behave completely different and
-major implementations including Linux and Windows kernel honour the
-table no matter what. So exFAT is not so "binary"(folding vs. not
-folding) when it comes to case folding behaviour.
-
-NTFS also has a similar up-case table feature. Although it's usually
-unused, if an up-case table exists in the volume, the implementation
-probably has to honour it(although this is not written down in any spec,
-this should be the expectation).
-
-At the end of the day, it wouldn't matter much because no sane formatter
-would produce a volume with some weird version up-case table. But if
-that attribute plays a important role in some system that has some level
-of impact, I suggest considering another attribute, say "unknown" or "it
-depends".
-
-Davo
+> Hi,
+>
+> as suggested by Christoph here:
+> https://lore.kernel.org/linux-cifs/aehrPuY60VMcYGU8@infradead.org/
+>
+> I've moved to use DEFAULT_SYMBOL_NAMESPACE and EXPORT_SYMBOL_GPL
+> for the smbdirect symbols. This actually fixes a problem
+> with out of tree builds.
+>
+> And I've created a include/linux/smbdirect.h
+> which also make out of tree builds for cifs.ko
+> and ksmbd.ko easier.
+>
+> Stefan Metzmacher (2):
+>   smb: smbdirect: make use of DEFAULT_SYMBOL_NAMESPACE and
+>     EXPORT_SYMBOL_GPL
+>   smb: smbdirect: introduce and use include/linux/smbdirect.h
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks!
