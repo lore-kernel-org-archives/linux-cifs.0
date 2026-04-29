@@ -1,258 +1,112 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cse.ust.hk (cssvr7.cse.ust.hk [143.89.41.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02C53A4F50
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 08:34:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777451685; cv=none; b=q4VcrELPlQTBvKmfpKVstrplILsGk4t8cLnPd8O1zl1YmZHY9Ye+V1Jx9Jzx34mpdLaKrepG1QQ9gruhZSvRhEDgk8LpMzw+0sufBgFyg1PwNeASlTbIKi9bbGpZA00tJ2ERyg3QlXHe4j4lrA/OnjwQZuGtGhCRRwR7q6qQfmo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777451685; c=relaxed/simple;
-	bh=2BxllXHRUI29Rtj2KmHSh/SsqLbQkOJrSOUKabd1rLg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BAopMK35iuWwOFBLzhc6+dgDJs7w3urkeBtnfRupwuNlLou4FBVlMb9/My3DeQyEoKPnkuvIrg6jqNboUFMUuruYd29ykVCnJYebqwCbCNbkuqOWWG0QwHnoAklxBGEjA2aOfP6QBoku/rXZ48b9HY03T3qkg8l6upY67ctVl/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l2H+7vTJ; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E743AA50A;
+	Wed, 29 Apr 2026 09:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=143.89.41.157
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777453241; cv=pass; b=C7q0mfWpGbuuRvvhurnLrhMdExYei016mdDa+wyrbROLox8+kylHqmzikk2p7YHML3hOAKWGKRThoACrLUUmE2Jp+/s/3qZ0LNM6T3FAzUEJiFvhYMguIjsQat+tqV1PxUg2gb+W52VnNEQINxEFdPOkdGY3t3zwgD+I64B6MhM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777453241; c=relaxed/simple;
+	bh=rV8glw086WVi2K69FtjQnQtbin2wKiquM05qZaglO6k=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=tqnIEKh8u2z7DWAtDJND9I3vhyE1opCySeAoWMSaOw6CJyzT0iLsQrZUGxuiFe2Z+VQFPtgH4+DC5y8AgFuevQ2ewLnX4u2n6yDvdayXSTZlo7HrVOxKGS+StxLFwyi9YE2SFd/UPndE48VY8Nx1oG8uvjDScOSpcmOJCckr7SE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.ust.hk; spf=pass smtp.mailfrom=cse.ust.hk; dkim=pass (1024-bit key) header.d=cse.ust.hk header.i=@cse.ust.hk header.b=3wpy67hA; arc=pass smtp.client-ip=143.89.41.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.ust.hk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.ust.hk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l2H+7vTJ"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c795f096fa5so4837130a12.3
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 01:34:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777451683; x=1778056483; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8JKWU7+oVtYnA2UgAwt+Mku6AWp9kXmwYjj/CQXNRjM=;
-        b=l2H+7vTJ4CMdc+zir253WBGNW3daQGNXWAKYi+ML5qTud/W5Zwe16JzpB+gaYhM2AX
-         LDqBT+cBHdLja5iIC47mbh+zKbNPParj91hi9vv6ixUkU8ScrS/5nGIbu8l9vJS/ZnK8
-         YXrqDjruAUfBG6tvbNcuENVzCZ4a2bETurBYmKt/0KR2D2ucfc7+eXruLyEv6mROLhHU
-         ua4yZRh160fkiyjIWpvafM/U+uAYS/vZHsGCldge0aITVHDBWsiV6JkvUfm7RB5EUGlN
-         lB71BpEAxGFOsU8tolBD5SMJh6zHQonXluWrAEq1Fto8yXjF+oukReMOrhfwb7Vdmiky
-         8e/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777451683; x=1778056483;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8JKWU7+oVtYnA2UgAwt+Mku6AWp9kXmwYjj/CQXNRjM=;
-        b=lEf+IM70GExEm3W1Rkms08oqAQJqJEeq4nfsdcF7xNbV4FtqMfSeMIQjZeucolC9sf
-         pjOe8BL1ZYcb8/ACh1KNZuV4dY7gT88oMtgmAWLn3zHfM8qiQGal/x8Yu8Jj2AMBQTzZ
-         0+p/k1JwLucmT0rjkNC08+vDSqEZzFXKgE+HVExNFvQOnHrZvW2RLAgcugVfpgzAn5sM
-         W11xM7n7NtC/WIqw0twR+bpx4uVPjVVezGlbajzz9bFuMlTwhwtTK+c4I9glzjtY3z/b
-         RTbZx3OjffTWU8XQOja6ejqnGuQDCwCiW+oVbKMKQB0tqwrbMTIFRzwASg+of8Jo071P
-         KZgw==
-X-Forwarded-Encrypted: i=1; AFNElJ8BCryfXeD5EUmuvZvzLQlbRkxr8oFVSMi7/u4PN/YnNH/Mqa2cmjnt3YjKSz0dTkoJXf0VWJ1JgkTH@vger.kernel.org
-X-Gm-Message-State: AOJu0YyACoOrFJqTuS9ivLLRuavr88xZRkc82CcoNVTKeZaki0uNb0mS
-	lBnzCm9S+0Fe5ihkg5pnCI7Jz50I/j3xKTwKymYSWgI+f5VPy4spcviJ
-X-Gm-Gg: AeBDiet42zWCEZfC25cgSqH9G4wfrEc3T+T2CPllbRklFYvERo1mypEsyHc+la4S2CW
-	Lz+wZvb8A5rjVvPiWbCRax+vZRPthU4gkhX7+pyLJuW/FR4dOTO1tDEpDZQQpt43eC2IKFMLJLU
-	DAwjMBV8THDLfRTj2kX0ogrwKfMOOps6fjZIwXXUolI4Vez2qW8zGKcsNoovQ8hgJdwITD1Q/lp
-	n7vVOcbsZfZbu16eeH/X1ixEY0KwXY0qPpX2sgCgs7aXew8y1XDpdwEOf/DwfK4O67GPElnwDys
-	/YYW+CpGAcNIrQiiPyjs3AchINsRIKdsYDap7XRi4O20mo5xtCN+iw/f/FvMOki4gkbc/yOx48y
-	OjwIjxUO1i84UEWUwybPMZ/X0pYe0YXKVHfvACNf3NY9TbRvXarASi8JECme+aytQACxNK5bDHJ
-	R7i6EHVWbz9502WxWkXSM90PTJLBKmwhMl/HSisXWMIu4rI9B+nw==
-X-Received: by 2002:a05:6a20:431e:b0:39b:c4cd:d848 with SMTP id adf61e73a8af0-3a39c0c3245mr7513204637.22.1777451683124;
-        Wed, 29 Apr 2026 01:34:43 -0700 (PDT)
-Received: from localhost ([49.207.153.169])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7fd606a079sm1299001a12.12.2026.04.29.01.34.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 01:34:42 -0700 (PDT)
-From: Piyush Sachdeva <s.piyush1024@gmail.com>
-To: Bharath SM <bharathsm.hsk@gmail.com>
-Cc: sfrench@samba.org, linux-cifs@vger.kernel.org, sprasad@microsoft.com,
- bharathsm@microsoft.com, samba-technical@lists.samba.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] smb: client: use FullSessionKey for AES-256 encryption
- key derivation
-In-Reply-To: <CAGypqWzW6YPfB2Z9nARHVj=qv8h6bcxShxxM=T1ceG9654ky8A@mail.gmail.com>
-References: <20260409161538.3618-1-s.piyush1024@gmail.com>
- <CAGypqWzW6YPfB2Z9nARHVj=qv8h6bcxShxxM=T1ceG9654ky8A@mail.gmail.com>
-Date: Wed, 29 Apr 2026 14:04:39 +0530
-Message-ID: <m27bpqgo68.fsf@gmail.com>
+	dkim=pass (1024-bit key) header.d=cse.ust.hk header.i=@cse.ust.hk header.b="3wpy67hA"
+ARC-Seal: i=1; d=cse.ust.hk; s=arccse; a=rsa-sha256; cv=none; t=1777453208;
+	b=AB715FkAn4q2NzYXlUpNYKnqxTX4jZ0eGw+9kp/NgDLqAL58fT0Uno8IL+rJAruHd/Yr
+	 Dmu8ngDUi8mm8dQCA1PyaN6kdxCPG0jr4B3YlQzVt1x1pfUkZOBmpOJI6AC9jX44S37kK
+	 +p0kkTFE2CM70S4fK0wagDjzW7ov5A5pCs=
+ARC-Message-Signature: i=1; d=cse.ust.hk; s=arccse; a=rsa-sha256;
+	c=relaxed/relaxed; t=1777453208;
+	h=DKIM-Signature:Date:From:To:Subject:Message-ID:MIME-Version;
+	bh=33PTQZPJbu6sjAhXoqNtjSbyDKywwjVQQR7Cb/Pb8Yc=;
+	b=KsQfHfdGytO8i74eAr9WtYNJiWJ1DQnjsPVDg8ytPatg0AXWmMR+ugOozNZIQSjsuCO2
+	 QTrXY5lIxM7no2RCLXZVegDahw32IkfYrh2mQGAO9hF8e3MojYxf686F48/u2TWqOARXo
+	 DVIpdXDLlXgztGAZ+PCs3aidZvciInCgEY=
+ARC-Authentication-Results: i=1; cse.ust.hk; arc=none smtp.remote-ip=143.89.191.45
+Received: from chcpu16 (191host045.mobilenet.cse.ust.hk [143.89.191.45])
+	(authenticated bits=0)
+	by cse.ust.hk (8.18.1/8.12.5) with ESMTPSA id 63T901P93610265
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 29 Apr 2026 17:00:07 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cse.ust.hk;
+	s=cseusthk; t=1777453208;
+	bh=33PTQZPJbu6sjAhXoqNtjSbyDKywwjVQQR7Cb/Pb8Yc=;
+	h=Date:From:To:Cc:Subject:From;
+	b=3wpy67hAMIIJPS1E0OPIBPEO61XNSe9SAaehA2iPKZt6ihAi88LSuKbw2x1/8Qmsk
+	 yhirey2caCmbWl04KdoyzFccvBNSRNVHbEZ7DRplgdalYc3A/DSfRW1lQuBQJOTyl0
+	 tePR4OwgNTjAjpIu/g12shjJnB8/aF3XJl1mRNts=
+Date: Wed, 29 Apr 2026 16:59:56 +0800
+From: Shuhao Fu <sfual@cse.ust.hk>
+To: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
+        linux-cifs@vger.kernel.org
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] ksmbd: fail share config requests when path allocation fails
+Message-ID: <20260429085956.GA3326432@chcpu16>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Env-From: sfual
 
-Bharath SM <bharathsm.hsk@gmail.com> writes:
+Non-pipe shares must have a duplicated backing path before they can be
+published. share_config_request() currently calls kstrndup() for that
+path, but if the allocation fails it leaves ret unchanged. If veto list
+parsing succeeds and share->name exists, the partially built share is
+still inserted into the global share table with share->path left NULL.
 
-> On Thu, Apr 9, 2026 at 9:16=E2=80=AFAM <s.piyush1024@gmail.com> wrote:
->>
->> From: Piyush Sachdeva <psachdeva@microsoft.com>
->>
->> When Kerberos authentication is used with AES-256 encryption (AES-256-CCM
->> or AES-256-GCM), the SMB3 encryption and decryption keys must be derived
->> using the full session key (Session.FullSessionKey) rather than just the
->> first 16 bytes (Session.SessionKey).
->>
->> Per MS-SMB2 section 3.2.5.3.1, when Connection.Dialect is "3.1.1" and
->> Connection.CipherId is AES-256-CCM or AES-256-GCM, Session.FullSessionKey
->> must be set to the full cryptographic key from the GSS authentication
->> context. The encryption and decryption key derivation (SMBC2SCipherKey,
->> SMBS2CCipherKey) must use this FullSessionKey as the KDF input. The
->> signing key derivation continues to use Session.SessionKey (first 16
->> bytes) in all cases.
->>
->> Previously, generate_key() hardcoded SMB2_NTLMV2_SESSKEY_SIZE (16) as the
->> HMAC-SHA256 key input length for all derivations. When Kerberos with
->> AES-256 provides a 32-byte session key, the KDF for encryption/decryption
->> was using only the first 16 bytes, producing keys that did not match the
->> server's, causing mount failures with sec=3Dkrb5 and require_gcm_256=3D1.
->>
->> Add a `full_key_size` parameter to generate_key() and pass the appropria=
-te
->> size from generate_smb3signingkey():
->>  - Signing: always SMB2_NTLMV2_SESSKEY_SIZE (16 bytes)
->>  - Encryption/Decryption: ses->auth_key.len when AES-256, otherwise 16
->>
->> Also fix cifs_dump_full_key() to report the actual session key length for
->> AES-256 instead of hardcoded CIFS_SESS_KEY_SIZE, so that userspace tools
->> like Wireshark receive the correct key for decryption.
->>
->> Signed-off-by: Piyush Sachdeva <psachdeva@microsoft.com>
->> Signed-off-by: Piyush Sachdeva <s.piyush1024@gmail.com>
->> ---
->>  fs/smb/client/ioctl.c         |  2 +-
->>  fs/smb/client/smb2transport.c | 32 +++++++++++++++++++++++++-------
->>  2 files changed, 26 insertions(+), 8 deletions(-)
->>
->> diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
->> index 9afab3237e54..17408bb8ab65 100644
->> --- a/fs/smb/client/ioctl.c
->> +++ b/fs/smb/client/ioctl.c
->> @@ -296,7 +296,7 @@ static int cifs_dump_full_key(struct cifs_tcon *tcon=
-, struct smb3_full_key_debug
->>                 break;
->>         case SMB2_ENCRYPTION_AES256_CCM:
->>         case SMB2_ENCRYPTION_AES256_GCM:
->> -               out.session_key_length =3D CIFS_SESS_KEY_SIZE;
->> +               out.session_key_length =3D ses->auth_key.len;
->>                 out.server_in_key_length =3D out.server_out_key_length =
-=3D SMB3_GCM256_CRYPTKEY_SIZE;
->>                 break;
->>         default:
->> diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport=
-.c
->> index 81be2b226e26..57e515774b97 100644
->> --- a/fs/smb/client/smb2transport.c
->> +++ b/fs/smb/client/smb2transport.c
->> @@ -259,7 +259,8 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TC=
-P_Server_Info *server,
->>  }
->>
->>  static int generate_key(struct cifs_ses *ses, struct kvec label,
->> -                       struct kvec context, __u8 *key, unsigned int key=
-_size)
->> +                       struct kvec context, __u8 *key, unsigned int key=
-_size,
->> +                       unsigned int full_key_size)
->>  {
->>         unsigned char zero =3D 0x0;
->>         __u8 i[4] =3D {0, 0, 0, 1};
->> @@ -280,7 +281,7 @@ static int generate_key(struct cifs_ses *ses, struct=
- kvec label,
->>         }
->>
->>         hmac_sha256_init_usingrawkey(&hmac_ctx, ses->auth_key.response,
->> -                                    SMB2_NTLMV2_SESSKEY_SIZE);
->> +                                    full_key_size);
->>         hmac_sha256_update(&hmac_ctx, i, 4);
->>         hmac_sha256_update(&hmac_ctx, label.iov_base, label.iov_len);
->>         hmac_sha256_update(&hmac_ctx, &zero, 1);
->> @@ -315,6 +316,7 @@ generate_smb3signingkey(struct cifs_ses *ses,
->>                         const struct derivation_triplet *ptriplet)
->>  {
->>         int rc;
->> +       unsigned int full_key_size;
->>         bool is_binding =3D false;
->>         int chan_index =3D 0;
->>
->> @@ -344,18 +346,32 @@ generate_smb3signingkey(struct cifs_ses *ses,
->>          * master connection signing key stored in the session
->>          */
->>
->> +       /*
->> +        * Per MS-SMB2 3.2.5.3.1, signing key always uses Session.Sessio=
-nKey
->> +        * (first 16 bytes). Encryption/decryption keys use
->> +        * Session.FullSessionKey when dialect is 3.1.1 and cipher is
->> +        * AES-256-CCM or AES-256-GCM, otherwise Session.SessionKey.
->> +        */
-> If this change is specific to 3.1.1 should we check for version as
-> this looks like a common function for SMB 3.?
->
->>         if (is_binding) {
->>                 rc =3D generate_key(ses, ptriplet->signing.label,
->>                                   ptriplet->signing.context,
->>                                   ses->chans[chan_index].signkey,
->> -                                 SMB3_SIGN_KEY_SIZE);
->> +                                 SMB3_SIGN_KEY_SIZE,
->> +                                 SMB2_NTLMV2_SESSKEY_SIZE);
->>                 if (rc)
->>                         return rc;
->>         } else {
->> +               if (server->cipher_type =3D=3D SMB2_ENCRYPTION_AES256_CC=
-M ||
->> +                   server->cipher_type =3D=3D SMB2_ENCRYPTION_AES256_GC=
-M)
->> +                       full_key_size =3D ses->auth_key.len;
-> Should we validate the length passed by user space and make sure it is
-> within limits.?
->
->> +               else
->> +                       full_key_size =3D SMB2_NTLMV2_SESSKEY_SIZE;
-> Should we move the above assignment down ? As this change is
-> needed only for encryption and decryption and not for signing.
->
->>                 rc =3D generate_key(ses, ptriplet->signing.label,
->>                                   ptriplet->signing.context,
->>                                   ses->smb3signingkey,
->> -                                 SMB3_SIGN_KEY_SIZE);
->> +                                 SMB3_SIGN_KEY_SIZE,
->> +                                 SMB2_NTLMV2_SESSKEY_SIZE);
->>                 if (rc)
->>                         return rc;
->>
->> @@ -368,13 +384,15 @@ generate_smb3signingkey(struct cifs_ses *ses,
->>                 rc =3D generate_key(ses, ptriplet->encryption.label,
->>                                   ptriplet->encryption.context,
->>                                   ses->smb3encryptionkey,
->> -                                 SMB3_ENC_DEC_KEY_SIZE);
->> +                                 SMB3_ENC_DEC_KEY_SIZE,
->> +                                 full_key_size);
->>                 if (rc)
->>                         return rc;
->>                 rc =3D generate_key(ses, ptriplet->decryption.label,
->>                                   ptriplet->decryption.context,
->>                                   ses->smb3decryptionkey,
->> -                                 SMB3_ENC_DEC_KEY_SIZE);
->> +                                 SMB3_ENC_DEC_KEY_SIZE,
->> +                                 full_key_size);
->>                 if (rc)
->>                         return rc;
->>         }
->> @@ -389,7 +407,7 @@ generate_smb3signingkey(struct cifs_ses *ses,
->>                         &ses->Suid);
->>         cifs_dbg(VFS, "Cipher type   %d\n", server->cipher_type);
->>         cifs_dbg(VFS, "Session Key   %*ph\n",
->> -                SMB2_NTLMV2_SESSKEY_SIZE, ses->auth_key.response);
->> +                ses->auth_key.len, ses->auth_key.response);
->>         cifs_dbg(VFS, "Signing Key   %*ph\n",
->>                  SMB3_SIGN_KEY_SIZE, ses->smb3signingkey);
->>         if ((server->cipher_type =3D=3D SMB2_ENCRYPTION_AES256_CCM) ||
->> --
->
-> Other than the above comments, Patch looks good to me.
+A later share-root SMB2 create uses tree_conn->share_conf->path as the
+lookup root. If the share was published with path == NULL, that request
+passes a NULL pathname into do_getname_kernel()/strlen() and can crash
+the ksmbd worker.
 
-Hey Bharath,
-Thanks for the comments. I will prepare a V2 with the recommended
-changes, and post the updated patch.
+Set ret = -ENOMEM when path duplication fails so the incomplete share is
+destroyed before publication.
 
---
-Best,
-Piyush
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Signed-off-by: Shuhao Fu <sfual@cse.ust.hk>
+---
+ fs/smb/server/mgmt/share_config.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/fs/smb/server/mgmt/share_config.c b/fs/smb/server/mgmt/share_config.c
+index 53f44ff4d376f3e..6f97f8d39657cd2 100644
+--- a/fs/smb/server/mgmt/share_config.c
++++ b/fs/smb/server/mgmt/share_config.c
+@@ -167,7 +167,10 @@ static struct ksmbd_share_config *share_config_request(struct ksmbd_work *work,
+ 
+ 		share->path = kstrndup(ksmbd_share_config_path(resp), path_len,
+ 				      KSMBD_DEFAULT_GFP);
+-		if (share->path) {
++		if (!share->path) {
++			ret = -ENOMEM;
++		} else {
++			ret = 0;
+ 			share->path_sz = strlen(share->path);
+ 			while (share->path_sz > 1 &&
+ 			       share->path[share->path_sz - 1] == '/')
+@@ -179,9 +182,10 @@ static struct ksmbd_share_config *share_config_request(struct ksmbd_work *work,
+ 		share->force_directory_mode = resp->force_directory_mode;
+ 		share->force_uid = resp->force_uid;
+ 		share->force_gid = resp->force_gid;
+-		ret = parse_veto_list(share,
+-				      KSMBD_SHARE_CONFIG_VETO_LIST(resp),
+-				      resp->veto_list_sz);
++		if (!ret)
++			ret = parse_veto_list(share,
++					      KSMBD_SHARE_CONFIG_VETO_LIST(resp),
++					      resp->veto_list_sz);
+ 		if (!ret && share->path) {
+ 			if (__ksmbd_override_fsids(work, share)) {
+ 				kill_share(share);
+-- 
+2.49.0
