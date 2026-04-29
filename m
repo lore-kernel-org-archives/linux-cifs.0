@@ -1,61 +1,63 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685B82FE58C
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 20:53:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035AA394462
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 20:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777495983; cv=none; b=RalZ1ykukZx/PmBqdUCbCyjlb5l7nP42I6zWydLBFNttzowtMVfeS+8I1Wolzf4S1G6LtfQgMEnJv/HorAc4efV8FkMiEwHCOReVJRLYh5Te/lrDO4SAyc1gqfJAtYZhlCO7TZ0yXYfeapdITU2EQA0fxMMMKIucwVIJcVi6gu4=
+	t=1777495992; cv=none; b=qq50CWHj4ekGDjtdBribuo9TZHYCoRC52TMEdl4JcD0Sq2WqF1oPt1YOSTomFv6OuzlpczF6MC2X49H+xhKaOaKqHoz++/BTOkNtJHZrRYyOyuwIknAEv2V9FWMKlzTrVfA4zdyPeV6QuUmAZvhaVOeRHVSdt9v9mpytz7AZpI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777495983; c=relaxed/simple;
-	bh=H95xvPfekRcV6kcCfZnWxct/d3WkScr/5zfu4CeTb74=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZC66xSL6BOLhdedeaow0sqpPUL4tm3lGtPTsPXySQjkKqluGxiCE7A7YKXt/WLWREuYziJfyZs6jN8WJpP9yvjh5sFoBRexblfREJeu9O+B0xLpG2J8TWEXEn1o2MaOW0YpbDgkVQVCgNE+PmlR/k8ThG7bq01+XO6XO+eJw0kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fpGBKwYt; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1777495992; c=relaxed/simple;
+	bh=B43jmh8tyellEDHw/JHQWGP4Kl4Bt82DdbNgnsOczTI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WwTySs9CviLv10PdNM4wdYOhcoP/vN2N1kxH4jNU84bCdaQcyNwStuvxdr/Px2Kcv999IyTm5iTY7y/ODx3J+CDfhOLR//V04IEhIFctP5qqzKrkHkJkOSlCp6sj0t2n/5lX/SxoS9c+8yHwPSRtL9W5DU5PEENQlIBGwGBjiQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=E8yzMhy4; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fpGBKwYt"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488b0046078so1717555e9.1
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 13:53:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="E8yzMhy4"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48a7fe4f40bso2081405e9.0
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 13:53:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1777495980; x=1778100780; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tb24MkyjLzb8BmTwEPAd5bKVggSokaYwMRLyJVXZm4g=;
-        b=fpGBKwYtS9J65Egz1e+qq1gHrLbrGMlnPZkOfDmPCgTPWC9HF7lDwH+aUERDnnkqJd
-         ggKmlIS9eA9r+ZeI8dLDxK9X68rMYIQGBxfC6eNm45UIe8b1EEu6Mc0eh2HwvAHWbinp
-         WleOeSL/i0cahlv8tcXluqlVCEKE+8MZrGTGDrE+XXVG//4WM5iTgXNBDIHeimE3Xxtz
-         xzXRHbnfUJYO5kQ1a5MQjrCXTKixfYErjXdOLn4Gndb3wlNmZWacnqHftZ33DYwmeyhr
-         Bjnt4i03G3LDeiXb8RmYblhqh2/iEXEPPZE/IaQ5WypGp5jRpmsMHhzJDFwYcs63+Hjo
-         YCsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777495980; x=1778100780;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=suse.com; s=google; t=1777495988; x=1778100788; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tb24MkyjLzb8BmTwEPAd5bKVggSokaYwMRLyJVXZm4g=;
-        b=nsBl7AkuWyD3POMDYFOnzMf01Zr30CK+R89K+12jxyjTDBtkSV5P+9bHo+gdDJFy3/
-         0VfjcWFtyzTa/KTKpgIQ7BS04FsP2oqwj63OuVGEgfXiRohtRX0wGOxRC6IjZeOnCkH8
-         tXQhnmeuij8AJuILglRXZOe43+9d2CiZelo6vC+xUL2BAQ3vPU+P5LNSHTGfoAiPAvfa
-         lRpAnaRslZ3CfRE1EQVFe9D9oX5zMeNiB/92UqabW1zdgrIIuMIq+rafIW0g/zVJqXu1
-         5nW3SSp3IANMiKZeMLhYWANV4M1MpZgYfSCDw/WOSHWD4t6S7WIhqeFacDeVWWVv3fNk
-         O6zg==
-X-Forwarded-Encrypted: i=1; AFNElJ9jq9EheMJJsy72jB52b2aPR5pSBS9XlhonLTdHF3iBlVCjBwEMIZgdeb5Lt5RVmhtTG1imZVyglsju@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNHhEG/GjHfBMtDFW/ncJjmPz6+J/KnWHXDDMIm7YpgneumY8e
-	k2nBO8v5QeP7z7HXsnWHDwXkS685YIv814cL0LY6oTrObCcIcftVf6MvUNuLLeC/SYo=
-X-Gm-Gg: AeBDiesWmvlTUGTg5Pg1fttWydhjJKiukb4Qx0NVpSFy1lahGOOMBnpQbHU3BP9Gvq8
-	Bqd0r8JpedoNy2E8aQNYJ32NzjSoH9TN8KBiqI6kiW+vXr/B55UHJ92lx5Kz8RKRUvR2Lgn2cxr
-	AUARKaJFNrHwxey8lqWcxxUybWIqiXPrSDPjEU0NzMtuKix+zqrzJDqRAAygaU8K1hN0FmPgM04
-	oQc8em8loVmvg217MZ5PHntUGgenxKOv+/jj8zjFpgR22KWAwRW1LWlVIXIGFZgqjhdBOl+oduw
-	fkPiJGGU6vgvnMigtJj+Mtq+cCaurFwFTgIrIlNsMPYvZ3sryMs+zL9wfIyRvujMRoTz/XIfQ1/
-	fQGEPy/XXPJKL49XYZ5O5scngIxcsciL1gWgF7OPcF4un1JT6jL5Co62cNmU45GXfVISh1BZ1if
-	9m9cz3QTXmL2uC1Fv/XhGRvADqbGVS80EVthH7AcMwRsjK
-X-Received: by 2002:a05:600c:a409:b0:489:1fa5:997f with SMTP id 5b1f17b1804b1-48a83d6c37cmr2425015e9.9.1777495979623;
-        Wed, 29 Apr 2026 13:52:59 -0700 (PDT)
+        bh=86QVkp45/ToGTd4flnsgE7Dt+Q0OFD4ax6NkF368peQ=;
+        b=E8yzMhy4SOL6sxsHtnTEJowaR2HCdNuuHqgmWU6jqGPmlbOw+xyuK2PyvCIYvceKqb
+         xnJJk3pUIGLqMo3mgHNAnaDG2+bOtb3QtoMz5mayDDiZ45dhiuKap9tTgm++VyndyhiB
+         Sv2P3vVMoYPq/dPqAzv4hsbj6ZAgwcp1DijNrg4psx+6Cr1KhqGP75pevVTczZyTG9kg
+         64yi+b3Jfe39HwGVfngVQw53GMXrnoaQwa149rZzezucbr/2lTf6U58jLV1eeKePihAX
+         sQ61q066u/mpR+nwA3FLJ3oNBPUB8JQjuWYiWY9k6WlHo5uojm7ubZxtQLBvEW2KqJW+
+         YJdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777495988; x=1778100788;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=86QVkp45/ToGTd4flnsgE7Dt+Q0OFD4ax6NkF368peQ=;
+        b=cmZAybl8jRdekgTWOvr1hOBnlZ9pjwYOW2icvbZCzkEiGYwvR0t2B2jHRPkBrARUmp
+         nF4owWhS2qfcAR6WKMre5mT4tEpE3oSUjXHFpXBXXicL4XlSmikrbymruRbTheRvKGc7
+         J+PDwDVQvLwb6SX8/V16WVVJ5C2yO/tRhxWRK39mRDTzJgY8KiDulxk6uaP0A3Db4OH8
+         8K3s2OW0QUfPHzlZ9ylv/yZjcr5x8KzD3x26zhwo7eGrGBFH0Wt858NBrDgC79C+NubX
+         sq+qc/HWlBYhHa1uo/xBSlJNu1i2fqlBFA/5gppwpZD6Fy4xriZm/nfKUzTQo4oC3eUV
+         JxGA==
+X-Forwarded-Encrypted: i=1; AFNElJ9AEbIjdD3P3fhWT+QNyLBiS6ZRZqesPefIAGWkpAt3R8UUXuWEZFPfJfqV87cBaJSi+rcNro3OOt+5@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7j3ZokQO9G9FSV2EpY0vAMBtlXfIeA4KbNg3t3gN2StG+CY/6
+	gqWaV4sqY3UdYll4VOr6DZhBXyJzNSfQj/IHVva5vHqyjEk4HMSxHjlqvm87Yll2CvA=
+X-Gm-Gg: AeBDietKIYjwcGYamtxfnuhSLYaeXoeJEVi9GngfyXCyyQOZ90eECEzcouKJh3O8Dup
+	iTXqKjKvSWK3Y3bdkm9RtIzk0Gy3NGErGPI3S6MwfIUkAPpKX3+qEOyxLMq4HqxxWgCbW4sysya
+	x8xvg8WOl1RlcOWBUKrrLCgq/8srZKBeIKGQPRGL6l607gxDwSVZbu8IL4mGggl6wdRh5Yw1LGA
+	NSc+mvmXg1eRhMpy5X47zMRvPOqidzc3a0HG+44DG6tA1GG5Gf9jpWe0fO3Dxl2Hc7dV6C/Yj2B
+	NcPJvi39gDggt3o7GD7ZeM3fUspDADJFuEUzzP3vJXYmyxtO3mI/j6bu9+gdmDHJDcqTjTQlETD
+	9Q+COCDmQJ0h0xQzbUETDtnUJrGHu14Hs99RwNtzNr+1HSpEMXnMjHw164RU7imzSyMfL08k37B
+	haT8LMJqp3BrUIDt9+mxNzTlfdyakOlolDK6ffvqs05q5P
+X-Received: by 2002:a05:600c:c058:b0:487:4eb:d125 with SMTP id 5b1f17b1804b1-48a83d6f154mr2397105e9.9.1777495988358;
+        Wed, 29 Apr 2026 13:53:08 -0700 (PDT)
 Received: from precision ([2a01:4b00:c007:bb00:be9d:a3c4:18b1:4a25])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12de3269b41sm3925240c88.13.2026.04.29.13.52.54
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12de3269b41sm3925240c88.13.2026.04.29.13.53.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 13:52:58 -0700 (PDT)
+        Wed, 29 Apr 2026 13:53:07 -0700 (PDT)
 From: Henrique Carvalho <henrique.carvalho@suse.com>
 To: sfrench@samba.org
 Cc: metze@samba.org,
@@ -65,11 +67,14 @@ Cc: metze@samba.org,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
 	ematsumiya@suse.de,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH 1/3] smb: client: fix conflicting option validation for new mount API
-Date: Wed, 29 Apr 2026 17:52:34 -0300
-Message-ID: <20260429205236.456099-1-henrique.carvalho@suse.com>
+	linux-cifs@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH 2/3] smb: client: fix race in multichannel rescaling during mount
+Date: Wed, 29 Apr 2026 17:52:35 -0300
+Message-ID: <20260429205236.456099-2-henrique.carvalho@suse.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260429205236.456099-1-henrique.carvalho@suse.com>
+References: <20260429205236.456099-1-henrique.carvalho@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -78,160 +83,117 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Apply conflicting option validation consistently across all the new
-mount API paths, for both mount and remount.
+mchan_mount_* introduced async channel rescaling during mount. That can
+lead race with other mount/remount attempts that use the same session,
+when these are scaling down the channels, potentially leading to UAF, as
+described in
+https://lore.kernel.org/linux-cifs/rw7ptbx22cntes5eag5r3kvg5mzfvvzdhj4v2kw6mnunmsewev@f2iyrmmitkl3/
 
-Some checks were only applied during initial mount validation, while
-others were handled during option parsing, causing mount and
-remount/reconfigure to behave differently.
+Fix this by using the same serialization used in other rescaling paths
+and if in a race, rescheduling the channel scaling work.
 
-Move the conflicting option checks into smb3_handle_conflicting_options()
-and call it from the common validation paths, including for
-multichannel/max_channels handling.
-
-Fixes: ef529f655a2c ("cifs: client: allow changing multichannel mount options on remount")
-Fixes: 1ef15fbe6771 ("cifs: client: enforce consistent handling of multichannel and max_channels")
-Fixes: 77d8aa79ecfb ("cifs: reinstate original behavior again for forceuid/forcegid")
-Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
+Cc: stable@vger.kernel.org
+Fixes: 556bb341f9f2 ("smb: client: introduce multichannel async work during mount")
 Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 ---
- fs/smb/client/fs_context.c | 87 +++++++++++++++++++++-----------------
- 1 file changed, 48 insertions(+), 39 deletions(-)
+ fs/smb/client/cifsglob.h |  2 +-
+ fs/smb/client/connect.c  | 32 +++++++++++++++++++++++++-------
+ fs/smb/client/sess.c     |  1 -
+ 3 files changed, 26 insertions(+), 9 deletions(-)
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index b9544eb0381b..41384e1f0f3c 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -724,6 +724,41 @@ static int smb3_handle_conflicting_options(struct fs_context *fc)
- {
- 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 82e0adc1dabd..ef63a1c3249c 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1817,7 +1817,7 @@ struct cifs_mount_ctx {
+ };
  
-+	if (ctx->rdma && ctx->vals->protocol_id < SMB30_PROT_ID) {
-+		cifs_errorf(fc, "SMB Direct requires Version >=3.0\n");
-+		return -EOPNOTSUPP;
+ struct mchan_mount {
+-	struct work_struct work;
++	struct delayed_work dwork;
+ 	struct cifs_ses *ses;
+ };
+ 
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index dcde25da468d..2ea93f0b78c9 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -3813,7 +3813,7 @@ mchan_mount_alloc(struct cifs_ses *ses)
+ 	if (!mchan_mount)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	INIT_WORK(&mchan_mount->work, mchan_mount_work_fn);
++	INIT_DELAYED_WORK(&mchan_mount->dwork, mchan_mount_work_fn);
+ 
+ 	spin_lock(&cifs_tcp_ses_lock);
+ 	cifs_smb_ses_inc_refcount(ses);
+@@ -3833,13 +3833,32 @@ mchan_mount_free(struct mchan_mount *mchan_mount)
+ static void
+ mchan_mount_work_fn(struct work_struct *work)
+ {
+-	struct mchan_mount *mchan_mount = container_of(work, struct mchan_mount, work);
++	struct mchan_mount *mchan_mount = container_of(work, struct mchan_mount, dwork.work);
++	struct cifs_ses *ses = mchan_mount->ses;
+ 
+-	smb3_update_ses_channels(mchan_mount->ses,
+-				 mchan_mount->ses->server,
++	/*
++	 * mchan_mount_work_fn could race with smb3_update_ses_channel called
++	 * for the same session on remount, other mounts or
++	 * smb3_update_ses_channel
++	 */
++	spin_lock(&ses->ses_lock);
++	if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
++		spin_unlock(&ses->ses_lock);
++		queue_delayed_work(cifsiod_wq, &mchan_mount->dwork, 2 * HZ);
++		return;
 +	}
++	ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
++	spin_unlock(&ses->ses_lock);
 +
-+	if (ctx->multiuser && !IS_ENABLED(CONFIG_KEYS)) {
-+		cifs_errorf(fc, "Multiuser mounts require kernels with CONFIG_KEYS enabled\n");
-+		return -EOPNOTSUPP;
-+	}
++	smb3_update_ses_channels(ses,
++				 ses->server,
+ 				 false /* from_reconnect */,
+ 				 false /* disable_mchan */);
+ 
++	spin_lock(&ses->ses_lock);
++	ses->flags &= ~CIFS_SES_FLAG_SCALE_CHANNELS;
++	spin_unlock(&ses->ses_lock);
 +
-+	if (ctx->multiuser && ctx->upcall_target == UPTARGET_MOUNT) {
-+		cifs_errorf(fc, "multiuser mount option not supported with upcalltarget set as 'mount'\n");
-+		return -EINVAL;
-+	}
-+
-+	if (ctx->uid_specified && !ctx->forceuid_specified) {
-+		ctx->override_uid = 1;
-+		pr_notice("enabling forceuid mount option implicitly because uid= option is specified\n");
-+	}
-+
-+	if (ctx->gid_specified && !ctx->forcegid_specified) {
-+		ctx->override_gid = 1;
-+		pr_notice("enabling forcegid mount option implicitly because gid= option is specified\n");
-+	}
-+
-+	if (ctx->override_uid && !ctx->uid_specified) {
-+		ctx->override_uid = 0;
-+		pr_notice("ignoring forceuid mount option specified with no uid= option\n");
-+	}
-+
-+	if (ctx->override_gid && !ctx->gid_specified) {
-+		ctx->override_gid = 0;
-+		pr_notice("ignoring forcegid mount option specified with no gid= option\n");
-+	}
-+
- 	if (ctx->multichannel_specified) {
- 		if (ctx->multichannel) {
- 			if (!ctx->max_channels_specified) {
-@@ -835,28 +870,23 @@ static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
- 		if (ret < 0)
- 			break;
- 	}
--	return ret ?: smb3_handle_conflicting_options(fc);
-+	return ret;
+ 	mchan_mount_free(mchan_mount);
  }
  
- /*
-- * Validate the preparsed information in the config.
-+ * smb3_fs_context_validate - check initial-mount-only constraints: UNC presence, address resolution,
-+ * dialect warnings
-+ *
-+ * @fc: generic mount context
-  */
- static int smb3_fs_context_validate(struct fs_context *fc)
- {
- 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
-+	int rc;
+@@ -3885,7 +3904,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ 		goto error;
  
--	if (ctx->rdma && ctx->vals->protocol_id < SMB30_PROT_ID) {
--		cifs_errorf(fc, "SMB Direct requires Version >=3.0\n");
--		return -EOPNOTSUPP;
--	}
--
--#ifndef CONFIG_KEYS
--	/* Muliuser mounts require CONFIG_KEYS support */
--	if (ctx->multiuser) {
--		cifs_errorf(fc, "Multiuser mounts require kernels with CONFIG_KEYS enabled\n");
--		return -1;
--	}
--#endif
-+	rc = smb3_handle_conflicting_options(fc);
-+	if (rc)
-+		return rc;
+ 	if (ctx->multichannel)
+-		queue_work(cifsiod_wq, &mchan_mount->work);
++		queue_work(cifsiod_wq, &mchan_mount->dwork.work);
  
- 	if (ctx->got_version == false)
- 		pr_warn_once("No dialect specified on mount. Default has changed to a more secure dialect, SMB2.1 or later (e.g. SMB3.1.1), from CIFS (SMB1). To use the less secure SMB1 dialect to access old servers which do not support SMB3.1.1 (or even SMB3 or SMB2.1) specify vers=1.0 on mount.\n");
-@@ -891,26 +921,6 @@ static int smb3_fs_context_validate(struct fs_context *fc)
- 	/* set the port that we got earlier */
- 	cifs_set_port((struct sockaddr *)&ctx->dstaddr, ctx->port);
+ 	free_xid(mnt_ctx.xid);
+ 	return rc;
+@@ -3942,8 +3961,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ 		goto error;
  
--	if (ctx->uid_specified && !ctx->forceuid_specified) {
--		ctx->override_uid = 1;
--		pr_notice("enabling forceuid mount option implicitly because uid= option is specified\n");
--	}
+ 	if (ctx->multichannel)
+-		queue_work(cifsiod_wq, &mchan_mount->work);
 -
--	if (ctx->gid_specified && !ctx->forcegid_specified) {
--		ctx->override_gid = 1;
--		pr_notice("enabling forcegid mount option implicitly because gid= option is specified\n");
--	}
--
--	if (ctx->override_uid && !ctx->uid_specified) {
--		ctx->override_uid = 0;
--		pr_notice("ignoring forceuid mount option specified with no uid= option\n");
--	}
--
--	if (ctx->override_gid && !ctx->gid_specified) {
--		ctx->override_gid = 0;
--		pr_notice("ignoring forcegid mount option specified with no gid= option\n");
--	}
--
- 	return 0;
++		queue_work(cifsiod_wq, &mchan_mount->dwork.work);
+ 	free_xid(mnt_ctx.xid);
+ 	return rc;
+ 
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index de2012cc9cf3..24d5206e5c44 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -627,7 +627,6 @@ cifs_ses_add_channel(struct cifs_ses *ses,
+ 	return rc;
  }
  
-@@ -1097,6 +1107,10 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	if (rc)
- 		return rc;
- 
-+	rc = smb3_handle_conflicting_options(fc);
-+	if (rc)
-+		return rc;
-+
- 	/*
- 	 * We can not change UNC/username/password/domainname/
- 	 * workstation_name/nodename/iocharset
-@@ -1909,11 +1923,6 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 	}
- 	/* case Opt_ignore: - is ignored as expected ... */
- 
--	if (ctx->multiuser && ctx->upcall_target == UPTARGET_MOUNT) {
--		cifs_errorf(fc, "multiuser mount option not supported with upcalltarget set as 'mount'\n");
--		goto cifs_parse_mount_err;
--	}
 -
- 	return 0;
- 
-  cifs_parse_mount_err:
+ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 				    struct cifs_ses *ses)
+ {
 -- 
 2.53.0
 
