@@ -1,195 +1,122 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from o12.p25.mailjet.com (o12.p25.mailjet.com [185.189.236.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34D543CECE;
-	Tue, 28 Apr 2026 17:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1810337F743
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 02:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.189.236.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777397297; cv=none; b=AO+7wqUVqI4zLEYMvA241rDcSs4IHEyKOzczHeNYn765poJzg1o5wJtdG5mhy/0O0vFEeB/2OYrupGWVvKjl0g54dV+nRwGtLG4Tx2wjPiGApkQAwzmQprpT/4ellBFYJNniwiN2SLwnrPHM0ssHoyUcvcNHjyKW+xg6MYTzCNU=
+	t=1777429559; cv=none; b=Y11GiSRhdidtHJIpy5xsbwD/f4Y0F2A6hyE9SKF1djkw+d9ETCGZ+zmsCjFHGv3DKs3gezHhkSuxZpsWTjIYd/gWXuxM0X2XSYldg84S1p9D4UxiZKCp2WXfqJxBIVK3RAHcKInV7FyzM0wsQXg90asdSjDznKzWtEFGTz56l3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777397297; c=relaxed/simple;
-	bh=aK1A0F52g1hEvh2240PVi8iidcBqxIpd6FloalqeCR0=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=G3ByD/na+4eiMH50wXaeAzS6hDq1+U/49InEmxwuTd1c0b9cT5m12gy8qoKjc7kXqxOEkKA5wUJMq9mbL+b5waJ9GLY1JEE6pMgT76jLe8Hoq3VvUWYfBNYq7bgq2H1kMPXOEAAPlTXJ6t6HKbjiJMYGjk+n2ln/9fw6jOEOsYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=IB2Qdp55; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1777429559; c=relaxed/simple;
+	bh=MnToQbK/FkNAhxh5aQ4vTyxi+EldDESUytf58yodrW8=;
+	h=Message-Id:MIME-Version:From:To:Subject:Date:Cc; b=NaMjFGyFWUE9Tg+eEA/eho7fjMcWVpNrz3Ylhi5rxLK8RKnDWgDJFIyZWhp5x8V2HmISES6rhwjGTUekfJMmFrdNEOCKnBZ0jY9ZkJ+mUhoLYwEbz0VkDQyQLPQXYKUio5uJdGYrtvX21DdUmC9fIkrCc3oyZM9aTjFWg7y3pRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yikuo.dev; spf=pass smtp.mailfrom=a3119462.bnc3.mailjet.com; dkim=pass (2048-bit key) header.d=yikuo.dev header.i=yi@yikuo.dev header.b=jefRvSJ4; arc=none smtp.client-ip=185.189.236.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yikuo.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a3119462.bnc3.mailjet.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="IB2Qdp55"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=G1J5OR3MUF730xBsui9yjwFfvvjC4RiDCVHbp7kYe74=; b=IB2Qdp556p5N5+ybQOgDxtxtwz
-	YD2f1IKgFPnWbNncPmBG6H2HalQTSP2g1SNFYNaVOcDVslsPMWNspKMM6rDLa9asiEP2N7hjOBbe7
-	h9o4nDtfKnEXtjbuC6h6SILf4NUR/C8PkIqcXSEgvpDuP1QFqMjmAw9xG3geWkRajILd15Pu6Cp6x
-	KJxeErRkl4DLnwlE78d9O3e9XFC7IEzwcPsL/ae67W63mNGwFR7NRylW9HpPe+iKx8CeXThs5Im+1
-	BAoAL88qiUSndZ7EZBzgnISTCjQEZTvKnI34alFbhxI+XWRR6OoLhwtvGBJtglmQvk3XItRLjPlK3
-	KqZBfpdQ==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
-	id 1wHmEF-0000000043A-2kKy;
-	Tue, 28 Apr 2026 14:28:11 -0300
-Message-ID: <d43b1d1023d13746819a780f65da9341@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: nspmangalore@gmail.com, linux-cifs@vger.kernel.org, smfrench@gmail.com,
- bharathsm@microsoft.com, dhowells@redhat.com, henrique.carvalho@suse.com,
- ematsumiya@suse.de
-Cc: Shyam Prasad N <sprasad@microsoft.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v3 03/19] cifs: invalidate cfid on unlink/rename/rmdir
-In-Reply-To: <20260428160804.281745-3-sprasad@microsoft.com>
-References: <20260428160804.281745-1-sprasad@microsoft.com>
- <20260428160804.281745-3-sprasad@microsoft.com>
-Date: Tue, 28 Apr 2026 14:28:11 -0300
+	dkim=pass (2048-bit key) header.d=yikuo.dev header.i=yi@yikuo.dev header.b="jefRvSJ4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; q=dns/txt;
+  d=yikuo.dev; i=yi@yikuo.dev; s=mailjet; t=1777429556; x=1777436756;
+  h=Message-Id: MIME-Version: From: To: Subject: Date:
+   List-Unsubscribe: List-Unsubscribe-Post: Cc: Feedback-Id:
+   X-CSA-Complaints: X-MJ-Mid: X-MJ-SMTPGUID:
+   X-REPORT-ABUSE-TO: Content-Transfer-Encoding: To: From:
+   Sender: Subject: Date;
+  bh=jgRWHS5LTnADW7gurrSjzDLoK6uUiNKmh4ecbUTbkmg=;
+  b=jefRvSJ4C2ISFVIHgqmY8OOjmBYULnk3qkugb3lUbuglcWpcCn1vCI3+9
+ W9RJnv1v/1l8RkEaRIC9YILuml/7b9JZs9HPmXnxoI/0UnUhPelvikqSOGJg
+ kN3jEUpvGpJI4HnxK8V+j7v28yx8l+GDZ9xkTITAzp1cIo7Ph/ziJXmzJzae
+ qaX7ZvnI5uQxF+5xfzZPHvLtO3aGcdJCzX0iD186cEkZxvd8DaisSAyi2Xme
+ DrFGAvNdKxA6rqzSYdbN03YdpDdfbNFhsgzZScchSvYRD0iAcKnpxcj6loBn
+ /XJW+lD63LCexEpCLaSHJKLbyBVNZlwMTjHpz0UnR9vJw==
+Message-Id: <4bf423bb.AU4AAJbgzlAAAAAAAAAABAMtJJMAAYKKIjQAAAAAAC-ZZgBp8Ww0@mailjet.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+From: Yi Kuo <yi@yikuo.dev>
+To: smfrench@gmail.com, linkinjeon@kernel.org
+Subject: [PATCH] smb: smbdirect: fix MR registration for coalesced SG lists
+Date: Wed, 29 Apr 2026 10:25:25 +0800
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+Cc: metze@samba.org, tom@talpey.com, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, Yi Kuo
+	<yi@yikuo.dev>
+Feedback-Id: 42.3119462.2858555:MJ
+X-CSA-Complaints: csa-complaints@eco.de
+X-MJ-Mid:
+	AU4AAJbgzlAAAAAAAAAABAMtJJMAAYKKIjQAAAAAAC-ZZgBp8Ww0yCNLysOaRJes78hqlhuD6gArnjs
+X-MJ-SMTPGUID: a321fef6-42c1-4399-acf4-f1adff38652b
+X-REPORT-ABUSE-TO: Message sent by Mailjet please report to
+	abuse@mailjet.com with a copy of the message
+Content-Transfer-Encoding: quoted-printable
 
-nspmangalore@gmail.com writes:
+ib_dma_map_sg() modifies the provided scatterlist and returns the
+number of mapped entries, which can be fewer than the requested
+mr->sgt.nents if the DMA controller coalesces contiguous memory
+segments. Passing the original, uncoalesced count to ib_map_mr_sg()
+causes memory registration failures if coalescing actually occurs.
 
-> From: Shyam Prasad N <sprasad@microsoft.com>
->
-> Today we do not invalidate the cached_dirent or the entire
-> parent cfid when a dentry in a dir has been removed/moved.
->
-> This change invalidates the parent cfid so that we don't serve
-> directory contents from the cache.
->
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/smb/client/inode.c | 40 ++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 38 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-> index 888f9e35f14b8..e077df844c819 100644
-> --- a/fs/smb/client/inode.c
-> +++ b/fs/smb/client/inode.c
-> @@ -28,6 +28,23 @@
->  #include "cached_dir.h"
->  #include "reparse.h"
->  
-> +static void cifs_invalidate_cached_dir(struct cifs_tcon *tcon,
-> +				       struct dentry *parent)
-> +{
-> +	struct cached_fid *parent_cfid = NULL;
-> +
-> +	if (!tcon || !parent)
-> +		return;
+Capture the actual mapped count returned by ib_dma_map_sg() and pass it
+to ib_map_mr_sg() to ensure correct MR registration.
 
-The NULL check for @tcon is unnecessary.  This seems to be called only
-with a valid @tcon.
+Also update the ib_dma_map_sg() error logging to drop the error
+pointer formatting, since the return value is an integer count
+rather than an error code.
 
-> +
-> +	if (!open_cached_dir_by_dentry(tcon, parent, &parent_cfid)) {
-> +		mutex_lock(&parent_cfid->dirents.de_mutex);
-> +		parent_cfid->dirents.is_valid = false;
-> +		parent_cfid->dirents.is_failed = true;
-> +		mutex_unlock(&parent_cfid->dirents.de_mutex);
-> +		close_cached_dir(parent_cfid);
-> +	}
-> +}
-> +
->  /*
->   * Set parameters for the netfs library
->   */
-> @@ -322,7 +339,7 @@ cifs_unix_basic_to_fattr(struct cifs_fattr *fattr, FILE_UNIX_BASIC_INFO *info,
->  				fattr->cf_uid = uid;
->  		}
->  	}
-> -	
-> +
+Signed-off-by: Yi Kuo <yi@yikuo.dev>
+---
+ fs/smb/smbdirect/mr.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-Why are you adding a blank newline?
+diff --git a/fs/smb/smbdirect/mr.c b/fs/smb/smbdirect/mr.c
+index 5228e699cd5d..058dc24bf544 100644
+--- a/fs/smb/smbdirect/mr.c
++++ b/fs/smb/smbdirect/mr.c
+@@ -269,7 +269,7 @@ smbdirect_connection_register_mr_io(struct smbdirect_so=
+cket *sc,
+ {
+ 	const struct smbdirect_socket_parameters *sp =3D &sc->parameters;
+ 	struct smbdirect_mr_io *mr;
+-	int ret, num_pages;
++	int ret, num_pages, num_mapped;
+ 	struct ib_reg_wr *reg_wr;
+=20
+ 	num_pages =3D iov_iter_npages(iter, sp->max_frmr_depth + 1);
+@@ -300,19 +300,19 @@ smbdirect_connection_register_mr_io(struct smbdirect_=
+socket *sc,
+ 		num_pages, iov_iter_count(iter), sp->max_frmr_depth);
+ 	smbdirect_iter_to_sgt(iter, &mr->sgt, sp->max_frmr_depth);
+=20
+-	ret =3D ib_dma_map_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->dir);
+-	if (!ret) {
++	num_mapped =3D ib_dma_map_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->=
+dir);
++	if (!num_mapped) {
+ 		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
+-			"ib_dma_map_sg num_pages=3D%u dir=3D%x ret=3D%d (%1pe)\n",
+-			num_pages, mr->dir, ret, SMBDIRECT_DEBUG_ERR_PTR(ret));
++			"ib_dma_map_sg num_pages=3D%u dir=3D%x num_mapped=3D%d\n",
++			num_pages, mr->dir, num_mapped);
+ 		goto dma_map_error;
+ 	}
+=20
+-	ret =3D ib_map_mr_sg(mr->mr, mr->sgt.sgl, mr->sgt.nents, NULL, PAGE_SIZE)=
+;
+-	if (ret !=3D mr->sgt.nents) {
++	ret =3D ib_map_mr_sg(mr->mr, mr->sgt.sgl, num_mapped, NULL, PAGE_SIZE);
++	if (ret !=3D num_mapped) {
+ 		smbdirect_log_rdma_mr(sc, SMBDIRECT_LOG_ERR,
+-			"ib_map_mr_sg failed ret =3D %d nents =3D %u\n",
+-			ret, mr->sgt.nents);
++			"ib_map_mr_sg failed ret =3D %d num_mapped =3D %u\n",
++			ret, num_mapped);
+ 		goto map_mr_error;
+ 	}
+=20
+--=20
+2.54.0
 
->  	fattr->cf_gid = cifs_sb->ctx->linux_gid;
->  	if (!(sbflags & CIFS_MOUNT_OVERR_GID)) {
->  		u64 id = le64_to_cpu(info->Gid);
-> @@ -2067,6 +2084,9 @@ static int __cifs_unlink(struct inode *dir, struct dentry *dentry, bool sillyren
->  		cifs_set_file_info(inode, attrs, xid, full_path, origattr);
->  
->  out_reval:
-> +	if (!rc && dentry->d_parent)
-> +		cifs_invalidate_cached_dir(tcon, dentry->d_parent);
-
-The non-NULL check of @dentry->d_parent is unnecessary.
-cifs_invalidate_cached_dir() already handles it.
-
-> +
->  	if (inode) {
->  		cifs_inode = CIFS_I(inode);
->  		cifs_inode->time = 0;	/* will force revalidate to get info
-> @@ -2378,7 +2398,6 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
->  	}
->  
->  	rc = server->ops->rmdir(xid, tcon, full_path, cifs_sb);
-> -	cifs_put_tlink(tlink);
->  
->  	cifsInode = CIFS_I(d_inode(direntry));
->  
-> @@ -2388,6 +2407,8 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
->  		i_size_write(d_inode(direntry), 0);
->  		clear_nlink(d_inode(direntry));
->  		spin_unlock(&d_inode(direntry)->i_lock);
-> +		if (direntry->d_parent)
-> +			cifs_invalidate_cached_dir(tcon, direntry->d_parent);
-
-Ditto.
-
->  	}
->  
->  	/* force revalidate to go get info when needed */
-> @@ -2402,6 +2423,7 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
->  
->  	inode_set_ctime_current(d_inode(direntry));
->  	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
-> +	cifs_put_tlink(tlink);
->  
->  rmdir_exit:
->  	free_dentry_path(page);
-> @@ -2501,6 +2523,8 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
->  	struct cifs_sb_info *cifs_sb;
->  	struct tcon_link *tlink;
->  	struct cifs_tcon *tcon;
-> +	struct dentry *source_parent;
-> +	struct dentry *target_parent;
->  	bool rehash = false;
->  	unsigned int xid;
->  	int rc, tmprc;
-> @@ -2532,6 +2556,8 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
->  	if (IS_ERR(tlink))
->  		return PTR_ERR(tlink);
->  	tcon = tlink_tcon(tlink);
-> +	source_parent = source_dentry->d_parent ? dget(source_dentry->d_parent) : NULL;
-> +	target_parent = target_dentry->d_parent ? dget(target_dentry->d_parent) : NULL;
-
-Why do you need to dget() ->d_parent?
-
->  	server = tcon->ses->server;
->  
->  	page1 = alloc_dentry_path();
-> @@ -2668,11 +2694,21 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
->  	}
->  
->  	/* force revalidate to go get info when needed */
-> +	if (!rc) {
-> +		cifs_invalidate_cached_dir(tcon, source_parent);
-> +		if (target_parent != source_parent)
-> +			cifs_invalidate_cached_dir(tcon, target_parent);
-> +	}
-> +
->  	CIFS_I(source_dir)->time = CIFS_I(target_dir)->time = 0;
->  
->  cifs_rename_exit:
->  	if (rehash)
->  		d_rehash(target_dentry);
-> +	if (target_parent)
-> +		dput(target_parent);
-> +	if (source_parent)
-> +		dput(source_parent);
-
-The non-NULL checks are unnecessary.  dput() already handles NULL
-dentries.
+=
