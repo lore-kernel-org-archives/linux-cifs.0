@@ -1,79 +1,82 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E141030B529;
-	Wed, 29 Apr 2026 10:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD12F32720C
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 10:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777456952; cv=none; b=AKAxOeAvFja/Jmsj2gm8xY9W71ip31gMxgE9bhdmX/xDc4mJntPMRi9u1ASQUfk6lTBatclMdvrc20l/Omd9QPoh3dtclibNQM4uaIcM1N89LCd//+7/sWj7GbOFAIhIWwhIaJG+h5KzOTXwWOFNnfAnJHq3IAyFAB/etF1jdyY=
+	t=1777457856; cv=none; b=pyElaU2kthYKAftuH/4SEsBX/5AJb2XCZP3WFBiWtvTdFW/UdIXGThSOC8dELCfVlHtZifVWD2jWZbHHq0wLop1k/R5tyukk8X/7mM7uy35SQPYTMCO2/F7SUmuLNnvebJEbz0bZprBQg7JXR7l6IEipw2ZlgaFAayIJKPrrWbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777456952; c=relaxed/simple;
-	bh=5YxoJVw44KcgxBvVmsrpnvEKT6/I3k3MSEPJNDbF2po=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sJXxFN4FDr6O2T1mJnRQk25I/e786Kq75ggfi9p/HYjOoNEl2+eUx2SwuABTBRmThMRbuHmV8aHSZ2OKgYVsEfGymoPf9qIKDXEv/GBn8m5lawp7uNTChv98lERR/aUUJQSitqaDkzDEDwQaeyPWsTVVkY9kQ9q4KSQaAVc/IEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=JRFiHFj3; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1777457856; c=relaxed/simple;
+	bh=fQbhdiGUrI5ESJ7CR1gbX0K0Lf+zodJ5LwrDU6i6NOw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YERnR1C3GWquUCf6BeNkG1R3ZaZMBejNa6WKc0NcvZ/W/QT9TVdC0MJQeiUDKWmiLF1iBJfRjjh1jlYVxuPvQqwdMVUXUp0P0oBSH2ZwZHF6LKG17StFcAXkhBW367uM9vfDrsKf1HqN8INibrUiAT2AUIBfXPbA5bq3A2H2i5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t0AoYySv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="JRFiHFj3"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=et6/844maY07PTlAUxa16aWNjywP2dUE1B0QsoENJXE=; b=JRFiHFj38HyueftVID3uiVuy3F
-	1NuuHKe0PgmjEgAsok8icjbtTIPwKLZ+TXULWIG7M1tKsrJskkI4NK0+TQPYsHmX9bcByNHZGgWs+
-	QjB+awnY15BRvwKK3BN1wldo/MyFBdeZ+L/btRNQazOBcwmYGI7zLzpP6nzbCDNvRo/5Q6If0rfhX
-	fp4w9o++U0rkKkFCpyMWGdxmF6KX3cOBsgh7j206CR9prglktXxDzfHhM92IG5TXUZptMz2wryT0Y
-	fgCV5SqNwFIULiUEGdDYktnmYgydQz8VqyFyO2NGL8zACoodiMjACc0jkZjAfmQka1TzqqqmxCEVi
-	Hh1ol5yKwPqlrzJ0T+J+2grLnSAAOmS2Cwrmooiy9xEjTQGZsw/S9mk/3VKObC1HZpQ4vQAEfGsHb
-	aDM/y6OYQW9sv6FhH8i8H/DajXisCGFgWEQeVVfJfxvRUmW/rRvX/q7qD82Gezj7EKZWW3q7MToeK
-	xvhp/BApLl0DMqRBpHJRUCum;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wI1kS-00000004xya-1o8N;
-	Wed, 29 Apr 2026 10:02:28 +0000
-Message-ID: <60857c4e-0d72-40d9-ad72-c2132a19c6ea@samba.org>
-Date: Wed, 29 Apr 2026 12:02:27 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t0AoYySv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9499BC2BCC7
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 10:17:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777457856;
+	bh=fQbhdiGUrI5ESJ7CR1gbX0K0Lf+zodJ5LwrDU6i6NOw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=t0AoYySvIxlq05/X2qe5UeFMZCJjHo1Awo2oGiPzi3UuwG5WtR+bvF3oDTNj4Of8C
+	 NXwm9fMnMVheegYRiHJlQ3YqhxAfTr20Ue2iScabbOpQpPxljySfFVRS3IWgB1bKr5
+	 malJPdYipkjZ0QMBpZiPcuRcBLVa8Lq3hpH/b/JLQ42EppTAN5KS1FdobRJTKik+LP
+	 eXPSKhO4lGYNNg4/M72Yk/vff5YzabN1z8ozwp7NV0OZZ73EuLGk5UEtZY+GPoOBtX
+	 YJev8jsXcnAm3WUkxKAJBeZ1Tsr3z0dxVxqjP7UtjVISaHYDbokIV7fB7Lv0V3LyTk
+	 gHc1kGCya2U+Q==
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-bb91b426e40so166128166b.0
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 03:17:36 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ/OCWmeSQa9A2I4LAUkSl7ZKNNT0TB10fdHkEIOe7vFm6dAvIuvegNuhrewUdTjtrUv8yYwJSg7v+Zm@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzs44ZlD43MkDa8s2a2BPVAjlASA6dhK7FEKX4Kko8Ty2QPDH7A
+	htXLonlFcuxjniaqbJx0QaR15rFMPy63zqfawPjApQ8xb53krRehLcgHHmA+bPqrErAs3CH6VQ2
+	bkXVWlUTWyL2/6Xmz6eWT/WwrAOTV+8o=
+X-Received: by 2002:a17:907:da16:b0:ba9:bb46:345b with SMTP id
+ a640c23a62f3a-bb93cd8bfa3mr204870066b.18.1777457855191; Wed, 29 Apr 2026
+ 03:17:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] smb: smbdirect: fix MR registration for coalesced SG
- lists
-To: Yi Kuo <yi@yikuo.dev>, smfrench@gmail.com, linkinjeon@kernel.org
-Cc: tom@talpey.com, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-References: <5b221fc2.AXEAAJjZnuQAAAAAAAAABAMtJJkAAYKKIjQAAAAAAC-ZZgBp8da7@mailjet.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <5b221fc2.AXEAAJjZnuQAAAAAAAAABAMtJJkAAYKKIjQAAAAAAC-ZZgBp8da7@mailjet.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <85118db1.AWEAAJaZP3EAAAAAAAAABAMtJJUAAYKKIjQAAAAAAC-ZZgBp8da6@mailjet.com>
+In-Reply-To: <85118db1.AWEAAJaZP3EAAAAAAAAABAMtJJUAAYKKIjQAAAAAAC-ZZgBp8da6@mailjet.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 29 Apr 2026 19:17:22 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-Ci4ReATdeoSr1Y++JfF1qF3i-QnbX+Qa2NDnGho2aBw@mail.gmail.com>
+X-Gm-Features: AVHnY4Is24Oz6cUtoldNmij8u68TkMk7TshQI-dHO70i-bi8NIH_TE8R7FEjEHE
+Message-ID: <CAKYAXd-Ci4ReATdeoSr1Y++JfF1qF3i-QnbX+Qa2NDnGho2aBw@mail.gmail.com>
+Subject: Re: [PATCH v2] smb: smbdirect: fix MR registration for coalesced SG lists
+To: Yi Kuo <yi@yikuo.dev>
+Cc: smfrench@gmail.com, metze@samba.org, tom@talpey.com, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Am 29.04.26 um 12:00 schrieb Yi Kuo:
+On Wed, Apr 29, 2026 at 7:00=E2=80=AFPM Yi Kuo <yi@yikuo.dev> wrote:
+>
 > ib_dma_map_sg() modifies the provided scatterlist and returns the
 > number of mapped entries, which can be fewer than the requested
 > mr->sgt.nents if the DMA controller coalesces contiguous memory
 > segments. Passing the original, uncoalesced count to ib_map_mr_sg()
 > causes memory registration failures if coalescing actually occurs.
-> 
+>
 > Capture the actual mapped count returned by ib_dma_map_sg() and pass it
 > to ib_map_mr_sg() to ensure correct MR registration.
-> 
+>
 > Also update the ib_dma_map_sg() error logging to drop the error
 > pointer formatting, since the return value is an integer count
 > rather than an error code.
-> 
+>
 > Ensure a proper error code (-EIO) is assigned when DMA mapping or
 > MR registration fails.
-> 
-> Fixes: de5ef8ec3c46 ("smb: smbdirect: introduce smbdirect_mr.c with client mr code")
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=221408
+>
+> Fixes: de5ef8ec3c46 ("smb: smbdirect: introduce smbdirect_mr.c with clien=
+t mr code")
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=3D221408
 > Signed-off-by: Yi Kuo <yi@yikuo.dev>
-
-Reviewed-by: Stefan Metzmacher <metze@samba.org>
-
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Thanks!
-metze
