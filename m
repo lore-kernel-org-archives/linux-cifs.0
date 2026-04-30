@@ -1,173 +1,128 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7834477E3F
-	for <linux-cifs@vger.kernel.org>; Thu, 30 Apr 2026 17:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777571328; cv=none; b=DSiLVBw8j13pbOBwumPIFLePL2s1TBc220m9wZXPj88FOyfR9Jxkzx4xvw/GcM7WEZ+w1GiRJRyDnRJ3xlWgRKFEOU2Txvm3HCME4PEk9amaZRT7mPggpC+LetIDJ6m2a4Ql4OTnkG6tYUEMsJ2YDLU/i4QGXxf9U9R0H5ZYz9Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777571328; c=relaxed/simple;
-	bh=aHoBqTbdr56DO71Zlzzaandq5SHQ8sCJYyYln2KmSW0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XpKy9VHW2RJw+IaoC8nVhxdfkgbef6Ywe13YPTn5Z5sT9dztJu6QESmnh44fo5hQwGOU/oHXW72/gX2vT3QXIywEmOfXNITz7Ld8+YcmqftK2xSRxD6v77Nix7LtStn1SUxFNVn0kDPGe/UBJwRS+7+QkmrQ75iRYccXUkVyqpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ajX4S1oZ; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943842BE62E
+	for <linux-cifs@vger.kernel.org>; Thu, 30 Apr 2026 18:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777574857; cv=pass; b=EC/ICI4OD621Xo3xjbj3/kV7kEv0ASxq6oe5W+7u+UqWcneuOFdiwfvsn7/wb9UUYJQB0qzSuRxqf8hGnjUMcyCMn7VpOyUg4aBu98XGyqzt9XPHI2QLA+ux77JPUWnG7GXmjkGPrYZG+M2Vr2PSYVxdyW9pGBOdTOd3IDHXFcI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777574857; c=relaxed/simple;
+	bh=whbimYf3xnyspzjn+jpf03D0Pfx1ZZEOqFqyB0oj+Yk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=UqPTSmNyAJlVfl6t2boJCa0txT8dUR7LJkf0aQyD7yzepQrMry9265kgP4NlJrfufa6BmTTUoGPHE5pAZ509msZT5P7H0aKgikrHCvYK2WMEsPWo39dx15+qcsQnO2ssZozTwNlxQAXGW1noFAREtR3tunoHzSoz6cUvO0JOf80=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dc8clnM7; arc=pass smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ajX4S1oZ"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c648bc907ebso766833a12.3
-        for <linux-cifs@vger.kernel.org>; Thu, 30 Apr 2026 10:48:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dc8clnM7"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-8c70b5594f4so128820185a.1
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Apr 2026 11:47:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777574856; cv=none;
+        d=google.com; s=arc-20240605;
+        b=R7/0GYw8GwC965GcrQqVc77nqEyA39QnccerzjNUkoG4hb20Ishev0Ao7EzMPl9eGJ
+         lx9UEyWs+BwGSNgdS2lbG6qSZUc+lJCUu2rVkWcQF2e0ch6hLG/lMMmDeK9UWM7pJZ1n
+         ih6WjOoikOZhlHZbPmBqHJvhvbkv6otkeLS8EaP6jQKarbtBe24vPQzKRc55TDFETKYp
+         DjBlv0F4rPGUbCJVmjfSU2n9fohwyUtdyLXMGxar46BwUqJtONSkiOfx1rlKx2NLjeIY
+         NB9rOBl/381odW2GWYejIrODV8Ec9xvduhOQtjURdMRR4+2mj2k7rBQwb4uKFqK/HqtI
+         Gkuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=8jjRms+6/2Kl4H0IlXWig648U5BW8h1jU9qe+FFToz0=;
+        fh=/3K/S22DMzYMjk9zGECm9PRgrnnP2c7bBcWz+3ynl0k=;
+        b=bm6YQxRusx4NaWzJ9psEMdhJ9MMbfGAO+sKYTcxstfoS/YVT2zYGpZgFE6gKWCBgkg
+         XClaB8Y7RE7TsazQWLX9+4sVQHdVuhMe1rDUhzcr6N1UrOhZ2PnVRa/YJg87c9hVS+YS
+         xl3hLqLJOrfVDEJSya/zC7B45EhoLPZNEIEBKjXgF35EqhHGKthImHPcc/oBg5tOSZCy
+         N7L2IWSStb6tqWwuvoH6G+BN4fWDm1IRoIhH1/qQsrOFX7/NzGreaWdt77BvbiQKlESD
+         Y4QoUKO6fMrcLYdfvHcAAZVAxo0LiD2SXYALYkk9d5CzqhCgckYtDgkVUPd6WFxs8yLA
+         bfbg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777571327; x=1778176127; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yv2fHWPI4GY7ycdmc2I4lTP92YQsllQ8O6sfU4iOItg=;
-        b=ajX4S1oZV31iH1kiV4kkA4B8RGAnF0rE6h+o3ciGBmAmWHhXiALgOGjPIfoVvsb7KJ
-         B4e1dTmZTG49CTBcC9tMZRSQo5mrLHP0HHg5dIKK51U/El0WNCOlen2W7kcyrGwpnWsf
-         33X/IY/A7G+/SRAs94fF2TxkEaN0BoIaXS6kFLvqlEeNR5MyxWCI8DBgYTqpZyNGT/Rj
-         bMHgwqrk0xN5sjG40YdopSfGl/oiAarzBqa7pvQQkU9DoIFFyeTwsDQ5UfNu66fD+4Gq
-         ynhuV/xDESNNqF0O30319g/RTobqFtkPh7/oMoUvGmDdBz3IM5ZaAAYdSNivaQNH8NDT
-         +8GA==
+        d=gmail.com; s=20251104; t=1777574856; x=1778179656; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8jjRms+6/2Kl4H0IlXWig648U5BW8h1jU9qe+FFToz0=;
+        b=dc8clnM781GUvwbfsMhsZGFsYSkkIVaC6MS0N89PST4e4H/zqYqKL+2iJetVPnQw2o
+         xFopvEQ6IWmRYei8gWyHxYG2yzN8eN3pQ7Wi8E2bzrgvewF54V8c0mT/EqtDS/2nGc4X
+         0ubLTk8pjaud7FQ/NahqAgd9QyiY/lpJrZ+6/iwApEo7O5fFvOMiKceHL8tGtkYeXFvS
+         MXTRMm2VTHwB0HzO1a/UWv5Kzaojtt4+bC1el7l2MPAVJZJ/qE6y3NKL3Jgmouxz2lYU
+         b1stuLUeJhwVXSnK3ENfRu8fnE4g5aA+UFo9uoh0pAdXSGm9iwUgN9+6KN4SEAvURkmw
+         Xtlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777571327; x=1778176127;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yv2fHWPI4GY7ycdmc2I4lTP92YQsllQ8O6sfU4iOItg=;
-        b=rZeiDib+YgFBnL6Of1HEe6ZzFs1N8VSprDBKlzoyBvhHCFq3Rlh9KIOwjSEl0wPksp
-         mu6ptE+HdsjYAUy4yODiZy7zrwYu6hvk4AKbsUNTy1nQXAV5GssO69n3ThjqvsaSPxpS
-         mHSUwvvs0rA4/0aYsZ30Y4mu9etu7Yf+ZjE7yva1jtyt6sCR5p25KgpKnMFGubRfEPmB
-         pLDyWarwpUXwEyunKXJWQ28CIEVH/nQ7rv7bByO2TJLtRdb58RvgGe2uGS0qrJvbjy1c
-         THAUD07ARzOZChUq7tvqNMFP1bD0ne4L7x5H6VSH8Bc56bXtKbp1elJj8H58MkuVb9xC
-         Bbxg==
-X-Forwarded-Encrypted: i=1; AFNElJ9WhhVtROL4T7BI62vcKL7+RGHxr/lz4UIt4hQLK1xpV3BOa/CTIlycGw+1SI3eDOtbLQNe4Ulr9lpF@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuDj291EM8lUQ6r866MpWKfWtpKbehTQ+QLMf7r86n76t7TgD4
-	1lBkbupUWakUdLu+tyogL65D5dgSmigYBlt62elYPQUpceGdxgEibeMA
-X-Gm-Gg: AeBDieuTiQGh1GErH9zpsUqk54Q8/VU7p21S5XTvri+7rrNvpBID5aNeYTP///Em9uT
-	eBoD+qPH/NO0bomN53EXoxWLec/FHeCV7La4NxJgalJGxIC2nAMuIT/88TWTiG5SA2My9ubCp9G
-	23cKTEpK0brbEBnZISKlF7JWn1klxfCjCd/GWtkJJX4CfIlzKXduBZXj0maYj4iRD4Ayc5Lzjln
-	oN981q223FmZiF32fEDRudAS66de+a1OHptkuVnxeR6pIbjwk9PrhgPdVEXKO2CIefpZr5NG8RQ
-	UhXk7mCensNtpMPILxw1oTNgqJsECWw5ET4uaxuDvqP+OCzLZSHFgKOsOcoq2pMeJs3DXQyBFHV
-	mp/1zDHcXthLY5iKErBzFrbDEoLLQ2M+7wH30Kl/zLAJGxIV5z9S3ZSLHyMezxCQi78IJNKH9wR
-	3lregcxYuFamb2uNlB0lr2E4dLPYeVQ7pfMCp0j9bkg1Gy8iIXMMFAUDbRr5Zh
-X-Received: by 2002:a05:6a00:909d:b0:81f:5037:a317 with SMTP id d2e1a72fcca58-834fdb1345emr4334423b3a.11.1777571326639;
-        Thu, 30 Apr 2026 10:48:46 -0700 (PDT)
-Received: from localhost ([49.207.150.30])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8351582e185sm278771b3a.3.2026.04.30.10.48.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 10:48:46 -0700 (PDT)
-From: Piyush Sachdeva <s.piyush1024@gmail.com>
-X-Google-Original-From: Piyush Sachdeva <psachdeva@microsoft.com>
-Date: Thu, 30 Apr 2026 23:18:24 +0530
-Subject: [PATCH v2 2/2] smb: client: Zero-pad short GSS session keys per
- MS-SMB2
+        d=1e100.net; s=20251104; t=1777574856; x=1778179656;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8jjRms+6/2Kl4H0IlXWig648U5BW8h1jU9qe+FFToz0=;
+        b=c+NqAqgpRds/UrWrOHcOHY0yiZKVXIIs6KMsfWPV3+KY4bHMyRzMvGqyDoprQjG8Wb
+         KCmzPe4hNEaNCw24XWvEN2GAu6CUH9DoC7Hi35OUJH9PEDFBPkEFCYiAS+6NFNfac2yV
+         EdowAwrBgoTlixmSKwMLYYEgsxXlywR5TxI2T6rKwr0rQ8ohWN8dKixun1uBjHYL5Bxn
+         H6k2SYEkNSt3G2oTjP//TvkDFJdQLMycVx5dZTmXfx7BVMfGRQn4Lx74b3k2pk9AkD2N
+         M/MqxemgbW7E7PWJoDULwqt8J1apsnNf9ZODAgJ1YXFn/DJCeBkSvnwEwzq7WX7VedNL
+         ClGA==
+X-Forwarded-Encrypted: i=1; AFNElJ94S63ipoqhjc3qruJHXRtHwk12TYKGucMRwLfsd9F3rNgFMUyELD2QKwnNGRir2iBqjDoazjuCOPt9@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+dh44K6MmHW5OaTQ27k4Uza5TOOF5jtKp3MR4OwVh/XvMdkFt
+	AYwAwD7U93zeVoZT/zwnP2htqcg5xYQ4OH/U+KIr1/xmSmLt508vM/RRTlqVHDkh9amiLAZrTSN
+	z9HNXaup2JwV1VFJdLbVgRSRQ3cgDIro=
+X-Gm-Gg: AeBDietSIOtXIMHRSaAKuN61uK+TaPNjOk6RUwb+MksAExJ/715fYIND6j8T+3VM7i9
+	zwLic0d2/yMqDyjhtC83BVhE/fuvKGRvQfThHvQpS8Ozjh3HCydcrM/cxINLV3adFOipzC894qV
+	+Lw2J46pH4X29XUOSgo6MD5k74S1+HQFWuUMMdQlO9DI/Wib8GHu7h3HE4Q+odilApKsTm/OTM7
+	N+HQaT1kGxRyf/tAZQJpPFvjwIAij1KN4M29yYamnYiveoSrskT6w7596plm41qDJ7RQ96jfttM
+	gwPOYA1JLjZX1vLosFUSPsIlJBRdRFtOYfPbqqt7aBhQhwPll5G/PK9JRk8SFZLW4Ve3+7xDZj9
+	Jk1l1qFYQR0Z3DFWJ5tiirA1/dk9rCfSNqGf7QBbgRHS12E4dk4K+Nd2CRHmuk5SXjdv1Xqg=
+X-Received: by 2002:a05:620a:708c:b0:8f0:c513:8cd9 with SMTP id
+ af79cd13be357-8fab90ea9f2mr484513685a.16.1777574855596; Thu, 30 Apr 2026
+ 11:47:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260430-kerbmi-v2-2-0b98fe250425@microsoft.com>
-References: <20260430-kerbmi-v2-0-0b98fe250425@microsoft.com>
-In-Reply-To: <20260430-kerbmi-v2-0-0b98fe250425@microsoft.com>
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, 
- Shyam Prasad N <sprasad@microsoft.com>, 
- Bharath SM <bharathsm@microsoft.com>
-Cc: samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
- vaibsharma@microsoft.com
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3414;
- i=psachdeva@microsoft.com; h=from:subject:message-id;
- bh=aHoBqTbdr56DO71Zlzzaandq5SHQ8sCJYyYln2KmSW0=;
- b=owGbwMvMwCV29FJ3ncRHDT/G02pJDJmfp36Y1SsyOXPuWc+60JDNV/zit7Tq/pv3nulpyY+Li
- Y/fX9es7JjIwiDGxWAppsiy4cQdWd74XZLzPj0xgpnDygQyRFqkgQEIWBj4chPzSo10jPRMtQ31
- DI10DHSMGbg4BWCqk70YGS7MWcO/smkdz+xDRxMlFA+wFglfelvZMl18p1FeW8XMRm5Ghs9LPzf
- KHc2z6mDWbLqhnLiEwzTQV+9R897QyJ1aWy8z8AMA
-X-Developer-Key: i=psachdeva@microsoft.com; a=openpgp;
- fpr=80350F71F916134953C3EB979E19C6F9839C3CFC
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 30 Apr 2026 13:47:23 -0500
+X-Gm-Features: AVHnY4JJ8TA6nEtiCmpy13eJgdhS4SSxt3tl3wTVCBUVz6QCxJxwYcDVkQTLA1c
+Message-ID: <CAH2r5mugZbZGTBudyymjUYWkXSEBdAB_NaS=QN2upcb3FWGVCg@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Per MS-SMB2 section 3.2.5.3, Session.SessionKey is the first 16 bytes
-of the GSS cryptographic key, right-padded with zero bytes if the key
-is shorter than 16 bytes.
+Please pull the following changes since commit
+254f49634ee16a731174d2ae34bc50bd5f45e731:
 
-SMB2_auth_kerberos() copies the GSS session key from the cifs.upcall
-response using kmemdup(msg->data, msg->sesskey_len, ...) and stores
-the GSS-reported length verbatim in ses->auth_key.len. generate_key()
-reads SMB2_NTLMV2_SESSKEY_SIZE bytes from this buffer when feeding the
-HMAC-SHA256 KDF for signing key derivation. If a GSS mechanism returns
-a session key shorter than 16 bytes (e.g. a deprecated single-DES
-Kerberos enctype with an 8-byte session key), the KDF call performs an
-out-of-bounds slab read and derives keys that do not match the server,
-which pads per the spec.
+  Linux 7.1-rc1 (2026-04-26 14:19:00 -0700)
 
-Modern KDCs disable short-key enctypes by default, so this is latent
-rather than reachable in production, but it is still a kernel heap
-over-read.
+are available in the Git repository at:
 
-Allocate auth_key.response with kzalloc() at a length of
-max(msg->sesskey_len, SMB2_NTLMV2_SESSKEY_SIZE), copy the GSS key in,
-and rely on kzalloc()'s zero initialization for the spec-mandated
-padding. Set ses->auth_key.len to the padded length. Larger GSS keys
-(e.g. the 32-byte aes256-cts-hmac-sha1-96 session key) continue to be
-stored at their natural length, preserving the FullSessionKey path.
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.1-rc2-smb3-client-fixes
 
-Emit a cifs_dbg(VFS, ...) message when a short key is encountered to
-surface deprecated-enctype usage.
+for you to fetch changes up to c208a2b95811d6e1ebae65d0d2fc13f73707f8e7:
 
-NTLMv2 and NTLMSSP code paths produce a 16-byte session key by
-construction and are unaffected.
+  cifs: change_conf needs to be called for session setup (2026-04-29
+17:26:37 -0500)
 
-Signed-off-by: Piyush Sachdeva <psachdeva@microsoft.com>
-Signed-off-by: Piyush Sachdeva <s.piyush1024@gmail.com>
----
- fs/smb/client/smb2pdu.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+----------------------------------------------------------------
+three smb3 client fixes
+- multichannel crediting fix
+- memory allocation improvement for smb2_compound_op
+- remove some dead code
+----------------------------------------------------------------
+David Disseldorp (1):
+      smb/client: remove unused smb3_parse_opt()
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index cb61051f9af3..995fcdd30681 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -1713,17 +1713,30 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
- 	is_binding = (ses->ses_status == SES_GOOD);
- 	spin_unlock(&ses->ses_lock);
- 
-+	/*
-+	 * Per MS-SMB2 3.2.5.3, Session.SessionKey is the first 16 bytes of the
-+	 * GSS cryptographic key, right-padded with zero bytes if shorter.
-+	 * Allocate at least SMB2_NTLMV2_SESSKEY_SIZE bytes (zeroed) so the KDF
-+	 * input buffer is always valid for HMAC-SHA256 even with deprecated
-+	 * Kerberos enctypes that return a short session key.
-+	 */
-+	if (unlikely(msg->sesskey_len < SMB2_NTLMV2_SESSKEY_SIZE))
-+		cifs_dbg(VFS,
-+			 "short GSS session key (%u bytes); zero-padding per MS-SMB2 3.2.5.3\n",
-+			 msg->sesskey_len);
-+
- 	kfree_sensitive(ses->auth_key.response);
--	ses->auth_key.response = kmemdup(msg->data,
--					 msg->sesskey_len,
--					 GFP_KERNEL);
-+	ses->auth_key.len = max_t(unsigned int, msg->sesskey_len,
-+				  SMB2_NTLMV2_SESSKEY_SIZE);
-+	ses->auth_key.response = kzalloc(ses->auth_key.len, GFP_KERNEL);
- 	if (!ses->auth_key.response) {
- 		cifs_dbg(VFS, "%s: can't allocate (%u bytes) memory\n",
--			 __func__, msg->sesskey_len);
-+			 __func__, ses->auth_key.len);
-+		ses->auth_key.len = 0;
- 		rc = -ENOMEM;
- 		goto out_put_spnego_key;
- 	}
--	ses->auth_key.len = msg->sesskey_len;
-+	memcpy(ses->auth_key.response, msg->data, msg->sesskey_len);
- 
- 	sess_data->iov[1].iov_base = msg->data + msg->sesskey_len;
- 	sess_data->iov[1].iov_len = msg->secblob_len;
+Fredric Cover (1):
+      smb: client: change allocation requirements in smb2_compound_op
+
+Shyam Prasad N (1):
+      cifs: change_conf needs to be called for session setup
+
+ fs/smb/client/cifsproto.h  |  1 -
+ fs/smb/client/fs_context.c | 31 -------------------------------
+ fs/smb/client/smb2inode.c  |  2 +-
+ fs/smb/client/smb2ops.c    | 11 +++++++++++
+ 4 files changed, 12 insertions(+), 33 deletions(-)
 
 -- 
-2.53.0
+Thanks,
 
+Steve
