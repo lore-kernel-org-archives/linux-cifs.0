@@ -1,149 +1,155 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743F1359A89;
-	Wed, 29 Apr 2026 23:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777504031; cv=none; b=MveCaYX/uhnS1OdmI61gLHzJhNuVVTuuYCF7Zq7oXfaDU2ndijhF3nnJPDw9vo6zrs4G9AwOCkanxGZAg4HoaFsqlIhpt8F4+ChMmNBFaa9HB+Yb9m03JWOzrG5xqifoNQzUZzNHyz1Abw5h10ZGbVqk9zyiVlXp6hZXfDI7M/U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777504031; c=relaxed/simple;
-	bh=JTlhJ9osmBzwut4VSM8c5XR2dSqQSlr9sygStqPGqhw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bPaPw05Aquq+tcuZ+XYuIAYRuL2JD7BFcBkB8EPRPBLkwwf44F4yT34PdpmZPzrhevyQX+N/VwuCOftvQ1lnhUrMi3lQTDOwvIcnVqUVa0IPblCOU8vT0LTGFHbPGGUtIHo2zHdBKk/2cYy3aIhi9ppySPv4hq/dOjBal8FYiUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IBvy7tOO; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33AA41D5146
+	for <linux-cifs@vger.kernel.org>; Thu, 30 Apr 2026 00:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777509281; cv=pass; b=B5uGZDC0cT/OeHxAQQy09p9hcm8KDTaiOnkoD9Qbr692Y2s5xNbPRj0L4d+UFfrCDeYlhI0oM2cLVRHCeAweRbhRt3uPmfx34wyV9hNVRj9OYh7dg9J61DJPQdVypROgACkVNX5IfjgsizV5DjvNzI18rTwH3EUoTfFVxtla5yk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777509281; c=relaxed/simple;
+	bh=Mh/rnZ/ke92Ba2K8c5PilKMb99q5DoT+BCEeNdMCB/A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=logfhR38YHuuOpyQmfoZj+d6wZHcUaKHM9gSmXEnPw1/oUgYcjXpjjc0totDklZzl73bJB4tE1iYYqZbTUKzmVxSkTK/Q64pMenlaN8a3/H5gMFZBFE50DU7Up764vo6dPNad3xUpCXMhrkjwulIGLAhEZ38zQ5AOQIFczPkVnU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wz3mzEK2; arc=pass smtp.client-ip=209.85.217.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IBvy7tOO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777504030; x=1809040030;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=JTlhJ9osmBzwut4VSM8c5XR2dSqQSlr9sygStqPGqhw=;
-  b=IBvy7tOO63Wo0QGneM7w5lKpEDE4NMNhYoWWvin8D+eQUmbjVMnhfuer
-   8zkxrL6OgkN1Q9AfO1JbyWjQDevGlDb60sGy58km4zR8dZ+fGLU/R3jww
-   jCE8V02QXBq2oiX1YbRcob7ycCch1du8Dsd7n5MXwQsCh9efmt3uNcRfm
-   MQ+SgWhk3IZ4TFUb2A9FtoWdArvGcgH+WQml8vgMMH+tTikxl7CTQQSBr
-   zSz5j5+U47n9C1S8Lm94WWhJzyXNMgX95vif7il0piFFuKROUbIcYE0rS
-   uFyz5wMEyrqM9Zeny0yOr02u6SbcWv3s0CqPl1Z+51XVpIRjz987ATsQt
-   Q==;
-X-CSE-ConnectionGUID: 7wmx5FXxSD2mKW51Un0HRQ==
-X-CSE-MsgGUID: VB2RWoEXRrmlMYdg1LooUA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="77611433"
-X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
-   d="scan'208";a="77611433"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2026 16:07:09 -0700
-X-CSE-ConnectionGUID: VC1tCHacRSWbNay9m+nl0g==
-X-CSE-MsgGUID: toe1Wfn8RzKFGVtaYgts5g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
-   d="scan'208";a="234676554"
-Received: from lkp-server01.sh.intel.com (HELO aa799cca880d) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 29 Apr 2026 16:07:06 -0700
-Received: from kbuild by aa799cca880d with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wIDzi-00000000Bd8-1zWM;
-	Wed, 29 Apr 2026 23:07:02 +0000
-Date: Thu, 30 Apr 2026 07:06:18 +0800
-From: kernel test robot <lkp@intel.com>
-To: Arnd Bergmann <arnd@kernel.org>, Steve French <sfrench@samba.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>
-Cc: oe-kbuild-all@lists.linux.dev, Arnd Bergmann <arnd@arndb.de>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Stefan Metzmacher <metze@samba.org>,
-	Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] smb: client: hide unused cifs_debug_dirs_proc_ops
-Message-ID: <202604300622.95X1Ab1U-lkp@intel.com>
-References: <20260423065042.1898971-1-arnd@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wz3mzEK2"
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-606045ef716so223381137.0
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Apr 2026 17:34:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777509278; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OpJjiQK6XePC3oDRQwHU3hlNA6r6whIyIMkS/aHO4rM3T+WI4Xzo4rVs1m1ohES+VJ
+         Dhxh2v1BC1D7ypHDITaCtrwfEXSID1HmE82voc8QJSsfmj8KY7HGZ02KM0DThg1ROUmN
+         13V98u7LmlAVEQrOWTOR+DIWlRqhqDdPKVBe+RTxQFXVLemo6Xt8MjYLLj7J1NTE9RHe
+         nB+K4tLXVmx4TWfxHePjJN1lvihWV14sd2AEG+TGUCAwqj9cKOfwiVXzMA2mLNtrLP/G
+         Aa7se32GPb+xVbYfPElrwwqVTAVGhGxXxCM/fFOc4wseHjSf/I+8Eg9bSNgCLl8gnRju
+         38fg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=OaJsSOetmcKyBCScmtUBe7wIzrooFlCftN+Lz2qYgxo=;
+        fh=zpd5Qxu4GMPm/L3Eyz4JXfv8OAh8BlL4LZo4f7ORJY0=;
+        b=aAd2chddRoOcWM7oBOvmOIvq1oYue7Wg8PUQiqkEu46GfVyQB2crYoZfyQovdV6JfV
+         U/6QZlj/bnOw1GRd+mRB0i2WsgSItcuBB5hLSuYkWIC6sJdturf3715d9UMA86EQZa6G
+         ksBR9fodILe2aF2TGKaLQQEdA5lXOuNx08mJEBNLsPJBb10V9IuWhcNlyuQI7ba1km8b
+         +tAF7cccXoHkzSexFS46VAZiSCfyGO973WuvE5dK7xPLgbZHZ4wbufYBuLgsilLqri72
+         t+TsuKQGgp7B9cFEzsI/dOuaMpmiT1BTEkkvDscLF/x5OfxoBw+5L+WZgrCyKWzV79WS
+         xJuA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777509278; x=1778114078; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OaJsSOetmcKyBCScmtUBe7wIzrooFlCftN+Lz2qYgxo=;
+        b=Wz3mzEK2ioI1qA1TuaPhj3A+jSUv2JWHGOk6jq3kWmZP4OZbJmXDI8WEQDSf2RJhg0
+         HVOdUKaOIn/M980D8yDscGzDpLVpZDhHZ7x+MRYUAmyzkTZCo4OF6EiJDZVv4jqVvSnb
+         1op3mCYkNupuZ/uYZKdRT/1WUDAUyJDtyOjkuX1Pj3HPuu1u2En4WIt+XFshN8mqQEnH
+         oYOrljfxrVfEzYNrdbJ5F2wqlgG2jvNTDjqzGyQ85GnuYtBFBoFZG3lgbO9h5+5N8jl/
+         407NTgUP5xC9KUo5UGGkH+olBWTBh6gyqvevcPKL9iqM+xHUAaS1EJf1V0FgdYTqyW3v
+         EKUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777509278; x=1778114078;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OaJsSOetmcKyBCScmtUBe7wIzrooFlCftN+Lz2qYgxo=;
+        b=jcoc+IQ3FbLN0JM5D/fZrQc/spCk+dxhLBZ8JINAXL6ehAoe6jnHZOrm+XH8q9hBQd
+         7pffRhsipSi1fzZ2CD/XiTPFHiB4cPcDvMnW1hwhIxgNgvmodISuhLp6/rsGYXbVTj26
+         iW+b8EtR6LYPIcQNL4+AndrlDyNZk34J0UOZRdqIGxoUwZasCjVNSAuMBGx0kyxTCjNb
+         8N4AONQI4Y7mtUzJcCOwse/dkN3iimpo5AKZ/ADkPeqtLl1a9zyTJtRPP18VGYBSZ5jE
+         bODtWc0afamdjegvguA7ZzeYfVrk0dMX/dN6pzYzGBZ+lp4HJGseE+4bcZU1ZQP1XbAz
+         uNHQ==
+X-Gm-Message-State: AOJu0YyxaQNqiORcaFw0ejn+EiqrFtJn08dpes96IVvMwVw0s7yqgoqf
+	Y5Pmwh/+GIfZB/67ywoTm6YRNp9gnH/GqWVowmXNK7tNyDVpD20Mkymd2S7dHTxRB7vRkHG+SjA
+	X+D0sjy8WVXHjyblR8Cs8ERH45555vNc=
+X-Gm-Gg: AeBDieuQAThRv1a0/LF8jVoYIYM+BaDClCZ3pKGpgSwSH7J1jdnCJ8Y8Ux+Ch6kRKdX
+	6aXU2j1Ahaf2ShO/1T4nak4kCTp16WO0yAwJ7my0qDaw95eoLyjwUPdFhnfwGeUGMiYQr2Hmgru
+	6gRb1wWXax0sqBkib2ZSsnO+1t+jtSPS95BlWc8VxiE7Wq5mfHi0jYf6mhHoyjbAa7ay1k30Edi
+	/laFb+GmBu9E49xs2p3m8ePd/txhkXWRMggyvvbB2l5cdsVmeurO/gWGzMVMhSB6RDacUY/yAQ5
+	o4SBJEHN3GQvEPHL1w==
+X-Received: by 2002:a05:6102:d94:b0:5ff:c64d:2283 with SMTP id
+ ada2fe7eead31-62ad56d048bmr416390137.30.1777509278038; Wed, 29 Apr 2026
+ 17:34:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260423065042.1898971-1-arnd@kernel.org>
+References: <20260428025110.38825-1-FredTheDude@proton.me>
+In-Reply-To: <20260428025110.38825-1-FredTheDude@proton.me>
+From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+Date: Wed, 29 Apr 2026 17:34:26 -0700
+X-Gm-Features: AVHnY4IdVo_bnjOiG-Rpty6RcenM2uyoo2yYIBKVzYINOZwm3jqtbO72G2Ih7ms
+Message-ID: <CAAk_H6EDmZAKZLbUWm9h1VVCvaY5RdyfepyUFOF8XwvEyvgSyg@mail.gmail.com>
+Subject: Re: [PATCH RFC] smb: client: fix NULL pointer dereference in smb2_compound_op
+To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Arnd,
+(Apologies for the duplicate; adding the list to the thread for the archive=
+)
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on next-20260424]
-[also build test ERROR on linus/master v7.1-rc1]
-[cannot apply to v7.0 v7.0-rc7 v7.0-rc6]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Arnd-Bergmann/smb-client-hide-unused-cifs_debug_dirs_proc_ops/20260426-163431
-base:   next-20260424
-patch link:    https://lore.kernel.org/r/20260423065042.1898971-1-arnd%40kernel.org
-patch subject: [PATCH] smb: client: hide unused cifs_debug_dirs_proc_ops
-config: microblaze-defconfig (https://download.01.org/0day-ci/archive/20260430/202604300622.95X1Ab1U-lkp@intel.com/config)
-compiler: microblaze-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260430/202604300622.95X1Ab1U-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202604300622.95X1Ab1U-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   fs/smb/client/cifs_debug.c: In function 'cifs_proc_init':
->> fs/smb/client/cifs_debug.c:937:55: error: 'cifs_debug_dirs_proc_ops' undeclared (first use in this function); did you mean 'cifs_debug_dirs_proc_show'?
-     937 |         proc_create("open_dirs", 0600, proc_fs_cifs, &cifs_debug_dirs_proc_ops);
-         |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~
-         |                                                       cifs_debug_dirs_proc_show
-   fs/smb/client/cifs_debug.c:937:55: note: each undeclared identifier is reported only once for each function it appears in
-   fs/smb/client/cifs_debug.c: At top level:
-   fs/smb/client/cifs_debug.c:298:12: warning: 'cifs_debug_dirs_proc_show' defined but not used [-Wunused-function]
-     298 | static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
-         |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+Please disregard this patch. It adds a redundant check; there is no
+NULL pointer dereference, and rqst is correctly zero-initialized using
+kzalloc_obj().
+Sorry for the confusion.
 
 
-vim +937 fs/smb/client/cifs_debug.c
-
-^1da177e4c3f41 fs/cifs/cifs_debug.c       Linus Torvalds    2005-04-16  922  
-^1da177e4c3f41 fs/cifs/cifs_debug.c       Linus Torvalds    2005-04-16  923  void
-^1da177e4c3f41 fs/cifs/cifs_debug.c       Linus Torvalds    2005-04-16  924  cifs_proc_init(void)
-^1da177e4c3f41 fs/cifs/cifs_debug.c       Linus Torvalds    2005-04-16  925  {
-36a5aeb8787fbf fs/cifs/cifs_debug.c       Alexey Dobriyan   2008-04-29  926  	proc_fs_cifs = proc_mkdir("fs/cifs", NULL);
-^1da177e4c3f41 fs/cifs/cifs_debug.c       Linus Torvalds    2005-04-16  927  	if (proc_fs_cifs == NULL)
-^1da177e4c3f41 fs/cifs/cifs_debug.c       Linus Torvalds    2005-04-16  928  		return;
-^1da177e4c3f41 fs/cifs/cifs_debug.c       Linus Torvalds    2005-04-16  929  
-3f3942aca6da35 fs/cifs/cifs_debug.c       Christoph Hellwig 2018-05-15  930  	proc_create_single("DebugData", 0, proc_fs_cifs,
-3f3942aca6da35 fs/cifs/cifs_debug.c       Christoph Hellwig 2018-05-15  931  			cifs_debug_data_proc_show);
-^1da177e4c3f41 fs/cifs/cifs_debug.c       Linus Torvalds    2005-04-16  932  
-dfe33f9abc0899 fs/cifs/cifs_debug.c       Steve French      2018-10-30  933  	proc_create_single("open_files", 0400, proc_fs_cifs,
-dfe33f9abc0899 fs/cifs/cifs_debug.c       Steve French      2018-10-30  934  			cifs_debug_files_proc_show);
-dfe33f9abc0899 fs/cifs/cifs_debug.c       Steve French      2018-10-30  935  
-17d912d54f2305 fs/smb/client/cifs_debug.c Enzo Matsumiya    2026-04-22  936  #ifdef CONFIG_CIFS_DEBUG
-17d912d54f2305 fs/smb/client/cifs_debug.c Enzo Matsumiya    2026-04-22 @937  	proc_create("open_dirs", 0600, proc_fs_cifs, &cifs_debug_dirs_proc_ops);
-17d912d54f2305 fs/smb/client/cifs_debug.c Enzo Matsumiya    2026-04-22  938  #else /* CONFIG_CIFS_DEBUG */
-17d912d54f2305 fs/smb/client/cifs_debug.c Enzo Matsumiya    2026-04-22  939  	proc_create_single("open_dirs", 0400, proc_fs_cifs, cifs_debug_dirs_proc_show);
-17d912d54f2305 fs/smb/client/cifs_debug.c Enzo Matsumiya    2026-04-22  940  #endif /* !CONFIG_CIFS_DEBUG */
-97a32539b9568b fs/cifs/cifs_debug.c       Alexey Dobriyan   2020-02-03  941  	proc_create("Stats", 0644, proc_fs_cifs, &cifs_stats_proc_ops);
-97a32539b9568b fs/cifs/cifs_debug.c       Alexey Dobriyan   2020-02-03  942  	proc_create("cifsFYI", 0644, proc_fs_cifs, &cifsFYI_proc_ops);
-97a32539b9568b fs/cifs/cifs_debug.c       Alexey Dobriyan   2020-02-03  943  	proc_create("traceSMB", 0644, proc_fs_cifs, &traceSMB_proc_ops);
-6539e7f3727ab9 fs/cifs/cifs_debug.c       Ronnie Sahlberg   2018-05-24  944  	proc_create("LinuxExtensionsEnabled", 0644, proc_fs_cifs,
-97a32539b9568b fs/cifs/cifs_debug.c       Alexey Dobriyan   2020-02-03  945  		    &cifs_linux_ext_proc_ops);
-6539e7f3727ab9 fs/cifs/cifs_debug.c       Ronnie Sahlberg   2018-05-24  946  	proc_create("SecurityFlags", 0644, proc_fs_cifs,
-97a32539b9568b fs/cifs/cifs_debug.c       Alexey Dobriyan   2020-02-03  947  		    &cifs_security_flags_proc_ops);
-6539e7f3727ab9 fs/cifs/cifs_debug.c       Ronnie Sahlberg   2018-05-24  948  	proc_create("LookupCacheEnabled", 0644, proc_fs_cifs,
-97a32539b9568b fs/cifs/cifs_debug.c       Alexey Dobriyan   2020-02-03  949  		    &cifs_lookup_cache_proc_ops);
-54be1f6c1c3749 fs/cifs/cifs_debug.c       Paulo Alcantara   2018-11-14  950  
-94b0595a8e018c fs/cifs/cifs_debug.c       Aurelien Aptel    2021-03-18  951  	proc_create("mount_params", 0444, proc_fs_cifs, &cifs_mount_params_proc_ops);
-94b0595a8e018c fs/cifs/cifs_debug.c       Aurelien Aptel    2021-03-18  952  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+On Mon, Apr 27, 2026 at 7:52=E2=80=AFPM Fredric Cover
+<fredric.cover.lkernel@gmail.com> wrote:
+>
+> From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+>
+> When a valid cfile is passed to smb2_compound_op, the code uses a
+> goto to jump to the 'after_open' label. This bypasses the
+> initialization of rqst[0] by SMB2_open_init().
+>
+> However, the 'finished' cleanup block unconditionally attempts to
+> call SMB2_open_free() on rqst[0]. If SMB2_open_init() was skipped,
+> rqst[0].rq_iov is NULL, leading to a NULL pointer dereference.
+>
+> Check for a valid rq_iov before attempting to free the request
+> to prevent the crash in handle-reuse scenarios.
+>
+> Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
+> ---
+> I am new to writing code for the Linux kernel.
+> Please be patient with me and feel free to point out any
+> obvious mistakes I made.
+> I tested this patch in a user-space skeleton clone using ASan.
+> I only have access to a shallow clone and cannot find the
+> original commit for the 'Fixes:' line.
+> ---
+>  fs/smb/client/smb2inode.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+> index c6dd282fc..aed96eeba 100644
+> --- a/fs/smb/client/smb2inode.c
+> +++ b/fs/smb/client/smb2inode.c
+> @@ -552,7 +552,13 @@ static int smb2_compound_op(const unsigned int xid, =
+struct cifs_tcon *tcon,
+>
+>  finished:
+>         num_rqst =3D 0;
+> -       SMB2_open_free(&rqst[num_rqst++]);
+> +       /*
+> +        * If cfile was passed, the open was skipped; check rq_iov
+> +        * to ensure we don't try to dereference a NULL pointer.
+> +        */
+> +       if (rqst[num_rqst].rq_iov)
+> +               SMB2_open_free(&rqst[num_rqst]);
+> +       num_rqst++;
+>         if (rc =3D=3D -EREMCHG) {
+>                 pr_warn_once("server share %s deleted\n", tcon->tree_name=
+);
+>                 tcon->need_reconnect =3D true;
+> --
+> 2.43.0
+>
