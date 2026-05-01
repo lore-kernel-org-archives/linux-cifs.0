@@ -1,62 +1,62 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9083A6B83
-	for <linux-cifs@vger.kernel.org>; Fri,  1 May 2026 11:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3383A6EF8
+	for <linux-cifs@vger.kernel.org>; Fri,  1 May 2026 11:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777634436; cv=none; b=jLj1PUS0sEUMz5fKc0rNyqX77OGtEd3+e9ovhO+bFrwJQn7qQz28JIZdG9aOa5kDYDDOGAfnNbi4Ml7Fho9iNhzI4U5fuWZCVY3RKq8fJjcjpQ1jMA4RD4Go/V1uGh2FPddel6ynpnipNkN5Y6dnfasoKFDqmPt2LfPFPsDIMnY=
+	t=1777634437; cv=none; b=Lm2hpGwEpWWKOw/D3bSOTxI0uE0vqkEVMkx5iaXZ5Ck8fGYZ0o0wjsmp7Gh/2U3l6pmcQSc+F+4H/qYQETALDeM5LqUdhpIoxrRP+bDrOLQBJkESkd1n1/kc6Fixupu5Pkk/V0b9TwK3oSGSPpNxUzBIB3Ge965tbltVeLoSo7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777634436; c=relaxed/simple;
-	bh=LwvNSAXXnSWzoHT3Wi0kz3QpPPutFGXNvtJ3F3liFfg=;
+	s=arc-20240116; t=1777634437; c=relaxed/simple;
+	bh=7fs/qpQj7CViKJpl1xKhLVHakBiwsBbgCOkyBzjRtuo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PckPYoy0fM51+TxUObGA8QvW7gr+unlPaG1/JFZyOaTUlJPj8mGl9eR0UvY4HzyCbcEGiu+niDPm23nPHC2uJ3bh9njal3HPBCFut0K2j+U5nX5XIJXP3DT5FbuY2ZYhT0mkfMSWw0a139WHzzt1PfkLP8EKa9Q4BAwUhRYuIpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sQWFvU2p; arc=none smtp.client-ip=209.85.210.170
+	 MIME-Version; b=CO946jlhKOq7PiNnpV31JcTPHpnrw/q3RZes5LBz64MnW2vRhuOMMK+uawqPoun1QT3ZVXTqfQBwUWlePXrKV5T1sCS7a4U+QQ5k8i6ygd9DgZ505PVUrF0UeuRcqsq8r/l73+OTOyflQb/6NY4FkG9WvCvjkQdqVgFYsdxAk+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mFoXoVK1; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sQWFvU2p"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82f8b60e54dso1302867b3a.2
-        for <linux-cifs@vger.kernel.org>; Fri, 01 May 2026 04:20:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFoXoVK1"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-82f69adeecbso825277b3a.2
+        for <linux-cifs@vger.kernel.org>; Fri, 01 May 2026 04:20:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777634433; x=1778239233; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777634434; x=1778239234; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZRWgA5OmDOPPbc7jmvxeovxvP/jnc1UOCkDIWNmHkgQ=;
-        b=sQWFvU2psz4r2lMyz69t4CeGPFUyCjKlSTMq4Int0RN//syyy3lw4JwO2RnvVjW4Wl
-         +5mJSF7d2AgRgy+HV6EmsNaeaJP7nmC3tam20fRTTk0/08G3lHjyWq0/pCKSmHQ4Hf9k
-         +WUBabu0SUFXTFVMdrp7ejYcdI763Ce9aCRyuAFo9/L2acF04NhbwtF7h4zHc9egItf0
-         ZiVCum/2Af1rpdHgHfSubEcAq5Ac8p+nD8F40ZZfeey/p1yEMOFga2sl3GYLreISLnTI
-         pjSDR1Eclsw12Tuw64xCao7oGGiiWWu/7f9O9GgsL+YHXv7v2Z36VerczQuQwNppL2na
-         96nw==
+        bh=4CeNnh5BjM1nRomeWQoA26EkMPBAyik+6iryoO/A02Y=;
+        b=mFoXoVK1le5VkApKd/GCCWgOsscJcBtm+7xlnYfiLDTna8p7t0sw1a9B3mmyyV1KW2
+         APZ5+6NFAbu6IBmQGmtDTh+70sXU/TUhFuakDoJqPBl2BjipTIIS3b0MPYuBXPHT7WVI
+         fpKblj9uKdNsgVvG2/6E9qMF6eM+NnnUAz3V8suvuh5SLNeb6aDZmE5ZAwGZnQTsDn8j
+         04YXS3AfkXcryCFYbUYHCTPPqr7Dwt2BZv/g0CBdsdSt/dXLy8YvLakkMmJpB4O22tv8
+         KZawT+3Ej91tP4zwXuH1N2RtaYE9lE0T9TiMwTYHV3Och5UnYN78I8GIy6DN/knfxmCe
+         kXgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777634433; x=1778239233;
+        d=1e100.net; s=20251104; t=1777634434; x=1778239234;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ZRWgA5OmDOPPbc7jmvxeovxvP/jnc1UOCkDIWNmHkgQ=;
-        b=JG2Z5I1le38l8xDQMyEr8WG91BAnJKC6jYu0fCClP0Wt0e63Fmd/ot/sOhOTn/rE19
-         pL/JnVs5RFdytjI5hSWwxF97cFWQE0WTcevrbxdQHMLoBhCFXHU3LXc5C7rtKmrBXLFm
-         9rNk4BQ9L9Z70LTl+NRXFx4bq9UZR0+FPV0unNPmpT0g8Cn5Ag7AKlY31XZ4+SyTLWjU
-         ywUAOo99Iuq3IBT9ELN9CpQgfWxTXQcQjizptDpOadXpDeF7Glwd8sk5l3TaWnd6+gty
-         EYIBZSxBpc0Hc8iLp0p0mFWLpwfQ5j9RpJXaBeSP2qYD4SSsaEHF6cMgW9/UBqRcllJu
-         xoqw==
-X-Gm-Message-State: AOJu0Yw7kl8Yf1ih0LnpjiSwOYO7YghU5Dz8VZZsPBQjsMcMIF2q228Q
-	Ekme2V0hl8GLTY/nmznjQ1eeX0IwF3y13G4A0P6TQ5gq5hVR4QB7kOqGlXJ3M0fsnC8=
-X-Gm-Gg: AeBDieviw6sZt0ndG7l2KpErQaQSOAussE9Nhu1IaMiKM4WCfrfpDG0vhvfKX57fK1A
-	Pepm/it0yayNCf0Cq+4Bm8HE/d9hXApuhafJKxHGK/GsThY/r52arjuzn9Jwov7rvJ3471QnV3J
-	i6SI1L0IxbAep7LBM0erG2gF4VMbzeDnoB7tEMgD3roQxvBQ21KmctMIemRxR2UYY14d70kOzxd
-	FDYnP8a85GUdK0Yovq18R9giDUtZxulZ2OzTcU/1Rp8wljcKWJITssdKcsltmglDiDM5wSp4Ch8
-	gYAP/BwNYDRepLIgoO2HbkhrORdOf14rRn8W5TehapYBGKJ40Iw6eL1LcZ7bAAzMarPbwTZGams
-	kWp9QmtWEz7yGAmbi5prOBA3g8xd2670DwBTRZy0QM+s7C+8GrR/yibyI9JxH2bzBUMm3RSrjuL
-	9oMxRLtzJDMuQXuteYKFVx89AMToVj74djfdx1Sv20TUgk0fROz3342OOMqNXwc+oc
-X-Received: by 2002:a05:6a00:1794:b0:823:1c5f:1c43 with SMTP id d2e1a72fcca58-8351a570ea0mr2916454b3a.36.1777634433437;
-        Fri, 01 May 2026 04:20:33 -0700 (PDT)
+        bh=4CeNnh5BjM1nRomeWQoA26EkMPBAyik+6iryoO/A02Y=;
+        b=D5cQbLf6hHPQevtcg/pvtRUoxzcdi2DHOa+pAdB1MNh/W+yfclUVZC5iiwL60LlJAR
+         u9Cj85iRukz+jU+BDUWYlgpC6XFv9MtwtwNugWGBwBmnE+Tjn40Ju+bqrasmsn2saUvN
+         te87Ykl8F3GW+Irtjz9F/8F3vIrTHXOHFg49nSUHyuQwPAXdzi9IEt4P4ABlqeFIFAgf
+         yge39qco7W5Y9vPFmiWLTn2N84vwFk/YxtzXhPCmTpsZLkhNCO2BdYpWLogI2KIChxOm
+         aGkmdxaGPSk33/HEn8FONbgzLTFSX2CvJ1wk/Gucq3P9IOQooFeBI0iBtaC+Q6FmWFJ8
+         AcwQ==
+X-Gm-Message-State: AOJu0YxhdGvYPJjT2b70+jlYvk/bAYpKxBhn4C8hIow8HpL3ool9wSHJ
+	mF0DayMFwm9qUIBFjyfGyAoH+ijNYPQpP/0SXHjdmRMqfb+ngYoVPSoVi/pVHQMgFt4=
+X-Gm-Gg: AeBDieun1DQXHKYQPp11KgVPNTtuFa8sV00upRYzhpXC/Rg7MLMVyON4gUIlXkExNRr
+	LIUR3wObwjbe3ZWamMMdatKXGUNoELM5bxS6mck5+voCYKrLarLisAYwEmHVm6HbmfK0Yf1Lcx0
+	9cGPVgOtj7+qOQFSBX3RqBuwaFzsFobUbq5C9XR6PNmCSND/Ea6OimfffdvVU2+xIFhS6GN97tU
+	lKA6d2Y4Vsu6WIxldHHJ1zw81wGi+5+C0/w8K16S1fypXY0SmckPTA81W1W9BhcCWUXPzwUBnWE
+	y7mPzVvVEqGEkn/mufKXJCaFIwkumel8EnHKJKgWof3NXQfc0wsyxTKHdaYQWxjO8N08xciuqGh
+	0FPBdH6SZXDUJuBZcKSXLOOe83d/SSseC/BIi8n+0jzw/BzzRtiN0AXcm+QnMIoZ96Epmd02dBv
+	BKGWB+0EfcFx7gJkLgozOir3ouytT+fsqiv24VlPQIPG+9qzGf3sAyUT5LSNlcwrA+
+X-Received: by 2002:a05:6a00:408d:b0:82f:38:a5b2 with SMTP id d2e1a72fcca58-834fe237b41mr7807442b3a.40.1777634434492;
+        Fri, 01 May 2026 04:20:34 -0700 (PDT)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.216])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8351587db67sm2331922b3a.13.2026.05.01.04.20.32
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8351587db67sm2331922b3a.13.2026.05.01.04.20.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 May 2026 04:20:32 -0700 (PDT)
+        Fri, 01 May 2026 04:20:34 -0700 (PDT)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -66,11 +66,10 @@ To: linux-cifs@vger.kernel.org,
 	dhowells@redhat.com,
 	henrique.carvalho@suse.com,
 	ematsumiya@suse.de
-Cc: Shyam Prasad N <sprasad@microsoft.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v4 03/19] cifs: invalidate cfid on unlink/rename/rmdir
-Date: Fri,  1 May 2026 16:50:06 +0530
-Message-ID: <20260501112023.338005-3-sprasad@microsoft.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Subject: [PATCH v4 04/19] cifs: define variable sized buffer for querydir responses
+Date: Fri,  1 May 2026 16:50:07 +0530
+Message-ID: <20260501112023.338005-4-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260501112023.338005-1-sprasad@microsoft.com>
 References: <20260501112023.338005-1-sprasad@microsoft.com>
@@ -84,94 +83,104 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-Today we do not invalidate the cached_dirent or the entire
-parent cfid when a dentry in a dir has been removed/moved.
+QueryDirectory responses today are stored in one of two fixed
+sized buffers: smallbuf (448 bytes) or bigbuf (16KB). These are
+borrowed from server struct and are not sufficient for large-sized
+query dir operations.
 
-This change invalidates the parent cfid so that we don't serve
-directory contents from the cache.
+With this change we will now define a new buffer type specifically
+for cifs_search_info to hold variable sized responses. These will
+be allocated by kmalloc and freed by kfree.
 
-Cc: <stable@vger.kernel.org>
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/inode.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ fs/smb/client/cifsglob.h |  2 ++
+ fs/smb/client/file.c     |  2 ++
+ fs/smb/client/readdir.c  |  2 ++
+ fs/smb/client/smb2pdu.c  | 14 +++++++++++---
+ 4 files changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 888f9e35f14b8..f0b76670b0921 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -28,6 +28,23 @@
- #include "cached_dir.h"
- #include "reparse.h"
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 709e96e077916..8d089ba08e3e5 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1394,6 +1394,7 @@ struct cifs_search_info {
+ 	bool emptyDir:1;
+ 	bool unicode:1;
+ 	bool smallBuf:1; /* so we know which buf_release function to call */
++	bool is_dynamic_buf:1; /* dynamically allocated buffer - can be variable size */
+ };
  
-+static void cifs_invalidate_cached_dir(struct cifs_tcon *tcon,
-+				       struct dentry *parent)
-+{
-+	struct cached_fid *parent_cfid = NULL;
-+
-+	if (!tcon || !parent)
-+		return;
-+
-+	if (!open_cached_dir_by_dentry(tcon, parent, &parent_cfid)) {
-+		mutex_lock(&parent_cfid->dirents.de_mutex);
-+		parent_cfid->dirents.is_valid = false;
-+		parent_cfid->dirents.is_failed = true;
-+		mutex_unlock(&parent_cfid->dirents.de_mutex);
-+		close_cached_dir(parent_cfid);
+ #define ACL_NO_MODE	((umode_t)(-1))
+@@ -1907,6 +1908,7 @@ enum cifs_find_flags {
+ #define   CIFS_NO_BUFFER        0    /* Response buffer not returned */
+ #define   CIFS_SMALL_BUFFER     1
+ #define   CIFS_LARGE_BUFFER     2
++#define   CIFS_DYNAMIC_BUFFER   3    /* Dynamically allocated buffer */
+ #define   CIFS_IOVEC            4    /* array of response buffers */
+ 
+ /* Type of Request to SendReceive2 */
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index a69e05f86d7e2..6a1419d59ed5a 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -1546,6 +1546,8 @@ int cifs_closedir(struct inode *inode, struct file *file)
+ 		cfile->srch_inf.ntwrk_buf_start = NULL;
+ 		if (cfile->srch_inf.smallBuf)
+ 			cifs_small_buf_release(buf);
++		else if (cfile->srch_inf.is_dynamic_buf)
++			kfree(buf);
+ 		else
+ 			cifs_buf_release(buf);
+ 	}
+diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
+index be22bbc4a65a0..b50efd9b9e1d2 100644
+--- a/fs/smb/client/readdir.c
++++ b/fs/smb/client/readdir.c
+@@ -732,6 +732,8 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
+ 			if (cfile->srch_inf.smallBuf)
+ 				cifs_small_buf_release(cfile->srch_inf.
+ 						ntwrk_buf_start);
++			else if (cfile->srch_inf.is_dynamic_buf)
++				kfree(cfile->srch_inf.ntwrk_buf_start);
+ 			else
+ 				cifs_buf_release(cfile->srch_inf.
+ 						ntwrk_buf_start);
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 5188218c25be4..49dca84b169e6 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -5625,6 +5625,8 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
+ 	if (srch_inf->ntwrk_buf_start) {
+ 		if (srch_inf->smallBuf)
+ 			cifs_small_buf_release(srch_inf->ntwrk_buf_start);
++		else if (srch_inf->is_dynamic_buf)
++			kfree(srch_inf->ntwrk_buf_start);
+ 		else
+ 			cifs_buf_release(srch_inf->ntwrk_buf_start);
+ 	}
+@@ -5644,12 +5646,18 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
+ 	cifs_dbg(FYI, "num entries %d last_index %lld srch start %p srch end %p\n",
+ 		 srch_inf->entries_in_buffer, srch_inf->index_of_last_entry,
+ 		 srch_inf->srch_entries_start, srch_inf->last_entry);
+-	if (resp_buftype == CIFS_LARGE_BUFFER)
++	if (resp_buftype == CIFS_LARGE_BUFFER) {
+ 		srch_inf->smallBuf = false;
+-	else if (resp_buftype == CIFS_SMALL_BUFFER)
++		srch_inf->is_dynamic_buf = false;
++	} else if (resp_buftype == CIFS_SMALL_BUFFER) {
+ 		srch_inf->smallBuf = true;
+-	else
++		srch_inf->is_dynamic_buf = false;
++	} else if (resp_buftype == CIFS_DYNAMIC_BUFFER) {
++		srch_inf->smallBuf = false;
++		srch_inf->is_dynamic_buf = true;
++	} else {
+ 		cifs_tcon_dbg(VFS, "Invalid search buffer type\n");
 +	}
-+}
-+
- /*
-  * Set parameters for the netfs library
-  */
-@@ -2067,6 +2084,9 @@ static int __cifs_unlink(struct inode *dir, struct dentry *dentry, bool sillyren
- 		cifs_set_file_info(inode, attrs, xid, full_path, origattr);
  
- out_reval:
-+	if (!rc && dentry->d_parent)
-+		cifs_invalidate_cached_dir(tcon, dentry->d_parent);
-+
- 	if (inode) {
- 		cifs_inode = CIFS_I(inode);
- 		cifs_inode->time = 0;	/* will force revalidate to get info
-@@ -2378,7 +2398,6 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
- 	}
- 
- 	rc = server->ops->rmdir(xid, tcon, full_path, cifs_sb);
--	cifs_put_tlink(tlink);
- 
- 	cifsInode = CIFS_I(d_inode(direntry));
- 
-@@ -2388,6 +2407,8 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
- 		i_size_write(d_inode(direntry), 0);
- 		clear_nlink(d_inode(direntry));
- 		spin_unlock(&d_inode(direntry)->i_lock);
-+		if (direntry->d_parent)
-+			cifs_invalidate_cached_dir(tcon, direntry->d_parent);
- 	}
- 
- 	/* force revalidate to go get info when needed */
-@@ -2402,6 +2423,7 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
- 
- 	inode_set_ctime_current(d_inode(direntry));
- 	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
-+	cifs_put_tlink(tlink);
- 
- rmdir_exit:
- 	free_dentry_path(page);
-@@ -2668,6 +2690,12 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
- 	}
- 
- 	/* force revalidate to go get info when needed */
-+	if (!rc) {
-+		cifs_invalidate_cached_dir(tcon, source_dentry->d_parent);
-+		if (target_dentry->d_parent != source_dentry->d_parent)
-+			cifs_invalidate_cached_dir(tcon, target_dentry->d_parent);
-+	}
-+
- 	CIFS_I(source_dir)->time = CIFS_I(target_dir)->time = 0;
- 
- cifs_rename_exit:
+ 	return 0;
+ }
 -- 
 2.43.0
 
