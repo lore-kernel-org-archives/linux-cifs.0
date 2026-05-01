@@ -1,73 +1,73 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371C037C917
-	for <linux-cifs@vger.kernel.org>; Fri,  1 May 2026 22:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3625336D9F1
+	for <linux-cifs@vger.kernel.org>; Fri,  1 May 2026 22:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777675919; cv=none; b=IVdvzx9u2TJxvfawOSRNwpHIdmen4RlC7Mcl9iwMFGVo5S7X/iSEnt4P0Eg++KEDIbU76U4ELG7f2Objbs5aNqstuOQ3gJSlyc8p8Y9uelRYLP28YHPE8GSrsRlsZLTJZ3ez4yAY5TdDMSAEuEHey4pV6oCkwtRjV+EYFwVH9PI=
+	t=1777675920; cv=none; b=OOyv1FMwYKgGpcQp5vR3cQYEIDbewsnn01RkV3F0aOv5f8ctOmRhOgtjdnLSf107zK1B6qGwaDq+64oKESruUKyyGQvn70kyb3nwI/fW8+MepPVIC+lgajW6T97I8hio/FYCSqJKrBboXCrkiy7tqZboJWpxaetMj4d5S2NLL6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777675919; c=relaxed/simple;
-	bh=sj+0TveqgFbria1WecUz8+lNLyXt3YQquh2jnrnlr9w=;
+	s=arc-20240116; t=1777675920; c=relaxed/simple;
+	bh=FJP6RLOefwTF8JWnGy5sNvBTTBntXVJzRuLhtI0f/H8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TV2h6lYJTCCqZnICj94PbJnKuWujsroK1xuEBA88uE8F+uxiQ0f+xMpFHqoAQM7O7KKx9mqhW6PtgMakyDyZ8Q5rCoQH6eqPPjZ+4JJFPxOTVuN2CaVrx/5Qtjl9wFtBypMPDwYcSzJJEt57QX704VGc9eE3B24uplq0WeNNiqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BcaDPRqA; arc=none smtp.client-ip=209.85.128.50
+	 MIME-Version; b=MqiXUmBfeuEOWiD5VL3zTkOk5u1F2M8/uB5gndq+P67MDWQbYHMigkj/xa8OtxN3mzq+9qvXYhI5q1Sq31QgV0NU1pILUedrOXgLl4t55/GRQRsnyOOxh/ErQj5pmfRfMJPlr55VFgCajPbAJGKfRnydhRw83AnomTyc17ejCp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VEKCZymA; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BcaDPRqA"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-488b0e1b870so37133575e9.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VEKCZymA"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-43d75312379so1939095f8f.1
         for <linux-cifs@vger.kernel.org>; Fri, 01 May 2026 15:51:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777675917; x=1778280717; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777675918; x=1778280718; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gwNDW+V2ZInjYz2679mwWIRItMIlkpJfBjr27qXLa8Y=;
-        b=BcaDPRqAJprjabvBPa/5BvjjlFoy/dYedfKc7LRO7Wy3ok0CDJPqvZ7z7Wu97uVRUs
-         DUAznbWzZ+VCo6032MIFtSi7ekTkYliIeb7FWGHKr9E8TDyj3XNg3FXE9u44AjFuGURI
-         R90PmCWFtTYM5Q3ptKQWxxt9k6TXu0hwfCz3AzvR86mKds+3lCacZXWovfxfOHwLObQ2
-         UqjkIO+PYAwFsxcTYWpvkEwKXsJoBAyddscHkVEIWx95+k9vWvw4Oi9ubAa2PYJLAXmd
-         1dnowyhq3EztmjmKWm6c9lA3fWNE8Y2OdbjfZHtrFRCAX+7aK/b5wDwsToskcqGavj3j
-         w4wg==
+        bh=fIwxaX7mlPOok/JTlWqcYtodZX36XvL0iKcCG4pk4DA=;
+        b=VEKCZymAk3VwNKxBEfQNJ3iMRuk35EMzmshfU6R2v2UyDS3ydveuDn0LZBMHb0+lBL
+         Ysskw4dn0RNUj6UyZ6WxxX6wTENZVGtrL4MzodXQefdrsuvGakKOCh1zac2nth8z8eee
+         nm0AoFkaixvCynmFiB4rlWUg+q3Snq2cTT+4WZX126nD4ljLUQLJ7hdX4Ee9+4XzS5hl
+         34thIYEOHnWNTXgDJEvOBDzT2WMcSFGOWxTRqeZDhTVU/k1LHa+XIvT8s17Dcov/Ap4S
+         t3kdmIMYrMp+1PeDrB0olRHXQDaqio1skD201LUjhp7nLBFYxCy2zEEi/ETpCBXkR0dw
+         DAFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777675917; x=1778280717;
+        d=1e100.net; s=20251104; t=1777675918; x=1778280718;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=gwNDW+V2ZInjYz2679mwWIRItMIlkpJfBjr27qXLa8Y=;
-        b=FsxY8Isa2AUr0o+8YrCM3/vgF6825J9OEYkZUgQstdA61OOeru8GatfWiQHPZSdOZG
-         IiJ7A1vj6HWMOJv+VuxSzzqqiLuQuZaBN9B8IKgc89zG9nZ2l7nXnpvdo0mUjhbm+zID
-         c0lzVjisNuggdI3vpoOburga7qLKrEZNB0X9RTlT2YgCaogBb7kVdVlXAOQR+xjQpO3C
-         d2Yov2xsrsZ0FWY74QOXG/TW0lZHM9XOM5IP+WnS4QJ3plMcGbE5hBtKSJfTvFsbKIiv
-         1sVTl1ltUzBqRglPBY9Z205fD8jUOF0mvFJom9jI9PKXN8DEJIoeeiDhJchWetUaQUBT
-         tL1A==
-X-Forwarded-Encrypted: i=1; AFNElJ+SQnXfG48/AeIeI68XyW0v9SARtFckK84iffk/QmIWVMd+hXADfMs+kQod/vXzBrHW+0HEW2jKeOBv@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXvPJsM5n/Q2+qDoj25nRRoxrO1HRwiF0FDdO9JM0CSGlmufqX
-	z9KAgk+YhrOTXAi6v/2auOefmLb6ArusZUTT3qxdUD42At8HpEpDJUZE
-X-Gm-Gg: AeBDievjkyILPWsRdAi4YspDkemKK3NdoIe+SlwevPgU30mcoj1reXWXLOsUX/A+Iv2
-	dBrnGYZoYQib24umdDCrAz44TGfCtM+S7s+XGt2qucdhJ4FsPvrRwafGRdJqdUonPvLknoYjji8
-	nwAQxz0h670/zq+GnifrtLHd8nJtZt01aC14bcjPZ6Xg4Ee4thj3zUCMYhhPplD8DGgFLS5waod
-	7TOnvsXx9wT/lnMdrAMzmDw7fUyxjoajrSWnYH7DfJRCIcizaBWsvJHQPcTqFVAi4SBlipmlrxA
-	KpnJTy2KcPly/jtyvris5odBBxd+h/RefCN8TNGdjWfeqENtxw3O6fv/jAZIG8UD6PUH94X+D8L
-	/F3o2rW4qecc/erGhgR6xSVIhhwXc+TvWdBhVs4sI8lq6yljylMWldztxL/JF7V8W7zH9Dsg8nn
-	xnHdzSVwn3oqqIIbnyZId7U/j8qOBPbAqFGdu1k3Vw27ZzyFx8zbYbQhdPMBcxG8lz2OgS1rUxB
-	ogjzu5RQ3Giol8Zj+1t0u7SxA==
-X-Received: by 2002:a05:6000:40c7:b0:43d:6787:992f with SMTP id ffacd0b85a97d-44bb37c7fabmr1783295f8f.10.1777675916470;
-        Fri, 01 May 2026 15:51:56 -0700 (PDT)
+        bh=fIwxaX7mlPOok/JTlWqcYtodZX36XvL0iKcCG4pk4DA=;
+        b=rssYc61gySg25uzodZlsANDMOeRBih+0uqgF/WLk6xEji23OhZBmZggjpqNEx11UpG
+         pT/6a3PjVXlfVr/lyCHT/QZNTg+48Tvt7wBDbfekJrjgnzigo2rjTuzi1WQoTU9F5JcF
+         HDQ1RI7iVfMk3RTWwDBX4J0/VqY6lBwtwoovjI5ddbwEpl3BWjrY5NuPNK25AqqCnFx2
+         +rR1CYMKSpMhW9ES2C+KWMtvf3nKX3EE4YzdpXMG0a6RReCBIerNaX8zdFRK9S1tNoQR
+         Y7ILxbPR1YkzMXGnePbKXWJYYndEAQTF5vqUOw/4DXXEAoDz9J8iaW+WpKeWK8VHBjz2
+         hmSw==
+X-Forwarded-Encrypted: i=1; AFNElJ/jNkFsgDqdJ3+nThDij41zaAeqOPGidg/zxj49a3o+8lrLr0ddcwT+XwlaxTpziOzKxLYBKEX/QSrN@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWzScyh/hluRZZdGsamuBCOwWTnYAs5XyrPvKnTm8pPv8nl9Ce
+	HJq7Ekdjv2+0AkA096ZbSZ5qS98UJjVczQ3BDvOFvByMfiB6ypILhTPy
+X-Gm-Gg: AeBDietjR7l+BTYRdO1pFJgg/GCEmlYAYdLXGDj/Ytm4XSTQFbAX2g8C4I8cFafAMbL
+	n3NpEUi9eHzxX2ueoMp5GEvwBspZxVpoqIJP6qdKGdssRZynu1q9YybWgKBqhnp0RhCL7aaSIcU
+	C1QMz6nPpCC+brTWOWSQ5jBo1k+U0vxF1ll/cqpUgtXo3zMOHVY+ALtZI/DYuGUsOVDj/8PkSZm
+	5bYagr0evxqNjmNkUvvZt2/Jr4IOJm4eu8r9796Q2yYSI+5Cwp5Aj/3S2m97cbUjzuTCfUEdpKr
+	Wom4qZAb9UEY84JjKVGExxu6dDniURzFJD+47HKSq+JjhpXfSNCuV4w5v30fPCGKUtYFWRpCF6p
+	Qti42ZCtmuRzG3GRvKWUsBzNQosjkwbmWpg/tJEvEXAQrwk6zFcfnQ4vuax4N8f5HQsVgzjt0yJ
+	Ac3duuLVlcrHVwIL9g/rkXB+6yBcGLu5TyvEWj4qx8aiZkQc0AAjOCX7dLdk+hm8MukCgzdDHxa
+	o1xNi0+xn65W76KF+TgQxBmwQ==
+X-Received: by 2002:a5d:648d:0:b0:43f:e571:184d with SMTP id ffacd0b85a97d-44951508317mr9228565f8f.28.1777675917540;
+        Fri, 01 May 2026 15:51:57 -0700 (PDT)
 Received: from localhost.localdomain ([77.124.36.154])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-44a98b76fd0sm8040341f8f.35.2026.05.01.15.51.55
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-44a98b76fd0sm8040341f8f.35.2026.05.01.15.51.56
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 01 May 2026 15:51:56 -0700 (PDT)
+        Fri, 01 May 2026 15:51:57 -0700 (PDT)
 From: Kai Aizen <kai.aizen.dev@gmail.com>
 To: stable@vger.kernel.org
 Cc: gregkh@linuxfoundation.org,
 	linkinjeon@kernel.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH 6.1.y] ksmbd: add chann_lock to protect ksmbd_chann_list xarray
-Date: Sat,  2 May 2026 01:51:51 +0300
-Message-ID: <20260501225152.90136-2-kai.aizen.dev@gmail.com>
+Subject: [PATCH 5.15.y] ksmbd: add chann_lock to protect ksmbd_chann_list xarray
+Date: Sat,  2 May 2026 01:51:52 +0300
+Message-ID: <20260501225152.90136-3-kai.aizen.dev@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260501225152.90136-1-kai.aizen.dev@gmail.com>
 References: <20260501225152.90136-1-kai.aizen.dev@gmail.com>
@@ -89,28 +89,31 @@ multi-channel sessions (between lookup_chann_list() and ksmbd_chann_del).
 Adds rw_semaphore chann_lock to struct ksmbd_session and protects
 all xa_load/xa_store/xa_erase accesses.
 
-Backport notes for linux-6.1.y:
-  - The smb client/server consolidation has already happened by 6.1.y;
-    file paths are fs/smb/server/, identical to mainline.
-  - The xa_store call sites use the older form
-    `xa_store(..., GFP_KERNEL)` with no captured `old`, but the
-    surrounding context for the lock-wrap is identical.
+Backport notes for linux-5.15.y:
+  - 5.15 still uses fs/ksmbd/ paths (the smb client/server consolidation
+    landed in 6.1).
+  - struct ksmbd_session does not yet have rpc_lock; init_rwsem for
+    chann_lock is added directly after the refcnt initialisation.
+  - Function bodies for free_channel_list, ksmbd_chann_del,
+    lookup_chann_list, and the two xa_store sites in
+    ntlm_authenticate / krb5_authenticate are byte-identical to
+    mainline at the time of the fix.
 
 CVE: CVE-2026-23226
-Cc: stable@vger.kernel.org # 6.1.y
+Cc: stable@vger.kernel.org # 5.15.y
 Reported-by: Igor Stepansky <igor.stepansky@orca.security>
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-[backport for linux-6.1.y, verified 2026-05-01]
+[backport for linux-5.15.y, verified 2026-05-01]
 ---
- fs/smb/server/mgmt/user_session.c |  5 +++++
- fs/smb/server/mgmt/user_session.h |  1 +
- fs/smb/server/smb2pdu.c           | 12 +++++++++++-
+ fs/ksmbd/mgmt/user_session.c |  5 +++++
+ fs/ksmbd/mgmt/user_session.h |  1 +
+ fs/ksmbd/smb2pdu.c           | 12 +++++++++++-
  3 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
---- a/fs/smb/server/mgmt/user_session.c
-+++ b/fs/smb/server/mgmt/user_session.c
+diff --git a/fs/ksmbd/mgmt/user_session.c b/fs/ksmbd/mgmt/user_session.c
+--- a/fs/ksmbd/mgmt/user_session.c
++++ b/fs/ksmbd/mgmt/user_session.c
 @@ -30,12 +30,14 @@ static void free_channel_list(struct ksmbd_session *sess)
  	struct channel *chann;
  	unsigned long index;
@@ -126,7 +129,7 @@ diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session
  }
 
  static void __session_rpc_close(struct ksmbd_session *sess,
-@@ -218,7 +220,9 @@ static int ksmbd_chann_del(struct ksmbd_conn *conn, struct ksmbd_session *sess)
+@@ -201,7 +203,9 @@ static int ksmbd_chann_del(struct ksmbd_conn *conn, struct ksmbd_session *sess)
  {
  	struct channel *chann;
 
@@ -136,17 +139,17 @@ diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session
  	if (!chann)
  		return -ENOENT;
 
-@@ -417,6 +421,7 @@ static struct ksmbd_session *__session_create(int protocol)
+@@ -395,6 +399,7 @@ static struct ksmbd_session *__session_create(int protocol)
+ 	sess->sequence_number = 1;
  	rwlock_init(&sess->tree_conns_lock);
- 	atomic_set(&sess->refcnt, 2);
- 	init_rwsem(&sess->rpc_lock);
+ 	atomic_set(&sess->refcnt, 1);
 +	init_rwsem(&sess->chann_lock);
 
  	ret = __init_smb2_session(sess);
  	if (ret)
-diff --git a/fs/smb/server/mgmt/user_session.h b/fs/smb/server/mgmt/user_session.h
---- a/fs/smb/server/mgmt/user_session.h
-+++ b/fs/smb/server/mgmt/user_session.h
+diff --git a/fs/ksmbd/mgmt/user_session.h b/fs/ksmbd/mgmt/user_session.h
+--- a/fs/ksmbd/mgmt/user_session.h
++++ b/fs/ksmbd/mgmt/user_session.h
 @@ -48,6 +48,7 @@ struct ksmbd_session {
  	char				sess_key[CIFS_KEY_SIZE];
 
@@ -155,10 +158,10 @@ diff --git a/fs/smb/server/mgmt/user_session.h b/fs/smb/server/mgmt/user_session
  	struct xarray			ksmbd_chann_list;
  	struct xarray			tree_conns;
  	struct ida			tree_conn_ida;
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -79,7 +79,13 @@ static inline bool check_session_id(struct ksmbd_conn *conn, u64 id)
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -78,7 +78,13 @@ static inline bool check_session_id(struct ksmbd_conn *conn, u64 id)
 
  struct channel *lookup_chann_list(struct ksmbd_session *sess, struct ksmbd_conn *conn)
  {
@@ -173,7 +176,7 @@ diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
  }
 
  /**
-@@ -1567,7 +1573,9 @@ static int ntlm_authenticate(struct ksmbd_work *work,
+@@ -1570,7 +1576,9 @@ static int ntlm_authenticate(struct ksmbd_work *work,
  				return -ENOMEM;
 
  			chann->conn = conn;
@@ -183,7 +186,7 @@ diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
  		}
  	}
 
-@@ -1660,7 +1668,9 @@ static int krb5_authenticate(struct ksmbd_work *work,
+@@ -1667,7 +1675,9 @@ static int krb5_authenticate(struct ksmbd_work *work,
  				return -ENOMEM;
 
  			chann->conn = conn;
