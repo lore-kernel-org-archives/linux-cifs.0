@@ -1,401 +1,204 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DE91EEA31
-	for <linux-cifs@vger.kernel.org>; Fri,  1 May 2026 06:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777615755; cv=none; b=Okmb2sQVqqlOpOgcIZzra0fcl8JXeMCpIVyD9FMsnWhuaH+QzhEx3uZeU84hG2DzKwTlT/OIw1QUzxZ9ww6bCXYLAjxSyQiJtrLlQg3+os8SvFU/dCks13W0Pym/g85pXjvpwtSPHnxriocWBop98VdOsESL81UUzskbbVVGKD4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777615755; c=relaxed/simple;
-	bh=nP4pQbVF7HV231uf0jmDk9LxaD/5c4P8phigOlYZ/7s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r33yS6OvbgYDroiaCaZA8LTd8QlgVGLHXL8Crmy7ERPFAF8mBmLTDvaVjr4AcmP9lw7foNv72bn1pI/3Jk8uus5by99ud+6ojMAopbK3VHiOjuiGWJoz8+UUiiF1XTsZewryB95TIrZ5ifSV+wwExd/grVHJ7qhl0e+dl9zSCwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gtLyLYRW; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19B4285CAD
+	for <linux-cifs@vger.kernel.org>; Fri,  1 May 2026 08:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777623556; cv=pass; b=rXPFbbMAgAbCxFXSUcC7poT6IZnsbHIXczZVIbBC6bDjqgFhHeuUJwXTrLe9OtWSCpKkY7f02Fv7zHcQdLknOygzPGEhb1MUM9eekhmU3KlhR6ai0RQTGyQdbxdQT6Q3J/zdFZwIztYq8qA5sMfHh25Z8NfbSikQLVAbiMmB3VM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777623556; c=relaxed/simple;
+	bh=Lu+eN3ekizYad1x1vhCFxk9heVmbaq1kuBgOprSo91o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=REtoSbftrW5EFlkwY9zvysHGTC+yPajDAuvccZheWg3uiz7Pt6X7oxUpVpls45BRHxWFisAC2OEWNdZnV74V+SaQxfFXMLB6v6XLsTfyshAHnc4/FkExkNrd/Vn4Zuc3JxySthuVT67tn8W33eQG5GZn9M6ysAIRfJrBwnGRTBs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LrVOmMLx; arc=pass smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gtLyLYRW"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-364efc41420so68934a91.3
-        for <linux-cifs@vger.kernel.org>; Thu, 30 Apr 2026 23:09:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LrVOmMLx"
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-67845996252so3216854a12.3
+        for <linux-cifs@vger.kernel.org>; Fri, 01 May 2026 01:19:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777623553; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JYAh6MvVYnAp7ZpzSzkp3WVWQvomIgoEuQ6Q4JhSzr+TDXYoepv3wuvce+4jXsv7Qt
+         tcyeyOlPuavLbEEphJ7HTV/e6FtzqtDkpQeMcX7/XxdzkCnMWAdk0+i8v32hWOqtVlWy
+         S6reSqTRLiliE8P07sjlQIOK7TnMe2Xza632Y26uWwfdPZP1IlLFE3LDHp0nNlW0hv6R
+         Pt81blOVsSBz+LkLf9p9kSx7ILf4ne2qDjg0uUFoH65Ld4Ys5kPqc+DEkS0ss3bieCch
+         6VL1XA9NUOBOO1hxg1sK9sS17sev6dZOUkP8+2RW9uNcxN1dNd2A3KyrbYNgGdK3sj4J
+         Tdlw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=g9KkST0u+uud4zMsS9a0NvbTTJ64h0UQCQgI9MpDHis=;
+        fh=nPg8hoTTN7UPOx/8/kKtrBcvPSl0lCQThCI/quIVrz4=;
+        b=GOGyFZ33F5mRmcy+wsyeZosMAo2n3tP/0QT0CSKuxdN9H+ilV8up/EG5cjzwwNCDGc
+         5kMWcXWXr0DhyhAtLvqVlrCpWwVaYgrtmLEKv+dn8No3Tu/Wan8zr3Q90wQNKiD5KX3z
+         79cDGDmbyPuWLArjwz6FW1eU2geXkmB791OsN/p4XP+O6rMZyM9/OeGConuxaHDi2I4b
+         rJLzE1Mau+zUg5bfBnf41rEHOm47YficBg3kapXcggUSxT8cM+dSNcgTQucGcFFXbb36
+         bSMuIc9hDO+W3TZIKCn8fJ6xVEmWtBZ/Y+M8xZiY7Nn7mWQO+SOycd4s2ijksRK+hAbq
+         YMww==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777615753; x=1778220553; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ljh2MVoIl78+pzMqYmjc4MFbJ/Ye1uVBhLvcnHvPQb0=;
-        b=gtLyLYRWo84NN1/RjJJ7JDCNNH7qYb0UHwkOpsgQGVxKVqVYpWmTUqS4niSV+rW6FG
-         jU2ZuVZLiWEJnJHdmbhassqFI/XI4r/jD4s9YwrhxF7OSPrWOyYYSnOFqtZumrvp74PM
-         /I19xR4WT5BSXP+9EGHrrG2cUDKm5mkJl+pgrIzwc7174pAlpqqZtyl3+fLIF5eEd0zj
-         c9XIVv0J9QU4cy0TM1RR5ko5bWy2YiLXbYKzwbdy816+JhQNCzT96OSYuSF4Sq68Gz+Z
-         hRtv3wAk/wSLsTmD7v7+1Uc3YuPCRmDC1NGy/HAvVH9uvYhtXC0LNBFtCoixSiPs5ej8
-         C1hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777615753; x=1778220553;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777623553; x=1778228353; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ljh2MVoIl78+pzMqYmjc4MFbJ/Ye1uVBhLvcnHvPQb0=;
-        b=JLCLL7CDlbk+lF+Jbf23jkKcdIvptVb+B3ZnakN6oNzz05nSGF8LQdhjoT6y7nU+nz
-         k+5WRpmynwhGrtenLneyyP3NIyWF6mf+XxSlbNr95c/DL5VIe8qUuAhSJqPUB5f/E96W
-         kGquL0zvplA1WDmKdicTlqhpZU4hn6I9SdUJKzItyLxHJSFlNqnqidOtGVGER+pFoNTD
-         w2l4HGOpK4D3Qmye/uaOxhURaeAlmz29C0ysmbsNbaWqV4b76kreHPxPjDLeh2i8hl21
-         u8Zkq2hffWeVRK2Xqa4vkkcbXvNlssBxM6f0lBD213xhuaZM7tFRHMAie++sH8jZ0mIG
-         guAA==
-X-Forwarded-Encrypted: i=1; AFNElJ/BLqa0KmZ6ihc5ok5eG3vKVoUzHEJe6nHS0s8cXkNG+nKr8YQ/wAsamQUXRjERLvZjZ8Ej0zC1b2c9@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6rcmchui1t+7Smjas9rMC8BACSR5/G5ksFgwNbZYrhiYHGDS9
-	h159JUNYe5ChsmwLQCpf+f6h57Y7ykLfB/psCR6gonj2xXfx9YMqMOaB
-X-Gm-Gg: AeBDiet5i+LS0R2xYaWCcAQPwM3/EP4dM1MeXBZ3QCTjezi/BbXyj03lOC7MRUGp3ah
-	c6X/0Q+P3BtPLIr9+L/+XgFLhI8BiGNEcC+/0gzc8wee8vc121v7tRX9wp74qI4e0AyXgJCqxsK
-	0YcN/SwKH1tPtG4AEgMkcW8Fl4b1vJb/FI/k0fiaaM/vyueu2yq0wntXrxWVt2YDYcNabieHIs5
-	Osqn1H0Qi9z02E5+x2+CrowWgbUEsZZGaTIx1QE88JKh62mYGsx6EX94bany6ZRz7MBc5fo93w0
-	UIkVFNByts47TikaHb0R26XXtmhnfjz67RUNJU8/ty8n+Yh7yRWQU7sgeEZWeM6SNn/+dBtprAP
-	oLsFSUkyOF5GFi/E9zhIdRbthKhN2Xvs9WdQGKh05yYZmk5t0cDsRaWvAQJ0YvGKRBmuqPQD29D
-	lt3VCN+CJrYq2zmTiS6b0G5lT1qPT0gNy6tJ5WRA==
-X-Received: by 2002:a17:90b:3a4b:b0:359:8e93:4fd6 with SMTP id 98e67ed59e1d1-364c3157c9amr3639546a91.4.1777615752788;
-        Thu, 30 Apr 2026 23:09:12 -0700 (PDT)
-Received: from ser8.. ([221.156.231.192])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364ec00b094sm1252022a91.9.2026.04.30.23.09.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 23:09:12 -0700 (PDT)
-From: DaeMyung Kang <charsyam@gmail.com>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Henrique Carvalho <henrique.carvalho@suse.com>,
-	Rajasi Mandal <rajasimandal@microsoft.com>,
-	Rajasi Mandal <rajasimandalos@gmail.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	DaeMyung Kang <charsyam@gmail.com>
-Subject: [PATCH v5] smb: client: avoid ctx corruption on failed multichannel remounts
-Date: Fri,  1 May 2026 15:09:07 +0900
-Message-ID: <20260501060907.3859641-1-charsyam@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=g9KkST0u+uud4zMsS9a0NvbTTJ64h0UQCQgI9MpDHis=;
+        b=LrVOmMLxgfCRVZU1N+L7FWHGaoivSuF6GxlWAMXi9Wrk/gTAemtSeR1rn6utp8+F12
+         9AcMag0wxiRmBtaigLThKtr7nzfc1wS65mV8Ag88ZePS7aUq4L37AU0VL+Xeh6P51Bq9
+         jPmyzhueqkRfGXeb9jfxPxctp2g1RXi+rFfv8fttHRHmnV5Hkjwh7pR56E0FN1EdN4oM
+         fuCADRtA9O63rs6LeF+oZeVvU4gwPtoqD+NMStPuqYmdsn/eoB55h0Waz4qj8eWe8ol0
+         yKA7oBDfgpg1CZl1dXAP8z+shjUxCVMf829PwLtXwq4rck7uTcrDjAknIUhCTou7+0H1
+         VB/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777623553; x=1778228353;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=g9KkST0u+uud4zMsS9a0NvbTTJ64h0UQCQgI9MpDHis=;
+        b=obkNbNhUpskxo8+I7L9TCVDjNBRyKH76ZFA+qqoCJIwbAyLPLE/cos+57oNpyzyfEa
+         YwzLcWd7TDwIcq0Gs9NNabStAroYRfaG4Ez+yC8Rw1l/DlImpLjtXiIRl7NN1o8eks9C
+         h72K2DJGfs8KW/6vEVNuUSfP0+IAKNywJdwQXgArT4O1oLBaTfCZVpvhzQS+9DEFfO6b
+         5mbnu/GOWv05SaN4gqPPeNULbTxDhQQTrWlKpRMryDSk5VDaY9IwJeQgmLZ5GEy4ljFU
+         V/PCn4Ea7XdOAzH2wCRTaguYh5EjYzXI4EH/LCy2Iv+tSknKAv7OB2i58Tm7rQ+94KjX
+         fHLw==
+X-Gm-Message-State: AOJu0Yxdk8HHWNH+Dv+2EmgWU6xsVTbGfL4hKQawsgy2A7/vxHPMU/8I
+	l39oFG+fIRWe4HNScuvoXIKaRyGLP00S7ge+FHfFxmaM2RgGTbx2qpL+Tj67E3GTGnvBzMflDYn
+	24dlhW22PikhK7oKE+0MEZoa8KcjqfQk=
+X-Gm-Gg: AeBDieumspHXy3PBeGuV6QjllrHdoRKojsvonzZg0tvplEKM3Ab/pWB3VWM1A8HoQtl
+	eWTI9xNExvtRDc1DUN8U8T24FhleXgEOWUyTr75CAaFX1LTpOwXbg+/ktUQFQf6kqiYvtZNwRYi
+	6a156iKs2QbPHzMJP6l+6hcUu4EdsD0/b8vcxwciNTyDsiF50ORZMZqx6IGqgPLD9PKpvNiyF9r
+	ZEixttgae+BBPXkBtArR9RaGXIUCvIWdhBkxyRAMXgQ2LmJED/Inp95rXNcOy417LnvVFQMnPCp
+	9V+kvR1NdX4Ryjw5
+X-Received: by 2002:a17:907:928d:b0:ba4:e5e5:58b4 with SMTP id
+ a640c23a62f3a-bbac67c2706mr428736266b.20.1777623552667; Fri, 01 May 2026
+ 01:19:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260428160804.281745-1-sprasad@microsoft.com>
+ <20260428160804.281745-17-sprasad@microsoft.com> <afDr5VhyWx9MIQHU@suse.de>
+In-Reply-To: <afDr5VhyWx9MIQHU@suse.de>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Fri, 1 May 2026 13:49:01 +0530
+X-Gm-Features: AVHnY4ITsKf9eWNcP7LdEs_iF1_7WenjpEHV5DkfhhdszJoBEmrD3J7K9uw2Sjs
+Message-ID: <CANT5p=r512+At=K1gu8iaKgYW_0Z382rG+ybYVW+kGwisj=CVw@mail.gmail.com>
+Subject: Re: [PATCH v3 17/19] cifs: discard functions should not return failure
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.org, 
+	bharathsm@microsoft.com, dhowells@redhat.com, henrique.carvalho@suse.com, 
+	Shyam Prasad N <sprasad@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-smb3_reconfigure() moves string fields out of the live mount context
-(cifs_sb->ctx) before updating multichannel state. If the remount fails
-after that point, the live context can be left with NULL strings or with
-options that do not match the session state.
+On Tue, Apr 28, 2026 at 10:58=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.de=
+> wrote:
+>
+> On 04/28, nspmangalore@gmail.com wrote:
+> >From: Shyam Prasad N <sprasad@microsoft.com>
+> >
+> >If discard functions for readv and query_dir return error, the
+> >callback functions can be skipped. This can end up with hung
+> >syscalls due to the completion functions not getting called.
+> >
+> >This change ensures that both these discard functions return
+> >success even when discard from socket returned error. This
+> >ensures that at least after the mid for the response is found,
+> >the callback doesn't get skipped, and we do not leave syscalls
+> >waiting.
+>
+Hi Enzo,
 
-Snapshot cifs_sb->ctx on entry, build the new context separately, and
-replace cifs_sb->ctx only after the staged reconfigure work succeeds.
-Restore the snapshot on failure paths before committing session-side
-state.
+Thanks for the review.
 
-Also make smb3_sync_session_ctx_passwords() all-or-nothing, and keep the
-ses->password commit before smb3_update_ses_channels() so newly added
-channels authenticate with the new credentials.
+> Then we'll also be returning wrong errors to callers?
+No. The errors returned are what is set in qd_io->result or rdata->result.
+>
+> Either way, if this is a special case for query dir, just
+> call __cifs_readv_discard() from the new
+> cifs_query_dir_receive() and ignore the error there
+> (but you really shouldn't).
+>
+> __cifs_readv_discard() is used in other places (mostly indirectly)
+> and returns important errors from deep down cifs_readv_from_socket()
+> (e.g. -ECONNABORTED, -ESHUTDOWN, -EINTR) so modifying it for all
+> callers doesn't sound good.
 
-Fixes: ef529f655a2c ("cifs: client: allow changing multichannel mount options on remount")
-Reported-by: RAJASI MANDAL <rajasimandalos@gmail.com>
-Closes: https://lore.kernel.org/lkml/CAEY6_V1+dzW3OD5zqXhsWyXwrDTrg5tAMGZ1AJ7_GAuRE+aevA@mail.gmail.com/
-Link: https://lore.kernel.org/lkml/xkr2dlvgibq5j6gkcxd3yhhnj4atgxw2uy4eug2pxm7wy7nbms@iq6cf5taa65v/
-Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
----
-v5: (feedback from Henrique Carvalho)
- - Drop mchan_rc / scale_busy; the early failure paths now restore
-   cifs_sb->ctx from a snapshot taken on entry.
- - Build new_ctx separately and replace cifs_sb->ctx only on success.
- - Make smb3_sync_session_ctx_passwords() all-or-nothing: allocate
-   both copies first, commit only when both succeed.
- - Switch smb3_sync_ses_chan_max() max_channels parameter to size_t
-   to match struct cifs_ses::chan_max.
- - Shorten the commit message and follow nearby CIFS log style.
+The return value from these functions are returned as is by the
+receive handlers (both for query_dir and read). cifsd uses this to
+determine that there was an error reading from socket and hence we
+cannot call mid handlers (because mid cannot be identified).
 
- fs/smb/client/fs_context.c | 163 +++++++++++++++++++++++++------------
- 1 file changed, 110 insertions(+), 53 deletions(-)
+However, these functions are always called after the mid is
+identified. Hence it is imperative that we return 0 to cifsd to ensure
+that the corresponding handler gets called. Otherwise, we leave the
+mid hanging.
+Alternatively, we could set qd_io->result or rdata->result to the
+length read from the socket and return 0 to callers. That way, this
+return value can be checked for retry by the main I/O process.
+Let me give that a shot and see how it works.
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index b9544eb0381b..1f0cbcf78e17 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -767,7 +767,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
- 					    void *data);
- static int smb3_get_tree(struct fs_context *fc);
--static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channels);
-+static void smb3_sync_ses_chan_max(struct cifs_ses *ses, size_t max_channels);
- static int smb3_reconfigure(struct fs_context *fc);
- 
- static const struct fs_context_operations smb3_fs_context_ops = {
-@@ -1041,24 +1041,35 @@ do {									\
- 
- int smb3_sync_session_ctx_passwords(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses)
- {
-+	char *password = NULL, *password2 = NULL;
-+	bool update_password = false, update_password2 = false;
-+
- 	if (ses->password &&
- 	    cifs_sb->ctx->password &&
- 	    strcmp(ses->password, cifs_sb->ctx->password)) {
--		kfree_sensitive(cifs_sb->ctx->password);
--		cifs_sb->ctx->password = kstrdup(ses->password, GFP_KERNEL);
--		if (!cifs_sb->ctx->password)
-+		password = kstrdup(ses->password, GFP_KERNEL);
-+		if (!password)
- 			return -ENOMEM;
-+		update_password = true;
- 	}
- 	if (ses->password2 &&
- 	    cifs_sb->ctx->password2 &&
- 	    strcmp(ses->password2, cifs_sb->ctx->password2)) {
--		kfree_sensitive(cifs_sb->ctx->password2);
--		cifs_sb->ctx->password2 = kstrdup(ses->password2, GFP_KERNEL);
--		if (!cifs_sb->ctx->password2) {
--			kfree_sensitive(cifs_sb->ctx->password);
--			cifs_sb->ctx->password = NULL;
-+		password2 = kstrdup(ses->password2, GFP_KERNEL);
-+		if (!password2) {
-+			kfree_sensitive(password);
- 			return -ENOMEM;
- 		}
-+		update_password2 = true;
-+	}
-+
-+	if (update_password) {
-+		kfree_sensitive(cifs_sb->ctx->password);
-+		cifs_sb->ctx->password = password;
-+	}
-+	if (update_password2) {
-+		kfree_sensitive(cifs_sb->ctx->password2);
-+		cifs_sb->ctx->password2 = password2;
- 	}
- 	return 0;
- }
-@@ -1072,7 +1083,7 @@ int smb3_sync_session_ctx_passwords(struct cifs_sb_info *cifs_sb, struct cifs_se
-  * with the session's channel lock. This should be called whenever the maximum
-  * allowed channels for a session changes (e.g., after a remount or reconfigure).
-  */
--static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channels)
-+static void smb3_sync_ses_chan_max(struct cifs_ses *ses, size_t max_channels)
- {
- 	spin_lock(&ses->chan_lock);
- 	ses->chan_max = max_channels;
-@@ -1082,12 +1093,15 @@ static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channe
- static int smb3_reconfigure(struct fs_context *fc)
- {
- 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
-+	struct smb3_fs_context *new_ctx = NULL;
-+	struct smb3_fs_context *old_ctx = NULL;
- 	struct dentry *root = fc->root;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(root->d_sb);
- 	struct cifs_ses *ses = cifs_sb_master_tcon(cifs_sb)->ses;
- 	unsigned int rsize = ctx->rsize, wsize = ctx->wsize;
- 	char *new_password = NULL, *new_password2 = NULL;
- 	bool need_recon = false;
-+	bool need_mchan_update;
- 	int rc;
- 
- 	if (ses->expired_pwd)
-@@ -1097,6 +1111,16 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	if (rc)
- 		return rc;
- 
-+	old_ctx = kzalloc_obj(*old_ctx);
-+	if (!old_ctx)
-+		return -ENOMEM;
-+
-+	rc = smb3_fs_context_dup(old_ctx, cifs_sb->ctx);
-+	if (rc) {
-+		kfree(old_ctx);
-+		return rc;
-+	}
-+
- 	/*
- 	 * We can not change UNC/username/password/domainname/
- 	 * workstation_name/nodename/iocharset
-@@ -1106,16 +1130,22 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	STEAL_STRING(cifs_sb, ctx, UNC);
- 	STEAL_STRING(cifs_sb, ctx, source);
- 	STEAL_STRING(cifs_sb, ctx, username);
-+	STEAL_STRING(cifs_sb, ctx, domainname);
-+	STEAL_STRING(cifs_sb, ctx, nodename);
-+	STEAL_STRING(cifs_sb, ctx, iocharset);
- 
--	if (need_recon == false)
-+	if (!need_recon) {
- 		STEAL_STRING_SENSITIVE(cifs_sb, ctx, password);
--	else  {
-+	} else {
- 		if (ctx->password) {
- 			new_password = kstrdup(ctx->password, GFP_KERNEL);
--			if (!new_password)
--				return -ENOMEM;
--		} else
-+			if (!new_password) {
-+				rc = -ENOMEM;
-+				goto restore_ctx;
-+			}
-+		} else {
- 			STEAL_STRING_SENSITIVE(cifs_sb, ctx, password);
-+		}
- 	}
- 
- 	/*
-@@ -1125,11 +1155,29 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	if (ctx->password2) {
- 		new_password2 = kstrdup(ctx->password2, GFP_KERNEL);
- 		if (!new_password2) {
--			kfree_sensitive(new_password);
--			return -ENOMEM;
-+			rc = -ENOMEM;
-+			goto restore_ctx;
- 		}
--	} else
-+	} else {
- 		STEAL_STRING_SENSITIVE(cifs_sb, ctx, password2);
-+	}
-+
-+	/* if rsize or wsize not passed in on remount, use previous values */
-+	ctx->rsize = rsize ? CIFS_ALIGN_RSIZE(fc, rsize) : cifs_sb->ctx->rsize;
-+	ctx->wsize = wsize ? CIFS_ALIGN_WSIZE(fc, wsize) : cifs_sb->ctx->wsize;
-+
-+	new_ctx = kzalloc_obj(*new_ctx);
-+	if (!new_ctx) {
-+		rc = -ENOMEM;
-+		goto restore_ctx;
-+	}
-+
-+	rc = smb3_fs_context_dup(new_ctx, ctx);
-+	if (rc)
-+		goto restore_ctx;
-+
-+	need_mchan_update = ctx->multichannel != cifs_sb->ctx->multichannel ||
-+			    ctx->max_channels != cifs_sb->ctx->max_channels;
- 
- 	/*
- 	 * we may update the passwords in the ses struct below. Make sure we do
-@@ -1140,54 +1188,55 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	/*
- 	 * smb2_reconnect may swap password and password2 in case session setup
- 	 * failed. First get ctx passwords in sync with ses passwords. It should
--	 * be okay to do this even if this function were to return an error at a
--	 * later stage
-+	 * be done before committing new passwords.
- 	 */
- 	rc = smb3_sync_session_ctx_passwords(cifs_sb, ses);
- 	if (rc) {
- 		mutex_unlock(&ses->session_mutex);
--		kfree_sensitive(new_password);
--		kfree_sensitive(new_password2);
--		return rc;
-+		goto restore_new_ctx;
- 	}
- 
- 	/*
--	 * now that allocations for passwords are done, commit them
-+	 * If multichannel or max_channels has changed, update the session's channels accordingly.
-+	 * This may add or remove channels to match the new configuration.
-+	 */
-+	if (need_mchan_update) {
-+		/* Prevent concurrent scaling operations */
-+		spin_lock(&ses->ses_lock);
-+		if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
-+			spin_unlock(&ses->ses_lock);
-+			mutex_unlock(&ses->session_mutex);
-+			rc = -EINVAL;
-+			goto restore_new_ctx;
-+		}
-+		ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
-+		spin_unlock(&ses->ses_lock);
-+	}
-+
-+	/*
-+	 * Commit session passwords before any channel work so newly added
-+	 * channels authenticate with the new credentials.
- 	 */
- 	if (new_password) {
- 		kfree_sensitive(ses->password);
- 		ses->password = new_password;
-+		new_password = NULL;
- 	}
- 	if (new_password2) {
- 		kfree_sensitive(ses->password2);
- 		ses->password2 = new_password2;
-+		new_password2 = NULL;
- 	}
- 
--	/*
--	 * If multichannel or max_channels has changed, update the session's channels accordingly.
--	 * This may add or remove channels to match the new configuration.
--	 */
--	if ((ctx->multichannel != cifs_sb->ctx->multichannel) ||
--	    (ctx->max_channels != cifs_sb->ctx->max_channels)) {
--
-+	if (need_mchan_update) {
- 		/* Synchronize ses->chan_max with the new mount context */
- 		smb3_sync_ses_chan_max(ses, ctx->max_channels);
--		/* Now update the session's channels to match the new configuration */
--		/* Prevent concurrent scaling operations */
--		spin_lock(&ses->ses_lock);
--		if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
--			spin_unlock(&ses->ses_lock);
--			mutex_unlock(&ses->session_mutex);
--			return -EINVAL;
--		}
--		ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
--		spin_unlock(&ses->ses_lock);
- 
- 		mutex_unlock(&ses->session_mutex);
- 
--		rc = smb3_update_ses_channels(ses, ses->server,
--					       false /* from_reconnect */,
--					       false /* disable_mchan */);
-+		smb3_update_ses_channels(ses, ses->server,
-+					 false /* from_reconnect */,
-+					 false /* disable_mchan */);
- 
- 		/* Clear scaling flag after operation */
- 		spin_lock(&ses->ses_lock);
-@@ -1197,22 +1246,30 @@ static int smb3_reconfigure(struct fs_context *fc)
- 		mutex_unlock(&ses->session_mutex);
- 	}
- 
--	STEAL_STRING(cifs_sb, ctx, domainname);
--	STEAL_STRING(cifs_sb, ctx, nodename);
--	STEAL_STRING(cifs_sb, ctx, iocharset);
--
--	/* if rsize or wsize not passed in on remount, use previous values */
--	ctx->rsize = rsize ? CIFS_ALIGN_RSIZE(fc, rsize) : cifs_sb->ctx->rsize;
--	ctx->wsize = wsize ? CIFS_ALIGN_WSIZE(fc, wsize) : cifs_sb->ctx->wsize;
--
- 	smb3_cleanup_fs_context_contents(cifs_sb->ctx);
--	rc = smb3_fs_context_dup(cifs_sb->ctx, ctx);
-+	memcpy(cifs_sb->ctx, new_ctx, sizeof(*new_ctx));
-+	kfree(new_ctx);
-+	new_ctx = NULL;
-+	smb3_cleanup_fs_context(old_ctx);
-+	old_ctx = NULL;
- 	smb3_update_mnt_flags(cifs_sb);
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	if (!rc)
- 		rc = dfs_cache_remount_fs(cifs_sb);
- #endif
- 
-+	return rc;
-+
-+restore_new_ctx:
-+	smb3_cleanup_fs_context_contents(new_ctx);
-+restore_ctx:
-+	kfree(new_ctx);
-+	kfree_sensitive(new_password);
-+	kfree_sensitive(new_password2);
-+	smb3_cleanup_fs_context_contents(cifs_sb->ctx);
-+	memcpy(cifs_sb->ctx, old_ctx, sizeof(*old_ctx));
-+	kfree(old_ctx);
-+
- 	return rc;
- }
- 
--- 
-2.43.0
+>
+> >Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> >---
+> > fs/smb/client/transport.c | 16 ++++++++--------
+> > 1 file changed, 8 insertions(+), 8 deletions(-)
+> >
+> >diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+> >index 1e9e6f3f9a06f..85fa5751781a8 100644
+> >--- a/fs/smb/client/transport.c
+> >+++ b/fs/smb/client/transport.c
+> >@@ -1137,13 +1137,13 @@ static int
+> > __cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry=
+ *mid,
+> >                    bool malformed)
+> > {
+> >-      int length;
+> >-
+> >-      length =3D cifs_discard_remaining_data(server);
+> >+      cifs_discard_remaining_data(server);
+> >       dequeue_mid(server, mid, malformed);
+> >       mid->resp_buf =3D server->smallbuf;
+> >       server->smallbuf =3D NULL;
+> >-      return length;
+> >+
+> >+      /* Once the mid is dequeued, the callback must run to terminate t=
+he subreq. */
+> >+      return 0;
+> > }
+> >
+> > static int
+> >@@ -1158,13 +1158,13 @@ static int
+> > cifs_query_dir_discard(struct TCP_Server_Info *server, struct mid_q_ent=
+ry *mid,
+> >                     bool malformed)
+> > {
+> >-      int length;
+> >-
+> >-      length =3D cifs_discard_remaining_data(server);
+> >+      cifs_discard_remaining_data(server);
+> >       dequeue_mid(server, mid, malformed);
+> >       mid->resp_buf =3D server->smallbuf;
+> >       server->smallbuf =3D NULL;
+> >-      return length;
+> >+
+> >+      /* Once the mid is dequeued, the callback must run to complete qd=
+_io->done. */
+> >+      return 0;
+> > }
+> >
+> > /*
+> >--
+> >2.43.0
+> >
+> >
 
+
+
+--=20
+Regards,
+Shyam
