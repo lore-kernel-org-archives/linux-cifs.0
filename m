@@ -1,256 +1,124 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB52B189F43
-	for <linux-cifs@vger.kernel.org>; Fri,  1 May 2026 00:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A3D279336
+	for <linux-cifs@vger.kernel.org>; Fri,  1 May 2026 01:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777596476; cv=pass; b=PaSvpO1dUgOR5/np2m1gyY+D5sfd64Ps0/enJ7ejmO+QSh63xWGf9WY0Ju2cFx/Zobn9yMU26EXCtW4PNHDqI4COHXi5aUFVJNOu3xZGRWrkEm6foE6N0efc5DpfKd5FvBkb6xMvo5xeR/VDgr0ufeueQNNnHZR+pX3EsWPvGFU=
+	t=1777600700; cv=pass; b=V8lnE5eA5l0kHUIuOrMaaloAkpxwbfrYbgG22YcV/v+frPWXC7RQiqFekiVWXOdUyLQ9F971K9QM0dsEGsTPptQ+5lenmFo8iO3VEzUV3k/D+LvLPV8WDCfzh8eAeu6QDBl8AvqYdQWxmx2JMr53mUBq7NzXgGuClKZb9v1oFYc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777596476; c=relaxed/simple;
-	bh=1dWIZJHlZdtZyn8FhsP1PzWEjeD9W5TWYymkhsSY1H4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=apE72pcbUnGfLxjYr3dBvDa2pOuPbgiLlGVZJidzecXhlcMU8sw6dh3CtOn3KHm4sQlEwCeCZ2ZxeJZiIUyuBiAgsECF5qS1YdJHmCtrepa20CHU4HGVal/PuS1SlAdO7iN7xS8s3SnE4H3M/hJj1CvKPiCZ5ifCzJZd9lByCVw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IynExUOV; arc=pass smtp.client-ip=209.85.218.43
+	s=arc-20240116; t=1777600700; c=relaxed/simple;
+	bh=4gNGD414tKrTyYKxZRl/pw4/QTgJgA+cz1EwjiBJxvw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=jvvly+tfH6xGr1RJR15uxpWj+/bxiQ59M+I2jrNg0XzRvXYD7RkSE47wHTtzyXQ1cWD4GswQJrt9xSXYUUnMvjFPTgduZ3GPrZPv0uk3DG7JUqx8vYTwQfyK76ii9rEkrnJPps+fStEKAY8W7AacKerW6LW9R7N8MgQsSnnWHA0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TVhz6o9m; arc=pass smtp.client-ip=209.85.219.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IynExUOV"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ba67b332bbaso227945666b.0
-        for <linux-cifs@vger.kernel.org>; Thu, 30 Apr 2026 17:47:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777596473; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TVhz6o9m"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8b038a00370so14465646d6.1
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Apr 2026 18:58:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777600698; cv=none;
         d=google.com; s=arc-20240605;
-        b=ZFj+R439zoIiJmQAmoKhBOIMbY1VouiRXW+F7xpu0FtD92UDCNvtoTNgR4OoDFgjiM
-         paZ1F3zOschG7MGEDCXA3a12BoLgSZusf9k0CW2EQdfbUoEh83sHfzEpfXXy4ezCW5mp
-         Bvi/NH+Nxra9iZ7PJysrnRfyUSXIbGdpeO/ikdqCgbERhbHyP5akzJmN0+cqlTezX97o
-         /H4xfAeEU9k3MKCidgE5cDTz/SEmPb8NufPdDVenaXvkb4n/24i6mR6seUgOpN6bhsqx
-         UBq3lDp3TcsweAzp+QSmaZ73MyrHgWQYbwhiHy0tQivUgl+W8XIolfVAIPTyi+JyxH6F
-         2Zuw==
+        b=R0HXx3kYhOgkodK6RslYS3EoSWEIhNjCt3Fd71BCf94/pdSIa9uivVhzIJrJZW4j0D
+         HEPTliz52MWlfp7M2FZDP6aCFxDW5xTqmVMtgC2unWDCzluM0uQvbDVGXY9X7lrVWOAH
+         q/kAlHbJTulniYJPYUyg/h+G/mAOvPMwUUWnfKNEg78ri4rczJE74t/K/eSexNCF+ete
+         rvYTTBgW3AT7Fw2msulFvYi6YZgBFEXunE6BcDd3eP+kBKxR5D2hZbDonluW8VO6iLJW
+         c1VsPUexeRCYw7mRf3RD+0Gm9yeygo7j6wL6f3Hb749BY2LHBAp4rWtQdkY95gx3t5Nz
+         WTDQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=gA5MU8H/VP+EpMiZU/F1urYiAlH9oeYefDlgYKqvLm0=;
-        fh=v1++Ia+fP5Cgt4iH6/T3wvsl5IZTsVbAm6oNSl5bGX0=;
-        b=H1oZ9cYw1Qkm77clk2c/mUEEcxkPIzkmcM5LHVvzPAB2YEfAmwRtazea2RUCS8DyId
-         /WKqsV6wK00lgLB5dVj4azLFMUtaCekFJGU25owtnpgmoiq78eOUlTeck7fM3tdb27bg
-         RCj48Y7+REIdtEpdTn9AVEJvDKGSX73rkvKIkAO2bcjbEEUIBDjSOIldIXOrBGWv4Q8Q
-         yio2Dq9o+5XdBnqJY67X7aD6Ks7geFZ/V+oi2gUjIld4gr+WX+hqIrG68P8bPX6GvtWm
-         ci2J3OPDCKpGTgYmFx0UC+M/wTdJ92S+avD4h53hb6dI2LIKh8g2s+onVyduUXdDBXV4
-         IjsA==;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=IcRlWDyO12dM1gv8ZUmZOHfElkl54BamF66VIdoyn60=;
+        fh=JWcost8KkgSZS/Rmu+2DeDbqWlU0L8rfRUA4WiRGbBU=;
+        b=jiavMUQdjedgBQAaFD7JgqXkjM8dTI9thqZ0RbXErjHXQAXubDWq6e2rgJXX59+rdF
+         niSPonM7GqDa0IDKXcj8GEbxbExeFA96CjGWcHjKlqCcQzJGRTJuFla6SBbYMUH9ReCt
+         2pCQdlAr70rQww5xrNl/OypWL3j/6tvpKivO5vZO4FwJdj/MLmzA6qSsY1PKBazchdxn
+         SZS9flvxv61SjYrwMX2PQJAH3hnPHoWbsdoD3IfxDPDTCo6AGS4WEYnYPejMPElCtRCN
+         Od/wDkhCPfqN+5zq77PpmSUpix0LRVTa3vXr2iT1v+yj5m2iy409B9CFQzg+t0gKhyac
+         78Gw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777596473; x=1778201273; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gA5MU8H/VP+EpMiZU/F1urYiAlH9oeYefDlgYKqvLm0=;
-        b=IynExUOVHgJrvzfElvJ42+PfA1Mq74d8cC1wQwaFVnkR8WohSq4O6m2wGBncr55hap
-         OxFeK1YaRiE12TfB34Q7O43yTNnK0rTMlfOsYWEteuYWvJFYho+uI50/eIkBFjAxPtAd
-         po0h2+JCj+yZTZsDQisLhNg4/nKsHD4Pb2ZAWhKd9wJ4Q9wIiJpUmpVL8R1yhx6Ks9/+
-         5Jp7mohtJIRIpntbuN2L1fqpO9qTwfnyvz4cjSxm4xOY0+mawhLoAbuYeifyjO/ke/08
-         Xobb+OGzyelOtfeQ5/SQquMhNsEH2IYVHK9heJqBAJqcMt4n/flmkXBTxD5cdSnhiHtD
-         67ew==
+        d=gmail.com; s=20251104; t=1777600698; x=1778205498; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IcRlWDyO12dM1gv8ZUmZOHfElkl54BamF66VIdoyn60=;
+        b=TVhz6o9mxeblOkhsqTsYGMNA13buVPzAl63246Ve9qJqZa+fvHp6buxAMTopPwwbGk
+         ZCuVfD5+m4um3L6/fArzc2tnDHfVPJZQsq3Ze870yzJGKoWgsSWe6vxjTXAaQUIkk4rm
+         zmu6E0iRextCxwwtH+u6Dso1Yn6AV3+gaLbZ2BCfIs0SNKAozMRChpx1BmCxTEqiA1nJ
+         QcnvLm2n41O7oodcKM6XgNmvfUDNr4vjVkaP+cZZqBNEpv7ekP557w3aj/Q9xg9tBfAF
+         AMQOAv5M3fpO+1n6i7YXQ3ZYuhcI8Zckh667P7fZodLe9hZWH+SspA/0VW0lmkHncKrl
+         Ci1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777596473; x=1778201273;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gA5MU8H/VP+EpMiZU/F1urYiAlH9oeYefDlgYKqvLm0=;
-        b=OTRl6gW92z8Ffg1Ijlc0j5umluisZjq7ridjibwrkt7svopXsDcvvRLNYYjiCofDs0
-         0rVXIK0JptwnkgnTJlWXDqFpcYH0BCGQJbvgdMkKCq6quloydBYYHbDsTrribjrO22o7
-         yEwj7QgZLKmrrgEAwgLNXo8/9PFHnf8fJXI16Re0JSTpIa69tch+s95JWE4unGeyrU9f
-         2E6gUsyVK863RzIB0U+aATzjOIgC74L7fANE7dnp37d/WOr60v92HSfBjEDxGvGjoHFx
-         80UNoujQtooQDMDI26ZB0IoEsLBiRkAQgXG7EHHxYVVtu5RwXyQBdOHY2rucfsbBQ3Bt
-         7EDw==
-X-Gm-Message-State: AOJu0Yyt1SEQCHlMyCIUW/qxkB//47ALGFhsrVcjq9y9cOhiZG0/mqGB
-	wBuXC7RwaLcx4aF+WUWOC2razP1wItg38zqcs/j5mFL6U24TbRrTmdxjBMwae9T2jgK/1dkCO8V
-	28HVriJwy9GxKK4eN2cI6q4As90Idl++TAvXwGa0=
-X-Gm-Gg: AeBDieuqNpOVFMThVzTuc12YB2AJDBHJzpE7YFKAFpMPURUsbq+FZ/YMCNBsCbPImio
-	zdYul5j+5J3f289gRSIbEoi3d1Pk5BBP4TdCJBqUUbSRdmtX1iWvwx5d5Ah1HSlzZPkawP4T+AE
-	w+g1M90Q9FnSefGjo1LmPHCibkt3qDPnWXg/QCiYBkZ5ndC0te9TyCet8e5kcV+kt/C53SxQeH6
-	yvvITlAqlD3M7g0INfmTOQ+b28U5xTf5CmkJsKdIz6tcZ1H6YRh2QhptGS1z7n3SeLKytwgcjga
-	8BV+Z8zLNzG6SeWmgBE7FqEDUoWNE+G784m8rfYukrRKIDAgFL3QYJk0J0em1dhB8Lht82ZQOFW
-	25VKAw81f8bd3Wsh8LdywWJHJj4Z/mEQfiqmqbgZPUToGh3xnd2oNZQpfNC2Eu0jtgDyT
-X-Received: by 2002:a17:907:6d11:b0:b9d:4301:be37 with SMTP id
- a640c23a62f3a-bbac5abfa9emr340991966b.5.1777596472435; Thu, 30 Apr 2026
- 17:47:52 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777600698; x=1778205498;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IcRlWDyO12dM1gv8ZUmZOHfElkl54BamF66VIdoyn60=;
+        b=D1hQKN8pZ6iM/4JCI0lv3mLQtpRnGkBpbLTZeCILkUkWkkqqJMqr2uXD76lbG0mDOe
+         C8q+DT0DtfEpfERVpb2DGaAJ2+zzZ2halAnWt8LMCfFwvH0D4c95mWGSJzK1A3eE50h7
+         pSZo0Mvo6Y3zs/XHJCXLrPVGce5d7r2apqSWsZmeYdhzjL0OqlFsJ2C5uHq+pMXa0iss
+         9ZPICCzmQA/1nVvo9Q4jLA/W0Qz/UHfjS9K3PvkpEUc8ARnEhTiQq2d1D5gHt1leHtw0
+         /r26qIj3j9lIW8sINGPUA6re93eDdBERaVw3ZpyuxSqre0SlWHVU43VPznel7jTXRzK0
+         Z0Rg==
+X-Forwarded-Encrypted: i=1; AFNElJ8kNCrJjiB4Tzyi4XzWVXuznfb+m0HDUjqOSG74qBLBF7ygniNSd+rAYZtr0C6EV4DB7IWdQ0J2/XwN@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1Jz6n3QjhenagvAzBmT07j4hYICu69jp019q082uFFMQBOOx9
+	+dwMpdJa7JOG4QL/RPYnsdsUKBupAt0k8J3jvQxWJcCl/kFR1EF15dVeI2vCkwLiP/WzbWaoV1K
+	+ceb75pKBE8quPbHapi0128yrnQMu9CU=
+X-Gm-Gg: AeBDieuvGAzb9LdDP0bHY8/5Dg2bNMdzvwRhy9sCQ9YoLsxEy1iTWVIE3R7kcNMq7Lu
+	1FoM2I1qfghlq1dTSYviyJCvYfWR91OWj7HvfMP6J2wVr4VqAkz9q6CWpezbwq2xcg9dCDkyLZS
+	SzylYBE1vHNSxeYWXhJRLuLfYaoqqFDyoyIFGpP2XIV2x8Rh74CcFNkgJIAevUavXNJ5XBk+B5D
+	cCbdGz9prc6E9P2pXUfb09FxA5h/eF/MSpY+x960xtKzn1XT3NYGUlu6iHFuGO7tx6naEYXu1Kl
+	Uy0K/stiV1TOFy7EczplUhOXOgVkcldaCngYhawSu9FVX0eisNDLLgK685p7Z67HdhEY2sDIdeK
+	Ce2DJKM2g+JaesrPRHniddKxOgTn24NnoS9oHyC+w8gHTvuNGe3PuwMO6mICVFQQnr6T+pyY=
+X-Received: by 2002:a05:6214:300f:b0:8ac:a9f1:6cf4 with SMTP id
+ 6a1803df08f44-8b5475f9eb8mr17707656d6.37.1777600697765; Thu, 30 Apr 2026
+ 18:58:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260430220601.76266-1-rosenp@gmail.com>
-In-Reply-To: <20260430220601.76266-1-rosenp@gmail.com>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Thu, 30 Apr 2026 17:47:41 -0700
-X-Gm-Features: AVHnY4I2reyX5j1UdJFbNiB8-56Esqx6Xgl89-hTzZbod2ktSGTZB1nv_bGU_Ow
-Message-ID: <CAKxU2N91aPUvWp20RUdad0P3VTLnX_Sby2RvHJ4Fq1y_4P77YQ@mail.gmail.com>
-Subject: Re: [PATCH] cifssmb: use struct_offset in memcpy calculations
-To: linux-cifs@vger.kernel.org
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	"moderated list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3)" <samba-technical@lists.samba.org>, open list <linux-kernel@vger.kernel.org>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 30 Apr 2026 20:58:06 -0500
+X-Gm-Features: AVHnY4LrAFRsVRwciW8IDHmgnzdwttKqNxsUwE7s3SIycng1zIyVkAlyX5zeNts
+Message-ID: <CAH2r5mvWVFyYF0szBX0aqOjFViPq7f9QEyF=UagFASZqVkqtxA@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 30, 2026 at 3:06=E2=80=AFPM Rosen Penev <rosenp@gmail.com> wrot=
-e:
->
-> It seems W=3D1/FORTIFY_SOURCE is getting confused about the math here.
->
-> Use struct_offset to point FORTIFY_SOURCE to the correct place.
->
-> Remove response_data variables and directly apply to memcpy. Simpler
-> and avoids excess casting.
->
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  fs/smb/client/cifssmb.c | 40 +++++++++++++---------------------------
->  1 file changed, 13 insertions(+), 27 deletions(-)
->
-> diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-> index 3990a9012264..8598cec5ebbd 100644
-> --- a/fs/smb/client/cifssmb.c
-> +++ b/fs/smb/client/cifssmb.c
-> @@ -4090,9 +4090,9 @@ CIFSSMBQFileInfo(const unsigned int xid, struct cif=
-s_tcon *tcon,
->                                       get_bcc(&pSMBr->hdr), 40);
->                 else if (pFindData) {
->                         __u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataO=
-ffset);
-> -                       memcpy((char *) pFindData,
-> -                              (char *) &pSMBr->hdr.Protocol +
-> -                              data_offset, sizeof(FILE_ALL_INFO));
-> +                       memcpy(pFindData,
-> +                              (char *)pSMBr + struct_offset(pSMBr, hdr.P=
-rotocol) + data_offset,
-> +                              sizeof(FILE_ALL_INFO));
->                 } else
->                     rc =3D -ENOMEM;
->         }
-> @@ -4264,9 +4264,8 @@ CIFSSMBUnixQFileInfo(const unsigned int xid, struct=
- cifs_tcon *tcon,
->                                       get_bcc(&pSMBr->hdr), sizeof(FILE_U=
-NIX_BASIC_INFO));
->                 } else {
->                         __u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataO=
-ffset);
-> -                       memcpy((char *) pFindData,
-> -                              (char *) &pSMBr->hdr.Protocol +
-> -                              data_offset,
-> +                       memcpy(pFindData,
-> +                              (char *)pSMBr + struct_offset(pSMBr, hdr.P=
-rotocol) + data_offset,
-On further review, struct_offset might not be needed.
+Please pull the following changes since commit
+254f49634ee16a731174d2ae34bc50bd5f45e731:
 
-I believe
+  Linux 7.1-rc1 (2026-04-26 14:19:00 -0700)
 
-struct_offset(pSMBr, hdr.Protocol) =3D=3D 0
+are available in the Git repository at:
 
-since Protocol is the first member of hdr and hdr is the first member of pS=
-MBr.
+  git://git.samba.org/ksmbd.git tags/v7.1-rc2-ksmbd-server-fixes
 
-Not sure if removal is desired.
->                                sizeof(FILE_UNIX_BASIC_INFO));
->                 }
->         }
-> @@ -4349,9 +4348,8 @@ CIFSSMBUnixQPathInfo(const unsigned int xid, struct=
- cifs_tcon *tcon,
->                                       get_bcc(&pSMBr->hdr), sizeof(FILE_U=
-NIX_BASIC_INFO));
->                 } else {
->                         __u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataO=
-ffset);
-> -                       memcpy((char *) pFindData,
-> -                              (char *) &pSMBr->hdr.Protocol +
-> -                              data_offset,
-> +                       memcpy(pFindData,
-> +                              (char *)pSMBr + struct_offset(pSMBr, hdr.P=
-rotocol) + data_offset,
->                                sizeof(FILE_UNIX_BASIC_INFO));
->                 }
->         }
-> @@ -5079,7 +5077,6 @@ CIFSSMBQFSAttributeInfo(const unsigned int xid, str=
-uct cifs_tcon *tcon)
->  /* level 0x105  SMB_QUERY_FILE_SYSTEM_INFO */
->         TRANSACTION2_QFSI_REQ *pSMB =3D NULL;
->         TRANSACTION2_QFSI_RSP *pSMBr =3D NULL;
-> -       FILE_SYSTEM_ATTRIBUTE_INFO *response_data;
->         unsigned int in_len;
->         int rc =3D 0;
->         int bytes_returned =3D 0;
-> @@ -5130,11 +5127,8 @@ CIFSSMBQFSAttributeInfo(const unsigned int xid, st=
-ruct cifs_tcon *tcon)
->                                       get_bcc(&pSMBr->hdr), 13);
->                 } else {
->                         __u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataO=
-ffset);
-> -                       response_data =3D
-> -                           (FILE_SYSTEM_ATTRIBUTE_INFO
-> -                            *) (((char *) &pSMBr->hdr.Protocol) +
-> -                                data_offset);
-> -                       memcpy(&tcon->fsAttrInfo, response_data,
-> +                       memcpy(&tcon->fsAttrInfo,
-> +                              (char *)pSMBr + struct_offset(pSMBr, hdr.P=
-rotocol) + data_offset,
->                                sizeof(FILE_SYSTEM_ATTRIBUTE_INFO));
->                 }
->         }
-> @@ -5152,7 +5146,6 @@ CIFSSMBQFSDeviceInfo(const unsigned int xid, struct=
- cifs_tcon *tcon)
->  /* level 0x104 SMB_QUERY_FILE_SYSTEM_INFO */
->         TRANSACTION2_QFSI_REQ *pSMB =3D NULL;
->         TRANSACTION2_QFSI_RSP *pSMBr =3D NULL;
-> -       FILE_SYSTEM_DEVICE_INFO *response_data;
->         unsigned int in_len;
->         int rc =3D 0;
->         int bytes_returned =3D 0;
-> @@ -5205,11 +5198,8 @@ CIFSSMBQFSDeviceInfo(const unsigned int xid, struc=
-t cifs_tcon *tcon)
->                                       sizeof(FILE_SYSTEM_DEVICE_INFO));
->                 else {
->                         __u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataO=
-ffset);
-> -                       response_data =3D
-> -                           (FILE_SYSTEM_DEVICE_INFO *)
-> -                               (((char *) &pSMBr->hdr.Protocol) +
-> -                                data_offset);
-> -                       memcpy(&tcon->fsDevInfo, response_data,
-> +                       memcpy(&tcon->fsDevInfo,
-> +                              (char *)pSMBr + struct_offset(pSMBr, hdr.P=
-rotocol) + data_offset,
->                                sizeof(FILE_SYSTEM_DEVICE_INFO));
->                 }
->         }
-> @@ -5227,7 +5217,6 @@ CIFSSMBQFSUnixInfo(const unsigned int xid, struct c=
-ifs_tcon *tcon)
->  /* level 0x200  SMB_QUERY_CIFS_UNIX_INFO */
->         TRANSACTION2_QFSI_REQ *pSMB =3D NULL;
->         TRANSACTION2_QFSI_RSP *pSMBr =3D NULL;
-> -       FILE_SYSTEM_UNIX_INFO *response_data;
->         unsigned int in_len;
->         int rc =3D 0;
->         int bytes_returned =3D 0;
-> @@ -5277,11 +5266,8 @@ CIFSSMBQFSUnixInfo(const unsigned int xid, struct =
-cifs_tcon *tcon)
->                                       get_bcc(&pSMBr->hdr), 13);
->                 } else {
->                         __u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataO=
-ffset);
-> -                       response_data =3D
-> -                           (FILE_SYSTEM_UNIX_INFO
-> -                            *) (((char *) &pSMBr->hdr.Protocol) +
-> -                                data_offset);
-> -                       memcpy(&tcon->fsUnixInfo, response_data,
-> +                       memcpy(&tcon->fsUnixInfo,
-> +                              (char *)pSMBr + struct_offset(pSMBr, hdr.P=
-rotocol) + data_offset,
->                                sizeof(FILE_SYSTEM_UNIX_INFO));
->                 }
->         }
-> --
-> 2.54.0
->
+for you to fetch changes up to c444139cb747bf6de1922b39900fdf02281490f4:
+
+  ksmbd: rewrite stop_sessions() with restartable iteration
+(2026-04-29 10:25:37 -0500)
+
+----------------------------------------------------------------
+Two ksmbd server fixes
+- Fix shutdown (stop sessions)
+- Fix readdir unsupported info level
+----------------------------------------------------------------
+DaeMyung Kang (1):
+      ksmbd: rewrite stop_sessions() with restartable iteration
+
+Marios Makassikis (1):
+      smb: server: handle readdir_info_level_struct_sz() error
+
+ fs/smb/server/connection.c | 46 ++++++++++++++++++++++++++++++++++++++--------
+ fs/smb/server/connection.h |  1 +
+ fs/smb/server/smb2pdu.c    |  8 +++++++-
+ 3 files changed, 46 insertions(+), 9 deletions(-)
+
+-- 
+Thanks,
+
+Steve
