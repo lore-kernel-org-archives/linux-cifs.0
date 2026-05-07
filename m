@@ -1,63 +1,63 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3C63C661D
-	for <linux-cifs@vger.kernel.org>; Thu,  7 May 2026 13:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C97B3F54B3
+	for <linux-cifs@vger.kernel.org>; Thu,  7 May 2026 13:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778161508; cv=none; b=LY7tjDXs4BRpdtdQWZTKEhDlV5omWJsPZL31v88i6gr4p7ZMjWdLx+zdVrk2udHpGsMHgELwMfmDHFyO7aYzwOyxTHDG+3shr7wglbuTMUkgeSukWmFfAh7is0tAfmvcx0TSBwdHoPWEDHzVkHpzPa+RfWWiS5IkTWYBTDLvMUM=
+	t=1778161511; cv=none; b=nVPTUPQFsmZ4K75fP0wlSFTZtZJmKH1WgEx1D/yrznaO+ljZ3LUhWPigvx0oT1IY0uToUj5I65QqO6Az5sz2kTQGiemAUHYvseHN7MVnXsSep9cV8itJ8xZ1emdhImdt9k0DIltw25/QHdMHfBZSzcSZXLV1PJogo4120F3IXcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778161508; c=relaxed/simple;
-	bh=VG+41lZ448btaNUOynmCdnEZq9o8tA/uUr4F8PoMhNg=;
+	s=arc-20240116; t=1778161511; c=relaxed/simple;
+	bh=MLDfsbrqE/irJ5C5mfSMehDDIzdVCSob1K9JLJJP0Yo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qjY8TDLxizaQMxaupZqwGpmGBgZzDVp+GYVijeZK+kKmpH5bBPRmaOuyzfwtQVPYsSGAAKNnI/ubiuGQ5g1u8r1Bp92jsR5FU/5dbyYlz5C5idoZhvLBsbeTtS04c9aF1E22OMHA9i9+qZFty1QHAzV7oms/pOlnNIFzqSrgaec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TD5itKVA; arc=none smtp.client-ip=209.85.216.42
+	 MIME-Version; b=gwBjTcIIfJhWbGTULUJjx3DJHmrlxviazI4c4tUWQ6GmF5U8sjqsRUWWDTVUYptChwsdSlY9faHXBBNkxvkouZJteywzFYk5S+qcU1j+4Jgd6YrMrEVOTfoDffnoG6ZnfuW8tQPhbKz44TyRtJIYwianneJmNmfTD5AyPeWpo14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hV0XaTGC; arc=none smtp.client-ip=209.85.216.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TD5itKVA"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-36627a0ea23so186956a91.0
-        for <linux-cifs@vger.kernel.org>; Thu, 07 May 2026 06:45:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hV0XaTGC"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-365d712bbd2so518597a91.2
+        for <linux-cifs@vger.kernel.org>; Thu, 07 May 2026 06:45:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778161506; x=1778766306; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778161509; x=1778766309; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N4wxpdgZR3F+6gO9A+ACWETsBld7N7ULc+/S9pmw4rc=;
-        b=TD5itKVArHc6uogtTmKhoeM6135KaoO4mO//KoZuU1XAD4dyDUahC20S2YFzPtur60
-         VV4a8y3+c7DpY71SrHaewjnMMJOWAHkHV5cKa6BJGid3DP8PAiXbQTFDmFVkMgKguQCT
-         oBQRdVvaETFwf74f7Y8pvjaHdX4twEj+7vn+lJl3fSWl4bA1aGSKJi7fGvtIpPOKgX61
-         LHQR9H38Wf9SUuKcdCA2SA3YX8SNxKmCqXJUQojJUz9pLVRj8N7+k6UNKibmP2fosuTm
-         w1+JriqM+IboPLShUjIFNGzKFpquZx+pIPSw0helo6+ZEVrwx7+dlYrP9FO7bGyZYmZk
-         ngxQ==
+        bh=lMnwkp3MOEwNeKoTQelUam/C2Jts/WAnmWXL6QUohHk=;
+        b=hV0XaTGCQ3rau2fOLJA3p0et77TPRLBApRFBKozEETjOyDnVMnCXsY+jbPsWr40D1Z
+         cQUMc++04My9is/H2yTctQbBUNiejYm/qwkhqGGieRizOi33o57XyJ6xxBr8bPIlXfh5
+         CyRGcCpMlM9GzFqRtmn6+0RjzJDMacI83pVZN94FCBGvFumOkJIxBGs5CBIDwGfEMPMa
+         MnXAH4xkHdyv0cxcEhBEp0JOd0uywmFFE0prpi+AFZlQI4mDck1fLsUDP6YDFhOAv8oO
+         gM3GOGzUKkp1mHOU5QhNR0hxBM481KelGaQxLNstSXGzbv0pwdid40wZ3CDX5FcLzea2
+         wH9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778161506; x=1778766306;
+        d=1e100.net; s=20251104; t=1778161509; x=1778766309;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=N4wxpdgZR3F+6gO9A+ACWETsBld7N7ULc+/S9pmw4rc=;
-        b=E+vnPoYGYDXPsRQj3DMVP2Bx+QN4IAHEzkwvAhOh3XXSMDx6ASqUN6WqpK3tSysu3x
-         StP6klc4WIj13iXgVKAWpZClO+eOZQqGDpVjarALehYk6MHTRsa+lFh4VeVNH5/W7nXL
-         Uujy9HSAbh8qgbhqlZXXabEKgDhcQHVTDTDnHPimzDhwWGKgaHgMHwz3BTat09Q/jMJM
-         d1Sjzxo02xjROqs3YJosgnMfwfgqLZtvzVxe+QAC6SXpQj9Zds3i02o8YQBbT/vQGtvv
-         7a5tj2SblUZLYsZeNQ8+9hPzIZVUOkFChsHHqoxcEmy5hPOLHFTexG+6FJd0iEmEz4Cs
-         2Oqw==
-X-Gm-Message-State: AOJu0YyRQfcuwfFMcKD4T/hHx1O6V1isD6qjgPsyAPiO+ZJ5W46JeZxN
-	OJyHKjhJwdUt5/Q2hQ3dAGYQqvZkihIMv64Aqx9S3ZHILACrFU1GLmhn6l256w==
-X-Gm-Gg: AeBDievYl0dQ22ib169XWgcUTISnmUyodTo6yXWKRvw2W5kK0O4Ztz8phM/4Qu0QC8n
-	5l/k/Ylypq9KvdYJDhaMkdPLNmZq585FnwsPJwliwDd2P0BVLL+rgBO67/KCp/RaBRHgeWMQNiE
-	fNK5Ntjra0OrP9+jikeP72IIfRbOvlcgau4P89vc6PFQNF2Si4TFb3nSPVsNBbvaSwQiT/ezMa+
-	eudYysp1SnthRN9ONdLEOJdW9SffRrosw/iiNApsVIIV6Al71o8UyQbwU8kyHnmzNII7tsFip/J
-	JiT+qPgTsubSwBuUYTiZW6OstZ6j+MrPqN99WeujfE0PSVPK+SZnzCwvVyL1vdsEvJH70oVBsYB
-	J75wOIf0BIyX985iWphnJVdcKcyY0mGVYMNMuWennI/Gq+E16msEAGqtbNigBs8ApEhcJlrzMrt
-	OlSaz81Yiu1Ue/VT2sghIbodBINS2r63d+CNn96O1T3DtjrmlmDS5BvMlb0Qum2cHYIhxycB9sF
-	5Opd7xY+r8Yz8HoExC3VVyBBENFp+/hGkznLubrvGRc
-X-Received: by 2002:a17:90b:1f89:b0:35b:e5ce:73bb with SMTP id 98e67ed59e1d1-365ab9b7feamr7647323a91.1.1778161506357;
-        Thu, 07 May 2026 06:45:06 -0700 (PDT)
+        bh=lMnwkp3MOEwNeKoTQelUam/C2Jts/WAnmWXL6QUohHk=;
+        b=NqpQkA8SXB2TlaWYEP0bfIvyGnazhTKWWtHowYTVnX+MiBkD9V1h35MTJfTSqeHOmx
+         0RHImI4q95pVvAXQr6m/8OdCdeLoio4Y0D0SrRbcrU7YmdT+C8o59cSFzbrUExjaxI94
+         YrHwwqvpqPcwuBR2lRNBLBkvABmBHE1cStWxa9qvfLILxqakQxKe8LGdaj59LFKfWMvZ
+         7oKFGoXz9Nba5OrU1Ixq0jH+vd4/4Q9uRMiseUtmeCRKF72iuuVG+UEzdS/3uQ0LFQnf
+         OJ9najazHBWgL9LEzq/qtBlQGJ0FFBI28dzPx65KvUn8Oad64BGRqL+wn0vkzy+817dv
+         ulIQ==
+X-Gm-Message-State: AOJu0Ywp4hmxjqNsAlZxlpwKbh/WrCiwRxREQNQbWRoxPVzyBaIB0wgi
+	uwheDT6XECrif0l/AUVbLM0B22j3G8gN7OQTj6sn/En0lPDtvpgPi6m96rFpBg==
+X-Gm-Gg: AeBDiesW8XI0kLtSW8kCgNYggvBA0Wd4PK5YYBtpcU+WTHr7pi9ZT14n3DdHi9u7PAu
+	ulP2jOaH7X1kShHkWWWb39NkvwGxU4EbLVAGnq+cF0gO9rJc/bt35ddTEcPG0t0I3r3NC32qyPb
+	nYIELhBVEgxcVCyP4zeNovuK2UP0AXhHS/h/lhDn5i95W0Ov72irLvzU3qj8auBWOCsS7LxMuNM
+	Jm60AFqUXqbBZpViHvKNoOepsZuS07Drp94aaEc58YFid5IW5EbRckMuyk+YBzCgi4FEdCS1ex2
+	CcQRvs8ZPidPfsmFRD/VHOC0RmCDPbVLvvE/443ngVsvbE9ZaVZwB7v/+bq1BziAK9bj9uU8mwu
+	f9bXXTgpj+/gglcbRtZ/hisqvU+lIet7Bqlj5IvklKtVTwRQN9UkJVQEsz2Ak5NYWGcn+1NYYQv
+	KoHD+j8Hljo5aZv6D/9CjxZoCLLMPXhpX7rihAB3qsL1551UjbWZfxKSsrjzzRzJhflUqbXexKL
+	Eh3nR6+isa09jZ7Kiixc7PLIHJnKkkjk+aWz2rQgfqh
+X-Received: by 2002:a17:90b:3a0f:b0:35e:5051:fb18 with SMTP id 98e67ed59e1d1-365ac7a5853mr7634568a91.26.1778161509385;
+        Thu, 07 May 2026 06:45:09 -0700 (PDT)
 Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-365b4c8a8e7sm8316609a91.13.2026.05.07.06.45.03
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-365b4c8a8e7sm8316609a91.13.2026.05.07.06.45.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 06:45:05 -0700 (PDT)
+        Thu, 07 May 2026 06:45:08 -0700 (PDT)
 From: rajasimandalos@gmail.com
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -65,9 +65,9 @@ Cc: smfrench@gmail.com,
 	sprasad@microsoft.com,
 	bharathsm@microsoft.com,
 	enzo@kernel.org
-Subject: [PATCH v2 4/8] smb: client: sync echo_interval on remount
-Date: Thu,  7 May 2026 13:44:44 +0000
-Message-ID: <20260507134448.168602-5-rajasimandalos@gmail.com>
+Subject: [PATCH v2 5/8] smb: client: move struct tcon_list to cifsglob.h
+Date: Thu,  7 May 2026 13:44:45 +0000
+Message-ID: <20260507134448.168602-6-rajasimandalos@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260507134448.168602-1-rajasimandalos@gmail.com>
 References: <20260507134448.168602-1-rajasimandalos@gmail.com>
@@ -81,52 +81,55 @@ Content-Transfer-Encoding: 8bit
 
 From: Rajasi Mandal <rajasimandal@microsoft.com>
 
-echo_interval is accepted during remount parsing but
-server->echo_interval is only set in cifs_get_tcp_session() at
-connection setup. A remount with a new echo_interval value silently
-has no effect on the echo keepalive timer.
+struct tcon_list is a small list-node wrapper that pairs a list_head
+with a cifs_tcon pointer, used to safely iterate tcons under a
+superblock outside tlink_tree_lock.
 
-Add echo_interval to smb3_sync_server_opts() under srv_lock so the
-new interval is pushed to the live server struct. Reschedule the echo
-delayed work via mod_delayed_work() so the new interval takes effect
-immediately rather than after the current timer fires.
+It is currently file-static in misc.c, used only by
+cifs_close_all_deferred_files_sb().  Move it next to the similar
+struct file_list in cifsglob.h so that other _sb() iteration helpers
+can reuse it instead of redefining the same shape locally.
+
+No functional change.
 
 Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
 ---
- fs/smb/client/fs_context.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ fs/smb/client/cifsglob.h | 5 +++++
+ fs/smb/client/misc.c     | 5 -----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index de682a5d2b68..972d3969f7e7 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1298,9 +1298,9 @@ static void smb3_sync_tcon_opts(struct cifs_sb_info *cifs_sb,
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 82e0adc1dabd..2a8b955638e7 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1807,6 +1807,11 @@ struct file_list {
+ 	struct cifsFileInfo *cfile;
+ };
  
- /*
-  * Synchronize server-level options that are stored on TCP_Server_Info
-- * at mount time.  These fields are consulted at runtime (retry logic)
-- * so remount needs to update the live server struct in addition to
-- * cifs_sb->ctx.
-+ * at mount time.  These fields are consulted at runtime (echo work,
-+ * retry logic) so remount needs to update the live server struct in
-+ * addition to cifs_sb->ctx.
-  */
- static void smb3_sync_server_opts(struct cifs_sb_info *cifs_sb)
- {
-@@ -1310,7 +1310,13 @@ static void smb3_sync_server_opts(struct cifs_sb_info *cifs_sb)
- 	spin_lock(&server->srv_lock);
- 	if (ctx->retrans)
- 		server->retrans = ctx->retrans;
-+	if (ctx->echo_interval)
-+		server->echo_interval = ctx->echo_interval * HZ;
- 	spin_unlock(&server->srv_lock);
++struct tcon_list {
++	struct list_head entry;
++	struct cifs_tcon *tcon;
++};
 +
-+	if (ctx->echo_interval)
-+		mod_delayed_work(cifsiod_wq, &server->echo,
-+				 server->echo_interval);
- }
+ struct cifs_mount_ctx {
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct smb3_fs_context *fs_ctx;
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 0c54b9b79a2c..7ef135dc8268 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -28,11 +28,6 @@
+ #include "fs_context.h"
+ #include "cached_dir.h"
  
- static int smb3_reconfigure(struct fs_context *fc)
+-struct tcon_list {
+-	struct list_head entry;
+-	struct cifs_tcon *tcon;
+-};
+-
+ /* The xid serves as a useful identifier for each incoming vfs request,
+    in a similar way to the mid which is useful to track each sent smb,
+    and CurrentXid can also provide a running counter (although it
 -- 
 2.43.0
 
