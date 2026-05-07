@@ -1,158 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC663BAD80;
-	Thu,  7 May 2026 08:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from n169-112.mail.139.com (n169-112.mail.139.com [120.232.169.112])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70F637BE66;
+	Thu,  7 May 2026 09:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778144116; cv=none; b=OBnnHZCOFXd9K3AN0RxUxooUtOW4w1PIWrY0NkU9bl/8Mby8JyJ9swC5KpBvIV7iWdexHpPfabU3eGLt6x+jnq380Gjgh1XZnqYIogCLdVGPm+7mVKzdoMnV8FnN/657vd02cRTjRNnBGaYku8iWi8J5QOT0OiGza4pMd2csHmQ=
+	t=1778144547; cv=none; b=NToldcNrs2n8rv1wZthYOT7TUDcPRt/hUEXnACZj9G2CyST+a17/BdXlYlIkhAGTGLfESG8ie36cFuRCWPzDD28bwOxe86HYLbmDCoCdIWIIFNuCtnI9GdaieIuVSwvGxFGRL/jJFjxDBsFmjiQZBp6zej3zTWQdqdi4F1dqY+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778144116; c=relaxed/simple;
-	bh=qee/kCsMg8C4eRFPxmiZaknm+clMPDWXLjgwoKgpYx8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pdajCaflUUgPAZ4Lw+CORI/591/aRO5Gs5RIRVPv4r72/of+kGcp4yM3qxw4ayfh8vm3KRWxPGLN8UFIsv0o4Xw3b76n1QxqhNeWphRwA65wbpXTsNdzEA85fqdHD+cYesSjvj1LFLBWkBOP/hQiZDdlNcOMH0zmaaCDrU5MHss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vHelsEcj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778144547; c=relaxed/simple;
+	bh=mHbfeNpi8n7SK7jlBtSsz1V/k39W5l3V0arwOXf+BTg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=POpCFKGzh9FPtXkaiG1aNYT5Ia3PsjV52LTn7+ICaiMOpI/HzwWDqUzmlgSTSaYKi8ZP37YPkr9CULZfBHcnVoQ+6WJDXXLT44DrWePDB34MpDFRNWgH3xeSCsZqjluJLEpbs/vhmYrQBfEf8SkdXvS+d5tEoW7z2aZOQUvyF7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=tw6yBIv3; arc=none smtp.client-ip=120.232.169.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vHelsEcj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95A08C2BCC4;
-	Thu,  7 May 2026 08:55:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778144114;
-	bh=qee/kCsMg8C4eRFPxmiZaknm+clMPDWXLjgwoKgpYx8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=vHelsEcj24pQruLyPkpHtNvcTqrgcxdW5XrAWAHws6zFy8dlmD3lhphWbo6rNoHKL
-	 pxyKS1lhXpPJY63Pd8/e3qqMQ0aJSwahOYJ5VgRlEX5x9Co+/NVq47XMe389xvO4To
-	 ef2DV1LLfLHw+byjCIfpNwL7N6t8NwMfqmlrEbLB94MK8/QVfBUlOsnE2pmfqZqs6C
-	 AgaxUYFWWzGLZHC20yFP04gqVXcotfKbRyjiSlnWoYWl524oYM7+a7jPCdrnHSPMmN
-	 RuMcRAMn9+ju2vxK9JkVEjzjq+73rGNPmKsZkgkus6BIYXF58eDMi19sSaGrOG8HsF
-	 snrkCWaSAvDxw==
-From: Chuck Lever <cel@kernel.org>
-Date: Thu, 07 May 2026 04:53:08 -0400
-Subject: [PATCH v14 15/15] ksmbd: Report filesystem case sensitivity via
- FS_ATTRIBUTE_INFORMATION
+	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="tw6yBIv3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=139.com; s=dkim; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=tw6yBIv34hr8l5iiKXp3m8LLmxfhX33wX2pTnB77QO1AjamrvkQQ4CujAvv73/Fg+BnZ7dOZfx3tQ
+	 QEkxa17q0PGJw3zeJpjSp2cmakN+v1q7JX/gSiYzD/HtAJVeOkiS9l3XUerFEr7JeqRY0NwCWugUuF
+	 anCRO1I8dNpJM0vU=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM:                                                                                        
+X-RM-SPAM-FLAG:00000000
+Received:from NTT-kernel-dev (unknown[60.247.85.88])
+	by rmsmtp-lg-appmail-26-12031 (RichMail) with SMTP id 2eff69fc5412ab4-00ac0;
+	Thu, 07 May 2026 16:57:59 +0800 (CST)
+X-RM-TRANSID:2eff69fc5412ab4-00ac0
+From: Li hongliang <1468888505@139.com>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	imv4bel@gmail.com
+Cc: patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linkinjeon@kernel.org,
+	senozhatsky@chromium.org,
+	sfrench@samba.org,
+	hyc.lee@gmail.com,
+	linux-cifs@vger.kernel.org,
+	stfrench@microsoft.com
+Subject: [PATCH 5.15.y] ksmbd: do not expire session on binding failure
+Date: Thu,  7 May 2026 16:57:58 +0800
+Message-Id: <20260507085758.3514265-1-1468888505@139.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260507-case-sensitivity-v14-15-e62cc8200435@oracle.com>
-References: <20260507-case-sensitivity-v14-0-e62cc8200435@oracle.com>
-In-Reply-To: <20260507-case-sensitivity-v14-0-e62cc8200435@oracle.com>
-To: Al Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org, 
- linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
- linux-nfs@vger.kernel.org, linux-api@vger.kernel.org, 
- linux-f2fs-devel@lists.sourceforge.net, hirofumi@mail.parknet.co.jp, 
- linkinjeon@kernel.org, sj1557.seo@samsung.com, yuezhang.mo@sony.com, 
- almaz.alexandrovich@paragon-software.com, slava@dubeyko.com, 
- glaubitz@physik.fu-berlin.de, frank.li@vivo.com, tytso@mit.edu, 
- adilger.kernel@dilger.ca, cem@kernel.org, sfrench@samba.org, 
- pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
- trondmy@kernel.org, anna@kernel.org, jaegeuk@kernel.org, chao@kernel.org, 
- hansg@kernel.org, senozhatsky@chromium.org, 
- Chuck Lever <chuck.lever@oracle.com>, 
- Roland Mainz <roland.mainz@nrubsig.org>
-X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2812;
- i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=3j19l6mVyr/XReBrhpdSBMPAL80WouHe9sT+TihiyQM=;
- b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBp/FL2hcwnjdqaNi/5q9kxt3YlM3d3QqSqstzKs
- 8W45Omd9QCJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCafxS9gAKCRAzarMzb2Z/
- l52vD/9oAzBTyM4xiFJ5QM41gLgiHj7PUdc2Q3lbIQ/lVfup4pis2Im+cGTpEumnlnsanTB+zf2
- FvmRrt8XkGFC32KiHFduHpw9zBL3jUOmcNiQtT+Bqs7MlCQ6DYk3z9T6CNo+QCfCxhtQIrXwJpH
- b8i/mvekEn8IjtcWAXENLEFsjSiZx9E3HCsGhQgNfoRAyD3dE8+4XkNwDzee2Dc5eKM3v5QFSqU
- RnV+cDOufTwJcVeblHkNhsgNCOB0ROntWVU9H8zQFUM2hyZlG+QT0ymaZT5Q7NQkJ6cLbhIbS+S
- l5FdnBjx3AUYQvQ2KPUSBC4kHru8d4OYlvjNi1D+jJhl27RB628LDCQLJrFTeFkAyoRnbmEIG9S
- 6AfCHIJ8Sdjp2kd4eCPbjbBj8l1X5wf8oAOXwLv72MaN0Y3H1eMi4jkgnhpEvzGsXKSDVEJbjXu
- HRICff28yGMX1lc9goVmC4Cs2pdp2KV6Sfjoy4kSYmJzTsSfUG1S5DTdu72bHl637v4GP5RgJfO
- f2NplDdE1Y8eNR0Qgm6WRdJsYAKksiNbK9dw0cmpJm/P5cowWFNYpLvd8yDIRKSvO+dyuQidfSp
- xuQul1Sgfz6933XPhNxs5EtyeDs8YsRhH4UzKDUFSOIIXnktBJpP78JrP5mKqcHv+7YEuDmr0p4
- ehpAkeTd/qm4/gw==
-X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
- fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
+Content-Transfer-Encoding: 8bit
 
-From: Chuck Lever <chuck.lever@oracle.com>
+From: Hyunwoo Kim <imv4bel@gmail.com>
 
-FS_ATTRIBUTE_INFORMATION responses have always reported
-FILE_CASE_SENSITIVE_SEARCH and FILE_CASE_PRESERVED_NAMES
-unconditionally. Case-insensitive filesystems like exFAT, and
-casefolded directories on ext4 or f2fs, have no way to signal
-their actual semantics to SMB clients.
+[ Upstream commit 9bbb19d21ded7d78645506f20d8c44895e3d0fb9 ]
 
-Now that filesystems expose case behavior through ->fileattr_get,
-query it via vfs_fileattr_get() and translate the FS_XFLAG_CASEFOLD
-and FS_XFLAG_CASENONPRESERVING flags into the corresponding SMB
-attributes. Filesystems without ->fileattr_get continue reporting
-default POSIX behavior (case-sensitive, case-preserving).
+When a multichannel session binding request fails (e.g. wrong password),
+the error path unconditionally sets sess->state = SMB2_SESSION_EXPIRED.
+However, during binding, sess points to the target session looked up via
+ksmbd_session_lookup_slowpath() -- which belongs to another connection's
+user. This allows a remote attacker to invalidate any active session by
+simply sending a binding request with a wrong password (DoS).
 
-SMB's FS_ATTRIBUTE_INFORMATION reports per-share attributes from
-the share root, not per-file. Shares mixing casefold and
-non-casefold directories report the root directory's behavior.
+Fix this by skipping session expiration when the failed request was
+a binding attempt, since the session does not belong to the current
+connection. The reference taken by ksmbd_session_lookup_slowpath() is
+still correctly released via ksmbd_user_session_put().
 
+Cc: stable@vger.kernel.org
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Reviewed-by: Roland Mainz <roland.mainz@nrubsig.org>
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Li hongliang <1468888505@139.com>
 ---
- fs/smb/server/smb2pdu.c | 30 ++++++++++++++++++++++++------
- 1 file changed, 24 insertions(+), 6 deletions(-)
+ fs/ksmbd/smb2pdu.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index ee32e61b6d3c..cf0bc453a036 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -14,6 +14,7 @@
- #include <linux/falloc.h>
- #include <linux/mount.h>
- #include <linux/filelock.h>
-+#include <linux/fileattr.h>
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 978a103e72bb..fb0dc06b2aff 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -1938,8 +1938,14 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 			if (sess->user && sess->user->flags & KSMBD_USER_FLAG_DELAY_SESSION)
+ 				try_delay = true;
  
- #include "glob.h"
- #include "smbfsctl.h"
-@@ -5541,16 +5542,33 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
- 	case FS_ATTRIBUTE_INFORMATION:
- 	{
- 		FILE_SYSTEM_ATTRIBUTE_INFO *info;
-+		struct file_kattr fa = {};
- 		size_t sz;
-+		u32 attrs;
-+		int err;
- 
- 		info = (FILE_SYSTEM_ATTRIBUTE_INFO *)rsp->Buffer;
--		info->Attributes = cpu_to_le32(FILE_SUPPORTS_OBJECT_IDS |
--					       FILE_PERSISTENT_ACLS |
--					       FILE_UNICODE_ON_DISK |
--					       FILE_CASE_PRESERVED_NAMES |
--					       FILE_CASE_SENSITIVE_SEARCH |
--					       FILE_SUPPORTS_BLOCK_REFCOUNTING);
-+		attrs = FILE_SUPPORTS_OBJECT_IDS |
-+			FILE_PERSISTENT_ACLS |
-+			FILE_UNICODE_ON_DISK |
-+			FILE_SUPPORTS_BLOCK_REFCOUNTING;
- 
-+		err = vfs_fileattr_get(path.dentry, &fa);
-+		/*
-+		 * -EINVAL, -EOPNOTSUPP: ntfs-3g and other FUSE
-+		 * filesystems that lack FS_IOC_FSGETXATTR support.
-+		 */
-+		if (err && err != -ENOIOCTLCMD && err != -ENOTTY &&
-+		    err != -EINVAL && err != -EOPNOTSUPP) {
-+			path_put(&path);
-+			return err;
-+		}
-+		if (!(fa.fsx_xflags & FS_XFLAG_CASEFOLD))
-+			attrs |= FILE_CASE_SENSITIVE_SEARCH;
-+		if (!(fa.fsx_xflags & FS_XFLAG_CASENONPRESERVING))
-+			attrs |= FILE_CASE_PRESERVED_NAMES;
-+
-+		info->Attributes = cpu_to_le32(attrs);
- 		info->Attributes |= cpu_to_le32(server_conf.share_fake_fscaps);
- 
- 		if (test_share_config_flag(work->tcon->share_conf,
-
+-			sess->last_active = jiffies;
+-			sess->state = SMB2_SESSION_EXPIRED;
++			/*
++			 * For binding requests, session belongs to another
++			 * connection. Do not expire it.
++			 */
++			if (!(req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
++				sess->last_active = jiffies;
++				sess->state = SMB2_SESSION_EXPIRED;
++			}
+ 			ksmbd_user_session_put(sess);
+ 			work->sess = NULL;
+ 			if (try_delay) {
 -- 
-2.53.0
+2.34.1
+
 
