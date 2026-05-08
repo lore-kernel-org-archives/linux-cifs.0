@@ -1,132 +1,105 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A28C343216;
-	Fri,  8 May 2026 08:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778229339; cv=none; b=b0HhkwjMNtCfpLXoaxxnemIMXX64wmA8Ccsee6xnjpQ0gzXxudFMuTxDT3ixI2mWgFtd/WncEbwP2y+jJ3X1q0ZQkVXEKojO5iXcUQ/aTb8XfQ84IsEVJGPZ9WQqqJ5YQTme7a5keifCO/FhQtxdeY+kkFBV4jdeL0vW/CWqIZg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778229339; c=relaxed/simple;
-	bh=tOoofxWe9ttsXO+WyHJ2DFzxNs1G8mDg+R0zmIa5v4Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dfdG5C2HJrco1ukH2WrOTFk+Vh+0va6AK3tA7ofBbjObS+nSe2xR6rjBCr+tmvFE1J/D6NQlablC76W0Nx0EZfw6YibO31JD6iGWq9VoFozu4ZvK/Q8D+dcmg9lKUhusAHtI0H67MZLNccNIeGOIxa+mt+76z/6k5+O7djgQnFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=uvj4z7sT; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B04F2FFDD6
+	for <linux-cifs@vger.kernel.org>; Fri,  8 May 2026 16:51:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778259076; cv=pass; b=nnCX17MKEbhPK9dE8XI4STQsSQD6xsxfFeEWwISZU7kO2R+KUNr27k2Lq/nrWaikoGwOt1Fc3dbczU4HM7yZhE2flfesRt6jVlaNkNzqRo+GI+aTFIaBe8f8F6Q5YxJniHiLdLjMgUBVUkEldzJ2Y8H8Uilf0fiROUa0Vzi5E9Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778259076; c=relaxed/simple;
+	bh=HpuzAuoWxyU0VMOwi8K6PwkcOrPjtCdqYAoukk4e110=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=rcxQHX0uwIwYa4fAwQofR9J+Iw9AiBqPzQYvs//fN4qXA9lCpjXC3vHRK9De5UALc+AETSj1p4xqxijSfU8uCNexykDlhns9BZTiXXsmshWRi6jFi6+4NHXX71/vseJTmdiwexgYpa9ju9V6jDG24KVl/tZLM8RUC6+A2PVOPhY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ioxcfgk5; arc=pass smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="uvj4z7sT"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=h4Oz5sDHc98VrM9jcrU2QxrS0yTu0FuamcBVTJQWxVE=; b=uvj4z7sTQo0Mjh2oFFOXEO+hL9
-	6TsLMw7QXFVOQEXRyEyfCsHDWdjdbB3Sdf1Yn1hhIihZjhjtaezLxXW39R/EPLZQPhum6/5MSKGLj
-	LFrDYA5tHWFzmlw0ByeRMN9aJjjIbiFqGFxEbCg1XC1S6fsp0RXZpD2fCBTc6FsKA2hxF0sO6oetm
-	T9E6bw7niqm8LYJPT/W4Yj0ykZnAdzsLjbJTHkvgK5Uj/+Y3NutOpD8JqxE51P0uuQE9cst80xTVu
-	zMamjBxGtS+8NPNzrGoGcY4VcDSYlIhtKszGn+E5nOj6O5AOFVsj4KEeNC0qFOgwXed9cjnsuMk5i
-	y2gzGCRlOPFJoA1g0ViqRTy6YJuKu4ayQNeXhAuv+JWb4MmMMaeMejnPruTNPdQ7cZNe/KAKlNcPd
-	yuIpZgmKCXJc2RkJsqsVavp3O+0YdE5H13fx03qkB9CGMTVEhx8vYxw+s26YDkWYZYaGTw1B4JcFT
-	ksaKrtZhBZQh8Ydu29j+S5xl;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wLGNf-00000007Esd-1mrL;
-	Fri, 08 May 2026 08:16:19 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: stable@vger.kernel.org
-Cc: metze@samba.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Yi Kuo <yi@yikuo.dev>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH for stable] smb: client/smbdirect: fix MR registration for coalesced SG lists
-Date: Fri,  8 May 2026 10:15:47 +0200
-Message-ID: <20260508081546.4177429-2-metze@samba.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ioxcfgk5"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5a877510541so2272097e87.2
+        for <linux-cifs@vger.kernel.org>; Fri, 08 May 2026 09:51:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778259073; cv=none;
+        d=google.com; s=arc-20240605;
+        b=A1ZzN1TJaDaPy9egCG7r6L/PNEK+JogcAW/jCOibKVbKp6r6oVYnauYhwqyFPWtShQ
+         Fxs4KI8f1BwUOmN8RX4SsxqyMcS3S2V6rp6e/Mw7mR3psF0ulnDXcTjf1HX+2zIPsrs5
+         fhMPizP64H/IFe0qYZSHEVBlpoCk31mc/bpTeCQ9cZA8NlMxxwOqSFlgK7xz/6Hswuvr
+         veW7HpY9sHUbhGoX6L6zOCQ53ixtsEkzXA/dYaRsYhDqWeXla2FJIdFNdPTljjhSMWbj
+         UXb/t3pd5+Zehuh4FNmnH/J/4LzxfYQlqFfL79bMTgUSKJwo30uU2/1WNB/kGF713I4Y
+         vEwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=7M1gDeBGhxjsNeWTODUXervEBvrOsS8HT08OhOQQFmU=;
+        fh=j24uJHKlpbWG017pObDHPgCloR8L9ZkT98WYoH+MNeo=;
+        b=Qz0ZPm1Mwh7+Wu5qgGSRANJN8Xh0UlXCyj+jDYbtBXvlhP65Of+kt+hkTiBqScEVmq
+         dVb3M/DJ6VlpA/D/0y+oydocWSIK4/ZhEQMuvc1wP1lRo+MtH0xsDivuXlXQa/ZpaLDE
+         4My+jQiB8QLsngxLBs7FP/ODYsx7LhxGrPzXNKJN9wRT2N9QZTvGu6cPc+hQ5TLVnVny
+         0Je7MSw6K7itYaOsAjiOyYbm7G8v6BsLOosFwATdtaKqeAhTQJWuteGQ2wC+9tJvIpCT
+         qDU2YWZAAlX1THFo01vypENstzAAjiRMmglZjluvAcz14OmVqwfT+m9WoWVz00HlDNBG
+         4/Fw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778259073; x=1778863873; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7M1gDeBGhxjsNeWTODUXervEBvrOsS8HT08OhOQQFmU=;
+        b=Ioxcfgk5OqeUxNdyTt+FlfM30UDuDcjGUmlEZ7AD1vNnLMqBg5QCUnrAF+gCf3DkbQ
+         cqbSBLvsEOhSOqlGBDu0mtz5apJu/6EFlALPgersskWpK1YHmiQ8o3z5lfyhyDZBSkDk
+         EqIXMl1l4QQeyinr8eGCaPcnfVJH0yMGuUIgAd6XEzB6FBkjXcD5iFHEl+g6Mk3Z8Nlm
+         eyyvmEqsH3ddQ/4D4OX1OZ6HHw4iWWXwiY/KHoYRBwJSAVach/o9iky59vRVct6cSviL
+         jwoMl3Mxlb2CTs3U5M8LG4ZwcW2UzN27+UH0yn426pxC071WZtzqfHYH+M4ocVvg/rJJ
+         FwvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778259073; x=1778863873;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7M1gDeBGhxjsNeWTODUXervEBvrOsS8HT08OhOQQFmU=;
+        b=Kl+E9LhyKibZoLX+gDHbqA+ZOAvanfK4dJF60rAq0PXEECTC86Njpfp1VPB2e83wEo
+         PlC3fAvcd86YUE4Obc9L7Kd9+vargPP9w2VuX6sYRfCNnjKapoTaebBAGHTxAWMbSk2l
+         +qKsrVEBvyIm2VXgWOs2AhoJJ7mr6lM4VvrjyMWr1uI6wSnKWsKtI70FDF4mATIs3dU1
+         pr+1CCBKiQ59NVkPG1ZQ6wsPWON9GXp4wa3JdDIAvU97m9U+S2HsH+16CKTS1rZMYT1I
+         b82SH4zPFvxM0/LX8SgZWP2jBHqCHOJOMtJvrUAi5coKXm0XPFg0dFR4qrVqdJWNHo58
+         apbA==
+X-Forwarded-Encrypted: i=1; AFNElJ/WYrD6FJuLLpsGulYPDU/SxjX9BIEwfMAmBLIfMSbb7HN0Ph83lUhzy88+oOQm6Y+K8O3sM0ea8E4b@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXmeJcnrsho2wyj/5Tb3qRhKLvr6TvigzORw4IVnVM5g7Vhdbh
+	AD6Zkf7670rYdArJhR3VyNOt8vMw+Crr0sz74bm82yEZkYIU/6ChvrXeJIJ9IRjCk1363ojReMD
+	ywhUlLL8Bpudx/9IFToyiAp+xIvXgnlM=
+X-Gm-Gg: Acq92OHR+8WPghwYWLmuxF6UDyd1idvXAORHBhZLMOSnLyUwvECCD4pdlJ3xTexTyyR
+	gd6GwMx8ZDa78exM9R52cQ2YyZrVjB07Be5YjCLcIprEDyCq9Y9h/xxyip1CpXxoH6URfhvRBXo
+	rI5VVzOernheyAml5TKw1bcKDd0mzK+1LMzH3Yte8OjbGJyK+FKMGUwqkM5fyXPZfEnNpPNRdg5
+	+JscsGJD0whUVmvDeJbDxmOIkC9bR69cVxlMO6iMpvSbYJbIjlocY2lqNXFk/+Xk28G8KhoCRyA
+	xnftGJw5u/Oi7LYx31hZmViztotHd5340Z1hI7nRj/SZWfO/cuoNl2OGnF/nUosjvl+z+aTeSxk
+	uZKnoap/k1ikk4nlCFyRFVbbdMvmf2sIWU1+G3Hi7qBjxN7IgrQC4YDYrd3QUL6/jByUk//xtJC
+	3wbe659NgQ2+z28x2oVbHKog==
+X-Received: by 2002:a05:6512:39cb:b0:5a8:7701:b815 with SMTP id
+ 2adb3069b0e04-5a887ada542mr4430249e87.8.1778259073144; Fri, 08 May 2026
+ 09:51:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 8 May 2026 11:50:59 -0500
+X-Gm-Features: AVHnY4JWHxHBQYlCCJ9gN5DkR96yQeqb5EigTp3ReSqAGnyzTsWD_LLKA3Nnb7w
+Message-ID: <CAH2r5mtXTpYdhU01w-GD32pDabZe6pq7=AhDnCpCGC00-JRxng@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: use kzalloc to zero-initialize security
+ descriptor buffer
+To: Bjoern Doebel <doebel@amazon.de>, CIFS <linux-cifs@vger.kernel.org>
+Cc: samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Yi Kuo <yi@yikuo.dev>
+You mentioned:
+    "When the reserved field happens to contain non-zero slab garbage,
+    Samba rejects the security descriptor with "ndr_pull_security_descriptor
+    failed: Range Error", causing chmod to fail with EINVAL."
+I had also been seeing unexpected chmod failures to Samba sometimes in
+a few xfstests, did you have a good repro for this?  We also have a
+problem with chown to Samba that when I tried to fix  on the client
+got an unexpected error back from Samba, so ideas on cleaning up
+setattr_nounix() to fix chown would be appreciated too.
 
-commit 9900b9fee5a0e0f72d7c744b37c7c851d5785ac6 upstream.
-The stable backport to < 7.1 a different file gets the
-fix. Also the Fixes tag below is adjusted for the old code path.
-
-ib_dma_map_sg() modifies the provided scatterlist and returns the
-number of mapped entries, which can be fewer than the requested
-mr->sgt.nents if the DMA controller coalesces contiguous memory
-segments. Passing the original, uncoalesced count to ib_map_mr_sg()
-causes memory registration failures if coalescing actually occurs.
-
-Capture the actual mapped count returned by ib_dma_map_sg() and pass it
-to ib_map_mr_sg() to ensure correct MR registration.
-
-Also update the ib_dma_map_sg() error logging to drop the error
-pointer formatting, since the return value is an integer count
-rather than an error code.
-
-Ensure a proper error code (-EIO) is assigned when DMA mapping or
-MR registration fails.
-
-Fixes: c7398583340a ("CIFS: SMBD: Implement RDMA memory registration")
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=221408
-Reviewed-by: Stefan Metzmacher <metze@samba.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Yi Kuo <yi@yikuo.dev>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
----
- fs/smb/client/smbdirect.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
-
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 461658105013..d0fcc7779415 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -2920,7 +2920,7 @@ struct smbdirect_mr_io *smbd_register_mr(struct smbd_connection *info,
- 	struct smbdirect_socket *sc = &info->socket;
- 	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct smbdirect_mr_io *mr;
--	int rc, num_pages;
-+	int rc, num_pages, num_mapped;
- 	struct ib_reg_wr *reg_wr;
- 
- 	num_pages = iov_iter_npages(iter, sp->max_frmr_depth + 1);
-@@ -2948,18 +2948,21 @@ struct smbdirect_mr_io *smbd_register_mr(struct smbd_connection *info,
- 		    num_pages, iov_iter_count(iter), sp->max_frmr_depth);
- 	smbd_iter_to_mr(iter, &mr->sgt, sp->max_frmr_depth);
- 
--	rc = ib_dma_map_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->dir);
--	if (!rc) {
--		log_rdma_mr(ERR, "ib_dma_map_sg num_pages=%x dir=%x rc=%x\n",
--			    num_pages, mr->dir, rc);
-+	num_mapped = ib_dma_map_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->dir);
-+	if (!num_mapped) {
-+		log_rdma_mr(ERR, "ib_dma_map_sg num_pages=%x dir=%x num_mapped=%x\n",
-+			    num_pages, mr->dir, num_mapped);
-+		rc = -EIO;
- 		goto dma_map_error;
- 	}
- 
--	rc = ib_map_mr_sg(mr->mr, mr->sgt.sgl, mr->sgt.nents, NULL, PAGE_SIZE);
--	if (rc != mr->sgt.nents) {
-+	rc = ib_map_mr_sg(mr->mr, mr->sgt.sgl, num_mapped, NULL, PAGE_SIZE);
-+	if (rc != num_mapped) {
- 		log_rdma_mr(ERR,
--			    "ib_map_mr_sg failed rc = %d nents = %x\n",
--			    rc, mr->sgt.nents);
-+			    "ib_map_mr_sg failed rc = %d num_mapped = %x\n",
-+			    rc, num_mapped);
-+		if (rc >= 0)
-+			rc = -EIO;
- 		goto map_mr_error;
- 	}
- 
 -- 
-2.43.0
+Thanks,
 
+Steve
