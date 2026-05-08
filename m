@@ -1,63 +1,65 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 126FF78F29;
-	Fri,  8 May 2026 17:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C654242314F;
+	Fri,  8 May 2026 21:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778262857; cv=none; b=nud98R9m7Xbi57DuYbPwD50xz03GmbivQfXOP/+8u5XNK7U+wElbbhTqyON8A5/21Dt4ZKdLB/AJJQ2Z/4fJal+vPVuupcQg3jvuAKqa4S/rC3+N0bnhdPThe379LTdZ87S0g/QuRYzbN2LSspOarDKB/mv7mdI5sufNkvYZ8AM=
+	t=1778274714; cv=none; b=a3IR+eGnQJd6MIFQO8W4k/7s8YxQ3RMu1abUtiYfOuRaJDpywbY+zjXVBJ6WHEDCcSOdwnfO4ampZ9Ce937VQyHvQ8vJcqn9GRiMHd2vXqbcLTpFCgj9GQkWPrSBr19yF7HdfFbd2C8IGo6oBFf41ZBb6N+/davY1XcpxyaPXlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778262857; c=relaxed/simple;
-	bh=2NEhaW+sGTSSULfLq98i0fMoh8nGVmxgbBHi9XWpYkA=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=E8/6HWchizxxBuwMO9pAlmQ+9FQXZZTIGNOzxytUn0MKngo7ZcX9Bq5QhyVDqDqbxNJ0gK15gwKAMhxVZvlU/5t1ZrZEg0evC/U4rybOY2PlhSHd6swIDAohh0l0P/G0U4V7u2e8Fy6SdFVaRPG36hcyxAu24nDsHJ/WxVxRJ7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SFnF7Cap; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778274714; c=relaxed/simple;
+	bh=Wm1oFhjlDHVMbWPEmGFvlTH0XsXVNjxx5xMjj8qlXUU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BLly3sNDDnKVTbaM6B746ma5CP8sL2roh+Vem0z0gFyT30fkBxGFk1Mz6lYYzlMuj9unwVfZBmWWJX9bwB0bXUA8ahozYmjsvgRnmhCK7FKE7r4xOxL/eJFqtmxYPNOMOOZ2/tW+BR/VKTVHGP5nCSXLRGk3oM5O1hSWBXZ+EjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QyeV1EnC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SFnF7Cap"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7E3CC2BCB0;
-	Fri,  8 May 2026 17:54:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QyeV1EnC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E699C2BCB0;
+	Fri,  8 May 2026 21:11:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778262856;
-	bh=2NEhaW+sGTSSULfLq98i0fMoh8nGVmxgbBHi9XWpYkA=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=SFnF7CapV714B57b3tXTM6/1pnGV0Z+4rBPP2wgKiZaNvABzokfAFKkpNRktxSarJ
-	 06athNgrBj14mYtwQcN11iXuboL5WlaNIJzRGlVsmahC3yy1JHtiQD5TgE7jzLSzAC
-	 HaAQecoLn0wcNeKYtidTMkA43SoCTFq6uLIRdVw1fLA8vGI/qh83rEdbaACV3/NwL+
-	 sqfdUjqvDGbL79K9NmlqOSf/bVjARH5zVVKQPp/zqcu8E9IYhzdDsmdNz+tM+9z0eL
-	 8o7K8NTJpTy7uAmjnrrzGqE/x44ep36CpeLoEYlxt5lWiOIIOUzZAIa4LUATX6vsTQ
-	 LR1ZUrnelqP1A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D066381197A;
-	Fri,  8 May 2026 17:53:26 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtFDoX_ytAJty_t-OwuG0DacO2D-NOL3RHNFe+SdmnJpw@mail.gmail.com>
-References: <CAH2r5mtFDoX_ytAJty_t-OwuG0DacO2D-NOL3RHNFe+SdmnJpw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtFDoX_ytAJty_t-OwuG0DacO2D-NOL3RHNFe+SdmnJpw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v7.1-rc3-smb3-client-fixes
-X-PR-Tracked-Commit-Id: f98b48151cc502ada59d9778f0112d21f2586ca3
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 81d6f7807536a0436dfada07e9292e3702d2bed4
-Message-Id: <177826280499.786505.10338109349050848677.pr-tracker-bot@kernel.org>
-Date: Fri, 08 May 2026 17:53:24 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	s=k20201202; t=1778274714;
+	bh=Wm1oFhjlDHVMbWPEmGFvlTH0XsXVNjxx5xMjj8qlXUU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=QyeV1EnClOq6luiXdvvic554mXNaVkpH3fu2P3PVuoKrluyKZFRajvjs3v0B8nnxe
+	 GEJoJxEd/ml6VGZCBcPac3MaZrwIlxNV7S8t6fLanrtt8o1bjt0783CewWfeJbMJmq
+	 ly0/bfV5i1LYICz0DZp7Q38J0kpTLKU+BoTJq/wVvQYGA63cZozh3sfRtl/zURyBJj
+	 UBebsJg49iS8Mg9qcZxz1Xb3+1OeteNvQwxZ3X8QGq2UnJSDlVxHXYq0RdhR+qKScI
+	 O/nBEtIb5tqFHiN7Wgc2mMsNFmCkDBYiuZkwSt1M0mRgr9AInp5Wpt1Ngi9KdHGqP5
+	 ezT1/9JQV+ZGw==
+From: Sasha Levin <sashal@kernel.org>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	imv4bel@gmail.com
+Cc: Sasha Levin <sashal@kernel.org>,
+	patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linkinjeon@kernel.org,
+	senozhatsky@chromium.org,
+	sfrench@samba.org,
+	hyc.lee@gmail.com,
+	linux-cifs@vger.kernel.org,
+	stfrench@microsoft.com,
+	Li hongliang <1468888505@139.com>
+Subject: Re: [PATCH 5.15.y] ksmbd: do not expire session on binding failure
+Date: Fri,  8 May 2026 17:11:41 -0400
+Message-ID: <0bf77c8c295b5e9a-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260507085758.3514265-1-1468888505@139.com>
+References: <20260507085758.3514265-1-1468888505@139.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Fri, 8 May 2026 12:05:41 -0500:
+> Subject: [PATCH 5.15.y] ksmbd: do not expire session on binding failure
+>
+> commit 9bbb19d21ded7d78645506f20d8c44895e3d0fb9 upstream.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/v7.1-rc3-smb3-client-fixes
+Now queued for 5.15, thanks.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/81d6f7807536a0436dfada07e9292e3702d2bed4
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+--
+Thanks,
+Sasha
