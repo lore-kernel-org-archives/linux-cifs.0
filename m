@@ -1,174 +1,132 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB9445107D
-	for <linux-cifs@vger.kernel.org>; Thu,  7 May 2026 16:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A28C343216;
+	Fri,  8 May 2026 08:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778172751; cv=none; b=MJa31x/g8VxxfVU9e+o6xF5PH+51BQr67z34CwkWvarD2cKmZjoFBoSlDmyKRXTyiFmoyedN7+UlUzIcsP5sNCtlePuATqDXBdWoEdm9UZH4gVHBVFF94OUncd9QXsZdQh/8Xs3c+nCA9L8yuLYDFLaWoaZyUNMRt/PKlVKNNF4=
+	t=1778229339; cv=none; b=b0HhkwjMNtCfpLXoaxxnemIMXX64wmA8Ccsee6xnjpQ0gzXxudFMuTxDT3ixI2mWgFtd/WncEbwP2y+jJ3X1q0ZQkVXEKojO5iXcUQ/aTb8XfQ84IsEVJGPZ9WQqqJ5YQTme7a5keifCO/FhQtxdeY+kkFBV4jdeL0vW/CWqIZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778172751; c=relaxed/simple;
-	bh=aHoBqTbdr56DO71Zlzzaandq5SHQ8sCJYyYln2KmSW0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kBza/eFvWzCHmzRas/uuNOsTqyCR6JMBM/515hwuTfVu6BtZ3PVvVGKu6I2b6jPmmZ+HMRrFw+uicL2GNrttrpNZ0KlTSS7vfP60oVdeIvpCgw3VFRyID21vMSGQpFDMUjfPvOgkT4AHdSx8UFQRIZ+HjK7Ff33JGEtntqyCyas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hLOKaJ2P; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778229339; c=relaxed/simple;
+	bh=tOoofxWe9ttsXO+WyHJ2DFzxNs1G8mDg+R0zmIa5v4Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dfdG5C2HJrco1ukH2WrOTFk+Vh+0va6AK3tA7ofBbjObS+nSe2xR6rjBCr+tmvFE1J/D6NQlablC76W0Nx0EZfw6YibO31JD6iGWq9VoFozu4ZvK/Q8D+dcmg9lKUhusAHtI0H67MZLNccNIeGOIxa+mt+76z/6k5+O7djgQnFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=uvj4z7sT; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hLOKaJ2P"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2b9ea536877so8108735ad.1
-        for <linux-cifs@vger.kernel.org>; Thu, 07 May 2026 09:52:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778172749; x=1778777549; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yv2fHWPI4GY7ycdmc2I4lTP92YQsllQ8O6sfU4iOItg=;
-        b=hLOKaJ2PpTO1yTKqpMknJRZzPhXHNq7xaXp8V5BnrxFTCvd0QcDK0DZAgm9VzK5bTT
-         Bux/AzMC2D7MJSLwhzTFDYnZc/PcFfAPrt8RjuB79Xlff9UFigczDKCeflfeCkGTz2G7
-         HABg0Kz931SdXv4whao41c0gDBwe/KKq6Y93up4S8hhGD6St0cVinpDlhAcwwesiCqFs
-         Z31FaqJ6koWowukjj/sUlfYD1qGPef56yjJbpvWTC/ZDLJf7Or6GBkk1inCS5dXXNvHH
-         TEnPVgXz9V6ixzjwa7SYJTbCt+ZIiVAH4LzRzP2VOMF76lXLsF0xCUxlnpIInpu0Rg1C
-         y0zA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778172749; x=1778777549;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yv2fHWPI4GY7ycdmc2I4lTP92YQsllQ8O6sfU4iOItg=;
-        b=egeyOouhCSAlAosQ1ENvkbkhFbfgvqh14rJJ20lOvLQciLMUm0+/EwbPMoR3L2tn3f
-         iu0GI+pHSn0ecqHl6Co/2KMH6H28EibsK7DTXLhCL3rkg7kOsoEnT9TaZFk7aRCero5j
-         lDn848QdVlxBjJqEwUi/NkqydO8Jpc2TvtP8a/qd7nJyaSdsT5Jt3wPbSlLr4Q930vAF
-         0KURvOLQU/5sekmtcGEElzg+PX0E9rgpXhNpkPlQWUwJDLdoNsi7GlK0ElZE29uVVIHc
-         oyv9W8IGNbVQtWj0g9Q5fu2+9EYsonin0hjXAPcaw9xs39UjHGIHkGJaRIXmu7HFTH4t
-         Ac8A==
-X-Forwarded-Encrypted: i=1; AFNElJ8ZExb3cs20TTOZAJG9+3zbNIRl7Bn4qN9Nhoqmowy3GkzLMivkJqFdCFO1CQ2DO8/9FstgVEGeujU4@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWGuBqGKdjAMw1Cux/TqI4xDLVNpb1PLdp7Fga1I0We9BzBv0N
-	ONVe6DsK+J25vIIIifU04nlBmGHjKPQCJO/ltxCoHZZ84RchBabHFETV
-X-Gm-Gg: Acq92OEPCN9Zoig8lPXd67rMNV7QVPuklAPrpl102XhBG9sKmxB1s35S6HTfPlkhggS
-	nil10RMZt6RyAWIFA5lXJtSjhsP2yFubHKZzXLG8aqKmlEvmDx7sUZkNm75sVKMu9L6Mw79/LMX
-	e+CfESNqG42spzPNYdDVrWLfwyAQc95NU5X088w8y3GCzUjlAOb8fGnblsEUfhS1I0g2WskKA1r
-	m4eXgRljpdE3Y80OBxEeqxB9iqYsL0g18VVfAXqiU+ukfHpEenyke9QKUqM0ZH8cwMlMcbvJtqp
-	9PIfpWdu/CiiHd6JUXkT+nJTeQSGvHqH5ldWLPT/18yL24xr1P1HcJDSiAePJMmXNHb8BpoWggJ
-	cKPL9Nn2GoOp0gTcm9XwYk36P6MR/NV22qF1YZBcaD0JVuoWSL3W0DVev5qM59sHJJ6dqzXnV+j
-	DdbW0veb5K7eKZXl2/ou0DQshvBxrjcHXSNWoTZvs=
-X-Received: by 2002:a17:903:4b03:b0:2ba:21c2:d6cb with SMTP id d9443c01a7336-2babd4bdb6dmr31502595ad.16.1778172749225;
-        Thu, 07 May 2026 09:52:29 -0700 (PDT)
-Received: from localhost ([49.207.150.30])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bae783dc50sm2551575ad.43.2026.05.07.09.52.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 09:52:28 -0700 (PDT)
-From: Piyush Sachdeva <s.piyush1024@gmail.com>
-X-Google-Original-From: Piyush Sachdeva <psachdeva@microsoft.com>
-Date: Thu, 07 May 2026 22:22:14 +0530
-Subject: [PATCH v3 2/2] smb: client: Zero-pad short GSS session keys per
- MS-SMB2
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="uvj4z7sT"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=h4Oz5sDHc98VrM9jcrU2QxrS0yTu0FuamcBVTJQWxVE=; b=uvj4z7sTQo0Mjh2oFFOXEO+hL9
+	6TsLMw7QXFVOQEXRyEyfCsHDWdjdbB3Sdf1Yn1hhIihZjhjtaezLxXW39R/EPLZQPhum6/5MSKGLj
+	LFrDYA5tHWFzmlw0ByeRMN9aJjjIbiFqGFxEbCg1XC1S6fsp0RXZpD2fCBTc6FsKA2hxF0sO6oetm
+	T9E6bw7niqm8LYJPT/W4Yj0ykZnAdzsLjbJTHkvgK5Uj/+Y3NutOpD8JqxE51P0uuQE9cst80xTVu
+	zMamjBxGtS+8NPNzrGoGcY4VcDSYlIhtKszGn+E5nOj6O5AOFVsj4KEeNC0qFOgwXed9cjnsuMk5i
+	y2gzGCRlOPFJoA1g0ViqRTy6YJuKu4ayQNeXhAuv+JWb4MmMMaeMejnPruTNPdQ7cZNe/KAKlNcPd
+	yuIpZgmKCXJc2RkJsqsVavp3O+0YdE5H13fx03qkB9CGMTVEhx8vYxw+s26YDkWYZYaGTw1B4JcFT
+	ksaKrtZhBZQh8Ydu29j+S5xl;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wLGNf-00000007Esd-1mrL;
+	Fri, 08 May 2026 08:16:19 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: stable@vger.kernel.org
+Cc: metze@samba.org,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Yi Kuo <yi@yikuo.dev>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH for stable] smb: client/smbdirect: fix MR registration for coalesced SG lists
+Date: Fri,  8 May 2026 10:15:47 +0200
+Message-ID: <20260508081546.4177429-2-metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260507-kerbmi-v3-2-397ebbb53eff@microsoft.com>
-References: <20260507-kerbmi-v3-0-397ebbb53eff@microsoft.com>
-In-Reply-To: <20260507-kerbmi-v3-0-397ebbb53eff@microsoft.com>
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, 
- Shyam Prasad N <sprasad@microsoft.com>, 
- Bharath SM <bharathsm@microsoft.com>, Paulo Alcantara <pc@manguebit.org>, 
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, Tom Talpey <tom@talpey.com>
-Cc: samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, vaibsharma@microsoft.com
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3414;
- i=psachdeva@microsoft.com; h=from:subject:message-id;
- bh=aHoBqTbdr56DO71Zlzzaandq5SHQ8sCJYyYln2KmSW0=;
- b=owGbwMvMwCV29FJ3ncRHDT/G02pJDJl/Djv5n01fPnF6wi83E+7DM3gmtQm4HoiepBY1uZTl8
- JPUFofrHRNZGMS4GCzFFFk2nLgjyxu/S3LepydGMHNYmUCGSIs0MAABCwNfbmJeqZGOkZ6ptqGe
- oZGOgY4xAxenAEz1rmhGhl3Z+fqduVN3PKrUWPizViSXMyR50q3G2+V9rS87JQqKuRkZDv53CLH
- Zq7rpwDS+S/4HPjx+HeCpof6Laa5EUNHBg5X5TAA=
-X-Developer-Key: i=psachdeva@microsoft.com; a=openpgp;
- fpr=80350F71F916134953C3EB979E19C6F9839C3CFC
+Content-Transfer-Encoding: 8bit
 
-Per MS-SMB2 section 3.2.5.3, Session.SessionKey is the first 16 bytes
-of the GSS cryptographic key, right-padded with zero bytes if the key
-is shorter than 16 bytes.
+From: Yi Kuo <yi@yikuo.dev>
 
-SMB2_auth_kerberos() copies the GSS session key from the cifs.upcall
-response using kmemdup(msg->data, msg->sesskey_len, ...) and stores
-the GSS-reported length verbatim in ses->auth_key.len. generate_key()
-reads SMB2_NTLMV2_SESSKEY_SIZE bytes from this buffer when feeding the
-HMAC-SHA256 KDF for signing key derivation. If a GSS mechanism returns
-a session key shorter than 16 bytes (e.g. a deprecated single-DES
-Kerberos enctype with an 8-byte session key), the KDF call performs an
-out-of-bounds slab read and derives keys that do not match the server,
-which pads per the spec.
+commit 9900b9fee5a0e0f72d7c744b37c7c851d5785ac6 upstream.
+The stable backport to < 7.1 a different file gets the
+fix. Also the Fixes tag below is adjusted for the old code path.
 
-Modern KDCs disable short-key enctypes by default, so this is latent
-rather than reachable in production, but it is still a kernel heap
-over-read.
+ib_dma_map_sg() modifies the provided scatterlist and returns the
+number of mapped entries, which can be fewer than the requested
+mr->sgt.nents if the DMA controller coalesces contiguous memory
+segments. Passing the original, uncoalesced count to ib_map_mr_sg()
+causes memory registration failures if coalescing actually occurs.
 
-Allocate auth_key.response with kzalloc() at a length of
-max(msg->sesskey_len, SMB2_NTLMV2_SESSKEY_SIZE), copy the GSS key in,
-and rely on kzalloc()'s zero initialization for the spec-mandated
-padding. Set ses->auth_key.len to the padded length. Larger GSS keys
-(e.g. the 32-byte aes256-cts-hmac-sha1-96 session key) continue to be
-stored at their natural length, preserving the FullSessionKey path.
+Capture the actual mapped count returned by ib_dma_map_sg() and pass it
+to ib_map_mr_sg() to ensure correct MR registration.
 
-Emit a cifs_dbg(VFS, ...) message when a short key is encountered to
-surface deprecated-enctype usage.
+Also update the ib_dma_map_sg() error logging to drop the error
+pointer formatting, since the return value is an integer count
+rather than an error code.
 
-NTLMv2 and NTLMSSP code paths produce a 16-byte session key by
-construction and are unaffected.
+Ensure a proper error code (-EIO) is assigned when DMA mapping or
+MR registration fails.
 
-Signed-off-by: Piyush Sachdeva <psachdeva@microsoft.com>
-Signed-off-by: Piyush Sachdeva <s.piyush1024@gmail.com>
+Fixes: c7398583340a ("CIFS: SMBD: Implement RDMA memory registration")
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=221408
+Reviewed-by: Stefan Metzmacher <metze@samba.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Yi Kuo <yi@yikuo.dev>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/client/smb2pdu.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ fs/smb/client/smbdirect.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index cb61051f9af3..995fcdd30681 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -1713,17 +1713,30 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
- 	is_binding = (ses->ses_status == SES_GOOD);
- 	spin_unlock(&ses->ses_lock);
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 461658105013..d0fcc7779415 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -2920,7 +2920,7 @@ struct smbdirect_mr_io *smbd_register_mr(struct smbd_connection *info,
+ 	struct smbdirect_socket *sc = &info->socket;
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 	struct smbdirect_mr_io *mr;
+-	int rc, num_pages;
++	int rc, num_pages, num_mapped;
+ 	struct ib_reg_wr *reg_wr;
  
-+	/*
-+	 * Per MS-SMB2 3.2.5.3, Session.SessionKey is the first 16 bytes of the
-+	 * GSS cryptographic key, right-padded with zero bytes if shorter.
-+	 * Allocate at least SMB2_NTLMV2_SESSKEY_SIZE bytes (zeroed) so the KDF
-+	 * input buffer is always valid for HMAC-SHA256 even with deprecated
-+	 * Kerberos enctypes that return a short session key.
-+	 */
-+	if (unlikely(msg->sesskey_len < SMB2_NTLMV2_SESSKEY_SIZE))
-+		cifs_dbg(VFS,
-+			 "short GSS session key (%u bytes); zero-padding per MS-SMB2 3.2.5.3\n",
-+			 msg->sesskey_len);
-+
- 	kfree_sensitive(ses->auth_key.response);
--	ses->auth_key.response = kmemdup(msg->data,
--					 msg->sesskey_len,
--					 GFP_KERNEL);
-+	ses->auth_key.len = max_t(unsigned int, msg->sesskey_len,
-+				  SMB2_NTLMV2_SESSKEY_SIZE);
-+	ses->auth_key.response = kzalloc(ses->auth_key.len, GFP_KERNEL);
- 	if (!ses->auth_key.response) {
- 		cifs_dbg(VFS, "%s: can't allocate (%u bytes) memory\n",
--			 __func__, msg->sesskey_len);
-+			 __func__, ses->auth_key.len);
-+		ses->auth_key.len = 0;
- 		rc = -ENOMEM;
- 		goto out_put_spnego_key;
+ 	num_pages = iov_iter_npages(iter, sp->max_frmr_depth + 1);
+@@ -2948,18 +2948,21 @@ struct smbdirect_mr_io *smbd_register_mr(struct smbd_connection *info,
+ 		    num_pages, iov_iter_count(iter), sp->max_frmr_depth);
+ 	smbd_iter_to_mr(iter, &mr->sgt, sp->max_frmr_depth);
+ 
+-	rc = ib_dma_map_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->dir);
+-	if (!rc) {
+-		log_rdma_mr(ERR, "ib_dma_map_sg num_pages=%x dir=%x rc=%x\n",
+-			    num_pages, mr->dir, rc);
++	num_mapped = ib_dma_map_sg(sc->ib.dev, mr->sgt.sgl, mr->sgt.nents, mr->dir);
++	if (!num_mapped) {
++		log_rdma_mr(ERR, "ib_dma_map_sg num_pages=%x dir=%x num_mapped=%x\n",
++			    num_pages, mr->dir, num_mapped);
++		rc = -EIO;
+ 		goto dma_map_error;
  	}
--	ses->auth_key.len = msg->sesskey_len;
-+	memcpy(ses->auth_key.response, msg->data, msg->sesskey_len);
  
- 	sess_data->iov[1].iov_base = msg->data + msg->sesskey_len;
- 	sess_data->iov[1].iov_len = msg->secblob_len;
-
+-	rc = ib_map_mr_sg(mr->mr, mr->sgt.sgl, mr->sgt.nents, NULL, PAGE_SIZE);
+-	if (rc != mr->sgt.nents) {
++	rc = ib_map_mr_sg(mr->mr, mr->sgt.sgl, num_mapped, NULL, PAGE_SIZE);
++	if (rc != num_mapped) {
+ 		log_rdma_mr(ERR,
+-			    "ib_map_mr_sg failed rc = %d nents = %x\n",
+-			    rc, mr->sgt.nents);
++			    "ib_map_mr_sg failed rc = %d num_mapped = %x\n",
++			    rc, num_mapped);
++		if (rc >= 0)
++			rc = -EIO;
+ 		goto map_mr_error;
+ 	}
+ 
 -- 
-2.53.0
+2.43.0
 
