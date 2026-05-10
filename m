@@ -1,72 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CCB1E7C03
-	for <linux-cifs@vger.kernel.org>; Sun, 10 May 2026 07:03:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ECFD365A0B;
+	Sun, 10 May 2026 11:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778396590; cv=none; b=DtOzgzoYmnfZ0uksUvFHYY2c1bMPSUdgOSAV8XvJBHlyNt1bxA3zLFehUJ5F20evB/3DbPxC6tuohe2PSCcNz6Je7VUdJqh9EgV091cMYQnUrg3SpkluoBnqw5ccR/ZC8y8R74yyaIGGGiScX744gdR9COKkPhEWkoeUkR5Gc54=
+	t=1778411125; cv=none; b=a4mUrZ9mB+LwUtEoX4v8wb8JXvtvuziJKtgMwzPkzqk7ZyuxYlZdnRZ6vyPAlUhhqPoD+m1fb7KMY55GRAgKj30S6Fxx2N7Iutx89UIz6Dn53u81h8KM6nY50eZF+ygo00pTTEpfsT+LjUIp0wp5GXYH1n7ye/txPfP5X2A8r1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778396590; c=relaxed/simple;
-	bh=6n/G/4JGU8fTNxowPQ87PHhLRkk91QGuIltcHdwnPpc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k0Ezo5Pff8TuRdwWMhyBO6rTOC2afQR3DReT0esaZxSj14YBdWzaIM6RUafsAm3g15myMiLQLPjvcdI/+7FDExCeGjK9n9Ub7mbPxwFxtCWEIj6aDbS4EufXdX148zcN8s4Pp293ho+wPr+aGbHnMbW8RFyF/lnEOZ+aWPoJINk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIpQI+6B; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778411125; c=relaxed/simple;
+	bh=7a2iV1/sBxU9K04sH1JBSHWzaxM6qao+99Uz3Ft6FNY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E3aT8/YXTNeGUsVIT68wcRRqSY2weARiFbeG6Gxad+Vwq55mIVx28d8lxEJPYP6Q8jf8cXkXUktnX/2ea88WKp4ricMzzJOnJ1U4vDOLulICGEqfEffyGPP75LHvQMwU9usq4lHBLUjaf5yXUzS1cG7IL9kBxCDMRmE9eW7Ypqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=yqYsQJZr; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIpQI+6B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0E20C2BCF7
-	for <linux-cifs@vger.kernel.org>; Sun, 10 May 2026 07:03:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778396589;
-	bh=6n/G/4JGU8fTNxowPQ87PHhLRkk91QGuIltcHdwnPpc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=QIpQI+6BZc6AGwee9NoCf7q9l0iiZm8j8++9lJ8B+3uoDRmkYzTmqFxpFm7LgmPeP
-	 /NAq2FZwZ79CermMmStxWnN+1beOLTyyrTd04Bchzs+OO94PbuzZFvSr+o0yS2KyRT
-	 PXQyL5E7Hmp7QlFaj7o+QgaBN2RhBfxwj/Kbs7XyARuFFWL+vGl3fWDPZVn9GP3CRZ
-	 QzHxkG6o32KSRMjVczw+D25X9Rt98j5rKHGNQbzXBzHqpwSduN5+tBNyS368q2C8p5
-	 WeXI4VsnPyFhB1TWTvSm3VROj5v8xbU3UMzgFF+seTTWJbT0b8WY73IGUYt9qLokWB
-	 L4Ci41VUs7SfA==
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-67c2d57a5ceso5694060a12.3
-        for <linux-cifs@vger.kernel.org>; Sun, 10 May 2026 00:03:09 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzINdzoq+r8yBbxWhiBbZxESjcz7DxsQBgsxDZqz3mRx4ykgQ7e
-	60bQwYA63JV1EBxsigPyBgWI86GGaITZYdMUy5CaSvvlGTOhtAlCBPt55xHq0el7jI2KwbtCoZZ
-	qDpuDXaWFtKdvLuZRH9Cro1HK9s9iIQ4=
-X-Received: by 2002:a05:6402:35d4:b0:670:f319:ae77 with SMTP id
- 4fb4d7f45d1cf-67f704fe942mr2214470a12.1.1778396588344; Sun, 10 May 2026
- 00:03:08 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="yqYsQJZr"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=tiLiDH5Rk2B2hLGZ0F0I+C/JK7yurZrcWAQHdfdnzaE=; b=yqYsQJZrIYcrsMt+2twsoS37j9
+	DiEB2njuLyYSwvSvMBKbKvMGtXMvgGRsPRbm738mQDiT7EVtPFIQuSDvY1SJyLS3ra7AnkM7RdFxx
+	KW6LlaVEehgRRHHmncB256i781DWg6/VhYqWwHd2bI/rnxEUfQ8q46x80yfRjWI4B8Dbtgy8ZoL+x
+	gq99Ia172mmD+ddOOyDOZc/VMH+U86rfx4Gl3XFuJGBQ2h+y9eOimGXVIgCApea4IJzgI2fDRsXz9
+	E8HKf942IqVh9+IEJqc3PUGWPTa7EsuTf3uG1bVjYRpnThIHkI0XmmbatXG2YPtbQNxBFqnrEHCFK
+	AJNVgMrLJKpzf9ZK7Ox57/NMbmf6R+WhSMWFg/ZW8EfpNQxGA1ysOyYCGFwvX/6kRRAMzc/2lbBYP
+	I7ehCBj7DLvc7nLumRiS6AlBkwmJide5sr8veHYtJtHlx8zmRWujW1eltuIj7mxX5GPxUqTF5MmUj
+	n7gfD2aDMqocrJeivlrXfxEM;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wM1yD-00000007jN8-0OSW;
+	Sun, 10 May 2026 11:05:13 +0000
+Message-ID: <e1ed4bb2-80b9-4e81-aa4a-502fc89077f0@samba.org>
+Date: Sun, 10 May 2026 13:05:12 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5msznQbtjUWfS7_s6Xd4R23LispAFSJQtFAGg5s3THc=UQ@mail.gmail.com>
-In-Reply-To: <CAH2r5msznQbtjUWfS7_s6Xd4R23LispAFSJQtFAGg5s3THc=UQ@mail.gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sun, 10 May 2026 16:02:56 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-6icAv2hQrfc8DnwcuA8wM9++3QNFqOu3bJEOa9=qZrg@mail.gmail.com>
-X-Gm-Features: AVHnY4K0LlOQxqY5Z5_zc7zNsmEtGHJGQARLgSEJdzxQtGhtoqTcWiPyZ8CXmrE
-Message-ID: <CAKYAXd-6icAv2hQrfc8DnwcuA8wM9++3QNFqOu3bJEOa9=qZrg@mail.gmail.com>
-Subject: Re: problem starting ksmbd
-To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH for stable] smb: client/smbdirect: fix MR registration for
+ coalesced SG lists
+To: Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ Yi Kuo <yi@yikuo.dev>, Namjae Jeon <linkinjeon@kernel.org>,
+ Steve French <stfrench@microsoft.com>
+References: <20260508081546.4177429-2-metze@samba.org>
+ <20260509122858.2097e82fa847.re-smbdirect-mr-coalesced-sg@kernel.org>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <20260509122858.2097e82fa847.re-smbdirect-mr-coalesced-sg@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, May 10, 2026 at 1:03=E2=80=AFAM Steve French <smfrench@gmail.com> w=
-rote:
->
-> I noticed that ksmbd.mountd was failing on one of my laptops (running
-> current Ubuntu, and current mainline kernel) and the reason was a
-> missing directory /usr/local/var/run.  Manually creating that
-> directory fixed the problem, but was wondering what is responsible for
-> creating that directory and why it wasn't automatically created (e.g.
-> with "make install").
->
-> 2026-05-09T10:59:04.054852-05:00 smfrench-ThinkPad-P16s-Gen-2 ksmbd:
-> [ksmbd.mountd/40000]: ERROR: Failed to create file
-> =E2=80=9C/usr/local/var/run/ksmbd.lock.PNL2O3=E2=80=9D: No such file or d=
-irectory
-FIXED it. It will create the runstatedir (e.g., /usr/local/var/run) to
-ensure ksmbd.mountd can create its lock files.
+Am 09.05.26 um 14:47 schrieb Sasha Levin:
+>> [PATCH for stable] smb: client/smbdirect: fix MR registration for coalesced SG lists
+> 
+> Queued for 7.0.y and 6.18.y, thanks.
+> 
+> The Fixes commit c7398583340a is also present on 6.12/6.6/6.1, but the
+> patch you sent uses the post-rename mr->sgt/.../mr-> field names that
+> match 7.0/6.18; on 6.12/6.6 the same code uses smbdirect_mr->... and
+> 6.1 has yet another older variant. Could you send adapted backports
+> for 6.12.y, 6.6.y and 6.1.y (or let me know if you'd like me to skip
+> those branches)?
+
+https://bugzilla.kernel.org/show_bug.cgi?id=221408 talks
+about 6.17, so I guess we can skip older branches.
+
 Thanks!
+metze
+
