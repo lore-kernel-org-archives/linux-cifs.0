@@ -1,74 +1,100 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ECFD365A0B;
-	Sun, 10 May 2026 11:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778411125; cv=none; b=a4mUrZ9mB+LwUtEoX4v8wb8JXvtvuziJKtgMwzPkzqk7ZyuxYlZdnRZ6vyPAlUhhqPoD+m1fb7KMY55GRAgKj30S6Fxx2N7Iutx89UIz6Dn53u81h8KM6nY50eZF+ygo00pTTEpfsT+LjUIp0wp5GXYH1n7ye/txPfP5X2A8r1I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778411125; c=relaxed/simple;
-	bh=7a2iV1/sBxU9K04sH1JBSHWzaxM6qao+99Uz3Ft6FNY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E3aT8/YXTNeGUsVIT68wcRRqSY2weARiFbeG6Gxad+Vwq55mIVx28d8lxEJPYP6Q8jf8cXkXUktnX/2ea88WKp4ricMzzJOnJ1U4vDOLulICGEqfEffyGPP75LHvQMwU9usq4lHBLUjaf5yXUzS1cG7IL9kBxCDMRmE9eW7Ypqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=yqYsQJZr; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575DB1DE2AD
+	for <linux-cifs@vger.kernel.org>; Sun, 10 May 2026 21:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778448993; cv=pass; b=tdxpA6qYevWbSAunMrQWtSza2EmZOvQaVyscYW6vrkAgc9avPSR8uAm9goggRaoVIfSvutjs7Y6+t6oNo6lVczMcYqVR0EavyDU/JP3mszilbz4rDRRtdex4xSEQjRf8Pi6VpL/V35KF+zauuQqH5bTqVDsc4IaFt5bcZVnHLOo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778448993; c=relaxed/simple;
+	bh=BZeF7psiOqUodTsUlp8cxz+AO7Mkd7E8JEpoQ/t3B0o=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=PoDOA9ixQzgoRYB6CcM4STmdQBRr0j6KgSZsktiryR0Vtd6A/bjhvm4s46jBGEYvaltohgxVnijmyOCoiZz+C4ZKe5rOz1JtSyl9qc49IGLfnyQ6dEDSZ5lwhotuVTTMB2zGK+5he+Y/EiVMMSTUaLSFJlqVTB0QoSWNdtLcAZE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IbDhLUtY; arc=pass smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="yqYsQJZr"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=tiLiDH5Rk2B2hLGZ0F0I+C/JK7yurZrcWAQHdfdnzaE=; b=yqYsQJZrIYcrsMt+2twsoS37j9
-	DiEB2njuLyYSwvSvMBKbKvMGtXMvgGRsPRbm738mQDiT7EVtPFIQuSDvY1SJyLS3ra7AnkM7RdFxx
-	KW6LlaVEehgRRHHmncB256i781DWg6/VhYqWwHd2bI/rnxEUfQ8q46x80yfRjWI4B8Dbtgy8ZoL+x
-	gq99Ia172mmD+ddOOyDOZc/VMH+U86rfx4Gl3XFuJGBQ2h+y9eOimGXVIgCApea4IJzgI2fDRsXz9
-	E8HKf942IqVh9+IEJqc3PUGWPTa7EsuTf3uG1bVjYRpnThIHkI0XmmbatXG2YPtbQNxBFqnrEHCFK
-	AJNVgMrLJKpzf9ZK7Ox57/NMbmf6R+WhSMWFg/ZW8EfpNQxGA1ysOyYCGFwvX/6kRRAMzc/2lbBYP
-	I7ehCBj7DLvc7nLumRiS6AlBkwmJide5sr8veHYtJtHlx8zmRWujW1eltuIj7mxX5GPxUqTF5MmUj
-	n7gfD2aDMqocrJeivlrXfxEM;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wM1yD-00000007jN8-0OSW;
-	Sun, 10 May 2026 11:05:13 +0000
-Message-ID: <e1ed4bb2-80b9-4e81-aa4a-502fc89077f0@samba.org>
-Date: Sun, 10 May 2026 13:05:12 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IbDhLUtY"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-512f09ecc67so24566061cf.3
+        for <linux-cifs@vger.kernel.org>; Sun, 10 May 2026 14:36:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778448991; cv=none;
+        d=google.com; s=arc-20240605;
+        b=AwcRGiRvEe3hptmls5G2fL3+s+IeI8QXlgvFzBVDUgys4F+7tU1kQUzb8ztwc6O1zm
+         cpw5HAUu1J7THu1UDIgvEj/aluAV/OEEh0uRTpUkDO5qtmpZFxevI+QzgpzV/D5Pzp7I
+         U5Da5k9/dC1pEKWsYt8WnV7qCjbDzBfkUXI9pI5NKD2FNEVY8DU7Xf5IAmoWiYceaFdr
+         m8Sdix1s0hGteU+Hv0O0Pm6/xfbb27XyZmScvy9TfkMPYIF6w6BECXRHhPwUWz7638F2
+         NHGDMK6gQ1CxlS/bVCvF5i2nbyExpKZdhT+A7eNjc7EJBJp1h0dwbBwfDBLby3czjy83
+         ggxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=/s2hZwCicpk0GIkEV0yT+fxR95uTmgucLT2jYDFC+nw=;
+        fh=0fNr2rcvUMAhIj+RDEcmvzN2WW3UqPgzSG/SZBOl/TQ=;
+        b=aRfLOr9tyF2NdWFGn+tnA6+CmOQidphDPK6FCV3bgTxxFNOl8k4BdQ7sd0MLGTMdok
+         xaVR0zbtz9C9BgHcg1okJbxLvYiYRn9J652kZE5TMvQR1CiWFUJ6PvHXSWTYOVEGr926
+         2fb7rH5o7LFh9wUhee43kbWmM0z/fD3cg0V+IdwKI+TxQj3wsLA7ycfImTn8vdRZuWpB
+         VtL4wdYPkCakNXv1fCo/W9Rc1T5ZVPRQ0Uc7wMSb3kXEl9twfovE9cAcVc4f/FwDd3ws
+         rjiDOJAKU5V2wdA4keL7PlANMekZ2en6TM2EycHJP8lbwE/+Nox9z4jbeJp0PZvOjUq8
+         Oh6g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778448991; x=1779053791; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/s2hZwCicpk0GIkEV0yT+fxR95uTmgucLT2jYDFC+nw=;
+        b=IbDhLUtYGJzQKDwUWUM40wRzT9D9m+YpdgPKeLU+Nwai1sXSd064heVZWvg9bEE1ka
+         2iIXaj2bmwIyHthuNEsGkLr/jmny/x3lG/JXSGW4DY8tLjvcdUnyc9FlSUT21J5SGgQ5
+         xtiA/5yixBwgYPYeSWyOFyfMvf7QB7dR74uIHoYpPO/5pRVxnpoc1aeolzV9Uv8hb1OB
+         lHu5oWToQxYF+oCQx/vIgxTA25fyQ64RM+Wc8wtEP1n9wIzm0P+w+ycVzYwvJJSVEcHU
+         2Lgw7kMEz2+9CgvaWq/rqHulrdmAZQNKdPyiZceybAOjuJkr1VHBN+ej34FeepP8D5F1
+         YrKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778448991; x=1779053791;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/s2hZwCicpk0GIkEV0yT+fxR95uTmgucLT2jYDFC+nw=;
+        b=B25qFV7ZGZncXuzcbZpNStbVqqIxf9FxwvMk2VnlbCf+5HUidmqUpmWNUQdqSEnwR0
+         rKONd1yRiUC5xl3T6JlYSKCfOGWf2GsJ6ONEn5lNdKHYfF4mpORb4VRI0Q1XsFkuPluu
+         nBAGarNvsaDb5GjFrjriXMUwj7uBo/XMYuslFlDvrwJF8vAXM7PD1syaPpGqty83oQ99
+         TAPfT78uDzObF0QWsj298twKkrBKJdtC44L2D6GQ0Glzi1VUv0e6Qua1jMhvHtznhlpR
+         HUVjE72X0d/EF3ke0sMDjgctDPikBT/9z0anN/PA74RnlrHBMB3+hUNLsFYbGHA/oa6p
+         C+BA==
+X-Forwarded-Encrypted: i=1; AFNElJ/6fIY8AqlpU/yVVg0/QBuPyJrhU5Sa4vLQE6+L7ZQeGBL66ICJMh/eo3/c/+xKqV9q27qrenINDkwq@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnNB5M6Hu/VQACemRwuZBugTMqRcKkA1M6qGX09/Rz9zFeRQmV
+	YAAa5Vive3j7HRl6VbuNYsSVf8hBac3cZTnNQs14kPA0bJiWn9xq9ajnX6DA/BtUxeNKkh6qJqI
+	/cMqpzFxwt8pnWdY7skJJ63UBuWad9mA=
+X-Gm-Gg: Acq92OHDHIqUP/RTQvY7/4g/va3CAIUfoiFzHbQ1zNUs14zP4OZ3FamVaSCi2lZGCSF
+	FLHNV2/9q/iwEr2FiD8CVzlfwLUwGbiuxS9wJNJJB5Bx6Cd2OapfBp1pGTga3/lk9RWdZs2rMVL
+	3QHErBsbvu6i/5BAo1XyjiWiMDLZvhECMyoFZ49qaNr7Y4Py9M56zt0ajSPhS1uBiPSsGmVB2vE
+	zk0tuiQVFOHmCsmTD+7UwYk++NEtShDdX/sG5L67fvZFAz/d4RFBlPeVTaq1YMhuY9CinCgEAvw
+	nrAfB4uJ1pQOpKssm9YRwbl3Jf5K8unEMBjfPKpkyo3gpeEockwrRD2RzHy6IIsm+eo/bccC0J8
+	KfR28i8CF6hVIh4p5fDDRhfXCobUPHDPLsPpe9MnAmP4SRZplk4FxLZPvPHXXB/ta8uKLlVenzH
+	PET3KTVvqPjzpE55UHYb3f
+X-Received: by 2002:ad4:5ba9:0:b0:8b6:6d70:aaac with SMTP id
+ 6a1803df08f44-8bc449aff20mr321038256d6.30.1778448991106; Sun, 10 May 2026
+ 14:36:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH for stable] smb: client/smbdirect: fix MR registration for
- coalesced SG lists
-To: Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- Yi Kuo <yi@yikuo.dev>, Namjae Jeon <linkinjeon@kernel.org>,
- Steve French <stfrench@microsoft.com>
-References: <20260508081546.4177429-2-metze@samba.org>
- <20260509122858.2097e82fa847.re-smbdirect-mr-coalesced-sg@kernel.org>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20260509122858.2097e82fa847.re-smbdirect-mr-coalesced-sg@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 10 May 2026 16:36:19 -0500
+X-Gm-Features: AVHnY4JFAhK--ziKuk9Upxr5ty_nGxzLaScuISYBuXjELMeqWw3l7aiX5143CYA
+Message-ID: <CAH2r5mvP9s_KMc2G-_AsP__G0S5JCmrigOT-7U_ZNu1pLf+Q2g@mail.gmail.com>
+Subject: generic/004 server bug
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Paulo Alcantara <pc@manguebit.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Am 09.05.26 um 14:47 schrieb Sasha Levin:
->> [PATCH for stable] smb: client/smbdirect: fix MR registration for coalesced SG lists
-> 
-> Queued for 7.0.y and 6.18.y, thanks.
-> 
-> The Fixes commit c7398583340a is also present on 6.12/6.6/6.1, but the
-> patch you sent uses the post-rename mr->sgt/.../mr-> field names that
-> match 7.0/6.18; on 6.12/6.6 the same code uses smbdirect_mr->... and
-> 6.1 has yet another older variant. Could you send adapted backports
-> for 6.12.y, 6.6.y and 6.1.y (or let me know if you'd like me to skip
-> those branches)?
+I noticed generic/004 fails to ksmbd, likely server bug since it works
+to Samba and Windows and Azure.   Test generic/004 was recently
+enabled when O_TMPFILE support was added by Paulo.
 
-https://bugzilla.kernel.org/show_bug.cgi?id=221408 talks
-about 6.17, so I guess we can skip older branches.
+Ideas welcome on the ksmbd problem this found.
 
-Thanks!
-metze
+-- 
+Thanks,
 
+Steve
