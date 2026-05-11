@@ -1,100 +1,152 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575DB1DE2AD
-	for <linux-cifs@vger.kernel.org>; Sun, 10 May 2026 21:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778448993; cv=pass; b=tdxpA6qYevWbSAunMrQWtSza2EmZOvQaVyscYW6vrkAgc9avPSR8uAm9goggRaoVIfSvutjs7Y6+t6oNo6lVczMcYqVR0EavyDU/JP3mszilbz4rDRRtdex4xSEQjRf8Pi6VpL/V35KF+zauuQqH5bTqVDsc4IaFt5bcZVnHLOo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778448993; c=relaxed/simple;
-	bh=BZeF7psiOqUodTsUlp8cxz+AO7Mkd7E8JEpoQ/t3B0o=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=PoDOA9ixQzgoRYB6CcM4STmdQBRr0j6KgSZsktiryR0Vtd6A/bjhvm4s46jBGEYvaltohgxVnijmyOCoiZz+C4ZKe5rOz1JtSyl9qc49IGLfnyQ6dEDSZ5lwhotuVTTMB2zGK+5he+Y/EiVMMSTUaLSFJlqVTB0QoSWNdtLcAZE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IbDhLUtY; arc=pass smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9142B3A3E9C;
+	Mon, 11 May 2026 12:46:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778503597; cv=none; b=BHJXS8IIR4+qzcILx7UURg8st/nvzHpC7MuTeBZ7l9lbIQR8ndmIzA9jgauiKH3CjryvE4B7kAP/AZ6dXt3Lym2EL4uBcCOV5XBQ+ALuPZmtA9lbgljPKyrs1ulsepYxL3lgIKE5GQQct9hDtf1sAsjnAkZIVGxKby7sD0CHGJk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778503597; c=relaxed/simple;
+	bh=oiytH4jcOOQ4aVAeWSl58QOPMIeSZGNgc/9D75Azq10=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MHhjQ/QzGQZErovYR5vyz78uSAax4bZEBNsl7lUB8U72RCnWm0sOqAE77pWhHg2J/YtecLFXATHs/4+plQ3i1Sn0Cgjik88TZtFy209Qn6Mb7OacLejq4r19BKhuldhSdCiry/i1hRrglvbSJU602PtlIwYRgsI4Lqo1yC/2JD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=q5riTVlg; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IbDhLUtY"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-512f09ecc67so24566061cf.3
-        for <linux-cifs@vger.kernel.org>; Sun, 10 May 2026 14:36:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778448991; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AwcRGiRvEe3hptmls5G2fL3+s+IeI8QXlgvFzBVDUgys4F+7tU1kQUzb8ztwc6O1zm
-         cpw5HAUu1J7THu1UDIgvEj/aluAV/OEEh0uRTpUkDO5qtmpZFxevI+QzgpzV/D5Pzp7I
-         U5Da5k9/dC1pEKWsYt8WnV7qCjbDzBfkUXI9pI5NKD2FNEVY8DU7Xf5IAmoWiYceaFdr
-         m8Sdix1s0hGteU+Hv0O0Pm6/xfbb27XyZmScvy9TfkMPYIF6w6BECXRHhPwUWz7638F2
-         NHGDMK6gQ1CxlS/bVCvF5i2nbyExpKZdhT+A7eNjc7EJBJp1h0dwbBwfDBLby3czjy83
-         ggxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=/s2hZwCicpk0GIkEV0yT+fxR95uTmgucLT2jYDFC+nw=;
-        fh=0fNr2rcvUMAhIj+RDEcmvzN2WW3UqPgzSG/SZBOl/TQ=;
-        b=aRfLOr9tyF2NdWFGn+tnA6+CmOQidphDPK6FCV3bgTxxFNOl8k4BdQ7sd0MLGTMdok
-         xaVR0zbtz9C9BgHcg1okJbxLvYiYRn9J652kZE5TMvQR1CiWFUJ6PvHXSWTYOVEGr926
-         2fb7rH5o7LFh9wUhee43kbWmM0z/fD3cg0V+IdwKI+TxQj3wsLA7ycfImTn8vdRZuWpB
-         VtL4wdYPkCakNXv1fCo/W9Rc1T5ZVPRQ0Uc7wMSb3kXEl9twfovE9cAcVc4f/FwDd3ws
-         rjiDOJAKU5V2wdA4keL7PlANMekZ2en6TM2EycHJP8lbwE/+Nox9z4jbeJp0PZvOjUq8
-         Oh6g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778448991; x=1779053791; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/s2hZwCicpk0GIkEV0yT+fxR95uTmgucLT2jYDFC+nw=;
-        b=IbDhLUtYGJzQKDwUWUM40wRzT9D9m+YpdgPKeLU+Nwai1sXSd064heVZWvg9bEE1ka
-         2iIXaj2bmwIyHthuNEsGkLr/jmny/x3lG/JXSGW4DY8tLjvcdUnyc9FlSUT21J5SGgQ5
-         xtiA/5yixBwgYPYeSWyOFyfMvf7QB7dR74uIHoYpPO/5pRVxnpoc1aeolzV9Uv8hb1OB
-         lHu5oWToQxYF+oCQx/vIgxTA25fyQ64RM+Wc8wtEP1n9wIzm0P+w+ycVzYwvJJSVEcHU
-         2Lgw7kMEz2+9CgvaWq/rqHulrdmAZQNKdPyiZceybAOjuJkr1VHBN+ej34FeepP8D5F1
-         YrKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778448991; x=1779053791;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/s2hZwCicpk0GIkEV0yT+fxR95uTmgucLT2jYDFC+nw=;
-        b=B25qFV7ZGZncXuzcbZpNStbVqqIxf9FxwvMk2VnlbCf+5HUidmqUpmWNUQdqSEnwR0
-         rKONd1yRiUC5xl3T6JlYSKCfOGWf2GsJ6ONEn5lNdKHYfF4mpORb4VRI0Q1XsFkuPluu
-         nBAGarNvsaDb5GjFrjriXMUwj7uBo/XMYuslFlDvrwJF8vAXM7PD1syaPpGqty83oQ99
-         TAPfT78uDzObF0QWsj298twKkrBKJdtC44L2D6GQ0Glzi1VUv0e6Qua1jMhvHtznhlpR
-         HUVjE72X0d/EF3ke0sMDjgctDPikBT/9z0anN/PA74RnlrHBMB3+hUNLsFYbGHA/oa6p
-         C+BA==
-X-Forwarded-Encrypted: i=1; AFNElJ/6fIY8AqlpU/yVVg0/QBuPyJrhU5Sa4vLQE6+L7ZQeGBL66ICJMh/eo3/c/+xKqV9q27qrenINDkwq@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnNB5M6Hu/VQACemRwuZBugTMqRcKkA1M6qGX09/Rz9zFeRQmV
-	YAAa5Vive3j7HRl6VbuNYsSVf8hBac3cZTnNQs14kPA0bJiWn9xq9ajnX6DA/BtUxeNKkh6qJqI
-	/cMqpzFxwt8pnWdY7skJJ63UBuWad9mA=
-X-Gm-Gg: Acq92OHDHIqUP/RTQvY7/4g/va3CAIUfoiFzHbQ1zNUs14zP4OZ3FamVaSCi2lZGCSF
-	FLHNV2/9q/iwEr2FiD8CVzlfwLUwGbiuxS9wJNJJB5Bx6Cd2OapfBp1pGTga3/lk9RWdZs2rMVL
-	3QHErBsbvu6i/5BAo1XyjiWiMDLZvhECMyoFZ49qaNr7Y4Py9M56zt0ajSPhS1uBiPSsGmVB2vE
-	zk0tuiQVFOHmCsmTD+7UwYk++NEtShDdX/sG5L67fvZFAz/d4RFBlPeVTaq1YMhuY9CinCgEAvw
-	nrAfB4uJ1pQOpKssm9YRwbl3Jf5K8unEMBjfPKpkyo3gpeEockwrRD2RzHy6IIsm+eo/bccC0J8
-	KfR28i8CF6hVIh4p5fDDRhfXCobUPHDPLsPpe9MnAmP4SRZplk4FxLZPvPHXXB/ta8uKLlVenzH
-	PET3KTVvqPjzpE55UHYb3f
-X-Received: by 2002:ad4:5ba9:0:b0:8b6:6d70:aaac with SMTP id
- 6a1803df08f44-8bc449aff20mr321038256d6.30.1778448991106; Sun, 10 May 2026
- 14:36:31 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="q5riTVlg"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1778503591; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=jj4XmQSi4do2CwZ55558GXwNtUuL4SsD8XOJuifWJt4=;
+	b=q5riTVlgxdkQL1EsIV16UqEu2A7jASvgnLay5EOcKQKdRRRRJMQlTqv74jSq3PA9a7BOlyDP+pEqYw7WtblHHUfRNQTl9CyLVqmml7vXopp2O55SS0TJnZyQQqUTzz6fDM0tLYhDYr8QuQndxnHz7p4F9rtnqWVqaKKK/Fr3hig=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=mengferry@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0X2jWrKK_1778503586;
+Received: from localhost(mailfrom:mengferry@linux.alibaba.com fp:SMTPD_---0X2jWrKK_1778503586 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 11 May 2026 20:46:30 +0800
+From: Ferry Meng <mengferry@linux.alibaba.com>
+To: stable@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <stfrench@microsoft.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	Henrique Carvalho <henrique.carvalho@suse.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ferry Meng <mengferry@linux.alibaba.com>
+Subject: [PATCH 6.6.y] ksmbd: make ksmbd thread names distinct by client IP
+Date: Mon, 11 May 2026 20:46:25 +0800
+Message-Id: <20260511124625.52768-1-mengferry@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 10 May 2026 16:36:19 -0500
-X-Gm-Features: AVHnY4JFAhK--ziKuk9Upxr5ty_nGxzLaScuISYBuXjELMeqWw3l7aiX5143CYA
-Message-ID: <CAH2r5mvP9s_KMc2G-_AsP__G0S5JCmrigOT-7U_ZNu1pLf+Q2g@mail.gmail.com>
-Subject: generic/004 server bug
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Paulo Alcantara <pc@manguebit.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-I noticed generic/004 fails to ksmbd, likely server bug since it works
-to Samba and Windows and Azure.   Test generic/004 was recently
-enabled when O_TMPFILE support was added by Paulo.
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-Ideas welcome on the ksmbd problem this found.
+commit 5da92a251e41f824d7e6b4d54d65dcdcfd69fda3 upstream.
 
+[backport needed for 6.6-stable to close a residual
+ active_num_conn leak. Commits 787769c8cc50 (upstream 77ffbcac4e56,
+ "smb: server: fix leak of active_num_conn in ksmbd_tcp_new_connection()")
+ and 97f8d2648ef4 (upstream 6551300dc452, "smb: server: fix
+ active_num_conn leak on transport allocation failure") were
+ backported to 6.6.y, but upstream 77ffbcac4e56 was built on top
+ of this commit, which removes kernel_getpeername() and the
+ out_error: label in ksmbd_tcp_new_connection(). Without this
+ commit, the kernel_getpeername() failure path still calls
+ free_transport(t) and leaks active_num_conn, eventually
+ exhausting max_connections until the module is reloaded.]
+
+This patch makes ksmbd thread names distinct by client IP address.
+
+100943 ?        S      0:00 [ksmbd:::ffff:10.177.110.57]
+ or
+101752 ?        S      0:00 [ksmbd:10.177.110.57]
+
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Ferry Meng <mengferry@linux.alibaba.com>
+---
+ fs/smb/server/transport_tcp.c | 39 ++++++++++++-----------------------
+ 1 file changed, 13 insertions(+), 26 deletions(-)
+
+diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
+index e55afd0c9bf4..f04aa8c504ff 100644
+--- a/fs/smb/server/transport_tcp.c
++++ b/fs/smb/server/transport_tcp.c
+@@ -173,17 +173,6 @@ static struct kvec *get_conn_iovec(struct tcp_transport *t, unsigned int nr_segs
+ 	return new_iov;
+ }
+ 
+-static unsigned short ksmbd_tcp_get_port(const struct sockaddr *sa)
+-{
+-	switch (sa->sa_family) {
+-	case AF_INET:
+-		return ntohs(((struct sockaddr_in *)sa)->sin_port);
+-	case AF_INET6:
+-		return ntohs(((struct sockaddr_in6 *)sa)->sin6_port);
+-	}
+-	return 0;
+-}
+-
+ /**
+  * ksmbd_tcp_new_connection() - create a new tcp session on mount
+  * @client_sk:	socket associated with new connection
+@@ -195,7 +184,6 @@ static unsigned short ksmbd_tcp_get_port(const struct sockaddr *sa)
+  */
+ static int ksmbd_tcp_new_connection(struct socket *client_sk)
+ {
+-	struct sockaddr *csin;
+ 	int rc = 0;
+ 	struct tcp_transport *t;
+ 	struct task_struct *handler;
+@@ -208,27 +196,26 @@ static int ksmbd_tcp_new_connection(struct socket *client_sk)
+ 		return -ENOMEM;
+ 	}
+ 
+-	csin = KSMBD_TCP_PEER_SOCKADDR(KSMBD_TRANS(t)->conn);
+-	if (kernel_getpeername(client_sk, csin) < 0) {
+-		pr_err("client ip resolution failed\n");
+-		rc = -EINVAL;
+-		goto out_error;
+-	}
+-
++#if IS_ENABLED(CONFIG_IPV6)
++	if (client_sk->sk->sk_family == AF_INET6)
++		handler = kthread_run(ksmbd_conn_handler_loop,
++				KSMBD_TRANS(t)->conn, "ksmbd:%pI6c",
++				&KSMBD_TRANS(t)->conn->inet6_addr);
++	else
++		handler = kthread_run(ksmbd_conn_handler_loop,
++				KSMBD_TRANS(t)->conn, "ksmbd:%pI4",
++				&KSMBD_TRANS(t)->conn->inet_addr);
++#else
+ 	handler = kthread_run(ksmbd_conn_handler_loop,
+-			      KSMBD_TRANS(t)->conn,
+-			      "ksmbd:%u",
+-			      ksmbd_tcp_get_port(csin));
++			KSMBD_TRANS(t)->conn, "ksmbd:%pI4",
++			&KSMBD_TRANS(t)->conn->inet_addr);
++#endif
+ 	if (IS_ERR(handler)) {
+ 		pr_err("cannot start conn thread\n");
+ 		rc = PTR_ERR(handler);
+ 		ksmbd_tcp_disconnect(KSMBD_TRANS(t));
+ 	}
+ 	return rc;
+-
+-out_error:
+-	free_transport(t);
+-	return rc;
+ }
+ 
+ /**
 -- 
-Thanks,
+2.43.5
 
-Steve
