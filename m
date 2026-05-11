@@ -1,394 +1,542 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27D73D6CBA;
-	Mon, 11 May 2026 22:19:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778537977; cv=none; b=bp3xYlffbUgj4YmeBR/gWD/H8TEO0ONbp4DuP004QSPtHecP4x05NBl/qYoMZ9XYLpJjSZ9NxtRmZxwlW3J899+YSIPpgnfdKpzGEA5FfBSXQpZJ5lM4LXJ7vLXBAg3xUaWmg/zW9BocDRXnw/NoMwHD4+PpIBnA6O2ecEMnt5c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778537977; c=relaxed/simple;
-	bh=y7cNncbCu1vNSCV4AZgZcWG7u3cQ333RocDy4eM+aHc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h5soYdCirc7405MJYYdcOixbBnj5RH69EzstR16HRJbxK1zShp567DMVYLXIfdQOo6TBhPOdKqNrEdga/KF4G2fEq9tk8MHZ62ykRGmH0NU3f0gfvlZOq95hldbWmO9lVhRiXsyQEndk4Mqqrjlctz7uiNQW+ydV2Vhwk0YMDoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IYEMNb00; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F93363098
+	for <linux-cifs@vger.kernel.org>; Mon, 11 May 2026 23:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778543450; cv=pass; b=tEtQCx6AZvkzzranHiwefqpPh+mkwjy7E1o37HA/wq8dtU7x5ZHLWdUwz+ns8Xceg1Xypw8qTCJ24WkvHeepKFN+Gs6lLMmYwaDnlkPs+MaYDZOBGJjJhwpph0YCjZ4ADM+qt1MfRQSEH2z+ycTC5n9kJNjJRAI5EMR/Wq62zmw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778543450; c=relaxed/simple;
+	bh=CRA/oLmdHZYnKMFP82eFWfkWa4OW2WEJ1weiSQ1xxBo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ckYoL1g4gfrAbsoRN59/E6oNqXmFS/3WeMmZTnm1HJJ3ajkX3IOKYM2pc+enQdCPzafiLK0nimXHDs6s2sCVG3l+dDb8Q/QJeaxlggY7Mq5Mbcp1Fwamcb+gdH+19wSF5G3JqbRFXFYajAbdG5Plf6GeXP2Wi5NEKoCqHJFIqO8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U+Bn6zPd; arc=pass smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IYEMNb00"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1879C2BCF5;
-	Mon, 11 May 2026 22:19:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778537977;
-	bh=y7cNncbCu1vNSCV4AZgZcWG7u3cQ333RocDy4eM+aHc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IYEMNb00KLs5NTn3j/IO3AAWDrA8uj6Moo3tr+zMNvpe9adF9ohWP3GdS7fr8KCHQ
-	 +Q/Q+PMg3Gua1B+QZfQK1mVg1glW4ZSIirbcLdGQBYoIgUx/9iIav2GgNfKCQQlNO+
-	 NF4o8wvATZp7MWpzjVlP5mM/2tbkuysljJFywYoiOyliCnRoXg+K/nfZFh1rc9M4o2
-	 MSJKvy/z0lyERVbwYdTNzjUYFvhkRTQIb2nb3MCBHPzDPCMUxgvztfjERH/1TKIyQC
-	 btBWa9xmdGXSzeWFYirZSstY6e39TNbViYDNvdhJwhlx42P6NelY4D7q4/MSDcQmt8
-	 VnKtf/8/G308A==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Piyush Sachdeva <s.piyush1024@gmail.com>,
-	Piyush Sachdeva <psachdeva@microsoft.com>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-6.1] smb: client: Zero-pad short GSS session keys per MS-SMB2
-Date: Mon, 11 May 2026 18:19:03 -0400
-Message-ID: <20260511221931.2370053-4-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260511221931.2370053-1-sashal@kernel.org>
-References: <20260511221931.2370053-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+Bn6zPd"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8b701756684so55705476d6.1
+        for <linux-cifs@vger.kernel.org>; Mon, 11 May 2026 16:50:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778543447; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lmJKR/b4BF10G/ZP1PZ61pLx/PxLXEtWq5Dpgt1YP8vRHFD8+pYuydQNQ4NpyPuVG9
+         8pTtACqz1R7wLjf/k8sk/yMgV0ymY4TNYg+DwBNWiGKmC0cbTz/iz88FsFGgrvavLVsv
+         wAOZbmf/6sawvRwPi+BMVPcvYCZPwOagGQLWrA6gV6F5G55q/HwC64xLZo7F+A2Fxf4A
+         w4HmLVj7smaPm/mQw73Euix9vWxQcySbVwqa9HOFOib/SZjtBu6f/q3f5blFl2uOdBC8
+         ClMYNZYThx5dAWr3ixEg26beZ5seOK0SA5Sm8ntfKsgBtzaFbmaA62EVqchakBkLGZiI
+         9rSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=sG1jgUpmk5IFJE13u+XdZLiUAHXVrcTYjw8TDUpzTK8=;
+        fh=7A3r6+09tzNnhHTw+uNnYVJyzJRQqAQTAUc0TDW5sqE=;
+        b=MtjCkTc035CEQKBeJvoSKnUMSQtKLKVky0CqsJTFZSeE/FUe75v8EE9dUIggn70lbA
+         qy2hoyJtPJoorbTZ0Np73RYVMx2i9dcmo6eX/du1VBZOqF0Nm153DXDCm3uHt6pTiyKH
+         /PLNkVo5EPV/VyReKvVpHEgika690eaCnwFsEqkJYEp11ERE0repVUIbPqY/qWsaq18s
+         eabqBTDUQwkR+XDmMfJ/RL1bA2kkOOWgZE6AYoxCPEkPgQq1t/Suo58nNJ1dr5fI2DqO
+         OnOQXYjE6XtrjLUGQVLgGZX5VSGlevLsQHbyWPLFWV5FLKyJxT0SY0UXpsTxF96vxJIi
+         IZKQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778543447; x=1779148247; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sG1jgUpmk5IFJE13u+XdZLiUAHXVrcTYjw8TDUpzTK8=;
+        b=U+Bn6zPdceUEACcrVlJb2YmmS4XOJMQd+CbQQ+gRjK5Qe60IiwPYizx0czDsdCjeDW
+         pvCVMWzjZa/rh1XzCZ4DkRGMVkeQ/kaxkFyY7NE8wrAAZrrw9wrD0X0tBYQVV4tKubE5
+         R9opzK3ks6oUUv/PSCSZYgH45XnI5G+rm9FWMSB96k/EJ6z59WjquQRV3JXn78jdLATY
+         0Rtp9+Q60GjK2RcbcBR24y1vm6bOVPRAClxn/KK12Zb6QakBBOIT0BP7opOUIgPZuR58
+         kJIHFm3okEjgc+cuWssI1Iv5YLQtZxVb/YVJUviH8J9yXnvvtFiBAO5c/J1elUqw8W6L
+         NNvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778543447; x=1779148247;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sG1jgUpmk5IFJE13u+XdZLiUAHXVrcTYjw8TDUpzTK8=;
+        b=SB42/RdbmzojVXAX3YEnFHThEj0AV/9W0+h71ozudxmWnzrInkqgStViRxs1L9KWE3
+         918CVEz0lCUaTZrbn0hKvPoh4acd6NKB6ampuQl5aCS7b9dBVkn0drSaEOcOBCi8Vj/t
+         y5LMnz966Q1ciSwTa2m77P/PeYFsbqRm8sd1kAfOUFG8Yg1EeCVFbql2mGhps07Zvl8B
+         +FM3Z/3GxWKnJKj45MdWibgCIcbgF7taVtjkLpKOe21+i8O6VvI49f22MSjmatHfJZ5n
+         Xw+UVugMLelpO4Y1HWc15VzPNtgQ2tFXvTPxGBYSXxvaMNvtBB06x4M+kdkMuD4JcCM/
+         RThg==
+X-Gm-Message-State: AOJu0YxLkxCk2dPuvcoB8aw39IKcYtTt7LvAipmM0QPvMkEu871IZYSH
+	EEusizfBsVJzLe3rXDuAzGg44JWrk/4BAuTEcZZK/Glvigjnac/FLGX1Qk0ZCqa5ZVmoxuidtbP
+	uG3bnaHTQCLnbLIgZeZkpYc0G3PeQa/A=
+X-Gm-Gg: Acq92OEFCFekNHJAmBrMfUmUpqkWFRvGkn8YX7aaZ0AWxEpw2zduOeJWLySHB0Njv20
+	W3q7R4Ys3HHNmBb6QyTRoIYBP8mp3XaTrgLnLSP3Jv+mKFqbhAxZ4BSglG6KbyfbN6mgO8veS0D
+	6aDdu5/S9tRS3YbNOF25g5bq9X2t6yYYjM2UMJr6IyDOItUSwsC96wxHdIXmAx11xwWbu8sAQ3i
+	ewms4P+QY1SMxFVlUtj2yQmnZ+XGEkOT3TLckuuKdt3BS/Rad4va+HPdZcXALj4ehrILyNVp1R2
+	san2r//84gGA1aa2Ku/QYANyUUGy9zEUt6enMWhXEZvBOpkiMETEOy7gYspvrm0fFRFWYQCqh8O
+	mHrbNq4T2upN83Dmy7srsNgA4GIjUgkomw0OAHLSpYbC/jLRaORD6jDz4Z2xOxsWAkaJVvj9BLn
+	4UGAWptxhTyy7vy9vfsuM=
+X-Received: by 2002:a05:6214:4a92:b0:8c6:450d:651 with SMTP id
+ 6a1803df08f44-8c6450d0789mr20217406d6.2.1778543446817; Mon, 11 May 2026
+ 16:50:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 7.0.6
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20260501112023.338005-1-sprasad@microsoft.com>
+ <20260501112023.338005-5-sprasad@microsoft.com> <CAH2r5mu_S29ep_c_k1n=C_YMf11SMS4X8tQNtQn_HAenUrBwvw@mail.gmail.com>
+In-Reply-To: <CAH2r5mu_S29ep_c_k1n=C_YMf11SMS4X8tQNtQn_HAenUrBwvw@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 11 May 2026 18:50:35 -0500
+X-Gm-Features: AVHnY4L3DDMZVxUwhr1Pnz0lXGosRlQfy2aOvgf98W90_854q1E5byAjMNbR8Hk
+Message-ID: <CAH2r5muEGk+mZqsJabZDPT2tkac0ZSebnGSpdYta0Cp+R7BDYw@mail.gmail.com>
+Subject: Re: [PATCH v4 05/19] cifs: optimize readdir for small directories
+To: nspmangalore@gmail.com
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, bharathsm@microsoft.com, 
+	dhowells@redhat.com, henrique.carvalho@suse.com, ematsumiya@suse.de, 
+	Shyam Prasad N <sprasad@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Piyush Sachdeva <s.piyush1024@gmail.com>
+Windows seems to pick sane numbers (I just tried to Samba):
+a compound with 64K in the first query, and the second one in the
+compound is only 1K
+the followon querydir is 1MB
 
-[ Upstream commit 8cb6fc3231500233ddaf63cb7fd5435008d9ed5f ]
+It was weird though that Windows was trying level 0x51 query dir
+(which the Samba server did not recognize, so Windows retries with
+level 37 which Samba does recognize
 
-Per MS-SMB2 section 3.2.5.3, Session.SessionKey is the first 16 bytes
-of the GSS cryptographic key, right-padded with zero bytes if the key
-is shorter than 16 bytes.
+On Mon, May 11, 2026 at 5:10=E2=80=AFPM Steve French <smfrench@gmail.com> w=
+rote:
+>
+> >  #define MAX_SMB2_CREATE_RESPONSE_SIZE 880
+> >
+> > +/* Size of the minimal QueryDir response for checking if more data exi=
+sts */
+> > +#define SMB2_QD2_RESPONSE_SIZE 4096
+> > +
+> > +/*
+> > + * Output buffer size for first QueryDir in Create+QD1+QD2 compound.
+> > + * Accounts for shared buffer space needed for all three responses.
+> > + */
+> > +#define SMB2_QD1_OUTPUT_SIZE(bufsize) \
+> > +       ((bufsize) - MAX_SMB2_CREATE_RESPONSE_SIZE - \
+> > +        sizeof(struct smb2_hdr) - SMB2_QD2_RESPONSE_SIZE)
+>
+> Isn't this suboptimal - it results in a compound with a query dir of
+> about 11K followed by a query dir of 4K in the same compound, but to
+> get the desired behavior more often (where no more files is returned
+> on the second one) wouldn't it be a lot more likely to succeed (ie
+> return the error on the second one) if SMB2_QD2_RESPONSE_SIZE was set
+> to e.g. 1K so SMB2_QD1_OUTPUT_SIZE could be larger, about 14K and
+> increase probability that directory would fit in the first query dir).
+>
+> On Fri, May 1, 2026 at 6:20=E2=80=AFAM <nspmangalore@gmail.com> wrote:
+> >
+> > From: Shyam Prasad N <sprasad@microsoft.com>
+> >
+> > For small directories (where the entire directory contents could be
+> > read in a single QueryDir request), we currently do an extra
+> > round-trip just to get a STATUS_NO_MORE_FILES back from the server.
+> >
+> > This change avoids doing that by adding another QueryDir to the first
+> > compound to the server for readdir. i.e. first request to readdir
+> > will correspond to a compound of (OPEN+QD1+QD2). QD2 will request
+> > for a smaller size (in anticipation of STATUS_NO_MORE_FILES).
+> >
+> > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> > ---
+> >  fs/smb/client/smb2ops.c   | 156 ++++++++++++++++++++++++++++++++++----
+> >  fs/smb/client/smb2pdu.c   |  19 +++--
+> >  fs/smb/client/smb2pdu.h   |  11 +++
+> >  fs/smb/client/smb2proto.h |   3 +-
+> >  4 files changed, 168 insertions(+), 21 deletions(-)
+> >
+> > diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+> > index a9d68e5fcea91..f075330f88598 100644
+> > --- a/fs/smb/client/smb2ops.c
+> > +++ b/fs/smb/client/smb2ops.c
+> > @@ -2450,18 +2450,21 @@ smb2_query_dir_first(const unsigned int xid, st=
+ruct cifs_tcon *tcon,
+> >                      struct cifs_search_info *srch_inf)
+> >  {
+> >         __le16 *utf16_path;
+> > -       struct smb_rqst rqst[2];
+> > -       struct kvec rsp_iov[2];
+> > -       int resp_buftype[2];
+> > +       struct smb_rqst rqst[3];
+> > +       struct kvec rsp_iov[3];
+> > +       int resp_buftype[3];
+> >         struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
+> > -       struct kvec qd_iov[SMB2_QUERY_DIRECTORY_IOV_SIZE];
+> > +       struct kvec qd_iov[SMB2_QUERY_DIRECTORY_IOV_SIZE + 1]; /* +1 fo=
+r padding */
+> > +       struct kvec qd2_iov[SMB2_QUERY_DIRECTORY_IOV_SIZE + 1]; /* +1 f=
+or padding */
+> >         int rc, flags =3D 0;
+> >         u8 oplock =3D SMB2_OPLOCK_LEVEL_NONE;
+> >         struct cifs_open_parms oparms;
+> >         struct smb2_query_directory_rsp *qd_rsp =3D NULL;
+> > +       struct smb2_query_directory_rsp *qd2_rsp =3D NULL;
+> >         struct smb2_create_rsp *op_rsp =3D NULL;
+> >         struct TCP_Server_Info *server;
+> >         int retries =3D 0, cur_sleep =3D 0;
+> > +       unsigned int compound_resp_bufsize;
+> >
+> >  replay_again:
+> >         /* reinitialize for possible replay */
+> > @@ -2476,8 +2479,15 @@ smb2_query_dir_first(const unsigned int xid, str=
+uct cifs_tcon *tcon,
+> >         if (smb3_encryption_required(tcon))
+> >                 flags |=3D CIFS_TRANSFORM_REQ;
+> >
+> > +       /*
+> > +        * Clamp compound Create+QD1+QD2 response sizing to a response =
+size
+> > +        * for suited for one credit even if CIFSMaxBufSize is tuned la=
+rger
+> > +        */
+> > +       compound_resp_bufsize =3D min_t(unsigned int, CIFSMaxBufSize,
+> > +                                     SMB2_MAX_BUFFER_SIZE);
+> > +
+> >         memset(rqst, 0, sizeof(rqst));
+> > -       resp_buftype[0] =3D resp_buftype[1] =3D CIFS_NO_BUFFER;
+> > +       resp_buftype[0] =3D resp_buftype[1] =3D resp_buftype[2] =3D CIF=
+S_NO_BUFFER;
+> >         memset(rsp_iov, 0, sizeof(rsp_iov));
+> >
+> >         /* Open */
+> > @@ -2501,7 +2511,7 @@ smb2_query_dir_first(const unsigned int xid, stru=
+ct cifs_tcon *tcon,
+> >                 goto qdf_free;
+> >         smb2_set_next_command(tcon, &rqst[0]);
+> >
+> > -       /* Query directory */
+> > +       /* First Query directory */
+> >         srch_inf->entries_in_buffer =3D 0;
+> >         srch_inf->index_of_last_entry =3D 2;
+> >
+> > @@ -2512,11 +2522,27 @@ smb2_query_dir_first(const unsigned int xid, st=
+ruct cifs_tcon *tcon,
+> >         rc =3D SMB2_query_directory_init(xid, tcon, server,
+> >                                        &rqst[1],
+> >                                        COMPOUND_FID, COMPOUND_FID,
+> > -                                      0, srch_inf->info_level);
+> > +                                      0, srch_inf->info_level,
+> > +                                      SMB2_QD1_OUTPUT_SIZE(compound_re=
+sp_bufsize));
+> >         if (rc)
+> >                 goto qdf_free;
+> >
+> >         smb2_set_related(&rqst[1]);
+> > +       smb2_set_next_command(tcon, &rqst[1]);
+> > +
+> > +       /* Second Query directory - minimal size to check if more data =
+exists */
+> > +       memset(&qd2_iov, 0, sizeof(qd2_iov));
+> > +       rqst[2].rq_iov =3D qd2_iov;
+> > +       rqst[2].rq_nvec =3D SMB2_QUERY_DIRECTORY_IOV_SIZE;
+> > +
+> > +       rc =3D SMB2_query_directory_init(xid, tcon, server,
+> > +                                      &rqst[2],
+> > +                                      COMPOUND_FID, COMPOUND_FID,
+> > +                                      0, srch_inf->info_level, SMB2_QD=
+2_RESPONSE_SIZE);
+> > +       if (rc)
+> > +               goto qdf_free;
+> > +
+> > +       smb2_set_related(&rqst[2]);
+> >
+> >         if (retries) {
+> >                 /* Back-off before retry */
+> > @@ -2524,10 +2550,11 @@ smb2_query_dir_first(const unsigned int xid, st=
+ruct cifs_tcon *tcon,
+> >                         msleep(cur_sleep);
+> >                 smb2_set_replay(server, &rqst[0]);
+> >                 smb2_set_replay(server, &rqst[1]);
+> > +               smb2_set_replay(server, &rqst[2]);
+> >         }
+> >
+> >         rc =3D compound_send_recv(xid, tcon->ses, server,
+> > -                               flags, 2, rqst,
+> > +                               flags, 3, rqst,
+> >                                 resp_buftype, rsp_iov);
+> >
+> >         /* If the open failed there is nothing to do */
+> > @@ -2559,14 +2586,111 @@ smb2_query_dir_first(const unsigned int xid, s=
+truct cifs_tcon *tcon,
+> >                 goto qdf_free;
+> >         }
+> >
+> > -       rc =3D smb2_parse_query_directory(tcon, &rsp_iov[1], resp_bufty=
+pe[1],
+> > -                                       srch_inf);
+> > -       if (rc) {
+> > -               trace_smb3_query_dir_err(xid, fid->persistent_fid, tcon=
+->tid,
+> > -                       tcon->ses->Suid, 0, 0, rc);
+> > -               goto qdf_free;
+> > +       qd2_rsp =3D (struct smb2_query_directory_rsp *)rsp_iov[2].iov_b=
+ase;
+> > +
+> > +       /*
+> > +        * If QD2 has data, combine QD1 and QD2 responses before parsin=
+g.
+> > +        * The server cursor advances past both responses, so we can't =
+discard QD2.
+> > +        */
+> > +       if (qd2_rsp && qd2_rsp->hdr.Status =3D=3D STATUS_SUCCESS &&
+> > +           le32_to_cpu(qd2_rsp->OutputBufferLength) > 0) {
+> > +               char *combined_buf;
+> > +               size_t qd1_data_len, qd2_data_len, combined_len;
+> > +               u16 qd1_offset, qd2_offset;
+> > +               struct smb2_query_directory_rsp *combined_rsp;
+> > +               struct kvec combined_iov;
+> > +               FILE_DIRECTORY_INFO *last_entry_in_qd1;
+> > +               char *qd1_entries_start, *qd2_entries_start;
+> > +               unsigned int next_offset;
+> > +
+> > +               qd1_offset =3D le16_to_cpu(qd_rsp->OutputBufferOffset);
+> > +               qd2_offset =3D le16_to_cpu(qd2_rsp->OutputBufferOffset)=
+;
+> > +               qd1_data_len =3D le32_to_cpu(qd_rsp->OutputBufferLength=
+);
+> > +               qd2_data_len =3D le32_to_cpu(qd2_rsp->OutputBufferLengt=
+h);
+> > +
+> > +               /* Allocate buffer for: QD1 header + QD1 data + QD2 dat=
+a */
+> > +               combined_len =3D qd1_offset + qd1_data_len + qd2_data_l=
+en;
+> > +               combined_buf =3D kmalloc(combined_len, GFP_KERNEL);
+> > +               if (!combined_buf) {
+> > +                       rc =3D -ENOMEM;
+> > +                       goto qdf_free;
+> > +               }
+> > +
+> > +               /* Copy QD1 header and data */
+> > +               memcpy(combined_buf, qd_rsp, qd1_offset + qd1_data_len)=
+;
+> > +
+> > +               /* Append QD2 data (directory entries only, not the hea=
+der) */
+> > +               memcpy(combined_buf + qd1_offset + qd1_data_len,
+> > +                      (char *)qd2_rsp + qd2_offset, qd2_data_len);
+> > +
+> > +               /* Update OutputBufferLength to reflect combined data *=
+/
+> > +               combined_rsp =3D (struct smb2_query_directory_rsp *)com=
+bined_buf;
+> > +               combined_rsp->OutputBufferLength =3D cpu_to_le32(qd1_da=
+ta_len + qd2_data_len);
+> > +
+> > +               /*
+> > +                * Chain QD1 and QD2 entries: find the last entry in QD=
+1 and update
+> > +                * its NextEntryOffset to point to the first entry in Q=
+D2.
+> > +                */
+> > +               if (qd1_data_len > 0) {
+> > +                       qd1_entries_start =3D combined_buf + qd1_offset=
+;
+> > +                       qd2_entries_start =3D combined_buf + qd1_offset=
+ + qd1_data_len;
+> > +                       last_entry_in_qd1 =3D (FILE_DIRECTORY_INFO *)qd=
+1_entries_start;
+> > +
+> > +                       /* Walk QD1 entries to find the last one with b=
+ounds checking */
+> > +                       while (1) {
+> > +                               char *end_of_qd1 =3D qd1_entries_start =
++ qd1_data_len;
+> > +
+> > +                               next_offset =3D le32_to_cpu(last_entry_=
+in_qd1->NextEntryOffset);
+> > +                               if (next_offset =3D=3D 0)
+> > +                                       break;  /* Found last entry */
+> > +
+> > +                               /* Bounds check before advancing */
+> > +                               if ((char *)last_entry_in_qd1 + next_of=
+fset >=3D end_of_qd1) {
+> > +                                       cifs_dbg(VFS, "query_dir_first:=
+ invalid NextEntryOffset in QD1\n");
+> > +                                       kfree(combined_buf);
+> > +                                       rc =3D -EIO;
+> > +                                       goto qdf_free;
+> > +                               }
+> > +
+> > +                               last_entry_in_qd1 =3D (FILE_DIRECTORY_I=
+NFO *)((char *)last_entry_in_qd1 + next_offset);
+> > +                       }
+> > +
+> > +                       /* Chain last QD1 entry to first QD2 entry */
+> > +                       last_entry_in_qd1->NextEntryOffset =3D cpu_to_l=
+e32(qd2_entries_start - (char *)last_entry_in_qd1);
+> > +               }
+> > +
+> > +               /* Parse the combined buffer */
+> > +               combined_iov.iov_base =3D combined_buf;
+> > +               combined_iov.iov_len =3D combined_len;
+> > +               rc =3D smb2_parse_query_directory(tcon, &combined_iov, =
+CIFS_DYNAMIC_BUFFER,
+> > +                                               srch_inf);
+> > +               if (rc) {
+> > +                       kfree(combined_buf);
+> > +                       trace_smb3_query_dir_err(xid, fid->persistent_f=
+id, tcon->tid,
+> > +                                                tcon->ses->Suid, 0, 0,=
+ rc);
+> > +                       goto qdf_free;
+> > +               }
+> > +               /* Ownership of combined_buf transferred to srch_inf->n=
+twrk_buf_start */
+> > +               srch_inf->endOfSearch =3D false;
+> > +               cifs_dbg(FYI, "query_dir_first: combined QD1 and QD2, %=
+d entries\n",
+> > +                        srch_inf->entries_in_buffer);
+> > +       } else {
+> > +               /* No data in QD2, just parse QD1 */
+> > +               rc =3D smb2_parse_query_directory(tcon, &rsp_iov[1], re=
+sp_buftype[1],
+> > +                                               srch_inf);
+> > +               if (rc) {
+> > +                       trace_smb3_query_dir_err(xid, fid->persistent_f=
+id, tcon->tid,
+> > +                                                tcon->ses->Suid, 0, 0,=
+ rc);
+> > +                       goto qdf_free;
+> > +               }
+> > +               resp_buftype[1] =3D CIFS_NO_BUFFER;
+> > +
+> > +               /* Check if QD2 indicates end of directory */
+> > +               if (qd2_rsp && qd2_rsp->hdr.Status =3D=3D STATUS_NO_MOR=
+E_FILES) {
+> > +                       srch_inf->endOfSearch =3D true;
+> > +                       cifs_dbg(FYI, "query_dir_first: small directory=
+, all entries read\n");
+> > +               }
+> >         }
+> > -       resp_buftype[1] =3D CIFS_NO_BUFFER;
+> >
+> >         trace_smb3_query_dir_done(xid, fid->persistent_fid, tcon->tid,
+> >                         tcon->ses->Suid, 0, srch_inf->entries_in_buffer=
+);
+> > @@ -2575,8 +2699,10 @@ smb2_query_dir_first(const unsigned int xid, str=
+uct cifs_tcon *tcon,
+> >         kfree(utf16_path);
+> >         SMB2_open_free(&rqst[0]);
+> >         SMB2_query_directory_free(&rqst[1]);
+> > +       SMB2_query_directory_free(&rqst[2]);
+> >         free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
+> >         free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
+> > +       free_rsp_buf(resp_buftype[2], rsp_iov[2].iov_base);
+> >
+> >         if (is_replayable_error(rc) &&
+> >             smb2_should_replay(tcon, &retries, &cur_sleep))
+> > diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> > index 49dca84b169e6..2d55246d2851b 100644
+> > --- a/fs/smb/client/smb2pdu.c
+> > +++ b/fs/smb/client/smb2pdu.c
+> > @@ -5504,18 +5504,27 @@ int SMB2_query_directory_init(const unsigned in=
+t xid,
+> >                               struct TCP_Server_Info *server,
+> >                               struct smb_rqst *rqst,
+> >                               u64 persistent_fid, u64 volatile_fid,
+> > -                             int index, int info_level)
+> > +                             int index, int info_level,
+> > +                             unsigned int output_size)
+> >  {
+> >         struct smb2_query_directory_req *req;
+> >         unsigned char *bufptr;
+> >         __le16 asteriks =3D cpu_to_le16('*');
+> > -       unsigned int output_size =3D CIFSMaxBufSize -
+> > -               MAX_SMB2_CREATE_RESPONSE_SIZE -
+> > -               MAX_SMB2_CLOSE_RESPONSE_SIZE;
+> >         unsigned int total_len;
+> >         struct kvec *iov =3D rqst->rq_iov;
+> >         int len, rc;
+> >
+> > +       /*
+> > +        * Use provided output_size, or default to CIFSMaxBufSize calcu=
+lation.
+> > +        * The default is for standalone QueryDir (smb2_query_dir_next)=
+.
+> > +        * For compounds, the caller should pass explicit output_size.
+> > +        */
+> > +       if (output_size =3D=3D 0) {
+> > +               output_size =3D CIFSMaxBufSize -
+> > +                       MAX_SMB2_CREATE_RESPONSE_SIZE -
+> > +                       MAX_SMB2_CLOSE_RESPONSE_SIZE;
+> > +       }
+> > +
+> >         rc =3D smb2_plain_req_init(SMB2_QUERY_DIRECTORY, tcon, server,
+> >                                  (void **) &req, &total_len);
+> >         if (rc)
+> > @@ -5697,7 +5706,7 @@ SMB2_query_directory(const unsigned int xid, stru=
+ct cifs_tcon *tcon,
+> >         rc =3D SMB2_query_directory_init(xid, tcon, server,
+> >                                        &rqst, persistent_fid,
+> >                                        volatile_fid, index,
+> > -                                      srch_inf->info_level);
+> > +                                      srch_inf->info_level, 0);
+> >         if (rc)
+> >                 goto qdir_exit;
+> >
+> > diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
+> > index 30d70097fe2fa..7b7a864520c68 100644
+> > --- a/fs/smb/client/smb2pdu.h
+> > +++ b/fs/smb/client/smb2pdu.h
+> > @@ -129,6 +129,17 @@ struct share_redirect_error_context_rsp {
+> >   */
+> >  #define MAX_SMB2_CREATE_RESPONSE_SIZE 880
+> >
+> > +/* Size of the minimal QueryDir response for checking if more data exi=
+sts */
+> > +#define SMB2_QD2_RESPONSE_SIZE 4096
+> > +
+> > +/*
+> > + * Output buffer size for first QueryDir in Create+QD1+QD2 compound.
+> > + * Accounts for shared buffer space needed for all three responses.
+> > + */
+> > +#define SMB2_QD1_OUTPUT_SIZE(bufsize) \
+> > +       ((bufsize) - MAX_SMB2_CREATE_RESPONSE_SIZE - \
+> > +        sizeof(struct smb2_hdr) - SMB2_QD2_RESPONSE_SIZE)
+> > +
+> >  #define SMB2_LEASE_READ_CACHING_HE     0x01
+> >  #define SMB2_LEASE_HANDLE_CACHING_HE   0x02
+> >  #define SMB2_LEASE_WRITE_CACHING_HE    0x04
+> > diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+> > index 230bb1e9f4e19..9de7d2fe8d466 100644
+> > --- a/fs/smb/client/smb2proto.h
+> > +++ b/fs/smb/client/smb2proto.h
+> > @@ -194,7 +194,8 @@ int SMB2_query_directory(const unsigned int xid, st=
+ruct cifs_tcon *tcon,
+> >  int SMB2_query_directory_init(const unsigned int xid, struct cifs_tcon=
+ *tcon,
+> >                               struct TCP_Server_Info *server,
+> >                               struct smb_rqst *rqst, u64 persistent_fid=
+,
+> > -                             u64 volatile_fid, int index, int info_lev=
+el);
+> > +                             u64 volatile_fid, int index, int info_lev=
+el,
+> > +                             unsigned int output_size);
+> >  void SMB2_query_directory_free(struct smb_rqst *rqst);
+> >  int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
+> >                  u64 persistent_fid, u64 volatile_fid, u32 pid,
+> > --
+> > 2.43.0
+> >
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
-SMB2_auth_kerberos() copies the GSS session key from the cifs.upcall
-response using kmemdup(msg->data, msg->sesskey_len, ...) and stores
-the GSS-reported length verbatim in ses->auth_key.len. generate_key()
-reads SMB2_NTLMV2_SESSKEY_SIZE bytes from this buffer when feeding the
-HMAC-SHA256 KDF for signing key derivation. If a GSS mechanism returns
-a session key shorter than 16 bytes (e.g. a deprecated single-DES
-Kerberos enctype with an 8-byte session key), the KDF call performs an
-out-of-bounds slab read and derives keys that do not match the server,
-which pads per the spec.
 
-Modern KDCs disable short-key enctypes by default, so this is latent
-rather than reachable in production, but it is still a kernel heap
-over-read.
 
-Allocate auth_key.response with kzalloc() at a length of
-max(msg->sesskey_len, SMB2_NTLMV2_SESSKEY_SIZE), copy the GSS key in,
-and rely on kzalloc()'s zero initialization for the spec-mandated
-padding. Set ses->auth_key.len to the padded length. Larger GSS keys
-(e.g. the 32-byte aes256-cts-hmac-sha1-96 session key) continue to be
-stored at their natural length, preserving the FullSessionKey path.
+--=20
+Thanks,
 
-Emit a cifs_dbg(VFS, ...) message when a short key is encountered to
-surface deprecated-enctype usage.
-
-NTLMv2 and NTLMSSP code paths produce a 16-byte session key by
-construction and are unaffected.
-
-Signed-off-by: Piyush Sachdeva <psachdeva@microsoft.com>
-Signed-off-by: Piyush Sachdeva <s.piyush1024@gmail.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-## Phase Walkthrough
-### Phase 1: Commit Message Forensics
-Record 1.1: subsystem `smb: client`; action verb `Zero-pad`; intent is
-to make short GSS session keys comply with MS-SMB2 and avoid short-
-buffer use in SMB2 key derivation.
-
-Record 1.2: tags present are:
-- `Signed-off-by: Piyush Sachdeva <psachdeva@microsoft.com>`
-- `Signed-off-by: Piyush Sachdeva <s.piyush1024@gmail.com>`
-- `Signed-off-by: Steve French <stfrench@microsoft.com>`
-
-No `Fixes:`, `Reported-by:`, `Tested-by:`, `Reviewed-by:`, `Acked-by:`,
-`Link:`, or `Cc: stable@vger.kernel.org` tag was present in the supplied
-commit message.
-
-Record 1.3: the commit describes a real memory-safety bug:
-`SMB2_auth_kerberos()` allocates exactly `msg->sesskey_len` bytes, but
-SMB2 key derivation later consumes `SMB2_NTLMV2_SESSKEY_SIZE` bytes,
-which is `16`. If `msg->sesskey_len < 16`, the kernel reads past the
-allocated buffer and also derives a non-spec-compliant key. MS-SMB2 says
-`Session.SessionKey` is the first 16 bytes of the cryptographic key,
-right-padded with zeros if shorter.
-
-Record 1.4: this is not just cleanup. It is a hidden memory-safety and
-protocol-correctness fix: short allocation plus fixed 16-byte HMAC key
-input creates an out-of-bounds read.
-
-### Phase 2: Diff Analysis
-Record 2.1: one file changed: `fs/smb/client/smb2pdu.c`, one hunk in
-`SMB2_auth_kerberos()`, roughly 18 insertions and 5 deletions from the
-supplied diff. Scope is a single-file surgical fix.
-
-Record 2.2: before, `ses->auth_key.response = kmemdup(msg->data,
-msg->sesskey_len, GFP_KERNEL)` and `ses->auth_key.len =
-msg->sesskey_len`. After, the code sets `ses->auth_key.len =
-max(msg->sesskey_len, 16)`, allocates a zeroed buffer of that size,
-copies only the original GSS key, and leaves zero padding if the key was
-short.
-
-Record 2.3: bug category is memory safety / out-of-bounds read plus
-protocol correctness. The verified consumer is `generate_key()` in
-`fs/smb/client/smb2transport.c`, which calls
-`hmac_sha256_init_usingrawkey(&hmac_ctx, ses->auth_key.response,
-SMB2_NTLMV2_SESSKEY_SIZE)`. The HMAC helper copies `raw_key_len` bytes
-from the pointer, so a shorter allocation is a real over-read.
-
-Record 2.4: fix quality is good: it preserves larger keys, fixes only
-Kerberos/GSS key storage, does not change the security blob pointer, and
-uses zeroed allocation to implement the spec padding. Regression risk is
-low; the only behavior change for short keys is from invalid over-
-read/wrong key material to zero-padded spec behavior. It adds one VFS
-debug message for short keys.
-
-### Phase 3: Git History Investigation
-Record 3.1: `git blame` on current `fs/smb/client/smb2pdu.c` shows the
-current `kmemdup(msg->data, msg->sesskey_len)` lines came from
-`d9d1e319b39e` (`smb: client: fix broken multichannel with
-krb5+signing`), first contained in local tags starting at `v7.0`. The
-fixed-size 16-byte HMAC use in current `generate_key()` came from
-`4b4c6fdb25de`, first contained in local tags starting at `v6.18`.
-
-Record 3.2: no `Fixes:` tag is present, so there was no tagged
-introducing commit to follow.
-
-Record 3.3: recent local history for `smb2pdu.c` includes related
-Kerberos/multichannel work (`d9d1e319b39e`). Recent `smb2transport.c`
-history includes crypto-library conversion commits. The candidate itself
-is standalone for current `v7.0.y` context.
-
-Record 3.4: local `git log master --author='Piyush Sachdeva' -10 --
-fs/smb/client fs/cifs` found no matching prior local commits. `Steve
-French` is listed in `MAINTAINERS` as maintainer for `COMMON INTERNET
-FILE SYSTEM CLIENT (CIFS and SMB3)`, and he signed off this patch.
-
-Record 3.5: no functional dependency was found for the current `v7.0.y`
-file: `git apply --check` of the supplied patch against this checkout
-succeeded. Older stable trees need path/context adjustments because
-older releases use `fs/cifs/` and some have the allocation inside an `if
-(!is_binding)` / `if (!ses->binding)` block.
-
-### Phase 4: Mailing List and External Research
-Record 4.1: no candidate commit hash was available locally. `git log
-master`, `pending-7.0`, and `for-greg/7.0-200` with the exact subject
-found no commit. `b4 dig -c '<subject>'`, `b4 dig -a`, and `b4 dig -w`
-failed because `b4 dig` needs a commitish.
-
-Record 4.2: reviewer/recipient data could not be obtained from `b4 dig`
-for this candidate. The only maintainer signal verified is Steve
-French’s signoff and MAINTAINERS entry.
-
-Record 4.3: no `Link:` or `Reported-by:` tags exist. Lore web queries
-were blocked by Anubis, so no bug-report thread was verified.
-
-Record 4.4: no series context was verified. No local subject match was
-found in searched branches.
-
-Record 4.5: stable-list search via lore was blocked by Anubis; no
-stable-specific discussion was verified.
-
-### Phase 5: Code Semantic Analysis
-Record 5.1: modified function: `SMB2_auth_kerberos()`.
-
-Record 5.2: caller path verified locally: `connect.c` calls
-`server->ops->sess_setup()`, SMB2/SMB3 ops point that to
-`SMB2_sess_setup()`, `SMB2_select_sec()` selects `SMB2_auth_kerberos()`
-for Kerberos, and `SMB2_sess_setup()` runs the selected auth function.
-
-Record 5.3: key callees are `cifs_get_spnego_key()`,
-`SMB2_sess_sendreceive()`, and `SMB2_sess_establish_session()`.
-`SMB2_sess_establish_session()` calls
-`server->ops->generate_signingkey()`, which reaches
-`generate_smb3signingkey()` and then `generate_key()` for SMB3 dialects.
-
-Record 5.4: reachability is from a user-requested CIFS/SMB mount using
-Kerberos, with `CONFIG_CIFS_UPCALL` enabled. `Kconfig` says
-`CIFS_UPCALL` enables Kerberos/SPNEGO advanced session setup and is used
-for Kerberos tickets needed to mount secure servers.
-
-Record 5.5: similar short allocation plus 16-byte consumer patterns
-exist across stable tags. I verified the same `kmemdup(msg->data,
-msg->sesskey_len)` and 16-byte key use in `v5.4`, `v5.10`, `v5.15`,
-`v6.1`, `v6.6`, `v6.12`, `v6.18`, `v6.19`, and `v7.0`, with path changes
-from `fs/cifs/` to `fs/smb/client/`.
-
-### Phase 6: Cross-Referencing and Stable Tree Analysis
-Record 6.1: buggy code exists in multiple stable-era tags. `v5.4`
-through `v6.1` use `fs/cifs/`; `v6.6+` uses `fs/smb/client/`. The
-relevant allocation and 16-byte key consumption pattern is present in
-those checked tags.
-
-Record 6.2: expected backport difficulty is clean for current `v7.0.y`
-because `git apply --check` succeeded. Older stable trees need minor
-backporting for path and context differences; pre-`d9d1e319b39e` trees
-should preserve their existing binding conditional unless that
-multichannel Kerberos fix is also backported.
-
-Record 6.3: local searches for the exact subject, `short GSS session
-key`, and related `MS-SMB2` terms did not find an existing local fix.
-
-### Phase 7: Subsystem and Maintainer Context
-Record 7.1: subsystem is CIFS/SMB3 client filesystem/network filesystem
-code. Criticality is important: it affects users mounting SMB shares
-with Kerberos/SPNEGO.
-
-Record 7.2: subsystem is active; recent `master` history under
-`fs/smb/client` includes multiple SMB client fixes and refactors. The
-maintained subsystem is marked `Supported` in `MAINTAINERS`.
-
-### Phase 8: Impact and Risk Assessment
-Record 8.1: affected population is config- and workload-specific:
-CIFS/SMB2+ Kerberos users with `CONFIG_CIFS_UPCALL`, especially where
-the GSS session key returned to the kernel is shorter than 16 bytes.
-
-Record 8.2: trigger condition is a Kerberos/SPNEGO session setup where
-`msg->sesskey_len < SMB2_NTLMV2_SESSKEY_SIZE`. The mount path is user
-reachable, but whether unprivileged users can trigger it depends on
-mount permissions and local configuration, which I did not verify.
-
-Record 8.3: failure mode is a kernel heap out-of-bounds read during HMAC
-key setup and incorrect SMB key derivation. Severity is high for memory
-safety, though likely low-frequency because it requires a short GSS
-session key.
-
-Record 8.4: benefit is high for affected users because it removes a
-kernel heap over-read and implements the protocol-required padding. Risk
-is low because the patch is small, local, and preserves behavior for
-keys of length 16 or greater.
-
-### Phase 9: Final Synthesis
-Record 9.1: evidence for backporting:
-- Verified short allocation in `SMB2_auth_kerberos()`.
-- Verified fixed 16-byte read in `generate_key()`.
-- Verified HMAC helper copies the specified key length.
-- Verified MS-SMB2 requires right-zero-padding short session keys.
-- Verified bug pattern exists across multiple stable-era tags.
-- Fix is small, local, and cleanly applies to current `v7.0.y`.
-
-Evidence against / concerns:
-- No `Reported-by`, `Tested-by`, `Reviewed-by`, `Fixes`, or `Link` tag
-  was supplied.
-- No lore review discussion could be verified.
-- Older stable trees need minor path/context backport adjustments.
-- Trigger appears specific to short GSS keys; I did not independently
-  verify real-world frequency.
-
-Unresolved:
-- No upstream commit hash was available locally, so `b4 dig` could not
-  retrieve the original thread.
-- Lore web searches were blocked.
-- I did not compile-test the patch.
-
-Record 9.2 stable rules:
-1. Obviously correct and tested: obviously correct by code inspection;
-   external testing not verified.
-2. Fixes a real bug: yes, verified out-of-bounds read when `sesskey_len
-   < 16`.
-3. Important issue: yes, kernel heap over-read and broken key
-   derivation.
-4. Small and contained: yes, one function in one file.
-5. No new feature/API: yes, no new API or userspace interface.
-6. Can apply to stable: yes for current `v7.0.y`; minor backport work
-   needed for older trees.
-
-Record 9.3: no automatic exception category applies. This is not a
-device ID, quirk, DT, build, or documentation-only change.
-
-Record 9.4: decision is to backport. The memory-safety fix is small and
-technically well justified; the limited trigger scope reduces urgency
-but not suitability.
-
-## Verification
-- [Phase 1] Parsed the supplied subject and tags; no `Fixes`, `Reported-
-  by`, `Tested-by`, `Reviewed-by`, `Link`, or stable Cc was present.
-- [Phase 2] Read `SMB2_auth_kerberos()` in `fs/smb/client/smb2pdu.c`;
-  verified current exact-size `kmemdup()` allocation and
-  `ses->auth_key.len = msg->sesskey_len`.
-- [Phase 2] Read `generate_key()` in `fs/smb/client/smb2transport.c`;
-  verified it passes `SMB2_NTLMV2_SESSKEY_SIZE` bytes from
-  `ses->auth_key.response`.
-- [Phase 2] Read `lib/crypto/sha256.c`; verified HMAC raw-key setup
-  copies `raw_key_len` bytes from the supplied pointer.
-- [Phase 2] Verified `SMB2_NTLMV2_SESSKEY_SIZE` is `16` in
-  `fs/smb/common/smb2pdu.h`.
-- [Phase 3] `git blame` identified local current-line history for the
-  allocation and HMAC key setup.
-- [Phase 3] `git show` inspected `d9d1e319b39e` and `4b4c6fdb25de`.
-- [Phase 3] `git tag --contains` showed `d9d1e319b39e` starts at local
-  `v7.0` tags and `4b4c6fdb25de` at local `v6.18` tags.
-- [Phase 4] `b4 dig` attempts by subject failed because no local
-  commitish exists; lore WebFetch searches were blocked by Anubis.
-- [Phase 5] `rg` and `ReadFile` traced `connect.c -> SMB2_sess_setup()
-  -> SMB2_auth_kerberos() -> SMB2_sess_establish_session() ->
-  generate_key()`.
-- [Phase 6] Checked `v5.4`, `v5.10`, `v5.15`, `v6.1`, `v6.6`, `v6.12`,
-  `v6.18`, `v6.19`, and `v7.0` for the allocation and 16-byte consumer
-  pattern.
-- [Phase 6] `git apply --check` confirmed the supplied patch applies
-  cleanly to current `v7.0.y`.
-- [Phase 7] Verified CIFS/SMB3 client maintainership and supported
-  status in `MAINTAINERS`.
-- [Phase 8] Verified `CONFIG_CIFS_UPCALL` Kconfig text describes
-  Kerberos/SPNEGO upcall support for secure SMB mounts.
-- UNVERIFIED: original mailing-list review, patch revisions, explicit
-  stable discussion, compile-test results, and real-world frequency of
-  short GSS session keys.
-
-**YES**
-
- fs/smb/client/smb2pdu.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
-
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 5188218c25be4..0792e0c38b44f 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -1714,17 +1714,30 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
- 	is_binding = (ses->ses_status == SES_GOOD);
- 	spin_unlock(&ses->ses_lock);
- 
-+	/*
-+	 * Per MS-SMB2 3.2.5.3, Session.SessionKey is the first 16 bytes of the
-+	 * GSS cryptographic key, right-padded with zero bytes if shorter.
-+	 * Allocate at least SMB2_NTLMV2_SESSKEY_SIZE bytes (zeroed) so the KDF
-+	 * input buffer is always valid for HMAC-SHA256 even with deprecated
-+	 * Kerberos enctypes that return a short session key.
-+	 */
-+	if (unlikely(msg->sesskey_len < SMB2_NTLMV2_SESSKEY_SIZE))
-+		cifs_dbg(VFS,
-+			 "short GSS session key (%u bytes); zero-padding per MS-SMB2 3.2.5.3\n",
-+			 msg->sesskey_len);
-+
- 	kfree_sensitive(ses->auth_key.response);
--	ses->auth_key.response = kmemdup(msg->data,
--					 msg->sesskey_len,
--					 GFP_KERNEL);
-+	ses->auth_key.len = max_t(unsigned int, msg->sesskey_len,
-+				  SMB2_NTLMV2_SESSKEY_SIZE);
-+	ses->auth_key.response = kzalloc(ses->auth_key.len, GFP_KERNEL);
- 	if (!ses->auth_key.response) {
- 		cifs_dbg(VFS, "%s: can't allocate (%u bytes) memory\n",
--			 __func__, msg->sesskey_len);
-+			 __func__, ses->auth_key.len);
-+		ses->auth_key.len = 0;
- 		rc = -ENOMEM;
- 		goto out_put_spnego_key;
- 	}
--	ses->auth_key.len = msg->sesskey_len;
-+	memcpy(ses->auth_key.response, msg->data, msg->sesskey_len);
- 
- 	sess_data->iov[1].iov_base = msg->data + msg->sesskey_len;
- 	sess_data->iov[1].iov_len = msg->secblob_len;
--- 
-2.53.0
-
+Steve
