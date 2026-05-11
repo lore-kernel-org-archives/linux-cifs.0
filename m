@@ -1,1494 +1,394 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D137A37EFE0
-	for <linux-cifs@vger.kernel.org>; Mon, 11 May 2026 22:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778537684; cv=pass; b=eYaod3O1HviucOSOsGwlGab2NE7ohN7mpglbley5kB4x8I8LJ6b819oshkzZnm5cBiigKD6Fj2hP2hi0ZZ94H37PzPqdnAS2PoTr21So9QSWRTOMaCLVJRMvBFm6iHkzrG/45Xe2V+wByA02ZPZT2LZSeUgkJvH5scQOcyzKot0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778537684; c=relaxed/simple;
-	bh=0XMTnZMzi/gPgDt2J81m+o1fNxINnI2enRAqMtyn1lc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aUpV5CMPFx2BoDYEUfr9JyxDf+n8namtHSDRDkkf+D6HqX5Dbyr0B/Bm0y2i26sVyV7vRI+34hTt4lRT8VJs5W3X9aA3t1nZiB9s3ux1ph7oqy5NKPysoZps69jn6KqOkp590gk+R2/ybdHtkNEnZ8lqP3iqRBWV+8OqkIguGlY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHhZUUEp; arc=pass smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27D73D6CBA;
+	Mon, 11 May 2026 22:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778537977; cv=none; b=bp3xYlffbUgj4YmeBR/gWD/H8TEO0ONbp4DuP004QSPtHecP4x05NBl/qYoMZ9XYLpJjSZ9NxtRmZxwlW3J899+YSIPpgnfdKpzGEA5FfBSXQpZJ5lM4LXJ7vLXBAg3xUaWmg/zW9BocDRXnw/NoMwHD4+PpIBnA6O2ecEMnt5c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778537977; c=relaxed/simple;
+	bh=y7cNncbCu1vNSCV4AZgZcWG7u3cQ333RocDy4eM+aHc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h5soYdCirc7405MJYYdcOixbBnj5RH69EzstR16HRJbxK1zShp567DMVYLXIfdQOo6TBhPOdKqNrEdga/KF4G2fEq9tk8MHZ62ykRGmH0NU3f0gfvlZOq95hldbWmO9lVhRiXsyQEndk4Mqqrjlctz7uiNQW+ydV2Vhwk0YMDoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IYEMNb00; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHhZUUEp"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8b821f39a12so37394426d6.2
-        for <linux-cifs@vger.kernel.org>; Mon, 11 May 2026 15:14:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778537681; cv=none;
-        d=google.com; s=arc-20240605;
-        b=a+4Q+NB6Y+6016j3G4pP4l6QZebMmp6haEXLTqIo2Zh9ywua99OPDAKqeNZM7CQA+e
-         3kMBz2vWbxcttM0o7ry7FMB1euZro8ZXBhHcvsKBlThWqnDDWIWmOsMVVMPHNljSEGv4
-         rvEjIyzuKh1RxYFAeh2WwZVb0u0bxanmX6rjYKn8tA2+U2AFMavx78vICNYqafKXTXZ8
-         m0AE5aGtOgW6hhYmWuIL2QKfCgHj6L8C1J1U2X1pYcOZ/0K8JGnwc/yGeL/XnXxIt2LT
-         j4QToLXuxa9KOOg1K/4M4NejJD+oRrvRryGLMFUFntyTnDmagoMux+5hctQkkTAZOuJF
-         WGXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3OehcxV5S+efZTZwQvzeLuxU7+Akh6zAQgW9/RdJBtA=;
-        fh=7A3r6+09tzNnhHTw+uNnYVJyzJRQqAQTAUc0TDW5sqE=;
-        b=PE/TrHv0+1eQ04l+eoj0Za1StEx7L7yRdcHfCiLx3xx6JMq1kRQFo5NJJyP2alOkeL
-         00TVhaVNjUgI1rOBTqa7ZN3dLC2NDyrwgSLANUt2lN1rk90l1yXGlUm0JgpI9QGyMH7E
-         svV72NCb+tP8DXlYgWC7B+nmFP9Yufr38JN35xHh5XW4YKRPBYzSwfdOaNQXl0xXBn5F
-         ADgk7JwPGOWYhup3pIa/zBuXSF5wYgJiZXfCh+fpr7vwxLR3rS1RSqvjxeHKeiUywsKe
-         TNmRP+jgqvGBu4LfKtSkSucdnftoqa8OpvnEVyCu9Sg44ATCecdgJ2Ve1a1A0vbARYF6
-         ps9Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778537681; x=1779142481; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3OehcxV5S+efZTZwQvzeLuxU7+Akh6zAQgW9/RdJBtA=;
-        b=HHhZUUEp90hPBBqHRBv+4F55GF9M+ABZLOpJOwzoI0EQi9Brkhmy7bq8ZGqXuHqzy2
-         l4MatIpBQSjzwN+QVLJbYDiHQZpg5MyfRmtTRV80emg9odl9khVqnZIVEjXbsiFs0/11
-         f1Lrqsc417N2aNxtPkXDnankAJ06Dw/krC/mr4vxWW7756Emege5bqMx581/JAOpG/93
-         zV8OMrQ9XtGXxUYzBeDRNWVfjYqqmMl4IpntdcsIDe6wzFLUuWPdD25J3B9jIxSH/JyI
-         WtQY8yJuFsU5VTVIgMF5epTb0eY04vGrn+Px3n0YnuL0UKMWE5w8EFTCQtUom73LPJP7
-         VSeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778537681; x=1779142481;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3OehcxV5S+efZTZwQvzeLuxU7+Akh6zAQgW9/RdJBtA=;
-        b=DKbKLGoRbfQNq7G2zBVhG7NpuUjchDDM9W83KNq/IiN1lExKmDvBeF6eAhKl0B5Zd0
-         cRr3TEgjIFA7yLbuR6FGqDNPPIsRc98nm3CEg6Vv82aK5nV8bxxTP3NefVMkZanE5XKd
-         Xrb9Kjk4RJnwwGuVJGkS+QXpyeytlgedIxMKbhhNor95qsAlq6S5kXvpx8pfruGZL4LR
-         Dl1epGHFfAgEOQkkJnXtq/ndspvbqip9Nr/sYkggkyxaC9osAZAQS24YPwHv0J7cVJJb
-         DfKPke1RvlFnetYuLmde4SmuOrGti459/yFMnaEYFEMw33ttE8xwWMXS6R8p6QDUtKsF
-         w9sA==
-X-Gm-Message-State: AOJu0Yyo+zYwMVCKG5I9uxBt8w3S9unjBywcvh6Xy4WqhcRepAIZTwxT
-	/mvnvUO4Ut4Fvq5paTSze2z1J+vCmVrOHPIPhCJ2y0E2uDx33AkcaKgfQNssyZgGz3/D388XTrx
-	rdYq72iIIZPLagQwzkzukSpdMyN/ugt1cPGLW
-X-Gm-Gg: Acq92OFj/oREPsQTeVlF+ycrGC8Xu0H/HthELM4Fvp0myIrgGmWwGPA8vGvH/Fa+1a5
-	Xbnsu0SE61+aBTelEQJx+speSVWIkDz2Xr4r2O6DYeVO8GzbyZPUlgGufQr8Tzb942gOoW40qzM
-	IL+SxPtXqGFewtH+0pf8yK49OFeUG0P38B4y9KGNtotfrRPU5mhySwciOvH/80n0MqJ/IbYCUbS
-	SBrigR1PM1V0Gn2111x/1UHFzC9UdPmdl49fc0gf/o9mcEkgoTrKREvxE526MlE/Ww4Cd0mEMNj
-	vv3Qo630U6EMY9wmrFKBF7KXi3lLiDSKi7OrERoc1uDBzJLWyiV3M04nTMKPQpYnXVBI5Wbku00
-	XtAwJT2+kPARc7wqduORiEN9H3qDxO9OBRVky7Jsb7+sNv4NPsCu3xumYmJpZgRbhlI3KAiWEWx
-	w+OlPlPIW32OxHmIFmsFU=
-X-Received: by 2002:a05:6214:2262:b0:8b1:f297:a54b with SMTP id
- 6a1803df08f44-8c1a30d0af2mr168700586d6.18.1778537680286; Mon, 11 May 2026
- 15:14:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IYEMNb00"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1879C2BCF5;
+	Mon, 11 May 2026 22:19:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778537977;
+	bh=y7cNncbCu1vNSCV4AZgZcWG7u3cQ333RocDy4eM+aHc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=IYEMNb00KLs5NTn3j/IO3AAWDrA8uj6Moo3tr+zMNvpe9adF9ohWP3GdS7fr8KCHQ
+	 +Q/Q+PMg3Gua1B+QZfQK1mVg1glW4ZSIirbcLdGQBYoIgUx/9iIav2GgNfKCQQlNO+
+	 NF4o8wvATZp7MWpzjVlP5mM/2tbkuysljJFywYoiOyliCnRoXg+K/nfZFh1rc9M4o2
+	 MSJKvy/z0lyERVbwYdTNzjUYFvhkRTQIb2nb3MCBHPzDPCMUxgvztfjERH/1TKIyQC
+	 btBWa9xmdGXSzeWFYirZSstY6e39TNbViYDNvdhJwhlx42P6NelY4D7q4/MSDcQmt8
+	 VnKtf/8/G308A==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Piyush Sachdeva <s.piyush1024@gmail.com>,
+	Piyush Sachdeva <psachdeva@microsoft.com>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	sfrench@samba.org,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 7.0-6.1] smb: client: Zero-pad short GSS session keys per MS-SMB2
+Date: Mon, 11 May 2026 18:19:03 -0400
+Message-ID: <20260511221931.2370053-4-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260511221931.2370053-1-sashal@kernel.org>
+References: <20260511221931.2370053-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260501112023.338005-1-sprasad@microsoft.com> <20260501112023.338005-6-sprasad@microsoft.com>
-In-Reply-To: <20260501112023.338005-6-sprasad@microsoft.com>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 11 May 2026 17:14:27 -0500
-X-Gm-Features: AVHnY4Ktym72Ttq4bPI0zlTtNz74zppksudB_i7hD8nWOA_9rcV0r0ZcGSyJryU
-Message-ID: <CAH2r5mtR7wcEN=s9AoCJN2SgbrrWAkT-FaJWzQvdaCcH3G0AWQ@mail.gmail.com>
-Subject: Re: [PATCH v4 06/19] cifs: optimize readdir for larger directories
-To: nspmangalore@gmail.com
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, bharathsm@microsoft.com, 
-	dhowells@redhat.com, henrique.carvalho@suse.com, ematsumiya@suse.de, 
-	Shyam Prasad N <sprasad@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 7.0.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-I see this fail with STATUS_INVALID_PARAMETER to ksmbd but working to
-Samba.  Probably server bug
+From: Piyush Sachdeva <s.piyush1024@gmail.com>
 
-On Fri, May 1, 2026 at 6:20=E2=80=AFAM <nspmangalore@gmail.com> wrote:
->
-> From: Shyam Prasad N <sprasad@microsoft.com>
->
-> Today QueryDirectory uses the compound_send_recv infrastructure
-> which is limited to 16KB in size. As a result, readdir of large
-> directories generally take several round trips.
->
-> With this change, if the readdir needs a QueryDir after the first
-> round-trip (meaning that there are more dirents to read), then the
-> following QueryDirs will now switch to using larger buffers with
-> MTU credits.
->
-> Till now, the only command type that used this flow was SMB2_READ.
-> In case of encrypted response, it becomes challenging to decide if
-> the response is for SMB2_READ or SMB2_READDIR. This change reuses
-> receive_encrypted_read and after decrypting the response decides
-> the handling function based on the command in the resp header. That
-> way, care has been taken to ensure that the read code path
-> modifications on account of this change are kept to a minimum.
->
-> The change also renames the discard function since both read and
-> query_dir paths will now reuse the same function to discard remaining
-> data in the socket and dequeue the mid.
->
-> Cc: David Howells <dhowells@redhat.com>
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/smb/client/cifsglob.h  |  21 +-
->  fs/smb/client/cifsproto.h |   3 +
->  fs/smb/client/readdir.c   |   2 +-
->  fs/smb/client/smb1ops.c   |   4 +-
->  fs/smb/client/smb2misc.c  |   7 +-
->  fs/smb/client/smb2ops.c   | 458 ++++++++++++++++++++++++++++++++++++--
->  fs/smb/client/smb2pdu.c   | 185 ++++++++++++++-
->  fs/smb/client/smb2pdu.h   |   3 +
->  fs/smb/client/smb2proto.h |   3 +
->  fs/smb/client/trace.h     |   1 +
->  fs/smb/client/transport.c | 169 +++++++++++++-
->  11 files changed, 811 insertions(+), 45 deletions(-)
->
-> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> index 8d089ba08e3e5..38d5600efe2c8 100644
-> --- a/fs/smb/client/cifsglob.h
-> +++ b/fs/smb/client/cifsglob.h
-> @@ -504,7 +504,7 @@ struct smb_version_operations {
->                                struct cifs_search_info *);
->         /* continue readdir */
->         int (*query_dir_next)(const unsigned int, struct cifs_tcon *,
-> -                             struct cifs_fid *,
-> +                             struct cifs_sb_info *, struct cifs_fid *,
->                               __u16, struct cifs_search_info *srch_inf);
->         /* close dir */
->         int (*close_dir)(const unsigned int, struct cifs_tcon *,
-> @@ -1397,6 +1397,25 @@ struct cifs_search_info {
->         bool is_dynamic_buf:1; /* dynamically allocated buffer - can be v=
-ariable size */
->  };
->
-> +/* Structure for QueryDirectory with multi-credit support */
-> +struct cifs_query_dir_io {
-> +       struct cifs_tcon *tcon;
-> +       struct TCP_Server_Info *server;
-> +       struct cifs_search_info *srch_inf;
-> +       unsigned int xid;
-> +       u64 persistent_fid;
-> +       u64 volatile_fid;
-> +       int index;
-> +       struct kvec combined_iov;       /* Pre-allocated buffer to hold r=
-esp */
-> +       struct completion done;
-> +       int result;
-> +       struct cifs_credits credits;
-> +       bool replay;
-> +       unsigned int retries;
-> +       unsigned int cur_sleep;
-> +       struct kvec iov[2];             /* For response handling */
-> +};
-> +
->  #define ACL_NO_MODE    ((umode_t)(-1))
->  struct cifs_open_parms {
->         struct cifs_tcon *tcon;
-> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> index 884bfa1cf0b42..bbbee0ef09443 100644
-> --- a/fs/smb/client/cifsproto.h
-> +++ b/fs/smb/client/cifsproto.h
-> @@ -336,6 +336,9 @@ struct cifs_ses *cifs_get_smb_ses(struct TCP_Server_I=
-nfo *server,
->  int cifs_readv_receive(struct TCP_Server_Info *server,
->                        struct mid_q_entry *mid);
->
-> +int cifs_query_dir_receive(struct TCP_Server_Info *server,
-> +                           struct mid_q_entry *mid);
-> +
->  int cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
->                           struct cifs_sb_info *cifs_sb,
->                           const unsigned char *path, char *pbuf,
-> diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-> index b50efd9b9e1d2..8a444f97e0ae9 100644
-> --- a/fs/smb/client/readdir.c
-> +++ b/fs/smb/client/readdir.c
-> @@ -760,7 +760,7 @@ find_cifs_entry(const unsigned int xid, struct cifs_t=
-con *tcon, loff_t pos,
->         while ((index_to_find >=3D cfile->srch_inf.index_of_last_entry) &=
-&
->                (rc =3D=3D 0) && !cfile->srch_inf.endOfSearch) {
->                 cifs_dbg(FYI, "calling findnext2\n");
-> -               rc =3D server->ops->query_dir_next(xid, tcon, &cfile->fid=
-,
-> +               rc =3D server->ops->query_dir_next(xid, tcon, cifs_sb, &c=
-file->fid,
->                                                  search_flags,
->                                                  &cfile->srch_inf);
->                 if (rc)
-> diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-> index 9694117050a6c..860a9b23a2f8d 100644
-> --- a/fs/smb/client/smb1ops.c
-> +++ b/fs/smb/client/smb1ops.c
-> @@ -1135,8 +1135,8 @@ cifs_query_dir_first(const unsigned int xid, struct=
- cifs_tcon *tcon,
->
->  static int
->  cifs_query_dir_next(const unsigned int xid, struct cifs_tcon *tcon,
-> -                   struct cifs_fid *fid, __u16 search_flags,
-> -                   struct cifs_search_info *srch_inf)
-> +                   struct cifs_sb_info *cifs_sb, struct cifs_fid *fid,
-> +                   __u16 search_flags, struct cifs_search_info *srch_inf=
-)
->  {
->         return CIFSFindNext(xid, tcon, fid->netfid, search_flags, srch_in=
-f);
->  }
-> diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-> index 973fce3c959c4..b7b6ecd5fdaee 100644
-> --- a/fs/smb/client/smb2misc.c
-> +++ b/fs/smb/client/smb2misc.c
-> @@ -12,6 +12,7 @@
->  #include "cifsglob.h"
->  #include "cifsproto.h"
->  #include "smb2proto.h"
-> +#include "smb2pdu.h"
->  #include "cifs_debug.h"
->  #include "cifs_unicode.h"
->  #include "../common/smb2status.h"
-> @@ -316,7 +317,7 @@ char *
->  smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *shdr)
->  {
->         const int max_off =3D 4096;
-> -       const int max_len =3D 128 * 1024;
-> +       int max_len =3D 128 * 1024;
->
->         *off =3D 0;
->         *len =3D 0;
-> @@ -367,6 +368,10 @@ smb2_get_data_area_len(int *off, int *len, struct sm=
-b2_hdr *shdr)
->                   ((struct smb2_query_directory_rsp *)shdr)->OutputBuffer=
-Offset);
->                 *len =3D le32_to_cpu(
->                   ((struct smb2_query_directory_rsp *)shdr)->OutputBuffer=
-Length);
-> +               /* Allow larger buffers for query directory (up to 2MB).
-> +                * The actual data is handled separately in cifs_query_di=
-r_receive().
-> +                */
-> +               max_len =3D SMB2_MAX_QD_DATABUF_SIZE;
->                 break;
->         case SMB2_IOCTL:
->                 *off =3D le32_to_cpu(
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index f075330f88598..2df4d080e95f0 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -2713,11 +2713,131 @@ smb2_query_dir_first(const unsigned int xid, str=
-uct cifs_tcon *tcon,
->
->  static int
->  smb2_query_dir_next(const unsigned int xid, struct cifs_tcon *tcon,
-> -                   struct cifs_fid *fid, __u16 search_flags,
-> -                   struct cifs_search_info *srch_inf)
-> +                   struct cifs_sb_info *cifs_sb, struct cifs_fid *fid,
-> +                   __u16 search_flags, struct cifs_search_info *srch_inf=
-)
->  {
-> -       return SMB2_query_directory(xid, tcon, fid->persistent_fid,
-> -                                   fid->volatile_fid, 0, srch_inf);
-> +       struct cifs_query_dir_io qd_io;
-> +       struct TCP_Server_Info *server;
-> +       struct cifs_ses *ses =3D tcon->ses;
-> +       size_t buf_size;
-> +       int rc;
-> +       int resp_buftype =3D CIFS_DYNAMIC_BUFFER;
-> +
-> +       /* Pick server and determine buffer size based on negotiated rsiz=
-e */
-> +       server =3D cifs_pick_channel(ses);
-> +       if (!server)
-> +               return smb_EIO(smb_eio_trace_null_pointers);
-> +
-> +       /* Negotiate rsize if not already set */
-> +       if (cifs_sb->ctx->rsize =3D=3D 0)
-> +               cifs_negotiate_rsize(server, cifs_sb->ctx, tcon);
-> +
-> +       /* Use negotiated rsize for buffer size, with reasonable limits *=
-/
-> +       buf_size =3D cifs_sb->ctx->rsize;
-> +
-> +       cifs_dbg(FYI, "%s: using buffer size %zu (rsize=3D%u, encrypted=
-=3D%d)\n",
-> +                __func__, buf_size, cifs_sb->ctx->rsize, smb3_encryption=
-_required(tcon));
-> +
-> +       /* Initialize qd_io structure */
-> +       memset(&qd_io, 0, sizeof(qd_io));
-> +       qd_io.tcon =3D tcon;
-> +       qd_io.server =3D server;
-> +       qd_io.srch_inf =3D srch_inf;
-> +       qd_io.xid =3D xid;
-> +       qd_io.persistent_fid =3D fid->persistent_fid;
-> +       qd_io.volatile_fid =3D fid->volatile_fid;
-> +       qd_io.index =3D 0;
-> +       qd_io.result =3D 0;
-> +       qd_io.replay =3D false;
-> +       qd_io.retries =3D 0;
-> +       qd_io.cur_sleep =3D 0;
-> +
-> +       /* Allocate credits for the buffer size */
-> +       rc =3D server->ops->wait_mtu_credits(server, buf_size, &buf_size,
-> +                                          &qd_io.credits);
-> +       if (rc) {
-> +               cifs_dbg(VFS, "%s: failed to get credits: %d\n", __func__=
-, rc);
-> +               return rc;
-> +       }
-> +
-> +       cifs_dbg(FYI, "%s: allocated %u credits for %zu bytes\n",
-> +                __func__, qd_io.credits.value, buf_size);
-> +
-> +       /* Send query directory with large buffer and wait for completion=
- */
-> +       rc =3D SMB2_query_directory_large(&qd_io, buf_size);
-> +       if (rc) {
-> +               if (rc =3D=3D -ENODATA) {
-> +                       const struct smb2_hdr *hdr =3D NULL;
-> +
-> +                       if (qd_io.combined_iov.iov_base)
-> +                               hdr =3D (const struct smb2_hdr *)qd_io.co=
-mbined_iov.iov_base;
-> +                       else if (qd_io.iov[0].iov_base)
-> +                               hdr =3D (const struct smb2_hdr *)qd_io.io=
-v[0].iov_base;
-> +
-> +                       /*
-> +                        * ENODATA from QUERY_DIRECTORY generally means e=
-numeration reached
-> +                        * the end. Treat it as end-of-search even if the=
- header buffer is
-> +                        * unavailable in this async path.
-> +                        */
-> +                       if (!hdr) {
-> +                               cifs_dbg(FYI, "%s: ENODATA but hdr is NUL=
-L\n", __func__);
-> +                       } else {
-> +                               cifs_dbg(FYI, "%s: ENODATA with hdr->Stat=
-us=3D0x%x (STATUS_NO_MORE_FILES=3D0x%x)\n",
-> +                                        __func__, le32_to_cpu(hdr->Statu=
-s), le32_to_cpu(STATUS_NO_MORE_FILES));
-> +                       }
-> +
-> +                       if (hdr && hdr->Status =3D=3D STATUS_NO_MORE_FILE=
-S) {
-> +                               trace_smb3_query_dir_done(xid, fid->persi=
-stent_fid,
-> +                                       tcon->tid, tcon->ses->Suid, 0, 0)=
-;
-> +                               srch_inf->endOfSearch =3D true;
-> +                               rc =3D 0;
-> +                       } else {
-> +                               cifs_dbg(FYI, "%s: ENODATA but Status mis=
-match - not treating as end-of-search\n",
-> +                                       __func__);
-> +                               trace_smb3_query_dir_err(xid, fid->persis=
-tent_fid,
-> +                                       tcon->tid, tcon->ses->Suid, 0, 0,=
- rc);
-> +                       }
-> +               } else {
-> +                       trace_smb3_query_dir_err(xid, fid->persistent_fid=
-,
-> +                               tcon->tid, tcon->ses->Suid, 0, 0, rc);
-> +               }
-> +               goto qdir_next_exit;
-> +       }
-> +
-> +       /* Parse the response using the combined buffer built in receive =
-handler */
-> +       if (qd_io.combined_iov.iov_len > 0) {
-> +               rc =3D smb2_parse_query_directory(tcon, &qd_io.combined_i=
-ov, resp_buftype,
-> +                                               srch_inf);
-> +               if (rc) {
-> +                       trace_smb3_query_dir_err(xid, fid->persistent_fid=
-,
-> +                               tcon->tid, tcon->ses->Suid, 0, 0, rc);
-> +                       kfree(qd_io.combined_iov.iov_base);
-> +                       qd_io.combined_iov.iov_base =3D NULL;
-> +                       goto qdir_next_exit;
-> +               }
-> +
-> +               /* combined_iov.iov_base ownership transferred to srch_in=
-f->ntwrk_buf_start */
-> +               qd_io.combined_iov.iov_base =3D NULL;
-> +
-> +               trace_smb3_query_dir_done(xid, fid->persistent_fid,
-> +                       tcon->tid, tcon->ses->Suid, 0,
-> +                       srch_inf->entries_in_buffer);
-> +       }
-> +
-> +qdir_next_exit:
-> +       /* Free the data buffer if not transferred to srch_inf */
-> +       kfree(qd_io.combined_iov.iov_base);
-> +
-> +       /* Return credits if we still have them (they should have been cl=
-eared in callback) */
-> +       if (qd_io.credits.value !=3D 0) {
-> +               trace_smb3_rw_credits(0, 0, 0,
-> +                                     server->credits, server->in_flight,
-> +                                     qd_io.credits.value,
-> +                                     cifs_trace_rw_credits_query_dir_don=
-e);
-> +               add_credits(server, &qd_io.credits, 0);
-> +       }
-> +
-> +       return rc;
->  }
->
->  static int
-> @@ -4834,6 +4954,252 @@ cifs_copy_folioq_to_iter(struct folio_queue *foli=
-oq, size_t data_size,
->         return 0;
->  }
->
-> +static int
-> +cifs_copy_folioq_to_buf(struct folio_queue *folioq, size_t total_size,
-> +                       size_t skip, char *buf, size_t buf_len)
-> +{
-> +       size_t copied =3D 0;
-> +
-> +       if (buf_len > total_size - skip)
-> +               buf_len =3D total_size - skip;
-> +
-> +       for (; folioq; folioq =3D folioq->next) {
-> +               for (int s =3D 0; s < folioq_count(folioq); s++) {
-> +                       struct folio *folio =3D folioq_folio(folioq, s);
-> +                       size_t fsize =3D folio_size(folio);
-> +                       size_t len =3D umin(fsize - skip, buf_len);
-> +
-> +                       if (len =3D=3D 0)
-> +                               break;
-> +
-> +                       memcpy_from_folio(buf + copied, folio, skip, len)=
-;
-> +                       copied +=3D len;
-> +                       buf_len -=3D len;
-> +                       skip =3D 0;
-> +
-> +                       if (buf_len =3D=3D 0)
-> +                               return 0;
-> +               }
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +/*
-> + * Handle encrypted QueryDirectory response data.
-> + * Called only for encrypted responses where mid->decrypted =3D=3D true.
-> + * For unencrypted responses, cifs_query_dir_receive handles everything.
-> + *
-> + * This is written in such a way that handle_read_data does not need mod=
-ification.
-> + *
-> + * buf: contains read_rsp_size bytes of decrypted response
-> + * buffer: contains (total_len - read_rsp_size) bytes of decrypted data
-> + *
-> + * Since sizeof(struct smb2_query_directory_rsp) < read_rsp_size,
-> + * the response header is always fully in buf. Data may be split between
-> + * buf and buffer depending on data_offset.
-> + */
-> +static int
-> +handle_query_dir_data(struct TCP_Server_Info *server, struct mid_q_entry=
- *mid,
-> +                     char *buf, unsigned int buf_len, struct folio_queue=
- *buffer,
-> +                     unsigned int buffer_len, bool is_offloaded)
-> +{
-> +       struct cifs_query_dir_io *qd_io =3D mid->callback_data;
-> +       struct smb2_query_directory_rsp *rsp;
-> +       struct smb2_hdr *shdr =3D (struct smb2_hdr *)buf;
-> +       unsigned int data_offset, data_len;
-> +       unsigned int hdr_len;
-> +
-> +       cifs_dbg(FYI, "%s: processing encrypted QueryDirectory response\n=
-", __func__);
-> +
-> +       if (shdr->Command !=3D SMB2_QUERY_DIRECTORY) {
-> +               cifs_server_dbg(VFS, "only QueryDirectory responses are s=
-upported\n");
-> +               return -EOPNOTSUPP;
-> +       }
-> +
-> +       if (server->ops->is_session_expired &&
-> +           server->ops->is_session_expired(buf)) {
-> +               if (!is_offloaded)
-> +                       cifs_reconnect(server, true);
-> +               return -1;
-> +       }
-> +
-> +       if (server->ops->is_status_pending &&
-> +                       server->ops->is_status_pending(buf, server))
-> +               return -1;
-> +
-> +       rsp =3D (struct smb2_query_directory_rsp *)buf;
-> +       hdr_len =3D min_t(unsigned int, buf_len,
-> +                        sizeof(struct smb2_query_directory_rsp));
-> +
-> +       /* Map error code first */
-> +       qd_io->result =3D server->ops->map_error(buf, false);
-> +
-> +       /* Get data_offset early to set up iov properly */
-> +       data_offset =3D le16_to_cpu(rsp->OutputBufferOffset);
-> +       data_len =3D le32_to_cpu(rsp->OutputBufferLength);
-> +
-> +       /* Set up first iov to point to header portion (needed for credit=
-s/signature) */
-> +       qd_io->iov[0].iov_base =3D buf;
-> +       qd_io->iov[0].iov_len =3D qd_io->result ? hdr_len : data_offset;
-> +
-> +       if (qd_io->result !=3D 0) {
-> +               cifs_dbg(FYI, "%s: server returned error %d (Status=3D0x%=
-x)\n",
-> +                        __func__, qd_io->result, le32_to_cpu(rsp->hdr.St=
-atus));
-> +
-> +               /*
-> +                * Copy header to persistent combined_iov buffer so statu=
-s
-> +                * remains accessible after receive handler returns. buf =
-is temporary
-> +                * and will be freed/reused, so we can't leave iov[0] poi=
-nting to it
-> +                */
-> +               if (qd_io->combined_iov.iov_base && hdr_len > 0 &&
-> +                   hdr_len <=3D qd_io->combined_iov.iov_len) {
-> +                       memcpy(qd_io->combined_iov.iov_base, buf, hdr_len=
-);
-> +                       qd_io->iov[0].iov_base =3D qd_io->combined_iov.io=
-v_base;
-> +                       qd_io->iov[0].iov_len =3D hdr_len;
-> +                       cifs_dbg(FYI, "%s: copied error response header t=
-o combined_iov\n",
-> +                               __func__);
-> +               }
-> +
-> +               /*
-> +                * Normal error on query_directory response - response re=
-ceived successfully,
-> +                * but the command failed. Store error in qd_io->result f=
-or callback
-> +                */
-> +               if (is_offloaded)
-> +                       mid->mid_state =3D MID_RESPONSE_RECEIVED;
-> +               else
-> +                       dequeue_mid(server, mid, false);
-> +               return 0;
-> +       }
-> +
-> +       /* Success - parse the response data */
-> +       cifs_dbg(FYI, "%s: data_offset=3D%u data_len=3D%u buf_len=3D%u bu=
-ffer_len=3D%u\n",
-> +                __func__, data_offset, data_len, buf_len, buffer_len);
-> +
-> +       /* Validate data_offset */
-> +       if (data_offset < sizeof(struct smb2_query_directory_rsp)) {
-> +               cifs_dbg(FYI, "%s: data offset (%u) inside response heade=
-r\n",
-> +                        __func__, data_offset);
-> +               data_offset =3D sizeof(struct smb2_query_directory_rsp);
-> +       } else if (data_offset > MAX_CIFS_SMALL_BUFFER_SIZE) {
-> +               cifs_dbg(VFS, "%s: data offset (%u) beyond end of smallbu=
-f\n",
-> +                        __func__, data_offset);
-> +               qd_io->result =3D -EIO;
-> +               dequeue_mid(server, mid, qd_io->result);
-> +               return qd_io->result;
-> +       }
-> +
-> +       /* Validate data_offset is within buf_len + buffer_len */
-> +       if (data_offset > buf_len + buffer_len) {
-> +               cifs_dbg(VFS, "%s: data offset (%u) beyond response lengt=
-h (%u)\n",
-> +                        __func__, data_offset, buf_len + buffer_len);
-> +               qd_io->result =3D -EIO;
-> +               dequeue_mid(server, mid, qd_io->result);
-> +               return qd_io->result;
-> +       }
-> +
-> +       /* Validate response fits in pre-allocated combined buffer */
-> +       if ((size_t)data_offset + data_len > qd_io->combined_iov.iov_len)=
- {
-> +               cifs_dbg(VFS, "%s: response (%u + %u) exceeds buffer capa=
-city (%zu)\n",
-> +                        __func__, data_offset, data_len, qd_io->combined=
-_iov.iov_len);
-> +               qd_io->result =3D -EIO;
-> +               dequeue_mid(server, mid, qd_io->result);
-> +               return qd_io->result;
-> +       }
-> +
-> +       /* Copy the prefix present in buf into combined_iov, preserving w=
-ire layout */
-> +       memcpy(qd_io->combined_iov.iov_base, buf, min(data_offset, buf_le=
-n));
-> +
-> +       if (data_offset < buf_len) {
-> +               /* Data starts in buf, may continue into buffer */
-> +               unsigned int data_in_buf =3D buf_len - data_offset;
-> +               unsigned int data_in_buffer;
-> +
-> +               if (data_len <=3D data_in_buf) {
-> +                       /* All data is in buf */
-> +                       memcpy(qd_io->combined_iov.iov_base + data_offset=
-,
-> +                              buf + data_offset, data_len);
-> +               } else {
-> +                       /* Copy from buf first */
-> +                       memcpy(qd_io->combined_iov.iov_base + data_offset=
-,
-> +                              buf + data_offset, data_in_buf);
-> +
-> +                       /* Copy remainder from buffer at offset 0 */
-> +                       data_in_buffer =3D data_len - data_in_buf;
-> +                       if (data_in_buffer > buffer_len) {
-> +                               cifs_dbg(VFS, "%s: data_in_buffer (%u) > =
-buffer_len (%u)\n",
-> +                                        __func__, data_in_buffer, buffer=
-_len);
-> +                               qd_io->result =3D -EIO;
-> +                               dequeue_mid(server, mid, qd_io->result);
-> +                               return qd_io->result;
-> +                       }
-> +
-> +                       qd_io->result =3D cifs_copy_folioq_to_buf(buffer,=
- buffer_len, 0,
-> +                                                               qd_io->co=
-mbined_iov.iov_base +
-> +                                                               data_offs=
-et + data_in_buf,
-> +                                                               data_in_b=
-uffer);
-> +                       if (qd_io->result !=3D 0) {
-> +                               cifs_dbg(VFS, "%s: failed to copy from fo=
-lio_queue: %d\n",
-> +                                        __func__, qd_io->result);
-> +                               dequeue_mid(server, mid, qd_io->result);
-> +                               return qd_io->result;
-> +                       }
-> +               }
-> +       } else {
-> +               /* Padding and data are in buffer starting at offset 0 */
-> +               unsigned int bytes_in_buffer =3D data_offset - buf_len + =
-data_len;
-> +
-> +               if (bytes_in_buffer > buffer_len) {
-> +                       cifs_dbg(VFS, "%s: data beyond buffer: prefix+len=
-=3D%u buffer_len=3D%u\n",
-> +                                __func__, bytes_in_buffer, buffer_len);
-> +                       qd_io->result =3D -EIO;
-> +                       dequeue_mid(server, mid, qd_io->result);
-> +                       return qd_io->result;
-> +               }
-> +
-> +               qd_io->result =3D cifs_copy_folioq_to_buf(buffer, buffer_=
-len, 0,
-> +                                                       qd_io->combined_i=
-ov.iov_base + buf_len,
-> +                                                       bytes_in_buffer);
-> +               if (qd_io->result !=3D 0) {
-> +                       cifs_dbg(VFS, "%s: failed to copy from folio_queu=
-e: %d\n",
-> +                                __func__, qd_io->result);
-> +                       dequeue_mid(server, mid, qd_io->result);
-> +                       return qd_io->result;
-> +               }
-> +       }
-> +
-> +       /* Set up iov[1] pointing into combined buffer, finalize valid le=
-ngth */
-> +       qd_io->iov[1].iov_base =3D qd_io->combined_iov.iov_base + data_of=
-fset;
-> +       qd_io->iov[1].iov_len =3D data_len;
-> +       qd_io->combined_iov.iov_len =3D data_offset + data_len;
-> +
-> +       dequeue_mid(server, mid, false);
-> +       return 0;
-> +}
-> +
-> +/*
-> + * Handle callback for async QueryDirectory with multi-credit support.
-> + * For encrypted responses, extracts decrypted data.
-> + * For unencrypted responses, cifs_query_dir_receive already processed e=
-verything.
-> + */
-> +int
-> +smb2_query_dir_handle_data(struct TCP_Server_Info *server, struct mid_q_=
-entry *mid)
-> +{
-> +       char *buf =3D server->large_buf ? server->bigbuf : server->smallb=
-uf;
-> +
-> +       /* For unencrypted responses, data already processed in cifs_quer=
-y_dir_receive */
-> +       if (!mid->decrypted)
-> +               return 0;
-> +
-> +       /*
-> +        * For small encrypted responses (< CIFSMaxBufSize), all data is =
-in buf.
-> +        * For large encrypted responses, this callback is not used - ins=
-tead,
-> +        * receive_encrypted_read/smb2_decrypt_offload call handle_query_=
-dir_data directly.
-> +        */
-> +       return handle_query_dir_data(server, mid, buf, server->pdu_size,
-> +                                     NULL, 0, false);
-> +}
-> +
->  static int
->  handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid=
-,
->                  char *buf, unsigned int buf_len, struct folio_queue *buf=
-fer,
-> @@ -4997,25 +5363,46 @@ static void smb2_decrypt_offload(struct work_stru=
-ct *work)
->         int rc;
->         struct mid_q_entry *mid;
->         struct iov_iter iter;
-> +       struct smb2_hdr *shdr;
-> +       unsigned int read_rsp_size =3D dw->server->vals->read_rsp_size;
->
-> +       /* decrypt read_rsp_size in buf + remainder in folio_queue */
->         iov_iter_folio_queue(&iter, ITER_DEST, dw->buffer, 0, 0, dw->len)=
-;
-> -       rc =3D decrypt_raw_data(dw->server, dw->buf, dw->server->vals->re=
-ad_rsp_size,
-> -                             &iter, true);
-> +       rc =3D decrypt_raw_data(dw->server, dw->buf, read_rsp_size, &iter=
-, true);
->         if (rc) {
->                 cifs_dbg(VFS, "error decrypting rc=3D%d\n", rc);
->                 goto free_pages;
->         }
->
->         dw->server->lstrp =3D jiffies;
-> +
-> +       shdr =3D (struct smb2_hdr *)(dw->buf + sizeof(struct smb2_transfo=
-rm_hdr));
-> +
-> +       /*
-> +        * buf now contains read_rsp_size bytes after transform_hdr.
-> +        * folio_queue contains (total_len - read_rsp_size) bytes.
-> +        * The handle functions will determine where data actually starts=
- based on data_offset.
-> +        */
-> +
->         mid =3D smb2_find_dequeue_mid(dw->server, dw->buf);
->         if (mid =3D=3D NULL)
->                 cifs_dbg(FYI, "mid not found\n");
->         else {
->                 mid->decrypted =3D true;
-> -               rc =3D handle_read_data(dw->server, mid, dw->buf,
-> -                                     dw->server->vals->read_rsp_size,
-> -                                     dw->buffer, dw->len,
-> -                                     true);
-> +
-> +               /* Handle based on command type */
-> +               if (le16_to_cpu(shdr->Command) =3D=3D SMB2_READ) {
-> +                       rc =3D handle_read_data(dw->server, mid, dw->buf,=
- read_rsp_size,
-> +                                             dw->buffer, dw->len, true);
-> +               } else if (le16_to_cpu(shdr->Command) =3D=3D SMB2_QUERY_D=
-IRECTORY) {
-> +                       rc =3D handle_query_dir_data(dw->server, mid, dw-=
->buf, read_rsp_size,
-> +                                                  dw->buffer, dw->len, t=
-rue);
-> +               } else {
-> +                       cifs_dbg(VFS, "Unexpected command %u in decrypt o=
-ffload\n",
-> +                                le16_to_cpu(shdr->Command));
-> +                       rc =3D -EOPNOTSUPP;
-> +               }
-> +
->                 if (rc >=3D 0) {
->  #ifdef CONFIG_CIFS_STATS2
->                         mid->when_received =3D jiffies;
-> @@ -5059,9 +5446,10 @@ receive_encrypted_read(struct TCP_Server_Info *ser=
-ver, struct mid_q_entry **mid,
->  {
->         char *buf =3D server->smallbuf;
->         struct smb2_transform_hdr *tr_hdr =3D (struct smb2_transform_hdr =
-*)buf;
-> +       struct smb2_hdr *shdr;
->         struct iov_iter iter;
-> -       unsigned int len;
-> -       unsigned int buflen =3D server->pdu_size;
-> +       unsigned int len, total_len, buflen =3D server->pdu_size;
-> +       unsigned int read_rsp_size =3D server->vals->read_rsp_size;
->         int rc;
->         struct smb2_decrypt_work *dw;
->
-> @@ -5072,7 +5460,10 @@ receive_encrypted_read(struct TCP_Server_Info *ser=
-ver, struct mid_q_entry **mid,
->         dw->server =3D server;
->
->         *num_mids =3D 1;
-> -       len =3D min_t(unsigned int, buflen, server->vals->read_rsp_size +
-> +       total_len =3D le32_to_cpu(tr_hdr->OriginalMessageSize);
-> +
-> +       /* Read transform_hdr + read_rsp_size into buf */
-> +       len =3D min_t(unsigned int, buflen, read_rsp_size +
->                 sizeof(struct smb2_transform_hdr)) - HEADER_SIZE(server) =
-+ 1;
->
->         rc =3D cifs_read_from_socket(server, buf + HEADER_SIZE(server) - =
-1, len);
-> @@ -5080,9 +5471,8 @@ receive_encrypted_read(struct TCP_Server_Info *serv=
-er, struct mid_q_entry **mid,
->                 goto free_dw;
->         server->total_read +=3D rc;
->
-> -       len =3D le32_to_cpu(tr_hdr->OriginalMessageSize) -
-> -               server->vals->read_rsp_size;
-> -       dw->len =3D len;
-> +       /* Read remaining data into folio_queue */
-> +       dw->len =3D total_len - read_rsp_size;
->         len =3D round_up(dw->len, PAGE_SIZE);
->
->         size_t cur_size =3D 0;
-> @@ -5111,7 +5501,7 @@ receive_encrypted_read(struct TCP_Server_Info *serv=
-er, struct mid_q_entry **mid,
->                 goto free_pages;
->
->         /*
-> -        * For large reads, offload to different thread for better perfor=
-mance,
-> +        * For large responses, offload to different thread for better pe=
-rformance,
->          * use more cores decrypting which can be expensive
->          */
->
-> @@ -5125,20 +5515,41 @@ receive_encrypted_read(struct TCP_Server_Info *se=
-rver, struct mid_q_entry **mid,
->                 return -1;
->         }
->
-> -       rc =3D decrypt_raw_data(server, buf, server->vals->read_rsp_size,
-> -                             &iter, false);
-> +       /* Decrypt: read_rsp_size in buf + remainder in folio_queue */
-> +       rc =3D decrypt_raw_data(server, buf, read_rsp_size, &iter, false)=
-;
->         if (rc)
->                 goto free_pages;
->
-> +       shdr =3D (struct smb2_hdr *) buf;
-> +
-> +       /*
-> +        * buf now contains the complete response header (read_rsp_size b=
-ytes).
-> +        * folio_queue contains (total_len - read_rsp_size) bytes.
-> +        * The handle functions will determine where data actually starts=
- based on data_offset.
-> +        */
-> +
->         *mid =3D smb2_find_mid(server, buf);
->         if (*mid =3D=3D NULL) {
->                 cifs_dbg(FYI, "mid not found\n");
->         } else {
-> -               cifs_dbg(FYI, "mid found\n");
-> +               cifs_dbg(FYI, "mid found, command=3D%u\n", le16_to_cpu(sh=
-dr->Command));
->                 (*mid)->decrypted =3D true;
-> -               rc =3D handle_read_data(server, *mid, buf,
-> -                                     server->vals->read_rsp_size,
-> -                                     dw->buffer, dw->len, false);
-> +
-> +               /* Handle based on command type */
-> +               if (le16_to_cpu(shdr->Command) =3D=3D SMB2_READ) {
-> +                       rc =3D handle_read_data(server, *mid, buf, read_r=
-sp_size,
-> +                                             dw->buffer, dw->len, false)=
-;
-> +               } else if (le16_to_cpu(shdr->Command) =3D=3D SMB2_QUERY_D=
-IRECTORY) {
-> +                       rc =3D handle_query_dir_data(server, *mid, buf, r=
-ead_rsp_size,
-> +                                                  dw->buffer, dw->len, f=
-alse);
-> +               } else {
-> +                       /* For now, other commands not supported in large=
- encrypted path */
-> +                       cifs_server_dbg(VFS,
-> +                                       "Large encrypted responses only s=
-upported for SMB2_READ and SMB2_QUERY_DIRECTORY (got %u)\n",
-> +                                       le16_to_cpu(shdr->Command));
-> +                       rc =3D -EOPNOTSUPP;
-> +               }
-> +
->                 if (rc >=3D 0) {
->                         if (server->ops->is_network_name_deleted) {
->                                 server->ops->is_network_name_deleted(buf,
-> @@ -5279,7 +5690,6 @@ smb3_receive_transform(struct TCP_Server_Info *serv=
-er,
->                 return -ECONNABORTED;
->         }
->
-> -       /* TODO: add support for compounds containing READ. */
->         if (pdu_length > CIFSMaxBufSize + MAX_HEADER_SIZE(server)) {
->                 return receive_encrypted_read(server, &mids[0], num_mids)=
-;
->         }
-> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index 2d55246d2851b..92724cfb5b3f5 100644
-> --- a/fs/smb/client/smb2pdu.c
-> +++ b/fs/smb/client/smb2pdu.c
-> @@ -5496,6 +5496,185 @@ num_entries(int infotype, char *bufstart, char *e=
-nd_of_buf, char **lastentry,
->         return entrycount;
->  }
->
-> +/*
-> + * Callback for async QueryDirectory with multi-credit support
-> + */
-> +static void
-> +smb2_query_dir_callback(struct TCP_Server_Info *server, struct mid_q_ent=
-ry *mid)
-> +{
-> +       struct cifs_query_dir_io *qd_io =3D mid->callback_data;
-> +       struct cifs_tcon *tcon =3D qd_io->tcon;
-> +       struct smb2_hdr *shdr =3D (struct smb2_hdr *)qd_io->iov[0].iov_ba=
-se;
-> +       struct cifs_credits credits =3D {
-> +               .value =3D 0,
-> +               .instance =3D 0,
-> +       };
-> +
-> +       WARN_ONCE(qd_io->server !=3D server,
-> +                 "qd_io server %p !=3D mid server %p",
-> +                 qd_io->server, server);
-> +
-> +       cifs_dbg(FYI, "%s: mid=3D%llu state=3D%d result=3D%d\n",
-> +                __func__, mid->mid, mid->mid_state, qd_io->result);
-> +
-> +       switch (mid->mid_state) {
-> +       case MID_RESPONSE_RECEIVED:
-> +               credits.value =3D le16_to_cpu(shdr->CreditRequest);
-> +               credits.instance =3D server->reconnect_instance;
-> +               /* result already set, check signature if needed */
-> +               if (server->sign && !mid->decrypted) {
-> +                       int rc;
-> +                       struct smb_rqst rqst =3D {
-> +                               .rq_iov =3D &qd_io->iov[0],
-> +                               .rq_nvec =3D qd_io->iov[1].iov_len ? 2 : =
-1,
-> +                       };
-> +
-> +                       rc =3D smb2_verify_signature(&rqst, server);
-> +                       if (rc) {
-> +                               cifs_tcon_dbg(VFS, "QueryDir signature ve=
-rification returned error =3D %d\n",
-> +                                             rc);
-> +                               qd_io->result =3D rc;
-> +                       }
-> +               }
-> +               break;
-> +       case MID_REQUEST_SUBMITTED:
-> +       case MID_RETRY_NEEDED:
-> +               qd_io->result =3D -EAGAIN;
-> +               break;
-> +       case MID_RESPONSE_MALFORMED:
-> +               credits.value =3D le16_to_cpu(shdr->CreditRequest);
-> +               credits.instance =3D server->reconnect_instance;
-> +               qd_io->result =3D smb_EIO(smb_eio_trace_read_rsp_malforme=
-d);
-> +               break;
-> +       default:
-> +               qd_io->result =3D smb_EIO1(smb_eio_trace_read_mid_state_u=
-nknown,
-> +                                        mid->mid_state);
-> +               break;
-> +       }
-> +
-> +       if (qd_io->result && qd_io->result !=3D -ENODATA)
-> +               cifs_stats_fail_inc(tcon, SMB2_QUERY_DIRECTORY_HE);
-> +
-> +       trace_smb3_rw_credits(0, 0, qd_io->credits.value,
-> +                             server->credits, server->in_flight,
-> +                             0, cifs_trace_rw_credits_read_response_clea=
-r);
-> +       qd_io->credits.value =3D 0;
-> +       release_mid(server, mid);
-> +       trace_smb3_rw_credits(0, 0, 0,
-> +                             server->credits, server->in_flight,
-> +                             credits.value, cifs_trace_rw_credits_read_r=
-esponse_add);
-> +       add_credits(server, &credits, 0);
-> +
-> +       complete(&qd_io->done);
-> +}
-> +
-> +/*
-> + * QueryDirectory with large buffer and multi-credit support.
-> + * Uses async infrastructure but waits for completion synchronously.
-> + */
-> +int
-> +SMB2_query_directory_large(struct cifs_query_dir_io *qd_io, unsigned int=
- buf_size)
-> +{
-> +       int rc, flags =3D 0;
-> +       char *buf;
-> +       struct smb2_hdr *shdr;
-> +       struct smb_rqst rqst =3D { .rq_iov =3D &qd_io->iov[0],
-> +                                .rq_nvec =3D SMB2_QUERY_DIRECTORY_IOV_SI=
-ZE };
-> +       struct TCP_Server_Info *server =3D qd_io->server;
-> +       struct cifs_tcon *tcon =3D qd_io->tcon;
-> +       unsigned int total_len;
-> +       int credit_request;
-> +
-> +       cifs_dbg(FYI, "%s: buf_size=3D%u\n", __func__, buf_size);
-> +
-> +       /* Cap buffer size to avoid kmalloc failures for very large alloc=
-ations.
-> +        * SMB2_MAX_QD_DATABUF_SIZE is a safe limit that stays well below=
- typical
-> +        * kmalloc constraints while still allowing large directory listi=
-ngs.
-> +        */
-> +       if (buf_size > SMB2_MAX_QD_DATABUF_SIZE)
-> +               buf_size =3D SMB2_MAX_QD_DATABUF_SIZE;
-> +
-> +       /* Allocate response buffer. Since we'll build a combined header+=
-data buffer,
-> +        * we need space for both. We'll request a slightly smaller Outpu=
-tBufferLength
-> +        * from the server to ensure the total response fits.
-> +        */
-> +       qd_io->combined_iov.iov_base =3D kmalloc(buf_size, GFP_KERNEL);
-> +       if (!qd_io->combined_iov.iov_base)
-> +               return -ENOMEM;
-> +       /* Store total capacity in iov_len; updated to actual data length=
- by receive handler */
-> +       qd_io->combined_iov.iov_len =3D buf_size;
-> +
-> +       /* Initialize completion */
-> +       init_completion(&qd_io->done);
-> +
-> +       /* Request less data from server to leave room for the response h=
-eader.
-> +        * Use MAX_CIFS_SMALL_BUFFER_SIZE as a safety margin.
-> +        */
-> +       rc =3D SMB2_query_directory_init(qd_io->xid, tcon, server,
-> +                                      &rqst, qd_io->persistent_fid,
-> +                                      qd_io->volatile_fid, qd_io->index,
-> +                                      qd_io->srch_inf->info_level,
-> +                                      buf_size - MAX_CIFS_SMALL_BUFFER_S=
-IZE);
-> +       if (rc) {
-> +               kfree(qd_io->combined_iov.iov_base);
-> +               qd_io->combined_iov.iov_base =3D NULL;
-> +               return rc;
-> +       }
-> +
-> +       if (smb3_encryption_required(tcon))
-> +               flags |=3D CIFS_TRANSFORM_REQ;
-> +
-> +       buf =3D rqst.rq_iov[0].iov_base;
-> +       total_len =3D rqst.rq_iov[0].iov_len;
-> +
-> +       shdr =3D (struct smb2_hdr *)buf;
-> +
-> +       if (qd_io->replay) {
-> +               /* Back-off before retry */
-> +               if (qd_io->cur_sleep)
-> +                       msleep(qd_io->cur_sleep);
-> +               smb2_set_replay(server, &rqst);
-> +       }
-> +
-> +       /* Set credit charge based on buffer size */
-> +       if (qd_io->credits.value > 0) {
-> +               shdr->CreditCharge =3D cpu_to_le16(DIV_ROUND_UP(buf_size,
-> +                                               SMB2_MAX_BUFFER_SIZE));
-> +               credit_request =3D le16_to_cpu(shdr->CreditCharge) + 8;
-> +               if (server->credits >=3D server->max_credits)
-> +                       shdr->CreditRequest =3D cpu_to_le16(0);
-> +               else
-> +                       shdr->CreditRequest =3D cpu_to_le16(
-> +                               min_t(int, server->max_credits -
-> +                                               server->credits, credit_r=
-equest));
-> +
-> +               flags |=3D CIFS_HAS_CREDITS;
-> +       }
-> +
-> +       rc =3D cifs_call_async(server, &rqst,
-> +                            cifs_query_dir_receive, smb2_query_dir_callb=
-ack,
-> +                            smb2_query_dir_handle_data, qd_io, flags,
-> +                            &qd_io->credits);
-> +       if (rc) {
-> +               cifs_stats_fail_inc(tcon, SMB2_QUERY_DIRECTORY_HE);
-> +               trace_smb3_query_dir_err(qd_io->xid, qd_io->persistent_fi=
-d,
-> +                                        tcon->tid, tcon->ses->Suid,
-> +                                        qd_io->index, 0, rc);
-> +               kfree(qd_io->combined_iov.iov_base);
-> +               qd_io->combined_iov.iov_base =3D NULL;
-> +       }
-> +
-> +       /* Free request buffer immediately after async call */
-> +       cifs_small_buf_release(buf);
-> +
-> +       if (rc)
-> +               return rc;
-> +
-> +       /* Wait for the async operation to complete */
-> +       wait_for_completion(&qd_io->done);
-> +       return qd_io->result;
-> +}
-> +
->  /*
->   * Readdir/FindFirst
->   */
-> @@ -5560,12 +5739,6 @@ int SMB2_query_directory_init(const unsigned int x=
-id,
->         req->FileNameOffset =3D
->                 cpu_to_le16(sizeof(struct smb2_query_directory_req));
->         req->FileNameLength =3D cpu_to_le16(len);
-> -       /*
-> -        * BB could be 30 bytes or so longer if we used SMB2 specific
-> -        * buffer lengths, but this is safe and close enough.
-> -        */
-> -       output_size =3D min_t(unsigned int, output_size, server->maxBuf);
-> -       output_size =3D min_t(unsigned int, output_size, 2 << 15);
->         req->OutputBufferLength =3D cpu_to_le32(output_size);
->
->         iov[0].iov_base =3D (char *)req;
-> diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
-> index 7b7a864520c68..843e30c1ecc61 100644
-> --- a/fs/smb/client/smb2pdu.h
-> +++ b/fs/smb/client/smb2pdu.h
-> @@ -132,6 +132,9 @@ struct share_redirect_error_context_rsp {
->  /* Size of the minimal QueryDir response for checking if more data exist=
-s */
->  #define SMB2_QD2_RESPONSE_SIZE 4096
->
-> +/* max query directory data buffer size */
-> +#define SMB2_MAX_QD_DATABUF_SIZE (2 * 1024 * 1024)
-> +
->  /*
->   * Output buffer size for first QueryDir in Create+QD1+QD2 compound.
->   * Accounts for shared buffer space needed for all three responses.
-> diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-> index 9de7d2fe8d466..9607e8899f7ff 100644
-> --- a/fs/smb/client/smb2proto.h
-> +++ b/fs/smb/client/smb2proto.h
-> @@ -46,6 +46,8 @@ __le32 smb2_get_lease_state(struct cifsInodeInfo *cinod=
-e, unsigned int oplock);
->  bool smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *se=
-rver);
->  int smb3_handle_read_data(struct TCP_Server_Info *server,
->                           struct mid_q_entry *mid);
-> +int smb2_query_dir_handle_data(struct TCP_Server_Info *server,
-> +                              struct mid_q_entry *mid);
->  struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data=
-,
->                                         struct super_block *sb,
->                                         const unsigned int xid,
-> @@ -197,6 +199,7 @@ int SMB2_query_directory_init(const unsigned int xid,=
- struct cifs_tcon *tcon,
->                               u64 volatile_fid, int index, int info_level=
-,
->                               unsigned int output_size);
->  void SMB2_query_directory_free(struct smb_rqst *rqst);
-> +int SMB2_query_directory_large(struct cifs_query_dir_io *qd_io, unsigned=
- int buf_size);
->  int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
->                  u64 persistent_fid, u64 volatile_fid, u32 pid,
->                  loff_t new_eof);
-> diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-> index acfbb63086ea2..54ee1317c5b12 100644
-> --- a/fs/smb/client/trace.h
-> +++ b/fs/smb/client/trace.h
-> @@ -165,6 +165,7 @@
->         EM(cifs_trace_rw_credits_write_prepare,         "wr-prepare ") \
->         EM(cifs_trace_rw_credits_write_response_add,    "wr-resp-add") \
->         EM(cifs_trace_rw_credits_write_response_clear,  "wr-resp-clr") \
-> +       EM(cifs_trace_rw_credits_query_dir_done,        "qd-done    ") \
->         E_(cifs_trace_rw_credits_zero_in_flight,        "ZERO-IN-FLT")
->
->  #define smb3_tcon_ref_traces                                         \
-> diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-> index 05f8099047e1a..24ccadb00f568 100644
-> --- a/fs/smb/client/transport.c
-> +++ b/fs/smb/client/transport.c
-> @@ -1134,7 +1134,7 @@ cifs_discard_remaining_data(struct TCP_Server_Info =
-*server)
->  }
->
->  static int
-> -__cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry =
-*mid,
-> +__cifs_discard_and_dequeue(struct TCP_Server_Info *server, struct mid_q_=
-entry *mid,
->                      bool malformed)
->  {
->         int length;
-> @@ -1146,12 +1146,161 @@ __cifs_readv_discard(struct TCP_Server_Info *ser=
-ver, struct mid_q_entry *mid,
->         return length;
->  }
->
-> -static int
-> -cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *m=
-id)
-> +/*
-> + * Receive handler for async QueryDirectory with multi-credit support
-> + */
-> +int
-> +cifs_query_dir_receive(struct TCP_Server_Info *server, struct mid_q_entr=
-y *mid)
->  {
-> -       struct cifs_io_subrequest *rdata =3D mid->callback_data;
-> +       int length, len;
-> +       unsigned int data_offset, data_len, resp_size;
-> +       struct cifs_query_dir_io *qd_io =3D mid->callback_data;
-> +       char *buf =3D server->smallbuf;
-> +       unsigned int buflen =3D server->pdu_size;
-> +       struct smb2_query_directory_rsp *rsp;
-> +
-> +       cifs_dbg(FYI, "%s: mid=3D%llu buf_capacity=3D%zu\n",
-> +                __func__, mid->mid, qd_io->combined_iov.iov_len);
-> +
-> +       /*
-> +        * Read the rest of QUERY_DIRECTORY_RSP header (sans Data array).
-> +        * QueryDirectory response structure is 64 bytes (SMB2 header) + =
-8 bytes (fixed part).
-> +        */
-> +       resp_size =3D sizeof(struct smb2_query_directory_rsp);
-> +       len =3D min_t(unsigned int, buflen, resp_size) - HEADER_SIZE(serv=
-er) + 1;
-> +
-> +       length =3D cifs_read_from_socket(server,
-> +                                      buf + HEADER_SIZE(server) - 1, len=
-);
-> +       if (length < 0) {
-> +               qd_io->result =3D length;
-> +               return __cifs_discard_and_dequeue(server, mid, false);
-> +       }
-> +       server->total_read +=3D length;
-> +
-> +       if (server->ops->is_session_expired &&
-> +           server->ops->is_session_expired(buf)) {
-> +               cifs_reconnect(server, true);
-> +               return -1;
-> +       }
-> +
-> +       if (server->ops->is_status_pending &&
-> +           server->ops->is_status_pending(buf, server)) {
-> +               cifs_discard_remaining_data(server);
-> +               return -1;
-> +       }
-> +
-> +       /* Is there enough to get to the rest of the QUERY_DIRECTORY_RSP =
-header? */
-> +       if (server->total_read < resp_size) {
-> +               cifs_dbg(FYI, "%s: server returned short header. got=3D%u=
- expected=3D%u\n",
-> +                        __func__, server->total_read, resp_size);
-> +               qd_io->result =3D smb_EIO2(smb_eio_trace_read_rsp_short,
-> +                                        server->total_read, resp_size);
-> +               return __cifs_discard_and_dequeue(server, mid, true);
-> +       }
-> +
-> +       /* Set up first iov for signature check and to get credits */
-> +       qd_io->iov[0].iov_base =3D buf;
-> +       qd_io->iov[0].iov_len =3D server->total_read;
-> +       qd_io->iov[1].iov_base =3D NULL;
-> +       qd_io->iov[1].iov_len =3D 0;
-> +       cifs_dbg(FYI, "0: iov_base=3D%p iov_len=3D%zu\n",
-> +                qd_io->iov[0].iov_base, qd_io->iov[0].iov_len);
-> +
-> +       /* Parse header early to access status before map_error converts =
-it */
-> +       rsp =3D (struct smb2_query_directory_rsp *)buf;
-> +
-> +       /* Was the SMB query_directory successful? */
-> +       qd_io->result =3D server->ops->map_error(buf, false);
-> +       if (qd_io->result !=3D 0) {
-> +               if (qd_io->combined_iov.iov_base && qd_io->iov[0].iov_len=
- > 0 &&
-> +                   qd_io->iov[0].iov_len <=3D qd_io->combined_iov.iov_le=
-n) {
-> +                       memcpy(qd_io->combined_iov.iov_base, qd_io->iov[0=
-].iov_base,
-> +                              qd_io->iov[0].iov_len);
-> +                       qd_io->iov[0].iov_base =3D qd_io->combined_iov.io=
-v_base;
-> +               }
-> +               cifs_dbg(FYI, "%s: server returned error %d (Status was 0=
-x%x)\n",
-> +                        __func__, qd_io->result, le32_to_cpu(rsp->hdr.St=
-atus));
-> +               return __cifs_discard_and_dequeue(server, mid, false);
-> +       }
-> +
-> +       data_offset =3D le16_to_cpu(rsp->OutputBufferOffset);
-> +       data_len =3D le32_to_cpu(rsp->OutputBufferLength);
-> +
-> +       cifs_dbg(FYI, "%s: total_read=3D%u data_offset=3D%u data_len=3D%u=
-\n",
-> +                __func__, server->total_read, data_offset, data_len);
-> +
-> +       /* Validate data_offset and data_len */
-> +       if (data_offset < server->total_read) {
-> +               cifs_dbg(FYI, "%s: data offset (%u) inside response heade=
-r\n",
-> +                        __func__, data_offset);
-> +               data_offset =3D server->total_read;
-> +               data_len =3D 0;
-> +       } else if (data_offset > MAX_CIFS_SMALL_BUFFER_SIZE) {
-> +               cifs_dbg(FYI, "%s: data offset (%u) beyond end of smallbu=
-f\n",
-> +                        __func__, data_offset);
-> +               qd_io->result =3D smb_EIO1(smb_eio_trace_read_overlarge,
-> +                                        data_offset);
-> +               return __cifs_discard_and_dequeue(server, mid, true);
-> +       }
-> +
-> +       /* Read any padding between header and data */
-> +       len =3D data_offset - server->total_read;
-> +       if (len > 0) {
-> +               length =3D cifs_read_from_socket(server,
-> +                                              buf + server->total_read, =
-len);
-> +               if (length < 0) {
-> +                       qd_io->result =3D length;
-> +                       return __cifs_discard_and_dequeue(server, mid, fa=
-lse);
-> +               }
-> +               server->total_read +=3D length;
-> +               qd_io->iov[0].iov_len =3D server->total_read;
-> +       }
-> +
-> +       /* Check if data fits in the pre-allocated combined buffer */
-> +       if (qd_io->iov[0].iov_len + data_len > qd_io->combined_iov.iov_le=
-n) {
-> +               cifs_dbg(VFS, "%s: response (%zu + %u) exceeds buffer cap=
-acity (%zu)\n",
-> +                        __func__, qd_io->iov[0].iov_len, data_len, qd_io=
-->combined_iov.iov_len);
-> +               qd_io->result =3D smb_EIO2(smb_eio_trace_read_rsp_malform=
-ed,
-> +                                        data_len, (unsigned int)qd_io->c=
-ombined_iov.iov_len);
-> +               return __cifs_discard_and_dequeue(server, mid, true);
-> +       }
-> +
-> +       /*
-> +        * Build combined header+data in qd_io->combined_iov.iov_base,
-> +        * preserving the wire layout so SMB2 signing can be verified aga=
-inst
-> +        * the exact on-the-wire bytes.  hdr_len already accounts for the
-> +        * header and any padding up to data_offset; data is read at that
-> +        * same offset.  OutputBufferOffset/Length are left untouched.
-> +        */
-> +       if (qd_io->iov[0].iov_len > 0 && qd_io->result =3D=3D 0) {
-> +               size_t hdr_len =3D qd_io->iov[0].iov_len;
-> +
-> +               /* Copy header+padding to combined buffer, preserving wir=
-e layout */
-> +               memcpy(qd_io->combined_iov.iov_base, qd_io->iov[0].iov_ba=
-se, hdr_len);
-> +
-> +               /* Read directory entries at the wire data_offset positio=
-n */
-> +               if (data_len > 0) {
-> +                       length =3D cifs_read_from_socket(server,
-> +                                                      qd_io->combined_io=
-v.iov_base + hdr_len,
-> +                                                      data_len);
-> +                       if (length < 0) {
-> +                               qd_io->result =3D length;
-> +                               return __cifs_discard_and_dequeue(server,=
- mid, false);
-> +                       }
-> +                       server->total_read +=3D length;
-> +
-> +                       /* Set up second iov pointing to the directory da=
-ta within combined buffer */
-> +                       qd_io->iov[1].iov_base =3D qd_io->combined_iov.io=
-v_base + hdr_len;
-> +                       qd_io->iov[1].iov_len =3D length;
-> +               }
-> +
-> +               qd_io->combined_iov.iov_len =3D hdr_len + (data_len > 0 ?=
- length : 0);
-> +
-> +               cifs_dbg(FYI, "total_read=3D%u buflen=3D%u data_len=3D%u =
-hdr_len=3D%zu combined_len=3D%zu\n",
-> +                        server->total_read, buflen, data_len, hdr_len, q=
-d_io->combined_iov.iov_len);
-> +       }
->
-> -       return  __cifs_readv_discard(server, mid, rdata->result);
-> +       return __cifs_discard_and_dequeue(server, mid, false);
->  }
->
->  int
-> @@ -1205,7 +1354,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, =
-struct mid_q_entry *mid)
->                 cifs_dbg(FYI, "%s: server returned error %d\n",
->                          __func__, rdata->result);
->                 /* normal error on read response */
-> -               return __cifs_readv_discard(server, mid, false);
-> +               return __cifs_discard_and_dequeue(server, mid, false);
->         }
->
->         /* Is there enough to get to the rest of the READ_RSP header? */
-> @@ -1215,7 +1364,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, =
-struct mid_q_entry *mid)
->                          server->vals->read_rsp_size);
->                 rdata->result =3D smb_EIO2(smb_eio_trace_read_rsp_short,
->                                          server->total_read, server->vals=
-->read_rsp_size);
-> -               return cifs_readv_discard(server, mid);
-> +               return __cifs_discard_and_dequeue(server, mid, rdata->res=
-ult);
->         }
->
->         data_offset =3D server->ops->read_data_offset(buf);
-> @@ -1234,7 +1383,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, =
-struct mid_q_entry *mid)
->                          __func__, data_offset);
->                 rdata->result =3D smb_EIO1(smb_eio_trace_read_overlarge,
->                                          data_offset);
-> -               return cifs_readv_discard(server, mid);
-> +               return __cifs_discard_and_dequeue(server, mid, rdata->res=
-ult);
->         }
->
->         cifs_dbg(FYI, "%s: total_read=3D%u data_offset=3D%u\n",
-> @@ -1260,7 +1409,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, =
-struct mid_q_entry *mid)
->                 /* data_len is corrupt -- discard frame */
->                 rdata->result =3D smb_EIO2(smb_eio_trace_read_rsp_malform=
-ed,
->                                          data_offset + data_len, buflen);
-> -               return cifs_readv_discard(server, mid);
-> +               return __cifs_discard_and_dequeue(server, mid, rdata->res=
-ult);
->         }
->
->  #ifdef CONFIG_CIFS_SMB_DIRECT
-> @@ -1279,7 +1428,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, =
-struct mid_q_entry *mid)
->
->         /* discard anything left over */
->         if (server->total_read < buflen)
-> -               return cifs_readv_discard(server, mid);
-> +               return __cifs_discard_and_dequeue(server, mid, rdata->res=
-ult);
->
->         dequeue_mid(server, mid, false);
->         mid->resp_buf =3D server->smallbuf;
-> --
-> 2.43.0
->
+[ Upstream commit 8cb6fc3231500233ddaf63cb7fd5435008d9ed5f ]
 
+Per MS-SMB2 section 3.2.5.3, Session.SessionKey is the first 16 bytes
+of the GSS cryptographic key, right-padded with zero bytes if the key
+is shorter than 16 bytes.
 
---=20
-Thanks,
+SMB2_auth_kerberos() copies the GSS session key from the cifs.upcall
+response using kmemdup(msg->data, msg->sesskey_len, ...) and stores
+the GSS-reported length verbatim in ses->auth_key.len. generate_key()
+reads SMB2_NTLMV2_SESSKEY_SIZE bytes from this buffer when feeding the
+HMAC-SHA256 KDF for signing key derivation. If a GSS mechanism returns
+a session key shorter than 16 bytes (e.g. a deprecated single-DES
+Kerberos enctype with an 8-byte session key), the KDF call performs an
+out-of-bounds slab read and derives keys that do not match the server,
+which pads per the spec.
 
-Steve
+Modern KDCs disable short-key enctypes by default, so this is latent
+rather than reachable in production, but it is still a kernel heap
+over-read.
+
+Allocate auth_key.response with kzalloc() at a length of
+max(msg->sesskey_len, SMB2_NTLMV2_SESSKEY_SIZE), copy the GSS key in,
+and rely on kzalloc()'s zero initialization for the spec-mandated
+padding. Set ses->auth_key.len to the padded length. Larger GSS keys
+(e.g. the 32-byte aes256-cts-hmac-sha1-96 session key) continue to be
+stored at their natural length, preserving the FullSessionKey path.
+
+Emit a cifs_dbg(VFS, ...) message when a short key is encountered to
+surface deprecated-enctype usage.
+
+NTLMv2 and NTLMSSP code paths produce a 16-byte session key by
+construction and are unaffected.
+
+Signed-off-by: Piyush Sachdeva <psachdeva@microsoft.com>
+Signed-off-by: Piyush Sachdeva <s.piyush1024@gmail.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+## Phase Walkthrough
+### Phase 1: Commit Message Forensics
+Record 1.1: subsystem `smb: client`; action verb `Zero-pad`; intent is
+to make short GSS session keys comply with MS-SMB2 and avoid short-
+buffer use in SMB2 key derivation.
+
+Record 1.2: tags present are:
+- `Signed-off-by: Piyush Sachdeva <psachdeva@microsoft.com>`
+- `Signed-off-by: Piyush Sachdeva <s.piyush1024@gmail.com>`
+- `Signed-off-by: Steve French <stfrench@microsoft.com>`
+
+No `Fixes:`, `Reported-by:`, `Tested-by:`, `Reviewed-by:`, `Acked-by:`,
+`Link:`, or `Cc: stable@vger.kernel.org` tag was present in the supplied
+commit message.
+
+Record 1.3: the commit describes a real memory-safety bug:
+`SMB2_auth_kerberos()` allocates exactly `msg->sesskey_len` bytes, but
+SMB2 key derivation later consumes `SMB2_NTLMV2_SESSKEY_SIZE` bytes,
+which is `16`. If `msg->sesskey_len < 16`, the kernel reads past the
+allocated buffer and also derives a non-spec-compliant key. MS-SMB2 says
+`Session.SessionKey` is the first 16 bytes of the cryptographic key,
+right-padded with zeros if shorter.
+
+Record 1.4: this is not just cleanup. It is a hidden memory-safety and
+protocol-correctness fix: short allocation plus fixed 16-byte HMAC key
+input creates an out-of-bounds read.
+
+### Phase 2: Diff Analysis
+Record 2.1: one file changed: `fs/smb/client/smb2pdu.c`, one hunk in
+`SMB2_auth_kerberos()`, roughly 18 insertions and 5 deletions from the
+supplied diff. Scope is a single-file surgical fix.
+
+Record 2.2: before, `ses->auth_key.response = kmemdup(msg->data,
+msg->sesskey_len, GFP_KERNEL)` and `ses->auth_key.len =
+msg->sesskey_len`. After, the code sets `ses->auth_key.len =
+max(msg->sesskey_len, 16)`, allocates a zeroed buffer of that size,
+copies only the original GSS key, and leaves zero padding if the key was
+short.
+
+Record 2.3: bug category is memory safety / out-of-bounds read plus
+protocol correctness. The verified consumer is `generate_key()` in
+`fs/smb/client/smb2transport.c`, which calls
+`hmac_sha256_init_usingrawkey(&hmac_ctx, ses->auth_key.response,
+SMB2_NTLMV2_SESSKEY_SIZE)`. The HMAC helper copies `raw_key_len` bytes
+from the pointer, so a shorter allocation is a real over-read.
+
+Record 2.4: fix quality is good: it preserves larger keys, fixes only
+Kerberos/GSS key storage, does not change the security blob pointer, and
+uses zeroed allocation to implement the spec padding. Regression risk is
+low; the only behavior change for short keys is from invalid over-
+read/wrong key material to zero-padded spec behavior. It adds one VFS
+debug message for short keys.
+
+### Phase 3: Git History Investigation
+Record 3.1: `git blame` on current `fs/smb/client/smb2pdu.c` shows the
+current `kmemdup(msg->data, msg->sesskey_len)` lines came from
+`d9d1e319b39e` (`smb: client: fix broken multichannel with
+krb5+signing`), first contained in local tags starting at `v7.0`. The
+fixed-size 16-byte HMAC use in current `generate_key()` came from
+`4b4c6fdb25de`, first contained in local tags starting at `v6.18`.
+
+Record 3.2: no `Fixes:` tag is present, so there was no tagged
+introducing commit to follow.
+
+Record 3.3: recent local history for `smb2pdu.c` includes related
+Kerberos/multichannel work (`d9d1e319b39e`). Recent `smb2transport.c`
+history includes crypto-library conversion commits. The candidate itself
+is standalone for current `v7.0.y` context.
+
+Record 3.4: local `git log master --author='Piyush Sachdeva' -10 --
+fs/smb/client fs/cifs` found no matching prior local commits. `Steve
+French` is listed in `MAINTAINERS` as maintainer for `COMMON INTERNET
+FILE SYSTEM CLIENT (CIFS and SMB3)`, and he signed off this patch.
+
+Record 3.5: no functional dependency was found for the current `v7.0.y`
+file: `git apply --check` of the supplied patch against this checkout
+succeeded. Older stable trees need path/context adjustments because
+older releases use `fs/cifs/` and some have the allocation inside an `if
+(!is_binding)` / `if (!ses->binding)` block.
+
+### Phase 4: Mailing List and External Research
+Record 4.1: no candidate commit hash was available locally. `git log
+master`, `pending-7.0`, and `for-greg/7.0-200` with the exact subject
+found no commit. `b4 dig -c '<subject>'`, `b4 dig -a`, and `b4 dig -w`
+failed because `b4 dig` needs a commitish.
+
+Record 4.2: reviewer/recipient data could not be obtained from `b4 dig`
+for this candidate. The only maintainer signal verified is Steve
+French’s signoff and MAINTAINERS entry.
+
+Record 4.3: no `Link:` or `Reported-by:` tags exist. Lore web queries
+were blocked by Anubis, so no bug-report thread was verified.
+
+Record 4.4: no series context was verified. No local subject match was
+found in searched branches.
+
+Record 4.5: stable-list search via lore was blocked by Anubis; no
+stable-specific discussion was verified.
+
+### Phase 5: Code Semantic Analysis
+Record 5.1: modified function: `SMB2_auth_kerberos()`.
+
+Record 5.2: caller path verified locally: `connect.c` calls
+`server->ops->sess_setup()`, SMB2/SMB3 ops point that to
+`SMB2_sess_setup()`, `SMB2_select_sec()` selects `SMB2_auth_kerberos()`
+for Kerberos, and `SMB2_sess_setup()` runs the selected auth function.
+
+Record 5.3: key callees are `cifs_get_spnego_key()`,
+`SMB2_sess_sendreceive()`, and `SMB2_sess_establish_session()`.
+`SMB2_sess_establish_session()` calls
+`server->ops->generate_signingkey()`, which reaches
+`generate_smb3signingkey()` and then `generate_key()` for SMB3 dialects.
+
+Record 5.4: reachability is from a user-requested CIFS/SMB mount using
+Kerberos, with `CONFIG_CIFS_UPCALL` enabled. `Kconfig` says
+`CIFS_UPCALL` enables Kerberos/SPNEGO advanced session setup and is used
+for Kerberos tickets needed to mount secure servers.
+
+Record 5.5: similar short allocation plus 16-byte consumer patterns
+exist across stable tags. I verified the same `kmemdup(msg->data,
+msg->sesskey_len)` and 16-byte key use in `v5.4`, `v5.10`, `v5.15`,
+`v6.1`, `v6.6`, `v6.12`, `v6.18`, `v6.19`, and `v7.0`, with path changes
+from `fs/cifs/` to `fs/smb/client/`.
+
+### Phase 6: Cross-Referencing and Stable Tree Analysis
+Record 6.1: buggy code exists in multiple stable-era tags. `v5.4`
+through `v6.1` use `fs/cifs/`; `v6.6+` uses `fs/smb/client/`. The
+relevant allocation and 16-byte key consumption pattern is present in
+those checked tags.
+
+Record 6.2: expected backport difficulty is clean for current `v7.0.y`
+because `git apply --check` succeeded. Older stable trees need minor
+backporting for path and context differences; pre-`d9d1e319b39e` trees
+should preserve their existing binding conditional unless that
+multichannel Kerberos fix is also backported.
+
+Record 6.3: local searches for the exact subject, `short GSS session
+key`, and related `MS-SMB2` terms did not find an existing local fix.
+
+### Phase 7: Subsystem and Maintainer Context
+Record 7.1: subsystem is CIFS/SMB3 client filesystem/network filesystem
+code. Criticality is important: it affects users mounting SMB shares
+with Kerberos/SPNEGO.
+
+Record 7.2: subsystem is active; recent `master` history under
+`fs/smb/client` includes multiple SMB client fixes and refactors. The
+maintained subsystem is marked `Supported` in `MAINTAINERS`.
+
+### Phase 8: Impact and Risk Assessment
+Record 8.1: affected population is config- and workload-specific:
+CIFS/SMB2+ Kerberos users with `CONFIG_CIFS_UPCALL`, especially where
+the GSS session key returned to the kernel is shorter than 16 bytes.
+
+Record 8.2: trigger condition is a Kerberos/SPNEGO session setup where
+`msg->sesskey_len < SMB2_NTLMV2_SESSKEY_SIZE`. The mount path is user
+reachable, but whether unprivileged users can trigger it depends on
+mount permissions and local configuration, which I did not verify.
+
+Record 8.3: failure mode is a kernel heap out-of-bounds read during HMAC
+key setup and incorrect SMB key derivation. Severity is high for memory
+safety, though likely low-frequency because it requires a short GSS
+session key.
+
+Record 8.4: benefit is high for affected users because it removes a
+kernel heap over-read and implements the protocol-required padding. Risk
+is low because the patch is small, local, and preserves behavior for
+keys of length 16 or greater.
+
+### Phase 9: Final Synthesis
+Record 9.1: evidence for backporting:
+- Verified short allocation in `SMB2_auth_kerberos()`.
+- Verified fixed 16-byte read in `generate_key()`.
+- Verified HMAC helper copies the specified key length.
+- Verified MS-SMB2 requires right-zero-padding short session keys.
+- Verified bug pattern exists across multiple stable-era tags.
+- Fix is small, local, and cleanly applies to current `v7.0.y`.
+
+Evidence against / concerns:
+- No `Reported-by`, `Tested-by`, `Reviewed-by`, `Fixes`, or `Link` tag
+  was supplied.
+- No lore review discussion could be verified.
+- Older stable trees need minor path/context backport adjustments.
+- Trigger appears specific to short GSS keys; I did not independently
+  verify real-world frequency.
+
+Unresolved:
+- No upstream commit hash was available locally, so `b4 dig` could not
+  retrieve the original thread.
+- Lore web searches were blocked.
+- I did not compile-test the patch.
+
+Record 9.2 stable rules:
+1. Obviously correct and tested: obviously correct by code inspection;
+   external testing not verified.
+2. Fixes a real bug: yes, verified out-of-bounds read when `sesskey_len
+   < 16`.
+3. Important issue: yes, kernel heap over-read and broken key
+   derivation.
+4. Small and contained: yes, one function in one file.
+5. No new feature/API: yes, no new API or userspace interface.
+6. Can apply to stable: yes for current `v7.0.y`; minor backport work
+   needed for older trees.
+
+Record 9.3: no automatic exception category applies. This is not a
+device ID, quirk, DT, build, or documentation-only change.
+
+Record 9.4: decision is to backport. The memory-safety fix is small and
+technically well justified; the limited trigger scope reduces urgency
+but not suitability.
+
+## Verification
+- [Phase 1] Parsed the supplied subject and tags; no `Fixes`, `Reported-
+  by`, `Tested-by`, `Reviewed-by`, `Link`, or stable Cc was present.
+- [Phase 2] Read `SMB2_auth_kerberos()` in `fs/smb/client/smb2pdu.c`;
+  verified current exact-size `kmemdup()` allocation and
+  `ses->auth_key.len = msg->sesskey_len`.
+- [Phase 2] Read `generate_key()` in `fs/smb/client/smb2transport.c`;
+  verified it passes `SMB2_NTLMV2_SESSKEY_SIZE` bytes from
+  `ses->auth_key.response`.
+- [Phase 2] Read `lib/crypto/sha256.c`; verified HMAC raw-key setup
+  copies `raw_key_len` bytes from the supplied pointer.
+- [Phase 2] Verified `SMB2_NTLMV2_SESSKEY_SIZE` is `16` in
+  `fs/smb/common/smb2pdu.h`.
+- [Phase 3] `git blame` identified local current-line history for the
+  allocation and HMAC key setup.
+- [Phase 3] `git show` inspected `d9d1e319b39e` and `4b4c6fdb25de`.
+- [Phase 3] `git tag --contains` showed `d9d1e319b39e` starts at local
+  `v7.0` tags and `4b4c6fdb25de` at local `v6.18` tags.
+- [Phase 4] `b4 dig` attempts by subject failed because no local
+  commitish exists; lore WebFetch searches were blocked by Anubis.
+- [Phase 5] `rg` and `ReadFile` traced `connect.c -> SMB2_sess_setup()
+  -> SMB2_auth_kerberos() -> SMB2_sess_establish_session() ->
+  generate_key()`.
+- [Phase 6] Checked `v5.4`, `v5.10`, `v5.15`, `v6.1`, `v6.6`, `v6.12`,
+  `v6.18`, `v6.19`, and `v7.0` for the allocation and 16-byte consumer
+  pattern.
+- [Phase 6] `git apply --check` confirmed the supplied patch applies
+  cleanly to current `v7.0.y`.
+- [Phase 7] Verified CIFS/SMB3 client maintainership and supported
+  status in `MAINTAINERS`.
+- [Phase 8] Verified `CONFIG_CIFS_UPCALL` Kconfig text describes
+  Kerberos/SPNEGO upcall support for secure SMB mounts.
+- UNVERIFIED: original mailing-list review, patch revisions, explicit
+  stable discussion, compile-test results, and real-world frequency of
+  short GSS session keys.
+
+**YES**
+
+ fs/smb/client/smb2pdu.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 5188218c25be4..0792e0c38b44f 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -1714,17 +1714,30 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
+ 	is_binding = (ses->ses_status == SES_GOOD);
+ 	spin_unlock(&ses->ses_lock);
+ 
++	/*
++	 * Per MS-SMB2 3.2.5.3, Session.SessionKey is the first 16 bytes of the
++	 * GSS cryptographic key, right-padded with zero bytes if shorter.
++	 * Allocate at least SMB2_NTLMV2_SESSKEY_SIZE bytes (zeroed) so the KDF
++	 * input buffer is always valid for HMAC-SHA256 even with deprecated
++	 * Kerberos enctypes that return a short session key.
++	 */
++	if (unlikely(msg->sesskey_len < SMB2_NTLMV2_SESSKEY_SIZE))
++		cifs_dbg(VFS,
++			 "short GSS session key (%u bytes); zero-padding per MS-SMB2 3.2.5.3\n",
++			 msg->sesskey_len);
++
+ 	kfree_sensitive(ses->auth_key.response);
+-	ses->auth_key.response = kmemdup(msg->data,
+-					 msg->sesskey_len,
+-					 GFP_KERNEL);
++	ses->auth_key.len = max_t(unsigned int, msg->sesskey_len,
++				  SMB2_NTLMV2_SESSKEY_SIZE);
++	ses->auth_key.response = kzalloc(ses->auth_key.len, GFP_KERNEL);
+ 	if (!ses->auth_key.response) {
+ 		cifs_dbg(VFS, "%s: can't allocate (%u bytes) memory\n",
+-			 __func__, msg->sesskey_len);
++			 __func__, ses->auth_key.len);
++		ses->auth_key.len = 0;
+ 		rc = -ENOMEM;
+ 		goto out_put_spnego_key;
+ 	}
+-	ses->auth_key.len = msg->sesskey_len;
++	memcpy(ses->auth_key.response, msg->data, msg->sesskey_len);
+ 
+ 	sess_data->iov[1].iov_base = msg->data + msg->sesskey_len;
+ 	sess_data->iov[1].iov_len = msg->secblob_len;
+-- 
+2.53.0
+
