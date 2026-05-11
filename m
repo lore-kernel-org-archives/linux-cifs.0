@@ -1,43 +1,42 @@
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9142B3A3E9C;
-	Mon, 11 May 2026 12:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAA9394471;
+	Mon, 11 May 2026 13:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778503597; cv=none; b=BHJXS8IIR4+qzcILx7UURg8st/nvzHpC7MuTeBZ7l9lbIQR8ndmIzA9jgauiKH3CjryvE4B7kAP/AZ6dXt3Lym2EL4uBcCOV5XBQ+ALuPZmtA9lbgljPKyrs1ulsepYxL3lgIKE5GQQct9hDtf1sAsjnAkZIVGxKby7sD0CHGJk=
+	t=1778505515; cv=none; b=DYSKryORyStFXQl7RMn336OR7SM8lwMl9uHn8i0ZxYs/1h2FiCr8iID9ANuQSvqqUjAC+brGR7gyb5To3m8QMXBkrSc7eod5viRt0dvpUMu8nKA1/YupTpHlQoAWdFxIrNBZfzfUcLNjWKedPHgfcPcErW7FDSH1kMeUBRGCaGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778503597; c=relaxed/simple;
-	bh=oiytH4jcOOQ4aVAeWSl58QOPMIeSZGNgc/9D75Azq10=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MHhjQ/QzGQZErovYR5vyz78uSAax4bZEBNsl7lUB8U72RCnWm0sOqAE77pWhHg2J/YtecLFXATHs/4+plQ3i1Sn0Cgjik88TZtFy209Qn6Mb7OacLejq4r19BKhuldhSdCiry/i1hRrglvbSJU602PtlIwYRgsI4Lqo1yC/2JD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=q5riTVlg; arc=none smtp.client-ip=115.124.30.101
+	s=arc-20240116; t=1778505515; c=relaxed/simple;
+	bh=tSxu3v1zFVmz1Ow1glgROXhvIIbM5P+KMcZs43VSTrg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bHdGz27IbQupPfYauEGCefjz/ayIuF823R0g+JYozcMSjaVHy/mqQr84g0AEoioAzCjNxPpQo5n6Nhgqt1LCLaIeSvaZqkH4QlO0i1WzoxUXG2WV1kiVSadQTnzQRnCCX6dOGG0/oIvZs3mrY6ky77r3nBIGYLlRzTX7NqzRiCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ITKhP3HM; arc=none smtp.client-ip=115.124.30.97
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="q5riTVlg"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ITKhP3HM"
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1778503591; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=jj4XmQSi4do2CwZ55558GXwNtUuL4SsD8XOJuifWJt4=;
-	b=q5riTVlgxdkQL1EsIV16UqEu2A7jASvgnLay5EOcKQKdRRRRJMQlTqv74jSq3PA9a7BOlyDP+pEqYw7WtblHHUfRNQTl9CyLVqmml7vXopp2O55SS0TJnZyQQqUTzz6fDM0tLYhDYr8QuQndxnHz7p4F9rtnqWVqaKKK/Fr3hig=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=mengferry@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0X2jWrKK_1778503586;
-Received: from localhost(mailfrom:mengferry@linux.alibaba.com fp:SMTPD_---0X2jWrKK_1778503586 cluster:ay36)
+	t=1778505506; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=qMTukbhOsh4wTjLAvEST29FKEUGQSBkjs6AvGD3bNxM=;
+	b=ITKhP3HM+6/6dIioCD3Y4siAI3nDphv/tA1FBQrQWZ51ednKoLEjKlMN0yluNOKkN8U0AEIT25VeVe/aOw6L9FB2IPLSw0X2rHrKwyXXLz44Pfr3zUOUBjzgIUV4xMXzzOzCEbP8EBBAAWBahKSLKQSK04fdHIDGRktY3ZxhTw0=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R901e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=mengferry@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0X2kmh0a_1778505499;
+Received: from localhost(mailfrom:mengferry@linux.alibaba.com fp:SMTPD_---0X2kmh0a_1778505499 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Mon, 11 May 2026 20:46:30 +0800
+          Mon, 11 May 2026 21:18:26 +0800
 From: Ferry Meng <mengferry@linux.alibaba.com>
-To: stable@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Tom Talpey <tom@talpey.com>,
-	Henrique Carvalho <henrique.carvalho@suse.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Tristan Madani <tristan@talencesecurity.com>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
 	Ferry Meng <mengferry@linux.alibaba.com>
-Subject: [PATCH 6.6.y] ksmbd: make ksmbd thread names distinct by client IP
-Date: Mon, 11 May 2026 20:46:25 +0800
-Message-Id: <20260511124625.52768-1-mengferry@linux.alibaba.com>
+Subject: [PATCH] ksmbd: fix SID memory leak in set_posix_acl_entries_dacl() on overflow
+Date: Mon, 11 May 2026 21:18:16 +0800
+Message-Id: <20260511131816.93314-1-mengferry@linux.alibaba.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -47,106 +46,72 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Namjae Jeon <linkinjeon@kernel.org>
+Commit 299f962c0b02 ("ksmbd: use check_add_overflow() to prevent u16
+DACL size overflow") added check_add_overflow() guards that break out
+of the ACE-building loops in set_posix_acl_entries_dacl() when the
+accumulated DACL size would wrap past 65535.
 
-commit 5da92a251e41f824d7e6b4d54d65dcdcfd69fda3 upstream.
+However, each iteration allocates a struct smb_sid via kmalloc_obj()
+at the top of the loop and relies on the kfree(sid) call at the end
+of the loop body (the 'pass_same_sid' label in the first loop, and
+the explicit kfree at the tail of the second loop) to release it.
+The newly introduced 'break' statements bypass those kfree() calls,
+leaking the sid buffer every time an overflow is detected.
 
-[backport needed for 6.6-stable to close a residual
- active_num_conn leak. Commits 787769c8cc50 (upstream 77ffbcac4e56,
- "smb: server: fix leak of active_num_conn in ksmbd_tcp_new_connection()")
- and 97f8d2648ef4 (upstream 6551300dc452, "smb: server: fix
- active_num_conn leak on transport allocation failure") were
- backported to 6.6.y, but upstream 77ffbcac4e56 was built on top
- of this commit, which removes kernel_getpeername() and the
- out_error: label in ksmbd_tcp_new_connection(). Without this
- commit, the kernel_getpeername() failure path still calls
- free_transport(t) and leaks active_num_conn, eventually
- exhausting max_connections until the module is reloaded.]
+A malicious or malformed file with enough POSIX ACL entries to trip
+the overflow check will leak one or more struct smb_sid allocations
+on every request that touches the file's DACL, providing a trivial
+kernel memory exhaustion vector.
 
-This patch makes ksmbd thread names distinct by client IP address.
+Free sid before breaking out of the loops to plug the leak.
 
-100943 ?        S      0:00 [ksmbd:::ffff:10.177.110.57]
- or
-101752 ?        S      0:00 [ksmbd:10.177.110.57]
-
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
+Fixes: 299f962c0b02 ("ksmbd: use check_add_overflow() to prevent u16 DACL size overflow")
+Cc: stable@vger.kernel.org
 Signed-off-by: Ferry Meng <mengferry@linux.alibaba.com>
 ---
- fs/smb/server/transport_tcp.c | 39 ++++++++++++-----------------------
- 1 file changed, 13 insertions(+), 26 deletions(-)
+ fs/smb/server/smbacl.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index e55afd0c9bf4..f04aa8c504ff 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -173,17 +173,6 @@ static struct kvec *get_conn_iovec(struct tcp_transport *t, unsigned int nr_segs
- 	return new_iov;
- }
- 
--static unsigned short ksmbd_tcp_get_port(const struct sockaddr *sa)
--{
--	switch (sa->sa_family) {
--	case AF_INET:
--		return ntohs(((struct sockaddr_in *)sa)->sin_port);
--	case AF_INET6:
--		return ntohs(((struct sockaddr_in6 *)sa)->sin6_port);
--	}
--	return 0;
--}
--
- /**
-  * ksmbd_tcp_new_connection() - create a new tcp session on mount
-  * @client_sk:	socket associated with new connection
-@@ -195,7 +184,6 @@ static unsigned short ksmbd_tcp_get_port(const struct sockaddr *sa)
-  */
- static int ksmbd_tcp_new_connection(struct socket *client_sk)
- {
--	struct sockaddr *csin;
- 	int rc = 0;
- 	struct tcp_transport *t;
- 	struct task_struct *handler;
-@@ -208,27 +196,26 @@ static int ksmbd_tcp_new_connection(struct socket *client_sk)
- 		return -ENOMEM;
- 	}
- 
--	csin = KSMBD_TCP_PEER_SOCKADDR(KSMBD_TRANS(t)->conn);
--	if (kernel_getpeername(client_sk, csin) < 0) {
--		pr_err("client ip resolution failed\n");
--		rc = -EINVAL;
--		goto out_error;
--	}
--
-+#if IS_ENABLED(CONFIG_IPV6)
-+	if (client_sk->sk->sk_family == AF_INET6)
-+		handler = kthread_run(ksmbd_conn_handler_loop,
-+				KSMBD_TRANS(t)->conn, "ksmbd:%pI6c",
-+				&KSMBD_TRANS(t)->conn->inet6_addr);
-+	else
-+		handler = kthread_run(ksmbd_conn_handler_loop,
-+				KSMBD_TRANS(t)->conn, "ksmbd:%pI4",
-+				&KSMBD_TRANS(t)->conn->inet_addr);
-+#else
- 	handler = kthread_run(ksmbd_conn_handler_loop,
--			      KSMBD_TRANS(t)->conn,
--			      "ksmbd:%u",
--			      ksmbd_tcp_get_port(csin));
-+			KSMBD_TRANS(t)->conn, "ksmbd:%pI4",
-+			&KSMBD_TRANS(t)->conn->inet_addr);
-+#endif
- 	if (IS_ERR(handler)) {
- 		pr_err("cannot start conn thread\n");
- 		rc = PTR_ERR(handler);
- 		ksmbd_tcp_disconnect(KSMBD_TRANS(t));
- 	}
- 	return rc;
--
--out_error:
--	free_transport(t);
--	return rc;
- }
- 
- /**
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index c1d1f34581d6..9161e9d7ed24 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -643,8 +643,10 @@ static void set_posix_acl_entries_dacl(struct mnt_idmap *idmap,
+ 		ntace = (struct smb_ace *)((char *)pndace + *size);
+ 		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, flags,
+ 				pace->e_perm, 0777);
+-		if (check_add_overflow(*size, ace_sz, size))
++		if (check_add_overflow(*size, ace_sz, size)) {
++			kfree(sid);
+ 			break;
++		}
+ 		(*num_aces)++;
+ 		if (pace->e_tag == ACL_USER)
+ 			ntace->access_req |=
+@@ -655,8 +657,10 @@ static void set_posix_acl_entries_dacl(struct mnt_idmap *idmap,
+ 			ntace = (struct smb_ace *)((char *)pndace + *size);
+ 			ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED,
+ 					0x03, pace->e_perm, 0777);
+-			if (check_add_overflow(*size, ace_sz, size))
++			if (check_add_overflow(*size, ace_sz, size)) {
++				kfree(sid);
+ 				break;
++			}
+ 			(*num_aces)++;
+ 			if (pace->e_tag == ACL_USER)
+ 				ntace->access_req |=
+@@ -698,8 +702,10 @@ static void set_posix_acl_entries_dacl(struct mnt_idmap *idmap,
+ 		ntace = (struct smb_ace *)((char *)pndace + *size);
+ 		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, 0x0b,
+ 				pace->e_perm, 0777);
+-		if (check_add_overflow(*size, ace_sz, size))
++		if (check_add_overflow(*size, ace_sz, size)) {
++			kfree(sid);
+ 			break;
++		}
+ 		(*num_aces)++;
+ 		if (pace->e_tag == ACL_USER)
+ 			ntace->access_req |=
 -- 
 2.43.5
 
