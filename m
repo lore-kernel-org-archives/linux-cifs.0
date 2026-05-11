@@ -1,117 +1,135 @@
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAA9394471;
-	Mon, 11 May 2026 13:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97E13F7896;
+	Mon, 11 May 2026 14:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778505515; cv=none; b=DYSKryORyStFXQl7RMn336OR7SM8lwMl9uHn8i0ZxYs/1h2FiCr8iID9ANuQSvqqUjAC+brGR7gyb5To3m8QMXBkrSc7eod5viRt0dvpUMu8nKA1/YupTpHlQoAWdFxIrNBZfzfUcLNjWKedPHgfcPcErW7FDSH1kMeUBRGCaGk=
+	t=1778508171; cv=none; b=aiKjwl/cX/mv0TuS+oAcJD5sqgN1InEEBWhR4UESh1YbT7BphbrN3JXilS5WoNzhYxq4k2uf4GCWok1dOlRW4EA8g0KCeS136mE5mzcbxX+QGgaiBWDgkQYdut7OquYb9AAWx8LQxKC2lsW18aY5lkjOvGbDbbPH+sW9SYXBKvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778505515; c=relaxed/simple;
-	bh=tSxu3v1zFVmz1Ow1glgROXhvIIbM5P+KMcZs43VSTrg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bHdGz27IbQupPfYauEGCefjz/ayIuF823R0g+JYozcMSjaVHy/mqQr84g0AEoioAzCjNxPpQo5n6Nhgqt1LCLaIeSvaZqkH4QlO0i1WzoxUXG2WV1kiVSadQTnzQRnCCX6dOGG0/oIvZs3mrY6ky77r3nBIGYLlRzTX7NqzRiCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ITKhP3HM; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1778508171; c=relaxed/simple;
+	bh=0UpJUGzPjFdRF+kzA5dFbDzrBSNpqPmuECOqes5zOLs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f9dmdrNQarRVn/vqoEq/zZV7yONM2GvxSR9SxQiT1Vaon2ba8VcQAxQXCZY133UYY3UFLhY8Qrh10uispJlTsOMyJWqi00/CnaOWK0ivde2iQCIs5YBMoAoocgkPBVTv+vOzhAfJNGeDlBprSlsJvXwjwCW9f8IZllFdArwPm+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=foKLY5sK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ITKhP3HM"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1778505506; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=qMTukbhOsh4wTjLAvEST29FKEUGQSBkjs6AvGD3bNxM=;
-	b=ITKhP3HM+6/6dIioCD3Y4siAI3nDphv/tA1FBQrQWZ51ednKoLEjKlMN0yluNOKkN8U0AEIT25VeVe/aOw6L9FB2IPLSw0X2rHrKwyXXLz44Pfr3zUOUBjzgIUV4xMXzzOzCEbP8EBBAAWBahKSLKQSK04fdHIDGRktY3ZxhTw0=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R901e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=mengferry@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0X2kmh0a_1778505499;
-Received: from localhost(mailfrom:mengferry@linux.alibaba.com fp:SMTPD_---0X2kmh0a_1778505499 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 11 May 2026 21:18:26 +0800
-From: Ferry Meng <mengferry@linux.alibaba.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	Tristan Madani <tristan@talencesecurity.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="foKLY5sK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58A9CC2BCB0;
+	Mon, 11 May 2026 14:02:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778508171;
+	bh=0UpJUGzPjFdRF+kzA5dFbDzrBSNpqPmuECOqes5zOLs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=foKLY5sKZ8pQXRuGHvimXnKVPDHujO7i9DUihew18ywt0UUkKvpcWEQ+GENjB0qNO
+	 NgxndUmM3WbrU08K5mm4wnFTJzeITiV9PHxDxNnq613Oo6dgzvUTfJ4/75GXQsn15r
+	 NJlH33gFSvNWgiZUBBYLjmXsJCL/6Obf0osLgh9dqAWq2pC9UmW+zvU5SZ3p1gFd4H
+	 9NTj/zHhF5SO3FGYLW42EKJjAe385+WS/DGrVUPgWh3nDkDhNJFaBUjjA4e2Hgsvor
+	 uPWR9IEwYD3MjdS9lV9YT2EinL9WsEwAuTWPBfysgN3ObitBAk5eEIS1jm4hwLXEn6
+	 xgJjFWUK5GBCA==
+From: Christian Brauner <brauner@kernel.org>
+To: Chuck Lever <chuck.lever@oracle.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
 	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Ferry Meng <mengferry@linux.alibaba.com>
-Subject: [PATCH] ksmbd: fix SID memory leak in set_posix_acl_entries_dacl() on overflow
-Date: Mon, 11 May 2026 21:18:16 +0800
-Message-Id: <20260511131816.93314-1-mengferry@linux.alibaba.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
+	linux-nfs@vger.kernel.org,
+	linux-api@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	hirofumi@mail.parknet.co.jp,
+	linkinjeon@kernel.org,
+	sj1557.seo@samsung.com,
+	yuezhang.mo@sony.com,
+	almaz.alexandrovich@paragon-software.com,
+	slava@dubeyko.com,
+	glaubitz@physik.fu-berlin.de,
+	frank.li@vivo.com,
+	tytso@mit.edu,
+	adilger.kernel@dilger.ca,
+	cem@kernel.org,
+	sfrench@samba.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	trondmy@kernel.org,
+	anna@kernel.org,
+	jaegeuk@kernel.org,
+	chao@kernel.org,
+	hansg@kernel.org,
+	senozhatsky@chromium.org,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Roland Mainz <roland.mainz@nrubsig.org>,
+	Steve French <stfrench@microsoft.com>
+Subject: Re: [PATCH v14 00/15] Exposing case folding behavior
+Date: Mon, 11 May 2026 16:02:31 +0200
+Message-ID: <20260511-wertverlust-vorbringen-070f016f3bd4@brauner>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260507-case-sensitivity-v14-0-e62cc8200435@oracle.com>
+References: <20260507-case-sensitivity-v14-0-e62cc8200435@oracle.com>
+C: Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2738; i=brauner@kernel.org; h=from:subject:message-id; bh=0UpJUGzPjFdRF+kzA5dFbDzrBSNpqPmuECOqes5zOLs=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQxPmzoE7cS0pi4htne4BtrZubeg2uf/OBf+WBFQOp93 w71crk5HaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABMp2cbIMEfiXshT9YRVMeHy 0dt39r6+sDHh9aLmwo1tk7ifh+3OYWNk+HUvYr/S77VKu596N6437xR9oNG88+uX37/zSzhErP7 +YAYA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 
-Commit 299f962c0b02 ("ksmbd: use check_add_overflow() to prevent u16
-DACL size overflow") added check_add_overflow() guards that break out
-of the ACE-building loops in set_posix_acl_entries_dacl() when the
-accumulated DACL size would wrap past 65535.
+On Thu, 07 May 2026 04:52:53 -0400, Chuck Lever wrote:
+> Christian, let's lock this one in. I will post subsequent changes
+> as delta patches.
+> 
+> Following on from:
+> 
+> https://lore.kernel.org/linux-nfs/20251021-zypressen-bazillus-545a44af57fd@brauner/T/#m0ba197d75b7921d994cf284f3cef3a62abb11aaa
+> 
+> [...]
 
-However, each iteration allocates a struct smb_sid via kmalloc_obj()
-at the top of the loop and relies on the kfree(sid) call at the end
-of the loop body (the 'pass_same_sid' label in the first loop, and
-the explicit kfree at the tail of the second loop) to release it.
-The newly introduced 'break' statements bypass those kfree() calls,
-leaking the sid buffer every time an overflow is detected.
+Applied to the vfs-7.2.exportfs branch of the vfs/vfs.git tree.
+Patches in the vfs-7.2.exportfs branch should appear in linux-next soon.
 
-A malicious or malformed file with enough POSIX ACL entries to trip
-the overflow check will leak one or more struct smb_sid allocations
-on every request that touches the file's DACL, providing a trivial
-kernel memory exhaustion vector.
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-Free sid before breaking out of the loops to plug the leak.
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
-Fixes: 299f962c0b02 ("ksmbd: use check_add_overflow() to prevent u16 DACL size overflow")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ferry Meng <mengferry@linux.alibaba.com>
----
- fs/smb/server/smbacl.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
 
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index c1d1f34581d6..9161e9d7ed24 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -643,8 +643,10 @@ static void set_posix_acl_entries_dacl(struct mnt_idmap *idmap,
- 		ntace = (struct smb_ace *)((char *)pndace + *size);
- 		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, flags,
- 				pace->e_perm, 0777);
--		if (check_add_overflow(*size, ace_sz, size))
-+		if (check_add_overflow(*size, ace_sz, size)) {
-+			kfree(sid);
- 			break;
-+		}
- 		(*num_aces)++;
- 		if (pace->e_tag == ACL_USER)
- 			ntace->access_req |=
-@@ -655,8 +657,10 @@ static void set_posix_acl_entries_dacl(struct mnt_idmap *idmap,
- 			ntace = (struct smb_ace *)((char *)pndace + *size);
- 			ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED,
- 					0x03, pace->e_perm, 0777);
--			if (check_add_overflow(*size, ace_sz, size))
-+			if (check_add_overflow(*size, ace_sz, size)) {
-+				kfree(sid);
- 				break;
-+			}
- 			(*num_aces)++;
- 			if (pace->e_tag == ACL_USER)
- 				ntace->access_req |=
-@@ -698,8 +702,10 @@ static void set_posix_acl_entries_dacl(struct mnt_idmap *idmap,
- 		ntace = (struct smb_ace *)((char *)pndace + *size);
- 		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, 0x0b,
- 				pace->e_perm, 0777);
--		if (check_add_overflow(*size, ace_sz, size))
-+		if (check_add_overflow(*size, ace_sz, size)) {
-+			kfree(sid);
- 			break;
-+		}
- 		(*num_aces)++;
- 		if (pace->e_tag == ACL_USER)
- 			ntace->access_req |=
--- 
-2.43.5
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-7.2.exportfs
 
+[01/15] fs: Move file_kattr initialization to callers
+        https://git.kernel.org/vfs/vfs/c/9d3942fa6a55
+[02/15] fs: Add case sensitivity flags to file_kattr
+        https://git.kernel.org/vfs/vfs/c/72504a889e52
+[03/15] fat: Implement fileattr_get for case sensitivity
+        https://git.kernel.org/vfs/vfs/c/d0d06cfce960
+[04/15] exfat: Implement fileattr_get for case sensitivity
+        https://git.kernel.org/vfs/vfs/c/64a4f2090cb2
+[05/15] ntfs3: Implement fileattr_get for case sensitivity
+        https://git.kernel.org/vfs/vfs/c/5fff53318cbf
+[06/15] hfs: Implement fileattr_get for case sensitivity
+        https://git.kernel.org/vfs/vfs/c/1b25c01375e0
+[07/15] hfsplus: Report case sensitivity in fileattr_get
+        https://git.kernel.org/vfs/vfs/c/b9e976dd58ff
+[08/15] xfs: Report case sensitivity in fileattr_get
+        https://git.kernel.org/vfs/vfs/c/30617d630d2f
+[09/15] cifs: Implement fileattr_get for case sensitivity
+        https://git.kernel.org/vfs/vfs/c/0f372b05c80c
+[10/15] nfs: Implement fileattr_get for case sensitivity
+        https://git.kernel.org/vfs/vfs/c/3ca9954cdc04
+[11/15] vboxsf: Implement fileattr_get for case sensitivity
+        https://git.kernel.org/vfs/vfs/c/0f5f23d411ac
+[12/15] isofs: Implement fileattr_get for case sensitivity
+        https://git.kernel.org/vfs/vfs/c/d56f6094035c
+[13/15] nfsd: Report export case-folding via NFSv3 PATHCONF
+        https://git.kernel.org/vfs/vfs/c/5ca2c8f14428
+[14/15] nfsd: Implement NFSv4 FATTR4_CASE_INSENSITIVE and FATTR4_CASE_PRESERVING
+        https://git.kernel.org/vfs/vfs/c/62c9555937ca
+[15/15] ksmbd: Report filesystem case sensitivity via FS_ATTRIBUTE_INFORMATION
+        https://git.kernel.org/vfs/vfs/c/35188379f010
