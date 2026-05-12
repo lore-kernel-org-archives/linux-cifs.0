@@ -1,346 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85B9385D6B;
-	Tue, 12 May 2026 17:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC613A0B39
+	for <linux-cifs@vger.kernel.org>; Tue, 12 May 2026 22:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.34.181.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778605829; cv=none; b=i1wpDAG1YU4yv/8aRb6zN3WnlsdA2yz4cgBcSodM+Bo/IjlkejggUzkZiBGwCWMQ9HNUY2FMyWoshHGssjGEqorLxY/5DP5WVlbowTPOL7OD1muH9hLxNHf60Aq5mV59/8LCMZJCKK2bbAtH8hoiOH1BlwGw1K2Shydd8q2Q4kI=
+	t=1778624999; cv=none; b=qdmE5wTNMVALpXB2cQZZHobk4HveXR3P6I9N5+OI1qzWU7pMHBSnR02bccJnOm8UHL2NUSoqp9Jt9VpAFCu6OdM6bdg7eAOx0TRMRNOOxtHQkjhVLRZ4udd4vUWgbcjVLKoHH6PBVrnQYfB6RryebSLBQhI372kXtna8xRDyPG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778605829; c=relaxed/simple;
-	bh=UIMc6Epq1jKVpYoN8NQkrsbH35Z/rxkSt0+cjObPXEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vF2Rh4X0Meb/cIxqTxT8Dd9Bs+Y7KK5rNJkI5VbdgkYjg7f3MHRUe8iQ3sHnmh1y2+vYUcUBCjpyNC3Kz8BYRym8YdjUSjKvhOiYsjKBvCFVD4zAhrUnRJVxilOY5Q0e/FuK27y+4qxd+pwUduBgo0zznzSI3iflkOrJaoqL+kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cwQyUKQ7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778624999; c=relaxed/simple;
+	bh=Kad4F7fLkwjbD6FqM7idZtYX36lLU8I870BzsHUT58o=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=KXfS6YHD0SOIEf98xHiLTaLmDB15rvktrT8LiiEQoRCN2dJ3tWRXzBocvQIyXxHJTF1++Y2Iaah1bAmTSZUZuYPkymniiRpZNsMjMIuTG6S1KVPrrvFmUSbo1BWYyIUfe85oUVcJ5CaO9VBl+KBS7mUTFJvxlhMkFr887LLqu6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=EiCRgEod; arc=none smtp.client-ip=52.34.181.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cwQyUKQ7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BEBEC2BCB0;
-	Tue, 12 May 2026 17:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778605829;
-	bh=UIMc6Epq1jKVpYoN8NQkrsbH35Z/rxkSt0+cjObPXEg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cwQyUKQ7/ehswE6htqBY9YS5WZtrPNKyBqWQCvZt3MGoMAZl38WrdS4VCCUoTtce5
-	 3HXiMl5gnt6E8BE0Wlgn1JAAx+a721k2CiMTFjCC1q/33PgDsydSqQVOEZ0c/aEcPh
-	 qqMPItxUFu2pzF96J9wTatigpI1eNoG4appb93SUembefpNXfS+dQ3jx5Zjo7T9pg+
-	 Mru+31A2ZvAy//NyZ0pamvIuUJ6MRZj/QrOw+oPtdc5YksLDWF2zrWsZK+3k4Y36/N
-	 kUKgR6D21j3nHYHX3zYVq674GjpOqIAusFNnu8t7U2Rep60jDIv6s7wrNPKcxawCYO
-	 7JJLf2m6C5FqQ==
-Date: Tue, 12 May 2026 10:10:28 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>,
-	Kairui Song <kasong@tencent.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
-	Theodore Ts'o <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Hyunchul Lee <hyc.lee@gmail.com>, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 12/12] swap: move swap_info_struct to mm/swap.h
-Message-ID: <20260512171028.GM9555@frogsfrogsfrogs>
-References: <20260512053625.2950900-1-hch@lst.de>
- <20260512053625.2950900-13-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="EiCRgEod"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1778624998; x=1810160998;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=IlfMsVakpqeFY9uvbIlRYi3hyNhCQXnUG+fluKP/kAw=;
+  b=EiCRgEod7KLIVOfRSahI0QqqSTBqdnDaaiHHArHRpHnaZ2VzhwMQYlkx
+   w6ZMz0pltY2QpfgW99lYuUmQJOnwFy6A3eviZRkbc/GypaJqKDg7M5SWM
+   oLEWpxip7K0UWW2ctUCYvi8rTnQlzNyctx2uLHvuRUzTWrqgQTqaqqPTp
+   9vY/LflpQS90+UvXF0xAH4qLuFca4pqlU6qLZwwChTLprMGv5sugfThZw
+   TyN9yX6iID7hVtHmvLYtE/Ho1MMERHX+j3ObsJeWwf6rBdlyzF0Zz0RH7
+   ySMMLMwPr9NAzoK/ktzZO95uHjoVb3q/wU32JgIJ2LHnX3d7tsDuW8wZ9
+   Q==;
+X-CSE-ConnectionGUID: GrrVbTbkQMiBcuCY+Tf+KA==
+X-CSE-MsgGUID: 8B8vuSdrS6Oel8B9gvpUgQ==
+X-IronPort-AV: E=Sophos;i="6.23,231,1770595200"; 
+   d="scan'208";a="19477410"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2026 22:29:55 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.48:31357]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.33.132:2525] with esmtp (Farcaster)
+ id 2b7c2b24-ab35-436e-abbc-d8b5d456a5ed; Tue, 12 May 2026 22:29:55 +0000 (UTC)
+X-Farcaster-Flow-ID: 2b7c2b24-ab35-436e-abbc-d8b5d456a5ed
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Tue, 12 May 2026 22:29:54 +0000
+Received: from dev-dsk-doebel-1a-7b355d76.us-east-1.amazon.com (10.169.119.5)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Tue, 12 May 2026 22:29:53 +0000
+From: Bjoern Doebel <doebel@amazon.de>
+To: Steve French <smfrench@gmail.com>
+CC: Bjoern Doebel <doebel@amazon.de>, CIFS <linux-cifs@vger.kernel.org>,
+	samba-technical <samba-technical@lists.samba.org>
+Subject: Re: [PATCH] smb: client: use kzalloc to zero-initialize security descriptor buffer
+Date: Tue, 12 May 2026 22:29:34 +0000
+Message-ID: <agOptysuOb5bNNX+@dev-dsk-doebel-1a-7b355d76.us-east-1.amazon.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <CAH2r5mtXTpYdhU01w-GD32pDabZe6pq7=AhDnCpCGC00-JRxng@mail.gmail.com>
+References: <CAH2r5mtXTpYdhU01w-GD32pDabZe6pq7=AhDnCpCGC00-JRxng@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260512053625.2950900-13-hch@lst.de>
+X-ClientProxiedBy: EX19D036UWB003.ant.amazon.com (10.13.139.172) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 12, 2026 at 07:35:28AM +0200, Christoph Hellwig wrote:
-> swap_info_struct is now internal to the MM subsystem, so remove it from
-> the public header.
-> 
+Hi Steve,
 
-Even more cleaning out of swap.h is nice, so
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
+On Fri, May 08, 2026 at 11:50:59AM -0500, Steve French wrote:
+> You mentioned:
+>     "When the reserved field happens to contain non-zero slab garbage,
+>     Samba rejects the security descriptor with "ndr_pull_security_descriptor
+>     failed: Range Error", causing chmod to fail with EINVAL."
+> I had also been seeing unexpected chmod failures to Samba sometimes in
+> a few xfstests, did you have a good repro for this?  We also have a
+> problem with chown to Samba that when I tried to fix  on the client
+> got an unexpected error back from Samba, so ideas on cleaning up
+> setattr_nounix() to fix chown would be appreciated too.
 
---D
+This specific issue I analyzed on a quest to hunt down sporadic xfstest
+failures in the Amazon Linux kernel test suite. It came down to
 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  include/linux/swap.h | 98 +-------------------------------------------
->  mm/swap.h            | 92 +++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 94 insertions(+), 96 deletions(-)
-> 
-> diff --git a/include/linux/swap.h b/include/linux/swap.h
-> index 95237ee065c2..31eef9b74949 100644
-> --- a/include/linux/swap.h
-> +++ b/include/linux/swap.h
-> @@ -16,9 +16,9 @@
->  #include <uapi/linux/mempolicy.h>
->  #include <asm/page.h>
->  
-> -struct notifier_block;
-> -
->  struct bio;
-> +struct notifier_block;
-> +struct swap_info_struct;
->  
->  #define SWAP_FLAG_PREFER	0x8000	/* set if swap priority specified */
->  #define SWAP_FLAG_PRIO_MASK	0x7fff
-> @@ -178,29 +178,6 @@ struct sysinfo;
->  struct writeback_control;
->  struct zone;
->  
-> -/*
-> - * Max bad pages in the new format..
-> - */
-> -#define MAX_SWAP_BADPAGES \
-> -	((offsetof(union swap_header, magic.magic) - \
-> -	  offsetof(union swap_header, info.badpages)) / sizeof(int))
-> -
-> -enum {
-> -	SWP_USED	= (1 << 0),	/* is slot in swap_info[] used? */
-> -	SWP_WRITEOK	= (1 << 1),	/* ok to write to this swap?	*/
-> -	SWP_DISCARDABLE = (1 << 2),	/* blkdev support discard */
-> -	SWP_DISCARDING	= (1 << 3),	/* now discarding a free cluster */
-> -	SWP_SOLIDSTATE	= (1 << 4),	/* blkdev seeks are cheap */
-> -	SWP_BLKDEV	= (1 << 6),	/* its a block device */
-> -	SWP_ACTIVATED	= (1 << 7),	/* set after swap_activate success */
-> -	SWP_FS_OPS	= (1 << 8),	/* swapfile operations go through fs */
-> -	SWP_AREA_DISCARD = (1 << 9),	/* single-time swap area discards */
-> -	SWP_PAGE_DISCARD = (1 << 10),	/* freed swap page-cluster discards */
-> -	SWP_STABLE_WRITES = (1 << 11),	/* no overwrite PG_writeback pages */
-> -	SWP_SYNCHRONOUS_IO = (1 << 12),	/* synchronous IO is efficient */
-> -					/* add others here before... */
-> -};
-> -
->  #define SWAP_CLUSTER_MAX 32UL
->  #define SWAP_CLUSTER_MAX_SKIPPED (SWAP_CLUSTER_MAX << 10)
->  #define COMPACT_CLUSTER_MAX SWAP_CLUSTER_MAX
-> @@ -219,56 +196,6 @@ enum {
->  #define SWAP_NR_ORDERS		1
->  #endif
->  
-> -/*
-> - * We keep using same cluster for rotational device so IO will be sequential.
-> - * The purpose is to optimize SWAP throughput on these device.
-> - */
-> -struct swap_sequential_cluster {
-> -	unsigned int next[SWAP_NR_ORDERS]; /* Likely next allocation offset */
-> -};
-> -
-> -/*
-> - * The in-memory structure used to track swap areas.
-> - */
-> -struct swap_info_struct {
-> -	struct percpu_ref users;	/* indicate and keep swap device valid. */
-> -	unsigned long	flags;		/* SWP_USED etc: see above */
-> -	signed short	prio;		/* swap priority of this type */
-> -	struct plist_node list;		/* entry in swap_active_head */
-> -	signed char	type;		/* strange name for an index */
-> -	unsigned int	max;		/* size of this swap device */
-> -	unsigned long *zeromap;		/* kvmalloc'ed bitmap to track zero pages */
-> -	struct swap_cluster_info *cluster_info; /* cluster info. Only for SSD */
-> -	struct list_head free_clusters; /* free clusters list */
-> -	struct list_head full_clusters; /* full clusters list */
-> -	struct list_head nonfull_clusters[SWAP_NR_ORDERS];
-> -					/* list of cluster that contains at least one free slot */
-> -	struct list_head frag_clusters[SWAP_NR_ORDERS];
-> -					/* list of cluster that are fragmented or contented */
-> -	unsigned int pages;		/* total of usable pages of swap */
-> -	atomic_long_t inuse_pages;	/* number of those currently in use */
-> -	struct swap_sequential_cluster *global_cluster; /* Use one global cluster for rotating device */
-> -	spinlock_t global_cluster_lock;	/* Serialize usage of global cluster */
-> -	struct rb_root swap_extent_root;/* root of the swap extent rbtree */
-> -	struct block_device *bdev;	/* swap device or bdev of swap file */
-> -	struct file *swap_file;		/* seldom referenced */
-> -	struct completion comp;		/* seldom referenced */
-> -	spinlock_t lock;		/*
-> -					 * protect map scan related fields like
-> -					 * inuse_pages and all cluster lists.
-> -					 * Other fields are only changed
-> -					 * at swapon/swapoff, so are protected
-> -					 * by swap_lock. changing flags need
-> -					 * hold this lock and swap_lock. If
-> -					 * both locks need hold, hold swap_lock
-> -					 * first.
-> -					 */
-> -	struct work_struct discard_work; /* discard worker */
-> -	struct work_struct reclaim_work; /* reclaim worker */
-> -	struct list_head discard_clusters; /* discard clusters list */
-> -	struct plist_node avail_list;   /* entry in swap_avail_head */
-> -};
-> -
->  static inline swp_entry_t page_swap_entry(struct page *page)
->  {
->  	struct folio *folio = page_folio(page);
-> @@ -423,10 +350,7 @@ int find_first_swap(dev_t *device);
->  extern unsigned int count_swap_pages(int, int);
->  extern sector_t swapdev_block(int, pgoff_t);
->  extern int __swap_count(swp_entry_t entry);
-> -extern bool swap_entry_swapped(struct swap_info_struct *si, swp_entry_t entry);
->  extern int swp_swapcount(swp_entry_t entry);
-> -struct backing_dev_info;
-> -extern struct swap_info_struct *get_swap_device(swp_entry_t entry);
->  sector_t swap_folio_sector(struct folio *folio);
->  
->  /*
-> @@ -452,20 +376,7 @@ bool folio_free_swap(struct folio *folio);
->  swp_entry_t swap_alloc_hibernation_slot(int type);
->  void swap_free_hibernation_slot(swp_entry_t entry);
->  
-> -static inline void put_swap_device(struct swap_info_struct *si)
-> -{
-> -	percpu_ref_put(&si->users);
-> -}
-> -
->  #else /* CONFIG_SWAP */
-> -static inline struct swap_info_struct *get_swap_device(swp_entry_t entry)
-> -{
-> -	return NULL;
-> -}
-> -
-> -static inline void put_swap_device(struct swap_info_struct *si)
-> -{
-> -}
->  
->  #define get_nr_swap_pages()			0L
->  #define total_swap_pages			0L
-> @@ -497,11 +408,6 @@ static inline int __swap_count(swp_entry_t entry)
->  	return 0;
->  }
->  
-> -static inline bool swap_entry_swapped(struct swap_info_struct *si, swp_entry_t entry)
-> -{
-> -	return false;
-> -}
-> -
->  static inline int swp_swapcount(swp_entry_t entry)
->  {
->  	return 0;
-> diff --git a/mm/swap.h b/mm/swap.h
-> index a77016f2423b..70974495bf15 100644
-> --- a/mm/swap.h
-> +++ b/mm/swap.h
-> @@ -8,6 +8,79 @@ struct swap_iocb;
->  
->  extern int page_cluster;
->  
-> +/*
-> + * We keep using same cluster for rotational device so IO will be sequential.
-> + * The purpose is to optimize SWAP throughput on these device.
-> + */
-> +struct swap_sequential_cluster {
-> +	unsigned int next[SWAP_NR_ORDERS]; /* Likely next allocation offset */
-> +};
-> +
-> +/*
-> + * The in-memory structure used to track swap areas.
-> + */
-> +struct swap_info_struct {
-> +	struct percpu_ref users;	/* indicate and keep swap device valid. */
-> +	unsigned long	flags;		/* SWP_USED etc: see above */
-> +	signed short	prio;		/* swap priority of this type */
-> +	struct plist_node list;		/* entry in swap_active_head */
-> +	signed char	type;		/* strange name for an index */
-> +	unsigned int	max;		/* size of this swap device */
-> +	unsigned long *zeromap;		/* kvmalloc'ed bitmap to track zero pages */
-> +	struct swap_cluster_info *cluster_info; /* cluster info. Only for SSD */
-> +	struct list_head free_clusters; /* free clusters list */
-> +	struct list_head full_clusters; /* full clusters list */
-> +	struct list_head nonfull_clusters[SWAP_NR_ORDERS];
-> +					/* list of cluster that contains at least one free slot */
-> +	struct list_head frag_clusters[SWAP_NR_ORDERS];
-> +					/* list of cluster that are fragmented or contented */
-> +	unsigned int pages;		/* total of usable pages of swap */
-> +	atomic_long_t inuse_pages;	/* number of those currently in use */
-> +	struct swap_sequential_cluster *global_cluster; /* Use one global cluster for rotating device */
-> +	spinlock_t global_cluster_lock;	/* Serialize usage of global cluster */
-> +	struct rb_root swap_extent_root;/* root of the swap extent rbtree */
-> +	struct block_device *bdev;	/* swap device or bdev of swap file */
-> +	struct file *swap_file;		/* seldom referenced */
-> +	struct completion comp;		/* seldom referenced */
-> +	spinlock_t lock;		/*
-> +					 * protect map scan related fields like
-> +					 * inuse_pages and all cluster lists.
-> +					 * Other fields are only changed
-> +					 * at swapon/swapoff, so are protected
-> +					 * by swap_lock. changing flags need
-> +					 * hold this lock and swap_lock. If
-> +					 * both locks need hold, hold swap_lock
-> +					 * first.
-> +					 */
-> +	struct work_struct discard_work; /* discard worker */
-> +	struct work_struct reclaim_work; /* reclaim worker */
-> +	struct list_head discard_clusters; /* discard clusters list */
-> +	struct plist_node avail_list;   /* entry in swap_avail_head */
-> +};
-> +
-> +/*
-> + * Max bad pages in the new format..
-> + */
-> +#define MAX_SWAP_BADPAGES \
-> +	((offsetof(union swap_header, magic.magic) - \
-> +	  offsetof(union swap_header, info.badpages)) / sizeof(int))
-> +
-> +enum {
-> +	SWP_USED	= (1 << 0),	/* is slot in swap_info[] used? */
-> +	SWP_WRITEOK	= (1 << 1),	/* ok to write to this swap?	*/
-> +	SWP_DISCARDABLE = (1 << 2),	/* blkdev support discard */
-> +	SWP_DISCARDING	= (1 << 3),	/* now discarding a free cluster */
-> +	SWP_SOLIDSTATE	= (1 << 4),	/* blkdev seeks are cheap */
-> +	SWP_BLKDEV	= (1 << 6),	/* its a block device */
-> +	SWP_ACTIVATED	= (1 << 7),	/* set after swap_activate success */
-> +	SWP_FS_OPS	= (1 << 8),	/* swapfile operations go through fs */
-> +	SWP_AREA_DISCARD = (1 << 9),	/* single-time swap area discards */
-> +	SWP_PAGE_DISCARD = (1 << 10),	/* freed swap page-cluster discards */
-> +	SWP_STABLE_WRITES = (1 << 11),	/* no overwrite PG_writeback pages */
-> +	SWP_SYNCHRONOUS_IO = (1 << 12),	/* synchronous IO is efficient */
-> +					/* add others here before... */
-> +};
-> +
->  #ifdef CONFIG_THP_SWAP
->  #define SWAPFILE_CLUSTER	HPAGE_PMD_NR
->  #define swap_entry_order(order)	(order)
-> @@ -352,6 +425,13 @@ static inline int non_swapcache_batch(swp_entry_t entry, int max_nr)
->  	return i;
->  }
->  
-> +bool swap_entry_swapped(struct swap_info_struct *si, swp_entry_t entry);
-> +struct swap_info_struct *get_swap_device(swp_entry_t entry);
-> +static inline void put_swap_device(struct swap_info_struct *si)
-> +{
-> +	percpu_ref_put(&si->users);
-> +}
-> +
->  #else /* CONFIG_SWAP */
->  struct swap_iocb;
->  static inline struct swap_cluster_info *swap_cluster_lock(
-> @@ -498,5 +578,17 @@ static inline int non_swapcache_batch(swp_entry_t entry, int max_nr)
->  {
->  	return 0;
->  }
-> +static inline bool swap_entry_swapped(struct swap_info_struct *si,
-> +		swp_entry_t entry)
-> +{
-> +	return false;
-> +}
-> +static inline struct swap_info_struct *get_swap_device(swp_entry_t entry)
-> +{
-> +	return NULL;
-> +}
-> +static inline void put_swap_device(struct swap_info_struct *si)
-> +{
-> +}
->  #endif /* CONFIG_SWAP */
->  #endif /* _MM_SWAP_H */
-> -- 
-> 2.53.0
-> 
-> 
+``` bash
+count=0
+while ./check -cifs generic/680; do
+    count=$((count+1))
+done
+echo "Failed after $count iterations."
+```
+
+which then took around 10-40 iterations to fail on an otherwise idle
+system.
+
+Bjoern
+
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
+
