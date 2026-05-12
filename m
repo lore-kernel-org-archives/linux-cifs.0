@@ -1,129 +1,149 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2AD83905E9;
-	Tue, 12 May 2026 12:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778589803; cv=none; b=X2PfmeAw5SxP4BFbmmipIdwpQ7dc/5HwaVfgeo2UrEiUKolMvyurSp1XQCUu/VDrNi9odch9iCUWlMPV32JxotJjRsmyVltb8i1/8hLX2PtcTJBhu7YLIJ3vuM90WFnrbybv8cG6CaYuorHvejJOwgL3effYc1+8mLTJX6OdAJk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778589803; c=relaxed/simple;
-	bh=jfDosqd7UGS2Yf2KYMlqVd6Sg1zrZc7gNnLbAFCEMnA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LFlDvV1GnsPP2PU8RPfM/OHBEHz32ucLvtt9HCxlqNdHIML2kK/7j40NuNB1/nLUWNLpWm+Ed59KlKGm2EDeCKjk3aDJU1nzGMRlo+uN4ZQG1cjmKExTYafZPTk0akFohNoCX4TKS4++N7jpI0G5XrLn3ldBNFJXx8bLyrE5x9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OfIIGkAW; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F22B349CF7
+	for <linux-cifs@vger.kernel.org>; Tue, 12 May 2026 13:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778591285; cv=pass; b=ckkcnXnaml6vj3pDkQIYnDk5rhPCSrktf8oW5MV7uz5Bh4t7UgfO1VXJSS4M16ioD05KIl5Evuxh0YiFqJiGfgn3wSaI6hfMYkpCqzkiG2Fd/LKGvJhj7R0KDzmp2PQK7Jp6G9lMcLV33qGZdPTPUa930j5a0xi1A/VofaFj38o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778591285; c=relaxed/simple;
+	bh=+vcfNdRtvwQHAPFi9qeID7iVjTEIACNb7t52akS/Gx4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eXYN4jj49DBqzzA6dNMEryHbe3LgZLu7994Qybc5ny5pCBGjfolekmpDLkqx0JlzOnTlLuX61VTjoPLw04wNnzaGgHzeOOEji3nDU/3qAqcptbbCXziN+RDPuUeaXD6HEff/S5qKcINHyiR/SxogvzvqK9D1NlcR1Xiss4xl5Hk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fEGrDJvt; arc=pass smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OfIIGkAW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5BD7C2BCF5;
-	Tue, 12 May 2026 12:43:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778589802;
-	bh=jfDosqd7UGS2Yf2KYMlqVd6Sg1zrZc7gNnLbAFCEMnA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OfIIGkAW2zQ9Pz70B4IjUAMqSjAJUjARSHnMxa8Sevg0Gp7Pkia/NJYQ4rGrS8daJ
-	 XNzJoNth2LbAqXaopPwWpqI8UDvgt7r0NtcU+7zvgnwfDj2LFGyZI4DHy0BnYhnjSg
-	 RAIaUdjYdkeIO49Thld3c5kbS4X31acY+MJ3rFhTmM3eLDXC8rPg8wZTM2gg9qBp77
-	 lLj6Y7JTW5/hhDAJZZiuQSjE+3tGh83BCnMWqAnns1YG1fEXyjacXQU5PpdxUlMrsJ
-	 tk/29KdH62Ooz3jgDMYUAOQoWpYfVYFjo8rlq7h4gh75tWWCyFomPCJxTkO+ispD1C
-	 zxYpIvvAibn/Q==
-From: Christian Brauner <brauner@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 00/24] netfs: Miscellaneous fixes
-Date: Tue, 12 May 2026 14:43:10 +0200
-Message-ID: <20260512-infozentrum-becher-7f86c47c96c8@brauner>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260512123404.719402-1-dhowells@redhat.com>
-References: <20260512123404.719402-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fEGrDJvt"
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-651ce87d785so569963d50.2
+        for <linux-cifs@vger.kernel.org>; Tue, 12 May 2026 06:08:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778591283; cv=none;
+        d=google.com; s=arc-20240605;
+        b=agoNk4hKe6JsZwACYBfT5aTSFW+ER9esfyAOVg+oY8i7Ckd3TTxD0d6fZv/YyyUFKS
+         PdbR2I7QBBc5lIJH8ydUlaTkmOnYU/w1dBsRUhiJjyL+QQrWGSbd74kQmxw49uf5NbW0
+         OZzJ3DfE44Yk26M5LRsiR/mi4JH1xyoSNiXXn9bxbFJx6lHcTZ0VfUyohFmCAmlEcBA1
+         QOzXwHCGmIqEgYF6Q4uZq2qGDv+lA1JGQvvRXlhKSxwq8SoEiAu8yNNnNlitx4QbLfMB
+         upOeiXI+ovgoG4VRrnUb18yebXn6g7KU8iHrW9Xbwi4dHRRWuq+U9w0cPdJBkIBMtzAi
+         2bng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vnBWAAshyrw9uW2waQU9UJFxrzx86ul1N0tkpGj9Dmo=;
+        fh=EcY0HLj75Z7t9i0Fuve6XUB/bBG/8+E2F/+HaFOoLKQ=;
+        b=ED7Q3KgYfhRZ65oiYPPctGCMhNS8Zv7qx0tk6xYObSyqC4hI1MROsEaZrpCHUyH6ql
+         LaieIK/r7fKVA3QDcf6th2nE6UDhaii+ScHGU/IJfmaUxVeyVzy5PfoepmR7NdiP8WhW
+         icuZZGT+9ZuGDuEror7lMe2S1MTFFRM/1G/lj6CwvgfFBswwdA20Kkz8fD2Nwh8zKWG9
+         N4OP3QyV7AQjZp/3W1/iMYQAdxKvLCQqsbCjgrMDqdzjkLbVxJUbWDeNoU4DOIQ2sm26
+         cILJAThpZjQtOiOOf8eEugf4x292LL7vsye0/gPmPgPedxtJQOCD30Ex6XR/DLjZXvXW
+         NCng==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778591283; x=1779196083; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vnBWAAshyrw9uW2waQU9UJFxrzx86ul1N0tkpGj9Dmo=;
+        b=fEGrDJvtHpIFtrTWjkSoGKqDTEQcVkexN4jqkdq4Th8fzXv9UTKn/H7MMd8olzktqd
+         2qVppYWSG4KHLvBTv3QKS2rbh4j+YD674sTm1qS7+gFGDg8nnkzV4OCMKG6vQlPS0l6n
+         HnJVvajdgkMF0uoiN4iFMck+1LrImvydCGoJw1xynC6YuSBYBAmXt4DIYqK+QFs7lygI
+         QuUY46kyQz1i6/B/pxWxeyVQXb1vbPYoK4OE+1wGDUyqs1nE+rZ84qnl+5DiWlRGICmQ
+         WNsPCeAKQZt4Bmwhi1eEo+WluE64FdBACfg+ocN/mJpHj/KLZ2ptvXO6LUs4IvPmpwUR
+         0/vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778591283; x=1779196083;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vnBWAAshyrw9uW2waQU9UJFxrzx86ul1N0tkpGj9Dmo=;
+        b=IK47Wp6Tt7NcF8mnAy1xaCuMwK+TMu0BFEV8ANNCEcY0nlv2z93YPDXMP6WTixb3EK
+         bqoZeCSoEkT72cIq7jmvQhRN7XHQ7vxiDiU5oFgZs2NzckT+1l9b1uE673kuQZHV2gOz
+         P++shUpWb29r3ukwCnSXrRXeiq2uypCXXitebs9p13ZoXbR5cS92SlCTejD4cSTDNWAI
+         dJyMxXXHC9F9UjSGEk9QzVSSMWIUAii918/cqIxeN8Jp7Xq6xz1DWf+zx79afykIlDlq
+         iF68+zBT1SsqwLvseHgE7MoTk0DjkJBzG7KNjc5nLlQausqCQQAjnxgWYbn9KJA+e4hB
+         BGLg==
+X-Forwarded-Encrypted: i=1; AFNElJ+/sKx38vurco/xwcs272no9DU2wfdT3pyKMfoYQbc1O/jsL+2VVTXoMbopk4tgedoL2Nz0X+MXNFli@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTWqV+Ndz5wUW1vDX6N8Ka5T1xnZir9qnaTrQDleOElw16pZK0
+	hp4n4N3pBV/3hDK3ywD1xK8r4GpYkd8k48Oml2BPZYdRn2zLrUnkHf6xslmSqIpz3cY7gth+l44
+	Pk1bIf3GN64ty2QSMl8WV5tUMgtNztFo=
+X-Gm-Gg: Acq92OEpW2YKAiDufhaMOWN1rfa/ukg3qMH0bH+m+YYLMGh31UKdMUidVPCwG/gaNJw
+	FyzZRAhM67c3SrutSU+Z82QNA8CpTaeaiaAwhI06V3AS7UMb7NVQK8A1eTgxSIMcAdop+VT7i1J
+	ykcCVRwoK+TiP0r54XODP5ww0cL+hlp/4/iYLMBU63/EQ7bQmh7eRYffXb78uyHuw8Stt0iuP2H
+	lTDrSVqds+xSfyBaDmCQFMUDe9yn6tHf2Rxm4i3+jiQC0BkFvUcSf9WjKL/xwT/GGzP8iiz+S59
+	57wUeZox
+X-Received: by 2002:a05:690e:13ce:b0:65c:322a:7ac3 with SMTP id
+ 956f58d0204a3-65c7b70bfbbmr17655158d50.2.1778591283371; Tue, 12 May 2026
+ 06:08:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4033; i=brauner@kernel.org; h=from:subject:message-id; bh=jfDosqd7UGS2Yf2KYMlqVd6Sg1zrZc7gNnLbAFCEMnA=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQxK6Rej4lRzvFL8lkybQ8PZ4rujk1LmDdHPFXku/z77 4lsbTeDjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgIksOMPI8ElxzrRjtUKBXGwW HL9e2y7YNm/Dkgzdyq6F5cUHp7peSmVkmLXdY4/CHDMT5Q2Ke1JOGC3PWj87NOJYT6ECW8yvX1Z WLAA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+References: <20260512123404.719402-1-dhowells@redhat.com> <20260512123404.719402-9-dhowells@redhat.com>
+In-Reply-To: <20260512123404.719402-9-dhowells@redhat.com>
+From: CharSyam <charsyam@gmail.com>
+Date: Tue, 12 May 2026 22:07:51 +0900
+X-Gm-Features: AVHnY4I7C6CzYKo5rOIaKeFxn1UK1vSWmDrEYuJGWgiJZva0dOf3Ebu3U-sXK3A
+Message-ID: <CAMrLSE5jFZwmUrx5GWhz4AD9QpLsF9VsdaMJxiDa6ukXqH8RPg@mail.gmail.com>
+Subject: Re: [PATCH v6 08/24] netfs: Fix potential uninitialised var in netfs_extract_user_iter()
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>, Paulo Alcantara <pc@manguebit.org>, netfs@lists.linux.dev, 
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Matthew Wilcox <willy@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 12 May 2026 13:33:37 +0100, David Howells wrote:
-> Here are the outstanding miscellaneous fixes for netfslib gathered together
-> and with some fixes-to-fixes folded down and one rearrangement.  Various
-> Sashiko review comments[1][2][3][4][5] are addressed:
-> 
->  (1) Fix subrequest cancellation cleanup in DIO read and single-read.
-> 
->  (2) Fix missing locking around retry adding new subrequests.
-> 
-> [...]
+Hi, David.
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+It looks like ret does not need to be initialized to 0, because it is
+only used after being assigned the
+return value of iov_iter_extract_pages(). In the zero-length case, the
+loop is skipped and ret is not used at all.
+What do you think?
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+Thanks
+DaeMyung
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
-
-[01/24] netfs: Fix cancellation of a DIO and single read subrequests
-        https://git.kernel.org/vfs/vfs/c/6f0f7ac1915a
-[02/24] netfs: Fix missing locking around retry adding new subreqs
-        https://git.kernel.org/vfs/vfs/c/cce18c263e96
-[03/24] netfs: Fix missing barriers when accessing stream->subrequests locklessly
-        https://git.kernel.org/vfs/vfs/c/b5782e2d462c
-[04/24] netfs: Fix netfs_read_to_pagecache() to pause on subreq failure
-        https://git.kernel.org/vfs/vfs/c/8a8c0cfdf465
-[05/24] netfs: Fix potential for tearing in ->remote_i_size and ->zero_point
-        https://git.kernel.org/vfs/vfs/c/2c8f4742bb76
-[06/24] netfs: Fix zeropoint update where i_size > remote_i_size
-        https://git.kernel.org/vfs/vfs/c/4543a4d73794
-[07/24] netfs: fix VM_BUG_ON_FOLIO() issue in netfs_write_begin() call
-        https://git.kernel.org/vfs/vfs/c/dc7832d05deb
-[08/24] netfs: Fix potential uninitialised var in netfs_extract_user_iter()
-        https://git.kernel.org/vfs/vfs/c/7e3d8db899d5
-[09/24] netfs: fix error handling in netfs_extract_user_iter()
-        https://git.kernel.org/vfs/vfs/c/0aad5704c6b4
-[10/24] netfs: Fix overrun check in netfs_extract_user_iter()
-        https://git.kernel.org/vfs/vfs/c/0ef37eef83fa
-[11/24] netfs: Fix netfs_invalidate_folio() to clear dirty bit if all changes gone
-        https://git.kernel.org/vfs/vfs/c/156ac2ec2ee7
-[12/24] netfs: Defer the emission of trace_netfs_folio()
-        https://git.kernel.org/vfs/vfs/c/daeb443b9281
-[13/24] netfs: Fix streaming write being overwritten
-        https://git.kernel.org/vfs/vfs/c/7b4dcf1b9455
-[14/24] netfs: Fix potential deadlock in write-through mode
-        https://git.kernel.org/vfs/vfs/c/b6a4ae1634b3
-[15/24] netfs: Fix read-gaps to remove netfs_folio from filled folio
-        https://git.kernel.org/vfs/vfs/c/a41168aef634
-[16/24] netfs: Fix write streaming disablement if fd open O_RDWR
-        https://git.kernel.org/vfs/vfs/c/70a7b9193bbb
-[17/24] netfs: Fix early put of sink folio in netfs_read_gaps()
-        https://git.kernel.org/vfs/vfs/c/3e5dd91b87a8
-[18/24] netfs: Fix leak of request in netfs_write_begin() error handling
-        https://git.kernel.org/vfs/vfs/c/5046a34f0643
-[19/24] netfs: Fix potential UAF in netfs_unlock_abandoned_read_pages()
-        https://git.kernel.org/vfs/vfs/c/dbe556972100
-[20/24] netfs: Fix partial invalidation of streaming-write folio
-        https://git.kernel.org/vfs/vfs/c/6d91acc7fb85
-[21/24] netfs: Fix folio->private handling in netfs_perform_write()
-        https://git.kernel.org/vfs/vfs/c/ccde2ac757c7
-[22/24] netfs: Fix netfs_read_folio() to wait on writeback
-        https://git.kernel.org/vfs/vfs/c/ded0c6f16060
-[23/24] netfs, afs: Fix write skipping in dir/link writepages
-        https://git.kernel.org/vfs/vfs/c/9871938f99cc
-[24/24] afs: Fix the locking used by afs_get_link()
-        https://git.kernel.org/vfs/vfs/c/c0410adf3da6
+2026=EB=85=84 5=EC=9B=94 12=EC=9D=BC (=ED=99=94) =EC=98=A4=ED=9B=84 9:43, D=
+avid Howells <dhowells@redhat.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+> In netfs_extract_user_iter(), if it's given a zero-length iterator, it wi=
+ll
+> fall through the loop without setting ret, and so the error handling
+> behaviour will be undefined, depending on whether ret happens to be
+> negative.  The value of ret then propagates back up the callstack.
+>
+> Fix this by presetting ret to 0.
+>
+> Fixes: 85dd2c8ff368 ("netfs: Add a function to extract a UBUF or IOVEC in=
+to a BVEC iterator")
+> Closes: https://sashiko.dev/#/patchset/20260414082004.3756080-1-dhowells%=
+40redhat.com
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Paulo Alcantara <pc@manguebit.org>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+>  fs/netfs/iterator.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
+> index 154a14bb2d7f..6903028b7162 100644
+> --- a/fs/netfs/iterator.c
+> +++ b/fs/netfs/iterator.c
+> @@ -43,7 +43,7 @@ ssize_t netfs_extract_user_iter(struct iov_iter *orig, =
+size_t orig_len,
+>         unsigned int max_pages;
+>         unsigned int npages =3D 0;
+>         unsigned int i;
+> -       ssize_t ret;
+> +       ssize_t ret =3D 0;
+>         size_t count =3D orig_len, offset, len;
+>         size_t bv_size, pg_size;
+>
+>
+>
