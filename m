@@ -1,410 +1,126 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3202930B509
-	for <linux-cifs@vger.kernel.org>; Wed, 13 May 2026 13:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFA438655A;
+	Wed, 13 May 2026 14:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778678792; cv=none; b=orU07SoO0eClrDjYFMyheF92hn/nm5V8gWz3FE8/IcEkcrp5ZJszsG1PLBvtSnpqhF+0g+pUDWacB31d3/Irxl9QY2z1DNsch9V0KQH5ylJ88T/1mzvs0yy31Qnv//CDH6TCouf+Suxo59+kbFR/xW1uXMvuN9BHVPiSPTc62go=
+	t=1778684361; cv=none; b=iTK1QhfmhcdYbhmyQoPdM4VrW7HzWoI3PtTB101iNjpQXqUEouYHpZk1olqfT4B6LFqCTRT5yRrHRnekBCrOC5b8ONsdLjVCul4tZP9p1DGGaA2oL6sHF3Tyd3Jo/xSZBrkajesE/xWKD5KrbKXeOJJj9bq5NgrI/WxMgGf0Cjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778678792; c=relaxed/simple;
-	bh=u6sTqYkY03AXF8Fsq7JIjX4yOqxj4hiNwK8IYEC8lg4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HWOJeR46ioMEX6bie08nUKbNmnp9vPY2XnrrqAoGA3BnJK1EFxdWR8eXlrECtDlPeYLOrzS2uzWrn/wcxdx0xHQSF08CNquILdo5bYiCdksn2Z8lhZLwcplaMUdK92/YBIHVlXmVvKG4wiQMYflCKeyX2T84Szn+AwNHH7uKquI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jvkGe515; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778684361; c=relaxed/simple;
+	bh=zbNHyyDRYAeGo6U86F5ea4LHa32zJh59lyteWOe4KGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZhMrupf3fZ6ls6FVHJp880rovHBrIpAxXmr8lnULIEhJPSrZiYAzG1/w8BjXXkWF/YlY651QuhNX2j5B0SV0hm4xGTDZ21uo84LwcqRDo7Umyj2OVhM7le6YNRunOLF4FBm+8lkkdyqRsJLIWqZH3UgwwtbbnGAmzRD9RgyiUzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iIhYEKx5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jvkGe515"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-83538fcdda8so196056b3a.3
-        for <linux-cifs@vger.kernel.org>; Wed, 13 May 2026 06:26:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778678788; x=1779283588; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/bkkMADpz2yXiOC9+FVOiFEb43Zu5O/R6fBoD4YtC/M=;
-        b=jvkGe515DwLEm66AIvyJpDqf4nsjRvlEe96WbJxTioVg1wHay4bhQjKFDVq8tpnzvL
-         A9YhWQLhEY46vBzMczEHfS2zXzBdVHpShVm6b7F/O2IYIp0yhTj2DESEgLIQb453O9YB
-         rrQd4f2NyprXjPhPim15/kito8tc9zBVqUXW417gcntgpFEIxroqTceYk5k1GdmKFjhu
-         GcY+Yhv7y6GAjEGK0YiyCdpngd1AB7R3v9YCj2yGGX/gAZSryUUvGJVGwKHLMEQ7gLqT
-         FmNfPLIlZmUoMNX3oB4x69iVO5BDYifS5Vscl0JYNB+sCG7XDtdCdpzUj/1YzSA2tHlA
-         GqXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778678788; x=1779283588;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/bkkMADpz2yXiOC9+FVOiFEb43Zu5O/R6fBoD4YtC/M=;
-        b=IpfFC94OSTsx1ZUkhbUSqHfXquH0n0md8UCttaHXB0MuxPOtg4CH7QfmRgsNVZLJQ0
-         VtAN7JDU6iOOlzP+RTEtNJsvUXdoCay/bkmL2Rw/u6Y19+pOzDltcrAmdo0fhMHfpOd4
-         PIovJGTTJY0fUd5BYWG4QUuViQ3SIRpd2sbi4Blw9ZJTfS2X2ERwHskLOSys2EveOeUQ
-         SXLLBZ+A2lpIJc15X+0wxc57lEZb0YXMXnUlBaDjT5bLSbrPO/3gN01DEoZkyHtQC5gU
-         RMLZpBvug0SSjV+Khasjf/ImtqX6kQ8A4fU05re+DnvJ30F6vVj19ebVGJcpp0i37lyM
-         vo7g==
-X-Forwarded-Encrypted: i=1; AFNElJ/58Z7Od+MgqQfhlMNVOxD7CL6SQ55MkDkevqbSKq8huDaRJAEqYjbEQnAH/iZSPafjcZLD/FwcuxOG@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmrQn2wj/FOzsKulMW7U1NRRJXQoAfDIqOA/ToB/wyv0EyH71C
-	aEHgrxqM3lRCq5W9HQpo8eFdQd5cN5Xur3+5mIkiXaZSQhJUNQl38efVFnLe6jCM
-X-Gm-Gg: Acq92OExc9XeAnt6jMJhgzVT9oa2dYPGJd/OCIfoMDzEwXDEr4oXWsFM50vir+lsjpz
-	Hhu3wJjhG7DTYYpeUwEOzfgxZxx6Ii54kreYebvxIy43XTUZu0tLE7Q0zet7krgxY74m16PYF+T
-	H3Coytz1hPJLRdxPT8se3Zo11kqWNjG3d+vUnBYyGi6cjDis/kncbrm4E5jcxO54JHXO57qHoZK
-	G0djw/O6GvFVaq34z0CjYpjr1riAWtN/OxSJuA3Ih6URV85Tur2YcfcTUNHmwxNE7AaqSGKyIMM
-	u+0UoD/SkZESOXDdpMY/4HMTakzEYK2Xt5WgclQEjFHXNqyFS7MbCo2piCskz8kia759mUQbpFU
-	+/GWjn8TrHJ1bhKfQun2dZ2WvJj0sFUsB2INa27k5YfkH2BwhCsUe26FbcSe8uFUGozVVPcVC+N
-	ZszAYabgah3xE+SQ0xGAIgnBUpzgM=
-X-Received: by 2002:a05:6a00:3d44:b0:838:c01a:7a56 with SMTP id d2e1a72fcca58-83f0427a642mr1778347b3a.4.1778678788250;
-        Wed, 13 May 2026 06:26:28 -0700 (PDT)
-Received: from ser8.. ([221.156.231.192])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83965645140sm27611899b3a.12.2026.05.13.06.26.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 06:26:27 -0700 (PDT)
-From: DaeMyung Kang <charsyam@gmail.com>
-To: Steve French <sfrench@samba.org>
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Henrique Carvalho <henrique.carvalho@suse.com>,
-	Rajasi Mandal <rajasimandalos@gmail.com>,
-	Rajasi Mandal <rajasimandal@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	DaeMyung Kang <charsyam@gmail.com>
-Subject: [PATCH v6] cifs: client: stage smb3_reconfigure() updates and restore ctx on failure
-Date: Wed, 13 May 2026 22:26:22 +0900
-Message-ID: <20260513132622.2640103-1-charsyam@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260501060907.3859641-1-charsyam@gmail.com>
-References: <20260501060907.3859641-1-charsyam@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iIhYEKx5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D47CC2BCB3;
+	Wed, 13 May 2026 14:59:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778684360;
+	bh=zbNHyyDRYAeGo6U86F5ea4LHa32zJh59lyteWOe4KGw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iIhYEKx51XcVXCXizSytP4ZvhZtiBJmIPf+6O8Mktq3AJeEzUzkfq9zJFMxWWOQN/
+	 aoWFZ5To1myUEqEdw7VallkySu/iGPAldgKZg0gl6xnLSnuloIhSu3lBTLqysfs1I0
+	 Skg4f9BktAuE18yvvQRJ70VrpwY5SAV36hi26w0P9GMsQkbf7JD+SNU9HxSde3AnHu
+	 bo3a4ZV9/09phwV+AioQvcuqmfuB2eTSN/4uxVBmpiaTeWdd95EFcAzHk3DTbz/8je
+	 v+mVMmUJ6OM8tMNlaOTQXwFxTd7uJskcOql+wcSZWQ2REyC0QM0b5EqoBwpRfC7ETk
+	 FtuJsAzYKU1jA==
+Date: Wed, 13 May 2026 07:59:19 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>,
+	Kairui Song <kasong@tencent.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
+	Theodore Ts'o <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
+	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Hyunchul Lee <hyc.lee@gmail.com>, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org
+Subject: Re: [PATCH 08/12] swap,iomap: simplify iomap_swapfile_iter
+Message-ID: <20260513145919.GP9555@frogsfrogsfrogs>
+References: <20260512053625.2950900-1-hch@lst.de>
+ <20260512053625.2950900-9-hch@lst.de>
+ <20260512170204.GI9555@frogsfrogsfrogs>
+ <20260513065608.GA2250@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260513065608.GA2250@lst.de>
 
-smb3_reconfigure() moves strings out of cifs_sb->ctx before the
-multichannel update, so a later failure can leave the live context
-with NULL strings or options that do not match the session.
+On Wed, May 13, 2026 at 08:56:08AM +0200, Christoph Hellwig wrote:
+> On Tue, May 12, 2026 at 10:02:04AM -0700, Darrick J. Wong wrote:
+> > OH.  Now I remember why -- it's to handle contiguous mixed mappings
+> > better.
+> > 
+> > Let's say that you have a 1k fsblock filesystem and 4k base pages.  You
+> > fallocate an 8G swap file and then mkswap it.  The first mapping is a 1k
+> > written mapping at offset 0 for the swap header, followed by an 8388607k
+> > unwritten mapping at offset 3k.
+> > 
+> > The PAGE_SIZE rounding code in iomap_swapfile_add_extent will round the
+> > end of that first mapping down to zero and ignore it.  The second
+> > mapping will be treated as if it were a 8388604k mapping starting at
+> > offset 4096.  Now the page counts are wrong and the swapon fails.
+> 
+> Do we care about this use case?  I guess you did as you implemented
+> his, but still?
 
-Stage the new ctx separately, commit it only on success, and restore
-the snapshot on failure. Also make smb3_sync_session_ctx_passwords()
-all-or-nothing.
+We do, because mkswap -F uses fallocate nowadays:
 
-Commit session passwords before channel updates so newly added channels
-authenticate with the staged credentials.
+$ mkswap -s 4194304 -F a
+Setting up swapspace version 1, size = 4 MiB (4190208 bytes)
+no label, UUID=bc9746bf-e200-4944-927c-80d83872f1cb
+$ filefrag -v a
+Filesystem type is: 58465342
+File size of a is 4194304 (1024 blocks of 4096 bytes)
+ ext:     logical_offset:        physical_offset: length:   expected: flags:
+   0:        0..       0:  411383552.. 411383552:      1:            
+   1:        1..    1023:  411383553.. 411384575:   1023:             last,unwritten,eof
+a: 1 extent found
 
-Fixes: ef529f655a2c ("cifs: client: allow changing multichannel mount options on remount")
-Reported-by: RAJASI MANDAL <rajasimandalos@gmail.com>
-Closes: https://lore.kernel.org/lkml/CAEY6_V1+dzW3OD5zqXhsWyXwrDTrg5tAMGZ1AJ7_GAuRE+aevA@mail.gmail.com/
-Link: https://lore.kernel.org/lkml/xkr2dlvgibq5j6gkcxd3yhhnj4atgxw2uy4eug2pxm7wy7nbms@iq6cf5taa65v/
-Reviewed-by: Henrique Carvalho <henrique.carvalho@suse.com>
-Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
----
-v6: (feedback from Henrique Carvalho)
- - Drop the update_password / update_password2 booleans in
-   smb3_sync_session_ctx_passwords(); commit when the local pointer
-   itself is non-NULL.
- - Rename the failure label restore_new_ctx -> cleanup_new_ctx, since
-   new_ctx is cleaned up (not restored) on the staged-failure path.
- - Shorten the commit message further per review.
+> > A more generic solution to this would be to change add_swap_extent to
+> > take sector_t addr and length values and use them to construct a bitmap
+> > representing contiguous physical space on the bdev, accounting of course
+> > for PAGE_SIZE alignment.  Except for the swap header page, every other
+> > contiguously set page-aligned region in the bitmap gets added to the
+> > swap extent map.
+> 
+> You don't even need a bitmap, just do basically the same checks as
+> the iomap code when moving to a new swap extent after moving to use
+> the sector_t.  And it really should anyway, as the current abuse of
+> sector_t to store a disk offset in PAGE_SIZE units is pretty gross.
 
-v5: (feedback from Henrique Carvalho)
- - Drop mchan_rc / scale_busy; the early failure paths now restore
-   cifs_sb->ctx from a snapshot taken on entry.
- - Build new_ctx separately and replace cifs_sb->ctx only on success.
- - Make smb3_sync_session_ctx_passwords() all-or-nothing: allocate
-   both copies first, commit only when both succeed.
- - Switch smb3_sync_ses_chan_max() max_channels parameter to size_t
-   to match struct cifs_ses::chan_max.
- - Shorten the commit message and follow nearby CIFS log style.
+Oh, I meant this to handle the particularly gross case where the fsblock
+size is smaller than a base page, but there are a very large number of
+file mappings that point to a physically contiguous extent but are not
+in logical order:
 
- fs/smb/client/fs_context.c | 161 +++++++++++++++++++++++++------------
- 1 file changed, 108 insertions(+), 53 deletions(-)
+{.offset=0, .length=1k, .addr=7},
+{.offset=1, .length=1k, .addr=6},
+{.offset=2, .length=1k, .addr=5},
+{.offset=3, .length=1k, .addr=4},
+{.offset=4, .length=1k, .addr=3},
+{.offset=5, .length=1k, .addr=2},
+{.offset=6, .length=1k, .addr=1},
+{.offset=7, .length=1k, .addr=0},
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index b9544eb0381b..cf6e18876c59 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -767,7 +767,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
- 					    void *data);
- static int smb3_get_tree(struct fs_context *fc);
--static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channels);
-+static void smb3_sync_ses_chan_max(struct cifs_ses *ses, size_t max_channels);
- static int smb3_reconfigure(struct fs_context *fc);
- 
- static const struct fs_context_operations smb3_fs_context_ops = {
-@@ -1041,25 +1041,34 @@ do {									\
- 
- int smb3_sync_session_ctx_passwords(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses)
- {
-+	char *password = NULL, *password2 = NULL;
-+
- 	if (ses->password &&
- 	    cifs_sb->ctx->password &&
- 	    strcmp(ses->password, cifs_sb->ctx->password)) {
--		kfree_sensitive(cifs_sb->ctx->password);
--		cifs_sb->ctx->password = kstrdup(ses->password, GFP_KERNEL);
--		if (!cifs_sb->ctx->password)
-+		password = kstrdup(ses->password, GFP_KERNEL);
-+		if (!password)
- 			return -ENOMEM;
- 	}
- 	if (ses->password2 &&
- 	    cifs_sb->ctx->password2 &&
- 	    strcmp(ses->password2, cifs_sb->ctx->password2)) {
--		kfree_sensitive(cifs_sb->ctx->password2);
--		cifs_sb->ctx->password2 = kstrdup(ses->password2, GFP_KERNEL);
--		if (!cifs_sb->ctx->password2) {
--			kfree_sensitive(cifs_sb->ctx->password);
--			cifs_sb->ctx->password = NULL;
-+		password2 = kstrdup(ses->password2, GFP_KERNEL);
-+		if (!password2) {
-+			kfree_sensitive(password);
- 			return -ENOMEM;
- 		}
- 	}
-+
-+	if (password) {
-+		kfree_sensitive(cifs_sb->ctx->password);
-+		cifs_sb->ctx->password = password;
-+	}
-+	if (password2) {
-+		kfree_sensitive(cifs_sb->ctx->password2);
-+		cifs_sb->ctx->password2 = password2;
-+	}
-+
- 	return 0;
- }
- 
-@@ -1072,7 +1081,7 @@ int smb3_sync_session_ctx_passwords(struct cifs_sb_info *cifs_sb, struct cifs_se
-  * with the session's channel lock. This should be called whenever the maximum
-  * allowed channels for a session changes (e.g., after a remount or reconfigure).
-  */
--static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channels)
-+static void smb3_sync_ses_chan_max(struct cifs_ses *ses, size_t max_channels)
- {
- 	spin_lock(&ses->chan_lock);
- 	ses->chan_max = max_channels;
-@@ -1082,12 +1091,15 @@ static void smb3_sync_ses_chan_max(struct cifs_ses *ses, unsigned int max_channe
- static int smb3_reconfigure(struct fs_context *fc)
- {
- 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
-+	struct smb3_fs_context *new_ctx = NULL;
-+	struct smb3_fs_context *old_ctx = NULL;
- 	struct dentry *root = fc->root;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(root->d_sb);
- 	struct cifs_ses *ses = cifs_sb_master_tcon(cifs_sb)->ses;
- 	unsigned int rsize = ctx->rsize, wsize = ctx->wsize;
- 	char *new_password = NULL, *new_password2 = NULL;
- 	bool need_recon = false;
-+	bool need_mchan_update;
- 	int rc;
- 
- 	if (ses->expired_pwd)
-@@ -1097,6 +1109,16 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	if (rc)
- 		return rc;
- 
-+	old_ctx = kzalloc_obj(*old_ctx);
-+	if (!old_ctx)
-+		return -ENOMEM;
-+
-+	rc = smb3_fs_context_dup(old_ctx, cifs_sb->ctx);
-+	if (rc) {
-+		kfree(old_ctx);
-+		return rc;
-+	}
-+
- 	/*
- 	 * We can not change UNC/username/password/domainname/
- 	 * workstation_name/nodename/iocharset
-@@ -1106,16 +1128,22 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	STEAL_STRING(cifs_sb, ctx, UNC);
- 	STEAL_STRING(cifs_sb, ctx, source);
- 	STEAL_STRING(cifs_sb, ctx, username);
-+	STEAL_STRING(cifs_sb, ctx, domainname);
-+	STEAL_STRING(cifs_sb, ctx, nodename);
-+	STEAL_STRING(cifs_sb, ctx, iocharset);
- 
--	if (need_recon == false)
-+	if (!need_recon) {
- 		STEAL_STRING_SENSITIVE(cifs_sb, ctx, password);
--	else  {
-+	} else {
- 		if (ctx->password) {
- 			new_password = kstrdup(ctx->password, GFP_KERNEL);
--			if (!new_password)
--				return -ENOMEM;
--		} else
-+			if (!new_password) {
-+				rc = -ENOMEM;
-+				goto restore_ctx;
-+			}
-+		} else {
- 			STEAL_STRING_SENSITIVE(cifs_sb, ctx, password);
-+		}
- 	}
- 
- 	/*
-@@ -1125,11 +1153,29 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	if (ctx->password2) {
- 		new_password2 = kstrdup(ctx->password2, GFP_KERNEL);
- 		if (!new_password2) {
--			kfree_sensitive(new_password);
--			return -ENOMEM;
-+			rc = -ENOMEM;
-+			goto restore_ctx;
- 		}
--	} else
-+	} else {
- 		STEAL_STRING_SENSITIVE(cifs_sb, ctx, password2);
-+	}
-+
-+	/* if rsize or wsize not passed in on remount, use previous values */
-+	ctx->rsize = rsize ? CIFS_ALIGN_RSIZE(fc, rsize) : cifs_sb->ctx->rsize;
-+	ctx->wsize = wsize ? CIFS_ALIGN_WSIZE(fc, wsize) : cifs_sb->ctx->wsize;
-+
-+	new_ctx = kzalloc_obj(*new_ctx);
-+	if (!new_ctx) {
-+		rc = -ENOMEM;
-+		goto restore_ctx;
-+	}
-+
-+	rc = smb3_fs_context_dup(new_ctx, ctx);
-+	if (rc)
-+		goto restore_ctx;
-+
-+	need_mchan_update = ctx->multichannel != cifs_sb->ctx->multichannel ||
-+			    ctx->max_channels != cifs_sb->ctx->max_channels;
- 
- 	/*
- 	 * we may update the passwords in the ses struct below. Make sure we do
-@@ -1140,54 +1186,55 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	/*
- 	 * smb2_reconnect may swap password and password2 in case session setup
- 	 * failed. First get ctx passwords in sync with ses passwords. It should
--	 * be okay to do this even if this function were to return an error at a
--	 * later stage
-+	 * be done before committing new passwords.
- 	 */
- 	rc = smb3_sync_session_ctx_passwords(cifs_sb, ses);
- 	if (rc) {
- 		mutex_unlock(&ses->session_mutex);
--		kfree_sensitive(new_password);
--		kfree_sensitive(new_password2);
--		return rc;
-+		goto cleanup_new_ctx;
-+	}
-+
-+	/*
-+	 * If multichannel or max_channels has changed, update the session's channels accordingly.
-+	 * This may add or remove channels to match the new configuration.
-+	 */
-+	if (need_mchan_update) {
-+		/* Prevent concurrent scaling operations */
-+		spin_lock(&ses->ses_lock);
-+		if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
-+			spin_unlock(&ses->ses_lock);
-+			mutex_unlock(&ses->session_mutex);
-+			rc = -EINVAL;
-+			goto cleanup_new_ctx;
-+		}
-+		ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
-+		spin_unlock(&ses->ses_lock);
- 	}
- 
- 	/*
--	 * now that allocations for passwords are done, commit them
-+	 * Commit session passwords before any channel work so newly added
-+	 * channels authenticate with the new credentials.
- 	 */
- 	if (new_password) {
- 		kfree_sensitive(ses->password);
- 		ses->password = new_password;
-+		new_password = NULL;
- 	}
- 	if (new_password2) {
- 		kfree_sensitive(ses->password2);
- 		ses->password2 = new_password2;
-+		new_password2 = NULL;
- 	}
- 
--	/*
--	 * If multichannel or max_channels has changed, update the session's channels accordingly.
--	 * This may add or remove channels to match the new configuration.
--	 */
--	if ((ctx->multichannel != cifs_sb->ctx->multichannel) ||
--	    (ctx->max_channels != cifs_sb->ctx->max_channels)) {
--
-+	if (need_mchan_update) {
- 		/* Synchronize ses->chan_max with the new mount context */
- 		smb3_sync_ses_chan_max(ses, ctx->max_channels);
--		/* Now update the session's channels to match the new configuration */
--		/* Prevent concurrent scaling operations */
--		spin_lock(&ses->ses_lock);
--		if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
--			spin_unlock(&ses->ses_lock);
--			mutex_unlock(&ses->session_mutex);
--			return -EINVAL;
--		}
--		ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
--		spin_unlock(&ses->ses_lock);
- 
- 		mutex_unlock(&ses->session_mutex);
- 
--		rc = smb3_update_ses_channels(ses, ses->server,
--					       false /* from_reconnect */,
--					       false /* disable_mchan */);
-+		smb3_update_ses_channels(ses, ses->server,
-+					 false /* from_reconnect */,
-+					 false /* disable_mchan */);
- 
- 		/* Clear scaling flag after operation */
- 		spin_lock(&ses->ses_lock);
-@@ -1197,22 +1244,30 @@ static int smb3_reconfigure(struct fs_context *fc)
- 		mutex_unlock(&ses->session_mutex);
- 	}
- 
--	STEAL_STRING(cifs_sb, ctx, domainname);
--	STEAL_STRING(cifs_sb, ctx, nodename);
--	STEAL_STRING(cifs_sb, ctx, iocharset);
--
--	/* if rsize or wsize not passed in on remount, use previous values */
--	ctx->rsize = rsize ? CIFS_ALIGN_RSIZE(fc, rsize) : cifs_sb->ctx->rsize;
--	ctx->wsize = wsize ? CIFS_ALIGN_WSIZE(fc, wsize) : cifs_sb->ctx->wsize;
--
- 	smb3_cleanup_fs_context_contents(cifs_sb->ctx);
--	rc = smb3_fs_context_dup(cifs_sb->ctx, ctx);
-+	memcpy(cifs_sb->ctx, new_ctx, sizeof(*new_ctx));
-+	kfree(new_ctx);
-+	new_ctx = NULL;
-+	smb3_cleanup_fs_context(old_ctx);
-+	old_ctx = NULL;
- 	smb3_update_mnt_flags(cifs_sb);
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	if (!rc)
- 		rc = dfs_cache_remount_fs(cifs_sb);
- #endif
- 
-+	return rc;
-+
-+cleanup_new_ctx:
-+	smb3_cleanup_fs_context_contents(new_ctx);
-+restore_ctx:
-+	kfree(new_ctx);
-+	kfree_sensitive(new_password);
-+	kfree_sensitive(new_password2);
-+	smb3_cleanup_fs_context_contents(cifs_sb->ctx);
-+	memcpy(cifs_sb->ctx, old_ctx, sizeof(*old_ctx));
-+	kfree(old_ctx);
-+
- 	return rc;
- }
- 
--- 
-2.43.0
+That's two pages of swapfile, but with the current layout accumulation
+code we "cannot" find either.
 
+--D
