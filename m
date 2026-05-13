@@ -1,126 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFA438655A;
-	Wed, 13 May 2026 14:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9974D990A
+	for <linux-cifs@vger.kernel.org>; Wed, 13 May 2026 16:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778684361; cv=none; b=iTK1QhfmhcdYbhmyQoPdM4VrW7HzWoI3PtTB101iNjpQXqUEouYHpZk1olqfT4B6LFqCTRT5yRrHRnekBCrOC5b8ONsdLjVCul4tZP9p1DGGaA2oL6sHF3Tyd3Jo/xSZBrkajesE/xWKD5KrbKXeOJJj9bq5NgrI/WxMgGf0Cjo=
+	t=1778691270; cv=none; b=dQ/lI32868/DuC11cC2W+0fjnkVnsn9nwIbUG8P4LQ+hHrHUqvAikjaz1dASCnN0EgObTrStJBnRTxZXagPmNihp4xVAvG8rTJZRe4u0C9vgsLvvdGWyjGN3Z/tgJJ4dEJJ958IPovxly/dJ/rD+KY3wvZ6FkQ2KMjsVpRqfr9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778684361; c=relaxed/simple;
-	bh=zbNHyyDRYAeGo6U86F5ea4LHa32zJh59lyteWOe4KGw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZhMrupf3fZ6ls6FVHJp880rovHBrIpAxXmr8lnULIEhJPSrZiYAzG1/w8BjXXkWF/YlY651QuhNX2j5B0SV0hm4xGTDZ21uo84LwcqRDo7Umyj2OVhM7le6YNRunOLF4FBm+8lkkdyqRsJLIWqZH3UgwwtbbnGAmzRD9RgyiUzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iIhYEKx5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778691270; c=relaxed/simple;
+	bh=X+vAvrk4BOoiLqoEBSjuTBlkKJrS3AA/TWW4u8XPhzY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ban8OBgcJpRBh1GFVZuYAG6qP7BgCj5uIgs/u7iiqlWo7z+cLA1E9nkvzT8+wYAFViZXPjuo8m6Y423md894LPfObnek3E11JOulQlCUpgD29ler87Rpur4unEnsJpS509FKbVtuH7tO0EvHlIDLDDsq0D9oToThuzXe4EHEIXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=S5ovTFnS; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iIhYEKx5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D47CC2BCB3;
-	Wed, 13 May 2026 14:59:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778684360;
-	bh=zbNHyyDRYAeGo6U86F5ea4LHa32zJh59lyteWOe4KGw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iIhYEKx51XcVXCXizSytP4ZvhZtiBJmIPf+6O8Mktq3AJeEzUzkfq9zJFMxWWOQN/
-	 aoWFZ5To1myUEqEdw7VallkySu/iGPAldgKZg0gl6xnLSnuloIhSu3lBTLqysfs1I0
-	 Skg4f9BktAuE18yvvQRJ70VrpwY5SAV36hi26w0P9GMsQkbf7JD+SNU9HxSde3AnHu
-	 bo3a4ZV9/09phwV+AioQvcuqmfuB2eTSN/4uxVBmpiaTeWdd95EFcAzHk3DTbz/8je
-	 v+mVMmUJ6OM8tMNlaOTQXwFxTd7uJskcOql+wcSZWQ2REyC0QM0b5EqoBwpRfC7ETk
-	 FtuJsAzYKU1jA==
-Date: Wed, 13 May 2026 07:59:19 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>,
-	Kairui Song <kasong@tencent.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
-	Theodore Ts'o <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Hyunchul Lee <hyc.lee@gmail.com>, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 08/12] swap,iomap: simplify iomap_swapfile_iter
-Message-ID: <20260513145919.GP9555@frogsfrogsfrogs>
-References: <20260512053625.2950900-1-hch@lst.de>
- <20260512053625.2950900-9-hch@lst.de>
- <20260512170204.GI9555@frogsfrogsfrogs>
- <20260513065608.GA2250@lst.de>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="S5ovTFnS"
+Message-ID: <b5400da0-b60e-4bed-87a6-92b1b009c2dd@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1778691264;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6yc4C7B3dStFEa9zOHeP/EI8UB9Y+B5NDztv8Xu7raQ=;
+	b=S5ovTFnS0HdxF2tW6YvS+TX5gUS6qcOviymv4z4QJNjozEYJIOdrcEVNN46AtVW94+gfuj
+	DhOs0sa/9nFmoSRWCa2Dl0b6ZaJjN0b1eC/ig+sXJfYvmtwS1zCsFXmo36k5nfLyOGMP7V
+	3dL5s+Bt7ng4lELoD3xyebb7FwyEEv/0MJ5x65YR1fGr6RMYqPwN5+t8XReyesAFKopzwb
+	47VipBzLA8ja+jIkJnjLt6G5hPVCyY+1EaTyMqsAkGSmR+sbNesSZKjznjjzb66wlK7KAs
+	hUedWa/1jFz10+lB2RxJbEJiasnRBTb5BUqxL9PFF7EKfSXCoBZyc3VFcOyvSg==
+Date: Thu, 14 May 2026 00:54:12 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260513065608.GA2250@lst.de>
+Subject: Re: generic/004 server bug
+To: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
+ Huiwen He <hehuiwen@kylinos.cn>
+Cc: Paulo Alcantara <pc@manguebit.org>, CIFS <linux-cifs@vger.kernel.org>
+References: <CAH2r5mvP9s_KMc2G-_AsP__G0S5JCmrigOT-7U_ZNu1pLf+Q2g@mail.gmail.com>
+ <CAKYAXd-8VmgLNX=0TnsPL1LP2u-V-zOs+Z08dKHDZUbt+q2AAw@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAKYAXd-8VmgLNX=0TnsPL1LP2u-V-zOs+Z08dKHDZUbt+q2AAw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, May 13, 2026 at 08:56:08AM +0200, Christoph Hellwig wrote:
-> On Tue, May 12, 2026 at 10:02:04AM -0700, Darrick J. Wong wrote:
-> > OH.  Now I remember why -- it's to handle contiguous mixed mappings
-> > better.
-> > 
-> > Let's say that you have a 1k fsblock filesystem and 4k base pages.  You
-> > fallocate an 8G swap file and then mkswap it.  The first mapping is a 1k
-> > written mapping at offset 0 for the swap header, followed by an 8388607k
-> > unwritten mapping at offset 3k.
-> > 
-> > The PAGE_SIZE rounding code in iomap_swapfile_add_extent will round the
-> > end of that first mapping down to zero and ignore it.  The second
-> > mapping will be treated as if it were a 8388604k mapping starting at
-> > offset 4096.  Now the page counts are wrong and the swapon fails.
+I am currently debugging this issue: 
+https://chenxiaosong.com/en/smb-xfstests-generic-004.html
+
+My team member Huiwen He <hehuiwen@kylinos.cn> will continue my work.
+
+On 2026/5/12 15:59, Namjae Jeon wrote:
+> On Mon, May 11, 2026 at 6:36 AM Steve French <smfrench@gmail.com> wrote:
+>>
+>> I noticed generic/004 fails to ksmbd, likely server bug since it works
+>> to Samba and Windows and Azure.   Test generic/004 was recently
+>> enabled when O_TMPFILE support was added by Paulo.
+>>
+>> Ideas welcome on the ksmbd problem this found.
+> If there are no volunteers for a while, I'll take a look at it later.
+> I will add it to my to-do list.
+> Thanks.
 > 
-> Do we care about this use case?  I guess you did as you implemented
-> his, but still?
-
-We do, because mkswap -F uses fallocate nowadays:
-
-$ mkswap -s 4194304 -F a
-Setting up swapspace version 1, size = 4 MiB (4190208 bytes)
-no label, UUID=bc9746bf-e200-4944-927c-80d83872f1cb
-$ filefrag -v a
-Filesystem type is: 58465342
-File size of a is 4194304 (1024 blocks of 4096 bytes)
- ext:     logical_offset:        physical_offset: length:   expected: flags:
-   0:        0..       0:  411383552.. 411383552:      1:            
-   1:        1..    1023:  411383553.. 411384575:   1023:             last,unwritten,eof
-a: 1 extent found
-
-> > A more generic solution to this would be to change add_swap_extent to
-> > take sector_t addr and length values and use them to construct a bitmap
-> > representing contiguous physical space on the bdev, accounting of course
-> > for PAGE_SIZE alignment.  Except for the swap header page, every other
-> > contiguously set page-aligned region in the bitmap gets added to the
-> > swap extent map.
-> 
-> You don't even need a bitmap, just do basically the same checks as
-> the iomap code when moving to a new swap extent after moving to use
-> the sector_t.  And it really should anyway, as the current abuse of
-> sector_t to store a disk offset in PAGE_SIZE units is pretty gross.
-
-Oh, I meant this to handle the particularly gross case where the fsblock
-size is smaller than a base page, but there are a very large number of
-file mappings that point to a physically contiguous extent but are not
-in logical order:
-
-{.offset=0, .length=1k, .addr=7},
-{.offset=1, .length=1k, .addr=6},
-{.offset=2, .length=1k, .addr=5},
-{.offset=3, .length=1k, .addr=4},
-{.offset=4, .length=1k, .addr=3},
-{.offset=5, .length=1k, .addr=2},
-{.offset=6, .length=1k, .addr=1},
-{.offset=7, .length=1k, .addr=0},
-
-That's two pages of swapfile, but with the current layout accumulation
-code we "cannot" find either.
-
---D
