@@ -1,62 +1,62 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB2034404F
-	for <linux-cifs@vger.kernel.org>; Thu, 14 May 2026 18:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43D233689B
+	for <linux-cifs@vger.kernel.org>; Thu, 14 May 2026 18:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778782125; cv=none; b=VLLy1xysgLQrPkzc4DG6b2Kv+9SbWYuoD3o8Mpuye6Q8p3suWR4aynOLY+Yy6FQkAQX+8na6f/gIXKf7V4gzyjjj7CY6t28bW8fD352n3BqAb4kbsZpyyNUyBFYYKYRph0q96nGa49qVLdnEVasEG8ArfgopTE/WLtpYLzNnX/s=
+	t=1778782125; cv=none; b=oQGoTC9guqJdtHmszR9p6gf+tzVY1zbYACF1blalFvn3LVhENySEJrnmlt8gKrr74uqlqO2keEAn3LYjOzslQ3gnOnpsrZh+mauGBXxLgbZFXtYXDkCob8rhEfMO4oMPG2rj4gBLLOIYFaqUN3AyOSFXAxQZLDHRLyQO5DCeou4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1778782125; c=relaxed/simple;
-	bh=5Ynp0tspbj7fop3SCVuGpgcFSVxC2e/pW316p1fDYmY=;
+	bh=y3XDBWgjGLvdKOqqdEXi1CCc3iEadE4/auoj285CRQg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fbwq8FoCEPX2IjzwquO//9NcTuQoaT0UHk4dQEm76sOJ+7t3pvpARFETKBygozwaAIi40dOtiDbUjXA5HQwdu5eTny6I16tZPL5v6EhtEuyoadnq6gtYRGIsciU/15anB+OWNeEYr7cJeQp7Zslf+VHG++FrGx34imF63aT5AjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QPWatS4+; arc=none smtp.client-ip=209.85.216.54
+	 MIME-Version; b=lpDGAEMvh3wfjgDqDQD2Tyo+et8/NhllAERv3QUzCXpyhuMCIvPGiVQJIqpPrQtXUFOy9yQDufFiLnidic3CCI6m8PI3C7p4q5zB7/CYgJEzfFru4MXbMmZvZe/Euk/9MPtb8cPkIXIjmO4jBml8bieAvywZKWwX9zygGZRTWJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VdXkuYob; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QPWatS4+"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3660daea6a5so4627774a91.1
-        for <linux-cifs@vger.kernel.org>; Thu, 14 May 2026 11:08:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VdXkuYob"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c801912c903so4002689a12.0
+        for <linux-cifs@vger.kernel.org>; Thu, 14 May 2026 11:08:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1778782123; x=1779386923; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ehxmwL/oIJBExyIAhWyjKvWrZy8W+BKAjdFc8FsLwUA=;
-        b=QPWatS4+cWbSjWOC6rZtdOa/sKlAHcXpAyjDKWtGiSXG38rWJu6YvvAd2H2v9uub3W
-         WgLCfjWo6vXk3rO5XxR7QKlqCWAOkiwCrj/b2d1BD26+UshhZR4gZJxfCz7JuqKYd6O6
-         i3jagyeDS5PJlUi+vZZoMGY4Zdap5cLuc7P1dVilO4TElvFFhqZzucGR6jtrNVomUxp1
-         RwjXXeY9nfUgm4g2BBoxYXtl8NPzjx/0mAiIunr0UyLYKYzapR/elsTmFQfk3SYzU+65
-         mfbPahgXDuK9FZx3igoMZgSfLyHuvP2BI2MNRKD7pjs/uDtKFPz5hNhBvnyUGexfkpZh
-         znfA==
+        bh=0e6j/npVv80kBiW+5yEwB1xvrblGuYXSB2qdyI4D/60=;
+        b=VdXkuYobr3l1+ZpwBbmR5yzEzx2xHsbKcQocBf5CAEhmkNd0y7nHMLheVIB/btPJgh
+         gTTuw/KqzYIBQ1FlHXt9c+t88QdbGmCvjOyRgzH3kvDh077kGi68Wcix9rQUyfvo8c0g
+         aFvbgKcQtpKzOFpv2tdrlgs8wN0GDGsyM88Wnvca+J5bo/OjlIEylpixWQLb22JXjyON
+         F1Ya61UVveDoRKuvBU59qNQc/+VZ80gHiiT7E2nKhH+rQQ710LI91TEOFEwBWR/h5E05
+         ZRqgihRmBc4rRbUB1S2wEq3yj7PAp3mOi9apRQR7urh2k6n1yLxFawiCtVhgDWMM7UKE
+         ZrPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1778782123; x=1779386923;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ehxmwL/oIJBExyIAhWyjKvWrZy8W+BKAjdFc8FsLwUA=;
-        b=EkvRWU6m6pnxEHQ752AVF/58JP/4IMIfCLtn1EZAmKd9aqNaq+u5UiqTQ9IcZQAv/A
-         /F0Blgh9A+c0WQG41pMI2Fdw2U6MVrLNo37WeC2+Wysxixl2TF70Jsx+FKb/XDG91Na5
-         3oW7IJxC6nOfsRvp1BU3RQs3djeDLe/S4tRqdQ1VWqQ4cUxYedKovGMIT0V/FjW2KH5r
-         Fjhky0/XItkPyBnnHI2t8GL5g4NbOUGVwKX2kjkYCsLRoTLMDxS7QdvpSXT5T+c8Euti
-         LlsxZZmOtLja9M9a3UgzDocBcliuYcGzL/rAPUcfrgbMP1q0FZPX59MaOUxMqQ9gssNb
-         Km5g==
-X-Gm-Message-State: AOJu0YyIdF4usongV8qEN0oCMh+e9EHk0o09q4h/+g4Nd6/hSRY9j4Xz
-	RFFYgvX9U6P7ebinQ3/47VP2+ioJvTPBHhzgQoQqMc1W95PXiR43Dabpg+b6Nz3dKfk=
-X-Gm-Gg: Acq92OGglFBsd4RRex10rQY6a5AGYwXs4ND8Et499C7NDpMP6H3Q5FhCm9L3WU1AOI4
-	DPLGNXHJ3vIfehVUTlq3rX8RC8KrNEZqmxbW7j2ctChhJjeThCCiqXgBw7SDjV3H9uAYnbg0yhc
-	TTNv+dW1xkB/XLWdV1svPWq6tQE44RvNJ6JJHmQil/Gseb4+wbRnvDKO0Zp01YPCn2L8E8FKeuD
-	RWXiOOMXNjsdJMmAmsePD2GukuI2tySKcomAsQG4uAiQRxuFHP7FaMGaX+E13xuEfmrWnD5KY9m
-	+vCX37NX/8VQpthp1IjKxr69Fp2X5YoEiViXnO/RD3YIv2YtclR2rX7lxuf2mT6dDwvnnchqYa2
-	c3qjJvRVshbSMfINeW5oEZZxLmkJ6nX4hGDZIE4uBFfXeYjsc+/BHcuLEoZ+mHLM/w8L10Urcyl
-	M/MVCzbVW+4vYTFgOvx5zTDlIicHhAVhH6iOks8zzQl2DcbfjWraHtGBGqoOMVpVpX
-X-Received: by 2002:a17:90b:1b05:b0:366:132:fda3 with SMTP id 98e67ed59e1d1-369519c4b9cmr440132a91.11.1778782123575;
-        Thu, 14 May 2026 11:08:43 -0700 (PDT)
+        bh=0e6j/npVv80kBiW+5yEwB1xvrblGuYXSB2qdyI4D/60=;
+        b=YmR4VYz//qdiOC/K+PvT29xfs8jJ1tPbML5WwYqpNgvAVYXzelsA1SSuBflhIMDyBo
+         xM/iTFE4wrsAZFo6xDJWLAQXFYIjovoQcLBQ49mChh+I2h4YpSrE8fJEtCg8pzSLaPZa
+         1FEsCfQM1wnNWwK/ImN2HFuYxwM9gKCdA8BWI9Woofp432JDmvCli0DzS5k3P++f8I8+
+         GjMAXbXypHfWGajCuoIUQaopEfpEJMBD8C55SoLYV0TVXxp15eKarYQ635Cj6m2tdgfG
+         sCRU5ae1m95RQS3ZCn52c/3cIFIPtU0wBWzSWWvJtuBjpBzDUCuKCNV0o3Qo2mRP6quF
+         kcpQ==
+X-Gm-Message-State: AOJu0YwcM7qG6LIPrV4JpAb6omZSFLpmMjsfgFlo1Szt5sNyQPsrZNiB
+	u5TcBj3KVtP5t2MpOeZKlc+8kiTQo7lfWt9X6fZ4BL1CtP88Af/KNHRB9SO47O+iPCY=
+X-Gm-Gg: Acq92OGxxLTzqWAzxNdUnFFqUoswUU0wZEEXk/RicfhU/0OgvegmWB0+ax7zcG6ckT9
+	lD/Zb2V7fbm9DiSfo6Bj3GGJgeiBGh1GWVXjencFHenpnqyxFHR4KmPinMTKcd7mQ47LYHrXlHl
+	e+Fdkyioencqwj9NyRLbydklrfffzTphYwTZ41m9uGOTuZeedBenNawfXe0hmB/k/dO5htmgdux
+	8dSRd+fy4jJKAD8RzxyRR8LQZVus1d6JPvRRMsEKnAoD6/yBSLcgIzHgom88Q4E9ZMncC8eQb3A
+	J4OdwcaGfpXan1tk6wxA9aLAsCaocJ15lQXv+AivYAwBx3C9J2nhYKq1aaZK6Q4vCXu5mFG5u9s
+	XFAoaBh5+nFOIhjc5liOhaVFy6avYvFtZAwv+O/BpqZwFxabmdMSLX1wExxE0LfwNT2XkFnTIte
+	6pa1eYBwN3osgc1BalH6bOrICJ8fvTRC3GjA4UbmH5WalMzoo3XHNNq5IQwRl0qoo3
+X-Received: by 2002:a05:6a20:6a0e:b0:39f:91e9:cada with SMTP id adf61e73a8af0-3b22e816ab4mr337132637.9.1778782122622;
+        Thu, 14 May 2026 11:08:42 -0700 (PDT)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.104])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c82bb121cd6sm3134589a12.30.2026.05.14.11.08.42
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c82bb121cd6sm3134589a12.30.2026.05.14.11.08.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 11:08:43 -0700 (PDT)
+        Thu, 14 May 2026 11:08:42 -0700 (PDT)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -67,9 +67,9 @@ To: linux-cifs@vger.kernel.org,
 	henrique.carvalho@suse.com,
 	ematsumiya@suse.de
 Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH v5 11/17] cifs: option to disable time-based eviction of cache
-Date: Thu, 14 May 2026 23:38:17 +0530
-Message-ID: <20260514180823.497293-11-sprasad@microsoft.com>
+Subject: [PATCH v5 10/17] cifs: register a shrinker to manage cached_dirents
+Date: Thu, 14 May 2026 23:38:16 +0530
+Message-ID: <20260514180823.497293-10-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260514180823.497293-1-sprasad@microsoft.com>
 References: <20260514180823.497293-1-sprasad@microsoft.com>
@@ -83,45 +83,214 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-Today there is no way to disable time-based eviction of dir cache.
-dir_cache_timeout = 0 meant immediate free up of dir cache on next
-laundromat scan. We already have nohandlecache to disable dir cache.
-
-This changes the meaning of dir_cache_timeout = 0 to mean unlimited
-timeout. Shrinker-based eviction is still possible.
+Since the cached_dirents are now backed by folioq, we do not need
+a timed cleanup of these cfids anymore. This change registers a
+shrinker with the mm layer for the dircache. If mm needs to free up
+memory or flush the cache, it can inform cifs about this using the
+shrinker interface.
 
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/cifsfs.c  | 2 +-
- fs/smb/client/connect.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ fs/smb/client/cifs_debug.c |  18 +------
+ fs/smb/client/cifsfs.c     | 104 ++++++++++++++++++++++++++++++++++++-
+ fs/smb/client/cifsfs.h     |   4 ++
+ 3 files changed, 108 insertions(+), 18 deletions(-)
 
+diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+index b35863eb2a660..131af7333fc58 100644
+--- a/fs/smb/client/cifs_debug.c
++++ b/fs/smb/client/cifs_debug.c
+@@ -375,22 +375,8 @@ static ssize_t cifs_debug_dirs_proc_write(struct file *file, const char __user *
+ 	if (rc)
+ 		return rc;
+ 
+-	if (v == 0) {
+-		struct TCP_Server_Info *server;
+-		struct cifs_ses *ses;
+-		struct cifs_tcon *tcon;
+-
+-		spin_lock(&cifs_tcp_ses_lock);
+-		list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
+-			list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
+-				if (cifs_ses_exiting(ses))
+-					continue;
+-				list_for_each_entry(tcon, &ses->tcon_list, tcon_list)
+-					invalidate_all_cached_dirs(tcon, false);
+-			}
+-		}
+-		spin_unlock(&cifs_tcp_ses_lock);
+-	}
++	if (v == 0)
++		cifs_shrink_dir_caches(false, ULONG_MAX);
+ 
+ 	return count;
+ }
 diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 14cb3d37a8607..f6dff13d9906d 100644
+index 9f76b0347fa9d..14cb3d37a8607 100644
 --- a/fs/smb/client/cifsfs.c
 +++ b/fs/smb/client/cifsfs.c
-@@ -121,7 +121,7 @@ MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server for "
- unsigned int dir_cache_timeout = 30;
- module_param(dir_cache_timeout, uint, 0644);
- MODULE_PARM_DESC(dir_cache_timeout, "Number of seconds to cache directory contents for which we have a lease. Default: 30 "
--				 "Range: 1 to 65000 seconds, 0 to disable caching dir contents");
-+				 "Range: 0 to 65000 seconds. 0 disables timeout-based cleanup (cached dirs persist until explicitly invalidated).");
+@@ -29,6 +29,7 @@
+ #include <linux/uuid.h>
+ #include <linux/xattr.h>
+ #include <linux/mm.h>
++#include <linux/shrinker.h>
+ #include <linux/key-type.h>
+ #include <uapi/linux/magic.h>
+ #include <net/ipv6.h>
+@@ -123,10 +124,95 @@ MODULE_PARM_DESC(dir_cache_timeout, "Number of seconds to cache directory conten
+ 				 "Range: 1 to 65000 seconds, 0 to disable caching dir contents");
  /* Module-wide total cached dirents (in bytes) across all tcons */
  atomic64_t cifs_dircache_bytes_used = ATOMIC64_INIT(0);
- static struct shrinker *cifs_dircache_shrinker;
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index dcde25da468df..f0aca5b7ac15d 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -2697,7 +2697,7 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
++static struct shrinker *cifs_dircache_shrinker;
  
- 	if (ses->server->dialect >= SMB20_PROT_ID &&
- 	    (ses->server->capabilities & SMB2_GLOBAL_CAP_DIRECTORY_LEASING))
--		nohandlecache = ctx->nohandlecache || !dir_cache_timeout;
-+		nohandlecache = ctx->nohandlecache;
- 	else
- 		nohandlecache = true;
- 	tcon = tcon_info_alloc(!nohandlecache, netfs_trace_tcon_ref_new);
+ atomic_t cifs_sillycounter;
+ atomic_t cifs_tmpcounter;
+ 
++/**
++ * cifs_shrink_dir_caches - shrink dir caches by a specific size
++ * @wait: wait for server responses to close
++ * @nr_to_free: number of pages to shrink the dir cache by (pass ULONG_MAX to
++ * free everything)
++ *
++ * Shrinks dir caches by a specific target size.
++ */
++unsigned long cifs_shrink_dir_caches(bool wait, unsigned long nr_to_free)
++{
++	struct TCP_Server_Info *server;
++	struct cifs_ses *ses;
++	struct cifs_tcon *tcon;
++	u64 before, after, freed_bytes = 0;
++	u64 target_bytes;
++
++	before = atomic64_read(&cifs_dircache_bytes_used);
++	if (nr_to_free == ULONG_MAX)
++		target_bytes = U64_MAX;
++	else
++		target_bytes = (u64)nr_to_free * PAGE_SIZE;
++
++	spin_lock(&cifs_tcp_ses_lock);
++	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
++		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
++			if (cifs_ses_exiting(ses))
++				continue;
++			list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
++				invalidate_all_cached_dirs(tcon, false);
++				after = atomic64_read(&cifs_dircache_bytes_used);
++				if (after < before)
++					freed_bytes = before - after;
++				if (freed_bytes >= target_bytes)
++					goto out_unlock;
++			}
++		}
++	}
++out_unlock:
++	spin_unlock(&cifs_tcp_ses_lock);
++
++	if (wait)
++		flush_workqueue(cfid_put_wq);
++
++	after = atomic64_read(&cifs_dircache_bytes_used);
++	if (after >= before)
++		return 0;
++	return (unsigned long)(before - after);
++}
++
++static unsigned long cifs_dircache_shrinker_count(struct shrinker *shrink,
++						   struct shrink_control *sc)
++{
++	u64 bytes = atomic64_read(&cifs_dircache_bytes_used);
++
++	(void)shrink;
++	(void)sc;
++
++	return DIV_ROUND_UP_ULL(bytes, PAGE_SIZE);
++}
++
++static unsigned long cifs_dircache_shrinker_scan(struct shrinker *shrink,
++						  struct shrink_control *sc)
++{
++	unsigned long freed_bytes;
++
++	(void)shrink;
++
++	if (!sc->nr_to_scan)
++		return 0;
++
++	if (!atomic64_read(&cifs_dircache_bytes_used))
++		return SHRINK_STOP;
++
++	/*
++	 * Shrinker scan can run from reclaim context, so avoid synchronously
++	 * flushing worker queues here to prevent long stalls/deadlocks.
++	 */
++	freed_bytes = cifs_shrink_dir_caches(false, max_t(unsigned long, 1, sc->nr_to_scan));
++	if (!freed_bytes)
++		return SHRINK_STOP;
++
++	return DIV_ROUND_UP_ULL(freed_bytes, PAGE_SIZE);
++}
++
+ #ifdef CONFIG_CIFS_STATS2
+ unsigned int slow_rsp_threshold = 1;
+ module_param(slow_rsp_threshold, uint, 0644);
+@@ -2011,10 +2097,19 @@ init_cifs(void)
+ 	if (rc)
+ 		goto out_destroy_mids;
+ 
++	cifs_dircache_shrinker = shrinker_alloc(0, "cifs-dircache");
++	if (!cifs_dircache_shrinker) {
++		rc = -ENOMEM;
++		goto out_destroy_request_bufs;
++	}
++	cifs_dircache_shrinker->count_objects = cifs_dircache_shrinker_count;
++	cifs_dircache_shrinker->scan_objects = cifs_dircache_shrinker_scan;
++	shrinker_register(cifs_dircache_shrinker);
++
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ 	rc = dfs_cache_init();
+ 	if (rc)
+-		goto out_destroy_request_bufs;
++		goto out_free_dircache_shrinker;
+ #endif /* CONFIG_CIFS_DFS_UPCALL */
+ #ifdef CONFIG_CIFS_UPCALL
+ 	rc = init_cifs_spnego();
+@@ -2056,8 +2151,11 @@ init_cifs(void)
+ #endif
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ 	dfs_cache_destroy();
+-out_destroy_request_bufs:
++out_free_dircache_shrinker:
+ #endif
++	shrinker_free(cifs_dircache_shrinker);
++	cifs_dircache_shrinker = NULL;
++out_destroy_request_bufs:
+ 	cifs_destroy_request_bufs();
+ out_destroy_mids:
+ 	destroy_mids();
+@@ -2090,6 +2188,8 @@ exit_cifs(void)
+ 	cifs_dbg(NOISY, "exit_smb3\n");
+ 	unregister_filesystem(&cifs_fs_type);
+ 	unregister_filesystem(&smb3_fs_type);
++	shrinker_free(cifs_dircache_shrinker);
++	cifs_dircache_shrinker = NULL;
+ 	cifs_release_automount_timer();
+ 	exit_cifs_idmap();
+ #ifdef CONFIG_CIFS_SWN_UPCALL
+diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
+index c455b15f27782..d08394a3c5ce5 100644
+--- a/fs/smb/client/cifsfs.h
++++ b/fs/smb/client/cifsfs.h
+@@ -122,6 +122,10 @@ extern const struct dentry_operations cifs_ci_dentry_ops;
+ 
+ struct vfsmount *cifs_d_automount(struct path *path);
+ 
++/* Functions related to dir cache */
++unsigned long cifs_shrink_dir_caches(bool wait,
++				     unsigned long nr_to_free);
++
+ /* Functions related to symlinks */
+ const char *cifs_get_link(struct dentry *dentry, struct inode *inode,
+ 			  struct delayed_call *done);
 -- 
 2.43.0
 
