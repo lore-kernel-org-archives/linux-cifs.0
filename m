@@ -1,67 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556763B9618
-	for <linux-cifs@vger.kernel.org>; Wed, 13 May 2026 23:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3293AA4F9;
+	Thu, 14 May 2026 11:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778716057; cv=none; b=n12RZqgNoWmSs9JKQoQGPYVGKtFSz5w+JSX1+xQNlGbxFY9JSHVDPO8bHQQ01FJfP/a6nH9vrnGynPBxF2cHLKG4j2MyUCWV9/8nrYpMncM9KJqaiv3DhH1bEe5g0n7MP80oA1CNeo/8lzPmOEsK+cwL7KIyMuCNl2JVKffHAro=
+	t=1778756568; cv=none; b=Ol/4qS/7FPOmYCXEAun2k397y0YkVFDGqNYKaMp/9WnnlGXgc/kj/UGeCcSeJxsmyRZrhN/QOLzewRANXFKx0wsoPchZvUDQsp5EE58NkZGXDrnupew6nKnE8iDXArg+2Taia1GzQa50KP+x5598DdFNau1xjW8/S81upurf4MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778716057; c=relaxed/simple;
-	bh=6czxAn1n4hAAYHtaFNQSj/x87tjmr9NCpZlQXqiJ7yE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qcd7GOuQzUnFqerrukCuVXGI6f3SL2ZiHsLzdjRpB/VnQ4FihorOLgcDys6ju0n2mNQNDsjoU3jso0N5XOw7BpGu3VSDn+wg19axSRdIUSB+JX2YuF8jt2rFFAVNU+/vEK4ryGeXG+yVv+3MmxpS/VfU8bTgPNWMnwPFub/EU5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kbEHo1zf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778756568; c=relaxed/simple;
+	bh=zyjl1Ct3b+gw6gBocJmX26R84MHN5JupYoOLs2uWsxI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QexR7PfiGbJIhw87NxIf5FeagMUSpbEjErGD4wW4wHmzwOLtbVkiNHIlMVvHwRqDJr4JUAECG/XHlcSQNGQ84Lhaeom4z3Wzfti/622iU9H2ZGF6XPKoCpmDUNhxSjAp7Slv1W4EeMV4wj44TPn3fka8AfpN5PKT76fFnVoSC+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=OmzgHsQp; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kbEHo1zf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F17F9C2BCC7
-	for <linux-cifs@vger.kernel.org>; Wed, 13 May 2026 23:47:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778716057;
-	bh=6czxAn1n4hAAYHtaFNQSj/x87tjmr9NCpZlQXqiJ7yE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=kbEHo1zfBEXMQRdedThlqlCKGRIzwAw5Y4iTzsQLsehLAFT0NhCKqKXXvoECbD8BI
-	 McJgUNhfvu//+1E7Hq3RGVxdxJQ0sqBeJz+ws1gjhH6gePSOGyquP26zHr6QAeGEzX
-	 bQ9VxdMFrx0ZbvUs1xdFSYZxyzobi1cFuk9Quh0INxWDrhmtHK2Zo+/yoZgE9ppb1P
-	 TxXhlahmaJbVGcFlGg9mNnbSvI8pCAkj7t/GDI/BwkSFXGDrUC6wEhj+A5cXiJhWQN
-	 NS+W9PFkrvZuDQxwxnuCwhZfGZRT7+WZEFUby+AlBjIRM+JcakF7TCnjVtdJ9GJfUB
-	 mJ7DpvPf6x+bQ==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-67bc8609a9bso13385515a12.0
-        for <linux-cifs@vger.kernel.org>; Wed, 13 May 2026 16:47:36 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ/NVsh/9GCZYn4eU/SAQI9PKLZMKLZaEAeP0LNyxIWEn9QLfPIUqImQkQBbINJgT4WyX5lYzT6ukOHp@vger.kernel.org
-X-Gm-Message-State: AOJu0YytzYAd20CSyjC5e5wfWd4fvDQ3zSghJWBg4xejd0zHWVwEz+zL
-	oMR62S1ahsXMRRqipfc4l7BFssQRdYCSfirPFM1e9A0qk/jhIoADHoh8MPXgvD1nmbQoSYA8g07
-	8bfnEBWti2GMDQFWIaFxG/M7mdaI7K0c=
-X-Received: by 2002:a17:907:3c8e:b0:bca:a09:9212 with SMTP id
- a640c23a62f3a-bd3c183bee6mr355634566b.45.1778716055554; Wed, 13 May 2026
- 16:47:35 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="OmzgHsQp"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=RsWnrQ/0UnSrtJxr9MFknS8VfTQmv+l46mUKZhXkp9I=; b=OmzgHsQpOGUL7cKZoH128F37Ej
+	HCruXaFjefPOa2LWNeI84rV3FZNWuBoJraMMiuuRsB5aUDjei03f8fG8ydHi3zTixAm+k0A5sAAPf
+	Q+aMp/ixX8STsKeM+3jb3Llm1dEzVQDR/QxnDkpiCpJSVIkNPZFQOH25abE1N8Stzf0q4BjUD0N1J
+	Fas/2VpFssJOUIhYBzA3vZ0GUWarHZrGNKUMzryEV8TedBsNVl/7UObkBXTf+6CeESYbdudEabaL7
+	BxSKr17h4w2JXulMUILQ6+Ilenvj2Ji4LmO/hYqWA1koq8MGZXoXefwgopsgBQ1HRDb6zW344RFdH
+	Biac2v6rU6rw+impjxkv8KzyYiiQxIrR83V59szUWWf8FjQX6oSV0U1RRaGllsYDjNpswiFae7N8Q
+	oISg7JtyPcC0r+wlb9bDPPPlYlpxP7aIm6dYp/aS89SHo+QETpWQAvU9KNOTwq4t3v4CBAetExKun
+	RhUDbk9kU/+OgXSokEacRnEg;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wNTpu-00000008mM4-3a1I;
+	Thu, 14 May 2026 11:02:38 +0000
+Message-ID: <7de22a6a-478a-4bb8-a023-d186eea26bf5@samba.org>
+Date: Thu, 14 May 2026 13:02:38 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5mvP9s_KMc2G-_AsP__G0S5JCmrigOT-7U_ZNu1pLf+Q2g@mail.gmail.com>
- <CAKYAXd-8VmgLNX=0TnsPL1LP2u-V-zOs+Z08dKHDZUbt+q2AAw@mail.gmail.com> <b5400da0-b60e-4bed-87a6-92b1b009c2dd@chenxiaosong.com>
-In-Reply-To: <b5400da0-b60e-4bed-87a6-92b1b009c2dd@chenxiaosong.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 14 May 2026 08:47:22 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9-gUkGspfZyv_LEBjST4CChB-ffk8BbOfGzK+FSEhF9Q@mail.gmail.com>
-X-Gm-Features: AVHnY4LZQYHf0wUIN1cLT1HKtKERwGBvF--tNgaM4f9gb6fxcV0ffBpgZsu35QY
-Message-ID: <CAKYAXd9-gUkGspfZyv_LEBjST4CChB-ffk8BbOfGzK+FSEhF9Q@mail.gmail.com>
-Subject: Re: generic/004 server bug
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: Steve French <smfrench@gmail.com>, Huiwen He <hehuiwen@kylinos.cn>, 
-	Paulo Alcantara <pc@manguebit.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] smbdirect: Fix error cleanup in
+ smbdirect_map_sges_from_iter()
+To: David Howells <dhowells@redhat.com>, Steve French <sfrench@samba.org>
+Cc: Paulo Alcantara <pc@manguebit.org>, Tom Talpey <tom@talpey.com>,
+ linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <1927248.1778698202@warthog.procyon.org.uk>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <1927248.1778698202@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 14, 2026 at 1:54=E2=80=AFAM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
->
-> I am currently debugging this issue:
-> https://chenxiaosong.com/en/smb-xfstests-generic-004.html
-Sound great!
->
-> My team member Huiwen He <hehuiwen@kylinos.cn> will continue my work.
-Really appreciate your work on this!
+Am 13.05.26 um 20:50 schrieb David Howells:
+> Fix smbdirect_map_sges_from_iter() to use pre-decrement, not post-decrement
+> so that it cleans up the correct slots.
+> 
+> Fixes: e5fbdde43017 ("cifs: Add a function to build an RDMA SGE list from an iterator")
+> Closes: https://sashiko.dev/#/patchset/20260326104544.509518-1-dhowells%40redhat.com
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <sfrench@samba.org>
+> cc: Stefan Metzmacher <metze@samba.org>
+> cc: Paulo Alcantara <pc@manguebit.org>
+> cc: Tom Talpey <tom@talpey.com>
+> cc: linux-cifs@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+
+Reviewed-by: Stefan Metzmacher <metze@samba.org>
+
+Thanks!
+metze
+
+> ---
+>   fs/smb/smbdirect/connection.c |    2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/smb/smbdirect/connection.c b/fs/smb/smbdirect/connection.c
+> index fe9912e53da6..8adf58097534 100644
+> --- a/fs/smb/smbdirect/connection.c
+> +++ b/fs/smb/smbdirect/connection.c
+> @@ -2168,7 +2168,7 @@ static ssize_t smbdirect_map_sges_from_iter(struct iov_iter *iter, size_t len,
+>   
+>   	if (ret < 0) {
+>   		while (state->num_sge > before) {
+> -			struct ib_sge *sge = &state->sge[state->num_sge--];
+> +			struct ib_sge *sge = &state->sge[--state->num_sge];
+>   
+>   			ib_dma_unmap_page(state->device,
+>   					  sge->addr,
+> 
+
