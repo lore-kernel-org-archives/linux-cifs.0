@@ -1,54 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736693EE1F7
-	for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 22:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122AD242925
+	for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 22:12:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778882466; cv=none; b=ENLpkK8ZAslBniPvfI5I6vx60/zjjqJx0NNpAe/7uphRZKUTl2+ChNJ7ecpnMhjavPH+VNuJ9E1UjKgPd3OIeToTz6DxwKJCHUInbVwKolSRWbMhJmPjla08BRKN3wXvUvUQOOCogxvuYLC5pJ4a96lApgHkc29fuuu/s2b2lyc=
+	t=1778883163; cv=none; b=Qszynbpc9HwpLoryZldDLmyKDG3dBBH61h2uHuU/bVNMzcsuUvpFaBuP7isH18VrnhiLZhR7a2xt/WXdZTnJ60TNPAqpp8ZQsQY6FPnj33juPZheudy6CWffV/GpHjPhM9qNYClz/BRs2xo/XhTbPNr2nqBhLvTCdNjeme6NTck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778882466; c=relaxed/simple;
-	bh=8FzUPImWV18kvph4lTxQrEFg0N5DGTFbvVX3bryYp3g=;
+	s=arc-20240116; t=1778883163; c=relaxed/simple;
+	bh=Xo9RN/YaHlAbWe60yDn3HcJADUDb6frVOkoaJStZf5s=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k297Egy1UfDVOCEi+LDDtj6b+Q3PGpLyt1Y8J4YxSNiv104pJoQPau/eVcHYdQJjFIIvOTxtOR689kq7Pt8FXbmcSxgpBL/DuDpFrCmETRWgOLmfHRrCF42WdAXOyiFyaLvkueirKtfSnJGJzZvUefpe7cSsmmLnjnrqs6JKExA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VnxyRqbT; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=p0F6lHTTWHEQwwLLRKv5mnObmtRCx0pOWnE04GeouCMDc7JJ63IQjh4H3WP3rGe1MA3fn4YjYARkJR5s8uh8yRSUNXG+dEo0+srtnTz9ZW9F91rmsInBBoqTZ4VPZGkno3Qy7lU4IgvCAaqnbFVCpkxMJTxYljdcAxB5c+yv724=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tv+IRzby; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VnxyRqbT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C6C7C4AF0F
-	for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 22:01:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tv+IRzby"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2753C2BCFF
+	for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 22:12:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778882466;
-	bh=8FzUPImWV18kvph4lTxQrEFg0N5DGTFbvVX3bryYp3g=;
+	s=k20201202; t=1778883162;
+	bh=Xo9RN/YaHlAbWe60yDn3HcJADUDb6frVOkoaJStZf5s=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=VnxyRqbTDYx6GgcrEkNlGe2hGiAg4yRf75lATHoVW0PpFzHCCZ+JgXUyuTTzFzYbZ
-	 nNFOXRco11MWvh1JDJOczfjW/o82VAln7pHQl4C82nUu1ViOis3SosrtDwHSbeQ5h2
-	 7hh5YIRfWUUE01drL01kz1ymKoCuIOuYafR/+moxrWHGCFsIPM/YwkCOoOMPR2BW2F
-	 sEFBWfkOLqEDVYWBgUv069lwh+x4UOBR3ulzyYJOKkob68jjmMKdwTenYe8GkABinC
-	 7xFMM9GSsMSLs+ZAmcpTxsTv3F41hHwR75Z87TBgh2LyaBVb9TXRTx2e7ts+Cg9SFX
-	 aQUiJr4F/vybw==
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-651c5d525f6so642108d50.3
-        for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 15:01:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+nXwLTcgXv6jCtf3khiIC1VWS2ZZM/wEZ/Hse9RD9vIvITq06Bgk1mCwVTAfRGYK5eUDPBLIntg//b@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjG9kHO8xif42oFq6di8KcA3VZzPXv2bfWxXv9LgXEYfaru3iJ
-	S732a+2DW2MFcyxnpygMXDVucxxRoi7UWDhtAJQSwxnPCM2qiAp/u9LCKRVUHB5+0YvNS5MiUzA
-	P2wAl1Px0dEJ7UesZ46ArsjuaetpIRLCv2AeNS4KxAA==
-X-Received: by 2002:a53:accd:0:20b0:654:468c:7dd5 with SMTP id
- 956f58d0204a3-65e2280d9e5mr5432439d50.33.1778882465457; Fri, 15 May 2026
- 15:01:05 -0700 (PDT)
+	b=tv+IRzby0Wc1y1AfRAfBW3nKPJfKGSdDUKMAC83W6JZ/dYSjgCeuFvnvRb+k2fDWh
+	 xbo5tF45ctQN2+lUP3uiBUSdgPOAi+Wx+0tkvg+4pJup5eskAOQTJlwp6phqJcshLI
+	 zwma6B6kmV2AJ2QU39YgSPGY+7u3MZcxTeE3mLdPCH/vhNyTGPwjMe4zxLH36reM8B
+	 Aer/b8HC7tlHs6JLUSTc8CC6m60eU8oVJuXGFC3sjcHNI2tTjQrIJ4E+efJOd+l39W
+	 8dpKuDtdYrLdKdfWZ3TWstbmXaMPftJx2DJhHT9Ud2qtgOsF/sPz15MPQ/jP7lSeCE
+	 kkkwEGkOg5Eqg==
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-65dead17c24so645649d50.2
+        for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 15:12:42 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+l8w6lST/oq5Zw4P2vqtt1y4c/+pnbrKovaibE4xBD03LLHoCcyzOtfpgovgsmm0p18bt7g3gM/Wo3@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLS9jgGIkVVcBv/F7RatetnppW2C2MyIGp0jHLyHoJCIzJkWS/
+	wHnW0w7bQUQLQmi7R/MTLo2Wo6X9v1zCZVGJHKXHoqU2/Do4kDLQHyX4Urkw5bfdLcsJxrvJNLN
+	yjr6juPjOtfXsRFLyS1bn8L/Au/0GahFfuKQokpi0EQ==
+X-Received: by 2002:a05:690e:14c4:b0:64e:f106:60ea with SMTP id
+ 956f58d0204a3-65e22807f82mr6158139d50.44.1778883162092; Fri, 15 May 2026
+ 15:12:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260512053625.2950900-1-hch@lst.de> <20260512053625.2950900-11-hch@lst.de>
-In-Reply-To: <20260512053625.2950900-11-hch@lst.de>
+References: <20260512053625.2950900-1-hch@lst.de> <20260512053625.2950900-10-hch@lst.de>
+In-Reply-To: <20260512053625.2950900-10-hch@lst.de>
 From: Chris Li <chrisl@kernel.org>
-Date: Fri, 15 May 2026 15:00:54 -0700
-X-Gmail-Original-Message-ID: <CACePvbXY5sdG=JXV2TE65NAWaEQ975wHhcGGzuFg5mRECkwy+Q@mail.gmail.com>
-X-Gm-Features: AVHnY4LoQkrm9-GqAeD5m6WwSsE12ARR5KdnPZLUwdKcGhFx_HvxcMbpEFa8lE4
-Message-ID: <CACePvbXY5sdG=JXV2TE65NAWaEQ975wHhcGGzuFg5mRECkwy+Q@mail.gmail.com>
-Subject: Re: [PATCH 10/12] swap: add a swap_activate_fs_ops helper
+Date: Fri, 15 May 2026 15:12:31 -0700
+X-Gmail-Original-Message-ID: <CACePvbVPV55SgPmivqMX+bP8H7FKcSAbWCwAe5icgZjZV9vUNA@mail.gmail.com>
+X-Gm-Features: AVHnY4LtC3KSyPNEsLh1ud1t2IOob9XfSBaYZO4ouG71LQM8qOS5lvZuuzrl4N0
+Message-ID: <CACePvbVPV55SgPmivqMX+bP8H7FKcSAbWCwAe5icgZjZV9vUNA@mail.gmail.com>
+Subject: Re: [PATCH 09/12] swap: push down setting sis->bdev into ->swap_activate
 To: Christoph Hellwig <hch@lst.de>
 Cc: Andrew Morton <akpm@linux-foundation.org>, Kairui Song <kasong@tencent.com>, 
 	Christian Brauner <brauner@kernel.org>, "Darrick J . Wong" <djwong@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
@@ -67,12 +67,16 @@ Content-Transfer-Encoding: quoted-printable
 On Mon, May 11, 2026 at 10:37=E2=80=AFPM Christoph Hellwig <hch@lst.de> wro=
 te:
 >
-> Add a helper abstracting away the low-level details of enabling
-> fs_ops-based swapping.  This prepares for taking swap_info_struct
-> private.
+> Only the file operation method knows what block device we'll swap
+> to.  So move down setting sis->bdev and the special blockdev flag
+> into ->swap_activate.
 >
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Acked-by: Chris Li <chrisl@kernel.org>
+
+The core swap part of the code looks fine to me, I did not look much
+deeper into the fs side.
+
+Ack-by: Chris Li <chrisl@kernel.org>
 
 Chris
