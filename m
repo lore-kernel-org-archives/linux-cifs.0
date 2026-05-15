@@ -1,82 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122AD242925
-	for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 22:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC787305693;
+	Fri, 15 May 2026 22:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778883163; cv=none; b=Qszynbpc9HwpLoryZldDLmyKDG3dBBH61h2uHuU/bVNMzcsuUvpFaBuP7isH18VrnhiLZhR7a2xt/WXdZTnJ60TNPAqpp8ZQsQY6FPnj33juPZheudy6CWffV/GpHjPhM9qNYClz/BRs2xo/XhTbPNr2nqBhLvTCdNjeme6NTck=
+	t=1778883229; cv=none; b=Cl0QywB0D73Prw5uJuYZCKSUt8V1J8pDvB/SAueg3lYkIUMrvyZZcpvRdwOKOqx/GUfhH4wrkIfTNEs6q6Zu1x/7qg22XnapC3ktXBvp842/9DzRR9bkTto+S5X6nS9UBrq3FZSrtY6rQ7qUF0c/HwfSAEJKZtgABtmAgcd1koE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778883163; c=relaxed/simple;
-	bh=Xo9RN/YaHlAbWe60yDn3HcJADUDb6frVOkoaJStZf5s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p0F6lHTTWHEQwwLLRKv5mnObmtRCx0pOWnE04GeouCMDc7JJ63IQjh4H3WP3rGe1MA3fn4YjYARkJR5s8uh8yRSUNXG+dEo0+srtnTz9ZW9F91rmsInBBoqTZ4VPZGkno3Qy7lU4IgvCAaqnbFVCpkxMJTxYljdcAxB5c+yv724=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tv+IRzby; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778883229; c=relaxed/simple;
+	bh=hKqVRZEOe9SzgcK0rW01H11ARClqYccJPTvR1v91pU4=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=ND+KQsHTCQV0tb4otcT4j6unXozUHDNnICsNLW+hQhAyQP63sIy3KknvcCr1LvKEs5HqIzT8I0BijWV4Xql93Y9vHko8JOQJ+b8ngW0yFTxA7tuwLxeDhRxL1h0RAQaXMo1063By01+YWKA/z4syFIG64wQ8m3U6Xq4CozHcf4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YP3jm/jG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tv+IRzby"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2753C2BCFF
-	for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 22:12:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YP3jm/jG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90F85C2BCB0;
+	Fri, 15 May 2026 22:13:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778883162;
-	bh=Xo9RN/YaHlAbWe60yDn3HcJADUDb6frVOkoaJStZf5s=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=tv+IRzby0Wc1y1AfRAfBW3nKPJfKGSdDUKMAC83W6JZ/dYSjgCeuFvnvRb+k2fDWh
-	 xbo5tF45ctQN2+lUP3uiBUSdgPOAi+Wx+0tkvg+4pJup5eskAOQTJlwp6phqJcshLI
-	 zwma6B6kmV2AJ2QU39YgSPGY+7u3MZcxTeE3mLdPCH/vhNyTGPwjMe4zxLH36reM8B
-	 Aer/b8HC7tlHs6JLUSTc8CC6m60eU8oVJuXGFC3sjcHNI2tTjQrIJ4E+efJOd+l39W
-	 8dpKuDtdYrLdKdfWZ3TWstbmXaMPftJx2DJhHT9Ud2qtgOsF/sPz15MPQ/jP7lSeCE
-	 kkkwEGkOg5Eqg==
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-65dead17c24so645649d50.2
-        for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 15:12:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+l8w6lST/oq5Zw4P2vqtt1y4c/+pnbrKovaibE4xBD03LLHoCcyzOtfpgovgsmm0p18bt7g3gM/Wo3@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLS9jgGIkVVcBv/F7RatetnppW2C2MyIGp0jHLyHoJCIzJkWS/
-	wHnW0w7bQUQLQmi7R/MTLo2Wo6X9v1zCZVGJHKXHoqU2/Do4kDLQHyX4Urkw5bfdLcsJxrvJNLN
-	yjr6juPjOtfXsRFLyS1bn8L/Au/0GahFfuKQokpi0EQ==
-X-Received: by 2002:a05:690e:14c4:b0:64e:f106:60ea with SMTP id
- 956f58d0204a3-65e22807f82mr6158139d50.44.1778883162092; Fri, 15 May 2026
- 15:12:42 -0700 (PDT)
+	s=k20201202; t=1778883229;
+	bh=hKqVRZEOe9SzgcK0rW01H11ARClqYccJPTvR1v91pU4=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=YP3jm/jGBTGIsV/1TKxnUcylxYhQJ4FGQs/GuY3Iz4k/G6EYyZ81qiII0qWU9XZmC
+	 ph93LpuXmRkjXF5KRhs3da/G90Tdtf44TTFMIBt6Go3cQWmpzUKayYyM/fXSN1BpyT
+	 cbdMKz3p3ZuY6eiCF3aEUyH/rxjVUp0XgK6W4iEcjxbCh223tHszHwqe0epPr0nk84
+	 8jvh18CJO/CW54KCjG+IQxj14FFcu+RTuUHmpyvwuy3r3P6i+Uw33gjCTZu3poLovN
+	 HqmXFs7pCuwGF4qJO1Q5SqVg9QUVLi8ggmqUSx779pXXz66885ygFhkk7GWSCotLJ+
+	 QleoDynimSQ4Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19A043930A12;
+	Fri, 15 May 2026 22:14:04 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mvGAbdCXg8uJ2NrFWLT0kB1myECtq5B6ttcXqdQ-SXE7g@mail.gmail.com>
+References: <CAH2r5mvGAbdCXg8uJ2NrFWLT0kB1myECtq5B6ttcXqdQ-SXE7g@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mvGAbdCXg8uJ2NrFWLT0kB1myECtq5B6ttcXqdQ-SXE7g@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v7.1-rc4-smb3-client-fixes
+X-PR-Tracked-Commit-Id: c207f1d785044667f87cc8c72355e33f3981f2d6
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: b0662be9131d87d8858d34d6134500e109dff958
+Message-Id: <177888324264.173168.16527408889934157565.pr-tracker-bot@kernel.org>
+Date: Fri, 15 May 2026 22:14:02 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260512053625.2950900-1-hch@lst.de> <20260512053625.2950900-10-hch@lst.de>
-In-Reply-To: <20260512053625.2950900-10-hch@lst.de>
-From: Chris Li <chrisl@kernel.org>
-Date: Fri, 15 May 2026 15:12:31 -0700
-X-Gmail-Original-Message-ID: <CACePvbVPV55SgPmivqMX+bP8H7FKcSAbWCwAe5icgZjZV9vUNA@mail.gmail.com>
-X-Gm-Features: AVHnY4LtC3KSyPNEsLh1ud1t2IOob9XfSBaYZO4ouG71LQM8qOS5lvZuuzrl4N0
-Message-ID: <CACePvbVPV55SgPmivqMX+bP8H7FKcSAbWCwAe5icgZjZV9vUNA@mail.gmail.com>
-Subject: Re: [PATCH 09/12] swap: push down setting sis->bdev into ->swap_activate
-To: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Kairui Song <kasong@tencent.com>, 
-	Christian Brauner <brauner@kernel.org>, "Darrick J . Wong" <djwong@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	David Sterba <dsterba@suse.com>, "Theodore Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, 
-	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Namjae Jeon <linkinjeon@kernel.org>, Hyunchul Lee <hyc.lee@gmail.com>, 
-	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, Carlos Maiolino <cem@kernel.org>, 
-	Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, linux-xfs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 11, 2026 at 10:37=E2=80=AFPM Christoph Hellwig <hch@lst.de> wro=
-te:
->
-> Only the file operation method knows what block device we'll swap
-> to.  So move down setting sis->bdev and the special blockdev flag
-> into ->swap_activate.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+The pull request you sent on Fri, 15 May 2026 13:44:45 -0500:
 
+> git://git.samba.org/sfrench/cifs-2.6.git tags/v7.1-rc4-smb3-client-fixes
 
-The core swap part of the code looks fine to me, I did not look much
-deeper into the fs side.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/b0662be9131d87d8858d34d6134500e109dff958
 
-Ack-by: Chris Li <chrisl@kernel.org>
+Thank you!
 
-Chris
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
