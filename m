@@ -1,139 +1,143 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0F03E16B8
-	for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 18:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778870705; cv=pass; b=h7ojcltJlaMcdvrbQ91IX3Gv0zWyzaL0EnibPSL0QtD6b4Oj+6PQtAI9YAlQMz6EFqKbe0Kkf36DnLwsLXUHsynyj3iqULHXWUKB9+i/miZHCHwcFzCYR9FQlGzYMJXZNjC9KWL7kLaMe6flL/vuCUDCd5oos52/aJm2gCJ8o+8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778870705; c=relaxed/simple;
-	bh=JbPpao5twJzVh7e8g5jgRWw0Ql9YuDv6AhNtPt0UbVE=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=keQ4abYNplz9WMD/OHO4W5HstMQ1Z1eu3Ry9AaeI5g1aHaA+giQ8b3meW2a2JxNI5dRUXtJG6SpvgFIcR3z4jG4nI7mcQY8eWsBJfQ8TK2vP4+Vy9Yejcc2Qkb+j29j6mURLXbGS7pqEqlQRuEiE0/tgbnestuD/Sh0TLxtO8sw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ilLowsKb; arc=pass smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F6324336D
+	for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 19:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778873510; cv=none; b=L0c/ciow83VhpaHZT5crNEG0rjTVh3/1YoZCVP2xFeDpRQLW8nEBpyucWCVYjEchfjdPniQJ5yt6m6M0TQMILmtlS2kqR1+zRA+TrNrkqc7cAGQwL2YK6pMfDVVrQWwXjCnpbaFf2ag23ED/NvJOgkAbwFzwfY80jT9zFNz18qg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778873510; c=relaxed/simple;
+	bh=x30wO2FhwyPK4fF9T73E7uFT/ppNy/M8P5Pz9ayv+14=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Bl81dEuWa7Ntoi5hiGuKkQg9KXp3/1RnEua3MyDWXWio1bhscwo5iNkb99f6aCNeIuYaHFkvmCqwhb80Zxchj1MXM39BOLMQWxRDc9Rfr2lWxewZTlN/8F5RfPwUH3gtto4hc0Aol0nyXdMlk9mNjPaNG+INauCNCY79hswUDPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ftTQzxtN; arc=none smtp.client-ip=209.85.219.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ilLowsKb"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8bc3ef10cc4so1349056d6.1
-        for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 11:44:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778870698; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OC47re+FW9oJyWb37m4phWxNT6AwnsOZhZyAY909NtuQBAzDhl9qGOdxZdybHdgCWY
-         8EDVaoToPZVFXWODxc47vPQ/m8GPvcS3VO63aRMgX2jV8JP6gxWpJG5gMRlTcFNTpAsi
-         5rVmSmz1G/V0P8zCQxWLHN98O+kCRrJ38CNJtk8CneSFIntl5PfDCza81LEUvKHY1dTC
-         3bad42wUz/6CxWynP3pvs4/oreh4xfNyyOmt+XJZV7fww1YIXmkFvxGxNuIymMljERtH
-         L5zVCBUdESUlDsAFphv+spwuS7fXd8i6hGFY8BsZajrII7aN2obrU5MffA9/EFOkMuIp
-         rVrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=BBd7Bfzp7bFCnoV1EGd0JsT766S+OudnUNiMnAS3KEE=;
-        fh=Nf1mvuQ9XbZKOmPhacDz1X5aHl0t82a+aHbY+2n4zlg=;
-        b=BkjjyEjqSsEIqTCr616EnOaMVhkUiZLnZ+4t+MElWSZsUJcluCC+4V6HNr9ny/VGX/
-         cGRqF7AKYBioqKyu9ZWQ84dldu8W+gigoMEVM3QVC5n802WnRMrGUykC7fPxQPShvS90
-         tH/VSx+F7nVE3cKyXf+drHgL49Fc2oBIcawJ3VPrmzilYe9nnt7q9xQL0duI2fPD48x0
-         aCK6qoAlP1boMbdMC1rQgXzUwz9YHQnDYj5KD1XV0/LUStUPvZrZrdVSJ8Bml9kxYq75
-         qfGSDKGqlc5qiVqdonp6N40i2VjtKMAp4n5eizRVQD0FXpGIP0A6OvgcSFj2i++PUwT3
-         i3BQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ftTQzxtN"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-8b4eb1fd5d0so2106216d6.0
+        for <linux-cifs@vger.kernel.org>; Fri, 15 May 2026 12:31:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778870698; x=1779475498; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BBd7Bfzp7bFCnoV1EGd0JsT766S+OudnUNiMnAS3KEE=;
-        b=ilLowsKbZeA7B2lPZ8W6ZLwOwvGO3/2iaQLf5/0TnKmrGFMCDb1v6mq7oiwOfWWRMv
-         Dx2iQv87j1fZ43sn0P+6fcrUMEzbhMjxb8ei2Xvb+Uj89eejnoTWO0S8ujdRSyBbHV7R
-         DOXO9GfmMxQvhOKynCReU+ilviyihV9olCkhONnivMlb5TyC4Yb9kSu+w5sKuYEHqpRG
-         93xQGpdf6mgCdR1oeeY5WzIcexovDXtSrGXVTO4QksAPWyc54iNDTM8Y5Pf+WWd+xbAT
-         Ii5K1vDR3yLg6/DdPqe0/wUy3GAAuRCjqkr61bCvmecZncEaOwmWqPfjcoM2reF4CiSc
-         z5Ww==
+        d=gmail.com; s=20251104; t=1778873508; x=1779478308; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pZwZ1sbOq1osboJiviKs99QuPcaN2fyHvMmUqI3TItE=;
+        b=ftTQzxtNhbz68/DMbVReybKdWSczG09d+ZHS2Jdz7BnquKEWOnTZgeQZmGbWs3ov+J
+         gi0nlASZezNqijmB19KT4lTKUBqrQVZDVPtGnKF5cu8CdMvQLTHoGaJvGVJ6doZ0+UVv
+         8mW7WOFeE6vuD0BBkkeGJrl4UcBlUdzvZ8LPU+BtG80VwBz1We44X+vbfwApvtLRi8p4
+         xn9Z1BLjAG3dJVviKF78DwKeLczHIFYzVug0g2Z7NIizZ1mJen6m2UE6AgSpLkuKyGa4
+         t9xKXdq/3vetsyloabj+Na8oldo39KANEQb2YIbOPC7yq/dvKUt4oqXx/gGw58Hxid+Y
+         m1vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778870698; x=1779475498;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BBd7Bfzp7bFCnoV1EGd0JsT766S+OudnUNiMnAS3KEE=;
-        b=ZIdtfCTwXtrTSkzIucJW616HGT962gazTq2tlQwyUHxlwLBXHa6OElPwl7EbbFK9e0
-         l7RhH2ojIrRKzJMxJIU2ZnTwR8VpYJYbVdTQT8IXE7tX5zEvSFExvuRnf/SGIhH78AwT
-         CYG4hpaoi90EdK4ICRjCAB+wLRH5SJeTZHhfsXdBDI0bc7UNyKITUi6lPVg8HIOVz4s4
-         0Q+WA0EV/AIOfbwFdRWce7cxD/1flt/L4z8t0L43xnT5/vIsgHCjG8Ybj+OM1rzdu/2G
-         vTbhRnBAe4pT8PgSs1/+4U3ey4nqYNliToazBJXf7YSbUTajZ4W9J/vWPT9/FMs3Tx4B
-         xSeA==
-X-Gm-Message-State: AOJu0Yztnja/y9kie24Mhd4kKAC16/FIh/XhMzQ8iSHMyRVJlb7GrJKS
-	lzsKE9ogYxefPyXl4OgicvsJpKNV5h7yb4vPgny1oZ7XD91bh+PBDawVIRgP+eI+LSW1p28c1+G
-	d1FxwFmPBXzIQOvu0Iug7wbkzm1o1+eoadNbXmTY=
-X-Gm-Gg: Acq92OFlCv3Xgk/9llVPfx3u8H8KyWSv5a6vjwwiICvFZXAKv8of2jKKLbsnNjKcTZq
-	2O4w9ukhtkNYBJq82voUh3I3MDElvKk4tvBrul2XSIVP2qzV82fHaQ6LFColqkwwFVnDxUhS5lL
-	G2AjAbO8y6NAV5VcpZpukcH4WBLeVYfqdsyqMXQQk4NtYj9x4V4hueNK55uBHBbkktnGkV8GbLe
-	MqHPCGNX/fONY/rcfXzQ1D7OQ6uu4/7iCFEo4hPgyUx7EknjjZ5uWkta7PndQOV/Y4wrzHy1hmm
-	WztQISY0v7ngCrFPRAnme2iPmhtVfgybbAo9lpU75kit83panA3KtRJVjVEpSTblGT1TwFBRXv+
-	MUbutj7ufWqpImVF8vkeFQj11iy7MAiSuoFeb6IPp9C0Ush19HAT9wbRzHfTQkC9Dws6qcPIn+4
-	DUbAXEiH0mJPrzs4DtCZV1vg==
-X-Received: by 2002:a05:6214:3010:b0:8b1:f297:a54b with SMTP id
- 6a1803df08f44-8ca1ecce81cmr20114016d6.18.1778870697845; Fri, 15 May 2026
- 11:44:57 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778873508; x=1779478308;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=pZwZ1sbOq1osboJiviKs99QuPcaN2fyHvMmUqI3TItE=;
+        b=dMkZ5M89YrDcFy9LZVRt/sf4+eWaKxIMmDpqZpHVgF6pi0LzKW3jBd2b55907gOF0+
+         bd4tqeopXO/eypiGxjXzrQatNYoLyuJTutyDvbHyrgyru9EZ5dlHxzJ01/Q+ZdGFqvaR
+         EiJN2EmavRk0vhVkaKZR6r2ZeWvSu5PkKeq1CloM8A2seBVhEd1IO1LS4tdNoTV2Fsb4
+         sVVOsRlC7pS/FXGwiqgDY9eHQzvxjKD4NBGpYcjfKljW+6xMD7FGnDgU4a1rN/kKkgmX
+         1uc0BTozmpU1dHvWgcObcFqipNPxylS5KkjBa5ch5OXXBnGva9ov23QvzH4u0mZ577in
+         ZENA==
+X-Gm-Message-State: AOJu0YxHseNileEjCJnasvk1C7QNHmkfGmCIxRnwby22w3dVocGL7JCv
+	A7cFPKVKoSUskKvRwhjudrHn2MxVMSo9jPRXpijqUSjrmclOA3BgXt1zCEZyG4x8zktqhA==
+X-Gm-Gg: Acq92OFE1w+24ZAR+HTg/pVdjimoqtw3Oxh1ohK5vbZmMnShsAbpgC4dQy64p5d7+BW
+	f03Cj/6ggahtNKlTt9fpYIPglhXlk4zPsLLB7yG5ZOsEylDGuu5mKkSaP9IW0VzUHJM95D0MTya
+	gWqA4Sy3Qiu7QzhKlbiTsHLvWZqs4NuaclvBrfmzuiN/H0MJgjMtoXE0RPSRv7kVFyzny4guPcB
+	6OVkomtW0ATVgCQ/e1YWDq289QgMMnioV5GoEKONnIiyH0OITmblmj1+g2YDrw3kvpcXWTcu4pv
+	thaRb7dbF0ApIh79Ld3UcNNTN+qv+Jmn2uvzPKxg1Ww2c3O6FpG2q43hBwiRvNnLpGk7h67vDjg
+	ny8SQmZ6ajyyor+bZHHlv/kRJilHJqvFcoPeN91tjnHj6AshpR6tzfVjUH3r4mX1ClLoYPx426R
+	O+A6xUjpKr4rNjB5GpUPRyY61gbcL2o/91ohZY2TnBLWp2a0+lrp2QwflYC0KjMKWvdrpV4Y/44
+	2WuIpowL6khP1I=
+X-Received: by 2002:a05:6214:2f8b:b0:8ca:10c9:845d with SMTP id 6a1803df08f44-8ca10c98663mr92214146d6.31.1778873508135;
+        Fri, 15 May 2026 12:31:48 -0700 (PDT)
+Received: from jeremy.kali (srv1619992.hstgr.cloud. [2a02:4780:75:55a3::1])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8c90c165434sm60542846d6.43.2026.05.15.12.31.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2026 12:31:47 -0700 (PDT)
+From: Jeremy Erazo <mendozayt13@gmail.com>
+To: Steve French <smfrench@gmail.com>
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] smb: client: use data_len for SMB2 READ encrypted folioq copy
+Date: Fri, 15 May 2026 19:31:41 +0000
+Message-ID: <20260515193141.542623-1-mendozayt13@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <CAH2r5mtBCP-sg6f3RH3RxO=-Fv9WznGmAwHHBQJBa=1+_DEnZA@mail.gmail.com>
+References: <CAH2r5mtBCP-sg6f3RH3RxO=-Fv9WznGmAwHHBQJBa=1+_DEnZA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 15 May 2026 13:44:45 -0500
-X-Gm-Features: AVHnY4Ji3d31QjulfDs_JJnH7x7f9fT-X8a5O3Qz5o2IdWQK0GSbeFciWI9MsQA
-Message-ID: <CAH2r5mvGAbdCXg8uJ2NrFWLT0kB1myECtq5B6ttcXqdQ-SXE7g@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Please pull the following changes since commit
-5d6919055dec134de3c40167a490f33c74c12581:
+In handle_read_data() the encrypted/folioq branch
+(buf_len <= data_offset, reached via receive_encrypted_read for
+transform PDUs > CIFSMaxBufSize + MAX_HEADER_SIZE) copies the READ
+payload using buffer_len rather than data_len:
 
-  Linux 7.1-rc3 (2026-05-10 14:08:09 -0700)
+	rdata->result = cifs_copy_folioq_to_iter(buffer, buffer_len,
+						 cur_off,
+						 &rdata->subreq.io_iter);
+	...
+	rdata->got_bytes = buffer_len;
 
-are available in the Git repository at:
+buffer_len comes from the SMB3 transform header OriginalMessageSize
+field (OriginalMessageSize - read_rsp_size); it represents the size
+of the decrypted message after the SMB2 header.  data_len comes from
+the SMB2 READ response DataLength field; it represents the actual
+READ payload size and may be smaller than buffer_len when the
+decrypted message contains padding or other trailing bytes after the
+READ payload.  The existing check `data_len > buffer_len - pad_len`
+only enforces an upper bound, so a server that emits
+OriginalMessageSize larger than read_rsp_size + pad_len + data_len
+passes the check and the kernel copies buffer_len bytes per response,
+ignoring the server-asserted DataLength.
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.1-rc4-smb3-client-fixes
+Two observable failures with a crafted server (DataLength=4,
+buffer_len=20000):
 
-for you to fetch changes up to c207f1d785044667f87cc8c72355e33f3981f2d6:
+  - the kernel returns 20000 bytes per sub-request to userspace and
+    sets got_bytes = buffer_len, even though the response claimed
+    only 4 bytes of payload;
 
-  smbdirect: Fix error cleanup in smbdirect_map_sges_from_iter()
-(2026-05-14 13:21:00 -0500)
+  - on a partial netfs sub-request whose iterator is sized to
+    data_len, the over-large copy_folio_to_iter() short-reads,
+    cifs_copy_folioq_to_iter() returns -EIO via the n != len path,
+    and the entire netfs read collapses to -EIO even though the
+    leading sub-requests succeeded.
 
-----------------------------------------------------------------
-Five client fixes
-- Fix integer overflow in read
-- Fix smbdirect error cleanup
-- Multichannel reconnect fix
-- Add some missing defines and correct some references to protocol spec
-- Fix oob symlink read
-----------------------------------------------------------------
-DaeMyung Kang (1):
-      cifs: client: stage smb3_reconfigure() updates and restore ctx on failure
+Use data_len for the copy length and for got_bytes so the kernel
+honours the server-asserted READ payload size.  For well-formed
+servers (where buffer_len == pad_len + data_len) the change is
+behaviour-equivalent.
 
-David Howells (1):
-      smbdirect: Fix error cleanup in smbdirect_map_sges_from_iter()
+Signed-off-by: Jeremy Erazo <mendozayt13@gmail.com>
+---
+ fs/smb/client/smb2ops.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Jeremy Erazo (1):
-      smb: client: avoid integer overflow in SMB2 READ length check
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -4825,7 +4825,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 		}
 
-Steve French (1):
-      SMB3.1.1: add missing QUERY_DIR info levels
+ 		/* Copy the data to the output I/O iterator. */
+-		rdata->result = cifs_copy_folioq_to_iter(buffer, buffer_len,
++		rdata->result = cifs_copy_folioq_to_iter(buffer, data_len,
+ 							 cur_off, &rdata->subreq.io_iter);
+ 		if (rdata->result != 0) {
+ 			if (is_offloaded)
+@@ -4834,5 +4834,5 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 				dequeue_mid(server, mid, rdata->result);
+ 			return 0;
+ 		}
+-		rdata->got_bytes = buffer_len;
++		rdata->got_bytes = data_len;
 
-Ye Bin (1):
-      smb/client: fix possible infinite loop and oob read in symlink_data()
-
- fs/smb/client/fs_context.c    | 161 ++++++++++++++++++++++++++++--------------
- fs/smb/client/smb2file.c      |   3 +
- fs/smb/client/smb2ops.c       |   4 +-
- fs/smb/client/transport.c     |  15 ++--
- fs/smb/common/fscc.h          |   4 +-
- fs/smb/common/smb2pdu.h       |   4 ++
- fs/smb/smbdirect/connection.c |   2 +-
- 7 files changed, 130 insertions(+), 63 deletions(-)
-
--- 
-Thanks,
-
-Steve
