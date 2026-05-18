@@ -1,128 +1,128 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24D43921DC
-	for <linux-cifs@vger.kernel.org>; Mon, 18 May 2026 21:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0FE82EA48F;
+	Mon, 18 May 2026 21:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779138815; cv=none; b=lONW2ykKIf8+bMk7290AdCTK3sH2X0lBptZrzK+70D0i4S2+72d5ew3D8yb4KF7xF0CJCyRjcCUOKilq1MoxsJVexI5Ht4nw/hfB8Syn16tq74G5TKCsyk74g5OBmn9hJKwQdcxxLH9mRe8uMyTqVfnHMox2FA6Kx2Y9vWFuroI=
+	t=1779139980; cv=none; b=YYz8nHOCAVYawXqgK8ixn0Lugn8BL3jO9m9E3lQyBNtlABbGZFdC0Q9mE2W+M9mvJVotHJ5wQ/O3JgbPH8CPcFXqns+pZBxgmVwqYrlkt6DYtQ3X//sPjHyTD5E1AIt+2tXpb3PMTbEiLmmWQRNqjWgIWcR6iH+XvVQquf2cfX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779138815; c=relaxed/simple;
-	bh=o/+rN4fO9ViHhv/UqBYorE9OXwCsK8MWPNhtt1y++Lw=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=fZ0WfSuzPOERplM7HgLaLH22AjufVihYVSyg54EkNn0rYDcUnfNUmfqQ/LQ4Ej71cttu9ztzmHofovfyF719+7+iew56R7nsjsxPrIzQYk1kQtYWNC0QzRZSuZb+NTEglcls3F65rRyJN9eeH0nuMCKf+T/tsAzCdnSiMaIGR18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N3SJhv6M; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1779139980; c=relaxed/simple;
+	bh=jis/84+rkvHhz3eLpzRb1KQ/6cDGjSDLWK2VgQBy0nY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XuOKygyJxryKpsrcd7E10lsOrv8/WCUK8IgKn/rMw2IfxDVGywJbgG9tiOSvPEr02SaTubtrMmDIpV0vRUJplA5bvTUUZrDJ6ouEr9E4grB2ZiU2x9yBKMk+wifgN3NxxFd2DBnLnsiKVwr23HEXlTyyK6Gl6hsDMSRQzDfdLx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4xuEb5N; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3SJhv6M"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779138802;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+3RDtzrQ1Czo/IGpos4A/0bras1DkEJY4PPaUs+z+xw=;
-	b=N3SJhv6MaMjJJTez6D7rePjIaJZ4v/tiBLOBQmC3Ybg0UoXFIHJtyOEQVIcFTQlacMnyTu
-	ZW5r5YoPdwBIQBXVPXA8DMImV0z7WalEJ98g4wF4GnxdK6CQy8oIZdCZBzA1WFsAcJpXHb
-	AB0lQycuQATxAa9969s6j4TkWRTezwU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-360-iK9HikplP56Rylpm-5s4yA-1; Mon,
- 18 May 2026 17:13:17 -0400
-X-MC-Unique: iK9HikplP56Rylpm-5s4yA-1
-X-Mimecast-MFC-AGG-ID: iK9HikplP56Rylpm-5s4yA_1779138795
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F00BC195608D;
-	Mon, 18 May 2026 21:13:14 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.48.33])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 131E51956053;
-	Mon, 18 May 2026 21:13:10 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Steve French <sfrench@samba.org>
-cc: dhowells@redhat.com, Nathan Chancellor <nathan@kernel.org>,
-    kernel test robot <lkp@intel.com>,
-    Paulo Alcantara <pc@manguebit.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Christian Brauner <brauner@kernel.org>,
-    Linus Torvalds <torvalds@linux-foundation.org>,
-    linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Fix undefined variables
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4xuEb5N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0B54C2BCB7;
+	Mon, 18 May 2026 21:32:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779139979;
+	bh=jis/84+rkvHhz3eLpzRb1KQ/6cDGjSDLWK2VgQBy0nY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e4xuEb5N4t+ZQ32+HoppzD7dGfIv79c9G8VPYDoKw8hfLhTpasPVU5SNO3KxVkoZI
+	 zXD3sMIyxguLEgPJisL/cEKZuvcvXlmAKpQNjbdKHaWGVcM/xSpAt4knEkan2wMRQW
+	 5TPOb1aoe1qh3vPpQ9BPrARxqHazIlT+BCEknsDUEDVnX9elIBUDFwnhdsHjFO7Q6F
+	 Wq15wqXybMQj1zAhzqHGyJvNktDch/k/E8NujL3UP/iJIplJnggiGyw4EsI6s2O2Ys
+	 98ffzxZ7vTzLNS71a6Qp2GyRmlfwD5kogoGlD4TNrJS3K2tY09KD+ZTmTZCxhQZPd2
+	 tn4j2ppCHiqWw==
+Date: Mon, 18 May 2026 14:32:54 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Steve French <sfrench@samba.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>
+Subject: Re: [GIT PULL for v7.1] vfs fixes
+Message-ID: <20260518213254.GB3979157@ax162>
+References: <20260518194622.GA2914683@ax162>
+ <20260518-vfs-7.1-rc5.fixes-3eded3a501f4@brauner>
+ <406981.1779138300@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <413532.1779138789.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 May 2026 22:13:09 +0100
-Message-ID: <413536.1779138789@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <406981.1779138300@warthog.procyon.org.uk>
 
-Fix a couple of undefined variables introduced by the patch to fix tearing
-on ->remote_i_size and ->zero_point.  For some reason, make W=3D1 with gcc
-doesn't give undefined variable warnings (but clang does).
+On Mon, May 18, 2026 at 10:05:00PM +0100, David Howells wrote:
+> Nathan Chancellor <nathan@kernel.org> wrote:
+> 
+> > > David Howells (22):
+> > >       netfs: Fix potential for tearing in ->remote_i_size and ->zero_point
+> > ...
+> > >  fs/smb/client/cifsfs.c       |  38 ++++--
+> > 
+> > The changes in this file from that patch breaks the build with clang:
+> > 
+> >   fs/smb/client/cifsfs.c:1390:29: error: variable 'old_size' is uninitialized when used here [-Werror,-Wuninitialized]
+> >    1390 |                 if (rc == 0 && new_size > old_size) {
+> >         |                                           ^~~~~~~~
+> >   fs/smb/client/cifsfs.c:1307:37: note: initialize the variable 'old_size' to silence this warning
+> >    1307 |         unsigned long long i_size, old_size, new_size, zero_point;
+> >         |                                            ^
+> >         |                                             = 0
+> >   fs/smb/client/cifsfs.c:1375:13: error: variable 'zero_point' is uninitialized when used here [-Werror,-Wuninitialized]
+> >    1375 |         if (fend > zero_point)
+> >         |                    ^~~~~~~~~~
+> >   fs/smb/client/cifsfs.c:1307:59: note: initialize the variable 'zero_point' to silence this warning
+> >    1307 |         unsigned long long i_size, old_size, new_size, zero_point;
+> >         |                                                                  ^
+> >         |                                                                   = 0
+> >   2 errors generated.
+> 
+> For some reason, make W=1 with gcc doesn't seem to generate uninitialised
+> variable warnings (though maybe clang does?).  Is that specifically
+> suppressed?
+> 
+> 	ifdef CONFIG_CC_IS_GCC
+> 	KBUILD_CFLAGS += -Wno-maybe-uninitialized
+> 	endif
 
-Fixes: 2c8f4742bb76 ("netfs: Fix potential for tearing in ->remote_i_size =
-and ->zero_point")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202605031459.eX5UbO3K-lkp@in=
-tel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202605021450.ca5QGqLH-lkp@in=
-tel.com/
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Christian Brauner <brauner@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/smb/client/cifsfs.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Yeah, clang's -Wuninitialized and -Wsometimes-uninitialized are on by
+default (not just at W=1) for the kernel, whereas GCC's
+-Wmaybe-uninitialized has been under W=2 since 78a5255ffb6a ("Stop the
+ad-hoc games with -Wno-maybe-initialized") back in 5.7.
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index feac491c5070..f557eb7875c7 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -1304,7 +1304,7 @@ static loff_t cifs_remap_file_range(struct file *src=
-_file, loff_t off,
- 	struct cifsFileInfo *smb_file_src =3D src_file->private_data;
- 	struct cifsFileInfo *smb_file_target =3D dst_file->private_data;
- 	struct cifs_tcon *target_tcon, *src_tcon;
--	unsigned long long i_size, old_size, new_size, zero_point;
-+	unsigned long long i_size, new_size;
- 	unsigned long long destend, fstart, fend;
- 	unsigned int xid;
- 	int rc;
-@@ -1372,7 +1372,7 @@ static loff_t cifs_remap_file_range(struct file *src=
-_file, loff_t off,
- 		goto unlock;
- =
+I consider this an unfortunate difference between GCC and clang with
+regards to -Wuninitialized. If there is any control flow that would
+avoid the block that uses the variable uninitialized, GCC "downgrades"
+it to -Wmaybe-uninitialized, whereas clang keeps it as -Wuninitialized
+with a note of "when used here" to make it clear that the variable will
+be used uninitialized if the block is reached:
 
- 	spin_lock(&target_inode->i_lock);
--	if (fend > zero_point)
-+	if (fend > target_cifsi->netfs._zero_point)
- 		netfs_write_zero_point(target_inode, fend + 1);
- 	i_size =3D target_inode->i_size;
- 	spin_unlock(&target_inode->i_lock);
-@@ -1387,7 +1387,7 @@ static loff_t cifs_remap_file_range(struct file *src=
-_file, loff_t off,
- 	if (target_tcon->ses->server->ops->duplicate_extents) {
- 		rc =3D target_tcon->ses->server->ops->duplicate_extents(xid,
- 			smb_file_src, smb_file_target, off, len, destoff);
--		if (rc =3D=3D 0 && new_size > old_size) {
-+		if (rc =3D=3D 0 && new_size > i_size) {
- 			truncate_setsize(target_inode, new_size);
- 			fscache_resize_cookie(cifs_inode_cookie(target_inode),
- 					      new_size);
+  https://godbolt.org/z/6eb5zK76T
 
+> I guess.  Can we remove that?
+
+It would be nice for my sanity if it could be but then we are back into
+the same situation of false positives, as GCC's warnings are influenced
+by optimizations, whereas clang's warnings happen purely in the frontend
+before optimizations happen. clang's versions do not flag as many
+instances of potentially uninitialized variables (as it cannot do
+interprocedural analysis to see across function boundaries) but that
+results in much fewer false positives in my experience.
+
+> > There were no -next updates last week, so it seems like the majority of
+> > this pull request saw zero -next testing time. I see two kbuild test
+> > robot build reports but I guess they were ignored.
+> > 
+> >   https://lore.kernel.org/202605031459.eX5UbO3K-lkp@intel.com/
+> >   https://lore.kernel.org/202605021450.ca5QGqLH-lkp@intel.com/
+> 
+> Gmail labelled them as spam :-(
+
+Bummer :/
+
+> I think this should be fixed as below, but Steve needs to look it over.
+
+Thanks, I will give it a build test but it seems obvious that it will
+fix it.
+
+-- 
+Cheers,
+Nathan
