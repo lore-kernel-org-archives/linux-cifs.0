@@ -1,128 +1,390 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0FE82EA48F;
-	Mon, 18 May 2026 21:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78BF2FFDD5
+	for <linux-cifs@vger.kernel.org>; Mon, 18 May 2026 22:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779139980; cv=none; b=YYz8nHOCAVYawXqgK8ixn0Lugn8BL3jO9m9E3lQyBNtlABbGZFdC0Q9mE2W+M9mvJVotHJ5wQ/O3JgbPH8CPcFXqns+pZBxgmVwqYrlkt6DYtQ3X//sPjHyTD5E1AIt+2tXpb3PMTbEiLmmWQRNqjWgIWcR6iH+XvVQquf2cfX0=
+	t=1779143425; cv=none; b=iKUSWD9Osyv1INKH+KuqlWo4uGXVrJn4J9BiAef5eOCBwPR+kL75YtAOmaQhaeNgQjJwNz4zOkSSGcpM3b/wGJtssC/7NDiOXvoA22A3NLzuVCP9EOkwViY8m/qdWpxfxNfQ72DPxtig3LSJ59C13jFyQB543ENTJDMvZKSrKb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779139980; c=relaxed/simple;
-	bh=jis/84+rkvHhz3eLpzRb1KQ/6cDGjSDLWK2VgQBy0nY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XuOKygyJxryKpsrcd7E10lsOrv8/WCUK8IgKn/rMw2IfxDVGywJbgG9tiOSvPEr02SaTubtrMmDIpV0vRUJplA5bvTUUZrDJ6ouEr9E4grB2ZiU2x9yBKMk+wifgN3NxxFd2DBnLnsiKVwr23HEXlTyyK6Gl6hsDMSRQzDfdLx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4xuEb5N; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779143425; c=relaxed/simple;
+	bh=oxciom+TsqccGjpj1bikbnA55+G/KYRRKH90D5Y9Dec=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uN0rm+UE7YYaBpAHYiY3wohjCSeXiV+/y4h1/o14fluVNRHmzZNZgSwgpUtfpx9Lu3iVSjSMfObn+0nQPVVwVUGvp2nS3KqcLuzwo+sEsdt4QTZTikevZbGquGMkSWsLR2gXps5UfXnb+PIo80yErNmsADcgCjBfsP2phWOB0wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U/h56lZA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4xuEb5N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0B54C2BCB7;
-	Mon, 18 May 2026 21:32:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779139979;
-	bh=jis/84+rkvHhz3eLpzRb1KQ/6cDGjSDLWK2VgQBy0nY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e4xuEb5N4t+ZQ32+HoppzD7dGfIv79c9G8VPYDoKw8hfLhTpasPVU5SNO3KxVkoZI
-	 zXD3sMIyxguLEgPJisL/cEKZuvcvXlmAKpQNjbdKHaWGVcM/xSpAt4knEkan2wMRQW
-	 5TPOb1aoe1qh3vPpQ9BPrARxqHazIlT+BCEknsDUEDVnX9elIBUDFwnhdsHjFO7Q6F
-	 Wq15wqXybMQj1zAhzqHGyJvNktDch/k/E8NujL3UP/iJIplJnggiGyw4EsI6s2O2Ys
-	 98ffzxZ7vTzLNS71a6Qp2GyRmlfwD5kogoGlD4TNrJS3K2tY09KD+ZTmTZCxhQZPd2
-	 tn4j2ppCHiqWw==
-Date: Mon, 18 May 2026 14:32:54 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Steve French <sfrench@samba.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>
-Subject: Re: [GIT PULL for v7.1] vfs fixes
-Message-ID: <20260518213254.GB3979157@ax162>
-References: <20260518194622.GA2914683@ax162>
- <20260518-vfs-7.1-rc5.fixes-3eded3a501f4@brauner>
- <406981.1779138300@warthog.procyon.org.uk>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U/h56lZA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779143422;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XKlg/PVJ6lY/p4wmIQDvsoHAGDkFSM169T8+EP2u5/w=;
+	b=U/h56lZAcUut1G7ndhx2S7jlmBMbpAkcBAn0fLJRIq18CLH0D+DoYi/utm6j4Fb8kKkwj8
+	zbiU8MJD+GtWdHflUAT0Y+a3kx+ZDq/Yk04gxfDMfMD887goPBkGivEkSwIwC6Ealsa/xL
+	iLTovFE8uHHeszGRE/k+rG8aDvXJ5H4=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-448-NrD_legDOMiE3PLHJOks1Q-1; Mon,
+ 18 May 2026 18:30:18 -0400
+X-MC-Unique: NrD_legDOMiE3PLHJOks1Q-1
+X-Mimecast-MFC-AGG-ID: NrD_legDOMiE3PLHJOks1Q_1779143415
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D4C131956046;
+	Mon, 18 May 2026 22:30:12 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.44.48.33])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3DC0330002DC;
+	Mon, 18 May 2026 22:30:02 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/21] netfs: Keep track of folios in a segmented bio_vec[] chain
+Date: Mon, 18 May 2026 23:29:32 +0100
+Message-ID: <20260518222959.488126-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <406981.1779138300@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, May 18, 2026 at 10:05:00PM +0100, David Howells wrote:
-> Nathan Chancellor <nathan@kernel.org> wrote:
-> 
-> > > David Howells (22):
-> > >       netfs: Fix potential for tearing in ->remote_i_size and ->zero_point
-> > ...
-> > >  fs/smb/client/cifsfs.c       |  38 ++++--
-> > 
-> > The changes in this file from that patch breaks the build with clang:
-> > 
-> >   fs/smb/client/cifsfs.c:1390:29: error: variable 'old_size' is uninitialized when used here [-Werror,-Wuninitialized]
-> >    1390 |                 if (rc == 0 && new_size > old_size) {
-> >         |                                           ^~~~~~~~
-> >   fs/smb/client/cifsfs.c:1307:37: note: initialize the variable 'old_size' to silence this warning
-> >    1307 |         unsigned long long i_size, old_size, new_size, zero_point;
-> >         |                                            ^
-> >         |                                             = 0
-> >   fs/smb/client/cifsfs.c:1375:13: error: variable 'zero_point' is uninitialized when used here [-Werror,-Wuninitialized]
-> >    1375 |         if (fend > zero_point)
-> >         |                    ^~~~~~~~~~
-> >   fs/smb/client/cifsfs.c:1307:59: note: initialize the variable 'zero_point' to silence this warning
-> >    1307 |         unsigned long long i_size, old_size, new_size, zero_point;
-> >         |                                                                  ^
-> >         |                                                                   = 0
-> >   2 errors generated.
-> 
-> For some reason, make W=1 with gcc doesn't seem to generate uninitialised
-> variable warnings (though maybe clang does?).  Is that specifically
-> suppressed?
-> 
-> 	ifdef CONFIG_CC_IS_GCC
-> 	KBUILD_CFLAGS += -Wno-maybe-uninitialized
-> 	endif
+Hi Christian,
 
-Yeah, clang's -Wuninitialized and -Wsometimes-uninitialized are on by
-default (not just at W=1) for the kernel, whereas GCC's
--Wmaybe-uninitialized has been under W=2 since 78a5255ffb6a ("Stop the
-ad-hoc games with -Wno-maybe-initialized") back in 5.7.
+Could you add these patches to the VFS tree for next?
 
-I consider this an unfortunate difference between GCC and clang with
-regards to -Wuninitialized. If there is any control flow that would
-avoid the block that uses the variable uninitialized, GCC "downgrades"
-it to -Wmaybe-uninitialized, whereas clang keeps it as -Wuninitialized
-with a note of "when used here" to make it clear that the variable will
-be used uninitialized if the block is reached:
+The patches get rid of folio_queue, rolling_buffer and ITER_FOLIOQ,
+replacing the folio queue construct used to manage buffers in netfslib with
+one based around a segmented chain of bio_vec arrays instead.  There are
+three main aims here:
 
-  https://godbolt.org/z/6eb5zK76T
+ (1) The kernel file I/O subsystem seems to be moving towards consolidating
+     on the use of bio_vec arrays, so embrace this by moving netfslib to
+     keep track of its buffers for buffered I/O in bio_vec[] form.
 
-> I guess.  Can we remove that?
+ (2) Netfslib already uses a bio_vec[] to handle unbuffered/DIO, so the
+     number of different buffering schemes used can be reduced to just a
+     single one.
 
-It would be nice for my sanity if it could be but then we are back into
-the same situation of false positives, as GCC's warnings are influenced
-by optimizations, whereas clang's warnings happen purely in the frontend
-before optimizations happen. clang's versions do not flag as many
-instances of potentially uninitialized variables (as it cannot do
-interprocedural analysis to see across function boundaries) but that
-results in much fewer false positives in my experience.
+ (3) Always send an entire filesystem RPC request message to a TCP socket
+     with single kernel_sendmsg() call as this is faster, more efficient
+     and doesn't require the use of corking as it puts the entire
+     transmission loop inside of a single tcp_sendmsg().
 
-> > There were no -next updates last week, so it seems like the majority of
-> > this pull request saw zero -next testing time. I see two kbuild test
-> > robot build reports but I guess they were ignored.
-> > 
-> >   https://lore.kernel.org/202605031459.eX5UbO3K-lkp@intel.com/
-> >   https://lore.kernel.org/202605021450.ca5QGqLH-lkp@intel.com/
-> 
-> Gmail labelled them as spam :-(
+For the replacement of folio_queue, a segmented chain of bio_vec arrays
+rather than a single monolithic array is provided:
 
-Bummer :/
+	struct bvecq {
+		struct bvecq		*next;
+		struct bvecq		*prev;
+		unsigned long long	fpos;
+		refcount_t		ref;
+		u32			priv;
+		u16			nr_segs;
+		u16			max_segs;
+		enum bvecq_mem		mem_type:2;
+		bool			inline_bv:1;
+		bool			discontig:1;
+		struct bio_vec		*bv;
+		struct bio_vec		__bv[];
+	};
 
-> I think this should be fixed as below, but Steve needs to look it over.
+The fields are:
 
-Thanks, I will give it a build test but it seems obvious that it will
-fix it.
+ (1) next, prev - Link segments together in a list.  I want this to be
+     NULL-terminated linear rather than circular to make it possible to
+     arbitrarily glue bits on the front.
 
--- 
-Cheers,
-Nathan
+ (2) fpos, discontig - Note the current file position of the first byte of
+     the segment; all the bio_vecs in ->bv[] must be contiguous in the file
+     space.  The fpos can be used to find the folio by file position rather
+     then from the info in the bio_vec.
+
+     If there's a discontiguity, this should break over into a new bvecq
+     segment with the discontig flag set (though this is redundant if you
+     keep track of the file position).  Note that the beginning and end
+     file positions in a segment need not be aligned to any filesystem
+     block size.
+
+ (3) ref - Refcount.  Each bvecq keeps a ref on the next.  I'm not sure
+     this is entirely necessary, but it makes sharing slices easier.
+
+ (4) priv - Private data for the owner.  Dispensible; currently only used
+     for storing a debug ID for tracing in a patch not included here.
+
+ (5) max_segs, nr_segs.  The size of bv[] and the number of elements used.
+     I've assumed a maximum of 65535 bio_vecs in the array (which would
+     represent a ~1MiB allocation).
+
+ (6) bv, __bv, inline_bv.  bv points to the bio_vec[] array handled by
+     this segment.  This may begin at __bv and if it does inline_bv should
+     be set (otherwise it's impossible to distinguish a separately
+     allocated bio_vec[] that follows immediately by coincidence).
+
+ (7) mem_type.  Indicates how the memory attached to the bio_vecs should be
+     disposed of when the bvecq is destroyed.  It can be one of:
+
+	BVECQ_MEM_EXTERNAL	- Externally tracked ref; don't put
+	BVECQ_MEM_PAGECACHE	- Pagecache; must be put
+	BVECQ_MEM_GUP		- Pinned by from GUP; needs unpin
+	BVECQ_MEM_ALLOCED	- Plain alloc'd pages; can be mempooled
+
+
+I've also defined an iov_iter iterator type ITER_BVECQ to walk this sort of
+construct so that it can be passed directly to sendmsg() or block-based DIO
+(as cachefiles does).
+
+
+This series makes the following changes to netfslib:
+
+ (1) The folio_queue chain used to hold folios for buffered I/O is replaced
+     with a bvecq chain.  Each bio_vec then holds (a portion of) one folio.
+     Each bvecq holds a contiguous sequence of folios, but adjacent bvecqs
+     in a chain may be discontiguous.
+
+ (2) For unbuffered/DIO, the source iov_iter is extracted into a bvecq
+     chain.
+
+ (3) An abstract position representation ('bvecq_pos') is created that can
+     used to hold a position in a bvecq chain.  For the moment, this takes
+     a ref on the bvecq it points to, but that may be excessive.
+
+ (4) Buffer tracking is managed with three cursors:  The load_cursor, at
+     which new folios are added as we go; the dispatch_cursor, at which new
+     subrequests' buffers start when they're created; and the
+     collect_cursor, the point at which folios are being unlocked.
+
+     Not all cursors are necessarily needed in all situations and during
+     buffered writeback, we need a dispatch cursor per stream (one for the
+     network filesystem and one for the cache).
+
+ (5) ->prepare_read(), buffer setting up and ->issue_read() are merged, as
+     are the write variants, with the filesystem calling back up to
+     netfslib to prepare its buffer.  This simplifies the process of
+     setting up a subrequest.  It may even make sense to have the
+     filesystem allocate the subrequest.
+
+ (6) Retry dispatch tracking is added to netfs_io_request so that the
+     buffer preparation functions can find it.  Retry requires an
+     additional buffer cursor.
+
+ (7) Netfslib dispatches I/O by accumulating enough bufferage to dispatch
+     at least one subrequest, then looping to generate as many as the
+     filesystem wants to (they may be limited by other constraints,
+     e.g. max RDMA segment count or negotiated max size).  This loop could
+     be moved down into the filesystem.  A new method is provided by which
+     netfslib can ask the filesystem to provide an estimate of the data
+     that should be accumulated before dispatch begins.
+
+ (8) Reading from the cache is now managed by querying the cache to provide
+     a list of the next two data extents within the cache.
+
+ (9) AFS directories are switched to using a bvecq rather than a
+     folio_queue to hold their contents.
+
+(10) CIFS is switch to using a bvecq rather than a folio_queue for holding
+     a temporary encryption buffer.
+
+(11) CIFS RDMA is given the ability to extract ITER_BVECQ and support for
+     extracting ITER_FOLIOQ is removed.
+
+(12) All the folio_queue and rolling_buffer code is removed.
+
+Cachefiles is also modified:
+
+ (1) The object type in the cachefiles file xattr is now correctly set to
+     CACHEFILES_CONTENT_{SINGLE,ALL,BACKFS_MAP} rather than just being 0,
+     to indicate whether we have a single monolithic blob, all the data up
+     to cache i_size with no holes or a sparse file with the data mapped by
+     the backing file system (as currently upstream).
+
+ (2) For "ALL" type files, the cache's i_size is used to track how much
+     data is saved in the cache and no longer bears any relation to the
+     netfs i_size.  The actual object size is stored in the xattr.
+
+ (3) For most typical files which are contiguous and written progressively,
+     the object type is now set to "ALL".  For anything else, cachefiles
+     uses SEEK_DATA/HOLE to find extent outlines at before (this is the
+     current behaviour and needs to be fixed, but in a separate set of
+     patches as it's not trivial).
+
+Two further things that I'm working on (but not in this branch) are:
+
+ (1) Make it so that a filesystem can be given a copy of a subchain which
+     it can then tack header and trailer protocol elements upon to form a
+     single message (I have this working for cifs) and even join copies
+     together with intervening protocol elements to form compounds.
+
+ (2) Make it so that a filesystem can 'splice' out the contents of the TCP
+     receive queue into a bvecq chain.  This allows the socket lock to be
+     dropped much more quickly and the copying of data read to the
+     destination buffers to happen without the lock.  I have this working
+     for cifs too.  Kernel recvmsg() doesn't then block kernel sendmsg()
+     for anywhere near as long.
+
+There are also some things I want to consider for the future:
+
+ (1) Create one or more batched iteration functions to 'unlock' all the
+     folios in a bio_vec[], where 'unlock' is the appropriate action for
+     ending a read or a write.  Batching should hopefully also improve the
+     efficiency of wrangling the marks on the xarray.  Very often these
+     marks are going to be represented by contiguous bits, so there may be
+     a way to change them in bulk.
+
+ (2) Rather than walking the bvecq chain to get each individual folio out
+     via bv_page, use the file position stored on the bvecq and the sum of
+     bv_len to iterate over the appropriate range in i_pages.
+
+ (3) Change iov_iter to store the initial starting point and for
+     iov_iter_revert() to reset to that and advance.  This would (a) help
+     prevent over-reversion and (b) dispense with the need for a prev
+     pointer.
+
+ (4) Use bvecq to replace scatterlist.  One problem with replacing
+     scatterlist is that crypto drivers like to glue bits on the front of
+     the scatterlists they're given (something trivial with that API) - and
+     this is one way to achieve it.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-next
+
+Thanks,
+David
+
+Changes
+=======
+ver #2)
+- Fixed a number of bugs reported by Sashiko[1].
+- Split a bunch of fixes out and posted them separately[2].
+
+[1] https://sashiko.dev/#/patchset/20260326104544.509518-1-dhowells%40redhat.com
+[2] https://lore.kernel.org/linux-fsdevel/20260512-infozentrum-becher-7f86c47c96c8@brauner/T/#t
+
+David Howells (21):
+  cachefiles: Don't rely on backing fs storage map for most use cases
+  netfs: Add the cache object ID to netfs_read/write tracepoints
+  mm: Make readahead store folio count in readahead_control
+  netfs: Bulk load the readahead-provided folios up front
+  Add a function to kmap one page of a multipage bio_vec
+  iov_iter: Make iov_iter_get_pages*() wrap iov_iter_extract_pages()
+  iov_iter: Add a segmented queue of bio_vec[]
+  netfs: Add some tools for managing bvecq chains
+  netfs: Add a function to extract from an iter into a bvecq
+  afs: Use a bvecq to hold dir content rather than folioq
+  cifs: Use a bvecq for buffering instead of a folioq
+  cifs: Support ITER_BVECQ in smb_extract_iter_to_rdma()
+  netfs: Switch to using bvecq rather than folio_queue and
+    rolling_buffer
+  cifs: Remove support for ITER_FOLIOQ from smb_extract_iter_to_rdma()
+  netfs: Remove netfs_alloc/free_folioq_buffer()
+  netfs: Remove netfs_extract_user_iter()
+  iov_iter: Remove ITER_FOLIOQ
+  netfs: Remove folio_queue and rolling_buffer
+  netfs: Check for too much data being read
+  netfs: Limit the minimum trigger for progress reporting
+  netfs: Combine prepare and issue ops and grab the buffers on request
+
+ Documentation/core-api/folio_queue.rst      |  209 ----
+ Documentation/core-api/index.rst            |    1 -
+ Documentation/filesystems/netfs_library.rst |    2 +-
+ fs/9p/vfs_addr.c                            |   49 +-
+ fs/afs/dir.c                                |   40 +-
+ fs/afs/dir_edit.c                           |   43 +-
+ fs/afs/dir_search.c                         |   33 +-
+ fs/afs/file.c                               |   28 +-
+ fs/afs/fsclient.c                           |    8 +-
+ fs/afs/inode.c                              |    2 +-
+ fs/afs/internal.h                           |   12 +-
+ fs/afs/symlink.c                            |   31 +-
+ fs/afs/write.c                              |   32 +-
+ fs/afs/yfsclient.c                          |    6 +-
+ fs/cachefiles/interface.c                   |   82 +-
+ fs/cachefiles/internal.h                    |   13 +-
+ fs/cachefiles/io.c                          |  530 +++++++---
+ fs/cachefiles/namei.c                       |   19 +-
+ fs/cachefiles/xattr.c                       |   24 +-
+ fs/ceph/Kconfig                             |    1 +
+ fs/ceph/addr.c                              |  119 ++-
+ fs/netfs/Kconfig                            |    3 +
+ fs/netfs/Makefile                           |    4 +-
+ fs/netfs/buffered_read.c                    |  508 +++++----
+ fs/netfs/buffered_write.c                   |   30 +-
+ fs/netfs/bvecq.c                            |  763 ++++++++++++++
+ fs/netfs/direct_read.c                      |  107 +-
+ fs/netfs/direct_write.c                     |  167 +--
+ fs/netfs/fscache_io.c                       |    8 +-
+ fs/netfs/internal.h                         |  112 +-
+ fs/netfs/iterator.c                         |  369 ++-----
+ fs/netfs/misc.c                             |  168 +--
+ fs/netfs/objects.c                          |   22 +-
+ fs/netfs/read_collect.c                     |  159 +--
+ fs/netfs/read_pgpriv2.c                     |  188 ++--
+ fs/netfs/read_retry.c                       |  243 ++---
+ fs/netfs/read_single.c                      |  169 +--
+ fs/netfs/rolling_buffer.c                   |  222 ----
+ fs/netfs/stats.c                            |    6 +-
+ fs/netfs/write_collect.c                    |  236 +++--
+ fs/netfs/write_issue.c                      | 1049 +++++++++++--------
+ fs/netfs/write_retry.c                      |  147 +--
+ fs/nfs/Kconfig                              |    1 +
+ fs/nfs/fscache.c                            |   23 +-
+ fs/smb/client/cifsglob.h                    |    2 +-
+ fs/smb/client/cifssmb.c                     |   13 +-
+ fs/smb/client/file.c                        |  137 +--
+ fs/smb/client/smb2ops.c                     |   79 +-
+ fs/smb/client/smb2pdu.c                     |   28 +-
+ fs/smb/client/transport.c                   |   15 +-
+ fs/smb/smbdirect/connection.c               |  134 ++-
+ include/linux/bvec.h                        |   17 +
+ include/linux/bvecq.h                       |  325 ++++++
+ include/linux/folio_queue.h                 |  282 -----
+ include/linux/fscache.h                     |   17 +
+ include/linux/iov_iter.h                    |   82 +-
+ include/linux/netfs.h                       |  166 +--
+ include/linux/pagemap.h                     |   10 +
+ include/linux/rolling_buffer.h              |   61 --
+ include/linux/uio.h                         |   17 +-
+ include/trace/events/cachefiles.h           |   17 +-
+ include/trace/events/netfs.h                |  155 ++-
+ kernel/bpf/btf.c                            |    2 -
+ lib/iov_iter.c                              |  545 +++++-----
+ lib/scatterlist.c                           |   59 +-
+ lib/tests/kunit_iov_iter.c                  |  135 ++-
+ mm/readahead.c                              |    5 +
+ net/9p/client.c                             |    8 +-
+ 68 files changed, 4694 insertions(+), 3605 deletions(-)
+ delete mode 100644 Documentation/core-api/folio_queue.rst
+ create mode 100644 fs/netfs/bvecq.c
+ delete mode 100644 fs/netfs/rolling_buffer.c
+ create mode 100644 include/linux/bvecq.h
+ delete mode 100644 include/linux/folio_queue.h
+ delete mode 100644 include/linux/rolling_buffer.h
+
