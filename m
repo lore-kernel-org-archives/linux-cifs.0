@@ -1,50 +1,50 @@
-Received: from out203-205-221-190.mail.qq.com (out203-205-221-190.mail.qq.com [203.205.221.190])
+Received: from out203-205-221-242.mail.qq.com (out203-205-221-242.mail.qq.com [203.205.221.242])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42743E16B5;
-	Mon, 18 May 2026 08:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2887237D115;
+	Mon, 18 May 2026 11:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.242
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779092190; cv=none; b=AXQ+L9DSYcEqMi1eASEFtofVMtdZVOPnRAVPQBlCb/5CA1Q/moJu0qGnMuwyNReQFKHQbLxmdsH57zNukZ6gW91EsQrgc8TQFxO0TSJL2ws/38i7zSyma4uzcTae57iHpHb66Pz/jpAjW7i1GWMuQRFrjFHTo0sSAjGosnbZAYk=
+	t=1779105208; cv=none; b=LEB1+IUvXpm9SmVH6Wi3Kd5hHx5rmdm1nTnbnjLDfk0dL7NF6NIRe+oU51XLWOUA7NDl087EA1u+/dr4pMk9boqUOQwyil/tyiNVGtyOxEDP9LYCsKKR1L5c5h0OSe0UEzjHnbomKBNlOOpsr8VHPdvkq0D7Yu2ZB4P6/pINLSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779092190; c=relaxed/simple;
-	bh=JhIcdbdQLcgj4UKpNSj9GSm1PBD5jnm5zV0iBTYrM4g=;
+	s=arc-20240116; t=1779105208; c=relaxed/simple;
+	bh=a8RHJb5fdvj94taVOB8Zs1yKqugsCa/YlHaWI3CD2ZM=;
 	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=RCaV6Yuv/BNtl62FtDb+K/LBnjc9ZU41Dr0f0Q3aWyYXnd/kkfTYbliBC0qolwxb6nkgaSRO01GgP89UJ+2tG8bTWzYYUtehBhctdREGyMDicztKUvDfQQ5wsTT8ybNsIG2mnzrECXb7N8uR1DgAFgLrrFZS6ozP5vaNtmYpgXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=yXPetU0+; arc=none smtp.client-ip=203.205.221.190
+	 MIME-Version; b=jIypprGReFplKwHTQLPHPb8tYeD+X5BQSBV0gtlvhHnf1Tdl9hiazLw+baOTakGFGKctNHlLpHW2Mqjsntp5G2eCGnIWZxfuT/rOzH6+2qQxKFuxtCFjSjWv+Fy5xZxz76HwhTQS5yFOddOR/LC5//UevnZBwee3sjj79rAYYHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=WFFsXNve; arc=none smtp.client-ip=203.205.221.242
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="yXPetU0+"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="WFFsXNve"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1779092179;
-	bh=4IxuhOwzABNC8IL++ludYkU8O8WExX1VY8dfqrvsQKw=;
+	s=s201512; t=1779105197;
+	bh=0QUjqelaAmgLSOU5FDBk9xFnggyFWdoSoWpzhigwSuU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=yXPetU0+ZZV4gq6h47BGECDRn3ZEEliVGlASFxzaFBHDODNSk6UMownffIocXPBns
-	 w5dBMGJsyRUajrKFZgR3W98hyWytsZB4BMmNI+DjC8hwvX1PEl+CkyZWl+lcRG7Yiq
-	 uNiFnZJG4/Dn65aIlNmo2m8ia0OeL9lRA9hvXAYk=
+	b=WFFsXNve9W5zmUreYKpyuKG6JOqYPwMEoyBB8hxiyBoPKzoIVJEmcHq+LnV+pc8Br
+	 0WVstovKhz/gy/ZEs0R7p3rJ08170GW/KtPA7ZpFlka7SIRm/rIEsXClkLcZWqYMtU
+	 QAfnzThS0qp5jmRdilI5boLS87ZS9kQ5Od9zLd0Q=
 Received: from China-team ([47.95.114.252])
-	by newxmesmtplogicsvrsza63-0.qq.com (NewEsmtp) with SMTP
-	id 4018BC9E; Mon, 18 May 2026 16:16:01 +0800
-X-QQ-mid: xmsmtpt1779092170tmzdlk0g4
-Message-ID: <tencent_7A69076B1A3E822455AD85719260081AEE09@qq.com>
-X-QQ-XMAILINFO: NX3IH4pixvQA85ED3sK18DcgVIekmMgB5Yc0FuSe4YZ0LJhmDhqP2LOE4fu8QY
-	 NXE7Cr2huRHHlD4Y/hlpXScQq2/MQOvN1mLMmekSCA+AvqcKFAEvpChlRyPmANjmZTwe7DWMphRW
-	 18LomtP29BLkmvXNr/HaO/2MasQzoZyd6ZC3aRoczPzvMsvL1AFqq1WOvdlIn8IY7QqpMzwPtdiP
-	 GlNusFX5bbnEiKBZjZ3uAU3NRFgHnabH4wLads0jBo7BGgcn3Y1mWaOXBuRPrn+bZG4PaJa5Nmih
-	 rvv+wm4ryRX0vJXNzk7kp5betwKZ4U/l1DUWeUw3OJOu2f5KfdF4hR4ExzEeTiu9sh8ABpAN5mrt
-	 EeP1e7Sq92psCaRq/Z8gWKhNDaZfBGW0dG4sNSX/ADMxJ6n35/BxJ33O/lFDiqIUfSGjHWSoDjJ5
-	 KwX6sinRDZDeQsQ5+3j0yR2MvbYXB4OPYxP22nQuK6eAnL/tJv9fV3T3kBAbd1R35vZ0+Uk0t26D
-	 OVn7sLDuT6FbEPaQQhuKry7DZz9BgmnqQOMEmwRp/cY/TBo0ZUqpK25e3m9uSD8KfwwMpMbXf899
-	 CxLrldKZJTpPjQkvLPs8a9OmDkkndFbMiWfZcCpca5mdaG01Vf1b7B1hOMVhOaYtVy9k/04a4HNi
-	 IXVvc/THuWCtWtWqP6OV7eeAyPS128OpH6wC9yb9k0Mm4PIjHgaJyVyRj6Pk8RTANhFn/cVr5xCt
-	 pYmEBsXlCSkc0PJNkC3QuPdkQi6C9d5wzbkaxnoa2ovFWYyfR13MMZaZqGFh/ZJyewU/QP8Hdef2
-	 PFQFUVJorrwMbvK8PMztf5tB7LEHxb3H9JiUITZusJfMWTTwg8fANCvD08/1CaI1B64Emg0uVlVV
-	 KdfakOhXMLizq8n4SVkObdc9chPjOOs1Kn1V+EssUn/D3+V1jYdDaIfw+wAUbAPv+CLs3IGBAsrH
-	 GukaohjcqdL+LgWsdRufZyDByRhCPS/vwRzN/vmauiWlPAfESMNY27K4PpC+CvM5AMqf+IilkbPl
-	 SKbIcLPfhdEikTRauCuG28chzVkpospLGE5QtB8kl3d7JGafqpf5fm0Naao+lDX+Ge9TY98sJrhT
-	 vMxaOB6KbJHlvioljal/H6KJ6fagHdW5BRx3tv
-X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
+	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
+	id D45BF675; Mon, 18 May 2026 19:53:05 +0800
+X-QQ-mid: xmsmtpt1779105193t7ai0d8zq
+Message-ID: <tencent_B0DF3A0F070846B6219D96AE66E1C34FB205@qq.com>
+X-QQ-XMAILINFO: MHlktdARe4QnUgv0VerQzX+qVWhx61/b5UGvDGEYtr+ihX6p7rFo0pYumtzUGb
+	 UB6rOmJPZ59aDQtkDHuHUfdEnShQcLTZL0Yos7irAfyDmI7WunRN9JXyUIKJJKVpXu8W6ECi6M2p
+	 AXDhK4eTVuMGXep8nRHkLUiLYCY2YfGSp+R8zys1E96lDHWF36bc76tgkPrLvEw6/rgpcBW3ldIT
+	 ueKxvDWXkqCOULJK+eUSWY78jcm4JOuU4OMGyN3G08jZMdWACUmPwKkDJXVij1lJ0s+dTKoZRwOJ
+	 ank6FOFQxG8zbQ50sdv6s8cAcIrWy5DGCZicIGBNxVJRQ2CXtmdwKVzaWEU6zsvg/100GXOnpttY
+	 CXyBIvIkkxQ3gIrOsJsHgaNW2rgdcWOYcaMkuIcjasQBDbtQ6We80lT09nRtQMYjXobG+RFRFjMF
+	 24bjr7h2ERxRgZGzgYJ+8OJlSui18yINf3NPQ1SsV361EydxmtWKbpeHF9oLQvD6ZcWWfgoDSau0
+	 UEMatzWFUZb9QtCgz33w45/NeDXNet78wYBJ3YbeEtlzrAhGDewBd+AoUksXNjsvbH046f9Fu7xx
+	 kK0y0OInbbQS6OXmMXlSlUu2NEv7qxypaLjgYxOqe13p9QHvmes6VKvlyZFKHCi46N3z1pB/MamM
+	 ejzb9mNYefdjm6HrZ1fSBzLzgHeiotglHfZQ85KJuIOpKmePmBjsxdwFzuGK9Td3cphAzDx3ZXId
+	 qjeETb9IEqi4zsK+7Mhk7SAI7sWfZimYyKjP7f43nG6DFaXo8wVOQm4XVveyNA6tPyc5Gmx/0SBW
+	 6OBJtIF5Eph5++MMCdWDY8bHzoahbjHv/xTELCw1fc/Md5BftiaMELrUNnNRHGoB+pdx314TGiH5
+	 va3vUpWBvARGCvXQxex7ul6h65E+L6ghGYj1rayOfq8MwYl+kTMzQdD8PHIC9ablAL38UjEbb8ab
+	 LwiHY9IGPmVfqeq0+eLM2ECTQQ8EB+aN+pcddECJk2cNkzXuEG20h3zuwpiw5cSWngcnv5k41nBh
+	 C3Wa4eJBXD6wCIxnklC6mK4UL7wefLSteW9ck8yDZ3bKrus/WvscfGURH9TC0BnSwvBzR6tYxSHL
+	 1huU6L0H02684WL8s=
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
 From: Alva Lan <alvalan9@foxmail.com>
 To: gregkh@linuxfoundation.org,
 	sashal@kernel.org,
@@ -60,12 +60,12 @@ Cc: linux-kernel@vger.kernel.org,
 	Paulo Alcantara <pc@manguebit.org>,
 	Steve French <stfrench@microsoft.com>,
 	Alva Lan <alvalan9@foxmail.com>
-Subject: [PATCH 6.6.y 2/2] smb: client: fix OOB reads parsing symlink error response
-Date: Mon, 18 May 2026 16:15:54 +0800
-X-OQ-MSGID: <20260518081554.21484-2-alvalan9@foxmail.com>
+Subject: [PATCH 6.1.y 2/2] smb: client: fix OOB reads parsing symlink error response
+Date: Mon, 18 May 2026 19:52:52 +0800
+X-OQ-MSGID: <20260518115252.22162-2-alvalan9@foxmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260518081554.21484-1-alvalan9@foxmail.com>
-References: <20260518081554.21484-1-alvalan9@foxmail.com>
+In-Reply-To: <20260518115252.22162-1-alvalan9@foxmail.com>
+References: <20260518115252.22162-1-alvalan9@foxmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -127,10 +127,10 @@ Signed-off-by: Alva Lan <alvalan9@foxmail.com>
  1 file changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
-index 3a5b62b29806..044512b77448 100644
+index def2602ea0fb..43e38909e20b 100644
 --- a/fs/smb/client/smb2file.c
 +++ b/fs/smb/client/smb2file.c
-@@ -27,10 +27,11 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
+@@ -26,10 +26,11 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
  {
  	struct smb2_err_rsp *err = iov->iov_base;
  	struct smb2_symlink_err_rsp *sym = ERR_PTR(-EINVAL);
@@ -143,7 +143,7 @@ index 3a5b62b29806..044512b77448 100644
  
  		len = (u32)err->ErrorContextCount * (offsetof(struct smb2_error_context_rsp,
  							      ErrorContextData) +
-@@ -39,8 +40,7 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
+@@ -38,8 +39,7 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
  			return ERR_PTR(-EINVAL);
  
  		p = (struct smb2_error_context_rsp *)err->ErrorData;
@@ -153,7 +153,7 @@ index 3a5b62b29806..044512b77448 100644
  			if (le32_to_cpu(p->ErrorId) == SMB2_ERROR_ID_DEFAULT) {
  				sym = (struct smb2_symlink_err_rsp *)p->ErrorContextData;
  				break;
-@@ -50,14 +50,16 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
+@@ -49,14 +49,16 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
  
  			len = ALIGN(le32_to_cpu(p->ErrorDataLength), 8);
  			p = (struct smb2_error_context_rsp *)(p->ErrorContextData + len);
@@ -173,7 +173,7 @@ index 3a5b62b29806..044512b77448 100644
  		sym = ERR_PTR(-EINVAL);
  
  	return sym;
-@@ -82,8 +84,10 @@ int smb2_parse_symlink_response(struct cifs_sb_info *cifs_sb, const struct kvec
+@@ -81,8 +83,10 @@ int smb2_parse_symlink_response(struct cifs_sb_info *cifs_sb, const struct kvec
  	print_len = le16_to_cpu(sym->PrintNameLength);
  	print_offs = le16_to_cpu(sym->PrintNameOffset);
  
@@ -185,7 +185,7 @@ index 3a5b62b29806..044512b77448 100644
 +		(char *)iov->iov_base + iov->iov_len)
  		return -EINVAL;
  
- 	return smb2_parse_native_symlink(path,
+ 	s = cifs_strndup_from_utf16((char *)sym->PathBuffer + sub_offs, sub_len, true,
 -- 
 2.43.0
 
