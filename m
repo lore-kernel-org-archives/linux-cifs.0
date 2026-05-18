@@ -1,67 +1,83 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7E530C15F;
-	Mon, 18 May 2026 19:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F48B382368;
+	Mon, 18 May 2026 19:46:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779132077; cv=none; b=OIfQkM4BTjBhpLV0DBX0DQCD+x0xA+8rZCXczeM8kK5q27+9bw6VdvN0BkWqhl5cyhmUZN0foIBFuMM2pNh37rl+8Df6G51nzIhKoJX3I1p5JWbSPRIQnY21RiPMyWD8KE7nPSNqRUmZ4JyCdNciwMVglhRoMWh3pkSAu7woW+I=
+	t=1779133587; cv=none; b=g8xnnk3J+5GACzYVQn6mOrfYl/vnzb66N9iHhmHOyB/wx7hT3T71UrDQ+HcNLKzV6iC98uXjSZtMpa95NkuBFoKanbVNphCy2pUy6/Y19071ZHUOeJfHF7Nn3Jhp/fLPbGqcGA7W5+r0zAlz5INHmMbQaS1gzpEYYe+ZwH3gYXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779132077; c=relaxed/simple;
-	bh=i3oY8PG4KwQGHN5L10dwyj0933i5Hb/FM18LjFX52oo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lUwcAR+7w7Xa0oF0rAE1KP1O/1IrfKJzCaV2aDFrz9RMzNzKYGx2mcRI/Rg0O7bgg9KJUmWXTa322QX1tG/R/J2EVq6Q2ouzRTkdBA413KkAzU5ROFyQSTI97tKBAUl8Oi55CdFh3af3K0W6bIA3FIzXDFQUbwC7RiPhrpvzjwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p6JB55L4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779133587; c=relaxed/simple;
+	bh=7CZiSpKGy3aqYpayTBO4axTiPSITWww+ahtBHVtxsBw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iN4idXn0U3LMMbiOEIOjB4gJLCk91epTlEZFTO9Ot1NfbakAipuIGGnurqLhszxD5qNk+4uNeixCIt+Sf85BqMxHa+9sy5urJdE3Jsx2LDxw+b5ikWHmnqrSWHIWDKyc/+DMuyufmJ+j8aVuLTtvFqCKKaY/xMjp9n2Z86E4dHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uPMBbs1E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p6JB55L4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33D3AC2BCC6;
-	Mon, 18 May 2026 19:21:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uPMBbs1E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E858FC2BCB7;
+	Mon, 18 May 2026 19:46:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779132073;
-	bh=i3oY8PG4KwQGHN5L10dwyj0933i5Hb/FM18LjFX52oo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=p6JB55L4lb1c8HyqobqdegPFsiAPmMOJphfPY59LRUnhHgg5rDg0AS7xmXTPgfC/b
-	 VLc/9ydg3HfwtpDJmSwlB/S/wLLKPDYFIfBiw9HK3WOtf2837a/vUG6zOfZ4CV47eO
-	 aizAaabVl5VECvTGA0d+Nwjm5pKIjs+bxtVQiPNrjyipuzrCBVQCjRrFTPjUNZaLOz
-	 z6iWGwp/4i2uxRuXj3h4WW6LATVPRlfSyc/FvXFvYmagsQMAUiW8ysM4YPK0c2d/7z
-	 enDUz5gEwj49KQ8/AZ/D2fBaM1zs02slmUvqD4cb4JQtcIdbJ2LM7+bB78FrZKKY49
-	 kYXVjf9BeihfQ==
-From: Sasha Levin <sashal@kernel.org>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org
-Cc: Sasha Levin <sashal@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	samba-technical@lists.samba.org,
-	stable <stable@kernel.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Steve French <stfrench@microsoft.com>,
-	Alva Lan <alvalan9@foxmail.com>
-Subject: Re: [PATCH 6.1.y 2/2] smb: client: fix OOB reads parsing symlink error response
-Date: Mon, 18 May 2026 15:20:57 -0400
-Message-ID: <20260518155236.reply-0008@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <tencent_B0DF3A0F070846B6219D96AE66E1C34FB205@qq.com>
-References: <tencent_B0DF3A0F070846B6219D96AE66E1C34FB205@qq.com>
+	s=k20201202; t=1779133586;
+	bh=7CZiSpKGy3aqYpayTBO4axTiPSITWww+ahtBHVtxsBw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uPMBbs1ESSbAvL38xLqkZTQAADrETvKzkpP+dBRQaso6QiNqlY471oIqI4VESu8mJ
+	 Q0l7BHNaH1++m/ehG1seELchK66HqhNH3KZBLLYcTFewwBgdCTfkMSmV91SwJwlY82
+	 cUdmpyRTkdkBauz1AGFh0yGKIgijH21ZKn6wDmxxkFfb5yEN6E+fprg7425G1I+jnx
+	 tApDxkNqAkbgdaqltIagIFo18iDKOy99X6tSt2GsqKMewogSxR6GGkUY1GthBKpghk
+	 wz/PiEAYit0bj89vwGmUnUjmr09mjFEd7C+mLIyBQa95JVtCTb128Q3h14MKAlTr/8
+	 KFoIdezZ/CRaw==
+Date: Mon, 18 May 2026 12:46:22 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Christian Brauner <brauner@kernel.org>,
+	David Howells <dhowells@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.org>
+Subject: Re: [GIT PULL for v7.1] vfs fixes
+Message-ID: <20260518194622.GA2914683@ax162>
+References: <20260518-vfs-7.1-rc5.fixes-3eded3a501f4@brauner>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260518-vfs-7.1-rc5.fixes-3eded3a501f4@brauner>
 
-On Sun, May 17, 2026, Alva Lan wrote:
-> From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->
-> [ Upstream commit 3df690bba28edec865cf7190be10708ad0ddd67e ]
+On Mon, May 18, 2026 at 09:35:59AM +0200, Christian Brauner wrote:
+> David Howells (22):
+>       netfs: Fix potential for tearing in ->remote_i_size and ->zero_point
+...
+>  fs/smb/client/cifsfs.c       |  38 ++++--
 
-Queued for 6.1 along with the 1/2 prerequisite (215b7f9ecb8d), thanks.
+The changes in this file from that patch breaks the build with clang:
 
---
-Thanks,
-Sasha
+  fs/smb/client/cifsfs.c:1390:29: error: variable 'old_size' is uninitialized when used here [-Werror,-Wuninitialized]
+   1390 |                 if (rc == 0 && new_size > old_size) {
+        |                                           ^~~~~~~~
+  fs/smb/client/cifsfs.c:1307:37: note: initialize the variable 'old_size' to silence this warning
+   1307 |         unsigned long long i_size, old_size, new_size, zero_point;
+        |                                            ^
+        |                                             = 0
+  fs/smb/client/cifsfs.c:1375:13: error: variable 'zero_point' is uninitialized when used here [-Werror,-Wuninitialized]
+   1375 |         if (fend > zero_point)
+        |                    ^~~~~~~~~~
+  fs/smb/client/cifsfs.c:1307:59: note: initialize the variable 'zero_point' to silence this warning
+   1307 |         unsigned long long i_size, old_size, new_size, zero_point;
+        |                                                                  ^
+        |                                                                   = 0
+  2 errors generated.
+
+There were no -next updates last week, so it seems like the majority of
+this pull request saw zero -next testing time. I see two kbuild test
+robot build reports but I guess they were ignored.
+
+  https://lore.kernel.org/202605031459.eX5UbO3K-lkp@intel.com/
+  https://lore.kernel.org/202605021450.ca5QGqLH-lkp@intel.com/
+
+-- 
+Cheers,
+Nathan
