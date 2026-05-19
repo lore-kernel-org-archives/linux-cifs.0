@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233474EA39C
-	for <linux-cifs@vger.kernel.org>; Tue, 19 May 2026 10:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30634F7980
+	for <linux-cifs@vger.kernel.org>; Tue, 19 May 2026 10:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779186277; cv=none; b=hPV8hg9k8zf8Ne/D6EFK+BGVdYD7V8JM/2m/5f1B713GKNnkvvEkCFj+0CYRE2YjaW4Iqg7yH49iJoRx7CxCyYKHmfmBAatZaHIv9CjqI7TTkY4KX0/uViW2umpIOEyvxa8xX4gA17T1QWBupPgkvjySs0oeA+Gu+NOIJ1sIdwA=
+	t=1779186283; cv=none; b=K2cthyNmYof5j25SZMamz72GjL07/ysnV4Hbobbq0qadsg1xMHMDcyC4TmhxAwdc5v36L2qnB37vfY5IK7fmzzzOMinvrFqPsF5HI4Ruz6HdzUSs5l2sdszqn8itvOtv4M0f85CJYvjix7L8asOL8pHuPFuFT4aHP6zgq2mwDVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779186277; c=relaxed/simple;
-	bh=gfaJzP289xQ4kVltCiQEPXCysPdOpM4vpGCDTkaZPTM=;
+	s=arc-20240116; t=1779186283; c=relaxed/simple;
+	bh=6JHO7zGoYUv42IdTqmkY851r6tP6oZ8F9UnTfS+t70g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G9nUnFKx0WKGgaOxdyWJl2dtP9sFUxanm6jC5hNwVoLqQhaY2Fm7XFADNfNsv1T6r8TR9ucXxc+fsrIZ5DYOuEzZE1Wp9R5VVy/zOmC/8pke/LUEDZzFE4wBL92vvNzQ2NmK10CGhLOz76EQN8A3gWvA+PwLvQ5osQzgDUfJIXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XYBaiLuD; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=GuamnBh1XZYdoBJfdlTmbVXjWr+3b/9o4a9Nzv9XIpGCWo4hmSqdeDKuJql2tpvPyYtl5x3LeMWzMQXD3hN7dRKFPsftd48O7G3L3TyGbzSNju+tTBrNd+02ZtFWpNXj4/JsoGNnQsbxcBPLW6gutYTKXqIomu8EHupJxbvRknk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AzuVFcIQ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYBaiLuD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AzuVFcIQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779186275;
+	s=mimecast20190719; t=1779186281;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=REhYKVbaqGbxNcyNXrV0J0+0n1UmD1ysJbs6hLY9zMU=;
-	b=XYBaiLuD7HqhvK8mOPeFfhTp+8D0VwVfTTMP0CLyAW0b0LCUhHb+OkZ2wDrAmrH8EIAbQG
-	Rt7gJAQBvSHZvByQ+9d+qL3YL53+Ch3LeCiYB/QPkyS3CcZjMGaEpYCzSZ308GwGgdIhxL
-	xa0vA/qI/tiWdcaJfzOIpJS09cJPq6E=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=j1YgjwJ80TNUQ6YOR+omfLsLBjy7Grl2VNzSblRzWrw=;
+	b=AzuVFcIQDErvXtxanjXaCFq060zrcRsTUPoIthpuRwk21jGbhE+ELPXZqD+SyNC6Yk9rvz
+	/VuS76xlVtVt6mNOSPtDsbO8L5jJzLk+7hKmOZb0nPcqebHuQepX4ddF3kBvFCzfTG9Vnz
+	WaKRnCUR5G0I6cHC8bI/p60vJ0nlfCQ=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-56-jOkhW4KOOyiXzBGFFZBWHg-1; Tue,
- 19 May 2026 06:24:31 -0400
-X-MC-Unique: jOkhW4KOOyiXzBGFFZBWHg-1
-X-Mimecast-MFC-AGG-ID: jOkhW4KOOyiXzBGFFZBWHg_1779186269
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-217-LocKuVccNHyw2eqB6ifX0Q-1; Tue,
+ 19 May 2026 06:24:35 -0400
+X-MC-Unique: LocKuVccNHyw2eqB6ifX0Q-1
+X-Mimecast-MFC-AGG-ID: LocKuVccNHyw2eqB6ifX0Q_1779186274
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4333019560A2;
-	Tue, 19 May 2026 10:24:29 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1BAB8195609D;
+	Tue, 19 May 2026 10:24:34 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.48.33])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1CA9C18001E9;
-	Tue, 19 May 2026 10:24:25 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E8CF71800357;
+	Tue, 19 May 2026 10:24:30 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Steve French <sfrench@samba.org>
 Cc: David Howells <dhowells@redhat.com>,
@@ -54,9 +54,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	netfs@lists.linux.dev,
 	linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 29/36] cifs: Convert SMB2 Tree Connect request
-Date: Tue, 19 May 2026 11:21:47 +0100
-Message-ID: <20260519102158.592165-30-dhowells@redhat.com>
+Subject: [RFC PATCH 30/36] cifs: Convert SMB2 Tree Disconnect request
+Date: Tue, 19 May 2026 11:21:48 +0100
+Message-ID: <20260519102158.592165-31-dhowells@redhat.com>
 In-Reply-To: <20260519102158.592165-1-dhowells@redhat.com>
 References: <20260519102158.592165-1-dhowells@redhat.com>
 Precedence: bulk
@@ -77,63 +77,43 @@ cc: linux-cifs@vger.kernel.org
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- fs/smb/client/smb2pdu.c | 76 ++++++++++++++++-------------------------
- 1 file changed, 30 insertions(+), 46 deletions(-)
+ fs/smb/client/smb2pdu.c | 36 ++++++++++++++----------------------
+ 1 file changed, 14 insertions(+), 22 deletions(-)
 
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 082838e9c9b5..ea4108669e6c 100644
+index ea4108669e6c..f0b39c77f8ae 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -2365,57 +2365,44 @@ int
- SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
- 	  struct cifs_tcon *tcon, const struct nls_table *cp)
+@@ -2489,16 +2489,12 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ int
+ SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
  {
 -	struct smb_rqst rqst;
-+	struct TCP_Server_Info *server = cifs_pick_channel(ses);
- 	struct smb2_tree_connect_req *req;
- 	struct smb2_tree_connect_rsp *rsp = NULL;
--	struct kvec iov[2];
--	struct kvec rsp_iov = { NULL, 0 };
+ 	struct smb2_tree_disconnect_req *req; /* response is trivial */
 -	int rc = 0;
--	int resp_buftype;
--	int unc_path_len;
--	__le16 *unc_path = NULL;
 +	struct smb_message *smb = NULL;
-+	int unc_path_size;
+ 	struct cifs_ses *ses = tcon->ses;
+ 	struct TCP_Server_Info *server = cifs_pick_channel(ses);
  	int flags = 0;
 -	unsigned int total_len;
--	struct TCP_Server_Info *server = cifs_pick_channel(ses);
+-	struct kvec iov[1];
+-	struct kvec rsp_iov;
+-	int resp_buf_type;
 +	int rc = 0;
  
- 	cifs_dbg(FYI, "TCON\n");
+ 	cifs_dbg(FYI, "Tree Disconnect\n");
  
- 	if (!server || !tree)
- 		return smb_EIO(smb_eio_trace_null_pointers);
+@@ -2516,33 +2512,29 @@ SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
  
--	unc_path = kmalloc(MAX_SHARENAME_LENGTH * 2, GFP_KERNEL);
--	if (unc_path == NULL)
--		return -ENOMEM;
--
--	unc_path_len = cifs_strtoUTF16(unc_path, tree, strlen(tree), cp);
--	if (unc_path_len <= 0) {
--		kfree(unc_path);
--		return -EINVAL;
--	}
--	unc_path_len *= 2;
-+	unc_path_size = cifs_size_strtoUTF16(tree, INT_MAX, cp);
+ 	invalidate_all_cached_dirs(tcon, true);
  
- 	/* SMB2 TREE_CONNECT request must be called with TreeId == 0 */
- 	tcon->tid = 0;
- 	atomic_set(&tcon->num_remote_opens, 0);
--	rc = smb2_plain_req_init(SMB2_TREE_CONNECT, tcon, server,
--				 (void **) &req, &total_len);
--	if (rc) {
--		kfree(unc_path);
+-	rc = smb2_plain_req_init(SMB2_TREE_DISCONNECT, tcon, server,
+-				 (void **) &req,
+-				 &total_len);
+-	if (rc)
 -		return rc;
--	}
-+
-+	smb = smb2_create_request(SMB2_TREE_CONNECT, server, tcon,
-+				  sizeof(*req), sizeof(*req) + unc_path_size, 0,
++	smb = smb2_create_request(SMB2_TREE_DISCONNECT, server, tcon,
++				  sizeof(*req), sizeof(*req), 0,
 +				  SMB2_REQ_DYNAMIC);
 +	if (!smb)
 +		return -ENOMEM;
@@ -142,67 +122,31 @@ index 082838e9c9b5..ea4108669e6c 100644
  	if (smb3_encryption_required(tcon))
  		flags |= CIFS_TRANSFORM_REQ;
  
+-	flags |= CIFS_NO_RSP_BUF;
+-
 -	iov[0].iov_base = (char *)req;
--	/* 1 for pad */
 -	iov[0].iov_len = total_len;
 -
- 	/* Testing shows that buffer offset must be at location of Buffer[0] */
--	req->PathOffset = cpu_to_le16(sizeof(struct smb2_tree_connect_req));
--	req->PathLength = cpu_to_le16(unc_path_len);
--	iov[1].iov_base = unc_path;
--	iov[1].iov_len = unc_path_len;
-+	req->PathOffset = cpu_to_le16(smb->ext_offset);
-+	req->PathLength = cpu_to_le16(unc_path_size);
-+
-+	rc = cifs_strtoUTF16(smb->request + smb->ext_offset, tree, strlen(tree), cp);
-+	if (rc <= 0) {
-+		rc = -EINVAL;
-+		goto tcon_exit;
-+	}
- 
- 	/*
- 	 * 3.11 tcon req must be signed if not encrypted. See MS-SMB2 3.2.4.1.1
-@@ -2429,22 +2416,21 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
- 	    ((ses->user_name != NULL) || (ses->sectype == Kerberos)))
- 		req->hdr.Flags |= SMB2_FLAGS_SIGNED;
- 
 -	memset(&rqst, 0, sizeof(struct smb_rqst));
 -	rqst.rq_iov = iov;
--	rqst.rq_nvec = 2;
--
- 	/* Need 64 for max size write so ask for more in case not there yet */
- 	if (server->credits >= server->max_credits)
- 		req->hdr.CreditRequest = cpu_to_le16(0);
- 	else
- 		req->hdr.CreditRequest = cpu_to_le16(
--			min_t(int, server->max_credits -
--			      server->credits, 64));
-+			min_t(int, server->max_credits - server->credits, 64));
- 
--	rc = cifs_send_recv(xid, ses, server,
--			    &rqst, &resp_buftype, flags, &rsp_iov);
--	cifs_small_buf_release(req);
--	rsp = (struct smb2_tree_connect_rsp *)rsp_iov.iov_base;
+-	rqst.rq_nvec = 1;
 +	iov_iter_bvec_queue(&smb->req_iter, ITER_SOURCE, &smb->bvecq, 0, 0,
 +			    smb->data_offset);
-+
+ 
+-	rc = cifs_send_recv(xid, ses, server,
+-			    &rqst, &resp_buf_type, flags, &rsp_iov);
+-	cifs_small_buf_release(req);
 +	smb->sr_flags = flags;
 +	rc = smb_send_recv_messages(xid, ses, server, smb, flags);
 +	smb_clear_request(smb);
-+
-+	rsp = (struct smb2_tree_connect_rsp *)smb->response;
- 	trace_smb3_tcon(xid, tcon->tid, ses->Suid, tree, rc);
- 	if ((rc != 0) || (rsp == NULL)) {
- 		cifs_stats_fail_inc(tcon, SMB2_TREE_CONNECT_HE);
-@@ -2491,9 +2477,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
- 		if (tcon->share_flags & SMB2_SHAREFLAG_ISOLATED_TRANSPORT)
- 			server->nosharesock = true;
- tcon_exit:
--
--	free_rsp_buf(resp_buftype, rsp);
--	kfree(unc_path);
+ 	if (rc) {
+ 		cifs_stats_fail_inc(tcon, SMB2_TREE_DISCONNECT_HE);
+ 		trace_smb3_tdis_err(xid, tcon->tid, ses->Suid, rc);
+ 	}
+ 	trace_smb3_tdis_done(xid, tcon->tid, ses->Suid);
+ 
 +	smb_put_messages(smb);
  	return rc;
+ }
  
- tcon_error_exit:
 
