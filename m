@@ -1,391 +1,166 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD4C321445
-	for <linux-cifs@vger.kernel.org>; Tue, 19 May 2026 02:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763883DFC93
+	for <linux-cifs@vger.kernel.org>; Tue, 19 May 2026 08:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779158185; cv=none; b=OgHZLJ1IqJ6niSefqfB9AghDJ5QopWmJFhvsVQbHo3l1MEmmDf4I2EXn21Jq/XsZ+zQMuROy2V6aovwYw4TSX/Fy/39NZQdXXt9iAX1+TJg8H+G16aCle0AoYl0ydvBVrQpqH3VLvcdKQp0tFt8kNpHZyOopyf9ItH0FsMmFpJ4=
+	t=1779178551; cv=none; b=fwzkUWMFT3rDv3JasZ067D34U7AWUIsPDTIM4rcrfNk+Gmli3fjyQIESI3VGglq97NE3urRY4ynv2Wss6Dp1VmyQQuJb6tbjtSabFSjIxRl+5MFbhUrAtN1c7I+cyt0K+uzo1HsR35z++wu2cyWIqOgsv767bV+QlaYu64HCbAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779158185; c=relaxed/simple;
-	bh=7pZcMxtxzu/bRg5te1nwynymGwXT/TI6ZsqMrqGcugo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VUNlYcA86VN3hecoP3cymTehgx5lkumgbI3w07FGDi4Bvn848I6a2vfrpb0FXj/2OdVYBaZ9rsODfbdow42e98OgjYSknj1iORF+8WQ7RYyIOYzKexe1g6imYcGyipZEkIheV5rAhGDQVy1weNXSQ9rbuWQLEh7cJBMM8Un+KDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dVOZIPTp; arc=none smtp.client-ip=209.85.216.51
+	s=arc-20240116; t=1779178551; c=relaxed/simple;
+	bh=ukNhp2SUe+V00i+CScbinEy01SmNCkigc3dUv72ANDo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JaAwi87kLsuh+HqgyskMqV/5a7pttRU4nP5yEZFB4BgWmOBwjEy22F5XRdrVJAP3xs7inH24uEE3JOwfTT1+3plPe4d+dkZCnplpK2YuagQaxCfKHj8750LwnHXxh1Y+jbAHjjBFlGE4RxtBQ7Sw2KU1BpTvQVN1GULiJ5YY74Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WaynMlMF; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dVOZIPTp"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-369372b3175so509915a91.3
-        for <linux-cifs@vger.kernel.org>; Mon, 18 May 2026 19:36:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WaynMlMF"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-441209fb77eso1883037f8f.1
+        for <linux-cifs@vger.kernel.org>; Tue, 19 May 2026 01:15:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779158183; x=1779762983; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lS9dH1OelCMRsVnf44bVJPX1fdqjrsY93PUhw+f8dko=;
-        b=dVOZIPTpmtt4v1j1OloBkZyiJ4Auh+uA6YgA3zB8tx7eXj/NoUMPREELpIejw6xHI5
-         7Zc4/k74InLWpSdr7bPO4cFRR6a+6dOX3MfhAEOU3Fsj7PcUma8tmleVysPiiiBGj45m
-         2vp9Qd9WmpY+Qg4Gfw27SCSum3nGJRcjIR47zTnFHFakuyiT3afLt5ZL+aWHsqQAbkEf
-         RuW3C3UCk+PWSJCfZDcUdfs6H8u+1RX96dRYuz8CKZkWXKQ5c08iT60aQJ+TLnlElqlY
-         CnVNU/gCebQPtHdQFVvLXXFlJ/7sdPWXQmIGzJPhZLSJR8JR+BdKmUHLQFlvHjqIWLJu
-         VMxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779158183; x=1779762983;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779178548; x=1779783348; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lS9dH1OelCMRsVnf44bVJPX1fdqjrsY93PUhw+f8dko=;
-        b=IstK/gpn6IWWr9k9OxPbmpIKhebzNVBVSooji57taQTQCCV3F+4IWkXCfTW+r+UVzi
-         Ns923cQew8cbrfwKvxVA/KhIeNroS+ofdG6pFU5eostopXP90f/KU032JAajgfo0FLmA
-         TipSVKLCiMVxUrpq31wsbqdB6qihambgHHD5FF+fyyyTfWWvTLJvdtTlrtcSOruK7+6M
-         llzKBxlY0Jyv17deGkRwFoVKYtbmdeTlevYrFBUEEr2G5ldmy2GC4ukvXBrXxpq3obip
-         KedpoToHfJQ6AqwLx9Dln2wocRrfFYituKS5QeQGC8JSKxX8Xr45nlg+vedeDqHjhVhu
-         +Gyg==
-X-Gm-Message-State: AOJu0YzREmObpl9s0AQlCfKDl4d8wDb49zW2N9fnNp/2QN0c5u6tjYjW
-	A6N4SUZNQv6+3lf8xqnjBO/d+qQrsEKOHSIPBaNuTNIqjYZUrrJF4iM2Kw5OmkT8OtE=
-X-Gm-Gg: Acq92OFv1uqQAQDJ2vilJke2iH7Vd6xC+qoFjMybP28v8hhAAaWzZ1l9E5N/5hln4sJ
-	syZWdOX8z9yTnuM57/BePSlnLK7AuPmjpHpp9gNgOz2hW8soiDHhesI7FFM5DMDua/lz37x/u0C
-	NGgH4Q6e5MqHOcfhrsjOd+Y0+svlCUwFrOW0JYUE2H0a7zkqF9i/Ne36fwsRnRvbUCtv/aFJzCo
-	4qxAbLP8QU/HtxPxP1N/0R15UtOdvpZliHUp6pU+RddBYyo1uLPHTWjMf1Vuoc8CqwzRZvByuZy
-	BFlPPiVd/P8zep3G6MrX/Q+4DtnoHiQlH8hJdvG7u3PwXFhE4FuLdavq4Ska830Nbn15rt00Hdl
-	452TZhBCMlukMN/Sv6a6gJ1BjxMoJSTcLB2Y32g0WwXrGEGqh0uWrBb2I42tbCz4nC38bA3fbIM
-	J2KfX6LMpPuAp/MPomTyGUlgqLpEAYl6+bcbZRUPrYs8FWPcewHBFYXA==
-X-Received: by 2002:a17:90b:1dc2:b0:364:6f0d:c0fc with SMTP id 98e67ed59e1d1-36951dd052cmr10175582a91.7.1779158183069;
-        Mon, 18 May 2026 19:36:23 -0700 (PDT)
-Received: from localhost.localdomain ([139.159.170.72])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3695155b2c4sm12470390a91.3.2026.05.18.19.36.21
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 18 May 2026 19:36:22 -0700 (PDT)
-From: Qihang <q.h.hack.winter@gmail.com>
-To: linux-cifs@vger.kernel.org
-Cc: sfrench@samba.org,
-	smfrench@gmail.com,
-	gregkh@linuxfoundation.org
-Subject: [RFC PATCH] cifs: validate full SID length in security descriptors
-Date: Tue, 19 May 2026 10:36:18 +0800
-Message-Id: <20260519023618.73569-1-q.h.hack.winter@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+        bh=Gq7q4q44H1XtbreNnGBa/qXoQQzGGv2LByvvEOVI2FM=;
+        b=WaynMlMFRuGTf8CvtKr5WJkga/2vuFLI4Z9hDGY2zHP4FUL/W1w8/z5fO03EraWi0k
+         zekysh4ooH3cwk8tMdVKmYd5G8IP80btK8Yhk5SHzuSCv5HNBAerLX9MSP8LjS3gkgEA
+         ivAtRVU/b4BDUVFd3zZS1V8zCW41ny0gc0s0lFjZrSV1HL7nYMJ64ke1uoPlaLmv/Su2
+         BXawho+iOHQkDKHzJt9a4tSgXH4Nrbp+SJ/MGjog7pHL3YzdCjdfbf165Z2OOgucdGGX
+         Abh/0uCTzxumg1RP3Mk44o90cDLwgXWGWzXlrMgSOjxMdTwS8GBuDixjlSejq9c+uBO4
+         46wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779178548; x=1779783348;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Gq7q4q44H1XtbreNnGBa/qXoQQzGGv2LByvvEOVI2FM=;
+        b=CbHeKhlaUt8epjQjWuxhPYwuYfS1G3vMLBEkNWqupO7/QpHem4dCYRIzlAsZtonk8z
+         C/8kBi/99cQXUArXKREnV01qrnw4hKJWuHAQogX1fIitabsgsowfwzRL/oFgpQE32cA8
+         FoeOVUKpYjz9X6tebXyCVaF0X7fT3mD5dsrbzZvqXQq5tWZz0fHh64gvpdgnMLHO3Fnp
+         pPFmMdjRzx+/lduEpUDKKofeEgLlOOFwUV3NsHBKLDCBKzoZwGmSntWRJwjEDShF7VNy
+         3Pxa0N+XLmt0tZ0M1EtQP9cpZ2p5L/WLw7ladHx2Rgqf0MVWoKVI+9YRBMYDPK+8W71d
+         J5UA==
+X-Forwarded-Encrypted: i=1; AFNElJ8dEibIj8bJGY6nTdMrgb/r3uCJX+JuN4MzIfzHQi3JQ5lef+GEAC7jk9Rk2yUMg7HcLFh68S3/ES2C@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxZGKZhdBaiNa7aKrzJ+vO/nl7V0gXLzdyMkrCoJ2wqYmowJO3
+	E9FSle9Og66IiLoI8pVrdoG6itVetH8W5+uTCP8dDf8tDTc19sbmKaOV
+X-Gm-Gg: Acq92OGtZ6OT8cDV0Pc9CMmmsRLfSNFhmOhjsnIMUqtUsiFmXCsKXf4MvKsO0zDPclb
+	+bvM8ub9avbZ+HYoOIF2z9FP2Q87l4lDBUOntrX8xWLrK4yi2tdIURbIklfLw771+1CyTVbZqfM
+	TmOxB45T8856eTaE/kPmY/4osctAoxfO7lPTK/p/Tkt8NhzwpzruKzKAJo1nruGFfCVj5VEYbRO
+	rQRTXAReI+wW8Xu0WgpuIt4+pJ44H1DrvLnOzNc8Ct19ouO1F/+QGn0URgHE2UU6pThvZ/YpK2g
+	eziZOjhLbrfk9pGxu4zXWIZnP23Be/SxLvCjSbvPyspvWJ+/HxjYwHpxG13mvcBhJAfH6+Mt6v2
+	AoOqDwJ8CMfzpz6jH/LEUiNYFTOmy7b9LTDlQIjfVqtiydF55ET/27UuaEdFaKTn7XwI1dkyx4L
+	YBZ/5FtiNpQ7UVHNhM7PvUKQIs2eRkb8SBHnVR8RTGUo72ssUZOP28AK2dKNjHKPiP
+X-Received: by 2002:a5d:4577:0:b0:450:b883:dd3c with SMTP id ffacd0b85a97d-45d9352412cmr26263969f8f.20.1779178547828;
+        Tue, 19 May 2026 01:15:47 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45e7c22d8b7sm14602897f8f.6.2026.05.19.01.15.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 01:15:47 -0700 (PDT)
+Date: Tue, 19 May 2026 09:15:45 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>, Matthew Wilcox
+ <willy@infradead.org>, Christoph Hellwig <hch@infradead.org>, Paulo
+ Alcantara <pc@manguebit.org>, Jens Axboe <axboe@kernel.dk>, Leon Romanovsky
+ <leon@kernel.org>, Steve French <sfrench@samba.org>, ChenXiaoSong
+ <chenxiaosong@chenxiaosong.com>, Marc Dionne <marc.dionne@auristor.com>,
+ Eric Van Hensbergen <ericvh@kernel.org>, Dominique Martinet
+ <asmadeus@codewreck.org>, Ilya Dryomov <idryomov@gmail.com>, Trond
+ Myklebust <trondmy@kernel.org>, netfs@lists.linux.dev,
+ linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+ linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+ v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 00/21] netfs: Keep track of folios in a segmented
+ bio_vec[] chain
+Message-ID: <20260519091545.171c4b85@pumpkin>
+In-Reply-To: <20260518222959.488126-1-dhowells@redhat.com>
+References: <20260518222959.488126-1-dhowells@redhat.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-parse_sid() only verified that the fixed SID header fit in the
-returned security descriptor, but did not verify that the full SID
-body described by num_subauth was present.
+On Mon, 18 May 2026 23:29:32 +0100
+David Howells <dhowells@redhat.com> wrote:
 
-A malicious server can return a truncated owner or group SID whose
-header lies within the descriptor buffer while sub_auth[] extends
-past the end of the allocation, leading to an out-of-bounds read
-when the client later parses or copies that SID.
+> Hi Christian,
+> 
+> Could you add these patches to the VFS tree for next?
+> 
+> The patches get rid of folio_queue, rolling_buffer and ITER_FOLIOQ,
+> replacing the folio queue construct used to manage buffers in netfslib with
+> one based around a segmented chain of bio_vec arrays instead.  There are
+> three main aims here:
+> 
+>  (1) The kernel file I/O subsystem seems to be moving towards consolidating
+>      on the use of bio_vec arrays, so embrace this by moving netfslib to
+>      keep track of its buffers for buffered I/O in bio_vec[] form.
+> 
+>  (2) Netfslib already uses a bio_vec[] to handle unbuffered/DIO, so the
+>      number of different buffering schemes used can be reduced to just a
+>      single one.
+> 
+>  (3) Always send an entire filesystem RPC request message to a TCP socket
+>      with single kernel_sendmsg() call as this is faster, more efficient
+>      and doesn't require the use of corking as it puts the entire
+>      transmission loop inside of a single tcp_sendmsg().
+> 
+> For the replacement of folio_queue, a segmented chain of bio_vec arrays
+> rather than a single monolithic array is provided:
+> 
+> 	struct bvecq {
+> 		struct bvecq		*next;
+> 		struct bvecq		*prev;
+> 		unsigned long long	fpos;
+> 		refcount_t		ref;
+> 		u32			priv;
+> 		u16			nr_segs;
+> 		u16			max_segs;
+> 		enum bvecq_mem		mem_type:2;
+> 		bool			inline_bv:1;
+> 		bool			discontig:1;
 
-Validate the full SID body in parse_sid(), centralize owner/group SID
-lookup and bounds checking in sid_from_sd(), and use that validation
-in parse_sec_desc(), build_sec_desc(), and copy_sec_desc() before
-sub_auth[] is accessed.
+There doesn't seem to be any point using bitfields.
+There is a massive hole here anyway.
 
-Signed-off-by: Qihang <q.h.hack.winter@gmail.com>
----
- fs/smb/client/cifsacl.c | 196 ++++++++++++++++++++++++++--------------
- 1 file changed, 129 insertions(+), 67 deletions(-)
+> 		struct bio_vec		*bv;
+> 		struct bio_vec		__bv[];
+> 	};
+> 
+> The fields are:
+> 
+>  (1) next, prev - Link segments together in a list.  I want this to be
+>      NULL-terminated linear rather than circular to make it possible to
+>      arbitrarily glue bits on the front.
 
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index 786dbbc43c5b..42a3115359da 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -275,6 +275,73 @@ cifs_copy_sid(struct smb_sid *dst, const struct smb_sid *src)
- 	return size;
- }
- 
-+static int parse_sid(const struct smb_sid *psid, const char *end_of_acl)
-+{
-+	unsigned int sid_len;
-+
-+	/* SID must contain the fixed header before num_subauth is trusted. */
-+	if (end_of_acl < (const char *)psid + CIFS_SID_BASE_SIZE) {
-+		cifs_dbg(VFS, "ACL too small to parse SID %p\n", psid);
-+		return -EINVAL;
-+	}
-+	if (psid->num_subauth > SID_MAX_SUB_AUTHORITIES) {
-+		cifs_dbg(VFS, "SID contains too many subauthorities %u\n",
-+			 psid->num_subauth);
-+		return -EINVAL;
-+	}
-+
-+	sid_len = CIFS_SID_BASE_SIZE + psid->num_subauth * sizeof(__le32);
-+	if (end_of_acl < (const char *)psid + sid_len) {
-+		cifs_dbg(VFS, "ACL too small to parse SID %p\n", psid);
-+		return -EINVAL;
-+	}
-+
-+#ifdef CONFIG_CIFS_DEBUG2
-+	if (psid->num_subauth) {
-+		int i;
-+
-+		cifs_dbg(FYI, "SID revision %d num_auth %d\n",
-+			 psid->revision, psid->num_subauth);
-+
-+		for (i = 0; i < psid->num_subauth; i++) {
-+			cifs_dbg(FYI, "SID sub_auth[%d]: 0x%x\n",
-+				 i, le32_to_cpu(psid->sub_auth[i]));
-+		}
-+
-+		cifs_dbg(FYI, "RID 0x%x\n",
-+			 le32_to_cpu(psid->sub_auth[psid->num_subauth - 1]));
-+	}
-+#endif
-+
-+	return 0;
-+}
-+
-+static int sid_from_sd(const struct smb_ntsd *pntsd, __u32 secdesclen,
-+		       __u32 sid_offset, struct smb_sid **sid)
-+{
-+	struct smb_sid *psid;
-+	char *end_of_acl;
-+
-+	if (secdesclen < sizeof(struct smb_ntsd)) {
-+		cifs_dbg(VFS, "ACL too small to parse security descriptor\n");
-+		return -EINVAL;
-+	}
-+	end_of_acl = (char *)pntsd + secdesclen;
-+
-+	if (sid_offset < sizeof(struct smb_ntsd) ||
-+	    sid_offset > secdesclen - CIFS_SID_BASE_SIZE) {
-+		cifs_dbg(VFS, "Server returned illegal SID offset\n");
-+		return -EINVAL;
-+	}
-+
-+	psid = (struct smb_sid *)((char *)pntsd + sid_offset);
-+	if (parse_sid(psid, end_of_acl))
-+		return -EINVAL;
-+
-+	*sid = psid;
-+	return 0;
-+}
-+
- static int
- id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
- {
-@@ -515,14 +582,14 @@ exit_cifs_idmap(void)
- }
- 
- /* copy ntsd, owner sid, and group sid from a security descriptor to another */
--static __u32 copy_sec_desc(const struct smb_ntsd *pntsd,
--				struct smb_ntsd *pnntsd,
--				__u32 sidsoffset,
--				struct smb_sid *pownersid,
--				struct smb_sid *pgrpsid)
-+static int copy_sec_desc(const struct smb_ntsd *pntsd, struct smb_ntsd *pnntsd,
-+			 __u32 sidsoffset, __u32 secdesclen,
-+			 __u32 *pnsecdesclen, struct smb_sid *pownersid,
-+			 struct smb_sid *pgrpsid)
- {
- 	struct smb_sid *owner_sid_ptr, *group_sid_ptr;
- 	struct smb_sid *nowner_sid_ptr, *ngroup_sid_ptr;
-+	int rc;
- 
- 	/* copy security descriptor control portion */
- 	pnntsd->revision = pntsd->revision;
-@@ -533,28 +600,34 @@ static __u32 copy_sec_desc(const struct smb_ntsd *pntsd,
- 	pnntsd->gsidoffset = cpu_to_le32(sidsoffset + sizeof(struct smb_sid));
- 
- 	/* copy owner sid */
--	if (pownersid)
-+	if (pownersid) {
- 		owner_sid_ptr = pownersid;
--	else
--		owner_sid_ptr = (struct smb_sid *)((char *)pntsd +
--				le32_to_cpu(pntsd->osidoffset));
-+	} else {
-+		rc = sid_from_sd(pntsd, secdesclen,
-+				 le32_to_cpu(pntsd->osidoffset), &owner_sid_ptr);
-+		if (rc)
-+			return rc;
-+	}
- 	nowner_sid_ptr = (struct smb_sid *)((char *)pnntsd + sidsoffset);
- 	cifs_copy_sid(nowner_sid_ptr, owner_sid_ptr);
- 
- 	/* copy group sid */
--	if (pgrpsid)
-+	if (pgrpsid) {
- 		group_sid_ptr = pgrpsid;
--	else
--		group_sid_ptr = (struct smb_sid *)((char *)pntsd +
--				le32_to_cpu(pntsd->gsidoffset));
-+	} else {
-+		rc = sid_from_sd(pntsd, secdesclen,
-+				 le32_to_cpu(pntsd->gsidoffset), &group_sid_ptr);
-+		if (rc)
-+			return rc;
-+	}
- 	ngroup_sid_ptr = (struct smb_sid *)((char *)pnntsd + sidsoffset +
- 					sizeof(struct smb_sid));
- 	cifs_copy_sid(ngroup_sid_ptr, group_sid_ptr);
- 
--	return sidsoffset + (2 * sizeof(struct smb_sid));
-+	*pnsecdesclen = sidsoffset + (2 * sizeof(struct smb_sid));
-+	return 0;
- }
- 
--
- /*
-    change posix mode to reflect permissions
-    pmode is the existing mode (we only want to overwrite part of this
-@@ -1232,38 +1305,6 @@ static int set_chmod_dacl(struct smb_acl *pdacl, struct smb_acl *pndacl,
- 	return 0;
- }
- 
--static int parse_sid(struct smb_sid *psid, char *end_of_acl)
--{
--	/* BB need to add parm so we can store the SID BB */
--
--	/* validate that we do not go past end of ACL - sid must be at least 8
--	   bytes long (assuming no sub-auths - e.g. the null SID */
--	if (end_of_acl < (char *)psid + 8) {
--		cifs_dbg(VFS, "ACL too small to parse SID %p\n", psid);
--		return -EINVAL;
--	}
--
--#ifdef CONFIG_CIFS_DEBUG2
--	if (psid->num_subauth) {
--		int i;
--		cifs_dbg(FYI, "SID revision %d num_auth %d\n",
--			 psid->revision, psid->num_subauth);
--
--		for (i = 0; i < psid->num_subauth; i++) {
--			cifs_dbg(FYI, "SID sub_auth[%d]: 0x%x\n",
--				 i, le32_to_cpu(psid->sub_auth[i]));
--		}
--
--		/* BB add length check to make sure that we do not have huge
--			num auths and therefore go off the end */
--		cifs_dbg(FYI, "RID 0x%x\n",
--			 le32_to_cpu(psid->sub_auth[psid->num_subauth-1]));
--	}
--#endif
--
--	return 0;
--}
--
- static bool dacl_offset_valid(unsigned int acl_len, __u32 dacloffset)
- {
- 	if (acl_len < sizeof(struct smb_acl))
-@@ -1284,23 +1325,25 @@ static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
- 	int rc = 0;
- 	struct smb_sid *owner_sid_ptr, *group_sid_ptr;
- 	struct smb_acl *dacl_ptr; /* no need for SACL ptr */
--	char *end_of_acl = ((char *)pntsd) + acl_len;
--	__u32 dacloffset;
-+	char *end_of_acl;
-+	__u32 dacloffset, osidoffset, gsidoffset;
- 
- 	if (pntsd == NULL)
- 		return smb_EIO(smb_eio_trace_null_pointers);
-+	if (acl_len < (int)sizeof(struct smb_ntsd)) {
-+		cifs_dbg(VFS, "ACL too small to parse security descriptor\n");
-+		return -EINVAL;
-+	}
-+	end_of_acl = ((char *)pntsd) + acl_len;
- 
--	owner_sid_ptr = (struct smb_sid *)((char *)pntsd +
--				le32_to_cpu(pntsd->osidoffset));
--	group_sid_ptr = (struct smb_sid *)((char *)pntsd +
--				le32_to_cpu(pntsd->gsidoffset));
-+	osidoffset = le32_to_cpu(pntsd->osidoffset);
-+	gsidoffset = le32_to_cpu(pntsd->gsidoffset);
- 	dacloffset = le32_to_cpu(pntsd->dacloffset);
- 	cifs_dbg(NOISY, "revision %d type 0x%x ooffset 0x%x goffset 0x%x sacloffset 0x%x dacloffset 0x%x\n",
--		 pntsd->revision, pntsd->type, le32_to_cpu(pntsd->osidoffset),
--		 le32_to_cpu(pntsd->gsidoffset),
-+		 pntsd->revision, pntsd->type, osidoffset, gsidoffset,
- 		 le32_to_cpu(pntsd->sacloffset), dacloffset);
- /*	cifs_dump_mem("owner_sid: ", owner_sid_ptr, 64); */
--	rc = parse_sid(owner_sid_ptr, end_of_acl);
-+	rc = sid_from_sd(pntsd, acl_len, osidoffset, &owner_sid_ptr);
- 	if (rc) {
- 		cifs_dbg(FYI, "%s: Error %d parsing Owner SID\n", __func__, rc);
- 		return rc;
-@@ -1312,9 +1355,9 @@ static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
- 		return rc;
- 	}
- 
--	rc = parse_sid(group_sid_ptr, end_of_acl);
-+	rc = sid_from_sd(pntsd, acl_len, gsidoffset, &group_sid_ptr);
- 	if (rc) {
--		cifs_dbg(FYI, "%s: Error %d mapping Owner SID to gid\n",
-+		cifs_dbg(FYI, "%s: Error %d parsing Group SID\n",
- 			 __func__, rc);
- 		return rc;
- 	}
-@@ -1354,8 +1397,15 @@ static int build_sec_desc(struct smb_ntsd *pntsd, struct smb_ntsd *pnntsd,
- 	struct smb_sid *nowner_sid_ptr = NULL, *ngroup_sid_ptr = NULL;
- 	struct smb_acl *dacl_ptr = NULL;  /* no need for SACL ptr */
- 	struct smb_acl *ndacl_ptr = NULL; /* no need for SACL ptr */
--	char *end_of_acl = ((char *)pntsd) + secdesclen;
-+	char *end_of_acl;
- 	u16 size = 0;
-+	__u32 osidoffset, gsidoffset;
-+
-+	if (secdesclen < sizeof(struct smb_ntsd)) {
-+		cifs_dbg(VFS, "ACL too small to parse security descriptor\n");
-+		return -EINVAL;
-+	}
-+	end_of_acl = ((char *)pntsd) + secdesclen;
- 
- 	dacloffset = le32_to_cpu(pntsd->dacloffset);
- 	if (dacloffset) {
-@@ -1370,10 +1420,18 @@ static int build_sec_desc(struct smb_ntsd *pntsd, struct smb_ntsd *pnntsd,
- 			return rc;
- 	}
- 
--	owner_sid_ptr = (struct smb_sid *)((char *)pntsd +
--			le32_to_cpu(pntsd->osidoffset));
--	group_sid_ptr = (struct smb_sid *)((char *)pntsd +
--			le32_to_cpu(pntsd->gsidoffset));
-+	osidoffset = le32_to_cpu(pntsd->osidoffset);
-+	gsidoffset = le32_to_cpu(pntsd->gsidoffset);
-+	rc = sid_from_sd(pntsd, secdesclen, osidoffset, &owner_sid_ptr);
-+	if (rc) {
-+		cifs_dbg(FYI, "%s: Error %d parsing Owner SID\n", __func__, rc);
-+		return rc;
-+	}
-+	rc = sid_from_sd(pntsd, secdesclen, gsidoffset, &group_sid_ptr);
-+	if (rc) {
-+		cifs_dbg(FYI, "%s: Error %d parsing Group SID\n", __func__, rc);
-+		return rc;
-+	}
- 
- 	if (pnmode && *pnmode != NO_CHANGE_64) { /* chmod */
- 		ndacloffset = sizeof(struct smb_ntsd);
-@@ -1389,8 +1447,10 @@ static int build_sec_desc(struct smb_ntsd *pntsd, struct smb_ntsd *pnntsd,
- 
- 		sidsoffset = ndacloffset + le16_to_cpu(ndacl_ptr->size);
- 		/* copy the non-dacl portion of secdesc */
--		*pnsecdesclen = copy_sec_desc(pntsd, pnntsd, sidsoffset,
--				NULL, NULL);
-+		rc = copy_sec_desc(pntsd, pnntsd, sidsoffset, secdesclen,
-+				   pnsecdesclen, NULL, NULL);
-+		if (rc)
-+			return rc;
- 
- 		*aclflag |= CIFS_ACL_DACL;
- 	} else {
-@@ -1467,8 +1527,10 @@ static int build_sec_desc(struct smb_ntsd *pntsd, struct smb_ntsd *pnntsd,
- 
- 		sidsoffset = ndacloffset + le16_to_cpu(ndacl_ptr->size);
- 		/* copy the non-dacl portion of secdesc */
--		*pnsecdesclen = copy_sec_desc(pntsd, pnntsd, sidsoffset,
--				nowner_sid_ptr, ngroup_sid_ptr);
-+		rc = copy_sec_desc(pntsd, pnntsd, sidsoffset, secdesclen,
-+				   pnsecdesclen, nowner_sid_ptr, ngroup_sid_ptr);
-+		if (rc)
-+			goto chown_chgrp_exit;
- 
- chown_chgrp_exit:
- 		/* errors could jump here. So make sure we return soon after this */
--- 
-2.39.5 (Apple Git-154)
+Do you ever need to follow the list backwards?
+If not making prev point to the pointer to the entry (probably a tailq?)
+makes the logic simpler (and safer) because you can remove an item without
+knowing whether it is the head or which list it is on.
 
+> 
+>  (2) fpos, discontig - Note the current file position of the first byte of
+>      the segment; all the bio_vecs in ->bv[] must be contiguous in the file
+>      space.  The fpos can be used to find the folio by file position rather
+>      then from the info in the bio_vec.
+
+Should fpos be off_t (or u64) rather than 'long long' (they are all the
+same underlying type).
+
+>      If there's a discontiguity, this should break over into a new bvecq
+>      segment with the discontig flag set (though this is redundant if you
+>      keep track of the file position).  Note that the beginning and end
+>      file positions in a segment need not be aligned to any filesystem
+>      block size.
+
+At this point you lose me :-)
+
+-- David
