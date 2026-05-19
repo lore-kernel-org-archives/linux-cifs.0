@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9EF3A962B
-	for <linux-cifs@vger.kernel.org>; Tue, 19 May 2026 10:22:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AD93A962B
+	for <linux-cifs@vger.kernel.org>; Tue, 19 May 2026 10:23:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779186178; cv=none; b=a/sKfgGVS/RcQV3SGta3GK+MRJ9rEO4fCrJKIwJvIXwmertBZKDm1WjQMJzHniUABtmcITH9AuVq+hZrIWrLsn0Kt7kEJG3MnjUiTOReA+I9e8aiY1ciDMHyT2AksL1ghOnt5HNOyHw8w7haZfDfGHQzA0ovhNnP1/Cn9k9s1Sk=
+	t=1779186185; cv=none; b=ljZ6tMNqA1n51x3NiLzbwieHkLRaydFOnqK+DJFZLNjZXyi5sD1rI3q5IBnV48Q41h74ya8s6WBHJrEPxofU6z8AnOb/34uAOK0/gYmkgZia7XInU/PjiQ4ZgoEXJXJCBJGGa+iZZ0mVeZfOGt6cFClpXwFvUmz8qiuGTYNLpWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779186178; c=relaxed/simple;
-	bh=IFI/NWmdMMC+KvK7r97V6VdqnXUhZU1xg+qh2gUWSJs=;
+	s=arc-20240116; t=1779186185; c=relaxed/simple;
+	bh=dOt7tvoRaTPjVMCowEPEy627fiSaBdDeltsTvaQzODU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s8CmSur9PsrpNQgjptLh+Hsig4I7Bds4oZ/k7VDntl3A61gDgyn4PMQJWH5Q/OcT4E/R/1ZXxZffFR6fw5s/8bc0QS93OyBe5Xy4ZHBTbTci6Jhrwpq5D905uRm05LkfKZK64cnyjrI8WEQMVsVNaPp+WNAl2m4OkJwIoteJck0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YeiQsz9p; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=dC6gbQt7TLjNiW7OR+Vv0ZXDfcxU2Z50XTJmUDF7vDJhB7rGCC0sYZgey7hPfsBHDOr5V01zJ8cLvvS/lgDF3TpWKu611/cCPpRo0V75TdIRJ4rba4PkpSSbkdPndD5hdzh0qrCZJh6RbLZt9p7xS9QWwftRk0FkjHDfC2jb0m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZRDK1FGR; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YeiQsz9p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZRDK1FGR"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779186175;
+	s=mimecast20190719; t=1779186182;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1FKNP+/i6bUXYcLLW3klf3x7a+ni5hzdhBlCQcUPUeQ=;
-	b=YeiQsz9p1zwKVsZZwLq2F3dhDtpgpVhEtsKA01RyZvW603wyRlOZcRLrzyiRFgzhGUuY7L
-	9maPDXXeqfMZW80r9vUhL2gF1IuHWVScPrYH9KD3oHfz+fonjgXvrurjzULzKDMcuQYkSg
-	k55YA63VYBv3w6sohqrZ6EDtuiUYvzA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=FHv0wA8qYdfuCzR7/8BZb1BosqZySnrazKlwIjeZxDg=;
+	b=ZRDK1FGRN1TZYoeaPtAFiI/9QZNgf0rMVBjO7x6uAH4yVfyESM08A7kOQpU9P5nZ4+VKVf
+	AR10F19c5A0/XaaIjW7HxHjJwxQCS4jLfR8FOfFiFqs3gexrHNH6mevWIOuc5+QmO7QJIm
+	OTs8gp3lbe/qo+nf77p9zWH30hSIALw=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-371-jmtsLVISM0CA9OLkZ2---g-1; Tue,
- 19 May 2026 06:22:51 -0400
-X-MC-Unique: jmtsLVISM0CA9OLkZ2---g-1
-X-Mimecast-MFC-AGG-ID: jmtsLVISM0CA9OLkZ2---g_1779186170
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-543-Lt3Qo-O-Odi2YXiWNN1wKA-1; Tue,
+ 19 May 2026 06:22:56 -0400
+X-MC-Unique: Lt3Qo-O-Odi2YXiWNN1wKA-1
+X-Mimecast-MFC-AGG-ID: Lt3Qo-O-Odi2YXiWNN1wKA_1779186175
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 16518195609E;
-	Tue, 19 May 2026 10:22:50 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EA465195605C;
+	Tue, 19 May 2026 10:22:54 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.48.33])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BA41E180034E;
-	Tue, 19 May 2026 10:22:46 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C01B61956053;
+	Tue, 19 May 2026 10:22:51 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Steve French <sfrench@samba.org>
 Cc: David Howells <dhowells@redhat.com>,
@@ -54,9 +54,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	netfs@lists.linux.dev,
 	linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 09/36] cifs: Institute message managing struct
-Date: Tue, 19 May 2026 11:21:27 +0100
-Message-ID: <20260519102158.592165-10-dhowells@redhat.com>
+Subject: [RFC PATCH 10/36] cifs: Split crypt_message() into encrypt and decrypt variants
+Date: Tue, 19 May 2026 11:21:28 +0100
+Message-ID: <20260519102158.592165-11-dhowells@redhat.com>
 In-Reply-To: <20260519102158.592165-1-dhowells@redhat.com>
 References: <20260519102158.592165-1-dhowells@redhat.com>
 Precedence: bulk
@@ -66,36 +66,10 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Turn the smb_message struct into a message handling struct to aid in
-building an SMB message, queuing them and holding the resources and
-buffers.  It has absorbed the mid_q_struct and now other fields are added.
-
-The idea is that the smb_message struct will be allocated and filled in
-much higher up (typically in the PDU encoding code) and passed down to the
-transport.
-
-In particular, the following fields:
-
- (*) ->next: This is used to link together messages into compounds and then
-     walk through the message list.
-
- (*) ->credits: The credit requirements for the message.
-
- (*) ->request: Pointer to the smb_hdr struct for the request.
-
- (*) ->command_trace: An ID of the command type for use in tracing.
-
- (*) ->total_len: The total length of the request message, not including
-     rfc1002 or transform headers.
-
- (*) ->response: Pointer to the smb_hdr struct for the response.
-
- (*) ->rqst, ->resp_buf_type, ->resp_iov: The old request info stuff.
-
-Functions are provided to get and put refs upon the struct and also to drop
-all the refs on a compound string of structs.
+Split crypt_message() into encrypt and decrypt variants so that the encrypt
+variant can be substantially changed.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Steve French <sfrench@samba.org>
@@ -106,310 +80,171 @@ cc: linux-cifs@vger.kernel.org
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- fs/smb/client/cifsglob.h      | 104 ++++++++++++++++++++++++----------
- fs/smb/client/cifsproto.h     |  11 ++--
- fs/smb/client/connect.c       |   6 +-
- fs/smb/client/smb1ops.c       |   2 +-
- fs/smb/client/smb1transport.c |   2 +-
- fs/smb/client/smb2ops.c       |   2 +-
- fs/smb/client/smb2transport.c |   4 +-
- fs/smb/client/transport.c     |  42 +++++++++++++-
- 8 files changed, 127 insertions(+), 46 deletions(-)
+ fs/smb/client/smb2ops.c | 103 +++++++++++++++++++++++++++++++++-------
+ 1 file changed, 87 insertions(+), 16 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index a5e12a2eefdd..0f876feb0dbf 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1701,40 +1701,82 @@ typedef void (*mid_callback_t)(struct TCP_Server_Info *srv, struct smb_message *
- typedef int (*mid_handle_t)(struct TCP_Server_Info *server,
- 			    struct smb_message *smb);
- 
--/* one of these for every pending CIFS request to the server */
-+/*
-+ * Definition of an SMB request message to be transmitted.  These may be
-+ * chained together and will automatically be turned into compound messages if
-+ * they are.
-+ *
-+ *	+-----------------------+
-+ *	| NetBIOS/padding	|
-+ *	+-----------------------+ <--- smb->request + pre_offset
-+ *	| (Transform header)	|
-+ *	+-----------------------+ <--- smb->request
-+ *	| SMB2 Header		| }				 }
-+ *	+-----------------------+ } header_size			 }
-+ *	| Req/Rsp struct	| }				 }
-+ *	+-----------------------+ <--- smb->request + ext_offset } protocol_size
-+ *	|			|				 }
-+ *	| Extra protocol data	|				 }
-+ *	|			|				 }
-+ *	+-----------------------+ <--- smb->request + smb->data_offset
-+ *	|			|
-+ *	| Data Payload		|  data_size
-+ *	|			|
-+ *	+-----------------------+
-+ *
-+ *
-+ * If the data is to be RDMA'd, it will be kept separate from the protocol.
-+ */
- struct smb_message {
--	struct list_head qhead;	/* mids waiting on reply from this server */
--	refcount_t refcount;
--	__u64 mid;		/* multiplex id */
--	__u16 credits;		/* number of credits consumed by this mid */
--	__u16 credits_received;	/* number of credits from the response */
--	__u32 pid;		/* process id */
--	__u32 sequence_number;  /* for CIFS signing */
--	unsigned int sr_flags;	/* Flags passed to send_recv() */
--	unsigned long when_alloc;  /* when mid was created */
-+	struct smb_message	*next;		/* Next message in compound */
-+	struct cifs_credits	credits;	/* Credit requirements for this message */
-+	void			*request;	/* Pointer to request message body */
-+	refcount_t		ref;
-+	bool			sensitive;	/* Request contains sensitive data */
-+	bool			cancelled;	/* T if cancelled */
-+	unsigned int		sr_flags;	/* Flags passed to send_recv() */
-+
-+	/* Queue state */
-+	struct list_head	qhead;		/* mids waiting on reply from this server */
-+	__u64			mid;		/* multiplex id */
-+	__u16			credits_consumed; /* number of credits consumed by this op */
-+	__u16			credits_received; /* number of credits from the response */
-+	__u32			pid;		/* process id */
-+	__u32			sequence_number;  /* for CIFS signing */
-+	unsigned long		when_alloc;	/* when mid was created */
- #ifdef CONFIG_CIFS_STATS2
--	unsigned long when_sent; /* time when smb send finished */
--	unsigned long when_received; /* when demux complete (taken off wire) */
-+	unsigned long		when_sent;	/* time when smb send finished */
-+	unsigned long		when_received;	/* when demux complete (taken off wire) */
- #endif
--	mid_receive_t receive;	/* call receive callback */
--	mid_callback_t callback; /* call completion callback */
--	mid_handle_t handle;	/* call handle mid callback */
--	void *callback_data;	  /* general purpose pointer for callback */
--	struct task_struct *creator;
--	void *resp_buf;		/* pointer to received SMB header */
--	unsigned int resp_buf_size;
--	u32 response_pdu_len;
--	int mid_state;	/* wish this were enum but can not pass to wait_event */
--	int mid_rc;		/* rc for MID_RC */
--	__le16 command;		/* smb command code */
--	unsigned int optype;	/* operation type */
--	spinlock_t mid_lock;
--	bool wait_cancelled:1;  /* Cancelled while waiting for response */
--	bool deleted_from_q:1;  /* Whether Mid has been dequeued frem pending_mid_q */
--	bool large_buf:1;	/* if valid response, is pointer to large buf */
--	bool multiRsp:1;	/* multiple trans2 responses for one request  */
--	bool multiEnd:1;	/* both received */
--	bool decrypted:1;	/* decrypted entry */
-+	mid_receive_t		receive;	/* call receive callback */
-+	mid_callback_t		callback;	/* call completion callback */
-+	mid_handle_t		handle;		/* call handle mid callback */
-+	void			*callback_data;	/* general purpose pointer for callback */
-+	struct task_struct	*creator;
-+	void			*resp_buf;	/* pointer to received SMB header */
-+	unsigned int		resp_buf_size;
-+	int			mid_state;	/* wish this were enum but can not pass to wait_event */
-+	int			mid_rc;		/* rc for MID_RC */
-+	unsigned int		optype;		/* operation type */
-+	spinlock_t		mid_lock;
-+	bool			wait_cancelled:1;  /* Cancelled while waiting for response */
-+	bool			deleted_from_q:1;  /* Mid has been dequeued from pending_mid_q */
-+	bool			large_buf:1;	/* if valid response, is pointer to large buf */
-+	bool			multiRsp:1;	/* multiple trans2 responses for one request  */
-+	bool			multiEnd:1;	/* both received */
-+	bool			decrypted:1;	/* decrypted entry */
-+
-+	/* Request details */
-+	u8			command_trace;	/* enum smb_command_trace - Command trace ID */
-+	__le16			command;	/* smb command code */
-+	s16			pre_offset;	/* Offset of pre-headers from ->body (negative) */
-+	unsigned int		total_len;	/* Total length of from hdr_offset onwards */
-+	/* Response */
-+	u32			response_pdu_len; /* Size of response PDU */
-+	/* Compat with old code */
-+	struct smb_rqst		rqst;
-+	int			*resp_buf_type;
-+	struct kvec		*resp_iov;
- };
- 
- struct close_cancelled_open {
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index f88ae04af85d..9c60fffcf53d 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -81,6 +81,10 @@ char *cifs_build_path_to_root(struct smb3_fs_context *ctx,
- 			      struct cifs_tcon *tcon, int add_treename);
- char *cifs_build_devname(char *nodename, const char *prepath);
- void delete_mid(struct TCP_Server_Info *server, struct smb_message *smb);
-+struct smb_message *smb_message_alloc(enum smb_command_trace cmd, gfp_t gfp);
-+void smb_get_message(struct smb_message *smb);
-+void smb_put_message(struct smb_message *smb);
-+void smb_put_messages(struct smb_message *smb);
- void __release_mid(struct TCP_Server_Info *server, struct smb_message *smb);
- void cifs_wake_up_task(struct TCP_Server_Info *server,
- 		       struct smb_message *smb);
-@@ -470,14 +474,9 @@ static inline bool dfs_src_pathname_equal(const char *s1, const char *s2)
- 	return true;
- }
- 
--static inline void smb_get_mid(struct smb_message *smb)
--{
--	refcount_inc(&smb->refcount);
--}
--
- static inline void release_mid(struct TCP_Server_Info *server, struct smb_message *smb)
- {
--	if (refcount_dec_and_test(&smb->refcount))
-+	if (refcount_dec_and_test(&smb->ref))
- 		__release_mid(server, smb);
- }
- 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 97de3ae68d7a..3d7e279ba149 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -327,7 +327,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
- 	cifs_dbg(FYI, "%s: moving mids to private list\n", __func__);
- 	spin_lock(&server->mid_queue_lock);
- 	list_for_each_entry_safe(smb, nsmb, &server->pending_mid_q, qhead) {
--		smb_get_mid(smb);
-+		smb_get_message(smb);
- 		if (smb->mid_state == MID_REQUEST_SUBMITTED)
- 			smb->mid_state = MID_RETRY_NEEDED;
- 		list_move(&smb->qhead, &retry_list);
-@@ -884,7 +884,7 @@ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
- 			 */
- 			spin_lock(&server->mid_queue_lock);
- 			list_for_each_entry_safe(smb, nsmb, &server->pending_mid_q, qhead) {
--				smb_get_mid(smb);
-+				smb_get_message(smb);
- 				list_move(&smb->qhead, &dispose_list);
- 				smb->deleted_from_q = true;
- 			}
-@@ -1103,7 +1103,7 @@ clean_demultiplex_info(struct TCP_Server_Info *server)
- 		list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
- 			smb = list_entry(tmp, struct smb_message, qhead);
- 			cifs_dbg(FYI, "Clearing mid %llu\n", smb->mid);
--			smb_get_mid(smb);
-+			smb_get_message(smb);
- 			smb->mid_state = MID_SHUTDOWN;
- 			list_move(&smb->qhead, &dispose_list);
- 			smb->deleted_from_q = true;
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index c1c16f6346fb..df74975374ee 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -254,7 +254,7 @@ cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
- 		if (compare_mid(smb->mid, buf) &&
- 		    smb->mid_state == MID_REQUEST_SUBMITTED &&
- 		    le16_to_cpu(smb->command) == buf->Command) {
--			smb_get_mid(smb);
-+			smb_get_message(smb);
- 			spin_unlock(&server->mid_queue_lock);
- 			return smb;
- 		}
-diff --git a/fs/smb/client/smb1transport.c b/fs/smb/client/smb1transport.c
-index c2d211a62577..f38fe262c7ea 100644
---- a/fs/smb/client/smb1transport.c
-+++ b/fs/smb/client/smb1transport.c
-@@ -45,7 +45,7 @@ alloc_mid(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
- 
- 	smb = mempool_alloc(&smb_message_pool, GFP_NOFS);
- 	memset(smb, 0, sizeof(struct smb_message));
--	refcount_set(&smb->refcount, 1);
-+	refcount_set(&smb->ref, 1);
- 	spin_lock_init(&smb->mid_lock);
- 	smb->mid = get_mid(smb_buffer);
- 	smb->pid = current->pid;
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 236eb560bdff..f39074d0e4a0 100644
+index f39074d0e4a0..10bb0fe6b77b 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -416,7 +416,7 @@ __smb2_find_mid(struct TCP_Server_Info *server, char *buf, bool dequeue)
- 		if ((smb->mid == wire_mid) &&
- 		    (smb->mid_state == MID_REQUEST_SUBMITTED) &&
- 		    (smb->command == shdr->Command)) {
--			smb_get_mid(smb);
-+			smb_get_message(smb);
- 			if (dequeue) {
- 				list_del_init(&smb->qhead);
- 				smb->deleted_from_q = true;
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index a28b66ead690..f5b676802ce7 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -619,10 +619,10 @@ smb2_mid_entry_alloc(const struct smb2_hdr *shdr,
+@@ -4458,16 +4458,17 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
  
- 	smb = mempool_alloc(&smb_message_pool, GFP_NOFS);
- 	memset(smb, 0, sizeof(*smb));
--	refcount_set(&smb->refcount, 1);
-+	refcount_set(&smb->ref, 1);
- 	spin_lock_init(&smb->mid_lock);
- 	smb->mid = le64_to_cpu(shdr->MessageId);
--	smb->credits = credits > 0 ? credits : 1;
-+	smb->credits_consumed = credits > 0 ? credits : 1;
- 	smb->pid = current->pid;
- 	smb->command = shdr->Command; /* Always LE */
- 	smb->when_alloc = jiffies;
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 622f63779de0..3ea52cf4a64b 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -30,6 +30,46 @@
- #include "smbdirect.h"
- #include "compress.h"
- 
-+struct smb_message *smb_message_alloc(enum smb_command_trace cmd, gfp_t gfp)
-+{
-+	struct smb_message *smb;
+ 	return -EAGAIN;
+ }
 +
-+	smb = mempool_alloc(&smb_message_pool, gfp);
-+	if (smb) {
-+		memset(smb, 0, sizeof(*smb));
-+		refcount_set(&smb->ref, 1);
-+		smb->command_trace = cmd;
-+	}
-+	return smb;
-+}
-+
-+void smb_get_message(struct smb_message *smb)
-+{
-+	refcount_inc(&smb->ref);
-+}
-+
-+/*
-+ * Drop a ref on a message.  This does not touch the chained messages.
-+ */
-+void smb_put_message(struct smb_message *smb)
-+{
-+	if (refcount_dec_and_test(&smb->ref))
-+		mempool_free(smb, &smb_message_pool);
-+}
-+
-+/*
-+ * Dispose of a chain of compound messages.
-+ */
-+void smb_put_messages(struct smb_message *smb)
-+{
-+	struct smb_message *next;
-+
-+	for (; smb; smb = next) {
-+		next = smb->next;
-+		smb_put_message(smb);
-+	}
-+}
-+
- void
- cifs_wake_up_task(struct TCP_Server_Info *server, struct smb_message *smb)
+ /*
+- * Encrypt or decrypt @rqst message. @rqst[0] has the following format:
++ * Encrypt @rqst message. @rqst[0] has the following format:
+  * iov[0]   - transform header (associate data),
+  * iov[1-N] - SMB2 header and pages - data to encrypt.
+  * On success return encrypted data in iov[1-N] and pages, leave iov[0]
+  * untouched.
+  */
+ static int
+-crypt_message(struct TCP_Server_Info *server, int num_rqst,
+-	      struct smb_rqst *rqst, int enc, struct crypto_aead *tfm)
++encrypt_message(struct TCP_Server_Info *server, int num_rqst,
++		struct smb_rqst *rqst, struct crypto_aead *tfm)
  {
-@@ -722,7 +762,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- 	rc = smb_send_rqst(server, 1, rqst, flags);
+ 	struct smb2_transform_hdr *tr_hdr =
+ 		(struct smb2_transform_hdr *)rqst[0].rq_iov[0].iov_base;
+@@ -4482,10 +4483,10 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
+ 	void *creq;
  
- 	if (rc < 0) {
--		revert_current_mid(server, smb->credits);
-+		revert_current_mid(server, smb->credits_consumed);
- 		server->sequence_number -= 2;
- 		delete_mid(server, smb);
+-	rc = smb2_get_enc_key(server, le64_to_cpu(tr_hdr->SessionId), enc, key);
++	rc = smb2_get_enc_key(server, le64_to_cpu(tr_hdr->SessionId), 1, key);
+ 	if (rc) {
+-		cifs_server_dbg(FYI, "%s: Could not get %scryption key. sid: 0x%llx\n", __func__,
+-			 enc ? "en" : "de", le64_to_cpu(tr_hdr->SessionId));
++		cifs_server_dbg(FYI, "%s: Could not get encryption key. sid: 0x%llx\n",
++				__func__, le64_to_cpu(tr_hdr->SessionId));
+ 		return rc;
  	}
+ 
+@@ -4510,11 +4511,6 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 	if (IS_ERR(creq))
+ 		return PTR_ERR(creq);
+ 
+-	if (!enc) {
+-		memcpy(sign, &tr_hdr->Signature, SMB2_SIGNATURE_SIZE);
+-		crypt_len += SMB2_SIGNATURE_SIZE;
+-	}
+-
+ 	if ((server->cipher_type == SMB2_ENCRYPTION_AES128_GCM) ||
+ 	    (server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
+ 		memcpy(iv, (char *)tr_hdr->Nonce, SMB3_AES_GCM_NONCE);
+@@ -4530,16 +4526,91 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 				  crypto_req_done, &wait);
+ 
+-	rc = crypto_wait_req(enc ? crypto_aead_encrypt(req)
+-				: crypto_aead_decrypt(req), &wait);
++	rc = crypto_wait_req(crypto_aead_encrypt(req), &wait);
+ 
+-	if (!rc && enc)
++	if (!rc)
+ 		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
+ 
+ 	kfree_sensitive(creq);
+ 	return rc;
+ }
+ 
++/*
++ * Decrypt @rqst message. @rqst[0] has the following format:
++ * iov[0]   - transform header (associate data),
++ * iov[1-N] - SMB2 header and pages - data to decrypt.
++ * On success return encrypted data in iov[1-N] and pages, leave iov[0]
++ * untouched.
++ */
++static int
++decrypt_message(struct TCP_Server_Info *server, int num_rqst,
++		struct smb_rqst *rqst, struct crypto_aead *tfm)
++{
++	struct smb2_transform_hdr *tr_hdr =
++		(struct smb2_transform_hdr *)rqst[0].rq_iov[0].iov_base;
++	unsigned int assoc_data_len = sizeof(struct smb2_transform_hdr) - 20;
++	int rc = 0;
++	struct scatterlist *sg;
++	u8 sign[SMB2_SIGNATURE_SIZE] = {};
++	u8 key[SMB3_ENC_DEC_KEY_SIZE];
++	struct aead_request *req;
++	u8 *iv;
++	DECLARE_CRYPTO_WAIT(wait);
++	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
++	void *creq;
++
++	rc = smb2_get_enc_key(server, le64_to_cpu(tr_hdr->SessionId), 0, key);
++	if (rc) {
++		cifs_server_dbg(FYI, "%s: Could not get decryption key. sid: 0x%llx\n",
++				__func__, le64_to_cpu(tr_hdr->SessionId));
++		return rc;
++	}
++
++	if ((server->cipher_type == SMB2_ENCRYPTION_AES256_CCM) ||
++		(server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
++		rc = crypto_aead_setkey(tfm, key, SMB3_GCM256_CRYPTKEY_SIZE);
++	else
++		rc = crypto_aead_setkey(tfm, key, SMB3_GCM128_CRYPTKEY_SIZE);
++
++	if (rc) {
++		cifs_server_dbg(VFS, "%s: Failed to set aead key %d\n", __func__, rc);
++		return rc;
++	}
++
++	rc = crypto_aead_setauthsize(tfm, SMB2_SIGNATURE_SIZE);
++	if (rc) {
++		cifs_server_dbg(VFS, "%s: Failed to set authsize %d\n", __func__, rc);
++		return rc;
++	}
++
++	creq = smb2_get_aead_req(tfm, rqst, num_rqst, sign, &iv, &req, &sg);
++	if (IS_ERR(creq))
++		return PTR_ERR(creq);
++
++	memcpy(sign, &tr_hdr->Signature, SMB2_SIGNATURE_SIZE);
++	crypt_len += SMB2_SIGNATURE_SIZE;
++
++	if ((server->cipher_type == SMB2_ENCRYPTION_AES128_GCM) ||
++	    (server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
++		memcpy(iv, (char *)tr_hdr->Nonce, SMB3_AES_GCM_NONCE);
++	else {
++		iv[0] = 3;
++		memcpy(iv + 1, (char *)tr_hdr->Nonce, SMB3_AES_CCM_NONCE);
++	}
++
++	aead_request_set_tfm(req, tfm);
++	aead_request_set_crypt(req, sg, sg, crypt_len, iv);
++	aead_request_set_ad(req, assoc_data_len);
++
++	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  crypto_req_done, &wait);
++
++	rc = crypto_wait_req(crypto_aead_decrypt(req), &wait);
++
++	kfree_sensitive(creq);
++	return rc;
++}
++
+ /*
+  * Copy data from an iterator to the pages in a bvec queue buffer.
+  */
+@@ -4618,7 +4689,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
+ 	/* fill the 1st iov with a transform header */
+ 	fill_transform_hdr(tr_hdr, orig_len, old_rq, server->cipher_type);
+ 
+-	rc = crypt_message(server, num_rqst, new_rq, 1, server->secmech.enc);
++	rc = encrypt_message(server, num_rqst, new_rq, server->secmech.enc);
+ 	cifs_dbg(FYI, "Encrypt message returned %d\n", rc);
+ 	if (rc)
+ 		goto err_free;
+@@ -4680,7 +4751,7 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
+ 		tfm = server->secmech.dec;
+ 	}
+ 
+-	rc = crypt_message(server, 1, &rqst, 0, tfm);
++	rc = decrypt_message(server, 1, &rqst, tfm);
+ 	cifs_dbg(FYI, "Decrypt message returned %d\n", rc);
+ 
+ 	if (is_offloaded)
 
