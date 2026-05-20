@@ -1,141 +1,201 @@
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06C49443
-	for <linux-cifs@vger.kernel.org>; Wed, 20 May 2026 01:53:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779241982; cv=pass; b=Tf2ZXUeIoVPGkvlFlje7E6wgJWrCWcDgbTvVdUYrHl49MxRlnSs49xl4Ff5THu37abWnkpQuEq9EIaNKI92/CdWTyMS1IxWxxesE8+h3sJbH0nqcIi73fjUnfdGUA5MEP4+ZXz+erCmZPLY2j+rwbW6dAwv8I3iBeiHqErD37i0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779241982; c=relaxed/simple;
-	bh=uKgH7pJzwShd3l3h9Kie21E1UNJdXPtqg6XvgLOCv5E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PS5KidU1oFB2aSPOxf5PG7hYhffBZ0+WS3oXuDiIcu6jb+JLqTHu5Yt1GhIRemmZ+FjF79TxKeym7G76M68+o5kSOyjX01ia9/pFVJpSTFt1V9cYdnDDEQ0xgPZ3Gq/U2ynbCc6UY9DxmyGYShZjhZ/ixGSaeYiUxa7NZ/Fdtb8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=miP2nTQr; arc=pass smtp.client-ip=209.85.222.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F822F5A36
+	for <linux-cifs@vger.kernel.org>; Wed, 20 May 2026 03:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779247198; cv=none; b=tIqfnI5MEvWYLsfHxRRaTQ9krimK6kUSe+sSUkvgLBMd8/EqBhuFnROk5Ge0gI1lVsDRtsum0OXoZXGlWntXYV/EF+8qtz+Nslx8iZ5vRhbsBUYZzLSoEHPdzZ3NUv7h1jGNUfEftBDCgq8HUBOvNuFXYqJWANH3/9RDbWUtvA8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779247198; c=relaxed/simple;
+	bh=17nxfRsu/mmBWYVlL9OzSO4HeHZxjgfU0eC2ctFuVPM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pPyRSfKixED43vR1CTEY1ZATup9e5mbb7pOUHF2Kwa42qOAQSX/BSB14bmdvhqItG1y/mZsf7NC3Wf8JnfWhUt88XeIQpH8ilbTb6VOzt0HEJBftQGAlplKMgkFhnQUYkTbmQel5Gh5N0HF/HV7MWt+VdJ/i6/6cXeMpyasRdlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DZb14AXJ; arc=none smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="miP2nTQr"
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-95cd9a5f24cso1029739241.2
-        for <linux-cifs@vger.kernel.org>; Tue, 19 May 2026 18:53:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779241980; cv=none;
-        d=google.com; s=arc-20240605;
-        b=G2p5FhpOrCXXF22mlbq19GIiqPZleg+wWFkgLyZ1C8qejVUX8tIUCcXhvW9wh+LmNR
-         GdpgBwuGDfV0ZUr53ZRTwd24MK4lX8WI7Pc59X9et95haEvbaVPs0tA9xoZ0uYNqGjJ2
-         Z1UiEGLEkpRLZhhPddkyqfdezx5/i8lOKnLZv9UQGs4emTuWVhYW1dHNWyhUz2EhN7zL
-         /WhMzNoLKkz4HfcvQUDfhE4FIPoYgtDVjrfF5eNobRBbYn7aU8W81Oij+munzL7FY3An
-         FCd2Nq5Wme/6fZ6okaWLXlLxl36bN4o5PEwldlSnGj1bX/7j5slNDTanoV0nqLleyC07
-         nMQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=OfiPYiS6scK9qfd7wKbDZfR7CqjtM+D9fRngzz5WV/k=;
-        fh=jneaMvy0xezsJ6wUmdacuUfL22I0beCVmnCgvjO+V6w=;
-        b=GJzpSx7z2RdKlUI2cwvNOYGif9JdLvROCUtls+rJPqRar/3PqoCYxU/57fYiuZZqyI
-         iI1zSTeIW2BEKvHU+utCoGlK+wOg3Du97C05ElkY2jlIG8k6SQ2ryeHkOmP1u0Zw3P8e
-         WF9y71/6SIJaGIdxgz+WwEUYTXydb8U8oaIGjK/BxxcJqNoihPvAjiznAMkRBlFGE8Gk
-         YOavw97DpXoefSeT6J9xWy1gLv59YwWHSN6nj8IDHOykRXXP771IqS1QEDLuJm4h3G6p
-         +zdhXTJ288unrkFc2EA0fUoEVo9p443JKUA/GD/oZMxJA7Cp1YV6DTArZfV3oxpUcAVO
-         Xv+A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DZb14AXJ"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-50d75bfb259so27312181cf.1
+        for <linux-cifs@vger.kernel.org>; Tue, 19 May 2026 20:19:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779241980; x=1779846780; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OfiPYiS6scK9qfd7wKbDZfR7CqjtM+D9fRngzz5WV/k=;
-        b=miP2nTQrFXuO3YbzGHmVIVugTsDaZySUNHleNJ85v47q6mv6xAAjWmmemkv3qgI4Wa
-         E2ZfR5SMecqGzphpzPK/uXqyIX4ouZGPYk3X+8kiqsxSC7n5G6KmGQgLAbXMCqGDG9/r
-         BiSjrk51MP7XV1WcOv8t5aBfTb0tqWW27TYWFahCWHQbWlocEi8Mn3hAWfgf1oS3U23o
-         ptzDOnL8KsEuLsDl+mwocgFLgUgfMwM6uUiGXMVnLv+FuJQVnOFMSq1RL5VrhkGNm9gx
-         2TtcuQPZEqSmdbuDwmBJrKsjWH/FuFHDYHuVSzjimDd9LSGJLQ/CHWtAo/YF5qKG3GWp
-         uukA==
+        d=gmail.com; s=20251104; t=1779247195; x=1779851995; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ExOjUKx730L5h/Y9Isojqzag32vFvnt6fAHuWyYmv/Q=;
+        b=DZb14AXJqszT86bDu9VMgV8k7nfVfjE+J6OGk+Qr2YXZ7udsz0esLIeozpLOPTZy/K
+         3+/aNFrrglILIKu3FRO+GDoTPBgd9uTq/dFV9xvgmZG4bKLXm5V8G4IEuW2OyDo/cPfR
+         6clJOzDK58LPl8RBYcaHIPFcUU/ch8FZ9vGQr/8Z0Cj8riJ5HQdkxU365sWmhNQGLqzn
+         O3NT///o25Pm97FU4mEFca5gbBhaXMg7W9v7ypMMpAxVYguJKdcrwn6OtMnEK2ofyBs2
+         hMjs5h5Cr0dmuF5g2OUs+L54VDAqimGr1IPUdavST6sQ5vKzzKgos5Bxo1YUBu10XFBl
+         YK4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779241980; x=1779846780;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OfiPYiS6scK9qfd7wKbDZfR7CqjtM+D9fRngzz5WV/k=;
-        b=afikt+0D9gNH2fcYXNdMiy1wWxtKhHCnYLUVUNz0p9275kt2BJq2IJ6ZfRWKbez73Z
-         MiS4t8dEXMobj84rU8U2U+OZTrejcqiRNG80b3s9hFM8hBdlNZzGb96Uz189/l+3h2vS
-         x45rFbR5cgnr2nbFGSan7Y/jimbhZdIFFFoV9BTZ5a6N5aOjSm4je74Sr6Bdbnzb1Yhx
-         6wboxMm3vaI1JuRgHnDnlWNUGzbBiztX6oemIooShDGo9kYe5JvHLLuS0oqDZkg2V12W
-         dOsho53wED/OhpGhM+UilYdbUN8JQ8O6I14BUEOsSPCVb+kdjjdCsm68aHjSVPK+EMPF
-         tN7g==
-X-Gm-Message-State: AOJu0YwVxU9OLvsj4DJgg6tr6bWJrQ7No54pa7/apGxSg5RqUnaP7aVY
-	DXj4T2/qQa2f8mZsOdUZrNxtjni1U2AIeIR73jUx0Yl+gisNNlyIz3oDPu9oYCXN4J33qUbqh8v
-	16MZyfPLRIvsTvr+oM+53a+2NtPTUd/k=
-X-Gm-Gg: Acq92OGVJIW9lHmOjr47rZFGu2PtBG+TG1/e46gADBgmoCyu2bBRLWWSQ6Or1XDadWF
-	ysq/J3JizPfdjH42udrlNhRP/8Kl7xy8mpfLmw7n318z6oxmb8aSWpFGpnf+TEHQfMc1MwzcMrS
-	gsg2eeg6nZWQCOPApHGDr8TNfMCyGFWeHSayKpWvmEgwE3uxPYiJp0liD8Q+/mHIYaJnRsXy9dz
-	rHBPjFA1IF8iYXBhsgpfuGQExqXj9rnmSeLGxfrn2F1LB6y5qKVCuicxuBp6CKpvMUTMeLcapBS
-	uy4MmUdO9UOpxkQhd4A=
-X-Received: by 2002:a05:6102:808b:b0:635:1bc8:3568 with SMTP id
- ada2fe7eead31-63a3fb99c96mr10946475137.23.1779241980065; Tue, 19 May 2026
- 18:53:00 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779247195; x=1779851995;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ExOjUKx730L5h/Y9Isojqzag32vFvnt6fAHuWyYmv/Q=;
+        b=A07WQAjnR+UtJp/LEwu44eTjf4VeXE/Ra1N4uvuInL1DOYMv4lgLl/CrJ7Jo60JnQj
+         vwp1neKFQJq5creCXex5MWyS1nz6UrbNBX68G+p7XwRwvDRG4ggajicATPnR1lq6+cl9
+         XoX5anexeXrOyWB4Es+ZBPmlKi0l9PLWKcQG2ktwyJOhs/i471pKd1LNR1AAAhXwEI80
+         G9fzhVueWdXsBns6308bu7+jF3z0YWEhen8QtbB6nUdnLVlVfI4Vy+hbIiM+zHfAohRj
+         77Hmlpt1ndpcpqLbCl599vJz1Y6cppHn++QyS/eaoJ3cv9tZLa3r8xm/sEt2LQm8bF3H
+         0+OA==
+X-Forwarded-Encrypted: i=1; AFNElJ+s8PtB2H/NC6zpXpaCd5xZhHqpkaDf3ldIXF6ZlVZVTtmphf8i6eRpjgY0aUq+xXJ2xQzU+1yuIjiU@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6gh/PNSiGLWVceZRlPlzluDC7o1RoqGxvmLeFkFwPB6sqJ7s9
+	MZJehEWbKFGSWPWgTBfLm7gCl1BQiTq1uxan3kp/kLV98MT2S8dns0+p
+X-Gm-Gg: Acq92OGW4uE3huU241JYEsw8gVlK5L4K6+wZv+tmTL0eP2FZq6T1DkvO64mRR+i3lmA
+	PwFQBXAiW7iGjjJm4gHkSmkWtg1NAl1fV1qgOKa2Fu0p3ShHBUP2tZARcQoeP5wFDHxa2Sg50fn
+	uj+c673Owa1ut7EqxDV+Wicnu5ydteH9e/TRLfKYIwpP/owvTyqgs3+qqTI6L8DxNExHEDCGt8p
+	Vt3fH41bYZ31+ztIv6miBXr/j3caxnKo2SR7cqejMgy44/NdXKJRQLnrn3uFka0TB7nkkJ/X/iS
+	X9mGvMmeqnCY+T3oR7hjRXy6fftCmZY7/mmA5q7g1DLFYMb2J7yJUUNXMmlgGLKEZdd+7afnGgR
+	kpkpYTuAFcoqQIk/8/2IBGP28/4rOAmHuU1EL/cnkR3Y6FgjrSkMCDyBQgdPU4tYCG0B70+z0yw
+	dVbD2O5IJeep4TxYQ4pgH7HUR2YRXH2fjUteslI9nb1wQ31WXA0JmwkEaeDNJ/pg9xjtfkCq5U+
+	s3g+MBqCWIEqTolgRQw
+X-Received: by 2002:a05:622a:8584:b0:50d:a8f5:1bf8 with SMTP id d75a77b69052e-5165a1dc9f7mr251865621cf.37.1779247195399;
+        Tue, 19 May 2026 20:19:55 -0700 (PDT)
+Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-516456c0a42sm189710571cf.10.2026.05.19.20.19.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 20:19:54 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	Hyunchul Lee <hyc.lee@gmail.com>,
+	Ronnie Sahlberg <lsahlber@redhat.com>,
+	Marios Makassikis <mmakassikis@freebox.fr>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: reject unsigned non-exempt requests when session requires signing
+Date: Tue, 19 May 2026 23:19:23 -0400
+Message-ID: <20260520031923.3679744-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260513201915.401320-1-FredTheDude@proton.me>
-In-Reply-To: <20260513201915.401320-1-FredTheDude@proton.me>
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
-Date: Tue, 19 May 2026 18:52:49 -0700
-X-Gm-Features: AVHnY4KppfoJyxSdjWv2q1jjh8Lrey4kMz6TjHgG7WH0KQ6d_Qx66GD4Ux6M0ns
-Message-ID: <CAAk_H6EYShvace2Kgdk+v9Mv_zkwfQgoLtRLCuu02w+S8BshWA@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: change allocation requirements in
- DUP_CTX_STR macro
-To: Steve French <sfrench@samba.org>
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-Hi Steve,
+This is the ksmbd SMB2 sibling of Samba CVE-2023-3347 ("SMB2
+packet signing not enforced"): when the server-side policy requires
+SMB2 signing, unsigned non-exempt requests must be rejected instead
+of processed. CVE-2016-2114 is the older Samba SMB1 analogue for
+mandatory server signing not being enforced.
 
-Following up on this patch. This logic should remain sound and still
-merge properly.
-Let me know if you need any modifications.
+When a ksmbd target is configured with "server signing = mandatory"
+and a client completes a signed SESSION_SETUP, an attacker on the
+network path of that connection can read the cleartext SessionId
+from the SMB2 header and inject unsigned TREE_CONNECT, CREATE, and
+WRITE requests on the victim's TCP flow. ksmbd processes the
+unsigned PDUs and commits attacker-supplied content to the share
+under the victim session's authority, without the attacker holding
+the victim's credentials.
 
-Thanks,
-Fredric Cover
+In fs/smb/server/server.c, __process_request() verifies signatures
+only when conn->ops->is_sign_req() returns true. The predicate
+(smb2_is_sign_req() at fs/smb/server/smb2pdu.c:8936-8947) reads
+only the client-set SMB2_FLAGS_SIGNED and never work->sess->sign --
+the per-session "signing required" state set during SESSION_SETUP
+at smb2pdu.c:1546 and :1645. MS-SMB2 3.3.5.2.4 requires the server
+to reject any unsigned non-exempt request when
+Session.SigningRequired is TRUE.
 
-On Wed, May 13, 2026 at 1:20=E2=80=AFPM Fredric Cover
-<fredric.cover.lkernel@gmail.com> wrote:
->
-> From: Fredric Cover <fredric.cover.lkernel@gmail.com>
->
-> Currently, the macro DUP_CTX_STR allocates new_ctx->field using
-> GFP_ATOMIC. DUP_CTX_STR is only used in smb3_fs_context_dup(), which
-> is never called in an atomic context. Using GFP_ATOMIC puts unnecessary
-> pressure on emergency memory pools.
->
-> Change GFP_ATOMIC to GFP_KERNEL.
->
-> Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
-> ---
->  fs/smb/client/fs_context.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index b9544eb03..a3ccc06c0 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -420,7 +420,7 @@ static int parse_symlink_flavor(struct fs_context *fc=
-, char *value,
->  #define DUP_CTX_STR(field)                                             \
->  do {                                                                   \
->         if (ctx->field) {                                               \
-> -               new_ctx->field =3D kstrdup(ctx->field, GFP_ATOMIC);      =
- \
-> +               new_ctx->field =3D kstrdup(ctx->field, GFP_KERNEL);      =
- \
->                 if (new_ctx->field =3D=3D NULL) {                        =
-   \
->                         smb3_cleanup_fs_context_contents(new_ctx);      \
->                         return -ENOMEM;                                 \
-> --
-> 2.53.0
->
+Reject directly in __process_request() when work->sess->sign is
+set and the inbound non-exempt request lacks SMB2_FLAGS_SIGNED,
+bypassing check_sign_req() to avoid emitting
+pr_err("bad smb2 signature") at KERN_ERR for each unsigned PDU.
+The set of commands exempt from signing (NEGOTIATE, SESSION_SETUP,
+OPLOCK_BREAK) is unchanged.
+
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+Assisted-by: Claude:claude-opus-4-7
+---
+
+Reproduction
+============
+
+Tree: linux-mainline 2f448dd9ef4e, x86_64 QEMU+KVM,
+CONFIG_SMB_SERVER=y, CONFIG_KASAN=y. Target ksmbd.conf has
+"server signing = mandatory", "map to guest = Never",
+"valid users = alice"; SMB user alice was added via
+ksmbd.adduser.
+
+Conditions: ksmbd configured with "server signing = mandatory"
+or a client requesting SMB2_NEGOTIATE_SIGNING_REQUIRED, so
+work->sess->sign is set to TRUE after SESSION_SETUP completes.
+Encryption MUST NOT be negotiated on the session (smb2_sess_setup
+clears sess->sign to FALSE at smb2pdu.c:1558/:1657 when
+smb3_encryption_negotiated() is TRUE). The PoCs force SMB 2.1 to
+keep the session in the signing-required state.
+
+Harness: a wire-level Python client establishes a normal NTLMv2
+SESSION_SETUP on a fresh TCP connection, then on the same
+connection issues TREE_CONNECT, CREATE, and WRITE with
+SMB2_FLAGS_SIGNED cleared and the Signature field zeroed. A
+companion transparent TCP MITM proxy demonstrates the same
+primitive without holding credentials: it observes SessionId from
+the cleartext SESSION_SETUP response and injects an unsigned
+TREE_CONNECT, CREATE, and WRITE into the victim's TCP flow using
+that SessionId; the victim's own SMB session continues normally
+and observes the attacker's file appear on the share.
+
+Stock kernel: unsigned TREE_CONNECT returns STATUS_SUCCESS with a
+tree_id; CREATE returns STATUS_SUCCESS with a file id; WRITE
+returns STATUS_SUCCESS and the attacker payload lands on the
+share path. The response header carries SMB2_FLAGS_SIGNED with a
+non-zero MAC, confirming work->sess->sign was TRUE on this
+session.
+
+Patched kernel: same harness, the dispatcher returns
+STATUS_ACCESS_DENIED on the first unsigned TREE_CONNECT and
+nothing reaches the share. dmesg shows zero
+"bad smb2 signature" entries; the rejection bypasses
+check_sign_req() so the existing pr_err path is not exercised.
+Regression: a legitimate smbclient session with
+--client-protection=sign continues to read and write to the
+share with no observable change.
+
+Mitigations: until patched, deployments can leave
+"server signing = mandatory" disabled in ksmbd.conf (the bypass
+is meaningful only when the session sets work->sess->sign), or
+configure clients to negotiate SMB3 encryption (sess->enc=TRUE
+clears sess->sign and the session uses TRANSFORM_HEADER
+encryption for the data path).
+
+Selftests: grep over tools/testing/selftests/ on the patched tree
+returns 0 references to ksmbd or smb2_is_sign_req; there is no
+in-tree selftest binary that exercises fs/smb/server/server.c's
+dispatch gate. The trigger Python client and the TCP MITM proxy
+are available off-list on request.
+---
+ fs/smb/server/server.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+index 58ef02c423fce..5755f907f29f4 100644
+--- a/fs/smb/server/server.c
++++ b/fs/smb/server/server.c
+@@ -143,6 +143,15 @@ static int __process_request(struct ksmbd_work *work, struct ksmbd_conn *conn,
+ 			conn->ops->set_rsp_status(work, STATUS_ACCESS_DENIED);
+ 			return SERVER_HANDLER_ABORT;
+ 		}
++	} else if (work->sess && work->sess->sign &&
++		   command != SMB2_NEGOTIATE_HE &&
++		   command != SMB2_SESSION_SETUP_HE &&
++		   command != SMB2_OPLOCK_BREAK_HE) {
++		/* MS-SMB2 3.3.5.2.4: Session.SigningRequired==TRUE,
++		 * reject unsigned non-exempt request.
++		 */
++		conn->ops->set_rsp_status(work, STATUS_ACCESS_DENIED);
++		return SERVER_HANDLER_ABORT;
+ 	}
+ 
+ 	ret = cmds->proc(work);
+-- 
+2.53.0
