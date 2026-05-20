@@ -1,47 +1,43 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC621233935
-	for <linux-cifs@vger.kernel.org>; Wed, 20 May 2026 09:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57723D333A
+	for <linux-cifs@vger.kernel.org>; Wed, 20 May 2026 10:03:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779269595; cv=none; b=jtL/gEdiYOj8eIYbexsUgcw0JL+btWxAh2FFz9OlkhHJlpWLv8FyncVTrIyjibkjKyB8w97MlgTIsagh2NIZ9C97Ju0kFdF5RzeGYuH1SpU4vWAQjmpzgVrx+44j3K5bwZBchkrmbdWZH1PpzdNq2Vj2ty5yvHoCcowjVNVQs3U=
+	t=1779271415; cv=none; b=gUDvUKeKgTlk5LPmG59UGPcNmSCIIW2I/Fi7zt/HahzGPPcZC0Awh/5RmQ5VINKOZu3HobR0uUJzbzZaj93j4Ug0fximIpX9b6Wt5lmq8RIwbryTQTMB2FAteXXcdNUUiRVvQeNq6TG9vv3FLPJnT0EF6UXTDUMBr8EUeDLPBFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779269595; c=relaxed/simple;
-	bh=Vj+0ec96/gMK0TF99sB6jBxba2hf7p8evkYNIZmuzLM=;
+	s=arc-20240116; t=1779271415; c=relaxed/simple;
+	bh=lXSV4OAE0hESm8bR6k6RgTxa/csfsY+BIPOoo4Wi30M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UqINPuf9vCx8iVhEcRfn33yBGKWQDV5krgQ7dYWR5P++zpr1Vc7nQiG6oX+73883X7yWst+IVt17kfAFXgdUHx/9s1t3Iirnm2ZGfj2sI8YevIP/kjzp1fMFcXzcgQFdw39B0EAGWQSD9lrZoP6B9E4Dtu5BpY2HfALUHlvVrRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Fvi59smC; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	 In-Reply-To:Content-Type; b=g2iajNbMhc4a+mmvIAtV3VJlO+LTqB3XERYdsTWruWpeICkDK9VcsJ5tkoT1W17LFuXcKF9dRluFytTy4VRddEds0qGZ/CXDepQRySO6rJbbrRPY6FREGHzrum4OisCHVsM00Wnx4JkaleteDE1kkElSpng+FVszefH0k1dUAxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=GWpNfZl7; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Fvi59smC"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=5x6xK0mRM7omKqbhi8qcBCSdvZqJqK+sklNFzj/W4V4=; b=Fvi59smCise5iztGbo2LFkHw69
-	st8x9dTo1lI2qVAwl2UvgvCbtUdLDwXsf1u195yw6qUYMJHMysnMLGF053OcHeGrGDBhlXHspdPDj
-	LxJp6Cw5sXUf1FUtTsqphKRx+P28cYmAxIhrNAS/x6dGyEgVPqqonO8ZeYYX81gk2FYhiBYQtcx+k
-	22W9jE2oSwqGf26yJXPWiN/j0D8UtV+WLXcUjpXpr+SbBqp+AGc7ZVnbWexO/C/kInT4KV0B1qsMW
-	TPmHZKDZ9EXNilaCrDndGCime9/rOoa+67Irc1TNQRKbY74ZdhcWc1CkHNOqv0fAdglx9x1LPJyla
-	h6+LqIa4N27B6SGT+uBd0dkVcuvRtYuGl7FCJqfB45YUQtylpN8x1yisXoodpM2zKkWIsWTHomipC
-	vdeyCRzkWeDuNRsMSAU8CMaoEqZu683g3mrRg2IocFQqup+6xNH9yIgzjR6w4m8sC9nT/kJm4r8wi
-	Zed0h474lD6evPJ5Az9oZVUP;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wPdIN-0000000AMFn-3BYN;
-	Wed, 20 May 2026 09:32:55 +0000
-Message-ID: <9b73c105-03af-4e71-93b5-a94e13b8c7dd@samba.org>
-Date: Wed, 20 May 2026 11:32:55 +0200
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="GWpNfZl7"
+Message-ID: <3a43f239-f35c-4d69-9c21-b410f0e38081@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1779271407;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QC3myGxz1OY3v56Po6PFF38hLRypHmRHNuwyW6KKfwY=;
+	b=GWpNfZl72g0zTSbHAZji9+9IXZs+rxR2lFLu86+pBbyNxlDet2TBwErIye+KanmBEw0dbO
+	rv3v3sAX7D7hj49NegwyWZbvDMMpQfsV9YHn+NmqzTSBsskqYalVMsFs8Ct8UA4q2Rd1C3
+	rLhUUV3DPgDBLkaJkKznoOzq5ztWhmHlcR2oMeJmU1G0t6lnpJ33OkKEJaOjk1ZYdpdZtE
+	phHCNyhPVOPlpasjCA5/Ua4YmrprE/ZnatDu0J9MQIuFyRqxBXBfw++mxeJzB0TH+z0K46
+	Iszxaxbm/kN6Yg1hdCXeQKxJby/Je5MiRQH8+3gQxZM6o8KFRd5MznsIf0Ia+w==
+Date: Wed, 20 May 2026 18:03:08 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH samba] smbclient: cancel pending notify on SIGINT
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, smfrench@gmail.com,
+To: Stefan Metzmacher <metze@samba.org>, smfrench@gmail.com,
  linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
  sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
  senozhatsky@chromium.org, dhowells@redhat.com
@@ -51,19 +47,26 @@ References: <20260519095113.289692-1-chenxiaosong@chenxiaosong.com>
  <9ecddf93-3599-4e0e-8aa9-93890fd54d96@chenxiaosong.com>
  <83ba770d-1a75-4231-843a-3e51ce3f85e5@samba.org>
  <60328fa3-1370-46a7-9114-0267ef0551ce@chenxiaosong.com>
+ <9b73c105-03af-4e71-93b5-a94e13b8c7dd@samba.org>
 Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <60328fa3-1370-46a7-9114-0267ef0551ce@chenxiaosong.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <9b73c105-03af-4e71-93b5-a94e13b8c7dd@samba.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Am 20.05.26 um 11:21 schrieb ChenXiaoSong:
-> Once the implementation is finished, I will test it with smbtorture. But right now I'm still developing it, and some issues require an open-source client that supports 
-> cancel notify to debug.
+Got it, I will try to use smbtorture to debug, thanks.
 
-That open-source client *is* smbtorture
-
-torture_smb2_notify_tcp_disconnect is a very simple test for this.
-
-metze
-
+On 2026/5/20 17:32, Stefan Metzmacher wrote:
+> Am 20.05.26 um 11:21 schrieb ChenXiaoSong:
+>> Once the implementation is finished, I will test it with smbtorture. 
+>> But right now I'm still developing it, and some issues require an 
+>> open-source client that supports cancel notify to debug.
+> 
+> That open-source client *is* smbtorture
+> 
+> torture_smb2_notify_tcp_disconnect is a very simple test for this.
+> 
+> metze
+> 
