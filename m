@@ -1,167 +1,160 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0443EF0DA
-	for <linux-cifs@vger.kernel.org>; Wed, 20 May 2026 15:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9210F3BED1E;
+	Wed, 20 May 2026 16:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779291456; cv=none; b=tCU9Ksm7ClnYMyIweyxB9AOn/BgQOLSM9iX6b0dZVmvy8ygKNHHeZpEVP7Xe0B0sN8S8lQuTtzrKeqqZ6SWUvTb9WxxMynMohSrCNWVM818B3YO8idJjGeJbwO5GMJQoEPdonrThc8CqGGEoBVI3Jbejl2eI6fT+S/il744txgo=
+	t=1779296325; cv=none; b=m/iSfnybSReiinMtTuOUz5V+5MFp8JBwq1zv0HtRP1WnH23j5mp0QpJujgD6kw2zUgeNt31CH0W4pbZ6peQlnpCdB6Tf/1Es7GYHYzDNTerEDoB/fGNaaBgi9e3k1b/FHsC86/WFOXHpgklRVP82n+2WV+RK40x1YY3G2yOz95w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779291456; c=relaxed/simple;
-	bh=GYCE9NPtSuZUtSm97fSDkHhTRvA6tafzCS1+0FwZfjg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cW+NuV7dIdy/VaJlxihpL4fyjko1u9iiXzRpdFJmIfsLTV8FPOvv4X9JPNMFMimPGJnqXacw27K/ftuG2byrolwvUT9vIH3MEzATwQ+9C4Be7QQPWMRhGDuMgrVJNFpSNaDj0u8pJm1ZyIfWgugKmIXTw5YMcSlxVvIVZQ7RRZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=igNKDhkk; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1779296325; c=relaxed/simple;
+	bh=HuRpGc2PUG4TKGlMk6ECKCEenG1oz34paklJhSdTDJs=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Y5jFSPY5CTAWkfIJAV8F/0JMkSGvj+sdEYUHYAnQvQOUjvOdar20CKWl5gR8rx3HT3kCO8gvk6eAvdGDIb+dJcC6ga21H4mv70ywMkoQJ+BrFMFrFO+jrhFSTgDgW1WFKf7ex5auZahiSCTxrE069lHUID3OD4WnUARQ/QV9m9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UwbdSUFf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="igNKDhkk"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1779291451;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cf239SaL59Uic5cw3AIL/fdVQj4V5v9G7P0FRuP8ksk=;
-	b=igNKDhkkcrIqcN4vkPE4gi2Oot7SFM58X5IBjHpzAiQxZokjPthsp+Yf/gjj21TjCNjg5k
-	3zOAfcKHX3q57VK+XFYZt2mlSkTMQRK/QLCBjI73oI0pN1uzcrH40F32Vnq37rPpc8j1DR
-	+XU1aIJCTVmEVRe59rarU9bGC3ItNP6wQPQUpOKTAy+lM/YFiEhbKdLoOniVfj/5VGAPvD
-	A6NT5uxyMhIXIA2EdwI/33JupKcY/HxGO56lsT1BZeBNU2fsfnrodNG17HBxoybbumUlg8
-	kYPTP9fuQbbPpakaKcsUaKFZHwZ7CdHWP6frx2ON9AZW8jRiFb5Lp0WF4N0k8w==
-From: chenxiaosong@chenxiaosong.com
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH samba v2 1/1] smbclient: cancel pending notify on SIGINT
-Date: Wed, 20 May 2026 15:36:07 +0000
-Message-ID: <20260520153607.347960-2-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260520153607.347960-1-chenxiaosong@chenxiaosong.com>
-References: <20260520153607.347960-1-chenxiaosong@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UwbdSUFf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E0611F00893;
+	Wed, 20 May 2026 16:58:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779296324;
+	bh=3HYCTjUKnMgOBwx9QLeP6Mvnf90VdQqX6Kq1eV2MzLM=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=UwbdSUFfiPD5nEs75u3836d9xkPyk26dXYEF4j6ngljmJB9byL9nvxBvogPMZEwS4
+	 HlmwR0Rq34lWaUCSaxX+qP0G3jQY+n5dNstgtVC1XjtFLnN6eag316xOeo21Oo3l8g
+	 nI/CHm5zH75HQblS72L7CFw3OiTnVKVi2i56AqGT074yhwFoulv9ggS7h9og71NL8s
+	 CUImdcg29FH5HSElh25NizNdrsqsSlyqKLhIH/aZ9mRzSL8VNxnMhU9kQHBMXoWC96
+	 wXpf0wB09Xs4FpEjOOUxXPlqI+hwRYphh5mtId442ujsKT5lIzZRLejcS2h5i3exxx
+	 +yDZS5cE5w3vg==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 653BFF4007D;
+	Wed, 20 May 2026 12:58:42 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Wed, 20 May 2026 12:58:42 -0400
+X-ME-Sender: <xms:QugNavyinx7bKrqL4HPeQunpcXbIaluZN7wF9StWTZXgR2qve6JZ-g>
+    <xme:QugNaiGhRRos_yOLWfm-5tiI1PIm-uXq5yDDMT3oiNGBSfN1wx_UeyhKOJHGIa_bo
+    cQ9rqE22bExtjIDyUHyrxhoLANTG9qDp37GvGe2tAPk0XVFu3TxC64>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugeehudejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
+    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
+    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
+    hilhdrtghomhdpnhgspghrtghpthhtohepfeegpdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopehsvghnohiihhgrthhskhihsegthhhrohhmihhumhdrohhrghdprhgtphhtth
+    hopegrughilhhgvghrrdhkvghrnhgvlhesughilhhgvghrrdgtrgdprhgtphhtthhopehs
+    lhgrvhgrseguuhgsvgihkhhordgtohhmpdhrtghpthhtoheprhhonhhnihgvshgrhhhlsg
+    gvrhhgsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnnhgrsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopegsrhgruhhnvghrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    gsrhhoohhnihgvsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtvghmsehkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopegthhgroheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:QugNamfaq2UpdXiWnPnay5nQ_rQckvm_41kR8NgaI4_lDDqQ4Yiy8A>
+    <xmx:QugNamv95ErjE6pb8okHjc44uM5BHK6ky05NPxz2-vrTiBeWgMpiJw>
+    <xmx:QugNaqupzmbSbdKQTrJcjN0dK0NknGvcRa4HhfzOtsthEH7eWtONFQ>
+    <xmx:QugNat90cmRSntFhphxoUhXn78eiEA_yq5VNO1np6BiZmUQI6kUYVw>
+    <xmx:QugNar9VQVV9Crz_mdTjuEL665Y3HC3jfH6afIH-rv2ZfQMjW6d6XLfr>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 33FD9780076; Wed, 20 May 2026 12:58:42 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-ThreadId: AuvJ25pICu_N
+Date: Wed, 20 May 2026 12:58:22 -0400
+From: "Chuck Lever" <cel@kernel.org>
+To: "Mark Brown" <broonie@kernel.org>
+Cc: "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-api@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net,
+ "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>,
+ "Namjae Jeon" <linkinjeon@kernel.org>,
+ "Sungjong Seo" <sj1557.seo@samsung.com>,
+ "Yuezhang Mo" <yuezhang.mo@sony.com>,
+ almaz.alexandrovich@paragon-software.com,
+ "Viacheslav Dubeyko" <slava@dubeyko.com>,
+ "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
+ frank.li@vivo.com, "Theodore Tso" <tytso@mit.edu>,
+ adilger.kernel@dilger.ca, "Carlos Maiolino" <cem@kernel.org>,
+ "Steve French" <sfrench@samba.org>, "Paulo Alcantara" <pc@manguebit.org>,
+ "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
+ "Shyam Prasad N" <sprasad@microsoft.com>,
+ "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>, "Jaegeuk Kim" <jaegeuk@kernel.org>,
+ "Chao Yu" <chao@kernel.org>, "Hans de Goede" <hansg@kernel.org>,
+ senozhatsky@chromium.org, "Chuck Lever" <chuck.lever@oracle.com>,
+ "Roland Mainz" <roland.mainz@nrubsig.org>
+Message-Id: <858d7233-1d9c-48f4-aa4f-c5a9f6e1f5dc@app.fastmail.com>
+In-Reply-To: <3a347b64-f91b-450f-b27d-26ea6810b960@sirena.org.uk>
+References: <20260507-case-sensitivity-v14-0-e62cc8200435@oracle.com>
+ <20260507-case-sensitivity-v14-3-e62cc8200435@oracle.com>
+ <dc69224d-9926-4414-8c6e-4c15ae98705b@sirena.org.uk>
+ <04302551-3628-4036-9a3f-596cb782f5b7@app.fastmail.com>
+ <a366645c-364d-4588-8a15-4cd446f64366@sirena.org.uk>
+ <8b750b3f-4d73-41f3-84fb-6e387fd24168@app.fastmail.com>
+ <3a347b64-f91b-450f-b27d-26ea6810b960@sirena.org.uk>
+Subject: Re: [PATCH v14 03/15] fat: Implement fileattr_get for case sensitivity
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-When client stops querying a directory for change notifications,
-it should send a cancel request to the server.
+On Wed, May 20, 2026, at 11:19 AM, Mark Brown wrote:
+> On Wed, May 20, 2026 at 11:12:51AM -0400, Chuck Lever wrote:
+>> On Wed, May 20, 2026, at 10:54 AM, Mark Brown wrote:
+>
+>> > It's not testing tmpfs (well, it does but that passed), as the log above
+>> > shows it is making a vfat filesystem on a loop device backed by a file
+>> > that happens to be in a tmpfs and then testing that.  There's a bunch of
+>> > filesystems covered in this manner:
+>
+>> OK. Is vfat the only failure in LTP statx04 ?
+>
+> Yes, it's the only one showing as failing - there are four failures
+> correspoding to the four tests done for vfat.
 
-After cancel notify succeeds, `status` returned by both
-`tevent_req_poll_ntstatus()` and `cli_notify_recv()` is
-`NT_STATUS_OK` rather than `NT_STATUS_CANCELLED`, so we
-can only check `sig_state.cancelled`.
+03/15 adds .fileattr_get = fat_fileattr_get for both
+fat_file_inode_operations and vfat_dir_inode_operations. LTP
+opens a directory (SAFE_OPEN(TESTDIR, O_RDONLY|O_DIRECTORY)),
+so FS_IOC_GETFLAGS on the dir now succeeds, and statx04
+proceeds where it was previously skipped.
 
-Suggested-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- source3/client/client.c | 53 ++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 50 insertions(+), 3 deletions(-)
+AFAICS, 03/15 did not change pre-existing kernel behavior of
+stx_attributes_mask on vfat. It merely converted a "skipped"
+LTP outcome into an "executed but failed" outcome.
 
-diff --git a/source3/client/client.c b/source3/client/client.c
-index 1d3656aab34..b474e0608cb 100644
---- a/source3/client/client.c
-+++ b/source3/client/client.c
-@@ -45,6 +45,7 @@
- #include "lib/cmdline/cmdline.h"
- #include "libcli/smb/reparse.h"
- #include "lib/param/param.h"
-+#include "lib/util/tevent_ntstatus.h"
- 
- #ifndef REGISTER
- #define REGISTER 0
-@@ -4653,12 +4654,39 @@ static int cmd_newer(TALLOC_CTX *mem_ctx)
-  Watch directory changes
- ****************************************************************************/
- 
-+struct notify_state {
-+	struct tevent_req *notify_req;
-+	bool cancelled;
-+};
-+
-+static void
-+notify_sig_int_handler(
-+	struct tevent_context *ev,
-+	struct tevent_signal *se,
-+	int signum,
-+	int count,
-+	void *siginfo,
-+	void *private_data)
-+{
-+	struct notify_state *state = (struct notify_state *)private_data;
-+
-+	if (state->notify_req)
-+		state->cancelled = tevent_req_cancel(state->notify_req);
-+}
-+
- static int cmd_notify(TALLOC_CTX *mem_ctx)
- {
- 	TALLOC_CTX *frame = talloc_stackframe();
- 	char *name, *buf;
- 	NTSTATUS status;
- 	uint16_t fnum;
-+	struct tevent_req *req;
-+	struct tevent_context *ev;
-+	struct tevent_signal *se;
-+	struct notify_state sig_state = {
-+		.notify_req = NULL,
-+		.cancelled = false,
-+	};
- 
- 	name = talloc_strdup(talloc_tos(), client_get_cur_dir());
- 	if (name == NULL) {
-@@ -4684,14 +4712,33 @@ static int cmd_notify(TALLOC_CTX *mem_ctx)
- 		goto fail;
- 	}
- 
-+	ev = samba_tevent_context_init(frame);
-+	if (!ev)
-+		goto fail;
-+
-+	se = tevent_add_signal(ev, frame, SIGINT, 0, notify_sig_int_handler, &sig_state);
-+	if (!se)
-+		goto fail;
-+
- 	while (1) {
- 		uint32_t i;
- 		uint32_t num_changes = 0;
- 		struct notify_change *changes = NULL;
- 
--		status = cli_notify(cli, fnum, 1000, FILE_NOTIFY_CHANGE_ALL,
--				    true,
--				    talloc_tos(), &num_changes, &changes);
-+		if (sig_state.cancelled) {
-+			printf("notify cancelled\n");
-+			goto fail;
-+		}
-+
-+		req = cli_notify_send(frame, ev, cli, fnum, 1000, FILE_NOTIFY_CHANGE_ALL, true);
-+		if (!req)
-+			goto fail;
-+		sig_state.notify_req = req;
-+
-+		if (!tevent_req_poll_ntstatus(req, ev, &status))
-+			goto fail;
-+
-+		status = cli_notify_recv(req, talloc_tos(), &num_changes, &changes);
- 		if (NT_STATUS_EQUAL(status, NT_STATUS_NOTIFY_ENUM_DIR)) {
- 			printf("NOTIFY_ENUM_DIR\n");
- 			status = NT_STATUS_OK;
+Fix options:
+
+* fat_getattr() could call generic_fill_statx_attr(inode, stat),
+  which advertises KSTAT_ATTR_VFS_FLAGS (IMMUTABLE + APPEND).
+  That clears 2 of 4 TFAILs but not COMPRESSED/NODUMP, which
+  FAT genuinely does not back.
+
+* Set stat->attributes_mask |= KSTAT_ATTR_FS_IOC_FLAGS in
+  fat_getattr(). Honest only to the extent that FAT now exposes
+  some FS_*_FL bits via fileattr. This would silence the test
+  failures, but advertises capabilities (COMPRESSED, NODUMP)
+  FAT doesn't track.
+
+* Admit the LTP statx04 test needs to be updated.
+  FS_IOC_GETFLAGS succeeding does not logically imply all four
+  FS_IOC_FLAGS-mapped STATX_ATTR_* bits are supported. The
+  test's gate is too coarse for filesystems that gained a
+  narrowly-scoped fileattr_get (just casefold/immutable). The
+  test's tag list pins it to filesystems that do support the
+  full set, but vfat was tacitly excluded by the prior ENOTTY.
+
+The first option is the narrowest kernel-side change, and
+matches what other minimal-fileattr filesystems do.
+
+
 -- 
-2.54.0
-
+Chuck Lever
