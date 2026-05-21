@@ -1,63 +1,63 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC443CBE75
-	for <linux-cifs@vger.kernel.org>; Thu, 21 May 2026 13:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B0E3DD87E
+	for <linux-cifs@vger.kernel.org>; Thu, 21 May 2026 13:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779371684; cv=none; b=Zu9c6s2VdwMMCPhsdsx273QDPdZFNCL/FfxIbqTB+7rE8pV5zUMk5+Xie52VPd+SoVilBb8ebRq4Dbq0O+ZdrRjNQ3mcaYRMg78oC8gXGMgBKpLFxXQ2CyqSiXuzuVHTl9BLQHupcbErO9TOiBKfFFLuSb1dQapa84TdGyl931k=
+	t=1779371687; cv=none; b=uKH8hpn1jZmcHgsTLW3pabpb4usn3t49VfQeLbt5CdaxR0X1yqwy2uV6oC/8kgoSHt5Ef0870dGkTXl1I3sqXZIbxi/da9AW4dShB6V9B/w3pd+rHa6B9O3CYp9byn7uZAfqNCXzV9YH2Ocg3hw08S0xBwXEpOPA3S4go61YCDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779371684; c=relaxed/simple;
-	bh=HPZNgfPv4NOwHRE+ejIrpad+UOQEhVdWYqPyCS8N2Xg=;
+	s=arc-20240116; t=1779371687; c=relaxed/simple;
+	bh=nYGXdwpc8GcUzVkXS9NXtV+mLT8i/xkjrbIQiskHE/U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PkXW300FOTQhQIn6toxRyqyaxc3EV7okOcN40xKcxq9riGZPgFfZTuo3k0SwEBJBGCrGcoaSHWyTVkNgw970lSjPKc9LMOOoaxw0YqDMq8KUhRMVTr6800HigFcD9PJDnqnbaBs/EdrSdGxO+CJ9Kcp1MjkdQn0864NCmVDdTEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YmotkIYw; arc=none smtp.client-ip=209.85.215.169
+	 MIME-Version; b=t4X0oQBlp6pM2zbzYGkVe7ACJGJChCVo9xy+9VFxQ6V4d2vUtwejq3uklzXcY6uwl+e71GAh4Yj7lGVzf/zxaudxbx5te688eCZw2D0JLiYUvUf9ejh48mc2kfH1yc+oFtxj9uVwtVPfJUzXhucvYxW7nQwkWQ4fiyjkIje0xB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ku8+6y+k; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YmotkIYw"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c736261ee8dso2857356a12.1
-        for <linux-cifs@vger.kernel.org>; Thu, 21 May 2026 06:54:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ku8+6y+k"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c80227c9572so2868377a12.2
+        for <linux-cifs@vger.kernel.org>; Thu, 21 May 2026 06:54:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779371682; x=1779976482; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779371686; x=1779976486; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rMMzrE02cBSizde/b8sQjJmuGF0rKjzqTNZ362Dbx5c=;
-        b=YmotkIYwjpU4FuqUOxWXwhq+YcJWyR0VOYWEWWsEZDyGi23pSnj5Xx8DkzH8DVSTIw
-         KL+qfTBRkOV/a5K6n+hYv+3zBMN299Mw7sYIJ7saYR7lQwCYLVA+nr3PfYthf7R6/Jap
-         gvs1Sts9COjoDF10YgxhluOpQbt4RVIKAYGK8Z2ZbW+InOKkIKCOfLSbQAFUOIsaanIB
-         0CDNIq9B+mBwoGe29y2oHp1cVvsbMouj7LfQbXkpe7l+QxRxwTIPFBtI1yJr7xfJUcgo
-         eLMPB3XDpKVhWQbQ+OWTnHFCnxvqZWlxxB2qE7lSnWjdbKSnsD6+M1d5cuiP/4vtDr9H
-         xr9Q==
+        bh=qW+lr0hx7HYrcP+8C0V2LOEx2Ctr7Xu1/3AsyXMtBps=;
+        b=Ku8+6y+kvlwX3O3XbnT9AVWNE5P0kDAASJ7J3w9ZOjADVgGxYf2D8guw2HRLDrcKRd
+         oq3rHyUeEPw/Fp9YmEImdPH5ocBzqoSmRpbxTA8hj4RXZPu3c4RSTmDRp7TZ1NrAnaqO
+         FF9EsUlCcnKXSWsYjBv2SucR0WUWURcIPUC4MSK6BpAlC+uGdRocI8z23KLWNTCn+SOE
+         AdHXdHlAGHgkTlqDAXguE/i6Bx5qMTyP9yPFO9kxiR+cWvRilRDRnwve1o8S89ZQD+AD
+         p+yJbUaV5eLBbBINZk/hsvdIJuyiyFiJYQ1LWuGxTSiRq6yuUBRx4rKMxK9jm61cNTcv
+         otgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779371682; x=1779976482;
+        d=1e100.net; s=20251104; t=1779371686; x=1779976486;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=rMMzrE02cBSizde/b8sQjJmuGF0rKjzqTNZ362Dbx5c=;
-        b=fpUGqtvy0ns+/TFG8UoxmlVL3pzQriRI2AAuK/QyULgaX2Z4UrT7dsvBoJJmJU7gYN
-         Q8k2HzxZsVSZOS0CoObM5p8Lp1qDFMj8y4ChdxGy23PcbdgNfybpCRg+zxX92x00Ww7X
-         GASqjBvl+9+3AaHUVuvAPyJaT1GHjq8psVQB1umn2CI2eS04GEP0GRoj0EDILs1Zk+bf
-         w5grssDN9JxqB4e9IDInzIEqncb7iGdcaPPeOML2Md9QKM4LBNcpyYtb+BfwVxP1F697
-         CZ6amuMbE7RWUHpzEe8lP0YrJIKluS80VOWvkFcS+I5ekulY/JNFOQBpvkVAoXesM8p3
-         ACTQ==
-X-Gm-Message-State: AOJu0Yz8iRqxJccGZ5CqNLeOrtojL/Q19ptHy6o3FO600QhMZw+skphw
-	bFStOU/TBcRl41OvERiyeS79lR8wq3uwVLhzKQfEa2q5lyeU7AHWdlRH
-X-Gm-Gg: Acq92OEyUjhq/VmE60FCkmXq0RO+G/TOwvhDynF4kFhkdGL94yyGOjJxyvKRj+4Ap4/
-	RAMEbaabeVIYPq4s2h5cMH6EH56CaaUIGKYSJWxpMt2qTuRYvCNAUonAFs6nrqs8izxdxVvpziN
-	SElRFoRyLeciGkkQV5YABvEMjj+WSuN1o1jgHyWNDWmy/4aygJ7Q9FXXkIMjy97EK1FAnLt/lfP
-	RREeqQipgYK70Eytcm48JhTSBZnYsoXjebkET/5Ay5gdAMrlS1cmY2M69xtdIc7rNS07NCLTYnP
-	O1mbT4CmqGrLELF9JwoM+eVzym+rPYlBu12850rLfOhx5sX7HDcCXXv5SQDIAt8YerOjPNmolnu
-	5xoj71EOE69Lp34/stcr1xTVarPBYaeScz6YJ541FdmvF87UNy06abeQFbQHioPb7MrNdJaAS5n
-	6VkCHvIvsoiJRyZe+5dq2caOQOj3PHmfwj5pohS+Muvk7tuPHC4R2Vf/8AhUn+HBMGUB/Yjy6hO
-	bRjST4IYzpz9CBm60yU5KTM8xhAA3vFkg==
-X-Received: by 2002:a05:6a20:9195:b0:3aa:f9cb:d438 with SMTP id adf61e73a8af0-3b3085d23e3mr3772719637.21.1779371682199;
-        Thu, 21 May 2026 06:54:42 -0700 (PDT)
+        bh=qW+lr0hx7HYrcP+8C0V2LOEx2Ctr7Xu1/3AsyXMtBps=;
+        b=a1kBEQX5fq/PlY3GGsqi16ULF8wjEUpvJU5/vLeiRdULF0xBmHbduGIGnaP77qXIvY
+         PTW/lp+Re5B1kamLLRmJMe3wOZsLPj/dp/+qslY2J7onBYlgU7rj1cD7rqcURpgy0c4s
+         EADCpRAn/xhYhaetW5GCdJUb03KWJplEQaVXLPJDYUdXJ0C/DLQB9TubXQRIL/bcG63Q
+         j1mSsCN9DwtFq+kzSTFHQtGpaAS+jTC3rDpBhBH9zquYmNncmq0/8wtSNuHGAYm+40ej
+         HQoZS+R4QlHwfegPBhlrXB7ErlX8LQxEhdRJBMlnlWWT/utnTSh2in1nyaNqj6t1voDI
+         2w4g==
+X-Gm-Message-State: AOJu0YxxGr6TPpgNXDLTWoIItpwJSgTrCCTI6ayjg9zpt/pPYG5lgFtc
+	BE26XoJl7raTEc9LtB9FtP/ToIVs9hH3iaT1M+OqnyJvBK1kSUHjr9jj
+X-Gm-Gg: Acq92OEzqDveuXX6WuaJ1++WIPNlmXjIZ9SVE5tCG829t90RExKVLGJ0Vt0kocQy/MQ
+	rs+DxK5GIuzB4Khl+LnOl944z2ZCYi0I0j9edlb1yYrQZakyqyKalWiSiKwg/cqZSLdBK363NbN
+	4BWleI4FXkBGt0mKd3z0+WpRTjPAGgUZG+SSXx3FtFlbGqT+HsDZxbRCSbxQBUORxq8bGsnkwX0
+	yhYdQJXHg4oqKePClnm1q07jD7ARlKVBa9FkNPzGDImDdDbV91sExbwHlPyZnlX9fSASeIklSxX
+	WpVimROTqnu9x2be1LW3Ug7+5zdivEBgGxX/dM89Rp29dKjRkgyr2ax6buAGvx2lpksBV0jTFni
+	TIyL1gnLgM9U4h7gJPK+ZZHVP0bnoXsz2D2cI7e7m62okgKheyoBE/1XnwPSDif5mhB6wI5iTy9
+	wMVvz2S1Jg1GPUMwofQ3F+B9OOtyp1E2qxImjJqJob9B5ECzOy5OFy9S6LXx3tJAsCK4A2gTQR1
+	TDc/h7fxykx01jQ/B80k7ppvyiohNBZJQ==
+X-Received: by 2002:a05:6300:210a:b0:39c:4af6:4309 with SMTP id adf61e73a8af0-3b308586320mr3614844637.12.1779371685696;
+        Thu, 21 May 2026 06:54:45 -0700 (PDT)
 Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85197c72b3sm455378a12.4.2026.05.21.06.54.39
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85197c72b3sm455378a12.4.2026.05.21.06.54.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 06:54:41 -0700 (PDT)
+        Thu, 21 May 2026 06:54:45 -0700 (PDT)
 From: rajasimandalos@gmail.com
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.org>,
@@ -69,9 +69,9 @@ To: Steve French <sfrench@samba.org>,
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Rajasi Mandal <rajasimandal@microsoft.com>
-Subject: [PATCH v3 1/9] smb: client: sync runtime state into ctx on reconfigure
-Date: Thu, 21 May 2026 13:54:07 +0000
-Message-ID: <5eeeecdba9a2ab93074b5fbac505b83f35aac18f.1779371115.git.rajasimandal@microsoft.com>
+Subject: [PATCH v3 2/9] smb: client: block non-reconfigurable option changes on remount
+Date: Thu, 21 May 2026 13:54:08 +0000
+Message-ID: <2421f42fd19e97a595262946def5131aa1ed1ed7.1779371115.git.rajasimandal@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1779371115.git.rajasimandal@microsoft.com>
 References: <cover.1779371115.git.rajasimandal@microsoft.com>
@@ -85,281 +85,174 @@ Content-Transfer-Encoding: 8bit
 
 From: Rajasi Mandal <rajasimandal@microsoft.com>
 
-smb3_init_fs_context() builds a fresh context with init defaults on
-every call, including reconfigure (remount).  Many fields displayed
-by cifs_show_options() are sourced from tcon/server/ses rather than
-from ctx, so the init defaults do not reflect the live mount and
-cannot be used as a baseline for comparing new vs old options on
-remount.
+Several mount options (seal, sign, vers, ip, rdma, nosharesock,
+persistent/resilient handles, etc.) require tearing down the
+connection to take effect, but smb3_verify_reconfigure_ctx() does
+not reject them.  A remount that changes any of these silently
+ignores the new value, confusing users.
 
-Detect FS_CONTEXT_FOR_RECONFIGURE in smb3_init_fs_context() and
-duplicate the existing cifs_sb->ctx instead.  Before duplicating,
-sync ctx with runtime state via a new helper
-smb3_sync_ctx_from_runtime() so the baseline matches what
-cifs_show_options() displays.  Add srv_lock / tc_lock around the
-relevant runtime writers (SMB2_negotiate, SMB2_tcon,
-reset_cifs_unix_caps, cifs_swn_set_server_dstaddr) so the helper
-can read them without torn-read races.
+Now that smb3_init_fs_context() duplicates the live context (with
+runtime state synced in) on reconfigure, simple != checks in
+smb3_verify_reconfigure_ctx() are sound -- a difference between
+new_ctx and old_ctx represents a real, intentional change by the
+user rather than a spurious mismatch against init defaults.
 
-Also preserve inherited multichannel/max_channels values in
-smb3_handle_conflicting_options() during reconfigure when neither
-option is explicitly specified, since the dup'd context already
-carries them.
-
-This is preparatory plumbing for a subsequent commit that compares
-new_ctx against old_ctx in smb3_verify_reconfigure_ctx() to reject
-non-reconfigurable option changes.
+Add comprehensive checks for connection-tied options with clear
+error messages so the user sees why the remount failed.
 
 Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
 ---
- fs/smb/client/cifs_swn.h   |  14 ++++-
- fs/smb/client/fs_context.c | 117 ++++++++++++++++++++++++++++++++++++-
- fs/smb/client/smb1ops.c    |   7 ++-
- fs/smb/client/smb2pdu.c    |  11 +++-
- 4 files changed, 143 insertions(+), 6 deletions(-)
+ fs/smb/client/fs_context.c | 137 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 137 insertions(+)
 
-diff --git a/fs/smb/client/cifs_swn.h b/fs/smb/client/cifs_swn.h
-index 955d07b69450..caf0779d4d07 100644
---- a/fs/smb/client/cifs_swn.h
-+++ b/fs/smb/client/cifs_swn.h
-@@ -26,11 +26,21 @@ void cifs_swn_check(void);
- 
- static inline bool cifs_swn_set_server_dstaddr(struct TCP_Server_Info *server)
- {
-+	bool ret = false;
-+
-+	/*
-+	 * srv_lock serializes the 128-byte sockaddr_storage write against
-+	 * concurrent readers (e.g. cifs_show_address(), reconn_set_ipaddr_
-+	 * from_hostname() snapshot, smb3_sync_ctx_from_runtime()) and other
-+	 * writers like cifs_chan_update_iface() which already use srv_lock.
-+	 */
-+	spin_lock(&server->srv_lock);
- 	if (server->use_swn_dstaddr) {
- 		server->dstaddr = server->swn_dstaddr;
--		return true;
-+		ret = true;
- 	}
--	return false;
-+	spin_unlock(&server->srv_lock);
-+	return ret;
- }
- 
- static inline void cifs_swn_reset_server_dstaddr(struct TCP_Server_Info *server)
 diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 2f86158f85d7..b93d6ef13463 100644
+index b93d6ef13463..0677aad237e8 100644
 --- a/fs/smb/client/fs_context.c
 +++ b/fs/smb/client/fs_context.c
-@@ -717,13 +717,13 @@ static int smb3_handle_conflicting_options(struct fs_context *fc)
- 				ctx->multichannel = true;
- 			else
- 				ctx->multichannel = false;
--		} else {
-+		} else if (fc->purpose != FS_CONTEXT_FOR_RECONFIGURE) {
- 			ctx->multichannel = false;
- 			ctx->max_channels = 1;
- 		}
-+		/* For reconfigure with neither specified, keep inherited values */
+@@ -1069,6 +1069,143 @@ static int smb3_verify_reconfigure_ctx(struct fs_context *fc,
+ 		cifs_errorf(fc, "can not change nbsessinit during remount\n");
+ 		return -EINVAL;
  	}
++	if (new_ctx->compress != old_ctx->compress) {
++		cifs_errorf(fc, "can not change compress during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->noblocksnd != old_ctx->noblocksnd) {
++		cifs_errorf(fc, "can not change noblocksend during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->noautotune != old_ctx->noautotune) {
++		cifs_errorf(fc, "can not change noautotune during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->no_sparse != old_ctx->no_sparse) {
++		cifs_errorf(fc, "can not change nosparse during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->nodelete != old_ctx->nodelete) {
++		cifs_errorf(fc, "can not change nodelete during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->cruid_specified &&
++	    !uid_eq(new_ctx->cred_uid, old_ctx->cred_uid)) {
++		cifs_errorf(fc, "can not change cruid during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->port != old_ctx->port) {
++		cifs_errorf(fc, "can not change port during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->min_offload != old_ctx->min_offload) {
++		cifs_errorf(fc, "can not change min_enc_offload during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->snapshot_time != old_ctx->snapshot_time) {
++		cifs_errorf(fc, "can not change snapshot during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->max_credits != old_ctx->max_credits) {
++		cifs_errorf(fc, "can not change max_credits during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->handle_timeout != old_ctx->handle_timeout) {
++		cifs_errorf(fc, "can not change handletimeout during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->got_ip &&
++	    !cifs_match_ipaddr((struct sockaddr *)&new_ctx->dstaddr,
++			       (struct sockaddr *)&old_ctx->dstaddr)) {
++		cifs_errorf(fc, "can not change ip during remount\n");
++		return -EINVAL;
++	}
++	if (((struct sockaddr *)&new_ctx->srcaddr)->sa_family != AF_UNSPEC &&
++	    memcmp(&new_ctx->srcaddr, &old_ctx->srcaddr, sizeof(new_ctx->srcaddr))) {
++		cifs_errorf(fc, "can not change srcaddr during remount\n");
++		return -EINVAL;
++	}
++	if (memcmp(new_ctx->source_rfc1001_name, old_ctx->source_rfc1001_name,
++		   RFC1001_NAME_LEN)) {
++		cifs_errorf(fc, "can not change netbiosname during remount\n");
++		return -EINVAL;
++	}
++	if (memcmp(new_ctx->target_rfc1001_name, old_ctx->target_rfc1001_name,
++		   RFC1001_NAME_LEN)) {
++		cifs_errorf(fc, "can not change servern during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->got_version &&
++	    (new_ctx->ops != old_ctx->ops || new_ctx->vals != old_ctx->vals)) {
++		cifs_errorf(fc, "can not change vers during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->witness != old_ctx->witness) {
++		cifs_errorf(fc, "can not change witness during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->rootfs != old_ctx->rootfs) {
++		cifs_errorf(fc, "can not change rootfs during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->linux_ext != old_ctx->linux_ext ||
++	    new_ctx->no_linux_ext != old_ctx->no_linux_ext) {
++		cifs_errorf(fc, "can not change unix during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->nocase != old_ctx->nocase) {
++		cifs_errorf(fc, "can not change nocase during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->intr != old_ctx->intr) {
++		cifs_errorf(fc, "can not change intr during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->no_psx_acl != old_ctx->no_psx_acl) {
++		cifs_errorf(fc, "can not change acl during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->local_lease != old_ctx->local_lease) {
++		cifs_errorf(fc, "can not change locallease during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->sign != old_ctx->sign) {
++		cifs_errorf(fc, "can not change sign during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->ignore_signature != old_ctx->ignore_signature) {
++		cifs_errorf(fc, "can not change ignore_signature during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->seal != old_ctx->seal) {
++		cifs_errorf(fc, "can not change seal during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->nosharesock != old_ctx->nosharesock) {
++		cifs_errorf(fc, "can not change nosharesock during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->persistent != old_ctx->persistent ||
++	    new_ctx->nopersistent != old_ctx->nopersistent) {
++		cifs_errorf(fc, "can not change persistenthandles during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->resilient != old_ctx->resilient) {
++		cifs_errorf(fc, "can not change resilienthandles during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->sockopt_tcp_nodelay != old_ctx->sockopt_tcp_nodelay) {
++		cifs_errorf(fc, "can not change tcpnodelay during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->domainauto != old_ctx->domainauto) {
++		cifs_errorf(fc, "can not change domainauto during remount\n");
++		return -EINVAL;
++	}
++	if (new_ctx->rdma != old_ctx->rdma) {
++		cifs_errorf(fc, "can not change rdma during remount\n");
++		return -EINVAL;
++	}
  
--	//resetting default values as remount doesn't initialize fs_context again
- 	ctx->multichannel_specified = false;
- 	ctx->max_channels_specified = false;
- 
-@@ -921,6 +921,85 @@ static void smb3_fs_context_free(struct fs_context *fc)
- 	smb3_cleanup_fs_context(ctx);
+ 	return 0;
  }
- 
-+/*
-+ * Sync cifs_sb->ctx with the runtime state visible through /proc/mounts.
-+ * cifs_show_options() reads many fields from tcon/server/ses rather than
-+ * from ctx.  On remount, libmount reads /proc/mounts and feeds those
-+ * values back as mount options.  To avoid false mismatches between the
-+ * old ctx and the newly parsed options, we must ensure ctx reflects
-+ * the current runtime state before it is duplicated into the new
-+ * remount context.
-+ *
-+ * Note: sb->s_umount is not yet held when VFS calls init_fs_context()
-+ * for reconfigure, so in theory concurrent I/O paths could read
-+ * cifs_sb->ctx fields (e.g. cifs_symlink_type()) while we write them.
-+ * This is safe because all fields written here are word-sized
-+ * (bool/int/pointer), so stores are architecturally atomic.  The same
-+ * unsynchronized-read pattern already exists in cifs_show_options().
-+ */
-+static void smb3_sync_ctx_from_runtime(struct cifs_sb_info *cifs_sb)
-+{
-+	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-+	struct TCP_Server_Info *server = tcon->ses->server;
-+	struct cifs_ses *ses = tcon->ses;
-+	struct smb3_fs_context *ctx = cifs_sb->ctx;
-+	const char *domain;
-+	int unicode;
-+
-+	/*
-+	 * Server fields that can drift from ctx after mount:
-+	 *  - ops/vals: dialect renegotiation during reconnect (paired,
-+	 *    so read under srv_lock to match the writer in SMB2_negotiate)
-+	 *  - dstaddr: SWN witness failover updates server->dstaddr; the
-+	 *    128-byte sockaddr_storage is not atomic, so srv_lock is
-+	 *    required against torn reads
-+	 *  - nosharesock: can be flipped to true post-mount by SMB2_tcon
-+	 *    on STATUS_BAD_NETWORK_NAME with ISOLATED_TRANSPORT, so read
-+	 *    under srv_lock to pair with that writer
-+	 */
-+	spin_lock(&server->srv_lock);
-+	ctx->ops = server->ops;
-+	ctx->vals = server->vals;
-+	ctx->dstaddr = server->dstaddr;
-+	ctx->nosharesock = server->nosharesock;
-+	spin_unlock(&server->srv_lock);
-+
-+	/*
-+	 * tcon->unix_ext can be flipped post-mount by reset_cifs_unix_caps()
-+	 * on SMB1 reconnect (smb1_reconnect path). Read under tc_lock to pair
-+	 * with that writer. tcon->posix_extensions is only ever set at
-+	 * mount-time pre-publish, but read it under the same lock so the
-+	 * derived linux_ext/no_linux_ext pair is consistent.
-+	 */
-+	spin_lock(&tcon->tc_lock);
-+	if (tcon->posix_extensions || tcon->unix_ext) {
-+		ctx->linux_ext = 1;
-+		ctx->no_linux_ext = 0;
-+	} else {
-+		ctx->linux_ext = 0;
-+		ctx->no_linux_ext = 1;
-+	}
-+	spin_unlock(&tcon->tc_lock);
-+	ctx->seal	  = tcon->seal;
-+	ctx->persistent	  = tcon->use_persistent;
-+	ctx->nopersistent = !tcon->use_persistent;
-+	ctx->resilient	  = tcon->use_resilient;
-+	ctx->witness	  = tcon->use_witness;
-+
-+	/*
-+	 * Session fields: domainName and unicode are effectively
-+	 * write-once (set during session setup, never freed/replaced
-+	 * while the session exists), so plain reads are safe.
-+	 */
-+	domain = ses->domainName;
-+	unicode = ses->unicode;
-+
-+	if (domain && !ctx->domainname)
-+		ctx->domainname = kstrdup(domain, GFP_KERNEL);
-+	if (unicode >= 0)
-+		ctx->unicode = unicode;
-+}
-+
- /*
-  * Compare the old and new proposed context during reconfigure
-  * and check if the changes are compatible.
-@@ -1958,6 +2037,40 @@ int smb3_init_fs_context(struct fs_context *fc)
- 	char *nodename = utsname()->nodename;
- 	int i;
- 
-+	/*
-+	 * For reconfigure (remount), duplicate the existing mount context
-+	 * instead of building one from scratch with init defaults.
-+	 *
-+	 * VFS sets fc->root before calling init_fs_context for reconfigure,
-+	 * so we can access the existing superblock's context.  We first sync
-+	 * cifs_sb->ctx with runtime state (tcon/server/ses) so that ctx
-+	 * matches what cifs_show_options() displays.  Then we dup old_ctx
-+	 * into new_ctx.  The parser will overwrite only the options
-+	 * explicitly passed on remount, so any difference between new_ctx
-+	 * and old_ctx in smb3_verify_reconfigure_ctx() represents a real,
-+	 * intentional change by the user.
-+	 */
-+	if (fc->purpose == FS_CONTEXT_FOR_RECONFIGURE) {
-+		struct cifs_sb_info *cifs_sb = CIFS_SB(fc->root->d_sb);
-+		int rc;
-+
-+		smb3_sync_ctx_from_runtime(cifs_sb);
-+
-+		ctx = kzalloc_obj(struct smb3_fs_context);
-+		if (!ctx)
-+			return -ENOMEM;
-+
-+		rc = smb3_fs_context_dup(ctx, cifs_sb->ctx);
-+		if (rc) {
-+			kfree(ctx);
-+			return rc;
-+		}
-+
-+		fc->fs_private = ctx;
-+		fc->ops = &smb3_fs_context_ops;
-+		return 0;
-+	}
-+
- 	ctx = kzalloc_obj(struct smb3_fs_context);
- 	if (unlikely(!ctx))
- 		return -ENOMEM;
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index e198e3dda917..a91539d7f0ba 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -36,11 +36,16 @@ void reset_cifs_unix_caps(unsigned int xid, struct cifs_tcon *tcon,
- 
- 	if (ctx && ctx->no_linux_ext) {
- 		tcon->fsUnixInfo.Capability = 0;
-+		spin_lock(&tcon->tc_lock);
- 		tcon->unix_ext = 0; /* Unix Extensions disabled */
-+		spin_unlock(&tcon->tc_lock);
- 		cifs_dbg(FYI, "Linux protocol extensions disabled\n");
- 		return;
--	} else if (ctx)
-+	} else if (ctx) {
-+		spin_lock(&tcon->tc_lock);
- 		tcon->unix_ext = 1; /* Unix Extensions supported */
-+		spin_unlock(&tcon->tc_lock);
-+	}
- 
- 	if (!tcon->unix_ext) {
- 		cifs_dbg(FYI, "Unix extensions disabled so not set on reconnect\n");
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 995fcdd30681..9e07c1a99981 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -1189,8 +1189,10 @@ SMB2_negotiate(const unsigned int xid,
- 			goto neg_exit;
- 		case SMB311_PROT_ID:
- 			/* ops set to 3.0 by default for default so update */
-+			spin_lock(&server->srv_lock);
- 			server->ops = &smb311_operations;
- 			server->vals = &smb311_values;
-+			spin_unlock(&server->srv_lock);
- 			break;
- 		default:
- 			break;
-@@ -1205,12 +1207,16 @@ SMB2_negotiate(const unsigned int xid,
- 			goto neg_exit;
- 		case SMB21_PROT_ID:
- 			/* ops set to 3.0 by default for default so update */
-+			spin_lock(&server->srv_lock);
- 			server->ops = &smb21_operations;
- 			server->vals = &smb21_values;
-+			spin_unlock(&server->srv_lock);
- 			break;
- 		case SMB311_PROT_ID:
-+			spin_lock(&server->srv_lock);
- 			server->ops = &smb311_operations;
- 			server->vals = &smb311_values;
-+			spin_unlock(&server->srv_lock);
- 			break;
- 		default:
- 			break;
-@@ -2228,8 +2234,11 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
- 	if (server->ops->validate_negotiate)
- 		rc = server->ops->validate_negotiate(xid, tcon);
- 	if (rc == 0) /* See MS-SMB2 2.2.10 and 3.2.5.5 */
--		if (tcon->share_flags & SMB2_SHAREFLAG_ISOLATED_TRANSPORT)
-+		if (tcon->share_flags & SMB2_SHAREFLAG_ISOLATED_TRANSPORT) {
-+			spin_lock(&server->srv_lock);
- 			server->nosharesock = true;
-+			spin_unlock(&server->srv_lock);
-+		}
- tcon_exit:
- 
- 	free_rsp_buf(resp_buftype, rsp);
 -- 
 2.43.0
 
