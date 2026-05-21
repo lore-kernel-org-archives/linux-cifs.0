@@ -1,88 +1,89 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE9130567F
-	for <linux-cifs@vger.kernel.org>; Thu, 21 May 2026 07:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877053859FA;
+	Thu, 21 May 2026 10:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779349601; cv=none; b=uXV05EfvuhYFB7rrW6nBuG2pjPXoamrp8ERrib3R3bI/C+3Hug77E7mONGZr27Rz96EOt1tGgVHw3SZQMqUTKzugw2qz+mkPV0I+TMjQhAbHhUbDHHgpfuyQVkYLowROxTAcjvA1KZdA17DmidDuL3wLkknbb+HSCxX7yh9USvM=
+	t=1779360849; cv=none; b=AiwPHxNfR/8E5vElKjlBZ+GtAytjkb01jMwdufSnxogVZBeepLEtATAMLG/jfuCVp7aPVUjZQikAk/t6jgrFqz4c85kMnJ37P7yPwbPqmT4L+2Uc8uT8cVMfX0cviwFkvmrlAAlw4qnwWvH5/r7g3jM3Ql4EZ8UOUKVgk9Tl1Rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779349601; c=relaxed/simple;
-	bh=kkAlJmtFCVSGO7EYw9N8XdmqkovW6LfCwRjZma3/HhQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CNDJFj1nip3flBRVQMUrjk5sUUVhSh0I09jbBLDb/mLNyEyqTAdR9aN8rAmWmKvvKC3HZGCaMBfsoHtPuP8kx1SdypF5Z9xgcB3HU8QKeV9bI0dyS71WdylJZU9u7iw9TpADx6EJkywGx4j1L3TLmqW+pnYIKS7IsGq1aSYLzNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=gxYKWCPI; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1779360849; c=relaxed/simple;
+	bh=tMnuYwHgo7w7gPx8laBi+vh4biK3BacbRE3N0c3HULA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=axyV6XOy9rnkopkiUzgQlJzH80gVIDis2YjiL0TxlZ1Qp4eHJW1LIkHtHJryI8ClKe3bnE3Cz3unmbpFCQHkLT/Pdga2LsI2dusfEBreHSGtAr5Ei3dDbuFilLNoud3ks+MyKqltDJJcq+n141622JrR513e4K86hYo44V33nfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8rOS1cG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="gxYKWCPI"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=6sNVoSJfDQw5vwBAftN5erjx4xjoSYtdrO1eUZva3mg=; b=gxYKWCPIQUzv1OTR6P6LLz5H0l
-	BKQBl4wZXzumjkfTJpkCli9zyDRlxqCwUew26pH/YuIKjjRv6eD7Jtv8cm55Lhuv91M3JKJGoLD5A
-	OWWWxVfXjPwokDic084ONOBTKMxYs0e+yesdxIUqkYdEbWljX2glRmuSUJQcr72T9ODtjqG2rdbok
-	jT5qt6+v59qOJ9ehOC22cNw7toByRMSsukuFnD1QD9mArIH3m4lXaxmnsyUvzFLVedd/7g8j9dEqh
-	bfjEZ66ma9Yrakn/Vzc7vRLLuESQGsmcOOxnmZ3Xkq8Pl0vIoRMzAjzwo55eOhk0m25mU/HpbIWoP
-	i0tvj773WouCk8DivU8251nduUH3Wgl8RPyD0v0GH17LbvabKqqJt7yb6NPTvZUiWL7J9c9eyUSa7
-	ZTUYLESaT5nbNqlHX3ffF+1N+ZNiMf4lD3ZXyid34fCtjA4CFUL9Sz02JMmaxLKFIvzcEyI0XK2E+
-	xnrss6Od5vbuVRMROIB2r4Or;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wPy72-0000000Ac8L-3rfC;
-	Thu, 21 May 2026 07:46:37 +0000
-Message-ID: <bd3a60e6-1af0-4780-a797-3b31abc0034e@samba.org>
-Date: Thu, 21 May 2026 09:46:35 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8rOS1cG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 284D11F000E9;
+	Thu, 21 May 2026 10:53:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779360848;
+	bh=hReAb/JnSiPheNetMpN9KuPDi9ArATr3SUITGa4P4hY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=A8rOS1cGqyEFWheeZg7Gevs8sfK5NeBIFPOWaiaMtEpuax0stwjgnfBRYXfe42fw+
+	 PkNdqWpTczhnsT+5zzafbfYYvZnE4lsb8LCl3MbH4SiEBUzeWbsTW/TwyEUH0EIWI7
+	 rXjTEEae4IQY/alXlNlwPRciBuM89DudZ/0g8hE6byUVFb4DnQ8vNmVB3OHZAvQaOL
+	 XbhBeyiBJWf6wy9ijtvnhwfR525PNDcFDIE5KN6Tbtkp0Pynq0S6/Wx6IaNQC4z55O
+	 nUvMijOU4uSW0CyHmDv2UcBnjr0lOBq1iiL/FkAZ6Ns5OmsYyneoVPjm5n+3fraI/R
+	 kde4w0nv6lkqw==
+Date: Thu, 21 May 2026 12:53:56 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: linux-fsdevel@vger.kernel.org, 
+	Dorjoy Chowdhury <dorjoychy111@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, linux-nfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, v9fs@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	viro@zeniv.linux.org.uk, jack@suse.cz, jlayton@kernel.org, chuck.lever@oracle.com, 
+	alex.aring@gmail.com, arnd@arndb.de, adilger@dilger.ca, mjguzik@gmail.com, 
+	smfrench@gmail.com, richard.henderson@linaro.org, mattst88@gmail.com, 
+	linmag7@gmail.com, tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com, 
+	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com, 
+	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, trondmy@kernel.org, 
+	anna@kernel.org, sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, shuah@kernel.org, 
+	miklos@szeredi.hu, hansg@kernel.org
+Subject: Re: [PATCH v6 0/4] OPENAT2_REGULAR flag support for openat2
+Message-ID: <20260521-grube-leitfaden-0e5420c9bedc@brauner>
+References: <20260328172314.45807-1-dorjoychy111@gmail.com>
+ <20260416-abgraben-seeweg-a44ce660957f@brauner>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] smb: smbdirect: divide, not multiply, milliseconds by
- 1000
-To: Namjae Jeon <linkinjeon@kernel.org>,
- "Alexander A. Klimov" <grandmaster@al2klimov.de>
-Cc: Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
- samba-technical@lists.samba.org,
- "linux-kernel@vger.kernel.org (open list)" <linux-cifs@vger.kernel.org>
-References: <20260520180401.539215-1-grandmaster@al2klimov.de>
- <20260520180401.539215-2-grandmaster@al2klimov.de>
- <CAKYAXd-GeH2o6a_rHs-CiPR5N=CZMDOP17Xc9Ry998kMqTVQsA@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAKYAXd-GeH2o6a_rHs-CiPR5N=CZMDOP17Xc9Ry998kMqTVQsA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260416-abgraben-seeweg-a44ce660957f@brauner>
 
-Am 21.05.26 um 07:41 schrieb Namjae Jeon:
->> diff --git a/fs/smb/smbdirect/debug.c b/fs/smb/smbdirect/debug.c
->> index 05ba7c8d165e..3445843445bf 100644
->> --- a/fs/smb/smbdirect/debug.c
->> +++ b/fs/smb/smbdirect/debug.c
->> @@ -40,7 +40,7 @@ void smbdirect_connection_legacy_debug_proc_show(struct smbdirect_socket *sc,
->>
->>          seq_puts(m, "\n");
->>          seq_printf(m, "Conn keep_alive_interval: %u ",
->             seq_printf(m, "Conn keep_alive_interval: %u sec ",
+On Thu, Apr 16, 2026 at 03:07:12PM +0200, Christian Brauner wrote:
+> On Sat, 28 Mar 2026 23:22:21 +0600, Dorjoy Chowdhury wrote:
+> > I came upon this "Ability to only open regular files" uapi feature suggestion
+> > from https://uapi-group.org/kernel-features/#ability-to-only-open-regular-files
+> > and thought it would be something I could do as a first patch and get to
+> > know the kernel code a bit better.
+> > 
+> > The following filesystems have been tested by building and booting the kernel
+> > x86 bzImage in a Fedora 43 VM in QEMU. I have tested with OPENAT2_REGULAR that
+> > regular files can be successfully opened and non-regular files (directory, fifo etc)
+> > return -EFTYPE.
+> > - btrfs
+> > - NFS (loopback)
+> > - SMB (loopback)
+> > 
+> > [...]
 > 
-> It would be nice to explicitly show the unit so readers don't have to
-> guess whether it's seconds or milliseconds ?
->> -                  sp->keepalive_interval_msec * 1000);
->> +                  sp->keepalive_interval_msec / 1000);
+> - I've added an explanation why OPENAT2_REGULAR is only needed for some
+>   ->atomic_open() implementers but not others. What I don't like is that
+>   we need all that custom handling in there but it's managable.
+> 
+> - I dropped the topmost style conversions. They really don't belong
+>   there and if we switch to something better we should use (1 << <nr>).
+> 
+> - I split the EFTYPE errno introduction into a separate patch.
 
-This all comes from keeping the output of
-smbdirect_connection_legacy_debug_proc_show() stable
-as it's user visible.
-
-If we can change it anyway, I'd just output thet msec value.
-
->>          seq_printf(m, "max_readwrite_size: %u rdma_readwrite_threshold: %u",
->>                     sp->max_read_write_size,
->>                     rdma_readwrite_threshold);
->> --
->> 2.54.0
->>
->>
-
+So I've massaged this series a bit in that I moved OPENAT2_REGULAR into
+the upper 64-bit and internally use a __O_REGULAR bit. After having
+thought about it makes a lot more sense to move the openat2() only
+features into the upper 32-bit for the uapi space. I also ported the
+selftests to the TEST* framework to fit with Aleksa's recent rework.
