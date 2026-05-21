@@ -1,89 +1,51 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877053859FA;
-	Thu, 21 May 2026 10:54:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472343D905B
+	for <linux-cifs@vger.kernel.org>; Thu, 21 May 2026 13:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779360849; cv=none; b=AiwPHxNfR/8E5vElKjlBZ+GtAytjkb01jMwdufSnxogVZBeepLEtATAMLG/jfuCVp7aPVUjZQikAk/t6jgrFqz4c85kMnJ37P7yPwbPqmT4L+2Uc8uT8cVMfX0cviwFkvmrlAAlw4qnwWvH5/r7g3jM3Ql4EZ8UOUKVgk9Tl1Rk=
+	t=1779369824; cv=none; b=rR+4SxQLVVSYNqVgS93lADML9w552NiZSjOmJpqZx+va8hKxe1qudCoqoxSvN+7P9cV9CyoAFJo9iZ/j32W2B712KuLT7lcq6exqt8ccyMKaz/meVHoZ8ZdytmDw+niw2IiqgSo/JIGgTMXCnjmYgdQbORoaijO1C5oHqJ3d/Zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779360849; c=relaxed/simple;
-	bh=tMnuYwHgo7w7gPx8laBi+vh4biK3BacbRE3N0c3HULA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=axyV6XOy9rnkopkiUzgQlJzH80gVIDis2YjiL0TxlZ1Qp4eHJW1LIkHtHJryI8ClKe3bnE3Cz3unmbpFCQHkLT/Pdga2LsI2dusfEBreHSGtAr5Ei3dDbuFilLNoud3ks+MyKqltDJJcq+n141622JrR513e4K86hYo44V33nfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8rOS1cG; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779369824; c=relaxed/simple;
+	bh=KSsRs9vXxax/kRFrbrYBNmU+8v/TfOdKVwpeAj70JgE=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=E7VPGA6goG1irdGjQlnIvqCtls55FvzNbYS8wogWwrUWUmzJc+94JO5EHvyo1IpfaA8afTsOWhm8xjY/yOHqNPm/JRsAC+9vTZF9seDr6oD2qTr8BQNr9ppOTi3gTCBYKCFMZVNxKBfvkUHmt7Zjr6F7D0gRzTE2X1cdI8FoZ/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=J2ZeRqNZ; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8rOS1cG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 284D11F000E9;
-	Thu, 21 May 2026 10:53:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779360848;
-	bh=hReAb/JnSiPheNetMpN9KuPDi9ArATr3SUITGa4P4hY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=A8rOS1cGqyEFWheeZg7Gevs8sfK5NeBIFPOWaiaMtEpuax0stwjgnfBRYXfe42fw+
-	 PkNdqWpTczhnsT+5zzafbfYYvZnE4lsb8LCl3MbH4SiEBUzeWbsTW/TwyEUH0EIWI7
-	 rXjTEEae4IQY/alXlNlwPRciBuM89DudZ/0g8hE6byUVFb4DnQ8vNmVB3OHZAvQaOL
-	 XbhBeyiBJWf6wy9ijtvnhwfR525PNDcFDIE5KN6Tbtkp0Pynq0S6/Wx6IaNQC4z55O
-	 nUvMijOU4uSW0CyHmDv2UcBnjr0lOBq1iiL/FkAZ6Ns5OmsYyneoVPjm5n+3fraI/R
-	 kde4w0nv6lkqw==
-Date: Thu, 21 May 2026 12:53:56 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: linux-fsdevel@vger.kernel.org, 
-	Dorjoy Chowdhury <dorjoychy111@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, v9fs@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	viro@zeniv.linux.org.uk, jack@suse.cz, jlayton@kernel.org, chuck.lever@oracle.com, 
-	alex.aring@gmail.com, arnd@arndb.de, adilger@dilger.ca, mjguzik@gmail.com, 
-	smfrench@gmail.com, richard.henderson@linaro.org, mattst88@gmail.com, 
-	linmag7@gmail.com, tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com, 
-	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com, 
-	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, trondmy@kernel.org, 
-	anna@kernel.org, sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, shuah@kernel.org, 
-	miklos@szeredi.hu, hansg@kernel.org
-Subject: Re: [PATCH v6 0/4] OPENAT2_REGULAR flag support for openat2
-Message-ID: <20260521-grube-leitfaden-0e5420c9bedc@brauner>
-References: <20260328172314.45807-1-dorjoychy111@gmail.com>
- <20260416-abgraben-seeweg-a44ce660957f@brauner>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="J2ZeRqNZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=uNtqi/2D+qoheoHrfIQqnAVQ9rX1zkTwlHnUMBclAUE=; b=J2ZeRqNZ2/Vu9ycLZqWjNqTIAr
+	f8Jc2MEZJx/o43dYFnvpigwmGoK69N/RvKjR1wVsSU7uK79T2jLkg4GINm2+i1sAAHI6v+jBFxRUs
+	qih5AgzPb0zPx3PjXmsKVFVk1XXHk93CJlIJ89czrxymj2YBsEasKgcYTCmp4WunxEjKmmYmHKhrN
+	fNqbzK/wtZe4PEu8kg5xxc1AMk5KLnwfGzC+YqQjyi+fUAfOE6MVWOcL2p4M/B43ZcuS0/ni/7ne3
+	TjHzYGd9xNM4AEJgNDMpqy87A2uo+dk3KhF6IDgmBkztdP+0rpOcUPZbCoXVXNdmg5j9BeY80HsTS
+	QCh73laA==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.2)
+	id 1wQ3N8-00000000CyE-2OTs;
+	Thu, 21 May 2026 10:23:34 -0300
+Message-ID: <2890c040da473576ba622c579c64b3c0@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Steve French <smfrench@gmail.com>
+Cc: Vaibhav Nagare <vnagare@redhat.com>, David Howells
+ <dhowells@redhat.com>, Jay Shin <jaeshin@redhat.com>,
+ linux-cifs@vger.kernel.org
+Subject: Re: [PATCH] smb: client: fix double free in cached_dir_offload_close()
+In-Reply-To: <20260519233934.684906-1-pc@manguebit.org>
+References: <20260519233934.684906-1-pc@manguebit.org>
+Date: Thu, 21 May 2026 10:23:33 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260416-abgraben-seeweg-a44ce660957f@brauner>
+Content-Type: text/plain
 
-On Thu, Apr 16, 2026 at 03:07:12PM +0200, Christian Brauner wrote:
-> On Sat, 28 Mar 2026 23:22:21 +0600, Dorjoy Chowdhury wrote:
-> > I came upon this "Ability to only open regular files" uapi feature suggestion
-> > from https://uapi-group.org/kernel-features/#ability-to-only-open-regular-files
-> > and thought it would be something I could do as a first patch and get to
-> > know the kernel code a bit better.
-> > 
-> > The following filesystems have been tested by building and booting the kernel
-> > x86 bzImage in a Fedora 43 VM in QEMU. I have tested with OPENAT2_REGULAR that
-> > regular files can be successfully opened and non-regular files (directory, fifo etc)
-> > return -EFTYPE.
-> > - btrfs
-> > - NFS (loopback)
-> > - SMB (loopback)
-> > 
-> > [...]
-> 
-> - I've added an explanation why OPENAT2_REGULAR is only needed for some
->   ->atomic_open() implementers but not others. What I don't like is that
->   we need all that custom handling in there but it's managable.
-> 
-> - I dropped the topmost style conversions. They really don't belong
->   there and if we switch to something better we should use (1 << <nr>).
-> 
-> - I split the EFTYPE errno introduction into a separate patch.
-
-So I've massaged this series a bit in that I moved OPENAT2_REGULAR into
-the upper 64-bit and internally use a __O_REGULAR bit. After having
-thought about it makes a lot more sense to move the openat2() only
-features into the upper 32-bit for the uapi space. I also ported the
-selftests to the TEST* framework to fit with Aleksa's recent rework.
+Please ignore this.  Will post v2 after sashiko's reviews when time
+allows it.
