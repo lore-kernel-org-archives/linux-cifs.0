@@ -1,141 +1,155 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02FD73E314D
-	for <linux-cifs@vger.kernel.org>; Thu, 21 May 2026 14:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779372424; cv=none; b=I2vqpEyhakv+TGPnFMBxXZ9Hm9aMRE9dJWMhHPY9DrfV33wPNyaSLrdVfHEOW4/Z4IotYnaCzXhGdj67NCd8gLKMIlsJTXqXWGulcpo7SfoPgVmXzJHFgp7taGV+I6xWTEUJGXw+PPOn0MzbyOtO20Qnk7ZP//lJUf2nD8+tnho=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779372424; c=relaxed/simple;
-	bh=1T8l8REmilfpCPHOBhjUy6PoNfGlv7+n54N3fM8ecbM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K3l3I66ToBWbU8VDynd8f1HJ6mtdNjMokPfPuldOWhUQbsduB6L2SRSxp5iArgUTrQB2QGcjSvxvKOhficROmGXEwZw13xrctcPZhkXCFs78B10yAzL7vNtdBk9ucGI6mBbZq1P7TH8aN1o66yOrBiaykOtZksrOQF7xzM+RwxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iplaEYue; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91832368D41
+	for <linux-cifs@vger.kernel.org>; Thu, 21 May 2026 15:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779378578; cv=pass; b=Bxs/TVEYI4hpavq4Vc+hyY63D4PBrZFZPYICywpIls1SVPyf0Xmg1fLhfoSo8+P4ioB9RCPNMhtOy2J7rDvxhtftCUjYUp4YNBeuOgZzQIx3KrqpKvkgb1nRJ/AGA2slk8EIjgbpCjXywX/bYIwvCaJVShP52jFvZGwkhlDpwTg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779378578; c=relaxed/simple;
+	bh=oTJGeDYTACLQP4b7lcnYS7MF/F8SkeHi472hQfd2CPw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gnoed14J5rO2QVUiQu2qylOOQv+fUAo63srtZYhmNFy0rBhCeFYd60eMd3OfWrngvV44bCub6YHyaewELgi/WZ+WLvsuWGjyljDIHTFqXttVRPAAn7Ug/DjMPAhK/ipPAy4GkU7LwwrOVF3ycgid2jRO2C1wkDEs3ULosAPeBl4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lL1NHx9I; arc=pass smtp.client-ip=209.85.217.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iplaEYue"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-83ef1d17904so6164487b3a.1
-        for <linux-cifs@vger.kernel.org>; Thu, 21 May 2026 07:07:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lL1NHx9I"
+Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-6314287380bso4501346137.3
+        for <linux-cifs@vger.kernel.org>; Thu, 21 May 2026 08:49:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779378575; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RPpn6vVJiV2IF6TROThGRIhr2mYNQAET3YAajVYMhii7nnWsHNXGf+Avy/Xwly+vI7
+         3KuJgWNvAzE5GbPX07slbI7JvoNC66NiG31hvLPEjErHqpGEGCSrvdRX0LJHnszUe8u+
+         eR9kw9K/bZop+ACpWh19f9Qb2hpH+LkS3S/LPprskUZfKqryhfwCcXclXiTAibUIskR1
+         w+psV4BVRgVGtvnR6fZSEGXtT9+xCPchpjASAxCW+VRAAs8prmyg36QkVrAs3o1B1mNs
+         1Cx5MIPDUM1CH8/qU0QshV88EDGRPBX4BVcYG7/rVBX9uLwbVcTx/0VKRX+kLc+yftQc
+         dgAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=BTiKHHtH6isAoh5+/ntoHPqjIgkFbjjbM7Qgllx7bcY=;
+        fh=4e1vhdiC3fhLgswsTy3YlQcsp86BzG24TiQjgMUm19U=;
+        b=PHZbET66Ob7+fXOS/FpFgAPCVz28V+2sZNEDG4qp4W9IPGevKXmlq8Ma9H4EJKjC14
+         XoAUzb8xQ0DmUYTCu2iiHsvQrCEuA6+WbhltWUWCuNYIaEsmkhvpF8FejNFedpi7xPks
+         90Ezmp8DLzuf9GUCkatFqcWNHLtRMxkeB4qjKCRknoqy5K/hKpttaN/UVPmixKswbi/8
+         vKfV+0djACU2RjFcCpKY7j7BECMcdWnem1m3eRUeAPcfoUDh6wCNwvw4v9z3qZD8lGKj
+         hYbyOB/LtSdoduiswsklTRbodp+45epTFrnBzy0TBO45NZ9dVMbkEuzeyafmDNx/U/tX
+         4uQg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779372422; x=1779977222; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779378575; x=1779983375; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=i8rn7+Tny7SXBXyjHw4bmnyLQ4nAf+a0iRkwkUyY9z4=;
-        b=iplaEYue2QRXiWHOeCLjxMulL0AoefsZOORc01ljTRLUb3rUb1d3A6bKYJoNZ07t6W
-         20II1RF29TOYEO+UpOBHE3wlzQfauRG4vwYiwhkUxTys4qtGuGzXGWV+TFD916nQr+ik
-         8eHw8lQg9v11VnK9lT7YO+ZnynN5fw14qj+G+RpkBFLp/xWddzXTN4vQUcYynHTwMUKB
-         McjhyiwRw1hPJQJ+/F8b/ZALc0YobI/IigB3w+98ymoJwBIiq5BsVu96FI1YwoUBWdEv
-         aHgKD3LEEgmqqr+azvymxu6TNeigRUzzTrI1JmX0GUVLEKktdQu/L6cj6NSWDzGGQlle
-         xKOA==
+        bh=BTiKHHtH6isAoh5+/ntoHPqjIgkFbjjbM7Qgllx7bcY=;
+        b=lL1NHx9IIKtcx4n399OipzLHTG7xOmxIhzXqniZ5H/PlWZnBHPquJmbnT+WXpW8VGl
+         gD5K7nwalvqc4Jt0om+M7KYYupeksRrANY4jRunce7CrRXOXxqnPI7tkmKyFagBaXwF0
+         8hbAFX6ZrBAhSIQxY+fV56hM0QhsKH/3w0jYikbW8LAIDNiMade6YzJVU1Efx90sVY3x
+         4RhbDvS072Slf7nSGxLx08t5GZTGyaCT39m+CpTwAhqunSH3Y9mmA6I+HSghd2xMwMha
+         PQ0O8KzBHHVN1VIStAFdCi0DV3GfXQMWyTqCZkVW0qbXHgDdJtycc4DpHzSHcGvAFvB1
+         f1xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779372422; x=1779977222;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1779378575; x=1779983375;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=i8rn7+Tny7SXBXyjHw4bmnyLQ4nAf+a0iRkwkUyY9z4=;
-        b=iOGkB8aEmsALQ4UMuSBNVHji9+gZGtMWcuRCAE29IuGIclrFviIhg6njzD9poWK6Lq
-         dvaOBtycqvEEiDUkLRFITaEfLI96NerEyR4Jtc+L608WukLJHcTSAlWpm5K/aPMrGCO2
-         wZ57rXMa2nBEBm1ee+PEmgt4KP17Bugzj22uphGf613k3EHpYBDMxKuyHDTp/vTQuQzY
-         QvrM9GdkK93kyhU7iL7xZsxxVTYw/hzLGuEd7wSj+f30DHnZn+yGraTHTmMU83damcG5
-         k2dAgvemIvEUmRcA2Yqt5YDnZ1W3Pvsp40QzXmfS1zA+2xWZM7fiMUZWSzo2sO1lYEVM
-         kgLQ==
-X-Gm-Message-State: AOJu0Yw+6LB1E1d4SEbv/wjhTs0akJaDBsUK2jQY0U0YmH41+slXERj4
-	DcOcXWGVe+2CGJxhjU+l7luef9MRUqWZwPJdwJ8/Khw/BCR9KARVtxjG
-X-Gm-Gg: Acq92OHGm9u1A7TFVNzeHJiwbhEO1W12XW35N/UMmuKzeI+jgShL+5dVWcvhRx39iDF
-	EgfxRWJx9iX6zgMO1FVscC/34wQLJKma5kzxec8Y2ApsWn5wZSrkzSf4sk/GqXqM0eplsji8tsd
-	mk/PVjru8exIrsHV14V19UhKPf3OCHh4MvPn1727zN4g2+wsjjTbyxnC0i4EvCCCRZplPxFQmRl
-	sdoHj7o4CjgvXeh1s7x71aOGjAFAR/XNM/llQokpR3Lcjxm7tOQQEpqQ3+dgfnLgglit8Wb4rbl
-	DMKJbcu2df8kaEK/C7ivMHBn2JEmW4n9EV746PyF4I/Hja66dZHtv8UswtQ8YWRarhpSzmNVgXY
-	Q2nh2610cYRwJJPdykSccW203kybjx88O2Us2exwV5kweqBTU2J0x/OfiDNBcNxs2XOswpeVOxc
-	n5GwpTfO+WuE2LlrJ4S9QWLw4MsF85vGzgW1wURtfvw2wq1QA6tLppMD2o5zuwZZ18YSmjaP5BS
-	lHEi0tI7WauxzyQCimbmYw=
-X-Received: by 2002:a05:6a00:3c85:b0:839:f1c0:13ce with SMTP id d2e1a72fcca58-8414ae69ebfmr3361708b3a.40.1779372422159;
-        Thu, 21 May 2026 07:07:02 -0700 (PDT)
-Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-841549c46c9sm1719329b3a.10.2026.05.21.07.06.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 07:07:00 -0700 (PDT)
-From: rajasimandalos@gmail.com
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Rajasi Mandal <rajasimandal@microsoft.com>
-Subject: [PATCH v3 9/9] smb: client: apply rasize on remount
-Date: Thu, 21 May 2026 14:06:44 +0000
-Message-ID: <c9d3b7dfc9aab1db3376eae3cdd32f4da1457a91.1779372325.git.rajasimandal@microsoft.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1779371115.git.rajasimandal@microsoft.com>
-References: <cover.1779371115.git.rajasimandal@microsoft.com>
+        bh=BTiKHHtH6isAoh5+/ntoHPqjIgkFbjjbM7Qgllx7bcY=;
+        b=T2thIVABsT87ZVxpyT1CWZmtXq9MPZB4F1nWuxmVI+L5rMzeq5UQ743sBjRi03liwE
+         6VdKclMDNjQzAYpkKhTvGb7A9AHirli1fTm1tEabrPwi37nag1wpUyWey6pKdS+RcNup
+         +dsXcd/yCm691nh2V9Lfkk2ArYLQlAVevW5ZMJKY45j79l8hDPibuWSJfvkkUj6uz/bP
+         loXcuoqB92Tj/F3NjyDkkXP+fVJDCdE+yIHZEGwxvUPf4urJVdpBrC6CmTKc5a08lcy0
+         klLOKFEnFESuzC1EN/mzI6Fh5/h08l22ZbnIhgiDvHyvS2EDQmWNmTmNzKahhOfWmf8D
+         t5CQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9+grec5fXPTUwbPRm4MY262V7Q8MhLEa95P1OSTH+wktg35/fDo17+BILWlCa5bf9Qqd3eeCHgsWPq@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGD7DWgRZPoic2+Tu77bIGalyTHcDgea8pVdNAZxxp6st0ceiY
+	xthAcHpd/yTKjJOmQWLycjwFUZlz03gHxGa4AJKHT98bcdrSEJ+HcDMoJcU2+Xg/P7uBezmRkH5
+	ciu3zJt5nJTAHralnS95gN2AVq7Xou4A=
+X-Gm-Gg: Acq92OGN2gWEknuRlrg6UhKsfOAYtG2CsYQDcgnFO+vMb8UEn5yoqKgeRlcgnlOl5c4
+	BhKLaL/b4hD+MrghipN1cJFC92+QkoDGqlIQRlGRrKB6FPtirz0pDuAcE1PbgdsB6tT3xbof8zk
+	UvyzB+pAwZm5mW6qiT1LCB2k60A3u9aY/kCB9NKrUhVBD/kOTE4Fh3kVwuf31FFsBPE+wyqbAAT
+	LxoFu9yKduqPi5yFA6XUDCwMO+Yb8MtW7S7TQZO3eyz2ufZgUf0YpgGD9NKRhILiPFmuhD6YHvx
+	/nHQapfGJ5bYC8LOOE/Atq+JDw0Qqee/ZlDNgWhY/zftfMHUy8NWwLM=
+X-Received: by 2002:a05:6102:1591:b0:650:a9f6:4d29 with SMTP id
+ ada2fe7eead31-67390b66b29mr2592164137.13.1779378575543; Thu, 21 May 2026
+ 08:49:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260328172314.45807-1-dorjoychy111@gmail.com>
+ <20260416-abgraben-seeweg-a44ce660957f@brauner> <20260521-grube-leitfaden-0e5420c9bedc@brauner>
+In-Reply-To: <20260521-grube-leitfaden-0e5420c9bedc@brauner>
+From: Dorjoy Chowdhury <dorjoychy111@gmail.com>
+Date: Thu, 21 May 2026 21:49:23 +0600
+X-Gm-Features: AVHnY4JMLUcx8yOSfS2Q9vtP8tvb48vFjP_vPMN644Wd5G5CD5CLlCbq3u4DVJI
+Message-ID: <CAFfO_h4Em26Hfbv-DWF+9dNS8TBuGpfWjWFBUhLr7jYCKzj3_Q@mail.gmail.com>
+Subject: Re: [PATCH v6 0/4] OPENAT2_REGULAR flag support for openat2
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-api@vger.kernel.org, ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz, 
+	jlayton@kernel.org, chuck.lever@oracle.com, alex.aring@gmail.com, 
+	arnd@arndb.de, adilger@dilger.ca, mjguzik@gmail.com, smfrench@gmail.com, 
+	richard.henderson@linaro.org, mattst88@gmail.com, linmag7@gmail.com, 
+	tsbogend@alpha.franken.de, James.Bottomley@hansenpartnership.com, 
+	deller@gmx.de, davem@davemloft.net, andreas@gaisler.com, idryomov@gmail.com, 
+	amarkuze@redhat.com, slava@dubeyko.com, agruenba@redhat.com, 
+	trondmy@kernel.org, anna@kernel.org, sfrench@samba.org, pc@manguebit.org, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+	bharathsm@microsoft.com, shuah@kernel.org, miklos@szeredi.hu, 
+	hansg@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Rajasi Mandal <rajasimandal@microsoft.com>
+On Thu, May 21, 2026 at 4:54=E2=80=AFPM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+>
+> On Thu, Apr 16, 2026 at 03:07:12PM +0200, Christian Brauner wrote:
+> > On Sat, 28 Mar 2026 23:22:21 +0600, Dorjoy Chowdhury wrote:
+> > > I came upon this "Ability to only open regular files" uapi feature su=
+ggestion
+> > > from https://uapi-group.org/kernel-features/#ability-to-only-open-reg=
+ular-files
+> > > and thought it would be something I could do as a first patch and get=
+ to
+> > > know the kernel code a bit better.
+> > >
+> > > The following filesystems have been tested by building and booting th=
+e kernel
+> > > x86 bzImage in a Fedora 43 VM in QEMU. I have tested with OPENAT2_REG=
+ULAR that
+> > > regular files can be successfully opened and non-regular files (direc=
+tory, fifo etc)
+> > > return -EFTYPE.
+> > > - btrfs
+> > > - NFS (loopback)
+> > > - SMB (loopback)
+> > >
+> > > [...]
+> >
+> > - I've added an explanation why OPENAT2_REGULAR is only needed for some
+> >   ->atomic_open() implementers but not others. What I don't like is tha=
+t
+> >   we need all that custom handling in there but it's managable.
+> >
+> > - I dropped the topmost style conversions. They really don't belong
+> >   there and if we switch to something better we should use (1 << <nr>).
+> >
+> > - I split the EFTYPE errno introduction into a separate patch.
+>
+> So I've massaged this series a bit in that I moved OPENAT2_REGULAR into
+> the upper 64-bit and internally use a __O_REGULAR bit. After having
+> thought about it makes a lot more sense to move the openat2() only
+> features into the upper 32-bit for the uapi space. I also ported the
+> selftests to the TEST* framework to fit with Aleksa's recent rework.
 
-rasize is accepted during remount parsing but sb->s_bdi->ra_pages is
-only set in cifs_read_super() at mount time. A remount with a new
-rasize value silently has no effect on the readahead window.
+Thanks for fixing up!
 
-Update ra_pages in smb3_reconfigure() after the context has been
-duplicated, using the same logic as cifs_read_super(): if rasize is
-set, use it directly; otherwise fall back to 2 * rsize.
-
-Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
----
- fs/smb/client/fs_context.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 0ef8ccd53882..1b42af418f77 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1367,7 +1367,7 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	struct dentry *root = fc->root;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(root->d_sb);
- 	struct cifs_ses *ses = cifs_sb_master_tcon(cifs_sb)->ses;
--	unsigned int rsize = ctx->rsize, wsize = ctx->wsize;
-+	unsigned int rsize = ctx->rsize, wsize = ctx->wsize, rasize = ctx->rasize;
- 	char *new_password = NULL, *new_password2 = NULL;
- 	bool need_recon = false;
- 	bool need_mchan_update;
-@@ -1431,9 +1431,10 @@ static int smb3_reconfigure(struct fs_context *fc)
- 		STEAL_STRING_SENSITIVE(cifs_sb, ctx, password2);
- 	}
- 
--	/* if rsize or wsize not passed in on remount, use previous values */
-+	/* if rsize, wsize, or rasize not passed in on remount, use previous values */
- 	ctx->rsize = rsize ? CIFS_ALIGN_RSIZE(fc, rsize) : cifs_sb->ctx->rsize;
- 	ctx->wsize = wsize ? CIFS_ALIGN_WSIZE(fc, wsize) : cifs_sb->ctx->wsize;
-+	ctx->rasize = rasize ? rasize : cifs_sb->ctx->rasize;
- 
- 	new_ctx = kzalloc_obj(*new_ctx);
- 	if (!new_ctx) {
-@@ -1522,6 +1523,12 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	smb3_cleanup_fs_context(old_ctx);
- 	old_ctx = NULL;
- 	smb3_update_mnt_flags(cifs_sb);
-+
-+	if (cifs_sb->ctx->rasize)
-+		root->d_sb->s_bdi->ra_pages = cifs_sb->ctx->rasize / PAGE_SIZE;
-+	else
-+		root->d_sb->s_bdi->ra_pages = 2 * (cifs_sb->ctx->rsize / PAGE_SIZE);
-+
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	if (!rc)
- 		rc = dfs_cache_remount_fs(cifs_sb);
--- 
-2.43.0
-
+Regards,
+Dorjoy
