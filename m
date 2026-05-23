@@ -1,152 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7218E29E116;
-	Sat, 23 May 2026 09:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779528174; cv=none; b=UIq1ikexo4aQIQhSsw9BfaBtdwdWrouSvyzzv03I18x5A5Em6wEJbXr3TuXJJlsRmFfEOnPvbnX7xPXqESNjOvfnJPaBihDJ/YUIBtpXVrGqmYcAXPLwZw6orhn+eQdACyUT8LMti+sPGHXWoWEKrM0JkYiFKiZAqhhcU647lDc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779528174; c=relaxed/simple;
-	bh=WzWnaxafrb449AME7UJ7Iy8ifl+TzT0qDjt5jndyN98=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MxfAK9HQ/G7J9Ez8V2mL1LT7nIpXwf1uahw2s+N3/bS/nUfaPw5DAi6BdWDHIyFmbclh7QE2jSpoRiEEIS+/vlI0QqZCYAnh5i1jhLwPcyquOO31Ev9fxkpqQatsWXL+olP30TjjnX9Rs1Xgl1QE7jXLTenP3iagvPfpz5CfGUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=uXBz4P3K; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A2143A599A
+	for <linux-cifs@vger.kernel.org>; Sat, 23 May 2026 14:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779546154; cv=pass; b=O4yJ1gV78kjUOP0sralNmh3iojEtTe55GtWDkgetE7AQcKju+UYEMxabcvdZJPFL8Q0FqHaBU4lxv8JpVElSbrpKB99Cs0HSIss0m6KXywQonNs4bNHjuckaCZiH9iUIPQLby20+Ic3LariP+isCYyE5X7RmLL3Yq5+gzkVI6Zk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779546154; c=relaxed/simple;
+	bh=QOq5bMTggiNr99Gq2aTqL2RF9tdp0JdXTbvp2nJVayk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=TnkiyFK5eLaO5ayLl/Luc9D8nuqOUMYeY+qLnYEgsMXuzEPFE3EYLd3vG43mRKdWuI+llq2GXgQ6AtR2r2KuDSfO9QmiMonaFJR0MH+jcS+FWC55nUoNT7pEGaq+wX6GuNhZJ/fM3I/QYql1y1TnPaKkNrDnEKZnkFKls1DKE6k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pjZIf1Ou; arc=pass smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="uXBz4P3K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C9511F000E9;
-	Sat, 23 May 2026 09:22:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1779528173;
-	bh=F7dDuv7wc6zC9c//1ET26gyJLdKCLeEDcRpy9I2R+8Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=uXBz4P3KU8bZCZGDAbposvHdqoVXnw0VCLY48PV3EclKMT2rkEO9lgDoHa7XMlznA
-	 xV+Se3w+1vAxlUc9yEsETXH11BjPFcHSMTE53qsufFww9bO76TAo++EABkZWI8UGlt
-	 K5Kef4NRsHBEG+Q2LJEWookbdckoOiG81HbempBQ=
-Date: Sat, 23 May 2026 11:22:55 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-Cc: stable@vger.kernel.org, patches@lists.linux.dev,
-	Xiaoli Feng <xifeng@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>, netfs@lists.linux.dev,
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH 6.12 634/666] netfs: fix error handling in
- netfs_extract_user_iter()
-Message-ID: <2026052349-handset-ambiguity-b618@gregkh>
-References: <20260520162111.222830634@linuxfoundation.org>
- <20260520162125.016902019@linuxfoundation.org>
- <7ed573be-1df9-43ee-bfef-4499af0767b4@oracle.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pjZIf1Ou"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8b4eb1fd5d0so102099896d6.0
+        for <linux-cifs@vger.kernel.org>; Sat, 23 May 2026 07:22:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779546152; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gL0blyN2NC7xWHfbzqPcGZ15W234k7XgZo2wcu/TXGXw/AvaBJYaMQjskN0lwgbXRo
+         mkBv+tvkGjeIbUvnl7rFfnIU7tZDHcAWLUbt46eEMBxKNOv0F9UXLu0WEVqcTT+3c4il
+         qzYLdp8DmdZ2x+an7Ii80qrjkeLFsO+RN2ePhxtCZoSu97ikBGwo6Tck91IM2i9WOvVz
+         xJpdyL5qUzr+nut1+bjy6y8nm9w26suFbbn7KLASYGcSbzAPFMZf+InzL1Y9l32Fr51e
+         SU5ZkHLpCKvyfdS4iGES1XWw1aYi/5HmX9A99lFpg6JQQg0zNYJQDpP6qXFnxKbqBy3/
+         NVuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=fvokk1U5NisQLg359Y/XFPkPqxa2c23Xwq58Zq0IY20=;
+        fh=7ZzNP9kU7nNunR+v9k7J1wfXsjrldIhNmB+WMtQIYhk=;
+        b=E2QpntNBhM4fcIcEPVTDJAeR4rcaW6QDyeT7le5UIl1my7Mi/PXZrMCK5lc9zHr/U+
+         iCtwTgNqpzelraXtbq30Pggxd85Q3L901HxJN4z17tc9Ts4syb9LpqSofnN2vW49G8ru
+         0+oH5eL2ytB8djWogHeCFmfrtadFCMutS1KIsaazv4cCORVf0AswFnc/GEbIX3A5t8hu
+         oigZsN6pr9DbWTev8odDd7KXfhU/3BODuRiEYpeo0WSTj4EaAUJaHE9tdH6F0v1rZGpJ
+         9AAiqtj41fpnvJ0DSCm2cO5fCaIyA071EzmnP74pdoaptlkDaG8HbbJr4fs9jVi1afSR
+         sEiw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779546152; x=1780150952; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fvokk1U5NisQLg359Y/XFPkPqxa2c23Xwq58Zq0IY20=;
+        b=pjZIf1Ou4v1JTFg0ABlQD8AckuCungbe/b1tkTFfiZTvhw6X0H0uNfZ7/FA0xNSlou
+         lEPImggg4cYwA5YpiokkC9RgnjFWFa7Y3V/eLOfsparMblNsbQ/Fg42Z54p3H05r7fMu
+         9jxbEA5G96yPwGl2T7Mu9tdDvYun+pImyRDp3QTOuyYpH7oAXSu5G7Xcj9waxUE4HGfp
+         o4VtQqAjlb6AA45r7HdzIvVTRS5IqDZiCY9MNirbiJOPdFdp21dMcgTZpeCoyDyifx89
+         0FAGyZ0tJA+oLFgP2cqtbwbBShv8pNFB8r0bf7CO2WkhFcsub7gCMU1xrl+5iwBKjQ0i
+         8W3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779546152; x=1780150952;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fvokk1U5NisQLg359Y/XFPkPqxa2c23Xwq58Zq0IY20=;
+        b=XnRI+t8EDm7nclWgpyD4z0zkE0LDMVgDJF+4LtR1yEELAz611QWK/MKBOg1hVtf7GJ
+         xn3wbGegxcUqNV2Zsbk5T2kdAuOgZHCkcX9/PmJVyrqk4KJqBr0CTFoAhdlN2ysx3kU4
+         CemNBUs5Ea/Ow4PlnTZk7E3cFeC5xJJIpvXtDAoT4nUGI2cOcyh8EbLIFg7eNM+gXclP
+         HLiiSOq6Bz7kraSidAAId8gNFctzDCJBFRy9cQd1UPn5/DHpW7qUAH4Bb1ehvx2bwWoD
+         rI44JaX6Qgjo3/k+H2iG/w12b7nZZnSkbWrhAbcjX3ke89cBCn/UFpCRHOy0Dis44o2H
+         URXw==
+X-Forwarded-Encrypted: i=1; AFNElJ8oJ730Zlne2ZNghJjLIZI/4KoZ1vmjcN05nasARgCeA2rWiuZJBAd4qWN+KuW16OzUxibCdiVm7tWX@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuNiheFBt3XmlLmPDHexBqolw75CLW72eO8e5PCpLEzRJRsfN4
+	VgysOuWJeSFHXqoYC9GU3/RnEqU0iQN/L+KYQsX2OB1125zHOto1irWNFwUX+egITv04d6cX/g1
+	XpkXHi/M7osmsb9pYGjq7mbohbK1wVE0Lm1fq8GI=
+X-Gm-Gg: Acq92OGxwx4Sy4MQm3+8HW9RWREHBAl0fyBffNmrPxZ5udPTqTd/zfkmhmp33PnCuV5
+	z49fJe8BmSQhLiKW0vCJuc382/+GRh1CFypb41L83qHr1bG5Bca1J++yuKgynzEFggC1ek8hbze
+	7CMFWLhcVvWWtQiiWEn1RqMNGa1wf3uoRYdkG2I5agv5fU8L8QpPxdUuTm5Oju+Cg4rtcx8Z5IA
+	P/u4FZsKyZ75LsabDxuTzwCJywq/2ZzeW+MKPYo6YEWiqp1izwDgRrxcwByL6SWMkfGIHIO0aqa
+	y8iW4cTI37OKTmOF2zgC+N52SXzzDr7b+V8X6PjCp7YrSS/tN75zkd23fC6FOXPTQfL6U936XoE
+	o1CEFTe8oojVG0v2RrXsOLXZDxxEydxECMbPLVauh4qusv4sZCdZYvODOUa4QD6X5y3tbTGvLB8
+	HmFMYD9iHi1kHP7IZQk4QV+catxclAM5xy
+X-Received: by 2002:a05:6214:2b83:b0:8b0:2c81:ad5f with SMTP id
+ 6a1803df08f44-8cc7b541aa3mr136892836d6.11.1779546152406; Sat, 23 May 2026
+ 07:22:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7ed573be-1df9-43ee-bfef-4499af0767b4@oracle.com>
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 23 May 2026 09:22:21 -0500
+X-Gm-Features: AVHnY4Kfyfqa984Iro5x5lJG1lkvn-6WVgbmntqyNEgW4_RGs8CXd5XWiZn-afc
+Message-ID: <CAH2r5mv+AhWk4nM8tWcMDwQHL40VneHN1XVwuQrX08OLRB8R9w@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, May 23, 2026 at 01:53:15AM +0530, Harshit Mogalapalli wrote:
-> Hi Greg/Sasha,
-> 
-> On 20/05/26 21:54, Greg Kroah-Hartman wrote:
-> > 6.12-stable review patch.  If anyone has any objections, please let me know.
-> > 
-> > ------------------
-> > 
-> > From: Paulo Alcantara <pc@manguebit.org>
-> > 
-> > commit 0aad5704c6b4d14007d4eab15883e8524e4310f4 upstream.
-> > 
-> > In netfs_extract_user_iter(), if iov_iter_extract_pages() failed to
-> > extract user pages, bail out on -ENOMEM, otherwise return the error
-> > code only if @npages == 0, allowing short DIO reads and writes to be
-> > issued.
-> > 
-> > This fixes mmapstress02 from LTP tests against CIFS.
-> > 
-> > Fixes: 85dd2c8ff368 ("netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator")
-> > Reported-by: Xiaoli Feng <xifeng@redhat.com>
-> > Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-> > Signed-off-by: David Howells <dhowells@redhat.com>
-> > Link: https://patch.msgid.link/20260512123404.719402-10-dhowells@redhat.com
-> > Cc: netfs@lists.linux.dev
-> > Cc: stable@vger.kernel.org
-> > Cc: linux-cifs@vger.kernel.org
-> > Cc: linux-fsdevel@vger.kernel.org
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > ---
-> >   fs/netfs/iterator.c |   13 ++++++++++---
-> >   1 file changed, 10 insertions(+), 3 deletions(-)
-> > 
-> > --- a/fs/netfs/iterator.c
-> > +++ b/fs/netfs/iterator.c
-> > @@ -22,7 +22,7 @@
-> >    *
-> >    * Extract the page fragments from the given amount of the source iterator and
-> >    * build up a second iterator that refers to all of those bits.  This allows
-> > - * the original iterator to disposed of.
-> > + * the original iterator to be disposed of.
-> >    *
-> >    * @extraction_flags can have ITER_ALLOW_P2PDMA set to request peer-to-peer DMA be
-> >    * allowed on the pages extracted.
-> > @@ -67,8 +67,8 @@ ssize_t netfs_extract_user_iter(struct i
-> >   		ret = iov_iter_extract_pages(orig, &pages, count,
-> >   					     max_pages - npages, extraction_flags,
-> >   					     &offset);
-> > -		if (ret < 0) {
-> > -			pr_err("Couldn't get user pages (rc=%zd)\n", ret);
-> > +		if (unlikely(ret <= 0)) {
-> > +			ret = ret ?: -EIO;
-> >   			break;
-> >   		}
-> > @@ -97,6 +97,13 @@ ssize_t netfs_extract_user_iter(struct i
-> >   		npages += cur_npages;
-> >   	}
-> > +	if (ret < 0 && (ret == -ENOMEM || npages == 0)) {
-> > +		for (i = 0; i < npages; i++)
-> > +			unpin_user_page(bv[i].bv_page);
-> > +		kvfree(bv);
-> > +		return ret;
-> > +	}
-> > +
-> 
-> I have run an AI assisted backport review and it spotted an issue: I
-> have taken a look and the issues goes like:
-> 
-> Upstream has:
-> 
-> 
-> 
-> ssize_t ret = 0;
-> 
-> ...
-> if (ret < 0 && (ret == -ENOMEM || npages == 0)) {
->         for (i = 0; i < npages; i++)
->                 unpin_user_page(bv[i].bv_page);
->         kvfree(bv);
->         return ret;
-> }
-> 
-> 6.12.y has:
-> 
-> ssize_t ret;
-> 
-> ...
-> if (ret < 0 && (ret == -ENOMEM || npages == 0)) {
->         for (i = 0; i < npages; i++)
->                 unpin_user_page(bv[i].bv_page);
->         kvfree(bv);
->         return ret;
-> }
-> 
-> I think 6.12.y misses commit: 7e3d8db899d5 ("netfs: Fix potential
-> uninitialised var in netfs_extract_user_iter()") so backport might not be
-> complete, thoughts ?
+Please pull the following changes since commit
+1a2ab0feaa23147e347b4d4cb79cb3fc392118eb:
 
-Now applied, thanks.
+  Merge tag 'v7.1-rc4-ksmbd-server-fixes' of git://git.samba.org/ksmbd
+(2026-05-19 09:49:32 -0700)
 
-greg k-h
+are available in the Git repository at:
+
+  git://git.samba.org/ksmbd.git tags/v7.1-rc5-ksmbd-server-fixes
+
+for you to fetch changes up to 4ec9c8e023c79f613fe4d5ad8cc737112efb2e44:
+
+  smb/server: promote S_DEL_ON_CLS to S_DEL_PENDING when close
+(2026-05-21 18:20:24 -0500)
+
+----------------------------------------------------------------
+Three ksmbd server fixes
+- fix for creating tmpfiles
+- fix durable reconnect error path
+- validate SID in security descriptor when inheriting DACL
+
+
+----------------------------------------------------------------
+ChenXiaoSong (1):
+      smb/server: promote S_DEL_ON_CLS to S_DEL_PENDING when close
+
+Junyi Liu (2):
+      ksmbd: fix durable reconnect error path file lifetime
+      ksmbd: validate SID in parent security descriptor during ACL inheritance
+
+ fs/smb/server/smb2pdu.c   | 15 +++++++++--
+ fs/smb/server/smbacl.c    | 66 +++++++++++++++++++++++++++++++++++------------
+ fs/smb/server/vfs_cache.c | 16 +++++++++---
+ 3 files changed, 75 insertions(+), 22 deletions(-)
+
+-- 
+Thanks,
+
+Steve
