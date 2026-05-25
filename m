@@ -1,272 +1,119 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1C71EE7C6;
-	Mon, 25 May 2026 02:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3325ADDA9;
+	Mon, 25 May 2026 06:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779677214; cv=none; b=QPO8JGADuNjnu0+AO6f9OzWLrppVnY9Roz1KULqQk97+M/yIu0hs/0g4AhCrRGJP8TKEFGZx0o52Sf8wNiz6RQOnScm8yst4lkuhtuMQVKObbOrbeMEu/9AgPrN1+s6XwZfUF3LPxY50ZMp/S6SWeekKKTr67c8MH6TDZME0zfk=
+	t=1779689603; cv=none; b=PWKcT2/U5R7B74SXluvjO0ipblnh3+W8dACtlHI7pC/uIU94tor9MgAit51FY6wW+5SE5mYg5XVOy1Rlz2owa7tLyKqEFfZFs92kHQw4sjZLiG69zDklbho8FbwohmMZQkobuFXYqsq1MWWLe/pWV1XeVKQ3gU0yg7q3H+71t5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779677214; c=relaxed/simple;
-	bh=TnTBkWxk9JhRl1kKLD0U/1acCccno9j0NNxzquqm2hE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EE7KdyD8v1O9LzKViLynrxTHkWGmfz2P4yes/PF/HmncmaqK6n54MfDMPPA4RWuTwuivj3gf6dgurDlUVINK5jdfVJiXsKZwi3ZI2pD5T/jv0jSEURmN30Z1GBkQlemr3ESgBupvoy5zbxhNOR97TwRhRL4jTWKpxV6T/9hF1cY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gP0dK6XLYzKHMNK;
-	Mon, 25 May 2026 10:46:29 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id B130440576;
-	Mon, 25 May 2026 10:46:40 +0800 (CST)
-Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP4 (Coremail) with SMTP id gCh0CgD3v1sOuBNqUEIoDg--.62009S3;
-	Mon, 25 May 2026 10:46:40 +0800 (CST)
-Message-ID: <17890c94-23b8-47b9-91eb-bd586bdacd25@huaweicloud.com>
-Date: Mon, 25 May 2026 10:46:38 +0800
+	s=arc-20240116; t=1779689603; c=relaxed/simple;
+	bh=eeD04UdoyibCLUbSESv4nDuwLvjdA69yocynqRXPeSQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=is2PNyz4XmIVLBUpW43iGhnDlWk9ygsFCI6C+ucV9nptBXkmcydX5jA7tPt65Zt9X+IqGHiqX8ieqgoyWd/4mjkyPRGwPAcklvi0PLBY3TCAVKgkNItHTfnihdPqUicNC8OdmnRh5fydxFetpR4lFC7GVsfDZxNv3l0ZKvuHPTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ch8C4AQu; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ch8C4AQu"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=k3SPzxVyWdadKptBoGs22ABp+4fSutAbLhXgTnFnk+c=; b=ch8C4AQus3YZ806Wh67oNprJWu
+	4YgLFI2/PnBCMuybdDy7PbfGtTtnOYTERUedeW5E5Ru5s2A42Wbka5YWGITgpXyoniyxVkeoX4jLc
+	IUiRdYgZdzB/Am4gsRBuGO/BRVBQ7wRZfgKXj1zZbTQQSFMZAafdMq1Nx00l5Uir2sYkM1+syo7Sb
+	tR2MZOHYxgUNgn6enT0n7mgnTQttQ6CNWFQCnUaBYMiOmFQAvhU06ASH+830Qwzg/OZoJ2MMde8pk
+	5myaDznWnGdkaDDiOgZB+6sZOcmbLJfO3PHqjAYQdxaW+wE6I2paALx9V82PLnhPBfyxJiW3AXzQ8
+	ADrqVaWg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wROYn-0000000GOIp-2PQ1;
+	Mon, 25 May 2026 06:13:09 +0000
+Date: Sun, 24 May 2026 23:13:09 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>,
+	Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Paulo Alcantara <pc@manguebit.org>, Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>, Steve French <sfrench@samba.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Trond Myklebust <trondmy@kernel.org>, netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 05/21] Add a function to kmap one page of a multipage
+ bio_vec
+Message-ID: <ahPodavlA-gt44FO@infradead.org>
+References: <20260518222959.488126-1-dhowells@redhat.com>
+ <20260518222959.488126-6-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] cifs: open files should not hold ref on superblock
-To: Zizhi Wo <wozizhi@huaweicloud.com>, Steve French <smfrench@gmail.com>,
- Shyam Prasad N <nspmangalore@gmail.com>
-Cc: Henrique Carvalho <henrique.carvalho@suse.com>,
- linux-cifs@vger.kernel.org, pc@manguebit.com, bharathsm@microsoft.com,
- dhowells@redhat.com, Shyam Prasad N <sprasad@microsoft.com>,
- stable@vger.kernel.org, "chengzhihao1@huawei.com" <chengzhihao1@huawei.com>,
- yangerkun <yangerkun@huawei.com>
-References: <20260304124629.1616108-1-sprasad@microsoft.com>
- <u4s57pxvrttksfxe5evylucarfoyiv3ut32d45nvfafsgmxtog@72x2iew66wrt>
- <CANT5p=rdme19zW8Dk7WuEXw68Jzdt2QsdfK-gRManJJgGWQByw@mail.gmail.com>
- <54dzktjc3vwt55dfj6wi4346la2my4fsg7wfyrtwm2apzvppip@xbi6evlur3kz>
- <CANT5p=rqgRwaADB=b_PhJkqXjtfq3SFv41SSTXSVEHnuh871pA@mail.gmail.com>
- <CAH2r5mu-3cDEhQWnBwBATq4hv4tw9aoPtGdmaDuc1+PxeiTuxA@mail.gmail.com>
- <dd1ee60d-f8b9-4019-991f-0fadf776694b@huaweicloud.com>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <dd1ee60d-f8b9-4019-991f-0fadf776694b@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3v1sOuBNqUEIoDg--.62009S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxKryxtry8Ar4fuw1UZw17trb_yoW3Ww15pF
-	Waka4jkr4kGryfGwn2v3WFqF10yw4xAa45Xr1Ygr17AF909r1IqF4fJrWUKFyUZrs7W3Wj
-	qF4UWry7Zr1DZ37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
-	evJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260518222959.488126-6-dhowells@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+On Mon, May 18, 2026 at 11:29:37PM +0100, David Howells wrote:
+> Add a function to kmap one page of a multipage bio_vec by offset (which is
+> added to the offset in the bio_vec internally).  The caller is responsible
+> for calculating how much of the page is then available.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: Christoph Hellwig <hch@infradead.org>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: linux-block@vger.kernel.org
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+>  include/linux/bvec.h | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+> index d36dd476feda..9df4a56fef61 100644
+> --- a/include/linux/bvec.h
+> +++ b/include/linux/bvec.h
+> @@ -299,4 +299,21 @@ static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
+>  	return page_to_phys(bvec->bv_page) + bvec->bv_offset;
+>  }
+>  
+> +/**
+> + * kmap_local_bvec - Map part of a bvec into the kernel virtual address space
+> + * @bvec: bvec to map
+> + * @offset: Offset into bvec
+> + *
+> + * Map the page containing the byte at @offset into the kernel virtual address
+> + * space.  The caller is responsible for making sure this doesn't overrun.
+> + *
+> + * Call kunmap_local on the returned address to unmap.
+> + */
+> +static inline void *kmap_local_bvec(struct bio_vec *bvec, size_t offset)
 
+The name is rather confusing for something that does not map the entire
+bvec, and is an anagram of the existing bvec_kmap_local.  So please
+rename it to bvec_kmap_partial or something.
 
-在 2026/5/25 10:16, Zizhi Wo 写道:
-> Hi!
-> 
-> 在 2026/3/15 6:03, Steve French 写道:
->> On Sat, Mar 14, 2026 at 3:38 AM Shyam Prasad N 
->> <nspmangalore@gmail.com> wrote:
->>>
->>> On Sat, Mar 14, 2026 at 1:47 AM Henrique Carvalho
->>> <henrique.carvalho@suse.com> wrote:
->>>>
->>>> On Fri, Mar 13, 2026 at 10:57:42AM +0530, Shyam Prasad N wrote:
->>>>> On Fri, Mar 13, 2026 at 1:28 AM Henrique Carvalho
->>>>> <henrique.carvalho@suse.com> wrote:
->>>>>>
->>>>>> On Wed, Mar 04, 2026 at 06:15:53PM +0530, nspmangalore@gmail.com 
->>>>>> wrote:
->>>>>>> From: Shyam Prasad N <sprasad@microsoft.com>
->>>>>>>
->>>>>>> Today whenever we deal with a file, in addition to holding
->>>>>>> a reference on the dentry, we also get a reference on the
->>>>>>> superblock. This happens in two cases:
->>>>>>> 1. when a new cinode is allocated
->>>>>>> 2. when an oplock break is being processed
->>>>>>>
->>>>>>> The reasoning for holding the superblock ref was to make sure
->>>>>>> that when umount happens, if there are users of inodes and
->>>>>>> dentries, it does not try to clean them up and wait for the
->>>>>>> last ref to superblock to be dropped by last of such users.
->>>>>>>
->>>>>>> But the side effect of doing that is that umount silently drops
->>>>>>> a ref on the superblock and we could have deferred closes and
->>>>>>> lease breaks still holding these refs.
->>>>>>>
->>>>>>> Ideally, we should ensure that all of these users of inodes and
->>>>>>> dentries are cleaned up at the time of umount, which is what this
->>>>>>> code is doing.
->>>>>>>
->>>>>>> This code change allows these code paths to use a ref on the
->>>>>>> dentry (and hence the inode). That way, umount is
->>>>>>> ensured to clean up SMB client resources when it's the last
->>>>>>> ref on the superblock (For ex: when same objects are shared).
->>>>>>>
->>>>>>> The code change also moves the call to close all the files in
->>>>>>> deferred close list to the umount code path. It also waits for
->>>>>>> oplock_break workers to be flushed before calling
->>>>>>> kill_anon_super (which eventually frees up those objects).
->>>>>>>
->>>>>>> Fixes: 24261fc23db9 ("cifs: delay super block destruction until 
->>>>>>> all cifsFileInfo objects are gone")
->>>>>>> Fixes: 705c79101ccf ("smb: client: fix use-after-free in 
->>>>>>> cifs_oplock_break")
->>>>>>> Cc: <stable@vger.kernel.org>
->>>>>>> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
->>>>>>> ---
->>>>>>
->>>>>> Hi Shyam,
->>>>>>
->>>>>> So the side effect of the previous code is that the umount hangs 
->>>>>> until
->>>>>> all the files are closed?
->>>>>
->>>>> Hi Henrique
->>>>> Umount works. All it does is decrement refcount on sb.
->>>>> When the last file is closed (or when the last cifs_oplock_break
->>>>> processing completes) that's when cifs_kill_sb would get called.
->>>>> Before that if there's another mount of the same share, it will reuse
->>>>> the same session, tcon and open handles. As a result, an attempt to
->>>>> delete files on the mount point may fail (which is one of first things
->>>>> done by many xfstests).
->>>>>
->>>>
->>>> Thank you for the explanation.
->>>>
->>>> I will wait for your v2.
->>>
->>> Hi Steve,
->>>
->>> I ran generic/694 to understand why it is failing with this change.
->>> I think that this fix has just exposed a problem rather than caused it.
->>>
->>> The test does the following:
->>> 1. either fallocates a file to 4G or pwrites to it
->>> 2. calls sync
->>> 3. runs stat to get number of blocks allocated for the file
->>> 4. umounts the share
->>> 5. mounts the share again
->>> 6. runs stat to get number of blocks allocated for the file
->>> 7. compares output of steps 3 and 6
->>
->> Any chance of creating a small repro script for this that is easier to
->> debug han the xfstest was?
-> 
-> I analyzed this issue and performed a simple local reproduction using
-> smb3/smb21:
-> 
-> mount /dev/sda /mnt
-> mount -t cifs //127.0.0.1/share /mnt/test_mnt -o vers=3.0,guest
-> # smb versions below 3 do not support fallocate;
-> # generic/694 replaces it with pwrite.
-> # xfs_io -ft -c "pwrite 0 4G" /mnt/test_mnt/aaa
-> xfs_io -ft -c "falloc 0 4M" /mnt/test_mnt/aaa
-> stat -c "%b" /mnt/test_mnt/aaa
-> umount /mnt/test_mnt
-> mount -t cifs //127.0.0.1/share /mnt/test_mnt -o vers=3.0,guest
-> stat -c "%b" /mnt/test_mnt/aaa
-> 
->>
->>> Without this change, both step 3 and 6 would return 0, since even
->>> through umount/mount, the same file would remain open (since
->>> superblocks will be shared).
->>> With this change, step 3 would return 0. Step 6 would return the 
->>> right value.
->>>
->>> If you use nosharesock even after reverting this change, you'll see
->>> the test failing.
->>> Or even with this change if actimeo=0, then this test passes.
->>>
->>> The real question to ask is why aren't we updating i_blocks even after
->>> sync succeeds?
->>> My guess is that this has something to do with attribute caching when
->>> the handle is kept open.
->>
->> That sounds an important bug to fix.  Glad this test showed it.
->>
->>
->>
-> 
-> xfs_io -ft -c "falloc 0 4M" /mnt/test_mnt/aaa opens the file for
-> writing, which causes stat -> ... -> update_inode_info to skip updating
-> inode->i_blocks, because is_size_safe_to_change() returns false.
-> 
-> The file is only removed from the list in _cifsFileInfo_put(), but that
-> call is deferred, so the value obtained in step 3 doesn't match the
-> expected value. Step 6, however, does match — because after the remount
-> the file has not been opened for writing.
-> 
-> Before the patch was merged, both runs returned 0, because the second
-> mount reused the sb instance and the inode instance from the first
-> mount, and the interval between the two mounts was too short, causing
-> cifs_dentry_needs_reval() to return false.
-> 
-> SMB 2.1 behaves similarly: pwrite writes 4 GB and the size shows as
-> 8388608. If the server-side backing filesystem is ext4, it also
-> initially shows 8388608(see ext4_file_getattr()), and only during the
-> writeback path — when it's discovered that the extent count is too
-> large and an additional ETB(extent tree block) is required — does it
-> become 8388616(ext4_do_writepages -> ... -> ext4_ext_new_meta_block).
-> 
-> On the client side, cifs_write_end() updates inode->i_blocks but doesn't
-> account for that metadata block. Although generic/694 issues a sync
-> before stat, and the server flushes to disk upon receiving it, so by
-> rights it should return 8388616 — it doesn't. This is because
-> cifs_revalidate_dentry_attr() -> cifs_dentry_needs_reval() returns false
-> directly, since CIFS_CACHE_READ evaluates to true; as a result, it
-> doesn't even go to the server to fetch stat.
+> +{
+> +	offset += bvec->bv_offset;
+> +
+> +	return kmap_local_page(bvec->bv_page + offset / PAGE_SIZE) + offset % PAGE_SIZE;
 
-Sorry, on the stable branch, cifs_write_end() is gone. It looks like the
-update now happens in netfs_perform_write -> netfs_update_i_size
-instead.
+Overly long line.  Also this can use shits and byte masking to be a tad
+more efficient and matching the rest of the bvec code.
 
-> 
-> The oplock is only cleared to 0 in _cifsFileInfo_put(), and that itself
-> is a deferred release, so the stat call never picks up the actual data
-> from the remote server before _cifsFileInfo_put() called.
-> 
-> 
-> On the other hand, why is there no problem with cifs/smb2, and the issue
-> only appears on smb21/smb3?
-> 
-> The difference is that prior to smb21, there was no concept of leases —
-> only oplocks:
-> 
-> smb2_set_oplock_level
->    cinode->lease_granted = false
-> 
-> smb21_set_oplock_level
->    cinode->lease_granted = true
-> 
-> This means that on cifs/smb2, cifs_close() invokes _cifsFileInfo_put()
-> immediately (rather than going through the deferred-close path), so the
-> problem described above doesn't occur.
-> 
-> 
-> 
-> I'm new to SMB, so this is very much a beginner's analysis. I hope it's
-> useful to others, and I'd really appreciate it if anyone could point out
-> mistakes or things I've gotten wrong.
-> 
-> Thanks,
-> Zizhi Wo
-> 
-> 
-> 
-> 
-> 
-> 
-> 
+Users of this would be interesting and why you're not simply using a
+bvec_iter at page granularity, which is what other block kmap code
+does.
 
