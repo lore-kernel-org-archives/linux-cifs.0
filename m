@@ -1,272 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7C0403E93;
-	Tue, 26 May 2026 15:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779808178; cv=none; b=uVZAocdq8OhhC1BgPUj8EpRxLE6LRY/R6wIo2yf2tjKKDavh1Q73zv4ZDbTdNSKzlOnvQ/BLjd4WHaDsCwoEexOkHevcsvMFXS0K6+ecjjcpyUVT6I9dblNvor9XmXuEdBE+cAzfBlPs50Hiw7EkTYu33h/jBQf7WZLJ3zdWVeQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779808178; c=relaxed/simple;
-	bh=Pm/3nYKji1k7vkWEne2WpXcwxjzW9fiBWyC9hAh/ehc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UGt33DP1w6R5qzOJGkvdxUVhXhLUdZZfEeJ9X0mkqgM4v6M9/E+nklfcOrg71Gcg0M0b5xnbppzukr/HQ+H6lMJaHTwnUZ94qOgph7HvUzi92hRnBgJSXGhgzaToiBrVSnVAiR/ib4ETk9MbgoEYbU0x6mibOQp3+8Gbm70Dspo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=osFPn8kX; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327C637DEAD
+	for <linux-cifs@vger.kernel.org>; Tue, 26 May 2026 20:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779826945; cv=pass; b=tzFB22ucRzYC5a8DsBXGBYcWGKkPF2eSdAQ/TuQJrpzJ5YW8BxEvv/mLoiCCqGwjHF9VFVyuRy2h17Rc8XYEtumh60nkg2SoQit0stCElVEgi536/52U4emJlgYAq9RNIh3GEvAxiQumHRx0p3RkVVxYMTAuOWJ1rlnXVz8lBDw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779826945; c=relaxed/simple;
+	bh=EJxi0LYnVHGU89X9/Le8D3Gxtg9JbiIeGttw3jVYowk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=KxXwNlm5uF/IQpkLLfR34gx4InLlE4a3HzgWIs0wHUZ8FuhhJbo9ywqNBQ5V8xhP//H/BT9HuQD40EOt/0MoRots8nYwJYTqgSxIxSVY7mF8vGu0NA6yocDN+qxWnWu+K+Jh/RUWoeMAHDYVWspK6zxNGoSPduMyVaHQCYNhCCk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GSIfLp62; arc=pass smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="osFPn8kX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 977231F00A3A;
-	Tue, 26 May 2026 15:09:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779808177;
-	bh=OYYZcK1TdwY85DshlEc6tQLHPx/HC7Fyn1GnzZvcskg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=osFPn8kXSAj0eBm37CBh3Y8xGzKeW0q4ByXhpEUN0JUe+U90C3AMShoRVVdALQygA
-	 4DGBq9XmG0Xi5h5417AaNg1d0IBICsvadFe3aZEM70tzhr+tHp4sq61K8VkwsJfzRJ
-	 /yRVA2n0ilRmzUKQ9Cg833C8SsW5ugSWaPce9Hj8VSZ6HBTScISq03HtYkalb3DW1a
-	 GlEMCBDVnZb9OMgueihTbSebPhvNG7iVuWH8QR8bHuBqGww4/xg9O81LBkTUKYQNdt
-	 do0/t5CVRO28TgQn6IVoXvZlzP41ja1h2aXRO24LwFLL4f5STNbpV34lnAWgIYGJ3j
-	 l6jiYpnaAGu5w==
-From: Christian Brauner <brauner@kernel.org>
-Date: Tue, 26 May 2026 17:09:10 +0200
-Subject: [PATCH 8/8] super: convert iterators to RCU readers +
- refcount_inc_not_zero
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GSIfLp62"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-8cbe69b122bso62341866d6.2
+        for <linux-cifs@vger.kernel.org>; Tue, 26 May 2026 13:22:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779826943; cv=none;
+        d=google.com; s=arc-20240605;
+        b=bhDyX4Q2jjThkqhyoCJYzDpTQud/hW4atJ57aC3I+4HHc9xYz3eLFyh69ZmQDe0tIX
+         3MuRpD+/Vvt14b0tV+tZzFVz/s8GzGPrvbiVGk4/yNrt0Vnn4DdqPXD4pPHtMwQhXyv8
+         mv+mu3h26IE7nVzFRdF4BiCC8rVhAGQ6lDgAJdzvBBceCFS2GIkpaV35HJxB0yjZV9vP
+         u2x1LHBQECt/znKIPMyU0+9RDOb+Ox8ugos/mnhFBWLk7BMZxzszJY9OLoGF7Mzj8tf9
+         ga5BdINuS/XPDrqKvslEdokQoYjrGOq55Q7qL3NXk5Bx2oe9WU2iPF9y4mFwGGA7psIn
+         rRbQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=O3khOo62AnXpi3t5fdjIOuCLZoe5BAvt8jokgOAAWUI=;
+        fh=jxNNffwlnklz5ejqtoMSwyIXYqUpoaE9SJaOuGx70DE=;
+        b=G8Xp9+YaUJ+jyuJ/D9UHiaTQdTUIf0DAiAcnIgFhLj/AtW1b9if4Q/n7PdTIz6Ko33
+         9nLjMl2x4Ak9uDbkJEi4vcYUm3uOleY41nVsA6kyBAN0Or2B6a6KEdrZ9lz26fRfUl8n
+         CrhR+c4r8kH3yXCYZq5ep6m7oNORf6pdiumaGcFhYmn/T3H2GXKHJSg8CHov7XvUN3uh
+         mu5xse1bqSoRzxR9wsRz5VQs/+zYGkCDB7npI8k4eOts8IAf3dIzhMKW03zmt6jGRWuM
+         EBMm0l4b6lDZP0YwIgxzaD2XOm08D2i+2uZt0wdVEuex9Kt3Q3phIc+ZHamuODJ+ABv0
+         8Rqw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779826943; x=1780431743; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=O3khOo62AnXpi3t5fdjIOuCLZoe5BAvt8jokgOAAWUI=;
+        b=GSIfLp62sNvUm+T29L1cA7PaYNe/FXQ2zZu+pU4aDQKv7Gq3mld9+suJsV65HN5bvv
+         PXJj8Jg1JC2QlFcUdp4mgC7r9CtoXsF7AQ9RXGrncyewc/pzeiZoD3cF0EuktRNvypaC
+         kzpoOMmqwt6PveY+o2IX/Fyy1aYimWp4WXZ94RajnmqZ9DhlRhOkkNi12cw84R+NiUMu
+         a93fKDKXoPRCS/oBOmCkqIOJEMOGjiEFGlmOurSEA1A9OlOyhlwgpfGnQuCCyq+xLkXn
+         wG7MUPAxMxXhzOWJ0VruFzVT3n3ngoT7s15xkoJNLFBDBtcO8dGlP19ngxpyIOIoBzYd
+         ArFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779826943; x=1780431743;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O3khOo62AnXpi3t5fdjIOuCLZoe5BAvt8jokgOAAWUI=;
+        b=GaizraFig7z01Yw3MDANWHoliJoACfXXGWhcgnLv14vRMhhyI4mUA7wL0d4XBZSzxZ
+         /DJLHvBM13ftJMrO2jYDSoAJ9szt/1xYH/4+M9momxt9OkyYirnrsHAe9sQcjhiAloHt
+         zz8++3yr6QBiWlcexe3CcvaP782lycQ5Ev8hHLZkdYzvOUVRgfYED/LfSfM5IP1y5Et/
+         TtAuTs65enscMuInwIPQIXAp2YLdEfpgzL9Bwu/ITje9DuivLN8+lBzh5D5yQRPHq0Ht
+         VE/jQY1RB4cfoQlzUpkcIYeA/eceMNNRCNteamApo3koILGm5tmys/TL2fJRfn/b4oyT
+         UJEA==
+X-Gm-Message-State: AOJu0Yw8pELUuobpE/8jYF7PrlWwpAvyyez/XSebptt/fiiaRMNIA0MN
+	gB1lBZVxKAHy6Ay0ddXKzx+mMGIpg14Ia4KP5Q5hlrHUgG2vO7MkqFRqHr73kNWff4GLLuzFETw
+	qkwebp1Ssn0gGeOAjRAmv0uDq1X0wXQUrhg==
+X-Gm-Gg: Acq92OF0USdOKceovXGADdGrfR9lZA1g/1A6GDWc2aaO7a9Iuqab10dY3YTlUttX/U7
+	xF5RKvRKweDzyJbDBn+pGSmqqgRF4VSm7qy8tPQDe6iUZWC4L+87bQswmkeA8+HYmaiHxlcSSQa
+	uJktTI3kKuYI2RLReZyfbfj0lT4VvXtTEtqV+dPgH3td4cEAisEtkgnqScmuDnhHRaIRNWIjXto
+	LRyQQ1p/CyWdMsHGgRnL4WoRkyGwfrLy8S8XfiURhcS1ckUFP6KWV+bJWGyLkX2exOeIVaIJpUF
+	+j4PLuEBgQK/Is8C47bgzKD2cd35I9atV4gCfKJerjmVhs1YHuea69Op5ifb7wfpghZfZXK0F1I
+	jSUH0fZzQx1f1EnRiqbQZOVKG46L76PxtNjiauF6HLALdSjHodK0Kz+nyFUywZJ3rFhvIM8n0Zp
+	YUQa6j7EQbl5lUn1rNvB9h3A==
+X-Received: by 2002:a05:6214:468f:b0:8ae:652b:e3c4 with SMTP id
+ 6a1803df08f44-8cc7b6028aemr322119886d6.49.1779826942996; Tue, 26 May 2026
+ 13:22:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260526-work-sget-v1-8-263f7025cedd@kernel.org>
-References: <20260526-work-sget-v1-0-263f7025cedd@kernel.org>
-In-Reply-To: <20260526-work-sget-v1-0-263f7025cedd@kernel.org>
-To: linux-fsdevel@vger.kernel.org
-Cc: Theodore Ts'o <tytso@mit.edu>, 
- Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.cz>, 
- "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, linux-ext4@vger.kernel.org, 
- linux-cifs@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
- "Christian Brauner (Amutable)" <brauner@kernel.org>
-X-Mailer: b4 0.16-dev-fffa9
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6639; i=brauner@kernel.org;
- h=from:subject:message-id; bh=Pm/3nYKji1k7vkWEne2WpXcwxjzW9fiBWyC9hAh/ehc=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWSJbp/9o2PbYtNrU6V+z8p4kJp29H3NwzsxIbZRZw5oX
- RdhVltS11HKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjARTi9Ghv7/DCci9v5dphfN
- s/3jn+xTiomp+Q/SUz2m380z5Ypsdmb47/xm2c7Fu1c3vm2wMAx6ve9+Xxhz9JPVK7r02dZW2ln
- dYQIA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 26 May 2026 15:21:43 -0500
+X-Gm-Features: AVHnY4KVRgd6-0zBRsC0XHn5TrR-Y_1JPFN8rI-4JW3UZJWZY0MtenWDp_u-58s
+Message-ID: <CAH2r5msNKaBO2HQfXri1VbN2RoSqCWgxHwvvWLeODK1hxNueJA@mail.gmail.com>
+Subject: chown Samba server bug
+To: samba-technical <samba-technical@lists.samba.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Walk @super_blocks and @fs_supers under rcu_read_lock() and pin the
-current entry with refcount_inc_not_zero() instead of holding sb_lock
-across the cursor advance. sb_lock was only there to keep the
-cursor's ->next / ->prev pointer from being mutated by concurrent
-list_del / list_add. RCU semantics give us that guarantee directly:
-list_bidir_del_rcu() preserves both ->next and ->prev on the
-unlinked entry and list_add_tail_rcu() publishes new entries with
-the release barrier set up by the previous patch.
+I was testing a fix for the Linux client problem with the SMB3.1.1
+POSIX extensions where the client was not sending chown or chmod over
+the wire, and noticed Samba server had a bug with chown.   I tried two
+experiments:
 
-The pattern at each iterator is:
+1) chgrp: with my fix I now see the group updated both locally on the
+Samba server, and what is reported remotely by Samba (for ls and stat)
+is correct and shows the updated group
 
-    rcu_read_lock();
-    list_for_each_entry_rcu(sb, ...) {
-            if (SB_DYING)                             continue;
-            if (!refcount_inc_not_zero(&sb->s_count)) continue;
-            rcu_read_unlock();
+2) chown: with my fix I only see the user owner updated locally on the
+Samba server, what is reported by Samba (for ls and stat) is the old
+user owner
 
-            ...                       /* may sleep on s_umount */
-
-            if (prev)
-                    put_super(prev);
-            prev = sb;
-            rcu_read_lock();          /* prev pinned: prev->{next,prev} valid */
-    }
-    rcu_read_unlock();
-    if (prev)
-            put_super(prev);
-
-While we hold a pin on @prev, __put_super() cannot reach the
-refcount_dec_and_test() transition that drives list_bidir_del_rcu().
-So @prev stays on the list and concurrent list_bidir_del_rcu() of
-other entries keeps @prev->s_list.{next,prev} pointing at the still-
-live neighbour (or the head sentinel). The cursor advance after
-re-acquiring rcu_read_lock() is therefore always against a live
-chain in whichever direction we're walking.
-
-put_super() now appears in the middle of the loop where __put_super()
-used to be called with sb_lock held. It briefly takes sb_lock for
-the trailing-ref drop; in the common case dec_and_test() returns
-false and the lock is held for only a handful of cycles.
-
-first_super() and next_super() switch the forward arm to READ_ONCE()
-on the head and cursor ->next pointers and the reverse arm to
-rcu_dereference(list_bidir_prev_rcu(...)). The forward arm matches
-the semantics of list_entry_rcu() used internally by
-list_for_each_entry_rcu(); the reverse arm is the canonical
-bidirectional-RCU traversal pattern (see kernel/nstree.c) and is
-needed because filesystems_freeze() and do_emergency_remount() pass
-SUPER_ITER_REVERSE.
-
-iterate_supers_type() and user_get_super() get the same treatment.
-user_get_super() simplifies further: on lookup hit we return with
-the pin; on lookup miss followed by SB_DYING discovery we put_super()
-and return NULL.
-
-sget_fc() and grab_super() are not touched here.
-
-Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
----
- fs/super.c | 71 +++++++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 38 insertions(+), 33 deletions(-)
-
-diff --git a/fs/super.c b/fs/super.c
-index 8c01b95be717..d9b1148f7030 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -831,17 +831,25 @@ enum super_iter_flags_t {
- 
- static inline struct super_block *first_super(enum super_iter_flags_t flags)
- {
-+	struct list_head *next;
-+
- 	if (flags & SUPER_ITER_REVERSE)
--		return list_last_entry(&super_blocks, struct super_block, s_list);
--	return list_first_entry(&super_blocks, struct super_block, s_list);
-+		next = rcu_dereference(list_bidir_prev_rcu(&super_blocks));
-+	else
-+		next = READ_ONCE(super_blocks.next);
-+	return list_entry(next, struct super_block, s_list);
- }
- 
- static inline struct super_block *next_super(struct super_block *sb,
- 					     enum super_iter_flags_t flags)
- {
-+	struct list_head *next;
-+
- 	if (flags & SUPER_ITER_REVERSE)
--		return list_prev_entry(sb, s_list);
--	return list_next_entry(sb, s_list);
-+		next = rcu_dereference(list_bidir_prev_rcu(&sb->s_list));
-+	else
-+		next = READ_ONCE(sb->s_list.next);
-+	return list_entry(next, struct super_block, s_list);
- }
- 
- static void __iterate_supers(void (*f)(struct super_block *, void *), void *arg,
-@@ -850,15 +858,15 @@ static void __iterate_supers(void (*f)(struct super_block *, void *), void *arg,
- 	struct super_block *sb, *p = NULL;
- 	bool excl = flags & SUPER_ITER_EXCL;
- 
--	guard(spinlock)(&sb_lock);
--
-+	rcu_read_lock();
- 	for (sb = first_super(flags);
- 	     !list_entry_is_head(sb, &super_blocks, s_list);
- 	     sb = next_super(sb, flags)) {
- 		if (super_flags(sb, SB_DYING))
- 			continue;
--		refcount_inc(&sb->s_count);
--		spin_unlock(&sb_lock);
-+		if (!refcount_inc_not_zero(&sb->s_count))
-+			continue;
-+		rcu_read_unlock();
- 
- 		if (flags & SUPER_ITER_UNLOCKED) {
- 			f(sb, arg);
-@@ -867,13 +875,14 @@ static void __iterate_supers(void (*f)(struct super_block *, void *), void *arg,
- 			super_unlock(sb, excl);
- 		}
- 
--		spin_lock(&sb_lock);
- 		if (p)
--			__put_super(p);
-+			put_super(p);
- 		p = sb;
-+		rcu_read_lock();
- 	}
-+	rcu_read_unlock();
- 	if (p)
--		__put_super(p);
-+		put_super(p);
- }
- 
- void iterate_supers(void (*f)(struct super_block *, void *), void *arg)
-@@ -895,15 +904,15 @@ void iterate_supers_type(struct file_system_type *type,
- {
- 	struct super_block *sb, *p = NULL;
- 
--	spin_lock(&sb_lock);
--	hlist_for_each_entry(sb, &type->fs_supers, s_instances) {
-+	rcu_read_lock();
-+	hlist_for_each_entry_rcu(sb, &type->fs_supers, s_instances) {
- 		bool locked;
- 
- 		if (super_flags(sb, SB_DYING))
- 			continue;
--
--		refcount_inc(&sb->s_count);
--		spin_unlock(&sb_lock);
-+		if (!refcount_inc_not_zero(&sb->s_count))
-+			continue;
-+		rcu_read_unlock();
- 
- 		locked = super_lock_shared(sb);
- 		if (locked) {
-@@ -911,14 +920,14 @@ void iterate_supers_type(struct file_system_type *type,
- 			super_unlock_shared(sb);
- 		}
- 
--		spin_lock(&sb_lock);
- 		if (p)
--			__put_super(p);
-+			put_super(p);
- 		p = sb;
-+		rcu_read_lock();
- 	}
-+	rcu_read_unlock();
- 	if (p)
--		__put_super(p);
--	spin_unlock(&sb_lock);
-+		put_super(p);
- }
- 
- EXPORT_SYMBOL(iterate_supers_type);
-@@ -927,25 +936,21 @@ struct super_block *user_get_super(dev_t dev, bool excl)
- {
- 	struct super_block *sb;
- 
--	spin_lock(&sb_lock);
--	list_for_each_entry(sb, &super_blocks, s_list) {
--		bool locked;
--
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(sb, &super_blocks, s_list) {
- 		if (sb->s_dev != dev)
- 			continue;
-+		if (!refcount_inc_not_zero(&sb->s_count))
-+			continue;
-+		rcu_read_unlock();
- 
--		refcount_inc(&sb->s_count);
--		spin_unlock(&sb_lock);
--
--		locked = super_lock(sb, excl);
--		if (locked)
-+		if (super_lock(sb, excl))
- 			return sb;
- 
--		spin_lock(&sb_lock);
--		__put_super(sb);
--		break;
-+		put_super(sb);
-+		return NULL;
- 	}
--	spin_unlock(&sb_lock);
-+	rcu_read_unlock();
- 	return NULL;
- }
- 
+Trying the same tests to ksmbd, both chown and chgrp now work, but to
+Samba chown only 1/2 works (updates local but not what is reported
+remotely)
 
 -- 
-2.47.3
+Thanks,
 
+Steve
