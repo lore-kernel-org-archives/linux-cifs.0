@@ -1,130 +1,167 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FA013B58A
-	for <linux-cifs@vger.kernel.org>; Sat, 30 May 2026 00:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780099256; cv=pass; b=OCkOtUuNryCizvZTO8lfrTgkj33m37XAMkjQwKUnF9fk1xNx94utMCDhT0JF1uzXLrfFcugxvLZDP7/LSA3lyHLK8Aq7WsG0abgvPEOnKIzvN3xGp8WjrTXMVQK4v7iS62pSJF19xtF21U/lftLsY1LjHT6NwUdeMdqkJUUKbFw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780099256; c=relaxed/simple;
-	bh=33vmJrDltqY+64sPBwD8bMNNYKDzHDaJYDXlYEPpF5E=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hoAzsMotJClrKdiTyT9qhx0Xvkvs332o5LNS500YtbKghOo37f+l7iVsgI9uS59dkDJN8JPPUX1/J67RJVDJ5w4Fl5hL86+0cI/lAR1gVZI4SY1PW/1RQnX0S+YlH81oqcTRsjHglHFamzyZrBtgSkMIzyM9TBcZm8QcWCLc+BQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h7q3g+VU; arc=pass smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86528395273
+	for <linux-cifs@vger.kernel.org>; Sat, 30 May 2026 10:16:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780136198; cv=none; b=p+GfLxzep0wCYF5SofeqHjics5uauSYaL1J33Gja6oZ40gRLrJ3YioOzw4jAKPpqD0Fs07YXKsBgjM+VnGa7XeO7gb4nyqFm1X4o28rN0nIo14zSaMNLRK3dsqWCJ/L8kTMIHCPaYFJwdMuSUhQpRQYEWM1pc+97Nra2dU01obc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780136198; c=relaxed/simple;
+	bh=AdkMomJGEaEJBi2NRBYCs/g75EDMfDkRfLf7bu9VtNU=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=ty4zcUgIrsmINy5KIHo9uOpu1nk8zLuzAEUFDEi2aTk6tMswivKIMtJL6Ftrxo+lYUrj6NLFRxWAkE/w/dUrzNqeCoU1e7hhwNnlFdtOyTuUoeLByb1JYSvvqPXiENFe5HRZN4rlmHyciw+kDazShpQLCc42+nQzpRH4hbdVfM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=3zgZPCAq; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h7q3g+VU"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8c92737a8d3so94810746d6.1
-        for <linux-cifs@vger.kernel.org>; Fri, 29 May 2026 17:00:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780099254; cv=none;
-        d=google.com; s=arc-20240605;
-        b=iSVzMz1OaL5z7wfoML25QMji3x+tDwtF2Cal1O3rxrku1AvhFp3WiTZt+Zw3qTQMJE
-         /e6gxzSu1QZbdptZnC1Kc7rKC++4vpEPnIcAOk3vmKHqJ2rCfLz7uuBZ0tqmkBdpkg91
-         /ISvcOcX8f3fWVv2NtcDohj3YE7b7sLitHkY1DuH7r22BXudP8Jj0qGw//ITJAMS/z1Y
-         Ik/FiTDiVfrLrwoKClLb8VZKUPPNTl5ucthiIqARDNquK5BMi68amWgLZAmuIlqvoxCi
-         W9MGmouzfjpKsf/7Ra1HgbMuaWv/YcWKXfDuXB9NChIZgJRTz2e/poSTDMhKWyku5UPQ
-         4T6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=TWGswphD+bZOHCJ11G2jKpBxaoJonw9YVK4kfZSPQEk=;
-        fh=aWuwO5lHHlNdJJ5YGVLl+Ie4EaFauyelA/OpB1HwjyY=;
-        b=Cb7YxQEAWjrZDU6AWgZIgQQ3wUfiM9qZTtYO8T5HEEtXxVsyC7KrXoh9rPWFtqclrr
-         DEQVWdBQs6gNoDZmRjZicXZwAjnYijGDOXUCVGuT/U9Kv6gofrFD94h8H76RqwMS6aVp
-         eqLzE1BGvQ7bSUCN80l1v7y57SSfHmQQSw52dKPxUBruBmJfaxK0S9jYt8rJkA69EfJa
-         OCCHQErwd4WjT+TJdjtlJxpmSkMOrJRwq8N08NwZK+dO4NObEX7CmQ6303PgzTJW0g9C
-         H+if6W64eiwPKGTgBC8FlxSXYo3LXVbmkdgnHJb7O2qo35lOgpXuxzFiI93llHEa6qOj
-         D5dw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780099254; x=1780704054; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TWGswphD+bZOHCJ11G2jKpBxaoJonw9YVK4kfZSPQEk=;
-        b=h7q3g+VUmR21jpGkNCvs511WFBvv3+A4NBlVl1ergs+epqP9CayYm76gy+ulV6T5qG
-         H+u6Zy4HjcTwBfTN3qDLj9FTgPo4J+lRGbILfOoyxe9ayZfGQrFAi7DTdNAU7BVOkQPD
-         OVDiSonY5FOo/YQtDRUPVjZ672zlcNsZXmhlNNbhbXcVF+bOiSymOrjacvHptB0tU5Xg
-         490yOJZ9XN0eNzWIYYs1VFN71ow7hisO3oV7KiiBlVICJSdNRX/uEcEGRwaw74dHQR9y
-         mL5kLXqDQPEMMjGdSN1wChB2+hD1Vg23rp48fkfXU+ikmQUmshfo0ZV8/3RUmgz/dHPa
-         9RJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780099254; x=1780704054;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TWGswphD+bZOHCJ11G2jKpBxaoJonw9YVK4kfZSPQEk=;
-        b=VhhXIHCeqWrDxjowBlVxvy3ewKm019ESoVZNxjD8M4iV/MijIXiUse3vs3wuiNmGeh
-         cXj5Mtw2zJIKQ9UGvZF1lEsy/pu/uR13eFQhsc9y5FxboBlNdkVwpsIn7SaPnlcJxalY
-         GojQG2VXweGN4dDD18hW1vQSzxiaXC2MaNmOP0R4on58qI6iESKTTQk2udNnAEwZoOsl
-         gQ4Y3e1s/rubo5/9sekgk22HWIDmVs4O4BbKv/UT7huwr11HWP1M8vLGnbDmvQiQ1GSi
-         ElXsM3zdE+1faydW6IIrhfu1iR2hUUwiIGME0pV0cwLdMBy9HJS+kvgkLrGposONUPdc
-         +Mfg==
-X-Forwarded-Encrypted: i=1; AFNElJ/N5uSjAbwiClMRVCCZqICxVjObnKauqCz22IWgJiFA1fWV2awmiFcfvBC+aqYiNO8tsaJ1Htqo90vT@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy348s1ciV3L6vdVSQm77YB7mo/d6xvF7xryjVbAQutqhL7rAp8
-	hMoaKDPFxdRlHRdq/oaf5MV26xiH6LnRKy2x5bE7Kdxq8z6RwSujF3CNPVXALYqemcA/4eDSuy1
-	AkfaAQWlijB8lwrizUWwRZuu9ruJmK++bsnOjD4w=
-X-Gm-Gg: Acq92OHt3eE3XklpfD21ce2iwWcdz9BBfbvKphszv5/gJQhYpHKNGU8FMA4dpo9AXFF
-	CQGRmG+7x4TXqOLiNJntTF/MAi/pB+s+EmBQcIoT0VZ08egArLzcbtxf2RW0sTOtvUEVVcF14yn
-	MA2j+aHREm0oa1bpZgi7eX1m8kQy57X5c4MhUXfX9A/Ng/ba5ugh68DTW6dI3mYRo+aG0BP1LhZ
-	yloGlKyDt9cxCCWVa/5hA/R5XAT1CZhpnERA9eur+eCCO6k9IcAymMqophqunExdAbdAFHwYIi9
-	ks/+txLaOyGNqN6RIH68Dnksa1msfTARIQTwl/emrGNG3AcrpKej0K9ebBEwZiI4Y86bjAoSfjo
-	uhf1nMRwZyBwF0NhIQUO3FjxoZ3Z/xk56B968XPDMkkQC5IZcTSlYM1mK55oO33n429uoysuQl4
-	rhVw+cDkG+fBhCwjAWUqeVt3NYJ054qdU=
-X-Received: by 2002:a05:6214:5092:b0:8b3:f59b:6c8 with SMTP id
- 6a1803df08f44-8ccefdc15admr31393106d6.31.1780099253472; Fri, 29 May 2026
- 17:00:53 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="3zgZPCAq"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Cc:To:From:Date:Message-ID;
+	bh=AdkMomJGEaEJBi2NRBYCs/g75EDMfDkRfLf7bu9VtNU=; b=3zgZPCAqVry/lFslQqf0lNZ/L4
+	xicZyThqGDzrWOwDLBbsCtb1ohCz5S2d3vBUph4dUe6gYDVJdViBBVMVvXRVdLf3u0Ut8o6HVkO1F
+	CXL0JkFEXdOBGt8QpCISIFa30ooqfWWz4r6/f4uSUsCToZ9v0cQsNdafnXFTIuac+leuFfjfzyI/o
+	roV9jat7WpASyf0QY1RohNGSCr/mrJbT6EhYct7sX07P3bNGj5RP4nh8w/8qehClB2IIo7I3FKHm7
+	2SCSCpQyLL5BqM/6B4Mti+jxkrQ9hbMyjR2e9qXzRHiPNJTIZ4englQ3wSd1RXna9FJ5K4jgMOkwU
+	L1VLbUYiX+C1CvN80jfR++WEU+FErnztQH43GRvrqAdQ5jPLT5/+V3csr8tNXvoh6G/M6Q6Zb9I9k
+	E7rQQrMca7vE22IsQg+jLqS349HEzvAxv2zmmHmYdZx9CLq8zgF+q8LIXFc2bldNzINYEt/FhCjSn
+	58//el7JWgrteObBWfypV0VI;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wTGk0-0000000CnkJ-1TXq;
+	Sat, 30 May 2026 10:16:28 +0000
+Message-ID: <1f053cac-c952-49cf-af22-16533b70939b@samba.org>
+Date: Sat, 30 May 2026 12:16:27 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 29 May 2026 19:00:41 -0500
-X-Gm-Features: AVHnY4KCOsOZl2s1I7odiC8vXi_au7lWZrkPdfGVZv0TY2DlryNs1lqgHr5XEgE
-Message-ID: <CAH2r5muwEzNYv-g_A41PSTFJoOCW6AzBD5U1WCuzTrao8k9xVA@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+From: Ralph Boehme <slow@samba.org>
+Content-Language: en-US, de-DE
+To: samba-technical <samba-technical@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>
+Cc: Jeremy Allison <jra@samba.org>, Steve French <smfrench@gmail.com>,
+ Paulo Alcantara <pc@manguebit.org>
+Subject: SMB3 POSIX Spec Reviews
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------40P8BKkSf54hEpBHhTO61xqI"
 
-Please pull the following changes since commit
-e7ae89a0c97ce2b68b0983cd01eda67cf373517d:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------40P8BKkSf54hEpBHhTO61xqI
+Content-Type: multipart/mixed; boundary="------------F35lqJSMch8e0AU4TX3n15r0";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: samba-technical <samba-technical@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>
+Cc: Jeremy Allison <jra@samba.org>, Steve French <smfrench@gmail.com>,
+ Paulo Alcantara <pc@manguebit.org>
+Message-ID: <1f053cac-c952-49cf-af22-16533b70939b@samba.org>
+Subject: SMB3 POSIX Spec Reviews
+Autocrypt-Gossip: addr=jra@samba.org; keydata=
+ xsDiBDxEcLsRBADMQzpWoVuu4oiq23q5AfZDbakENMP/8ZU+AnzqzGr70lIEJb2jfcudViUT
+ 97+RmXptlnDmE4/ILOf6w0udMlQ9Jpm+iqxbr35D/6qvFgrgE+PnNAPlKSlI2fyGuLhpv1QP
+ forHV13gB3B6S/ZWHpf/owKnJMwu8ozQpjnMnqOiVwCg8QnSX2AFCMd3HLQsqVaMdlO+jBEE
+ AKrMu2Pavmyc/eoNfrjgeRoNRkwHCINWO5u93o92dngWK/hN1QOOCQfAzqZ1JwS5Q+E2gGug
+ 4OVaZI1vZGsAzb06TSnS4fmrOfwHqltSDsCHhwd+pyWkIvi96Swx00e1NEwNExEBo5NrGunf
+ fONGlfRc+WhMLIk0u2e2V14R+ebDA/42T+cQZtUR6EdBReHVpmckQXXcE8cIqsu6UpZCsdEP
+ N6YjxQKgTKWQWoxE2k4lYl9KsDK1BaF6rLNz/yt2RAVb1qZVaOqpITZWwzykzH60dMaX/G1S
+ GWuN28by9ghI2LIsxcXHiDhG2CZxyfogBDDXoTPXlVMdk55IwAJny8Wj4s0eSmVyZW15IEFs
+ bGlzb24gPGpyYUBzYW1iYS5vcmc+wlcEExECABcFAjxEcLsFCwcKAwQDFQMCAxYCAQIXgAAK
+ CRCl3XhJ1sA2rDHZAKDwxfxpGuCOAuDHaN3ULDrIzKw9DQCdHb3Sq5WKfeqeaY2ZKXT3AmXl
+ Fq7OwE0EPERwvhAEAIY1K5TICtxmFOeoRMW39jtF8DNSXl/se6HBe3Wy5Cz43lMZ6NvjDATa
+ 1w3JlkmjUyIDP29ApqmMu78Tv4UUxAh1PhyTttX1/aorTlIdVYFjey/yW4mSDXUBhPvMpq52
+ TncLRmK9HC6mIxJqS0vi6W9IqGOqDRZph3GzVzJN7WvLAAMGA/sGAyg2rVsBzs77WH0jPO+A
+ QZDj+Hf/RFHOwmcyG7/XgmV6LOcQP4HfQHH3DGYihu5cZj3BeWKPDJnjOjB2qmr+FTjYEsjw
+ LDBNG7rjRye412rUbNwmEtcD2/dw4xNyu5h2u+1++KVBPf4SqG/a10gDqGJXDHA1Os5MmnQl
+ 3CTq9sJGBBgRAgAGBQI8RHC+AAoJEKXdeEnWwDasbeIAoL6+EsZKAYrZ2w22A6V67tRNGOIe
+ AJ0cV9+pk/vqEgbv8ipKU4iniZclhg==
 
-  Linux 7.1-rc5 (2026-05-24 13:48:06 -0700)
+--------------F35lqJSMch8e0AU4TX3n15r0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-are available in the Git repository at:
+SGV5IGZvbGtzLA0KDQphbnlvbmUgYWJsZSB0byByZXZpZXcgdGhlIGFkZGl0aW9ucyBJIG1h
+ZGUgdG8gdGhlIHNwZWM/DQoNClBPU0lYLUZTQTogUE9TSVggZmlsZSBkZWxldGlvbiBzZW1h
+bnRpY3MNCjxodHRwczovL2dpdGxhYi5jb20vc21iMy1wb3NpeC1leHRlbnNpb25zL3NtYjMt
+cG9zaXgtZXh0ZW5zaW9ucy8tL21lcmdlX3JlcXVlc3RzLzE+DQoNCkZTQTogYnl0ZXJhbmdl
+IGxvY2tzDQo8aHR0cHM6Ly9naXRsYWIuY29tL3NtYjMtcG9zaXgtZXh0ZW5zaW9ucy9zbWIz
+LXBvc2l4LWV4dGVuc2lvbnMvLS9tZXJnZV9yZXF1ZXN0cy80Pg0KDQpGU0E6IHF1ZXJ5aW5n
+IEZpbGVQb3NpeEluZm9ybWF0aW9uIGFuZCBGaWxlRnNQb3NpeEluZm9ybWF0aW9uDQo8aHR0
+cHM6Ly9naXRsYWIuY29tL3NtYjMtcG9zaXgtZXh0ZW5zaW9ucy9zbWIzLXBvc2l4LWV4dGVu
+c2lvbnMvLS9tZXJnZV9yZXF1ZXN0cy81Pg0KDQpTTUIyOiBDbGllbnQgRGV0YWlsczogbWFw
+IFBPU0lYIGZ1bmN0aW9ucyB0byBIaWdoZXItTGF5ZXIgVHJpZ2dlcmVkIEV2ZW50cw0KPGh0
+dHBzOi8vZ2l0bGFiLmNvbS9zbWIzLXBvc2l4LWV4dGVuc2lvbnMvc21iMy1wb3NpeC1leHRl
+bnNpb25zLy0vbWVyZ2VfcmVxdWVzdHMvNj4NCg0KVGhhbmtzIQ0KLXNsb3cNCg==
 
-  git://git.samba.org/ksmbd.git tags/v7.1-rc6-ksmbd-server-fixes
+--------------F35lqJSMch8e0AU4TX3n15r0--
 
-for you to fetch changes up to cc57232cae23c0df91b4a59d0f519141ce9b5b02:
+--------------40P8BKkSf54hEpBHhTO61xqI
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-  ksmbd: fix FSCTL permission bypass by adding a permission check for
-FSCTL_SET_SPARSE (2026-05-26 20:36:36 -0500)
+-----BEGIN PGP SIGNATURE-----
 
-----------------------------------------------------------------
-Three ksmbd server fixes
-- security fix for FSCTL_SET_SPARSE
-- fix leak in ksmbd_query_inode_status()
-- fix OOB read in smb_check_perm_dacl()
-----------------------------------------------------------------
-Aleksandr Golovnya (1):
-      ksmbd: release ksmbd_inode ref via ksmbd_inode_put on lookup paths
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmoauPsFAwAAAAAACgkQqh6bcSY5nkba
+RA/9FEcQPziq3n/IDxZLgmgV8R2qb4/eAf/2vkJ2F8+LAj5QxFLonoP34z1kg6v+ZrmXz5ti/qz4
+aIxBHn+2M9zecbmVadkV+Tc4UmqnSGtHkwER2fYctB05NCBPrVRdOtuwz4D4fT+irhXqtNHM01g1
+8g+SUDP9RdtRAM7s8a5LVcSClXpYKw1XzrZD5I91BwcIYwAl0bk4IpN5OPqUCve1aCKHW2Y5F7V3
+v19SqLR0MhNvM/s9VMijkKxVRkXZ7lY3G5+pDbF19N2roAJDBi5zK5WleCHPFAxKQYD73OPL1IIx
+MJB1N/ncNNdx/osOgTKMYknu4L3EjAxFSyXt7K5NJLlw+wAqOFmYflipelZKHPw+mxKHZyQpC0ar
+vgqvEP0p/M5fNz0SufSpBmh414FdOdY7z54SuvJ4+yEznBQaVTUheipcuKGsFEto1s0w2fNd3pJy
+StOLxAwmR3a6rV2aCzh30UUoo5OX8zMR3kqJ+kbcKlfJqGpAZvO2hX1kXkasFR+0xu/2kox0eFGa
+JdyEUEaLvES4H53DvLvdlon0DBu8d7uKd15C9HkEa8XVoEGteA+Y+5bV6NBJVQnx4fGfvZy5/zhS
+G7f3P5xga2G80UdW91aWQ4mnX+a0V8qHZ6Om2qm9H38RyGLcESkibPTvFblMck5YG9IJyfS55uEU
+jPM=
+=FVgJ
+-----END PGP SIGNATURE-----
 
-Ali Ganiyev (1):
-      ksmbd: OOB read regression in smb_check_perm_dacl() ACE-walk loops
-
-Sean Shen (1):
-      ksmbd: fix FSCTL permission bypass by adding a permission check
-for FSCTL_SET_SPARSE
-
- fs/smb/server/smb2pdu.c   | 11 +++++++++++
- fs/smb/server/smbacl.c    |  8 ++++----
- fs/smb/server/vfs_cache.c |  6 +++---
- 3 files changed, 18 insertions(+), 7 deletions(-)
-
--- 
-Thanks,
-
-Steve
+--------------40P8BKkSf54hEpBHhTO61xqI--
