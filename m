@@ -1,223 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E4D2E7399;
-	Fri, 29 May 2026 08:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780044239; cv=none; b=rC0goldnrZKrA2q+IxLD2Je+8dZmf8157FLf19ODQUwzpqL9XIc+Fu2ErX3jvotX4EkNSTqv3cHFAdklrCcOujFIx1vjKD1atfpGkVmwbprGpAV78P2v33UiwgkkUsylM3Fyjw+cLlm7OWZXDywYT8jTwMBdSB/WYMqKKjxQlWk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780044239; c=relaxed/simple;
-	bh=e7wKMKr+HsU/JnqET2ePDgdpli5v5VhqWtSSBsarBiA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sMhzJq6u/7CIyh2VK3X9UazUnsFNb8KERyS9VHPvkUcuXbImYll9fOfiraeuoIzfypwwEq4+b5G5oEWi7pFG6KxxBM9xWPxYKtkoEgE1k8s/dyfPAZP2eg9LhxNMK2DVfejInzY8fiL/C+M0++k65fH3DWrVyeP7AdQAhwnri3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PX4TA1FM; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FA013B58A
+	for <linux-cifs@vger.kernel.org>; Sat, 30 May 2026 00:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780099256; cv=pass; b=OCkOtUuNryCizvZTO8lfrTgkj33m37XAMkjQwKUnF9fk1xNx94utMCDhT0JF1uzXLrfFcugxvLZDP7/LSA3lyHLK8Aq7WsG0abgvPEOnKIzvN3xGp8WjrTXMVQK4v7iS62pSJF19xtF21U/lftLsY1LjHT6NwUdeMdqkJUUKbFw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780099256; c=relaxed/simple;
+	bh=33vmJrDltqY+64sPBwD8bMNNYKDzHDaJYDXlYEPpF5E=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hoAzsMotJClrKdiTyT9qhx0Xvkvs332o5LNS500YtbKghOo37f+l7iVsgI9uS59dkDJN8JPPUX1/J67RJVDJ5w4Fl5hL86+0cI/lAR1gVZI4SY1PW/1RQnX0S+YlH81oqcTRsjHglHFamzyZrBtgSkMIzyM9TBcZm8QcWCLc+BQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h7q3g+VU; arc=pass smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PX4TA1FM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCFEB1F00898;
-	Fri, 29 May 2026 08:43:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780044237;
-	bh=MN6sCcOU8pQHv4qRImohzFWvar0iO7Uv/wwPJx7ADng=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=PX4TA1FMPZNH/wA0WQhg4yBZ25MqGONZdPYL8YELmOOVg1ZuCB8Ed0FQNu1AVvP+E
-	 l5+KHJKaCFiFHMwgJCf/1tBxrVDBiBNhw/z9MgDaolkOFLRB/2CWVtSnzgJbyTa+Up
-	 Jfl8ilybBE9jL8WKIQ8aSPtGuwlz/wTVcHQnI9qcqml+LErdDugY75zkHWN/ezG5Ri
-	 /s2Qb4itLVAKb6y+uqMz6W7EQPhUs/AglsaiR4KPJx84tWdsL5ynMDJ3kwU5SevdwB
-	 fkeZw5jMfmHze0n5kyn2KptuBsnGScU1mBWzlSj7YhTJbHGrtwO80OGMQYxKmJufpJ
-	 xN0mpbFcs0sdw==
-From: Christian Brauner <brauner@kernel.org>
-Date: Fri, 29 May 2026 10:43:43 +0200
-Subject: [PATCH v2 4/4] fs: retire sget()
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h7q3g+VU"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8c92737a8d3so94810746d6.1
+        for <linux-cifs@vger.kernel.org>; Fri, 29 May 2026 17:00:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780099254; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iSVzMz1OaL5z7wfoML25QMji3x+tDwtF2Cal1O3rxrku1AvhFp3WiTZt+Zw3qTQMJE
+         /e6gxzSu1QZbdptZnC1Kc7rKC++4vpEPnIcAOk3vmKHqJ2rCfLz7uuBZ0tqmkBdpkg91
+         /ISvcOcX8f3fWVv2NtcDohj3YE7b7sLitHkY1DuH7r22BXudP8Jj0qGw//ITJAMS/z1Y
+         Ik/FiTDiVfrLrwoKClLb8VZKUPPNTl5ucthiIqARDNquK5BMi68amWgLZAmuIlqvoxCi
+         W9MGmouzfjpKsf/7Ra1HgbMuaWv/YcWKXfDuXB9NChIZgJRTz2e/poSTDMhKWyku5UPQ
+         4T6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=TWGswphD+bZOHCJ11G2jKpBxaoJonw9YVK4kfZSPQEk=;
+        fh=aWuwO5lHHlNdJJ5YGVLl+Ie4EaFauyelA/OpB1HwjyY=;
+        b=Cb7YxQEAWjrZDU6AWgZIgQQ3wUfiM9qZTtYO8T5HEEtXxVsyC7KrXoh9rPWFtqclrr
+         DEQVWdBQs6gNoDZmRjZicXZwAjnYijGDOXUCVGuT/U9Kv6gofrFD94h8H76RqwMS6aVp
+         eqLzE1BGvQ7bSUCN80l1v7y57SSfHmQQSw52dKPxUBruBmJfaxK0S9jYt8rJkA69EfJa
+         OCCHQErwd4WjT+TJdjtlJxpmSkMOrJRwq8N08NwZK+dO4NObEX7CmQ6303PgzTJW0g9C
+         H+if6W64eiwPKGTgBC8FlxSXYo3LXVbmkdgnHJb7O2qo35lOgpXuxzFiI93llHEa6qOj
+         D5dw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780099254; x=1780704054; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TWGswphD+bZOHCJ11G2jKpBxaoJonw9YVK4kfZSPQEk=;
+        b=h7q3g+VUmR21jpGkNCvs511WFBvv3+A4NBlVl1ergs+epqP9CayYm76gy+ulV6T5qG
+         H+u6Zy4HjcTwBfTN3qDLj9FTgPo4J+lRGbILfOoyxe9ayZfGQrFAi7DTdNAU7BVOkQPD
+         OVDiSonY5FOo/YQtDRUPVjZ672zlcNsZXmhlNNbhbXcVF+bOiSymOrjacvHptB0tU5Xg
+         490yOJZ9XN0eNzWIYYs1VFN71ow7hisO3oV7KiiBlVICJSdNRX/uEcEGRwaw74dHQR9y
+         mL5kLXqDQPEMMjGdSN1wChB2+hD1Vg23rp48fkfXU+ikmQUmshfo0ZV8/3RUmgz/dHPa
+         9RJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780099254; x=1780704054;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TWGswphD+bZOHCJ11G2jKpBxaoJonw9YVK4kfZSPQEk=;
+        b=VhhXIHCeqWrDxjowBlVxvy3ewKm019ESoVZNxjD8M4iV/MijIXiUse3vs3wuiNmGeh
+         cXj5Mtw2zJIKQ9UGvZF1lEsy/pu/uR13eFQhsc9y5FxboBlNdkVwpsIn7SaPnlcJxalY
+         GojQG2VXweGN4dDD18hW1vQSzxiaXC2MaNmOP0R4on58qI6iESKTTQk2udNnAEwZoOsl
+         gQ4Y3e1s/rubo5/9sekgk22HWIDmVs4O4BbKv/UT7huwr11HWP1M8vLGnbDmvQiQ1GSi
+         ElXsM3zdE+1faydW6IIrhfu1iR2hUUwiIGME0pV0cwLdMBy9HJS+kvgkLrGposONUPdc
+         +Mfg==
+X-Forwarded-Encrypted: i=1; AFNElJ/N5uSjAbwiClMRVCCZqICxVjObnKauqCz22IWgJiFA1fWV2awmiFcfvBC+aqYiNO8tsaJ1Htqo90vT@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy348s1ciV3L6vdVSQm77YB7mo/d6xvF7xryjVbAQutqhL7rAp8
+	hMoaKDPFxdRlHRdq/oaf5MV26xiH6LnRKy2x5bE7Kdxq8z6RwSujF3CNPVXALYqemcA/4eDSuy1
+	AkfaAQWlijB8lwrizUWwRZuu9ruJmK++bsnOjD4w=
+X-Gm-Gg: Acq92OHt3eE3XklpfD21ce2iwWcdz9BBfbvKphszv5/gJQhYpHKNGU8FMA4dpo9AXFF
+	CQGRmG+7x4TXqOLiNJntTF/MAi/pB+s+EmBQcIoT0VZ08egArLzcbtxf2RW0sTOtvUEVVcF14yn
+	MA2j+aHREm0oa1bpZgi7eX1m8kQy57X5c4MhUXfX9A/Ng/ba5ugh68DTW6dI3mYRo+aG0BP1LhZ
+	yloGlKyDt9cxCCWVa/5hA/R5XAT1CZhpnERA9eur+eCCO6k9IcAymMqophqunExdAbdAFHwYIi9
+	ks/+txLaOyGNqN6RIH68Dnksa1msfTARIQTwl/emrGNG3AcrpKej0K9ebBEwZiI4Y86bjAoSfjo
+	uhf1nMRwZyBwF0NhIQUO3FjxoZ3Z/xk56B968XPDMkkQC5IZcTSlYM1mK55oO33n429uoysuQl4
+	rhVw+cDkG+fBhCwjAWUqeVt3NYJ054qdU=
+X-Received: by 2002:a05:6214:5092:b0:8b3:f59b:6c8 with SMTP id
+ 6a1803df08f44-8ccefdc15admr31393106d6.31.1780099253472; Fri, 29 May 2026
+ 17:00:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260529-work-sget-v2-4-57bbe08604e4@kernel.org>
-References: <20260529-work-sget-v2-0-57bbe08604e4@kernel.org>
-In-Reply-To: <20260529-work-sget-v2-0-57bbe08604e4@kernel.org>
-To: linux-fsdevel@vger.kernel.org
-Cc: Theodore Ts'o <tytso@mit.edu>, 
- Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.cz>, 
- "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, linux-ext4@vger.kernel.org, 
- linux-cifs@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
- "Christian Brauner (Amutable)" <brauner@kernel.org>
-X-Mailer: b4 0.16-dev-fffa9
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5936; i=brauner@kernel.org;
- h=from:subject:message-id; bh=e7wKMKr+HsU/JnqET2ePDgdpli5v5VhqWtSSBsarBiA=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRJBh6cqcw3zW+p7pY/xsJZD+e//d/JpLfr6wuz3AP7b
- O7Zrzzf2VHKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjCR5EiG/y7rO62SWlU1ajuv
- Pb9vt1iq3XPlOQMOnzjxJTm3/H+f02FkuORyMOlVwZ/4n3PMM2fcddPhy7C1yvuYodImaTfz4SR
- VLgA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 29 May 2026 19:00:41 -0500
+X-Gm-Features: AVHnY4KCOsOZl2s1I7odiC8vXi_au7lWZrkPdfGVZv0TY2DlryNs1lqgHr5XEgE
+Message-ID: <CAH2r5muwEzNYv-g_A41PSTFJoOCW6AzBD5U1WCuzTrao8k9xVA@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-sget() and sget_fc() have lived side by side as near-duplicate
-find-or-create-and-publish helpers for the legacy and fs_context mount
-APIs. The three remaining in-tree callers (CIFS plus the ext4 extents
-and mballoc KUnit tests) have all been moved to sget_fc(). Nothing
-calls sget() anymore.
+Please pull the following changes since commit
+e7ae89a0c97ce2b68b0983cd01eda67cf373517d:
 
-Delete sget() from fs/super.c and the prototype in <linux/fs.h>.
-Update the two comments that referred to "sget()" or "sget{_fc}()" to
-just say "sget_fc()".
+  Linux 7.1-rc5 (2026-05-24 13:48:06 -0700)
 
-This removes ~60 lines of code that only existed to be kept in
-lockstep with sget_fc() on every superblock publish-path change.
+are available in the Git repository at:
 
-Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
----
- fs/btrfs/super.c   |  2 +-
- fs/super.c         | 71 ++++--------------------------------------------------
- include/linux/fs.h |  4 ---
- 3 files changed, 6 insertions(+), 71 deletions(-)
+  git://git.samba.org/ksmbd.git tags/v7.1-rc6-ksmbd-server-fixes
 
-diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-index b26aa9169e83..636154861d7c 100644
---- a/fs/btrfs/super.c
-+++ b/fs/btrfs/super.c
-@@ -2052,7 +2052,7 @@ static int btrfs_get_tree_subvol(struct fs_context *fc)
- 	 * then open_ctree will properly initialize the file system specific
- 	 * settings later.  btrfs_init_fs_info initializes the static elements
- 	 * of the fs_info (locks and such) to make cleanup easier if we find a
--	 * superblock with our given fs_devices later on at sget() time.
-+	 * superblock with our given fs_devices later on at sget_fc() time.
- 	 */
- 	fs_info = kvzalloc_obj(struct btrfs_fs_info);
- 	if (!fs_info)
-diff --git a/fs/super.c b/fs/super.c
-index 378e81efe643..5fe8cea9f8fe 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -328,7 +328,7 @@ static struct super_block *alloc_super(struct file_system_type *type, int flags,
- 	init_rwsem(&s->s_umount);
- 	lockdep_set_class(&s->s_umount, &type->s_umount_key);
- 	/*
--	 * sget() can have s_umount recursion.
-+	 * sget_fc() can have s_umount recursion.
- 	 *
- 	 * When it cannot find a suitable sb, it allocates a new
- 	 * one (this one), and tries again to find a suitable old
-@@ -439,7 +439,7 @@ static void kill_super_notify(struct super_block *sb)
- 
- 	/*
- 	 * Remove it from @fs_supers so it isn't found by new
--	 * sget{_fc}() walkers anymore. Any concurrent mounter still
-+	 * sget_fc() walkers anymore. Any concurrent mounter still
- 	 * managing to grab a temporary reference is guaranteed to
- 	 * already see SB_DYING and will wait until we notify them about
- 	 * SB_DEAD.
-@@ -517,7 +517,7 @@ EXPORT_SYMBOL(deactivate_super);
-  * @sb: superblock to acquire
-  *
-  * Acquire a temporary reference on a superblock and try to trade it for
-- * an active reference. This is used in sget{_fc}() to wait for a
-+ * an active reference. This is used in sget_fc() to wait for a
-  * superblock to either become SB_BORN or for it to pass through
-  * sb->kill() and be marked as SB_DEAD.
-  *
-@@ -673,11 +673,11 @@ void generic_shutdown_super(struct super_block *sb)
- 	/*
- 	 * Broadcast to everyone that grabbed a temporary reference to this
- 	 * superblock before we removed it from @fs_supers that the superblock
--	 * is dying. Every walker of @fs_supers outside of sget{_fc}() will now
-+	 * is dying. Every walker of @fs_supers outside of sget_fc() will now
- 	 * discard this superblock and treat it as dead.
- 	 *
- 	 * We leave the superblock on @fs_supers so it can be found by
--	 * sget{_fc}() until we passed sb->kill_sb().
-+	 * sget_fc() until we passed sb->kill_sb().
- 	 */
- 	super_wake(sb, SB_DYING);
- 	super_unlock_excl(sb);
-@@ -808,67 +808,6 @@ struct super_block *sget_fc(struct fs_context *fc,
- }
- EXPORT_SYMBOL(sget_fc);
- 
--/**
-- *	sget	-	find or create a superblock
-- *	@type:	  filesystem type superblock should belong to
-- *	@test:	  comparison callback
-- *	@set:	  setup callback
-- *	@flags:	  mount flags
-- *	@data:	  argument to each of them
-- */
--struct super_block *sget(struct file_system_type *type,
--			int (*test)(struct super_block *,void *),
--			int (*set)(struct super_block *,void *),
--			int flags,
--			void *data)
--{
--	struct user_namespace *user_ns = current_user_ns();
--	struct super_block *s = NULL;
--	struct super_block *old;
--	int err;
--
--retry:
--	spin_lock(&sb_lock);
--	if (test) {
--		hlist_for_each_entry(old, &type->fs_supers, s_instances) {
--			if (!test(old, data))
--				continue;
--			if (user_ns != old->s_user_ns) {
--				spin_unlock(&sb_lock);
--				destroy_unused_super(s);
--				return ERR_PTR(-EBUSY);
--			}
--			if (!grab_super(old))
--				goto retry;
--			destroy_unused_super(s);
--			return old;
--		}
--	}
--	if (!s) {
--		spin_unlock(&sb_lock);
--		s = alloc_super(type, flags, user_ns);
--		if (!s)
--			return ERR_PTR(-ENOMEM);
--		goto retry;
--	}
--
--	err = set(s, data);
--	if (err) {
--		spin_unlock(&sb_lock);
--		destroy_unused_super(s);
--		return ERR_PTR(err);
--	}
--	s->s_type = type;
--	strscpy(s->s_id, type->name, sizeof(s->s_id));
--	list_add_tail(&s->s_list, &super_blocks);
--	hlist_add_head(&s->s_instances, &type->fs_supers);
--	spin_unlock(&sb_lock);
--	get_filesystem(type);
--	shrinker_register(s->s_shrink);
--	return s;
--}
--EXPORT_SYMBOL(sget);
--
- void drop_super(struct super_block *sb)
- {
- 	super_unlock_shared(sb);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 11559c513dfb..6dbe3218dc1e 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2327,10 +2327,6 @@ void free_anon_bdev(dev_t);
- struct super_block *sget_fc(struct fs_context *fc,
- 			    int (*test)(struct super_block *, struct fs_context *),
- 			    int (*set)(struct super_block *, struct fs_context *));
--struct super_block *sget(struct file_system_type *type,
--			int (*test)(struct super_block *,void *),
--			int (*set)(struct super_block *,void *),
--			int flags, void *data);
- struct super_block *sget_dev(struct fs_context *fc, dev_t dev);
- 
- /* Alas, no aliases. Too much hassle with bringing module.h everywhere */
+for you to fetch changes up to cc57232cae23c0df91b4a59d0f519141ce9b5b02:
+
+  ksmbd: fix FSCTL permission bypass by adding a permission check for
+FSCTL_SET_SPARSE (2026-05-26 20:36:36 -0500)
+
+----------------------------------------------------------------
+Three ksmbd server fixes
+- security fix for FSCTL_SET_SPARSE
+- fix leak in ksmbd_query_inode_status()
+- fix OOB read in smb_check_perm_dacl()
+----------------------------------------------------------------
+Aleksandr Golovnya (1):
+      ksmbd: release ksmbd_inode ref via ksmbd_inode_put on lookup paths
+
+Ali Ganiyev (1):
+      ksmbd: OOB read regression in smb_check_perm_dacl() ACE-walk loops
+
+Sean Shen (1):
+      ksmbd: fix FSCTL permission bypass by adding a permission check
+for FSCTL_SET_SPARSE
+
+ fs/smb/server/smb2pdu.c   | 11 +++++++++++
+ fs/smb/server/smbacl.c    |  8 ++++----
+ fs/smb/server/vfs_cache.c |  6 +++---
+ 3 files changed, 18 insertions(+), 7 deletions(-)
 
 -- 
-2.47.3
+Thanks,
 
+Steve
