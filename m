@@ -1,63 +1,103 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C1E34AB17;
-	Sat, 30 May 2026 16:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314A81DE4EF;
+	Sat, 30 May 2026 16:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780157836; cv=none; b=NB71ZKQSYlS3l9SYziGFAZZQLOD2SDkKlw9whGVo/YsXIcP4OhNUsVPDoCKLv+3zxLoDrh+rkqZ10HrV+oj4xUtlBhNH3RPs6BzRgL7T9G/a9f4ski2HUf8ZI53GyjFd00egWRDmGC5k5xYqXZAxvjS3X4qBOZe9DD5p03Qi08c=
+	t=1780159086; cv=none; b=IpG41UFMFfYYPAjdcGw566GTbefs+ILHW/CHpUpWxoC7MAPb5lm1p+X3TTkzW9BI6KjGq79ETpl1wWKYqvi38dfziA1exKan8B9JbBO1QGKjLHEqmMfzpeM5fK1MRPOQh/fO9l/IZ5RfFZjSTl70+qNWauSshSmRKxy4dd69e40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780157836; c=relaxed/simple;
-	bh=eGsqoVSziLHqa5BAvDbyjZKO6o3KEAtYUAonC6s1K3I=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=PJq5FTiARLv/T6JOcwcYR9/bH+gDR+JTUcie7PaZoqYpm9/eTNC5Y/w3Dlv1534r5qk5phiJZKCjmjLzXq++V5rQRMB019U23WZbFPfjLy2H8TawqZXj7OyBmj8zFe5EE4t0dH7a50Hpph6TNMx38TsmeauJBeYxYFm2srNcLL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DjjdQPXn; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780159086; c=relaxed/simple;
+	bh=bxdxVJhNOQH5YGXn/QnSxTM4XIW//9QDH98rs9etwEg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=r6LWHsW5FMtPqtljnu8wmDV9Bsg7512pZVa0LiNug/hlaOc83a59g38eUXJsSrRGQUqHAR4EYvPDCK9XwJ6QwWOjPHOD1wsbfjxKrz4ZzmrEbzUSjUo6iVulvwvfPE39UJl+lvrm1J4ZFObjJtXSYNi80+d71L90p8SUHs9Dfkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=JYUxNnV3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DjjdQPXn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BDCD1F00A02;
-	Sat, 30 May 2026 16:16:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780157815;
-	bh=OnVkrOMSq7w/+2oiD76llq1TaQkUiMqji3MCKxD6c40=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc;
-	b=DjjdQPXns1aHJtpTND4Z8Lo1raUX60v7U21l9eLvnMb07Kb+l7Tge/EqJ+KWtSyo7
-	 REqJHJH/oU8hC3NC/661cv2g/W4qhe2WGXTdauAFAIRVKKYlqTfpim0CwVQjza9ITE
-	 6YV8EiOJj3wnSRJpvlWdpEoyfm8FJ7mKjzxI8Zmy6EnIOCzPEDjT2ZTCE0Q0zPxHo7
-	 1YhovKFuryXuqzUiZt2Y+ZDMNwR6c9ZyYRFOs73gbLv/yfGarXqp3XeBpeXijJyKHh
-	 v4aLYn1iS3XIEtlDwFzJcx4HvpXLEUScUGwsM4AeKrFRZxst+kiiiFs4Ypg2eir6o8
-	 qLi1xsA7jEWGg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93F18393021E;
-	Sat, 30 May 2026 16:16:59 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5muwEzNYv-g_A41PSTFJoOCW6AzBD5U1WCuzTrao8k9xVA@mail.gmail.com>
-References: <CAH2r5muwEzNYv-g_A41PSTFJoOCW6AzBD5U1WCuzTrao8k9xVA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5muwEzNYv-g_A41PSTFJoOCW6AzBD5U1WCuzTrao8k9xVA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v7.1-rc6-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: cc57232cae23c0df91b4a59d0f519141ce9b5b02
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 1246c246d9f684599e1dd7498043062c89fb0a36
-Message-Id: <178015781808.2653560.14082876548560956749.pr-tracker-bot@kernel.org>
-Date: Sat, 30 May 2026 16:16:58 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="JYUxNnV3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 862DD1F00893;
+	Sat, 30 May 2026 16:37:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1780159084;
+	bh=ke9M0qJ+lRZMS+YELa5ZnoFoIoNp2jlUXrm8XrY8WrE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=JYUxNnV3pQX9RmW9rkoUVbeVm+hZM/+2gjud431M+XRK7Iu0PKBgUW7iuzkpjfG7E
+	 sb6XdmaROUzfjo5HbT+UxZjCYCMFnhxKpzFfnHRuZLMej7K8P3pzRauZ2Zf+zq6Ozv
+	 8JkjxPaP4EVHC6bn/oJkbrRwSUukpWdzCikva4YE=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	stable@kernel.org,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH 6.1 070/969] ksmbd: validate EaNameLength in smb2_get_ea()
+Date: Sat, 30 May 2026 17:53:14 +0200
+Message-ID: <20260530160302.301811276@linuxfoundation.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260530160300.485627683@linuxfoundation.org>
+References: <20260530160300.485627683@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Fri, 29 May 2026 19:00:41 -0500:
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
-> git://git.samba.org/ksmbd.git tags/v7.1-rc6-ksmbd-server-fixes
+------------------
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/1246c246d9f684599e1dd7498043062c89fb0a36
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-Thank you!
+commit 66751841212c2cc196577453c37f7774ff363f02 upstream.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+smb2_get_ea() reads ea_req->EaNameLength from the client request and
+passes it directly to strncmp() as the comparison length without
+verifying that the length of the name really is the size of the input
+buffer received.
+
+Fix this up by properly checking the size of the name based on the value
+received and the overall size of the request, to prevent a later
+strncmp() call to use the length as a "trusted" size of the buffer.
+Without this check, uninitialized heap values might be slowly leaked to
+the client.
+
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: <stable@kernel.org>
+Assisted-by: gregkh_clanker_t1000
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ fs/smb/server/smb2pdu.c |    5 +++++
+ 1 file changed, 5 insertions(+)
+
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -4390,6 +4390,11 @@ static int smb2_get_ea(struct ksmbd_work
+ 
+ 		ea_req = (struct smb2_ea_info_req *)((char *)req +
+ 						     le16_to_cpu(req->InputBufferOffset));
++
++		if (le32_to_cpu(req->InputBufferLength) <
++		    offsetof(struct smb2_ea_info_req, name) +
++		    ea_req->EaNameLength)
++			return -EINVAL;
+ 	} else {
+ 		/* need to send all EAs, if no specific EA is requested*/
+ 		if (le32_to_cpu(req->Flags) & SL_RETURN_SINGLE_ENTRY)
+
+
