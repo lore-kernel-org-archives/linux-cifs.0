@@ -1,297 +1,128 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC723655F7
-	for <linux-cifs@vger.kernel.org>; Tue,  2 Jun 2026 11:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE5636A03A
+	for <linux-cifs@vger.kernel.org>; Tue,  2 Jun 2026 11:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780399230; cv=none; b=HPs4F1Id2sZ1tT/1NhOW1x5vw6+fwUimYG7EZyhBNs8YKuw6hX8c7rdVINdkBF9ZSlqfhsORVUOn2zrGTquWQITFZosHvNF+aHGawAiemEyP/rH5xxhE5sEKu4NrSpmroM8DgEn2/2RWnyliZOcHqWqBoZHHwRAloB+zdqYNUZU=
+	t=1780399271; cv=none; b=EM2qkbhs0kVcvgOUgRtJGclCi0i0OpoEFzrhOX3cShR1DMPH1HIIT7xbrOpKj/KnEeMt72QvKxLndko1jknmZSz83qragHVVZR33ugVLjoNS/rvC0+Bj1wZhCuvuSXHNPdG3UEY76soagKvkRX0wS0tcZhvmZDmJg9J4cp3nNyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780399230; c=relaxed/simple;
-	bh=IyMHoAZbPPag4lfUP9uNWmdJZitaczEmpngB7lEFZOc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mOtSoeXDaeXsO95dE/mieak71CHnFmuX6Pj+obVNuPM1lbQdNC+2waE/dYG4zIfwx1oIXCVBX8BCMZmRgQWw8JbPmuxtsmEJ5e7rxdoglPlOtA9DgO5be17dapYX8d5w+YDyILkLQ/fUDZ77DyK3V2pOYvhB/VqIF5YtihOodI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mbYG1QPo; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=7suFEa+E; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mbYG1QPo; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=7suFEa+E; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1780399271; c=relaxed/simple;
+	bh=mdyShz2Hb1nhbf16JMmhzAI3lw9uTjlKGNRSkU4NhIY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RZfQ2UUV2IRh2VvIEjVdQ3/904Z47y0INRv7948fXK4r1r560OrL5VTI3L9aoR95H74NgBC4bqQ8OqF0Uz5x12CbUs/g/8krp3dhBLgnOrF7/LFvVykCXKewvoWUenp5jT5Xy+65LS3xs5s6Gb6Al4j6diAOr6gwdUUExzbgNPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QWDREzUc; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mbYG1QPo";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="7suFEa+E";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mbYG1QPo";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="7suFEa+E"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B7D3E758D8;
-	Tue,  2 Jun 2026 11:20:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1780399226; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9+acDEyGozKj6T7QiZ48ofcK73obei9g+W/7IT5GjEw=;
-	b=mbYG1QPoKe8JSHLLondGNPRcJzVsz88zWf2DMcZlO5tTJomAfiRaPQ+/7RQAhW6mrAAxAZ
-	3JXvfwwtpoeNGg4xZtHVCKljDgDByP5u+IbYNcHGyDplwRl1T9YpQ1M147ZNehIgyp8n8W
-	MNzuFzILcvL9Y1YRfO+MqngJWO8fn+c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1780399226;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9+acDEyGozKj6T7QiZ48ofcK73obei9g+W/7IT5GjEw=;
-	b=7suFEa+EVSb7jlkmZG2S2E1QXdZ2K0OB+nWnC1nxXRyPtmm7r4U651J8HelCmQxO0BEZip
-	EZIK6TfcZXc2IDDA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1780399226; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9+acDEyGozKj6T7QiZ48ofcK73obei9g+W/7IT5GjEw=;
-	b=mbYG1QPoKe8JSHLLondGNPRcJzVsz88zWf2DMcZlO5tTJomAfiRaPQ+/7RQAhW6mrAAxAZ
-	3JXvfwwtpoeNGg4xZtHVCKljDgDByP5u+IbYNcHGyDplwRl1T9YpQ1M147ZNehIgyp8n8W
-	MNzuFzILcvL9Y1YRfO+MqngJWO8fn+c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1780399226;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9+acDEyGozKj6T7QiZ48ofcK73obei9g+W/7IT5GjEw=;
-	b=7suFEa+EVSb7jlkmZG2S2E1QXdZ2K0OB+nWnC1nxXRyPtmm7r4U651J8HelCmQxO0BEZip
-	EZIK6TfcZXc2IDDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id AAE13779A7;
-	Tue,  2 Jun 2026 11:20:26 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Mf62KXq8HmrlOwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 02 Jun 2026 11:20:26 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 67BC3A0EC1; Tue, 02 Jun 2026 13:20:22 +0200 (CEST)
-Date: Tue, 2 Jun 2026 13:20:22 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, 
-	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.cz>, 
-	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, linux-ext4@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	Alexander Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH v2 4/4] fs: retire sget()
-Message-ID: <c3ouabc7iiejbgalzclpsg43dnowixi6z5hjox5ibeiig3t4it@dxmx4fwg2jek>
-References: <20260529-work-sget-v2-0-57bbe08604e4@kernel.org>
- <20260529-work-sget-v2-4-57bbe08604e4@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QWDREzUc"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-490a7629380so23969285e9.0
+        for <linux-cifs@vger.kernel.org>; Tue, 02 Jun 2026 04:21:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780399269; x=1781004069; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N+Mx9qxe5Noh2BseN2qEXUEhNI+HpIudHixhjkzy9lQ=;
+        b=QWDREzUcNvwFfuiuy45CUK0AXWlgdkktBJ+GtFJ8FBXCqyxwgJFlKRhsPar2d2ZSS/
+         wF+OEbhaLwx7LV28ZPNWspdgAJm9xUvN96CZwuoAtPTffSCzW/4Fpr6/Mbt9enzRoXPK
+         A8vQoiFTbt5B2mNhEoq1uAz7t7WnR63xJyAs9Jqz6Qq8pOBKts+L5/hKYYv7x9LFkOQk
+         hLy4CUB02VWElNjR5IpQWxMuofdoGXhNgBfSxRh30zfh3WNMYPoKoGEmTte5sN9ugr58
+         IEZwZrfmGvoplpLC/y3c2bT2VXy/rXJ4VUqMPgGRnElRSiMysIq4uug9vXoy1EJesNkh
+         bggA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780399269; x=1781004069;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=N+Mx9qxe5Noh2BseN2qEXUEhNI+HpIudHixhjkzy9lQ=;
+        b=fKvQ/hZHncvUNC7Z02HRq8LQEdxxI12eXdW18zP6h4Sljplzvh3VIRX8pJ52RVwWfC
+         6hmCpczOpjlsTRXYgSvhioL78s/tfe24ilpLw/oHqk2VjSThE9hxufgjtjZ5/VujWCdg
+         rd2iZKEFeM6QriVcImzIsFZC/Mz9vSOFif9DkItjKDy89tS7YpUtqy7l8UAOVtmrKzbI
+         EII/e6ak3Gr3U005Ps53nfVSgUXPCXxttJKv0TzppqPjDYfJ8cNsK2ZPY2quLts1ipzs
+         u8tvWQIjDEgw1stxt0JkF7pkboqDJ2nloI77Fp7th8qreOVjIcHqNnVce/a2EHkwOwh6
+         81kA==
+X-Forwarded-Encrypted: i=1; AFNElJ+L+dI3QlXAKcIau8r4YqzsIzpAKcViLlGP3cDiQGgCe1rLV8vnsZXchfkSeW5Bklwd8bHtg4fKn5mk@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBskaPn179Sysq/RxSvFM8PLIlxwLZLmlLmVxwnxNTy8Ut31zi
+	FdYsxFdcNQJCKSZm24UooS9ePxn0sIa7KrxGbufvsgaFfzZo9453DMq7
+X-Gm-Gg: Acq92OFwKwuWbA4hePJxkMX+ZaTYUmSKLVcCcdDRw8T/y4MFOEI3AT9D+q3nY4nUyil
+	qGbg056G8z7LM23M+6JhZXkMMOfX5lSWK48agactFWEaD/KRvViExWz2ATWsV5nSZ2XFBvbNn59
+	ZeffvaveWtpuSN915KLmDlQshmppfEeZVMqu2bopd6sNwa3IxsH7FEJ5VOWQslFYDh+2R1K1GYp
+	rsb5WfuZ6U4RoXEtE2SPhphWuGLpgKmXKookdrtui4rtKo/by3Cx4gXdd/jOGyr/9AJhKiYLfpD
+	VnL0l7kp6TlPp1WGwMxRI6se9aEgMuiD2vPR5yj5EnHIjDL6GIwNcKjr19CpeYzQfD15EWuccMb
+	BhthDp4FvKrmmRHVcblDcKTLcrsio0N8TJY190uq/m1uDEZ5apYL2pFxTN7K803ktPUz74b4XCs
+	9uJnldo5HoaUXv0F8eeZisq87Kt5kof2ao1FB7DRIENVSLqA0t8hhzMoy4wmlJ2OlyLHEAaJQ=
+X-Received: by 2002:a05:600c:46d1:b0:490:a7ab:bbe3 with SMTP id 5b1f17b1804b1-490a7abbd7fmr206981415e9.0.1780399268568;
+        Tue, 02 Jun 2026 04:21:08 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45ef3559645sm31033836f8f.26.2026.06.02.04.21.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 04:21:08 -0700 (PDT)
+Date: Tue, 2 Jun 2026 12:21:04 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, Erni Sri Satya Vennela
+ <ernis@linux.microsoft.com>, mkalderon@marvell.com, Jason Gunthorpe
+ <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, zyjzyj2000@gmail.com,
+ sagi@grimberg.me, mgurtovoy@nvidia.com, haris.iqbal@ionos.com,
+ jinpu.wang@ionos.com, kbusch@kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, kch@nvidia.com, smfrench@gmail.com,
+ linkinjeon@kernel.org, metze@samba.org, tom@talpey.com,
+ chuck.lever@oracle.com, jlayton@kernel.org, neil@brown.name,
+ okorniev@redhat.com, Dai.Ngo@oracle.com, trondmy@kernel.org,
+ anna@kernel.org, achender@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ kees@kernel.org, ebadger@purestorage.com, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
+ netdev@vger.kernel.org, rds-devel@oss.oracle.com, Jason Gunthorpe
+ <jgg@nvidia.com>
+Subject: Re: [PATCH rdma-next v6] RDMA: Change capability fields in
+ ib_device_attr from int to u32
+Message-ID: <20260602122104.20afa8b4@pumpkin>
+In-Reply-To: <ah6gtquGDMvEXjcb@ashevche-desk.local>
+References: <20260601092534.1764560-1-ernis@linux.microsoft.com>
+	<5d3cac2b-4011-49c5-a142-55c85d38e90f@acm.org>
+	<ah6gtquGDMvEXjcb@ashevche-desk.local>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260529-work-sget-v2-4-57bbe08604e4@kernel.org>
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mit.edu,dilger.ca,suse.cz,gmail.com,zeniv.linux.org.uk];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email,suse.cz:email]
-X-Spam-Level: 
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri 29-05-26 10:43:43, Christian Brauner wrote:
-> sget() and sget_fc() have lived side by side as near-duplicate
-> find-or-create-and-publish helpers for the legacy and fs_context mount
-> APIs. The three remaining in-tree callers (CIFS plus the ext4 extents
-> and mballoc KUnit tests) have all been moved to sget_fc(). Nothing
-> calls sget() anymore.
-> 
-> Delete sget() from fs/super.c and the prototype in <linux/fs.h>.
-> Update the two comments that referred to "sget()" or "sget{_fc}()" to
-> just say "sget_fc()".
-> 
-> This removes ~60 lines of code that only existed to be kept in
-> lockstep with sget_fc() on every superblock publish-path change.
-> 
-> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
+On Tue, 2 Jun 2026 12:21:58 +0300
+Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
 
-Looks good. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  fs/btrfs/super.c   |  2 +-
->  fs/super.c         | 71 ++++--------------------------------------------------
->  include/linux/fs.h |  4 ---
->  3 files changed, 6 insertions(+), 71 deletions(-)
+> On Mon, Jun 01, 2026 at 08:51:40AM -0700, Bart Van Assche wrote:
+> > On 6/1/26 2:25 AM, Erni Sri Satya Vennela wrote:  
 > 
-> diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-> index b26aa9169e83..636154861d7c 100644
-> --- a/fs/btrfs/super.c
-> +++ b/fs/btrfs/super.c
-> @@ -2052,7 +2052,7 @@ static int btrfs_get_tree_subvol(struct fs_context *fc)
->  	 * then open_ctree will properly initialize the file system specific
->  	 * settings later.  btrfs_init_fs_info initializes the static elements
->  	 * of the fs_info (locks and such) to make cleanup easier if we find a
-> -	 * superblock with our given fs_devices later on at sget() time.
-> +	 * superblock with our given fs_devices later on at sget_fc() time.
->  	 */
->  	fs_info = kvzalloc_obj(struct btrfs_fs_info);
->  	if (!fs_info)
-> diff --git a/fs/super.c b/fs/super.c
-> index 378e81efe643..5fe8cea9f8fe 100644
-> --- a/fs/super.c
-> +++ b/fs/super.c
-> @@ -328,7 +328,7 @@ static struct super_block *alloc_super(struct file_system_type *type, int flags,
->  	init_rwsem(&s->s_umount);
->  	lockdep_set_class(&s->s_umount, &type->s_umount_key);
->  	/*
-> -	 * sget() can have s_umount recursion.
-> +	 * sget_fc() can have s_umount recursion.
->  	 *
->  	 * When it cannot find a suitable sb, it allocates a new
->  	 * one (this one), and tries again to find a suitable old
-> @@ -439,7 +439,7 @@ static void kill_super_notify(struct super_block *sb)
->  
->  	/*
->  	 * Remove it from @fs_supers so it isn't found by new
-> -	 * sget{_fc}() walkers anymore. Any concurrent mounter still
-> +	 * sget_fc() walkers anymore. Any concurrent mounter still
->  	 * managing to grab a temporary reference is guaranteed to
->  	 * already see SB_DYING and will wait until we notify them about
->  	 * SB_DEAD.
-> @@ -517,7 +517,7 @@ EXPORT_SYMBOL(deactivate_super);
->   * @sb: superblock to acquire
->   *
->   * Acquire a temporary reference on a superblock and try to trade it for
-> - * an active reference. This is used in sget{_fc}() to wait for a
-> + * an active reference. This is used in sget_fc() to wait for a
->   * superblock to either become SB_BORN or for it to pass through
->   * sb->kill() and be marked as SB_DEAD.
->   *
-> @@ -673,11 +673,11 @@ void generic_shutdown_super(struct super_block *sb)
->  	/*
->  	 * Broadcast to everyone that grabbed a temporary reference to this
->  	 * superblock before we removed it from @fs_supers that the superblock
-> -	 * is dying. Every walker of @fs_supers outside of sget{_fc}() will now
-> +	 * is dying. Every walker of @fs_supers outside of sget_fc() will now
->  	 * discard this superblock and treat it as dead.
->  	 *
->  	 * We leave the superblock on @fs_supers so it can be found by
-> -	 * sget{_fc}() until we passed sb->kill_sb().
-> +	 * sget_fc() until we passed sb->kill_sb().
->  	 */
->  	super_wake(sb, SB_DYING);
->  	super_unlock_excl(sb);
-> @@ -808,67 +808,6 @@ struct super_block *sget_fc(struct fs_context *fc,
->  }
->  EXPORT_SYMBOL(sget_fc);
->  
-> -/**
-> - *	sget	-	find or create a superblock
-> - *	@type:	  filesystem type superblock should belong to
-> - *	@test:	  comparison callback
-> - *	@set:	  setup callback
-> - *	@flags:	  mount flags
-> - *	@data:	  argument to each of them
-> - */
-> -struct super_block *sget(struct file_system_type *type,
-> -			int (*test)(struct super_block *,void *),
-> -			int (*set)(struct super_block *,void *),
-> -			int flags,
-> -			void *data)
-> -{
-> -	struct user_namespace *user_ns = current_user_ns();
-> -	struct super_block *s = NULL;
-> -	struct super_block *old;
-> -	int err;
-> -
-> -retry:
-> -	spin_lock(&sb_lock);
-> -	if (test) {
-> -		hlist_for_each_entry(old, &type->fs_supers, s_instances) {
-> -			if (!test(old, data))
-> -				continue;
-> -			if (user_ns != old->s_user_ns) {
-> -				spin_unlock(&sb_lock);
-> -				destroy_unused_super(s);
-> -				return ERR_PTR(-EBUSY);
-> -			}
-> -			if (!grab_super(old))
-> -				goto retry;
-> -			destroy_unused_super(s);
-> -			return old;
-> -		}
-> -	}
-> -	if (!s) {
-> -		spin_unlock(&sb_lock);
-> -		s = alloc_super(type, flags, user_ns);
-> -		if (!s)
-> -			return ERR_PTR(-ENOMEM);
-> -		goto retry;
-> -	}
-> -
-> -	err = set(s, data);
-> -	if (err) {
-> -		spin_unlock(&sb_lock);
-> -		destroy_unused_super(s);
-> -		return ERR_PTR(err);
-> -	}
-> -	s->s_type = type;
-> -	strscpy(s->s_id, type->name, sizeof(s->s_id));
-> -	list_add_tail(&s->s_list, &super_blocks);
-> -	hlist_add_head(&s->s_instances, &type->fs_supers);
-> -	spin_unlock(&sb_lock);
-> -	get_filesystem(type);
-> -	shrinker_register(s->s_shrink);
-> -	return s;
-> -}
-> -EXPORT_SYMBOL(sget);
-> -
->  void drop_super(struct super_block *sb)
->  {
->  	super_unlock_shared(sb);
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 11559c513dfb..6dbe3218dc1e 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -2327,10 +2327,6 @@ void free_anon_bdev(dev_t);
->  struct super_block *sget_fc(struct fs_context *fc,
->  			    int (*test)(struct super_block *, struct fs_context *),
->  			    int (*set)(struct super_block *, struct fs_context *));
-> -struct super_block *sget(struct file_system_type *type,
-> -			int (*test)(struct super_block *,void *),
-> -			int (*set)(struct super_block *,void *),
-> -			int flags, void *data);
->  struct super_block *sget_dev(struct fs_context *fc, dev_t dev);
->  
->  /* Alas, no aliases. Too much hassle with bringing module.h everywhere */
+> ...
 > 
-> -- 
-> 2.47.3
+> > > -	sdev->srq_size = min(srpt_srq_size, sdev->device->attrs.max_srq_wr);
+> > > +	sdev->srq_size = min_t(u32, srpt_srq_size, sdev->device->attrs.max_srq_wr);  
+> > 
+> > min_t() shouldn't be used if there is an alternative available. For the
+> > SRP drivers, please make sure that both arguments of min() are unsigned
+> > instead of using min_t().  
 > 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> Ah, I just answered in similar way against v5. I also mentioned clamp() there.
+> 
+
+IMHO it is also best to do min(value, 255) not min(255, value).
+Like an 'if' put the value you are comparing against second.
+
+The min_t(u8, x, y) you've removed are usually broken.
+
+Maybe I should change clamp() to allow clamp(int_var, 0, unsigned_var).
+That will need the order of the compares swapping (to do the low bound
+first).
+I think they used to be that way around, got changed by a commit that
+said it didn't change it!
+Correct code shouldn't care.
+
+-- David
