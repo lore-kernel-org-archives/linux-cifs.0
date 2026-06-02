@@ -1,169 +1,113 @@
-Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2A331F98D
-	for <linux-cifs@vger.kernel.org>; Tue,  2 Jun 2026 00:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4FE1F2380;
+	Tue,  2 Jun 2026 09:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780361868; cv=none; b=Xqi2MbKf+krlCWKea41JzILJq7JDt/JKXGBLrlXkmaUflqYUbS0a10X4VzS7xJDtM299T0IKxnuosqa7seJwuZl4G0RUGkhXGR+yv8pT3yV4RAde143/hRkToACf0KTeShHGql++6la/4QTNNZLCyv57QXSVqQY5wxM+/T34UFQ=
+	t=1780392037; cv=none; b=rH6OjB7qacdLN2rGhZeLi59ekrIDr+NOg8yIv0kK8X934NPsi8XNDIn54PVCq4Iu8NWskbN91HkkA8aOGvkxDD8oUqPpkv3bzdoJsjzpX2+LnHFVsXmaTsOXJCo8Tb+vfmiVI7gsbE6Cpxdh4Ub7mCD5nrcmkX2FZ0tED6L1Ug0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780361868; c=relaxed/simple;
-	bh=8dOzYtDhU17Y9aqUIAk3lssg6AUbmv6OzcAHvyNbPMs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YiKQOwAD/EncrkdP7OIdsz46IF6vZ2K4dGyRgRf9JqvUriXzQL+xzYvnwRq5Ctr69vHyAcBLSVhAX/HQNEetNAwQXFo7yNxFUB3CpuLUBvMYbRRt6+qlkJdVFepc2XTYGarNkIY6JxupbZ7aO4TOXrIHOzsOsQjl13cLiLhwq/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O3u6CoKB; arc=none smtp.client-ip=74.125.82.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780392037; c=relaxed/simple;
+	bh=6BQsHpGsUXg2fWEevShYArT8/T1HQSJKUOOi9RFcaco=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D2sP/+hyb9r0Dju4J03hA3/p6pXvbaphO8RoT6NSgYSztxHRYmHsbmQw4+q4VETCh6aTmb6C/24i6OWBYJd6b6yaaTsfXkR8fX2Pe7VbCC1QmGpbgNpzwP7cG86ZoJyY19zMqXVlj+XTQCMoOWyPSdKRiG6e48KGzjopl/t/zHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JOZY3BQd; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3u6CoKB"
-Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-137dd523634so3044454c88.1
-        for <linux-cifs@vger.kernel.org>; Mon, 01 Jun 2026 17:57:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780361866; x=1780966666; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DXR6yUNY2xTRwtTa1l0H+ifyduTbQtbKZWSjUq1qTZM=;
-        b=O3u6CoKBPlzgOr0eCjBllqdBi7APlhQ2VXPBXDHxwHnbILodSfYQnq7JzXFLPY3nTP
-         euDSNM+EVGxDAogx+7DZJk6hIJZSNQp3ZS6OscJ6TCNBVBFuzHo0Gley2C/QUSQGoNoH
-         A4VBf/D8r7AwxJVSlbIK1cCyy1Xfwf1OSlASqeofhwSctKN8a2A6IodgGi8uzq5lklN2
-         ZHMxuf8dz08RC4rZLN537yTGGCmA2HsArxm7OL3cWU9eTvyAZ6ZxoMx4ttkB2qbCB0BQ
-         wth4wNOXvOzWTnZebmMmaYUG+QRu18O4uklV+02Zr911NK8l30w9iwktKSfZ9sDXR85p
-         4eFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780361866; x=1780966666;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DXR6yUNY2xTRwtTa1l0H+ifyduTbQtbKZWSjUq1qTZM=;
-        b=XV1nskBQulGocBw3mioXmUKJhRcVbR+FGxpSLjUlcOP9XoT5hoJEHxYc/IuACEgpL0
-         3ut5j97z/WRrhEqkWKncnYq2BCBFfXUnGLtk/Fzr4nqUY9QayacM74WNMc2S6oaYW+fa
-         x8dyjGCfgw0K3k9C5mp2aX4LosOerNu6iwdLtWVBKslKn9b/S0mikGmrkfo1VtwpwuGK
-         JHl/qiaWA6RJny4HiEWb/zMJ4JyyCNCdqfKmn3nVszZsWGRmXYaGwWb5gj1ZRdOvuZJA
-         uSYmnYM5XL6x7uro/x2H71atUuBYv+WE04Q94Cc9FeJcx58sa9ogcB5+ApcEXV+ji5qz
-         NWKA==
-X-Forwarded-Encrypted: i=1; AFNElJ/WXzhHClRU4J7BR6OVceWd8l3JWzr2Fb6iu/JpjA3gU1sTInBmGth657DLtS5X9TOVelueO5gT0L7N@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1YZB2TiyLg6M/RSKmCDCuP9VWz5Oed1kq6uVaI412SnqpDz+2
-	jM2xiRJgCYqc52T8FDxeZ7vaLxrRlLlFoE64fRfqqFTK+HA2xWnFcayX
-X-Gm-Gg: Acq92OEdUkqt6FQucnuTfGBrpM8KuSjTGiFYOUWi/eoeCnLUp4hczWiBEkutEyXInHp
-	q1Z3xjvJBtDDdw/r91asOqhwIuXbLnes9klMO3ZA0SPdQTaYiEoXyce8OPGeRcNg4S4WuaXVD93
-	YKUXxhbA2CXPSlLic7VyLY+FAf/mUEG/usAlDnE2GEof+EA8gHJFRjCd3R/70qIPPSReNiMiO6U
-	owlicSBtJ7ELveey/kIO6XVDbp0bo9riOrZI0pAlxM6UhbgMyEbrzh4tu9u1BfeoEoO3PxZCtn6
-	gKRZM5dH3uSDSafxW/WB/xl5M70MWbwPYbd+aEtpUOuVTxx7zBElFG342qt3kc7aonehISj+4TL
-	inJ5yNvJGM3aBmplmzXC66PtBE3pT2gBF1cWSakj+cC7Hx0hdg0YosEbQRKV9OvJGdmNC9/Udik
-	hdERVqfJAOwFmfVsgoDTRnf635Y4/Afs4=
-X-Received: by 2002:a05:7022:117:b0:135:3ed5:5e38 with SMTP id a92af1059eb24-137d4028f39mr5708982c88.27.1780361865398;
-        Mon, 01 Jun 2026 17:57:45 -0700 (PDT)
-Received: from FredPC ([2600:381:b903:348a:53c:a9ca:4ab3:9c1b])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-137dc179940sm6135319c88.5.2026.06.01.17.57.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 17:57:45 -0700 (PDT)
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
-X-Google-Original-From: Fredric Cover <FredTheDude@proton.me>
-To: sfrench@samba.org
-Cc: ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fredric Cover <fredric.cover.lkernel@gmail.com>
-Subject: [PATCH RFC] smb: client: fix races in cifsd thread creation
-Date: Mon,  1 Jun 2026 17:55:10 -0700
-Message-ID: <20260602005512.126883-1-FredTheDude@proton.me>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JOZY3BQd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780392036; x=1811928036;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6BQsHpGsUXg2fWEevShYArT8/T1HQSJKUOOi9RFcaco=;
+  b=JOZY3BQdS3kMTkEkbHPL+PhTPdPomq/6CjVt1jCKqsn4ClRndtq0QRtl
+   v95wZnSa9JrycFwlOMWdG6/m59ooG+p8+AIKL7RIzL9fpuaSYsWWRlGOT
+   vbdL+LW1yKUADxRu+s5a+XkDYS5BeUiybEQRmOX48hV4mg+aGT2sBI6yV
+   ALnIeGw2r+dhbWPh/oKu/i0kARWGeDbMj8O8BweP4Qrt7O88cNLXHMd2E
+   uxLN3vj3yOL2llmaTyKrBxRc3RzQD/+ZrJ62tfS8kOdGk/PhA97lyFT41
+   GWT+wEXeSf30SZurV1GEJCY9vTJKYjcHJyTl6eFeN7/kjetZ55vqLNQRr
+   g==;
+X-CSE-ConnectionGUID: 0zu+gchYTp2BE+eQpk9Luw==
+X-CSE-MsgGUID: PHRFtguVRByrI0Zwq88vWw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11804"; a="81298075"
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="81298075"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 02:20:35 -0700
+X-CSE-ConnectionGUID: O7CD12lDRu+OSzqR/16fAw==
+X-CSE-MsgGUID: LeqUzhbQREKqhxz6sCXoyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="240848911"
+Received: from mkosciow-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.229])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 02:20:26 -0700
+Date: Tue, 2 Jun 2026 12:20:24 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: mkalderon@marvell.com, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>, zyjzyj2000@gmail.com,
+	sagi@grimberg.me, mgurtovoy@nvidia.com, haris.iqbal@ionos.com,
+	jinpu.wang@ionos.com, bvanassche@acm.org, kbusch@kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	kch@nvidia.com, smfrench@gmail.com, linkinjeon@kernel.org,
+	metze@samba.org, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, chuck.lever@oracle.com, jlayton@kernel.org,
+	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
+	achender@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	kees@kernel.org, ebadger@purestorage.com,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	target-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+	rds-devel@oss.oracle.com, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH net-next v5] RDMA: Change capability fields in
+ ib_device_attr from int to u32
+Message-ID: <ah6gWPQP56RO6_ho@ashevche-desk.local>
+References: <20260601091505.1763912-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260601091505.1763912-1-ernis@linux.microsoft.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+On Mon, Jun 01, 2026 at 02:14:44AM -0700, Erni Sri Satya Vennela wrote:
+> The capability counter fields in struct ib_device_attr are declared
+> as signed int, but these values are inherently non-negative. Drivers
+> maintain their cached caps as u32 and assign them directly into these
+> int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
+> negative value visible to the IB core.
+> 
+> Change the signed int capability fields to u32 to match the
+> underlying nature of the data. Also update consumers across the IB
+> core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
+> are not forced back through signed int or u8 via min()/min_t() or
+> narrowing local variables.
 
-The cifsd demultiplex thread can run and access tcp_ses before the parent
-thread has finished populating tcp_ses, which the worker thread accesses
-locklessly.
+...
 
-Also, the kthread_run macro may start the thread before returning the
-thread pointer. Because the pointer is part of the structure that the
-thread can access, if the kernel is preempted after the thread is spawned,
-but before the thread pointer is populated and the thread attempts to exit,
-it will sleep, waiting for a SIGKILL signal.
+>  	attr->max_qp_rd_atom =
+> -	    min(1 << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
+> -		attr->max_qp_init_rd_atom);
+> +	    min_t(u32, 1 << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
+> +		  attr->max_qp_init_rd_atom);
 
-Fix this by moving creation of the thread to after all of tcp_ses'es
-fields are populated, and spawning the thread last, using a split
-kthread_create/wake_up_process logic.
+Just no. min_t() usage has to be very well justified. It's a beast which may
+stub one in the back. As Linus said in most of the cases one wants clamp()
+rather than min().
 
-Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
----
-Please note that I am fairly new to kernel development, and this patch
-may have major flaws that I overlooked. Also, although I wrote the code,
-Google's Gemini found the bug in the first place.
+Please, redo this and similar pieces.
 
----
- fs/smb/client/connect.c | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
-
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index dcde25da468d..3452e54c9a18 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -1871,14 +1871,6 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 	 * this will succeed. No need for try_module_get().
- 	 */
- 	__module_get(THIS_MODULE);
--	tcp_ses->tsk = kthread_run(cifs_demultiplex_thread,
--				  tcp_ses, "cifsd");
--	if (IS_ERR(tcp_ses->tsk)) {
--		rc = PTR_ERR(tcp_ses->tsk);
--		cifs_dbg(VFS, "error %d create cifsd thread\n", rc);
--		module_put(THIS_MODULE);
--		goto out_err_crypto_release;
--	}
- 	tcp_ses->min_offload = ctx->min_offload;
- 	tcp_ses->retrans = ctx->retrans;
- 	/*
-@@ -1886,9 +1878,7 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 	 * to the struct since the kernel thread not created yet
- 	 * no need to spinlock this update of tcpStatus
- 	 */
--	spin_lock(&tcp_ses->srv_lock);
- 	tcp_ses->tcpStatus = CifsNeedNegotiate;
--	spin_unlock(&tcp_ses->srv_lock);
- 
- 	if ((ctx->max_credits < 20) || (ctx->max_credits > 60000))
- 		tcp_ses->max_credits = SMB2_MAX_CREDITS_AVAILABLE;
-@@ -1897,7 +1887,16 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 
- 	tcp_ses->nr_targets = 1;
- 	tcp_ses->ignore_signature = ctx->ignore_signature;
--	/* thread spawned, put it on the list */
-+
-+	tcp_ses->tsk = kthread_create(cifs_demultiplex_thread,
-+				  tcp_ses, "cifsd");
-+	if (IS_ERR(tcp_ses->tsk)) {
-+		rc = PTR_ERR(tcp_ses->tsk);
-+		cifs_dbg(VFS, "error %d create cifsd thread\n", rc);
-+		module_put(THIS_MODULE);
-+		goto out_err_crypto_release;
-+	}
-+	/* thread created, put it on the list */
- 	spin_lock(&cifs_tcp_ses_lock);
- 	list_add(&tcp_ses->tcp_ses_list, &cifs_tcp_ses_list);
- 	spin_unlock(&cifs_tcp_ses_lock);
-@@ -1905,6 +1904,12 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 	/* queue echo request delayed work */
- 	queue_delayed_work(cifsiod_wq, &tcp_ses->echo, tcp_ses->echo_interval);
- 
-+	/*
-+	 * Use split create/wake logic to ensure that tcp_ses is fully populated
-+	 * and tcp_ses->tsk is valid
-+	 */
-+	wake_up_process(tcp_ses->tsk);
-+
- 	return tcp_ses;
- 
- out_err_crypto_release:
 -- 
-2.53.0
+With Best Regards,
+Andy Shevchenko
+
 
