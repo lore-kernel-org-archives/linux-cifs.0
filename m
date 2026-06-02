@@ -1,102 +1,116 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF013CDBC0;
-	Tue,  2 Jun 2026 09:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2F528C869
+	for <linux-cifs@vger.kernel.org>; Tue,  2 Jun 2026 10:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780392133; cv=none; b=JuG/vWgp1/y4pmAqm+iXNHaZn+neKZT9b4jhIoo8djEvLrSqNT+XMwPRqj3KwciE3XP1LARXs8sRKvE7Aw/02JTm/j4XSVwqaNaHmtP5B0xQGmn4lBMnb5EEI7vglmW1/jyW0b8mBuvUXXuMs8x/cl3jt2moXtY32Hr9Vikmsu0=
+	t=1780397999; cv=none; b=J+HPOCipucV3x7KpTxmA/AtQzVx4uWN1X52LjkkTeLfneq+u67R6qLs3sgNYZ2h1tQIPhPN2rSfXmR8XwCiLgnshjf47pikTlDEpzXvrhMG1ERcA9nWv7vSQ9JHQrKsVO5gc4PoYgJrt3o2U8XsE/2IohZiVJ17k+0Gw4BUgoRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780392133; c=relaxed/simple;
-	bh=qx9Oyz913PcMyr3DRCcFWEjLHUEyxDQo5cOmQloCccg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I4GxKcz0uzbOUmzxB8ojqWonB6E5OTA2PoF4+U3qKfbiP7ZsmcPqAF2YxKS3Tl0l7bdXw9Yn1jlRN0EsgJVrFgKKoYV7qs5O4Za6GuuW3nIZg2T4XcFFCjUS8aLivFEvSd0Qxb9I4LuSIWZHUwqOKZScCtgYwKD9w/iIUxowetE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LbFO37gP; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1780397999; c=relaxed/simple;
+	bh=sIVdK1xaNSNQwCVlOv/Pixr8w05CIer7htOyvmA6LMI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oTFyzmZvXQDkUtZTK7SV75PTDtxeOnPcqHFxk/WF05sO8W/Eg2nQYgurAEMiEP3QQUhr4ztHHFWsURC33hRlQ+7ZaXwHnh1fbjKlB+wsrT9pzK0bxrl03L4Mg71457MMBF2/xUyP7nFOD0MolsSkITsggDCwQ1VtQPSAKXSTAls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KSevwFm2; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LbFO37gP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780392132; x=1811928132;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qx9Oyz913PcMyr3DRCcFWEjLHUEyxDQo5cOmQloCccg=;
-  b=LbFO37gPZtpEIBpRoMN5RwwLulYWOSEGXShacFCKfeYh8ohbWJyVRpc4
-   Ko7vfb+5NSUmPQmRBISimrX0RYwZzh1mM14WJRAp5r0zYkb695T8+X3vJ
-   D9TzSGQRZon4CYheKURZhJ7t1W7hWctPZcSIixldtC2T3E5US1q5xmCKs
-   YLoEYnl2tgBReC6kaWeG5dih+2a0iDOMHSe6vKJF4B0th19jcG8ofg/2r
-   i09lY0VhR9TabnknHOG3c/oQKTbb9SLH3YS3orNfy/NRQsdqNqmmpZH+4
-   G/bWSd0pFa3KFx0bAIYdOb6+qamToLv8pJ4EP/F+FfT/i14f+tCpFuC+Y
-   Q==;
-X-CSE-ConnectionGUID: fnJgRrf9SomqyMin/LHf8Q==
-X-CSE-MsgGUID: ipooZghzQIeT8N7ZT9JXQg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11804"; a="103833897"
-X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
-   d="scan'208";a="103833897"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 02:22:11 -0700
-X-CSE-ConnectionGUID: 6MlgT1ArRse4ecPJiJxjWQ==
-X-CSE-MsgGUID: dpH2w+yIR4iKpkksHiG1RQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
-   d="scan'208";a="281963145"
-Received: from mkosciow-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.229])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 02:22:01 -0700
-Date: Tue, 2 Jun 2026 12:21:58 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	mkalderon@marvell.com, Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>, zyjzyj2000@gmail.com,
-	sagi@grimberg.me, mgurtovoy@nvidia.com, haris.iqbal@ionos.com,
-	jinpu.wang@ionos.com, kbusch@kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	kch@nvidia.com, smfrench@gmail.com, linkinjeon@kernel.org,
-	metze@samba.org, tom@talpey.com, chuck.lever@oracle.com,
-	jlayton@kernel.org, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, trondmy@kernel.org, anna@kernel.org,
-	achender@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	kees@kernel.org, ebadger@purestorage.com,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	target-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-	rds-devel@oss.oracle.com, Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH rdma-next v6] RDMA: Change capability fields in
- ib_device_attr from int to u32
-Message-ID: <ah6gtquGDMvEXjcb@ashevche-desk.local>
-References: <20260601092534.1764560-1-ernis@linux.microsoft.com>
- <5d3cac2b-4011-49c5-a142-55c85d38e90f@acm.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KSevwFm2"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780397994;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=L7qFB5lGQwqgEPRL6y70lO8/D+BdYgzCoInieJvnhd8=;
+	b=KSevwFm2BvgNYbFO7QQhqBlE/B4OevYRz4JYVpB/oAlsDT4fmLA2lbOfabXG5JuDAx6/BM
+	K0sqMuVdV1+q6cm+4PP3JQc9C2u3ERNoUskbSOwRVfKydPh/w9Ur0euDe14cbJ97o4Hl6S
+	eGCmbf9rP4h7mBkPDeFx2ujkjsqoKxE=
+From: Huiwen He <huiwen.he@linux.dev>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org,
+	chenxiaosong@kylinos.cn
+Cc: linux-cifs@vger.kernel.org
+Subject: [PATCH] smb/client: always return a value for FS_IOC_GETFLAGS
+Date: Tue,  2 Jun 2026 18:59:30 +0800
+Message-ID: <20260602105930.713403-1-huiwen.he@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5d3cac2b-4011-49c5-a142-55c85d38e90f@acm.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jun 01, 2026 at 08:51:40AM -0700, Bart Van Assche wrote:
-> On 6/1/26 2:25 AM, Erni Sri Satya Vennela wrote:
+From: Huiwen He <hehuiwen@kylinos.cn>
 
-...
+Currently, repeated lsattr calls on a regular CIFS file without the
+compressed attribute may show random flags:
 
-> > -	sdev->srq_size = min(srpt_srq_size, sdev->device->attrs.max_srq_wr);
-> > +	sdev->srq_size = min_t(u32, srpt_srq_size, sdev->device->attrs.max_srq_wr);
-> 
-> min_t() shouldn't be used if there is an alternative available. For the
-> SRP drivers, please make sure that both arguments of min() are unsigned
-> instead of using min_t().
+	$ touch test.bin
+	$ lsattr test.bin
+	s-S-ia-A-EjI---------m test.bin
+	$ lsattr test.bin
+	------d-cEjI---------m test.bin
 
-Ah, I just answered in similar way against v5. I also mentioned clamp() there.
+The lsattr reproducer depends on the previous contents of its userspace
+buffer, so it may not reproduce on every setup. A deterministic
+reproducer is to initialize the ioctl argument before FS_IOC_GETFLAGS
+on a file without the compressed attribute:
 
+        int flags = 0x7fffffff;
+        ioctl(fd, FS_IOC_GETFLAGS, &flags);
+
+On an affected kernel, flags remains 0x7fffffff. With the fix, it is
+set to 0.
+
+This happens because when the cached inode does not have the compressed
+bit set, the CIFS fallback path in FS_IOC_GETFLAGS returns success
+without calling put_user() to write the zero flags value into the user
+buffer. As a result, the caller observes stale contents from its own
+buffer.
+
+Fix this by always writing the visible flags value back to the user
+buffer before returning success, even when the value is zero.
+
+Fixes: 64a5cfa6db94 ("Allow setting per-file compression via SMB2/3")
+Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/client/ioctl.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
+index ac33ebaa1f97..9a624e88bca7 100644
+--- a/fs/smb/client/ioctl.c
++++ b/fs/smb/client/ioctl.c
+@@ -459,13 +459,11 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ 			}
+ #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+ #endif /* CONFIG_CIFS_POSIX */
+-			rc = 0;
+-			if (CIFS_I(inode)->cifsAttrs & ATTR_COMPRESSED) {
+-				/* add in the compressed bit */
+-				ExtAttrBits = FS_COMPR_FL;
+-				rc = put_user(ExtAttrBits & FS_FL_USER_VISIBLE,
+-					      (int __user *)arg);
+-			}
++			if (CIFS_I(inode)->cifsAttrs & FILE_ATTRIBUTE_COMPRESSED)
++				ExtAttrBits |= FS_COMPR_FL;
++
++			rc = put_user(ExtAttrBits & FS_FL_USER_VISIBLE,
++				      (int __user *)arg);
+ 			break;
+ 		case FS_IOC_SETFLAGS:
+ 			if (pSMBFile == NULL)
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.43.0
 
