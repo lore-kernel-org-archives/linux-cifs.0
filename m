@@ -1,95 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD1F35F8D2;
-	Tue,  2 Jun 2026 18:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2043C5522
+	for <linux-cifs@vger.kernel.org>; Tue,  2 Jun 2026 23:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780424306; cv=none; b=CDSp+pGw6JUfa7pVI2Z+WrAOR91BsvUFe9zI2fqxb3LyG3yXK7sqVkjPPbfS+rlW4JtksD/DAf6Gv3Cw+F1/bR3p1ccXM8M9lgk32tMGaeQzxTsCOqZ+RypzECZ7bI55WBxPZKkdWvy1zWDvDeTNYRB9UDiT6Cm/ZHiXEc/5NYY=
+	t=1780444612; cv=none; b=Gwhln2et+BxL7AXMCK4kbgVrBogTuwpPPH/gDEMjgiM0a1eghl/VksYhZKaaYbY3YMIxX7MHjlIgZ1VmAzsJQxgc5gl3kNtQxFrjRiQOijpbB3KFG+kZhzUmUpFDCvOSRd+WhJftvPLXhClZAbtQsCLF+8KipSsm+nv3yuZ8Sp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780424306; c=relaxed/simple;
-	bh=kaiP5nlmx+o6J5dZn3NEtFmE+/1HE1JUKqGhpXDCNTk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f3mSxbpF/6gxs8peUdyKPCRHvNVFdxZZOxgQrTq4JH/aKagjoCsvvRSS8bJdxec9QzaOc9E/mx6WKEc8fG7n1lRImV1Cx87GrSP81SyAOt7QlkWPVZUGfe+b4X+nmKofWkWLQiEcuAUwXVuCxhGclOPs5EoO4wKTgnOMjpz9jtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nTzLFTrT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780444612; c=relaxed/simple;
+	bh=sep4V0SjjMM5AxsPLB1KhRivWls906n1Sgx+OoHi9cA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rlXPnYLNgOOtBSTqEJE8YRFdZy7TSEB0c/iAnRWJhbrpFskkU9p9pTdkvMK6MqqZaKJUQFriAqeD3OmBFw5Sruu+r8NOFt5An1cO8SDrSIJ2K7kIlAJqTQV/JhtVV2Up2UlsAesMdtz2jGIzf4GjWMYYUmxhDTX7+1FCcEFZ3P8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bAqoM0cf; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nTzLFTrT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB3181F00893;
-	Tue,  2 Jun 2026 18:18:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780424305;
-	bh=tDyACb5/KqIGSD/zVzhz+P1a4GYNHCqoT3JaADnFHhQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=nTzLFTrTFDNrds9z+BHs394zIpMQnncSZ4LXYu1cjVIecgdX4KfmqViJq75KQHnuK
-	 abGBei3kUWObVS5dyh9mXuz/K5Fam0en2eakjVz/HigNAtrrNMiKcM8y1XZ554HLPF
-	 4Ak4VGu63ZFHb6m3S/mvcQOViokzTcoWHewkWPfmS1QNHvpiHVeomNowhbIFYRWbsv
-	 7KumAtMzFLELe/cAzhLLDVPj6BbSQJSphC1PbbT+HrKjTxlheI12ZAyyZkQi+wyq2C
-	 1c/8QxH7mL4uPjYRAMQqivEvJX3FcdLJ1VD4RbAph4syzrxg2BYhJoMqH/xgNTgjei
-	 lqyacgx2jzZWg==
-Date: Tue, 2 Jun 2026 11:18:23 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stefan Metzmacher
- <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli
- <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz
- <dreibh@simula.no>, linux-cifs@vger.kernel.org, Steve French
- <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey
- <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, Chuck Lever
- <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Steve Dickson
- <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring
- <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, Matthieu Baerts
- <matttbe@kernel.org>, John Ericson <mail@johnericson.me>, Cong Wang
- <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, Jason
- Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, Sabrina
- Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner
- <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, Andy
- Gospodarek <andrew.gospodarek@broadcom.com>, mef@scarletmail.rutgers.edu,
- paul@jakma.org
-Subject: Re: [PATCH net-next v12 00/15] net: introduce QUIC infrastructure
- and core subcomponents
-Message-ID: <20260602111823.0b1129d6@kernel.org>
-In-Reply-To: <CADvbK_fBbLCwY61HXsNeGCA8MhiBKcbvE0BvSZppohJgtXO+2g@mail.gmail.com>
-References: <cover.1780232930.git.lucien.xin@gmail.com>
-	<CADvbK_fBbLCwY61HXsNeGCA8MhiBKcbvE0BvSZppohJgtXO+2g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bAqoM0cf"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c8584e80d59so1588451a12.2
+        for <linux-cifs@vger.kernel.org>; Tue, 02 Jun 2026 16:56:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780444611; x=1781049411; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0xHIqJkwJ2SbbPlEp9EiveDRo0m8mJTT+U3xdWCxDh8=;
+        b=bAqoM0cf122ph8l4Kp32OIwNngy7b8d4jMf5JnoJckgx5hjgsxEqZ2KaebsqugQwDU
+         TJAYkWdg8Ba6XTGPSweaBRCPR5DJjdWjp2I+1sazzGUMtcMsuAo7h2/DRdwxYXrmmU03
+         V24+YMbQsDNjdxsn1EPiZ7s3PpmPNX/idhC8cg9UHOvWT3niOJx8oAXKvWswBsri+tBW
+         m/JvDcdjP7OuHxplnWq32AgKLWoDC7npleglUwNnyPHtNCqcgQN3k33uCIQmEkZLsuY0
+         N+J5wS7LPCizzNM8CkFj4igNd5s8/IEk7lM9vn6iUB4S2ap6hFGTbrlTzY9tX3yQ7feZ
+         Jp7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780444611; x=1781049411;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0xHIqJkwJ2SbbPlEp9EiveDRo0m8mJTT+U3xdWCxDh8=;
+        b=OJIJGt+t5PWhaLyi4aKXlWmfIoSH5pLcHCQb9radzphTrpcIAJ5twMs8Er6rYWYia3
+         aZQfL8HuOhQoHaP43xSJtGmeIrGX6egWokNTyqPdkBoNhg+BWMcLoZEtsuqGfoGQrUuv
+         1ZGYi2xxAJW+Qb2pkZedMSFDW7j6lFHOEW65OwN3yx1ImXj+OGAwDwS5QM1Fb4O+5x6F
+         Tav8zMoLqQXx57DFi0X4nTPEzU2ZB1d+fPAfwkXlGVAZ/0bt6hEz8qvVaSqz+2CME1X+
+         flLDRk86v/AyZJWEVoVAAzjWpGup0wgo+qdHxsGUEpgA1nLngOrdWZ05cFnfs7KQupAQ
+         XA0g==
+X-Forwarded-Encrypted: i=1; AFNElJ/MSj5+8bTEu4noYIkaCGS/pFTO2r9WCX7podu4brRZKd75CQbrQXwVNZkh+uny6vzBKsFWkeXl2LXb@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+G7Iat2IhyE57dI8lfK1dinYtMhU3lWGGw1V6Vof/4l8PpWO0
+	9Tujw1XS8ZXo2amc2+WBtLVDwybSZznR1fJELp2SvsXr+QEeShEWskBj
+X-Gm-Gg: Acq92OECAcKHK8sxqvcNymJ9c6/Ia8eesF6fYnGgv0+vAttLJS7+5g896p9P2w3gBiE
+	xBc9OuVpyKxXG3k1t2NZeyISK9U6wJIeCuQ6wHfLHSOHU1VwvsTbBb8HW8wrPAWC76LvUMu6SFO
+	8DYsMZJlDRnpneXfdiE5f3l34wEhxvHIRKtEAZ6N5JthJSPGulgYoGJWWUgef4JEcnVxelKbkyC
+	InkOBYFdIMbeskM+tz2Fb4ugCWHeattfgcOV8ICcu2GTPq4V3W+7NuNihaOUWn/cN8KnGvSUAIo
+	ldFRF4A8Cvx30oyfJSTBkC/KOITjDHOgA0wceGRKTF7ioSKTiyKKVDf7fShz+Cac1P/I5+gR0qE
+	VAwVNSQRoCp41Ri2zGUj+5Yn7StCB2IMAlbw2kTb5PCozzXNUEQqKC+OnhIoHBKwYIxD+UbQut0
+	EvyP0cSMTa1YqnIS3bJeIZtYFRJcSl9qgx8fSSnMcJf9pMF53jhhvDu08hSMfRDWCDfrH8GyVVl
+	xs=
+X-Received: by 2002:a05:6a21:6906:b0:3b4:68e3:f14f with SMTP id adf61e73a8af0-3b49731f75fmr1063489637.1.1780444610458;
+        Tue, 02 Jun 2026 16:56:50 -0700 (PDT)
+Received: from localhost.localdomain ([2601:600:807f:1ae0:c98d:5eba:43bd:375])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85df0a63b3sm352301a12.21.2026.06.02.16.56.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 16:56:50 -0700 (PDT)
+From: Hem Parekh <hemparekh1596@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <sfrench@samba.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	Hyunchul Lee <hyc.lee@gmail.com>,
+	linux-cifs@vger.kernel.org,
+	Hem Parekh <hemparekh1596@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: fix out-of-bounds read in smb_check_perm_dacl()
+Date: Tue,  2 Jun 2026 16:56:46 -0700
+Message-ID: <20260602235646.23581-1-hemparekh1596@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 2 Jun 2026 09:12:30 -0400 Xin Long wrote:
-> Note: I've run Sashiko on this patchset many times locally over the past
-> month and addressed all the real issues it found. I don't see any new real
-> issues being reported on:
+The permission-check ACE walk in smb_check_perm_dacl() validates the ACE
+header size and caps sid.num_subauth at SID_MAX_SUB_AUTHORITIES, but it
+never checks that ace->size is actually large enough to contain
+num_subauth sub-authorities before compare_sids() dereferences them.
 
-Coccinelle had a report tho:
+CIFS_SID_BASE_SIZE covers the SID header up to but excluding the
+sub_auth[] array, and offsetof(struct smb_ace, sid) is the ACE header,
+so the existing guards only guarantee the 8-byte SID base, i.e. zero
+sub-authorities. compare_sids() then reads ace->sid.sub_auth[i] for
+i < min(local_sid->num_subauth, ace->sid.num_subauth). The local
+comparison SIDs (sid_everyone, sid_unix_NFS_mode, and the id_to_sid()
+result) always have at least one sub-authority, and an attacker controls
+the ACE revision and authority bytes (which lie within the in-bounds SID
+base), so they can match one of those SIDs and force the sub_auth read.
 
-The NIPA CI coccicheck run flagged a new Coccinelle warning introduced by
-this patch:
+A crafted ACE with size == 16 and num_subauth >= 1 placed at the tail of
+the security descriptor therefore causes a heap out-of-bounds read of up
+to SID_MAX_SUB_AUTHORITIES * sizeof(__le32) bytes past the pntsd
+allocation. The security descriptor is loaded by ksmbd_vfs_get_sd_xattr()
+into a buffer sized exactly to the on-disk data (kzalloc(sd_size) in
+ndr_decode_v4_ntacl()), so the read lands past the allocation. The
+malformed descriptor can be stored verbatim via SMB2_SET_INFO (the DACL
+is not normalised before being written to the security.NTACL xattr) and
+the read fires on a subsequent SMB2_CREATE access check, making this
+reachable by an authenticated client on a share that uses ACL xattrs.
 
-  net/quic/crypto.c:1164:13-20: WARNING opportunity for kmemdup
+Add the missing num_subauth-versus-ace_size check, mirroring the
+identical guards already present in the sibling parsers parse_dacl() and
+smb_inherit_dacl().
 
-At line 1164 of the newly introduced net/quic/crypto.c, there is a
-kmalloc() call immediately followed by a memcpy() into the allocated
-buffer.  Coccinelle's memdup checker suggests replacing this two-step
-pattern with a single kmemdup() call, which is the preferred kernel idiom.
+Fixes: d07b26f39246 ("ksmbd: require minimum ACE size in smb_check_perm_dacl()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Hem Parekh <hemparekh1596@gmail.com>
+---
+ fs/smb/server/smbacl.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-The fix is straightforward - replacing:
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index 664b1b4a3..340ea98fa 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -1477,7 +1477,9 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 			break;
+ 		aces_size -= ace_size;
+ 
+-		if (ace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES)
++		if (ace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
++		    ace_size < offsetof(struct smb_ace, sid) + CIFS_SID_BASE_SIZE +
++			      sizeof(__le32) * ace->sid.num_subauth)
+ 			break;
+ 
+ 		if (!compare_sids(&sid, &ace->sid) ||
+-- 
+2.34.1
 
-  p = kmalloc(len, gfp);
-  if (!p)
-      return -ENOMEM;
-  memcpy(p, src, len);
-
-with:
-
-  p = kmemdup(src, len, gfp);
-  if (!p)
-      return -ENOMEM;
-
-Please update the patch to use kmemdup() at that location.
