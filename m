@@ -1,32 +1,32 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8FE313532
-	for <linux-cifs@vger.kernel.org>; Thu,  4 Jun 2026 15:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1603B30568A
+	for <linux-cifs@vger.kernel.org>; Thu,  4 Jun 2026 15:04:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780585476; cv=none; b=d7TyneG+ljSnzbFN1jmnuXeGDj9OSduh1C7EA59eojMcjnACHQCG1c8MgrtmfxHXJ6ctifB+qUlLEP5lh1is6HQ5ZyqRV6Tzp/QY+PfQxd/o73C1Q67JvKiJvQ5EuqlVjt9qZSkjqIusqOnueK45W8M8SpYmqqLV3dZeSHFPgRg=
+	t=1780585484; cv=none; b=sFZRlrkYyuJinTgglA3IJcf9qeNQFoPIoZvifwz+1Eubzmz6eUQMS1uEMKzvYvWBnACYu2jLA5taJkYmaJVu9RjmDT77zeuc2NzIPspv7jeCouEbRsfySzsH9zqwRrf8K+oPVr/anbfa5PKyxXk9MXO3m/0uTyjgR2MM1exBqAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780585476; c=relaxed/simple;
-	bh=fbo7wOIlHCx4FNJu0f1ByWgz21mvO/1xhi2V2LpfSrU=;
+	s=arc-20240116; t=1780585484; c=relaxed/simple;
+	bh=J1/+Fw0l+hqjolzgxRTykfqM7a6eXYO77v2Wak+Q8wQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WwCj57Yo7pflVlNOGf+TejZ9LTgkDY0WHL8jSem/FNb0DK3cloArRH8mloaSftN01YA4o4pj61w/VzzO9p78Ck/0EH3z8M96J7RkDCV1KGQNHeLSv/4qn89r/Tj9GKFgpyUn0KXP9ldxoTC4Tjg4+wyClyskkM6mUfyN42Rgagc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JbF3t2Fq; arc=none smtp.client-ip=91.218.175.183
+	 MIME-Version; b=BUB73B0+08sKam1SCjl1YUyKMHfPLuXavQY3caqv7BX29iyK5g4N9PqFHDdwmYJQ4C9VnJYaNXPLuj8m789uy/yew9biTdjT5VUBrcxR1GHQ+jMacqJKLlfHM0kqf4Ukfa6paanedgBFDlThJ3y578vR31eVTjMLVKd/qEPecVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VIPsfIo8; arc=none smtp.client-ip=91.218.175.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JbF3t2Fq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VIPsfIo8"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780585472;
+	t=1780585481;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=C5JRKKCS5IIx6cBhQ9MEVjp+lpwzUft9bNyxaQzjcEk=;
-	b=JbF3t2Fq+V6BuD1QQvHWP0q/Enrq4Auz4j0FrL+0M5Jqbgr3Cymtc04+Sk242oaUNTB18T
-	WMg/7KlULl9uJT0XW2JvWX+IJ9xoWecUznpCizhSCowIwVUhJ+hibl8TAqjzJ9GyCnT/xa
-	1mUoNHTFDL2MMS8Y0Qi3ZnK8Tr8ighk=
+	bh=EWjHlpSjmYZGSbz1H2D7Jfnbqw/P4YGWd3wTm0OBKb0=;
+	b=VIPsfIo8euXO3sDszmUedclgNimQtxRS45P+ddyTf6KlkFeKsilksoI1Ly6OzFOqBwp2hF
+	lpwkFVO6nzCt4fpXdLwThV/nCPkZ3Aw/nQK8uJa5tS8wZTzLzx+G/GcIxwv4g96BXOBGMW
+	/aAn6MyMwQVcYqz+3Bk+BA36tKeJLqI=
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -40,9 +40,9 @@ To: smfrench@gmail.com,
 	metze@samba.org,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH 2/3] smb/client: do not account EOF extension as allocation
-Date: Thu,  4 Jun 2026 23:03:48 +0800
-Message-ID: <20260604150349.101716-3-huiwen.he@linux.dev>
+Subject: [PATCH 3/3] smb/client: refresh allocation size after fallocate
+Date: Thu,  4 Jun 2026 23:03:49 +0800
+Message-ID: <20260604150349.101716-4-huiwen.he@linux.dev>
 In-Reply-To: <20260604150349.101716-1-huiwen.he@linux.dev>
 References: <20260604150349.101716-1-huiwen.he@linux.dev>
 Precedence: bulk
@@ -56,69 +56,66 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-cifs_setsize() updates the local inode size after SetEOF succeeds. It also
-used the new EOF as a local i_blocks estimate, but extending EOF does not
-prove that the intervening range was allocated.
+SMB3 fallocate extends EOF using FILE_END_OF_FILE_INFORMATION, but the
+server may also update the file's AllocationSize.  If the client keeps
+the old cached i_blocks value after fallocate, the swapfile hole check
+can still see:
 
-For example, after writing 1 MiB and then extending EOF to 10 MiB, the
-client can report the file as fully allocated even though the server still
-reports a much smaller AllocationSize:
+        i_blocks * 512 < i_size
 
-	$ dd if=/dev/zero of=test bs=1M count=1
-	$ truncate -s 10M test && stat -c 'size=%s blocks=%b' test
-        $ stat --cached=never -c 'size=%s blocks=%b' test
+and reject the file as sparse.
 
-	client stat:		size=10485760 blocks=20480
-	server stat:		size=10485760 blocks=2056
-	client stat(nocache):	size=10485760 blocks=2056
+This shows up in xfstests generic/496 as:
 
-A later attribute revalidation may correct i_blocks, but callers such as
-xfstests generic/495 invoke swapon immediately after truncate. The swapfile
-hole check can therefore observe the inflated local i_blocks value and
-accept a sparse file.
+        generic/496         [not run] fallocated swap not supported here
 
-Do not grow i_blocks from cifs_setsize() on EOF extension.  Only clamp it
-on shrink; allocation growth must come from write completion or from
-server-reported AllocationSize.
+After a successful EOF-extending fallocate, query FILE_ALL_INFORMATION on
+the open handle and update i_blocks from the returned AllocationSize. If
+the query fails, leave the fallocate result unchanged and force a later
+attribute revalidation by setting cifsi->time to zero.
 
-With this change, EOF extension no longer makes a sparse file appear
-fully allocated before the next attribute revalidation, and xfstests
-generic/495 correctly rejects the sparse swapfile.
+With this client-side refresh, and with a server that really allocates the
+fallocated range, for example Samba configured with:
+
+        [scratch_share]
+        strict allocate = yes
+
+generic/496 can pass the swapfile hole check.
 
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/inode.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ fs/smb/client/smb2ops.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 826d36ed13ec..e0aa71b87d27 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -3038,13 +3038,20 @@ int cifs_fiemap(struct inode *inode, struct fiemap_extent_info *fei, u64 start,
- 
- void cifs_setsize(struct inode *inode, loff_t offset)
- {
-+	loff_t old_size;
-+	u64 blocks = CIFS_INO_BLOCKS(offset);
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index d4875f9532b4..89230141b5dd 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -3698,8 +3698,23 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
+ 				  cfile->fid.volatile_fid, cfile->pid, new_eof);
+ 		if (rc == 0) {
++			struct smb2_file_all_info file_inf;
++			u64 asize;
++			int qrc;
 +
- 	spin_lock(&inode->i_lock);
-+	old_size = i_size_read(inode);
- 	i_size_write(inode, offset);
+ 			netfs_resize_file(&cifsi->netfs, new_eof, true);
+ 			cifs_setsize(inode, new_eof);
 +
- 	/*
--	 * Until we can query the server for actual allocation size,
--	 * this is best estimate we have for blocks allocated for a file.
-+	 * Extending EOF does not allocate the intervening range. Only clamp
-+	 * i_blocks on shrink; allocation growth comes from writes or from the
-+	 * server-reported AllocationSize.
- 	 */
--	inode->i_blocks = CIFS_INO_BLOCKS(offset);
-+	if (offset < old_size && (u64)inode->i_blocks > blocks)
-+		inode->i_blocks = blocks;
- 	spin_unlock(&inode->i_lock);
- 	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
- 	truncate_pagecache(inode, offset);
++			qrc = SMB2_query_info(xid, tcon, cfile->fid.persistent_fid,
++					      cfile->fid.volatile_fid, &file_inf);
++			spin_lock(&inode->i_lock);
++			if (qrc == 0) {
++				asize = le64_to_cpu(file_inf.AllocationSize);
++				inode->i_blocks = CIFS_INO_BLOCKS(asize);
++			} else {
++				cifsi->time = 0;
++			}
++			spin_unlock(&inode->i_lock);
+ 		}
+ 		goto out;
+ 	}
 -- 
 2.43.0
 
