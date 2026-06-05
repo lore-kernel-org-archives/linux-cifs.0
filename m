@@ -1,32 +1,32 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1519630C142
-	for <linux-cifs@vger.kernel.org>; Fri,  5 Jun 2026 16:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD2137D11A
+	for <linux-cifs@vger.kernel.org>; Fri,  5 Jun 2026 16:36:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780677392; cv=none; b=dyGZuC+rYIUhA1+b2mrW0QtFkIJaVte8cEbrSFD6FeRu0Ve86xtIB06L1ukdzvngAZIQS2Cr/S+o265ipSwa0rpsVyV3QynEAO4kstfI4lZ6YXXNwf3TEK0bdxsozie4DT0qAe2LYksRFbm7cHMNmc918F7aw6J+eLAyabCL8II=
+	t=1780677398; cv=none; b=FmvVFO+XfJ52tZ1Rfwg56+Beornip0q66B/kXCX5FOHsHKWdoL7N5keuxsx4NUHC6jEwrl8nCdnf202ZL0YqCzpiVzM4BZpS1ViCyEpXmwTIwugCv8a1vw6Wc2ZeJTBKf6A8mB893optceeKueTsvCGcO3WvSvwjWEdeu/v52zw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780677392; c=relaxed/simple;
-	bh=MRPDnHgVBnpbo+AamCuKD0QfkgxzHSBsWTrF8zk1M7o=;
+	s=arc-20240116; t=1780677398; c=relaxed/simple;
+	bh=fbo7wOIlHCx4FNJu0f1ByWgz21mvO/1xhi2V2LpfSrU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Df+zKQBhyz6We6wfufN7rOrChQ7vlmZuRjQVo+hdHuVY2TFd+xntHrzKe9nm8T8KKwTUXU7aJVIOu9o9SYjZQ7CiusR9sMfQOL3OWRfiPuhVo2DO5YyWSyT+qPFdu4jr4WHW1bOvyMG1wn2zVu5enAdw2LN6PLb6PtJFcgnvTHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h3MXAMf1; arc=none smtp.client-ip=91.218.175.180
+	 MIME-Version; b=udiR1vQ80TM8jeMqRfXNZiVFYMK9udzRYpy2pTb3fQLC/9UlAja2bX0pydaF1ZQMzvgf4xV6P0aHVgoqqEn6jjbn/VxNGN3I+ySSAfQ/oXRbmTx6ZiyrKpHjzH3n4EPq/DBsjxIRPtnpaff7Jew+kuA36sGpydXB+1Mi6X+ta+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mV3Kq6q0; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h3MXAMf1"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mV3Kq6q0"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780677384;
+	t=1780677392;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HDF54vuiAmfmJoRJApwknwLrh2q6UWn7LVhTf8pUWRA=;
-	b=h3MXAMf1Dr1NP69tIXlCpizWOav3XySDqUIyPuthQe+Mt9afyLyqm9WeclHmjth3eJ2CNt
-	l+y2ocVpcB4v32F5tl4yYZYJe00TgvIeFFd/45N8eU6vYnVxu4iZ74ya9OxTBXyV3aTplP
-	vzaw5DvQCvlJz9f9BFdfXUmTE1fjan4=
+	bh=C5JRKKCS5IIx6cBhQ9MEVjp+lpwzUft9bNyxaQzjcEk=;
+	b=mV3Kq6q0ch0tKF6vsw25H7IMEH1MjVeDL7JtZAMJAJzFppLGXaCsKESg5es0c17MyXJv36
+	omlB//yIpxzQW+VrGXML6Qb224RDB3/sz9NDdXRGJztGHxpAzUU6K3G20XXfdZ4jQBLaxl
+	Qh52mjTU0AxNeMBCWJ/z4gAlNa58iLA=
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -40,9 +40,9 @@ To: smfrench@gmail.com,
 	metze@samba.org,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v2 1/3] smb/client: update i_blocks after contiguous writes
-Date: Sat,  6 Jun 2026 00:35:17 +0800
-Message-ID: <20260605163519.169916-2-huiwen.he@linux.dev>
+Subject: [PATCH v2 2/3] smb/client: do not account EOF extension as allocation
+Date: Sat,  6 Jun 2026 00:35:18 +0800
+Message-ID: <20260605163519.169916-3-huiwen.he@linux.dev>
 In-Reply-To: <20260605163519.169916-1-huiwen.he@linux.dev>
 References: <20260605163519.169916-1-huiwen.he@linux.dev>
 Precedence: bulk
@@ -56,217 +56,69 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-When a lease allows CIFS to use cached inode attributes, getattr may
-return the locally cached attributes instead of revalidating them from
-the server. After local writes extend a file, the write path updates the
-file size, but i_blocks can remain based on the old allocation size.
+cifs_setsize() updates the local inode size after SetEOF succeeds. It also
+used the new EOF as a local i_blocks estimate, but extending EOF does not
+prove that the intervening range was allocated.
 
-For example, while the file is still open after two contiguous writes,
-the local block count can remain smaller than the written range:
+For example, after writing 1 MiB and then extending EOF to 10 MiB, the
+client can report the file as fully allocated even though the server still
+reports a much smaller AllocationSize:
 
-        after first write:   st_size = 4096,  st_blocks = 7
-        after second write:  st_size = 12288, st_blocks = 21
-        after close:         st_size = 12288, st_blocks = 24
+	$ dd if=/dev/zero of=test bs=1M count=1
+	$ truncate -s 10M test && stat -c 'size=%s blocks=%b' test
+        $ stat --cached=never -c 'size=%s blocks=%b' test
 
-This can make a fully written file look sparse:
+	client stat:		size=10485760 blocks=20480
+	server stat:		size=10485760 blocks=2056
+	client stat(nocache):	size=10485760 blocks=2056
 
-        i_blocks * 512 < i_size
+A later attribute revalidation may correct i_blocks, but callers such as
+xfstests generic/495 invoke swapon immediately after truncate. The swapfile
+hole check can therefore observe the inflated local i_blocks value and
+accept a sparse file.
 
-and can cause swap activation to reject a valid write-created swapfile
-as having holes. This results in xfstests skipping swap-related tests
-on CIFS mounts:
+Do not grow i_blocks from cifs_setsize() on EOF extension.  Only clamp it
+on shrink; allocation growth must come from write completion or from
+server-reported AllocationSize.
 
-	generic/472         [not run] swapfiles are not supported
-	generic/494         [not run] swapfiles are not supported
-	generic/497         [not run] swapfiles are not supported
-	generic/569         [not run] swapfiles are not supported
-	generic/636         [not run] swapfiles are not supported
-	generic/643         [not run] swapfiles are not supported
-
-Update the local i_blocks estimate after successful writes, but only
-when the write starts at or before the currently known allocated range.
-This lets sequential writes grow i_blocks while avoiding treating
-write-past-EOF holes as allocated.
-
-Skip the local estimate for files that are already marked sparse, since
-their allocation needs to come from the server rather than from a
-contiguous-write estimate.
+With this change, EOF extension no longer makes a sparse file appear
+fully allocated before the next attribute revalidation, and xfstests
+generic/495 correctly rejects the sparse swapfile.
 
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifsfs.c   |  4 ++--
- fs/smb/client/cifsfs.h   |  1 +
- fs/smb/client/cifsglob.h |  9 ++++---
- fs/smb/client/file.c     | 52 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 61 insertions(+), 5 deletions(-)
+ fs/smb/client/inode.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index ce23924f01b3..6b97f7a91235 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -1615,7 +1615,7 @@ const struct file_operations cifs_file_strict_ops = {
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index 826d36ed13ec..e0aa71b87d27 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -3038,13 +3038,20 @@ int cifs_fiemap(struct inode *inode, struct fiemap_extent_info *fei, u64 start,
  
- const struct file_operations cifs_file_direct_ops = {
- 	.read_iter = netfs_unbuffered_read_iter,
--	.write_iter = netfs_file_write_iter,
-+	.write_iter = cifs_direct_write_iter,
- 	.open = cifs_open,
- 	.release = cifs_close,
- 	.lock = cifs_lock,
-@@ -1671,7 +1671,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
- 
- const struct file_operations cifs_file_direct_nobrl_ops = {
- 	.read_iter = netfs_unbuffered_read_iter,
--	.write_iter = netfs_file_write_iter,
-+	.write_iter = cifs_direct_write_iter,
- 	.open = cifs_open,
- 	.release = cifs_close,
- 	.fsync = cifs_fsync,
-diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
-index c455b15f2778..c35074ce5aad 100644
---- a/fs/smb/client/cifsfs.h
-+++ b/fs/smb/client/cifsfs.h
-@@ -104,6 +104,7 @@ int cifs_closedir(struct inode *inode, struct file *file);
- ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
- ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
- ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from);
-+ssize_t cifs_direct_write_iter(struct kiocb *iocb, struct iov_iter *from);
- ssize_t cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter);
- int cifs_flock(struct file *file, int cmd, struct file_lock *fl);
- int cifs_lock(struct file *file, int cmd, struct file_lock *flock);
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 82e0adc1dabd..943b7cd2c096 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -2387,9 +2387,12 @@ static inline int cifs_open_create_options(unsigned int oflags, int opts)
- }
- 
- /*
-- * The number of blocks is not related to (i_size / i_blksize), but instead
-- * 512 byte (2**9) size is required for calculating num blocks.
-+ * inode->i_blocks is counted in 512-byte units, independent of
-+ * inode->i_blksize.
-  */
--#define CIFS_INO_BLOCKS(size) DIV_ROUND_UP_ULL((u64)(size), 512)
-+#define CIFS_INO_BLOCK_SIZE 512ULL
-+#define CIFS_INO_BLOCKS(size) \
-+	DIV_ROUND_UP_ULL((u64)(size), CIFS_INO_BLOCK_SIZE)
-+#define CIFS_INO_BYTES(blocks) ((u64)(blocks) * CIFS_INO_BLOCK_SIZE)
- 
- #endif	/* _CIFS_GLOB_H */
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index b60344125f27..58430ba51b10 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -2514,6 +2514,42 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
- 	return rc;
- }
- 
-+static void cifs_update_i_blocks_for_write(struct inode *inode, loff_t start,
-+					     loff_t end)
-+{
-+	struct cifsInodeInfo *cinode = CIFS_I(inode);
-+	u64 allocated_end = CIFS_INO_BYTES(inode->i_blocks);
-+	u64 blocks;
-+
-+	if (cinode->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE)
-+		return;
-+
-+	/*
-+	 * Grow the local estimate only across the currently known allocated
-+	 * prefix. A write beyond that may leave a hole.
-+	 */
-+	if ((u64)start > allocated_end)
-+		return;
-+
-+	blocks = CIFS_INO_BLOCKS(end);
-+	if ((u64)inode->i_blocks < blocks)
-+		inode->i_blocks = blocks;
-+}
-+
-+static void cifs_update_i_blocks_after_write(struct kiocb *iocb,
-+						ssize_t written)
-+{
-+	struct inode *inode = file_inode(iocb->ki_filp);
-+	loff_t end = iocb->ki_pos;
-+
-+	if (written <= 0)
-+		return;
-+
-+	spin_lock(&inode->i_lock);
-+	cifs_update_i_blocks_for_write(inode, end - written, end);
-+	spin_unlock(&inode->i_lock);
-+}
-+
- void cifs_write_subrequest_terminated(struct cifs_io_subrequest *wdata, ssize_t result)
+ void cifs_setsize(struct inode *inode, loff_t offset)
  {
- 	struct netfs_io_request *wreq = wdata->rreq;
-@@ -2532,6 +2568,8 @@ void cifs_write_subrequest_terminated(struct cifs_io_subrequest *wdata, ssize_t
- 			netfs_write_zero_point(inode, wrend);
- 		if (wrend > ictx->_remote_i_size)
- 			netfs_resize_file(ictx, wrend, true);
-+		cifs_update_i_blocks_for_write(inode, wdata->subreq.start,
-+						 wrend);
- 
- 		spin_unlock(&inode->i_lock);
- 	}
-@@ -2920,6 +2958,7 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from)
- 	}
- 
- 	rc = netfs_buffered_write_iter_locked(iocb, from, NULL);
-+	cifs_update_i_blocks_after_write(iocb, rc);
- 
- out:
- 	up_read(&cinode->lock_sem);
-@@ -2949,6 +2988,7 @@ cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from)
- 		    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability)) &&
- 		    ((cifs_sb_flags(cifs_sb) & CIFS_MOUNT_NOPOSIXBRL) == 0)) {
- 			written = netfs_file_write_iter(iocb, from);
-+			cifs_update_i_blocks_after_write(iocb, written);
- 			goto out;
- 		}
- 		written = cifs_writev(iocb, from);
-@@ -2961,6 +3001,7 @@ cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from)
- 	 * these pages but not on the region from pos to ppos+len-1.
++	loff_t old_size;
++	u64 blocks = CIFS_INO_BLOCKS(offset);
++
+ 	spin_lock(&inode->i_lock);
++	old_size = i_size_read(inode);
+ 	i_size_write(inode, offset);
++
+ 	/*
+-	 * Until we can query the server for actual allocation size,
+-	 * this is best estimate we have for blocks allocated for a file.
++	 * Extending EOF does not allocate the intervening range. Only clamp
++	 * i_blocks on shrink; allocation growth comes from writes or from the
++	 * server-reported AllocationSize.
  	 */
- 	written = netfs_file_write_iter(iocb, from);
-+	cifs_update_i_blocks_after_write(iocb, written);
- 	if (CIFS_CACHE_READ(cinode)) {
- 		/*
- 		 * We have read level caching and we have just sent a write
-@@ -2979,6 +3020,15 @@ cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from)
- 	return written;
- }
- 
-+ssize_t cifs_direct_write_iter(struct kiocb *iocb, struct iov_iter *from)
-+{
-+	ssize_t written;
-+
-+	written = netfs_file_write_iter(iocb, from);
-+	cifs_update_i_blocks_after_write(iocb, written);
-+	return written;
-+}
-+
- ssize_t cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- {
- 	ssize_t rc;
-@@ -3003,6 +3053,7 @@ ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 
- 	if (iocb->ki_filp->f_flags & O_DIRECT) {
- 		written = netfs_unbuffered_write_iter(iocb, from);
-+		cifs_update_i_blocks_after_write(iocb, written);
- 		if (written > 0 && CIFS_CACHE_READ(cinode)) {
- 			cifs_zap_mapping(inode);
- 			cifs_dbg(FYI,
-@@ -3018,6 +3069,7 @@ ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 		return written;
- 
- 	written = netfs_file_write_iter(iocb, from);
-+	cifs_update_i_blocks_after_write(iocb, written);
- 
- 	if (!CIFS_CACHE_WRITE(CIFS_I(inode))) {
- 		rc = filemap_fdatawrite(inode->i_mapping);
+-	inode->i_blocks = CIFS_INO_BLOCKS(offset);
++	if (offset < old_size && (u64)inode->i_blocks > blocks)
++		inode->i_blocks = blocks;
+ 	spin_unlock(&inode->i_lock);
+ 	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
+ 	truncate_pagecache(inode, offset);
 -- 
 2.43.0
 
