@@ -1,177 +1,126 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140313264CA
-	for <linux-cifs@vger.kernel.org>; Thu,  4 Jun 2026 15:19:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780586370; cv=none; b=R7k8GDDKUMNk6kfpQvSSYAs45CDipqf/bFZWm5hRFdMst7VQNlFF9pVAlboIwxO+IEonRFRQ9kscaVsAEHD0/7M6HbLO4jNZNI6FOd+vaSOFVzgcBT3P5Drwob94DhXFvTjtHuY+Ht++0Vnyy9IipBgWyyZHUP6fEQ1PFDme6Es=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780586370; c=relaxed/simple;
-	bh=0hHw4FfGlFIXySlLMLvV+VOCckAac2tW+qQwe1BFLwY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tOys0wLDpv0HfDH/gyJfhuKyXDQARUNC6O7hUgVRJVjuC0qtEih00pAfYuvczf31z4AVl4uVYnfLH7mqMDYSnHbw2xcIIUSK82V6Z9kSFZ/mdcmGzNKopdYfMwKtG1wUif39Bq8/xnpBkY8VjZ6Tr9L7TAH60V8VlzdsmD4vlL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sXuZBcQz; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5812E1F02
+	for <linux-cifs@vger.kernel.org>; Fri,  5 Jun 2026 01:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780621533; cv=pass; b=HscW5l8D81Nky/+gg5TYMWgDJItNDrNjuxN3hTx55G67+sAuvdd2pel+iTf8YdgklvESPy3ooTSBUjpVBmcBXCUwTix/uQhTAat5d7VKIkgVUwK6a3PkytyI+wKluQr0CTYXYcW7l+m8cdXNgu24Kl8F6aUKsFpTDhMd9wEauyI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780621533; c=relaxed/simple;
+	bh=aXiuoQV52r+S/KH4hTvJRmCeaPgm9e4+tI2Ssvemhvo=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=k1n+evhdc0FxpakOiPwkM0cEqnaiTLjmNmOtxD6Q85ouYPvdRUEsnpumE1l9Yr5HikmAydbSYVHbgezyLk7fBE3CFfuB4AS7Rn9XYpZ7GjhjBU74lC5UlBY1D5oEkVKINAiDV75NNgfI0Snks8t2YT80+C72Mm9rCTL/Jy5PRd0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NsB2AWny; arc=pass smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sXuZBcQz"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780586367;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=G3K8FswOToNgL0zQ2Q4pMvXu5LbgeyhbCn79wxZ/wAM=;
-	b=sXuZBcQzKXPSTk8R1RkKjeMb+0/M4zSNYfIEwp8xV8pwJu6a2oKNLod+NkB7O/prC+pPxc
-	7jdVYU8sM2c8C5KwrIa2kQTMRi0h+OA0UkYJBerDwVQRsKdrr9Him2XlibtNwiE6J5CbbP
-	0vD1yvW/lrUblqgNlLDzKfqylTGycIs=
-From: Huiwen He <huiwen.he@linux.dev>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org,
-	chenxiaosong@kylinos.cn
-Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH] smb/client: use writable handle for FS_IOC_SETFLAGS compression
-Date: Thu,  4 Jun 2026 23:18:59 +0800
-Message-ID: <20260604151859.102653-1-huiwen.he@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NsB2AWny"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-5177945a279so13933501cf.0
+        for <linux-cifs@vger.kernel.org>; Thu, 04 Jun 2026 18:05:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780621530; cv=none;
+        d=google.com; s=arc-20240605;
+        b=BPEKEGTKpNp3DD+2Qz0icl+K5HizN4WBCIyVeSsO46m9iJpN0UcUvuW/WZ0YzLD23l
+         NlGdf8ZhxtkF2clI86QJY4HjJy/blH2xiv98Xjr7K1mbGi2SDS8u9Tij3YLcgvp0pZSd
+         9JABn7h4ouOaTEuyHf0Zy+9/zqeLG/uKZn5yohjp4SNanDtemwjl5/XhFif6bXQzHfIE
+         lKCzJiBMZJ4okKF3I2rYxC+e8YbsK5CX7FOPNcmRHUCZngj0YDh+RNjbxVcOfepUJsc8
+         wfF6MGhATWjKAn3jVRJlWNLUpqtjKClov6Iz174DgZuWi0/qDT/nzdBSSZ5ojUAmsUha
+         dJ/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=Su/C2V1bq+MhfXLJHZydnqsSwCOFf744TyZyk3brPUE=;
+        fh=JCAJRyneh12kZG57Tv1JbHyRGB/zhlTjbCHQrj6dai4=;
+        b=YMK1djjK3SNRFCZdB+sV2HKsTXI3yJIXu6/PrRrr7u9ddIqBtYKs62FWoDMsnVyGUf
+         haRoIoBR5+jf02flaeUAJnUcLTu9W+ZBMbYKjTEwiOi1L6rD/xhSI46cwA6Ayh1Y1i4h
+         sE2h2mk3f5rq9hTwt877pQgp0Z54qvxoSIlalXTDbmzrM0ObCBIw9k63xOK4AGeBYo96
+         xO1qdX+2Mu8u4qu80JpofJwfOWfYAH50huOXKdogxWr+KdnXpxvH/0Jx7DUdX8Z5c31b
+         ZU1yHr7FfCSlElwcJDon2rde9dU0/mMgWR20dvfMAnD3ftUIWT0Fu+ASn5yNvGHBKHHu
+         3Wrg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780621530; x=1781226330; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Su/C2V1bq+MhfXLJHZydnqsSwCOFf744TyZyk3brPUE=;
+        b=NsB2AWnygS+CaTXp2qaJwHZYbYEdv8sj2f41SYYiqeVhr5Nvxs9zICoAeolWIgDvwX
+         vkJH/ZldNHKLcjlG+q/wvkKcQ45+3G01TxKNG3hKJmWCsHFi09P7P64+hnM3qvqczMZH
+         iJ3qnMiBDuTuUj6GOP7o8snQNMewMSfKHLtFScnlE/vNTO336Lh7OtqXbMA9/ZqaEpmP
+         K29YR3N+3AR3bPIoFIW5rsKLRj3tcF3pcfWkb4NNvpAV4tJJNFb/yUi1tqWMARBA0Rzb
+         va0eG3aElgqQDbESK8Y9TqupEjp3vV7cy/LCGQ+a4Xh4JjSt+QPslU59Ry/1Ec0WboWX
+         0v7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780621530; x=1781226330;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Su/C2V1bq+MhfXLJHZydnqsSwCOFf744TyZyk3brPUE=;
+        b=Q6QEpOdByazA1MlWkEVyNKaPkmuR6OVCjwldO9D5vJGf33TFzAUq7Fp/SKdAA9x7b+
+         MuHxZqDwCgxjiPT2+UwA3Nq+xajOjGn03df9bMVQhZepclFrNQZ9b3HS6fYWXpUKjFlv
+         Y0mAR2GazkFWpzYJTV5BIdrIr2SqcZPszBwKE4WYkIzAmmsMeFMYH/CDc4DnUd38RfO9
+         eldZAf8T4a2yI6J8PqbvrNS+k7b++YI9G3FZwWhVn+jvxj7F7WeRyHKlJ0+hWXpg2xGh
+         XsE+h6+1e6s4cwNuPfMPqdeGTTNU7d1ATz3cuB6Lq8iF2Z/W9bAtM14gren3agTi98AB
+         1/1Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9mZ+oVVKYH0cVfoHuf921MKVGG2jAc7+awBYkwAdYPFAAIwApkw6p4WUJRmWhyAI+aznRYQSrMHy2+@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyasvRH+P+BrFfyRTA8g823EGSdLk69bgGjY+FGW9P3/b+axvX
+	MKpdm2GU35IuaW/kyYYwhATI9FNceskzPTjpRafC1G2mkHE0xl+rf7zltVKOl7EdBVx6LNrY3rd
+	0dW/hiPqPbuhcQ1PDIhToXLXd2ESECXk=
+X-Gm-Gg: Acq92OE1B7iRUkpRX4OtB8q2cWIKNz0jYXZ5YzKidVI58pHGkKqTm1WCVxG8OeYQuvq
+	g/lpVe0OBcdOZGznI7iFeFwWVtV+eait8QEuI19DOQyXacP7aYrWgnYuLm9VCuMBfKtMME2HwWE
+	SnYTiIaU3REqQFnnisr/mqBezcqZWLWwM6PJ2khZNdSoXFCQxxtzO+pxkMfoLTAILFNVmkP7NNQ
+	zWrbcG/h2YLgqPbvhAHE/uOEtHbzc40y7HdhWkgElEFD2bJ3VMcirGEArxUY2mJjZsCsIuQNyhP
+	IZxV9QUCTlpttmPtUZuiSmEySa0XpYNq15zLPzDxoPSnq4cymrkzj3pwSKfOo5lmZntONXvVhKe
+	JuGCgC3JOy5OZnVY49QwX7SOTioO/gP1wKSoo+w+do8iVb1JQ9cgOFzX005QYw14Kfrwv4AcPrQ
+	trM4Plo+LltRVWf1QhDGEeivRhym9IBjox
+X-Received: by 2002:a05:622a:188b:b0:50e:6182:b4c with SMTP id
+ d75a77b69052e-51795b8f843mr20479371cf.25.1780621529718; Thu, 04 Jun 2026
+ 18:05:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 4 Jun 2026 20:05:18 -0500
+X-Gm-Features: AVVi8Ceer_vTUlnCUlwT6H1zVgKVYNyS7zJ2CzUCJhHL3qOz8V3nMHFyeGMl8z8
+Message-ID: <CAH2r5mu5c04vjOemsf8_c8htBD772sjRkLgNNtX7+bBk66Kg1Q@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Huiwen He <hehuiwen@kylinos.cn>
+Please pull the following changes since commit
+e43ffb69e0438cddd72aaa30898b4dc446f664f8:
 
-Setting the compressed flag on a CIFS mount can fail with -EACCES:
+  Linux 7.1-rc6 (2026-05-31 15:14:24 -0700)
 
-        $ touch test.bin
-        $ chattr +c test.bin
-        chattr: Permission denied while setting flags on test.bin
+are available in the Git repository at:
 
-This can be reproduced against a Samba share backed by a filesystem that
-supports compression, such as btrfs.
+  git://git.samba.org/ksmbd.git tags/v7.1-rc7-ksmbd-server-fixes
 
-FS_IOC_SETFLAGS is issued on the file handle opened by userspace.  chattr
-opens the target read-only before setting FS_COMPR_FL, so the SMB client
-currently sends FSCTL_SET_COMPRESSION on a handle that may not have
-FILE_WRITE_DATA access.  Samba requires FILE_WRITE_DATA for
-FSCTL_SET_COMPRESSION and rejects the request.
+for you to fetch changes up to f580d27e8928828693df44ba2db0fffdbe11dfea:
 
-Use the current handle only if it already has FILE_WRITE_DATA.  Otherwise
-try an existing writable handle for the inode.  If none is available, open
-a temporary FILE_WRITE_DATA handle for the compression request.
+  ksmbd: fix use-after-free of a deferred file_lock on double
+SMB2_CANCEL (2026-05-31 19:13:48 -0500)
 
-After FSCTL_SET_COMPRESSION succeeds, update the cached compressed
-attribute immediately, matching how smb2_set_sparse() updates
-FILE_ATTRIBUTE_SPARSE_FILE after a successful FSCTL_SET_SPARSE.
+----------------------------------------------------------------
+Three ksmbd server fixes
+- Fix use after free in SMB2_CANCEL
+- Fix race in ksmbd_reopen_durable_fd
+- Fix oplock and lease break potential NULL-dref
 
-Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/client/ioctl.c | 73 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 71 insertions(+), 2 deletions(-)
+----------------------------------------------------------------
+Gil Portnoy (3):
+      ksmbd: fix NULL-deref of opinfo->conn in oplock/lease break notifiers
+      ksmbd: fix durable reconnect double-bind race in ksmbd_reopen_durable_fd
+      ksmbd: fix use-after-free of a deferred file_lock on double SMB2_CANCEL
 
-diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
-index 17408bb8ab65..9afc43ac2bde 100644
---- a/fs/smb/client/ioctl.c
-+++ b/fs/smb/client/ioctl.c
-@@ -67,6 +67,72 @@ static long cifs_ioctl_query_info(unsigned int xid, struct file *filep,
- 	return rc;
- }
- 
-+static int cifs_ioctl_set_compression(unsigned int xid, struct file *filep,
-+				      struct cifs_tcon *tcon,
-+				      struct cifsFileInfo *cfile)
-+{
-+	struct inode *inode = file_inode(filep);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-+	struct TCP_Server_Info *server = tcon->ses->server;
-+	struct cifs_open_parms oparms;
-+	struct cifsFileInfo *wfile;
-+	struct cifsFileInfo tmp_cfile = {};
-+	struct cifs_tcon *wtcon;
-+	struct cifs_fid fid = {};
-+	const char *full_path;
-+	__u32 oplock = 0;
-+	void *page;
-+	int rc;
-+
-+	if (!server->ops->set_compression)
-+		return -EOPNOTSUPP;
-+
-+	if (cfile && (cfile->fid.access & FILE_WRITE_DATA)) {
-+		rc = server->ops->set_compression(xid, tcon, cfile);
-+		if (rc != -EACCES)
-+			return rc;
-+	}
-+
-+	rc = cifs_get_writable_file(CIFS_I(inode), FIND_FSUID_ONLY, &wfile);
-+	if (!rc) {
-+		wtcon = tlink_tcon(wfile->tlink);
-+		if (wtcon->ses->server->ops->set_compression)
-+			rc = wtcon->ses->server->ops->set_compression(xid,
-+									  wtcon, wfile);
-+		else
-+			rc = -EOPNOTSUPP;
-+		cifsFileInfo_put(wfile);
-+		if (rc != -EACCES)
-+			return rc;
-+	}
-+
-+	if (!server->ops->open || !server->ops->close)
-+		return -EOPNOTSUPP;
-+
-+	page = alloc_dentry_path();
-+	full_path = build_path_from_dentry(filep->f_path.dentry, page);
-+	if (IS_ERR(full_path)) {
-+		free_dentry_path(page);
-+		return PTR_ERR(full_path);
-+	}
-+
-+	oparms = CIFS_OPARMS(cifs_sb, tcon, full_path, FILE_WRITE_DATA,
-+			     FILE_OPEN, 0, ACL_NO_MODE);
-+	oparms.fid = &fid;
-+
-+	rc = server->ops->open(xid, &oparms, &oplock, NULL);
-+	if (rc)
-+		goto out;
-+
-+	tmp_cfile.fid = fid;
-+	rc = server->ops->set_compression(xid, tcon, &tmp_cfile);
-+
-+	server->ops->close(xid, tcon, &fid);
-+out:
-+	free_dentry_path(page);
-+	return rc;
-+}
-+
- static long cifs_ioctl_copychunk(unsigned int xid, struct file *dst_file,
- 			unsigned long srcfd)
- {
-@@ -427,8 +493,11 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- 
- 			/* Try to set compress flag */
- 			if (tcon->ses->server->ops->set_compression) {
--				rc = tcon->ses->server->ops->set_compression(
--							xid, tcon, pSMBFile);
-+				rc = cifs_ioctl_set_compression(xid, filep, tcon,
-+								pSMBFile);
-+				if (rc == 0)
-+					CIFS_I(inode)->cifsAttrs |=
-+						FILE_ATTRIBUTE_COMPRESSED;
- 				cifs_dbg(FYI, "set compress flag rc %d\n", rc);
- 			}
- 			break;
+ fs/smb/server/oplock.c    | 15 ++++++++++++---
+ fs/smb/server/smb2pdu.c   | 11 +++++++++++
+ fs/smb/server/vfs_cache.c | 12 +++++++++---
+ 3 files changed, 32 insertions(+), 6 deletions(-)
+
 -- 
-2.43.0
+Thanks,
 
+Steve
