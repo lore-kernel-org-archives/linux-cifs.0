@@ -1,126 +1,126 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5812E1F02
-	for <linux-cifs@vger.kernel.org>; Fri,  5 Jun 2026 01:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780621533; cv=pass; b=HscW5l8D81Nky/+gg5TYMWgDJItNDrNjuxN3hTx55G67+sAuvdd2pel+iTf8YdgklvESPy3ooTSBUjpVBmcBXCUwTix/uQhTAat5d7VKIkgVUwK6a3PkytyI+wKluQr0CTYXYcW7l+m8cdXNgu24Kl8F6aUKsFpTDhMd9wEauyI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780621533; c=relaxed/simple;
-	bh=aXiuoQV52r+S/KH4hTvJRmCeaPgm9e4+tI2Ssvemhvo=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=k1n+evhdc0FxpakOiPwkM0cEqnaiTLjmNmOtxD6Q85ouYPvdRUEsnpumE1l9Yr5HikmAydbSYVHbgezyLk7fBE3CFfuB4AS7Rn9XYpZ7GjhjBU74lC5UlBY1D5oEkVKINAiDV75NNgfI0Snks8t2YT80+C72Mm9rCTL/Jy5PRd0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NsB2AWny; arc=pass smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6924E38E8D4
+	for <linux-cifs@vger.kernel.org>; Fri,  5 Jun 2026 04:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780633825; cv=none; b=CwHlVrQjqKcHLchh4zRlLcG0gtV6z4lC3ucgR8UGWBXq1Po59E5Z5zovQKv7bWZd2r8mtUywMN5F6I1gbwqQQTqMHmCBsZOQwsQaf3v1ps337y3G9YSLi97SS2NsVoGHMwbs6jsY97qN4j2NAJ/DYZqAHqZl8+nsnfl7DKJ7g+I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780633825; c=relaxed/simple;
+	bh=UZuK36PdajGvvnVo7gqEzruJ6LWrsxaDKanPqorC5Ls=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tx86EaGjoin1IzyZI/XWoqVTsLLNP9Q+Wcmtjq49ejeMezPN/fOs5dBWzEfZo2zIHLWtsj9p+h8MOLQIuTu2nIc5gi+Pz41Euanfw0IiwScLvsWiwUqvoXWYGKgFEfqEHbYCgnAgGAEDuKMKGxxv5kyW/1DS/j9uz6RLPWLQfWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O54OLNk9; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NsB2AWny"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-5177945a279so13933501cf.0
-        for <linux-cifs@vger.kernel.org>; Thu, 04 Jun 2026 18:05:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780621530; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BPEKEGTKpNp3DD+2Qz0icl+K5HizN4WBCIyVeSsO46m9iJpN0UcUvuW/WZ0YzLD23l
-         NlGdf8ZhxtkF2clI86QJY4HjJy/blH2xiv98Xjr7K1mbGi2SDS8u9Tij3YLcgvp0pZSd
-         9JABn7h4ouOaTEuyHf0Zy+9/zqeLG/uKZn5yohjp4SNanDtemwjl5/XhFif6bXQzHfIE
-         lKCzJiBMZJ4okKF3I2rYxC+e8YbsK5CX7FOPNcmRHUCZngj0YDh+RNjbxVcOfepUJsc8
-         wfF6MGhATWjKAn3jVRJlWNLUpqtjKClov6Iz174DgZuWi0/qDT/nzdBSSZ5ojUAmsUha
-         dJ/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=Su/C2V1bq+MhfXLJHZydnqsSwCOFf744TyZyk3brPUE=;
-        fh=JCAJRyneh12kZG57Tv1JbHyRGB/zhlTjbCHQrj6dai4=;
-        b=YMK1djjK3SNRFCZdB+sV2HKsTXI3yJIXu6/PrRrr7u9ddIqBtYKs62FWoDMsnVyGUf
-         haRoIoBR5+jf02flaeUAJnUcLTu9W+ZBMbYKjTEwiOi1L6rD/xhSI46cwA6Ayh1Y1i4h
-         sE2h2mk3f5rq9hTwt877pQgp0Z54qvxoSIlalXTDbmzrM0ObCBIw9k63xOK4AGeBYo96
-         xO1qdX+2Mu8u4qu80JpofJwfOWfYAH50huOXKdogxWr+KdnXpxvH/0Jx7DUdX8Z5c31b
-         ZU1yHr7FfCSlElwcJDon2rde9dU0/mMgWR20dvfMAnD3ftUIWT0Fu+ASn5yNvGHBKHHu
-         3Wrg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O54OLNk9"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2c0c3543590so10472705ad.2
+        for <linux-cifs@vger.kernel.org>; Thu, 04 Jun 2026 21:30:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780621530; x=1781226330; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Su/C2V1bq+MhfXLJHZydnqsSwCOFf744TyZyk3brPUE=;
-        b=NsB2AWnygS+CaTXp2qaJwHZYbYEdv8sj2f41SYYiqeVhr5Nvxs9zICoAeolWIgDvwX
-         vkJH/ZldNHKLcjlG+q/wvkKcQ45+3G01TxKNG3hKJmWCsHFi09P7P64+hnM3qvqczMZH
-         iJ3qnMiBDuTuUj6GOP7o8snQNMewMSfKHLtFScnlE/vNTO336Lh7OtqXbMA9/ZqaEpmP
-         K29YR3N+3AR3bPIoFIW5rsKLRj3tcF3pcfWkb4NNvpAV4tJJNFb/yUi1tqWMARBA0Rzb
-         va0eG3aElgqQDbESK8Y9TqupEjp3vV7cy/LCGQ+a4Xh4JjSt+QPslU59Ry/1Ec0WboWX
-         0v7Q==
+        d=gmail.com; s=20251104; t=1780633824; x=1781238624; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6ujxSEDq4R8lp2y/Xo01gcDdYjorcuEfHYNTccxz27Y=;
+        b=O54OLNk9UsgFHvqQGrwzateTaEvxTb74r4A+NcHV2LGqG3c6cw438mUUtNivfqzvMS
+         zwKRzDd5JZac5s1OVymta5PjgguHEHMP6d01b2mNmsDH1ONJMA4jMrZoPMxcXvYCXKEN
+         C/pAgeNzqWFkQajpfySWfIJqYMrCqEPFcNyHk8e55dl0WRaEvBKfkZEBag9IfjWPsu9O
+         DmIO9hVcZqrRLN9iZdtxRhI3ti4v990FXEiKyveqcAcEqx6z17jusxgDdFNSBcUmPN6X
+         xWg3jAya2ZVoNo6eFE/TIDvVVnZTQrQEBQudkdxZdDbUs6JOhewp59LPgsw54NW33eSy
+         LhOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780621530; x=1781226330;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Su/C2V1bq+MhfXLJHZydnqsSwCOFf744TyZyk3brPUE=;
-        b=Q6QEpOdByazA1MlWkEVyNKaPkmuR6OVCjwldO9D5vJGf33TFzAUq7Fp/SKdAA9x7b+
-         MuHxZqDwCgxjiPT2+UwA3Nq+xajOjGn03df9bMVQhZepclFrNQZ9b3HS6fYWXpUKjFlv
-         Y0mAR2GazkFWpzYJTV5BIdrIr2SqcZPszBwKE4WYkIzAmmsMeFMYH/CDc4DnUd38RfO9
-         eldZAf8T4a2yI6J8PqbvrNS+k7b++YI9G3FZwWhVn+jvxj7F7WeRyHKlJ0+hWXpg2xGh
-         XsE+h6+1e6s4cwNuPfMPqdeGTTNU7d1ATz3cuB6Lq8iF2Z/W9bAtM14gren3agTi98AB
-         1/1Q==
-X-Forwarded-Encrypted: i=1; AFNElJ9mZ+oVVKYH0cVfoHuf921MKVGG2jAc7+awBYkwAdYPFAAIwApkw6p4WUJRmWhyAI+aznRYQSrMHy2+@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyasvRH+P+BrFfyRTA8g823EGSdLk69bgGjY+FGW9P3/b+axvX
-	MKpdm2GU35IuaW/kyYYwhATI9FNceskzPTjpRafC1G2mkHE0xl+rf7zltVKOl7EdBVx6LNrY3rd
-	0dW/hiPqPbuhcQ1PDIhToXLXd2ESECXk=
-X-Gm-Gg: Acq92OE1B7iRUkpRX4OtB8q2cWIKNz0jYXZ5YzKidVI58pHGkKqTm1WCVxG8OeYQuvq
-	g/lpVe0OBcdOZGznI7iFeFwWVtV+eait8QEuI19DOQyXacP7aYrWgnYuLm9VCuMBfKtMME2HwWE
-	SnYTiIaU3REqQFnnisr/mqBezcqZWLWwM6PJ2khZNdSoXFCQxxtzO+pxkMfoLTAILFNVmkP7NNQ
-	zWrbcG/h2YLgqPbvhAHE/uOEtHbzc40y7HdhWkgElEFD2bJ3VMcirGEArxUY2mJjZsCsIuQNyhP
-	IZxV9QUCTlpttmPtUZuiSmEySa0XpYNq15zLPzDxoPSnq4cymrkzj3pwSKfOo5lmZntONXvVhKe
-	JuGCgC3JOy5OZnVY49QwX7SOTioO/gP1wKSoo+w+do8iVb1JQ9cgOFzX005QYw14Kfrwv4AcPrQ
-	trM4Plo+LltRVWf1QhDGEeivRhym9IBjox
-X-Received: by 2002:a05:622a:188b:b0:50e:6182:b4c with SMTP id
- d75a77b69052e-51795b8f843mr20479371cf.25.1780621529718; Thu, 04 Jun 2026
- 18:05:29 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780633824; x=1781238624;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6ujxSEDq4R8lp2y/Xo01gcDdYjorcuEfHYNTccxz27Y=;
+        b=XGSnNgUfTOu0MpMtBIavkJuQg4kCioomrFcrQU07+FbANqXe2opVAIerG1HSDFX/vK
+         c4IgKFeuBpu3V3KEuot6lcHXyinBE7x8RdnmCzkdac/D53T5vpwmI9dnnwXJUkVKlnEI
+         zt2U3Iv5yKkfop8qJBskuE0A1W/3GKZdSTx4uPUo1rUGyXUuyRXre375JDZeDnubNaQB
+         SWERa3l99gvnfzqvtFz7eYqW8E9m0yYkFLDcT+0LnajysAXbRCIPLmDgDsZcEV9e8AA7
+         caRyzz+jvy8/9Z8BM68seds3/7+vQYiUL1rLsgoH2+6e8E2SEvzUJ8uI5nIQhDkWInAW
+         /hzw==
+X-Forwarded-Encrypted: i=1; AFNElJ8Uj16Nh0cF+SY+UQr94vzBpzdVcNuR31cZMpdRRZIxOHqbjybbRvwNNiyKV9GM/5BaBNP7GKBgANtM@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxtngfmz8lZzICVRKUFoESxCr6G7nyIT2peKgtKK+tRFwf+NxFo
+	TKhm1QBzDs+OoPfIicC2QR4DYwG0JHplx2C8A5yfHf41mXz/O/A+JRGj
+X-Gm-Gg: Acq92OF46rSZh+1KJt/G4HclpPvIXnZYt87OMLSKxxXJGlRLUTm5g9LYMRKOojzmNrv
+	LvWgAGt7+PUAzpuDAirSQze/WjxYcmoZdtD5tfwFHW2aCUbdzDZStWPDU7q4gnCYr/vEYvzwXQn
+	TOQM+RiepZZSFRH40VvK81lwzI8stJDEnQqAqYNXNl11c9HehvBOIQIVeIoiFfvPPc0hpaunLke
+	0NVUJtLS5e0seAG1eneRG2+k2uK6ZVJC9HqmmYwvGmSPa48xH1YnKS1awbov6k9ZfkAbvVAbELF
+	OfwVaXtLLbVxed/DQZlZWoq4TlXTtlE6i9qaFkUEXMHAMY+JA2H7mqv2kDCB01+XbKtUFQewf1+
+	pJpIE/EeuYvwgPTJ3RYcems8t4wNOFvcMyPr017tzCoJ932TUtXo6HT+JCn67k7IKbCWfv+7GYZ
+	r16bgUQlqUtLtajGcp4k6uw2bBmi74PJmUkbfbil0Cng==
+X-Received: by 2002:a17:902:d58f:b0:2bf:195d:21d2 with SMTP id d9443c01a7336-2c1e7e44e91mr18339595ad.16.1780633823560;
+        Thu, 04 Jun 2026 21:30:23 -0700 (PDT)
+Received: from lgs.. ([101.76.249.46])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c1664ad138sm78825415ad.82.2026.06.04.21.30.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jun 2026 21:30:23 -0700 (PDT)
+From: Guangshuo Li <lgs201920130244@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	Hyunchul Lee <hyc.lee@gmail.com>,
+	Ronnie Sahlberg <lsahlber@redhat.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Guangshuo Li <lgs201920130244@gmail.com>
+Subject: [PATCH] ksmbd: fix use-after-free in same_client_has_lease()
+Date: Fri,  5 Jun 2026 12:30:16 +0800
+Message-ID: <20260605043016.1440866-1-lgs201920130244@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 4 Jun 2026 20:05:18 -0500
-X-Gm-Features: AVVi8Ceer_vTUlnCUlwT6H1zVgKVYNyS7zJ2CzUCJhHL3qOz8V3nMHFyeGMl8z8
-Message-ID: <CAH2r5mu5c04vjOemsf8_c8htBD772sjRkLgNNtX7+bBk66Kg1Q@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Please pull the following changes since commit
-e43ffb69e0438cddd72aaa30898b4dc446f664f8:
+same_client_has_lease() returns an opinfo pointer from ci->m_op_list
+after dropping ci->m_lock without taking a reference.
 
-  Linux 7.1-rc6 (2026-05-31 15:14:24 -0700)
+smb_grant_oplock() then dereferences that pointer in copy_lease() and
+when checking breaking_cnt. A concurrent close can remove the old lease
+from ci->m_op_list and drop the last reference before the caller uses
+the returned pointer, leading to a use-after-free.
 
-are available in the Git repository at:
+Take a reference when same_client_has_lease() selects an existing lease,
+drop any previous match while scanning, and release the returned
+reference in smb_grant_oplock() after copying the lease state.
 
-  git://git.samba.org/ksmbd.git tags/v7.1-rc7-ksmbd-server-fixes
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+---
+ fs/smb/server/oplock.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-for you to fetch changes up to f580d27e8928828693df44ba2db0fffdbe11dfea:
-
-  ksmbd: fix use-after-free of a deferred file_lock on double
-SMB2_CANCEL (2026-05-31 19:13:48 -0500)
-
-----------------------------------------------------------------
-Three ksmbd server fixes
-- Fix use after free in SMB2_CANCEL
-- Fix race in ksmbd_reopen_durable_fd
-- Fix oplock and lease break potential NULL-dref
-
-----------------------------------------------------------------
-Gil Portnoy (3):
-      ksmbd: fix NULL-deref of opinfo->conn in oplock/lease break notifiers
-      ksmbd: fix durable reconnect double-bind race in ksmbd_reopen_durable_fd
-      ksmbd: fix use-after-free of a deferred file_lock on double SMB2_CANCEL
-
- fs/smb/server/oplock.c    | 15 ++++++++++++---
- fs/smb/server/smb2pdu.c   | 11 +++++++++++
- fs/smb/server/vfs_cache.c | 12 +++++++++---
- 3 files changed, 32 insertions(+), 6 deletions(-)
-
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 0f5c18520eff..5e717aa03446 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -528,7 +528,12 @@ static struct oplock_info *same_client_has_lease(struct ksmbd_inode *ci,
+ 
+ 		ret = compare_guid_key(opinfo, client_guid, lctx->lease_key);
+ 		if (ret) {
++			if (!atomic_inc_not_zero(&opinfo->refcount))
++				continue;
++			if (m_opinfo)
++				opinfo_put(m_opinfo);
+ 			m_opinfo = opinfo;
++
+ 			/* skip upgrading lease about breaking lease */
+ 			if (atomic_read(&opinfo->breaking_cnt))
+ 				continue;
+@@ -1237,6 +1242,7 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
+ 			if (atomic_read(&m_opinfo->breaking_cnt))
+ 				opinfo->o_lease->flags =
+ 					SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE;
++			opinfo_put(m_opinfo);
+ 			goto out;
+ 		}
+ 	}
 -- 
-Thanks,
+2.43.0
 
-Steve
