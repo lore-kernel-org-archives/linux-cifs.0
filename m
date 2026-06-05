@@ -1,32 +1,30 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8517A362130
-	for <linux-cifs@vger.kernel.org>; Fri,  5 Jun 2026 16:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8492433B6C2
+	for <linux-cifs@vger.kernel.org>; Fri,  5 Jun 2026 17:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780677409; cv=none; b=YlGrNk1roYLzE8X5fIMhafijdTt6qfndCKZtfSrb2nXq4R2mAzUkxwJTcF5Z3spCN9aNkn1OKdN80KECgp7F5X9urLScJk8nINITiX/ZfwPLJ8oMOCbuZ2ZuGItuNhweWNSAeVN5DMBZclyNFvTpwccTzQsTjU6/IzVmkvoqsxc=
+	t=1780678877; cv=none; b=igW41cZy6FVsa0chVwUF9CWJ9KGUzPQQgG5EZDFclR/yW0jv7A/rolGCyR7lX4ViiESIeElUm4x1YLIIoq6/Y5c3mDFu3HAyoLGXugupDseZf1eKdulGSjG8hOS1EaEPZoM81rJ10Hopr6BOoLqS0mntP6m/TDtZSYHIzcZQH9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780677409; c=relaxed/simple;
-	bh=J1/+Fw0l+hqjolzgxRTykfqM7a6eXYO77v2Wak+Q8wQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=COFD5L79U4k1KZ5hsCtHY33fWkZ1s3ne4kNSvqiVnnz9OWGMWQrCbODJ8Cj/yeE90AndDL1/IWVBIvEzcQDDqpc7/06KXRPrYjRh1ysy/E49A4vsrju2CTw0N0s8FklFUhoZ/8wYkjCbZ4qRwVYKXh/ZwM7aw+GtMgChrxtTuhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eYnu1EjQ; arc=none smtp.client-ip=91.218.175.172
+	s=arc-20240116; t=1780678877; c=relaxed/simple;
+	bh=napwasjYOk9CW0qIlGq9XUx41lb+cdGunWzIOGcUM+I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tk4T1k3fbFe/B5axOOCPzT1tCCLy/wUbsxFinjlbEnvG+cMrksSsBDKGYeaZzOVzpkUPwDyNs82QznLs1dyw54f5yZNBXPG6tfIEKjC3CXaqhTgY+C7ikdtNZpl7rRNKEvL0XJlPFje9jD/xkKuGBXQTeDNg4G3fpswxv+gFyIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NFXL9awz; arc=none smtp.client-ip=91.218.175.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eYnu1EjQ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NFXL9awz"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780677399;
+	t=1780678872;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EWjHlpSjmYZGSbz1H2D7Jfnbqw/P4YGWd3wTm0OBKb0=;
-	b=eYnu1EjQDEGsN4gA0RkkuIT4cqoQV/TCxlllCKYWLHx0Lr4lL19XFMEWfCa0I6KeSrMzhZ
-	MF6c2mfASj2ALcwlraQLHclCw1Ry2RnXvEiL9YGCVVFwnJKNK5spFlwLei+lBVArhVTjq0
-	RYZKOKP+KZoRqKh4lxyNxElsrVf3MxY=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=/oC1L44LCuCNLbLeMU603NokWD0CmqVWJ2sf08B6tZM=;
+	b=NFXL9awzMn/KfMmetcCsgBm6UI/STzEagEIeEjvlOfb88T+5cfCV+UgPJbCxw/ne0AQU9Q
+	WTlVLHlRO82o/ak8ZAFCPjCysibu/pen5VH/rnACK/SO3Eg752cbITsjhNBLIa9u17k+NJ
+	j5Fp6exxt2ec5HoJXxn7KM94jXWSPwM=
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -40,11 +38,9 @@ To: smfrench@gmail.com,
 	metze@samba.org,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v2 3/3] smb/client: refresh allocation size after fallocate
-Date: Sat,  6 Jun 2026 00:35:19 +0800
-Message-ID: <20260605163519.169916-4-huiwen.he@linux.dev>
-In-Reply-To: <20260605163519.169916-1-huiwen.he@linux.dev>
-References: <20260605163519.169916-1-huiwen.he@linux.dev>
+Subject: [PATCH] cifs/client: allow FS_IOC_SETFLAGS to clear compression
+Date: Sat,  6 Jun 2026 01:00:55 +0800
+Message-ID: <20260605170055.172146-1-huiwen.he@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -56,66 +52,276 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-SMB3 fallocate extends EOF using FILE_END_OF_FILE_INFORMATION, but the
-server may also update the file's AllocationSize.  If the client keeps
-the old cached i_blocks value after fallocate, the swapfile hole check
-can still see:
+The CIFS FS_IOC_SETFLAGS path can set FS_COMPR_FL now, but it cannot
+clear it again. This can be reproduced on a share backed by a filesystem
+that supports compression, for example btrfs exported by Samba:
 
-        i_blocks * 512 < i_size
+	[compress_share]
+		vfs objects = btrfs
 
-and reject the file as sparse.
+	$ touch test.bin
+	$ chattr +c test.bin
+	$ lsattr test.bin
+	$ chattr -c test.bin
 
-This shows up in xfstests generic/496 as:
+The final chattr -c fails with EOPNOTSUPP, and leaves the remote object
+with the compressed attribute still set, because the client always sends
+FSCTL_SET_COMPRESSION with COMPRESSION_FORMAT_DEFAULT. That is correct
+for setting FS_COMPR_FL, but clearing FS_COMPR_FL requires sending
+COMPRESSION_FORMAT_NONE.
 
-        generic/496         [not run] fallocated swap not supported here
+Fix this by passing the requested compression state through the
+set_compression operation.  The SMB1 and SMB2 helpers no longer hard-code
+COMPRESSION_FORMAT_DEFAULT.
 
-After a successful EOF-extending fallocate, query FILE_ALL_INFORMATION on
-the open handle and update i_blocks from the returned AllocationSize. If
-the query fails, leave the fallocate result unchanged and force a later
-attribute revalidation by setting cifsi->time to zero.
-
-With this client-side refresh, and with a server that really allocates the
-fallocated range, for example Samba configured with:
-
-        [scratch_share]
-        strict allocate = yes
-
-generic/496 can pass the swapfile hole check.
+When FS_COMPR_FL is set, send COMPRESSION_FORMAT_DEFAULT.  When it is
+cleared, send COMPRESSION_FORMAT_NONE.  If the server accepts the request,
+update the cached FILE_ATTRIBUTE_COMPRESSED bit under i_lock so
+FS_IOC_GETFLAGS reports the new state.
 
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smb2ops.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ fs/smb/client/cifsglob.h  |  2 +-
+ fs/smb/client/cifssmb.c   |  4 ++--
+ fs/smb/client/ioctl.c     | 46 +++++++++++++++++++++++++++------------
+ fs/smb/client/smb1ops.c   |  5 +++--
+ fs/smb/client/smb1proto.h |  2 +-
+ fs/smb/client/smb2ops.c   |  4 ++--
+ fs/smb/client/smb2pdu.c   |  6 ++---
+ fs/smb/client/smb2proto.h |  3 ++-
+ 8 files changed, 46 insertions(+), 26 deletions(-)
 
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 943b7cd2c096..a462c1590a9e 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -425,7 +425,7 @@ struct smb_version_operations {
+ 	int (*set_file_info)(struct inode *, const char *, FILE_BASIC_INFO *,
+ 			     const unsigned int);
+ 	int (*set_compression)(const unsigned int, struct cifs_tcon *,
+-			       struct cifsFileInfo *);
++			       struct cifsFileInfo *, __u16);
+ 	/* check if we can send an echo or nor */
+ 	bool (*can_echo)(struct TCP_Server_Info *);
+ 	/* send echo request */
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index 9e27bfa7376b..d39175cdf1b1 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -3207,7 +3207,7 @@ struct inode *cifs_create_reparse_inode(struct cifs_open_info_data *data,
+ 
+ int
+ CIFSSMB_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+-		    __u16 fid)
++		    __u16 fid, __u16 compression_state)
+ {
+ 	int rc = 0;
+ 	int bytes_returned;
+@@ -3222,7 +3222,7 @@ CIFSSMB_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+ 		return rc;
+ 	in_len = rc;
+ 
+-	pSMB->compression_state = cpu_to_le16(COMPRESSION_FORMAT_DEFAULT);
++	pSMB->compression_state = cpu_to_le16(compression_state);
+ 
+ 	pSMB->TotalParameterCount = 0;
+ 	pSMB->TotalDataCount = cpu_to_le32(2);
+diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
+index b64bcde6e766..bb512a04934e 100644
+--- a/fs/smb/client/ioctl.c
++++ b/fs/smb/client/ioctl.c
+@@ -69,18 +69,21 @@ static long cifs_ioctl_query_info(unsigned int xid, struct file *filep,
+ 
+ static int cifs_set_compression_handle(unsigned int xid,
+ 				       struct cifs_tcon *tcon,
+-				       struct cifsFileInfo *cfile)
++				       struct cifsFileInfo *cfile,
++				       __u16 compression_state)
+ {
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+ 
+ 	if (!server->ops->set_compression)
+ 		return -EOPNOTSUPP;
+ 
+-	return server->ops->set_compression(xid, tcon, cfile);
++	return server->ops->set_compression(xid, tcon, cfile,
++					   compression_state);
+ }
+ 
+ static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
+-					struct cifs_tcon *tcon)
++					struct cifs_tcon *tcon,
++					__u16 compression_state)
+ {
+ 	struct inode *inode = file_inode(filep);
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+@@ -132,7 +135,8 @@ static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
+ 		goto close;
+ 	}
+ 
+-	rc = cifs_set_compression_handle(xid, tcon, &tmp_cfile);
++	rc = cifs_set_compression_handle(xid, tcon, &tmp_cfile,
++					 compression_state);
+ 
+ close:
+ 	server->ops->close(xid, tcon, &fid);
+@@ -144,7 +148,8 @@ static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
+ 
+ static int cifs_ioctl_set_compression(unsigned int xid, struct file *filep,
+ 				      struct cifs_tcon *tcon,
+-				      struct cifsFileInfo *cfile)
++				      struct cifsFileInfo *cfile,
++				      __u16 compression_state)
+ {
+ 	struct cifsFileInfo *wfile;
+ 	struct cifs_tcon *wtcon;
+@@ -155,7 +160,8 @@ static int cifs_ioctl_set_compression(unsigned int xid, struct file *filep,
+ 		return -EOPNOTSUPP;
+ 
+ 	if (cfile && (cfile->fid.access & FILE_WRITE_DATA)) {
+-		rc = cifs_set_compression_handle(xid, tcon, cfile);
++		rc = cifs_set_compression_handle(xid, tcon, cfile,
++						 compression_state);
+ 		if (rc != -EACCES)
+ 			return rc;
+ 	}
+@@ -163,13 +169,15 @@ static int cifs_ioctl_set_compression(unsigned int xid, struct file *filep,
+ 	rc = cifs_get_writable_file(CIFS_I(inode), FIND_FSUID_ONLY, &wfile);
+ 	if (!rc) {
+ 		wtcon = tlink_tcon(wfile->tlink);
+-		rc = cifs_set_compression_handle(xid, wtcon, wfile);
++		rc = cifs_set_compression_handle(xid, wtcon, wfile,
++						 compression_state);
+ 		cifsFileInfo_put(wfile);
+ 		if (rc != -EACCES)
+ 			return rc;
+ 	}
+ 
+-	return cifs_set_compression_by_path(xid, filep, tcon);
++	return cifs_set_compression_by_path(xid, filep, tcon,
++					    compression_state);
+ }
+ 
+ static long cifs_ioctl_copychunk(unsigned int xid, struct file *dst_file,
+@@ -526,18 +534,28 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ 			 *	break;
+ 			 */
+ 
+-			/* Currently only flag we can set is compressed flag */
+-			if ((ExtAttrBits & FS_COMPR_FL) == 0)
++			/* Currently only flag we can set or clear is compressed. */
++			if (ExtAttrBits & ~FS_COMPR_FL)
+ 				break;
+ 
+-			/* Try to set compress flag */
+ 			if (tcon->ses->server->ops->set_compression) {
++				__u16 compression_state;
++
++				compression_state = (ExtAttrBits & FS_COMPR_FL) ?
++					COMPRESSION_FORMAT_DEFAULT :
++					COMPRESSION_FORMAT_NONE;
++
+ 				rc = cifs_ioctl_set_compression(xid, filep, tcon,
+-								pSMBFile);
++								pSMBFile,
++								compression_state);
+ 				if (rc == 0) {
+ 					spin_lock(&inode->i_lock);
+-					CIFS_I(inode)->cifsAttrs |=
+-						FILE_ATTRIBUTE_COMPRESSED;
++					if (ExtAttrBits & FS_COMPR_FL)
++						CIFS_I(inode)->cifsAttrs |=
++							FILE_ATTRIBUTE_COMPRESSED;
++					else
++						CIFS_I(inode)->cifsAttrs &=
++							~FILE_ATTRIBUTE_COMPRESSED;
+ 					spin_unlock(&inode->i_lock);
+ 				}
+ 				cifs_dbg(FYI, "set compress flag rc %d\n", rc);
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+index e198e3dda917..d34b3d99f6ed 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -1110,9 +1110,10 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ 
+ static int
+ cifs_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+-		   struct cifsFileInfo *cfile)
++		   struct cifsFileInfo *cfile, __u16 compression_state)
+ {
+-	return CIFSSMB_set_compression(xid, tcon, cfile->fid.netfid);
++	return CIFSSMB_set_compression(xid, tcon, cfile->fid.netfid,
++				       compression_state);
+ }
+ 
+ static int
+diff --git a/fs/smb/client/smb1proto.h b/fs/smb/client/smb1proto.h
+index 5f522d359952..80eaeb3dd2ec 100644
+--- a/fs/smb/client/smb1proto.h
++++ b/fs/smb/client/smb1proto.h
+@@ -117,7 +117,7 @@ struct inode *cifs_create_reparse_inode(struct cifs_open_info_data *data,
+ 					struct kvec *reparse_iov,
+ 					struct kvec *xattr_iov);
+ int CIFSSMB_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+-			    __u16 fid);
++			    __u16 fid, __u16 compression_state);
+ int cifs_do_get_acl(const unsigned int xid, struct cifs_tcon *tcon,
+ 		    const unsigned char *searchName, struct posix_acl **acl,
+ 		    const int acl_type, const struct nls_table *nls_codepage,
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index d4875f9532b4..89230141b5dd 100644
+index 89230141b5dd..23807023c027 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -3698,8 +3698,23 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
- 				  cfile->fid.volatile_fid, cfile->pid, new_eof);
- 		if (rc == 0) {
-+			struct smb2_file_all_info file_inf;
-+			u64 asize;
-+			int qrc;
-+
- 			netfs_resize_file(&cifsi->netfs, new_eof, true);
- 			cifs_setsize(inode, new_eof);
-+
-+			qrc = SMB2_query_info(xid, tcon, cfile->fid.persistent_fid,
-+					      cfile->fid.volatile_fid, &file_inf);
-+			spin_lock(&inode->i_lock);
-+			if (qrc == 0) {
-+				asize = le64_to_cpu(file_inf.AllocationSize);
-+				inode->i_blocks = CIFS_INO_BLOCKS(asize);
-+			} else {
-+				cifsi->time = 0;
-+			}
-+			spin_unlock(&inode->i_lock);
- 		}
- 		goto out;
- 	}
+@@ -2246,10 +2246,10 @@ smb2_duplicate_extents(const unsigned int xid,
+ 
+ static int
+ smb2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+-		   struct cifsFileInfo *cfile)
++		   struct cifsFileInfo *cfile, __u16 compression_state)
+ {
+ 	return SMB2_set_compression(xid, tcon, cfile->fid.persistent_fid,
+-			    cfile->fid.volatile_fid);
++			    cfile->fid.volatile_fid, compression_state);
+ }
+ 
+ static int
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index fbeb2156ddb6..6a185b805c1e 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -3626,14 +3626,14 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 
+ int
+ SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+-		     u64 persistent_fid, u64 volatile_fid)
++		     u64 persistent_fid, u64 volatile_fid,
++		     __u16 compression_state)
+ {
+ 	int rc;
+ 	struct  compress_ioctl fsctl_input;
+ 	char *ret_data = NULL;
+ 
+-	fsctl_input.CompressionState =
+-			cpu_to_le16(COMPRESSION_FORMAT_DEFAULT);
++	fsctl_input.CompressionState = cpu_to_le16(compression_state);
+ 
+ 	rc = SMB2_ioctl(xid, tcon, persistent_fid, volatile_fid,
+ 			FSCTL_SET_COMPRESSION,
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index 1ceb95b907e6..78a4e1c340f9 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -216,7 +216,8 @@ int SMB2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+ 		u64 persistent_fid, u64 volatile_fid,
+ 		struct smb2_file_full_ea_info *buf, int len);
+ int SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+-			 u64 persistent_fid, u64 volatile_fid);
++			 u64 persistent_fid, u64 volatile_fid,
++			 __u16 compression_state);
+ int SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
+ 		      const u64 persistent_fid, const u64 volatile_fid,
+ 		      __u8 oplock_level);
 -- 
 2.43.0
 
