@@ -1,66 +1,73 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92801241695
-	for <linux-cifs@vger.kernel.org>; Sat,  6 Jun 2026 14:56:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FDD22236E3
+	for <linux-cifs@vger.kernel.org>; Sat,  6 Jun 2026 15:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780757791; cv=none; b=avIdN9kMTQvo41rYOAEVlpyLm+6o2lp/WScAaR5zXTKOF48ocOY/ep8LAOd4Yh/W9xATFAg5cRkiTGx44fWQvGS0IbK2j+PWicGCOk8d8ETS1T8815mDIkcpdEAcWIwBhKRv+npUHudi4WrvrlgP67KhKJx41oCkcy+/OSUWL/0=
+	t=1780758891; cv=none; b=AOnyrKVAowGzVeP47Lu21LCFNNoFYQhsNQm/mMFRuW2VwqO7bCp1SRBMoV9WSJqeKp5Ir+43LvPSzVd7YVbEXOJS8y3ZquF+lw8IzbhCEEb9Q4x382fMZubbrLcY+5c+in++4qiqzLxmDZRF0QozEkTsxI0JAxl65UH/uDsBcX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780757791; c=relaxed/simple;
-	bh=+bU0cyYXMFXsIF0fqwVHB1maLQjBuLzhVHy2EpXj1pM=;
+	s=arc-20240116; t=1780758891; c=relaxed/simple;
+	bh=k91A7xPTB1f9ovgfzvgXo4/xwSIa+A5Rdi4wB81MMjU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GfhR3HWMcpg6OVh5+5mwqLe9/8W8IK1QLF2b78x56wy9J5i1iOdN+n2vSc09sTlHjyqmz1Hiulm/0x0MYcW+kOnYaOc2A0BpccE0oZutWMHgXE3EVfIaVz5zmke7et24Ep05O+6cr7BpcEOSc3PxTgN+lNvxExGEIwqHs6mjx0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=JoX1BRsC; arc=none smtp.client-ip=95.215.58.182
+	 In-Reply-To:Content-Type; b=V6WfHwSrgsBi8Hq69+RGq668mRbgFJPgWeGxqYJyuSdSis5M3X+km+Genav9zCvQPRJ8I9WbwGOwbU6HfK9s2aIAHBAhDIvyrIWAG8cQU5ck5fgjPH6otWBRY+8zynz/h0EG0w2fDOg71DPEPWX5NVd69LtcG491BucbHgweDAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=Zxryhiee; arc=none smtp.client-ip=91.218.175.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="JoX1BRsC"
-Message-ID: <ac3b69d0-748a-45c9-881a-38219abd7787@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="Zxryhiee"
+Message-ID: <7b58996f-270f-486c-bba2-0e3971c11b91@chenxiaosong.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1780757784;
+	s=key1; t=1780758885;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=csOcR7Ls7lvkIDYxrvK0x4AnZ31YV7Ra2vK467rJEbg=;
-	b=JoX1BRsCWlIRRP1826g0TCIkjq9M9d+7i63vXAFGEZBMaw3jaUTUXCcYDhKZM6qqQ6xeGA
-	4HaREHJeq113R0hK3KV9Hu9MUAfv/wOC7Ae+Ij3IAFnTVYXybShWEmHk+MVaV4CnpK3TN0
-	0g98/MsPu9j1U1RIn2s+g8PTUdS+y/2+6rN+y2o6D5s3beeJUHoVq2f6IwLUcsPF2d61VW
-	lDW9/iPKnkX48QpVEpOlcc7Ywpwyw5X+b5mb9C9X/g9P7Y2ouG5Aqc+4kfjLyF0OplGeyO
-	nxOKmUWrSuMe4Y57Rd8cTpO/wlF73/OS4t0gMpX/7YivzktxL43KcGRSWTqJTQ==
-Date: Sat, 6 Jun 2026 22:55:32 +0800
+	bh=7F9/Q8aknLDC/Zz16tI/YD3k+DJACosWjxhhI0ClqMA=;
+	b=ZxryhieeMld8fcf9eEqFQCPc0Lfk0tD4ITMtc7Si05bXlIUcTeo8k80oz+F2GH6+fmmH5m
+	punLn0UKL5Qh2TPYeJas09lzYvT4v29kquCzJTBP0RG3NFDzCX+HDdPPWDFPBLtFm++R4x
+	A6qyUzFoweaO8HQ8znIZP4iu/cFFw+eSPdbuYLiORmPlNpws5Xh1HLxEdN6i+2vJ/5WsSh
+	mhtFX+uISicof4Ky9Ax2i8gVO1XrIfzspmsmh+mR3ZlRQA3OqZ5bRwHNbz3B8J3nDdTTqF
+	bV9pcwXOUZCEmw9t3ji5hd265zqYRR+U//QBlEwWODHQODJBjBgulBioB6JNqQ==
+Date: Sat, 6 Jun 2026 23:14:33 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/5] smb: move compression definitions into common/fscc.h
-To: Tom Talpey <tom@talpey.com>, Namjae Jeon <linkinjeon@kernel.org>
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
- dhowells@redhat.com, metze@samba.org, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH 3/5] smb/server: implement FSCTL_GET_COMPRESSION ioctl
+ handler
+To: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>
+Cc: Paulo Alcantara <pc@manguebit.org>,
+ ronnie sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Bharath S M <bharathsm@microsoft.com>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ David Howells <dhowells@redhat.com>,
+ "Stefan (metze) Metzmacher" <metze@samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>
 References: <20260606092601.299698-1-chenxiaosong@chenxiaosong.com>
- <20260606092601.299698-2-chenxiaosong@chenxiaosong.com>
- <CAKYAXd-inU4rYZ=P0SmLUwDdL-x=QtJuBPdSg2DRKZMF-KuLDg@mail.gmail.com>
- <a4502395-735d-4c90-a116-754a3e91137b@chenxiaosong.com>
- <CAKYAXd-H6PoLQ+4CTMFg0UvRB7m8V+UinVQRcCB1yk-icB0rrQ@mail.gmail.com>
- <de411d1c-36ba-4fb5-94cd-4ac6026e0465@talpey.com>
+ <20260606092601.299698-4-chenxiaosong@chenxiaosong.com>
+ <CAKYAXd-DeND_0vjHTrbTaWMjvMAk3dpiDFp0XJyK756C8AiJRw@mail.gmail.com>
+ <CAH2r5mtmggcLnkBrFOX-ob4KC=v8LmfOGfmzH0X-WR5nxNTceQ@mail.gmail.com>
+ <CAKYAXd8V9XYaRLFviyBTxLQuWAsvDuab1nmuX_i4v4nY8j6iHQ@mail.gmail.com>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <de411d1c-36ba-4fb5-94cd-4ac6026e0465@talpey.com>
+In-Reply-To: <CAKYAXd8V9XYaRLFviyBTxLQuWAsvDuab1nmuX_i4v4nY8j6iHQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Hi Tom,
+It's more likely a specification error (an omission).
 
-I'm only using DEFAULT for now，it seems reasonable，right?
-
-在 2026/6/6 22:41, Tom Talpey 写道:
-> It's a behavior (choice), and the Windows Behavior note states
-> what Windows implements. Per the WBN link in the quoted fragment:
+在 2026/6/6 22:35, Namjae Jeon 写道:
+> See:
+> https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms- 
+> fscc/62de177d-ed90-4884-ae04-9de52f1180f1
 > 
->    <62> Section 2.3.67: Equivalent to COMPRESSION_FORMAT_LZNT1.
+> It is defined in the FSCTL_SET_COMPRESSION request but not in the
+> FSCTL_GET_COMPRESSION response. This patch is for
+> FSCTL_GET_COMPRESSION. I'm not sure if it's a specification error or
+> if it's intentional.
 
