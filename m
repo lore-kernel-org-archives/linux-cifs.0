@@ -1,83 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816662264D6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931F630C617
 	for <linux-cifs@vger.kernel.org>; Sat,  6 Jun 2026 13:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780753867; cv=none; b=izt7FheQPuq4J6XVYZ+hvohGgs8yf3nI/q79Ha645sH+HAOHEXvnQFTcYrwiSsj2M2sphr7EgWEo0dkv7hBbsnO2wyBAD+l0gY83gg+cOqAqWHizMWQmJZpVKHoJoNTPIPjnzgLqmVGFmpbtndykZijCf9SJteM4SAgvFFxozP8=
+	t=1780753868; cv=none; b=Ztodq2fTPa63uFRvVHrv52Ivm+Y2zuoBqv9eVWE7Jw3dylTW3R+z0G53RtcgpsZtZ40F9zpCFjWyPyjPIy+0ZoP69vQs+LyDd2K8R4ysoJ7rd5mJuH7rN+OJRMpq9JxBGoVw7Y+CUzsza5Z5VI/9ofXb9ow5s0TaXeUtc3doJSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780753867; c=relaxed/simple;
-	bh=IUflA7fxPW8fFiSnVaHZ7eSTTQBOPWZhticTk/XZOv8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N4VHkEuYYlKBNy3U77EPDR3qyjXOOv9pZnc7N+Rk1z5iASfD7xnRjiYW8shGpmOlkr/yETEtExw2CsSJXL0h3iyJfqFSvsUngI3YlebGMjRU2evEN4mODe6uZ3mpeBUvnui5fZin6eQLl6+u8NC1pI3mrS+AlHSs8Y0OYbwO87s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=alAi7Ouc; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780753868; c=relaxed/simple;
+	bh=KHm+2LKUs14eo6qh8mJQ97ix//xkPACeaiQv1eSdwiA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S+c9tYTSwWyz71EPk5e80zveHCsEUMjwjJiQ+HgcYoPNe6gPrnKqR6IGun66Mf8lVqTX4gMJLQIMd/i3O3/aGlcCoHCCoude+dTPT0ki6NtufjECSH0mCNbctJfM7bKP+rbjRcXbvVATU3EiMl2l38bAI8vfePNOrA+rOlZNVrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=fW4faI8c; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="alAi7Ouc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 324521F00899
-	for <linux-cifs@vger.kernel.org>; Sat,  6 Jun 2026 13:51:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780753866;
-	bh=KrTC6qoiXcFrUfcaAGg3nbkCDHS9e5gMsf+u+yYIbhY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=alAi7Ouct+JwQxPPi9Yay4ZQKtScP9AcGghrQ6/haRDFZvIiY6sCqgTgW0urZB/y/
-	 MhZJtHBv/eV4BBXhrWgJyMPK3tjAe35DFEbB5U8hf3iKIFeNr7eblVVT9dZR4/k/kt
-	 LOOUmTZ1TmCmomRQtNSgJNbZO4js2KnedKMoewQ1KJa8771m06imZzYQNU88EdTiKL
-	 7s1eAqbMMatYd1/SFtsJWXobPKkiXhsj42xQp55L744BId12FYeYtWPHzD+0q8qNpU
-	 mmWo0kttETvqGLStNDFsvDe0OxAYf1A6D4zZwlEUgSvDmtUENlFH0ugI6E7L9Y3CtL
-	 nTmjnDpceES6A==
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-bec449d0af2so329508966b.2
-        for <linux-cifs@vger.kernel.org>; Sat, 06 Jun 2026 06:51:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8sg0NyWavlw+XxRTq/ychi80oGrnnavq5lrs4ndao3qdiulqpblgM39rLBOkMeI6yxHVgbjcJM+x73@vger.kernel.org
-X-Gm-Message-State: AOJu0YzirVlAnmm0lskSjAurPygmwe8suMxcK5DsqarOV6SJwsXS4s6j
-	g6+UwHmXVeeXW2KRC7SBPd33s8Mtwrt3DE0HwMQSj90fWOIZGOGzzbdQiJes+yCEcVWI1tBPPGo
-	gGItsn4W0n2TPNJRqRKY/Q9NjMgVY+0k=
-X-Received: by 2002:a17:907:2803:b0:be8:d31d:e1e1 with SMTP id
- a640c23a62f3a-bf36fba1c38mr292940766b.3.1780753864667; Sat, 06 Jun 2026
- 06:51:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="fW4faI8c"
+Message-ID: <a4502395-735d-4c90-a116-754a3e91137b@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1780753864;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+CZkt1CIqGjM31qEeT1wxXVFoADijGaFoqQmtJ7PuFQ=;
+	b=fW4faI8cQseTFJwqYOtBvAmg/S0Vj0/wGSsjlCJk68KgWnXkiLe7JF7zh/tJDEXB4soQJC
+	tOJjqac+Nudth31fJGyTye8weQKpDUCsHdmDK6wPRiz/WSpYtdVN6sxmFwKsq0iytJ3KoJ
+	9XJuPv4mAGECbLGPO67ksrnNLDixILhlYTABqHfy3JgqoBQ86jkRzaao+P9QogjT8juZ+P
+	ZD8BrJf8N7zgbLIKYUQ6ugSTWQgbA/FXX6xFi6ccu9exbHH2L7De0MCt6JOErfBPmx1VAi
+	8G77p3vlp0AHJWqL8HbHAvtw95FfxcIonNZIrhLaQpvBL+QBceyox/wvojUN1w==
+Date: Sat, 6 Jun 2026 21:50:53 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260606092601.299698-1-chenxiaosong@chenxiaosong.com> <20260606092601.299698-4-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260606092601.299698-4-chenxiaosong@chenxiaosong.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 6 Jun 2026 22:50:51 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-DeND_0vjHTrbTaWMjvMAk3dpiDFp0XJyK756C8AiJRw@mail.gmail.com>
-X-Gm-Features: AVVi8CdwXC9Jektp8EJ9wGgsjnZzB0sBEs8xN9DpLFNIdYiUkeeTD-d9Zceiqd8
-Message-ID: <CAKYAXd-DeND_0vjHTrbTaWMjvMAk3dpiDFp0XJyK756C8AiJRw@mail.gmail.com>
-Subject: Re: [PATCH 3/5] smb/server: implement FSCTL_GET_COMPRESSION ioctl handler
-To: chenxiaosong@chenxiaosong.com
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
-	linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 1/5] smb: move compression definitions into common/fscc.h
+To: Namjae Jeon <linkinjeon@kernel.org>, chenxiaosong@chenxiaosong.com
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com,
+ sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
+ senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org,
+ linux-cifs@vger.kernel.org
+References: <20260606092601.299698-1-chenxiaosong@chenxiaosong.com>
+ <20260606092601.299698-2-chenxiaosong@chenxiaosong.com>
+ <CAKYAXd-inU4rYZ=P0SmLUwDdL-x=QtJuBPdSg2DRKZMF-KuLDg@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAKYAXd-inU4rYZ=P0SmLUwDdL-x=QtJuBPdSg2DRKZMF-KuLDg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-> +int ksmbd_vfs_get_compression(struct ksmbd_file *fp, u16 *fmt)
-> +{
-> +       struct file_kattr fa = { .flags_valid = true };
-> +       int rc;
-> +
-> +       rc = vfs_fileattr_get(fp->filp->f_path.dentry, &fa);
-> +       if (rc == -ENOIOCTLCMD) {
-> +               *fmt = COMPRESSION_FORMAT_NONE;
-> +               rc = 0;
-> +               goto out;
-> +       }
-> +       if (rc)
-> +               goto out;
-> +
-> +       if (fa.flags & FS_COMPR_FL)
-> +               *fmt = COMPRESSION_FORMAT_DEFAULT;
-Again.. The definition of COMPRESSION_FORMAT_DEFAULT doesn't seem to
-exist in the spec. How do other smb clients behave when they receive
-this response?
-> +       else
-> +               *fmt = COMPRESSION_FORMAT_NONE;
-> +
-> +out:
-> +       return rc;
-> +}
+Please see MS-FSCC 2.3.67: 
+https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/77f650a3-e3a2-4a25-baac-4bf9b36bcc46
+
+在 2026/6/6 21:46, Namjae Jeon 写道:
+>> -#define COMPRESSION_FORMAT_DEFAULT     0x0001
+> Where is COMPRESSION_FORMAT_DEFAULT defined in the specifications? I
+> looked through MS-FSCC but couldn't find it...
+
