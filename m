@@ -1,63 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF5E72D6E58;
-	Fri,  5 Jun 2026 17:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9ED2594BD;
+	Sat,  6 Jun 2026 06:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780680776; cv=none; b=YTPWnUaqz1XX1/0tObYBwpWGNjZ7W88b37wV772b7yTJPoKkakiTubR8mM+/y4zVSpAiPKnlCq2Ycf+za0sYVcPGYsb7LG8Mx3kL+b72ZewaHtHjjuasolXm2gh+YIywCTH4T2nU/GDw6WqjyDEV7N7RIx8ZoAu7VIqBHYYkvmU=
+	t=1780728510; cv=none; b=n0Q43jo87ufIV0iII2dx7LUA7PZfzRVkyzoIWOA9hRZ4dhRcS8cpGCyF8tJ2EQ1WcJqtQ3ZXsNGPEnyTcWZ1y5PJlizX4GB7GkLqM+96+jP37YFcnsI7R66aSIGp5gklnWh/jStOyRWtE2Dx+Ps1nwf2ZHiih47uLlNTeS6D07k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780680776; c=relaxed/simple;
-	bh=taHJa7B8gaji+nt/vdr+D+bgAaLStZ1r3vJ44dc4Ftk=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=FYfyD6hI9M89FSPBS63q11Nkr+bD6LR9yKBSPDzmDXx0/Tf9uq/0aSBlGCFwmr5qz5+j908C0RFp/fK0RGcIuF70gYjE4rKbC0Ah8VmLqSMzN4uymCd07V4mUsNcvQeECk3QPcGpxvU890Gk4kVqwNffv8+Mm6NwSwYi5SwAJck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YnGAiAgz; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780728510; c=relaxed/simple;
+	bh=uWBF/03PegbY9gCca2HvFGcjZrl5rkZsU+ZUnbs1z2c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qzGM1z01AEZ5vfxJtdIM3TAUjkheAUBAXswZlthibGABGKLUHap8ZLbTRi7JTTwBfd0ZDdeU3cW3G2eiBlSzEoNF5G9CSR+HGOTGoMsmUhxtyKmvoXUkZ2ZmRk04zXPmM7XwKef/8zF3bPsdjTAs3chN+PaOTRUlNTrvVYv20P8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=VnPfXI+A; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YnGAiAgz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C459F1F00893;
-	Fri,  5 Jun 2026 17:32:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780680775;
-	bh=YVe1VeCszBiPDHSWCeRNs7KSIxxkZFDMHHRbrnRoyIg=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc;
-	b=YnGAiAgzBAzaSE15yzjQiFbhwqFuvj5KMJmobdGkrcDw1DVo+TDEr841dQYwkBKd/
-	 V4YhJ1PukSIM3tsJGhYa+WoHdRwoHFxW9EOA9u8yNvVoy9nkMO5YVhWDrBQtyRLA6p
-	 tXzlzs+DnIbll3wkt8e1GcWMuDENXfnoJfCNTmFYPEIK5qu4SR7qnXEiGW/uaJUuM8
-	 zxm0uysWinwIu5ccADFQGUXHM9MevXXe2XuM8kbV0Q4afxty+G0SuMM+/P5uN3C25/
-	 rUAW907UG9XS/SSzYDDyiSly0Aco4ZS2VESQkeuIxy3TGBGUkZMOiixZvdkd84SNnh
-	 bOAyWQj3SQ1wA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569943930BAF;
-	Fri,  5 Jun 2026 17:32:57 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mu5c04vjOemsf8_c8htBD772sjRkLgNNtX7+bBk66Kg1Q@mail.gmail.com>
-References: <CAH2r5mu5c04vjOemsf8_c8htBD772sjRkLgNNtX7+bBk66Kg1Q@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mu5c04vjOemsf8_c8htBD772sjRkLgNNtX7+bBk66Kg1Q@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v7.1-rc7-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: f580d27e8928828693df44ba2db0fffdbe11dfea
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e4a9638a0b2295fc6b69500b25d01510aa8d66ac
-Message-Id: <178068077597.3853150.2635520681545702068.pr-tracker-bot@kernel.org>
-Date: Fri, 05 Jun 2026 17:32:55 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Namjae Jeon <linkinjeon@kernel.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="VnPfXI+A"
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 54C0A20B7168; Fri,  5 Jun 2026 23:48:07 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 54C0A20B7168
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1780728487;
+	bh=PR7ToRx/wDiY6sKscwtk/u6K/FY/uYmFS3+FmKRDjGI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VnPfXI+AMVTVkk0EGJPknGbql7WNCzWglOIFL/abCzxvwh0Q3KKxUeuTKhRlBDBwp
+	 gk6osILlOGWTvevQgXFBCnAcRBkkWc5Z2YRIgFQukDls4mwp3OZ/tMX0q3Yt+qxVMA
+	 icqhyJzx21rETrOrooUA3ZxzI5FFMZefPCWP8+PY=
+Date: Fri, 5 Jun 2026 23:48:07 -0700
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: mkalderon@marvell.com, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>, zyjzyj2000@gmail.com,
+	sagi@grimberg.me, mgurtovoy@nvidia.com, haris.iqbal@ionos.com,
+	jinpu.wang@ionos.com, kbusch@kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	kch@nvidia.com, smfrench@gmail.com, linkinjeon@kernel.org,
+	metze@samba.org, tom@talpey.com, chuck.lever@oracle.com,
+	jlayton@kernel.org, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, trondmy@kernel.org, anna@kernel.org,
+	achender@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	kees@kernel.org, andriy.shevchenko@linux.intel.com,
+	ebadger@purestorage.com, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH rdma-next v6] RDMA: Change capability fields in
+ ib_device_attr from int to u32
+Message-ID: <aiPCpyVN7IYbQgyA@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260601092534.1764560-1-ernis@linux.microsoft.com>
+ <5d3cac2b-4011-49c5-a142-55c85d38e90f@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5d3cac2b-4011-49c5-a142-55c85d38e90f@acm.org>
 
-The pull request you sent on Thu, 4 Jun 2026 20:05:18 -0500:
+On Mon, Jun 01, 2026 at 08:51:40AM -0700, Bart Van Assche wrote:
+ > -	ch->rq_size = min(MAX_SRPT_RQ_SIZE, sdev->device->attrs.max_qp_wr);
+> > +	ch->rq_size = min_t(u32, MAX_SRPT_RQ_SIZE, sdev->device->attrs.max_qp_wr);
+> >   	spin_lock_init(&ch->spinlock);
+> >   	ch->state = CH_CONNECTING;
+> >   	INIT_LIST_HEAD(&ch->cmd_wait_list);
+> > @@ -3225,7 +3225,7 @@ static int srpt_add_one(struct ib_device *device)
+> >   	sdev->lkey = sdev->pd->local_dma_lkey;
+> > -	sdev->srq_size = min(srpt_srq_size, sdev->device->attrs.max_srq_wr);
+> > +	sdev->srq_size = min_t(u32, srpt_srq_size, sdev->device->attrs.max_srq_wr);
+> >   	srpt_use_srq(sdev, sdev->port[0].port_attrib.use_srq);
+> 
+> min_t() shouldn't be used if there is an alternative available. For the
+> SRP drivers, please make sure that both arguments of min() are unsigned
+> instead of using min_t().
 
-> git://git.samba.org/ksmbd.git tags/v7.1-rc7-ksmbd-server-fixes
+Thankyou for your suggestion, Bart.
+I'll update this in the next version.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e4a9638a0b2295fc6b69500b25d01510aa8d66ac
+- Vennela
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> Thanks,
+> 
+> Bart.
