@@ -1,64 +1,65 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292A02E7383
-	for <linux-cifs@vger.kernel.org>; Sun,  7 Jun 2026 18:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9828830C168
+	for <linux-cifs@vger.kernel.org>; Sun,  7 Jun 2026 18:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780855440; cv=none; b=Nk7Iy8Cwcr/AX8ekXGXIEcpseIHFpZ72IkIjVRCnQR6QuTwEhzvs0rsT1Kl5Qibz59hSmjlbySb0mP2ZNJl2TyFJrlufhNZKk6+CD1uANx/7nRrNvJVHYtEI9Uzuk5hkbgfdSyRVynoX3yrkjbZakl9Rlu01xTHQv9VIIxyclfo=
+	t=1780855443; cv=none; b=HxzufKyvfyCn3jKb/6uNX2pK0NtfJTuES2SDsz0zlwep/UQIwIAeu3PzJcn39usztnj8LMKWPDbJz3OUwIDBpQyemHqV/aYaMfdYCBjn2CTo1q7Rf7hvYTJGNVML3pxjc2Pd5Cr/vurOLBhZVx2hjZCarGNn5pZfENZis5hhjJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780855440; c=relaxed/simple;
-	bh=gCdcOeRrT9msIqfg4xnzSCTWttsjcauiHVIVaUvug0U=;
+	s=arc-20240116; t=1780855443; c=relaxed/simple;
+	bh=d7cwmLuU8DPcUc1FCZ2DhdRQstWaclxKqzo4j1syt74=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DtliEA5xiOEkvI0curK+oI0hwPoeEkVKkGZnjO2U48RsHxl58nRnW1LkaahJ49bMW2N0KZYMntSRJZ5wmVP3EpzqXBndcAMFqK8PqnGxisbYlpGxDSfOJhi7DjE0Pf/3R0lbksIcGVeLxXJSEclUee/6Esnq6aVX7aIgalJm300=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O6KuC1PA; arc=none smtp.client-ip=209.85.222.174
+	 MIME-Version; b=hHDr57Xxa40h92Bwkfpo8w06ZTt5wmiF9i2AxyBP9Afa/zgzccJMszGPWhDZ6NNw6mK35IExR/hj+EZZZ+P1jRlbZ6vfAURo9kMeeEjySG+xlPFKi+FIISoCyJITrH8SORy3NKLWf+kvfiQzLJa4kbumbTI6OFNk4Ex7ZtWksQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rRt00lD+; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6KuC1PA"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-91578122305so615592385a.0
-        for <linux-cifs@vger.kernel.org>; Sun, 07 Jun 2026 11:03:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rRt00lD+"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-91562bf6c12so461284885a.2
+        for <linux-cifs@vger.kernel.org>; Sun, 07 Jun 2026 11:04:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780855437; x=1781460237; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780855441; x=1781460241; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LMe6bw304974ZWdfguTfSxoYW11FzH7cy74nJOBCywI=;
-        b=O6KuC1PAAwgj2/tNjkBrtZ3J7xIylLY7zXilerBFaWa9vSaP6d245iAeWs17qjWFjx
-         TXvj+rHJzW81BfBCLBRHVnECcLQz/1UYIUcOrhhWc8cO/FTD2n2UyN8JdaVevUAgC0uE
-         AbKpxDsgqXAfkf/OrICK6QRiOFSvpZfOIAkiM8yo6+TW3a20fiCSryiqB7HwexBtaS6A
-         6oaS8yQMy4LKX4rlK4w0hzg4Ov44piFqfnTmwKYjPH5kou30zYBQuAwz5lmh8s8ek8sY
-         CevPsk8uk4idwKm1x+9UJVRsHu/KLr7I28gEjv7JDWg/vIeSfk9Oh5CLOva6dLi6XZpw
-         E+dA==
+        bh=HnHJ1SdTyxPyyUDg7Xpf2wB8swfy4FQOMOiIFtxDsP0=;
+        b=rRt00lD+zHq4f/ZpJHToYKOGRqukDzqCEFifOy71ei0D3gRy0nINxr1z+EeY4sdeCG
+         DgfPGjeOJ27endlNpYcgd/EedASeLQg+mvDVIczQd8Jusy3DvJ3n1OE7FvVuUGM84bki
+         R6xizvHsyKoBAOJQKqaj4VR1Q9j/JSyq5Dzi+2ADMw+Nt+UhxbSDQ2gcSJWPT1U3Xcnl
+         p21TBtrMshjis+ikCVfAQdAJ5/1BviIMJrgHzVX4W+neCCobOB0OP5WLkcexWHFA4+7u
+         hEk0lPQnxFoW9jWuRF8lJNxWnRs3OddAHXxwncYSOY6x6ZmrUUFeqFsT8CqY8FG8BQVv
+         kcqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780855437; x=1781460237;
+        d=1e100.net; s=20251104; t=1780855441; x=1781460241;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=LMe6bw304974ZWdfguTfSxoYW11FzH7cy74nJOBCywI=;
-        b=J2wK1YD9RrXmeXcVWdZzuuyR2K4GPScHkXmFQBhzKwwWoW0nODd4pxVJuYQZVRQeSI
-         4JV5T5jsw81pCWZJqdFpH9ThWWNJL8g0ChbgyomHQZuJzqkbxRJTsiRBu/JiE6SPFBkq
-         wWkg1Ua7ADAnE0m0V3CUiLswXUMPQSYT5KMfYC0TaSjXPUjvQlRvPALD1aZqwlTvyWUE
-         YdIHxz6hy4MpZypYMrncmy21zB7HCSG/3avnaFtZt0FUHUAjuofbR3js97jK+VyLWY7L
-         PL9iizKTy7fgsz05CKyV7G/BtakCFp0BMfn3SA/vK+zq4hIoZVoY+0UqyhNglK7risxt
-         dBcA==
-X-Forwarded-Encrypted: i=1; AFNElJ8KbKvuZx8o86aO+PiwfvUDPxDNVqnrtfwYyzNMFxz2O/as97mun7BX4PYmkmyjIad6h7GBtnlg+Hpm@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7zd5Innaf05M6kmKybN7PFU3uReXq/zTxm33e2JXdU075qEPG
-	yVR7prjUSpU9kdNkcsFvej+QfV39bhxaK06XZvSF+9MHoRX0Tx4Lf2/t
-X-Gm-Gg: Acq92OG7hEn9jATYgXv+laUtN6Us9fIHGC/J1+L2OYIuTspQv5vad4BMwsVb+nEd2wx
-	dieF8lNxreCtsXc2F8uskmLU83drd1dIoR0scbci3ZwHO/PVY8u6fqeK0iNC5dnJwsrW1C3BPVv
-	K+5BHTjQA1Bf4K+dSAljwqWFKPAkzeBewGj09ZCbSQPZzy++6kcgmwucq2t0/Hk3B1Y5i/z//DY
-	X5xCc2c/y4bnnwWaC+ncBUOX3QFVXERDzHyFgZf64P8KOIWZjByxAzOuRUgh5B4E8aIEbwfVJYq
-	M8HydxG7u+vXOeEP5z16/ETDwvR5Dimvc+uIgAFkdI5UqElLZGc18oRviX9AYSVf/mb4XTsHylp
-	KrU20up1/Z8i1vOe6IjeVc8cfJpPJF50K8uJjoBionHhE98Og1gc7XDFFenn+g70VWlV2KUWd4s
-	jVs5DuZdqCcV1hvxJT9mavxmpBejxfoBSdAg+GupSlPdzcxdFtkCB+UPHrV7d5s/yjKu3QdwXbm
-	W1A0bwzLuRQHC42BRDzYJ75dVFuyyw8i0tHeK2qmqQ3YS684tNH40bDRTXrNAp395Ded8G9VYJT
-X-Received: by 2002:a05:620a:44d3:b0:910:87f4:9a26 with SMTP id af79cd13be357-915a9da30e3mr2217028985a.41.1780855437073;
-        Sun, 07 Jun 2026 11:03:57 -0700 (PDT)
+        bh=HnHJ1SdTyxPyyUDg7Xpf2wB8swfy4FQOMOiIFtxDsP0=;
+        b=LJTBKeM1jKx/sLcw4Gde0lqLsxq8uip5MM2hOpJv1iR72Te8BSBZKy5wvCjXWmf1XU
+         0lKACdnizIDKtq7O4q3B2QazLXRi8vWhxEI3bb6KDF+Z6IL9GQTBvijFf2DwRn+ylPUg
+         pX2zE9cor70+r4oPvP3nkHtQ1vorUkZmIuC0rkagOss+7exnaY4B7peKCor+6kCxnYEz
+         abPeyVn7ZiPe3kBGN1wrRQ8/dOcG+WX/n2KMuSrLTBBOCGtXGKOzj7mYk3NEglxSj6Fd
+         ACf+Sjw+z0NRt4QQBkunE5PmC6K562rzyIf3lcAWzn+QEs/vEiDugbogyKtGyETb8G/U
+         ewGQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9bFtGuNdbLxZNYlCYFTsFnZDo8XMELqpmgjCLSy0w2akr13VMoIhCs0YF0TlKv1mBnIK8JrsLLqcrN@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPdISKMm8dpMBKUe0Y4fBfbalPt0ioPTAmX9Y2pU9NLX3TM1BJ
+	zpMKdou/TH0nHYQEtNIfc9YUjgrTjQSvLVNvO6R1FicqTPwGTmJBEQuT
+X-Gm-Gg: Acq92OGtTHaorrKQBuBAI+I/48uFZMHGWpi1X7O1cb4UvEKLF34Ij1P/fR2FKevTFNR
+	ONQRUPq4hs/b820hpGBwQ2SlRi9cB1lGlUZqGYveABkPZTq4aB2RycBKrywmLGKg6Pt41VPUehj
+	VQBVMCn1f2h46FWgaUS+hFV8gtZqWvpb3anqLlTu0p9O+FEaQpd06QeyXCWBR7umxz6EAIRA8yA
+	AyZ7zyeDZ5X9VC1thxhJwa6cs5Lxcl0SM1DMxt8c/JWZjaW/HQIHzeGKBi0QgYaS2Ki0IspG/hF
+	QTXEUuZEh07IIzK6E0puQYzdyJ35v0lnYoIcqpm3eQUe74AonJqKmY9J5nsETsgIK0h54n80B+c
+	r9Oe/IEvnPrGE1SEIkyt2Qx2/+DCO+V2znoDqZX81kK1FZ7to4J0ukr5vsIPXyO1aMxqXSR7/Wt
+	5+jrr6spdsAwRgnnaPRVyC9vzbOsG3sgIKeCyCIOWDOBFWyHmE2V07f5qfLY2tnP5DbWY27xUao
+	JSIhW2iNmRRGyJJ7R676KhIaC0b/TZ9TZoKD1kF+VUB9b2w9xoK3Qslk+kw4qJqKbO4NetANVIl
+	pTwCXE2FhsU=
+X-Received: by 2002:a05:620a:a0c9:10b0:915:b9f6:7191 with SMTP id af79cd13be357-915b9f67384mr707007185a.32.1780855440594;
+        Sun, 07 Jun 2026 11:04:00 -0700 (PDT)
 Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a2359ecsm1489771785a.14.2026.06.07.11.03.54
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a2359ecsm1489771785a.14.2026.06.07.11.03.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 11:03:55 -0700 (PDT)
+        Sun, 07 Jun 2026 11:04:00 -0700 (PDT)
 From: Xin Long <lucien.xin@gmail.com>
 To: network dev <netdev@vger.kernel.org>,
 	quic@lists.linux.dev
@@ -95,9 +96,9 @@ Cc: davem@davemloft.net,
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
 	mef@scarletmail.rutgers.edu,
 	paul@jakma.org
-Subject: [PATCH net-next v13 07/15] quic: add connection id management
-Date: Sun,  7 Jun 2026 14:01:29 -0400
-Message-ID: <0565988e6b54dac937fa00cdb3b09adef9650be6.1780855297.git.lucien.xin@gmail.com>
+Subject: [PATCH net-next v13 09/15] quic: add congestion control
+Date: Sun,  7 Jun 2026 14:01:31 -0400
+Message-ID: <465489e5fafa9326b4a21c4851e420d344bbfdfe.1780855297.git.lucien.xin@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <cover.1780855296.git.lucien.xin@gmail.com>
 References: <cover.1780855296.git.lucien.xin@gmail.com>
@@ -109,93 +110,102 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch introduces 'struct quic_conn_id_set' for managing Connection
-IDs (CIDs), which are represented by 'struct quic_source_conn_id'
-and 'struct quic_dest_conn_id'.
+This patch introduces 'quic_cong' for RTT measurement and congestion
+control. The 'quic_cong_ops' is added to define the congestion
+control algorithm.
 
-It provides helpers to add and remove CIDs from the set, and handles
-insertion of source CIDs into the global connection ID hash table
-when necessary.
+It implements a congestion control state machine with slow start,
+congestion avoidance, and recovery phases, and currently introduces
+the New Reno algorithm only.
 
-- quic_conn_id_add(): Add a new Connection ID to the set, and inserts
-  it to conn_id hash table if it is a source conn_id.
+The implementation updates RTT estimates when packets are acknowledged,
+reacts to loss and ECN signals, and adjusts the congestion window
+accordingly during packet transmission and acknowledgment processing.
 
-- quic_conn_id_remove(): Remove connection IDs the set with sequence
-  numbers less than or equal to a number.
+- quic_cong_rtt_update(): Performs RTT measurement, invoked when a
+  packet is acknowledged by the largest number in the ACK frame.
 
-It also adds utilities to look up CIDs by value or sequence number,
-search the global hash table for incoming packets, and check for
-stateless reset tokens among destination CIDs. These functions are
-essential for RX path connection lookup and stateless reset processing.
+- quic_cong_on_packet_acked(): Invoked when a packet is acknowledged.
 
-- quic_conn_id_find(): Find a Connection ID in the set by seq number.
+- quic_cong_on_packet_lost(): Invoked when a packet is marked as lost.
 
-- quic_conn_id_lookup(): Lookup a Connection ID from global hash table
-  using the ID value, typically used for socket lookup on the RX path.
+- quic_cong_on_process_ecn(): Invoked when an ACK_ECN frame is received.
 
-- quic_conn_id_token_exists(): Check if a stateless reset token exists
-  in any dest Connection ID (used during stateless reset processing).
+- quic_cong_on_packet_sent(): Invoked when a packet is transmitted.
 
-Note source/dest conn_id set is per socket, the operations on it are
-always protected by the sock lock.
+- quic_cong_on_ack_recv(): Invoked when an ACK frame is received.
 
 Signed-off-by: Xin Long <lucien.xin@gmail.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
 ---
-v3:
-  - Clarify in changelog that conn_id set is always protected by sock lock
-    (suggested by Paolo).
-  - Adjust global source conn_id hashtable operations for the new hashtable
-    type.
 v4:
-  - Replace struct hlist_node with hlist_nulls_node for the node in
-    struct quic_source_conn_id to support lockless lookup.
-v7:
-  - Break the loop earlier if common->number > number in
-    quic_conn_id_remove/find() (suggested by Paolo).
-  - Add a comment in quic_conn_id_first_number().
+  - Remove the CUBIC congestion algorithm support for this version
+    (suggested by Paolo).
+v5:
+  - Do not update the pacing rate when !cong->smoothed_rtt in
+    quic_cong_pace_update() (suggested by Paolo).
+  - Change timestamp variables from u32 to u64, as RTT is measured in
+    microseconds and u64 provides sufficient precision for timestamps
+    in microsecond.
 v8:
-  - Add a comment to quic_conn_id_remove() clarifying that the ID number
-    must be smaller than the sequence number of the last ID in the set.
+  - Add a comment in quic_reno_on_packet_acked() clarifying cong->window
+    is never zero (noted by AI review).
+v9:
+  - Use abs_diff() to simplify RTT variance calculation (noted by AI
+    review).
+  - Fix a small typo in the comment for struct quic_cong::time (noted
+    by AI review).
+  - Fix another small typo in quic_cong_check_persistent_congestion().
+v10:
+  - Note for AI reviews: cong->time will always be set before processing
+    the packet on the RX path in the future patch series.
+  - Add initial_srtt and algo to struct quic_cong to store the initial
+    smoothed RTT and congestion control algorithm, previously kept in
+    quic_sock.config.
 v11:
-  - Note for AI review: each id_set contains at most 8 connection IDs, so
-    using an RB-tree for faster lookup is unnecessary.
+  - Note for AI reviews: later patches guarantee cong->time is set
+    before any quic_cong function uses it.
+  - Note for AI reviews: RFC 9002 section 5.3 does NOT specify that
+    rttvar_sample must use the previous smoothed_rtt value.
   - Set maximum line length to 80 characters.
-  - Add a check for number in quic_conn_id_remove().
+  - Change return type of quic_cong_check_persistent_congestion() to bool.
+  - Add a check for algo in quic_cong_set_algo().
+  - Extract quic_reno_handle_packet_lost() from quic_reno_on_packet_lost()
+    and quic_reno_on_process_ecn() (noted by AI review).
 v12:
-  - Add a comment in quic_conn_id_lookup() clarifying why a
-    get_nulls_value() check is not needed.
-  - Do not match zero-valued tokens in quic_conn_id_token_exists().
-  - Update id_set->alt to the next entry when the current one is removed
-    in quic_conn_id_remove().
-  - Call quic_conn_id_set_init() with true/false instead of 1/0 in
-    quic_init_sock().
+  - Delete the unnecessary WRITE_ONCE() and READ_ONCE() for
+    cong->pacing_rate, as it's always used under sock lock.
+  - Set cong->max_window to S32_MAX / 4 instead of S32_MAX / 2.
+  - Add pc_start_time in struct quic_cong to track persistent congestion
+    start time more precisely and improve persistent congestion detection;
+    move its handling into quic_cong_on_packet_lost() and
+    quic_cong_on_packet_acked().
 ---
- net/quic/Makefile |   2 +-
- net/quic/connid.c | 256 ++++++++++++++++++++++++++++++++++++++++++++++
- net/quic/connid.h | 182 ++++++++++++++++++++++++++++++++
- net/quic/socket.c |   6 ++
- net/quic/socket.h |  13 +++
- 5 files changed, 458 insertions(+), 1 deletion(-)
- create mode 100644 net/quic/connid.c
- create mode 100644 net/quic/connid.h
+ net/quic/Makefile |   3 +-
+ net/quic/cong.c   | 333 ++++++++++++++++++++++++++++++++++++++++++++++
+ net/quic/cong.h   | 130 ++++++++++++++++++
+ net/quic/socket.c |   1 +
+ net/quic/socket.h |   7 +
+ 5 files changed, 473 insertions(+), 1 deletion(-)
+ create mode 100644 net/quic/cong.c
+ create mode 100644 net/quic/cong.h
 
 diff --git a/net/quic/Makefile b/net/quic/Makefile
-index 094e9da5d739..eee7501588d3 100644
+index 1565fb5cef9d..4d4a42c6d565 100644
 --- a/net/quic/Makefile
 +++ b/net/quic/Makefile
-@@ -5,4 +5,4 @@
+@@ -5,4 +5,5 @@
  
  obj-$(CONFIG_IP_QUIC) += quic.o
  
--quic-y := common.o family.o protocol.o socket.o stream.o
-+quic-y := common.o family.o protocol.o socket.o stream.o connid.o
-diff --git a/net/quic/connid.c b/net/quic/connid.c
+-quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o
++quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o \
++	  cong.o
+diff --git a/net/quic/cong.c b/net/quic/cong.c
 new file mode 100644
-index 000000000000..b1a39feb827e
+index 000000000000..6bb2b05fe070
 --- /dev/null
-+++ b/net/quic/connid.c
-@@ -0,0 +1,256 @@
++++ b/net/quic/cong.c
+@@ -0,0 +1,333 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/* QUIC kernel implementation
 + * (C) Copyright Red Hat Corp. 2023
@@ -209,255 +219,332 @@ index 000000000000..b1a39feb827e
 + */
 +
 +#include <linux/quic.h>
-+#include <net/sock.h>
 +
 +#include "common.h"
-+#include "connid.h"
++#include "cong.h"
 +
-+/* Lookup a source connection ID (scid) in the global source connection ID hash
-+ * table.
-+ */
-+struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u32 len)
++/* NEW RENO APIs */
++static void quic_reno_handle_packet_lost(struct quic_cong *cong)
 +{
-+	struct quic_shash_head *head = quic_source_conn_id_head(net, scid, len);
-+	struct quic_source_conn_id *s_conn_id;
-+	struct quic_conn_id *conn_id = NULL;
-+	struct hlist_nulls_node *node;
-+
-+	hlist_nulls_for_each_entry_rcu(s_conn_id, node, &head->head, node) {
-+		if (net != sock_net(s_conn_id->sk))
-+			continue;
-+		if (s_conn_id->common.id.len != len ||
-+		    memcmp(scid, &s_conn_id->common.id.data, len))
-+			continue;
-+		if (likely(refcount_inc_not_zero(&s_conn_id->sk->sk_refcnt)))
-+			conn_id = &s_conn_id->common.id;
++	switch (cong->state) {
++	case QUIC_CONG_SLOW_START:
++		pr_debug("%s: slow_start -> recovery, cwnd: %u, ssth: %u\n",
++			 __func__, cong->window, cong->ssthresh);
 +		break;
-+	}
-+	/* No need to check get_nulls_value(node) != hash for !conn_id, as
-+	 * hashtable size is fixed and a conn_id can not rehashed.
-+	 */
-+	return conn_id;
-+}
-+
-+/* Check if a given stateless reset token exists in any connection ID in the
-+ * connection ID set.
-+ */
-+bool quic_conn_id_token_exists(struct quic_conn_id_set *id_set, u8 *token)
-+{
-+	struct quic_common_conn_id *common;
-+	struct quic_dest_conn_id *dcid;
-+
-+	dcid = (struct quic_dest_conn_id *)id_set->active;
-+	if (memchr_inv(dcid->token, 0, QUIC_CONN_ID_TOKEN_LEN) &&
-+	    !memcmp(dcid->token, token, QUIC_CONN_ID_TOKEN_LEN))
-+		return true; /* Fast path. */
-+
-+	list_for_each_entry(common, &id_set->head, list) {
-+		dcid = (struct quic_dest_conn_id *)common;
-+		if (common == id_set->active)
-+			continue;
-+		if (memchr_inv(dcid->token, 0, QUIC_CONN_ID_TOKEN_LEN) &&
-+		    !memcmp(dcid->token, token, QUIC_CONN_ID_TOKEN_LEN))
-+			return true;
-+	}
-+	return false;
-+}
-+
-+static void quic_source_conn_id_free_rcu(struct rcu_head *head)
-+{
-+	struct quic_source_conn_id *s_conn_id;
-+
-+	s_conn_id = container_of(head, struct quic_source_conn_id, rcu);
-+	kfree(s_conn_id);
-+}
-+
-+static void quic_source_conn_id_free(struct quic_source_conn_id *s_conn_id)
-+{
-+	u8 *data = s_conn_id->common.id.data;
-+	u32 len = s_conn_id->common.id.len;
-+	struct quic_shash_head *head;
-+
-+	if (!hlist_nulls_unhashed(&s_conn_id->node)) {
-+		head = quic_source_conn_id_head(sock_net(s_conn_id->sk), data,
-+						len);
-+		spin_lock_bh(&head->lock);
-+		hlist_nulls_del_init_rcu(&s_conn_id->node);
-+		spin_unlock_bh(&head->lock);
-+	}
-+
-+	/* Freeing is deferred via RCU to avoid use-after-free during
-+	 * concurrent lookups.
-+	 */
-+	call_rcu(&s_conn_id->rcu, quic_source_conn_id_free_rcu);
-+}
-+
-+static void quic_conn_id_del(struct quic_common_conn_id *common)
-+{
-+	list_del(&common->list);
-+	if (!common->hashed) {
-+		kfree(common);
++	case QUIC_CONG_RECOVERY_PERIOD:
++		return;
++	case QUIC_CONG_CONGESTION_AVOIDANCE:
++		pr_debug("%s: cong_avoid -> recovery, cwnd: %u, ssth: %u\n",
++			 __func__, cong->window, cong->ssthresh);
++		break;
++	default:
++		pr_debug("%s: wrong congestion state: %d\n", __func__,
++			 cong->state);
 +		return;
 +	}
-+	quic_source_conn_id_free((struct quic_source_conn_id *)common);
++
++	cong->recovery_time = cong->time;
++	cong->state = QUIC_CONG_RECOVERY_PERIOD;
++	cong->ssthresh = max(cong->window >> 1U, cong->min_window);
++	cong->window = cong->ssthresh;
 +}
 +
-+/* Add a connection ID with sequence number and associated private data to the
-+ * connection ID set.
-+ */
-+int quic_conn_id_add(struct quic_conn_id_set *id_set,
-+		     struct quic_conn_id *conn_id, u32 number, void *data)
++static void quic_reno_on_packet_lost(struct quic_cong *cong, u64 time,
++				     u32 bytes, s64 number)
 +{
-+	struct quic_source_conn_id *s_conn_id;
-+	struct quic_dest_conn_id *d_conn_id;
-+	struct quic_common_conn_id *common;
-+	struct quic_shash_head *head;
-+	struct list_head *list;
++	quic_reno_handle_packet_lost(cong);
++}
 +
-+	/* Locate insertion point to keep list ordered by number. */
-+	list = &id_set->head;
-+	list_for_each_entry(common, list, list) {
-+		if (number == common->number)
-+			return 0; /* Ignore if it already exists on the list. */
-+		if (number < common->number) {
-+			list = &common->list;
++static void quic_reno_on_packet_acked(struct quic_cong *cong, u64 time,
++				      u32 bytes, s64 number)
++{
++	switch (cong->state) {
++	case QUIC_CONG_SLOW_START:
++		cong->window = min_t(u32, cong->window + bytes,
++				     cong->max_window);
++		if (cong->window < cong->ssthresh)
 +			break;
-+		}
-+	}
-+
-+	if (conn_id->len > QUIC_CONN_ID_MAX_LEN)
-+		return -EINVAL;
-+	common = kzalloc(id_set->entry_size, GFP_ATOMIC);
-+	if (!common)
-+		return -ENOMEM;
-+	common->id = *conn_id;
-+	common->number = number;
-+	if (id_set->entry_size == sizeof(struct quic_dest_conn_id)) {
-+		/* For destination connection IDs, copy the stateless reset
-+		 * token if available.
++		cong->state = QUIC_CONG_CONGESTION_AVOIDANCE;
++		pr_debug("%s: slow_start -> cong_avoid, cwnd: %u, ssth: %u\n",
++			 __func__, cong->window, cong->ssthresh);
++		break;
++	case QUIC_CONG_RECOVERY_PERIOD:
++		if (cong->recovery_time >= time)
++			break;
++		cong->state = QUIC_CONG_CONGESTION_AVOIDANCE;
++		pr_debug("%s: recovery -> cong_avoid, cwnd: %u, ssth: %u\n",
++			 __func__, cong->window, cong->ssthresh);
++		break;
++	case QUIC_CONG_CONGESTION_AVOIDANCE:
++		/* cong->window is never zero; it is initialized by
++		 * quic_packet_route() during connect/accept.
 +		 */
-+		if (data) {
-+			d_conn_id = (struct quic_dest_conn_id *)common;
-+			memcpy(d_conn_id->token, data, QUIC_CONN_ID_TOKEN_LEN);
-+		}
-+	} else {
-+		/* For source connection IDs, mark as hashed and insert into
-+		 * the global source connection ID hashtable.
-+		 */
-+		common->hashed = 1;
-+		s_conn_id = (struct quic_source_conn_id *)common;
-+		s_conn_id->sk = data;
-+
-+		head = quic_source_conn_id_head(sock_net(s_conn_id->sk),
-+						common->id.data,
-+						common->id.len);
-+		spin_lock_bh(&head->lock);
-+		hlist_nulls_add_head_rcu(&s_conn_id->node, &head->head);
-+		spin_unlock_bh(&head->lock);
++		cong->window += cong->mss * bytes / cong->window;
++		break;
++	default:
++		pr_debug("%s: wrong congestion state: %d\n", __func__,
++			 cong->state);
++		return;
 +	}
-+	list_add_tail(&common->list, list);
-+
-+	if (number == quic_conn_id_last_number(id_set) + 1) {
-+		if (!id_set->active)
-+			id_set->active = common;
-+		id_set->count++;
-+
-+		/* Increment count for consecutive following IDs. */
-+		list_for_each_entry_continue(common, &id_set->head, list) {
-+			if (common->number != ++number)
-+				break;
-+			id_set->count++;
-+		}
-+	}
-+	return 0;
 +}
 +
-+/* Remove consecutive connection IDs from the set with sequence numbers less
-+ * than or equal to a number.
-+ */
-+void quic_conn_id_remove(struct quic_conn_id_set *id_set, u32 number)
++static void quic_reno_on_process_ecn(struct quic_cong *cong)
 +{
-+	struct quic_common_conn_id *common, *tmp;
-+	struct list_head *list;
++	quic_reno_handle_packet_lost(cong);
++}
 +
-+	/* The number must be less than the sequence number of the last
-+	 * consecutive connection ID in the set.
++static void quic_reno_on_init(struct quic_cong *cong)
++{
++}
++
++static struct quic_cong_ops quic_congs[] = {
++	{ /* QUIC_CONG_ALG_RENO */
++		.on_packet_acked = quic_reno_on_packet_acked,
++		.on_packet_lost = quic_reno_on_packet_lost,
++		.on_process_ecn = quic_reno_on_process_ecn,
++		.on_init = quic_reno_on_init,
++	},
++};
++
++static bool quic_cong_check_persistent_congestion(struct quic_cong *cong,
++						  u64 time)
++{
++	u32 ssthresh;
++
++	time -= cong->pc_start_time;
++
++	/* rfc9002#section-7.6.1:
++	 *   (smoothed_rtt + max(4*rttvar, kGranularity) + max_ack_delay) *
++	 *      kPersistentCongestionThreshold
 +	 */
-+	if (WARN_ON_ONCE(number >= quic_conn_id_last_number(id_set)))
++	ssthresh = cong->smoothed_rtt +
++		   max(4 * cong->rttvar, QUIC_KGRANULARITY);
++	ssthresh = (ssthresh + cong->max_ack_delay) *
++		   QUIC_KPERSISTENT_CONGESTION_THRESHOLD;
++
++	return time > ssthresh;
++}
++
++/* COMMON APIs */
++void quic_cong_on_packet_lost(struct quic_cong *cong, u64 time, u32 bytes,
++			      s64 number)
++{
++	if (cong->pc_start_time && time > cong->pc_start_time &&
++	    quic_cong_check_persistent_congestion(cong, time)) {
++		cong->pc_start_time = 0;
++		cong->min_rtt_valid = 0;
++		cong->window = cong->min_window;
++		cong->state = QUIC_CONG_SLOW_START;
 +		return;
-+	list = &id_set->head;
-+	list_for_each_entry_safe(common, tmp, list, list) {
-+		if (common->number > number)
-+			break;
-+		if (id_set->active == common)
-+			id_set->active = tmp;
-+		if (id_set->alt == common)
-+			id_set->alt = tmp;
-+		quic_conn_id_del(common);
-+		id_set->count--;
 +	}
++
++	if (!cong->pc_start_time && cong->is_rtt_set)
++		cong->pc_start_time = time;
++
++	cong->ops->on_packet_lost(cong, time, bytes, number);
 +}
 +
-+struct quic_conn_id *quic_conn_id_find(struct quic_conn_id_set *id_set,
-+				       u32 number)
++void quic_cong_on_packet_acked(struct quic_cong *cong, u64 time, u32 bytes,
++			       s64 number)
 +{
-+	struct quic_common_conn_id *common;
++	/* When a packet is acked, if time - cong->pc_start_time <= duration
++	 * threshold, it means the acked packet was sent within the persistent
++	 * congestion window.
++	 *
++	 * This breaks the condition in rfc9002#section-7.6.2:
++	 *
++	 * - across all packet number spaces, none of the packets sent between
++	 *   the send times of these two packets are acknowledged;
++	 *
++	 * so pc_start_time is reset to 0.
++	 */
++	if (cong->pc_start_time && time > cong->pc_start_time &&
++	    !quic_cong_check_persistent_congestion(cong, time))
++		cong->pc_start_time = 0;
 +
-+	list_for_each_entry(common, &id_set->head, list) {
-+		if (common->number > number)
-+			break;
-+		if (common->number == number)
-+			return &common->id;
++	cong->ops->on_packet_acked(cong, time, bytes, number);
++}
++
++void quic_cong_on_process_ecn(struct quic_cong *cong)
++{
++	cong->ops->on_process_ecn(cong);
++}
++
++/* Update Probe Timeout (PTO) and loss detection delay based on RTT stats. */
++static void quic_cong_pto_update(struct quic_cong *cong)
++{
++	u32 pto, loss_delay;
++
++	/* rfc9002#section-6.2.1:
++	 *   PTO = smoothed_rtt + max(4*rttvar, kGranularity) + max_ack_delay
++	 */
++	pto = cong->smoothed_rtt + max(4 * cong->rttvar, QUIC_KGRANULARITY);
++	cong->pto = pto + cong->max_ack_delay;
++
++	/* rfc9002#section-6.1.2:
++	 *   max(kTimeThreshold * max(smoothed_rtt, latest_rtt), kGranularity)
++	 */
++	loss_delay = QUIC_KTIME_THRESHOLD(max(cong->smoothed_rtt,
++					      cong->latest_rtt));
++	cong->loss_delay = max(loss_delay, QUIC_KGRANULARITY);
++
++	pr_debug("%s: update pto: %u\n", __func__, pto);
++}
++
++/* Update pacing timestamp after sending 'bytes' bytes.
++ *
++ * This function tracks when the next packet is allowed to be sent based on
++ * pacing rate.
++ */
++static void quic_cong_update_pacing_time(struct quic_cong *cong, u32 bytes)
++{
++	u64 prior_time, credit, len_ns, rate = cong->pacing_rate;
++
++	if (!rate)
++		return;
++
++	prior_time = cong->pacing_time;
++	cong->pacing_time = max(cong->pacing_time, ktime_get_ns());
++	credit = cong->pacing_time - prior_time;
++
++	/* take into account OS jitter */
++	len_ns = div64_ul((u64)bytes * NSEC_PER_SEC, rate);
++	len_ns -= min_t(u64, len_ns / 2, credit);
++	cong->pacing_time += len_ns;
++}
++
++/* Compute and update the pacing rate based on congestion window and smoothed
++ * RTT.
++ */
++static void quic_cong_pace_update(struct quic_cong *cong, u32 bytes,
++				  u64 max_rate)
++{
++	u64 rate;
++
++	if (unlikely(!cong->smoothed_rtt))
++		return;
++
++	/* rate = N * congestion_window / smoothed_rtt */
++	rate = div64_ul((u64)cong->window * USEC_PER_SEC * 2,
++			cong->smoothed_rtt);
++
++	cong->pacing_rate = min_t(u64, rate, max_rate);
++	pr_debug("%s: update pacing rate: %llu, max rate: %llu, srtt: %u\n",
++		 __func__, cong->pacing_rate, max_rate, cong->smoothed_rtt);
++}
++
++void quic_cong_on_packet_sent(struct quic_cong *cong, u64 time, u32 bytes,
++			      s64 number)
++{
++	if (!bytes)
++		return;
++	if (cong->ops->on_packet_sent)
++		cong->ops->on_packet_sent(cong, time, bytes, number);
++	quic_cong_update_pacing_time(cong, bytes);
++}
++
++void quic_cong_on_ack_recv(struct quic_cong *cong, u32 bytes, u64 max_rate)
++{
++	if (!bytes)
++		return;
++	if (cong->ops->on_ack_recv)
++		cong->ops->on_ack_recv(cong, bytes, max_rate);
++	quic_cong_pace_update(cong, bytes, max_rate);
++}
++
++/* rfc9002#section-5: Estimating the Round-Trip Time */
++void quic_cong_rtt_update(struct quic_cong *cong, u64 time, u32 ack_delay)
++{
++	u32 adjusted_rtt, rttvar_sample;
++
++	/* Ignore RTT sample if ACK delay is suspiciously large. */
++	if (ack_delay > cong->max_ack_delay * 2)
++		return;
++
++	/* rfc9002#section-5.1:
++	 *   latest_rtt = ack_time - send_time_of_largest_acked
++	 */
++	cong->latest_rtt = cong->time - time;
++
++	/* rfc9002#section-5.2: Estimating min_rtt */
++	if (!cong->min_rtt_valid) {
++		cong->min_rtt = cong->latest_rtt;
++		cong->min_rtt_valid = 1;
 +	}
-+	return NULL;
-+}
++	if (cong->min_rtt > cong->latest_rtt)
++		cong->min_rtt = cong->latest_rtt;
 +
-+void quic_conn_id_update_active(struct quic_conn_id_set *id_set, u32 number)
-+{
-+	struct quic_conn_id *conn_id;
-+
-+	if (number == id_set->active->number)
++	if (!cong->is_rtt_set) {
++		/* rfc9002#section-5.3:
++		 *   smoothed_rtt = latest_rtt
++		 *   rttvar = latest_rtt / 2
++		 */
++		cong->smoothed_rtt = cong->latest_rtt;
++		cong->rttvar = cong->smoothed_rtt / 2;
++		quic_cong_pto_update(cong);
++		cong->is_rtt_set = 1;
 +		return;
-+	conn_id = quic_conn_id_find(id_set, number);
-+	if (!conn_id)
++	}
++
++	/* rfc9002#section-5.3:
++	 *   adjusted_rtt = latest_rtt
++	 *   if (latest_rtt >= min_rtt + ack_delay):
++	 *     adjusted_rtt = latest_rtt - ack_delay
++	 *   smoothed_rtt = 7/8 * smoothed_rtt + 1/8 * adjusted_rtt
++	 *   rttvar_sample = abs(smoothed_rtt - adjusted_rtt)
++	 *   rttvar = 3/4 * rttvar + 1/4 * rttvar_sample
++	 */
++	adjusted_rtt = cong->latest_rtt;
++	if (cong->latest_rtt >= cong->min_rtt + ack_delay)
++		adjusted_rtt = cong->latest_rtt - ack_delay;
++
++	cong->smoothed_rtt = (cong->smoothed_rtt * 7 + adjusted_rtt) / 8;
++	rttvar_sample = abs_diff(cong->smoothed_rtt, adjusted_rtt);
++	cong->rttvar = (cong->rttvar * 3 + rttvar_sample) / 4;
++	quic_cong_pto_update(cong);
++
++	if (cong->ops->on_rtt_update)
++		cong->ops->on_rtt_update(cong);
++}
++
++void quic_cong_set_algo(struct quic_cong *cong, u8 algo)
++{
++	/* The caller must ensure algo < QUIC_CONG_ALG_MAX. */
++	if (WARN_ON_ONCE(algo >= QUIC_CONG_ALG_MAX))
 +		return;
-+	quic_conn_id_set_active(id_set, conn_id);
++	cong->algo = algo;
++	cong->state = QUIC_CONG_SLOW_START;
++	cong->ssthresh = U32_MAX;
++	cong->ops = &quic_congs[algo];
++	cong->ops->on_init(cong);
 +}
 +
-+void quic_conn_id_set_init(struct quic_conn_id_set *id_set, bool source)
++void quic_cong_set_srtt(struct quic_cong *cong, u32 srtt)
 +{
-+	id_set->entry_size = source ? sizeof(struct quic_source_conn_id) :
-+				      sizeof(struct quic_dest_conn_id);
-+	INIT_LIST_HEAD(&id_set->head);
++	/* rfc9002#section-5.3:
++	 *   smoothed_rtt = kInitialRtt
++	 *   rttvar = kInitialRtt / 2
++	 */
++	cong->initial_srtt = srtt;
++	cong->latest_rtt = srtt;
++	cong->smoothed_rtt = cong->latest_rtt;
++	cong->rttvar = cong->smoothed_rtt / 2;
++	quic_cong_pto_update(cong);
 +}
 +
-+void quic_conn_id_set_free(struct quic_conn_id_set *id_set)
++void quic_cong_init(struct quic_cong *cong)
 +{
-+	struct quic_common_conn_id *common, *tmp;
-+
-+	list_for_each_entry_safe(common, tmp, &id_set->head, list)
-+		quic_conn_id_del(common);
-+	id_set->count = 0;
-+	id_set->active = NULL;
++	cong->max_ack_delay = QUIC_DEF_ACK_DELAY;
++	cong->max_window = S32_MAX / 4;
++	quic_cong_set_algo(cong, QUIC_CONG_ALG_RENO);
++	quic_cong_set_srtt(cong, QUIC_RTT_INIT);
 +}
-+
-+void quic_conn_id_get_param(struct quic_conn_id_set *id_set,
-+			    struct quic_transport_param *p)
-+{
-+	p->active_connection_id_limit = id_set->max_count;
-+}
-+
-+void quic_conn_id_set_param(struct quic_conn_id_set *id_set,
-+			    struct quic_transport_param *p)
-+{
-+	id_set->max_count = p->active_connection_id_limit;
-+}
-diff --git a/net/quic/connid.h b/net/quic/connid.h
+diff --git a/net/quic/cong.h b/net/quic/cong.h
 new file mode 100644
-index 000000000000..54e3fd3f33e0
+index 000000000000..1debec2d75b8
 --- /dev/null
-+++ b/net/quic/connid.h
-@@ -0,0 +1,182 @@
++++ b/net/quic/cong.h
+@@ -0,0 +1,130 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/* QUIC kernel implementation
 + * (C) Copyright Red Hat Corp. 2023
@@ -468,240 +555,170 @@ index 000000000000..54e3fd3f33e0
 + *    Xin Long <lucien.xin@gmail.com>
 + */
 +
-+#define QUIC_CONN_ID_LIMIT	8
-+#define QUIC_CONN_ID_DEF	7
-+#define QUIC_CONN_ID_LEAST	2
++#define QUIC_KPERSISTENT_CONGESTION_THRESHOLD	3
++#define QUIC_KPACKET_THRESHOLD			3
++#define QUIC_KTIME_THRESHOLD(rtt)		((rtt) * 9 / 8)
++#define QUIC_KGRANULARITY			1000U
 +
-+#define QUIC_CONN_ID_TOKEN_LEN	16
++#define QUIC_RTT_INIT		333000U
++#define QUIC_RTT_MAX		2000000U
++#define QUIC_RTT_MIN		QUIC_KGRANULARITY
 +
-+/* Common fields shared by both source and destination Connection IDs */
-+struct quic_common_conn_id {
-+	struct quic_conn_id id; /* Connection ID value and its length */
-+	struct list_head list;  /* List node for connection ID management */
-+	u32 number; /* Sequence number assigned to this Connection ID */
-+	u8 hashed;  /* Non-zero if stored in source_conn_id hash table */
-+};
-+
-+struct quic_source_conn_id {
-+	struct quic_common_conn_id common;
-+	struct hlist_nulls_node node; /* Hash table node for fast lookup */
-+	struct rcu_head rcu; /* RCU header for deferred destruction */
-+	struct sock *sk;      /* Socket associated with this Connection ID */
-+};
-+
-+struct quic_dest_conn_id {
-+	struct quic_common_conn_id common;
-+	/* Stateless reset token in rfc9000#section-10.3 */
-+	u8 token[QUIC_CONN_ID_TOKEN_LEN];
-+};
-+
-+struct quic_conn_id_set {
-+	/* Connection ID in use on the current path */
-+	struct quic_common_conn_id *active;
-+	/* Connection ID to use for a new path (e.g., after migration) */
-+	struct quic_common_conn_id *alt;
-+	struct list_head head; /* List head of available connection IDs */
-+	u8 entry_size; /* Size of each connection ID entry in the list */
-+	u8 max_count;  /* active_connection_id_limit in rfc9000#section-18.2 */
-+	u8 count;      /* Current number of connection IDs in the list */
-+};
-+
-+static inline u32 quic_conn_id_first_number(struct quic_conn_id_set *id_set)
-+{
-+	struct quic_common_conn_id *common;
-+
-+	/* The id_set is guaranteed to be non-empty when called (sk is not in
-+	 * CLOSE state).
-+	 */
-+	common = list_first_entry(&id_set->head, struct quic_common_conn_id,
-+				  list);
-+	return common->number;
-+}
-+
-+static inline u32 quic_conn_id_last_number(struct quic_conn_id_set *id_set)
-+{
-+	return quic_conn_id_first_number(id_set) + id_set->count - 1;
-+}
-+
-+static inline void quic_conn_id_generate(struct quic_conn_id *conn_id)
-+{
-+	get_random_bytes(conn_id->data, QUIC_CONN_ID_DEF_LEN);
-+	conn_id->len = QUIC_CONN_ID_DEF_LEN;
-+}
-+
-+/* Select an alternate destination Connection ID for a new path (e.g., after
-+ * migration).
++/* rfc9002#section-7.3: Congestion Control States
++ *
++ *                  New path or      +------------+
++ *             persistent congestion |   Slow     |
++ *         (O)---------------------->|   Start    |
++ *                                   +------------+
++ *                                         |
++ *                                 Loss or |
++ *                         ECN-CE increase |
++ *                                         v
++ *  +------------+     Loss or       +------------+
++ *  | Congestion |  ECN-CE increase  |  Recovery  |
++ *  | Avoidance  |------------------>|   Period   |
++ *  +------------+                   +------------+
++ *            ^                            |
++ *            |                            |
++ *            +----------------------------+
++ *               Acknowledgment of packet
++ *                 sent during recovery
 + */
-+static inline bool quic_conn_id_select_alt(struct quic_conn_id_set *id_set,
-+					   bool active)
++enum quic_cong_state {
++	QUIC_CONG_SLOW_START,
++	QUIC_CONG_RECOVERY_PERIOD,
++	QUIC_CONG_CONGESTION_AVOIDANCE,
++};
++
++struct quic_cong {
++	/* RTT tracking */
++	u32 max_ack_delay;	/* max_ack_delay from rfc9000#section-18.2 */
++	u32 smoothed_rtt;	/* Smoothed RTT */
++	u32 latest_rtt;		/* Latest RTT sample */
++	u32 min_rtt;		/* Lowest observed RTT */
++	u32 rttvar;		/* RTT variation */
++	u32 pto;		/* Probe timeout */
++
++	/* Timing & pacing */
++	u64 pc_start_time;      /* Persistent congestion tracking timestamp */
++	u64 recovery_time;	/* Recovery period start timestamp */
++	u64 pacing_rate;	/* Packet sending speed Bytes/sec */
++	u64 pacing_time;	/* Next scheduled send timestamp (ns) */
++	u64 time;		/* Cached current timestamp */
++
++	/* Congestion window */
++	u32 max_window;		/* Max growth cap */
++	u32 min_window;		/* Min window limit */
++	u32 loss_delay;		/* Time before marking loss */
++	u32 ssthresh;		/* Slow start threshold */
++	u32 window;		/* Bytes in flight allowed */
++	u32 mss;		/* QUIC MSS (excl. UDP) */
++
++	/* Algorithm-specific */
++	struct quic_cong_ops *ops;
++	u64 priv[8];		/* Algo private data */
++
++	u32 initial_srtt;	/* Initial smoothed RTT */
++	u8 algo;		/* Congestion control algorithm */
++
++	/* Flags & state */
++	u8 min_rtt_valid;	/* min_rtt initialized */
++	u8 is_rtt_set;		/* RTT samples exist */
++	u8 state;		/* State machine in rfc9002#section-7.3 */
++};
++
++/* Hooks for congestion control algorithms */
++struct quic_cong_ops {
++	void (*on_packet_acked)(struct quic_cong *cong, u64 time, u32 bytes,
++				s64 number);
++	void (*on_packet_lost)(struct quic_cong *cong, u64 time, u32 bytes,
++			       s64 number);
++	void (*on_process_ecn)(struct quic_cong *cong);
++	void (*on_init)(struct quic_cong *cong);
++
++	/* Optional callbacks */
++	void (*on_packet_sent)(struct quic_cong *cong, u64 time, u32 bytes,
++			       s64 number);
++	void (*on_ack_recv)(struct quic_cong *cong, u32 bytes, u64 max_rate);
++	void (*on_rtt_update)(struct quic_cong *cong);
++};
++
++static inline void quic_cong_set_mss(struct quic_cong *cong, u32 mss)
 +{
-+	if (id_set->alt)
-+		return true;
-+	/* NAT rebinding: peer keeps using the current source conn_id.
-+	 * In this case, continue using the same dest conn_id for the new path.
-+	 */
-+	if (active) {
-+		id_set->alt = id_set->active;
-+		return true;
-+	}
-+	/* Treat the prev conn_ids as used.
-+	 * Try selecting the next conn_id in the list, unless at the end.
-+	 */
-+	if (id_set->active->number != quic_conn_id_last_number(id_set)) {
-+		id_set->alt = list_next_entry(id_set->active, list);
-+		return true;
-+	}
-+	/* If there's only one conn_id in the list, reuse the active one. */
-+	if (id_set->active->number == quic_conn_id_first_number(id_set)) {
-+		id_set->alt = id_set->active;
-+		return true;
-+	}
-+	/* No alternate conn_id could be selected.  Caller should send a
-+	 * QUIC_FRAME_RETIRE_CONNECTION_ID frame to request new connection IDs
-+	 * from the peer.
-+	 */
-+	return false;
++	if (cong->mss == mss)
++		return;
++
++	/* rfc9002#section-7.2: Initial and Minimum Congestion Window */
++	cong->mss = mss;
++	cong->min_window = max(min(mss * 10, 14720U), mss * 2);
++
++	if (cong->window < cong->min_window)
++		cong->window = cong->min_window;
 +}
 +
-+static inline void quic_conn_id_set_alt(struct quic_conn_id_set *id_set,
-+					struct quic_conn_id *alt)
++static inline void *quic_cong_priv(struct quic_cong *cong)
 +{
-+	id_set->alt = (struct quic_common_conn_id *)alt;
++	return (void *)cong->priv;
 +}
 +
-+/* Swap the active and alternate destination Connection IDs after path
-+ * migration completes, since the path has already been switched accordingly.
-+ */
-+static inline void quic_conn_id_swap_active(struct quic_conn_id_set *id_set)
-+{
-+	void *active = id_set->active;
++void quic_cong_on_packet_acked(struct quic_cong *cong, u64 time, u32 bytes,
++			       s64 number);
++void quic_cong_on_packet_lost(struct quic_cong *cong, u64 time, u32 bytes,
++			      s64 number);
++void quic_cong_on_process_ecn(struct quic_cong *cong);
 +
-+	id_set->active = id_set->alt;
-+	id_set->alt = active;
-+}
++void quic_cong_on_packet_sent(struct quic_cong *cong, u64 time, u32 bytes,
++			      s64 number);
++void quic_cong_on_ack_recv(struct quic_cong *cong, u32 bytes, u64 max_rate);
++void quic_cong_rtt_update(struct quic_cong *cong, u64 time, u32 ack_delay);
 +
-+/* Choose which destination Connection ID to use for a new path migration if
-+ * alt is true.
-+ */
-+static inline struct quic_conn_id *
-+quic_conn_id_choose(struct quic_conn_id_set *id_set, u8 alt)
-+{
-+	return (alt && id_set->alt) ? &id_set->alt->id : &id_set->active->id;
-+}
-+
-+static inline struct quic_conn_id *
-+quic_conn_id_active(struct quic_conn_id_set *id_set)
-+{
-+	return &id_set->active->id;
-+}
-+
-+static inline void quic_conn_id_set_active(struct quic_conn_id_set *id_set,
-+					   struct quic_conn_id *active)
-+{
-+	id_set->active = (struct quic_common_conn_id *)active;
-+}
-+
-+static inline u32 quic_conn_id_number(struct quic_conn_id *conn_id)
-+{
-+	return ((struct quic_common_conn_id *)conn_id)->number;
-+}
-+
-+static inline struct sock *quic_conn_id_sk(struct quic_conn_id *conn_id)
-+{
-+	return ((struct quic_source_conn_id *)conn_id)->sk;
-+}
-+
-+static inline void quic_conn_id_set_token(struct quic_conn_id *conn_id,
-+					  u8 *token)
-+{
-+	memcpy(((struct quic_dest_conn_id *)conn_id)->token, token,
-+	       QUIC_CONN_ID_TOKEN_LEN);
-+}
-+
-+static inline int quic_conn_id_cmp(struct quic_conn_id *a,
-+				   struct quic_conn_id *b)
-+{
-+	return a->len != b->len || memcmp(a->data, b->data, a->len);
-+}
-+
-+int quic_conn_id_add(struct quic_conn_id_set *id_set,
-+		     struct quic_conn_id *conn_id, u32 number, void *data);
-+bool quic_conn_id_token_exists(struct quic_conn_id_set *id_set, u8 *token);
-+void quic_conn_id_remove(struct quic_conn_id_set *id_set, u32 number);
-+
-+struct quic_conn_id *quic_conn_id_find(struct quic_conn_id_set *id_set,
-+				       u32 number);
-+struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u32 len);
-+void quic_conn_id_update_active(struct quic_conn_id_set *id_set, u32 number);
-+
-+void quic_conn_id_get_param(struct quic_conn_id_set *id_set,
-+			    struct quic_transport_param *p);
-+void quic_conn_id_set_param(struct quic_conn_id_set *id_set,
-+			    struct quic_transport_param *p);
-+void quic_conn_id_set_init(struct quic_conn_id_set *id_set, bool source);
-+void quic_conn_id_set_free(struct quic_conn_id_set *id_set);
++void quic_cong_set_srtt(struct quic_cong *cong, u32 srtt);
++void quic_cong_set_algo(struct quic_cong *cong, u8 algo);
++void quic_cong_init(struct quic_cong *cong);
 diff --git a/net/quic/socket.c b/net/quic/socket.c
-index 88a6954b90b1..07c436740eaf 100644
+index 0e5595d14b88..04cfbddc0304 100644
 --- a/net/quic/socket.c
 +++ b/net/quic/socket.c
-@@ -49,6 +49,9 @@ static int quic_init_sock(struct sock *sk)
- 	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
- 	INIT_LIST_HEAD(quic_reqs(sk));
+@@ -51,6 +51,7 @@ static int quic_init_sock(struct sock *sk)
  
-+	quic_conn_id_set_init(quic_source(sk), true);
-+	quic_conn_id_set_init(quic_dest(sk), false);
-+
+ 	quic_conn_id_set_init(quic_source(sk), true);
+ 	quic_conn_id_set_init(quic_dest(sk), false);
++	quic_cong_init(quic_cong(sk));
+ 
  	if (quic_stream_init(quic_streams(sk)))
  		return -ENOMEM;
- 
-@@ -57,6 +60,9 @@ static int quic_init_sock(struct sock *sk)
- 
- static void quic_destroy_sock(struct sock *sk)
- {
-+	quic_conn_id_set_free(quic_source(sk));
-+	quic_conn_id_set_free(quic_dest(sk));
-+
- 	quic_stream_free(quic_streams(sk));
- 
- 	quic_data_free(quic_ticket(sk));
 diff --git a/net/quic/socket.h b/net/quic/socket.h
-index e76737b9b74b..68a58f0016cc 100644
+index 91338601905e..9201ca3edad0 100644
 --- a/net/quic/socket.h
 +++ b/net/quic/socket.h
-@@ -14,6 +14,7 @@
- #include "common.h"
- #include "family.h"
+@@ -16,6 +16,7 @@
  #include "stream.h"
-+#include "connid.h"
+ #include "connid.h"
+ #include "path.h"
++#include "cong.h"
  
  #include "protocol.h"
  
-@@ -36,6 +37,8 @@ struct quic_sock {
- 	struct quic_data		alpn;
- 
- 	struct quic_stream_table	streams;
-+	struct quic_conn_id_set		source;
-+	struct quic_conn_id_set		dest;
+@@ -41,6 +42,7 @@ struct quic_sock {
+ 	struct quic_conn_id_set		source;
+ 	struct quic_conn_id_set		dest;
+ 	struct quic_path_group		paths;
++	struct quic_cong		cong;
  };
  
  struct quic6_sock {
-@@ -73,6 +76,16 @@ static inline struct quic_stream_table *quic_streams(const struct sock *sk)
- 	return &quic_sk(sk)->streams;
+@@ -98,6 +100,11 @@ static inline bool quic_is_serv(const struct sock *sk)
+ 	return !!sk->sk_max_ack_backlog;
  }
  
-+static inline struct quic_conn_id_set *quic_source(const struct sock *sk)
++static inline struct quic_cong *quic_cong(const struct sock *sk)
 +{
-+	return &quic_sk(sk)->source;
++	return &quic_sk(sk)->cong;
 +}
 +
-+static inline struct quic_conn_id_set *quic_dest(const struct sock *sk)
-+{
-+	return &quic_sk(sk)->dest;
-+}
-+
- static inline bool quic_is_serv(const struct sock *sk)
+ static inline bool quic_is_establishing(struct sock *sk)
  {
- 	return !!sk->sk_max_ack_backlog;
+ 	return sk->sk_state == QUIC_SS_ESTABLISHING;
 -- 
 2.47.1
 
