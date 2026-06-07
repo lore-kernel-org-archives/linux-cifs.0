@@ -1,290 +1,220 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15784071E4
-	for <linux-cifs@vger.kernel.org>; Sun,  7 Jun 2026 14:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780844124; cv=none; b=WIJy7ZQ+Ya9LnIudLvwQBhbJGR57OJzHccy9rhsyNkFYz0wv36LSWrCNn2utNm88BmSskjlypgVUpNhCG2oaRg0ZD8Ks+fiAdJ53qrZZAsg2QY5Bt/capluyXHnTf4vfwFTars/9X0XpWSICSnpw3jfidyS71Gd78gEEP/9ul+c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780844124; c=relaxed/simple;
-	bh=ilUlGW5XWW4BRi2NC/f5VlE9JmLP22f6BbeS6mMc508=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=S6gZloEZYTe03ySIKfGTjYkvQZaLLMKJijt9gTEL+eqOwkf+Va4ytKqxV1Hzn2l1nb9i/5wIsbYR8f7Q5RaHW9OtdD35FRqcc1Mz7oSTc1zeHFLEmd7auVuowTjYURYjJq7h2YPU32YoEAwqKushAEaKC2KCZczwZaftcr0vZik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=DCj1XtEm; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F206C2571C0
+	for <linux-cifs@vger.kernel.org>; Sun,  7 Jun 2026 15:33:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780846418; cv=pass; b=NB/WmngXg/DXKGKdk7jmmzYgZuFVQKtP7UdBraahjHyintD+vbqcnofUMjqi6FA+1IaxbianWF8xwEg0+duOviA+2wdrw7FO/0jK+NO4FZfcdkMC4gBNcv6EMy23ojBcGWu6J7gp0oi2wBhSsOgePIKfE5MxzwAWoZtLIJLBINs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780846418; c=relaxed/simple;
+	bh=4ZP0m5DCW4H/vJZTDUnDL39ccjigQliH4W286OcBo28=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Q5+mW1kh6lDVYWcD5ZVsiQyDnXXsN3j0LvOzlco9e9Gh8lCfWG2UqWRtjLVuMXEnGCofGHOHBS5SdY0Zj5AJz/fr11ELgKhDabfvAdyWs85BXfAm4cN5jMw1Jw/htgz24og2wuVpT/rxoiO922ycg594eFAOuxuN8mEtSZYKPEw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EQaPDRjZ; arc=pass smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="DCj1XtEm"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Cc:To:From:Date:Message-ID;
-	bh=ilUlGW5XWW4BRi2NC/f5VlE9JmLP22f6BbeS6mMc508=; b=DCj1XtEmPQ0EicyBRTrdbl2Nkr
-	smaZdjcOHB9K39zEHh9afC550NLBqWKqF58X5gPxywGroY/Qu6bdl4UnjSjSPkZcP4uPdcDq4NeEz
-	50oRgeLQtAzvSmRe7MG1/VQs81dp/To5bR7KsXBj2u/1BW3rSBxJHh6K/zmzWT4MfeNtlvo20ndoj
-	8mrAgZIglZYn3anfZ4VIZeSXwF+2VE4VsX93XwZe3dLNSutWS3PZO/XwqQAtPIWx0WeKf4AWNFuI4
-	UmbDAaL+sZK7QcdpFRCftWlLr2h8/k55dlnb0sIC17SUDe0jjsZ+3baOZ+PW2zk3qrf7CcXzGg40F
-	bC/JmgpuDU5H4YpchQ+7Mbsh7zeIYcomUPFY2FVAaM3StsojJObMfmBArNlVGvfEtV84FzeeKc5vE
-	Nf6BznqYY/Z03xzGZ+c0hieZmXpAGNVm5rCHxStSWju6WSFc6yrs3EoMJrDJeP6iTPUbUCD/iuEsM
-	hLp6LunBc3wotsag163bJ59O;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wWEfi-0000000EfLQ-1Afq;
-	Sun, 07 Jun 2026 14:40:18 +0000
-Message-ID: <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
-Date: Sun, 7 Jun 2026 16:40:16 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EQaPDRjZ"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-9154ca1aa1dso618694485a.0
+        for <linux-cifs@vger.kernel.org>; Sun, 07 Jun 2026 08:33:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780846416; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TVRRQrNhFZGNiP9LHsi71gZTY8Z2nZcy9LexqPVkGZPfQ+QSH/yROmqDpIDWJFoyld
+         MAFV/Yi2NMYR4JL00fWAc0UVmuIiuVwJoMJRxRs6puszeopccMAC+18GXSmcM0kNmnt6
+         +Rjeh0re5h0D2jvyQSl2Nt+Rf/+1y3+pm7kCH4Bd2lrkAQ3Q6PsJpDOdJxuB1YvzZdPc
+         ehEAuLQSHx9GPPPACx1jR2hyNXExmpjVuWrb/mtAqviPhe5M1axvQiYxLeS8DHXYLCKz
+         JEIXGMYsh+EtWntnCPRlwUqlQEyc/whfrz3PIyy1wESu6G8bBywHikPv8UW6X8GYLnQ9
+         H5+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=sz459/uU78CQrP/iGzk56Ui3JxP9skMhu9oEu2XdACU=;
+        fh=Yz6FVGoZ8UNm05f7/aowpptF790dx1AUAoKqVhQBWcQ=;
+        b=hDoSZh+r1MSFCmV99zAoEneM+yFAc6BTCkreyrl7HA1/Np1MPLDlGRLVwtJH10YXhm
+         7OZyF4mpyWLyarXS+/aWfsG8O3zRXUkk1+rXXuWYwszmW27DJR+K8zQNvTgRfeyLynDc
+         O/rv1DRD+Uktk2Rrj9uNslI77JnkYYNRONRAftlfO6NBmNhkOjFQrh7IuPjF5i7+VLJZ
+         pc9In3jeVidZs2Vjpuxl2ekTiHGUOKAiXVwUdDvX9pBUzQOXNLZGFyLNGTYzUrwiavdE
+         HCtAKUtvKPiGRsgtNFMLxM/NDWCtzWGG4wdZw2gjHm/an9e9wbQEZ1Rsx/9DHYBZuFrm
+         k/CQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780846416; x=1781451216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sz459/uU78CQrP/iGzk56Ui3JxP9skMhu9oEu2XdACU=;
+        b=EQaPDRjZMBlGP6R7MCGCxq1i5ZPyqENQqQO7dFD1CfIfShQhg0GHyEdNi4kw+1/i7w
+         fPwhwfhv8M3j3zx+WdvjP3uVsJG5v0chj6MFrTjvNKjCeIF1sN/51ND5iaxFFMtrTiLw
+         +vQI5dS9R9ek3ZeIHpo0K+8ueeOz+yjpmXUdj8a8J0ohjKaD22/L1Tkj6SfC5W+mUbS0
+         j0Bld9TocUNLOBpsW40OU/VK6GN/tdvh1/EEiyQwYbZZdgOGt/NSq6aMYoaEO2qIzyRM
+         CbNA61wtbvARokVYOTM+4wOmNCVlSFF1wXIN3G8C/IcuqKPfnKY4PlIRjkMqKRO6FSn5
+         0fgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780846416; x=1781451216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sz459/uU78CQrP/iGzk56Ui3JxP9skMhu9oEu2XdACU=;
+        b=Yj8CHI4+jCTobSf3XKQpMWQwzgnJ/jq5n/onGmzAE1z4b1jjhlRw/gG5je8WYgYyyq
+         yUqtGJBWKXzaXgKF+vxaNBrpjS2e5VbO+yhQYm72iM4j792SBQjzUsW4ME+kJs+l1Wdi
+         ncHlAYbbAMvhi2pCxMbw2c5VH7RLoZm6AmiGLPT7HrXYUk5X7ZxbWA8ppncUls2b2hNN
+         zHAt2W42PpwLpuCPzZ8z/thRAnwCskpRECigJQKRbTgGems/wLlLP3YsANFVo4q9Epe2
+         6NDKYkQPYBnAJccB2MbamBpY+qBoXOZTyYJ0B4+2TM1pBeMRiF9pHjeNUpXcJxMOMky8
+         WLbQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+eNUApweoEtWuvvFWh/dDEi3iHe+uqqZCAnFp04q2o8xei7S3CPtCBVipfoHQ2h25LcqQ5iWVXrt8c@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbWxwGSZ0+cA5wswEvNdAP8xPZPPIfVpy5rWz1fjFKL2qM7T8a
+	7eJk2+kcZfuoZKTYqrbnM3/rciO0ZT4WsPM8cxCSopSeYodIijG0xHvECkqIVKwq4Cy8F7DUeQx
+	I3H7BdiCAPJDneWIx0dqj+kpQUr4Xvkc=
+X-Gm-Gg: Acq92OFOkEAIPdKnW5A5uZj9LQvfgKoKPUEoCmuXFkAOXAgaTwO2zr8jiZjZKaMRUoi
+	h0hm+gO3CJ8a6jh9XC9sy+EiEI8BdsCbivOA64carRIa0n7jrOrSsueqvtR0KtkyWp6ajxTFFTj
+	NaKT+J7NNLTd/PDWlO3oyQiNNW9j8FIvLmB6XpA8LbMzsHP+djQsNrKdXGs1Q+gjSy6BEqUCnUk
+	IaeuXjr+gRnQS9GFVdzppIkhq2mR1rBsyNqsETq1MtOczWyiSSEnQWmHzvkZaZRGI5THblGJclS
+	Cbu+k7l19gKkXkY+F8MHHaVeRsABFCbwqPEHIMqNRMiAb+IiViNdrhd02vf1nonwCPq2iIm8gDA
+	KlYk/VUO+G57AHusiiZmYQah0/eAjcaqlmt3PcxD/xt0GiDj2LMrsDydOQbLMrLlKP2ikl523LS
+	LqHcOe8edD+AVXQuSMmqdZooLZ9jH3bw==
+X-Received: by 2002:a05:622a:4c13:b0:517:5bc6:b575 with SMTP id
+ d75a77b69052e-51798673664mr114564061cf.4.1780846415890; Sun, 07 Jun 2026
+ 08:33:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] smb: client: fix chmod and chgrp with SMB3.1.1 POSIX
- Extensions
-From: Ralph Boehme <slow@samba.org>
-To: Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>
-Cc: samba-technical <samba-technical@lists.samba.org>,
- CIFS <linux-cifs@vger.kernel.org>, Jeremy Allison <jrasamba@gmail.com>
-References: <CAH2r5mv_wgjBqEsWYGxEt86tN6hJNV1VBY2YipAbeP8goxsSZA@mail.gmail.com>
- <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- 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
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------9VGzFO9v5VUV0MmfSpiGeDM5"
+References: <20260605163519.169916-1-huiwen.he@linux.dev> <20260605163519.169916-3-huiwen.he@linux.dev>
+In-Reply-To: <20260605163519.169916-3-huiwen.he@linux.dev>
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 7 Jun 2026 10:33:23 -0500
+X-Gm-Features: AVVi8Cd3dlraeDaxo_fZZ5E1HUyIeJWiVLMTmp_6738meMMksLBVnwKDoYQNk5g
+Message-ID: <CAH2r5mv81BSAp0weQmJ=OjUE-s9wD14vUeDSC0jgy22eabHoXw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] smb/client: do not account EOF extension as allocation
+To: Huiwen He <huiwen.he@linux.dev>
+Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
+	chenxiaosong@kylinos.cn, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------9VGzFO9v5VUV0MmfSpiGeDM5
-Content-Type: multipart/mixed; boundary="------------hB8TlPdApo92Hwtp5KyCzjQo";
- protected-headers="v1"
-Message-ID: <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
-Date: Sun, 7 Jun 2026 16:40:16 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] smb: client: fix chmod and chgrp with SMB3.1.1 POSIX
- Extensions
-From: Ralph Boehme <slow@samba.org>
-To: Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>
-Cc: samba-technical <samba-technical@lists.samba.org>,
- CIFS <linux-cifs@vger.kernel.org>, Jeremy Allison <jrasamba@gmail.com>
-References: <CAH2r5mv_wgjBqEsWYGxEt86tN6hJNV1VBY2YipAbeP8goxsSZA@mail.gmail.com>
- <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- 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
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
+This patch regresses xfstests generic/568 and generic/701 can you
+update it to address that regression?
 
---------------hB8TlPdApo92Hwtp5KyCzjQo
-Content-Type: multipart/mixed; boundary="------------PzuSwVZld5N6VZ1W5qt32scE"
+generic/568  0s ... - output mismatch (see
+/home/smfrench/xfstests-dev/results//sambamfs/generic/568.out.bad)
+    --- tests/generic/568.out 2025-08-22 09:54:32.333796989 -0500
+    +++ /home/smfrench/xfstests-dev/results//sambamfs/generic/568.out.bad
+2026-06-07 10:20:34.002140048 -0500
+    @@ -1,4 +1,4 @@
+     QA output created by 568
+     wrote 2/2 bytes at offset block_size - 1
+     XXX Bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+    -OK: File did not grow.
+    +ERROR: File grew from 0 B to 1536 B when writing to the fallocated ran=
+ge.
+    ...
+    (Run 'diff -u /home/smfrench/xfstests-dev/tests/generic/568.out
+/home/smfrench/xfstests-dev/results//sambamfs/generic/568.out.bad'  to
+see the entire diff)
+generic/701  1s ... - output mismatch (see
+/home/smfrench/xfstests-dev/results//sambamfs/generic/701.out.bad)
+    --- tests/generic/701.out 2025-08-22 09:54:32.350807804 -0500
+    +++ /home/smfrench/xfstests-dev/results//sambamfs/generic/701.out.bad
+2026-06-07 10:20:34.573010303 -0500
+    @@ -1,2 +1,3 @@
+     QA output created by 701
+    -Number of allocated blocks after truncate is in range
+    +Number of allocated blocks after truncate has value of 0
+    +Number of allocated blocks after truncate is NOT in range
+8304721.92 .. 8472494.08
+    ...
+    (Run 'diff -u /home/smfrench/xfstests-dev/tests/generic/701.out
+/home/smfrench/xfstests-dev/results//sambamfs/generic/701.out.bad'  to
+see the entire diff)
 
---------------PzuSwVZld5N6VZ1W5qt32scE
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
 
-SGkgU3RldmUsDQoNCkkgc3BlbmQgc29tZSBtb3JlIHRpbWUgbG9va2luZyBpbnRvIHRoaXMu
-IFNvbWUgZmluZGluZ3M6DQoNCiogV2UgZG9uJ3QgaGF2ZSBhbnkga2luZCBvZiBkZXNpZ24g
-aWYgYW5kIGhvdyB1aWRzL2dpZHMgY291bGQgYmUgZW5jb2RlZCANCmFzIFMtMS0yMi14IChT
-YW1iYSBzdHlsZSkgb3IgUy0xLTUtODgteCAoTVMgTkZTIHN0eWxlKSBpbiBTTUIzIFBPU0lY
-Lg0KDQoqIEZvciBjaG1vZCgpIFNNQjMtUE9TSVggKmRvZXMqIHRlbGwgeW91IHRvIHVzZSBT
-LTEtNS04OC0zLTxtb2RlPiwgc28gDQoqaWYqIHdlIHdhbnQgc29tZSBTSUQgZW5jb2Rpbmcg
-b2YgdWlkcy9naWRzLCB3ZSBzaG91bGQgdXNlIFMtMS01LTg4Lg0KDQoqIGNpZnMua28gc3Vw
-cG9ydHMgYm90aCBTLTEtMjIgYW5kIFMtMS01LTg4IHdoZW4gcXVlcnlpbmcgbWV0YWRhdGEg
-YW5kIA0KbWFwcGluZyB0byB1aWQvZ2lkLiBJIHRlc3RlZCBib3RoIHZlcnNpb25zIHdpdGgg
-YSBtb2RpZmllZCBTYW1iYSBzZXJ2ZXIgDQp0aGF0IGFsbG93ZWQgbWUgdG8gY29uZmlndXJl
-IHdoaWNoIFNJRHMgdG8gcmV0dXJuIChTLTEtNS1kb21haW4sIFMtMS0yMiANCm9yIFMtMS01
-LTg4KQ0KDQoqIFRvIGZpeCBjaG93bigpIGZvciBTTUIzIFBPU0lYLCBhbGwgd2UgbmVlZCBp
-cyB0aGUgc2Vjb25kIGh1bmsgZnJvbSANCnlvdXIgcGF0Y2gsIGNmIGF0dGFjaGVkIHBhdGNo
-c2V0LCBmaXJzdCBjb21taXQuIEJ5IGRlZmF1bHQgdGhpcyB3aWxsIA0Kb25seSB3b3JrIHdp
-dGggY2lmcy5pZG1hcCBzZXR1cCBhbmQgdXNlICJub3JtYWwiICJkb21haW4tU0lEcyIuDQoN
-CiogSWYgdGhlIHVzZXIgaXMgd29ya2luZyB3aXRoIGEgc2V0dXAgd2hlcmUgaWRzZnJvbXNp
-ZCBpcyBiZWluZyB1c2VkIChzbyANCmlkZW50aXRpZXMgYXJlIG1hcHBlZCB0byBhbmQgZnJv
-bSBTLTEtNS04OC14KSwgdGhlIHVzZXIgbW91bnRzIHdpdGggDQoicG9zaXgsaWRzZnJvbXNp
-ZCIgYW5kIHRoZSBleGlzdGluZyBjaG93bigpIGNvZGUgd2lsbCBjb3JyZWN0bHkgZW5jb2Rl
-IA0KdGhlIG1vZGUgYXMgYW4gUy0xLTUtODgtMy08bW9kZT4gQUNFLg0KDQoqIEBuYW1qYWU6
-IGtzbWJkIHdyb25nbHkgc3dpdGNoZWQgZnJvbSBTLTEtNS04OC14IHRvIFMtMS0yMi14IGlu
-IA0KNTYwOWJkZDlmZmRjY2Q4M2Y5MDAzNTExYjE4MDE1ODRiNzAzYmFhNS4NCg0KKiBAbmFt
-amFlOiBrc21iZCByZXR1cm5zIHRoZSB3cm9uZyBTSUQgZm9yIHRoZSBvd25lciBpbiB0aGUg
-DQpTTUIyX1BPU0lYX0NSRUFURV9DT05URVhUOg0KDQpDaGFpbiBFbGVtZW50OiBTTUIyX1BP
-U0lYX0NSRUFURV9DT05URVhUIA0KIjUwMjVhZDkzLWI0OWMtZTcxMS1iNDIzLTgzZGU5Njhi
-Y2Q3YyINCiAgICAgRGF0YTogUE9TSVggQ3JlYXRlIENvbnRleHQgcmVzcG9uc2UNCiAgICAg
-ICAgIE51bWJlciBvZiBMaW5rczogMQ0KICAgICAgICAgUmVwYXJzZSBUYWc6IFVua25vd24g
-KDB4MDAwMDAwMDcpDQogICAgICAgICBQT1NJWCBwZXJtczogMDYwNA0KICAgICAgICAgT3du
-ZXIgU0lEOiBTLTEtNS0yMS0yMzA1NzI0MTE2LTEyNzU5NTQ1OTgtMjYwNTI0OTAyNi0xMDAw
-DQogICAgICAgICBHcm91cCBTSUQ6IFMtMS0yMi0yLTEwMDANCg0KSXQgbWFwcyB0aGUgZ2lk
-IHRvIHRoZSBTLTEtMjIgZG9tYWluIGJ1dCByZXR1cm5zIHRoZSB1aWQgbWFwcGVkIHRvIHRo
-ZSANCmxvY2FsIGRvbWFpbiBmcm9tIC9ldGMva3NtYmQva3NtYmQuc3ViYXV0aC4NCg0KKiBX
-aGF0J3Mgc3RpbGwgbWlzc2luZyBpbW8gaXMgYSBwcm90b2NvbCBzcGVjIHRvIG5lZ290aWF0
-ZSB1c2Ugb2YgDQpTLTEtNS04OC14IGlkZW50aXR5IG1hcHBpbmcuIFdlIGNvdWxkIGRlZmlu
-ZSBhIG5ldyBjcmVhdGUgY29udGV4dCB0aGF0IA0KYWxsb3dzIHRoZSBjbGllbnQgdG8gcmVx
-dWVzdCBpdC4gSWYgdGhlIHNlcnZlciBzdXBwb3J0cyBpdCwgaXQgcmV0dXJucyANCnRoZSBj
-b250ZXh0LiBUaGUgY2xpZW50IHRoZW4gb25seSB1c2VzIHRoZSBtYXBwaW5nIGlmIHRoZSBz
-ZXJ2ZXIgDQpzaWduYWxsZWQgc3VwcG9ydC4gRm9yIFNhbWJhIHRoaXMgbWlnaHQgYmUgcXVp
-dGUgc29tZSB3b3JrIHBhcnRpY3VsYXJpbHkgDQppbiB0aGUgQUNMIGNvZGUsIG5vdCBzbyBt
-dWNoIGZvciBvd25lciBhbmQgZ3JvdXAuDQoNCi1zbG93DQo=
---------------PzuSwVZld5N6VZ1W5qt32scE
-Content-Type: text/x-patch; charset=UTF-8; name="smb3_posix_chown.patch"
-Content-Disposition: attachment; filename="smb3_posix_chown.patch"
-Content-Transfer-Encoding: base64
 
-RnJvbSAxNjMyOGMzNGE0YzUzZGI4ZTM1ZGVjMTMyYTc5MzZhM2Q1ZjcyN2M1IE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBSYWxwaCBCb2VobWUgPHNsb3dAc2FtYmEub3JnPgpE
-YXRlOiBTdW4sIDcgSnVuIDIwMjYgMTU6MjM6MTggKzAyMDAKU3ViamVjdDogW1BBVENIIDEv
-Ml0gc21iL2NsaWVudDogZml4IGNobW9kIGFuZCBjaGdycCB3aXRoIFNNQjMgUE9TSVgKIEV4
-dGVuc2lvbnMKCmNobW9kIGFuZCBjaGdycCB3ZXJlIGJlaW5nIGlnbm9yZWQgd2hlbiBtb3V0
-aW5nIHdpdGggU01CMwpQT1NJWCBFeHRlbnNpb25zLgoKQ2M6IHN0YWJsZUB2Z2VyLmtlcm5l
-bC5vcmcKU2lnbmVkLW9mZi1ieTogUmFscGggQm9laG1lIDxzbG93QHNhbWJhLm9yZz4KLS0t
-CiBmcy9zbWIvY2xpZW50L2lub2RlLmMgfCAzICsrLQogMSBmaWxlIGNoYW5nZWQsIDIgaW5z
-ZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQv
-aW5vZGUuYyBiL2ZzL3NtYi9jbGllbnQvaW5vZGUuYwppbmRleCA5NDcyYzBhNmMxODcuLjNi
-NWJhYzkzODEyZCAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9pbm9kZS5jCisrKyBiL2Zz
-L3NtYi9jbGllbnQvaW5vZGUuYwpAQCAtMzM0OCw3ICszMzQ4LDggQEAgY2lmc19zZXRhdHRy
-X25vdW5peChzdHJ1Y3QgZGVudHJ5ICpkaXJlbnRyeSwgc3RydWN0IGlhdHRyICphdHRycykK
-IAlpZiAoYXR0cnMtPmlhX3ZhbGlkICYgQVRUUl9HSUQpCiAJCWdpZCA9IGF0dHJzLT5pYV9n
-aWQ7CiAKLQlpZiAoc2JmbGFncyAmIChDSUZTX01PVU5UX0NJRlNfQUNMIHwgQ0lGU19NT1VO
-VF9NT0RFX0ZST01fU0lEKSkgeworCWlmICgoc2JmbGFncyAmIChDSUZTX01PVU5UX0NJRlNf
-QUNMIHwgQ0lGU19NT1VOVF9NT0RFX0ZST01fU0lEKSkgfHwKKwkgICAgY2lmc19zYl9tYXN0
-ZXJfdGNvbihjaWZzX3NiKS0+cG9zaXhfZXh0ZW5zaW9ucykgewogCQlpZiAodWlkX3ZhbGlk
-KHVpZCkgfHwgZ2lkX3ZhbGlkKGdpZCkpIHsKIAkJCW1vZGUgPSBOT19DSEFOR0VfNjQ7CiAJ
-CQlyYyA9IGlkX21vZGVfdG9fY2lmc19hY2woaW5vZGUsIGZ1bGxfcGF0aCwgJm1vZGUsCi0t
-IAoyLjU0LjAKCgpGcm9tIDY2MzQ5YjEwNjM5NTE4ODg5ZDFmYzg4Yjk3OTI1OWQwZWFiOWZk
-MjUgTW9uIFNlcCAxNyAwMDowMDowMCAyMDAxCkZyb206IFJhbHBoIEJvZWhtZSA8c2xvd0Bz
-YW1iYS5vcmc+CkRhdGU6IFN1biwgNyBKdW4gMjAyNiAxNToyNjowOCArMDIwMApTdWJqZWN0
-OiBbUEFUQ0ggMi8yXSBzbWIvY2xpZW50OiBmaXggc2VjdXJpdHkgZmxhZyBjYWxjdWxhdGlv
-biB3aGVuIHNldHRpbmcKIHNlY3VyaXR5IGluZm9ybWF0aW9uCgphY2xmbGFnIGlzIG9mIHR5
-cGUgTVMtRFRZUCAyLjQuNyBTRUNVUklUWV9JTkZPUk1BVElPTiB3aGljaCB0ZWxscyB0aGUg
-c2VydmVyCndoaWNoIHBhcnRzIG9mIHRoZSBzZWN1cml0eSBkZXNjcmlwdG9yIHdlJ3JlIGFj
-dHVhbGx5IG1vZGlmeWluZyAob3duZXIsIGdyb3VwLApkYWNsLCBzYWNsLCAuLi4pLgoKV2hl
-biBkb2luZyBhIGNob3duKCkgb3IgY2hncnAoKSB3ZSBkb24ndCB3YW50IHRvIGZvcmNlCkRB
-Q0xfU0VDVVJJVFlfSU5GT1JNQVRJT04sIGJ1aWxkX3NlY19kZXNjKCkgZG9lcyB0aGUgcHJv
-cGVyIGZsYWcgY2FsY3VsYXRpb24uCgpTaWduZWQtb2ZmLWJ5OiBSYWxwaCBCb2VobWUgPHNs
-b3dAc2FtYmEub3JnPgotLS0KIGZzL3NtYi9jbGllbnQvY2lmc2FjbC5jIHwgOCArKysrKysr
-LQogMSBmaWxlIGNoYW5nZWQsIDcgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlm
-ZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvY2lmc2FjbC5jIGIvZnMvc21iL2NsaWVudC9jaWZz
-YWNsLmMKaW5kZXggNzg2ZGJiYzQzYzViLi4zYWVlYTAxNTJkZWQgMTAwNjQ0Ci0tLSBhL2Zz
-L3NtYi9jbGllbnQvY2lmc2FjbC5jCisrKyBiL2ZzL3NtYi9jbGllbnQvY2lmc2FjbC5jCkBA
-IC0xNjc2LDcgKzE2NzYsNyBAQCBpZF9tb2RlX3RvX2NpZnNfYWNsKHN0cnVjdCBpbm9kZSAq
-aW5vZGUsIGNvbnN0IGNoYXIgKnBhdGgsIF9fdTY0ICpwbm1vZGUsCiAJCQlrdWlkX3QgdWlk
-LCBrZ2lkX3QgZ2lkKQogewogCWludCByYyA9IDA7Ci0JaW50IGFjbGZsYWcgPSBDSUZTX0FD
-TF9EQUNMOyAvKiBkZWZhdWx0IGZsYWcgdG8gc2V0ICovCisJaW50IGFjbGZsYWcgPSAwOwog
-CV9fdTMyIHNlY2Rlc2NsZW4gPSAwOwogCV9fdTMyIG5zZWNkZXNjbGVuID0gMDsKIAlfX3Uz
-MiBkYWNsb2Zmc2V0ID0gMDsKQEAgLTE3NzIsNiArMTc3MiwxMiBAQCBpZF9tb2RlX3RvX2Np
-ZnNfYWNsKHN0cnVjdCBpbm9kZSAqaW5vZGUsIGNvbnN0IGNoYXIgKnBhdGgsIF9fdTY0ICpw
-bm1vZGUsCiAKIAljaWZzX2RiZyhOT0lTWSwgImJ1aWxkX3NlY19kZXNjIHJjOiAlZFxuIiwg
-cmMpOwogCisJaWYgKGFjbGZsYWcgPT0gMCkgeworCQljaWZzX2RiZyhGWUksICJzZXRfY2lm
-c19hY2wgYWNsZmxhZz0wLCBubyBjaGFuZ2UgbWFwcGVkXG4iKTsKKwkJcmMgPSAwOworCQln
-b3RvIGlkX21vZGVfdG9fY2lmc19hY2xfZXhpdDsKKwl9CisKIAlpZiAob3BzLT5zZXRfYWNs
-ID09IE5VTEwpCiAJCXJjID0gLUVPUE5PVFNVUFA7CiAKLS0gCjIuNTQuMAoK
+On Fri, Jun 5, 2026 at 11:36=E2=80=AFAM Huiwen He <huiwen.he@linux.dev> wro=
+te:
+>
+> From: Huiwen He <hehuiwen@kylinos.cn>
+>
+> cifs_setsize() updates the local inode size after SetEOF succeeds. It als=
+o
+> used the new EOF as a local i_blocks estimate, but extending EOF does not
+> prove that the intervening range was allocated.
+>
+> For example, after writing 1 MiB and then extending EOF to 10 MiB, the
+> client can report the file as fully allocated even though the server stil=
+l
+> reports a much smaller AllocationSize:
+>
+>         $ dd if=3D/dev/zero of=3Dtest bs=3D1M count=3D1
+>         $ truncate -s 10M test && stat -c 'size=3D%s blocks=3D%b' test
+>         $ stat --cached=3Dnever -c 'size=3D%s blocks=3D%b' test
+>
+>         client stat:            size=3D10485760 blocks=3D20480
+>         server stat:            size=3D10485760 blocks=3D2056
+>         client stat(nocache):   size=3D10485760 blocks=3D2056
+>
+> A later attribute revalidation may correct i_blocks, but callers such as
+> xfstests generic/495 invoke swapon immediately after truncate. The swapfi=
+le
+> hole check can therefore observe the inflated local i_blocks value and
+> accept a sparse file.
+>
+> Do not grow i_blocks from cifs_setsize() on EOF extension.  Only clamp it
+> on shrink; allocation growth must come from write completion or from
+> server-reported AllocationSize.
+>
+> With this change, EOF extension no longer makes a sparse file appear
+> fully allocated before the next attribute revalidation, and xfstests
+> generic/495 correctly rejects the sparse swapfile.
+>
+> Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> ---
+>  fs/smb/client/inode.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+> index 826d36ed13ec..e0aa71b87d27 100644
+> --- a/fs/smb/client/inode.c
+> +++ b/fs/smb/client/inode.c
+> @@ -3038,13 +3038,20 @@ int cifs_fiemap(struct inode *inode, struct fiema=
+p_extent_info *fei, u64 start,
+>
+>  void cifs_setsize(struct inode *inode, loff_t offset)
+>  {
+> +       loff_t old_size;
+> +       u64 blocks =3D CIFS_INO_BLOCKS(offset);
+> +
+>         spin_lock(&inode->i_lock);
+> +       old_size =3D i_size_read(inode);
+>         i_size_write(inode, offset);
+> +
+>         /*
+> -        * Until we can query the server for actual allocation size,
+> -        * this is best estimate we have for blocks allocated for a file.
+> +        * Extending EOF does not allocate the intervening range. Only cl=
+amp
+> +        * i_blocks on shrink; allocation growth comes from writes or fro=
+m the
+> +        * server-reported AllocationSize.
+>          */
+> -       inode->i_blocks =3D CIFS_INO_BLOCKS(offset);
+> +       if (offset < old_size && (u64)inode->i_blocks > blocks)
+> +               inode->i_blocks =3D blocks;
+>         spin_unlock(&inode->i_lock);
+>         inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
+>         truncate_pagecache(inode, offset);
+> --
+> 2.43.0
+>
 
---------------PzuSwVZld5N6VZ1W5qt32scE--
 
---------------hB8TlPdApo92Hwtp5KyCzjQo--
+--
+Thanks,
 
---------------9VGzFO9v5VUV0MmfSpiGeDM5
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmolgtEFAwAAAAAACgkQqh6bcSY5nkZm
-IRAAkaRNEdqK6LImppXgD2tAmCmWsCxLz4oGJYHmgwi4RJcCfxBBfy1xJn2uJVij/MZqX/trADyb
-I5Xg0nDgGnHOBgVxDXX31xPyfrdfZ2/48YMUTKpv4q4dix6EcFwKGAIFvreBKB4BPkqOrt440Bpp
-EHv3AzdmfVUlczlgZCdtHeXOHPgNiXOf7UDry/sRZlmnARdh9s4HNbA23pUMLC9tqhIY1zOu7xAa
-4DWdDno+oTiKD5VvV3WRaS8wm+QI6Qb0XoniINdYGniUJuOcuvd7+Rpaty/qf5KPt66PgYOZ3Ym2
-Ls98WXAGwr+M44rsXyWgdOUnIJHjzeHv2LvoFOEIdVVu2vSAIcGGzZJ6fMmi+BZHRDozmypreAai
-Dym0f0TYln37wrcTyMXu0dppe7eag36TyP6h6XgzkXwct/AyFl+/1aTsucNRwG9MM87gPufWbbb0
-fk78E0KcxSYhQERaMfMGjhwDulHcWNH3y0FBNy8sXKx2R5MqPNS7Erq8+vV5LgiD86MtxhFI9jmz
-hKSMojENIh64JhI5zEd2t7RpSrhURZQqRzTjK8R6VphPPYuH8apigYZOq9OiNj33GkQ8T4whbvDs
-WLdZOYX70+V3boOMlgFpeOFMm4Cr7HXeeYv5JugV6Ij8p9NNZnPquj9HiF/0NwRayjhxlYmtaydh
-RGs=
-=UL8X
------END PGP SIGNATURE-----
-
---------------9VGzFO9v5VUV0MmfSpiGeDM5--
+Steve
