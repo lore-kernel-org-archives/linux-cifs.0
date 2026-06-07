@@ -1,38 +1,38 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231DE1DA23
-	for <linux-cifs@vger.kernel.org>; Sun,  7 Jun 2026 14:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15784071E4
+	for <linux-cifs@vger.kernel.org>; Sun,  7 Jun 2026 14:55:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780843467; cv=none; b=Tzvu2a/irWS27jCvWL3dy366ohxivv6+G/I2aYfpFt99vrhiTkRmV1dTUZISBt6qi+nu7drIvNLYOoZ0Rh1N8C5m2Cwhe6pqR5+nlCdNL3TSAC2+fb++tEUI1KHKa1Z8CG0BsSNgFblQJiCk4kFh+VFUR8zYvN6Kak18VkDiDEU=
+	t=1780844124; cv=none; b=WIJy7ZQ+Ya9LnIudLvwQBhbJGR57OJzHccy9rhsyNkFYz0wv36LSWrCNn2utNm88BmSskjlypgVUpNhCG2oaRg0ZD8Ks+fiAdJ53qrZZAsg2QY5Bt/capluyXHnTf4vfwFTars/9X0XpWSICSnpw3jfidyS71Gd78gEEP/9ul+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780843467; c=relaxed/simple;
-	bh=qERFDx0IAWSzmIKxRKK4iKOMshhcNHi8O4BMtx0FHQg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Tvnvrw1KBr8f08sEasqXeu+jY/0RGkJVaGkomC44B9dFX4Ots7LXrrECJy60GFiPXS1rQTNx1jKLPmRX7ZnytP9NaxfBgnITToaFkclvBgMQz6N6EzndppnV5Kaxg+QRQnDL90i8mRw686nSmSEFkxHe5yCGRQmOQ+dEHCjEXy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=SRBUOF1B; arc=none smtp.client-ip=144.76.82.148
+	s=arc-20240116; t=1780844124; c=relaxed/simple;
+	bh=ilUlGW5XWW4BRi2NC/f5VlE9JmLP22f6BbeS6mMc508=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=S6gZloEZYTe03ySIKfGTjYkvQZaLLMKJijt9gTEL+eqOwkf+Va4ytKqxV1Hzn2l1nb9i/5wIsbYR8f7Q5RaHW9OtdD35FRqcc1Mz7oSTc1zeHFLEmd7auVuowTjYURYjJq7h2YPU32YoEAwqKushAEaKC2KCZczwZaftcr0vZik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=DCj1XtEm; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="SRBUOF1B"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="DCj1XtEm"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=qERFDx0IAWSzmIKxRKK4iKOMshhcNHi8O4BMtx0FHQg=; b=SRBUOF1B6PQjYyGQsQEz87nMMG
-	r1RmiBLlqO3L+3FEzhsKkpkZTOxkPoeKbVS3Plj56USyBsGUTZrDbWPWsBKbHxw+uds1zXHpQG2Jt
-	aynpbAD/kp+aiJhn2TaLXC1mJBtMunMGwMqtJ1QfL5rCwpCnNAfZHZ+D1KsCeE0fkNgPS5tdGoA83
-	8pVDvs27/8kZ7fFll7UHIyYvL94fEIruuHP+iBRLCOOCjC6bXL49uq+ZvJGUpR/6ZyrF8smgPI1sG
-	sJzdXktnoNMMgDMZqAE9RNBZYCm6+ArShpbhumLzCJBFhN6wJZTqvzWWHcsWJ4vVq1yAXhH89I2Rs
-	w+jrHXOrohaibfo2XVojWUjgfqf8FVWnBmFN63+tNuQkRwS1e+xvSFaMFPUw6XSUCoTb1cKzNcNzZ
-	ayqGFU63UFCIjIlVz7sh9XDHVl1UgLuetQT0jVdvGUXw/Kxzqwu4sFBsiPvblmKOKQcIxp4hV7VyS
-	9xyVSafzG0aFK3GSEZo+vKqu;
+	s=42; h=Cc:To:From:Date:Message-ID;
+	bh=ilUlGW5XWW4BRi2NC/f5VlE9JmLP22f6BbeS6mMc508=; b=DCj1XtEmPQ0EicyBRTrdbl2Nkr
+	smaZdjcOHB9K39zEHh9afC550NLBqWKqF58X5gPxywGroY/Qu6bdl4UnjSjSPkZcP4uPdcDq4NeEz
+	50oRgeLQtAzvSmRe7MG1/VQs81dp/To5bR7KsXBj2u/1BW3rSBxJHh6K/zmzWT4MfeNtlvo20ndoj
+	8mrAgZIglZYn3anfZ4VIZeSXwF+2VE4VsX93XwZe3dLNSutWS3PZO/XwqQAtPIWx0WeKf4AWNFuI4
+	UmbDAaL+sZK7QcdpFRCftWlLr2h8/k55dlnb0sIC17SUDe0jjsZ+3baOZ+PW2zk3qrf7CcXzGg40F
+	bC/JmgpuDU5H4YpchQ+7Mbsh7zeIYcomUPFY2FVAaM3StsojJObMfmBArNlVGvfEtV84FzeeKc5vE
+	Nf6BznqYY/Z03xzGZ+c0hieZmXpAGNVm5rCHxStSWju6WSFc6yrs3EoMJrDJeP6iTPUbUCD/iuEsM
+	hLp6LunBc3wotsag163bJ59O;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1wWEjg-0000000EfPd-08ZF;
-	Sun, 07 Jun 2026 14:44:24 +0000
-Message-ID: <dfa47ace-7f18-427c-8d2c-74d2d61eb6d7@samba.org>
-Date: Sun, 7 Jun 2026 16:44:23 +0200
+	id 1wWEfi-0000000EfLQ-1Afq;
+	Sun, 07 Jun 2026 14:40:18 +0000
+Message-ID: <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
+Date: Sun, 7 Jun 2026 16:40:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -42,15 +42,13 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] smb: client: fix chmod and chgrp with SMB3.1.1 POSIX
  Extensions
+From: Ralph Boehme <slow@samba.org>
 To: Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>,
- samba-technical <samba-technical@lists.samba.org>,
- Jeremy Allison <jrasamba@gmail.com>
+Cc: samba-technical <samba-technical@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>, Jeremy Allison <jrasamba@gmail.com>
 References: <CAH2r5mv_wgjBqEsWYGxEt86tN6hJNV1VBY2YipAbeP8goxsSZA@mail.gmail.com>
  <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
- <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
 Content-Language: en-US, de-DE
-From: Ralph Boehme <slow@samba.org>
 Autocrypt: addr=slow@samba.org; keydata=
  xsFNBFRbb/sBEADGFqSo7Ya3S00RsDWC7O4esYxuo+J5PapFMKvFNiYvpNEAoHnoJkzT6bCG
  eZWlARe4Ihmry9XV67v/DUa3qXYihV62jmiTgCyEu1HFGhWGzkk99Vahq/2kVgN4vwz8zep1
@@ -95,30 +93,28 @@ Autocrypt: addr=slow@samba.org; keydata=
  PgCGx2XZ0ICO1zdh1OafQXZcI0ZKA/+ZmMt7rFcf8cdjwJ3qRKtScUYhxq2N9wL3fQJNQPvK
  TXc80T2QVqV/yS3gZ4UmqYaBcMIoAyQWu8vbJnt6vCnf33g5sko3H8vbfpFW2TgesM6tyK1W
  rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
+In-Reply-To: <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------CrhkjUJ0Zv464ZIcQrziCwU1"
+ boundary="------------9VGzFO9v5VUV0MmfSpiGeDM5"
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------CrhkjUJ0Zv464ZIcQrziCwU1
-Content-Type: multipart/mixed; boundary="------------1NhYNJfLFmqwuZd2NyzQV07G";
+--------------9VGzFO9v5VUV0MmfSpiGeDM5
+Content-Type: multipart/mixed; boundary="------------hB8TlPdApo92Hwtp5KyCzjQo";
  protected-headers="v1"
-Message-ID: <dfa47ace-7f18-427c-8d2c-74d2d61eb6d7@samba.org>
-Date: Sun, 7 Jun 2026 16:44:23 +0200
+Message-ID: <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
+Date: Sun, 7 Jun 2026 16:40:16 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] smb: client: fix chmod and chgrp with SMB3.1.1 POSIX
  Extensions
+From: Ralph Boehme <slow@samba.org>
 To: Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>,
- samba-technical <samba-technical@lists.samba.org>,
- Jeremy Allison <jrasamba@gmail.com>
+Cc: samba-technical <samba-technical@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>, Jeremy Allison <jrasamba@gmail.com>
 References: <CAH2r5mv_wgjBqEsWYGxEt86tN6hJNV1VBY2YipAbeP8goxsSZA@mail.gmail.com>
  <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
- <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
 Content-Language: en-US, de-DE
-From: Ralph Boehme <slow@samba.org>
 Autocrypt: addr=slow@samba.org; keydata=
  xsFNBFRbb/sBEADGFqSo7Ya3S00RsDWC7O4esYxuo+J5PapFMKvFNiYvpNEAoHnoJkzT6bCG
  eZWlARe4Ihmry9XV67v/DUa3qXYihV62jmiTgCyEu1HFGhWGzkk99Vahq/2kVgN4vwz8zep1
@@ -163,42 +159,132 @@ Autocrypt: addr=slow@samba.org; keydata=
  PgCGx2XZ0ICO1zdh1OafQXZcI0ZKA/+ZmMt7rFcf8cdjwJ3qRKtScUYhxq2N9wL3fQJNQPvK
  TXc80T2QVqV/yS3gZ4UmqYaBcMIoAyQWu8vbJnt6vCnf33g5sko3H8vbfpFW2TgesM6tyK1W
  rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
+In-Reply-To: <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
 
---------------1NhYNJfLFmqwuZd2NyzQV07G
+--------------hB8TlPdApo92Hwtp5KyCzjQo
+Content-Type: multipart/mixed; boundary="------------PzuSwVZld5N6VZ1W5qt32scE"
+
+--------------PzuSwVZld5N6VZ1W5qt32scE
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: base64
 
-T24gNi83LzI2IDQ6NDAgUE0sIFJhbHBoIEJvZWhtZSB2aWEgc2FtYmEtdGVjaG5pY2FsIHdy
-b3RlOg0KPiAqIElmIHRoZSB1c2VyIGlzIHdvcmtpbmcgd2l0aCBhIHNldHVwIHdoZXJlIGlk
-c2Zyb21zaWQgaXMgYmVpbmcgdXNlZCAoc28gDQo+IGlkZW50aXRpZXMgYXJlIG1hcHBlZCB0
-byBhbmQgZnJvbSBTLTEtNS04OC14KSwgdGhlIHVzZXIgbW91bnRzIHdpdGggDQo+ICJwb3Np
-eCxpZHNmcm9tc2lkIiBhbmQgdGhlIGV4aXN0aW5nIGNob3duKCkgY29kZSB3aWxsIGNvcnJl
-Y3RseSBlbmNvZGUgDQo+IHRoZSBtb2RlIGFzIGFuIFMtMS01LTg4LTMtPG1vZGU+IEFDRS4N
-CmFoLCBkcmF0LCBtZWFuIHRvIHNheSAid2lsbCBlbmNvZGUgdGhlIG93bmVyIG9yIGdyb3Vw
-IGFzIFMtMS01LTg4LTF8MiBTSUQiLg0K
+SGkgU3RldmUsDQoNCkkgc3BlbmQgc29tZSBtb3JlIHRpbWUgbG9va2luZyBpbnRvIHRoaXMu
+IFNvbWUgZmluZGluZ3M6DQoNCiogV2UgZG9uJ3QgaGF2ZSBhbnkga2luZCBvZiBkZXNpZ24g
+aWYgYW5kIGhvdyB1aWRzL2dpZHMgY291bGQgYmUgZW5jb2RlZCANCmFzIFMtMS0yMi14IChT
+YW1iYSBzdHlsZSkgb3IgUy0xLTUtODgteCAoTVMgTkZTIHN0eWxlKSBpbiBTTUIzIFBPU0lY
+Lg0KDQoqIEZvciBjaG1vZCgpIFNNQjMtUE9TSVggKmRvZXMqIHRlbGwgeW91IHRvIHVzZSBT
+LTEtNS04OC0zLTxtb2RlPiwgc28gDQoqaWYqIHdlIHdhbnQgc29tZSBTSUQgZW5jb2Rpbmcg
+b2YgdWlkcy9naWRzLCB3ZSBzaG91bGQgdXNlIFMtMS01LTg4Lg0KDQoqIGNpZnMua28gc3Vw
+cG9ydHMgYm90aCBTLTEtMjIgYW5kIFMtMS01LTg4IHdoZW4gcXVlcnlpbmcgbWV0YWRhdGEg
+YW5kIA0KbWFwcGluZyB0byB1aWQvZ2lkLiBJIHRlc3RlZCBib3RoIHZlcnNpb25zIHdpdGgg
+YSBtb2RpZmllZCBTYW1iYSBzZXJ2ZXIgDQp0aGF0IGFsbG93ZWQgbWUgdG8gY29uZmlndXJl
+IHdoaWNoIFNJRHMgdG8gcmV0dXJuIChTLTEtNS1kb21haW4sIFMtMS0yMiANCm9yIFMtMS01
+LTg4KQ0KDQoqIFRvIGZpeCBjaG93bigpIGZvciBTTUIzIFBPU0lYLCBhbGwgd2UgbmVlZCBp
+cyB0aGUgc2Vjb25kIGh1bmsgZnJvbSANCnlvdXIgcGF0Y2gsIGNmIGF0dGFjaGVkIHBhdGNo
+c2V0LCBmaXJzdCBjb21taXQuIEJ5IGRlZmF1bHQgdGhpcyB3aWxsIA0Kb25seSB3b3JrIHdp
+dGggY2lmcy5pZG1hcCBzZXR1cCBhbmQgdXNlICJub3JtYWwiICJkb21haW4tU0lEcyIuDQoN
+CiogSWYgdGhlIHVzZXIgaXMgd29ya2luZyB3aXRoIGEgc2V0dXAgd2hlcmUgaWRzZnJvbXNp
+ZCBpcyBiZWluZyB1c2VkIChzbyANCmlkZW50aXRpZXMgYXJlIG1hcHBlZCB0byBhbmQgZnJv
+bSBTLTEtNS04OC14KSwgdGhlIHVzZXIgbW91bnRzIHdpdGggDQoicG9zaXgsaWRzZnJvbXNp
+ZCIgYW5kIHRoZSBleGlzdGluZyBjaG93bigpIGNvZGUgd2lsbCBjb3JyZWN0bHkgZW5jb2Rl
+IA0KdGhlIG1vZGUgYXMgYW4gUy0xLTUtODgtMy08bW9kZT4gQUNFLg0KDQoqIEBuYW1qYWU6
+IGtzbWJkIHdyb25nbHkgc3dpdGNoZWQgZnJvbSBTLTEtNS04OC14IHRvIFMtMS0yMi14IGlu
+IA0KNTYwOWJkZDlmZmRjY2Q4M2Y5MDAzNTExYjE4MDE1ODRiNzAzYmFhNS4NCg0KKiBAbmFt
+amFlOiBrc21iZCByZXR1cm5zIHRoZSB3cm9uZyBTSUQgZm9yIHRoZSBvd25lciBpbiB0aGUg
+DQpTTUIyX1BPU0lYX0NSRUFURV9DT05URVhUOg0KDQpDaGFpbiBFbGVtZW50OiBTTUIyX1BP
+U0lYX0NSRUFURV9DT05URVhUIA0KIjUwMjVhZDkzLWI0OWMtZTcxMS1iNDIzLTgzZGU5Njhi
+Y2Q3YyINCiAgICAgRGF0YTogUE9TSVggQ3JlYXRlIENvbnRleHQgcmVzcG9uc2UNCiAgICAg
+ICAgIE51bWJlciBvZiBMaW5rczogMQ0KICAgICAgICAgUmVwYXJzZSBUYWc6IFVua25vd24g
+KDB4MDAwMDAwMDcpDQogICAgICAgICBQT1NJWCBwZXJtczogMDYwNA0KICAgICAgICAgT3du
+ZXIgU0lEOiBTLTEtNS0yMS0yMzA1NzI0MTE2LTEyNzU5NTQ1OTgtMjYwNTI0OTAyNi0xMDAw
+DQogICAgICAgICBHcm91cCBTSUQ6IFMtMS0yMi0yLTEwMDANCg0KSXQgbWFwcyB0aGUgZ2lk
+IHRvIHRoZSBTLTEtMjIgZG9tYWluIGJ1dCByZXR1cm5zIHRoZSB1aWQgbWFwcGVkIHRvIHRo
+ZSANCmxvY2FsIGRvbWFpbiBmcm9tIC9ldGMva3NtYmQva3NtYmQuc3ViYXV0aC4NCg0KKiBX
+aGF0J3Mgc3RpbGwgbWlzc2luZyBpbW8gaXMgYSBwcm90b2NvbCBzcGVjIHRvIG5lZ290aWF0
+ZSB1c2Ugb2YgDQpTLTEtNS04OC14IGlkZW50aXR5IG1hcHBpbmcuIFdlIGNvdWxkIGRlZmlu
+ZSBhIG5ldyBjcmVhdGUgY29udGV4dCB0aGF0IA0KYWxsb3dzIHRoZSBjbGllbnQgdG8gcmVx
+dWVzdCBpdC4gSWYgdGhlIHNlcnZlciBzdXBwb3J0cyBpdCwgaXQgcmV0dXJucyANCnRoZSBj
+b250ZXh0LiBUaGUgY2xpZW50IHRoZW4gb25seSB1c2VzIHRoZSBtYXBwaW5nIGlmIHRoZSBz
+ZXJ2ZXIgDQpzaWduYWxsZWQgc3VwcG9ydC4gRm9yIFNhbWJhIHRoaXMgbWlnaHQgYmUgcXVp
+dGUgc29tZSB3b3JrIHBhcnRpY3VsYXJpbHkgDQppbiB0aGUgQUNMIGNvZGUsIG5vdCBzbyBt
+dWNoIGZvciBvd25lciBhbmQgZ3JvdXAuDQoNCi1zbG93DQo=
+--------------PzuSwVZld5N6VZ1W5qt32scE
+Content-Type: text/x-patch; charset=UTF-8; name="smb3_posix_chown.patch"
+Content-Disposition: attachment; filename="smb3_posix_chown.patch"
+Content-Transfer-Encoding: base64
 
---------------1NhYNJfLFmqwuZd2NyzQV07G--
+RnJvbSAxNjMyOGMzNGE0YzUzZGI4ZTM1ZGVjMTMyYTc5MzZhM2Q1ZjcyN2M1IE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBSYWxwaCBCb2VobWUgPHNsb3dAc2FtYmEub3JnPgpE
+YXRlOiBTdW4sIDcgSnVuIDIwMjYgMTU6MjM6MTggKzAyMDAKU3ViamVjdDogW1BBVENIIDEv
+Ml0gc21iL2NsaWVudDogZml4IGNobW9kIGFuZCBjaGdycCB3aXRoIFNNQjMgUE9TSVgKIEV4
+dGVuc2lvbnMKCmNobW9kIGFuZCBjaGdycCB3ZXJlIGJlaW5nIGlnbm9yZWQgd2hlbiBtb3V0
+aW5nIHdpdGggU01CMwpQT1NJWCBFeHRlbnNpb25zLgoKQ2M6IHN0YWJsZUB2Z2VyLmtlcm5l
+bC5vcmcKU2lnbmVkLW9mZi1ieTogUmFscGggQm9laG1lIDxzbG93QHNhbWJhLm9yZz4KLS0t
+CiBmcy9zbWIvY2xpZW50L2lub2RlLmMgfCAzICsrLQogMSBmaWxlIGNoYW5nZWQsIDIgaW5z
+ZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQv
+aW5vZGUuYyBiL2ZzL3NtYi9jbGllbnQvaW5vZGUuYwppbmRleCA5NDcyYzBhNmMxODcuLjNi
+NWJhYzkzODEyZCAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9pbm9kZS5jCisrKyBiL2Zz
+L3NtYi9jbGllbnQvaW5vZGUuYwpAQCAtMzM0OCw3ICszMzQ4LDggQEAgY2lmc19zZXRhdHRy
+X25vdW5peChzdHJ1Y3QgZGVudHJ5ICpkaXJlbnRyeSwgc3RydWN0IGlhdHRyICphdHRycykK
+IAlpZiAoYXR0cnMtPmlhX3ZhbGlkICYgQVRUUl9HSUQpCiAJCWdpZCA9IGF0dHJzLT5pYV9n
+aWQ7CiAKLQlpZiAoc2JmbGFncyAmIChDSUZTX01PVU5UX0NJRlNfQUNMIHwgQ0lGU19NT1VO
+VF9NT0RFX0ZST01fU0lEKSkgeworCWlmICgoc2JmbGFncyAmIChDSUZTX01PVU5UX0NJRlNf
+QUNMIHwgQ0lGU19NT1VOVF9NT0RFX0ZST01fU0lEKSkgfHwKKwkgICAgY2lmc19zYl9tYXN0
+ZXJfdGNvbihjaWZzX3NiKS0+cG9zaXhfZXh0ZW5zaW9ucykgewogCQlpZiAodWlkX3ZhbGlk
+KHVpZCkgfHwgZ2lkX3ZhbGlkKGdpZCkpIHsKIAkJCW1vZGUgPSBOT19DSEFOR0VfNjQ7CiAJ
+CQlyYyA9IGlkX21vZGVfdG9fY2lmc19hY2woaW5vZGUsIGZ1bGxfcGF0aCwgJm1vZGUsCi0t
+IAoyLjU0LjAKCgpGcm9tIDY2MzQ5YjEwNjM5NTE4ODg5ZDFmYzg4Yjk3OTI1OWQwZWFiOWZk
+MjUgTW9uIFNlcCAxNyAwMDowMDowMCAyMDAxCkZyb206IFJhbHBoIEJvZWhtZSA8c2xvd0Bz
+YW1iYS5vcmc+CkRhdGU6IFN1biwgNyBKdW4gMjAyNiAxNToyNjowOCArMDIwMApTdWJqZWN0
+OiBbUEFUQ0ggMi8yXSBzbWIvY2xpZW50OiBmaXggc2VjdXJpdHkgZmxhZyBjYWxjdWxhdGlv
+biB3aGVuIHNldHRpbmcKIHNlY3VyaXR5IGluZm9ybWF0aW9uCgphY2xmbGFnIGlzIG9mIHR5
+cGUgTVMtRFRZUCAyLjQuNyBTRUNVUklUWV9JTkZPUk1BVElPTiB3aGljaCB0ZWxscyB0aGUg
+c2VydmVyCndoaWNoIHBhcnRzIG9mIHRoZSBzZWN1cml0eSBkZXNjcmlwdG9yIHdlJ3JlIGFj
+dHVhbGx5IG1vZGlmeWluZyAob3duZXIsIGdyb3VwLApkYWNsLCBzYWNsLCAuLi4pLgoKV2hl
+biBkb2luZyBhIGNob3duKCkgb3IgY2hncnAoKSB3ZSBkb24ndCB3YW50IHRvIGZvcmNlCkRB
+Q0xfU0VDVVJJVFlfSU5GT1JNQVRJT04sIGJ1aWxkX3NlY19kZXNjKCkgZG9lcyB0aGUgcHJv
+cGVyIGZsYWcgY2FsY3VsYXRpb24uCgpTaWduZWQtb2ZmLWJ5OiBSYWxwaCBCb2VobWUgPHNs
+b3dAc2FtYmEub3JnPgotLS0KIGZzL3NtYi9jbGllbnQvY2lmc2FjbC5jIHwgOCArKysrKysr
+LQogMSBmaWxlIGNoYW5nZWQsIDcgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlm
+ZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvY2lmc2FjbC5jIGIvZnMvc21iL2NsaWVudC9jaWZz
+YWNsLmMKaW5kZXggNzg2ZGJiYzQzYzViLi4zYWVlYTAxNTJkZWQgMTAwNjQ0Ci0tLSBhL2Zz
+L3NtYi9jbGllbnQvY2lmc2FjbC5jCisrKyBiL2ZzL3NtYi9jbGllbnQvY2lmc2FjbC5jCkBA
+IC0xNjc2LDcgKzE2NzYsNyBAQCBpZF9tb2RlX3RvX2NpZnNfYWNsKHN0cnVjdCBpbm9kZSAq
+aW5vZGUsIGNvbnN0IGNoYXIgKnBhdGgsIF9fdTY0ICpwbm1vZGUsCiAJCQlrdWlkX3QgdWlk
+LCBrZ2lkX3QgZ2lkKQogewogCWludCByYyA9IDA7Ci0JaW50IGFjbGZsYWcgPSBDSUZTX0FD
+TF9EQUNMOyAvKiBkZWZhdWx0IGZsYWcgdG8gc2V0ICovCisJaW50IGFjbGZsYWcgPSAwOwog
+CV9fdTMyIHNlY2Rlc2NsZW4gPSAwOwogCV9fdTMyIG5zZWNkZXNjbGVuID0gMDsKIAlfX3Uz
+MiBkYWNsb2Zmc2V0ID0gMDsKQEAgLTE3NzIsNiArMTc3MiwxMiBAQCBpZF9tb2RlX3RvX2Np
+ZnNfYWNsKHN0cnVjdCBpbm9kZSAqaW5vZGUsIGNvbnN0IGNoYXIgKnBhdGgsIF9fdTY0ICpw
+bm1vZGUsCiAKIAljaWZzX2RiZyhOT0lTWSwgImJ1aWxkX3NlY19kZXNjIHJjOiAlZFxuIiwg
+cmMpOwogCisJaWYgKGFjbGZsYWcgPT0gMCkgeworCQljaWZzX2RiZyhGWUksICJzZXRfY2lm
+c19hY2wgYWNsZmxhZz0wLCBubyBjaGFuZ2UgbWFwcGVkXG4iKTsKKwkJcmMgPSAwOworCQln
+b3RvIGlkX21vZGVfdG9fY2lmc19hY2xfZXhpdDsKKwl9CisKIAlpZiAob3BzLT5zZXRfYWNs
+ID09IE5VTEwpCiAJCXJjID0gLUVPUE5PVFNVUFA7CiAKLS0gCjIuNTQuMAoK
 
---------------CrhkjUJ0Zv464ZIcQrziCwU1
+--------------PzuSwVZld5N6VZ1W5qt32scE--
+
+--------------hB8TlPdApo92Hwtp5KyCzjQo--
+
+--------------9VGzFO9v5VUV0MmfSpiGeDM5
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmolg8cFAwAAAAAACgkQqh6bcSY5nkYV
-Lw//RF7qf1Hj6PoQcOmBdU5TQjwlRSbxiuMp/f4tH7JNiW6wv6hl7Splzh7iJK4BQEUNmJP+Vg0S
-pFT+l1cYDUaOUxoYnA3F6GwLBU0n17uIOuhcXJgcUxPlj6tU8opFxckYnvibbB5Vr45FND5pmfs+
-Ne5PHEN4gwdEM6aKcvQ7bYf/1bfWXi59rpQk2gR3RyiNDz6aRoEZLBOBmD6EjI3kCmyKi1zlTWJB
-uED2NrCXCqFUm25sD7ZN8sodrno32WZcXUpogZK/ru8A/czB4rKdbzPQ9xiKvORpx5fxPkAUNY1f
-QnLK7xTIweiVfOVmTgChhJLU+WA5MREpY252bk/hiqzkUv2fz3jy7R1Ke9jHOIkH7WNSRUlCvPdC
-Yl6ZhYIb0i5sAKeiejENQRcaMJJ//sho3KHPD0rmHVY4TTs/o/faQNCulmengDUXt0XSAcJI/Owz
-iJ5cXT5+RR6sWRZbVAfh4xMv4r8mdnUG/qtGP6RSw3uN15DKX8ggD15F76cd0qZoOK4abD6rFn2v
-MQZ27hVrGWlP2lBEyZy4RAx8u1T1u6WM9jP5A+MwIKE5OBWYfd144QilnmFNC6Epowa40E8JyAjg
-A6MAMSu9xH/ANr6t8eT+xtyEc1yV6fjOzMpX00l+u7+iyP2Dke2X0FZRHi7Bv5Sh6mqLfdhANIXN
-12o=
-=xWWR
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmolgtEFAwAAAAAACgkQqh6bcSY5nkZm
+IRAAkaRNEdqK6LImppXgD2tAmCmWsCxLz4oGJYHmgwi4RJcCfxBBfy1xJn2uJVij/MZqX/trADyb
+I5Xg0nDgGnHOBgVxDXX31xPyfrdfZ2/48YMUTKpv4q4dix6EcFwKGAIFvreBKB4BPkqOrt440Bpp
+EHv3AzdmfVUlczlgZCdtHeXOHPgNiXOf7UDry/sRZlmnARdh9s4HNbA23pUMLC9tqhIY1zOu7xAa
+4DWdDno+oTiKD5VvV3WRaS8wm+QI6Qb0XoniINdYGniUJuOcuvd7+Rpaty/qf5KPt66PgYOZ3Ym2
+Ls98WXAGwr+M44rsXyWgdOUnIJHjzeHv2LvoFOEIdVVu2vSAIcGGzZJ6fMmi+BZHRDozmypreAai
+Dym0f0TYln37wrcTyMXu0dppe7eag36TyP6h6XgzkXwct/AyFl+/1aTsucNRwG9MM87gPufWbbb0
+fk78E0KcxSYhQERaMfMGjhwDulHcWNH3y0FBNy8sXKx2R5MqPNS7Erq8+vV5LgiD86MtxhFI9jmz
+hKSMojENIh64JhI5zEd2t7RpSrhURZQqRzTjK8R6VphPPYuH8apigYZOq9OiNj33GkQ8T4whbvDs
+WLdZOYX70+V3boOMlgFpeOFMm4Cr7HXeeYv5JugV6Ij8p9NNZnPquj9HiF/0NwRayjhxlYmtaydh
+RGs=
+=UL8X
 -----END PGP SIGNATURE-----
 
---------------CrhkjUJ0Zv464ZIcQrziCwU1--
+--------------9VGzFO9v5VUV0MmfSpiGeDM5--
