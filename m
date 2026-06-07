@@ -1,246 +1,253 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66F228CF4A
-	for <linux-cifs@vger.kernel.org>; Sun,  7 Jun 2026 16:52:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780851144; cv=pass; b=jvWzpdLtBYKFhHGDVSmb/SAlIz2tLvybP/6hbuav12hdk9qlBFDN5HIAV0MRgPevP+KpWxaQM5gNO4z1yO4JVqKSZ6oc9v/Gkv0FXwrkvWPUwe4P9xgCp8R3z8jdixI2qH8KBODmbXixdcPrymZgn1QQDNz34lwfObmLsd+YorM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780851144; c=relaxed/simple;
-	bh=nvQqw3yMJbS1zZleTidW06afhaSwH5aDS+e+qPRMqR4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vEFRxKqXbHAP8YldYX9T6Dy0ZHrVMZYFIPtlwxBpS997yrb7v+7CsriUz0mu6sQvTh/o4IwsA8uZvb0qJCAKSoZXrBkETYC0G5jQB66l81ikfRyR6C0NDwArAig+62qSKUfSNRie3M1PN3vahZFQgUVonp5W6Z5eVmLZa2t93OQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q5wRGbRk; arc=pass smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335391990A7
+	for <linux-cifs@vger.kernel.org>; Sun,  7 Jun 2026 17:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780853753; cv=none; b=HaY7HdBX7fQVZ2UzG4eBNtwjRZDmc5o9bDsSfnkZenhpPZbULWQsoHLLd5XI/M0YSCrau+gc/YF9z6jRAeQBgKkAU5DmeV4S3NKp3Id8+8r8f8vVBgSyx9b+gcExRcXrVZcsz+vBhshM0/WBUPYLajfS8G26m7mew4fVue8fMvg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780853753; c=relaxed/simple;
+	bh=8ffSOPuac/qs1+GWpP6xU2Q7dzB2H4L716qy621wblo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I43WQgiZYtGfaygJdtm0N05eB0laW0RynrXht3d8KN+Jb/3QNfRq5VEVTKl9NZFPDtLOq/qXlblVkmWGxVrvjDO7gaGsLPhdFe+T8hQWHaryZHtm0rnLO6tnGAfTBFRGkkPFyj1CArHJGw5HkeCjjJ0y8iA5eYtfgnPjZ/SpXLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=kcJtgpGw; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q5wRGbRk"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-8cceaa6f75bso56245366d6.0
-        for <linux-cifs@vger.kernel.org>; Sun, 07 Jun 2026 09:52:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780851142; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DOsQDZby0qp2rKuapSXSXaI9BDuL+ELHE4mCS7w83ioQ+Y49fpqD+oCWnCWrXvbJK+
-         6tEtiiAmiA4Z+H8Sehz02KzYkOZYYr4lwyr/cmHZf32ulXYVpjdqS2tsOb7RQPJKu7XA
-         r9SfLureXh8tz5XG+VJWzxBBOpz6LEItM9F3ha4ilVLeseFwn5SlBykxqZlV9OeUjKg7
-         IFpQY9Vnm4Ic9OBhSOdbAb85dKih4U7NhuGUPxl6s7KzkIe190m/CSWgABarEkBPW97K
-         OZNxeOK0eFv7tt+oABGbDwJzCHdMMW6X7CpDZvVXE/jbWFz6+7J8X2GhnDz/S+UF+UUt
-         s0mw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=wdT0PYuYliGmkc8X/daaU1577Dhy7rR83jIFguNSknA=;
-        fh=d9cTNCqIoMOIJaYBQ+mznDfQQqHJPNIIQn96dprlPJg=;
-        b=BbgasA9N35/BdPET9F6aA2nH7NBTeIOvIHmby6PEF2NnfGFe4668/XhU5ZABwxhlgn
-         20ckO4RraPaLs/fRcrFSLEknmjWnWNSxYHDdOaH6nODdNZxYa05ty9+yf7J9Ax1X4emT
-         8d1Uoub8Wka41SZsD8Usmr80nlxJgYBlYm/bOk55gZL3XBMzNs7ZMBP0pfD8PuENwg+8
-         zF7oDN/za1wPGOju/ejQ0p9kEFBOrGlRDH007DnefLCtL7qb1YXxNMfGBEHBZKm1W7SF
-         N8ip6vT/QXX3VXMIdrlCEMu2mddDzRZYG2VejgUx7IFtB17URYdht/D3I2QCqRn6grUJ
-         teoQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780851142; x=1781455942; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wdT0PYuYliGmkc8X/daaU1577Dhy7rR83jIFguNSknA=;
-        b=q5wRGbRkeki5TsmaixIFxd+vVTLceNuImSUOGQLNAGezmtFlaDVgyz09aVbUbRg2iR
-         hQVGVSuSmWrUh3XOXBI3s1m1GeRfNftP0hZlaHICimOhgn51VJw/R9yTArczS2NNshLv
-         mP38oquXSpGZYhUXAArfKiI2HYheZs+rgq+/xrbyzNb4QHpVoyFdXEsxLdbn8D2rkl3V
-         LJXId32NMeDvlia2IKouxNZoJw6LRzsEhO/xWFnHnQvZJKiMX2Rucgb2cDpvyCtLVjxi
-         TQe4+2G7IXYUUqPXlYGtMgRxQ7axGcsfTClrw7j3RzErgLTuXp4M1pXfSquRyqWg3dt9
-         JePQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780851142; x=1781455942;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wdT0PYuYliGmkc8X/daaU1577Dhy7rR83jIFguNSknA=;
-        b=dEHWkfCieQpe7xxmrAyPNf2oHx8Ga51nBmA0V5cP+Gdws5MYavZELmW8InSDRIYRqI
-         R80OQfa0Jt2YEYhotPZvVBsd504ZfFqyGn+4nceUIbwxGwNHSVWCu5CLYwmGQFkkYI40
-         dKIEj58qHi8Iht5+i3o54m/3sMixe9025smeisn5mi0MkIkCByRcQFYu16W3HDYa69BP
-         hNl2XTqyZT1TaEgcUKJNfUNn0bkdXsND6UjINwZVR+qanWRYt89NKzjr35ZTG1AU78KM
-         SpDBfHt0/IkX5HUrs91UOEwViYSfJLR+s8qttP1wZh2KOawh0KB2TJkOnoe9RWPCTeyT
-         Ehog==
-X-Forwarded-Encrypted: i=1; AFNElJ9EFvMyoMkoUGISqOWkLJrjVkHjhTyC9M8jvUyCNOGskgLCaXhp3EC7xjX0JwdYz20IYQIU6qGLkw1z@vger.kernel.org
-X-Gm-Message-State: AOJu0YyChJmeNfVbkG/Kb2f3d6JMiEAxWG6QdR0t5rSEMHzqeruiVJCe
-	3hTPuUKlm4mqGRbY3jKz+F7O63wkwKN9Rn0nyDtnhJF49waIKBZrqMSY8EWn+hel9wXlhyMeYa0
-	Ti1h0RPLBONliX+8/32n4pT7XgPDiUVilnXSmMoI=
-X-Gm-Gg: Acq92OFWpapbOFd0nsp6Jplb0faBPIBGFP8yBlOa148Fe3jnbDTCIwmvURiZTVNfqXb
-	TBF8k7WrxZwbfXuJI1E8BMgLUCHdVPkmjhpCDmyg87x3+F6rb8BrCWT4W9zlc35FiluSz5J2nUm
-	f053b2yLtJBPZml2wOcNIZVgTl6BYtq3bOpn9rfD642JQJxlmZJRTxZNRqAAJrIOQ/Eu12/9EOi
-	6F7rFUUbLpMTcXAZ88C04AgcaQ9UHoCqrDbcjR4XASxjnUN5pihSaC+SMaYDc2dgpPrRzm8Zr8o
-	u6lLPOnr1dn0zIX9JzUU/EYjyoyP8d/5H/FGzRYEOBpbfOixtQFf5HZ/xvBYzl7koGRs6DUxS0f
-	cYjuAsgX6spSvfquG6ooQNxmXZfSwmKPB6BrPJDdZwfRncXaXsypm7QTA/qdkKT+sivgSvRWYcR
-	5is81iRndsbb8HCwUOoaRHzqD7QyRu
-X-Received: by 2002:a0c:d602:0:b0:8ce:9ecf:e92c with SMTP id
- 6a1803df08f44-8cee5fc99fdmr153959766d6.15.1780851141723; Sun, 07 Jun 2026
- 09:52:21 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="kcJtgpGw"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=8ffSOPuac/qs1+GWpP6xU2Q7dzB2H4L716qy621wblo=; b=kcJtgpGww1UfNhYplbTcFdqKtb
+	9Lzq94LVrjpW1rhnmzAJqJohjzUMyBIlMxkFq9sE06AKRJfUnB30FDDEjknxFMEZQn5DMHwsu+8cA
+	3TMzAM3PG+kCCvTG3tKBojw4l8spGfKFeL/fMBkCkpu6z7bsqEds1gb1WGKizHtaBvd3wN/MUji04
+	SdCGVxzvECQkvcSmKA1OVPXUNs6Mlj08eSx5XMkC6vWEMdM7cy7uh1fLjutNrGFK3fxzG/Zh7bZW/
+	qq3zpIFXU6KDFW5af6A30GkzVc+HCuPsqPTd0ZJPrgYc2DCinoRs+WEkAENAVy21NIURMCRDQATO0
+	RHUXJtw22euhZBPJQHfq7tDVFyQejOjAKpkROeEYO+6jyv7Vbv1rVkMgrpJBBFj3ACsOKE0EabtJp
+	KFQ6wu7LABJoWn/n5B3D5Lzu5HXnyWooHSnNWyEtPqfHI15dzcIaAsUM3xU5VYtiPFEvML4BL4O/w
+	t3R5+sp0Ea2Zy+OZzwPYfQZS;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wWHPZ-0000000EgYL-03VS;
+	Sun, 07 Jun 2026 17:35:49 +0000
+Message-ID: <40942fc2-330b-420b-b188-dafb065d1edb@samba.org>
+Date: Sun, 7 Jun 2026 19:35:48 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] smb: client: fix chmod and chgrp with SMB3.1.1 POSIX
+ Extensions
+To: Steve French <smfrench@gmail.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>, Jeremy Allison <jrasamba@gmail.com>
 References: <CAH2r5mv_wgjBqEsWYGxEt86tN6hJNV1VBY2YipAbeP8goxsSZA@mail.gmail.com>
- <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org> <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
+ <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
+ <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
  <CAH2r5mubw0zVBO83XzOmhWSOzq6PM5OkP-18Eg+LK3tvoULzkQ@mail.gmail.com>
+Content-Language: en-US, de-DE
+From: Ralph Boehme <slow@samba.org>
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
 In-Reply-To: <CAH2r5mubw0zVBO83XzOmhWSOzq6PM5OkP-18Eg+LK3tvoULzkQ@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 7 Jun 2026 11:52:10 -0500
-X-Gm-Features: AVVi8CdGglgZz5dVvWXTIv0AiYfJKVIQdkiAnJdE1FAw1jXWSDQJzakYk8p4wTw
-Message-ID: <CAH2r5muePx09GkNLuQ5ww5+cPyCH=FFyCu2pA+hQ5gSPMh62UQ@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix chmod and chgrp with SMB3.1.1 POSIX Extensions
-To: Ralph Boehme <slow@samba.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Jeremy Allison <jrasamba@gmail.com>, Huiwen He <hehuiwen@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------SUN702ZUx0eoyPoqe0abEzCC"
 
-the chmod bug (when mounting to samba with modefromsid) causes a few
-xfstests to fail (I noticed this when testing the swapon fixes from
-Huiwen.  See below:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------SUN702ZUx0eoyPoqe0abEzCC
+Content-Type: multipart/mixed; boundary="------------Z4TmOO8ItN6qvzJfDK73cCk1";
+ protected-headers="v1"
+Message-ID: <40942fc2-330b-420b-b188-dafb065d1edb@samba.org>
+Date: Sun, 7 Jun 2026 19:35:48 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] smb: client: fix chmod and chgrp with SMB3.1.1 POSIX
+ Extensions
+To: Steve French <smfrench@gmail.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>, Jeremy Allison <jrasamba@gmail.com>
+References: <CAH2r5mv_wgjBqEsWYGxEt86tN6hJNV1VBY2YipAbeP8goxsSZA@mail.gmail.com>
+ <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
+ <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
+ <CAH2r5mubw0zVBO83XzOmhWSOzq6PM5OkP-18Eg+LK3tvoULzkQ@mail.gmail.com>
+Content-Language: en-US, de-DE
+From: Ralph Boehme <slow@samba.org>
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
+In-Reply-To: <CAH2r5mubw0zVBO83XzOmhWSOzq6PM5OkP-18Eg+LK3tvoULzkQ@mail.gmail.com>
 
-generic/494        - output mismatch (see
-/home/smfrench/xfstests-dev/results//sambamfs/generic/494.out.bad)
-    --- tests/generic/494.out 2025-08-22 09:54:32.322789992 -0500
-    +++ /home/smfrench/xfstests-dev/results//sambamfs/generic/494.out.bad
-2026-06-07 11:48:55.528175150 -0500
-    @@ -1,6 +1,7 @@
-     QA output created by 494
-     Format and mount
-     Initialize file
-    +swapon: /mnt/scratch/test-494/file1: insecure permissions 1766,
-0600 suggested.
-     Try to truncate
-     ftruncate: Text file busy
-     Try to punch hole
-    ...
-    (Run 'diff -u /home/smfrench/xfstests-dev/tests/generic/494.out
-/home/smfrench/xfstests-dev/results//sambamfs/generic/494.out.bad'  to
-see the entire diff)
-generic/569        - output mismatch (see
-/home/smfrench/xfstests-dev/results//sambamfs/generic/569.out.bad)
-    --- tests/generic/569.out 2025-08-22 09:54:32.334797626 -0500
-    +++ /home/smfrench/xfstests-dev/results//sambamfs/generic/569.out.bad
-2026-06-07 11:48:57.292054389 -0500
-    @@ -6,6 +6,7 @@
-     verb 3
-     Caught signal 7, terminating...
-     verb 4
-    +swapon: SCRATCH_MNT/569.swap: insecure permissions 1766, 0600 suggeste=
-d.
-     pwrite: Text file busy
-     pwrite: Text file busy
-     mmap: Text file busy
+--------------Z4TmOO8ItN6qvzJfDK73cCk1
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-On Sun, Jun 7, 2026 at 11:38=E2=80=AFAM Steve French <smfrench@gmail.com> w=
-rote:
->
-> > For chmod() SMB3-POSIX *does* tell you to use S-1-5-88-3-<mode>, so
-> *if* we want some SID encoding of uids/gids, we should use S-1-5-88
->
-> We definitely have use cases where the client (similar to what you see
-> with people using nfs on Linux) wants to be able to save and view
-> uids/gids that the client understands without worrying about whether
-> server has RFC2307 setup to map uids.  The server may not have those
-> same users defined locally but the server still saves the uids and
-> gids (similar to nfs).
->
-> One advantage of having two uid mapping choices (S-1-5-88-x vs
-> S-1-22-x) is that it would allow you to have two different server
-> behaviors (one where the client changing the uid also changes the
-> server uid for the file, and the other where changing the client uid
-> is stored by the server but doesn't update the uid on the local file).
->
-> Do you have a change to Samba server fixing the chmod bug with
-> modefromsid?  I see that creating a file the mode is set incorrectly,
-> and that chmod doesn't work either (it briefly works while the lease
-> is on the file, but when the lease expires, requerying from the server
-> you can see the mode hasn't changed).
->
-> root@smfrench-ThinkPad-P16s-Gen-2:/mnt/scratch# touch file
-> root@smfrench-ThinkPad-P16s-Gen-2:/mnt/scratch# ls -l file
-> -rwxrw-rwT 1 root root 0 Jun  7 11:34 file
-> root@smfrench-ThinkPad-P16s-Gen-2:/mnt/scratch# ls -l /home/scratch/file
-> -rwxrw-rw-+ 1 root root 0 Jun  7 11:34 /home/scratch/file
-> root@smfrench-ThinkPad-P16s-Gen-2:/mnt/scratch# chmod 0760 file
-> root@smfrench-ThinkPad-P16s-Gen-2:/mnt/scratch# ls -l /home/scratch/file
-> -rwxrw-rw-+ 1 root root 0 Jun  7 11:34 /home/scratch/file
-> root@smfrench-ThinkPad-P16s-Gen-2:/mnt/scratch# ls -l file
-> -rwxrw---- 1 root root 0 Jun  7 11:34 file
-> root@smfrench-ThinkPad-P16s-Gen-2:/mnt/scratch# ls -l file
-> -rwxrw-rwT 1 root root 0 Jun  7 11:34 file
->
-> On Sun, Jun 7, 2026 at 9:40=E2=80=AFAM Ralph Boehme <slow@samba.org> wrot=
-e:
-> >
-> > Hi Steve,
-> >
-> > I spend some more time looking into this. Some findings:
-> >
-> > * We don't have any kind of design if and how uids/gids could be encode=
-d
-> > as S-1-22-x (Samba style) or S-1-5-88-x (MS NFS style) in SMB3 POSIX.
-> >
-> > * For chmod() SMB3-POSIX *does* tell you to use S-1-5-88-3-<mode>, so
-> > *if* we want some SID encoding of uids/gids, we should use S-1-5-88.
-> >
-> > * cifs.ko supports both S-1-22 and S-1-5-88 when querying metadata and
-> > mapping to uid/gid. I tested both versions with a modified Samba server
-> > that allowed me to configure which SIDs to return (S-1-5-domain, S-1-22
-> > or S-1-5-88)
-> >
-> > * To fix chown() for SMB3 POSIX, all we need is the second hunk from
-> > your patch, cf attached patchset, first commit. By default this will
-> > only work with cifs.idmap setup and use "normal" "domain-SIDs".
-> >
-> > * If the user is working with a setup where idsfromsid is being used (s=
-o
-> > identities are mapped to and from S-1-5-88-x), the user mounts with
-> > "posix,idsfromsid" and the existing chown() code will correctly encode
-> > the mode as an S-1-5-88-3-<mode> ACE.
-> >
-> > * @namjae: ksmbd wrongly switched from S-1-5-88-x to S-1-22-x in
-> > 5609bdd9ffdccd83f9003511b1801584b703baa5.
-> >
-> > * @namjae: ksmbd returns the wrong SID for the owner in the
-> > SMB2_POSIX_CREATE_CONTEXT:
-> >
-> > Chain Element: SMB2_POSIX_CREATE_CONTEXT
-> > "5025ad93-b49c-e711-b423-83de968bcd7c"
-> >      Data: POSIX Create Context response
-> >          Number of Links: 1
-> >          Reparse Tag: Unknown (0x00000007)
-> >          POSIX perms: 0604
-> >          Owner SID: S-1-5-21-2305724116-1275954598-2605249026-1000
-> >          Group SID: S-1-22-2-1000
-> >
-> > It maps the gid to the S-1-22 domain but returns the uid mapped to the
-> > local domain from /etc/ksmbd/ksmbd.subauth.
-> >
-> > * What's still missing imo is a protocol spec to negotiate use of
-> > S-1-5-88-x identity mapping. We could define a new create context that
-> > allows the client to request it. If the server supports it, it returns
-> > the context. The client then only uses the mapping if the server
-> > signalled support. For Samba this might be quite some work particularil=
-y
-> > in the ACL code, not so much for owner and group.
-> >
-> > -slow
->
->
->
-> --
-> Thanks,
->
-> Steve
+T24gNi83LzI2IDY6MzggUE0sIFN0ZXZlIEZyZW5jaCB3cm90ZToNCj4+IEZvciBjaG1vZCgp
+IFNNQjMtUE9TSVggKmRvZXMqIHRlbGwgeW91IHRvIHVzZSBTLTEtNS04OC0zLTxtb2RlPiwg
+c28NCj4gKmlmKiB3ZSB3YW50IHNvbWUgU0lEIGVuY29kaW5nIG9mIHVpZHMvZ2lkcywgd2Ug
+c2hvdWxkIHVzZSBTLTEtNS04OA0KPiANCj4gV2UgZGVmaW5pdGVseSBoYXZlIHVzZSBjYXNl
+cyB3aGVyZSB0aGUgY2xpZW50IChzaW1pbGFyIHRvIHdoYXQgeW91IHNlZQ0KPiB3aXRoIHBl
+b3BsZSB1c2luZyBuZnMgb24gTGludXgpIHdhbnRzIHRvIGJlIGFibGUgdG8gc2F2ZSBhbmQg
+dmlldw0KPiB1aWRzL2dpZHMgdGhhdCB0aGUgY2xpZW50IHVuZGVyc3RhbmRzIHdpdGhvdXQg
+d29ycnlpbmcgYWJvdXQgd2hldGhlcg0KPiBzZXJ2ZXIgaGFzIFJGQzIzMDcgc2V0dXAgdG8g
+bWFwIHVpZHMuDQoNCkNhbiB5b3UgZWxhYm9yYXRlIG9uIHRoZXNlIHVzZSBjYXNlcz8gSSBn
+dWVzcyB0aGlzIGludm9sdmVzIExpbnV4IFZNcyBpbiANCkF6dXJlIHRhbGtpbmcgdG8g4oCT
+IHdoYXQ/IGtzbWJkPyBXaW5kb3dzIFNNQj8NCg0KRndpdywgcHJvcGVyIGlkbWFwcGluZyBp
+cyBOT1QgcmVzdHJpY3RlZCB0byBSRkMyMzA3LiBJdCBpcyBqdXN0IA0KcmVxdWlyaW5nIHBy
+b3BlciBqb2luIG9mIGJvdGggc2VydmVyIGFuZCBjbGllbnQgdG8gdGhlIGF1dGhlbnRpY2F0
+aW9uIA0KZG9tYWluIHdpdGggd2luYmluZCBvciBzc3NkLiBUaGUgaWRtYXBwaW5nIGNhbiBi
+ZSBiYXNlZCBvbiBSRkMyMzA3LCBidXQgDQpib3RoIHNzc2QgYW5kIHdpbmJpbmRkIHN1cHBv
+cnQgb3RoZXIgc2NoZW1lcywgaW4gdGhlIFNhbWJhIGNhc2UgdGhlcmUgDQphcmUgInJpZCIg
+YW5kICJhdXRvcmlkIiB3aGljaCBhcmUgdmVyeSBjb21tb24gaW4gZGVwbG95bWVudHMuDQoN
+CklmIHNlcnZlciBhbmQgY2xpZW50IGFyZSB3b3JraW5nIGluIHRoaXMgbWFwcGVkIG1vZGUs
+IHdlJ2xsIGhhdmUgdG8gbWFwIA0KYWxsIFNJRHMsIG5vdCBqdXN0IG93bmVyIGFuZCBncm91
+cCwgYnV0IGFsc28gdGhlIGlkZW50aWZpZXJzIGluIEFDRXMsIGluIA0KYm90aCBkaXJlY3Rp
+b25zLiBJIGRvdWJ0IGFueW9uZSBpcyBjdXJyZW50bHkgZG9pbmcgdGhpcyBwcm9wZXJseSBh
+Y3Jvc3MgDQp1aWRzLCBnaWRzIGFuZCBBQ0xzLg0KDQpJIGFncmVlIHRoYXQgdGhpcyBtaWdo
+dCBiZSB1c2VmdWwsIGJ1dCBsZXRzIHBsZWFzZSBnZXQgYSBjb21wbGV0ZSANCnBpY3R1cmUg
+Zmlyc3QsIHRoaW5rIGl0IHRocm91Z2ggYW5kIGZ1bGx5IHVuZGVyc3RhbmQgdGhlIHByb3Rv
+Y29sIA0KaW1wbGljYXRpb25zLiBTdGFydGluZyB3aXRoIGEgbmV3IGNyZWF0ZSBjb250ZXh0
+Li4uDQoNCj4gVGhlIHNlcnZlciBtYXkgbm90IGhhdmUgdGhvc2UNCj4gc2FtZSB1c2VycyBk
+ZWZpbmVkIGxvY2FsbHkgYnV0IHRoZSBzZXJ2ZXIgc3RpbGwgc2F2ZXMgdGhlIHVpZHMgYW5k
+DQo+IGdpZHMgKHNpbWlsYXIgdG8gbmZzKS4NCg0KV2hhdCBhYm91dCBvdGhlciBjbGllbnRz
+PyBIb3cgaXMgaXQgZW5zdXJlZCBhbGwgY2xpZW50cyBoYXZlIHRoZSBzYW1lIA0Kc2V0IG9m
+IHVzZXJzLCBncm91cHMgYW5kIGlkcywgYXZvaWRpbmcgYWxpY2UgaGF2aW5nIHVpZCAxMDAw
+IG9uIG9uZSANCmNsaWVudCBhbmQgYm9iIHVpZCAxMDAwIG9uIGFub3RoZXIgb25lPw0KDQo+
+IE9uZSBhZHZhbnRhZ2Ugb2YgaGF2aW5nIHR3byB1aWQgbWFwcGluZyBjaG9pY2VzIChTLTEt
+NS04OC14IHZzDQo+IFMtMS0yMi14KSBpcyB0aGF0IGl0IHdvdWxkIGFsbG93IHlvdSB0byBo
+YXZlIHR3byBkaWZmZXJlbnQgc2VydmVyDQo+IGJlaGF2aW9ycyAob25lIHdoZXJlIHRoZSBj
+bGllbnQgY2hhbmdpbmcgdGhlIHVpZCBhbHNvIGNoYW5nZXMgdGhlDQo+IHNlcnZlciB1aWQg
+Zm9yIHRoZSBmaWxlLCBhbmQgdGhlIG90aGVyIHdoZXJlIGNoYW5naW5nIHRoZSBjbGllbnQg
+dWlkDQo+IGlzIHN0b3JlZCBieSB0aGUgc2VydmVyIGJ1dCBkb2Vzbid0IHVwZGF0ZSB0aGUg
+dWlkIG9uIHRoZSBsb2NhbCBmaWxlKS4NCg0KT25lIG1hcHBpbmcsIG9rLCBidXQgdHdvPyBO
+bywganVzdCBubyEgTGV0J3MgZ2V0IG9uZSB0aGluZyByaWdodCwgDQphbGxvd2luZyBmb3Ig
+ZnV0dXJlIGFkZGl0aW9ucywgYnV0IHdlIG11c3Qgbm90IG92ZXJsb2FkIHRoZSANCnNwZWNp
+ZmljYXRpb24gYW5kIHRoZSBpbXBsZW1lbnRhdGlvbnMuIElpcmMgdGhlcmUgaGF2ZSBiZWVu
+IHF1aXRlIGEgZmV3IA0KYnVncyBpbiBjaWZzLmtvIGNhdXNlZCBieSB0aGlzIGNvbXBsZXhp
+dHkgYW5kIGtlZXBpbmcgdG8gdGhyb3cgc3R1ZmYgb24gDQp0b3Agb2YgdGhpcyBwaWxlIHdp
+bGwgb25seSBtYWtlIGl0IHdvcnNlLg0KDQo+IERvIHlvdSBoYXZlIGEgY2hhbmdlIHRvIFNh
+bWJhIHNlcnZlciBmaXhpbmcgdGhlIGNobW9kIGJ1ZyB3aXRoDQo+IG1vZGVmcm9tc2lkPw0K
+DQpJdCdzIG5vdCBhIGJ1ZywgbW9kZWZyb21zaWQgaXMgbm90IHJlbGV2YW50IGluIHRoZSBQ
+T1NJWCBjb250ZXh0Lg0KDQpTTUIzIFBPU0lYIGV4cGVjdHMgYSBQT1NJWCBiYWNrZW5kIHdo
+aWNoIGhhcyB0byBiZSBhYmxlIHRvIHN0b3JlIG1vZGVfdCwgDQpubyBuZWVkIHRvIG1hcCB0
+aGUgbW9kZSB0byBhIG5vbi1uYXRpdmUgcmVwcmVzZW50YXRpb24gZm9yIFNNQjMgUE9TSVgg
+b24gDQp0aGUgc2VydmVyLg0KDQpDb3JyZXNwb25kaW5nbHksIFNhbWJhIGhhcyB0aGlzIGNo
+ZWNrIHRoYXQgZ3VhcmRzIHByb2Nlc3Npbmcgb2YgdGhlIA0KUy0xLTUtODgtMy08bW9kZT4g
+U0lEIGluIGNoZWNrX3NtYjJfcG9zaXhfY2htb2RfYWNlKCk6DQoNCiAgICAgICAgIGlmICgh
+ZnNwLT5mc3BfZmxhZ3MucG9zaXhfb3Blbikgew0KICAgICAgICAgICAgICAgICByZXR1cm4g
+ZmFsc2U7DQogICAgICAgICB9DQoNCk9uIGEgUE9TSVggbW91bnQgY2htb2QoKSB3b3JrcyBq
+dXN0IGZpbmUsIGp1c3QgdGVzdGVkLg0KDQotc2xvdw0K
 
+--------------Z4TmOO8ItN6qvzJfDK73cCk1--
 
+--------------SUN702ZUx0eoyPoqe0abEzCC
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
---=20
-Thanks,
+-----BEGIN PGP SIGNATURE-----
 
-Steve
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmolq/QFAwAAAAAACgkQqh6bcSY5nkaN
+Xw/+LHTfQTQ2bdorI0+Cqy3FQTIST3kRnVGL+GPDTIUg74KFk8E3hSYFauq6KNSrrhAkxG0s6h98
+4D89IzkSgzcThJKZJwFIOHfi5TjRvHUWrgxJdPKSp677qluUgCB8st/NZmORHXk9GxKqmm0f3Rpq
+5kLOcJHNalacxxhaF3BlIVsF5Ljlq6KZuTz/ZcY+qoyuxly6zGVONBljSvtcyhenOUJ4pJorM6iL
+o4kyALvXzoiHtJTMzke92UiuHQZnbZVB2ZuolRDueb54+tPuOm0c+4J0yKhQyv8+tz1zRkaeyhks
+nZsAzMm6iwzwP29l1lVESoLEgIufwWrq6i+LJKVhmDvDN5mVUdD9PDYtqdJXw6br+fX9SfZe5SPY
+uDZAwqwjD2ZojbOXU1TprkmC5SfQIMi/rfwa1kIfdgrr7SvFMw2YXN7UPt2h1hnx8Plrkbf55CVe
+6g8aFOhFYRS9v0SXZQjcLKvOKHWq6OmhFlXnigX41iBjUUC2tJqDyRwh4JI5q6rNzH6fd04i/Cn8
+aMr5DH4+UveFitE847ngKzl9nWOT5giN27ipWVeIk3/APmErWcbniHSf578ozpGnPJjrH5tivX8I
+pXrG+lGvaFtLd7Z+3bmS1pO0TJ19jyI0IaveT+ejDzmTmked5/QvHNKsx4HLQ0FoqX8dmt8niu0s
+MU8=
+=hmZT
+-----END PGP SIGNATURE-----
+
+--------------SUN702ZUx0eoyPoqe0abEzCC--
