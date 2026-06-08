@@ -1,327 +1,219 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F207C325494
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Jun 2026 15:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234823CE4B6
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Jun 2026 17:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780934354; cv=none; b=eccLoJIPNGnW9B+8BWhfZu7mfbIeoS15T6Q125NdVojqwWtLNineDwBMmUJCDj2N2wLnUPcoOMlv3VQNfJ01j8WeEsZpyFdCAmB+UP1D2AI8i3wlSmq7CHxa7lMnSiN+LD76Z84g2nJb5kIIOa6UDGlliArSBhSP+yKrgdK8yg8=
+	t=1780939313; cv=none; b=uAY2pYQGKcpTprHGNKMI5y+0cRgKpL2BNzVnlqmLcnXS/R1NRBZhnWrv+tNRzQpoOMlrxqDOc8OzpQbVvDk+aMRM3WkwIZKEmuLdyJTJGmIlXnbMYQQs/46RJSoY4C9mb0GG5lNrQ71nLWS5NiFybzK6QoGQLb6mwuP8O7D3nn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780934354; c=relaxed/simple;
-	bh=CkD+hgo7ELEAb42XPUvTGbEZx1/cmIaSU0FV/8hMOzc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y63xNynPJG1tcdNleZ4mFb1dSqtbK9d9Fv596wnUXR26jGJENbXurpBH+y6WUSv28sVKWjLsgbwWmpd5mR3vRtQI01NOP84DR6HIgOiACS9pgJoTVuj+U5jNVBxePYbzwXePKyAjkneG3aJxIo2+AfYPh/eI4zMIOzJVyBzRzKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OGi+D0Ud; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1780939313; c=relaxed/simple;
+	bh=v6g3CMp0smqnbFo9QjLmtQKyERqIT5IS3Jf891Ra/rA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=el1zv0WWoOBieTzxVk8s94zKRZ8GngWImGXeDYOwEoJ9GOretbAGywxHCEgfCjzAxd11DZ8IFlwkxLz+mH7sHoSRj0TZwtkpaRgCO5nzaYzcA2Elj6IpplQ4dSSMgXfm/LnNpwlQ5onBHePFf1iBKpB9Im5Lw6Z69IBBGw8WmGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=WZ2pjHMW; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OGi+D0Ud"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780934351;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YJwY2N+5Lb2QrI52432vcHfxYgOsVAa/9f3J1FZ+86U=;
-	b=OGi+D0UdeHSfaPu+QqhdsMBqsYmdopC9zpEwn+gpPyMZ14CPE4sOrkGfnS7gBVA0GGGUvd
-	/0UeMsoLoQExxbocggrokLZ0q7Hndyr1iXpnSdEp8XXXtBPOyf5QdS/pRslF+XDUITpQro
-	C0hz5wSIWSe6f2yRJXgJpk53faj6boA=
-From: Huiwen He <huiwen.he@linux.dev>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org,
-	chenxiaosong@kylinos.cn
-Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v2 3/3] smb/client: allow FS_IOC_SETFLAGS to clear compression
-Date: Mon,  8 Jun 2026 23:57:31 +0800
-Message-ID: <20260608155731.634984-4-huiwen.he@linux.dev>
-In-Reply-To: <20260608155731.634984-1-huiwen.he@linux.dev>
-References: <20260608155731.634984-1-huiwen.he@linux.dev>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="WZ2pjHMW"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=v6g3CMp0smqnbFo9QjLmtQKyERqIT5IS3Jf891Ra/rA=; b=WZ2pjHMWNbsT4W2I2ccmnJ4Hsv
+	yOA13403OedNhxqTRpMvDHPNaVT4pnRqKIYayLLDwQBr6DhDYHZsZwCd9NqVnRMdHL6PaYKEXWqnc
+	WW+EW8Pz2S82+G3B2m5kv9/elycuqITv9NgJoEM66EypFdQYXFBdo3UrCdNADUGZwiQfHRcS7ummy
+	TrgEdCFghogwC5f9b+ThCL8sz0efwPh8+XKyPATigTryZs1UAx2X93cKKSnOLs4o9VFfyw0Nu/21m
+	g2PRLAYr0WNev5mPEL+5g90NSJVmoZLFZALguVtiMHmF6e/QC9apzxJBSgaR5q/TgfYBZvmVp8Ojx
+	vLZdpyBXkuMxeiFdbQghDJLYYIHXbTz5CpT+pluIg3ZCFZ5pOXQjcdFnARCokWcUp/7d6ZFcm4sBP
+	TWouGPxsh3eGi5ktmhjTnSpZezr3GDuB1sWNsAQJX9qUebcfoLv4y+SeM5SdH5kWHnoSVG5r9ZMjw
+	b+bPWsttvNJLq6Mmxn0Ig7e6;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wWdfT-0000000EuSL-0Nm1;
+	Mon, 08 Jun 2026 17:21:43 +0000
+Message-ID: <1087073d-02a2-4acf-bb79-5c9be77858fe@samba.org>
+Date: Mon, 8 Jun 2026 19:21:42 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] smb: client: fix chmod and chgrp with SMB3.1.1 POSIX
+ Extensions
+To: Steve French <smfrench@gmail.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>, Jeremy Allison <jrasamba@gmail.com>,
+ Huiwen He <hehuiwen@kylinos.cn>
+References: <CAH2r5mv_wgjBqEsWYGxEt86tN6hJNV1VBY2YipAbeP8goxsSZA@mail.gmail.com>
+ <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
+ <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
+ <CAH2r5mubw0zVBO83XzOmhWSOzq6PM5OkP-18Eg+LK3tvoULzkQ@mail.gmail.com>
+ <CAH2r5muePx09GkNLuQ5ww5+cPyCH=FFyCu2pA+hQ5gSPMh62UQ@mail.gmail.com>
+ <de2e9edb-c52a-4a70-8f43-30ef6a8e4041@samba.org>
+ <CAH2r5mumYk1bcnwwgm8ogP9gaKSZzZX_TFdv+cm9CyxCiT11zw@mail.gmail.com>
+ <CAH2r5mtH3H8t1xOOwL+8=2CT6XPdndDkwb-438GQoibCgeF-tQ@mail.gmail.com>
+Content-Language: en-US, de-DE
+From: Ralph Boehme <slow@samba.org>
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
+In-Reply-To: <CAH2r5mtH3H8t1xOOwL+8=2CT6XPdndDkwb-438GQoibCgeF-tQ@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------eUK4q8AL0QEoe0UPgyXJr31b"
 
-From: Huiwen He <hehuiwen@kylinos.cn>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------eUK4q8AL0QEoe0UPgyXJr31b
+Content-Type: multipart/mixed; boundary="------------D10TiC1um2tmYnnOEnezxCMh";
+ protected-headers="v1"
+Message-ID: <1087073d-02a2-4acf-bb79-5c9be77858fe@samba.org>
+Date: Mon, 8 Jun 2026 19:21:42 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] smb: client: fix chmod and chgrp with SMB3.1.1 POSIX
+ Extensions
+To: Steve French <smfrench@gmail.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>, Jeremy Allison <jrasamba@gmail.com>,
+ Huiwen He <hehuiwen@kylinos.cn>
+References: <CAH2r5mv_wgjBqEsWYGxEt86tN6hJNV1VBY2YipAbeP8goxsSZA@mail.gmail.com>
+ <1aa393be-4f17-4dc4-989d-77b0dc6de09d@samba.org>
+ <01a5f813-1847-4ede-83a5-62bef4dd26ed@samba.org>
+ <CAH2r5mubw0zVBO83XzOmhWSOzq6PM5OkP-18Eg+LK3tvoULzkQ@mail.gmail.com>
+ <CAH2r5muePx09GkNLuQ5ww5+cPyCH=FFyCu2pA+hQ5gSPMh62UQ@mail.gmail.com>
+ <de2e9edb-c52a-4a70-8f43-30ef6a8e4041@samba.org>
+ <CAH2r5mumYk1bcnwwgm8ogP9gaKSZzZX_TFdv+cm9CyxCiT11zw@mail.gmail.com>
+ <CAH2r5mtH3H8t1xOOwL+8=2CT6XPdndDkwb-438GQoibCgeF-tQ@mail.gmail.com>
+Content-Language: en-US, de-DE
+From: Ralph Boehme <slow@samba.org>
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
+In-Reply-To: <CAH2r5mtH3H8t1xOOwL+8=2CT6XPdndDkwb-438GQoibCgeF-tQ@mail.gmail.com>
 
-The CIFS FS_IOC_SETFLAGS path can set FS_COMPR_FL now, but it cannot
-clear it again. This can be reproduced on a share backed by a filesystem
-that supports compression, for example btrfs exported by Samba:
+--------------D10TiC1um2tmYnnOEnezxCMh
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-	[compress_share]
-		vfs objects = btrfs
+T24gNi84LzI2IDI6MDEgQU0sIFN0ZXZlIEZyZW5jaCB3cm90ZToNCj4gWWVzIC0gY2htb2Qg
+c2VlbXMgdG8gd29yayBtb3N0bHkgb2sgd2l0aCBwb3NpeCAobm90IHVzaW5nIG1vZGVmcm9t
+c2lkLA0KPiB0aGUgbW9kZWZyb21zaWQgYnVnIEkgd2FzIHRhbGtpbmcgYWJvdXQgd2FzIG5v
+dCBtb3VudGluZyB3aXRoIHBvc2l4KQ0KPiBidXQgdGhlcmUgYXJlIGEgZmV3IGV4YW1wbGVz
+IG9mIHByb2JsZW1zIHdpdGggcG9zaXggYW5kIGNobW9kLiAgIGUuZy4NCj4gbW91bnRlZCB0
+byBTYW1iYSB3aXRoIHBvc2l4DQo+ICAgICAgIGNobW9kIDA3NjQgL21udC9zY3JhdGNoL2Zp
+bGUNCj4gd29ya3MgZmluZSBhbmQgbG9jYWwgYW5kIHJlbW90ZSBtb2RlIGJpdHMgbWF0Y2gg
+YnV0IHNldHRpbmcgdGhlIHN0aWNreQ0KPiBiaXQgcmVtb3RlbHkgaXMgaWdub3JlZA0KPiAg
+ICAgICBjaG1vZCArdCAvbW50L3NjcmF0Y2gvZmlsZQ0KPiB0aGUgbW9kZSBzdGF5cyBhdCAw
+NzY0Lg0KZ29vZCBjYXRjaCwgdGhhbmtzLiBUaGF0J3MgaW5kZWVkIGEgYnVnOg0KDQpodHRw
+czovL2J1Z3ppbGxhLnNhbWJhLm9yZy9zaG93X2J1Zy5jZ2k/aWQ9MTYwOTgNCg==
 
-	$ touch test.bin
-	$ chattr +c test.bin
-	$ lsattr test.bin
-	$ chattr -c test.bin
+--------------D10TiC1um2tmYnnOEnezxCMh--
 
-The final chattr -c fails with EOPNOTSUPP, and leaves the remote object
-with the compressed attribute still set, because the client always sends
-FSCTL_SET_COMPRESSION with COMPRESSION_FORMAT_DEFAULT. That is correct
-for setting FS_COMPR_FL, but clearing FS_COMPR_FL requires sending
-COMPRESSION_FORMAT_NONE.
+--------------eUK4q8AL0QEoe0UPgyXJr31b
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-Fix this by passing the requested compression state through the
-set_compression operation.  The SMB1 and SMB2 helpers no longer hard-code
-COMPRESSION_FORMAT_DEFAULT.
+-----BEGIN PGP SIGNATURE-----
 
-When FS_COMPR_FL is set, send COMPRESSION_FORMAT_DEFAULT.  When it is
-cleared, send COMPRESSION_FORMAT_NONE.  If the server accepts the request,
-update the cached FILE_ATTRIBUTE_COMPRESSED bit under i_lock so
-FS_IOC_GETFLAGS reports the new state.
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmom+iYFAwAAAAAACgkQqh6bcSY5nkZz
+tg/9Fwq/Dt+YxIodMLMjuFgtHcgzvzo18nG+btCoocmq0RhYVd22nlTyyV8smxPcMXblZfnn7ZWw
+h2R0+8Ue31kQ4h2FRqGWpcjV+TrGDxoWOJVmWyd3pV5sJIG+/iJBLMs5FNfbZdd4KCU1/NzWvDUm
+XfHtMVLJXPgSPdRd+z/drEiGriwDyzqfFEte3Lnm63WxR7H8ipDl21FPl3y9p/rEEnWy+xp4nPh2
+Va/5FekY6MiKNF7tksWf21EDH6eX4TNgh+RHQ5lkdHQ7kRvPu4hw1TnIcJZ6nPQuorhHsK+v06BX
++L782La5zT1P56J13TJOq1fG8wi1BEdBWiy2BP6J8+jrGtcCns5GM4ucR74KNFpeJWD4tWxz4/Zp
+YRGnKZ0Qt55wHGgN1FcCBI3qlSAL3RHSQADnwysDINlf9iunlKCfGAMqCFu7N9fAxhtcYNX8YXQQ
++SN9B1kyODPoD1t43sfwheLsCbixWqBE/+cO3AZplbM3hUbhTnq8JAR3Z4gvrgvZ/LHJhaMfAhJ0
+2IiCy7C59AP+BVMs+fwlmWkBgAIdZM9eVTX4fnYMdodg89BLlJ50ss3RkxTODXLXNb/ir+wRcZYr
+mhqEqNtMtrN5E3mmwrVPS7W6BDbO0VW60XA3Ox5V3CgbNHmTai0vG+WESMa+HVblHWwwnvDX1fry
+TWw=
+=zvRs
+-----END PGP SIGNATURE-----
 
-Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/client/cifsglob.h  |  2 +-
- fs/smb/client/cifssmb.c   |  4 ++--
- fs/smb/client/ioctl.c     | 43 ++++++++++++++++++++++++++++-----------
- fs/smb/client/smb1ops.c   |  5 +++--
- fs/smb/client/smb1proto.h |  2 +-
- fs/smb/client/smb2ops.c   |  4 ++--
- fs/smb/client/smb2pdu.c   |  6 +++---
- fs/smb/client/smb2proto.h |  3 ++-
- 8 files changed, 45 insertions(+), 24 deletions(-)
-
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 943b7cd2c096..a462c1590a9e 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -425,7 +425,7 @@ struct smb_version_operations {
- 	int (*set_file_info)(struct inode *, const char *, FILE_BASIC_INFO *,
- 			     const unsigned int);
- 	int (*set_compression)(const unsigned int, struct cifs_tcon *,
--			       struct cifsFileInfo *);
-+			       struct cifsFileInfo *, __u16);
- 	/* check if we can send an echo or nor */
- 	bool (*can_echo)(struct TCP_Server_Info *);
- 	/* send echo request */
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 9e27bfa7376b..d39175cdf1b1 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -3207,7 +3207,7 @@ struct inode *cifs_create_reparse_inode(struct cifs_open_info_data *data,
- 
- int
- CIFSSMB_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
--		    __u16 fid)
-+		    __u16 fid, __u16 compression_state)
- {
- 	int rc = 0;
- 	int bytes_returned;
-@@ -3222,7 +3222,7 @@ CIFSSMB_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
- 		return rc;
- 	in_len = rc;
- 
--	pSMB->compression_state = cpu_to_le16(COMPRESSION_FORMAT_DEFAULT);
-+	pSMB->compression_state = cpu_to_le16(compression_state);
- 
- 	pSMB->TotalParameterCount = 0;
- 	pSMB->TotalDataCount = cpu_to_le32(2);
-diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
-index 886e6893a552..9fa743be3652 100644
---- a/fs/smb/client/ioctl.c
-+++ b/fs/smb/client/ioctl.c
-@@ -68,7 +68,8 @@ static long cifs_ioctl_query_info(unsigned int xid, struct file *filep,
- }
- 
- static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
--					struct cifs_tcon *tcon)
-+					struct cifs_tcon *tcon,
-+					__u16 compression_state)
- {
- 	struct inode *inode = file_inode(filep);
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-@@ -127,7 +128,8 @@ static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
- 		goto close;
- 	}
- 
--	rc = server->ops->set_compression(xid, tcon, tmp_cfile);
-+	rc = server->ops->set_compression(xid, tcon, tmp_cfile,
-+					 compression_state);
- 
- close:
- 	server->ops->close(xid, tcon, &fid);
-@@ -141,7 +143,8 @@ static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
- 
- static int cifs_ioctl_set_compression(unsigned int xid, struct file *filep,
- 				      struct cifs_tcon *tcon,
--				      struct cifsFileInfo *cfile)
-+				      struct cifsFileInfo *cfile,
-+				      __u16 compression_state)
- {
- 	struct cifsFileInfo *wfile;
- 	struct cifs_tcon *wtcon;
-@@ -152,7 +155,8 @@ static int cifs_ioctl_set_compression(unsigned int xid, struct file *filep,
- 		return -EOPNOTSUPP;
- 
- 	if (cfile && (cfile->fid.access & FILE_WRITE_DATA)) {
--		rc = tcon->ses->server->ops->set_compression(xid, tcon, cfile);
-+		rc = tcon->ses->server->ops->set_compression(xid, tcon, cfile,
-+							       compression_state);
- 		if (rc != -EACCES)
- 			return rc;
- 	}
-@@ -160,7 +164,8 @@ static int cifs_ioctl_set_compression(unsigned int xid, struct file *filep,
- 	rc = cifs_get_writable_file(CIFS_I(inode), FIND_FSUID_ONLY, &wfile);
- 	if (!rc) {
- 		wtcon = tlink_tcon(wfile->tlink);
--		rc = wtcon->ses->server->ops->set_compression(xid, wtcon, wfile);
-+		rc = wtcon->ses->server->ops->set_compression(xid, wtcon, wfile,
-+							       compression_state);
- 		cifsFileInfo_put(wfile);
- 		if (rc != -EACCES)
- 			return rc;
-@@ -168,7 +173,8 @@ static int cifs_ioctl_set_compression(unsigned int xid, struct file *filep,
- 		return rc;
- 	}
- 
--	return cifs_set_compression_by_path(xid, filep, tcon);
-+	return cifs_set_compression_by_path(xid, filep, tcon,
-+					    compression_state);
- }
- 
- static long cifs_ioctl_copychunk(unsigned int xid, struct file *dst_file,
-@@ -460,6 +466,8 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- 	struct tcon_link *tlink;
- 	struct cifs_sb_info *cifs_sb;
- 	__u64	ExtAttrBits = 0;
-+	bool enable_compression;
-+	__u16 compression_state;
- #ifdef CONFIG_CIFS_POSIX
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- 	__u64   caps;
-@@ -523,17 +531,28 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- 			 *	break;
- 			 */
- 
--			/* Currently only flag we can set is compressed flag */
--			if ((ExtAttrBits & FS_COMPR_FL) == 0)
-+			/* Currently only flag we can set or clear is compressed. */
-+			if (ExtAttrBits & ~FS_COMPR_FL) {
-+				rc = -EOPNOTSUPP;
- 				break;
-+			}
-+
-+			enable_compression = ExtAttrBits & FS_COMPR_FL;
-+			compression_state = enable_compression ?
-+				COMPRESSION_FORMAT_DEFAULT :
-+				COMPRESSION_FORMAT_NONE;
- 
--			/* Try to set compress flag */
- 			rc = cifs_ioctl_set_compression(xid, filep, tcon,
--							pSMBFile);
-+						pSMBFile,
-+						compression_state);
- 			if (rc == 0) {
- 				spin_lock(&inode->i_lock);
--				CIFS_I(inode)->cifsAttrs |=
--					FILE_ATTRIBUTE_COMPRESSED;
-+				if (enable_compression)
-+					CIFS_I(inode)->cifsAttrs |=
-+						FILE_ATTRIBUTE_COMPRESSED;
-+				else
-+					CIFS_I(inode)->cifsAttrs &=
-+						~FILE_ATTRIBUTE_COMPRESSED;
- 				spin_unlock(&inode->i_lock);
- 			}
- 			cifs_dbg(FYI, "set compress flag rc %d\n", rc);
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index e198e3dda917..d34b3d99f6ed 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -1110,9 +1110,10 @@ smb_set_file_info(struct inode *inode, const char *full_path,
- 
- static int
- cifs_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
--		   struct cifsFileInfo *cfile)
-+		   struct cifsFileInfo *cfile, __u16 compression_state)
- {
--	return CIFSSMB_set_compression(xid, tcon, cfile->fid.netfid);
-+	return CIFSSMB_set_compression(xid, tcon, cfile->fid.netfid,
-+				       compression_state);
- }
- 
- static int
-diff --git a/fs/smb/client/smb1proto.h b/fs/smb/client/smb1proto.h
-index 5f522d359952..80eaeb3dd2ec 100644
---- a/fs/smb/client/smb1proto.h
-+++ b/fs/smb/client/smb1proto.h
-@@ -117,7 +117,7 @@ struct inode *cifs_create_reparse_inode(struct cifs_open_info_data *data,
- 					struct kvec *reparse_iov,
- 					struct kvec *xattr_iov);
- int CIFSSMB_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
--			    __u16 fid);
-+			    __u16 fid, __u16 compression_state);
- int cifs_do_get_acl(const unsigned int xid, struct cifs_tcon *tcon,
- 		    const unsigned char *searchName, struct posix_acl **acl,
- 		    const int acl_type, const struct nls_table *nls_codepage,
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 89230141b5dd..23807023c027 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -2246,10 +2246,10 @@ smb2_duplicate_extents(const unsigned int xid,
- 
- static int
- smb2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
--		   struct cifsFileInfo *cfile)
-+		   struct cifsFileInfo *cfile, __u16 compression_state)
- {
- 	return SMB2_set_compression(xid, tcon, cfile->fid.persistent_fid,
--			    cfile->fid.volatile_fid);
-+			    cfile->fid.volatile_fid, compression_state);
- }
- 
- static int
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index fbeb2156ddb6..6a185b805c1e 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -3626,14 +3626,14 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 
- int
- SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
--		     u64 persistent_fid, u64 volatile_fid)
-+		     u64 persistent_fid, u64 volatile_fid,
-+		     __u16 compression_state)
- {
- 	int rc;
- 	struct  compress_ioctl fsctl_input;
- 	char *ret_data = NULL;
- 
--	fsctl_input.CompressionState =
--			cpu_to_le16(COMPRESSION_FORMAT_DEFAULT);
-+	fsctl_input.CompressionState = cpu_to_le16(compression_state);
- 
- 	rc = SMB2_ioctl(xid, tcon, persistent_fid, volatile_fid,
- 			FSCTL_SET_COMPRESSION,
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index 1ceb95b907e6..78a4e1c340f9 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -216,7 +216,8 @@ int SMB2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
- 		u64 persistent_fid, u64 volatile_fid,
- 		struct smb2_file_full_ea_info *buf, int len);
- int SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
--			 u64 persistent_fid, u64 volatile_fid);
-+			 u64 persistent_fid, u64 volatile_fid,
-+			 __u16 compression_state);
- int SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
- 		      const u64 persistent_fid, const u64 volatile_fid,
- 		      __u8 oplock_level);
--- 
-2.43.0
-
+--------------eUK4q8AL0QEoe0UPgyXJr31b--
