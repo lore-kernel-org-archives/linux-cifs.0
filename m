@@ -1,34 +1,34 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265C23C3C02
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Jun 2026 14:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2924A3C343E
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Jun 2026 14:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780927381; cv=none; b=pu1QMwIbt2vsAMMfqsktQ2coGVdiZ+34uAdKkWLkO2wvjso0TCI+KUcgnyL/YsyxeiHtQumhmv3h9Yl8id7yXApkDv4Rkk33/eJ0SW73nn51M5i5uJBmF4nEIRmlVbsAt4GGsfzg2KOUJ2YaPjg6b7r/Se5duzG5h9dx0ldVF0Y=
+	t=1780927385; cv=none; b=IP6eKaizUAa295TaTwD/CEZeq/XRrQ15jJ/rnxeIOvyfEsAXGpcQPLwFFzRFK6qQNeKWRzd44/AMIYq7SfN6CKVx38g0hGP0jreeSXRTXRhVzjER7+MuHDfAtPfALM41tNY905cD89QR0gN6CvPq+DxPKEK7CnLpMX5qNnGlb48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780927381; c=relaxed/simple;
-	bh=mlQ904YDa+x7cjAmSFN9NnSzXiOrScSFbjcuINa/d/U=;
+	s=arc-20240116; t=1780927385; c=relaxed/simple;
+	bh=oZQP6uqLA26ybG0sLT3Y8E/G51hd0/A64br44xYf8iM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=to4p1uHJQAYRBST/pxIskc+/9uRd9vxfnbtfSLX53wbdXYznpwvp7wserGrWoJ6lGcy3QX6VpRbXH13AJCy5EPQKzSd8L0jKXfSqFBV9NoUYsjttm18q3G20yjbjARqeIckg8uLp+YQ5QAWMm1kQvs1XP2rroGHAWxdB0kP5aZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=hRtE2MsF; arc=none smtp.client-ip=95.215.58.189
+	 MIME-Version; b=J7ufnonff+MgsiELPcdGgjkFDwIHMcwDx72FtR2Ek4gJ7m01dWkSOzHnzxyHaStf5vt/TiEt3oUW1eSz/P9lrxZc1Hm8fh3quA/u63X6xpL528d/CPS6EkuH+IyAq3PlPeFR9LyTdKv5HU8O0A0QdszJNJvIU+NkpD+sl6GIu44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=REAcFt18; arc=none smtp.client-ip=95.215.58.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="hRtE2MsF"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="REAcFt18"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1780927378;
+	s=key1; t=1780927381;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uygkpu+C1mEWzfTRrosdPlbElYFYbOQRVtu9+cvYRVY=;
-	b=hRtE2MsFKHAZtptb8FlPWj0LzlZWvzWHRUekUVQNwpO3RnjTK/a+5szAXYE570pscV+sbc
-	sMqoUzz51ANPDlovPnj/90sMMlnh73mR6L0Cyt1j1uNWBdhAKM0wnjKBLtFhHcZLifzvKE
-	RU0ByPas0gVSHwaaNbRaufDmBBtn8BzEZE98ZyYDTojdy2sACidzoIfby5S+y8Ud8hjjfw
-	Kc5xPBne8JwDZ4mxA9ubTTwmSn493eOcj2gTqT4bbC6hJElrhwBHnzpkAa2jkFGC4yySlV
-	rtHV0e7QvRXH4EsXMxAEKgvgsVdc1E01B5CfQIF3tlWunI+n86QOXyG32HuSQw==
+	bh=KLtITZRyqzSX8882p9s1OjR3959PaZgD7R/HSnHFbZM=;
+	b=REAcFt18V66u2cG2T03tsUms2dtqalQKUIlX8eXd2/D8UIo7llqt+kzoFizBTl5YzB6ERA
+	KS9AAfBk2Fi5HjoBrR8wSc0bkJUVb8sbNQ3848FkIoyVjpT4C//Wciyd0LBSnOLqhzf8lg
+	DGu1B8gg9VAuEzn76vn6W1wPWi1MAuW8y9+ejnotUsfthWVE8AZ1uPHw0L2/Tky6E3z18H
+	mY8vZZGsXS1+Fnzu/XgfDvy2huDIj9U7lM4PftqfOUZEJZsKlSh/TCJNC5hfp/XW2UBQAY
+	VJDF1i/Eoa59osAeyklmyQhBd3J8nga5I6POLApPV4lPRCxegda0dodisT1YfA==
 From: chenxiaosong@chenxiaosong.com
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -42,9 +42,9 @@ To: smfrench@gmail.com,
 	metze@samba.org
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v3 5/7] smb/server: implement FSCTL_SET_COMPRESSION ioctl handler
-Date: Mon,  8 Jun 2026 14:01:26 +0000
-Message-ID: <20260608140128.387844-6-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH v3 6/7] smb/server: get compression format in get_file_compression_info()
+Date: Mon,  8 Jun 2026 14:01:27 +0000
+Message-ID: <20260608140128.387844-7-chenxiaosong@chenxiaosong.com>
 In-Reply-To: <20260608140128.387844-1-chenxiaosong@chenxiaosong.com>
 References: <20260608140128.387844-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
@@ -58,166 +58,51 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
+I have added `filecompressioninfo` subcommand to `smbinfo`
+in cifs-utils.git.
+
 Example:
 
-  1. client: smbinfo setcompression no /mnt/file
-  2. client: smbinfo getcompression /mnt/file
-             Compression: 0 (NONE)
-  3. client: smbinfo setcompression lznt1 /mnt/file
-  4. client: smbinfo getcompression /mnt/file
-             Compression: 2 (LZNT1)
-  5. client: smbinfo setcompression default /mnt/file
-  6. client: smbinfo getcompression /mnt/file
-             Compression: 2 (LZNT1)
+  1. client: smbinfo setcompression lznt1 /mnt/file
+  2. client: smbinfo filecompressioninfo /mnt/file
+             Compressed File Size: 104857600
+             Compression Format: 2 (LZNT1)
+             Compression Unit Shift: 0
+             Chunk Shift: 0
+             Cluster Shift: 0
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/common/smbfsctl.h |  2 +-
- fs/smb/server/smb2pdu.c  | 28 ++++++++++++++++
- fs/smb/server/vfs.c      | 70 ++++++++++++++++++++++++++++++++++++++++
- fs/smb/server/vfs.h      |  1 +
- 4 files changed, 100 insertions(+), 1 deletion(-)
+ fs/smb/server/smb2pdu.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/common/smbfsctl.h b/fs/smb/common/smbfsctl.h
-index 9debdd709d1c..d1fcb46a7cde 100644
---- a/fs/smb/common/smbfsctl.h
-+++ b/fs/smb/common/smbfsctl.h
-@@ -62,7 +62,7 @@
- #define FSCTL_UNLOCK_VOLUME          0x0009001C
- #define FSCTL_IS_PATHNAME_VALID      0x0009002C /* BB add struct */
- #define FSCTL_GET_COMPRESSION        0x0009003C
--#define FSCTL_SET_COMPRESSION        0x0009C040 /* BB add struct */
-+#define FSCTL_SET_COMPRESSION        0x0009C040
- #define FSCTL_QUERY_FAT_BPB          0x00090058 /* BB add struct */
- /* Verify the next FSCTL number, we had it as 0x00090090 before */
- #define FSCTL_FILESYSTEM_GET_STATS   0x00090060 /* BB add struct */
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 7cc63678e2e0..2b67c5926c67 100644
+index 2b67c5926c67..7150e77ff113 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -8364,6 +8364,34 @@ int smb2_ioctl(struct ksmbd_work *work)
- 		rsp->VolatileFileId = req->VolatileFileId;
- 		break;
- 	}
-+	case FSCTL_SET_COMPRESSION: {
-+		struct compress_ioctl *cmpr_req;
-+		struct ksmbd_file *fp;
+@@ -5278,6 +5278,7 @@ static int get_file_compression_info(struct smb2_query_info_rsp *rsp,
+ {
+ 	struct smb2_file_comp_info *file_info;
+ 	struct kstat stat;
++	u16 fmt;
+ 	int ret;
+ 
+ 	ret = vfs_getattr(&fp->filp->f_path, &stat, STATX_BASIC_STATS,
+@@ -5285,9 +5286,13 @@ static int get_file_compression_info(struct smb2_query_info_rsp *rsp,
+ 	if (ret)
+ 		return ret;
+ 
++	ret = ksmbd_vfs_get_compression(fp, &fmt);
++	if (ret)
++		return ret;
 +
-+		if (in_buf_len < sizeof(struct compress_ioctl)) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+
-+		if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
-+			ksmbd_debug(SMB, "User does not have write permission\n");
-+			ret = -EACCES;
-+			goto out;
-+		}
-+
-+		cmpr_req = (struct compress_ioctl *)buffer;
-+		fp = ksmbd_lookup_fd_fast(work, id);
-+		if (!fp) {
-+			ret = -ENOENT;
-+			goto out;
-+		}
-+
-+		ret = ksmbd_vfs_set_compression(work, fp, le16_to_cpu(cmpr_req->CompressionState));
-+		ksmbd_fd_put(work, fp);
-+		if (ret)
-+			goto out;
-+		break;
-+	}
- 	case FSCTL_CREATE_OR_GET_OBJECT_ID:
- 	{
- 		struct file_object_buf_type1_ioctl_rsp *obj_buf;
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index b8c3ba43452a..0be40601ab3d 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -1931,3 +1931,73 @@ int ksmbd_vfs_get_compression(struct ksmbd_file *fp, u16 *fmt)
- out:
- 	return rc;
- }
-+
-+int ksmbd_vfs_set_compression(struct ksmbd_work *work, struct ksmbd_file *fp, u16 fmt)
-+{
-+	struct file_kattr fa;
-+	struct dentry *dentry = fp->filp->f_path.dentry;
-+	struct mnt_idmap *idmap = file_mnt_idmap(fp->filp);
-+	u32 flags;
-+	__le32 old_fattr;
-+	int rc;
-+
-+	if (!(fp->daccess & FILE_WRITE_DATA_LE)) {
-+		rc = -EACCES;
-+		goto out;
-+	}
-+
-+	rc = vfs_fileattr_get(dentry, &fa);
-+	if (rc)
-+		goto out;
-+
-+	flags = fa.flags;
-+	if (fmt == COMPRESSION_FORMAT_NONE) {
-+		flags &= ~FS_COMPR_FL;
-+	} else if (fmt == COMPRESSION_FORMAT_DEFAULT ||
-+		   fmt == COMPRESSION_FORMAT_LZNT1) {
-+		flags |= FS_COMPR_FL;
-+	} else {
-+		rc = -EINVAL;
-+		goto out;
-+	}
-+
-+	if (flags != fa.flags) {
-+		fileattr_fill_flags(&fa, flags);
-+		rc = mnt_want_write_file(fp->filp);
-+		if (rc)
-+			goto out;
-+
-+		rc = vfs_fileattr_set(idmap, dentry, &fa);
-+		mnt_drop_write_file(fp->filp);
-+		if (rc)
-+			goto out;
-+	}
-+
-+	old_fattr = fp->f_ci->m_fattr;
-+	if (fmt == COMPRESSION_FORMAT_NONE)
-+		fp->f_ci->m_fattr &= ~FILE_ATTRIBUTE_COMPRESSED_LE;
-+	else
-+		fp->f_ci->m_fattr |= FILE_ATTRIBUTE_COMPRESSED_LE;
-+
-+	if (fp->f_ci->m_fattr != old_fattr &&
-+	    test_share_config_flag(work->tcon->share_conf,
-+				   KSMBD_SHARE_FLAG_STORE_DOS_ATTRS)) {
-+		struct xattr_dos_attrib da;
-+
-+		rc = ksmbd_vfs_get_dos_attrib_xattr(idmap, dentry, &da);
-+		if (rc <= 0) {
-+			rc = 0;
-+			goto out;
-+		}
-+
-+		da.attr = le32_to_cpu(fp->f_ci->m_fattr);
-+		rc = ksmbd_vfs_set_dos_attrib_xattr(idmap,
-+						    &fp->filp->f_path,
-+						    &da, true);
-+		if (rc)
-+			rc = 0;
-+	}
-+
-+out:
-+	return rc;
-+}
-diff --git a/fs/smb/server/vfs.h b/fs/smb/server/vfs.h
-index f6121207dbda..7b3d2f4fd985 100644
---- a/fs/smb/server/vfs.h
-+++ b/fs/smb/server/vfs.h
-@@ -170,4 +170,5 @@ int ksmbd_vfs_inherit_posix_acl(struct mnt_idmap *idmap,
- 				struct inode *parent_inode);
- void ksmbd_vfs_update_compressed_fattr(struct dentry *dentry, __le32 *fattr);
- int ksmbd_vfs_get_compression(struct ksmbd_file *fp, u16 *fmt);
-+int ksmbd_vfs_set_compression(struct ksmbd_work *work, struct ksmbd_file *fp, u16 fmt);
- #endif /* __KSMBD_VFS_H__ */
+ 	file_info = (struct smb2_file_comp_info *)rsp->Buffer;
+ 	file_info->CompressedFileSize = cpu_to_le64(stat.blocks << 9);
+-	file_info->CompressionFormat = COMPRESSION_FORMAT_NONE;
++	file_info->CompressionFormat = cpu_to_le16(fmt);
+ 	file_info->CompressionUnitShift = 0;
+ 	file_info->ChunkShift = 0;
+ 	file_info->ClusterShift = 0;
 -- 
 2.54.0
 
