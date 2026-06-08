@@ -1,34 +1,32 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C375F3B5319
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Jun 2026 14:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A300A3D16F1
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Jun 2026 14:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780927390; cv=none; b=E/IeyLf/cbwBTUWTEgO4Ww7eg38skCB0GQWHCNPsFvBAqBGtkP9EdSF4rZ5wei9X+BRASqg8BlwcTwKJI0/ph6nOkZUBMJ/J4a389fHu6M+9hm3czNG9HenyAX4cjQAgs5uUeQpHUJK3kMogCgaxa4zblO0CgRn9Q9DHbzWCsgk=
+	t=1780928966; cv=none; b=BPMpWifyYt7Vod615NOKqrrgQzMPyWDXdkIFDoqP40nX0+wTSaYzq8QQHhxoS9FI6Lmna9EzdRDDMery3Hvy9CkxSTWYFSSjK106kKvnc9tIddZrG6WTNBKwEOxz20rTXjTX/EoxNFG6z1O7lUZnQBkfmsfBCNXsRQ9sspzs5/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780927390; c=relaxed/simple;
-	bh=Q+pMljTG72dS49IpgSsdzbQaS3tGbBPqGVyiRSfAaLc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=th533Qio8oXMHcByLiB1N5dw4jLzlOz8JW7rLp/iKSVaJh85JWL/UIAHJNdRMYxEXPMFAWzkKD5iaMiWe18g+QhdIK3noo/sKN2NnJ/3fgwxnOFau6lTYx+/3P5d7KlrzV68+UPR1F7lW5AoOxNPI+W09SAKginTWXgpGobFWxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=dSiuubeM; arc=none smtp.client-ip=95.215.58.171
+	s=arc-20240116; t=1780928966; c=relaxed/simple;
+	bh=CG7u1fcRfMWimFv+3QTK0NPry+RtNtXTkCFmjyOQ3uQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LOe3i/y058M1u0J00E7ZjRsoE4HqqfuIpBwff3u6tS5FO/I1eTF+jvrGHqy+YNn/dLwdoCY4hPT/aSbZRbpcWHHSbln5r4jO/VB0GHF6v3bTJWTQXiRB7zCTyuFbY0I3eFX7577PZT//zYOFyJNZ+hpogRbQQMTgCCFoh2GKye4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=j96YwCGH; arc=none smtp.client-ip=95.215.58.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="dSiuubeM"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="j96YwCGH"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1780927387;
+	s=key1; t=1780928959;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FxS8o5tC14XIr+IHqe9NYO9AE4Y5JaFgIw5hE065EHk=;
-	b=dSiuubeMeC7nlTw8CoIUleDJIN68SkF6tqXPDlguFBgiYueQXec8H5LDuNshXW/oV6Ib3g
-	vnaZ8couKf2lzNsRMvTm9O7S/Oiryzt7lF1LosE5EiEJsOOGQ5uKdxyfWJ22+VBVG9XJbv
-	9Ii30ZCP9fhLxKmxeBcqqwgZbluHUIgUTyTy9r5fJhD59YfPQiUjFaONB33aoHKFfCaqK6
-	yOopWXYGYG1a7VISCdpL2w2rjQwakwdbxVOvDG9x1ue2joRbReqhDxH1Lt/Nome0pTWlID
-	1/th0rGmC/1ylmYKIHDlbX8lP8CFE2Ro8q23cycMkVwPGzkrRHr+R/uwmgcr0w==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=yzyCyHWfBJX99aVEJzIaEA8icDK7KRH08RELhjIa52Y=;
+	b=j96YwCGHc9cGX14Ll9YHdbAwCn2lO+ncvpCPKlASghOv2OZqspd1Cpi2JjNWQAYcmkjrRS
+	JCYgy8V+v8Ne+o388iQ+HWcnGCx3HNG+kaDaQAfhM1nKHjjMstaQqw9F/RGLVYHiXpBj7L
+	4QQnyFz7k6MoqFbWPRsH0dDKdnoIqmpl4kx+9cJQqsdTZHOzcd4o5RR1i878Q/CN2Yagyr
+	VxzBtdFTY/+wZae+ZyQruGJOTJ2e4dcbockyreKnSIzab0gC12QNT7eYwt8WChLyAvMbmX
+	VnW6rDbCMqP2Hs22mvBOp+hLvLpnjYXdqt7swzPU2zF391z+CEz5EgdOlozyQQ==
 From: chenxiaosong@chenxiaosong.com
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -41,12 +39,11 @@ To: smfrench@gmail.com,
 	dhowells@redhat.com,
 	metze@samba.org
 Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v3 7/7] smb/server: fix incorrect file size in get_file_compression_info()
-Date: Mon,  8 Jun 2026 14:01:28 +0000
-Message-ID: <20260608140128.387844-8-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260608140128.387844-1-chenxiaosong@chenxiaosong.com>
-References: <20260608140128.387844-1-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH samba v3 0/1] smbclient: cancel pending notify on SIGINT
+Date: Mon,  8 Jun 2026 14:28:14 +0000
+Message-ID: <20260608142815.388768-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -58,48 +55,18 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Before this patch, we got the wrong file size:
+I also created a merge request on GitLab: https://gitlab.com/samba-team/samba/-/merge_requests/4530
 
-  - client: touch /mnt/file
-  - client: smbinfo setcompression default /mnt/file
-  - client: dd if=/dev/zero of=/mnt/file bs=1 count=1000
-  - client: smbinfo filecompressioninfo /mnt/file
-            Compressed File Size: 4096
-            Compression Format: 2 (LZNT1)
+v2->v3: close file before `notify` exit 
 
-After this patch, we get the correct file size:
+v2: https://lore.kernel.org/linux-cifs/20260520153607.347960-1-chenxiaosong@chenxiaosong.com/
 
-  - client: smbinfo filecompressioninfo /mnt/file
-            Compressed File Size: 1000
-            Compression Format: 2 (LZNT1)
+ChenXiaoSong (1):
+  smbclient: cancel pending notify on SIGINT
 
-Note that the actual compressed file size must be got by other methods.
-For Btrfs, use the following command to get actual compressed file size:
+ source3/client/client.c | 64 ++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 57 insertions(+), 7 deletions(-)
 
-  - server: compsize /export/file
-            Processed 1 file, 0 regular extents (0 refs), 1 inline.
-            Type       Perc     Disk Usage   Uncompressed Referenced
-            TOTAL        4%       47B        1000B        1000B
-            zlib         4%       47B        1000B        1000B
-
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/server/smb2pdu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 7150e77ff113..5781695d1094 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -5291,7 +5291,7 @@ static int get_file_compression_info(struct smb2_query_info_rsp *rsp,
- 		return ret;
- 
- 	file_info = (struct smb2_file_comp_info *)rsp->Buffer;
--	file_info->CompressedFileSize = cpu_to_le64(stat.blocks << 9);
-+	file_info->CompressedFileSize = cpu_to_le64(stat.size);
- 	file_info->CompressionFormat = cpu_to_le16(fmt);
- 	file_info->CompressionUnitShift = 0;
- 	file_info->ChunkShift = 0;
 -- 
 2.54.0
 
