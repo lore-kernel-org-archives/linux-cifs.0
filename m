@@ -1,112 +1,106 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9AE3B3886
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Jun 2026 22:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780958070; cv=pass; b=HcAIdOdMRGM+LJ63bXnVfJBiY3QPIjg7z8V8vxp9OxFeANrKgBPG2KRUnzQOVhidO4gjEeDXfy0MPrDrkfFa6PtahuZRreqHdL1tPAe2eKn4/atf42ic6IV5dFFit5yjj8gQ3qciOFY5sl0i/ny5NIyEtxGaXiuYR++xLOY+yU0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780958070; c=relaxed/simple;
-	bh=jrgsOYLu0aHR3gnZJyC7K1DyuZa/bQgGWt+lamS4Q8Q=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=T957L5enp9zrK2eumEZ6NLXg89oD/B9ZYjohxHuA/5WqZvlwoTPEKFi2ezhSqc/XSk6DKphQIkmX4unC5vgUNqKgkc6OtFV+ix0FQsjInPrxwbd3L+lZDKzykxgqolprxF6eYUO+W3EC1CpM8jxWwBpYh9zr1/Snqhho33uusT0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WbtwBjnZ; arc=pass smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58EF175A84
+	for <linux-cifs@vger.kernel.org>; Tue,  9 Jun 2026 00:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780965125; cv=none; b=AAL5KJS4wn8D6iOcqbNfVumhblDdeqPJ085ncrjJC4b0upIid4cWlaGbWsX8nWilPReloscBuxDj/QpnHM4Cr4zEJSuDZP7SMv6WUBxMWl7qJBmLBSL2yTmXoZZcK/PMaeC87ECwV6SMHuhEeibIIpJOAVk+L5v7ZbWUvQ+eipA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780965125; c=relaxed/simple;
+	bh=Egs8RoNt9rU7BtC/pafzLe/1YuyAsob8a3yFE90Z9BM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SqK9xxayIlwDwVEu4WQEMuRGwaYlJg4iBgr4UW/ir2k/n/NHKicUly9EdVgg5iaOvIjaLjSVK04MC/KOhbeVBn/Opj5rcuqeDttWXE7W5hfVJ/v9Obi1ifmcd+8/2lmqYi3qgDdwfPqQB5JjVNlltHyrTdRt3s+BV720pyaxGr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1s6N6F6; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WbtwBjnZ"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8ccef9eabccso56675516d6.1
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Jun 2026 15:34:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780958068; cv=none;
-        d=google.com; s=arc-20240605;
-        b=etE5j0MN6eeVdMDAh6UHIreNTEo2e9S4qxiVPPX0WW0xqJYPFxLSnP/+NKkq1t3voR
-         eq917MrxgrRQJXqhcc7UIA8FXu9ezMZBBAnsbtF9g221IiHme6juAwHKJaCPx7BdC+47
-         huHWuVjwzkdOdGcGcbTVr29QSvUDK9XOLgCc7vsYlSTan1XPNfgCGlLvYF9cCup7JuEY
-         UMCv6M6nrxRIFwUJ4qaPyoa0sNGsyv0CvVWP94v9vlpL1pPCEmO7dVnMgQ1xlU+mjpun
-         ae0g2tZu+68KQXJTRc+YniSM8sNLLHyIJ/nhGbeJ9O5EFmnBENolipvXcPMsvWELVG2H
-         O6nQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=A8YkrczZi+iXKp1TNAEmUnrgjLzgRyXUAQtGxOytYig=;
-        fh=4pZOygrxjUMSWMqRiZ7YhJnexf31YCNZaShWtwPX3Q8=;
-        b=J+eke8Pf9GDDgvsTiyeuo1EQHaNgP2aJsDOfjNCYc3FeLyGM5wUTFpU6EVQ9cH8/td
-         oi80Wl3SYUJRTPECFYMOB6jTy2lB+9Seq7HS4Tpl5/fVhz/61UJWB3y3qxudEudBfabm
-         zT5417yTuaIj9XsBxiVD9/hHNoS8jBWELE1Cux88r6GWeQcVZLiXklqNc+/OIMcmFZLn
-         p3pYvegJ7eqtAq7MgBgLVyesvpC6IAWHO+rJc3I0tkKKQMUYbp+hfBDdEjS7/78syZkw
-         XPxdM4/rZq4Vz5h6ZeSXqPQ42qal+Q2uEwYkkD+vTel6d19+rKt9YeOWvAe5QV+j4mux
-         dySA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780958068; x=1781562868; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=A8YkrczZi+iXKp1TNAEmUnrgjLzgRyXUAQtGxOytYig=;
-        b=WbtwBjnZFUicFiKIJVcd0THvstXZzESSYB5ELNB9CPkuEP/MrrD6+dm+hHN3UlwY5W
-         KwNt0V+4/ukNaB180HD3SeU9mGIUY+LiVSPO1/mC8w5W6WByjSEQ/hNtXbHBwFn6OEzk
-         m8Lx84iscut4/7up0WIK+h/s8qrM3StvjSu8kbs6P/UqMSCF8BEOf0dWDfdt01w0gUG/
-         AmNyhimCO4OzzheUsMA1R7AUeis1YjWuND080SCq6pT/5a+H8t0HAfek4JN6AxZ0/QHh
-         rKDL2DQsTlBJ67hCUnzyO8k3hg6gcAk2ZNfclOoUUdsq6AcwxCGlNfYdc2OdfvnRFKuO
-         HB1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780958068; x=1781562868;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A8YkrczZi+iXKp1TNAEmUnrgjLzgRyXUAQtGxOytYig=;
-        b=DfHMOvHifaputeGJXNSb1VYXiAzooAyWBRDQiMUmAkMo+li3leOFRY8CPgAxzbUa5N
-         27u3wGfA2n6uGU5S7V2fDUtDh5KHYHN+Y0UtmSLHfdqTUvOauFidgRLPI0ZxkmQTa/m/
-         xtvtPEp1H7i/5t8RPWc0WoKvNG3mzK15802ByyXHmPe23HAiPTPW8YELZ7QI6ZGwbg2I
-         5ISGyJYR5tOTSkBedDTcXHYTgstWvHYIKrUklZT82uQcmRhXg8EhqotLwFdUuGxA33Me
-         fb1ranmzZQ981mqOkcdsqn18mGmGVVaoM9xBVzdh3KQsVSJagj15ZDKEiRgDozvHiUzZ
-         wxoQ==
-X-Gm-Message-State: AOJu0Yz+lDkeeOEG0uP5ZYKpMC72f1Jl7Evd7I9OdtCmJ3F5HO/qjOvt
-	dPsB4/y/7/i+FTGOxVGrr3oqAvrPDdBfIGIP96pkzJ8AEAvm1V7eC0PGYa9WKQE5o5+F4+BrutA
-	T0LxNocrPhU990J9mJdww8zE5k4F4BL4=
-X-Gm-Gg: Acq92OGjWfNXOYKwMHvCxkYWEwKZsIspl5NeBr8mcU0SoMdYquOxR5wZyN3qitFxv4e
-	bCJbasv7GFByu1PcrPEa2iwYnx4JZB18qqOApg3kpn1HozHAenHD6QJQ3+F4LpK9SgAbWUVyV18
-	1RfXwFsrkwQq8lT8OMNcBEnOxI2mVzmF3SMURILdKPzms6cENtv7A/wj0C84AV9MAR2PNYiug8z
-	eBefTK5xvCtbRQPPtiuQ8JF5niPNWqgHf8tO+967SmBNGSyI7eAbmlCDLWxqGbn1ccFY82+5us3
-	eLcsyCeh8E1iVxlyjD4pksAk2ggtdU6/jgPKhU1wEdslpb80ApclwqQ/nbmSQ6GWAzjPn9VkzDU
-	rr3NiH+q2+bcUZ+ZXIszMsDjEnZYhTVgJNrEQhK4gIgiKi4Xlyr9Xg4k6fTNfkJPLIpY3fm+sh2
-	O7j2nXm3IeE/mI2CCVfmcXfYaN7gH4XDxw
-X-Received: by 2002:a05:6214:1242:b0:8ca:256b:8751 with SMTP id
- 6a1803df08f44-8cee8b1db55mr212047496d6.1.1780958068364; Mon, 08 Jun 2026
- 15:34:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1s6N6F6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F4941F008A0
+	for <linux-cifs@vger.kernel.org>; Tue,  9 Jun 2026 00:32:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780965124;
+	bh=1vUWycOtjeCv4PfyJLEBA+FeJiReG8Z6FEtRQNg9kfY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=n1s6N6F6qj69D3NnPP4RerJjajyfNI0Eehmr9eRmJieinW1Hf6c0YNtaqwIxsWtmm
+	 UptbAezQwSFbN9byf55QmNipCJss9p4an8Jf7ZFPIgB8YM6wUbGI6CJ1uiMOHFOczP
+	 tfXTmyZU9c0/+SWSiUyEpBPN30VAYwWJyFvcLm/b5H5OpCmuV5muArdkzrE/IkpbdO
+	 pPpJe25J3AkTczRJhZDHobtZZkrbuI3nEOi+63PL99SHzAvqJBZ6bXzIXLbgQYS7Z5
+	 Vsx3P09YyFm1NjBi/DKyaRNE3rKHVBDLZh4dAX1M+0cOi6j9rxOZjuearCt9ppKMQ3
+	 gN0pMgUmmJFow==
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-bec429c2bb1so715832466b.1
+        for <linux-cifs@vger.kernel.org>; Mon, 08 Jun 2026 17:32:04 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ8Sm7GaYvsBzBNo7A37zsugKWAyW8mrLAWeM6PdYnsVgZFeRr2LK6EU64o+7Y+e9tMq9MYahBWFDsYe@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgaP7pV+AjuyqhbLAD1G7VnfDSaZ8fEyQ/8jtMzDDtRgqKuRBU
+	3ySSkmr10TXm2C7witcT+PlQ6vdQX/hHCSenZn/TUl18BUb1WIiQlFfjR7Aa+yzEylsfNT5mXyN
+	QWqDDhjxEEOz7+lusgTkvLFgsP6PM6ug=
+X-Received: by 2002:a17:906:8a48:b0:bed:6e53:bb25 with SMTP id
+ a640c23a62f3a-bf37301d00amr634249666b.40.1780965122959; Mon, 08 Jun 2026
+ 17:32:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 8 Jun 2026 17:34:22 -0500
-X-Gm-Features: AVVi8CeMcywVbR_REdArSCCCMzZ9vEntNfdQxZoM0RBYrd3qs3T9dojG8iX0vhA
-Message-ID: <CAH2r5muMKwYGGAcBN_LQcE2zhd-+Kk+fKsRiTokpYXwZoGS68A@mail.gmail.com>
-Subject: xfstest generic/035
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>
+References: <20260608140128.387844-1-chenxiaosong@chenxiaosong.com> <20260608140128.387844-8-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260608140128.387844-8-chenxiaosong@chenxiaosong.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 9 Jun 2026 09:31:51 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9JGDYJvtO3fZcjLh_qY3bs198BYW4ijYaHsgZDFF9eCA@mail.gmail.com>
+X-Gm-Features: AVVi8CdU3nt13U9owmyAZDB2zCuimdc-Df79QAU4CUHOhHkYjovwRZpDKflMBgI
+Message-ID: <CAKYAXd9JGDYJvtO3fZcjLh_qY3bs198BYW4ijYaHsgZDFF9eCA@mail.gmail.com>
+Subject: Re: [PATCH v3 7/7] smb/server: fix incorrect file size in get_file_compression_info()
+To: chenxiaosong@chenxiaosong.com
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
+	linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Do you also see xfstest generic/035 fail to ksmbd (but works to Samba)?
-
-Client's mount options are "modefromsid,idsfromsid" otherwise default
-
-generic/035         - output mismatch (see
-/data/xfstests-dev/results//ksmbd/generic/035.out.bad)
-    --- tests/generic/035.out   2024-05-15 02:56:12.624944737 -0500
-    +++ /data/xfstests-dev/results//ksmbd/generic/035.out.bad
-2026-06-08 17:26:09.357104228 -0500
-    @@ -1,3 +1,4 @@
-     QA output created by 035
-     overwriting regular file:
-    +nlink is 1, should be 0
-     overwriting directory:
-    ...
-    (Run 'diff -u /data/xfstests-dev/tests/generic/035.out
-/data/xfstests-dev/results//ksmbd/generic/035.out.bad'  to see the
-entire diff)
-
--- 
-Thanks,
-
-Steve
+On Mon, Jun 8, 2026 at 11:03=E2=80=AFPM <chenxiaosong@chenxiaosong.com> wro=
+te:
+>
+> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>
+> Before this patch, we got the wrong file size:
+>
+>   - client: touch /mnt/file
+>   - client: smbinfo setcompression default /mnt/file
+>   - client: dd if=3D/dev/zero of=3D/mnt/file bs=3D1 count=3D1000
+>   - client: smbinfo filecompressioninfo /mnt/file
+>             Compressed File Size: 4096
+>             Compression Format: 2 (LZNT1)
+>
+> After this patch, we get the correct file size:
+>
+>   - client: smbinfo filecompressioninfo /mnt/file
+>             Compressed File Size: 1000
+>             Compression Format: 2 (LZNT1)
+>
+> Note that the actual compressed file size must be got by other methods.
+> For Btrfs, use the following command to get actual compressed file size:
+>
+>   - server: compsize /export/file
+>             Processed 1 file, 0 regular extents (0 refs), 1 inline.
+>             Type       Perc     Disk Usage   Uncompressed Referenced
+>             TOTAL        4%       47B        1000B        1000B
+>             zlib         4%       47B        1000B        1000B
+>
+> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> ---
+>  fs/smb/server/smb2pdu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+> index 7150e77ff113..5781695d1094 100644
+> --- a/fs/smb/server/smb2pdu.c
+> +++ b/fs/smb/server/smb2pdu.c
+> @@ -5291,7 +5291,7 @@ static int get_file_compression_info(struct smb2_qu=
+ery_info_rsp *rsp,
+>                 return ret;
+>
+>         file_info =3D (struct smb2_file_comp_info *)rsp->Buffer;
+> -       file_info->CompressedFileSize =3D cpu_to_le64(stat.blocks << 9);
+> +       file_info->CompressedFileSize =3D cpu_to_le64(stat.size);
+We should return the number of bytes allocated to the actual disk
+after compression. Is stat.size the actual compressed size?
