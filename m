@@ -1,250 +1,145 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1269635E1D7;
-	Tue,  9 Jun 2026 15:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781018695; cv=none; b=A2NHcR5ClKzOAjBGne7x5Jmtvbee/YjYXvO8ZzSG377od+0kgksI/3hJjz6FGmiNg/NjmLw+eWUFIT68k6gEePbTghIcCLs6ZayKiqW8tUhP9PcaURiGyqR+1MwWzvT6jR8CIJTVYoh3O5T8DQrc+S3FTAS/yqNuVRufbuur2QA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781018695; c=relaxed/simple;
-	bh=HBoPFGOXGybi9zPjNvhBs4GVWkRnbZRL7P47phF5uJE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hin+eoFCcgAQShKajG0m11q4PTGYpm/hB2rIShaWLOubXuigRe3kMtKA+YsyMnlJ1L/8maJ99hE2Xu6dIg9yUdjV5klIRfXYetq9Cm0cPs22CvVq6xKSyBRczZAq5Tsy1g3mJ5L2a9XgBAytGmRrw2W/x+myhC4RQAtMgs6XY8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H0G+XJ5b; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F3E4D8D84
+	for <linux-cifs@vger.kernel.org>; Tue,  9 Jun 2026 22:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781043618; cv=pass; b=kLUUp8S8flvEdUqNikXLIz/mCVvmf3rZ7cNMkB2SYfNHapK9l+vUdePGFOCevXrxCGNAA5MCo+jAgEORv5AzJsU3kwbFLgv4L8ywU9zLzyHcoCL7oXehDzOxUesIkPGgTiVENQTohHNTruv00do2MTtcWrymxnI7odrXufQ1Mow=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781043618; c=relaxed/simple;
+	bh=hSgi0DQrQeGWXJn/UStoGjVMSyxqvgC7nF5MpkTHiIw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CudTknuqW8IwE74rENYTOUaHQXNQAae3WrNZGPGy4/U0xQpQ9guL+Boys0tho3ZQwOrIoyin0sObk7FkrdZer1MU2ajS76hnesNJKum/gvcqC4j9R7eLVcMIYt+FE8Zvz+o0fwCw8DqNklAG5OIdoO4ftj0pNQgisRg32baJ9Io=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g0c3/SYM; arc=pass smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H0G+XJ5b"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781018693; x=1812554693;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=HBoPFGOXGybi9zPjNvhBs4GVWkRnbZRL7P47phF5uJE=;
-  b=H0G+XJ5bIYimtJQcJLuS3eLXT1WH3dQ8er+6Apt7BaefoAV44r46WzWE
-   8N3WXL8F6zQ5yWOJrnS9blKfAE7c1xg8eKxeVp3moDZ45w4EJfcNx29yQ
-   mdn4Knlgii/qCTJVR8TGlWId9WTxhQMpIWsvLF7j5lyITJeAydfkHGBWu
-   dFqbwQo63yd8hDnQlf/BO5z0ywFwwmBI4LL9YOntjNofRwN0oEfKzU7AA
-   WOqBYq2Ghyh7ReCyVaAybPZVJXGifSJiy0nmXe5wimG798BKZdH1cbX3P
-   yPY3comgXso9fzJZ9y27aysjXvQVKOGZTNUYQlZvqauxLIe9MPEJ64PXT
-   A==;
-X-CSE-ConnectionGUID: UI4WHEsZQ6aSIwE11oMzHg==
-X-CSE-MsgGUID: Fzj+RrxzSwiu9YKVcopZrw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11812"; a="84352283"
-X-IronPort-AV: E=Sophos;i="6.24,196,1774335600"; 
-   d="scan'208";a="84352283"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2026 08:24:51 -0700
-X-CSE-ConnectionGUID: SIFLfa6ORfeM1YV6G9lz1g==
-X-CSE-MsgGUID: 6n6rabJGS8qCw/q/3/ezcw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,196,1774335600"; 
-   d="scan'208";a="247759332"
-Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.162])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2026 08:24:42 -0700
-Date: Tue, 9 Jun 2026 18:24:40 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: mkalderon@marvell.com, Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>, zyjzyj2000@gmail.com,
-	sagi@grimberg.me, mgurtovoy@nvidia.com, haris.iqbal@ionos.com,
-	jinpu.wang@ionos.com, bvanassche@acm.org, kbusch@kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	kch@nvidia.com, smfrench@gmail.com, linkinjeon@kernel.org,
-	metze@samba.org, tom@talpey.com, trondmy@kernel.org,
-	anna@kernel.org, chuck.lever@oracle.com, jlayton@kernel.org,
-	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
-	achender@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	kees@kernel.org, ebadger@purestorage.com,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	target-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-	rds-devel@oss.oracle.com, Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH rdma-next v7] RDMA: Change capability fields in
- ib_device_attr from int to u32
-Message-ID: <aigwONAwxQx6rLef@ashevche-desk.local>
-References: <20260606070735.2163063-1-ernis@linux.microsoft.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g0c3/SYM"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-9158c621ebbso708082185a.2
+        for <linux-cifs@vger.kernel.org>; Tue, 09 Jun 2026 15:20:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781043616; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TyFeeDrqqEwl9Y+pxRhLogkDzp48bJeVy3S3rDEKrzAimc4zkAe/NNEy53iFD5jPQu
+         2gpOBfN2yW5h3eyXfJnRCKykfF+yAHf+d1xulB1KiN21a6YBXB3eHUEEHT/ntCOs4O+Y
+         6M70IPwKBOWxMan54YNpteicwtmhShxY9MFN/Sw84rz0lkJYRPMX+C1USfSRx9r/2c3k
+         1ULt3KMBS7j99jlrr1tgTrxqWzfXvZVlLkHQwDrSOtXlE3KhVTjZk4dAsI979eTmcvKN
+         Rawsew68hTXsGQ6whY7b/39A1kXfKrfSEVVRueIbdH5kPzEL3NISM20sr4sqKDz58wZ6
+         S4gw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=+ot/4t41HpYuXj39wqSGjI97S9W+8dZZVBBjzX6WdKw=;
+        fh=74J9kUtVznQMJAijN0AgQId9iiXakfi5SQxcKsz5PTw=;
+        b=OwRzbUU0NCkCbklQR6sLPxMnOUTVGy4yfJdbe+h3sVY4/ebyBy2MQM58dQDgnepn1k
+         iva6E8t9UYPDCJaBNERUWexhXGcY6WJA5tpJcPbxm5mUeNkqoo1NUPt9OYTlfC7dq+UJ
+         WWeqpQQvyJvEuKVgZSve7sbBLlg1Czna0OiLRYQ/r0Elke8r2L1LdiIrBpjI8RqTVoMn
+         vOGLCIp0tykGAyw6KvFtJYNu0vBP00X5NNmoRx0RSJTeCXm1jS+TL9Bkc+NLNF3/ly7f
+         mRxxXFeIG+sCrj5C2q82VF1/+MC0mvq8RN/GxWtBoLzb1rFPmEO92N7N6vrifnurklth
+         yYvw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781043616; x=1781648416; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+ot/4t41HpYuXj39wqSGjI97S9W+8dZZVBBjzX6WdKw=;
+        b=g0c3/SYMhZvcbk53OtB81C44qN0i8o9Zfoxo476GFl8lkS85Nlp+OdnWn4Bb1ZBWrS
+         QAgNcgXmKOW1lmshHFvhQYaPC3L80gHiwjyltuJBsn7oyyjbbQ+GYINEAUGBXsY1XjHn
+         +FcHV48PeNTimZ2QuhXRn1aW/ML/+Dv6USr1hJ2Xl9vm34mjvoKatxf7mDCnr0xN1F14
+         3ap4bXfyVQKBJmQVmYb3Gjmj0jsZ8istDJ2cgLGmm2ciP1/bywfTVTtscf9xsFWZ1grQ
+         57akXr0upu0ucJAecqgY7RQykDj3yWKOc9EfxaM5G1PWzTLeI/kpNAtw/saC+mnh58vJ
+         7uxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781043616; x=1781648416;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+ot/4t41HpYuXj39wqSGjI97S9W+8dZZVBBjzX6WdKw=;
+        b=J8C8GGonWWETpxYvH92Df3REPdEu5JWXBPllqRNyqgqfkAMLZh3PRl8qM75wJUe3SL
+         /2e59jKhNB8TfNcdjKhLalITSrGRxEgkJyD07M/F79+9m2TEcp7HWOyRM+3x+yMTYVCF
+         PJLq2KecS+O2/pFJhlL1QjJp31LHRkasCPVF4wUFdziZM33a60CwFOD70Hic8ZF5HrUc
+         DQiL9Y/D9KXW7pIgTzPxW8TKJIh+dTNGdPCi5AUTniZJaUoVUKPFvlv7XlnYRScY+hes
+         6XQ2xr/pbjzCKGldqOnELwJ/3z649LSnSlQMJk1H9+971yZ85mhjW+mIlDtCuCleueXd
+         YZDQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9AcRCzb/FKDEQauV/Bnj/LseXdcDSJcNCt5M/T3akowTEbEykwdiQlQdn/U6etCT/U/JzeGNoIqVvm@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywxb3QsrcWJtCiS3BSisyihZt3NULyuWWDDIXyVf+sIQPlkwLOV
+	ZG9cmPaGLfAGuMm5ZKAXS61oL9Ixwzl81ScVPwgiFy5LiwAeV54KrgGaOAGySsuGLWrTfG9XMOe
+	hRWhybgH7yx2ekVmPS5UIduLr1iAlPUHl53kIqRc=
+X-Gm-Gg: Acq92OHmEnFP4cARj23HKTys8vLSEhSPFJXKhB1ACuPwnFLFuLveg2NX7baA9zXkVvD
+	2NL18aIqlA6WNETQKGTsJqg0R1XI1UY1QVhX+E9e7is8A8oAx31WEKE+XkEugH2loFoA07dzEHO
+	pgejNfBDjUaXkGPMF9IWl9m5lIwO4+mCRLMhDjjGw6nP5D5XPgjazxDfo753Rsd4RGuQgKaslu8
+	f4jmI85Dg5SvpQn0scGeFUk2GPBKPjUIU+XDdFt1+UNyFCXQ1aeC8pAtIw5P3Z+L/8dkYZ6BAaw
+	nsAbSHKO7xfPFH0BugSPxnehYCgHlMMxPa78eKz63eAnlgTLbQnSP74I0ggeJzSPVgI05QJa6p5
+	iYjQqGeQ3FSsSBh1w1FGNQAYO4Ow8J482Zlzozkg2gl5ZA3ybNAXfAV3NyDWPlOkS6qeTnF+OFl
+	gfZa42Yy2nSKglvjxfZrIvUHfvLxTHiqIU
+X-Received: by 2002:a05:620a:1d0e:b0:911:9a7a:8076 with SMTP id
+ af79cd13be357-915a9c350edmr3718229185a.8.1781043615973; Tue, 09 Jun 2026
+ 15:20:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260606070735.2163063-1-ernis@linux.microsoft.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+References: <202606091825.Fvo4zzYp-lkp@intel.com> <20260609141108.90414-1-cel@kernel.org>
+In-Reply-To: <20260609141108.90414-1-cel@kernel.org>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 9 Jun 2026 17:20:04 -0500
+X-Gm-Features: AVVi8CeOfYnDex28-rn-0FojbcnrExEKLSF5jGwKXya_gdEo9vDq-mOmY0-SzJg
+Message-ID: <CAH2r5mvCKnRjvt4VK7xj47L4yLoBc8_dTc_CRHjG4xq2MuFBjA@mail.gmail.com>
+Subject: Re: [cifs:for-next-next 15/16] fs/smb/client/cifsfs.c:1204:22: error:
+ use of undeclared identifier 'FS_XFLAG_CASEFOLD'
+To: Chuck Lever <cel@kernel.org>
+Cc: kernel test robot <lkp@intel.com>, llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Steve French <stfrench@microsoft.com>, Roland Mainz <roland.mainz@nrubsig.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 06, 2026 at 12:07:15AM -0700, Erni Sri Satya Vennela wrote:
-> The capability counter fields in struct ib_device_attr are declared
-> as signed int, but these values are inherently non-negative. Drivers
-> maintain their cached caps as u32 and assign them directly into these
-> int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
-> negative value visible to the IB core.
-> 
-> Change the signed int capability fields to u32 to match the
-> underlying nature of the data. Also update consumers across the IB
-> core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
-> are not forced back through signed int or u8 via min()/min_t() or
-> narrowing local variables.
+On Tue, Jun 9, 2026 at 9:19=E2=80=AFAM Chuck Lever <cel@kernel.org> wrote:
+>
+> On 6/9/26 6:24 AM, kernel test robot wrote:
+> > >> fs/smb/client/cifsfs.c:1204:22: error: use of undeclared identifier =
+'FS_XFLAG_CASEFOLD'
+>
+> FS_XFLAG_CASEFOLD and FS_XFLAG_CASENONPRESERVING are defined by
+> "fs: Add case sensitivity flags to file_kattr", the foundational
+> patch of the case-sensitivity series. That patch adds the two
+> macros to include/uapi/linux/fs.h and folds them into
+> FS_XFLAG_RDONLY_MASK in include/linux/fileattr.h.
+>
+> The cifs consumer ("cifs: Implement fileattr_get for case
+> sensitivity") landed in for-next-next without that prerequisite,
+> so the identifiers are undeclared. The failure reproduces under
+> both clang and gcc because the macros are simply absent, not
+> because of any arch- or compiler-specific construct.
+>
+> Steve, the cifs patch should not be applied ahead of its
+> dependency. Either base for-next-next on the branch carrying
+> "fs: Add case sensitivity flags to file_kattr", or drop the cifs
+> patch until that patch lands. The full series is intended to be
+> merged together for this reason.
 
-...
+Removed now - the purpose of this branch ("for-next-next") was not to
+forget patches in next merge window,
+(ie that are too early to merge into cifs-2.6.git for-next) I didn't
+realize that anyone auto-built from for-next-next,
+I didn't want to forget about the followon patch to yours:
 
->  	attr->max_qp_init_rd_atom =
->  	    1 << (fls(qattr->max_qp_req_rd_atomic_resc) - 1);
+smb: client: revalidate attrs before reporting FS_COMPR_FL
 
-FWIW, this one and below looks like reinvention of rounddown_pow_of_two().
+  cifs_fileattr_get() reports FS_COMPR_FL from inode->cifsAttrs.
+  Revalidate the dentry attributes before consulting cifsAttrs
+  so that the reported compression flag reflects current server
+  state when attribute revalidation is required.
 
->  	attr->max_qp_rd_atom =
-> -	    min(1 << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
-> +	    min(1U << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
->  		attr->max_qp_init_rd_atom);
-
-...
-
->  int ipoib_cm_dev_init(struct net_device *dev)
->  {
->  	struct ipoib_dev_priv *priv = ipoib_priv(dev);
-> -	int max_srq_sge, i;
-> +	int i;
-> +	u32 max_srq_sge;
->  	u8 addr;
-
-It seems the order is reversed xmas tree, why not preserving it?
-
-...
-
-> --- a/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> +++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-
->  		max_send_wr =
-> -			min_t(int, wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
-> +			min(wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
-
-Now perfectly a single line
-
-		max_send_wr = min(wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
-
->  		max_recv_wr = max_send_wr;
-
-...
-
-> -		max_send_wr = min_t(int, wr_limit,
-> -			      /* QD * (REQ + RSP + FR REGS or INVS) + drain */
-> -			      clt_path->queue_depth * 4 + 1);
-> -		max_recv_wr = min_t(int, wr_limit,
-> -			      clt_path->queue_depth * 3 + 1);
-> +		max_send_wr = min_t(u32, wr_limit,
-> +				    /* QD * (REQ + RSP + FR REGS or INVS) + drain */
-> +				    clt_path->queue_depth * 4 + 1);
-> +		max_recv_wr = min_t(u32, wr_limit,
-> +				    clt_path->queue_depth * 3 + 1);
-
-Can we rather update the type of one of them and use min() instead?
-
-...
-
-> --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-
-Ditto.
-
-...
-
-> -static int srpt_srq_size = DEFAULT_SRPT_SRQ_SIZE;
-> -module_param(srpt_srq_size, int, 0444);
-> +static unsigned int srpt_srq_size = DEFAULT_SRPT_SRQ_SIZE;
-> +module_param(srpt_srq_size, uint, 0444);
-
-Theoretically this might break ABI (if somebody uses negative values for
-anything. I don't think it's the case, but just be informed.
-
->  MODULE_PARM_DESC(srpt_srq_size,
->  		 "Shared receive queue (SRQ) size.");
-
-...
-
-> --- a/drivers/nvme/target/rdma.c
-> +++ b/drivers/nvme/target/rdma.c
-
-> -	ndev->srq_size = min(ndev->device->attrs.max_srq_wr,
-> -			     nvmet_rdma_srq_size);
-> -	ndev->srq_count = min(ndev->device->num_comp_vectors,
-> -			      ndev->device->attrs.max_srq);
-> +	ndev->srq_size = min_t(u32, ndev->device->attrs.max_srq_wr,
-> +			       nvmet_rdma_srq_size);
-> +	ndev->srq_count = min_t(u32, ndev->device->num_comp_vectors,
-> +				ndev->device->attrs.max_srq);
-
-Same question, can we change type type of variables instead?
-
->  	mutex_lock(&device_list_mutex);
-
-...
-
->  	inline_page_count = num_pages(nport->inline_data_size);
->  	inline_sge_count = max(cm_id->device->attrs.max_sge_rd,
-> -				cm_id->device->attrs.max_recv_sge) - 1;
-> +				cm_id->device->attrs.max_recv_sge);
-> +	inline_sge_count = inline_sge_count ? inline_sge_count - 1 : 0;
-
-Simple conditional might be better
-
-	if (inline_sge_count)
-		inline_sge_count--;
-	OR
-		inline_sge_count -= 1;
-
-...
-
-> +++ b/include/rdma/ib_verbs.h
-
-> -	int			max_qp;
-> -	int			max_qp_wr;
-> +	u32			max_qp;
-> +	u32			max_qp_wr;
-
-Nice, but please check that none of these (and beyond) were not used in signed
-multiplication or (which is more disasterous) division. Otherwise it might be
-subtle issues that will be hard to debug.
-
-...
-
->  	conn_param->responder_resources =
-> -		min_t(u32, rds_ibdev->max_responder_resources, max_responder_resources);
-> +		min3(rds_ibdev->max_responder_resources,
-> +		     max_responder_resources, U8_MAX);
->  	conn_param->initiator_depth =
-> -		min_t(u32, rds_ibdev->max_initiator_depth, max_initiator_depth);
-> +		min3(rds_ibdev->max_initiator_depth,
-> +		     max_initiator_depth, U8_MAX);
-
-I believe we can go a few characters over and leave them to be single lines.
-
->  	conn_param->retry_count = min_t(unsigned int, rds_ib_retry_count, 7);
-
-What about this one?
-
->  	conn_param->rnr_retry_count = 7;
-
-...
-
->  int frwr_query_device(struct rpcrdma_ep *ep, const struct ib_device *device)
->  {
->  	const struct ib_device_attr *attrs = &device->attrs;
-> -	int max_qp_wr, depth, delta;
-> +	u32 max_qp_wr;
-> +	int depth, delta;
->  	unsigned int max_sge;
-
-Reversed xmas tree order.
-
--- 
-With Best Regards,
-Andy Shevchenko
+  Signed-off-by: tanze <tanze@kylinos.cn>
 
 
+
+--=20
+Thanks,
+
+Steve
