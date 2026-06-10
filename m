@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739CB2F8EB5
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Jun 2026 15:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13912DC79A
+	for <linux-cifs@vger.kernel.org>; Wed, 10 Jun 2026 15:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781104581; cv=none; b=VQaPGlAqwaD2HnI6rvD+zfkQsiQILcif00z+owPecACH8MX7o8EJd25+H1E2uVPKDtC4arKROuK5ClSs6M/+er3U5LdVxXfMGnsQV+zFyG2c2lrGRiq7K74DGCqJj1jZ/sW87TrCpqOL+it/5u0rTOqqP3BDtrP8CTbdf7x/vyo=
+	t=1781104584; cv=none; b=SVK4/nsHcdg7/wR5W5rnZS9d2ZxUWQvuGjhHf1MFlEmefWj++KdqwNLGrSogPUztiIXZJPczZxDsb/SsWCEZKCDHdToy3U01fN2hHI/lFLbVdGnpg/yjzIhw4DvztslxehmjMNWS8sjlv0NS72CGiRCQlyUwF/OlG0sAG3LQcHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781104581; c=relaxed/simple;
-	bh=sYglwa0ajga0GeFgFhmcUKjVcCKH2P6TGrP0E82pTMo=;
+	s=arc-20240116; t=1781104584; c=relaxed/simple;
+	bh=fHZq2iG/GdpXb9TgI/hga9bi1OB/9dbL75XnV31tKpM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YgPRCDjfdqPwpfqmNeDQszUeSb+5aJbVvic3CcqcefMe3X1rHnHCnWk7mz4DbfhssnWmH4TYuekUxW8Kdv3OogXxBkk8etdoZ+Dh50DEdQTso16lTL9z0XN+ke1R7SLaAstBhvGGezM7mBGvUlifbFk1hXJ6G3Mmlr6WP4AZGN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Su+Ewm77; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=q0i2cSFOnDveY3hvmgWyPYqtNtXHGBfoU8bd1PBNw3up+QQQs2e2rIPxdogMfENopTjmXE9ZPXOxWybPv8vJUDUIvB5hk1oK4MieggxcpKAdLL8at5+T958oo/So7mB8pr97gNGmDsIbsEN5TUJFLrt5Ax/BC0bUuEmpJh6FMEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XTvOsmQa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Su+Ewm77"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9DA41F00893;
-	Wed, 10 Jun 2026 15:16:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XTvOsmQa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 532921F00898;
+	Wed, 10 Jun 2026 15:16:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781104580;
-	bh=M3DzhDZQm03Tj2ZWDHPNqJUSRh8U/EZmUOYVRNA9Ds0=;
+	s=k20260515; t=1781104582;
+	bh=QR7STUmqxTPJkY1xhC/S6lDRYWw4qbOFnTr/KlAiKCM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Su+Ewm77bMCKKj/OH1rXhmHYGwJ2yIradaz8yZ0QCpwssz9U2aqq7GJIdYJCQOJLg
-	 J7pH9/IuH7go6oB8Dk5xNTIsGFZkRXKweS/4VyXI/m11KkUo9T3wbFK+ZRsfOk0zbi
-	 lMUK1K+0jNPB1HUezQuuhHVNEu5LLUFDxnbHX7myhqZyAU4CN4fhDuNr/IWEXXfrty
-	 7UdoSJvhvaDfBEMlNrZp4ZNixXFIEL2EpBNe7X+ykdt5QVI6dFo1T3wHFuahttlJJ8
-	 2uqCuyvvnJspOfe/m9/R1kmcaN2ygpLLw1WqTAHZGvb0rMYWnpI8hSEnMDqKYwofA7
-	 HfgmN5py/qsyg==
+	b=XTvOsmQaDxs947LHkBsObZjOomXeLNOnIIrHJGaOHUhKwksL2Wapu2JdHiVNHHNmd
+	 T4GIqdEZvTzByO1jueV0/2EHr47gJHpFatDz5RD8+ZEbhCREdTtn0cpRbTZJytNtBq
+	 gqXHP3bOumiP23eaJzuI7Wh4p+fDp2zNPR2rzou+45z0kcsr3Ukr86LlYPlFrypmAm
+	 EjGNUiZmXUBT3Y8pGKtQX0i77YbbZBHs2B2UyAzaWBJOjMW0l44oTBFGebVRz70ZK+
+	 qsYO5Nq2Uwzy5LTxjcg0c2YRayf5GNFKgu7nS4Z3DziOszxefaBJRtb/0QWu0wNSSk
+	 0fpfdPojTr9nQ==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -34,9 +34,9 @@ Cc: smfrench@gmail.com,
 	metze@samba.org,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 4/5] ksmbd: negotiate and decode SMB2 compression
-Date: Thu, 11 Jun 2026 00:15:42 +0900
-Message-Id: <20260610151543.25218-5-linkinjeon@kernel.org>
+Subject: [PATCH 5/5] ksmbd: compress SMB2 READ responses
+Date: Thu, 11 Jun 2026 00:15:43 +0900
+Message-Id: <20260610151543.25218-6-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260610151543.25218-1-linkinjeon@kernel.org>
 References: <20260610151543.25218-1-linkinjeon@kernel.org>
@@ -48,368 +48,261 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Parse the SMB 3.1.1 compression capabilities context and negotiate LZ77
-with optional chained Pattern_V1 support.
+Handle SMB2_READFLAG_REQUEST_COMPRESSED for non-RDMA reads.
 
-Advertise compression on tree connections and decode compressed requests
-before normal SMB dispatch.
+Flatten the response iov, emit chained or unchained LZ77 transforms when
+compression is beneficial, and retain the generated buffer until the work
+item is released.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/Makefile     |   2 +-
- fs/smb/server/compress.c   |  77 ++++++++++++++++++++++++++
- fs/smb/server/compress.h   |  15 +++++
- fs/smb/server/connection.c |  12 ++++
- fs/smb/server/connection.h |   3 +
- fs/smb/server/smb2pdu.c    | 109 ++++++++++++++++++++++++++++++++++---
- fs/smb/server/smb_common.c |   5 --
- 7 files changed, 210 insertions(+), 13 deletions(-)
- create mode 100644 fs/smb/server/compress.c
- create mode 100644 fs/smb/server/compress.h
+ fs/smb/server/compress.c   | 132 +++++++++++++++++++++++++++++++++++++
+ fs/smb/server/compress.h   |   1 +
+ fs/smb/server/ksmbd_work.c |   1 +
+ fs/smb/server/ksmbd_work.h |   4 ++
+ fs/smb/server/server.c     |  10 +++
+ fs/smb/server/smb2pdu.c    |   9 +++
+ 6 files changed, 157 insertions(+)
 
-diff --git a/fs/smb/server/Makefile b/fs/smb/server/Makefile
-index 6407ba6b9340..a3e9306055e8 100644
---- a/fs/smb/server/Makefile
-+++ b/fs/smb/server/Makefile
-@@ -10,7 +10,7 @@ ksmbd-y :=	unicode.o auth.o vfs.o vfs_cache.o server.o ndr.o \
- 		mgmt/tree_connect.o mgmt/user_session.o smb_common.o \
- 		transport_tcp.o transport_ipc.o smbacl.o smb2pdu.o \
- 		smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
--		ksmbd_spnego_negtokentarg.asn1.o asn1.o
-+		ksmbd_spnego_negtokentarg.asn1.o asn1.o compress.o
- 
- $(obj)/asn1.o: $(obj)/ksmbd_spnego_negtokeninit.asn1.h $(obj)/ksmbd_spnego_negtokentarg.asn1.h
- 
 diff --git a/fs/smb/server/compress.c b/fs/smb/server/compress.c
-new file mode 100644
-index 000000000000..7c9f8a6cceb8
---- /dev/null
+index 7c9f8a6cceb8..f8cf515b9c30 100644
+--- a/fs/smb/server/compress.c
 +++ b/fs/smb/server/compress.c
-@@ -0,0 +1,77 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * SMB2 compression support for ksmbd.
-+ *
-+ * Receive and send SMB 3.1.1 compression transforms using the common helpers.
-+ *
-+ * Copyright (C) 2026 Namjae Jeon <linkinjeon@kernel.org>
-+ */
-+#include <linux/slab.h>
+@@ -10,6 +10,9 @@
+ 
+ #include "compress.h"
+ #include "smb_common.h"
++#include "../common/compress/lz77.h"
 +
-+#include "compress.h"
-+#include "smb_common.h"
++#define SMB_COMPRESS_MIN_LEN	PAGE_SIZE
+ 
+ /**
+  * ksmbd_decompress_request() - replace a compressed request with its SMB2 PDU
+@@ -75,3 +78,132 @@ int ksmbd_decompress_request(struct ksmbd_conn *conn)
+ 	conn->request_buf = out;
+ 	return 0;
+ }
 +
 +/**
-+ * ksmbd_decompress_request() - replace a compressed request with its SMB2 PDU
-+ * @conn: connection which owns the current RFC1002 request buffer
++ * ksmbd_compress_response() - compress an eligible ksmbd response
++ * @work: request work item containing the response iov
 + *
-+ * Derive the uncompressed size from the transform variant, enforce ksmbd's
-+ * normal message limits, and ask the common decoder to validate every payload.
-+ * On success, replace conn->request_buf with a regular RFC1002-framed SMB2
-+ * message so the rest of the request path needs no compression awareness.
++ * Compression transforms describe one contiguous SMB2 message, while ksmbd
++ * builds responses from multiple iov entries. Flatten the response first,
++ * produce the negotiated transform, and replace the response iov only when the
++ * result is smaller than the original message.
 + *
-+ * Return: 0 on success, otherwise a negative errno.
++ * Encrypted and compound responses are intentionally left unchanged. The
++ * caller may still continue sending the original response when this function
++ * returns zero.
++ *
++ * Return: 1 if the response was replaced, 0 if compression was skipped, or a
++ * negative errno on failure.
 + */
-+int ksmbd_decompress_request(struct ksmbd_conn *conn)
++int ksmbd_compress_response(struct ksmbd_work *work)
 +{
-+	struct smb2_compression_hdr *hdr;
-+	unsigned int pdu_size = get_rfc1002_len(conn->request_buf);
-+	u32 orig_size, offset, out_size;
-+	u32 max_allowed_pdu_size;
-+	char *buf, *out;
-+	int rc;
++	struct smb2_compression_hdr *chdr;
++	struct smb2_hdr *req_hdr;
++	u32 src_len, dst_len, compressed_pdu_len, max_dst_len;
++	u8 *src = NULL, *out = NULL, *p;
++	int i, rc;
 +
-+	if (pdu_size < sizeof(struct smb2_compression_hdr))
-+		return -EINVAL;
++	if (!work->compress_response || work->encrypted ||
++	    work->conn->compress_algorithm != SMB3_COMPRESS_LZ77)
++		return 0;
 +
-+	if (conn->dialect != SMB311_PROT_ID ||
-+	    conn->compress_algorithm == SMB3_COMPRESS_NONE)
-+		return -EINVAL;
++	req_hdr = smb_get_msg(work->request_buf);
++	if (req_hdr->NextCommand || work->next_smb2_rcv_hdr_off ||
++	    work->next_smb2_rsp_hdr_off)
++		return 0;
 +
-+	hdr = smb_get_msg(conn->request_buf);
-+	if (hdr->ProtocolId != SMB2_COMPRESSION_TRANSFORM_ID)
-+		return -EINVAL;
++	src_len = get_rfc1002_len(work->iov[0].iov_base);
++	if (src_len < SMB_COMPRESS_MIN_LEN)
++		return 0;
 +
-+	orig_size = le32_to_cpu(hdr->OriginalCompressedSegmentSize);
-+	if (hdr->Flags == cpu_to_le16(SMB2_COMPRESSION_FLAG_CHAINED)) {
-+		out_size = orig_size;
-+	} else {
-+		offset = le32_to_cpu(hdr->Offset);
-+		if (offset > pdu_size - sizeof(*hdr) ||
-+		    check_add_overflow(orig_size, offset, &out_size))
-+			return -EINVAL;
-+	}
-+
-+	max_allowed_pdu_size = SMB3_MAX_MSGSIZE + conn->vals->max_write_size;
-+	if (out_size > max_allowed_pdu_size ||
-+	    out_size > MAX_STREAM_PROT_LEN)
-+		return -EINVAL;
-+
-+	out = kvmalloc(out_size + 4 + 1, KSMBD_DEFAULT_GFP);
-+	if (!out)
++	src = kvmalloc(src_len, KSMBD_DEFAULT_GFP);
++	if (!src)
 +		return -ENOMEM;
 +
-+	buf = (char *)hdr;
-+	*(__be32 *)out = cpu_to_be32(out_size);
-+	rc = smb_compression_decompress(conn->compress_algorithm,
-+					conn->compress_chained,
-+					buf, pdu_size, out + 4, out_size);
-+	if (rc) {
-+		kvfree(out);
-+		return rc;
++	p = src;
++	/* iov[0] contains only the RFC1002 length; the SMB2 PDU starts at iov[1]. */
++	for (i = 1; i < work->iov_cnt; i++) {
++		if (work->iov[i].iov_len > src + src_len - p) {
++			rc = -EINVAL;
++			goto out;
++		}
++		memcpy(p, work->iov[i].iov_base, work->iov[i].iov_len);
++		p += work->iov[i].iov_len;
++	}
++	if (p != src + src_len) {
++		rc = -EINVAL;
++		goto out;
 +	}
 +
-+	kvfree(conn->request_buf);
-+	conn->request_buf = out;
-+	return 0;
++	max_dst_len = smb_lz77_compressed_alloc_size(src_len) +
++		sizeof(struct smb2_compression_hdr) +
++		3 * sizeof(struct smb2_compression_payload_hdr) +
++		2 * sizeof(struct smb2_compression_pattern_v1);
++	out = kvzalloc(sizeof(__be32) + max_dst_len,
++		       KSMBD_DEFAULT_GFP);
++	if (!out) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	if (work->conn->compress_chained) {
++		dst_len = max_dst_len;
++		rc = smb_compression_compress_chained(SMB3_COMPRESS_LZ77,
++						      work->conn->compress_pattern,
++						      src, src_len,
++						      out + sizeof(__be32),
++						      &dst_len);
++		if (rc == -EMSGSIZE || dst_len >= src_len) {
++			rc = 0;
++			goto out;
++		}
++		if (rc)
++			goto out;
++		compressed_pdu_len = dst_len;
++	} else {
++		/*
++		 * Peers which did not negotiate chained compression still use
++		 * the original 16-byte unchained transform format.
++		 */
++		dst_len = smb_lz77_compressed_alloc_size(src_len);
++		rc = smb_lz77_compress(src, src_len,
++				       out + sizeof(__be32) + sizeof(*chdr),
++				       &dst_len);
++		if (rc == -EMSGSIZE ||
++		    dst_len + sizeof(*chdr) >= src_len) {
++			rc = 0;
++			goto out;
++		}
++		if (rc)
++			goto out;
++
++		compressed_pdu_len = sizeof(*chdr) + dst_len;
++		chdr = (struct smb2_compression_hdr *)(out + sizeof(__be32));
++		chdr->ProtocolId = SMB2_COMPRESSION_TRANSFORM_ID;
++		chdr->OriginalCompressedSegmentSize = cpu_to_le32(src_len);
++		chdr->CompressionAlgorithm = SMB3_COMPRESS_LZ77;
++		chdr->Flags = cpu_to_le16(SMB2_COMPRESSION_FLAG_NONE);
++		chdr->Offset = 0;
++	}
++
++	*(__be32 *)out = cpu_to_be32(compressed_pdu_len);
++
++	/*
++	 * Keep the transform in work->compress_buf until send completion.
++	 * Existing response iovs can then be replaced without changing their
++	 * individual ownership rules.
++	 */
++	work->compress_buf = out;
++	work->iov[0].iov_base = out;
++	work->iov[0].iov_len = sizeof(__be32);
++	work->iov[1].iov_base = out + sizeof(__be32);
++	work->iov[1].iov_len = compressed_pdu_len;
++	work->iov_cnt = 2;
++	work->iov_idx = 1;
++	out = NULL;
++	rc = 1;
++out:
++	kvfree(out);
++	kvfree(src);
++	return rc;
 +}
 diff --git a/fs/smb/server/compress.h b/fs/smb/server/compress.h
-new file mode 100644
-index 000000000000..49b36d931aac
---- /dev/null
+index 49b36d931aac..663c6f44f09b 100644
+--- a/fs/smb/server/compress.h
 +++ b/fs/smb/server/compress.h
-@@ -0,0 +1,15 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * SMB2 compression support for ksmbd.
-+ *
-+ * Copyright (C) 2026 Namjae Jeon <linkinjeon@kernel.org>
-+ */
-+#ifndef __KSMBD_COMPRESS_H__
-+#define __KSMBD_COMPRESS_H__
-+
-+#include "connection.h"
-+#include "../common/compress/compress.h"
-+
-+int ksmbd_decompress_request(struct ksmbd_conn *conn);
-+
-+#endif /* __KSMBD_COMPRESS_H__ */
-diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index 8347495dbc62..9e8fdb39e5a2 100644
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -12,6 +12,7 @@
- #include "smb_common.h"
- #include "mgmt/ksmbd_ida.h"
- #include "connection.h"
-+#include "compress.h"
- #include "transport_tcp.h"
- #include "transport_rdma.h"
- #include "misc.h"
-@@ -531,6 +532,17 @@ int ksmbd_conn_handler_loop(void *p)
- 			continue;
- 		}
+@@ -11,5 +11,6 @@
+ #include "../common/compress/compress.h"
  
-+		if (((struct smb2_hdr *)smb_get_msg(conn->request_buf))->ProtocolId ==
-+		    SMB2_COMPRESSION_TRANSFORM_ID) {
-+			/*
-+			 * Convert the transform into a normal RFC1002-framed SMB2
-+			 * request before protocol validation and work allocation.
-+			 */
-+			if (ksmbd_decompress_request(conn))
-+				break;
-+			pdu_size = get_rfc1002_len(conn->request_buf);
-+		}
-+
- 		if (!ksmbd_smb_request(conn))
- 			break;
+ int ksmbd_decompress_request(struct ksmbd_conn *conn);
++int ksmbd_compress_response(struct ksmbd_work *work);
  
-diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
-index e074be942582..ec75633b7da0 100644
---- a/fs/smb/server/connection.h
-+++ b/fs/smb/server/connection.h
-@@ -115,6 +115,9 @@ struct ksmbd_conn {
- 
- 	__le16				cipher_type;
- 	__le16				compress_algorithm;
-+	/* Negotiated SMB 3.1.1 compression capabilities. */
-+	bool				compress_chained;
-+	bool				compress_pattern;
- 	bool				posix_ext_supported;
- 	bool				signing_negotiated;
- 	__le16				signing_algorithm;
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 7e61377a16bb..86309dc70a62 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -41,6 +41,7 @@
- #include "ndr.h"
- #include "stats.h"
- #include "transport_tcp.h"
-+#include "compress.h"
- 
- static void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
- {
-@@ -803,6 +804,30 @@ static void build_encrypt_ctxt(struct smb2_encryption_neg_context *pneg_ctxt,
- 	pneg_ctxt->Ciphers[0] = cipher_type;
- }
- 
-+static void build_compress_ctxt(struct smb2_compression_capabilities_context *pneg_ctxt,
-+				__le16 compress_algorithm, bool compress_chained,
-+				bool compress_pattern)
-+{
-+	/*
-+	 * Return only algorithms implemented by ksmbd. Pattern_V1 is advertised
-+	 * as a second ID when the client also enabled chained transforms.
-+	 */
-+	pneg_ctxt->ContextType = SMB2_COMPRESSION_CAPABILITIES;
-+	pneg_ctxt->DataLength = cpu_to_le16(compress_pattern ? 12 : 10);
-+	pneg_ctxt->Reserved = cpu_to_le32(0);
-+	pneg_ctxt->CompressionAlgorithmCount =
-+		cpu_to_le16(compress_pattern ? 2 : 1);
-+	pneg_ctxt->Padding = cpu_to_le16(0);
-+	pneg_ctxt->Flags = compress_chained ?
-+		SMB2_COMPRESSION_CAPABILITIES_FLAG_CHAINED :
-+		SMB2_COMPRESSION_CAPABILITIES_FLAG_NONE;
-+	pneg_ctxt->CompressionAlgorithms[0] = compress_algorithm;
-+	pneg_ctxt->CompressionAlgorithms[1] = compress_pattern ?
-+		SMB3_COMPRESS_PATTERN : 0;
-+	pneg_ctxt->CompressionAlgorithms[2] = 0;
-+	pneg_ctxt->CompressionAlgorithms[3] = 0;
-+}
-+
- static void build_sign_cap_ctxt(struct smb2_signing_capabilities *pneg_ctxt,
- 				__le16 sign_algo)
- {
-@@ -864,8 +889,19 @@ static unsigned int assemble_neg_contexts(struct ksmbd_conn *conn,
- 		ctxt_size += sizeof(struct smb2_encryption_neg_context) + 2;
+ #endif /* __KSMBD_COMPRESS_H__ */
+diff --git a/fs/smb/server/ksmbd_work.c b/fs/smb/server/ksmbd_work.c
+index ab4958dc3eb0..a5ab6799a65c 100644
+--- a/fs/smb/server/ksmbd_work.c
++++ b/fs/smb/server/ksmbd_work.c
+@@ -53,6 +53,7 @@ void ksmbd_free_work_struct(struct ksmbd_work *work)
  	}
  
--	/* compression context not yet supported */
--	WARN_ON(conn->compress_algorithm != SMB3_COMPRESS_NONE);
-+	if (conn->compress_algorithm != SMB3_COMPRESS_NONE) {
-+		ctxt_size = round_up(ctxt_size, 8);
-+		ksmbd_debug(SMB,
-+			    "assemble SMB2_COMPRESSION_CAPABILITIES context\n");
-+		build_compress_ctxt((struct smb2_compression_capabilities_context *)
-+				    (pneg_ctxt + ctxt_size),
-+				    conn->compress_algorithm,
-+				    conn->compress_chained,
-+				    conn->compress_pattern);
-+		neg_ctxt_cnt++;
-+		ctxt_size += sizeof(struct smb2_neg_context) +
-+			(conn->compress_pattern ? 12 : 10);
+ 	kfree(work->tr_buf);
++	kvfree(work->compress_buf);
+ 	kvfree(work->request_buf);
+ 	kfree(work->iov);
+ 
+diff --git a/fs/smb/server/ksmbd_work.h b/fs/smb/server/ksmbd_work.h
+index d36393ff8310..0da8cc0972d6 100644
+--- a/fs/smb/server/ksmbd_work.h
++++ b/fs/smb/server/ksmbd_work.h
+@@ -67,12 +67,16 @@ struct ksmbd_work {
+ 	unsigned int                    response_sz;
+ 
+ 	void				*tr_buf;
++	/* Contiguous SMB2 compression transform owned by this work item. */
++	void				*compress_buf;
+ 
+ 	unsigned char			state;
+ 	/* No response for cancelled request */
+ 	bool                            send_no_response:1;
+ 	/* Request is encrypted */
+ 	bool                            encrypted:1;
++	/* READ response should be wrapped in a compression transform. */
++	bool                            compress_response:1;
+ 	/* Is this SYNC or ASYNC ksmbd_work */
+ 	bool                            asynchronous:1;
+ 	bool                            need_invalidate_rkey:1;
+diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+index 5d799b2d4c62..36feda7e0942 100644
+--- a/fs/smb/server/server.c
++++ b/fs/smb/server/server.c
+@@ -22,6 +22,7 @@
+ #include "crypto_ctx.h"
+ #include "auth.h"
+ #include "stats.h"
++#include "compress.h"
+ 
+ int ksmbd_debug_types;
+ 
+@@ -244,6 +245,15 @@ static void __handle_ksmbd_work(struct ksmbd_work *work,
+ 	if (work->tcon)
+ 		ksmbd_tree_connect_put(work->tcon);
+ 	smb3_preauth_hash_rsp(work);
++	/*
++	 * Preauthentication hashes cover the original SMB2 response. Apply the
++	 * transport compression wrapper only after updating the hash.
++	 */
++	if (work->compress_response) {
++		rc = ksmbd_compress_response(work);
++		if (rc < 0)
++			ksmbd_debug(CONN, "Failed to compress response: %d\n", rc);
 +	}
- 
- 	if (conn->posix_ext_supported) {
- 		ctxt_size = round_up(ctxt_size, 8);
-@@ -969,10 +1005,59 @@ bool smb3_encryption_negotiated(struct ksmbd_conn *conn)
- 	    conn->cipher_type;
- }
- 
--static void decode_compress_ctxt(struct ksmbd_conn *conn,
--				 struct smb2_compression_capabilities_context *pneg_ctxt)
-+static __le32 decode_compress_ctxt(struct ksmbd_conn *conn,
-+				   struct smb2_compression_capabilities_context *pneg_ctxt,
-+				   int ctxt_len)
- {
-+	int alg_cnt, algs_size, i;
-+
-+	if (sizeof(struct smb2_neg_context) + 10 > ctxt_len) {
-+		pr_err("Invalid SMB2_COMPRESSION_CAPABILITIES context length\n");
-+		return STATUS_INVALID_PARAMETER;
-+	}
-+
- 	conn->compress_algorithm = SMB3_COMPRESS_NONE;
-+	conn->compress_chained = false;
-+	conn->compress_pattern = false;
-+
-+	alg_cnt = le16_to_cpu(pneg_ctxt->CompressionAlgorithmCount);
-+	if (!alg_cnt)
-+		return STATUS_INVALID_PARAMETER;
-+
-+	if (pneg_ctxt->Flags != SMB2_COMPRESSION_CAPABILITIES_FLAG_NONE &&
-+	    pneg_ctxt->Flags != SMB2_COMPRESSION_CAPABILITIES_FLAG_CHAINED)
-+		return STATUS_INVALID_PARAMETER;
-+
-+	algs_size = alg_cnt * sizeof(__le16);
-+	if (sizeof(struct smb2_neg_context) + 8 + algs_size > ctxt_len) {
-+		pr_err("Invalid compression algorithm count(%d)\n", alg_cnt);
-+		return STATUS_INVALID_PARAMETER;
-+	}
-+
-+	for (i = 0; i < alg_cnt; i++) {
-+		__le16 alg = pneg_ctxt->CompressionAlgorithms[i];
-+
-+		/*
-+		 * LZ77 is the required general-purpose codec. Pattern_V1 is an
-+		 * optional chained payload type and cannot stand alone.
-+		 */
-+		if (alg == SMB3_COMPRESS_LZ77) {
-+			conn->compress_algorithm = alg;
-+			conn->compress_chained =
-+				pneg_ctxt->Flags ==
-+				SMB2_COMPRESSION_CAPABILITIES_FLAG_CHAINED;
-+			ksmbd_debug(SMB, "Compression Algorithm ID = 0x%x\n",
-+				    le16_to_cpu(alg));
-+		} else if (alg == SMB3_COMPRESS_PATTERN) {
-+			conn->compress_pattern = true;
-+		}
-+	}
-+
-+	if (conn->compress_algorithm == SMB3_COMPRESS_NONE ||
-+	    !conn->compress_chained)
-+		conn->compress_pattern = false;
-+
-+	return STATUS_SUCCESS;
- }
- 
- static void decode_sign_cap_ctxt(struct ksmbd_conn *conn,
-@@ -1020,6 +1105,7 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
- 	unsigned int offset = le32_to_cpu(req->NegotiateContextOffset);
- 	unsigned int neg_ctxt_cnt = le16_to_cpu(req->NegotiateContextCount);
- 	__le32 status = STATUS_INVALID_PARAMETER;
-+	int compress_ctxt_cnt = 0;
- 
- 	ksmbd_debug(SMB, "decoding %d negotiate contexts\n", neg_ctxt_cnt);
- 	if (len_of_smb <= offset) {
-@@ -1065,11 +1151,16 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
- 		} else if (pctx->ContextType == SMB2_COMPRESSION_CAPABILITIES) {
- 			ksmbd_debug(SMB,
- 				    "deassemble SMB2_COMPRESSION_CAPABILITIES context\n");
--			if (conn->compress_algorithm)
-+			if (compress_ctxt_cnt++) {
-+				status = STATUS_INVALID_PARAMETER;
- 				break;
-+			}
- 
--			decode_compress_ctxt(conn,
--					     (struct smb2_compression_capabilities_context *)pctx);
-+			status = decode_compress_ctxt(conn,
-+				(struct smb2_compression_capabilities_context *)
-+				pctx, ctxt_len);
-+			if (status != STATUS_SUCCESS)
-+				break;
- 		} else if (pctx->ContextType == SMB2_NETNAME_NEGOTIATE_CONTEXT_ID) {
- 			ksmbd_debug(SMB,
- 				    "deassemble SMB2_NETNAME_NEGOTIATE_CONTEXT_ID context\n");
-@@ -2060,6 +2151,10 @@ int smb2_tree_connect(struct ksmbd_work *work)
- 	rsp->Reserved = 0;
- 	/* default manual caching */
- 	rsp->ShareFlags = SMB2_SHAREFLAG_MANUAL_CACHING;
-+	/* Tell the client that READ requests may request compressed responses. */
-+	if (conn->dialect == SMB311_PROT_ID &&
+ 	if (work->sess && work->sess->enc && work->encrypted &&
+ 	    conn->ops->encrypt_resp) {
+ 		rc = conn->ops->encrypt_resp(work);
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 86309dc70a62..5d5f868e7817 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -7097,6 +7097,15 @@ int smb2_read(struct ksmbd_work *work)
+ 		kvfree(aux_payload_buf);
+ 		goto out;
+ 	}
++	/*
++	 * RDMA responses are transferred through channel buffers and encrypted
++	 * responses use the encryption transform, so only normal SMB transport
++	 * responses are candidates for compression.
++	 */
++	if (!is_rdma_channel && nbytes &&
++	    (req->Flags & SMB2_READFLAG_REQUEST_COMPRESSED) &&
 +	    conn->compress_algorithm != SMB3_COMPRESS_NONE)
-+		rsp->ShareFlags |= cpu_to_le32(SMB2_SHAREFLAG_COMPRESS_DATA);
++		work->compress_response = true;
+ 	ksmbd_fd_put(work, fp);
+ 	return 0;
  
- 	rc = ksmbd_iov_pin_rsp(work, rsp, sizeof(struct smb2_tree_connect_rsp));
- 	if (rc)
-diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-index 82de4fdfe446..7de73223189a 100644
---- a/fs/smb/server/smb_common.c
-+++ b/fs/smb/server/smb_common.c
-@@ -185,11 +185,6 @@ bool ksmbd_smb_request(struct ksmbd_conn *conn)
- 		return false;
- 
- 	proto = (__le32 *)smb_get_msg(conn->request_buf);
--	if (*proto == SMB2_COMPRESSION_TRANSFORM_ID) {
--		pr_err_ratelimited("smb2 compression not support yet");
--		return false;
--	}
--
- 	if (*proto != SMB1_PROTO_NUMBER &&
- 	    *proto != SMB2_PROTO_NUMBER &&
- 	    *proto != SMB2_TRANSFORM_PROTO_NUM)
 -- 
 2.25.1
 
