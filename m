@@ -1,67 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1CA17A305
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Jun 2026 00:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FFE335BA
+	for <linux-cifs@vger.kernel.org>; Wed, 10 Jun 2026 00:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781051023; cv=none; b=X3gZryGRF2TcmvOTHVENAdLHbvjBc/zyTZoKuHx6vlM9qe9nsQDmqkpRmTWwxvRex/cnMnLZOMrz/GPkHfzBbDa9JZscyD5agxNLxIJFgqy8/CvrwFEGDwihFsp+BSlmQSkS8V/AyYlnBJFIN3TsjV6Ar/W1GwYyBRxqyA+LiOc=
+	t=1781052498; cv=none; b=X0Z3EIhwlI4DMDQdXSt7MQuEFMUEThB3DMznaNr3U2tkQk54xR7V2eMtpeiOJ3nW2K7PLAdZftFU4OC39xxrLwJMjsz1dvbkZqgeUYuYRmKdyLECrIseMSwFfS3N3AP21l2+y56HFPt73/u//KfPFtAr2Ss1Bxfs0cunP9llkdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781051023; c=relaxed/simple;
-	bh=PJG1w2d1W/a3t5veQf3n86qTeMEYX+FrclQ1NsOvJN0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qHGqGRdteyoQZBjEo7dpMa1GK9jlvarsYXYtoggER3DaQJ1vMd18S4IykIzT4FXJlXvIU06W22oqEHjLz9VJEkdRUezgLPyH668y9AL3cahHymaRsWzep+2sXWMtfZns7Ud/r6UycTrtMxyeznRAqScF2hMR99o8Ok5ZESK/ito=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JzGDvC+U; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781052498; c=relaxed/simple;
+	bh=vfJQsbxYjfUK4lXNLp4DHHv+9Do7Tlqjav0uwPJhgVs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S2OwbekJmsTX2tsk6xyzGtcpUJf/ngzRNwy1MHie5h8/khyBYYxUYF6Tk3z1zza1fuaCh6yRYOCGToO9BObxW/9UKYRCIMAKhukQJSBaQ2YRTrDAivpIexYISf1JTUYL8QcSLREmuAawGHe7LXzYrv5QYpREpzmU6xb/rleRrHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=CMX2VXk3; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JzGDvC+U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A83F1F00893
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Jun 2026 00:23:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781051022;
-	bh=PJG1w2d1W/a3t5veQf3n86qTeMEYX+FrclQ1NsOvJN0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=JzGDvC+UZcOgKTy4u8fB4A1b8u1rt/hbhBQUThS83uKw2apKcO0aGgkUKnBgWKIIF
-	 kvdv5dacVw9YIjVJGaF5D9wkmWn5i5813o5h8DDG/73eTB/Avnowcu3bjcI+DTCIBL
-	 E2WVHq1KpyTVSwCedqSBVfFZtIZk88YJkyl7dCiOrf8UpZJphvZzVkS6V8WV+GdaJT
-	 7dpjGTTGR9oV870WfenVenMqv1ZWHhYsIrh6tUTDoksGVtswN5xKMW/27dibO9IWyv
-	 jmO6D9+0SBHqKF2d8lTSQKznDvyZjv6yD61YtxUNnC06kMj1JNJ+RmvOMdJQpr588Y
-	 9jMnPiZMMNbCA==
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-beeba001887so819897066b.3
-        for <linux-cifs@vger.kernel.org>; Tue, 09 Jun 2026 17:23:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9oXv+QrPa3lCW9SA9rKn0sw7f1LYIfokRPSkZnWrb8BjXNSPhlC8yNHHE1+/gFW8QiZPcQDGWUwHj4@vger.kernel.org
-X-Gm-Message-State: AOJu0YyI8qMqrd/2kwZDIhC4TSm0m8eNfmus50+aJAeDCT0RWfrgkMl2
-	IIU5Q9irtfjKT9O0cimQFtzX73ZzsybkRWRZFNqpM9UGO3GyG/h386LOO8foM8xNcmGSNrDZzg4
-	29afjyVfq5zlRoptH3TnFYo0ftdUi+4A=
-X-Received: by 2002:a17:907:608b:b0:bec:9f90:629d with SMTP id
- a640c23a62f3a-bf3743ea8d5mr1371195466b.39.1781051021329; Tue, 09 Jun 2026
- 17:23:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="CMX2VXk3"
+Message-ID: <f150473b-549b-48eb-8f33-3a79e58d6547@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1781052492;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=quZk+e6xPQzeJrwMYlm2pT+TJnJHXeJQjAGye8+nAs8=;
+	b=CMX2VXk3IQ/hNupBQ1rqjz7xae6ymPqrrkQwN7Waa359j5jV0XE17Qf249V/yiSGhdE01G
+	uubRA9Dat+wh94GzM8DXV4Q2VTENEi4HzX/s/eMjlhonuMxvSBLjvB5d5zyMZn7nj3TEH4
+	nqyDu+EDqKtC0QOLAiQQMhbNNZ7LJwnQo7QtyEcsqNrbI8ovutNM8p+7ZVmaqH8CdvQ1OL
+	6SpQS9EuK6sOhxhUu0sct8VYPmFDmZ3MWdCxIu3Jw5YzN5SvUsZcpvLXcSQbvTGnE4KUXI
+	fA1J5Rv6Tw1hWB+sSxSLfuhFz+N5/KbciaESnVuRtAeLbOmAsEhnFchJWokbvg==
+Date: Wed, 10 Jun 2026 08:45:39 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5muMKwYGGAcBN_LQcE2zhd-+Kk+fKsRiTokpYXwZoGS68A@mail.gmail.com>
- <069dbbfd-e3f7-4566-a7ef-624e56aea46a@chenxiaosong.com>
-In-Reply-To: <069dbbfd-e3f7-4566-a7ef-624e56aea46a@chenxiaosong.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 10 Jun 2026 09:23:29 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd852AzX8PAo8joXSOeDqTYgbgoiz98sALduLOTh1BTTdw@mail.gmail.com>
-X-Gm-Features: AVVi8CeKHmP8vIj1F3RBMpSLji7qrhCWCriFA3hrPos2hMtY3rVlsHf54bTgNwA
-Message-ID: <CAKYAXd852AzX8PAo8joXSOeDqTYgbgoiz98sALduLOTh1BTTdw@mail.gmail.com>
-Subject: Re: xfstest generic/035
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: generic/004 server bug
+To: Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>
+Cc: Paulo Alcantara <pc@manguebit.org>, CIFS <linux-cifs@vger.kernel.org>
+References: <CAH2r5mvP9s_KMc2G-_AsP__G0S5JCmrigOT-7U_ZNu1pLf+Q2g@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAH2r5mvP9s_KMc2G-_AsP__G0S5JCmrigOT-7U_ZNu1pLf+Q2g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 10, 2026 at 9:14=E2=80=AFAM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
->
-> Hi Namjae,
-Hi ChenXiaoSong,
->
-> Is anyone currently working on this issue? If not, I'm planning to spend
-> some time looking into it.
-I haven't started yet. I would be really grateful if you could take a
-look at this problem!
+To help others who run into this issue resolve it more quickly, here is 
+a link to my fix patch: 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4ec9c8e023c7
+
+On 5/11/26 05:36, Steve French wrote:
+> I noticed generic/004 fails to ksmbd, likely server bug since it works
+> to Samba and Windows and Azure.   Test generic/004 was recently
+> enabled when O_TMPFILE support was added by Paulo.
+> 
+> Ideas welcome on the ksmbd problem this found.
+> 
+
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: chenxiaosong.com
+English Homepage: chenxiaosong.com/en
+
